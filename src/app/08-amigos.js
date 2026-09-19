@@ -206,7 +206,7 @@
       + '<h1>Começou um novo propósito dos amigos!</h1>'
       + '<div class="dupla-nomeada">'
       + '<span>' + retrato(eu(), 'enorme') + '<b>Você</b></span>'
-      + '<span class="chama-meio">' + CC.arte.chama(false) + '</span>'
+      + '<span class="chama-meio">' + CC.icoChama() + '</span>'
       + '<span>' + retrato(amigo, 'enorme') + '<b>' + CC.esc(amigo.nome) + '</b></span></div>'
       + '<p class="frase-cena">A contagem sobe nos dias em que vocês dois fazem a lição.</p></div>', {
       classe: 'tela-proposito',
@@ -409,7 +409,7 @@
     let extra = '';
     if (ev.tipo === 'ofensiva') {
       frase = quem + ' chegou a <b>' + d.dias + ' dias de ofensiva</b>!';
-      arte = CC.arte.chama(false);
+      arte = CC.icoChama();
     } else if (ev.tipo === 'conquista') {
       const c = CC.conquistasComNivel().find((x) => x.id === d.id);
       const titulo = c ? c.titulo : 'uma conquista';
@@ -434,14 +434,14 @@
       frase = ev.tipo === 'novoProposito'
         ? 'Você e ' + CC.esc(outro ? outro.nome : 'um amigo') + ' começaram um <b>propósito</b>!'
         : 'Você e ' + CC.esc(outro ? outro.nome : 'um amigo') + ' chegaram a <b>' + d.dias + ' dias de propósito</b>!';
-      arte = CC.arte.chama(false);
+      arte = CC.icoChama();
     } else if (ev.tipo === 'semeador') {
       const artes = ['broto', 'bronze', 'prata', 'ouro', 'igreja'];
       frase = quem + ' chegou ao nível <b>' + CC.esc(d.nome || '') + '</b> da Trilha do Semeador!';
       arte = CC.arte.semeador(artes[(Number(d.nivel) || 1) - 1] || 'broto', true);
     } else if (ev.tipo === 'propositoGrupo') {
       frase = 'O grupo <b>' + CC.esc(d.titulo || 'de vocês') + '</b> chegou a <b>' + CC.plural(Number(d.dias) || 0, 'dia', 'dias') + '</b> de meta batida!';
-      arte = CC.arte.chama(false);
+      arte = CC.icoChama();
     }
     const reacao = '<button class="botao-reagir' + (ev.euReagi ? ' ligado' : '') + '" data-celebrar="' + CC.esc(ev.id) + '" aria-pressed="' + ev.euReagi + '">'
       + CC.ico('aperto') + '<b>' + (ev.total || '') + '</b><span class="so-leitor">Celebrar</span></button>';

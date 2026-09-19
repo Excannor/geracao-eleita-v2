@@ -44,6 +44,11 @@ services:
   # "network_mode: service:caminho" põe os dois na mesma pilha de rede, então no painel
   # da Cloudflare o serviço aponta para http://localhost:8080 — e não para a porta 8082,
   # que é só o mapeamento para fora, no host.
+  #
+  # ATENÇÃO ao publicar: recriar o container "caminho" destrói a pilha de rede que este
+  # aqui usa, e o túnel fica órfão ("network is unreachable"), no ar mas sem servir nada.
+  # Depois de todo deploy, reinicie os dois:
+  #   docker compose up -d --build && docker compose restart tunel-fixo
   tunel-fixo:
     image: cloudflare/cloudflared:latest
     container_name: geracao-eleita-tunel-fixo

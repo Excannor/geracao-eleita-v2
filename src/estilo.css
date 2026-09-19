@@ -834,7 +834,10 @@ button { font-family: inherit; }
 /* o dia de hoje: anel que respira em volta do nó */
 .no .anel-atual {
   position: absolute;
-  inset: -11px -12px -16px;
+  /* Igual nos quatro lados. Era mais folgado embaixo (-16px) para dar passagem ao relevo
+     3D que ficava sob o nó; o relevo saiu no redesenho e a folga virou um anel torto,
+     com a barriga para baixo. */
+  inset: -12px;
   border-radius: 50%;
   /* o halo é sempre do tom de hoje: é ele quem diz "hoje", não a cor da unidade */
   border: 6px solid color-mix(in srgb, var(--hoje) 32%, transparent);
@@ -924,6 +927,11 @@ button { font-family: inherit; }
   color: var(--tinta);
   cursor: pointer;
 }
+/* Só o fim de unidade ganha anel: é o único ponto da trilha que fecha um capítulo, e o
+   anel marca isso sem gastar cor. O baú fica sem, porque já se destaca sozinho — é a
+   única peça em madeira no meio de nós de petróleo. */
+.no-marco { padding: 9px; border-radius: 50%; box-shadow: 0 0 0 3px color-mix(in srgb, var(--inverso) 30%, transparent); }
+.no-marco.ganho { box-shadow: 0 0 0 3.5px var(--inverso); }
 .no-bau svg { width: 76px; height: auto; }
 .no-bau.pronto svg { animation: bau-chama 2.6s ease-in-out infinite; transform-origin: 50% 90%; }
 .no-bau.travado svg { opacity: .8; }
@@ -1176,7 +1184,7 @@ button { font-family: inherit; }
 .arte-chama { width: 140px; height: auto; color: var(--tinta); overflow: visible; }
 .arte-chama .fogo { transform-box: fill-box; transform-origin: 50% 100%; }
 .arte-chama .brilho-fogo { transform-box: fill-box; transform-origin: 50% 50%; }
-.chama-palco .arte-chama { width: 170px; animation: surgir-lamparina .6s var(--mola) both; }
+.chama-palco .ico-chama { width: 150px; height: 150px; animation: surgir-lamparina .6s var(--mola) both; }
 .chama-palco .arte-chama .fogo { animation: acender .8s var(--mola) .35s both, tremular 2.2s ease-in-out 1.3s infinite; }
 .chama-palco .arte-chama .brilho-fogo { animation: brilhar 2.2s ease-in-out 1s infinite; }
 @keyframes surgir-lamparina { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
@@ -1418,13 +1426,18 @@ button { font-family: inherit; }
 .cartao-versiculo {
   position: relative;
   margin: 10px 0 16px;
-  padding: 26px 20px 18px;
+  padding: 30px 22px 20px;
   border-radius: var(--raio-g);
-  background: linear-gradient(160deg, var(--azul-fraco), var(--amarelo-fraco));
+  /* Mesmo par do cartão de oração. Antes ia de --azul-fraco a --amarelo-fraco, que na
+     paleta nova são o mesmo tom: o gradiente degradava de uma cor para ela mesma e o
+     cartão saía chapado. */
+  background: linear-gradient(160deg, var(--acento-fraco), var(--fundo-2));
   text-align: left;
   animation: entrar-cena .5s var(--suave);
 }
-.cartao-versiculo .aspas { position: absolute; top: -6px; left: 16px; color: var(--azul); font-size: 4rem; font-weight: 900; line-height: 1; opacity: .5; }
+/* Alinhada com o texto, não colada na borda: a aspas ficava 6px à esquerda do parágrafo
+   e dava impressão de que o cartão inteiro estava torto. */
+.cartao-versiculo .aspas { position: absolute; top: 0; left: 22px; color: var(--acento); font-size: 3.4rem; font-weight: 900; line-height: 1; opacity: .38; }
 .cartao-versiculo blockquote { position: relative; margin: 0; color: var(--tinta-forte); font-size: 1.15rem; font-weight: 700; line-height: 1.55; }
 .cartao-versiculo figcaption { margin-top: 10px; color: var(--tinta-fraca); font-size: 0.86rem; font-weight: 800; }
 .cartao-versiculo figcaption b { color: var(--tinta); }
@@ -1784,7 +1797,7 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .cabeca-amigo h2 { margin: 0; }
 .cabeca-amigo .conta { display: block; color: var(--tinta-fraca); font-weight: 700; }
 .recomeco { display: grid; justify-items: center; gap: 8px; text-align: center; }
-.recomeco svg { width: 120px; height: auto; color: var(--tinta); }
+.recomeco .ico-chama { width: 104px; height: 104px; }
 
 /* Bolha de texto, sem mais o mascote ao lado: o mesmo tratamento que o balão do nó de hoje
    já usava (.pop-no .fala-bento), agora aplicado direto no <p>/<h2>, sem wrapper nem ícone. */
@@ -1915,7 +1928,7 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
    ========================================================================= */
 .folha-ofensiva { display: grid; gap: 14px; }
 .chama-grande { display: grid; justify-items: center; color: var(--chama); }
-.chama-grande .arte-chama { width: 104px; }
+.chama-grande .ico-chama { width: 96px; height: 96px; }
 .chama-grande .arte-chama .fogo { animation: acender .7s var(--mola) both, tremular 2.2s ease-in-out 1s infinite; }
 .chama-grande b { font-size: 2.8rem; font-weight: 900; line-height: 1.05; }
 .chama-grande span { color: var(--tinta-forte); font-weight: 800; }

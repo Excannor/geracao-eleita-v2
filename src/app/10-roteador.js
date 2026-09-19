@@ -80,7 +80,7 @@
 
     const est = CC.estagioDaChama(seq.atual);
     CC.folha('<div class="folha-ofensiva">'
-      + '<div class="chama-grande' + (seq.atual ? '' : ' apagada') + '">' + CC.arte.lamparina(seq.atual, { recorde: seq.recorde }) + '<b>' + seq.atual + '</b>'
+      + '<div class="chama-grande' + (seq.atual ? '' : ' apagada') + '">' + CC.icoChama(seq.atual) + '<b>' + seq.atual + '</b>'
       + '<span>' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + (seq.atual ? '!' : '') + '</span></div>'
       + '<p class="estagio-chama"><b>' + est.nome + '</b> · ' + est.ref + '<br><span>' + est.frase + '</span>'
       + (est.proximo ? '<br><small>' + CC.plural(est.faltam, 'dia', 'dias') + ' para ' + est.proximo.nome + '</small>' : '') + '</p>'
@@ -217,7 +217,7 @@
     }
     if (seq.zerouEm && !seq.feitoHoje && seq.zerouEm >= CC.somaDias(hoje, -14) && lerLocal('cc.aviso.zerou') !== dono + ':' + seq.zerouEm) {
       gravarLocal('cc.aviso.zerou', dono + ':' + seq.zerouEm);
-      CC.folha('<div class="recomeco">' + CC.arte.lamparina(0) + '<h2>O pavio ainda fumega</h2>'
+      CC.folha('<div class="recomeco">' + CC.icoChama(0) + '<h2>O pavio ainda fumega</h2>'
         + '<p>O azeite que você guardou não se perdeu: tudo o que leu continua aqui, e o seu recorde de '
         + CC.plural(seq.recorde, 'dia', 'dias') + ' também. Hoje é um novo dia para acender de novo.</p></div>'
         + '<div class="acoes"><button class="botao" data-ler>Reavivar hoje</button>'

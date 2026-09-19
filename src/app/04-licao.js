@@ -441,7 +441,7 @@
     return {
       semTopo: true,
       corpo: '<div class="resumo-dia">'
-        + '<div class="chama-palco">' + CC.arte.faiscas() + CC.arte.lamparina(seq.atual) + '</div>'
+        + '<div class="chama-palco">' + CC.arte.faiscas() + CC.icoChama(seq.atual) + '</div>'
         + '<b class="numero-ofensiva" data-de="' + (subiuHoje ? sessao.antes.ofensiva : seq.atual) + '">' + (subiuHoje ? sessao.antes.ofensiva : seq.atual) + '</b>'
         + '<h1 class="rotulo-ofensiva">' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + '</h1>'
         + '<p class="passo-dica">Dia ' + sessao.dia + ' · ' + CC.esc(CC.passagemDe(dia)) + '</p>'
