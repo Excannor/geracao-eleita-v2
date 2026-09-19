@@ -289,7 +289,7 @@ button { font-family: inherit; }
 .contador.ofensiva { gap: 6px; margin: 0 auto; padding: 4px 12px 6px 8px; color: var(--tinta-fraca); align-items: flex-end; }
 .contador.ofensiva span, .contador.ofensiva small { line-height: 1; padding-bottom: 5px; }
 .contador.ofensiva small { padding-bottom: 6px; }
-.contador.ofensiva .ico-chama { width: 40px; height: 35px; }
+.contador.ofensiva .ico-chama { width: 34px; height: 34px; }
 .contador.ofensiva span { color: var(--tinta-forte); font-size: 1.1rem; font-weight: 900; }
 .contador.ofensiva small { color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 800; }
 .contador.ofensiva.ativo span, .contador.ofensiva.ativo small { color: var(--chama-texto); }
@@ -2606,18 +2606,26 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
    ========================================================================= */
 /* ícone da lamparina no meio do texto (dias juntos, propósitos, listas) */
 .ico-chama { width: 1.3em; height: 1.3em; vertical-align: -0.3em; flex: 0 0 auto; }
-/* O fogo tremula: bem de leve e fora de compasso entre a chama e o miolo, senão vira um
-   pisca-pisca. A chama apagada não tremula — não há o que tremular. */
-.ico-chama:not(.apagada) .fogo { animation: fogo-tremula 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 88%; }
-.ico-chama:not(.apagada) .miolo { animation: fogo-miolo 1.9s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 88%; }
+/* O fogo dança. Presa na base (origem em 50% 96%), a chama estica e encolhe na vertical,
+   se aperta na horizontal e balança de leve — fogo sobe, não infla no meio. Os dois ciclos
+   têm períodos diferentes e primos entre si (1,7s e 1,1s), então saem de compasso e não
+   repetem o mesmo quadro: é isso que tira a cara de pisca-pisca mecânico.
+   A amplitude é generosa de propósito: num ícone de 35px no topo, variação de 5% não se vê.
+   A chama apagada não anima — não há o que tremular num pavio que fumega. */
+.ico-chama:not(.apagada) .fogo { animation: fogo-tremula 1.7s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 96%; }
+.ico-chama:not(.apagada) .miolo { animation: fogo-miolo 1.1s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 96%; }
 @keyframes fogo-tremula {
-  0%, 100% { transform: scaleY(1) scaleX(1); }
-  35% { transform: scaleY(1.06) scaleX(.97); }
-  65% { transform: scaleY(.97) scaleX(1.03); }
+  0%, 100% { transform: scale(1, 1) rotate(0deg); }
+  17% { transform: scale(.94, 1.13) rotate(-2.4deg); }
+  35% { transform: scale(1.07, .95) rotate(1.8deg); }
+  54% { transform: scale(.97, 1.09) rotate(-1.2deg); }
+  76% { transform: scale(1.04, .97) rotate(2.2deg); }
 }
 @keyframes fogo-miolo {
-  0%, 100% { opacity: 1; transform: scaleY(1); }
-  40% { opacity: .82; transform: scaleY(1.1); }
+  0%, 100% { opacity: .95; transform: scale(1, 1); }
+  25% { opacity: .66; transform: scale(.88, 1.22); }
+  50% { opacity: 1; transform: scale(1.08, .9); }
+  75% { opacity: .74; transform: scale(.93, 1.14); }
 }
 /* balão do baú pronto: mesmo balão do "Começar", na cor de conquista */
 .balao.balao-bau { color: var(--amarelo-3d); }
