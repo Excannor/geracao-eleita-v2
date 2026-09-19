@@ -4,22 +4,25 @@
 
   const D = CC.D;
 
+  // Nenhuma categoria usa "vermelho". Na paleta nova ele é a cor de erro, a única que
+  // carrega significado próprio no app; gasto como cor de categoria, deixa de avisar
+  // quando precisa. Livros, Alianças e Oração eram vermelhos e saíram dele.
   const ESTILO_SECAO = {
     '01 - Trilha do Recém-Batizado': ['bandeira', 'azul'],
     '05 - Hermenêutica': ['bussola', 'roxo'],
     '15 - Fios Bíblicos': ['elo', 'turquesa'],
-    '03 - Livros da Bíblia': ['livro', 'vermelho'],
+    '03 - Livros da Bíblia': ['livro', 'turquesa'],
     '08 - Versículos': ['marcador', 'amarelo'],
     '06 - Estudos Temáticos': ['camadas', 'roxo'],
     '11 - Pessoas': ['pessoas', 'azul'],
     '12 - Eventos': ['calendario', 'verde'],
     '13 - Lugares': ['alfinete', 'turquesa'],
-    '14 - Alianças': ['aperto', 'vermelho'],
+    '14 - Alianças': ['aperto', 'amarelo'],
     '00 - Início': ['info', 'azul'],
     '02 - Plano de Leitura': ['trilha', 'verde'],
     '04 - Diário de Leitura': ['caneta', 'amarelo'],
     '07 - Reflexões': ['balao', 'roxo'],
-    '09 - Oração': ['aperto', 'vermelho'],
+    '09 - Oração': ['aperto', 'roxo'],
     '10 - Igreja': ['casa', 'azul'],
     '98 - Templates': ['folha', 'verde'],
   };
