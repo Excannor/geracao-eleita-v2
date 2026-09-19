@@ -1,0 +1,1053 @@
+// Servidor: serve dist/, guarda o progresso de cada conta em dados/ e cuida de
+// amizades, convites, toques e denúncias.
+// Uso: node servidor.mjs [porta]
+import { createServer } from 'node:http';
+import { readFile, writeFile, rename, stat, mkdir, readdir, unlink } from 'node:fs/promises';
+import { readFileSync, readdirSync, existsSync, writeFileSync, unlinkSync } from 'node:fs';
+import { join, dirname, extname, normalize, basename } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { networkInterfaces } from 'node:os';
+import { createHmac, randomBytes } from 'node:crypto';
+import { createContext, runInContext } from 'node:vm';
+import {
+  Contas, arquivoDoEstado, seloDaConta, limparNome, iguais, hojeNoFuso, fusoValido, somaDias,
+  datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA,
+} from './contas.mjs';
+import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs';
+import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
+import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
+import {
+  abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
+  backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado,
+} from './db.mjs';
+import {
+  Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio,
+  MAX_TOQUES_RECEBIDOS_DIA,
+} from './notificacoes.mjs';
+
+const AQUI = dirname(fileURLToPath(import.meta.url));
+const RAIZ = join(AQUI, 'dist');
+const PORTA = Number(process.argv[2]) || 8080;
+// CAMINHO_ESTADO permite testar sem encostar no progresso real de ninguém.
+const ESTADO = process.env.CAMINHO_ESTADO || join(AQUI, 'dados', 'estado.json');
+// A pasta de dados: o banco (caminho.db), os backups e as chaves moram aqui.
+const PASTA_DADOS = dirname(ESTADO);
+// Só as ferramentas de teste sobem o servidor aberto, sem conta nenhuma.
+const ABERTO_PARA_TESTE = process.env.CAMINHO_ABERTO === '1';
+
+// A chave do progresso de cada conta na tabela estados: o @ dela. O servidor aberto das
+// ferramentas de teste, sem conta, usa "caminho".
+const arquivoDe = (usuario) => limparNome(usuario) || 'caminho';
+const LIMITE = 4 * 1024 * 1024;
+
+const TIPOS = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.woff2': 'font/woff2',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
+};
+
+// ---------- as regras do aplicativo, as mesmas do navegador ----------
+// A fusão entre aparelhos e a conta da ofensiva com escudos moram em 02-estado.js.
+// O servidor carrega o mesmo arquivo, para os dois lados nunca discordarem.
+// O plano do conteúdo: os propósitos de livro precisam saber por onde cada dia passa.
+let PLANO_DO_CONTEUDO = [];
+function carregarRegras() {
+  const D = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conteudo.json'), 'utf8'));
+  PLANO_DO_CONTEUDO = D.plano;
+  const contexto = createContext({
+    window: { DADOS: D }, console, Date, Math, JSON, Object, Set, Map, Number, String, Array, Boolean, Intl,
+    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+    document: { documentElement: { dataset: {} }, querySelector: () => null },
+    fetch: () => Promise.reject(new Error('sem rede no servidor')),
+    setTimeout, clearTimeout, location: { protocol: 'file:' }, navigator: {}, addEventListener: () => {},
+  });
+  for (const f of ['01-nucleo.js', '02-estado.js', '02b-jogo.js']) {
+    runInContext(readFileSync(join(AQUI, 'src', 'app', f), 'utf8'), contexto, { filename: f });
+  }
+  return contexto.window.CC;
+}
+const REGRAS = carregarRegras();
+const TODOS_LIVROS = [...new Set(PLANO_DO_CONTEUDO.flatMap((d) => d.livros))];
+
+const json = (res, codigo, dados) => {
+  const corpo = Buffer.from(JSON.stringify(dados), 'utf8');
+  res.writeHead(codigo, {
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': corpo.length,
+    'cache-control': 'no-store',
+  });
+  res.end(corpo);
+};
+
+// ---------- progresso ----------
+// Mora na tabela estados do banco. A fusão entre aparelhos continua na rota /api/estado.
+async function lerEstado(chave) {
+  try { return lerEstadoDoBanco(DB, chave); } catch { return null; }
+}
+
+async function gravarEstado(dados, chave) {
+  gravarEstadoNoBanco(DB, chave, dados);
+}
+
+// Apaga o progresso de uma conta e as cópias dele: a linha no banco, a pessoa em cada
+// backup, e o que sobrou da época dos arquivos (cópias diárias e a pasta de legado).
+async function apagarProgressoDe(usuario) {
+  const chave = arquivoDe(usuario);
+  DB.prepare('DELETE FROM estados WHERE usuario = ?').run(chave);
+  apagarPessoaDosBackups(join(PASTA_DADOS, 'backup'), chave);
+  limparLegadoDe(chave);
+}
+
+// Os JSON da época dos arquivos que ainda existem (cópias .bak.json na pasta de dados e o
+// que a migração guardou em json-legado-*): quem apaga a conta sai deles também.
+function limparLegadoDe(chave) {
+  const base = basename(ESTADO).replace(/\.json$/, '');
+  const prefixo = chave === 'caminho' ? base : base + '-' + chave;
+  const pastas = [PASTA_DADOS, ...readdirSync(PASTA_DADOS).filter((n) => n.startsWith('json-legado-')).map((n) => join(PASTA_DADOS, n))];
+  for (const pasta of pastas) {
+    for (const n of readdirSync(pasta)) {
+      if (!n.endsWith('.json')) continue;
+      const caminho = join(pasta, n);
+      if (n === prefixo + '.json' || (n.startsWith(prefixo + '.') && n.endsWith('.bak.json'))) { unlinkSync(caminho); continue; }
+      if (/^(contas|novidades|notificacoes)[.-]/.test(n)) tirarDoJsonLegado(caminho, chave);
+    }
+  }
+}
+
+function tirarDoJsonLegado(caminho, u) {
+  let d;
+  try { d = JSON.parse(readFileSync(caminho, 'utf8')); } catch { return; }
+  if (!d || typeof d !== 'object') return;
+  const semEle = (lista) => (Array.isArray(lista) ? lista.filter((x) => x !== u) : lista);
+  if (d.contas) {
+    delete d.contas[u];
+    for (const c of Object.values(d.contas)) if (Array.isArray(c.segue)) c.segue = semEle(c.segue);
+    for (const k of Object.keys(d.amizades || {})) if (k.split('|').includes(u)) delete d.amizades[k];
+    for (const campo of ['bloqueios', 'silenciados']) {
+      if (!d[campo]) continue;
+      delete d[campo][u];
+      for (const k of Object.keys(d[campo])) d[campo][k] = semEle(d[campo][k]);
+    }
+    for (const k of Object.keys(d.toques || {})) if (k.split('>').includes(u)) delete d.toques[k];
+  }
+  if (Array.isArray(d.eventos)) {
+    d.eventos = d.eventos.filter((e) => e.autor !== u && (e.dados || {}).com !== u).map((e) => ({ ...e, reacoes: semEle(e.reacoes || []) }));
+    d.ligados = semEle(d.ligados || []);
+    d.perguntados = semEle(d.perguntados || []);
+  }
+  if (d.inscricoes) {
+    delete d.inscricoes[u];
+    if (d.preferencias) delete d.preferencias[u];
+    if (d.historico) delete d.historico[u];
+  }
+  writeFileSync(caminho, JSON.stringify(d), 'utf8');
+}
+
+function corpoDaRequisicao(req) {
+  return new Promise((resolve, reject) => {
+    let bruto = '';
+    let tamanho = 0;
+    req.on('data', (parte) => {
+      tamanho += parte.length;
+      if (tamanho > LIMITE) { reject(new Error('corpo grande demais')); req.destroy(); return; }
+      bruto += parte;
+    });
+    req.on('end', () => resolve(bruto));
+    req.on('error', reject);
+  });
+}
+const lerJson = async (req) => {
+  try { return JSON.parse((await corpoDaRequisicao(req)) || '{}') || {}; } catch { return {}; }
+};
+
+// ---------- contas e sessão ----------
+// Um banco só para tudo: dados/caminho.db. Na primeira subida, cada módulo importa o seu
+// JSON antigo e o guarda em json-legado-AAAA-MM-DD/.
+const DB = abrirBanco(arquivoDoBanco(PASTA_DADOS));
+const CONTAS = await new Contas(join(dirname(ESTADO), 'contas.json')).carregar();
+// O mural das novidades mora ao lado das contas.
+const NOVIDADES = await new Novidades(join(dirname(ESTADO), 'novidades.json')).carregar();
+// Notificações: aparelhos inscritos, preferências e o que já saiu hoje.
+const NOTIFICACOES = await new Notificacoes(join(dirname(ESTADO), 'notificacoes.json')).carregar();
+const CHAVES_PUSH = await chavesDoServidor(join(dirname(ESTADO), 'push.chave'));
+
+// O progresso que morava em estado*.json entra na tabela uma vez, e os arquivos vão para
+// json-legado-*. Arquivo ilegível para a subida: seguir sem ele apagaria o progresso de alguém.
+function importarEstadosLegados() {
+  if (lerMeta(DB, 'importado:estados') !== null) return;
+  const base = basename(ESTADO).replace(/\.json$/, '');
+  const achados = (existsSync(PASTA_DADOS) ? readdirSync(PASTA_DADOS) : [])
+    .filter((n) => n.endsWith('.json') && !n.endsWith('.bak.json') && (n === base + '.json' || n.startsWith(base + '-')));
+  const lidos = achados.map((n) => [
+    n === base + '.json' ? 'caminho' : n.slice(base.length + 1, -'.json'.length),
+    JSON.parse(readFileSync(join(PASTA_DADOS, n), 'utf8')),
+  ]);
+  transacao(DB, () => {
+    for (const [chave, dados] of lidos) gravarEstadoNoBanco(DB, chave, dados);
+    gravarMeta(DB, 'importado:estados', new Date().toISOString());
+  });
+  for (const n of achados) guardarLegado(join(PASTA_DADOS, n));
+  if (achados.length) console.log('  progresso importado para o banco: ' + achados.length + ' arquivo(s)');
+}
+importarEstadosLegados();
+// O serviço de push pede um contato de quem manda: o endereço do app, e não o e-mail de ninguém.
+const CONTATO_PUSH = process.env.CAMINHO_ENDERECO || 'https://ccc.off-sec.net';
+// Só as ferramentas de teste: aceitam um serviço de push em 127.0.0.1 e fixam o relógio.
+const PUSH_TESTE = process.env.CAMINHO_PUSH_TESTE === '1';
+const agoraDoServidor = () => (PUSH_TESTE && process.env.CAMINHO_RELOGIO ? new Date(process.env.CAMINHO_RELOGIO) : new Date());
+
+const COOKIE = 'cc_sessao';
+const DURACAO = 90 * 24 * 60 * 60 * 1000;
+
+// A chave que assina sessões e convites nasce aqui e fica no disco: sorteada a cada
+// start, todo reinício derrubaria quem já tinha entrado.
+async function chaveDaSessao() {
+  const arquivo = join(dirname(ESTADO), 'sessao.chave');
+  try {
+    return await readFile(arquivo, 'utf8');
+  } catch {
+    const nova = randomBytes(32).toString('hex');
+    await mkdir(dirname(arquivo), { recursive: true });
+    await writeFile(arquivo, nova, 'utf8');
+    return nova;
+  }
+}
+const CHAVE = await chaveDaSessao();
+const assinar = (texto) => createHmac('sha256', CHAVE).update(texto).digest('base64url');
+
+// O crachá é "nome.validade.assinatura". Nome de usuário aceita ponto, e o escape à
+// mão evita que "julia.andrade" vire um crachá de quatro partes.
+const paraCracha = (usuario) => encodeURIComponent(usuario).split('.').join('%2E');
+const firmaDo = (nome, vence, usuario) =>
+  assinar(nome + '.' + vence + '.' + seloDaConta(CONTAS.achar(usuario)));
+
+function novoCracha(usuario) {
+  const vence = Date.now() + DURACAO;
+  const nome = paraCracha(usuario);
+  return nome + '.' + vence + '.' + firmaDo(nome, vence, usuario);
+}
+
+function donoDoCracha(cracha) {
+  if (!cracha) return '';
+  const partes = String(cracha).split('.');
+  if (partes.length !== 3) return '';
+  const [nome, vence, firma] = partes;
+  if (Number(vence) < Date.now()) return '';
+  const usuario = decodeURIComponent(nome);
+  if (!CONTAS.achar(usuario)) return '';
+  if (!iguais(firma, firmaDo(nome, vence, usuario))) return '';
+  return usuario;
+}
+
+function porCookie(req, res, usuario) {
+  const seguro = (req.headers['x-forwarded-proto'] || '') === 'https';
+  res.setHeader('set-cookie', COOKIE + '=' + novoCracha(usuario)
+    + '; Path=/; Max-Age=' + Math.floor(DURACAO / 1000)
+    + '; HttpOnly; SameSite=Lax' + (seguro ? '; Secure' : ''));
+}
+const limparCookie = (res) =>
+  res.setHeader('set-cookie', COOKIE + '=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax');
+
+function lerCookie(req, nome) {
+  for (const parte of (req.headers.cookie || '').split(';')) {
+    const [k, ...resto] = parte.trim().split('=');
+    if (k === nome) return resto.join('=');
+  }
+  return '';
+}
+
+const quemFala = (req) => (ABERTO_PARA_TESTE && CONTAS.vazio
+  ? 'caminho' : donoDoCracha(lerCookie(req, COOKIE)));
+
+// Uma tentativa errada custa espera, e a espera cresce. O IP vem do cabeçalho da
+// Cloudflare: pelo túnel, todo pedido chega com o mesmo endereço do container, e cinco
+// senhas erradas de uma pessoa trancariam todo mundo.
+const castigo = new Map();
+const ipDe = (req) => String(req.headers['cf-connecting-ip'] || req.socket.remoteAddress || 'desconhecido');
+function podeTentar(ip) {
+  const t = castigo.get(ip);
+  if (!t) return true;
+  if (Date.now() > t.livre) { castigo.delete(ip); return true; }
+  return t.erros < 5;
+}
+function anotarErro(ip) {
+  const t = castigo.get(ip) || { erros: 0, livre: 0 };
+  t.erros++;
+  t.livre = Date.now() + Math.min(t.erros * 5000, 60000);
+  castigo.set(ip, t);
+}
+
+// ---------- o dia de cada um ----------
+// A versão publicada, lida do service worker que o build gerou. Rota de API: o Cloudflare
+// não guarda, então o app sempre recebe a resposta de agora.
+async function versaoPublicada() {
+  const sw = await readFile(join(RAIZ, 'sw.js'), 'utf8').catch(() => '');
+  return (sw.match(/const CACHE = 'caminho-([0-9a-f]+)'/) || [])[1] || '';
+}
+
+const hojeDe = (usuario) => hojeNoFuso((CONTAS.achar(usuario) || {}).fuso);
+
+async function diaDe(usuario, hoje) {
+  const estado = await lerEstado(arquivoDe(usuario));
+  const feitas = datasFeitas(estado);
+  const simulacao = REGRAS.simularOfensiva([...feitas], hoje);
+  return { estado, feitas, protegidos: new Set(simulacao.protegidos) };
+}
+
+// ---------- notificações ----------
+const minutosNoFuso = (fuso, agora = new Date()) => {
+  const partes = new Intl.DateTimeFormat('en-GB', {
+    timeZone: fusoValido(fuso) ? fuso : 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(agora);
+  const valor = (tipo) => Number((partes.find((p) => p.type === tipo) || {}).value || 0);
+  return valor('hour') * 60 + valor('minute');
+};
+
+const nomeDeExibicao = async (usuario) => {
+  const c = CONTAS.achar(usuario);
+  const estado = c ? await lerEstado(arquivoDe(usuario)) : null;
+  return primeiroNome((estado && estado.apelido) || (c && c.nome) || usuario);
+};
+
+// Manda para todos os aparelhos da pessoa. O serviço que responde 404 ou 410 avisa que o
+// aparelho desinstalou ou revogou a permissão: a inscrição sai da lista.
+async function enviarPara(usuario, mensagem, opcoes = {}) {
+  let enviados = 0;
+  for (const inscricao of NOTIFICACOES.inscricoesDe(usuario)) {
+    try {
+      const status = await enviarPush(inscricao, mensagem, CHAVES_PUSH, CONTATO_PUSH, opcoes);
+      if (status === 404 || status === 410) await NOTIFICACOES.esquecerEndpoint(inscricao.endpoint);
+      else if (status >= 200 && status < 300) enviados++;
+      else console.log('  push ' + status + ' para ' + usuario);
+    } catch (e) {
+      console.log('  push falhou para ' + usuario + ': ' + e.message);
+    }
+  }
+  return enviados;
+}
+
+// Aviso social (toque, pedido, convite aceito): sai na hora, mas respeita a escolha da
+// pessoa, o silêncio da noite e, nos toques, o teto do dia de quem recebe.
+async function avisoSocial(para, tipo, dados) {
+  const conta = CONTAS.achar(para);
+  if (!conta || !NOTIFICACOES.inscricoesDe(para).length || !NOTIFICACOES.preferencias(para).amigos) return;
+  const agora = agoraDoServidor();
+  if (emSilencio(minutosNoFuso(conta.fuso, agora))) return;
+  const data = hojeNoFuso(conta.fuso, agora);
+  if (tipo === 'toque') {
+    const ja = NOTIFICACOES.toquesHoje(para, data);
+    if (ja >= MAX_TOQUES_RECEBIDOS_DIA) return;
+    dados = { ...dados, outros: ja };
+  }
+  const mensagem = montarMensagem(tipo, dados, { usuario: para, data, nome: await nomeDeExibicao(para) });
+  if (await enviarPara(para, mensagem)) await NOTIFICACOES.anotar(para, tipo, data, 0);
+}
+const semEsperar = (promessa) => { promessa.catch((e) => console.log('  aviso não saiu: ' + e.message)); };
+
+// A rodada dos lembretes: cada pessoa com aparelho inscrito é olhada no próprio fuso. As
+// regras (horário, teto do dia, silêncio, quem sumiu) moram em decidir(), testadas hora a hora.
+// ---------- Trilha do Semeador ----------
+// O nível de quem convidou. Nível novo vira marco no mural uma vez só: o nível já anunciado
+// fica na conta, porque a novidade vence em 30 dias e não pode voltar a aparecer.
+async function marcoDoSemeador(usuario) {
+  const trilha = trilhaDoSemeador(CONTAS.semeadorDe(usuario));
+  const conta = CONTAS.achar(usuario);
+  if (conta && trilha.nivel > (Number(conta.semeadorNivel) || 0)) {
+    await CONTAS.anotarNivelSemeador(conta.usuario, trilha.nivel);
+    await NOVIDADES.publicar(conta.usuario, 'semeador', { nivel: trilha.nivel, nome: trilha.nome }, 'semeador:' + trilha.nivel);
+  }
+  return { ...trilha, niveis: NIVEIS_SEMEADOR };
+}
+
+// ---------- propósitos ----------
+// O retrato de um propósito hoje, como o app mostra: quem já fez, os pontos do grupo e os dias
+// juntos. Leva só se cada um fez, nunca o que alguém escreveu ou orou.
+async function retratoDoProposito(p, eu) {
+  const hojeEu = hojeDe(eu);
+  const info = new Map();
+  for (const m of p.membros) {
+    const c = CONTAS.achar(m.usuario);
+    if (!c) continue;
+    const hojeDele = hojeNoFuso(c.fuso);
+    const referencia = hojeDele < hojeEu ? hojeDele : hojeEu;
+    const dia = await diaDe(m.usuario, referencia);
+    info.set(m.usuario, { conta: c, estado: dia.estado, protegidos: dia.protegidos, datas: datasDoTipo(p.tipo, p.alvo, dia.estado, PLANO_DO_CONTEUDO), referencia });
+  }
+  const referencia = [...info.values()].reduce((menor, x) => (x.referencia < menor ? x.referencia : menor), hojeEu);
+  const ativos = p.membros.filter((m) => m.estado === 'ativo' && info.has(m.usuario));
+  let dias = 0;
+  let hoje = null;
+  if (!p.grupo) {
+    const [x, y] = ativos.map((m) => info.get(m.usuario));
+    if (x && y) {
+      dias = diasJuntos({ tipo: p.tipo, datasA: x.datas, datasB: y.datas, protegidosA: x.protegidos, protegidosB: y.protegidos, desde: p.criadoEm, hoje: referencia });
+    }
+  } else {
+    // Conta como membro do dia quem já tinha entrado e ainda não tinha saído.
+    const noDia = (data) => pontosDoDia(p.membros
+      .filter((m) => info.has(m.usuario) && m.estado !== 'convidado' && m.entrouEm && m.entrouEm <= data && (!m.saiuEm || m.saiuEm > data))
+      .map((m) => { const x = info.get(m.usuario); return { feito: x.datas.has(data), extra: extraNoDia(x.estado, data) }; }));
+    // Dia fechado e batido fica anotado; hoje ainda pode mudar, então é sempre recalculado.
+    const guardados = new Set(p.diasBatidos || []);
+    const novos = [];
+    const batidaEm = (d) => {
+      if (guardados.has(d)) return true;
+      const batida = noDia(d).batida;
+      if (batida && d < referencia) novos.push(d);
+      return batida;
+    };
+    hoje = noDia(referencia);
+    dias = sequenciaDoGrupo({ tipo: p.tipo, batidaEm, desde: p.criadoEm, hoje: referencia });
+    if (novos.length) await CONTAS.anotarDiasBatidos(p.id, novos);
+  }
+  const membros = p.membros.filter((m) => m.estado !== 'saiu' && info.has(m.usuario)).map((m) => {
+    const x = info.get(m.usuario);
+    return {
+      usuario: m.usuario, nome: (x.estado && x.estado.apelido) || x.conta.nome || m.usuario, foto: (x.estado && x.estado.foto) || '',
+      estado: m.estado, fezHoje: m.estado === 'ativo' && x.datas.has(referencia),
+      extraHoje: p.grupo && m.estado === 'ativo' ? extraNoDia(x.estado, referencia) === 1 : false,
+    };
+  });
+  const minha = p.membros.find((m) => m.usuario === eu) || {};
+  return {
+    id: p.id, tipo: p.tipo, alvo: p.alvo, titulo: p.titulo, grupo: p.grupo, criadoPor: p.criadoPor, criadoEm: p.criadoEm,
+    dias, hoje, membros, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
+  };
+}
+
+async function rodadaDeLembretes(agora = new Date()) {
+  const saiu = [];
+  for (const usuario of NOTIFICACOES.comInscricao()) {
+    const conta = CONTAS.achar(usuario);
+    if (!conta) continue;
+    const data = hojeNoFuso(conta.fuso, agora);
+    const minutos = minutosNoFuso(conta.fuso, agora);
+    if (emSilencio(minutos)) continue;
+    const { feitas, protegidos } = await diaDe(usuario, data);
+    const ontem = somaDias(data, -1);
+    let ofensiva = 0;
+    for (let d = ontem; (feitas.has(d) || protegidos.has(d)) && ofensiva < 5000; d = somaDias(d, -1)) ofensiva++;
+    const decisao = decidir({
+      agora: { data, minutos },
+      pref: NOTIFICACOES.preferencias(usuario),
+      historico: NOTIFICACOES.historico(usuario),
+      leitura: {
+        leuHoje: feitas.has(data),
+        ofensiva,
+        ultimaLeitura: [...feitas].filter((d) => d <= data).sort().pop() || null,
+        escudoOntem: protegidos.has(ontem) && !feitas.has(ontem),
+        criadaEm: conta.criadaEm,
+      },
+    });
+    if (!decisao) continue;
+    // Anota antes de mandar: se o serviço demorar, a rodada seguinte não repete o aviso.
+    await NOTIFICACOES.anotar(usuario, decisao.tipo, data, minutos);
+    const mensagem = montarMensagem(decisao.tipo, decisao.dados, { usuario, data, nome: await nomeDeExibicao(usuario) });
+    await enviarPara(usuario, mensagem, { ttl: 3 * 3600 });
+    saiu.push({ usuario, tipo: decisao.tipo, titulo: mensagem.titulo });
+  }
+
+  // Meta do grupo: depois das 18h, se falta pouco (até 2 pontos), quem ainda não fez recebe um
+  // recado, no máximo um por dia por grupo, dentro da escolha "Amigos" e do silêncio da noite.
+  // Grupo de oração não entra: oração não tem meta nem cobrança.
+  for (const p of CONTAS.propositosAtivos().filter((x) => x.grupo && x.tipo !== 'oracao')) {
+    const retrato = await retratoDoProposito(p, p.criadoPor);
+    if (!retrato.hoje || retrato.hoje.batida || retrato.hoje.faltam > 2) continue;
+    for (const m of retrato.membros) {
+      if (m.estado !== 'ativo' || m.fezHoje || !NOTIFICACOES.inscricoesDe(m.usuario).length || !NOTIFICACOES.preferencias(m.usuario).amigos) continue;
+      const conta = CONTAS.achar(m.usuario);
+      const data = hojeNoFuso(conta.fuso, agora);
+      const minutos = minutosNoFuso(conta.fuso, agora);
+      if (emSilencio(minutos) || minutos < 18 * 60) continue;
+      const chave = 'grupo:' + p.id;
+      if (NOTIFICACOES.historico(m.usuario)[chave] === data) continue;
+      await NOTIFICACOES.anotar(m.usuario, chave, data, minutos);
+      const mensagem = montarMensagem('metaDoGrupo', { faltam: retrato.hoje.faltam, titulo: p.titulo, id: p.id }, { usuario: m.usuario, data, nome: m.nome });
+      await enviarPara(m.usuario, mensagem, { ttl: 3 * 3600 });
+      saiu.push({ usuario: m.usuario, tipo: 'metaDoGrupo', titulo: mensagem.titulo });
+    }
+  }
+  return saiu;
+}
+
+// ---------- rotas ----------
+const servidor = createServer(async (req, res) => {
+  try {
+    const url = new URL(req.url, 'http://x');
+    const rota = decodeURIComponent(url.pathname);
+    const ip = ipDe(req);
+    const post = req.method === 'POST';
+
+    // ---------- públicas ----------
+    if (rota === '/api/existe-conta') { json(res, 200, { existe: !CONTAS.vazio }); return; }
+    if (rota === '/api/versao') { json(res, 200, { versao: await versaoPublicada() }); return; }
+
+    // Só nas ferramentas de teste: um backup agora, para conferir que apagar a conta limpa os backups.
+    if ((PUSH_TESTE || process.env.CAMINHO_TESTE === '1') && rota === '/api/teste/backup' && post) {
+      json(res, 200, { arquivo: basename(fazerBackup(DB, join(PASTA_DADOS, 'backup', 'caminho-teste-' + Date.now() + '.db'))) });
+      return;
+    }
+
+    // Só nas ferramentas de teste: roda os lembretes num horário escolhido.
+    if (PUSH_TESTE && rota === '/api/notificacoes/rodada' && post) {
+      const { agora } = await lerJson(req);
+      json(res, 200, { saiu: await rodadaDeLembretes(new Date(agora || Date.now())) });
+      return;
+    }
+
+    if (rota.startsWith('/api/convites/') && req.method === 'GET') {
+      const convite = CONTAS.lerConvite(rota.slice('/api/convites/'.length), assinar);
+      if (!convite) { json(res, 410, { erro: 'esse convite venceu ou foi cancelado' }); return; }
+      json(res, 200, { usuario: convite.de, nome: convite.nome });
+      return;
+    }
+
+    if (rota === '/api/criar-conta') {
+      if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
+      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      try {
+        const pedido = await lerJson(req);
+        const criada = await CONTAS.criar(pedido);
+        porCookie(req, res, criada.usuario);
+        // Conta criada pelo link de um convite: a amizade nasce junto, e quem convidou fica
+        // anotado para a Trilha do Semeador. Convite vencido ou cancelado não impede a conta.
+        let convidadoPor = '';
+        if (pedido.convite) {
+          try {
+            const hoje = hojeDe(criada.usuario);
+            const usado = await CONTAS.usarConvite(criada.usuario, String(pedido.convite), assinar, hoje, Date.now(), { contaNova: true });
+            if (!usado.ja) {
+              convidadoPor = usado.de;
+              await NOVIDADES.publicar(criada.usuario, 'novoProposito', { com: usado.de }, 'novo:' + [criada.usuario, usado.de].sort().join('|') + ':' + hoje);
+              semEsperar(avisoSocial(usado.de, 'aceito', { amigo: primeiroNome(criada.nome), amigoUsuario: criada.usuario }));
+            }
+          } catch { /* segue sem o convite */ }
+        }
+        json(res, 200, { ok: true, usuario: criada.usuario, convidadoPor });
+      } catch (e) {
+        anotarErro(ip);
+        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não consegui criar a conta' });
+      }
+      return;
+    }
+
+    if (rota === '/api/entrar') {
+      if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
+      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      const { login, usuario, senha } = await lerJson(req);
+      const conta = await CONTAS.conferir(login || usuario, senha);
+      if (!conta) { anotarErro(ip); json(res, 401, { erro: 'usuário ou senha não conferem' }); return; }
+      castigo.delete(ip);
+      porCookie(req, res, conta.usuario);
+      json(res, 200, { ok: true, usuario: conta.usuario });
+      return;
+    }
+
+    if (rota === '/api/sair') { limparCookie(res); json(res, 200, { ok: true }); return; }
+
+    // Versões antigas do aplicativo em cache ainda chamam estas rotas.
+    if (rota === '/api/seguir' || rota === '/api/parar-de-seguir') {
+      json(res, 410, { erro: 'atualize o aplicativo' });
+      return;
+    }
+
+    // ---------- porteiro ----------
+    const eu = quemFala(req);
+    if (!eu) {
+      if (rota.startsWith('/api/')) { json(res, 401, { erro: 'entre primeiro' }); return; }
+      const livre = rota === '/entrar.html' || rota === '/privacidade.html'
+        || rota.endsWith('.png') || rota === '/manifest.webmanifest' || rota === '/favicon.ico';
+      if (!livre) {
+        const pagina = await readFile(join(RAIZ, 'entrar.html')).catch(() => null);
+        if (!pagina) { res.writeHead(503).end('rode "node build.mjs" antes de servir'); return; }
+        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'content-length': pagina.length, 'cache-control': 'no-store' });
+        res.end(req.method === 'HEAD' ? undefined : pagina);
+        return;
+      }
+    }
+
+    const conta = CONTAS.achar(eu);
+    const exigir = (condicao, codigo, erro) => { if (!condicao) { json(res, codigo, { erro }); return false; } return true; };
+
+    if (rota === '/api/quem') {
+      const semeador = conta ? await marcoDoSemeador(eu) : null;
+      json(res, 200, {
+        usuario: eu,
+        nome: conta ? conta.nome : eu,
+        email: conta ? conta.email : '',
+        nascimento: conta ? conta.nascimento : '',
+        perfilCompleto: conta ? CONTAS.perfilCompleto(conta) : false,
+        comSenha: !!conta,
+        semeador,
+      });
+      return;
+    }
+
+    if (rota === '/api/perfil') {
+      if (!exigir(post && conta, 405, 'método não suportado')) return;
+      try {
+        await CONTAS.completarPerfil(eu, await lerJson(req));
+        json(res, 200, { ok: true });
+      } catch (e) {
+        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não consegui salvar' });
+      }
+      return;
+    }
+
+    if (rota === '/api/fuso') {
+      if (!exigir(post && conta, 405, 'método não suportado')) return;
+      const { fuso } = await lerJson(req);
+      if (fusoValido(fuso)) await CONTAS.atualizarFuso(eu, fuso);
+      json(res, 200, { ok: true });
+      return;
+    }
+
+    // ---------- estado ----------
+    // Fundido também aqui: um aparelho que grava antes de sincronizar não pode apagar
+    // o que outro marcou. A ofensiva dos amigos depende dessas datas.
+    if (rota === '/api/estado') {
+      const arquivo = arquivoDe(eu);
+      if (req.method === 'GET') { json(res, 200, (await lerEstado(arquivo)) || { vazio: true }); return; }
+      if (req.method === 'PUT' || post) {
+        try {
+          const novo = REGRAS.normalizarEstado(JSON.parse(await corpoDaRequisicao(req)));
+          if (!novo) throw new Error('formato inválido');
+          const atual = REGRAS.normalizarEstado(await lerEstado(arquivo));
+          const junto = atual ? REGRAS.fundir(atual, novo) : novo;
+          if (novo.dono) junto.dono = novo.dono;
+          await gravarEstado(junto, arquivo);
+          // A primeira lição de quem veio por um convite conta para quem convidou.
+          if (conta && conta.convidadoPor && datasFeitas(junto).size && await CONTAS.ativarConvidado(eu)) await marcoDoSemeador(conta.convidadoPor);
+          json(res, 200, { ok: true });
+        } catch (e) {
+          json(res, 400, { erro: e.message });
+        }
+        return;
+      }
+      json(res, 405, { erro: 'método não suportado' });
+      return;
+    }
+
+    // ---------- amigos ----------
+    if (rota.startsWith('/api/') && ['/api/amigos', '/api/procurar', '/api/amizade', '/api/convites',
+      '/api/convites/aceitar', '/api/convites/cancelar', '/api/toques', '/api/denuncias',
+      '/api/novidades', '/api/novidades/reagir', '/api/novidades/preferencia', '/api/propositos'].includes(rota)) {
+      if (!conta) { json(res, 403, { erro: 'entre com uma conta' }); return; }
+    }
+
+    if (rota === '/api/amigos') {
+      const completo = CONTAS.perfilCompleto(conta);
+      const hojeEu = hojeDe(eu);
+      const listas = CONTAS.listas(eu);
+      const meu = await diaDe(eu, hojeEu);
+      const nomeDe = (u) => ({ usuario: u, nome: (CONTAS.achar(u) || {}).nome || u });
+
+      const amigos = [];
+      for (const { usuario, aceitaEm } of listas.amigos) {
+        const outra = CONTAS.achar(usuario);
+        const hojeEle = hojeNoFuso(outra.fuso);
+        const referencia = hojeEle < hojeEu ? hojeEle : hojeEu;
+        const dele = await diaDe(usuario, referencia);
+        const euRef = referencia === hojeEu ? meu : await diaDe(eu, referencia);
+        // A contagem da amizade é a do propósito de leitura em dupla que nasce com ela.
+        const dupla = CONTAS.duplaPlano(eu, usuario);
+        const dias = diasDeProposito(euRef, dele, dupla ? dupla.criadoEm : aceitaEm, referencia);
+        // A missão da semana: dias, desde segunda, em que os dois fizeram a lição.
+        const segunda = somaDias(referencia, -((new Date(referencia + 'T12:00:00Z').getUTCDay() + 6) % 7));
+        let juntos = 0;
+        for (let d = segunda; d <= referencia; d = somaDias(d, 1)) if (euRef.feitas.has(d) && dele.feitas.has(d)) juntos++;
+        amigos.push({
+          ...resumoDeAmigo(outra, dele.estado, hojeEle),
+          dias,
+          semana: { desde: segunda, dias: juntos },
+          toqueEnviado: CONTAS.toqueEnviado(eu, usuario, hojeEu),
+        });
+        // Marco de propósito vira novidade só da dupla, uma vez por marco.
+        if (MARCOS_PROPOSITO.includes(dias)) {
+          const [a, b] = [eu, usuario].sort();
+          await NOVIDADES.publicar(a, 'proposito', { com: b, dias }, 'proposito:' + a + '|' + b + ':' + dias + ':' + aceitaEm);
+        }
+      }
+      amigos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+
+      json(res, 200, {
+        perfilCompleto: completo,
+        motivos: MOTIVOS_DENUNCIA,
+        eu: { ...resumoDeAmigo(conta, meu.estado, hojeEu) },
+        amigos,
+        recebidos: listas.recebidos.map(nomeDe),
+        enviados: listas.enviados.map(nomeDe),
+        bloqueados: listas.bloqueados.map(nomeDe),
+        toques: CONTAS.toquesRecebidos(eu, hojeEu).map(nomeDe),
+        convitesProposito: CONTAS.propositosDe(eu).filter((p) => p.membros.some((m) => m.usuario === eu && m.estado === 'convidado')).length,
+      });
+      return;
+    }
+
+    if (rota === '/api/procurar') {
+      json(res, 200, { achado: CONTAS.procurar(eu, url.searchParams.get('q') || '') });
+      return;
+    }
+
+    const acao = async (fazer) => {
+      if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
+      try {
+        const resposta = await fazer(await lerJson(req));
+        json(res, 200, { ok: true, ...(resposta || {}) });
+      } catch (e) {
+        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora' });
+      }
+    };
+
+    if (rota === '/api/amizade') {
+      await acao(async ({ acao: qual, usuario }) => {
+        const outro = limparNome(usuario);
+        const hoje = hojeDe(eu);
+        const referencia = (() => {
+          const o = CONTAS.achar(outro);
+          const h = o ? hojeNoFuso(o.fuso) : hoje;
+          return h < hoje ? h : hoje;
+        })();
+        if (qual === 'pedir') {
+          const antes = CONTAS.relacao(eu, outro);
+          const relacao = await CONTAS.pedir(eu, outro, referencia);
+          // Só o pedido novo avisa; pedir de novo, ou pedir a quem bloqueou, não dispara nada.
+          if (antes === 'nenhuma' && relacao === 'enviado' && !CONTAS.algumBloqueio(eu, outro)) {
+            semEsperar(avisoSocial(outro, 'pedido', { amigo: await nomeDeExibicao(eu), amigoUsuario: eu }));
+          }
+          if (antes === 'recebido' && relacao === 'amigos') semEsperar(avisoSocial(outro, 'aceito', { amigo: await nomeDeExibicao(eu), amigoUsuario: eu }));
+          return { relacao };
+        }
+        if (qual === 'aceitar') {
+          await CONTAS.aceitar(eu, outro, referencia);
+          await NOVIDADES.publicar(eu, 'novoProposito', { com: outro }, 'novo:' + [eu, outro].sort().join('|') + ':' + referencia);
+          semEsperar(avisoSocial(outro, 'aceito', { amigo: await nomeDeExibicao(eu), amigoUsuario: eu }));
+          return {};
+        }
+        if (qual === 'recusar') { await CONTAS.recusar(eu, outro); return {}; }
+        if (qual === 'cancelar') { await CONTAS.cancelar(eu, outro); return {}; }
+        if (qual === 'desfazer') { await CONTAS.desfazer(eu, outro); return {}; }
+        if (qual === 'bloquear') { await CONTAS.bloquear(eu, outro); return {}; }
+        if (qual === 'desbloquear') { await CONTAS.desbloquear(eu, outro); return {}; }
+        if (qual === 'silenciar' || qual === 'ouvir') { await CONTAS.silenciar(eu, outro, qual === 'silenciar'); return {}; }
+        const e = new Error('ação desconhecida'); e.publico = true; throw e;
+      });
+      return;
+    }
+
+    // ---------- propósitos ----------
+    if (rota === '/api/propositos' && req.method === 'GET') {
+      const lista = [];
+      for (const p of CONTAS.propositosDe(eu)) {
+        const retrato = await retratoDoProposito(p, eu);
+        lista.push(retrato);
+        // Marco de grupo vira novidade só de quem está nele, uma vez por marco.
+        if (p.grupo && MARCOS_PROPOSITO.includes(retrato.dias)) {
+          const membros = retrato.membros.filter((m) => m.estado === 'ativo').map((m) => m.usuario);
+          await NOVIDADES.publicar(p.criadoPor, 'propositoGrupo', { id: p.id, titulo: p.titulo, dias: retrato.dias, membros }, 'grupo:' + p.id + ':' + retrato.dias);
+        }
+      }
+      lista.sort((a, b) => (b.euConvidado - a.euConvidado) || (b.dias - a.dias) || a.titulo.localeCompare(b.titulo, 'pt-BR'));
+      json(res, 200, { propositos: lista, tipos: TIPOS_DE_PROPOSITO, limiteGrupo: LIMITE_GRUPO, livros: TODOS_LIVROS });
+      return;
+    }
+
+    if (rota === '/api/propositos') {
+      await acao(async ({ acao: qual, id, tipo, alvo, titulo, com, usuario }) => {
+        const hoje = hojeDe(eu);
+        if (qual === 'criar') {
+          const p = await CONTAS.criarProposito(eu, { tipo, alvo, titulo, com }, hoje, TODOS_LIVROS);
+          const nome = await nomeDeExibicao(eu);
+          for (const m of p.membros) {
+            if (m.estado === 'convidado') semEsperar(avisoSocial(m.usuario, 'propositoConvite', { amigo: nome, titulo: p.titulo, id: p.id }));
+          }
+          return { proposito: await retratoDoProposito(p, eu) };
+        }
+        if (qual === 'aceitar' || qual === 'recusar') { await CONTAS.responderProposito(eu, id, qual === 'aceitar', hoje); return {}; }
+        if (qual === 'convidar') {
+          const p = await CONTAS.convidarParaProposito(eu, id, usuario);
+          semEsperar(avisoSocial(limparNome(usuario), 'propositoConvite', { amigo: await nomeDeExibicao(eu), titulo: p.titulo, id: p.id }));
+          return {};
+        }
+        if (qual === 'sair') { await CONTAS.sairDoProposito(eu, id, hoje); return {}; }
+        if (qual === 'encerrar') { await CONTAS.encerrarProposito(eu, id, hoje); return {}; }
+        throw Object.assign(new Error('ação desconhecida'), { publico: true });
+      });
+      return;
+    }
+
+    if (rota === '/api/convites') {
+      await acao(async () => {
+        const { token, venceEm } = CONTAS.gerarConvite(eu, assinar);
+        const origem = (req.headers['x-forwarded-proto'] || 'http') + '://' + (req.headers.host || 'localhost');
+        return { link: origem + '/?convite=' + token, venceEm };
+      });
+      return;
+    }
+
+    if (rota === '/api/convites/aceitar') {
+      await acao(async ({ token }) => {
+        const dono = (CONTAS.lerConvite(token, assinar) || {}).de;
+        const h = dono ? hojeDe(dono) : hojeDe(eu);
+        const referencia = h < hojeDe(eu) ? h : hojeDe(eu);
+        const usado = await CONTAS.usarConvite(eu, token, assinar, referencia);
+        if (!usado.ja) await NOVIDADES.publicar(eu, 'novoProposito', { com: usado.de }, 'novo:' + [eu, usado.de].sort().join('|') + ':' + referencia);
+        if (!usado.ja) semEsperar(avisoSocial(usado.de, 'aceito', { amigo: await nomeDeExibicao(eu), amigoUsuario: eu }));
+        return usado;
+      });
+      return;
+    }
+
+    if (rota === '/api/convites/cancelar') {
+      await acao(async () => { await CONTAS.cancelarConvites(eu); return {}; });
+      return;
+    }
+
+    if (rota === '/api/toques') {
+      await acao(async ({ para }) => {
+        const outro = CONTAS.achar(para);
+        const hojeEu = hojeDe(eu);
+        const euLeu = (await diaDe(eu, hojeEu)).feitas.has(hojeEu);
+        const eleLeu = outro ? (await diaDe(outro.usuario, hojeNoFuso(outro.fuso))).feitas.has(hojeNoFuso(outro.fuso)) : false;
+        const resultado = await CONTAS.tocar(eu, para, { hoje: hojeEu, euLeu, eleLeu });
+        // O push só sai no toque novo: "Notificar" de novo no mesmo dia devolve "ja" e não dispara nada.
+        if (resultado === 'enviado') semEsperar(avisoSocial(outro.usuario, 'toque', { amigo: await nomeDeExibicao(eu) }));
+        return { resultado };
+      });
+      return;
+    }
+
+    if (rota === '/api/denuncias') {
+      await acao(async ({ usuario, motivo }) => { await CONTAS.denunciar(eu, usuario, motivo); return {}; });
+      return;
+    }
+
+    // ---------- novidades ----------
+    // O mural: marcos que o servidor confere no progresso de quem publica, e as reações.
+    const amigosDe = (u) => new Set(CONTAS.listas(u).amigos.map((a) => a.usuario));
+
+    if (rota === '/api/novidades' && req.method === 'GET') {
+      const amigos = amigosDe(eu);
+      const pessoas = new Map();
+      const pessoa = async (u) => {
+        if (!u) return null;
+        if (!pessoas.has(u)) {
+          const c = CONTAS.achar(u);
+          const estado = c ? await lerEstado(arquivoDe(u)) : null;
+          pessoas.set(u, c ? { usuario: c.usuario, nome: (estado && estado.apelido) || c.nome || c.usuario, foto: (estado && estado.foto) || '' } : null);
+        }
+        return pessoas.get(u);
+      };
+      const eventos = [];
+      for (const ev of NOVIDADES.mural(eu, amigos)) {
+        const outro = ev.autor === eu ? (ev.dados || {}).com : ev.autor;
+        // novidade de dupla com quem deixou de ser amigo some do mural
+        if (DE_DUPLA.has(ev.tipo) && !amigos.has(outro)) continue;
+        const autor = await pessoa(ev.autor);
+        if (!autor) continue;
+        const quem = [];
+        for (const u of ev.reacoes) {
+          if (u !== eu && !amigos.has(u)) continue;
+          const p = await pessoa(u);
+          if (p) quem.push(u === eu ? 'você' : p.nome);
+        }
+        eventos.push({
+          id: ev.id, tipo: ev.tipo, dados: ev.dados, em: ev.em, autor,
+          com: (ev.dados || {}).com ? await pessoa(ev.dados.com) : null,
+          total: ev.reacoes.length, euReagi: ev.reacoes.includes(eu), quem,
+        });
+      }
+      json(res, 200, { ligado: NOVIDADES.compartilha(eu), perguntado: NOVIDADES.perguntou(eu), eventos });
+      return;
+    }
+
+    if (rota === '/api/novidades') {
+      await acao(async ({ tipo, dados }) => {
+        const d = dados || {};
+        const limpos = {
+          ofensiva: () => ({ dias: Number(d.dias) }),
+          conquista: () => ({ id: String(d.id || '').slice(0, 20), nivel: Number(d.nivel) }),
+          livro: () => ({ livro: String(d.livro || '').slice(0, 30) }),
+          unidade: () => ({ numero: Number(d.numero) }),
+          quadro: () => ({ mes: String(d.mes || '').slice(0, 7) }),
+          versiculo: () => ({ ref: String(d.ref || '').slice(0, 40) }),
+        }[tipo];
+        if (!limpos) { const e = new Error('tipo de novidade desconhecido'); e.publico = true; throw e; }
+        const estado = REGRAS.normalizarEstado(await lerEstado(arquivoDe(eu)));
+        const chave = REGRAS.conferirNovidade(tipo, limpos(), estado, hojeDe(eu));
+        if (!chave) { const e = new Error('o progresso não confirma essa novidade'); e.publico = true; e.codigo = 409; throw e; }
+        return { publicado: !!(await NOVIDADES.publicar(eu, tipo, limpos(), chave)) };
+      });
+      return;
+    }
+
+    if (rota === '/api/novidades/reagir') {
+      await acao(async ({ id }) => NOVIDADES.reagir(eu, String(id || ''), amigosDe(eu)));
+      return;
+    }
+
+    if (rota === '/api/novidades/preferencia') {
+      await acao(async ({ ligado }) => { await NOVIDADES.preferir(eu, !!ligado); return {}; });
+      return;
+    }
+
+    // ---------- conta ----------
+    if (rota === '/api/trocar-senha') {
+      if (!exigir(post && conta, 405, 'método não suportado')) return;
+      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      const { atual, nova } = await lerJson(req);
+      if (!await CONTAS.conferir(eu, atual)) { anotarErro(ip); json(res, 401, { erro: 'a senha atual não confere' }); return; }
+      if (String(nova || '') === String(atual || '')) { json(res, 400, { erro: 'a senha nova é igual à atual' }); return; }
+      try {
+        await CONTAS.trocarSenha(eu, nova);
+      } catch (e) {
+        json(res, 400, { erro: e.publico ? e.message : 'não consegui trocar a senha' });
+        return;
+      }
+      porCookie(req, res, eu);
+      json(res, 200, { ok: true });
+      return;
+    }
+
+    // ---------- notificações ----------
+    if (rota === '/api/notificacoes' && req.method === 'GET') {
+      json(res, 200, {
+        chave: CHAVES_PUSH.publica,
+        preferencias: NOTIFICACOES.preferencias(eu),
+        aparelhos: NOTIFICACOES.inscricoesDe(eu).map((i) => i.endpoint),
+      });
+      return;
+    }
+
+    if (rota === '/api/notificacoes/inscrever') {
+      await acao(async ({ inscricao }) => {
+        const valida = inscricaoValida(inscricao, { permitirLocal: PUSH_TESTE });
+        if (!valida) throw Object.assign(new Error('esse aparelho não aceita notificações daqui'), { publico: true });
+        await NOTIFICACOES.inscrever(eu, valida);
+        return { aparelhos: NOTIFICACOES.inscricoesDe(eu).length };
+      });
+      return;
+    }
+
+    if (rota === '/api/notificacoes/cancelar') {
+      await acao(async ({ endpoint }) => { await NOTIFICACOES.cancelar(eu, String(endpoint || '')); return {}; });
+      return;
+    }
+
+    if (rota === '/api/notificacoes/preferencias') {
+      await acao(async (novas) => ({ preferencias: await NOTIFICACOES.definirPreferencias(eu, novas || {}) }));
+      return;
+    }
+
+    if (rota === '/api/notificacoes/testar') {
+      await acao(async () => {
+        const mensagem = montarMensagem('teste', {}, { usuario: eu, data: hojeDe(eu) });
+        const enviados = await enviarPara(eu, mensagem, { ttl: 600, urgencia: 'high' });
+        if (!enviados) throw Object.assign(new Error('nenhum aparelho recebeu. Ative de novo neste celular'), { publico: true });
+        return { enviados };
+      });
+      return;
+    }
+
+    if (rota === '/api/apagar-conta') {
+      if (!exigir(post && conta, 405, 'método não suportado')) return;
+      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      const { senha } = await lerJson(req);
+      if (!await CONTAS.conferir(eu, senha)) { anotarErro(ip); json(res, 401, { erro: 'a senha não confere' }); return; }
+      await CONTAS.apagar(eu);
+      await NOVIDADES.apagarDe(eu);
+      await NOTIFICACOES.apagarDe(eu);
+      await apagarProgressoDe(eu);
+      limparCookie(res);
+      json(res, 200, { ok: true });
+      return;
+    }
+
+    if (rota.startsWith('/api/')) { json(res, 404, { erro: 'rota desconhecida' }); return; }
+
+    // ---------- arquivos ----------
+    // O navegador pede /favicon.ico sozinho, em qualquer página. Sem isto a resposta era
+    // a tela de entrada inteira, 120 KB de HTML no lugar de um ícone.
+    const pedido = rota === '/' ? 'index.html' : rota === '/favicon.ico' ? 'icone-48.png' : rota;
+    let alvo = normalize(join(RAIZ, pedido));
+    if (!alvo.startsWith(RAIZ)) { res.writeHead(403).end('acesso negado'); return; }
+    let info = await stat(alvo).catch(() => null);
+    if (info && info.isDirectory()) {
+      alvo = join(alvo, 'index.html');
+      info = await stat(alvo).catch(() => null);
+    }
+    if (!info) {
+      res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
+      res.end('não encontrado: rode "node build.mjs" antes de servir');
+      return;
+    }
+    // Quando o build deixou uma versão .gz ao lado (as bíblias), ela vai no lugar do
+    // original para quem aceita: no celular longe de casa, 4 MB pesam.
+    const aceitaGzip = /\bgzip\b/.test(req.headers['accept-encoding'] || '');
+    const comprimido = aceitaGzip ? await readFile(alvo + '.gz').catch(() => null) : null;
+    const corpo = comprimido || await readFile(alvo);
+    res.writeHead(200, {
+      'content-type': TIPOS[extname(alvo).toLowerCase()] || 'application/octet-stream',
+      'content-length': corpo.length,
+      'cache-control': 'no-cache',
+      vary: 'accept-encoding',
+      ...(comprimido ? { 'content-encoding': 'gzip' } : {}),
+    });
+    res.end(req.method === 'HEAD' ? undefined : corpo);
+  } catch (erro) {
+    res.writeHead(500, { 'content-type': 'text/plain; charset=utf-8' });
+    res.end('erro: ' + erro.message);
+  }
+});
+
+function enderecosDaRede() {
+  const saida = [];
+  for (const [nome, lista] of Object.entries(networkInterfaces())) {
+    for (const i of lista || []) if (i.family === 'IPv4' && !i.internal) saida.push([nome, i.address]);
+  }
+  return saida;
+}
+
+servidor.listen(PORTA, '0.0.0.0', () => {
+  console.log('\n  Caminho com Cristo\n');
+  console.log('  neste computador:   http://localhost:' + PORTA);
+  const redes = enderecosDaRede();
+  if (redes.length) {
+    console.log('\n  na mesma rede Wi-Fi:');
+    for (const [nome, ip] of redes) console.log(`    http://${ip}:${PORTA}   (${nome})`);
+  }
+  console.log('\n  contas: ' + CONTAS.lista().length + (ABERTO_PARA_TESTE ? ' · modo aberto de teste' : ''));
+  console.log('  Ctrl+C para parar.\n');
+});
+
+// Uma rodada de lembretes por minuto. unref: o relógio não segura o processo aberto sozinho.
+if (!PUSH_TESTE) {
+  setInterval(() => rodadaDeLembretes().catch((e) => console.log('  rodada de lembretes: ' + e.message)), 60 * 1000).unref();
+}
+
+// Backup do dia (dados/backup/caminho-AAAA-MM-DD.db, ficam os 14 mais novos): na subida e a
+// cada hora. Substitui as cópias .bak.json de cada progresso.
+const backupSeDer = () => {
+  try {
+    const feito = backupDoDia(DB, join(PASTA_DADOS, 'backup'), hojeNoFuso(''));
+    if (feito) console.log('  backup do dia: ' + basename(feito));
+  } catch (e) {
+    console.log('  backup falhou: ' + e.message);
+  }
+};
+backupSeDer();
+setInterval(backupSeDer, 60 * 60 * 1000).unref();
+
+servidor.on('error', (e) => {
+  if (e.code === 'EADDRINUSE') {
+    console.error(`\n  a porta ${PORTA} já está em uso. Tente: node servidor.mjs ${PORTA + 1}\n`);
+    process.exit(1);
+  }
+  throw e;
+});
