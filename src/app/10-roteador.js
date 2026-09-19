@@ -131,7 +131,7 @@
   // ---------- roteamento ----------
   const PERFIL = () => ({
     escritos: CC.vistaEscritos, livros: CC.vistaLivros, conquistas: CC.vistaConquistas,
-    trofeus: CC.vistaTrofeus,
+    trofeus: CC.vistaTrofeus, versiculos: CC.vistaVersiculos,
   });
 
   function rotear() {

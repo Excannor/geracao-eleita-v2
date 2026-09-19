@@ -198,9 +198,14 @@
   CC.quadrosCompletos = (e) => Object.keys(est(e).quadros || {})
     .filter((mes) => CC.quadroDoMes(mes, e).completo).sort();
 
-  // ---------- baús da trilha e cartas ----------
-  // A cada sete dias lidos a trilha tem um baú. Ele guarda a carta de um personagem,
-  // de preferência alguém da unidade em que a pessoa está.
+  // ---------- baús da trilha ----------
+  // A cada sete dias lidos a trilha tem um baú, e dentro dele vai um versículo tirado
+  // justamente desses sete dias: o baú guarda a memória do trecho que a pessoa acabou de
+  // ler, e não um brinde avulso. A referência de cada dia já existe em CC.reflexaoDoDia.
+  //
+  // O array de personagens continua aqui, sem uso na tela, esperando a arte nova. Antes o
+  // baú sorteava uma carta daqui; quando os personagens saíram da interface, ele seguiu
+  // sorteando e gravando cartas que ninguém via.
   CC.CARTAS = ['Noé', 'Abraão', 'Sara', 'José', 'Moisés', 'Josué', 'Rute', 'Samuel', 'Davi', 'Salomão',
     'Elias', 'Ester', 'Jó', 'Isaías', 'Jeremias', 'Ezequiel', 'Daniel', 'Jonas', 'Maria', 'Pedro', 'João', 'Paulo'];
   CC.cartas = (e) => {
@@ -211,17 +216,46 @@
   CC.chaveBau = (numero) => 'dia:' + numero;
   CC.bauAberto = (numero, e) => !!(est(e).bausAbertos || {})[CC.chaveBau(numero)];
 
-  CC.abrirBau = (numero, elenco) => {
+  // Qual versículo cabe ao baú do dia N, entre os sete dias que ele fecha. A escolha é
+  // fixa para cada baú (deriva só do número), por dois motivos: reabrir a tela mostra o
+  // mesmo versículo, e os baús abertos antes desta mudança — que só guardaram carta —
+  // conseguem a referência na hora, sem precisar migrar nada no banco.
+  CC.versiculoDoBau = (numero) => {
+    if (!CC.reflexaoDoDia) return null;
+    const refs = [];
+    for (let n = Math.max(1, numero - 6); n <= numero; n++) {
+      const ref = (CC.reflexaoDoDia(n) || {}).ref;
+      if (ref && !refs.includes(ref)) refs.push(ref);
+    }
+    if (!refs.length) return null;
+    // Sem aleatoriedade: o mesmo baú cai sempre no mesmo versículo.
+    return refs[numero % refs.length];
+  };
+
+  // A referência guardada manda sobre a derivada: se o conteúdo das reflexões mudar
+  // depois, o versículo que a pessoa já recebeu não pode trocar debaixo dela.
+  CC.versiculoGuardado = (numero, e) => {
+    const bau = (est(e).bausAbertos || {})[CC.chaveBau(numero)];
+    if (!bau) return null;
+    return bau.ref || CC.versiculoDoBau(numero);
+  };
+
+  CC.abrirBau = (numero) => {
     const E = CC.estado();
     const chave = CC.chaveBau(numero);
     if ((E.bausAbertos || {})[chave]) return E.bausAbertos[chave];
-    const tem = new Set(CC.cartas(E));
-    const carta = (elenco || []).find((c) => CC.CARTAS.includes(c) && !tem.has(c))
-      || CC.CARTAS.find((c) => !tem.has(c)) || null;
-    const bau = { em: CC.hojeIso(), carta };
+    const bau = { em: CC.hojeIso(), ref: CC.versiculoDoBau(numero) };
     CC.gravar('bausAbertos', { ...(E.bausAbertos || {}), [chave]: bau });
     return bau;
   };
+
+  // Todos os versículos já guardados, do mais novo para o mais antigo.
+  CC.versiculosGuardados = (e) => Object.keys(est(e).bausAbertos || {})
+    .map((chave) => Number(String(chave).replace('dia:', '')))
+    .filter((n) => Number.isFinite(n))
+    .sort((a, b) => b - a)
+    .map((numero) => ({ dia: numero, ref: CC.versiculoGuardado(numero, e) }))
+    .filter((v) => v.ref);
 
   // ---------- conquistas com níveis ----------
   CC.CONQUISTAS = [
@@ -242,8 +276,11 @@
       texto: (n) => 'Chegue a ' + n + ' dias num propósito dos amigos', valor: (e) => e.maiorProposito || 0 },
     { id: 'missoes', titulo: 'Dia após dia', icone: 'estrela', cor: 'amarelo', niveis: [5, 25, 100, 250, 500],
       texto: (n) => 'Complete ' + n + ' desafios', valor: (e) => e.missoesTotal || 0 },
-    { id: 'cartas', titulo: 'Nuvem de testemunhas', icone: 'pessoas', cor: 'amarelo', niveis: [3, 8, 15, 22],
-      texto: (n) => 'Junte ' + n + ' cartas de personagens', valor: (e) => CC.cartas(e).length },
+    // O id segue 'cartas' de propósito: quem já tinha nível guardado em conquistasGanhas
+    // não perde o que conquistou. O que mudou foi o que se junta — versículos, não cartas.
+    // Os níveis acompanham o ano: são 52 baús, um a cada sete dias.
+    { id: 'cartas', titulo: 'Versículos guardados', icone: 'marcador', cor: 'amarelo', niveis: [3, 10, 26, 52],
+      texto: (n) => 'Guarde ' + n + ' versículos nos baús', valor: (e) => CC.versiculosGuardados(e).length },
     { id: 'explorador', titulo: 'Explorador', icone: 'bussola', cor: 'roxo', niveis: [5, 20, 60, 150],
       texto: (n) => 'Abra ' + n + ' notas de estudo', valor: (e) => (e.notasVistas || []).length },
   ];

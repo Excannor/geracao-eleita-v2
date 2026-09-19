@@ -379,13 +379,26 @@
         const botao = el.querySelector('[data-abrir-bau]');
         botao.onclick = async () => {
           botao.disabled = true;
-          const bau = CC.abrirBau(numero, CC.personagensDaUnidade(u.numero));
+          const bau = CC.abrirBau(numero);
           botao.classList.add('abrindo');
           CC.vibrar('conquista');
           await CC.esperar(650);
           const palco = el.querySelector('.tela-cheia-palco');
-          palco.innerHTML = '<div class="cena-carta revelando"><h1>Baú aberto!</h1><p class="passo-dica">Mais um marco na sua leitura. Continue firme.</p></div>';
+          const ref = bau.ref || CC.versiculoDoBau(numero);
+          palco.innerHTML = '<div class="cena-carta revelando"><h1>Baú aberto!</h1>'
+            + '<p class="passo-dica">Um versículo dos sete dias que você acabou de ler.</p>'
+            + '<div class="versiculo-do-bau" id="versiculo-do-bau"></div></div>';
           CC.arte.confete(el);
+          // O texto vem da tradução escolhida e chega depois: o cartão entra quando
+          // chegar, sem segurar a comemoração esperando o carregamento.
+          if (ref && CC.textoDoVersiculo) {
+            const alvo = palco.querySelector('#versiculo-do-bau');
+            CC.textoDoVersiculo(ref).then((texto) => {
+              if (!alvo.isConnected || !texto) return;
+              alvo.innerHTML = CC.cartaoVersiculo(ref, texto);
+              if (CC.ligarCartaoVersiculo) CC.ligarCartaoVersiculo(alvo, ref);
+            }).catch(() => { /* sem rede ou sem tradução: o baú abre do mesmo jeito */ });
+          }
           const pe = document.createElement('div');
           pe.className = 'tela-cheia-pe';
           pe.innerHTML = '<button class="botao" data-guardar>Continuar</button>';

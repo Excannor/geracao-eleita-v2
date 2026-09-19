@@ -180,6 +180,7 @@
       + '</div>'
       + '<div class="estante">' + estante.slice(0, 3).map(trofeuHtml).join('') + '</div>'
       + '<div class="lista-atalhos">'
+      + atalho('#/perfil/versiculos', 'marcador', 'Versículos guardados')
       + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
       + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
@@ -236,6 +237,36 @@
       + '<div class="estante">' + t.unidades.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Partes da Bíblia', t.colecoes.filter((x) => x.ganho).length + ' de ' + t.colecoes.length)
       + '<div class="estante">' + t.colecoes.map(trofeuHtml).join('') + '</div>';
+  };
+
+  // ---------- versículos guardados ----------
+  // O que veio nos baús, do mais novo para o mais antigo. O texto de cada um chega depois,
+  // porque vem da tradução escolhida: a lista aparece inteira de cara, com a referência e o
+  // dia, e cada cartão se completa quando o texto carrega. Assim a tela não fica em branco
+  // esperando e continua servindo para quem está sem rede.
+  CC.vistaVersiculos = function (raiz) {
+    const guardados = CC.versiculosGuardados ? CC.versiculosGuardados() : [];
+    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Versículos guardados</h1>'
+      + (guardados.length
+        ? '<p class="passo-dica">' + CC.plural(guardados.length, 'versículo guardado', 'versículos guardados')
+          + ', um por baú da trilha.</p>'
+          + '<div class="lista-versiculos">' + guardados.map((v) => '<section class="item-versiculo" data-ref="'
+            + CC.esc(v.ref) + '"><span class="etiqueta">Dia ' + v.dia + '</span>'
+            + '<div class="cartao-do-versiculo"><p class="ref-carregando">' + CC.esc(v.ref) + '</p></div></section>').join('')
+          + '</div>'
+        : '<p class="passo-dica">Ainda não há nenhum. A cada sete dias de leitura, um baú aparece '
+          + 'na trilha com um versículo do trecho que você acabou de ler.</p>');
+
+    if (!guardados.length || !CC.textoDoVersiculo) return;
+    raiz.querySelectorAll('.item-versiculo').forEach((item) => {
+      const ref = item.dataset.ref;
+      const alvo = item.querySelector('.cartao-do-versiculo');
+      CC.textoDoVersiculo(ref).then((texto) => {
+        if (!alvo.isConnected || !texto) return;
+        alvo.innerHTML = CC.cartaoVersiculo(ref, texto);
+        if (CC.ligarCartaoVersiculo) CC.ligarCartaoVersiculo(alvo, ref);
+      }).catch(() => { /* fica só a referência, que já diz qual é */ });
+    });
   };
 
   // ---------- minhas anotações ----------

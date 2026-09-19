@@ -1524,8 +1524,12 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .tela-cheia-palco { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(24px + env(safe-area-inset-top)) 16px 16px; overflow-y: auto; }
 .tela-cheia-pe { display: grid; gap: 10px; width: 100%; max-width: 560px; margin: 0 auto; padding: 12px 16px calc(18px + env(safe-area-inset-bottom)); }
 
-.tela-bau { background: var(--cor, var(--azul)); color: var(--sobre, var(--sobre-cor)); }
-.tela-bau h1 { color: inherit; }
+/* Fundo normal da tela, não a cor da unidade. Quando cada unidade tinha a sua cor, essa
+   lavagem em tela cheia fazia sentido; com a paleta nova todas caem no petróleo, e o
+   resultado era uma parede verde com o texto de apoio ilegível por cima dela. O que
+   comemora aqui é o confete e o versículo, não o fundo. */
+.tela-bau { background: var(--fundo); color: var(--tinta); }
+.tela-bau h1 { color: var(--tinta-forte); }
 .cena-bau { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
 .bau-grande { position: relative; display: grid; place-items: center; width: 240px; height: 230px; padding: 0; border: 0; background: none; color: rgba(0, 0, 0, .5); cursor: pointer; }
 .bau-grande svg.arte-bau { width: 210px; height: auto; animation: bau-chama 2.2s ease-in-out infinite; transform-origin: 50% 90%; }
@@ -2281,6 +2285,14 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 
 .grade { display: grid; gap: 10px; }
 .item { display: block; padding: 14px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); color: inherit; text-decoration: none; }
+
+/* ---------- versículos guardados: um por baú ----------
+   O cartão de dentro é o mesmo .cartao-versiculo da lição; aqui só o espaçamento da lista
+   e a etiqueta do dia de onde ele veio. */
+.lista-versiculos { display: grid; gap: 18px; margin: 4px 0 22px; }
+.item-versiculo .etiqueta { display: block; margin-bottom: 2px; }
+.item-versiculo .cartao-versiculo { margin: 0; }
+.item-versiculo .ref-carregando { margin: 0; padding: 18px 0; color: var(--tinta-fraca); font-weight: 700; }
 
 /* ---------- minhas anotações: um caderno por dia ---------- */
 .cadernos-dias { display: grid; gap: 10px; margin: 4px 0 22px; }
