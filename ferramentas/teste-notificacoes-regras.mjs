@@ -99,7 +99,11 @@ const base = (m, extra = {}) => ({
 const hm = (h, m = 0) => h * 60 + m;
 const tipo = (x) => (N.decidir(x) || {}).tipo || null;
 
-ok(tipo(base(hm(18, 59))) === null, 'antes do horário escolhido (19h), nada');
+ok(tipo(base(hm(8, 59))) === null, 'antes do primeiro horário (9h), nada');
+ok(tipo(base(hm(9))) === 'lembrete', 'às 9h sai o lembrete da manhã');
+ok(tipo(base(hm(12))) === 'lembrete', 'ao meio-dia sai o segundo');
+ok(tipo(base(hm(12), { historico: { data: '2026-09-15', automaticas: 1, lembrete: '2026-09-15', lembreteMinutos: hm(12) } })) === null,
+  'o mesmo horário não sai duas vezes');
 ok(tipo(base(hm(19))) === 'lembrete', 'no horário escolhido, o lembrete');
 ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, leuHoje: true } })) === null, 'quem já leu hoje não recebe nada');
 ok(tipo(base(hm(19, 30), { historico: { data: '2026-09-15', automaticas: 1, lembrete: '2026-09-15', lembreteMinutos: hm(19) } })) === null,
@@ -118,7 +122,7 @@ ok(tipo(base(hm(19), { pref: { ...N.PREFERENCIAS_PADRAO, lembrete: false, ofensi
 ok(tipo(base(hm(9, 30), { leitura: { ...base(0).leitura, escudoOntem: true } })) === 'escudo', 'de manhã, avisa que o escudo cobriu ontem');
 ok(tipo(base(hm(9, 30), { leitura: { ...base(0).leitura, escudoOntem: true }, historico: { data: '2026-09-15', automaticas: 1, escudo: '2026-09-15' } })) === null,
   'o recado do escudo sai uma vez');
-ok(tipo(base(hm(13), { leitura: { ...base(0).leitura, escudoOntem: true } })) === null, 'depois do meio-dia o escudo não é mais novidade');
+ok(tipo(base(hm(13), { leitura: { ...base(0).leitura, escudoOntem: true } })) !== 'escudo', 'depois do meio-dia o escudo não é mais novidade');
 
 const sumido = (dias, m = hm(19)) => base(m, { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: ['2026-09-12', '2026-09-08', '2026-09-01'][[3, 7, 14].indexOf(dias)] || '2026-09-10' } });
 ok(tipo(sumido(3)) === 'volta' && tipo(sumido(7)) === 'volta' && tipo(sumido(14)) === 'volta', 'quem sumiu recebe recado no 3º, 7º e 14º dia');

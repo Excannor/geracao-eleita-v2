@@ -23,8 +23,8 @@
     --verde: #0f5c5c; --verde-3d: #0a4444; --vinho: #b3261e; --azul: #0f5c5c; --azul-fraco: #e2f0f0; --erro: #b3261e;
     --trilho: #dcdcdc; --sobre: #ffffff;
     --inverso: #121212; --inverso-tinta: #ffffff;
-    /* O selo do lema é uma marca fixa (bloco escuro, letra clara), igual nos dois temas: é
-       um carimbo, não um cartão que devia seguir o tema. */
+    /* O carimbo inverte com o tema. O efeito depende do contraste entre a chapa e a
+       página: chapa preta sobre fundo preto some, e o que era carimbo vira letra solta. */
     --selo-bloco: #121212; --selo-texto: #f2f2f2;
   }
   @media (prefers-color-scheme: dark) {
@@ -33,6 +33,7 @@
       --verde: #5fbdb9; --verde-3d: #3d9995; --vinho: #ff6b6b; --azul: #5fbdb9; --azul-fraco: #123230; --erro: #ff6b6b;
       --trilho: #2a2a2a; --sobre: #0d0d0d;
       --inverso: #ffffff; --inverso-tinta: #111111;
+      --selo-bloco: #f2f2f2; --selo-texto: #121212;
     }
   }
   /* O portal segue o sistema e tem tema escuro próprio; escolhido "claro" no app, ele
@@ -45,6 +46,7 @@
     --verde: #5fbdb9; --verde-3d: #3d9995; --vinho: #ff6b6b; --azul: #5fbdb9; --azul-fraco: #123230; --erro: #ff6b6b;
     --trilho: #2a2a2a; --sobre: #0d0d0d;
     --inverso: #ffffff; --inverso-tinta: #111111;
+    --selo-bloco: #f2f2f2; --selo-texto: #121212;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--fundo); color: var(--tinta);
@@ -59,29 +61,39 @@
   /* O selo do lema: um carimbo, sempre escuro com letra clara nos dois temas, como uma
      etiqueta impressa, não um cartão que devia seguir o tema. Linhas curtas de propósito:
      a Permanent Marker é uma fonte larga, e frases longas numa linha só quebravam feio. */
-  .selo-lema { display: flex; flex-direction: column; align-items: center; margin: 4px 0 2px; }
-  .selo-linha { display: block; width: fit-content; max-width: 90%; margin-top: -6px; padding: 4px 14px;
-    background: var(--selo-bloco); color: var(--selo-texto); font-family: 'Permanent Marker', 'Oswald', sans-serif;
-    font-size: clamp(.92rem, 5.2vw, 1.25rem); line-height: 1.3; text-transform: uppercase; text-align: center;
-    white-space: nowrap; border: 1px solid rgba(243, 234, 217, .14); box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
-  /* Inclinação igual em todas as linhas: é uma etiqueta carimbada de uma vez, não seis
-     pedaços tortos em direções diferentes. */
-  .selo-lema > * { transform: rotate(-1deg); }
-  .selo-linha:first-child { margin-top: 0; }
+  .selo-lema { display: flex; flex-direction: column; align-items: center; margin: 14px 0 6px; }
+  /* Chapa preta lisa, sem contorno nem sombra: com borda e relevo o bloco virava adesivo
+     colado por cima da tela, em vez de tinta carimbada nela. A letra enche o bloco — é o
+     tamanho que dá o peso da arte; pequena, ela vira legenda. */
+  .selo-linha { display: block; width: fit-content; max-width: 100%; margin-top: -3px; padding: 7px 16px 3px;
+    background: var(--selo-bloco); color: var(--selo-texto); font-family: 'Permanent Marker', cursive;
+    font-size: clamp(1.3rem, 7.4vw, 1.8rem); line-height: 1.12; letter-spacing: .02em;
+    text-transform: uppercase; text-align: center; white-space: nowrap; }
+  /* Sem rotação: na arte de referência os blocos estão retos, e o que quebra a régua é um
+     empurrãozinho lateral em cada linha. Inclinar dava aspecto de etiqueta torta.
+     A contagem começa em 2 porque a referência é a primeira filha. */
+  .selo-lema > :nth-child(2) { margin-top: 0; transform: translateX(3px); }
+  .selo-lema > :nth-child(3) { transform: translateX(15px); }
+  .selo-lema > :nth-child(4) { transform: translateX(-7px); }
+  .selo-lema > :nth-child(5) { transform: translateX(5px); }
+  .selo-lema > :nth-child(6) { transform: translateX(-10px); }
   /* A cruz acompanha a linha "Geração", fora do bloco escuro, na tinta da página. Fica
      posicionada por cima e não no fluxo: ocupando espaço, ela empurrava essa linha para
-     a direita e quebrava o eixo do carimbo, que precisa ser uma pilha centrada. */
-  .selo-com-cruz { position: relative; display: block; width: fit-content; margin-top: -6px; }
+     a direita e quebrava o eixo do carimbo. */
+  .selo-com-cruz { position: relative; display: block; width: fit-content; margin-top: -3px; }
   .selo-com-cruz .selo-linha { margin-top: 0; transform: none; }
-  .selo-cruz { position: absolute; right: 100%; top: 50%; margin-right: 8px; transform: translateY(-50%);
-    width: 15px; height: 20px; color: var(--forte); }
-  .selo-ref { margin-top: 9px; font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 600;
-    font-style: italic; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--fraca); }
+  .selo-cruz { position: absolute; right: 100%; top: 52%; margin-right: 9px; transform: translateY(-50%);
+    width: 16px; height: 22px; color: var(--forte); }
+  .selo-ref { margin-bottom: 10px; font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 700;
+    font-style: italic; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--forte); }
   .marca { position: relative; font-family: 'Oswald', 'Arial Narrow', var(--fonte, sans-serif); font-size: 1.15rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
   .marca em { font-style: normal; }
   .mascote { position: relative; margin: 0 auto; }
   .mascote svg { width: 108px; height: auto; display: block; color: var(--forte); }
   h1 { margin: 0; color: var(--forte); font-size: 1.65rem; line-height: 1.2; text-wrap: balance; }
+  /* Na tela de boas-vindas o carimbo é o protagonista; o título vira apoio dele. */
+  #tela-boas h1 { font-size: 1.24rem; }
+  #tela-boas .dica { font-size: .88rem; }
   p { margin: 0; }
   .dica { color: var(--fraca); font-weight: 600; font-size: .95rem; line-height: 1.5; }
   .etiqueta { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fraca); }
@@ -136,9 +148,13 @@
   <section id="tela-boas" class="centro">
     <div class="mascote">/*SIMBOLO*/</div>
     <div class="marca">Geração <em>Eleita</em></div>
-    <h1 id="titulo-boas">A Bíblia inteira em um ano, uma lição por dia.</h1>
-    <p class="dica" id="dica-boas">De 10 a 20 minutos na maioria dos dias, com ofensiva e amigos lendo junto com você.</p>
+    <!-- O carimbo vem logo depois da marca, e não no meio da tela: ele é a declaração de
+         quem o app é, parte da identidade. Espremido entre o título e os botões, parecia
+         uma arte colada ali por falta de lugar melhor. -->
     <div class="selo-lema">
+      <!-- A referência vem antes do carimbo: embaixo dele, parecia citar a frase, que não
+           é de 1 Pedro. Em cima, ela anuncia de onde vem o nome do app. -->
+      <span class="selo-ref">1 Pedro 2.9</span>
       <span class="selo-linha">Somos a</span>
       <span class="selo-com-cruz">
         <svg class="selo-cruz" viewBox="0 0 24 30" fill="currentColor" aria-hidden="true"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z"/></svg>
@@ -147,8 +163,9 @@
       <span class="selo-linha">Que busca</span>
       <span class="selo-linha">À sua face</span>
       <span class="selo-linha">E te adora</span>
-      <span class="selo-ref">1 Pedro 2.9</span>
     </div>
+    <h1 id="titulo-boas">A Bíblia inteira em um ano, uma lição por dia.</h1>
+    <p class="dica" id="dica-boas">De 10 a 20 minutos na maioria dos dias, com ofensiva e amigos lendo junto com você.</p>
     <div class="espaco"></div>
     <div class="botoes">
       <button class="botao" data-ir="cadastro">Começar</button>

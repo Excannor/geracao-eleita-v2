@@ -177,7 +177,10 @@ ok((await pedirJson('/api/notificacoes/preferencias', { hora: '03:00' }, bento))
 
 // ---------- rodada dos lembretes ----------
 const rodada = async (hora) => (await pedirJson('/api/notificacoes/rodada', { agora: emSP(hora) })).saiu || [];
-ok((await rodada('20:00')).length === 0, 'às 20h, antes do horário do Bento (20h30), nenhum lembrete');
+// Às 8h nenhum dos três horários (9h, 12h e o escolhido) chegou ainda.
+ok((await rodada('08:00')).length === 0, 'antes das 9h, nenhum lembrete');
+// Às 9h sai o da manhã; o horário escolhido (20h30) continua valendo para o da noite.
+ok((await rodada('09:00')).some((s) => s.usuario === 'bento' && s.tipo === 'lembrete'), 'às 9h sai o lembrete da manhã');
 n = doAparelho(celBento).length;
 const as2030 = await rodada('20:30');
 ok(as2030.some((s) => s.usuario === 'bento' && s.tipo === 'lembrete'), 'às 20h30 sai o lembrete do Bento');

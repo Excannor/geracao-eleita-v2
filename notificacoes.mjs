@@ -7,9 +7,9 @@
 //   2. as regras de quando avisar, numa função pura que os testes exercitam hora a hora;
 //   3. o banco de mensagens, em linguagem de gente, sem culpa e sem cobrança.
 //
-// O combinado para não virar chatice: no máximo 2 automáticas por dia, silêncio das
-// 22h30 às 7h, nada depois que a pessoa leu, e quem sumiu recebe três recados espaçados
-// e depois silêncio. Toque de amigo tem teto próprio e se substitui no celular.
+// O combinado para não virar chatice: no máximo 3 automáticas por dia (manhã, meio-dia e
+// noite), silêncio das 22h30 às 7h, nada depois que a pessoa leu, e quem sumiu recebe
+// três recados espaçados e depois silêncio. Toque de amigo tem teto próprio.
 import { readFile, writeFile, rename, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import {
@@ -103,7 +103,12 @@ export async function enviarPush(inscricao, mensagem, chaves, contato, opcoes = 
 
 // ---------------------------------------------------------------- regras
 export const SILENCIO = { inicio: 22 * 60 + 30, fim: 7 * 60 };
-export const MAX_AUTOMATICAS_DIA = 2;
+export const MAX_AUTOMATICAS_DIA = 3;
+// Três chamadas por dia: manhã, meio-dia e noite. A da noite respeita a hora escolhida nas
+// configurações; as duas primeiras são fixas. Todas param no instante em que a pessoa lê,
+// então três é o teto de quem passou o dia inteiro sem abrir, e não a rotina de quem usa.
+export const LEMBRETE_MANHA = 9 * 60;
+export const LEMBRETE_MEIO = 12 * 60;
 export const MAX_TOQUES_RECEBIDOS_DIA = 3;
 export const DIAS_DE_VOLTA = [3, 7, 14];
 export const HORA_OFENSIVA = 21 * 60;
@@ -147,8 +152,19 @@ export function decidir({ agora, pref, historico = {}, leitura }) {
     return DIAS_DE_VOLTA.includes(semLer) ? { tipo: 'volta', dados: { dias: semLer } } : null;
   }
 
-  if (pref.lembrete && minutos >= hora && historico.lembrete !== data) {
-    return { tipo: 'lembrete', dados: { ofensiva: leitura.ofensiva } };
+  // Os três horários do dia. "enviadoAte" é o minuto do último lembrete de hoje: só sai o
+  // horário que já passou e que é mais tarde que o último enviado, então cada um sai uma
+  // vez só e nenhum atropela o outro quando a rodada roda de hora em hora.
+  if (pref.lembrete) {
+    const enviadoAte = historico.lembrete === data ? (historico.lembreteMinutos || 0) : -1;
+    // O recado do escudo já é a mensagem da manhã. Sem isto, quem usou escudo recebia o
+    // escudo e o lembrete das 9h em seguida, dois avisos colados no mesmo intervalo.
+    const inicio = historico.escudo === data ? Math.max(enviadoAte, LEMBRETE_MANHA) : enviadoAte;
+    const horarios = [...new Set([LEMBRETE_MANHA, LEMBRETE_MEIO, hora])].sort((a, b) => b - a);
+    const slot = horarios.find((m) => minutos >= m && m > inicio);
+    if (slot !== undefined) {
+      return { tipo: 'lembrete', dados: { ofensiva: leitura.ofensiva, slot } };
+    }
   }
 
   // A ofensiva em risco sai à noite, e nunca colada no lembrete.
@@ -166,13 +182,13 @@ const T = {
   lembreteComOfensiva: [
     ['🔥 {n} dias seguidos!', 'Bora fazer o dia {n1}? A lição de hoje já tá pronta.'],
     ['Pausa pro café com a Palavra ☕', 'Uns 15 minutinhos e a sua chama de {n} dias segue acesa.'],
-    ['Ei, {nome}! 👋', 'O Bento separou a leitura de hoje pra você. Bora manter os {n} dias?'],
+    ['Ei, {nome}! 👋', 'A leitura de hoje já está separada. Bora manter os {n} dias?'],
     ['Seu momento do dia chegou 📖', '{n} dias de caminho. Hoje é o dia {n1}!'],
   ],
   lembreteSemOfensiva: [
     ['Bora começar? 🌱', 'Um dia de cada vez. A leitura de hoje tá te esperando.'],
     ['Hoje é um bom dia pra abrir a Palavra 📖', 'Uns minutinhos, uma leitura e pronto.'],
-    ['Ei, {nome}! O Bento tá te esperando 🐴', 'A lição de hoje é rapidinha. Bora?'],
+    ['Ei, {nome}! 👋', 'A lição de hoje é rapidinha. Bora?'],
     ['Pausa boa pro seu dia ✨', 'Respira, abre o app e lê com calma.'],
   ],
   lembreteMarco: [
@@ -182,6 +198,21 @@ const T = {
   lembreteDomingo: [
     ['Domingo com a Palavra ☀️', 'Começa a semana leve: a leitura de hoje tá pronta.'],
     ['Bom domingo, {nome}! 🙌', 'Que tal fechar a semana com a lição de hoje?'],
+  ],
+  // Os recados de manhã e de meio-dia carregam Escritura de verdade, com a referência à
+  // vista. O app não inventa profecia nem fala em nome de Deus: quando quer animar, cita
+  // o texto e deixa quem lê conferir de onde veio.
+  lembreteManha: [
+    ['As misericórdias se renovam 🌅', '"As misericórdias do Senhor renovam-se a cada manhã" (Lm 3.22-23). Comece o dia na Palavra.'],
+    ['De manhã, Senhor ☀️', '"De manhã fazes ouvir a minha voz" (Sl 5.3). A leitura de hoje te espera.'],
+    ['Primeiro o Reino 📖', '"Buscai primeiro o Reino de Deus" (Mt 6.33). Uns minutos e o dia começa diferente.'],
+    ['Bom dia, {nome}! 🌤️', '"Ensina-me a fazer a tua vontade" (Sl 143.10). Bora abrir a lição de hoje?'],
+  ],
+  lembreteMeio: [
+    ['Uma pausa no meio do dia ☕', '"Aquietai-vos e sabei que eu sou Deus" (Sl 46.10). Dez minutos bastam.'],
+    ['Fome de quê? 🍞', '"Nem só de pão viverá o homem" (Mt 4.4). A leitura de hoje é rapidinha.'],
+    ['Respira fundo 🌿', '"Vinde a mim, todos os que estais cansados" (Mt 11.28). Abre a Palavra um instante.'],
+    ['No meio do corre 🕊️', '"A tua palavra é doce ao meu paladar" (Sl 119.103). Dá uma parada e lê.'],
   ],
   ofensiva: [
     ['Sua chama de {n} dias tá pedindo lenha 🔥', 'Ainda dá tempo! Faz a lição antes da meia-noite.'],
@@ -194,7 +225,7 @@ const T = {
   ],
   volta3: [['Saudade de você por aqui 👀', 'Seu progresso tá guardadinho. Bora retomar com a leitura de hoje?']],
   volta7: [['O caminho continua aberto 🛤️', 'Sem pressão: é só abrir e seguir de onde parou.']],
-  volta14: [['Passando só pra lembrar 💛', 'Quando quiser voltar, o Bento guardou tudo pra você.']],
+  volta14: [['Passando só pra lembrar 💛', 'Quando quiser voltar, está tudo guardado do jeito que você deixou.']],
   toque: [
     ['{amigo} te deu um toque 👊', 'Bora ler hoje? A lição tá esperando vocês dois.'],
     ['{amigo} tá te chamando pra ler 📣', 'Faz a lição de hoje e a contagem de vocês sobe.'],
@@ -228,7 +259,11 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
     const n = dados.ofensiva || 0;
     const marco = MARCOS.find((m) => m === n + 1);
     const domingo = data && new Date(data + 'T12:00:00Z').getUTCDay() === 0;
-    lista = marco ? T.lembreteMarco : (n >= 1 ? T.lembreteComOfensiva : (domingo ? T.lembreteDomingo : T.lembreteSemOfensiva));
+    // O horário manda no tom: de manhã e ao meio-dia é convite com Escritura; à noite
+    // entra o repertório de sempre, que fala da ofensiva e do marco por vir.
+    const cedo = dados.slot !== undefined && dados.slot <= LEMBRETE_MEIO;
+    if (cedo) lista = dados.slot <= LEMBRETE_MANHA ? T.lembreteManha : T.lembreteMeio;
+    else lista = marco ? T.lembreteMarco : (n >= 1 ? T.lembreteComOfensiva : (domingo ? T.lembreteDomingo : T.lembreteSemOfensiva));
     Object.assign(d, { n, n1: n + 1, marco });
     tag = 'lembrete';
   }
