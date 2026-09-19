@@ -64,13 +64,19 @@
     background: var(--selo-bloco); color: var(--selo-texto); font-family: 'Permanent Marker', 'Oswald', sans-serif;
     font-size: clamp(.92rem, 5.2vw, 1.25rem); line-height: 1.3; text-transform: uppercase; text-align: center;
     white-space: nowrap; border: 1px solid rgba(243, 234, 217, .14); box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
+  /* Inclinação igual em todas as linhas: é uma etiqueta carimbada de uma vez, não seis
+     pedaços tortos em direções diferentes. */
+  .selo-lema > * { transform: rotate(-1deg); }
   .selo-linha:first-child { margin-top: 0; }
-  .selo-linha:nth-child(1) { transform: rotate(-1.3deg); }
-  .selo-linha:nth-child(2) { transform: rotate(1deg); }
-  .selo-linha:nth-child(3) { transform: rotate(-.8deg); }
-  .selo-linha:nth-child(4) { transform: rotate(1.2deg); }
-  .selo-linha:nth-child(5) { transform: rotate(-1deg); }
-  .selo-linha:nth-child(6) { transform: rotate(.9deg); }
+  /* A cruz acompanha a linha "Geração", fora do bloco escuro, na tinta da página. Fica
+     posicionada por cima e não no fluxo: ocupando espaço, ela empurrava essa linha para
+     a direita e quebrava o eixo do carimbo, que precisa ser uma pilha centrada. */
+  .selo-com-cruz { position: relative; display: block; width: fit-content; margin-top: -6px; }
+  .selo-com-cruz .selo-linha { margin-top: 0; transform: none; }
+  .selo-cruz { position: absolute; right: 100%; top: 50%; margin-right: 8px; transform: translateY(-50%);
+    width: 15px; height: 20px; color: var(--forte); }
+  .selo-ref { margin-top: 9px; font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 600;
+    font-style: italic; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--fraca); }
   .marca { position: relative; font-family: 'Oswald', 'Arial Narrow', var(--fonte, sans-serif); font-size: 1.15rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
   .marca em { font-style: normal; }
   .mascote { position: relative; margin: 0 auto; }
@@ -133,12 +139,15 @@
     <h1 id="titulo-boas">A Bíblia inteira em um ano, uma lição por dia.</h1>
     <p class="dica" id="dica-boas">De 10 a 20 minutos na maioria dos dias, com ofensiva e amigos lendo junto com você.</p>
     <div class="selo-lema">
-      <span class="selo-linha">Geração</span>
-      <span class="selo-linha">Que não se</span>
-      <span class="selo-linha">Dobra</span>
-      <span class="selo-linha">Não se vende</span>
-      <span class="selo-linha">Não se</span>
-      <span class="selo-linha">Contamina</span>
+      <span class="selo-linha">Somos a</span>
+      <span class="selo-com-cruz">
+        <svg class="selo-cruz" viewBox="0 0 24 30" fill="currentColor" aria-hidden="true"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z"/></svg>
+        <span class="selo-linha">Geração</span>
+      </span>
+      <span class="selo-linha">Que busca</span>
+      <span class="selo-linha">À sua face</span>
+      <span class="selo-linha">E te adora</span>
+      <span class="selo-ref">1 Pedro 2.9</span>
     </div>
     <div class="espaco"></div>
     <div class="botoes">

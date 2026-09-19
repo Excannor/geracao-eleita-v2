@@ -254,42 +254,49 @@ window.CC = window.CC || {};
   function arrastarParaFechar(folha, fechar) {
     let y0 = 0;
     let dy = 0;
-    let puxando = false;
+    let avaliando = false;
     let ativo = false;
 
-    folha.addEventListener('pointerdown', (ev) => {
-      if (ev.pointerType === 'mouse' && ev.button !== 0) return;
-      if (folha.scrollTop > 0) return;
-      y0 = ev.clientY;
+    // Eventos de toque, e não de ponteiro: a folha tem rolagem própria, e ao primeiro
+    // movimento o navegador assume o gesto como rolagem e dispara pointercancel — o
+    // arraste morria antes de começar. Com touchmove não passivo dá para chamar
+    // preventDefault e tomar o gesto de volta, mas só quando é mesmo para baixo.
+    folha.addEventListener('touchstart', (ev) => {
+      if (ev.touches.length !== 1 || folha.scrollTop > 0) { avaliando = false; return; }
+      y0 = ev.touches[0].clientY;
       dy = 0;
-      puxando = true;
+      avaliando = true;
       ativo = false;
-    });
+    }, { passive: true });
 
-    folha.addEventListener('pointermove', (ev) => {
-      if (!puxando) return;
-      dy = Math.max(0, ev.clientY - y0);
-      // Só assume o gesto depois de uns pixels: antes disso ainda pode ser um toque, e
-      // capturar cedo demais roubaria o clique dos botões de dentro.
-      if (!ativo && dy > 6) {
+    folha.addEventListener('touchmove', (ev) => {
+      if (!avaliando) return;
+      dy = ev.touches[0].clientY - y0;
+      if (!ativo) {
+        // Para cima é rolagem do conteúdo: solta o gesto e não volta a pegá-lo até o
+        // próximo toque. Para baixo, assume depois de uns pixels, para um toque simples
+        // num botão de dentro continuar sendo um toque.
+        if (dy < -4) { avaliando = false; return; }
+        if (dy <= 8) return;
         ativo = true;
-        folha.setPointerCapture(ev.pointerId);
         folha.style.transition = 'none';
       }
-      if (ativo) folha.style.transform = 'translateY(' + dy + 'px)';
-    });
+      if (dy < 0) dy = 0;
+      ev.preventDefault();
+      folha.style.transform = 'translateY(' + dy + 'px)';
+    }, { passive: false });
 
     const soltar = () => {
-      if (!puxando) return;
-      puxando = false;
+      if (!avaliando) return;
+      avaliando = false;
       if (!ativo) return;
       ativo = false;
       folha.style.transition = 'transform .22s var(--suave)';
       folha.style.transform = '';
       if (dy > LIMITE_FECHAR) fechar();
     };
-    folha.addEventListener('pointerup', soltar);
-    folha.addEventListener('pointercancel', soltar);
+    folha.addEventListener('touchend', soltar);
+    folha.addEventListener('touchcancel', soltar);
   }
 
   CC.folha = (interno, opcoes = {}) => {
