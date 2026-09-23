@@ -389,8 +389,10 @@ export class Notificacoes {
       if (tipo === 'lembrete') h.lembreteMinutos = minutos;
     }
     if (tipo === 'toque') h.toques = (h.toques || 0) + 1;
-    // o recado de meta de cada grupo sai no máximo uma vez por dia
-    if (tipo.startsWith('grupo:')) h[tipo] = data;
+    // o recado de meta e a comemoração de cada grupo saem no máximo uma vez por dia. A
+    // comemoração ("grupoBatida:") ficava de fora deste teste: nunca era anotada e saía de
+    // novo a cada rodada de lembretes, uma por minuto.
+    if (tipo.startsWith('grupo:') || tipo.startsWith('grupoBatida:')) h[tipo] = data;
     this.dados.historico[usuario] = h;
     await this.salvar();
     return h;

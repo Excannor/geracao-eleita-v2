@@ -155,6 +155,23 @@ ok(exemplos.filter(({ t }) => t === 'toque').every(({ m }) => m.tag === 'toque')
 ok(new Set(exemplos.filter(({ t, d }) => t === 'lembrete' && d.ofensiva === 12).map(({ m }) => m.titulo)).size >= 2, 'o lembrete varia de um dia para o outro');
 ok(exemplos.some(({ m }) => m.titulo.includes('Marcos')) && !exemplos.some(({ m }) => m.titulo.includes('Estevão')), 'usa só o primeiro nome');
 
+// ---------- avisos de grupo: uma vez por dia ----------
+// A comemoração "o grupo bateu a meta" não era anotada no histórico e saía de novo a cada
+// rodada de lembretes (uma por minuto, em 23/09/2026). As duas marcas de grupo têm de ficar.
+{
+  const { mkdtempSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const pasta = mkdtempSync(join(tmpdir(), 'cc-notif-'));
+  const notif = await new N.Notificacoes(join(pasta, 'notificacoes.json')).carregar();
+  await notif.anotar('ana', 'grupoBatida:p1', '2026-09-23', 1163);
+  await notif.anotar('ana', 'grupo:p2', '2026-09-23', 1163);
+  const h = notif.historico('ana');
+  ok(h['grupoBatida:p1'] === '2026-09-23', 'a comemoração do grupo fica anotada no dia (não repete a cada minuto)');
+  ok(h['grupo:p2'] === '2026-09-23', 'o recado de meta do grupo continua anotado');
+  try { (await import(pathToFileURL(join(AQUI, 'db.mjs')).href)).fecharBanco(join(pasta, 'caminho.db')); } catch { /* ok */ }
+  try { rmSync(pasta, { recursive: true, force: true }); } catch { /* ok */ }
+}
+
 console.log('\n  exemplos:');
 for (const { t, m } of exemplos.filter((_, i) => i % 4 === 2)) console.log('    [' + t + '] ' + m.titulo + '  |  ' + m.corpo);
 

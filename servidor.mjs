@@ -507,6 +507,9 @@ async function rodadaDeLembretes(agora = new Date()) {
   for (const p of CONTAS.propositosAtivos().filter((x) => x.grupo && x.tipo !== 'oracao')) {
     const retrato = await retratoDoProposito(p, p.criadoPor);
     if (!retrato.hoje) continue;
+    // Meta de grupo precisa de grupo: com uma pessoa só (a célula que acabou de nascer), ler
+    // o próprio dia não vira "o grupo bateu a meta" nem cobrança de ninguém.
+    if (retrato.membros.filter((m) => m.estado === 'ativo').length < 2) continue;
     if (retrato.hoje.batida) {
       for (const m of retrato.membros) {
         if (m.estado !== 'ativo' || !NOTIFICACOES.inscricoesDe(m.usuario).length || !NOTIFICACOES.preferencias(m.usuario).amigos) continue;
