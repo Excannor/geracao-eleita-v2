@@ -372,13 +372,10 @@ button { font-family: inherit; }
 .conteudo.largo { max-width: 720px; }
 
 /* ---------- barra inferior / trilho lateral ----------
-   No celular a barra virou duas "ilhas" em pílula, separadas, com o botão quadrado da
-   Bíblia levantado entre elas — a própria barra (.navegacao) é só um trilho invisível que
-   as posiciona; quem tem fundo, borda e sombra são as ilhas e o botão central. Por isso
-   .navegacao fica com pointer-events:none e só as ilhas e o botão central voltam a
-   pointer-events:auto: sem isso, a faixa transparente entre as duas ilhas bloquearia o
-   toque no conteúdo por baixo dela. No trilho lateral (>= 860px) isso tudo volta ao
-   normal: ver a media query de telas largas. */
+   No celular: uma barra só, de ponta a ponta, com duas metades (.ilha, sem fundo próprio)
+   de duas abas cada e o botão quadrado da Bíblia encaixado no meio. As .ilha existem para
+   dividir as abas por igual dos dois lados; no trilho lateral (>= 860px) elas somem
+   (display: contents) e tudo volta a ser lista. */
 .navegacao .marca-lateral { display: none; }
 
 .navegacao {
@@ -390,10 +387,11 @@ button { font-family: inherit; }
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 10px;
-  padding: 0 12px calc(10px + env(safe-area-inset-bottom));
-  background: transparent;
-  pointer-events: none;
+  gap: 4px;
+  padding: 0 8px env(safe-area-inset-bottom);
+  background: var(--cartao);
+  border-top: 1px solid var(--borda);
+  border-radius: var(--raio-g) var(--raio-g) 0 0;
 }
 
 .ilha {
@@ -402,14 +400,8 @@ button { font-family: inherit; }
   justify-content: space-around;
   align-items: center;
   height: 64px;
-  padding: 0 6px;
-  background: var(--cartao);
-  border: 1px solid var(--borda);
-  border-radius: 32px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
-  pointer-events: auto;
+  padding: 0 2px;
 }
-:root[data-tema="escuro"] .ilha { box-shadow: 0 4px 16px rgba(0, 0, 0, .4); }
 
 .aba {
   flex: 0 0 auto;
@@ -454,32 +446,27 @@ button { font-family: inherit; }
 }
 .aba.selecionada .retrato-aba { border-color: var(--inverso); }
 
-/* Bíblia: o botão quadrado (cantos bem arredondados) levantado entre as duas ilhas — a
-   Bíblia é o texto por trás de tudo, não mais um destino entre outros. A margem embaixo é
-   o que o ergue acima das ilhas, que ficam alinhadas pelo pé da barra (align-items:
-   flex-end em .navegacao). O brilho é uma exceção pedida pelo dono, na referência que ele
-   mandou: a única peça do app com sombra de destaque assim. */
+/* Bíblia: o botão quadrado (cantos bem arredondados) erguido no meio da barra — a Bíblia é
+   o texto por trás de tudo, não mais um destino entre outros. A margem embaixo o ergue; a
+   borda grossa na cor da barra é o encaixe: a parte que passa da borda de cima fica
+   abraçada pela barra, em vez de flutuar solta (o dono rejeitou a versão solta). O brilho
+   é exceção pedida pelo dono: a única peça do app com sombra de destaque assim. */
 .aba.aba-central {
-  flex: 0 0 72px;
-  width: 72px;
-  height: 72px;
+  flex: 0 0 74px;
+  width: 74px;
+  height: 74px;
   max-width: none;
-  margin-bottom: 18px;
-  border: 0;
-  border-radius: 24px;
+  margin-bottom: 10px;
+  border: 5px solid var(--cartao);
+  border-radius: 28px;
   background: var(--inverso);
   color: var(--inverso-tinta);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--inverso) 45%, transparent),
-    0 0 0 6px color-mix(in srgb, var(--inverso) 12%, transparent);
-  pointer-events: auto;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--inverso) 35%, transparent);
 }
 .aba.aba-central .ico-aba { width: 26px; height: 26px; }
 .aba.aba-central .rotulo-aba { font-size: 0.68rem; }
 .aba.aba-central:hover { background: var(--inverso); }
-.aba.aba-central.selecionada {
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--inverso) 45%, transparent),
-    0 0 0 6px color-mix(in srgb, var(--inverso) 22%, transparent);
-}
+.aba.aba-central.selecionada { box-shadow: 0 6px 22px color-mix(in srgb, var(--inverso) 55%, transparent); }
 
 /* ---------- botões ----------
    Acabamento novo: cápsula, chapado. O botão principal é o par que se inverte entre
