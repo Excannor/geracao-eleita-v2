@@ -54,11 +54,11 @@ const leituraNbv = (plano) => plano.trechos.map((t) => {
 }).join(' ');
 // Expressões conferidas como redação de outra tradução (ARA/ACF), já usadas por engano.
 const OUTRA_TRADUCAO = ['proverá', 'achou graça', 'cana rachada', 'mecha que fumega', 'casa da escravidão',
-  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo', 'pesado de boca', 'pesado de língua', 'estarei com a tua boca', 'fazer três tendas', 'três tendas', 'lento para se irar', 'lento para se irritar', 'tardio em irar', 'convosco todos os dias', 'com vocês todos os dias', 'atire a primeira pedra', 'nada me faltará', 'nada me faltara', 'sombra da morte', 'verdes pastos', 'refrigera a minha alma', 'águas tranquilas', 'por que me desamparaste', 'céus proclamam a glória'].map(normalizar);
+  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo', 'pesado de boca', 'pesado de língua', 'estarei com a tua boca', 'fazer três tendas', 'três tendas', 'lento para se irar', 'lento para se irritar', 'tardio em irar', 'convosco todos os dias', 'com vocês todos os dias', 'atire a primeira pedra', 'nada me faltará', 'nada me faltara', 'sombra da morte', 'verdes pastos', 'refrigera a minha alma', 'águas tranquilas', 'por que me desamparaste', 'céus proclamam a glória', 'este é o dia que o senhor fez', 'o fruto do espírito é', 'tudo posso naquele', 'tudo posso em cristo', 'as misericórdias do senhor', 'renovam-se cada manhã', 'não por força nem por violência', 'o justo viverá pela fé', 'ainda que a figueira não floresça', 'rasgai o vosso coração', 'prisioneiros da esperança'].map(normalizar);
 // Palavras com maiúscula que não são nome de alguém da leitura (nomes de Deus, termos gerais).
 // Os nomes dos livros também passam: citar "Êxodo" ou "Marcos" é falar da própria leitura.
 const NOMES_LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia',
-  'Escritura', 'Escrituras', 'Reino', 'Lei', 'Palavra', 'Altíssimo', 'Soberano', 'Messias', 'Mestre', 'Salvador', 'Criador', 'Salmo', 'Pregador',
+  'Escritura', 'Escrituras', 'Reino', 'Lei', 'Palavra', 'Altíssimo', 'Soberano', 'Messias', 'Mestre', 'Salvador', 'Criador', 'Salmo', 'Pregador', 'Antigo', 'Novo', 'Testamento',
   ...Object.keys(biblia.livros).flatMap((l) => l.split(' ')).filter((p) => /^\p{Lu}/u.test(p))]);
 // Todas as palavras que a NBV escreve em minúscula em algum lugar: servem para separar palavra
 // comum de nome próprio no começo da frase.

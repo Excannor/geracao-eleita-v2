@@ -112,6 +112,12 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    assustam quem está chegando. A reflexão fica no que o texto diz com clareza: Deus reina,
    o Cordeiro vence, os fiéis são guardados, Deus enxugará as lágrimas. Nas cartas às igrejas
    (Ap 2-3), a pergunta é sobre a vida do leitor, não sobre "qual era da história" é cada uma.
+
+   **Dinheiro e bênção.** Malaquias 3.8-12 ("roubar a Deus", "janelas do céu") e textos
+   parecidos não viram âncora nem pergunta sobre o quanto o leitor dá, e nunca prometem retorno
+   financeiro. Quem está chegando é alvo fácil de cobrança e de teologia da prosperidade.
+   A reflexão pode falar de generosidade e de dar a Deus o melhor (Ml 1.8), sem número, sem
+   troca e sem culpa.
    Provérbios são conselhos de sabedoria, não garantias: "sua vida será prolongada", "seus
    celeiros ficarão cheios" (Pv 3) não viram promessa de saúde ou dinheiro para quem obedece.
    Âncora em conselho (confiar, cuidar do coração, falar com cuidado), não em recompensa.
