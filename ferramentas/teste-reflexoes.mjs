@@ -51,11 +51,11 @@ const leituraNbv = (plano) => plano.trechos.map((t) => {
 }).join(' ');
 // Expressões conferidas como redação de outra tradução (ARA/ACF), já usadas por engano.
 const OUTRA_TRADUCAO = ['proverá', 'achou graça', 'cana rachada', 'mecha que fumega', 'casa da escravidão',
-  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo', 'pesado de boca', 'pesado de língua', 'estarei com a tua boca', 'fazer três tendas', 'três tendas', 'lento para se irar', 'lento para se irritar', 'tardio em irar', 'convosco todos os dias', 'com vocês todos os dias', 'atire a primeira pedra'].map(normalizar);
+  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo', 'pesado de boca', 'pesado de língua', 'estarei com a tua boca', 'fazer três tendas', 'três tendas', 'lento para se irar', 'lento para se irritar', 'tardio em irar', 'convosco todos os dias', 'com vocês todos os dias', 'atire a primeira pedra', 'nada me faltará', 'nada me faltara', 'sombra da morte', 'verdes pastos', 'refrigera a minha alma', 'águas tranquilas', 'por que me desamparaste', 'céus proclamam a glória'].map(normalizar);
 // Palavras com maiúscula que não são nome de alguém da leitura (nomes de Deus, termos gerais).
 // Os nomes dos livros também passam: citar "Êxodo" ou "Marcos" é falar da própria leitura.
 const NOMES_LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia',
-  'Escritura', 'Escrituras', 'Reino', 'Lei', 'Palavra', 'Altíssimo', 'Soberano', 'Messias', 'Mestre', 'Salvador',
+  'Escritura', 'Escrituras', 'Reino', 'Lei', 'Palavra', 'Altíssimo', 'Soberano', 'Messias', 'Mestre', 'Salvador', 'Criador', 'Salmo',
   ...Object.keys(biblia.livros).flatMap((l) => l.split(' ')).filter((p) => /^\p{Lu}/u.test(p))]);
 // Todas as palavras que a NBV escreve em minúscula em algum lugar: servem para separar palavra
 // comum de nome próprio no começo da frase.
@@ -169,7 +169,7 @@ for (const dia of dias) {
 
     // Número citado que a leitura não tem vai para conferência: "quarenta anos" (Atos 7),
     // "quatro palavras" (eram seis) e "mais de vinte anos" (conta nossa) já saíram errados.
-    const semCapitulo = normalizar(escrito).replace(/\b(capítulos?|versículos?|dia) \d+/g, ' ')
+    const semCapitulo = normalizar(escrito).replace(/\b(capítulos?|versículos?|dia|salmos?) \d+/g, ' ')
       // "1 Samuel", "2 Reis": o número faz parte do nome do livro, não é contagem.
       .replace(/(?<!\p{L})[123] (samuel|reis|crônicas|coríntios|tessalonicenses|timóteo|pedro|joão)(?!\p{L})/gu, ' ');
     for (const n of new Set(semCapitulo.match(NUMERO) || [])) {
