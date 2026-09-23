@@ -465,7 +465,31 @@ async function retratoDoProposito(p, eu) {
     id: p.id, tipo: p.tipo, alvo: p.alvo, titulo: p.titulo, grupo: p.grupo, celula: !!p.celula, limite: limiteDo(p),
     criadoPor: p.criadoPor, criadoEm: p.criadoEm,
     dias, hoje, membros, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
+    ...(p.celula ? celulaNoRetrato(p, eu, info, ativos, referencia) : {}),
   };
+}
+
+// O que só a célula tem: o dia do encontro, o recado do líder, a semana que o roteiro cobre
+// (os 7 dias do plano até onde o líder já leu: é ele quem conduz o encontro) e, só para o
+// líder, o número da semana do grupo inteiro, sem dizer quem faltou.
+function celulaNoRetrato(p, eu, info, ativos, referencia) {
+  const lider = info.get(p.criadoPor);
+  const lidos = ((lider && lider.estado && lider.estado.lidos) || []).map(Number).filter((n) => n >= 1 && n <= PLANO_DO_CONTEUDO.length);
+  const semanaAte = Math.max(7, lidos.length ? Math.max(...lidos) : 0);
+  const extra = {
+    encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', semanaAte,
+    estudo: p.estudo || null,
+  };
+  if (eu !== p.criadoPor) return extra;
+  const semana = new Set(Array.from({ length: 7 }, (_, i) => somaDias(referencia, -i)));
+  let leram = 0;
+  let leituras = 0;
+  for (const m of ativos) {
+    const n = [...info.get(m.usuario).datas].filter((d) => semana.has(d)).length;
+    if (n) leram++;
+    leituras += n;
+  }
+  return { ...extra, semanaLider: { pessoas: ativos.length, leram, leituras, possiveis: ativos.length * 7 } };
 }
 
 async function rodadaDeLembretes(agora = new Date()) {
@@ -955,7 +979,7 @@ const servidor = createServer(async (req, res) => {
     }
 
     if (rota === '/api/celula') {
-      await acao(async ({ acao: qual, id, titulo, token }) => {
+      await acao(async ({ acao: qual, id, titulo, token, dia, texto, usuario, estudo, ref }) => {
         const hoje = hojeDe(eu);
         if (qual === 'criar') {
           const p = await CONTAS.criarCelula(eu, { titulo }, hoje);
@@ -971,6 +995,10 @@ const servidor = createServer(async (req, res) => {
           if (!r.ja) await avisarEntradaNaCelula(eu, r, hoje);
           return { ja: !!r.ja, id: r.proposito.id, titulo: r.proposito.titulo };
         }
+        if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia); return {}; }
+        if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto); return {}; }
+        if (qual === 'estudo') { await CONTAS.definirEstudo(eu, id, { tipo: estudo, ref, texto }, TODOS_LIVROS); return {}; }
+        if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
         throw Object.assign(new Error('ação desconhecida'), { publico: true });
       });
       return;

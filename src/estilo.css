@@ -1648,12 +1648,35 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .retratos-grupo .retrato-amigo, .retratos-dupla .retrato-amigo { box-shadow: 0 0 0 2px var(--cartao); }
 .retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -20px; }
 .retratos-grupo .retrato-mais { display: grid; place-items: center; background: var(--fundo-2); color: var(--tinta-forte); font-size: 0.72rem; font-weight: 900; }
+
+/* ---------- célula: líder, recado, encontro e estudo ---------- */
+.selo-lider { margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--azul-fraco); color: var(--acento); font-size: 0.7rem; font-weight: 800; vertical-align: middle; }
+.recado-lider { margin: 10px 0; padding: 12px 14px; border-left: 4px solid var(--acento); border-radius: var(--raio-p); background: var(--fundo-2); }
+.recado-lider p { margin: 4px 0 0; color: var(--tinta-forte); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.recado-cartao { margin: 0; padding: 8px 10px; border-radius: var(--raio-p); background: var(--fundo-2); color: var(--tinta); font-size: 0.86rem; font-weight: 600; line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.semana-lider { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0; color: var(--tinta); font-size: 0.88rem; font-weight: 600; }
+.semana-lider svg { flex: 0 0 auto; width: 18px; height: 18px; color: var(--acento); margin-top: 1px; }
+.escolha-dia { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 12px 0; }
+.escolha-trecho { display: grid; gap: 10px; }
+.roteiro { display: grid; gap: 16px; margin: 14px 0; padding-left: 22px; }
+.roteiro > li > b { color: var(--tinta-forte); }
+.roteiro > li > p { margin: 4px 0 0; }
+.roteiro .cartao-versiculo { margin: 8px 0; }
+.roteiro .botao.pequeno { margin-top: 6px; }
+.roteiro ul { display: grid; gap: 8px; margin: 6px 0 0; padding-left: 0; list-style: none; }
+.roteiro-dias li span { display: inline-block; min-width: 52px; color: var(--tinta-fraca); font-weight: 800; }
+.roteiro-dias small, .roteiro-perguntas small { display: block; color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 700; }
+.roteiro-perguntas li, .roteiro-oracao li { padding: 8px 10px; border-radius: var(--raio-p); background: var(--fundo-2); line-height: 1.45; }
+.estudo-livre { margin: 12px 0; line-height: 1.6; }
+.estudo-livre p { margin: 0 0 10px; overflow-wrap: anywhere; }
 .cabeca-proposito .quem-amigo { flex: 1; }
 .retratos-grupo .retrato-amigo.fez, .retratos-dupla .retrato-amigo.fez { box-shadow: 0 0 0 2px var(--cartao), 0 0 0 4px var(--verde); }
 .tipo-proposito { display: inline-flex; align-items: center; gap: 4px; min-width: 0; margin: 0; color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 800; }
 .tipo-proposito svg { flex: 0 0 auto; width: 14px; height: 14px; }
 .tipo-proposito > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.folha .barra-missao { margin: 12px 0 10px; }
+/* o rótulo de pontos fica em cima da barra: o respiro é para ele não bater no texto de cima */
+.folha .barra-missao { margin: 30px 0 10px; }
 .dias-cartao { display: grid; justify-items: end; flex: 0 0 auto; margin-left: auto; color: var(--chama); font-size: 1.2rem; font-weight: 900; line-height: 1.1; }
 .dias-cartao svg { width: 16px; height: 16px; }
 .dias-cartao small { color: var(--tinta-fraca); font-size: 0.72rem; font-weight: 800; }
@@ -2432,6 +2455,9 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
 .campo-senha span { color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 .campo-senha input { width: 100%; min-height: 50px; padding: 13px 14px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--fundo-2); color: var(--tinta-forte); font-family: inherit; font-size: 1rem; font-weight: 700; }
 .campo-senha input:focus { outline: none; border-color: var(--azul); background: var(--cartao); }
+.campo-senha textarea { width: 100%; min-height: 110px; padding: 12px 14px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--fundo-2); color: var(--tinta-forte);
+  font-family: inherit; font-size: 1rem; font-weight: 600; line-height: 1.5; resize: vertical; }
+.campo-senha textarea:focus { outline: none; border-color: var(--azul); background: var(--cartao); }
 .recado-senha:empty { display: none; }
 .recado-senha { margin: 4px 0 0; padding: 10px 12px; border-radius: var(--raio); background: var(--vermelho-fraco); color: var(--vermelho-3d); font-size: 0.9rem; font-weight: 800; }
 :root[data-tema="escuro"] .recado-senha { color: var(--vermelho); }

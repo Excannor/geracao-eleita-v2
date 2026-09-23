@@ -101,6 +101,45 @@ try {
   ok(retrato && retrato.membros.filter((m) => m.estado === 'ativo').length === 20 && retrato.hoje && retrato.hoje.meta === 20
     && retrato.celula === true && retrato.limite === 20, 'o líder vê a célula com 20 pessoas e meta do dia 20');
 
+  ok(!(await propositos(lider.cookie)).some((p) => !p.grupo), 'entrar pela célula não empilha uma dupla por membro na tela do líder');
+
+  // ---------- o líder ----------
+  console.log('\n  O líder da célula\n');
+  const celula = (corpo, cookie) => pedir('/api/celula', { id, ...corpo }, cookie);
+  ok((await celula({ acao: 'encontro', dia: 4 }, lider.cookie)).status === 200, 'o líder marca o encontro (quinta)');
+  ok((await celula({ acao: 'encontro', dia: 9 }, lider.cookie)).status === 400, 'dia fora da semana é recusado');
+  ok((await celula({ acao: 'encontro', dia: 2 }, ana.cookie)).status === 403, 'quem não é líder não muda o encontro');
+  ok((await celula({ acao: 'recado', texto: 'Quinta às 20h na casa da Ana. Tragam a Bíblia!' }, lider.cookie)).status === 200, 'o líder publica um recado');
+  ok((await celula({ acao: 'recado', texto: 'x'.repeat(281) }, lider.cookie)).status === 400, 'recado com mais de 280 caracteres é recusado');
+  ok((await celula({ acao: 'recado', texto: 'oi' }, ana.cookie)).status === 403, 'quem não é líder não escreve recado');
+
+  // o estudo é escolha do líder, nunca imposto
+  let daBia = (await propositos(bia.cookie)).find((p) => p.id === id);
+  ok(daBia.estudo === null, 'sem o líder escolher, não há estudo nenhum');
+  ok((await celula({ acao: 'estudo', estudo: 'trecho', ref: 'Romanos 8.28-30', texto: 'Tudo coopera para o bem.' }, lider.cookie)).status === 200, 'o líder escolhe um trecho');
+  daBia = (await propositos(bia.cookie)).find((p) => p.id === id);
+  ok(daBia.estudo && daBia.estudo.tipo === 'trecho' && daBia.estudo.ref === 'Romanos 8.28-30' && daBia.estudo.texto === 'Tudo coopera para o bem.', 'os membros veem o trecho e a palavra do líder');
+  ok(daBia.encontro === 4 && /Tragam a Bíblia/.test(daBia.recado), 'os membros veem o dia do encontro e o recado');
+  ok((await celula({ acao: 'estudo', estudo: 'trecho', ref: 'Livro Nenhum 3' }, lider.cookie)).status === 400, 'livro que não existe é recusado');
+  ok((await celula({ acao: 'estudo', estudo: 'trecho', ref: 'João 3.18-16' }, lider.cookie)).status === 400, 'versículos de trás para frente são recusados');
+  ok((await celula({ acao: 'estudo', estudo: 'livre', texto: '' }, lider.cookie)).status === 400, 'estudo escrito vazio é recusado');
+  ok((await celula({ acao: 'estudo', estudo: 'livre', texto: 'Hoje vamos falar de perdão.\nLeiam Mateus 18.21-22.' }, lider.cookie)).status === 200, 'o líder escreve o próprio estudo');
+  ok((await celula({ acao: 'estudo', estudo: 'semana' }, lider.cookie)).status === 200, 'o líder escolhe a leitura da semana');
+  ok((await celula({ acao: 'estudo', estudo: 'semana' }, ana.cookie)).status === 403, 'quem não é líder não escolhe o estudo');
+  const doLider = (await propositos(lider.cookie)).find((p) => p.id === id);
+  ok(doLider.semanaAte >= 7 && doLider.estudo.tipo === 'semana', 'a leitura da semana cobre 7 dias do plano');
+  ok(doLider.semanaLider && doLider.semanaLider.pessoas === 20 && doLider.semanaLider.possiveis === 140, 'o líder vê só o número da semana do grupo');
+  ok(!('semanaLider' in daBia), 'os membros não veem o número da semana');
+  ok((await celula({ acao: 'estudo', estudo: '' }, lider.cookie)).status === 200
+    && (await propositos(bia.cookie)).find((p) => p.id === id).estudo === null, 'o líder tira o estudo');
+
+  // tirar alguém
+  ok((await celula({ acao: 'remover', usuario: 'duda' }, ana.cookie)).status === 403, 'quem não é líder não tira ninguém');
+  ok((await celula({ acao: 'remover', usuario: 'lider' }, lider.cookie)).status === 400, 'o líder não tira a si mesmo');
+  ok((await celula({ acao: 'remover', usuario: 'duda' }, lider.cookie)).status === 200, 'o líder tira alguém da célula');
+  ok(!(await propositos(duda.cookie)).some((p) => p.id === id), 'quem saiu não vê mais a célula');
+  ok((await amigos(duda.cookie)).includes('lider'), 'a amizade com o líder continua');
+
   // o grupo de amigos continua com 5
   const g = await dados(await pedir('/api/propositos', { acao: 'criar', tipo: 'plano', com: ['ana', 'membro6', 'membro7', 'membro8', 'membro9'] }, lider.cookie));
   ok(g.erro && /5/.test(g.erro), 'o grupo de amigos continua com no máximo 5 pessoas');

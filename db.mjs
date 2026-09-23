@@ -103,6 +103,17 @@ const ESQUEMA = [
   `
   ALTER TABLE propositos ADD COLUMN celula INTEGER NOT NULL DEFAULT 0;
   `,
+  // v6: a célula ganha o dia do encontro (0 domingo a 6 sábado, -1 sem dia), o recado do líder
+  // e o estudo do encontro que o líder escolhe: a leitura da semana, um trecho ou um texto dele
+  `
+  ALTER TABLE propositos ADD COLUMN encontro INTEGER NOT NULL DEFAULT -1;
+  ALTER TABLE propositos ADD COLUMN recado TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN recado_em TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_tipo TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_ref TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_texto TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_em TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrarEsquema(db) {

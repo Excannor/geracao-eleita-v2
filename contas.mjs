@@ -22,6 +22,8 @@ const TAMANHO = 64;
 export const LIMITE_ACEITES_HORA = 30;
 export const LIMITE_TOQUES_DIA = 5;
 export const VALIDADE_CONVITE = 30 * 24 * 60 * 60 * 1000;
+export const RECADO_MAX = 280;
+export const ESTUDO_MAX = 3000;
 export const FUSO_PADRAO = 'America/Sao_Paulo';
 export const MOTIVOS_DENUNCIA = [
   'Insiste ou incomoda',
@@ -128,6 +130,9 @@ function paraLinhas(d) {
     { tabela: 'propositos', chaves: ['id'], linhas: Object.values(d.propositos || {}).map((p) => ({
       id: p.id, tipo: p.tipo, alvo: p.alvo || '', titulo: p.titulo || '', criado_por: p.criadoPor, criado_em: p.criadoEm,
       encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0, celula: p.celula ? 1 : 0,
+      encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recado_em: p.recadoEm || '',
+      estudo_tipo: (p.estudo && p.estudo.tipo) || '', estudo_ref: (p.estudo && p.estudo.ref) || '',
+      estudo_texto: (p.estudo && p.estudo.texto) || '', estudo_em: (p.estudo && p.estudo.em) || '',
     })) },
     { tabela: 'proposito_membros', chaves: ['proposito', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => p.membros.map((m) => ({
       proposito: p.id, usuario: m.usuario, estado: m.estado, entrou_em: m.entrouEm || '', saiu_em: m.saiuEm || '', convidado_por: m.convidadoPor || '',
@@ -177,7 +182,10 @@ function deLinhas(t, versao) {
   for (const l of t.propositos || []) {
     d.propositos[l.id] = {
       id: l.id, tipo: l.tipo, alvo: l.alvo || '', titulo: l.titulo || '', criadoPor: l.criado_por, criadoEm: l.criado_em,
-      encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, celula: !!l.celula, membros: [], diasBatidos: [],
+      encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, celula: !!l.celula,
+      encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '',
+      estudo: l.estudo_tipo ? { tipo: l.estudo_tipo, ref: l.estudo_ref || '', texto: l.estudo_texto || '', em: l.estudo_em || '' } : null,
+      membros: [], diasBatidos: [],
     };
   }
   for (const l of t.membros || []) {
@@ -537,7 +545,7 @@ export class Contas {
 
   // O link vale para quantas pessoas quiserem, por 30 dias, até quem convidou cancelar. Cada
   // aceite fica anotado, e é daí que sai a Trilha do Semeador.
-  async usarConvite(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false } = {}) {
+  async usarConvite(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false, semDupla = false } = {}) {
     const convite = this.lerConvite(token, assinar, agora);
     if (!convite) throw erro('esse convite venceu ou foi cancelado', 410);
     const a = this.exigirCompleto(eu);
@@ -559,7 +567,9 @@ export class Contas {
     this.dados.amizades[par(a.usuario, convite.de)] = {
       estado: 'ativa', pediu: convite.de, em: hoje, aceitaEm: hoje,
     };
-    this.garantirDuplaPlano(a.usuario, convite.de, hoje, convite.de);
+    // Quem entra por uma célula já lê junto nela: a dupla automática só empilharia uma dupla
+    // por membro na tela do líder.
+    if (!semDupla) this.garantirDuplaPlano(a.usuario, convite.de, hoje, convite.de);
     await this.salvar();
     return { de: convite.de };
   }
@@ -739,7 +749,7 @@ export class Contas {
   gerarLinkCelula(eu, id, assinar, agora = Date.now()) {
     const a = this.exigirCompleto(eu);
     const p = this.proposito(id);
-    if (!p || p.encerradoEm || !p.grupo || !this.ativosDe(p).some((m) => m.usuario === a.usuario)) throw erro('grupo não encontrado', 404);
+    if (!p || p.encerradoEm || !p.celula || !this.ativosDe(p).some((m) => m.usuario === a.usuario)) throw erro('célula não encontrada', 404);
     const carga = Buffer.from(JSON.stringify({ p: p.id, d: a.usuario, v: agora + VALIDADE_CONVITE })).toString('base64url');
     return { token: carga + '.' + assinar('celula.' + carga + '.' + a.seloConvite), venceEm: new Date(agora + VALIDADE_CONVITE).toISOString() };
   }
@@ -753,7 +763,7 @@ export class Contas {
     if (!dono || !iguais(firma, assinar('celula.' + carga + '.' + dono.seloConvite))) return null;
     if (!(Number(dado.v) > agora)) return null;
     const p = this.proposito(dado.p);
-    if (!p || p.encerradoEm || !p.grupo || !this.ativosDe(p).some((m) => m.usuario === dono.usuario)) return null;
+    if (!p || p.encerradoEm || !p.celula || !this.ativosDe(p).some((m) => m.usuario === dono.usuario)) return null;
     const pessoas = this.presentes(p).length;
     return { proposito: p, de: dono.usuario, nome: dono.nome, titulo: p.titulo, pessoas, limite: limiteDo(p), vagas: Math.max(0, limiteDo(p) - pessoas) };
   }
@@ -771,13 +781,80 @@ export class Contas {
     let amizadeNova = false;
     if (link.de !== a.usuario && this.relacao(a.usuario, link.de) !== 'amigos') {
       const convite = this.gerarConvite(link.de, assinar, agora);
-      const usado = await this.usarConvite(a.usuario, convite.token, assinar, hoje, agora, { contaNova });
+      const usado = await this.usarConvite(a.usuario, convite.token, assinar, hoje, agora, { contaNova, semDupla: true });
       amizadeNova = !usado.ja;
     }
     if (minha) Object.assign(minha, { estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: link.de });
     else p.membros.push({ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: link.de });
     await this.salvar();
     return { proposito: p, de: link.de, amizadeNova };
+  }
+
+  // ---------- o líder da célula ----------
+  // Quem criou a célula é o líder: escolhe o dia do encontro, deixa um recado para todos e pode
+  // tirar alguém. Ver quem leu cada dia já é de todos os membros; o líder vê a mais só o número
+  // da semana do grupo inteiro, nunca uma lista de quem faltou.
+  celulaDoLider(eu, id) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
+    if (p.criadoPor !== a.usuario) throw erro('só o líder da célula pode fazer isso', 403);
+    return p;
+  }
+
+  async definirEncontro(eu, id, dia) {
+    const p = this.celulaDoLider(eu, id);
+    const n = Number(dia);
+    if (!Number.isInteger(n) || n < -1 || n > 6) throw erro('escolha um dia da semana');
+    p.encontro = n;
+    await this.salvar();
+    return p;
+  }
+
+  async definirRecado(eu, id, texto, agora = new Date()) {
+    const p = this.celulaDoLider(eu, id);
+    const limpo = String(texto || '').replace(/\s+/g, ' ').trim();
+    if (limpo.length > RECADO_MAX) throw erro('o recado tem no máximo ' + RECADO_MAX + ' caracteres');
+    p.recado = limpo;
+    p.recadoEm = limpo ? agora.toISOString() : '';
+    await this.salvar();
+    return p;
+  }
+
+  // O estudo do encontro é escolha do líder, nunca imposto pelo app:
+  //   semana: o roteiro que o app monta da leitura da semana (sugestão pronta)
+  //   trecho: um livro e capítulo, ou versículos, escolhidos por ele ("Romanos 8", "João 3.16-18")
+  //   livre:  um estudo escrito por ele
+  // Nos três, "texto" é a palavra do líder (no livre, é o estudo inteiro). Tipo vazio apaga.
+  async definirEstudo(eu, id, { tipo, ref, texto } = {}, livros = [], agora = new Date()) {
+    const p = this.celulaDoLider(eu, id);
+    const t = String(tipo || '');
+    if (!t) { p.estudo = null; await this.salvar(); return p; }
+    if (!['semana', 'trecho', 'livre'].includes(t)) throw erro('escolha como vai ser o estudo');
+    const limpo = String(texto || '').replace(/\r\n/g, '\n').trim();
+    if (limpo.length > ESTUDO_MAX) throw erro('o estudo tem no máximo ' + ESTUDO_MAX + ' caracteres');
+    if (t === 'livre' && !limpo) throw erro('escreva o estudo');
+    let referencia = '';
+    if (t === 'trecho') {
+      referencia = String(ref || '').replace(/\s+/g, ' ').trim();
+      const m = /^(.+?) (\d{1,3})(?:\.(\d{1,3})(?:-(\d{1,3}))?)?$/.exec(referencia);
+      if (!m || !livros.includes(m[1]) || (m[4] && Number(m[4]) < Number(m[3]))) throw erro('escolha um livro e um capítulo, como "Romanos 8" ou "João 3.16-18"');
+    }
+    p.estudo = { tipo: t, ref: referencia, texto: limpo, em: agora.toISOString() };
+    await this.salvar();
+    return p;
+  }
+
+  async removerDaCelula(eu, id, usuario, hoje) {
+    const p = this.celulaDoLider(eu, id);
+    const u = limparNome(usuario);
+    if (u === p.criadoPor) throw erro('o líder não sai pela lista; para acabar a célula, encerre');
+    const m = p.membros.find((x) => x.usuario === u && x.estado !== 'saiu');
+    if (!m) throw erro('essa pessoa não está na célula', 404);
+    m.estado = 'saiu';
+    m.saiuEm = hoje;
+    await this.salvar();
+    return p;
   }
 
   async sairDoProposito(eu, id, hoje) {
