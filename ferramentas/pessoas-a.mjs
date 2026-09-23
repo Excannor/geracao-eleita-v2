@@ -13,7 +13,7 @@ export const PESSOAS_A = {
     resumo: 'Segundo filho de Adão e Eva. Ofereceu a Deus o melhor do rebanho, com fé, e foi morto pelo próprio irmão.',
     quem: 'Segundo filho de Adão e Eva, pastor de ovelhas. Ele oferece a Deus as primeiras e melhores crias do rebanho. Deus aceita a oferta dele e não aceita a do irmão, Caim. O ciúme toma conta de Caim, que mata Abel. É a primeira morte contada na Bíblia.',
     onde: 'Gênesis 4.1-10; citado em Mateus 23.35 e Hebreus 11.4.',
-    deus: 'Hebreus 11.4 explica que Abel ofereceu um sacrifício melhor pela fé. Deus olhou pro coração de quem ofereceu, e a oferta mostrava esse coração.\n\nO mesmo texto diz que Abel, mesmo morto, ainda fala. E Hebreus 12.24 compara o sangue dele com o de Jesus: o sangue de Abel clamava por justiça, e o de Jesus fala uma palavra melhor, de perdão.',
+    deus: 'Hebreus 11.4 explica que Abel ofereceu um sacrifício melhor pela fé. Deus olhou pro coração de quem ofereceu, e a oferta mostrava esse coração.\n\nO mesmo texto diz que Abel, mesmo morto, ainda fala. E Hebreus 12.24 compara o sangue dele com o de Jesus: o sangue de Abel clamava por vingança, e o de Jesus perdoa gratuitamente.',
   },
   'Abraão': {
     sub: 'Patriarcas',
@@ -52,7 +52,7 @@ export const PESSOAS_A = {
     resumo: 'Uma mulher que não conseguia ter filhos e abriu o coração diante de Deus. O filho que ela pediu foi Samuel.',
     quem: 'Ana era uma das duas esposas de Elcana. Não conseguia ter filhos, e todo ano era provocada pela outra esposa, Penina, que tinha. No santuário de Siló, ora com tanta angústia, mexendo os lábios sem som, que o sacerdote Eli acha que ela está bêbada. Ana promete que, se tiver um filho, vai entregá-lo ao serviço de Deus. Samuel nasce, e ela cumpre a promessa.',
     onde: '1 Samuel 1-2.',
-    deus: 'O texto diz que o Senhor tinha fechado o ventre dela (1 Samuel 1.6) e depois que o Senhor se lembrou dela (1 Samuel 1.19). Pra Bíblia, a espera e a resposta estão nas mãos de Deus.\n\nA oração de Ana depois do nascimento (1 Samuel 2.1-10) celebra um Deus que derruba os orgulhosos e levanta os humildes. Mil anos depois, Maria canta algo muito parecido em Lucas 1. Duas mães, a mesma confiança.',
+    deus: 'O texto diz que o Senhor não tinha permitido que ela tivesse filhos (1 Samuel 1.6) e depois que o Senhor se lembrou dela (1 Samuel 1.19). Pra Bíblia, a espera e a resposta estão nas mãos de Deus.\n\nA oração de Ana depois do nascimento (1 Samuel 2.1-10) celebra um Deus que derruba os orgulhosos e levanta os humildes. Mil anos depois, Maria canta algo muito parecido em Lucas 1. Duas mães, a mesma confiança.',
   },
   'Ananias de Damasco': {
     sub: 'Igreja primitiva · séc. I',
@@ -104,7 +104,7 @@ export const PESSOAS_A = {
     resumo: 'Primeiro filho de Adão e Eva. Deus o avisou antes do crime, e mesmo assim ele matou o irmão.',
     quem: 'Primeiro filho de Adão e Eva, agricultor. Ele oferece a Deus parte da colheita. Quando a oferta dele não é aceita e a do irmão Abel é, Caim fica furioso, em vez de olhar pro próprio coração. Acaba matando Abel no campo. É o primeiro assassino da Bíblia e também o primeiro a construir uma cidade.',
     onde: 'Gênesis 4; citado em Hebreus 11.4, 1 João 3.12 e Judas 11.',
-    deus: 'Antes do crime, Deus conversa com Caim e avisa: o pecado está à porta, querendo dominar você, mas você deve dominá-lo (Gênesis 4.7). A escolha ainda estava nas mãos dele.\n\nDepois do assassinato vem o castigo, e junto vem um sinal de proteção sobre Caim, pra que ninguém o matasse. Mesmo o primeiro homicida continua sob o cuidado de Deus.',
+    deus: 'Antes do crime, Deus conversa com Caim e avisa: o pecado está à sua espera e deseja destruí-lo, mas está na sua mão o poder de dominá-lo (Gênesis 4.7). A escolha ainda estava nas mãos dele.\n\nDepois do assassinato vem o castigo, e junto vem um sinal de proteção sobre Caim, pra que ninguém o matasse. Mesmo o primeiro homicida continua sob o cuidado de Deus.',
     erros: 'Matou o próprio irmão por ciúme e, quando Deus perguntou por Abel, desconversou: por acaso eu sou responsável pelo meu irmão? (Gênesis 4.9).',
   },
   'Calebe': {
@@ -112,7 +112,7 @@ export const PESSOAS_A = {
     resumo: 'Um dos espiões que confiaram em Deus quando o resto do povo teve medo. Aos 85 anos, pediu a parte mais difícil da terra.',
     quem: 'Da tribo de Judá, foi um dos doze espiões que Moisés mandou conhecer Canaã. Dez voltaram assustados e espalharam medo. Só Calebe e Josué disseram que, com Deus, dava pra entrar. Por essa confiança, foram os únicos da geração deles que entraram na terra prometida.',
     onde: 'Números 13-14; Josué 14-15.',
-    deus: 'Deus cumpre, décadas depois, o que tinha prometido a Calebe. Aos oitenta e cinco anos, ele pede a região mais difícil de conquistar e diz que continua tão forte quanto no dia em que Moisés o enviou (Josué 14.11).\n\nDeus não esquece uma promessa, e a fé de Calebe não perdeu força com o tempo. A Bíblia diz que ele seguiu o Senhor de todo o coração (Números 32.12).',
+    deus: 'Deus cumpre, décadas depois, o que tinha prometido a Calebe. Aos oitenta e cinco anos, ele pede a região mais difícil de conquistar e diz que continua tão forte quanto no dia em que Moisés o enviou (Josué 14.11).\n\nDeus não esquece uma promessa, e a fé de Calebe não perdeu força com o tempo. A Bíblia diz que ele continuou fiel ao Senhor (Números 32.12).',
   },
   'Cornélio': {
     sub: 'Igreja primitiva · séc. I',
@@ -133,7 +133,7 @@ export const PESSOAS_A = {
     resumo: 'O pastor que virou o maior rei de Israel. Escreveu muitos salmos, caiu feio e voltou pra Deus de coração.',
     quem: 'O caçula dos filhos de Jessé, pastor de ovelhas, ungido rei ainda jovem. Enfrentou Golias, fugiu de Saul por anos e se tornou o maior rei de Israel. Escreveu boa parte dos Salmos. Deus prometeu que a família dele teria um trono pra sempre, promessa que se cumpre em Jesus, chamado Filho de Davi.',
     onde: '1 Samuel 16 a 1 Reis 2; 1 Crônicas 11-29; muitos Salmos.',
-    deus: 'Quando Samuel vai ungir um dos filhos de Jessé, Deus avisa: o ser humano vê a aparência, mas o Senhor vê o coração (1 Samuel 16.7). Davi era o filho que ninguém tinha lembrado de chamar.\n\nNos salmos, Davi fala com Deus com muita honestidade, tanto na alegria quanto no pecado. O Salmo 51, escrito depois da queda com Bate-Seba, mostra o caminho de volta: confessar sem desculpas e confiar na misericórdia de Deus.',
+    deus: 'Quando Samuel vai ungir um dos filhos de Jessé, Deus avisa: o homem vê a aparência exterior, mas o Senhor examina os pensamentos e as intenções do coração (1 Samuel 16.7). Davi era o filho que ninguém tinha lembrado de chamar.\n\nNos salmos, Davi fala com Deus com muita honestidade, tanto na alegria quanto no pecado. O Salmo 51, escrito depois da queda com Bate-Seba, mostra o caminho de volta: confessar sem desculpas e confiar na misericórdia de Deus.',
     erros: 'Usou o poder de rei pra ter Bate-Seba, mulher de outro homem, e depois mandou matar o marido dela, Urias, pra esconder o que tinha feito. Também fez um censo do exército por orgulho, e isso trouxe castigo sobre o povo (2 Samuel 24).',
   },
   'Débora': {
@@ -220,7 +220,7 @@ export const PESSOAS_A = {
     resumo: 'Um agricultor inseguro que Deus chamou pra libertar Israel com só trezentos homens.',
     quem: 'Agricultor da tribo de Manassés, com medo e sem confiança em si mesmo, chamado por Deus pra libertar Israel dos midianitas. Pede sinais mais de uma vez antes de acreditar no chamado. Depois lidera um exército reduzido a trezentos homens e vence uma multidão de inimigos.',
     onde: 'Juízes 6-8.',
-    deus: 'Deus diminui de propósito o exército de Gideão pra que ninguém dissesse que venceu pela própria força (Juízes 7.2).\n\nDeus também tem paciência com a insegurança de Gideão e responde aos pedidos de confirmação. Quando o anjo aparece, chama Gideão de guerreiro valente numa hora em que ele estava escondido, com medo (Juízes 6.12). Deus via nele o que ele ainda não via.',
+    deus: 'Deus diminui de propósito o exército de Gideão pra que ninguém dissesse que venceu pela própria força (Juízes 7.2).\n\nDeus também tem paciência com a insegurança de Gideão e responde aos pedidos de confirmação. Quando o anjo aparece, chama Gideão de homem valente numa hora em que ele estava escondido, com medo (Juízes 6.12). Deus via nele o que ele ainda não via.',
     erros: 'Depois da vitória, fez um objeto de ouro, um éfode, que virou ídolo pra Israel e pra sua própria família. Teve muitas esposas, e um dos filhos, Abimeleque, trouxe violência ao povo depois da morte de Gideão.',
   },
 };

@@ -98,7 +98,7 @@ export const PESSOAS_B = {
     resumo: 'Vendido pelos irmãos como escravo, foi parar no Egito e virou governador. E perdoou quem o feriu.',
     quem: 'Filho preferido de Jacó. Por inveja, os irmãos o vendem como escravo, e ele vai parar no Egito. Lá passa anos de injustiça, inclusive preso por uma acusação falsa, até chegar a governar o país logo abaixo do faraó. A história dele fecha o livro de Gênesis e explica como a família de Jacó foi morar no Egito.',
     onde: 'Gênesis 37-50.',
-    deus: 'No fim, José diz aos irmãos: vocês planejaram o mal contra mim, mas Deus o transformou em bem (Gênesis 50.20). O mal foi dos irmãos, e mesmo assim Deus usou até aquela injustiça pra salvar muita gente da fome.\n\nJosé escolhe perdoar quem o feriu, e perdoa chorando. A fidelidade dele em lugares que não escolheu, como a casa de Potifar e a prisão, fez parte do caminho.',
+    deus: 'No fim, José diz aos irmãos: vocês planejaram o mal contra mim, mas Deus tornou o mal em bem (Gênesis 50.20). O mal foi dos irmãos, e mesmo assim Deus usou até aquela injustiça pra salvar muita gente da fome.\n\nJosé escolhe perdoar quem o feriu, e perdoa chorando. A fidelidade dele em lugares que não escolheu, como a casa de Potifar e a prisão, fez parte do caminho.',
     erros: 'Quando jovem, contou aos irmãos, com ar de superioridade, os sonhos em que eles se curvavam diante dele. Isso aumentou o ódio que já sentiam, embora nada justifique o que fizeram com ele.',
   },
   'José pai adotivo de Jesus': {
@@ -113,7 +113,7 @@ export const PESSOAS_B = {
     resumo: 'O profeta do deserto que preparou o caminho pra Jesus e disse: ele precisa crescer, e eu diminuir.',
     quem: 'Filho de Zacarias e Isabel, nascido quando os pais já eram idosos. Desde antes de nascer foi separado pra preparar o caminho do Messias. Pregava arrependimento no deserto, batizava no rio Jordão e apontou pra Jesus dizendo: vejam, o Cordeiro de Deus que tira o pecado do mundo (João 1.29). Foi preso e morto por Herodes.',
     onde: 'Mateus 3, 11 e 14; Marcos 1 e 6; Lucas 1, 3 e 7; João 1 e 3.',
-    deus: 'Depois de séculos sem profetas, Deus envia João como o mensageiro anunciado por Isaías e Malaquias, pra preparar a chegada do Messias.\n\nQuando os discípulos de João reclamam que todo mundo estava indo atrás de Jesus, ele responde: é necessário que ele cresça e que eu diminua (João 3.30). Esse é o lugar de qualquer pessoa que serve a Deus: apontar pra Jesus.',
+    deus: 'Depois de séculos sem profetas, Deus envia João como o mensageiro anunciado por Isaías e Malaquias, pra preparar a chegada do Messias.\n\nQuando os discípulos de João reclamam que todo mundo estava indo atrás de Jesus, ele responde: ele deve tornar-se cada vez maior, e eu devo diminuir cada vez mais (João 3.30). Esse é o lugar de qualquer pessoa que serve a Deus: apontar pra Jesus.',
     erros: 'Na prisão, passou por um momento de dúvida e mandou perguntar a Jesus se ele era mesmo aquele que havia de vir (Mateus 11.3). Jesus respondeu mostrando o que estava acontecendo e depois elogiou João diante de todos.',
   },
   'João apóstolo': {
@@ -197,12 +197,12 @@ export const PESSOAS_B = {
     resumo: 'Sentou aos pés de Jesus pra ouvir e, antes da cruz, derramou um perfume caríssimo nos pés dele.',
     quem: 'Irmã de Marta e de Lázaro, moradora de Betânia. É lembrada por sentar aos pés de Jesus pra ouvir enquanto a irmã cuidava do serviço da casa. Pouco antes da crucificação, derrama sobre os pés de Jesus um perfume de nardo puro, muito caro, e enxuga com os próprios cabelos.',
     onde: 'Lucas 10.38-42; João 11-12. Não confunda com Maria Madalena nem com Maria, mãe de Jesus.',
-    deus: 'Quando criticam o perfume como desperdício, dizendo que o dinheiro podia ajudar os pobres, Jesus defende Maria. Diz que ela estava preparando o corpo dele pro sepultamento (João 12.7), e os outros evangelhos acrescentam que o gesto seria lembrado onde o evangelho fosse anunciado (Marcos 14.9).\n\nSentar aos pés de um mestre pra aprender era posição de discípulo, e na época isso era esperado de homens. Jesus diz que Maria escolheu a boa parte, e que ninguém ia tirar isso dela (Lucas 10.42).',
+    deus: 'Quando criticam o perfume como desperdício, dizendo que o dinheiro podia ajudar os pobres, Jesus defende Maria. Diz que ela estava preparando o corpo dele pro sepultamento (João 12.7), e os outros evangelhos acrescentam que o gesto seria lembrado onde o evangelho fosse anunciado (Marcos 14.9).\n\nSentar aos pés de um mestre pra aprender era posição de discípulo, e na época isso era esperado de homens. Jesus diz que Maria descobriu a única coisa necessária, e que ninguém ia tirar isso dela (Lucas 10.42).',
   },
   'Maria': {
     sub: 'Evangelhos · séc. I',
     resumo: 'A jovem de Nazaré escolhida pra ser mãe de Jesus. Respondeu: aqui está a serva do Senhor.',
-    quem: 'Jovem de Nazaré, noiva de José. O anjo Gabriel anuncia que ela seria mãe do Filho de Deus pelo Espírito Santo, e Maria responde: aqui está a serva do Senhor, que aconteça comigo conforme a sua palavra (Lucas 1.38). Acompanhou o ministério de Jesus, esteve ao pé da cruz e estava entre os discípulos reunidos em oração depois da ascensão.',
+    quem: 'Jovem de Nazaré, noiva de José. O anjo Gabriel anuncia que ela seria mãe do Filho de Deus pelo Espírito Santo, e Maria responde: eu sou a serva do Senhor; que aconteça tudo o que o Senhor me disse (Lucas 1.38). Acompanhou o ministério de Jesus, esteve ao pé da cruz e estava entre os discípulos reunidos em oração depois da ascensão.',
     onde: 'Mateus 1-2; Lucas 1-2 e 8; João 2 e 19; Atos 1.14.',
     deus: 'Deus escolhe uma jovem comum, sem riqueza nem posição, pro papel mais único da história da salvação. No cântico de Lucas 1.46-55, Maria celebra um Deus que derruba os poderosos dos seus tronos e levanta os humildes.\n\nAo pé da cruz, Maria vê o filho sofrer. E Jesus, no meio da dor, cuida dela e a entrega aos cuidados do discípulo João (João 19.26-27).',
     erros: 'Num momento, a família de Jesus, com Maria junto, foi atrás dele sem entender a missão que ele cumpria. Jesus aproveitou pra dizer que a família dele é quem faz a vontade de Deus (Marcos 3.21 e 3.31-35).',
@@ -212,7 +212,7 @@ export const PESSOAS_B = {
     resumo: 'Recebeu Jesus em casa, se enrolou no serviço e fez uma das declarações de fé mais completas do evangelho.',
     quem: 'Irmã de Maria e de Lázaro, moradora de Betânia. Recebe Jesus em casa e fica ocupada com os preparativos enquanto a irmã senta pra ouvi-lo. Quando Lázaro morre, é Marta quem sai ao encontro de Jesus e conversa com ele sobre a ressurreição.',
     onde: 'Lucas 10.38-42; João 11-12.',
-    deus: 'Quando Marta reclama da irmã, Jesus responde com carinho: Marta, Marta, você está ansiosa e preocupada com muitas coisas, mas uma só é necessária (Lucas 10.41-42). Jesus valoriza o serviço dela e coloca em ordem o que vem primeiro.\n\nDiante da morte do irmão, Marta diz: eu creio que tu és o Cristo, o Filho de Deus, que devia vir ao mundo (João 11.27). Ela faz essa declaração antes de ver o milagre.',
+    deus: 'Quando Marta reclama da irmã, Jesus responde com carinho: Marta, Marta, você está tão preocupada com todos esses serviços; há apenas uma coisa necessária (Lucas 10.41-42). Jesus valoriza o serviço dela e coloca em ordem o que vem primeiro.\n\nDiante da morte do irmão, Marta diz: eu creio que tu és o Cristo, o Filho de Deus, que devia vir ao mundo (João 11.27). Ela faz essa declaração antes de ver o milagre.',
     erros: 'Reclamou com Jesus porque estava sobrecarregada enquanto a irmã só ouvia, e cobrou dele que mandasse Maria ajudar.',
   },
 };
