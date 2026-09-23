@@ -93,6 +93,18 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    Versículo famoso fora do contexto: Jeremias 29.11 ("planos de bem") foi dito a exilados
    que iam esperar setenta anos na Babilônia, e não é promessa de solução rápida. A reflexão
    conta o contexto (a carta, a espera, orar pela cidade) antes da promessa.
+
+   **Códigos domésticos** (esposas e maridos, escravos e senhores: Efésios 5-6, Colossenses
+   3-4, Tito 2, 1 Pedro 2.18-3.7) não viram âncora nem pergunta sobre o casamento ou o trabalho
+   do leitor. A NBV chega a dizer "se fizerem o bem e suportarem os açoites"; para quem vive
+   violência em casa, uma pergunta sobre "sujeitar-se" soa como mandar suportar. Nesses dias,
+   ancorar em outro trecho (1 Pe 3.8-9, 3.15; Ef 4.32; Cl 3.12-14).
+
+   **Tradição de pregação que o texto não diz.** Isaías 14.12-15 ("estrela da manhã") e
+   Ezequiel 28.12-19 ("querubim da guarda") são ditos, no próprio texto, ao rei da Babilônia e
+   ao rei de Tiro. Ler neles a queda de Satanás é interpretação de tradição, não o que está
+   escrito; a reflexão fala de quem o texto nomeia (o orgulho do rei) e não ensina a outra
+   leitura como fato. Ezequiel 16 e 23 (imagens sexuais explícitas) nunca viram âncora.
    Provérbios são conselhos de sabedoria, não garantias: "sua vida será prolongada", "seus
    celeiros ficarão cheios" (Pv 3) não viram promessa de saúde ou dinheiro para quem obedece.
    Âncora em conselho (confiar, cuidar do coração, falar com cuidado), não em recompensa.
