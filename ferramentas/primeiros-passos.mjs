@@ -571,7 +571,7 @@ O pecado começa quando a pessoa aceita e alimenta a tentação. Um pensamento e
 
 ## Uma promessa pra hora difícil
 
-1 Coríntios 10.13 diz que nenhuma tentação que chegou até você é diferente das que outras pessoas enfrentam. Deus é fiel e não vai deixar você ser tentado além do que consegue suportar. Junto com a tentação, ele dá uma saída, pra que você consiga aguentar.
+1 Coríntios 10.13 diz que as tentações que você enfrenta são as mesmas que os outros enfrentam. Deus não vai deixar a tentação ficar tão forte que você não consiga enfrentar, e ele dá forças pra suportar. A Bíblia Livre diz que, junto com a tentação, ele "também dará a saída".
 
 Três coisas aqui. O que você enfrenta é comum, outras pessoas passam por isso. Existe um limite, e quem garante é Deus. E sempre existe uma saída, mesmo quando você ainda não viu. A promessa não dispensa o esforço de resistir, mas derruba a mentira de que você está sozinho num teste que ninguém nunca enfrentou.
 
