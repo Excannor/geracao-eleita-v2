@@ -14,7 +14,7 @@
 
   function wireVoltar(alvo) {
     alvo.querySelectorAll('[data-voltar]').forEach((el) => {
-      el.onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/'; };
+      el.onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/biblia'; };
     });
   }
 
@@ -84,6 +84,7 @@
           + encodeURIComponent(livro) + '/' + n + '"' + (n === capValido ? ' aria-current="true" class="atual"' : '')
           + '>' + n + '</a>').join('') + '</div>';
       wireVoltar(alvo);
+      alvo.querySelectorAll('.grade-capitulos a').forEach((a) => a.addEventListener('click', () => { leitorSobreGrade = true; }));
       if (capValido) abrirLeitor(livro, capValido, biblia, b);
       else CC.fecharLeituraBiblia();
     }).catch(() => { if (minha === geracao) erroDeCarga(alvo); });
@@ -123,12 +124,24 @@
       if (ev.key !== 'Escape') return;
       if (document.querySelector('.cortina')) return; // a folha "Aa" fecha primeiro, pelo listener do roteador
       const atual = document.querySelector('.leitor-biblia');
-      if (atual) location.hash = '#/biblia/' + encodeURIComponent(atual.dataset.livro);
+      if (atual) voltarParaGrade(atual.dataset.livro);
     };
     document.addEventListener('keydown', escOuvinte);
   }
 
+  // Fechar o leitor tem de devolver o histórico ao estado de antes dele. Se o capítulo foi
+  // aberto por um toque na grade, a entrada anterior É a grade: volta de verdade (virar
+  // capítulo usa replace, então ela continua ali). Se ninguém passou pela grade (link direto),
+  // troca a entrada do capítulo pela da grade. Empurrar uma entrada nova, como antes, fazia o
+  // "Voltar" da grade cair no capítulo recém-fechado e reabrir o leitor.
+  let leitorSobreGrade = false;
+  function voltarParaGrade(livro) {
+    if (leitorSobreGrade) history.back();
+    else location.replace('#/biblia/' + encodeURIComponent(livro));
+  }
+
   CC.fecharLeituraBiblia = function () {
+    leitorSobreGrade = false;
     const el = document.querySelector('.leitor-biblia');
     if (el) el.remove();
     if (escOuvinte) { document.removeEventListener('keydown', escOuvinte); escOuvinte = null; }
@@ -180,7 +193,7 @@
       + (temProximo ? '<button class="botao contorno" data-proximo>' + CC.esc(proxLivro) + ' ' + proxCap + ' ›</button>' : '')
       + '</div></div>';
 
-    el.querySelector('[data-fechar-biblia]').onclick = () => { location.hash = '#/biblia/' + encodeURIComponent(livro); };
+    el.querySelector('[data-fechar-biblia]').onclick = () => voltarParaGrade(livro);
     el.querySelector('[data-aa-biblia]').onclick = () => folhaAaBiblia(el, livro, n);
     const btAnt = el.querySelector('[data-anterior]');
     // replace e não hash: virar capítulo não empilha histórico, e o voltar do celular leva
