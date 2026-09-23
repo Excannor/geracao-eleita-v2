@@ -100,6 +100,10 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    busca, não ensino para o leitor. Âncora no que o próprio livro apresenta como conclusão ou
    observação sóbria (3.11, 4.9-10, 12.13) e, se preciso, dizer no texto que nem tudo o que o
    Pregador diz no meio da busca é o ponto final.
+   Cânticos é uma canção de amor entre a amada e o amado; Deus não é citado nos capítulos. Não
+   dizer "Deus diz" nem ler o texto como alegoria (Cristo e a igreja é tradição de pregação).
+   Com pudor: âncora em frases como "o meu amado é meu, e eu sou dele" ou "não despertem o
+   amor antes do tempo"; nada de imagens do corpo, nem pergunta sobre a vida íntima do leitor.
    Salmos que pedem destruição dos inimigos (58, 69.22-28, 83, 109, 137) não viram âncora nem
    pergunta sobre o leitor desejar o mal de alguém.
 

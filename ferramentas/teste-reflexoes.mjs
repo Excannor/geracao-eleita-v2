@@ -47,6 +47,7 @@ const normalizar = (s) => String(s).normalize('NFC').toLowerCase()
 const CARTAS_DE_PAULO = /^(Romanos|[12] Coríntios|Gálatas|Efésios|Filipenses|Colossenses|[12] Tessalonicenses|[12] Timóteo|Tito|Filemom)$/;
 const CIDADE_DA_CARTA = { Romanos: 'Roma', 'Coríntios': 'Corinto', 'Gálatas': 'Galácia', 'Efésios': 'Éfeso',
   Filipenses: 'Filipos', Colossenses: 'Colossos', Tessalonicenses: 'Tessalônica' };
+const LIVRO_E_CAPITULO = new RegExp('(?<!\\p{L})(' + Object.keys(biblia.livros).map((l) => l.toLowerCase()).join('|') + ') \\d+', 'gu');
 const leituraNbv = (plano) => plano.trechos.map((t) => {
   const caps = biblia.livros[t.livro] || [];
   return caps.slice(t.de - 1, t.ate).map((c) => c.join(' ')).join(' ');
@@ -174,6 +175,8 @@ for (const dia of dias) {
     // Número citado que a leitura não tem vai para conferência: "quarenta anos" (Atos 7),
     // "quatro palavras" (eram seis) e "mais de vinte anos" (conta nossa) já saíram errados.
     const semCapitulo = normalizar(escrito).replace(/\b(capítulos?|versículos?|dia|salmos?) \d+/g, ' ')
+      // "Isaías 12", "Cânticos 3": nome do livro com o capítulo, não é contagem.
+      .replace(LIVRO_E_CAPITULO, ' ')
       // "1 Samuel", "2 Reis": o número faz parte do nome do livro, não é contagem.
       .replace(/(?<!\p{L})[123] (samuel|reis|crônicas|coríntios|tessalonicenses|timóteo|pedro|joão)(?!\p{L})/gu, ' ');
     for (const n of new Set(semCapitulo.match(NUMERO) || [])) {
