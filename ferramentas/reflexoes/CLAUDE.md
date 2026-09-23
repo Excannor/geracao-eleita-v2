@@ -49,6 +49,12 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    em Gn 24 o servo primeiro dá as joias e pergunta de quem a moça é filha, e só depois se curva
    e adora. Recontar na ordem do texto ou sem ordem nenhuma.
 
+   **Nem tradição de pregação, nem outro evangelho.** Explicação que circula em pregação não
+   é texto: "cada praga atingia um deus do Egito" saiu numa reflexão de Êx 7-9, e a leitura
+   não diz isso. Detalhe de um evangelho também não entra na leitura de outro: "Pedro, sem
+   saber o que dizer" é de Marcos 9.6, e o dia lia Mateus 17. Ao recontar, conferir também a
+   primeira reação da pessoa: Moisés responde "Eis-me aqui!" antes do "quem sou eu?".
+
    **Sentimento e tempo na medida do texto.** Não aumentar o que o texto diz: em Gn 50.15 os
    irmãos acham "possível" que José se vingue, e a reflexão dizia que eles "têm certeza"; em
    Mt 14 a NBV diz que "lutavam contra o mar agitado" e que Jesus veio "já de madrugada", e a
