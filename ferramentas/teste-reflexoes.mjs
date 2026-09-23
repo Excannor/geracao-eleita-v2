@@ -28,6 +28,18 @@ const PROIBIDOS = [
   [/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u, 'emoji'],
 ];
 
+// Palavras da regra 2 do filtro. \b não enxerga letra acentuada, então a fronteira é feita
+// com \p{L}.
+const palavra = (raiz) => new RegExp('(?<!\\p{L})' + raiz + '(?!\\p{L})', 'iu');
+const SENSIVEIS = [
+  ['graça', 'graça'], ['just[oa]s?', 'justo'], ['justiça', 'justiça'], ['sant[oa]s?', 'santo'],
+  ['carne', 'carne'], ['mundo', 'mundo'], ['leis?', 'lei'], ['temor', 'temor'], ['fé', 'fé'],
+  ['glória', 'glória'], ['bênçãos?', 'bênção'], ['salvação|salv[oa]s?', 'salvação'], ['sangue', 'sangue'],
+  ['aliança', 'aliança'], ['espírito', 'espírito'], ['coração', 'coração'], ['promessas?', 'promessa'],
+  ['perdão', 'perdão'], ['sacrifícios?', 'sacrifício'], ['ofertas?', 'oferta'], ['servos?', 'servo'],
+].map(([raiz, nome]) => [palavra(raiz), nome]);
+const revisar = [];
+
 // O versículo existe? A referência é conferida contra o texto que o app traz.
 function versiculoExiste(ref) {
   const m = /^(.+?)\s(\d+)\.(\d+)(?:-(\d+))?$/.exec(String(ref || ''));
@@ -87,6 +99,17 @@ for (const dia of dias) {
       }
     }
 
+    // Regra 2 do filtro (ferramentas/reflexoes/CLAUDE.md): palavra de sentido bíblico próprio
+    // numa pergunta vai para revisão humana, e com mais cuidado se também está no texto,
+    // onde pode estar em outro sentido (o caso real: "achou graça" no texto e "de graça"
+    // na pergunta). Não reprova: só avisa, porque só lendo dá para saber o sentido.
+    for (const per of r.perguntas.map((p) => (typeof p === 'string' ? p : p[1]))) {
+      for (const [re, nome] of SENSIVEIS) {
+        if (!re.test(per)) continue;
+        revisar.push('dia ' + dia + ' · ' + nome + (re.test(r.texto) ? ' (também no texto)' : '') + ' · ' + per);
+      }
+    }
+
     const tudo = [r.titulo, r.texto, ...r.perguntas.map((p) => (typeof p === 'string' ? p : p[1])), ...(r.oracao || [])].join(' ');
     for (const [re, nome] of PROIBIDOS) if (re.test(tudo)) falhar(dia, 'proibido: ' + nome);
   }
@@ -102,6 +125,10 @@ for (const u of dados.unidades) {
   const tem = porUnidade[u.numero] || 0;
   const total = u.ate - u.de + 1;
   if (tem) console.log('    unidade ' + String(u.numero).padStart(2) + ': ' + tem + ' de ' + total + (tem === total ? ' · completa' : ''));
+}
+if (revisar.length) {
+  console.log('\n  revisar sentido (' + revisar.length + '): palavra de sentido bíblico numa pergunta');
+  for (const linha of revisar) console.log('    ' + linha);
 }
 console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  as reflexões estão no formato\n');
 process.exit(falhas ? 1 : 0);
