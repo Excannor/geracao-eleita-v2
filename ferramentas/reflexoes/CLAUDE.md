@@ -67,6 +67,13 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    para outra coisa ("salvação" para quem sobreviveu à picada); motivo psicológico dado a
    personagem ("tinha acabado de enterrar a irmã quando explodiu").
 
+   **Quem está falando.** Nem toda fala dentro da Bíblia é ensino de Deus. Em Jó, os amigos
+   (Elifaz, Bildade, Zofar) falam muito sobre Deus e o próprio livro diz depois que eles não
+   falaram o que é certo; nunca usar fala deles como verdade para o leitor, nem como âncora.
+   O mesmo vale para reis, falsos profetas e acusadores: o que o comandante assírio gritou contra Jerusalém não é "Deus disse".
+   Nas reflexões já escritas: o anjo, o profeta ou Jesus falando é Deus falando; o rei ou o
+   povo falando é só o que eles disseram.
+
    **Sentimento e tempo na medida do texto.** Não aumentar o que o texto diz: em Gn 50.15 os
    irmãos acham "possível" que José se vingue, e a reflexão dizia que eles "têm certeza"; em
    Mt 14 a NBV diz que "lutavam contra o mar agitado" e que Jesus veio "já de madrugada", e a
