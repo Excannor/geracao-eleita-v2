@@ -6,24 +6,26 @@
   const topo = document.getElementById('topo');
   const navegacao = document.getElementById('navegacao');
 
-  // Cinco abas, cada uma com um trabalho claro e o nome à vista: um ícone sozinho não diz a
+  // Quatro abas, cada uma com um trabalho claro e o nome à vista: um ícone sozinho não diz a
   // quem acabou de chegar que o baú é Desafios e a bússola é Explorar. Praticar mora dentro
-  // de Desafios e no fim de cada unidade da trilha.
+  // de Desafios e no fim de cada unidade da trilha. O Perfil saiu daqui: virou o retrato no
+  // canto do topo (pintarTopo), o que deixa duas abas de cada lado do botão da Bíblia.
   const ABAS = [
     ['#/', 'Trilha', 'trilha'],
     ['#/missoes', 'Desafios', 'bau'],
     ['#/novidades', 'Juntos', 'novidades'],
     ['#/explorar', 'Explorar', 'bussola'],
-    ['#/perfil', 'Perfil', 'pessoa'],
   ];
 
   const ABA_DA_ROTA = {
     '': '#/', dia: '#/', passos: '#/', licoes: '#/', praticar: '#/missoes', missoes: '#/missoes',
     amigos: '#/novidades', novidades: '#/novidades',
     explorar: '#/explorar', secao: '#/explorar', nota: '#/explorar', busca: '#/explorar',
+    // Perfil e Config não apontam para nenhuma das 4 abas da barra: quem marca o retrato
+    // do topo como selecionado é pintarTopo, lendo a rota direto.
     perfil: '#/perfil', config: '#/perfil',
-    // não aponta para nenhuma das 5 abas: assim nenhuma fica marcada como selecionada
-    // enquanto a Bíblia está aberta, e o botão central cuida da sua própria marcação.
+    // não aponta para nenhuma aba: assim nenhuma fica marcada como selecionada enquanto a
+    // Bíblia está aberta, e o botão central cuida da sua própria marcação.
     biblia: '#/biblia',
   };
 
@@ -51,16 +53,32 @@
     const subiu = ofensivaAnterior !== null && seq.atual > ofensivaAnterior;
     ofensivaAnterior = seq.atual;
 
+    // O Perfil saiu da barra de baixo e virou este retrato redondo no canto do topo, ao
+    // lado da lamparina. `pintarTopo` não recebe a rota do roteador: lê direto daqui, e o
+    // estado de selecionado entra no próprio HTML para o cache abaixo redesenhar ao mudar.
+    const rota = partesDaRota().rota;
+    const naContaOuConfig = rota === 'perfil' || rota === 'config';
+    const foto = CC.foto();
+    const retrato = foto ? '<img class="retrato-topo" src="' + CC.esc(foto) + '" alt="">' : CC.icoAba('pessoa');
+
     const html = '<div class="estatisticas">'
       + '<button class="contador ofensiva' + (seq.atual ? ' ativo' : '') + (seq.feitoHoje ? ' hoje' : '') + (subiu ? ' subiu' : '')
       + '" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva, ' + CC.estagioDaChama(seq.atual).nome + '">'
       + CC.icoChama(seq.atual)
       + '<span>' + seq.atual + '</span><small>' + (seq.atual === 1 ? 'dia' : 'dias') + '</small></button>'
-      + '</div>';
+      + '</div>'
+      + '<button class="perfil-topo' + (naContaOuConfig ? ' selecionado' : '') + '" data-ir="#/perfil" aria-label="Perfil"'
+      + (naContaOuConfig ? ' aria-current="page"' : '') + '>' + retrato + '</button>';
     if (html === topoDesenhado && topo.firstChild) return;
     topoDesenhado = html;
     topo.innerHTML = html;
     topo.querySelectorAll('[data-ofensiva]').forEach((b) => { b.onclick = CC.folhaOfensiva; });
+    topo.querySelectorAll('[data-ir]').forEach((el) => {
+      el.onclick = () => {
+        CC.vibrar('leve');
+        if (location.hash === el.dataset.ir) { CC.redesenhar(); scrollTo(0, 0); } else location.hash = el.dataset.ir;
+      };
+    });
   }
   CC.pintarTopo = pintarTopo;
 
@@ -132,24 +150,24 @@
     const naBiblia = rota === 'biblia';
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
     const abas = ABAS.map(([href, rotulo, icone]) => {
-      const foto = icone === 'pessoa' ? CC.foto() : '';
-      const marca = foto ? '<img class="retrato-aba" src="' + CC.esc(foto) + '" alt="">' : CC.icoAba(icone);
       const ponto = icone === 'novidades' && pendencias ? '<i class="ponto-aba"></i>' : '';
       return '<button class="aba' + (href === ativa ? ' selecionada' : '') + '" data-ir="' + href + '"'
-        + (href === ativa ? ' aria-current="page"' : '') + '><span class="icone-aba">' + marca + ponto + '</span>'
+        + (href === ativa ? ' aria-current="page"' : '') + '><span class="icone-aba">' + CC.icoAba(icone) + ponto + '</span>'
         + '<span class="rotulo-aba">' + rotulo + '</span></button>';
     });
-    // A Bíblia entra NO FLUXO da barra, entre a 2ª e a 3ª aba (Trilha, Desafios, [Bíblia],
-    // Juntos, Explorar, Perfil): com 5 abas não existe centro exato, e um círculo em
-    // position:absolute cairia em cima da aba "Juntos". Na barra de baixo o CSS levanta
-    // este item com margem negativa; no trilho lateral ele volta a ser um item comum.
-    abas.splice(2, 0, '<button class="aba aba-central' + (naBiblia ? ' selecionada' : '') + '" data-ir="#/biblia" aria-label="Bíblia"'
+    const biblia = '<button class="aba aba-central' + (naBiblia ? ' selecionada' : '') + '" data-ir="#/biblia" aria-label="Bíblia"'
       + (naBiblia ? ' aria-current="page"' : '') + '><span class="icone-aba">' + CC.icoAba('livro') + '</span>'
-      + '<span class="rotulo-aba">Bíblia</span></button>');
+      + '<span class="rotulo-aba">Bíblia</span></button>';
+    // Duas ilhas em pílula, uma de cada lado do botão da Bíblia (Trilha, Desafios | Juntos,
+    // Explorar): no trilho lateral (>= 860px) .ilha vira `display: contents` e some do
+    // layout, deixando as abas na ordem natural da lista — Trilha, Desafios, Bíblia,
+    // Juntos, Explorar — com a Bíblia como item comum de novo.
     navegacao.innerHTML = '<a class="marca-lateral" href="#/">'
       + '<span class="simbolo">' + CC.icoLogo() + '</span>'
       + '<span>Geração <em>Eleita</em></span></a>'
-      + abas.join('');
+      + '<div class="ilha">' + abas[0] + abas[1] + '</div>'
+      + biblia
+      + '<div class="ilha">' + abas[2] + abas[3] + '</div>';
     navegacao.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
         CC.vibrar('leve');

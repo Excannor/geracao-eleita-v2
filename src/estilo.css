@@ -108,7 +108,10 @@
   --raio-p: 14px;
   --raio-capsula: 999px;
   --alt-topo: 58px;
-  --alt-barra: 70px;
+  /* Cobre a barra inteira, do chão até o topo do botão da Bíblia levantado (ilha de 64px +
+     10px de respiro embaixo + o quanto o botão central sobe acima delas). Quem lê este
+     número em .conteudo e nos botões flutuantes evita ficar escondido atrás da barra nova. */
+  --alt-barra: 100px;
   /* Tinta sobre as cores cheias. No claro, branco; no escuro as cores são mais
      luminosas, e a tinta escura é que se lê, como no aplicativo de referência. */
   --sobre-cor: #ffffff;
@@ -312,6 +315,32 @@ button { font-family: inherit; }
   border: 2px solid var(--fundo);
 }
 
+/* O Perfil saiu da barra de baixo e virou este retrato redondo no canto do topo, ao lado
+   da lamparina — o que sobrou fica simétrico, duas abas de cada lado da Bíblia. .topo é
+   sticky, o que já o torna o contêiner posicionado de que este botão precisa. O alvo de
+   toque (a caixa inteira, 44px) é maior que o retrato visível (a área de dentro da borda,
+   40px): a borda de 2px é o que abre essa folga sem precisar de padding nem pseudo-elemento. */
+.perfil-topo {
+  position: absolute;
+  right: calc(16px + env(safe-area-inset-right));
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--borda);
+  border-radius: 50%;
+  background: var(--fundo-2);
+  color: var(--tinta-fraca);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.perfil-topo .retrato-topo { width: 100%; height: 100%; object-fit: cover; display: block; }
+.perfil-topo .ico-aba { width: 24px; height: 24px; }
+.perfil-topo.selecionado { border-color: var(--inverso); box-shadow: 0 0 0 2px var(--inverso); }
+
 .botao-icone {
   display: inline-grid;
   place-items: center;
@@ -342,7 +371,14 @@ button { font-family: inherit; }
 }
 .conteudo.largo { max-width: 720px; }
 
-/* ---------- barra inferior / trilho lateral ---------- */
+/* ---------- barra inferior / trilho lateral ----------
+   No celular a barra virou duas "ilhas" em pílula, separadas, com o botão quadrado da
+   Bíblia levantado entre elas — a própria barra (.navegacao) é só um trilho invisível que
+   as posiciona; quem tem fundo, borda e sombra são as ilhas e o botão central. Por isso
+   .navegacao fica com pointer-events:none e só as ilhas e o botão central voltam a
+   pointer-events:auto: sem isso, a faixa transparente entre as duas ilhas bloquearia o
+   toque no conteúdo por baixo dela. No trilho lateral (>= 860px) isso tudo volta ao
+   normal: ver a media query de telas largas. */
 .navegacao .marca-lateral { display: none; }
 
 .navegacao {
@@ -352,23 +388,37 @@ button { font-family: inherit; }
   bottom: 0;
   z-index: 50;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  gap: 2px;
-  height: calc(var(--alt-barra) + env(safe-area-inset-bottom));
-  padding: 6px 8px env(safe-area-inset-bottom);
-  background: var(--cartao);
-  border-top: 1px solid var(--borda);
-  border-radius: var(--raio-g) var(--raio-g) 0 0;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 12px calc(10px + env(safe-area-inset-bottom));
+  background: transparent;
+  pointer-events: none;
 }
 
-.aba {
+.ilha {
   flex: 1 1 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 64px;
+  padding: 0 6px;
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-radius: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+  pointer-events: auto;
+}
+:root[data-tema="escuro"] .ilha { box-shadow: 0 4px 16px rgba(0, 0, 0, .4); }
+
+.aba {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 1px;
+  min-width: 44px;
   max-width: 76px;
   height: 58px;
   padding: 0;
@@ -379,16 +429,18 @@ button { font-family: inherit; }
   font-size: 0.85rem;
   font-weight: 800;
   cursor: pointer;
-  min-width: 0;
 }
 .aba .icone-aba { position: relative; display: grid; place-items: center; }
 .aba .ico-aba { width: 28px; height: 28px; display: block; transition: transform .2s var(--mola); }
 /* o nome da aba à vista: ícone sozinho não diz a quem chegou agora o que há ali */
 .aba .rotulo-aba { font-family: var(--fonte-destaque); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.1; white-space: nowrap; color: inherit; }
 .aba .ponto-aba { top: -2px; right: -4px; }
-/* aba ativa: pílula preta que inverte entre temas, dentro da barra --cartao */
-.aba.selecionada { color: var(--inverso-tinta); background: var(--inverso); border-radius: var(--raio-capsula); }
-.aba:hover:not(.selecionada) { background: var(--fundo-2); }
+/* Dentro da ilha, a aba ativa não ganha mais pílula preenchida: só cor e peso, como o
+   "Início" azul da referência do dono. A pílula preenchida (mais abaixo) volta a valer só
+   no trilho lateral, onde cada aba é uma linha inteira. */
+.aba.selecionada { color: var(--inverso); font-weight: 900; background: none; }
+/* Sem cinza de hover dentro da ilha: o fundo da própria ilha já é o acabamento. */
+.aba:hover:not(.selecionada) { background: none; }
 /* O ícone da aba encolhia para 82% e voltava a cada toque. Era esse o "zoom" na troca de
    aba: some junto com o resto das animações de escala. O toque já responde pela vibração
    e pela pílula que muda de lugar. */
@@ -402,26 +454,32 @@ button { font-family: inherit; }
 }
 .aba.selecionada .retrato-aba { border-color: var(--inverso); }
 
-/* Bíblia: item comum da barra, só que levantado — a Bíblia é o texto por trás de tudo,
-   não mais um destino entre outros. Fica NO FLUXO da barra (entre a 2ª e a 3ª aba: com
-   5 abas não existe centro exato, e um círculo em position:absolute cai em cima da aba
-   vizinha). A margem negativa é o que ergue metade do círculo acima da borda da barra. */
+/* Bíblia: o botão quadrado (cantos bem arredondados) levantado entre as duas ilhas — a
+   Bíblia é o texto por trás de tudo, não mais um destino entre outros. A margem embaixo é
+   o que o ergue acima das ilhas, que ficam alinhadas pelo pé da barra (align-items:
+   flex-end em .navegacao). O brilho é uma exceção pedida pelo dono, na referência que ele
+   mandou: a única peça do app com sombra de destaque assim. */
 .aba.aba-central {
-  flex: 0 0 60px;
-  width: 60px;
-  height: 60px;
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
   max-width: none;
-  margin-top: -30px;
-  align-self: flex-start;
-  border: 4px solid var(--cartao);
-  border-radius: 50%;
+  margin-bottom: 18px;
+  border: 0;
+  border-radius: 24px;
   background: var(--inverso);
   color: var(--inverso-tinta);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--inverso) 45%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--inverso) 12%, transparent);
+  pointer-events: auto;
 }
-.aba.aba-central .ico-aba { width: 28px; height: 28px; }
-.aba.aba-central .rotulo-aba { display: none; }
+.aba.aba-central .ico-aba { width: 26px; height: 26px; }
+.aba.aba-central .rotulo-aba { font-size: 0.68rem; }
 .aba.aba-central:hover { background: var(--inverso); }
-.aba.aba-central.selecionada { box-shadow: 0 0 0 2px var(--inverso); }
+.aba.aba-central.selecionada {
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--inverso) 45%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--inverso) 22%, transparent);
+}
 
 /* ---------- botões ----------
    Acabamento novo: cápsula, chapado. O botão principal é o par que se inverte entre
@@ -2571,18 +2629,26 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
     border-right: 2px solid var(--borda);
     border-radius: 0;
     background: var(--fundo);
+    pointer-events: auto;
   }
   .navegacao .marca-lateral { display: flex; align-items: center; gap: 10px; font-family: var(--fonte-destaque); font-size: 1.15rem; font-weight: 600; color: var(--tinta-forte); text-decoration: none; padding: 8px 12px 20px; letter-spacing: 0.02em; text-transform: uppercase; }
   .navegacao .marca-lateral em { font-style: normal; color: var(--vermelho); }
   .navegacao .marca-lateral .simbolo { flex: 0 0 auto; display: grid; place-items: center; color: var(--tinta-forte); }
   .navegacao .marca-lateral .simbolo svg.ico-logo { width: 30px; height: auto; }
+  /* As ilhas eram só um agrupamento visual do celular: no trilho lateral elas somem do
+     layout (display: contents) e as abas voltam a ser itens soltos da lista vertical,
+     na ordem em que o roteador as desenha — Trilha, Desafios, Bíblia, Juntos, Explorar. */
+  .ilha { display: contents; }
   .aba { flex: 0 0 auto; flex-direction: row; justify-content: flex-start; gap: 14px; max-width: none; width: 100%; height: 54px; padding: 0 14px; }
   .aba .rotulo-aba { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  /* No trilho lateral a Bíblia volta a ser um item comum da lista: o círculo flutuante
-     só faz sentido flutuando sobre a borda da barra de baixo. */
+  /* No trilho lateral a aba ativa volta a ser a pílula preenchida de sempre: a troca para
+     "só cor", feita lá em cima, vale só na barra de baixo do celular. */
+  .aba.selecionada { color: var(--inverso-tinta); background: var(--inverso); border-radius: var(--raio-capsula); }
+  .aba:hover:not(.selecionada) { background: var(--fundo-2); }
+  /* No trilho lateral a Bíblia volta a ser um item comum da lista: o brilho e o quadrado
+     levantado só fazem sentido flutuando sobre a barra de baixo. */
   .aba.aba-central {
-    margin-top: 0;
-    align-self: auto;
+    margin-bottom: 0;
     flex: 0 0 auto;
     width: 100%;
     height: 54px;
@@ -2593,7 +2659,7 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
     color: var(--tinta-fraca);
     box-shadow: none;
   }
-  .aba.aba-central .rotulo-aba { display: block; }
+  .aba.aba-central .rotulo-aba { font-size: 0.95rem; }
   .aba.aba-central:hover { background: var(--fundo-2); }
   .aba.aba-central.selecionada { color: var(--inverso-tinta); background: var(--inverso); border-radius: var(--raio-capsula); box-shadow: none; }
   .aplicativo { padding-left: 240px; }
