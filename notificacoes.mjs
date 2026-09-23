@@ -233,7 +233,7 @@ const T = {
   toques: [['{amigo} e mais {outros} te deram um toque 👊', 'A galera já leu. Bora você também?']],
   pedido: [['{amigo} quer ler a Bíblia com você 🙌', 'Abre o app pra aceitar e começar o propósito de vocês.']],
   aceito: [['{amigo} topou ler junto 🤝', 'Começou o propósito de vocês. Cada dia que os dois leem conta!']],
-  teste: [['Tudo certo por aqui ✅', 'É assim que os lembretes do Caminho vão chegar.']],
+  teste: [['Tudo certo por aqui ✅', 'É assim que os lembretes do Geração Eleita vão chegar.']],
   propositoConvite: [
     ['{amigo} te chamou para um propósito 🤝', '{titulo}. Abre o app pra ver e aceitar.'],
   ],

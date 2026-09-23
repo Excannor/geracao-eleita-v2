@@ -109,7 +109,7 @@
         'A Apple só entrega notificações para o app aberto pelo ícone da tela de início.',
         '<button class="botao" data-instalar>Ver como instalar</button>'),
       bloqueado: cartao('cadeado', 'As notificações estão bloqueadas',
-        ehIos() ? 'Abra os Ajustes do iPhone, entre em Notificações, toque em Caminho e ative.'
+        ehIos() ? 'Abra os Ajustes do iPhone, entre em Notificações, toque em Geração Eleita e ative.'
           : 'Toque no cadeado ao lado do endereço, ou nas informações do app no celular, e permita notificações.', ''),
       'sem-suporte': cartao('info', 'Este navegador não recebe notificações', 'No Android, use o Chrome. No iPhone, instale o app pela tela de início.', ''),
       'sem-servidor': cartao('info', 'Sem servidor, sem notificação', 'Abra o app pelo endereço dele para ativar.', ''),

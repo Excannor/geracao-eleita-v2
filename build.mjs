@@ -193,7 +193,7 @@ self.addEventListener('fetch', (ev) => {
 self.addEventListener('push', (ev) => {
   let d = {};
   try { d = ev.data ? ev.data.json() : {}; } catch (e) { d = { corpo: ev.data ? ev.data.text() : '' }; }
-  ev.waitUntil(self.registration.showNotification(d.titulo || 'Caminho com Cristo', {
+  ev.waitUntil(self.registration.showNotification(d.titulo || 'Geração Eleita', {
     body: d.corpo || '',
     icon: './icone-192.png',
     tag: d.tag || 'caminho',
