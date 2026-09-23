@@ -18,7 +18,13 @@
 
   CC.carregarNovidades = function () {
     if (!comConta()) return Promise.resolve(null);
-    return CC.api('api/novidades').then((d) => { mural = d; return d; }).catch(() => null);
+    // O quadro do mês saiu da tela junto com os personagens (redesenho futuro): os já
+    // publicados ficam no servidor, mas não aparecem nem contam como novidade.
+    return CC.api('api/novidades').then((d) => {
+      if (d && d.eventos) d.eventos = d.eventos.filter((e) => e.tipo !== 'quadro');
+      mural = d;
+      return d;
+    }).catch(() => null);
   };
   CC.novidadesEmCache = () => mural;
 
@@ -81,7 +87,7 @@
   }
 
   // Os marcos saem daqui depois que o progresso já foi para o servidor, que confere tudo.
-  CC.publicarNovidades = async function ({ ofensiva, niveis, livros, unidade, quadro } = {}) {
+  CC.publicarNovidades = async function ({ ofensiva, niveis, livros, unidade } = {}) {
     if (!comConta()) return;
     if (!mural) await CC.carregarNovidades();
     if (!mural || !mural.ligado) return;
@@ -90,7 +96,6 @@
     for (const c of niveis || []) await publicar('conquista', { id: c.id, nivel: c.nivel });
     for (const l of livros || []) await publicar('livro', { livro: l });
     if (unidade) await publicar('unidade', { numero: unidade });
-    if (quadro) await publicar('quadro', { mes: quadro });
   };
 
   CC.compartilharVersiculo = async function (ref) {
@@ -407,10 +412,6 @@
       const u = CC.D.unidades.find((x) => x.numero === Number(d.numero));
       frase = quem + ' concluiu a <b>unidade ' + CC.esc(d.numero) + '</b> do plano!';
       arte = CC.arte.trofeu(u ? u.cor : 'amarelo', true);
-    } else if (ev.tipo === 'quadro') {
-      const q = CC.quadroDoMes(d.mes, { quadros: {} });
-      frase = quem + ' completou o <b>quadro de ' + CC.esc(q.nome) + '</b>!';
-      arte = '<span class="arte-retrato">' + CC.ico('camadas') + '</span>';
     } else if (ev.tipo === 'versiculo') {
       frase = quem + ' guardou um versículo:';
       extra = '<div class="versiculo-mural" data-ref="' + CC.esc(d.ref) + '"><p class="texto-versiculo">…</p><b>' + CC.esc(d.ref) + '</b></div>';

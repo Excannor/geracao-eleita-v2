@@ -241,6 +241,12 @@ const T = {
     ['Faltam {faltam} pro grupo bater a meta 🎯', '{titulo}: bora fechar o dia juntos?'],
     ['O grupo tá quase lá 🙌', 'Falta pouco em {titulo}. A sua lição ajuda a bater a meta!'],
   ],
+  // O corpo não diz "leem": o propósito pode ser de oração.
+  propositoAceito: [['{amigo} entrou no propósito 🙌', '{titulo}: agora vocês estão juntos nessa.']],
+  metaBatida: [
+    ['O grupo bateu a meta de hoje 🎉', '{titulo}: vocês chegaram lá juntos.'],
+    ['Meta do grupo batida 🙌', 'Deu certo em {titulo}. Obrigado por estar junto!'],
+  ],
 };
 export const TEXTOS = T;
 
@@ -274,8 +280,9 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
     tag = 'toque';
   }
   if (tipo === 'pedido' || tipo === 'aceito') { url = './#/amigos'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
-  if (tipo === 'propositoConvite') { url = './#/propositos'; tag = 'proposito:' + (dados.id || ''); }
-  if (tipo === 'metaDoGrupo') { url = './#/propositos'; tag = 'grupo:' + (dados.id || ''); }
+  if (tipo === 'propositoConvite' || tipo === 'propositoAceito') { url = './#/propositos'; tag = 'proposito:' + (dados.id || ''); }
+  // A meta batida usa a mesma tag do "falta pouco": no celular, a boa notícia substitui o recado.
+  if (tipo === 'metaDoGrupo' || tipo === 'metaBatida') { url = './#/propositos'; tag = 'grupo:' + (dados.id || ''); }
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = lista[semente(usuario + '|' + data + '|' + tipo) % lista.length];
   return { titulo: preencher(titulo, d), corpo: preencher(corpo, d), tag, url };

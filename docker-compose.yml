@@ -29,6 +29,7 @@ services:
       - "./dados:/app/dados"
     environment:
       CAMINHO_AMBIENTE: "hml"
+      CAMINHO_ENDERECO: "https://ge.off-sec.net"
 
   # Túnel rápido: endereço novo a cada reinício. Só sobe se pedido, com
   #   docker compose --profile rapido up -d

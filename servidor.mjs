@@ -197,7 +197,7 @@ function importarEstadosLegados() {
 }
 importarEstadosLegados();
 // O serviço de push pede um contato de quem manda: o endereço do app, e não o e-mail de ninguém.
-const CONTATO_PUSH = process.env.CAMINHO_ENDERECO || 'https://ccc.off-sec.net';
+const CONTATO_PUSH = process.env.CAMINHO_ENDERECO || 'https://ge.off-sec.net';
 // Só as ferramentas de teste: aceitam um serviço de push em 127.0.0.1 e fixam o relógio.
 const PUSH_TESTE = process.env.CAMINHO_PUSH_TESTE === '1';
 const agoraDoServidor = () => (PUSH_TESTE && process.env.CAMINHO_RELOGIO ? new Date(process.env.CAMINHO_RELOGIO) : new Date());
@@ -455,10 +455,28 @@ async function rodadaDeLembretes(agora = new Date()) {
 
   // Meta do grupo: depois das 18h, se falta pouco (até 2 pontos), quem ainda não fez recebe um
   // recado, no máximo um por dia por grupo, dentro da escolha "Amigos" e do silêncio da noite.
+  // Quando a meta é batida, todos os ativos recebem a boa notícia, também uma vez por dia.
   // Grupo de oração não entra: oração não tem meta nem cobrança.
   for (const p of CONTAS.propositosAtivos().filter((x) => x.grupo && x.tipo !== 'oracao')) {
     const retrato = await retratoDoProposito(p, p.criadoPor);
-    if (!retrato.hoje || retrato.hoje.batida || retrato.hoje.faltam > 2) continue;
+    if (!retrato.hoje) continue;
+    if (retrato.hoje.batida) {
+      for (const m of retrato.membros) {
+        if (m.estado !== 'ativo' || !NOTIFICACOES.inscricoesDe(m.usuario).length || !NOTIFICACOES.preferencias(m.usuario).amigos) continue;
+        const conta = CONTAS.achar(m.usuario);
+        const data = hojeNoFuso(conta.fuso, agora);
+        const minutos = minutosNoFuso(conta.fuso, agora);
+        if (emSilencio(minutos)) continue;
+        const chave = 'grupoBatida:' + p.id;
+        if (NOTIFICACOES.historico(m.usuario)[chave] === data) continue;
+        await NOTIFICACOES.anotar(m.usuario, chave, data, minutos);
+        const mensagem = montarMensagem('metaBatida', { titulo: p.titulo, id: p.id }, { usuario: m.usuario, data, nome: m.nome });
+        await enviarPara(m.usuario, mensagem, { ttl: 3 * 3600 });
+        saiu.push({ usuario: m.usuario, tipo: 'metaBatida', titulo: mensagem.titulo });
+      }
+      continue;
+    }
+    if (retrato.hoje.faltam > 2) continue;
     for (const m of retrato.membros) {
       if (m.estado !== 'ativo' || m.fezHoje || !NOTIFICACOES.inscricoesDe(m.usuario).length || !NOTIFICACOES.preferencias(m.usuario).amigos) continue;
       const conta = CONTAS.achar(m.usuario);
@@ -769,7 +787,16 @@ const servidor = createServer(async (req, res) => {
           }
           return { proposito: await retratoDoProposito(p, eu) };
         }
-        if (qual === 'aceitar' || qual === 'recusar') { await CONTAS.responderProposito(eu, id, qual === 'aceitar', hoje); return {}; }
+        if (qual === 'aceitar' || qual === 'recusar') {
+          const p = await CONTAS.responderProposito(eu, id, qual === 'aceitar', hoje);
+          // Quem chamou fica sabendo que a pessoa entrou (recusa não avisa ninguém).
+          if (qual === 'aceitar') {
+            const m = p.membros.find((x) => x.usuario === eu);
+            const quem = (m && m.convidadoPor) || p.criadoPor;
+            if (quem && quem !== eu) semEsperar(avisoSocial(quem, 'propositoAceito', { amigo: await nomeDeExibicao(eu), titulo: p.titulo, id: p.id }));
+          }
+          return {};
+        }
         if (qual === 'convidar') {
           const p = await CONTAS.convidarParaProposito(eu, id, usuario);
           semEsperar(avisoSocial(limparNome(usuario), 'propositoConvite', { amigo: await nomeDeExibicao(eu), titulo: p.titulo, id: p.id }));

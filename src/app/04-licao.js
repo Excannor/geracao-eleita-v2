@@ -243,7 +243,6 @@
       CC.publicarNovidades({
         ofensiva: CC.MARCOS_OFENSIVA.includes(seq.atual) && seq.atual > sessao.antes.ofensiva ? seq.atual : 0,
         niveis: subiram, livros, unidade: unidade ? u.numero : 0,
-        quadro: missoes.peca && quadro.completo ? quadro.mes : '',
       });
     }
     // O servidor precisa desta leitura antes de contar o propósito com os amigos.

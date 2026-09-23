@@ -231,7 +231,6 @@
     CC.somarAcertos(s.acertos);
     CC.conferirMissoes();
     const recorde = s.acertos > antes;
-    const ganho = s.acertos * CC.XP_PRATICA_ACERTO;
     const proporcao = s.acertos / total;
     const nota = proporcao === 1 ? 'Perfeito!'
       : proporcao >= 0.7 ? 'Muito bem!'
@@ -249,8 +248,6 @@
       + '<div class="premios">'
       + '<div class="premio c-verde"><div class="cabeca">Acertos</div>'
       + '<div class="valor">' + CC.ico('certo') + s.acertos + '/' + total + '</div></div>'
-      + '<div class="premio c-amarelo"><div class="cabeca">XP ganho</div>'
-      + '<div class="valor">' + CC.ico('raio') + '+' + ganho + '</div></div>'
       + '</div>'
       + (recorde && antes > 0 ? '<p class="conquista-linha">' + CC.ico('coroa') + 'Novo recorde!</p>' : '')
       + '</div></div></div>'

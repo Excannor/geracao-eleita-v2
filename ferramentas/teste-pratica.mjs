@@ -41,7 +41,7 @@ for(let i=0;i<8;i++){
 await dormir(500);
 const txt=await av('document.querySelector(".quiz").innerText');
 console.log('--- texto final ---',JSON.stringify(txt).slice(0,300));
-ok(/XP/.test(txt),'a tela final mostra XP');
+ok(/acertos/i.test(txt) && !/XP/.test(txt),'a tela final mostra os acertos e não XP');
 ok(await av('!!document.querySelector(".estrelas-fim")'),'a tela final tem estrelas');
 await dormir(900);const est=await av('fetch("api/estado",{cache:"no-store"}).then(r=>r.json())');
 ok(est&&est.pratica&&Object.keys(est.pratica).length>=1,'o servidor guardou o resultado da pratica');
