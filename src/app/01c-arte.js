@@ -298,15 +298,6 @@
     requestAnimationFrame(passo);
   };
 
-  // Barras que enchem: o HTML nasce com a largura antiga em data-de e anda até a nova.
-  CC.encherBarras = (raiz, atraso = 250) => {
-    raiz.querySelectorAll('[data-encher]').forEach((i, n) => {
-      const alvo = i.dataset.encher;
-      if (CC.semMovimento()) { i.style.width = alvo; return; }
-      setTimeout(() => { i.style.width = alvo; }, atraso + n * 180);
-    });
-  };
-
   CC.esperar = (ms) => new Promise((r) => setTimeout(r, CC.semMovimento() ? 0 : ms));
 
   // ---------- tela cheia ----------

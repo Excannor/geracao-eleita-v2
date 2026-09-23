@@ -1015,7 +1015,7 @@ function enderecosDaRede() {
 }
 
 servidor.listen(PORTA, '0.0.0.0', () => {
-  console.log('\n  Caminho com Cristo\n');
+  console.log('\n  Geração Eleita\n');
   console.log('  neste computador:   http://localhost:' + PORTA);
   const redes = enderecosDaRede();
   if (redes.length) {

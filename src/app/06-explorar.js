@@ -48,7 +48,6 @@
     if (!s || !TEXTO_SECAO[pasta]) return s;
     return { ...s, rotulo: TEXTO_SECAO[pasta][0], descricao: TEXTO_SECAO[pasta][1] };
   };
-  CC.estiloSecao = estilo;
 
   // O subtítulo que só repete o nome da seção some, e a data perde a nota acadêmica entre
   // parênteses: no cartão basta a época, o detalhe fica dentro do texto.
@@ -259,7 +258,7 @@
       bt.onclick = () => {
         CC.marcarLicao(id, true);
         CC.guardarConquistas();
-        CC.avisar('Lição concluída! +' + CC.XP_LICAO + ' XP');
+        CC.avisar('Lição concluída!');
         CC.redesenhar();
       };
     }

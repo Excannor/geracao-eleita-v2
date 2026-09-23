@@ -174,8 +174,9 @@ ok(await esperar(existe('.cartao-versiculo'), 6000), 'o fim mostra um versículo
 await foto('4c-versiculo');
 ok(await av('!' + existe('[data-etapa-bloco="pensar"]:not([hidden])')), 'pensar e orar começam fechados');
 await clicar('[data-avancar]');
-ok(await esperar(existe('[data-etapa-bloco="pensar"]:not([hidden])') + ' && document.querySelectorAll(".pergunta-reflexao").length === 3'),
-  '"Pensar sobre isso" abre três perguntas');
+// 2 ou 3: as reflexões revistas têm a quantidade de perguntas que o texto pede
+ok(await esperar(existe('[data-etapa-bloco="pensar"]:not([hidden])') + ' && [2, 3].includes(document.querySelectorAll(".pergunta-reflexao").length)'),
+  '"Pensar sobre isso" abre as perguntas do dia');
 await clicar('[data-pergunta="0"]');
 ok(await av(q('[data-pergunta="0"]') + '.getAttribute("aria-pressed") === "true"'), 'a pessoa escolhe uma pergunta');
 await clicar('[data-avancar]');

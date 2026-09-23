@@ -481,7 +481,7 @@
         const desafios = el.querySelector('[data-ver-desafios]');
         if (desafios) desafios.onclick = (ev) => { ev.preventDefault(); CC.fecharLicao(); location.hash = '#/missoes'; };
         el.querySelector('[data-compartilhar]').onclick = async () => {
-          const r = await CC.compartilhar('Estou há ' + CC.plural(seq.atual, 'dia', 'dias') + ' lendo a Bíblia no Caminho com Cristo!', location.origin);
+          const r = await CC.compartilhar('Estou há ' + CC.plural(seq.atual, 'dia', 'dias') + ' lendo a Bíblia no Geração Eleita!', location.origin);
           if (r === 'copiado') CC.avisar('Copiado. É só colar na conversa.');
           else if (r === 'falhou') CC.avisar('Não consegui compartilhar nem copiar. Tente de novo.');
         };
@@ -624,17 +624,4 @@
       },
     };
   }
-
-  // O registro de um dia como texto, pronto para colar em qualquer lugar.
-  CC.textoDoRegistro = function (numero) {
-    const dia = D.plano[numero - 1];
-    const r = CC.registro(numero);
-    const nl = String.fromCharCode(10);
-    const L = ['# Leitura do dia ' + numero, '', 'Passagem: ' + [dia.antigo, dia.novo].filter(Boolean).join(' | '), ''];
-    for (const [chave, rotulo] of [['o', 'Observação'], ['i', 'Interpretação'], ['a', 'Aplicação'], ['oracao', 'Oração']]) {
-      if (!(r[chave] || '').trim()) continue;
-      L.push('## ' + rotulo, '', r[chave].trim(), '');
-    }
-    return L.join(nl);
-  };
 })(window.CC);

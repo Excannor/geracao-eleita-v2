@@ -373,17 +373,6 @@ window.CC = window.CC || {};
     '<div class="barra' + (classe ? ' ' + classe : '') + '"><i style="width:'
     + Math.max(0, Math.min(100, fracao * 100)).toFixed(2) + '%"></i></div>';
 
-  CC.anelMeta = (fracao, dentro) => {
-    const r = 22;
-    const volta = 2 * Math.PI * r;
-    const feito = Math.max(0, Math.min(1, fracao)) * volta;
-    return '<div class="anel-meta"><svg viewBox="0 0 52 52">'
-      + '<circle class="fundo" cx="26" cy="26" r="' + r + '"/>'
-      + '<circle class="frente" cx="26" cy="26" r="' + r + '" stroke-dasharray="'
-      + feito.toFixed(1) + ' ' + volta.toFixed(1) + '"/>'
-      + '</svg><b>' + dentro + '</b></div>';
-  };
-
   CC.tituloSecao = (texto, nota) =>
     '<div class="titulo-secao"><h2>' + CC.esc(texto) + '</h2>'
     + (nota ? '<span>' + CC.esc(nota) + '</span>' : '') + '</div>';

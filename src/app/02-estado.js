@@ -309,8 +309,6 @@
     return { ...s, recorde: Math.max(s.recorde, s.atual), total: datas.size };
   };
 
-  CC.protegido = (data) => CC.sequencia().protegidos.includes(data);
-
   // ---------- prática ----------
   CC.praticaDe = (unidade) => (E.pratica || {})[unidade] || { melhor: 0, total: 0, feitoEm: null };
 
@@ -481,7 +479,7 @@
     const L = [];
     const nl = String.fromCharCode(10);
     const seq = CC.sequencia();
-    L.push('# Caminho com Cristo: meus registros', '');
+    L.push('# Geração Eleita: meus registros', '');
     L.push('Exportado em ' + CC.hojeIso() + '.', '');
     L.push('## Progresso', '');
     L.push('- Dias lidos: ' + E.lidos.length + ' de ' + D.plano.length);

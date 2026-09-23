@@ -10,7 +10,6 @@
   const acao = (corpo) => CC.api('api/propositos', corpo);
 
   CC.carregarPropositos = () => CC.api('api/propositos').then((d) => { cache = d; return d; }).catch(() => null);
-  CC.propositosEmCache = () => cache;
 
   const ICONE = { plano: 'trilha', livro: 'livro', oracao: 'aperto' };
   const ROTULO_TIPO = { plano: 'Plano de leitura', livro: 'Leitura', oracao: 'Oração' };

@@ -185,21 +185,6 @@
       + '</div>';
   }
 
-  // ---------- atalho de amigos ----------
-  CC.cartaoAmigosTrilha = function (dados) {
-    if (!location.protocol.startsWith('http') || !dados || !dados.perfilCompleto) return '';
-    const amigos = dados.amigos || [];
-    if (!amigos.length) {
-      return '<button class="atalho-trilha vazio-proposito" data-convidar>'
-        + '<span class="marca-atalho c-azul">' + CC.ico('pessoas') + '</span>'
-        + '<span class="texto-atalho"><b>Convidar</b><small>ler junto</small></span></button>';
-    }
-    const melhor = amigos.reduce((m, a) => (a.dias > m.dias ? a : m), amigos[0]);
-    return '<a class="atalho-trilha com-amigos" href="#/novidades">'
-      + '<span class="rostos">' + amigos.slice(0, 3).map((a) => CC.retratoAmigo(a, 'mini')).join('') + '</span>'
-      + '<span class="texto-atalho"><b>' + CC.icoChama() + melhor.dias + '</b><small>' + (melhor.dias === 1 ? 'dia' : 'dias') + ' juntos</small></span></a>';
-  };
-
   // ---------- a tela ----------
   CC.vistaTrilha = function (raiz) {
     const atual = CC.diaAtual();
@@ -325,7 +310,7 @@
       + fala
       + (adiante ? '<span class="sub-pop">Este dia vem mais adiante, mas pode ler agora se quiser.</span>' : '')
       + '<button class="botao ' + (adiante ? 'contorno' : 'branco') + '" data-comecar="' + numero + '">'
-      + (feito ? 'Revisar' : (adiante ? 'Ler mesmo assim' : 'Começar <span class="xp-pop">+' + CC.XP_LEITURA + ' XP</span>')) + '</button>');
+      + (feito ? 'Revisar' : (adiante ? 'Ler mesmo assim' : 'Começar')) + '</button>');
     if (!pop) return;
     pop.querySelector('[data-comecar]').onclick = () => { fecharPop(); CC.abrirLicao(numero); };
   }

@@ -33,7 +33,7 @@
     return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) : 0) + novas;
   };
 
-  const TEXTO_CONVITE = 'Quer ler a Bíblia comigo? No Caminho com Cristo é uma lição por dia, e a gente mantém um propósito juntos. Aceita meu convite:';
+  const TEXTO_CONVITE = 'Quer ler a Bíblia comigo? No Geração Eleita é uma lição por dia, e a gente mantém um propósito juntos. Aceita meu convite:';
   const FALA_TOQUE = 'Bora ler hoje?';
 
   // ---------- peças ----------
@@ -62,21 +62,6 @@
     await CC.api('api/toques', { para: usuario });
   };
 
-  CC.ligarToques = function (raiz, depois) {
-    raiz.querySelectorAll('[data-tocar]').forEach((b) => {
-      b.onclick = async () => {
-        b.disabled = true;
-        try {
-          await enviarToque(b.dataset.tocar);
-          CC.avisar('Notificado!');
-        } catch (e) {
-          b.disabled = false;
-          CC.avisar(e.message);
-        }
-        if (depois) depois();
-      };
-    });
-  };
 
   // ---------- publicar no mural ----------
   CC.podeCompartilharComAmigos = () => comConta() && !!(cache && (cache.amigos || []).length);

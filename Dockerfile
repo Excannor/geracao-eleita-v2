@@ -1,4 +1,4 @@
-# Caminho com Cristo: aplicativo de leitura bíblica
+# Geração Eleita: aplicativo de leitura bíblica
 #
 # Não há dependências npm: basta o runtime do Node e o código. O conteúdo já vem
 # congelado em conteudo/conteudo.json, então a imagem não precisa de vault nenhum.
