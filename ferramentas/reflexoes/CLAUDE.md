@@ -57,6 +57,16 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    sacerdote" não é como a NBV chama Arão ali. Ao recontar, conferir também a
    primeira reação da pessoa: Moisés responde "Eis-me aqui!" antes do "quem sou eu?".
 
+   **Achados da 2ª passada (U1-U2), para não repetir:** conclusão tirada do silêncio ("ninguém
+   perguntou nada aos gigantes", "paradas em que nada aconteceu", "Deus não tira as serpentes");
+   adiantar o próximo dia (Josué discordando dos espias só aparece em Nm 14, não no 13);
+   texto de outro livro puxado para dentro (Nicodemos e a serpente é João 3; "ninguém era
+   obrigado a fazer voto" é de Deuteronômio); lei com alcance maior do que o texto dá ("o
+   resultado é sempre o mesmo" quando só vale para lepra confirmada; "contem a comunidade toda"
+   quando a contagem é dos homens de vinte anos para cima); palavra de sentido espiritual usada
+   para outra coisa ("salvação" para quem sobreviveu à picada); motivo psicológico dado a
+   personagem ("tinha acabado de enterrar a irmã quando explodiu").
+
    **Sentimento e tempo na medida do texto.** Não aumentar o que o texto diz: em Gn 50.15 os
    irmãos acham "possível" que José se vingue, e a reflexão dizia que eles "têm certeza"; em
    Mt 14 a NBV diz que "lutavam contra o mar agitado" e que Jesus veio "já de madrugada", e a
