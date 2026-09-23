@@ -90,6 +90,11 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    admite ("quando estiver em dificuldades, eu estarei ao seu lado", 91.15) e, se houver no
    dia, mostrar quem sofreu confiando (Paulo em 2 Co 11). Nos salmos de lamento, não apressar o
    consolo: o Salmo 88 termina na escuridão, e a reflexão diz isso.
+   Provérbios são conselhos de sabedoria, não garantias: "sua vida será prolongada", "seus
+   celeiros ficarão cheios" (Pv 3) não viram promessa de saúde ou dinheiro para quem obedece.
+   Âncora em conselho (confiar, cuidar do coração, falar com cuidado), não em recompensa.
+   Os capítulos sobre a "mulher imoral" (Pv 5-7) não viram âncora nem pergunta sobre a vida
+   sexual do leitor; se aparecerem, uma frase sóbria sobre fidelidade basta.
    Salmos que pedem destruição dos inimigos (58, 69.22-28, 83, 109, 137) não viram âncora nem
    pergunta sobre o leitor desejar o mal de alguém.
 
