@@ -194,13 +194,14 @@ const CC = contexto.window.CC;
   for (const d of D.plano) {
     const r = CC.reflexaoDoDia(d.numero);
     if (!r.ref && !r.nota) { semReflexao.push(d.numero); continue; }
-    if (r.perguntas.length !== 3 || r.oracao.length !== 3) semReflexao.push(d.numero);
+    // 2 ou 3 perguntas: as reflexões revistas têm a quantidade que o texto pede
+    if (r.perguntas.length < 2 || r.perguntas.length > 3 || r.oracao.length !== 3) semReflexao.push(d.numero);
     if (!r.ref) continue;
     const m = /^(.+?) (\d+)\./.exec(r.ref);
     if (!d.trechos.some((t) => t.livro === m[1] && Number(m[2]) >= t.de && Number(m[2]) <= t.ate)) foraDaLeitura.push(d.numero);
     if (!existe(nbv, r.ref) || !existe(blivre, r.ref)) semTexto.push(d.numero);
   }
-  checar(!semReflexao.length, 'os 365 dias têm versículo ou nota, três perguntas e três começos de oração' + (semReflexao.length ? ' (' + semReflexao.join(', ') + ')' : ''));
+  checar(!semReflexao.length, 'os 365 dias têm versículo ou nota, 2 ou 3 perguntas e três começos de oração' + (semReflexao.length ? ' (' + semReflexao.join(', ') + ')' : ''));
   checar(!foraDaLeitura.length, 'o versículo para guardar está dentro da leitura do dia' + (foraDaLeitura.length ? ' (' + foraDaLeitura.join(', ') + ')' : ''));
   checar(!semTexto.length, 'todo versículo para guardar existe nas duas traduções' + (semTexto.length ? ' (' + semTexto.join(', ') + ')' : ''));
 }

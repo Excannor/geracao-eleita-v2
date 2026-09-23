@@ -5,8 +5,12 @@
 // Cada arquivo em ferramentas/reflexoes/ guarda um pedaço do plano, por número de dia:
 //
 //   { "5": [{ "titulo": "...", "texto": "...",
-//             "perguntas": [["Sobre Deus", "..."], ["Sobre nós", "..."], ["Para hoje", "..."]],
+//             "perguntas": ["...", "..."],
 //             "oracao": ["...", "...", "..."] }] }
+//
+// As perguntas vão sem rótulo e na quantidade que o texto pede (2 ou 3). O molde antigo
+// de três vagas fixas, "Sobre Deus / Sobre nós / Para hoje", obrigava uma pergunta sobre
+// algum atributo de Deus mesmo quando a passagem não pedia, e daí saíam as genéricas.
 //
 // A lista por dia existe para a rotatividade que vem depois: mais de uma reflexão por dia,
 // mostrando outra a cada volta. Enquanto houver só uma, é ela que aparece sempre.
@@ -31,6 +35,10 @@ export function aplicarReflexoes(dados) {
       }
       if (reflexoes[numero]) { problemas.push('dia ' + numero + ' aparece em mais de um arquivo'); continue; }
       const boas = (Array.isArray(lista) ? lista : [lista]).filter((r) => r && r.texto && Array.isArray(r.perguntas) && r.perguntas.length);
+      for (const r of boas) {
+        const n = r.perguntas.length;
+        if (n < 2 || n > 3) problemas.push('dia ' + numero + ': ' + n + ' pergunta(s), o esperado é 2 ou 3');
+      }
       if (!boas.length) { problemas.push('dia ' + numero + ': nenhuma reflexão completa'); continue; }
       reflexoes[numero] = boas;
       dias++;

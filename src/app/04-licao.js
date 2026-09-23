@@ -313,8 +313,13 @@
             + '<p>' + CC.esc(r.pensamento) + '</p></figure>'
           : '')
         + '<h2>' + (r.pensamento ? 'Para pensar' : 'Escolha uma pergunta') + '</h2>'
-        + '<div class="perguntas-reflexao">' + r.perguntas.map(([rotulo, pergunta], i) => '<button class="pergunta-reflexao" data-pergunta="' + i + '" aria-pressed="false">'
-          + '<span class="rotulo-pergunta">' + CC.esc(rotulo) + '</span><span>' + CC.esc(pergunta) + '</span></button>').join('') + '</div>'
+        // As reflexões escritas trazem só a pergunta; as genéricas por gênero ainda vêm como
+        // [rótulo, pergunta]. Sem rótulo não sai a etiqueta em cima.
+        + '<div class="perguntas-reflexao">' + r.perguntas.map((p, i) => {
+          const [rotulo, pergunta] = Array.isArray(p) ? p : ['', p];
+          return '<button class="pergunta-reflexao" data-pergunta="' + i + '" aria-pressed="false">'
+            + (rotulo ? '<span class="rotulo-pergunta">' + CC.esc(rotulo) + '</span>' : '') + '<span>' + CC.esc(pergunta) + '</span></button>';
+        }).join('') + '</div>'
         + '<p class="passo-dica pequena dica-pensar" hidden>Fique um minuto com essa pergunta. Se ajudar, volte ao texto.</p>'
         + '</section>'
         // orar: começos de frase para a pessoa completar, nunca uma oração pronta

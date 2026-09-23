@@ -1,4 +1,4 @@
-// Confere as reflexões do dia: formato, rótulos, estilo e se a referência do versículo existe
+// Confere as reflexões do dia: formato, perguntas, estilo e se a referência do versículo existe
 // de verdade no texto bíblico que o app traz.
 // Uso: node ferramentas/teste-reflexoes.mjs [unidade]
 import { readFileSync } from 'node:fs';
@@ -56,7 +56,16 @@ for (const dia of dias) {
   for (const r of reflexoes[dia]) {
     if (!r.titulo) falhar(dia, 'falta o título');
     if (!r.texto || r.texto.split(/[.!?]\s/).length < 3) falhar(dia, 'o texto precisa de ao menos três frases');
-    if (!Array.isArray(r.perguntas) || r.perguntas.length !== 3) falhar(dia, 'precisa de três perguntas');
+    // Formato novo: 2 ou 3 perguntas, só o texto, sem rótulo. O antigo (três pares com
+    // rótulo fixo) ainda é aceito nas unidades que não foram revistas.
+    const novo = Array.isArray(r.perguntas) && r.perguntas.every((p) => typeof p === 'string');
+    if (!Array.isArray(r.perguntas)) falhar(dia, 'faltam as perguntas');
+    else if (novo) {
+      if (r.perguntas.length < 2 || r.perguntas.length > 3) falhar(dia, 'precisa de 2 ou 3 perguntas, tem ' + r.perguntas.length);
+      r.perguntas.forEach((per, i) => {
+        if (!per.trim().endsWith('?')) falhar(dia, 'a pergunta ' + (i + 1) + ' não termina com interrogação');
+      });
+    } else if (r.perguntas.length !== 3) falhar(dia, 'precisa de três perguntas');
     else r.perguntas.forEach(([rot, per], i) => {
       if (rot !== ROTULOS[i]) falhar(dia, 'o rótulo ' + (i + 1) + ' devia ser "' + ROTULOS[i] + '" e é "' + rot + '"');
       if (!per || !per.trim().endsWith('?')) falhar(dia, 'a pergunta "' + rot + '" não termina com interrogação');
@@ -78,7 +87,7 @@ for (const dia of dias) {
       }
     }
 
-    const tudo = [r.titulo, r.texto, ...r.perguntas.map((p) => p[1]), ...(r.oracao || [])].join(' ');
+    const tudo = [r.titulo, r.texto, ...r.perguntas.map((p) => (typeof p === 'string' ? p : p[1])), ...(r.oracao || [])].join(' ');
     for (const [re, nome] of PROIBIDOS) if (re.test(tudo)) falhar(dia, 'proibido: ' + nome);
   }
 }
