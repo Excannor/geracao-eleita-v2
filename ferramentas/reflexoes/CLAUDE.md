@@ -290,7 +290,12 @@ As regras de fidelidade valem também para o Explorar, com três pontos próprio
    vem depois tem de ser o que a NBV diz, porque é o que o leitor encontra ao abrir. Achados
    na Trilha: "amabilidade" (NVI) onde a NBV diz "retidão" (Gl 5.22), "templo" onde diz
    "morada" (1 Co 6.19), "resgate" onde diz "salvar" (Mc 10.45). Citação entre aspas: copiar
-   da NBV.
+   da NBV, sempre imprimindo o versículo com `node` antes de escrever. Até na correção a
+   memória trai: ao trocar João 4.14, saiu "uma fonte perene dentro dela", que não está em
+   tradução nenhuma; a checagem pegou.
+   Quando o comentário depende da palavra literal ("circuncidará", "resgatei", "expiar",
+   "habitou"), a citação pode vir da Bíblia Livre, que também é do app, com "(na Bíblia
+   Livre)" depois.
 3. **Onde mexer.** Cada pasta tem a sua fonte: Trilha em `primeiros-passos.mjs`, Pessoas em
    `pessoas-a/b/c.mjs` (as duas são aplicadas de novo a cada rodada), o resto em
    `ferramentas/explorar/*.json`. Nesse último, a nota já aplicada no `conteudo.json` só

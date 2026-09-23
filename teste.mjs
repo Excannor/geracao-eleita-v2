@@ -207,6 +207,20 @@ const CC = contexto.window.CC;
   checar(!foraDaLeitura.length, 'o versículo para guardar está dentro da leitura do dia' + (foraDaLeitura.length ? ' (' + foraDaLeitura.join(', ') + ')' : ''));
   checar(!semTexto.length, 'todo versículo para guardar existe nas duas traduções' + (semTexto.length ? ' (' + semTexto.join(', ') + ')' : ''));
 
+  // Integridade das Bíblias (conferida em 2026-09-23): 66 livros com os mesmos nomes e na
+  // mesma ordem, nenhum versículo vazio, e a única diferença de contagem entre as duas é a
+  // versificação da NBV, que divide em dois o último versículo de Juízes 5, 1 Samuel 20 e
+  // 3 João (31.105 contra 31.102). Uma importação nova que desalinhe capítulos cai aqui.
+  const livrosN = Object.keys(nbv.livros);
+  const vazio = (b) => Object.values(b.livros).flat().flat().some((v) => !v || !String(v).trim());
+  const diferentes = [];
+  for (const l of livrosN) (nbv.livros[l] || []).forEach((cap, i) => {
+    if (cap.length !== ((blivre.livros[l] || [])[i] || []).length) diferentes.push(l + ' ' + (i + 1));
+  });
+  checar(livrosN.length === 66 && JSON.stringify(livrosN) === JSON.stringify(Object.keys(blivre.livros))
+    && !vazio(nbv) && !vazio(blivre) && diferentes.join() === 'Juízes 5,1 Samuel 20,3 João 1',
+    'as duas Bíblias têm os 66 livros alinhados, sem versículo vazio' + (diferentes.join() === 'Juízes 5,1 Samuel 20,3 João 1' ? '' : ' (capítulos diferentes: ' + diferentes.join(', ') + ')'));
+
   // As notas de versículo do Explorar citavam a NVI, que não tem licença para o app: o texto
   // tem de vir das Bíblias do app, uma versão por tradução.
   const versiculos = Object.values(D.notas).filter((n) => n.pasta === '08 - Versículos' && /^.+ \d+\.\d+(-\d+)?$/.test(n.nome));
