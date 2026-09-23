@@ -132,6 +132,78 @@
     return n.pasta === '00 - Início' && id !== HISTORIA;
   };
 
+  // ---------- comece por aqui ----------
+  // Um caminho curto para quem abre o Explorar pela primeira vez e se assusta com tanto
+  // texto: como ler e entender a Bíblia, na ordem. A fé do recém-convertido (quem é Jesus,
+  // batismo, oração...) já está nos Primeiros passos da trilha; aqui o assunto é a leitura.
+  // Cada passo conta como feito quando a nota é aberta (notasVistas, igual em todo aparelho).
+  const COMECE = [
+    [HISTORIA, 'O fio da Bíblia inteira, antes das partes.'],
+    ['06 - Estudos Temáticos/Graça', 'O presente que está no centro de tudo.'],
+    ['05 - Hermenêutica/Método Indutivo (OIA)', 'Um jeito simples de ler qualquer trecho.'],
+    ['05 - Hermenêutica/Gêneros literários da Bíblia', 'Poema, carta e história se leem diferente.'],
+    ['05 - Hermenêutica/Os quatro contextos', 'Por que um versículo solto engana.'],
+    ['05 - Hermenêutica/Erros comuns de interpretação', 'As armadilhas em que todo mundo cai.'],
+    ['05 - Hermenêutica/Cristo em toda a Escritura', 'Como o Antigo Testamento aponta para Jesus.'],
+    ['15 - Fios Bíblicos/Fio do cordeiro', 'Um tema que atravessa a Bíblia de ponta a ponta.'],
+  ].filter(([id]) => D.notas[id]);
+  CC.COMECE_POR_AQUI = COMECE.map(([id]) => id);
+  const nomeDe = (id) => CC.semPrefixo(D.notas[id].nome || id.split('/').pop());
+  const hrefNota = (id) => '#/nota/' + encodeURIComponent(id);
+
+  function progressoComece() {
+    const vistas = new Set(CC.estado().notasVistas || []);
+    const feitos = COMECE.filter(([id]) => vistas.has(id)).length;
+    const proximo = COMECE.find(([id]) => !vistas.has(id));
+    return { vistas, feitos, proximo: proximo ? proximo[0] : null };
+  }
+
+  function blocoComece() {
+    const { vistas, feitos, proximo } = progressoComece();
+    const total = COMECE.length;
+    if (!total) return '';
+    // Terminado, o caminho vira uma linha discreta no fim da tela, para quem quiser rever.
+    if (!proximo) {
+      return '<details class="cartao comece feito"><summary>' + CC.ico('certo') + '<span><b>Comece por aqui</b>'
+        + '<span class="passo-dica">Você leu os ' + total + ' passos. Toque para rever.</span></span></summary>'
+        + listaComece(vistas, null) + '</details>';
+    }
+    return '<section class="cartao comece" aria-label="Comece por aqui">'
+      + '<span class="etiqueta">Comece por aqui</span>'
+      + '<h2>Como ler e entender a Bíblia</h2>'
+      + '<p class="passo-dica">' + total + ' textos curtos, nesta ordem. ' + (feitos ? 'Você já leu ' + feitos + ' de ' + total + '.' : 'De 2 a 6 minutos cada.') + '</p>'
+      + '<div class="barra-comece" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + feitos + '" aria-label="' + feitos + ' de ' + total + ' passos lidos">'
+      + '<i style="width:' + Math.round((feitos / total) * 100) + '%"></i></div>'
+      + '<a class="botao azul" href="' + hrefNota(proximo) + '">' + (feitos ? 'Continuar: ' : 'Começar: ') + CC.esc(nomeDe(proximo)) + '</a>'
+      + listaComece(vistas, proximo)
+      + (D.licoes.length ? '<a class="link-passos" href="#/passos">' + CC.ico('bandeira') + 'Acabou de chegar à fé? Comece pelos Primeiros passos</a>' : '')
+      + '</section>';
+  }
+
+  function listaComece(vistas, proximo) {
+    return '<ol class="lista-comece">' + COMECE.map(([id, porque], i) => {
+      const lido = vistas.has(id);
+      return '<li class="' + (lido ? 'lido' : '') + (id === proximo ? ' agora' : '') + '"><a href="' + hrefNota(id) + '">'
+        + '<span class="numero-comece" aria-hidden="true">' + (lido ? CC.ico('certo') : i + 1) + '</span>'
+        + '<span><b>' + CC.esc(nomeDe(id)) + '</b><small>' + CC.esc(porque) + '</small></span>'
+        + (lido ? '<span class="so-leitor">lido</span>' : '') + '</a></li>';
+    }).join('') + '</ol>';
+  }
+
+  // No fim de uma nota do caminho: onde a pessoa está e o próximo passo, sem voltar à lista.
+  function fimDoComece(id) {
+    const i = COMECE.findIndex(([x]) => x === id);
+    if (i < 0) return '';
+    const seguinte = COMECE[i + 1];
+    return '<div class="cartao comece-proximo"><span class="etiqueta">Comece por aqui · passo ' + (i + 1) + ' de ' + COMECE.length + '</span>'
+      + (seguinte
+        ? '<a class="botao azul" href="' + hrefNota(seguinte[0]) + '">Próximo: ' + CC.esc(nomeDe(seguinte[0])) + '</a>'
+          + '<p class="passo-dica pequena">' + CC.esc(seguinte[1]) + '</p>'
+        : '<p><b>Você chegou ao fim do caminho.</b> Agora é ler com calma e voltar aqui sempre que um trecho travar.</p>'
+          + '<a class="botao contorno" href="#/explorar">Voltar ao Explorar</a>')
+      + '</div>';
+  }
+
   CC.vistaExplorar = function (raiz) {
     const blocos = GRUPOS.map(([titulo, pastas]) => {
       const cartoes = pastas.map((pasta) => {
@@ -150,18 +222,25 @@
     const deHoje = [...(dia.rel.livros || []), ...(dia.rel.pessoas || []), ...(dia.rel.eventos || [])].slice(0, 8);
     const total = Object.keys(D.notas).filter((id) => !CC.notaInterna(id)).length;
 
+    const comece = blocoComece();
+    const terminou = !progressoComece().proximo;
+
     raiz.innerHTML = '<h1>Explorar</h1>'
       + '<p class="passo-dica">Quer entender melhor o que leu? Aqui tem quem é quem, onde tudo aconteceu e o que cada livro conta.</p>'
       + CC.campoBusca('')
+      // Quem ainda não fez o caminho vê ele primeiro; depois ele desce para o fim da tela.
+      + (terminou ? '' : comece)
       + (deHoje.length
         ? '<div class="cartao notas-de-hoje"><span class="etiqueta">Pra ir além na leitura de hoje</span>'
           + '<b>' + CC.esc(CC.passagemDe(dia)) + '</b>'
           + '<div class="pilulas">' + deHoje.map(CC.pilulaNota).join('') + '</div></div>'
         : '')
-      + (D.notas[HISTORIA] ? '<a class="cartao cartao-historia" href="#/nota/' + encodeURIComponent(HISTORIA) + '">'
+      // A história em uma página é o passo 1 do caminho; o atalho próprio só volta depois dele.
+      + (terminou && D.notas[HISTORIA] ? '<a class="cartao cartao-historia" href="#/nota/' + encodeURIComponent(HISTORIA) + '">'
         + CC.ico('livro') + '<span><b>A história da Bíblia em uma página</b>'
         + '<span class="passo-dica">Veja o todo antes das partes.</span></span>' + CC.ico('avancar') + '</a>' : '')
       + blocos
+      + (terminou ? comece : '')
       + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
     CC.ligarBusca(raiz);
   };
@@ -208,7 +287,9 @@
     const s = secaoDe(n.pasta);
     const [, cor] = estilo(n.pasta);
 
-    const daqui = (n.backlinks || []).filter((b) => D.notas[b]);
+    // Só o que a pessoa pode abrir: índices e páginas de bastidor do material de origem
+    // apareciam aqui como se fossem textos do app.
+    const daqui = (n.backlinks || []).filter((b) => D.notas[b] && !CC.notaInterna(b));
     const grupos = {};
     for (const b of daqui) (grupos[D.notas[b].pasta] ||= []).push(b);
 
@@ -235,6 +316,7 @@
               + '<button class="botao" data-concluir hidden>Concluí esta lição</button>')
           + '</div>'
         : '')
+      + fimDoComece(id)
       + CC.painelAnotacao('nota:' + id, 'Suas anotações')
       + citada;
 

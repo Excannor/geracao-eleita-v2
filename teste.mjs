@@ -52,6 +52,14 @@ checar(D.plano.every((d) => d.antigo || d.novo), 'todo dia tem ao menos uma pass
   checar(!citamArquivo.length, 'os textos visíveis não citam vault, modelos ou Obsidian' + (citamArquivo.length ? ' (' + citamArquivo.slice(0, 3).join(', ') + ')' : ''));
   checar(!linkOculto.length, 'nenhum texto visível leva a uma página de bastidor' + (linkOculto.length ? ' (' + linkOculto.slice(0, 3).join(', ') + ')' : ''));
   checar(D.unidades.every((u) => !/[—–]/.test(u.titulo)), 'os títulos das unidades não têm travessão');
+  // "Volta para: Home" era a navegação do vault, sem sentido no app.
+  const voltaPara = visiveis.filter((id) => /Volta para:/.test(textoDe(D.notas[id])));
+  checar(!voltaPara.length, 'nenhum texto visível manda "voltar para" uma página do vault' + (voltaPara.length ? ' (' + voltaPara.slice(0, 3).join(', ') + ')' : ''));
+  // O "Comece por aqui" do Explorar aponta para notas que existem e que a pessoa pode abrir.
+  const fonteExplorar = readFileSync(join(AQUI, 'src', 'app', '06-explorar.js'), 'utf8');
+  const blocoComece = (fonteExplorar.match(/const COMECE = \[([\s\S]*?)\]\.filter/) || [])[1] || '';
+  const idsComece = [...blocoComece.matchAll(/\['([^']+)'/g)].map((m) => m[1]).concat(/\[HISTORIA,/.test(blocoComece) ? ['00 - Início/A história bíblica em uma página'] : []);
+  checar(idsComece.length === 8 && idsComece.every((id) => D.notas[id] && !notaOculta(D, id)), 'os 8 passos do "Comece por aqui" são notas visíveis (' + idsComece.length + ')');
 }
 
 const LIVROS = new Set();
