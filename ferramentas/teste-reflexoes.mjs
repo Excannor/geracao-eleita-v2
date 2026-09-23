@@ -51,7 +51,25 @@ const leituraNbv = (plano) => plano.trechos.map((t) => {
 // Expressões conferidas como redação de outra tradução (ARA/ACF), já usadas por engano.
 const OUTRA_TRADUCAO = ['proverá', 'achou graça', 'cana rachada', 'mecha que fumega', 'casa da escravidão',
   'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai'].map(normalizar);
-const NUMERO = /(?<!\p{L})(\d+|três|quatro|cinco|seis|sete|oito|nove|dez|doze|catorze|quinze|vinte|trinta|quarenta|cinquenta|cem|cento|mil)(?!\p{L})/gu;
+// Palavras com maiúscula que não são nome de alguém da leitura (nomes de Deus, termos gerais).
+// Os nomes dos livros também passam: citar "Êxodo" ou "Marcos" é falar da própria leitura.
+const NOMES_LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia',
+  'Escritura', 'Escrituras', 'Reino', 'Lei', 'Palavra', 'Altíssimo', 'Soberano', 'Messias', 'Mestre', 'Salvador',
+  ...Object.keys(biblia.livros).flatMap((l) => l.split(' ')).filter((p) => /^\p{Lu}/u.test(p))]);
+// Todas as palavras que a NBV escreve em minúscula em algum lugar: servem para separar palavra
+// comum de nome próprio no começo da frase.
+const MINUSCULAS_DA_NBV = new Set();
+for (const caps of Object.values(biblia.livros)) for (const cap of caps) for (const v of cap) {
+  for (const p of String(v).match(/\p{Ll}[\p{L}-]*/gu) || []) MINUSCULAS_DA_NBV.add(p);
+}
+// Palavras comuns que abrem frase de reflexão e podem não estar na leitura.
+const PALAVRAS_DE_INICIO = new Set(['Como', 'Quando', 'Que', 'Qual', 'Quem', 'Onde', 'Tem', 'Você', 'Em', 'No', 'Na',
+  'Nos', 'Nas', 'Depois', 'Antes', 'Mesmo', 'Mas', 'Só', 'Repare', 'Até', 'Ali', 'Aqui', 'Então', 'Hoje', 'Por',
+  'Para', 'Se', 'Ele', 'Ela', 'Eles', 'Elas', 'Isso', 'Esse', 'Essa', 'Este', 'Esta', 'Foi', 'Era', 'Existe',
+  'Deus', 'Nada', 'Ninguém', 'Tudo', 'Todo', 'Toda', 'Dois', 'Duas', 'Três', 'Cinco', 'Dez', 'Doze', 'Poucos',
+  'Logo', 'Agora', 'Sem', 'Com', 'Uma', 'Um', 'Os', 'As', 'O', 'A', 'Às', 'Ao', 'Aos', 'Do', 'Da', 'De', 'E', 'Ou']);
+const ABSOLUTA =/(?<!\p{L})(o primeiro|a primeira|os primeiros|o único|a única|os únicos|a Bíblia inteira|toda a Bíblia|nunca mais|em toda a história|mais que qualquer)(?!\p{L})/giu;
+const NUMERO =/(?<!\p{L})(\d+|três|quatro|cinco|seis|sete|oito|nove|dez|doze|catorze|quinze|vinte|trinta|quarenta|cinquenta|cem|cento|mil)(?!\p{L})/gu;
 
 // O versículo existe? A referência é conferida contra o texto que o app traz.
 function versiculoExiste(ref) {
@@ -116,7 +134,8 @@ for (const dia of dias) {
     // sem ninguém perceber ("Deus proverá", "achou graça"). Toda citação entre aspas tem de
     // existir, palavra por palavra, na NBV da leitura do dia; expressão típica de outra
     // tradução só passa se estiver nela.
-    const lido = normalizar(leituraNbv(plano));
+    const lidoCru = leituraNbv(plano);
+    const lido = normalizar(lidoCru);
     const escrito = [r.texto, ...r.perguntas.map((p) => (typeof p === 'string' ? p : p[1]))].join(' ');
     for (const m of escrito.matchAll(/["“]([^"”]+)["”]/g)) {
       const citado = normalizar(m[1]);
@@ -125,6 +144,25 @@ for (const dia of dias) {
     for (const expr of OUTRA_TRADUCAO) {
       if (normalizar(escrito).includes(expr) && !lido.includes(expr)) falhar(dia, 'redação de outra tradução, a NBV da leitura não diz "' + expr + '"');
     }
+    // Nome próprio que a leitura do dia não tem vai para conferência: a NBV escreve "Hagar", e a
+    // reflexão dizia "Agar". Palavra com maiúscula no meio da frase que não aparece no texto
+    // lido é nome de outra tradução, de outro dia ou erro de digitação.
+    const frases = escrito.split(/(?<=[.!?:"])\s+/);
+    for (const f of frases) {
+      const frase = f.replace(/^["“(]+/, '');
+      for (const m of frase.matchAll(/(?<!\p{L})(\p{Lu}[\p{Ll}]+)(?!\p{L})/gu)) {
+        const nome = m[1];
+        if (NOMES_LIVRES.has(nome) || lidoCru.includes(nome)) continue;
+        // No começo da frase, a maiúscula é da frase: palavra que a NBV usa em minúscula em algum
+        // lugar é palavra comum ("Sai", "Dorme"), não nome. "Agar" nunca aparece em minúscula.
+        if (m.index === 0 && (PALAVRAS_DE_INICIO.has(nome) || MINUSCULAS_DA_NBV.has(nome.toLowerCase()))) continue;
+        conferir.push('dia ' + dia + ' · nome "' + nome + '" não aparece na leitura');
+      }
+    }
+    // Afirmação absoluta vai para conferência: "o primeiro castigo da Bíblia" (Gn 3 vem antes)
+    // e "a única pessoa na Bíblia inteira que..." já saíram errados.
+    for (const m of escrito.matchAll(ABSOLUTA)) conferir.push('dia ' + dia + ' · afirmação absoluta: "' + m[0] + '"');
+
     // Número citado que a leitura não tem vai para conferência: "quarenta anos" (Atos 7),
     // "quatro palavras" (eram seis) e "mais de vinte anos" (conta nossa) já saíram errados.
     const semCapitulo = normalizar(escrito).replace(/\b(capítulos?|versículos?|dia) \d+/g, ' ');

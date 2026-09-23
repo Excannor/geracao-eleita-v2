@@ -27,6 +27,28 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    (NBV: "onde você foi um povo escravo"). E conferir números e contagens ("quatro palavras",
    "mais de vinte anos"), que também já saíram errados.
 
+   **Nomes como a NBV escreve.** Nome de pessoa ou lugar tem a grafia da NBV: ela escreve
+   "Hagar" e "Coré", e as reflexões diziam "Agar" e "Corá". O teste lista em "conferir" todo
+   nome que a leitura do dia não tem.
+
+   **Nada de afirmação absoluta sem conferir.** "O primeiro", "o único", "a Bíblia inteira",
+   "a única vez" pedem prova na própria leitura. Já saíram errados: "o primeiro castigo da
+   Bíblia" (Adão e Eva são castigados antes, Gn 3), "a única pessoa na Bíblia inteira que dá
+   nome a Deus", "a única vez na Bíblia em que alguém proíbe o povo de ofertar". Na dúvida,
+   tira-se o absoluto: "dessa vez" no lugar de "pela primeira vez".
+
+   **Não concluir do silêncio.** O texto não dizer que alguém orou não prova que ele não orou.
+   Já saíram "Ló não pergunta nada a Deus" e "Deus não cobrou uma explicação de Arão". Afirma-se
+   o que o texto conta, não o que ele deixa de contar.
+
+   **Quem fez o quê, exatamente.** Ao recontar, manter quem age e quem recebe como no texto:
+   em Gn 19.16 são "os anjos" que puxam Ló (não "os homens"), e a misericórdia é "deles" (a
+   família), não só "dele".
+
+   **Não adiantar outros dias.** Nada de "isso vai custar caro" apontando para uma leitura que
+   ainda vai vir, nem citar história de outro dia como se estivesse nesta (a torre de Babel é
+   Gn 11, e não cabe no dia que lê Gn 9-10).
+
 2. **Uma palavra, um sentido.** Palavra com sentido bíblico próprio não pode aparecer com
    outro sentido na mesma reflexão. Caso real: o texto diz que Noé "achou graça aos olhos do
    Senhor" (graça = favor que Deus dá sem ninguém merecer), e a pergunta dizia "o que Deus já
@@ -128,7 +150,13 @@ máquina estão no `ferramentas/teste-reflexoes.mjs`, e publicar exige que ele p
 - **lista para conferir** todo número citado que não aparece na leitura. Contagem que o
   próprio texto dá (cinco filhas, doze espiões, 7 + 7 anos) pode ficar; número trazido de
   fora (os "quarenta anos" que vêm de Atos 7) sai;
+- **lista para conferir** nome próprio que não aparece na leitura do dia (a palavra no começo da
+  frase só entra se nunca aparece em minúscula na NBV, para não confundir verbo com nome);
+- **lista para conferir** afirmação absoluta (lista `ABSOLUTA`);
 - **lista para revisar** pergunta com palavra de sentido bíblico próprio (regra 2).
+
+**Regra de manutenção (pedido do dono):** todo tipo de erro novo encontrado numa revisão vira
+uma regra neste arquivo e, quando der para pegar por máquina, uma trava no teste.
 
 Nunca escrever citação de cabeça: copiar do `conteudo/biblias/nbv.json`.
 

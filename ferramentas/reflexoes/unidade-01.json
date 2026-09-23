@@ -1,112 +1,113 @@
 {
  "1": [
   {
-   "titulo": "Tudo começa com alguém falando",
-   "texto": "Deus não encontra o mundo pronto, ele fala e o mundo aparece. E quando chega no ser humano, faz diferente: cria à imagem dele. No capítulo 3 a serpente ataca exatamente isso, pondo dúvida no que Deus disse. A primeira briga da Bíblia não é sobre uma fruta, é sobre em quem acreditar.",
+   "ref": "Gênesis 1.27",
+   "titulo": "Tudo começa com Deus falando",
+   "texto": "No começo, Deus fala e as coisas passam a existir: a luz, o céu, os mares, as plantas, os animais. Quando chega no ser humano, ele cria homem e mulher à sua imagem e, olhando tudo o que fez, vê que tinha ficado muito bom. No capítulo 3 entra a serpente, e a primeira coisa que ela faz é perguntar: \"É verdade que Deus disse\"... A primeira tentação da Bíblia começa com uma dúvida sobre o que Deus falou. E mesmo depois do erro, é Deus quem vai atrás de Adão, perguntando: \"Onde você está?\"",
    "perguntas": [
-    "Depois de fazer o ser humano, Deus olhou para tudo e disse que era muito bom. Que voz tem te dito o contrário sobre quem você é?",
-    "A serpente começou plantando uma dúvida sobre o que Deus tinha dito. Quando uma dúvida assim aparece em você, com quem você conversa sobre ela?"
+    "Deus olhou para tudo o que tinha feito, incluindo o ser humano, e viu que estava muito bom. Que voz tem te dito o contrário sobre quem você é?",
+    "A serpente começou plantando uma dúvida sobre o que Deus tinha dito. Quando uma dúvida assim aparece em você, com quem você conversa sobre ela?",
+    "Adão e Eva se esconderam, e Deus foi atrás chamando. Como é saber que, mesmo quando a gente se esconde, Deus vem procurar?"
    ],
    "oracao": [
     "Deus, tu me fizeste e isso não foi por acaso…",
     "Às vezes eu duvido quando…",
-    "Hoje me ajuda a acreditar no que tu dizes sobre mim, principalmente em…"
-   ],
-   "ref": "Gênesis 1.27"
+    "Obrigado porque tu me procuras mesmo quando…"
+   ]
   }
  ],
  "2": [
   {
-   "titulo": "Dois caminhos saindo do mesmo lugar",
-   "texto": "Caim e Abel crescem na mesma casa. Deus avisa Caim antes do crime: o pecado está à sua espera, mas está na sua mão o poder de dominá-lo. Ele escolhe não ouvir. Na outra ponta do capítulo 5, no meio de uma lista em que todo mundo morre, aparece Enoque, que sempre andou com Deus e um dia desapareceu, porque Deus o levou. A mesma família, dois destinos.",
+   "ref": "Gênesis 4.7",
+   "titulo": "O pecado está à sua espera",
+   "texto": "Caim fica furioso porque o Senhor se agradou da oferta do irmão e não da dele. Antes de qualquer crime, Deus conversa com ele: o pecado está à sua espera, mas está na sua mão o poder de dominá-lo. Caim não escuta e mata Abel. Mesmo assim, quando Caim tem medo de ser morto por quem o encontrar, o Senhor coloca nele um sinal para protegê-lo. Até no castigo, Deus continua cuidando.",
    "perguntas": [
-    "Deus avisou Caim antes, com cuidado, como quem quer proteger. Tem algum aviso assim no seu coração hoje?",
-    "A raiva de Caim cresceu enquanto ele comparava a vida dele com a do irmão. Tem alguém com quem você se compara e isso te faz mal?"
+    "Antes do crime, Deus perguntou a Caim por que ele estava furioso. Se Deus te fizesse essa pergunta hoje, o que você responderia?",
+    "A raiva de Caim cresceu por causa do irmão. Tem alguém com quem você se compara e isso te faz mal?"
    ],
    "oracao": [
     "Senhor, tu falas comigo antes de eu errar…",
     "Eu me comparo com…",
     "Me ajuda a ouvir o teu aviso sobre…"
-   ],
-   "ref": "Gênesis 4.7"
+   ]
   }
  ],
  "3": [
   {
+   "ref": "Gênesis 6.22",
    "titulo": "Quem fecha a porta é Deus",
-   "texto": "No meio de uma geração que tinha se afastado de Deus, o texto diz que Noé agradava ao Senhor com a sua vida. Deus manda construir um barco enorme em terra seca, e Noé faz tudo conforme Deus tinha ordenado, sem nenhuma prova de que a chuva viria. E quando todos entram, quem fecha a porta é o Senhor, não Noé.",
+   "texto": "No meio de uma geração que tinha se afastado de Deus, o texto diz que Noé agradava ao Senhor com a sua vida. Deus manda construir uma embarcação enorme, de 150 metros, e Noé faz tudo conforme Deus tinha ordenado, antes de ver qualquer sinal do dilúvio. Quando todos entram, quem fecha a porta é o Senhor, não Noé. E depois de tantos dias boiando, o texto diz que Deus atentou para Noé e fez as águas começarem a baixar.",
    "perguntas": [
-    "Noé fez tudo o que Deus mandou, sem ver uma gota de chuva. Em que você precisa confiar em Deus antes de ver o resultado?",
+    "Noé fez tudo o que Deus mandou antes de ver o que ia acontecer. Em que você precisa confiar em Deus antes de ver o resultado?",
     "Quem fechou a porta da arca foi o Senhor, não Noé. O que você está tentando controlar sozinho que pode deixar nas mãos de Deus?"
    ],
    "oracao": [
     "Senhor, eu confio na tua palavra mesmo sem ver…",
     "Eu me canso de esperar quando…",
     "Me dá firmeza para continuar em…"
-   ],
-   "ref": "Gênesis 6.22"
+   ]
   }
  ],
  "4": [
   {
-   "titulo": "A promessa que não depende de você",
-   "texto": "Depois do dilúvio, Deus faz uma promessa e põe o arco no céu como sinal. Repare no que ele não diz: não pede nada em troca, nem condiciona a promessa ao bom comportamento de ninguém. Poucos versículos depois Noé se embebeda, e a promessa continua de pé. Já em Babel, a humanidade tenta subir até o céu por conta própria, e é aí que tudo desanda.",
+   "ref": "Gênesis 9.13",
+   "titulo": "Um sinal nas nuvens",
+   "texto": "Depois do dilúvio, Deus faz uma aliança com Noé, com os filhos dele e com todo ser vivo: nunca mais um dilúvio vai destruir a terra. O sinal é o arco-íris nas nuvens, e Deus diz que, quando o vir, vai se lembrar dessa aliança. Repare no que ele não pede: nada em troca. Poucos versículos depois, Noé se embriaga dentro da tenda, e a aliança continua de pé.",
    "perguntas": [
-    "Noé falhou logo depois, e o arco continuou no céu. Como é saber que Deus não desfaz a promessa dele quando você erra?",
-    "Em Babel as pessoas queriam fazer um nome para si mesmas. Em que momento você sente pressão para aparecer?",
+    "Noé falhou logo depois, e o arco continuou no céu. Como é saber que o amor de Deus não depende de você acertar tudo?",
+    "Quando Noé falhou, dois dos filhos cobriram o pai sem expor a vergonha dele. Quando alguém perto de você erra, você espalha ou protege?",
     "O arco-íris aparece no meio de um céu comum. Que sinal do cuidado de Deus está na sua rotina e você parou de reparar?"
    ],
    "oracao": [
-    "Senhor, tu prometes e cumpres mesmo quando eu…",
-    "Eu quero aparecer quando…",
+    "Senhor, tu cumpres a tua palavra mesmo quando eu…",
+    "Quando alguém erra, me ajuda a…",
     "Hoje eu reparo em ti porque…"
-   ],
-   "ref": "Gênesis 9.13"
+   ]
   }
  ],
  "5": [
   {
-   "titulo": "Quem levanta os olhos primeiro",
-   "texto": "Abrão e Ló precisam se separar, e Abrão, o mais velho, deixa o sobrinho escolher. Ló levanta os olhos, vê que o vale do Jordão é todo irrigado, e escolhe o que parecia melhor. Não pergunta nada a Deus. Escolhe também a vizinhança de Sodoma, e isso vai custar caro. Abrão fica com o que sobrou. Só depois que Ló vai embora é que Deus manda Abrão olhar até onde a vista alcançar, e promete a ele tudo o que ele consegue ver.",
+   "ref": "Gênesis 13.14-15",
+   "titulo": "Olhe até onde a vista alcançar",
+   "texto": "Os rebanhos de Abrão e de Ló crescem tanto que os pastores começam a brigar. Abrão, o tio, não quer briga na família e deixa o sobrinho escolher primeiro para que lado ir. Ló observa com atenção a planície do Jordão, toda irrigada, parecendo o próprio jardim do Senhor, e fica com ela, armando as tendas perto de Sodoma, uma cidade de homens extremamente maus. Abrão fica com o que sobrou. Só depois que Ló vai embora é que Deus manda Abrão olhar até onde a vista alcançar, e promete a ele toda a terra que ele consegue ver.",
    "perguntas": [
-    "Ló escolheu pelo que parecia melhor aos olhos. Que escolha sua hoje é assim: boa na aparência, sem nenhuma pergunta a Deus?",
-    "Abrão deixou o sobrinho escolher primeiro, mesmo sendo o mais velho. Em que situação é difícil para você deixar o outro escolher primeiro?",
-    "Só depois que Ló foi embora Deus mandou Abrão olhar até onde a vista alcançasse. Quando foi que você só enxergou o que Deus tinha para você depois de perder alguma coisa?"
+    "Ló escolheu pelo que via: a planície parecia o próprio jardim do Senhor. Que escolha você está fazendo agora só pela aparência?",
+    "Abrão abriu mão de escolher primeiro para não ter briga na família. Em que situação é difícil para você deixar o outro escolher primeiro?",
+    "Só depois que Ló foi embora Deus mandou Abrão olhar até onde a vista alcançasse. Quando foi que você só enxergou o que Deus tinha para você depois de abrir mão de alguma coisa?"
    ],
    "oracao": [
     "Senhor, tu vês o que eu não vejo…",
     "Eu tenho escolhido pela aparência quando…",
     "Hoje eu espero em ti sobre…"
-   ],
-   "ref": "Gênesis 13.14-15"
+   ]
   }
  ],
  "6": [
   {
+   "ref": "Gênesis 15.6",
    "titulo": "Contar as estrelas",
-   "texto": "Abrão volta de uma batalha e recusa a recompensa do rei de Sodoma: não quer dever nada a ninguém além de Deus. Depois, quando reclama que continua sem filho, Deus o leva para fora e manda contar as estrelas. Abrão continua sem nenhum filho. Ele acredita, e o texto diz que Deus o considerou justo por causa da sua fé. Foi a fé, não o currículo.",
+   "texto": "Abrão volta de uma batalha e recusa a recompensa do rei de Sodoma, para que o rei nunca diga que foi ele quem o enriqueceu. Depois disso, Deus fala com ele: não tenha medo, eu sou o seu escudo. Abrão responde com a dor que carregava: continua sem filhos. Deus então o leva para fora da tenda e manda contar as estrelas, se puder. Abrão crê, e o texto diz que Deus o considerou justo por causa da sua fé.",
    "perguntas": [
-    "Abrão reclamou que continuava sem filho, e Deus não deu bronca: levou ele para fora e mandou contar as estrelas. Que dúvida você esconde de Deus por achar que ele vai brigar?",
-    "Abrão preferiu não dever favor a quem podia cobrar depois. A quem você está devendo algo que te prende?",
+    "Abrão contou a Deus a dor de continuar sem filhos, e Deus não deu bronca: levou ele para fora e mandou contar as estrelas. Que dúvida você esconde de Deus por achar que ele vai brigar?",
+    "Abrão recusou um presente do rei para não ficar devendo favor a ele. A quem você está devendo algo que te prende?",
     "Abrão continuava sem filho, mesmo com a promessa de Deus. O que na sua vida você acha que já passou da hora de Deus agir?"
    ],
    "oracao": [
     "Senhor, tu me chamas para fora e me mostras…",
     "A minha dúvida hoje é…",
     "Eu escolho crer em ti sobre…"
-   ],
-   "ref": "Gênesis 15.6"
+   ]
   }
  ],
  "7": [
   {
    "ref": "Gênesis 16.13",
    "titulo": "O Deus que me vê",
-   "texto": "Agar é escrava, estrangeira, grávida e sozinha no deserto, fugindo de uma dona que a maltratava. Ninguém na história pergunta o que ela está sentindo. Deus a procura, chama pelo nome e faz uma promessa a ela. Agar então dá um nome a Deus, e é a única pessoa na Bíblia inteira que faz isso: o Deus que me vê.",
+   "texto": "Hagar é uma criada egípcia, grávida e sozinha no deserto, fugindo de Sarai, que a maltratou. O Anjo do Senhor a encontra perto de uma fonte, chama pelo nome e pergunta de onde ela vem e para onde vai. Ele promete um filho e diz até o nome dele, Ismael, porque o Senhor deu ouvidos ao sofrimento dela. E Hagar dá um nome ao Senhor: \"O Deus que me vê\".",
    "perguntas": [
-    "Deus chamou Agar pelo nome, no deserto, quando ninguém perguntava como ela estava. Quando foi a última vez que você sentiu que Deus te procurou assim?",
-    "Agar achava que ninguém estava vendo. Em que parte da sua vida você se sente invisível?",
-    "Quem, perto de você, está sendo tratado como Agar era? O que você pode fazer hoje por essa pessoa?"
+    "O Anjo do Senhor chamou Hagar pelo nome, no deserto, sozinha. Quando foi a última vez que você sentiu que Deus te procurou assim?",
+    "Hagar estava sozinha no deserto, e Deus a viu. Em que parte da sua vida você se sente invisível?",
+    "Quem, perto de você, está sendo tratado como Hagar era? O que você pode fazer hoje por essa pessoa?"
    ],
    "oracao": [
     "Senhor, tu me vês mesmo quando…",
@@ -119,10 +120,10 @@
   {
    "ref": "Gênesis 19.16",
    "titulo": "Arrastado para fora",
-   "texto": "Os anjos mandam Ló sair de Sodoma antes que a cidade seja destruída, e ele hesita. Não discute, não recusa: só demora. O texto diz que os homens o agarraram pela mão, junto com a mulher e as filhas, porque o Senhor teve misericórdia dele. Ló foi salvo sendo puxado. A demora dele quase custou tudo.",
+   "texto": "Os anjos mandam Ló sair de Sodoma antes que a cidade seja destruída, e ele não se apressa. Não recusa: só demora. Então os anjos o tomam pelas mãos, com a mulher e as duas filhas, e os tiram dali à força, porque o Senhor teve misericórdia deles. E quando Ló ainda pede para fugir para uma cidade pequena em vez das montanhas, o anjo aceita também esse pedido.",
    "perguntas": [
     "Ló não se recusou a sair, só foi ficando. O que você já decidiu largar, mas continua empurrando para amanhã?",
-    "Ló foi tirado de Sodoma pela mão, sem mérito nenhum, só porque Deus teve misericórdia dele. Você já foi puxado para fora de alguma coisa que sozinho não teria deixado? Como foi?"
+    "Ló foi tirado de Sodoma pela mão, porque o Senhor teve misericórdia deles. Você já foi puxado para fora de alguma coisa que sozinho não teria deixado? Como foi?"
    ],
    "oracao": [
     "Senhor, obrigado por não desistir de mim quando…",
