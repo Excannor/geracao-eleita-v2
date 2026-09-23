@@ -50,7 +50,7 @@ const leituraNbv = (plano) => plano.trechos.map((t) => {
 }).join(' ');
 // Expressões conferidas como redação de outra tradução (ARA/ACF), já usadas por engano.
 const OUTRA_TRADUCAO = ['proverá', 'achou graça', 'cana rachada', 'mecha que fumega', 'casa da escravidão',
-  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai'].map(normalizar);
+  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo'].map(normalizar);
 // Palavras com maiúscula que não são nome de alguém da leitura (nomes de Deus, termos gerais).
 // Os nomes dos livros também passam: citar "Êxodo" ou "Marcos" é falar da própria leitura.
 const NOMES_LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia',
@@ -152,7 +152,8 @@ for (const dia of dias) {
       const frase = f.replace(/^["“(]+/, '');
       for (const m of frase.matchAll(/(?<!\p{L})(\p{Lu}[\p{Ll}]+)(?!\p{L})/gu)) {
         const nome = m[1];
-        if (NOMES_LIVRES.has(nome) || lidoCru.includes(nome)) continue;
+        // Palavra inteira: "Dina" não pode passar só porque a leitura tem "Dinabá" (a NBV escreve "Diná").
+        if (NOMES_LIVRES.has(nome) || new RegExp('(?<!\\p{L})' + nome + '(?!\\p{L})', 'u').test(lidoCru)) continue;
         // No começo da frase, a maiúscula é da frase: palavra que a NBV usa em minúscula em algum
         // lugar é palavra comum ("Sai", "Dorme"), não nome. "Agar" nunca aparece em minúscula.
         if (m.index === 0 && (PALAVRAS_DE_INICIO.has(nome) || MINUSCULAS_DA_NBV.has(nome.toLowerCase()))) continue;

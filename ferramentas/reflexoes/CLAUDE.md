@@ -45,6 +45,16 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    em Gn 19.16 são "os anjos" que puxam Ló (não "os homens"), e a misericórdia é "deles" (a
    família), não só "dele".
 
+   **Sequência como no texto.** Não resumir dizendo "a primeira coisa que ele fez foi...":
+   em Gn 24 o servo primeiro dá as joias e pergunta de quem a moça é filha, e só depois se curva
+   e adora. Recontar na ordem do texto ou sem ordem nenhuma.
+
+   **Sentimento e tempo na medida do texto.** Não aumentar o que o texto diz: em Gn 50.15 os
+   irmãos acham "possível" que José se vingue, e a reflexão dizia que eles "têm certeza"; em
+   Mt 14 a NBV diz que "lutavam contra o mar agitado" e que Jesus veio "já de madrugada", e a
+   reflexão dizia "havia horas" e "a noite toda". Medo, certeza, duração e intensidade ficam
+   no tamanho que o texto dá.
+
    **Não adiantar outros dias.** Nada de "isso vai custar caro" apontando para uma leitura que
    ainda vai vir, nem citar história de outro dia como se estivesse nesta (a torre de Babel é
    Gn 11, e não cabe no dia que lê Gn 9-10).
@@ -66,6 +76,15 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    você?" (ele está sempre). Verdades que nenhuma pergunta pode contrariar: Deus está sempre
    presente; o amor dele não depende do nosso comportamento; salvação é pela graça, não por
    mérito; Deus não é cúmplice do mal.
+
+   **Passagem que pode assustar ou confundir conta o desfecho que o próprio texto dá.** Em Gn 22,
+   contar que Deus pediu Isaque sem dizer que o Anjo mandou parar deixa um recém-convertido com a
+   ideia de um Deus que pede filhos. O texto resolve, e a reflexão tem de mostrar a resolução.
+   Vale para juízo, violência e castigo: se o texto traz misericórdia junto, ela entra.
+
+   **Não fechar o que o texto deixa aberto.** "Lia para de pedir o amor do marido" era verdade
+   no quarto filho, mas no mesmo dia de leitura (Gn 30) ela volta a esperar isso. Descrever o
+   momento, não transformar em mudança definitiva.
 
 5. **O que é da história não vira ordem para o leitor.** Separar o que o texto conta do que ele
    manda. Deus pedir Isaque a Abraão não é Deus pedindo filhos hoje; uma promessa feita a
@@ -154,6 +173,10 @@ máquina estão no `ferramentas/teste-reflexoes.mjs`, e publicar exige que ele p
   frase só entra se nunca aparece em minúscula na NBV, para não confundir verbo com nome);
 - **lista para conferir** afirmação absoluta (lista `ABSOLUTA`);
 - **lista para revisar** pergunta com palavra de sentido bíblico próprio (regra 2).
+
+**As travas também erram.** A de nomes deixou passar "Dina" (a NBV escreve "Diná") porque
+procurava pedaço de texto e achou "Dinabá". Comparação de nome e de citação é sempre por palavra
+inteira. Quando a revisão humana acha algo que uma trava deveria ter pegado, corrige-se a trava.
 
 **Regra de manutenção (pedido do dono):** todo tipo de erro novo encontrado numa revisão vira
 uma regra neste arquivo e, quando der para pegar por máquina, uma trava no teste.
