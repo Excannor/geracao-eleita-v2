@@ -121,6 +121,9 @@ for (const dia of dias) {
     else for (const o of r.oracao) if (!/…$|\.\.\.$/.test(o.trim())) falhar(dia, 'o começo de oração "' + o.slice(0, 30) + '" devia terminar em reticências');
 
     const erro = versiculoExiste(r.ref);
+    // O cartão de "versículo para guardar" mostra no máximo três versículos (teste.mjs).
+    const faixa = /\.(\d+)-(\d+)$/.exec(r.ref || '');
+    if (faixa && Number(faixa[2]) - Number(faixa[1]) > 2) falhar(dia, r.ref + ' tem mais de três versículos para guardar');
     if (erro) falhar(dia, erro);
     else {
       // Não basta ser do mesmo livro: o capítulo tem de estar entre os lidos naquele dia,
