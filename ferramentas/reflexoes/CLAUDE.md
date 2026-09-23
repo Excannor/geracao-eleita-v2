@@ -73,6 +73,10 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    O mesmo vale para reis, falsos profetas e acusadores: o que o comandante assírio gritou contra Jerusalém não é "Deus disse".
    Nas reflexões já escritas: o anjo, o profeta ou Jesus falando é Deus falando; o rei ou o
    povo falando é só o que eles disseram.
+   Eliú (Jó 32-37) segue a mesma regra: fala coisas bonitas sobre Deus e, no mesmo discurso,
+   repete a acusação dos amigos ("está recebendo o merecido castigo"). Quando o dia inteiro é
+   fala dele (Jó 36-37), a reflexão diz no texto que é Eliú falando e trabalha o discernimento
+   (conferir o que se ouve sobre Deus), sem apresentar a fala dele como palavra de Deus.
 
    **Ordem dada para aquele povo, naquele momento.** Esdras 9-10 (os homens mandam embora as
    esposas estrangeiras e os filhos) e textos parecidos não viram aplicação para o leitor.
