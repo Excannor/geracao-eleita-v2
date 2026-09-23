@@ -1,5 +1,5 @@
 /* Propósitos: o compromisso de ler, ou orar, junto. Em dupla, com quantas pessoas quiser; em
-   grupo, até 5, com a meta coletiva do dia. A célula é um grupo que cresce por um link. O
+   grupo, até 5, com a meta coletiva do dia. A célula é um grupo de até 20 que cresce por link. O
    servidor faz as contas; aqui só aparece quem já fez hoje, nunca o que alguém escreveu ou orou. */
 (function (CC) {
   'use strict';
@@ -60,7 +60,9 @@
     const quem = p.grupo ? CC.plural(ativos(p).length, 'pessoa', 'pessoas') : outros.map((m) => CC.esc(m.nome)).join(', ');
     return '<div class="cabeca-proposito">'
       + '<span class="' + (p.grupo ? 'retratos-grupo' : 'retratos-dupla') + '">'
-      + (p.grupo ? gente : outros).map((m) => retrato(m, (p.grupo ? 'pequeno' : 'medio') + (m.fezHoje ? ' fez' : ''))).join('') + '</span>'
+      // Célula pode ter 20 pessoas: o cartão mostra 5 retratos e conta o resto.
+      + (p.grupo ? gente : outros).slice(0, 5).map((m) => retrato(m, (p.grupo ? 'pequeno' : 'medio') + (m.fezHoje ? ' fez' : ''))).join('')
+      + (p.grupo && gente.length > 5 ? '<span class="retrato-amigo pequeno retrato-mais">+' + (gente.length - 5) + '</span>' : '') + '</span>'
       + '<span class="quem-amigo"><b>' + CC.esc(p.grupo ? p.titulo : quem) + '</b>'
       + '<span class="tipo-proposito">' + CC.ico(ICONE[p.tipo] || 'trilha') + '<span>' + CC.esc(p.grupo ? quem + ' · ' + oQue(p) : oQue(p)) + '</span></span></span>'
       + (p.euConvidado ? '' : contagem(p))
@@ -149,7 +151,7 @@
     const faltam = ativos(p).filter((m) => !m.fezHoje && m.usuario !== euUsuario() && amigos.includes(m.usuario));
     const podeNotificar = p.tipo !== 'oracao' && eu.fezHoje && faltam.length;
     const oracao = p.tipo === 'oracao';
-    const limite = (cache && cache.limiteGrupo) || 5;
+    const limite = p.limite || (cache && cache.limiteGrupo) || 5;
     const podeChamar = p.grupo && gente.length < limite;
     const ehDaAmizade = !p.grupo && p.tipo === 'plano';
 
@@ -267,7 +269,7 @@
       CC.completarCadastro(CC.quem).then((ok) => { if (ok) CC.novaCelula(); });
       return;
     }
-    const limite = (cache && cache.limiteGrupo) || 5;
+    const limite = (cache && cache.limiteCelula) || 20;
     CC.folha('<h2>Criar uma célula</h2>'
       + '<p class="passo-dica">Vocês leem o plano juntos, até ' + limite + ' pessoas. Depois de criar, você manda o link no grupo do WhatsApp e quem abrir já entra.</p>'
       + '<label class="campo-senha"><span>Nome da célula</span><input data-titulo maxlength="30" placeholder="Ex.: Célula de quinta"></label>'
@@ -314,7 +316,7 @@
       + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar no grupo</button>'
       + '<button class="botao contorno" data-copiar>Copiar link</button></div>'
       + '<p class="passo-dica pequena">Quem abrir o link entra direto na célula, com conta nova ou com a que já tem, até completar '
-      + ((cache && cache.limiteGrupo) || 5) + ' pessoas. O link vale por 30 dias.</p>'
+      + (p.limite || (cache && cache.limiteCelula) || 20) + ' pessoas. O link vale por 30 dias.</p>'
       + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>',
     {
       rotulo: 'Link da célula',

@@ -1,5 +1,5 @@
 // Confere o link da célula: o líder cria o grupo sozinho, manda o link, e quem abre entra
-// direto (conta nova ou já existente), vira amigo de quem mandou, e o grupo para em 5.
+// direto (conta nova ou já existente), vira amigo de quem mandou, e a célula para em 20.
 // Uso: node ferramentas/teste-celula.mjs
 import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
@@ -53,7 +53,7 @@ try {
   const token = new URL(link).searchParams.get('celula');
 
   const info = await dados(await pedir('/api/celula/' + encodeURIComponent(token)));
-  ok(info.titulo === 'Célula de quinta' && info.pessoas === 1 && info.vagas === 4 && info.usuario === 'lider', 'sem conta, o link mostra nome, quem chamou e vagas');
+  ok(info.titulo === 'Célula de quinta' && info.pessoas === 1 && info.limite === 20 && info.vagas === 19 && info.usuario === 'lider', 'sem conta, o link mostra nome, quem chamou e vagas');
   ok(!('membros' in info), 'sem conta, o link não mostra quem está dentro');
   ok((await pedir('/api/celula/' + encodeURIComponent(token + 'x'))).status === 410, 'link adulterado não vale');
 
@@ -79,10 +79,12 @@ try {
   ok((await amigos(caio.cookie)).includes('ana'), 'e a amizade nasce com quem mandou esse link');
 
   const duda = await criar('duda', { celula: token });
-  ok(duda.corpo.celula === 'Célula de quinta', 'a quinta pessoa entra');
+  ok(duda.corpo.celula === 'Célula de quinta', 'a quinta pessoa entra (célula passa do limite de 5 do grupo de amigos)');
+  for (let i = 6; i <= 20; i++) await criar('membro' + i, { celula: token });
+  ok((await dados(await pedir('/api/celula/' + encodeURIComponent(token)))).pessoas === 20, 'a célula chega a 20 pessoas');
   const eva = await criar('eva');
   const cheia = await pedir('/api/celula', { acao: 'entrar', token }, eva.cookie);
-  ok(cheia.status === 409, 'a sexta pessoa não entra: célula cheia');
+  ok(cheia.status === 409, 'a 21ª pessoa não entra: célula cheia');
   ok((await dados(await pedir('/api/celula/' + encodeURIComponent(token)))).vagas === 0, 'o link mostra que não há vagas');
   const semVaga = await criar('fabi', { celula: token });
   ok(semVaga.status === 200 && semVaga.corpo.celula === '', 'célula cheia não impede criar a conta');
@@ -96,8 +98,12 @@ try {
   ok((await pedir('/api/celula', { acao: 'link', id })).status === 401, 'sem entrar, ninguém gera link');
 
   const retrato = (await propositos(lider.cookie)).find((p) => p.id === id);
-  ok(retrato && retrato.membros.filter((m) => m.estado === 'ativo').length === 5 && retrato.hoje && retrato.hoje.meta === 5,
-    'o líder vê a célula com 5 pessoas e meta do dia 5');
+  ok(retrato && retrato.membros.filter((m) => m.estado === 'ativo').length === 20 && retrato.hoje && retrato.hoje.meta === 20
+    && retrato.celula === true && retrato.limite === 20, 'o líder vê a célula com 20 pessoas e meta do dia 20');
+
+  // o grupo de amigos continua com 5
+  const g = await dados(await pedir('/api/propositos', { acao: 'criar', tipo: 'plano', com: ['ana', 'membro6', 'membro7', 'membro8', 'membro9'] }, lider.cookie));
+  ok(g.erro && /5/.test(g.erro), 'o grupo de amigos continua com no máximo 5 pessoas');
 } finally {
   servidor.kill();
   await dormir(300);

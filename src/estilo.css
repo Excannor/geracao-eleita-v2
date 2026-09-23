@@ -1647,6 +1647,7 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .retratos-grupo, .retratos-dupla { display: flex; flex: 0 0 auto; }
 .retratos-grupo .retrato-amigo, .retratos-dupla .retrato-amigo { box-shadow: 0 0 0 2px var(--cartao); }
 .retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -20px; }
+.retratos-grupo .retrato-mais { display: grid; place-items: center; background: var(--fundo-2); color: var(--tinta-forte); font-size: 0.72rem; font-weight: 900; }
 .cabeca-proposito .quem-amigo { flex: 1; }
 .retratos-grupo .retrato-amigo.fez, .retratos-dupla .retrato-amigo.fez { box-shadow: 0 0 0 2px var(--cartao), 0 0 0 4px var(--verde); }
 .tipo-proposito { display: inline-flex; align-items: center; gap: 4px; min-width: 0; margin: 0; color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 800; }

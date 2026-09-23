@@ -99,6 +99,10 @@ const ESQUEMA = [
     PRIMARY KEY (proposito, data)
   );
   `,
+  // v5: a célula é um grupo que cresce por link e aceita mais gente que o grupo de amigos
+  `
+  ALTER TABLE propositos ADD COLUMN celula INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
 
 function migrarEsquema(db) {

@@ -12,7 +12,7 @@ import { dirname } from 'node:path';
 import { randomBytes, scrypt as scryptCb, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import { abrirModulo, concluirImportacao, lerTabela, sincronizar, transacao, gravarMeta, lerMeta } from './db.mjs';
-import { LIMITE_GRUPO, alvoValido, rotuloDoProposito } from './propositos.mjs';
+import { LIMITE_GRUPO, limiteDo, alvoValido, rotuloDoProposito } from './propositos.mjs';
 
 const scrypt = promisify(scryptCb);
 const CUSTO = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
@@ -127,7 +127,7 @@ function paraLinhas(d) {
     })) },
     { tabela: 'propositos', chaves: ['id'], linhas: Object.values(d.propositos || {}).map((p) => ({
       id: p.id, tipo: p.tipo, alvo: p.alvo || '', titulo: p.titulo || '', criado_por: p.criadoPor, criado_em: p.criadoEm,
-      encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0,
+      encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0, celula: p.celula ? 1 : 0,
     })) },
     { tabela: 'proposito_membros', chaves: ['proposito', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => p.membros.map((m) => ({
       proposito: p.id, usuario: m.usuario, estado: m.estado, entrou_em: m.entrouEm || '', saiu_em: m.saiuEm || '', convidado_por: m.convidadoPor || '',
@@ -177,7 +177,7 @@ function deLinhas(t, versao) {
   for (const l of t.propositos || []) {
     d.propositos[l.id] = {
       id: l.id, tipo: l.tipo, alvo: l.alvo || '', titulo: l.titulo || '', criadoPor: l.criado_por, criadoEm: l.criado_em,
-      encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, membros: [], diasBatidos: [],
+      encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, celula: !!l.celula, membros: [], diasBatidos: [],
     };
   }
   for (const l of t.membros || []) {
@@ -709,7 +709,7 @@ export class Contas {
     const u = limparNome(outro);
     if (!this.achar(u) || this.relacao(a.usuario, u) !== 'amigos') throw erro('só dá para chamar amigos', 403);
     if (this.presentes(p).some((m) => m.usuario === u)) throw erro('essa pessoa já está no grupo');
-    if (this.presentes(p).length >= LIMITE_GRUPO) throw erro('um grupo tem no máximo ' + LIMITE_GRUPO + ' pessoas');
+    if (this.presentes(p).length >= limiteDo(p)) throw erro('esse grupo tem no máximo ' + limiteDo(p) + ' pessoas');
     const antigo = p.membros.find((m) => m.usuario === u);
     if (antigo) Object.assign(antigo, { estado: 'convidado', entrouEm: '', saiuEm: '', convidadoPor: a.usuario });
     else p.membros.push({ usuario: u, estado: 'convidado', entrouEm: '', saiuEm: '', convidadoPor: a.usuario });
@@ -726,7 +726,7 @@ export class Contas {
     const id = 'p' + randomBytes(6).toString('hex');
     const p = {
       id, tipo: 'plano', alvo: '', titulo: String(titulo || '').trim().slice(0, 30) || 'Célula',
-      criadoPor: a.usuario, criadoEm: hoje, encerradoEm: '', grupo: true,
+      criadoPor: a.usuario, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
       membros: [{ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: '' }],
     };
     this.dados.propositos[id] = p;
@@ -755,7 +755,7 @@ export class Contas {
     const p = this.proposito(dado.p);
     if (!p || p.encerradoEm || !p.grupo || !this.ativosDe(p).some((m) => m.usuario === dono.usuario)) return null;
     const pessoas = this.presentes(p).length;
-    return { proposito: p, de: dono.usuario, nome: dono.nome, titulo: p.titulo, pessoas, vagas: Math.max(0, LIMITE_GRUPO - pessoas) };
+    return { proposito: p, de: dono.usuario, nome: dono.nome, titulo: p.titulo, pessoas, limite: limiteDo(p), vagas: Math.max(0, limiteDo(p) - pessoas) };
   }
 
   async entrarNaCelula(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false } = {}) {
@@ -765,7 +765,7 @@ export class Contas {
     const p = link.proposito;
     const minha = p.membros.find((m) => m.usuario === a.usuario);
     if (minha && minha.estado === 'ativo') return { ja: true, proposito: p, de: link.de };
-    if (link.vagas <= 0 && !(minha && minha.estado === 'convidado')) throw erro('essa célula já está cheia (' + LIMITE_GRUPO + ' pessoas)', 409);
+    if (link.vagas <= 0 && !(minha && minha.estado === 'convidado')) throw erro('essa célula já está cheia (' + link.limite + ' pessoas)', 409);
     // A amizade com quem mandou o link passa pelo mesmo caminho de um convite: respeita
     // bloqueio, conta para o Semeador só quando é conta nova, e cria a leitura em dupla.
     let amizadeNova = false;

@@ -14,6 +14,9 @@
 
 export const TIPOS = { plano: 'Plano de leitura', livro: 'Um livro ou testamento', oracao: 'Oração' };
 export const LIMITE_GRUPO = 5;
+// A célula da igreja é maior que o grupo de amigos: entra pelo link, até 20 pessoas.
+export const LIMITE_CELULA = 20;
+export const limiteDo = (p) => (p && p.celula ? LIMITE_CELULA : LIMITE_GRUPO);
 
 export const NOVO_TESTAMENTO = [
   'Mateus', 'Marcos', 'Lucas', 'João', 'Atos', 'Romanos', '1 Coríntios', '2 Coríntios', 'Gálatas', 'Efésios',

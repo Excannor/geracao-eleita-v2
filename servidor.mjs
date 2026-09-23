@@ -15,7 +15,7 @@ import {
 } from './contas.mjs';
 import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs';
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
-import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
+import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado,
@@ -462,7 +462,8 @@ async function retratoDoProposito(p, eu) {
   });
   const minha = p.membros.find((m) => m.usuario === eu) || {};
   return {
-    id: p.id, tipo: p.tipo, alvo: p.alvo, titulo: p.titulo, grupo: p.grupo, criadoPor: p.criadoPor, criadoEm: p.criadoEm,
+    id: p.id, tipo: p.tipo, alvo: p.alvo, titulo: p.titulo, grupo: p.grupo, celula: !!p.celula, limite: limiteDo(p),
+    criadoPor: p.criadoPor, criadoEm: p.criadoEm,
     dias, hoje, membros, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
   };
 }
@@ -577,7 +578,7 @@ const servidor = createServer(async (req, res) => {
     if (rota.startsWith('/api/celula/') && req.method === 'GET') {
       const link = CONTAS.lerLinkCelula(rota.slice('/api/celula/'.length), assinar);
       if (!link) { json(res, 410, { erro: 'esse link de célula venceu ou foi cancelado' }); return; }
-      json(res, 200, { usuario: link.de, nome: link.nome, titulo: link.titulo, pessoas: link.pessoas, vagas: link.vagas });
+      json(res, 200, { usuario: link.de, nome: link.nome, titulo: link.titulo, pessoas: link.pessoas, limite: link.limite, vagas: link.vagas });
       return;
     }
 
@@ -913,7 +914,7 @@ const servidor = createServer(async (req, res) => {
         }
       }
       lista.sort((a, b) => (b.euConvidado - a.euConvidado) || (b.dias - a.dias) || a.titulo.localeCompare(b.titulo, 'pt-BR'));
-      json(res, 200, { propositos: lista, tipos: TIPOS_DE_PROPOSITO, limiteGrupo: LIMITE_GRUPO, livros: TODOS_LIVROS });
+      json(res, 200, { propositos: lista, tipos: TIPOS_DE_PROPOSITO, limiteGrupo: LIMITE_GRUPO, limiteCelula: LIMITE_CELULA, livros: TODOS_LIVROS });
       return;
     }
 
