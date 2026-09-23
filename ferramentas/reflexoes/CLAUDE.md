@@ -105,6 +105,13 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    ao rei de Tiro. Ler neles a queda de Satanás é interpretação de tradição, não o que está
    escrito; a reflexão fala de quem o texto nomeia (o orgulho do rei) e não ensina a outra
    leitura como fato. Ezequiel 16 e 23 (imagens sexuais explícitas) nunca viram âncora.
+
+   **Visões do fim (Daniel 7-12, Ezequiel 38-39, Apocalipse).** Nada de datas, de contar
+   semanas ou anos para chegar a um calendário, nem de dizer quem são hoje a besta, o
+   anticristo, Gogue ou a "marca" (país, líder, tecnologia). Essas leituras dividem igrejas e
+   assustam quem está chegando. A reflexão fica no que o texto diz com clareza: Deus reina,
+   o Cordeiro vence, os fiéis são guardados, Deus enxugará as lágrimas. Nas cartas às igrejas
+   (Ap 2-3), a pergunta é sobre a vida do leitor, não sobre "qual era da história" é cada uma.
    Provérbios são conselhos de sabedoria, não garantias: "sua vida será prolongada", "seus
    celeiros ficarão cheios" (Pv 3) não viram promessa de saúde ou dinheiro para quem obedece.
    Âncora em conselho (confiar, cuidar do coração, falar com cuidado), não em recompensa.

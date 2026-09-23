@@ -177,7 +177,7 @@ for (const dia of dias) {
 
     // Número citado que a leitura não tem vai para conferência: "quarenta anos" (Atos 7),
     // "quatro palavras" (eram seis) e "mais de vinte anos" (conta nossa) já saíram errados.
-    const semCapitulo = normalizar(escrito).replace(/\b(capítulos?|versículos?|dia|salmos?) \d+/g, ' ')
+    const semCapitulo = normalizar(escrito).replace(/\b(capítulos?|versículos?|dia|salmos?) \d+(?: (?:e|a) \d+)?/g, ' ')
       // "Isaías 12", "Cânticos 3": nome do livro com o capítulo, não é contagem.
       .replace(LIVRO_E_CAPITULO, ' ')
       // "1 Samuel", "2 Reis": o número faz parte do nome do livro, não é contagem.
