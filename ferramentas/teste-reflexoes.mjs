@@ -44,6 +44,7 @@ const conferir = [];
 // A NBV é a tradução que o app abre por padrão: é o texto que o leitor tem na frente.
 const normalizar = (s) => String(s).normalize('NFC').toLowerCase()
   .replace(/[“”"'‘’«».,;:!?()[\]…—–-]/g, ' ').replace(/\s+/g, ' ').trim();
+const CARTAS_DE_PAULO = /^(Romanos|[12] Coríntios|Gálatas|Efésios|Filipenses|Colossenses|[12] Tessalonicenses|[12] Timóteo|Tito|Filemom)$/;
 const leituraNbv = (plano) => plano.trechos.map((t) => {
   const caps = biblia.livros[t.livro] || [];
   return caps.slice(t.de - 1, t.ate).map((c) => c.join(' ')).join(' ');
@@ -157,6 +158,8 @@ for (const dia of dias) {
         // No começo da frase, a maiúscula é da frase: palavra que a NBV usa em minúscula em algum
         // lugar é palavra comum ("Sai", "Dorme"), não nome. "Agar" nunca aparece em minúscula.
         if (m.index === 0 && (PALAVRAS_DE_INICIO.has(nome) || MINUSCULAS_DA_NBV.has(nome.toLowerCase()))) continue;
+        // O autor da carta é nome certo mesmo quando o capítulo do dia não o escreve (Romanos 2).
+        if (nome === 'Paulo' && plano.livros.some((l) => CARTAS_DE_PAULO.test(l))) continue;
         conferir.push('dia ' + dia + ' · nome "' + nome + '" não aparece na leitura');
       }
     }

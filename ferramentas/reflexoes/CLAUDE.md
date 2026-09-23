@@ -74,6 +74,12 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    Nas reflexões já escritas: o anjo, o profeta ou Jesus falando é Deus falando; o rei ou o
    povo falando é só o que eles disseram.
 
+   **Ordem dada para aquele povo, naquele momento.** Esdras 9-10 (os homens mandam embora as
+   esposas estrangeiras e os filhos) e textos parecidos não viram aplicação para o leitor.
+   Muitos recém-convertidos são casados com quem não crê, e a leitura de hoje não pode soar
+   como "separe-se". Nesses dias, ancorar em outro trecho da leitura e não fazer pergunta sobre
+   o casamento do leitor. Vale também para as guerras de conquista e as ordens de destruição.
+
    **Sentimento e tempo na medida do texto.** Não aumentar o que o texto diz: em Gn 50.15 os
    irmãos acham "possível" que José se vingue, e a reflexão dizia que eles "têm certeza"; em
    Mt 14 a NBV diz que "lutavam contra o mar agitado" e que Jesus veio "já de madrugada", e a
