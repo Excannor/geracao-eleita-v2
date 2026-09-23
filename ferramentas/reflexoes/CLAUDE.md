@@ -52,7 +52,9 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    **Nem tradição de pregação, nem outro evangelho.** Explicação que circula em pregação não
    é texto: "cada praga atingia um deus do Egito" saiu numa reflexão de Êx 7-9, e a leitura
    não diz isso. Detalhe de um evangelho também não entra na leitura de outro: "Pedro, sem
-   saber o que dizer" é de Marcos 9.6, e o dia lia Mateus 17. Ao recontar, conferir também a
+   saber o que dizer" é de Marcos 9.6, e o dia lia Mateus 17. Simbolismo de pregação também não: "sangue na orelha, na mão e no pé =
+   o que ele ouve, faz e por onde anda" (Lv 8) é leitura de sermão, não do texto; e "sumo
+   sacerdote" não é como a NBV chama Arão ali. Ao recontar, conferir também a
    primeira reação da pessoa: Moisés responde "Eis-me aqui!" antes do "quem sou eu?".
 
    **Sentimento e tempo na medida do texto.** Não aumentar o que o texto diz: em Gn 50.15 os

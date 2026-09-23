@@ -50,7 +50,7 @@ const leituraNbv = (plano) => plano.trechos.map((t) => {
 }).join(' ');
 // Expressões conferidas como redação de outra tradução (ARA/ACF), já usadas por engano.
 const OUTRA_TRADUCAO = ['proverá', 'achou graça', 'cana rachada', 'mecha que fumega', 'casa da escravidão',
-  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo', 'pesado de boca', 'pesado de língua', 'estarei com a tua boca', 'fazer três tendas', 'três tendas'].map(normalizar);
+  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo', 'pesado de boca', 'pesado de língua', 'estarei com a tua boca', 'fazer três tendas', 'três tendas', 'lento para se irar', 'lento para se irritar', 'tardio em irar', 'convosco todos os dias', 'com vocês todos os dias'].map(normalizar);
 // Palavras com maiúscula que não são nome de alguém da leitura (nomes de Deus, termos gerais).
 // Os nomes dos livros também passam: citar "Êxodo" ou "Marcos" é falar da própria leitura.
 const NOMES_LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia',
