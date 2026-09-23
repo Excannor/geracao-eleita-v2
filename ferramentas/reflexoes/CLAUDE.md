@@ -65,6 +65,55 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
 10. **Oração acompanha as perguntas.** Os três começos de oração conversam com o que foi
     perguntado, não acusam e terminam em "…".
 
+## Regras de escrita (a voz)
+
+**Ordem de prioridade, sem exceção:** fidelidade à Bíblia > clareza > acolhimento > estilo.
+Se uma frase bonita arrisca qualquer uma das três primeiras, ela sai.
+
+Referência de tom indicada pelo dono: os devocionais de **Deive Leonardo**, "Oi Deus, Sou Eu
+de Novo!" (365 dias, conversa diária com Deus "sem cobranças, sem culpa, sem perfeição") e
+"Um Mês Sem Errar" (31 dias, "uma leitura por dia, sem enrolação", um passo prático por
+dia). É referência de TOM, não de conteúdo: não copiar frases, bordões nem títulos dele.
+
+**Voz.** Um amigo mais velho na fé conversando, não um professor dando aula nem um pregador
+no púlpito. Fala com "você", frases curtas, palavras do dia a dia de um jovem brasileiro.
+
+**Sem enrolação.** O texto tem de 4 a 6 frases. Cada frase faz um trabalho; nada de
+introdução ("Hoje vamos ver..."), resumo no fim ou moral da história repetida.
+
+**O texto, em três movimentos:**
+1. o que acontece na leitura, contado com um detalhe concreto (um gesto, uma frase dita,
+   um objeto), como quem conta uma história, não como quem resume um capítulo;
+2. o detalhe que passa despercebido numa leitura rápida, o "repare que..." da passagem;
+3. o que aquilo mostra do coração de Deus, dito com encorajamento, sem sermão.
+
+**Perguntas.** Levam a pessoa a olhar para a própria vida e a conversar com Deus sobre isso.
+Pelo menos uma tem um passo possível HOJE, pequeno e concreto ("Um Mês Sem Errar"): uma
+conversa, um perdão, um agradecimento, uma pausa. Nunca uma tarefa que gere culpa se não
+for feita.
+
+**Oração.** Começos de frase de uma conversa sincera, do jeito que a pessoa falaria com Deus
+no quarto: curtos, em primeira pessoa, sem linguagem de púlpito ("Senhor, eu te louvo e te
+bendigo porque..." não).
+
+**Tom.** Esperança e recomeço antes de exigência. Confronto existe, mas vem com a porta
+aberta: o erro é nomeado e em seguida vem o que Deus faz com quem erra.
+
+**Evitar:**
+- culpa e perfeccionismo: "você deveria", "você falhou", "está na hora de parar de...";
+- jargão e clichê de igreja sem explicar: "tremendo", "ministrar", "unção", "romper", "no
+  mover", "profetizar sobre a sua vida";
+- autoajuda sem Deus: o centro é o que Deus faz, não "você é capaz", "acredite em você";
+- promessa que a Bíblia não faz: sucesso, dinheiro, cura garantida, "Deus vai te dar o que
+  você quer";
+- exagero emocional ("a coisa mais linda que você vai ler hoje") e sensacionalismo;
+- tratar o leitor como se já fosse maduro na fé, ou como criança.
+
+**Teste final de cada reflexão:** um jovem que acabou de se converter, lendo sozinho no
+celular antes de dormir, termina a leitura (1) entendendo o que aconteceu na passagem,
+(2) sentindo que Deus está do lado dele, e (3) com uma coisa pequena para conversar com
+Deus ou fazer amanhã?
+
 ## Por que existe checagem automática
 
 Quem escreve com IA cita de memória, e a memória mistura traduções (ARA, ACF, NVI, NTLH)
