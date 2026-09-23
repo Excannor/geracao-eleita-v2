@@ -385,7 +385,7 @@ button { font-family: inherit; }
   bottom: 0;
   z-index: 50;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   gap: 4px;
   padding: 0 8px env(safe-area-inset-bottom);
@@ -430,7 +430,9 @@ button { font-family: inherit; }
 /* Dentro da ilha, a aba ativa não ganha mais pílula preenchida: só cor e peso, como o
    "Início" azul da referência do dono. A pílula preenchida (mais abaixo) volta a valer só
    no trilho lateral, onde cada aba é uma linha inteira. */
-.aba.selecionada { color: var(--inverso); font-weight: 900; background: none; }
+/* --acento e não --inverso: no tema escuro o --inverso é um petróleo fechado que some no
+   fundo preto; o acento clareia sozinho no escuro. */
+.aba.selecionada { color: var(--acento); font-weight: 900; background: none; }
 /* Sem cinza de hover dentro da ilha: o fundo da própria ilha já é o acabamento. */
 .aba:hover:not(.selecionada) { background: none; }
 /* O ícone da aba encolhia para 82% e voltava a cada toque. Era esse o "zoom" na troca de
@@ -446,27 +448,28 @@ button { font-family: inherit; }
 }
 .aba.selecionada .retrato-aba { border-color: var(--inverso); }
 
-/* Bíblia: o botão quadrado (cantos bem arredondados) erguido no meio da barra — a Bíblia é
-   o texto por trás de tudo, não mais um destino entre outros. A margem embaixo o ergue; a
-   borda grossa na cor da barra é o encaixe: a parte que passa da borda de cima fica
-   abraçada pela barra, em vez de flutuar solta (o dono rejeitou a versão solta). O brilho
-   é exceção pedida pelo dono: a única peça do app com sombra de destaque assim. */
+/* Bíblia: quadrado de cantos arredondados, cheio, no meio da barra — a Bíblia é o texto por
+   trás de tudo, não mais um destino entre outros. Fica INTEIRO dentro da barra, de
+   propósito: as duas versões erguidas acima da borda (círculo solto, depois o "encaixe"
+   com borda da cor da barra) pareciam coladas por cima no celular. O destaque vem do
+   preenchimento, do tamanho e do brilho — exceção pedida pelo dono, a única peça do app
+   com sombra de destaque assim. */
 .aba.aba-central {
-  flex: 0 0 74px;
-  width: 74px;
-  height: 74px;
+  flex: 0 0 64px;
+  width: 64px;
+  height: 56px;
   max-width: none;
-  margin-bottom: 10px;
-  border: 5px solid var(--cartao);
-  border-radius: 28px;
+  margin: 0 6px;
+  border: 0;
+  border-radius: 20px;
   background: var(--inverso);
   color: var(--inverso-tinta);
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--inverso) 35%, transparent);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--inverso) 35%, transparent);
 }
 .aba.aba-central .ico-aba { width: 26px; height: 26px; }
 .aba.aba-central .rotulo-aba { font-size: 0.68rem; }
 .aba.aba-central:hover { background: var(--inverso); }
-.aba.aba-central.selecionada { box-shadow: 0 6px 22px color-mix(in srgb, var(--inverso) 55%, transparent); }
+.aba.aba-central.selecionada { box-shadow: 0 4px 18px color-mix(in srgb, var(--inverso) 55%, transparent); }
 
 /* ---------- botões ----------
    Acabamento novo: cápsula, chapado. O botão principal é o par que se inverte entre
@@ -2635,7 +2638,7 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
   /* No trilho lateral a Bíblia volta a ser um item comum da lista: o brilho e o quadrado
      levantado só fazem sentido flutuando sobre a barra de baixo. */
   .aba.aba-central {
-    margin-bottom: 0;
+    margin: 0;
     flex: 0 0 auto;
     width: 100%;
     height: 54px;
