@@ -79,6 +79,18 @@
     }).catch(() => null);
   };
 
+  // Notas de versículo do Explorar trazem o texto de cada tradução do app ("versos"):
+  // mostra a escolhida, sem esperar o arquivo da Bíblia carregar.
+  CC.textoDaNota = function (n) {
+    const b = CC.traducao();
+    return (n && n.versos && b && n.versos[b.sigla]) || (n && n.texto) || '';
+  };
+  CC.htmlDaNota = function (n) {
+    if (!n || !n.versos) return n ? n.html : '';
+    return n.html.replace(/(<blockquote data-verso="[^"]*">)[\s\S]*?(<\/blockquote>)/,
+      (_, abre, fecha) => abre + CC.esc(CC.textoDaNota(n)) + fecha);
+  };
+
   // Pede a tradução escolhida sem abri-la, só para o service worker guardá-la.
   function guardarNoAparelho() {
     const b = CC.traducao();

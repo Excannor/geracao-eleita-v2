@@ -95,7 +95,7 @@
     if (!n) return;
     CC.anotarNotaVista(id);
     CC.folha('<span class="etiqueta">' + CC.esc((secaoDe(n.pasta) || {}).rotulo || n.pasta) + '</span>'
-      + '<div class="nota-corpo">' + n.html + '</div>'
+      + '<div class="nota-corpo">' + CC.htmlDaNota(n) + '</div>'
       + '<div class="acoes"><a class="botao contorno" href="#/nota/' + encodeURIComponent(id)
       + '">Abrir o texto inteiro</a>'
       + '<button class="botao plano" data-fechar>Fechar</button></div>',
@@ -226,7 +226,7 @@
     raiz.innerHTML = CC.botaoVoltar(ehLicao ? 'Primeiros passos' : (s ? s.rotulo : 'Voltar'))
       + '<article class="nota-artigo c-' + cor + '">'
       + (n.alerta ? '<p class="etiqueta" style="color:var(--vermelho)">Assunto delicado: leia com calma</p>' : '')
-      + '<div class="nota-corpo">' + n.html + '</div></article>'
+      + '<div class="nota-corpo">' + CC.htmlDaNota(n) + '</div></article>'
       + (ehLicao
         ? '<div class="fim-da-licao" id="fim-da-licao">'
           + (feita

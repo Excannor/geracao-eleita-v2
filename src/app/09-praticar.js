@@ -131,11 +131,11 @@
     const q = s.perguntas[s.indice];
     const enunciado = q.tipo === 'refDoTexto'
       ? '<span class="etiqueta">Qual é a referência?</span>'
-        + '<blockquote class="verso">' + CC.esc(D.notas[q.certo].texto) + '</blockquote>'
+        + '<blockquote class="verso">' + CC.esc(CC.textoDaNota(D.notas[q.certo])) + '</blockquote>'
       : '<span class="etiqueta">Qual texto é ' + CC.esc(ref(q.certo)) + '?</span>';
 
     const opcoes = q.opcoes.map((id) => {
-      const rotulo = q.tipo === 'refDoTexto' ? ref(id) : trecho(D.notas[id].texto, 90);
+      const rotulo = q.tipo === 'refDoTexto' ? ref(id) : trecho(CC.textoDaNota(D.notas[id]), 90);
       let estado = '';
       if (s.conferido) {
         if (id === q.certo) estado = ' certo';
@@ -199,7 +199,7 @@
       + '<span class="selo-v">' + CC.ico(acertou ? 'certo' : 'fechar') + '</span>'
       + '<div><b>' + (acertou ? 'Isso!' : 'A resposta era') + '</b>'
       + '<span>' + CC.esc(ref(q.certo))
-      + (mostraTexto ? ': ' + CC.esc(trecho(n.texto, 80)) : '') + '</span></div>'
+      + (mostraTexto ? ': ' + CC.esc(trecho(CC.textoDaNota(n), 80)) : '') + '</span></div>'
       + '</div>'
       + '<button class="botao ' + (acertou ? 'cor' : 'vermelho') + '" data-adiante>'
       + (ultima ? 'Ver resultado' : 'Continuar') + '</button>'

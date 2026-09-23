@@ -42,7 +42,9 @@ checar(D.plano.every((d) => d.antigo || d.novo), 'todo dia tem ao menos uma pass
 {
   const { notaOculta } = await import('./ferramentas/ajustes-conteudo.mjs');
   const visiveis = Object.keys(D.notas).filter((id) => !notaOculta(D, id));
-  const textoDe = (n) => [n.nome, n.sub, n.resumo, n.destaque, (n.html || '').replace(/<[^>]+>/g, ' ')].join(' ');
+  // A citação do versículo é o texto da tradução, como ela escreve: o travessão dela fica.
+  const textoDe = (n) => [n.nome, n.sub, n.resumo, n.destaque, (n.html || '')
+    .replace(/<blockquote data-verso="[^"]*">[\s\S]*?<\/blockquote>/, ' ').replace(/<[^>]+>/g, ' ')].join(' ');
   const comTravessao = visiveis.filter((id) => /[—–]/.test(textoDe(D.notas[id])));
   const citamArquivo = visiveis.filter((id) => /\bvault\b|obsidian|\btemplates?\b|frontmatter/i.test(textoDe(D.notas[id])));
   const linkOculto = visiveis.filter((id) => [...(D.notas[id].html || '').matchAll(/data-nota="([^"]+)"/g)].some((m) => notaOculta(D, m[1])));
@@ -204,6 +206,14 @@ const CC = contexto.window.CC;
   checar(!semReflexao.length, 'os 365 dias têm versículo ou nota, 2 ou 3 perguntas e três começos de oração' + (semReflexao.length ? ' (' + semReflexao.join(', ') + ')' : ''));
   checar(!foraDaLeitura.length, 'o versículo para guardar está dentro da leitura do dia' + (foraDaLeitura.length ? ' (' + foraDaLeitura.join(', ') + ')' : ''));
   checar(!semTexto.length, 'todo versículo para guardar existe nas duas traduções' + (semTexto.length ? ' (' + semTexto.join(', ') + ')' : ''));
+
+  // As notas de versículo do Explorar citavam a NVI, que não tem licença para o app: o texto
+  // tem de vir das Bíblias do app, uma versão por tradução.
+  const versiculos = Object.values(D.notas).filter((n) => n.pasta === '08 - Versículos' && /^.+ \d+\.\d+(-\d+)?$/.test(n.nome));
+  const foraDasBiblias = versiculos.filter((n) => !n.versos || !n.versos.nbv || !n.versos.blivre
+    || n.texto !== n.versos.nbv || !n.html.includes('<blockquote data-verso='));
+  checar(versiculos.length > 100 && !foraDasBiblias.length, 'as notas de versículo do Explorar trazem o texto da NBV e da Bíblia Livre, e não o da NVI'
+    + (foraDasBiblias.length ? ' (' + foraDasBiblias.slice(0, 5).map((n) => n.nome).join(', ') + ')' : ''));
 }
 const dias = (ini, n) => Array.from({ length: n }, (_, i) => somaDias(ini, i));
 
