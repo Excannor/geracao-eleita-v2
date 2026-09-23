@@ -45,6 +45,8 @@ const conferir = [];
 const normalizar = (s) => String(s).normalize('NFC').toLowerCase()
   .replace(/[“”"'‘’«».,;:!?()[\]…—–-]/g, ' ').replace(/\s+/g, ' ').trim();
 const CARTAS_DE_PAULO = /^(Romanos|[12] Coríntios|Gálatas|Efésios|Filipenses|Colossenses|[12] Tessalonicenses|[12] Timóteo|Tito|Filemom)$/;
+const CIDADE_DA_CARTA = { Romanos: 'Roma', 'Coríntios': 'Corinto', 'Gálatas': 'Galácia', 'Efésios': 'Éfeso',
+  Filipenses: 'Filipos', Colossenses: 'Colossos', Tessalonicenses: 'Tessalônica' };
 const leituraNbv = (plano) => plano.trechos.map((t) => {
   const caps = biblia.livros[t.livro] || [];
   return caps.slice(t.de - 1, t.ate).map((c) => c.join(' ')).join(' ');
@@ -160,6 +162,8 @@ for (const dia of dias) {
         if (m.index === 0 && (PALAVRAS_DE_INICIO.has(nome) || MINUSCULAS_DA_NBV.has(nome.toLowerCase()))) continue;
         // O autor da carta é nome certo mesmo quando o capítulo do dia não o escreve (Romanos 2).
         if (nome === 'Paulo' && plano.livros.some((l) => CARTAS_DE_PAULO.test(l))) continue;
+        // A cidade para onde a carta foi mandada também: "Corinto" num dia de 1 Coríntios.
+        if (plano.livros.some((l) => CIDADE_DA_CARTA[l.replace(/^[12] /, '')] === nome)) continue;
         conferir.push('dia ' + dia + ' · nome "' + nome + '" não aparece na leitura');
       }
     }
