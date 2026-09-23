@@ -90,6 +90,9 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    admite ("quando estiver em dificuldades, eu estarei ao seu lado", 91.15) e, se houver no
    dia, mostrar quem sofreu confiando (Paulo em 2 Co 11). Nos salmos de lamento, não apressar o
    consolo: o Salmo 88 termina na escuridão, e a reflexão diz isso.
+   Versículo famoso fora do contexto: Jeremias 29.11 ("planos de bem") foi dito a exilados
+   que iam esperar setenta anos na Babilônia, e não é promessa de solução rápida. A reflexão
+   conta o contexto (a carta, a espera, orar pela cidade) antes da promessa.
    Provérbios são conselhos de sabedoria, não garantias: "sua vida será prolongada", "seus
    celeiros ficarão cheios" (Pv 3) não viram promessa de saúde ou dinheiro para quem obedece.
    Âncora em conselho (confiar, cuidar do coração, falar com cuidado), não em recompensa.
