@@ -13,6 +13,7 @@
     '2 Coríntios', 'Gálatas', 'Efésios', 'Filipenses', 'Colossenses', '1 Tessalonicenses',
     '2 Tessalonicenses', '1 Timóteo', '2 Timóteo', 'Tito', 'Filemom', 'Hebreus', 'Tiago',
     '1 Pedro', '2 Pedro', '1 João', '2 João', '3 João', 'Judas', 'Apocalipse']);
+  CC.ehNovoTestamento = (livro) => NOVO.has(livro);
 
   // Um dia do plano pode juntar dois livros na mesma trilha ("Rute 3-4; 1 Samuel 1"),
   // então a trilha é recortada pelos trechos, e não pela referência escrita.
@@ -32,6 +33,8 @@
   const letra = () => (LETRAS.includes(lerLocal(CHAVE_LETRA)) ? lerLocal(CHAVE_LETRA) : 'normal');
   // Um versículo por bloco é o padrão: texto corrido numa tela de celular vira um paredão.
   const corrido = () => lerLocal(CHAVE_MODO) === 'corrido';
+  CC.tamanhoDaLetra = letra;
+  CC.leituraCorrida = corrido;
 
   const posicoes = () => { try { return JSON.parse(lerLocal(CHAVE_POSICAO) || '{}'); } catch (e) { return {}; } };
   const guardarPosicao = (chave, valor) => {
@@ -45,6 +48,7 @@
 
   // ---------- carregar o texto ----------
   const servido = () => location.protocol.startsWith('http');
+  CC.appServido = servido;
   const carregadas = new Map();
 
   function carregar(b) {
@@ -58,6 +62,7 @@
     }
     return carregadas.get(b.sigla);
   }
+  CC.carregarBiblia = carregar;
 
   // "Marcos 1.35" ou "João 3.16-17": devolve o texto na tradução escolhida.
   CC.textoDoVersiculo = function (ref) {
@@ -259,6 +264,7 @@
     }
     return html;
   }
+  CC.htmlDoTrecho = textoDe;
 
   // Tocar num versículo marca e abre o que fazer com ele: copiar ou mostrar aos amigos.
   function ligarVersos(el) {
@@ -301,6 +307,7 @@
     + b.credito.map((linha) => '<p>' + CC.esc(linha) + '</p>').join('')
     + '<p><a href="' + CC.esc(b.licencaUrl) + '" target="_blank" rel="noopener">Licença '
     + CC.esc(b.licenca) + '</a></p></footer>';
+  CC.creditoBiblia = credito;
 
   // ---------- folha Aa ----------
   function folhaAa(el) {

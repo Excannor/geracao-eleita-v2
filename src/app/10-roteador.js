@@ -22,6 +22,9 @@
     amigos: '#/novidades', novidades: '#/novidades',
     explorar: '#/explorar', secao: '#/explorar', nota: '#/explorar', busca: '#/explorar',
     perfil: '#/perfil', config: '#/perfil',
+    // não aponta para nenhuma das 5 abas: assim nenhuma fica marcada como selecionada
+    // enquanto a Bíblia está aberta, e o botão central cuida da sua própria marcação.
+    biblia: '#/biblia',
   };
 
   const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -126,18 +129,27 @@
 
   function pintarNavegacao(rota) {
     const ativa = ABA_DA_ROTA[rota] || '#/';
+    const naBiblia = rota === 'biblia';
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
+    const abas = ABAS.map(([href, rotulo, icone]) => {
+      const foto = icone === 'pessoa' ? CC.foto() : '';
+      const marca = foto ? '<img class="retrato-aba" src="' + CC.esc(foto) + '" alt="">' : CC.icoAba(icone);
+      const ponto = icone === 'novidades' && pendencias ? '<i class="ponto-aba"></i>' : '';
+      return '<button class="aba' + (href === ativa ? ' selecionada' : '') + '" data-ir="' + href + '"'
+        + (href === ativa ? ' aria-current="page"' : '') + '><span class="icone-aba">' + marca + ponto + '</span>'
+        + '<span class="rotulo-aba">' + rotulo + '</span></button>';
+    });
+    // A Bíblia entra NO FLUXO da barra, entre a 2ª e a 3ª aba (Trilha, Desafios, [Bíblia],
+    // Juntos, Explorar, Perfil): com 5 abas não existe centro exato, e um círculo em
+    // position:absolute cairia em cima da aba "Juntos". Na barra de baixo o CSS levanta
+    // este item com margem negativa; no trilho lateral ele volta a ser um item comum.
+    abas.splice(2, 0, '<button class="aba aba-central' + (naBiblia ? ' selecionada' : '') + '" data-ir="#/biblia" aria-label="Bíblia"'
+      + (naBiblia ? ' aria-current="page"' : '') + '><span class="icone-aba">' + CC.icoAba('livro') + '</span>'
+      + '<span class="rotulo-aba">Bíblia</span></button>');
     navegacao.innerHTML = '<a class="marca-lateral" href="#/">'
       + '<span class="simbolo">' + CC.icoLogo() + '</span>'
       + '<span>Geração <em>Eleita</em></span></a>'
-      + ABAS.map(([href, rotulo, icone]) => {
-        const foto = icone === 'pessoa' ? CC.foto() : '';
-        const marca = foto ? '<img class="retrato-aba" src="' + CC.esc(foto) + '" alt="">' : CC.icoAba(icone);
-        const ponto = icone === 'novidades' && pendencias ? '<i class="ponto-aba"></i>' : '';
-        return '<button class="aba' + (href === ativa ? ' selecionada' : '') + '" data-ir="' + href + '"'
-          + (href === ativa ? ' aria-current="page"' : '') + '><span class="icone-aba">' + marca + ponto + '</span>'
-          + '<span class="rotulo-aba">' + rotulo + '</span></button>';
-      }).join('');
+      + abas.join('');
     navegacao.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
         CC.vibrar('leve');
@@ -157,6 +169,7 @@
 
     conteudo.classList.toggle('sem-entrada', redesenhando);
     if (rota !== 'dia') CC.fecharLicao();
+    if (rota !== 'biblia' && CC.fecharLeituraBiblia) CC.fecharLeituraBiblia();
     if (rota !== 'praticar') CC.fecharPratica();
     if (CC.fecharPopNo) CC.fecharPopNo();
 
@@ -165,6 +178,7 @@
     else if (rota === 'praticar') CC.vistaPraticar(conteudo);
     else if (rota === 'missoes') CC.vistaMissoes(conteudo);
     else if (rota === 'amigos' || rota === 'novidades') (arg === 'bloqueados' ? CC.vistaBloqueados : arg === 'propositos' ? CC.vistaPropositos : CC.vistaAmigos)(conteudo);
+    else if (rota === 'biblia') CC.vistaBiblia(conteudo, arg);
     else if (rota === 'explorar') CC.vistaExplorar(conteudo);
     else if (rota === 'secao') CC.vistaSecao(conteudo, arg, consulta ? decodeURIComponent(consulta) : '');
     else if (rota === 'nota') CC.vistaNota(conteudo, arg);

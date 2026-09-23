@@ -402,6 +402,27 @@ button { font-family: inherit; }
 }
 .aba.selecionada .retrato-aba { border-color: var(--inverso); }
 
+/* Bíblia: item comum da barra, só que levantado — a Bíblia é o texto por trás de tudo,
+   não mais um destino entre outros. Fica NO FLUXO da barra (entre a 2ª e a 3ª aba: com
+   5 abas não existe centro exato, e um círculo em position:absolute cai em cima da aba
+   vizinha). A margem negativa é o que ergue metade do círculo acima da borda da barra. */
+.aba.aba-central {
+  flex: 0 0 60px;
+  width: 60px;
+  height: 60px;
+  max-width: none;
+  margin-top: -30px;
+  align-self: flex-start;
+  border: 4px solid var(--cartao);
+  border-radius: 50%;
+  background: var(--inverso);
+  color: var(--inverso-tinta);
+}
+.aba.aba-central .ico-aba { width: 28px; height: 28px; }
+.aba.aba-central .rotulo-aba { display: none; }
+.aba.aba-central:hover { background: var(--inverso); }
+.aba.aba-central.selecionada { box-shadow: 0 0 0 2px var(--inverso); }
+
 /* ---------- botões ----------
    Acabamento novo: cápsula, chapado. O botão principal é o par que se inverte entre
    temas (preto no claro, branco no escuro); as variantes de cor continuam para ações
@@ -2313,6 +2334,44 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .item .resumo { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.9rem; color: var(--tinta-fraca); line-height: 1.45; margin-top: 4px; }
 .item .destaque { font-size: 0.92rem; font-style: italic; color: var(--tinta); margin-top: 6px; }
 
+/* ---------- Bíblia: lista de livros e grade de capítulos ---------- */
+.grade-livros { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; }
+@media (min-width: 600px) { .grade-livros { grid-template-columns: repeat(3, 1fr); } }
+.item-livro {
+  display: block;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--cartao);
+  color: var(--tinta-forte);
+  font-weight: 800;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.item-livro:hover { text-decoration: none; background: var(--fundo-2); }
+
+.grade-capitulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.grade-capitulos a {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  aspect-ratio: 1;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--cartao);
+  color: var(--tinta-forte);
+  font-weight: 800;
+  text-decoration: none;
+}
+.grade-capitulos a:hover { text-decoration: none; background: var(--fundo-2); }
+.grade-capitulos a.atual { border-color: var(--inverso); background: var(--inverso); color: var(--inverso-tinta); }
+
+/* Os dois botões de navegar entre capítulos lado a lado; sozinho, o que existir ocupa
+   a largura toda (Gênesis 1 só tem "próximo", Apocalipse 22 só tem "anterior"). */
+.leitor-biblia .licao-pe .interno { display: flex; gap: 10px; }
+.leitor-biblia .licao-pe .interno .botao { flex: 1; width: auto; }
+
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .chip { font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--fundo-2); color: var(--tinta-fraca); }
 .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
@@ -2519,6 +2578,24 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
   .navegacao .marca-lateral .simbolo svg.ico-logo { width: 30px; height: auto; }
   .aba { flex: 0 0 auto; flex-direction: row; justify-content: flex-start; gap: 14px; max-width: none; width: 100%; height: 54px; padding: 0 14px; }
   .aba .rotulo-aba { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  /* No trilho lateral a Bíblia volta a ser um item comum da lista: o círculo flutuante
+     só faz sentido flutuando sobre a borda da barra de baixo. */
+  .aba.aba-central {
+    margin-top: 0;
+    align-self: auto;
+    flex: 0 0 auto;
+    width: 100%;
+    height: 54px;
+    max-width: none;
+    border: 2px solid transparent;
+    border-radius: var(--raio-p);
+    background: none;
+    color: var(--tinta-fraca);
+    box-shadow: none;
+  }
+  .aba.aba-central .rotulo-aba { display: block; }
+  .aba.aba-central:hover { background: var(--fundo-2); }
+  .aba.aba-central.selecionada { color: var(--inverso-tinta); background: var(--inverso); border-radius: var(--raio-capsula); box-shadow: none; }
   .aplicativo { padding-left: 240px; }
   .topo { padding-left: 24px; }
   .estatisticas { justify-content: center; gap: 14px; }
