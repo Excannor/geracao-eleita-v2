@@ -39,7 +39,7 @@
     return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) : 0) + novas;
   };
 
-  const TEXTO_CONVITE = 'Quer ler a Bíblia comigo? No Geração Eleita é uma lição por dia, e a gente mantém um propósito juntos. Aceita meu convite:';
+  const TEXTO_CONVITE = 'Bora ler a Bíblia inteira em um ano, junto? No Geração Eleita é uma leitura por dia, e a gente mantém um propósito juntos. Aceita meu convite:';
   const FALA_TOQUE = 'Bora ler hoje?';
 
   // ---------- peças ----------
@@ -498,7 +498,7 @@
           + (eventos.length
             ? '<div class="mural">' + eventos.map(itemDoMural).join('') + '</div>'
             : '<div class="vazio-amigos">' + CC.ico('pessoas')
-              + '<p>' + (amigos.length ? 'Quando alguém bater uma meta, aparece aqui.' : 'Ler junto é mais fácil! Convide alguém para começar um propósito.') + '</p></div>')
+              + '<p>' + (amigos.length ? 'Quando alguém bater uma meta, aparece aqui.' : 'Ler junto é mais fácil! Chame a sua célula ou até 4 amigos e montem um propósito.') + '</p></div>')
           + (enviados.length
             ? CC.tituloSecao('Convites enviados') + '<div class="lista-pedidos">' + enviados.map((p) => '<div class="linha-amigo enviado">'
               + '<div class="quem-amigo"><b>@' + CC.esc(p.usuario) + '</b><span class="arroba">aguardando</span></div>'

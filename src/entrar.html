@@ -164,8 +164,10 @@
       <span class="selo-linha">À sua face</span>
       <span class="selo-linha">E te adora</span>
     </div>
-    <h1 id="titulo-boas">A Bíblia inteira em um ano, uma lição por dia.</h1>
-    <p class="dica" id="dica-boas">De 10 a 20 minutos na maioria dos dias, com ofensiva e amigos lendo junto com você.</p>
+    <!-- Posicionamento (23/09/2026): o app do discipulado da juventude da igreja. A frase de
+         cima é a promessa; a de baixo diz para quem é e o que o diferencia. -->
+    <h1 id="titulo-boas">A Bíblia inteira em um ano, junto com a sua célula.</h1>
+    <p class="dica" id="dica-boas">Uma leitura por dia, de 10 a 20 minutos, com reflexões feitas para quem está começando e o seu grupo lendo junto.</p>
     <div class="espaco"></div>
     <div class="botoes">
       <button class="botao" data-ir="cadastro">Começar</button>
@@ -188,7 +190,39 @@
       <p class="erro" id="erro-entrar" role="alert"></p>
       <div class="espaco"></div>
       <button class="botao" type="submit" id="botao-entrar">Entrar</button>
+      <button class="botao plano" type="button" data-ir="esqueci">Esqueci minha senha</button>
       <button class="botao plano" type="button" data-ir="cadastro">Criar uma conta</button>
+    </form>
+  </section>
+
+  <!-- senha esquecida -->
+  <section id="tela-esqueci" hidden>
+    <div class="topo-passo"><button class="voltar" data-ir="entrar" aria-label="Voltar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button></div>
+    <h1>Esqueceu a senha?</h1>
+    <form id="form-esqueci" novalidate>
+      <p class="dica">Seu progresso não se perde. Diga qual é a sua conta e a gente manda um link para criar uma senha nova.</p>
+      <div class="campo"><label for="login-esqueci">@usuário ou e-mail</label>
+        <input id="login-esqueci" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
+      <p class="erro" id="erro-esqueci" role="alert"></p>
+      <div class="privacidade" id="pronto-esqueci" role="status" hidden></div>
+      <div class="espaco"></div>
+      <button class="botao" type="submit" id="botao-esqueci">Pedir o link</button>
+    </form>
+  </section>
+
+  <!-- nova senha, aberta pelo link -->
+  <section id="tela-redefinir" hidden>
+    <h1>Crie uma senha nova</h1>
+    <form id="form-redefinir" novalidate>
+      <div class="campo"><label for="senha-redefinir">Senha nova</label>
+        <div class="senha"><input id="senha-redefinir" name="new-password" type="password" autocomplete="new-password" required>
+          <button type="button" class="mostrar" data-mostrar="senha-redefinir" aria-pressed="false">Mostrar</button></div>
+        <span class="ajuda">Seis caracteres ou mais.</span></div>
+      <p class="erro" id="erro-redefinir" role="alert"></p>
+      <div class="espaco"></div>
+      <button class="botao" type="submit" id="botao-redefinir">Salvar e entrar</button>
+      <button class="botao plano" type="button" data-ir="esqueci">Pedir outro link</button>
     </form>
   </section>
 
@@ -244,7 +278,7 @@
   var passo = 1;
 
   function mostrarTela(nome) {
-    ['boas', 'entrar', 'cadastro'].forEach(function (n) { $('tela-' + n).hidden = n !== nome; });
+    ['boas', 'entrar', 'cadastro', 'esqueci', 'redefinir'].forEach(function (n) { $('tela-' + n).hidden = n !== nome; });
     var foco = document.querySelector('#tela-' + nome + ' input, #tela-' + nome + ' button');
     if (nome !== 'boas' && foco) foco.focus();
     if (nome === 'cadastro') irPasso(1);
@@ -363,6 +397,62 @@
       $('erro-entrar').textContent = 'Sem conexão com o servidor.';
     });
   });
+
+  // ---------- senha esquecida ----------
+  $('form-esqueci').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var login = $('login-esqueci').value.trim();
+    if (!login) { $('erro-esqueci').textContent = 'Diga o seu @usuário ou e-mail.'; return; }
+    var botao = $('botao-esqueci');
+    botao.disabled = true;
+    $('erro-esqueci').textContent = '';
+    fetch('api/esqueci-senha', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ login: login }),
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        botao.disabled = false;
+        if (r.status === 429) { $('erro-esqueci').textContent = 'Muitas tentativas. Espere um pouco.'; return; }
+        if (!r.ok) { $('erro-esqueci').textContent = 'Não deu certo agora. Tente de novo.'; return; }
+        // A mesma resposta para conta que existe e que não existe: a tela não entrega quem tem cadastro.
+        $('pronto-esqueci').textContent = d.porEmail
+          ? 'Pronto! Se essa conta tiver e-mail cadastrado, o link chega em alguns minutos. Olhe também a caixa de spam. O link vale por 1 hora.'
+          : 'Pedido anotado! Quem cuida do app vai te mandar o link da senha nova, normalmente pelo WhatsApp. Se demorar, fale com o líder que te convidou.';
+        $('pronto-esqueci').hidden = false;
+      });
+    }).catch(function () {
+      botao.disabled = false;
+      $('erro-esqueci').textContent = 'Sem conexão com o servidor.';
+    });
+  });
+
+  var tokenSenha = params.get('redefinir');
+  $('form-redefinir').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var senha = $('senha-redefinir').value;
+    if (senha.length < 6) { $('erro-redefinir').textContent = 'A senha precisa de 6 caracteres ou mais.'; return; }
+    var botao = $('botao-redefinir');
+    botao.disabled = true;
+    $('erro-redefinir').textContent = '';
+    fetch('api/redefinir-senha', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: tokenSenha, senha: senha }),
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (r.ok) {
+          // Sem o ?redefinir, para o link não abrir de novo esta tela depois de entrar.
+          try { history.replaceState(null, '', location.pathname); } catch (e) { /* segue */ }
+          entrarNoApp(d.usuario);
+          return;
+        }
+        botao.disabled = false;
+        var msg = d.erro || 'Não consegui trocar a senha.';
+        $('erro-redefinir').textContent = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
+      });
+    }).catch(function () {
+      botao.disabled = false;
+      $('erro-redefinir').textContent = 'Sem conexão com o servidor.';
+    });
+  });
+  if (tokenSenha) mostrarTela('redefinir');
 
   // Com convite no link, quem chamou aparece logo na primeira tela.
   if (convite) {

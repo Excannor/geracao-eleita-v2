@@ -9,6 +9,16 @@ versículos, temas e conexões) continua ali, como apoio de uma tela, não como 
 bíblico está dentro, em duas traduções de licença livre, e a Bíblia inteira pode ser lida à
 vontade, fora do plano do dia.
 
+## Posicionamento
+
+**A Bíblia inteira em um ano, junto com a sua célula.** O Geração Eleita não disputa com os
+aplicativos de Bíblia genéricos: ele é o aplicativo do discipulado da juventude da igreja.
+O que o diferencia: reflexões escritas e revisadas para quem está começando (com um filtro de
+fidelidade ao texto), leitura em grupo pequeno de verdade (propósitos de até 5 pessoas, com
+meta coletiva do dia), e nada de placar. O crescimento esperado é de igreja em igreja, pelo
+líder de jovens que coloca a turma no app, e não pela loja de aplicativos. Essa frase aparece
+na tela de boas-vindas, no manifesto, na descrição da página e no texto do convite.
+
 Não depende do Obsidian. O conteúdo está congelado em `conteudo/conteudo.json`, dentro do
 projeto.
 
@@ -59,7 +69,7 @@ A barra de baixo tem quatro abas, com um botão quadrado da Bíblia no meio:
 - **Juntos** (`#/novidades`)
 - **Explorar** (`#/explorar`)
 
-O Perfil saiu da barra: virou a foto redonda no canto do topo, ao lado da lamparina da
+O Perfil saiu da barra: virou a foto redonda no canto do topo, ao lado do fogo da
 ofensiva. No computador, em telas a partir de 860px, a barra vira um trilho lateral, com a
 marca "Geração Eleita" no alto. Tudo isto mora em `src/app/10-roteador.js` (`ABAS`,
 `pintarNavegacao`, `pintarTopo`).
@@ -94,8 +104,8 @@ conquistas.
 **Explorar**: todo o material de consulta, com busca em texto integral que alcança também o
 que você escreveu.
 
-No topo, em todas as telas, fica a lamparina com os dias de ofensiva e, ao lado, a foto de
-perfil. Tocar na lamparina abre a folha com o estágio da chama, o recorde e quanto falta para
+No topo, em todas as telas, fica o fogo com os dias de ofensiva e, ao lado, a foto de
+perfil. Tocar no fogo abre a folha com o estágio da chama, o recorde e quanto falta para
 o próximo estágio.
 
 ## O dia como uma lição
@@ -110,7 +120,7 @@ Tocar num nó abre a tela cheia, com barra de progresso no topo, e passa por:
 3. **Para levar com você**: logo depois da leitura, sem tela de festa no meio. Um versículo
    para guardar, uma pergunta e a mesma coisa virada em oração. Dá para pular, e dá para abrir
    **Escrever sobre hoje**, onde ficam o método OIA completo e a oração.
-4. **Resumo**: a lamparina e os dias de ofensiva, a semana, e o que mudou hoje: estágio novo
+4. **Resumo**: o fogo e os dias de ofensiva, a semana, e o que mudou hoje: estágio novo
    da chama, marco, conquista, livro terminado, unidade fechada, baú pronto e
    desafios do dia. Mostra quem leu hoje junto com você, com um botão para encorajar quem
    ainda não leu.
@@ -119,10 +129,10 @@ A leitura é para todo dia. Escrever, não: o aplicativo diz isso e não penaliz
 
 ## Reflexões do dia
 
-Os dias 1 a 59 têm uma reflexão escrita de verdade, guardada em
-`ferramentas/reflexoes/unidade-01.json` (dias 1 a 31) e `unidade-02.json` (dias 32 a 59), com
-2 ou 3 perguntas sem rótulo, mais três começos de oração. Os demais dias usam perguntas
-genéricas por gênero do texto (carta, narrativa, lei...), em `src/app/04c-reflexao.js`. Quem
+Os 365 dias têm uma reflexão escrita de verdade, guardada em
+`ferramentas/reflexoes/unidade-NN.json` (uma por unidade), com 2 ou 3 perguntas sem rótulo,
+mais três começos de oração. As perguntas genéricas por gênero do texto (carta, narrativa,
+lei...), em `src/app/04c-reflexao.js`, ficaram só como reserva. Quem
 lê pode ter acabado de se converter, então há um filtro de fidelidade e estilo para tudo o
 que se escreve nessa pasta, em `ferramentas/reflexoes/CLAUDE.md`, e um teste automático que
 confere cada citação contra o texto bíblico de verdade:
@@ -130,6 +140,24 @@ confere cada citação contra o texto bíblico de verdade:
 ```
 node ferramentas/teste-reflexoes.mjs [unidade]
 ```
+
+## Senha esquecida
+
+Na tela de entrar, **Esqueci minha senha** pede o @ ou o e-mail. A resposta é a mesma exista
+ou não a conta, para a tela não entregar quem tem cadastro. Sem serviço de e-mail, o pedido
+fica anotado no **Painel do app**, e o dono gera ali um link de senha nova para mandar pelo
+WhatsApp. O link vale 1 hora e uma vez só: ele é assinado com o selo da senha atual, então
+morre sozinho quando a senha muda, e a troca derruba as sessões antigas. Para o link ir sozinho
+por e-mail, basta configurar um SMTP (uma conta Gmail com senha de app serve): veja o topo de
+`email.mjs` e as variáveis `CAMINHO_SMTP_*` no `docker-compose.yml`.
+
+## Painel do app
+
+Em **Configurações → Painel do app**, visível só para quem está em `CAMINHO_ADMIN`
+(`docker-compose.yml`). Só contagens, sem nome de ninguém: contas novas, quem leu hoje, na
+semana e no mês, quantos voltaram 1, 7 e 30 dias depois de criar a conta, onde as pessoas param
+no plano, Primeiros Passos, escrita, propósitos e notificações. A conta vem de `painel.mjs`
+(função pura, testada em `ferramentas/teste-senha-painel.mjs`).
 
 ## Não é placar
 
@@ -429,7 +457,7 @@ falhou e o container está servindo a versão anterior.
 | `db.mjs` | o banco: esquema com versão, gravação só do que mudou, importação, backups |
 | `src/estilo.css` | a linguagem visual: cores, botões com aresta, nós da trilha |
 | `src/app/02-estado.js` | progresso, fusão entre aparelhos, ofensiva, XP, conquistas |
-| `src/app/01c-arte.js` | a lamparina que cresce com a ofensiva, os troféus, o baú e as medalhas, em SVG |
+| `src/app/01c-arte.js` | os estágios do fogo da ofensiva, os troféus, o baú e as medalhas, em SVG |
 | `src/app/02b-jogo.js` | as conquistas com nível, os desafios do dia e o quadro do mês (calculado, fora da tela) |
 | `src/app/03-trilha.js` | a trilha de nós, as unidades e o baú |
 | `src/app/04-licao.js` | o dia em passos, do "leia" ao troféu |
@@ -444,7 +472,7 @@ falhou e o container está servindo a versão anterior.
 | `propositos.mjs` | as regras puras dos propósitos: tipos, dias juntos e meta do grupo |
 | `semeador.mjs` | os cinco níveis da Trilha do Semeador e quanto falta para o próximo |
 | `notificacoes.mjs` | Web Push (VAPID e criptografia), as regras de quando avisar e as mensagens |
-| `ferramentas/reflexoes/` | as reflexões escritas dos dias 1 a 59, e o filtro de fidelidade (`CLAUDE.md`) |
+| `ferramentas/reflexoes/` | as reflexões escritas dos 365 dias, e o filtro de fidelidade (`CLAUDE.md`) |
 | `ferramentas/importar-vault.mjs` | o único arquivo que lê o vault Obsidian |
 
 Não abra `src/index.html` direto: é só o molde, com os marcadores `/*FONTES*/`, `/*ESTILO*/`,

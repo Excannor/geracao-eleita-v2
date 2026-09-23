@@ -24,6 +24,8 @@ import {
   Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio,
   MAX_TOQUES_RECEBIDOS_DIA,
 } from './notificacoes.mjs';
+import { montarPainel } from './painel.mjs';
+import { configDoEmail, enviarEmail } from './email.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, 'dist');
@@ -261,6 +263,43 @@ function lerCookie(req, nome) {
   }
   return '';
 }
+
+// ---------- senha esquecida ----------
+// O link de nova senha é "nome.validade.assinatura", como o crachá, mas assinado com outro
+// prefixo (um não serve no lugar do outro). A assinatura leva o selo da senha atual: trocada
+// a senha, o link morre sozinho, então ele vale uma vez só, sem precisar anotar no banco.
+const VALIDADE_LINK_SENHA = 60 * 60 * 1000;
+const firmaDoLink = (nome, vence, usuario) =>
+  assinar('redefinir.' + nome + '.' + vence + '.' + seloDaConta(CONTAS.achar(usuario)));
+function linkDeSenha(usuario) {
+  const vence = Date.now() + VALIDADE_LINK_SENHA;
+  const nome = paraCracha(usuario);
+  return CONTATO_PUSH.replace(/\/$/, '') + '/entrar.html?redefinir=' + nome + '.' + vence + '.' + firmaDoLink(nome, vence, usuario);
+}
+function donoDoLink(token) {
+  const partes = String(token || '').split('.');
+  if (partes.length !== 3) return '';
+  const [nome, vence, firma] = partes;
+  if (!(Number(vence) > Date.now())) return '';
+  const usuario = decodeURIComponent(nome);
+  if (!CONTAS.achar(usuario)) return '';
+  return iguais(firma, firmaDoLink(nome, vence, usuario)) ? usuario : '';
+}
+
+// Sem e-mail configurado, o pedido fica anotado para o dono ver no painel e mandar o link à
+// mão. Guarda só o @ e quando pediu, e some em 7 dias ou quando o link é gerado.
+const EMAIL = configDoEmail();
+const ADMINS = String(process.env.CAMINHO_ADMIN || '').split(',').map((u) => limparNome(u)).filter(Boolean);
+const ehAdmin = (usuario) => ADMINS.includes(usuario);
+function pedidosDeSenha() {
+  let lista = [];
+  try { lista = JSON.parse(lerMeta(DB, 'pedidos_senha') || '[]'); } catch { /* lista vazia */ }
+  const limite = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  return lista.filter((p) => p.em > limite && CONTAS.achar(p.usuario));
+}
+function guardarPedidosDeSenha(lista) { gravarMeta(DB, 'pedidos_senha', JSON.stringify(lista.slice(-50))); }
+const ultimoEnvioDeSenha = new Map();
+const pedidosDeLinkPorIp = new Map();
 
 const quemFala = (req) => (ABERTO_PARA_TESTE && CONTAS.vazio
   ? 'caminho' : donoDoCracha(lerCookie(req, COOKIE)));
@@ -569,6 +608,53 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/sair') { limparCookie(res); json(res, 200, { ok: true }); return; }
 
+    // A resposta é a mesma exista ou não a conta: a tela não pode servir para descobrir
+    // quais e-mails têm cadastro. Limite próprio (5 pedidos por IP a cada 15 minutos), para
+    // pedir link não trancar o login de quem está do mesmo lado.
+    if (rota === '/api/esqueci-senha') {
+      if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
+      const janela = (pedidosDeLinkPorIp.get(ip) || []).filter((t) => t > Date.now() - 15 * 60 * 1000);
+      if (janela.length >= 5) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      pedidosDeLinkPorIp.set(ip, janela.concat(Date.now()));
+      const { login } = await lerJson(req);
+      const conta = CONTAS.achar(login) || CONTAS.acharPorEmail(login);
+      const recente = conta && Date.now() - (ultimoEnvioDeSenha.get(conta.usuario) || 0) < 5 * 60 * 1000;
+      if (conta && !recente) {
+        ultimoEnvioDeSenha.set(conta.usuario, Date.now());
+        if (EMAIL && conta.email) {
+          semEsperar(enviarEmail(EMAIL, {
+            para: conta.email,
+            assunto: 'Sua nova senha no Geração Eleita',
+            texto: 'Olá, ' + primeiroNome(conta.nome) + '!\n\nRecebemos um pedido para criar uma nova senha para @' + conta.usuario
+              + '. Abra o link abaixo em até 1 hora:\n\n' + linkDeSenha(conta.usuario)
+              + '\n\nSe não foi você, ignore este e-mail: sua senha continua a mesma.\n\nGeração Eleita',
+          }));
+        } else {
+          guardarPedidosDeSenha(pedidosDeSenha().filter((p) => p.usuario !== conta.usuario).concat({ usuario: conta.usuario, em: Date.now() }));
+        }
+      }
+      json(res, 200, { ok: true, porEmail: !!EMAIL });
+      return;
+    }
+
+    if (rota === '/api/redefinir-senha') {
+      if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
+      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      const { token, senha } = await lerJson(req);
+      const usuario = donoDoLink(token);
+      if (!usuario) { anotarErro(ip); json(res, 410, { erro: 'esse link venceu ou já foi usado. Peça outro' }); return; }
+      try {
+        await CONTAS.trocarSenha(usuario, senha);
+      } catch (e) {
+        json(res, 400, { erro: e.publico ? e.message : 'não consegui trocar a senha' });
+        return;
+      }
+      guardarPedidosDeSenha(pedidosDeSenha().filter((p) => p.usuario !== usuario));
+      porCookie(req, res, usuario);
+      json(res, 200, { ok: true, usuario });
+      return;
+    }
+
     // Versões antigas do aplicativo em cache ainda chamam estas rotas.
     if (rota === '/api/seguir' || rota === '/api/parar-de-seguir') {
       json(res, 410, { erro: 'atualize o aplicativo' });
@@ -603,7 +689,35 @@ const servidor = createServer(async (req, res) => {
         perfilCompleto: conta ? CONTAS.perfilCompleto(conta) : false,
         comSenha: !!conta,
         semeador,
+        admin: ehAdmin(eu),
       });
+      return;
+    }
+
+    // ---------- painel do dono ----------
+    if (rota === '/api/painel' || rota === '/api/painel/link') {
+      if (!exigir(conta && ehAdmin(eu), 403, 'só o dono do app vê o painel')) return;
+      if (rota === '/api/painel/link') {
+        if (!exigir(post, 405, 'método não suportado')) return;
+        const { usuario } = await lerJson(req);
+        const alvo = CONTAS.achar(usuario);
+        if (!exigir(alvo, 404, 'conta não encontrada')) return;
+        guardarPedidosDeSenha(pedidosDeSenha().filter((p) => p.usuario !== alvo.usuario));
+        json(res, 200, { link: linkDeSenha(alvo.usuario), usuario: alvo.usuario, validade: '1 hora' });
+        return;
+      }
+      const estados = {};
+      for (const c of CONTAS.lista()) estados[c.usuario] = (await lerEstado(arquivoDe(c.usuario))) || {};
+      const painel = montarPainel({
+        contas: CONTAS.lista(),
+        estados,
+        propositos: Object.values(CONTAS.dados.propositos || {}),
+        comPush: NOTIFICACOES.comInscricao(),
+        hoje: hojeDe(eu),
+      });
+      painel.pedidosDeSenha = pedidosDeSenha().map((p) => ({ usuario: p.usuario, em: new Date(p.em).toISOString() }));
+      painel.emailLigado = !!EMAIL;
+      json(res, 200, painel);
       return;
     }
 

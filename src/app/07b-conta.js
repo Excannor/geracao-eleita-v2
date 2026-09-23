@@ -43,6 +43,7 @@
           + linha('Sair desta conta', '', 'data-sair')
           + linha('Apagar a conta', '', 'data-apagar', 'perigo'))
         : '')
+      + (quem.admin ? grupo('Administração', linha('Painel do app', '', 'data-ir="#/config/painel"')) : '')
       + '<p class="passo-dica pequena" style="text-align:center;margin-top:20px">Conteúdo de ' + D.importadoEm
       + ' · ' + (CC.servidorVivo() ? 'progresso sincronizado entre seus aparelhos' : 'progresso salvo neste aparelho') + '</p>';
 

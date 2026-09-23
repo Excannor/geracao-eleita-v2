@@ -86,7 +86,7 @@ const iconeEmbutido = 'data:image/png;base64,' + readFileSync(src('icones', 'ico
 const manifesto = {
   name: 'Geração Eleita',
   short_name: 'Geração Eleita',
-  description: 'Plano de leitura bíblica de 365 dias, com trilha e ofensiva de dias seguidos.',
+  description: 'A Bíblia inteira em um ano, junto com a sua célula: uma leitura por dia, reflexões para quem está começando e grupos de até 5 lendo juntos.',
   lang: 'pt-BR',
   start_url: './',
   scope: './',

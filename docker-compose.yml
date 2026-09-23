@@ -30,6 +30,15 @@ services:
     environment:
       CAMINHO_AMBIENTE: "hml"
       CAMINHO_ENDERECO: "https://ge.off-sec.net"
+      # Quem vê o Painel do app (Configurações): métricas sem nomes e os pedidos de senha.
+      CAMINHO_ADMIN: "maarcos_e"
+      # E-mail da senha esquecida: desligado enquanto CAMINHO_SMTP_HOST estiver vazio no .env.
+      # Como ligar com uma conta Gmail: ver o topo de email.mjs.
+      CAMINHO_SMTP_HOST: "${CAMINHO_SMTP_HOST:-}"
+      CAMINHO_SMTP_PORTA: "${CAMINHO_SMTP_PORTA:-465}"
+      CAMINHO_SMTP_USUARIO: "${CAMINHO_SMTP_USUARIO:-}"
+      CAMINHO_SMTP_SENHA: "${CAMINHO_SMTP_SENHA:-}"
+      CAMINHO_SMTP_DE: "${CAMINHO_SMTP_DE:-}"
 
   # Túnel rápido: endereço novo a cada reinício. Só sobe se pedido, com
   #   docker compose --profile rapido up -d

@@ -520,7 +520,7 @@
     const blob = new Blob([CC.montarExportacao()], { type: 'text/markdown;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'caminho-com-cristo-' + CC.hojeIso() + '.md';
+    a.download = 'geracao-eleita-' + CC.hojeIso() + '.md';
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
