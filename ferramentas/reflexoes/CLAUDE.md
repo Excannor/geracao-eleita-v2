@@ -95,6 +95,11 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    Âncora em conselho (confiar, cuidar do coração, falar com cuidado), não em recompensa.
    Os capítulos sobre a "mulher imoral" (Pv 5-7) não viram âncora nem pergunta sobre a vida
    sexual do leitor; se aparecerem, uma frase sóbria sobre fidelidade basta.
+   Eclesiastes é a busca de alguém "debaixo do sol": frases como "os mortos são mais felizes
+   que os vivos" (4.2) ou "o homem não tem vantagem sobre o animal" (3.19) são o caminho da
+   busca, não ensino para o leitor. Âncora no que o próprio livro apresenta como conclusão ou
+   observação sóbria (3.11, 4.9-10, 12.13) e, se preciso, dizer no texto que nem tudo o que o
+   Pregador diz no meio da busca é o ponto final.
    Salmos que pedem destruição dos inimigos (58, 69.22-28, 83, 109, 137) não viram âncora nem
    pergunta sobre o leitor desejar o mal de alguém.
 

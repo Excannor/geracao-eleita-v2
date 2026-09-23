@@ -57,7 +57,7 @@ const OUTRA_TRADUCAO = ['proverá', 'achou graça', 'cana rachada', 'mecha que f
 // Palavras com maiúscula que não são nome de alguém da leitura (nomes de Deus, termos gerais).
 // Os nomes dos livros também passam: citar "Êxodo" ou "Marcos" é falar da própria leitura.
 const NOMES_LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia',
-  'Escritura', 'Escrituras', 'Reino', 'Lei', 'Palavra', 'Altíssimo', 'Soberano', 'Messias', 'Mestre', 'Salvador', 'Criador', 'Salmo',
+  'Escritura', 'Escrituras', 'Reino', 'Lei', 'Palavra', 'Altíssimo', 'Soberano', 'Messias', 'Mestre', 'Salvador', 'Criador', 'Salmo', 'Pregador',
   ...Object.keys(biblia.livros).flatMap((l) => l.split(' ')).filter((p) => /^\p{Lu}/u.test(p))]);
 // Todas as palavras que a NBV escreve em minúscula em algum lugar: servem para separar palavra
 // comum de nome próprio no começo da frase.
