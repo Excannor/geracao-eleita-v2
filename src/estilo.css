@@ -1910,7 +1910,8 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
   position: relative;
   width: 100%;
   max-width: 560px;
-  max-height: 92vh;
+  /* com o teclado aberto a cortina encolhe (visualViewport): a folha cabe no que sobrou */
+  max-height: min(92vh, calc(100% - 12px));
   overflow-y: auto;
   background: var(--cartao);
   border-radius: 24px 24px 0 0;

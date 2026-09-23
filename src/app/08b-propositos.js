@@ -272,7 +272,7 @@
     const limite = (cache && cache.limiteCelula) || 20;
     CC.folha('<h2>Criar uma célula</h2>'
       + '<p class="passo-dica">Vocês leem o plano juntos, até ' + limite + ' pessoas. Depois de criar, você manda o link no grupo do WhatsApp e quem abrir já entra.</p>'
-      + '<label class="campo-senha"><span>Nome da célula</span><input data-titulo maxlength="30" placeholder="Ex.: Célula de quinta"></label>'
+      + '<label class="campo-senha"><span>Nome da célula</span><input data-titulo name="nome-da-celula" maxlength="30" placeholder="Ex.: Célula de quinta" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
       + '<p class="passo-dica pequena">A meta do dia é o número de pessoas. Cada um soma 1 ponto por ler, e mais 1 se praticar ou abrir uma nota de estudo. Quem fez mais cobre quem faltou.</p>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao azul" data-criar>Criar e pegar o link</button>'
@@ -398,7 +398,7 @@
         + '<input type="checkbox" value="' + CC.esc(a.usuario) + '"' + (preEscolhido === a.usuario ? ' checked' : '') + '>' + retrato(a)
         + '<span class="quem-amigo"><b>' + CC.esc(a.nome) + '</b><span class="arroba">@' + CC.esc(a.usuario) + '</span></span></label>').join('') + '</div>'
       + '<p class="passo-dica pequena" data-dica-grupo hidden>Com 3 ou mais vira grupo: a meta do dia é o número de pessoas, e quem fizer mais cobre quem faltou.</p>'
-      + '<label class="campo-senha" data-bloco-nome hidden><span>Nome do grupo</span><input data-titulo maxlength="30" placeholder="Ex.: Célula de quinta"></label>'
+      + '<label class="campo-senha" data-bloco-nome hidden><span>Nome do grupo</span><input data-titulo name="nome-do-grupo" maxlength="30" placeholder="Ex.: Amigos da escola" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao azul" data-criar disabled>Chamar para o propósito</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',

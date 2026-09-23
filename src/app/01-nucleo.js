@@ -304,7 +304,17 @@ window.CC = window.CC || {};
       + (opcoes.rolavel ? ' style="max-height:86vh;overflow-y:auto"' : '')
       + '>' + interno + '</div>';
     const folha = cortina.firstChild;
+    // No iPhone o teclado cobre a tela sem mexer no que é "fixed": a cortina acompanha a área
+    // que sobra visível (visualViewport), e a folha, presa no fim dela, sobe junto com o teclado.
+    const vv = window.visualViewport;
+    const acompanharTeclado = () => {
+      cortina.style.top = vv.offsetTop + 'px';
+      cortina.style.height = vv.height + 'px';
+      cortina.style.bottom = 'auto';
+    };
+    if (vv) { vv.addEventListener('resize', acompanharTeclado); vv.addEventListener('scroll', acompanharTeclado); }
     const fechar = () => {
+      if (vv) { vv.removeEventListener('resize', acompanharTeclado); vv.removeEventListener('scroll', acompanharTeclado); }
       cortina.remove();
       if (origem && origem.focus && document.body.contains(origem)) origem.focus();
     };
@@ -313,8 +323,15 @@ window.CC = window.CC || {};
     if (!opcoes.presa) arrastarParaFechar(folha, fechar);
     document.body.appendChild(cortina);
     if (opcoes.ligar) opcoes.ligar(folha, fechar);
-    const primeiro = folha.querySelector('input, textarea, button, a[href]');
-    (primeiro || folha).focus();
+    // No celular, abrir a folha não abre o teclado: ele cobria o texto antes de a pessoa ler.
+    // O teclado aparece quando ela toca no campo, e o campo rola para o meio da folha.
+    const toque = matchMedia('(pointer: coarse)').matches;
+    const primeiro = folha.querySelector(toque ? 'button, a[href]' : 'input, textarea, button, a[href]');
+    (toque ? folha : (primeiro || folha)).focus({ preventScroll: true });
+    folha.addEventListener('focusin', (ev) => {
+      if (!/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) return;
+      setTimeout(() => ev.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+    });
     return { folha, fechar };
   };
 
