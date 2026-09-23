@@ -13,7 +13,9 @@
   };
 
   // ---------- a lamparina ----------
-  // A ofensiva é uma lamparina de barro, a candeia dos tempos bíblicos, com a chama no
+  // A ofensiva hoje é um fogo que cresce com os dias, e os textos falam só de fogo, brasa e
+  // lenha. O desenho abaixo (a lamparina) é o antigo e não aparece mais em nenhuma tela.
+  // Antes: a ofensiva era uma lamparina de barro, a candeia dos tempos bíblicos, com a chama no
   // bico. A imagem vem de Salmos 119.105: a Palavra é a lâmpada que ilumina o caminho.
   //
   // A chama cresce com os dias, em cinco estágios, e o barro nunca muda: a luz é o que
@@ -25,13 +27,13 @@
   // e aí ela deixa de dizer onde a pessoa chegou.
   const ESTAGIOS = [
     { de: 0, nome: 'Reavivar', ref: 'Is 42.3', selo: ['Ainda tem brasa', 'debaixo da cinza'],
-      frase: 'O pavio ainda fumega. Deus está acendendo a sua chama de novo.' },
-    { de: 1, nome: 'Pavio aceso', ref: 'Lv 6.12', selo: ['A nossa geração tem lenha', 'pra queimar'],
+      frase: 'Deus não apaga a chama que quase não dá luz. Ele está acendendo a sua de novo.' },
+    { de: 1, nome: 'Fogo aceso', ref: 'Lv 6.12', selo: ['A nossa geração tem lenha', 'pra queimar'],
       frase: 'A chama acendeu, e quem acendeu foi Deus. A você cabe a lenha de cada manhã.' },
-    { de: 7, nome: 'Candeia', ref: 'Mt 25.4', selo: ['Não é fogo de palha', 'é azeite guardado'],
-      frase: 'Pavio sozinho acende e logo apaga. O que sustenta é o azeite guardado por dentro.' },
-    { de: 30, nome: 'Luz no velador', ref: 'Mt 5.15', selo: ['Essa chama', 'não se esconde'],
-      frase: 'O pavio queima à vista de todos. O azeite, ninguém vê.' },
+    { de: 7, nome: 'Fogo nos ossos', ref: 'Jr 20.9', selo: ['Não é fogo de palha', 'é fogo nos ossos'],
+      frase: 'Fogo de palha acende e logo apaga. A Palavra, guardada por dentro, queima como fogo nos ossos.' },
+    { de: 30, nome: 'Luz do mundo', ref: 'Mt 5.14', selo: ['Essa chama', 'não se esconde'],
+      frase: 'Um fogo aceso todo dia não fica escondido. Quem está por perto vê a luz.' },
     { de: 100, nome: 'Coração ardente', ref: 'Lc 24.32', selo: ['Coração que arde', 'não volta atrás'],
       frase: 'O coração arde quando a Escritura se abre.' },
     { de: 365, nome: 'Um ano na Palavra', ref: 'Lv 6.13', selo: ['Um ano de fogo', 'que não apagou'],

@@ -428,19 +428,19 @@
       'Desafios do dia: ' + feitas + ' de ' + c.missoes.lista.length, feitas === c.missoes.lista.length ? 'Todos feitos' : '<a href="#/missoes" data-ver-desafios>Ver os desafios</a>', 'desafios');
 
     // A frase do fim do dia, sempre no mesmo fio: quem acende é Deus, e o que mantém a chama
-    // é o azeite guardado por dentro, que ninguém vê. Varia com o dia para não virar refrão.
-    const FRASES_AZEITE = [
-      'Pavio sozinho acende e logo apaga. Cada leitura é azeite guardado por dentro.',
+    // é a lenha de cada manhã, como no altar de Levítico 6.12. Varia com o dia para não virar refrão.
+    const FRASES_FOGO = [
+      'Fogo de palha acende e logo apaga. Cada leitura é lenha que mantém o fogo aceso.',
       'O fogo que arde em você não foi você que acendeu. Cuidar dele é o seu trabalho de hoje.',
-      'O pavio queima do lado de fora, e todo mundo vê. O azeite fica do lado de dentro.',
+      'A chama todo mundo vê. A lenha de cada manhã, só você e Deus sabem.',
       'Não é chama passageira. É lenha posta cada manhã, como no altar que não se apagava.',
-      'O que separa quem permanece aceso de quem apaga no meio do caminho é o azeite guardado.',
-      'Deus está acendendo a sua chama. Volte amanhã para ela não faltar de azeite.',
+      'O que separa quem permanece aceso de quem apaga no meio do caminho é a lenha de cada dia.',
+      'Deus está acendendo a sua chama. Volte amanhã para não faltar lenha.',
       'Constância vale mais que intensidade. Um dia de cada vez mantém o fogo.',
     ];
     const frase = seq.atual === 1
-      ? 'Sua lamparina acendeu! O que mantém a chama é o azeite de cada dia. Volte amanhã!'
-      : FRASES_AZEITE[(sessao.dia - 1) % FRASES_AZEITE.length];
+      ? 'Seu fogo acendeu! O que mantém a chama é a lenha de cada dia. Volte amanhã!'
+      : FRASES_FOGO[(sessao.dia - 1) % FRASES_FOGO.length];
 
     return {
       semTopo: true,

@@ -28,6 +28,8 @@ export function aplicarExplorar(dados) {
         // a citação do versículo é trocada depois pelo texto das Bíblias do app
         // (versiculos-explorar.mjs), então não conta como diferença
         if (semCitacao(n.html) !== semCitacao(nova.html)) desatualizadas.push(id);
+        // a busca acompanha o texto que está na nota (correções feitas direto no html)
+        n.t = semAcento(n.nome + ' ' + textoPlano(n.html));
         continue;
       }
       n.html = nova.html;

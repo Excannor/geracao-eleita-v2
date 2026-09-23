@@ -696,7 +696,7 @@ Testemunha é quem conta o que viu e viveu. Você não precisa ser especialista 
 
 Muitas vezes a conversa começa com o jeito como você lida com um problema, com dinheiro, com a liderança num grupo, com o próprio erro.
 
-Em Mateus 5.14-16, Jesus diz que somos a luz do mundo e que a nossa luz deve brilhar diante das pessoas, pra que vejam o bem que fazemos e glorifiquem o Pai. É a mesma imagem da lamparina que acompanha a sua ofensiva aqui no app. Primeiro as pessoas veem, depois perguntam.
+Em Mateus 5.14-16, Jesus diz que somos a luz do mundo e que a nossa luz deve brilhar diante das pessoas, pra que vejam o bem que fazemos e glorifiquem o Pai. É a mesma imagem do fogo que acompanha a sua ofensiva aqui no app. Primeiro as pessoas veem, depois perguntam.
 
 As palavras continuam necessárias. Uma vida diferente sem explicação nenhuma faz as pessoas admirarem você, e Deus fica de fora. As duas coisas andam juntas.
 

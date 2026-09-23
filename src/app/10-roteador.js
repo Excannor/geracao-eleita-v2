@@ -113,13 +113,13 @@
       // para o próximo — aí o nome tem função, é um lugar aonde se chega.
       + '<p class="estagio-chama"><span>' + est.frase + '</span><br><b>' + est.ref + '</b>'
       + (est.proximo ? '<br><small>' + CC.plural(est.faltam, 'dia', 'dias') + ' para ' + est.proximo.nome + '</small>' : '') + '</p>'
-      + (seq.atual === 0 ? '<p class="passo-dica">Leia hoje para acender sua lamparina.</p>'
-        : (seq.feitoHoje ? '' : '<p class="passo-dica">O azeite de hoje ainda não entrou. Leia para manter a chama acesa!</p>'))
+      + (seq.atual === 0 ? '<p class="passo-dica">Leia hoje para acender o seu fogo.</p>'
+        : (seq.feitoHoje ? '' : '<p class="passo-dica">A lenha de hoje ainda não entrou. Leia para manter o fogo aceso!</p>'))
       + '<div class="semana-bolinhas">' + semana + '</div>'
       + '<p class="linha-escudos">' + [0, 1].map((i) => '<i class="' + (i < seq.escudos ? 'tem' : '') + '">' + CC.ico('escudo') + '</i>').join('')
       + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Um dia em branco usa um. Você ganha um todo mês e outro a cada 7 dias seguidos.</span></p>'
       + '<p class="linha-recorde"><span>Recorde</span><b>' + CC.plural(seq.recorde, 'dia', 'dias') + '</b></p>'
-      + (seq.recorde >= 7 ? '<p class="passo-dica pequena marcas-barro">As marcas no barro guardam até onde você já chegou. Até aqui nos ajudou o Senhor (1Sm 7.12).</p>' : '')
+      + (seq.recorde >= 7 ? '<p class="passo-dica pequena marcas-barro">Seu recorde guarda até onde você já chegou. Até aqui o Senhor nos ajudou! (1Sm 7.12)</p>' : '')
       + (amigos.length
         ? '<span class="etiqueta">Lendo junto</span><div class="lista-proposito">'
           + amigos.map((a) => '<span class="pessoa-proposito">' + CC.retratoAmigo(a, 'pequeno') + '<span class="quem"><b>'
@@ -267,8 +267,8 @@
     }
     if (seq.zerouEm && !seq.feitoHoje && seq.zerouEm >= CC.somaDias(hoje, -14) && lerLocal('cc.aviso.zerou') !== dono + ':' + seq.zerouEm) {
       gravarLocal('cc.aviso.zerou', dono + ':' + seq.zerouEm);
-      CC.folha('<div class="recomeco">' + CC.icoChama(0) + '<h2>O pavio ainda fumega</h2>'
-        + '<p>O azeite que você guardou não se perdeu: tudo o que leu continua aqui, e o seu recorde de '
+      CC.folha('<div class="recomeco">' + CC.icoChama(0) + '<h2>Ainda tem brasa</h2>'
+        + '<p>O que você leu não se perdeu: tudo continua aqui, e o seu recorde de '
         + CC.plural(seq.recorde, 'dia', 'dias') + ' também. Hoje é um novo dia para acender de novo.</p></div>'
         + '<div class="acoes"><button class="botao" data-ler>Reavivar hoje</button>'
         + '<button class="botao plano" data-fechar>Agora não</button></div>',
