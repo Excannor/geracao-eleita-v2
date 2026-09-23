@@ -409,78 +409,74 @@
     return 'narrativa';
   };
 
-  // Primeiro Deus, depois as pessoas, por último o dia de hoje: é o que evita transformar
-  // cada texto numa lição de moral. Lei e profecia passam por Jesus antes de chegar a nós.
+  // As perguntas dos dias sem reflexão escrita. Valem para qualquer trecho daquele tipo de
+  // texto, inclusive os difíceis (os amigos de Jó, que falam errado sobre Deus; profecias de
+  // juízo; as histórias violentas de Juízes), então não podem afirmar nada sobre a passagem:
+  // partem do que a pessoa leu e do que chamou a atenção dela. Nada de pergunta de aula ("por
+  // que o povo precisava ouvir isso naquele tempo?"), que quem acabou de se converter não sabe
+  // responder. Regras de escrita e de fidelidade: ferramentas/reflexoes/CLAUDE.md.
   CC.GENEROS = {
     narrativa: {
       nome: 'uma história',
       perguntas: [
-        ['Sobre Deus', 'O que Deus faz ou diz nesta história? O que isso mostra sobre quem ele é?'],
-        ['Sobre nós', 'Com quem da história você mais se parece hoje? Por quê?'],
-        ['Para hoje', 'Que confiança em Deus desta história você pode levar para o seu dia?'],
+        'Na leitura de hoje, o que Deus fez ou disse que chamou a sua atenção?',
+        'Tem alguém nessa história que passou por algo parecido com o que você vive agora? O que você quer conversar com Deus sobre isso?',
       ],
-      oracao: ['Senhor, nesta história eu vi que tu…', 'Eu me pareço com… quando…', 'Me ajuda hoje a confiar em ti em…'],
+      oracao: ['Senhor, na leitura de hoje eu vi…', 'Eu me identifiquei com… porque…', 'Me ajuda hoje a…'],
     },
     lei: {
       nome: 'instruções de Deus ao seu povo',
       perguntas: [
-        ['Sobre Deus', 'O que estas instruções mostram sobre o que Deus ama e o que ele rejeita?'],
-        ['Sobre nós', 'Por que Deus pediu isso ao seu povo naquele tempo?'],
-        ['Para hoje', 'Como Jesus cumpre isso, e o que muda na sua forma de amar a Deus e as pessoas?'],
+        'Que instrução da leitura de hoje mostra algo que importa para Deus?',
+        'Como você pode amar a Deus ou alguém perto de você hoje, de um jeito prático?',
       ],
-      oracao: ['Senhor, tu és santo e…', 'Obrigado porque Jesus cumpriu o que eu não consigo…', 'Me ensina a amar a ti e ao próximo em…'],
+      oracao: ['Senhor, eu vi que tu te importas com…', 'Obrigado porque Jesus cumpriu o que eu não consigo…', 'Me ensina a amar a ti e ao próximo em…'],
     },
     poesia: {
       nome: 'poesia e oração',
       perguntas: [
-        ['Sobre Deus', 'Que nome ou jeito de Deus aparece nestes versos?'],
-        ['Sobre nós', 'Que sentimento o autor leva até Deus? Você já sentiu algo parecido?'],
-        ['Para hoje', 'Que verso daqui você pode repetir para Deus ao longo do dia?'],
+        'Qual verso de hoje mais falou com você? Por quê?',
+        'Que frase daqui você pode transformar numa oração sua hoje?',
       ],
       oracao: ['Senhor, tu és…', 'Hoje o meu coração está…', 'Por isso eu te peço…'],
     },
     sabedoria: {
       nome: 'sabedoria',
       perguntas: [
-        ['Sobre Deus', 'O que este texto ensina sobre viver com respeito e confiança em Deus?'],
-        ['Sobre nós', 'Que escolha sábia ou tola aparece aqui?'],
-        ['Para hoje', 'Em que situação desta semana essa sabedoria faz diferença?'],
+        'Qual frase do texto de hoje mais mexeu com você? Por quê?',
+        'Em que situação desta semana você precisa da sabedoria de Deus?',
       ],
-      oracao: ['Senhor, tu és a fonte de toda sabedoria…', 'Reconheço que eu preciso de ti em…', 'Me dá sabedoria para…'],
+      oracao: ['Senhor, eu preciso da tua sabedoria em…', 'Hoje eu percebi que…', 'Me ajuda a escolher bem quando…'],
     },
     profecia: {
       nome: 'profecia',
       perguntas: [
-        ['Sobre Deus', 'O que Deus denuncia e o que ele promete neste trecho?'],
-        ['Sobre nós', 'Por que o povo precisava ouvir esta mensagem naquele tempo?'],
-        ['Para hoje', 'Onde esta promessa aponta para Jesus e para a esperança de hoje?'],
+        'No meio das palavras duras ou das promessas de hoje, o que você percebe que Deus quer do povo dele?',
+        'Tem alguma área da sua vida em que Deus está te chamando de volta para perto dele?',
       ],
-      oracao: ['Senhor, tu cumpres o que prometes…', 'Me perdoa quando eu…', 'Eu espero em ti por…'],
+      oracao: ['Senhor, tu cumpres o que prometes…', 'Me perdoa quando eu…', 'Eu quero voltar para perto de ti em…'],
     },
     evangelho: {
       nome: 'a vida de Jesus',
       perguntas: [
-        ['Sobre Deus', 'O que Jesus faz ou diz aqui? O que isso revela sobre ele?'],
-        ['Sobre nós', 'Como as pessoas reagem a Jesus nesta passagem? E você, como reagiria?'],
-        ['Para hoje', 'O que significa seguir Jesus nisso, hoje?'],
+        'O que Jesus fez ou disse na leitura de hoje que mais chamou a sua atenção?',
+        'Se você estivesse ali, perto de Jesus, o que você gostaria de dizer ou pedir para ele?',
       ],
-      oracao: ['Jesus, eu vi que tu…', 'Eu quero te seguir quando…', 'Me ajuda hoje a…'],
+      oracao: ['Jesus, eu vi que tu…', 'Se eu estivesse ali, eu te diria…', 'Me ajuda hoje a te seguir em…'],
     },
     carta: {
       nome: 'uma carta para a igreja',
       perguntas: [
-        ['Sobre Deus', 'O que esta carta ensina sobre Deus e sobre o que Jesus fez?'],
-        ['Sobre nós', 'Que problema ou pergunta os primeiros leitores estavam vivendo?'],
-        ['Para hoje', 'Que verdade daqui muda o jeito como você pensa ou age esta semana?'],
+        'Que frase da carta de hoje você quer guardar no coração? Por quê?',
+        'Que conselho dessa carta você pode colocar em prática esta semana?',
       ],
       oracao: ['Pai, obrigado porque em Jesus…', 'Hoje eu entendi que…', 'Me ajuda a viver isso em…'],
     },
     apocalipse: {
       nome: 'visões do fim da história',
       perguntas: [
-        ['Sobre Deus', 'O que este texto mostra sobre Deus reinando sobre a história?'],
-        ['Sobre nós', 'Que esperança isso dava a quem estava sofrendo?'],
-        ['Para hoje', 'Que medo seu essa esperança ajuda a enfrentar?'],
+        'Que imagem ou frase da leitura de hoje mostra que Deus está no controle?',
+        'Que medo seu você quer entregar a Deus hoje?',
       ],
       oracao: ['Senhor, tu reinas sobre…', 'Eu entrego a ti o medo de…', 'Vem, Senhor Jesus, e…'],
     },
