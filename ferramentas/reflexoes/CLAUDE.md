@@ -65,6 +65,24 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
 10. **Oração acompanha as perguntas.** Os três começos de oração conversam com o que foi
     perguntado, não acusam e terminam em "…".
 
+## Por que existe checagem automática
+
+Quem escreve com IA cita de memória, e a memória mistura traduções (ARA, ACF, NVI, NTLH)
+sem perceber: saiu "Deus proverá", "achou graça" e "cana rachada" em reflexões que diziam
+citar o texto. Ler a regra não impede o erro. Por isso as regras que dá para conferir por
+máquina estão no `ferramentas/teste-reflexoes.mjs`, e publicar exige que ele passe:
+
+- **reprova** citação entre aspas (12+ caracteres) que não exista, palavra por palavra, na
+  NBV da leitura do dia;
+- **reprova** expressão típica de outra tradução (lista `OUTRA_TRADUCAO`) que a NBV da leitura
+  não tenha. Cada erro novo desse tipo entra na lista;
+- **lista para conferir** todo número citado que não aparece na leitura. Contagem que o
+  próprio texto dá (cinco filhas, doze espiões, 7 + 7 anos) pode ficar; número trazido de
+  fora (os "quarenta anos" que vêm de Atos 7) sai;
+- **lista para revisar** pergunta com palavra de sentido bíblico próprio (regra 2).
+
+Nunca escrever citação de cabeça: copiar do `conteudo/biblias/nbv.json`.
+
 ## Como revisar (toda vez, antes de publicar)
 
 1. Para cada dia, abrir a leitura do dia e conferir cada fato citado (regra 1).

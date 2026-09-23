@@ -39,6 +39,19 @@ const SENSIVEIS = [
   ['perdão', 'perdão'], ['sacrifícios?', 'sacrifício'], ['ofertas?', 'oferta'], ['servos?', 'servo'],
 ].map(([raiz, nome]) => [palavra(raiz), nome]);
 const revisar = [];
+const conferir = [];
+
+// A NBV é a tradução que o app abre por padrão: é o texto que o leitor tem na frente.
+const normalizar = (s) => String(s).normalize('NFC').toLowerCase()
+  .replace(/[“”"'‘’«».,;:!?()[\]…—–-]/g, ' ').replace(/\s+/g, ' ').trim();
+const leituraNbv = (plano) => plano.trechos.map((t) => {
+  const caps = biblia.livros[t.livro] || [];
+  return caps.slice(t.de - 1, t.ate).map((c) => c.join(' ')).join(' ');
+}).join(' ');
+// Expressões conferidas como redação de outra tradução (ARA/ACF), já usadas por engano.
+const OUTRA_TRADUCAO = ['proverá', 'achou graça', 'cana rachada', 'mecha que fumega', 'casa da escravidão',
+  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai'].map(normalizar);
+const NUMERO = /(?<!\p{L})(\d+|três|quatro|cinco|seis|sete|oito|nove|dez|doze|catorze|quinze|vinte|trinta|quarenta|cinquenta|cem|cento|mil)(?!\p{L})/gu;
 
 // O versículo existe? A referência é conferida contra o texto que o app traz.
 function versiculoExiste(ref) {
@@ -99,6 +112,26 @@ for (const dia of dias) {
       }
     }
 
+    // Regra 1 do filtro, feita por máquina porque de memória a redação sai de outra tradução
+    // sem ninguém perceber ("Deus proverá", "achou graça"). Toda citação entre aspas tem de
+    // existir, palavra por palavra, na NBV da leitura do dia; expressão típica de outra
+    // tradução só passa se estiver nela.
+    const lido = normalizar(leituraNbv(plano));
+    const escrito = [r.texto, ...r.perguntas.map((p) => (typeof p === 'string' ? p : p[1]))].join(' ');
+    for (const m of escrito.matchAll(/["“]([^"”]+)["”]/g)) {
+      const citado = normalizar(m[1]);
+      if (citado.length >= 12 && !lido.includes(citado)) falhar(dia, 'citação que não está na NBV da leitura do dia: "' + m[1] + '"');
+    }
+    for (const expr of OUTRA_TRADUCAO) {
+      if (normalizar(escrito).includes(expr) && !lido.includes(expr)) falhar(dia, 'redação de outra tradução, a NBV da leitura não diz "' + expr + '"');
+    }
+    // Número citado que a leitura não tem vai para conferência: "quarenta anos" (Atos 7),
+    // "quatro palavras" (eram seis) e "mais de vinte anos" (conta nossa) já saíram errados.
+    const semCapitulo = normalizar(escrito).replace(/\b(capítulos?|versículos?|dia) \d+/g, ' ');
+    for (const n of new Set(semCapitulo.match(NUMERO) || [])) {
+      if (!lido.match(new RegExp('(?<!\\p{L})' + n + '(?!\\p{L})', 'u'))) conferir.push('dia ' + dia + ' · "' + n + '" não aparece na leitura');
+    }
+
     // Regra 2 do filtro (ferramentas/reflexoes/CLAUDE.md): palavra de sentido bíblico próprio
     // numa pergunta vai para revisão humana, e com mais cuidado se também está no texto,
     // onde pode estar em outro sentido (o caso real: "achou graça" no texto e "de graça"
@@ -125,6 +158,10 @@ for (const u of dados.unidades) {
   const tem = porUnidade[u.numero] || 0;
   const total = u.ate - u.de + 1;
   if (tem) console.log('    unidade ' + String(u.numero).padStart(2) + ': ' + tem + ' de ' + total + (tem === total ? ' · completa' : ''));
+}
+if (conferir.length) {
+  console.log('\n  conferir número (' + conferir.length + '): citado na reflexão e ausente da leitura do dia');
+  for (const linha of conferir) console.log('    ' + linha);
 }
 if (revisar.length) {
   console.log('\n  revisar sentido (' + revisar.length + '): palavra de sentido bíblico numa pergunta');
