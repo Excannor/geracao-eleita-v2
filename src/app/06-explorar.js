@@ -168,17 +168,23 @@
         + '<span class="passo-dica">Você leu os ' + total + ' passos. Toque para rever.</span></span></summary>'
         + listaComece(vistas, null) + '</details>';
     }
-    return '<section class="cartao comece" aria-label="Comece por aqui">'
-      + '<span class="etiqueta">Comece por aqui</span>'
-      + '<h2>Como ler e entender a Bíblia</h2>'
-      + '<p class="passo-dica">' + total + ' textos curtos, nesta ordem. ' + (feitos ? 'Você já leu ' + feitos + ' de ' + total + '.' : 'De 2 a 6 minutos cada.') + '</p>'
-      + '<div class="barra-comece" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + feitos + '" aria-label="' + feitos + ' de ' + total + ' passos lidos">'
-      + '<i style="width:' + Math.round((feitos / total) * 100) + '%"></i></div>'
+    // Fechado, é só um cartão com o título e o progresso; aberto, mostra a trilha. Fica
+    // fechado de início para não empurrar o resto do Explorar para baixo.
+    return '<details class="cartao comece"' + (comeceAberto ? ' open' : '') + ' data-comece>'
+      + '<summary><span class="cabeca-comece"><span class="etiqueta">Comece por aqui</span>'
+      + '<b>Como ler e entender a Bíblia</b>'
+      + '<span class="passo-dica">' + (feitos ? feitos + ' de ' + total + ' passos lidos' : total + ' textos curtos, de 2 a 6 minutos cada') + '</span>'
+      + '<span class="barra-comece" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + feitos + '" aria-label="' + feitos + ' de ' + total + ' passos lidos">'
+      + '<i style="width:' + Math.round((feitos / total) * 100) + '%"></i></span></span>'
+      + '<span class="seta-comece" aria-hidden="true">' + CC.ico('baixo') + '</span></summary>'
+      + '<div class="corpo-comece">'
       + '<a class="botao azul" href="' + hrefNota(proximo) + '">' + (feitos ? 'Continuar: ' : 'Começar: ') + CC.esc(nomeDe(proximo)) + '</a>'
       + listaComece(vistas, proximo)
       + (D.licoes.length ? '<a class="link-passos" href="#/passos">' + CC.ico('bandeira') + 'Acabou de chegar à fé? Comece pelos Primeiros passos</a>' : '')
-      + '</section>';
+      + '</div></details>';
   }
+  // Aberto ou fechado, o cartão continua como a pessoa deixou enquanto ela anda pelo app.
+  let comeceAberto = false;
 
   function listaComece(vistas, proximo) {
     return '<ol class="lista-comece">' + COMECE.map(([id, porque], i) => {
@@ -243,6 +249,8 @@
       + (terminou ? comece : '')
       + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
     CC.ligarBusca(raiz);
+    const cartaoComece = raiz.querySelector('[data-comece]');
+    if (cartaoComece) cartaoComece.addEventListener('toggle', () => { comeceAberto = cartaoComece.open; });
   };
 
   // ---------- uma seção ----------

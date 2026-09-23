@@ -2339,10 +2339,18 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .rolagem-tabela { overflow-x: auto; }
 
 /* ---------- comece por aqui (Explorar) ---------- */
-.comece { display: grid; gap: 10px; margin: 14px 0; }
-.comece h2 { margin: 0; color: var(--tinta-forte); font-size: 1.3rem; }
+.comece { display: block; margin: 14px 0; }
 .comece .passo-dica { margin: 0; }
-.barra-comece { height: 8px; border-radius: 999px; background: var(--progresso-trilho, var(--borda)); overflow: hidden; }
+.comece:not(.feito) > summary { display: flex; align-items: center; gap: 12px; cursor: pointer; list-style: none; }
+.comece > summary::-webkit-details-marker { display: none; }
+.comece > summary:focus-visible { outline: 3px solid var(--azul); outline-offset: 4px; border-radius: var(--raio-p); }
+.cabeca-comece { flex: 1; display: grid; gap: 4px; min-width: 0; }
+.cabeca-comece b { color: var(--tinta-forte); font-size: 1.15rem; }
+.seta-comece { flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--fundo-2); color: var(--tinta-fraca); }
+.seta-comece svg { width: 20px; height: 20px; transition: transform .2s ease; }
+.comece[open] .seta-comece svg { transform: rotate(180deg); }
+.corpo-comece { display: grid; gap: 10px; margin-top: 14px; }
+.barra-comece { display: block; height: 8px; margin-top: 4px; border-radius: 999px; background: var(--progresso-trilho, var(--borda)); overflow: hidden; }
 .barra-comece i { display: block; height: 100%; min-width: 4px; border-radius: 999px; background: var(--acento); }
 .lista-comece { display: grid; gap: 2px; margin: 4px 0 0; padding: 0; list-style: none; }
 .lista-comece a { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 4px; border-radius: var(--raio-p); color: var(--tinta); text-decoration: none; }
