@@ -82,7 +82,15 @@
     CC.folha('<div class="folha-ofensiva">'
       + '<div class="chama-grande' + (seq.atual ? '' : ' apagada') + '">' + CC.icoChama(seq.atual) + '<b>' + seq.atual + '</b>'
       + '<span>' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + (seq.atual ? '!' : '') + '</span></div>'
-      + '<p class="estagio-chama"><b>' + est.nome + '</b> · ' + est.ref + '<br><span>' + est.frase + '</span>'
+      // O carimbo vem logo abaixo da contagem, na arte do onboarding: ele comenta o número
+      // que está ali em cima, em vez de abrir a folha como um cartaz solto.
+      + '<div class="selo-lema selo-ofensiva">'
+      + (est.selo || []).map((l) => '<span class="selo-linha">' + CC.esc(l) + '</span>').join('')
+      + '</div>'
+      // O nome do estágio saiu daqui: sozinho e em negrito, ele era um rótulo solto que não
+      // se explicava. O que fica é a frase com o versículo de onde ela vem, e o quanto falta
+      // para o próximo — aí o nome tem função, é um lugar aonde se chega.
+      + '<p class="estagio-chama"><span>' + est.frase + '</span><br><b>' + est.ref + '</b>'
       + (est.proximo ? '<br><small>' + CC.plural(est.faltam, 'dia', 'dias') + ' para ' + est.proximo.nome + '</small>' : '') + '</p>'
       + (seq.atual === 0 ? '<p class="passo-dica">Leia hoje para acender sua lamparina.</p>'
         : (seq.feitoHoje ? '' : '<p class="passo-dica">O azeite de hoje ainda não entrou. Leia para manter a chama acesa!</p>'))
@@ -102,6 +110,16 @@
       rotulo: 'Ofensiva',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-ver-amigos]').onclick = () => { fechar(); location.hash = '#/novidades'; };
+        // A frase do carimbo muda a cada estágio (CC.ESTAGIOS_CHAMA) e algumas são mais
+        // compridas que outras. Em vez de fixar um tamanho que sobra pras curtas e estoura
+        // nas longas, cada linha encolhe só o necessário para caber na largura da folha.
+        folha.querySelectorAll('.selo-linha').forEach((linha) => {
+          let tamanho = parseFloat(getComputedStyle(linha).fontSize);
+          for (let i = 0; i < 12 && linha.scrollWidth > linha.clientWidth + 1; i++) {
+            tamanho *= 0.94;
+            linha.style.fontSize = tamanho + 'px';
+          }
+        });
       },
     });
   };

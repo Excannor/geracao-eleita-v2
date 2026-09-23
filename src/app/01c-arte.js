@@ -20,13 +20,22 @@
   // cresce, não o vaso (2Co 4.7). Quando a ofensiva zera, a lamparina não fica cinza nem
   // some: o pavio ainda fumega, com uma brasa, e o convite é reavivar (Is 42.3).
   // O estágio é só da própria pessoa: amigos e Feed nunca veem o tamanho da chama.
+  // "selo" são as duas linhas do carimbo na folha da ofensiva, no tom da marca. Muda a cada
+  // estágio de propósito: uma frase só, fixa, seria a mesma no primeiro dia e no ano inteiro,
+  // e aí ela deixa de dizer onde a pessoa chegou.
   const ESTAGIOS = [
-    { de: 0, nome: 'Reavivar', ref: 'Is 42.3', frase: 'O pavio ainda fumega. Deus está acendendo a sua chama de novo.' },
-    { de: 1, nome: 'Pavio aceso', ref: 'Lv 6.12', frase: 'A chama acendeu, e quem acendeu foi Deus. A você cabe a lenha de cada manhã.' },
-    { de: 7, nome: 'Candeia', ref: 'Mt 25.4', frase: 'Pavio sozinho acende e logo apaga. O que sustenta é o azeite guardado por dentro.' },
-    { de: 30, nome: 'Luz no velador', ref: 'Mt 5.15', frase: 'O pavio queima à vista de todos. O azeite, ninguém vê.' },
-    { de: 100, nome: 'Coração ardente', ref: 'Lc 24.32', frase: 'O coração arde quando a Escritura se abre.' },
-    { de: 365, nome: 'Um ano na Palavra', ref: 'Lv 6.13', frase: 'Um ano de fogo que não se apagou sobre o altar.' },
+    { de: 0, nome: 'Reavivar', ref: 'Is 42.3', selo: ['Ainda tem brasa', 'debaixo da cinza'],
+      frase: 'O pavio ainda fumega. Deus está acendendo a sua chama de novo.' },
+    { de: 1, nome: 'Pavio aceso', ref: 'Lv 6.12', selo: ['A nossa geração tem lenha', 'pra queimar'],
+      frase: 'A chama acendeu, e quem acendeu foi Deus. A você cabe a lenha de cada manhã.' },
+    { de: 7, nome: 'Candeia', ref: 'Mt 25.4', selo: ['Não é fogo de palha', 'é azeite guardado'],
+      frase: 'Pavio sozinho acende e logo apaga. O que sustenta é o azeite guardado por dentro.' },
+    { de: 30, nome: 'Luz no velador', ref: 'Mt 5.15', selo: ['Essa chama', 'não se esconde'],
+      frase: 'O pavio queima à vista de todos. O azeite, ninguém vê.' },
+    { de: 100, nome: 'Coração ardente', ref: 'Lc 24.32', selo: ['Coração que arde', 'não volta atrás'],
+      frase: 'O coração arde quando a Escritura se abre.' },
+    { de: 365, nome: 'Um ano na Palavra', ref: 'Lv 6.13', selo: ['Um ano de fogo', 'que não apagou'],
+      frase: 'Um ano de fogo que não se apagou sobre o altar.' },
   ];
   CC.ESTAGIOS_CHAMA = ESTAGIOS;
   CC.estagioDaChama = (dias) => {

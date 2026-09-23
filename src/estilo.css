@@ -2644,9 +2644,44 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 :root[data-tema="escuro"] .balao.balao-bau { color: var(--amarelo); }
 /* nome e versículo do estágio da chama, na folha da ofensiva */
 .estagio-chama { margin: 4px 0 14px; text-align: center; color: var(--tinta-fraca); font-size: 0.92rem; line-height: 1.45; }
-.estagio-chama b { color: var(--chama-texto); font-size: 1.05rem; }
-.estagio-chama span { color: var(--tinta); }
+/* a referência do versículo, não mais o nome do estágio */
+.estagio-chama b { color: var(--chama-texto); font-size: 0.86rem; letter-spacing: .04em; }
+.estagio-chama span { color: var(--tinta); font-size: 1rem; }
 .estagio-chama small { color: var(--tinta-fraca); font-weight: 800; }
+
+/* ---------- carimbo do lema ----------
+   A mesma arte do onboarding, trazida para dentro do app: chapas retas, letra de marcador
+   enchendo o bloco, e um empurrãozinho lateral em cada linha no lugar de rotação. A chapa
+   inverte com o tema, senão ela some no fundo preto. O portal (entrar.html) repete estas
+   regras na mão, porque é uma página à parte e não carrega este arquivo. */
+/* min-width:0 evita que uma frase comprida (nowrap) empurre a trilha do grid da folha
+   inteira: sem isso, o carimbo mais longo alargava a folha e cortava até a fileira dos
+   dias da semana lá embaixo, que não tem nada a ver com ele. */
+.selo-lema { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.selo-linha { position: relative; isolation: isolate; display: block; width: fit-content; max-width: 100%;
+  margin-top: -3px; padding: 8px 18px 4px; color: var(--fundo); font-family: 'Permanent Marker', cursive;
+  font-size: clamp(.95rem, 5.6vw, 1.35rem); line-height: 1.12; letter-spacing: .02em;
+  text-transform: uppercase; text-align: center; white-space: nowrap; overflow: hidden; }
+/* A tinta é um pseudo-elemento atrás do texto, e não o fundo da caixa: mascarar a caixa
+   mascararia as letras junto, comendo as bordas delas. A forma vem de um SVG embutido
+   (nada de arquivo externo: o app precisa abrir offline), esticado no tamanho do bloco —
+   é o que dá a borda irregular de pincel em vez de um retângulo chapado. */
+.selo-linha::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--tinta-forte);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60' preserveAspectRatio='none'%3E%3Cpath d='M3 11C42 5 84 12 124 7 168 2 214 11 256 6c18-2 34 3 42 0l0 44c-20 7-46-2-82 4-44 7-90-4-134 2-30 4-58-5-80 0z' fill='%23fff'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60' preserveAspectRatio='none'%3E%3Cpath d='M3 11C42 5 84 12 124 7 168 2 214 11 256 6c18-2 34 3 42 0l0 44c-20 7-46-2-82 4-44 7-90-4-134 2-30 4-58-5-80 0z' fill='%23fff'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+}
+/* a segunda pincelada é espelhada, para as linhas não saírem do mesmo carimbo */
+.selo-lema > :nth-child(even)::before { transform: scaleX(-1); }
+.selo-linha:first-child { margin-top: 0; }
+.selo-lema > :nth-child(1) { transform: translateX(3px); }
+.selo-lema > :nth-child(2) { transform: translateX(-8px); }
+.selo-lema > :nth-child(3) { transform: translateX(6px); }
+.selo-ofensiva { margin: 6px 0 16px; }
 .marcas-barro { text-align: center; margin: -4px 0 12px; }
 .arte-chama .brasa { animation: brasa 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 50%; }
 @keyframes brasa { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
