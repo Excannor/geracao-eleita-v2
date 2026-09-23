@@ -277,3 +277,27 @@ Nunca escrever citação de cabeça: copiar do `conteudo/biblias/nbv.json`.
    palavras da regra 2: cada uma tem de ser olhada por alguém, não é aviso para ignorar.
 3. Passar cada pergunta pelas regras 3 a 8.
 4. O que for teologicamente delicado vai para o dono antes de publicar.
+
+## Explorar (as 546 notas)
+
+As regras de fidelidade valem também para o Explorar, com três pontos próprios:
+
+1. **O texto bíblico vem das Bíblias do app.** O material de origem citava a NVI 2023, que
+   não tem licença para o aplicativo. O blockquote das notas de versículo é preenchido por
+   `ferramentas/versiculos-explorar.mjs` com a NBV e a Bíblia Livre, e o app mostra a
+   tradução escolhida (`CC.textoDaNota`). Nunca colar texto da NVI ou da ARA numa nota.
+2. **Paráfrase com referência segue a NBV.** Quando a nota diz "João 1.9 diz que...", o que
+   vem depois tem de ser o que a NBV diz, porque é o que o leitor encontra ao abrir. Achados
+   na Trilha: "amabilidade" (NVI) onde a NBV diz "retidão" (Gl 5.22), "templo" onde diz
+   "morada" (1 Co 6.19), "resgate" onde diz "salvar" (Mc 10.45). Citação entre aspas: copiar
+   da NBV.
+3. **Onde mexer.** Cada pasta tem a sua fonte: Trilha em `primeiros-passos.mjs`, Pessoas em
+   `pessoas-a/b/c.mjs` (as duas são aplicadas de novo a cada rodada), o resto em
+   `ferramentas/explorar/*.json`. Nesse último, a nota já aplicada no `conteudo.json` só
+   continua em dia se as duas cópias mudarem juntas (a fonte e o `conteudo.json`); mudar só
+   a fonte faz a nota aparecer como "desatualizada".
+
+Checagem: `node ferramentas/teste-explorar.mjs [pasta]` confere que toda referência existe
+(livro de um capítulo só aceita "Judas 24"; faixa entre capítulos, "Gênesis 29.31-30.24") e
+lista as citações entre aspas que não estão na NBV nem na Bíblia Livre, para conferir uma a
+uma: nem toda é erro, muitas são frases do autor ou falas de exemplo.

@@ -214,6 +214,10 @@ const CC = contexto.window.CC;
     || n.texto !== n.versos.nbv || !n.html.includes('<blockquote data-verso='));
   checar(versiculos.length > 100 && !foraDasBiblias.length, 'as notas de versículo do Explorar trazem o texto da NBV e da Bíblia Livre, e não o da NVI'
     + (foraDasBiblias.length ? ' (' + foraDasBiblias.slice(0, 5).map((n) => n.nome).join(', ') + ')' : ''));
+  const livros = Object.values(D.notas).filter((n) => n.pasta === '03 - Livros da Bíblia' && /<h2>Versículo-chave<\/h2>/.test(n.html));
+  const chaveForaDasBiblias = livros.filter((n) => !n.versos || !n.versos.nbv || !n.versos.blivre || !/<h2>Versículo-chave<\/h2>\s*<blockquote data-verso=/.test(n.html));
+  checar(livros.length === 66 && !chaveForaDasBiblias.length, 'o versículo-chave dos 66 livros vem da NBV e da Bíblia Livre'
+    + (chaveForaDasBiblias.length ? ' (' + chaveForaDasBiblias.slice(0, 5).map((n) => n.nome).join(', ') + ')' : ''));
 }
 const dias = (ini, n) => Array.from({ length: n }, (_, i) => somaDias(ini, i));
 

@@ -11,6 +11,7 @@ import { esc, semAcento, textoPlano } from './texto-app.mjs';
 const PASTA_BIBLIAS = join(dirname(fileURLToPath(import.meta.url)), '..', 'conteudo', 'biblias');
 const ORDEM = ['nbv', 'blivre'];
 export const PASTA_VERSICULOS = '08 - Versículos';
+export const PASTA_LIVROS = '03 - Livros da Bíblia';
 export const REF = /^(.+?) (\d+)\.(\d+)(?:-(\d+))?$/;
 
 let cache = null;
@@ -40,11 +41,42 @@ export function textoDaReferencia(biblia, ref) {
 // troca de tradução conte como diferença.
 export const semCitacao = (html) => String(html).replace(/<blockquote[^>]*>[\s\S]*?<\/blockquote>/, '<blockquote></blockquote>');
 
+// "(2 Coríntios 12:9)", "(Ageu 1:7-8)", "(Judas 24)": a referência que fecha o versículo-chave
+// das notas de livro, escrita com dois-pontos. Livro de um capítulo só vem sem capítulo.
+function refDoVersiculoChave(biblia, citacao) {
+  // "12:9" no material de origem; "12.9" depois de aplicado uma vez (a <cite> que fica)
+  const m = /\(([^()]+?) (\d+)(?:[:.](\d+)(?:-(\d+))?)?\)\s*$/.exec(citacao.replace(/<[^>]+>/g, ''));
+  if (!m || !biblia.livros[m[1]]) return '';
+  if (!m[3]) return biblia.livros[m[1]].length === 1 ? m[1] + ' 1.' + m[2] : '';
+  return m[1] + ' ' + m[2] + '.' + m[3] + (m[4] ? '-' + m[4] : '');
+}
+
 export function aplicarTextoDosVersiculos(dados) {
   const lista = biblias();
   let trocadas = 0;
   const semTexto = [];
   if (!lista.length) return { trocadas, semTexto };
+  // O versículo-chave das notas de livro também vinha da NVI.
+  for (const [id, n] of Object.entries(dados.notas)) {
+    if (n.pasta !== PASTA_LIVROS) continue;
+    const m = /(<h2>Versículo-chave<\/h2>\s*)<blockquote[^>]*>([\s\S]*?)<\/blockquote>/.exec(n.html);
+    if (!m) continue;
+    const citacao = m[2].includes('<cite>') ? '(' + m[2].split('<cite>')[1].replace(/<\/cite>/, '') + ')' : m[2];
+    const ref = refDoVersiculoChave(lista[0], citacao);
+    const versos = {};
+    for (const b of lista) {
+      const t = ref && textoDaReferencia(b, ref);
+      if (t) versos[b.sigla] = t;
+    }
+    const principal = versos[lista[0].sigla];
+    if (!principal) { semTexto.push(id); continue; }
+    const visivel = ref.replace(/ 1\.(\d+)$/, (s, v) => (lista[0].livros[ref.split(' 1.')[0]].length === 1 ? ' ' + v : s));
+    n.versos = versos;
+    n.html = n.html.replace(m[0], m[1] + '<blockquote data-verso="' + esc(ref) + '">' + esc(principal)
+      + '<cite>' + esc(visivel) + '</cite></blockquote>');
+    n.t = semAcento(n.nome + ' ' + textoPlano(n.html));
+    trocadas++;
+  }
   for (const [id, n] of Object.entries(dados.notas)) {
     if (n.pasta !== PASTA_VERSICULOS || !REF.test(n.nome)) continue;
     const versos = {};

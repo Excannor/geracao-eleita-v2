@@ -26,7 +26,7 @@ Quase sempre a dúvida nasce de olhar pra si mesmo. A pessoa mede o próprio dia
 
 Efésios 2.8-9 diz que somos salvos pela graça, por meio da fé, e que isso vem de Deus como presente. Ninguém ganhou por merecer, e por isso ninguém tem do que se gabar.
 
-Pensa assim: se você não conquistou a salvação com esforço, também não é o seu esforço que vai mantê-la de pé. Paulo faz essa pergunta aos gálatas (Gálatas 3.3): vocês começaram pelo Espírito e agora querem terminar pela própria força?
+Pensa assim: se você não conquistou a salvação com esforço, também não é o seu esforço que vai mantê-la de pé. Paulo pergunta aos gálatas (Gálatas 3.3) por que achavam que, depois de começar a vida com Deus sem nenhum mérito, iam ficar mais fortes na fé tentando cumprir regras por conta própria.
 
 Jesus usa uma imagem bonita em João 10.28-29. Ele dá vida eterna às suas ovelhas, e ninguém consegue arrancá-las da mão do Pai. Quem segura a ovelha é o pastor.
 
@@ -103,7 +103,7 @@ E se ele não fosse as duas coisas, não haveria ponte entre nós e Deus. 1 Tim�
 
 ## O que ele fez
 
-Jesus viveu uma vida de obediência completa, coisa que nenhum de nós conseguiu. Morreu carregando uma condenação que era nossa. Em Marcos 10.45 ele mesmo diz que veio pra servir e dar a vida como resgate por muitos.
+Jesus viveu uma vida de obediência completa, coisa que nenhum de nós conseguiu. Morreu carregando uma condenação que era nossa. Em Marcos 10.45 ele mesmo diz que veio pra servir e dar a vida pra salvar muitos.
 
 E ressuscitou. Paulo diz em 1 Coríntios 15.14-17 que tudo depende disso: se Cristo não ressuscitou, a fé de vocês é inútil e vocês continuam nos seus pecados.
 
@@ -340,7 +340,7 @@ O Espírito dá vida nova a quem estava longe de Deus (Tito 3.5; João 3.5-6). J
 
 Ele também é um selo (Efésios 1.13-14). Naquele tempo, o selo mostrava a quem uma coisa pertencia e garantia que o combinado seria cumprido. O Espírito em você é a garantia de que Deus vai completar o que prometeu.
 
-E ele produz fruto: amor, alegria, paz, paciência, amabilidade, bondade, fidelidade, mansidão e domínio próprio (Gálatas 5.22-23). Fruto cresce na árvore aos poucos. Você participa, cuidando da sua vida com Deus, e quem faz crescer é o Espírito.
+E ele produz fruto: amor, alegria, paz, paciência, retidão, bondade, fidelidade, mansidão e domínio próprio (Gálatas 5.22-23). Fruto cresce na árvore aos poucos. Você participa, cuidando da sua vida com Deus, e quem faz crescer é o Espírito.
 
 ## Dons
 
@@ -440,7 +440,7 @@ Você vai errar de novo. Todo cristão erra. O jeito como você lida com isso mo
 
 É fácil pensar em pecado como uma lista de coisas proibidas. A Bíblia vai mais fundo. Pecado é tudo o que se afasta do caráter e da vontade de Deus, em pensamento, palavra, atitude ou omissão. Romanos 3.23 diz que todos pecaram e estão longe da glória de Deus.
 
-A Bíblia usa a imagem de errar o alvo. Você foi criado pra refletir quem Deus é, e o pecado desvia disso. Por isso orgulho escondido, indiferença com quem sofre e amor colocado no lugar errado também são pecado, tanto quanto as coisas que todo mundo vê.
+Uma das palavras que a Bíblia usa pra pecado, na língua original, tem a ideia de errar o alvo. Você foi criado pra refletir quem Deus é, e o pecado desvia disso. Por isso orgulho escondido, indiferença com quem sofre e amor colocado no lugar errado também são pecado, tanto quanto as coisas que todo mundo vê.
 
 Entender isso evita dois enganos: achar que pecado é só o que está na lista, ou achar que está tudo bem porque você não faz as coisas mais óbvias dela.
 
@@ -460,7 +460,7 @@ Arrependimento tem três partes: admitir o erro sem desculpa, mudar de direção
 
 ## Quando o mesmo pecado volta
 
-1 João 1.9 traz uma promessa central: se confessarmos os nossos pecados, Deus é fiel e justo pra nos perdoar e nos limpar de toda injustiça. Repare no que o texto deixa de fora. Ele não coloca limite de tentativas nem exige garantia de que você nunca mais vai falhar. Ele pede confissão sincera.
+1 João 1.9 traz uma promessa central: se confessarmos os nossos pecados, Deus é fiel e justo pra perdoar os nossos pecados e nos limpar de toda maldade. Repare no que o texto deixa de fora. Ele não coloca limite de tentativas nem exige garantia de que você nunca mais vai falhar. Ele pede confissão sincera.
 
 Isso vale também pro pecado que insiste em voltar. A mesma promessa cobre a primeira queda e a vigésima.
 
@@ -496,7 +496,7 @@ A lição anterior falou de pecado e perdão. Esta fala de quem você passa a se
 
 ## Adotado por Deus
 
-Efésios 1.5 diz que Deus, por amor, decidiu nos adotar como filhos por meio de Jesus Cristo. No mundo romano, a adoção era um ato legal e definitivo. O adotado passava a ter os mesmos direitos de um filho de sangue, inclusive a herança.
+Efésios 1.5 diz que o plano de Deus sempre foi nos adotar na família dele, por meio de Jesus Cristo. No mundo romano, a adoção era um ato legal e definitivo. O adotado passava a ter os mesmos direitos de um filho de sangue, inclusive a herança.
 
 Romanos 8.15 completa: você não recebeu um espírito que te faz viver com medo, como escravo. Recebeu o Espírito que te faz filho ou filha, e por isso pode chamar Deus de Aba, Pai. Você chega perto de Deus como alguém que já tem lugar na casa. Ninguém precisa bater ponto pra continuar sendo da família.
 
@@ -628,7 +628,7 @@ Nenhum dos dois textos elogia agenda lotada. Eles pedem intenção. De vez em qu
 
 ## Corpo e trabalho
 
-1 Coríntios 6.19-20 diz que o seu corpo é templo do Espírito Santo, que você foi comprado por um preço e que deve honrar a Deus com o corpo. Isso alcança muita coisa: sono, alimentação, saúde, sexualidade e o jeito como você trata o próprio corpo e o dos outros.
+1 Coríntios 6.19-20 diz que o seu corpo é morada do Espírito Santo, que Deus comprou você por um preço alto e que você deve glorificar a Deus com o corpo. Isso alcança muita coisa: sono, alimentação, saúde, sexualidade e o jeito como você trata o próprio corpo e o dos outros.
 
 Sobre trabalho, Colossenses 3.23 orienta fazer tudo de coração, como quem trabalha pro Senhor. Isso vale pro estágio, pro emprego, pra prova da faculdade e pra louça em casa. Na Bíblia, um trabalho comum feito com integridade honra a Deus tanto quanto uma função na igreja.
 

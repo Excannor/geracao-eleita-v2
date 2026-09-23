@@ -2415,6 +2415,7 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .nota-corpo li { margin-bottom: 6px; }
 .nota-corpo blockquote { margin: 16px 0; padding: 14px 16px; border-radius: var(--raio); background: var(--azul-fraco); font-style: italic; }
 .nota-corpo blockquote p:last-child { margin-bottom: 0; }
+.nota-corpo blockquote cite { display: block; margin-top: 8px; font-style: normal; font-size: 0.85rem; font-weight: 700; color: var(--tinta-suave, inherit); }
 .nota-corpo table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
 .nota-corpo th, .nota-corpo td { border: 1px solid var(--borda); padding: 8px 10px; text-align: left; vertical-align: top; }
 .nota-corpo th { background: var(--fundo-2); font-weight: 800; }

@@ -87,7 +87,8 @@
   };
   CC.htmlDaNota = function (n) {
     if (!n || !n.versos) return n ? n.html : '';
-    return n.html.replace(/(<blockquote data-verso="[^"]*">)[\s\S]*?(<\/blockquote>)/,
+    // a referência em <cite>, no versículo-chave das notas de livro, fica
+    return n.html.replace(/(<blockquote data-verso="[^"]*">)[\s\S]*?(<cite>[\s\S]*?<\/cite><\/blockquote>|<\/blockquote>)/,
       (_, abre, fecha) => abre + CC.esc(CC.textoDaNota(n)) + fecha);
   };
 

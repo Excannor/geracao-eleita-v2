@@ -68,7 +68,10 @@ for (const [id, n] of Object.entries(D.notas)) {
     if (!/^\p{L}/u.test(m[1].trim()) || /[():]/.test(m[1])) continue;
     const alvo = normalizar(m[1]);
     if (alvo.split(' ').length < 4) continue;
-    if (corrido.some((c) => c.includes(' ' + alvo + ' '))) continue;
+    // Citação com reticências ("Se uma delas cair... Uma corda trançada") pula um trecho:
+    // cada pedaço tem de estar na mesma tradução.
+    const pedacos = m[1].split(/\.\.\.|…/).map(normalizar).filter(Boolean);
+    if (corrido.some((c) => pedacos.every((p) => c.includes(' ' + p + ' ')))) continue;
     citacoes.push([id, m[1].trim()]);
   }
 }
