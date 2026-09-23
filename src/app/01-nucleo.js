@@ -125,16 +125,12 @@ window.CC = window.CC || {};
     // livro aberto, dos dias lidos
     livro: (a, b) => '<path d="M4 10c7-3 14-3 20 1v30c-6-4-13-4-20-1z" fill="' + a + '"/>'
       + '<path d="M44 10c-7-3-14-3-20 1v30c6-4 13-4 20-1z" fill="' + b + '"/>',
-    // a lamparina de barro com a chama no bico
-    chama: (a, b) => '<path d="M13 2c2 5 9 9 10 15 1 6-3 10-8 10s-9-4-8-9c1 3 3 4 5 4-1-7 0-14 1-20z" fill="' + a + '"/>'
-      + '<path d="M15 15c1 3 4 5 4 8 0 3-2 4-4 4s-4-1-4-4c0-3 3-5 4-8z" fill="' + b + '"/>'
-      + '<path d="M7 31c6-5 24-7 34-4 6 2 6 7 3 11-6 6-22 8-31 4-5-2-8-6-6-11z" fill="#d4843f"/>'
-      + '<path d="M12 31c8-4 22-5 30-2 1 1 1 2 0 3-9-3-21-2-30 1z" fill="#eeae6b"/>'
-      + '<path d="M44 28c5 0 5 8 0 8" fill="none" stroke="#d4843f" stroke-width="3" stroke-linecap="round"/>',
-    'chama-apagada': () => '<path d="M15 26c-4-4 3-7-1-11-3-3 2-6 0-10" fill="none" stroke="#9aa7b0" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>'
-      + '<path d="M7 31c6-5 24-7 34-4 6 2 6 7 3 11-6 6-22 8-31 4-5-2-8-6-6-11z" fill="#9aa7b0"/>'
-      + '<path d="M12 31c8-4 22-5 30-2 1 1 1 2 0 3-9-3-21-2-30 1z" fill="#c9d0d5"/>'
-      + '<path d="M44 28c5 0 5 8 0 8" fill="none" stroke="#9aa7b0" stroke-width="3" stroke-linecap="round"/>',
+    // fogo, o mesmo da ofensiva (a lamparina de barro saiu do app)
+    chama: (a, b) => '<path d="M24 4c3 7 12 12 12 22 0 9-6 16-12 16s-12-7-12-16c0-6 3-10 6-13 0 5 2 8 5 9-2-7-1-13 1-18z" fill="' + a + '"/>'
+      + '<path d="M24 24c2 4 6 7 6 11 0 4-3 7-6 7s-6-3-6-7c0-4 4-7 6-11z" fill="' + b + '"/>',
+    // brasa apagada: só a fumaça subindo
+    'chama-apagada': () => '<path d="M24 42c-6-5 4-9-1-15-4-5 3-9 0-15" fill="none" stroke="#9aa7b0" stroke-width="3" stroke-linecap="round" opacity=".7"/>'
+      + '<path d="M16 44h16" stroke="#9aa7b0" stroke-width="3" stroke-linecap="round"/>',
     escudo: (a, b) => '<path d="M24 4 40 10v12c0 11-7 19-16 22C15 41 8 33 8 22V10z" fill="' + a + '"/>'
       + '<path d="M24 4v40C15 41 8 33 8 22V10z" fill="' + b + '" opacity=".5"/>',
     sino: (a, b) => '<path d="M24 5c-8 0-13 6-13 14v8l-4 7h34l-4-7v-8c0-8-5-14-13-14z" fill="' + a + '"/>'

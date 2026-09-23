@@ -1,4 +1,4 @@
-/* Desafios: os três do dia, praticar os versículos, o quadro do mês e a leitura da semana com os amigos.
+/* Desafios: os três do dia, praticar os versículos, e a leitura da semana com os amigos.
    (O arquivo e a rota continuam com o nome antigo, "missões", para não quebrar links guardados.) */
 (function (CC) {
   'use strict';
@@ -17,21 +17,6 @@
       + '<span>' + m.valor + ' / ' + m.alvo + '</span></div></div>'
       + '<span class="premio-missao">' + CC.arte.bau(m.feita ? 'aberto' : 'travado') + '</span>'
       + '</div>';
-  };
-
-  // O quadro: nove peças, cada uma um recorte do mesmo retrato.
-  CC.quadroHtml = (q, nova) => {
-    const cor = CORES_MES[(Number(q.mes.slice(5, 7)) - 1) % CORES_MES.length];
-    const cena = '<span class="cena-retrato">' + CC.personagemSvg(q.personagem) + '</span>';
-    const pecas = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
-      const revelada = q.pecas.includes(i);
-      return '<span class="peca' + (revelada ? ' revelada' : '') + (i === nova ? ' nova' : '') + '" style="--r:' + Math.floor(i / 3) + ';--c:' + (i % 3) + '">'
-        + '<span class="recorte' + (revelada ? '' : ' apagado') + '">' + cena + '</span></span>';
-    }).join('');
-    return '<div class="quadro c-' + cor + (q.completo ? ' completo' : '') + '" role="img" aria-label="Quadro de ' + CC.esc(q.nome) + ': '
-      + q.quantas + ' de ' + CC.PECAS_QUADRO + ' peças">' + pecas + '</div>'
-      + '<div class="barra-missao c-' + cor + ' barra-quadro"><i style="width:' + pct(Math.max(0, q.quantas - (nova === undefined ? 0 : 1)), CC.PECAS_QUADRO) + '" data-encher="'
-      + pct(q.quantas, CC.PECAS_QUADRO) + '"></i><span>' + q.quantas + ' / ' + CC.PECAS_QUADRO + '</span></div>';
   };
 
   // Segunda-feira da semana de uma data, no formato do diário.

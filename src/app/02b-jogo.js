@@ -1,4 +1,4 @@
-/* O jogo: missões do dia, baús da trilha, cartas, quadro do mês, conquistas com níveis e
+/* O jogo: missões do dia, baús da trilha, conquistas com níveis e
    troféus. Tudo é contado a partir de um estado e de uma data passados por parâmetro: o
    servidor carrega este mesmo arquivo para conferir o que alguém publica no Feed.
    Orar e escrever continuam fora de qualquer contagem. */
@@ -128,8 +128,8 @@
     });
   };
 
-  // No aparelho: fixa as missões de hoje, soma as que ficaram prontas e entrega a peça
-  // do quadro quando as três fecham. Devolve o que mudou, para a tela celebrar.
+  // No aparelho: fixa as missões de hoje e soma as que ficaram prontas. Devolve o que
+  // mudou, para a tela celebrar.
   CC.conferirMissoes = (ctx) => {
     const E = CC.estado();
     const hoje = CC.hojeIso();
@@ -145,17 +145,7 @@
     if (mudou) CC.gravar('diario', diario);
     if (novas) CC.gravar('missoesTotal', (E.missoesTotal || 0) + novas);
 
-    let peca = false;
-    if (feitas === lista.length) {
-      const mes = hoje.slice(0, 7);
-      const quadros = { ...(E.quadros || {}) };
-      if (!(quadros[mes] || []).includes(hoje)) {
-        quadros[mes] = [...(quadros[mes] || []), hoje].sort();
-        CC.gravar('quadros', quadros);
-        peca = true;
-      }
-    }
-    return { lista, novas, peca };
+    return { lista, novas };
   };
 
   // Horas até a meia-noite, para o "faltam 5 horas" das missões.
@@ -166,52 +156,10 @@
     return Math.max(1, Math.ceil((fim - agora) / 3600000));
   };
 
-  // ---------- quadro do mês ----------
-  // Cada dia com as três missões feitas revela uma peça do retrato do mês. Nove peças
-  // completam o quadro, que fica na estante de troféus.
-  CC.PECAS_QUADRO = 9;
-  const RETRATOS = ['Noé', 'Abraão', 'José', 'Moisés', 'Rute', 'Davi', 'Elias', 'Ester', 'Daniel', 'Jonas', 'Maria', 'Pedro'];
-  const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-  CC.nomeDoMes = (mes) => MESES[Number(String(mes).slice(5, 7)) - 1] || '';
-
-  CC.quadroDoMes = (mes, e) => {
-    mes = mes || CC.hojeIso().slice(0, 7);
-    const dias = ((est(e).quadros || {})[mes]) || [];
-    // a ordem em que as peças aparecem também sai do mês, e é igual em todo aparelho
-    const ordem = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    let h = semente(mes);
-    for (let i = ordem.length - 1; i > 0; i--) {
-      h = (Math.imul(h, 1103515245) + 12345) >>> 0;
-      const j = h % (i + 1);
-      [ordem[i], ordem[j]] = [ordem[j], ordem[i]];
-    }
-    const quantas = Math.min(CC.PECAS_QUADRO, dias.length);
-    return {
-      mes,
-      nome: CC.nomeDoMes(mes),
-      personagem: RETRATOS[Number(mes.slice(5, 7)) - 1] || 'Davi',
-      pecas: ordem.slice(0, quantas),
-      quantas,
-      completo: quantas >= CC.PECAS_QUADRO,
-    };
-  };
-  CC.quadrosCompletos = (e) => Object.keys(est(e).quadros || {})
-    .filter((mes) => CC.quadroDoMes(mes, e).completo).sort();
-
   // ---------- baús da trilha ----------
   // A cada sete dias lidos a trilha tem um baú, e dentro dele vai um versículo tirado
   // justamente desses sete dias: o baú guarda a memória do trecho que a pessoa acabou de
   // ler, e não um brinde avulso. A referência de cada dia já existe em CC.reflexaoDoDia.
-  //
-  // O array de personagens continua aqui, sem uso na tela, esperando a arte nova. Antes o
-  // baú sorteava uma carta daqui; quando os personagens saíram da interface, ele seguiu
-  // sorteando e gravando cartas que ninguém via.
-  CC.CARTAS = ['Noé', 'Abraão', 'Sara', 'José', 'Moisés', 'Josué', 'Rute', 'Samuel', 'Davi', 'Salomão',
-    'Elias', 'Ester', 'Jó', 'Isaías', 'Jeremias', 'Ezequiel', 'Daniel', 'Jonas', 'Maria', 'Pedro', 'João', 'Paulo'];
-  CC.cartas = (e) => {
-    const vistas = new Set(Object.values(est(e).bausAbertos || {}).map((b) => b.carta).filter(Boolean));
-    return CC.CARTAS.filter((c) => vistas.has(c));
-  };
   CC.temBau = (numero) => numero % 7 === 0;
   CC.chaveBau = (numero) => 'dia:' + numero;
   CC.bauAberto = (numero, e) => !!(est(e).bausAbertos || {})[CC.chaveBau(numero)];
@@ -329,8 +277,7 @@
       const total = u.ate - u.de + 1;
       return { tipo: 'unidade', numero: u.numero, titulo: 'Unidade ' + u.numero, sub: u.titulo, cor: u.cor, feitos, total, ganho: feitos === total };
     });
-    const quadros = CC.quadrosCompletos(e).map((mes) => ({ tipo: 'quadro', mes, ...CC.quadroDoMes(mes, e), ganho: true }));
-    return { colecoes, unidades, quadros };
+    return { colecoes, unidades };
   };
 
   // ---------- novidades: o que o servidor confere ----------
@@ -356,7 +303,6 @@
     }
     if (tipo === 'livro') return LIVROS.has(dados.livro) && CC.livroCompletoEm(dados.livro, e) ? 'livro:' + dados.livro : null;
     if (tipo === 'unidade') return CC.unidadeCompletaEm(dados.numero, e) ? 'unidade:' + Number(dados.numero) : null;
-    if (tipo === 'quadro') return /^\d{4}-\d{2}$/.test(dados.mes || '') && CC.quadroDoMes(dados.mes, e).completo ? 'quadro:' + dados.mes : null;
     if (tipo === 'versiculo') {
       const m = /^(.+?) (\d{1,3})\.(\d{1,3})(?:-(\d{1,3}))?$/.exec(String(dados.ref || ''));
       if (!m || !LIVROS.has(m[1])) return null;

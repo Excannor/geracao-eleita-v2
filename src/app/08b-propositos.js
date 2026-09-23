@@ -1,6 +1,6 @@
 /* Propósitos: o compromisso de ler, ou orar, junto. Em dupla, com quantas pessoas quiser; em
-   grupo, de 3 a 5, com a meta coletiva do dia. O servidor faz as contas; aqui só aparece quem
-   já fez hoje, nunca o que alguém escreveu ou orou. */
+   grupo, até 5, com a meta coletiva do dia. A célula é um grupo que cresce por um link. O
+   servidor faz as contas; aqui só aparece quem já fez hoje, nunca o que alguém escreveu ou orou. */
 (function (CC) {
   'use strict';
 
@@ -101,7 +101,8 @@
         + '<div class="cabeca-tela"><h1>Propósitos</h1>'
         + (d ? '<span class="contagem-amigos">' + CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') + '</span>' : '') + '</div>'
         + (aviso ? '<p class="aviso-cadeado">' + CC.esc(aviso) + '</p>' : '')
-        + '<button class="botao azul" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito</button>'
+        + '<button class="botao azul" data-nova-celula>' + CC.ico('pessoas') + 'Criar uma célula</button>'
+        + '<button class="botao contorno" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito com amigos</button>'
         + (!d ? '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>' : '')
         + (convites.length ? CC.tituloSecao('Convites', String(convites.length)) + '<div class="lista-propositos">' + convites.map(cartaoConvite).join('') + '</div>' : '')
         + (grupos.length ? CC.tituloSecao('Grupos') + '<div class="lista-propositos">' + grupos.map(cartao).join('') + '</div>' : '')
@@ -113,6 +114,7 @@
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
       ligar('[data-novo-proposito]', () => CC.novoProposito());
+      ligar('[data-nova-celula]', () => CC.novaCelula());
       ligar('[data-proposito]', (el) => folhaProposito(lista.find((p) => p.id === el.dataset.proposito)));
       ligar('[data-aceitar-proposito]', async (el) => {
         el.disabled = true;
@@ -173,7 +175,8 @@
       + '<div class="lista-pedidos">' + linhas + '</div>'
       + '<div class="acoes">'
       + (podeNotificar ? '<button class="botao azul" data-notificar>' + CC.ico('sino') + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
-      + (podeChamar ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar mais alguém</button>' : '')
+      + (podeChamar && eu.estado === 'ativo' ? '<button class="botao azul" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link do grupo</button>' : '')
+      + (podeChamar ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar um amigo</button>' : '')
       + (p.grupo && p.criadoPor === euUsuario() ? '<button class="botao plano perigo" data-encerrar>Encerrar grupo</button>' : '')
       + (p.grupo && p.criadoPor !== euUsuario() ? '<button class="botao plano perigo" data-sair>Sair do grupo</button>' : '')
       + (!p.grupo && !ehDaAmizade ? '<button class="botao plano perigo" data-sair>Encerrar propósito</button>' : '')
@@ -195,6 +198,8 @@
         };
         const chamar = folha.querySelector('[data-chamar]');
         if (chamar) chamar.onclick = () => { fechar(); folhaChamar(p, limite - gente.length); };
+        const linkCelula = folha.querySelector('[data-link-celula]');
+        if (linkCelula) linkCelula.onclick = () => { fechar(); folhaLinkCelula(p); };
         const sair = folha.querySelector('[data-sair]');
         if (sair) sair.onclick = async () => {
           fechar();
@@ -249,6 +254,124 @@
       },
     });
   }
+
+  // ---------- célula ----------
+  // A célula nasce só com quem criou e cresce por um link, mandado no grupo do WhatsApp: quem
+  // abre entra direto, sem precisar ser amigo antes. É o "junto com a sua célula" do app.
+  // "Célula de quinta" já diz o que é; "Jovens Betel" ganha a palavra na frente.
+  const comoCelula = (titulo) => (/^c[ée]lula(\s|$)/i.test(titulo) ? titulo : 'célula ' + titulo);
+  const textoCelula = (titulo) => 'Bora ler a Bíblia inteira em um ano, junto? Entra na ' + comoCelula(titulo) + ' no Geração Eleita:';
+
+  CC.novaCelula = function () {
+    if (CC.quem && CC.quem.comSenha && !CC.quem.perfilCompleto) {
+      CC.completarCadastro(CC.quem).then((ok) => { if (ok) CC.novaCelula(); });
+      return;
+    }
+    const limite = (cache && cache.limiteGrupo) || 5;
+    CC.folha('<h2>Criar uma célula</h2>'
+      + '<p class="passo-dica">Vocês leem o plano juntos, até ' + limite + ' pessoas. Depois de criar, você manda o link no grupo do WhatsApp e quem abrir já entra.</p>'
+      + '<label class="campo-senha"><span>Nome da célula</span><input data-titulo maxlength="30" placeholder="Ex.: Célula de quinta"></label>'
+      + '<p class="passo-dica pequena">A meta do dia é o número de pessoas. Cada um soma 1 ponto por ler, e mais 1 se praticar ou abrir uma nota de estudo. Quem fez mais cobre quem faltou.</p>'
+      + '<p class="erro-proposito" role="alert" hidden></p>'
+      + '<div class="acoes"><button class="botao azul" data-criar>Criar e pegar o link</button>'
+      + '<button class="botao plano" data-fechar>Cancelar</button></div>',
+    {
+      rotulo: 'Criar uma célula',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        const botao = folha.querySelector('[data-criar]');
+        botao.onclick = async () => {
+          const erro = folha.querySelector('.erro-proposito');
+          botao.disabled = true;
+          erro.hidden = true;
+          try {
+            const { proposito } = await CC.api('api/celula', { acao: 'criar', titulo: folha.querySelector('[data-titulo]').value });
+            fechar();
+            if (!/^#\/novidades\/propositos/.test(location.hash)) location.hash = '#/novidades/propositos';
+            else recarregar();
+            folhaLinkCelula(proposito);
+          } catch (e) {
+            erro.textContent = e.message;
+            erro.hidden = false;
+            botao.disabled = false;
+          }
+        };
+      },
+    });
+  };
+
+  async function folhaLinkCelula(p) {
+    let link = '';
+    try {
+      link = (await CC.api('api/celula', { acao: 'link', id: p.id })).link;
+    } catch (e) {
+      CC.avisar(e.message || 'Não consegui gerar o link agora.');
+      return;
+    }
+    const texto = textoCelula(p.titulo);
+    CC.folha('<h2>Link da ' + CC.esc(comoCelula(p.titulo)) + '</h2>'
+      + '<p class="mensagem-convite">' + CC.esc(texto) + ' <span>' + CC.esc(link) + '</span></p>'
+      + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar no grupo</button>'
+      + '<button class="botao contorno" data-copiar>Copiar link</button></div>'
+      + '<p class="passo-dica pequena">Quem abrir o link entra direto na célula, com conta nova ou com a que já tem, até completar '
+      + ((cache && cache.limiteGrupo) || 5) + ' pessoas. O link vale por 30 dias.</p>'
+      + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>',
+    {
+      rotulo: 'Link da célula',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelector('[data-compartilhar]').onclick = async () => {
+          const r = await CC.compartilhar(texto, link);
+          if (r === 'copiado') CC.avisar('Link copiado. É só colar no grupo.');
+          else if (r === 'falhou') CC.avisar('Não consegui compartilhar. Toque em "Copiar link" e cole no grupo.');
+        };
+        folha.querySelector('[data-copiar]').onclick = async () => {
+          CC.avisar((await CC.copiar(link)) ? 'Link copiado' : 'Não consegui copiar');
+        };
+      },
+    });
+  }
+
+  // Quem já tem conta e abre o link da célula.
+  CC.abrirLinkCelula = async function (token) {
+    let info;
+    try {
+      info = await CC.api('api/celula/' + encodeURIComponent(token));
+    } catch (e) {
+      CC.folha('<h2>Esse link de célula venceu</h2><p>Peça um novo para quem te chamou!</p>'
+        + '<div class="acoes"><button class="botao" data-fechar>Entendi</button></div>',
+      { ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
+      return;
+    }
+    const dentro = info.usuario === euUsuario();
+    CC.folha('<h2>' + (dentro ? 'Esse é o link da sua célula' : CC.esc(info.nome) + ' te chamou para a ' + CC.esc(comoCelula(info.titulo)) + '!') + '</h2>'
+      + '<p>' + CC.plural(info.pessoas, 'pessoa', 'pessoas') + ' lendo o plano juntos'
+      + (info.vagas > 0 ? ' · ' + CC.plural(info.vagas, 'vaga', 'vagas') : ' · sem vagas') + '.</p>'
+      + (dentro ? '' : '<p class="passo-dica pequena">A meta do dia é o número de pessoas: cada um que lê soma 1 ponto, e quem fez mais cobre quem faltou.</p>')
+      + '<p class="recado-senha" id="recado" role="alert"></p>'
+      + '<div class="acoes">' + (dentro ? '' : '<button class="botao azul" data-entrar' + (info.vagas > 0 ? '' : ' disabled') + '>Entrar na célula</button>')
+      + '<button class="botao plano" data-fechar>' + (dentro ? 'Fechar' : 'Agora não') + '</button></div>',
+    {
+      rotulo: 'Célula',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        const entrar = folha.querySelector('[data-entrar]');
+        if (entrar) entrar.onclick = async () => {
+          entrar.disabled = true;
+          try {
+            const r = await CC.api('api/celula', { acao: 'entrar', token });
+            fechar();
+            CC.avisar(r.ja ? 'Você já está nessa célula' : 'Bem-vindo à ' + comoCelula(r.titulo) + '!');
+            if (!/^#\/novidades\/propositos/.test(location.hash)) location.hash = '#/novidades/propositos';
+            else recarregar();
+          } catch (e) {
+            entrar.disabled = false;
+            folha.querySelector('#recado').textContent = e.message;
+          }
+        };
+      },
+    });
+  };
 
   // ---------- criar ----------
   CC.novoProposito = async function (preEscolhido) {

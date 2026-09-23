@@ -42,8 +42,8 @@
   }
 
   // ---------- topo ----------
-  // Só a lamparina com os dias, em todas as telas. Dias lidos, escudos e o sino saíram: o
-  // topo parecia placar até dentro de uma nota de estudo. Tocar na lamparina abre a semana,
+  // Só o fogo com os dias, em todas as telas. Dias lidos, escudos e o sino saíram: o
+  // topo parecia placar até dentro de uma nota de estudo. Tocar no fogo abre a semana,
   // os escudos e o recorde; as novidades dos amigos aparecem como ponto na aba Juntos.
   let ofensivaAnterior = null;
 
@@ -54,7 +54,7 @@
     ofensivaAnterior = seq.atual;
 
     // O Perfil saiu da barra de baixo e virou este retrato redondo no canto do topo, ao
-    // lado da lamparina. `pintarTopo` não recebe a rota do roteador: lê direto daqui, e o
+    // lado do fogo. `pintarTopo` não recebe a rota do roteador: lê direto daqui, e o
     // estado de selecionado entra no próprio HTML para o cache abaixo redesenhar ao mudar.
     const rota = partesDaRota().rota;
     const naContaOuConfig = rota === 'perfil' || rota === 'config';
@@ -347,6 +347,16 @@
       if (!CC.rodandoComoApp()) await CC.tutorialInstalar({ contaNova: true });
     }
 
+    const celula = new URLSearchParams(location.search).get('celula');
+    if (celula) {
+      history.replaceState(null, '', location.pathname + (location.hash || '#/'));
+      if (quem && quem.comSenha && !quem.perfilCompleto) {
+        if (await CC.completarCadastro(quem)) CC.abrirLinkCelula(celula);
+      } else {
+        CC.abrirLinkCelula(celula);
+      }
+      return;
+    }
     const convite = new URLSearchParams(location.search).get('convite');
     if (convite) {
       history.replaceState(null, '', location.pathname + (location.hash || '#/'));

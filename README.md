@@ -97,9 +97,18 @@ capítulos e leitor em tela cheia, com troca de tradução e tamanho de letra. S
 busca, sem marcar como lida, sem XP. É uma cópia enxuta do leitor da lição, porque aquele
 carrega junto o progresso do dia. Código em `src/app/04d-biblia.js`.
 
-**Juntos**: o Feed dos amigos, os pedidos de amizade, os propósitos e o convite. Aparecem ali
-os versículos que os amigos guardaram e os marcos deles: ofensiva, livros terminados e
-conquistas.
+**Juntos**: o Feed dos amigos, os pedidos de amizade, os propósitos, a célula e o convite.
+Aparecem ali os versículos que os amigos guardaram e os marcos deles: ofensiva, livros
+terminados e conquistas.
+
+**Célula** (o "junto com a sua célula" do posicionamento): **Criar uma célula**, em Juntos ou
+em Propósitos, cria um grupo de leitura do plano só com quem criou. Dali sai um link
+(`/?celula=...`) para mandar no grupo do WhatsApp: quem abre entra direto, com conta nova ou
+com a que já tem, e vira amigo de quem mandou o link (pelo mesmo caminho do convite, então
+bloqueio vale e conta nova conta para o Semeador). Qualquer membro manda o link; a célula para
+em 5 pessoas; o link vale 30 dias e cai junto quando a pessoa cancela os convites. Regras em
+`contas.mjs` (`criarCelula`, `gerarLinkCelula`, `entrarNaCelula`), rota `/api/celula`, teste
+em `ferramentas/teste-celula.mjs`.
 
 **Explorar**: todo o material de consulta, com busca em texto integral que alcança também o
 que você escreveu.
@@ -187,11 +196,10 @@ antes dele.
 
 ## Personagens, mascote e cartas
 
-Os personagens bíblicos, o mascote Bento, as cartas de personagem e o quadro do mês saíram
-da tela no rebrand, de propósito: dependiam da arte antiga, e o redesenho deles é um projeto
-à parte. O código ficou guardado, sem chamador (`CC.mascoteSvg`, `CC.personagensDaUnidade`,
-`CC.mostrarCarta`, `CC.quadroHtml`, e `figuraAoLado` em `03-trilha.js`). O quadro do mês
-segue calculado por dentro, mas não aparece nem no Resumo nem no Feed. O baú hoje revela um
+Os personagens bíblicos, o mascote Bento, as cartas de personagem, o quadro do mês e o desenho
+da lamparina saíram da tela no rebrand e, em setembro de 2026, também do código (continuam no
+histórico do git, se um redesenho futuro quiser partir deles). Da fala do Bento ficou só o
+texto do balão do dia na trilha, em `src/app/03b-fala-do-dia.js`. O baú hoje revela um
 versículo.
 
 ## O texto bíblico
@@ -458,14 +466,14 @@ falhou e o container está servindo a versão anterior.
 | `src/estilo.css` | a linguagem visual: cores, botões com aresta, nós da trilha |
 | `src/app/02-estado.js` | progresso, fusão entre aparelhos, ofensiva, XP, conquistas |
 | `src/app/01c-arte.js` | os estágios do fogo da ofensiva, os troféus, o baú e as medalhas, em SVG |
-| `src/app/02b-jogo.js` | as conquistas com nível, os desafios do dia e o quadro do mês (calculado, fora da tela) |
+| `src/app/02b-jogo.js` | as conquistas com nível, os desafios do dia e os baús |
 | `src/app/03-trilha.js` | a trilha de nós, as unidades e o baú |
 | `src/app/04-licao.js` | o dia em passos, do "leia" ao troféu |
 | `src/app/04c-reflexao.js` | o versículo para guardar, a pergunta e a oração de cada dia |
 | `src/app/04d-biblia.js` | a Bíblia livre, fora da trilha: lista dos livros, capítulos e leitor |
 | `src/app/06-explorar.js` | seções, notas, anotações e busca |
 | `src/app/07-perfil.js` | visão geral, conquistas, exportação |
-| `src/app/08-amigos.js`, `08b-propositos.js` | seguir amigos, duplas e grupos, a barra do dia |
+| `src/app/08-amigos.js`, `08b-propositos.js` | amigos, duplas, grupos e a célula, a barra do dia |
 | `src/app/09b-missoes.js` | a tela de Desafios: desafios do dia e a semana da dupla |
 | `src/app/10-roteador.js` | rotas, topo, navegação e partida |
 | `contas.mjs` | contas, senhas em resumo scrypt, amizade, propósitos e o resumo público |

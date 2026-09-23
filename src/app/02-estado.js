@@ -26,10 +26,9 @@
     xpLegado: null,
     conquistasGanhas: {},
     maiorProposito: 0,
-    // o jogo: o que se fez em cada dia (para as missões), baús, quadro do mês e contadores
+    // o jogo: o que se fez em cada dia (para as missões), baús e contadores
     diario: {},
     bausAbertos: {},
-    quadros: {},
     notasVistas: [],
     acertosTotal: 0,
     missoesTotal: 0,
@@ -38,7 +37,7 @@
     oradoEm: {},
   });
 
-  // O diário só precisa do mês corrente e do anterior: é o que as missões e o quadro leem.
+  // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
   const DIAS_DE_DIARIO = 70;
   function fundirDiario(a, b) {
     const saida = {};
@@ -55,13 +54,6 @@
     }
     const datas = Object.keys(saida).sort();
     for (const velha of datas.slice(0, Math.max(0, datas.length - DIAS_DE_DIARIO))) delete saida[velha];
-    return saida;
-  }
-  function fundirQuadros(a, b) {
-    const saida = {};
-    for (const fonte of [a || {}, b || {}]) {
-      for (const [mes, pecas] of Object.entries(fonte)) saida[mes] = uniao(saida[mes], pecas).sort();
-    }
     return saida;
   }
   function fundirBaus(a, b) {
@@ -127,7 +119,6 @@
       maiorProposito: Math.max(a.maiorProposito || 0, b.maiorProposito || 0),
       diario: fundirDiario(a.diario, b.diario),
       bausAbertos: fundirBaus(a.bausAbertos, b.bausAbertos),
-      quadros: fundirQuadros(a.quadros, b.quadros),
       notasVistas: uniao(a.notasVistas, b.notasVistas).slice(-400),
       acertosTotal: Math.max(a.acertosTotal || 0, b.acertosTotal || 0),
       missoesTotal: Math.max(a.missoesTotal || 0, b.missoesTotal || 0),

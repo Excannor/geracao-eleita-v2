@@ -404,6 +404,13 @@ async function marcoDoSemeador(usuario) {
   return { ...trilha, niveis: NIVEIS_SEMEADOR };
 }
 
+// Quem entrou na célula: a amizade nova com quem mandou o link vira novidade, como num
+// convite, e quem mandou recebe o mesmo aviso de "entrou no propósito".
+async function avisarEntradaNaCelula(eu, r, hoje) {
+  if (r.amizadeNova) await NOVIDADES.publicar(eu, 'novoProposito', { com: r.de }, 'novo:' + [eu, r.de].sort().join('|') + ':' + hoje);
+  semEsperar(avisoSocial(r.de, 'propositoAceito', { amigo: await nomeDeExibicao(eu), titulo: r.proposito.titulo, id: r.proposito.id }));
+}
+
 // ---------- propósitos ----------
 // O retrato de um propósito hoje, como o app mostra: quem já fez, os pontos do grupo e os dias
 // juntos. Leva só se cada um fez, nunca o que alguém escreveu ou orou.
@@ -565,6 +572,15 @@ const servidor = createServer(async (req, res) => {
       return;
     }
 
+    // Quem abre o link da célula ainda sem conta vê só o nome da célula, quem chamou e quantas
+    // vagas restam. Os nomes de quem já está dentro ficam para depois de entrar.
+    if (rota.startsWith('/api/celula/') && req.method === 'GET') {
+      const link = CONTAS.lerLinkCelula(rota.slice('/api/celula/'.length), assinar);
+      if (!link) { json(res, 410, { erro: 'esse link de célula venceu ou foi cancelado' }); return; }
+      json(res, 200, { usuario: link.de, nome: link.nome, titulo: link.titulo, pessoas: link.pessoas, vagas: link.vagas });
+      return;
+    }
+
     if (rota === '/api/criar-conta') {
       if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
       if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
@@ -586,7 +602,18 @@ const servidor = createServer(async (req, res) => {
             }
           } catch { /* segue sem o convite */ }
         }
-        json(res, 200, { ok: true, usuario: criada.usuario, convidadoPor });
+        // Conta criada pelo link de uma célula: entra direto no grupo. Célula cheia ou link
+        // vencido não impedem a conta; o app avisa depois, ao abrir.
+        let celula = '';
+        if (pedido.celula) {
+          try {
+            const hoje = hojeDe(criada.usuario);
+            const r = await CONTAS.entrarNaCelula(criada.usuario, String(pedido.celula), assinar, hoje, Date.now(), { contaNova: true });
+            celula = r.proposito.titulo;
+            await avisarEntradaNaCelula(criada.usuario, r, hoje);
+          } catch { /* segue sem a célula */ }
+        }
+        json(res, 200, { ok: true, usuario: criada.usuario, convidadoPor, celula });
       } catch (e) {
         anotarErro(ip);
         json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não consegui criar a conta' });
@@ -923,6 +950,28 @@ const servidor = createServer(async (req, res) => {
       return;
     }
 
+    if (rota === '/api/celula') {
+      await acao(async ({ acao: qual, id, titulo, token }) => {
+        const hoje = hojeDe(eu);
+        if (qual === 'criar') {
+          const p = await CONTAS.criarCelula(eu, { titulo }, hoje);
+          return { proposito: await retratoDoProposito(p, eu) };
+        }
+        if (qual === 'link') {
+          const gerado = CONTAS.gerarLinkCelula(eu, id, assinar);
+          const origem = (req.headers['x-forwarded-proto'] || 'http') + '://' + (req.headers.host || 'localhost');
+          return { link: origem + '/?celula=' + gerado.token, venceEm: gerado.venceEm };
+        }
+        if (qual === 'entrar') {
+          const r = await CONTAS.entrarNaCelula(eu, String(token || ''), assinar, hoje);
+          if (!r.ja) await avisarEntradaNaCelula(eu, r, hoje);
+          return { ja: !!r.ja, id: r.proposito.id, titulo: r.proposito.titulo };
+        }
+        throw Object.assign(new Error('ação desconhecida'), { publico: true });
+      });
+      return;
+    }
+
     if (rota === '/api/convites') {
       await acao(async () => {
         const { token, venceEm } = CONTAS.gerarConvite(eu, assinar);
@@ -1016,7 +1065,6 @@ const servidor = createServer(async (req, res) => {
           conquista: () => ({ id: String(d.id || '').slice(0, 20), nivel: Number(d.nivel) }),
           livro: () => ({ livro: String(d.livro || '').slice(0, 30) }),
           unidade: () => ({ numero: Number(d.numero) }),
-          quadro: () => ({ mes: String(d.mes || '').slice(0, 7) }),
           versiculo: () => ({ ref: String(d.ref || '').slice(0, 40) }),
         }[tipo];
         if (!limpos) { const e = new Error('tipo de novidade desconhecido'); e.publico = true; throw e; }

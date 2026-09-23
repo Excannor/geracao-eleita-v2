@@ -58,7 +58,7 @@ console.log('bíblias:', biblias.map((b) => b.abreviatura).join(', ') || 'nenhum
 // Vêm prontos de src/icones/, gerados da arte em arte/icone-app.png por
 // ferramentas/icones.ps1. Reduzir um PNG exige decodificá-lo, e o build roda no Docker
 // sem dependência nenhuma: aqui os ícones só são copiados. A arte é só do ícone da
-// tela de início e do favicon; dentro do app quem aparece é o mascote.
+// tela de início e do favicon; dentro do app a marca aparece como o símbolo GE.
 const iconesProntos = readdirSync(src('icones')).filter((f) => f.endsWith('.png')).sort();
 for (const f of iconesProntos) copyFileSync(src('icones', f), dist(f));
 

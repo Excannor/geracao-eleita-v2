@@ -236,8 +236,7 @@
     const subiram = CC.conquistasComNivel().filter((c) => c.nivel > (sessao.antes.niveis[c.id] || 0));
     const livros = (dia.livros || []).filter((l) => CC.livroCompletoEm(l) && !sessao.antes.livros.includes(l));
     const unidade = !sessao.antes.unidade && CC.unidadeCompletaEm(u.numero);
-    const quadro = CC.quadroDoMes();
-    sessao.celebracao = { seq, missoes, quadro, subiram, livros, unidade, amigos: undefined };
+    sessao.celebracao = { seq, missoes, subiram, livros, unidade, amigos: undefined };
 
     if (CC.publicarNovidades) {
       CC.publicarNovidades({
@@ -389,7 +388,7 @@
   }
 
   // ---------- o resumo do dia ----------
-  // Uma tela só, no fim: a lamparina no estágio de hoje, a semana, e o que o dia trouxe
+  // Uma tela só, no fim: o fogo no estágio de hoje, a semana, e o que o dia trouxe
   // como destaque dentro dela (meta, chama que cresceu, conquista, livro, unidade, peça do
   // quadro, baú). O XP não aparece: ele é só um número para a própria pessoa, no Perfil.
   function telaResumo(dia, u) {

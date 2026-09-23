@@ -113,22 +113,6 @@
       + '</div></div>';
   }
 
-  function figuraAoLado(u, numero, atual, passo) {
-    const lado = deslocamento(passo) > 0 ? 'esquerda' : 'direita';
-    if (numero === atual) {
-      return '<div class="figura-trilha ' + lado + ' mascote" aria-hidden="true">'
-        + CC.mascoteSvg(CC.leu(numero) ? 'feliz' : 'parado') + '</div>';
-    }
-    const elenco = CC.personagensDaUnidade(u.numero);
-    const total = u.ate - u.de + 1;
-    const vao = Math.floor(total / (elenco.length + 1));
-    const indice = elenco.findIndex((_, i) => numero === u.de + vao * (i + 1));
-    if (indice === -1) return '';
-    const nome = elenco[indice];
-    return '<div class="figura-trilha ' + lado + (CC.leu(numero) ? '' : ' adiante') + '" '
-      + 'title="' + CC.esc(nome) + '">' + CC.personagemSvg(nome) + '</div>';
-  }
-
   function faixa(u, aberta) {
     const p = progressoUnidade(u);
     const travada = p.feitos === 0 && u.de > CC.diaAtual();
@@ -303,7 +287,7 @@
     const feito = CC.leu(numero);
     const atual = numero === CC.diaAtual();
     const adiante = !feito && !atual;
-    const fala = atual && !feito ? '<p class="fala-bento">' + CC.esc(CC.falaMascote(CC.amigosEmCache && CC.amigosEmCache())) + '</p>' : '';
+    const fala = atual && !feito ? '<p class="fala-bento">' + CC.esc(CC.falaDoDia(CC.amigosEmCache && CC.amigosEmCache())) + '</p>' : '';
     const pop = montarPop(botao, adiante ? 'adiante' : 'c-' + u.cor,
       '<b class="titulo-pop">' + CC.esc(passagemDe(dia)) + '</b>'
       + '<span class="sub-pop">Dia ' + numero + ' de ' + D.plano.length + ' · uns ' + CC.minutosDoDia(dia) + ' min</span>'
@@ -324,34 +308,7 @@
     if (pop) pop.onclick = (ev) => ev.stopPropagation();
   }
 
-  // ---------- baú e cartas ----------
-  CC.cartaHtml = function (nome) {
-    const id = '11 - Pessoas/' + nome;
-    const nota = D.notas[id];
-    const sub = nota && nota.sub ? nota.sub.split('·')[0].trim() : '';
-    return '<div class="carta">'
-      + '<div class="carta-arte">' + CC.personagemSvg(nome) + '</div>'
-      + '<div class="carta-texto"><span class="etiqueta">' + CC.esc(sub || 'Personagem') + '</span>'
-      + '<h2>' + CC.esc(nome) + '</h2>'
-      + (nota && nota.resumo ? '<p>' + CC.esc(nota.resumo) + '</p>' : '')
-      + '</div></div>';
-  };
-
-  CC.mostrarCarta = function (nome) {
-    const nota = D.notas['11 - Pessoas/' + nome];
-    CC.telaCheia('<div class="cena-carta">' + CC.cartaHtml(nome) + '</div>', {
-      classe: 'tela-carta',
-      rotulo: 'Carta de ' + nome,
-      pe: (nota ? '<button class="botao contorno" data-ler-nota>Ler sobre ' + CC.esc(nome) + '</button>' : '')
-        + '<button class="botao" data-fechar-tela>Fechar</button>',
-      ligar: (el, fechar) => {
-        el.querySelector('[data-fechar-tela]').onclick = fechar;
-        const ler = el.querySelector('[data-ler-nota]');
-        if (ler) ler.onclick = () => { fechar(); location.hash = '#/nota/' + encodeURIComponent('11 - Pessoas/' + nome); };
-      },
-    });
-  };
-
+  // ---------- baú ----------
   CC.telaBau = function (numero) {
     const u = unidadeDoDia(numero);
     CC.telaCheia('<div class="cena-bau">'

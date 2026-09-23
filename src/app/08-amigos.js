@@ -481,9 +481,10 @@
             + '<button class="botao pequeno plano" data-mural-nao>Agora não</button></div></div></div>'
           : '';
         corpo = '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
+          + '<button class="botao azul convidar-largo" data-nova-celula>' + CC.ico('pessoas') + 'Criar uma célula</button>'
           + '<button class="botao contorno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
           + '<button class="entrada-propositos" data-propositos>' + CC.ico('pessoas')
-            + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
+            + '<span><b>Propósitos</b><small>Células, duplas e grupos de leitura e oração</small></span>'
             + (d.convitesProposito ? '<i class="selo-numero" aria-label="' + CC.plural(d.convitesProposito, 'convite', 'convites') + '">' + d.convitesProposito + '</i>' : '')
             + CC.ico('avancar') + '</button>'
           + (recebidos.length
@@ -514,6 +515,7 @@
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
       ligar('[data-convidar]', () => CC.convidar());
+      ligar('[data-nova-celula]', () => CC.novaCelula());
       ligar('[data-propositos]', () => { location.hash = '#/novidades/propositos'; });
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));
       ligar('[data-amigo]', (el) => folhaAmigo(amigos.find((a) => a.usuario === el.dataset.amigo)));

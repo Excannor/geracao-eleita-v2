@@ -275,6 +275,7 @@
 
   var params = new URLSearchParams(location.search);
   var convite = params.get('convite');
+  var celula = params.get('celula');
   var passo = 1;
 
   function mostrarTela(nome) {
@@ -353,14 +354,14 @@
     fetch('api/criar-conta', {
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: $('nascimento').value, email: $('email').value.trim(),
-        usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '' }),
+        usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '', celula: celula || '' }),
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
         if (r.ok) {
           // Conta nova: o app abre com o tutorial de pôr o ícone na tela de início.
           try { localStorage.setItem('cc.instalar', '1'); } catch (e) { /* segue */ }
-          // O convite já foi aceito junto com o cadastro: o app não precisa perguntar de novo.
-          if (d.convidadoPor) { try { history.replaceState(null, '', location.pathname); } catch (e) { /* segue */ } }
+          // O convite (ou a célula) já foi aceito junto com o cadastro: o app não precisa perguntar de novo.
+          if (d.convidadoPor || d.celula) { try { history.replaceState(null, '', location.pathname); } catch (e) { /* segue */ } }
           entrarNoApp(d.usuario);
           return;
         }
@@ -462,6 +463,19 @@
       $('dica-boas').textContent = 'Uma lição por dia, e a contagem de vocês sobe nos dias em que os dois leem.';
       $('convite-cadastro').hidden = false;
       $('convite-cadastro').textContent = 'Convite de ' + d.nome + ' (@' + d.usuario + ')';
+    }).catch(function () {});
+  }
+  // Com link de célula, a primeira tela diz para onde a pessoa está entrando.
+  if (celula) {
+    fetch('api/celula/' + encodeURIComponent(celula)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d) return;
+      var nomeCelula = /^c[ée]lula(\s|$)/i.test(d.titulo) ? d.titulo : 'célula ' + d.titulo;
+      $('titulo-boas').textContent = d.nome + ' te chamou para a ' + nomeCelula + '!';
+      $('dica-boas').textContent = d.vagas > 0
+        ? 'A Bíblia inteira em um ano, lendo junto com o grupo. Crie sua conta e você já entra na célula.'
+        : 'Essa célula já está cheia, mas você pode criar sua conta e ler o plano do mesmo jeito.';
+      $('convite-cadastro').hidden = false;
+      $('convite-cadastro').textContent = nomeCelula.charAt(0).toUpperCase() + nomeCelula.slice(1) + ' · convite de ' + d.nome + ' (@' + d.usuario + ')';
     }).catch(function () {});
   }
   // Servidor sem nenhuma conta abre direto no cadastro: é o primeiro uso.

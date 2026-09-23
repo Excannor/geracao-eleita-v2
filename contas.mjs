@@ -717,6 +717,69 @@ export class Contas {
     return p;
   }
 
+  // ---------- célula ----------
+  // A célula é um grupo de leitura do plano que nasce só com quem criou e cresce por um link:
+  // o líder manda o link no grupo do WhatsApp, e quem abre entra direto, sem precisar ser
+  // amigo antes (a amizade com quem mandou o link nasce junto, como num convite).
+  async criarCelula(eu, { titulo } = {}, hoje) {
+    const a = this.exigirCompleto(eu);
+    const id = 'p' + randomBytes(6).toString('hex');
+    const p = {
+      id, tipo: 'plano', alvo: '', titulo: String(titulo || '').trim().slice(0, 30) || 'Célula',
+      criadoPor: a.usuario, criadoEm: hoje, encerradoEm: '', grupo: true,
+      membros: [{ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: '' }],
+    };
+    this.dados.propositos[id] = p;
+    await this.salvar();
+    return p;
+  }
+
+  // O link leva o grupo, quem mandou e a validade, assinados com o selo de convite de quem
+  // mandou: "cancelar meus convites" também cancela os links de célula dessa pessoa.
+  gerarLinkCelula(eu, id, assinar, agora = Date.now()) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    if (!p || p.encerradoEm || !p.grupo || !this.ativosDe(p).some((m) => m.usuario === a.usuario)) throw erro('grupo não encontrado', 404);
+    const carga = Buffer.from(JSON.stringify({ p: p.id, d: a.usuario, v: agora + VALIDADE_CONVITE })).toString('base64url');
+    return { token: carga + '.' + assinar('celula.' + carga + '.' + a.seloConvite), venceEm: new Date(agora + VALIDADE_CONVITE).toISOString() };
+  }
+
+  lerLinkCelula(token, assinar, agora = Date.now()) {
+    const [carga, firma, sobra] = String(token || '').split('.');
+    if (!carga || !firma || sobra !== undefined) return null;
+    let dado;
+    try { dado = JSON.parse(Buffer.from(carga, 'base64url').toString('utf8')); } catch { return null; }
+    const dono = dado && this.achar(dado.d);
+    if (!dono || !iguais(firma, assinar('celula.' + carga + '.' + dono.seloConvite))) return null;
+    if (!(Number(dado.v) > agora)) return null;
+    const p = this.proposito(dado.p);
+    if (!p || p.encerradoEm || !p.grupo || !this.ativosDe(p).some((m) => m.usuario === dono.usuario)) return null;
+    const pessoas = this.presentes(p).length;
+    return { proposito: p, de: dono.usuario, nome: dono.nome, titulo: p.titulo, pessoas, vagas: Math.max(0, LIMITE_GRUPO - pessoas) };
+  }
+
+  async entrarNaCelula(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false } = {}) {
+    const link = this.lerLinkCelula(token, assinar, agora);
+    if (!link) throw erro('esse link de célula venceu ou foi cancelado', 410);
+    const a = this.exigirCompleto(eu);
+    const p = link.proposito;
+    const minha = p.membros.find((m) => m.usuario === a.usuario);
+    if (minha && minha.estado === 'ativo') return { ja: true, proposito: p, de: link.de };
+    if (link.vagas <= 0 && !(minha && minha.estado === 'convidado')) throw erro('essa célula já está cheia (' + LIMITE_GRUPO + ' pessoas)', 409);
+    // A amizade com quem mandou o link passa pelo mesmo caminho de um convite: respeita
+    // bloqueio, conta para o Semeador só quando é conta nova, e cria a leitura em dupla.
+    let amizadeNova = false;
+    if (link.de !== a.usuario && this.relacao(a.usuario, link.de) !== 'amigos') {
+      const convite = this.gerarConvite(link.de, assinar, agora);
+      const usado = await this.usarConvite(a.usuario, convite.token, assinar, hoje, agora, { contaNova });
+      amizadeNova = !usado.ja;
+    }
+    if (minha) Object.assign(minha, { estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: link.de });
+    else p.membros.push({ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: link.de });
+    await this.salvar();
+    return { proposito: p, de: link.de, amizadeNova };
+  }
+
   async sairDoProposito(eu, id, hoje) {
     const a = this.exigirCompleto(eu);
     const p = this.proposito(id);

@@ -1,5 +1,5 @@
 // Novidades: o mural do que os amigos alcançaram. Só entra marco que o servidor confere
-// no progresso de quem publica (ofensiva, livro, unidade, conquista, quadro do mês) e
+// no progresso de quem publica (ofensiva, livro, unidade, conquista) e
 // o versículo que a pessoa escolheu guardar. Nada do que alguém escreve ou ora vira
 // novidade, e texto livre não existe aqui: o mural não precisa de moderação.
 import { readFile, writeFile, rename, mkdir } from 'node:fs/promises';

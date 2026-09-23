@@ -12,15 +12,10 @@
     try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   };
 
-  // ---------- a lamparina ----------
-  // A ofensiva hoje é um fogo que cresce com os dias, e os textos falam só de fogo, brasa e
-  // lenha. O desenho abaixo (a lamparina) é o antigo e não aparece mais em nenhuma tela.
-  // Antes: a ofensiva era uma lamparina de barro, a candeia dos tempos bíblicos, com a chama no
-  // bico. A imagem vem de Salmos 119.105: a Palavra é a lâmpada que ilumina o caminho.
-  //
-  // A chama cresce com os dias, em cinco estágios, e o barro nunca muda: a luz é o que
-  // cresce, não o vaso (2Co 4.7). Quando a ofensiva zera, a lamparina não fica cinza nem
-  // some: o pavio ainda fumega, com uma brasa, e o convite é reavivar (Is 42.3).
+  // ---------- o fogo da ofensiva ----------
+  // A ofensiva é um fogo que cresce com os dias, e os textos falam só de fogo, brasa e lenha
+  // (a lamparina de barro de antes saiu do app). Quando a ofensiva zera, o fogo não some:
+  // ainda tem brasa, e o convite é reavivar (Is 42.3).
   // O estágio é só da própria pessoa: amigos e Feed nunca veem o tamanho da chama.
   // "selo" são as duas linhas do carimbo na folha da ofensiva, no tom da marca. Muda a cada
   // estágio de propósito: uma frase só, fixa, seria a mesma no primeiro dia e no ano inteiro,
@@ -47,80 +42,13 @@
     const proximo = ESTAGIOS[i + 1] || null;
     return Object.assign({ nivel: i, proximo, faltam: proximo ? proximo.de - n : 0 }, ESTAGIOS[i]);
   };
-  // ---------- o desenho ----------
-  // Uma lamparina de barro vista de lado, com o que faz qualquer um reconhecer: o bico
-  // alongado com o pavio e a chama na ponta, a barriga redonda, o furo do azeite em cima,
-  // a faixa de pontinhos, a alça em argola e o pé. O mesmo desenho serve para o ícone do
-  // topo e para a ilustração grande, só muda o enquadramento.
-  const TAMANHO_CHAMA = [0, 0.82, 0.96, 1.08, 1.2, 1.2];
-
-  function desenhoLamparina(nivel, opcoes = {}) {
-    // o corpo de barro vira neutro; só a chama (mais abaixo) continua colorida
-    const barro = '#8e8e8e', claro = '#b5b5b5', escuro = '#3a3a3a', furo = '#1a1a1a';
-    const k = TAMANHO_CHAMA[nivel];
-    const g = id('luz');
-    let chama;
-    if (k) {
-      // a base da chama fica presa ao pavio, na ponta do bico (10, 26)
-      const brilho = nivel >= 2
-        ? '<radialGradient id="' + g + '"><stop offset="0" stop-color="#ffc83d" stop-opacity="' + (nivel >= 4 ? '.75' : '.55') + '"/><stop offset="1" stop-color="#ffc83d" stop-opacity="0"/></radialGradient>'
-          + '<circle class="brilho-fogo" cx="10" cy="' + (26 - 8 * k).toFixed(1) + '" r="' + ((nivel >= 4 ? 15 : 11) * k).toFixed(1) + '" fill="url(#' + g + ')"/>'
-        : '';
-      chama = brilho + '<g transform="translate(10 26) scale(' + k + ')"><g class="fogo">'
-        + '<path d="M0 0C-4.6 0-6.4-3.4-5.6-7-4.9-10.2-2.2-12.4-.6-16.6 1.8-13.4 5.8-10.4 5.9-6 6-2.6 3.8 0 0 0Z" fill="#ff9d1c"/>'
-        + '<path d="M0 0C-2.8 0-4-2.2-3.4-4.6-2.9-6.7-1.2-8.2-.3-10.8 1.3-8.6 3.8-6.6 3.8-3.9 3.8-1.6 2.4 0 0 0Z" fill="#ffc83d"/>'
-        + '<path d="M0 0C-1.3 0-1.9-1-1.6-2.2-1.3-3.2-.6-3.9-.1-5.1.6-4.1 1.8-3.2 1.8-1.9 1.8-.8 1.1 0 0 0Z" fill="#fff2c4"/>'
-        + '</g></g>';
-    } else {
-      // apagada: o pavio ainda fumega, com uma brasa (Is 42.3)
-      chama = '<path class="fumaca" d="M10 24c-3-3 2-5-1-8-2-2 1.5-4 0-7" fill="none" stroke="#8e8e8e" stroke-width="1.8" stroke-linecap="round" opacity=".75"/>'
-        + '<circle class="brasa" cx="10" cy="26" r="2.2" fill="#ff9d1c"/><circle cx="10" cy="26" r="1" fill="#ffc83d"/>';
-    }
-    // marcas gravadas no barro, uma por estágio já alcançado na vida (só onde a pessoa se vê)
-    const marcas = opcoes.marcas
-      ? Array.from({ length: opcoes.marcas }, (_, i) => '<path d="M' + (21 + i * 3.4).toFixed(1) + ' 35.4l.9 2.4" stroke="' + escuro + '" stroke-width="1" stroke-linecap="round" opacity=".7"/>').join('')
-      : '';
-    const selo = nivel === 5
-      ? '<circle cx="41" cy="14" r="5.5" fill="#3a3a3a"/><path d="M38.4 14l1.9 1.9 3.3-3.6" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
-      : '';
-    return (opcoes.sombra === false ? '' : '<ellipse cx="27" cy="44.5" rx="14" ry="1.8" fill="currentColor" opacity=".13"/>')
-      + '<path d="M21 38.5h12l-1.6 4.6c-.2.6-.8 1-1.4 1h-6.4c-.6 0-1.2-.4-1.4-1z" fill="' + escuro + '"/>'
-      + '<path d="M38.5 29.5c3.6-3.8 8.6-2.2 8.3 1.9-.3 3.8-4.6 5.6-8.2 4.6" fill="none" stroke="' + barro + '" stroke-width="3.2" stroke-linecap="round"/>'
-      + '<path d="M8.6 27.4c3.4-.6 6.6-1.4 9.6-2.9 5.8-3 14.6-3.3 19.7.3 4.6 3.3 4.4 9.4-.6 12.6-5.6 3.6-15.6 3.4-20.8-.6-2.6-2-5-4.4-8.2-6.2-1.2-.7-1.1-2.9.3-3.2z" fill="' + barro + '"/>'
-      + '<path d="M11 31c3 1.6 5.2 3.8 7.4 5.6 5.2 4 15.2 4.2 20.8.6 2.4-1.5 3.6-3.6 3.8-5.8-2.6 3.6-9.8 5.6-16.2 4.8-6.6-.8-11.2-3.4-15.8-5.2z" fill="' + escuro + '" opacity=".45"/>'
-      + '<path d="M19 26.2c5-2.6 12.8-2.8 17.4.2-5-1.4-12-1.2-17.4-.2z" fill="' + claro + '"/>'
-      + '<ellipse cx="29.5" cy="25.6" rx="4.2" ry="1.5" fill="' + furo + '"/>'
-      + '<circle cx="22" cy="32.6" r="1" fill="' + claro + '"/><circle cx="27" cy="33.6" r="1" fill="' + claro + '"/><circle cx="32" cy="33.4" r="1" fill="' + claro + '"/><circle cx="36.4" cy="32" r="1" fill="' + claro + '"/>'
-      + marcas
-      + '<ellipse cx="9.4" cy="27.6" rx="1.7" ry="1.1" fill="' + furo + '"/>'
-      + '<path d="M9.6 27.4l.4-1.6" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/>'
-      + chama + selo;
-  }
-
-  // Ilustração grande: folha da ofensiva, resumo do dia, recomeço. opcoes.recorde grava no
-  // barro uma marca por estágio já alcançado na vida.
-  A.lamparina = (dias, opcoes = {}) => {
-    const est = CC.estagioDaChama(dias);
-    const marcas = opcoes.recorde ? Math.max(0, CC.estagioDaChama(opcoes.recorde).nivel - 1) : 0;
-    return '<svg class="arte-chama estagio-' + est.nivel + (est.nivel ? '' : ' apagada') + '" viewBox="-2 0 52 48" aria-hidden="true">'
-      + desenhoLamparina(est.nivel, { marcas }) + '</svg>';
-  };
-
-  // A lamparina de sempre, para lugares que falam da constância sem ser a de alguém em
-  // particular (marco de um amigo, propósito): tamanho fixo de Candeia, ou apagada.
-  A.chama = (apagada) => A.lamparina(apagada ? 0 : 7);
-
-  // Ícone pequeno (topo, listas, contagens): um foguinho, não a lamparina. A lamparina é um
-  // desenho com corpo, pavio e alça — some quando reduzida a 20px ao lado de um número, e
-  // ainda arrasta um cinza grande para dentro de uma barra que deveria ser preta e branca.
-  // O fogo sozinho lê bem em qualquer tamanho. A lamparina inteira continua existindo em
-  // A.lamparina, que é o desenho grande da comemoração e da folha da ofensiva.
+  // O fogo, em qualquer tamanho (topo, folha da ofensiva, listas, contagens).
   // Nível 0 é a chama apagada: herda a cor do texto (cinza), em vez de fingir fogo.
   const FOGO_FORA = 'M12 1.9c1.1 4.3 5.7 6.2 5.7 11.1a5.7 5.7 0 0 1-11.4 0c0-2.2 1-3.9 2.2-4.9'
     + '.1 1.8 1.1 3 2.2 3 1.3 0 2-1.9 1.2-4.6-.4-1.6-.5-3.2.1-4.6Z';
   const FOGO_DENTRO = 'M12 10.6c.5 2 2.4 2.9 2.4 5.2a2.4 2.4 0 0 1-4.8 0c0-1 .4-1.8.9-2.3'
     + '.1.8.5 1.4.9 1.4.6 0 .9-.9.6-2.2Z';
-  // A chama cresce com a ofensiva, como a da lamparina: quem está no primeiro dia vê um
+  // A chama cresce com a ofensiva: quem está no primeiro dia vê um
   // fogo pequeno, quem está há um ano vê o maior. É a mesma escada de seis estágios do
   // resto do app. Cresce a partir da base (12, 21), para o fogo subir em vez de inchar.
   const ESCALA_FOGO = [0.58, 0.72, 0.84, 0.94, 1.04, 1.14];
@@ -138,7 +66,6 @@
       + (apagada ? '' : '<path class="miolo" d="' + FOGO_DENTRO + '" fill="#ff9d1c"/>')
       + '</g></g></svg>';
   };
-  A.lamparinaTopo = (dias) => CC.icoChama(dias);
 
   // ---------- o baú ----------
   A.bau = (estado, cor) => {
