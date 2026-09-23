@@ -84,6 +84,15 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    como "separe-se". Nesses dias, ancorar em outro trecho da leitura e não fazer pergunta sobre
    o casamento do leitor. Vale também para as guerras de conquista e as ordens de destruição.
 
+   **Promessa de proteção não é promessa de vida sem sofrimento.** Salmos como o 91 ("nenhum
+   mal o atingirá") e o 37.25 ("nunca vi o justo abandonado, nem seus filhos mendigar o pão")
+   ferem quem está sofrendo ou é pobre se virarem garantia. Ancorar no que a própria promessa
+   admite ("quando estiver em dificuldades, eu estarei ao seu lado", 91.15) e, se houver no
+   dia, mostrar quem sofreu confiando (Paulo em 2 Co 11). Nos salmos de lamento, não apressar o
+   consolo: o Salmo 88 termina na escuridão, e a reflexão diz isso.
+   Salmos que pedem destruição dos inimigos (58, 69.22-28, 83, 109, 137) não viram âncora nem
+   pergunta sobre o leitor desejar o mal de alguém.
+
    **Sentimento e tempo na medida do texto.** Não aumentar o que o texto diz: em Gn 50.15 os
    irmãos acham "possível" que José se vingue, e a reflexão dizia que eles "têm certeza"; em
    Mt 14 a NBV diz que "lutavam contra o mar agitado" e que Jesus veio "já de madrugada", e a
