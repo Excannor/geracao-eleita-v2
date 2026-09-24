@@ -7,7 +7,6 @@ import { dirname } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { abrirModulo, concluirImportacao, lerTabela, sincronizar } from './db.mjs';
 
-export const MARCOS_OFENSIVA = [7, 14, 30, 50, 100, 150, 200, 250, 300, 365];
 export const MARCOS_PROPOSITO = [7, 30, 100, 365];
 export const VIDA_NOVIDADE = 30 * 24 * 60 * 60 * 1000;
 const POR_AUTOR = 80;

@@ -228,7 +228,6 @@
   };
 
   // O "Orei" do dia. Guarda só a data: é o que o propósito de oração enxerga.
-  CC.oreiHoje = () => !!(E.oradoEm || {})[CC.hojeIso()];
   CC.marcarOrei = () => {
     (E.oradoEm ||= {})[CC.hojeIso()] = 1;
     CC.gravar('oradoEm', E.oradoEm);
@@ -340,16 +339,6 @@
   CC.xpTotal = () => E.lidos.length * CC.XP_LEITURA + E.licoes.length * CC.XP_LICAO
     + CC.xpPratica() + (E.xpLegado || 0);
 
-  CC.xpDoDia = (data) => {
-    const quando = data || CC.hojeIso();
-    let xp = 0;
-    for (const d of Object.values(E.marcadoEm || {})) if (d === quando) xp += CC.XP_LEITURA;
-    for (const d of Object.values(E.licoesEm || {})) if (d === quando) xp += CC.XP_LICAO;
-    for (const p of Object.values(E.pratica || {})) {
-      if (p.feitoEm === quando) xp += (p.melhor || 0) * CC.XP_PRATICA_ACERTO;
-    }
-    return xp;
-  };
 
   // ---------- livros ----------
   const DIAS_POR_LIVRO = (() => {
@@ -532,7 +521,6 @@
   };
 
   // ---------- tema ----------
-  CC.temaEscuro = () => document.documentElement.dataset.tema === 'escuro';
   CC.aplicarTema = (escuro) => {
     document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro';
     const cor = document.querySelector('meta[name="theme-color"]');

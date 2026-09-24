@@ -523,7 +523,7 @@ async function marcoDoSemeador(usuario) {
 // convite, e quem mandou recebe o mesmo aviso de "entrou no propósito".
 async function avisarEntradaNaCelula(eu, r, hoje) {
   if (r.amizadeNova) await NOVIDADES.publicar(eu, 'novoProposito', { com: r.de }, 'novo:' + [eu, r.de].sort().join('|') + ':' + hoje);
-  semEsperar(avisoSocial(r.de, 'propositoAceito', { amigo: await nomeDeExibicao(eu), titulo: r.proposito.titulo, id: r.proposito.id }));
+  semEsperar(avisoSocial(r.de, 'propositoAceito', { amigo: await nomeDeExibicao(eu), titulo: r.proposito.titulo, id: r.proposito.id, celula: true }));
 }
 
 // ---------- propósitos ----------
@@ -659,7 +659,7 @@ async function rodadaDeLembretes(agora = new Date()) {
         const chave = 'grupoBatida:' + p.id;
         if (NOTIFICACOES.historico(m.usuario)[chave] === data) continue;
         await NOTIFICACOES.anotar(m.usuario, chave, data, minutos);
-        const mensagem = montarMensagem('metaBatida', { titulo: p.titulo, id: p.id }, { usuario: m.usuario, data, nome: m.nome });
+        const mensagem = montarMensagem('metaBatida', { titulo: p.titulo, id: p.id, celula: !!p.celula }, { usuario: m.usuario, data, nome: m.nome });
         await enviarPara(m.usuario, mensagem, { ttl: 3 * 3600 });
         saiu.push({ usuario: m.usuario, tipo: 'metaBatida', titulo: mensagem.titulo });
       }
@@ -675,7 +675,7 @@ async function rodadaDeLembretes(agora = new Date()) {
       const chave = 'grupo:' + p.id;
       if (NOTIFICACOES.historico(m.usuario)[chave] === data) continue;
       await NOTIFICACOES.anotar(m.usuario, chave, data, minutos);
-      const mensagem = montarMensagem('metaDoGrupo', { faltam: retrato.hoje.faltam, titulo: p.titulo, id: p.id }, { usuario: m.usuario, data, nome: m.nome });
+      const mensagem = montarMensagem('metaDoGrupo', { faltam: retrato.hoje.faltam, titulo: p.titulo, id: p.id, celula: !!p.celula }, { usuario: m.usuario, data, nome: m.nome });
       await enviarPara(m.usuario, mensagem, { ttl: 3 * 3600 });
       saiu.push({ usuario: m.usuario, tipo: 'metaDoGrupo', titulo: mensagem.titulo });
     }
@@ -1346,7 +1346,9 @@ const servidor = createServer(async (req, res) => {
     // Quando o build deixou uma versão .gz ao lado (as bíblias), ela vai no lugar do
     // original para quem aceita: no celular longe de casa, 4 MB pesam.
     const aceitaGzip = /\bgzip\b/.test(req.headers['accept-encoding'] || '');
-    const comprimido = aceitaGzip ? await readFile(alvo + '.gz').catch(() => null) : null;
+    // Um .gz mais velho que o original é sobra de outra versão: vale o original.
+    const infoGz = aceitaGzip ? await stat(alvo + '.gz').catch(() => null) : null;
+    const comprimido = infoGz && infoGz.mtimeMs >= info.mtimeMs ? await readFile(alvo + '.gz').catch(() => null) : null;
     const corpo = comprimido || await readFile(alvo);
     res.writeHead(200, {
       'content-type': TIPOS[extname(alvo).toLowerCase()] || 'application/octet-stream',

@@ -329,9 +329,11 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
     tag = 'toque';
   }
   if (tipo === 'pedido' || tipo === 'aceito') { url = './#/amigos'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
-  if (tipo === 'propositoConvite' || tipo === 'propositoAceito') { url = './#/propositos'; tag = 'proposito:' + (dados.id || ''); }
+  // A célula mora no Juntos; duplas e grupos, em Juntos > Propósitos.
+  const telaDoProposito = dados.celula ? './#/novidades' : './#/novidades/propositos';
+  if (tipo === 'propositoConvite' || tipo === 'propositoAceito') { url = telaDoProposito; tag = 'proposito:' + (dados.id || ''); }
   // A meta batida usa a mesma tag do "falta pouco": no celular, a boa notícia substitui o recado.
-  if (tipo === 'metaDoGrupo' || tipo === 'metaBatida') { url = './#/propositos'; tag = 'grupo:' + (dados.id || ''); }
+  if (tipo === 'metaDoGrupo' || tipo === 'metaBatida') { url = telaDoProposito; tag = 'grupo:' + (dados.id || ''); }
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = lista[semente(usuario + '|' + data + '|' + tipo) % lista.length];
   return { titulo: preencher(titulo, d), corpo: preencher(corpo, d), tag, url };

@@ -14,7 +14,6 @@ window.CC = window.CC || {};
 
   // ---------- datas ----------
   const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  CC.iso = iso;
   CC.hojeIso = () => iso(new Date());
   CC.somaDias = (texto, n) => {
     const d = new Date(texto + 'T12:00:00');

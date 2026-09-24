@@ -386,8 +386,6 @@
     const m = /^(\d+) (.+)$/.exec(linha.trim());
     return [Number(m[1]), m[2]];
   }));
-  CC.versiculosEscolhidos = () => MAPA;
-  CC.notasDeReflexao = () => NOTAS;
 
   // ---------- o tipo de texto ----------
   const CARTAS = ['Romanos', '1 Coríntios', '2 Coríntios', 'Gálatas', 'Efésios', 'Filipenses', 'Colossenses',

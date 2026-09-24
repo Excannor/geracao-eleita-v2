@@ -191,6 +191,7 @@
     if (rota !== 'praticar') CC.fecharPratica();
     if (CC.fecharPopNo) CC.fecharPopNo();
 
+    if (rota === 'propositos') { location.replace('#/novidades/propositos'); return; }
     if (rota === '' || rota === 'dia') CC.vistaTrilha(conteudo);
     else if (rota === 'passos' || rota === 'licoes') CC.vistaPassos(conteudo);
     else if (rota === 'praticar') CC.vistaPraticar(conteudo);

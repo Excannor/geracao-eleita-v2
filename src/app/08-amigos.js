@@ -603,7 +603,6 @@
       desenhar(d || cache, n || mural, d ? '' : 'Não consegui falar com o servidor agora.');
     });
   };
-  CC.vistaNovidades = CC.vistaAmigos;
 
   CC.vistaBloqueados = function (raiz) {
     const desenhar = (d) => {

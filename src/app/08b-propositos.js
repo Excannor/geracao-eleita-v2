@@ -10,7 +10,6 @@
   const acao = (corpo) => CC.api('api/propositos', corpo);
 
   CC.carregarPropositos = () => CC.api('api/propositos').then((d) => { cache = d; return d; }).catch(() => null);
-  CC.propositosEmCache = () => cache;
   // A célula mora no Juntos, num cartão próprio; Propósitos fica com as duplas e os grupos.
   CC.minhasCelulas = () => ((cache && cache.propositos) || []).filter((p) => p.celula && !p.euConvidado);
 

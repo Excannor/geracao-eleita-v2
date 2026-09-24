@@ -107,7 +107,7 @@ ok(recusou, 'arquivo que não é imagem é recusado');
 await av('CC.guardarFoto(' + JSON.stringify(pronta.dados) + '); CC.redesenhar();');
 await dormir(700);
 ok(await av('!!document.querySelector(".cartao-pessoa img")'), 'a foto aparece no cartão');
-ok(await av('!!document.querySelector(".aba .retrato-aba")'), 'a foto aparece na aba do perfil');
+ok(await av('!!document.querySelector("img.retrato-topo")'), 'a foto aparece no retrato do topo (o atalho do perfil)');
 
 // o nome
 await av('CC.guardarApelido("Marcos"); CC.redesenhar();');

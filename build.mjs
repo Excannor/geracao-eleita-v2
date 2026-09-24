@@ -118,7 +118,10 @@ const html = molde
 // A versão sai do conteúdo da página, com o marcador ainda no lugar, e depois entra nela:
 // assim o app compara a versão que está rodando com a que o servidor publicou.
 const versao = createHash('sha256').update(html).digest('hex').slice(0, 12);
-writeFileSync(dist('index.html'), html.replace(/\/\*VERSAO_APP\*\//g, versao), 'utf8');
+const paginaFinal = html.replace(/\/\*VERSAO_APP\*\//g, versao);
+writeFileSync(dist('index.html'), paginaFinal, 'utf8');
+// Comprimida ao lado, como as bíblias: são quase 5 MB, e em gzip cabem em pouco mais de 1.
+writeFileSync(dist('index.html.gz'), gzipSync(Buffer.from(paginaFinal, 'utf8'), { level: 9 }));
 
 // ---------- tela de entrada ----------
 // Vive fora do index.html porque o servidor a entrega antes de saber quem é a

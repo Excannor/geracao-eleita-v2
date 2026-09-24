@@ -438,15 +438,6 @@ button { font-family: inherit; }
 /* O ícone da aba encolhia para 82% e voltava a cada toque. Era esse o "zoom" na troca de
    aba: some junto com o resto das animações de escala. O toque já responde pela vibração
    e pela pílula que muda de lugar. */
-.aba .retrato-aba {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-  border: 2px solid var(--borda);
-}
-.aba.selecionada .retrato-aba { border-color: var(--inverso); }
 
 /* Bíblia: quadrado de cantos arredondados, cheio, no meio da barra — a Bíblia é o texto por
    trás de tudo, não mais um destino entre outros. Fica INTEIRO dentro da barra, de
@@ -532,7 +523,6 @@ button { font-family: inherit; }
 .botao svg { width: 20px; height: 20px; flex: 0 0 auto; }
 
 .acoes { display: grid; gap: 10px; margin-top: 16px; }
-.acoes.lado-a-lado { grid-template-columns: 1fr 1fr; }
 .pe-duplo { display: grid; grid-template-columns: 56px 1fr; gap: 10px; }
 .pe-duplo-plano { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
 
@@ -1138,10 +1128,6 @@ button { font-family: inherit; }
 
 /* ---------- celebração ---------- */
 /* sem o topo, a grade da lição tem só palco e pé: sem isto, o pé pegava a linha que estica */
-.licao.tela-celebrar { grid-template-rows: 1fr auto; }
-.tela-celebrar .licao-palco > .interno { min-height: 100%; display: flex; flex-direction: column; justify-content: center; }
-.tela-celebrar .licao-pe { border-top-color: transparent; }
-.tela-celebrar .licao-palco { padding-top: calc(24px + env(safe-area-inset-top)); }
 
 .cena {
   display: flex;
@@ -1162,36 +1148,15 @@ button { font-family: inherit; }
 }
 .cena h1 { font-size: 1.9rem; margin: 0; text-wrap: balance; }
 .frase-cena { max-width: 340px; margin: 4px 0 0; font-size: 1.1rem; font-weight: 700; color: var(--tinta); text-wrap: balance; }
-.frase-cena.trocando { animation: trocar-frase .4s ease; }
-@keyframes trocar-frase { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
-.cena-feito h1 { color: var(--amarelo-3d); }
-:root[data-tema="escuro"] .cena-feito h1 { color: var(--amarelo); }
-
-.placas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 380px; margin-top: 10px; }
-.placa { border: 2px solid var(--cor); border-radius: var(--raio); overflow: hidden; background: var(--cartao); animation: pop .45s var(--mola) both; }
-.placa:nth-child(2) { animation-delay: .12s; }
-.placa:nth-child(3) { animation-delay: .24s; }
-.cabeca-placa { display: block; padding: 4px; background: var(--cor); color: var(--sobre, var(--sobre-cor)); font-size: 0.7rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
-.valor-placa { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 12px 4px; color: var(--cor); font-size: 1.45rem; font-weight: 900; }
-.valor-placa svg { width: 22px; height: 22px; }
 
 /* o fogo grande e o número da ofensiva */
 .chama-palco { position: relative; display: grid; place-items: center; width: 180px; height: 190px; }
 .chama-palco .ico-chama { width: 150px; height: 150px; animation: surgir-fogo .6s var(--mola) both; }
 @keyframes surgir-fogo { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
-.versiculo-cena { max-width: 340px; margin: 8px 0 0; color: var(--tinta-fraca); font-size: 0.86rem; font-weight: 700; font-style: italic; text-wrap: balance; }
-.versiculo-cena:empty { display: none; }
-.versiculo-cena b { font-style: normal; white-space: nowrap; }
 @keyframes acender {
   0% { transform: scale(.15) rotate(-12deg); opacity: 0; }
   60% { transform: scale(1.12) rotate(4deg); opacity: 1; }
   100% { transform: scale(1) rotate(0); }
-}
-@keyframes tremular {
-  0%, 100% { transform: scale(1, 1); }
-  30% { transform: scale(.97, 1.04); }
-  60% { transform: scale(1.03, .97); }
 }
 .numero-ofensiva {
   display: block;
@@ -1205,7 +1170,6 @@ button { font-family: inherit; }
 }
 .numero-ofensiva.subindo { animation: numero-sobe .5s var(--mola); }
 @keyframes numero-sobe { 0% { transform: scale(1); } 50% { transform: scale(1.22); } 100% { transform: scale(1); } }
-.cena-ofensiva h1.rotulo-ofensiva { font-size: 1.7rem; color: var(--chama); }
 
 .semana-ofensiva { width: 100%; max-width: 360px; margin-top: 14px; }
 .semana-ofensiva .nomes, .semana-ofensiva .trilho { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
@@ -1230,11 +1194,6 @@ button { font-family: inherit; }
 .marca-dia.escudo svg { color: var(--branco); }
 
 /* marcos de ofensiva: calendários numa estrada */
-.trilho-marcos { position: relative; display: flex; align-items: center; justify-content: center; gap: 22px; width: 100%; margin: 10px 0 18px; }
-.trilho-marcos::before { content: ''; position: absolute; left: -16px; right: -16px; top: 50%; height: 14px; margin-top: -7px; background: linear-gradient(90deg, #ffb13d 50%, var(--trilho) 50%); }
-.marco-lado, .marco-centro { position: relative; }
-.marco-lado.vazio { width: 64px; }
-.marco-centro { animation: pop .6s var(--mola) .2s both; }
 .arte-calendario {
   position: relative;
   display: grid;
@@ -1281,15 +1240,6 @@ button { font-family: inherit; }
 .missao.fechou-agora .premio-missao svg { animation: bau-pronto .7s var(--mola) 1.1s both; }
 @keyframes bau-pronto { 0% { transform: scale(1); } 40% { transform: scale(1.35) rotate(-8deg); } 100% { transform: scale(1) rotate(0); } }
 
-
-/* conquista, livro e unidade */
-.medalha-palco { position: relative; display: grid; place-items: center; width: 190px; height: 190px; }
-.medalha-palco > .arte-medalha, .medalha-palco > .arte-trofeu, .medalha-palco > .arte-livro { animation: girar-entrar .8s var(--mola) both; }
-@keyframes girar-entrar {
-  0% { transform: scale(.2) rotate(-25deg); opacity: 0; }
-  70% { transform: scale(1.1) rotate(4deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); }
-}
 .arte-medalha { position: relative; display: inline-grid; justify-items: center; flex: 0 0 auto; width: 64px; }
 .arte-medalha .escudo {
   display: grid;
@@ -1320,7 +1270,6 @@ button { font-family: inherit; }
 .arte-trofeu.ganho .copa { fill: var(--cor); }
 .arte-trofeu.ganho .alcas { stroke: var(--cor-3d); }
 .arte-trofeu.ganho .haste, .arte-trofeu.ganho .base { fill: var(--cor-3d); }
-.medalha-palco > .arte-trofeu { width: 130px; }
 
 /* faíscas que saem do centro */
 .faiscas { position: absolute; inset: 0; pointer-events: none; }
@@ -1416,7 +1365,6 @@ button { font-family: inherit; }
 .etapa-reflexao + .etapa-reflexao { margin-top: 22px; padding-top: 20px; border-top: 2px solid var(--borda); }
 .etapa-reflexao h2 { margin: 6px 0 12px; font-size: 1.18rem; }
 .etapa-reflexao .cartao-versiculo { margin-top: 0; }
-.avancar-reflexao { margin-top: 2px; }
 .contexto-reflexao { margin: -4px 0 14px; color: var(--tinta-fraca); font-size: 0.9rem; font-weight: 600; line-height: 1.5; }
 .contexto-reflexao b { color: var(--tinta); }
 /* O tamanho do ícone precisa estar aqui, na regra base, e não só nos lugares específicos:
@@ -1460,7 +1408,6 @@ button { font-family: inherit; }
 .pergunta-reflexao .rotulo-pergunta { color: var(--azul); font-size: 0.72rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
 .pergunta-reflexao[aria-pressed="true"] { border-color: var(--azul); background: var(--azul-fraco); }
 .dica-pensar { margin: 12px 0 12px; }
-.perguntas-reflexao + .avancar-reflexao, .dica-pensar + .avancar-reflexao { margin-top: 12px; }
 .oracao-guia { display: grid; gap: 10px; margin: 0 0 14px; padding: 0; list-style: none; }
 .oracao-guia li { padding: 12px 16px; border-radius: var(--raio); background: linear-gradient(160deg, var(--amarelo-fraco), var(--fundo-2)); color: var(--tinta-forte); font-size: 1.03rem; font-weight: 700; font-style: italic; animation: entrar-cena .45s var(--suave) both; }
 .oracao-guia li:nth-child(2) { animation-delay: .1s; }
@@ -1739,8 +1686,6 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .corpo-mural p b { color: var(--tinta-forte); font-weight: 800; }
 .arte-mural { flex: 0 0 auto; display: grid; place-items: center; width: 74px; }
 .arte-mural .arte-trofeu { width: 54px; }
-.arte-retrato { display: block; width: 70px; height: 70px; border-radius: var(--raio-g); overflow: hidden; background: linear-gradient(180deg, var(--arte-ceu), var(--arte-creme)); }
-.arte-retrato svg { width: 100%; height: 100%; }
 .versiculo-mural { margin: 0 0 12px; padding: 14px 16px; border-radius: var(--raio); background: var(--fundo-2); }
 .versiculo-mural p { margin: 0 0 6px; color: var(--tinta-forte); font-size: 1rem; font-weight: 600; line-height: 1.55; }
 .versiculo-mural b { color: var(--tinta-fraca); font-size: 0.82rem; }
@@ -1853,22 +1798,6 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .cartao-pessoa .conta { display: block; padding-left: 8px; font-size: 0.9rem; font-weight: 700; color: var(--tinta-fraca); }
 
 .titulo-perfil { margin: 20px 0 12px; }
-.numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.numero-cartao {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 2px solid var(--borda);
-  border-radius: var(--raio);
-  background: var(--cartao);
-  color: inherit;
-  text-decoration: none;
-}
-.numero-cartao svg { width: 26px; height: 26px; flex: 0 0 auto; color: var(--cor, var(--tinta-fraca)); }
-.numero-cartao b { display: block; font-size: 1.3rem; font-weight: 900; color: var(--tinta-forte); line-height: 1.1; }
-.numero-cartao span { display: block; font-size: 0.8rem; font-weight: 700; color: var(--tinta-fraca); }
-a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
 
 .linha-ritmo { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; padding: 12px 14px; border-radius: var(--raio); background: var(--azul-fraco); font-size: 0.9rem; color: var(--tinta); font-weight: 700; }
 .linha-ritmo svg { width: 22px; height: 22px; flex: 0 0 auto; color: var(--azul); }
@@ -1884,7 +1813,6 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
 .estante { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
 .trofeu { display: grid; justify-items: center; align-content: start; gap: 4px; padding: 14px 6px 12px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); text-align: center; }
 .trofeu .arte-trofeu { width: 46px; }
-.trofeu .arte-retrato { width: 56px; height: 56px; border-radius: var(--raio-p); }
 .trofeu b { color: var(--tinta-forte); font-size: 0.8rem; line-height: 1.2; }
 .trofeu span { color: var(--tinta-fraca); font-size: 0.74rem; font-weight: 700; }
 .trofeu:not(.ganho) b { color: var(--tinta-fraca); }
@@ -2322,14 +2250,6 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .filtro { border: 2px solid var(--borda); background: var(--cartao); color: var(--tinta-fraca); border-radius: 999px; padding: 8px 16px; min-height: 40px; font-weight: 800; font-size: 0.84rem; cursor: pointer; font-family: inherit; }
 .filtro.ligado { background: var(--azul); border-color: var(--azul); color: var(--sobre-cor); }
-
-.dobra-livros { margin-top: 12px; }
-.dobra-livros > summary { cursor: pointer; font-weight: 800; font-size: 0.86rem; color: var(--tinta-fraca); padding: 10px 2px; list-style: none; }
-.dobra-livros > summary::-webkit-details-marker { display: none; }
-.dobra-livros > summary::after { content: ' ⌄'; }
-.dobra-livros[open] > summary::after { content: ' ⌃'; }
-.dobra-livros > summary:hover { color: var(--azul); }
-.dobra-livros .pilulas { margin-top: 8px; }
 
 .notas-de-hoje { display: grid; gap: 8px; margin-top: 14px; }
 .notas-de-hoje b { color: var(--tinta-forte); }
@@ -2801,9 +2721,6 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 .acoes-reflexao .link-nota svg { width: 18px; height: 18px; }
 
 /* o resumo é uma tela sem topo, como a celebração antiga */
-.licao.tela-resumo { grid-template-rows: 1fr auto; }
-.tela-resumo .licao-pe { border-top-color: transparent; }
-.tela-resumo .licao-palco { padding-top: calc(20px + env(safe-area-inset-top)); }
 .resumo-dia { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0 12px; text-align: center; }
 .resumo-dia > * { animation: entrar-cena .45s var(--suave) both; }
 .resumo-dia > *:nth-child(n+3) { animation-delay: .1s; }

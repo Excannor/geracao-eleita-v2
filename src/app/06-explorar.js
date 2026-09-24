@@ -147,7 +147,6 @@
     ['05 - Hermenêutica/Cristo em toda a Escritura', 'Como o Antigo Testamento aponta para Jesus.'],
     ['15 - Fios Bíblicos/Fio do cordeiro', 'Um tema que atravessa a Bíblia de ponta a ponta.'],
   ].filter(([id]) => D.notas[id]);
-  CC.COMECE_POR_AQUI = COMECE.map(([id]) => id);
   const nomeDe = (id) => CC.semPrefixo(D.notas[id].nome || id.split('/').pop());
   const hrefNota = (id) => '#/nota/' + encodeURIComponent(id);
 
