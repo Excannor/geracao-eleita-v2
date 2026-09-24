@@ -125,11 +125,8 @@ const atrasadoManha = { historico: { data: '2026-09-15', automaticas: 1, lembret
 ok(tipo(base(hm(12), atrasadoManha)) === null && tipo(base(hm(13), atrasadoManha)) === null,
   'o da manhã que saiu às 11h50 cobre o do meio-dia: nada de dois avisos colados');
 ok(slot(base(hm(19), atrasadoManha)) === hm(19), 'e o da noite sai normal');
-const sumidoHa = (dias, historico = {}) => base(hm(19), { historico, leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: new Date(Date.parse('2026-09-15T12:00:00Z') - dias * 864e5).toISOString().slice(0, 10) } });
-ok((N.decidir(sumidoHa(8)) || {}).tipo === 'volta' && N.decidir(sumidoHa(8)).dados.dias === 7,
-  'o recado do 7º dia perdido com o servidor fora sai no dia seguinte');
-ok(tipo(sumidoHa(8, { volta: '2026-09-14' })) === null, 'se o do 7º dia já tinha saído, não repete');
-ok(tipo(sumidoHa(9)) === null, 'atraso de mais de um dia não vira recado: espera o próximo da lista');
+const sumidoAs = (m) => base(m, { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-09-10' } });
+ok(tipo(sumidoAs(hm(21, 40))) === 'volta', 'quem sumiu: servidor voltou depois do horário, o aviso do dia sai atrasado');
 ok(tipo(base(hm(22, 30))) === null && tipo(base(hm(23, 59))) === null && tipo(base(hm(6, 59))) === null,
   'silêncio das 22h30 às 7h, mesmo sem nada ter saído');
 ok(tipo(base(hm(19), { pref: { ...N.PREFERENCIAS_PADRAO, lembrete: false, ofensiva: false } })) === null, 'desligado nas configurações, não sai');
@@ -140,8 +137,11 @@ ok(tipo(base(hm(13), { leitura: { ...base(0).leitura, escudoOntem: true } })) !=
 
 const sumido = (dias, m = hm(19)) => base(m, { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: ['2026-09-12', '2026-09-08', '2026-09-01'][[3, 7, 14].indexOf(dias)] || '2026-09-10' } });
 ok(tipo(sumido(3)) === 'volta' && tipo(sumido(7)) === 'volta' && tipo(sumido(14)) === 'volta', 'quem sumiu recebe recado no 3º, 7º e 14º dia');
-ok(tipo(sumido(5)) === null, 'entre um recado e outro, silêncio: nada de lembrete todo dia para quem sumiu');
-ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-08-01' } })) === null, 'depois do 14º dia, silêncio até a pessoa voltar');
+ok(tipo(sumido(5)) === 'volta' && N.decidir(sumido(5)).dados.dias === 0, 'entre um recado especial e outro, o aviso diário leve');
+ok(tipo(sumido(5, hm(12))) === null, 'quem sumiu recebe um só por dia, no horário escolhido, não os três');
+ok(tipo(base(hm(19), { historico: { data: '2026-09-15', automaticas: 1, volta: '2026-09-15' }, leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-09-10' } })) === null,
+  'e não repete no mesmo dia');
+ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-08-01' } })) === 'volta', 'depois do 14º dia o aviso diário continua');
 ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: null, criadaEm: '2026-09-14' } })) === 'lembrete',
   'conta nova que ainda não leu recebe o lembrete nos primeiros dias');
 

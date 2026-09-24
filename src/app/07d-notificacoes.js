@@ -128,7 +128,7 @@
         + interruptor('ofensiva', 'Ofensiva em risco', 'Às 21h, se a sua chama ainda não foi acesa', p.ofensiva)
         + interruptor('amigos', 'Amigos', 'Toques, pedidos e convites aceitos', p.amigos)
         + '</div></section>'
-        + '<p class="passo-dica pequena">Nada chega entre 22h30 e 7h. Quem fica uns dias sem ler recebe só três recados espaçados, e depois o app espera você voltar.</p>'
+        + '<p class="passo-dica pequena">Nada chega entre 22h30 e 7h. Quem fica uns dias sem ler recebe um aviso leve por dia, no horário escolhido.</p>'
       : '';
 
     raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1>' + topo + preferencias

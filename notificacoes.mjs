@@ -9,7 +9,7 @@
 //
 // O combinado para não virar chatice: no máximo 3 automáticas por dia (manhã, meio-dia e
 // noite), silêncio das 22h30 às 7h, nada depois que a pessoa leu, e quem sumiu recebe
-// três recados espaçados e depois silêncio. Toque de amigo tem teto próprio.
+// um aviso por dia, leve, até voltar. Toque de amigo tem teto próprio.
 import { readFile, writeFile, rename, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import {
@@ -126,7 +126,6 @@ const MARCOS = [7, 14, 30, 50, 100, 150, 200, 250, 300, 365];
 
 export const emSilencio = (minutos) => minutos >= SILENCIO.inicio || minutos < SILENCIO.fim;
 const paraMinutos = (hora) => { const [h, m] = String(hora).split(':').map(Number); return h * 60 + (m || 0); };
-const somarDias = (data, n) => new Date(Date.parse(data + 'T12:00:00Z') + n * 864e5).toISOString().slice(0, 10);
 const diasEntre = (de, ate) => Math.round((Date.parse(ate + 'T12:00:00Z') - Date.parse(de + 'T12:00:00Z')) / 864e5);
 
 export function horaValida(hora) {
@@ -156,16 +155,12 @@ export function decidir({ agora, pref, historico = {}, leitura }) {
   const referencia = leitura.ultimaLeitura || leitura.criadaEm || data;
   const semLer = diasEntre(referencia, data);
 
-  // Quem sumiu não recebe lembrete todo dia: três recados espaçados e depois silêncio.
-  // Se o servidor esteve fora no dia do recado, ele sai no dia seguinte, uma vez só; atraso
-  // maior que isso fica para o próximo recado da lista, sem acumular.
+  // Quem sumiu recebe um aviso por dia, só um, no horário escolhido: sem os três do dia, que
+  // viram cobrança para quem está afastado. O 3º, o 7º e o 14º dia têm frase própria; os
+  // outros dias usam as frases leves de volta. Servidor fora no horário: sai quando ele voltar.
   if (semLer >= DIAS_DE_VOLTA[0]) {
     if (!pref.lembrete || minutos < hora || historico.volta === data) return null;
-    const etapa = [...DIAS_DE_VOLTA].reverse().find((d) => d <= semLer);
-    const devidoEm = somarDias(referencia, etapa);
-    const atrasado = semLer - etapa;
-    if (atrasado > 1 || (historico.volta && historico.volta >= devidoEm)) return null;
-    return { tipo: 'volta', dados: { dias: etapa } };
+    return { tipo: 'volta', dados: { dias: DIAS_DE_VOLTA.includes(semLer) ? semLer : 0 } };
   }
 
   // Os três horários do dia. "enviadoAte" é o minuto do último lembrete de hoje: só sai o
@@ -245,6 +240,13 @@ const T = {
   volta3: [['Saudade de você por aqui 👀', 'Seu progresso tá guardadinho. Bora retomar com a leitura de hoje?']],
   volta7: [['O caminho continua aberto 🛤️', 'Sem pressão: é só abrir e seguir de onde parou.']],
   volta14: [['Passando só pra lembrar 💛', 'Quando quiser voltar, está tudo guardado do jeito que você deixou.']],
+  // Os outros dias de quem está afastado: um convite leve, nunca contagem de dias perdidos.
+  voltaDiario: [
+    ['A leitura de hoje tá aqui 📖', 'Sem cobrança: abre quando der e lê com calma.'],
+    ['Um minutinho com a Palavra? 🌿', 'Seu progresso tá guardado. Dá pra seguir de onde parou.'],
+    ['Oi, {nome} 👋', 'A lição de hoje é curtinha. Que tal hoje?'],
+    ['Recomeçar é sempre possível 🌱', 'É só abrir o app e seguir do ponto em que você parou.'],
+  ],
   toque: [
     ['{amigo} te deu um toque 👊', 'Bora ler hoje? A lição tá esperando vocês dois.'],
     ['{amigo} tá te chamando pra ler 📣', 'Faz a lição de hoje e a contagem de vocês sobe.'],
@@ -293,7 +295,7 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
     tag = 'lembrete';
   }
   if (tipo === 'ofensiva' || tipo === 'escudo') { d.n = dados.ofensiva || 0; tag = 'lembrete'; }
-  if (tipo === 'volta') { lista = T['volta' + dados.dias] || T.volta3; tag = 'lembrete'; }
+  if (tipo === 'volta') { lista = T['volta' + dados.dias] || T.voltaDiario; tag = 'lembrete'; }
   if (tipo === 'toque') {
     if ((dados.outros || 0) > 0) lista = T.toques;
     tag = 'toque';
