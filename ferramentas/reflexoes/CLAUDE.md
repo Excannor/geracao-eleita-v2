@@ -160,7 +160,12 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    ideia sobre Deus uma pessoa nova tira daqui? Erros já cometidos: "onde Deus está te
    privando de algo?" (Deus não priva) e "em que momento você pode lembrar que Deus está com
    você?" (ele está sempre) e "em que lugar ruim da sua vida você acha que Deus não está?" (a
-   pergunta pede para a pessoa apontar um lugar sem Deus). Verdades que nenhuma pergunta pode contrariar: Deus está sempre
+   pergunta pede para a pessoa apontar um lugar sem Deus). Revisão de 2026-09-24 achou mais da
+   mesma família: "o que já passou da hora de Deus agir?" (Deus atrasado), "Deus volta para perto
+   depois de um tempo de distância" (Deus que se afasta), "quer ter certeza de que ele vai junto?"
+   (presença incerta), "imaginar Deus do seu lado" (como se fosse imaginação). O sentimento da
+   pessoa pode entrar como lamento dirigido a Deus ("você já disse isso a Deus?"), nunca como
+   afirmação sobre ele. Verdades que nenhuma pergunta pode contrariar: Deus está sempre
    presente; o amor dele não depende do nosso comportamento; salvação é pela graça, não por
    mérito; Deus não é cúmplice do mal.
 
