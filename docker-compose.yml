@@ -41,6 +41,9 @@ services:
       CAMINHO_SMTP_USUARIO: "${CAMINHO_SMTP_USUARIO:-}"
       CAMINHO_SMTP_SENHA: "${CAMINHO_SMTP_SENHA:-}"
       CAMINHO_SMTP_DE: "${CAMINHO_SMTP_DE:-}"
+      # A chave dos backups cifrados mora no .env, fora da pasta de dados: quem levar dados/
+      # não leva a chave junto. Guarde uma cópia dela: sem a chave, o backup não abre.
+      CAMINHO_BACKUP_CHAVE: "${CAMINHO_BACKUP_CHAVE:-}"
 
   # Túnel rápido: endereço novo a cada reinício. Só sobe se pedido, com
   #   docker compose --profile rapido up -d

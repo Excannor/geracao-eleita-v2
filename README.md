@@ -326,9 +326,13 @@ vem no Node (`node:sqlite`, nenhuma dependência nova). Roda em modo WAL.
   tem versão (`schema_versao`).
 - **Gravação:** `Contas`, `Novidades` e `Notificacoes` gravam sobre o mesmo objeto em
   memória; a cada gravação, só as linhas que mudaram vão para o banco, numa transação.
-- **Backups:** um por dia (`dados/backup/caminho-AAAA-MM-DD.db`, via `VACUUM INTO`), ficam
-  os 14 mais novos. `node ferramentas/exportar-sqlite-para-json.mjs dados saida` regenera os
-  JSON a partir de uma cópia do banco, o caminho de volta.
+- **Backups:** um por dia (`dados/backup/caminho-AAAA-MM-DD.db.cifrado`, via `VACUUM INTO`),
+  ficam os 14 mais novos. Cada um é cifrado (AES-256-GCM) com a chave `CAMINHO_BACKUP_CHAVE`
+  do `.env`; sem ela, com `dados/backup.chave`. **Guarde uma cópia da chave fora do
+  computador: sem ela nenhum backup abre.** Para restaurar:
+  `node ferramentas/backup.mjs abrir dados/backup/caminho-AAAA-MM-DD.db.cifrado restaurado.db`.
+  `node ferramentas/exportar-sqlite-para-json.mjs dados saida` regenera os JSON a partir de
+  uma cópia do banco, o caminho de volta.
 - **Chaves:** `dados/sessao.chave` e `dados/push.chave` continuam como arquivos.
 
 ## Notificações

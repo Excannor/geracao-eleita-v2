@@ -11,7 +11,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
 const importar = (f) => import(pathToFileURL(join(AQUI, f)).href);
-const { abrirBanco, arquivoDoBanco, fazerBackup, fecharBanco } = await importar('db.mjs');
+const { abrirBanco, arquivoDoBanco, copiarBanco, fecharBanco } = await importar('db.mjs');
 const { Contas } = await importar('contas.mjs');
 const { Novidades } = await importar('novidades.mjs');
 const { Notificacoes } = await importar('notificacoes.mjs');
@@ -34,7 +34,7 @@ if (resolve(origem) === resolve(saida)) {
 // dela como se fosse a de verdade, e nada é importado nem movido na origem.
 const temporaria = mkdtempSync(join(tmpdir(), 'cc-exportar-'));
 const bancoOrigem = abrirBanco(arquivoDoBanco(origem));
-fazerBackup(bancoOrigem, arquivoDoBanco(temporaria));
+copiarBanco(bancoOrigem, arquivoDoBanco(temporaria));
 fecharBanco(arquivoDoBanco(origem));
 
 try {

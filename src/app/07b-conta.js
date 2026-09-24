@@ -40,6 +40,7 @@
           + '<div class="linha-config sem-toque"><span>Nascimento</span><span class="valor">' + CC.esc(dataBr(quem.nascimento) || 'falta completar') + '</span></div>'
           + (quem.perfilCompleto ? '' : linha('Completar cadastro', '', 'data-completar'))
           + linha('Trocar a senha', '', 'data-senha')
+          + linha('Sair dos outros aparelhos', '', 'data-sair-outros')
           + linha('Sair desta conta', '', 'data-sair')
           + linha('Apagar a conta', '', 'data-apagar', 'perigo'))
         : '')
@@ -77,6 +78,15 @@
     ligar('[data-completar]', () => CC.completarCadastro(quem));
     ligar('[data-senha]', () => CC.trocarSenha());
     ligar('[data-apagar]', () => CC.apagarConta(quem.usuario));
+    ligar('[data-sair-outros]', async () => {
+      const certo = await CC.confirmar({
+        titulo: 'Sair dos outros aparelhos?',
+        texto: 'Todo celular ou computador onde a sua conta está aberta sai dela. Este aparelho continua dentro.',
+        acao: 'Sair dos outros',
+      });
+      if (!certo) return;
+      try { await CC.api('api/sair-dos-outros', {}); CC.avisar('Pronto: só este aparelho continua dentro'); } catch (e) { CC.avisar(e.message); }
+    });
     ligar('[data-sair]', async () => {
       const certo = await CC.confirmar({
         titulo: 'Sair da conta?',
@@ -183,7 +193,7 @@
         botao.onclick = async () => {
           const nova = folha.querySelector('#senha-nova').value;
           dizer('');
-          if (nova.length < 6) { dizer('A senha nova precisa de 6 caracteres ou mais.'); return; }
+          if (nova.length < 8) { dizer('A senha nova precisa de 8 caracteres ou mais.'); return; }
           if (nova !== folha.querySelector('#senha-repete').value) { dizer('As duas senhas novas não são iguais.'); return; }
           botao.disabled = true;
           try {

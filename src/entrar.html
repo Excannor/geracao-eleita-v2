@@ -326,7 +326,7 @@
     if (n === 3) {
       $('usuario').value = $('usuario').value.trim().toLowerCase().replace(/^@/, '');
       if (!/^[a-z0-9][a-z0-9._-]{1,29}$/.test($('usuario').value)) return erro($('usuario'), 'O @ aceita letras minúsculas, números, ponto, hífen e sublinhado, de 2 a 30 caracteres.');
-      if ($('senha-nova').value.length < 6) return erro($('senha-nova'), 'A senha precisa de 6 caracteres ou mais.');
+      if ($('senha-nova').value.length < 8) return erro($('senha-nova'), 'A senha precisa de 8 caracteres ou mais.');
     }
     return true;
   }
@@ -431,7 +431,7 @@
   $('form-redefinir').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var senha = $('senha-redefinir').value;
-    if (senha.length < 6) { $('erro-redefinir').textContent = 'A senha precisa de 6 caracteres ou mais.'; return; }
+    if (senha.length < 8) { $('erro-redefinir').textContent = 'A senha precisa de 8 caracteres ou mais.'; return; }
     var botao = $('botao-redefinir');
     botao.disabled = true;
     $('erro-redefinir').textContent = '';

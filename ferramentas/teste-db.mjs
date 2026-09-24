@@ -2,7 +2,7 @@
 // que mudou, transação que desfaz tudo quando algo falha, backup do dia e a pessoa que
 // apaga a conta saindo também dos backups.
 // Uso: node ferramentas/teste-db.mjs
-import { mkdtempSync, rmSync, existsSync, readdirSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -70,9 +70,13 @@ try {
   const pastaBackup = join(pasta, 'backup');
   ok(!!B.backupDoDia(db, pastaBackup, '2026-09-15') && B.backupDoDia(db, pastaBackup, '2026-09-15') === null, 'um backup por dia, sem repetir');
   for (let d = 1; d <= 16; d++) B.backupDoDia(db, pastaBackup, '2026-08-' + String(d).padStart(2, '0'));
-  const guardados = readdirSync(pastaBackup).filter((f) => f.endsWith('.db')).sort();
-  ok(guardados.length === 14 && guardados.includes('caminho-2026-09-15.db') && !guardados.includes('caminho-2026-08-01.db'), 'ficam os 14 backups mais novos');
-  const copia = new B.DatabaseSync(join(pastaBackup, 'caminho-2026-09-15.db'));
+  const guardados = readdirSync(pastaBackup).filter((f) => f.endsWith('.db.cifrado')).sort();
+  ok(guardados.length === 14 && guardados.includes('caminho-2026-09-15.db.cifrado') && !guardados.includes('caminho-2026-08-01.db.cifrado'), 'ficam os 14 backups mais novos');
+  const bruto = readFileSync(join(pastaBackup, 'caminho-2026-09-15.db.cifrado'));
+  ok(!bruto.includes('SQLite format') && !bruto.includes('só minha') && !readdirSync(pastaBackup).some((f) => f.endsWith('.db') || f.endsWith('.tmp')),
+    'o backup fica cifrado: nem o SQLite nem o texto de ninguém aparecem no arquivo, e não sobra cópia aberta');
+  const aberto = (f) => B.abrirBackup(join(pastaBackup, f), join(pasta, 'aberto-' + f + '.db'));
+  const copia = new B.DatabaseSync(aberto('caminho-2026-09-15.db.cifrado'));
   ok(copia.prepare("SELECT usuario FROM contas").all().length === 1 && copia.prepare("SELECT 1 FROM estados WHERE usuario = 'ana'").get(), 'o backup abre sozinho e tem os dados');
   copia.close();
 
@@ -82,21 +86,29 @@ try {
     { id: 'e2', autor: 'carla', tipo: 'novoProposito', dados: '{"com":"ana"}', chave: 'k2', em: 2 },
     { id: 'e3', autor: 'carla', tipo: 'ofensiva', dados: '{}', chave: 'k3', em: 3 },
   ] }]);
-  B.fazerBackup(db, join(pastaBackup, 'caminho-teste-extra.db'));
+  B.fazerBackup(db, join(pastaBackup, 'caminho-teste-extra.db.cifrado'));
   const limpos = B.apagarPessoaDosBackups(pastaBackup, 'ana');
   let sobrou = 0;
   let outrosFicaram = true;
-  for (const f of readdirSync(pastaBackup).filter((n) => n.endsWith('.db'))) {
-    const c = new B.DatabaseSync(join(pastaBackup, f));
+  for (const f of readdirSync(pastaBackup).filter((n) => n.endsWith('.db.cifrado'))) {
+    const c = new B.DatabaseSync(aberto(f));
     sobrou += c.prepare("SELECT count(*) n FROM contas WHERE usuario = 'ana'").get().n
       + c.prepare("SELECT count(*) n FROM estados WHERE usuario = 'ana'").get().n
       + c.prepare("SELECT count(*) n FROM amizades WHERE a = 'ana' OR b = 'ana'").get().n
       + c.prepare("SELECT count(*) n FROM novidades_eventos WHERE autor = 'ana' OR json_extract(dados, '$.com') = 'ana'").get().n;
-    if (f === 'caminho-teste-extra.db' && !c.prepare("SELECT 1 FROM novidades_eventos WHERE id = 'e3'").get()) outrosFicaram = false;
+    if (f === 'caminho-teste-extra.db.cifrado' && !c.prepare("SELECT 1 FROM novidades_eventos WHERE id = 'e3'").get()) outrosFicaram = false;
     c.close();
   }
   ok(limpos === 15 && sobrou === 0, 'apagar a conta tira a pessoa de todos os ' + limpos + ' backups (conta, progresso, amizades, novidades)');
   ok(outrosFicaram, 'o que é só de outra pessoa continua nos backups');
+  const outraChave = Buffer.alloc(32, 7);
+  let recusou = false;
+  try { B.abrirBackup(join(pastaBackup, 'caminho-2026-09-15.db.cifrado'), join(pasta, 'x.db'), outraChave); } catch { recusou = true; }
+  ok(recusou, 'com outra chave o backup não abre');
+  B.fazerBackup(db, join(pastaBackup, 'caminho-2026-07-01.db.cifrado'));
+  B.abrirBackup(join(pastaBackup, 'caminho-2026-07-01.db.cifrado'), join(pastaBackup, 'caminho-2026-07-01.db'));
+  ok(B.cifrarBackupsAbertos(pastaBackup) >= 1 && !readdirSync(pastaBackup).some((f) => f.endsWith('.db')),
+    'backup antigo guardado aberto vira cifrado, e o aberto some');
 
   B.fecharBanco(arquivo);
 } catch (e) {

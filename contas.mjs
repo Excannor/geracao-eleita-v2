@@ -19,7 +19,9 @@ const CUSTO = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
 const TAMANHO = 64;
 // Senha muito longa só serve para fazer o servidor gastar CPU no scrypt.
 export const SENHA_MAX = 128;
-const senhaCurta = (senha) => String(senha || '').length < 6;
+// Mínimo de 8 para senha nova ou trocada; quem já tinha uma de 6 ou 7 continua entrando com ela.
+export const SENHA_MIN = 8;
+const senhaCurta = (senha) => String(senha || '').length < SENHA_MIN;
 const senhaLonga = (senha) => String(senha || '').length > SENHA_MAX;
 
 // Um link de convite aceita no máximo isto por hora: segura o link que vazou para onde não devia.
@@ -306,7 +308,7 @@ export class Contas {
       if (this.acharPorEmail(mail)) throw erro('este e-mail já tem conta');
     }
     if (exigirPerfil && !nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
-    if (senhaCurta(senha)) throw erro('a senha precisa de 6 caracteres ou mais');
+    if (senhaCurta(senha)) throw erro('a senha precisa de ' + SENHA_MIN + ' caracteres ou mais');
     if (senhaLonga(senha)) throw erro('a senha pode ter no máximo ' + SENHA_MAX + ' caracteres');
 
     const sal = randomBytes(16).toString('hex');
@@ -363,10 +365,20 @@ export class Contas {
   async trocarSenha(usuario, nova) {
     const conta = this.achar(usuario);
     if (!conta) throw erro('conta não encontrada', 404);
-    if (senhaCurta(nova)) throw erro('a senha precisa de 6 caracteres ou mais');
+    if (senhaCurta(nova)) throw erro('a senha precisa de ' + SENHA_MIN + ' caracteres ou mais');
     if (senhaLonga(nova)) throw erro('a senha pode ter no máximo ' + SENHA_MAX + ' caracteres');
     conta.sal = randomBytes(16).toString('hex');
     conta.senha = await embaralhar(nova, conta.sal);
+    await this.salvar();
+    return conta;
+  }
+
+  // Sair dos outros aparelhos: um selo novo na conta invalida todos os crachás assinados antes.
+  // Quem pediu recebe um crachá novo e continua dentro.
+  async renovarSessao(usuario) {
+    const conta = this.achar(usuario);
+    if (!conta) throw erro('conta não encontrada', 404);
+    conta.sessao = randomBytes(8).toString('hex');
     await this.salvar();
     return conta;
   }
@@ -942,7 +954,10 @@ export class Contas {
 
 // Um pedaço do resumo da senha, para entrar na assinatura da sessão. Trocar a senha
 // muda o selo, e todo crachá emitido antes para de valer.
-export const seloDaConta = (conta) => String((conta && conta.senha) || '').slice(0, 16);
+// O selo entra na assinatura do crachá e do link de senha: muda quando a senha muda e quando a
+// pessoa sai dos outros aparelhos. Conta sem "sessao" tem o mesmo selo de antes, então ninguém
+// foi derrubado quando o campo nasceu.
+export const seloDaConta = (conta) => String((conta && conta.senha) || '').slice(0, 16) + String((conta && conta.sessao) || '');
 
 // Onde mora o progresso de cada conta.
 export function arquivoDoEstado(base, usuario) {

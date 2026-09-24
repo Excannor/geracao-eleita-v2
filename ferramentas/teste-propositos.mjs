@@ -29,7 +29,7 @@ console.log('\n  Propósitos em dupla e em grupo\n');
 try {
   const arquivo = join(RASCUNHO, 'contas.json');
   let contas = await new Contas(arquivo).carregar();
-  for (const u of ['velha', 'amiga']) await contas.criar({ usuario: u, senha: '123456', nome: u, email: u + '@x.com', nascimento: '2000-01-01' });
+  for (const u of ['velha', 'amiga']) await contas.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '2000-01-01' });
   await contas.pedir('velha', 'amiga', '2026-01-10');
   await contas.aceitar('amiga', 'velha', '2026-01-10');
   // Volta o banco ao jeito de antes: amizade sem propósito e sem a marca da migração.

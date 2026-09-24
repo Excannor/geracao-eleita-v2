@@ -18,7 +18,7 @@ import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
 import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
-  backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado,
+  backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
 } from './db.mjs';
 import {
   Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio,
@@ -136,6 +136,40 @@ function limparPerfilDoEstado(e) {
   e.apelido = String(e.apelido || '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 20);
   if (!(typeof e.foto === 'string' && e.foto.length <= 400 * 1024 && FOTO_VALIDA.test(e.foto))) e.foto = '';
   return e;
+}
+
+// O progresso nasce no celular (o app funciona sem rede) e o servidor não refaz as contas.
+// Mas não aceita o que não pode ter acontecido, porque a ofensiva, as conquistas e o que vai
+// para o Feed saem dele:
+//   - data no futuro (além de amanhã, pela diferença de fuso) vira hoje;
+//   - leitura nova com mais de 7 dias de atraso conta como hoje: quem ficou uma semana sem
+//     rede sincroniza normal; quem inventa um ano de leitura de uma vez não ganha um ano de ofensiva;
+//   - data já gravada não é trocada por uma mais antiga que isso;
+//   - contadores sobem no máximo um tanto por sincronização.
+const DIAS_DE_ATRASO = 7;
+const SUBIDA_MAXIMA = { acertosTotal: 500, missoesTotal: 30, maiorProposito: 30 };
+const DATA_VALIDA = /^\d{4}-\d{2}-\d{2}$/;
+function conferirProgresso(atual, junto, hoje) {
+  const limite = somaDias(hoje, -DIAS_DE_ATRASO);
+  const amanha = somaDias(hoje, 1);
+  for (const campo of ['marcadoEm', 'licoesEm']) {
+    const antes = (atual && atual[campo]) || {};
+    const mapa = { ...(junto[campo] || {}) };
+    for (const [k, d] of Object.entries(mapa)) {
+      if (d === antes[k]) continue;
+      if (typeof d !== 'string' || !DATA_VALIDA.test(d)) { if (antes[k]) mapa[k] = antes[k]; else delete mapa[k]; continue; }
+      if (d > amanha || d < limite) mapa[k] = antes[k] || hoje;
+    }
+    junto[campo] = mapa;
+  }
+  for (const [campo, maximo] of Object.entries(SUBIDA_MAXIMA)) {
+    const antes = Number((atual && atual[campo]) || 0);
+    const agora = Number(junto[campo] || 0);
+    junto[campo] = Number.isFinite(agora) ? Math.max(antes, Math.min(agora, antes + maximo)) : antes;
+  }
+  // O XP da versão antiga só entra na primeira vez que o progresso chega ao servidor.
+  if (atual) junto.xpLegado = atual.xpLegado === undefined ? null : atual.xpLegado;
+  return junto;
 }
 
 const json = (res, codigo, dados) => {
@@ -666,7 +700,7 @@ const servidor = createServer(async (req, res) => {
 
     // Só nas ferramentas de teste: um backup agora, para conferir que apagar a conta limpa os backups.
     if ((PUSH_TESTE || process.env.CAMINHO_TESTE === '1') && rota === '/api/teste/backup' && post) {
-      json(res, 200, { arquivo: basename(fazerBackup(DB, join(PASTA_DADOS, 'backup', 'caminho-teste-' + Date.now() + '.db'))) });
+      json(res, 200, { arquivo: basename(fazerBackup(DB, join(PASTA_DADOS, 'backup', 'caminho-teste-' + Date.now() + '.db.cifrado'))) });
       return;
     }
 
@@ -899,7 +933,7 @@ const servidor = createServer(async (req, res) => {
           const atual = REGRAS.normalizarEstado(await lerEstado(arquivo));
           const junto = atual ? REGRAS.fundir(atual, novo) : novo;
           if (novo.dono) junto.dono = novo.dono;
-          await gravarEstado(limparPerfilDoEstado(junto), arquivo);
+          await gravarEstado(limparPerfilDoEstado(conferirProgresso(atual, junto, hojeDe(eu))), arquivo);
           // A primeira lição de quem veio por um convite conta para quem convidou.
           if (conta && conta.convidadoPor && datasFeitas(junto).size && await CONTAS.ativarConvidado(eu)) await marcoDoSemeador(conta.convidadoPor);
           json(res, 200, { ok: true });
@@ -1227,6 +1261,15 @@ const servidor = createServer(async (req, res) => {
       return;
     }
 
+    // Sair dos outros aparelhos: todo crachá antigo deixa de valer; este aparelho ganha um novo.
+    if (rota === '/api/sair-dos-outros') {
+      if (!exigir(post && conta, 405, 'método não suportado')) return;
+      await CONTAS.renovarSessao(eu);
+      porCookie(req, res, eu);
+      json(res, 200, { ok: true });
+      return;
+    }
+
     // ---------- notificações ----------
     if (rota === '/api/notificacoes' && req.method === 'GET') {
       json(res, 200, {
@@ -1350,6 +1393,8 @@ if (!PUSH_TESTE) {
 // cada hora. Substitui as cópias .bak.json de cada progresso.
 const backupSeDer = () => {
   try {
+    const cifrados = cifrarBackupsAbertos(join(PASTA_DADOS, 'backup'));
+    if (cifrados) console.log('  backups antigos cifrados: ' + cifrados);
     const feito = backupDoDia(DB, join(PASTA_DADOS, 'backup'), hojeNoFuso(''));
     if (feito) console.log('  backup do dia: ' + basename(feito));
   } catch (e) {

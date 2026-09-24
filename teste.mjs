@@ -322,10 +322,10 @@ checar(contas.lista().every((c) => !c.segue && c.seloConvite && c.fuso), 'contas
 
 checar(!nascimentoValido('2999-01-01') && nascimentoValido('2004-02-29') && !nascimentoValido('2003-02-29'), 'data de nascimento é validada de verdade');
 let erro = '';
-try { await contas.criar({ usuario: 'dora', senha: '123456', nome: 'Dora' }); } catch (e) { erro = e.message; }
+try { await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora' }); } catch (e) { erro = e.message; }
 checar(/e-mail/.test(erro), 'cadastro sem e-mail é recusado');
-await contas.criar({ usuario: 'dora', senha: '123456', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03' });
-checar(!!(await contas.conferir('dora@x.com', '123456')), 'entra com o e-mail, sem diferenciar maiúsculas');
+await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03' });
+checar(!!(await contas.conferir('dora@x.com', '12345678')), 'entra com o e-mail, sem diferenciar maiúsculas');
 for (const u of ['ana', 'bia', 'caio']) await contas.completarPerfil(u, { email: u + '@x.com', nascimento: '2000-01-01' });
 checar(contas.procurar('dora', 'an') === null && contas.procurar('dora', 'ana').usuario === 'ana', 'a busca só acha pelo @ exato');
 
@@ -345,14 +345,14 @@ checar(contas.dados.convitesAceites.length === 2 && contas.dados.convitesAceites
 checar(contas.lerConvite(convite.token.slice(0, -3) + 'abc', assinar) === null, 'convite adulterado é recusado');
 
 for (const u of ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']) {
-  await contas.criar({ usuario: u, senha: '123456', nome: u, email: u + '@x.com', nascimento: '2000-01-01' });
+  await contas.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '2000-01-01' });
   await contas.pedir(u, 'ana', '2026-03-01');
   await contas.aceitar('ana', u, '2026-03-01');
 }
 checar(contas.ativasDe('ana') === 8, 'amigos sem limite: a Ana passa de 5 (' + contas.ativasDe('ana') + ')');
 
 const conviteDaAna = contas.gerarConvite('ana', assinar);
-await contas.criar({ usuario: 'novo1', senha: '123456', nome: 'Novo', email: 'novo1@x.com', nascimento: '2000-01-01' });
+await contas.criar({ usuario: 'novo1', senha: '12345678', nome: 'Novo', email: 'novo1@x.com', nascimento: '2000-01-01' });
 await contas.usarConvite('novo1', conviteDaAna.token, assinar, '2026-03-03', Date.now(), { contaNova: true });
 checar(contas.achar('novo1').convidadoPor === 'ana' && contas.semeadorDe('ana') === 0,
   'quem cria a conta pelo link fica anotado, mas só conta depois da primeira lição');

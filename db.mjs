@@ -9,7 +9,8 @@
 // gravando alternadas (1.000 linhas, integridade ok, cerca de 5 ms por transação). O modo
 // clássico (DELETE) também ficou íntegro, mas seis vezes mais lento.
 import { createRequire } from 'node:module';
-import { existsSync, mkdirSync, readdirSync, rmSync, renameSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, rmSync, renameSync, readFileSync, writeFileSync } from 'node:fs';
+import { randomBytes, createCipheriv, createDecipheriv } from 'node:crypto';
 import { join, dirname, resolve, basename } from 'node:path';
 
 // O node:sqlite ainda avisa que é experimental a cada subida. O aviso não diz nada a quem
@@ -293,35 +294,122 @@ export function apagarPessoaDoBanco(db, usuario) {
 // ---------------------------------------------------------------- backups
 // Uma cópia por dia, feita pelo próprio SQLite (VACUUM INTO): consistente mesmo com o
 // servidor gravando. Ficam as 14 mais novas.
-const PADRAO_BACKUP = /^caminho-\d{4}-\d{2}-\d{2}\.db$/;
+//
+// A cópia é guardada cifrada (AES-256-GCM, arquivo .db.cifrado): quem levar a pasta de
+// backups não lê e-mail, data de nascimento nem progresso de ninguém sem a chave. A chave vem
+// de CAMINHO_BACKUP_CHAVE (64 caracteres hexadecimais, no .env, fora da pasta de dados); sem
+// ela, de dados/backup.chave, criada na primeira vez. Para abrir um backup:
+//   node ferramentas/backup.mjs abrir dados/backup/caminho-AAAA-MM-DD.db.cifrado saida.db
+const PADRAO_BACKUP = /^caminho-\d{4}-\d{2}-\d{2}\.db\.cifrado$/;
+const PADRAO_BACKUP_ABERTO = /^caminho-.+\.db$/;
+const CABECA_CIFRADO = Buffer.from('GEBACKUP1');
 
-export function backupDoDia(db, pasta, dia, manter = 14) {
-  const destino = join(pasta, 'caminho-' + dia + '.db');
+export function chaveDeBackup(pastaDados) {
+  const doAmbiente = String(process.env.CAMINHO_BACKUP_CHAVE || '').trim();
+  if (/^[0-9a-f]{64}$/i.test(doAmbiente)) return Buffer.from(doAmbiente, 'hex');
+  const arquivo = join(pastaDados, 'backup.chave');
+  if (existsSync(arquivo)) return Buffer.from(readFileSync(arquivo, 'utf8').trim(), 'hex');
+  const nova = randomBytes(32);
+  mkdirSync(pastaDados, { recursive: true });
+  writeFileSync(arquivo, nova.toString('hex'), { mode: 0o600 });
+  return nova;
+}
+const chavePadrao = (pastaBackup) => chaveDeBackup(dirname(resolve(pastaBackup)));
+
+export function cifrar(conteudo, chave) {
+  const iv = randomBytes(12);
+  const c = createCipheriv('aes-256-gcm', chave, iv);
+  const corpo = Buffer.concat([c.update(conteudo), c.final()]);
+  return Buffer.concat([CABECA_CIFRADO, iv, c.getAuthTag(), corpo]);
+}
+
+export function decifrar(conteudo, chave) {
+  if (!conteudo.subarray(0, CABECA_CIFRADO.length).equals(CABECA_CIFRADO)) throw new Error('não é um backup cifrado');
+  const ini = CABECA_CIFRADO.length;
+  const d = createDecipheriv('aes-256-gcm', chave, conteudo.subarray(ini, ini + 12));
+  d.setAuthTag(conteudo.subarray(ini + 12, ini + 28));
+  return Buffer.concat([d.update(conteudo.subarray(ini + 28)), d.final()]);
+}
+
+// Abre um backup cifrado num arquivo comum (para restaurar ou conferir).
+export function abrirBackup(arquivo, destino, chave = chavePadrao(dirname(arquivo))) {
+  writeFileSync(destino, decifrar(readFileSync(arquivo), chave));
+  return destino;
+}
+
+const temporario = (perto) => perto + '.' + randomBytes(4).toString('hex') + '.tmp';
+function cifrarArquivo(aberto, destino, chave) {
+  writeFileSync(destino + '.novo', cifrar(readFileSync(aberto), chave));
+  renameSync(destino + '.novo', destino);
+}
+
+// Backups da época em que eram guardados abertos viram cifrados, e o aberto some.
+export function cifrarBackupsAbertos(pasta, chave = chavePadrao(pasta)) {
+  if (!existsSync(pasta)) return 0;
+  let n = 0;
+  for (const f of readdirSync(pasta).filter((x) => PADRAO_BACKUP_ABERTO.test(x))) {
+    cifrarArquivo(join(pasta, f), join(pasta, f + '.cifrado'), chave);
+    rmSync(join(pasta, f), { force: true });
+    n++;
+  }
+  return n;
+}
+
+export function backupDoDia(db, pasta, dia, manter = 14, chave = chavePadrao(pasta)) {
+  const destino = join(pasta, 'caminho-' + dia + '.db.cifrado');
   if (existsSync(destino)) return null;
-  fazerBackup(db, destino);
+  fazerBackup(db, destino, chave);
   const antigos = readdirSync(pasta).filter((f) => PADRAO_BACKUP.test(f)).sort();
   for (const f of antigos.slice(0, Math.max(0, antigos.length - manter))) rmSync(join(pasta, f), { force: true });
   return destino;
 }
 
-export function fazerBackup(db, destino) {
+// Cópia aberta e consistente do banco, para as ferramentas (exportar para JSON).
+export function copiarBanco(db, destino) {
   mkdirSync(dirname(destino), { recursive: true });
   db.exec("VACUUM INTO '" + String(destino).replace(/'/g, "''") + "'");
   return destino;
 }
 
+// A cópia aberta só existe por um instante, ao lado do destino, e some mesmo se der erro.
+export function fazerBackup(db, destino, chave = chavePadrao(dirname(destino))) {
+  mkdirSync(dirname(destino), { recursive: true });
+  const aberto = temporario(destino);
+  try {
+    copiarBanco(db, aberto);
+    cifrarArquivo(aberto, destino, chave);
+  } finally {
+    rmSync(aberto, { force: true });
+  }
+  return destino;
+}
+
 // Quem apaga a conta leva junto as cópias: a pessoa sai de cada backup guardado.
-export function apagarPessoaDosBackups(pasta, usuario) {
+// Cifrado: abre num temporário, tira a pessoa e cifra de novo por cima.
+export function apagarPessoaDosBackups(pasta, usuario, chave = chavePadrao(pasta)) {
   if (!existsSync(pasta)) return 0;
   let limpos = 0;
-  for (const f of readdirSync(pasta).filter((n) => n.endsWith('.db'))) {
-    const copia = new DatabaseSync(join(pasta, f));
+  const limpar = (arquivo) => {
+    const copia = new DatabaseSync(arquivo);
     try {
       apagarPessoaDoBanco(copia, usuario);
       copia.exec('VACUUM');
-      limpos++;
     } finally {
       copia.close();
+    }
+  };
+  for (const f of readdirSync(pasta)) {
+    const arquivo = join(pasta, f);
+    if (f.endsWith('.db')) { limpar(arquivo); limpos++; continue; }
+    if (!f.endsWith('.db.cifrado')) continue;
+    const aberto = temporario(arquivo);
+    try {
+      abrirBackup(arquivo, aberto, chave);
+      limpar(aberto);
+      cifrarArquivo(aberto, arquivo, chave);
+      limpos++;
+    } finally {
+      rmSync(aberto, { force: true });
     }
   }
   return limpos;

@@ -104,6 +104,40 @@ try {
   ok(torto.status === 401, 'crachá malformado é só "entre primeiro", não erro do servidor');
   const erro = await fetch(base + '/%E0%A4%A');
   ok(!(await erro.text()).includes('URI'), 'erro do servidor não mostra detalhe interno');
+
+  // ---------- sair dos outros aparelhos ----------
+  const entrarDaDuda = async () => biscoito(await pedir('/api/entrar', { login: 'duda', senha: 'senha-duda' }, { cabecalhos: { 'cf-connecting-ip': '10.2.2.2' } }));
+  await criar('duda');
+  const celular = await entrarDaDuda();
+  const computador = await entrarDaDuda();
+  ok((await pedir('/api/quem', undefined, { cookie: computador })).status === 200, 'a Duda está dentro em dois aparelhos');
+  const saiu = await pedir('/api/sair-dos-outros', {}, { cookie: celular });
+  const celularNovo = biscoito(saiu);
+  ok(saiu.status === 200 && !!celularNovo, 'o celular pede para sair dos outros e ganha um crachá novo');
+  ok((await pedir('/api/quem', undefined, { cookie: computador })).status === 401, 'o computador sai da conta');
+  ok((await pedir('/api/quem', undefined, { cookie: celular })).status === 401, 'o crachá antigo do próprio celular também deixa de valer');
+  ok((await pedir('/api/quem', undefined, { cookie: celularNovo })).status === 200, 'e o celular continua dentro com o novo');
+
+  // ---------- senha mínima ----------
+  ok((await pedir('/api/criar-conta', { usuario: 'eva', senha: 'abc1234', nome: 'Eva', email: 'eva@t.com', nascimento: '2000-01-01' })).status === 400,
+    'senha nova com 7 caracteres é recusada');
+  ok(!!(await criar('fabi')), 'com 8 ou mais, a conta nasce');
+
+  // ---------- progresso que não pode ter acontecido ----------
+  const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const dia = (n) => new Date(Date.parse(hoje + 'T12:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+  const fabi = biscoito(await pedir('/api/entrar', { login: 'fabi', senha: 'senha-fabi' }, { cabecalhos: { 'cf-connecting-ip': '10.3.3.3' } }));
+  await pedir('/api/estado', { lidos: [1], marcadoEm: { 1: dia(-2) }, licoes: [], acertosTotal: 10 }, { cookie: fabi, metodo: 'PUT' });
+  await pedir('/api/estado', {
+    lidos: [1, 2, 3, 4, 5], marcadoEm: { 1: dia(-300), 2: dia(-1), 3: dia(-6), 4: '2099-01-01', 5: dia(-200) },
+    licoes: [], acertosTotal: 999999, missoesTotal: 5000,
+  }, { cookie: fabi, metodo: 'PUT' });
+  const conferido = await (await pedir('/api/estado', undefined, { cookie: fabi })).json();
+  const m = conferido.marcadoEm;
+  ok(m[1] === dia(-2), 'uma data já gravada não é trocada por uma de 300 dias atrás');
+  ok(m[2] === dia(-1) && m[3] === dia(-6), 'leitura feita sem rede nos últimos dias sincroniza com a data certa');
+  ok(m[4] === hoje && m[5] === hoje, 'data no futuro, ou inventada meses para trás, conta como hoje');
+  ok(conferido.acertosTotal === 510 && conferido.missoesTotal === 30, 'contadores não sobem milhares de uma vez');
 } finally {
   servidor.kill();
 }
