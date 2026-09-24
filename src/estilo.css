@@ -2805,14 +2805,6 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .visao-item span { display: grid; min-width: 0; }
 .visao-item b { color: var(--tinta-forte); font-size: 1.15rem; font-weight: 900; line-height: 1.15; font-variant-numeric: tabular-nums; }
 .visao-item small { color: var(--tinta-fraca); font-size: 0.82rem; font-weight: 700; }
-.roda-junto { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; }
-.pessoa-junto { flex: 0 0 76px; display: grid; justify-items: center; gap: 2px; padding: 4px 0; border: 0; background: none; color: var(--tinta); font: inherit; text-align: center; text-decoration: none; cursor: pointer; }
-.pessoa-junto:hover { text-decoration: none; }
-.pessoa-junto b { color: var(--tinta-forte); font-size: 0.86rem; max-width: 76px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pessoa-junto small { color: var(--tinta-fraca); font-size: 0.72rem; font-weight: 700; line-height: 1.2; }
-.pessoa-junto.leu .retrato-amigo { box-shadow: 0 0 0 3px var(--progresso); }
-.pessoa-junto .mais { display: grid; place-items: center; width: 56px; height: 56px; border: 2px dashed var(--borda-3d); border-radius: 50%; color: var(--tinta-fraca); }
-.pessoa-junto .mais svg { width: 24px; height: 24px; }
 .colecao-atalhos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
 .colecao-atalhos a { display: grid; justify-items: center; gap: 2px; padding: 10px 6px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); color: var(--tinta-forte); text-align: center; text-decoration: none; }
 .colecao-atalhos a:hover { background: var(--fundo-2); text-decoration: none; }

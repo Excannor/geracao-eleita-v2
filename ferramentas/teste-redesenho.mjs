@@ -300,7 +300,7 @@ await foto('5b-missoes');
 
 // ---------- perfil e configurações ----------
 await irPara('#/perfil');
-ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".estante .trofeu").length === 3 && document.querySelectorAll(".visao-geral .visao-item").length === 4'),
+ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".colecao-atalhos a").length === 2 && document.querySelectorAll(".visao-geral .visao-item").length === 4'),
   'o perfil mostra a visão geral, conquistas com nível e a coleção');
 ok(await av('/188/.test(' + q('.linha-ajuda') + '.innerText) && !/XP/.test(' + q('.conteudo') + '.innerText)'),
   'o perfil tem a linha do CVV e não mostra XP');

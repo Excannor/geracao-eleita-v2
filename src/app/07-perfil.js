@@ -1,5 +1,5 @@
-/* Perfil: quem você é, a visão geral, quem lê junto com você, suas anotações e a coleção
-   (conquistas e troféus). O Perfil mostra fidelidade e comunhão, não placar: o XP
+/* Perfil: quem você é, a visão geral, a coleção (conquistas e troféus), o Semeador, o que
+   você escreveu e guardou, e o aplicativo. Quem lê junto com você mora no Juntos. O Perfil mostra fidelidade e comunhão, não placar: o XP
    saiu da vista, e os marcos só aparecem para amigos se você escolher mostrá-los no Feed. */
 (function (CC) {
   'use strict';
@@ -124,21 +124,8 @@
       : '<button class="visao-item"' + (dado ? ' ' + dado : '') + '>') + icone
       + '<span><b>' + valor + '</b><small>' + CC.esc(rotulo) + '</small></span>' + (href ? '</a>' : '</button>');
 
-    // Lendo junto: os dias da dupla, nunca o estágio da chama do outro. O "+" chama mais alguém.
-    const amigos = ((CC.amigosEmCache && CC.amigosEmCache()) || {}).amigos || [];
-    const lendoJunto = quem.comSenha
-      ? '<div class="titulo-secao"><h2>Lendo junto</h2><a href="#/novidades">Juntos</a></div>'
-        + '<div class="roda-junto">' + amigos.slice(0, 4).map((a) => '<a class="pessoa-junto' + (a.leuHoje ? ' leu' : '') + '" href="#/novidades">'
-          + CC.retratoAmigo(a, 'medio') + '<b>' + CC.esc(String(a.nome).split(' ')[0]) + '</b>'
-          + '<small>' + CC.plural(a.dias || 0, 'dia junto', 'dias juntos') + '</small></a>').join('')
-        + '<button class="pessoa-junto vaga" data-convidar-perfil aria-label="Convidar alguém para ler junto"><span class="mais">' + CC.ico('mais-sinal') + '</span><b>Convidar</b></button>'
-        + '</div>'
-      : '';
-
     // Primeiro as conquistas mais perto do próximo nível: é o que dá vontade de seguir.
     const vitrine = conquistas.slice().sort((a, b) => (a.maximo - b.maximo) || (b.fracao - a.fracao)).slice(0, 3);
-    // Troféus: os ganhos primeiro, depois os que estão mais perto.
-    const estante = todos.slice().sort((a, b) => (b.ganho - a.ganho) || ((b.feitos / b.total) - (a.feitos / a.total))).slice(0, 6);
 
     raiz.innerHTML = '<div class="cabeca-tela"><h1>Perfil</h1>'
       + '<a class="botao-icone" href="#/config" aria-label="Configurações">' + CC.ico('engrenagem') + '</a></div>'
@@ -154,7 +141,6 @@
       + '</div>'
       + '<input type="file" id="arquivo-foto" accept="image/*" hidden>'
       + '</div>'
-      + '<div data-semeador>' + cartaoSemeador((CC.quem || {}).semeador) + '</div>'
       + (semNada ? '<p class="passo-dica">Sua primeira lição acende tudo isso!</p>' : '')
       + '<h2 class="titulo-perfil">Visão geral</h2>'
       + '<div class="visao-geral">'
@@ -169,21 +155,27 @@
         ? '<div class="linha-ritmo">' + CC.ico('bussola') + '<span>No seu ritmo, você termina a Bíblia em <b>'
           + ritmo.termino.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) + '</b>.</span></div>'
         : '')
-      + lendoJunto
-      + '<div class="lista-atalhos">' + atalho('#/perfil/escritos', 'caneta', 'Minhas anotações') + '</div>'
-      // A coleção num lugar só: conquistas e troféus.
+      // A coleção num lugar só: as três conquistas mais perto do próximo nível e os atalhos.
       + '<div class="titulo-secao"><h2>Coleção</h2></div>'
       + '<div class="caixa-lista">' + vitrine.map(CC.linhaConquista).join('') + '</div>'
       + '<div class="colecao-atalhos">'
       + '<a href="#/perfil/conquistas">' + CC.ico('medalha') + '<b>Conquistas</b><small>' + conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length + '</small></a>'
       + '<a href="#/perfil/trofeus">' + CC.ico('trofeu') + '<b>Troféus</b><small>' + ganhos.length + ' de ' + todos.length + '</small></a>'
       + '</div>'
-      + '<div class="estante">' + estante.slice(0, 3).map(trofeuHtml).join('') + '</div>'
+      + '<div data-semeador>' + cartaoSemeador((CC.quem || {}).semeador) + '</div>'
+      // O que é da pessoa: o que escreveu, guardou e leu.
+      + '<div class="titulo-secao"><h2>Meus conteúdos</h2></div>'
       + '<div class="lista-atalhos">'
+      + atalho('#/perfil/escritos', 'caneta', 'Minhas anotações')
       + atalho('#/perfil/versiculos', 'marcador', 'Versículos guardados')
       + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
+      + '</div>'
+      // O app: instalar e as configurações com nome, não só o ícone do canto.
+      + '<div class="titulo-secao"><h2>O aplicativo</h2></div>'
+      + '<div class="lista-atalhos">'
       + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
+      + atalho('#/config', 'engrenagem', 'Configurações e conta')
       + '</div>'
       + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Precisa conversar com alguém? Fale com alguém de '
       + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora.</p></div>';
@@ -207,8 +199,6 @@
     raiz.querySelector('[data-instalar]').onclick = () => CC.tutorialInstalar();
     const ofensiva = raiz.querySelector('[data-ofensiva-perfil]');
     if (ofensiva) ofensiva.onclick = CC.folhaOfensiva;
-    const convidar = raiz.querySelector('[data-convidar-perfil]');
-    if (convidar) convidar.onclick = () => CC.convidar();
     ligarSemeador(raiz);
   };
 

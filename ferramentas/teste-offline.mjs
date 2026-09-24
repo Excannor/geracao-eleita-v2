@@ -137,7 +137,7 @@ ok(await av('JSON.stringify(CC.estado().oia).includes("escrito sem rede")'),
 
 // as outras telas
 for (const [nome, hash, marca] of [['praticar', '#/praticar', '.cartao-pratica'],
-  ['explorar', '#/explorar', '.bloco-secao'], ['perfil', '#/perfil', '.estante'],
+  ['explorar', '#/explorar', '.bloco-secao'], ['perfil', '#/perfil', '.colecao-atalhos'],
   ['uma nota', '#/nota/' + encodeURIComponent('11 - Pessoas/Davi'), '.nota-corpo']]) {
   await av('location.hash = ' + JSON.stringify(hash));
   await dormir(600);
