@@ -69,7 +69,7 @@
       + '<div class="titulo-bloco"><h2>Desafios do dia</h2><span class="relogio">' + CC.ico('calendario') + CC.plural(CC.horasAteAmanha(), 'hora', 'horas') + '</span></div>'
       + '<div class="lista-missoes">' + lista.map((m) => CC.linhaMissao(m)).join('') + '</div></section>'
       // Praticar mora aqui: guardar versículos é o mesmo trabalho do "Guardar" da reflexão
-      + '<a class="cartao-praticar" href="#/praticar"><span class="icone-praticar">' + CC.icoAba('alvo') + '</span>'
+      + '<a class="cartao-praticar" href="#/praticar"><span class="icone-praticar">' + CC.ico('alvo') + '</span>'
       + '<span class="textos"><b>Praticar</b><small>Guarde os versículos das unidades num quiz rápido</small></span>' + CC.ico('avancar') + '</a>'
       + '<section class="bloco-missoes" id="missao-amigos">' + missaoAmigos(CC.amigosEmCache && CC.amigosEmCache()) + '</section>';
 

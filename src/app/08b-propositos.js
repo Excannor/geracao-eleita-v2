@@ -31,9 +31,10 @@
 
   function contagem(p) {
     if (p.tipo === 'oracao') return '<span class="dias-cartao orando">' + CC.ico('aperto') + '<small>orando juntos</small></span>';
+    const um = p.dias === 1;
     const rotulo = p.grupo
-      ? (p.tipo === 'livro' ? 'dias de meta' : 'dias seguidos')
-      : (p.tipo === 'livro' ? 'dias lidos' : 'dias juntos');
+      ? (p.tipo === 'livro' ? (um ? 'dia de meta' : 'dias de meta') : (um ? 'dia seguido' : 'dias seguidos'))
+      : (p.tipo === 'livro' ? (um ? 'dia lido' : 'dias lidos') : (um ? 'dia junto' : 'dias juntos'));
     return '<span class="dias-cartao">' + CC.icoChama() + p.dias + '<small>' + rotulo + '</small></span>';
   }
 
@@ -66,7 +67,9 @@
       + (p.grupo ? gente : outros).slice(0, 5).map((m) => retrato(m, (p.grupo ? 'pequeno' : 'medio') + (m.fezHoje ? ' fez' : ''))).join('')
       + (p.grupo && gente.length > 5 ? '<span class="retrato-amigo pequeno retrato-mais">+' + (gente.length - 5) + '</span>' : '') + '</span>'
       + '<span class="quem-amigo"><b>' + CC.esc(p.grupo ? p.titulo : quem) + '</b>'
-      + '<span class="tipo-proposito">' + CC.ico(ICONE[p.tipo] || 'trilha') + '<span>' + CC.esc(p.grupo ? quem + ' · ' + oQue(p) : oQue(p)) + '</span></span></span>'
+      // Toda célula lê o plano: ali o "Plano de leitura" só roubava espaço do número de pessoas.
+      + '<span class="tipo-proposito">' + CC.ico(p.celula ? 'pessoas' : ICONE[p.tipo] || 'trilha') + '<span>'
+        + CC.esc(p.celula ? quem : p.grupo ? quem + ' · ' + oQue(p) : oQue(p)) + '</span></span></span>'
       + (p.euConvidado ? '' : contagem(p))
       + '</div>';
   }

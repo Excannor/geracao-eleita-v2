@@ -36,7 +36,7 @@
       + '<b>' + CC.esc(atual ? atual.nome : 'Lance a primeira semente') + '</b>'
       + '<span class="barra-missao" style="--cor: var(--verde)"><i style="width:' + (Math.max(0, Math.min(1, fracao)) * 100).toFixed(1) + '%"></i></span>'
       + '<span class="descricao-conquista">' + pessoas
-      + (s.proximo ? ' · faltam ' + s.proximo.faltam + ' para ' + CC.esc(s.proximo.nome) : ' · último nível!') + '</span>'
+      + (s.proximo ? ' · ' + (s.proximo.faltam === 1 ? 'falta 1' : 'faltam ' + s.proximo.faltam) + ' para ' + CC.esc(s.proximo.nome) : ' · último nível!') + '</span>'
       + '</span>' + CC.ico('avancar') + '</button>';
   }
 

@@ -433,6 +433,7 @@ button { font-family: inherit; }
 /* --acento e não --inverso: no tema escuro o --inverso é um petróleo fechado que some no
    fundo preto; o acento clareia sozinho no escuro. */
 .aba.selecionada { color: var(--acento); font-weight: 900; background: none; }
+.aba.selecionada:not(.aba-central) .rotulo-aba::after { content: ''; display: block; width: 18px; height: 3px; margin: 3px auto 0; border-radius: 3px; background: currentColor; }
 /* Sem cinza de hover dentro da ilha: o fundo da própria ilha já é o acabamento. */
 .aba:hover:not(.selecionada) { background: none; }
 /* O ícone da aba encolhia para 82% e voltava a cada toque. Era esse o "zoom" na troca de
@@ -1248,7 +1249,9 @@ button { font-family: inherit; }
   height: 62px;
   border-radius: 20px 20px 50% 50% / 20px 20px 42% 42%;
   background: var(--cor);
-  color: var(--sobre-cor);
+  /* --sobre: a cor que tem tinta própria (o amarelo, que virou preenchimento claro) leva
+     desenho escuro; sem isso a estrela branca sumia no escudo claro da conquista ganha. */
+  color: var(--sobre, var(--sobre-cor));
   box-shadow: inset 0 -6px 0 var(--cor-3d), 0 0 0 4px color-mix(in srgb, var(--cor) 28%, transparent);
 }
 .arte-medalha .escudo svg { width: 28px; height: 28px; }
@@ -2752,7 +2755,8 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 /* ---------- desafios ---------- */
 .cartao-praticar { display: flex; align-items: center; gap: 12px; margin: 14px 0 4px; padding: 12px 14px; border: 2px solid var(--borda); border-bottom-width: 4px; border-radius: var(--raio-g); background: var(--cartao); color: var(--tinta-forte); text-decoration: none; }
 .cartao-praticar:hover { text-decoration: none; background: var(--fundo-2); }
-.cartao-praticar .icone-praticar .ico-aba { width: 36px; height: 36px; }
+.cartao-praticar .icone-praticar { display: grid; place-items: center; flex: 0 0 auto; width: 48px; height: 48px; border-radius: var(--raio-p); background: var(--vermelho-fraco); color: var(--vermelho); }
+.cartao-praticar .icone-praticar svg { width: 28px; height: 28px; }
 .cartao-praticar .textos { flex: 1; display: grid; }
 .cartao-praticar small { color: var(--tinta-fraca); font-weight: 700; }
 .cartao-praticar > svg { width: 20px; height: 20px; color: var(--tinta-fraca); }
@@ -2777,7 +2781,7 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .pessoa-junto.leu .retrato-amigo { box-shadow: 0 0 0 3px var(--progresso); }
 .pessoa-junto .mais { display: grid; place-items: center; width: 56px; height: 56px; border: 2px dashed var(--borda-3d); border-radius: 50%; color: var(--tinta-fraca); }
 .pessoa-junto .mais svg { width: 24px; height: 24px; }
-.colecao-atalhos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.colecao-atalhos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
 .colecao-atalhos a { display: grid; justify-items: center; gap: 2px; padding: 10px 6px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); color: var(--tinta-forte); text-align: center; text-decoration: none; }
 .colecao-atalhos a:hover { background: var(--fundo-2); text-decoration: none; }
 .colecao-atalhos svg { width: 24px; height: 24px; color: var(--tinta-fraca); }

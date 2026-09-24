@@ -121,7 +121,7 @@
     const ganha = c.nivel > 0;
     return '<span class="arte-medalha c-' + c.cor + (ganha ? '' : ' sem-nivel') + (grande ? ' grande' : '') + '" aria-hidden="true">'
       + '<span class="escudo">' + (c.icone === 'chama' ? CC.icoChama() : CC.ico(c.icone)) + '</span>'
-      + '<span class="faixa">' + (c.maximo ? 'MÁX' : 'NÍVEL ' + Math.max(1, c.nivel)) + '</span>'
+      + (ganha ? '<span class="faixa">' + (c.maximo ? 'MÁX' : 'NÍVEL ' + c.nivel) + '</span>' : '')
       + '</span>';
   };
 

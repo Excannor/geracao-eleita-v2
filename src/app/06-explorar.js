@@ -12,15 +12,15 @@
     '05 - Hermenêutica': ['bussola', 'roxo'],
     '15 - Fios Bíblicos': ['elo', 'turquesa'],
     '03 - Livros da Bíblia': ['livro', 'turquesa'],
-    '08 - Versículos': ['marcador', 'amarelo'],
+    '08 - Versículos': ['marcador', 'azul'],
     '06 - Estudos Temáticos': ['camadas', 'roxo'],
     '11 - Pessoas': ['pessoas', 'azul'],
     '12 - Eventos': ['calendario', 'verde'],
     '13 - Lugares': ['alfinete', 'turquesa'],
-    '14 - Alianças': ['aperto', 'amarelo'],
+    '14 - Alianças': ['aperto', 'roxo'],
     '00 - Início': ['info', 'azul'],
     '02 - Plano de Leitura': ['trilha', 'verde'],
-    '04 - Diário de Leitura': ['caneta', 'amarelo'],
+    '04 - Diário de Leitura': ['caneta', 'verde'],
     '07 - Reflexões': ['balao', 'roxo'],
     '09 - Oração': ['aperto', 'roxo'],
     '10 - Igreja': ['casa', 'azul'],
@@ -209,6 +209,26 @@
       + '</div>';
   }
 
+  // O que a leitura de hoje toca: as notas de pessoa, acontecimento e lugar do livro que citam
+  // os capítulos do dia, das que citam mais para as que citam menos. As que não citam nenhum
+  // ficam de fora: melhor mostrar só o livro do que Adão e Caim num dia que lê Jacó.
+  function notasDoTrecho(dia) {
+    const capitulos = (dia.trechos || []).flatMap((t) => {
+      const lista = [];
+      for (let c = t.de; c <= t.ate; c++) lista.push(new RegExp(t.livro + ' ' + c + '(?![0-9])', 'g'));
+      return lista;
+    });
+    const candidatas = [...(dia.rel.pessoas || []), ...(dia.rel.eventos || []), ...(dia.rel.lugares || [])];
+    return candidatas
+      .map((id) => {
+        const html = (D.notas[id] || {}).html || '';
+        return [id, capitulos.reduce((n, r) => n + (html.match(r) || []).length, 0)];
+      })
+      .filter(([, n]) => n > 0)
+      .sort((a, b) => b[1] - a[1])
+      .map(([id]) => id);
+  }
+
   CC.vistaExplorar = function (raiz) {
     const blocos = GRUPOS.map(([titulo, pastas]) => {
       const cartoes = pastas.map((pasta) => {
@@ -224,7 +244,7 @@
     }).join('');
 
     const dia = D.plano[CC.diaAtual() - 1];
-    const deHoje = [...(dia.rel.livros || []), ...(dia.rel.pessoas || []), ...(dia.rel.eventos || [])].slice(0, 8);
+    const deHoje = [...(dia.rel.livros || []), ...notasDoTrecho(dia)].slice(0, 8);
     const total = Object.keys(D.notas).filter((id) => !CC.notaInterna(id)).length;
 
     const comece = blocoComece();
