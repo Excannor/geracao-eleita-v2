@@ -159,7 +159,8 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
 4. **Não ensinar sem querer uma ideia errada sobre Deus.** Ler cada pergunta e perguntar: que
    ideia sobre Deus uma pessoa nova tira daqui? Erros já cometidos: "onde Deus está te
    privando de algo?" (Deus não priva) e "em que momento você pode lembrar que Deus está com
-   você?" (ele está sempre). Verdades que nenhuma pergunta pode contrariar: Deus está sempre
+   você?" (ele está sempre) e "em que lugar ruim da sua vida você acha que Deus não está?" (a
+   pergunta pede para a pessoa apontar um lugar sem Deus). Verdades que nenhuma pergunta pode contrariar: Deus está sempre
    presente; o amor dele não depende do nosso comportamento; salvação é pela graça, não por
    mérito; Deus não é cúmplice do mal.
 

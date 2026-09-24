@@ -148,6 +148,12 @@ for (const dia of dias) {
       const citado = normalizar(m[1]);
       if (citado.length >= 12 && !lido.includes(citado)) falhar(dia, 'citação que não está na NBV da leitura do dia: "' + m[1] + '"');
     }
+    // Regra 4 do filtro: Deus está sempre presente. Pergunta que pede para a pessoa apontar onde
+    // Deus não está ensina o contrário (dia 16: "em que lugar ruim você acha que Deus não está?").
+    for (const p of r.perguntas.map((p) => (typeof p === 'string' ? p : p[1]))) {
+      if (/(ach\w*|sent\w*|pens\w*) que (Deus|o Senhor|Jesus|ele) não (está|estava|esteve)/i.test(p) && !/e ele estava/i.test(p))
+        falhar(dia, 'pergunta supõe um lugar sem Deus: "' + p + '"');
+    }
     for (const expr of OUTRA_TRADUCAO) {
       if (normalizar(escrito).includes(expr) && !lido.includes(expr)) falhar(dia, 'redação de outra tradução, a NBV da leitura não diz "' + expr + '"');
     }
