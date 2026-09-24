@@ -98,6 +98,13 @@ export async function enviarPush(inscricao, mensagem, chaves, contato, opcoes = 
   // O tópico faz o serviço de push trocar o aviso ainda não entregue pelo mais novo.
   if (mensagem.tag) cabecalhos.topic = createHash('sha256').update(mensagem.tag).digest('base64url').slice(0, 32);
   const resposta = await (opcoes.fetch || fetch)(inscricao.endpoint, { method: 'POST', headers: cabecalhos, body: corpo });
+  // Inscrição feita com a chave de outro servidor (a Apple responde 400 VapidPkHashMismatch)
+  // nunca vai receber nada daqui: conta como aparelho que saiu (410), e o app pede de novo.
+  // No Chrome/Android o mesmo caso vem como 403 "does not correspond to the sender".
+  if (resposta.status === 400 || resposta.status === 403) {
+    const motivo = await resposta.text().catch(() => '');
+    if (/VapidPkHashMismatch|does not correspond/i.test(motivo)) return 410;
+  }
   return resposta.status;
 }
 
@@ -112,11 +119,14 @@ export const LEMBRETE_MEIO = 12 * 60;
 export const MAX_TOQUES_RECEBIDOS_DIA = 3;
 export const DIAS_DE_VOLTA = [3, 7, 14];
 export const HORA_OFENSIVA = 21 * 60;
+// Distância mínima entre dois avisos automáticos do mesmo dia.
+export const ESPACO_ENTRE_AVISOS = 90;
 export const PREFERENCIAS_PADRAO = { lembrete: true, hora: '19:00', ofensiva: true, amigos: true };
 const MARCOS = [7, 14, 30, 50, 100, 150, 200, 250, 300, 365];
 
 export const emSilencio = (minutos) => minutos >= SILENCIO.inicio || minutos < SILENCIO.fim;
 const paraMinutos = (hora) => { const [h, m] = String(hora).split(':').map(Number); return h * 60 + (m || 0); };
+const somarDias = (data, n) => new Date(Date.parse(data + 'T12:00:00Z') + n * 864e5).toISOString().slice(0, 10);
 const diasEntre = (de, ate) => Math.round((Date.parse(ate + 'T12:00:00Z') - Date.parse(de + 'T12:00:00Z')) / 864e5);
 
 export function horaValida(hora) {
@@ -147,16 +157,25 @@ export function decidir({ agora, pref, historico = {}, leitura }) {
   const semLer = diasEntre(referencia, data);
 
   // Quem sumiu não recebe lembrete todo dia: três recados espaçados e depois silêncio.
+  // Se o servidor esteve fora no dia do recado, ele sai no dia seguinte, uma vez só; atraso
+  // maior que isso fica para o próximo recado da lista, sem acumular.
   if (semLer >= DIAS_DE_VOLTA[0]) {
     if (!pref.lembrete || minutos < hora || historico.volta === data) return null;
-    return DIAS_DE_VOLTA.includes(semLer) ? { tipo: 'volta', dados: { dias: semLer } } : null;
+    const etapa = [...DIAS_DE_VOLTA].reverse().find((d) => d <= semLer);
+    const devidoEm = somarDias(referencia, etapa);
+    const atrasado = semLer - etapa;
+    if (atrasado > 1 || (historico.volta && historico.volta >= devidoEm)) return null;
+    return { tipo: 'volta', dados: { dias: etapa } };
   }
 
   // Os três horários do dia. "enviadoAte" é o minuto do último lembrete de hoje: só sai o
   // horário que já passou e que é mais tarde que o último enviado, então cada um sai uma
   // vez só e nenhum atropela o outro quando a rodada roda de hora em hora.
   if (pref.lembrete) {
-    const enviadoAte = historico.lembrete === data ? (historico.lembreteMinutos || 0) : -1;
+    // Um lembrete que saiu atrasado (o servidor esteve desligado no horário) cobre também os
+    // horários da hora e meia seguinte: volta do servidor às 11h50 manda o da manhã e pula o do
+    // meio-dia, em vez de mandar os dois colados. Cada volta manda um aviso só, o do período.
+    const enviadoAte = historico.lembrete === data ? (historico.lembreteMinutos || 0) + ESPACO_ENTRE_AVISOS - 1 : -1;
     // O recado do escudo já é a mensagem da manhã. Sem isto, quem usou escudo recebia o
     // escudo e o lembrete das 9h em seguida, dois avisos colados no mesmo intervalo.
     const inicio = historico.escudo === data ? Math.max(enviadoAte, LEMBRETE_MANHA) : enviadoAte;
@@ -168,7 +187,7 @@ export function decidir({ agora, pref, historico = {}, leitura }) {
   }
 
   // A ofensiva em risco sai à noite, e nunca colada no lembrete.
-  const lembreteRecente = historico.lembrete === data && minutos - (historico.lembreteMinutos || 0) < 90;
+  const lembreteRecente = historico.lembrete === data && minutos - (historico.lembreteMinutos || 0) < ESPACO_ENTRE_AVISOS;
   if (pref.ofensiva && leitura.ofensiva >= 2 && minutos >= HORA_OFENSIVA && historico.ofensiva !== data && !lembreteRecente) {
     return { tipo: 'ofensiva', dados: { ofensiva: leitura.ofensiva } };
   }

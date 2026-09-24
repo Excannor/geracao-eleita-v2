@@ -116,6 +116,20 @@ ok(tipo(base(hm(21), { leitura: { ...base(0).leitura, ofensiva: 1 }, historico: 
   'com 1 dia só, não tem "ofensiva em risco"');
 ok(tipo(base(hm(22, 15), { historico: { data: '2026-09-15', automaticas: 2, lembrete: '2026-09-15', ofensiva: '2026-09-15', lembreteMinutos: hm(19) } })) === null,
   'no máximo 2 automáticas por dia');
+// Servidor desligado (falta de energia) no horário: quando volta, sai um aviso só, o do período.
+const slot = (x) => ((N.decidir(x) || {}).dados || {}).slot;
+ok(slot(base(hm(10, 15))) === hm(9), 'voltou às 10h15 sem ter mandado nada: sai o da manhã, atrasado');
+ok(slot(base(hm(14))) === hm(12), 'voltou às 14h: sai só o do meio-dia, não o da manhã junto');
+ok(slot(base(hm(20))) === hm(19), 'voltou às 20h: sai só o da noite');
+const atrasadoManha = { historico: { data: '2026-09-15', automaticas: 1, lembrete: '2026-09-15', lembreteMinutos: hm(11, 50) } };
+ok(tipo(base(hm(12), atrasadoManha)) === null && tipo(base(hm(13), atrasadoManha)) === null,
+  'o da manhã que saiu às 11h50 cobre o do meio-dia: nada de dois avisos colados');
+ok(slot(base(hm(19), atrasadoManha)) === hm(19), 'e o da noite sai normal');
+const sumidoHa = (dias, historico = {}) => base(hm(19), { historico, leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: new Date(Date.parse('2026-09-15T12:00:00Z') - dias * 864e5).toISOString().slice(0, 10) } });
+ok((N.decidir(sumidoHa(8)) || {}).tipo === 'volta' && N.decidir(sumidoHa(8)).dados.dias === 7,
+  'o recado do 7º dia perdido com o servidor fora sai no dia seguinte');
+ok(tipo(sumidoHa(8, { volta: '2026-09-14' })) === null, 'se o do 7º dia já tinha saído, não repete');
+ok(tipo(sumidoHa(9)) === null, 'atraso de mais de um dia não vira recado: espera o próximo da lista');
 ok(tipo(base(hm(22, 30))) === null && tipo(base(hm(23, 59))) === null && tipo(base(hm(6, 59))) === null,
   'silêncio das 22h30 às 7h, mesmo sem nada ter saído');
 ok(tipo(base(hm(19), { pref: { ...N.PREFERENCIAS_PADRAO, lembrete: false, ofensiva: false } })) === null, 'desligado nas configurações, não sai');
