@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fluxo das telas</title>
+<meta name="description" content="Quadro das telas do Geração Eleita com a navegação entre elas e a análise de cada fluxo.">
+<style>
+  :root {
+    --fundo: #eceeed; --grade: #dfe3e2; --cartao: #ffffff; --tinta: #1c1f1f; --fraca: #5d6665;
+    --acento: #0f5c5c; --acento-claro: #d8ecec; --alerta: #b3261e; --alerta-claro: #fbeae8;
+    --ok: #2e7d32; --ok-claro: #e3f1e4; --aviso: #8a5a00; --aviso-claro: #fff1d6; --seta: #7f8b8a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --fundo: #121414; --grade: #1d2121; --cartao: #1b1e1e; --tinta: #e9eeee; --fraca: #9aa6a5;
+      --acento: #5fbdb9; --acento-claro: #173331; --alerta: #ff8a80; --alerta-claro: #3a1a18;
+      --ok: #7fd18a; --ok-claro: #17301b; --aviso: #ffcc66; --aviso-claro: #33290f; --seta: #6b7777;
+    }
+  }
+  :root[data-theme="dark"] {
+    --fundo: #121414; --grade: #1d2121; --cartao: #1b1e1e; --tinta: #e9eeee; --fraca: #9aa6a5;
+    --acento: #5fbdb9; --acento-claro: #173331; --alerta: #ff8a80; --alerta-claro: #3a1a18;
+    --ok: #7fd18a; --ok-claro: #17301b; --aviso: #ffcc66; --aviso-claro: #33290f; --seta: #6b7777;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--fundo); color: var(--tinta); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  header {
+    position: fixed; inset: 0 0 auto 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+    padding: 10px 16px; background: color-mix(in srgb, var(--cartao) 92%, transparent); border-bottom: 1px solid var(--grade);
+    backdrop-filter: blur(8px);
+  }
+  header h1 { margin: 0; font-size: 1.05rem; }
+  header .dica { color: var(--fraca); font-size: 0.85rem; }
+  header .espaco { flex: 1; }
+  button.seg { border: 1px solid var(--grade); background: var(--cartao); color: var(--tinta); padding: 6px 10px; border-radius: 8px; font: inherit; font-size: 0.85rem; cursor: pointer; }
+  button.seg[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: var(--cartao); }
+  .legenda { display: flex; gap: 10px; font-size: 0.8rem; color: var(--fraca); }
+  .legenda i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+  #palco { position: absolute; inset: 0; cursor: grab; touch-action: none; background-image: radial-gradient(var(--grade) 1.2px, transparent 1.2px); background-size: 24px 24px; }
+  #palco.arrastando { cursor: grabbing; }
+  #quadro { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .raia { position: absolute; left: 0; height: 520px; border-top: 1px dashed var(--grade); }
+  .raia h2 { position: absolute; left: 24px; top: 14px; margin: 0; font-size: 22px; letter-spacing: 0.02em; }
+  .raia p { position: absolute; left: 24px; top: 48px; margin: 0; width: 230px; color: var(--fraca); font-size: 14px; }
+  .tela { position: absolute; width: 220px; }
+  .tela button.moldura {
+    display: block; width: 220px; height: 420px; padding: 0; border: 0; border-radius: 22px; overflow: hidden; cursor: pointer;
+    background: var(--cartao); box-shadow: 0 1px 0 var(--grade), 0 8px 24px rgb(0 0 0 / 0.12); outline: 3px solid transparent;
+  }
+  .tela button.moldura:focus-visible, .tela.ativa button.moldura { outline-color: var(--acento); }
+  .tela img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .tela .nome { margin-top: 8px; font-weight: 700; font-size: 14px; }
+  .tela .nota { font-size: 12px; color: var(--fraca); }
+  .selo { position: absolute; top: -10px; right: -10px; min-width: 26px; height: 26px; padding: 0 7px; border-radius: 13px; display: grid; place-items: center; font-size: 13px; font-weight: 800; border: 2px solid var(--fundo); }
+  .selo.ok { background: var(--ok); color: var(--cartao); }
+  .selo.aviso { background: var(--aviso); color: var(--cartao); }
+  .selo.problema { background: var(--alerta); color: var(--cartao); }
+  svg#setas { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+  svg#setas path { fill: none; stroke: var(--seta); stroke-width: 2; }
+  svg#setas path.volta { stroke-dasharray: 6 6; }
+  svg#setas text { fill: var(--fraca); font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--fundo); stroke-width: 4px; }
+  aside {
+    position: fixed; top: 62px; right: 12px; bottom: 12px; z-index: 6; width: min(380px, calc(100% - 24px)); overflow: auto;
+    background: var(--cartao); border: 1px solid var(--grade); border-radius: 16px; padding: 18px; box-shadow: 0 12px 40px rgb(0 0 0 / 0.18);
+  }
+  aside[hidden] { display: none; }
+  aside h3 { margin: 0 0 4px; font-size: 1.15rem; }
+  aside .rota { font-family: ui-monospace, Consolas, monospace; font-size: 0.8rem; color: var(--fraca); }
+  aside img { width: 100%; border-radius: 14px; border: 1px solid var(--grade); margin: 12px 0; }
+  aside ul { padding-left: 18px; margin: 6px 0 12px; }
+  aside li { margin: 4px 0; }
+  aside .bloco { border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
+  aside .bloco b { display: block; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
+  aside .bloco.ok { background: var(--ok-claro); }
+  aside .bloco.aviso { background: var(--aviso-claro); }
+  aside .bloco.problema { background: var(--alerta-claro); }
+  aside .fechar { float: right; }
+  @media (max-width: 640px) { header .dica, .legenda { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Geração Eleita · fluxo das telas</h1>
+  <span class="dica">Arraste para mover, role para aproximar, toque numa tela para ver a análise.</span>
+  <span class="espaco"></span>
+  <span class="legenda"><span><i style="background:var(--ok)"></i>faz sentido</span><span><i style="background:var(--aviso)"></i>ajustar</span><span><i style="background:var(--alerta)"></i>problema</span></span>
+  <button class="seg" data-tema="claro" aria-pressed="true">Telas no claro</button>
+  <button class="seg" data-tema="escuro" aria-pressed="false">Telas no escuro</button>
+  <button class="seg" data-ajustar>Ver tudo</button>
+</header>
+<div id="palco"><div id="quadro"><svg id="setas"></svg></div></div>
+<aside id="painel" hidden></aside>
+
+<script>
+// ---------- o que há em cada tela ----------
+// avaliacao: ok (o fluxo faz sentido), aviso (funciona, mas pede ajuste), problema (quebra ou confunde)
+const RAIAS = [
+  ['entrada', 'Entrada', 'Quem ainda não tem conta: boas-vindas, cadastro em 3 passos ou entrar.'],
+  ['trilha', 'Trilha e lição', 'O caminho diário: um dia por vez, com leitura, reflexão e celebração.'],
+  ['desafios', 'Desafios', 'Três desafios por dia, o Praticar e a leitura em dupla da semana.'],
+  ['biblia', 'Bíblia', 'Botão central: a Bíblia inteira para ler à vontade.'],
+  ['explorar', 'Explorar', 'Notas de estudo: pessoas, lugares, livros, temas.'],
+  ['juntos', 'Juntos', 'Amigos, célula, propósitos e o feed.'],
+  ['perfil', 'Perfil e conta', 'Pelo retrato no canto do topo: progresso, coleção e configurações.'],
+];
+
+const TELAS = [
+  { id: '01-boas-vindas', raia: 'entrada', col: 0, rota: '/', nome: 'Boas-vindas', av: 'aviso',
+    faz: 'Mostra a marca, a proposta em uma frase e dois caminhos claros (Começar / Já tenho conta).',
+    ajustar: ['A referência "1 Pedro 2.9" está sobre uma frase que não é o texto de 1 Pedro 2.9, e o app tem a regra de não atribuir ao texto o que ele não diz.', '"busca à sua face": sem crase ("busca a sua face"), e mistura "sua" com "te" na mesma frase.'] },
+  { id: '02-cadastro', raia: 'entrada', col: 1, rota: '/ (cadastro)', nome: 'Cadastro · passo 1 de 3', av: 'ok',
+    faz: 'Três passos curtos com barra de progresso, cada campo explica por que é pedido ("não aparece para ninguém").',
+    ajustar: ['Apps de hábito perguntam aqui o horário preferido de leitura; hoje o lembrete nasce às 19h e a pessoa só muda nas configurações.'] },
+  { id: '03-entrar', raia: 'entrada', col: 2, rota: '/ (entrar)', nome: 'Entrar', av: 'ok',
+    faz: 'Um campo aceita @ ou e-mail, senha com "Mostrar", links de senha esquecida e criar conta.',
+    ajustar: ['Muito espaço vazio entre os campos e o botão no celular alto; o botão pode subir para logo abaixo da senha.'] },
+
+  { id: '10-trilha', raia: 'trilha', col: 0, rota: '#/', nome: 'Trilha', av: 'ok',
+    faz: 'O dia atual se destaca ("Começar"), os feitos têm visto, os baús marcam a semana. Mesmo modelo do Duolingo, que o público já conhece.',
+    ajustar: ['Com 365 dias, a trilha é muito longa: abrir sempre rolado no dia atual (já acontece) e dar um atalho "ir para hoje" quando a pessoa rola para longe.'] },
+  { id: '11-trilha-pop', raia: 'trilha', col: 1, rota: '#/ (balão)', nome: 'Balão do dia', av: 'ok',
+    faz: 'Tocar no dia mostra a passagem e o botão para começar, sem trocar de tela.' },
+  { id: '12-licao-leitura', raia: 'trilha', col: 2, rota: '#/dia/N', nome: 'Lição · leitura', av: 'ok',
+    faz: 'Ler aqui ou na própria Bíblia e marcar como lido; o botão de baixo diz exatamente o que falta ("Falta marcar Gênesis 32-33").' },
+  { id: '15-licao-guardar', raia: 'trilha', col: 3, rota: '#/dia/N (guardar)', nome: 'Reflexão · guardar', av: 'ok',
+    faz: 'O versículo do dia com a opção de mostrar aos amigos; as três etapas (guardar, pensar, orar) ficam visíveis no topo.' },
+  { id: '16-licao-pensar', raia: 'trilha', col: 4, rota: '#/dia/N (pensar)', nome: 'Reflexão · pensar', av: 'ok',
+    faz: 'Texto curto da reflexão e três perguntas; "Pular por hoje" deixa sair sem culpa.' },
+  { id: '17-licao-orar', raia: 'trilha', col: 5, rota: '#/dia/N (orar)', nome: 'Reflexão · orar', av: 'ok',
+    faz: 'Começos de oração, fora de qualquer placar.' },
+  { id: '18-licao-celebracao', raia: 'trilha', col: 6, rota: '#/dia/N (celebração)', nome: 'Celebração', av: 'aviso',
+    faz: 'Festeja a constância (ofensiva, semana, amigos que leram) e fecha com "Até amanhã".',
+    ajustar: ['"Volte amanhã para não faltar lenha" puxa para a cobrança que as regras de tom evitam; algo como "Amanhã tem mais" mantém o convite sem pressão.'] },
+  { id: '14-ofensiva', raia: 'trilha', col: 7, rota: 'topo → chama', nome: 'Folha da ofensiva', av: 'ok',
+    faz: 'Explica a ofensiva, os escudos e o recorde com versículo. Aberta pela chama do topo em qualquer tela.' },
+  { id: '13-primeiros-passos', raia: 'trilha', col: 8, rota: '#/passos', nome: 'Primeiros passos', av: 'ok',
+    faz: 'As 12 lições para quem acabou de chegar. Quem é novo vê "Novo na fé? Comece pelos Primeiros passos" na Trilha; também há atalho no Explorar, no Perfil e num dos desafios do dia.',
+    ajustar: ['Depois que o aviso da Trilha some, o caminho mais curto passa a ser o Perfil, que não é onde se procura conteúdo.'] },
+
+  { id: '20-desafios', raia: 'desafios', col: 0, rota: '#/missoes', nome: 'Desafios', av: 'ok',
+    faz: 'Três desafios com barra e baú, o atalho do Praticar e a meta da semana com cada amigo.' },
+  { id: '21-praticar', raia: 'desafios', col: 1, rota: '#/praticar', nome: 'Praticar', av: 'aviso',
+    faz: 'Quiz por unidade para guardar versículos; a unidade atual vem primeiro.',
+    ajustar: ['Só se chega aqui pelo cartão em Desafios. Um atalho no fim da lição ("guarde o versículo de hoje") aproveitaria o momento em que o versículo acabou de ser lido.'] },
+
+  { id: '30-biblia', raia: 'biblia', col: 0, rota: '#/biblia', nome: 'Bíblia · livros', av: 'aviso',
+    faz: 'Os 66 livros em dois testamentos, em botões grandes.',
+    ajustar: ['Falta "continuar de onde parei" no topo: o YouVersion abre direto no último capítulo lido.', 'Não mostra quais livros a pessoa já leu, e não há busca por palavra no texto.'] },
+  { id: '31-biblia-leitor', raia: 'biblia', col: 1, rota: '#/biblia/Livro/N', nome: 'Leitor', av: 'ok',
+    faz: 'Texto limpo, tamanho da letra (Aa), capítulo anterior e seguinte no pé.',
+    ajustar: ['Destacar e anotar um versículo (o hábito mais usado no YouVersion) ainda não existe no leitor livre.'] },
+
+  { id: '40-explorar', raia: 'explorar', col: 0, rota: '#/explorar', nome: 'Explorar', av: 'ok',
+    faz: 'Busca no topo, "Comece por aqui", notas ligadas à leitura de hoje e as seções por assunto.' },
+  { id: '41-explorar-secao', raia: 'explorar', col: 1, rota: '#/secao/…', nome: 'Seção', av: 'ok',
+    faz: 'Lista da seção com filtros.' },
+  { id: '42-explorar-nota', raia: 'explorar', col: 2, rota: '#/nota/…', nome: 'Nota de estudo', av: 'ok',
+    faz: 'Texto da nota com versículos na tradução escolhida e ligações para outras notas.' },
+
+  { id: '50-juntos', raia: 'juntos', col: 0, rota: '#/novidades', nome: 'Juntos', av: 'aviso',
+    faz: 'Amigos no topo, cartão da célula, convidar, Propósitos e o feed com marcos e o recado do líder.',
+    ajustar: ['"Convidar" aparece duas vezes seguidas (na roda de amigos e no botão largo).', 'O pedido "Mostrar seus marcos aos amigos?" fica no meio do feed, empurrando o conteúdo.'] },
+  { id: '51-celula', raia: 'juntos', col: 1, rota: 'Juntos → célula', nome: 'Célula (folha)', av: 'aviso',
+    faz: 'Recado, encontro, meta do dia e quem leu, com as ações do líder.',
+    ajustar: ['Numa célula de 20 pessoas a folha fica muito longa; o desenho da célula como tela com abas (Hoje, Estudo, Pessoas) está em espera.'] },
+  { id: '52-propositos', raia: 'juntos', col: 2, rota: '#/novidades/propositos', nome: 'Propósitos', av: 'ok',
+    faz: 'Duplas e grupos de leitura e oração, com convites no topo.' },
+
+  { id: '60-perfil', raia: 'perfil', col: 0, rota: '#/perfil', nome: 'Perfil', av: 'aviso',
+    faz: 'Semeador, visão geral, amigos, anotações, coleção, versículos, livros, instalar e o apoio do CVV.',
+    ajustar: ['É a tela mais longa do app e mistura progresso, social, conteúdo e ajuda. "Lendo junto" repete o topo do Juntos.', 'Configurações ficam num ícone pequeno no canto; muita gente procura por "Conta" no fim da tela.'] },
+  { id: '61-perfil-conquistas', raia: 'perfil', col: 1, rota: '#/perfil/conquistas', nome: 'Conquistas', av: 'ok',
+    faz: 'Dez conquistas com nível, barra e o próximo alvo; as ainda não ganhas ficam em cinza.' },
+  { id: '62-perfil-trofeus', raia: 'perfil', col: 2, rota: '#/perfil/trofeus', nome: 'Troféus', av: 'ok',
+    faz: 'Unidades do plano e partes da Bíblia; a taça enche conforme o progresso.' },
+  { id: '63-perfil-livros', raia: 'perfil', col: 3, rota: '#/perfil/livros', nome: 'Livros', av: 'ok',
+    faz: 'Quanto de cada livro já foi lido.' },
+  { id: '64-perfil-versiculos', raia: 'perfil', col: 4, rota: '#/perfil/versiculos', nome: 'Versículos guardados', av: 'ok',
+    faz: 'Os versículos abertos nos baús.' },
+  { id: '65-perfil-escritos', raia: 'perfil', col: 5, rota: '#/perfil/escritos', nome: 'Minhas anotações', av: 'ok',
+    faz: 'O que a pessoa escreveu em cada dia, só para ela.' },
+  { id: '70-configuracoes', raia: 'perfil', col: 6, rota: '#/config', nome: 'Configurações', av: 'ok',
+    faz: 'Grupos claros (aparência, leitura, notificações, privacidade, dados, conta); ações destrutivas em vermelho e com confirmação.' },
+  { id: '71-notificacoes', raia: 'perfil', col: 7, rota: '#/config/notificacoes', nome: 'Notificações', av: 'ok',
+    faz: 'Liga e desliga, escolhe o horário e manda uma de teste.' },
+  { id: '72-textos', raia: 'perfil', col: 8, rota: '#/config/textos', nome: 'Textos bíblicos', av: 'ok',
+    faz: 'Escolha da tradução e os créditos que as licenças pedem.' },
+];
+
+// [de, para, rótulo, volta?]
+const SETAS = [
+  ['01-boas-vindas', '02-cadastro', 'Começar'],
+  ['02-cadastro', '03-entrar', 'já tenho conta', true],
+  ['10-trilha', '11-trilha-pop', 'toca no dia'],
+  ['11-trilha-pop', '12-licao-leitura', 'Começar'],
+  ['12-licao-leitura', '15-licao-guardar', 'Concluir o dia'],
+  ['15-licao-guardar', '16-licao-pensar', 'Pensar sobre isso'],
+  ['16-licao-pensar', '17-licao-orar', 'Transformar em oração'],
+  ['17-licao-orar', '18-licao-celebracao', 'Terminar'],
+  ['18-licao-celebracao', '14-ofensiva', 'chama do topo', true],
+  ['14-ofensiva', '13-primeiros-passos', 'Novo na fé? (Trilha)', true],
+  ['20-desafios', '21-praticar', 'Praticar'],
+  ['30-biblia', '31-biblia-leitor', 'livro e capítulo'],
+  ['40-explorar', '41-explorar-secao', 'seção'],
+  ['41-explorar-secao', '42-explorar-nota', 'nota'],
+  ['50-juntos', '51-celula', 'cartão da célula'],
+  ['51-celula', '52-propositos', 'Propósitos', true],
+  ['60-perfil', '61-perfil-conquistas', 'Conquistas'],
+  ['61-perfil-conquistas', '62-perfil-trofeus', 'Troféus', true],
+  ['62-perfil-trofeus', '63-perfil-livros', 'Livros', true],
+  ['63-perfil-livros', '64-perfil-versiculos', 'Versículos', true],
+  ['64-perfil-versiculos', '65-perfil-escritos', 'Anotações', true],
+  ['65-perfil-escritos', '70-configuracoes', 'engrenagem', true],
+  ['70-configuracoes', '71-notificacoes', 'Lembretes'],
+  ['71-notificacoes', '72-textos', 'Tradução', true],
+  ['03-entrar', '10-trilha', 'entrou'],
+];
+
+// ---------- montagem ----------
+const LARGURA_TELA = 220, ALTURA_RAIA = 560, PASSO = 310, INICIO_X = 290, TOPO = 40;
+const quadro = document.getElementById('quadro');
+const setas = document.getElementById('setas');
+let tema = 'claro';
+const posicao = {};
+RAIAS.forEach(([id, titulo, texto], i) => {
+  const r = document.createElement('div');
+  r.className = 'raia';
+  r.style.top = (i * ALTURA_RAIA) + 'px';
+  r.style.width = (INICIO_X + 9 * PASSO + 40) + 'px';
+  r.innerHTML = '<h2>' + titulo + '</h2><p>' + texto + '</p>';
+  quadro.appendChild(r);
+});
+const indiceRaia = Object.fromEntries(RAIAS.map(([id], i) => [id, i]));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const SIMBOLO = { ok: '✓', aviso: '!', problema: '×' };
+for (const t of TELAS) {
+  const x = INICIO_X + t.col * PASSO;
+  const y = indiceRaia[t.raia] * ALTURA_RAIA + TOPO + 40;
+  posicao[t.id] = { x, y };
+  const el = document.createElement('div');
+  el.className = 'tela';
+  el.dataset.id = t.id;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.innerHTML = '<span class="selo ' + t.av + '" aria-hidden="true">' + SIMBOLO[t.av] + '</span>'
+    + '<button class="moldura" aria-label="' + esc(t.nome) + ': ver a análise"><img loading="lazy" alt="" data-tela="' + t.id + '"></button>'
+    + '<div class="nome">' + esc(t.nome) + '</div><div class="nota">' + esc(t.rota) + '</div>';
+  el.querySelector('button').onclick = () => abrir(t);
+  quadro.appendChild(el);
+}
+function pintarImagens() {
+  document.querySelectorAll('img[data-tela]').forEach((img) => { img.src = 'telas/' + tema + '-' + img.dataset.tela + '.png'; });
+}
+pintarImagens();
+
+// setas: da borda direita de uma tela à esquerda da outra; na mesma raia é reta curvada,
+// entre raias desce em S
+const NS = 'http://www.w3.org/2000/svg';
+const largura = INICIO_X + 9 * PASSO + 60, altura = RAIAS.length * ALTURA_RAIA;
+setas.setAttribute('width', largura);
+setas.setAttribute('height', altura);
+const def = document.createElementNS(NS, 'defs');
+def.innerHTML = '<marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor" style="fill:var(--seta)"/></marker>';
+setas.appendChild(def);
+for (const [de, para, rotulo, volta] of SETAS) {
+  const a = posicao[de], b = posicao[para];
+  if (!a || !b) continue;
+  const x1 = a.x + LARGURA_TELA, y1 = a.y + 210, x2 = b.x - 4, y2 = b.y + 210;
+  const p = document.createElementNS(NS, 'path');
+  const meio = (x1 + x2) / 2;
+  const d = Math.abs(y1 - y2) < 2
+    ? 'M' + x1 + ' ' + y1 + ' C' + meio + ' ' + (y1 - 30) + ', ' + meio + ' ' + (y2 - 30) + ', ' + x2 + ' ' + y2
+    : 'M' + x1 + ' ' + y1 + ' C' + (x1 + 120) + ' ' + y1 + ', ' + (x2 - 120) + ' ' + y2 + ', ' + x2 + ' ' + y2;
+  p.setAttribute('d', d);
+  p.setAttribute('marker-end', 'url(#ponta)');
+  if (volta) p.setAttribute('class', 'volta');
+  setas.appendChild(p);
+  const t = document.createElementNS(NS, 'text');
+  t.setAttribute('x', meio);
+  t.setAttribute('y', (y1 + y2) / 2 - (Math.abs(y1 - y2) < 2 ? 30 : 8));
+  t.setAttribute('text-anchor', 'middle');
+  t.textContent = rotulo;
+  setas.appendChild(t);
+}
+
+// ---------- painel da análise ----------
+const painel = document.getElementById('painel');
+function abrir(t) {
+  document.querySelectorAll('.tela.ativa').forEach((e) => e.classList.remove('ativa'));
+  document.querySelector('.tela[data-id="' + t.id + '"]').classList.add('ativa');
+  const nomes = { ok: 'Faz sentido', aviso: 'Funciona, pede ajuste', problema: 'Problema' };
+  painel.innerHTML = '<button class="seg fechar" data-fechar>Fechar</button>'
+    + '<h3>' + esc(t.nome) + '</h3><div class="rota">' + esc(t.rota) + '</div>'
+    + '<div class="bloco ' + t.av + '"><b>' + nomes[t.av] + '</b>' + esc(t.faz) + '</div>'
+    + (t.ajustar ? '<b>O que ajustar</b><ul>' + t.ajustar.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '')
+    + '<img alt="Tela ' + esc(t.nome) + ' inteira" src="telas/' + tema + '-' + t.id + '.png">';
+  painel.hidden = false;
+  painel.querySelector('[data-fechar]').onclick = () => { painel.hidden = true; document.querySelectorAll('.tela.ativa').forEach((e) => e.classList.remove('ativa')); };
+}
+
+// ---------- mover e aproximar ----------
+const palco = document.getElementById('palco');
+let escala = 0.5, dx = 20, dy = 70;
+const aplicar = () => { quadro.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + escala + ')'; };
+function ajustar() {
+  const w = palco.clientWidth, h = palco.clientHeight - 60;
+  escala = Math.min(w / largura, h / altura) * 0.98;
+  dx = (w - largura * escala) / 2; dy = 64;
+  aplicar();
+}
+ajustar();
+palco.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const fator = Math.exp(-e.deltaY * 0.0015);
+  const nova = Math.min(2.5, Math.max(0.08, escala * fator));
+  dx = e.clientX - (e.clientX - dx) * (nova / escala);
+  dy = e.clientY - (e.clientY - dy) * (nova / escala);
+  escala = nova;
+  aplicar();
+}, { passive: false });
+const toques = new Map();
+let distancia = 0;
+palco.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('button')) return;
+  palco.setPointerCapture(e.pointerId);
+  toques.set(e.pointerId, [e.clientX, e.clientY]);
+  palco.classList.add('arrastando');
+});
+palco.addEventListener('pointermove', (e) => {
+  if (!toques.has(e.pointerId)) return;
+  const [x0, y0] = toques.get(e.pointerId);
+  toques.set(e.pointerId, [e.clientX, e.clientY]);
+  if (toques.size === 2) {
+    const [[ax, ay], [bx, by]] = [...toques.values()];
+    const d = Math.hypot(ax - bx, ay - by);
+    if (distancia) {
+      const cx = (ax + bx) / 2, cy = (ay + by) / 2;
+      const nova = Math.min(2.5, Math.max(0.08, escala * d / distancia));
+      dx = cx - (cx - dx) * (nova / escala); dy = cy - (cy - dy) * (nova / escala); escala = nova;
+    }
+    distancia = d;
+  } else { dx += e.clientX - x0; dy += e.clientY - y0; }
+  aplicar();
+});
+const soltar = (e) => { toques.delete(e.pointerId); distancia = 0; if (!toques.size) palco.classList.remove('arrastando'); };
+palco.addEventListener('pointerup', soltar);
+palco.addEventListener('pointercancel', soltar);
+document.querySelector('[data-ajustar]').onclick = ajustar;
+addEventListener('resize', ajustar);
+
+document.querySelectorAll('[data-tema]').forEach((b) => {
+  b.onclick = () => {
+    tema = b.dataset.tema;
+    document.querySelectorAll('[data-tema]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    document.documentElement.dataset.theme = tema === 'escuro' ? 'dark' : 'light';
+    pintarImagens();
+    const aberta = document.querySelector('.tela.ativa');
+    if (aberta && !painel.hidden) abrir(TELAS.find((t) => t.id === aberta.dataset.id));
+  };
+});
+</script>
+</body>
+</html>
