@@ -2228,6 +2228,21 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
   overflow-wrap: anywhere;
 }
 .item-livro:hover { text-decoration: none; background: var(--fundo-2); }
+.item-livro { position: relative; display: flex; align-items: center; gap: 6px; overflow: hidden; }
+.item-livro > span { flex: 1; min-width: 0; }
+.item-livro > svg { flex: 0 0 auto; width: 18px; height: 18px; color: var(--acento); }
+.item-livro.completo { border-color: color-mix(in srgb, var(--acento) 45%, var(--borda)); }
+/* quanto do livro o plano já leu: um fio no pé do botão */
+.progresso-livro { position: absolute; left: 0; bottom: 0; height: 4px; width: var(--f); background: var(--acento); border-radius: 0 4px 0 0; }
+/* Continuar lendo */
+.cartao-continuar { display: flex; align-items: center; gap: 12px; margin: 4px 0 18px; padding: 14px 16px; border-radius: var(--raio-g); background: var(--inverso); color: var(--inverso-tinta); text-decoration: none; }
+.cartao-continuar:hover { text-decoration: none; filter: brightness(1.05); }
+.cartao-continuar .icone-continuar { display: grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; border-radius: var(--raio-p); background: color-mix(in srgb, var(--inverso-tinta) 16%, transparent); }
+.cartao-continuar .icone-continuar svg { width: 24px; height: 24px; }
+.cartao-continuar .textos { flex: 1; display: grid; min-width: 0; line-height: 1.25; }
+.cartao-continuar small { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.85; }
+.cartao-continuar b { font-size: 1.15rem; }
+.cartao-continuar > svg:last-child { flex: 0 0 auto; width: 20px; height: 20px; }
 
 .grade-capitulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 8px; margin-bottom: 10px; }
 .grade-capitulos a {

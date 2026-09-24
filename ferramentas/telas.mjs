@@ -166,6 +166,9 @@ for (tema of TEMAS) {
   await foto('30-biblia', 'Bíblia');
   await ir('#/biblia/' + encodeURIComponent('João') + '/3', 3500);
   await foto('31-biblia-leitor', 'Bíblia: lendo um capítulo', { cheia: false });
+  await av('document.querySelector(".leitor-biblia")?.remove()');
+  await ir('#/biblia', 2500);
+  await foto('32-biblia-continuar', 'Bíblia: continuar de onde parou', { cheia: false });
   await ir('#/explorar');
   await foto('40-explorar', 'Explorar');
   const secao = await av('(document.querySelector(".bloco-secao") || {}).getAttribute?.("href")');

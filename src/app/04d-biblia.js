@@ -45,9 +45,39 @@
   }
 
   // ---------- lista dos 66 livros ----------
+  // Cada livro mostra quanto dele o plano já leu: um visto quando terminou, uma barra fina
+  // enquanto está no meio. É o mesmo número da tela "Livros" do Perfil.
   function gradeLivros(lista) {
-    return '<div class="grade-livros">' + lista.map((l) => '<a class="item-livro" href="#/biblia/'
-      + encodeURIComponent(l) + '">' + CC.esc(l) + '</a>').join('') + '</div>';
+    return '<div class="grade-livros">' + lista.map((l) => {
+      const p = CC.progressoDoLivro(l);
+      const completo = p.total > 0 && p.lidos === p.total;
+      const fracao = p.total ? p.lidos / p.total : 0;
+      const rotulo = completo ? ', lido inteiro no plano' : p.lidos ? ', ' + p.lidos + ' de ' + p.total + ' dias do plano' : '';
+      return '<a class="item-livro' + (completo ? ' completo' : '') + '" href="#/biblia/' + encodeURIComponent(l) + '"'
+        + (rotulo ? ' aria-label="' + CC.esc(l + rotulo) + '"' : '') + '>'
+        + '<span>' + CC.esc(l) + '</span>'
+        + (completo ? CC.ico('certo') : fracao > 0 ? '<i class="progresso-livro" style="--f:' + (fracao * 100).toFixed(0) + '%"></i>' : '')
+        + '</a>';
+    }).join('') + '</div>';
+  }
+
+  // No topo: voltar ao capítulo que estava aberto, ou, para quem nunca abriu, a passagem do
+  // plano de hoje. É o que o YouVersion faz ao abrir: ninguém procura de novo onde parou.
+  function cartaoContinuar(biblia) {
+    const u = CC.ultimaBiblia();
+    if (u && Object.hasOwn(biblia.livros, u.livro) && u.cap >= 1 && u.cap <= biblia.livros[u.livro].length) {
+      return '<a class="cartao-continuar" href="#/biblia/' + encodeURIComponent(u.livro) + '/' + u.cap + '">'
+        + '<span class="icone-continuar">' + CC.ico('livro') + '</span>'
+        + '<span class="textos"><small>Continuar lendo</small><b>' + CC.esc(u.livro + ' ' + u.cap) + '</b></span>'
+        + CC.ico('avancar') + '</a>';
+    }
+    const dia = CC.D.plano[CC.diaAtual() - 1];
+    const t = dia && (dia.trechos || [])[0];
+    if (!t || !Object.hasOwn(biblia.livros, t.livro)) return '';
+    return '<a class="cartao-continuar" href="#/biblia/' + encodeURIComponent(t.livro) + '/' + t.de + '">'
+      + '<span class="icone-continuar">' + CC.ico('livro') + '</span>'
+      + '<span class="textos"><small>Leitura de hoje no plano</small><b>' + CC.esc(CC.passagemDe(dia)) + '</b></span>'
+      + CC.ico('avancar') + '</a>';
   }
 
   function listar(alvo, minha) {
@@ -61,6 +91,7 @@
       const novo = livros.filter((l) => CC.ehNovoTestamento(l));
       alvo.innerHTML = '<h1>Bíblia</h1>'
         + '<p class="passo-dica">Escolha um livro e leia à vontade, no seu ritmo.</p>'
+        + cartaoContinuar(biblia)
         + CC.tituloSecao('Antigo Testamento', CC.plural(antigo.length, 'livro', 'livros')) + gradeLivros(antigo)
         + CC.tituloSecao('Novo Testamento', CC.plural(novo.length, 'livro', 'livros')) + gradeLivros(novo);
     }).catch(() => { if (minha === geracao) erroDeCarga(alvo); });
@@ -148,6 +179,7 @@
   };
 
   function abrirLeitor(livro, n, biblia, b) {
+    CC.guardarUltimaBiblia(livro, n);
     let el = document.querySelector('.leitor-biblia');
     const novo = !el;
     if (!el) {

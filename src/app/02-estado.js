@@ -35,6 +35,8 @@
     semanasJuntos: {},
     // as datas do "Orei": só a data, para o propósito de oração; a oração continua só sua
     oradoEm: {},
+    // o último capítulo aberto na Bíblia livre: { livro, cap, em }, para continuar de onde parou
+    ultimaBiblia: null,
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -124,6 +126,8 @@
       missoesTotal: Math.max(a.missoesTotal || 0, b.missoesTotal || 0),
       semanasJuntos: { ...(a.semanasJuntos || {}), ...(b.semanasJuntos || {}) },
       oradoEm: { ...(a.oradoEm || {}), ...(b.oradoEm || {}) },
+      // vale o capítulo aberto por último, em qualquer aparelho
+      ultimaBiblia: ((b.ultimaBiblia || {}).em || 0) >= ((a.ultimaBiblia || {}).em || 0) ? (b.ultimaBiblia || a.ultimaBiblia || null) : a.ultimaBiblia,
     };
   }
   function fundirPratica(a, b) {
@@ -352,6 +356,12 @@
     return mapa;
   })();
   CC.totalLivros = DIAS_POR_LIVRO.size;
+  CC.ultimaBiblia = () => E.ultimaBiblia || null;
+  CC.guardarUltimaBiblia = (livro, cap) => {
+    const u = E.ultimaBiblia;
+    if (u && u.livro === livro && u.cap === cap) return;
+    CC.gravar('ultimaBiblia', { livro, cap, em: Date.now() });
+  };
   CC.progressoDoLivro = (livro) => {
     const dias = DIAS_POR_LIVRO.get(livro) || [];
     const lidos = new Set(E.lidos);

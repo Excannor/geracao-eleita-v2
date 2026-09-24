@@ -135,6 +135,9 @@ const FOTO_VALIDA = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
 function limparPerfilDoEstado(e) {
   e.apelido = String(e.apelido || '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 20);
   if (!(typeof e.foto === 'string' && e.foto.length <= 400 * 1024 && FOTO_VALIDA.test(e.foto))) e.foto = '';
+  const u = e.ultimaBiblia;
+  e.ultimaBiblia = u && typeof u.livro === 'string' && TODOS_LIVROS.includes(u.livro) && Number.isInteger(u.cap) && u.cap >= 1 && u.cap <= 150
+    ? { livro: u.livro, cap: u.cap, em: Number(u.em) || 0 } : null;
   return e;
 }
 

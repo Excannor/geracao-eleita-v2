@@ -138,6 +138,13 @@ try {
   ok(m[2] === dia(-1) && m[3] === dia(-6), 'leitura feita sem rede nos últimos dias sincroniza com a data certa');
   ok(m[4] === hoje && m[5] === hoje, 'data no futuro, ou inventada meses para trás, conta como hoje');
   ok(conferido.acertosTotal === 510 && conferido.missoesTotal === 30, 'contadores não sobem milhares de uma vez');
+
+  // ---------- continuar de onde parou na Bíblia ----------
+  await pedir('/api/estado', { ...conferido, ultimaBiblia: { livro: 'João', cap: 3, em: Date.now() } }, { cookie: fabi, metodo: 'PUT' });
+  const comBiblia = await (await pedir('/api/estado', undefined, { cookie: fabi })).json();
+  ok(comBiblia.ultimaBiblia && comBiblia.ultimaBiblia.livro === 'João' && comBiblia.ultimaBiblia.cap === 3, 'o último capítulo aberto na Bíblia sincroniza entre aparelhos');
+  await pedir('/api/estado', { ...comBiblia, ultimaBiblia: { livro: '<script>', cap: 999, em: Date.now() + 1000 } }, { cookie: fabi, metodo: 'PUT' });
+  ok((await (await pedir('/api/estado', undefined, { cookie: fabi })).json()).ultimaBiblia === null, 'livro que não existe ou capítulo impossível não é guardado');
 } finally {
   servidor.kill();
 }
