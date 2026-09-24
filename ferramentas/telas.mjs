@@ -178,8 +178,14 @@ for (tema of TEMAS) {
   await ir('#/novidades', 2500);
   await foto('50-juntos', 'Juntos (feed, célula, amigos)');
   await av('document.querySelector("[data-celula]")?.click()');
-  await dormir(900);
-  await foto('51-celula', 'Célula (folha)', { cheia: false });
+  await dormir(1500);
+  await foto('51-celula', 'Célula: Hoje');
+  await av('document.querySelector("[data-aba=\\"estudo\\"]")?.click()');
+  await dormir(1800);
+  await foto('53-celula-estudo', 'Célula: Estudo');
+  await av('document.querySelector("[data-aba=\\"pessoas\\"]")?.click()');
+  await dormir(1200);
+  await foto('54-celula-pessoas', 'Célula: Pessoas');
   await ir('#/novidades/propositos', 2000);
   await foto('52-propositos', 'Propósitos');
   await ir('#/perfil', 2000);

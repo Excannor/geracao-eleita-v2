@@ -94,9 +94,184 @@
       + (p.hoje ? barraDoGrupo(p.hoje) : '')
       + '</button>';
   };
-  CC.abrirCelula = function (id) {
-    folhaProposito(((cache && cache.propositos) || []).find((p) => p.id === id));
+  // ---------- a célula como tela ----------
+  // Uma célula de 20 pessoas não cabia numa folha: a célula tem tela própria, com três abas.
+  //   Hoje: o recado, o encontro e a meta do dia, e o que o líder muda (recado, dia, link)
+  //   Estudo: o estudo do encontro inteiro, para ler antes e mandar no grupo
+  //   Pessoas: quem leu hoje, notificar quem falta, chamar alguém, sair ou encerrar
+  const ABAS_CELULA = [['hoje', 'Hoje'], ['estudo', 'Estudo'], ['pessoas', 'Pessoas']];
+  const enderecoCelula = (id, aba) => '#/novidades/celula/' + encodeURIComponent(id) + (aba && aba !== 'hoje' ? '/' + aba : '');
+  CC.abrirCelula = (id, aba) => { location.hash = enderecoCelula(id, aba); };
+  let desenhoCelula = 0;
+
+  CC.vistaCelula = function (raiz, arg) {
+    const [id, pedida] = String(arg || '').split('/');
+    const aba = ABAS_CELULA.some(([k]) => k === pedida) ? pedida : 'hoje';
+    const meu = ++desenhoCelula;
+    const nestaTela = () => meu === desenhoCelula && location.hash.startsWith('#/novidades/celula/');
+
+    const desenhar = (d) => {
+      if (!d) { raiz.innerHTML = CC.botaoVoltar('Juntos') + '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>'; ligarVoltar(raiz); return; }
+      const p = (d.propositos || []).find((x) => x.id === id && x.celula && !x.euConvidado);
+      if (!p) {
+        raiz.innerHTML = CC.botaoVoltar('Juntos') + '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Essa célula não está mais na sua lista.</p></div>';
+        ligarVoltar(raiz);
+        return;
+      }
+      const souLider = p.criadoPor === euUsuario();
+      raiz.innerHTML = CC.botaoVoltar('Juntos')
+        + '<div class="cabeca-celula"><div><span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula</span>'
+        + '<h1>' + CC.esc(p.titulo) + '</h1>'
+        + '<p class="passo-dica">' + CC.plural(ativos(p).length, 'pessoa', 'pessoas')
+        + (p.encontro >= 0 ? ' · encontro ' + nomeDoEncontro(p.encontro) : '') + '</p></div>'
+        + contagem(p) + '</div>'
+        + '<div class="segmentado abas-celula" role="tablist" aria-label="Partes da célula">'
+        + ABAS_CELULA.map(([k, r]) => '<button type="button" role="tab" data-aba="' + k + '" aria-selected="' + (k === aba) + '" aria-pressed="' + (k === aba) + '">'
+          + r + (k === 'estudo' && p.estudo ? '<i class="ponto-estudo" aria-hidden="true"></i>' : '') + '</button>').join('')
+        + '</div>'
+        + '<div class="painel-celula" role="tabpanel">'
+        + (aba === 'hoje' ? abaHoje(p, souLider) : aba === 'pessoas' ? abaPessoas(p, souLider) : '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>')
+        + '</div>';
+      ligarVoltar(raiz);
+      // Trocar de aba não empilha histórico: o "voltar" do celular sai da célula de uma vez.
+      raiz.querySelectorAll('[data-aba]').forEach((b) => { b.onclick = () => location.replace(enderecoCelula(p.id, b.dataset.aba)); });
+      const painel = raiz.querySelector('.painel-celula');
+      if (aba === 'hoje') ligarHoje(painel, p, souLider);
+      if (aba === 'pessoas') ligarPessoas(painel, p, souLider);
+      if (aba === 'estudo') preencherEstudo(painel, p, souLider, () => meu === desenhoCelula);
+    };
+
+    desenhar(cache);
+    // Como em Propósitos: redesenha só se a resposta mudou algo, e sem repetir a entrada.
+    const antes = JSON.stringify(cache);
+    const jaMostrou = !!cache;
+    CC.carregarPropositos().then((d) => {
+      if (!nestaTela() || (d && JSON.stringify(d) === antes)) return;
+      if (jaMostrou) raiz.classList.add('sem-entrada');
+      desenhar(d || cache);
+    });
   };
+
+  function ligarVoltar(raiz) {
+    raiz.querySelectorAll('[data-voltar]').forEach((el) => {
+      el.onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/novidades'; };
+    });
+  }
+
+  function abaHoje(p, souLider) {
+    const eu = p.membros.find((m) => m.usuario === euUsuario()) || {};
+    const podeChamar = p.membros.filter((m) => m.estado !== 'saiu').length < (p.limite || (cache && cache.limiteCelula) || 20);
+    return topoDaCelula(p, souLider)
+      + (encontroHoje(p) ? '<button class="selo-status leu botao-selo" data-ir-estudo>' + CC.ico('livro') + 'Encontro hoje · veja o estudo</button>' : '')
+      + (p.hoje ? barraDoGrupo(p.hoje)
+        + '<p class="passo-dica pequena">A meta do dia é o número de pessoas. Cada um soma 1 ponto por ler e mais 1 se praticar ou abrir uma nota de estudo. Quem fez mais cobre quem faltou.</p>' : '')
+      + '<div class="acoes">'
+      + (podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
+      + (souLider ? '<div class="pe-duplo-plano"><button class="botao plano pequeno" data-recado>' + (p.recado ? 'Mudar o recado' : 'Escrever um recado') + '</button>'
+        + '<button class="botao plano pequeno" data-encontro>Dia do encontro</button></div>' : '')
+      + '</div>';
+  }
+
+  function ligarHoje(painel, p) {
+    const ligar = (sel, fn) => { const el = painel.querySelector(sel); if (el) el.onclick = fn; };
+    ligar('[data-ir-estudo]', () => location.replace(enderecoCelula(p.id, 'estudo')));
+    ligar('[data-link-celula]', () => folhaLinkCelula(p));
+    ligar('[data-recado]', () => folhaRecado(p));
+    ligar('[data-encontro]', () => folhaEncontro(p));
+  }
+
+  async function preencherEstudo(painel, p, souLider, aindaAqui) {
+    if (!p.estudo) {
+      painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('livro')
+        + '<p>' + (souLider ? 'O estudo do encontro ainda não foi preparado. Você escolhe: a leitura da semana, um trecho ou um estudo seu.'
+          : CC.esc(nomeDoLider(p)) + ' ainda não preparou o estudo deste encontro.') + '</p>'
+        + (souLider ? '<button class="botao azul" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>' : '') + '</div>';
+      const preparar = painel.querySelector('[data-preparar]');
+      if (preparar) preparar.onclick = () => folhaPrepararEstudo(p);
+      return;
+    }
+    const { html, texto } = await montarEstudo(p);
+    if (!aindaAqui()) return;
+    painel.innerHTML = html
+      + '<div class="acoes"><button class="botao azul" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
+      + (souLider ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '') + '</div>';
+    painel.querySelector('[data-compartilhar]').onclick = () => compartilharEstudo(texto);
+    const mudar = painel.querySelector('[data-mudar]');
+    if (mudar) mudar.onclick = () => folhaPrepararEstudo(p);
+  }
+
+  function abaPessoas(p, souLider) {
+    const gente = p.membros.filter((m) => m.estado !== 'saiu');
+    const eu = gente.find((m) => m.usuario === euUsuario()) || {};
+    const faltam = faltamNotificar(p);
+    const limite = p.limite || (cache && cache.limiteCelula) || 20;
+    // O líder primeiro, depois quem já leu hoje, depois os outros: quem faltou não vira lista à parte.
+    const ordem = gente.slice().sort((a, b) => (b.usuario === p.criadoPor) - (a.usuario === p.criadoPor)
+      || (b.fezHoje - a.fezHoje) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
+    const leram = gente.filter((m) => m.estado === 'ativo' && m.fezHoje).length;
+    return '<p class="passo-dica">' + leram + ' de ' + CC.plural(ativos(p).length, 'pessoa leu', 'pessoas leram') + ' hoje.</p>'
+      + '<div class="lista-pedidos">' + ordem.map((m) => {
+        const situacao = m.estado === 'convidado' ? 'Ainda não aceitou'
+          : m.fezHoje ? 'Leu hoje' + (m.extraHoje ? ' e fez o extra' : '')
+            : m.extraHoje ? 'Fez o extra hoje' : 'Ainda não leu hoje';
+        return '<div class="linha-amigo' + (m.estado === 'convidado' ? ' enviado' : '') + '">' + retrato(m)
+          + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + (m.usuario === p.criadoPor ? ' <small class="selo-lider">líder</small>' : '') + '</b>'
+          + '<span class="arroba">' + situacao + '</span></div>'
+          + (m.fezHoje ? '<span class="selo-status leu">' + CC.ico('certo') + '</span>' : '')
+          + (souLider && m.usuario !== p.criadoPor ? '<button class="botao plano pequeno" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar</button>' : '')
+          + '</div>';
+      }).join('') + '</div>'
+      + '<div class="acoes">'
+      + (eu.fezHoje && faltam.length ? '<button class="botao azul" data-notificar>' + CC.ico('sino')
+        + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
+      + (gente.length < limite ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar um amigo</button>' : '')
+      + (souLider ? '<button class="botao plano perigo" data-encerrar>Encerrar a célula</button>' : '<button class="botao plano perigo" data-sair>Sair da célula</button>')
+      + '</div>';
+  }
+
+  // Só quem é amigo recebe o toque: o "Notificar" é o mesmo toque de amigo de sempre.
+  function faltamNotificar(p) {
+    const amigos = ((CC.amigosEmCache() || {}).amigos || []).map((a) => a.usuario);
+    return ativos(p).filter((m) => !m.fezHoje && m.usuario !== euUsuario() && amigos.includes(m.usuario));
+  }
+
+  function ligarPessoas(painel, p) {
+    const gente = p.membros.filter((m) => m.estado !== 'saiu');
+    const limite = p.limite || (cache && cache.limiteCelula) || 20;
+    const notificar = painel.querySelector('[data-notificar]');
+    if (notificar) notificar.onclick = async () => {
+      notificar.disabled = true;
+      const r = await Promise.allSettled(faltamNotificar(p).map((m) => CC.api('api/toques', { para: m.usuario })));
+      CC.avisar(r.some((x) => x.status === 'fulfilled') ? 'Notificado! 🔔' : 'Hoje você já notificou quem falta');
+      recarregar();
+    };
+    const chamar = painel.querySelector('[data-chamar]');
+    if (chamar) chamar.onclick = () => folhaChamar(p, limite - gente.length);
+    painel.querySelectorAll('[data-remover]').forEach((b) => {
+      b.onclick = async () => {
+        const m = gente.find((x) => x.usuario === b.dataset.remover);
+        if (!await CC.confirmar({
+          titulo: 'Tirar ' + (m ? m.nome : '@' + b.dataset.remover) + ' da célula?',
+          texto: 'A pessoa sai da célula e da contagem do grupo. A amizade com você continua, e ninguém é avisado.',
+          acao: 'Tirar', perigo: true,
+        })) return;
+        try { await CC.api('api/celula', { acao: 'remover', id: p.id, usuario: b.dataset.remover }); CC.avisar('Pronto'); } catch (e) { CC.avisar(e.message); }
+        recarregar();
+      };
+    });
+    const sair = painel.querySelector('[data-sair]');
+    if (sair) sair.onclick = async () => {
+      if (!await CC.confirmar({ titulo: 'Sair da ' + comoCelula(p.titulo) + '?', texto: 'A célula continua sem você. Ninguém é avisado.', acao: 'Sair', perigo: true })) return;
+      try { await acao({ acao: 'sair', id: p.id }); location.hash = '#/novidades'; } catch (e) { CC.avisar(e.message); }
+      recarregar();
+    };
+    const encerrar = painel.querySelector('[data-encerrar]');
+    if (encerrar) encerrar.onclick = async () => {
+      if (!await CC.confirmar({ titulo: 'Encerrar a ' + comoCelula(p.titulo) + '?', texto: 'A célula acaba para todo mundo.', acao: 'Encerrar', perigo: true })) return;
+      try { await acao({ acao: 'encerrar', id: p.id }); location.hash = '#/novidades'; } catch (e) { CC.avisar(e.message); }
+      recarregar();
+    };
+  }
 
   function cartaoConvite(p) {
     const quem = p.membros.find((m) => m.usuario === p.convidadoPor);
@@ -525,6 +700,34 @@
       { rotulo: 'Estudo do encontro', ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
       return;
     }
+    const { html, texto } = await montarEstudo(p);
+    CC.folha('<h2>Estudo do encontro</h2>' + html
+      + '<div class="acoes"><button class="botao azul" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
+      + (souLider ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '')
+      + '<button class="botao plano" data-fechar>Fechar</button></div>',
+    {
+      rotulo: 'Estudo do encontro',
+      rolavel: true,
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        const abrir = folha.querySelector('[data-abrir-biblia]');
+        if (abrir) abrir.addEventListener('click', () => fechar());
+        const mudar = folha.querySelector('[data-mudar]');
+        if (mudar) mudar.onclick = () => { fechar(); folhaPrepararEstudo(p); };
+        folha.querySelector('[data-compartilhar]').onclick = () => compartilharEstudo(texto);
+      },
+    });
+  };
+
+  async function compartilharEstudo(texto) {
+    const r = await CC.compartilhar(texto, '');
+    if (r === 'copiado') CC.avisar('Estudo copiado. É só colar no grupo.');
+    else if (r === 'falhou') CC.avisar('Não consegui compartilhar agora.');
+  }
+
+  // O estudo pronto para ler: a linha de quem preparou, a palavra do líder e o roteiro. Serve
+  // à folha do estudo e à aba Estudo da tela da célula; "texto" é a versão para o WhatsApp.
+  async function montarEstudo(p) {
     const est = p.estudo;
     const e = est.tipo === 'semana' ? semanaDoEstudo(p) : null;
     const refLer = est.tipo === 'semana' ? e.chave.r.ref : est.tipo === 'trecho' ? est.ref : '';
@@ -555,31 +758,14 @@
         + '<li><b>Para orar juntos</b><p>Orem a partir do que o texto mostrou.</p></li></ol>';
     }
 
-    CC.folha('<h2>Estudo do encontro</h2>'
-      + '<p class="passo-dica">' + CC.esc(p.titulo) + (est.tipo === 'semana' ? ' · dias ' + e.de + ' a ' + e.ate + ' do plano' : '')
-      + ' · preparado por ' + CC.esc(nomeDoLider(p)) + '</p>'
-      + (est.tipo !== 'livre' && est.texto ? '<div class="recado-lider"><span class="etiqueta">Palavra de ' + CC.esc(nomeDoLider(p)) + '</span>' + paragrafos(est.texto) + '</div>' : '')
-      + corpo
-      + '<div class="acoes"><button class="botao azul" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
-      + (souLider ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '')
-      + '<button class="botao plano" data-fechar>Fechar</button></div>',
-    {
-      rotulo: 'Estudo do encontro',
-      rolavel: true,
-      ligar: (folha, fechar) => {
-        folha.querySelector('[data-fechar]').onclick = fechar;
-        const abrir = folha.querySelector('[data-abrir-biblia]');
-        if (abrir) abrir.addEventListener('click', () => fechar());
-        const mudar = folha.querySelector('[data-mudar]');
-        if (mudar) mudar.onclick = () => { fechar(); folhaPrepararEstudo(p); };
-        folha.querySelector('[data-compartilhar]').onclick = async () => {
-          const r = await CC.compartilhar(estudoEmTexto(p, e, versiculo), '');
-          if (r === 'copiado') CC.avisar('Estudo copiado. É só colar no grupo.');
-          else if (r === 'falhou') CC.avisar('Não consegui compartilhar agora.');
-        };
-      },
-    });
-  };
+    return {
+      html: '<p class="passo-dica">' + CC.esc(p.titulo) + (est.tipo === 'semana' ? ' · dias ' + e.de + ' a ' + e.ate + ' do plano' : '')
+        + ' · preparado por ' + CC.esc(nomeDoLider(p)) + '</p>'
+        + (est.tipo !== 'livre' && est.texto ? '<div class="recado-lider"><span class="etiqueta">Palavra de ' + CC.esc(nomeDoLider(p)) + '</span>' + paragrafos(est.texto) + '</div>' : '')
+        + corpo,
+      texto: estudoEmTexto(p, e, versiculo),
+    };
+  }
 
   function folhaPrepararEstudo(p) {
     const atual = p.estudo || {};
@@ -626,7 +812,9 @@
             CC.avisar(corpo.estudo ? 'Estudo salvo' : 'Estudo tirado');
             await recarregar();
             const novo = ((cache && cache.propositos) || []).find((x) => x.id === p.id);
-            if (novo && novo.estudo) CC.estudoDoEncontro(novo);
+            // Na tela da célula, o estudo novo aparece na aba Estudo; fora dela, abre na folha.
+            if (location.hash.startsWith('#/novidades/celula/')) location.replace(enderecoCelula(p.id, 'estudo'));
+            else if (novo && novo.estudo) CC.estudoDoEncontro(novo);
           } catch (e) {
             const erro = q('.erro-proposito');
             erro.textContent = e.message;

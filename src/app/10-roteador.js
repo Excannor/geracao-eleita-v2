@@ -196,7 +196,7 @@
     else if (rota === 'passos' || rota === 'licoes') CC.vistaPassos(conteudo);
     else if (rota === 'praticar') CC.vistaPraticar(conteudo);
     else if (rota === 'missoes') CC.vistaMissoes(conteudo);
-    else if (rota === 'amigos' || rota === 'novidades') (arg === 'bloqueados' ? CC.vistaBloqueados : arg === 'propositos' ? CC.vistaPropositos : CC.vistaAmigos)(conteudo);
+    else if (rota === 'amigos' || rota === 'novidades') (arg.startsWith('celula/') ? (alvo) => CC.vistaCelula(alvo, arg.slice(7)) : arg === 'bloqueados' ? CC.vistaBloqueados : arg === 'propositos' ? CC.vistaPropositos : CC.vistaAmigos)(conteudo);
     else if (rota === 'biblia') CC.vistaBiblia(conteudo, arg);
     else if (rota === 'explorar') CC.vistaExplorar(conteudo);
     else if (rota === 'secao') CC.vistaSecao(conteudo, arg, consulta ? decodeURIComponent(consulta) : '');

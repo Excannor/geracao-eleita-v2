@@ -36,6 +36,11 @@
     .filter((p) => p.recado && p.recadoEm)
     .map((p) => ({ celula: p, em: Date.parse(p.recadoEm), lider: p.membros.find((m) => m.usuario === p.criadoPor) }))
     .filter((r) => r.em && r.lider && Date.now() - r.em < RECADO_NO_FEED_DIAS * 864e5);
+  // O estudo que o líder preparou também entra no feed, pelo mesmo prazo do recado.
+  const estudosDasCelulas = () => (CC.minhasCelulas ? CC.minhasCelulas() : [])
+    .filter((p) => p.estudo && p.estudo.em)
+    .map((p) => ({ celula: p, em: Date.parse(p.estudo.em), lider: p.membros.find((m) => m.usuario === p.criadoPor) }))
+    .filter((r) => r.em && r.lider && Date.now() - r.em < RECADO_NO_FEED_DIAS * 864e5);
   CC.novidadesEmCache = () => mural;
 
   const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -46,7 +51,7 @@
     const visto = Number(lerLocal('cc.novidades.visto') || 0);
     const eu = (CC.quem || {}).usuario;
     const novas = ((mural && mural.eventos) || []).filter((e) => e.em > visto && e.autor.usuario !== eu).length
-      + recadosDasCelulas().filter((r) => r.em > visto && r.lider.usuario !== eu).length;
+      + recadosDasCelulas().concat(estudosDasCelulas()).filter((r) => r.em > visto && r.lider.usuario !== eu).length;
     return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) : 0) + novas;
   };
 
@@ -467,6 +472,21 @@
       + '</article>';
   }
 
+  // O estudo no feed: a mesma faixa da célula do recado, com o que vão estudar e o atalho
+  // direto para a aba Estudo da célula.
+  function itemEstudo({ celula, em, lider }) {
+    const meu = lider.usuario === (CC.quem || {}).usuario;
+    const est = celula.estudo;
+    const oQue = est.tipo === 'trecho' ? 'Vamos estudar ' + est.ref + ' no encontro.'
+      : est.tipo === 'semana' ? 'O estudo do encontro é sobre a leitura da semana.' : 'O estudo do encontro está pronto.';
+    return '<article class="item-mural item-recado item-estudo">'
+      + '<p class="faixa-recado">' + CC.ico('livro') + '<span>Estudo na <b>' + CC.esc(celula.titulo) + '</b></span></p>'
+      + '<div class="cabeca-mural">' + retrato(lider, 'medio') + '<div><b>' + CC.esc(meu ? 'Você' : lider.nome) + ' <small class="selo-lider">líder</small></b><span>' + quando(em) + '</span></div></div>'
+      + '<p class="texto-recado">' + CC.esc(oQue) + '</p>'
+      + '<div class="pe-mural"><button class="botao contorno pequeno" data-abrir-estudo="' + CC.esc(celula.id) + '">Ver o estudo' + CC.ico('avancar') + '</button></div>'
+      + '</article>';
+  }
+
   // Sem célula, o cartão explica o que ela é e como começar; com célula, mostra cada uma.
   function blocoCelula(celulas) {
     if (celulas.length) return '<div class="lista-propositos">' + celulas.map(CC.cartaoCelula).join('') + '</div>';
@@ -510,6 +530,7 @@
         const eventos = m.eventos || [];
         const linhaDoTempo = eventos.map((e) => ({ em: e.em, html: itemDoMural(e) }))
           .concat(recadosDasCelulas().map((r) => ({ em: r.em, html: itemRecado(r) })))
+          .concat(estudosDasCelulas().map((r) => ({ em: r.em, html: itemEstudo(r) })))
           .sort((a, b) => b.em - a.em);
         const pedidoLigar = !m.ligado && !m.perguntado && amigos.length
           ? '<div class="pedido-mural">' + CC.ico('pessoas') + '<div><b>Mostrar seus marcos aos amigos?</b>'
@@ -556,6 +577,7 @@
       ligar('[data-propositos]', () => { location.hash = '#/novidades/propositos'; });
       ligar('[data-celula]', (el) => CC.abrirCelula(el.dataset.celula));
       ligar('[data-abrir-celula]', (el) => CC.abrirCelula(el.dataset.abrirCelula));
+      ligar('[data-abrir-estudo]', (el) => CC.abrirCelula(el.dataset.abrirEstudo, 'estudo'));
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));
       ligar('[data-amigo]', (el) => folhaAmigo(amigos.find((a) => a.usuario === el.dataset.amigo)));
       ligar('[data-aceitar]', async (el) => {

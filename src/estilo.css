@@ -1624,6 +1624,16 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .etiqueta-celula { display: flex; align-items: center; gap: 6px; color: var(--acento); font-size: 0.78rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
 .etiqueta-celula svg { flex: 0 0 auto; width: 16px; height: 16px; }
 .etiqueta-celula small { margin-left: auto; color: var(--tinta-fraca); font-size: 0.78rem; font-weight: 800; letter-spacing: 0; text-transform: none; }
+/* A tela da célula: cabeçalho com a contagem, abas e o painel de cada uma. */
+.cabeca-celula { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.cabeca-celula > div { flex: 1; min-width: 0; }
+.cabeca-celula h1 { margin: 4px 0 2px; overflow-wrap: anywhere; }
+.cabeca-celula .passo-dica { margin: 0; }
+.abas-celula button { position: relative; }
+.abas-celula .ponto-estudo { position: absolute; top: 8px; right: 12px; width: 7px; height: 7px; border-radius: 50%; background: var(--acento); }
+.painel-celula { display: grid; gap: 4px; }
+.painel-celula > .acoes { margin-top: 18px; }
+.botao-selo { justify-self: start; border: 0; font: inherit; cursor: pointer; }
 .cartao-celula .recado-cartao { display: block; border-left: 3px solid var(--acento); }
 .cartao-celula .recado-cartao span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .cartao-celula .recado-cartao b { color: var(--tinta-forte); }
