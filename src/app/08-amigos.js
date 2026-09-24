@@ -20,12 +20,22 @@
     if (!comConta()) return Promise.resolve(null);
     // O quadro do mês saiu da tela junto com os personagens (redesenho futuro): os já
     // publicados ficam no servidor, mas não aparecem nem contam como novidade.
-    return CC.api('api/novidades').then((d) => {
+    // As células vêm junto: o recado do líder também entra no feed.
+    const celulas = CC.carregarPropositos ? CC.carregarPropositos() : null;
+    return Promise.all([CC.api('api/novidades'), celulas]).then(([d]) => {
       if (d && d.eventos) d.eventos = d.eventos.filter((e) => e.tipo !== 'quadro');
       mural = d;
       return d;
     }).catch(() => null);
   };
+
+  // O recado do líder aparece no feed de quem está na célula, na hora em que foi publicado.
+  // Recado velho sai do feed, mas continua no alto da célula enquanto o líder não o trocar.
+  const RECADO_NO_FEED_DIAS = 14;
+  const recadosDasCelulas = () => (CC.minhasCelulas ? CC.minhasCelulas() : [])
+    .filter((p) => p.recado && p.recadoEm)
+    .map((p) => ({ celula: p, em: Date.parse(p.recadoEm), lider: p.membros.find((m) => m.usuario === p.criadoPor) }))
+    .filter((r) => r.em && r.lider && Date.now() - r.em < RECADO_NO_FEED_DIAS * 864e5);
   CC.novidadesEmCache = () => mural;
 
   const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -35,7 +45,8 @@
   CC.pendenciasDeAmigos = () => {
     const visto = Number(lerLocal('cc.novidades.visto') || 0);
     const eu = (CC.quem || {}).usuario;
-    const novas = ((mural && mural.eventos) || []).filter((e) => e.em > visto && e.autor.usuario !== eu).length;
+    const novas = ((mural && mural.eventos) || []).filter((e) => e.em > visto && e.autor.usuario !== eu).length
+      + recadosDasCelulas().filter((r) => r.em > visto && r.lider.usuario !== eu).length;
     return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) : 0) + novas;
   };
 
@@ -445,6 +456,28 @@
       + '</article>';
   }
 
+  // O recado no feed: com a faixa da célula em cima, para ninguém confundir com um marco de amigo.
+  function itemRecado({ celula, em, lider }) {
+    const meu = lider.usuario === (CC.quem || {}).usuario;
+    return '<article class="item-mural item-recado">'
+      + '<p class="faixa-recado">' + CC.ico('pessoas') + '<span>Recado na <b>' + CC.esc(celula.titulo) + '</b></span></p>'
+      + '<div class="cabeca-mural">' + retrato(lider, 'medio') + '<div><b>' + CC.esc(meu ? 'Você' : lider.nome) + ' <small class="selo-lider">líder</small></b><span>' + quando(em) + '</span></div></div>'
+      + '<p class="texto-recado">' + CC.esc(celula.recado) + '</p>'
+      + '<div class="pe-mural"><button class="botao contorno pequeno" data-abrir-celula="' + CC.esc(celula.id) + '">Abrir a célula' + CC.ico('avancar') + '</button></div>'
+      + '</article>';
+  }
+
+  // Sem célula, o cartão explica o que ela é e como começar; com célula, mostra cada uma.
+  function blocoCelula(celulas) {
+    if (celulas.length) return '<div class="lista-propositos">' + celulas.map(CC.cartaoCelula).join('') + '</div>';
+    return '<div class="cartao-proposito cartao-celula vazia">'
+      + '<span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula</span>'
+      + '<p>Leiam o plano juntos, até 20 pessoas, com o recado do líder e o estudo do encontro.</p>'
+      + '<button class="botao azul" data-nova-celula>Criar uma célula</button>'
+      + '<p class="passo-dica pequena">Recebeu o link da sua célula? É só abrir que você entra.</p>'
+      + '</div>';
+  }
+
   CC.vistaAmigos = function (raiz) {
     if (!servido()) {
       raiz.innerHTML = '<h1>Juntos</h1><div class="vazio">Os amigos aparecem quando o aplicativo está aberto pelo servidor.</div>';
@@ -457,6 +490,7 @@
       const recebidos = d.recebidos || [];
       const enviados = d.enviados || [];
       const m = novidades || {};
+      const celulas = CC.minhasCelulas ? CC.minhasCelulas() : [];
 
       const roda = amigos.map((a) => '<button class="amigo-roda' + (a.leuHoje ? ' leu' : '') + '" data-amigo="' + CC.esc(a.usuario) + '" '
         + 'aria-label="' + CC.esc(a.nome) + ', ' + CC.plural(a.dias, 'dia', 'dias') + ' de propósito' + (a.leuHoje ? ', já leu hoje' : '') + '">'
@@ -474,6 +508,9 @@
         corpo = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>';
       } else {
         const eventos = m.eventos || [];
+        const linhaDoTempo = eventos.map((e) => ({ em: e.em, html: itemDoMural(e) }))
+          .concat(recadosDasCelulas().map((r) => ({ em: r.em, html: itemRecado(r) })))
+          .sort((a, b) => b.em - a.em);
         const pedidoLigar = !m.ligado && !m.perguntado && amigos.length
           ? '<div class="pedido-mural">' + CC.ico('pessoas') + '<div><b>Mostrar seus marcos aos amigos?</b>'
             + '<p>Ofensiva, livros terminados, conquistas e versículos que você guardar.</p>'
@@ -481,10 +518,10 @@
             + '<button class="botao pequeno plano" data-mural-nao>Agora não</button></div></div></div>'
           : '';
         corpo = '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
-          + '<button class="botao azul convidar-largo" data-nova-celula>' + CC.ico('pessoas') + 'Criar uma célula</button>'
+          + blocoCelula(celulas)
           + '<button class="botao contorno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
-          + '<button class="entrada-propositos" data-propositos>' + CC.ico('pessoas')
-            + '<span><b>Propósitos</b><small>Células, duplas e grupos de leitura e oração</small></span>'
+          + '<button class="entrada-propositos" data-propositos>' + CC.ico('aperto')
+            + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
             + (d.convitesProposito ? '<i class="selo-numero" aria-label="' + CC.plural(d.convitesProposito, 'convite', 'convites') + '">' + d.convitesProposito + '</i>' : '')
             + CC.ico('avancar') + '</button>'
           + (recebidos.length
@@ -496,8 +533,8 @@
                 + '</div>').join('') + '</div>'
             : '')
           + pedidoLigar
-          + (eventos.length
-            ? '<div class="mural">' + eventos.map(itemDoMural).join('') + '</div>'
+          + (linhaDoTempo.length
+            ? '<div class="mural">' + linhaDoTempo.map((i) => i.html).join('') + '</div>'
             : '<div class="vazio-amigos">' + CC.ico('pessoas')
               + '<p>' + (amigos.length ? 'Quando alguém bater uma meta, aparece aqui.' : 'Ler junto é mais fácil! Chame a sua célula ou até 4 amigos e montem um propósito.') + '</p></div>')
           + (enviados.length
@@ -517,6 +554,8 @@
       ligar('[data-convidar]', () => CC.convidar());
       ligar('[data-nova-celula]', () => CC.novaCelula());
       ligar('[data-propositos]', () => { location.hash = '#/novidades/propositos'; });
+      ligar('[data-celula]', (el) => CC.abrirCelula(el.dataset.celula));
+      ligar('[data-abrir-celula]', (el) => CC.abrirCelula(el.dataset.abrirCelula));
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));
       ligar('[data-amigo]', (el) => folhaAmigo(amigos.find((a) => a.usuario === el.dataset.amigo)));
       ligar('[data-aceitar]', async (el) => {
@@ -553,12 +592,13 @@
     desenhar(cache, mural);
     // A resposta do servidor só redesenha se trouxe algo novo; e aí sem repetir a entrada, que
     // já tocou no primeiro desenho. Redesenhar igual fazia a tela piscar ao abrir o Feed.
-    const antes = JSON.stringify([cache, mural]);
+    const celulasAgora = () => (CC.minhasCelulas ? CC.minhasCelulas() : []);
+    const antes = JSON.stringify([cache, mural, celulasAgora()]);
     const jaMostrou = !!cache;
     Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]).then(([d, n]) => {
       if (!/^#\/(amigos|novidades)\/?$/.test(location.hash)) return;
       if (CC.pintarTopo) CC.pintarTopo();
-      if (d && JSON.stringify([d, n || mural]) === antes) return;
+      if (d && JSON.stringify([d, n || mural, celulasAgora()]) === antes) return;
       if (jaMostrou) raiz.classList.add('sem-entrada');
       desenhar(d || cache, n || mural, d ? '' : 'Não consegui falar com o servidor agora.');
     });

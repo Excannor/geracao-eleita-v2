@@ -10,6 +10,9 @@
   const acao = (corpo) => CC.api('api/propositos', corpo);
 
   CC.carregarPropositos = () => CC.api('api/propositos').then((d) => { cache = d; return d; }).catch(() => null);
+  CC.propositosEmCache = () => cache;
+  // A célula mora no Juntos, num cartão próprio; Propósitos fica com as duplas e os grupos.
+  CC.minhasCelulas = () => ((cache && cache.propositos) || []).filter((p) => p.celula && !p.euConvidado);
 
   const ICONE = { plano: 'trilha', livro: 'livro', oracao: 'aperto' };
   const ROTULO_TIPO = { plano: 'Plano de leitura', livro: 'Leitura', oracao: 'Oração' };
@@ -78,6 +81,21 @@
       + '</button>';
   }
 
+  // O cartão da célula no Juntos: o nome, quem leu hoje, o encontro e o recado do líder.
+  CC.cartaoCelula = function (p) {
+    return '<button class="cartao-proposito cartao-celula" data-celula="' + CC.esc(p.id) + '">'
+      + '<span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula'
+        + (p.encontro >= 0 && !encontroHoje(p) ? '<small>Encontro ' + nomeDoEncontro(p.encontro) + '</small>' : '') + '</span>'
+      + cabeca(p)
+      + (p.recado ? '<p class="recado-cartao"><span><b>' + CC.esc(nomeDoLider(p)) + ':</b> ' + CC.esc(p.recado) + '</span></p>' : '')
+      + (encontroHoje(p) ? '<span class="selo-status leu">' + CC.ico('livro') + 'Encontro hoje · veja o estudo</span>' : '')
+      + (p.hoje ? barraDoGrupo(p.hoje) : '')
+      + '</button>';
+  };
+  CC.abrirCelula = function (id) {
+    folhaProposito(((cache && cache.propositos) || []).find((p) => p.id === id));
+  };
+
   function cartaoConvite(p) {
     const quem = p.membros.find((m) => m.usuario === p.convidadoPor);
     return '<div class="cartao-proposito convite">'
@@ -93,32 +111,35 @@
     await Promise.all([CC.carregarPropositos(), CC.carregarAmigos()]);
     CC.redesenhar();
   }
+  // A célula mora no Juntos: criar ou entrar numa leva a pessoa para lá.
+  function irParaJuntos() {
+    if (!/^#\/(novidades|amigos)\/?$/.test(location.hash)) location.hash = '#/novidades';
+    else recarregar();
+  }
 
   // ---------- a tela ----------
   CC.vistaPropositos = function (raiz) {
     const desenhar = (d, aviso) => {
       const lista = (d && d.propositos) || [];
       const convites = lista.filter((p) => p.euConvidado);
-      const grupos = lista.filter((p) => !p.euConvidado && p.grupo);
+      const grupos = lista.filter((p) => !p.euConvidado && p.grupo && !p.celula);
       const duplas = lista.filter((p) => !p.euConvidado && !p.grupo);
       raiz.innerHTML = CC.botaoVoltar('Juntos')
         + '<div class="cabeca-tela"><h1>Propósitos</h1>'
         + (d ? '<span class="contagem-amigos">' + CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') + '</span>' : '') + '</div>'
         + (aviso ? '<p class="aviso-cadeado">' + CC.esc(aviso) + '</p>' : '')
-        + '<button class="botao azul" data-nova-celula>' + CC.ico('pessoas') + 'Criar uma célula</button>'
-        + '<button class="botao contorno" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito com amigos</button>'
+        + '<button class="botao azul" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito com amigos</button>'
         + (!d ? '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>' : '')
         + (convites.length ? CC.tituloSecao('Convites', String(convites.length)) + '<div class="lista-propositos">' + convites.map(cartaoConvite).join('') + '</div>' : '')
         + (grupos.length ? CC.tituloSecao('Grupos') + '<div class="lista-propositos">' + grupos.map(cartao).join('') + '</div>' : '')
         + (duplas.length ? CC.tituloSecao('Em dupla') + '<div class="lista-propositos">' + duplas.map(cartao).join('') + '</div>' : '')
         + (d && !lista.length
-          ? '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Chame um amigo para ler, ou orar, junto com você.</p></div>'
+          ? '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Chame um amigo para ler, ou orar, junto com você. A célula fica no Juntos.</p></div>'
           : '')
         ;
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
       ligar('[data-novo-proposito]', () => CC.novoProposito());
-      ligar('[data-nova-celula]', () => CC.novaCelula());
       ligar('[data-proposito]', (el) => folhaProposito(lista.find((p) => p.id === el.dataset.proposito)));
       ligar('[data-aceitar-proposito]', async (el) => {
         el.disabled = true;
@@ -317,8 +338,7 @@
           try {
             const { proposito } = await CC.api('api/celula', { acao: 'criar', titulo: folha.querySelector('[data-titulo]').value });
             fechar();
-            if (!/^#\/novidades\/propositos/.test(location.hash)) location.hash = '#/novidades/propositos';
-            else recarregar();
+            irParaJuntos();
             folhaLinkCelula(proposito);
           } catch (e) {
             erro.textContent = e.message;
@@ -652,8 +672,7 @@
             const r = await CC.api('api/celula', { acao: 'entrar', token });
             fechar();
             CC.avisar(r.ja ? 'Você já está nessa célula' : 'Bem-vindo à ' + comoCelula(r.titulo) + '!');
-            if (!/^#\/novidades\/propositos/.test(location.hash)) location.hash = '#/novidades/propositos';
-            else recarregar();
+            irParaJuntos();
           } catch (e) {
             entrar.disabled = false;
             folha.querySelector('#recado').textContent = e.message;

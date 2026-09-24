@@ -1650,6 +1650,29 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .retratos-grupo .retrato-mais { display: grid; place-items: center; background: var(--fundo-2); color: var(--tinta-forte); font-size: 0.72rem; font-weight: 900; }
 
 /* ---------- célula: líder, recado, encontro e estudo ---------- */
+/* A célula no Juntos: cartão próprio, com a cor de acento, acima dos propósitos. */
+.cartao-celula { border-color: color-mix(in srgb, var(--acento) 55%, var(--borda)); box-shadow: inset 4px 0 0 var(--acento); }
+.cartao-celula:hover { border-color: var(--acento); }
+.cartao-celula.vazia { margin: 4px 0 8px; cursor: default; }
+.cartao-celula.vazia .botao { margin: 2px 0 0; }
+.cartao-celula.vazia .passo-dica { margin: 0; }
+.etiqueta-celula { display: flex; align-items: center; gap: 6px; color: var(--acento); font-size: 0.78rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
+.etiqueta-celula svg { flex: 0 0 auto; width: 16px; height: 16px; }
+.etiqueta-celula small { margin-left: auto; color: var(--tinta-fraca); font-size: 0.78rem; font-weight: 800; letter-spacing: 0; text-transform: none; }
+.cartao-celula .recado-cartao { display: block; border-left: 3px solid var(--acento); }
+.cartao-celula .recado-cartao span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cartao-celula .recado-cartao b { color: var(--tinta-forte); }
+.lista-propositos + .convidar-largo { margin-top: 2px; }
+
+/* O recado do líder no feed: faixa da célula em cima e fundo de acento, diferente dos marcos. */
+.item-mural.item-recado { margin: 14px 0; padding: 14px 16px; border: 0; border-left: 4px solid var(--acento); border-radius: var(--raio-g); background: var(--acento-fraco); }
+.faixa-recado { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; color: var(--acento); font-size: 0.82rem; font-weight: 800; }
+.faixa-recado svg { flex: 0 0 auto; width: 16px; height: 16px; }
+.faixa-recado b { color: var(--tinta-forte); }
+.texto-recado { margin: 10px 0 12px; color: var(--tinta-forte); font-size: 1.05rem; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.item-recado .botao { width: auto; }
+.item-recado .botao svg { width: 16px; height: 16px; }
+
 .selo-lider { margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--azul-fraco); color: var(--acento); font-size: 0.7rem; font-weight: 800; vertical-align: middle; }
 .recado-lider { margin: 10px 0; padding: 12px 14px; border-left: 4px solid var(--acento); border-radius: var(--raio-p); background: var(--fundo-2); }
 .recado-lider p { margin: 4px 0 0; color: var(--tinta-forte); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
