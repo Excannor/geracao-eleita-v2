@@ -105,10 +105,15 @@ secao('arquivo gerado');
 const dist = (f) => join(AQUI, 'dist', f);
 checar(existsSync(dist('index.html')), 'dist/index.html existe');
 const html = readFileSync(dist('index.html'), 'utf8');
-for (const marcador of ['/*APP*/', '/*ESTILO*/', '/*DADOS*/', '/*FONTES*/', '/*ICONE*/']) {
+for (const marcador of ['/*APP*/', '/*ESTILO*/', '/*DADOS*/', '/*FONTES*/', '/*ICONE*/', '/*CONTEUDO_ARQUIVO*/']) {
   checar(!html.includes(marcador), 'o marcador ' + marcador + ' foi substituído');
 }
-checar(html.includes('window.DADOS=') && html.includes('@font-face') && html.includes('window.CC'), 'dados, fonte e app estão embutidos');
+checar(html.includes('@font-face') && html.includes('window.CC') && html.includes('window.iniciarApp'), 'fonte e app estão embutidos');
+// O conteúdo mora num arquivo à parte, com resumo no nome, e a página só aponta para ele.
+const arquivoConteudo = (html.match(/window\.CONTEUDO_ARQUIVO="(conteudo\.[0-9a-f]+\.json)"/) || [])[1];
+checar(!!arquivoConteudo && existsSync(dist(arquivoConteudo)) && !html.includes('"plano":'), 'o conteúdo saiu do index.html para ' + arquivoConteudo);
+checar(readFileSync(dist('sw.js'), 'utf8').includes('./' + arquivoConteudo), 'o service worker guarda o conteúdo para abrir sem rede');
+checar(Buffer.byteLength(html) < 1024 * 1024, 'o index.html ficou abaixo de 1 MB (' + Math.round(Buffer.byteLength(html) / 1024) + ' KB)');
 // Três blocos: o tema (uma linha, para a abertura já nascer no tema escolhido), os dados e o app.
 checar(html.split('<script').length - 1 === 3, 'há exatamente três blocos de script: tema da abertura, dados e aplicativo');
 checar(!html.includes('coluna-lado'), 'a coluna de resumo das telas largas saiu');

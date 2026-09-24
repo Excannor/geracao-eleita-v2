@@ -1933,6 +1933,8 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
   50% { transform: translateY(-8px) scale(1.02); }
 }
 .abertura-marca { font-family: var(--fonte-destaque); font-size: 1.4rem; font-weight: 600; color: #1c1812; letter-spacing: 0.06em; text-transform: uppercase; }
+.abertura-erro { margin: 18px 24px 0; color: var(--tinta); font-weight: 700; text-align: center; line-height: 1.5; }
+.abertura-erro button { margin-top: 10px; padding: 10px 18px; border: 2px solid currentColor; border-radius: 999px; background: none; color: inherit; font: inherit; cursor: pointer; }
 .abertura-barra { width: 150px; height: 8px; border-radius: 999px; background: #e3f5ee; overflow: hidden; }
 .abertura-barra i { display: block; height: 100%; width: 40%; border-radius: 999px; background: #18a877; animation: abertura-corre 1.1s ease-in-out infinite; }
 /* No escuro, as cores do tema escuro do app. Vale o tema escolhido e, sem escolha, o do

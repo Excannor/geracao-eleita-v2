@@ -98,7 +98,7 @@
     if (!b || !servido() || !navigator.serviceWorker || !navigator.serviceWorker.controller) return;
     fetch(b.arquivo).then((r) => r.blob()).catch(() => { /* fica para a próxima abertura */ });
   }
-  addEventListener('load', () => setTimeout(guardarNoAparelho, 5000));
+  CC.quandoCarregar(() => setTimeout(guardarNoAparelho, 5000));
 
   // ---------- a tela ----------
   let aberto = null;

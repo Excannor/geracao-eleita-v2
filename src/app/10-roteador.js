@@ -433,7 +433,7 @@
       } catch (e) { /* sem rede: segue com a versão que tem */ }
     };
 
-    addEventListener('load', () => {
+    CC.quandoCarregar(() => {
       navigator.serviceWorker.register('sw.js' + (VERSAO ? '?v=' + VERSAO : ''))
         .catch(() => { /* segue sem cache */ })
         .then(() => CC.conferirVersao());

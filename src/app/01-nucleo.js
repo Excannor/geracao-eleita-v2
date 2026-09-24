@@ -15,6 +15,10 @@ window.CC = window.CC || {};
   // ---------- datas ----------
   const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   CC.hojeIso = () => iso(new Date());
+
+  // O app começa depois que o conteúdo chega, e a página pode já ter terminado de carregar:
+  // aí o "load" não vem mais, e quem esperava por ele roda na hora.
+  CC.quandoCarregar = (fn) => (document.readyState === 'complete' ? setTimeout(fn, 0) : addEventListener('load', fn));
   CC.somaDias = (texto, n) => {
     const d = new Date(texto + 'T12:00:00');
     d.setDate(d.getDate() + n);
