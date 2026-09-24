@@ -23,8 +23,10 @@ services:
       context: .
     container_name: geracao-eleita
     restart: unless-stopped
+    # Só nesta máquina: de fora, o caminho é o túnel da Cloudflare. Aberta na rede, a porta
+    # deixava qualquer um da mesma Wi-Fi falar direto com o servidor, sem Cloudflare na frente.
     ports:
-      - "8082:8080"
+      - "127.0.0.1:8082:8080"
     volumes:
       - "./dados:/app/dados"
     environment:

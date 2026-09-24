@@ -17,6 +17,11 @@ COPY arte ./arte
 # O build roda aqui, uma vez: a imagem já sai com dist/ pronto.
 RUN node build.mjs
 
+# O servidor não roda como root: se alguém achar uma falha nele, fica preso ao usuário node,
+# que só escreve na pasta de dados.
+RUN mkdir -p /app/dados && chown node:node /app/dados
+USER node
+
 # Onde o progresso é gravado; monte um volume aqui para ele sobreviver ao container
 ENV CAMINHO_ESTADO=/app/dados/estado.json
 ENV PORTA=8080

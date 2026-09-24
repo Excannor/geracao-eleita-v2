@@ -4,10 +4,10 @@
 import { createServer } from 'node:http';
 import { readFile, writeFile, rename, stat, mkdir, readdir, unlink } from 'node:fs/promises';
 import { readFileSync, readdirSync, existsSync, writeFileSync, unlinkSync } from 'node:fs';
-import { join, dirname, extname, normalize, basename } from 'node:path';
+import { join, dirname, extname, normalize, basename, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { networkInterfaces } from 'node:os';
-import { createHmac, randomBytes } from 'node:crypto';
+import { createHmac, createHash, randomBytes } from 'node:crypto';
 import { createContext, runInContext } from 'node:vm';
 import {
   Contas, arquivoDoEstado, seloDaConta, limparNome, iguais, hojeNoFuso, fusoValido, somaDias,
@@ -40,7 +40,9 @@ const ABERTO_PARA_TESTE = process.env.CAMINHO_ABERTO === '1';
 // A chave do progresso de cada conta na tabela estados: o @ dela. O servidor aberto das
 // ferramentas de teste, sem conta, usa "caminho".
 const arquivoDe = (usuario) => limparNome(usuario) || 'caminho';
-const LIMITE = 4 * 1024 * 1024;
+// O progresso (com a foto) pode passar de 1 MB; nenhum outro pedido chega perto de 64 KB.
+const LIMITE_ESTADO = 4 * 1024 * 1024;
+const LIMITE = 64 * 1024;
 
 const TIPOS = {
   '.html': 'text/html; charset=utf-8',
@@ -76,6 +78,65 @@ function carregarRegras() {
 }
 const REGRAS = carregarRegras();
 const TODOS_LIVROS = [...new Set(PLANO_DO_CONTEUDO.flatMap((d) => d.livros))];
+
+// ---------- cabeçalhos de segurança ----------
+// O app é uma página só, com os scripts dentro do HTML. A CSP libera exatamente esses
+// scripts (pelo hash de cada um, calculado aqui a partir do dist/) e nada de fora: um texto
+// malicioso que escapasse para a tela não roda, e nada sai do app para outro endereço.
+function hashesDosScripts() {
+  const hashes = new Set();
+  for (const pagina of ['index.html', 'entrar.html', 'privacidade.html']) {
+    let html = '';
+    try { html = readFileSync(join(RAIZ, pagina), 'utf8'); } catch { continue; }
+    for (const m of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
+      // O navegador troca \r\n por \n antes de calcular o hash (o HTML chega assim do Windows).
+      if (m[1].trim()) hashes.add("'sha256-" + createHash('sha256').update(m[1].replace(/\r\n?/g, '\n'), 'utf8').digest('base64') + "'");
+    }
+  }
+  return [...hashes].join(' ');
+}
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' " + hashesDosScripts(),
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "worker-src 'self'",
+  "manifest-src 'self'",
+  "frame-ancestors 'none'",
+  "base-uri 'none'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join('; ');
+
+function protecoes(req, res) {
+  res.setHeader('content-security-policy', CSP);
+  res.setHeader('x-content-type-options', 'nosniff');
+  res.setHeader('x-frame-options', 'DENY');
+  res.setHeader('referrer-policy', 'same-origin');
+  res.setHeader('permissions-policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  res.setHeader('cross-origin-opener-policy', 'same-origin');
+  if ((req.headers['x-forwarded-proto'] || '') === 'https') res.setHeader('strict-transport-security', 'max-age=15552000');
+}
+
+// Pedido que muda alguma coisa e vem de outra página é recusado. O cookie já é SameSite=Lax;
+// isto é a segunda tranca, para o dia em que um navegador tratar o cookie diferente.
+function origemAceita(req) {
+  const origem = req.headers.origin;
+  if (origem === undefined) return true;
+  try { return new URL(origem).host === req.headers.host; } catch { return false; }
+}
+
+// O que o progresso leva para os amigos: o nome curto e a foto. A foto só pode ser a que o
+// próprio app gera (uma imagem embutida); um endereço de fora serviria para rastrear quem
+// abre o Juntos ou a célula.
+const FOTO_VALIDA = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+function limparPerfilDoEstado(e) {
+  e.apelido = String(e.apelido || '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 20);
+  if (!(typeof e.foto === 'string' && e.foto.length <= 400 * 1024 && FOTO_VALIDA.test(e.foto))) e.foto = '';
+  return e;
+}
 
 const json = (res, codigo, dados) => {
   const corpo = Buffer.from(JSON.stringify(dados), 'utf8');
@@ -151,13 +212,13 @@ function tirarDoJsonLegado(caminho, u) {
   writeFileSync(caminho, JSON.stringify(d), 'utf8');
 }
 
-function corpoDaRequisicao(req) {
+function corpoDaRequisicao(req, limite = LIMITE) {
   return new Promise((resolve, reject) => {
     let bruto = '';
     let tamanho = 0;
     req.on('data', (parte) => {
       tamanho += parte.length;
-      if (tamanho > LIMITE) { reject(new Error('corpo grande demais')); req.destroy(); return; }
+      if (tamanho > limite) { reject(new Error('corpo grande demais')); req.destroy(); return; }
       bruto += parte;
     });
     req.on('end', () => resolve(bruto));
@@ -240,8 +301,9 @@ function donoDoCracha(cracha) {
   const partes = String(cracha).split('.');
   if (partes.length !== 3) return '';
   const [nome, vence, firma] = partes;
-  if (Number(vence) < Date.now()) return '';
-  const usuario = decodeURIComponent(nome);
+  if (!(Number(vence) > Date.now())) return '';
+  let usuario;
+  try { usuario = decodeURIComponent(nome); } catch { return ''; }
   if (!CONTAS.achar(usuario)) return '';
   if (!iguais(firma, firmaDo(nome, vence, usuario))) return '';
   return usuario;
@@ -281,7 +343,8 @@ function donoDoLink(token) {
   if (partes.length !== 3) return '';
   const [nome, vence, firma] = partes;
   if (!(Number(vence) > Date.now())) return '';
-  const usuario = decodeURIComponent(nome);
+  let usuario;
+  try { usuario = decodeURIComponent(nome); } catch { return ''; }
   if (!CONTAS.achar(usuario)) return '';
   return iguais(firma, firmaDoLink(nome, vence, usuario)) ? usuario : '';
 }
@@ -304,23 +367,41 @@ const pedidosDeLinkPorIp = new Map();
 const quemFala = (req) => (ABERTO_PARA_TESTE && CONTAS.vazio
   ? 'caminho' : donoDoCracha(lerCookie(req, COOKIE)));
 
-// Uma tentativa errada custa espera, e a espera cresce. O IP vem do cabeçalho da
-// Cloudflare: pelo túnel, todo pedido chega com o mesmo endereço do container, e cinco
-// senhas erradas de uma pessoa trancariam todo mundo.
-const castigo = new Map();
+// Tentativas erradas contam numa janela de 15 minutos, por IP e por conta. O IP vem do
+// cabeçalho da Cloudflare: pelo túnel, todo pedido chega com o mesmo endereço do container,
+// e as senhas erradas de uma pessoa trancariam todo mundo. Como esse cabeçalho pode ser
+// forjado por quem fala direto com o servidor, a conta tem o seu próprio limite: dá para
+// trocar de IP à vontade, mas não de alvo. A janela não zera com uma espera curta.
 const ipDe = (req) => String(req.headers['cf-connecting-ip'] || req.socket.remoteAddress || 'desconhecido');
-function podeTentar(ip) {
-  const t = castigo.get(ip);
-  if (!t) return true;
-  if (Date.now() > t.livre) { castigo.delete(ip); return true; }
-  return t.erros < 5;
+const JANELA_ERROS = 15 * 60 * 1000;
+const MAX_ERROS = { ip: 10, conta: 10, cadastro: 20 };
+const marcas = new Map();
+const recentes = (chave, janela) => (marcas.get(chave) || []).filter((t) => t > Date.now() - janela);
+function marcar(chave, janela) { marcas.set(chave, recentes(chave, janela).concat(Date.now())); }
+// Contas de verdade viram o @ delas: entrar pelo e-mail ou pelo @ gasta a mesma cota.
+const alvoDe = (login) => {
+  const c = CONTAS.achar(login) || CONTAS.acharPorEmail(login);
+  return c ? c.usuario : String(login || '').trim().toLowerCase().slice(0, 254);
+};
+function podeTentar(ip, conta) {
+  if (recentes('ip:' + ip, JANELA_ERROS).length >= MAX_ERROS.ip) return false;
+  return !conta || recentes('conta:' + conta, JANELA_ERROS).length < MAX_ERROS.conta;
 }
-function anotarErro(ip) {
-  const t = castigo.get(ip) || { erros: 0, livre: 0 };
-  t.erros++;
-  t.livre = Date.now() + Math.min(t.erros * 5000, 60000);
-  castigo.set(ip, t);
+function anotarErro(ip, conta) {
+  marcar('ip:' + ip, JANELA_ERROS);
+  if (conta) marcar('conta:' + conta, JANELA_ERROS);
 }
+// Uso normal da API por conta: bem acima do que uma pessoa faz, abaixo do que um robô faz.
+function dentroDoLimite(chave, max, janela = 60 * 1000) {
+  if (recentes(chave, janela).length >= max) return false;
+  marcar(chave, janela);
+  return true;
+}
+// A memória das marcas não cresce para sempre.
+setInterval(() => {
+  for (const chave of marcas.keys()) if (!recentes(chave, JANELA_ERROS).length) marcas.delete(chave);
+}, 10 * 60 * 1000).unref();
+const MUITAS = { erro: 'muitas tentativas, espere alguns minutos' };
 
 // ---------- o dia de cada um ----------
 // A versão publicada, lida do service worker que o build gerou. Rota de API: o Cloudflare
@@ -571,10 +652,13 @@ async function rodadaDeLembretes(agora = new Date()) {
 // ---------- rotas ----------
 const servidor = createServer(async (req, res) => {
   try {
+    protecoes(req, res);
     const url = new URL(req.url, 'http://x');
     const rota = decodeURIComponent(url.pathname);
     const ip = ipDe(req);
     const post = req.method === 'POST';
+    const mudaAlgo = !['GET', 'HEAD', 'OPTIONS'].includes(req.method);
+    if (mudaAlgo && rota.startsWith('/api/') && !origemAceita(req)) { json(res, 403, { erro: 'pedido de outra origem' }); return; }
 
     // ---------- públicas ----------
     if (rota === '/api/existe-conta') { json(res, 200, { existe: !CONTAS.vazio }); return; }
@@ -611,7 +695,7 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/criar-conta') {
       if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
-      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      if (recentes('cadastro:' + ip, JANELA_ERROS).length >= MAX_ERROS.cadastro) { json(res, 429, MUITAS); return; }
       try {
         const pedido = await lerJson(req);
         const criada = await CONTAS.criar(pedido);
@@ -643,7 +727,7 @@ const servidor = createServer(async (req, res) => {
         }
         json(res, 200, { ok: true, usuario: criada.usuario, convidadoPor, celula });
       } catch (e) {
-        anotarErro(ip);
+        marcar('cadastro:' + ip, JANELA_ERROS);
         json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não consegui criar a conta' });
       }
       return;
@@ -651,11 +735,12 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/entrar') {
       if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
-      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
       const { login, usuario, senha } = await lerJson(req);
+      const alvo = alvoDe(login || usuario);
+      if (!podeTentar(ip, alvo)) { json(res, 429, MUITAS); return; }
       const conta = await CONTAS.conferir(login || usuario, senha);
-      if (!conta) { anotarErro(ip); json(res, 401, { erro: 'usuário ou senha não conferem' }); return; }
-      castigo.delete(ip);
+      if (!conta) { anotarErro(ip, alvo); json(res, 401, { erro: 'usuário ou senha não conferem' }); return; }
+      marcas.delete('conta:' + conta.usuario);
       porCookie(req, res, conta.usuario);
       json(res, 200, { ok: true, usuario: conta.usuario });
       return;
@@ -694,7 +779,7 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/redefinir-senha') {
       if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
-      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      if (!podeTentar(ip)) { json(res, 429, MUITAS); return; }
       const { token, senha } = await lerJson(req);
       const usuario = donoDoLink(token);
       if (!usuario) { anotarErro(ip); json(res, 410, { erro: 'esse link venceu ou já foi usado. Peça outro' }); return; }
@@ -731,6 +816,10 @@ const servidor = createServer(async (req, res) => {
       }
     }
 
+    // Mais de 120 mudanças por minuto, ou 30 buscas de @, não é gente usando o app.
+    if (rota.startsWith('/api/') && mudaAlgo && !dentroDoLimite('api:' + eu, 120)) { json(res, 429, MUITAS); return; }
+    if (rota === '/api/procurar' && !dentroDoLimite('procurar:' + eu, 30)) { json(res, 429, MUITAS); return; }
+
     const conta = CONTAS.achar(eu);
     const exigir = (condicao, codigo, erro) => { if (!condicao) { json(res, codigo, { erro }); return false; } return true; };
 
@@ -758,6 +847,8 @@ const servidor = createServer(async (req, res) => {
         const alvo = CONTAS.achar(usuario);
         if (!exigir(alvo, 404, 'conta não encontrada')) return;
         guardarPedidosDeSenha(pedidosDeSenha().filter((p) => p.usuario !== alvo.usuario));
+        // Fica no registro do servidor: quem gerou, para quem e quando.
+        console.log('  painel: @' + eu + ' gerou link de nova senha para @' + alvo.usuario + ' em ' + new Date().toISOString());
         json(res, 200, { link: linkDeSenha(alvo.usuario), usuario: alvo.usuario, validade: '1 hora' });
         return;
       }
@@ -803,12 +894,12 @@ const servidor = createServer(async (req, res) => {
       if (req.method === 'GET') { json(res, 200, (await lerEstado(arquivo)) || { vazio: true }); return; }
       if (req.method === 'PUT' || post) {
         try {
-          const novo = REGRAS.normalizarEstado(JSON.parse(await corpoDaRequisicao(req)));
+          const novo = REGRAS.normalizarEstado(JSON.parse(await corpoDaRequisicao(req, LIMITE_ESTADO)));
           if (!novo) throw new Error('formato inválido');
           const atual = REGRAS.normalizarEstado(await lerEstado(arquivo));
           const junto = atual ? REGRAS.fundir(atual, novo) : novo;
           if (novo.dono) junto.dono = novo.dono;
-          await gravarEstado(junto, arquivo);
+          await gravarEstado(limparPerfilDoEstado(junto), arquivo);
           // A primeira lição de quem veio por um convite conta para quem convidou.
           if (conta && conta.convidadoPor && datasFeitas(junto).size && await CONTAS.ativarConvidado(eu)) await marcoDoSemeador(conta.convidadoPor);
           json(res, 200, { ok: true });
@@ -1121,9 +1212,9 @@ const servidor = createServer(async (req, res) => {
     // ---------- conta ----------
     if (rota === '/api/trocar-senha') {
       if (!exigir(post && conta, 405, 'método não suportado')) return;
-      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      if (!podeTentar(ip, eu)) { json(res, 429, MUITAS); return; }
       const { atual, nova } = await lerJson(req);
-      if (!await CONTAS.conferir(eu, atual)) { anotarErro(ip); json(res, 401, { erro: 'a senha atual não confere' }); return; }
+      if (!await CONTAS.conferir(eu, atual)) { anotarErro(ip, eu); json(res, 401, { erro: 'a senha atual não confere' }); return; }
       if (String(nova || '') === String(atual || '')) { json(res, 400, { erro: 'a senha nova é igual à atual' }); return; }
       try {
         await CONTAS.trocarSenha(eu, nova);
@@ -1178,9 +1269,9 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/apagar-conta') {
       if (!exigir(post && conta, 405, 'método não suportado')) return;
-      if (!podeTentar(ip)) { json(res, 429, { erro: 'muitas tentativas, espere um pouco' }); return; }
+      if (!podeTentar(ip, eu)) { json(res, 429, MUITAS); return; }
       const { senha } = await lerJson(req);
-      if (!await CONTAS.conferir(eu, senha)) { anotarErro(ip); json(res, 401, { erro: 'a senha não confere' }); return; }
+      if (!await CONTAS.conferir(eu, senha)) { anotarErro(ip, eu); json(res, 401, { erro: 'a senha não confere' }); return; }
       await CONTAS.apagar(eu);
       await NOVIDADES.apagarDe(eu);
       await NOTIFICACOES.apagarDe(eu);
@@ -1197,7 +1288,8 @@ const servidor = createServer(async (req, res) => {
     // a tela de entrada inteira, 120 KB de HTML no lugar de um ícone.
     const pedido = rota === '/' ? 'index.html' : rota === '/favicon.ico' ? 'icone-48.png' : rota;
     let alvo = normalize(join(RAIZ, pedido));
-    if (!alvo.startsWith(RAIZ)) { res.writeHead(403).end('acesso negado'); return; }
+    // RAIZ + separador: só startsWith(RAIZ) deixaria passar uma pasta vizinha como "dist-velho".
+    if (alvo !== RAIZ && !alvo.startsWith(RAIZ + sep)) { res.writeHead(403).end('acesso negado'); return; }
     let info = await stat(alvo).catch(() => null);
     if (info && info.isDirectory()) {
       alvo = join(alvo, 'index.html');
@@ -1222,8 +1314,10 @@ const servidor = createServer(async (req, res) => {
     });
     res.end(req.method === 'HEAD' ? undefined : corpo);
   } catch (erro) {
-    res.writeHead(500, { 'content-type': 'text/plain; charset=utf-8' });
-    res.end('erro: ' + erro.message);
+    // O detalhe fica no registro do servidor; quem pediu recebe só que deu errado.
+    console.error('  erro em ' + req.method + ' ' + String(req.url).split('?')[0] + ': ' + (erro && erro.stack || erro));
+    if (!res.headersSent) res.writeHead(500, { 'content-type': 'text/plain; charset=utf-8' });
+    res.end('erro no servidor');
   }
 });
 

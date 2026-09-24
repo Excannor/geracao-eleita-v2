@@ -17,6 +17,10 @@ import { LIMITE_GRUPO, limiteDo, alvoValido, rotuloDoProposito } from './proposi
 const scrypt = promisify(scryptCb);
 const CUSTO = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
 const TAMANHO = 64;
+// Senha muito longa só serve para fazer o servidor gastar CPU no scrypt.
+export const SENHA_MAX = 128;
+const senhaCurta = (senha) => String(senha || '').length < 6;
+const senhaLonga = (senha) => String(senha || '').length > SENHA_MAX;
 
 // Um link de convite aceita no máximo isto por hora: segura o link que vazou para onde não devia.
 export const LIMITE_ACEITES_HORA = 30;
@@ -302,7 +306,8 @@ export class Contas {
       if (this.acharPorEmail(mail)) throw erro('este e-mail já tem conta');
     }
     if (exigirPerfil && !nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
-    if (String(senha || '').length < 6) throw erro('a senha precisa de 6 caracteres ou mais');
+    if (senhaCurta(senha)) throw erro('a senha precisa de 6 caracteres ou mais');
+    if (senhaLonga(senha)) throw erro('a senha pode ter no máximo ' + SENHA_MAX + ' caracteres');
 
     const sal = randomBytes(16).toString('hex');
     this.dados.contas[chave] = {
@@ -326,7 +331,8 @@ export class Contas {
     // Mesmo sem a conta existir, gasta o tempo de um scrypt: sem isso, a resposta
     // rápida entrega quais contas existem.
     const sal = conta ? conta.sal : 'sal-de-isca-sem-uso';
-    const tentativa = await embaralhar(senha, sal);
+    const tentativa = await embaralhar(senhaLonga(senha) ? '' : senha, sal);
+    if (senhaLonga(senha)) return null;
     if (!conta) return null;
     return iguais(tentativa, conta.senha) ? conta : null;
   }
@@ -357,7 +363,8 @@ export class Contas {
   async trocarSenha(usuario, nova) {
     const conta = this.achar(usuario);
     if (!conta) throw erro('conta não encontrada', 404);
-    if (String(nova || '').length < 6) throw erro('a senha precisa de 6 caracteres ou mais');
+    if (senhaCurta(nova)) throw erro('a senha precisa de 6 caracteres ou mais');
+    if (senhaLonga(nova)) throw erro('a senha pode ter no máximo ' + SENHA_MAX + ' caracteres');
     conta.sal = randomBytes(16).toString('hex');
     conta.senha = await embaralhar(nova, conta.sal);
     await this.salvar();
