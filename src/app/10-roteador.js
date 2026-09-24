@@ -76,7 +76,7 @@
     topo.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
         CC.vibrar('leve');
-        if (location.hash === el.dataset.ir) { CC.redesenhar(); scrollTo(0, 0); } else location.hash = el.dataset.ir;
+        if (location.hash === el.dataset.ir) { CC.redesenhar(); CC.rolarPara(0); } else location.hash = el.dataset.ir;
       };
     });
   }
@@ -171,7 +171,7 @@
     navegacao.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
         CC.vibrar('leve');
-        if (location.hash === el.dataset.ir) { CC.redesenhar(); scrollTo(0, 0); } else location.hash = el.dataset.ir;
+        if (location.hash === el.dataset.ir) { CC.redesenhar(); CC.rolarPara(0); } else location.hash = el.dataset.ir;
       };
     });
   }
@@ -220,7 +220,7 @@
     if ((rota === '' || rota === 'dia') && ultimaRota !== rota) {
       requestAnimationFrame(() => CC.rolarAteAtual(false));
     }
-    if (rota !== ultimaRota && rota !== 'busca') scrollTo(0, 0);
+    if (rota !== ultimaRota && rota !== 'busca') CC.rolarPara(0);
     entradaDaTela(rota);
     ultimaRota = rota;
   }
@@ -243,12 +243,12 @@
 
   let redesenhando = false;
   CC.redesenhar = function () {
-    const y = scrollY;
+    const y = CC.rolagemY();
     const guardar = ultimaRota;
     redesenhando = true;
     try { rotear(); } finally { redesenhando = false; }
     ultimaRota = guardar;
-    scrollTo(0, y);
+    CC.rolarPara(y);
   };
 
   // ---------- avisos da abertura ----------

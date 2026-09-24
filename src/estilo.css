@@ -371,6 +371,21 @@ button { font-family: inherit; }
 }
 .conteudo.largo { max-width: 720px; }
 
+/* iPhone com o app instalado na tela de início (html.app-ios, marcado no primeiro script da
+   página). No iOS 26 o WebKit descola o que é "fixed" da borda enquanto a página rola, e mais
+   ainda depois que o teclado abre e fecha: a barra de abas subia para o meio da tela, com o
+   conteúdo aparecendo embaixo dela (bug 297779 do WebKit, sem correção oficial). Aqui a página
+   não rola: quem rola é a .aplicativo, e a barra vira um bloco comum no fim da coluna, sem
+   "fixed" nenhum. Fora do app instalado no iPhone, nada muda. */
+@media (max-width: 859px) {
+  html.app-ios, html.app-ios body { height: 100%; overflow: hidden; }
+  html.app-ios body { display: flex; flex-direction: column; padding-bottom: 0; }
+  html.app-ios .aplicativo { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+  html.app-ios .navegacao { position: relative; flex: 0 0 auto; }
+  /* a barra não cobre mais o fim do conteúdo: basta o respiro de sempre */
+  html.app-ios .conteudo { padding-bottom: 40px; }
+}
+
 /* ---------- barra inferior / trilho lateral ----------
    No celular: uma barra só, de ponta a ponta, com duas metades (.ilha, sem fundo próprio)
    de duas abas cada e o botão quadrado da Bíblia encaixado no meio. As .ilha existem para

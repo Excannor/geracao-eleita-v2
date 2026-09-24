@@ -18,6 +18,15 @@ window.CC = window.CC || {};
 
   // O app começa depois que o conteúdo chega, e a página pode já ter terminado de carregar:
   // aí o "load" não vem mais, e quem esperava por ele roda na hora.
+  // Quem rola: no iPhone com o app instalado é a .aplicativo (ver html.app-ios no estilo.css),
+  // em todo o resto é a página. Voltar ao topo e guardar a posição passam por aqui.
+  const areaRolavel = () => {
+    const el = document.documentElement.classList.contains('app-ios') && document.querySelector('.aplicativo');
+    return el && getComputedStyle(el).overflowY === 'auto' ? el : null;
+  };
+  CC.rolagemY = () => { const el = areaRolavel(); return el ? el.scrollTop : scrollY; };
+  CC.rolarPara = (y) => { const el = areaRolavel(); if (el) el.scrollTop = y; else scrollTo(0, y); };
+
   CC.quandoCarregar = (fn) => (document.readyState === 'complete' ? setTimeout(fn, 0) : addEventListener('load', fn));
   CC.somaDias = (texto, n) => {
     const d = new Date(texto + 'T12:00:00');

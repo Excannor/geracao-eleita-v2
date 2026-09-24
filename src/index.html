@@ -20,7 +20,7 @@
 <style>/*ESTILO*/</style>
 </head>
 <body>
-<script>try{var t=localStorage.getItem('cc.tema');if(t!==null)document.documentElement.dataset.tema=JSON.parse(t)?'escuro':'claro'}catch(e){}</script>
+<script>try{var t=localStorage.getItem('cc.tema');if(t!==null)document.documentElement.dataset.tema=JSON.parse(t)?'escuro':'claro'}catch(e){}if(navigator.standalone===true||/[?&]app-ios(&|$)/.test(location.search))document.documentElement.classList.add('app-ios')</script>
 /*ABERTURA*/
 <div class="aplicativo">
   <header class="topo" id="topo"></header>
