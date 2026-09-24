@@ -91,6 +91,11 @@ try {
   const foto = 'data:image/jpeg;base64,' + Buffer.from('foto').toString('base64');
   await pedir('/api/estado', { ...estado, foto }, { cookie: bia, metodo: 'PUT' });
   ok((await (await pedir('/api/estado', undefined, { cookie: bia })).json()).foto === foto, 'a foto que o app gera continua valendo');
+  // A sincronização leve manda o progresso sem a foto quando ela não mudou.
+  const { foto: _f, ...semFoto } = await (await pedir('/api/estado', undefined, { cookie: bia })).json();
+  await pedir('/api/estado', { ...semFoto, atualizadoEm: Date.now() + 5000, lidos: [1, 2] }, { cookie: bia, metodo: 'PUT' });
+  const depois = await (await pedir('/api/estado', undefined, { cookie: bia })).json();
+  ok(depois.foto === foto && depois.lidos.includes(2), 'progresso que chega sem a foto grava a leitura e mantém a foto guardada');
 
   // ---------- tamanho e caminho ----------
   const grande = await pedir('/api/denuncias', JSON.stringify({ usuario: 'ana', motivo: 'x'.repeat(100 * 1024) }), { cookie: bia }).catch(() => null);

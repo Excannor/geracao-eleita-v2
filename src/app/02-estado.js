@@ -167,17 +167,30 @@
     try { localStorage.setItem(CHAVE, JSON.stringify(E)); } catch (e) { /* segue */ }
   };
 
+  // O progresso vai inteiro a cada marcação, menos a foto: ela é quase todo o peso (uns 30 KB)
+  // e quase nunca muda. Vai só quando é diferente da que o servidor já tem; sem ela no
+  // pedido, a fusão do servidor fica com a que estava guardada.
+  let fotoNoServidor = null;
+  function corpoDoEnvio() {
+    const foto = E.foto || '';
+    if (foto && foto === fotoNoServidor) {
+      const { foto: _semFoto, ...resto } = E;
+      return { corpo: JSON.stringify(resto), foto };
+    }
+    return { corpo: JSON.stringify(E), foto };
+  }
+  function enviar() {
+    const { corpo, foto } = corpoDoEnvio();
+    return fetch('api/estado', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: corpo })
+      .then((r) => { if (r.ok) fotoNoServidor = foto; })
+      .catch(() => { servidorVivo = false; });
+  }
+
   let envioPendente;
   function enviarAoServidor() {
     if (!servidorVivo) return;
     clearTimeout(envioPendente);
-    envioPendente = setTimeout(() => {
-      fetch('api/estado', {
-        method: 'PUT',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(E),
-      }).catch(() => { servidorVivo = false; });
-    }, 600);
+    envioPendente = setTimeout(enviar, 600);
   }
 
   // Grava agora, sem esperar a pausa: o servidor precisa saber que a pessoa leu antes
@@ -185,11 +198,7 @@
   CC.salvarNoServidor = function () {
     if (!servidorVivo) return Promise.resolve();
     clearTimeout(envioPendente);
-    return fetch('api/estado', {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(E),
-    }).catch(() => { servidorVivo = false; });
+    return enviar();
   };
 
   CC.estado = () => E;
@@ -581,6 +590,7 @@
           const d = await r.json();
           servidorVivo = true;
           doServidor = normalizar(d);
+          fotoNoServidor = (doServidor && doServidor.foto) || '';
         }
       } catch (e) { servidorVivo = false; }
     }

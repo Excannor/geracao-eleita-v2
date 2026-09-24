@@ -127,6 +127,24 @@ ok(noServidor && typeof noServidor.foto === 'string' && noServidor.foto.length >
   'a foto chega ao servidor, para valer nos seus outros aparelhos');
 ok(noServidor && noServidor.apelido === 'Marcos', 'o nome também sobe');
 
+// sincronização leve: depois que o servidor tem a foto, as marcações seguintes vão sem ela
+await av(`(() => {
+  window.__envios = [];
+  const original = window.fetch;
+  window.fetch = (u, o) => {
+    if (String(u).includes('api/estado') && o && o.method === 'PUT') window.__envios.push({ tamanho: o.body.length, foto: o.body.includes('data:image') });
+    return original(u, o);
+  };
+  return true;
+})()`);
+await av('CC.gravar("acertosTotal", (CC.ler("acertosTotal", 0) || 0) + 1); 1');
+await dormir(1200);
+const envios = await av('window.__envios');
+ok(envios.length >= 1 && envios.every((x) => !x.foto),
+  'com a foto já no servidor, a marcação seguinte vai sem ela (' + (envios[0] ? Math.round(envios[0].tamanho / 1024 * 10) / 10 + ' KB' : 'nada saiu') + ')');
+const aindaNoServidor = await av('fetch("api/estado", {cache:"no-store"}).then(r => r.json()).then(d => d.foto && d.foto.length > 100)');
+ok(aindaNoServidor, 'e o servidor continua com a foto');
+
 // a fusão entre aparelhos não apaga a foto de quem já tinha
 const fundido = await av(`(() => {
   const comFoto = { atualizadoEm: 10, foto: 'data:image/jpeg;base64,AAA', apelido: 'Marcos',
