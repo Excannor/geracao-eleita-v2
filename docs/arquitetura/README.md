@@ -36,17 +36,18 @@ flowchart LR
 ```
 
 - **Sem framework e sem dependências npm.** O servidor usa só o Node (http, crypto, sqlite), e o app é JavaScript puro em módulos concatenados pelo build.
-- **O conteúdo vai dentro do app.** O plano de 365 dias, as reflexões e as 546 notas ficam em `conteudo/conteudo.json` e são embutidos no `index.html` (4,9 MB, 1,1 MB comprimido). As duas Bíblias (NBV e Bíblia Livre) são arquivos à parte, com cache próprio.
+- **O conteúdo é um arquivo à parte.** O plano de 365 dias, as reflexões e as 546 notas saem de `conteudo/conteudo.json` para `dist/conteudo.<resumo>.json` (4,2 MB, 821 KB comprimido), baixado só quando muda. O `index.html` tem só o app (730 KB, 282 KB comprimido). As duas Bíblias (NBV e Bíblia Livre) também são arquivos à parte, com cache próprio.
 - **Funciona sem internet.** O service worker guarda o app e as Bíblias. O progresso nasce no aparelho (`localStorage`) e é fundido com o servidor quando há rede.
 
 ## Build
 
 `node build.mjs` monta o `dist/`:
 
-1. junta `src/app/*.js` em ordem (01 a 10) num `<script>` dentro de `src/index.html`, junto com o `conteudo.json`;
-2. copia as Bíblias com um resumo (hash) no nome e gera a versão `.gz`;
-3. gera o `sw.js` com o nome do cache ligado à versão, o `manifest.webmanifest` e os ícones;
-4. grava `index.html` e `index.html.gz`.
+1. junta `src/app/*.js` em ordem (01 a 10) numa função `iniciarApp` dentro de `src/index.html`, com um carregador que busca o conteúdo e só então chama o app;
+2. grava o conteúdo como `conteudo.<resumo>.json` (e `.gz`), pedido já no `<head>` (preload);
+3. copia as Bíblias com um resumo (hash) no nome e gera a versão `.gz`;
+4. gera o `sw.js` (que guarda a página e o conteúdo para abrir sem rede), o `manifest.webmanifest` e os ícones;
+5. grava `index.html` e `index.html.gz`. A versão é o resumo da página junto com o do conteúdo.
 
 A versão publicada (`/api/versao`) é o hash do `index.html`. O app compara a versão dele com a do servidor, e o service worker novo assume sem recarregar a página na frente da pessoa: a versão nova entra quando a janela é fechada e aberta de novo.
 
@@ -77,11 +78,11 @@ A versão publicada (`/api/versao`) é o hash do `index.html`. O app compara a v
 | `#/missoes` · `#/praticar` | Desafios · Praticar | Desafios |
 | `#/biblia` · `#/biblia/Livro/N` | livros · leitor | Bíblia (centro) |
 | `#/explorar` · `#/secao/…` · `#/nota/…` · `#/busca/…` | Explorar | Explorar |
-| `#/novidades` · `#/novidades/propositos` · `#/amigos/bloqueados` | Juntos · Propósitos · bloqueados | Juntos |
+| `#/novidades` · `#/novidades/celula/<id>[/estudo\|/pessoas]` · `#/novidades/propositos` · `#/amigos/bloqueados` | Juntos · célula (Hoje, Estudo, Pessoas) · Propósitos · bloqueados | Juntos |
 | `#/perfil` · `#/perfil/{conquistas,trofeus,livros,versiculos,escritos}` | Perfil e subtelas | retrato do topo |
 | `#/config` · `#/config/{notificacoes,textos,painel}` | Configurações | retrato do topo |
 
-A célula, a ofensiva, os convites e as confirmações abrem como **folhas** (painéis que sobem de baixo), sem mudar a rota. `#/propositos`, rota antiga de notificações já entregues, redireciona para `#/novidades/propositos`.
+A ofensiva, os convites e as confirmações abrem como **folhas** (painéis que sobem de baixo), sem mudar a rota. `#/propositos`, rota antiga de notificações já entregues, redireciona para `#/novidades/propositos`.
 
 ## O servidor
 
@@ -119,7 +120,7 @@ sequenceDiagram
   participant S as Servidor
   participant D as SQLite
   A->>A: marca a leitura (localStorage)
-  A->>S: PUT /api/estado (o estado inteiro, 600 ms depois)
+  A->>S: PUT /api/estado (o estado, 600 ms depois; a foto só quando mudou)
   S->>D: lê o que já estava gravado
   S->>S: funde (união das leituras, o mais novo nos campos únicos)
   S->>S: confere (data no futuro ou atrasada demais vira hoje; contadores com teto; foto só embutida)
@@ -150,6 +151,10 @@ Inscrição recusada pelo serviço (410, ou chave de outro servidor) sai da list
 - **Dados de terceiros:** a foto e o nome que vão para os amigos são limpos no servidor, e todo texto é escapado ao entrar na tela.
 - **Backups:** um por dia, AES-256-GCM, 14 guardados, chave no `.env`. Quem apaga a conta sai também dos backups.
 - **Docker:** usuário `node` (não root), porta `8082` só em `127.0.0.1`, acesso de fora só pelo túnel.
+
+### iPhone com o app instalado
+
+No iOS 26 o WebKit descola da borda o que é `position: fixed` durante a rolagem (bug 297779), e a barra de abas subia para o meio da tela. No app instalado (`navigator.standalone`), o primeiro script marca `html.app-ios`: a página não rola, quem rola é a `.aplicativo`, e a barra é um bloco comum no fim da coluna. `CC.rolarPara` e `CC.rolagemY` sabem quem rola. `ferramentas/teste-app-ios.mjs` simula o modo com `?app-ios`.
 
 ## Ambientes
 

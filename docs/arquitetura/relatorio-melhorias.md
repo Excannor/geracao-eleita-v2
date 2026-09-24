@@ -31,6 +31,18 @@ Os pontos fracos estão menos nas telas e mais em volta delas:
 | Barra de abas | O botão central da Bíblia chamava mais atenção que a aba atual | Traço sob o nome da aba atual |
 | Código | 11 funções mortas, 50 regras de CSS e 3 animações que sobraram do redesenho, 1 teste desatualizado | Removidos e corrigido |
 
+## Feito depois do relatório (24/09)
+
+| Item | Commit |
+|---|---|
+| 9. Conteúdo fora do `index.html`: 4,9 MB → 730 KB; atualização de código baixa 282 KB | `089417b` |
+| 4. Bíblia: "Continuar lendo" e progresso de cada livro (a busca por palavra ainda falta) | `efde616` |
+| 5. Perfil numa ordem só, sem repetir o Juntos, com "Configurações e conta" | `7b339be` |
+| 6. Célula como tela, com as abas Hoje, Estudo e Pessoas, e o estudo no feed | `d133069` |
+| 14. Sincronização leve: a foto só vai quando muda | `58ec0ad` |
+| Barra de abas no iPhone (bug do iOS 26 no app instalado) | `28e8fd2` |
+| Frase da ofensiva de 7 dias | `0104ea2` |
+
 ## Prioridade alta
 
 ### 1. O servidor não pode depender de alguém perceber que ele caiu

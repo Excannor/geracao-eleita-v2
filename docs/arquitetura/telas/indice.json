@@ -64,6 +64,10 @@
     "titulo": "Bíblia: lendo um capítulo"
   },
   {
+    "nome": "32-biblia-continuar",
+    "titulo": "Bíblia: continuar de onde parou"
+  },
+  {
     "nome": "40-explorar",
     "titulo": "Explorar"
   },
@@ -81,7 +85,15 @@
   },
   {
     "nome": "51-celula",
-    "titulo": "Célula (folha)"
+    "titulo": "Célula: Hoje"
+  },
+  {
+    "nome": "53-celula-estudo",
+    "titulo": "Célula: Estudo"
+  },
+  {
+    "nome": "54-celula-pessoas",
+    "titulo": "Célula: Pessoas"
   },
   {
     "nome": "52-propositos",
