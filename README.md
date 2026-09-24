@@ -345,7 +345,7 @@ instalado na tela de início. As mensagens moram em `notificacoes.mjs` (lista `T
 | Lembrete da leitura | no horário escolhido (padrão 19h) | ainda não leu hoje |
 | Ofensiva em risco | 21h | 2+ dias seguidos, sem leitura hoje |
 | Escudo usado | manhã (9h às 12h) | o escudo cobriu ontem |
-| Sumiu (3+ dias sem ler) | um por dia, no horário escolhido | frase própria no 3º, 7º e 14º dia; leve nos outros |
+| Sumiu (3+ dias sem ler) | no horário escolhido: todo dia do 3º ao 7º; 9º, 11º, 14º; 21º, 30º; de 15 em 15 até 90; depois todo mês | um aviso só no dia, do "de onde parou" ao "sentimos sua falta" |
 | Toque ("Notificar") | na hora | quem toca já leu, quem recebe não |
 | Pedido de amizade / convite aceito | na hora | só quando é novo |
 | Convite de propósito | na hora | alguém te chamou para um propósito |

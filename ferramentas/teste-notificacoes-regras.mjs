@@ -137,11 +137,21 @@ ok(tipo(base(hm(13), { leitura: { ...base(0).leitura, escudoOntem: true } })) !=
 
 const sumido = (dias, m = hm(19)) => base(m, { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: ['2026-09-12', '2026-09-08', '2026-09-01'][[3, 7, 14].indexOf(dias)] || '2026-09-10' } });
 ok(tipo(sumido(3)) === 'volta' && tipo(sumido(7)) === 'volta' && tipo(sumido(14)) === 'volta', 'quem sumiu recebe recado no 3º, 7º e 14º dia');
-ok(tipo(sumido(5)) === 'volta' && N.decidir(sumido(5)).dados.dias === 0, 'entre um recado especial e outro, o aviso diário leve');
+const sumidoHa = (dias, historico = {}, m = hm(19)) => base(m, { historico, leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: new Date(Date.parse('2026-09-15T12:00:00Z') - dias * 864e5).toISOString().slice(0, 10) } });
+const sai = (dias, historico) => tipo(sumidoHa(dias, historico)) === 'volta';
+ok([3, 4, 5, 6, 7].every((d) => sai(d)), 'na primeira semana sem ler, um aviso por dia');
+ok(sai(9) && sai(11) && sai(14) && !sai(10, { volta: '2026-09-14' }) && !sai(12, { volta: '2026-09-14' }), 'da 2ª semana, dia sim, dia não');
+ok(sai(21) && sai(30) && !sai(25) && !sai(28), 'depois, semanal (21º e 30º dia)');
+ok(sai(45) && sai(60) && sai(90) && !sai(50) && sai(120) && sai(150) && !sai(100), 'e cada vez mais espaçado: 15 em 15 dias até 90, depois todo mês');
+const texto = (dias) => N.montarMensagem('volta', { dias }, { usuario: 'x', data: '2026-09-15', nome: 'Ana' });
+ok(N.TEXTOS.voltaSaudade.some(([t]) => t === texto(45).titulo || t.replace('{nome}', 'Ana') === texto(45).titulo), 'quem sumiu há muito tempo recebe o "sentimos sua falta"');
+ok(N.TEXTOS.voltaValor.some(([t]) => t === texto(9).titulo), 'no 9º dia, o convite de que não precisa correr atrás do atraso');
+ok(sai(8) && N.decidir(sumidoHa(8)).dados.dias === 7 && !sai(8, { volta: '2026-09-14' }), 'servidor fora no dia marcado: sai no dia seguinte, uma vez');
+ok(!sai(47), 'atraso de mais de um dia espera o próximo da lista');
 ok(tipo(sumido(5, hm(12))) === null, 'quem sumiu recebe um só por dia, no horário escolhido, não os três');
 ok(tipo(base(hm(19), { historico: { data: '2026-09-15', automaticas: 1, volta: '2026-09-15' }, leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-09-10' } })) === null,
   'e não repete no mesmo dia');
-ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-08-01' } })) === 'volta', 'depois do 14º dia o aviso diário continua');
+ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-08-01' } })) === 'volta', 'no 45º dia ainda sai um aviso (nunca para de vez)');
 ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: null, criadaEm: '2026-09-14' } })) === 'lembrete',
   'conta nova que ainda não leu recebe o lembrete nos primeiros dias');
 
