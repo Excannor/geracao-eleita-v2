@@ -208,6 +208,29 @@ de Novo!" (365 dias, conversa diária com Deus "sem cobranças, sem culpa, sem p
 "Um Mês Sem Errar" (31 dias, "uma leitura por dia, sem enrolação", um passo prático por
 dia). É referência de TOM, não de conteúdo: não copiar frases, bordões nem títulos dele.
 
+**Lido de verdade (2026-09-24):** o dono deixou o PDF do "Oi Deus, Sou Eu de Novo!" em
+`C:\Users\Admin\Pictures\oi DEUS, SOU EU DE NOVO!.pdf` (fora do repo, é obra protegida: não
+copiar para cá nem citar trechos). O que se aproveita dele, sempre DENTRO das regras acima:
+- **uma imagem do dia a dia para iluminar a verdade.** Ele conta uma obra coberta por tapume:
+  o prédio parece parado, mas a fundação está sendo feita. Uma frase assim, simples e
+  verdadeira, ajuda um jovem a entender. Aqui a cena principal é sempre a passagem; a imagem
+  do cotidiano entra no máximo em uma frase, e só se esclarece o texto;
+- **ele se inclui:** "sei que não sou o único", "a gente". Nada de falar de cima;
+- **dá nome à dor real sem amaciar** (gente a ponto de desistir, beco sem saída) e logo em
+  seguida mostra Deus ali dentro, não depois dela;
+- **termina com uma frase curta que dá para guardar** (ele usa "Lembre-se: ..."). No nosso
+  texto, a última frase pode fazer esse papel, sem o rótulo e sem repetir o que já foi dito;
+- **Deus sempre presente e trabalhando, mesmo quando não se vê.** É exatamente a regra 4.
+
+O que NÃO se aproveita, porque bate de frente com o filtro:
+- promessa que o texto não faz ("este será o melhor ano da sua vida", "provocar milagres",
+  "viver o sobrenatural");
+- ilustração de fonte duvidosa ou lenda contada como fato (preço e adestramento de jumento,
+  a história do aluno e do professor sobre a noite): se não dá para conferir, não entra;
+- dizer o que o texto não diz ("era como se o animal reconhecesse o Salvador");
+- versículos em outra tradução (ele cita NVI): aqui é sempre a NBV da leitura;
+- o tamanho: os dele são uma página inteira; os nossos continuam com 4 a 6 frases.
+
 **Voz.** Um amigo mais velho na fé conversando, não um professor dando aula nem um pregador
 no púlpito. Fala com "você", frases curtas, palavras do dia a dia de um jovem brasileiro.
 
