@@ -2441,17 +2441,17 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .acoes-verso b { flex: 1 1 100%; color: var(--tinta-forte); font-size: 0.95rem; }
 .acoes-verso .botao { flex: 1; }
 .cores-marca { display: flex; align-items: center; gap: 10px; flex: 1 1 100%; }
-.bolinha {
+.cor-marca {
   width: 34px; height: 34px; padding: 0; border-radius: 50%;
   border: 2px solid color-mix(in srgb, var(--tinta) 30%, transparent);
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.bolinha.marca-1 { background: var(--marca-1); }
-.bolinha.marca-2 { background: var(--marca-2); }
-.bolinha.marca-3 { background: var(--marca-3); }
-.bolinha.marca-4 { background: var(--marca-4); }
-.bolinha[aria-pressed="true"] { border-color: var(--tinta-forte); box-shadow: 0 0 0 3px var(--acento); }
-.bolinha:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.cor-marca.marca-1 { background: var(--marca-1); }
+.cor-marca.marca-2 { background: var(--marca-2); }
+.cor-marca.marca-3 { background: var(--marca-3); }
+.cor-marca.marca-4 { background: var(--marca-4); }
+.cor-marca[aria-pressed="true"] { border-color: var(--tinta-forte); box-shadow: 0 0 0 3px var(--acento); }
+.cor-marca:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
 .cores-marca .tirar-marca { margin-left: auto; }
 .botoes-verso { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 1 100%; }
 .botoes-verso .botao { flex: 1 1 auto; }
@@ -2732,12 +2732,6 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 /* balão do baú pronto: mesmo balão do "Começar", na cor de conquista */
 .balao.balao-bau { color: var(--amarelo-3d); }
 :root[data-tema="escuro"] .balao.balao-bau { color: var(--amarelo); }
-/* nome e versículo do estágio da chama, na folha da ofensiva */
-.estagio-chama { margin: 4px 0 14px; text-align: center; color: var(--tinta-fraca); font-size: 0.92rem; line-height: 1.45; }
-/* a referência do versículo, não mais o nome do estágio */
-.estagio-chama b { color: var(--chama-texto); font-size: 0.86rem; letter-spacing: .04em; }
-.estagio-chama span { color: var(--tinta); font-size: 1rem; }
-.estagio-chama small { color: var(--tinta-fraca); font-weight: 800; }
 
 /* ---------- carimbo do lema ----------
    A mesma arte do onboarding, trazida para dentro do app: chapas retas, letra de marcador
@@ -2771,7 +2765,20 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 .selo-lema > :nth-child(1) { transform: translateX(3px); }
 .selo-lema > :nth-child(2) { transform: translateX(-8px); }
 .selo-lema > :nth-child(3) { transform: translateX(6px); }
+.selo-lema > :nth-child(4) { transform: translateX(-5px); }
+.selo-lema > :nth-child(5) { transform: translateX(4px); }
+.selo-lema > :nth-child(6) { transform: translateX(-7px); }
 .selo-ofensiva { margin: 6px 0 16px; }
+/* Letra do carimbo pelo tamanho da frase: quanto mais linhas, menor. O JS da folha ainda
+   encolhe o carimbo inteiro, por igual, se a linha mais larga não couber. */
+.selo-ofensiva { --tam-selo: clamp(.95rem, 5.6vw, 1.35rem); }
+.selo-ofensiva[data-linhas="3"] { --tam-selo: clamp(.9rem, 5.2vw, 1.22rem); }
+.selo-ofensiva[data-linhas="4"] { --tam-selo: clamp(.85rem, 4.8vw, 1.1rem); }
+.selo-ofensiva[data-linhas="5"], .selo-ofensiva[data-linhas="6"] { --tam-selo: clamp(.8rem, 4.4vw, 1rem); }
+.selo-ofensiva .selo-linha { font-size: var(--tam-selo); }
+/* referência em cima do carimbo, quando a frase é versículo (o mesmo desenho do portal) */
+.folha-ofensiva .selo-ref { justify-self: center; margin: 4px 0 -8px; font-family: var(--fonte-destaque); font-weight: 700;
+  font-style: italic; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-forte); }
 .marcas-barro { text-align: center; margin: -4px 0 12px; }
 
 /* ---------- trilha: leitura de hoje ---------- */

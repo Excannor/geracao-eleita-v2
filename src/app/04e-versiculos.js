@@ -42,7 +42,7 @@
     const temNota = !!CC.anotacao(chaveNota(ref)).trim();
     return '<b class="ref-verso">' + CC.esc(ref) + '</b>'
       + '<div class="cores-marca" role="group" aria-label="Marcar">'
-      + CORES.map(([n, nome]) => '<button class="bolinha marca-' + n + '" data-cor="' + n + '" aria-pressed="' + (atual === n)
+      + CORES.map(([n, nome]) => '<button class="cor-marca marca-' + n + '" data-cor="' + n + '" aria-pressed="' + (atual === n)
         + '" aria-label="Marcar em ' + nome + '"></button>').join('')
       + (r && algumMarcado(r) ? '<button class="botao-icone tirar-marca" data-cor="0" aria-label="Tirar a marca">' + CC.ico('fechar') + '</button>' : '')
       + '</div>'

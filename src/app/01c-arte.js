@@ -17,24 +17,56 @@
   // (a lamparina de barro de antes saiu do app). Quando a ofensiva zera, o fogo não some:
   // ainda tem brasa, e o convite é reavivar (Is 42.3).
   // O estágio é só da própria pessoa: amigos e Feed nunca veem o tamanho da chama.
-  // "selo" são as duas linhas do carimbo na folha da ofensiva, no tom da marca. Muda a cada
-  // estágio de propósito: uma frase só, fixa, seria a mesma no primeiro dia e no ano inteiro,
-  // e aí ela deixa de dizer onde a pessoa chegou.
+  // A frase e o versículo de cada estágio aparecem no resumo da lição, quando a chama sobe.
   const ESTAGIOS = [
-    { de: 0, nome: 'Reavivar', ref: 'Is 42.3', selo: ['Ainda tem brasa', 'debaixo da cinza'],
+    { de: 0, nome: 'Reavivar', ref: 'Is 42.3',
       frase: 'Deus não apaga a chama que quase não dá luz. Ele está acendendo a sua de novo.' },
-    { de: 1, nome: 'Fogo aceso', ref: 'Lv 6.12', selo: ['A nossa geração tem lenha', 'pra queimar'],
+    { de: 1, nome: 'Fogo aceso', ref: 'Lv 6.12',
       frase: 'A chama acendeu, e quem acendeu foi Deus. A você cabe a lenha de cada manhã.' },
-    { de: 7, nome: 'Fogo no coração', ref: 'Jr 20.9', selo: ['Uma semana', 'e a chama pegou'],
+    { de: 7, nome: 'Fogo no coração', ref: 'Jr 20.9',
       frase: 'Jeremias tentou ficar calado, mas as palavras de Deus queimavam como fogo no coração dele. Uma semana lendo, e essa chama já pegou em você.' },
-    { de: 30, nome: 'Luz do mundo', ref: 'Mt 5.14', selo: ['Essa chama', 'não se esconde'],
+    { de: 30, nome: 'Luz do mundo', ref: 'Mt 5.14',
       frase: 'Um fogo aceso todo dia não fica escondido. Quem está por perto vê a luz.' },
-    { de: 100, nome: 'Coração ardente', ref: 'Lc 24.32', selo: ['Coração que arde', 'não volta atrás'],
+    { de: 100, nome: 'Coração ardente', ref: 'Lc 24.32',
       frase: 'O coração arde quando a Escritura se abre.' },
-    { de: 365, nome: 'Um ano na Palavra', ref: 'Lv 6.13', selo: ['Um ano de fogo', 'que não apagou'],
+    { de: 365, nome: 'Um ano na Palavra', ref: 'Lv 6.13',
       frase: 'Um ano de fogo que não se apagou sobre o altar.' },
   ];
   CC.ESTAGIOS_CHAMA = ESTAGIOS;
+
+  // O carimbo da folha da ofensiva: uma destas frases, sorteada a cada vez que a folha abre.
+  // A lista é do dono (2026-09-25), com a grafia acertada; os versículos foram conferidos na
+  // NBV e na Bíblia Livre. As linhas já vêm quebradas: a Permanent Marker é larga, e cada
+  // linha com até ~20 letras cabe numa tela de 320px (a que passar encolhe na hora).
+  CC.FRASES_OFENSIVA = [
+    { linhas: ['Direcionados', 'à santidade'], ref: '2 Timóteo 2.22' },
+    { linhas: ['Somos', 'remanescentes'] },
+    { linhas: ['Nele vivemos,', 'nos movemos', 'e existimos'], ref: 'Atos 17.28' },
+    { linhas: ['Prepara-te,', 'Ele vem'] },
+    { linhas: ['Até que', 'Ele venha'] },
+    { linhas: ['Quem já foi', 'comprado', 'não se vende'] },
+    { linhas: ['Atraídos pela', 'Sua presença'] },
+    { linhas: ['Marcados pela', 'diferença'] },
+    { linhas: ['Perseverando', 'até o fim'] },
+    { linhas: ['Há esperança', 'para a árvore que,', 'se for cortada,', 'ainda se renovará'], ref: 'Jó 14.7-9' },
+    { linhas: ['Jesus para', 'as nações'] },
+    { linhas: ['Conhecer a Deus', 'e fazê-Lo', 'conhecido'] },
+    { linhas: ['Se alguém quiser', 'vir após mim,', 'negue a si mesmo,', 'tome diariamente', 'a sua cruz', 'e siga-me'], ref: 'Lucas 9.23' },
+    { linhas: ['Firmes no propósito,', 'constantes', 'na oração', 'e inabaláveis na fé'] },
+    { linhas: ['O propósito de Deus', 'para a sua vida', 'é maior do que', 'qualquer obstáculo', 'no seu caminho'] },
+    { linhas: ['A sua oração', 'de hoje está', 'construindo', 'o milagre de amanhã.', 'Continue firme'] },
+    { linhas: ['Onde o mundo', 'vê um fim, Deus', 'escreve um', 'novo começo cheio', 'de esperança'] },
+    { linhas: ['Geração', 'inconformada'] },
+  ];
+  // Nunca a mesma da última vez: abrir de novo e ver a mesma frase parece que não sorteou.
+  let ultimaFrase = -1;
+  CC.fraseDaOfensiva = () => {
+    const total = CC.FRASES_OFENSIVA.length;
+    let i = Math.floor(Math.random() * total);
+    if (i === ultimaFrase && total > 1) i = (i + 1 + Math.floor(Math.random() * (total - 1))) % total;
+    ultimaFrase = i;
+    return CC.FRASES_OFENSIVA[i];
+  };
   CC.estagioDaChama = (dias) => {
     const n = Math.max(0, Number(dias) || 0);
     let i = 0;

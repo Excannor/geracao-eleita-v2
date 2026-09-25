@@ -99,20 +99,17 @@
     }).join('');
     const amigos = (CC.amigosEmCache() || {}).amigos || [];
 
-    const est = CC.estagioDaChama(seq.atual);
+    const lema = CC.fraseDaOfensiva();
     CC.folha('<div class="folha-ofensiva">'
       + '<div class="chama-grande' + (seq.atual ? '' : ' apagada') + '">' + CC.icoChama(seq.atual) + '<b>' + seq.atual + '</b>'
       + '<span>' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + (seq.atual ? '!' : '') + '</span></div>'
-      // O carimbo vem logo abaixo da contagem, na arte do onboarding: ele comenta o número
-      // que está ali em cima, em vez de abrir a folha como um cartaz solto.
-      + '<div class="selo-lema selo-ofensiva">'
-      + (est.selo || []).map((l) => '<span class="selo-linha">' + CC.esc(l) + '</span>').join('')
+      // O carimbo vem logo abaixo da contagem, na arte do onboarding: uma frase sorteada
+      // (CC.FRASES_OFENSIVA), com a referência em cima quando é versículo, como no portal.
+      // Só o carimbo, sem texto corrido embaixo: o dono quer a frase sozinha, motivando.
+      + (lema.ref ? '<span class="selo-ref">' + CC.esc(lema.ref) + '</span>' : '')
+      + '<div class="selo-lema selo-ofensiva" data-linhas="' + lema.linhas.length + '">'
+      + lema.linhas.map((l) => '<span class="selo-linha">' + CC.esc(l) + '</span>').join('')
       + '</div>'
-      // O nome do estágio saiu daqui: sozinho e em negrito, ele era um rótulo solto que não
-      // se explicava. O que fica é a frase com o versículo de onde ela vem, e o quanto falta
-      // para o próximo — aí o nome tem função, é um lugar aonde se chega.
-      + '<p class="estagio-chama"><span>' + est.frase + '</span><br><b>' + est.ref + '</b>'
-      + (est.proximo ? '<br><small>' + CC.plural(est.faltam, 'dia', 'dias') + ' para ' + est.proximo.nome + '</small>' : '') + '</p>'
       + (seq.atual === 0 ? '<p class="passo-dica">Leia hoje para acender o seu fogo.</p>'
         : (seq.feitoHoje ? '' : '<p class="passo-dica">A lenha de hoje ainda não entrou. Leia para manter o fogo aceso!</p>'))
       + '<div class="semana-bolinhas">' + semana + '</div>'
@@ -131,16 +128,19 @@
       rotulo: 'Ofensiva',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-ver-amigos]').onclick = () => { fechar(); location.hash = '#/novidades'; };
-        // A frase do carimbo muda a cada estágio (CC.ESTAGIOS_CHAMA) e algumas são mais
-        // compridas que outras. Em vez de fixar um tamanho que sobra pras curtas e estoura
-        // nas longas, cada linha encolhe só o necessário para caber na largura da folha.
-        folha.querySelectorAll('.selo-linha').forEach((linha) => {
-          let tamanho = parseFloat(getComputedStyle(linha).fontSize);
-          for (let i = 0; i < 12 && linha.scrollWidth > linha.clientWidth + 1; i++) {
-            tamanho *= 0.94;
-            linha.style.fontSize = tamanho + 'px';
-          }
-        });
+        // A frase do carimbo é sorteada (CC.FRASES_OFENSIVA), de 2 a 6 linhas. O tamanho de
+        // partida já vem do CSS pela quantidade de linhas (data-linhas): frase curta em letra
+        // grande, frase longa menor, para não virar um cartaz que empurra a folha inteira.
+        // Se a linha mais larga ainda não couber, o carimbo TODO encolhe junto, na mesma
+        // medida: linhas de tamanhos diferentes davam aparência de carimbo remendado.
+        const selo = folha.querySelector('.selo-ofensiva');
+        const linhas = [...selo.querySelectorAll('.selo-linha')];
+        let tamanho = parseFloat(getComputedStyle(linhas[0]).fontSize);
+        const minimo = tamanho * 0.7;
+        for (let i = 0; i < 14 && tamanho > minimo && linhas.some((l) => l.scrollWidth > l.clientWidth + 1); i++) {
+          tamanho *= 0.95;
+          selo.style.setProperty('--tam-selo', tamanho + 'px');
+        }
       },
     });
   };

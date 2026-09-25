@@ -338,6 +338,26 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   E.anotacoes = {};
 }
 
+// --- frases do carimbo da ofensiva (01c-arte.js) ---
+runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), contexto, { filename: '01c-arte.js' });
+{
+  const frases = CC.FRASES_OFENSIVA;
+  const biblias = ['nbv', 'blivre'].map((s) => JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', s + '.json'), 'utf8')));
+  const longas = frases.filter((f) => !f.linhas.length || f.linhas.length > 6 || f.linhas.some((l) => l.length > 20));
+  const refsRuins = frases.filter((f) => f.ref && (() => {
+    const r = CC.lerRef(f.ref);
+    return !r || biblias.some((b) => ((b.livros[r.livro] || [])[r.cap - 1] || []).slice(r.de - 1, r.ate).filter(Boolean).length !== r.ate - r.de + 1);
+  })());
+  checar(frases.length === 18 && !longas.length, 'as 18 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
+    + (longas.length ? ' (' + longas.map((f) => f.linhas[0]).join(', ') + ')' : ''));
+  checar(!refsRuins.length, 'toda frase da ofensiva com referência aponta para versículos que existem nas duas Bíblias'
+    + (refsRuins.length ? ' (' + refsRuins.map((f) => f.ref).join(', ') + ')' : ''));
+  let repetiu = false;
+  let antes = null;
+  for (let i = 0; i < 400; i++) { const f = CC.fraseDaOfensiva(); if (f === antes) repetiu = true; antes = f; }
+  checar(!repetiu, 'o sorteio da ofensiva nunca repete a frase da vez anterior');
+}
+
 // --- trilhas do leitor ---
 let trilhaErrada = 0;
 for (const d of D.plano) {
