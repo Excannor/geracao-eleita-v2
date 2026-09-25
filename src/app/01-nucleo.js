@@ -27,6 +27,20 @@ window.CC = window.CC || {};
   CC.rolagemY = () => { const el = areaRolavel(); return el ? el.scrollTop : scrollY; };
   CC.rolarPara = (y) => { const el = areaRolavel(); if (el) el.scrollTop = y; else scrollTo(0, y); };
 
+  // No app instalado no iPhone a raiz nunca rola, mas o iOS rola a raiz sozinho para mostrar um
+  // campo acima do teclado (e o scrollIntoView da folha ajuda). Com overflow:hidden ninguém
+  // desfaz isso com o dedo: fechado o teclado, a tela inteira ficava deslocada para cima, com a
+  // barra de abas no meio e fundo vazio embaixo. Sem campo em foco, a raiz volta para o zero.
+  CC.endireitarRaiz = () => {
+    if (!areaRolavel()) return;
+    const foco = document.activeElement;
+    if (foco && /^(INPUT|TEXTAREA|SELECT)$/.test(foco.tagName)) return;
+    const raiz = document.scrollingElement || document.documentElement;
+    if (raiz.scrollTop || scrollY) { raiz.scrollTop = 0; scrollTo(0, 0); }
+  };
+  addEventListener('focusout', () => setTimeout(CC.endireitarRaiz, 120));
+  if (window.visualViewport) visualViewport.addEventListener('resize', () => setTimeout(CC.endireitarRaiz, 120));
+
   CC.quandoCarregar = (fn) => (document.readyState === 'complete' ? setTimeout(fn, 0) : addEventListener('load', fn));
   CC.somaDias = (texto, n) => {
     const d = new Date(texto + 'T12:00:00');
@@ -329,6 +343,7 @@ window.CC = window.CC || {};
       if (vv) { vv.removeEventListener('resize', acompanharTeclado); vv.removeEventListener('scroll', acompanharTeclado); }
       cortina.remove();
       if (origem && origem.focus && document.body.contains(origem)) origem.focus();
+      setTimeout(CC.endireitarRaiz, 120);
     };
     if (!opcoes.presa) cortina.onclick = (ev) => { if (ev.target === cortina) fechar(); };
     if (opcoes.presa) cortina.dataset.presa = '1';
