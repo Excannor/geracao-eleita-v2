@@ -465,6 +465,11 @@
     }
     for (const [chave, texto] of Object.entries(E.anotacoes || {})) {
       if (!texto || !texto.trim()) continue;
+      if (chave.startsWith('verso:')) {
+        const ref = chave.slice(6);
+        saida.push({ onde: 'Nota · ' + ref, texto: texto.trim(), href: CC.hrefDoVerso(ref) });
+        continue;
+      }
       const alvo = chave.replace(/^(nota|secao):/, '');
       const nome = D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : ((secaoDe(alvo) || {}).rotulo || alvo);
       saida.push({
@@ -509,8 +514,13 @@
     });
 
     const porNota = [];
+    const porVerso = [];
     for (const [chave, texto] of Object.entries(E.anotacoes || {})) {
       if (!texto || !texto.trim()) continue;
+      if (chave.startsWith('verso:')) {
+        porVerso.push({ ref: chave.slice(6), texto: texto.trim(), href: CC.hrefDoVerso(chave.slice(6)) });
+        continue;
+      }
       const alvo = chave.replace(/^(nota|secao):/, '');
       const ehNota = chave.startsWith('nota:');
       const nome = ehNota ? (D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : alvo)
@@ -522,7 +532,7 @@
         dias: ehNota ? (diasPorNota.get(alvo) || []) : [],
       });
     }
-    return { porDia, porNota };
+    return { porDia, porNota, porVerso };
   };
 
   CC.vazio = function (raiz, mensagem) {

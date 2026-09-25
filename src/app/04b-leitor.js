@@ -67,12 +67,14 @@
   // "Marcos 1.35" ou "João 3.16-17": devolve o texto na tradução escolhida.
   CC.textoDoVersiculo = function (ref) {
     const b = CC.traducao();
+    // Aceita trecho longo (o estudo da célula pode pedir "Romanos 8.1-39"), mas a citação
+    // mostra no máximo MAX_TRECHO versículos: é um cartão, não o capítulo.
     const m = /^(.+?) (\d+)\.(\d+)(?:-(\d+))?/.exec(String(ref || ''));
     if (!b || !m || !servido()) return Promise.resolve(null);
     return carregar(b).then((biblia) => {
       const cap = ((biblia.livros[m[1]] || [])[Number(m[2]) - 1]) || [];
       const de = Number(m[3]);
-      const ate = Math.min(Number(m[4] || m[3]), de + 2);
+      const ate = Math.min(Number(m[4] || m[3]), de + CC.MAX_TRECHO - 1);
       // o cabeçalho acróstico da Bíblia Livre ("[Nun] :") não entra na citação
       const texto = cap.slice(de - 1, ate).filter(Boolean).join(' ').replace(/^\[[^\]]*\]\s*:?\s*/, '');
       return texto || null;
@@ -155,10 +157,7 @@
       + '<span class="so-leitor" role="status"></span>'
       + '</div></div>'
       + '<div class="licao-pe"><div class="interno">'
-      + '<div class="acoes-verso" hidden><b></b>'
-      + '<button class="botao pequeno contorno" data-copiar-verso>' + CC.ico('folha') + 'Copiar</button>'
-      + (CC.podeCompartilharComAmigos && CC.podeCompartilharComAmigos() ? '<button class="botao pequeno contorno" data-verso-amigos>' + CC.ico('pessoas') + 'Amigos</button>' : '')
-      + '<button class="botao-icone" data-fechar-verso aria-label="Tirar a marca do versículo">' + CC.ico('fechar') + '</button></div>'
+      + '<div class="acoes-verso" hidden></div>'
       + '<button class="botao cor" data-terminei>' + CC.esc(principal) + '</button>'
       + '</div></div>';
 
@@ -227,7 +226,7 @@
       if (minha !== geracao) return;
       alvo.innerHTML = textoDe(biblia, CC.trechosDaTrilha(dia, chave)) + credito(b);
       status.textContent = 'Texto carregado';
-      ligarVersos(el);
+      CC.versiculos.ligar(el);
       retomar(el);
     }).catch(() => {
       if (minha !== geracao) return;
@@ -278,43 +277,6 @@
     return html;
   }
   CC.htmlDoTrecho = textoDe;
-
-  // Tocar num versículo marca e abre o que fazer com ele: copiar ou mostrar aos amigos.
-  function ligarVersos(el) {
-    const barra = el.querySelector('.acoes-verso');
-    const limpar = () => {
-      el.querySelectorAll('.leitor-verso.escolhido').forEach((v) => v.classList.remove('escolhido'));
-      barra.hidden = true;
-    };
-    el.querySelector('.leitor-texto').onclick = (ev) => {
-      const verso = ev.target.closest && ev.target.closest('.leitor-verso');
-      if (!verso) return;
-      const ja = verso.classList.contains('escolhido');
-      limpar();
-      if (ja) return;
-      verso.classList.add('escolhido');
-      const [c, v] = verso.dataset.v.split(':');
-      barra.dataset.ref = verso.closest('.leitor-capitulo').dataset.livro + ' ' + c + '.' + v;
-      barra.dataset.texto = verso.textContent.replace(/^\d+/, '').trim();
-      barra.querySelector('b').textContent = barra.dataset.ref;
-      barra.hidden = false;
-    };
-    barra.querySelector('[data-fechar-verso]').onclick = limpar;
-    barra.querySelector('[data-copiar-verso]').onclick = async () => {
-      const t = CC.traducao();
-      const certo = await CC.copiar('“' + barra.dataset.texto + '” ' + barra.dataset.ref + (t ? ' (' + t.abreviatura + ')' : ''));
-      CC.avisar(certo ? 'Versículo copiado' : 'Não consegui copiar');
-      limpar();
-    };
-    const amigos = barra.querySelector('[data-verso-amigos]');
-    if (amigos) {
-      amigos.onclick = async () => {
-        const certo = await CC.compartilharVersiculo(barra.dataset.ref);
-        CC.avisar(certo ? 'Seus amigos vão ver no Feed' : 'Não deu para mostrar agora');
-        limpar();
-      };
-    }
-  }
 
   const credito = (b) => '<footer class="leitor-credito">'
     + b.credito.map((linha) => '<p>' + CC.esc(linha) + '</p>').join('')

@@ -101,6 +101,13 @@
   --arte-creme: #fff1c9;
   --rosa: #ff4f8b;
 
+  /* Marca-texto dos versículos (04e-versiculos.js): amarelo, verde, azul e rosa, suaves.
+     Ficam fora da paleta da marca de propósito: são do texto da pessoa, não da interface. */
+  --marca-1: #fff0a3;
+  --marca-2: #cdeccd;
+  --marca-3: #cfe4f7;
+  --marca-4: #f9d3e2;
+
   /* Cantos mais generosos que antes: é o que dá o acabamento de aplicativo em vez de
      página. Botão e pílula não usam raio nenhum destes — usam 999px, viram cápsula. */
   --raio: 20px;
@@ -194,6 +201,12 @@
 
   --sobre-cor: #0d0d0d;
   --sombra-flutuante: 0 10px 30px rgba(0, 0, 0, .55);
+
+  /* marca-texto no escuro: tons fundos, para o texto claro continuar lendo bem por cima */
+  --marca-1: #373010;
+  --marca-2: #183426;
+  --marca-3: #1c3350;
+  --marca-4: #4a2033;
 }
 
 /* famílias de cor aplicáveis a qualquer bloco */
@@ -2412,12 +2425,49 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .leitor-verso sup { margin-right: 8px; color: var(--cor, var(--azul)); font-size: 0.66em; font-weight: 900; vertical-align: 0.4em; }
 .leitor-verso:hover { background: var(--fundo-2); }
 .leitor-verso.escolhido { background: color-mix(in srgb, var(--amarelo) 22%, transparent); box-shadow: inset 4px 0 0 var(--amarelo); }
+/* Marca-texto (04e-versiculos.js). Vem depois do .escolhido: o fundo é o da marca e a escolha
+   continua visível pelo filete à esquerda. */
+.leitor-verso.marca-1, .cartao-versiculo.marca-1, .item-versiculo.marca-1 .cartao-versiculo { background: var(--marca-1); }
+.leitor-verso.marca-2, .cartao-versiculo.marca-2, .item-versiculo.marca-2 .cartao-versiculo { background: var(--marca-2); }
+.leitor-verso.marca-3, .cartao-versiculo.marca-3, .item-versiculo.marca-3 .cartao-versiculo { background: var(--marca-3); }
+.leitor-verso.marca-4, .cartao-versiculo.marca-4, .item-versiculo.marca-4 .cartao-versiculo { background: var(--marca-4); }
+.leitor-verso.escolhido { box-shadow: inset 4px 0 0 var(--acento); }
+/* versículo com nota: um pontinho no fim, discreto */
+.leitor-verso.com-nota::after { content: ''; display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--acento); vertical-align: middle; }
 .leitor.corrido .versos { display: block; }
 .leitor.corrido .leitor-verso { display: inline; margin: 0; padding: 2px 0; border-radius: 4px; }
 .leitor.corrido .leitor-verso sup { margin: 0 4px 0 2px; }
 .acoes-verso { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; animation: subir .2s var(--suave); }
 .acoes-verso b { flex: 1 1 100%; color: var(--tinta-forte); font-size: 0.95rem; }
 .acoes-verso .botao { flex: 1; }
+.cores-marca { display: flex; align-items: center; gap: 10px; flex: 1 1 100%; }
+.bolinha {
+  width: 34px; height: 34px; padding: 0; border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--tinta) 30%, transparent);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.bolinha.marca-1 { background: var(--marca-1); }
+.bolinha.marca-2 { background: var(--marca-2); }
+.bolinha.marca-3 { background: var(--marca-3); }
+.bolinha.marca-4 { background: var(--marca-4); }
+.bolinha[aria-pressed="true"] { border-color: var(--tinta-forte); box-shadow: 0 0 0 3px var(--acento); }
+.bolinha:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.cores-marca .tirar-marca { margin-left: auto; }
+.botoes-verso { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 1 100%; }
+.botoes-verso .botao { flex: 1 1 auto; }
+.botoes-verso .botao-icone { flex: 0 0 auto; }
+.acoes-verso.no-cartao { margin-top: 16px; animation: none; }
+.acoes-verso.no-cartao .botao { margin-top: 0; }
+/* na Bíblia, com versículo escolhido, a barra toma o lugar dos botões de capítulo */
+.leitor-biblia.escolhendo [data-anterior], .leitor-biblia.escolhendo [data-proximo] { display: none; }
+.trecho-da-nota { margin: 0 0 14px; padding: 12px 14px; border-left: 4px solid var(--acento); border-radius: var(--raio-p); background: var(--fundo-2); color: var(--tinta); font-weight: 600; }
+.lista-notas-verso { display: grid; gap: 12px; margin: 4px 0 22px; }
+.nota-verso { padding: 14px 16px; border-radius: var(--raio); background: var(--cartao); border: 2px solid var(--borda); }
+.abrir-nota-verso { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.abrir-nota-verso b { display: block; color: var(--tinta-forte); }
+.abrir-nota-verso .resumo { display: block; margin-top: 4px; color: var(--tinta); }
+.nota-verso .botao { margin-top: 8px; }
+a.item-versiculo { display: block; color: inherit; text-decoration: none; }
 .acoes-verso .botao-icone { flex: 0 0 auto; }
 @media (min-width: 420px) { .acoes-verso b { flex: 1 1 auto; } .acoes-verso .botao { flex: 0 0 auto; } }
 

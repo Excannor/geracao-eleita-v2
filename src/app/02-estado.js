@@ -37,6 +37,8 @@
     oradoEm: {},
     // o último capítulo aberto na Bíblia livre: { livro, cap, em }, para continuar de onde parou
     ultimaBiblia: null,
+    // marca-texto por versículo: { "João 3:16": { cor: 1..4, em } }; cor 0 é marca apagada
+    marcas: {},
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -63,6 +65,20 @@
     for (const [chave, bau] of Object.entries(a || {})) {
       if (!saida[chave] || (bau.em || '') < (saida[chave].em || '')) saida[chave] = bau;
     }
+    return saida;
+  }
+
+  // Vence a mudança mais recente de cada versículo. Apagar deixa { cor: 0 } com a data, senão
+  // o outro aparelho, que ainda tem a marca, a traria de volta na fusão. Passados 90 dias,
+  // todo aparelho já recebeu a lápide e ela pode sumir.
+  const LAPIDE_MS = 90 * 864e5;
+  function fundirMarcas(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [chave, m] of Object.entries(b || {})) {
+      if (!saida[chave] || (m.em || 0) > (saida[chave].em || 0)) saida[chave] = m;
+    }
+    const limite = Date.now() - LAPIDE_MS;
+    for (const [chave, m] of Object.entries(saida)) if (!m.cor && (m.em || 0) < limite) delete saida[chave];
     return saida;
   }
 
@@ -128,6 +144,7 @@
       oradoEm: { ...(a.oradoEm || {}), ...(b.oradoEm || {}) },
       // vale o capítulo aberto por último, em qualquer aparelho
       ultimaBiblia: ((b.ultimaBiblia || {}).em || 0) >= ((a.ultimaBiblia || {}).em || 0) ? (b.ultimaBiblia || a.ultimaBiblia || null) : a.ultimaBiblia,
+      marcas: fundirMarcas(a.marcas, b.marcas),
     };
   }
   function fundirPratica(a, b) {
@@ -216,6 +233,15 @@
     const r = E.oia[dia];
     return !!r && Object.values(r).some((x) => (x || '').trim());
   };
+  // Marca-texto: a chave é "Livro cap:vers", um versículo por chave.
+  CC.marcaDe = (chave) => ((E.marcas || {})[chave] || {}).cor || 0;
+  CC.marcar = (chaves, cor) => {
+    const em = Date.now();
+    for (const k of chaves) (E.marcas ||= {})[k] = { cor, em };
+    CC.gravar('atualizadoEm', em);
+  };
+  CC.marcas = () => Object.entries(E.marcas || {}).filter(([, m]) => m.cor).map(([chave, m]) => ({ chave, cor: m.cor, em: m.em }));
+
   CC.anotacao = (chave) => (E.anotacoes || {})[chave] || '';
   CC.gravarAnotacao = (chave, texto) => {
     (E.anotacoes ||= {})[chave] = texto;
@@ -503,7 +529,13 @@
     }
 
     const anot = E.anotacoes || {};
-    const chaves = Object.keys(anot).filter((k) => (anot[k] || '').trim()).sort();
+    const comTextoAnot = Object.keys(anot).filter((k) => (anot[k] || '').trim()).sort();
+    const deVerso = comTextoAnot.filter((k) => k.startsWith('verso:'));
+    if (deVerso.length) {
+      L.push('## Notas nos versículos', '');
+      for (const k of deVerso) L.push('### ' + k.slice(6), '', anot[k].trim(), '');
+    }
+    const chaves = comTextoAnot.filter((k) => !k.startsWith('verso:'));
     if (chaves.length) {
       L.push('## Anotações', '');
       for (const k of chaves) {

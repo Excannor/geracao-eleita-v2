@@ -166,7 +166,7 @@
       + '<div class="titulo-secao"><h2>Meus conteúdos</h2></div>'
       + '<div class="lista-atalhos">'
       + atalho('#/perfil/escritos', 'caneta', 'Minhas anotações')
-      + atalho('#/perfil/versiculos', 'marcador', 'Versículos guardados')
+      + atalho('#/perfil/versiculos', 'marcador', 'Meus versículos')
       + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
       + '</div>'
@@ -227,34 +227,53 @@
       + '<div class="estante">' + t.colecoes.map(trofeuHtml).join('') + '</div>';
   };
 
-  // ---------- versículos guardados ----------
-  // O que veio nos baús, do mais novo para o mais antigo. O texto de cada um chega depois,
-  // porque vem da tradução escolhida: a lista aparece inteira de cara, com a referência e o
-  // dia, e cada cartão se completa quando o texto carrega. Assim a tela não fica em branco
-  // esperando e continua servindo para quem está sem rede.
-  CC.vistaVersiculos = function (raiz) {
-    const guardados = CC.versiculosGuardados ? CC.versiculosGuardados() : [];
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Versículos guardados</h1>'
-      + (guardados.length
-        ? '<p class="passo-dica">' + CC.plural(guardados.length, 'versículo guardado', 'versículos guardados')
-          + ', um por baú da trilha.</p>'
-          + '<div class="lista-versiculos">' + guardados.map((v) => '<section class="item-versiculo" data-ref="'
-            + CC.esc(v.ref) + '"><span class="etiqueta">Dia ' + v.dia + '</span>'
-            + '<div class="cartao-do-versiculo"><p class="ref-carregando">' + CC.esc(v.ref) + '</p></div></section>').join('')
-          + '</div>'
-        : '<p class="passo-dica">Ainda não há nenhum. A cada sete dias de leitura, um baú aparece '
-          + 'na trilha com um versículo do trecho que você acabou de ler.</p>');
+  // ---------- meus versículos ----------
+  // Tudo o que a pessoa fez com versículos, num lugar só: os que marcou, os que têm nota e
+  // os que vieram nos baús, cada grupo do mais novo para o mais antigo. A lista aparece de
+  // cara só com a referência e cada cartão se completa quando o texto da tradução carrega,
+  // para a tela não ficar em branco e continuar servindo sem rede. Tocar num cartão abre o
+  // trecho na Bíblia já escolhido: as ações (marcar, nota, Juntos) moram lá, e não repetidas
+  // em cada cartão da lista.
+  const itemVersiculo = (ref, etiqueta, cor) => '<a class="item-versiculo' + (cor ? ' marca-' + cor : '') + '" href="'
+    + CC.hrefDoVerso(ref) + '" data-ref="' + CC.esc(ref) + '">'
+    + (etiqueta ? '<span class="etiqueta">' + CC.esc(etiqueta) + '</span>' : '')
+    + '<div class="cartao-do-versiculo"><p class="ref-carregando">' + CC.esc(ref) + '</p></div></a>';
 
-    if (!guardados.length || !CC.textoDoVersiculo) return;
+  CC.vistaVersiculos = function (raiz) {
+    const V = CC.versiculos;
+    const marcados = V.marcados();
+    const comNota = V.comNota();
+    const guardados = CC.versiculosGuardados ? CC.versiculosGuardados() : [];
+    const algum = marcados.length || comNota.length || guardados.length;
+
+    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Meus versículos</h1>'
+      + (algum ? '' : '<p class="passo-dica">Enquanto lê, toque num versículo para marcar, escrever uma nota ou mostrar no Juntos. '
+        + 'Os baús da trilha também trazem versículos para cá.</p>')
+      + (marcados.length ? CC.tituloSecao('Marcados', String(marcados.length))
+        + '<div class="lista-versiculos">' + marcados.map((m) => itemVersiculo(m.ref, '', m.cor)).join('') + '</div>' : '')
+      + (comNota.length ? CC.tituloSecao('Com nota', String(comNota.length))
+        + '<div class="lista-notas-verso">' + comNota.map((n) => '<div class="nota-verso">'
+          + '<button class="abrir-nota-verso" data-nota="' + CC.esc(n.ref) + '"><b>' + CC.esc(n.ref) + '</b>'
+          + '<span class="resumo">' + CC.esc(n.texto.slice(0, 220)) + '</span></button>'
+          + '<button class="botao plano pequeno" data-abrir="' + CC.esc(n.ref) + '">' + CC.ico('livro') + 'Abrir na Bíblia</button></div>').join('')
+        + '</div>' : '')
+      + (guardados.length ? CC.tituloSecao('Dos baús', String(guardados.length))
+        + '<div class="lista-versiculos">' + guardados.map((v) => itemVersiculo(v.ref, 'Dia ' + v.dia)).join('') + '</div>' : '');
+
     raiz.querySelectorAll('.item-versiculo').forEach((item) => {
       const ref = item.dataset.ref;
+      item.onclick = (ev) => { ev.preventDefault(); V.irPara(ref); };
+      if (!CC.textoDoVersiculo) return;
       const alvo = item.querySelector('.cartao-do-versiculo');
       CC.textoDoVersiculo(ref).then((texto) => {
         if (!alvo.isConnected || !texto) return;
-        alvo.innerHTML = CC.cartaoVersiculo(ref, texto);
-        if (CC.ligarCartaoVersiculo) CC.ligarCartaoVersiculo(alvo, ref);
+        alvo.innerHTML = CC.cartaoVersiculo(ref, texto, { semAcoes: true });
       }).catch(() => { /* fica só a referência, que já diz qual é */ });
     });
+    raiz.querySelectorAll('[data-nota]').forEach((b) => {
+      b.onclick = () => V.abrirNota(b.dataset.nota, null, () => CC.vistaVersiculos(raiz));
+    });
+    raiz.querySelectorAll('[data-abrir]').forEach((b) => { b.onclick = () => V.irPara(b.dataset.abrir); });
   };
 
   // ---------- minhas anotações ----------
@@ -284,19 +303,26 @@
   }
 
   CC.vistaEscritos = function (raiz) {
-    const { porDia, porNota } = CC.minhasAnotacoes();
-    const total = porDia.reduce((s, d) => s + d.campos.length, 0) + porNota.length;
+    const { porDia, porNota, porVerso } = CC.minhasAnotacoes();
+    const total = porDia.reduce((s, d) => s + d.campos.length, 0) + porNota.length + porVerso.length;
     raiz.innerHTML = CC.botaoVoltar('Perfil')
       + '<h1>Minhas anotações</h1>'
       + (total
         ? '<p class="passo-dica">' + CC.plural(total, 'anotação', 'anotações')
           + (porDia.length ? ' em ' + CC.plural(porDia.length, 'dia de leitura', 'dias de leitura') : '') + '.</p>'
           + (porDia.length ? '<div class="cadernos-dias">' + porDia.map(cartaoDoDia).join('') + '</div>' : '')
+          + (porVerso.length ? '<h2 class="titulo-anotacoes-nota">Nos versículos</h2>'
+            + '<div class="grade">' + porVerso.map((n) => '<a class="item" href="' + n.href + '" data-ref-nota="' + CC.esc(n.ref) + '">'
+              + '<span class="sub">' + CC.esc(n.ref) + '</span><span class="resumo">' + CC.esc(n.texto.slice(0, 220)) + '</span></a>').join('')
+            + '</div>' : '')
           + (porNota.length ? '<h2 class="titulo-anotacoes-nota">No material do Explorar</h2>'
             + '<div class="grade">' + porNota.map(itemDaNota).join('') + '</div>' : '')
-        : '<div class="vazio">Quando você escrever sobre uma leitura ou anotar numa nota, aparece aqui.</div>')
+        : '<div class="vazio">Quando você escrever sobre uma leitura, um versículo ou uma nota, aparece aqui.</div>')
       + '<div class="acoes"><button class="botao contorno" data-exportar>' + CC.ico('baixar') + 'Baixar tudo o que escrevi</button></div>';
     if (porDia.length) raiz.querySelector('.cadernos-dias details').open = true;
+    raiz.querySelectorAll('[data-ref-nota]').forEach((a) => {
+      a.onclick = (ev) => { ev.preventDefault(); CC.versiculos.irPara(a.dataset.refNota); };
+    });
     raiz.querySelector('[data-exportar]').onclick = () => { CC.baixarExportacao(); CC.avisar('Arquivo gerado'); };
   };
 

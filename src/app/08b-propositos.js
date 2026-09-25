@@ -189,11 +189,12 @@
       if (preparar) preparar.onclick = () => folhaPrepararEstudo(p);
       return;
     }
-    const { html, texto } = await montarEstudo(p);
+    const { html, texto, ref } = await montarEstudo(p);
     if (!aindaAqui()) return;
     painel.innerHTML = html
       + '<div class="acoes"><button class="botao azul" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
       + (souLider ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '') + '</div>';
+    if (ref) CC.ligarCartaoVersiculo(painel, ref);
     painel.querySelector('[data-compartilhar]').onclick = () => compartilharEstudo(texto);
     const mudar = painel.querySelector('[data-mudar]');
     if (mudar) mudar.onclick = () => folhaPrepararEstudo(p);
@@ -693,7 +694,7 @@
       { rotulo: 'Estudo do encontro', ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
       return;
     }
-    const { html, texto } = await montarEstudo(p);
+    const { html, texto, ref } = await montarEstudo(p);
     CC.folha('<h2>Estudo do encontro</h2>' + html
       + '<div class="acoes"><button class="botao azul" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
       + (souLider ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '')
@@ -708,6 +709,7 @@
         const mudar = folha.querySelector('[data-mudar]');
         if (mudar) mudar.onclick = () => { fechar(); folhaPrepararEstudo(p); };
         folha.querySelector('[data-compartilhar]').onclick = () => compartilharEstudo(texto);
+        if (ref) CC.ligarCartaoVersiculo(folha, ref);
       },
     });
   };
@@ -757,6 +759,7 @@
         + (est.tipo !== 'livre' && est.texto ? '<div class="recado-lider"><span class="etiqueta">Palavra de ' + CC.esc(nomeDoLider(p)) + '</span>' + paragrafos(est.texto) + '</div>' : '')
         + corpo,
       texto: estudoEmTexto(p, e, versiculo),
+      ref: versiculo ? refLer : '',
     };
   }
 

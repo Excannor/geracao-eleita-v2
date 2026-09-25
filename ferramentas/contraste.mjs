@@ -51,6 +51,16 @@ const PARES = [
   [['--vermelho-3d', '--vermelho'], '--vermelho-fraco', 4.5, 'texto de erro'],
   [['--amarelo-3d', '--amarelo'], '--amarelo-fraco', 4.5, 'texto de conquista'],
   ['--chama', '--fundo', 3, 'chama da ofensiva'],
+  // marca-texto dos versículos: o texto do versículo e o título do cartão por cima
+  ['--tinta', '--marca-1', 4.5, 'versículo marcado em amarelo'],
+  ['--tinta', '--marca-2', 4.5, 'versículo marcado em verde'],
+  ['--tinta', '--marca-3', 4.5, 'versículo marcado em azul'],
+  ['--tinta', '--marca-4', 4.5, 'versículo marcado em rosa'],
+  ['--tinta-forte', '--marca-1', 4.5, 'cartão marcado em amarelo'],
+  ['--tinta-fraca', '--marca-1', 4.5, 'legenda do cartão marcado em amarelo'],
+  ['--tinta-fraca', '--marca-2', 4.5, 'legenda do cartão marcado em verde'],
+  ['--tinta-fraca', '--marca-3', 4.5, 'legenda do cartão marcado em azul'],
+  ['--tinta-fraca', '--marca-4', 4.5, 'legenda do cartão marcado em rosa'],
 ];
 
 // Estes não entram na conta de falhas. A WCAG 1.4.11 pede 3:1 para a parte que

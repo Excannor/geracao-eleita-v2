@@ -27,6 +27,23 @@ window.CC = window.CC || {};
   CC.rolagemY = () => { const el = areaRolavel(); return el ? el.scrollTop : scrollY; };
   CC.rolarPara = (y) => { const el = areaRolavel(); if (el) el.scrollTop = y; else scrollTo(0, y); };
 
+  // Referência de versículo, num lugar só: "João 3.16" ou "1 João 4.7-8". O trecho vai até
+  // MAX_TRECHO versículos seguidos do mesmo capítulo. Roda também no servidor.
+  CC.MAX_TRECHO = 10;
+  CC.lerRef = (ref) => {
+    const m = /^(.+?) (\d{1,3})\.(\d{1,3})(?:-(\d{1,3}))?$/.exec(String(ref || '').trim());
+    if (!m) return null;
+    const de = Number(m[3]);
+    const ate = Number(m[4] || m[3]);
+    if (!(de >= 1) || ate < de || ate - de + 1 > CC.MAX_TRECHO) return null;
+    return { livro: m[1], cap: Number(m[2]), de, ate };
+  };
+  CC.escreverRef = (livro, cap, de, ate) => livro + ' ' + cap + '.' + de + (ate && ate !== de ? '-' + ate : '');
+  CC.hrefDoVerso = (ref) => {
+    const r = CC.lerRef(ref);
+    return r ? '#/biblia/' + encodeURIComponent(r.livro) + '/' + r.cap : '#/biblia';
+  };
+
   // No app instalado no iPhone a raiz nunca rola, mas o iOS rola a raiz sozinho para mostrar um
   // campo acima do teclado (e o scrollIntoView da folha ajuda). Com overflow:hidden ninguém
   // desfaz isso com o dedo: fechado o teclado, a tela inteira ficava deslocada para cima, com a

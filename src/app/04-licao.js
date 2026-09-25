@@ -534,24 +534,19 @@
     });
   }
 
-  CC.cartaoVersiculo = (ref, texto) => {
+  CC.cartaoVersiculo = (ref, texto, { semAcoes } = {}) => {
     const t = CC.traducao();
     return '<figure class="cartao-versiculo">'
       + '<span class="aspas" aria-hidden="true">“</span>'
       + '<blockquote>' + CC.esc(texto) + '</blockquote>'
       + '<figcaption><b>' + CC.esc(ref) + '</b>' + (t ? ' · ' + CC.esc(t.abreviatura) : '') + '</figcaption>'
-      + (CC.podeCompartilharComAmigos && CC.podeCompartilharComAmigos()
-        ? '<button class="botao pequeno contorno" data-versiculo-amigos>' + CC.ico('pessoas') + 'Mostrar aos amigos</button>' : '')
+      + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref))
       + '</figure>';
   };
+  // As ações são as mesmas dos leitores (04e-versiculos.js): marcar, nota, Juntos, copiar.
   CC.ligarCartaoVersiculo = (raiz, ref) => {
-    const b = raiz.querySelector('[data-versiculo-amigos]');
-    if (!b) return;
-    b.onclick = async () => {
-      b.disabled = true;
-      const certo = await CC.compartilharVersiculo(ref);
-      b.innerHTML = certo ? CC.ico('certo') + 'No Feed' : 'Tente depois';
-    };
+    const citacao = raiz.querySelector('.cartao-versiculo blockquote');
+    CC.versiculos.ligarCartao(raiz, ref, citacao ? citacao.textContent : '');
   };
 
   // ---------- ir mais fundo ----------

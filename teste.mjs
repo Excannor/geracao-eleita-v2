@@ -299,6 +299,45 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
 
+// --- versículos: referência, marca-texto e notas (04e-versiculos.js) ---
+for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
+  runInContext(readFileSync(join(AQUI, 'src', 'app', f), 'utf8'), contexto, { filename: f });
+}
+{
+  const r = CC.lerRef('1 João 4.7-8');
+  checar(r && r.livro === '1 João' && r.cap === 4 && r.de === 7 && r.ate === 8 && CC.lerRef('Salmos 23.1').livro === 'Salmos',
+    'a referência lê livro com número, Salmos e trecho');
+  checar(!CC.lerRef('João 3.16-30') && !CC.lerRef('João 3.18-16') && !CC.lerRef('João 3') && CC.escreverRef('João', 3, 16, 18) === 'João 3.16-18',
+    'trecho acima de 10 versículos, invertido ou sem versículo não vale; escrever devolve o mesmo formato');
+  checar(CC.conferirNovidade('versiculo', { ref: 'João 3.16-18' }, null, '2026-03-01') && !CC.conferirNovidade('versiculo', { ref: 'João 3.1-36' }, null, '2026-03-01')
+    && !CC.conferirNovidade('versiculo', { ref: 'Livro Nenhum 1.1' }, null, '2026-03-01'),
+    'o Juntos aceita trecho de até 10 versículos de um livro que existe');
+
+  const agora = Date.now();
+  const a = { atualizadoEm: 10, marcas: { 'João 3:16': { cor: 2, em: agora - 1000 }, 'João 3:17': { cor: 1, em: agora - 5000 } } };
+  const b = { atualizadoEm: 20, marcas: { 'João 3:16': { cor: 0, em: agora - 500 }, 'João 3:17': { cor: 3, em: agora - 9000 },
+    'Rute 1:16': { cor: 0, em: agora - 100 * 864e5 }, 'Rute 1:17': { cor: 4, em: agora - 100 * 864e5 } } };
+  const m = CC.fundir(a, b).marcas;
+  checar(m['João 3:16'].cor === 0 && m['João 3:17'].cor === 1, 'marca-texto: vale a mudança mais recente, e apagar num aparelho não volta pelo outro');
+  checar(!m['Rute 1:16'] && m['Rute 1:17'].cor === 4, 'marca apagada há mais de 90 dias some; marca antiga de verdade fica');
+  checar(JSON.stringify(CC.fundir(a, b).marcas) === JSON.stringify(CC.fundir(b, a).marcas), 'a fusão das marcas dá o mesmo nos dois sentidos');
+
+  const E = CC.estado();
+  E.marcas = { 'João 3:16': { cor: 2, em: 3 }, 'João 3:17': { cor: 2, em: 4 }, 'João 3:18': { cor: 1, em: 5 }, 'João 3:19': { cor: 0, em: 6 } };
+  E.anotacoes = { 'verso:João 3.16-18': 'Deus amou primeiro.', 'nota:x': 'outra', 'verso:Rute 1.16': '  ' };
+  const marcados = CC.versiculos.marcados();
+  checar(marcados.length === 2 && marcados.some((t) => t.ref === 'João 3.16-17' && t.cor === 2) && marcados.some((t) => t.ref === 'João 3.18' && t.cor === 1),
+    'Meus versículos junta versículos seguidos da mesma cor num trecho e ignora marca apagada');
+  checar(CC.versiculos.comNota().length === 1 && CC.versiculos.comNota()[0].ref === 'João 3.16-18', 'nota vazia não aparece em Meus versículos');
+  const an = CC.minhasAnotacoes();
+  checar(an.porVerso.length === 1 && an.porVerso[0].href === '#/biblia/Jo%C3%A3o/3' && !an.porNota.some((n) => n.titulo.includes('verso')),
+    'Minhas anotações separa as notas de versículo das do Explorar, com link para a Bíblia');
+  const exp = CC.montarExportacao();
+  checar(exp.includes('## Notas nos versículos') && exp.includes('### João 3.16-18') && !exp.includes('verso:'), 'o arquivo baixado leva as notas de versículo com a referência como título');
+  E.marcas = {};
+  E.anotacoes = {};
+}
+
 // --- trilhas do leitor ---
 let trilhaErrada = 0;
 for (const d of D.plano) {

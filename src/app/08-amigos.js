@@ -119,7 +119,7 @@
     if (mural && !mural.ligado) {
       const ligar = await CC.confirmar({
         titulo: 'Mostrar aos amigos?',
-        texto: 'Seus amigos passam a ver no Feed os versículos que você guarda e seus marcos: ofensiva, livros e conquistas.',
+        texto: 'Seus amigos passam a ver no Feed os versículos que você compartilha e seus marcos: ofensiva, livros e conquistas.',
         acao: 'Mostrar',
       });
       if (!ligar) return false;
@@ -429,7 +429,7 @@
       frase = quem + ' concluiu a <b>unidade ' + CC.esc(d.numero) + '</b> do plano!';
       arte = CC.arte.trofeu(u ? u.cor : 'amarelo', true);
     } else if (ev.tipo === 'versiculo') {
-      frase = quem + ' guardou um versículo:';
+      frase = quem + ' compartilhou um versículo:';
       extra = '<div class="versiculo-mural" data-ref="' + CC.esc(d.ref) + '"><p class="texto-versiculo">…</p><b>' + CC.esc(d.ref) + '</b></div>';
     } else if (ev.tipo === 'novoProposito' || ev.tipo === 'proposito') {
       const outro = meu ? ev.com : ev.autor;

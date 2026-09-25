@@ -1,7 +1,7 @@
-/* Bíblia: ler os 66 livros à vontade, fora da trilha do dia. Só leitura — sem busca,
-   sem XP, sem marcar como lido, sem ações de versículo. O leitor daqui é uma cópia
-   enxuta do leitor da lição (04b-leitor.js), porque aquele carrega junto o progresso
-   do dia e a marcação de versículo, que não fazem sentido aqui. */
+/* Bíblia: ler os 66 livros à vontade, fora da trilha do dia. Sem busca, sem XP, sem marcar
+   como lido. O leitor daqui é uma cópia enxuta do leitor da lição (04b-leitor.js), porque
+   aquele carrega junto o progresso do dia. As ações de versículo (marcar, nota, Juntos,
+   copiar) são as mesmas dos dois leitores e moram em 04e-versiculos.js. */
 (function (CC) {
   'use strict';
 
@@ -221,6 +221,7 @@
       + '<div class="leitor-texto">' + CC.htmlDoTrecho(biblia, [{ livro, de: n, ate: n }]) + CC.creditoBiblia(b) + '</div>'
       + '</div></div>'
       + '<div class="licao-pe"><div class="interno">'
+      + '<div class="acoes-verso" hidden></div>'
       + (temAnterior ? '<button class="botao contorno" data-anterior>‹ ' + CC.esc(antLivro) + ' ' + antCap + '</button>' : '')
       + (temProximo ? '<button class="botao contorno" data-proximo>' + CC.esc(proxLivro) + ' ' + proxCap + ' ›</button>' : '')
       + '</div></div>';
@@ -239,6 +240,7 @@
     const palco = el.querySelector('.licao-palco');
     palco.scrollTop = 0;
     ligarProgresso(palco, el.querySelector('.leitor-progresso i'));
+    CC.versiculos.ligar(el);
 
     if (novo) ligarEsc();
   }

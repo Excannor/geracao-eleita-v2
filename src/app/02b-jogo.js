@@ -304,8 +304,8 @@
     if (tipo === 'livro') return LIVROS.has(dados.livro) && CC.livroCompletoEm(dados.livro, e) ? 'livro:' + dados.livro : null;
     if (tipo === 'unidade') return CC.unidadeCompletaEm(dados.numero, e) ? 'unidade:' + Number(dados.numero) : null;
     if (tipo === 'versiculo') {
-      const m = /^(.+?) (\d{1,3})\.(\d{1,3})(?:-(\d{1,3}))?$/.exec(String(dados.ref || ''));
-      if (!m || !LIVROS.has(m[1])) return null;
+      const r = CC.lerRef(dados.ref);
+      if (!r || !LIVROS.has(r.livro)) return null;
       return 'versiculo:' + dados.ref + ':' + hoje;
     }
     return null;
