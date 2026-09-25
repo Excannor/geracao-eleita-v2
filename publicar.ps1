@@ -24,8 +24,9 @@ scp @ssh $tar "${pi}:/tmp/publicar.tar"
 if ($LASTEXITCODE) { throw 'Não consegui copiar para o Pi (ele está ligado na rede?)' }
 Remove-Item $tar
 
-# Recriar o app derruba a pilha de rede do túnel, por isso o restart do tunel-fixo logo depois.
-ssh @ssh $pi 'cd ~/geracao-eleita && tar -xf /tmp/publicar.tar && rm /tmp/publicar.tar && sudo docker compose up -d --build caminho 2>&1 | tail -2 && sudo docker compose restart tunel-fixo 2>&1 | tail -1'
+# Recriar o app derruba a pilha de rede do túnel. No Docker do Pi um simples restart do túnel
+# falha ("No such container"), porque ele segue preso ao container antigo: tem que recriar.
+ssh @ssh $pi 'cd ~/geracao-eleita && tar -xf /tmp/publicar.tar && rm /tmp/publicar.tar && sudo docker compose up -d --build caminho 2>&1 | tail -2 && sudo docker compose up -d --force-recreate tunel-fixo 2>&1 | tail -1'
 if ($LASTEXITCODE) { throw 'O build ou a subida no Pi falhou' }
 
 Start-Sleep 8
