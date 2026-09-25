@@ -568,7 +568,7 @@
     return {
       corpo: '<span class="etiqueta">' + CC.esc(CC.passagemDe(dia)) + '</span>'
         + '<h1 class="passo-titulo">Ir mais fundo</h1>'
-        + '<p class="passo-dica">Notas sobre os livros de hoje. As conexões são sugestões de leitura, não doutrina.</p>'
+        + '<p class="passo-dica">Notas sobre os livros de hoje.</p>'
         + blocos,
       pe: botao('Voltar', 'data-voltar'),
       ligar(el) {

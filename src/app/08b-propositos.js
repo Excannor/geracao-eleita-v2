@@ -163,8 +163,7 @@
     const podeChamar = p.membros.filter((m) => m.estado !== 'saiu').length < (p.limite || (cache && cache.limiteCelula) || 20);
     return topoDaCelula(p, souLider)
       + (encontroHoje(p) ? '<button class="selo-status leu botao-selo" data-ir-estudo>' + CC.ico('livro') + 'Encontro hoje · veja o estudo</button>' : '')
-      + (p.hoje ? barraDoGrupo(p.hoje)
-        + '<p class="passo-dica pequena">A meta do dia é o número de pessoas. Cada um soma 1 ponto por ler e mais 1 se praticar ou abrir uma nota de estudo. Quem fez mais cobre quem faltou.</p>' : '')
+      + (p.hoje ? barraDoGrupo(p.hoje) : '')
       + '<div class="acoes">'
       + (podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
       + (souLider ? '<div class="pe-duplo-plano"><button class="botao plano pequeno" data-recado>' + (p.recado ? 'Mudar o recado' : 'Escrever um recado') + '</button>'
@@ -375,8 +374,6 @@
       + (oracao ? '' : ' · ' + CC.plural(p.dias, 'dia', 'dias')) + '</p>'
       + (p.celula ? topoDaCelula(p, souLider) : '')
       + (p.grupo && p.hoje && !oracao ? barraDoGrupo(p.hoje)
-        + '<p class="passo-dica pequena">A meta do dia é o número de pessoas. Cada um soma 1 ponto por '
-        + (p.tipo === 'oracao' ? 'orar' : 'ler') + ' e mais 1 se praticar ou abrir uma nota de estudo. Quem fez mais cobre quem faltou.</p>'
         : '<p class="passo-dica pequena">' + CC.esc(EXPLICA[p.tipo] || '') + '</p>')
       + '<div class="lista-pedidos">' + linhas + '</div>'
       + '<div class="acoes">'
@@ -389,7 +386,6 @@
       + (p.grupo && p.criadoPor === euUsuario() ? '<button class="botao plano perigo" data-encerrar>Encerrar grupo</button>' : '')
       + (p.grupo && p.criadoPor !== euUsuario() ? '<button class="botao plano perigo" data-sair>Sair do grupo</button>' : '')
       + (!p.grupo && !ehDaAmizade ? '<button class="botao plano perigo" data-sair>Encerrar propósito</button>' : '')
-      + (ehDaAmizade ? '<p class="passo-dica pequena">A leitura em dupla anda junto com a amizade.</p>' : '')
       + '<button class="botao plano" data-fechar>Fechar</button></div>',
     {
       rotulo: p.titulo,
@@ -499,7 +495,6 @@
     CC.folha('<h2>Criar uma célula</h2>'
       + '<p class="passo-dica">Vocês leem o plano juntos, até ' + limite + ' pessoas. Depois de criar, você manda o link no grupo do WhatsApp e quem abrir já entra.</p>'
       + '<label class="campo-senha"><span>Nome da célula</span><input data-titulo name="nome-da-celula" maxlength="30" placeholder="Ex.: Célula de quinta" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
-      + '<p class="passo-dica pequena">A meta do dia é o número de pessoas. Cada um soma 1 ponto por ler, e mais 1 se praticar ou abrir uma nota de estudo. Quem fez mais cobre quem faltou.</p>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao azul" data-criar>Criar e pegar o link</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
@@ -540,8 +535,7 @@
       + '<p class="mensagem-convite">' + CC.esc(texto) + ' <span>' + CC.esc(link) + '</span></p>'
       + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar no grupo</button>'
       + '<button class="botao contorno" data-copiar>Copiar link</button></div>'
-      + '<p class="passo-dica pequena">Quem abrir o link entra direto na célula, com conta nova ou com a que já tem, até completar '
-      + (p.limite || (cache && cache.limiteCelula) || 20) + ' pessoas. O link vale por 30 dias.</p>'
+      + '<p class="passo-dica pequena">Quem abrir o link entra direto na célula. O link vale por 30 dias.</p>'
       + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>',
     {
       rotulo: 'Link da célula',
@@ -620,7 +614,6 @@
 
   function folhaEncontro(p) {
     CC.folha('<h2>Dia do encontro</h2>'
-      + '<p class="passo-dica">No dia do encontro, a célula mostra "Encontro hoje" e o estudo que você preparou.</p>'
       + '<div class="escolha-dia">' + DIAS_ENCONTRO.map((d, i) => '<button class="botao ' + (p.encontro === i ? 'azul' : 'contorno') + ' pequeno" data-dia="' + i + '" aria-pressed="' + (p.encontro === i) + '">'
         + d.charAt(0).toUpperCase() + d.slice(1) + '</button>').join('') + '</div>'
       + '<div class="acoes">' + (p.encontro >= 0 ? '<button class="botao plano" data-dia="-1">Sem dia marcado</button>' : '')
@@ -847,7 +840,6 @@
     CC.folha('<h2>' + (dentro ? 'Esse é o link da sua célula' : CC.esc(info.nome) + ' te chamou para a ' + CC.esc(comoCelula(info.titulo)) + '!') + '</h2>'
       + '<p>' + CC.plural(info.pessoas, 'pessoa', 'pessoas') + ' lendo o plano juntos'
       + (info.vagas > 0 ? ' · ' + CC.plural(info.vagas, 'vaga', 'vagas') : ' · sem vagas') + '.</p>'
-      + (dentro ? '' : '<p class="passo-dica pequena">A meta do dia é o número de pessoas: cada um que lê soma 1 ponto, e quem fez mais cobre quem faltou.</p>')
       + '<p class="recado-senha" id="recado" role="alert"></p>'
       + '<div class="acoes">' + (dentro ? '' : '<button class="botao azul" data-entrar' + (info.vagas > 0 ? '' : ' disabled') + '>Entrar na célula</button>')
       + '<button class="botao plano" data-fechar>' + (dentro ? 'Fechar' : 'Agora não') + '</button></div>',
@@ -894,7 +886,7 @@
       + '<div class="escolha-amigos">' + amigos.map((a) => '<label class="linha-amigo escolha-amigo">'
         + '<input type="checkbox" value="' + CC.esc(a.usuario) + '"' + (preEscolhido === a.usuario ? ' checked' : '') + '>' + retrato(a)
         + '<span class="quem-amigo"><b>' + CC.esc(a.nome) + '</b><span class="arroba">@' + CC.esc(a.usuario) + '</span></span></label>').join('') + '</div>'
-      + '<p class="passo-dica pequena" data-dica-grupo hidden>Com 3 ou mais vira grupo: a meta do dia é o número de pessoas, e quem fizer mais cobre quem faltou.</p>'
+      + '<p class="passo-dica pequena" data-dica-grupo hidden>Com 3 ou mais pessoas, vira um grupo.</p>'
       + '<label class="campo-senha" data-bloco-nome hidden><span>Nome do grupo</span><input data-titulo name="nome-do-grupo" maxlength="30" placeholder="Ex.: Amigos da escola" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao azul" data-criar disabled>Chamar para o propósito</button>'

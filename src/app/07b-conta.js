@@ -44,9 +44,7 @@
           + linha('Sair desta conta', '', 'data-sair')
           + linha('Apagar a conta', '', 'data-apagar', 'perigo'))
         : '')
-      + (quem.admin ? grupo('Administração', linha('Painel do app', '', 'data-ir="#/config/painel"')) : '')
-      + '<p class="passo-dica pequena" style="text-align:center;margin-top:20px">Conteúdo de ' + dataBr(String(D.importadoEm || '').slice(0, 10))
-      + ' · ' + (CC.servidorVivo() ? 'progresso sincronizado entre seus aparelhos' : 'progresso salvo neste aparelho') + '</p>';
+      + (quem.admin ? grupo('Administração', linha('Painel do app', '', 'data-ir="#/config/painel"')) : '');
 
     raiz.querySelectorAll('[data-ir]').forEach((el) => { el.onclick = () => { location.hash = el.dataset.ir; }; });
     raiz.querySelectorAll('[data-tema]').forEach((b) => {

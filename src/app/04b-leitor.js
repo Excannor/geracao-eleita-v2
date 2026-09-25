@@ -341,7 +341,6 @@
       + [['Sistema', null], ['Claro', false], ['Escuro', true]].map(([rot, v]) =>
         '<button data-tema="' + JSON.stringify(v) + '" aria-pressed="' + (tema === v) + '">' + rot + '</button>').join('')
       + '</div>'
-      + '<p class="passo-dica pequena">A Nova Bíblia Viva ajuda a ler bastante. Para estudar um trecho, compare com a Bíblia da sua igreja.</p>'
       + '<div class="acoes"><button class="botao contorno" data-fechar>Pronto</button></div>',
     {
       rotulo: 'Opções de leitura',

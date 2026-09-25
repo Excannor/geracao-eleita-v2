@@ -43,8 +43,7 @@
   function folhaSemeador(s) {
     if (!s) return;
     CC.folha('<h2>Trilha do Semeador</h2>'
-      + '<p class="passo-dica pequena">Conta quem criou a conta pelo seu convite e já fez a primeira lição. Até aqui, '
-      + CC.plural(s.pessoas, 'pessoa', 'pessoas') + '.</p>'
+      + '<p class="passo-dica pequena">Até aqui, ' + CC.plural(s.pessoas, 'pessoa chegou', 'pessoas chegaram') + ' pelo seu convite.</p>'
       + '<div class="niveis-semeador">' + (s.niveis || []).map((n) => {
         const ganho = s.nivel >= n.nivel;
         return '<details class="nivel-semeador' + (ganho ? ' ganho' : '') + '"' + (n.nivel === Math.max(1, s.nivel) ? ' open' : '') + '>'
@@ -210,7 +209,6 @@
     const conquistas = CC.conquistasComNivel();
     const legado = CC.conquistasLegado();
     raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1>'
-      + '<p class="passo-dica">Cada conquista tem níveis. Elas contam leitura e constância, nunca o que você escreve ou ora.</p>'
       + '<div class="caixa-lista">' + conquistas.map(CC.linhaConquista).join('') + '</div>'
       + (legado.length
         ? CC.tituloSecao('Da primeira versão') + '<div class="caixa-lista">' + legado.map((c) => '<div class="linha-conquista ganha">'
