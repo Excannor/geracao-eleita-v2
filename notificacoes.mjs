@@ -288,6 +288,9 @@ const T = {
   ],
   // O corpo não diz "leem": o propósito pode ser de oração.
   propositoAceito: [['{amigo} entrou no propósito 🙌', '{titulo}: agora vocês estão juntos nessa.']],
+  // "Quero conversar com alguém", do Conhecer Jesus: só quem convidou (e o líder da célula
+  // dela, se houver) recebe, e nunca o que a pessoa escreveu. Assunto sério, sem emoji.
+  querConversar: [['{nome} quer conversar com você sobre Jesus.', 'Chame essa pessoa para uma conversa, do jeito que vocês costumam falar.']],
   metaBatida: [
     ['O grupo bateu a meta de hoje 🎉', '{titulo}: vocês chegaram lá juntos.'],
     ['Meta do grupo batida 🙌', 'Deu certo em {titulo}. Obrigado por estar junto!'],
@@ -329,6 +332,7 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
     tag = 'toque';
   }
   if (tipo === 'pedido' || tipo === 'aceito') { url = './#/amigos'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
+  if (tipo === 'querConversar') { url = './#/amigos'; tag = 'querConversar:' + (dados.deUsuario || ''); }
   // A célula mora no Juntos; duplas e grupos, em Juntos > Propósitos.
   const telaDoProposito = dados.celula ? './#/novidades' : './#/novidades/propositos';
   if (tipo === 'propositoConvite' || tipo === 'propositoAceito') { url = telaDoProposito; tag = 'proposito:' + (dados.id || ''); }

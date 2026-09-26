@@ -18,6 +18,10 @@
     anotacoes: {},
     marcadoEm: {},
     licoesEm: {},
+    // Conhecer Jesus: número do dia (1 a 14) → data ISO em que a pessoa o terminou. Vive
+    // separado de "licoesEm" porque não é primeiro passo nem lição do plano, mas conta
+    // do mesmo jeito para a ofensiva.
+    conhecidos: {},
     pratica: {},
     foto: '',
     apelido: '',
@@ -64,6 +68,16 @@
     const saida = { ...(b || {}) };
     for (const [chave, bau] of Object.entries(a || {})) {
       if (!saida[chave] || (bau.em || '') < (saida[chave].em || '')) saida[chave] = bau;
+    }
+    return saida;
+  }
+
+  // União por dia; quando os dois lados marcaram o mesmo dia do Conhecer, vale a data mais
+  // antiga: é a que corresponde a quando a pessoa terminou de verdade.
+  function fundirConhecidos(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [dia, data] of Object.entries(b || {})) {
+      if (!saida[dia] || data < saida[dia]) saida[dia] = data;
     }
     return saida;
   }
@@ -128,6 +142,7 @@
       anotacoes,
       marcadoEm: { ...(a.marcadoEm || {}), ...(b.marcadoEm || {}) },
       licoesEm: { ...(a.licoesEm || {}), ...(b.licoesEm || {}) },
+      conhecidos: fundirConhecidos(a.conhecidos, b.conhecidos),
       pratica: fundirPratica(a.pratica, b.pratica),
       foto: maisNovo.foto || a.foto || b.foto || '',
       apelido: maisNovo.apelido || a.apelido || b.apelido || '',
@@ -272,12 +287,22 @@
     CC.gravar('oradoEm', E.oradoEm);
   };
 
+  // ---------- conhecer jesus ----------
+  CC.conhecido = (n) => !!(E.conhecidos || {})[n];
+  CC.marcarConhecido = (n) => {
+    (E.conhecidos ||= {})[n] = CC.hojeIso();
+    CC.gravar('conhecidos', E.conhecidos);
+  };
+  CC.conhecidos = () => Object.keys(E.conhecidos || {}).map(Number);
+
   // ---------- ofensiva e escudos ----------
-  // Uma data está feita quando houve lição do plano ou primeiros passos lidos até o fim.
+  // Uma data está feita quando houve lição do plano, primeiros passos lidos até o fim, ou
+  // um dia do Conhecer Jesus terminado: quem está nesse caminho também tem ofensiva.
   CC.datasFeitas = (estado) => {
     const s = new Set();
     for (const d of Object.values((estado || E).marcadoEm || {})) if (d) s.add(d);
     for (const d of Object.values((estado || E).licoesEm || {})) if (d) s.add(d);
+    for (const d of Object.values((estado || E).conhecidos || {})) if (d) s.add(d);
     return s;
   };
 

@@ -1,0 +1,283 @@
+{
+  "versao": 1,
+  "titulo": "Conhecer Jesus",
+  "subtitulo": "14 dias, uns 10 minutos por dia",
+  "perguntasFixas": [
+    "O que esse texto mostra sobre Deus?",
+    "O que ele mostra sobre as pessoas? Você se vê em alguém?",
+    "Se isso for verdade, o que mudaria na sua semana?",
+    "Com quem você gostaria de conversar sobre isso?"
+  ],
+  "dias": [
+    {
+      "numero": 1,
+      "titulo": "No começo",
+      "trechos": [
+        {
+          "livro": "Gênesis",
+          "cap": 1,
+          "de": 1,
+          "ate": 31
+        },
+        {
+          "livro": "Gênesis",
+          "cap": 2,
+          "de": 1,
+          "ate": 3
+        }
+      ],
+      "abertura": "A Bíblia começa com Deus fazendo tudo o que existe. Leia devagar, como quem ouve uma história pela primeira vez.",
+      "repare": "Uma frase volta várias vezes: \"E Deus ficou satisfeito\" (Gênesis 1.10). No fim, ele olha para tudo e o texto diz que \"havia ficado muito bom\" (Gênesis 1.31).",
+      "pergunta": "O texto diz que Deus criou o ser humano \"à imagem de Deus\" (Gênesis 1.27). Se isso vale para toda pessoa, o que muda no jeito de você olhar para você e para os outros?",
+      "conversa": "Deus, se foi você que fez tudo isso…"
+    },
+    {
+      "numero": 2,
+      "titulo": "O que deu errado",
+      "trechos": [
+        {
+          "livro": "Gênesis",
+          "cap": 3,
+          "de": 1,
+          "ate": 24
+        }
+      ],
+      "abertura": "Logo depois da criação, o ser humano diz \"não\" a Deus e resolve decidir sozinho o que é bom e o que é mau. Mais à frente, a Bíblia vai chamar isso de pecado.",
+      "repare": "Depois do erro, os dois se escondem, e é Deus quem vai atrás: \"Onde você está?\" (Gênesis 3.9). E antes de eles saírem do jardim, o próprio Deus faz roupas e os veste (Gênesis 3.21).",
+      "pergunta": "Quando erram, os dois se escondem e jogam a culpa em outro (Gênesis 3.12-13). O que você costuma fazer quando erra?",
+      "conversa": "Deus, às vezes eu também me escondo de você quando…"
+    },
+    {
+      "numero": 3,
+      "titulo": "Uma promessa",
+      "trechos": [
+        {
+          "livro": "Isaías",
+          "cap": 53,
+          "de": 1,
+          "ate": 12
+        }
+      ],
+      "abertura": "Este texto foi escrito muito antes de Jesus nascer. Ele fala de alguém que sofre no lugar dos outros. Enquanto lê, pense: de quem ele está falando?",
+      "repare": "Ele sofre sem ter culpa: \"Ele foi ferido por causa de nossos pecados\" (Isaías 53.5). E, maltratado, \"ele não abriu a boca\" (Isaías 53.7).",
+      "pergunta": "O texto diz que \"pelos seus ferimentos nós fomos sarados\" (Isaías 53.5). Alguém já pagou um preço para te ajudar? Como foi receber isso sem ter feito nada para merecer?",
+      "conversa": "Deus, se esse texto fala de alguém que sofreu por mim…"
+    },
+    {
+      "numero": 4,
+      "titulo": "Deus chega perto",
+      "trechos": [
+        {
+          "livro": "Lucas",
+          "cap": 2,
+          "de": 1,
+          "ate": 20
+        }
+      ],
+      "abertura": "Jesus nasce longe de casa. A mãe dele o deita numa manjedoura, o cocho onde os animais comem, \"porque não havia lugar para eles na hospedaria\" (Lucas 2.7).",
+      "repare": "A primeira notícia vai para pastores que estavam de noite no campo, cuidando das ovelhas (Lucas 2.8). Gente comum, no meio do trabalho.",
+      "pergunta": "O anjo diz que a boa notícia \"é para todo o povo\" (Lucas 2.10). Você já achou que Deus era só para gente religiosa? O que esse texto diz sobre isso?",
+      "conversa": "Deus, eu nunca pensei que você quisesse chegar perto de mim, mas…"
+    },
+    {
+      "numero": 5,
+      "titulo": "Quem te carrega",
+      "trechos": [
+        {
+          "livro": "Lucas",
+          "cap": 5,
+          "de": 17,
+          "ate": 26
+        }
+      ],
+      "abertura": "Alguns homens levam até Jesus um homem que não conseguia andar, mas a multidão não deixa passar. Eles dão um jeito.",
+      "repare": "Jesus vê \"a fé que eles demonstravam\" e a primeira coisa que diz é: \"Amigo, os seus pecados estão perdoados!\" (Lucas 5.20). A cura vem logo depois (Lucas 5.24-25).",
+      "pergunta": "Esse homem chegou até Jesus porque outras pessoas o carregaram e abriram caminho pelo teto (Lucas 5.18-19). Quem tem feito isso por você?",
+      "conversa": "Deus, obrigado por quem me trouxe até aqui…"
+    },
+    {
+      "numero": 6,
+      "titulo": "Conhecido por inteiro",
+      "trechos": [
+        {
+          "livro": "João",
+          "cap": 4,
+          "de": 1,
+          "ate": 26
+        }
+      ],
+      "abertura": "Jesus para num poço, cansado, e puxa conversa com uma mulher de Samaria. Os judeus não se davam com os samaritanos (João 4.9), e mesmo assim ele pede água a ela.",
+      "repare": "Jesus mostra que conhece a história dela (João 4.18) e continua a conversa. É para ela que ele diz quem é: \"Eu sou o Messias! Eu, que estou falando com você\" (João 4.26). Messias é o salvador que Deus tinha prometido.",
+      "pergunta": "Jesus fala de uma água que mata a sede de um jeito que nenhuma outra mata (João 4.13-14). Do que você tem sede lá no fundo, que nada até hoje resolveu?",
+      "conversa": "Deus, você me conhece por inteiro, e mesmo assim…"
+    },
+    {
+      "numero": 7,
+      "titulo": "O pai que corre",
+      "trechos": [
+        {
+          "livro": "Lucas",
+          "cap": 15,
+          "de": 11,
+          "ate": 32
+        }
+      ],
+      "abertura": "Jesus conta a história de um pai e dois filhos. O mais novo pega a parte dele da herança, vai para longe e gasta tudo.",
+      "repare": "O filho volta pensando no que vai dizer, mas o pai o vê \"quando ainda estava longe\", corre, abraça e beija (Lucas 15.20).",
+      "pergunta": "O irmão mais velho, que nunca saiu de casa, fica muito irado e não quer entrar na festa, e o pai também sai para chamar esse filho: \"O pai saiu e insistiu com ele\" (Lucas 15.28). Com qual dos dois filhos você se parece mais hoje?",
+      "conversa": "Deus, se você é como esse pai…"
+    },
+    {
+      "numero": 8,
+      "titulo": "Na tempestade",
+      "trechos": [
+        {
+          "livro": "Marcos",
+          "cap": 4,
+          "de": 35,
+          "ate": 41
+        }
+      ],
+      "abertura": "Jesus e os discípulos, os amigos que andavam com ele, atravessam o mar de barco. No meio do caminho vem uma tempestade forte.",
+      "repare": "Com medo, eles acordam Jesus e perguntam: \"o Senhor nem se importa?\" (Marcos 4.38). Ele se levanta, acalma o vento e o mar (Marcos 4.39) e pergunta por que tanto medo (Marcos 4.40).",
+      "pergunta": "No fim, eles perguntam: \"Quem é este, que até os ventos e as ondas lhe obedecem?\" (Marcos 4.41). Qual é a tempestade que você está enfrentando agora? Você já contou isso a Deus?",
+      "conversa": "Deus, às vezes eu sinto que você não se importa, porque…"
+    },
+    {
+      "numero": 9,
+      "titulo": "Jesus chorou",
+      "trechos": [
+        {
+          "livro": "João",
+          "cap": 11,
+          "de": 1,
+          "ate": 44
+        }
+      ],
+      "abertura": "Lázaro, um amigo de Jesus, fica doente e morre. Quando Jesus chega, ele já estava no túmulo havia quatro dias (João 11.17).",
+      "repare": "Para Marta, a irmã de Lázaro, Jesus diz: \"Eu sou a ressurreição e a vida\" (João 11.25). Ressurreição é voltar da morte para a vida. E diante da dor da família, o texto diz só isto: \"Jesus chorou\" (João 11.35).",
+      "pergunta": "Jesus sabia que ia trazer Lázaro de volta (João 11.11), e mesmo assim chorou junto com quem chorava (João 11.33-35). Que dor sua você gostaria que alguém chorasse junto com você?",
+      "conversa": "Jesus, você viu a minha dor quando…"
+    },
+    {
+      "numero": 10,
+      "titulo": "A cruz",
+      "trechos": [
+        {
+          "livro": "Lucas",
+          "cap": 23,
+          "de": 32,
+          "ate": 49
+        }
+      ],
+      "abertura": "Jesus é crucificado entre dois criminosos (Lucas 23.33). Leia com calma: aqui está o centro de toda a história.",
+      "repare": "Pregado na cruz, Jesus ora pelos que o mataram: \"Pai, perdoa-lhes, porque não sabem o que estão fazendo\" (Lucas 23.34).",
+      "pergunta": "Um dos criminosos admite: \"Nós merecemos morrer pelos nossos crimes, mas este homem não cometeu nenhum mal\" (Lucas 23.41). Depois só pede: \"Jesus, lembre-se de mim\" (Lucas 23.42), e ouve: \"Hoje você estará comigo no paraíso\" (Lucas 23.43). Ele não teve tempo de consertar nada na vida. O que isso mostra sobre como se chega perto de Jesus?",
+      "conversa": "Jesus, lembre-se de mim também…"
+    },
+    {
+      "numero": 11,
+      "titulo": "Ele está vivo",
+      "trechos": [
+        {
+          "livro": "Lucas",
+          "cap": 24,
+          "de": 1,
+          "ate": 12
+        },
+        {
+          "livro": "Lucas",
+          "cap": 24,
+          "de": 36,
+          "ate": 49
+        }
+      ],
+      "abertura": "Bem cedo, no primeiro dia da semana (Lucas 24.1), algumas mulheres vão ao túmulo de Jesus e não encontram o corpo.",
+      "repare": "Dois homens de roupas brilhantes perguntam: \"Por que vocês estão procurando entre os mortos aquele que está vivo?\" (Lucas 24.5). Depois, Jesus aparece aos amigos que andavam com ele, mostra as mãos e os pés e come peixe na frente deles (Lucas 24.39-43).",
+      "pergunta": "Eles ficaram \"cheios de alegria e de dúvida\" ao mesmo tempo (Lucas 24.41). Você tem dúvidas? Dá para levar essas dúvidas para perto de Jesus, em vez de ficar longe por causa delas?",
+      "conversa": "Jesus, se você está vivo mesmo…"
+    },
+    {
+      "numero": 12,
+      "titulo": "Nascer de novo",
+      "trechos": [
+        {
+          "livro": "João",
+          "cap": 3,
+          "de": 1,
+          "ate": 21
+        }
+      ],
+      "abertura": "Nicodemos, um líder religioso, vai conversar com Jesus à noite, cheio de perguntas.",
+      "repare": "Jesus diz que é preciso \"nascer de novo\" (João 3.3) e conta por que veio: \"Deus não enviou o seu Filho ao mundo para condenar o mundo, mas para que o mundo fosse salvo por meio dele\" (João 3.17).",
+      "pergunta": "Nicodemos pergunta: \"Como pode ser isso?\" (João 3.9), e Jesus continua a conversa. Qual é a sua maior pergunta sobre Deus hoje? Que tal fazer essa pergunta a quem te convidou?",
+      "conversa": "Deus, eu ainda não entendo tudo, mas…"
+    },
+    {
+      "numero": 13,
+      "titulo": "E agora?",
+      "trechos": [
+        {
+          "livro": "Atos",
+          "cap": 2,
+          "de": 22,
+          "ate": 41
+        }
+      ],
+      "abertura": "Algum tempo depois, Pedro, um dos amigos que andavam com Jesus, fala para uma multidão em Jerusalém sobre a morte e a ressurreição de Jesus.",
+      "repare": "Quem ouviu ficou mexido e perguntou: \"que devemos fazer?\" (Atos 2.37). Pedro responde: deixar o pecado, voltar-se para Deus e ser batizado, que é passar pela água para mostrar a todos que agora a pessoa segue Jesus. E promete perdão e o Espírito Santo, que é o próprio Deus vindo morar e agir dentro de quem crê (Atos 2.38).",
+      "pergunta": "Pedro diz que a promessa é \"até para os que estão longe\" (Atos 2.39). Se você se sente longe, o que isso muda para você?",
+      "conversa": "Deus, se eu estou longe…"
+    },
+    {
+      "numero": 14,
+      "titulo": "Uma família",
+      "trechos": [
+        {
+          "livro": "Atos",
+          "cap": 2,
+          "de": 42,
+          "ate": 47
+        }
+      ],
+      "abertura": "Quem creu não ficou sozinho. Veja como aquelas pessoas passaram a viver.",
+      "repare": "Eles se reuniam \"nas casas\", comiam juntos \"com grande alegria\" e repartiam com quem tinha necessidade (Atos 2.45-46).",
+      "pergunta": "O texto termina dizendo: \"Todo o povo tinha simpatia por eles\" (Atos 2.47). Quer conhecer de perto um grupo assim? Se quiser, pergunte a quem te convidou quando é o próximo encontro nas casas.",
+      "conversa": "Deus, eu quero fazer parte de…"
+    }
+  ],
+  "seguir": {
+    "titulo": "E agora, o que eu faço?",
+    "abertura": "Em Atos 2, quem ouviu falar de Jesus perguntou: \"que devemos fazer?\" (Atos 2.37). Pedro tinha acabado de dizer que Deus fez Jesus \"Senhor e Cristo\" (Atos 2.36). A resposta cabe em poucas palavras.",
+    "passos": [
+      {
+        "titulo": "Voltar-se para Deus",
+        "texto": "Pedro diz para deixar o pecado e voltar-se para Deus (Atos 2.38). É parar de viver de costas para ele e dizer: eu quero você no centro da minha vida."
+      },
+      {
+        "titulo": "Confiar em Jesus",
+        "texto": "Ninguém chega a Deus por ser bom o bastante. É um presente: \"A salvação não é uma recompensa pelo bem que fizemos\" (Efésios 2.9). Jesus morreu e ressuscitou por você, e o que cabe a você é confiar nele."
+      },
+      {
+        "titulo": "Não seguir sozinho",
+        "texto": "Quem creu foi batizado e se uniu aos outros seguidores de Jesus (Atos 2.41). Batismo é um momento com água, na igreja, em que a pessoa mostra diante de todos que passou a seguir Jesus. Se você tiver dúvidas sobre isso, por exemplo se já foi batizado quando criança, converse com quem te convidou, sem pressa. O importante é não caminhar sozinho."
+      }
+    ],
+    "oracaoTitulo": "Uma conversa com Deus",
+    "oracaoAbertura": "Não existe frase mágica. Fale com Deus do seu jeito. Se ajudar, pode ser algo assim:",
+    "oracao": "Deus, eu quero voltar para você. Eu vivi do meu jeito e errei. Me perdoa. Obrigado porque Jesus morreu e ressuscitou por mim. Eu quero confiar nele e seguir Jesus. Me ajuda a começar.",
+    "conversar": "Quero conversar com alguém",
+    "conversarFeito": "Pronto. Quem te convidou vai falar com você.",
+    "proximo": "Começar os Primeiros passos"
+  },
+  "acompanhar": {
+    "titulo": "Como acompanhar",
+    "itens": [
+      "Pergunte o que achou da leitura do dia, e escute antes de explicar.",
+      "Conte como foi com você. A sua história ajuda mais do que ganhar uma discussão.",
+      "Não pressione. Quem salva é Deus: \"o Senhor acrescentava à igreja todos os que estavam sendo salvos\" (Atos 2.47).",
+      "Ore todos os dias por essa pessoa.",
+      "Chame para o encontro nas casas quando ela quiser ir."
+    ]
+  }
+}

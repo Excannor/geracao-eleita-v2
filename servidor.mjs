@@ -155,10 +155,12 @@ const DATA_VALIDA = /^\d{4}-\d{2}-\d{2}$/;
 function conferirProgresso(atual, junto, hoje) {
   const limite = somaDias(hoje, -DIAS_DE_ATRASO);
   const amanha = somaDias(hoje, 1);
-  for (const campo of ['marcadoEm', 'licoesEm']) {
+  for (const campo of ['marcadoEm', 'licoesEm', 'conhecidos']) {
     const antes = (atual && atual[campo]) || {};
     const mapa = { ...(junto[campo] || {}) };
     for (const [k, d] of Object.entries(mapa)) {
+      // O Conhecer Jesus só tem 14 dias: chave fora disso não pode ter vindo de verdade.
+      if (campo === 'conhecidos' && !(Number.isInteger(Number(k)) && Number(k) >= 1 && Number(k) <= 14)) { delete mapa[k]; continue; }
       if (d === antes[k]) continue;
       if (typeof d !== 'string' || !DATA_VALIDA.test(d)) { if (antes[k]) mapa[k] = antes[k]; else delete mapa[k]; continue; }
       if (d > amanha || d < limite) mapa[k] = antes[k] || hoje;
@@ -751,6 +753,11 @@ const servidor = createServer(async (req, res) => {
             }
           } catch { /* segue sem o convite */ }
         }
+        // Sem convite, o próprio portal deixa marcar "estou conhecendo" no cadastro. Só
+        // "conhecer" é aceito aqui: o plano é o padrão de quem não diz nada.
+        if (!pedido.convite && pedido.caminho === 'conhecer') {
+          try { await CONTAS.definirCaminho(criada.usuario, 'conhecer'); } catch { /* segue no plano */ }
+        }
         // Conta criada pelo link de uma célula: entra direto no grupo. Célula cheia ou link
         // vencido não impedem a conta; o app avisa depois, ao abrir.
         let celula = '';
@@ -862,6 +869,9 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/quem') {
       const semeador = conta ? await marcoDoSemeador(eu) : null;
+      // Quem acompanha (só o @ e o nome: nunca o que a pessoa escreveu) só aparece para
+      // quem está mesmo no caminho de conhecer Jesus e tem alguém marcado.
+      const quemAcompanha = conta && conta.acompanhadoPor ? CONTAS.achar(conta.acompanhadoPor) : null;
       json(res, 200, {
         usuario: eu,
         nome: conta ? conta.nome : eu,
@@ -873,6 +883,8 @@ const servidor = createServer(async (req, res) => {
         comSenha: !!conta,
         semeador,
         admin: ehAdmin(eu),
+        caminho: (conta && conta.caminho) || 'plano',
+        ...(quemAcompanha ? { acompanhadoPor: { usuario: quemAcompanha.usuario, nome: quemAcompanha.nome } } : {}),
       });
       return;
     }
@@ -922,6 +934,18 @@ const servidor = createServer(async (req, res) => {
       const { fuso } = await lerJson(req);
       if (fusoValido(fuso)) await CONTAS.atualizarFuso(eu, fuso);
       json(res, 200, { ok: true });
+      return;
+    }
+
+    // Troca o próprio caminho: "plano" (a Bíblia em um ano) ou "conhecer" (os 14 dias).
+    if (rota === '/api/caminho') {
+      if (!exigir(post && conta, 405, 'método não suportado')) return;
+      try {
+        await CONTAS.definirCaminho(eu, (await lerJson(req)).caminho);
+        json(res, 200, { ok: true });
+      } catch (e) {
+        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não consegui trocar o caminho' });
+      }
       return;
     }
 
@@ -993,6 +1017,18 @@ const servidor = createServer(async (req, res) => {
       }
       amigos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 
+      // Quem esta pessoa acompanha no Conhecer Jesus: só o número de dias terminados e a
+      // data mais recente, nunca o que a outra pessoa escreveu.
+      const acompanhando = [];
+      for (const c of CONTAS.lista()) {
+        if (c.acompanhadoPor !== eu || c.caminho !== 'conhecer') continue;
+        const conhecidos = ((await lerEstado(arquivoDe(c.usuario))) || {}).conhecidos || {};
+        const datas = Object.values(conhecidos).filter(Boolean).sort();
+        const dia = datas.length;
+        acompanhando.push({ usuario: c.usuario, nome: c.nome, dia, ultimo: datas[datas.length - 1] || '', terminou: dia >= 14 });
+      }
+      acompanhando.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+
       json(res, 200, {
         perfilCompleto: completo,
         consentimento: CONTAS.consentiu(conta),
@@ -1004,6 +1040,7 @@ const servidor = createServer(async (req, res) => {
         bloqueados: listas.bloqueados.map(nomeDe),
         toques: CONTAS.toquesRecebidos(eu, hojeEu).map(nomeDe),
         convitesProposito: CONTAS.propositosDe(eu).filter((p) => p.membros.some((m) => m.usuario === eu && m.estado === 'convidado')).length,
+        acompanhando,
       });
       return;
     }
@@ -1143,8 +1180,8 @@ const servidor = createServer(async (req, res) => {
     }
 
     if (rota === '/api/convites') {
-      await acao(async () => {
-        const { token, venceEm } = CONTAS.gerarConvite(eu, assinar);
+      await acao(async ({ modo } = {}) => {
+        const { token, venceEm } = CONTAS.gerarConvite(eu, assinar, Date.now(), { modo });
         const origem = (req.headers['x-forwarded-proto'] || 'http') + '://' + (req.headers.host || 'localhost');
         return { link: origem + '/?convite=' + token, venceEm };
       });
@@ -1166,6 +1203,22 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/convites/cancelar') {
       await acao(async () => { await CONTAS.cancelarConvites(eu); return {}; });
+      return;
+    }
+
+    // "Quero conversar com alguém", do Conhecer Jesus: avisa só quem convidou e, se
+    // houver, o líder da célula da pessoa. Nunca vai para o Feed, e no máximo uma vez
+    // por dia (a segunda chamada do mesmo dia só confirma, sem mandar de novo).
+    if (rota === '/api/conhecer/conversar') {
+      await acao(async () => {
+        const r = await CONTAS.pedirConversa(eu, hojeDe(eu));
+        if (r.ja) return { ja: true };
+        const nome = await nomeDeExibicao(eu);
+        const destinos = new Set([r.de]);
+        for (const p of CONTAS.propositosDe(eu)) if (p.celula && p.criadoPor) destinos.add(p.criadoPor);
+        for (const destino of destinos) semEsperar(avisoSocial(destino, 'querConversar', { nome, deUsuario: eu }));
+        return {};
+      });
       return;
     }
 

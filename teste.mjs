@@ -300,6 +300,15 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
 
+// --- conhecer jesus: fusão de "conhecidos" e ofensiva ---
+{
+  const c1 = CC.fundir({ conhecidos: { 1: '2026-03-05', 2: '2026-03-06' } }, { conhecidos: { 2: '2026-03-01', 3: '2026-03-07' } }).conhecidos;
+  checar(c1['1'] === '2026-03-05' && c1['2'] === '2026-03-01' && c1['3'] === '2026-03-07',
+    'conhecidos: união por dia, e no mesmo dia vale a data mais antiga (quando a pessoa terminou de verdade)');
+  const datas = CC.datasFeitas({ marcadoEm: { 1: '2026-03-01' }, licoesEm: {}, conhecidos: { 1: '2026-03-02', 2: '2026-03-03' } });
+  checar(datas.has('2026-03-02') && datas.has('2026-03-03') && datas.size === 3, 'datasFeitas conta também os dias do Conhecer Jesus');
+}
+
 // --- versículos: referência, marca-texto e notas (04e-versiculos.js) ---
 for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   runInContext(readFileSync(join(AQUI, 'src', 'app', f), 'utf8'), contexto, { filename: f });
@@ -461,6 +470,23 @@ await contas.ativarConvidado('novo1');
 checar(contas.semeadorDe('ana') === 1, 'feita a primeira lição, a pessoa conta para quem convidou');
 await contas.apagar('novo1');
 checar(contas.semeadorDe('ana') === 0, 'conta apagada deixa de contar');
+
+// ---------- conhecer jesus: convite com modo ----------
+const conviteConhecer = contas.gerarConvite('ana', assinar, Date.now(), { modo: 'conhecer' });
+checar(contas.lerConvite(conviteConhecer.token, assinar).modo === 'conhecer' && contas.lerConvite(convite.token, assinar).modo === '',
+  'lerConvite devolve o modo do convite; o convite comum não tem modo');
+await contas.criar({ usuario: 'novo2', senha: '12345678', nome: 'Novo2', email: 'novo2@x.com', nascimento: '2000-01-01', consentimento: true });
+await contas.usarConvite('novo2', conviteConhecer.token, assinar, '2026-03-04', Date.now(), { contaNova: true });
+checar(contas.achar('novo2').caminho === 'conhecer' && contas.achar('novo2').acompanhadoPor === 'ana',
+  'o convite "conhecer" põe a conta nova nos 14 dias e anota quem convidou');
+checar(!contas.duplaPlano('novo2', 'ana'), 'quem entra pelo convite "conhecer" não ganha a dupla de leitura do plano');
+checar(contas.relacao('novo2', 'ana') === 'amigos', 'mesmo sem dupla, a amizade nasce normal');
+{
+  const [carga, firma] = conviteConhecer.token.split('.');
+  const dado = JSON.parse(Buffer.from(carga, 'base64url').toString('utf8'));
+  const cargaAdulterada = Buffer.from(JSON.stringify({ ...dado, m: '' })).toString('base64url');
+  checar(contas.lerConvite(cargaAdulterada + '.' + firma, assinar) === null, 'trocar o modo na carga do convite invalida a assinatura');
+}
 
 checar(await contas.tocar('bia', 'dora', { hoje: '2026-03-02', euLeu: true, eleLeu: false }) === 'enviado'
   && await contas.tocar('bia', 'dora', { hoje: '2026-03-02', euLeu: true, eleLeu: false }) === 'ja', 'um toque por amigo por dia');

@@ -13,10 +13,20 @@ const AQUI = dirname(fileURLToPath(import.meta.url));
 const src = (...p) => join(AQUI, 'src', ...p);
 const dist = (...p) => join(AQUI, 'dist', ...p);
 
-const dados = readFileSync(join(AQUI, 'conteudo', 'conteudo.json'), 'utf8');
+let dados = readFileSync(join(AQUI, 'conteudo', 'conteudo.json'), 'utf8');
 const conteudo = JSON.parse(dados);
 console.log('conteúdo:', conteudo.totalNotas, 'notas ·', conteudo.plano.length, 'dias ·',
   conteudo.unidades.length, 'unidades');
+
+// O Conhecer Jesus (14 dias) e as perguntas honestas nascem em arquivos à parte, prontos e
+// revisados por fora: aqui só entram debaixo de uma chave nova, para o app ler tudo como
+// CC.D.conhecer. "dados" é regravado porque é ele, e não "conteudo", que vira o hash e o
+// arquivo publicado logo abaixo.
+const conhecer = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
+const perguntasHonestas = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'perguntas-honestas.json'), 'utf8'));
+conteudo.conhecer = { ...conhecer, perguntas: perguntasHonestas };
+dados = JSON.stringify(conteudo);
+console.log('conhecer jesus:', conteudo.conhecer.dias.length, 'dias ·', conteudo.conhecer.perguntas.length, 'perguntas honestas');
 
 // Os módulos do app são concatenados na ordem do nome do arquivo: 01 antes de 02.
 const pastaApp = src('app');

@@ -588,10 +588,14 @@ export class Contas {
   // ---------- convites ----------
   // O link leva quem convidou, a validade e um número único, assinados com a chave do
   // servidor e o selo de convite da conta. Trocar o selo cancela todos os links abertos.
-  gerarConvite(eu, assinar, agora = Date.now()) {
+  // modo "conhecer": a carga leva "m", e quem entra por esse link começa no caminho de
+  // 14 dias, não no plano. Adulterar o "m" na URL invalida a assinatura, como qualquer
+  // outro campo da carga.
+  gerarConvite(eu, assinar, agora = Date.now(), { modo } = {}) {
     const a = this.exigirCompleto(eu);
     const carga = Buffer.from(JSON.stringify({
       d: a.usuario, v: agora + VALIDADE_CONVITE, n: randomBytes(8).toString('hex'),
+      ...(modo === 'conhecer' ? { m: 'conhecer' } : {}),
     })).toString('base64url');
     return {
       token: carga + '.' + assinar('convite.' + carga + '.' + a.seloConvite),
@@ -607,7 +611,7 @@ export class Contas {
     const dono = dado && this.achar(dado.d);
     if (!dono || !iguais(firma, assinar('convite.' + carga + '.' + dono.seloConvite))) return null;
     if (!(Number(dado.v) > agora)) return null;
-    return { de: dono.usuario, nome: dono.nome, nonce: dado.n, vence: Number(dado.v) };
+    return { de: dono.usuario, nome: dono.nome, nonce: dado.n, vence: Number(dado.v), modo: dado.m === 'conhecer' ? 'conhecer' : '' };
   }
 
   // O link vale para quantas pessoas quiserem, por 30 dias, até quem convidou cancelar. Cada
@@ -627,6 +631,10 @@ export class Contas {
       aceites.push({ convite: convite.nonce, de: convite.de, para: a.usuario, em: new Date(agora).toISOString(), contaNova: nova, ativadoEm: '' });
       if (nova) a.convidadoPor = convite.de;
     }
+    // Convite "conhecer" numa conta nova sem caminho ainda: ela entra nos 14 dias, e quem
+    // convidou passa a acompanhá-la. Sem dupla de plano: ela ainda não está lendo o plano.
+    const paraConhecer = convite.modo === 'conhecer' && contaNova && !a.caminho;
+    if (paraConhecer) { a.caminho = 'conhecer'; a.acompanhadoPor = convite.de; }
     if (this.relacao(a.usuario, convite.de) === 'amigos') {
       await this.salvar();
       return { ja: true, de: convite.de };
@@ -634,9 +642,9 @@ export class Contas {
     this.dados.amizades[par(a.usuario, convite.de)] = {
       estado: 'ativa', pediu: convite.de, em: hoje, aceitaEm: hoje,
     };
-    // Quem entra por uma célula já lê junto nela: a dupla automática só empilharia uma dupla
-    // por membro na tela do líder.
-    if (!semDupla) this.garantirDuplaPlano(a.usuario, convite.de, hoje, convite.de);
+    // Quem entra por uma célula já lê junto nela, e quem está conhecendo Jesus ainda não lê
+    // o plano: nos dois casos, a dupla automática não faz sentido.
+    if (!semDupla && !paraConhecer) this.garantirDuplaPlano(a.usuario, convite.de, hoje, convite.de);
     await this.salvar();
     return { de: convite.de };
   }
@@ -645,6 +653,30 @@ export class Contas {
     const a = this.exigirCompleto(eu);
     a.seloConvite = randomBytes(6).toString('hex');
     await this.salvar();
+  }
+
+  // ---------- conhecer jesus ----------
+  // "plano": a leitura da Bíblia em um ano. "conhecer": os 14 dias para quem ainda não crê.
+  // A conta nova entra direto num dos dois (cadastro sem convite ou link "conhecer"); depois
+  // disso, quem já tem conta troca quando quiser pela rota /api/caminho.
+  async definirCaminho(usuario, caminho) {
+    const conta = this.achar(usuario);
+    if (!conta) throw erro('conta não encontrada', 404);
+    if (caminho !== 'plano' && caminho !== 'conhecer') throw erro('caminho inválido');
+    conta.caminho = caminho;
+    await this.salvar();
+    return conta;
+  }
+
+  // "Quero conversar com alguém": só quem está sendo acompanhado, e no máximo um pedido
+  // por dia, mesmo que a pessoa toque o botão de novo.
+  async pedirConversa(usuario, hoje) {
+    const a = this.achar(usuario);
+    if (!a || !a.acompanhadoPor) throw erro('essa opção é para quem está no caminho de conhecer Jesus', 403);
+    if (a.conversouEm === hoje) return { ja: true, de: a.acompanhadoPor };
+    a.conversouEm = hoje;
+    await this.salvar();
+    return { ja: false, de: a.acompanhadoPor };
   }
 
   // Quem veio pelo link "entrou de verdade" quando conclui a primeira lição.
@@ -1015,12 +1047,13 @@ export function arquivoDoEstado(base, usuario) {
 }
 
 // ---------- o que o dia de cada um diz ----------
-// Uma data está feita quando a pessoa concluiu a lição do plano ou uma lição de
-// primeiros passos até o fim. Orar, escrever e praticar não contam.
+// Uma data está feita quando a pessoa concluiu a lição do plano, uma lição de primeiros
+// passos até o fim, ou um dia do Conhecer Jesus. Orar, escrever e praticar não contam.
 export function datasFeitas(estado) {
   const s = new Set();
   for (const d of Object.values((estado && estado.marcadoEm) || {})) if (d) s.add(d);
   for (const d of Object.values((estado && estado.licoesEm) || {})) if (d) s.add(d);
+  for (const d of Object.values((estado && estado.conhecidos) || {})) if (d) s.add(d);
   return s;
 }
 
