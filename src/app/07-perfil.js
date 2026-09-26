@@ -169,6 +169,7 @@
       + atalho('#/perfil/versiculos', 'marcador', 'Meus versículos')
       + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
+      + atalho('#/perfil/discipulado', 'cruz', 'Discipulado')
       + '</div>'
       // O app: instalar e as configurações com nome, não só o ícone do canto.
       + '<div class="titulo-secao"><h2>O aplicativo</h2></div>'

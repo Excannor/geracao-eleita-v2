@@ -288,6 +288,9 @@
       + (quem ? '<button class="botao azul" data-conversar>' + CC.esc(S.conversar) + '</button>'
         : '<p class="passo-dica">Converse com um amigo que segue Jesus ou procure uma igreja perto de você.</p>')
       + '</div>'
+      // Integração com o Discipulado (Fase 3): depois de "Quero conversar", o caminho para
+      // pedir alguém que acompanhe na fé, sem obrigar ninguém a fazer isso agora.
+      + '<p class="passo-dica pequena">Quando quiser, peça para alguém te acompanhar na fé no Perfil.</p>'
       + '<div class="acoes"><a class="botao contorno" href="#/passos">' + CC.esc(S.proximo) + '</a></div>';
 
     const btn = raiz.querySelector('[data-conversar]');

@@ -201,6 +201,9 @@ try {
   const conversar1 = await pedir('/api/conhecer/conversar', {}, lia.cookie);
   ok(conversar1.status === 200 && conversar1.corpo.ok === true && !conversar1.corpo.ja, 'a Lia pede para conversar');
   ok((await esperarChegar(celJovem, 1)) === 1, 'o jovem, que a convidou, recebe o aviso');
+  // "pediuConversa" liga o botão de "Acompanhar na fé" (Fase 3), sem expor o que foi escrito.
+  liaAcompanhada = (await amigosDe(jovem.cookie)).acompanhando.find((a) => a.usuario === 'lia');
+  ok(liaAcompanhada.pediuConversa === hoje, 'o jovem vê que a Lia pediu para conversar hoje, para poder oferecer acompanhar na fé');
   await dormir(300);
   ok(chegou(celOutra) === 0, 'quem não tem nada a ver com a Lia não recebe nada');
   const novidadesDepois = (await pedir('/api/novidades', null, jovem.cookie)).corpo.eventos.length;

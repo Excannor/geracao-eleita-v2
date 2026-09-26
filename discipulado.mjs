@@ -18,7 +18,7 @@ export const papelValido = (p) => PAPEIS.includes(p);
 export const MARCOS = ['decisao', 'batismo', 'celula', 'discipula'];
 export const ROTULOS_MARCO = {
   decisao: 'Decidi seguir Jesus',
-  batismo: 'Fui batizado',
+  batismo: 'Me batizei',
   celula: 'Entrei numa célula',
   discipula: 'Comecei a acompanhar alguém na fé',
 };

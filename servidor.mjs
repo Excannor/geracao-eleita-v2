@@ -1064,7 +1064,12 @@ const servidor = createServer(async (req, res) => {
         const conhecidos = ((await lerEstado(arquivoDe(c.usuario))) || {}).conhecidos || {};
         const datas = Object.values(conhecidos).filter(Boolean).sort();
         const dia = datas.length;
-        acompanhando.push({ usuario: c.usuario, nome: c.nome, dia, ultimo: datas[datas.length - 1] || '', terminou: dia >= 14 });
+        // "pediuConversa" (a data de "Quero conversar") liga o botão de convidar para o
+        // acompanhamento na fé (Fase 3), sem expor o que a pessoa escreveu.
+        acompanhando.push({
+          usuario: c.usuario, nome: c.nome, dia, ultimo: datas[datas.length - 1] || '', terminou: dia >= 14,
+          pediuConversa: c.conversouEm || '',
+        });
       }
       acompanhando.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 
@@ -1235,7 +1240,7 @@ const servidor = createServer(async (req, res) => {
         const outro = CONTAS.achar(meuAtivo.discipulador);
         if (outro) {
           meuDiscipulador = {
-            usuario: outro.usuario, nome: outro.nome, desde: meuAtivo.aceitoEm,
+            id: meuAtivo.id, usuario: outro.usuario, nome: outro.nome, desde: meuAtivo.aceitoEm,
             mostrar: meuAtivo.mostrar, ultimoEncontro: ultimoEncontroDiscipulado(meuAtivo),
           };
         }
@@ -1253,7 +1258,7 @@ const servidor = createServer(async (req, res) => {
         const semana = diasLidosNaSemana(datasFeitas(estado), referencia);
         const acompanha = CONTAS.discipulosAtivosDe(x.discipulo).length;
         meusDiscipulos.push({
-          usuario: outro.usuario, nome: outro.nome, desde: x.aceitoEm, ultimoEncontro: ultimoEncontroDiscipulado(x),
+          id: x.id, usuario: outro.usuario, nome: outro.nome, desde: x.aceitoEm, ultimoEncontro: ultimoEncontroDiscipulado(x),
           ...resumoParaDiscipulador({ mostrar: x.mostrar, passos, semana, marcos: outro.marcos, acompanha }),
         });
       }

@@ -117,8 +117,10 @@ try {
 
   const deAna = await ver(ana.cookie);
   ok(deAna.meusDiscipulos.length === 1 && deAna.meusDiscipulos[0].usuario === 'bia', 'Ana passa a ver a Bia como discípula');
+  ok(deAna.meusDiscipulos[0].id === convite1.id, 'a tela do guia já vem com o id da relação, sem precisar guardar o da resposta do convite');
   const deBia = await ver(bia.cookie);
   ok(deBia.meuDiscipulador && deBia.meuDiscipulador.usuario === 'ana', 'Bia vê a Ana como quem a acompanha');
+  ok(deBia.meuDiscipulador.id === convite1.id, 'a tela do discípulo também vem com o id, para poder mostrar, marcar encontro e encerrar');
   ok(deBia.meuDiscipulador.mostrar.passos === true && deBia.meuDiscipulador.mostrar.marcos === false, 'Bia vê de volta o que ela mesma escolheu mostrar');
 
   // ---------- o outro papel do convite ----------

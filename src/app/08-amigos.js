@@ -530,7 +530,12 @@
         + CC.esc(p.nome) + '">' + CC.ico('sino') + '</button>'
         + '</div>'
         + '<button class="link-nota" data-como-acompanhar="' + CC.esc(p.usuario) + '">Como acompanhar '
-        + CC.esc(String(p.nome).split(' ')[0]) + '</button>').join('') + '</div>';
+        + CC.esc(String(p.nome).split(' ')[0]) + '</button>'
+        // Depois dos 14 dias, ou assim que a pessoa pede para conversar, o caminho natural é
+        // seguir acompanhando na fé (Discipulado, Fase 3), com o convite já como discipulador.
+        + (p.terminou || p.pediuConversa
+          ? '<button class="link-nota" data-acompanhar-fe="' + CC.esc(p.usuario) + '">Acompanhar '
+            + CC.esc(String(p.nome).split(' ')[0]) + ' na fé</button>' : '')).join('') + '</div>';
   }
 
   function folhaComoAcompanhar(pessoa) {
@@ -647,6 +652,10 @@
       ligar('[data-como-acompanhar]', (el) => {
         const p = acompanhando.find((x) => x.usuario === el.dataset.comoAcompanhar);
         if (p) folhaComoAcompanhar(p);
+      });
+      ligar('[data-acompanhar-fe]', (el) => {
+        const p = acompanhando.find((x) => x.usuario === el.dataset.acompanharFe);
+        if (p && CC.folhaAcompanharNaFe) CC.folhaAcompanharNaFe(p);
       });
       ligar('[data-aceitar]', async (el) => {
         el.disabled = true;
