@@ -1,0 +1,308 @@
+/* Conhecer Jesus: os 14 dias de quem ainda não segue Jesus, as perguntas honestas e a tela
+   "E agora, o que eu faço?". Nada aqui pontua, sobe de nível ou aparece no Feed: os dias só
+   contam para a ofensiva, do mesmo jeito que uma leitura do plano (02-estado.js). Reaproveita
+   as peças visuais dos Primeiros passos e da reflexão do dia (04-licao.js) de propósito, para
+   não nascer uma segunda linguagem visual dentro do mesmo app. */
+(function (CC) {
+  'use strict';
+
+  const D = CC.D;
+  const conteudoDe = () => D.conhecer;
+
+  const primeiroNome = (nome) => String(nome || '').trim().split(/\s+/)[0];
+
+  // Pede a conversa ao servidor e devolve o texto pronto de "seguir" para mostrar depois:
+  // o servidor decide sozinho quem avisa (quem convidou e, se houver, o líder da célula) e
+  // nunca manda o que a pessoa escreveu.
+  function pedirConversa() {
+    return CC.api('api/conhecer/conversar', {});
+  }
+
+  // A folha que "Converse com {nome}" abre nas perguntas honestas: confirma antes de avisar,
+  // porque ali a pessoa pode só estar pesquisando, não necessariamente pronta para chamar.
+  function abrirFolhaConversar(nome) {
+    const S = conteudoDe().seguir;
+    CC.folha('<h2>Converse com ' + CC.esc(nome) + '</h2>'
+      + '<p class="passo-dica">' + CC.esc(nome) + ' vai saber que você quer conversar. O que você escreveu fica só com você.</p>'
+      + '<div class="acoes"><button class="botao azul" data-enviar>' + CC.esc(S.conversar) + '</button>'
+      + '<button class="botao plano" data-fechar>Fechar</button></div>',
+    {
+      rotulo: 'Conversar',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelector('[data-enviar]').onclick = async (ev) => {
+          ev.currentTarget.disabled = true;
+          try {
+            await pedirConversa();
+            folha.innerHTML = '<p class="conquista-linha">' + CC.ico('certo') + CC.esc(S.conversarFeito) + '</p>'
+              + '<div class="acoes"><button class="botao plano" data-fechar2>Fechar</button></div>';
+            folha.querySelector('[data-fechar2]').onclick = fechar;
+          } catch (e) {
+            ev.currentTarget.disabled = false;
+            CC.avisar(e.message);
+          }
+        };
+      },
+    });
+  }
+
+  // ---------- #/conhecer: a lista dos 14 dias ----------
+  // `comLinkPlano` só é verdadeiro quando esta mesma lista aparece na aba Trilha (03-trilha.js):
+  // é ali que faz sentido oferecer trocar de caminho, não dentro do próprio #/conhecer.
+  CC.vistaConhecer = function (raiz, comLinkPlano) {
+    const C = conteudoDe();
+    const feitos = CC.conhecidos();
+    const proximo = C.dias.find((d) => !feitos.includes(d.numero));
+    const fracao = C.dias.length ? feitos.length / C.dias.length : 0;
+
+    const lista = C.dias.map((dia) => {
+      const feita = feitos.includes(dia.numero);
+      const ehProxima = !!proximo && dia.numero === proximo.numero;
+      const referencia = dia.trechos.map((t) => CC.escreverRef(t.livro, t.cap, t.de, t.ate)).join('; ');
+      return '<a class="item-licao' + (feita ? ' feita' : '') + (ehProxima ? ' proxima' : '') + '" '
+        + 'href="#/conhecer/' + dia.numero + '">'
+        + '<span class="num" aria-hidden="true">' + (feita ? CC.ico('certo') : dia.numero) + '</span>'
+        + '<span class="textos">'
+        + (ehProxima ? '<span class="marca-proxima">Próximo</span>' : '')
+        + '<b>' + CC.esc(dia.titulo) + (feita ? '<span class="so-leitor">, concluído</span>' : '') + '</b>'
+        + '<span>' + CC.esc(referencia) + '</span></span>'
+        + CC.ico('avancar') + '</a>';
+    }).join('');
+
+    raiz.innerHTML = '<div class="cabeca-passos c-azul">'
+      + '<div class="textos"><h1>' + CC.esc(C.titulo) + '</h1>'
+      + '<p>' + CC.esc(C.subtitulo) + '</p>'
+      + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitos.length + ' de ' + C.dias.length + '</b></div>'
+      + (proximo
+        ? '<a class="botao branco" href="#/conhecer/' + proximo.numero + '">' + CC.ico('bandeira')
+          + (feitos.length ? 'Continuar: ' : 'Começar: ') + CC.esc(proximo.titulo) + '</a>'
+        : '<p class="conquista-linha">' + CC.ico('certo') + 'Você terminou os 14 dias!</p>')
+      + '</div></div>'
+      // Quem convidou vê em que dia a pessoa está (nunca o que ela escreve): dito aqui, às claras.
+      + (CC.quem && CC.quem.acompanhadoPor
+        ? '<p class="passo-dica pequena" style="margin-top:12px">' + CC.esc(String(CC.quem.acompanhadoPor.nome).split(' ')[0])
+          + ' vê em que dia você está. O que você escreve fica só com você.</p>'
+        : '')
+      + CC.tituloSecao('Os 14 dias')
+      + '<div class="lista-licoes caixa-lista">' + lista + '</div>'
+      + '<a class="cartao-proposito" href="#/perguntas"><span class="etiqueta">' + CC.ico('balao') + 'Perguntas honestas</span>'
+      + '<span>Dúvidas comuns de quem está conhecendo Jesus.</span></a>'
+      + '<a class="link-nota" href="#/seguir">' + CC.ico('avancar') + CC.esc(C.seguir.titulo) + '</a>'
+      + (comLinkPlano ? '<div><button class="link-nota" data-ver-plano>Ver o plano da Bíblia em um ano</button></div>' : '');
+
+    const verPlano = raiz.querySelector('[data-ver-plano]');
+    if (verPlano) {
+      verPlano.onclick = async () => {
+        verPlano.disabled = true;
+        try {
+          await CC.api('api/caminho', { caminho: 'plano' });
+          if (CC.quem) CC.quem.caminho = 'plano';
+          CC.redesenhar();
+        } catch (e) {
+          verPlano.disabled = false;
+          CC.avisar(e.message);
+        }
+      };
+    }
+  };
+
+  // ---------- #/conhecer/N: a tela do dia, em folha cheia ----------
+  let sessaoDia = null;
+
+  CC.abrirConhecerDia = function (numero) { location.hash = '#/conhecer/' + numero; };
+
+  CC.fecharConhecerDia = function () {
+    if (CC.fecharLeitor) CC.fecharLeitor();
+    const el = document.querySelector('.licao.tela-conhecer');
+    if (el) el.remove();
+    sessaoDia = null;
+  };
+
+  CC.montarConhecerDia = function (numero) {
+    const C = conteudoDe();
+    const n = Math.min(Math.max(1, Number(numero) || 1), C.dias.length);
+    if (!sessaoDia || sessaoDia.numero !== n) sessaoDia = { numero: n, lida: CC.conhecido(n) };
+    desenharConhecerDia();
+  };
+
+  function desenharConhecerDia() {
+    const C = conteudoDe();
+    const dia = C.dias[sessaoDia.numero - 1];
+    const terminado = CC.conhecido(dia.numero);
+    // Uma vez terminado o dia, reabrir sempre mostra o conteúdo inteiro, mesmo que a sessão
+    // (aberta agora) ainda não tenha passado pelo "Ler".
+    const lida = sessaoDia.lida || terminado;
+    const fracao = terminado ? 1 : (lida ? 0.6 : 0.1);
+
+    let el = document.querySelector('.licao.tela-conhecer');
+    if (!el) {
+      el = document.createElement('div');
+      el.setAttribute('role', 'dialog');
+      el.setAttribute('aria-modal', 'true');
+      document.body.appendChild(el);
+    }
+    el.className = 'licao c-azul tela-conhecer';
+    el.setAttribute('aria-label', 'Dia ' + dia.numero + ' do Conhecer Jesus');
+
+    const perguntasFixas = '<details class="cartao"><summary>Mais perguntas para pensar</summary>'
+      + '<ul style="margin:12px 0 0;padding-left:20px;display:grid;gap:10px">'
+      + C.perguntasFixas.map((p) => '<li>' + CC.esc(p) + '</li>').join('') + '</ul></details>';
+
+    const corpoLido = !lida ? '' : '<section class="etapa-reflexao">'
+      + '<span class="etiqueta">Repare</span><p>' + CC.esc(dia.repare) + '</p></section>'
+      + '<section class="etapa-reflexao"><div class="pensamento-dia"><p>' + CC.esc(dia.pergunta) + '</p></div></section>'
+      + '<section class="etapa-reflexao">' + perguntasFixas + '</section>'
+      + '<section class="etapa-reflexao"><h2>Se quiser, fale com Deus:</h2>'
+      + '<ul class="oracao-guia"><li>' + CC.esc(dia.conversa) + '</li></ul></section>'
+      + CC.painelAnotacao('conhecer:' + dia.numero, 'Escrever sobre isso')
+      + (terminado ? '<p class="conquista-linha">' + CC.ico('certo') + 'Dia concluído</p>' : '');
+
+    el.innerHTML = '<div class="licao-topo">'
+      + '<button class="fechar" data-fechar aria-label="Fechar">' + CC.ico('fechar') + '</button>'
+      + CC.barra(fracao)
+      + '</div>'
+      + '<div class="licao-palco"><div class="interno">'
+      + '<span class="etiqueta">Conhecer Jesus · Dia ' + dia.numero + ' de 14</span>'
+      + '<h1 class="passo-titulo">' + CC.esc(dia.titulo) + '</h1>'
+      + '<p class="passo-dica">' + CC.esc(dia.abertura) + '</p>'
+      // Antes de ler, a tela mostra o que vem: sem isso, sobrava um vazio que parecia travado.
+      + (lida ? '' : '<div class="leitura-hoje"><span class="etiqueta">O que você vai ler</span>'
+        + '<span class="passagem-hoje">' + CC.esc(dia.trechos.map((t) => CC.escreverRef(t.livro, t.cap, t.de, t.ate)).join(' e ')) + '</span>'
+        + '<span class="tempo">uns ' + minutosDoConhecer(dia) + ' minutos</span></div>')
+      + corpoLido
+      + '</div></div>'
+      + '<div class="licao-pe' + (peDoConhecer(dia, lida, terminado) ? '' : ' vazio') + '"><div class="interno">'
+      + peDoConhecer(dia, lida, terminado) + '</div></div>';
+
+    el.querySelector('[data-fechar]').onclick = () => { location.hash = '#/conhecer'; };
+    const ler = el.querySelector('[data-ler]');
+    if (ler) {
+      ler.onclick = () => {
+        sessaoDia.lida = true;
+        desenharConhecerDia();
+        CC.abrirLeitor({
+          dia,
+          chave: 'dia',
+          trilhas: [['dia', 'Dia ' + dia.numero, dia.titulo]],
+          cor: 'azul',
+          conhecer: true,
+          lida: () => true,
+          marcar: () => {},
+        });
+      };
+    }
+    const terminar = el.querySelector('[data-terminar]');
+    if (terminar) {
+      terminar.onclick = () => {
+        CC.vibrar('certo');
+        CC.marcarConhecido(dia.numero);
+        desenharConhecerDia();
+      };
+    }
+    const continuarPlano = el.querySelector('[data-continuar-plano]');
+    if (continuarPlano) {
+      continuarPlano.onclick = async () => {
+        continuarPlano.disabled = true;
+        try {
+          await CC.api('api/caminho', { caminho: 'plano' });
+          if (CC.quem) CC.quem.caminho = 'plano';
+          location.hash = '#/';
+        } catch (e) {
+          continuarPlano.disabled = false;
+          CC.avisar(e.message);
+        }
+      };
+    }
+    CC.ligarAnotacao(el);
+  }
+
+  // O rodapé muda com o estado do dia: primeiro só "Ler"; depois de ler, "Terminei o dia";
+  // terminado, só nos dias 13 e 14 aparece um próximo passo, senão o rodapé fica vazio e a
+  // pessoa sai pelo X.
+  // Uns 6 versículos por minuto, arredondado; os trechos do Conhecer são curtos e por versículo.
+  const minutosDoConhecer = (dia) => Math.max(3, Math.round(dia.trechos.reduce((n, t) => n + (t.ate - t.de + 1), 0) / 6));
+
+  function peDoConhecer(dia, lida, terminado) {
+    if (!lida) return '<button class="botao cor" data-ler>Ler</button>';
+    if (!terminado) return '<button class="botao cor" data-terminar>Terminei o dia</button>';
+    const botoes = [];
+    if (dia.numero === 13 || dia.numero === 14) {
+      botoes.push('<a class="botao cor" href="#/seguir">' + CC.esc(conteudoDe().seguir.titulo) + '</a>');
+    }
+    if (dia.numero === 14) {
+      botoes.push('<button class="botao contorno" data-continuar-plano>Continuar lendo a Bíblia</button>');
+    }
+    return botoes.join('');
+  }
+
+  // ---------- #/perguntas: as 10 perguntas honestas ----------
+  CC.vistaPerguntas = function (raiz) {
+    const C = conteudoDe();
+    raiz.innerHTML = CC.botaoVoltar('Voltar')
+      + '<h1>Perguntas honestas</h1>'
+      + '<p class="passo-dica">Dúvidas comuns de quem está conhecendo Jesus, ou de quem já segue e quer conversar com um amigo.</p>'
+      + '<div class="grade">' + C.perguntas.map((p) => '<a class="item" href="#/perguntas/' + encodeURIComponent(p.id) + '">'
+        + '<b>' + CC.esc(p.titulo) + '</b>'
+        + '<span class="resumo">' + CC.esc(p.resumo) + '</span></a>').join('') + '</div>';
+  };
+
+  CC.vistaPergunta = function (raiz, id) {
+    const p = conteudoDe().perguntas.find((x) => x.id === id);
+    if (!p) return CC.vazio(raiz, 'Não encontrei essa pergunta.');
+
+    const pilulas = (p.leia || []).map((ref) => {
+      const m = /^(.+?)\s+(\d+)/.exec(ref);
+      return m ? '<a class="pilula" href="#/biblia/' + encodeURIComponent(m[1]) + '/' + m[2] + '">' + CC.esc(ref) + '</a>'
+        : '<span class="pilula">' + CC.esc(ref) + '</span>';
+    }).join('');
+
+    const quem = CC.quem && CC.quem.acompanhadoPor;
+
+    raiz.innerHTML = CC.botaoVoltar('Voltar')
+      + '<h1>' + CC.esc(p.titulo) + '</h1>'
+      + p.paragrafos.map((par) => '<p style="margin:0 0 14px;line-height:1.6">' + CC.esc(par) + '</p>').join('')
+      + (pilulas ? CC.tituloSecao('Leia você mesmo') + '<div class="pilulas">' + pilulas + '</div>' : '')
+      + (quem ? '<div class="acoes"><button class="botao contorno" data-conversar>Converse com '
+        + CC.esc(primeiroNome(quem.nome)) + '</button></div>' : '');
+
+    const btn = raiz.querySelector('[data-conversar]');
+    if (btn) btn.onclick = () => abrirFolhaConversar(primeiroNome(quem.nome));
+  };
+
+  // ---------- #/seguir: "E agora, o que eu faço?" ----------
+  CC.vistaSeguir = function (raiz) {
+    const S = conteudoDe().seguir;
+    const quem = CC.quem && CC.quem.acompanhadoPor;
+
+    const passos = S.passos.map((p) => '<section class="etapa-reflexao"><h2>' + CC.esc(p.titulo) + '</h2>'
+      + '<p style="margin:0;line-height:1.6">' + CC.esc(p.texto) + '</p></section>').join('');
+
+    raiz.innerHTML = CC.botaoVoltar('Voltar')
+      + '<h1>' + CC.esc(S.titulo) + '</h1>'
+      + '<p class="passo-dica">' + CC.esc(S.abertura) + '</p>'
+      + passos
+      + '<section class="etapa-reflexao"><h2>' + CC.esc(S.oracaoTitulo) + '</h2>'
+      + '<p class="passo-dica">' + CC.esc(S.oracaoAbertura) + '</p>'
+      + '<div class="pensamento-dia"><p>' + CC.esc(S.oracao) + '</p></div></section>'
+      + '<div class="acoes" id="acoes-conversar-seguir">'
+      + (quem ? '<button class="botao azul" data-conversar>' + CC.esc(S.conversar) + '</button>'
+        : '<p class="passo-dica">Converse com um amigo que segue Jesus ou procure uma igreja perto de você.</p>')
+      + '</div>'
+      + '<div class="acoes"><a class="botao contorno" href="#/passos">' + CC.esc(S.proximo) + '</a></div>';
+
+    const btn = raiz.querySelector('[data-conversar]');
+    if (btn) {
+      btn.onclick = async () => {
+        btn.disabled = true;
+        try {
+          await pedirConversa();
+          document.getElementById('acoes-conversar-seguir').innerHTML =
+            '<p class="conquista-linha">' + CC.ico('certo') + CC.esc(S.conversarFeito) + '</p>';
+        } catch (e) {
+          btn.disabled = false;
+          CC.avisar(e.message);
+        }
+      };
+    }
+  };
+})(window.CC);

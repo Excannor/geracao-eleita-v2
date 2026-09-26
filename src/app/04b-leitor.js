@@ -123,10 +123,12 @@
 
   function desenhar() {
     const minha = ++geracao;
-    const { dia, chave, trilhas, cor } = aberto;
+    const { dia, chave, trilhas, cor, conhecer } = aberto;
     const [, rotulo, ref] = trilhas.find(([k]) => k === chave);
     const atual = CC.traducao();
     const lida = aberto.lida(chave);
+    // O Conhecer Jesus tem uma trilha só (o dia inteiro), sem Antigo/Novo Testamento para
+    // encadear: "seguinte" nunca existe ali.
     const seguinte = trilhas.find(([k]) => k !== chave && !aberto.lida(k));
 
     let el = document.querySelector('.leitor');
@@ -141,6 +143,9 @@
 
     let principal = lida ? 'Voltar à lição' : 'Terminei a leitura';
     if (seguinte) principal = (lida ? 'Ler ' : 'Terminei! Ler ') + seguinte[2];
+    // No Conhecer Jesus o botão só fecha o leitor e volta ao dia: quem marca o dia como
+    // feito é o botão "Terminei o dia" na própria tela do dia, não o leitor.
+    if (conhecer) principal = 'Terminei a leitura';
 
     el.innerHTML = '<div class="leitor-cabeca">'
       + '<div class="licao-topo">'
@@ -165,6 +170,7 @@
     el.querySelector('[data-aa]').onclick = () => folhaAa(el);
     el.querySelector('[data-terminei]').onclick = () => {
       guardarPosicao(chavePosicao(), null);
+      if (conhecer) { CC.fecharLeitor(); return; }
       if (!lida) { CC.anotarDiario('leitor', 1); aberto.marcar(chave); }
       if (seguinte) {
         aberto.chave = seguinte[0];
@@ -224,7 +230,10 @@
     alvo.innerHTML = '<div class="leitor-esqueleto"><i></i><i></i><i></i><i></i></div>';
     carregar(b).then((biblia) => {
       if (minha !== geracao) return;
-      alvo.innerHTML = textoDe(biblia, CC.trechosDaTrilha(dia, chave)) + credito(b);
+      // O Conhecer Jesus não separa Antigo e Novo Testamento como o plano: os trechos do
+      // dia entram todos juntos, na ordem em que o JSON os lista.
+      const trechos = aberto.conhecer ? (dia.trechos || []) : CC.trechosDaTrilha(dia, chave);
+      alvo.innerHTML = textoDe(biblia, trechos) + credito(b);
       status.textContent = 'Texto carregado';
       CC.versiculos.ligar(el);
       retomar(el);
@@ -257,17 +266,23 @@
 
   // Cada versículo num bloco, com o número em destaque discreto e o capítulo como título.
   // A separação é só visual: o arquivo não tem parágrafos, e nenhuma palavra é mudada.
+  // Com "cap", o trecho não é um intervalo de capítulos (o plano da Bíblia), e sim
+  // de..ate dentro daquele único capítulo: é como o Conhecer Jesus cita passagens curtas.
   function textoDe(biblia, trechos) {
     let html = '';
     for (const t of trechos) {
       const capitulos = biblia.livros[t.livro] || [];
       const nome = t.livro === 'Salmos' ? 'Salmo' : t.livro;
-      for (let c = t.de; c <= t.ate; c++) {
+      const capDe = t.cap || t.de;
+      const capAte = t.cap || t.ate;
+      for (let c = capDe; c <= capAte; c++) {
         const versos = capitulos[c - 1] || [];
+        const vDe = t.cap ? t.de : 1;
+        const vAte = t.cap ? t.ate : versos.length;
         html += '<section class="leitor-capitulo" data-livro="' + CC.esc(t.livro) + '">'
           + '<h2><small>' + CC.esc(nome) + '</small> ' + c + '</h2>'
-          + (versos.some(Boolean)
-            ? '<div class="versos">' + versos.map((v, i) => (v
+          + (versos.slice(vDe - 1, vAte).some(Boolean)
+            ? '<div class="versos">' + versos.map((v, i) => (v && i + 1 >= vDe && i + 1 <= vAte
               ? '<p class="leitor-verso" data-v="' + c + ':' + (i + 1) + '"><sup>' + (i + 1) + '</sup>' + CC.esc(v) + ' </p>'
               : '')).join('') + '</div>'
             : '<p class="passo-dica">Este capítulo não veio nesta tradução.</p>')

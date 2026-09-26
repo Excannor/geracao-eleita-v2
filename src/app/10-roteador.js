@@ -21,6 +21,9 @@
     '': '#/', dia: '#/', passos: '#/', licoes: '#/', praticar: '#/missoes', missoes: '#/missoes',
     amigos: '#/novidades', novidades: '#/novidades',
     explorar: '#/explorar', secao: '#/explorar', nota: '#/explorar', busca: '#/explorar',
+    // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
+    // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
+    conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
     // Perfil e Config não apontam para nenhuma das 4 abas da barra: quem marca o retrato
     // do topo como selecionado é pintarTopo, lendo a rota direto.
     perfil: '#/perfil', config: '#/perfil',
@@ -187,6 +190,9 @@
 
     conteudo.classList.toggle('sem-entrada', redesenhando);
     if (rota !== 'dia') CC.fecharLicao();
+    // A tela do dia do Conhecer Jesus é uma folha cheia por cima da lista (igual à lição),
+    // então só fica aberta enquanto a rota aponta para aquele dia específico.
+    if ((rota !== 'conhecer' || !arg) && CC.fecharConhecerDia) CC.fecharConhecerDia();
     if (rota !== 'biblia' && CC.fecharLeituraBiblia) CC.fecharLeituraBiblia();
     if (rota !== 'praticar') CC.fecharPratica();
     if (CC.fecharPopNo) CC.fecharPopNo();
@@ -202,6 +208,9 @@
     else if (rota === 'secao') CC.vistaSecao(conteudo, arg, consulta ? decodeURIComponent(consulta) : '');
     else if (rota === 'nota') CC.vistaNota(conteudo, arg);
     else if (rota === 'busca') CC.vistaBusca(conteudo, arg);
+    else if (rota === 'conhecer') CC.vistaConhecer(conteudo);
+    else if (rota === 'perguntas') (arg ? (r) => CC.vistaPergunta(r, arg) : CC.vistaPerguntas)(conteudo);
+    else if (rota === 'seguir') CC.vistaSeguir(conteudo);
     else if (rota === 'perfil') (PERFIL()[arg] || CC.vistaPerfil)(conteudo);
     else if (rota === 'config') (arg === 'textos' ? CC.vistaTextos : arg === 'notificacoes' ? CC.vistaNotificacoes : arg === 'painel' ? CC.vistaPainel : CC.vistaConfig)(conteudo);
     else CC.vazio(conteudo, 'Página não encontrada.');
@@ -209,6 +218,7 @@
     conteudo.classList.toggle('largo', rota === 'nota');
     conteudo.dataset.rota = rota || 'trilha';
     if (rota === 'dia') CC.montarLicao(Number(arg));
+    if (rota === 'conhecer' && arg) CC.montarConhecerDia(Number(arg));
 
     pintarTopo();
     pintarNavegacao(rota);
@@ -337,6 +347,11 @@
     await Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]);
     CC.conferirMissoes();
     CC.redesenhar();
+    // Antes de saber quem é a pessoa, a abertura desenha o plano padrão e pode rolar até o
+    // dia atual dele; quando a conta é do Conhecer Jesus, o redesenho troca para outra
+    // lista, mas herda aquela rolagem, escondendo o título. Corrige assim que o caminho
+    // é conhecido, só na Trilha.
+    if (quem && quem.caminho === 'conhecer' && (location.hash === '#/' || location.hash === '')) CC.rolarPara(0);
 
     // Conta recém-criada: primeiro a leitura do dia 1, que é o que dá sentido ao app. O
     // tutorial de pôr o app na tela de início espera a primeira leitura concluída; a marca

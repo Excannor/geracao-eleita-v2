@@ -55,7 +55,8 @@ function conferirTexto(onde, s) {
     if (!nbv[livro]) continue; // não é livro (ex.: "Messias é o salvador")
     if (versos(livro, +cap, de && +de, ate && +ate) === null) problemas.push(onde + ': referência não existe: ' + m[0]);
   }
-  for (const q of s.matchAll(/"([^"]{4,})"/g)) {
+  // Aspas curvas (como o app mostra) ou retas: as duas contam como citação.
+  for (const q of s.matchAll(/[“"]([^”"]{4,})[”"]/g)) {
     const depois = s.slice(q.index + q[0].length);
     const r = /\(((?:[123] )?[A-ZÁÉÍÓÚÂÊÔ][a-zà-ú]+(?: [a-zà-ú]+)?) (\d+)\.(\d+)(?:-(\d+))?\)/.exec(depois);
     const alvo = r && nbv[r[1]] ? versos(r[1], +r[2], +r[3], r[4] && +r[4]) : null;

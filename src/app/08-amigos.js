@@ -56,6 +56,9 @@
   };
 
   const TEXTO_CONVITE = 'Bora ler a Bíblia inteira em um ano, junto? No Geração Eleita é uma leitura por dia, e a gente mantém um propósito juntos. Aceita meu convite:';
+  // O convite do Conhecer Jesus não fala em "propósito" nem "ano": é para quem talvez nunca
+  // tenha lido a Bíblia, então o convite abre pelo caminho de 14 dias, sem pressa.
+  const TEXTO_CONVITE_CONHECER = 'Tô lendo a Bíblia num app e tem um caminho de 14 dias pra quem quer conhecer Jesus, sem pressão. Quer ver?';
   const FALA_TOQUE = 'Bora ler hoje?';
 
   // ---------- peças ----------
@@ -134,14 +137,36 @@
   }
 
   // ---------- convidar ----------
+  // Primeiro pergunta para quem é o convite: o link e o texto mudam, porque um vai para
+  // quem já lê a Bíblia com a pessoa e o outro para quem talvez nunca tenha lido nada.
   CC.convidar = async function () {
     if (cache && !cache.perfilCompleto) {
       const completou = await CC.completarCadastro(CC.quem || {});
       if (!completou) return;
     }
+    CC.folha('<h2>Para quem é o convite?</h2>'
+      + '<div class="acoes">'
+      + '<button class="botao azul" data-modo="plano">Alguém que já segue Jesus</button>'
+      + '<button class="botao contorno" data-modo="conhecer">Alguém que está conhecendo Jesus</button>'
+      + '<button class="botao plano" data-fechar>Cancelar</button>'
+      + '</div>',
+    {
+      rotulo: 'Para quem é o convite?',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelectorAll('[data-modo]').forEach((b) => {
+          b.onclick = () => { fechar(); gerarConvite(b.dataset.modo); };
+        });
+      },
+    });
+  };
+
+  async function gerarConvite(modo) {
+    const conhecer = modo === 'conhecer';
+    const corpo = conhecer ? { modo: 'conhecer' } : {};
     let link = '';
     try {
-      link = (await CC.api('api/convites', {})).link;
+      link = (await CC.api('api/convites', corpo)).link;
     } catch (e) {
       // O cache do perfil pode estar desatualizado: se o servidor recusou por cadastro
       // incompleto, oferece completar na hora em vez de só mostrar o erro sem saída.
@@ -149,7 +174,7 @@
         const completou = await CC.completarCadastro(CC.quem || {});
         if (!completou) return;
         try {
-          link = (await CC.api('api/convites', {})).link;
+          link = (await CC.api('api/convites', corpo)).link;
         } catch (e2) {
           CC.avisar(e2.message || 'Não consegui gerar o convite. Tente de novo em instantes.');
           return;
@@ -159,14 +184,17 @@
         return;
       }
     }
+    const texto = conhecer ? TEXTO_CONVITE_CONHECER : TEXTO_CONVITE;
+    // A busca por @ exato é para quem já tem conta no app: não faz sentido no convite de
+    // quem ainda está conhecendo Jesus, que chega pelo link, sem conta nenhuma ainda.
     CC.folha('<h2>Convide alguém para ler junto!</h2>'
-      + '<p class="mensagem-convite">' + CC.esc(TEXTO_CONVITE) + ' <span>' + CC.esc(link) + '</span></p>'
+      + '<p class="mensagem-convite">' + CC.esc(texto) + ' <span>' + CC.esc(link) + '</span></p>'
       + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Compartilhar convite</button>'
       + '<button class="botao contorno" data-copiar>Copiar link</button></div>'
-      + '<p class="separador"><span>ou pelo @ exato</span></p>'
-      + '<form class="busca-exata" data-pedido><label class="so-leitor" for="arroba">@usuário</label>'
-      + '<input id="arroba" placeholder="@usuario" autocomplete="off" autocapitalize="none" spellcheck="false">'
-      + '<button class="botao pequeno" type="submit">Enviar</button></form>'
+      + (conhecer ? '' : '<p class="separador"><span>ou pelo @ exato</span></p>'
+        + '<form class="busca-exata" data-pedido><label class="so-leitor" for="arroba">@usuário</label>'
+        + '<input id="arroba" placeholder="@usuario" autocomplete="off" autocapitalize="none" spellcheck="false">'
+        + '<button class="botao pequeno" type="submit">Enviar</button></form>')
       + '<p class="recado-senha" id="recado" role="status"></p>'
       + '<p class="passo-dica pequena">O link vale por 30 dias e serve para quantas pessoas você quiser chamar.</p>'
       + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>',
@@ -176,33 +204,36 @@
         const recado = folha.querySelector('#recado');
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelector('[data-compartilhar]').onclick = async () => {
-          const r = await CC.compartilhar(TEXTO_CONVITE, link);
+          const r = await CC.compartilhar(texto, link);
           if (r === 'copiado') CC.avisar('Convite copiado. É só colar na conversa.');
           else if (r === 'falhou') CC.avisar('Não consegui compartilhar. Toque em "Copiar link" e cole na conversa.');
         };
         folha.querySelector('[data-copiar]').onclick = async () => {
           CC.avisar((await CC.copiar(link)) ? 'Link copiado' : 'Não consegui copiar');
         };
-        folha.querySelector('[data-pedido]').onsubmit = async (ev) => {
-          ev.preventDefault();
-          const arroba = folha.querySelector('#arroba').value.trim().replace(/^@/, '');
-          if (!arroba) return;
-          recado.textContent = '';
-          try {
-            const { achado } = await CC.api('api/procurar?q=' + encodeURIComponent(arroba));
-            if (!achado) { recado.textContent = 'Não achei ninguém com esse @.'; return; }
-            if (achado.relacao === 'amigos') { recado.textContent = 'Vocês já leem juntos!'; return; }
-            await acaoAmizade('pedir', achado.usuario);
-            recado.textContent = 'Pedido enviado para @' + achado.usuario + '.';
-            folha.querySelector('#arroba').value = '';
-            CC.carregarAmigos().then(() => CC.redesenhar());
-          } catch (e) {
-            recado.textContent = e.message;
-          }
-        };
+        const pedido = folha.querySelector('[data-pedido]');
+        if (pedido) {
+          pedido.onsubmit = async (ev) => {
+            ev.preventDefault();
+            const arroba = folha.querySelector('#arroba').value.trim().replace(/^@/, '');
+            if (!arroba) return;
+            recado.textContent = '';
+            try {
+              const { achado } = await CC.api('api/procurar?q=' + encodeURIComponent(arroba));
+              if (!achado) { recado.textContent = 'Não achei ninguém com esse @.'; return; }
+              if (achado.relacao === 'amigos') { recado.textContent = 'Vocês já leem juntos!'; return; }
+              await acaoAmizade('pedir', achado.usuario);
+              recado.textContent = 'Pedido enviado para @' + achado.usuario + '.';
+              folha.querySelector('#arroba').value = '';
+              CC.carregarAmigos().then(() => CC.redesenhar());
+            } catch (e) {
+              recado.textContent = e.message;
+            }
+          };
+        }
       },
     });
-  };
+  }
 
   // ---------- telas cheias: novo propósito e toques ----------
   const duplaGrande = (a, b) => '<div class="dupla-grande">' + retrato(a, 'enorme') + retrato(b, 'enorme') + '</div>';
@@ -487,6 +518,33 @@
       + '</article>';
   }
 
+  // Quem a pessoa está acompanhando no Conhecer Jesus: só o número do dia, nunca o que foi
+  // escrito. O toque é o mesmo dos amigos de sempre; "Como acompanhar" abre as dicas do JSON.
+  function blocoAcompanhando(lista) {
+    if (!lista.length) return '';
+    return CC.tituloSecao('Conhecendo Jesus')
+      + '<div class="lista-pedidos">' + lista.map((p) => '<div class="linha-amigo">' + retrato(p)
+        + '<div class="quem-amigo"><b>' + CC.esc(p.nome) + '</b><span class="arroba">'
+        + (p.terminou ? 'terminou os 14 dias' : 'dia ' + p.dia + ' de 14') + '</span></div>'
+        + '<button class="botao-icone" data-toque-conhecer="' + CC.esc(p.usuario) + '" aria-label="Notificar '
+        + CC.esc(p.nome) + '">' + CC.ico('sino') + '</button>'
+        + '</div>'
+        + '<button class="link-nota" data-como-acompanhar="' + CC.esc(p.usuario) + '">Como acompanhar '
+        + CC.esc(String(p.nome).split(' ')[0]) + '</button>').join('') + '</div>';
+  }
+
+  function folhaComoAcompanhar(pessoa) {
+    const A = CC.D.conhecer.acompanhar;
+    CC.folha('<h2>' + CC.esc(A.titulo) + ' ' + CC.esc(String(pessoa.nome).split(' ')[0]) + '</h2>'
+      + '<ul style="margin:0;padding-left:20px;display:grid;gap:10px">'
+      + A.itens.map((t) => '<li>' + CC.esc(t) + '</li>').join('') + '</ul>'
+      + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>',
+    {
+      rotulo: A.titulo,
+      ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; },
+    });
+  }
+
   // Sem célula, o cartão explica o que ela é e como começar; com célula, mostra cada uma.
   function blocoCelula(celulas) {
     if (celulas.length) return '<div class="lista-propositos">' + celulas.map(CC.cartaoCelula).join('') + '</div>';
@@ -540,6 +598,7 @@
           : '';
         corpo = '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
           + blocoCelula(celulas)
+          + blocoAcompanhando(d.acompanhando || [])
           + '<button class="botao contorno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
           + '<button class="entrada-propositos" data-propositos>' + CC.ico('aperto')
             + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
@@ -580,6 +639,15 @@
       ligar('[data-abrir-estudo]', (el) => CC.abrirCelula(el.dataset.abrirEstudo, 'estudo'));
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));
       ligar('[data-amigo]', (el) => folhaAmigo(amigos.find((a) => a.usuario === el.dataset.amigo)));
+      const acompanhando = d.acompanhando || [];
+      ligar('[data-toque-conhecer]', (el) => {
+        const p = acompanhando.find((x) => x.usuario === el.dataset.toqueConhecer);
+        if (p) CC.telaToque({ usuario: p.usuario, nome: p.nome });
+      });
+      ligar('[data-como-acompanhar]', (el) => {
+        const p = acompanhando.find((x) => x.usuario === el.dataset.comoAcompanhar);
+        if (p) folhaComoAcompanhar(p);
+      });
       ligar('[data-aceitar]', async (el) => {
         el.disabled = true;
         const pessoa = recebidos.find((p) => p.usuario === el.dataset.aceitar);

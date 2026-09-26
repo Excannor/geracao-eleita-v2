@@ -146,6 +146,12 @@
   .consentimento span { font-size: .88rem; font-weight: 600; line-height: 1.5; color: var(--tinta); }
   .consentimento:has(input[aria-invalid="true"]) { outline: 2px solid var(--erro); }
   .convite { padding: 12px 14px; border-radius: 16px; background: var(--azul-fraco); font-weight: 700; color: var(--forte); }
+  /* A pergunta "Você já segue Jesus?": duas opções lado a lado, uma sempre marcada (o
+     padrão é "Sim"), sem exigir resposta, como um segmentado simples. */
+  .caminho-escolha { display: flex; gap: 10px; }
+  .opcao-caminho { flex: 1; min-height: 54px; padding: 10px; border: 2px solid var(--borda); border-radius: 16px;
+    background: var(--cartao); color: var(--tinta); font-family: inherit; font-size: 0.92rem; font-weight: 700; cursor: pointer; }
+  .opcao-caminho[aria-pressed="true"] { border-color: var(--azul); background: var(--azul-fraco); color: var(--forte); }
   :focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -251,6 +257,13 @@
         <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
           <input id="nascimento" name="bday" type="date" autocomplete="bday" required>
           <span class="ajuda">Não aparece para ninguém.</span></div>
+        <div class="campo" style="margin-top:16px" id="campo-caminho">
+          <label id="rotulo-caminho">Você já segue Jesus?</label>
+          <div class="caminho-escolha" role="group" aria-labelledby="rotulo-caminho">
+            <button type="button" class="opcao-caminho" data-caminho="plano" aria-pressed="true">Sim</button>
+            <button type="button" class="opcao-caminho" data-caminho="conhecer" aria-pressed="false">Estou conhecendo</button>
+          </div>
+        </div>
       </div>
       <div data-passo="2" hidden>
         <h1>Seu e-mail</h1>
@@ -291,6 +304,15 @@
   var convite = params.get('convite');
   var celula = params.get('celula');
   var passo = 1;
+  // "Sim" é o padrão: a pergunta não obriga resposta, só existe para quem quer dizer que
+  // ainda está conhecendo Jesus.
+  var caminhoEscolhido = 'plano';
+  document.querySelectorAll('.opcao-caminho').forEach(function (b) {
+    b.addEventListener('click', function () {
+      caminhoEscolhido = b.dataset.caminho;
+      document.querySelectorAll('.opcao-caminho').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    });
+  });
 
   function mostrarTela(nome) {
     ['boas', 'entrar', 'cadastro', 'esqueci', 'redefinir'].forEach(function (n) { $('tela-' + n).hidden = n !== nome; });
@@ -384,7 +406,7 @@
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: $('nascimento').value, email: $('email').value.trim(),
         usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '', celula: celula || '',
-        consentimento: $('consentimento-cadastro').checked }),
+        consentimento: $('consentimento-cadastro').checked, caminho: caminhoEscolhido }),
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
         if (r.ok) {
@@ -486,12 +508,20 @@
   });
   if (tokenSenha) mostrarTela('redefinir');
 
-  // Com convite no link, quem chamou aparece logo na primeira tela.
+  // Com convite no link, quem chamou aparece logo na primeira tela. O convite do Conhecer
+  // Jesus já decide o caminho sozinho: não faz sentido perguntar de novo.
   if (convite) {
     fetch('api/convites/' + encodeURIComponent(convite)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
       if (!d) return;
-      $('titulo-boas').textContent = d.nome + ' te chamou para ler a Bíblia junto!';
-      $('dica-boas').textContent = 'Uma lição por dia, e a contagem de vocês sobe nos dias em que os dois leem.';
+      if (d.modo === 'conhecer') {
+        $('titulo-boas').textContent = d.nome + ' te chamou para conhecer Jesus!';
+        $('dica-boas').textContent = 'Um caminho de 14 dias, sem pressa, pra quem quer conhecer Jesus.';
+        $('campo-caminho').hidden = true;
+        caminhoEscolhido = 'conhecer';
+      } else {
+        $('titulo-boas').textContent = d.nome + ' te chamou para ler a Bíblia junto!';
+        $('dica-boas').textContent = 'Uma lição por dia, e a contagem de vocês sobe nos dias em que os dois leem.';
+      }
       $('convite-cadastro').hidden = false;
       $('convite-cadastro').textContent = 'Convite de ' + d.nome + ' (@' + d.usuario + ')';
     }).catch(function () {});

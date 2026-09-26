@@ -719,7 +719,9 @@ const servidor = createServer(async (req, res) => {
     if (rota.startsWith('/api/convites/') && req.method === 'GET') {
       const convite = CONTAS.lerConvite(rota.slice('/api/convites/'.length), assinar);
       if (!convite) { json(res, 410, { erro: 'esse convite venceu ou foi cancelado' }); return; }
-      json(res, 200, { usuario: convite.de, nome: convite.nome });
+      // O portal usa "modo" para não perguntar "você já segue Jesus?" de quem já chega
+      // pelo link do Conhecer Jesus: a resposta já está decidida pelo convite.
+      json(res, 200, { usuario: convite.de, nome: convite.nome, modo: convite.modo || '' });
       return;
     }
 

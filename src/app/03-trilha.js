@@ -171,6 +171,12 @@
 
   // ---------- a tela ----------
   CC.vistaTrilha = function (raiz) {
+    // Quem está no Conhecer Jesus vê os 14 dias aqui, no lugar do plano anual: é o caminho
+    // dela até decidir seguir Jesus (ou trocar de volta pelo link discreto no fim da lista).
+    if (CC.quem && CC.quem.caminho === 'conhecer' && CC.vistaConhecer) {
+      CC.vistaConhecer(raiz, true);
+      return;
+    }
     const atual = CC.diaAtual();
     const uAtual = unidadeDoDia(atual);
     if (abertas === null) abertas = new Set([uAtual.numero]);

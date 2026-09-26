@@ -229,6 +229,14 @@
       .map(([id]) => id);
   }
 
+  // Um cartão simples, no formato do que já existe para "A história da Bíblia em uma página":
+  // ícone, título, uma linha de apoio e a seta. Serve tanto para quem está conhecendo Jesus
+  // (aparece no lugar de "Comece por aqui") quanto para quem já segue e quer conversar com
+  // um amigo (aparece discreto, depois das seções de sempre).
+  const cartaoPerguntasHonestas = () => '<a class="cartao cartao-historia" href="#/perguntas">' + CC.ico('balao')
+    + '<span><b>Perguntas honestas</b><span class="passo-dica">Dúvidas comuns de quem está conhecendo Jesus.</span></span>'
+    + CC.ico('avancar') + '</a>';
+
   CC.vistaExplorar = function (raiz) {
     const blocos = GRUPOS.map(([titulo, pastas]) => {
       const cartoes = pastas.map((pasta) => {
@@ -249,12 +257,16 @@
 
     const comece = blocoComece();
     const terminou = !progressoComece().proximo;
+    // Quem está conhecendo Jesus ainda não lê o plano: "Comece por aqui" (que ensina a ler a
+    // Bíblia inteira) não serve pra ela agora. As perguntas honestas tomam o lugar.
+    const conhecendo = !!(CC.quem && CC.quem.caminho === 'conhecer');
+    const perguntas = cartaoPerguntasHonestas();
 
     raiz.innerHTML = '<h1>Explorar</h1>'
       + '<p class="passo-dica">Quer entender melhor o que leu? Aqui tem quem é quem, onde tudo aconteceu e o que cada livro conta.</p>'
       + CC.campoBusca('')
       // Quem ainda não fez o caminho vê ele primeiro; depois ele desce para o fim da tela.
-      + (terminou ? '' : comece)
+      + (conhecendo ? perguntas : (terminou ? '' : comece))
       + (deHoje.length
         ? '<div class="cartao notas-de-hoje"><span class="etiqueta">Pra ir além na leitura de hoje</span>'
           + '<b>' + CC.esc(CC.passagemDe(dia)) + '</b>'
@@ -265,7 +277,10 @@
         + CC.ico('livro') + '<span><b>A história da Bíblia em uma página</b>'
         + '<span class="passo-dica">Veja o todo antes das partes.</span></span>' + CC.ico('avancar') + '</a>' : '')
       + blocos
-      + (terminou ? comece : '')
+      // Para quem já segue Jesus, as perguntas honestas também servem para conversar com um
+      // amigo: entram discretas, depois das seções de sempre.
+      + (conhecendo ? '' : perguntas)
+      + (conhecendo ? '' : (terminou ? comece : ''))
       + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
     CC.ligarBusca(raiz);
     const cartaoComece = raiz.querySelector('[data-comece]');

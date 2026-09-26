@@ -25,6 +25,8 @@
           '<button data-tema="' + JSON.stringify(v) + '" aria-pressed="' + (tema === v) + '">' + rot + '</button>').join('')
         + '</div></div>')
       + grupo('Leitura', linha('Tradução e créditos', traducao ? traducao.abreviatura : '', 'data-ir="#/config/textos"'))
+      + grupo('Seu caminho', linha('Seu caminho',
+        quem.caminho === 'conhecer' ? 'Conhecer Jesus' : 'Plano da Bíblia em um ano', 'data-caminho'))
       + grupo('Notificações', linha('Lembretes e avisos', CC.resumoNotificacoes(), 'data-ir="#/config/notificacoes"'))
       + grupo('Privacidade', (quem.comSenha
         ? '<button class="linha-config" data-mural role="switch" aria-checked="' + !!(CC.novidadesEmCache() || {}).ligado + '">'
@@ -74,6 +76,7 @@
       CC.redesenhar();
     });
     ligar('[data-privacidade]', () => CC.abrirPrivacidade(quem));
+    ligar('[data-caminho]', () => folhaSeuCaminho(quem));
     ligar('[data-completar]', () => CC.completarCadastro(quem));
     ligar('[data-senha]', () => CC.trocarSenha());
     ligar('[data-apagar]', () => CC.apagarConta(quem.usuario));
@@ -98,6 +101,42 @@
       location.reload();
     });
   };
+
+  // ---------- seu caminho ----------
+  // Troca entre o plano da Bíblia em um ano e o Conhecer Jesus, os dois únicos caminhos que
+  // a conta pode seguir. Quem termina o Conhecer Jesus já vê esta troca oferecida lá mesmo;
+  // aqui é para quem muda de ideia a qualquer momento.
+  function folhaSeuCaminho(quem) {
+    const atual = quem.caminho === 'conhecer' ? 'conhecer' : 'plano';
+    CC.folha('<h2>Seu caminho</h2>'
+      + '<div class="acoes">'
+      + '<button class="botao ' + (atual === 'plano' ? 'azul' : 'contorno') + '" data-caminho-opcao="plano">Plano da Bíblia em um ano</button>'
+      + '<button class="botao ' + (atual === 'conhecer' ? 'azul' : 'contorno') + '" data-caminho-opcao="conhecer">Conhecer Jesus</button>'
+      + '<button class="botao plano" data-fechar>Cancelar</button>'
+      + '</div>',
+    {
+      rotulo: 'Seu caminho',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelectorAll('[data-caminho-opcao]').forEach((b) => {
+          b.onclick = async () => {
+            const novo = b.dataset.caminhoOpcao;
+            if (novo === atual) { fechar(); return; }
+            b.disabled = true;
+            try {
+              await CC.api('api/caminho', { caminho: novo });
+              if (CC.quem) CC.quem.caminho = novo;
+              fechar();
+              CC.redesenhar();
+            } catch (e) {
+              b.disabled = false;
+              CC.avisar(e.message);
+            }
+          };
+        });
+      },
+    });
+  }
 
   // ---------- textos bíblicos ----------
   // As licenças das traduções pedem o crédito à vista; ele aparece também no fim de cada leitura.
