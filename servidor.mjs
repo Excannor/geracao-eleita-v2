@@ -1325,6 +1325,8 @@ const servidor = createServer(async (req, res) => {
           texto: r.texto, criadoEm: r.criadoEm, venceEm: r.venceEm, meu,
           oreiHoje: jaOrouHoje(r, eu, hoje), ajudei: jaAjudou(r, eu),
         };
+        // Só o autor vê o próprio pedido depois de "Deus respondeu": ele precisa saber que já marcou.
+        if (meu) item.respondido = r.estado === 'respondido';
         if (meu) item.gestos = gestosParaAutor(r).map((g) => ({ usuario: g.usuario, nome: nomeDe(g.usuario), gesto: g.gesto, data: g.data }));
         pedidos.push(item);
       }
@@ -1354,7 +1356,8 @@ const servidor = createServer(async (req, res) => {
               const alvos = new Set([p.criadoPor]);
               for (const m of p.membros) if (m.estado === 'ativo' && m.papel === 'auxiliar') alvos.add(m.usuario);
               alvos.delete(eu);
-              for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'pedidoConduz', { amigo: nome }));
+              // "celula" vai junto para o toque na notificação abrir direto na aba Oração.
+              for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'pedidoConduz', { amigo: nome, celula: p.id }));
             }
           }
           return { id: r.id };
@@ -1366,7 +1369,7 @@ const servidor = createServer(async (req, res) => {
           // Só avisa na primeira vez: chamar de novo (idempotente) não pode reenviar o push.
           const jaTinhaAjudado = jaAjudou(r, eu);
           await CONTAS.ajudarPedido(eu, id, hoje);
-          if (!jaTinhaAjudado) semEsperar(avisoSocial(r.autor, 'possoAjudar', { amigo: await nomeDeExibicao(eu) }));
+          if (!jaTinhaAjudado) semEsperar(avisoSocial(r.autor, 'possoAjudar', { amigo: await nomeDeExibicao(eu), celula: r.celula }));
           return {};
         }
         if (qual === 'respondido') { await CONTAS.marcarRespondido(eu, id, hoje); return {}; }
@@ -1381,7 +1384,7 @@ const servidor = createServer(async (req, res) => {
             if (p) {
               const alvos = new Set([p.criadoPor]);
               for (const m of p.membros) if (m.estado === 'ativo' && m.papel === 'auxiliar') alvos.add(m.usuario);
-              for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'denunciaPerigo', {}));
+              for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'denunciaPerigo', { celula: p.id }));
             }
           }
           return {};

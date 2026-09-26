@@ -183,6 +183,7 @@
   const PERFIL = () => ({
     escritos: CC.vistaEscritos, livros: CC.vistaLivros, conquistas: CC.vistaConquistas,
     trofeus: CC.vistaTrofeus, versiculos: CC.vistaVersiculos, discipulado: CC.vistaDiscipulado,
+    historia: CC.vistaHistoria,
   });
 
   function rotear() {

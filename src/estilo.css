@@ -656,6 +656,10 @@ button { font-family: inherit; }
 .selo-status.leu { background: var(--verde-fraco); color: var(--verde-3d); }
 :root[data-tema="escuro"] .selo-status.leu { color: var(--verde); }
 .selo-status svg { width: 14px; height: 14px; }
+/* Nos pedidos de oração o selo leva nomes e data: como parágrafo, ele quebra linha em vez
+   de empurrar a tela para fora da largura do celular. */
+p.selo-status { white-space: normal; display: flex; align-items: flex-start; border-radius: 16px; }
+p.selo-status svg { flex: 0 0 auto; margin-top: 2px; }
 
 .aviso-cadeado, .folha p.aviso-cadeado { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: var(--raio); background: var(--azul-fraco); color: var(--tinta); font-size: 0.88rem; font-weight: 600; line-height: 1.5; }
 .aviso-cadeado svg { width: 20px; height: 20px; flex: 0 0 auto; color: var(--azul); margin-top: 1px; }

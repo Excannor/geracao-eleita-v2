@@ -347,8 +347,12 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   if (tipo === 'metaDoGrupo' || tipo === 'metaBatida') { url = telaDoProposito; tag = 'grupo:' + (dados.id || ''); }
   // Discipulado mora no Perfil, nunca no Feed: o toque na notificação leva direto para lá.
   if (tipo === 'discipuladoConvite' || tipo === 'discipuladoAceito') { url = './#/perfil/discipulado'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
-  // Cuidado mútuo mora na célula (aba Oração), nunca no Feed.
-  if (tipo === 'pedidoConduz' || tipo === 'possoAjudar' || tipo === 'denunciaPerigo') { url = './#/novidades'; tag = tipo; }
+  // Cuidado mútuo mora na célula (aba Oração), nunca no Feed: com o id da célula, o toque na
+  // notificação leva direto para lá; sem ele (aviso antigo, ainda na fila), cai no Juntos.
+  if (tipo === 'pedidoConduz' || tipo === 'possoAjudar' || tipo === 'denunciaPerigo') {
+    url = dados.celula ? './#/novidades/celula/' + encodeURIComponent(dados.celula) + '/oracao' : './#/novidades';
+    tag = tipo;
+  }
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = lista[semente(usuario + '|' + data + '|' + tipo) % lista.length];
   return { titulo: preencher(titulo, d), corpo: preencher(corpo, d), tag, url };

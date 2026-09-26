@@ -110,18 +110,20 @@
       + '</button>';
   };
   // ---------- a célula como tela ----------
-  // Uma célula de 20 pessoas não cabia numa folha: a célula tem tela própria, com três abas.
+  // Uma célula de 20 pessoas não cabia numa folha: a célula tem tela própria, com quatro abas.
   //   Hoje: o recado, o encontro e a meta do dia, e o que o líder muda (recado, dia, link)
   //   Estudo: o estudo do encontro inteiro, para ler antes e mandar no grupo
+  //   Oração: pedir oração ou ajuda, e reagir com um gesto, sem chat (Atos 2.42; 2.44-45)
   //   Pessoas: quem leu hoje, notificar quem falta, chamar alguém, sair ou encerrar
-  const ABAS_CELULA = [['hoje', 'Hoje'], ['estudo', 'Estudo'], ['pessoas', 'Pessoas']];
+  // Visitante (só está conhecendo) não vê a aba Oração: pedido é dado sensível, e ele ainda
+  // não é membro de verdade.
+  const ABAS_CELULA = [['hoje', 'Hoje'], ['estudo', 'Estudo'], ['oracao', 'Oração'], ['pessoas', 'Pessoas']];
   const enderecoCelula = (id, aba) => '#/novidades/celula/' + encodeURIComponent(id) + (aba && aba !== 'hoje' ? '/' + aba : '');
   CC.abrirCelula = (id, aba) => { location.hash = enderecoCelula(id, aba); };
   let desenhoCelula = 0;
 
   CC.vistaCelula = function (raiz, arg) {
     const [id, pedida] = String(arg || '').split('/');
-    const aba = ABAS_CELULA.some(([k]) => k === pedida) ? pedida : 'hoje';
     const meu = ++desenhoCelula;
     const nestaTela = () => meu === desenhoCelula && location.hash.startsWith('#/novidades/celula/');
 
@@ -134,6 +136,11 @@
         return;
       }
       const souLider = p.criadoPor === euUsuario();
+      const euMembro = p.membros.find((m) => m.usuario === euUsuario()) || {};
+      const visitante = euMembro.papel === 'visitante';
+      // Visitante não vê a aba Oração: se chegou nela por um link antigo, cai em Hoje.
+      const abasVisiveis = ABAS_CELULA.filter(([k]) => k !== 'oracao' || !visitante);
+      const aba = abasVisiveis.some(([k]) => k === pedida) ? pedida : 'hoje';
       raiz.innerHTML = CC.botaoVoltar('Juntos')
         + '<div class="cabeca-celula"><div><span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula</span>'
         + '<h1>' + CC.esc(p.titulo) + '</h1>'
@@ -141,7 +148,7 @@
         + (p.encontro >= 0 ? ' · encontro ' + nomeDoEncontro(p.encontro) : '') + '</p></div>'
         + contagem(p) + '</div>'
         + '<div class="segmentado abas-celula" role="tablist" aria-label="Partes da célula">'
-        + ABAS_CELULA.map(([k, r]) => '<button type="button" role="tab" data-aba="' + k + '" aria-selected="' + (k === aba) + '" aria-pressed="' + (k === aba) + '">'
+        + abasVisiveis.map(([k, r]) => '<button type="button" role="tab" data-aba="' + k + '" aria-selected="' + (k === aba) + '" aria-pressed="' + (k === aba) + '">'
           + r + (k === 'estudo' && p.estudo ? '<i class="ponto-estudo" aria-hidden="true"></i>' : '') + '</button>').join('')
         + '</div>'
         + '<div class="painel-celula" role="tabpanel">'
@@ -154,6 +161,7 @@
       if (aba === 'hoje') ligarHoje(painel, p);
       if (aba === 'pessoas') ligarPessoas(painel, p, souLider);
       if (aba === 'estudo') preencherEstudo(painel, p, () => meu === desenhoCelula);
+      if (aba === 'oracao') preencherOracao(painel, p, () => meu === desenhoCelula);
     };
 
     desenhar(cache);
@@ -1267,4 +1275,261 @@
       },
     });
   };
+
+  // ---------- oração e ajuda: aba "Oração" da célula (Atos 2.42; 2.44-45) ----------
+  // Sem chat: o pedido é só do autor, os outros só reagem com um gesto sem texto. Nada disto
+  // vai para o Feed, nada vale XP. As regras (quem vê, limites, denúncia) já moram no servidor
+  // (cuidado.mjs / contas.mjs); aqui só desenha e liga os botões.
+  let cuidadoCache = {}; // por id de célula
+  const MOTIVO_PERIGO = 'Alguém pode estar em perigo';
+  // Texto fixo da seção 5 da spec: mostrado inteiro assim que alguém denuncia por perigo.
+  const AJUDA_PERIGO_DENUNCIA = 'Se você ou alguém está em perigo, se machucando ou pensando em se machucar, '
+    + 'não espere: fale agora com um adulto de confiança ou ligue 188 (CVV), a qualquer hora. Em emergência, 192 ou 190.';
+  // Para quem conduz, junto da denúncia de perigo (seção 5).
+  const AJUDA_PERIGO_CONDUZ = 'Procure a pessoa hoje e avise o pastor ou um responsável da igreja. '
+    + 'Em emergência, 192 ou 190. Não tente resolver sozinho.';
+
+  const carregarCuidado = (celulaId) => CC.api('api/cuidado?celula=' + encodeURIComponent(celulaId))
+    .then((d) => { cuidadoCache[celulaId] = d; return d; }).catch(() => null);
+
+  function cartaoPedido(item) {
+    const necessidade = item.tipo === 'necessidade';
+    const quem = item.meu ? 'Você' : CC.esc(item.autor.nome);
+    const rotulo = necessidade ? 'Pedido de ajuda' : (item.destino === 'conduz' ? 'Pedido de oração · só quem conduz' : 'Pedido de oração');
+    let html = '<div class="cartao-proposito" style="cursor:default">'
+      + '<div class="quem-amigo"><b>' + quem + '</b><span class="arroba">' + rotulo + '</span></div>'
+      + '<p>' + CC.esc(item.texto) + '</p>'
+      + '<p class="passo-dica pequena">Vence em ' + ddmm(item.venceEm) + '</p>';
+
+    if (item.meu) {
+      // Num pedido de ajuda (carona, mudança) "Deus respondeu" soa estranho: ali é "Já resolvi".
+      const fimDoPedido = necessidade ? 'Já resolvi' : 'Deus respondeu';
+      const gestos = item.gestos || [];
+      const orou = gestos.filter((g) => g.gesto === 'orei');
+      const ajudou = gestos.filter((g) => g.gesto === 'ajudo');
+      if (orou.length) {
+        const nomes = orou.map((g) => '<b>' + CC.esc(g.nome) + '</b>');
+        const juntos = nomes.length === 1 ? nomes[0] : nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1];
+        const ultima = orou.reduce((a, b) => (a.data > b.data ? a : b)).data;
+        html += '<p class="selo-status leu">' + CC.ico('certo') + '<span>' + juntos + (orou.length === 1 ? ' orou' : ' oraram')
+          + ' por você · última vez em ' + ddmm(ultima) + '</span></p>';
+      }
+      if (necessidade && ajudou.length) {
+        const nomes = ajudou.map((g) => '<b>' + CC.esc(g.nome) + '</b>').join(', ');
+        html += '<p class="selo-status leu">' + CC.ico('certo') + '<span>' + nomes + (ajudou.length === 1 ? ' pode ajudar' : ' podem ajudar') + '</span></p>';
+      }
+      html += '<div class="pe-duplo-plano">'
+        + (item.respondido ? '<span class="selo-status leu">' + CC.ico('certo') + fimDoPedido + '</span>'
+          : '<button class="botao contorno pequeno" data-respondido="' + CC.esc(item.id) + '" data-fim="' + fimDoPedido + '">' + fimDoPedido + '</button>')
+        + '<button class="botao plano perigo pequeno" data-apagar-pedido="' + CC.esc(item.id) + '">Apagar</button></div>';
+    } else {
+      html += '<div class="pe-duplo-plano">'
+        + (item.oreiHoje ? '<span class="selo-status leu">' + CC.ico('certo') + 'Você orou hoje</span>'
+          : '<button class="botao azul pequeno" data-orei="' + CC.esc(item.id) + '">Orei por você</button>')
+        + (necessidade ? (item.ajudei ? '<span class="selo-status leu">' + CC.ico('certo') + 'Você disse que pode ajudar</span>'
+          : '<button class="botao contorno pequeno" data-ajudo="' + CC.esc(item.id) + '">Posso ajudar</button>') : '')
+        + '</div>'
+        // Menu discreto, como o de denunciar um amigo (08-amigos.js): não fica ao lado dos
+        // gestos, para não parecer a mesma categoria de resposta.
+        + '<button class="botao plano pequeno" data-denunciar-pedido="' + CC.esc(item.id) + '">' + CC.ico('bandeira') + 'Denunciar</button>';
+    }
+    return html + '</div>';
+  }
+
+  // Quem conduz vê, no topo da aba, os pedidos com denúncia, à espera de uma decisão.
+  function blocoRevisaoPedidos(denuncias) {
+    return CC.tituloSecao('Pedidos para rever', String(denuncias.length))
+      + '<div class="lista-pedidos">' + denuncias.map((x) => '<div class="cartao-proposito" style="cursor:default">'
+        + '<div class="quem-amigo"><b>' + CC.esc(x.autor) + '</b></div>'
+        + '<p>' + CC.esc(x.texto) + '</p>'
+        + '<p class="passo-dica pequena">' + CC.plural(x.total, 'denúncia', 'denúncias') + ' · ' + x.motivos.map((m) => CC.esc(m)).join(', ') + '</p>'
+        + (x.motivos.includes(MOTIVO_PERIGO) ? '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>' + AJUDA_PERIGO_CONDUZ + '</p></div>' : '')
+        + '<div class="pe-duplo-plano"><button class="botao contorno pequeno" data-manter-pedido="' + CC.esc(x.pedido) + '">Manter</button>'
+        + '<button class="botao plano perigo pequeno" data-tirar-pedido="' + CC.esc(x.pedido) + '">Tirar</button></div>'
+        + '</div>').join('') + '</div>';
+  }
+
+  function desenharOracao(painel, p, d) {
+    if (!d) { painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('aperto') + '<p>Não consegui falar com o servidor agora.</p></div>'; return; }
+    const conduzo = p.euConduzo;
+    painel.innerHTML = (conduzo && d.denuncias && d.denuncias.length ? blocoRevisaoPedidos(d.denuncias) : '')
+      + '<div class="acoes"><button class="botao azul" data-pedir="oracao">' + CC.ico('aperto') + 'Pedir oração</button>'
+      + '<button class="botao contorno" data-pedir="necessidade">Pedir ajuda</button></div>'
+      + (d.pedidos.length
+        ? '<div class="lista-pedidos">' + d.pedidos.map(cartaoPedido).join('') + '</div>'
+        : '<div class="vazio-amigos">' + CC.ico('aperto') + '<p>Nenhum pedido agora. Quando alguém pedir oração, aparece aqui.</p></div>');
+    ligarOracao(painel, p);
+  }
+
+  async function recarregarOracao(p) {
+    const d = await carregarCuidado(p.id);
+    if (location.hash !== enderecoCelula(p.id, 'oracao')) return;
+    const painel = document.querySelector('.painel-celula');
+    if (painel) desenharOracao(painel, p, d);
+  }
+
+  function ligarOracao(painel, p) {
+    painel.querySelectorAll('[data-pedir]').forEach((b) => { b.onclick = () => folhaPedido(p, b.dataset.pedir); });
+    painel.querySelectorAll('[data-orei]').forEach((b) => {
+      b.onclick = async () => {
+        b.disabled = true;
+        try { await CC.api('api/cuidado', { acao: 'orei', id: b.dataset.orei }); } catch (e) { CC.avisar(e.message); }
+        recarregarOracao(p);
+      };
+    });
+    painel.querySelectorAll('[data-ajudo]').forEach((b) => {
+      b.onclick = async () => {
+        b.disabled = true;
+        try { await CC.api('api/cuidado', { acao: 'ajudo', id: b.dataset.ajudo }); CC.avisar('Combinem pessoalmente ou no WhatsApp.'); } catch (e) { CC.avisar(e.message); }
+        recarregarOracao(p);
+      };
+    });
+    painel.querySelectorAll('[data-respondido]').forEach((b) => {
+      b.onclick = async () => {
+        if (!await CC.confirmar({ titulo: 'Marcar "' + b.dataset.fim + '"?', texto: 'O pedido some da lista dos outros, e some da sua em 7 dias.', acao: 'Marcar' })) return;
+        try {
+          await CC.api('api/cuidado', { acao: 'respondido', id: b.dataset.respondido });
+          CC.avisar(b.dataset.fim === 'Já resolvi' ? 'Que bom!' : 'Que alegria!');
+        } catch (e) { CC.avisar(e.message); }
+        recarregarOracao(p);
+      };
+    });
+    painel.querySelectorAll('[data-apagar-pedido]').forEach((b) => {
+      b.onclick = async () => {
+        if (!await CC.confirmar({ titulo: 'Apagar este pedido?', texto: 'Ninguém mais vê o pedido, quem orou ou quem se ofereceu para ajudar.', acao: 'Apagar', perigo: true })) return;
+        try { await CC.api('api/cuidado', { acao: 'apagar', id: b.dataset.apagarPedido }); CC.avisar('Pedido apagado'); } catch (e) { CC.avisar(e.message); }
+        recarregarOracao(p);
+      };
+    });
+    painel.querySelectorAll('[data-denunciar-pedido]').forEach((b) => {
+      b.onclick = () => {
+        const d = cuidadoCache[p.id];
+        const item = d && d.pedidos.find((x) => x.id === b.dataset.denunciarPedido);
+        if (item) folhaDenunciaPedido(p, item);
+      };
+    });
+    painel.querySelectorAll('[data-manter-pedido]').forEach((b) => {
+      b.onclick = async () => {
+        try { await CC.api('api/cuidado', { acao: 'decidir', id: b.dataset.manterPedido, manter: true }); CC.avisar('Pedido mantido'); } catch (e) { CC.avisar(e.message); }
+        recarregarOracao(p);
+      };
+    });
+    painel.querySelectorAll('[data-tirar-pedido]').forEach((b) => {
+      b.onclick = async () => {
+        if (!await CC.confirmar({ titulo: 'Tirar este pedido?', texto: 'O pedido some para todo mundo.', acao: 'Tirar', perigo: true })) return;
+        try { await CC.api('api/cuidado', { acao: 'decidir', id: b.dataset.tirarPedido, manter: false }); CC.avisar('Pedido tirado'); } catch (e) { CC.avisar(e.message); }
+        recarregarOracao(p);
+      };
+    });
+  }
+
+  async function preencherOracao(painel, p, aindaAqui) {
+    const d = await carregarCuidado(p.id);
+    if (!aindaAqui()) return;
+    desenharOracao(painel, p, d);
+  }
+
+  const TEXTO_MAX_PEDIDO = { oracao: 280, necessidade: 200 };
+
+  function folhaPedido(p, tipo) {
+    const max = TEXTO_MAX_PEDIDO[tipo] || TEXTO_MAX_PEDIDO.oracao;
+    const oracao = tipo === 'oracao';
+    const titulo = oracao ? 'Pedir oração' : 'Pedir ajuda';
+    let destino = 'celula';
+    let dias = 7;
+    CC.folha('<h2>' + titulo + '</h2>'
+      + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Em perigo ou pensando em se machucar? Ligue <b>188 (CVV)</b> ou fale com um adulto de confiança agora.</p></div>'
+      + '<label class="campo-senha"><span>' + (oracao ? 'Seu pedido de oração' : 'O que você precisa') + '</span>'
+      + '<textarea data-texto maxlength="' + max + '" rows="4" autocomplete="off" autocapitalize="sentences"></textarea></label>'
+      + '<p class="passo-dica pequena" data-conta></p>'
+      + (oracao
+        ? '<span class="dica-campo">Para quem?</span>'
+          + '<div class="segmentado" role="group" aria-label="Para quem é o pedido">'
+          + '<button type="button" data-destino="celula" aria-pressed="true">Toda a célula</button>'
+          + '<button type="button" data-destino="conduz" aria-pressed="false">Só quem conduz</button></div>'
+        : '')
+      + '<span class="dica-campo">Por quanto tempo?</span>'
+      + '<div class="segmentado" role="group" aria-label="Por quanto tempo o pedido fica de pé">'
+      + '<button type="button" data-dias="7" aria-pressed="true">7 dias</button>'
+      + '<button type="button" data-dias="30" aria-pressed="false">30 dias</button></div>'
+      + '<p class="erro-proposito" role="alert" hidden></p>'
+      + '<div class="acoes"><button class="botao azul" data-enviar>Pedir</button>'
+      + '<button class="botao plano" data-fechar>Cancelar</button></div>',
+    {
+      rotulo: titulo,
+      rolavel: true,
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        const campo = folha.querySelector('[data-texto]');
+        const conta = () => { folha.querySelector('[data-conta]').textContent = campo.value.length + ' de ' + max + ' caracteres'; };
+        campo.oninput = conta;
+        conta();
+        folha.querySelectorAll('[data-destino]').forEach((b) => {
+          b.onclick = () => {
+            destino = b.dataset.destino;
+            folha.querySelectorAll('[data-destino]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          };
+        });
+        folha.querySelectorAll('[data-dias]').forEach((b) => {
+          b.onclick = () => {
+            dias = Number(b.dataset.dias);
+            folha.querySelectorAll('[data-dias]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          };
+        });
+        const enviar = folha.querySelector('[data-enviar]');
+        enviar.onclick = async () => {
+          const erro = folha.querySelector('.erro-proposito');
+          enviar.disabled = true;
+          erro.hidden = true;
+          try {
+            await CC.api('api/cuidado', { acao: 'criar', celula: p.id, tipo, destino, texto: campo.value, dias });
+            fechar();
+            CC.avisar(oracao ? 'Pedido de oração enviado' : 'Pedido de ajuda enviado');
+            recarregarOracao(p);
+          } catch (e) {
+            erro.textContent = e.message;
+            erro.hidden = false;
+            enviar.disabled = false;
+          }
+        };
+      },
+    });
+  }
+
+  function folhaDenunciaPedido(p, item) {
+    const motivos = (cuidadoCache[p.id] && cuidadoCache[p.id].motivos) || [];
+    CC.folha('<h2>Denunciar pedido</h2>'
+      + '<p>Escolha o motivo. A pessoa que pediu não fica sabendo quem denunciou.</p>'
+      + '<div class="opcoes-traducao">' + motivos.map((m) => '<button class="opcao-traducao" data-motivo="' + CC.esc(m) + '"><b>'
+        + CC.esc(m) + '</b></button>').join('') + '</div>'
+      + '<div class="acoes"><button class="botao plano" data-fechar>Cancelar</button></div>',
+    {
+      rotulo: 'Denunciar pedido',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelectorAll('[data-motivo]').forEach((b) => {
+          b.onclick = async () => {
+            const motivo = b.dataset.motivo;
+            try {
+              await CC.api('api/cuidado', { acao: 'denunciar', id: item.id, motivo });
+              if (motivo === MOTIVO_PERIGO) {
+                // A caixa de ajuda completa da seção 5, mostrada na hora para quem denunciou.
+                folha.innerHTML = '<h2>Obrigado por avisar</h2>'
+                  + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>' + AJUDA_PERIGO_DENUNCIA + '</p></div>'
+                  + '<div class="acoes"><button class="botao azul" data-entendi>Entendi</button></div>';
+                folha.querySelector('[data-entendi]').onclick = fechar;
+              } else {
+                fechar();
+                CC.avisar('Denúncia enviada. Obrigado por avisar.');
+              }
+            } catch (e) {
+              fechar();
+              CC.avisar(e.message);
+            }
+            recarregarOracao(p);
+          };
+        });
+      },
+    });
+  }
 })(window.CC);
