@@ -13,6 +13,7 @@ import { randomBytes, scrypt as scryptCb, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import { abrirModulo, concluirImportacao, lerTabela, sincronizar, transacao, gravarMeta, lerMeta } from './db.mjs';
 import { LIMITE_GRUPO, limiteDo, alvoValido, rotuloDoProposito } from './propositos.mjs';
+import { LIMITE_DISCIPULOS, MARCOS, MOSTRAR_PADRAO, mostrarValido, dataEncontroValida, papelValido } from './discipulado.mjs';
 
 const scrypt = promisify(scryptCb);
 const CUSTO = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
@@ -129,7 +130,7 @@ function erro(mensagem, codigo = 400) {
 const par = (a, b) => [a, b].sort().join('|');
 const vazio = () => ({
   versao: 2, contas: {}, amizades: {}, bloqueios: {}, silenciados: {},
-  convitesUsados: {}, toques: {}, denuncias: [], convitesAceites: [], propositos: {},
+  convitesUsados: {}, toques: {}, denuncias: [], convitesAceites: [], propositos: {}, discipulados: {},
 });
 
 // ---------- linhas do banco ----------
@@ -183,6 +184,13 @@ function paraLinhas(d) {
     }))) },
     { tabela: 'celula_presencas', chaves: ['proposito', 'data', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || [])
       .flatMap((e) => (e.presentes || []).map((usuario) => ({ proposito: p.id, data: e.data, usuario })))) },
+    { tabela: 'discipulados', chaves: ['id'], linhas: Object.values(d.discipulados || {}).map((x) => ({
+      id: x.id, discipulador: x.discipulador, discipulo: x.discipulo, estado: x.estado, pediu: x.pediu,
+      criado_em: x.criadoEm, aceito_em: x.aceitoEm || '', encerrado_em: x.encerradoEm || '',
+      mostrar: JSON.stringify(x.mostrar || {}),
+    })) },
+    { tabela: 'discipulado_encontros', chaves: ['discipulado', 'data'], linhas: Object.values(d.discipulados || {})
+      .flatMap((x) => (x.encontros || []).map((data) => ({ discipulado: x.id, data }))) },
   ];
 }
 
@@ -201,6 +209,8 @@ function lerTabelas(db) {
     diasBatidos: lerTabela(db, 'proposito_dias', ['proposito', 'data'], 'data'),
     encontros: lerTabela(db, 'celula_encontros', ['proposito', 'data'], 'data'),
     presencas: lerTabela(db, 'celula_presencas', ['proposito', 'data', 'usuario']),
+    discipulados: lerTabela(db, 'discipulados', ['id'], 'criado_em'),
+    discipuladoEncontros: lerTabela(db, 'discipulado_encontros', ['discipulado', 'data'], 'data'),
   };
 }
 
@@ -252,6 +262,17 @@ function deLinhas(t, versao) {
     const p = d.propositos[l.proposito];
     const encontro = p && p.encontros.find((e) => e.data === l.data);
     if (encontro) encontro.presentes.push(l.usuario);
+  }
+  for (const l of t.discipulados || []) {
+    d.discipulados[l.id] = {
+      id: l.id, discipulador: l.discipulador, discipulo: l.discipulo, estado: l.estado, pediu: l.pediu,
+      criadoEm: l.criado_em, aceitoEm: l.aceito_em || '', encerradoEm: l.encerrado_em || '',
+      mostrar: JSON.parse(l.mostrar || '{}'), encontros: [],
+    };
+  }
+  for (const l of t.discipuladoEncontros || []) {
+    const x = d.discipulados[l.discipulado];
+    if (x) x.encontros.push(l.data);
   }
   return d;
 }
@@ -496,6 +517,11 @@ export class Contas {
     // registrou, quantas pessoas vieram) continua de pé
     for (const p of Object.values(this.dados.propositos || {})) {
       for (const e of p.encontros || []) e.presentes = e.presentes.filter((u) => u !== chave);
+    }
+    // discipulado é relação de duas pontas só: some com a pessoa, dos dois lados, com os encontros
+    for (const id of Object.keys(this.dados.discipulados || {})) {
+      const x = this.dados.discipulados[id];
+      if (x.discipulador === chave || x.discipulo === chave) delete this.dados.discipulados[id];
     }
     await this.salvar();
     return chave;
@@ -1152,6 +1178,125 @@ export class Contas {
       .filter(([k, d]) => k.endsWith('>' + eu) && (d === hoje || d === amanha))
       .map(([k]) => k.split('>')[0])
       .filter((de) => this.achar(de) && this.relacao(eu, de) === 'amigos' && !this.silenciou(eu, de));
+  }
+
+  // ---------- discipulado ----------
+  // Mateus 28.19-20 e 2 Timóteo 2.2: uma relação de duas pontas só, sem placar. O discipulador
+  // acompanha; o discípulo decide o que mostrar. As regras puras (limites, o que passa para o
+  // discipulador, datas) moram em discipulado.mjs; aqui só o estado é guardado.
+  discipulado(id) { return (this.dados.discipulados || {})[String(id || '')] || null; }
+  discipuladosDe(usuario) {
+    return Object.values(this.dados.discipulados || {}).filter((x) => x.discipulador === usuario || x.discipulo === usuario);
+  }
+  // No máximo 1 discipulador ativo por pessoa.
+  meuDiscipuladorAtivo(usuario) {
+    return Object.values(this.dados.discipulados || {}).find((x) => x.discipulo === usuario && x.estado === 'ativo') || null;
+  }
+  discipulosAtivosDe(usuario) {
+    return Object.values(this.dados.discipulados || {}).filter((x) => x.discipulador === usuario && x.estado === 'ativo');
+  }
+
+  // Qualquer um dos dois convida, dizendo o papel que vai ter. Só entre amigos, e só um
+  // convite (ou discipulado) de cada vez entre os dois, em qualquer sentido.
+  async convidarDiscipulado(eu, outro, papel, hoje) {
+    const a = this.exigirCompleto(eu);
+    const b = this.achar(outro);
+    if (!b || b.usuario === a.usuario || !this.perfilCompleto(b)) throw erro('não achei ninguém com esse @', 404);
+    if (this.relacao(a.usuario, b.usuario) !== 'amigos') throw erro('só dá para convidar quem já é seu amigo', 403);
+    if (!papelValido(papel)) throw erro('escolha quem acompanha quem');
+    const discipulador = papel === 'discipulador' ? a.usuario : b.usuario;
+    const discipulo = papel === 'discipulador' ? b.usuario : a.usuario;
+    const existente = this.discipuladosDe(a.usuario).find((x) => x.estado !== 'encerrado'
+      && (x.discipulador === b.usuario || x.discipulo === b.usuario));
+    if (existente) throw erro('já existe um convite ou discipulado entre vocês');
+    if (this.meuDiscipuladorAtivo(discipulo)) throw erro('essa pessoa já tem alguém acompanhando', 409);
+    if (this.discipulosAtivosDe(discipulador).length >= LIMITE_DISCIPULOS) throw erro('você já acompanha ' + LIMITE_DISCIPULOS + ' pessoas', 409);
+    const id = 'd' + randomBytes(6).toString('hex');
+    this.dados.discipulados[id] = {
+      id, discipulador, discipulo, estado: 'convidado', pediu: a.usuario,
+      criadoEm: hoje, aceitoEm: '', encerradoEm: '', mostrar: { ...MOSTRAR_PADRAO }, encontros: [],
+    };
+    await this.salvar();
+    return this.dados.discipulados[id];
+  }
+
+  // Só quem recebeu o convite aceita (nunca quem pediu), escolhendo o que vai mostrar.
+  async aceitarDiscipulado(eu, id, mostrar, hoje) {
+    const a = this.exigirCompleto(eu);
+    const x = this.discipulado(id);
+    if (!x || x.estado !== 'convidado' || x.pediu === a.usuario || (x.discipulador !== a.usuario && x.discipulo !== a.usuario)) {
+      throw erro('esse convite não existe mais', 404);
+    }
+    // Confere os limites de novo: a agenda de um dos dois pode ter enchido enquanto o convite esperava.
+    if (this.meuDiscipuladorAtivo(x.discipulo)) throw erro('essa pessoa já tem alguém acompanhando', 409);
+    if (this.discipulosAtivosDe(x.discipulador).length >= LIMITE_DISCIPULOS) throw erro('esse discipulador já acompanha ' + LIMITE_DISCIPULOS + ' pessoas', 409);
+    x.estado = 'ativo';
+    x.aceitoEm = hoje;
+    x.mostrar = mostrarValido(mostrar);
+    // Marco automático: quem passa a ter o primeiro discípulo ativo ganha "discipula" sozinho,
+    // sem sobrescrever se a pessoa já tinha apagado o marco antes.
+    const discipuladorConta = this.achar(x.discipulador);
+    if (discipuladorConta && !((discipuladorConta.marcos || {}).discipula) && this.discipulosAtivosDe(x.discipulador).length === 1) {
+      discipuladorConta.marcos = { ...(discipuladorConta.marcos || {}), discipula: hoje };
+    }
+    await this.salvar();
+    return x;
+  }
+
+  async recusarDiscipulado(eu, id) {
+    const a = this.exigirCompleto(eu);
+    const x = this.discipulado(id);
+    if (!x || x.estado !== 'convidado' || x.pediu === a.usuario || (x.discipulador !== a.usuario && x.discipulo !== a.usuario)) return;
+    delete this.dados.discipulados[id];
+    await this.salvar();
+  }
+
+  // O discípulo muda o que mostra quando quiser; só ele, e só enquanto o discipulado está ativo.
+  async definirMostrarDiscipulado(eu, id, mostrar) {
+    const a = this.exigirCompleto(eu);
+    const x = this.discipulado(id);
+    if (!x || x.estado !== 'ativo' || x.discipulo !== a.usuario) throw erro('discipulado não encontrado', 404);
+    x.mostrar = mostrarValido(mostrar);
+    await this.salvar();
+    return x;
+  }
+
+  // Qualquer um dos dois marca "nos encontramos": hoje ou até 7 dias atrás, só a data.
+  async registrarEncontroDiscipulado(eu, id, data, hoje) {
+    const a = this.exigirCompleto(eu);
+    const x = this.discipulado(id);
+    if (!x || x.estado !== 'ativo' || (x.discipulador !== a.usuario && x.discipulo !== a.usuario)) throw erro('discipulado não encontrado', 404);
+    if (!dataEncontroValida(data, hoje)) throw erro('escolha o dia do encontro, de hoje até 7 dias atrás');
+    const d = String(data);
+    if (!x.encontros.includes(d)) { x.encontros.push(d); x.encontros.sort(); }
+    await this.salvar();
+    return x;
+  }
+
+  // Qualquer um dos dois encerra, sem aviso ao outro além de a relação sumir da tela.
+  async encerrarDiscipulado(eu, id, hoje) {
+    const a = this.exigirCompleto(eu);
+    const x = this.discipulado(id);
+    if (!x || x.estado === 'encerrado' || (x.discipulador !== a.usuario && x.discipulo !== a.usuario)) throw erro('discipulado não encontrado', 404);
+    x.estado = 'encerrado';
+    x.encerradoEm = hoje;
+    await this.salvar();
+    return x;
+  }
+
+  // ---------- minha caminhada (marcos pessoais) ----------
+  // Vivem soltos no extra da conta (campo "marcos"), sem coluna própria: é só uma data opcional
+  // por marco, e o discipulador só os vê se a pessoa ligar "mostrar marcos".
+  async definirMarco(eu, chave, data) {
+    const a = this.exigirCompleto(eu);
+    if (!MARCOS.includes(chave)) throw erro('marco desconhecido');
+    const d = String(data || '');
+    if (d && !/^\d{4}-\d{2}-\d{2}$/.test(d)) throw erro('data inválida');
+    const marcos = { ...(a.marcos || {}) };
+    if (d) marcos[chave] = d; else delete marcos[chave];
+    a.marcos = marcos;
+    await this.salvar();
+    return marcos;
   }
 
   // ---------- denúncias ----------

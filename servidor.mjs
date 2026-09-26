@@ -16,6 +16,7 @@ import {
 import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs';
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
 import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, quemPrecisaDeAtencao, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
+import { diasLidosNaSemana, resumoParaDiscipulador } from './discipulado.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
@@ -1015,7 +1016,8 @@ const servidor = createServer(async (req, res) => {
     // ---------- amigos ----------
     if (rota.startsWith('/api/') && ['/api/amigos', '/api/procurar', '/api/amizade', '/api/convites',
       '/api/convites/aceitar', '/api/convites/cancelar', '/api/toques', '/api/denuncias',
-      '/api/novidades', '/api/novidades/reagir', '/api/novidades/preferencia', '/api/propositos'].includes(rota)) {
+      '/api/novidades', '/api/novidades/reagir', '/api/novidades/preferencia', '/api/propositos',
+      '/api/discipulado'].includes(rota)) {
       if (!conta) { json(res, 403, { erro: 'entre com uma conta' }); return; }
     }
 
@@ -1217,6 +1219,79 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'estudo') { await CONTAS.definirEstudo(eu, id, { tipo: estudo, ref, texto, acolhida, adoracao, testemunho }, TODOS_LIVROS); return {}; }
         if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes }, hoje); return {}; }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
+        throw Object.assign(new Error('ação desconhecida'), { publico: true });
+      });
+      return;
+    }
+
+    // ---------- discipulado ----------
+    // O último encontro de uma relação: a data mais recente, ou vazio se ainda não houve.
+    const ultimoEncontroDiscipulado = (x) => (x.encontros.length ? x.encontros[x.encontros.length - 1] : '');
+
+    if (rota === '/api/discipulado' && req.method === 'GET') {
+      let meuDiscipulador = null;
+      const meuAtivo = CONTAS.meuDiscipuladorAtivo(eu);
+      if (meuAtivo) {
+        const outro = CONTAS.achar(meuAtivo.discipulador);
+        if (outro) {
+          meuDiscipulador = {
+            usuario: outro.usuario, nome: outro.nome, desde: meuAtivo.aceitoEm,
+            mostrar: meuAtivo.mostrar, ultimoEncontro: ultimoEncontroDiscipulado(meuAtivo),
+          };
+        }
+      }
+
+      // O que cada discípulo mostra: nunca o que a pessoa escreveu, só números e datas.
+      const meusDiscipulos = [];
+      for (const x of CONTAS.discipulosAtivosDe(eu)) {
+        const outro = CONTAS.achar(x.discipulo);
+        if (!outro) continue;
+        const estado = await lerEstado(arquivoDe(x.discipulo));
+        const referencia = hojeNoFuso(outro.fuso);
+        // São 12 Primeiros passos: o teto evita número estranho se a lista trouxer repetição.
+        const passos = Math.min(12, new Set((estado && estado.licoes) || []).size);
+        const semana = diasLidosNaSemana(datasFeitas(estado), referencia);
+        const acompanha = CONTAS.discipulosAtivosDe(x.discipulo).length;
+        meusDiscipulos.push({
+          usuario: outro.usuario, nome: outro.nome, desde: x.aceitoEm, ultimoEncontro: ultimoEncontroDiscipulado(x),
+          ...resumoParaDiscipulador({ mostrar: x.mostrar, passos, semana, marcos: outro.marcos, acompanha }),
+        });
+      }
+      meusDiscipulos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+
+      // Convites recebidos: "de" é quem pediu, e o papel é o que "de" escolheu para si mesmo
+      // ("quero te acompanhar" = de vira discipulador; "quero que você me acompanhe" = discípulo).
+      const pedidos = [];
+      for (const x of CONTAS.discipuladosDe(eu)) {
+        if (x.estado !== 'convidado' || x.pediu === eu) continue;
+        const de = CONTAS.achar(x.pediu);
+        if (!de) continue;
+        pedidos.push({ id: x.id, de: { usuario: de.usuario, nome: de.nome }, papel: x.pediu === x.discipulador ? 'discipulador' : 'discipulo' });
+      }
+
+      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {} });
+      return;
+    }
+
+    if (rota === '/api/discipulado') {
+      await acao(async ({ acao: qual, id, usuario, papel, mostrar, data, chave }) => {
+        const hoje = hojeDe(eu);
+        if (qual === 'convidar') {
+          const outro = limparNome(usuario);
+          const x = await CONTAS.convidarDiscipulado(eu, outro, papel, hoje);
+          semEsperar(avisoSocial(outro, 'discipuladoConvite', { amigo: await nomeDeExibicao(eu), amigoUsuario: eu }));
+          return { id: x.id };
+        }
+        if (qual === 'aceitar') {
+          const x = await CONTAS.aceitarDiscipulado(eu, id, mostrar, hoje);
+          semEsperar(avisoSocial(x.pediu, 'discipuladoAceito', { amigo: await nomeDeExibicao(eu), amigoUsuario: eu }));
+          return {};
+        }
+        if (qual === 'recusar') { await CONTAS.recusarDiscipulado(eu, id); return {}; }
+        if (qual === 'mostrar') { await CONTAS.definirMostrarDiscipulado(eu, id, mostrar); return {}; }
+        if (qual === 'encontro') { await CONTAS.registrarEncontroDiscipulado(eu, id, data, hoje); return {}; }
+        if (qual === 'encerrar') { await CONTAS.encerrarDiscipulado(eu, id, hoje); return {}; }
+        if (qual === 'marco') { const marcos = await CONTAS.definirMarco(eu, chave, data); return { marcos }; }
         throw Object.assign(new Error('ação desconhecida'), { publico: true });
       });
       return;

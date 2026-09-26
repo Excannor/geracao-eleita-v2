@@ -295,6 +295,9 @@ const T = {
     ['O grupo bateu a meta de hoje 🎉', '{titulo}: vocês chegaram lá juntos.'],
     ['Meta do grupo batida 🙌', 'Deu certo em {titulo}. Obrigado por estar junto!'],
   ],
+  // Discipulado (Mateus 28.19-20; 2 Tm 2.2): assunto sério, sem emoji, como querConversar.
+  discipuladoConvite: [['{amigo} quer caminhar com você na fé.', 'Abra o app para ver o convite.']],
+  discipuladoAceito: [['{amigo} aceitou caminhar com você na fé.', 'Combinem juntos o primeiro encontro da semana.']],
 };
 export const TEXTOS = T;
 
@@ -338,6 +341,8 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   if (tipo === 'propositoConvite' || tipo === 'propositoAceito') { url = telaDoProposito; tag = 'proposito:' + (dados.id || ''); }
   // A meta batida usa a mesma tag do "falta pouco": no celular, a boa notícia substitui o recado.
   if (tipo === 'metaDoGrupo' || tipo === 'metaBatida') { url = telaDoProposito; tag = 'grupo:' + (dados.id || ''); }
+  // Discipulado mora no Perfil, nunca no Feed: o toque na notificação leva direto para lá.
+  if (tipo === 'discipuladoConvite' || tipo === 'discipuladoAceito') { url = './#/perfil/discipulado'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = lista[semente(usuario + '|' + data + '|' + tipo) % lista.length];
   return { titulo: preencher(titulo, d), corpo: preencher(corpo, d), tag, url };

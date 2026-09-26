@@ -128,6 +128,21 @@ const ESQUEMA = [
   CREATE TABLE celula_presencas (proposito TEXT NOT NULL, data TEXT NOT NULL, usuario TEXT NOT NULL,
     PRIMARY KEY (proposito, data, usuario));
   `,
+  // v8: discipulado 1 a 1 (Mateus 28.19-20; 2 Timóteo 2.2). Quem acompanha, quem é acompanhado,
+  // o que o discípulo decide mostrar e os encontros semanais dos dois. Os marcos pessoais
+  // ("Minha caminhada") não ganham tabela: moram no extra da conta, como qualquer campo solto.
+  `
+  CREATE TABLE discipulados (
+    id TEXT PRIMARY KEY, discipulador TEXT NOT NULL, discipulo TEXT NOT NULL,
+    estado TEXT NOT NULL,
+    pediu TEXT NOT NULL,
+    criado_em TEXT NOT NULL, aceito_em TEXT NOT NULL DEFAULT '', encerrado_em TEXT NOT NULL DEFAULT '',
+    mostrar TEXT NOT NULL DEFAULT '{}'
+  );
+  CREATE INDEX discipulados_discipulador ON discipulados (discipulador);
+  CREATE INDEX discipulados_discipulo ON discipulados (discipulo);
+  CREATE TABLE discipulado_encontros (discipulado TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (discipulado, data));
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -293,6 +308,10 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['proposito_membros', 'DELETE FROM proposito_membros WHERE usuario = ?', [u]],
     // o histórico do encontro fica (quem registrou, quantas pessoas), só a presença da pessoa some
     ['celula_presencas', 'DELETE FROM celula_presencas WHERE usuario = ?', [u]],
+    // discipulado dos dois lados, e os encontros dele, saem inteiros: não é um grupo que
+    // sobrevive sem a pessoa, é uma relação de duas pontas só
+    ['discipulado_encontros', "DELETE FROM discipulado_encontros WHERE discipulado IN (SELECT id FROM discipulados WHERE discipulador = ? OR discipulo = ?)", [u, u]],
+    ['discipulados', 'DELETE FROM discipulados WHERE discipulador = ? OR discipulo = ?', [u, u]],
     ['novidades_reacoes', "DELETE FROM novidades_reacoes WHERE usuario = ? OR evento IN (SELECT id FROM novidades_eventos WHERE autor = ? OR json_extract(dados, '$.com') = ? OR EXISTS (SELECT 1 FROM json_each(dados, '$.membros') WHERE value = ?))", [u, u, u, u]],
     ['novidades_eventos', "DELETE FROM novidades_eventos WHERE autor = ? OR json_extract(dados, '$.com') = ? OR EXISTS (SELECT 1 FROM json_each(dados, '$.membros') WHERE value = ?)", [u, u, u]],
     ['novidades_pessoas', 'DELETE FROM novidades_pessoas WHERE usuario = ?', [u]],
