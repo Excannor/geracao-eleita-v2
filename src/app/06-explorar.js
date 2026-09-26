@@ -238,7 +238,12 @@
     + CC.ico('avancar') + '</a>';
 
   CC.vistaExplorar = function (raiz) {
-    const blocos = GRUPOS.map(([titulo, pastas]) => {
+    const conhecendo = !!(CC.quem && CC.quem.caminho === 'conhecer');
+    // Para quem já segue Jesus, as perguntas honestas entram como mais um quadro da última
+    // grade, no mesmo formato dos outros (e ocupam a vaga ao lado do último quadro sozinho).
+    const quadroPerguntas = '<a class="bloco-secao c-azul" href="#/perguntas"><span class="icone">' + CC.ico('balao') + '</span>'
+      + '<b>Perguntas honestas</b><span>Dúvidas comuns de quem está conhecendo Jesus</span></a>';
+    const blocos = GRUPOS.map(([titulo, pastas], i) => {
       const cartoes = pastas.map((pasta) => {
         const s = secaoDe(pasta);
         if (!s) return '';
@@ -248,7 +253,8 @@
           + '<b>' + CC.esc(s.rotulo) + '</b>'
           + '<span>' + CC.esc(s.descricao) + '</span></a>';
       }).join('');
-      return CC.tituloSecao(titulo) + '<div class="grade-secoes">' + cartoes + '</div>';
+      const extra = !conhecendo && i === GRUPOS.length - 1 ? quadroPerguntas : '';
+      return CC.tituloSecao(titulo) + '<div class="grade-secoes">' + cartoes + extra + '</div>';
     }).join('');
 
     const dia = D.plano[CC.diaAtual() - 1];
@@ -259,7 +265,6 @@
     const terminou = !progressoComece().proximo;
     // Quem está conhecendo Jesus ainda não lê o plano: "Comece por aqui" (que ensina a ler a
     // Bíblia inteira) não serve pra ela agora. As perguntas honestas tomam o lugar.
-    const conhecendo = !!(CC.quem && CC.quem.caminho === 'conhecer');
     const perguntas = cartaoPerguntasHonestas();
 
     raiz.innerHTML = '<h1>Explorar</h1>'
@@ -277,9 +282,6 @@
         + CC.ico('livro') + '<span><b>A história da Bíblia em uma página</b>'
         + '<span class="passo-dica">Veja o todo antes das partes.</span></span>' + CC.ico('avancar') + '</a>' : '')
       + blocos
-      // Para quem já segue Jesus, as perguntas honestas também servem para conversar com um
-      // amigo: entram discretas, depois das seções de sempre.
-      + (conhecendo ? '' : perguntas)
       + (conhecendo ? '' : (terminou ? comece : ''))
       + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
     CC.ligarBusca(raiz);

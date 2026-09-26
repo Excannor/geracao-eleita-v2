@@ -1760,6 +1760,8 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .vazio-amigos svg { width: 40px; height: 40px; color: var(--tinta-travada); }
 .vazio-amigos p { margin: 0; max-width: 300px; }
 .vazio-amigos .botao { width: auto; }
+/* O ícone grande e apagado é da ilustração do vazio; dentro do botão, o ícone segue o botão. */
+.vazio-amigos .botao svg { width: 20px; height: 20px; color: currentColor; }
 
 .folha .mensagem-convite { padding: 12px 14px; border-radius: var(--raio); background: var(--fundo-2); color: var(--tinta); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
 .mensagem-convite span { color: var(--azul); font-weight: 800; }
