@@ -162,6 +162,16 @@ const ESQUEMA = [
   CREATE TABLE pedido_denuncias (pedido TEXT NOT NULL, usuario TEXT NOT NULL, motivo TEXT NOT NULL, em TEXT NOT NULL,
     PRIMARY KEY (pedido, usuario));
   `,
+  // v10: multiplicação de célula (Atos 2.47; 2 Timóteo 2.2). A célula filha guarda de onde
+  // veio ("mae", o id da célula de origem) e quando nasceu; a célula mãe não ganha coluna
+  // nova, porque quem é mãe de quem se descobre olhando as filhas. E o painel pastoral
+  // (Fase 5, seção 2) precisa saber quando um visitante virou membro, para contar "quantos
+  // visitantes com conta passaram a membro" nas últimas 4 semanas.
+  `
+  ALTER TABLE propositos ADD COLUMN mae TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN multiplicada_em TEXT NOT NULL DEFAULT '';
+  ALTER TABLE proposito_membros ADD COLUMN tornou_membro_em TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrarEsquema(db) {

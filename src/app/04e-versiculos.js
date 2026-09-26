@@ -51,6 +51,7 @@
       + (CC.podeCompartilharComAmigos && CC.podeCompartilharComAmigos()
         ? '<button class="botao pequeno contorno" data-juntos-verso>' + CC.ico('pessoas') + 'Juntos</button>' : '')
       + '<button class="botao pequeno contorno" data-copiar-verso>' + CC.ico('folha') + 'Copiar</button>'
+      + '<button class="botao pequeno contorno" data-imagem-verso>' + CC.ico('imagem') + 'Imagem</button>'
       + (fechar ? '<button class="botao-icone" data-fechar-verso aria-label="Desfazer a escolha">' + CC.ico('fechar') + '</button>' : '')
       + '</div>';
   }
@@ -84,6 +85,16 @@
       CC.avisar(certo ? 'Versículo copiado' : 'Não consegui copiar');
       aoMudar('copiar');
     };
+    const imagem = barra.querySelector('[data-imagem-verso]');
+    if (imagem) {
+      imagem.onclick = async () => {
+        imagem.disabled = true;
+        const corpo = await Promise.resolve(texto()).catch(() => '');
+        await CC.gerarImagemVersiculo(ref, corpo);
+        imagem.disabled = false;
+        aoMudar('imagem');
+      };
+    }
   }
 
   // ---------- nota ----------
@@ -265,6 +276,115 @@
       .filter(([k, t]) => k.startsWith('verso:') && (t || '').trim())
       .map(([k, t]) => ({ ref: k.slice(6), texto: t.trim() }));
   }
+
+  // ---------- cartão de versículo em imagem ----------
+  // Formato de status e stories (1080x1920), no aparelho, com <canvas>: nada sai daqui, nada
+  // vai para o servidor. A letra encolhe para caber (mesma lógica do carimbo da ofensiva, só
+  // que quebrando o texto na hora, porque o versículo não vem pré-quebrado).
+  const CARTAO_LARGURA = 1080;
+  const CARTAO_ALTURA = 1920;
+  async function desenharCartaoVersiculo(ref, corpo) {
+    const t = CC.traducao();
+    const nomeTraducao = t ? t.nome.replace(/Biblica® Open |™/g, '') : '';
+    const tela = document.createElement('canvas');
+    tela.width = CARTAO_LARGURA;
+    tela.height = CARTAO_ALTURA;
+    const ctx = tela.getContext('2d');
+
+    // Fundo escuro do próprio app (o mesmo tom do tema escuro), com o creme e o laranja do
+    // pôster para o texto: não depende de qual tema a pessoa está usando agora.
+    const fundo = ctx.createLinearGradient(0, 0, 0, CARTAO_ALTURA);
+    fundo.addColorStop(0, '#161616');
+    fundo.addColorStop(1, '#0d0d0d');
+    ctx.fillStyle = fundo;
+    ctx.fillRect(0, 0, CARTAO_LARGURA, CARTAO_ALTURA);
+
+    const creme = '#fff1c9';
+    const laranja = '#ff9d1c';
+    const margem = 96;
+    const larguraTexto = CARTAO_LARGURA - margem * 2;
+
+    // “Aspas” discretas no topo, só decoração.
+    ctx.fillStyle = laranja;
+    ctx.globalAlpha = 0.5;
+    ctx.font = '900 160px Oswald, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('“', margem - 12, 150);
+    ctx.globalAlpha = 1;
+
+    const medir = (texto, tamanho) => { ctx.font = '700 ' + tamanho + 'px Oswald, sans-serif'; return ctx.measureText(texto).width; };
+    const texto = String(corpo || '').trim() || ref;
+    const { linhas, tamanho } = CC.ajustarTextoCartao(texto, {
+      larguraMax: larguraTexto, alturaMax: CARTAO_ALTURA * 0.58, fonteMax: 84, fonteMin: 34, entreLinhas: 1.3, medir,
+    });
+    ctx.font = '700 ' + tamanho + 'px Oswald, sans-serif';
+    ctx.fillStyle = creme;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const alturaBloco = linhas.length * tamanho * 1.3;
+    let y = CARTAO_ALTURA / 2 - alturaBloco / 2 + tamanho * 0.65;
+    for (const linha of linhas) { ctx.fillText(linha, CARTAO_LARGURA / 2, y); y += tamanho * 1.3; }
+
+    // Referência e tradução, embaixo do texto (a licença da tradução pede o nome dela).
+    ctx.font = '700 40px Oswald, sans-serif';
+    ctx.fillStyle = laranja;
+    ctx.fillText(ref, CARTAO_LARGURA / 2, CARTAO_ALTURA - 220);
+    if (nomeTraducao) {
+      ctx.font = '600 30px Nunito, sans-serif';
+      ctx.fillStyle = creme;
+      ctx.globalAlpha = 0.85;
+      ctx.fillText(nomeTraducao, CARTAO_LARGURA / 2, CARTAO_ALTURA - 170);
+      ctx.globalAlpha = 1;
+    }
+
+    // O nome do app, pequeno, no pé.
+    ctx.font = '600 26px Nunito, sans-serif';
+    ctx.fillStyle = creme;
+    ctx.globalAlpha = 0.6;
+    ctx.fillText('Geração Eleita', CARTAO_LARGURA / 2, CARTAO_ALTURA - 80);
+    ctx.globalAlpha = 1;
+
+    return tela;
+  }
+
+  CC.gerarImagemVersiculo = async function (ref, corpo) {
+    try {
+      // As fontes precisam estar prontas antes de desenhar, senão o canvas usa a fonte de
+      // sistema e o texto sai diferente do que a pessoa vê no app.
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+        try { await Promise.all([document.fonts.load('700 84px Oswald'), document.fonts.load('600 30px Nunito')]); } catch (e) { /* segue com o que tiver */ }
+      }
+      const tela = await desenharCartaoVersiculo(ref, corpo);
+      const blob = await new Promise((resolver) => tela.toBlob(resolver, 'image/png'));
+      if (!blob) throw new Error('sem imagem');
+      const nomeArquivo = 'versiculo-' + ref.replace(/[^\w]+/g, '-').toLowerCase() + '.png';
+      const arquivo = new File([blob], nomeArquivo, { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+        try {
+          await navigator.share({ files: [arquivo] });
+          CC.avisar('Imagem pronta.');
+          return true;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return false;
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nomeArquivo;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      CC.avisar('Imagem pronta.');
+      return true;
+    } catch (e) {
+      CC.avisar('Não consegui gerar a imagem agora.');
+      return false;
+    }
+  };
 
   CC.versiculos = { CORES, chaveNota, chavesDoTrecho, ligar, irPara, abrirNota, acoesDoCartao, ligarCartao, marcados, comNota };
 })(window.CC);

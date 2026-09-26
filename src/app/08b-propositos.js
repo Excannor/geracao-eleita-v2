@@ -305,6 +305,8 @@
       + (eu.fezHoje && faltam.length ? '<button class="botao azul" data-notificar>' + CC.ico('sino')
         + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
       + (gente.length < limite ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar um amigo</button>' : '')
+      + (souLider && p.membros.some((m) => m.estado === 'ativo' && m.papel === 'auxiliar')
+        ? '<button class="botao contorno" data-multiplicar>' + CC.ico('mais-sinal') + 'Multiplicar a célula</button>' : '')
       + (souLider ? '<button class="botao plano perigo" data-encerrar>Encerrar a célula</button>' : '<button class="botao plano perigo" data-sair>Sair da célula</button>')
       + '</div>';
   }
@@ -366,6 +368,75 @@
       try { await acao({ acao: 'encerrar', id: p.id }); location.hash = '#/novidades'; } catch (e) { CC.avisar(e.message); }
       recarregar();
     };
+    const multiplicar = painel.querySelector('[data-multiplicar]');
+    if (multiplicar) multiplicar.onclick = () => folhaMultiplicar(p);
+  }
+
+  // ---------- multiplicar a célula (Atos 2.47; 2 Timóteo 2.2) ----------
+  // Só o líder vê o botão (já garantido em abaPessoas). Ele escolhe o auxiliar que vai
+  // liderar a nova célula, o nome dela e quem vai junto (membros ativos; visitante também
+  // pode ir). O auxiliar escolhido sempre vai, então não aparece de novo na lista de "quem vai".
+  function folhaMultiplicar(p) {
+    const gente = p.membros.filter((m) => m.estado === 'ativo' && m.usuario !== p.criadoPor);
+    const auxiliares = gente.filter((m) => m.papel === 'auxiliar');
+    CC.folha('<h2>Multiplicar a célula</h2>'
+      + '<p class="passo-dica">Quando a célula cresce, ela pode virar duas. Um auxiliar passa a liderar a nova, e vocês escolhem juntos quem vai para lá.</p>'
+      + '<label class="campo-senha"><span>Quem vai liderar a nova célula</span><select data-auxiliar>'
+      + auxiliares.map((m) => '<option value="' + CC.esc(m.usuario) + '">' + CC.esc(m.nome) + '</option>').join('') + '</select></label>'
+      + '<label class="campo-senha"><span>Nome da nova célula</span><input data-titulo maxlength="30" placeholder="Ex.: Célula de quinta" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
+      + '<p class="etiqueta">Quem mais vai para a nova célula</p>'
+      + '<div class="escolha-amigos" data-lista-pessoas>' + gente.filter((m) => m.papel !== 'auxiliar' || auxiliares.length > 1).map((m) => '<label class="linha-amigo escolha-amigo">'
+        + '<input type="checkbox" value="' + CC.esc(m.usuario) + '" data-pessoa-multiplicar' + (m.papel === 'auxiliar' ? ' data-outro-auxiliar' : '') + '>' + retrato(m)
+        + '<span class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + (m.papel === 'visitante' ? ' <small class="selo-lider">visitante</small>' : '') + '</b></span></label>').join('') + '</div>'
+      + '<p class="erro-proposito" role="alert" hidden></p>'
+      + '<div class="acoes"><button class="botao azul" data-confirmar-multiplicar>Multiplicar</button>'
+      + '<button class="botao plano" data-fechar>Cancelar</button></div>',
+    {
+      rotulo: 'Multiplicar a célula',
+      rolavel: true,
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        const erro = folha.querySelector('.erro-proposito');
+        const botao = folha.querySelector('[data-confirmar-multiplicar]');
+        // Marcar a pessoa que virou "quem vai liderar" desmarca ela da lista de "quem mais vai":
+        // o auxiliar escolhido sempre vai, então não faz sentido escolher ele duas vezes.
+        const selecionaAuxiliar = folha.querySelector('[data-auxiliar]');
+        const atualizarOutroAuxiliar = () => {
+          folha.querySelectorAll('[data-outro-auxiliar]').forEach((c) => {
+            const linha = c.closest('.escolha-amigo');
+            const escondido = c.value === selecionaAuxiliar.value;
+            if (linha) linha.hidden = escondido;
+            if (escondido) c.checked = false;
+          });
+        };
+        if (selecionaAuxiliar) { selecionaAuxiliar.onchange = atualizarOutroAuxiliar; atualizarOutroAuxiliar(); }
+        botao.onclick = async () => {
+          const auxiliar = selecionaAuxiliar ? selecionaAuxiliar.value : '';
+          const titulo = folha.querySelector('[data-titulo]').value.trim();
+          const pessoas = [...folha.querySelectorAll('[data-pessoa-multiplicar]:checked')].map((c) => c.value);
+          erro.hidden = true;
+          if (!auxiliar) { erro.textContent = 'A célula precisa de um auxiliar ativo para poder multiplicar.'; erro.hidden = false; return; }
+          if (!titulo) { erro.textContent = 'Diga o nome da nova célula.'; erro.hidden = false; return; }
+          const nomeAux = (auxiliares.find((m) => m.usuario === auxiliar) || {}).nome || '@' + auxiliar;
+          if (!await CC.confirmar({
+            titulo: 'Multiplicar a célula?',
+            texto: nomeAux + ' passa a liderar a nova célula "' + titulo + '", com ' + CC.plural(pessoas.length + 1, 'pessoa', 'pessoas') + ' (incluindo ' + nomeAux + ').',
+            acao: 'Multiplicar',
+          })) return;
+          botao.disabled = true;
+          try {
+            await CC.api('api/celula', { acao: 'multiplicar', id: p.id, auxiliar, titulo, pessoas });
+            CC.avisar('Célula multiplicada!');
+            fechar();
+            recarregar();
+          } catch (e) {
+            botao.disabled = false;
+            erro.textContent = e.message;
+            erro.hidden = false;
+          }
+        };
+      },
+    });
   }
 
   function cartaoConvite(p) {
@@ -663,7 +734,9 @@
 
   function topoDaCelula(p) {
     const conduzo = p.euConduzo;
-    return (p.recado
+    return (p.nasceuDe ? '<div class="recado-lider"><p>Esta célula nasceu da ' + CC.esc(comoCelula(p.nasceuDe.titulo)) + '.</p></div>' : '')
+      + (p.multiplicouPara ? '<div class="recado-lider"><p>Nasceu a ' + CC.esc(comoCelula(p.multiplicouPara.titulo)) + ' a partir desta célula.</p></div>' : '')
+      + (p.recado
       ? '<div class="recado-lider"><span class="etiqueta">Recado de ' + CC.esc(nomeDoLider(p)) + '</span><p>' + CC.esc(p.recado) + '</p></div>'
       : '')
       // No dia do encontro o botão "Encontro hoje · veja o estudo" (logo abaixo, na aba Hoje)

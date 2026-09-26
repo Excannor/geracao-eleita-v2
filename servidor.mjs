@@ -604,6 +604,23 @@ const JANELA_ENCONTROS = 60;
 // do plano até onde o líder já leu: é ele quem conduz o encontro) e o roteiro 4 Ws. O resto
 // (semana do grupo, quem precisa de atenção, o registro dos encontros) é só de quem conduz
 // (líder ou auxiliar): membro comum nunca vê lista de presença nem "quem sumiu".
+// Por 30 dias depois da multiplicação, as duas células mostram um aviso discreto no topo da
+// aba Hoje: a mãe não ganha coluna nenhuma para isso (quem é filha de quem se descobre
+// olhando quem tem "mae" apontando para ela), a filha guarda "mae" e "multiplicadaEm" direto.
+const JANELA_MULTIPLICACAO = 30;
+function bannerMultiplicacao(p, referencia) {
+  const dentroDaJanela = (data) => !!data && diasEntre(data, referencia) >= 0 && diasEntre(data, referencia) <= JANELA_MULTIPLICACAO;
+  let nasceuDe = null;
+  if (p.mae && dentroDaJanela(p.multiplicadaEm)) {
+    const maeProposito = CONTAS.proposito(p.mae);
+    if (maeProposito) nasceuDe = { titulo: maeProposito.titulo };
+  }
+  let multiplicouPara = null;
+  const filhaRecente = Object.values(CONTAS.dados.propositos || {}).find((x) => x.mae === p.id && dentroDaJanela(x.multiplicadaEm));
+  if (filhaRecente) multiplicouPara = { titulo: filhaRecente.titulo };
+  return { nasceuDe, multiplicouPara };
+}
+
 function celulaNoRetrato(p, eu, info, ativos, referencia) {
   const lider = info.get(p.criadoPor);
   const lidos = ((lider && lider.estado && lider.estado.lidos) || []).map(Number).filter((n) => n >= 1 && n <= PLANO_DO_CONTEUDO.length);
@@ -614,6 +631,7 @@ function celulaNoRetrato(p, eu, info, ativos, referencia) {
     estudo: p.estudo || null,
     estudoAcolhida: p.estudoAcolhida || '', estudoAdoracao: p.estudoAdoracao || '', estudoTestemunho: p.estudoTestemunho || '',
     euConduzo: conduzo,
+    ...bannerMultiplicacao(p, referencia),
   };
   if (!conduzo) return extra;
   const semana = new Set(Array.from({ length: 7 }, (_, i) => somaDias(referencia, -i)));
@@ -950,6 +968,8 @@ const servidor = createServer(async (req, res) => {
         propositos: Object.values(CONTAS.dados.propositos || {}),
         comPush: NOTIFICACOES.comInscricao(),
         hoje: hojeDe(eu),
+        pedidos: Object.values(CONTAS.dados.pedidos || {}),
+        discipulados: Object.values(CONTAS.dados.discipulados || {}),
       });
       painel.pedidosDeSenha = pedidosDeSenha().map((p) => ({ usuario: p.usuario, em: new Date(p.em).toISOString() }));
       painel.emailLigado = !!EMAIL;
@@ -1201,7 +1221,7 @@ const servidor = createServer(async (req, res) => {
     if (rota === '/api/celula') {
       await acao(async ({
         acao: qual, id, titulo, token, dia, texto, usuario, estudo, ref, acolhida, adoracao, testemunho,
-        visitante, sim, data, presentes, visitantes,
+        visitante, sim, data, presentes, visitantes, auxiliar, pessoas,
       }) => {
         const hoje = hojeDe(eu);
         if (qual === 'criar') {
@@ -1218,13 +1238,21 @@ const servidor = createServer(async (req, res) => {
           if (!r.ja) await avisarEntradaNaCelula(eu, r, hoje);
           return { ja: !!r.ja, id: r.proposito.id, titulo: r.proposito.titulo, papel: r.papel || '' };
         }
-        if (qual === 'tornarMembro') { await CONTAS.tornarMembro(eu, id); return {}; }
+        if (qual === 'tornarMembro') { await CONTAS.tornarMembro(eu, id, hoje); return {}; }
         if (qual === 'auxiliar') { await CONTAS.definirAuxiliar(eu, id, usuario, !!sim); return {}; }
         if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia); return {}; }
         if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto); return {}; }
         if (qual === 'estudo') { await CONTAS.definirEstudo(eu, id, { tipo: estudo, ref, texto, acolhida, adoracao, testemunho }, TODOS_LIVROS); return {}; }
         if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes }, hoje); return {}; }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
+        if (qual === 'multiplicar') {
+          const r = await CONTAS.multiplicarCelula(eu, id, { auxiliar, titulo, pessoas }, hoje);
+          const nomeNovoLider = await nomeDeExibicao(r.filha.criadoPor);
+          for (const alvo of r.movidos) {
+            semEsperar(avisoSocial(alvo, 'celulaMultiplicada', { filha: r.filha.titulo, novoLider: nomeNovoLider, id: r.filha.id }));
+          }
+          return { id: r.filha.id, titulo: r.filha.titulo };
+        }
         throw Object.assign(new Error('ação desconhecida'), { publico: true });
       });
       return;

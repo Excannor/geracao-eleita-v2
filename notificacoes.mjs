@@ -302,6 +302,8 @@ const T = {
   pedidoConduz: [['{amigo} deixou um pedido de oração para você.', 'Abra a célula para ver.']],
   possoAjudar: [['{amigo} pode ajudar com o que você pediu.', 'Combinem pessoalmente ou no WhatsApp.']],
   denunciaPerigo: [['Um pedido da célula precisa da sua atenção.', 'Abra a célula para ver.']],
+  // Multiplicação de célula (Atos 2.47): quem foi para a célula nova recebe só isto, uma vez.
+  celulaMultiplicada: [['Você agora faz parte da {filha}.', 'O líder é {novoLider}.']],
 };
 export const TEXTOS = T;
 
@@ -352,6 +354,11 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   if (tipo === 'pedidoConduz' || tipo === 'possoAjudar' || tipo === 'denunciaPerigo') {
     url = dados.celula ? './#/novidades/celula/' + encodeURIComponent(dados.celula) + '/oracao' : './#/novidades';
     tag = tipo;
+  }
+  // A multiplicação leva direto para a célula nova, na aba Hoje (onde o aviso discreto mora).
+  if (tipo === 'celulaMultiplicada') {
+    url = dados.id ? './#/novidades/celula/' + encodeURIComponent(dados.id) : './#/novidades';
+    tag = tipo + ':' + (dados.id || '');
   }
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = lista[semente(usuario + '|' + data + '|' + tipo) % lista.length];

@@ -317,6 +317,21 @@ try {
       criado_em TEXT NOT NULL, aceito_em TEXT NOT NULL DEFAULT '', encerrado_em TEXT NOT NULL DEFAULT '', mostrar TEXT NOT NULL DEFAULT '{}'
     );
     CREATE TABLE discipulado_encontros (discipulado TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (discipulado, data));
+    -- Uma célula de verdade já existe num banco v8 real (nasceu na v3, ganhou colunas até a
+    -- v7): entra aqui também, para a migração v9 -> v10 (que mexe em propositos) ter o que alterar.
+    CREATE TABLE propositos (
+      id TEXT PRIMARY KEY, tipo TEXT NOT NULL, alvo TEXT NOT NULL DEFAULT '', titulo TEXT NOT NULL DEFAULT '',
+      criado_por TEXT NOT NULL, criado_em TEXT NOT NULL, encerrado_em TEXT NOT NULL DEFAULT '', grupo INTEGER NOT NULL DEFAULT 0,
+      celula INTEGER NOT NULL DEFAULT 0, encontro INTEGER NOT NULL DEFAULT -1, recado TEXT NOT NULL DEFAULT '',
+      recado_em TEXT NOT NULL DEFAULT '', estudo_tipo TEXT NOT NULL DEFAULT '', estudo_ref TEXT NOT NULL DEFAULT '',
+      estudo_texto TEXT NOT NULL DEFAULT '', estudo_em TEXT NOT NULL DEFAULT '', estudo_acolhida TEXT NOT NULL DEFAULT '',
+      estudo_adoracao TEXT NOT NULL DEFAULT '', estudo_testemunho TEXT NOT NULL DEFAULT ''
+    );
+    CREATE TABLE proposito_membros (
+      proposito TEXT NOT NULL, usuario TEXT NOT NULL, estado TEXT NOT NULL,
+      entrou_em TEXT NOT NULL DEFAULT '', saiu_em TEXT NOT NULL DEFAULT '', convidado_por TEXT NOT NULL DEFAULT '',
+      papel TEXT NOT NULL DEFAULT '', PRIMARY KEY (proposito, usuario)
+    );
     CREATE TABLE schema_versao (versao INTEGER NOT NULL);
     INSERT INTO schema_versao (versao) VALUES (8);
     INSERT INTO contas (usuario, nome, email, nascimento, fuso, sal, senha, criada_em, selo_convite, extra)
@@ -332,6 +347,55 @@ try {
   ok(['pedidos', 'pedido_gestos', 'pedido_denuncias'].every((t) => tabelasV9b.includes(t)), 'as tabelas de cuidado mútuo nascem também na migração de um banco v8 de verdade');
   B.fecharBanco(arquivoV8);
   try { rmSync(pastaV8, { recursive: true, force: true }); } catch { /* ok */ }
+
+  // ---------- migração v9 -> v10 (multiplicação de célula) ----------
+  console.log('\n  Banco: migração v9 -> v10\n');
+  const pastaV9 = mkdtempSync(join(tmpdir(), 'cc-db-v9-'));
+  const arquivoV9 = B.arquivoDoBanco(pastaV9);
+  const brutoV9 = new B.DatabaseSync(arquivoV9);
+  brutoV9.exec(`
+    CREATE TABLE contas (
+      usuario TEXT PRIMARY KEY, nome TEXT NOT NULL DEFAULT '', email TEXT NOT NULL DEFAULT '',
+      nascimento TEXT NOT NULL DEFAULT '', fuso TEXT NOT NULL DEFAULT '', sal TEXT NOT NULL, senha TEXT NOT NULL,
+      criada_em TEXT NOT NULL DEFAULT '', selo_convite TEXT NOT NULL DEFAULT '', extra TEXT NOT NULL DEFAULT '{}'
+    );
+    CREATE TABLE propositos (
+      id TEXT PRIMARY KEY, tipo TEXT NOT NULL, alvo TEXT NOT NULL DEFAULT '', titulo TEXT NOT NULL DEFAULT '',
+      criado_por TEXT NOT NULL, criado_em TEXT NOT NULL, encerrado_em TEXT NOT NULL DEFAULT '', grupo INTEGER NOT NULL DEFAULT 0,
+      celula INTEGER NOT NULL DEFAULT 0, encontro INTEGER NOT NULL DEFAULT -1, recado TEXT NOT NULL DEFAULT '',
+      recado_em TEXT NOT NULL DEFAULT '', estudo_tipo TEXT NOT NULL DEFAULT '', estudo_ref TEXT NOT NULL DEFAULT '',
+      estudo_texto TEXT NOT NULL DEFAULT '', estudo_em TEXT NOT NULL DEFAULT '', estudo_acolhida TEXT NOT NULL DEFAULT '',
+      estudo_adoracao TEXT NOT NULL DEFAULT '', estudo_testemunho TEXT NOT NULL DEFAULT ''
+    );
+    CREATE TABLE proposito_membros (
+      proposito TEXT NOT NULL, usuario TEXT NOT NULL, estado TEXT NOT NULL,
+      entrou_em TEXT NOT NULL DEFAULT '', saiu_em TEXT NOT NULL DEFAULT '', convidado_por TEXT NOT NULL DEFAULT '',
+      papel TEXT NOT NULL DEFAULT '', PRIMARY KEY (proposito, usuario)
+    );
+    CREATE TABLE schema_versao (versao INTEGER NOT NULL);
+    INSERT INTO schema_versao (versao) VALUES (9);
+    INSERT INTO contas (usuario, nome, email, nascimento, fuso, sal, senha, criada_em, selo_convite, extra)
+      VALUES ('duda', 'Duda', 'duda@x.com', '2000-01-01', 'America/Sao_Paulo', 's', 'h', '2026-01-01', 'w', '{}');
+    INSERT INTO propositos (id, tipo, titulo, criado_por, criado_em, grupo, celula)
+      VALUES ('p1', 'plano', 'Célula da Duda', 'duda', '2026-01-01', 1, 1);
+    INSERT INTO proposito_membros (proposito, usuario, estado, entrou_em, papel) VALUES ('p1', 'duda', 'ativo', '2026-01-01', '');
+  `);
+  ok(Number(brutoV9.prepare('SELECT versao FROM schema_versao').get().versao) === 9, 'o banco de ensaio nasce na versão 9, como um HML de antes da Fase 5');
+  brutoV9.close();
+
+  const dbV10 = B.abrirBanco(arquivoV9);
+  ok(Number(dbV10.prepare('SELECT versao FROM schema_versao').get().versao) === B.versaoDoEsquema(), 'reabrir um banco v9 migra sozinho até a versão atual');
+  ok(dbV10.prepare("SELECT count(*) n FROM propositos").get().n === 1, 'a migração v9 -> v10 não perde nenhuma célula que já existia');
+  const linhaV10 = dbV10.prepare("SELECT mae, multiplicada_em FROM propositos WHERE id = 'p1'").get();
+  ok(linhaV10.mae === '' && linhaV10.multiplicada_em === '', 'as colunas novas (mae, multiplicada_em) nascem vazias para quem já existia');
+  dbV10.prepare("INSERT INTO propositos (id, tipo, titulo, criado_por, criado_em, grupo, celula, mae, multiplicada_em) VALUES ('p2', 'plano', 'Célula filha', 'aux', '2026-02-01', 1, 1, 'p1', '2026-02-01')").run();
+  ok(dbV10.prepare("SELECT mae FROM propositos WHERE id = 'p2'").get().mae === 'p1', 'a coluna nova aceita uma linha de verdade');
+  ok(dbV10.prepare("SELECT tornou_membro_em FROM proposito_membros WHERE proposito = 'p1' AND usuario = 'duda'").get().tornou_membro_em === '',
+    'proposito_membros ganha tornou_membro_em, vazia para quem já estava lá');
+  dbV10.prepare("INSERT INTO proposito_membros (proposito, usuario, estado, entrou_em, papel, tornou_membro_em) VALUES ('p1', 'nova', 'ativo', '2026-01-05', '', '2026-01-10')").run();
+  ok(dbV10.prepare("SELECT tornou_membro_em FROM proposito_membros WHERE usuario = 'nova'").get().tornou_membro_em === '2026-01-10', 'a coluna nova de proposito_membros aceita uma linha de verdade');
+  B.fecharBanco(arquivoV9);
+  try { rmSync(pastaV9, { recursive: true, force: true }); } catch { /* ok */ }
 } catch (e) {
   ok(false, 'o teste quebrou: ' + e.stack);
 } finally {

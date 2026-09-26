@@ -67,6 +67,38 @@
     ultimaFrase = i;
     return CC.FRASES_OFENSIVA[i];
   };
+  // Quebra um texto em linhas que cabem numa largura, encolhendo a letra até o bloco caber
+  // também na altura: a mesma lógica do carimbo da ofensiva (começa grande, diminui aos
+  // poucos), só que aqui o texto não vem pré-quebrado, então quem quebra as linhas é a
+  // própria função. Pura: "medir" é quem sabe a largura de um texto num tamanho de fonte
+  // (o cartão de versículo usa o canvas; o teste usa uma régua sintética).
+  CC.ajustarTextoCartao = function ajustarTextoCartao(texto, {
+    larguraMax, alturaMax, fonteMax, fonteMin = fonteMax * 0.35, entreLinhas = 1.25, medir,
+  }) {
+    const palavras = String(texto || '').split(/\s+/).filter(Boolean);
+    const quebrar = (tamanho) => {
+      const linhas = [];
+      let atual = '';
+      for (const p of palavras) {
+        const tentativa = atual ? atual + ' ' + p : p;
+        if (atual && medir(tentativa, tamanho) > larguraMax) { linhas.push(atual); atual = p; }
+        else atual = tentativa;
+      }
+      if (atual) linhas.push(atual);
+      return linhas;
+    };
+    let tamanho = fonteMax;
+    let linhas = quebrar(tamanho);
+    for (let i = 0; i < 40 && tamanho > fonteMin; i++) {
+      const alturaBloco = linhas.length * tamanho * entreLinhas;
+      const maiorLinha = Math.max(0, ...linhas.map((l) => medir(l, tamanho)));
+      if (alturaBloco <= alturaMax && maiorLinha <= larguraMax) break;
+      tamanho = Math.max(fonteMin, tamanho * 0.94);
+      linhas = quebrar(tamanho);
+    }
+    return { linhas, tamanho };
+  };
+
   CC.estagioDaChama = (dias) => {
     const n = Math.max(0, Number(dias) || 0);
     let i = 0;

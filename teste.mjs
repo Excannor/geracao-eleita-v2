@@ -13,6 +13,7 @@ import {
   somaAnos, idadeMinimaOk, hojeNoFuso, FUSO_PADRAO, IDADE_MINIMA,
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
+import { montarPainel } from './painel.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 let falhas = 0;
@@ -376,6 +377,32 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
   checar(!repetiu, 'o sorteio da ofensiva nunca repete a frase da vez anterior');
 }
 
+// --- quebra de linhas e tamanho de letra do cartão de versículo (01c-arte.js) ---
+{
+  // Régua sintética: cada letra "pesa" o mesmo tanto (0.56 do tamanho da fonte), como uma
+  // fonte monoespaçada. Não precisa ser exata: só precisa crescer com o tamanho da fonte e
+  // com o comprimento do texto, do jeito que um medidor de canvas de verdade se comporta.
+  const medir = (t, f) => t.length * f * 0.56;
+
+  const curto = CC.ajustarTextoCartao('Deus é amor', { larguraMax: 900, alturaMax: 1200, fonteMax: 90, medir });
+  checar(curto.linhas.length === 1 && curto.tamanho === 90, 'texto curto cabe numa linha só, no tamanho máximo (' + curto.linhas.length + ' linha(s), ' + curto.tamanho + 'px)');
+
+  const versiculo = 'Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna';
+  const medio = CC.ajustarTextoCartao(versiculo, { larguraMax: 900, alturaMax: 1200, fonteMax: 90, medir });
+  checar(medio.linhas.length > 1, 'um versículo mais longo quebra em várias linhas (' + medio.linhas.length + ')');
+  checar(medio.linhas.every((l) => medir(l, medio.tamanho) <= 900 + 0.01), 'nenhuma linha passa da largura máxima, no tamanho escolhido');
+  checar(medio.linhas.length * medio.tamanho * 1.25 <= 1200 + 0.01, 'o bloco inteiro cabe na altura máxima');
+
+  // Trecho bem mais longo, numa caixa pequena: a letra tem que encolher bem mais que no caso médio.
+  const longo = 'Palavras '.repeat(80).trim();
+  const pequeno = CC.ajustarTextoCartao(longo, { larguraMax: 700, alturaMax: 500, fonteMax: 90, medir });
+  checar(pequeno.tamanho < medio.tamanho, 'um trecho bem mais longo, numa caixa menor, encolhe mais que o do caso médio (' + pequeno.tamanho.toFixed(1) + ' < ' + medio.tamanho.toFixed(1) + ')');
+  checar(pequeno.tamanho >= 90 * 0.35 - 0.01, 'a letra nunca encolhe além do tamanho mínimo (35% do máximo)');
+  checar(pequeno.linhas.join(' ') === longo, 'quebrar em linhas não perde nem repete nenhuma palavra');
+
+  checar(CC.ajustarTextoCartao('', { larguraMax: 900, alturaMax: 1200, fonteMax: 90, medir }).linhas.length === 0, 'texto vazio não gera linha nenhuma');
+}
+
 // --- trilhas do leitor ---
 let trilhaErrada = 0;
 for (const d of D.plano) {
@@ -540,6 +567,98 @@ checar(diasDeProposito(p(dias('2026-03-01', 5)), p(dias('2026-03-01', 5)), '2026
 // No Windows, arquivo aberto não se apaga: o banco da pasta temporária fecha antes.
 fecharBanco(arquivoDoBanco(pasta));
 rmSync(pasta, { recursive: true, force: true });
+
+// =========================================================================
+secao('painel pastoral agregado (Fase 5, seção 2)');
+// =========================================================================
+{
+  const HOJE = '2026-04-01';
+  // Uma igreja pequena de propósito: menos de 5 em quase tudo, para o "menos de 5" aparecer.
+  const contasPainel = [
+    { usuario: 'lider1', criadaEm: '2026-01-01', conversouEm: '' },
+    { usuario: 'joao1', criadaEm: '2026-01-01', conversouEm: '' },
+    { usuario: 'maria1', criadaEm: '2026-01-01', conversouEm: '2026-03-20' },
+    { usuario: 'pedro1', criadaEm: '2026-01-01', conversouEm: '' },
+  ];
+  const setDatas = (lista) => Object.fromEntries(lista.map((d, i) => [String(i + 1), d]));
+  const estadosPainel = {
+    // lidos em 5 dos últimos 7 (Power of 4: entra).
+    lider1: { lidos: [1, 2, 3, 4, 5], marcadoEm: setDatas(dias('2026-03-26', 5)) },
+    // só 2 dos últimos 7 (não entra no Power of 4).
+    joao1: { lidos: [1, 2], marcadoEm: setDatas(['2026-03-30', '2026-03-31']) },
+    // conheceu os 14 dias inteiros.
+    maria1: { lidos: [1], marcadoEm: { 1: '2026-03-15' }, conhecidos: setDatas(Array.from({ length: 14 }, () => '2026-03-15')) },
+    // começou a conhecer, mas não terminou.
+    pedro1: { lidos: [], marcadoEm: {}, conhecidos: { 1: '2026-03-10', 2: '2026-03-11' } },
+  };
+  const celulaPainel = {
+    id: 'pc1', celula: true, encerradoEm: '', tipo: 'plano',
+    mae: '', multiplicadaEm: '',
+    membros: [
+      { usuario: 'lider1', estado: 'ativo', papel: '', tornouMembroEm: '' },
+      { usuario: 'joao1', estado: 'ativo', papel: '', tornouMembroEm: '2026-03-25' }, // virou membro há 7 dias
+      { usuario: 'maria1', estado: 'ativo', papel: 'visitante', tornouMembroEm: '' },
+    ],
+    encontros: [
+      { data: '2026-03-28', presentes: ['lider1', 'joao1'], visitantes: 3 },
+      { data: '2026-01-14', presentes: ['lider1'], visitantes: 0 }, // fora das últimas 4 semanas (mais de 28 dias atrás)
+    ],
+  };
+  const filhaPainel = {
+    id: 'pc2', celula: true, encerradoEm: '', tipo: 'plano',
+    mae: 'pc1', multiplicadaEm: '2026-03-20',
+    membros: [{ usuario: 'pedro1', estado: 'ativo', papel: '', tornouMembroEm: '' }],
+    encontros: [],
+  };
+  const pedidosPainel = [
+    { tipo: 'oracao', estado: 'ativo', venceEm: '2026-04-10', denuncias: [] },
+    { tipo: 'oracao', estado: 'removido', venceEm: '2026-04-10', denuncias: [] },
+    { tipo: 'necessidade', estado: 'ativo', venceEm: '2026-04-10', denuncias: [] },
+    { tipo: 'oracao', estado: 'ativo', venceEm: '2026-04-10', denuncias: [{ usuario: 'a', motivo: 'x' }, { usuario: 'b', motivo: 'y' }] },
+  ];
+  const discipuladosPainel = [
+    { discipulador: 'lider1', discipulo: 'joao1', estado: 'ativo' },
+    { discipulador: 'joao1', discipulo: 'maria1', estado: 'ativo' }, // joao1 é discípulo e discipulador: 2ª geração
+    { discipulador: 'pedro1', discipulo: 'maria1', estado: 'encerrado' },
+  ];
+
+  const painel = montarPainel({
+    contas: contasPainel, estados: estadosPainel, propositos: [celulaPainel, filhaPainel],
+    comPush: [], hoje: HOJE, pedidos: pedidosPainel, discipulados: discipuladosPainel,
+  });
+  const c = painel.celulasECuidado;
+
+  checar(c.celulasAtivas === 2, 'as duas células (mãe e filha) contam como ativas: ' + c.celulasAtivas);
+  checar(c.celulasComEncontro === 1, 'só a célula mãe registrou encontro nas últimas 4 semanas: ' + c.celulasComEncontro);
+  checar(c.frequenciaMedia === 5, 'frequência média do único encontro recente (2 presentes + 3 visitantes): ' + c.frequenciaMedia);
+  checar(c.visitantesViraramMembros === 'menos de 5', 'com 1 pessoa (joao1), aparece "menos de 5": ' + c.visitantesViraramMembros);
+  checar(c.multiplicacoes === 1, 'uma multiplicação nos últimos 12 meses: ' + c.multiplicacoes);
+  checar(c.diasNaPalavra.pct === 25, 'só lider1 bate o Power of 4 entre as 4 contas ativas nos últimos 30 dias: ' + c.diasNaPalavra.pct);
+  checar(c.diasNaPalavra.base === 'menos de 5', 'a base do Power of 4 também é mascarada quando pequena: ' + c.diasNaPalavra.base);
+  checar(c.conhecer.comecaram === 'menos de 5' && c.conhecer.terminaram === 'menos de 5' && c.conhecer.quiseramConversar === 'menos de 5',
+    'conhecer Jesus: começaram (maria1, pedro1), terminaram (maria1) e quiseram conversar (maria1) aparecem mascarados');
+  checar(c.discipulado.ativos === 'menos de 5' && c.discipulado.segundaGeracao === 'menos de 5',
+    '2 relações ativas e 1 de 2ª geração (joao1), mascarados por serem poucos');
+  checar(c.cuidado.pedidosAtivos === 'menos de 5' && c.cuidado.denunciasAbertas === 'menos de 5',
+    '2 pedidos de oração ativos e 1 denúncia aberta (2 denúncias no mesmo pedido), mascarados');
+
+  const semNomeOuTexto = !/lider1|joao1|maria1|pedro1|@/.test(JSON.stringify(c));
+  checar(semNomeOuTexto, 'a saída do painel não leva nenhum nome, @ ou texto de ninguém');
+
+  // Com uma igreja "grande" (5 ou mais em cada conta), o número exato aparece.
+  const muitos = Array.from({ length: 6 }, (_, i) => 'gente' + i);
+  const contasGrandes = muitos.map((u) => ({ usuario: u, criadaEm: '2026-01-01', conversouEm: '' }));
+  const estadosGrandes = Object.fromEntries(muitos.map((u) => [u, {}]));
+  const celulaGrande = {
+    id: 'pg1', celula: true, encerradoEm: '', tipo: 'plano', mae: '', multiplicadaEm: '',
+    membros: muitos.map((u) => ({ usuario: u, estado: 'ativo', papel: '', tornouMembroEm: '2026-03-25' })),
+    encontros: [],
+  };
+  const painelGrande = montarPainel({
+    contas: contasGrandes, estados: estadosGrandes, propositos: [celulaGrande], comPush: [], hoje: HOJE, pedidos: [], discipulados: [],
+  });
+  checar(painelGrande.celulasECuidado.visitantesViraramMembros === 6, 'com 6 pessoas (5 ou mais), o painel mostra o número exato: ' + painelGrande.celulasECuidado.visitantesViraramMembros);
+}
 
 console.log('\n  ' + contagem + ' checagens' + (falhas ? ' · ' + falhas + ' FALHA(S)\n' : ' · todas passaram\n'));
 process.exit(falhas ? 1 : 0);

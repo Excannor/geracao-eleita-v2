@@ -21,6 +21,24 @@
 
   const quando = (iso) => new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
+  // Fase 5, seção 2: células e cuidado, agregados. Sem nome nenhum, e sem contador de gerações.
+  function celulasECuidado(c) {
+    if (!c) return '';
+    return numero('Células ativas', c.celulasAtivas)
+      + numero('Registraram encontro nas últimas 4 semanas', c.celulasComEncontro)
+      + numero('Frequência média por encontro (4 semanas)', c.frequenciaMedia === null ? 'sem encontros' : c.frequenciaMedia)
+      + numero('Visitantes que viraram membros (4 semanas)', c.visitantesViraramMembros)
+      + numero('Multiplicações nos últimos 12 meses', c.multiplicacoes)
+      + numero('Dias na Palavra (Power of 4, 30 dias)', c.diasNaPalavra.pct === null ? 'sem dado' : c.diasNaPalavra.pct + '% (base ' + c.diasNaPalavra.base + ')')
+      + numero('Conhecer Jesus: começaram', c.conhecer.comecaram)
+      + numero('Conhecer Jesus: terminaram os 14 dias', c.conhecer.terminaram)
+      + numero('Conhecer Jesus: tocaram "Quero conversar"', c.conhecer.quiseramConversar)
+      + numero('Discipulado: relações ativas', c.discipulado.ativos)
+      + numero('Discipulado: 2ª geração', c.discipulado.segundaGeracao)
+      + numero('Cuidado: pedidos de oração ativos', c.cuidado.pedidosAtivos)
+      + numero('Cuidado: denúncias abertas', c.cuidado.denunciasAbertas);
+  }
+
   CC.vistaPainel = async function (raiz) {
     raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Painel do app</h1><div class="vazio">Carregando…</div>';
     let p;
@@ -61,7 +79,9 @@
         + numero('Escreveram sobre algum dia', p.escreveram)
         + numero('Estão em algum propósito', p.propositos.contasEmAlgum)
         + numero('Propósitos ativos (grupos)', p.propositos.ativos + ' (' + p.propositos.grupos + ')')
-        + numero('Com notificação ligada', p.comNotificacao));
+        + numero('Com notificação ligada', p.comNotificacao))
+      + grupo('Células e cuidado', celulasECuidado(p.celulasECuidado),
+        'Só números. Com menos de 5 pessoas numa conta, aparece "menos de 5" para não identificar ninguém numa igreja pequena.');
 
     async function gerar(usuario) {
       if (!usuario) return;

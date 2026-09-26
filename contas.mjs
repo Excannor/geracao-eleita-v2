@@ -12,7 +12,7 @@ import { dirname } from 'node:path';
 import { randomBytes, scrypt as scryptCb, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import { abrirModulo, concluirImportacao, lerTabela, sincronizar, transacao, gravarMeta, lerMeta } from './db.mjs';
-import { LIMITE_GRUPO, limiteDo, alvoValido, rotuloDoProposito } from './propositos.mjs';
+import { LIMITE_GRUPO, LIMITE_CELULA, limiteDo, alvoValido, rotuloDoProposito } from './propositos.mjs';
 import { LIMITE_DISCIPULOS, MARCOS, MOSTRAR_PADRAO, mostrarValido, dataEncontroValida, papelValido } from './discipulado.mjs';
 import {
   tipoValido, destinoValido, diasValido, textoValido, limparTexto, LIMITE_ATIVOS_POR_CELULA,
@@ -178,10 +178,11 @@ function paraLinhas(d) {
       estudo_tipo: (p.estudo && p.estudo.tipo) || '', estudo_ref: (p.estudo && p.estudo.ref) || '',
       estudo_texto: (p.estudo && p.estudo.texto) || '', estudo_em: (p.estudo && p.estudo.em) || '',
       estudo_acolhida: p.estudoAcolhida || '', estudo_adoracao: p.estudoAdoracao || '', estudo_testemunho: p.estudoTestemunho || '',
+      mae: p.mae || '', multiplicada_em: p.multiplicadaEm || '',
     })) },
     { tabela: 'proposito_membros', chaves: ['proposito', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => p.membros.map((m) => ({
       proposito: p.id, usuario: m.usuario, estado: m.estado, entrou_em: m.entrouEm || '', saiu_em: m.saiuEm || '', convidado_por: m.convidadoPor || '',
-      papel: m.papel || '',
+      papel: m.papel || '', tornou_membro_em: m.tornouMembroEm || '',
     }))) },
     { tabela: 'proposito_dias', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.diasBatidos || []).map((data) => ({ proposito: p.id, data }))) },
     { tabela: 'celula_encontros', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || []).map((e) => ({
@@ -259,12 +260,18 @@ function deLinhas(t, versao) {
       encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '',
       estudo: l.estudo_tipo ? { tipo: l.estudo_tipo, ref: l.estudo_ref || '', texto: l.estudo_texto || '', em: l.estudo_em || '' } : null,
       estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
+      mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '',
       membros: [], diasBatidos: [], encontros: [],
     };
   }
   for (const l of t.membros || []) {
     const p = d.propositos[l.proposito];
-    if (p) p.membros.push({ usuario: l.usuario, estado: l.estado, entrouEm: l.entrou_em || '', saiuEm: l.saiu_em || '', convidadoPor: l.convidado_por || '', papel: l.papel || '' });
+    if (p) {
+      p.membros.push({
+        usuario: l.usuario, estado: l.estado, entrouEm: l.entrou_em || '', saiuEm: l.saiu_em || '', convidadoPor: l.convidado_por || '',
+        papel: l.papel || '', tornouMembroEm: l.tornou_membro_em || '',
+      });
+    }
   }
   for (const l of t.diasBatidos || []) {
     const p = d.propositos[l.proposito];
@@ -1009,7 +1016,7 @@ export class Contas {
 
   // O visitante que decide ficar: vira membro de verdade, contando na meta e no limite de 20
   // como qualquer um. Continua precisando de vaga: virar membro não é convite automático.
-  async tornarMembro(eu, id) {
+  async tornarMembro(eu, id, hoje) {
     const a = this.exigirCompleto(eu);
     const p = this.proposito(id);
     if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
@@ -1018,6 +1025,9 @@ export class Contas {
     const membros = this.ativosDe(p).filter((x) => x.papel !== 'visitante').length;
     if (membros >= limiteDo(p)) throw erro('essa célula já está cheia (' + limiteDo(p) + ' pessoas)', 409);
     m.papel = '';
+    // Guardado só para o painel pastoral agregado (Fase 5): "quantos visitantes com conta
+    // passaram a membro" nas últimas semanas, sem nome nenhum, é a única razão desta data.
+    m.tornouMembroEm = hoje || m.tornouMembroEm || '';
     await this.salvar();
     return p;
   }
@@ -1165,6 +1175,48 @@ export class Contas {
     this.limparPedidosDaCelula(u, id);
     await this.salvar();
     return p;
+  }
+
+  // ---------- multiplicação da célula (Atos 2.47; 2 Timóteo 2.2) ----------
+  // Só o líder inicia, e só com pelo menos 1 auxiliar ativo: ele passa a liderar a célula
+  // nova, e o líder escolhe junto com ele quem mais vai (membros ativos; visitante pode ir
+  // junto, sem virar membro por causa disso). Quem vai sai da mãe e entra na filha na mesma
+  // data, sem perder a ofensiva pessoal (ela é da conta, nunca da célula); a ofensiva da
+  // célula nova começa do zero porque ela nasce naquele dia. O auxiliar deixa de ser
+  // auxiliar da mãe só porque saiu dela, não por um passo à parte.
+  async multiplicarCelula(eu, id, { auxiliar, titulo, pessoas } = {}, hoje) {
+    const mae = this.celulaDoLider(eu, id);
+    const novoLider = limparNome(auxiliar);
+    const souAuxiliar = (u) => mae.membros.find((m) => m.usuario === u && m.estado === 'ativo' && m.papel === 'auxiliar');
+    if (!souAuxiliar(novoLider)) throw erro('escolha um auxiliar ativo da célula para liderar a nova célula', 400);
+    const escolhidos = [...new Set((Array.isArray(pessoas) ? pessoas : []).map(limparNome))]
+      .filter((u) => u && u !== novoLider && u !== mae.criadoPor);
+    for (const u of escolhidos) {
+      if (!mae.membros.some((m) => m.usuario === u && m.estado === 'ativo')) {
+        throw erro('só dá para levar quem está ativo na célula', 400);
+      }
+    }
+    const movidos = [novoLider, ...escolhidos];
+    if (movidos.length > LIMITE_CELULA) throw erro('a nova célula tem no máximo ' + LIMITE_CELULA + ' pessoas', 400);
+    const filhaId = 'p' + randomBytes(6).toString('hex');
+    const filha = {
+      id: filhaId, tipo: 'plano', alvo: '', titulo: String(titulo || '').trim().slice(0, 30) || 'Célula',
+      criadoPor: novoLider, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
+      mae: mae.id, multiplicadaEm: hoje, membros: [],
+    };
+    for (const u of movidos) {
+      const m = mae.membros.find((x) => x.usuario === u);
+      m.estado = 'saiu';
+      m.saiuEm = hoje;
+      filha.membros.push({
+        usuario: u, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: '',
+        papel: u !== novoLider && m.papel === 'visitante' ? 'visitante' : '',
+      });
+      this.limparPedidosDaCelula(u, mae.id);
+    }
+    this.dados.propositos[filhaId] = filha;
+    await this.salvar();
+    return { filha, mae, movidos };
   }
 
   async sairDoProposito(eu, id, hoje) {
