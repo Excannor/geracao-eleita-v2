@@ -332,6 +332,14 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   checar(!m['Rute 1:16'] && m['Rute 1:17'].cor === 4, 'marca apagada há mais de 90 dias some; marca antiga de verdade fica');
   checar(JSON.stringify(CC.fundir(a, b).marcas) === JSON.stringify(CC.fundir(b, a).marcas), 'a fusão das marcas dá o mesmo nos dois sentidos');
 
+  // --- minha história com Deus: fusão pelo "em" mais recente, sem misturar campos ---
+  const h1 = { antes: 'era perdido', encontro: 'numa célula', hoje: 'tenho paz', em: 1000 };
+  const h2 = { antes: 'outra versão', encontro: 'outro jeito', hoje: 'outra coisa', em: 2000 };
+  checar(CC.fundir({ historia: h1 }, { historia: h2 }).historia === h2, 'a história mais recente (maior "em") vence inteira, sem misturar campos');
+  checar(CC.fundir({ historia: h2 }, { historia: h1 }).historia === h2, 'a fusão da história dá o mesmo resultado nos dois sentidos');
+  checar(CC.fundir({ historia: h1 }, { historia: null }).historia === h1, 'sem história no outro lado, a que existe se mantém');
+  checar(CC.fundir({}, {}).historia === undefined || CC.fundir({}, {}).historia === null, 'sem história nos dois lados, continua vazia');
+
   const E = CC.estado();
   E.marcas = { 'João 3:16': { cor: 2, em: 3 }, 'João 3:17': { cor: 2, em: 4 }, 'João 3:18': { cor: 1, em: 5 }, 'João 3:19': { cor: 0, em: 6 } };
   E.anotacoes = { 'verso:João 3.16-18': 'Deus amou primeiro.', 'nota:x': 'outra', 'verso:Rute 1.16': '  ' };

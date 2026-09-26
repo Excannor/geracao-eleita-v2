@@ -43,6 +43,9 @@
     ultimaBiblia: null,
     // marca-texto por versículo: { "João 3:16": { cor: 1..4, em } }; cor 0 é marca apagada
     marcas: {},
+    // Minha história com Deus (Perfil): guia privado, nunca sai para amigo, célula,
+    // discipulado nem painel. { antes, encontro, hoje, em }.
+    historia: null,
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -94,6 +97,14 @@
     const limite = Date.now() - LAPIDE_MS;
     for (const [chave, m] of Object.entries(saida)) if (!m.cor && (m.em || 0) < limite) delete saida[chave];
     return saida;
+  }
+
+  // Minha história com Deus: vence a cópia com "em" mais recente, sem misturar campo a
+  // campo (é um relato só, escrito de uma vez; misturar pedaços de dois textos não faz sentido).
+  function fundirHistoria(a, b) {
+    if (!a) return b || null;
+    if (!b) return a;
+    return (b.em || 0) >= (a.em || 0) ? b : a;
   }
 
   let E = VAZIO();
@@ -160,6 +171,7 @@
       // vale o capítulo aberto por último, em qualquer aparelho
       ultimaBiblia: ((b.ultimaBiblia || {}).em || 0) >= ((a.ultimaBiblia || {}).em || 0) ? (b.ultimaBiblia || a.ultimaBiblia || null) : a.ultimaBiblia,
       marcas: fundirMarcas(a.marcas, b.marcas),
+      historia: fundirHistoria(a.historia, b.historia),
     };
   }
   function fundirPratica(a, b) {
@@ -261,6 +273,13 @@
   CC.gravarAnotacao = (chave, texto) => {
     (E.anotacoes ||= {})[chave] = texto;
     CC.gravar('atualizadoEm', Date.now());
+  };
+
+  // Minha história com Deus: guia privado do Perfil. Só volta pela própria conta da pessoa
+  // (api/estado); nunca sai em amigos, célula, discipulado ou painel.
+  CC.minhaHistoria = () => E.historia || null;
+  CC.gravarHistoria = (antes, encontro, hoje) => {
+    CC.gravar('historia', { antes, encontro, hoje, em: Date.now() });
   };
 
   // ---------- marcação ----------

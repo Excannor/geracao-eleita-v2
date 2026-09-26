@@ -288,7 +288,50 @@ try {
   dbV8.prepare("INSERT INTO discipulados (id, discipulador, discipulo, estado, pediu, criado_em, aceito_em, mostrar) VALUES ('d1', 'ana', 'bia', 'ativo', 'ana', '2026-01-03', '2026-01-03', '{}')").run();
   dbV8.prepare("INSERT INTO discipulado_encontros (discipulado, data) VALUES ('d1', '2026-01-10')").run();
   ok(dbV8.prepare("SELECT count(*) n FROM discipulado_encontros WHERE discipulado = 'd1'").get().n === 1, 'a tabela nova aceita linhas de verdade');
+  // Antes de fechar em v8, o banco já pode reabrir e migrar até v9 sozinho: confere logo a seguir.
+  ok(Number(dbV8.prepare('SELECT versao FROM schema_versao').get().versao) === B.versaoDoEsquema(), 'o mesmo banco, sem fechar, já está na versão atual (inclui a v9)');
+  const tabelasV9 = dbV8.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
+  ok(['pedidos', 'pedido_gestos', 'pedido_denuncias'].every((t) => tabelasV9.includes(t)), 'as tabelas de cuidado mútuo (v9) nascem na migração');
+  dbV8.prepare(`INSERT INTO pedidos (id, celula, autor, tipo, destino, texto, criado_em, vence_em, estado, removido_por)
+    VALUES ('r1', 'p1', 'ana', 'oracao', 'celula', 'ore por mim', '2026-01-05', '2026-01-12', 'ativo', '')`).run();
+  dbV8.prepare("INSERT INTO pedido_gestos (pedido, usuario, gesto, data) VALUES ('r1', 'bia', 'orei', '2026-01-06')").run();
+  dbV8.prepare("INSERT INTO pedido_denuncias (pedido, usuario, motivo, em) VALUES ('r1', 'bia', 'É ofensivo', '2026-01-06T10:00:00.000Z')").run();
+  ok(dbV8.prepare("SELECT count(*) n FROM pedido_gestos WHERE pedido = 'r1'").get().n === 1
+    && dbV8.prepare("SELECT count(*) n FROM pedido_denuncias WHERE pedido = 'r1'").get().n === 1,
+    'as tabelas novas de cuidado mútuo aceitam linhas de verdade');
   B.fecharBanco(arquivoV7);
+
+  // ---------- migração v8 -> v9 num banco v8 existente, reaberto do zero ----------
+  console.log('\n  Banco: migração v8 -> v9\n');
+  const pastaV8 = mkdtempSync(join(tmpdir(), 'cc-db-v8-'));
+  const arquivoV8 = B.arquivoDoBanco(pastaV8);
+  const brutoV8 = new B.DatabaseSync(arquivoV8);
+  brutoV8.exec(`
+    CREATE TABLE contas (
+      usuario TEXT PRIMARY KEY, nome TEXT NOT NULL DEFAULT '', email TEXT NOT NULL DEFAULT '',
+      nascimento TEXT NOT NULL DEFAULT '', fuso TEXT NOT NULL DEFAULT '', sal TEXT NOT NULL, senha TEXT NOT NULL,
+      criada_em TEXT NOT NULL DEFAULT '', selo_convite TEXT NOT NULL DEFAULT '', extra TEXT NOT NULL DEFAULT '{}'
+    );
+    CREATE TABLE discipulados (
+      id TEXT PRIMARY KEY, discipulador TEXT NOT NULL, discipulo TEXT NOT NULL, estado TEXT NOT NULL, pediu TEXT NOT NULL,
+      criado_em TEXT NOT NULL, aceito_em TEXT NOT NULL DEFAULT '', encerrado_em TEXT NOT NULL DEFAULT '', mostrar TEXT NOT NULL DEFAULT '{}'
+    );
+    CREATE TABLE discipulado_encontros (discipulado TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (discipulado, data));
+    CREATE TABLE schema_versao (versao INTEGER NOT NULL);
+    INSERT INTO schema_versao (versao) VALUES (8);
+    INSERT INTO contas (usuario, nome, email, nascimento, fuso, sal, senha, criada_em, selo_convite, extra)
+      VALUES ('cae', 'Caê', 'cae@x.com', '2000-01-01', 'America/Sao_Paulo', 's', 'h', '2026-01-01', 'z', '{}');
+  `);
+  ok(Number(brutoV8.prepare('SELECT versao FROM schema_versao').get().versao) === 8, 'o banco de ensaio nasce na versão 8, como um HML de antes da Fase 4');
+  brutoV8.close();
+
+  const dbV9 = B.abrirBanco(arquivoV8);
+  ok(Number(dbV9.prepare('SELECT versao FROM schema_versao').get().versao) === B.versaoDoEsquema(), 'reabrir um banco v8 migra sozinho até a versão atual');
+  ok(dbV9.prepare("SELECT count(*) n FROM contas").get().n === 1, 'a migração v8 -> v9 não perde nenhuma conta que já existia');
+  const tabelasV9b = dbV9.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
+  ok(['pedidos', 'pedido_gestos', 'pedido_denuncias'].every((t) => tabelasV9b.includes(t)), 'as tabelas de cuidado mútuo nascem também na migração de um banco v8 de verdade');
+  B.fecharBanco(arquivoV8);
+  try { rmSync(pastaV8, { recursive: true, force: true }); } catch { /* ok */ }
 } catch (e) {
   ok(false, 'o teste quebrou: ' + e.stack);
 } finally {

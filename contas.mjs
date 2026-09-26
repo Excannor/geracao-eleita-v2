@@ -14,6 +14,10 @@ import { promisify } from 'node:util';
 import { abrirModulo, concluirImportacao, lerTabela, sincronizar, transacao, gravarMeta, lerMeta } from './db.mjs';
 import { LIMITE_GRUPO, limiteDo, alvoValido, rotuloDoProposito } from './propositos.mjs';
 import { LIMITE_DISCIPULOS, MARCOS, MOSTRAR_PADRAO, mostrarValido, dataEncontroValida, papelValido } from './discipulado.mjs';
+import {
+  tipoValido, destinoValido, diasValido, textoValido, limparTexto, LIMITE_ATIVOS_POR_CELULA,
+  motivoDenunciaValido, venceEmDe, vencidoParaApagar, membroDeVerdade,
+} from './cuidado.mjs';
 
 const scrypt = promisify(scryptCb);
 const CUSTO = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
@@ -131,6 +135,7 @@ const par = (a, b) => [a, b].sort().join('|');
 const vazio = () => ({
   versao: 2, contas: {}, amizades: {}, bloqueios: {}, silenciados: {},
   convitesUsados: {}, toques: {}, denuncias: [], convitesAceites: [], propositos: {}, discipulados: {},
+  pedidos: {},
 });
 
 // ---------- linhas do banco ----------
@@ -191,6 +196,14 @@ function paraLinhas(d) {
     })) },
     { tabela: 'discipulado_encontros', chaves: ['discipulado', 'data'], linhas: Object.values(d.discipulados || {})
       .flatMap((x) => (x.encontros || []).map((data) => ({ discipulado: x.id, data }))) },
+    { tabela: 'pedidos', chaves: ['id'], linhas: Object.values(d.pedidos || {}).map((x) => ({
+      id: x.id, celula: x.celula, autor: x.autor, tipo: x.tipo, destino: x.destino, texto: x.texto,
+      criado_em: x.criadoEm, vence_em: x.venceEm, estado: x.estado, removido_por: x.removidoPor || '',
+    })) },
+    { tabela: 'pedido_gestos', chaves: ['pedido', 'usuario', 'gesto', 'data'], linhas: Object.values(d.pedidos || {})
+      .flatMap((x) => (x.gestos || []).map((g) => ({ pedido: x.id, usuario: g.usuario, gesto: g.gesto, data: g.data }))) },
+    { tabela: 'pedido_denuncias', chaves: ['pedido', 'usuario'], linhas: Object.values(d.pedidos || {})
+      .flatMap((x) => (x.denuncias || []).map((n) => ({ pedido: x.id, usuario: n.usuario, motivo: n.motivo, em: n.em }))) },
   ];
 }
 
@@ -211,6 +224,9 @@ function lerTabelas(db) {
     presencas: lerTabela(db, 'celula_presencas', ['proposito', 'data', 'usuario']),
     discipulados: lerTabela(db, 'discipulados', ['id'], 'criado_em'),
     discipuladoEncontros: lerTabela(db, 'discipulado_encontros', ['discipulado', 'data'], 'data'),
+    pedidos: lerTabela(db, 'pedidos', ['id'], 'criado_em'),
+    pedidoGestos: lerTabela(db, 'pedido_gestos', ['pedido', 'usuario', 'gesto', 'data'], 'data'),
+    pedidoDenuncias: lerTabela(db, 'pedido_denuncias', ['pedido', 'usuario'], 'em'),
   };
 }
 
@@ -273,6 +289,21 @@ function deLinhas(t, versao) {
   for (const l of t.discipuladoEncontros || []) {
     const x = d.discipulados[l.discipulado];
     if (x) x.encontros.push(l.data);
+  }
+  for (const l of t.pedidos || []) {
+    d.pedidos[l.id] = {
+      id: l.id, celula: l.celula, autor: l.autor, tipo: l.tipo, destino: l.destino, texto: l.texto,
+      criadoEm: l.criado_em, venceEm: l.vence_em, estado: l.estado, removidoPor: l.removido_por || '',
+      gestos: [], denuncias: [],
+    };
+  }
+  for (const l of t.pedidoGestos || []) {
+    const r = d.pedidos[l.pedido];
+    if (r) r.gestos.push({ usuario: l.usuario, gesto: l.gesto, data: l.data });
+  }
+  for (const l of t.pedidoDenuncias || []) {
+    const r = d.pedidos[l.pedido];
+    if (r) r.denuncias.push({ usuario: l.usuario, motivo: l.motivo, em: l.em });
   }
   return d;
 }
@@ -522,6 +553,15 @@ export class Contas {
     for (const id of Object.keys(this.dados.discipulados || {})) {
       const x = this.dados.discipulados[id];
       if (x.discipulador === chave || x.discipulo === chave) delete this.dados.discipulados[id];
+    }
+    // cuidado mútuo: os pedidos da pessoa somem inteiros (com gestos e denúncias deles); o
+    // gesto ou a denúncia que ela deixou no pedido de outra pessoa também some, mas o pedido
+    // de quem não é ela continua de pé
+    for (const id of Object.keys(this.dados.pedidos || {})) {
+      const r = this.dados.pedidos[id];
+      if (r.autor === chave) { delete this.dados.pedidos[id]; continue; }
+      r.gestos = r.gestos.filter((g) => g.usuario !== chave);
+      r.denuncias = r.denuncias.filter((n) => n.usuario !== chave);
     }
     await this.salvar();
     return chave;
@@ -1105,6 +1145,15 @@ export class Contas {
     return p;
   }
 
+  // Os pedidos de oração e de ajuda que a pessoa deixou naquela célula somem com ela: quem
+  // não está mais lá não tem por que continuar pedindo (nem sendo pedido) ali.
+  limparPedidosDaCelula(usuario, celula) {
+    for (const id of Object.keys(this.dados.pedidos || {})) {
+      const r = this.dados.pedidos[id];
+      if (r.celula === celula && r.autor === usuario) delete this.dados.pedidos[id];
+    }
+  }
+
   async removerDaCelula(eu, id, usuario, hoje) {
     const p = this.celulaDoLider(eu, id);
     const u = limparNome(usuario);
@@ -1113,6 +1162,7 @@ export class Contas {
     if (!m) throw erro('essa pessoa não está na célula', 404);
     m.estado = 'saiu';
     m.saiuEm = hoje;
+    this.limparPedidosDaCelula(u, id);
     await this.salvar();
     return p;
   }
@@ -1125,6 +1175,7 @@ export class Contas {
     m.estado = 'saiu';
     m.saiuEm = hoje;
     if (!p.grupo || this.presentes(p).length < 2) p.encerradoEm = hoje;
+    if (p.celula) this.limparPedidosDaCelula(a.usuario, id);
     await this.salvar();
     return p;
   }
@@ -1297,6 +1348,138 @@ export class Contas {
     a.marcos = marcos;
     await this.salvar();
     return marcos;
+  }
+
+  // ---------- cuidado mútuo (Atos 2.42, 2.44-45) ----------
+  // O pedido é do autor; os outros só respondem com um gesto sem texto. As regras (limites,
+  // quem vê, o que esconde) moram em cuidado.mjs; aqui só o estado é guardado.
+  pedido(id) { return (this.dados.pedidos || {})[String(id || '')] || null; }
+  pedidosDaCelula(celula) { return Object.values(this.dados.pedidos || {}).filter((r) => r.celula === celula); }
+
+  // Membro ativo que não está só conhecendo (visitante): só ele cria, vê e reage.
+  membroDeCuidado(p, usuario) { return !!p && p.membros.some((m) => m.usuario === usuario && membroDeVerdade(m)); }
+
+  celulaDeCuidado(id) {
+    const p = this.proposito(id);
+    if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
+    return p;
+  }
+
+  async criarPedido(eu, { celula, tipo, destino, texto, dias } = {}, hoje) {
+    const a = this.exigirCompleto(eu);
+    const p = this.celulaDeCuidado(celula);
+    if (!this.membroDeCuidado(p, a.usuario)) throw erro('quem só está conhecendo a célula ainda não pede', 403);
+    if (!tipoValido(tipo)) throw erro('escolha se é um pedido de oração ou de ajuda');
+    if (!destinoValido(tipo, destino)) throw erro('escolha para quem é o pedido');
+    if (!diasValido(dias)) throw erro('escolha por quanto tempo o pedido fica de pé');
+    if (!textoValido(tipo, texto)) throw erro('escreva o pedido, dentro do tamanho permitido');
+    const ativos = this.pedidosDaCelula(p.id).filter((r) => r.autor === a.usuario && r.estado === 'ativo');
+    if (ativos.length >= LIMITE_ATIVOS_POR_CELULA) throw erro('você já tem ' + LIMITE_ATIVOS_POR_CELULA + ' pedidos ativos nessa célula', 409);
+    const id = 'r' + randomBytes(6).toString('hex');
+    this.dados.pedidos[id] = {
+      id, celula: p.id, autor: a.usuario, tipo, destino, texto: limparTexto(texto),
+      criadoEm: hoje, venceEm: venceEmDe(hoje, dias), estado: 'ativo', removidoPor: '', gestos: [], denuncias: [],
+    };
+    await this.salvar();
+    return this.dados.pedidos[id];
+  }
+
+  pedidoVisivel(id, usuario) {
+    const r = this.pedido(id);
+    if (!r) return null;
+    const p = this.proposito(r.celula);
+    if (!p || !this.membroDeCuidado(p, usuario)) return null;
+    return { r, p };
+  }
+
+  async orarPorPedido(eu, id, hoje) {
+    const a = this.exigirCompleto(eu);
+    const achado = this.pedidoVisivel(id, a.usuario);
+    if (!achado) throw erro('pedido não encontrado', 404);
+    const { r } = achado;
+    if (r.autor === a.usuario) throw erro('não dá para orar pelo próprio pedido', 400);
+    if (!r.gestos.some((g) => g.usuario === a.usuario && g.gesto === 'orei' && g.data === hoje)) {
+      r.gestos.push({ usuario: a.usuario, gesto: 'orei', data: hoje });
+      await this.salvar();
+    }
+    return r;
+  }
+
+  async ajudarPedido(eu, id, hoje) {
+    const a = this.exigirCompleto(eu);
+    const achado = this.pedidoVisivel(id, a.usuario);
+    if (!achado) throw erro('pedido não encontrado', 404);
+    const { r } = achado;
+    if (r.tipo !== 'necessidade') throw erro('"posso ajudar" é só para pedido de ajuda', 400);
+    if (r.autor === a.usuario) throw erro('não dá para ajudar no próprio pedido', 400);
+    if (!r.gestos.some((g) => g.usuario === a.usuario && g.gesto === 'ajudo')) {
+      r.gestos.push({ usuario: a.usuario, gesto: 'ajudo', data: hoje });
+      await this.salvar();
+    }
+    return r;
+  }
+
+  // Só o autor marca "Deus respondeu": some da lista dos outros e fica só 7 dias na dele
+  // (o vencimento é encurtado, sem precisar de um campo novo no banco).
+  async marcarRespondido(eu, id, hoje) {
+    const a = this.exigirCompleto(eu);
+    const r = this.pedido(id);
+    if (!r || r.autor !== a.usuario || r.estado !== 'ativo') throw erro('pedido não encontrado', 404);
+    r.estado = 'respondido';
+    r.venceEm = somaDias(hoje, 7);
+    await this.salvar();
+    return r;
+  }
+
+  // Só o autor apaga, e apaga de vez (com os gestos e denúncias): não é moderação, é a
+  // pessoa recolhendo o próprio pedido.
+  async apagarPedido(eu, id) {
+    const a = this.exigirCompleto(eu);
+    const r = this.pedido(id);
+    if (!r || r.autor !== a.usuario) throw erro('pedido não encontrado', 404);
+    delete this.dados.pedidos[id];
+    await this.salvar();
+  }
+
+  // Qualquer um que vê o pedido pode denunciar, uma vez só; quem denuncia nunca é
+  // identificado para o autor (a lista de denúncias só aparece para quem conduz).
+  async denunciarPedido(eu, id, motivo) {
+    const a = this.exigirCompleto(eu);
+    const achado = this.pedidoVisivel(id, a.usuario);
+    if (!achado) throw erro('pedido não encontrado', 404);
+    const { r } = achado;
+    if (r.autor === a.usuario) throw erro('não dá para denunciar o próprio pedido', 400);
+    if (!motivoDenunciaValido(motivo)) throw erro('escolha um motivo');
+    if (!r.denuncias.some((n) => n.usuario === a.usuario)) {
+      r.denuncias.push({ usuario: a.usuario, motivo, em: new Date().toISOString() });
+      await this.salvar();
+    }
+    return r;
+  }
+
+  // Só quem conduz decide: "manter" limpa as denúncias (o pedido volta a aparecer para
+  // todos); "tirar" remove o pedido e guarda quem decidiu.
+  async decidirPedido(eu, id, manter) {
+    const a = this.exigirCompleto(eu);
+    const r = this.pedido(id);
+    if (!r) throw erro('pedido não encontrado', 404);
+    const p = this.proposito(r.celula);
+    if (!p || !podeConduzir(p, a.usuario)) throw erro('só quem conduz a célula pode fazer isso', 403);
+    if (manter) r.denuncias = [];
+    else { r.estado = 'removido'; r.removidoPor = a.usuario; }
+    await this.salvar();
+    return r;
+  }
+
+  // Limpeza: 30 dias depois de vencido (ou de "Deus respondeu" ter encurtado o vencimento),
+  // o pedido some do banco de vez, com gestos e denúncias.
+  async limparPedidosVencidos(hoje) {
+    let mudou = false;
+    for (const id of Object.keys(this.dados.pedidos || {})) {
+      if (vencidoParaApagar(this.dados.pedidos[id], hoje)) { delete this.dados.pedidos[id]; mudou = true; }
+    }
+    if (mudou) await this.salvar();
+    return mudou;
   }
 
   // ---------- denúncias ----------

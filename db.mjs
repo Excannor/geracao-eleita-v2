@@ -143,6 +143,25 @@ const ESQUEMA = [
   CREATE INDEX discipulados_discipulo ON discipulados (discipulo);
   CREATE TABLE discipulado_encontros (discipulado TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (discipulado, data));
   `,
+  // v9: cuidado mútuo (Atos 2.42; 2.44-45). O pedido é só do autor, sem chat: os outros
+  // respondem com um gesto sem texto ("orei" ou "ajudo"). Denúncia é anônima para o autor;
+  // as regras (limites, quem vê, o que esconde) moram em cuidado.mjs.
+  `
+  CREATE TABLE pedidos (
+    id TEXT PRIMARY KEY, celula TEXT NOT NULL, autor TEXT NOT NULL,
+    tipo TEXT NOT NULL,                 -- 'oracao' | 'necessidade'
+    destino TEXT NOT NULL,              -- 'celula' | 'conduz' (líder e auxiliar); necessidade é sempre 'celula'
+    texto TEXT NOT NULL,                -- até 280 caracteres (oração) ou 200 (necessidade)
+    criado_em TEXT NOT NULL, vence_em TEXT NOT NULL,
+    estado TEXT NOT NULL DEFAULT 'ativo', -- 'ativo' | 'respondido' | 'removido'
+    removido_por TEXT NOT NULL DEFAULT ''
+  );
+  CREATE INDEX pedidos_celula ON pedidos (celula);
+  CREATE TABLE pedido_gestos (pedido TEXT NOT NULL, usuario TEXT NOT NULL, gesto TEXT NOT NULL, data TEXT NOT NULL,
+    PRIMARY KEY (pedido, usuario, gesto, data));
+  CREATE TABLE pedido_denuncias (pedido TEXT NOT NULL, usuario TEXT NOT NULL, motivo TEXT NOT NULL, em TEXT NOT NULL,
+    PRIMARY KEY (pedido, usuario));
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -312,6 +331,11 @@ export function apagarPessoaDoBanco(db, usuario) {
     // sobrevive sem a pessoa, é uma relação de duas pontas só
     ['discipulado_encontros', "DELETE FROM discipulado_encontros WHERE discipulado IN (SELECT id FROM discipulados WHERE discipulador = ? OR discipulo = ?)", [u, u]],
     ['discipulados', 'DELETE FROM discipulados WHERE discipulador = ? OR discipulo = ?', [u, u]],
+    // cuidado mútuo: os pedidos da pessoa somem inteiros; o gesto ou a denúncia que ela deixou
+    // no pedido de outra pessoa também some, mas o pedido em si continua de pé
+    ['pedido_gestos', "DELETE FROM pedido_gestos WHERE usuario = ? OR pedido IN (SELECT id FROM pedidos WHERE autor = ?)", [u, u]],
+    ['pedido_denuncias', "DELETE FROM pedido_denuncias WHERE usuario = ? OR pedido IN (SELECT id FROM pedidos WHERE autor = ?)", [u, u]],
+    ['pedidos', 'DELETE FROM pedidos WHERE autor = ?', [u]],
     ['novidades_reacoes', "DELETE FROM novidades_reacoes WHERE usuario = ? OR evento IN (SELECT id FROM novidades_eventos WHERE autor = ? OR json_extract(dados, '$.com') = ? OR EXISTS (SELECT 1 FROM json_each(dados, '$.membros') WHERE value = ?))", [u, u, u, u]],
     ['novidades_eventos', "DELETE FROM novidades_eventos WHERE autor = ? OR json_extract(dados, '$.com') = ? OR EXISTS (SELECT 1 FROM json_each(dados, '$.membros') WHERE value = ?)", [u, u, u]],
     ['novidades_pessoas', 'DELETE FROM novidades_pessoas WHERE usuario = ?', [u]],

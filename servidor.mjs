@@ -17,6 +17,7 @@ import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
 import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, quemPrecisaDeAtencao, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import { diasLidosNaSemana, resumoParaDiscipulador } from './discipulado.mjs';
+import { MOTIVOS_DENUNCIA_PEDIDO, MOTIVO_PERIGO, pedidoVisivelPara, gestosParaAutor, jaOrouHoje, jaAjudou } from './cuidado.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
@@ -1017,7 +1018,7 @@ const servidor = createServer(async (req, res) => {
     if (rota.startsWith('/api/') && ['/api/amigos', '/api/procurar', '/api/amizade', '/api/convites',
       '/api/convites/aceitar', '/api/convites/cancelar', '/api/toques', '/api/denuncias',
       '/api/novidades', '/api/novidades/reagir', '/api/novidades/preferencia', '/api/propositos',
-      '/api/discipulado'].includes(rota)) {
+      '/api/discipulado', '/api/cuidado'].includes(rota)) {
       if (!conta) { json(res, 403, { erro: 'entre com uma conta' }); return; }
     }
 
@@ -1297,6 +1298,91 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'encontro') { await CONTAS.registrarEncontroDiscipulado(eu, id, data, hoje); return {}; }
         if (qual === 'encerrar') { await CONTAS.encerrarDiscipulado(eu, id, hoje); return {}; }
         if (qual === 'marco') { const marcos = await CONTAS.definirMarco(eu, chave, data); return { marcos }; }
+        throw Object.assign(new Error('ação desconhecida'), { publico: true });
+      });
+      return;
+    }
+
+    // ---------- cuidado mútuo (Atos 2.42; 2.44-45) ----------
+    // Sem chat: o pedido é do autor, os outros só reagem com um gesto sem texto. Nunca vai
+    // para o Feed, nunca vale XP, e visitante (só está conhecendo) não vê nem cria.
+    if (rota === '/api/cuidado' && req.method === 'GET') {
+      const celulaId = url.searchParams.get('celula') || '';
+      const p = CONTAS.proposito(celulaId);
+      if (!p || p.encerradoEm || !p.celula) { json(res, 404, { erro: 'célula não encontrada' }); return; }
+      if (!CONTAS.membroDeCuidado(p, eu)) { json(res, 403, { erro: 'só quem participa da célula vê os pedidos' }); return; }
+      const hoje = hojeDe(eu);
+      await CONTAS.limparPedidosVencidos(hoje);
+      const conduz = podeConduzir(p, eu);
+      const todos = CONTAS.pedidosDaCelula(p.id);
+      const nomeDe = (u) => { const c = CONTAS.achar(u); return (c && c.nome) || u; };
+      const pedidos = [];
+      for (const r of todos) {
+        if (!pedidoVisivelPara(r, { usuario: eu, hoje, conduz })) continue;
+        const meu = r.autor === eu;
+        const item = {
+          id: r.id, autor: { usuario: r.autor, nome: nomeDe(r.autor) }, tipo: r.tipo, destino: r.destino,
+          texto: r.texto, criadoEm: r.criadoEm, venceEm: r.venceEm, meu,
+          oreiHoje: jaOrouHoje(r, eu, hoje), ajudei: jaAjudou(r, eu),
+        };
+        if (meu) item.gestos = gestosParaAutor(r).map((g) => ({ usuario: g.usuario, nome: nomeDe(g.usuario), gesto: g.gesto, data: g.data }));
+        pedidos.push(item);
+      }
+      pedidos.sort((a, b) => (b.meu - a.meu) || b.criadoEm.localeCompare(a.criadoEm));
+      const resposta = { pedidos, motivos: MOTIVOS_DENUNCIA_PEDIDO };
+      if (conduz) {
+        resposta.denuncias = todos.filter((r) => r.estado !== 'removido' && r.denuncias.length > 0).map((r) => ({
+          pedido: r.id, texto: r.texto, autor: nomeDe(r.autor),
+          motivos: [...new Set(r.denuncias.map((n) => n.motivo))], total: r.denuncias.length,
+        }));
+      }
+      json(res, 200, resposta);
+      return;
+    }
+
+    if (rota === '/api/cuidado') {
+      await acao(async ({ acao: qual, id, celula, tipo, destino, texto, dias, motivo, manter }) => {
+        const hoje = hojeDe(eu);
+        if (qual === 'criar') {
+          const r = await CONTAS.criarPedido(eu, { celula, tipo, destino, texto, dias }, hoje);
+          // Só quem conduz é avisado, e só quando o pedido é reservado para eles: a célula
+          // inteira nunca recebe push a cada pedido novo.
+          if (r.destino === 'conduz') {
+            const p = CONTAS.proposito(celula);
+            if (p) {
+              const nome = await nomeDeExibicao(eu);
+              const alvos = new Set([p.criadoPor]);
+              for (const m of p.membros) if (m.estado === 'ativo' && m.papel === 'auxiliar') alvos.add(m.usuario);
+              alvos.delete(eu);
+              for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'pedidoConduz', { amigo: nome }));
+            }
+          }
+          return { id: r.id };
+        }
+        const r = CONTAS.pedido(id);
+        if (!r) { const e = new Error('pedido não encontrado'); e.publico = true; e.codigo = 404; throw e; }
+        if (qual === 'orei') { await CONTAS.orarPorPedido(eu, id, hoje); return {}; }
+        if (qual === 'ajudo') {
+          await CONTAS.ajudarPedido(eu, id, hoje);
+          semEsperar(avisoSocial(r.autor, 'possoAjudar', { amigo: await nomeDeExibicao(eu) }));
+          return {};
+        }
+        if (qual === 'respondido') { await CONTAS.marcarRespondido(eu, id, hoje); return {}; }
+        if (qual === 'apagar') { await CONTAS.apagarPedido(eu, id); return {}; }
+        if (qual === 'denunciar') {
+          await CONTAS.denunciarPedido(eu, id, motivo);
+          // "Alguém pode estar em perigo" avisa quem conduz na hora, sem esperar a segunda denúncia.
+          if (motivo === MOTIVO_PERIGO) {
+            const p = CONTAS.proposito(r.celula);
+            if (p) {
+              const alvos = new Set([p.criadoPor]);
+              for (const m of p.membros) if (m.estado === 'ativo' && m.papel === 'auxiliar') alvos.add(m.usuario);
+              for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'denunciaPerigo', {}));
+            }
+          }
+          return {};
+        }
+        if (qual === 'decidir') { await CONTAS.decidirPedido(eu, id, !!manter); return {}; }
         throw Object.assign(new Error('ação desconhecida'), { publico: true });
       });
       return;

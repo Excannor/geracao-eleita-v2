@@ -298,6 +298,10 @@ const T = {
   // Discipulado (Mateus 28.19-20; 2 Tm 2.2): assunto sério, sem emoji, como querConversar.
   discipuladoConvite: [['{amigo} quer caminhar com você na fé.', 'Abra o app para ver o convite.']],
   discipuladoAceito: [['{amigo} aceitou caminhar com você na fé.', 'Combinem juntos o primeiro encontro da semana.']],
+  // Cuidado mútuo (Atos 2.42; 2.44-45): assunto sério, sem emoji, sem detalhe do pedido.
+  pedidoConduz: [['{amigo} deixou um pedido de oração para você.', 'Abra a célula para ver.']],
+  possoAjudar: [['{amigo} pode ajudar com o que você pediu.', 'Combinem pessoalmente ou no WhatsApp.']],
+  denunciaPerigo: [['Um pedido da célula precisa da sua atenção.', 'Abra a célula para ver.']],
 };
 export const TEXTOS = T;
 
@@ -343,6 +347,8 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   if (tipo === 'metaDoGrupo' || tipo === 'metaBatida') { url = telaDoProposito; tag = 'grupo:' + (dados.id || ''); }
   // Discipulado mora no Perfil, nunca no Feed: o toque na notificação leva direto para lá.
   if (tipo === 'discipuladoConvite' || tipo === 'discipuladoAceito') { url = './#/perfil/discipulado'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
+  // Cuidado mútuo mora na célula (aba Oração), nunca no Feed.
+  if (tipo === 'pedidoConduz' || tipo === 'possoAjudar' || tipo === 'denunciaPerigo') { url = './#/novidades'; tag = tipo; }
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = lista[semente(usuario + '|' + data + '|' + tipo) % lista.length];
   return { titulo: preencher(titulo, d), corpo: preencher(corpo, d), tag, url };
