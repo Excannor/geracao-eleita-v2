@@ -1363,16 +1363,20 @@ const servidor = createServer(async (req, res) => {
         if (!r) { const e = new Error('pedido não encontrado'); e.publico = true; e.codigo = 404; throw e; }
         if (qual === 'orei') { await CONTAS.orarPorPedido(eu, id, hoje); return {}; }
         if (qual === 'ajudo') {
+          // Só avisa na primeira vez: chamar de novo (idempotente) não pode reenviar o push.
+          const jaTinhaAjudado = jaAjudou(r, eu);
           await CONTAS.ajudarPedido(eu, id, hoje);
-          semEsperar(avisoSocial(r.autor, 'possoAjudar', { amigo: await nomeDeExibicao(eu) }));
+          if (!jaTinhaAjudado) semEsperar(avisoSocial(r.autor, 'possoAjudar', { amigo: await nomeDeExibicao(eu) }));
           return {};
         }
         if (qual === 'respondido') { await CONTAS.marcarRespondido(eu, id, hoje); return {}; }
         if (qual === 'apagar') { await CONTAS.apagarPedido(eu, id); return {}; }
         if (qual === 'denunciar') {
+          // Idem: denunciar de novo (a mesma pessoa só denuncia uma vez) não reenvia o aviso.
+          const jaTinhaDenunciado = r.denuncias.some((n) => n.usuario === eu);
           await CONTAS.denunciarPedido(eu, id, motivo);
           // "Alguém pode estar em perigo" avisa quem conduz na hora, sem esperar a segunda denúncia.
-          if (motivo === MOTIVO_PERIGO) {
+          if (motivo === MOTIVO_PERIGO && !jaTinhaDenunciado) {
             const p = CONTAS.proposito(r.celula);
             if (p) {
               const alvos = new Set([p.criadoPor]);

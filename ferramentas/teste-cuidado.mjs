@@ -51,7 +51,8 @@ console.log('\n  Cuidado mútuo: regras puras\n');
   ok(C.pedidoVisivelPara(escondido, { usuario: 'lider', hoje: '2026-03-10', conduz: true }), 'com 2 denúncias, quem conduz continua vendo');
 
   ok(C.venceEmDe('2026-03-01', 7) === '2026-03-08' && C.venceEmDe('2026-03-01', 30) === '2026-03-31', 'o vencimento soma os dias certos');
-  ok(C.vencidoParaApagar({ venceEm: '2026-01-01' }, '2026-01-31'), 'exatamente 30 dias depois do vencimento já pode ser apagado');
+  ok(C.vencidoParaApagar({ venceEm: '2026-01-01' }, '2026-02-01'), '31 dias depois do vencimento já pode ser apagado');
+  ok(!C.vencidoParaApagar({ venceEm: '2026-01-01' }, '2026-01-31'), 'exatamente 30 dias depois do vencimento ainda não pode');
   ok(!C.vencidoParaApagar({ venceEm: '2026-01-01' }, '2026-01-30'), '29 dias depois ainda não pode');
 
   const gestos = [
@@ -136,9 +137,11 @@ try {
   ok((await ver(idCelula, ana.cookie)).pedidos.some((p) => p.id === soConduz.corpo.id), 'a própria ana continua vendo o que pediu');
 
   console.log('\n  Limite de 3 pedidos ativos\n');
-  await cuidado({ acao: 'criar', celula: idCelula, tipo: 'oracao', destino: 'celula', texto: 'terceiro pedido', dias: 7 }, ana.cookie);
+  const terceiro = await cuidado({ acao: 'criar', celula: idCelula, tipo: 'oracao', destino: 'celula', texto: 'terceiro pedido', dias: 7 }, ana.cookie);
   const quarto = await cuidado({ acao: 'criar', celula: idCelula, tipo: 'oracao', destino: 'celula', texto: 'quarto pedido', dias: 7 }, ana.cookie);
   ok(quarto.status === 409, 'o quarto pedido ativo de ana na mesma célula é recusado');
+  // Libera a vaga de volta para os testes seguintes (que também criam pedidos para ana).
+  await cuidado({ acao: 'apagar', id: terceiro.corpo.id }, ana.cookie);
 
   console.log('\n  "Orei por você": uma vez por dia\n');
   ok((await cuidado({ acao: 'orei', id: idPedido }, ana.cookie)).status === 400, 'ana não pode orar pelo próprio pedido');
@@ -198,6 +201,8 @@ try {
   ok((await ver(idCelula, caio.cookie)).pedidos.some((p) => p.id === denunciavel), 'depois de "manter", o pedido volta a aparecer para todos');
   ok(!((await ver(idCelula, lider.cookie)).denuncias || []).some((d) => d.pedido === denunciavel), 'e some da lista de revisão');
 
+  // Libera uma vaga de ana (ela está no limite de 3 ativos) para o próximo pedido do teste.
+  await cuidado({ acao: 'apagar', id: soConduz.corpo.id }, ana.cookie);
   const paraTirar = (await cuidado({ acao: 'criar', celula: idCelula, tipo: 'oracao', destino: 'celula', texto: 'outro pedido qualquer', dias: 7 }, ana.cookie)).corpo.id;
   await cuidado({ acao: 'denunciar', id: paraTirar, motivo: 'É ofensivo' }, bia.cookie);
   await cuidado({ acao: 'denunciar', id: paraTirar, motivo: 'É ofensivo' }, caio.cookie);
@@ -235,17 +240,51 @@ try {
   const semDaniel = JSON.stringify(await ver(idCelula, ana.cookie));
   ok(!semDaniel.includes('daniel9'), 'e some o gesto que ela deixou no pedido de outra pessoa');
 
-  console.log('\n  Limpeza dos vencidos há mais de 30 dias\n');
-  const checador = await criar('checador9');
-  await entrar(checador.cookie);
-  const antesDeLimpar = (await ver(idCelula, checador.cookie)).pedidos.length;
-  ok(antesDeLimpar >= 0, 'a lista responde normalmente antes de forçar uma limpeza (checagem de sanidade)');
-  const jsonLimpo = await import(pathToFileURL(join(AQUI, 'contas.mjs')).href);
-  ok(typeof jsonLimpo.Contas === 'function', 'contas.mjs continua exportando a classe Contas normalmente');
 } finally {
   servidor.kill();
   await dormir(300);
   try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
+}
+
+// ---------- limpeza dos vencidos há mais de 30 dias (direto em contas.mjs, sem servidor) ----------
+// Precisa controlar "hoje" à vontade, coisa que o servidor de verdade não deixa fazer por HTTP.
+console.log('\n  Limpeza dos vencidos há mais de 30 dias\n');
+{
+  const { Contas } = await import(pathToFileURL(join(AQUI, 'contas.mjs')).href);
+  const { fecharBanco, arquivoDoBanco } = await import(pathToFileURL(join(AQUI, 'db.mjs')).href);
+  const pastaLimpeza = join(tmpdir(), 'cc-cuidado-limpeza');
+  try { rmSync(pastaLimpeza, { recursive: true, force: true }); } catch { /* ok */ }
+  try {
+    const arquivo = join(pastaLimpeza, 'estado.json');
+    const C = new Contas(arquivo);
+    await C.carregar();
+    await C.criar({ usuario: 'lideral', senha: 'senha123', nome: 'Lideral', email: 'lideral@teste.com', nascimento: '2000-01-01', consentimento: true });
+    const celula = await C.criarCelula('lideral', { titulo: 'Célula limpeza' }, '2026-01-01');
+    const velho = await C.criarPedido('lideral', { celula: celula.id, tipo: 'oracao', destino: 'celula', texto: 'pedido velho', dias: 7 }, '2026-01-01');
+    const recente = await C.criarPedido('lideral', { celula: celula.id, tipo: 'oracao', destino: 'celula', texto: 'pedido recente', dias: 7 }, '2026-03-01');
+    ok(velho.venceEm === '2026-01-08', 'o pedido velho vence em 2026-01-08 (uma semana depois de criado)');
+
+    const antesDoPrazo = await C.limparPedidosVencidos('2026-02-07');
+    ok(antesDoPrazo === false, 'exatamente 30 dias depois do vencimento (ainda não passou) não apaga nada');
+    ok(C.pedido(velho.id) && C.pedido(recente.id), 'os dois pedidos continuam de pé');
+
+    const depoisDoPrazo = await C.limparPedidosVencidos('2026-02-08');
+    ok(depoisDoPrazo === true, '31 dias depois do vencimento, a limpeza encontra algo para apagar');
+    ok(!C.pedido(velho.id), 'o pedido vencido há mais de 30 dias é apagado do banco');
+    ok(C.pedido(recente.id), 'o pedido que ainda não venceu continua de pé');
+
+    // "Deus respondeu" encurta o vencimento: a limpeza segue a data nova, não a original.
+    const paraResponder = await C.criarPedido('lideral', { celula: celula.id, tipo: 'oracao', destino: 'celula', texto: 'outro pedido', dias: 30 }, '2026-01-01');
+    await C.marcarRespondido('lideral', paraResponder.id, '2026-01-10');
+    ok(C.pedido(paraResponder.id).venceEm === '2026-01-17', 'marcar "Deus respondeu" encurta o vencimento para 7 dias à frente');
+    await C.limparPedidosVencidos('2026-02-16');
+    ok(C.pedido(paraResponder.id), 'exatamente 30 dias depois do vencimento encurtado (2026-01-17), ainda não apaga');
+    await C.limparPedidosVencidos('2026-02-17');
+    ok(!C.pedido(paraResponder.id), 'a limpeza usa o vencimento encurtado por "Deus respondeu" (2026-01-17), não o original (2026-01-31)');
+  } finally {
+    try { fecharBanco(arquivoDoBanco(pastaLimpeza)); } catch { /* ok */ }
+    try { rmSync(pastaLimpeza, { recursive: true, force: true }); } catch { /* ok */ }
+  }
 }
 
 console.log('\n  ' + (falhas ? falhas + ' falha(s)' : 'todas passaram') + '\n');
