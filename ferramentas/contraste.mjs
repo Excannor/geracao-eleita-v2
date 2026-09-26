@@ -51,6 +51,14 @@ const PARES = [
   [['--vermelho-3d', '--vermelho'], '--vermelho-fraco', 4.5, 'texto de erro'],
   [['--amarelo-3d', '--amarelo'], '--amarelo-fraco', 4.5, 'texto de conquista'],
   ['--chama', '--fundo', 3, 'chama da ofensiva'],
+  // Retrato sem foto na pilha da célula e do grupo (cabeca(p), 08b-propositos.js): fundo
+  // suave por família e letra na cor forte da mesma família. Verde, azul e amarelo trocam
+  // de tom no escuro, igual às linhas acima; roxo e vermelho ficam no mesmo tom nos dois temas.
+  [['--verde-3d', '--verde'], '--verde-fraco', 4.5, 'inicial sem foto na pilha: verde'],
+  [['--azul-3d', '--azul'], '--azul-fraco', 4.5, 'inicial sem foto na pilha: azul'],
+  ['--roxo-3d', '--roxo-fraco', 4.5, 'inicial sem foto na pilha: roxo'],
+  [['--amarelo-3d', '--amarelo'], '--amarelo-fraco', 4.5, 'inicial sem foto na pilha: amarelo'],
+  ['--vermelho-3d', '--vermelho-fraco', 4.5, 'inicial sem foto na pilha: vermelho'],
   // marca-texto dos versículos: o texto do versículo e o título do cartão por cima
   ['--tinta', '--marca-1', 4.5, 'versículo marcado em amarelo'],
   ['--tinta', '--marca-2', 4.5, 'versículo marcado em verde'],

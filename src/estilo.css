@@ -1466,6 +1466,14 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .tela-cheia-palco { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(24px + env(safe-area-inset-top)) 16px 16px; overflow-y: auto; }
 .tela-cheia-pe { display: grid; gap: 10px; width: 100%; max-width: 560px; margin: 0 auto; padding: 12px 16px calc(18px + env(safe-area-inset-bottom)); }
 
+/* Modo encontro: letra grande, uma parte do roteiro por vez. A Palavra usa a estrutura de
+   sempre (com o cartão do versículo); as outras três são uma frase só, para ler em voz alta. */
+.modo-encontro { width: 100%; max-width: 420px; }
+.modo-encontro > .etiqueta { display: block; margin-bottom: 10px; font-size: 0.85rem; }
+.modo-encontro .frase-cena { max-width: none; font-size: 1.5rem; line-height: 1.4; }
+.modo-encontro-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.modo-encontro-nav span { color: var(--tinta-fraca); font-weight: 800; font-size: 0.88rem; }
+
 /* Fundo normal da tela, não a cor da unidade. Quando cada unidade tinha a sua cor, essa
    lavagem em tela cheia fazia sentido; com a paleta nova todas caem no petróleo, e o
    resultado era uma parede verde com o texto de apoio ilegível por cima dela. O que
@@ -1559,6 +1567,19 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 }
 .retrato-amigo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .retrato-amigo.inicial { background: var(--cor); color: var(--sobre, var(--sobre-cor)); font-weight: 900; font-size: 1.15rem; }
+/* Pilha de retratos sem foto (cabeca(p), em célula e grupo): fundo suave por família de cor,
+   letra na cor forte da mesma família. Claro usa o tom -3d; verde, azul e amarelo trocam para
+   o tom cheio no escuro, onde o -3d perde contraste contra o fundo suave escuro da família
+   (conferido em ferramentas/contraste.mjs). Três classes, não duas: para vencer a regra acima
+   sem depender da ordem no arquivo. */
+.retrato-amigo.inicial.retrato-cor-verde { background: var(--verde-fraco); color: var(--verde-3d); }
+.retrato-amigo.inicial.retrato-cor-azul { background: var(--azul-fraco); color: var(--azul-3d); }
+.retrato-amigo.inicial.retrato-cor-roxo { background: var(--roxo-fraco); color: var(--roxo-3d); }
+.retrato-amigo.inicial.retrato-cor-amarelo { background: var(--amarelo-fraco); color: var(--amarelo-3d); }
+.retrato-amigo.inicial.retrato-cor-vermelho { background: var(--vermelho-fraco); color: var(--vermelho-3d); }
+:root[data-tema="escuro"] .retrato-amigo.inicial.retrato-cor-verde { color: var(--verde); }
+:root[data-tema="escuro"] .retrato-amigo.inicial.retrato-cor-azul { color: var(--azul); }
+:root[data-tema="escuro"] .retrato-amigo.inicial.retrato-cor-amarelo { color: var(--amarelo); }
 .retrato-amigo.mini { width: 30px; height: 30px; font-size: 0.8rem; border-width: 2px; border-color: var(--cartao); }
 .retrato-amigo.pequeno { width: 32px; height: 32px; font-size: 0.85rem; }
 .retrato-amigo.medio { width: 42px; height: 42px; font-size: 1rem; }
@@ -1623,8 +1644,13 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .cartao-proposito.convite { border-color: color-mix(in srgb, var(--azul) 45%, transparent); background: var(--azul-fraco); cursor: default; }
 .cabeca-proposito { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .retratos-grupo, .retratos-dupla { display: flex; flex: 0 0 auto; }
-.retratos-grupo .retrato-amigo, .retratos-dupla .retrato-amigo { box-shadow: 0 0 0 2px var(--cartao); }
-.retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -20px; }
+/* Borda fina na cor do cartão (não a do fundo da página, que é o padrão do retrato solto):
+   sem isso, a pilha somava a borda cinza de sempre com o contorno do cartão e virava um
+   borrão de duas cores por cima uma da outra. */
+.retratos-grupo .retrato-amigo, .retratos-dupla .retrato-amigo { border-color: var(--cartao); }
+/* Sobreposição pequena (8 a 10px): a pilha ainda separa uma pessoa da outra, em vez de
+   empilhar quase inteiro por cima, o que fazia as bordas se acumularem numa mancha só. */
+.retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -9px; }
 .retratos-grupo .retrato-mais { display: grid; place-items: center; background: var(--fundo-2); color: var(--tinta-forte); font-size: 0.72rem; font-weight: 900; }
 
 /* ---------- célula: líder, recado, encontro e estudo ---------- */
@@ -1666,9 +1692,14 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .recado-lider p { margin: 4px 0 0; color: var(--tinta-forte); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
 .recado-cartao { margin: 0; padding: 8px 10px; border-radius: var(--raio-p); background: var(--fundo-2); color: var(--tinta); font-size: 0.86rem; font-weight: 600; line-height: 1.4;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.semana-lider { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0; color: var(--tinta); font-size: 0.88rem; font-weight: 600; }
-.semana-lider svg { flex: 0 0 auto; width: 18px; height: 18px; color: var(--acento); margin-top: 1px; }
 .escolha-dia { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 12px 0; }
+/* Registro do encontro: o selo de "já registrado" e o botão de corrigir, lado a lado. */
+.registro-encontro { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0; }
+/* Contador de "pessoas sem conta que vieram": rótulo à esquerda, − e + de cada lado do número. */
+.conta-visitantes { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0; padding: 12px 14px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); font-weight: 700; }
+.conta-visitantes-controles { display: flex; align-items: center; gap: 10px; }
+.conta-visitantes-controles b { min-width: 22px; text-align: center; font-size: 1.05rem; }
+.conta-visitantes-controles .botao-icone { border: 2px solid var(--borda); font-size: 1.25rem; font-weight: 800; line-height: 1; }
 .escolha-trecho { display: grid; gap: 10px; }
 .roteiro { display: grid; gap: 16px; margin: 14px 0; padding-left: 22px; }
 .roteiro > li > b { color: var(--tinta-forte); }
@@ -1681,6 +1712,10 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .roteiro-perguntas li, .roteiro-oracao li { padding: 8px 10px; border-radius: var(--raio-p); background: var(--fundo-2); line-height: 1.45; }
 .estudo-livre { margin: 12px 0; line-height: 1.6; }
 .estudo-livre p { margin: 0 0 10px; overflow-wrap: anywhere; }
+/* Cada uma das quatro partes do roteiro (Acolhida, Adoração, Palavra, Testemunho). */
+.secao-w { margin: 16px 0; }
+.secao-w > .etiqueta { display: block; margin-bottom: 6px; }
+.secao-w > p { margin: 0; line-height: 1.5; }
 .cabeca-proposito .quem-amigo { flex: 1; }
 .retratos-grupo .retrato-amigo.fez, .retratos-dupla .retrato-amigo.fez { box-shadow: 0 0 0 2px var(--cartao), 0 0 0 4px var(--verde); }
 .tipo-proposito { display: inline-flex; align-items: center; gap: 4px; min-width: 0; margin: 0; color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 800; }

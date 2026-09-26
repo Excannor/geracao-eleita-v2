@@ -592,7 +592,7 @@
           .sort((a, b) => b.em - a.em);
         const pedidoLigar = !m.ligado && !m.perguntado && amigos.length
           ? '<div class="pedido-mural">' + CC.ico('pessoas') + '<div><b>Mostrar seus marcos aos amigos?</b>'
-            + '<p>Ofensiva, livros terminados, conquistas e versículos que você guardar.</p>'
+            + '<p>Ofensiva, livros terminados, conquistas e os versículos que você compartilhar.</p>'
             + '<div class="pe-duplo-plano"><button class="botao pequeno" data-mural-ligar>Mostrar</button>'
             + '<button class="botao pequeno plano" data-mural-nao>Agora não</button></div></div></div>'
           : '';

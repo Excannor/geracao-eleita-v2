@@ -378,6 +378,28 @@ for (const d of D.plano) {
 }
 checar(trilhaErrada === 0, 'o leitor separa cada dia nas trilhas do Antigo e do Novo Testamento (' + trilhaErrada + ')');
 
+// --- célula: rodízio de "ore hoje por" (08b-propositos.js) ---
+runInContext(readFileSync(join(AQUI, 'src', 'app', '08-amigos.js'), 'utf8'), contexto, { filename: '08-amigos.js' });
+runInContext(readFileSync(join(AQUI, 'src', 'app', '08b-propositos.js'), 'utf8'), contexto, { filename: '08b-propositos.js' });
+{
+  const gente = [{ usuario: 'ana', nome: 'Ana' }, { usuario: 'bia', nome: 'Bia' }, { usuario: 'caio', nome: 'Caio' },
+    { usuario: 'davi', nome: 'Davi' }, { usuario: 'eva', nome: 'Eva' }];
+  const alfabetica = gente.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  const r1 = CC.oreHojePor(gente, '2026-01-01', gente.length);
+  checar(r1.length === 2, 'célula de até 12 membros: o rodízio sugere 2 nomes');
+  const r2 = CC.oreHojePor(gente, '2026-01-01', 13);
+  checar(r2.length === 3, 'célula com mais de 12 membros: o rodízio sugere 3 nomes');
+  // Dia do ano 1 (2026-01-01), quantidade 2, total 5: índice inicial (1 * 2) % 5 = 2.
+  checar(r1[0].usuario === alfabetica[2].usuario && r1[1].usuario === alfabetica[3].usuario,
+    'o índice inicial é (dia do ano × quantidade) % total, em ordem alfabética');
+  const outroDia = CC.oreHojePor(gente, '2026-03-01', gente.length);
+  checar(JSON.stringify(outroDia) !== JSON.stringify(r1), 'dias diferentes tendem a sugerir gente diferente');
+  const mesmoDiaDeNovo = CC.oreHojePor(gente, '2026-01-01', gente.length);
+  checar(JSON.stringify(mesmoDiaDeNovo) === JSON.stringify(r1), 'o mesmo dia sempre devolve a mesma sugestão (determinístico, nada gravado)');
+  checar(CC.oreHojePor([], '2026-01-01', 0).length === 0, 'sem candidatos, não há o que sugerir');
+  checar(CC.oreHojePor([{ usuario: 'so', nome: 'Só' }], '2026-01-01', 1).length === 1, 'com um candidato só, a sugestão é ele mesmo');
+}
+
 // =========================================================================
 secao('contas, amizades e propósito');
 // =========================================================================

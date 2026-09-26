@@ -56,6 +56,9 @@
     padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
   section { flex: 1; display: flex; flex-direction: column; gap: 16px; }
   section[hidden] { display: none; }
+  /* Sem isto, qualquer elemento com display próprio (o .botao é flex, a .privacidade é
+     flex) vence o atributo hidden: ele ficava escondido no nome, mas continuava na tela. */
+  [hidden] { display: none !important; }
   .centro { align-items: center; text-align: center; justify-content: center; }
   #tela-boas { position: relative; }
   /* O selo do lema: um carimbo, sempre escuro com letra clara nos dois temas, como uma
@@ -185,7 +188,11 @@
     <p class="dica" id="dica-boas">Uma leitura por dia, de 10 a 20 minutos, com reflexões feitas para quem está começando. Leia com os amigos ou com a sua célula.</p>
     <div class="espaco"></div>
     <div class="botoes">
-      <button class="botao" data-ir="cadastro">Começar</button>
+      <button class="botao" data-ir="cadastro" id="botao-comecar">Começar</button>
+      <!-- Só aparecem com link de célula (ver "if (celula)" no script): a mesma escolha da
+           folha do app, antes de criar a conta. -->
+      <button class="botao" data-ir="cadastro" id="botao-entrar-celula" hidden>Entrar na célula</button>
+      <button class="botao contorno" data-ir="cadastro" id="botao-so-conhecer" hidden>Só quero conhecer</button>
       <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
     </div>
     <div class="links"><a href="privacidade.html">Privacidade</a></div>
@@ -307,12 +314,17 @@
   // "Sim" é o padrão: a pergunta não obriga resposta, só existe para quem quer dizer que
   // ainda está conhecendo Jesus.
   var caminhoEscolhido = 'plano';
+  // Com link de célula, a pessoa escolhe entre entrar de vez ou só conhecer (visitante) antes
+  // de criar a conta; sem link de célula, o valor não é usado (fica sempre false).
+  var celulaVisitante = false;
   document.querySelectorAll('.opcao-caminho').forEach(function (b) {
     b.addEventListener('click', function () {
       caminhoEscolhido = b.dataset.caminho;
       document.querySelectorAll('.opcao-caminho').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
     });
   });
+  $('botao-entrar-celula').addEventListener('click', function () { celulaVisitante = false; });
+  $('botao-so-conhecer').addEventListener('click', function () { celulaVisitante = true; });
 
   function mostrarTela(nome) {
     ['boas', 'entrar', 'cadastro', 'esqueci', 'redefinir'].forEach(function (n) { $('tela-' + n).hidden = n !== nome; });
@@ -406,6 +418,7 @@
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: $('nascimento').value, email: $('email').value.trim(),
         usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '', celula: celula || '',
+        celulaVisitante: celula ? celulaVisitante : false,
         consentimento: $('consentimento-cadastro').checked, caminho: caminhoEscolhido }),
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
@@ -537,6 +550,11 @@
         : 'Essa célula já está cheia, mas você pode criar sua conta e ler o plano do mesmo jeito.';
       $('convite-cadastro').hidden = false;
       $('convite-cadastro').textContent = nomeCelula.charAt(0).toUpperCase() + nomeCelula.slice(1) + ' · convite de ' + d.nome + ' (@' + d.usuario + ')';
+      // A mesma escolha da folha do app: entrar de vez ou só conhecer (visitante), antes
+      // de criar a conta.
+      $('botao-comecar').hidden = true;
+      $('botao-entrar-celula').hidden = false;
+      $('botao-so-conhecer').hidden = false;
     }).catch(function () {});
   }
   // Servidor sem nenhuma conta abre direto no cadastro: é o primeiro uso.
