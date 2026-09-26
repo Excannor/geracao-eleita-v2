@@ -137,6 +137,14 @@
   .privacidade { display: flex; gap: 12px; padding: 14px; border-radius: 16px; background: var(--azul-fraco); color: var(--tinta);
     font-size: .88rem; font-weight: 600; line-height: 1.5; }
   .privacidade svg { flex: 0 0 auto; width: 22px; height: 22px; color: var(--azul); }
+  /* A marcação de consentimento precisa ser vista, não uma letra miúda perto do botão:
+     por isso o mesmo tratamento de caixa da dica de "link enviado", com a caixinha grande
+     o bastante para o dedo (WCAG 2.5.5) e sublinhado só no link de dentro. */
+  .consentimento { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 16px;
+    background: var(--azul-fraco); cursor: pointer; }
+  .consentimento input { flex: 0 0 auto; width: 24px; height: 24px; margin-top: 1px; accent-color: var(--verde); }
+  .consentimento span { font-size: .88rem; font-weight: 600; line-height: 1.5; color: var(--tinta); }
+  .consentimento:has(input[aria-invalid="true"]) { outline: 2px solid var(--erro); }
   .convite { padding: 12px 14px; border-radius: 16px; background: var(--azul-fraco); font-weight: 700; color: var(--forte); }
   :focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -259,6 +267,11 @@
           <div class="senha"><input id="senha-nova" name="new-password" type="password" autocomplete="new-password" required>
             <button type="button" class="mostrar" data-mostrar="senha-nova" aria-pressed="false">Mostrar</button></div>
           <span class="ajuda">Seis caracteres ou mais.</span></div>
+        <label class="consentimento" style="margin-top:16px" for="consentimento-cadastro">
+          <input type="checkbox" id="consentimento-cadastro">
+          <span>Concordo que o Geração Eleita guarde minhas leituras, anotações e a minha participação em grupos de leitura e oração. São informações sobre a minha fé, e só eu decido o que meus amigos veem.
+            <a href="privacidade.html" target="_blank" rel="noopener">Ler a política de privacidade</a></span>
+        </label>
       </div>
       <p class="erro" id="erro-cadastro" role="alert"></p>
       <div class="espaco"></div>
@@ -315,18 +328,33 @@
     if (campo) { campo.setAttribute('aria-invalid', 'true'); campo.focus(); }
     return false;
   }
+  // Mesma conta de idade do servidor (contas.mjs: somaAnos/idadeMinimaOk): soma anos à data
+  // de hoje mantendo mês e dia, e joga 29 de fevereiro para 28 num ano sem esse dia.
+  function somaAnos(texto, n) {
+    var p = texto.split('-');
+    var novoAno = Number(p[0]) + n;
+    var mes = Number(p[1]);
+    var diasNoMes = new Date(Date.UTC(novoAno, mes, 0)).getUTCDate();
+    var dia = String(Math.min(Number(p[2]), diasNoMes)).padStart(2, '0');
+    return novoAno + '-' + String(mes).padStart(2, '0') + '-' + dia;
+  }
   function validar(n) {
     document.querySelectorAll('#form-cadastro input').forEach(function (i) { i.removeAttribute('aria-invalid'); });
     if (n === 1) {
       if (!$('nome').value.trim()) return erro($('nome'), 'Diga como quer ser chamado.');
       var d = $('nascimento').value;
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= new Date().toISOString().slice(0, 10)) return erro($('nascimento'), 'Confira a data de nascimento.');
+      var hoje = new Date().toISOString().slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= hoje) return erro($('nascimento'), 'Confira a data de nascimento.');
+      if (d > somaAnos(hoje, -12)) return erro($('nascimento'), 'O Geração Eleita é para quem tem 12 anos ou mais.');
     }
     if (n === 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim())) return erro($('email'), 'Esse e-mail não parece certo.');
     if (n === 3) {
       $('usuario').value = $('usuario').value.trim().toLowerCase().replace(/^@/, '');
       if (!/^[a-z0-9][a-z0-9._-]{1,29}$/.test($('usuario').value)) return erro($('usuario'), 'O @ aceita letras minúsculas, números, ponto, hífen e sublinhado, de 2 a 30 caracteres.');
       if ($('senha-nova').value.length < 8) return erro($('senha-nova'), 'A senha precisa de 8 caracteres ou mais.');
+      if (!$('consentimento-cadastro').checked) {
+        return erro($('consentimento-cadastro'), 'Marque que concorda com o uso dos dados sobre a sua fé para continuar.');
+      }
     }
     return true;
   }
@@ -355,7 +383,8 @@
     fetch('api/criar-conta', {
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: $('nascimento').value, email: $('email').value.trim(),
-        usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '', celula: celula || '' }),
+        usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '', celula: celula || '',
+        consentimento: $('consentimento-cadastro').checked }),
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
         if (r.ok) {
@@ -370,7 +399,8 @@
         var msg = d.erro || 'Não consegui criar a conta.';
         msg = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
         if (/e-mail/.test(msg)) { irPasso(2); erro($('email'), msg); }
-        else if (/nascimento|chamado/.test(msg)) { irPasso(1); erro(null, msg); }
+        else if (/nascimento|chamado|12 anos/.test(msg)) { irPasso(1); erro(null, msg); }
+        else if (/concordar/.test(msg)) { irPasso(3); erro($('consentimento-cadastro'), msg); }
         else { erro(null, msg); }
       });
     }).catch(function () {

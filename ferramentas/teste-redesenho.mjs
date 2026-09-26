@@ -54,7 +54,7 @@ const api = async (rota, corpo, cookie) => {
   return { status: r.status, cookie: (r.headers.get('set-cookie') || '').split(';')[0], dado: await r.json().catch(() => ({})) };
 };
 const criarConta = (usuario, nome) => api('/api/criar-conta', {
-  usuario, nome, senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2003-04-05',
+  usuario, nome, senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2003-04-05', consentimento: true,
 });
 
 const perfil = mkdtempSync(join(tmpdir(), 'cc-redesenho-nav-'));
@@ -136,6 +136,9 @@ await preencher('#senha-nova', 'senha-da-ana');
 await clicar('[data-mostrar="senha-nova"]');
 ok(await av(q('#senha-nova') + '.type === "text"'), 'o botão Mostrar revela a senha');
 await foto('2-cadastro-acesso');
+await clicar('#botao-cadastro');
+ok(await esperar(q('#erro-cadastro') + '.textContent.length > 0'), 'sem marcar o consentimento, o cadastro não completa');
+await clicar('#consentimento-cadastro');
 await clicar('#botao-cadastro');
 ok(await esperar(existe('.no.atual'), 12000), 'criar a conta abre o aplicativo');
 ok(await esperar('CC.quem && CC.quem.perfilCompleto === true'), 'a conta nova já nasce com o cadastro completo');
@@ -330,7 +333,10 @@ await clicar('[data-ir="entrar"]');
 await preencher('#login', 'velho');
 await preencher('#senha-entrar', 'senha-velha');
 await clicar('#botao-entrar');
-ok(await esperar(existe('.cortina #cad-email'), 12000), 'a conta antiga entra e é convidada a completar o cadastro');
+// Conta antiga, sem consentimento: a folha de "Antes de continuar" vem antes de tudo.
+ok(await esperar(existe('.cortina [data-concordar]'), 12000), 'a conta antiga entra e é convidada a concordar com o uso do dado de fé');
+await clicar('.cortina [data-concordar]');
+ok(await esperar(existe('.cortina #cad-email'), 12000), 'depois de concordar, a conta antiga é convidada a completar o cadastro');
 await foto('9-completar-cadastro');
 await preencher('#cad-email', 'velho@teste.com');
 await preencher('#cad-nasc', '1999-09-09');

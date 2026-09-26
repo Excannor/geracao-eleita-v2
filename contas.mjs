@@ -31,6 +31,12 @@ export const VALIDADE_CONVITE = 30 * 24 * 60 * 60 * 1000;
 export const RECADO_MAX = 280;
 export const ESTUDO_MAX = 3000;
 export const FUSO_PADRAO = 'America/Sao_Paulo';
+// LGPD art. 14: menor de 12 anos precisaria de consentimento dos pais, que o app não tem
+// como conferir; por isso a idade mínima para ter conta é 12 anos completos.
+export const IDADE_MINIMA = 12;
+// Versão do texto de consentimento sobre dado de fé (LGPD art. 11). Mudar o texto de um
+// jeito que precise de um "sim" de novo exige subir este número.
+export const CONSENTIMENTO_VERSAO = 1;
 export const MOTIVOS_DENUNCIA = [
   'Insiste ou incomoda',
   'Nome ou foto impróprios',
@@ -70,6 +76,24 @@ export function nascimentoValido(texto, hoje = hojeNoFuso(FUSO_PADRAO)) {
   const d = new Date(t + 'T12:00:00Z');
   if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== t) return false;
   return t < hoje && t > somaDias(hoje, -365 * 120);
+}
+
+// Soma (ou subtrai) anos a uma data ISO, mantendo mês e dia. 29 de fevereiro que caia
+// num ano sem esse dia vira 28: sem isso, "somaAnos" quebraria uma vez a cada 4 anos.
+export function somaAnos(texto, n) {
+  const [ano, mes, dia] = String(texto).split('-').map(Number);
+  const novoAno = ano + n;
+  const diasNoMes = new Date(Date.UTC(novoAno, mes, 0)).getUTCDate();
+  const diaAjustado = String(Math.min(dia, diasNoMes)).padStart(2, '0');
+  return novoAno + '-' + String(mes).padStart(2, '0') + '-' + diaAjustado;
+}
+
+// Se, na data "hoje", a pessoa já fez a idade mínima. Comparar strings ISO funciona porque
+// AAAA-MM-DD em ordem alfabética é a mesma ordem cronológica.
+export function idadeMinimaOk(nascimento, hoje = hojeNoFuso(FUSO_PADRAO)) {
+  const t = String(nascimento || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return false;
+  return t <= somaAnos(hoje, -IDADE_MINIMA);
 }
 
 async function embaralhar(senha, sal) {
@@ -308,6 +332,10 @@ export class Contas {
       if (this.acharPorEmail(mail)) throw erro('este e-mail já tem conta');
     }
     if (exigirPerfil && !nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
+    if (exigirPerfil && !idadeMinimaOk(nascimento)) throw erro('o Geração Eleita é para quem tem 12 anos ou mais');
+    if (exigirPerfil && dados.consentimento !== true) {
+      throw erro('para criar a conta, é preciso concordar com o uso dos dados sobre a sua fé');
+    }
     if (senhaCurta(senha)) throw erro('a senha precisa de ' + SENHA_MIN + ' caracteres ou mais');
     if (senhaLonga(senha)) throw erro('a senha pode ter no máximo ' + SENHA_MAX + ' caracteres');
 
@@ -323,6 +351,10 @@ export class Contas {
       criadaEm: hojeNoFuso(FUSO_PADRAO),
       seloConvite: randomBytes(6).toString('hex'),
     };
+    // Sem exigirPerfil (importação de conta antiga), não houve tela nem consentimento para gravar.
+    if (exigirPerfil) {
+      this.dados.contas[chave].consentimento = { versao: CONSENTIMENTO_VERSAO, em: new Date().toISOString() };
+    }
     await this.salvar();
     return this.dados.contas[chave];
   }
@@ -347,6 +379,7 @@ export class Contas {
     const dono = this.acharPorEmail(mail);
     if (dono && dono.usuario !== conta.usuario) throw erro('este e-mail já tem conta');
     if (!nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
+    if (!idadeMinimaOk(nascimento)) throw erro('o Geração Eleita é para quem tem 12 anos ou mais');
     conta.email = mail;
     conta.nascimento = nascimento;
     const n = String(nome || '').trim().slice(0, 20);
@@ -371,6 +404,21 @@ export class Contas {
     conta.senha = await embaralhar(nova, conta.sal);
     await this.salvar();
     return conta;
+  }
+
+  // O "Concordo" da folha de consentimento, ou quando quem já tinha conta antiga aceita o
+  // texto pela primeira vez. Grava a mesma versão que "criar" grava na conta nova.
+  async registrarConsentimento(usuario) {
+    const conta = this.achar(usuario);
+    if (!conta) throw erro('conta não encontrada', 404);
+    conta.consentimento = { versao: CONSENTIMENTO_VERSAO, em: new Date().toISOString() };
+    await this.salvar();
+    return conta;
+  }
+
+  // Se a conta já concordou com a versão atual do texto sobre dado de fé.
+  consentiu(conta) {
+    return !!(conta && conta.consentimento && conta.consentimento.versao >= CONSENTIMENTO_VERSAO);
   }
 
   // Sair dos outros aparelhos: um selo novo na conta invalida todos os crachás assinados antes.

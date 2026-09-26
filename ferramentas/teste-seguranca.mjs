@@ -35,7 +35,7 @@ const pedir = (rota, corpo, { cookie, cabecalhos = {}, metodo } = {}) => fetch(b
 });
 const biscoito = (r) => (r.headers.get('set-cookie') || '').split(';')[0];
 const criar = async (usuario) => biscoito(await pedir('/api/criar-conta', {
-  usuario, senha: 'senha-' + usuario, nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01',
+  usuario, senha: 'senha-' + usuario, nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true,
 }));
 
 try {
@@ -79,7 +79,7 @@ try {
     'dez erros do mesmo IP em contas diferentes trancam o IP');
   ok((await pedir('/api/entrar', { login: 'bia', senha: 'x'.repeat(5000) }, { cabecalhos: { 'cf-connecting-ip': '10.1.1.1' } })).status === 401,
     'senha gigante não entra (e não faz o servidor trabalhar à toa)');
-  ok((await pedir('/api/criar-conta', { usuario: 'caio', senha: 'x'.repeat(200), nome: 'Caio', email: 'caio@t.com', nascimento: '2000-01-01' })).status === 400,
+  ok((await pedir('/api/criar-conta', { usuario: 'caio', senha: 'x'.repeat(200), nome: 'Caio', email: 'caio@t.com', nascimento: '2000-01-01', consentimento: true })).status === 400,
     'ninguém cria conta com senha de mais de 128 caracteres');
 
   // ---------- o que vai para os amigos ----------
@@ -124,7 +124,7 @@ try {
   ok((await pedir('/api/quem', undefined, { cookie: celularNovo })).status === 200, 'e o celular continua dentro com o novo');
 
   // ---------- senha mínima ----------
-  ok((await pedir('/api/criar-conta', { usuario: 'eva', senha: 'abc1234', nome: 'Eva', email: 'eva@t.com', nascimento: '2000-01-01' })).status === 400,
+  ok((await pedir('/api/criar-conta', { usuario: 'eva', senha: 'abc1234', nome: 'Eva', email: 'eva@t.com', nascimento: '2000-01-01', consentimento: true })).status === 400,
     'senha nova com 7 caracteres é recusada');
   ok(!!(await criar('fabi')), 'com 8 ou mais, a conta nasce');
 

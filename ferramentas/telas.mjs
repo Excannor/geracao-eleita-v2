@@ -34,7 +34,7 @@ const api = async (rota, corpo, cookie, metodo) => {
   return { cookie: (r.headers.get('set-cookie') || '').split(';')[0], dado: await r.json().catch(() => ({})) };
 };
 const criar = (usuario, nome, extra = {}) => api('/api/criar-conta', {
-  usuario, nome, senha: 'senha-' + usuario, email: usuario + '@exemplo.com', nascimento: '2003-04-05', ...extra,
+  usuario, nome, senha: 'senha-' + usuario, email: usuario + '@exemplo.com', nascimento: '2003-04-05', consentimento: true, ...extra,
 });
 
 // ---------- a conta de exemplo ----------

@@ -31,7 +31,7 @@
           + '<span>Mostrar meus marcos no Feed</span><span class="interruptor" aria-hidden="true"><i></i></span></button>'
         : '')
         + linha('Pessoas bloqueadas', '', 'data-ir="#/amigos/bloqueados"')
-        + '<a class="linha-config" href="privacidade.html"><span>Privacidade</span>' + CC.ico('avancar') + '</a>')
+        + linha('Privacidade', '', 'data-privacidade'))
       + grupo('Seus dados', linha('Baixar o que escrevi', '', 'data-exportar')
         + linha('Zerar progresso', '', 'data-zerar', 'perigo'))
       + (quem.comSenha
@@ -73,6 +73,7 @@
       await CC.carregarNovidades();
       CC.redesenhar();
     });
+    ligar('[data-privacidade]', () => CC.abrirPrivacidade(quem));
     ligar('[data-completar]', () => CC.completarCadastro(quem));
     ligar('[data-senha]', () => CC.trocarSenha());
     ligar('[data-apagar]', () => CC.apagarConta(quem.usuario));
@@ -164,6 +165,85 @@
           };
         },
       });
+    });
+  };
+
+  // ---------- consentimento sobre dado de fé (LGPD art. 11) ----------
+  // O mesmo texto do portal de entrada (src/entrar.html): leitura, anotação e participação
+  // em grupo de leitura e oração são dado sensível, e pedem um "sim" claro, não escondido
+  // em letra miúda.
+  const TEXTO_CONSENTIMENTO = 'Concordo que o Geração Eleita guarde minhas leituras, anotações e a minha '
+    + 'participação em grupos de leitura e oração. São informações sobre a minha fé, e só eu decido o que '
+    + 'meus amigos veem.';
+  const LINK_PRIVACIDADE = '<a href="privacidade.html" target="_blank" rel="noopener">Ler a política de privacidade</a>';
+
+  // Folha presa (sem fechar tocando fora) que a abertura do app mostra antes de tudo para
+  // quem tem conta e ainda não concordou. Só depois dela o convite, a célula e o cadastro
+  // seguem o caminho de sempre.
+  CC.pedirConsentimento = function () {
+    return new Promise((resolver) => {
+      CC.folha('', {
+        rotulo: 'Seus dados',
+        presa: true,
+        ligar: (folha, fechar) => {
+          const telaConcordar = () => {
+            folha.innerHTML = '<h3>Antes de continuar</h3>'
+              + '<p class="passo-dica">' + CC.esc(TEXTO_CONSENTIMENTO) + '</p>'
+              + '<p>' + LINK_PRIVACIDADE + '</p>'
+              + '<p class="recado-senha" id="recado" role="alert"></p>'
+              + '<div class="acoes"><button class="botao" data-concordar>Concordo</button>'
+              + '<button class="botao plano" data-nao-concordo>Não concordo</button></div>';
+            const recado = folha.querySelector('#recado');
+            const botao = folha.querySelector('[data-concordar]');
+            botao.onclick = async () => {
+              recado.textContent = '';
+              botao.disabled = true;
+              try {
+                await CC.api('api/consentimento', {});
+                if (CC.quem) CC.quem.consentimento = true;
+                fechar();
+                resolver(true);
+              } catch (e) {
+                botao.disabled = false;
+                recado.textContent = e.message;
+              }
+            };
+            folha.querySelector('[data-nao-concordo]').onclick = telaRecusar;
+          };
+          const telaRecusar = () => {
+            folha.innerHTML = '<h3>Antes de continuar</h3>'
+              + '<p class="passo-dica">Sem esse consentimento, não dá para guardar sua leitura na conta. '
+              + 'Você pode apagar a conta e tudo o que ela guarda.</p>'
+              + '<div class="acoes"><button class="botao vermelho" data-apagar>Apagar minha conta</button>'
+              + '<button class="botao plano" data-voltar>Voltar</button></div>';
+            folha.querySelector('[data-apagar]').onclick = () => { fechar(); location.hash = '#/config'; };
+            folha.querySelector('[data-voltar]').onclick = telaConcordar;
+          };
+          telaConcordar();
+        },
+      });
+    });
+  };
+
+  // Item "Privacidade" das Configurações: quando concordou, um jeito de rever a política e
+  // de saber que retirar o consentimento é apagar a conta (não dá para guardar leitura de
+  // fé sem concordar, e não dá para "meio guardar").
+  CC.abrirPrivacidade = function (quem) {
+    const dataConsentimento = quem && quem.comSenha && quem.consentimentoEm ? dataBr(String(quem.consentimentoEm).slice(0, 10)) : '';
+    CC.folha('<h3>Privacidade</h3>' + (dataConsentimento ? '<p class="passo-dica">Você concordou em ' + CC.esc(dataConsentimento) + '.</p>' : '')
+      + '<p>' + LINK_PRIVACIDADE + '</p>'
+      + (quem && quem.comSenha
+        ? '<h3>Retirar o consentimento</h3>'
+          + '<p class="passo-dica">O app só guarda leitura, anotação e participação em grupo com o seu consentimento. '
+          + 'Retirar o consentimento é apagar a conta, com todas as cópias.</p>'
+          + '<div class="acoes"><button class="botao plano perigo" data-apagar>Apagar a conta</button></div>'
+        : ''),
+    {
+      rotulo: 'Privacidade',
+      ligar: (folha, fechar) => {
+        const apagar = folha.querySelector('[data-apagar]');
+        if (apagar) apagar.onclick = () => { fechar(); CC.apagarConta(quem.usuario); };
+      },
     });
   };
 

@@ -10,6 +10,7 @@ import { createHmac } from 'node:crypto';
 import { fecharBanco, arquivoDoBanco } from './db.mjs';
 import {
   Contas, diasDeProposito, resumoDeAmigo, somaDias, nascimentoValido,
+  somaAnos, idadeMinimaOk, hojeNoFuso, FUSO_PADRAO, IDADE_MINIMA,
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 
@@ -385,10 +386,46 @@ checar(contas.relacao('ana', 'caio') === 'enviado' && contas.relacao('caio', 'an
 checar(contas.lista().every((c) => !c.segue && c.seloConvite && c.fuso), 'contas migradas ganham selo de convite e fuso');
 
 checar(!nascimentoValido('2999-01-01') && nascimentoValido('2004-02-29') && !nascimentoValido('2003-02-29'), 'data de nascimento é validada de verdade');
+
+// ---------- idade mínima (LGPD art. 14) e consentimento sobre dado de fé (LGPD art. 11) ----------
+checar(somaAnos('2024-02-29', -1) === '2023-02-28', 'somaAnos joga 29 de fevereiro para 28 num ano sem esse dia');
+checar(idadeMinimaOk('2000-01-01', '2012-01-01') && !idadeMinimaOk('2000-01-02', '2012-01-01'),
+  'idadeMinimaOk compara direitinho o dia do aniversário');
+
+const hojeTeste = hojeNoFuso(FUSO_PADRAO);
+const nasc11anos = somaAnos(hojeTeste, -(IDADE_MINIMA - 1));
+const nasc12anos = somaAnos(hojeTeste, -IDADE_MINIMA);
+
+let erroIdade = '';
+try {
+  await contas.criar({ usuario: 'crianca', senha: '12345678', nome: 'Crianca', email: 'crianca@x.com', nascimento: nasc11anos, consentimento: true });
+} catch (e) { erroIdade = e.message; }
+checar(erroIdade === 'o Geração Eleita é para quem tem 12 anos ou mais', 'com 11 anos, o cadastro é recusado pela idade');
+await contas.criar({ usuario: 'douze', senha: '12345678', nome: 'Doze', email: 'doze@x.com', nascimento: nasc12anos, consentimento: true });
+checar(!!contas.achar('douze'), 'com exatamente 12 anos completados hoje, o cadastro passa');
+
+let erroConsentimento = '';
+try {
+  await contas.criar({ usuario: 'semsim', senha: '12345678', nome: 'SemSim', email: 'semsim@x.com', nascimento: nasc12anos });
+} catch (e) { erroConsentimento = e.message; }
+checar(erroConsentimento === 'para criar a conta, é preciso concordar com o uso dos dados sobre a sua fé', 'sem marcar o consentimento, o cadastro é recusado');
+const comSim = await contas.criar({ usuario: 'comsim', senha: '12345678', nome: 'ComSim', email: 'comsim@x.com', nascimento: nasc12anos, consentimento: true });
+checar(contas.consentiu(comSim), 'com o consentimento marcado, a conta nasce com consentiu() verdadeiro');
+
+const antiga = await contas.criar({ usuario: 'antiga', senha: '12345678' }, { exigirPerfil: false });
+checar(!contas.consentiu(antiga), 'conta importada sem exigirPerfil nasce sem consentimento');
+await contas.registrarConsentimento('antiga');
+checar(contas.consentiu(contas.achar('antiga')), 'registrarConsentimento liga o consentimento numa conta antiga');
+
+await contas.salvar();
+const contasRecarregadas = await new Contas(arquivoContas).carregar();
+checar(contasRecarregadas.consentiu(contasRecarregadas.achar('comsim')) && contasRecarregadas.consentiu(contasRecarregadas.achar('antiga')),
+  'o consentimento sobrevive a salvar e recarregar do banco');
+
 let erro = '';
 try { await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora' }); } catch (e) { erro = e.message; }
 checar(/e-mail/.test(erro), 'cadastro sem e-mail é recusado');
-await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03' });
+await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03', consentimento: true });
 checar(!!(await contas.conferir('dora@x.com', '12345678')), 'entra com o e-mail, sem diferenciar maiúsculas');
 for (const u of ['ana', 'bia', 'caio']) await contas.completarPerfil(u, { email: u + '@x.com', nascimento: '2000-01-01' });
 checar(contas.procurar('dora', 'an') === null && contas.procurar('dora', 'ana').usuario === 'ana', 'a busca só acha pelo @ exato');
@@ -409,14 +446,14 @@ checar(contas.dados.convitesAceites.length === 2 && contas.dados.convitesAceites
 checar(contas.lerConvite(convite.token.slice(0, -3) + 'abc', assinar) === null, 'convite adulterado é recusado');
 
 for (const u of ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']) {
-  await contas.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '2000-01-01' });
+  await contas.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '2000-01-01', consentimento: true });
   await contas.pedir(u, 'ana', '2026-03-01');
   await contas.aceitar('ana', u, '2026-03-01');
 }
 checar(contas.ativasDe('ana') === 8, 'amigos sem limite: a Ana passa de 5 (' + contas.ativasDe('ana') + ')');
 
 const conviteDaAna = contas.gerarConvite('ana', assinar);
-await contas.criar({ usuario: 'novo1', senha: '12345678', nome: 'Novo', email: 'novo1@x.com', nascimento: '2000-01-01' });
+await contas.criar({ usuario: 'novo1', senha: '12345678', nome: 'Novo', email: 'novo1@x.com', nascimento: '2000-01-01', consentimento: true });
 await contas.usarConvite('novo1', conviteDaAna.token, assinar, '2026-03-03', Date.now(), { contaNova: true });
 checar(contas.achar('novo1').convidadoPor === 'ana' && contas.semeadorDe('ana') === 0,
   'quem cria a conta pelo link fica anotado, mas só conta depois da primeira lição');

@@ -26,7 +26,7 @@ const base = 'http://127.0.0.1:' + PORTA;
 for (let i = 0; i < 80; i++) { try { await fetch(base + '/api/existe-conta'); break; } catch { await dormir(150); } }
 const r = await fetch(base + '/api/criar-conta', {
   method: 'POST', headers: { 'content-type': 'application/json' },
-  body: JSON.stringify({ usuario: 'iphone', nome: 'Iphone', senha: 'senha-iphone', email: 'iphone@t.com', nascimento: '2001-01-01' }),
+  body: JSON.stringify({ usuario: 'iphone', nome: 'Iphone', senha: 'senha-iphone', email: 'iphone@t.com', nascimento: '2001-01-01', consentimento: true }),
 });
 const cookie = (r.headers.get('set-cookie') || '').split(';')[0];
 const lidos = Array.from({ length: 20 }, (_, i) => i + 1);

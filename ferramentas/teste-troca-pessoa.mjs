@@ -35,7 +35,7 @@ for (let i = 0; i < 80; i++) { try { await fetch(base + '/api/existe-conta'); br
 const criar = async (usuario, senha, nome) => {
   const r = await fetch(base + '/api/criar-conta', {
     method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ usuario, senha, nome, email: usuario + '@teste.com', nascimento: '2000-01-01' }),
+    body: JSON.stringify({ usuario, senha, nome, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true }),
   });
   return (r.headers.get('set-cookie') || '').split(';')[0];
 };

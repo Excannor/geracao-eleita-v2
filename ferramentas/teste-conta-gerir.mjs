@@ -35,7 +35,7 @@ const pedir = (rota, corpo, cookie) => fetch(base + rota, {
   body: corpo ? JSON.stringify(corpo) : undefined,
 });
 const criar = async (usuario, senha, nome) => {
-  const r = await pedir('/api/criar-conta', { usuario, senha, nome, email: usuario + '@teste.com', nascimento: '2000-01-01' });
+  const r = await pedir('/api/criar-conta', { usuario, senha, nome, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true });
   return { status: r.status, cookie: (r.headers.get('set-cookie') || '').split(';')[0] };
 };
 const entrar = async (usuario, senha) => {

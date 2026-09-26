@@ -348,6 +348,10 @@
       if (!CC.rodandoComoApp()) await CC.tutorialInstalar({ contaNova: true });
     }
 
+    // Conta com senha que ainda não concordou com o uso do dado de fé (LGPD art. 11) não
+    // segue para convite, célula ou completar cadastro antes de decidir isso.
+    if (quem && quem.comSenha && !quem.consentimento) await CC.pedirConsentimento();
+
     const celula = new URLSearchParams(location.search).get('celula');
     if (celula) {
       history.replaceState(null, '', location.pathname + (location.hash || '#/'));

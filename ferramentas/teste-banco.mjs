@@ -42,7 +42,7 @@ for (const n of readdirSync(fonte)) {
 // Uma conta com senha conhecida entra no contas.json copiado, para conferir o login depois.
 const rascunho = mkdtempSync(join(tmpdir(), 'cc-banco-rascunho-'));
 const criada = await (await new Contas(join(rascunho, 'contas.json')).carregar())
-  .criar({ usuario: 'ensaio.banco', senha: 'senha-do-ensaio', nome: 'Ensaio', email: 'ensaio@teste.com', nascimento: '2000-01-01' });
+  .criar({ usuario: 'ensaio.banco', senha: 'senha-do-ensaio', nome: 'Ensaio', email: 'ensaio@teste.com', nascimento: '2000-01-01', consentimento: true });
 const contasJson = JSON.parse(readFileSync(join(PASTA, 'contas.json'), 'utf8'));
 contasJson.contas['ensaio.banco'] = { ...criada };
 writeFileSync(join(PASTA, 'contas.json'), JSON.stringify(contasJson));
@@ -129,7 +129,7 @@ try {
   // ---------- gravações simultâneas ----------
   const pessoas = [];
   for (let i = 1; i <= 5; i++) {
-    const r = await pedir('/api/criar-conta', { usuario: 'carga' + i, senha: 'senha-de-carga', nome: 'Carga', email: 'carga' + i + '@teste.com', nascimento: '2000-01-01' });
+    const r = await pedir('/api/criar-conta', { usuario: 'carga' + i, senha: 'senha-de-carga', nome: 'Carga', email: 'carga' + i + '@teste.com', nascimento: '2000-01-01', consentimento: true });
     pessoas.push((r.headers.get('set-cookie') || '').split(';')[0]);
   }
   const gravacoes = [];

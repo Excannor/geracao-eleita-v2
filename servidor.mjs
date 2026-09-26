@@ -868,6 +868,8 @@ const servidor = createServer(async (req, res) => {
         email: conta ? conta.email : '',
         nascimento: conta ? conta.nascimento : '',
         perfilCompleto: conta ? CONTAS.perfilCompleto(conta) : false,
+        consentimento: conta ? CONTAS.consentiu(conta) : false,
+        consentimentoEm: (conta && conta.consentimento && conta.consentimento.em) || '',
         comSenha: !!conta,
         semeador,
         admin: ehAdmin(eu),
@@ -993,6 +995,7 @@ const servidor = createServer(async (req, res) => {
 
       json(res, 200, {
         perfilCompleto: completo,
+        consentimento: CONTAS.consentiu(conta),
         motivos: MOTIVOS_DENUNCIA,
         eu: { ...resumoDeAmigo(conta, meu.estado, hojeEu) },
         amigos,
@@ -1019,6 +1022,13 @@ const servidor = createServer(async (req, res) => {
         json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora' });
       }
     };
+
+    // O "Concordo" da folha de consentimento sobre dado de fé (LGPD art. 11).
+    if (rota === '/api/consentimento') {
+      if (!exigir(conta, 403, 'entre com uma conta')) return;
+      await acao(async () => { await CONTAS.registrarConsentimento(eu); return {}; });
+      return;
+    }
 
     if (rota === '/api/amizade') {
       await acao(async ({ acao: qual, usuario }) => {

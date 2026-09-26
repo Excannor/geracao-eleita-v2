@@ -29,7 +29,7 @@ console.log('\n  Propósitos em dupla e em grupo\n');
 try {
   const arquivo = join(RASCUNHO, 'contas.json');
   let contas = await new Contas(arquivo).carregar();
-  for (const u of ['velha', 'amiga']) await contas.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '2000-01-01' });
+  for (const u of ['velha', 'amiga']) await contas.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '2000-01-01', consentimento: true });
   await contas.pedir('velha', 'amiga', '2026-01-10');
   await contas.aceitar('amiga', 'velha', '2026-01-10');
   // Volta o banco ao jeito de antes: amizade sem propósito e sem a marca da migração.
@@ -68,7 +68,7 @@ const pedir = async (rota, corpo, cookie, metodo) => {
   return { status: r.status, cookie: (r.headers.get('set-cookie') || '').split(';')[0], corpo: json, texto };
 };
 const criar = (usuario, convite) => pedir('/api/criar-conta', {
-  usuario, senha: 'senha-boa-1', nome: usuario[0].toUpperCase() + usuario.slice(1), email: usuario + '@teste.com', nascimento: '2000-01-01', ...(convite ? { convite } : {}),
+  usuario, senha: 'senha-boa-1', nome: usuario[0].toUpperCase() + usuario.slice(1), email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true, ...(convite ? { convite } : {}),
 });
 const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const respostas = [];

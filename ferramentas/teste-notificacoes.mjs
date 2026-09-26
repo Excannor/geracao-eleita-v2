@@ -57,7 +57,7 @@ const pedir = (rota, corpo, cookie, metodo) => fetch(base + rota, {
 const pedirJson = async (...a) => { const r = await pedir(...a); return { status: r.status, ...(await r.json().catch(() => ({}))) }; };
 
 async function criar(usuario, nome) {
-  const r = await pedir('/api/criar-conta', { usuario, senha: 'senha-boa-1', nome, email: usuario + '@teste.com', nascimento: '2000-01-01', fuso: FUSO });
+  const r = await pedir('/api/criar-conta', { usuario, senha: 'senha-boa-1', nome, email: usuario + '@teste.com', nascimento: '2000-01-01', fuso: FUSO, consentimento: true });
   return (r.headers.get('set-cookie') || '').split(';')[0];
 }
 const ler = (cookie) => pedir('/api/estado', { atualizadoEm: Date.now(), lidos: [1], marcadoEm: { 1: hojeSP }, licoes: [], anotacoes: {}, oia: {} }, cookie, 'PUT');

@@ -71,7 +71,7 @@ const pedir = (rota, corpo, cookie) => fetch(base + rota, {
 });
 const biscoito = (r) => (r.headers.get('set-cookie') || '').split(';')[0];
 const criar = async (usuario) => biscoito(await pedir('/api/criar-conta',
-  { usuario, senha: 'senha-velha', nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01' }));
+  { usuario, senha: 'senha-velha', nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true }));
 
 try {
   console.log('\n  Senha esquecida\n');

@@ -37,7 +37,7 @@ const pedir = async (rota, corpo, cookie, metodo) => {
   return { status: r.status, cookie: (r.headers.get('set-cookie') || '').split(';')[0], corpo: await r.json().catch(() => ({})) };
 };
 const criar = (usuario, convite) => pedir('/api/criar-conta', {
-  usuario, senha: 'senha-boa-1', nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', ...(convite ? { convite } : {}),
+  usuario, senha: 'senha-boa-1', nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true, ...(convite ? { convite } : {}),
 });
 const banco = (sql, ...p) => { const b = new DatabaseSync(join(PASTA, 'caminho.db')); try { return b.prepare(sql).all(...p); } finally { b.close(); } };
 const amigosDe = async (cookie) => (await pedir('/api/amigos', null, cookie)).corpo;
