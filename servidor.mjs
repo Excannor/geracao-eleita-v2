@@ -11,11 +11,11 @@ import { createHmac, createHash, randomBytes } from 'node:crypto';
 import { createContext, runInContext } from 'node:vm';
 import {
   Contas, arquivoDoEstado, seloDaConta, limparNome, iguais, hojeNoFuso, fusoValido, somaDias,
-  datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA,
+  datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA, podeConduzir,
 } from './contas.mjs';
 import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs';
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
-import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
+import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, quemPrecisaDeAtencao, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
@@ -546,7 +546,9 @@ async function retratoDoProposito(p, eu) {
     info.set(m.usuario, { conta: c, estado: dia.estado, protegidos: dia.protegidos, datas: datasDoTipo(p.tipo, p.alvo, dia.estado, PLANO_DO_CONTEUDO), referencia });
   }
   const referencia = [...info.values()].reduce((menor, x) => (x.referencia < menor ? x.referencia : menor), hojeEu);
-  const ativos = p.membros.filter((m) => m.estado === 'ativo' && info.has(m.usuario));
+  // Visitante (só está conhecendo a célula) fica fora da meta do dia e de "quem leu": não é
+  // membro de verdade ainda, então não pode pesar a favor nem contra o grupo.
+  const ativos = p.membros.filter((m) => m.estado === 'ativo' && info.has(m.usuario) && m.papel !== 'visitante');
   let dias = 0;
   let hoje = null;
   if (!p.grupo) {
@@ -555,9 +557,9 @@ async function retratoDoProposito(p, eu) {
       dias = diasJuntos({ tipo: p.tipo, datasA: x.datas, datasB: y.datas, protegidosA: x.protegidos, protegidosB: y.protegidos, desde: p.criadoEm, hoje: referencia });
     }
   } else {
-    // Conta como membro do dia quem já tinha entrado e ainda não tinha saído.
+    // Conta como membro do dia quem já tinha entrado, ainda não tinha saído e não é visitante.
     const noDia = (data) => pontosDoDia(p.membros
-      .filter((m) => info.has(m.usuario) && m.estado !== 'convidado' && m.entrouEm && m.entrouEm <= data && (!m.saiuEm || m.saiuEm > data))
+      .filter((m) => info.has(m.usuario) && m.estado !== 'convidado' && m.papel !== 'visitante' && m.entrouEm && m.entrouEm <= data && (!m.saiuEm || m.saiuEm > data))
       .map((m) => { const x = info.get(m.usuario); return { feito: x.datas.has(data), extra: extraNoDia(x.estado, data) }; }));
     // Dia fechado e batido fica anotado; hoje ainda pode mudar, então é sempre recalculado.
     const guardados = new Set(p.diasBatidos || []);
@@ -576,7 +578,7 @@ async function retratoDoProposito(p, eu) {
     const x = info.get(m.usuario);
     return {
       usuario: m.usuario, nome: (x.estado && x.estado.apelido) || x.conta.nome || m.usuario, foto: (x.estado && x.estado.foto) || '',
-      estado: m.estado, fezHoje: m.estado === 'ativo' && x.datas.has(referencia),
+      estado: m.estado, papel: m.papel || '', fezHoje: m.estado === 'ativo' && x.datas.has(referencia),
       extraHoje: p.grupo && m.estado === 'ativo' ? extraNoDia(x.estado, referencia) === 1 : false,
     };
   });
@@ -589,18 +591,29 @@ async function retratoDoProposito(p, eu) {
   };
 }
 
-// O que só a célula tem: o dia do encontro, o recado do líder, a semana que o roteiro cobre
-// (os 7 dias do plano até onde o líder já leu: é ele quem conduz o encontro) e, só para o
-// líder, o número da semana do grupo inteiro, sem dizer quem faltou.
+// Dias inteiros entre duas datas ISO (a antes de ou igual a b).
+const diasEntre = (a, b) => Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000);
+// Quantos dias de encontro registrado entram na conta de "encontrosRegistrados".
+const JANELA_ENCONTROS = 60;
+// No máximo esta quantidade de pessoas no bloco "precisam de atenção".
+// A partir de quantos dias sem ler alguém entra em "precisa de atenção".
+
+// O que só a célula tem: o dia do encontro, o recado, a semana que o roteiro cobre (os 7 dias
+// do plano até onde o líder já leu: é ele quem conduz o encontro) e o roteiro 4 Ws. O resto
+// (semana do grupo, quem precisa de atenção, o registro dos encontros) é só de quem conduz
+// (líder ou auxiliar): membro comum nunca vê lista de presença nem "quem sumiu".
 function celulaNoRetrato(p, eu, info, ativos, referencia) {
   const lider = info.get(p.criadoPor);
   const lidos = ((lider && lider.estado && lider.estado.lidos) || []).map(Number).filter((n) => n >= 1 && n <= PLANO_DO_CONTEUDO.length);
   const semanaAte = Math.max(7, lidos.length ? Math.max(...lidos) : 0);
+  const conduzo = podeConduzir(p, eu);
   const extra = {
     encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', semanaAte,
     estudo: p.estudo || null,
+    estudoAcolhida: p.estudoAcolhida || '', estudoAdoracao: p.estudoAdoracao || '', estudoTestemunho: p.estudoTestemunho || '',
+    euConduzo: conduzo,
   };
-  if (eu !== p.criadoPor) return extra;
+  if (!conduzo) return extra;
   const semana = new Set(Array.from({ length: 7 }, (_, i) => somaDias(referencia, -i)));
   let leram = 0;
   let leituras = 0;
@@ -609,7 +622,28 @@ function celulaNoRetrato(p, eu, info, ativos, referencia) {
     if (n) leram++;
     leituras += n;
   }
-  return { ...extra, semanaLider: { pessoas: ativos.length, leram, leituras, possiveis: ativos.length * 7 } };
+
+  // Os dois últimos encontros registrados, do mais novo para o mais velho.
+  const encontros = (p.encontros || []).slice().sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0));
+  const ultimo = encontros[0] || null;
+  const nomeDe = (u) => { const x = info.get(u); return (x && ((x.estado && x.estado.apelido) || x.conta.nome)) || u; };
+
+  // Quem precisa de atenção: nunca quem conduz, nunca visitante (já fora de "ativos"). A regra
+  // mora em propositos.mjs, onde os testes a exercitam sem servidor.
+  const atencao = quemPrecisaDeAtencao({
+    candidatos: ativos.filter((m) => !podeConduzir(p, m.usuario))
+      .map((m) => ({ usuario: m.usuario, nome: nomeDe(m.usuario), entrouEm: m.entrouEm, datas: info.get(m.usuario).datas })),
+    encontros, referencia, criadoEm: p.criadoEm,
+  });
+
+  const limiteJanela = somaDias(referencia, -JANELA_ENCONTROS);
+  return {
+    ...extra,
+    semanaLider: { pessoas: ativos.length, leram, leituras, possiveis: ativos.length * 7 },
+    atencao,
+    ultimoEncontro: ultimo ? { data: ultimo.data, presentes: ultimo.presentes.length, visitantes: ultimo.visitantes } : null,
+    encontrosRegistrados: encontros.filter((e) => e.data >= limiteJanela && e.data <= referencia).length,
+  };
 }
 
 async function rodadaDeLembretes(agora = new Date()) {
@@ -672,7 +706,8 @@ async function rodadaDeLembretes(agora = new Date()) {
     }
     if (retrato.hoje.faltam > 2) continue;
     for (const m of retrato.membros) {
-      if (m.estado !== 'ativo' || m.fezHoje || !NOTIFICACOES.inscricoesDe(m.usuario).length || !NOTIFICACOES.preferencias(m.usuario).amigos) continue;
+      // Visitante não entra na meta do grupo, então também não recebe a cobrança dela.
+      if (m.estado !== 'ativo' || m.papel === 'visitante' || m.fezHoje || !NOTIFICACOES.inscricoesDe(m.usuario).length || !NOTIFICACOES.preferencias(m.usuario).amigos) continue;
       const conta = CONTAS.achar(m.usuario);
       const data = hojeNoFuso(conta.fuso, agora);
       const minutos = minutosNoFuso(conta.fuso, agora);
@@ -766,7 +801,7 @@ const servidor = createServer(async (req, res) => {
         if (pedido.celula) {
           try {
             const hoje = hojeDe(criada.usuario);
-            const r = await CONTAS.entrarNaCelula(criada.usuario, String(pedido.celula), assinar, hoje, Date.now(), { contaNova: true });
+            const r = await CONTAS.entrarNaCelula(criada.usuario, String(pedido.celula), assinar, hoje, Date.now(), { contaNova: true, visitante: !!pedido.celulaVisitante });
             celula = r.proposito.titulo;
             await avisarEntradaNaCelula(criada.usuario, r, hoje);
           } catch { /* segue sem a célula */ }
@@ -1156,7 +1191,10 @@ const servidor = createServer(async (req, res) => {
     }
 
     if (rota === '/api/celula') {
-      await acao(async ({ acao: qual, id, titulo, token, dia, texto, usuario, estudo, ref }) => {
+      await acao(async ({
+        acao: qual, id, titulo, token, dia, texto, usuario, estudo, ref, acolhida, adoracao, testemunho,
+        visitante, sim, data, presentes, visitantes,
+      }) => {
         const hoje = hojeDe(eu);
         if (qual === 'criar') {
           const p = await CONTAS.criarCelula(eu, { titulo }, hoje);
@@ -1168,13 +1206,16 @@ const servidor = createServer(async (req, res) => {
           return { link: origem + '/?celula=' + gerado.token, venceEm: gerado.venceEm };
         }
         if (qual === 'entrar') {
-          const r = await CONTAS.entrarNaCelula(eu, String(token || ''), assinar, hoje);
+          const r = await CONTAS.entrarNaCelula(eu, String(token || ''), assinar, hoje, Date.now(), { visitante: !!visitante });
           if (!r.ja) await avisarEntradaNaCelula(eu, r, hoje);
-          return { ja: !!r.ja, id: r.proposito.id, titulo: r.proposito.titulo };
+          return { ja: !!r.ja, id: r.proposito.id, titulo: r.proposito.titulo, papel: r.papel || '' };
         }
+        if (qual === 'tornarMembro') { await CONTAS.tornarMembro(eu, id); return {}; }
+        if (qual === 'auxiliar') { await CONTAS.definirAuxiliar(eu, id, usuario, !!sim); return {}; }
         if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia); return {}; }
         if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto); return {}; }
-        if (qual === 'estudo') { await CONTAS.definirEstudo(eu, id, { tipo: estudo, ref, texto }, TODOS_LIVROS); return {}; }
+        if (qual === 'estudo') { await CONTAS.definirEstudo(eu, id, { tipo: estudo, ref, texto, acolhida, adoracao, testemunho }, TODOS_LIVROS); return {}; }
+        if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes }, hoje); return {}; }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
         throw Object.assign(new Error('ação desconhecida'), { publico: true });
       });

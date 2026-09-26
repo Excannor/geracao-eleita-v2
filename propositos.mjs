@@ -118,3 +118,31 @@ export function sequenciaDoGrupo({ tipo, batidaEm, desde, hoje }) {
   while (cursor >= desde && batidaEm(cursor)) { n++; cursor = somaDias(cursor, -1); }
   return n;
 }
+
+// ---------- célula: quem precisa de atenção ----------
+// Só quem conduz a célula vê esta lista, para procurar a pessoa, e nunca como placar.
+// candidatos: [{ usuario, nome, entrouEm, datas: Set de datas em que leu }], já sem quem conduz
+// e sem visitantes. encontros: [{ data, presentes: [usuarios] }].
+export const LIMITE_ATENCAO = 5;
+export const DIAS_SEM_LER_ATENCAO = 5;
+const diasEntre = (a, b) => Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000);
+export function quemPrecisaDeAtencao({ candidatos, encontros, referencia, criadoEm = '' }) {
+  const doisUltimos = (encontros || []).slice().sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0)).slice(0, 2);
+  const saida = [];
+  for (const m of candidatos.slice().sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'pt-BR'))) {
+    if (saida.length >= LIMITE_ATENCAO) break;
+    // Só contam encontros de quando a pessoa já estava na célula: quem entrou depois não "faltou".
+    const entrou = m.entrouEm || '';
+    let motivo = '';
+    if (doisUltimos.length >= 2 && doisUltimos.every((e) => e.data >= entrou && !e.presentes.includes(m.usuario))) {
+      motivo = 'faltou aos 2 últimos encontros';
+    } else {
+      const feitas = [...(m.datas || [])].filter((d) => d <= referencia).sort();
+      const desde = feitas[feitas.length - 1] || entrou || criadoEm;
+      const semLer = desde ? diasEntre(desde, referencia) : 0;
+      if (semLer >= DIAS_SEM_LER_ATENCAO) motivo = 'sem ler há ' + semLer + ' dias';
+    }
+    if (motivo) saida.push({ usuario: m.usuario, nome: m.nome, motivo });
+  }
+  return saida;
+}

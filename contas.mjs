@@ -30,6 +30,14 @@ export const LIMITE_TOQUES_DIA = 5;
 export const VALIDADE_CONVITE = 30 * 24 * 60 * 60 * 1000;
 export const RECADO_MAX = 280;
 export const ESTUDO_MAX = 3000;
+// Acolhida, adoração e testemunho são só um empurrão para a conversa: bem mais curtos que a
+// Palavra, que pode ser um estudo inteiro.
+export const CAMPO_4W_MAX = 300;
+// Quem só está conhecendo entra sem ocupar vaga de membro: um teto próprio, menor que o da
+// célula inteira, evita que a "visita" vire o jeito de furar o limite de 20.
+export const LIMITE_VISITANTES = 10;
+// Quantos auxiliares (além do líder) podem conduzir a célula junto.
+export const LIMITE_AUXILIARES = 2;
 export const FUSO_PADRAO = 'America/Sao_Paulo';
 // LGPD art. 14: menor de 12 anos precisaria de consentimento dos pais, que o app não tem
 // como conferir; por isso a idade mínima para ter conta é 12 anos completos.
@@ -163,11 +171,18 @@ function paraLinhas(d) {
       encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recado_em: p.recadoEm || '',
       estudo_tipo: (p.estudo && p.estudo.tipo) || '', estudo_ref: (p.estudo && p.estudo.ref) || '',
       estudo_texto: (p.estudo && p.estudo.texto) || '', estudo_em: (p.estudo && p.estudo.em) || '',
+      estudo_acolhida: p.estudoAcolhida || '', estudo_adoracao: p.estudoAdoracao || '', estudo_testemunho: p.estudoTestemunho || '',
     })) },
     { tabela: 'proposito_membros', chaves: ['proposito', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => p.membros.map((m) => ({
       proposito: p.id, usuario: m.usuario, estado: m.estado, entrou_em: m.entrouEm || '', saiu_em: m.saiuEm || '', convidado_por: m.convidadoPor || '',
+      papel: m.papel || '',
     }))) },
     { tabela: 'proposito_dias', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.diasBatidos || []).map((data) => ({ proposito: p.id, data }))) },
+    { tabela: 'celula_encontros', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || []).map((e) => ({
+      proposito: p.id, data: e.data, visitantes: Number(e.visitantes) || 0, registrado_por: e.registradoPor || '', em: e.em || '',
+    }))) },
+    { tabela: 'celula_presencas', chaves: ['proposito', 'data', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || [])
+      .flatMap((e) => (e.presentes || []).map((usuario) => ({ proposito: p.id, data: e.data, usuario })))) },
   ];
 }
 
@@ -184,6 +199,8 @@ function lerTabelas(db) {
     propositos: lerTabela(db, 'propositos', ['id'], 'criado_em'),
     membros: lerTabela(db, 'proposito_membros', ['proposito', 'usuario']),
     diasBatidos: lerTabela(db, 'proposito_dias', ['proposito', 'data'], 'data'),
+    encontros: lerTabela(db, 'celula_encontros', ['proposito', 'data'], 'data'),
+    presencas: lerTabela(db, 'celula_presencas', ['proposito', 'data', 'usuario']),
   };
 }
 
@@ -215,18 +232,37 @@ function deLinhas(t, versao) {
       encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, celula: !!l.celula,
       encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '',
       estudo: l.estudo_tipo ? { tipo: l.estudo_tipo, ref: l.estudo_ref || '', texto: l.estudo_texto || '', em: l.estudo_em || '' } : null,
-      membros: [], diasBatidos: [],
+      estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
+      membros: [], diasBatidos: [], encontros: [],
     };
   }
   for (const l of t.membros || []) {
     const p = d.propositos[l.proposito];
-    if (p) p.membros.push({ usuario: l.usuario, estado: l.estado, entrouEm: l.entrou_em || '', saiuEm: l.saiu_em || '', convidadoPor: l.convidado_por || '' });
+    if (p) p.membros.push({ usuario: l.usuario, estado: l.estado, entrouEm: l.entrou_em || '', saiuEm: l.saiu_em || '', convidadoPor: l.convidado_por || '', papel: l.papel || '' });
   }
   for (const l of t.diasBatidos || []) {
     const p = d.propositos[l.proposito];
     if (p) p.diasBatidos.push(l.data);
   }
+  for (const l of t.encontros || []) {
+    const p = d.propositos[l.proposito];
+    if (p) p.encontros.push({ data: l.data, visitantes: Number(l.visitantes) || 0, registradoPor: l.registrado_por || '', em: l.em || '', presentes: [] });
+  }
+  for (const l of t.presencas || []) {
+    const p = d.propositos[l.proposito];
+    const encontro = p && p.encontros.find((e) => e.data === l.data);
+    if (encontro) encontro.presentes.push(l.usuario);
+  }
   return d;
+}
+
+// Quem conduz a célula: o líder sempre, e o auxiliar enquanto for membro ativo (perde o papel
+// se sair ou virar visitante). É a mesma regra para o servidor decidir o que mostrar e para
+// contas.mjs decidir o que aceitar.
+export function podeConduzir(p, usuario) {
+  if (!p || !usuario) return false;
+  if (p.criadoPor === usuario) return true;
+  return p.membros.some((m) => m.usuario === usuario && m.estado === 'ativo' && m.papel === 'auxiliar');
 }
 
 export class Contas {
@@ -455,6 +491,11 @@ export class Contas {
       if (!p.membros.some((m) => m.usuario === chave)) continue;
       p.membros = p.membros.filter((m) => m.usuario !== chave);
       if (!p.encerradoEm && (!p.grupo || this.presentes(p).length < 2)) p.encerradoEm = hojeNoFuso(FUSO_PADRAO);
+    }
+    // sai da lista de presentes de qualquer encontro já registrado; o encontro em si (quem
+    // registrou, quantas pessoas vieram) continua de pé
+    for (const p of Object.values(this.dados.propositos || {})) {
+      for (const e of p.encontros || []) e.presentes = e.presentes.filter((u) => u !== chave);
     }
     await this.salvar();
     return chave;
@@ -863,18 +904,28 @@ export class Contas {
     if (!(Number(dado.v) > agora)) return null;
     const p = this.proposito(dado.p);
     if (!p || p.encerradoEm || !p.celula || !this.ativosDe(p).some((m) => m.usuario === dono.usuario)) return null;
-    const pessoas = this.presentes(p).length;
+    // Quem só está conhecendo (visitante) não ocupa vaga de membro: as vagas do link são só
+    // as dos 20 lugares de membro, mesmo que a célula já tenha visitantes dentro.
+    const pessoas = this.presentes(p).filter((m) => m.papel !== 'visitante').length;
     return { proposito: p, de: dono.usuario, nome: dono.nome, titulo: p.titulo, pessoas, limite: limiteDo(p), vagas: Math.max(0, limiteDo(p) - pessoas) };
   }
 
-  async entrarNaCelula(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false } = {}) {
+  async entrarNaCelula(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false, visitante = false } = {}) {
     const link = this.lerLinkCelula(token, assinar, agora);
     if (!link) throw erro('esse link de célula venceu ou foi cancelado', 410);
     const a = this.exigirCompleto(eu);
     const p = link.proposito;
     const minha = p.membros.find((m) => m.usuario === a.usuario);
-    if (minha && minha.estado === 'ativo') return { ja: true, proposito: p, de: link.de };
-    if (link.vagas <= 0 && !(minha && minha.estado === 'convidado')) throw erro('essa célula já está cheia (' + link.limite + ' pessoas)', 409);
+    if (minha && minha.estado === 'ativo') return { ja: true, proposito: p, de: link.de, papel: minha.papel || '' };
+    if (visitante) {
+      // Visitante tem teto próprio, menor e separado do limite de membros da célula.
+      const visitantesAtuais = this.ativosDe(p).filter((m) => m.papel === 'visitante').length;
+      if (visitantesAtuais >= LIMITE_VISITANTES && !(minha && minha.estado === 'convidado')) {
+        throw erro('essa célula já tem visitantes demais (o teto é ' + LIMITE_VISITANTES + ')', 409);
+      }
+    } else if (link.vagas <= 0 && !(minha && minha.estado === 'convidado')) {
+      throw erro('essa célula já está cheia (' + link.limite + ' pessoas)', 409);
+    }
     // A amizade com quem mandou o link passa pelo mesmo caminho de um convite: respeita
     // bloqueio, conta para o Semeador só quando é conta nova, e cria a leitura em dupla.
     let amizadeNova = false;
@@ -883,10 +934,26 @@ export class Contas {
       const usado = await this.usarConvite(a.usuario, convite.token, assinar, hoje, agora, { contaNova, semDupla: true });
       amizadeNova = !usado.ja;
     }
-    if (minha) Object.assign(minha, { estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: link.de });
-    else p.membros.push({ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: link.de });
+    const papel = visitante ? 'visitante' : '';
+    if (minha) Object.assign(minha, { estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: link.de, papel });
+    else p.membros.push({ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: link.de, papel });
     await this.salvar();
-    return { proposito: p, de: link.de, amizadeNova };
+    return { proposito: p, de: link.de, amizadeNova, papel };
+  }
+
+  // O visitante que decide ficar: vira membro de verdade, contando na meta e no limite de 20
+  // como qualquer um. Continua precisando de vaga: virar membro não é convite automático.
+  async tornarMembro(eu, id) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
+    const m = p.membros.find((x) => x.usuario === a.usuario && x.estado === 'ativo' && x.papel === 'visitante');
+    if (!m) throw erro('você não está como visitante nessa célula', 404);
+    const membros = this.ativosDe(p).filter((x) => x.papel !== 'visitante').length;
+    if (membros >= limiteDo(p)) throw erro('essa célula já está cheia (' + limiteDo(p) + ' pessoas)', 409);
+    m.papel = '';
+    await this.salvar();
+    return p;
   }
 
   // ---------- o líder da célula ----------
@@ -901,8 +968,19 @@ export class Contas {
     return p;
   }
 
+  // O auxiliar conduz a célula junto com o líder (recado, encontro, estudo, registrar
+  // encontro, atenção e oração), mas não tira gente, não marca auxiliar e não encerra: isso
+  // continua só do líder.
+  celulaDeQuemConduz(eu, id) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
+    if (!podeConduzir(p, a.usuario)) throw erro('só quem conduz a célula pode fazer isso', 403);
+    return p;
+  }
+
   async definirEncontro(eu, id, dia) {
-    const p = this.celulaDoLider(eu, id);
+    const p = this.celulaDeQuemConduz(eu, id);
     const n = Number(dia);
     if (!Number.isInteger(n) || n < -1 || n > 6) throw erro('escolha um dia da semana');
     p.encontro = n;
@@ -911,7 +989,7 @@ export class Contas {
   }
 
   async definirRecado(eu, id, texto, agora = new Date()) {
-    const p = this.celulaDoLider(eu, id);
+    const p = this.celulaDeQuemConduz(eu, id);
     const limpo = String(texto || '').replace(/\s+/g, ' ').trim();
     if (limpo.length > RECADO_MAX) throw erro('o recado tem no máximo ' + RECADO_MAX + ' caracteres');
     p.recado = limpo;
@@ -920,26 +998,83 @@ export class Contas {
     return p;
   }
 
-  // O estudo do encontro é escolha do líder, nunca imposto pelo app:
+  // Só o líder marca (ou tira) um auxiliar: no máximo 2, e só entre quem já é membro ativo
+  // (visitante ainda não conduz nada).
+  async definirAuxiliar(eu, id, usuario, sim) {
+    const p = this.celulaDoLider(eu, id);
+    const u = limparNome(usuario);
+    if (u === p.criadoPor) throw erro('o líder já conduz a célula', 400);
+    const m = p.membros.find((x) => x.usuario === u && x.estado === 'ativo');
+    if (!m) throw erro('essa pessoa não está na célula', 404);
+    if (sim) {
+      if (m.papel === 'visitante') throw erro('quem só está conhecendo ainda não pode conduzir', 400);
+      const atuais = p.membros.filter((x) => x.estado === 'ativo' && x.papel === 'auxiliar' && x.usuario !== u).length;
+      if (atuais >= LIMITE_AUXILIARES) throw erro('a célula já tem ' + LIMITE_AUXILIARES + ' auxiliares', 400);
+      m.papel = 'auxiliar';
+    } else if (m.papel === 'auxiliar') {
+      m.papel = '';
+    }
+    await this.salvar();
+    return p;
+  }
+
+  // O estudo do encontro é escolha de quem conduz, nunca imposto pelo app:
   //   semana: o roteiro que o app monta da leitura da semana (sugestão pronta)
   //   trecho: um livro e capítulo, ou versículos, escolhidos por ele ("Romanos 8", "João 3.16-18")
   //   livre:  um estudo escrito por ele
-  // Nos três, "texto" é a palavra do líder (no livre, é o estudo inteiro). Tipo vazio apaga.
-  async definirEstudo(eu, id, { tipo, ref, texto } = {}, livros = [], agora = new Date()) {
-    const p = this.celulaDoLider(eu, id);
+  // Nos três, "texto" é a palavra de quem conduz (no livre, é o estudo inteiro). Tipo vazio apaga.
+  // Acolhida, adoração e testemunho são os outros três W do roteiro: valem e são gravados
+  // mesmo quando a Palavra está vazia, porque a conversa da célula não depende dela.
+  async definirEstudo(eu, id, { tipo, ref, texto, acolhida, adoracao, testemunho } = {}, livros = [], agora = new Date()) {
+    const p = this.celulaDeQuemConduz(eu, id);
+    const campo4w = (valor, nome) => {
+      const limpo = String(valor || '').replace(/\s+/g, ' ').trim();
+      if (limpo.length > CAMPO_4W_MAX) throw erro('o campo "' + nome + '" tem no máximo ' + CAMPO_4W_MAX + ' caracteres');
+      return limpo;
+    };
+    // Tudo é validado antes de mudar o propósito: um campo recusado não pode deixar o outro
+    // pela metade gravado na memória.
+    const novaAcolhida = acolhida !== undefined ? campo4w(acolhida, 'acolhida') : undefined;
+    const novaAdoracao = adoracao !== undefined ? campo4w(adoracao, 'adoração') : undefined;
+    const novoTestemunho = testemunho !== undefined ? campo4w(testemunho, 'testemunho') : undefined;
     const t = String(tipo || '');
-    if (!t) { p.estudo = null; await this.salvar(); return p; }
-    if (!['semana', 'trecho', 'livre'].includes(t)) throw erro('escolha como vai ser o estudo');
-    const limpo = String(texto || '').replace(/\r\n/g, '\n').trim();
-    if (limpo.length > ESTUDO_MAX) throw erro('o estudo tem no máximo ' + ESTUDO_MAX + ' caracteres');
-    if (t === 'livre' && !limpo) throw erro('escreva o estudo');
-    let referencia = '';
-    if (t === 'trecho') {
-      referencia = String(ref || '').replace(/\s+/g, ' ').trim();
-      const m = /^(.+?) (\d{1,3})(?:\.(\d{1,3})(?:-(\d{1,3}))?)?$/.exec(referencia);
-      if (!m || !livros.includes(m[1]) || (m[4] && Number(m[4]) < Number(m[3]))) throw erro('escolha um livro e um capítulo, como "Romanos 8" ou "João 3.16-18"');
+    let novoEstudo = null;
+    if (t) {
+      if (!['semana', 'trecho', 'livre'].includes(t)) throw erro('escolha como vai ser o estudo');
+      const limpo = String(texto || '').replace(/\r\n/g, '\n').trim();
+      if (limpo.length > ESTUDO_MAX) throw erro('o estudo tem no máximo ' + ESTUDO_MAX + ' caracteres');
+      if (t === 'livre' && !limpo) throw erro('escreva o estudo');
+      let referencia = '';
+      if (t === 'trecho') {
+        referencia = String(ref || '').replace(/\s+/g, ' ').trim();
+        const m = /^(.+?) (\d{1,3})(?:\.(\d{1,3})(?:-(\d{1,3}))?)?$/.exec(referencia);
+        if (!m || !livros.includes(m[1]) || (m[4] && Number(m[4]) < Number(m[3]))) throw erro('escolha um livro e um capítulo, como "Romanos 8" ou "João 3.16-18"');
+      }
+      novoEstudo = { tipo: t, ref: referencia, texto: limpo, em: agora.toISOString() };
     }
-    p.estudo = { tipo: t, ref: referencia, texto: limpo, em: agora.toISOString() };
+    if (novaAcolhida !== undefined) p.estudoAcolhida = novaAcolhida;
+    if (novaAdoracao !== undefined) p.estudoAdoracao = novaAdoracao;
+    if (novoTestemunho !== undefined) p.estudoTestemunho = novoTestemunho;
+    p.estudo = novoEstudo;
+    await this.salvar();
+    return p;
+  }
+
+  // Quem conduz registra quem foi ao encontro: hoje ou um dos 7 dias anteriores, membros e
+  // visitantes de verdade (não qualquer @ digitado), e regrava por cima se já havia registro
+  // naquele dia. "visitantes" aqui é o contador de pessoas que vieram mas não têm conta no app.
+  async registrarEncontro(eu, id, { data, presentes, visitantes } = {}, hoje) {
+    const p = this.celulaDeQuemConduz(eu, id);
+    const d = String(data || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d > hoje || d < somaDias(hoje, -7)) throw erro('escolha o dia do encontro, de hoje até 7 dias atrás');
+    const n = Number(visitantes);
+    if (!Number.isInteger(n) || n < 0 || n > 30) throw erro('o número de pessoas sem conta vai de 0 a 30');
+    const validos = new Set(this.ativosDe(p).map((m) => m.usuario));
+    const lista = [...new Set((Array.isArray(presentes) ? presentes : []).map(limparNome))].filter((u) => validos.has(u));
+    const registro = { data: d, visitantes: n, registradoPor: limparNome(eu), em: new Date().toISOString(), presentes: lista };
+    const encontros = p.encontros || (p.encontros = []);
+    const existente = encontros.find((e) => e.data === d);
+    if (existente) Object.assign(existente, registro); else encontros.push(registro);
     await this.salvar();
     return p;
   }

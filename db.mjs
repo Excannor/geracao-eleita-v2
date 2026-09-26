@@ -115,6 +115,19 @@ const ESQUEMA = [
   ALTER TABLE propositos ADD COLUMN estudo_texto TEXT NOT NULL DEFAULT '';
   ALTER TABLE propositos ADD COLUMN estudo_em TEXT NOT NULL DEFAULT '';
   `,
+  // v7: papéis dentro da célula (auxiliar conduz junto, visitante só está conhecendo), o
+  // roteiro 4 Ws (acolhida, adoração e testemunho, além da Palavra que já existia) e o
+  // registro de quem foi a cada encontro
+  `
+  ALTER TABLE proposito_membros ADD COLUMN papel TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_acolhida TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_adoracao TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_testemunho TEXT NOT NULL DEFAULT '';
+  CREATE TABLE celula_encontros (proposito TEXT NOT NULL, data TEXT NOT NULL, visitantes INTEGER NOT NULL DEFAULT 0,
+    registrado_por TEXT NOT NULL, em TEXT NOT NULL, PRIMARY KEY (proposito, data));
+  CREATE TABLE celula_presencas (proposito TEXT NOT NULL, data TEXT NOT NULL, usuario TEXT NOT NULL,
+    PRIMARY KEY (proposito, data, usuario));
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -278,6 +291,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['toques', 'DELETE FROM toques WHERE de = ? OR para = ?', [u, u]],
     ['convites_aceites', 'DELETE FROM convites_aceites WHERE de = ? OR para = ?', [u, u]],
     ['proposito_membros', 'DELETE FROM proposito_membros WHERE usuario = ?', [u]],
+    // o histórico do encontro fica (quem registrou, quantas pessoas), só a presença da pessoa some
+    ['celula_presencas', 'DELETE FROM celula_presencas WHERE usuario = ?', [u]],
     ['novidades_reacoes', "DELETE FROM novidades_reacoes WHERE usuario = ? OR evento IN (SELECT id FROM novidades_eventos WHERE autor = ? OR json_extract(dados, '$.com') = ? OR EXISTS (SELECT 1 FROM json_each(dados, '$.membros') WHERE value = ?))", [u, u, u, u]],
     ['novidades_eventos', "DELETE FROM novidades_eventos WHERE autor = ? OR json_extract(dados, '$.com') = ? OR EXISTS (SELECT 1 FROM json_each(dados, '$.membros') WHERE value = ?)", [u, u, u]],
     ['novidades_pessoas', 'DELETE FROM novidades_pessoas WHERE usuario = ?', [u]],
