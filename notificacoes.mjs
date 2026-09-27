@@ -217,7 +217,7 @@ const T = {
     ['Pausa boa pro seu dia ✨', 'Respira, abre o app e lê com calma.'],
   ],
   lembreteMarco: [
-    ['Falta 1 dia pra {marco} 🏆', 'Lê hoje e a sua ofensiva chega em {marco} dias seguidos!'],
+    ['Falta 1 dia pra bater {marco} dias 🏆', 'Lê hoje e a sua ofensiva chega em {marco} dias seguidos!'],
     ['Quase lá! 🎯', 'Mais uma leitura e você bate {marco} dias. Bora?'],
   ],
   lembreteDomingo: [
