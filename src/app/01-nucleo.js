@@ -412,7 +412,7 @@ window.CC = window.CC || {};
   }).then(async (r) => {
     const dado = await r.json().catch(() => ({}));
     if (!r.ok) {
-      const e = new Error(dado.erro || (r.status === 401 ? 'entre de novo' : 'não deu certo agora'));
+      const e = new Error(dado.erro || (r.status === 401 ? 'Entre de novo.' : 'Não deu certo agora.'));
       e.status = r.status;
       throw e;
     }

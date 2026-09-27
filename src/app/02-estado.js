@@ -457,14 +457,14 @@
   CC.prepararFoto = function (arquivo) {
     return new Promise((resolver, rejeitar) => {
       if (!arquivo || !/^image\//.test(arquivo.type)) {
-        rejeitar(new Error('isso não é uma imagem'));
+        rejeitar(new Error('Isso não é uma imagem.'));
         return;
       }
       const leitor = new FileReader();
-      leitor.onerror = () => rejeitar(new Error('não consegui ler o arquivo'));
+      leitor.onerror = () => rejeitar(new Error('Não consegui ler o arquivo.'));
       leitor.onload = () => {
         const img = new Image();
-        img.onerror = () => rejeitar(new Error('não consegui abrir a imagem'));
+        img.onerror = () => rejeitar(new Error('Não consegui abrir a imagem.'));
         img.onload = () => {
           try {
             const lado = CC.LADO_FOTO;
@@ -476,7 +476,7 @@
             ctx.drawImage(img, (img.width - corte) / 2, (img.height - corte) / 2, corte, corte, 0, 0, lado, lado);
             resolver(tela.toDataURL('image/jpeg', 0.82));
           } catch (e) {
-            rejeitar(new Error('não consegui preparar a imagem'));
+            rejeitar(new Error('Não consegui preparar a imagem.'));
           }
         };
         img.src = leitor.result;
