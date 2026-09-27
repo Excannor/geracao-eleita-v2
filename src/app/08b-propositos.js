@@ -360,7 +360,7 @@
     if (notificar) notificar.onclick = async () => {
       notificar.disabled = true;
       const r = await Promise.allSettled(faltamNotificar(p).map((m) => CC.api('api/toques', { para: m.usuario })));
-      CC.avisar(r.some((x) => x.status === 'fulfilled') ? 'Notificado! 🔔' : 'Hoje você já notificou quem falta');
+      CC.avisar(r.some((x) => x.status === 'fulfilled') ? 'Notificado!' : 'Hoje você já notificou quem falta');
       recarregar();
     };
     const chamar = painel.querySelector('[data-chamar]');
@@ -586,7 +586,7 @@
           const r = await Promise.allSettled(faltam.map((m) => CC.api('api/toques', { para: m.usuario })));
           const foram = r.filter((x) => x.status === 'fulfilled').length;
           fechar();
-          CC.avisar(foram ? 'Notificado! 🔔' : 'Hoje você já notificou quem falta');
+          CC.avisar(foram ? 'Notificado!' : 'Hoje você já notificou quem falta');
           recarregar();
         };
         const chamar = folha.querySelector('[data-chamar]');

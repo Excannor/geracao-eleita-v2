@@ -42,10 +42,10 @@
   CC.ativarNotificacoes = async function () {
     const permissao = await Notification.requestPermission();
     if (permissao !== 'granted') {
-      throw new Error(permissao === 'denied' ? 'as notificações ficaram bloqueadas neste aparelho' : 'sem permissão, sem notificação');
+      throw new Error(permissao === 'denied' ? 'As notificações ficaram bloqueadas neste aparelho.' : 'Sem permissão, sem notificação.');
     }
     const dados = cache || await CC.carregarNotificacoes();
-    if (!dados) throw new Error('não consegui falar com o servidor agora');
+    if (!dados) throw new Error('Não consegui falar com o servidor agora.');
     let reg = await navigator.serviceWorker.getRegistration();
     if (!reg) reg = await navigator.serviceWorker.register('sw.js');
     await navigator.serviceWorker.ready;
