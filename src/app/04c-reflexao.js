@@ -428,7 +428,7 @@
         'Que instrução da leitura de hoje mostra algo que importa para Deus?',
         'Como você pode amar a Deus ou alguém perto de você hoje, de um jeito prático?',
       ],
-      oracao: ['Senhor, eu vi que tu te importas com…', 'Obrigado porque Jesus cumpriu o que eu não consigo…', 'Me ensina a amar a ti e ao próximo em…'],
+      oracao: ['Senhor, eu vi que tu te importas com…', 'Eu te agradeço porque Jesus cumpriu o que eu não consigo…', 'Me ensina a amar a ti e ao próximo em…'],
     },
     poesia: {
       nome: 'poesia e oração',
@@ -468,7 +468,7 @@
         'Que frase da carta de hoje você quer guardar no coração? Por quê?',
         'Que conselho dessa carta você pode colocar em prática esta semana?',
       ],
-      oracao: ['Pai, obrigado porque em Jesus…', 'Hoje eu entendi que…', 'Me ajuda a viver isso em…'],
+      oracao: ['Pai, eu te agradeço porque em Jesus…', 'Hoje eu entendi que…', 'Me ajuda a viver isso em…'],
     },
     apocalipse: {
       nome: 'visões do fim da história',
