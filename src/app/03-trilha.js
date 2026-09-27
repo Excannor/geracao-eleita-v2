@@ -158,7 +158,7 @@
     }
     const novo = CC.ler('lidos', []).length < 3 && CC.ler('licoes', []).length < D.licoes.length;
     const primeira = !CC.ler('lidos', []).length;
-    return (primeira ? '<p class="fala-bento pequena apresenta">Bem-vindo! Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
+    return (primeira ? '<p class="fala-bento pequena apresenta">Que bom ter você aqui! Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
       + '<div class="leitura-hoje">'
       + '<span class="etiqueta">Leitura de hoje · Dia ' + atual + '</span>'
       + '<b class="passagem-hoje">' + CC.esc(passagemDe(dia)) + '</b>'
