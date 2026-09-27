@@ -63,14 +63,17 @@ for (const [id, n] of Object.entries(D.notas)) {
   }
   // Citações: entre aspas curvas ou retas, com ao menos quatro palavras.
   // Aspas retas mal pareadas pegam pedaços de texto corrido: só entra o que começa com
-  // letra e não tem parêntese nem dois-pontos no meio.
+  // letra e não tem parêntese. Dois-pontos só barram com cara de texto corrido (" : " de
+  // título tirado, ou frase terminando em ":"): antes todo dois-pontos barrava, e citações
+  // de outra tradução com fala dentro ("Disse Deus: 'Haja luz'", Romanos 1.17) passavam.
   for (const m of texto.matchAll(/[“"]([^“”"]{12,250})[”"]/g)) {
-    if (!/^\p{L}/u.test(m[1].trim()) || /[():]/.test(m[1])) continue;
+    if (!/^\p{L}/u.test(m[1].trim()) || /[()]/.test(m[1]) || / : |:\s*$/.test(m[1])) continue;
     const alvo = normalizar(m[1]);
     if (alvo.split(' ').length < 4) continue;
     // Citação com reticências ("Se uma delas cair... Uma corda trançada") pula um trecho:
-    // cada pedaço tem de estar na mesma tradução.
-    const pedacos = m[1].split(/\.\.\.|…/).map(normalizar).filter(Boolean);
+    // cada pedaço tem de estar na mesma tradução. Dois-pontos e aspas simples também
+    // separam pedaços, porque a Bíblia pode trazer a fala com outra pontuação.
+    const pedacos = m[1].split(/\.\.\.|…|:|['‘’]/).map(normalizar).filter(Boolean);
     if (corrido.some((c) => pedacos.every((p) => c.includes(' ' + p + ' ')))) continue;
     citacoes.push([id, m[1].trim()]);
   }
