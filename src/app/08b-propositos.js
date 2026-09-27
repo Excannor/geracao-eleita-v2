@@ -982,7 +982,7 @@
     'O que te fez rir nos últimos dias?',
     'Se você pudesse passar um dia em qualquer lugar, onde seria?',
     'Qual música não sai da sua cabeça esta semana?',
-    'Conte uma coisa pequena pela qual você é grato hoje.',
+    'Conte uma coisa pequena pela qual você quer agradecer hoje.',
     'Qual foi a parte mais difícil da sua semana?',
     'Quem é uma pessoa que te ajudou recentemente?',
     'Qual comida te lembra a sua casa?',
@@ -1378,10 +1378,10 @@
   const MOTIVO_PERIGO = 'Alguém pode estar em perigo';
   // Texto fixo da seção 5 da spec: mostrado inteiro assim que alguém denuncia por perigo.
   const AJUDA_PERIGO_DENUNCIA = 'Se você ou alguém está em perigo, se machucando ou pensando em se machucar, '
-    + 'não espere: fale agora com um adulto de confiança ou ligue 188 (CVV), a qualquer hora. Em emergência, 192 ou 190.';
+    + 'não espere: fale agora com um adulto de confiança ou ligue 188 (CVV), a qualquer hora. Se for abuso ou violência, ligue 100. Em emergência, 192 (SAMU) ou 190 (Polícia).';
   // Para quem conduz, junto da denúncia de perigo (seção 5).
   const AJUDA_PERIGO_CONDUZ = 'Procure a pessoa hoje e avise o pastor ou um responsável da igreja. '
-    + 'Em emergência, 192 ou 190. Não tente resolver sozinho.';
+    + 'Se for abuso ou violência, ligue 100. Em emergência, 192 (SAMU) ou 190 (Polícia). Não tente resolver sozinho.';
 
   const carregarCuidado = (celulaId) => CC.api('api/cuidado?celula=' + encodeURIComponent(celulaId))
     .then((d) => { cuidadoCache[celulaId] = d; return d; }).catch(() => null);
@@ -1536,6 +1536,10 @@
       + '<label class="campo-senha"><span>' + (oracao ? 'Seu pedido de oração' : 'O que você precisa') + '</span>'
       + '<textarea data-texto maxlength="' + max + '" rows="4" autocomplete="off" autocapitalize="sentences"></textarea></label>'
       + '<p class="passo-dica pequena" data-conta></p>'
+      // Até 20 pessoas leem: um lembrete para não expor a vida de ninguém sem querer.
+      + '<p class="passo-dica pequena">' + (oracao
+        ? 'Não escreva nome nem detalhe da vida de outra pessoa. Se for algo mais pessoal, escolha "Só quem conduz".'
+        : 'Toda a célula lê. Não escreva endereço nem detalhe da vida de outra pessoa.') + '</p>'
       + (oracao
         ? '<span class="dica-campo">Para quem?</span>'
           + '<div class="segmentado" role="group" aria-label="Para quem é o pedido">'

@@ -228,21 +228,21 @@ const T = {
   // vista. O app não inventa profecia nem fala em nome de Deus: quando quer animar, cita
   // o texto e deixa quem lê conferir de onde veio.
   lembreteManha: [
-    ['As misericórdias se renovam 🌅', '"As misericórdias do Senhor renovam-se a cada manhã" (Lm 3.22-23). Comece o dia na Palavra.'],
-    ['De manhã, Senhor ☀️', '"De manhã fazes ouvir a minha voz" (Sl 5.3). A leitura de hoje te espera.'],
-    ['Primeiro o Reino 📖', '"Buscai primeiro o Reino de Deus" (Mt 6.33). Uns minutos e o dia começa diferente.'],
-    ['Bom dia, {nome}! 🌤️', '"Ensina-me a fazer a tua vontade" (Sl 143.10). Bora abrir a lição de hoje?'],
+    ['As misericórdias se renovam 🌅', 'A misericórdia do Senhor "se renova a cada manhã" (Lm 3.23). Comece o dia na Palavra.'],
+    ['De manhã ☀️', '"De manhã faço a minha oração e fico esperando a sua resposta" (Sl 5.3). A leitura de hoje te espera.'],
+    ['Primeiro o Reino 📖', '"Coloquem, pois, em primeiro lugar o Reino de Deus" (Mt 6.33). Uns minutos e o dia começa diferente.'],
+    ['Bom dia, {nome}! 🌤️', '"Ensine-me a fazer a sua vontade" (Sl 143.10). Bora abrir a lição de hoje?'],
   ],
   lembreteMeio: [
-    ['Uma pausa no meio do dia ☕', '"Aquietai-vos e sabei que eu sou Deus" (Sl 46.10). Dez minutos bastam.'],
-    ['Fome de quê? 🍞', '"Nem só de pão viverá o homem" (Mt 4.4). A leitura de hoje é rapidinha.'],
-    ['Respira fundo 🌿', '"Vinde a mim, todos os que estais cansados" (Mt 11.28). Abre a Palavra um instante.'],
-    ['No meio do corre 🕊️', '"A tua palavra é doce ao meu paladar" (Sl 119.103). Dá uma parada e lê.'],
+    ['Uma pausa no meio do dia ☕', '"Fiquem quietos e saibam, de uma vez por todas, que eu sou Deus!" (Sl 46.10). Dez minutos bastam.'],
+    ['Fome de quê? 🍞', '"Não é só de pão que vive o homem" (Mt 4.4). A leitura de hoje é rapidinha.'],
+    ['Respira fundo 🌿', '"Venham a mim, todos vocês que estão cansados" (Mt 11.28). Abre a Palavra um instante.'],
+    ['No meio do corre 🕊️', '"As suas palavras são doces, mais doces do que o mel" (Sl 119.103). Dá uma parada e lê.'],
   ],
   ofensiva: [
     ['Sua chama de {n} dias tá pedindo lenha 🔥', 'Ainda dá tempo! Faz a lição antes da meia-noite.'],
-    ['Última chamada do dia ⏰', 'Uma leitura rapidinha garante os seus {n} dias seguidos.'],
-    ['Ei, a ofensiva! 🚨', '{n} dias acesos. Bora salvar o de hoje?'],
+    ['Um minutinho antes de dormir? 🌙', 'A leitura de hoje é curta e mantém os seus {n} dias.'],
+    ['{n} dias acesos 🔥', 'Ainda dá para ler hoje, com calma.'],
   ],
   escudo: [
     ['Seu escudo segurou a onda 🛡️', 'Ontem ficou coberto e a ofensiva seguiu em {n}. Hoje é com você!'],
@@ -275,7 +275,7 @@ const T = {
     ['{amigo} te deu um toque 👊', 'Bora ler hoje? A lição tá esperando vocês dois.'],
     ['{amigo} tá te chamando pra ler 📣', 'Faz a lição de hoje e a contagem de vocês sobe.'],
   ],
-  toques: [['{amigo} e mais {outros} te deram um toque 👊', 'A galera já leu. Bora você também?']],
+  toques: [['{amigo} e mais {outros} te deram um toque 👊', 'A galera lembrou de você. A leitura de hoje tá aqui.']],
   pedido: [['{amigo} quer ler a Bíblia com você 🙌', 'Abre o app pra aceitar e começar o propósito de vocês.']],
   aceito: [['{amigo} topou ler junto 🤝', 'Começou o propósito de vocês. Cada dia que os dois leem conta!']],
   teste: [['Tudo certo por aqui ✅', 'É assim que os lembretes do Geração Eleita vão chegar.']],

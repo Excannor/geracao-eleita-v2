@@ -49,7 +49,7 @@
 
     if (!lidos) return trocar(FALAS.primeiroDia[0]);
     const leuAmigo = ((amigos && amigos.amigos) || []).find((a) => a.leuHoje);
-    if (!seq.feitoHoje && leuAmigo) return leuAmigo.nome + ' já leu hoje. Sua vez!';
+    if (!seq.feitoHoje && leuAmigo) return leuAmigo.nome + ' já leu hoje. Que tal ler também?';
     if (!seq.feitoHoje && seq.atual === 0) return trocar(sorteio(FALAS.voltando, semente));
 
     const u = CC.unidadeDoDia(atual);

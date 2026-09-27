@@ -101,7 +101,7 @@
     const opcoes = Array.from({ length: 8 }, (_, i) => CC.somaDias(hoje, -i));
     const rotuloData = (d) => (d === hoje ? 'Hoje' : d === CC.somaDias(hoje, -1) ? 'Ontem' : ddmm(d).slice(0, 5));
     CC.folha('<h2>Encontro da semana</h2>'
-      + '<p class="passo-dica">Uma conversa de meia hora, pessoalmente ou por chamada. Sem pressa e sem prova.</p>'
+      + '<p class="passo-dica">Uma conversa de meia hora, pessoalmente ou por chamada. Sem pressa e sem prova. Se um de vocês é menor de idade, encontrem-se num lugar aberto ou com outras pessoas por perto, e com os responsáveis sabendo.</p>'
       + '<ul class="oracao-guia">' + PERGUNTAS_ENCONTRO.map((p) => '<li>' + CC.esc(p) + '</li>').join('') + '</ul>'
       + '<p class="passo-dica">Terminem orando um pelo outro.</p>'
       + '<div class="escolha-dia" role="group" aria-label="Dia do encontro">' + opcoes.map((d, i) => '<button type="button" class="botao '

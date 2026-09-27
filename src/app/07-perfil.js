@@ -29,7 +29,7 @@
     const atual = (s.niveis || []).find((n) => n.nivel === s.nivel);
     const anterior = atual ? atual.meta : 0;
     const fracao = s.proximo ? (s.pessoas - anterior) / (s.proximo.meta - anterior) : 1;
-    const pessoas = CC.plural(s.pessoas, 'pessoa trazida', 'pessoas trazidas');
+    const pessoas = CC.plural(s.pessoas, 'pessoa pelo seu convite', 'pessoas pelo seu convite');
     return '<button class="cartao-semeador' + (s.nivel ? ' ganho' : '') + '" data-abrir-semeador>'
       + CC.arte.semeador(atual ? atual.arte : 'broto', !!s.nivel)
       + '<span class="corpo-semeador"><small>Trilha do Semeador</small>'
@@ -377,7 +377,7 @@
     const h = CC.minhaHistoria() || {};
     raiz.innerHTML = CC.botaoVoltar('Perfil')
       + '<h1>Minha história com Deus</h1>'
-      + '<p class="passo-dica">Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus. '
+      + '<p class="passo-dica">Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus. Se você cresceu na igreja, conte quando a fé passou a ser sua. '
       + 'Escreva só para você. Ninguém vê o que está aqui.</p>'
       + '<span class="selo-status" id="salvo-historia" role="status"></span>'
       + CAMPOS_HISTORIA.map(([chave, pergunta]) => campoHistoria(chave, pergunta, h[chave])).join('')

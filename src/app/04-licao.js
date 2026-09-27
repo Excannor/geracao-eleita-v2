@@ -433,12 +433,12 @@
       'O fogo que arde em você não foi você que acendeu. Cuidar dele é o seu trabalho de hoje.',
       'A chama todo mundo vê. A lenha de cada manhã, só você e Deus sabem.',
       'Não é chama passageira. É lenha posta cada manhã, como no altar que não se apagava.',
-      'O que separa quem permanece aceso de quem apaga no meio do caminho é a lenha de cada dia.',
-      'Deus está acendendo a sua chama. Volte amanhã para não faltar lenha.',
+      'Não precisa ser muito. Um pouco de lenha a cada dia mantém o fogo aceso.',
+      'Deus está acendendo a sua chama. Amanhã tem mais lenha esperando.',
       'Constância vale mais que intensidade. Um dia de cada vez mantém o fogo.',
     ];
     const frase = seq.atual === 1
-      ? 'Seu fogo acendeu! O que mantém a chama é a lenha de cada dia. Volte amanhã!'
+      ? 'Seu fogo acendeu! O que mantém a chama é a lenha de cada dia. Até amanhã!'
       : FRASES_FOGO[(sessao.dia - 1) % FRASES_FOGO.length];
 
     return {
