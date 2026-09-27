@@ -148,7 +148,10 @@ ok(await av('CC.ler("lidos", []).length === 0 && CC.sequencia().atual === 0'),
 // ---------- trilha ----------
 ok(await esperar(existe('.leitura-hoje [data-abrir-dia]') + ' && ' + existe('.fala-bento.apresenta')),
   'a conta nova vê a leitura de hoje no alto da trilha, e o Bento se apresenta');
-ok(await av('document.querySelectorAll(".navegacao .aba").length === 5 && ' + existe('.aba[aria-current=page]')
+// Cinco abas de verdade na barra (Trilha, Desafios, Bíblia, Juntos, Mais): o
+// ".so-trilho" é o fantasma que só o trilho lateral usa (Explorar, aqui), escondido no
+// celular por CSS, então não conta como aba visível.
+ok(await av('document.querySelectorAll(".navegacao .aba:not(.so-trilho)").length === 5 && ' + existe('.aba[aria-current=page]')
   + ' && getComputedStyle(' + q('.aba .rotulo-aba') + ').position !== "absolute"'),
   'cinco abas com o nome à vista, e a atual marcada para leitor de tela');
 ok(await av('!' + existe('.topo .contador.lidos') + ' && !' + existe('.topo .contador.escudos') + ' && !' + existe('.topo .sino')),

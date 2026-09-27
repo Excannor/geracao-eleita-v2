@@ -98,17 +98,8 @@
       + '</button>';
   }
 
-  // O cartão da célula no Juntos: o nome, quem leu hoje, o encontro e o recado do líder.
-  CC.cartaoCelula = function (p) {
-    return '<button class="cartao-proposito cartao-celula" data-celula="' + CC.esc(p.id) + '">'
-      + '<span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula'
-        + (p.encontro >= 0 && !encontroHoje(p) ? '<small>Encontro ' + nomeDoEncontro(p.encontro) + '</small>' : '') + '</span>'
-      + cabeca(p)
-      + (p.recado ? '<p class="recado-cartao"><span><b>' + CC.esc(nomeDoLider(p)) + ':</b> ' + CC.esc(p.recado) + '</span></p>' : '')
-      + (encontroHoje(p) ? '<span class="selo-status leu">' + CC.ico('livro') + 'Encontro hoje · veja o estudo</span>' : '')
-      + (p.hoje ? barraDoGrupo(p.hoje) : '')
-      + '</button>';
-  };
+  // O cartão da célula saiu do Juntos: a célula tem aba própria agora (ver
+  // CC.vistaEscolherCelula, mais abaixo, para quem está em mais de uma).
   // ---------- a célula como tela ----------
   // Uma célula de 20 pessoas não cabia numa folha: a célula tem tela própria, com quatro abas.
   //   Hoje: o recado, o encontro e a meta do dia, e o que o líder muda (recado, dia, link)
@@ -169,10 +160,36 @@
     const antes = JSON.stringify(cache);
     const jaMostrou = !!cache;
     CC.carregarPropositos().then((d) => {
-      if (!nestaTela() || (d && JSON.stringify(d) === antes)) return;
+      if (!nestaTela()) return;
+      if (CC.pintarNavegacao) CC.pintarNavegacao();
+      if (d && JSON.stringify(d) === antes) return;
       if (jaMostrou) raiz.classList.add('sem-entrada');
       desenhar(d || cache);
     });
+  };
+
+  // ---------- a aba Célula (#/celula) ----------
+  // Com uma célula só, abre ela direto (location.replace: o "voltar" do celular não fica
+  // preso numa tela de escolha com um item só). Com mais de uma, uma lista simples.
+  CC.vistaEscolherCelula = function (raiz) {
+    const nestaTela = () => location.hash === '#/celula';
+    const desenhar = (d, carregando) => {
+      if (!nestaTela()) return;
+      if (carregando) { raiz.innerHTML = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>'; return; }
+      const celulas = CC.minhasCelulas ? CC.minhasCelulas() : [];
+      if (celulas.length === 1) { location.replace(enderecoCelula(celulas[0].id)); return; }
+      if (!celulas.length) {
+        raiz.innerHTML = '<h1>Célula</h1><div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Você ainda não está em nenhuma célula.</p></div>';
+        return;
+      }
+      raiz.innerHTML = '<h1>Escolha uma célula</h1>'
+        + '<div class="lista-pedidos">' + celulas.map((p) => '<button type="button" class="cartao-proposito" data-ir-celula="' + CC.esc(p.id) + '">'
+          + cabeca(p) + '</button>').join('') + '</div>';
+      raiz.querySelectorAll('[data-ir-celula]').forEach((b) => { b.onclick = () => { location.hash = enderecoCelula(b.dataset.irCelula); }; });
+    };
+    desenhar(cache, !cache);
+    if (cache && (CC.minhasCelulas() || []).length === 1) return;
+    CC.carregarPropositos().then((d) => { if (CC.pintarNavegacao) CC.pintarNavegacao(); desenhar(d || cache); });
   };
 
   function ligarVoltar(raiz) {
@@ -454,10 +471,10 @@
     await Promise.all([CC.carregarPropositos(), CC.carregarAmigos()]);
     CC.redesenhar();
   }
-  // A célula mora no Juntos: criar ou entrar numa leva a pessoa para lá.
-  function irParaJuntos() {
-    if (!/^#\/(novidades|amigos)\/?$/.test(location.hash)) location.hash = '#/novidades';
-    else recarregar();
+  // A célula tem aba própria: criar ou entrar numa leva a pessoa direto para ela.
+  function irParaCelula(id) {
+    const alvo = enderecoCelula(id);
+    if (location.hash === alvo) recarregar(); else location.hash = alvo;
   }
 
   // ---------- a tela ----------
@@ -677,7 +694,7 @@
           try {
             const { proposito } = await CC.api('api/celula', { acao: 'criar', titulo: folha.querySelector('[data-titulo]').value });
             fechar();
-            irParaJuntos();
+            irParaCelula(proposito.id);
             folhaLinkCelula(proposito);
           } catch (e) {
             erro.textContent = e.message;
@@ -1256,7 +1273,7 @@
             const r = await CC.api('api/celula', { acao: 'entrar', token, visitante });
             fechar();
             CC.avisar(r.ja ? 'Você já está nessa célula' : 'Bem-vindo à ' + comoCelula(r.titulo) + '!');
-            irParaJuntos();
+            irParaCelula(r.id);
           } catch (e) {
             botao.disabled = false;
             folha.querySelector('#recado').textContent = e.message;

@@ -148,6 +148,14 @@
     return { lista, novas };
   };
 
+  // Só para o pontinho do Mais, quando Desafios está lá dentro (sem mexer no diário, sem
+  // contar conquista): há algum dos três desafios de hoje ainda não feito?
+  CC.haDesafioPendenteHoje = () => {
+    const E = CC.estado();
+    const ctx = { amigos: !!((CC.amigosEmCache && CC.amigosEmCache()) || {}).amigos?.length };
+    return CC.missoesDoDia(CC.hojeIso(), E, ctx).some((m) => !m.feita);
+  };
+
   // Horas até a meia-noite, para o "faltam 5 horas" das missões.
   CC.horasAteAmanha = () => {
     const agora = new Date();

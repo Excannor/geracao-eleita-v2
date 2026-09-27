@@ -1303,7 +1303,11 @@ const servidor = createServer(async (req, res) => {
         pedidos.push({ id: x.id, de: { usuario: de.usuario, nome: de.nome }, papel: x.pediu === x.discipulador ? 'discipulador' : 'discipulo' });
       }
 
-      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {} });
+      // Resumo leve para a barra de abas: existe algum vínculo, ativo ou só convidado, de
+      // qualquer lado (inclusive um convite que eu mandei e ainda não foi aceito, que não
+      // aparece em nenhuma das listas acima).
+      const algumVinculo = CONTAS.discipuladosDe(eu).some((x) => x.estado === 'ativo' || x.estado === 'convidado');
+      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {}, algumVinculo });
       return;
     }
 

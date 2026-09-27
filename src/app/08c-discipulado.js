@@ -13,6 +13,9 @@
   const primeiroNome = (nome) => String(nome || '').trim().split(/\s+/)[0];
 
   CC.carregarDiscipulado = () => CC.api('api/discipulado').then((d) => { cache = d; return d; }).catch(() => null);
+  // Para a barra de abas: existe algum vínculo (ativo ou só convidado, de qualquer lado)?
+  // Lê do mesmo cache que a tela usa, carregado no boot junto com amigos e novidades.
+  CC.temDiscipulado = () => !!(cache && cache.algumVinculo);
 
   async function recarregar() {
     await CC.carregarDiscipulado();
@@ -351,13 +354,18 @@
 
   // ---------- a tela ----------
   CC.vistaDiscipulado = function (raiz) {
+    // Rota nova (#/discipulado), aberta pela própria aba: sem "voltar para o Perfil". A
+    // rota antiga (#/perfil/discipulado) continua existindo por causa das notificações já
+    // entregues antes desta mudança, e essa sim mostra o voltar de sempre.
+    const viaPerfil = location.hash.startsWith('#/perfil/discipulado');
+    const voltar = viaPerfil ? CC.botaoVoltar('Perfil') : '';
     const desenhar = (d) => {
       if (!d) {
-        raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Discipulado</h1><div class="leitor-esqueleto"><i></i><i></i><i></i></div>';
+        raiz.innerHTML = voltar + '<h1>Discipulado</h1><div class="leitor-esqueleto"><i></i><i></i><i></i></div>';
         return;
       }
       const marcos = d.marcos || {};
-      raiz.innerHTML = CC.botaoVoltar('Perfil')
+      raiz.innerHTML = voltar
         + '<h1>Discipulado</h1>'
         + '<p class="passo-dica">Caminhe com alguém mais perto de Jesus. O que você escreve no app continua só seu.</p>'
         + CC.tituloSecao('Minha caminhada')
@@ -381,10 +389,13 @@
     const antes = JSON.stringify(cache);
     const jaMostrou = !!cache;
     CC.carregarDiscipulado().then((d) => {
-      if (!location.hash.startsWith('#/perfil/discipulado')) return;
+      if (!(location.hash.startsWith('#/perfil/discipulado') || location.hash.startsWith('#/discipulado'))) return;
       if (d && JSON.stringify(d) === antes) return;
       if (jaMostrou) raiz.classList.add('sem-entrada');
       desenhar(d || cache);
+      // A barra reflete "tem discipulado" a partir deste mesmo cache: se mudou (aceitou,
+      // encerrou, um pedido chegou), ela se redesenha aqui, sem esperar o próximo boot.
+      if (CC.pintarNavegacao) CC.pintarNavegacao();
     });
   };
 })(window.CC);

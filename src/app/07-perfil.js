@@ -171,6 +171,9 @@
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
       + atalho('#/perfil/discipulado', 'cruz', 'Discipulado')
       + atalho('#/perfil/historia', 'aperto', 'Minha história com Deus')
+      // Só para quem ainda não está em nenhuma célula: quem já está numa (ou mais) usa a
+      // aba Célula da barra, que abre direto (ou lista, se for mais de uma).
+      + (CC.minhasCelulas && CC.minhasCelulas().length ? '' : '<button class="atalho" data-nova-celula>' + CC.ico('pessoas') + '<span>Criar uma célula</span>' + CC.ico('avancar') + '</button>')
       + '</div>'
       // O app: instalar e as configurações com nome, não só o ícone do canto.
       + '<div class="titulo-secao"><h2>O aplicativo</h2></div>'
@@ -181,6 +184,8 @@
       + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Precisa conversar com alguém? Fale com alguém de '
       + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora.</p></div>';
 
+    const novaCelula = raiz.querySelector('[data-nova-celula]');
+    if (novaCelula) novaCelula.onclick = () => CC.novaCelula();
     const arquivo = raiz.querySelector('#arquivo-foto');
     raiz.querySelector('[data-trocar-foto]').onclick = () => arquivo.click();
     arquivo.onchange = async () => {

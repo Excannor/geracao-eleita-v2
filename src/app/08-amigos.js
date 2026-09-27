@@ -29,29 +29,18 @@
     }).catch(() => null);
   };
 
-  // O recado do líder aparece no feed de quem está na célula, na hora em que foi publicado.
-  // Recado velho sai do feed, mas continua no alto da célula enquanto o líder não o trocar.
-  const RECADO_NO_FEED_DIAS = 14;
-  const recadosDasCelulas = () => (CC.minhasCelulas ? CC.minhasCelulas() : [])
-    .filter((p) => p.recado && p.recadoEm)
-    .map((p) => ({ celula: p, em: Date.parse(p.recadoEm), lider: p.membros.find((m) => m.usuario === p.criadoPor) }))
-    .filter((r) => r.em && r.lider && Date.now() - r.em < RECADO_NO_FEED_DIAS * 864e5);
-  // O estudo que o líder preparou também entra no feed, pelo mesmo prazo do recado.
-  const estudosDasCelulas = () => (CC.minhasCelulas ? CC.minhasCelulas() : [])
-    .filter((p) => p.estudo && p.estudo.em)
-    .map((p) => ({ celula: p, em: Date.parse(p.estudo.em), lider: p.membros.find((m) => m.usuario === p.criadoPor) }))
-    .filter((r) => r.em && r.lider && Date.now() - r.em < RECADO_NO_FEED_DIAS * 864e5);
   CC.novidadesEmCache = () => mural;
 
   const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const gravarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* segue */ } };
 
-  // O ponto no sino: pedido, toque ou novidade de amigo desde a última visita ao mural.
+  // O ponto no sino: pedido, toque ou novidade de amigo desde a última visita ao mural. O
+  // recado e o estudo da célula não entram mais aqui: a célula tem aba própria, e o Juntos
+  // não mostra nada dela.
   CC.pendenciasDeAmigos = () => {
     const visto = Number(lerLocal('cc.novidades.visto') || 0);
     const eu = (CC.quem || {}).usuario;
-    const novas = ((mural && mural.eventos) || []).filter((e) => e.em > visto && e.autor.usuario !== eu).length
-      + recadosDasCelulas().concat(estudosDasCelulas()).filter((r) => r.em > visto && r.lider.usuario !== eu).length;
+    const novas = ((mural && mural.eventos) || []).filter((e) => e.em > visto && e.autor.usuario !== eu).length;
     return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) : 0) + novas;
   };
 
@@ -492,31 +481,8 @@
       + '</article>';
   }
 
-  // O recado no feed: com a faixa da célula em cima, para ninguém confundir com um marco de amigo.
-  function itemRecado({ celula, em, lider }) {
-    const meu = lider.usuario === (CC.quem || {}).usuario;
-    return '<article class="item-mural item-recado">'
-      + '<p class="faixa-recado">' + CC.ico('pessoas') + '<span>Recado na <b>' + CC.esc(celula.titulo) + '</b></span></p>'
-      + '<div class="cabeca-mural">' + retrato(lider, 'medio') + '<div><b>' + CC.esc(meu ? 'Você' : lider.nome) + ' <small class="selo-lider">líder</small></b><span>' + quando(em) + '</span></div></div>'
-      + '<p class="texto-recado">' + CC.esc(celula.recado) + '</p>'
-      + '<div class="pe-mural"><button class="botao contorno pequeno" data-abrir-celula="' + CC.esc(celula.id) + '">Abrir a célula' + CC.ico('avancar') + '</button></div>'
-      + '</article>';
-  }
-
-  // O estudo no feed: a mesma faixa da célula do recado, com o que vão estudar e o atalho
-  // direto para a aba Estudo da célula.
-  function itemEstudo({ celula, em, lider }) {
-    const meu = lider.usuario === (CC.quem || {}).usuario;
-    const est = celula.estudo;
-    const oQue = est.tipo === 'trecho' ? 'Vamos estudar ' + est.ref + ' no encontro.'
-      : est.tipo === 'semana' ? 'O estudo do encontro é sobre a leitura da semana.' : 'O estudo do encontro está pronto.';
-    return '<article class="item-mural item-recado item-estudo">'
-      + '<p class="faixa-recado">' + CC.ico('livro') + '<span>Estudo na <b>' + CC.esc(celula.titulo) + '</b></span></p>'
-      + '<div class="cabeca-mural">' + retrato(lider, 'medio') + '<div><b>' + CC.esc(meu ? 'Você' : lider.nome) + ' <small class="selo-lider">líder</small></b><span>' + quando(em) + '</span></div></div>'
-      + '<p class="texto-recado">' + CC.esc(oQue) + '</p>'
-      + '<div class="pe-mural"><button class="botao contorno pequeno" data-abrir-estudo="' + CC.esc(celula.id) + '">Ver o estudo' + CC.ico('avancar') + '</button></div>'
-      + '</article>';
-  }
+  // O recado e o estudo da célula saíram do feed do Juntos: agora moram só na aba Célula
+  // (Hoje/Estudo). itemRecado/itemEstudo saíram junto, sem mais chamador.
 
   // Quem a pessoa está acompanhando no Conhecer Jesus: só o número do dia, nunca o que foi
   // escrito. O toque é o mesmo dos amigos de sempre; "Como acompanhar" abre as dicas do JSON.
@@ -550,17 +516,6 @@
     });
   }
 
-  // Sem célula, o cartão explica o que ela é e como começar; com célula, mostra cada uma.
-  function blocoCelula(celulas) {
-    if (celulas.length) return '<div class="lista-propositos">' + celulas.map(CC.cartaoCelula).join('') + '</div>';
-    return '<div class="cartao-proposito cartao-celula vazia">'
-      + '<span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula</span>'
-      + '<p>Leiam o plano juntos, até 20 pessoas, com o recado do líder e o estudo do encontro.</p>'
-      + '<button class="botao azul" data-nova-celula>Criar uma célula</button>'
-      + '<p class="passo-dica pequena">Recebeu o link da sua célula? É só abrir que você entra.</p>'
-      + '</div>';
-  }
-
   CC.vistaAmigos = function (raiz) {
     if (!servido()) {
       raiz.innerHTML = '<h1>Juntos</h1><div class="vazio">Os amigos aparecem quando o aplicativo está aberto pelo servidor.</div>';
@@ -573,7 +528,6 @@
       const recebidos = d.recebidos || [];
       const enviados = d.enviados || [];
       const m = novidades || {};
-      const celulas = CC.minhasCelulas ? CC.minhasCelulas() : [];
 
       const roda = amigos.map((a) => '<button class="amigo-roda' + (a.leuHoje ? ' leu' : '') + '" data-amigo="' + CC.esc(a.usuario) + '" '
         + 'aria-label="' + CC.esc(a.nome) + ', ' + CC.plural(a.dias, 'dia', 'dias') + ' de propósito' + (a.leuHoje ? ', já leu hoje' : '') + '">'
@@ -590,11 +544,10 @@
       } else if (!dados) {
         corpo = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>';
       } else {
+        // O recado e o estudo da célula saíram do Feed: a célula tem aba própria agora, e
+        // é lá (Hoje/Estudo) que eles aparecem.
         const eventos = m.eventos || [];
-        const linhaDoTempo = eventos.map((e) => ({ em: e.em, html: itemDoMural(e) }))
-          .concat(recadosDasCelulas().map((r) => ({ em: r.em, html: itemRecado(r) })))
-          .concat(estudosDasCelulas().map((r) => ({ em: r.em, html: itemEstudo(r) })))
-          .sort((a, b) => b.em - a.em);
+        const linhaDoTempo = eventos.map((e) => ({ em: e.em, html: itemDoMural(e) })).sort((a, b) => b.em - a.em);
         const pedidoLigar = !m.ligado && !m.perguntado && amigos.length
           ? '<div class="pedido-mural">' + CC.ico('pessoas') + '<div><b>Mostrar seus marcos aos amigos?</b>'
             + '<p>Ofensiva, livros terminados, conquistas e os versículos que você compartilhar.</p>'
@@ -602,7 +555,6 @@
             + '<button class="botao pequeno plano" data-mural-nao>Agora não</button></div></div></div>'
           : '';
         corpo = '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
-          + blocoCelula(celulas)
           + blocoAcompanhando(d.acompanhando || [])
           + '<button class="botao contorno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
           + '<button class="entrada-propositos" data-propositos>' + CC.ico('aperto')
@@ -637,11 +589,7 @@
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
       ligar('[data-convidar]', () => CC.convidar());
-      ligar('[data-nova-celula]', () => CC.novaCelula());
       ligar('[data-propositos]', () => { location.hash = '#/novidades/propositos'; });
-      ligar('[data-celula]', (el) => CC.abrirCelula(el.dataset.celula));
-      ligar('[data-abrir-celula]', (el) => CC.abrirCelula(el.dataset.abrirCelula));
-      ligar('[data-abrir-estudo]', (el) => CC.abrirCelula(el.dataset.abrirEstudo, 'estudo'));
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));
       ligar('[data-amigo]', (el) => folhaAmigo(amigos.find((a) => a.usuario === el.dataset.amigo)));
       const acompanhando = d.acompanhando || [];
@@ -697,6 +645,9 @@
     Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]).then(([d, n]) => {
       if (!/^#\/(amigos|novidades)\/?$/.test(location.hash)) return;
       if (CC.pintarTopo) CC.pintarTopo();
+      // A célula pode ter chegado agora (link, "fazer parte da célula"): a barra reflete na
+      // hora, sem esperar a próxima troca de tela.
+      if (CC.pintarNavegacao) CC.pintarNavegacao();
       if (d && JSON.stringify([d, n || mural, celulasAgora()]) === antes) return;
       if (jaMostrou) raiz.classList.add('sem-entrada');
       desenhar(d || cache, n || mural, d ? '' : 'Não consegui falar com o servidor agora.');

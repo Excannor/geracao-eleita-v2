@@ -6,25 +6,53 @@
   const topo = document.getElementById('topo');
   const navegacao = document.getElementById('navegacao');
 
-  // Quatro abas, cada uma com um trabalho claro e o nome à vista: um ícone sozinho não diz a
-  // quem acabou de chegar que o baú é Desafios e a bússola é Explorar. Praticar mora dentro
-  // de Desafios e no fim de cada unidade da trilha. O Perfil saiu daqui: virou o retrato no
-  // canto do topo (pintarTopo), o que deixa duas abas de cada lado do botão da Bíblia.
-  const ABAS = [
-    ['#/', 'Trilha', 'trilha'],
-    ['#/missoes', 'Desafios', 'bau'],
-    ['#/novidades', 'Juntos', 'novidades'],
-    ['#/explorar', 'Explorar', 'bussola'],
-  ];
+  // A barra muda de cara com quem está falando: Desafios sai do lugar quando entra Célula ou
+  // Discipulado (aí mora dentro do Mais), e some de vez o Explorar, que virou item do Mais.
+  // Praticar mora dentro de Desafios e no fim de cada unidade da trilha. O Perfil saiu daqui:
+  // virou o retrato no canto do topo (pintarTopo).
+  //   nada:        Trilha · Desafios          | Bíblia | Juntos · Mais
+  //   só célula:   Trilha · Célula            | Bíblia | Juntos · Mais
+  //   só disc.:    Trilha · Discipulado       | Bíblia | Juntos · Mais
+  //   os dois:     Trilha · Juntos · Célula   | Bíblia | Discipulado · Mais
+  // No caso dos dois o Juntos passa para a esquerda: "DISCIPULADO" não cabe ao lado de
+  // "JUNTOS" a 320px, e são 6 botões em vez de 5.
+  const TRILHA = ['#/', 'Trilha', 'trilha', 'trilha'];
+  const DESAFIOS = ['#/missoes', 'Desafios', 'bau', 'desafios'];
+  const JUNTOS = ['#/novidades', 'Juntos', 'novidades', 'juntos'];
+  const CELULA = ['#/celula', 'Célula', 'casa', 'celula'];
+  const DISCIPULADO = ['#/discipulado', 'Discipulado', 'dupla', 'discipulado'];
+  const EXPLORAR = ['#/explorar', 'Explorar', 'bussola', 'explorar'];
+
+  function estadoDaBarra() {
+    return {
+      temCelula: !!(CC.minhasCelulas && CC.minhasCelulas().length),
+      temDiscipulado: !!(CC.temDiscipulado && CC.temDiscipulado()),
+    };
+  }
+
+  // As abas do celular, já na ordem visual: uma ilha de cada lado da Bíblia. O Mais mora
+  // sempre por último, na ilha da direita.
+  function abasDoCelular({ temCelula, temDiscipulado }) {
+    if (temCelula && temDiscipulado) return { esq: [TRILHA, JUNTOS, CELULA], dir: [DISCIPULADO, null] };
+    if (temCelula) return { esq: [TRILHA, CELULA], dir: [JUNTOS, null] };
+    if (temDiscipulado) return { esq: [TRILHA, DISCIPULADO], dir: [JUNTOS, null] };
+    return { esq: [TRILHA, DESAFIOS], dir: [JUNTOS, null] };
+  }
+  // null é o marcador do botão Mais: ele não é um item de dados como os outros (não tem
+  // rota própria, abre um painel), então entra por fora do array de abas comuns.
 
   const ABA_DA_ROTA = {
     '': '#/', dia: '#/', passos: '#/', licoes: '#/', praticar: '#/missoes', missoes: '#/missoes',
     amigos: '#/novidades', novidades: '#/novidades',
+    celula: '#/celula',
+    discipulado: '#/discipulado',
+    // O Explorar não é mais aba própria: mora dentro do Mais, mas continua marcando o Mais
+    // como selecionado enquanto a pessoa está nele (ver maisSelecionado, abaixo).
     explorar: '#/explorar', secao: '#/explorar', nota: '#/explorar', busca: '#/explorar',
     // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
     // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
     conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
-    // Perfil e Config não apontam para nenhuma das 4 abas da barra: quem marca o retrato
+    // Perfil e Config não apontam para nenhuma das abas da barra: quem marca o retrato
     // do topo como selecionado é pintarTopo, lendo a rota direto.
     perfil: '#/perfil', config: '#/perfil',
     // não aponta para nenhuma aba: assim nenhuma fica marcada como selecionada enquanto a
@@ -148,35 +176,130 @@
     });
   };
 
-  function pintarNavegacao(rota) {
-    const ativa = ABA_DA_ROTA[rota] || '#/';
+  // ---------- painel do Mais ----------
+  // Um painel por cima da barra (não a tela cheia da folha comum: a barra continua à vista
+  // por baixo do véu, como no mock aprovado). Fecha tocando fora, no próprio Mais, com Escape
+  // ou com o voltar do celular — por isso o history.pushState/back só para ele.
+  let painelMaisAberto = false;
+  function fecharPainelMais(semVoltar) {
+    if (!painelMaisAberto) return;
+    painelMaisAberto = false;
+    document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => el.remove());
+    if (!semVoltar && history.state && history.state.painelMais) history.back();
+  }
+  CC.fecharPainelMais = fecharPainelMais;
+
+  function itemPainelMais(icone, leve, rotulo, sub, href) {
+    return '<a href="' + href + '" data-ir-mais="' + href + '"><span class="q' + (leve ? ' leve' : '') + '">' + icone + '</span>'
+      + '<span>' + CC.esc(rotulo) + (sub ? '<small>' + CC.esc(sub) + '</small>' : '') + '</span></a>';
+  }
+
+  function abrirPainelMais(desafiosNoPainel) {
+    if (painelMaisAberto) { fecharPainelMais(); return; }
+    painelMaisAberto = true;
+    const itens = [];
+    if (desafiosNoPainel) {
+      const lista = CC.missoesDoDia ? CC.missoesDoDia(CC.hojeIso(), CC.estado()) : [];
+      const feitas = lista.filter((m) => m.feita).length;
+      const sub = feitas && lista.length ? feitas + ' de ' + lista.length + ' desafios de hoje concluídos' : 'Complete os três desafios de hoje';
+      itens.push(itemPainelMais(CC.icoAba('bau'), false, 'Desafios', sub, '#/missoes'));
+    }
+    itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
+    itens.push(itemPainelMais(CC.ico('marcador'), true, 'Meus versículos', '', '#/perfil/versiculos'));
+    itens.push(itemPainelMais(CC.ico('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
+    document.body.insertAdjacentHTML('beforeend', '<div class="veu-mais"></div><div class="painel-mais" role="dialog" aria-modal="true" aria-label="Mais">' + itens.join('') + '</div>');
+    document.querySelector('.veu-mais').onclick = () => fecharPainelMais();
+    document.querySelectorAll('[data-ir-mais]').forEach((a) => {
+      a.onclick = (ev) => {
+        ev.preventDefault();
+        painelMaisAberto = false;
+        document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => el.remove());
+        CC.vibrar('leve');
+        location.hash = a.dataset.irMais;
+      };
+    });
+    history.pushState({ painelMais: true }, '', location.href);
+  }
+  addEventListener('popstate', () => { if (painelMaisAberto) fecharPainelMais(true); });
+  addEventListener('hashchange', () => { if (painelMaisAberto) fecharPainelMais(true); });
+
+  function pintarNavegacao(rotaPedida, argPedido) {
+    let rota = rotaPedida;
+    let arg = argPedido;
+    if (rota === undefined) { const p = partesDaRota(); rota = p.rota; arg = p.arg; }
+    const { temCelula, temDiscipulado } = estadoDaBarra();
+    const { esq, dir } = abasDoCelular({ temCelula, temDiscipulado });
+    const desafiosNaBarra = !temCelula && !temDiscipulado;
+    const dono = (CC.quem && CC.quem.usuario) || '';
+    const chaveNova = (papel) => 'cc.novaaba.' + papel + ':' + dono;
+
+    let ativa = ABA_DA_ROTA[rota] || '#/';
+    if ((rota === 'novidades' || rota === 'amigos') && arg && arg.startsWith('celula/')) ativa = '#/celula';
+    if (rota === 'perfil' && arg === 'discipulado') ativa = '#/discipulado';
     const naBiblia = rota === 'biblia';
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
-    const abas = ABAS.map(([href, rotulo, icone]) => {
-      const ponto = icone === 'novidades' && pendencias ? '<i class="ponto-aba"></i>' : '';
-      return '<button class="aba' + (href === ativa ? ' selecionada' : '') + '" data-ir="' + href + '"'
-        + (href === ativa ? ' aria-current="page"' : '') + '><span class="icone-aba">' + CC.icoAba(icone) + ponto + '</span>'
+    const maisSelecionado = !naBiblia && (ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
+    const pontoMais = !desafiosNaBarra && !!(CC.haDesafioPendenteHoje && CC.haDesafioPendenteHoje());
+    const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
+    const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
+    // Uma vez que a pessoa chegou na aba, o pontinho de novidade não aparece nunca mais.
+    if (ativa === '#/celula') gravarLocal(chaveNova('celula'), '1');
+    if (ativa === '#/discipulado') gravarLocal(chaveNova('discipulado'), '1');
+
+    const aba = ([href, rotulo, icone, papel], soTrilho) => {
+      const sel = href === ativa;
+      const ponto = (papel === 'juntos' && pendencias) || (papel === 'celula' && pontoCelula) || (papel === 'discipulado' && pontoDiscipulado)
+        ? '<i class="ponto-aba"></i>' : '';
+      return '<button type="button" class="aba' + (sel ? ' selecionada' : '') + (soTrilho ? ' so-trilho' : '') + '" data-papel="' + papel + '" data-ir="' + href + '"'
+        + (sel ? ' aria-current="page"' : '') + ' aria-label="' + CC.esc(rotulo) + '"><span class="icone-aba">' + CC.icoAba(icone) + ponto + '</span>'
         + '<span class="rotulo-aba">' + rotulo + '</span></button>';
-    });
-    const biblia = '<button class="aba aba-central' + (naBiblia ? ' selecionada' : '') + '" data-ir="#/biblia" aria-label="Bíblia"'
+    };
+
+    const botaoMais = () => {
+      const ponto = pontoMais ? '<i class="ponto-aba"></i>' : '';
+      return '<button type="button" class="aba' + (maisSelecionado ? ' selecionada' : '') + '" data-papel="mais" data-abrir-mais'
+        + (maisSelecionado ? ' aria-current="page"' : '') + ' aria-label="Mais"><span class="icone-aba"><span class="mais-ico"><i><b></b><b></b><b></b></i></span>' + ponto + '</span>'
+        + '<span class="rotulo-aba">Mais</span></button>';
+    };
+
+    const lado = (itens) => itens.map((t) => (t === null ? botaoMais() : aba(t))).join('');
+    const biblia = '<button type="button" class="aba aba-central' + (naBiblia ? ' selecionada' : '') + '" data-papel="biblia" data-ir="#/biblia" aria-label="Bíblia"'
       + (naBiblia ? ' aria-current="page"' : '') + '><span class="icone-aba">' + CC.icoAba('livro') + '</span>'
       + '<span class="rotulo-aba">Bíblia</span></button>';
-    // Duas ilhas em pílula, uma de cada lado do botão da Bíblia (Trilha, Desafios | Juntos,
-    // Explorar): no trilho lateral (>= 860px) .ilha vira `display: contents` e some do
-    // layout, deixando as abas na ordem natural da lista — Trilha, Desafios, Bíblia,
-    // Juntos, Explorar — com a Bíblia como item comum de novo.
+    // Fantasmas: só existem para o trilho lateral (>= 860px), que sempre mostra Desafios e
+    // Explorar mesmo quando o celular os escondeu dentro do Mais ou trocou por Célula/
+    // Discipulado. .so-trilho fica invisível no celular (ver estilo.css).
+    const fantasmaDesafios = desafiosNaBarra ? '' : aba(DESAFIOS, true);
+    const fantasmaExplorar = aba(EXPLORAR, true);
+
+    // Duas ilhas em pílula, uma de cada lado do botão da Bíblia: no trilho lateral (>= 860px)
+    // .ilha vira `display: contents` e some do layout, e a ordem visual passa a ser dada por
+    // `order` (ver @media (min-width: 860px) perto do fim do estilo.css), não mais pela
+    // ordem no HTML — que no celular muda de caso para caso (ver abasDoCelular).
     navegacao.innerHTML = '<a class="marca-lateral" href="#/">'
       + '<span class="simbolo">' + CC.icoLogo() + '</span>'
       + '<span>Geração <em>Eleita</em></span></a>'
-      + '<div class="ilha">' + abas[0] + abas[1] + '</div>'
+      + '<div class="ilha">' + lado(esq) + '</div>'
       + biblia
-      + '<div class="ilha">' + abas[2] + abas[3] + '</div>';
+      + '<div class="ilha">' + lado(dir) + '</div>'
+      + fantasmaDesafios + fantasmaExplorar;
+    navegacao.classList.toggle('cheia', esq.length + dir.length + 1 === 6);
     navegacao.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
         CC.vibrar('leve');
         if (location.hash === el.dataset.ir) { CC.redesenhar(); CC.rolarPara(0); } else location.hash = el.dataset.ir;
       };
     });
+    const botao = navegacao.querySelector('[data-abrir-mais]');
+    if (botao) botao.onclick = () => { CC.vibrar('leve'); abrirPainelMais(!desafiosNaBarra); };
+  }
+  CC.pintarNavegacao = pintarNavegacao;
+
+  // A ordem visual do celular, achatada, para o cálculo de "de que lado a tela entra"
+  // (entradaDaTela) — muda de caso para caso, então não dá para usar um array fixo.
+  function ordemDasAbas() {
+    const { esq, dir } = abasDoCelular(estadoDaBarra());
+    return esq.concat(dir).filter(Boolean).map((t) => t[0]);
   }
 
   // ---------- roteamento ----------
@@ -204,6 +327,8 @@
     else if (rota === 'praticar') CC.vistaPraticar(conteudo);
     else if (rota === 'missoes') CC.vistaMissoes(conteudo);
     else if (rota === 'amigos' || rota === 'novidades') (arg.startsWith('celula/') ? (alvo) => CC.vistaCelula(alvo, arg.slice(7)) : arg === 'bloqueados' ? CC.vistaBloqueados : arg === 'propositos' ? CC.vistaPropositos : CC.vistaAmigos)(conteudo);
+    else if (rota === 'celula') CC.vistaEscolherCelula(conteudo);
+    else if (rota === 'discipulado') CC.vistaDiscipulado(conteudo);
     else if (rota === 'biblia') CC.vistaBiblia(conteudo, arg);
     else if (rota === 'explorar') CC.vistaExplorar(conteudo);
     else if (rota === 'secao') CC.vistaSecao(conteudo, arg, consulta ? decodeURIComponent(consulta) : '');
@@ -222,7 +347,7 @@
     if (rota === 'conhecer' && arg) CC.montarConhecerDia(Number(arg));
 
     pintarTopo();
-    pintarNavegacao(rota);
+    pintarNavegacao(rota, arg);
 
     conteudo.querySelectorAll('[data-voltar]').forEach((el) => {
       el.onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/'; };
@@ -242,7 +367,8 @@
   // Redesenho no mesmo lugar não anima: piscaria a cada atualização.
   function entradaDaTela(rota) {
     if (redesenhando || rota === ultimaRota) { conteudo.dataset.entrada = ''; return; }
-    const ondeFica = (r) => ABAS.findIndex(([href]) => href === (ABA_DA_ROTA[r] || '#/'));
+    const ordem = ordemDasAbas();
+    const ondeFica = (r) => ordem.indexOf(ABA_DA_ROTA[r] || '#/');
     const novo = ondeFica(rota);
     const velho = ultimaRota === null ? novo : ondeFica(ultimaRota);
     conteudo.dataset.entrada = novo === velho ? 'fundo' : (novo > velho ? 'direita' : 'esquerda');
@@ -325,6 +451,7 @@
   addEventListener('hashchange', rotear);
   addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
+    if (document.querySelector('.painel-mais')) { fecharPainelMais(); return; }
     const cortinas = document.querySelectorAll('.cortina');
     const cortina = cortinas[cortinas.length - 1];
     if (cortina) { if (!cortina.dataset.presa) cortina.remove(); return; }
@@ -345,7 +472,9 @@
         if (fuso) CC.api('api/fuso', { fuso }).catch(() => {});
       } catch (e) { /* segue */ }
     }
-    await Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]);
+    // Discipulado entra no mesmo lote de propósitos/amigos: é dali que a barra sabe, já na
+    // primeira tela, se a aba Discipulado deve aparecer.
+    await Promise.all([CC.carregarAmigos(), CC.carregarNovidades(), CC.carregarDiscipulado ? CC.carregarDiscipulado() : null]);
     CC.conferirMissoes();
     CC.redesenhar();
     // Antes de saber quem é a pessoa, a abertura desenha o plano padrão e pode rolar até o
@@ -403,8 +532,8 @@
   addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') return;
     CC.sincronizar(false)
-      .then(() => Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]))
-      .then(() => pintarTopo());
+      .then(() => Promise.all([CC.carregarAmigos(), CC.carregarNovidades(), CC.carregarDiscipulado ? CC.carregarDiscipulado() : null]))
+      .then(() => { pintarTopo(); pintarNavegacao(); });
   });
 
   if (location.protocol.startsWith('http')) {

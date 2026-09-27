@@ -184,6 +184,18 @@ window.CC = window.CC || {};
       + '<path d="M17 27c-7 0-12 4-12 10 0 2 1 3 3 3h18c2 0 3-1 3-3 0-6-5-10-12-10z" fill="' + b + '"/>'
       + '<circle cx="33" cy="15" r="6" fill="' + b + '"/>'
       + '<path d="M33 24c-2 0-4 .4-5.5 1.2 3 2.4 4.5 6 4.5 10.3 0 1.3-.2 2.4-.6 3.5H41c2 0 3-1 3-3 0-7-5-12-11-12z" fill="' + a + '"/>',
+    // casa da célula: telhado e porta em destaque, corpo no tom fraco. Desenho do mock
+    // aprovado (mock-hibrida.mjs), reaproveitado tal e qual.
+    casa: (a, b) => '<path d="M24 5 3 23h6v19c0 1.7 1.3 3 3 3h24c1.7 0 3-1.3 3-3V23h6z" fill="' + b + '"/>'
+      + '<path d="M24 5 3 23h6l15-12.5L39 23h6z" fill="' + a + '"/>'
+      + '<path d="M19 45V32c0-1.7 1.3-3 3-3h4c1.7 0 3 1.3 3 3v13z" fill="' + a + '"/>',
+    // dupla do discipulado: duas cabeças e os dois corpos, uma pessoa acompanhando a outra.
+    // Mesmo desenho do mock aprovado (mock-hibrida.mjs), reaproveitado tal e qual.
+    dupla: (a, b) => '<circle cx="15" cy="9" r="6" fill="' + a + '"/>'
+      + '<circle cx="33" cy="9" r="6" fill="' + b + '"/>'
+      + '<path d="M26 19h14c2 0 3 1.3 3 3v23h-6V32h-3v13h-8z" fill="' + b + '"/>'
+      + '<path d="M8 16h13c1.7 0 3 1.3 3 3v26h-6V32h-3v13H6V19c0-1.7.8-3 2-3z" fill="' + a + '"/>'
+      + '<path d="M21 16h19c2.8 0 4.5 1.8 4.5 4.2V27h-5v-5.5H21z" fill="' + a + '"/>',
   };
 
   // Os ícones herdam a cor de quem os contém (currentColor) em vez de trazerem a sua: é o
@@ -206,6 +218,8 @@ window.CC = window.CC || {};
     'chama-apagada': HERDA,
     escudo: HERDA,
     sino: HERDA,
+    casa: HERDA,
+    dupla: HERDA,
   };
 
   CC.icoAba = (nome) => {

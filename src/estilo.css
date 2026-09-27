@@ -420,6 +420,10 @@ button { font-family: inherit; }
   background: var(--cartao);
   border-top: 1px solid var(--borda);
   border-radius: var(--raio-g) var(--raio-g) 0 0;
+  /* 0 a 320px, 1 a 390px (e além): a régua que encolhe ícone, rótulo e o botão da Bíblia
+     juntos, para a barra a 320px parecer a de 390px encolhida, e não apertada. Vale para
+     as quatro combinações de Célula/Discipulado, não só para quando a barra está cheia. */
+  --cresce: calc((100vw - 320px) / 70px);
 }
 
 .ilha {
@@ -430,6 +434,10 @@ button { font-family: inherit; }
   height: 64px;
   padding: 0 2px;
 }
+/* Célula e Discipulado (e, na barra cheia, também Juntos do outro lado) deixam a ilha com
+   três abas em vez de duas: mesma classe do mock aprovado. */
+.navegacao.cheia .ilha { padding: 0; }
+.navegacao.cheia .ilha .aba { max-width: none; }
 
 .aba {
   flex: 0 0 auto;
@@ -451,10 +459,23 @@ button { font-family: inherit; }
   cursor: pointer;
 }
 .aba .icone-aba { position: relative; display: grid; place-items: center; }
-.aba .ico-aba { width: 28px; height: 28px; display: block; transition: transform .2s var(--mola); }
+.aba .ico-aba { width: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); height: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); display: block; transition: transform .2s var(--mola); }
 /* o nome da aba à vista: ícone sozinho não diz a quem chegou agora o que há ali */
-.aba .rotulo-aba { font-family: var(--fonte-destaque); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.1; white-space: nowrap; color: inherit; }
+.aba .rotulo-aba { font-family: var(--fonte-destaque); font-size: clamp(0.67rem, calc(0.67rem + 0.05rem * var(--cresce)), 0.72rem); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.1; white-space: nowrap; color: inherit; }
+/* Com 6 botões (Célula e Discipulado juntos) o rótulo precisa de mais um passo de encolhida:
+   0.56rem a 320px, 0.6rem a 390px, na mesma régua --cresce. */
+.navegacao.cheia .aba:not(.aba-central) .rotulo-aba { font-size: clamp(0.56rem, calc(0.56rem + 0.04rem * var(--cresce)), 0.6rem); }
 .aba .ponto-aba { top: -2px; right: -4px; }
+/* Fantasmas: abas que só existem para o trilho lateral (Desafios quando o celular o trocou
+   por Célula/Discipulado, e o Explorar, que no celular mora dentro do Mais). No celular
+   somem de vez; o @media (min-width: 860px) no fim do arquivo as traz de volta. */
+.aba.so-trilho { display: none; }
+/* O botão de três pontinhos do Mais: uma bolinha neutra, que vira "invertida" quando a
+   pessoa está numa das telas do painel (Explorar, ou Desafios quando mora só ali dentro). */
+.mais-ico { display: grid; place-items: center; width: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); height: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); border-radius: 50%; background: var(--fundo-2); color: var(--tinta-fraca); }
+.mais-ico i { display: flex; gap: 3px; }
+.mais-ico i b { width: 4px; height: 4px; border-radius: 50%; background: currentColor; display: block; }
+.aba.selecionada .mais-ico { background: var(--inverso); color: var(--inverso-tinta); }
 /* Dentro da ilha, a aba ativa não ganha mais pílula preenchida: só cor e peso, como o
    "Início" azul da referência do dono. A pílula preenchida (mais abaixo) volta a valer só
    no trilho lateral, onde cada aba é uma linha inteira. */
@@ -475,9 +496,11 @@ button { font-family: inherit; }
    preenchimento, do tamanho e do brilho — exceção pedida pelo dono, a única peça do app
    com sombra de destaque assim. */
 .aba.aba-central {
-  flex: 0 0 64px;
-  width: 64px;
-  height: 56px;
+  /* 56x50 a 320px, 64x56 a 390px, na mesma régua --cresce das outras abas: a Bíblia encolhe
+     junto com o resto, sem virar a peça desproporcional da barra estreita. */
+  flex: 0 0 clamp(56px, calc(56px + 8px * var(--cresce)), 64px);
+  width: clamp(56px, calc(56px + 8px * var(--cresce)), 64px);
+  height: clamp(50px, calc(50px + 6px * var(--cresce)), 56px);
   max-width: none;
   margin: 0 6px;
   border: 0;
@@ -486,10 +509,54 @@ button { font-family: inherit; }
   color: var(--inverso-tinta);
   box-shadow: 0 4px 14px color-mix(in srgb, var(--inverso) 35%, transparent);
 }
-.aba.aba-central .ico-aba { width: 26px; height: 26px; }
-.aba.aba-central .rotulo-aba { font-size: 0.68rem; }
+.aba.aba-central .ico-aba { width: clamp(23px, calc(23px + 3px * var(--cresce)), 26px); height: clamp(23px, calc(23px + 3px * var(--cresce)), 26px); }
+.aba.aba-central .rotulo-aba { font-size: clamp(0.63rem, calc(0.63rem + 0.05rem * var(--cresce)), 0.68rem); }
 .aba.aba-central:hover { background: var(--inverso); }
 .aba.aba-central.selecionada { box-shadow: 0 4px 18px color-mix(in srgb, var(--inverso) 55%, transparent); }
+
+/* ---------- o painel do Mais ----------
+   Por cima da barra, e não no lugar dela: o véu escuro cobre a tela, mas a barra continua
+   à vista por baixo, como no mock aprovado. Fecha tocando fora, no próprio Mais, com Escape
+   ou com o voltar do celular (ver fecharPainelMais em 10-roteador.js). */
+.veu-mais {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, #000 45%, transparent);
+  animation: aparecer .2s ease;
+}
+.painel-mais {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  z-index: 65;
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--cartao);
+  border-radius: var(--raio-g) var(--raio-g) 0 0;
+  padding: 8px 0;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, .18);
+  animation: folha-sobe .28s var(--suave);
+}
+.painel-mais a {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 44px;
+  padding: 14px 22px;
+  color: var(--tinta);
+  font-weight: 800;
+  font-size: 1.02rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--borda);
+}
+.painel-mais a:last-child { border-bottom: 0; }
+.painel-mais a:hover { background: var(--fundo-2); }
+.painel-mais .q { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: var(--inverso); color: var(--inverso-tinta); }
+.painel-mais .q.leve { background: var(--fundo-2); color: var(--tinta); }
+.painel-mais .q svg { width: 22px; height: 22px; }
+.painel-mais small { display: block; margin-top: 2px; font-weight: 600; font-size: 0.8rem; color: var(--tinta-fraca); }
 
 /* ---------- botões ----------
    Acabamento novo: cápsula, chapado. O botão principal é o par que se inverte entre
@@ -2624,11 +2691,27 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
   .navegacao .marca-lateral .simbolo { flex: 0 0 auto; display: grid; place-items: center; color: var(--tinta-forte); }
   .navegacao .marca-lateral .simbolo svg.ico-logo { width: 30px; height: auto; }
   /* As ilhas eram só um agrupamento visual do celular: no trilho lateral elas somem do
-     layout (display: contents) e as abas voltam a ser itens soltos da lista vertical,
-     na ordem em que o roteador as desenha — Trilha, Desafios, Bíblia, Juntos, Explorar. */
+     layout (display: contents) e as abas voltam a ser itens soltos da lista vertical.
+     A ordem no celular muda de caso para caso (ver abasDoCelular em 10-roteador.js), mas
+     o trilho lateral sempre mostra a lista inteira, na mesma ordem: Trilha, Desafios,
+     Célula, Discipulado, Bíblia, Juntos, Explorar. Como .navegacao é o flex container aqui
+     (a ilha virou "contents"), `order` decide essa posição sem depender do HTML. */
   .ilha { display: contents; }
   .aba { flex: 0 0 auto; flex-direction: row; justify-content: flex-start; gap: 14px; max-width: none; width: 100%; height: 54px; padding: 0 14px; }
   .aba .rotulo-aba { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .aba[data-papel="trilha"] { order: 1; }
+  .aba[data-papel="desafios"] { order: 2; }
+  .aba[data-papel="celula"] { order: 3; }
+  .aba[data-papel="discipulado"] { order: 4; }
+  .aba[data-papel="biblia"] { order: 5; }
+  .aba[data-papel="juntos"] { order: 6; }
+  .aba[data-papel="explorar"] { order: 7; }
+  /* O Mais só existe no celular: no trilho, Desafios e Explorar já têm lugar fixo na
+     lista, e Célula/Discipulado (quando existem) também são itens de verdade. */
+  .aba[data-papel="mais"] { display: none; }
+  /* Os "fantasmas" (Desafios trocado por Célula/Discipulado, e o Explorar, que no celular
+     mora dentro do Mais) só aparecem aqui. */
+  .aba.so-trilho { display: flex; }
   /* No trilho lateral a aba ativa volta a ser a pílula preenchida de sempre: a troca para
      "só cor", feita lá em cima, vale só na barra de baixo do celular. */
   .aba.selecionada { color: var(--inverso-tinta); background: var(--inverso); border-radius: var(--raio-capsula); }

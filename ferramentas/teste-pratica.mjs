@@ -48,7 +48,8 @@ ok(est&&est.pratica&&Object.keys(est.pratica).length>=1,'o servidor guardou o re
 ok(await av('CC.xpTotal()>10'),'a pratica somou XP ao total');
 await av('document.querySelector("[data-sair]").click()');await dormir(400);
 ok(!(await av('!!document.querySelector(".quiz")')),'sair fecha o quiz');
-ok(await av('document.querySelectorAll(".aba").length===5'),'a navegacao tem 5 abas');
+// .so-trilho e o fantasma do Explorar, que so o trilho lateral usa (escondido no celular).
+ok(await av('document.querySelectorAll(".aba:not(.so-trilho)").length===5'),'a navegacao tem 5 abas');
 // aviso benigno do Chrome: .click() por script nao conta como toque de verdade pro celular,
 // entao a vibracao (CC.vibrar) e bloqueada aqui e so aqui, sem ser erro do app
 const AVISO_VIBRAR_SEM_TOQUE=/Blocked call to navigator\.vibrate because user hasn't tapped/;
