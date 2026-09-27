@@ -350,23 +350,37 @@
   };
   const ENDERECO_DO_ROTULO = { 'Trilha': '#/', 'Perfil': '#/perfil', 'Juntos': '#/novidades', 'Explorar': '#/explorar',
     'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes' };
+  // Muitas telas (Discipulado, Painel, Notificações, Perfil...) só desenham o voltar DEPOIS
+  // que os dados chegam, quando o roteador já tinha passado. Ligar o clique botão a botão
+  // deixava esses mortos. Por isso: o nome é acertado por um observador assim que o botão
+  // aparece, e o toque é tratado por um único ouvinte na área de conteúdo, que vale para
+  // qualquer voltar, desenhado a qualquer momento.
+  const anteriorNaPilha = () => (pilha.length >= 2 ? pilha[pilha.length - 2] : null);
+  function rotularVoltar(el) {
+    if (el.dataset.rotuloVoltar) return;
+    const rotulo = el.textContent.trim();
+    el.dataset.rotuloVoltar = rotulo;
+    const anterior = anteriorNaPilha();
+    const confere = DESTINO_DO_ROTULO[rotulo];
+    if (anterior && confere && !confere(anterior)) {
+      // Vai voltar para outra tela: o nome fixo mentiria.
+      [...el.childNodes].forEach((n) => { if (n.nodeType === 3) n.remove(); });
+      el.append('Voltar');
+    }
+  }
   function ligarVoltarDoTopo(raiz) {
-    const anterior = pilha.length >= 2 ? pilha[pilha.length - 2] : null;
-    raiz.querySelectorAll('[data-voltar]').forEach((el) => {
-      const rotulo = el.textContent.trim();
-      const confere = DESTINO_DO_ROTULO[rotulo];
-      if (anterior && confere && !confere(anterior)) {
-        // Vai voltar para outra tela: o nome fixo mentiria.
-        [...el.childNodes].forEach((n) => { if (n.nodeType === 3) n.remove(); });
-        el.append('Voltar');
-      }
-      el.onclick = () => {
-        if (anterior) history.back();
-        else location.hash = ENDERECO_DO_ROTULO[rotulo] || '#/';
-      };
-    });
+    raiz.querySelectorAll('[data-voltar]').forEach(rotularVoltar);
   }
   CC.ligarVoltarDoTopo = ligarVoltarDoTopo;
+  new MutationObserver(() => ligarVoltarDoTopo(conteudo)).observe(conteudo, { childList: true, subtree: true });
+  conteudo.addEventListener('click', (ev) => {
+    const el = ev.target.closest('[data-voltar]');
+    // Um voltar com comportamento próprio (onclick posto pela tela) segue o dele.
+    if (!el || !conteudo.contains(el) || el.onclick) return;
+    ev.preventDefault();
+    if (anteriorNaPilha()) history.back();
+    else location.hash = ENDERECO_DO_ROTULO[el.dataset.rotuloVoltar || el.textContent.trim()] || '#/';
+  });
 
   function rotear() {
     anotarCaminho();
