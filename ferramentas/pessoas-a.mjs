@@ -3,7 +3,7 @@ export const PESSOAS_A = {
   'A mulher samaritana': {
     sub: 'Evangelhos · séc. I',
     resumo: 'Uma mulher de Samaria que encontrou Jesus num poço, no meio do dia, e saiu dali chamando a cidade inteira.',
-    quem: 'Uma mulher da cidade de Sicar, na Samaria. Ela vai buscar água no poço na hora mais quente do dia, talvez pra não cruzar com ninguém. Ali encontra Jesus, que pede água e puxa conversa. No fim, Jesus diz com todas as letras que é o Messias, e ela corre pra cidade chamando todo mundo pra conhecê-lo.',
+    quem: 'Uma mulher da cidade de Sicar, na Samaria. Ela vai buscar água no poço por volta do meio-dia. Ali encontra Jesus, que pede água e puxa conversa. No fim, Jesus diz com todas as letras que é o Messias, e ela corre pra cidade chamando todo mundo pra conhecê-lo.',
     onde: 'João 4.',
     deus: 'Judeus e samaritanos não se falavam, e um mestre judeu conversando sozinho com uma mulher samaritana quebrava duas regras de uma vez. Jesus quebra as duas pra oferecer a ela água viva, uma vida que mata a sede de verdade.\n\nFoi pra essa mulher, e não pra um líder religioso, que Jesus disse uma das frases mais importantes sobre adoração: Deus é Espírito, e quem o adora precisa adorar em espírito e em verdade (João 4.24).',
     erros: 'Jesus menciona que ela teve cinco maridos e que o homem com quem vivia não era seu marido. O texto não conta por quê. Ela pode ter ficado viúva, ter sido abandonada ou ter feito escolhas erradas, e a Bíblia não explica. O que fica claro é que Jesus conhecia a história inteira dela e mesmo assim se ofereceu a ela.',
@@ -11,7 +11,7 @@ export const PESSOAS_A = {
   'Abel': {
     sub: 'Início da história',
     resumo: 'Segundo filho de Adão e Eva. Ofereceu a Deus o melhor do rebanho, com fé, e foi morto pelo próprio irmão.',
-    quem: 'Segundo filho de Adão e Eva, pastor de ovelhas. Ele oferece a Deus as primeiras e melhores crias do rebanho. Deus aceita a oferta dele e não aceita a do irmão, Caim. O ciúme toma conta de Caim, que mata Abel. É a primeira morte contada na Bíblia.',
+    quem: 'Segundo filho de Adão e Eva, pastor de ovelhas. Ele oferece a Deus as primeiras e melhores crias do rebanho. Deus aceita a oferta dele e não aceita a do irmão, Caim. Caim fica furioso e mata Abel. É a primeira morte contada na Bíblia.',
     onde: 'Gênesis 4.1-10; citado em Mateus 23.35 e Hebreus 11.4.',
     deus: 'Hebreus 11.4 explica que Abel ofereceu um sacrifício melhor pela fé. Deus olhou pro coração de quem ofereceu, e a oferta mostrava esse coração.\n\nO mesmo texto diz que Abel, mesmo morto, ainda fala. E Hebreus 12.24 compara o sangue dele com o de Jesus: o sangue de Abel clamava por vingança, e o de Jesus perdoa gratuitamente.',
   },
@@ -21,12 +21,12 @@ export const PESSOAS_A = {
     quem: 'Abraão morava em Ur, na Mesopotâmia, quando Deus o chamou pra deixar a própria terra e ir pra um lugar que ainda ia mostrar. Ele foi. Dele nasceu o povo de Israel, e com ele Deus fez a aliança que atravessa o resto da Bíblia. O Novo Testamento o apresenta como modelo de fé: alguém que confiou na promessa antes de vê-la cumprida.',
     onde: 'Gênesis 12-25; citado em Romanos 4, Gálatas 3 e Hebreus 11.8-19.',
     deus: 'Deus toma a iniciativa. Chama e abençoa Abraão sem que ele tenha feito nada pra merecer. E cumpre a promessa quando, pelas contas humanas, já não dava mais tempo: Isaque nasce quando Abraão e Sara já eram bem idosos.\n\nEm Gênesis 15, na cerimônia da aliança, só Deus passa entre as partes dos animais. Naquele tempo, quem passava ali se comprometia a cumprir o acordo. Deus assume o compromisso sozinho.',
-    erros: 'Por medo, Abraão mentiu duas vezes dizendo que Sara era só sua irmã, e a colocou em risco. E, cansado de esperar, teve um filho com Agar, a serva de Sara.',
+    erros: 'Por medo, Abraão mentiu duas vezes dizendo que Sara era só sua irmã, e a colocou em risco. E, depois de dez anos em Canaã sem filhos, aceitou a proposta de Sara e teve um filho com Hagar, a serva dela.',
   },
   'Absalão': {
     sub: 'Reino de Israel · por volta de 1000 a.C.',
     resumo: 'Filho de Davi, bonito e ambicioso. Vingou a irmã, se revoltou contra o pai e morreu tentando tomar o trono.',
-    quem: 'Terceiro filho de Davi, famoso pela beleza e pelo cabelo. Quando o meio-irmão Amnom violenta Tamar, irmã de Absalão, e Davi não faz nada, Absalão espera dois anos e manda matar Amnom. Foge, volta, faz as pazes com o pai só por fora e passa anos conquistando o povo na porta da cidade. Até que lidera uma revolta e expulsa Davi de Jerusalém. Morre com a cabeça presa nos galhos de uma árvore, perseguido pelos soldados do pai, mesmo com Davi tendo pedido que poupassem a vida dele.',
+    quem: 'Terceiro filho de Davi, famoso pela beleza e pelo cabelo. Quando o meio-irmão Amnom violenta Tamar, irmã de Absalão, e Davi não faz nada, Absalão espera dois anos e manda matar Amnom. Foge, volta, faz as pazes com o pai só por fora e passa anos conquistando o povo na porta da cidade. Até que lidera uma revolta e expulsa Davi de Jerusalém. Na fuga, fica pendurado pelos cabelos nos galhos de uma árvore e é morto por Joabe e seus homens, mesmo com Davi tendo pedido que tratassem o filho com bondade.',
     onde: '2 Samuel 13-19.',
     deus: 'Nessa história Deus quase não aparece agindo diretamente. O que se vê é o efeito em cadeia do pecado dentro de uma família: a omissão de Davi diante do crime contra Tamar e a ambição do filho. Natã já tinha avisado Davi que a espada não se afastaria da casa dele (2 Samuel 12.10).\n\nQuando Absalão morre, Davi chora: meu filho Absalão, quem me dera ter morrido no seu lugar (2 Samuel 18.33). É uma das cenas de dor de pai mais honestas da Bíblia.',
     erros: 'Mandou matar o meio-irmão, liderou uma rebelião armada contra o próprio pai, que era o rei escolhido por Deus, e desonrou em público as mulheres do palácio de Davi pra mostrar que tinha tomado o poder (2 Samuel 16.22).',
@@ -52,14 +52,14 @@ export const PESSOAS_A = {
     resumo: 'Uma mulher que não conseguia ter filhos e abriu o coração diante de Deus. O filho que ela pediu foi Samuel.',
     quem: 'Ana era uma das duas esposas de Elcana. Não conseguia ter filhos, e todo ano era provocada pela outra esposa, Penina, que tinha. No santuário de Siló, ora com tanta angústia, mexendo os lábios sem som, que o sacerdote Eli acha que ela está bêbada. Ana promete que, se tiver um filho, vai entregá-lo ao serviço de Deus. Samuel nasce, e ela cumpre a promessa.',
     onde: '1 Samuel 1-2.',
-    deus: 'O texto diz que o Senhor não tinha permitido que ela tivesse filhos (1 Samuel 1.6) e depois que o Senhor se lembrou dela (1 Samuel 1.19). Pra Bíblia, a espera e a resposta estão nas mãos de Deus.\n\nA oração de Ana depois do nascimento (1 Samuel 2.1-10) celebra um Deus que derruba os orgulhosos e levanta os humildes. Mil anos depois, Maria canta algo muito parecido em Lucas 1. Duas mães, a mesma confiança.',
+    deus: 'O texto diz que o Senhor não tinha permitido que ela tivesse filhos (1 Samuel 1.6) e depois que o Senhor se lembrou dela (1 Samuel 1.19). Pra Bíblia, a espera e a resposta estão nas mãos de Deus.\n\nA oração de Ana depois do nascimento (1 Samuel 2.1-10) celebra um Deus que derruba os orgulhosos e levanta os humildes. Uns mil anos depois, Maria canta algo muito parecido em Lucas 1. Duas mães, a mesma confiança.',
   },
   'Ananias de Damasco': {
     sub: 'Igreja primitiva · séc. I',
     resumo: 'Um discípulo quase desconhecido que Deus mandou visitar Saulo, o maior perseguidor dos cristãos.',
     quem: 'Um seguidor de Jesus que morava em Damasco e só aparece nesta história. Numa visão, Deus manda ele procurar Saulo de Tarso, que estava cego havia três dias depois de encontrar Jesus na estrada. Ananias tem medo, e com razão: Saulo era conhecido por perseguir cristãos. Mesmo assim vai, coloca as mãos sobre ele, Saulo volta a enxergar e é batizado.',
     onde: 'Atos 9.10-19. Não confunda com o Ananias de Atos 5, marido de Safira.',
-    deus: 'Deus escolhe alguém sem fama nenhuma pra um papel decisivo: receber e batizar quem viria a ser o apóstolo Paulo. Ananias hesita, fala do medo com sinceridade e obedece, contra todo instinto de se proteger.',
+    deus: 'Deus escolhe alguém sem fama nenhuma pra um papel decisivo: receber e impor as mãos sobre quem viria a ser o apóstolo Paulo. Ananias hesita, fala do medo com sinceridade e obedece, contra todo instinto de se proteger.',
     erros: 'Hesitou diante da ordem de Deus e lembrou a ele tudo o que Saulo tinha feito antes de obedecer. Deus ouviu e explicou o plano (Atos 9.13-16).',
   },
   'André': {
@@ -72,9 +72,9 @@ export const PESSOAS_A = {
   'Apolo': {
     sub: 'Igreja primitiva · séc. I',
     resumo: 'Pregador talentoso que aceitou ser corrigido por um casal da igreja e cresceu com isso.',
-    quem: 'Judeu de Alexandria, bom de palavra e conhecedor das Escrituras. Chega a Éfeso falando de Jesus com entusiasmo, mas só conhecia o batismo de João. Priscila e Áquila chamam Apolo em particular e explicam o caminho de Deus com mais clareza. Depois ele vai pra Corinto, onde a pregação dele ajuda muita gente a crer.',
+    quem: 'Judeu de Alexandria, bom de palavra e conhecedor das Escrituras. Chega a Éfeso falando de Jesus com entusiasmo, mas só conhecia o batismo de João. Priscila e Áquila chamam Apolo em particular e explicam o caminho de Deus com mais clareza. Depois ele vai pra Acaia, a região de Corinto, onde Deus o usa pra fortalecer a igreja.',
     onde: 'Atos 18.24-28; citado em 1 Coríntios 1, 3 e 16 e em Tito 3.13.',
-    deus: 'Apolo já era um pregador reconhecido e mesmo assim aceitou ser corrigido, em particular, por um casal sem cargo na igreja. Talento sem disposição pra continuar aprendendo não leva longe.\n\nEm Corinto, a igreja começou a se dividir em torcidas: uns eram de Paulo, outros de Apolo. Paulo corrige isso lembrando que ele plantou, Apolo regou, mas quem fez crescer foi Deus (1 Coríntios 3.6). Nenhum dos dois tinha incentivado a rivalidade.',
+    deus: 'Apolo já era um pregador reconhecido e mesmo assim aceitou ser corrigido, em particular, por um casal da igreja. Talento sem disposição pra continuar aprendendo não leva longe.\n\nEm Corinto, a igreja começou a se dividir em torcidas: uns eram de Paulo, outros de Apolo. Paulo corrige isso lembrando que ele plantou, Apolo regou, mas quem fez crescer foi Deus (1 Coríntios 3.6).',
   },
   'Arão': {
     sub: 'Êxodo e deserto',
@@ -86,8 +86,8 @@ export const PESSOAS_A = {
   },
   'Barnabé': {
     sub: 'Igreja primitiva · séc. I',
-    resumo: 'O apelido dele quer dizer filho da consolação. Apostou em Paulo quando ninguém confiava nele, e depois em Marcos.',
-    quem: 'Levita de Chipre. O apelido Barnabé quer dizer filho da consolação. Foi um dos primeiros a vender o que tinha pra ajudar a igreja de Jerusalém. Quando Paulo se converteu e a igreja ainda tinha medo dele, foi Barnabé quem o apresentou aos apóstolos. Depois viraram parceiros nas primeiras viagens missionárias.',
+    resumo: 'O apelido dele quer dizer encorajador. Apostou em Paulo quando ninguém confiava nele, e depois em Marcos.',
+    quem: 'Levita de Chipre. O apelido Barnabé quer dizer encorajador. Foi um dos primeiros a vender o que tinha pra ajudar a igreja de Jerusalém. Quando Paulo se converteu e a igreja ainda tinha medo dele, foi Barnabé quem o apresentou aos apóstolos. Depois viraram parceiros nas primeiras viagens missionárias.',
     onde: 'Atos 4, 9 e 11-15; citado em 1 Coríntios 9.6, Gálatas 2 e Colossenses 4.10.',
     deus: 'Barnabé arriscou a própria reputação por outra pessoa mais de uma vez. Primeiro com Paulo, depois com João Marcos, a quem quis dar uma segunda chance mesmo com Paulo discordando. Anos depois, o próprio Paulo reconheceu o valor de Marcos (2 Timóteo 4.11).\n\nA graça que a igreja recebe de Deus aparece no jeito como os irmãos tratam uns aos outros.',
     erros: 'Em Antioquia, acompanhou Pedro quando ele passou a evitar os cristãos não judeus pra agradar um grupo vindo de Jerusalém. Paulo chamou isso de hipocrisia e confrontou Pedro na frente de todos (Gálatas 2.11-14).',
@@ -102,10 +102,10 @@ export const PESSOAS_A = {
   'Caim': {
     sub: 'Início da história',
     resumo: 'Primeiro filho de Adão e Eva. Deus o avisou antes do crime, e mesmo assim ele matou o irmão.',
-    quem: 'Primeiro filho de Adão e Eva, agricultor. Ele oferece a Deus parte da colheita. Quando a oferta dele não é aceita e a do irmão Abel é, Caim fica furioso, em vez de olhar pro próprio coração. Acaba matando Abel no campo. É o primeiro assassino da Bíblia e também o primeiro a construir uma cidade.',
+    quem: 'Primeiro filho de Adão e Eva, agricultor. Ele oferece a Deus parte da colheita. Quando a oferta dele não é aceita e a do irmão Abel é, Caim fica furioso, em vez de olhar pro próprio coração. Convida Abel pro campo e ali o mata. É o primeiro assassino da Bíblia e também o primeiro a construir uma cidade.',
     onde: 'Gênesis 4; citado em Hebreus 11.4, 1 João 3.12 e Judas 11.',
     deus: 'Antes do crime, Deus conversa com Caim e avisa: o pecado está à sua espera e deseja destruí-lo, mas está na sua mão o poder de dominá-lo (Gênesis 4.7). A escolha ainda estava nas mãos dele.\n\nDepois do assassinato vem o castigo, e junto vem um sinal de proteção sobre Caim, pra que ninguém o matasse. Mesmo o primeiro homicida continua sob o cuidado de Deus.',
-    erros: 'Matou o próprio irmão por ciúme e, quando Deus perguntou por Abel, desconversou: por acaso eu sou responsável pelo meu irmão? (Gênesis 4.9).',
+    erros: 'Matou o próprio irmão, cheio de raiva, e, quando Deus perguntou por Abel, desconversou: por acaso eu sou responsável pelo meu irmão? (Gênesis 4.9).',
   },
   'Calebe': {
     sub: 'Conquista de Canaã',
@@ -134,7 +134,7 @@ export const PESSOAS_A = {
     quem: 'O caçula dos filhos de Jessé, pastor de ovelhas, ungido rei ainda jovem. Enfrentou Golias, fugiu de Saul por anos e se tornou o maior rei de Israel. Escreveu boa parte dos Salmos. Deus prometeu que a família dele teria um trono pra sempre, promessa que se cumpre em Jesus, chamado Filho de Davi.',
     onde: '1 Samuel 16 a 1 Reis 2; 1 Crônicas 11-29; muitos Salmos.',
     deus: 'Quando Samuel vai ungir um dos filhos de Jessé, Deus avisa: o homem vê a aparência exterior, mas o Senhor examina os pensamentos e as intenções do coração (1 Samuel 16.7). Davi era o filho que ninguém tinha lembrado de chamar.\n\nNos salmos, Davi fala com Deus com muita honestidade, tanto na alegria quanto no pecado. O Salmo 51, escrito depois da queda com Bate-Seba, mostra o caminho de volta: confessar sem desculpas e confiar na misericórdia de Deus.',
-    erros: 'Usou o poder de rei pra ter Bate-Seba, mulher de outro homem, e depois mandou matar o marido dela, Urias, pra esconder o que tinha feito. Também fez um censo do exército por orgulho, e isso trouxe castigo sobre o povo (2 Samuel 24).',
+    erros: 'Usou o poder de rei pra ter Bate-Seba, mulher de outro homem, e depois mandou matar o marido dela, Urias, pra esconder o que tinha feito. Também mandou contar o povo, algo que ele mesmo depois reconheceu como pecado, e isso trouxe castigo sobre o povo (2 Samuel 24).',
   },
   'Débora': {
     sub: 'Tempo dos juízes',
@@ -148,7 +148,7 @@ export const PESSOAS_A = {
     resumo: 'O profeta do fogo no monte Carmelo, que logo depois quis desistir de tudo. Deus cuidou dele no deserto.',
     quem: 'Profeta que enfrentou o rei Acabe e a rainha Jezabel quando Israel estava tomado pela adoração a Baal. É lembrado pelo desafio no monte Carmelo, pela fuga pro deserto em profundo desânimo e por ter sido levado ao céu num redemoinho, sem passar pela morte.',
     onde: '1 Reis 17-19 e 21; 2 Reis 1-2.',
-    deus: 'No Carmelo, Deus responde com fogo à oração de Elias e mostra, diante dos profetas de Baal, que ele é o único Deus verdadeiro.\n\nLogo depois, Elias foge com medo de Jezabel, deita debaixo de uma árvore e pede pra morrer. Deus manda comida, deixa ele dormir e só depois conversa. No monte Horebe, a voz de Deus vem num sussurro suave (1 Reis 19.12). O mesmo Deus do fogo cuida com carinho de um profeta esgotado.\n\nSe você também está tão cansado que não quer continuar, não fique sozinho com isso. Fale com alguém de confiança ou ligue 188, o CVV, a qualquer hora.',
+    deus: 'No Carmelo, Deus responde com fogo à oração de Elias e mostra, diante dos profetas de Baal, que ele é o único Deus verdadeiro.\n\nLogo depois, Elias foge com medo de Jezabel, deita debaixo de uma árvore e pede pra morrer. Deus manda comida, deixa ele dormir e só depois conversa. No monte Horebe, depois do vento, do terremoto e do fogo, vem um som de brisa suave (1 Reis 19.11-12). O mesmo Deus do fogo cuida com carinho de um profeta esgotado.\n\nSe você também está tão cansado que não quer continuar, não fique sozinho com isso. Fale com alguém de confiança ou ligue 188, o CVV, a qualquer hora.',
     erros: 'Depois da grande vitória no Carmelo, entrou em desânimo e medo diante da ameaça de Jezabel e chegou a pedir a Deus que tirasse sua vida (1 Reis 19.4).',
   },
   'Eliseu': {
@@ -203,8 +203,8 @@ export const PESSOAS_A = {
   },
   'Filipe apóstolo': {
     sub: 'Evangelhos · séc. I',
-    resumo: 'Um dos doze. Chamou Natanael com um convite simples, vem e vê, e pediu a Jesus pra ver o Pai.',
-    quem: 'Discípulo de Betsaida, na Galileia, chamado diretamente por Jesus. Logo depois chama o amigo Natanael com um convite simples: vem e vê (João 1.46). Faz parte dos doze e aparece em algumas conversas bem diretas com Jesus no evangelho de João.',
+    resumo: 'Um dos doze. Chamou Natanael com um convite simples, venha e veja, e pediu a Jesus pra ver o Pai.',
+    quem: 'Discípulo de Betsaida, na Galileia, chamado diretamente por Jesus. Logo depois chama o amigo Natanael com um convite simples: venha e veja você mesmo (João 1.46). Faz parte dos doze e aparece em algumas conversas bem diretas com Jesus no evangelho de João.',
     onde: 'Mateus 10; Marcos 3; Lucas 6; João 1, 6, 12 e 14; Atos 1. Não confunda com Filipe, o evangelista de Atos 6 e 8.',
     deus: 'Diante da multidão com fome, Jesus pergunta a Filipe onde comprar pão, só pra testá-lo, porque já sabia o que ia fazer (João 6.5-6). Filipe faz as contas e diz que nem muito dinheiro daria. Aí vem a multiplicação. Deus age além do que os nossos cálculos alcançam.\n\nNa última ceia, Filipe pede: mostra o Pai pra nós. Jesus responde: quem me vê, vê o Pai (João 14.9). Uma pergunta sincera recebe uma das respostas mais claras sobre quem Jesus é.',
   },
@@ -221,6 +221,6 @@ export const PESSOAS_A = {
     quem: 'Agricultor da tribo de Manassés, com medo e sem confiança em si mesmo, chamado por Deus pra libertar Israel dos midianitas. Pede sinais mais de uma vez antes de acreditar no chamado. Depois lidera um exército reduzido a trezentos homens e vence uma multidão de inimigos.',
     onde: 'Juízes 6-8.',
     deus: 'Deus diminui de propósito o exército de Gideão pra que ninguém dissesse que venceu pela própria força (Juízes 7.2).\n\nDeus também tem paciência com a insegurança de Gideão e responde aos pedidos de confirmação. Quando o anjo aparece, chama Gideão de homem valente numa hora em que ele estava escondido, com medo (Juízes 6.12). Deus via nele o que ele ainda não via.',
-    erros: 'Depois da vitória, fez um objeto de ouro, um éfode, que virou ídolo pra Israel e pra sua própria família. Teve muitas esposas, e um dos filhos, Abimeleque, trouxe violência ao povo depois da morte de Gideão.',
+    erros: 'Depois da vitória, fez com ouro um manto sacerdotal, que virou ídolo pra Israel e pra sua própria família. Teve muitas esposas, e um dos filhos, Abimeleque, trouxe violência ao povo depois da morte de Gideão.',
   },
 };

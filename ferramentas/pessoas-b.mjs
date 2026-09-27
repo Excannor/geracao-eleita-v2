@@ -2,10 +2,10 @@
 export const PESSOAS_B = {
   'Isabel': {
     sub: 'Evangelhos · séc. I',
-    resumo: 'Mãe de João Batista. Engravidou já idosa e foi a primeira a reconhecer que Maria carregava o Senhor.',
-    quem: 'Parente de Maria, esposa do sacerdote Zacarias. A Bíblia diz que os dois eram justos diante de Deus. Isabel não conseguia ter filhos e já era idosa quando um anjo avisa Zacarias, no templo, que a oração deles tinha sido ouvida. Ela engravida de João Batista.',
+    resumo: 'Mãe de João Batista. Engravidou já idosa e reconheceu, cheia do Espírito Santo, que Maria carregava o Senhor.',
+    quem: 'Parente de Maria, esposa do sacerdote Zacarias. A Bíblia diz que os dois eram piedosos aos olhos de Deus. Isabel não conseguia ter filhos e já era idosa quando um anjo avisa Zacarias, no templo, que a oração deles tinha sido ouvida. Ela engravida de João Batista.',
     onde: 'Lucas 1.',
-    deus: 'A gravidez de Isabel repete algo que aparece várias vezes na Bíblia: Deus dá filhos a mulheres que não podiam ter pra começar algo novo, como fez com Sara e com Ana.\n\nQuando Maria, grávida de Jesus, visita Isabel, o bebê pula na barriga dela e Isabel fica cheia do Espírito Santo. Ela chama Maria de mãe do meu Senhor (Lucas 1.43), reconhecendo quem era a criança antes de todo mundo.',
+    deus: 'A gravidez de Isabel repete algo que aparece várias vezes na Bíblia: Deus dá filhos a mulheres que não podiam ter pra começar algo novo, como fez com Sara e com Ana.\n\nQuando Maria, grávida de Jesus, visita Isabel, o bebê pula na barriga dela e Isabel fica cheia do Espírito Santo. Ela chama Maria de mãe do meu Senhor (Lucas 1.43), reconhecendo quem era a criança antes mesmo de ele nascer.',
   },
   'Isaque': {
     sub: 'Patriarcas',
@@ -20,12 +20,12 @@ export const PESSOAS_B = {
     resumo: 'Profeta que viu a santidade de Deus no templo e anunciou o Servo que sofreria pelos pecados do povo.',
     quem: 'Profeta de Judá durante o reinado de vários reis. Foi chamado numa visão de Deus no templo, cercado de serafins que diziam santo, santo, santo (Isaías 6). O livro dele junta avisos contra a infidelidade do povo e algumas das promessas mais claras sobre o Messias em todo o Antigo Testamento.',
     onde: 'Livro de Isaías; contexto em 2 Reis 19-20.',
-    deus: 'Diante da santidade de Deus, Isaías se sente perdido: sou um homem de lábios impuros. Um serafim toca a boca dele com uma brasa e diz que a culpa foi tirada (Isaías 6.5-7). Depois disso, quando Deus pergunta quem vai, Isaías responde: aqui estou, envia-me.\n\nEm Isaías 53, o profeta fala de um Servo ferido pelas nossas transgressões, que carrega o castigo que nos traz paz. Desde o começo, os cristãos leram esse texto como anúncio de Jesus (Atos 8.32-35).',
+    deus: 'Diante da santidade de Deus, Isaías se sente perdido: sou um homem de lábios impuros. Um serafim toca a boca dele com uma brasa e diz que a culpa foi tirada (Isaías 6.5-7). Depois disso, quando Deus pergunta quem vai, Isaías responde: eu irei, Senhor, envie-me (Isaías 6.8).\n\nEm Isaías 53, o profeta fala de um Servo ferido pelas nossas transgressões, que carrega o castigo que nos traz paz. Desde o começo, os cristãos leram esse texto como anúncio de Jesus (Atos 8.32-35).',
   },
   'Ismael': {
     sub: 'Patriarcas',
-    resumo: 'Filho de Abraão com Agar. Mandado pro deserto com a mãe, ouviu de Deus que não estava esquecido.',
-    quem: 'Filho de Abraão com Agar, a serva egípcia de Sara. Nasceu quando Abraão e Sara tentaram resolver do jeito deles a demora da promessa. O nome dele quer dizer Deus ouve. Anos depois, ele e a mãe são mandados embora pro deserto, e Deus ouve o choro do menino e mostra água pra eles.',
+    resumo: 'Filho de Abraão com Hagar. Mandado pro deserto com a mãe, ouviu de Deus que não estava esquecido.',
+    quem: 'Filho de Abraão com Hagar, a serva egípcia de Sara. Nasceu quando Abraão e Sara tentaram resolver do jeito deles a demora da promessa. O nome dele quer dizer Deus ouve. Anos depois, ele e a mãe são mandados embora pro deserto, e Deus ouve o choro do menino e mostra água pra eles.',
     onde: 'Gênesis 16, 17.18-20, 21.8-21 e 25.12-18; citado em Gálatas 4.21-31.',
     deus: 'A aliança seguiria por Isaque, e mesmo assim Deus não abandona Ismael. Promete fazer dele uma grande nação e salva a vida dele no deserto. Deus escolher uma família pra um propósito específico não significa que ele deixe de se importar com quem está fora dela.\n\nEm Gálatas 4, Paulo usa os dois filhos de Abraão como imagem: um nasceu do esforço humano, o outro da promessa. É a diferença entre tentar se salvar pela lei e receber a graça.',
   },
@@ -75,7 +75,7 @@ export const PESSOAS_B = {
     quem: 'Profeta de Israel no tempo do rei Jeroboão II (2 Reis 14.25). Deus manda Jonas pregar em Nínive, capital da Assíria, um império inimigo e violento. Ele foge na direção oposta. No meio de uma tempestade é jogado no mar, engolido por um grande peixe e devolvido à praia três dias depois. Quando finalmente prega em Nínive, a cidade inteira se arrepende. E Jonas fica com raiva.',
     onde: '2 Reis 14.25; livro de Jonas; citado por Jesus em Mateus 12.39-41.',
     deus: 'A parte mais desconfortável do livro está no final. Depois que Deus poupa Nínive, Jonas confessa por que fugiu: ele sabia que Deus é compassivo, misericordioso, paciente e cheio de amor (Jonas 4.2), e não queria isso pros inimigos.\n\nO livro termina com uma pergunta de Deus, sem resposta de Jonas. A pergunta fica pra quem lê: você consegue querer pros seus inimigos a mesma misericórdia que recebeu? Jesus usa a história de Jonas como sinal da própria morte e ressurreição.',
-    erros: 'Fugiu da ordem de Deus, preferiu morrer a ver os ninivitas perdoados e ficou mais incomodado com uma planta que secou do que com a vida de mais de cento e vinte mil pessoas (Jonas 4.9-11).',
+    erros: 'Fugiu da ordem de Deus, preferiu morrer a ver os ninivitas perdoados e ficou mais incomodado com uma planta que secou do que com a vida de cento e vinte mil pessoas (Jonas 4.9-11).',
   },
   'Josias': {
     sub: 'Reino de Judá · por volta de 640 a 609 a.C.',
@@ -99,7 +99,7 @@ export const PESSOAS_B = {
     quem: 'Filho preferido de Jacó. Por inveja, os irmãos o vendem como escravo, e ele vai parar no Egito. Lá passa anos de injustiça, inclusive preso por uma acusação falsa, até chegar a governar o país logo abaixo do faraó. A história dele fecha o livro de Gênesis e explica como a família de Jacó foi morar no Egito.',
     onde: 'Gênesis 37-50.',
     deus: 'No fim, José diz aos irmãos: vocês planejaram o mal contra mim, mas Deus tornou o mal em bem (Gênesis 50.20). O mal foi dos irmãos, e mesmo assim Deus usou até aquela injustiça pra salvar muita gente da fome.\n\nJosé escolhe perdoar quem o feriu, e perdoa chorando. A fidelidade dele em lugares que não escolheu, como a casa de Potifar e a prisão, fez parte do caminho.',
-    erros: 'Quando jovem, contou aos irmãos, com ar de superioridade, os sonhos em que eles se curvavam diante dele. Isso aumentou o ódio que já sentiam, embora nada justifique o que fizeram com ele.',
+    erros: 'Quando jovem, contou aos irmãos os sonhos em que eles se curvavam diante dele. Isso aumentou o ódio que já sentiam, embora nada justifique o que fizeram com ele.',
   },
   'José pai adotivo de Jesus': {
     sub: 'Evangelhos · séc. I',
@@ -121,7 +121,7 @@ export const PESSOAS_B = {
     resumo: 'Um dos três mais próximos de Jesus. Já quis mandar fogo do céu, e anos depois escreveu que Deus é amor.',
     quem: 'Filho de Zebedeu, pescador chamado junto com o irmão Tiago. Foi um dos três discípulos mais próximos de Jesus, presente na transfiguração e no Getsêmani. Jesus chamou os dois irmãos de filhos do trovão (Marcos 3.17). A tradição o reconhece como autor do quarto evangelho, de três cartas e do Apocalipse, escrito no exílio na ilha de Patmos.',
     onde: 'Os quatro evangelhos; Atos 3-4; 1, 2 e 3 João; Apocalipse.',
-    deus: 'No evangelho, João se chama de o discípulo que Jesus amava. Ele viu de perto o carinho e a autoridade de Jesus, e o evangelho dele é o que mais insiste que Jesus é Deus.\n\nO rapaz que queria mandar fogo do céu sobre uma vila escreveu, anos depois, que Deus é amor (1 João 4.8). Já idoso e exilado, recebe as visões do Apocalipse, que mostram Deus no controle da história mesmo quando a igreja sofre.',
+    deus: 'No quarto evangelho, o autor se chama de o discípulo que Jesus amava. Ele viu de perto o carinho e a autoridade de Jesus, e o evangelho dele é o que mais insiste que Jesus é Deus.\n\nO rapaz que queria mandar fogo do céu sobre uma vila escreveu, anos depois, que Deus é amor (1 João 4.8). Já idoso e exilado, recebe as visões do Apocalipse, que mostram Deus no controle da história mesmo quando a igreja sofre.',
     erros: 'Junto com o irmão, pediu a Jesus os lugares de honra no reino, e os outros discípulos ficaram indignados. Numa outra vez, quis pedir fogo do céu contra uma vila samaritana que não recebeu Jesus, e Jesus o repreendeu (Lucas 9.54-55).',
   },
   'Judas Iscariotes': {
@@ -138,7 +138,7 @@ export const PESSOAS_B = {
     quem: 'Quarto filho de Jacó e Lia. É ele quem sugere vender José a mercadores em vez de matá-lo (Gênesis 37.26-27). Depois vive o episódio com a nora Tamar, que precisa enganá-lo pra receber o direito que ele tinha negado a ela (Gênesis 38). Anos mais tarde, diante de José já governador do Egito, Judá se oferece pra ficar como escravo no lugar do irmão mais novo, Benjamim, pra poupar o pai de mais uma dor.',
     onde: 'Gênesis 37-49; citado em Mateus 1.2-3 e Hebreus 7.14.',
     deus: 'A história de Judá mostra uma mudança real: de quem vende o irmão a quem se oferece no lugar do irmão. Deus trabalha no caráter das pessoas com o tempo.\n\nEm Gênesis 49.10, Jacó anuncia que o cetro não sairia de Judá. Da tribo dele vêm o rei Davi e Jesus, que Apocalipse 5.5 chama de Leão da tribo de Judá.',
-    erros: 'Sugeriu vender José como escravo. Negou a Tamar o casamento com o filho mais novo, como mandava o costume, e depois dormiu com ela pensando que era uma prostituta. Quando descobriu tudo, reconheceu: ela é mais justa do que eu (Gênesis 38.26).',
+    erros: 'Sugeriu vender José como escravo. Negou a Tamar o casamento com o filho mais novo, como mandava o costume, e depois dormiu com ela pensando que era uma prostituta. Quando descobriu tudo, reconheceu: ela é mais correta do que eu (Gênesis 38.26).',
   },
   'Jó': {
     sub: 'Livro de Jó · época dos patriarcas',
@@ -197,14 +197,14 @@ export const PESSOAS_B = {
     resumo: 'Sentou aos pés de Jesus pra ouvir e, antes da cruz, derramou um perfume caríssimo nos pés dele.',
     quem: 'Irmã de Marta e de Lázaro, moradora de Betânia. É lembrada por sentar aos pés de Jesus pra ouvir enquanto a irmã cuidava do serviço da casa. Pouco antes da crucificação, derrama sobre os pés de Jesus um perfume de nardo puro, muito caro, e enxuga com os próprios cabelos.',
     onde: 'Lucas 10.38-42; João 11-12. Não confunda com Maria Madalena nem com Maria, mãe de Jesus.',
-    deus: 'Quando criticam o perfume como desperdício, dizendo que o dinheiro podia ajudar os pobres, Jesus defende Maria. Diz que ela estava preparando o corpo dele pro sepultamento (João 12.7), e os outros evangelhos acrescentam que o gesto seria lembrado onde o evangelho fosse anunciado (Marcos 14.9).\n\nSentar aos pés de um mestre pra aprender era posição de discípulo, e na época isso era esperado de homens. Jesus diz que Maria descobriu a única coisa necessária, e que ninguém ia tirar isso dela (Lucas 10.42).',
+    deus: 'Quando criticam o perfume como desperdício, dizendo que o dinheiro podia ajudar os pobres, Jesus defende Maria. Diz que ela estava preparando o corpo dele pro sepultamento (João 12.7). Marcos conta uma cena parecida em Betânia, com uma mulher que ele não nomeia, e ali Jesus diz que o gesto seria lembrado onde o evangelho fosse anunciado (Marcos 14.3-9).\n\nSentar aos pés de um mestre pra aprender era posição de discípulo, e na época isso era esperado de homens. Jesus diz que Maria descobriu a única coisa necessária, e que ninguém ia tirar isso dela (Lucas 10.42).',
   },
   'Maria': {
     sub: 'Evangelhos · séc. I',
-    resumo: 'A jovem de Nazaré escolhida pra ser mãe de Jesus. Respondeu: aqui está a serva do Senhor.',
+    resumo: 'A jovem de Nazaré escolhida pra ser mãe de Jesus. Respondeu: eu sou a serva do Senhor.',
     quem: 'Jovem de Nazaré, noiva de José. O anjo Gabriel anuncia que ela seria mãe do Filho de Deus pelo Espírito Santo, e Maria responde: eu sou a serva do Senhor; que aconteça tudo o que o Senhor me disse (Lucas 1.38). Acompanhou o ministério de Jesus, esteve ao pé da cruz e estava entre os discípulos reunidos em oração depois da ascensão.',
     onde: 'Mateus 1-2; Lucas 1-2 e 8; João 2 e 19; Atos 1.14.',
-    deus: 'Deus escolhe uma jovem comum, sem riqueza nem posição, pro papel mais único da história da salvação. No cântico de Lucas 1.46-55, Maria celebra um Deus que derruba os poderosos dos seus tronos e levanta os humildes.\n\nAo pé da cruz, Maria vê o filho sofrer. E Jesus, no meio da dor, cuida dela e a entrega aos cuidados do discípulo João (João 19.26-27).',
+    deus: 'Deus escolhe uma jovem comum, sem riqueza nem posição, pro papel mais único da história da salvação. No cântico de Lucas 1.46-55, Maria celebra um Deus que derruba os poderosos dos seus tronos e levanta os humildes.\n\nAo pé da cruz, Maria vê o filho sofrer. E Jesus, no meio da dor, cuida dela e a entrega aos cuidados do discípulo que ele amava (João 19.26-27).',
     erros: 'Num momento, a família de Jesus, com Maria junto, foi atrás dele sem entender a missão que ele cumpria. Jesus aproveitou pra dizer que a família dele é quem faz a vontade de Deus (Marcos 3.21 e 3.31-35).',
   },
   'Marta': {
