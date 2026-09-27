@@ -228,7 +228,7 @@ const T = {
   // vista. O app não inventa profecia nem fala em nome de Deus: quando quer animar, cita
   // o texto e deixa quem lê conferir de onde veio.
   lembreteManha: [
-    ['As misericórdias se renovam 🌅', 'A misericórdia do Senhor "se renova a cada manhã" (Lm 3.23). Comece o dia na Palavra.'],
+    ['A misericórdia se renova 🌅', 'A misericórdia do Senhor "se renova a cada manhã" (Lm 3.23). Comece o dia na Palavra.'],
     ['De manhã ☀️', '"De manhã faço a minha oração e fico esperando a sua resposta" (Sl 5.3). A leitura de hoje te espera.'],
     ['Primeiro o Reino 📖', '"Coloquem, pois, em primeiro lugar o Reino de Deus" (Mt 6.33). Uns minutos e o dia começa diferente.'],
     ['Bom dia, {nome}! 🌤️', '"Ensine-me a fazer a sua vontade" (Sl 143.10). Bora abrir a lição de hoje?'],

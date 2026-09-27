@@ -1533,7 +1533,7 @@
     let destino = 'celula';
     let dias = 7;
     CC.folha('<h2>' + titulo + '</h2>'
-      + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Em perigo ou pensando em se machucar? Ligue <b>188 (CVV)</b> ou fale com um adulto de confiança agora.</p></div>'
+      + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Em perigo ou pensando em se machucar? Ligue <b>188 (CVV)</b> ou fale com um adulto de confiança agora. Se for abuso ou violência, ligue <b>100</b>.</p></div>'
       + '<label class="campo-senha"><span>' + (oracao ? 'Seu pedido de oração' : 'O que você precisa') + '</span>'
       + '<textarea data-texto maxlength="' + max + '" rows="4" autocomplete="off" autocapitalize="sentences"></textarea></label>'
       + '<p class="passo-dica pequena" data-conta></p>'
