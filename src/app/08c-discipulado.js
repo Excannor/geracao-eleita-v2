@@ -11,8 +11,15 @@
   const acao = (corpo) => CC.api('api/discipulado', corpo);
   const ddmm = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4);
   const primeiroNome = (nome) => String(nome || '').trim().split(/\s+/)[0];
+  // Mesma guarda de CC.carregarAmigos: sem conta de verdade (servidor aberto das
+  // ferramentas de teste, ou visitante sem senha) não há discipulado a pedir.
+  const servido = () => location.protocol.startsWith('http');
+  const comConta = () => servido() && !(CC.quem && !CC.quem.comSenha);
 
-  CC.carregarDiscipulado = () => CC.api('api/discipulado').then((d) => { cache = d; return d; }).catch(() => null);
+  CC.carregarDiscipulado = () => {
+    if (!comConta()) return Promise.resolve(null);
+    return CC.api('api/discipulado').then((d) => { cache = d; return d; }).catch(() => null);
+  };
   // Para a barra de abas: existe algum vínculo (ativo ou só convidado, de qualquer lado)?
   // Lê do mesmo cache que a tela usa, carregado no boot junto com amigos e novidades.
   CC.temDiscipulado = () => !!(cache && cache.algumVinculo);
