@@ -205,7 +205,7 @@ export const PESSOAS_B = {
     quem: 'Jovem de Nazaré, noiva de José. O anjo Gabriel anuncia que ela seria mãe do Filho de Deus pelo Espírito Santo, e Maria responde: eu sou a serva do Senhor; que aconteça tudo o que o Senhor me disse (Lucas 1.38). Acompanhou o ministério de Jesus, esteve ao pé da cruz e estava entre os discípulos reunidos em oração depois da ascensão.',
     onde: 'Mateus 1-2; Lucas 1-2 e 8; João 2 e 19; Atos 1.14.',
     deus: 'Deus escolhe uma jovem comum, sem riqueza nem posição, pro papel mais único da história da salvação. No cântico de Lucas 1.46-55, Maria celebra um Deus que derruba os poderosos dos seus tronos e levanta os humildes.\n\nAo pé da cruz, Maria vê o filho sofrer. E Jesus, no meio da dor, cuida dela e a entrega aos cuidados do discípulo que ele amava (João 19.26-27).',
-    erros: 'Num momento, a família de Jesus, com Maria junto, foi atrás dele sem entender a missão que ele cumpria. Jesus aproveitou pra dizer que a família dele é quem faz a vontade de Deus (Marcos 3.21 e 3.31-35).',
+    erros: '',
   },
   'Marta': {
     sub: 'Evangelhos · séc. I',
