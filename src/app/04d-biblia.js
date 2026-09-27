@@ -13,9 +13,7 @@
   let geracao = 0;
 
   function wireVoltar(alvo) {
-    alvo.querySelectorAll('[data-voltar]').forEach((el) => {
-      el.onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/biblia'; };
-    });
+    CC.ligarVoltarDoTopo(alvo);
   }
 
   // CC.vazio já monta o botão de voltar, mas a tela pode ter sido preenchida dentro de
@@ -168,7 +166,7 @@
   let leitorSobreGrade = false;
   function voltarParaGrade(livro) {
     if (leitorSobreGrade) history.back();
-    else location.replace('#/biblia/' + encodeURIComponent(livro));
+    else CC.substituirRota('#/biblia/' + encodeURIComponent(livro));
   }
 
   CC.fecharLeituraBiblia = function () {
@@ -231,9 +229,9 @@
     const btAnt = el.querySelector('[data-anterior]');
     // replace e não hash: virar capítulo não empilha histórico, e o voltar do celular leva
     // à grade de capítulos em vez de refazer, um por um, todos os capítulos lidos.
-    if (btAnt) btAnt.onclick = () => { location.replace('#/biblia/' + encodeURIComponent(antLivro) + '/' + antCap); };
+    if (btAnt) btAnt.onclick = () => { CC.substituirRota('#/biblia/' + encodeURIComponent(antLivro) + '/' + antCap); };
     const btProx = el.querySelector('[data-proximo]');
-    if (btProx) btProx.onclick = () => { location.replace('#/biblia/' + encodeURIComponent(proxLivro) + '/' + proxCap); };
+    if (btProx) btProx.onclick = () => { CC.substituirRota('#/biblia/' + encodeURIComponent(proxLivro) + '/' + proxCap); };
 
     // Cada capítulo aberto começa do topo: navegar para o próximo/anterior não deveria
     // herdar a rolagem de onde a pessoa parou no capítulo passado.

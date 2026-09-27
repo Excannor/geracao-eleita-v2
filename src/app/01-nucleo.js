@@ -179,6 +179,13 @@ window.CC = window.CC || {};
       + '<path d="M24 4v40C15 41 8 33 8 22V10z" fill="' + b + '" opacity=".5"/>',
     sino: (a, b) => '<path d="M24 5c-8 0-13 6-13 14v8l-4 7h34l-4-7v-8c0-8-5-14-13-14z" fill="' + a + '"/>'
       + '<path d="M19 38a5 5 0 0 0 10 0z" fill="' + b + '"/>',
+    // marcador de página, dos versículos guardados
+    marcador: (a, b) => '<path d="M11 4h26c1.7 0 3 1.3 3 3v37l-16-10-16 10V7c0-1.7 1.3-3 3-3z" fill="' + a + '"/>'
+      + '<path d="M11 4h13v30L8 44V7c0-1.7 1.3-3 3-3z" fill="' + b + '"/>',
+    // lápis, da história escrita pela pessoa
+    caneta: (a, b) => '<path d="M33 5l10 10-24 24-10 1 1-10z" fill="' + a + '"/>'
+      + '<path d="M29 9l10 10-4 4-10-10z" fill="' + b + '"/>'
+      + '<rect x="6" y="42" width="36" height="3" rx="1.5" fill="' + b + '"/>',
     // duas pessoas lado a lado
     amigos: (a, b) => '<circle cx="17" cy="17" r="7" fill="' + a + '"/>'
       + '<path d="M17 27c-7 0-12 4-12 10 0 2 1 3 3 3h18c2 0 3-1 3-3 0-6-5-10-12-10z" fill="' + b + '"/>'
@@ -211,6 +218,8 @@ window.CC = window.CC || {};
     bussola: HERDA,
     pessoa: HERDA,
     amigos: HERDA,
+    marcador: HERDA,
+    caneta: HERDA,
     bau: HERDA,
     novidades: HERDA,
     livro: HERDA,

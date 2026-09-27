@@ -553,9 +553,10 @@ button { font-family: inherit; }
 }
 .painel-mais a:last-child { border-bottom: 0; }
 .painel-mais a:hover { background: var(--fundo-2); }
-.painel-mais .q { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: var(--inverso); color: var(--inverso-tinta); }
-.painel-mais .q.leve { background: var(--fundo-2); color: var(--tinta); }
-.painel-mais .q svg { width: 22px; height: 22px; }
+/* Todos os ícones do Mais no mesmo padrão (o dono pediu: nada de um verde cheio e outros
+   cinza). O mesmo fundo claro e o mesmo verde dos quadros do Explorar. */
+.painel-mais .q { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: var(--verde-fraco); color: var(--verde); }
+.painel-mais .q svg { width: 24px; height: 24px; }
 .painel-mais small { display: block; margin-top: 2px; font-weight: 600; font-size: 0.8rem; color: var(--tinta-fraca); }
 
 /* ---------- botões ----------
@@ -2322,7 +2323,9 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
   animation: entrar-cartao .3s var(--suave) both;
 }
 .bloco-secao:hover { text-decoration: none; background: var(--fundo-2); }
-.bloco-secao .icone { width: 44px; height: 44px; border-radius: var(--raio-p); display: grid; place-items: center; background: var(--cor-fraca); color: var(--cor); margin-bottom: 6px; }
+/* Um padrão só para os ícones da grade (antes cada seção tinha uma cor, e depois da paleta
+   nova sobrou uma mistura de verde e cinza). */
+.bloco-secao .icone { width: 44px; height: 44px; border-radius: var(--raio-p); display: grid; place-items: center; background: var(--verde-fraco); color: var(--verde); margin-bottom: 6px; }
 .bloco-secao .icone svg { width: 24px; height: 24px; }
 .bloco-secao b { color: var(--tinta-forte); font-size: 1rem; }
 .bloco-secao span { font-size: 0.8rem; color: var(--tinta-fraca); font-weight: 700; line-height: 1.35; }

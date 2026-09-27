@@ -119,10 +119,10 @@
     const nestaTela = () => meu === desenhoCelula && location.hash.startsWith('#/novidades/celula/');
 
     const desenhar = (d) => {
-      if (!d) { raiz.innerHTML = CC.botaoVoltar('Juntos') + '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>'; ligarVoltar(raiz); return; }
+      if (!d) { raiz.innerHTML = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>'; ligarVoltar(raiz); return; }
       const p = (d.propositos || []).find((x) => x.id === id && x.celula && !x.euConvidado);
       if (!p) {
-        raiz.innerHTML = CC.botaoVoltar('Juntos') + '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Essa célula não está mais na sua lista.</p></div>';
+        raiz.innerHTML = voltarCelulas() + '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Essa célula não está mais na sua lista.</p></div>';
         ligarVoltar(raiz);
         return;
       }
@@ -132,7 +132,7 @@
       // Visitante não vê a aba Oração: se chegou nela por um link antigo, cai em Hoje.
       const abasVisiveis = ABAS_CELULA.filter(([k]) => k !== 'oracao' || !visitante);
       const aba = abasVisiveis.some(([k]) => k === pedida) ? pedida : 'hoje';
-      raiz.innerHTML = CC.botaoVoltar('Juntos')
+      raiz.innerHTML = voltarCelulas()
         + '<div class="cabeca-celula"><div><span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula</span>'
         + '<h1>' + CC.esc(p.titulo) + '</h1>'
         + '<p class="passo-dica">' + CC.plural(ativos(p).length, 'pessoa', 'pessoas')
@@ -147,7 +147,7 @@
         + '</div>';
       ligarVoltar(raiz);
       // Trocar de aba não empilha histórico: o "voltar" do celular sai da célula de uma vez.
-      raiz.querySelectorAll('[data-aba]').forEach((b) => { b.onclick = () => location.replace(enderecoCelula(p.id, b.dataset.aba)); });
+      raiz.querySelectorAll('[data-aba]').forEach((b) => { b.onclick = () => CC.substituirRota(enderecoCelula(p.id, b.dataset.aba)); });
       const painel = raiz.querySelector('.painel-celula');
       if (aba === 'hoje') ligarHoje(painel, p);
       if (aba === 'pessoas') ligarPessoas(painel, p, souLider);
@@ -177,7 +177,7 @@
       if (!nestaTela()) return;
       if (carregando) { raiz.innerHTML = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>'; return; }
       const celulas = CC.minhasCelulas ? CC.minhasCelulas() : [];
-      if (celulas.length === 1) { location.replace(enderecoCelula(celulas[0].id)); return; }
+      if (celulas.length === 1) { CC.substituirRota(enderecoCelula(celulas[0].id)); return; }
       if (!celulas.length) {
         raiz.innerHTML = '<h1>Célula</h1><div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Você ainda não está em nenhuma célula.</p></div>';
         return;
@@ -192,10 +192,14 @@
     CC.carregarPropositos().then((d) => { if (CC.pintarNavegacao) CC.pintarNavegacao(); desenhar(d || cache); });
   };
 
+  // A célula agora é aba da barra: não volta para o Juntos. Só quem está em mais de uma
+  // célula ganha um caminho de volta, para a lista delas.
+  const voltarCelulas = () => ((CC.minhasCelulas() || []).length > 1
+    ? '<button class="voltar" data-lista-celulas>' + CC.ico('voltar') + 'Minhas células</button>' : '');
+
   function ligarVoltar(raiz) {
-    raiz.querySelectorAll('[data-voltar]').forEach((el) => {
-      el.onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/novidades'; };
-    });
+    CC.ligarVoltarDoTopo(raiz);
+    raiz.querySelectorAll('[data-lista-celulas]').forEach((el) => { el.onclick = () => { location.hash = '#/celula'; }; });
   }
 
   function abaHoje(p) {
@@ -221,7 +225,7 @@
 
   function ligarHoje(painel, p) {
     const ligar = (sel, fn) => { const el = painel.querySelector(sel); if (el) el.onclick = fn; };
-    ligar('[data-ir-estudo]', () => location.replace(enderecoCelula(p.id, 'estudo')));
+    ligar('[data-ir-estudo]', () => CC.substituirRota(enderecoCelula(p.id, 'estudo')));
     ligar('[data-link-celula]', () => folhaLinkCelula(p));
     ligar('[data-recado]', () => folhaRecado(p));
     ligar('[data-encontro]', () => folhaEncontro(p));
@@ -1219,7 +1223,7 @@
             await recarregar();
             const novo = ((cache && cache.propositos) || []).find((x) => x.id === p.id);
             // Na tela da célula, o estudo novo aparece na aba Estudo; fora dela, abre na folha.
-            if (location.hash.startsWith('#/novidades/celula/')) location.replace(enderecoCelula(p.id, 'estudo'));
+            if (location.hash.startsWith('#/novidades/celula/')) CC.substituirRota(enderecoCelula(p.id, 'estudo'));
             else if (novo && novo.estudo) CC.estudoDoEncontro(novo);
           } catch (e) {
             const erro = q('.erro-proposito');

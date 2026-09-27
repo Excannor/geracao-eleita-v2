@@ -189,6 +189,14 @@
   }
   CC.fecharPainelMais = fecharPainelMais;
 
+  // O painel empilha uma entrada no histórico (para o voltar do celular fechá-lo). Se a
+  // pessoa sai do painel indo para outra tela, essa entrada tem de ser TROCADA pelo destino,
+  // senão o próximo voltar cai nela, na mesma tela, e parece que o botão não funciona.
+  function irSemFantasma(destino) {
+    if (history.state && history.state.painelMais) location.replace(destino);
+    else location.hash = destino;
+  }
+
   function itemPainelMais(icone, leve, rotulo, sub, href) {
     return '<a href="' + href + '" data-ir-mais="' + href + '"><span class="q' + (leve ? ' leve' : '') + '">' + icone + '</span>'
       + '<span>' + CC.esc(rotulo) + (sub ? '<small>' + CC.esc(sub) + '</small>' : '') + '</span></a>';
@@ -205,8 +213,8 @@
       itens.push(itemPainelMais(CC.icoAba('bau'), false, 'Desafios', sub, '#/missoes'));
     }
     itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
-    itens.push(itemPainelMais(CC.ico('marcador'), true, 'Meus versículos', '', '#/perfil/versiculos'));
-    itens.push(itemPainelMais(CC.ico('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
+    itens.push(itemPainelMais(CC.icoAba('marcador'), true, 'Meus versículos', '', '#/perfil/versiculos'));
+    itens.push(itemPainelMais(CC.icoAba('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
     document.body.insertAdjacentHTML('beforeend', '<div class="veu-mais"></div><div class="painel-mais" role="dialog" aria-modal="true" aria-label="Mais">' + itens.join('') + '</div>');
     document.querySelector('.veu-mais').onclick = () => fecharPainelMais();
     document.querySelectorAll('[data-ir-mais]').forEach((a) => {
@@ -215,7 +223,7 @@
         painelMaisAberto = false;
         document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => el.remove());
         CC.vibrar('leve');
-        location.hash = a.dataset.irMais;
+        irSemFantasma(a.dataset.irMais);
       };
     });
     history.pushState({ painelMais: true }, '', location.href);
@@ -238,7 +246,10 @@
     if (rota === 'perfil' && arg === 'discipulado') ativa = '#/discipulado';
     const naBiblia = rota === 'biblia';
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
-    const maisSelecionado = !naBiblia && (ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
+    // Meus versículos e Minha história abrem pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
+    const anteriorNav = pilha.length >= 2 ? pilha[pilha.length - 2] : '';
+    const doMais = rota === 'perfil' && (arg === 'versiculos' || arg === 'historia') && !anteriorNav.startsWith('#/perfil');
+    const maisSelecionado = !naBiblia && (doMais || ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
     const pontoMais = !desafiosNaBarra && !!(CC.haDesafioPendenteHoje && CC.haDesafioPendenteHoje());
     const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
     const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
@@ -287,7 +298,8 @@
     navegacao.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
         CC.vibrar('leve');
-        if (location.hash === el.dataset.ir) { CC.redesenhar(); CC.rolarPara(0); } else location.hash = el.dataset.ir;
+        if (painelMaisAberto) { painelMaisAberto = false; document.querySelectorAll('.veu-mais, .painel-mais').forEach((x) => x.remove()); }
+        if (location.hash === el.dataset.ir && !(history.state && history.state.painelMais)) { CC.redesenhar(); CC.rolarPara(0); } else irSemFantasma(el.dataset.ir);
       };
     });
     const botao = navegacao.querySelector('[data-abrir-mais]');
@@ -309,7 +321,55 @@
     historia: CC.vistaHistoria,
   });
 
+  // ---------- o caminho percorrido, para o botão de voltar dizer a verdade ----------
+  // O voltar do topo é o "voltar" do navegador, mas o nome escrito nele era fixo ("Perfil",
+  // "Juntos"). Com a barra nova as mesmas telas abrem por outros caminhos (o Mais, por
+  // exemplo), e o botão dizia um lugar e levava a outro. A pilha abaixo acompanha as telas
+  // visitadas: quando o voltar vai dar em outro lugar, o botão passa a dizer só "Voltar"; e
+  // quando não há para onde voltar (app aberto direto numa tela), ele leva ao lugar escrito.
+  const pilha = [];
+  let substituirRota = false;
+  CC.substituirRota = (destino) => { substituirRota = true; location.replace(destino); };
+  function anotarCaminho() {
+    const h = location.hash || '#/';
+    if (pilha[pilha.length - 1] === h) return;
+    if (substituirRota && pilha.length) pilha[pilha.length - 1] = h;
+    else if (pilha.length >= 2 && pilha[pilha.length - 2] === h) pilha.pop();
+    else pilha.push(h);
+    substituirRota = false;
+    if (pilha.length > 60) pilha.splice(0, pilha.length - 60);
+  }
+  const DESTINO_DO_ROTULO = {
+    'Trilha': (h) => h === '#/' || h === '#' || h === '',
+    'Perfil': (h) => h === '#/perfil',
+    'Juntos': (h) => h === '#/novidades',
+    'Explorar': (h) => h === '#/explorar',
+    'Configurações': (h) => h === '#/config',
+    'Bíblia': (h) => h === '#/biblia',
+    'Primeiros passos': (h) => h === '#/licoes',
+  };
+  const ENDERECO_DO_ROTULO = { 'Trilha': '#/', 'Perfil': '#/perfil', 'Juntos': '#/novidades', 'Explorar': '#/explorar',
+    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes' };
+  function ligarVoltarDoTopo(raiz) {
+    const anterior = pilha.length >= 2 ? pilha[pilha.length - 2] : null;
+    raiz.querySelectorAll('[data-voltar]').forEach((el) => {
+      const rotulo = el.textContent.trim();
+      const confere = DESTINO_DO_ROTULO[rotulo];
+      if (anterior && confere && !confere(anterior)) {
+        // Vai voltar para outra tela: o nome fixo mentiria.
+        [...el.childNodes].forEach((n) => { if (n.nodeType === 3) n.remove(); });
+        el.append('Voltar');
+      }
+      el.onclick = () => {
+        if (anterior) history.back();
+        else location.hash = ENDERECO_DO_ROTULO[rotulo] || '#/';
+      };
+    });
+  }
+  CC.ligarVoltarDoTopo = ligarVoltarDoTopo;
+
   function rotear() {
+    anotarCaminho();
     const { rota, arg, consulta } = partesDaRota();
 
     conteudo.classList.toggle('sem-entrada', redesenhando);
@@ -321,7 +381,7 @@
     if (rota !== 'praticar') CC.fecharPratica();
     if (CC.fecharPopNo) CC.fecharPopNo();
 
-    if (rota === 'propositos') { location.replace('#/novidades/propositos'); return; }
+    if (rota === 'propositos') { CC.substituirRota('#/novidades/propositos'); return; }
     if (rota === '' || rota === 'dia') CC.vistaTrilha(conteudo);
     else if (rota === 'passos' || rota === 'licoes') CC.vistaPassos(conteudo);
     else if (rota === 'praticar') CC.vistaPraticar(conteudo);
@@ -349,9 +409,7 @@
     pintarTopo();
     pintarNavegacao(rota, arg);
 
-    conteudo.querySelectorAll('[data-voltar]').forEach((el) => {
-      el.onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/'; };
-    });
+    ligarVoltarDoTopo(conteudo);
 
     if ((rota === '' || rota === 'dia') && ultimaRota !== rota) {
       requestAnimationFrame(() => CC.rolarAteAtual(false));
