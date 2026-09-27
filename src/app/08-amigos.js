@@ -125,6 +125,21 @@
     if (mural) { mural.ligado = ligado; mural.perguntado = true; }
   }
 
+  // QR Code do convite, para o amigo que está do lado apontar a câmera em vez de receber
+  // mensagem. Gerado aqui mesmo (00-qrcode.js): o link não passa por nenhum serviço de fora.
+  // Fundo sempre branco, também no tema escuro: leitor de QR precisa de contraste claro.
+  CC.qrDoLink = function (link) {
+    try {
+      const q = qrcode(0, 'M');
+      q.addData(link);
+      q.make();
+      return '<div class="qr-convite" role="img" aria-label="QR Code do convite">' + q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }) + '</div>'
+        + '<p class="passo-dica pequena qr-legenda">Quem está do seu lado pode apontar a câmera do celular para o código.</p>';
+    } catch (e) {
+      return '';
+    }
+  };
+
   // ---------- convidar ----------
   // Primeiro pergunta para quem é o convite: o link e o texto mudam, porque um vai para
   // quem já lê a Bíblia com a pessoa e o outro para quem talvez nunca tenha lido nada.
@@ -178,6 +193,7 @@
     // quem ainda está conhecendo Jesus, que chega pelo link, sem conta nenhuma ainda.
     CC.folha('<h2>Convide alguém para ler junto!</h2>'
       + '<p class="mensagem-convite">' + CC.esc(texto) + ' <span>' + CC.esc(link) + '</span></p>'
+      + CC.qrDoLink(link)
       + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Compartilhar convite</button>'
       + '<button class="botao contorno" data-copiar>Copiar link</button></div>'
       + (conhecer ? '' : '<p class="separador"><span>ou pelo @ exato</span></p>'

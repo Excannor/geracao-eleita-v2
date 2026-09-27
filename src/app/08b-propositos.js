@@ -721,6 +721,7 @@
     const texto = textoCelula(p.titulo);
     CC.folha('<h2>Link da ' + CC.esc(comoCelula(p.titulo)) + '</h2>'
       + '<p class="mensagem-convite">' + CC.esc(texto) + ' <span>' + CC.esc(link) + '</span></p>'
+      + CC.qrDoLink(link)
       + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar no grupo</button>'
       + '<button class="botao contorno" data-copiar>Copiar link</button></div>'
       + '<p class="passo-dica pequena">Quem abrir o link entra direto na célula. O link vale por 30 dias.</p>'

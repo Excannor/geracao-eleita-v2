@@ -3011,3 +3011,8 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .arte-trofeu .copa-parte { fill: color-mix(in srgb, var(--cor) 55%, var(--trilho)); }
 /* alvos de toque de pelo menos 44px nos links de ação */
 .praticar-unidade, .acoes-reflexao .link-nota, .estado-dupla .link-nota, .leitura-hoje .novo-na-fe { min-height: 44px; }
+
+/* QR Code do convite: fundo branco nos dois temas (o leitor precisa de contraste claro). */
+.qr-convite { width: min(200px, 64%); margin: 2px auto 0; padding: 10px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px var(--borda); }
+.qr-convite svg { display: block; width: 100%; height: auto; }
+.qr-legenda { text-align: center; margin-top: 6px; }
