@@ -2306,7 +2306,7 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .cabeca-secao { display: flex; align-items: center; gap: 14px; margin: 4px 0 6px; }
 .cabeca-secao h1 { margin: 0 0 2px; }
 .cabeca-secao p { margin: 0; color: var(--tinta-fraca); font-size: 0.95rem; font-weight: 700; }
-.icone-secao { flex: 0 0 auto; display: grid; place-items: center; width: 56px; height: 56px; border-radius: var(--raio-g); background: var(--cor-fraca); color: var(--cor); }
+.icone-secao { flex: 0 0 auto; display: grid; place-items: center; width: 56px; height: 56px; border-radius: var(--raio-g); background: var(--verde-fraco); color: var(--verde); }
 .icone-secao svg { width: 28px; height: 28px; }
 .grade-secoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .bloco-secao {
@@ -2432,7 +2432,10 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 /* a nota lida como texto, sem moldura em volta */
 .nota-artigo { padding: 2px 0 6px; }
 .nota-artigo .nota-corpo > h1:first-child { margin: 4px 0 6px; font-size: 2rem; }
-.nota-artigo .nota-corpo h2 { color: var(--cor, var(--tinta-forte)); }
+/* Um verde só para os subtítulos das notas (antes cada seção tinha a sua cor, e depois da
+   paleta nova sobrou uma mistura de verde e cinza). */
+.nota-artigo .nota-corpo h2 { color: var(--verde-3d); }
+:root[data-tema="escuro"] .nota-artigo .nota-corpo h2 { color: var(--verde); }
 .nota-corpo { font-size: 1.05rem; font-weight: 500; line-height: 1.72; color: var(--tinta); }
 .nota-corpo strong, .nota-corpo b { font-weight: 800; }
 .nota-corpo h1, .nota-corpo h2 { margin-top: 26px; }
