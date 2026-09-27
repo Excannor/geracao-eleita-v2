@@ -103,3 +103,11 @@ Responda com o número e a letra, por exemplo "1a, 2b, 3 manter...".
   - `revisao-telas-a.md`, do revisor de tela A.
 - A revisão de ontem (Pessoas, Temas, Fios, Eventos e Lugares) está em `docs/revisao-explorar-2026-09-26.md`.
 - Commits desta revisão, do mais antigo ao mais novo: `3bcdbbf`, `b0a1293`, `a929c32`, `d8de896`, `f6fb894`, `41600b0`, `78dc03f`, `10deca2`. Cada um pode ser desfeito sozinho.
+
+### Decisões novas da rodada 2 de validação
+21. **Orações com "filho":** "me chamar de filho" e "me chamar de teu filho" (reflexões das unidades 6 e 11). É a linguagem bíblica ("filhos de Deus"), mas uma menina diria "filha". Trocar exige mexer também nas perguntas da mesma reflexão.
+    - a) Manter.
+    - b) Trocar por formas neutras, por exemplo "me chamar para a tua família".
+22. **Aviso da ofensiva:** "Sua chama de {n} dias tá pedindo lenha… Faz a lição antes da meia-noite" ainda soa como pressão.
+    - a) Manter.
+    - b) Suavizar: "Sua chama de {n} dias ainda pode receber lenha hoje."
