@@ -182,7 +182,7 @@
       + atalho('#/config', 'engrenagem', 'Configurações e conta')
       + '</div>'
       + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Precisa conversar com alguém? Fale com alguém de '
-      + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora.</p></div>';
+      + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora. Se for abuso ou violência, ligue <b>100</b>.</p></div>';
 
     const novaCelula = raiz.querySelector('[data-nova-celula]');
     if (novaCelula) novaCelula.onclick = () => CC.novaCelula();
