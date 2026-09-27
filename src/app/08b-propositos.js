@@ -1276,7 +1276,7 @@
           try {
             const r = await CC.api('api/celula', { acao: 'entrar', token, visitante });
             fechar();
-            CC.avisar(r.ja ? 'Você já está nessa célula' : 'Bem-vindo à ' + comoCelula(r.titulo) + '!');
+            CC.avisar(r.ja ? 'Você já está nessa célula' : 'Que bom ter você na ' + comoCelula(r.titulo) + '!');
             irParaCelula(r.id);
           } catch (e) {
             botao.disabled = false;

@@ -196,7 +196,7 @@
         CC.avisar('Foto atualizada');
         CC.redesenhar();
       } catch (e) {
-        CC.avisar(e.message || 'não consegui usar essa imagem');
+        CC.avisar(e.message || 'Não consegui usar essa imagem.');
       }
       arquivo.value = '';
     };
