@@ -52,6 +52,8 @@
     // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
     // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
     conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
+    // Apoiar também mora no Mais: marca o Mais como selecionado, como o Explorar.
+    apoiar: '#/explorar',
     // Perfil e Config não apontam para nenhuma das abas da barra: quem marca o retrato
     // do topo como selecionado é pintarTopo, lendo a rota direto.
     perfil: '#/perfil', config: '#/perfil',
@@ -215,6 +217,7 @@
     itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
     itens.push(itemPainelMais(CC.icoAba('marcador'), true, 'Meus versículos', '', '#/perfil/versiculos'));
     itens.push(itemPainelMais(CC.icoAba('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
+    itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
     document.body.insertAdjacentHTML('beforeend', '<div class="veu-mais"></div><div class="painel-mais" role="dialog" aria-modal="true" aria-label="Mais">' + itens.join('') + '</div>');
     document.querySelector('.veu-mais').onclick = () => fecharPainelMais();
     document.querySelectorAll('[data-ir-mais]').forEach((a) => {
@@ -411,6 +414,7 @@
     else if (rota === 'conhecer') CC.vistaConhecer(conteudo);
     else if (rota === 'perguntas') (arg ? (r) => CC.vistaPergunta(r, arg) : CC.vistaPerguntas)(conteudo);
     else if (rota === 'seguir') CC.vistaSeguir(conteudo);
+    else if (rota === 'apoiar') CC.vistaApoiar(conteudo);
     else if (rota === 'perfil') (PERFIL()[arg] || CC.vistaPerfil)(conteudo);
     else if (rota === 'config') (arg === 'textos' ? CC.vistaTextos : arg === 'notificacoes' ? CC.vistaNotificacoes : arg === 'painel' ? CC.vistaPainel : CC.vistaConfig)(conteudo);
     else CC.vazio(conteudo, 'Página não encontrada.');

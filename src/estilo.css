@@ -3025,3 +3025,11 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .painel-coluna i { display: block; width: 100%; min-height: 2px; border-radius: 4px 4px 0 0; background: var(--verde); }
 .painel-coluna small { font-size: .6rem; font-weight: 800; color: var(--tinta-fraca); }
 .painel-coluna em { font-style: normal; font-size: .52rem; color: var(--tinta-fraca); writing-mode: vertical-rl; transform: rotate(180deg); height: 30px; }
+
+/* ---------- Apoiar o app ---------- */
+.apoiar-item { padding: 12px 14px; }
+.apoiar-pix { border: 2px solid var(--borda); border-radius: var(--raio-g); background: var(--cartao); padding: 14px; margin-bottom: 12px; }
+.apoiar-valores { display: flex; gap: 8px; margin-bottom: 12px; }
+.apoiar-valor { flex: 1; min-width: 0; padding: 12px 0; border: 2px solid var(--borda); border-radius: 12px; background: var(--cartao); color: var(--tinta-forte); font-weight: 700; font-size: 15px; cursor: pointer; }
+.apoiar-valor.sel { border-color: var(--acento); background: var(--acento-fraco); color: var(--acento); }
+.aviso-apoiar { background: var(--acento-fraco); color: var(--tinta-forte); border-radius: 12px; padding: 10px 12px; font-size: 14px; }
