@@ -69,8 +69,19 @@ window.CC = window.CC || {};
 
   // ---------- ícones ----------
   // Traçado aberto, 2.2 de espessura: é o que dá o ar de aplicativo e não de documento.
-  const PREENCHIDOS = { chama: 1, coroa: 1, estrela: 1, raio: 1 };
+  const PREENCHIDOS = { chama: 1, coroa: 1, estrela: 1, raio: 1, pegadas: 1 };
   const P = {
+    // conquistas: um desenho por conceito, no mesmo traço (28/09/2026)
+    'dia-visto': '<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="m8.5 15 2.5 2.5 4.5-4.5"/>',
+    'estante': '<path d="M2.5 21h19"/><rect x="4.5" y="6" width="3.5" height="15" rx=".8"/><rect x="9.5" y="3.5" width="3.5" height="17.5" rx=".8"/><path d="m15 8.2 3.2-1 3.6 13.1-3.2 1z"/>',
+    'pegadas': '<path d="M6.6 23C4.2 23 3 20.4 3 17.2S4.5 10.8 6.9 10.8 10.4 13.6 10.4 17 9 23 6.6 23z"/><circle cx="3.9" cy="7.9" r="1.25"/><circle cx="6.5" cy="6.8" r="1.25"/><circle cx="9.1" cy="7.5" r="1.25"/><path d="M17.4 16.4c-2.4 0-3.6-2.6-3.6-5.8s1.5-6.4 3.9-6.4S21.2 7 21.2 10.4s-1.4 6-3.8 6z"/><circle cx="14.7" cy="1.3" r="1.25"/><circle cx="17.3" cy="1.2" r="1.25"/><circle cx="19.9" cy="1.5" r="1.25"/>',
+    'cartoes': '<rect x="7" y="3" width="14" height="13" rx="2"/><path d="M3.5 7.5V19a2 2 0 0 0 2 2H17"/><path d="M11 8h6M11 11.5h4"/>',
+    'lista-visto': '<path d="M10 6h11M10 12h11M10 18h11"/><path d="m3 6 1.6 1.6L7.5 4.7M3 12l1.6 1.6 2.9-2.9M3 18l1.6 1.6 2.9-2.9"/>',
+    'bau': '<path d="M3.5 11V8.5a4.5 4.5 0 0 1 4.5-4.5h8a4.5 4.5 0 0 1 4.5 4.5V11"/><rect x="3" y="11" width="18" height="9.5" rx="1.5"/><path d="M10.5 11v3.5h3V11"/>',
+    'semana': '<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><rect x="7" y="12" width="3.6" height="3" rx=".6" fill="currentColor"/><rect x="13.4" y="12" width="3.6" height="3" rx=".6" fill="currentColor"/><rect x="7" y="16.3" width="3.6" height="3" rx=".6" fill="currentColor"/><rect x="13.4" y="16.3" width="3.6" height="3" rx=".6" fill="currentColor"/>',
+    'broto': '<path d="M4 21h16"/><path d="M7.5 21v-4.5h9V21"/><path d="M12 16.5V9.5"/><path d="M12 11c0-3.3 2.2-5.5 5.5-5.5 0 3.3-2.2 5.5-5.5 5.5z"/><path d="M12 13c0-2.6-1.8-4.3-4.3-4.3 0 2.6 1.8 4.3 4.3 4.3z"/>',
+    'marca-texto': '<path d="m14.5 3.5 6 6-8.5 8.5h-4v-4z"/><path d="m12 6 6 6"/><path d="M3 21h9" stroke-width="3.2"/>',
+    'caderno': '<rect x="5.5" y="2.5" width="14" height="19" rx="2"/><path d="M3 7h4.5M3 12h4.5M3 17h4.5"/><path d="M10.5 8h5.5M10.5 12h5.5M10.5 16h3"/>',
     trilha: '<path d="M1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6z"/><path d="M8 2v16"/><path d="M16 6v16"/>',
     bandeira: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>',
     bussola: '<circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/>',
@@ -121,7 +132,7 @@ window.CC = window.CC || {};
     estrela: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8 5.8 21l1.2-6.9-5-4.9 6.9-1z"/>',
   };
 
-  const CAIXAS = { chama: '0 0 16 16' };
+  const CAIXAS = { chama: '0 0 16 16', pegadas: '0 -1 24 25' };
 
   CC.ico = (nome, extra) => {
     const d = P[nome];

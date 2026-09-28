@@ -115,7 +115,7 @@
     const ritmo = CC.ritmo();
     const conquistas = CC.conquistasComNivel();
     const trofeus = CC.trofeus();
-    const todos = [...trofeus.unidades, ...trofeus.colecoes, ...(trofeus.desafios || [])];
+    const todos = [...trofeus.unidades, ...trofeus.colecoes, ...(trofeus.desafios || []), ...(trofeus.testamentos || [])];
     const ganhos = todos.filter((t) => t.ganho);
 
     // Visão geral: quatro números em grade simples, sem cartão colorido em volta de cada um
@@ -231,6 +231,8 @@
   CC.vistaTrofeus = function (raiz) {
     const t = CC.trofeus();
     raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Troféus</h1>'
+      + CC.tituloSecao('A Bíblia toda', t.testamentos.filter((x) => x.ganho).length + ' de ' + t.testamentos.length)
+      + '<div class="estante">' + t.testamentos.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Unidades do plano', t.unidades.filter((x) => x.ganho).length + ' de ' + t.unidades.length)
       + '<div class="estante">' + t.unidades.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Partes da Bíblia', t.colecoes.filter((x) => x.ganho).length + ' de ' + t.colecoes.length)

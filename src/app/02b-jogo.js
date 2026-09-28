@@ -218,28 +218,58 @@
     { id: 'chama', titulo: 'Chama acesa', icone: 'chama', cor: 'vermelho', niveis: [3, 7, 30, 100, 365],
       texto: (n) => 'Chegue a ' + n + ' dias de ofensiva',
       valor: (e, hoje) => CC.simularOfensiva(CC.datasFeitas(e), hoje).recorde },
-    { id: 'leitor', titulo: 'Todo dia na Palavra', icone: 'marcador', cor: 'verde', niveis: [10, 50, 100, 200, 365],
+    { id: 'leitor', titulo: 'Todo dia na Palavra', icone: 'dia-visto', cor: 'verde', niveis: [10, 50, 100, 200, 365],
       texto: (n) => 'Leia ' + n + ' dias do plano', valor: (e) => e.lidos.length },
     { id: 'capitulos', titulo: 'Página a página', icone: 'folha', cor: 'azul', niveis: [50, 200, 500, 900, 1189],
       texto: (n) => 'Leia ' + n + ' capítulos', valor: (e) => CC.capitulosLidos(e) },
-    { id: 'livros', titulo: 'Estante', icone: 'livro', cor: 'turquesa', niveis: [1, 5, 20, 40, 66],
+    { id: 'livros', titulo: 'Estante', icone: 'estante', cor: 'turquesa', niveis: [1, 5, 20, 40, 66],
       texto: (n) => (n === 1 ? 'Termine um livro da Bíblia' : 'Termine ' + n + ' livros'), valor: (e) => livrosCompletosDe(e) },
-    { id: 'passos', titulo: 'Alicerce', icone: 'bandeira', cor: 'roxo', niveis: [1, 4, 8, 12],
+    { id: 'passos', titulo: 'Primeiros passos', icone: 'pegadas', cor: 'roxo', niveis: [1, 4, 8, 12],
       texto: (n) => (n === 1 ? 'Leia o primeiro dos Primeiros passos' : 'Leia ' + n + ' dos Primeiros passos'), valor: (e) => e.licoes.length },
-    { id: 'memoria', titulo: 'Memória', icone: 'alvo', cor: 'vermelho', niveis: [10, 50, 150, 400, 1000],
+    { id: 'memoria', titulo: 'Memória', icone: 'cartoes', cor: 'vermelho', niveis: [10, 50, 150, 400, 1000],
       texto: (n) => 'Acerte ' + n + ' perguntas no Praticar', valor: (e) => e.acertosTotal || 0 },
     { id: 'proposito', titulo: 'Lado a lado', icone: 'pessoas', cor: 'azul', niveis: [3, 7, 30, 100, 365],
       texto: (n) => 'Chegue a ' + n + ' dias num propósito dos amigos', valor: (e) => e.maiorProposito || 0 },
-    { id: 'missoes', titulo: 'Dia após dia', icone: 'estrela', cor: 'amarelo', niveis: [5, 25, 100, 250, 500],
+    { id: 'missoes', titulo: 'Dia após dia', icone: 'lista-visto', cor: 'amarelo', niveis: [5, 25, 100, 250, 500],
       texto: (n) => 'Complete ' + n + ' desafios', valor: (e) => e.missoesTotal || 0 },
     // O id segue 'cartas' de propósito: quem já tinha nível guardado em conquistasGanhas
     // não perde o que conquistou. O que mudou foi o que se junta — versículos, não cartas.
     // Os níveis acompanham o ano: são 52 baús, um a cada sete dias.
-    { id: 'cartas', titulo: 'Versículos guardados', icone: 'marcador', cor: 'amarelo', niveis: [3, 10, 26, 52],
+    { id: 'cartas', titulo: 'Versículos guardados', icone: 'bau', cor: 'amarelo', niveis: [3, 10, 26, 52],
       texto: (n) => 'Guarde ' + n + ' versículos nos baús', valor: (e) => CC.versiculosGuardados(e).length },
     { id: 'explorador', titulo: 'Explorador', icone: 'bussola', cor: 'roxo', niveis: [5, 20, 60, 150],
       texto: (n) => 'Abra ' + n + ' notas de estudo', valor: (e) => (e.notasVistas || []).length },
+    // Constância, não sequência perfeita: semanas (segunda a domingo) com 4 dias ou mais de leitura.
+    { id: 'semanas', titulo: 'Semanas na Palavra', icone: 'semana', cor: 'verde', niveis: [4, 12, 26, 52],
+      texto: (n) => 'Leia 4 dias ou mais em ' + n + ' semanas', valor: (e) => semanasNaPalavra(e) },
+    // Voltar depois de uma pausa merece festa, não culpa (Lm 3.22-23).
+    { id: 'recomeco', titulo: 'Recomeço', icone: 'broto', cor: 'verde', niveis: [1, 3, 10],
+      texto: (n) => (n === 1 ? 'Volte a ler depois de uma pausa' : 'Volte a ler depois de ' + n + ' pausas'), valor: (e) => recomecos(e) },
+    { id: 'marcas', titulo: 'Marca-texto', icone: 'marca-texto', cor: 'amarelo', niveis: [5, 25, 100, 300],
+      texto: (n) => 'Marque ' + n + ' versículos', valor: (e) => Object.values(e.marcas || {}).filter((m) => m && m.cor).length },
+    // Conta só quantas notas existem; o texto nunca é lido aqui.
+    { id: 'notas', titulo: 'Caderno de notas', icone: 'caderno', cor: 'azul', niveis: [5, 25, 100],
+      texto: (n) => 'Escreva nota em ' + n + ' versículos',
+      valor: (e) => Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
   ];
+
+  // Semana de segunda a domingo, pela data da segunda-feira.
+  function segundaDe(iso) {
+    const d = new Date(iso + 'T12:00:00Z');
+    return CC.somaDias(iso, -((d.getUTCDay() + 6) % 7));
+  }
+  function semanasNaPalavra(e) {
+    const porSemana = new Map();
+    for (const d of CC.datasFeitas(e)) { const s = segundaDe(d); porSemana.set(s, (porSemana.get(s) || 0) + 1); }
+    return [...porSemana.values()].filter((n) => n >= 4).length;
+  }
+  // Quantas vezes a pessoa leu de novo depois de ficar 2 dias ou mais sem ler.
+  function recomecos(e) {
+    const datas = [...CC.datasFeitas(e)].sort();
+    let n = 0;
+    for (let i = 1; i < datas.length; i++) if (datas[i] > CC.somaDias(datas[i - 1], 2)) n++;
+    return n;
+  }
 
   CC.conquistasComNivel = (e, hoje) => {
     e = est(e);
@@ -287,7 +317,19 @@
     });
     // Desafios de vários dias (09c-desafios.js): um troféu por desafio concluído.
     const desafios = (CC.DESAFIOS || []).map((d) => { const s = CC.situacaoDesafio(d, e); return { tipo: 'desafio', titulo: d.titulo, feitos: s.vencidos, total: d.dias, ganho: s.concluido }; });
-    return { colecoes, unidades, desafios };
+    // Testamentos: as cinco primeiras partes são o Antigo, as outras o Novo.
+    const livrosDe = (lista) => lista.flatMap(([, livros]) => livros);
+    const testamento = (titulo, livros) => {
+      const feitos = livros.filter((l) => CC.livroCompletoEm(l, e)).length;
+      return { tipo: 'testamento', titulo, feitos, total: livros.length, ganho: feitos === livros.length };
+    };
+    const testamentos = [
+      testamento('Antigo Testamento', livrosDe(CC.COLECOES.slice(0, 5))),
+      testamento('Novo Testamento', livrosDe(CC.COLECOES.slice(5))),
+      testamento('Bíblia inteira', livrosDe(CC.COLECOES)),
+      { tipo: 'plano', titulo: 'Plano de um ano', feitos: lidos.size, total: 365, ganho: lidos.size >= 365 },
+    ];
+    return { colecoes, unidades, desafios, testamentos };
   };
 
   // ---------- novidades: o que o servidor confere ----------
