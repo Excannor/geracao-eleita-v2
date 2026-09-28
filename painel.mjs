@@ -183,7 +183,7 @@ export function montarPainel({
 
   // Desafios de vários dias, um por um: quantos começaram, venceram, seguem, estão parados
   // (ativos sem vencer nenhum dia na última semana) ou pausaram; e em que dia param.
-  const DESAFIOS = { 'sem-redes-21': ['21 dias sem redes sociais', 21], 'celular-cama-7': ['7 dias sem celular na cama', 7] };
+  const DESAFIOS = { 'sem-redes-21': ['21 dias sem redes sociais', 21], 'celular-cama-7': ['7 dias sem celular na cama', 7], 'gratidao-14': ['14 dias de gratidão', 14], 'sem-reclamar-30': ['30 dias sem reclamar', 30] };
   const desafios = Object.entries(DESAFIOS).map(([id, [titulo, total]]) => {
     const regs = pessoas.map((p) => p.registrosDesafio[id]).filter(Boolean);
     const vencidos = (r) => new Set(r.dias || []).size;
