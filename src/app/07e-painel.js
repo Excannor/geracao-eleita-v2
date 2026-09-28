@@ -27,6 +27,20 @@
   }
   const diaMes = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
 
+  // Um número grande com a comparação da semana anterior (texto, não só cor).
+  function cartaoResumo(rotulo, par) {
+    const d = par.agora - par.antes;
+    const seta = d > 0 ? '▲ ' + d : d < 0 ? '▼ ' + Math.abs(d) : 'igual';
+    return '<div class="painel-cartao"><strong>' + par.agora + '</strong><span>' + CC.esc(rotulo) + '</span>'
+      + '<small class="' + (d > 0 ? 'sobe' : d < 0 ? 'desce' : '') + '">' + seta + ' <em>vs. semana anterior (' + par.antes + ')</em></small></div>';
+  }
+  function atualizado(iso) {
+    if (!iso) return 'agora';
+    const min = Math.floor((Date.now() - Date.parse(iso)) / 60000);
+    const hora = new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return min < 1 ? 'agora há pouco, às ' + hora : 'às ' + hora + ' (há ' + min + ' min)';
+  }
+
   const quando = (iso) => new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
   // Fase 5, seção 2: células e cuidado, agregados. Sem nome nenhum, e sem contador de gerações.
@@ -61,7 +75,13 @@
     const pedidos = p.pedidosDeSenha || [];
     raiz.innerHTML = CC.botaoVoltar('Perfil')
       + '<h1>Painel do administrador</h1>'
-      + '<p class="passo-dica">Só números, sem nomes. Atualizado agora (' + CC.esc(p.hoje.split('-').reverse().join('/')) + ').</p>'
+      + '<p class="passo-dica">Só números, sem nomes. Calculado ' + CC.esc(atualizado(p.geradoEm)) + ', em ' + CC.esc(p.hoje.split('-').reverse().join('/')) + '.</p>'
+      + (p.detalhe && p.detalhe.resumo ? '<div class="painel-resumo">'
+        + cartaoResumo('abriram o app', p.detalhe.resumo.abriram) + cartaoResumo('leram', p.detalhe.resumo.leram)
+        + cartaoResumo('contas novas', p.detalhe.resumo.novas)
+        + (p.retorno[1] && p.retorno[1].pct !== null ? '<div class="painel-cartao"><strong>' + p.retorno[1].pct + '%' : '<div class="painel-cartao"><strong class="texto">ainda sem dado') + '</strong><span>voltaram depois de 7 dias</span>'
+        + '<small><em>' + (p.retorno[1] ? p.retorno[1].voltaram + ' de ' + p.retorno[1].elegiveis + ' contas' : '') + '</em></small></div>'
+        + '</div>' : '')
       + grupo('Senha esquecida',
         (pedidos.length
           ? pedidos.map((x) => '<div class="linha-config sem-toque"><span>@' + CC.esc(x.usuario) + ' <small class="valor">' + quando(x.em) + '</small></span>'
@@ -84,7 +104,10 @@
         + grupo('Funil da leitura', barras(p.detalhe.funil), 'De todas as contas, quantas chegaram a cada marca de dias lidos.')
         + grupo('Ofensivas de agora', barras(p.detalhe.ofensivas))
         + grupo('Dia da semana em que mais se lê', barras(p.detalhe.diasDaSemana), 'Soma das leituras dos últimos 30 dias.')
-        + grupo('Uso das funções', barras(p.detalhe.funcoes)) : '')
+        + grupo('Uso das funções', barras(p.detalhe.funcoes))
+        + (p.detalhe.origens ? grupo('De onde vêm e quanto ficam', p.detalhe.origens.map((o) => numero(o.faixa,
+          o.contas ? o.contas + (o.contas === 1 ? ' conta' : ' contas') + ' · ' + o.pct + '% leram nos últimos 30 dias' : 'nenhuma conta')).join(''),
+          'Contas antigas sem registro de origem entram por dedução: convite de amigo, conhecendo Jesus ou cadastro direto.') : '') : '')
       + grupo('Voltaram depois de criar a conta',
         p.retorno.map((r) => numero(r.dias === 1 ? 'Depois de 1 dia' : 'Depois de ' + r.dias + ' dias', porcento(r))).join(''),
         'É a pergunta "o hábito pegou?". Conta quem leu de novo a partir desse dia, entre as contas com idade para isso.')

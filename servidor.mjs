@@ -823,11 +823,13 @@ const servidor = createServer(async (req, res) => {
         // Conta criada pelo link de uma célula: entra direto no grupo. Célula cheia ou link
         // vencido não impedem a conta; o app avisa depois, ao abrir.
         let celula = '';
+        const marcarOrigem = (origem) => CONTAS.marcarOrigem(criada.usuario, origem).catch(() => {});
         if (pedido.celula) {
           try {
             const hoje = hojeDe(criada.usuario);
             const r = await CONTAS.entrarNaCelula(criada.usuario, String(pedido.celula), assinar, hoje, Date.now(), { contaNova: true, visitante: !!pedido.celulaVisitante });
             celula = r.proposito.titulo;
+            await marcarOrigem('celula');
             await avisarEntradaNaCelula(criada.usuario, r, hoje);
           } catch { /* segue sem a célula */ }
         }
@@ -987,6 +989,7 @@ const servidor = createServer(async (req, res) => {
       }
       const painel = {
         ...cachePainel.painel,
+        geradoEm: new Date(cachePainel.em).toISOString(),
         pedidosDeSenha: pedidosDeSenha().map((p) => ({ usuario: p.usuario, em: new Date(p.em).toISOString() })),
         emailLigado: !!EMAIL,
       };

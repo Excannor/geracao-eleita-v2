@@ -34,6 +34,8 @@ export function montarPainel({
     return {
       criadaEm: c.criadaEm || datas[0] || hoje,
       acessos: new Set(c.acessos || []),
+      // Contas antigas não têm origem gravada: deduz pelo que ficou anotado no convite.
+      origem: c.origem || (c.acompanhadoPor ? 'conhecer' : c.convidadoPor ? 'convite' : 'direto'),
       datas,
       diasLidos: (e.lidos || []).length,
       passos: (e.licoes || []).length,
@@ -153,8 +155,25 @@ export function montarPainel({
     { faixa: 'Leram 90 dias', contas: pessoas.filter((p) => p.diasLidos >= 90).length },
   ];
   const ativos30 = pessoas.filter((p) => p.ultima && p.ultima > desde(30));
+
+  // Resumo do topo: esta semana (últimos 7 dias) contra a anterior (8 a 14 dias atrás).
+  const naJanela = (datas, de, ate) => [...datas].some((d) => d > desde(de) && d <= desde(ate));
+  const semana = (conta) => ({ agora: conta(7, 0), antes: conta(14, 7) });
+  const resumo = {
+    abriram: semana((de, ate) => pessoas.filter((p) => naJanela(p.acessos, de, ate)).length),
+    leram: semana((de, ate) => pessoas.filter((p) => naJanela(p.datas, de, ate)).length),
+    novas: semana((de, ate) => pessoas.filter((p) => p.criadaEm > desde(de) && p.criadaEm <= desde(ate)).length),
+  };
+
+  // De onde vêm e quanto ficam: por origem, quantas contas e quantas leram nos últimos 30 dias.
+  const NOMES_ORIGEM = { convite: 'Convite de amigo', celula: 'Link de célula', conhecer: 'Conhecendo Jesus', direto: 'Cadastro direto' };
+  const origens = Object.entries(NOMES_ORIGEM).map(([chave, faixa]) => {
+    const grupo = pessoas.filter((p) => p.origem === chave);
+    const ficaram = grupo.filter((p) => p.ultima && p.ultima > desde(30)).length;
+    return { faixa, contas: grupo.length, ficaram, pct: pct(ficaram, grupo.length) };
+  });
   const detalhe = {
-    porDia, novasPorSemana, ofensivas, diasDaSemana, funil,
+    porDia, novasPorSemana, ofensivas, diasDaSemana, funil, resumo, origens,
     mediaDiasLidos: ativos30.length ? Math.round(ativos30.reduce((s2, p) => s2 + p.diasLidos, 0) / ativos30.length) : 0,
     maiorOfensiva: ofensiva.length ? Math.max(...ofensiva) : 0,
     funcoes: [

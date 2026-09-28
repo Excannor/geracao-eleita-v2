@@ -779,6 +779,14 @@ export class Contas {
     return conta;
   }
 
+  // Por onde a conta chegou (convite, conhecer, celula, direto): só para o painel agregado.
+  async marcarOrigem(usuario, origem) {
+    const a = this.achar(usuario);
+    if (!a || a.origem) return;
+    a.origem = origem;
+    await this.salvar();
+  }
+
   // Dia em que a conta abriu o app, para o painel medir quem abre (e não só quem lê). Grava
   // no máximo uma vez por dia e guarda só os últimos 90 dias, sem hora nem tela.
   async anotarAcesso(usuario, hoje) {
