@@ -779,6 +779,16 @@ export class Contas {
     return conta;
   }
 
+  // Dia em que a conta abriu o app, para o painel medir quem abre (e não só quem lê). Grava
+  // no máximo uma vez por dia e guarda só os últimos 90 dias, sem hora nem tela.
+  async anotarAcesso(usuario, hoje) {
+    const a = this.achar(usuario);
+    if (!a || (a.acessos && a.acessos.at(-1) === hoje)) return;
+    const corte = somaDias(hoje, -90);
+    a.acessos = (a.acessos || []).filter((d) => d > corte && d < hoje).concat(hoje);
+    await this.salvar();
+  }
+
   // "Quero conversar com alguém": só quem está sendo acompanhado, e no máximo um pedido
   // por dia, mesmo que a pessoa toque o botão de novo.
   async pedirConversa(usuario, hoje) {

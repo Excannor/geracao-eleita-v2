@@ -399,6 +399,7 @@ function donoDoLink(token) {
 const EMAIL = configDoEmail();
 const ADMINS = String(process.env.CAMINHO_ADMIN || '').split(',').map((u) => limparNome(u)).filter(Boolean);
 const ehAdmin = (usuario) => ADMINS.includes(usuario);
+let cachePainel = null;
 function pedidosDeSenha() {
   let lista = [];
   try { lista = JSON.parse(lerMeta(DB, 'pedidos_senha') || '[]'); } catch { /* lista vazia */ }
@@ -921,6 +922,8 @@ const servidor = createServer(async (req, res) => {
       }
     }
 
+    if (eu && rota.startsWith('/api/')) await CONTAS.anotarAcesso(eu, hojeDe(eu)).catch(() => {});
+
     // Mais de 120 mudanças por minuto, ou 30 buscas de @, não é gente usando o app.
     if (rota.startsWith('/api/') && mudaAlgo && !dentroDoLimite('api:' + eu, 120)) { json(res, 429, MUITAS); return; }
     if (rota === '/api/procurar' && !dentroDoLimite('procurar:' + eu, 30)) { json(res, 429, MUITAS); return; }
@@ -964,19 +967,29 @@ const servidor = createServer(async (req, res) => {
         json(res, 200, { link: linkDeSenha(alvo.usuario), usuario: alvo.usuario, validade: '1 hora' });
         return;
       }
-      const estados = {};
-      for (const c of CONTAS.lista()) estados[c.usuario] = (await lerEstado(arquivoDe(c.usuario))) || {};
-      const painel = montarPainel({
-        contas: CONTAS.lista(),
-        estados,
-        propositos: Object.values(CONTAS.dados.propositos || {}),
-        comPush: NOTIFICACOES.comInscricao(),
-        hoje: hojeDe(eu),
-        pedidos: Object.values(CONTAS.dados.pedidos || {}),
-        discipulados: Object.values(CONTAS.dados.discipulados || {}),
-      });
-      painel.pedidosDeSenha = pedidosDeSenha().map((p) => ({ usuario: p.usuario, em: new Date(p.em).toISOString() }));
-      painel.emailLigado = !!EMAIL;
+      // Um minuto de cache nos números (reler todos os estados pesa no Pi); os pedidos de senha
+      // e o e-mail são lidos na hora, porque mudam quando o dono gera um link.
+      if (!cachePainel || Date.now() - cachePainel.em >= 60000) {
+        const estados = {};
+        await Promise.all(CONTAS.lista().map(async (c) => { estados[c.usuario] = (await lerEstado(arquivoDe(c.usuario))) || {}; }));
+        cachePainel = {
+          em: Date.now(),
+          painel: montarPainel({
+            contas: CONTAS.lista(),
+            estados,
+            propositos: Object.values(CONTAS.dados.propositos || {}),
+            comPush: NOTIFICACOES.comInscricao(),
+            hoje: hojeDe(eu),
+            pedidos: Object.values(CONTAS.dados.pedidos || {}),
+            discipulados: Object.values(CONTAS.dados.discipulados || {}),
+          }),
+        };
+      }
+      const painel = {
+        ...cachePainel.painel,
+        pedidosDeSenha: pedidosDeSenha().map((p) => ({ usuario: p.usuario, em: new Date(p.em).toISOString() })),
+        emailLigado: !!EMAIL,
+      };
       json(res, 200, painel);
       return;
     }

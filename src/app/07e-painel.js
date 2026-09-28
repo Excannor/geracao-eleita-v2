@@ -76,6 +76,8 @@
         + numero('Novas nos últimos 30 dias', p.contas.novas30))
       + grupo('Quem está lendo', numero('Leram hoje', p.ativos.hoje) + numero('Nos últimos 7 dias', p.ativos.dias7)
         + numero('Nos últimos 30 dias', p.ativos.dias30))
+      + (p.abriram ? grupo('Quem abriu o app', numero('Hoje', p.abriram.hoje) + numero('Nos últimos 7 dias', p.abriram.dias7)
+        + numero('Nos últimos 30 dias', p.abriram.dias30)) : '')
       + (p.detalhe ? grupo('Leituras por dia (últimos 30 dias)', colunas(p.detalhe.porDia, (x) => diaMes(x.dia)),
         'Quantas pessoas leram em cada dia. Média de ' + p.detalhe.mediaDiasLidos + ' dias lidos por quem leu no último mês; maior ofensiva hoje: ' + p.detalhe.maiorOfensiva + ' dias.')
         + grupo('Contas novas por semana', colunas(p.detalhe.novasPorSemana, (x) => diaMes(x.de)))

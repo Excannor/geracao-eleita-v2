@@ -33,6 +33,7 @@ export function montarPainel({
     const datas = [...datasFeitas(e)].sort();
     return {
       criadaEm: c.criadaEm || datas[0] || hoje,
+      acessos: new Set(c.acessos || []),
       datas,
       diasLidos: (e.lidos || []).length,
       passos: (e.licoes || []).length,
@@ -48,6 +49,7 @@ export function montarPainel({
   });
   const desde = (dias) => somaDias(hoje, -dias);
   const ativosEm = (dias) => pessoas.filter((p) => p.ultima && p.ultima > desde(dias)).length;
+  const abriramEm = (dias) => pessoas.filter((p) => [...p.acessos].some((d) => (dias ? d > desde(dias) : d === hoje))).length;
 
   // Retorno: das contas com idade para isso, quantas leram de novo N dias depois de criadas
   // ou mais tarde. É a pergunta "o hábito pegou?", não "leu naquele dia exato".
@@ -123,7 +125,7 @@ export function montarPainel({
   // Quantas pessoas leram em cada um dos últimos 30 dias (do mais antigo para hoje).
   const porDia = Array.from({ length: 30 }, (_, i) => {
     const dia = desde(29 - i);
-    return { dia, contas: conjuntos.filter((c) => c.has(dia)).length };
+    return { dia, contas: conjuntos.filter((c) => c.has(dia)).length, abriram: pessoas.filter((p) => p.acessos.has(dia)).length };
   });
   // Contas novas por semana, nas últimas 8 semanas (a última é a atual).
   const novasPorSemana = Array.from({ length: 8 }, (_, i) => {
@@ -173,6 +175,8 @@ export function montarPainel({
       novas30: pessoas.filter((p) => p.criadaEm > desde(30)).length,
     },
     ativos: { hoje: pessoas.filter((p) => p.ultima === hoje).length, dias7: ativosEm(7), dias30: ativosEm(30) },
+    // Quem abriu o app, leia ou não (o registro de acesso começou em 28/09/2026).
+    abriram: { hoje: abriramEm(0), dias7: abriramEm(7), dias30: abriramEm(30) },
     retorno,
     progresso: contarFaixas(pessoas),
     ondeParam: { total: parados.length, faixas: contarFaixas(parados) },
