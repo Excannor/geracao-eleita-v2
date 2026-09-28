@@ -1645,13 +1645,9 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
    (conferido em ferramentas/contraste.mjs). Três classes, não duas: para vencer a regra acima
    sem depender da ordem no arquivo. */
 .retrato-amigo.inicial.retrato-cor-verde { background: var(--verde-fraco); color: var(--verde-3d); }
-.retrato-amigo.inicial.retrato-cor-azul { background: var(--azul-fraco); color: var(--azul-3d); }
 .retrato-amigo.inicial.retrato-cor-roxo { background: var(--roxo-fraco); color: var(--roxo-3d); }
-.retrato-amigo.inicial.retrato-cor-amarelo { background: var(--amarelo-fraco); color: var(--amarelo-3d); }
 .retrato-amigo.inicial.retrato-cor-vermelho { background: var(--vermelho-fraco); color: var(--vermelho-3d); }
 :root[data-tema="escuro"] .retrato-amigo.inicial.retrato-cor-verde { color: var(--verde); }
-:root[data-tema="escuro"] .retrato-amigo.inicial.retrato-cor-azul { color: var(--azul); }
-:root[data-tema="escuro"] .retrato-amigo.inicial.retrato-cor-amarelo { color: var(--amarelo); }
 .retrato-amigo.mini { width: 30px; height: 30px; font-size: 0.8rem; border-width: 2px; border-color: var(--cartao); }
 .retrato-amigo.pequeno { width: 32px; height: 32px; font-size: 0.85rem; }
 .retrato-amigo.medio { width: 42px; height: 42px; font-size: 1rem; }
@@ -1727,11 +1723,6 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 
 /* ---------- célula: líder, recado, encontro e estudo ---------- */
 /* A célula no Juntos: cartão próprio, com a cor de acento, acima dos propósitos. */
-.cartao-celula { border-color: color-mix(in srgb, var(--acento) 55%, var(--borda)); box-shadow: inset 4px 0 0 var(--acento); }
-.cartao-celula:hover { border-color: var(--acento); }
-.cartao-celula.vazia { margin: 4px 0 8px; cursor: default; }
-.cartao-celula.vazia .botao { margin: 2px 0 0; }
-.cartao-celula.vazia .passo-dica { margin: 0; }
 .etiqueta-celula { display: flex; align-items: center; gap: 6px; color: var(--acento); font-size: 0.78rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
 .etiqueta-celula svg { flex: 0 0 auto; width: 16px; height: 16px; }
 .etiqueta-celula small { margin-left: auto; color: var(--tinta-fraca); font-size: 0.78rem; font-weight: 800; letter-spacing: 0; text-transform: none; }
@@ -1745,19 +1736,9 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .painel-celula { display: grid; gap: 4px; }
 .painel-celula > .acoes { margin-top: 18px; }
 .botao-selo { justify-self: start; border: 0; font: inherit; cursor: pointer; }
-.cartao-celula .recado-cartao { display: block; border-left: 3px solid var(--acento); }
-.cartao-celula .recado-cartao span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.cartao-celula .recado-cartao b { color: var(--tinta-forte); }
 .lista-propositos + .convidar-largo { margin-top: 2px; }
 
 /* O recado do líder no feed: faixa da célula em cima e fundo de acento, diferente dos marcos. */
-.item-mural.item-recado { margin: 14px 0; padding: 14px 16px; border: 0; border-left: 4px solid var(--acento); border-radius: var(--raio-g); background: var(--acento-fraco); }
-.faixa-recado { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; color: var(--acento); font-size: 0.82rem; font-weight: 800; }
-.faixa-recado svg { flex: 0 0 auto; width: 16px; height: 16px; }
-.faixa-recado b { color: var(--tinta-forte); }
-.texto-recado { margin: 10px 0 12px; color: var(--tinta-forte); font-size: 1.05rem; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
-.item-recado .botao { width: auto; }
-.item-recado .botao svg { width: 16px; height: 16px; }
 
 .selo-lider { margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--azul-fraco); color: var(--acento); font-size: 0.7rem; font-weight: 800; vertical-align: middle; }
 .recado-lider { margin: 10px 0; padding: 12px 14px; border-left: 4px solid var(--acento); border-radius: var(--raio-p); background: var(--fundo-2); }
@@ -2063,8 +2044,8 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
   place-content: center;
   justify-items: center;
   gap: 22px;
-  /* o fundo do próprio app, e não mais o vermelho que destoava da paleta */
-  background: #fdfbf5;
+  /* o mesmo preto do ícone do app (#0b0b0b), nos dois temas: a abertura fica igual ao ícone */
+  background: #0b0b0b;
   transition: opacity .35s ease, visibility .35s ease;
 }
 .abertura.saindo { opacity: 0; visibility: hidden; }
@@ -2072,32 +2053,18 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
   width: 108px;
   height: auto;
   display: block;
-  color: #1c1812;
+  color: #f6f1e6;
   animation: simbolo-respira 2.4s ease-in-out infinite;
 }
 @keyframes simbolo-respira {
   0%, 100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-8px) scale(1.02); }
 }
-.abertura-marca { font-family: var(--fonte-destaque); font-size: 1.4rem; font-weight: 600; color: #1c1812; letter-spacing: 0.06em; text-transform: uppercase; }
-.abertura-erro { margin: 18px 24px 0; color: var(--tinta); font-weight: 700; text-align: center; line-height: 1.5; }
+.abertura-marca { font-family: var(--fonte-destaque); font-size: 1.4rem; font-weight: 600; color: #f6f1e6; letter-spacing: 0.06em; text-transform: uppercase; }
+.abertura-erro { margin: 18px 24px 0; color: #f6f1e6; font-weight: 700; text-align: center; line-height: 1.5; }
 .abertura-erro button { margin-top: 10px; padding: 10px 18px; border: 2px solid currentColor; border-radius: 999px; background: none; color: inherit; font: inherit; cursor: pointer; }
-.abertura-barra { width: 150px; height: 8px; border-radius: 999px; background: #e3f5ee; overflow: hidden; }
-.abertura-barra i { display: block; height: 100%; width: 40%; border-radius: 999px; background: #18a877; animation: abertura-corre 1.1s ease-in-out infinite; }
-/* No escuro, as cores do tema escuro do app. Vale o tema escolhido e, sem escolha, o do
-   sistema: a abertura aparece antes de o aplicativo aplicar o tema. */
-:root[data-tema="escuro"] .abertura { background: #15110b; }
-:root[data-tema="escuro"] .abertura-simbolo svg { color: #f6f1e6; }
-:root[data-tema="escuro"] .abertura-marca { color: #f6f1e6; }
-:root[data-tema="escuro"] .abertura-barra { background: #16362b; }
-:root[data-tema="escuro"] .abertura-barra i { background: #3ecf8e; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema]) .abertura { background: #15110b; }
-  :root:not([data-tema]) .abertura-simbolo svg { color: #f6f1e6; }
-  :root:not([data-tema]) .abertura-marca { color: #f6f1e6; }
-  :root:not([data-tema]) .abertura-barra { background: #16362b; }
-  :root:not([data-tema]) .abertura-barra i { background: #3ecf8e; }
-}
+.abertura-barra { width: 150px; height: 8px; border-radius: 999px; background: #1f2a2a; overflow: hidden; }
+.abertura-barra i { display: block; height: 100%; width: 40%; border-radius: 999px; background: #5fbdb9; animation: abertura-corre 1.1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .abertura-simbolo svg, .abertura-barra i { animation: none; }
 }

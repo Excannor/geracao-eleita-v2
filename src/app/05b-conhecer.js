@@ -109,7 +109,6 @@
   // ---------- #/conhecer/N: a tela do dia, em folha cheia ----------
   let sessaoDia = null;
 
-  CC.abrirConhecerDia = function (numero) { location.hash = '#/conhecer/' + numero; };
 
   CC.fecharConhecerDia = function () {
     if (CC.fecharLeitor) CC.fecharLeitor();

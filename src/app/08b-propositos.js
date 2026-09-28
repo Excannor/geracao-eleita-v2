@@ -110,7 +110,6 @@
   // não é membro de verdade.
   const ABAS_CELULA = [['hoje', 'Hoje'], ['estudo', 'Estudo'], ['oracao', 'Oração'], ['pessoas', 'Pessoas']];
   const enderecoCelula = (id, aba) => '#/novidades/celula/' + encodeURIComponent(id) + (aba && aba !== 'hoje' ? '/' + aba : '');
-  CC.abrirCelula = (id, aba) => { location.hash = enderecoCelula(id, aba); };
   let desenhoCelula = 0;
 
   CC.vistaCelula = function (raiz, arg) {

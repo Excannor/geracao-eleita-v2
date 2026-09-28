@@ -639,7 +639,7 @@
   CC.aplicarTema = (escuro) => {
     document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro';
     const cor = document.querySelector('meta[name="theme-color"]');
-    if (cor) cor.content = escuro ? '#15110b' : '#fdfbf5';
+    if (cor) cor.content = escuro ? '#0d0d0d' : '#e6e6e6'; // o --fundo de cada tema
   };
   // null segue o sistema; true e false fixam o escuro ou o claro.
   CC.guardarTema = (escuro) => {
