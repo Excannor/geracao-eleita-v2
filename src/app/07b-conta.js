@@ -45,8 +45,7 @@
           + linha('Sair dos outros aparelhos', '', 'data-sair-outros')
           + linha('Sair desta conta', '', 'data-sair')
           + linha('Apagar a conta', '', 'data-apagar', 'perigo'))
-        : '')
-      + (quem.admin ? grupo('Administração', linha('Painel do app', '', 'data-ir="#/config/painel"')) : '');
+        : '');
 
     raiz.querySelectorAll('[data-ir]').forEach((el) => { el.onclick = () => { location.hash = el.dataset.ir; }; });
     raiz.querySelectorAll('[data-tema]').forEach((b) => {

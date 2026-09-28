@@ -48,19 +48,19 @@
   }
 
   CC.vistaPainel = async function (raiz) {
-    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Painel do app</h1><div class="vazio">Carregando…</div>';
+    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1><div class="vazio">Carregando…</div>';
     let p;
     try {
       p = await CC.api('api/painel');
     } catch (e) {
-      raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Painel do app</h1><div class="vazio">' + CC.esc(e.message) + '</div>';
+      raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1><div class="vazio">' + CC.esc(e.message) + '</div>';
       return;
     }
     if (location.hash !== '#/config/painel') return;
 
     const pedidos = p.pedidosDeSenha || [];
-    raiz.innerHTML = CC.botaoVoltar('Configurações')
-      + '<h1>Painel do app</h1>'
+    raiz.innerHTML = CC.botaoVoltar('Perfil')
+      + '<h1>Painel do administrador</h1>'
       + '<p class="passo-dica">Só números, sem nomes. Atualizado agora (' + CC.esc(p.hoje.split('-').reverse().join('/')) + ').</p>'
       + grupo('Senha esquecida',
         (pedidos.length
