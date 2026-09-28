@@ -3043,3 +3043,5 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .painel-cartao small em { font-style: normal; font-weight: 400; }
 .painel-cartao small.sobe { color: var(--acento); }
 .painel-cartao strong.texto { font-size: 19px; padding: 6px 0 3px; }
+.painel-linha2 { flex-direction: column; align-items: flex-start; gap: 2px; }
+.painel-linha2 small { color: var(--tinta-fraca); font-size: 14px; line-height: 1.35; }

@@ -7,6 +7,10 @@
   const grupo = (titulo, dentro, nota) => '<section class="grupo-config"><h2 class="etiqueta">' + CC.esc(titulo) + '</h2>'
     + '<div class="caixa-config">' + dentro + '</div>'
     + (nota ? '<p class="passo-dica pequena">' + nota + '</p>' : '') + '</section>';
+  // Linha em duas partes, para textos longos: o rótulo em cima e o número explicado embaixo,
+  // sem cortar a frase.
+  const linha2 = (rotulo, texto) => '<div class="linha-config sem-toque painel-linha2"><span>' + CC.esc(rotulo) + '</span>'
+    + '<small>' + CC.esc(texto) + '</small></div>';
   const numero = (rotulo, valor) => '<div class="linha-config sem-toque"><span>' + CC.esc(rotulo) + '</span>'
     + '<span class="valor">' + CC.esc(String(valor)) + '</span></div>';
   const porcento = (r) => (r.pct === null ? 'ainda não' : r.pct + '% (' + r.voltaram + ' de ' + r.elegiveis + ')');
@@ -41,6 +45,7 @@
     return min < 1 ? 'agora há pouco, às ' + hora : 'às ' + hora + ' (há ' + min + ' min)';
   }
 
+  const fmt = (v) => (v === null ? 'ainda não' : v + '%');
   const quando = (iso) => new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
   // Fase 5, seção 2: células e cuidado, agregados. Sem nome nenhum, e sem contador de gerações.
@@ -105,20 +110,20 @@
         + grupo('Ofensivas de agora', barras(p.detalhe.ofensivas))
         + grupo('Dia da semana em que mais se lê', barras(p.detalhe.diasDaSemana), 'Soma das leituras dos últimos 30 dias.')
         + grupo('Uso das funções', barras(p.detalhe.funcoes))
-        + (p.detalhe.turmas ? grupo('Retenção por turma', p.detalhe.turmas.map((t) => numero(diaMes(t.de) + ' a ' + diaMes(t.ate) + ' · ' + t.contas + (t.contas === 1 ? ' conta' : ' contas'),
-          t.contas ? ['s1', 's2', 's4'].map((k, i) => 'sem. ' + [1, 2, 4][i] + ': ' + (t[k] === null ? 'ainda não' : t[k] + '%')).join(' · ') : 'sem contas')).join(''),
-          'Contas agrupadas pela semana do cadastro. Em cada turma, quantas leram na 1ª, 2ª e 4ª semana depois de criar a conta.') : '')
-        + (p.detalhe.desafios ? grupo('Desafios', p.detalhe.desafios.map((d) => numero(d.titulo,
+        + (p.detalhe.turmas ? grupo('Retenção por turma', p.detalhe.turmas.filter((t) => t.contas).map((t) => linha2('Cadastro de ' + diaMes(t.de) + ' a ' + diaMes(t.ate) + ' (' + t.contas + (t.contas === 1 ? ' conta)' : ' contas)'),
+          t.contas ? 'Leram na 1ª semana: ' + fmt(t.s1) + ' · na 2ª: ' + fmt(t.s2) + ' · na 4ª: ' + fmt(t.s4) : 'Ninguém criou conta nessa semana')).join(''),
+          'Em cada turma, a porcentagem que leu pelo menos um dia naquela semana depois de criar a conta.') : '')
+        + (p.detalhe.desafios ? grupo('Desafios', p.detalhe.desafios.map((d) => linha2(d.titulo,
           d.comecaram ? d.comecaram + ' começaram · ' + d.venceram + ' venceram · ' + d.seguem + ' seguem · ' + d.pararam + ' pararam'
-            + (d.paramNoDia ? ' (em geral no dia ' + d.paramNoDia + ')' : '') : 'ninguém começou')).join(''),
-          '"Pararam" inclui quem pausou e quem está sem vencer nenhum dia há uma semana.') : '')
+            + (d.paramNoDia ? ', em geral no dia ' + d.paramNoDia : '') : 'Ninguém começou ainda')).join(''),
+          '"Pararam" inclui quem pausou e quem está há uma semana sem vencer nenhum dia.') : '')
         + (p.detalhe.notificacao ? grupo('Notificação e leitura',
-          numero('Com notificação ligada', p.detalhe.notificacao.com.contas + ' contas · ' + (p.detalhe.notificacao.com.media ?? 0) + ' dias lidos em 30')
-          + numero('Sem notificação', p.detalhe.notificacao.sem.contas + ' contas · ' + (p.detalhe.notificacao.sem.media ?? 0) + ' dias lidos em 30'),
-          'Média de dias lidos nos últimos 30 dias. É uma comparação, não prova de causa: quem já lê mais tende a ligar os avisos.') : '')
-        + (p.detalhe.origens ? grupo('De onde vêm e quanto ficam', p.detalhe.origens.map((o) => numero(o.faixa,
-          o.contas ? o.contas + (o.contas === 1 ? ' conta' : ' contas') + ' · ' + o.pct + '% leram nos últimos 30 dias' : 'nenhuma conta')).join(''),
-          'Contas antigas sem registro de origem entram por dedução: convite de amigo, conhecendo Jesus ou cadastro direto.') : '') : '')
+          linha2('Com notificação ligada (' + p.detalhe.notificacao.com.contas + ' contas)', 'Em média, ' + (p.detalhe.notificacao.com.media ?? 0) + ' dias lidos nos últimos 30')
+          + linha2('Sem notificação (' + p.detalhe.notificacao.sem.contas + ' contas)', 'Em média, ' + (p.detalhe.notificacao.sem.media ?? 0) + ' dias lidos nos últimos 30'),
+          'É uma comparação, não prova de causa: quem já lê mais tende a ligar os avisos.') : '')
+        + (p.detalhe.origens ? grupo('De onde vêm e quanto ficam', p.detalhe.origens.map((o) => linha2(o.faixa + ' (' + o.contas + (o.contas === 1 ? ' conta)' : ' contas)'),
+          o.contas ? o.pct + '% ainda leem (leram nos últimos 30 dias)' : 'Nenhuma conta chegou assim')).join(''),
+          'Contas antigas sem origem gravada entram por dedução: convite de amigo, conhecendo Jesus ou cadastro direto.') : '') : '')
       + grupo('Voltaram depois de criar a conta',
         p.retorno.map((r) => numero(r.dias === 1 ? 'Depois de 1 dia' : 'Depois de ' + r.dias + ' dias', porcento(r))).join(''),
         'É a pergunta "o hábito pegou?". Conta quem leu de novo a partir desse dia, entre as contas com idade para isso.')
