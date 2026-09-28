@@ -177,6 +177,10 @@ O batismo é um sinal, e um sinal aponta pra um fato. O fato continua de pé, fo
 
 Não precisa ter pressa nem medo. Se você crê em Jesus e quer segui-lo, o batismo é o passo que ele mesmo pediu. Converse com alguém mais experiente na fé: quem te convidou pro app, o líder da célula ou o pastor da igreja que você frequenta. Conte o que você entende e pergunte o que ainda não está claro. Muitas igrejas têm um tempo de preparo antes, justamente pra isso.
 
+Se você tem menos de 18 anos, converse também com seus pais ou responsáveis: eles fazem parte dessa decisão.
+
+{{conversar-batismo}}
+
 Se você ainda tem dúvidas sobre a própria fé, tudo bem também. Continue lendo, orando e fazendo perguntas. O batismo faz mais sentido quando você sabe a que está dizendo sim.
 
 ## Onde os cristãos pensam diferente
@@ -753,11 +757,28 @@ function linha(texto) {
     });
 }
 
+// "Leia esta semana": cada referência vira um atalho que abre o capítulo na Bíblia do app
+// ("Romanos 8.1-4 e 8.31-39" abre Romanos 8). O que não for referência fica como texto.
+const REF_LEITURA = /^((?:[1-3] )?[A-ZÀ-Ú][a-zà-ú]+(?: [a-zà-ú]+)*) (\d+)/;
+function leituras(texto) {
+  return '<div class="pilulas leituras-semana">' + texto.split(/\s*·\s*/).map((item) => {
+    const m = item.match(REF_LEITURA);
+    return m ? '<a class="pilula" href="#/biblia/' + encodeURIComponent(m[1] === 'Salmo' ? 'Salmos' : m[1]) + '/' + m[2] + '">' + esc(item) + '</a>' : '<span>' + esc(item) + '</span>';
+  }).join('') + '</div>';
+}
+
+// Marcadores de bloco inteiro, que viram ação na tela (ligada em 05b-conhecer.js).
+const ACOES = {
+  '{{conversar-batismo}}': '<div class="acoes-licao"><button type="button" class="botao contorno" data-conversar-batismo>Quero conversar sobre o batismo</button></div>',
+};
+
 export function montarHtml(nome, texto) {
   const blocos = texto.trim().split(/\n\s*\n/);
-  return '<h1>' + esc(semNumero(nome)) + '</h1>\n' + blocos.map((b) => {
+  return '<h1>' + esc(semNumero(nome)) + '</h1>\n' + blocos.map((b, i) => {
     const t = b.trim();
+    if (ACOES[t]) return ACOES[t];
     if (t.startsWith('## ')) return '<h2>' + linha(t.slice(3)) + '</h2>';
+    if (i > 0 && blocos[i - 1].trim() === '## Leia esta semana') return leituras(t);
     return '<p>' + t.split('\n').map(linha).join('<br>') + '</p>';
   }).join('\n');
 }

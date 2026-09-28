@@ -307,4 +307,50 @@
       };
     }
   };
+  // ---------- "Quero conversar sobre o batismo" (lição 3 dos Primeiros passos) ----------
+  // O botão vem pronto no texto da lição; o clique é pego aqui, em qualquer tela.
+  const juntarNomes = (lista) => (lista.length > 1 ? lista.slice(0, -1).join(', ') + ' e ' + lista.at(-1) : lista[0] || '');
+
+  CC.conversarSobreBatismo = function () {
+    CC.folha('<h3>Conversar sobre o batismo</h3>'
+      + '<p>Vamos avisar quem te acompanha no app: quem te convidou, o líder da sua célula e quem faz discipulado com você, se houver. A pessoa vai te procurar para conversar, do jeito que vocês costumam falar.</p>'
+      + '<p class="passo-dica">Só vai o aviso. Ninguém vê o que você escreveu no app.</p>'
+      + '<div class="acoes"><button class="botao" data-avisar>Avisar</button><button class="botao plano" data-fechar>Agora não</button></div>', {
+      rotulo: 'Conversar sobre o batismo',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        const avisar = folha.querySelector('[data-avisar]');
+        avisar.onclick = async () => {
+          avisar.disabled = true;
+          let r;
+          try { r = await CC.api('api/batismo/conversar', {}); } catch (e) { avisar.disabled = false; CC.avisar(e.message || 'Não consegui avisar agora'); return; }
+          let corpo;
+          if (r.ninguem) {
+            corpo = '<h3>Ainda não tem ninguém ligado a você no app</h3>'
+              + '<p>Converse com o pastor ou com um líder da igreja que você frequenta. Se você tem menos de 18 anos, conte também para seus pais ou responsáveis.</p>';
+          } else if (r.ja) {
+            corpo = '<h3>O aviso já foi hoje</h3><p>Quem te acompanha já recebeu o seu pedido. Agora é esperar a pessoa te procurar.</p>';
+          } else if (r.avisados && r.avisados.length) {
+            corpo = '<h3>Pedido enviado</h3>'
+              + '<p>Avisamos ' + CC.esc(juntarNomes(r.avisados)) + '. Agora é esperar a pessoa te procurar.</p>'
+              + (r.semAviso && r.semAviso.length ? '<p class="passo-dica">' + CC.esc(juntarNomes(r.semAviso)) + ' não pôde receber o aviso agora. Se puder, fale pessoalmente.</p>' : '');
+          } else {
+            // Ninguém tinha notificação ligada (ou era de madrugada): nada foi marcado, dá para tentar de novo.
+            corpo = '<h3>Não deu para avisar agora</h3>'
+              + '<p>' + CC.esc(juntarNomes(r.semAviso || [])) + ' não pôde receber o aviso pelo app agora. Se puder, fale pessoalmente, ou tente de novo mais tarde.</p>';
+          }
+          folha.innerHTML = corpo + '<div class="acoes"><button class="botao" data-fechar>Fechar</button></div>';
+          folha.querySelector('[data-fechar]').onclick = fechar;
+        };
+      },
+    });
+  };
+
+  document.addEventListener('click', (ev) => {
+    const bt = ev.target.closest && ev.target.closest('[data-conversar-batismo]');
+    if (!bt) return;
+    ev.preventDefault();
+    CC.conversarSobreBatismo();
+  });
+
 })(window.CC);

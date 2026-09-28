@@ -502,9 +502,9 @@ async function enviarPara(usuario, mensagem, opcoes = {}) {
 // pessoa, o silêncio da noite e, nos toques, o teto do dia de quem recebe.
 async function avisoSocial(para, tipo, dados) {
   const conta = CONTAS.achar(para);
-  if (!conta || !NOTIFICACOES.inscricoesDe(para).length || !NOTIFICACOES.preferencias(para).amigos) return;
+  if (!conta || !NOTIFICACOES.inscricoesDe(para).length || !NOTIFICACOES.preferencias(para).amigos) return false;
   const agora = agoraDoServidor();
-  if (emSilencio(minutosNoFuso(conta.fuso, agora))) return;
+  if (emSilencio(minutosNoFuso(conta.fuso, agora))) return false;
   const data = hojeNoFuso(conta.fuso, agora);
   if (tipo === 'toque') {
     const ja = NOTIFICACOES.toquesHoje(para, data);
@@ -512,7 +512,9 @@ async function avisoSocial(para, tipo, dados) {
     dados = { ...dados, outros: ja };
   }
   const mensagem = montarMensagem(tipo, dados, { usuario: para, data, nome: await nomeDeExibicao(para) });
-  if (await enviarPara(para, mensagem)) await NOTIFICACOES.anotar(para, tipo, data, 0);
+  if (!(await enviarPara(para, mensagem))) return false;
+  await NOTIFICACOES.anotar(para, tipo, data, 0);
+  return true;
 }
 const semEsperar = (promessa) => { promessa.catch((e) => console.log('  aviso não saiu: ' + e.message)); };
 
@@ -1486,6 +1488,35 @@ const servidor = createServer(async (req, res) => {
         for (const p of CONTAS.propositosDe(eu)) if (p.celula && p.criadoPor) destinos.add(p.criadoPor);
         for (const destino of destinos) semEsperar(avisoSocial(destino, 'querConversar', { nome, deUsuario: eu }));
         return {};
+      });
+      return;
+    }
+
+    // "Quero conversar sobre o batismo", da lição 3 dos Primeiros passos: avisa quem acompanha a
+    // pessoa no app (quem convidou, o líder das células em que ela está e quem faz discipulado
+    // com ela). Só o aviso, nunca o que ela escreveu. A resposta diz quem recebeu e quem não
+    // pôde receber agora (sem notificação ligada ou fora do horário), para ela procurar pessoalmente.
+    if (rota === '/api/batismo/conversar') {
+      await acao(async () => {
+        const conta = CONTAS.achar(eu);
+        const destinos = new Set([conta.acompanhadoPor, conta.convidadoPor].filter(Boolean));
+        for (const p of CONTAS.propositosDe(eu)) {
+          if (p.celula && p.criadoPor && p.membros.some((m) => m.usuario === eu && m.estado === 'ativo')) destinos.add(p.criadoPor);
+        }
+        for (const x of Object.values(CONTAS.dados.discipulados || {})) if (x.estado === 'ativo' && x.discipulo === eu) destinos.add(x.discipulador);
+        destinos.delete(eu);
+        for (const d of [...destinos]) if (!CONTAS.achar(d) || CONTAS.algumBloqueio(eu, d)) destinos.delete(d);
+        if (!destinos.size) return { ninguem: true };
+        if (conta.batismoConversaEm === hojeDe(eu)) return { ja: true };
+        const nome = await nomeDeExibicao(eu);
+        const avisados = [];
+        const semAviso = [];
+        for (const d of destinos) {
+          const saiu = await avisoSocial(d, 'querBatismo', { nome, deUsuario: eu }).catch(() => false);
+          (saiu ? avisados : semAviso).push(await nomeDeExibicao(d));
+        }
+        if (avisados.length) await CONTAS.anotarConversaBatismo(eu, hojeDe(eu));
+        return { avisados, semAviso };
       });
       return;
     }

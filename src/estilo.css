@@ -3047,3 +3047,7 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .painel-linha2 small { color: var(--tinta-fraca); font-size: 14px; line-height: 1.35; }
 .arte-trofeu .detalhe { stroke: var(--cartao); opacity: .75; }
 .arte-trofeu.ganho .detalhe { stroke: #fff; opacity: .9; }
+
+/* ---------- ações dentro das lições e leituras da semana ---------- */
+.acoes-licao { margin: 14px 0 18px; }
+.leituras-semana { margin: 6px 0 16px; }

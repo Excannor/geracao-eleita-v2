@@ -797,6 +797,16 @@ export class Contas {
     await this.salvar();
   }
 
+  // "Quero conversar sobre o batismo" (lição 3 dos Primeiros passos): um pedido por dia.
+  async anotarConversaBatismo(usuario, hoje) {
+    const a = this.achar(usuario);
+    if (!a) throw erro('conta não encontrada', 404);
+    if (a.batismoConversaEm === hoje) return { ja: true };
+    a.batismoConversaEm = hoje;
+    await this.salvar();
+    return { ja: false };
+  }
+
   // "Quero conversar com alguém": só quem está sendo acompanhado, e no máximo um pedido
   // por dia, mesmo que a pessoa toque o botão de novo.
   async pedirConversa(usuario, hoje) {
