@@ -31,7 +31,7 @@ services:
       - "./dados:/app/dados"
     environment:
       CAMINHO_AMBIENTE: "hml"
-      CAMINHO_ENDERECO: "https://ge.off-sec.net"
+      CAMINHO_ENDERECO: "https://geracaoeleita.app"
       # Quem vê o Painel do app (Configurações): métricas sem nomes e os pedidos de senha.
       CAMINHO_ADMIN: "maarcos_e"
       # E-mail da senha esquecida: desligado enquanto CAMINHO_SMTP_HOST estiver vazio no .env.

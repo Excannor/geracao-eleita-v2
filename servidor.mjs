@@ -301,6 +301,10 @@ function importarEstadosLegados() {
 }
 importarEstadosLegados();
 // O serviço de push pede um contato de quem manda: o endereço do app, e não o e-mail de ninguém.
+// Endereço que vai nos links de convite e de célula: o oficial (CAMINHO_ENDERECO), mesmo
+// quando quem convida usa o app pelo endereço antigo. Sem ele (testes, HML), o da própria visita.
+const enderecoPublico = (req) => process.env.CAMINHO_ENDERECO
+  || (req.headers['x-forwarded-proto'] || 'http') + '://' + (req.headers.host || 'localhost');
 const CONTATO_PUSH = process.env.CAMINHO_ENDERECO || 'https://ge.off-sec.net';
 // Só as ferramentas de teste: aceitam um serviço de push em 127.0.0.1 e fixam o relógio.
 const PUSH_TESTE = process.env.CAMINHO_PUSH_TESTE === '1';
@@ -1230,7 +1234,7 @@ const servidor = createServer(async (req, res) => {
         }
         if (qual === 'link') {
           const gerado = CONTAS.gerarLinkCelula(eu, id, assinar);
-          const origem = (req.headers['x-forwarded-proto'] || 'http') + '://' + (req.headers.host || 'localhost');
+          const origem = enderecoPublico(req);
           return { link: origem + '/?celula=' + gerado.token, venceEm: gerado.venceEm };
         }
         if (qual === 'entrar') {
@@ -1430,7 +1434,7 @@ const servidor = createServer(async (req, res) => {
     if (rota === '/api/convites') {
       await acao(async ({ modo } = {}) => {
         const { token, venceEm } = CONTAS.gerarConvite(eu, assinar, Date.now(), { modo });
-        const origem = (req.headers['x-forwarded-proto'] || 'http') + '://' + (req.headers.host || 'localhost');
+        const origem = enderecoPublico(req);
         return { link: origem + '/?convite=' + token, venceEm };
       });
       return;

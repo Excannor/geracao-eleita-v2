@@ -213,10 +213,10 @@
   // uma única vez, uma semana depois, e nunca mais.
   CC.talvezOferecerNotificacoes = function () {
     if (suportado() && CC.rodandoComoApp() && Notification.permission === 'granted') { religar(); return; }
-    if (!suportado() || !CC.rodandoComoApp() || Notification.permission !== 'default') return;
+    // No iPhone só há notificação com o app instalado (suportado() já dá falso fora dele); no
+    // Android o navegador também aceita, então o pedido vem logo depois do tutorial de instalar.
+    if (!suportado() || Notification.permission !== 'default') return;
     if (!(CC.quem && CC.quem.comSenha)) return;
-    // Primeiro a pessoa conhece o app lendo; o pedido vem depois da primeira leitura.
-    if (!CC.ler('lidos', []).length) return;
     let marca = '';
     try { marca = localStorage.getItem('cc.aviso.push') || ''; } catch (e) { return; }
     if (marca === 'feito' || marca === 'nunca') return;

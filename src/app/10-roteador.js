@@ -564,10 +564,37 @@
       try { localStorage.removeItem('cc.instalar'); } catch (e) { /* segue */ }
       if (!CC.rodandoComoApp()) await CC.tutorialInstalar({ contaNova: true });
     }
+    // Depois do tutorial de instalar (ou na primeira abertura do app já instalado), o pedido
+    // para mandar notificações. A função só pergunta quando ainda não foi respondido.
+    if (CC.talvezOferecerNotificacoes && !document.querySelector('.cortina')) CC.talvezOferecerNotificacoes();
 
     // Conta com senha que ainda não concordou com o uso do dado de fé (LGPD art. 11) não
     // segue para convite, célula ou completar cadastro antes de decidir isso.
     if (quem && quem.comSenha && !quem.consentimento) await CC.pedirConsentimento();
+
+    // Endereço novo: quem ainda usa o app pelo endereço antigo (o ícone instalado fica preso
+    // a ele) recebe, no máximo uma vez por dia, o convite para abrir e instalar o novo. A
+    // conta é a mesma: tudo fica no servidor.
+    if (location.hostname === 'ge.off-sec.net') {
+      let visto = '';
+      try { visto = localStorage.getItem('cc.enderecoNovo') || ''; } catch (e) { /* segue */ }
+      if (visto !== CC.hojeIso()) {
+        try { localStorage.setItem('cc.enderecoNovo', CC.hojeIso()); } catch (e) { /* segue */ }
+        {
+          CC.folha('<h2>O app tem endereço novo</h2>'
+            + '<p>Agora o Geração Eleita fica em <b>geracaoeleita.app</b>. Abra por lá, entre com o mesmo usuário e senha e instale de novo na tela de início. Suas leituras, amigos e célula continuam todos lá.</p>'
+            + '<p class="passo-dica pequena">Depois de instalar o novo, você pode apagar este ícone antigo. Se usa notificações, ative de novo no app novo.</p>'
+            + '<div class="acoes"><a class="botao azul" href="https://geracaoeleita.app/" target="_blank" rel="noopener" data-fechar-novo>Abrir o endereço novo</a>'
+            + '<button class="botao plano" data-fechar>Agora não</button></div>', {
+            rotulo: 'Endereço novo',
+            ligar: (folha, fechar) => {
+              folha.querySelector('[data-fechar]').onclick = fechar;
+              folha.querySelector('[data-fechar-novo]').addEventListener('click', () => fechar());
+            },
+          });
+        }
+      }
+    }
 
     const celula = new URLSearchParams(location.search).get('celula');
     if (celula) {
