@@ -5,8 +5,8 @@
     chave: '009f5d33-a220-4a2a-ac28-47df02fed6a9',
     nome: 'MARCOS E DE S BARBOSA',
     cidade: 'BETIM',
-    // no código o nome vai abreviado (o padrão limita a 25 letras); na tela, por extenso
-    exibido: 'Marcos Estevão de Sousa Barbosa',
+    // abreviado no código (o padrão limita a 25 letras) e na tela
+    exibido: 'Marcos E. de S. Barbosa',
   };
   const VALORES = [5, 10, 20];
 
