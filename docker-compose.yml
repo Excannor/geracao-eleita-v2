@@ -73,3 +73,20 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+
+  # Segundo túnel nomeado: o endereço novo, geracaoeleita.app. Mesmo esquema do tunel-fixo
+  # (no painel da Cloudflare o serviço aponta para http://localhost:8080). Os dois
+  # endereços servem o MESMO app e o mesmo banco: os apps já instalados pelo endereço
+  # antigo continuam funcionando. Só sobe com o perfil "pi", para nunca ligar por engano
+  # num PC (dois lugares com o mesmo túnel dividem as visitas entre bancos diferentes).
+  #   docker compose --profile pi up -d tunel-app
+  tunel-app:
+    image: cloudflare/cloudflared:latest
+    container_name: geracao-eleita-tunel-app
+    restart: unless-stopped
+    profiles: [pi]
+    network_mode: "service:caminho"
+    depends_on: [caminho]
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN_APP}
