@@ -28,7 +28,7 @@
         ['Marcos 1.35', 'Jesus acordou cedo e foi sozinho a um lugar deserto para orar. Onde fica o seu lugar quieto para falar com Deus?', 'Escolha um lugar e um horário para orar amanhã cedo.'],
         ['Provérbios 4.23', 'O texto diz que toda a vida depende do coração. O que tem entrado no seu coração pelos olhos e pelos ouvidos?', 'Escolha uma música de louvor para ouvir hoje com atenção.'],
         ['Romanos 12.2', 'Paulo pede para não imitar os costumes deste mundo. Que costume da rede você percebeu que tinha pegado sem querer?', 'Troque esse costume por outro hoje, de propósito.'],
-        ['1 Samuel 16.7', 'Deus diz a Samuel que o homem vê a aparência, mas o Senhor examina o coração. Como seria parar de medir as pessoas pela foto?', 'Elogie alguém hoje por uma coisa que não aparece na foto.'],
+        ['1 Samuel 16.7', 'Deus diz a Samuel que o homem vê a aparência exterior, mas o Senhor examina os pensamentos e as intenções. Como seria parar de medir as pessoas pela foto?', 'Elogie alguém hoje por uma coisa que não aparece na foto.'],
         ['Mateus 6.1-4', 'Jesus pede para não fazer o bem para ser admirado. O que muda quando ninguém vai ver, curtir ou comentar?', 'Faça um bem escondido hoje: ninguém precisa saber.'],
         ['Filipenses 4.11-13', 'Paulo aprendeu a viver contente tendo muito ou pouco. A rede te deixava contente ou sempre querendo mais?', 'Anote três coisas que você já tem e pelas quais quer agradecer.'],
         ['Salmos 46.10', 'Deus diz: fiquem quietos e saibam que eu sou Deus. Quando foi a última vez que você ficou em silêncio de verdade?', 'Fique cinco minutos em silêncio hoje, só lembrando quem Deus é.'],
@@ -55,7 +55,7 @@
         ['Salmos 63.6-7', 'Davi, acordado de noite, fica pensando no Senhor. Quando o sono demora, em que você costuma pensar?', 'Se acordar ou demorar a dormir, lembre de uma coisa boa que Deus já fez por você.'],
         ['Lamentações 3.22-23', 'O texto diz que a misericórdia de Deus se renova a cada manhã. O que você quer deixar para trás de ontem?', 'Comece o dia agradecendo por uma coisa nova.'],
         ['Mateus 11.28-30', 'Jesus chama os cansados para descansar nele. Qual cansaço você carrega que não é só do corpo?', 'Deite hoje meia hora mais cedo que o normal.'],
-        ['Salmos 127.2', 'O texto diz que o Senhor cuida dos seus amados mesmo enquanto dormem. O que você acha que precisa resolver sozinho, sem deixar Deus cuidar?', 'Escreva essa preocupação num papel e deixe o papel fora do quarto.'],
+        ['Salmos 127.2', 'O texto diz que o Senhor dá o sustento aos seus amados mesmo enquanto estão dormindo. O que você acha que precisa resolver por conta própria, sem deixar Deus cuidar?', 'Escreva essa preocupação num papel e deixe o papel fora do quarto.'],
         ['Provérbios 3.24', 'O texto promete um sono tranquilo, sem medo. O que mudou no seu sono nesta semana?', 'Decida onde o seu celular vai dormir daqui para frente.'],
       ],
     },
@@ -104,7 +104,7 @@
       + '<span><b>' + s.seguidos + '</b><small>Seguidos</small></span>'
       + '<span><b>' + s.vencidos + '</b><small>Vencidos</small></span>'
       + '<span><b>' + s.faltam + '</b><small>Faltam</small></span></span>'
-      + '<span class="dsf-acao' + (s.venceuHoje ? ' feito' : '') + '">' + (s.venceuHoje ? 'Hoje vencido ✓' : 'Estudo do dia ' + s.numero + ' e vencer o dia') + '</span>'
+      + '<span class="dsf-acao' + (s.venceuHoje ? ' feito' : '') + '">' + (s.venceuHoje ? 'Hoje vencido ✓' : 'Ver o estudo do dia ' + s.numero) + '</span>'
       + '<span class="dsf-barra"><i style="width:' + Math.round((s.vencidos / d.dias) * 100) + '%"></i></span>'
       + '<span class="dsf-pe">' + s.vencidos + ' de ' + d.dias + ' dias vencidos</span></span></button>';
   }

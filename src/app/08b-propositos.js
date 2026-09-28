@@ -1381,7 +1381,7 @@
     + 'não espere: fale agora com um adulto de confiança ou ligue 188 (CVV), a qualquer hora. Se for abuso ou violência, ligue 100. Em emergência, 192 (SAMU) ou 190 (Polícia).';
   // Para quem conduz, junto da denúncia de perigo (seção 5).
   const AJUDA_PERIGO_CONDUZ = 'Procure a pessoa hoje e avise o pastor ou um responsável da igreja. '
-    + 'Se for abuso ou violência, ligue 100. Em emergência, 192 (SAMU) ou 190 (Polícia). Não tente resolver sozinho.';
+    + 'Se for abuso ou violência, ligue 100. Em emergência, 192 (SAMU) ou 190 (Polícia). Não tente resolver isso sem ajuda.';
 
   const carregarCuidado = (celulaId) => CC.api('api/cuidado?celula=' + encodeURIComponent(celulaId))
     .then((d) => { cuidadoCache[celulaId] = d; return d; }).catch(() => null);
