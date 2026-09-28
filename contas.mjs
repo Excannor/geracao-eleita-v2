@@ -797,6 +797,39 @@ export class Contas {
     await this.salvar();
   }
 
+  // Pedido de conversa (Conhecer Jesus ou batismo): fica na conta de quem pediu, com a lista
+  // de quem foi avisado. Quem recebeu vê no Juntos (e o líder também na aba Célula) até
+  // tocar em "Já conversamos", ou por 30 dias. Só a data e os nomes, nunca texto.
+  async registrarPedidoConversa(usuario, tipo, para, hoje) {
+    const a = this.achar(usuario);
+    if (!a) return;
+    a.pedidosConversa = { ...(a.pedidosConversa || {}), [tipo]: { em: hoje, para: [...para], feito: {} } };
+    await this.salvar();
+  }
+
+  pedidosConversaPara(quem, hoje) {
+    const eu = limparNome(quem);
+    const corte = somaDias(hoje, -30);
+    const saida = [];
+    for (const a of this.lista()) {
+      for (const [tipo, p] of Object.entries(a.pedidosConversa || {})) {
+        if (!p || !(p.para || []).includes(eu) || (p.feito || {})[eu] || p.em < corte) continue;
+        if (this.algumBloqueio(eu, a.usuario)) continue;
+        saida.push({ tipo, usuario: a.usuario, em: p.em });
+      }
+    }
+    return saida.sort((x, y) => (x.em < y.em ? 1 : x.em > y.em ? -1 : 0));
+  }
+
+  async marcarConversaFeita(quem, deUsuario, tipo, hoje) {
+    const eu = limparNome(quem);
+    const a = this.achar(deUsuario);
+    const p = a && a.pedidosConversa && a.pedidosConversa[tipo];
+    if (!p || !(p.para || []).includes(eu)) throw erro('esse pedido não está mais aqui', 404);
+    p.feito = { ...(p.feito || {}), [eu]: hoje };
+    await this.salvar();
+  }
+
   // "Quero conversar sobre o batismo" (lição 3 dos Primeiros passos): um pedido por dia.
   async anotarConversaBatismo(usuario, hoje) {
     const a = this.achar(usuario);

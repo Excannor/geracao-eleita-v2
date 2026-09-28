@@ -330,14 +330,15 @@
               + '<p>Converse com o pastor ou com um líder da igreja que você frequenta. Se você tem menos de 18 anos, conte também para seus pais ou responsáveis.</p>';
           } else if (r.ja) {
             corpo = '<h3>O aviso já foi hoje</h3><p>Quem te acompanha já recebeu o seu pedido. Agora é esperar a pessoa te procurar.</p>';
-          } else if (r.avisados && r.avisados.length) {
-            corpo = '<h3>Pedido enviado</h3>'
-              + '<p>Avisamos ' + CC.esc(juntarNomes(r.avisados)) + '. Agora é esperar a pessoa te procurar.</p>'
-              + (r.semAviso && r.semAviso.length ? '<p class="passo-dica">' + CC.esc(juntarNomes(r.semAviso)) + ' não pôde receber o aviso agora. Se puder, fale pessoalmente.</p>' : '');
           } else {
-            // Ninguém tinha notificação ligada (ou era de madrugada): nada foi marcado, dá para tentar de novo.
-            corpo = '<h3>Não deu para avisar agora</h3>'
-              + '<p>' + CC.esc(juntarNomes(r.semAviso || [])) + ' não pôde receber o aviso pelo app agora. Se puder, fale pessoalmente, ou tente de novo mais tarde.</p>';
+            // Quem não recebeu a notificação agora (sem aviso ligado ou de madrugada) vê o
+            // pedido no Juntos quando abrir o app.
+            const avisados = r.avisados || [];
+            const noApp = r.noApp || [];
+            corpo = '<h3>Pedido enviado</h3>'
+              + (avisados.length ? '<p>Avisamos ' + CC.esc(juntarNomes(avisados)) + '.</p>' : '')
+              + (noApp.length ? '<p>' + CC.esc(juntarNomes(noApp)) + ' vai ver o pedido quando abrir o app.</p>' : '')
+              + '<p class="passo-dica">Agora é esperar a pessoa te procurar. Se quiser, fale pessoalmente também.</p>';
           }
           folha.innerHTML = corpo + '<div class="acoes"><button class="botao" data-fechar>Fechar</button></div>';
           folha.querySelector('[data-fechar]').onclick = fechar;
@@ -346,7 +347,8 @@
     });
   };
 
-  document.addEventListener('click', (ev) => {
+  // (o teste roda este arquivo sem DOM de verdade: só liga o clique quando existe)
+  if (typeof document.addEventListener === 'function') document.addEventListener('click', (ev) => {
     const bt = ev.target.closest && ev.target.closest('[data-conversar-batismo]');
     if (!bt) return;
     ev.preventDefault();

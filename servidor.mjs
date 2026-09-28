@@ -1128,6 +1128,7 @@ const servidor = createServer(async (req, res) => {
         toques: CONTAS.toquesRecebidos(eu, hojeEu).map(nomeDe),
         convitesProposito: CONTAS.propositosDe(eu).filter((p) => p.membros.some((m) => m.usuario === eu && m.estado === 'convidado')).length,
         acompanhando,
+        pedidosConversa: await Promise.all(CONTAS.pedidosConversaPara(eu, hojeEu).map(async (p) => ({ ...p, nome: await nomeDeExibicao(p.usuario) }))),
       });
       return;
     }
@@ -1486,7 +1487,17 @@ const servidor = createServer(async (req, res) => {
         const nome = await nomeDeExibicao(eu);
         const destinos = new Set([r.de]);
         for (const p of CONTAS.propositosDe(eu)) if (p.celula && p.criadoPor) destinos.add(p.criadoPor);
+        await CONTAS.registrarPedidoConversa(eu, 'conhecer', [...destinos], hojeDe(eu));
         for (const destino of destinos) semEsperar(avisoSocial(destino, 'querConversar', { nome, deUsuario: eu }));
+        return {};
+      });
+      return;
+    }
+
+    // "Já conversamos": tira o pedido da lista de quem tocou (os outros avisados decidem por si).
+    if (rota === '/api/conversa/feita') {
+      await acao(async ({ usuario, tipo }) => {
+        await CONTAS.marcarConversaFeita(eu, String(usuario || ''), String(tipo || ''), hojeDe(eu));
         return {};
       });
       return;
@@ -1508,15 +1519,16 @@ const servidor = createServer(async (req, res) => {
         for (const d of [...destinos]) if (!CONTAS.achar(d) || CONTAS.algumBloqueio(eu, d)) destinos.delete(d);
         if (!destinos.size) return { ninguem: true };
         if (conta.batismoConversaEm === hojeDe(eu)) return { ja: true };
+        await CONTAS.anotarConversaBatismo(eu, hojeDe(eu));
+        await CONTAS.registrarPedidoConversa(eu, 'batismo', [...destinos], hojeDe(eu));
         const nome = await nomeDeExibicao(eu);
         const avisados = [];
-        const semAviso = [];
+        const noApp = [];
         for (const d of destinos) {
           const saiu = await avisoSocial(d, 'querBatismo', { nome, deUsuario: eu }).catch(() => false);
-          (saiu ? avisados : semAviso).push(await nomeDeExibicao(d));
+          (saiu ? avisados : noApp).push(await nomeDeExibicao(d));
         }
-        if (avisados.length) await CONTAS.anotarConversaBatismo(eu, hojeDe(eu));
-        return { avisados, semAviso };
+        return { avisados, noApp };
       });
       return;
     }

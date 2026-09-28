@@ -41,7 +41,7 @@
     const visto = Number(lerLocal('cc.novidades.visto') || 0);
     const eu = (CC.quem || {}).usuario;
     const novas = ((mural && mural.eventos) || []).filter((e) => e.em > visto && e.autor.usuario !== eu).length;
-    return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) : 0) + novas;
+    return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) + (cache.pedidosConversa || []).length : 0) + novas;
   };
 
   const TEXTO_CONVITE = 'Bora ler a Bíblia inteira em um ano, junto? No Geração Eleita é uma leitura por dia, e dá pra gente ler junto. Aceita meu convite:';
@@ -65,6 +65,38 @@
   // A inicial do retrato vem do nome de verdade; o rótulo "Você" fica por conta de cada tela.
   const eu = () => ({ usuario: (CC.quem || {}).usuario || 'eu', nome: String(CC.apelido() || (CC.quem || {}).nome || 'Você').trim(), foto: CC.foto() });
   const acaoAmizade = (acao, usuario) => CC.api('api/amizade', { acao, usuario });
+
+  // ---------- pedidos de conversa ----------
+  // "Fulano quer conversar sobre Jesus / sobre o batismo": aparece para quem foi avisado (no
+  // Juntos e, para quem conduz, também na aba Célula) até tocar em "Já conversamos".
+  const ASSUNTO_CONVERSA = { conhecer: 'quer conversar sobre Jesus', batismo: 'quer conversar sobre o batismo' };
+  const quandoFoi = (iso) => (iso === CC.hojeIso() ? 'hoje' : iso === CC.somaDias(CC.hojeIso(), -1) ? 'ontem' : 'em ' + iso.slice(8, 10) + '/' + iso.slice(5, 7));
+  CC.linhaPedidoConversa = (x) => '<div class="linha-amigo pedido">'
+    + '<div class="quem-amigo"><b>' + CC.esc(x.nome) + '</b><span class="arroba">' + CC.esc((ASSUNTO_CONVERSA[x.tipo] || 'quer conversar') + ', ' + quandoFoi(x.em)) + '</span></div>'
+    + '<button class="botao plano pequeno" data-conversa-feita="' + CC.esc(x.usuario) + '" data-tipo="' + CC.esc(x.tipo) + '">Já conversamos</button></div>';
+  CC.blocoPedidosConversa = (lista) => (lista.length
+    ? CC.tituloSecao('Pedidos de conversa', String(lista.length))
+      + '<p class="passo-dica pequena">Procure a pessoa do jeito que vocês costumam falar. Só chega o pedido, nunca o que ela escreveu no app.</p>'
+      + '<div class="lista-pedidos">' + lista.map(CC.linhaPedidoConversa).join('') + '</div>'
+    : '');
+  CC.pedidosDeConversa = () => (cache && cache.pedidosConversa) || [];
+
+  // (o teste roda este arquivo sem DOM de verdade: só liga o clique quando existe)
+  if (typeof document.addEventListener === 'function') document.addEventListener('click', async (ev) => {
+    const bt = ev.target.closest && ev.target.closest('[data-conversa-feita]');
+    if (!bt) return;
+    ev.preventDefault();
+    bt.disabled = true;
+    try {
+      await CC.api('api/conversa/feita', { usuario: bt.dataset.conversaFeita, tipo: bt.dataset.tipo });
+    } catch (e) {
+      bt.disabled = false;
+      CC.avisar(e.message || 'Não consegui marcar agora');
+      return;
+    }
+    CC.avisar('Que bom que vocês conversaram');
+    recarregar();
+  });
 
   async function recarregar() {
     await Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]);
@@ -570,7 +602,8 @@
             + '<div class="pe-duplo-plano"><button class="botao pequeno" data-mural-ligar>Mostrar</button>'
             + '<button class="botao pequeno plano" data-mural-nao>Agora não</button></div></div></div>'
           : '';
-        corpo = '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
+        corpo = CC.blocoPedidosConversa(d.pedidosConversa || [])
+          + '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
           + blocoAcompanhando(d.acompanhando || [])
           + '<button class="botao contorno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
           + '<button class="entrada-propositos" data-propositos>' + CC.ico('aperto')

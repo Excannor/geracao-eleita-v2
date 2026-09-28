@@ -775,7 +775,11 @@
   function blocoAtencao(p) {
     const lista = p.atencao || [];
     const amigos = ((CC.amigosEmCache() || {}).amigos || []).map((a) => a.usuario);
-    return CC.tituloSecao('Precisam de atenção')
+    // Pedidos de conversa de quem é desta célula e avisou quem conduz (os mesmos do Juntos).
+    const daqui = new Set((p.membros || []).filter((m) => m.estado === 'ativo').map((m) => m.usuario));
+    const pedidos = (CC.pedidosDeConversa ? CC.pedidosDeConversa() : []).filter((x) => daqui.has(x.usuario));
+    return (pedidos.length && CC.blocoPedidosConversa ? CC.blocoPedidosConversa(pedidos) : '')
+      + CC.tituloSecao('Precisam de atenção')
       + (lista.length
         ? '<div class="lista-pedidos">' + lista.map((m) => '<div class="linha-amigo">' + retrato(m)
           + '<div class="quem-amigo"><b>' + CC.esc(m.nome) + '</b><span class="arroba">' + CC.esc(m.motivo) + '</span></div>'

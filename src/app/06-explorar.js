@@ -141,8 +141,9 @@
     [HISTORIA, 'O fio da Bíblia inteira, antes das partes.'],
     ['06 - Estudos Temáticos/Graça', 'O presente que está no centro de tudo.'],
     ['05 - Hermenêutica/Método Indutivo (OIA)', 'Um jeito simples de ler qualquer trecho.'],
-    ['05 - Hermenêutica/Gêneros literários da Bíblia', 'Poema, carta e história se leem diferente.'],
+    // O contexto vem antes dos gêneros, como a própria nota dos gêneros diz (e o Anterior/Próximo das notas).
     ['05 - Hermenêutica/Os quatro contextos', 'Por que um versículo solto engana.'],
+    ['05 - Hermenêutica/Gêneros literários da Bíblia', 'Poema, carta e história se leem diferente.'],
     ['05 - Hermenêutica/Erros comuns de interpretação', 'As armadilhas em que todo mundo cai.'],
     ['05 - Hermenêutica/Cristo em toda a Escritura', 'Como o Antigo Testamento aponta para Jesus.'],
     ['15 - Fios Bíblicos/Fio do cordeiro', 'Um tema que atravessa a Bíblia de ponta a ponta.'],
