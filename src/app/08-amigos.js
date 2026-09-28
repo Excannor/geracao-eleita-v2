@@ -605,7 +605,7 @@
         corpo = CC.blocoPedidosConversa(d.pedidosConversa || [])
           + '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
           + blocoAcompanhando(d.acompanhando || [])
-          + '<button class="botao contorno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
+          + '<button class="botao contorno pequeno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
           + '<button class="entrada-propositos" data-propositos>' + CC.ico('aperto')
             + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
             + (d.convitesProposito ? '<i class="selo-numero" aria-label="' + CC.plural(d.convitesProposito, 'convite', 'convites') + '">' + d.convitesProposito + '</i>' : '')

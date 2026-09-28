@@ -3051,3 +3051,137 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 /* ---------- ações dentro das lições e leituras da semana ---------- */
 .acoes-licao { margin: 14px 0 18px; }
 .leituras-semana { margin: 6px 0 16px; }
+
+/* =====================================================================================
+   POLIMENTO DE DESIGN · lote 1 (28/09/2026)
+   Revisão de acabamento (docs/revisao-2026-09-28/ux-polimento.md): hierarquia de moldura,
+   relevo só no que se aperta, divisórias finas, raios por família, pesos mais leves no
+   texto de apoio, vazio neutro e contornos de controle que se leem. Fica no fim do arquivo
+   de propósito: são decisões de acabamento que valem por cima das regras de cada tela.
+   ===================================================================================== */
+:root {
+  --moldura: 1px;          /* agrupador de lista e cartão de grade */
+  --moldura-forte: 2px;    /* só o cartão de ação da tela */
+  --linha: 1px;            /* divisória interna */
+  --rotulo-tam: 0.74rem; --rotulo-peso: 800; --rotulo-esp: 0.07em;
+  --trilho-neutro: var(--borda);
+  --progresso-trilho: var(--trilho-neutro);
+  --borda-controle: color-mix(in srgb, var(--tinta-fraca) 75%, var(--fundo));
+  --interruptor-off: color-mix(in srgb, var(--tinta-fraca) 70%, var(--cartao));
+}
+
+/* ---------- S1 · três níveis de moldura ---------- */
+.cartao, .caixa-lista, .lista-atalhos, .caixa-config, .lista-missoes, .bloco-secao, .trofeu,
+.painel-cartao, .colecao-atalhos a, .item-livro, .item, .linha-amigo, .cartao-proposito,
+.cartao-semeador, .cartao-caderno, .nivel-semeador, .dsf-item, .entrada-propositos { border-width: var(--moldura); }
+.leitura-hoje, .passagem, .cartao-push, .apoiar-pix, .dsf-card { border-width: var(--moldura-forte); }
+
+/* ---------- 1.1 · relevo só no que se aperta; estático é chapado; flutuante tem sombra ---------- */
+.leitura-hoje, .cartao-praticar, .cartao-pratica { border-bottom-width: var(--moldura-forte); }
+.cabeca-pratica, .cabeca-passos, .faixa-unidade.travada { box-shadow: none; }
+.item-licao .num, .item-licao.feita .num,
+.lista-licoes.caixa-lista .item-licao.proxima .num { box-shadow: none; }
+.segmentado button[aria-pressed="true"] { box-shadow: none; }
+.cartao-pratica:active { transform: translateY(1px); border-bottom-width: var(--moldura-forte); margin-bottom: 0; }
+.ir-atual { border-bottom-width: 2px; box-shadow: var(--sombra-flutuante); }
+
+/* ---------- 1.2 · os três heróis com o mesmo acabamento; botão branco legível ---------- */
+.cabeca-missoes, .cabeca-pratica, .cabeca-passos {
+  background: var(--inverso);
+  color: var(--inverso-tinta);
+  box-shadow: none;
+  padding: 20px;
+  margin-bottom: 8px;
+}
+.cabeca-missoes h1, .cabeca-pratica h1, .cabeca-passos h1 { color: inherit; }
+.botao.branco { background: var(--branco); color: var(--inverso); }
+
+/* ---------- 1.3 · divisórias que tinham sumido, e finas ---------- */
+.caixa-lista > * + *, .lista-atalhos > * + *, .caixa-config > * + *,
+.caixa-config > * + .linha-config,
+.lista-licoes.caixa-lista .item-licao + .item-licao,
+.lista-pratica.caixa-lista .cartao-pratica + .cartao-pratica,
+.missao + .missao, .painel-mais a + a { border-top: var(--linha) solid var(--borda); }
+.painel-mais a, .painel-mais a:last-child { border-bottom: 0; }
+.item-mural { border-bottom-width: var(--linha); }
+.cartao-pessoa { border-bottom-width: var(--linha); }
+.topo { border-bottom-width: 1px; }
+.botao.contorno { border-width: 2px; }
+.dsf-dias { border-width: 2px; }
+
+/* ---------- 1.4 · raios por família ---------- */
+.fala-bento, .dsf-card, .linha-amigo { border-radius: var(--raio-g); }
+.folha { border-radius: var(--raio-g) var(--raio-g) 0 0; }
+.dsf-item, .dsf-stats, .dsf-estudo, p.selo-status, .qr-convite, .aviso-apoiar,
+.trofeu, .colecao-atalhos a { border-radius: var(--raio); }
+.painel-mais .q, .apoiar-valor, .dsf-base, .painel-outro input,
+.icone-secao, .cartao-pratica .marca { border-radius: var(--raio-p); }
+.arte-livro { border-radius: var(--raio-g); }
+.aba.aba-central { border-radius: var(--raio); }
+
+/* ---------- 1.5 · botão desabilitado que ainda diz o que falta ---------- */
+.botao[disabled], .botao.cor[disabled], .botao.azul[disabled],
+.botao.vermelho[disabled], .botao.branco[disabled] {
+  background: var(--trilho-neutro);
+  color: var(--tinta-fraca);
+  border-color: transparent;
+}
+
+/* ---------- 1.6 · um rótulo em caixa-alta só; contadores em caixa normal ---------- */
+.etiqueta, .leitura-hoje .etiqueta, .passagem .rot, .cartao-pratica .rot, .faixa-unidade .rot,
+.cartao-continuar small, .corpo-semeador small, .leitor-titulo .rot,
+.campo-senha span, .rotulo-escolha, .etiqueta-celula, .item .sub, .dsf-selo, .dsf-stats small,
+.pergunta-reflexao .rotulo-pergunta, .premio .cabeca {
+  font-size: var(--rotulo-tam); font-weight: var(--rotulo-peso);
+  letter-spacing: var(--rotulo-esp); text-transform: uppercase; line-height: 1.2;
+}
+.faixa-unidade .rot { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.titulo-secao span, .titulo-secao a, .contagem-amigos, .titulo-bloco span {
+  font-size: 0.85rem; font-weight: 800; color: var(--tinta-fraca);
+  text-transform: none; letter-spacing: 0;
+}
+
+/* ---------- S2 · texto de apoio mais leve; rótulo de grupo sem gritar ---------- */
+.passo-dica, .dica-campo, .descricao-conquista, .cartao-pratica .sub, .item-licao .textos > span,
+.trofeu span, .folha p, .linha-config .valor, .visao-item small, .bloco-secao span,
+.quem-amigo .arroba, .cabeca-push p, .item .resumo { font-weight: 600; }
+.grupo-config h2.etiqueta { text-transform: none; letter-spacing: 0; font-size: 0.88rem; font-weight: 800; }
+
+/* ---------- 1.7 · campos e interruptor com contorno que se lê (3:1) ---------- */
+.busca-caixa input, .busca-exata input, .campo textarea,
+.campo-senha input, .campo-senha textarea, .campo-senha select,
+.seletor-config, .painel-outro input {
+  background: var(--cartao);
+  border-color: var(--borda-controle);
+}
+.interruptor { background: var(--interruptor-off); }
+[aria-checked="true"] .interruptor { background: var(--verde); }
+
+/* ---------- S4 · o vazio é neutro; o teal fica para a trilha e para o "hoje" ---------- */
+.leitor-progresso, .painel-trilho, .barra-comece { background: var(--trilho-neutro); }
+.estrelas i, .estrelas-fim i { color: var(--trilho-neutro); }
+
+/* ---------- S5 · ícones da visão geral na mesma caixa ---------- */
+.visao-item > svg { width: 24px; height: 24px; stroke-width: 2; }
+.visao-item > .ico-chama { width: 28px; height: 28px; }
+
+/* ---------- S7 · alinhamento ótico pela primeira linha ---------- */
+.dsf-n { align-self: flex-start; margin-top: 2px; }
+.linha-amigo .retrato-amigo { align-self: flex-start; }
+.cartao-pratica > svg { align-self: flex-start; margin-top: 14px; }
+.leitura-hoje .novo-na-fe { align-items: flex-start; }
+.leitura-hoje .novo-na-fe svg { margin-top: 3px; }
+
+/* ---------- S8 · linha que já é botão não precisa de seta ---------- */
+.lista-pratica.caixa-lista .cartao-pratica > svg { display: none; }
+
+/* ---------- S3 · ação secundária em botão pequeno, centrado ---------- */
+.acoes .botao.pequeno, .botao.pequeno.convidar-largo { justify-self: center; }
+
+/* ---------- 1.8 · barra de baixo ---------- */
+.aba .ponto-aba { border-color: var(--cartao); }
+.mais-ico { box-shadow: inset 0 0 0 2px var(--borda); }
+.navegacao.cheia .aba:not(.aba-central) .rotulo-aba {
+  font-size: clamp(0.62rem, calc(0.62rem + 0.04rem * var(--cresce)), 0.66rem);
+  letter-spacing: 0;
+}

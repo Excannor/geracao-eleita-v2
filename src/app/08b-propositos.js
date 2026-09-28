@@ -216,7 +216,7 @@
       + (eu.papel === 'visitante' ? '<button class="botao azul" data-tornar-membro>' + CC.ico('mais-sinal') + 'Fazer parte da célula</button>' : '')
       + (eu.papel !== 'visitante' && eu.estado === 'ativo' && p.encontro >= 0
         ? '<button class="botao contorno" data-convidar-encontro>' + CC.ico('compartilhar') + 'Convidar para o encontro</button>' : '')
-      + (podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
+      + (podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno pequeno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
       + (conduzo ? '<div class="pe-duplo-plano"><button class="botao plano pequeno" data-recado>' + (p.recado ? 'Mudar o recado' : 'Escrever um recado') + '</button>'
         + '<button class="botao plano pequeno" data-encontro>Dia do encontro</button></div>' : '')
       + '</div>';
@@ -566,7 +566,7 @@
       + '<div class="acoes">'
       + (podeNotificar ? '<button class="botao azul" data-notificar>' + CC.ico('sino') + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
       + (p.celula ? '<button class="botao azul" data-roteiro>' + CC.ico('livro') + 'Estudo do encontro</button>' : '')
-      + (p.celula && podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
+      + (p.celula && podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno pequeno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
       + (souLider ? '<div class="pe-duplo-plano"><button class="botao plano pequeno" data-recado>' + (p.recado ? 'Mudar o recado' : 'Escrever um recado') + '</button>'
         + '<button class="botao plano pequeno" data-encontro>Dia do encontro</button></div>' : '')
       + (podeChamar ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar um amigo</button>' : '')

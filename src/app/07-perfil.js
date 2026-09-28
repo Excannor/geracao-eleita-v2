@@ -390,7 +390,7 @@
       + '<span class="selo-status" id="salvo-historia" role="status"></span>'
       + CAMPOS_HISTORIA.map(([chave, pergunta]) => campoHistoria(chave, pergunta, h[chave])).join('')
       + '<p class="passo-dica pequena">Use palavras suas, sem termos de igreja. Três minutos de conversa bastam.</p>'
-      + '<div class="acoes"><button class="botao contorno" data-copiar>' + CC.ico('compartilhar') + 'Copiar minha história</button></div>';
+      + '<div class="acoes"><button class="botao contorno pequeno" data-copiar>' + CC.ico('compartilhar') + 'Copiar minha história</button></div>';
 
     const conta = (chave) => {
       const campo = raiz.querySelector('[data-campo="' + chave + '"]');

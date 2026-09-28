@@ -62,7 +62,7 @@
       + VALORES.map((v) => '<button class="apoiar-valor" role="radio" data-valor="' + v + '">' + reais(v) + '</button>').join('')
       + '<button class="apoiar-valor" role="radio" data-valor="0">Outro</button></div>'
       + '<div class="acoes"><button class="botao" data-copiar-pix>Copiar código Pix</button>'
-      + '<button class="botao contorno" data-qr-pix>Mostrar QR Code</button></div>'
+      + '<button class="botao contorno pequeno" data-qr-pix>Mostrar QR Code</button></div>'
       + '<p class="passo-dica pequena">Quem recebe: ' + CC.esc(PIX.exibido) + '. Com "Outro", você escolhe o valor no app do banco.</p>'
       + '</div>'
       + '<p class="aviso-apoiar">Se você tem menos de 18 anos, converse com seus pais ou responsáveis antes de doar.</p>';

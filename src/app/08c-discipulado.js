@@ -406,7 +406,7 @@
           ? '<div class="lista-pedidos">' + d.meusDiscipulos.map(cartaoDiscipulo).join('') + '</div>'
           : '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Quando você acompanhar alguém na fé, a pessoa aparece aqui.</p></div>')
         + (d.pedidos.length ? CC.tituloSecao('Pedidos', String(d.pedidos.length)) + '<div class="lista-pedidos">' + d.pedidos.map(linhaPedido).join('') + '</div>' : '')
-        + '<div class="acoes"><button class="botao contorno" data-convidar>' + CC.ico('mais-sinal') + 'Convidar alguém</button></div>';
+        + '<div class="acoes"><button class="botao contorno pequeno" data-convidar>' + CC.ico('mais-sinal') + 'Convidar alguém</button></div>';
 
       ligarMarcos(raiz);
       ligarMeuDiscipulador(raiz, d.meuDiscipulador);
