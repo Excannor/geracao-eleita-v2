@@ -93,7 +93,7 @@
       desafio: 'Nada de reclamação solta. Quando algo incomodar, diga o que precisa ou leve a Deus em oração.',
       base: { texto: 'Façam tudo sem queixas e discussões', ref: 'Filipenses 2.14' },
       noLugar: 'Antes de reclamar, diga o que você precisa ou fale com Deus sobre isso.',
-      dicas: ['Peça a alguém de casa para te avisar quando você reclamar.', 'Reclamou? Não zera nada: siga no dia seguinte.', 'Troque "que droga" por "o que eu posso fazer?"', 'Dor de verdade não é reclamação. Se algo grave está acontecendo com você, conte a Deus e a um adulto de confiança.'],
+      dicas: ['Peça a alguém de casa para te avisar quando você reclamar.', 'Reclamou? Não zera nada: siga no dia seguinte.', 'Troque "que droga" por "o que eu posso fazer?"'],
       estudos: [
         ['Números 11.1-6', 'O povo reclamou e passou a lembrar do Egito como se lá fosse melhor. Qual é a sua reclamação mais repetida?', 'Conte hoje quantas vezes você reclama. Só conte, sem se culpar.'],
         ['Filipenses 2.14-15', 'Paulo diz que quem vive sem queixas brilha como as estrelas. Quem perto de você sente o peso das suas reclamações?', 'Troque a próxima reclamação por um pedido claro do que você precisa.'],
