@@ -138,11 +138,11 @@ window.CC = window.CC || {};
   // Os dois precisam ser diferentes — várias destas formas são chapas sobrepostas, e com
   // um tom só viram uma mancha sólida (foi o que aconteceu com a bússola e o alvo).
   const ICONES_ABA = {
-    // mapa dobrado em três painéis
-    trilha: (a, b) => '<path d="M5 13l13-6v30l-13 6z" fill="' + b + '"/>'
-      + '<path d="M18 7l12 6v30l-12-6z" fill="' + a + '"/>'
-      + '<path d="M30 13l13-6v30l-13 6z" fill="' + b + '"/>'
-      + '<path d="M18 7l12 6v30l-12-6z" fill="' + a + '"/>',
+    // estrada em curva com faixa pontilhada: o marcador no começo e a bandeira na chegada
+    trilha: (a, b) => '<path d="M22 47C6 40 38 31 27 23S19 11 33 5" fill="none" stroke="' + b + '" stroke-width="10" stroke-linecap="round"/>'
+      + '<path d="M22 47C6 40 38 31 27 23S19 11 33 5" fill="none" stroke="' + a + '" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="0.1 4.4"/>'
+      + '<path fill-rule="evenodd" d="M9 25a7 7 0 0 1 7 7c0 6-7 13-7 13s-7-7-7-13a7 7 0 0 1 7-7zm0 4.2a2.8 2.8 0 1 0 0 5.6a2.8 2.8 0 1 0 0-5.6z" fill="' + a + '"/>'
+      + '<rect x="37.5" y="2" width="2.8" height="15" rx="1.4" fill="' + a + '"/><path d="M40 2h7.5l-2.5 4 2.5 4H40z" fill="' + a + '"/>',
     // bandeira fincada
     bandeira: (a, b) => '<rect x="9" y="6" width="6" height="37" rx="3" fill="' + b + '"/>'
       + '<path d="M15 9c7-4 15 4 23 0v17c-8 4-16-4-23 0z" fill="' + a + '"/>',
