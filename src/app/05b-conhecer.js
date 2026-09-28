@@ -23,7 +23,7 @@
   function abrirFolhaConversar(nome) {
     const S = conteudoDe().seguir;
     CC.folha('<h2>Converse com ' + CC.esc(nome) + '</h2>'
-      + '<p class="passo-dica">' + CC.esc(nome) + ' vai saber que você quer conversar. O que você escreveu fica só com você.</p>'
+      + '<p class="passo-dica">' + CC.esc(nome) + ' vai saber que você quer conversar (e o líder da sua célula, se você tiver uma). O que você escreve no app fica só com você.</p>'
       + '<div class="acoes"><button class="botao azul" data-enviar>' + CC.esc(S.conversar) + '</button>'
       + '<button class="botao plano" data-fechar>Fechar</button></div>',
     {
@@ -260,7 +260,7 @@
     raiz.innerHTML = CC.botaoVoltar('Voltar')
       + '<h1>' + CC.esc(p.titulo) + '</h1>'
       + p.paragrafos.map((par) => '<p style="margin:0 0 14px;line-height:1.6">' + CC.esc(par) + '</p>').join('')
-      + (pilulas ? CC.tituloSecao('Leia você mesmo') + '<div class="pilulas">' + pilulas + '</div>' : '')
+      + (pilulas ? CC.tituloSecao('Leia na Bíblia') + '<div class="pilulas">' + pilulas + '</div>' : '')
       + (quem ? '<div class="acoes"><button class="botao contorno" data-conversar>Converse com '
         + CC.esc(primeiroNome(quem.nome)) + '</button></div>' : '');
 
