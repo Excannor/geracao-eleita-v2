@@ -779,6 +779,18 @@ export class Contas {
     return conta;
   }
 
+  // "Estou conhecendo" no cadastro, vindo do convite de um amigo ou do link de uma célula:
+  // a conta entra no Conhecer Jesus e quem chamou passa a acompanhar (vê em que dia a pessoa
+  // está e recebe o "Quero conversar"). Não troca um acompanhante que já exista.
+  async acompanharNoConhecer(usuario, quem) {
+    const a = this.achar(usuario);
+    const q = this.achar(quem);
+    if (!a || !q || a.usuario === q.usuario || this.algumBloqueio(a.usuario, q.usuario)) return;
+    a.caminho = 'conhecer';
+    if (!a.acompanhadoPor) a.acompanhadoPor = q.usuario;
+    await this.salvar();
+  }
+
   // Por onde a conta chegou (convite, conhecer, celula, direto): só para o painel agregado.
   async marcarOrigem(usuario, origem) {
     const a = this.achar(usuario);

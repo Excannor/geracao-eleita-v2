@@ -810,6 +810,8 @@ const servidor = createServer(async (req, res) => {
           try {
             const hoje = hojeDe(criada.usuario);
             const usado = await CONTAS.usarConvite(criada.usuario, String(pedido.convite), assinar, hoje, Date.now(), { contaNova: true });
+            // Marcou "Estou conhecendo" vindo do convite de um amigo: esse amigo acompanha.
+            if (pedido.caminho === 'conhecer' && usado.de) await CONTAS.acompanharNoConhecer(criada.usuario, usado.de);
             if (!usado.ja) {
               convidadoPor = usado.de;
               await NOVIDADES.publicar(criada.usuario, 'novoProposito', { com: usado.de }, 'novo:' + [criada.usuario, usado.de].sort().join('|') + ':' + hoje);
@@ -831,6 +833,8 @@ const servidor = createServer(async (req, res) => {
             const hoje = hojeDe(criada.usuario);
             const r = await CONTAS.entrarNaCelula(criada.usuario, String(pedido.celula), assinar, hoje, Date.now(), { contaNova: true, visitante: !!pedido.celulaVisitante });
             celula = r.proposito.titulo;
+            // Marcou "Estou conhecendo" vindo do link da célula: quem mandou o link acompanha.
+            if (pedido.caminho === 'conhecer' && r.de) await CONTAS.acompanharNoConhecer(criada.usuario, r.de);
             await marcarOrigem('celula');
             await avisarEntradaNaCelula(criada.usuario, r, hoje);
           } catch { /* segue sem a célula */ }

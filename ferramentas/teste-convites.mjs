@@ -233,6 +233,17 @@ try {
   ok(conversarNoa.status === 200 && !conversarNoa.corpo.ja, 'a Noa, que também está numa célula, pede para conversar');
   ok((await esperarChegar(celPrimo, 1)) === 1, 'o primo, que a convidou, recebe o aviso');
   ok((await esperarChegar(celDuda, 1)) === 1, 'e o líder da célula dela também recebe');
+
+  // ---------- "Estou conhecendo" com o convite comum de um amigo ----------
+  const tio = await criar('tio');
+  const linkComum = (await pedir('/api/convites', {}, tio.cookie)).corpo.link;
+  const tokenComum = new URL(linkComum).searchParams.get('convite');
+  const nina = await pedir('/api/criar-conta', { usuario: 'nina', senha: 'senha-boa-1', nome: 'nina', email: 'nina@teste.com', nascimento: '2000-01-01', consentimento: true, convite: tokenComum, caminho: 'conhecer' });
+  ok(nina.status === 200, 'a Nina cria a conta pelo convite comum marcando "Estou conhecendo"');
+  ok(!!(await amigosDe(tio.cookie)).acompanhando.find((a) => a.usuario === 'nina'), 'quem mandou o convite comum passa a acompanhar a Nina');
+  const conversaNina = await pedir('/api/conhecer/conversar', {}, nina.cookie);
+  ok(conversaNina.status === 200, 'a Nina consegue pedir "Quero conversar"');
+  ok(((await amigosDe(tio.cookie)).pedidosConversa || []).some((p) => p.usuario === 'nina' && p.tipo === 'conhecer'), 'o pedido da Nina aparece no Juntos de quem acompanha');
 } catch (e) {
   ok(false, 'o teste quebrou: ' + e.stack);
 } finally {
