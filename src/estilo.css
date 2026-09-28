@@ -3016,3 +3016,6 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .qr-convite { width: min(200px, 64%); margin: 2px auto 0; padding: 10px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px var(--borda); }
 .qr-convite svg { display: block; width: 100%; height: auto; }
 .qr-legenda { text-align: center; margin-top: 6px; }
+
+/* Referência da frase da ofensiva no fim da lição, embaixo da frase. */
+.frase-cena .ref-frase { display: block; margin-top: 6px; font-size: 0.8em; font-weight: 700; color: var(--tinta-fraca); }

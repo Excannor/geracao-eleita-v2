@@ -426,20 +426,10 @@
     item(CC.arte.bau(feitas === c.missoes.lista.length ? 'aberto' : 'travado', feitas === c.missoes.lista.length ? 'madeira' : ''),
       'Desafios do dia: ' + feitas + ' de ' + c.missoes.lista.length, feitas === c.missoes.lista.length ? 'Todos feitos' : '<a href="#/missoes" data-ver-desafios>Ver os desafios</a>', 'desafios');
 
-    // A frase do fim do dia, sempre no mesmo fio: quem acende é Deus, e o que mantém a chama
-    // é a lenha de cada manhã, como no altar de Levítico 6.12. Varia com o dia para não virar refrão.
-    const FRASES_FOGO = [
-      'Fogo de palha acende e logo apaga. Cada leitura é lenha que mantém o fogo aceso.',
-      'O fogo que arde em você não foi você que acendeu. Cuidar dele é o seu trabalho de hoje.',
-      'A chama todo mundo vê. A lenha de cada manhã, só você e Deus sabem.',
-      'Não é chama passageira. É lenha posta cada manhã, como no altar que não se apagava.',
-      'Não precisa ser muito. Um pouco de lenha a cada dia mantém o fogo aceso.',
-      'Deus está acendendo a sua chama. Amanhã tem mais lenha esperando.',
-      'Constância vale mais que intensidade. Um dia de cada vez mantém o fogo.',
-    ];
-    const frase = seq.atual === 1
-      ? 'Seu fogo acendeu! O que mantém a chama é a lenha de cada dia. Até amanhã!'
-      : FRASES_FOGO[(sessao.dia - 1) % FRASES_FOGO.length];
+    // A frase do fim do dia é uma das frases da ofensiva (as mesmas do carimbo), sorteada,
+    // com a referência quando a frase tem uma.
+    const f = CC.fraseDaOfensiva();
+    const frase = CC.esc(f.linhas.join(' ')) + (f.ref ? ' <span class="ref-frase">' + CC.esc(f.ref) + '</span>' : '');
 
     return {
       semTopo: true,
