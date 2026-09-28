@@ -148,7 +148,7 @@ export const PESSOAS_A = {
     resumo: 'O profeta do fogo no monte Carmelo, que logo depois quis desistir de tudo. Deus cuidou dele no deserto.',
     quem: 'Profeta que enfrentou o rei Acabe e a rainha Jezabel quando Israel estava tomado pela adoração a Baal. É lembrado pelo desafio no monte Carmelo, pela fuga pro deserto em profundo desânimo e por ter sido levado ao céu num redemoinho, sem passar pela morte.',
     onde: '1 Reis 17-19 e 21; 2 Reis 1-2.',
-    deus: 'No Carmelo, Deus responde com fogo à oração de Elias e mostra, diante dos profetas de Baal, que ele é o único Deus verdadeiro.\n\nLogo depois, Elias foge com medo de Jezabel, deita debaixo de uma árvore e pede pra morrer. Deus manda comida, deixa ele dormir e só depois conversa. No monte Horebe, depois do vento, do terremoto e do fogo, vem um som de brisa suave (1 Reis 19.11-12). O mesmo Deus do fogo cuida com carinho de um profeta esgotado.\n\nSe você também está tão cansado que não quer continuar, não fique sozinho com isso. Fale com alguém de confiança ou ligue 188, o CVV, a qualquer hora.',
+    deus: 'No Carmelo, Deus responde com fogo à oração de Elias e mostra, diante dos profetas de Baal, que ele é o único Deus verdadeiro.\n\nLogo depois, Elias foge com medo de Jezabel, deita debaixo de uma árvore e pede pra morrer. Deus manda comida, deixa ele dormir e só depois conversa. No monte Horebe, depois do vento, do terremoto e do fogo, vem um som de brisa suave (1 Reis 19.11-12). O mesmo Deus do fogo cuida com carinho de um profeta esgotado.\n\nSe você também está sem forças pra continuar, não fique sozinho com isso. Fale com alguém de confiança ou ligue 188, o CVV, a qualquer hora.',
     erros: 'Depois da grande vitória no Carmelo, entrou em desânimo e medo diante da ameaça de Jezabel e chegou a pedir a Deus que tirasse sua vida (1 Reis 19.4).',
   },
   'Eliseu': {
@@ -161,7 +161,7 @@ export const PESSOAS_A = {
   'Enoque': {
     sub: 'Início da história',
     resumo: 'Andou com Deus, e Deus o levou. No meio de uma lista de gente que morreu, a história dele termina diferente.',
-    quem: 'Descendente de Adão, pai de Matusalém e bisavô de Noé. A genealogia de Gênesis 5 repete o tempo todo a mesma frase: e morreu. Com Enoque é diferente. Ele andou com Deus, e já não foi visto, porque Deus o levou (Gênesis 5.24).',
+    quem: 'Descendente de Adão, pai de Matusalém e bisavô de Noé. A genealogia de Gênesis 5 repete o tempo todo a mesma frase: e morreu. Com Enoque é diferente. Ele sempre andou com Deus e um dia desapareceu, porque Deus o levou (Gênesis 5.24).',
     onde: 'Gênesis 5.21-24; citado em Hebreus 11.5 e Judas 14-15.',
     deus: 'Hebreus 11.5 diz que Enoque foi levado por causa da fé, e que antes disso recebeu o testemunho de que agradava a Deus. Numa lista marcada pela morte, Enoque aponta pra uma vida com Deus em que a morte não tem a última palavra.\n\nAndar com Deus é uma imagem de caminhada diária, passo a passo, lado a lado.',
   },

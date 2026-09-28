@@ -20,7 +20,7 @@ export const PESSOAS_B = {
     resumo: 'Profeta que viu a santidade de Deus no templo e anunciou o Servo que sofreria pelos pecados do povo.',
     quem: 'Profeta de Judá durante o reinado de vários reis. Foi chamado numa visão de Deus no templo, cercado de serafins que diziam santo, santo, santo (Isaías 6). O livro dele junta avisos contra a infidelidade do povo e algumas das promessas mais claras sobre o Messias em todo o Antigo Testamento.',
     onde: 'Livro de Isaías; contexto em 2 Reis 19-20.',
-    deus: 'Diante da santidade de Deus, Isaías se sente perdido: sou um homem de lábios impuros. Um serafim toca a boca dele com uma brasa e diz que a culpa foi tirada (Isaías 6.5-7). Depois disso, quando Deus pergunta quem vai, Isaías responde: eu irei, Senhor, envie-me (Isaías 6.8).\n\nEm Isaías 53, o profeta fala de um Servo ferido pelas nossas transgressões, que carrega o castigo que nos traz paz. Desde o começo, os cristãos leram esse texto como anúncio de Jesus (Atos 8.32-35).',
+    deus: 'Diante da santidade de Deus, Isaías se sente perdido: sou um homem de lábios impuros. Um serafim toca a boca dele com uma brasa e diz que a culpa foi tirada (Isaías 6.5-7). Depois disso, quando Deus pergunta quem vai, Isaías responde: eu irei, Senhor, envie-me (Isaías 6.8).\n\nEm Isaías 53, o profeta fala de um Servo ferido por causa dos nossos pecados, que carrega o castigo que nos traz paz. Desde o começo, os cristãos leram esse texto como anúncio de Jesus (Atos 8.32-35).',
   },
   'Ismael': {
     sub: 'Patriarcas',
@@ -114,7 +114,7 @@ export const PESSOAS_B = {
     quem: 'Filho de Zacarias e Isabel, nascido quando os pais já eram idosos. Desde antes de nascer foi separado pra preparar o caminho do Messias. Pregava arrependimento no deserto, batizava no rio Jordão e apontou pra Jesus dizendo: vejam, o Cordeiro de Deus que tira o pecado do mundo (João 1.29). Foi preso e morto por Herodes.',
     onde: 'Mateus 3, 11 e 14; Marcos 1 e 6; Lucas 1, 3 e 7; João 1 e 3.',
     deus: 'Depois de séculos sem profetas, Deus envia João como o mensageiro anunciado por Isaías e Malaquias, pra preparar a chegada do Messias.\n\nQuando os discípulos de João reclamam que todo mundo estava indo atrás de Jesus, ele responde: ele deve tornar-se cada vez maior, e eu devo diminuir cada vez mais (João 3.30). Esse é o lugar de qualquer pessoa que serve a Deus: apontar pra Jesus.',
-    erros: 'Na prisão, passou por um momento de dúvida e mandou perguntar a Jesus se ele era mesmo aquele que havia de vir (Mateus 11.3). Jesus respondeu mostrando o que estava acontecendo e depois elogiou João diante de todos.',
+    erros: 'Na prisão, passou por um momento de dúvida e mandou perguntar a Jesus se ele era mesmo aquele que estavam esperando (Mateus 11.3). Jesus respondeu mostrando o que estava acontecendo e depois elogiou João diante de todos.',
   },
   'João apóstolo': {
     sub: 'Evangelhos · séc. I',
@@ -129,7 +129,7 @@ export const PESSOAS_B = {
     resumo: 'Um dos doze. Andou com Jesus, cuidava do dinheiro do grupo e o entregou por trinta moedas de prata.',
     quem: 'Um dos doze apóstolos, responsável pela bolsa de dinheiro do grupo. Combina com os chefes dos sacerdotes entregar Jesus por trinta moedas de prata e o identifica aos soldados com um beijo, no Getsêmani. Depois da prisão de Jesus, sente remorso e morre. Mateus e Atos contam a morte dele com detalhes diferentes.',
     onde: 'Mateus 26-27; Marcos 14; Lucas 22; João 12-13 e 18; Atos 1.',
-    deus: 'Os evangelhos não explicam tudo o que levou Judas a trair. João diz que ele já roubava do dinheiro do grupo (João 12.6) e que Satanás entrou nele naquela noite (João 13.27).\n\nJesus trata a traição como algo previsto nas Escrituras e, ao mesmo tempo, terrível: ai daquele por quem o Filho do homem é traído (Mateus 26.24). Deus estava no controle do que aconteceu na cruz, e Judas continuou responsável pelo que escolheu. A Bíblia segura essas duas verdades juntas.',
+    deus: 'Os evangelhos não explicam tudo o que levou Judas a trair. João diz que ele já roubava do dinheiro do grupo (João 12.6) e que Satanás entrou nele naquela noite (João 13.27).\n\nJesus trata a traição como algo previsto nas Escrituras e, ao mesmo tempo, terrível: ai do homem que trai o Filho do Homem (Mateus 26.24). Deus estava no controle do que aconteceu na cruz, e Judas continuou responsável pelo que escolheu. A Bíblia segura essas duas verdades juntas.',
     erros: 'Traiu Jesus por dinheiro e o entregou com um beijo. Antes disso, já roubava da bolsa do grupo. O texto conta que ele sentiu remorso, e a história dele termina longe de Jesus. Pedro também falhou naquela noite, e voltou.',
   },
   'Judá filho de Jacó': {
@@ -153,7 +153,7 @@ export const PESSOAS_B = {
     resumo: 'A esposa menos amada de Jacó. Deus viu o desprezo que ela sofria, e dela veio a família de Davi e de Jesus.',
     quem: 'Filha mais velha de Labão. Na noite do casamento, o pai a coloca no lugar da irmã Raquel, e Jacó só descobre de manhã. Lia passa a vida como a esposa menos amada. Mesmo assim, é mãe de seis dos doze filhos de Jacó, entre eles Levi e Judá.',
     onde: 'Gênesis 29-35 e 49.31.',
-    deus: 'A Bíblia diz sem rodeios que Lia era desprezada e que por isso o Senhor lhe deu filhos (Gênesis 29.31). Deus toma o lado de quem é rejeitado dentro da própria família.\n\nOs nomes que ela dá aos filhos mostram a dor e a mudança. Primeiro espera que o marido passe a amá-la. No quarto filho, Judá, diz apenas: desta vez louvarei ao Senhor (Gênesis 29.35). Da família de Judá vêm Davi e Jesus.',
+    deus: 'A Bíblia diz sem rodeios que Lia era desprezada e que por isso o Senhor lhe deu filhos (Gênesis 29.31). Deus toma o lado de quem é rejeitado dentro da própria família.\n\nOs nomes que ela dá aos filhos mostram a dor e a mudança. Primeiro espera que o marido passe a amá-la. No quarto filho, Judá, diz apenas: desta vez louvarei o Senhor (Gênesis 29.35). Da família de Judá vêm Davi e Jesus.',
     erros: 'A Bíblia mostra Lia mais como vítima do arranjo do pai e da preferência do marido. Ela também entrou na rivalidade com a irmã pela atenção de Jacó (Gênesis 30.14-16).',
   },
   'Lucas evangelista': {
@@ -179,10 +179,10 @@ export const PESSOAS_B = {
   },
   'Marcos evangelista': {
     sub: 'Igreja primitiva · séc. I',
-    resumo: 'Desistiu no meio de uma viagem missionária e anos depois ouviu de Paulo: ele me é útil. Uma história de segunda chance.',
+    resumo: 'Desistiu no meio de uma viagem missionária e anos depois Paulo escreveu sobre ele: necessito dele no ministério. Uma história de segunda chance.',
     quem: 'Também chamado João Marcos, primo de Barnabé. A casa da mãe dele em Jerusalém era ponto de encontro da igreja. Acompanha Paulo e Barnabé na primeira viagem missionária, mas volta pra casa no meio do caminho. Mais tarde, Barnabé quer levá-lo de novo, Paulo não aceita, e os dois se separam por causa disso.',
     onde: 'Atos 12-13 e 15; citado em Colossenses 4.10, 2 Timóteo 4.11 e 1 Pedro 5.13. A tradição o reconhece como autor do evangelho de Marcos.',
-    deus: 'No fim da vida, o mesmo Paulo que não quis levar Marcos pede que o tragam, porque ele é útil pro ministério (2 Timóteo 4.11). É um dos retratos mais completos de recomeço depois de um fracasso em toda a Bíblia.\n\nSegundo a tradição da igreja, o evangelho de Marcos registra o que Pedro contava. Isso ajuda a explicar o ritmo rápido do livro, cheio de ação.',
+    deus: 'No fim da vida, o mesmo Paulo que não quis levar Marcos pede que o tragam, porque necessita dele no ministério (2 Timóteo 4.11). É um dos retratos mais completos de recomeço depois de um fracasso em toda a Bíblia.\n\nSegundo a tradição da igreja, o evangelho de Marcos registra o que Pedro contava. Isso ajuda a explicar o ritmo rápido do livro, cheio de ação.',
     erros: 'Abandonou Paulo e Barnabé no meio da primeira viagem missionária, em Perge (Atos 13.13), e isso fez Paulo desconfiar dele por um tempo.',
   },
   'Maria Madalena': {
@@ -212,7 +212,7 @@ export const PESSOAS_B = {
     resumo: 'Recebeu Jesus em casa, se enrolou no serviço e fez uma das declarações de fé mais completas do evangelho.',
     quem: 'Irmã de Maria e de Lázaro, moradora de Betânia. Recebe Jesus em casa e fica ocupada com os preparativos enquanto a irmã senta pra ouvi-lo. Quando Lázaro morre, é Marta quem sai ao encontro de Jesus e conversa com ele sobre a ressurreição.',
     onde: 'Lucas 10.38-42; João 11-12.',
-    deus: 'Quando Marta reclama da irmã, Jesus responde com carinho: Marta, Marta, você está tão preocupada com todos esses serviços; há apenas uma coisa necessária (Lucas 10.41-42). Jesus valoriza o serviço dela e coloca em ordem o que vem primeiro.\n\nDiante da morte do irmão, Marta diz: eu creio que tu és o Cristo, o Filho de Deus, que devia vir ao mundo (João 11.27). Ela faz essa declaração antes de ver o milagre.',
+    deus: 'Quando Marta reclama da irmã, Jesus responde com carinho: Marta, Marta, você se encontra tão preocupada com todos esses serviços caseiros; há realmente apenas uma coisa necessária (Lucas 10.41-42). Jesus valoriza o serviço dela e coloca em ordem o que vem primeiro.\n\nDiante da morte do irmão, Marta diz: eu creio que o Senhor é o Cristo, o Filho de Deus, que devia vir ao mundo (João 11.27). Ela faz essa declaração antes de ver o milagre.',
     erros: 'Reclamou com Jesus porque estava sobrecarregada enquanto a irmã só ouvia, e cobrou dele que mandasse Maria ajudar.',
   },
 };
