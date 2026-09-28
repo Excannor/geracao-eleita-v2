@@ -65,6 +65,7 @@
     raiz.innerHTML = '<div class="cabeca-missoes">'
       + '<div class="textos"><h1>Desafios</h1><p>Complete os três desafios de hoje.</p></div>'
       + '<span class="bau-cabeca">' + CC.arte.bau(feitas === lista.length ? 'aberto' : 'pronto') + '</span></div>'
+      + '<section class="bloco-missoes" id="desafios-longos">' + CC.blocoDesafiosLongos() + '</section>'
       + '<section class="bloco-missoes">'
       + '<div class="titulo-bloco"><h2>Desafios do dia</h2><span class="relogio">' + CC.ico('calendario') + CC.plural(CC.horasAteAmanha(), 'hora', 'horas') + '</span></div>'
       + '<div class="lista-missoes">' + lista.map((m) => CC.linhaMissao(m)).join('') + '</div></section>'
@@ -87,6 +88,7 @@
       });
     };
     ligarAmigos();
+    CC.ligarDesafiosLongos(raiz, () => { if (location.hash.startsWith('#/missoes')) CC.vistaMissoes(raiz); });
     if (CC.carregarAmigos) {
       CC.carregarAmigos().then((d) => {
         const alvo = raiz.querySelector('#missao-amigos');

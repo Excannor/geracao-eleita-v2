@@ -285,7 +285,9 @@
       const total = u.ate - u.de + 1;
       return { tipo: 'unidade', numero: u.numero, titulo: 'Unidade ' + u.numero, sub: u.titulo, cor: u.cor, feitos, total, ganho: feitos === total };
     });
-    return { colecoes, unidades };
+    // Desafios de vários dias (09c-desafios.js): um troféu por desafio concluído.
+    const desafios = (CC.DESAFIOS || []).map((d) => { const s = CC.situacaoDesafio(d, e); return { tipo: 'desafio', titulo: d.titulo, feitos: s.vencidos, total: d.dias, ganho: s.concluido }; });
+    return { colecoes, unidades, desafios };
   };
 
   // ---------- novidades: o que o servidor confere ----------

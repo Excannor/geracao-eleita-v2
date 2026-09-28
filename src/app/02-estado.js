@@ -46,6 +46,8 @@
     // Minha história com Deus (Perfil): guia privado, nunca sai para amigo, célula,
     // discipulado nem painel. { antes, encontro, hoje, em }.
     historia: null,
+    // desafios de vários dias (aba Desafios): { [id]: { inicio, dias: [datas], ativo, concluidoEm, em } }
+    desafios: {},
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -101,6 +103,23 @@
 
   // Minha história com Deus: vence a cópia com "em" mais recente, sem misturar campo a
   // campo (é um relato só, escrito de uma vez; misturar pedaços de dois textos não faz sentido).
+  // Desafios: os dias vencidos se somam entre aparelhos; "ativo" (e pausar) vale o mais recente.
+  function fundirDesafios(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [id, y] of Object.entries(b || {})) {
+      const x = saida[id];
+      if (!x) { saida[id] = y; continue; }
+      const novo = (y.em || 0) >= (x.em || 0) ? y : x;
+      saida[id] = {
+        inicio: [x.inicio, y.inicio].filter(Boolean).sort()[0] || '',
+        dias: uniao(x.dias, y.dias),
+        ativo: !!novo.ativo,
+        concluidoEm: [x.concluidoEm, y.concluidoEm].filter(Boolean).sort()[0] || '',
+        em: Math.max(x.em || 0, y.em || 0),
+      };
+    }
+    return saida;
+  }
   function fundirHistoria(a, b) {
     if (!a) return b || null;
     if (!b) return a;
@@ -172,6 +191,7 @@
       ultimaBiblia: ((b.ultimaBiblia || {}).em || 0) >= ((a.ultimaBiblia || {}).em || 0) ? (b.ultimaBiblia || a.ultimaBiblia || null) : a.ultimaBiblia,
       marcas: fundirMarcas(a.marcas, b.marcas),
       historia: fundirHistoria(a.historia, b.historia),
+      desafios: fundirDesafios(a.desafios, b.desafios),
     };
   }
   function fundirPratica(a, b) {

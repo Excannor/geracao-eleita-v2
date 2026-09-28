@@ -115,7 +115,7 @@
     const ritmo = CC.ritmo();
     const conquistas = CC.conquistasComNivel();
     const trofeus = CC.trofeus();
-    const todos = [...trofeus.unidades, ...trofeus.colecoes];
+    const todos = [...trofeus.unidades, ...trofeus.colecoes, ...(trofeus.desafios || [])];
     const ganhos = todos.filter((t) => t.ganho);
 
     // Visão geral: quatro números em grade simples, sem cartão colorido em volta de cada um
@@ -231,7 +231,9 @@
       + CC.tituloSecao('Unidades do plano', t.unidades.filter((x) => x.ganho).length + ' de ' + t.unidades.length)
       + '<div class="estante">' + t.unidades.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Partes da Bíblia', t.colecoes.filter((x) => x.ganho).length + ' de ' + t.colecoes.length)
-      + '<div class="estante">' + t.colecoes.map(trofeuHtml).join('') + '</div>';
+      + '<div class="estante">' + t.colecoes.map(trofeuHtml).join('') + '</div>'
+      + CC.tituloSecao('Desafios', t.desafios.filter((x) => x.ganho).length + ' de ' + t.desafios.length)
+      + '<div class="estante">' + t.desafios.map(trofeuHtml).join('') + '</div>';
   };
 
   // ---------- meus versículos ----------
