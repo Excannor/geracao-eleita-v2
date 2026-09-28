@@ -26,7 +26,7 @@ Quase sempre a dúvida nasce de olhar pra si mesmo. A pessoa mede o próprio dia
 
 Efésios 2.8-9 diz que somos salvos pela graça, por meio da fé, e que isso vem de Deus como presente. Ninguém ganhou por merecer, e por isso ninguém tem do que se gabar.
 
-Pensa assim: se você não conquistou a salvação com esforço, também não é o seu esforço que vai mantê-la de pé. Paulo pergunta aos gálatas (Gálatas 3.3) por que achavam que, depois de começar a vida com Deus sem nenhum mérito, iam ficar mais fortes na fé tentando cumprir regras por conta própria.
+Pensa assim: se você não conquistou a salvação com esforço, também não é o seu esforço que vai mantê-la de pé. [[11 - Pessoas/Paulo|Paulo]] pergunta aos cristãos da Galácia (Gálatas 3.3) por que achavam que, depois de começar a vida com Deus sem nenhum mérito, iam ficar mais fortes na fé tentando cumprir regras por conta própria.
 
 Jesus usa uma imagem bonita em João 10.28-29. Ele dá vida eterna às suas ovelhas, e ninguém consegue arrancá-las da mão do Pai. Quem segura a ovelha é o pastor.
 
@@ -83,7 +83,7 @@ Em Mateus 16.15, Jesus fez uma pergunta direta aos amigos mais próximos: e voc�
 
 Quase ninguém diz que Jesus nunca existiu. A maioria das pessoas fala bem dele: foi um homem bom, um grande mestre, um exemplo de amor. Parece elogio, só que deixa o principal de fora.
 
-Um bom mestre humano não diria que perdoa pecados cometidos contra outras pessoas. Não aceitaria ser adorado. Não diria que já existia antes de Abraão (João 8.58). Jesus disse e fez tudo isso. Então sobram poucas saídas: ou ele estava enganado, ou estava enganando, ou é quem disse ser.
+Um bom mestre humano não diria que perdoa pecados cometidos contra outras pessoas. Não aceitaria ser adorado. Não diria que já existia antes de [[11 - Pessoas/Abraão|Abraão]] (João 8.58). Jesus disse e fez tudo isso. Então sobram poucas saídas: ou ele estava enganado, ou estava enganando, ou é quem disse ser.
 
 ## O que a Bíblia afirma sobre ele
 
@@ -134,12 +134,12 @@ João 1.1-18 · Marcos 8.27-38 · Colossenses 1.15-23 · Hebreus 1.1-4 e 2.14-18
 Próxima lição: [[${T}03 - O batismo|O batismo]]
 Pessoas: [[11 - Pessoas/Jesus Cristo|Jesus Cristo]]
 Temas: [[06 - Estudos Temáticos/Messias|Messias]] · [[06 - Estudos Temáticos/Redenção|Redenção]] · [[06 - Estudos Temáticos/Graça|Graça]]
-Fios: [[15 - Fios Bíblicos/Fio da semente prometida|Fio da semente prometida]] · [[15 - Fios Bíblicos/Fio do servo sofredor|Fio do servo sofredor]] · [[15 - Fios Bíblicos/Fio do rei prometido|Fio do rei prometido]]
+Conexões: [[15 - Fios Bíblicos/Fio da semente prometida|Fio da semente prometida]] · [[15 - Fios Bíblicos/Fio do servo sofredor|Fio do servo sofredor]] · [[15 - Fios Bíblicos/Fio do rei prometido|Fio do rei prometido]]
 `,
   },
 
   [T + '03 - O batismo']: {
-    resumo: 'O que o batismo significa, pra quem já passou pelas águas e pra quem ainda está pensando nesse passo.',
+    resumo: 'O que o batismo significa, pra quem já passou pelo batismo e pra quem ainda está pensando nesse passo.',
     texto: `
 Talvez você já tenha passado pelo batismo. Talvez esteja pensando nisso, ou ainda nem saiba se quer. Esta lição serve pra todo mundo: mostra o que a Bíblia diz sobre o batismo e por que Jesus pediu que ele fizesse parte da vida de quem o segue.
 
@@ -175,7 +175,7 @@ O batismo é um sinal, e um sinal aponta pra um fato. O fato continua de pé, fo
 
 ## Se você ainda não passou pelo batismo
 
-Não precisa ter pressa nem medo. Se você crê em Jesus e quer segui-lo, o batismo é o passo que ele mesmo pediu. Converse com o pastor ou com alguém da liderança da sua igreja, conte o que você entende e pergunte o que ainda não está claro. Muitas igrejas têm um tempo de preparo antes, justamente pra isso.
+Não precisa ter pressa nem medo. Se você crê em Jesus e quer segui-lo, o batismo é o passo que ele mesmo pediu. Converse com alguém mais experiente na fé: quem te convidou pro app, o líder da célula ou o pastor da igreja que você frequenta. Conte o que você entende e pergunte o que ainda não está claro. Muitas igrejas têm um tempo de preparo antes, justamente pra isso.
 
 Se você ainda tem dúvidas sobre a própria fé, tudo bem também. Continue lendo, orando e fazendo perguntas. O batismo faz mais sentido quando você sabe a que está dizendo sim.
 
@@ -183,7 +183,7 @@ Se você ainda tem dúvidas sobre a própria fé, tudo bem também. Continue len
 
 Igrejas diferentes batizam de jeitos diferentes, e é bom saber disso pra não estranhar. Algumas batizam por imersão, outras derramando ou aspergindo água. Algumas batizam só quem já professa a fé, outras batizam também os filhos pequenos de famílias cristãs. E cada tradição dá um peso um pouco diferente ao que acontece no batismo.
 
-Se você recebeu o batismo quando era bebê e agora está entendendo a fé, converse com a liderança da sua igreja sobre como ela entende isso.
+Se você recebeu o batismo quando era bebê e agora está entendendo a fé, converse com a liderança da igreja que você frequenta agora sobre como ela entende isso, sem pressa.
 
 Essas diferenças são antigas e sérias. Mesmo assim, quase todos concordam no principal: Jesus mandou batizar, o batismo aponta pra união com a morte e a ressurreição dele, e a salvação vem pela graça, por meio da fé. Ver [[05 - Hermenêutica/Analogia da fé|Analogia da fé]], sobre separar o essencial do secundário.
 
@@ -195,7 +195,7 @@ Na prática, isso passa por três coisas: ler a Bíblia com constância, como na
 
 ## Pra anotar
 
-Se você já passou pelo batismo, escreva em Suas anotações, no fim desta página, como foi: a data, quem estava lá, o que você entendia na hora e o que entende agora. Se ainda não foi, anote as perguntas que você quer levar pra conversar com alguém da sua igreja.
+Se você já passou pelo batismo, escreva em Suas anotações, no fim desta página, como foi: a data, quem estava lá, o que você entendia na hora e o que entende agora. Se ainda não passou, anote as perguntas que você quer levar pra conversar com alguém mais experiente na fé.
 
 ## Leia esta semana
 
@@ -204,7 +204,7 @@ Romanos 6.1-14 · Mateus 28.16-20 · Atos 2.36-41 · Colossenses 2.6-15
 ## Pra ir além
 
 Próxima lição: [[${T}04 - A Bíblia|A Bíblia]]
-Eventos: [[12 - Eventos/Crucificação|Crucificação]] · [[12 - Eventos/Ressurreição|Ressurreição]] · [[12 - Eventos/Pentecostes|Pentecostes]]
+Acontecimentos: [[12 - Eventos/Crucificação|Crucificação]] · [[12 - Eventos/Ressurreição|Ressurreição]] · [[12 - Eventos/Pentecostes|Pentecostes]]
 Temas: [[06 - Estudos Temáticos/Igreja|Igreja]] · [[06 - Estudos Temáticos/Perdão|Perdão]] · [[06 - Estudos Temáticos/Redenção|Redenção]]
 Alianças: [[14 - Alianças/Nova aliança|Nova aliança]]
 `,
@@ -257,7 +257,7 @@ Um jeito simples de fazer isso tem três passos: observar o que o texto diz, int
 
 ## Pra anotar
 
-Em Suas anotações, no fim desta página, escreva o que você já sabia sobre como a Bíblia chegou até nós e o que foi novidade. Se ficou alguma dúvida sobre cópias ou traduções, anote também. É normal a dúvida voltar, e ter isso escrito ajuda a conversar com alguém da sua igreja.
+Em Suas anotações, no fim desta página, escreva o que você já sabia sobre como a Bíblia chegou até nós e o que foi novidade. Se ficou alguma dúvida sobre cópias ou traduções, anote também. É normal a dúvida voltar, e ter isso escrito ajuda a conversar com alguém mais experiente na fé.
 
 ## Leia esta semana
 
@@ -414,7 +414,7 @@ Isso nunca significa aceitar tudo calado. Abuso, manipulação ou qualquer tipo 
 
 Duas práticas marcam a vida da igreja desde o começo. O batismo acontece uma vez e é o sinal público de união com Jesus na morte e na ressurreição dele (Romanos 6.3-4). A ceia do Senhor se repete: o pão e o cálice lembram o corpo de Jesus entregue e o sangue dele derramado, e a igreja celebra junta até ele voltar (1 Coríntios 11.23-26).
 
-As igrejas entendem de formas um pouco diferentes o que acontece na ceia, e cada uma tem seu jeito de celebrar. Todas concordam que ela é celebrada em comunidade e aponta pra Jesus. Se você ainda não participa, pergunte na sua igreja como ela entende a ceia e quem pode participar.
+As igrejas entendem de formas um pouco diferentes o que acontece na ceia, e cada uma tem seu jeito de celebrar. Todas concordam que ela é celebrada em comunidade e aponta pra Jesus. Se você ainda não participa, pergunte na igreja que você frequenta como ela entende a ceia e quem pode participar.
 
 ## Pra anotar
 
@@ -448,7 +448,7 @@ Entender isso evita dois enganos: achar que pecado é só o que está na lista, 
 
 Culpa é perceber que você fez algo errado. Vergonha é sentir que você é algo errado. A culpa aponta pra uma ação e pode ser resolvida com perdão. A vergonha ataca a pessoa inteira e paralisa, porque parece que não tem conserto.
 
-O evangelho cuida das duas. A culpa real é perdoada. E a vergonha perde força, porque em Cristo o seu pior momento deixa de definir quem você é, assunto da próxima lição. Quem confunde as duas costuma cair no desespero, achando que não tem jeito, ou tenta abafar a vergonha sem nunca tratar a culpa de verdade.
+O evangelho, a boa notícia do que Jesus fez, cuida das duas. A culpa real é perdoada. E a vergonha perde força, porque em Cristo o seu pior momento deixa de definir quem você é, assunto da próxima lição. Quem confunde as duas costuma cair no desespero, achando que não tem jeito, ou tenta abafar a vergonha sem nunca tratar a culpa de verdade.
 
 ## Arrependimento de verdade
 
@@ -630,7 +630,7 @@ Nenhum dos dois textos elogia agenda lotada. Eles pedem intenção. De vez em qu
 
 1 Coríntios 6.19-20 diz que o seu corpo é morada do Espírito Santo, que Deus comprou você por um preço alto e que você deve glorificar a Deus com o corpo. Isso alcança muita coisa: sono, alimentação, saúde, sexualidade e o jeito como você trata o próprio corpo e o dos outros.
 
-Sobre trabalho, Colossenses 3.23 orienta fazer tudo de coração, como quem trabalha pro Senhor. Isso vale pro estágio, pro emprego, pra prova da faculdade e pra louça em casa. Na Bíblia, um trabalho comum feito com integridade honra a Deus tanto quanto uma função na igreja.
+Sobre trabalho, Colossenses 3.23 orienta fazer tudo de coração, como quem trabalha pro Senhor. Isso vale pro estágio, pro emprego, pra prova da escola ou da faculdade e pra louça em casa. Na Bíblia, um trabalho comum feito com integridade honra a Deus tanto quanto uma função na igreja.
 
 ## Talentos
 
@@ -732,10 +732,10 @@ Em Suas anotações, no fim desta página, escreva o nome dessas pessoas. Depois
 
 ## Pra ir além
 
-Você chegou ao fim dos primeiros passos. Continue com a leitura do dia na Trilha e explore os Fios bíblicos no Explorar.
+Você chegou ao fim dos Primeiros passos. Continue com a leitura do dia na Trilha e explore as Conexões no Explorar, os fios que atravessam a Bíblia.
 Temas: [[06 - Estudos Temáticos/Missão|Missão]] · [[06 - Estudos Temáticos/Esperança|Esperança]] · [[06 - Estudos Temáticos/Igreja|Igreja]]
-Fios: [[15 - Fios Bíblicos/Fio das nações|Fio das nações]]
-Eventos: [[12 - Eventos/Pentecostes|Pentecostes]] · [[12 - Eventos/Missão aos gentios|Missão aos gentios]]
+Conexões: [[15 - Fios Bíblicos/Fio das nações|Fio das nações]]
+Acontecimentos: [[12 - Eventos/Pentecostes|Pentecostes]] · [[12 - Eventos/Missão aos gentios|Missão aos gentios]]
 `,
   },
 };
