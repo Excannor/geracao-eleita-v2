@@ -306,7 +306,7 @@
     e = est(e);
     const colecoes = CC.COLECOES.map(([titulo, livros]) => {
       const feitos = livros.filter((l) => CC.livroCompletoEm(l, e)).length;
-      return { tipo: 'colecao', titulo, feitos, total: livros.length, ganho: feitos === livros.length };
+      return { tipo: 'colecao', cor: 'azul', titulo, feitos, total: livros.length, ganho: feitos === livros.length };
     });
     const lidos = new Set(e.lidos);
     const unidades = D.unidades.map((u) => {
@@ -316,18 +316,18 @@
       return { tipo: 'unidade', numero: u.numero, titulo: 'Unidade ' + u.numero, sub: u.titulo, cor: u.cor, feitos, total, ganho: feitos === total };
     });
     // Desafios de vários dias (09c-desafios.js): um troféu por desafio concluído.
-    const desafios = (CC.DESAFIOS || []).map((d) => { const s = CC.situacaoDesafio(d, e); return { tipo: 'desafio', titulo: d.titulo, feitos: s.vencidos, total: d.dias, ganho: s.concluido }; });
+    const desafios = (CC.DESAFIOS || []).map((d) => { const s = CC.situacaoDesafio(d, e); return { tipo: 'desafio', cor: 'vermelho', titulo: d.titulo, feitos: s.vencidos, total: d.dias, ganho: s.concluido }; });
     // Testamentos: as cinco primeiras partes são o Antigo, as outras o Novo.
     const livrosDe = (lista) => lista.flatMap(([, livros]) => livros);
     const testamento = (titulo, livros) => {
       const feitos = livros.filter((l) => CC.livroCompletoEm(l, e)).length;
-      return { tipo: 'testamento', titulo, feitos, total: livros.length, ganho: feitos === livros.length };
+      return { tipo: 'testamento', cor: 'turquesa', titulo, feitos, total: livros.length, ganho: feitos === livros.length };
     };
     const testamentos = [
       testamento('Antigo Testamento', livrosDe(CC.COLECOES.slice(0, 5))),
       testamento('Novo Testamento', livrosDe(CC.COLECOES.slice(5))),
       testamento('Bíblia inteira', livrosDe(CC.COLECOES)),
-      { tipo: 'plano', titulo: 'Plano de um ano', feitos: lidos.size, total: 365, ganho: lidos.size >= 365 },
+      { tipo: 'plano', cor: 'verde', titulo: 'Plano de um ano', feitos: lidos.size, total: 365, ganho: lidos.size >= 365 },
     ];
     return { colecoes, unidades, desafios, testamentos };
   };

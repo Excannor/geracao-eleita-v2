@@ -14,8 +14,9 @@
     + '<div class="barra-missao"><i style="width:' + (c.fracao * 100).toFixed(1) + '%"></i></div>'
     + '<span class="descricao-conquista">' + CC.esc(c.maximo ? 'Você chegou ao último nível!' : c.descricao) + '</span></div></div>';
 
+  const FORMA_DO_TIPO = { unidade: 'taca', colecao: 'livros', testamento: 'biblia', plano: 'calendario', desafio: 'bandeira' };
   const trofeuHtml = (t) => '<div class="trofeu' + (t.ganho ? ' ganho' : '') + '">'
-    + CC.arte.trofeu(t.cor || 'amarelo', t.ganho, t.total ? t.feitos / t.total : 0)
+    + CC.arte.trofeu(t.cor || 'amarelo', t.ganho, t.total ? t.feitos / t.total : 0, FORMA_DO_TIPO[t.tipo])
     + '<b>' + CC.esc(t.titulo) + '</b>'
     + '<span>' + (t.ganho ? 'Conquistado' : t.feitos + ' de ' + t.total) + '</span></div>';
 

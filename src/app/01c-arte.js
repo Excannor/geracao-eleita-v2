@@ -192,17 +192,55 @@
   // ---------- troféu ----------
   // fracao (0 a 1) enche a copa de baixo para cima enquanto o troféu não foi ganho: a estante
   // mostra o quanto falta, e não 22 taças cinza iguais.
-  A.trofeu = (cor, ganho, fracao) => {
+  // Cada estante tem o seu desenho: a taça para as unidades do plano, a pilha de livros para
+  // as partes da Bíblia, a Bíblia fechada para os testamentos, o calendário para o plano de
+  // um ano e a bandeira de chegada para os desafios. "corpo" é o que enche com a fração;
+  // [de, ate] é a faixa vertical que ele ocupa, para o enchimento subir de baixo para cima.
+  const FORMAS_TROFEU = {
+    taca: {
+      corpo: 'M16 6h32v18c0 10-7 18-16 18S16 34 16 24z', de: 6, ate: 42,
+      resto: '<path class="alcas" d="M16 12H8v4c0 7 4 12 10 13M48 12h8v4c0 7-4 12-10 13" fill="none" stroke-width="5" stroke-linecap="round"/>'
+        + '<rect class="haste" x="28" y="40" width="8" height="12" rx="2"/><rect class="base" x="16" y="52" width="32" height="12" rx="4"/>',
+      reflexo: 'M22 10h5v14c0 4 1 7 3 9-5-1-8-5-8-10z',
+    },
+    livros: {
+      corpo: 'M9 44h46v12H9zM13 30h40v12H13zM7 16h44v12H7z', de: 16, ate: 56,
+      resto: '<rect class="base" x="4" y="58" width="56" height="8" rx="3"/>',
+      frente: '<path class="detalhe" d="M15 50h8M19 36h8M13 22h8" fill="none" stroke-width="3" stroke-linecap="round"/>',
+      reflexo: 'M40 18h6v8h-6z',
+    },
+    biblia: {
+      corpo: 'M18 4h28a4 4 0 0 1 4 4v44H18a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z', de: 4, ate: 52,
+      resto: '<path class="base" d="M14 48a4 4 0 0 0 4 4h32v8H18a8 8 0 0 1-4-1z"/>'
+        + '<path class="haste" d="M38 52h6v16l-3-3-3 3z"/>',
+      frente: '<path class="detalhe" d="M32 14v18M25 21h14" fill="none" stroke-width="4" stroke-linecap="round"/>',
+      reflexo: 'M20 8h4v36h-4z',
+    },
+    calendario: {
+      corpo: 'M8 22h48v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6z', de: 22, ate: 62,
+      resto: '<path class="base" d="M14 10h36a6 6 0 0 1 6 6v8H8v-8a6 6 0 0 1 6-6z"/>'
+        + '<rect class="haste" x="18" y="4" width="6" height="12" rx="3"/><rect class="haste" x="40" y="4" width="6" height="12" rx="3"/>',
+      frente: '<path class="detalhe" d="m22 42 7 7 14-14" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>',
+      reflexo: 'M12 26h5v26h-5z',
+    },
+    bandeira: {
+      corpo: 'M22 8h32l-8 11 8 11H22z', de: 8, ate: 30,
+      resto: '<rect class="haste" x="14" y="4" width="7" height="56" rx="3.5"/><path class="base" d="M4 66c0-6 6-10 13-10s13 4 13 10z"/>',
+      reflexo: 'M25 11h8l-5 6h-3z',
+    },
+  };
+  A.trofeu = (cor, ganho, fracao, forma) => {
+    const F = FORMAS_TROFEU[forma] || FORMAS_TROFEU.taca;
     const f = !ganho && fracao > 0 ? Math.min(1, fracao) : 0;
     const g = f ? id('copa') : '';
+    const altura = F.ate - F.de;
     return '<span class="arte-trofeu c-' + (cor || 'amarelo') + (ganho ? ' ganho' : '') + (f ? ' parcial' : '') + '" aria-hidden="true">'
-    + '<svg viewBox="0 0 64 72">' + (f ? '<defs><clipPath id="' + g + '"><rect x="0" y="' + (42 - 36 * f).toFixed(1) + '" width="64" height="' + (36 * f).toFixed(1) + '"/></clipPath></defs>' : '')
-    + '<path class="copa" d="M16 6h32v18c0 10-7 18-16 18S16 34 16 24z"/>'
-    + (f ? '<path class="copa-parte" clip-path="url(#' + g + ')" d="M16 6h32v18c0 10-7 18-16 18S16 34 16 24z"/>' : '')
-    + '<path class="alcas" d="M16 12H8v4c0 7 4 12 10 13M48 12h8v4c0 7-4 12-10 13" fill="none" stroke-width="5" stroke-linecap="round"/>'
-    + '<rect class="haste" x="28" y="40" width="8" height="12" rx="2"/>'
-    + '<rect class="base" x="16" y="52" width="32" height="12" rx="4"/>'
-    + '<path class="reflexo" d="M22 10h5v14c0 4 1 7 3 9-5-1-8-5-8-10z" fill="#fff" opacity=".35"/></svg></span>';
+    + '<svg viewBox="0 0 64 72">' + (f ? '<defs><clipPath id="' + g + '"><rect x="0" y="' + (F.ate - altura * f).toFixed(1) + '" width="64" height="' + (altura * f).toFixed(1) + '"/></clipPath></defs>' : '')
+    + F.resto
+    + '<path class="copa" d="' + F.corpo + '"/>'
+    + (f ? '<path class="copa-parte" clip-path="url(#' + g + ')" d="' + F.corpo + '"/>' : '')
+    + (F.frente || '')
+    + '<path class="reflexo" d="' + F.reflexo + '" fill="#fff" opacity=".35"/></svg></span>';
   };
 
   // ---------- Trilha do Semeador ----------
