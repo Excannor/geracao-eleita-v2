@@ -19,6 +19,14 @@
       + '<span class="valor">' + f.contas + '</span></div>').join('');
   }
 
+  // Colunas (uma por dia ou semana), com o número no topo e o rótulo embaixo.
+  function colunas(itens, rotulo) {
+    const maior = Math.max(1, ...itens.map((x) => x.contas));
+    return '<div class="painel-colunas" role="img" aria-label="' + CC.esc(itens.map((x) => rotulo(x) + ': ' + x.contas).join(', ')) + '">'
+      + itens.map((x) => '<span class="painel-coluna"><small>' + (x.contas || '') + '</small><i style="height:' + Math.round((x.contas / maior) * 100) + '%"></i><em>' + CC.esc(rotulo(x)) + '</em></span>').join('') + '</div>';
+  }
+  const diaMes = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
+
   const quando = (iso) => new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
   // Fase 5, seção 2: células e cuidado, agregados. Sem nome nenhum, e sem contador de gerações.
@@ -68,6 +76,13 @@
         + numero('Novas nos últimos 30 dias', p.contas.novas30))
       + grupo('Quem está lendo', numero('Leram hoje', p.ativos.hoje) + numero('Nos últimos 7 dias', p.ativos.dias7)
         + numero('Nos últimos 30 dias', p.ativos.dias30))
+      + (p.detalhe ? grupo('Leituras por dia (últimos 30 dias)', colunas(p.detalhe.porDia, (x) => diaMes(x.dia)),
+        'Quantas pessoas leram em cada dia. Média de ' + p.detalhe.mediaDiasLidos + ' dias lidos por quem leu no último mês; maior ofensiva hoje: ' + p.detalhe.maiorOfensiva + ' dias.')
+        + grupo('Contas novas por semana', colunas(p.detalhe.novasPorSemana, (x) => diaMes(x.de)))
+        + grupo('Funil da leitura', barras(p.detalhe.funil), 'De todas as contas, quantas chegaram a cada marca de dias lidos.')
+        + grupo('Ofensivas de agora', barras(p.detalhe.ofensivas))
+        + grupo('Dia da semana em que mais se lê', barras(p.detalhe.diasDaSemana), 'Soma das leituras dos últimos 30 dias.')
+        + grupo('Uso das funções', barras(p.detalhe.funcoes)) : '')
       + grupo('Voltaram depois de criar a conta',
         p.retorno.map((r) => numero(r.dias === 1 ? 'Depois de 1 dia' : 'Depois de ' + r.dias + ' dias', porcento(r))).join(''),
         'É a pergunta "o hábito pegou?". Conta quem leu de novo a partir desse dia, entre as contas com idade para isso.')

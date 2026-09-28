@@ -3051,3 +3051,10 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .dsf-estudo p { margin: 0; }
 .dsf-sobre { margin: 10px 0; }
 .dsf-sobre summary { font-weight: 800; cursor: pointer; }
+
+/* Painel do app: colunas por dia/semana (07e-painel.js). */
+.painel-colunas { display: flex; align-items: flex-end; gap: 3px; height: 150px; padding: 12px 10px 6px; }
+.painel-coluna { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
+.painel-coluna i { display: block; width: 100%; min-height: 2px; border-radius: 4px 4px 0 0; background: var(--verde); }
+.painel-coluna small { font-size: .6rem; font-weight: 800; color: var(--tinta-fraca); }
+.painel-coluna em { font-style: normal; font-size: .52rem; color: var(--tinta-fraca); writing-mode: vertical-rl; transform: rotate(180deg); height: 30px; }

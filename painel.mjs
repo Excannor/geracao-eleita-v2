@@ -40,6 +40,10 @@ export function montarPainel({
       ultima: datas.at(-1) || '',
       conhecidos: Object.keys(e.conhecidos || {}).length,
       conversou: !!c.conversouEm,
+      marcou: Object.values(e.marcas || {}).some((m) => m && m.cor),
+      praticou: Object.keys(e.pratica || {}).length > 0,
+      desafio: Object.values(e.desafios || {}).some((d) => d && (d.ativo || d.concluidoEm)),
+      historia: !!(e.historia && (e.historia.antes || e.historia.encontro || e.historia.hoje)),
     };
   });
   const desde = (dias) => somaDias(hoje, -dias);
@@ -114,6 +118,53 @@ export function montarPainel({
     },
   };
 
+  // ---------- relatório de uso detalhado (só números) ----------
+  const conjuntos = pessoas.map((p) => new Set(p.datas));
+  // Quantas pessoas leram em cada um dos últimos 30 dias (do mais antigo para hoje).
+  const porDia = Array.from({ length: 30 }, (_, i) => {
+    const dia = desde(29 - i);
+    return { dia, contas: conjuntos.filter((c) => c.has(dia)).length };
+  });
+  // Contas novas por semana, nas últimas 8 semanas (a última é a atual).
+  const novasPorSemana = Array.from({ length: 8 }, (_, i) => {
+    const ate = desde(7 * (7 - i));
+    const de = somaDias(ate, -6);
+    return { de, ate, contas: pessoas.filter((p) => p.criadaEm >= de && p.criadaEm <= ate).length };
+  });
+  // Ofensiva atual de cada um: dias seguidos até hoje (ou até ontem, se hoje ainda não leu).
+  const ofensiva = conjuntos.map((c) => {
+    let n = 0; let d = c.has(hoje) ? hoje : desde(1);
+    while (c.has(d)) { n++; d = somaDias(d, -1); }
+    return n;
+  });
+  const FAIXAS_OFENSIVA = [['sem ofensiva', 0, 0], ['1 a 6 dias', 1, 6], ['7 a 13', 7, 13], ['14 a 29', 14, 29], ['30 a 99', 30, 99], ['100 ou mais', 100, Infinity]];
+  const ofensivas = FAIXAS_OFENSIVA.map(([faixa, de, ate]) => ({ faixa, contas: ofensiva.filter((n) => n >= de && n <= ate).length }));
+  // Em que dia da semana mais se lê (últimos 30 dias).
+  const SEMANA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+  const diasDaSemana = SEMANA.map((faixa) => ({ faixa, contas: 0 }));
+  for (const { dia, contas: n } of porDia) diasDaSemana[new Date(dia + 'T12:00:00Z').getUTCDay()].contas += n;
+  const funil = [
+    { faixa: 'Criaram a conta', contas: pessoas.length },
+    { faixa: 'Leram 1 dia', contas: pessoas.filter((p) => p.diasLidos >= 1).length },
+    { faixa: 'Leram 7 dias', contas: pessoas.filter((p) => p.diasLidos >= 7).length },
+    { faixa: 'Leram 30 dias', contas: pessoas.filter((p) => p.diasLidos >= 30).length },
+    { faixa: 'Leram 90 dias', contas: pessoas.filter((p) => p.diasLidos >= 90).length },
+  ];
+  const ativos30 = pessoas.filter((p) => p.ultima && p.ultima > desde(30));
+  const detalhe = {
+    porDia, novasPorSemana, ofensivas, diasDaSemana, funil,
+    mediaDiasLidos: ativos30.length ? Math.round(ativos30.reduce((s2, p) => s2 + p.diasLidos, 0) / ativos30.length) : 0,
+    maiorOfensiva: ofensiva.length ? Math.max(...ofensiva) : 0,
+    funcoes: [
+      { faixa: 'Marcaram versículos', contas: pessoas.filter((p) => p.marcou).length },
+      { faixa: 'Praticaram versículos', contas: pessoas.filter((p) => p.praticou).length },
+      { faixa: 'Entraram num desafio', contas: pessoas.filter((p) => p.desafio).length },
+      { faixa: 'Escreveram a Minha história', contas: pessoas.filter((p) => p.historia).length },
+      { faixa: 'Escreveram sobre algum dia', contas: pessoas.filter((p) => p.escreveu).length },
+      { faixa: 'Com notificação ligada', contas: new Set(comPush).size },
+    ],
+  };
+
   return {
     hoje,
     contas: {
@@ -137,5 +188,6 @@ export function montarPainel({
     },
     comNotificacao: new Set(comPush).size,
     celulasECuidado,
+    detalhe,
   };
 }
