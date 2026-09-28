@@ -32,6 +32,8 @@ export function montarPainel({
     const e = estados[c.usuario] || {};
     const datas = [...datasFeitas(e)].sort();
     return {
+      usuario: c.usuario,
+      registrosDesafio: e.desafios || {},
       criadaEm: c.criadaEm || datas[0] || hoje,
       acessos: new Set(c.acessos || []),
       // Contas antigas não têm origem gravada: deduz pelo que ficou anotado no convite.
@@ -165,6 +167,49 @@ export function montarPainel({
     novas: semana((de, ate) => pessoas.filter((p) => p.criadaEm > desde(de) && p.criadaEm <= desde(ate)).length),
   };
 
+  // Retenção por turma: contas agrupadas pela semana em que foram criadas; em cada turma,
+  // quantas leram na 1ª, 2ª e 4ª semana depois do cadastro (só quando a semana já passou).
+  const turmas = Array.from({ length: 6 }, (_, i) => {
+    const ate = desde(7 * (5 - i));
+    const de = somaDias(ate, -6);
+    const turma = pessoas.filter((p) => p.criadaEm >= de && p.criadaEm <= ate);
+    const semanaN = (n) => {
+      if (somaDias(ate, 7 * n) > hoje) return null;
+      const leram = turma.filter((p) => p.datas.some((d) => d > somaDias(p.criadaEm, 7 * (n - 1)) && d <= somaDias(p.criadaEm, 7 * n))).length;
+      return pct(leram, turma.length);
+    };
+    return { de, ate, contas: turma.length, s1: semanaN(1), s2: semanaN(2), s4: semanaN(4) };
+  });
+
+  // Desafios de vários dias, um por um: quantos começaram, venceram, seguem, estão parados
+  // (ativos sem vencer nenhum dia na última semana) ou pausaram; e em que dia param.
+  const DESAFIOS = { 'sem-redes-21': ['21 dias sem redes sociais', 21], 'celular-cama-7': ['7 dias sem celular na cama', 7] };
+  const desafios = Object.entries(DESAFIOS).map(([id, [titulo, total]]) => {
+    const regs = pessoas.map((p) => p.registrosDesafio[id]).filter(Boolean);
+    const vencidos = (r) => new Set(r.dias || []).size;
+    const venceu = (r) => !!r.concluidoEm || vencidos(r) >= total;
+    const parado = (r) => r.ativo && !venceu(r) && !(r.dias || []).some((d) => d > desde(7));
+    const pararam = regs.filter((r) => !venceu(r) && (!r.ativo || parado(r))).map(vencidos).sort((a, b) => a - b);
+    return {
+      titulo, total,
+      comecaram: regs.length,
+      venceram: regs.filter(venceu).length,
+      seguem: regs.filter((r) => r.ativo && !venceu(r) && !parado(r)).length,
+      pararam: pararam.length,
+      paramNoDia: pararam.length ? pararam[Math.floor(pararam.length / 2)] + 1 : null,
+    };
+  });
+
+  // Notificação e leitura: dias lidos nos últimos 30 dias, em média, de quem tem e de quem não
+  // tem notificação ligada. É correlação: quem já lê mais tende a ligar os avisos.
+  const comAviso = new Set(comPush);
+  const lidos30 = (p) => p.datas.filter((d) => d > desde(30)).length;
+  const media = (lista) => (lista.length ? Math.round((lista.reduce((s2, p) => s2 + lidos30(p), 0) / lista.length) * 10) / 10 : null);
+  const notificacao = {
+    com: { contas: pessoas.filter((p) => comAviso.has(p.usuario)).length, media: media(pessoas.filter((p) => comAviso.has(p.usuario))) },
+    sem: { contas: pessoas.filter((p) => !comAviso.has(p.usuario)).length, media: media(pessoas.filter((p) => !comAviso.has(p.usuario))) },
+  };
+
   // De onde vêm e quanto ficam: por origem, quantas contas e quantas leram nos últimos 30 dias.
   const NOMES_ORIGEM = { convite: 'Convite de amigo', celula: 'Link de célula', conhecer: 'Conhecendo Jesus', direto: 'Cadastro direto' };
   const origens = Object.entries(NOMES_ORIGEM).map(([chave, faixa]) => {
@@ -173,7 +218,7 @@ export function montarPainel({
     return { faixa, contas: grupo.length, ficaram, pct: pct(ficaram, grupo.length) };
   });
   const detalhe = {
-    porDia, novasPorSemana, ofensivas, diasDaSemana, funil, resumo, origens,
+    porDia, novasPorSemana, ofensivas, diasDaSemana, funil, resumo, origens, turmas, desafios, notificacao,
     mediaDiasLidos: ativos30.length ? Math.round(ativos30.reduce((s2, p) => s2 + p.diasLidos, 0) / ativos30.length) : 0,
     maiorOfensiva: ofensiva.length ? Math.max(...ofensiva) : 0,
     funcoes: [
