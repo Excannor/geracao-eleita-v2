@@ -1,4 +1,4 @@
-/* Bíblia: ler os 66 livros à vontade, fora da trilha do dia. Sem busca, sem XP, sem marcar
+/* Bíblia: ler os 66 livros à vontade, fora da trilha do dia. Sem XP, sem marcar
    como lido. O leitor daqui é uma cópia enxuta do leitor da lição (04b-leitor.js), porque
    aquele carrega junto o progresso do dia. As ações de versículo (marcar, nota, Juntos,
    copiar) são as mesmas dos dois leitores e moram em 04e-versiculos.js. */
@@ -90,9 +90,47 @@
       alvo.innerHTML = '<h1>Bíblia</h1>'
         + '<p class="passo-dica">Escolha um livro e leia à vontade, no seu ritmo.</p>'
         + cartaoContinuar(biblia)
-        + CC.tituloSecao('Antigo Testamento', CC.plural(antigo.length, 'livro', 'livros')) + gradeLivros(antigo)
-        + CC.tituloSecao('Novo Testamento', CC.plural(novo.length, 'livro', 'livros')) + gradeLivros(novo);
+        + '<div class="busca-caixa">' + CC.ico('lupa') + '<input id="busca-livro" type="search" placeholder="Buscar livro (ex.: João 3)" aria-label="Buscar livro da Bíblia" autocomplete="off" spellcheck="false" enterkeyhint="go"></div>'
+        + '<p class="passo-dica" id="busca-livro-vazia" hidden>Nenhum livro com esse nome.</p>'
+        + '<div id="testamento-antigo">' + CC.tituloSecao('Antigo Testamento', CC.plural(antigo.length, 'livro', 'livros')) + gradeLivros(antigo) + '</div>'
+        + '<div id="testamento-novo">' + CC.tituloSecao('Novo Testamento', CC.plural(novo.length, 'livro', 'livros')) + gradeLivros(novo) + '</div>';
+      ligarBuscaLivro(alvo, biblia);
     }).catch(() => { if (minha === geracao) erroDeCarga(alvo); });
+  }
+
+  // Busca pelo nome, sem acento e sem espaço ("1co", "joao"): primeiro o nome exato, depois os
+  // que começam assim, depois os que contêm.
+  // Com número depois do nome ("joão 3"), o Enter abre direto o capítulo.
+  function ligarBuscaLivro(alvo, biblia) {
+    const campo = alvo.querySelector('#busca-livro');
+    if (!campo) return;
+    const chave = (t) => CC.semAcento(t).replace(/[^a-z0-9]/g, '');
+    const livros = Object.keys(biblia.livros);
+    const separar = (texto) => {
+      const m = texto.trim().match(/^(.*?)(?:\s+(\d+))?$/);
+      return { nome: chave(m[1]), cap: m[2] ? Number(m[2]) : 0 };
+    };
+    const achados = (nome) => [...new Set(livros.filter((l) => chave(l) === nome)
+      .concat(livros.filter((l) => chave(l).startsWith(nome)), livros.filter((l) => chave(l).includes(nome))))];
+    campo.oninput = () => {
+      const { nome } = separar(campo.value);
+      const vistos = new Set(nome ? achados(nome) : livros);
+      alvo.querySelectorAll('.item-livro').forEach((a) => { a.hidden = !vistos.has(a.querySelector('span').textContent); });
+      ['#testamento-antigo', '#testamento-novo'].forEach((sel) => {
+        const bloco = alvo.querySelector(sel);
+        bloco.hidden = !bloco.querySelector('.item-livro:not([hidden])');
+      });
+      alvo.querySelector('#busca-livro-vazia').hidden = vistos.size > 0;
+    };
+    campo.onkeydown = (ev) => {
+      if (ev.key !== 'Enter') return;
+      const { nome, cap } = separar(campo.value);
+      const livro = nome && achados(nome)[0];
+      if (!livro) return;
+      ev.preventDefault();
+      const total = biblia.livros[livro].length;
+      location.hash = '#/biblia/' + encodeURIComponent(livro) + (cap ? '/' + Math.min(cap, total) : '');
+    };
   }
 
   // ---------- grade de capítulos de um livro ----------
