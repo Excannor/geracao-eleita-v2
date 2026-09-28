@@ -69,22 +69,45 @@
 
   // ---------- Minha caminhada ----------
   function linhaMarco(chave, data) {
-    return linhaInterruptor('marco', chave, ROTULOS_MARCO[chave], !!data, data ? ddmm(data) : '');
+    return linhaInterruptor('marco', chave, ROTULOS_MARCO[chave], !!data, data ? ddmm(data) : '')
+      .replace('data-marco=', 'data-data-marco="' + CC.esc(data || '') + '" data-marco=');
+  }
+
+  function folhaDataMarco(chave, atual) {
+    const hoje = CC.hojeIso();
+    CC.folha('<h2>' + CC.esc(ROTULOS_MARCO[chave]) + '</h2>'
+      + '<label class="campo-senha"><span>Quando foi?</span>'
+      + '<input type="date" data-quando max="' + hoje + '" value="' + CC.esc(atual || hoje) + '"></label>'
+      + '<p class="erro-proposito" role="alert" hidden></p>'
+      + '<div class="acoes"><button class="botao azul" data-salvar>Salvar</button>'
+      + (atual ? '<button class="botao plano perigo" data-desmarcar>Desmarcar</button>' : '')
+      + '<button class="botao plano" data-fechar>Cancelar</button></div>', {
+      rotulo: ROTULOS_MARCO[chave],
+      ligar: (folha, fechar) => {
+        const erro = folha.querySelector('.erro-proposito');
+        const gravar = async (data) => {
+          try {
+            await acao({ acao: 'marco', chave, data });
+            fechar();
+            await recarregar();
+          } catch (e) { erro.textContent = e.message; erro.hidden = false; }
+        };
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelector('[data-salvar]').onclick = () => {
+          const data = folha.querySelector('[data-quando]').value;
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || data > hoje) { erro.textContent = 'Escolha uma data até hoje.'; erro.hidden = false; return; }
+          gravar(data);
+        };
+        const desmarcar = folha.querySelector('[data-desmarcar]');
+        if (desmarcar) desmarcar.onclick = () => gravar('');
+      },
+    });
   }
 
   function ligarMarcos(raiz) {
     raiz.querySelectorAll('[data-marco]').forEach((b) => {
-      b.onclick = async () => {
-        const ligado = b.getAttribute('aria-checked') === 'true';
-        b.disabled = true;
-        try {
-          await acao({ acao: 'marco', chave: b.dataset.marco, data: ligado ? '' : CC.hojeIso() });
-          await recarregar();
-        } catch (e) {
-          b.disabled = false;
-          CC.avisar(e.message);
-        }
-      };
+      // Tocar abre a escolha da data: o batismo, por exemplo, pode ter sido anos atrás.
+      b.onclick = () => folhaDataMarco(b.dataset.marco, b.dataset.dataMarco || '');
     });
   }
 
