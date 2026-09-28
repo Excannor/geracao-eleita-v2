@@ -262,8 +262,8 @@
     const algum = marcados.length || comNota.length || guardados.length;
 
     raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Meus versículos</h1>'
-      + (algum ? '' : '<p class="passo-dica">Enquanto lê, toque num versículo para marcar, escrever uma nota ou mostrar no Juntos. '
-        + 'Os baús da trilha também trazem versículos para cá.</p>')
+      + (algum ? '' : '<div class="vazio-amigos">' + CC.ico('marcador') + '<p>Enquanto lê, toque num versículo para marcar, escrever uma nota ou mostrar no Juntos. '
+        + 'Os baús da trilha também trazem versículos para cá.</p></div>')
       + (marcados.length ? CC.tituloSecao('Marcados', String(marcados.length))
         + '<div class="lista-versiculos">' + marcados.map((m) => itemVersiculo(m.ref, '', m.cor)).join('') + '</div>' : '')
       + (comNota.length ? CC.tituloSecao('Com nota', String(comNota.length))

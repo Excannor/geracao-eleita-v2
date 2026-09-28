@@ -25,6 +25,7 @@
 
   // Colunas (uma por dia ou semana), com o número no topo e o rótulo embaixo.
   function colunas(itens, rotulo) {
+    if (!itens.some((x) => x.contas)) return '<p class="passo-dica pequena painel-vazio">Ainda sem dados neste período.</p>';
     const maior = Math.max(1, ...itens.map((x) => x.contas));
     return '<div class="painel-colunas" role="img" aria-label="' + CC.esc(itens.map((x) => rotulo(x) + ': ' + x.contas).join(', ')) + '">'
       + itens.map((x) => '<span class="painel-coluna"><small>' + (x.contas || '') + '</small><i style="height:' + Math.round((x.contas / maior) * 100) + '%"></i><em>' + CC.esc(rotulo(x)) + '</em></span>').join('') + '</div>';

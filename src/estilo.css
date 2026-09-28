@@ -3185,3 +3185,73 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
   font-size: clamp(0.62rem, calc(0.62rem + 0.04rem * var(--cresce)), 0.66rem);
   letter-spacing: 0;
 }
+
+/* =====================================================================================
+   POLIMENTO DE DESIGN · lote 2: ajustes pontuais por tela (ux-polimento.md, seção 2)
+   ===================================================================================== */
+/* ritmo: 32 acima do título de seção, 12 abaixo, 12 entre cartões */
+.titulo-secao { margin-top: 32px; margin-bottom: 12px; }
+.titulo-perfil { margin: 32px 0 12px; }
+/* Trilha */
+.leitura-hoje { margin-bottom: 12px; }
+.faixa-unidade { margin: 12px 0 8px; }
+/* Lição: a barra do topo no tamanho de "dentro de cartão" */
+.licao-topo .barra { height: 10px; }
+/* Bíblia */
+.grade-livros { gap: 10px; }
+.leitor-cabeca { border-bottom: 0; }
+/* Desafios: azulejo do Praticar sem vermelho; o botão do cartão na família dos botões */
+.cartao-praticar .icone-praticar { background: var(--verde-fraco); color: var(--verde); }
+.dsf-acao { display: flex; align-items: center; justify-content: center; min-height: 50px; padding: 8px 16px;
+  font-family: var(--fonte-destaque); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+/* Praticar: estrela vazia que não parece sujeira; respiro na lista */
+.estrelas i, .estrelas-fim i { color: color-mix(in srgb, var(--tinta-fraca) 35%, var(--cartao)); }
+.lista-pratica.caixa-lista .cartao-pratica { gap: 12px; }
+/* Juntos: o coração de Propósitos ganha azulejo como os outros ícones de lista; o feed no corpo normal */
+.entrada-propositos > svg:first-child { box-sizing: border-box; width: 44px; height: 44px; padding: 10px; border-radius: var(--raio-p);
+  background: var(--verde-fraco); color: var(--verde); flex: 0 0 auto; }
+.corpo-mural p { font-size: 1rem; }
+/* Célula: sem o vão duplo antes de "Precisam de atenção"; botões do pé empilham a 320 */
+.painel-celula > .passo-dica { margin-bottom: 0; }
+.painel-celula .pe-duplo-plano { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+/* Discipulado: dentro do cartão os dois botões empilham */
+.linha-amigo .pe-duplo-plano { grid-template-columns: 1fr; }
+/* Explorar */
+.seta-comece { width: 44px; height: 44px; background: none; color: var(--tinta); }
+.grade-secoes { gap: 12px; }
+/* Nota: a tabela "Onde ler" com canto e linhas da família */
+.rolagem-tabela { border: var(--moldura) solid var(--borda); border-radius: var(--raio-p); }
+.nota-corpo .rolagem-tabela table { margin: 0; }
+.nota-corpo .rolagem-tabela th, .nota-corpo .rolagem-tabela td { border: 0; border-bottom: 1px solid var(--borda); }
+.nota-corpo .rolagem-tabela td + td, .nota-corpo .rolagem-tabela th + th { border-left: 1px solid var(--borda); }
+.nota-corpo .rolagem-tabela tr:last-child td { border-bottom: 0; }
+/* Primeiros passos: a "próxima" no acento do app (o roxo virava cinza no escuro) */
+.lista-licoes.caixa-lista .item-licao.proxima { background: var(--acento-fraco); }
+.lista-licoes.caixa-lista .item-licao.proxima .num { background: var(--inverso); color: var(--inverso-tinta); }
+.lista-licoes.caixa-lista .item-licao .marca-proxima { color: var(--acento); }
+/* Perfil */
+.visao-item small { font-size: 0.78rem; }
+.lista-atalhos { margin-top: 0; }
+/* Troféus */
+.estante { gap: 12px; }
+/* Minha história: sem a pílula vazia; contador com respiro */
+.selo-status:empty { display: none; }
+.dica-campo { margin-top: 6px; }
+/* Livros: contador legível */
+.conta-livro { opacity: 1; color: var(--tinta-fraca); }
+/* Configurações: o rótulo não é espremido pelo valor */
+.linha-config > span:first-child { flex: 1 1 auto; min-width: 45%; }
+.linha-config .valor { max-width: 50%; }
+/* Azulejos de ícone em 44 */
+.marca-push, .painel-mais .q { width: 44px; height: 44px; }
+.painel-mais .q { border-radius: var(--raio-p); }
+/* Painel: medidas em rem; gráfico vazio vira frase */
+.painel-cartao strong { font-size: 1.75rem; }
+.painel-cartao strong.texto { font-size: 1.2rem; }
+.painel-cartao small { font-size: 0.78rem; }
+.painel-linha2 small { font-size: 0.88rem; }
+.painel-vazio { padding: 12px 16px; margin: 0; }
+/* Apoiar */
+.apoiar-valor { font-size: 0.95rem; }
+.aviso-apoiar { font-size: 0.88rem; }
+.apoiar-pix .passo-dica { margin-top: 10px; }
