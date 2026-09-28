@@ -89,9 +89,9 @@ try {
 
   // ---------- duplas ----------
   const daAna = await lista(ana.cookie);
-  ok(daAna.length === 6 && daAna.every((p) => p.tipo === 'plano' && !p.grupo && p.membros.length === 2),
-    'cada amizade nova já nasce com a sua dupla de leitura (' + daAna.length + ')');
-  ok((await acao(ana.cookie, { acao: 'criar', tipo: 'plano', com: ['bia'] })).status === 400, 'a mesma dupla de leitura não se repete');
+  ok(daAna.length === 0, 'amizade nova não cria propósito sozinha: cada convite é separado (' + daAna.length + ')');
+  ok((await acao(ana.cookie, { acao: 'criar', tipo: 'plano', com: ['bia'] })).status === 200
+    && (await acao(ana.cookie, { acao: 'criar', tipo: 'plano', com: ['bia'] })).status === 400, 'a dupla de leitura nasce do convite de propósito e não se repete');
 
   const oracao = await acao(ana.cookie, { acao: 'criar', tipo: 'oracao', com: ['bia'] });
   const nt = await acao(ana.cookie, { acao: 'criar', tipo: 'livro', alvo: 'nt', com: ['bia'] });
@@ -99,7 +99,7 @@ try {
   ok(oracao.status === 200 && nt.status === 200 && rute.status === 200, 'com a Bia dá para ter oração, Novo Testamento e Rute, além da leitura');
   ok((await acao(ana.cookie, { acao: 'criar', tipo: 'livro', alvo: 'Livro Inventado', com: ['bia'] })).status === 400, 'livro que não existe no plano é recusado');
   ok((await acao(ana.cookie, { acao: 'criar', tipo: 'oracao', com: ['ninguem'] })).status === 403, 'só dá para chamar amigos');
-  ok((await pedir('/api/amigos', null, bia)).corpo.convitesProposito === 3, 'a Bia vê que tem 3 convites de propósito');
+  ok((await pedir('/api/amigos', null, bia)).corpo.convitesProposito === 4, 'a Bia vê que tem 4 convites de propósito');
 
   const idOracao = oracao.corpo.proposito.id;
   ok((await acao(bia, { acao: 'aceitar', id: idOracao })).status === 200, 'a Bia aceita a oração');

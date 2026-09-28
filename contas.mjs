@@ -630,7 +630,6 @@ export class Contas {
     if (!am || am.estado !== 'pendente' || am.pediu === a.usuario) throw erro('esse pedido não existe mais', 404);
     am.estado = 'ativa';
     am.aceitaEm = hoje;
-    this.garantirDuplaPlano(a.usuario, am.pediu, hoje, am.pediu);
     await this.salvar();
   }
 
@@ -756,9 +755,7 @@ export class Contas {
     this.dados.amizades[par(a.usuario, convite.de)] = {
       estado: 'ativa', pediu: convite.de, em: hoje, aceitaEm: hoje,
     };
-    // Quem entra por uma célula já lê junto nela, e quem está conhecendo Jesus ainda não lê
-    // o plano: nos dois casos, a dupla automática não faz sentido.
-    if (!semDupla && !paraConhecer) this.garantirDuplaPlano(a.usuario, convite.de, hoje, convite.de);
+    // Convite de amigo cria só a amizade: propósito e célula têm convites próprios.
     await this.salvar();
     return { de: convite.de };
   }

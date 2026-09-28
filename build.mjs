@@ -96,14 +96,16 @@ const iconeEmbutido = 'data:image/png;base64,' + readFileSync(src('icones', 'ico
 const manifesto = {
   name: 'Geração Eleita',
   short_name: 'Geração Eleita',
-  description: 'A Bíblia inteira em um ano, junto com a sua célula: uma leitura por dia, reflexões para quem está começando e grupos de até 5 lendo juntos.',
+  description: 'A Bíblia inteira em um ano, com os amigos e a sua célula: uma leitura por dia e reflexões para quem está começando.',
   lang: 'pt-BR',
   start_url: './',
   scope: './',
   display: 'standalone',
   orientation: 'portrait',
-  background_color: '#fdfbf5',
-  theme_color: '#fdfbf5',
+  // A tela de abertura do Android pinta este fundo com o ícone no meio: o mesmo preto do
+  // ícone (#0b0b0b), para a abertura ser igual ao app instalado. O creme era da paleta antiga.
+  background_color: '#0b0b0b',
+  theme_color: '#0b0b0b',
   icons: icones.map(({ tamanho, arquivo, proposito }) => ({
     src: './' + arquivo + '?v=' + versaoIcones,
     sizes: tamanho + 'x' + tamanho,

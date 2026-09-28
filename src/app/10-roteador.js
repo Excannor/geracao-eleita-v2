@@ -555,12 +555,12 @@
     // é conhecido, só na Trilha.
     if (quem && quem.caminho === 'conhecer' && (location.hash === '#/' || location.hash === '')) CC.rolarPara(0);
 
-    // Conta recém-criada: primeiro a leitura do dia 1, que é o que dá sentido ao app. O
-    // tutorial de pôr o app na tela de início espera a primeira leitura concluída; a marca
-    // fica guardada até lá e sai quando ele aparece, para não repetir a cada abertura.
+    // Conta recém-criada: o tutorial de pôr o app na tela de início aparece logo na primeira
+    // abertura, antes de qualquer leitura (quem entra pelo Conhecer Jesus nem lê o plano). A marca
+    // sai quando ele aparece, para não repetir a cada abertura.
     let novaConta = false;
     try { novaConta = localStorage.getItem('cc.instalar') === '1'; } catch (e) { /* segue */ }
-    if (novaConta && CC.ler('lidos', []).length) {
+    if (novaConta) {
       try { localStorage.removeItem('cc.instalar'); } catch (e) { /* segue */ }
       if (!CC.rodandoComoApp()) await CC.tutorialInstalar({ contaNova: true });
     }
