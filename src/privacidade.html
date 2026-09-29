@@ -10,44 +10,49 @@
 <style>/*FONTES*/</style>
 <style>
   /* Mesma paleta do app (estilo.css), repetida na mão: esta página é servida sozinha e não
-     carrega aquele arquivo. Mexeu lá, mexa aqui também. */
-  :root { --fundo: #e6e6e6; --cartao: #f7f7f7; --borda: #d9d9d9; --tinta: #3c3c3c; --forte: #111111; --fraca: #5f5f5f;
-    --verde: #0f5c5c; --vinho: #b3261e; --azul: #0f5c5c; --ajuda: #fbeae8; --fundo2: #e2e2e2; --destaque: #e2f0f0; }
+     carrega aquele arquivo. Mexeu lá, mexa aqui também. Cinza-claro, cartões brancos sem
+     contorno, preto como tinta forte e uma fonte só, a Manrope. */
+  :root { --fundo: #efefef; --cartao: #ffffff; --pilula: #f2f2f2; --tinta: #2a2a2a; --forte: #111111; --fraca: #6b6b6b;
+    --lima: #dff74a; --ajuda: #fde9e7; }
   @media (prefers-color-scheme: dark) {
-    :root { --fundo: #0d0d0d; --cartao: #171717; --borda: #2b2b2b; --tinta: #e2e2e2; --forte: #ffffff; --fraca: #9a9a9a;
-      --verde: #5fbdb9; --vinho: #ff6b6b; --azul: #5fbdb9; --ajuda: #3a1414; --fundo2: #1a1a1a; --destaque: #123230; }
+    :root { --fundo: #0c0c0c; --cartao: #1c1c1c; --pilula: #2a2a2a; --tinta: #e8e8e8; --forte: #ffffff; --fraca: #9d9d9d;
+      --ajuda: #3a1414; }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--fundo); color: var(--tinta);
-    font-family: 'Nunito', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; line-height: 1.65; }
-  main { max-width: 680px; margin: 0 auto; padding: 32px 20px 56px; }
+    font-family: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; font-weight: 500; line-height: 1.65;
+    -webkit-font-smoothing: antialiased; }
+  main { max-width: 680px; margin: 0 auto; padding: 32px 16px 56px; }
   .cabeca { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
   .cabeca svg { width: 52px; height: auto; flex: 0 0 auto; color: var(--forte); }
-  .marca { font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
+  .marca { font-size: .85rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
   .marca em { font-style: normal; }
-  h1 { margin: 0; color: var(--forte); font-size: 1.7rem; line-height: 1.2; }
+  h1 { margin: 0; color: var(--forte); font-size: 1.6rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
   .atualizada { margin: 0 0 22px; color: var(--fraca); font-size: .9rem; font-weight: 600; }
-  h2 { margin: 30px 0 8px; color: var(--forte); font-size: 1.12rem; scroll-margin-top: 16px; }
+  h2 { margin: 30px 0 8px; color: var(--forte); font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em; scroll-margin-top: 16px; }
   p { margin: 0 0 10px; font-weight: 500; }
   ul { margin: 0 0 10px; padding-left: 20px; }
   li { margin: 0 0 6px; font-weight: 500; }
   b { color: var(--forte); }
-  a { color: var(--azul); font-weight: 700; }
-  .resumo { padding: 16px 18px; border-radius: 16px; background: var(--destaque); border: 2px solid var(--borda); }
+  a { color: var(--forte); font-weight: 700; text-underline-offset: 3px; }
+  .resumo { padding: 18px 20px; border-radius: 24px; background: var(--lima); color: #111111; }
+  .resumo b { color: #111111; }
   .resumo p:last-child, .resumo ul:last-child { margin-bottom: 0; }
-  nav.indice { margin: 18px 0 0; padding: 14px 18px; border-radius: 16px; background: var(--cartao); border: 2px solid var(--borda); }
+  nav.indice { margin: 16px 0 0; padding: 16px 20px; border-radius: 24px; background: var(--cartao); }
   nav.indice ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 24px; }
   nav.indice li { margin: 0 0 4px; font-size: .92rem; break-inside: avoid; }
   nav.indice a { font-weight: 600; }
   @media (max-width: 480px) { nav.indice ol { columns: 1; } }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--cartao); border: 2px solid var(--borda);
-    border-radius: 16px; overflow: hidden; font-size: .9rem; }
-  th, td { text-align: left; padding: 10px 12px; border-top: 2px solid var(--fundo2); vertical-align: top; }
-  th { background: var(--fundo2); color: var(--fraca); font-weight: 700; border-top: 0; }
-  td.sim { color: var(--verde); font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--cartao);
+    border-radius: 20px; overflow: hidden; font-size: .9rem; }
+  th, td { text-align: left; padding: 10px 12px; border-top: 1px solid var(--pilula); vertical-align: top; }
+  th { background: var(--pilula); color: var(--fraca); font-weight: 700; border-top: 0; }
+  td.sim { color: var(--forte); font-weight: 700; }
   td.nao { color: var(--fraca); }
-  .ajuda { margin-top: 30px; padding: 14px 16px; border-radius: 16px; background: var(--ajuda); font-weight: 600; }
-  .voltar { display: inline-flex; align-items: center; min-height: 44px; margin-top: 18px; }
+  .ajuda { margin-top: 30px; padding: 16px 18px; border-radius: 24px; background: var(--ajuda); font-weight: 600; }
+  .voltar { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; margin-top: 18px; padding: 0 20px;
+    border-radius: 999px; background: #111111; color: var(--lima); text-decoration: none; }
+  @media (prefers-color-scheme: dark) { .voltar { background: #ffffff; color: #111111; } }
 </style>
 </head>
 <body>

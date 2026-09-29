@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#e6e6e6">
+<meta name="theme-color" content="#efefef">
 <link rel="icon" href="/*ICONE*/">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=/*VERSAO_ICONES*/">
 <link rel="manifest" href="manifest.webmanifest">
@@ -16,23 +16,21 @@
 <style>/*FONTES*/</style>
 <style>
   /* O portal repete a paleta do app (estilo.css) na mão, porque é uma página à parte e não
-     carrega aquele arquivo. Ao mexer na paleta lá, mexa aqui também: cinza puro, acento
-     petróleo, e o preto/branco que troca de lado entre os temas. */
+     carrega aquele arquivo. Ao mexer na paleta lá, mexa aqui também: cinza-claro, cartões
+     brancos sem contorno, preto como ação (texto lima em cima), uma fonte só, a Manrope.
+     O carimbo do lema é a exceção: mantém a Permanent Marker e a chapa que inverte com o
+     tema, exatamente como sempre foi. */
   :root {
-    --fundo: #e6e6e6; --cartao: #f7f7f7; --borda: #d9d9d9; --tinta: #3c3c3c; --forte: #111111; --fraca: #5f5f5f;
-    --verde: #0f5c5c; --verde-3d: #0a4444; --vinho: #b3261e; --azul: #0f5c5c; --azul-fraco: #e2f0f0; --erro: #b3261e;
-    --trilho: #dcdcdc; --sobre: #ffffff;
-    --inverso: #121212; --inverso-tinta: #ffffff;
+    --fundo: #efefef; --cartao: #ffffff; --pilula: #f2f2f2; --tinta: #2a2a2a; --forte: #111111; --fraca: #6b6b6b;
+    --lima: #dff74a; --erro: #d4261b; --botao: #111111; --botao-tinta: #dff74a;
     /* O carimbo inverte com o tema. O efeito depende do contraste entre a chapa e a
        página: chapa preta sobre fundo preto some, e o que era carimbo vira letra solta. */
     --selo-bloco: #121212; --selo-texto: #f2f2f2;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-tema="claro"]) {
-      --fundo: #0d0d0d; --cartao: #171717; --borda: #2b2b2b; --tinta: #e2e2e2; --forte: #ffffff; --fraca: #9a9a9a;
-      --verde: #5fbdb9; --verde-3d: #3d9995; --vinho: #ff6b6b; --azul: #5fbdb9; --azul-fraco: #123230; --erro: #ff6b6b;
-      --trilho: #2a2a2a; --sobre: #0d0d0d;
-      --inverso: #ffffff; --inverso-tinta: #111111;
+      --fundo: #0c0c0c; --cartao: #1c1c1c; --pilula: #2a2a2a; --tinta: #e8e8e8; --forte: #ffffff; --fraca: #9d9d9d;
+      --erro: #ff6b6b; --botao: #ffffff; --botao-tinta: #111111;
       --selo-bloco: #f2f2f2; --selo-texto: #121212;
     }
   }
@@ -42,18 +40,17 @@
   :root[data-tema="claro"] { color-scheme: only light; }
   :root[data-tema="escuro"] { color-scheme: dark; }
   :root[data-tema="escuro"] {
-    --fundo: #0d0d0d; --cartao: #171717; --borda: #2b2b2b; --tinta: #e2e2e2; --forte: #ffffff; --fraca: #9a9a9a;
-    --verde: #5fbdb9; --verde-3d: #3d9995; --vinho: #ff6b6b; --azul: #5fbdb9; --azul-fraco: #123230; --erro: #ff6b6b;
-    --trilho: #2a2a2a; --sobre: #0d0d0d;
-    --inverso: #ffffff; --inverso-tinta: #111111;
+    --fundo: #0c0c0c; --cartao: #1c1c1c; --pilula: #2a2a2a; --tinta: #e8e8e8; --forte: #ffffff; --fraca: #9d9d9d;
+    --erro: #ff6b6b; --botao: #ffffff; --botao-tinta: #111111;
     --selo-bloco: #f2f2f2; --selo-texto: #121212;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--fundo); color: var(--tinta);
-    font-family: 'Nunito', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; }
+    font-family: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; font-weight: 500;
+    -webkit-font-smoothing: antialiased; }
   body { display: flex; justify-content: center; }
   main { width: 100%; max-width: 420px; min-height: 100dvh; display: flex; flex-direction: column;
-    padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
+    padding: calc(16px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom)); }
   section { flex: 1; display: flex; flex-direction: column; gap: 16px; }
   section[hidden] { display: none; }
   .centro { align-items: center; text-align: center; justify-content: center; }
@@ -86,59 +83,59 @@
     width: 16px; height: 22px; color: var(--forte); }
   .selo-ref { margin-bottom: 10px; font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 700;
     font-style: italic; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--forte); }
-  .marca { position: relative; font-family: 'Oswald', 'Arial Narrow', var(--fonte, sans-serif); font-size: 1.15rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
+  .marca { position: relative; font-size: .95rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
   .marca em { font-style: normal; }
   .mascote { position: relative; margin: 0 auto; }
-  .mascote svg { width: 108px; height: auto; display: block; color: var(--forte); }
-  h1 { margin: 0; color: var(--forte); font-size: 1.65rem; line-height: 1.2; text-wrap: balance; }
+  .mascote svg { width: 96px; height: auto; display: block; color: var(--forte); }
+  h1 { margin: 0; color: var(--forte); font-size: 1.5rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; text-wrap: balance; }
   /* Na tela de boas-vindas o carimbo é o protagonista; o título vira apoio dele. */
-  #tela-boas h1 { font-size: 1.24rem; }
-  #tela-boas .dica { font-size: .88rem; }
+  #tela-boas h1 { font-size: 1.2rem; }
+  #tela-boas .dica { font-size: .9rem; }
   p { margin: 0; }
-  .dica { color: var(--fraca); font-weight: 600; font-size: .95rem; line-height: 1.5; }
-  .etiqueta { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fraca); }
+  .dica { color: var(--fraca); font-weight: 500; font-size: .95rem; line-height: 1.5; }
+  .etiqueta { font-size: .82rem; font-weight: 600; color: var(--fraca); }
   .espaco { flex: 1; }
   /* Nas telas de formulário o vão empurra o botão para o rodapé, que é o certo. Na de
      boas-vindas não há formulário: sem limite, sobrava um buraco no meio da tela. */
   #tela-boas .espaco { max-height: 72px; }
-  .botoes { display: grid; gap: 12px; width: 100%; }
+  .botoes { display: grid; gap: 10px; width: 100%; }
   button, .botao { font-family: inherit; }
-  /* Cápsula e sem relevo: o botão principal é o preto/branco que inverte com o tema. */
-  .botao { font-family: 'Oswald', 'Arial Narrow', var(--fonte, sans-serif); display: flex; align-items: center;
-    justify-content: center; gap: 8px; width: 100%; min-height: 54px; padding: 12px 18px; border: 0;
-    border-radius: 999px; background: var(--inverso); color: var(--inverso-tinta); font-size: 1rem;
-    font-weight: 600; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
-  .botao:active { transform: translateY(2px); }
+  /* Pílula preta com texto lima; no escuro, pílula branca com texto preto. O secundário é
+     uma pílula neutra, sem contorno. */
+  .botao { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 56px;
+    padding: 14px 22px; border: 0; border-radius: 999px; background: var(--botao); color: var(--botao-tinta);
+    font-size: 1rem; font-weight: 700; cursor: pointer; text-decoration: none; }
+  .botao:active { transform: scale(.98); }
   .botao[disabled] { opacity: .4; cursor: default; transform: none; }
-  .botao.contorno { background: transparent; color: var(--forte); border: 1.6px solid var(--forte); }
-  .botao.plano { background: none; color: var(--fraca); min-height: 44px; text-transform: none; letter-spacing: 0; }
+  .botao.contorno { background: var(--cartao); color: var(--forte); }
+  .botao.plano { background: none; color: var(--fraca); min-height: 48px; }
   .links { display: flex; justify-content: center; gap: 20px; min-height: 44px; align-items: center; }
   /* Sublinhado porque a cor sozinha não pode ser o que distingue um link (WCAG 1.4.1). */
-  a { color: var(--azul); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-  .topo-passo { display: flex; align-items: center; gap: 12px; min-height: 48px; }
-  .voltar { display: grid; place-items: center; width: 44px; height: 44px; margin-left: -10px; border: 0; background: none;
-    color: var(--fraca); cursor: pointer; border-radius: 12px; }
-  .voltar svg { width: 24px; height: 24px; }
-  .barra { flex: 1; height: 14px; border-radius: 999px; background: var(--trilho); overflow: hidden; }
-  .barra i { display: block; height: 100%; border-radius: 999px; background: var(--verde); transition: width .3s ease; }
+  a { color: var(--forte); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  .topo-passo { display: flex; align-items: center; gap: 12px; min-height: 52px; }
+  .voltar { display: grid; place-items: center; flex: 0 0 auto; width: 52px; height: 52px; border: 0; border-radius: 50%;
+    background: var(--cartao); color: var(--forte); cursor: pointer; }
+  .voltar svg { width: 22px; height: 22px; }
+  .barra { flex: 1; height: 10px; border-radius: 999px; background: var(--cartao); overflow: hidden; }
+  .barra i { display: block; height: 100%; border-radius: 999px; background: var(--forte); transition: width .3s ease; }
   form { display: flex; flex-direction: column; gap: 16px; flex: 1; }
   .campo { display: grid; gap: 6px; }
-  label { font-size: .9rem; font-weight: 700; color: var(--tinta); }
-  input { width: 100%; min-height: 54px; padding: 12px 16px; border: 2px solid var(--borda); border-radius: 16px;
-    background: var(--cartao); color: var(--forte); font-family: inherit; font-size: 1.05rem; font-weight: 700; }
-  input:focus { outline: none; border-color: var(--azul); }
-  input[aria-invalid="true"] { border-color: var(--erro); }
-  .ajuda { font-size: .8rem; font-weight: 600; color: var(--fraca); }
-  .erro { min-height: 20px; font-size: .88rem; font-weight: 700; color: var(--erro); }
+  label { font-size: .9rem; font-weight: 700; color: var(--forte); }
+  input { width: 100%; min-height: 56px; padding: 12px 20px; border: 0; border-radius: 999px;
+    background: var(--cartao); color: var(--forte); font-family: inherit; font-size: 1.05rem; font-weight: 600; }
+  input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--forte); }
+  input[aria-invalid="true"] { box-shadow: inset 0 0 0 2px var(--erro); }
+  .ajuda { font-size: .82rem; font-weight: 500; color: var(--fraca); }
+  .erro { min-height: 20px; font-size: .9rem; font-weight: 700; color: var(--erro); }
   .senha { position: relative; }
-  .senha input { padding-right: 96px; }
-  .mostrar { position: absolute; right: 6px; top: 5px; min-height: 44px; padding: 0 12px; border: 0; background: none;
-    color: var(--fraca); font-weight: 700; font-size: .9rem; cursor: pointer; border-radius: 12px; }
-  .privacidade { display: flex; gap: 12px; padding: 14px; border-radius: 16px; background: var(--azul-fraco); color: var(--tinta);
-    font-size: .88rem; font-weight: 600; line-height: 1.5; }
-  .privacidade svg { flex: 0 0 auto; width: 22px; height: 22px; color: var(--azul); }
-  .convite { padding: 12px 14px; border-radius: 16px; background: var(--azul-fraco); font-weight: 700; color: var(--forte); }
-  :focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+  .senha input { padding-right: 104px; }
+  .mostrar { position: absolute; right: 6px; top: 6px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px;
+    background: var(--pilula); color: var(--forte); font-weight: 700; font-size: .88rem; cursor: pointer; }
+  .privacidade { display: flex; gap: 12px; padding: 16px; border-radius: 24px; background: var(--cartao); color: var(--tinta);
+    font-size: .88rem; font-weight: 500; line-height: 1.5; }
+  .privacidade svg { flex: 0 0 auto; width: 22px; height: 22px; color: var(--forte); }
+  .convite { padding: 12px 18px; border-radius: 999px; background: var(--lima); font-weight: 700; color: #111111; }
+  :focus-visible { outline: 3px solid var(--forte); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
