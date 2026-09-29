@@ -272,7 +272,7 @@
     const botaoMais = () => {
       const ponto = pontoMais ? '<i class="ponto-aba"></i>' : '';
       return '<button type="button" class="aba' + (maisSelecionado ? ' selecionada' : '') + '" data-papel="mais" data-abrir-mais'
-        + (maisSelecionado ? ' aria-current="page"' : '') + ' aria-label="Mais"><span class="icone-aba"><span class="mais-ico"><i><b></b><b></b><b></b></i></span>' + ponto + '</span>'
+        + (maisSelecionado ? ' aria-current="page"' : '') + ' aria-label="Mais"><span class="icone-aba">' + CC.icoAba('mais') + ponto + '</span>'
         + '<span class="rotulo-aba">Mais</span></button>';
     };
 

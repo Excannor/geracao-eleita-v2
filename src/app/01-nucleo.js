@@ -151,11 +151,13 @@ window.CC = window.CC || {};
   // Os dois precisam ser diferentes — várias destas formas são chapas sobrepostas, e com
   // um tom só viram uma mancha sólida (foi o que aconteceu com a bússola e o alvo).
   const ICONES_ABA = {
-    // estrada em curva com faixa pontilhada: o marcador no começo e a bandeira na chegada
-    trilha: (a, b) => '<path d="M22 47C6 40 38 31 27 23S19 11 33 5" fill="none" stroke="' + b + '" stroke-width="10" stroke-linecap="round"/>'
-      + '<path d="M22 47C6 40 38 31 27 23S19 11 33 5" fill="none" stroke="' + a + '" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="0.1 4.4"/>'
-      + '<path fill-rule="evenodd" d="M9 25a7 7 0 0 1 7 7c0 6-7 13-7 13s-7-7-7-13a7 7 0 0 1 7-7zm0 4.2a2.8 2.8 0 1 0 0 5.6a2.8 2.8 0 1 0 0-5.6z" fill="' + a + '"/>'
-      + '<rect x="37.5" y="2" width="2.8" height="15" rx="1.4" fill="' + a + '"/><path d="M40 2h7.5l-2.5 4 2.5 4H40z" fill="' + a + '"/>',
+    // três paradas ligadas por um caminho, com o alfinete na primeira (escolha do dono, 29/09)
+    trilha: (a, b) => '<ellipse cx="19" cy="40" rx="15" ry="6" fill="' + b + '"/>'
+    + '<ellipse cx="35" cy="27.5" rx="10.5" ry="4.8" fill="' + b + '"/>'
+    + '<ellipse cx="13" cy="19.5" rx="9" ry="4" fill="' + b + '"/>'
+    + '<path d="M13 19.5l22 8L19 40" fill="none" stroke="' + a + '" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<rect x="10.4" y="9.5" width="5.2" height="10" rx="2.6" fill="' + a + '"/>'
+    + '<path fill-rule="evenodd" d="M13 1.6a7.2 7.2 0 1 1 0 14.4A7.2 7.2 0 0 1 13 1.6zm0 4.6a2.6 2.6 0 1 0 0 5.2a2.6 2.6 0 1 0 0-5.2z" fill="' + a + '"/>',
     // bandeira fincada
     bandeira: (a, b) => '<rect x="9" y="6" width="6" height="37" rx="3" fill="' + b + '"/>'
       + '<path d="M15 9c7-4 15 4 23 0v17c-8 4-16-4-23 0z" fill="' + a + '"/>',
@@ -170,18 +172,19 @@ window.CC = window.CC || {};
     // pessoa de frente
     pessoa: (a, b) => '<circle cx="24" cy="16" r="8" fill="' + a + '"/>'
       + '<path d="M24 27c-8 0-14 5-14 12 0 2 1 3 3 3h22c2 0 3-1 3-3 0-7-6-12-14-12z" fill="' + b + '"/>',
-    // baú fechado, das missões
-    bau: (a, b) => '<rect x="6" y="20" width="36" height="22" rx="5" fill="' + b + '"/>'
-      + '<path d="M6 20c0-7 5-12 12-12h12c7 0 12 5 12 12v4H6z" fill="' + a + '"/>'
-      + '<rect x="6" y="22" width="36" height="5" fill="' + b + '" opacity=".55"/>'
-      + '<rect x="19" y="18" width="10" height="13" rx="3" fill="' + b + '"/><circle cx="24" cy="24" r="2" fill="' + a + '"/>',
-    // balão de conversa com um coração, das novidades
+    // baú dos desafios: tampa e fecho em cor cheia
+    bau: (a, b) => '<rect x="6" y="21" width="36" height="21" rx="4.5" fill="' + b + '"/>'
+    + '<path d="M6 21c0-7.2 5.8-13 13-13h10c7.2 0 13 5.8 13 13v2.5H6z" fill="' + a + '"/>'
+    + '<rect x="19.5" y="18" width="9" height="12" rx="3" fill="' + a + '"/>'
+    + '<circle cx="24" cy="24" r="1.8" fill="' + b + '"/>',
+    // balão de conversa com um coração, das novidades (o dono preferiu o desenho original)
     novidades: (a, b) => '<path d="M8 8h32a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H22l-9 7v-7H8a4 4 0 0 1-4-4V12a4 4 0 0 1 4-4z" fill="' + a + '"/>'
       + '<path d="M24 30s-9-5-9-11a4.6 4.6 0 0 1 9-1.6A4.6 4.6 0 0 1 33 19c0 6-9 11-9 11z" fill="' + b + '"/>'
       + '<path d="M40 8a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4h-6c5-8 5-20 0-28z" fill="' + b + '" opacity=".35"/>',
-    // livro aberto, dos dias lidos
-    livro: (a, b) => '<path d="M4 10c7-3 14-3 20 1v30c-6-4-13-4-20-1z" fill="' + a + '"/>'
-      + '<path d="M44 10c-7-3-14-3-20 1v30c6-4 13-4 20-1z" fill="' + b + '"/>',
+    // Bíblia aberta: a folha da esquerda cheia, a da direita suave e a fita
+    livro: (a, b) => '<path d="M4 10.5c7.2-3.2 14-3 19.2 1v30c-5.4-3.8-12.2-4-19.2-.9z" fill="' + a + '"/>'
+    + '<path d="M44 10.5c-7.2-3.2-14-3-19.2 1v30c5.4-3.8 12.2-4 19.2-.9z" fill="' + b + '"/>'
+    + '<path d="M29 12.5h4v12l-2-1.8-2 1.8z" fill="' + a + '"/>',
     // fogo, o mesmo da ofensiva (a lamparina de barro saiu do app)
     chama: (a, b) => '<path d="M24 4c3 7 12 12 12 22 0 9-6 16-12 16s-12-7-12-16c0-6 3-10 6-13 0 5 2 8 5 9-2-7-1-13 1-18z" fill="' + a + '"/>'
       + '<path d="M24 24c2 4 6 7 6 11 0 4-3 7-6 7s-6-3-6-7c0-4 4-7 6-11z" fill="' + b + '"/>',
@@ -204,18 +207,18 @@ window.CC = window.CC || {};
       + '<path d="M17 27c-7 0-12 4-12 10 0 2 1 3 3 3h18c2 0 3-1 3-3 0-6-5-10-12-10z" fill="' + b + '"/>'
       + '<circle cx="33" cy="15" r="6" fill="' + b + '"/>'
       + '<path d="M33 24c-2 0-4 .4-5.5 1.2 3 2.4 4.5 6 4.5 10.3 0 1.3-.2 2.4-.6 3.5H41c2 0 3-1 3-3 0-7-5-12-11-12z" fill="' + a + '"/>',
-    // casa da célula: telhado e porta em destaque, corpo no tom fraco. Desenho do mock
-    // aprovado (mock-hibrida.mjs), reaproveitado tal e qual.
+    // casa da célula (o dono preferiu o desenho original)
     casa: (a, b) => '<path d="M24 5 3 23h6v19c0 1.7 1.3 3 3 3h24c1.7 0 3-1.3 3-3V23h6z" fill="' + b + '"/>'
       + '<path d="M24 5 3 23h6l15-12.5L39 23h6z" fill="' + a + '"/>'
       + '<path d="M19 45V32c0-1.7 1.3-3 3-3h4c1.7 0 3 1.3 3 3v13z" fill="' + a + '"/>',
-    // dupla do discipulado: duas cabeças e os dois corpos, uma pessoa acompanhando a outra.
-    // Mesmo desenho do mock aprovado (mock-hibrida.mjs), reaproveitado tal e qual.
-    dupla: (a, b) => '<circle cx="15" cy="9" r="6" fill="' + a + '"/>'
-      + '<circle cx="33" cy="9" r="6" fill="' + b + '"/>'
-      + '<path d="M26 19h14c2 0 3 1.3 3 3v23h-6V32h-3v13h-8z" fill="' + b + '"/>'
-      + '<path d="M8 16h13c1.7 0 3 1.3 3 3v26h-6V32h-3v13H6V19c0-1.7.8-3 2-3z" fill="' + a + '"/>'
-      + '<path d="M21 16h19c2.8 0 4.5 1.8 4.5 4.2V27h-5v-5.5H21z" fill="' + a + '"/>',
+    // dupla do discipulado: quem conduz à frente, em cor cheia; quem caminha junto, atrás
+    dupla: (a, b) => '<circle cx="33" cy="12.5" r="5.8" fill="' + b + '"/>'
+    + '<path d="M24 44V31.5c0-5.2 4-9.5 9-9.5s9 4.3 9 9.5V44z" fill="' + b + '"/>'
+    + '<circle cx="17" cy="11" r="6.8" fill="' + a + '"/>'
+    + '<path d="M6 44V31c0-6.1 4.9-11 11-11s11 4.9 11 11v13z" fill="' + a + '"/>',
+    // Mais: o disco suave com os três pontos cheios (antes era um disco feito no CSS)
+    mais: (a, b) => '<circle cx="24" cy="24" r="19.5" fill="' + b + '"/>'
+    + '<circle cx="14.5" cy="24" r="3.4" fill="' + a + '"/><circle cx="24" cy="24" r="3.4" fill="' + a + '"/><circle cx="33.5" cy="24" r="3.4" fill="' + a + '"/>',
   };
 
   // Os ícones herdam a cor de quem os contém (currentColor) em vez de trazerem a sua: é o
@@ -242,6 +245,7 @@ window.CC = window.CC || {};
     sino: HERDA,
     casa: HERDA,
     dupla: HERDA,
+    mais: HERDA,
   };
 
   CC.icoAba = (nome) => {
