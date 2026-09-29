@@ -101,6 +101,11 @@
         p.emailLigado
           ? 'O e-mail está ligado: quem tem e-mail cadastrado recebe o link sozinho.'
           : 'Sem e-mail configurado. Gere o link e mande pela conversa com a pessoa. Vale 1 hora e só uma vez.')
+      + (p.backup ? grupo('Cópias de segurança',
+        linha2(p.backup.externo ? 'No disco externo' : 'No cartão do Pi (o disco externo não está sendo usado)',
+          p.backup.quantos ? p.backup.quantos + ' cópias diárias cifradas · a última em ' + p.backup.ultimo.split('-').reverse().join('/')
+            + (p.backup.livreGB !== null ? ' · ' + String(p.backup.livreGB).replace('.', ',') + ' GB livres' : '') : 'Nenhuma cópia ainda'),
+        p.backup.externo ? '' : 'Confira se o pendrive está ligado no Pi e montado em /mnt/externo.') : '')
       + grupo('Contas', numero('Total', p.contas.total) + numero('Novas nos últimos 7 dias', p.contas.novas7)
         + numero('Novas nos últimos 30 dias', p.contas.novas30))
       + grupo('Quem está lendo', numero('Leram hoje', p.ativos.hoje) + numero('Nos últimos 7 dias', p.ativos.dias7)

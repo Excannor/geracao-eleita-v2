@@ -3,7 +3,7 @@
 // Uso: node servidor.mjs [porta]
 import { createServer } from 'node:http';
 import { readFile, writeFile, rename, stat, mkdir, readdir, unlink } from 'node:fs/promises';
-import { readFileSync, readdirSync, existsSync, writeFileSync, unlinkSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, writeFileSync, unlinkSync, statfsSync } from 'node:fs';
 import { join, dirname, extname, normalize, basename, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { networkInterfaces } from 'node:os';
@@ -400,6 +400,20 @@ const EMAIL = configDoEmail();
 const ADMINS = String(process.env.CAMINHO_ADMIN || '').split(',').map((u) => limparNome(u)).filter(Boolean);
 const ehAdmin = (usuario) => ADMINS.includes(usuario);
 let cachePainel = null;
+// Para o painel: onde estão os backups, o último e o espaço livre. O arquivo .disco-externo
+// é deixado na pasta do disco externo; se ele sumir (disco solto, pasta recriada no cartão),
+// o painel avisa que os backups voltaram para o cartão do Pi.
+function estadoDosBackups() {
+  const pasta = join(PASTA_DADOS, 'backup');
+  try {
+    const cifrados = readdirSync(pasta).filter((f) => /^caminho-\d{4}-\d{2}-\d{2}\.db\.cifrado$/.test(f)).sort();
+    let livreGB = null;
+    try { const s = statfsSync(pasta); livreGB = Math.round((s.bavail * s.bsize) / 1e8) / 10; } catch { /* sem statfs */ }
+    return { quantos: cifrados.length, ultimo: (cifrados.at(-1) || '').slice(8, 18), externo: existsSync(join(pasta, '.disco-externo')), livreGB };
+  } catch {
+    return { quantos: 0, ultimo: '', externo: false, livreGB: null };
+  }
+}
 function pedidosDeSenha() {
   let lista = [];
   try { lista = JSON.parse(lerMeta(DB, 'pedidos_senha') || '[]'); } catch { /* lista vazia */ }
@@ -998,6 +1012,7 @@ const servidor = createServer(async (req, res) => {
         geradoEm: new Date(cachePainel.em).toISOString(),
         pedidosDeSenha: pedidosDeSenha().map((p) => ({ usuario: p.usuario, em: new Date(p.em).toISOString() })),
         emailLigado: !!EMAIL,
+        backup: estadoDosBackups(),
       };
       json(res, 200, painel);
       return;
@@ -1778,7 +1793,7 @@ const backupSeDer = () => {
   try {
     const cifrados = cifrarBackupsAbertos(join(PASTA_DADOS, 'backup'));
     if (cifrados) console.log('  backups antigos cifrados: ' + cifrados);
-    const feito = backupDoDia(DB, join(PASTA_DADOS, 'backup'), hojeNoFuso(''));
+    const feito = backupDoDia(DB, join(PASTA_DADOS, 'backup'), hojeNoFuso(''), Number(process.env.CAMINHO_BACKUP_MANTER) || 14);
     if (feito) console.log('  backup do dia: ' + basename(feito));
   } catch (e) {
     console.log('  backup falhou: ' + e.message);

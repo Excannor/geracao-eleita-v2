@@ -29,6 +29,9 @@ services:
       - "127.0.0.1:8082:8080"
     volumes:
       - "./dados:/app/dados"
+      # Os backups cifrados podem ir para outro disco (no Pi, o pendrive em /mnt/externo):
+      # CAMINHO_PASTA_BACKUP no .env. Sem ela, ficam em dados/backup, como sempre.
+      - "${CAMINHO_PASTA_BACKUP:-./dados/backup}:/app/dados/backup"
     environment:
       CAMINHO_AMBIENTE: "hml"
       CAMINHO_ENDERECO: "https://geracaoeleita.app"
@@ -44,6 +47,8 @@ services:
       # A chave dos backups cifrados mora no .env, fora da pasta de dados: quem levar dados/
       # não leva a chave junto. Guarde uma cópia dela: sem a chave, o backup não abre.
       CAMINHO_BACKUP_CHAVE: "${CAMINHO_BACKUP_CHAVE:-}"
+      # Quantas cópias diárias guardar (com o disco externo cabem bem mais que 14).
+      CAMINHO_BACKUP_MANTER: "${CAMINHO_BACKUP_MANTER:-14}"
 
   # Túnel rápido: endereço novo a cada reinício. Só sobe se pedido, com
   #   docker compose --profile rapido up -d
