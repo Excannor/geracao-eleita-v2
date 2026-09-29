@@ -1,0 +1,60 @@
+# DEV do Geração Eleita: o redesenho da identidade nova (preto, branco e verde-limão).
+#
+# Três ambientes vivos ao mesmo tempo, cada um na sua pasta e na sua porta:
+#   PRD: "Caminho com Cristo - App",     porta 8080, https://ccc.off-sec.net
+#   HML: "Caminho com Cristo - App HML", porta 8081, o app como estava antes do redesenho
+#   DEV: esta pasta,                     porta 8082, onde o redesenho é feito
+#
+# O HML fica de pé de propósito, para comparar o antes e o depois lado a lado.
+# Backup das duas pastas originais: D:\Backups\caminho-com-cristo\2026-09-19\
+#
+# O túnel rápido dá um endereço https (necessário para instalar no celular e testar
+# notificações) que muda a cada reinício. Para ver o endereço atual:
+#   docker compose logs tunel | findstr trycloudflare
+#
+# Os dados em ./dados vieram do HML, que por sua vez é uma cópia da produção sem as
+# chaves de sessão e de push: um login daqui não vale lá e nenhuma notificação sai
+# com a chave de produção.
+name: geracao-eleita
+
+services:
+  caminho:
+    build:
+      context: .
+    container_name: geracao-eleita
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+    volumes:
+      - "./dados:/app/dados"
+    environment:
+      CAMINHO_AMBIENTE: "hml"
+
+  # Túnel rápido: endereço novo a cada reinício. Só sobe se pedido, com
+  #   docker compose --profile rapido up -d
+  tunel:
+    image: cloudflare/cloudflared:latest
+    container_name: geracao-eleita-tunel
+    restart: unless-stopped
+    profiles: [rapido]
+    depends_on: [caminho]
+    command: tunnel --no-autoupdate --url http://caminho:8080
+
+  # Túnel nomeado, endereço fixo. O token mora no .env desta pasta, que o git ignora.
+  # "network_mode: service:caminho" põe os dois na mesma pilha de rede, então no painel
+  # da Cloudflare o serviço aponta para http://localhost:8080 — e não para a porta 8082,
+  # que é só o mapeamento para fora, no host.
+  #
+  # ATENÇÃO ao publicar: recriar o container "caminho" destrói a pilha de rede que este
+  # aqui usa, e o túnel fica órfão ("network is unreachable"), no ar mas sem servir nada.
+  # Depois de todo deploy, reinicie os dois:
+  #   docker compose up -d --build && docker compose restart tunel-fixo
+  tunel-fixo:
+    image: cloudflare/cloudflared:latest
+    container_name: geracao-eleita-tunel-fixo
+    restart: unless-stopped
+    network_mode: "service:caminho"
+    depends_on: [caminho]
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}

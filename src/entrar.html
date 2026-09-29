@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#e6e6e6">
+<link rel="icon" href="/*ICONE*/">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=/*VERSAO_ICONES*/">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Geração Eleita">
+<meta name="robots" content="noindex, nofollow">
+<title>Geração Eleita</title>
+<style>/*FONTES*/</style>
+<style>
+  /* O portal repete a paleta do app (estilo.css) na mão, porque é uma página à parte e não
+     carrega aquele arquivo. Ao mexer na paleta lá, mexa aqui também: cinza puro, acento
+     petróleo, e o preto/branco que troca de lado entre os temas. */
+  :root {
+    --fundo: #e6e6e6; --cartao: #f7f7f7; --borda: #d9d9d9; --tinta: #3c3c3c; --forte: #111111; --fraca: #5f5f5f;
+    --verde: #0f5c5c; --verde-3d: #0a4444; --vinho: #b3261e; --azul: #0f5c5c; --azul-fraco: #e2f0f0; --erro: #b3261e;
+    --trilho: #dcdcdc; --sobre: #ffffff;
+    --inverso: #121212; --inverso-tinta: #ffffff;
+    /* O carimbo inverte com o tema. O efeito depende do contraste entre a chapa e a
+       página: chapa preta sobre fundo preto some, e o que era carimbo vira letra solta. */
+    --selo-bloco: #121212; --selo-texto: #f2f2f2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) {
+      --fundo: #0d0d0d; --cartao: #171717; --borda: #2b2b2b; --tinta: #e2e2e2; --forte: #ffffff; --fraca: #9a9a9a;
+      --verde: #5fbdb9; --verde-3d: #3d9995; --vinho: #ff6b6b; --azul: #5fbdb9; --azul-fraco: #123230; --erro: #ff6b6b;
+      --trilho: #2a2a2a; --sobre: #0d0d0d;
+      --inverso: #ffffff; --inverso-tinta: #111111;
+      --selo-bloco: #f2f2f2; --selo-texto: #121212;
+    }
+  }
+  /* O portal segue o sistema e tem tema escuro próprio; escolhido "claro" no app, ele
+     pede "só claro" para o navegador não escurecer a página por cima. */
+  :root { color-scheme: light dark; }
+  :root[data-tema="claro"] { color-scheme: only light; }
+  :root[data-tema="escuro"] { color-scheme: dark; }
+  :root[data-tema="escuro"] {
+    --fundo: #0d0d0d; --cartao: #171717; --borda: #2b2b2b; --tinta: #e2e2e2; --forte: #ffffff; --fraca: #9a9a9a;
+    --verde: #5fbdb9; --verde-3d: #3d9995; --vinho: #ff6b6b; --azul: #5fbdb9; --azul-fraco: #123230; --erro: #ff6b6b;
+    --trilho: #2a2a2a; --sobre: #0d0d0d;
+    --inverso: #ffffff; --inverso-tinta: #111111;
+    --selo-bloco: #f2f2f2; --selo-texto: #121212;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--fundo); color: var(--tinta);
+    font-family: 'Nunito', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; }
+  body { display: flex; justify-content: center; }
+  main { width: 100%; max-width: 420px; min-height: 100dvh; display: flex; flex-direction: column;
+    padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
+  section { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+  section[hidden] { display: none; }
+  .centro { align-items: center; text-align: center; justify-content: center; }
+  #tela-boas { position: relative; }
+  /* O selo do lema: um carimbo, sempre escuro com letra clara nos dois temas, como uma
+     etiqueta impressa, não um cartão que devia seguir o tema. Linhas curtas de propósito:
+     a Permanent Marker é uma fonte larga, e frases longas numa linha só quebravam feio. */
+  .selo-lema { display: flex; flex-direction: column; align-items: center; margin: 14px 0 6px; }
+  /* Chapa preta lisa, sem contorno nem sombra: com borda e relevo o bloco virava adesivo
+     colado por cima da tela, em vez de tinta carimbada nela. A letra enche o bloco — é o
+     tamanho que dá o peso da arte; pequena, ela vira legenda. */
+  .selo-linha { display: block; width: fit-content; max-width: 100%; margin-top: -3px; padding: 7px 16px 3px;
+    background: var(--selo-bloco); color: var(--selo-texto); font-family: 'Permanent Marker', cursive;
+    font-size: clamp(1.3rem, 7.4vw, 1.8rem); line-height: 1.12; letter-spacing: .02em;
+    text-transform: uppercase; text-align: center; white-space: nowrap; }
+  /* Sem rotação: na arte de referência os blocos estão retos, e o que quebra a régua é um
+     empurrãozinho lateral em cada linha. Inclinar dava aspecto de etiqueta torta.
+     A contagem começa em 2 porque a referência é a primeira filha. */
+  .selo-lema > :nth-child(2) { margin-top: 0; transform: translateX(3px); }
+  .selo-lema > :nth-child(3) { transform: translateX(15px); }
+  .selo-lema > :nth-child(4) { transform: translateX(-7px); }
+  .selo-lema > :nth-child(5) { transform: translateX(5px); }
+  .selo-lema > :nth-child(6) { transform: translateX(-10px); }
+  /* A cruz acompanha a linha "Geração", fora do bloco escuro, na tinta da página. Fica
+     posicionada por cima e não no fluxo: ocupando espaço, ela empurrava essa linha para
+     a direita e quebrava o eixo do carimbo. */
+  .selo-com-cruz { position: relative; display: block; width: fit-content; margin-top: -3px; }
+  .selo-com-cruz .selo-linha { margin-top: 0; transform: none; }
+  .selo-cruz { position: absolute; right: 100%; top: 52%; margin-right: 9px; transform: translateY(-50%);
+    width: 16px; height: 22px; color: var(--forte); }
+  .selo-ref { margin-bottom: 10px; font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 700;
+    font-style: italic; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--forte); }
+  .marca { position: relative; font-family: 'Oswald', 'Arial Narrow', var(--fonte, sans-serif); font-size: 1.15rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
+  .marca em { font-style: normal; }
+  .mascote { position: relative; margin: 0 auto; }
+  .mascote svg { width: 108px; height: auto; display: block; color: var(--forte); }
+  h1 { margin: 0; color: var(--forte); font-size: 1.65rem; line-height: 1.2; text-wrap: balance; }
+  /* Na tela de boas-vindas o carimbo é o protagonista; o título vira apoio dele. */
+  #tela-boas h1 { font-size: 1.24rem; }
+  #tela-boas .dica { font-size: .88rem; }
+  p { margin: 0; }
+  .dica { color: var(--fraca); font-weight: 600; font-size: .95rem; line-height: 1.5; }
+  .etiqueta { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fraca); }
+  .espaco { flex: 1; }
+  /* Nas telas de formulário o vão empurra o botão para o rodapé, que é o certo. Na de
+     boas-vindas não há formulário: sem limite, sobrava um buraco no meio da tela. */
+  #tela-boas .espaco { max-height: 72px; }
+  .botoes { display: grid; gap: 12px; width: 100%; }
+  button, .botao { font-family: inherit; }
+  /* Cápsula e sem relevo: o botão principal é o preto/branco que inverte com o tema. */
+  .botao { font-family: 'Oswald', 'Arial Narrow', var(--fonte, sans-serif); display: flex; align-items: center;
+    justify-content: center; gap: 8px; width: 100%; min-height: 54px; padding: 12px 18px; border: 0;
+    border-radius: 999px; background: var(--inverso); color: var(--inverso-tinta); font-size: 1rem;
+    font-weight: 600; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
+  .botao:active { transform: translateY(2px); }
+  .botao[disabled] { opacity: .4; cursor: default; transform: none; }
+  .botao.contorno { background: transparent; color: var(--forte); border: 1.6px solid var(--forte); }
+  .botao.plano { background: none; color: var(--fraca); min-height: 44px; text-transform: none; letter-spacing: 0; }
+  .links { display: flex; justify-content: center; gap: 20px; min-height: 44px; align-items: center; }
+  /* Sublinhado porque a cor sozinha não pode ser o que distingue um link (WCAG 1.4.1). */
+  a { color: var(--azul); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  .topo-passo { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+  .voltar { display: grid; place-items: center; width: 44px; height: 44px; margin-left: -10px; border: 0; background: none;
+    color: var(--fraca); cursor: pointer; border-radius: 12px; }
+  .voltar svg { width: 24px; height: 24px; }
+  .barra { flex: 1; height: 14px; border-radius: 999px; background: var(--trilho); overflow: hidden; }
+  .barra i { display: block; height: 100%; border-radius: 999px; background: var(--verde); transition: width .3s ease; }
+  form { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+  .campo { display: grid; gap: 6px; }
+  label { font-size: .9rem; font-weight: 700; color: var(--tinta); }
+  input { width: 100%; min-height: 54px; padding: 12px 16px; border: 2px solid var(--borda); border-radius: 16px;
+    background: var(--cartao); color: var(--forte); font-family: inherit; font-size: 1.05rem; font-weight: 700; }
+  input:focus { outline: none; border-color: var(--azul); }
+  input[aria-invalid="true"] { border-color: var(--erro); }
+  .ajuda { font-size: .8rem; font-weight: 600; color: var(--fraca); }
+  .erro { min-height: 20px; font-size: .88rem; font-weight: 700; color: var(--erro); }
+  .senha { position: relative; }
+  .senha input { padding-right: 96px; }
+  .mostrar { position: absolute; right: 6px; top: 5px; min-height: 44px; padding: 0 12px; border: 0; background: none;
+    color: var(--fraca); font-weight: 700; font-size: .9rem; cursor: pointer; border-radius: 12px; }
+  .privacidade { display: flex; gap: 12px; padding: 14px; border-radius: 16px; background: var(--azul-fraco); color: var(--tinta);
+    font-size: .88rem; font-weight: 600; line-height: 1.5; }
+  .privacidade svg { flex: 0 0 auto; width: 22px; height: 22px; color: var(--azul); }
+  .convite { padding: 12px 14px; border-radius: 16px; background: var(--azul-fraco); font-weight: 700; color: var(--forte); }
+  :focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <!-- boas-vindas -->
+  <section id="tela-boas" class="centro">
+    <div class="mascote">/*SIMBOLO*/</div>
+    <div class="marca">Geração <em>Eleita</em></div>
+    <!-- O carimbo vem logo depois da marca, e não no meio da tela: ele é a declaração de
+         quem o app é, parte da identidade. Espremido entre o título e os botões, parecia
+         uma arte colada ali por falta de lugar melhor. -->
+    <div class="selo-lema">
+      <!-- A referência vem antes do carimbo: embaixo dele, parecia citar a frase, que não
+           é de 1 Pedro. Em cima, ela anuncia de onde vem o nome do app. -->
+      <span class="selo-ref">1 Pedro 2.9</span>
+      <span class="selo-linha">Somos a</span>
+      <span class="selo-com-cruz">
+        <svg class="selo-cruz" viewBox="0 0 24 30" fill="currentColor" aria-hidden="true"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z"/></svg>
+        <span class="selo-linha">Geração</span>
+      </span>
+      <span class="selo-linha">Que busca</span>
+      <span class="selo-linha">À sua face</span>
+      <span class="selo-linha">E te adora</span>
+    </div>
+    <h1 id="titulo-boas">A Bíblia inteira em um ano, uma lição por dia.</h1>
+    <p class="dica" id="dica-boas">De 10 a 20 minutos na maioria dos dias, com ofensiva e amigos lendo junto com você.</p>
+    <div class="espaco"></div>
+    <div class="botoes">
+      <button class="botao" data-ir="cadastro">Começar</button>
+      <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
+    </div>
+    <div class="links"><a href="privacidade.html">Privacidade</a></div>
+  </section>
+
+  <!-- entrar -->
+  <section id="tela-entrar" hidden>
+    <div class="topo-passo"><button class="voltar" data-ir="boas" aria-label="Voltar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button></div>
+    <h1>Que bom te ver de novo!</h1>
+    <form id="form-entrar" autocomplete="on" novalidate>
+      <div class="campo"><label for="login">@usuário ou e-mail</label>
+        <input id="login" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
+      <div class="campo"><label for="senha-entrar">Senha</label>
+        <div class="senha"><input id="senha-entrar" name="password" type="password" autocomplete="current-password" required>
+          <button type="button" class="mostrar" data-mostrar="senha-entrar" aria-pressed="false">Mostrar</button></div></div>
+      <p class="erro" id="erro-entrar" role="alert"></p>
+      <div class="espaco"></div>
+      <button class="botao" type="submit" id="botao-entrar">Entrar</button>
+      <button class="botao plano" type="button" data-ir="cadastro">Criar uma conta</button>
+    </form>
+  </section>
+
+  <!-- cadastro -->
+  <section id="tela-cadastro" hidden>
+    <div class="topo-passo"><button class="voltar" id="voltar-cadastro" aria-label="Voltar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
+      <div class="barra" aria-hidden="true"><i id="barra-cadastro" style="width:33%"></i></div></div>
+    <div id="convite-cadastro" class="convite" hidden></div>
+    <span class="etiqueta" id="passo-rotulo">Passo 1 de 3</span>
+    <form id="form-cadastro" autocomplete="on" novalidate>
+      <div data-passo="1">
+        <h1>Quem é você?</h1>
+        <div class="campo" style="margin-top:16px"><label for="nome">Como você quer ser chamado?</label>
+          <input id="nome" name="name" autocomplete="given-name" maxlength="20" required>
+          <span class="ajuda">Até 20 letras. É assim que seus amigos veem você.</span></div>
+        <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
+          <input id="nascimento" name="bday" type="date" autocomplete="bday" required>
+          <span class="ajuda">Não aparece para ninguém.</span></div>
+      </div>
+      <div data-passo="2" hidden>
+        <h1>Seu e-mail</h1>
+        <div class="campo" style="margin-top:16px"><label for="email">E-mail</label>
+          <input id="email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required>
+          <span class="ajuda">Fica guardado e nunca aparece para ninguém. Com ele você também entra em outro aparelho.</span></div>
+      </div>
+      <div data-passo="3" hidden>
+        <h1>Crie seu acesso</h1>
+        <div class="campo" style="margin-top:16px"><label for="usuario">Escolha um @usuário</label>
+          <input id="usuario" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" required>
+          <span class="ajuda">Letras minúsculas, números, ponto, hífen e sublinhado. É por ele que um amigo te encontra.</span></div>
+        <div class="campo" style="margin-top:16px"><label for="senha-nova">Crie uma senha</label>
+          <div class="senha"><input id="senha-nova" name="new-password" type="password" autocomplete="new-password" required>
+            <button type="button" class="mostrar" data-mostrar="senha-nova" aria-pressed="false">Mostrar</button></div>
+          <span class="ajuda">Seis caracteres ou mais.</span></div>
+      </div>
+      <p class="erro" id="erro-cadastro" role="alert"></p>
+      <div class="espaco"></div>
+      <button class="botao" type="submit" id="botao-cadastro">Continuar</button>
+      <p class="ajuda" style="text-align:center">Ao criar a conta, você concorda com a <a href="privacidade.html">Privacidade</a>.</p>
+    </form>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  try { var t = localStorage.getItem('cc.tema'); if (t !== null) document.documentElement.dataset.tema = JSON.parse(t) ? 'escuro' : 'claro'; } catch (e) {}
+
+  var params = new URLSearchParams(location.search);
+  var convite = params.get('convite');
+  var passo = 1;
+
+  function mostrarTela(nome) {
+    ['boas', 'entrar', 'cadastro'].forEach(function (n) { $('tela-' + n).hidden = n !== nome; });
+    var foco = document.querySelector('#tela-' + nome + ' input, #tela-' + nome + ' button');
+    if (nome !== 'boas' && foco) foco.focus();
+    if (nome === 'cadastro') irPasso(1);
+  }
+  document.querySelectorAll('[data-ir]').forEach(function (b) {
+    b.addEventListener('click', function () { mostrarTela(b.dataset.ir); });
+  });
+  document.querySelectorAll('[data-mostrar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var campo = $(b.dataset.mostrar);
+      var ver = campo.type === 'password';
+      campo.type = ver ? 'text' : 'password';
+      b.textContent = ver ? 'Ocultar' : 'Mostrar';
+      b.setAttribute('aria-pressed', String(ver));
+    });
+  });
+
+  function irPasso(n) {
+    passo = n;
+    document.querySelectorAll('[data-passo]').forEach(function (el) { el.hidden = Number(el.dataset.passo) !== n; });
+    $('barra-cadastro').style.width = Math.round(n / 3 * 100) + '%';
+    $('passo-rotulo').textContent = 'Passo ' + n + ' de 3';
+    $('botao-cadastro').textContent = n === 3 ? 'Criar minha conta' : 'Continuar';
+    $('erro-cadastro').textContent = '';
+    var primeiro = document.querySelector('[data-passo="' + n + '"] input');
+    if (primeiro) primeiro.focus();
+  }
+  $('voltar-cadastro').addEventListener('click', function () { if (passo > 1) irPasso(passo - 1); else mostrarTela('boas'); });
+
+  function erro(campo, texto) {
+    $('erro-cadastro').textContent = texto;
+    if (campo) { campo.setAttribute('aria-invalid', 'true'); campo.focus(); }
+    return false;
+  }
+  function validar(n) {
+    document.querySelectorAll('#form-cadastro input').forEach(function (i) { i.removeAttribute('aria-invalid'); });
+    if (n === 1) {
+      if (!$('nome').value.trim()) return erro($('nome'), 'Diga como quer ser chamado.');
+      var d = $('nascimento').value;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= new Date().toISOString().slice(0, 10)) return erro($('nascimento'), 'Confira a data de nascimento.');
+    }
+    if (n === 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim())) return erro($('email'), 'Esse e-mail não parece certo.');
+    if (n === 3) {
+      $('usuario').value = $('usuario').value.trim().toLowerCase().replace(/^@/, '');
+      if (!/^[a-z0-9][a-z0-9._-]{1,29}$/.test($('usuario').value)) return erro($('usuario'), 'O @ aceita letras minúsculas, números, ponto, hífen e sublinhado, de 2 a 30 caracteres.');
+      if ($('senha-nova').value.length < 6) return erro($('senha-nova'), 'A senha precisa de 6 caracteres ou mais.');
+    }
+    return true;
+  }
+
+  // O progresso guardado neste aparelho só segue se for de quem acabou de entrar.
+  function entrarNoApp(usuario) {
+    try {
+      ['cc.app.estado', 'cc.estado'].forEach(function (chave) {
+        var bruto = localStorage.getItem(chave);
+        var dono = bruto ? (JSON.parse(bruto) || {}).dono : null;
+        if (bruto && (!usuario || dono !== usuario)) localStorage.removeItem(chave);
+      });
+    } catch (e) { /* segue */ }
+    location.replace('./' + location.search);
+  }
+
+  $('form-cadastro').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    if (!validar(passo)) return;
+    if (passo < 3) { irPasso(passo + 1); return; }
+    var botao = $('botao-cadastro');
+    botao.disabled = true;
+    $('erro-cadastro').textContent = '';
+    var fuso = '';
+    try { fuso = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) {}
+    fetch('api/criar-conta', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: $('nascimento').value, email: $('email').value.trim(),
+        usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '' }),
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (r.ok) {
+          // Conta nova: o app abre com o tutorial de pôr o ícone na tela de início.
+          try { localStorage.setItem('cc.instalar', '1'); } catch (e) { /* segue */ }
+          // O convite já foi aceito junto com o cadastro: o app não precisa perguntar de novo.
+          if (d.convidadoPor) { try { history.replaceState(null, '', location.pathname); } catch (e) { /* segue */ } }
+          entrarNoApp(d.usuario);
+          return;
+        }
+        botao.disabled = false;
+        var msg = d.erro || 'Não consegui criar a conta.';
+        msg = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
+        if (/e-mail/.test(msg)) { irPasso(2); erro($('email'), msg); }
+        else if (/nascimento|chamado/.test(msg)) { irPasso(1); erro(null, msg); }
+        else { erro(null, msg); }
+      });
+    }).catch(function () {
+      botao.disabled = false;
+      erro(null, 'Sem conexão. Seus dados continuam aqui.');
+    });
+  });
+
+  $('form-entrar').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var botao = $('botao-entrar');
+    if (!$('login').value || !$('senha-entrar').value) { $('erro-entrar').textContent = 'Preencha o @usuário ou e-mail e a senha.'; return; }
+    botao.disabled = true;
+    $('erro-entrar').textContent = '';
+    fetch('api/entrar', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ login: $('login').value.trim(), senha: $('senha-entrar').value }),
+    }).then(function (r) {
+      if (r.ok) { r.json().catch(function () { return {}; }).then(function (d) { entrarNoApp(d.usuario); }); return; }
+      botao.disabled = false;
+      $('senha-entrar').value = '';
+      $('senha-entrar').focus();
+      $('erro-entrar').textContent = r.status === 429 ? 'Muitas tentativas. Espere um pouco.' : 'Usuário ou senha não conferem.';
+    }).catch(function () {
+      botao.disabled = false;
+      $('erro-entrar').textContent = 'Sem conexão com o servidor.';
+    });
+  });
+
+  // Com convite no link, quem chamou aparece logo na primeira tela.
+  if (convite) {
+    fetch('api/convites/' + encodeURIComponent(convite)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d) return;
+      $('titulo-boas').textContent = d.nome + ' te chamou para ler a Bíblia junto!';
+      $('dica-boas').textContent = 'Uma lição por dia, e a contagem de vocês sobe nos dias em que os dois leem.';
+      $('convite-cadastro').hidden = false;
+      $('convite-cadastro').textContent = 'Convite de ' + d.nome + ' (@' + d.usuario + ')';
+    }).catch(function () {});
+  }
+  // Servidor sem nenhuma conta abre direto no cadastro: é o primeiro uso.
+  fetch('api/existe-conta').then(function (r) { return r.json(); }).then(function (d) {
+    if (d && !d.existe) mostrarTela('cadastro');
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>

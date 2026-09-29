@@ -1,0 +1,16 @@
+# Dependências e gerados
+node_modules/
+dist/
+capturas/
+
+# Dados de quem usa o app: banco (contas, e-mails, progresso), backups, JSON legados
+# e as chaves de sessão e de push. Nunca vão para o repositório.
+dados/
+*.db
+*.db-shm
+*.db-wal
+*.chave
+*.bak.json
+
+# Configuração local (token do túnel em PRD)
+.env

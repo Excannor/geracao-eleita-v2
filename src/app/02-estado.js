@@ -1,0 +1,618 @@
+/* Estado: o que a pessoa fez. Vive na memória, no localStorage deste aparelho e,
+   quando há servidor, no arquivo da conta. As cópias são fundidas, nunca substituídas.
+   O servidor carrega este mesmo arquivo para fundir e contar a ofensiva igual. */
+(function (CC) {
+  'use strict';
+
+  const D = CC.D;
+  const CHAVE = 'cc.app.estado';
+  const CHAVE_ANTIGA = 'cc.estado';
+  const CHAVE_TEMA = 'cc.tema';
+
+  const VAZIO = () => ({
+    atualizadoEm: 0,
+    dia: 1,
+    lidos: [],
+    licoes: [],
+    oia: {},
+    anotacoes: {},
+    marcadoEm: {},
+    licoesEm: {},
+    pratica: {},
+    foto: '',
+    apelido: '',
+    zeradoEm: 0,
+    // XP ganho com registros antes de escrever deixar de valer pontos: fica congelado
+    xpLegado: null,
+    conquistasGanhas: {},
+    maiorProposito: 0,
+    // o jogo: o que se fez em cada dia (para as missões), baús, quadro do mês e contadores
+    diario: {},
+    bausAbertos: {},
+    quadros: {},
+    notasVistas: [],
+    acertosTotal: 0,
+    missoesTotal: 0,
+    semanasJuntos: {},
+    // as datas do "Orei": só a data, para o propósito de oração; a oração continua só sua
+    oradoEm: {},
+  });
+
+  // O diário só precisa do mês corrente e do anterior: é o que as missões e o quadro leem.
+  const DIAS_DE_DIARIO = 70;
+  function fundirDiario(a, b) {
+    const saida = {};
+    for (const fonte of [a || {}, b || {}]) {
+      for (const [data, dia] of Object.entries(fonte)) {
+        const atual = saida[data] || {};
+        const junto = { ...atual };
+        for (const [campo, valor] of Object.entries(dia || {})) {
+          if (campo === 'missoes') junto.missoes = atual.missoes || valor;
+          else if (typeof valor === 'number') junto[campo] = Math.max(atual[campo] || 0, valor);
+        }
+        saida[data] = junto;
+      }
+    }
+    const datas = Object.keys(saida).sort();
+    for (const velha of datas.slice(0, Math.max(0, datas.length - DIAS_DE_DIARIO))) delete saida[velha];
+    return saida;
+  }
+  function fundirQuadros(a, b) {
+    const saida = {};
+    for (const fonte of [a || {}, b || {}]) {
+      for (const [mes, pecas] of Object.entries(fonte)) saida[mes] = uniao(saida[mes], pecas).sort();
+    }
+    return saida;
+  }
+  function fundirBaus(a, b) {
+    const saida = { ...(b || {}) };
+    for (const [chave, bau] of Object.entries(a || {})) {
+      if (!saida[chave] || (bau.em || '') < (saida[chave].em || '')) saida[chave] = bau;
+    }
+    return saida;
+  }
+
+  let E = VAZIO();
+  let servidorVivo = false;
+  CC.servidorVivo = () => servidorVivo;
+
+  // ---------- pontuação ----------
+  // Orar e escrever não valem pontos: ficam entre a pessoa e Deus.
+  CC.XP_LEITURA = 10;
+  CC.XP_LICAO = 20;
+  CC.XP_PRATICA_ACERTO = 3;
+
+  // ---------- fusão ----------
+  const uniao = (a, b) => [...new Set([...(a || []), ...(b || [])])];
+
+  // Nunca perde uma marcação: conjuntos são unidos, e só os campos únicos seguem
+  // o carimbo de tempo mais recente.
+  function fundir(a, b) {
+    if (!a) return b || VAZIO();
+    if (!b) return a;
+    // Zerar é a única operação que apaga.
+    if ((b.zeradoEm || 0) > (a.atualizadoEm || 0)) return b;
+    if ((a.zeradoEm || 0) > (b.atualizadoEm || 0)) return a;
+    const maisNovo = (b.atualizadoEm || 0) >= (a.atualizadoEm || 0) ? b : a;
+
+    const vazio = (r) => !r || !((r.o || '') + (r.i || '') + (r.a || '') + (r.oracao || '')).trim();
+    const oia = { ...(a.oia || {}) };
+    for (const [k, v] of Object.entries(b.oia || {})) {
+      if (!oia[k] || vazio(oia[k]) || maisNovo === b) oia[k] = v;
+    }
+    const anotacoes = { ...(a.anotacoes || {}) };
+    for (const [k, v] of Object.entries(b.anotacoes || {})) {
+      if (!anotacoes[k] || !anotacoes[k].trim() || maisNovo === b) anotacoes[k] = v;
+    }
+    const legado = [a.xpLegado, b.xpLegado].filter((x) => typeof x === 'number');
+    const conquistas = { ...(b.conquistasGanhas || {}) };
+    for (const [k, v] of Object.entries(a.conquistasGanhas || {})) {
+      if (!conquistas[k] || v < conquistas[k]) conquistas[k] = v;
+    }
+    return {
+      atualizadoEm: Math.max(a.atualizadoEm || 0, b.atualizadoEm || 0),
+      dia: maisNovo.dia || a.dia || 1,
+      lidos: uniao(a.lidos, b.lidos),
+      licoes: uniao(a.licoes, b.licoes),
+      oia,
+      anotacoes,
+      marcadoEm: { ...(a.marcadoEm || {}), ...(b.marcadoEm || {}) },
+      licoesEm: { ...(a.licoesEm || {}), ...(b.licoesEm || {}) },
+      pratica: fundirPratica(a.pratica, b.pratica),
+      foto: maisNovo.foto || a.foto || b.foto || '',
+      apelido: maisNovo.apelido || a.apelido || b.apelido || '',
+      zeradoEm: Math.max(a.zeradoEm || 0, b.zeradoEm || 0),
+      xpLegado: legado.length ? Math.max(...legado) : null,
+      conquistasGanhas: conquistas,
+      maiorProposito: Math.max(a.maiorProposito || 0, b.maiorProposito || 0),
+      diario: fundirDiario(a.diario, b.diario),
+      bausAbertos: fundirBaus(a.bausAbertos, b.bausAbertos),
+      quadros: fundirQuadros(a.quadros, b.quadros),
+      notasVistas: uniao(a.notasVistas, b.notasVistas).slice(-400),
+      acertosTotal: Math.max(a.acertosTotal || 0, b.acertosTotal || 0),
+      missoesTotal: Math.max(a.missoesTotal || 0, b.missoesTotal || 0),
+      semanasJuntos: { ...(a.semanasJuntos || {}), ...(b.semanasJuntos || {}) },
+      oradoEm: { ...(a.oradoEm || {}), ...(b.oradoEm || {}) },
+    };
+  }
+  function fundirPratica(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [u, p] of Object.entries(b || {})) {
+      const atual = saida[u];
+      saida[u] = !atual ? p
+        : { melhor: Math.max(atual.melhor || 0, p.melhor || 0),
+            total: p.total || atual.total || 0,
+            feitoEm: (p.feitoEm || '') > (atual.feitoEm || '') ? p.feitoEm : atual.feitoEm,
+            vezes: (atual.vezes || 0) + (p.vezes || 0) };
+    }
+    return saida;
+  }
+  CC.fundir = fundir;
+
+  // O aplicativo antigo guardava as lições em "trilha" e tinha meta e protetor guardados.
+  function normalizar(bruto) {
+    if (!bruto || typeof bruto !== 'object' || bruto.vazio) return null;
+    const e = { ...VAZIO(), ...bruto };
+    if (bruto.trilha && !bruto.licoes) e.licoes = bruto.trilha;
+    delete e.trilha;
+    delete e.meta;
+    delete e.protegidos;
+    e.lidos = (e.lidos || []).map(Number).filter((n) => n >= 1 && n <= D.plano.length);
+    return e;
+  }
+  CC.normalizarEstado = normalizar;
+
+  const localLer = (chave) => {
+    try {
+      const v = localStorage.getItem(chave);
+      return v ? normalizar(JSON.parse(v)) : null;
+    } catch (e) { return null; }
+  };
+  const localGravar = () => {
+    try { localStorage.setItem(CHAVE, JSON.stringify(E)); } catch (e) { /* segue */ }
+  };
+
+  let envioPendente;
+  function enviarAoServidor() {
+    if (!servidorVivo) return;
+    clearTimeout(envioPendente);
+    envioPendente = setTimeout(() => {
+      fetch('api/estado', {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(E),
+      }).catch(() => { servidorVivo = false; });
+    }, 600);
+  }
+
+  // Grava agora, sem esperar a pausa: o servidor precisa saber que a pessoa leu antes
+  // de aceitar o toque que ela vai dar num amigo.
+  CC.salvarNoServidor = function () {
+    if (!servidorVivo) return Promise.resolve();
+    clearTimeout(envioPendente);
+    return fetch('api/estado', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(E),
+    }).catch(() => { servidorVivo = false; });
+  };
+
+  CC.estado = () => E;
+  CC.ler = (chave, padrao) => (E[chave] === undefined ? padrao : E[chave]);
+  CC.gravar = (chave, valor) => {
+    E[chave] = valor;
+    E.atualizadoEm = Date.now();
+    localGravar();
+    enviarAoServidor();
+  };
+
+  CC.registro = (dia) => E.oia[dia] || { o: '', i: '', a: '', oracao: '' };
+  CC.gravarRegistro = (dia, valor) => { E.oia[dia] = valor; CC.gravar('atualizadoEm', Date.now()); };
+  CC.temRegistro = (dia) => {
+    const r = E.oia[dia];
+    return !!r && Object.values(r).some((x) => (x || '').trim());
+  };
+  CC.anotacao = (chave) => (E.anotacoes || {})[chave] || '';
+  CC.gravarAnotacao = (chave, texto) => {
+    (E.anotacoes ||= {})[chave] = texto;
+    CC.gravar('atualizadoEm', Date.now());
+  };
+
+  // ---------- marcação ----------
+  CC.leu = (dia) => E.lidos.includes(Number(dia));
+  CC.marcarLido = (dia, marcar) => {
+    const n = Number(dia);
+    const i = E.lidos.indexOf(n);
+    if (marcar && i === -1) { E.lidos.push(n); E.marcadoEm[n] = CC.hojeIso(); }
+    if (!marcar && i !== -1) { E.lidos.splice(i, 1); delete E.marcadoEm[n]; }
+    CC.gravar('lidos', E.lidos);
+  };
+
+  CC.fezLicao = (id) => E.licoes.includes(id);
+  CC.marcarLicao = (id, marcar) => {
+    const i = E.licoes.indexOf(id);
+    if (marcar && i === -1) { E.licoes.push(id); (E.licoesEm ||= {})[id] = CC.hojeIso(); }
+    if (!marcar && i !== -1) { E.licoes.splice(i, 1); delete (E.licoesEm || {})[id]; }
+    CC.gravar('licoes', E.licoes);
+  };
+
+  // O "Orei" do dia. Guarda só a data: é o que o propósito de oração enxerga.
+  CC.oreiHoje = () => !!(E.oradoEm || {})[CC.hojeIso()];
+  CC.marcarOrei = () => {
+    (E.oradoEm ||= {})[CC.hojeIso()] = 1;
+    CC.gravar('oradoEm', E.oradoEm);
+  };
+
+  // ---------- ofensiva e escudos ----------
+  // Uma data está feita quando houve lição do plano ou primeiros passos lidos até o fim.
+  CC.datasFeitas = (estado) => {
+    const s = new Set();
+    for (const d of Object.values((estado || E).marcadoEm || {})) if (d) s.add(d);
+    for (const d of Object.values((estado || E).licoesEm || {})) if (d) s.add(d);
+    return s;
+  };
+
+  // A ofensiva é contada do começo, dia a dia, para dar sempre o mesmo resultado em
+  // qualquer aparelho e no servidor. Escudo: começa com 1, ganha 1 a cada mês e 1 a
+  // cada 7 dias seguidos, guarda no máximo 2. Um buraco de dias em branco é coberto
+  // inteiro se houver escudos para todos eles; se não houver, a ofensiva zera e nenhum
+  // escudo é gasto à toa. Hoje nunca é buraco: o dia ainda não acabou.
+  CC.simularOfensiva = function (datas, hoje) {
+    const feitas = new Set(datas);
+    const r = { atual: 0, recorde: 0, escudos: 1, protegidos: [], feitoHoje: feitas.has(hoje), zerouEm: null, recomeco: false };
+    const ordenadas = [...feitas].filter((d) => d <= hoje).sort();
+    if (!ordenadas.length) return r;
+
+    const mesDe = (d) => d.slice(0, 7);
+    const ganhar = () => { r.escudos = Math.min(2, r.escudos + 1); };
+    const ontem = CC.somaDias(hoje, -1);
+    let mes = mesDe(ordenadas[0]);
+    let corrida = 0;
+    let zerou = false;
+    let d = ordenadas[0];
+
+    while (d <= hoje) {
+      if (mesDe(d) !== mes) { mes = mesDe(d); ganhar(); }
+      if (feitas.has(d)) {
+        corrida++;
+        if (corrida % 7 === 0) ganhar();
+        if (corrida > r.recorde) r.recorde = corrida;
+        if (zerou && corrida >= 3) r.recomeco = true;
+        d = CC.somaDias(d, 1);
+        continue;
+      }
+      if (d === hoje) break;
+      let fim = d;
+      let tamanho = 0;
+      while (fim <= ontem && !feitas.has(fim)) {
+        if (mesDe(fim) !== mes) { mes = mesDe(fim); ganhar(); }
+        tamanho++;
+        fim = CC.somaDias(fim, 1);
+      }
+      if (corrida > 0 && tamanho <= r.escudos) {
+        r.escudos -= tamanho;
+        for (let i = 0, c = d; i < tamanho; i++, c = CC.somaDias(c, 1)) r.protegidos.push(c);
+      } else {
+        if (corrida > 0) { zerou = true; r.zerouEm = d; }
+        corrida = 0;
+      }
+      d = fim;
+    }
+    r.atual = corrida;
+    return r;
+  };
+
+  // Recebe as datas por parâmetro para poder ser exercitada por teste.
+  CC.sequencia = function (marcadas, referencia) {
+    const datas = marcadas ? new Set(Object.values(marcadas)) : CC.datasFeitas();
+    const s = CC.simularOfensiva(datas, referencia || CC.hojeIso());
+    return { ...s, recorde: Math.max(s.recorde, s.atual), total: datas.size };
+  };
+
+  CC.protegido = (data) => CC.sequencia().protegidos.includes(data);
+
+  // ---------- prática ----------
+  CC.praticaDe = (unidade) => (E.pratica || {})[unidade] || { melhor: 0, total: 0, feitoEm: null };
+
+  // Guarda só o melhor resultado de cada unidade: repetir uma prática já dominada não
+  // infla o total, mas melhorar a pontuação conta.
+  CC.registrarPratica = function (unidade, acertos, total) {
+    const atual = CC.praticaDe(unidade);
+    const pratica = { ...(E.pratica || {}) };
+    pratica[unidade] = {
+      melhor: Math.max(atual.melhor || 0, acertos),
+      total,
+      feitoEm: CC.hojeIso(),
+      vezes: (atual.vezes || 0) + 1,
+    };
+    CC.gravar('pratica', pratica);
+  };
+
+  CC.xpPratica = () => Object.values(E.pratica || {})
+    .reduce((s, p) => s + (p.melhor || 0) * CC.XP_PRATICA_ACERTO, 0);
+
+  // ---------- ritmo ----------
+  CC.ritmo = function () {
+    const JANELA = 28;
+    const hoje = CC.hojeIso();
+    const inicio = CC.somaDias(hoje, -(JANELA - 1));
+    const datas = new Set(Object.values(E.marcadoEm || {}));
+    let dias = 0;
+    for (const d of datas) if (d >= inicio && d <= hoje) dias++;
+    const porSemana = (dias / JANELA) * 7;
+    const faltam = D.plano.length - E.lidos.length;
+    if (!dias || !faltam) return { porSemana, faltam, termino: null };
+    const fim = new Date();
+    fim.setDate(fim.getDate() + Math.round((faltam / porSemana) * 7));
+    return { porSemana, faltam, termino: fim };
+  };
+
+  // ---------- XP (privado) ----------
+  CC.xpTotal = () => E.lidos.length * CC.XP_LEITURA + E.licoes.length * CC.XP_LICAO
+    + CC.xpPratica() + (E.xpLegado || 0);
+
+  CC.xpDoDia = (data) => {
+    const quando = data || CC.hojeIso();
+    let xp = 0;
+    for (const d of Object.values(E.marcadoEm || {})) if (d === quando) xp += CC.XP_LEITURA;
+    for (const d of Object.values(E.licoesEm || {})) if (d === quando) xp += CC.XP_LICAO;
+    for (const p of Object.values(E.pratica || {})) {
+      if (p.feitoEm === quando) xp += (p.melhor || 0) * CC.XP_PRATICA_ACERTO;
+    }
+    return xp;
+  };
+
+  // ---------- livros ----------
+  const DIAS_POR_LIVRO = (() => {
+    const mapa = new Map();
+    for (const d of D.plano) {
+      for (const l of d.livros) {
+        if (!mapa.has(l)) mapa.set(l, []);
+        mapa.get(l).push(d.numero);
+      }
+    }
+    return mapa;
+  })();
+  CC.totalLivros = DIAS_POR_LIVRO.size;
+  CC.progressoDoLivro = (livro) => {
+    const dias = DIAS_POR_LIVRO.get(livro) || [];
+    const lidos = new Set(E.lidos);
+    return { lidos: dias.filter((x) => lidos.has(x)).length, total: dias.length };
+  };
+  const livroCompleto = (l) => { const p = CC.progressoDoLivro(l); return p.total > 0 && p.lidos === p.total; };
+  CC.livrosCompletos = () => [...DIAS_POR_LIVRO.keys()].filter(livroCompleto).length;
+
+  // ---------- foto ----------
+  CC.LADO_FOTO = 256;
+  CC.foto = () => E.foto || '';
+  CC.apelido = () => E.apelido || '';
+
+  CC.prepararFoto = function (arquivo) {
+    return new Promise((resolver, rejeitar) => {
+      if (!arquivo || !/^image\//.test(arquivo.type)) {
+        rejeitar(new Error('isso não é uma imagem'));
+        return;
+      }
+      const leitor = new FileReader();
+      leitor.onerror = () => rejeitar(new Error('não consegui ler o arquivo'));
+      leitor.onload = () => {
+        const img = new Image();
+        img.onerror = () => rejeitar(new Error('não consegui abrir a imagem'));
+        img.onload = () => {
+          try {
+            const lado = CC.LADO_FOTO;
+            const tela = document.createElement('canvas');
+            tela.width = lado;
+            tela.height = lado;
+            const ctx = tela.getContext('2d');
+            const corte = Math.min(img.width, img.height);
+            ctx.drawImage(img, (img.width - corte) / 2, (img.height - corte) / 2, corte, corte, 0, 0, lado, lado);
+            resolver(tela.toDataURL('image/jpeg', 0.82));
+          } catch (e) {
+            rejeitar(new Error('não consegui preparar a imagem'));
+          }
+        };
+        img.src = leitor.result;
+      };
+      leitor.readAsDataURL(arquivo);
+    });
+  };
+  CC.guardarFoto = (dados) => CC.gravar('foto', dados || '');
+  CC.guardarApelido = (texto) => CC.gravar('apelido', String(texto || '').slice(0, 20));
+
+  // ---------- conquistas (privadas) ----------
+  const LEGADO = {
+    'Escriba': ['caneta', 'Dez registros escritos, da versão anterior'],
+    'Estante cheia': ['livro', 'Vinte livros concluídos, da versão anterior'],
+    'Os sessenta e seis': ['coroa', 'Todos os livros, da versão anterior'],
+  };
+
+  // As conquistas agora têm níveis (02b-jogo.js). As da primeira versão, que não existem
+  // mais, continuam na estante de quem as ganhou.
+  CC.conquistasLegado = () => Object.entries(E.conquistasGanhas || {})
+    .filter(([titulo]) => LEGADO[titulo])
+    .map(([titulo, desde]) => ({ titulo, descricao: LEGADO[titulo][1], icone: LEGADO[titulo][0], desde }));
+
+  // Quais níveis de cada conquista a pessoa tem agora, para comparar antes e depois.
+  CC.fotoDosNiveis = () => {
+    const foto = {};
+    for (const c of CC.conquistasComNivel()) foto[c.id] = c.nivel;
+    return foto;
+  };
+
+  // Guarda a data de cada nível na primeira vez que ele aparece, para não sumir se um
+  // critério mudar depois. Devolve os níveis que acabaram de ser guardados.
+  CC.guardarConquistas = () => {
+    const ganhas = { ...(E.conquistasGanhas || {}) };
+    const novos = [];
+    for (const c of CC.conquistasComNivel()) {
+      for (let n = 1; n <= c.nivel; n++) {
+        const chave = 'nivel:' + c.id + ':' + n;
+        if (!ganhas[chave]) { ganhas[chave] = CC.hojeIso(); novos.push({ ...c, nivel: n }); }
+      }
+    }
+    if (novos.length) CC.gravar('conquistasGanhas', ganhas);
+    return novos;
+  };
+
+  CC.anotarProposito = (dias) => {
+    if (Number(dias) > (E.maiorProposito || 0)) CC.gravar('maiorProposito', Number(dias));
+  };
+
+  // Quem vem da versão com XP por registro e conquistas antigas não perde nada.
+  CC.migrarEstado = () => {
+    // Acertos de antes do contador: o melhor de cada unidade é o que se sabe deles.
+    const melhores = Object.values(E.pratica || {}).reduce((s, p) => s + (p.melhor || 0), 0);
+    if ((E.acertosTotal || 0) < melhores) CC.gravar('acertosTotal', melhores);
+    if (typeof E.xpLegado === 'number') return;
+    const registros = E.lidos.filter((d) => CC.temRegistro(d)).length;
+    const ganhas = { ...(E.conquistasGanhas || {}) };
+    const escritos = Object.keys(E.oia || {}).filter((k) => CC.temRegistro(k)).length;
+    const hoje = CC.hojeIso();
+    if (escritos >= 10) ganhas['Escriba'] ||= hoje;
+    if (CC.livrosCompletos() >= 20) ganhas['Estante cheia'] ||= hoje;
+    if (CC.livrosCompletos() >= CC.totalLivros) ganhas['Os sessenta e seis'] ||= hoje;
+    E.conquistasGanhas = ganhas;
+    CC.gravar('xpLegado', registros * 5);
+  };
+
+  // ---------- exportação ----------
+  CC.montarExportacao = function () {
+    const L = [];
+    const nl = String.fromCharCode(10);
+    const seq = CC.sequencia();
+    L.push('# Caminho com Cristo: meus registros', '');
+    L.push('Exportado em ' + CC.hojeIso() + '.', '');
+    L.push('## Progresso', '');
+    L.push('- Dias lidos: ' + E.lidos.length + ' de ' + D.plano.length);
+    L.push('- Ofensiva atual: ' + seq.atual + ' · recorde: ' + seq.recorde);
+    L.push('- Primeiros passos: ' + E.licoes.length + ' de ' + D.licoes.length);
+    L.push('- Livros concluídos: ' + CC.livrosCompletos() + ' de ' + CC.totalLivros, '');
+
+    const comTexto = Object.keys(E.oia || {}).filter((k) => CC.temRegistro(k)).sort((a, b) => Number(a) - Number(b));
+    if (comTexto.length) {
+      L.push('## Registros de leitura', '');
+      for (const k of comTexto) {
+        const d = D.plano[Number(k) - 1];
+        const r = E.oia[k];
+        L.push('### Dia ' + k + (d ? ': ' + [d.antigo, d.novo].filter(Boolean).join(' | ') : ''));
+        if (E.marcadoEm[k]) L.push('', 'Lido em ' + E.marcadoEm[k] + '.');
+        for (const [chave, rotulo] of [['o', 'Observação'], ['i', 'Interpretação'], ['a', 'Aplicação'], ['oracao', 'Oração']]) {
+          if (!(r[chave] || '').trim()) continue;
+          L.push('', '**' + rotulo + '**', '', r[chave].trim());
+        }
+        L.push('');
+      }
+    }
+
+    const anot = E.anotacoes || {};
+    const chaves = Object.keys(anot).filter((k) => (anot[k] || '').trim()).sort();
+    if (chaves.length) {
+      L.push('## Anotações', '');
+      for (const k of chaves) {
+        const alvo = k.replace(/^(nota|secao):/, '');
+        const nome = D.notas[alvo] ? D.notas[alvo].nome : alvo;
+        L.push('### ' + CC.semPrefixo(nome), '', anot[k].trim(), '');
+      }
+    }
+    return L.join(nl);
+  };
+
+  CC.baixarExportacao = function () {
+    const blob = new Blob([CC.montarExportacao()], { type: 'text/markdown;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'caminho-com-cristo-' + CC.hojeIso() + '.md';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  };
+
+  CC.zerarProgresso = function () {
+    const agora = Date.now();
+    E = { ...VAZIO(), xpLegado: 0, atualizadoEm: agora, zeradoEm: agora };
+    localGravar();
+    enviarAoServidor();
+  };
+
+  // Limpa só o que ficou neste aparelho, sem avisar o servidor.
+  CC.zerarLocal = function () {
+    E = VAZIO();
+    try { localStorage.removeItem(CHAVE); } catch (e) { /* segue */ }
+    try { localStorage.removeItem(CHAVE_ANTIGA); } catch (e) { /* segue */ }
+  };
+
+  // ---------- tema ----------
+  CC.temaEscuro = () => document.documentElement.dataset.tema === 'escuro';
+  CC.aplicarTema = (escuro) => {
+    document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro';
+    const cor = document.querySelector('meta[name="theme-color"]');
+    if (cor) cor.content = escuro ? '#15110b' : '#fdfbf5';
+  };
+  // null segue o sistema; true e false fixam o escuro ou o claro.
+  CC.guardarTema = (escuro) => {
+    try {
+      if (escuro === null) localStorage.removeItem(CHAVE_TEMA);
+      else localStorage.setItem(CHAVE_TEMA, JSON.stringify(escuro));
+    } catch (e) { /* segue */ }
+    CC.aplicarTema(escuro === null ? matchMedia('(prefers-color-scheme: dark)').matches : escuro);
+  };
+  CC.temaGuardado = () => {
+    try {
+      const v = localStorage.getItem(CHAVE_TEMA);
+      return v === null ? null : JSON.parse(v);
+    } catch (e) { return null; }
+  };
+
+  // ---------- partida e sincronização ----------
+  CC.carregarLocal = function () {
+    E = localLer(CHAVE) || localLer(CHAVE_ANTIGA) || VAZIO();
+  };
+
+  CC.sincronizar = async function (primeiraVez) {
+    let doServidor = null;
+    let dono = '';
+    if (location.protocol.startsWith('http')) {
+      try {
+        const q = await fetch('api/quem', { cache: 'no-store' });
+        // Sessão vencida ou quem acabou de sair: o aplicativo guardado no aparelho abre
+        // sem conta, e a pessoa precisa voltar à tela de entrada. Sem rede, o fetch
+        // falha antes de chegar aqui e o aplicativo segue funcionando com o que tem.
+        if (q.status === 401) {
+          location.replace('entrar.html' + location.search);
+          return false;
+        }
+        if (q.ok) {
+          const quem = await q.json();
+          dono = quem.usuario || '';
+          CC.quem = quem;
+        }
+      } catch (e) { /* sem servidor, segue sem dono */ }
+      try {
+        const r = await fetch('api/estado', { cache: 'no-store' });
+        if (r.ok) {
+          const d = await r.json();
+          servidorVivo = true;
+          doServidor = normalizar(d);
+        }
+      } catch (e) { servidorVivo = false; }
+    }
+
+    // Num aparelho compartilhado, quem sai deixa o progresso no localStorage: a próxima
+    // pessoa não pode herdá-lo. Progresso sem dono também fica de fora: veio da versão
+    // sem contas ou do servidor aberto de teste, e somado a uma conta nova aparecia
+    // como fases já concluídas por quem nunca leu nada.
+    if (dono && E.dono !== dono) E = VAZIO();
+
+    const antes = JSON.stringify(E);
+    E = fundir(E, doServidor);
+    if (dono) E.dono = dono;
+    localGravar();
+    if (servidorVivo && (doServidor === null || JSON.stringify(E) !== JSON.stringify({ ...doServidor, dono }))) {
+      enviarAoServidor();
+    }
+    const mudou = JSON.stringify(E) !== antes;
+    if (!primeiraVez && mudou && CC.redesenhar) CC.redesenhar();
+    return mudou;
+  };
+})(window.CC);

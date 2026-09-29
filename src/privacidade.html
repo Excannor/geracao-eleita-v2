@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/*ICONE*/">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=/*VERSAO_ICONES*/">
+<title>Política de Privacidade · Geração Eleita</title>
+<style>/*FONTES*/</style>
+<style>
+  /* Mesma paleta do app (estilo.css), repetida na mão: esta página é servida sozinha e não
+     carrega aquele arquivo. Mexeu lá, mexa aqui também. */
+  :root { --fundo: #e6e6e6; --cartao: #f7f7f7; --borda: #d9d9d9; --tinta: #3c3c3c; --forte: #111111; --fraca: #5f5f5f;
+    --verde: #0f5c5c; --vinho: #b3261e; --azul: #0f5c5c; --ajuda: #fbeae8; --fundo2: #e2e2e2; --destaque: #e2f0f0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fundo: #0d0d0d; --cartao: #171717; --borda: #2b2b2b; --tinta: #e2e2e2; --forte: #ffffff; --fraca: #9a9a9a;
+      --verde: #5fbdb9; --vinho: #ff6b6b; --azul: #5fbdb9; --ajuda: #3a1414; --fundo2: #1a1a1a; --destaque: #123230; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--tinta);
+    font-family: 'Nunito', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; line-height: 1.65; }
+  main { max-width: 680px; margin: 0 auto; padding: 32px 20px 56px; }
+  .cabeca { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .cabeca svg { width: 52px; height: auto; flex: 0 0 auto; color: var(--forte); }
+  .marca { font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
+  .marca em { font-style: normal; }
+  h1 { margin: 0; color: var(--forte); font-size: 1.7rem; line-height: 1.2; }
+  .atualizada { margin: 0 0 22px; color: var(--fraca); font-size: .9rem; font-weight: 600; }
+  h2 { margin: 30px 0 8px; color: var(--forte); font-size: 1.12rem; scroll-margin-top: 16px; }
+  p { margin: 0 0 10px; font-weight: 500; }
+  ul { margin: 0 0 10px; padding-left: 20px; }
+  li { margin: 0 0 6px; font-weight: 500; }
+  b { color: var(--forte); }
+  a { color: var(--azul); font-weight: 700; }
+  .resumo { padding: 16px 18px; border-radius: 16px; background: var(--destaque); border: 2px solid var(--borda); }
+  .resumo p:last-child, .resumo ul:last-child { margin-bottom: 0; }
+  nav.indice { margin: 18px 0 0; padding: 14px 18px; border-radius: 16px; background: var(--cartao); border: 2px solid var(--borda); }
+  nav.indice ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 24px; }
+  nav.indice li { margin: 0 0 4px; font-size: .92rem; break-inside: avoid; }
+  nav.indice a { font-weight: 600; }
+  @media (max-width: 480px) { nav.indice ol { columns: 1; } }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--cartao); border: 2px solid var(--borda);
+    border-radius: 16px; overflow: hidden; font-size: .9rem; }
+  th, td { text-align: left; padding: 10px 12px; border-top: 2px solid var(--fundo2); vertical-align: top; }
+  th { background: var(--fundo2); color: var(--fraca); font-weight: 700; border-top: 0; }
+  td.sim { color: var(--verde); font-weight: 700; }
+  td.nao { color: var(--fraca); }
+  .ajuda { margin-top: 30px; padding: 14px 16px; border-radius: 16px; background: var(--ajuda); font-weight: 600; }
+  .voltar { display: inline-flex; align-items: center; min-height: 44px; margin-top: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="cabeca">/*SIMBOLO*/<div><div class="marca">Geração <em>Eleita</em></div><h1>Política de Privacidade</h1></div></div>
+  <p class="atualizada">Última atualização: setembro de 2026</p>
+
+  <div class="resumo">
+    <p><b>Em poucas palavras</b></p>
+    <ul>
+      <li>Usamos seus dados só para o app funcionar: guardar seu progresso, deixar você entrar em qualquer aparelho e ler junto com amigos.</li>
+      <li>Não vendemos, não alugamos e não compartilhamos seus dados com empresas. Não há anúncios nem ferramentas de rastreamento.</li>
+      <li>O que você escreve (registros, orações e anotações) é só seu. Nem seus amigos veem.</li>
+      <li>Você pode baixar tudo o que escreveu e apagar sua conta quando quiser, com todas as cópias.</li>
+    </ul>
+  </div>
+
+  <nav class="indice" aria-label="Nesta página">
+    <ol>
+      <li><a href="#quem-somos">Quem somos</a></li>
+      <li><a href="#coleta">Dados que coletamos</a></li>
+      <li><a href="#uso">Como usamos</a></li>
+      <li><a href="#quem-ve">Quem vê o quê</a></li>
+      <li><a href="#compartilhamento">Compartilhamento</a></li>
+      <li><a href="#seguranca">Segurança</a></li>
+      <li><a href="#guarda">Guarda e exclusão</a></li>
+      <li><a href="#direitos">Seus controles</a></li>
+      <li><a href="#convivencia">Amizades, toques e denúncias</a></li>
+      <li><a href="#mudancas">Mudanças nesta política</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="quem-somos">1. Quem somos</h2>
+  <p>O Caminho com Cristo é um aplicativo de leitura bíblica criado para ajudar jovens a ler a Bíblia inteira em um ano, uma lição por dia. É um projeto sem fins lucrativos, desenvolvido e mantido por membros da igreja, sem patrocínio e sem publicidade.</p>
+
+  <h2 id="coleta">2. Dados que coletamos</h2>
+  <p><b>No cadastro:</b> nome ou apelido, @usuário, e-mail, data de nascimento e senha.</p>
+  <p><b>Enquanto você usa o app:</b> seu progresso de leitura (dias lidos, ofensiva, lições, prática e conquistas), o que você escreve nas reflexões, orações e anotações, a foto de perfil se você escolher uma, suas preferências de tema e tradução bíblica, e suas amizades e propósitos.</p>
+  <p><b>Se você ativar notificações:</b> o endereço técnico que o seu celular fornece para receber avisos e os horários que você escolheu.</p>
+  <p>Não coletamos localização, contatos, dados de outros aplicativos nem informações de pagamento.</p>
+
+  <h2 id="uso">3. Como usamos</h2>
+  <ul>
+    <li>Manter sua conta e permitir que você entre em outros aparelhos, pelo @usuário ou pelo e-mail.</li>
+    <li>Guardar e sincronizar seu progresso entre os seus aparelhos.</li>
+    <li>Mostrar aos amigos que você aceitou somente o que está descrito em <a href="#quem-ve">Quem vê o quê</a>.</li>
+    <li>Enviar os lembretes e avisos que você ativou.</li>
+    <li>Proteger o app contra acesso indevido e tratar denúncias.</li>
+  </ul>
+  <p>Seu e-mail e sua data de nascimento não aparecem para ninguém no app e não são usados para enviar propaganda.</p>
+
+  <h2 id="quem-ve">4. Quem vê o quê</h2>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>Informação</th><th>Amigos que você aceitou</th><th>Demais pessoas no app</th></tr></thead>
+    <tbody>
+      <tr><td>Nome e foto</td><td class="sim">sim</td><td class="nao">não</td></tr>
+      <tr><td>Se leu hoje e os dias dos propósitos em comum</td><td class="sim">sim</td><td class="nao">não</td></tr>
+      <tr><td>Orações, registros e anotações</td><td class="nao">não</td><td class="nao">não</td></tr>
+      <tr><td>E-mail e data de nascimento</td><td class="nao">não</td><td class="nao">não</td></tr>
+      <tr><td>Marcos no Feed: ofensiva, livros terminados, conquistas e versículos guardados</td><td class="sim">só se você ativar</td><td class="nao">não</td></tr>
+      <tr><td>Pontos (XP)</td><td class="nao">não</td><td class="nao">não</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 id="compartilhamento">5. Compartilhamento</h2>
+  <p>Não vendemos nem compartilhamos seus dados com empresas, anunciantes ou outras organizações. O app não usa ferramentas de análise, anúncios ou rastreadores, e as fontes e os textos bíblicos já vêm dentro do próprio app.</p>
+  <p>Para funcionar pela internet, o app conta com dois serviços técnicos:</p>
+  <ul>
+    <li><b>Conexão segura:</b> o acesso passa por um serviço de rede que entrega a conexão protegida (HTTPS) até o nosso servidor.</li>
+    <li><b>Notificações:</b> quando você ativa lembretes, o aviso é entregue pelo serviço de notificações do seu próprio celular ou navegador (como Google ou Apple). O conteúdo do aviso segue criptografado até o seu aparelho.</li>
+  </ul>
+  <p>Só divulgaríamos dados diante de obrigação legal ou ordem de autoridade competente.</p>
+
+  <h2 id="seguranca">6. Segurança</h2>
+  <ul>
+    <li>Toda a comunicação entre o seu aparelho e o servidor usa conexão criptografada (HTTPS).</li>
+    <li>Sua senha nunca é guardada: armazenamos apenas um resumo criptográfico dela (scrypt, com um valor aleatório próprio de cada conta), do qual não é possível recuperar a senha original.</li>
+    <li>A sessão fica num cookie protegido, fora do alcance de scripts da página. Trocar a senha desconecta todos os seus outros aparelhos.</li>
+    <li>Tentativas seguidas de senha errada são bloqueadas por um tempo que aumenta a cada erro.</li>
+    <li>O acesso ao servidor é restrito a quem mantém o app e é usado apenas para manutenção, segurança e tratamento de denúncias.</li>
+  </ul>
+
+  <h2 id="guarda">7. Guarda e exclusão</h2>
+  <ul>
+    <li>Seus dados ficam guardados enquanto sua conta existir.</li>
+    <li>Fazemos uma cópia de segurança por dia e mantemos somente as dos últimos 14 dias.</li>
+    <li>Os marcos publicados no Feed deixam de aparecer depois de 30 dias.</li>
+    <li>Ao apagar sua conta, removemos a conta, o progresso, o que você escreveu, as amizades e os propósitos, inclusive das cópias de segurança já guardadas.</li>
+  </ul>
+
+  <h2 id="direitos">8. Seus controles</h2>
+  <p>Você controla seus dados direto no app, em Perfil e Configurações:</p>
+  <ul>
+    <li><b>Levar com você:</b> baixe tudo o que escreveu em "Baixar o que escrevi".</li>
+    <li><b>Corrigir:</b> altere seu nome e sua foto quando quiser.</li>
+    <li><b>Escolher o que aparece:</b> ative ou desative seus marcos no Feed e as notificações.</li>
+    <li><b>Apagar:</b> use "Apagar a conta". A exclusão é definitiva.</li>
+  </ul>
+  <p>Para corrigir e-mail ou data de nascimento, ou para qualquer outra dúvida sobre seus dados, fale com a liderança responsável pelo app na sua igreja.</p>
+
+  <h2 id="convivencia">9. Amizades, toques e denúncias</h2>
+  <p><b>Amizade</b> só existe com convite aceito. Ninguém encontra você por parte do nome, apenas pelo @usuário exato. Não existe ranking entre pessoas nem pontos por orar.</p>
+  <p><b>Toques:</b> um amigo pode enviar um lembrete com texto pronto, no máximo um por dia e só quando ele já leu e você ainda não. Você pode silenciar os toques de qualquer pessoa.</p>
+  <p><b>Proteção:</b> você pode encerrar um propósito, bloquear ou denunciar alguém a qualquer momento, e a outra pessoa não é avisada. As denúncias ficam registradas para quem cuida do app, com o @ de quem denunciou, o @ denunciado, o motivo e a data.</p>
+
+  <h2 id="mudancas">10. Mudanças nesta política</h2>
+  <p>Esta política pode ser atualizada quando o app ganhar funções novas. A data da última atualização fica sempre no topo desta página.</p>
+
+  <p class="ajuda">Precisa conversar com alguém? Fale com alguém de confiança ou ligue 188 (CVV), a qualquer hora. Em emergência, 192.</p>
+  <a class="voltar" href="./">Voltar ao aplicativo</a>
+</main>
+</body>
+</html>

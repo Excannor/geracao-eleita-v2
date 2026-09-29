@@ -1,0 +1,841 @@
+// Contas: quem entra, amizades com aceite, convites, toques e denúncias.
+//
+// Tudo vive no banco (dados/caminho.db), nas tabelas de contas, amizades, bloqueios, toques
+// e denúncias; o dados/contas.json antigo é importado uma vez. A senha nunca é guardada:
+// fica só o resultado de scrypt sobre ela, com sal próprio. Quem abrir o banco não descobre
+// a senha de ninguém.
+//
+// A regra de quem vê o quê é a mesma para todo mundo: ninguém vê ninguém sem aceite,
+// ninguém é encontrado por parte do nome, e o que a pessoa escreve nunca sai da conta dela.
+import { readFile, writeFile, rename, mkdir, stat } from 'node:fs/promises';
+import { dirname } from 'node:path';
+import { randomBytes, scrypt as scryptCb, timingSafeEqual } from 'node:crypto';
+import { promisify } from 'node:util';
+import { abrirModulo, concluirImportacao, lerTabela, sincronizar, transacao, gravarMeta, lerMeta } from './db.mjs';
+import { LIMITE_GRUPO, alvoValido, rotuloDoProposito } from './propositos.mjs';
+
+const scrypt = promisify(scryptCb);
+const CUSTO = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
+const TAMANHO = 64;
+
+// Um link de convite aceita no máximo isto por hora: segura o link que vazou para onde não devia.
+export const LIMITE_ACEITES_HORA = 30;
+export const LIMITE_TOQUES_DIA = 5;
+export const VALIDADE_CONVITE = 30 * 24 * 60 * 60 * 1000;
+export const FUSO_PADRAO = 'America/Sao_Paulo';
+export const MOTIVOS_DENUNCIA = [
+  'Insiste ou incomoda',
+  'Nome ou foto impróprios',
+  'Parece uma conta falsa',
+  'Outro motivo',
+];
+
+// Um nome de conta vira arquivo em disco e aparece em URL: só o que é seguro nos dois.
+export const nomeValido = (n) => /^[a-z0-9][a-z0-9._-]{1,29}$/.test(String(n || ''));
+export const limparNome = (n) => String(n || '').trim().toLowerCase().replace(/^@/, '');
+export const limparEmail = (e) => String(e || '').trim().toLowerCase();
+export const emailValido = (e) => String(e || '').length <= 254
+  && /^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/.test(String(e || ''));
+
+export function fusoValido(fuso) {
+  if (typeof fuso !== 'string' || !fuso || fuso.length > 60) return false;
+  try { new Intl.DateTimeFormat('en-CA', { timeZone: fuso }); return true; } catch { return false; }
+}
+
+// A data de hoje no fuso de quem lê. O container roda em UTC: sem isto, depois das 21h
+// de Brasília o servidor acharia que ninguém leu "hoje".
+export function hojeNoFuso(fuso, agora = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: fusoValido(fuso) ? fuso : FUSO_PADRAO, year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(agora);
+}
+
+export function somaDias(texto, n) {
+  const d = new Date(texto + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+export function nascimentoValido(texto, hoje = hojeNoFuso(FUSO_PADRAO)) {
+  const t = String(texto || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return false;
+  const d = new Date(t + 'T12:00:00Z');
+  if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== t) return false;
+  return t < hoje && t > somaDias(hoje, -365 * 120);
+}
+
+async function embaralhar(senha, sal) {
+  const chave = await scrypt(String(senha), sal, TAMANHO, CUSTO);
+  return chave.toString('hex');
+}
+
+// Comparação de tempo constante: com === o tempo de resposta diz quantos caracteres
+// bateram, e isso basta para descobrir a senha aos poucos.
+export function iguais(a, b) {
+  const x = Buffer.from(String(a || ''));
+  const y = Buffer.from(String(b || ''));
+  if (x.length !== y.length) return false;
+  return timingSafeEqual(x, y);
+}
+
+// Erro com mensagem que pode ir para a tela, e o código HTTP que combina com ele.
+function erro(mensagem, codigo = 400) {
+  const e = new Error(mensagem);
+  e.publico = true;
+  e.codigo = codigo;
+  return e;
+}
+
+const par = (a, b) => [a, b].sort().join('|');
+const vazio = () => ({
+  versao: 2, contas: {}, amizades: {}, bloqueios: {}, silenciados: {},
+  convitesUsados: {}, toques: {}, denuncias: [], convitesAceites: [], propositos: {},
+});
+
+// ---------- linhas do banco ----------
+// A regra toda continua trabalhando com o mesmo objeto de antes (this.dados). Estas funções
+// só traduzem entre ele e as tabelas.
+const CAMPOS_CONTA = {
+  usuario: 'usuario', nome: 'nome', email: 'email', nascimento: 'nascimento', fuso: 'fuso',
+  sal: 'sal', senha: 'senha', criadaEm: 'criada_em', seloConvite: 'selo_convite',
+};
+
+function paraLinhas(d) {
+  const contas = Object.values(d.contas).map((c) => {
+    const linha = {};
+    for (const [campo, coluna] of Object.entries(CAMPOS_CONTA)) linha[coluna] = c[campo] === undefined || c[campo] === null ? '' : String(c[campo]);
+    const extra = {};
+    for (const k of Object.keys(c)) if (!(k in CAMPOS_CONTA)) extra[k] = c[k];
+    linha.extra = JSON.stringify(extra);
+    return linha;
+  });
+  const amizades = Object.entries(d.amizades).map(([k, v]) => {
+    const [a, b] = k.split('|');
+    return { a, b, estado: v.estado, pediu: v.pediu, em: v.em ?? null, aceita_em: v.aceitaEm ?? null };
+  });
+  const listas = (mapa) => Object.entries(mapa).flatMap(([quem, alvos]) => (alvos || []).map((alvo, ordem) => ({ quem, alvo, ordem })));
+  return [
+    { tabela: 'contas', chaves: ['usuario'], linhas: contas },
+    { tabela: 'amizades', chaves: ['a', 'b'], linhas: amizades },
+    { tabela: 'bloqueios', chaves: ['quem', 'alvo'], linhas: listas(d.bloqueios) },
+    { tabela: 'silenciados', chaves: ['quem', 'alvo'], linhas: listas(d.silenciados) },
+    { tabela: 'convites_usados', chaves: ['nonce'], linhas: Object.entries(d.convitesUsados).map(([nonce, vence]) => ({ nonce, vence: Number(vence) })) },
+    { tabela: 'toques', chaves: ['de', 'para'], linhas: Object.entries(d.toques).map(([k, dia]) => { const [de, para] = k.split('>'); return { de, para, dia }; }) },
+    { tabela: 'denuncias', chaves: ['ordem'], linhas: d.denuncias.map((x, ordem) => ({ ordem, de: x.de, contra: x.contra, motivo: x.motivo, em: x.em })) },
+    { tabela: 'convites_aceites', chaves: ['de', 'para'], linhas: (d.convitesAceites || []).map((x) => ({
+      convite: x.convite, de: x.de, para: x.para, em: x.em, conta_nova: x.contaNova ? 1 : 0, ativado_em: x.ativadoEm || '',
+    })) },
+    { tabela: 'propositos', chaves: ['id'], linhas: Object.values(d.propositos || {}).map((p) => ({
+      id: p.id, tipo: p.tipo, alvo: p.alvo || '', titulo: p.titulo || '', criado_por: p.criadoPor, criado_em: p.criadoEm,
+      encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0,
+    })) },
+    { tabela: 'proposito_membros', chaves: ['proposito', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => p.membros.map((m) => ({
+      proposito: p.id, usuario: m.usuario, estado: m.estado, entrou_em: m.entrouEm || '', saiu_em: m.saiuEm || '', convidado_por: m.convidadoPor || '',
+    }))) },
+    { tabela: 'proposito_dias', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.diasBatidos || []).map((data) => ({ proposito: p.id, data }))) },
+  ];
+}
+
+function lerTabelas(db) {
+  return {
+    contas: lerTabela(db, 'contas', ['usuario']),
+    amizades: lerTabela(db, 'amizades', ['a', 'b']),
+    bloqueios: lerTabela(db, 'bloqueios', ['quem', 'alvo'], 'quem, ordem'),
+    silenciados: lerTabela(db, 'silenciados', ['quem', 'alvo'], 'quem, ordem'),
+    convites: lerTabela(db, 'convites_usados', ['nonce']),
+    toques: lerTabela(db, 'toques', ['de', 'para']),
+    denuncias: lerTabela(db, 'denuncias', ['ordem'], 'ordem'),
+    aceites: lerTabela(db, 'convites_aceites', ['de', 'para'], 'em'),
+    propositos: lerTabela(db, 'propositos', ['id'], 'criado_em'),
+    membros: lerTabela(db, 'proposito_membros', ['proposito', 'usuario']),
+    diasBatidos: lerTabela(db, 'proposito_dias', ['proposito', 'data'], 'data'),
+  };
+}
+
+function deLinhas(t, versao) {
+  const d = vazio();
+  d.versao = Number(versao) || 2;
+  for (const l of t.contas) {
+    const c = {};
+    for (const [campo, coluna] of Object.entries(CAMPOS_CONTA)) c[campo] = l[coluna];
+    d.contas[l.usuario] = { ...c, ...JSON.parse(l.extra || '{}') };
+  }
+  for (const l of t.amizades) {
+    const v = { estado: l.estado, pediu: l.pediu };
+    if (l.em !== null) v.em = l.em;
+    if (l.aceita_em !== null) v.aceitaEm = l.aceita_em;
+    d.amizades[l.a + '|' + l.b] = v;
+  }
+  for (const l of t.bloqueios) (d.bloqueios[l.quem] || (d.bloqueios[l.quem] = [])).push(l.alvo);
+  for (const l of t.silenciados) (d.silenciados[l.quem] || (d.silenciados[l.quem] = [])).push(l.alvo);
+  for (const l of t.convites) d.convitesUsados[l.nonce] = Number(l.vence);
+  for (const l of t.toques) d.toques[l.de + '>' + l.para] = l.dia;
+  d.denuncias = t.denuncias.map((l) => ({ de: l.de, contra: l.contra, motivo: l.motivo, em: l.em }));
+  d.convitesAceites = (t.aceites || []).map((l) => ({
+    convite: l.convite, de: l.de, para: l.para, em: l.em, contaNova: !!l.conta_nova, ativadoEm: l.ativado_em || '',
+  }));
+  for (const l of t.propositos || []) {
+    d.propositos[l.id] = {
+      id: l.id, tipo: l.tipo, alvo: l.alvo || '', titulo: l.titulo || '', criadoPor: l.criado_por, criadoEm: l.criado_em,
+      encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, membros: [], diasBatidos: [],
+    };
+  }
+  for (const l of t.membros || []) {
+    const p = d.propositos[l.proposito];
+    if (p) p.membros.push({ usuario: l.usuario, estado: l.estado, entrouEm: l.entrou_em || '', saiuEm: l.saiu_em || '', convidadoPor: l.convidado_por || '' });
+  }
+  for (const l of t.diasBatidos || []) {
+    const p = d.propositos[l.proposito];
+    if (p) p.diasBatidos.push(l.data);
+  }
+  return d;
+}
+
+export class Contas {
+  constructor(arquivo) {
+    this.arquivo = arquivo;
+    this.dados = vazio();
+    this.gravando = Promise.resolve();
+  }
+
+  // Na primeira abertura com banco, o contas.json antigo é importado (passando pela
+  // migração da versão 1, se precisar) e guardado em json-legado-*. Depois disso, tudo vem
+  // das tabelas. JSON antigo ilegível para tudo: seguir com a lista vazia gravaria por cima
+  // das contas de todo mundo.
+  async carregar() {
+    const { db, legado, bruto } = abrirModulo(this.arquivo, 'contas');
+    this.db = db;
+    if (legado) {
+      if (legado.contas) this.dados = { ...vazio(), ...legado };
+      if (this.precisaMigrar()) {
+        const copia = this.arquivo.replace(/\.json$/, '') + '.v1.bak.json';
+        try { await stat(copia); } catch { await writeFile(copia, bruto, 'utf8'); }
+        this.migrar();
+      }
+      lerTabelas(db);
+      await this.salvar();
+      concluirImportacao(db, 'contas', this.arquivo);
+      await this.migrarPropositos();
+      return this;
+    }
+    this.dados = deLinhas(lerTabelas(db), lerMeta(db, 'contas_versao'));
+    if (this.precisaMigrar()) { this.migrar(); await this.salvar(); }
+    await this.migrarPropositos();
+    return this;
+  }
+
+  precisaMigrar() {
+    return this.dados.versao !== 2
+      || this.lista().some((c) => Array.isArray(c.segue) || !c.seloConvite || !c.fuso);
+  }
+
+  // Da versão 1: quem se seguia dos dois lados vira amizade aceita; quem seguia sozinho
+  // vira pedido pendente. Senhas e progresso não mudam, então ninguém perde a sessão.
+  migrar() {
+    const hoje = hojeNoFuso(FUSO_PADRAO);
+    for (const a of this.lista()) {
+      for (const alvo of a.segue || []) {
+        const b = this.achar(alvo);
+        if (!b || b.usuario === a.usuario) continue;
+        const chave = par(a.usuario, b.usuario);
+        if (this.dados.amizades[chave]) continue;
+        const mutuo = (b.segue || []).includes(a.usuario);
+        this.dados.amizades[chave] = mutuo
+          ? { estado: 'ativa', pediu: a.usuario, em: hoje, aceitaEm: hoje }
+          : { estado: 'pendente', pediu: a.usuario, em: hoje };
+      }
+    }
+    for (const c of this.lista()) {
+      delete c.segue;
+      if (!c.seloConvite) c.seloConvite = randomBytes(6).toString('hex');
+      if (!c.fuso) c.fuso = FUSO_PADRAO;
+      if (c.email === undefined) c.email = '';
+      if (c.nascimento === undefined) c.nascimento = '';
+    }
+    this.dados.versao = 2;
+  }
+
+  // Grava só as linhas que mudaram, numa transação: ou a mudança entra inteira, ou nada.
+  // O banco é síncrono, então duas gravações nunca se atropelam.
+  async salvar() {
+    if (!this.db) {
+      this.db = abrirModulo(this.arquivo, 'contas').db;
+      lerTabelas(this.db);
+    }
+    const db = this.db;
+    transacao(db, () => {
+      gravarMeta(db, 'contas_versao', this.dados.versao || 2);
+      sincronizar(db, paraLinhas(this.dados));
+    });
+  }
+
+  lista() { return Object.values(this.dados.contas); }
+  achar(usuario) { return this.dados.contas[limparNome(usuario)] || null; }
+  acharPorEmail(email) {
+    const e = limparEmail(email);
+    return e ? this.lista().find((c) => c.email === e) || null : null;
+  }
+  get vazio() { return this.lista().length === 0; }
+  perfilCompleto(conta) { return !!(conta && conta.email && conta.nascimento); }
+
+  // ---------- conta ----------
+  async criar(dados, { exigirPerfil = true } = {}) {
+    const { usuario, senha, nome, email, nascimento, fuso } = dados || {};
+    const chave = limparNome(usuario);
+    if (!nomeValido(chave)) {
+      throw erro('o @ aceita letras minúsculas, números, ponto, hífen e sublinhado, de 2 a 30 caracteres');
+    }
+    if (this.achar(chave)) throw erro('esse @ já existe');
+    const nomeLimpo = String(nome || '').trim().slice(0, 20);
+    if (exigirPerfil && !nomeLimpo) throw erro('diga como quer ser chamado');
+    const mail = limparEmail(email);
+    if (exigirPerfil || mail) {
+      if (!emailValido(mail)) throw erro('esse e-mail não parece certo');
+      if (this.acharPorEmail(mail)) throw erro('este e-mail já tem conta');
+    }
+    if (exigirPerfil && !nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
+    if (String(senha || '').length < 6) throw erro('a senha precisa de 6 caracteres ou mais');
+
+    const sal = randomBytes(16).toString('hex');
+    this.dados.contas[chave] = {
+      usuario: chave,
+      nome: nomeLimpo || chave,
+      email: mail,
+      nascimento: nascimentoValido(nascimento) ? nascimento : '',
+      fuso: fusoValido(fuso) ? fuso : FUSO_PADRAO,
+      sal,
+      senha: await embaralhar(senha, sal),
+      criadaEm: hojeNoFuso(FUSO_PADRAO),
+      seloConvite: randomBytes(6).toString('hex'),
+    };
+    await this.salvar();
+    return this.dados.contas[chave];
+  }
+
+  // Entra com o @ ou com o e-mail.
+  async conferir(login, senha) {
+    const conta = this.achar(login) || this.acharPorEmail(login);
+    // Mesmo sem a conta existir, gasta o tempo de um scrypt: sem isso, a resposta
+    // rápida entrega quais contas existem.
+    const sal = conta ? conta.sal : 'sal-de-isca-sem-uso';
+    const tentativa = await embaralhar(senha, sal);
+    if (!conta) return null;
+    return iguais(tentativa, conta.senha) ? conta : null;
+  }
+
+  async completarPerfil(usuario, { email, nascimento, nome } = {}) {
+    const conta = this.achar(usuario);
+    if (!conta) throw erro('conta não encontrada', 404);
+    const mail = limparEmail(email);
+    if (!emailValido(mail)) throw erro('esse e-mail não parece certo');
+    const dono = this.acharPorEmail(mail);
+    if (dono && dono.usuario !== conta.usuario) throw erro('este e-mail já tem conta');
+    if (!nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
+    conta.email = mail;
+    conta.nascimento = nascimento;
+    const n = String(nome || '').trim().slice(0, 20);
+    if (n) conta.nome = n;
+    await this.salvar();
+    return conta;
+  }
+
+  async atualizarFuso(usuario, fuso) {
+    const conta = this.achar(usuario);
+    if (!conta || !fusoValido(fuso) || conta.fuso === fuso) return;
+    conta.fuso = fuso;
+    await this.salvar();
+  }
+
+  async trocarSenha(usuario, nova) {
+    const conta = this.achar(usuario);
+    if (!conta) throw erro('conta não encontrada', 404);
+    if (String(nova || '').length < 6) throw erro('a senha precisa de 6 caracteres ou mais');
+    conta.sal = randomBytes(16).toString('hex');
+    conta.senha = await embaralhar(nova, conta.sal);
+    await this.salvar();
+    return conta;
+  }
+
+  // Apagar a conta leva junto amizades, pedidos, bloqueios e toques: deixar o nome
+  // pendurado faria a tela de amigos pedir ao servidor alguém que não existe.
+  async apagar(usuario) {
+    const chave = limparNome(usuario);
+    if (!this.dados.contas[chave]) throw erro('conta não encontrada', 404);
+    delete this.dados.contas[chave];
+    for (const k of Object.keys(this.dados.amizades)) {
+      if (k.split('|').includes(chave)) delete this.dados.amizades[k];
+    }
+    delete this.dados.bloqueios[chave];
+    delete this.dados.silenciados[chave];
+    for (const mapa of [this.dados.bloqueios, this.dados.silenciados]) {
+      for (const u of Object.keys(mapa)) mapa[u] = mapa[u].filter((x) => x !== chave);
+    }
+    for (const k of Object.keys(this.dados.toques)) {
+      if (k.split('>').includes(chave)) delete this.dados.toques[k];
+    }
+    // quem foi trazido por esta conta, ou a trouxe, deixa de contar na Trilha do Semeador
+    this.dados.convitesAceites = (this.dados.convitesAceites || []).filter((x) => x.de !== chave && x.para !== chave);
+    // sai de todos os propósitos: dupla sem ela acaba, grupo com menos de duas pessoas também
+    for (const p of Object.values(this.dados.propositos || {})) {
+      if (!p.membros.some((m) => m.usuario === chave)) continue;
+      p.membros = p.membros.filter((m) => m.usuario !== chave);
+      if (!p.encerradoEm && (!p.grupo || this.presentes(p).length < 2)) p.encerradoEm = hojeNoFuso(FUSO_PADRAO);
+    }
+    await this.salvar();
+    return chave;
+  }
+
+  // ---------- amizade ----------
+  exigirCompleto(usuario) {
+    const conta = this.achar(usuario);
+    if (!conta) throw erro('conta não encontrada', 404);
+    if (!this.perfilCompleto(conta)) throw erro('complete seu cadastro primeiro', 403);
+    return conta;
+  }
+
+  amizade(a, b) { return this.dados.amizades[par(limparNome(a), limparNome(b))] || null; }
+  bloqueou(quem, alvo) { return (this.dados.bloqueios[quem] || []).includes(alvo); }
+  algumBloqueio(a, b) { return this.bloqueou(a, b) || this.bloqueou(b, a); }
+
+  // Quantos amigos a pessoa tem. Não há mais limite: serve só para mostrar.
+  ativasDe(usuario) {
+    return Object.entries(this.dados.amizades)
+      .filter(([k, v]) => v.estado === 'ativa' && k.split('|').includes(usuario)).length;
+  }
+
+  relacao(eu, outro) {
+    if (this.bloqueou(eu, outro)) return 'bloqueado';
+    const a = this.amizade(eu, outro);
+    if (!a) return 'nenhuma';
+    if (a.estado === 'ativa') return 'amigos';
+    return a.pediu === eu ? 'enviado' : 'recebido';
+  }
+
+  // Busca só pelo @ exato. Quem bloqueou você, ou ainda não completou o cadastro,
+  // responde igual a quem não existe.
+  procurar(eu, termo) {
+    const alvo = this.achar(termo);
+    if (!alvo || alvo.usuario === eu || !this.perfilCompleto(alvo) || this.bloqueou(alvo.usuario, eu)) {
+      return null;
+    }
+    return { usuario: alvo.usuario, nome: alvo.nome, relacao: this.relacao(eu, alvo.usuario) };
+  }
+
+  async pedir(eu, outro, hoje) {
+    const a = this.exigirCompleto(eu);
+    const b = this.achar(outro);
+    if (!b || b.usuario === a.usuario || !this.perfilCompleto(b)) throw erro('não achei ninguém com esse @', 404);
+    // Bloqueio é silencioso: quem foi bloqueado vê o pedido como enviado, e só.
+    if (this.algumBloqueio(a.usuario, b.usuario)) return 'enviado';
+    const rel = this.relacao(a.usuario, b.usuario);
+    if (rel === 'amigos' || rel === 'enviado') return rel;
+    if (rel === 'recebido') { await this.aceitar(a.usuario, b.usuario, hoje); return 'amigos'; }
+    this.dados.amizades[par(a.usuario, b.usuario)] = { estado: 'pendente', pediu: a.usuario, em: hoje };
+    await this.salvar();
+    return 'enviado';
+  }
+
+  async aceitar(eu, de, hoje) {
+    const a = this.exigirCompleto(eu);
+    const am = this.dados.amizades[par(a.usuario, limparNome(de))];
+    if (!am || am.estado !== 'pendente' || am.pediu === a.usuario) throw erro('esse pedido não existe mais', 404);
+    am.estado = 'ativa';
+    am.aceitaEm = hoje;
+    this.garantirDuplaPlano(a.usuario, am.pediu, hoje, am.pediu);
+    await this.salvar();
+  }
+
+  async removerPendente(eu, outro, quemPediu) {
+    const chave = par(limparNome(eu), limparNome(outro));
+    const am = this.dados.amizades[chave];
+    if (am && am.estado === 'pendente' && am.pediu === quemPediu) {
+      delete this.dados.amizades[chave];
+      await this.salvar();
+    }
+  }
+  recusar(eu, de) { return this.removerPendente(eu, de, limparNome(de)); }
+  cancelar(eu, para) { return this.removerPendente(eu, para, limparNome(eu)); }
+
+  async desfazer(eu, outro) {
+    const chave = par(limparNome(eu), limparNome(outro));
+    if (this.dados.amizades[chave]) {
+      delete this.dados.amizades[chave];
+      this.encerrarDuplas(limparNome(eu), limparNome(outro));
+      await this.salvar();
+    }
+  }
+
+  async bloquear(eu, outro) {
+    const a = this.achar(eu);
+    const b = this.achar(outro);
+    if (!a || !b || a.usuario === b.usuario) throw erro('conta não encontrada', 404);
+    delete this.dados.amizades[par(a.usuario, b.usuario)];
+    // quem bloqueia encerra as duplas com a pessoa e sai dos grupos que divide com ela
+    this.encerrarDuplas(a.usuario, b.usuario);
+    this.sairDeGruposCom(a.usuario, b.usuario);
+    delete this.dados.toques[a.usuario + '>' + b.usuario];
+    delete this.dados.toques[b.usuario + '>' + a.usuario];
+    const lista = this.dados.bloqueios[a.usuario] || (this.dados.bloqueios[a.usuario] = []);
+    if (!lista.includes(b.usuario)) lista.push(b.usuario);
+    await this.salvar();
+  }
+
+  async desbloquear(eu, outro) {
+    const lista = this.dados.bloqueios[limparNome(eu)] || [];
+    this.dados.bloqueios[limparNome(eu)] = lista.filter((x) => x !== limparNome(outro));
+    await this.salvar();
+  }
+
+  async silenciar(eu, de, ligado) {
+    const chave = limparNome(eu);
+    const lista = (this.dados.silenciados[chave] || []).filter((x) => x !== limparNome(de));
+    if (ligado) lista.push(limparNome(de));
+    this.dados.silenciados[chave] = lista;
+    await this.salvar();
+  }
+  silenciou(eu, de) { return (this.dados.silenciados[eu] || []).includes(de); }
+
+  listas(eu) {
+    const saida = { amigos: [], recebidos: [], enviados: [], bloqueados: [] };
+    for (const [k, v] of Object.entries(this.dados.amizades)) {
+      const [x, y] = k.split('|');
+      if (x !== eu && y !== eu) continue;
+      const outro = x === eu ? y : x;
+      if (!this.achar(outro)) continue;
+      if (v.estado === 'ativa') saida.amigos.push({ usuario: outro, aceitaEm: v.aceitaEm });
+      else if (v.pediu === eu) saida.enviados.push(outro);
+      else saida.recebidos.push(outro);
+    }
+    saida.bloqueados = (this.dados.bloqueios[eu] || []).filter((u) => this.achar(u));
+    return saida;
+  }
+
+  // ---------- convites ----------
+  // O link leva quem convidou, a validade e um número único, assinados com a chave do
+  // servidor e o selo de convite da conta. Trocar o selo cancela todos os links abertos.
+  gerarConvite(eu, assinar, agora = Date.now()) {
+    const a = this.exigirCompleto(eu);
+    const carga = Buffer.from(JSON.stringify({
+      d: a.usuario, v: agora + VALIDADE_CONVITE, n: randomBytes(8).toString('hex'),
+    })).toString('base64url');
+    return {
+      token: carga + '.' + assinar('convite.' + carga + '.' + a.seloConvite),
+      venceEm: new Date(agora + VALIDADE_CONVITE).toISOString(),
+    };
+  }
+
+  lerConvite(token, assinar, agora = Date.now()) {
+    const [carga, firma, sobra] = String(token || '').split('.');
+    if (!carga || !firma || sobra !== undefined) return null;
+    let dado;
+    try { dado = JSON.parse(Buffer.from(carga, 'base64url').toString('utf8')); } catch { return null; }
+    const dono = dado && this.achar(dado.d);
+    if (!dono || !iguais(firma, assinar('convite.' + carga + '.' + dono.seloConvite))) return null;
+    if (!(Number(dado.v) > agora)) return null;
+    return { de: dono.usuario, nome: dono.nome, nonce: dado.n, vence: Number(dado.v) };
+  }
+
+  // O link vale para quantas pessoas quiserem, por 30 dias, até quem convidou cancelar. Cada
+  // aceite fica anotado, e é daí que sai a Trilha do Semeador.
+  async usarConvite(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false } = {}) {
+    const convite = this.lerConvite(token, assinar, agora);
+    if (!convite) throw erro('esse convite venceu ou foi cancelado', 410);
+    const a = this.exigirCompleto(eu);
+    if (convite.de === a.usuario) throw erro('esse convite é seu', 400);
+    if (this.algumBloqueio(a.usuario, convite.de)) throw erro('convite indisponível', 410);
+    const aceites = this.dados.convitesAceites || (this.dados.convitesAceites = []);
+    const naUltimaHora = aceites.filter((x) => x.convite === convite.nonce && agora - Date.parse(x.em) < 60 * 60 * 1000).length;
+    if (naUltimaHora >= LIMITE_ACEITES_HORA) throw erro('esse convite foi usado muitas vezes na última hora; tente mais tarde', 429);
+    if (!aceites.some((x) => x.de === convite.de && x.para === a.usuario)) {
+      // Conta como pessoa trazida para o app só quem criou a conta pelo link, e uma vez só.
+      const nova = contaNova && !a.convidadoPor;
+      aceites.push({ convite: convite.nonce, de: convite.de, para: a.usuario, em: new Date(agora).toISOString(), contaNova: nova, ativadoEm: '' });
+      if (nova) a.convidadoPor = convite.de;
+    }
+    if (this.relacao(a.usuario, convite.de) === 'amigos') {
+      await this.salvar();
+      return { ja: true, de: convite.de };
+    }
+    this.dados.amizades[par(a.usuario, convite.de)] = {
+      estado: 'ativa', pediu: convite.de, em: hoje, aceitaEm: hoje,
+    };
+    this.garantirDuplaPlano(a.usuario, convite.de, hoje, convite.de);
+    await this.salvar();
+    return { de: convite.de };
+  }
+
+  async cancelarConvites(eu) {
+    const a = this.exigirCompleto(eu);
+    a.seloConvite = randomBytes(6).toString('hex');
+    await this.salvar();
+  }
+
+  // Quem veio pelo link "entrou de verdade" quando conclui a primeira lição.
+  async ativarConvidado(usuario, quando = new Date().toISOString()) {
+    const u = limparNome(usuario);
+    const aceite = (this.dados.convitesAceites || []).find((x) => x.para === u && x.contaNova && !x.ativadoEm);
+    if (!aceite) return false;
+    aceite.ativadoEm = quando;
+    await this.salvar();
+    return true;
+  }
+
+  // Quantas pessoas vieram pelo convite desta conta: conta nova, primeira lição feita e conta
+  // que ainda existe. É o número da Trilha do Semeador.
+  semeadorDe(usuario) {
+    const u = limparNome(usuario);
+    return (this.dados.convitesAceites || []).filter((x) => x.de === u && x.contaNova && x.ativadoEm && this.achar(x.para)).length;
+  }
+
+  // O maior nível da Trilha do Semeador que já virou marco. Só sobe.
+  async anotarNivelSemeador(usuario, nivel) {
+    const c = this.achar(usuario);
+    if (!c || nivel <= (Number(c.semeadorNivel) || 0)) return;
+    c.semeadorNivel = nivel;
+    await this.salvar();
+  }
+
+  // ---------- propósitos ----------
+  // Os métodos mudam o objeto em memória e gravam; as contas de dias e metas moram em
+  // propositos.mjs e são feitas pelo servidor, que tem o progresso de cada um.
+  presentes(p) { return p.membros.filter((m) => m.estado !== 'saiu'); }
+  ativosDe(p) { return p.membros.filter((m) => m.estado === 'ativo'); }
+  proposito(id) { return (this.dados.propositos || {})[String(id || '')] || null; }
+  propositosAtivos() { return Object.values(this.dados.propositos || {}).filter((p) => !p.encerradoEm); }
+  propositosDe(usuario) {
+    const u = limparNome(usuario);
+    return this.propositosAtivos().filter((p) => p.membros.some((m) => m.usuario === u && (m.estado === 'ativo' || m.estado === 'convidado')));
+  }
+
+  // O propósito de leitura em dupla que acompanha toda amizade.
+  duplaPlano(a, b) {
+    const par2 = [limparNome(a), limparNome(b)].sort().join('|');
+    return this.propositosAtivos().find((p) => !p.grupo && p.tipo === 'plano' && !p.alvo
+      && this.ativosDe(p).map((m) => m.usuario).sort().join('|') === par2) || null;
+  }
+
+  garantirDuplaPlano(a, b, desde, criadoPor = a) {
+    const existe = this.duplaPlano(a, b);
+    if (existe) return existe;
+    const id = 'p' + randomBytes(6).toString('hex');
+    const p = {
+      id, tipo: 'plano', alvo: '', titulo: rotuloDoProposito('plano', ''), criadoPor, criadoEm: desde, encerradoEm: '', grupo: false,
+      membros: [a, b].map((usuario) => ({ usuario, estado: 'ativo', entrouEm: desde, saiuEm: '', convidadoPor: '' })),
+    };
+    (this.dados.propositos || (this.dados.propositos = {}))[id] = p;
+    return p;
+  }
+
+  // Antes, cada amizade ativa era um propósito de leitura em dupla. Na primeira abertura desta
+  // versão ela vira esse propósito, desde o dia do aceite: a contagem de ninguém muda.
+  async migrarPropositos() {
+    if (lerMeta(this.db, 'propositos_migrados') !== null) return;
+    for (const [k, v] of Object.entries(this.dados.amizades)) {
+      if (v.estado !== 'ativa') continue;
+      const [a, b] = k.split('|');
+      this.garantirDuplaPlano(a, b, v.aceitaEm || v.em || hojeNoFuso(FUSO_PADRAO), v.pediu || a);
+    }
+    await this.salvar();
+    gravarMeta(this.db, 'propositos_migrados', new Date().toISOString());
+  }
+
+  encerrarDuplas(a, b) {
+    const par2 = [a, b].sort().join('|');
+    for (const p of this.propositosAtivos()) {
+      if (!p.grupo && p.membros.map((m) => m.usuario).sort().join('|') === par2) p.encerradoEm = hojeNoFuso(FUSO_PADRAO);
+    }
+  }
+
+  sairDeGruposCom(quem, outro) {
+    const hoje = hojeNoFuso(FUSO_PADRAO);
+    for (const p of this.propositosAtivos()) {
+      if (!p.grupo) continue;
+      const nomes = this.presentes(p).map((m) => m.usuario);
+      if (!nomes.includes(quem) || !nomes.includes(outro)) continue;
+      const m = p.membros.find((x) => x.usuario === quem);
+      m.estado = 'saiu';
+      m.saiuEm = hoje;
+      if (this.presentes(p).length < 2) p.encerradoEm = hoje;
+    }
+  }
+
+  async criarProposito(eu, { tipo, alvo, titulo, com }, hoje, todosLivros) {
+    const a = this.exigirCompleto(eu);
+    const outros = [...new Set((Array.isArray(com) ? com : [com]).map(limparNome).filter((u) => u && u !== a.usuario))];
+    if (!outros.length) throw erro('escolha com quem');
+    if (outros.length + 1 > LIMITE_GRUPO) throw erro('um grupo tem no máximo ' + LIMITE_GRUPO + ' pessoas');
+    for (const u of outros) {
+      if (!this.achar(u) || this.relacao(a.usuario, u) !== 'amigos') throw erro('só dá para chamar amigos', 403);
+    }
+    const alvoLimpo = String(alvo || '');
+    if (!alvoValido(String(tipo || ''), alvoLimpo, todosLivros)) throw erro('escolha o que vão ler ou orar');
+    const conjunto = [a.usuario, ...outros].sort().join('|');
+    const repetido = this.propositosAtivos().some((p) => p.tipo === tipo && (p.alvo || '') === alvoLimpo
+      && this.presentes(p).map((m) => m.usuario).sort().join('|') === conjunto);
+    if (repetido) throw erro('vocês já têm esse propósito');
+    const id = 'p' + randomBytes(6).toString('hex');
+    const p = {
+      id, tipo, alvo: alvoLimpo, titulo: String(titulo || '').trim().slice(0, 30) || rotuloDoProposito(tipo, alvoLimpo),
+      criadoPor: a.usuario, criadoEm: hoje, encerradoEm: '', grupo: outros.length >= 2,
+      membros: [{ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: '' }]
+        .concat(outros.map((u) => ({ usuario: u, estado: 'convidado', entrouEm: '', saiuEm: '', convidadoPor: a.usuario }))),
+    };
+    this.dados.propositos[id] = p;
+    await this.salvar();
+    return p;
+  }
+
+  async responderProposito(eu, id, aceitar, hoje) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    const m = p && !p.encerradoEm && p.membros.find((x) => x.usuario === a.usuario && x.estado === 'convidado');
+    if (!m) throw erro('esse convite não existe mais', 404);
+    if (aceitar) {
+      m.estado = 'ativo';
+      m.entrouEm = hoje;
+    } else {
+      p.membros = p.membros.filter((x) => x !== m);
+      if (!p.grupo || this.presentes(p).length < 2) p.encerradoEm = hoje;
+    }
+    await this.salvar();
+    return p;
+  }
+
+  async convidarParaProposito(eu, id, outro) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    if (!p || p.encerradoEm || !p.membros.some((m) => m.usuario === a.usuario && m.estado === 'ativo')) throw erro('propósito não encontrado', 404);
+    if (!p.grupo) throw erro('só dá para chamar mais gente para um grupo');
+    const u = limparNome(outro);
+    if (!this.achar(u) || this.relacao(a.usuario, u) !== 'amigos') throw erro('só dá para chamar amigos', 403);
+    if (this.presentes(p).some((m) => m.usuario === u)) throw erro('essa pessoa já está no grupo');
+    if (this.presentes(p).length >= LIMITE_GRUPO) throw erro('um grupo tem no máximo ' + LIMITE_GRUPO + ' pessoas');
+    const antigo = p.membros.find((m) => m.usuario === u);
+    if (antigo) Object.assign(antigo, { estado: 'convidado', entrouEm: '', saiuEm: '', convidadoPor: a.usuario });
+    else p.membros.push({ usuario: u, estado: 'convidado', entrouEm: '', saiuEm: '', convidadoPor: a.usuario });
+    await this.salvar();
+    return p;
+  }
+
+  async sairDoProposito(eu, id, hoje) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    const m = p && !p.encerradoEm && p.membros.find((x) => x.usuario === a.usuario && x.estado !== 'saiu');
+    if (!m) throw erro('propósito não encontrado', 404);
+    m.estado = 'saiu';
+    m.saiuEm = hoje;
+    if (!p.grupo || this.presentes(p).length < 2) p.encerradoEm = hoje;
+    await this.salvar();
+    return p;
+  }
+
+  // Dia que já fechou com a meta batida fica anotado para sempre: o diário do aparelho some
+  // depois de 70 dias, mas a sequência do grupo não pode encolher por isso.
+  async anotarDiasBatidos(id, datas) {
+    const p = this.proposito(id);
+    if (!p) return;
+    const antes = new Set(p.diasBatidos || []);
+    const novos = datas.filter((d) => !antes.has(d));
+    if (!novos.length) return;
+    p.diasBatidos = [...antes, ...novos].sort();
+    await this.salvar();
+  }
+
+  async encerrarProposito(eu, id, hoje) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    if (!p || p.encerradoEm || !this.presentes(p).some((m) => m.usuario === a.usuario)) throw erro('propósito não encontrado', 404);
+    if (p.grupo && p.criadoPor !== a.usuario) throw erro('só quem criou o grupo pode encerrar; você pode sair', 403);
+    p.encerradoEm = hoje;
+    await this.salvar();
+    return p;
+  }
+
+  // ---------- toques ----------
+  async tocar(eu, para, { hoje, euLeu, eleLeu }) {
+    const a = this.exigirCompleto(eu);
+    const b = this.achar(para);
+    if (!b || this.relacao(a.usuario, b.usuario) !== 'amigos') throw erro('só dá para dar um toque em amigo', 403);
+    if (!euLeu) throw erro('faça a sua lição antes de dar um toque');
+    if (eleLeu) throw erro('essa pessoa já leu hoje');
+    const chave = a.usuario + '>' + b.usuario;
+    if (this.dados.toques[chave] === hoje) return 'ja';
+    const hojeDados = Object.entries(this.dados.toques)
+      .filter(([k, d]) => k.startsWith(a.usuario + '>') && d === hoje).length;
+    if (hojeDados >= LIMITE_TOQUES_DIA) throw erro('você já deu ' + LIMITE_TOQUES_DIA + ' toques hoje', 429);
+    this.dados.toques[chave] = hoje;
+    await this.salvar();
+    return 'enviado';
+  }
+
+  toqueEnviado(eu, para, hoje) { return this.dados.toques[eu + '>' + para] === hoje; }
+
+  // Toques do dia de hoje para esta pessoa. A data é a de quem tocou, que pode estar
+  // um dia à frente num fuso diferente.
+  toquesRecebidos(eu, hoje) {
+    const amanha = somaDias(hoje, 1);
+    return Object.entries(this.dados.toques)
+      .filter(([k, d]) => k.endsWith('>' + eu) && (d === hoje || d === amanha))
+      .map(([k]) => k.split('>')[0])
+      .filter((de) => this.achar(de) && this.relacao(eu, de) === 'amigos' && !this.silenciou(eu, de));
+  }
+
+  // ---------- denúncias ----------
+  // Sem equipe e sem e-mail configurado, a denúncia fica guardada para o dono do servidor.
+  async denunciar(eu, contra, motivo) {
+    const a = this.exigirCompleto(eu);
+    const b = this.achar(contra);
+    if (!b || b.usuario === a.usuario) throw erro('conta não encontrada', 404);
+    if (!MOTIVOS_DENUNCIA.includes(motivo)) throw erro('escolha um motivo');
+    this.dados.denuncias.push({ de: a.usuario, contra: b.usuario, motivo, em: new Date().toISOString() });
+    this.dados.denuncias = this.dados.denuncias.slice(-500);
+    await this.salvar();
+  }
+}
+
+// Um pedaço do resumo da senha, para entrar na assinatura da sessão. Trocar a senha
+// muda o selo, e todo crachá emitido antes para de valer.
+export const seloDaConta = (conta) => String((conta && conta.senha) || '').slice(0, 16);
+
+// Onde mora o progresso de cada conta.
+export function arquivoDoEstado(base, usuario) {
+  const nome = limparNome(usuario);
+  if (!nome || nome === 'caminho') return base;
+  return base.replace(/\.json$/, '') + '-' + nome + '.json';
+}
+
+// ---------- o que o dia de cada um diz ----------
+// Uma data está feita quando a pessoa concluiu a lição do plano ou uma lição de
+// primeiros passos até o fim. Orar, escrever e praticar não contam.
+export function datasFeitas(estado) {
+  const s = new Set();
+  for (const d of Object.values((estado && estado.marcadoEm) || {})) if (d) s.add(d);
+  for (const d of Object.values((estado && estado.licoesEm) || {})) if (d) s.add(d);
+  return s;
+}
+
+// Dias de propósito: datas seguidas, desde o aceite, em que os dois fizeram a lição.
+// Um dia coberto por escudo de um dos dois congela a contagem: não soma e não quebra.
+// Hoje só entra quando os dois já leram; senão, a contagem para em ontem.
+export function diasDeProposito(a, b, desde, hoje) {
+  const feito = (p, d) => p.feitas.has(d);
+  const coberto = (p, d) => p.feitas.has(d) || p.protegidos.has(d);
+  let cursor = feito(a, hoje) && feito(b, hoje) ? hoje : somaDias(hoje, -1);
+  let dias = 0;
+  while (desde && cursor >= desde && coberto(a, cursor) && coberto(b, cursor)) {
+    if (feito(a, cursor) && feito(b, cursor)) dias++;
+    cursor = somaDias(cursor, -1);
+  }
+  return dias;
+}
+
+// O que um amigo aceito vê: nome, foto e se leu hoje. Pontos, registros, orações,
+// anotações, e-mail e data de nascimento não entram aqui em hipótese alguma.
+export function resumoDeAmigo(conta, estado, hoje) {
+  return {
+    usuario: conta.usuario,
+    nome: (estado && estado.apelido) || conta.nome || conta.usuario,
+    foto: (estado && estado.foto) || '',
+    leuHoje: datasFeitas(estado).has(hoje),
+  };
+}
