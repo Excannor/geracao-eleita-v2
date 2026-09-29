@@ -48,7 +48,7 @@ const pedir = async (rota, corpo, cookie, metodo) => {
   return { status: r.status, cookie: (r.headers.get('set-cookie') || '').split(';')[0], corpo: await r.json().catch(() => ({})) };
 };
 const criar = (usuario, convite) => pedir('/api/criar-conta', {
-  usuario, senha: 'senha-boa-1', nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', ...(convite ? { convite } : {}),
+  usuario, senha: 'senha-boa-1', nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true, ...(convite ? { convite } : {}),
 });
 const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 let carimbo = Date.now();

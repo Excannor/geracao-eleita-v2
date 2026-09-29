@@ -42,7 +42,7 @@ for (const n of readdirSync(fonte)) {
 // Uma conta com senha conhecida entra no contas.json copiado, para conferir o login depois.
 const rascunho = mkdtempSync(join(tmpdir(), 'cc-banco-rascunho-'));
 const criada = await (await new Contas(join(rascunho, 'contas.json')).carregar())
-  .criar({ usuario: 'ensaio.banco', senha: 'senha-do-ensaio', nome: 'Ensaio', email: 'ensaio@teste.com', nascimento: '2000-01-01' });
+  .criar({ usuario: 'ensaio.banco', senha: 'senha-do-ensaio', nome: 'Ensaio', email: 'ensaio@teste.com', nascimento: '2000-01-01', consentimento: true });
 const contasJson = JSON.parse(readFileSync(join(PASTA, 'contas.json'), 'utf8'));
 contasJson.contas['ensaio.banco'] = { ...criada };
 writeFileSync(join(PASTA, 'contas.json'), JSON.stringify(contasJson));
@@ -107,7 +107,7 @@ try {
   const naRaiz = readdirSync(PASTA).filter((n) => n.endsWith('.json') && !n.endsWith('.bak.json'));
   ok(!!pastaLegado && naRaiz.length === 0, 'os JSON saem da pasta de dados e ficam guardados em ' + pastaLegado);
   ok(pastaLegado && readdirSync(join(PASTA, pastaLegado)).includes('contas.json'), 'o contas.json antigo está intacto na pasta de legado');
-  ok(existsSync(join(PASTA, 'backup')) && readdirSync(join(PASTA, 'backup')).some((n) => /^caminho-\d{4}-\d{2}-\d{2}\.db$/.test(n)), 'o backup do dia é feito na subida');
+  ok(existsSync(join(PASTA, 'backup')) && readdirSync(join(PASTA, 'backup')).some((n) => /^caminho-\d{4}-\d{2}-\d{2}\.db\.cifrado$/.test(n)), 'o backup do dia é feito na subida, cifrado');
 
   // ---------- entrar e ler ----------
   const entrou = await pedir('/api/entrar', { login: 'ensaio.banco', senha: 'senha-do-ensaio' });
@@ -129,7 +129,7 @@ try {
   // ---------- gravações simultâneas ----------
   const pessoas = [];
   for (let i = 1; i <= 5; i++) {
-    const r = await pedir('/api/criar-conta', { usuario: 'carga' + i, senha: 'senha-de-carga', nome: 'Carga', email: 'carga' + i + '@teste.com', nascimento: '2000-01-01' });
+    const r = await pedir('/api/criar-conta', { usuario: 'carga' + i, senha: 'senha-de-carga', nome: 'Carga', email: 'carga' + i + '@teste.com', nascimento: '2000-01-01', consentimento: true });
     pessoas.push((r.headers.get('set-cookie') || '').split(';')[0]);
   }
   const gravacoes = [];
@@ -161,8 +161,9 @@ try {
   ok(banco("SELECT count(*) n FROM contas WHERE usuario = 'ensaio.banco'")[0].n === 0
     && banco("SELECT count(*) n FROM estados WHERE usuario = 'ensaio.banco'")[0].n === 0, 'ela sai do banco');
   let nosBackups = 0;
-  for (const n of readdirSync(join(PASTA, 'backup')).filter((x) => x.endsWith('.db'))) {
-    const b = new DatabaseSync(join(PASTA, 'backup', n));
+  const { abrirBackup } = await import(pathToFileURL(join(AQUI, 'db.mjs')).href);
+  for (const n of readdirSync(join(PASTA, 'backup')).filter((x) => x.endsWith('.db.cifrado'))) {
+    const b = new DatabaseSync(abrirBackup(join(PASTA, 'backup', n), join(PASTA, 'conferir-' + n + '.db')));
     nosBackups += b.prepare("SELECT count(*) n FROM contas WHERE usuario = 'ensaio.banco'").get().n + b.prepare("SELECT count(*) n FROM estados WHERE usuario = 'ensaio.banco'").get().n;
     b.close();
   }

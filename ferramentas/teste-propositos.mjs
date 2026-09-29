@@ -29,7 +29,7 @@ console.log('\n  Propósitos em dupla e em grupo\n');
 try {
   const arquivo = join(RASCUNHO, 'contas.json');
   let contas = await new Contas(arquivo).carregar();
-  for (const u of ['velha', 'amiga']) await contas.criar({ usuario: u, senha: '123456', nome: u, email: u + '@x.com', nascimento: '2000-01-01' });
+  for (const u of ['velha', 'amiga']) await contas.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '2000-01-01', consentimento: true });
   await contas.pedir('velha', 'amiga', '2026-01-10');
   await contas.aceitar('amiga', 'velha', '2026-01-10');
   // Volta o banco ao jeito de antes: amizade sem propósito e sem a marca da migração.
@@ -68,7 +68,7 @@ const pedir = async (rota, corpo, cookie, metodo) => {
   return { status: r.status, cookie: (r.headers.get('set-cookie') || '').split(';')[0], corpo: json, texto };
 };
 const criar = (usuario, convite) => pedir('/api/criar-conta', {
-  usuario, senha: 'senha-boa-1', nome: usuario[0].toUpperCase() + usuario.slice(1), email: usuario + '@teste.com', nascimento: '2000-01-01', ...(convite ? { convite } : {}),
+  usuario, senha: 'senha-boa-1', nome: usuario[0].toUpperCase() + usuario.slice(1), email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true, ...(convite ? { convite } : {}),
 });
 const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const respostas = [];
@@ -89,9 +89,9 @@ try {
 
   // ---------- duplas ----------
   const daAna = await lista(ana.cookie);
-  ok(daAna.length === 6 && daAna.every((p) => p.tipo === 'plano' && !p.grupo && p.membros.length === 2),
-    'cada amizade nova já nasce com a sua dupla de leitura (' + daAna.length + ')');
-  ok((await acao(ana.cookie, { acao: 'criar', tipo: 'plano', com: ['bia'] })).status === 400, 'a mesma dupla de leitura não se repete');
+  ok(daAna.length === 0, 'amizade nova não cria propósito sozinha: cada convite é separado (' + daAna.length + ')');
+  ok((await acao(ana.cookie, { acao: 'criar', tipo: 'plano', com: ['bia'] })).status === 200
+    && (await acao(ana.cookie, { acao: 'criar', tipo: 'plano', com: ['bia'] })).status === 400, 'a dupla de leitura nasce do convite de propósito e não se repete');
 
   const oracao = await acao(ana.cookie, { acao: 'criar', tipo: 'oracao', com: ['bia'] });
   const nt = await acao(ana.cookie, { acao: 'criar', tipo: 'livro', alvo: 'nt', com: ['bia'] });
@@ -99,7 +99,7 @@ try {
   ok(oracao.status === 200 && nt.status === 200 && rute.status === 200, 'com a Bia dá para ter oração, Novo Testamento e Rute, além da leitura');
   ok((await acao(ana.cookie, { acao: 'criar', tipo: 'livro', alvo: 'Livro Inventado', com: ['bia'] })).status === 400, 'livro que não existe no plano é recusado');
   ok((await acao(ana.cookie, { acao: 'criar', tipo: 'oracao', com: ['ninguem'] })).status === 403, 'só dá para chamar amigos');
-  ok((await pedir('/api/amigos', null, bia)).corpo.convitesProposito === 3, 'a Bia vê que tem 3 convites de propósito');
+  ok((await pedir('/api/amigos', null, bia)).corpo.convitesProposito === 4, 'a Bia vê que tem 4 convites de propósito');
 
   const idOracao = oracao.corpo.proposito.id;
   ok((await acao(bia, { acao: 'aceitar', id: idOracao })).status === 200, 'a Bia aceita a oração');

@@ -116,6 +116,17 @@ ok(tipo(base(hm(21), { leitura: { ...base(0).leitura, ofensiva: 1 }, historico: 
   'com 1 dia só, não tem "ofensiva em risco"');
 ok(tipo(base(hm(22, 15), { historico: { data: '2026-09-15', automaticas: 2, lembrete: '2026-09-15', ofensiva: '2026-09-15', lembreteMinutos: hm(19) } })) === null,
   'no máximo 2 automáticas por dia');
+// Servidor desligado (falta de energia) no horário: quando volta, sai um aviso só, o do período.
+const slot = (x) => ((N.decidir(x) || {}).dados || {}).slot;
+ok(slot(base(hm(10, 15))) === hm(9), 'voltou às 10h15 sem ter mandado nada: sai o da manhã, atrasado');
+ok(slot(base(hm(14))) === hm(12), 'voltou às 14h: sai só o do meio-dia, não o da manhã junto');
+ok(slot(base(hm(20))) === hm(19), 'voltou às 20h: sai só o da noite');
+const atrasadoManha = { historico: { data: '2026-09-15', automaticas: 1, lembrete: '2026-09-15', lembreteMinutos: hm(11, 50) } };
+ok(tipo(base(hm(12), atrasadoManha)) === null && tipo(base(hm(13), atrasadoManha)) === null,
+  'o da manhã que saiu às 11h50 cobre o do meio-dia: nada de dois avisos colados');
+ok(slot(base(hm(19), atrasadoManha)) === hm(19), 'e o da noite sai normal');
+const sumidoAs = (m) => base(m, { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-09-10' } });
+ok(tipo(sumidoAs(hm(21, 40))) === 'volta', 'quem sumiu: servidor voltou depois do horário, o aviso do dia sai atrasado');
 ok(tipo(base(hm(22, 30))) === null && tipo(base(hm(23, 59))) === null && tipo(base(hm(6, 59))) === null,
   'silêncio das 22h30 às 7h, mesmo sem nada ter saído');
 ok(tipo(base(hm(19), { pref: { ...N.PREFERENCIAS_PADRAO, lembrete: false, ofensiva: false } })) === null, 'desligado nas configurações, não sai');
@@ -126,8 +137,21 @@ ok(tipo(base(hm(13), { leitura: { ...base(0).leitura, escudoOntem: true } })) !=
 
 const sumido = (dias, m = hm(19)) => base(m, { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: ['2026-09-12', '2026-09-08', '2026-09-01'][[3, 7, 14].indexOf(dias)] || '2026-09-10' } });
 ok(tipo(sumido(3)) === 'volta' && tipo(sumido(7)) === 'volta' && tipo(sumido(14)) === 'volta', 'quem sumiu recebe recado no 3º, 7º e 14º dia');
-ok(tipo(sumido(5)) === null, 'entre um recado e outro, silêncio: nada de lembrete todo dia para quem sumiu');
-ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-08-01' } })) === null, 'depois do 14º dia, silêncio até a pessoa voltar');
+const sumidoHa = (dias, historico = {}, m = hm(19)) => base(m, { historico, leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: new Date(Date.parse('2026-09-15T12:00:00Z') - dias * 864e5).toISOString().slice(0, 10) } });
+const sai = (dias, historico) => tipo(sumidoHa(dias, historico)) === 'volta';
+ok([3, 4, 5, 6, 7].every((d) => sai(d)), 'na primeira semana sem ler, um aviso por dia');
+ok(sai(9) && sai(11) && sai(14) && !sai(10, { volta: '2026-09-14' }) && !sai(12, { volta: '2026-09-14' }), 'da 2ª semana, dia sim, dia não');
+ok(sai(21) && sai(30) && !sai(25) && !sai(28), 'depois, semanal (21º e 30º dia)');
+ok(sai(45) && sai(60) && sai(90) && !sai(50) && sai(120) && sai(150) && !sai(100), 'e cada vez mais espaçado: 15 em 15 dias até 90, depois todo mês');
+const texto = (dias) => N.montarMensagem('volta', { dias }, { usuario: 'x', data: '2026-09-15', nome: 'Ana' });
+ok(N.TEXTOS.voltaSaudade.some(([t]) => t === texto(45).titulo || t.replace('{nome}', 'Ana') === texto(45).titulo), 'quem sumiu há muito tempo recebe o "sentimos sua falta"');
+ok(N.TEXTOS.voltaValor.some(([t]) => t === texto(9).titulo), 'no 9º dia, o convite de que não precisa correr atrás do atraso');
+ok(sai(8) && N.decidir(sumidoHa(8)).dados.dias === 7 && !sai(8, { volta: '2026-09-14' }), 'servidor fora no dia marcado: sai no dia seguinte, uma vez');
+ok(!sai(47), 'atraso de mais de um dia espera o próximo da lista');
+ok(tipo(sumido(5, hm(12))) === null, 'quem sumiu recebe um só por dia, no horário escolhido, não os três');
+ok(tipo(base(hm(19), { historico: { data: '2026-09-15', automaticas: 1, volta: '2026-09-15' }, leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-09-10' } })) === null,
+  'e não repete no mesmo dia');
+ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: '2026-08-01' } })) === 'volta', 'no 45º dia ainda sai um aviso (nunca para de vez)');
 ok(tipo(base(hm(19), { leitura: { ...base(0).leitura, ofensiva: 0, ultimaLeitura: null, criadaEm: '2026-09-14' } })) === 'lembrete',
   'conta nova que ainda não leu recebe o lembrete nos primeiros dias');
 
@@ -154,6 +178,23 @@ ok(exemplos.some(({ t, d, m }) => t === 'lembrete' && d.ofensiva === 6 && /7/.te
 ok(exemplos.filter(({ t }) => t === 'toque').every(({ m }) => m.tag === 'toque'), 'toques usam a mesma tag: se substituem no celular em vez de empilhar');
 ok(new Set(exemplos.filter(({ t, d }) => t === 'lembrete' && d.ofensiva === 12).map(({ m }) => m.titulo)).size >= 2, 'o lembrete varia de um dia para o outro');
 ok(exemplos.some(({ m }) => m.titulo.includes('Marcos')) && !exemplos.some(({ m }) => m.titulo.includes('Estevão')), 'usa só o primeiro nome');
+
+// ---------- avisos de grupo: uma vez por dia ----------
+// A comemoração "o grupo bateu a meta" não era anotada no histórico e saía de novo a cada
+// rodada de lembretes (uma por minuto, em 23/09/2026). As duas marcas de grupo têm de ficar.
+{
+  const { mkdtempSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const pasta = mkdtempSync(join(tmpdir(), 'cc-notif-'));
+  const notif = await new N.Notificacoes(join(pasta, 'notificacoes.json')).carregar();
+  await notif.anotar('ana', 'grupoBatida:p1', '2026-09-23', 1163);
+  await notif.anotar('ana', 'grupo:p2', '2026-09-23', 1163);
+  const h = notif.historico('ana');
+  ok(h['grupoBatida:p1'] === '2026-09-23', 'a comemoração do grupo fica anotada no dia (não repete a cada minuto)');
+  ok(h['grupo:p2'] === '2026-09-23', 'o recado de meta do grupo continua anotado');
+  try { (await import(pathToFileURL(join(AQUI, 'db.mjs')).href)).fecharBanco(join(pasta, 'caminho.db')); } catch { /* ok */ }
+  try { rmSync(pasta, { recursive: true, force: true }); } catch { /* ok */ }
+}
 
 console.log('\n  exemplos:');
 for (const { t, m } of exemplos.filter((_, i) => i % 4 === 2)) console.log('    [' + t + '] ' + m.titulo + '  |  ' + m.corpo);

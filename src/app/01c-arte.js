@@ -12,23 +12,93 @@
     try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   };
 
-  // ---------- a lamparina ----------
-  // A ofensiva é uma lamparina de barro, a candeia dos tempos bíblicos, com a chama no
-  // bico. A imagem vem de Salmos 119.105: a Palavra é a lâmpada que ilumina o caminho.
-  //
-  // A chama cresce com os dias, em cinco estágios, e o barro nunca muda: a luz é o que
-  // cresce, não o vaso (2Co 4.7). Quando a ofensiva zera, a lamparina não fica cinza nem
-  // some: o pavio ainda fumega, com uma brasa, e o convite é reavivar (Is 42.3).
+  // ---------- o fogo da ofensiva ----------
+  // A ofensiva é um fogo que cresce com os dias, e os textos falam só de fogo, brasa e lenha
+  // (a lamparina de barro de antes saiu do app). Quando a ofensiva zera, o fogo não some:
+  // ainda tem brasa, e o convite é reavivar (Is 42.3).
   // O estágio é só da própria pessoa: amigos e Feed nunca veem o tamanho da chama.
+  // A frase e o versículo de cada estágio aparecem no resumo da lição, quando a chama sobe.
   const ESTAGIOS = [
-    { de: 0, nome: 'Reavivar', ref: 'Is 42.3', frase: 'O pavio ainda fumega. Deus está acendendo a sua chama de novo.' },
-    { de: 1, nome: 'Pavio aceso', ref: 'Lv 6.12', frase: 'A chama acendeu, e quem acendeu foi Deus. A você cabe a lenha de cada manhã.' },
-    { de: 7, nome: 'Candeia', ref: 'Mt 25.4', frase: 'Pavio sozinho acende e logo apaga. O que sustenta é o azeite guardado por dentro.' },
-    { de: 30, nome: 'Luz no velador', ref: 'Mt 5.15', frase: 'O pavio queima à vista de todos. O azeite, ninguém vê.' },
-    { de: 100, nome: 'Coração ardente', ref: 'Lc 24.32', frase: 'O coração arde quando a Escritura se abre.' },
-    { de: 365, nome: 'Um ano na Palavra', ref: 'Lv 6.13', frase: 'Um ano de fogo que não se apagou sobre o altar.' },
+    { de: 0, nome: 'Reavivar', ref: 'Is 42.3',
+      frase: 'Deus não apaga a chama que quase não dá luz. Ele está acendendo a sua de novo.' },
+    { de: 1, nome: 'Fogo aceso', ref: 'Lv 6.12',
+      frase: 'A chama acendeu, e quem acendeu foi Deus. A você cabe a lenha de cada manhã.' },
+    { de: 7, nome: 'Fogo no coração', ref: 'Jr 20.9',
+      frase: 'Jeremias tentou ficar calado, mas as palavras de Deus queimavam como fogo no coração dele. Uma semana lendo, e essa chama já pegou em você.' },
+    { de: 30, nome: 'Luz do mundo', ref: 'Mt 5.14',
+      frase: 'Um fogo aceso todo dia não fica escondido. Quem está por perto vê a luz.' },
+    { de: 100, nome: 'Coração ardente', ref: 'Lc 24.32',
+      frase: 'O coração arde quando a Escritura se abre.' },
+    { de: 365, nome: 'Um ano na Palavra', ref: 'Lv 6.13',
+      frase: 'Um ano de fogo que não se apagou sobre o altar.' },
   ];
   CC.ESTAGIOS_CHAMA = ESTAGIOS;
+
+  // O carimbo da folha da ofensiva: uma destas frases, sorteada a cada vez que a folha abre.
+  // A lista é do dono (2026-09-25), com a grafia acertada; os versículos foram conferidos na
+  // NBV e na Bíblia Livre. As linhas já vêm quebradas: a Permanent Marker é larga, e cada
+  // linha com até ~20 letras cabe numa tela de 320px (a que passar encolhe na hora).
+  CC.FRASES_OFENSIVA = [
+    { linhas: ['Direcionados', 'à santidade'], ref: '2 Timóteo 2.22' },
+    { linhas: ['Somos', 'remanescentes'] },
+    { linhas: ['Nele vivemos,', 'nos movemos', 'e existimos'], ref: 'Atos 17.28' },
+    { linhas: ['Prepara-te,', 'Ele vem'] },
+    { linhas: ['Até que', 'Ele venha'] },
+    { linhas: ['Quem já foi', 'comprado', 'não se vende'] },
+    { linhas: ['Atraídos pela', 'Sua presença'] },
+    { linhas: ['Marcados pela', 'diferença'] },
+    { linhas: ['Perseverando', 'até o fim'] },
+    { linhas: ['Há esperança', 'para a árvore que,', 'se for cortada,', 'ainda se renovará'], ref: 'Jó 14.7-9' },
+    { linhas: ['Jesus para', 'as nações'] },
+    { linhas: ['Conhecer a Deus', 'e fazê-Lo', 'conhecido'] },
+    { linhas: ['Se alguém quiser', 'vir após mim,', 'negue a si mesmo,', 'tome diariamente', 'a sua cruz', 'e siga-me'], ref: 'Lucas 9.23' },
+    { linhas: ['Firmes no propósito,', 'constantes', 'na oração', 'e inabaláveis na fé'] },
+    { linhas: ['O propósito de Deus', 'para a sua vida', 'é maior do que', 'qualquer obstáculo', 'no seu caminho'] },
+    { linhas: ['A sua oração', 'de hoje está', 'construindo', 'o milagre de amanhã.', 'Continue firme'] },
+    { linhas: ['Onde o mundo', 'vê um fim, Deus', 'escreve um', 'novo começo cheio', 'de esperança'] },
+    { linhas: ['Geração', 'inconformada'] },
+  ];
+  // Nunca a mesma da última vez: abrir de novo e ver a mesma frase parece que não sorteou.
+  let ultimaFrase = -1;
+  CC.fraseDaOfensiva = () => {
+    const total = CC.FRASES_OFENSIVA.length;
+    let i = Math.floor(Math.random() * total);
+    if (i === ultimaFrase && total > 1) i = (i + 1 + Math.floor(Math.random() * (total - 1))) % total;
+    ultimaFrase = i;
+    return CC.FRASES_OFENSIVA[i];
+  };
+  // Quebra um texto em linhas que cabem numa largura, encolhendo a letra até o bloco caber
+  // também na altura: a mesma lógica do carimbo da ofensiva (começa grande, diminui aos
+  // poucos), só que aqui o texto não vem pré-quebrado, então quem quebra as linhas é a
+  // própria função. Pura: "medir" é quem sabe a largura de um texto num tamanho de fonte
+  // (o cartão de versículo usa o canvas; o teste usa uma régua sintética).
+  CC.ajustarTextoCartao = function ajustarTextoCartao(texto, {
+    larguraMax, alturaMax, fonteMax, fonteMin = fonteMax * 0.35, entreLinhas = 1.25, medir,
+  }) {
+    const palavras = String(texto || '').split(/\s+/).filter(Boolean);
+    const quebrar = (tamanho) => {
+      const linhas = [];
+      let atual = '';
+      for (const p of palavras) {
+        const tentativa = atual ? atual + ' ' + p : p;
+        if (atual && medir(tentativa, tamanho) > larguraMax) { linhas.push(atual); atual = p; }
+        else atual = tentativa;
+      }
+      if (atual) linhas.push(atual);
+      return linhas;
+    };
+    let tamanho = fonteMax;
+    let linhas = quebrar(tamanho);
+    for (let i = 0; i < 40 && tamanho > fonteMin; i++) {
+      const alturaBloco = linhas.length * tamanho * entreLinhas;
+      const maiorLinha = Math.max(0, ...linhas.map((l) => medir(l, tamanho)));
+      if (alturaBloco <= alturaMax && maiorLinha <= larguraMax) break;
+      tamanho = Math.max(fonteMin, tamanho * 0.94);
+      linhas = quebrar(tamanho);
+    }
+    return { linhas, tamanho };
+  };
+
   CC.estagioDaChama = (dias) => {
     const n = Math.max(0, Number(dias) || 0);
     let i = 0;
@@ -36,80 +106,13 @@
     const proximo = ESTAGIOS[i + 1] || null;
     return Object.assign({ nivel: i, proximo, faltam: proximo ? proximo.de - n : 0 }, ESTAGIOS[i]);
   };
-  // ---------- o desenho ----------
-  // Uma lamparina de barro vista de lado, com o que faz qualquer um reconhecer: o bico
-  // alongado com o pavio e a chama na ponta, a barriga redonda, o furo do azeite em cima,
-  // a faixa de pontinhos, a alça em argola e o pé. O mesmo desenho serve para o ícone do
-  // topo e para a ilustração grande, só muda o enquadramento.
-  const TAMANHO_CHAMA = [0, 0.82, 0.96, 1.08, 1.2, 1.2];
-
-  function desenhoLamparina(nivel, opcoes = {}) {
-    // o corpo de barro vira neutro; só a chama (mais abaixo) continua colorida
-    const barro = '#8e8e8e', claro = '#b5b5b5', escuro = '#3a3a3a', furo = '#1a1a1a';
-    const k = TAMANHO_CHAMA[nivel];
-    const g = id('luz');
-    let chama;
-    if (k) {
-      // a base da chama fica presa ao pavio, na ponta do bico (10, 26)
-      const brilho = nivel >= 2
-        ? '<radialGradient id="' + g + '"><stop offset="0" stop-color="#ffc83d" stop-opacity="' + (nivel >= 4 ? '.75' : '.55') + '"/><stop offset="1" stop-color="#ffc83d" stop-opacity="0"/></radialGradient>'
-          + '<circle class="brilho-fogo" cx="10" cy="' + (26 - 8 * k).toFixed(1) + '" r="' + ((nivel >= 4 ? 15 : 11) * k).toFixed(1) + '" fill="url(#' + g + ')"/>'
-        : '';
-      chama = brilho + '<g transform="translate(10 26) scale(' + k + ')"><g class="fogo">'
-        + '<path d="M0 0C-4.6 0-6.4-3.4-5.6-7-4.9-10.2-2.2-12.4-.6-16.6 1.8-13.4 5.8-10.4 5.9-6 6-2.6 3.8 0 0 0Z" fill="#ff9d1c"/>'
-        + '<path d="M0 0C-2.8 0-4-2.2-3.4-4.6-2.9-6.7-1.2-8.2-.3-10.8 1.3-8.6 3.8-6.6 3.8-3.9 3.8-1.6 2.4 0 0 0Z" fill="#ffc83d"/>'
-        + '<path d="M0 0C-1.3 0-1.9-1-1.6-2.2-1.3-3.2-.6-3.9-.1-5.1.6-4.1 1.8-3.2 1.8-1.9 1.8-.8 1.1 0 0 0Z" fill="#fff2c4"/>'
-        + '</g></g>';
-    } else {
-      // apagada: o pavio ainda fumega, com uma brasa (Is 42.3)
-      chama = '<path class="fumaca" d="M10 24c-3-3 2-5-1-8-2-2 1.5-4 0-7" fill="none" stroke="#8e8e8e" stroke-width="1.8" stroke-linecap="round" opacity=".75"/>'
-        + '<circle class="brasa" cx="10" cy="26" r="2.2" fill="#ff9d1c"/><circle cx="10" cy="26" r="1" fill="#ffc83d"/>';
-    }
-    // marcas gravadas no barro, uma por estágio já alcançado na vida (só onde a pessoa se vê)
-    const marcas = opcoes.marcas
-      ? Array.from({ length: opcoes.marcas }, (_, i) => '<path d="M' + (21 + i * 3.4).toFixed(1) + ' 35.4l.9 2.4" stroke="' + escuro + '" stroke-width="1" stroke-linecap="round" opacity=".7"/>').join('')
-      : '';
-    const selo = nivel === 5
-      ? '<circle cx="41" cy="14" r="5.5" fill="#3a3a3a"/><path d="M38.4 14l1.9 1.9 3.3-3.6" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
-      : '';
-    return (opcoes.sombra === false ? '' : '<ellipse cx="27" cy="44.5" rx="14" ry="1.8" fill="currentColor" opacity=".13"/>')
-      + '<path d="M21 38.5h12l-1.6 4.6c-.2.6-.8 1-1.4 1h-6.4c-.6 0-1.2-.4-1.4-1z" fill="' + escuro + '"/>'
-      + '<path d="M38.5 29.5c3.6-3.8 8.6-2.2 8.3 1.9-.3 3.8-4.6 5.6-8.2 4.6" fill="none" stroke="' + barro + '" stroke-width="3.2" stroke-linecap="round"/>'
-      + '<path d="M8.6 27.4c3.4-.6 6.6-1.4 9.6-2.9 5.8-3 14.6-3.3 19.7.3 4.6 3.3 4.4 9.4-.6 12.6-5.6 3.6-15.6 3.4-20.8-.6-2.6-2-5-4.4-8.2-6.2-1.2-.7-1.1-2.9.3-3.2z" fill="' + barro + '"/>'
-      + '<path d="M11 31c3 1.6 5.2 3.8 7.4 5.6 5.2 4 15.2 4.2 20.8.6 2.4-1.5 3.6-3.6 3.8-5.8-2.6 3.6-9.8 5.6-16.2 4.8-6.6-.8-11.2-3.4-15.8-5.2z" fill="' + escuro + '" opacity=".45"/>'
-      + '<path d="M19 26.2c5-2.6 12.8-2.8 17.4.2-5-1.4-12-1.2-17.4-.2z" fill="' + claro + '"/>'
-      + '<ellipse cx="29.5" cy="25.6" rx="4.2" ry="1.5" fill="' + furo + '"/>'
-      + '<circle cx="22" cy="32.6" r="1" fill="' + claro + '"/><circle cx="27" cy="33.6" r="1" fill="' + claro + '"/><circle cx="32" cy="33.4" r="1" fill="' + claro + '"/><circle cx="36.4" cy="32" r="1" fill="' + claro + '"/>'
-      + marcas
-      + '<ellipse cx="9.4" cy="27.6" rx="1.7" ry="1.1" fill="' + furo + '"/>'
-      + '<path d="M9.6 27.4l.4-1.6" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/>'
-      + chama + selo;
-  }
-
-  // Ilustração grande: folha da ofensiva, resumo do dia, recomeço. opcoes.recorde grava no
-  // barro uma marca por estágio já alcançado na vida.
-  A.lamparina = (dias, opcoes = {}) => {
-    const est = CC.estagioDaChama(dias);
-    const marcas = opcoes.recorde ? Math.max(0, CC.estagioDaChama(opcoes.recorde).nivel - 1) : 0;
-    return '<svg class="arte-chama estagio-' + est.nivel + (est.nivel ? '' : ' apagada') + '" viewBox="-2 0 52 48" aria-hidden="true">'
-      + desenhoLamparina(est.nivel, { marcas }) + '</svg>';
-  };
-
-  // A lamparina de sempre, para lugares que falam da constância sem ser a de alguém em
-  // particular (marco de um amigo, propósito): tamanho fixo de Candeia, ou apagada.
-  A.chama = (apagada) => A.lamparina(apagada ? 0 : 7);
-
-  // Ícone pequeno (topo, listas, contagens): um foguinho, não a lamparina. A lamparina é um
-  // desenho com corpo, pavio e alça — some quando reduzida a 20px ao lado de um número, e
-  // ainda arrasta um cinza grande para dentro de uma barra que deveria ser preta e branca.
-  // O fogo sozinho lê bem em qualquer tamanho. A lamparina inteira continua existindo em
-  // A.lamparina, que é o desenho grande da comemoração e da folha da ofensiva.
+  // O fogo, em qualquer tamanho (topo, folha da ofensiva, listas, contagens).
   // Nível 0 é a chama apagada: herda a cor do texto (cinza), em vez de fingir fogo.
   const FOGO_FORA = 'M12 1.9c1.1 4.3 5.7 6.2 5.7 11.1a5.7 5.7 0 0 1-11.4 0c0-2.2 1-3.9 2.2-4.9'
     + '.1 1.8 1.1 3 2.2 3 1.3 0 2-1.9 1.2-4.6-.4-1.6-.5-3.2.1-4.6Z';
   const FOGO_DENTRO = 'M12 10.6c.5 2 2.4 2.9 2.4 5.2a2.4 2.4 0 0 1-4.8 0c0-1 .4-1.8.9-2.3'
     + '.1.8.5 1.4.9 1.4.6 0 .9-.9.6-2.2Z';
-  // A chama cresce com a ofensiva, como a da lamparina: quem está no primeiro dia vê um
+  // A chama cresce com a ofensiva: quem está no primeiro dia vê um
   // fogo pequeno, quem está há um ano vê o maior. É a mesma escada de seis estágios do
   // resto do app. Cresce a partir da base (12, 21), para o fogo subir em vez de inchar.
   const ESCALA_FOGO = [0.58, 0.72, 0.84, 0.94, 1.04, 1.14];
@@ -127,7 +130,6 @@
       + (apagada ? '' : '<path class="miolo" d="' + FOGO_DENTRO + '" fill="#ff9d1c"/>')
       + '</g></g></svg>';
   };
-  A.lamparinaTopo = (dias) => CC.icoChama(dias);
 
   // ---------- o baú ----------
   A.bau = (estado, cor) => {
@@ -183,24 +185,62 @@
     const ganha = c.nivel > 0;
     return '<span class="arte-medalha c-' + c.cor + (ganha ? '' : ' sem-nivel') + (grande ? ' grande' : '') + '" aria-hidden="true">'
       + '<span class="escudo">' + (c.icone === 'chama' ? CC.icoChama() : CC.ico(c.icone)) + '</span>'
-      + '<span class="faixa">' + (c.maximo ? 'MÁX' : 'NÍVEL ' + Math.max(1, c.nivel)) + '</span>'
+      + (ganha ? '<span class="faixa">' + (c.maximo ? 'MÁX' : 'NÍVEL ' + c.nivel) + '</span>' : '')
       + '</span>';
   };
 
   // ---------- troféu ----------
   // fracao (0 a 1) enche a copa de baixo para cima enquanto o troféu não foi ganho: a estante
   // mostra o quanto falta, e não 22 taças cinza iguais.
-  A.trofeu = (cor, ganho, fracao) => {
+  // Cada estante tem o seu desenho: a taça para as unidades do plano, a pilha de livros para
+  // as partes da Bíblia, a Bíblia fechada para os testamentos, o calendário para o plano de
+  // um ano e a bandeira de chegada para os desafios. "corpo" é o que enche com a fração;
+  // [de, ate] é a faixa vertical que ele ocupa, para o enchimento subir de baixo para cima.
+  const FORMAS_TROFEU = {
+    taca: {
+      corpo: 'M16 6h32v18c0 10-7 18-16 18S16 34 16 24z', de: 6, ate: 42,
+      resto: '<path class="alcas" d="M16 12H8v4c0 7 4 12 10 13M48 12h8v4c0 7-4 12-10 13" fill="none" stroke-width="5" stroke-linecap="round"/>'
+        + '<rect class="haste" x="28" y="40" width="8" height="12" rx="2"/><rect class="base" x="16" y="52" width="32" height="12" rx="4"/>',
+      reflexo: 'M22 10h5v14c0 4 1 7 3 9-5-1-8-5-8-10z',
+    },
+    livros: {
+      corpo: 'M9 44h46v12H9zM13 30h40v12H13zM7 16h44v12H7z', de: 16, ate: 56,
+      resto: '<rect class="base" x="4" y="58" width="56" height="8" rx="3"/>',
+      frente: '<path class="detalhe" d="M15 50h8M19 36h8M13 22h8" fill="none" stroke-width="3" stroke-linecap="round"/>',
+      reflexo: 'M40 18h6v8h-6z',
+    },
+    biblia: {
+      corpo: 'M18 4h28a4 4 0 0 1 4 4v44H18a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z', de: 4, ate: 52,
+      resto: '<path class="base" d="M14 48a4 4 0 0 0 4 4h32v8H18a8 8 0 0 1-4-1z"/>'
+        + '<path class="haste" d="M38 52h6v16l-3-3-3 3z"/>',
+      frente: '<path class="detalhe" d="M32 14v18M25 21h14" fill="none" stroke-width="4" stroke-linecap="round"/>',
+      reflexo: 'M20 8h4v36h-4z',
+    },
+    calendario: {
+      corpo: 'M8 22h48v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6z', de: 22, ate: 62,
+      resto: '<path class="base" d="M14 10h36a6 6 0 0 1 6 6v8H8v-8a6 6 0 0 1 6-6z"/>'
+        + '<rect class="haste" x="18" y="4" width="6" height="12" rx="3"/><rect class="haste" x="40" y="4" width="6" height="12" rx="3"/>',
+      frente: '<path class="detalhe" d="m22 42 7 7 14-14" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>',
+      reflexo: 'M12 26h5v26h-5z',
+    },
+    bandeira: {
+      corpo: 'M22 8h32l-8 11 8 11H22z', de: 8, ate: 30,
+      resto: '<rect class="haste" x="14" y="4" width="7" height="56" rx="3.5"/><path class="base" d="M4 66c0-6 6-10 13-10s13 4 13 10z"/>',
+      reflexo: 'M25 11h8l-5 6h-3z',
+    },
+  };
+  A.trofeu = (cor, ganho, fracao, forma) => {
+    const F = FORMAS_TROFEU[forma] || FORMAS_TROFEU.taca;
     const f = !ganho && fracao > 0 ? Math.min(1, fracao) : 0;
     const g = f ? id('copa') : '';
+    const altura = F.ate - F.de;
     return '<span class="arte-trofeu c-' + (cor || 'amarelo') + (ganho ? ' ganho' : '') + (f ? ' parcial' : '') + '" aria-hidden="true">'
-    + '<svg viewBox="0 0 64 72">' + (f ? '<defs><clipPath id="' + g + '"><rect x="0" y="' + (42 - 36 * f).toFixed(1) + '" width="64" height="' + (36 * f).toFixed(1) + '"/></clipPath></defs>' : '')
-    + '<path class="copa" d="M16 6h32v18c0 10-7 18-16 18S16 34 16 24z"/>'
-    + (f ? '<path class="copa-parte" clip-path="url(#' + g + ')" d="M16 6h32v18c0 10-7 18-16 18S16 34 16 24z"/>' : '')
-    + '<path class="alcas" d="M16 12H8v4c0 7 4 12 10 13M48 12h8v4c0 7-4 12-10 13" fill="none" stroke-width="5" stroke-linecap="round"/>'
-    + '<rect class="haste" x="28" y="40" width="8" height="12" rx="2"/>'
-    + '<rect class="base" x="16" y="52" width="32" height="12" rx="4"/>'
-    + '<path class="reflexo" d="M22 10h5v14c0 4 1 7 3 9-5-1-8-5-8-10z" fill="#fff" opacity=".35"/></svg></span>';
+    + '<svg viewBox="0 0 64 72">' + (f ? '<defs><clipPath id="' + g + '"><rect x="0" y="' + (F.ate - altura * f).toFixed(1) + '" width="64" height="' + (altura * f).toFixed(1) + '"/></clipPath></defs>' : '')
+    + F.resto
+    + '<path class="copa" d="' + F.corpo + '"/>'
+    + (f ? '<path class="copa-parte" clip-path="url(#' + g + ')" d="' + F.corpo + '"/>' : '')
+    + (F.frente || '')
+    + '<path class="reflexo" d="' + F.reflexo + '" fill="#fff" opacity=".35"/></svg></span>';
   };
 
   // ---------- Trilha do Semeador ----------
@@ -287,15 +327,6 @@
       else if (depois) depois();
     };
     requestAnimationFrame(passo);
-  };
-
-  // Barras que enchem: o HTML nasce com a largura antiga em data-de e anda até a nova.
-  CC.encherBarras = (raiz, atraso = 250) => {
-    raiz.querySelectorAll('[data-encher]').forEach((i, n) => {
-      const alvo = i.dataset.encher;
-      if (CC.semMovimento()) { i.style.width = alvo; return; }
-      setTimeout(() => { i.style.width = alvo; }, atraso + n * 180);
-    });
   };
 
   CC.esperar = (ms) => new Promise((r) => setTimeout(r, CC.semMovimento() ? 0 : ms));

@@ -9,7 +9,8 @@
 // gravando alternadas (1.000 linhas, integridade ok, cerca de 5 ms por transação). O modo
 // clássico (DELETE) também ficou íntegro, mas seis vezes mais lento.
 import { createRequire } from 'node:module';
-import { existsSync, mkdirSync, readdirSync, rmSync, renameSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, rmSync, renameSync, readFileSync, writeFileSync } from 'node:fs';
+import { randomBytes, createCipheriv, createDecipheriv } from 'node:crypto';
 import { join, dirname, resolve, basename } from 'node:path';
 
 // O node:sqlite ainda avisa que é experimental a cada subida. O aviso não diz nada a quem
@@ -98,6 +99,78 @@ const ESQUEMA = [
     proposito TEXT NOT NULL, data TEXT NOT NULL,
     PRIMARY KEY (proposito, data)
   );
+  `,
+  // v5: a célula é um grupo que cresce por link e aceita mais gente que o grupo de amigos
+  `
+  ALTER TABLE propositos ADD COLUMN celula INTEGER NOT NULL DEFAULT 0;
+  `,
+  // v6: a célula ganha o dia do encontro (0 domingo a 6 sábado, -1 sem dia), o recado do líder
+  // e o estudo do encontro que o líder escolhe: a leitura da semana, um trecho ou um texto dele
+  `
+  ALTER TABLE propositos ADD COLUMN encontro INTEGER NOT NULL DEFAULT -1;
+  ALTER TABLE propositos ADD COLUMN recado TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN recado_em TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_tipo TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_ref TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_texto TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_em TEXT NOT NULL DEFAULT '';
+  `,
+  // v7: papéis dentro da célula (auxiliar conduz junto, visitante só está conhecendo), o
+  // roteiro 4 Ws (acolhida, adoração e testemunho, além da Palavra que já existia) e o
+  // registro de quem foi a cada encontro
+  `
+  ALTER TABLE proposito_membros ADD COLUMN papel TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_acolhida TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_adoracao TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN estudo_testemunho TEXT NOT NULL DEFAULT '';
+  CREATE TABLE celula_encontros (proposito TEXT NOT NULL, data TEXT NOT NULL, visitantes INTEGER NOT NULL DEFAULT 0,
+    registrado_por TEXT NOT NULL, em TEXT NOT NULL, PRIMARY KEY (proposito, data));
+  CREATE TABLE celula_presencas (proposito TEXT NOT NULL, data TEXT NOT NULL, usuario TEXT NOT NULL,
+    PRIMARY KEY (proposito, data, usuario));
+  `,
+  // v8: discipulado 1 a 1 (Mateus 28.19-20; 2 Timóteo 2.2). Quem acompanha, quem é acompanhado,
+  // o que o discípulo decide mostrar e os encontros semanais dos dois. Os marcos pessoais
+  // ("Minha caminhada") não ganham tabela: moram no extra da conta, como qualquer campo solto.
+  `
+  CREATE TABLE discipulados (
+    id TEXT PRIMARY KEY, discipulador TEXT NOT NULL, discipulo TEXT NOT NULL,
+    estado TEXT NOT NULL,
+    pediu TEXT NOT NULL,
+    criado_em TEXT NOT NULL, aceito_em TEXT NOT NULL DEFAULT '', encerrado_em TEXT NOT NULL DEFAULT '',
+    mostrar TEXT NOT NULL DEFAULT '{}'
+  );
+  CREATE INDEX discipulados_discipulador ON discipulados (discipulador);
+  CREATE INDEX discipulados_discipulo ON discipulados (discipulo);
+  CREATE TABLE discipulado_encontros (discipulado TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (discipulado, data));
+  `,
+  // v9: cuidado mútuo (Atos 2.42; 2.44-45). O pedido é só do autor, sem chat: os outros
+  // respondem com um gesto sem texto ("orei" ou "ajudo"). Denúncia é anônima para o autor;
+  // as regras (limites, quem vê, o que esconde) moram em cuidado.mjs.
+  `
+  CREATE TABLE pedidos (
+    id TEXT PRIMARY KEY, celula TEXT NOT NULL, autor TEXT NOT NULL,
+    tipo TEXT NOT NULL,                 -- 'oracao' | 'necessidade'
+    destino TEXT NOT NULL,              -- 'celula' | 'conduz' (líder e auxiliar); necessidade é sempre 'celula'
+    texto TEXT NOT NULL,                -- até 280 caracteres (oração) ou 200 (necessidade)
+    criado_em TEXT NOT NULL, vence_em TEXT NOT NULL,
+    estado TEXT NOT NULL DEFAULT 'ativo', -- 'ativo' | 'respondido' | 'removido'
+    removido_por TEXT NOT NULL DEFAULT ''
+  );
+  CREATE INDEX pedidos_celula ON pedidos (celula);
+  CREATE TABLE pedido_gestos (pedido TEXT NOT NULL, usuario TEXT NOT NULL, gesto TEXT NOT NULL, data TEXT NOT NULL,
+    PRIMARY KEY (pedido, usuario, gesto, data));
+  CREATE TABLE pedido_denuncias (pedido TEXT NOT NULL, usuario TEXT NOT NULL, motivo TEXT NOT NULL, em TEXT NOT NULL,
+    PRIMARY KEY (pedido, usuario));
+  `,
+  // v10: multiplicação de célula (Atos 2.47; 2 Timóteo 2.2). A célula filha guarda de onde
+  // veio ("mae", o id da célula de origem) e quando nasceu; a célula mãe não ganha coluna
+  // nova, porque quem é mãe de quem se descobre olhando as filhas. E o painel pastoral
+  // (Fase 5, seção 2) precisa saber quando um visitante virou membro, para contar "quantos
+  // visitantes com conta passaram a membro" nas últimas 4 semanas.
+  `
+  ALTER TABLE propositos ADD COLUMN mae TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN multiplicada_em TEXT NOT NULL DEFAULT '';
+  ALTER TABLE proposito_membros ADD COLUMN tornou_membro_em TEXT NOT NULL DEFAULT '';
   `,
 ];
 
@@ -262,6 +335,17 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['toques', 'DELETE FROM toques WHERE de = ? OR para = ?', [u, u]],
     ['convites_aceites', 'DELETE FROM convites_aceites WHERE de = ? OR para = ?', [u, u]],
     ['proposito_membros', 'DELETE FROM proposito_membros WHERE usuario = ?', [u]],
+    // o histórico do encontro fica (quem registrou, quantas pessoas), só a presença da pessoa some
+    ['celula_presencas', 'DELETE FROM celula_presencas WHERE usuario = ?', [u]],
+    // discipulado dos dois lados, e os encontros dele, saem inteiros: não é um grupo que
+    // sobrevive sem a pessoa, é uma relação de duas pontas só
+    ['discipulado_encontros', "DELETE FROM discipulado_encontros WHERE discipulado IN (SELECT id FROM discipulados WHERE discipulador = ? OR discipulo = ?)", [u, u]],
+    ['discipulados', 'DELETE FROM discipulados WHERE discipulador = ? OR discipulo = ?', [u, u]],
+    // cuidado mútuo: os pedidos da pessoa somem inteiros; o gesto ou a denúncia que ela deixou
+    // no pedido de outra pessoa também some, mas o pedido em si continua de pé
+    ['pedido_gestos', "DELETE FROM pedido_gestos WHERE usuario = ? OR pedido IN (SELECT id FROM pedidos WHERE autor = ?)", [u, u]],
+    ['pedido_denuncias', "DELETE FROM pedido_denuncias WHERE usuario = ? OR pedido IN (SELECT id FROM pedidos WHERE autor = ?)", [u, u]],
+    ['pedidos', 'DELETE FROM pedidos WHERE autor = ?', [u]],
     ['novidades_reacoes', "DELETE FROM novidades_reacoes WHERE usuario = ? OR evento IN (SELECT id FROM novidades_eventos WHERE autor = ? OR json_extract(dados, '$.com') = ? OR EXISTS (SELECT 1 FROM json_each(dados, '$.membros') WHERE value = ?))", [u, u, u, u]],
     ['novidades_eventos', "DELETE FROM novidades_eventos WHERE autor = ? OR json_extract(dados, '$.com') = ? OR EXISTS (SELECT 1 FROM json_each(dados, '$.membros') WHERE value = ?)", [u, u, u]],
     ['novidades_pessoas', 'DELETE FROM novidades_pessoas WHERE usuario = ?', [u]],
@@ -278,35 +362,122 @@ export function apagarPessoaDoBanco(db, usuario) {
 // ---------------------------------------------------------------- backups
 // Uma cópia por dia, feita pelo próprio SQLite (VACUUM INTO): consistente mesmo com o
 // servidor gravando. Ficam as 14 mais novas.
-const PADRAO_BACKUP = /^caminho-\d{4}-\d{2}-\d{2}\.db$/;
+//
+// A cópia é guardada cifrada (AES-256-GCM, arquivo .db.cifrado): quem levar a pasta de
+// backups não lê e-mail, data de nascimento nem progresso de ninguém sem a chave. A chave vem
+// de CAMINHO_BACKUP_CHAVE (64 caracteres hexadecimais, no .env, fora da pasta de dados); sem
+// ela, de dados/backup.chave, criada na primeira vez. Para abrir um backup:
+//   node ferramentas/backup.mjs abrir dados/backup/caminho-AAAA-MM-DD.db.cifrado saida.db
+const PADRAO_BACKUP = /^caminho-\d{4}-\d{2}-\d{2}\.db\.cifrado$/;
+const PADRAO_BACKUP_ABERTO = /^caminho-.+\.db$/;
+const CABECA_CIFRADO = Buffer.from('GEBACKUP1');
 
-export function backupDoDia(db, pasta, dia, manter = 14) {
-  const destino = join(pasta, 'caminho-' + dia + '.db');
+export function chaveDeBackup(pastaDados) {
+  const doAmbiente = String(process.env.CAMINHO_BACKUP_CHAVE || '').trim();
+  if (/^[0-9a-f]{64}$/i.test(doAmbiente)) return Buffer.from(doAmbiente, 'hex');
+  const arquivo = join(pastaDados, 'backup.chave');
+  if (existsSync(arquivo)) return Buffer.from(readFileSync(arquivo, 'utf8').trim(), 'hex');
+  const nova = randomBytes(32);
+  mkdirSync(pastaDados, { recursive: true });
+  writeFileSync(arquivo, nova.toString('hex'), { mode: 0o600 });
+  return nova;
+}
+const chavePadrao = (pastaBackup) => chaveDeBackup(dirname(resolve(pastaBackup)));
+
+export function cifrar(conteudo, chave) {
+  const iv = randomBytes(12);
+  const c = createCipheriv('aes-256-gcm', chave, iv);
+  const corpo = Buffer.concat([c.update(conteudo), c.final()]);
+  return Buffer.concat([CABECA_CIFRADO, iv, c.getAuthTag(), corpo]);
+}
+
+export function decifrar(conteudo, chave) {
+  if (!conteudo.subarray(0, CABECA_CIFRADO.length).equals(CABECA_CIFRADO)) throw new Error('não é um backup cifrado');
+  const ini = CABECA_CIFRADO.length;
+  const d = createDecipheriv('aes-256-gcm', chave, conteudo.subarray(ini, ini + 12));
+  d.setAuthTag(conteudo.subarray(ini + 12, ini + 28));
+  return Buffer.concat([d.update(conteudo.subarray(ini + 28)), d.final()]);
+}
+
+// Abre um backup cifrado num arquivo comum (para restaurar ou conferir).
+export function abrirBackup(arquivo, destino, chave = chavePadrao(dirname(arquivo))) {
+  writeFileSync(destino, decifrar(readFileSync(arquivo), chave));
+  return destino;
+}
+
+const temporario = (perto) => perto + '.' + randomBytes(4).toString('hex') + '.tmp';
+function cifrarArquivo(aberto, destino, chave) {
+  writeFileSync(destino + '.novo', cifrar(readFileSync(aberto), chave));
+  renameSync(destino + '.novo', destino);
+}
+
+// Backups da época em que eram guardados abertos viram cifrados, e o aberto some.
+export function cifrarBackupsAbertos(pasta, chave = chavePadrao(pasta)) {
+  if (!existsSync(pasta)) return 0;
+  let n = 0;
+  for (const f of readdirSync(pasta).filter((x) => PADRAO_BACKUP_ABERTO.test(x))) {
+    cifrarArquivo(join(pasta, f), join(pasta, f + '.cifrado'), chave);
+    rmSync(join(pasta, f), { force: true });
+    n++;
+  }
+  return n;
+}
+
+export function backupDoDia(db, pasta, dia, manter = 14, chave = chavePadrao(pasta)) {
+  const destino = join(pasta, 'caminho-' + dia + '.db.cifrado');
   if (existsSync(destino)) return null;
-  fazerBackup(db, destino);
+  fazerBackup(db, destino, chave);
   const antigos = readdirSync(pasta).filter((f) => PADRAO_BACKUP.test(f)).sort();
   for (const f of antigos.slice(0, Math.max(0, antigos.length - manter))) rmSync(join(pasta, f), { force: true });
   return destino;
 }
 
-export function fazerBackup(db, destino) {
+// Cópia aberta e consistente do banco, para as ferramentas (exportar para JSON).
+export function copiarBanco(db, destino) {
   mkdirSync(dirname(destino), { recursive: true });
   db.exec("VACUUM INTO '" + String(destino).replace(/'/g, "''") + "'");
   return destino;
 }
 
+// A cópia aberta só existe por um instante, ao lado do destino, e some mesmo se der erro.
+export function fazerBackup(db, destino, chave = chavePadrao(dirname(destino))) {
+  mkdirSync(dirname(destino), { recursive: true });
+  const aberto = temporario(destino);
+  try {
+    copiarBanco(db, aberto);
+    cifrarArquivo(aberto, destino, chave);
+  } finally {
+    rmSync(aberto, { force: true });
+  }
+  return destino;
+}
+
 // Quem apaga a conta leva junto as cópias: a pessoa sai de cada backup guardado.
-export function apagarPessoaDosBackups(pasta, usuario) {
+// Cifrado: abre num temporário, tira a pessoa e cifra de novo por cima.
+export function apagarPessoaDosBackups(pasta, usuario, chave = chavePadrao(pasta)) {
   if (!existsSync(pasta)) return 0;
   let limpos = 0;
-  for (const f of readdirSync(pasta).filter((n) => n.endsWith('.db'))) {
-    const copia = new DatabaseSync(join(pasta, f));
+  const limpar = (arquivo) => {
+    const copia = new DatabaseSync(arquivo);
     try {
       apagarPessoaDoBanco(copia, usuario);
       copia.exec('VACUUM');
-      limpos++;
     } finally {
       copia.close();
+    }
+  };
+  for (const f of readdirSync(pasta)) {
+    const arquivo = join(pasta, f);
+    if (f.endsWith('.db')) { limpar(arquivo); limpos++; continue; }
+    if (!f.endsWith('.db.cifrado')) continue;
+    const aberto = temporario(arquivo);
+    try {
+      abrirBackup(arquivo, aberto, chave);
+      limpar(aberto);
+      cifrarArquivo(aberto, arquivo, chave);
+      limpos++;
+    } finally {
+      rmSync(aberto, { force: true });
     }
   }
   return limpos;

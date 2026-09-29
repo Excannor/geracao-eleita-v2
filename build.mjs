@@ -13,10 +13,20 @@ const AQUI = dirname(fileURLToPath(import.meta.url));
 const src = (...p) => join(AQUI, 'src', ...p);
 const dist = (...p) => join(AQUI, 'dist', ...p);
 
-const dados = readFileSync(join(AQUI, 'conteudo', 'conteudo.json'), 'utf8');
+let dados = readFileSync(join(AQUI, 'conteudo', 'conteudo.json'), 'utf8');
 const conteudo = JSON.parse(dados);
 console.log('conteúdo:', conteudo.totalNotas, 'notas ·', conteudo.plano.length, 'dias ·',
   conteudo.unidades.length, 'unidades');
+
+// O Conhecer Jesus (14 dias) e as perguntas honestas nascem em arquivos à parte, prontos e
+// revisados por fora: aqui só entram debaixo de uma chave nova, para o app ler tudo como
+// CC.D.conhecer. "dados" é regravado porque é ele, e não "conteudo", que vira o hash e o
+// arquivo publicado logo abaixo.
+const conhecer = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
+const perguntasHonestas = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'perguntas-honestas.json'), 'utf8'));
+conteudo.conhecer = { ...conhecer, perguntas: perguntasHonestas };
+dados = JSON.stringify(conteudo);
+console.log('conhecer jesus:', conteudo.conhecer.dias.length, 'dias ·', conteudo.conhecer.perguntas.length, 'perguntas honestas');
 
 // Os módulos do app são concatenados na ordem do nome do arquivo: 01 antes de 02.
 const pastaApp = src('app');
@@ -25,7 +35,9 @@ const js = modulos.map((f) => '/* ' + f + ' */\n' + readFileSync(join(pastaApp, 
 console.log('módulos:', modulos.join(', '));
 
 const fontes = readFileSync(src('fontes.css'), 'utf8');
-const estilo = readFileSync(src('estilo.css'), 'utf8');
+// Os comentários do estilo.css são a documentação de design: ficam no fonte e saem do
+// app entregue (economizam uns 30 KB do index.html, que tem teto de 1 MB).
+const estilo = readFileSync(src('estilo.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n\s*\n+/g, '\n');
 const molde = readFileSync(src('index.html'), 'utf8');
 
 mkdirSync(dist(), { recursive: true });
@@ -58,7 +70,7 @@ console.log('bíblias:', biblias.map((b) => b.abreviatura).join(', ') || 'nenhum
 // Vêm prontos de src/icones/, gerados da arte em arte/icone-app.png por
 // ferramentas/icones.ps1. Reduzir um PNG exige decodificá-lo, e o build roda no Docker
 // sem dependência nenhuma: aqui os ícones só são copiados. A arte é só do ícone da
-// tela de início e do favicon; dentro do app quem aparece é o mascote.
+// tela de início e do favicon; dentro do app a marca aparece como o símbolo GE.
 const iconesProntos = readdirSync(src('icones')).filter((f) => f.endsWith('.png')).sort();
 for (const f of iconesProntos) copyFileSync(src('icones', f), dist(f));
 
@@ -86,14 +98,16 @@ const iconeEmbutido = 'data:image/png;base64,' + readFileSync(src('icones', 'ico
 const manifesto = {
   name: 'Geração Eleita',
   short_name: 'Geração Eleita',
-  description: 'Plano de leitura bíblica de 365 dias, com trilha e ofensiva de dias seguidos.',
+  description: 'A Bíblia inteira em um ano, com os amigos e a sua célula: uma leitura por dia e reflexões para quem está começando.',
   lang: 'pt-BR',
   start_url: './',
   scope: './',
   display: 'standalone',
   orientation: 'portrait',
-  background_color: '#fdfbf5',
-  theme_color: '#fdfbf5',
+  // A tela de abertura do Android pinta este fundo com o ícone no meio: o mesmo preto do
+  // ícone (#0b0b0b), para a abertura ser igual ao app instalado. O creme era da paleta antiga.
+  background_color: '#0b0b0b',
+  theme_color: '#0b0b0b',
   icons: icones.map(({ tamanho, arquivo, proposito }) => ({
     src: './' + arquivo + '?v=' + versaoIcones,
     sizes: tamanho + 'x' + tamanho,
@@ -103,30 +117,59 @@ const manifesto = {
 };
 writeFileSync(dist('manifest.webmanifest'), JSON.stringify(manifesto, null, 2), 'utf8');
 
+// ---------- conteúdo ----------
+// O plano, as reflexões e as notas (4 MB) moram num arquivo à parte, com um resumo no nome,
+// como as bíblias. Dentro do index.html, qualquer mudança de código fazia todo mundo baixar
+// o conteúdo de novo; separado, ele só é baixado quando muda de verdade.
+for (const velho of readdirSync(dist()).filter((f) => /^conteudo\.[0-9a-f]+\.json(\.gz)?$/.test(f))) rmSync(dist(velho));
+const resumoConteudo = createHash('sha256').update(dados).digest('hex').slice(0, 10);
+const arquivoConteudo = 'conteudo.' + resumoConteudo + '.json';
+writeFileSync(dist(arquivoConteudo), dados, 'utf8');
+writeFileSync(dist(arquivoConteudo + '.gz'), gzipSync(Buffer.from(dados, 'utf8'), { level: 9 }));
+
 // ---------- página ----------
-const json = dados.replace(/</g, '\\u003c');
+// O app roda só depois que o conteúdo chega: o código inteiro vira a função iniciarApp,
+// chamada pelo carregador logo abaixo dela.
+const carregador = `(function () {
+  function falhou() {
+    var a = document.getElementById('abertura');
+    if (!a) return;
+    // sem onclick no HTML: a CSP não deixa rodar código escrito dentro da marcação
+    a.insertAdjacentHTML('beforeend', '<p class="abertura-erro">Não consegui carregar o conteúdo agora.<br><button type="button">Tentar de novo</button></p>');
+    a.querySelector('.abertura-erro button').addEventListener('click', function () { location.reload(); });
+  }
+  fetch(window.CONTEUDO_ARQUIVO)
+    .then(function (r) { if (!r.ok || (r.headers.get('content-type') || '').indexOf('json') < 0) throw new Error('conteúdo'); return r.json(); })
+    .then(function (d) { window.DADOS = d; window.iniciarApp(); })
+    .catch(falhou);
+})();`;
 const html = molde
   .replace(/\/\*FONTES\*\//g, () => fontes)
   .replace(/\/\*ESTILO\*\//g, () => estilo)
-  .replace(/\/\*DADOS\*\//g, () => 'window.DADOS=' + json + ';'
+  .replace(/\/\*CONTEUDO_ARQUIVO\*\//g, () => arquivoConteudo)
+  .replace(/\/\*DADOS\*\//g, () => 'window.CONTEUDO_ARQUIVO=' + JSON.stringify(arquivoConteudo) + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
-  .replace(/\/\*APP\*\//g, () => js)
+  .replace(/\/\*APP\*\//g, () => 'window.iniciarApp = function () {\n' + js + '\n};\n' + carregador)
   .replace(/\/\*ICONE\*\//g, () => iconeEmbutido)
   .replace(/\/\*VERSAO_ICONES\*\//g, () => versaoIcones)
   .replace(/\/\*ABERTURA\*\//g, () => montarAbertura());
 
 // A versão sai do conteúdo da página, com o marcador ainda no lugar, e depois entra nela:
 // assim o app compara a versão que está rodando com a que o servidor publicou.
-const versao = createHash('sha256').update(html).digest('hex').slice(0, 12);
-writeFileSync(dist('index.html'), html.replace(/\/\*VERSAO_APP\*\//g, versao), 'utf8');
+// O conteúdo entra na conta: mudou só o texto de uma reflexão, muda a versão também.
+const versao = createHash('sha256').update(html).update(resumoConteudo).digest('hex').slice(0, 12);
+const paginaFinal = html.replace(/\/\*VERSAO_APP\*\//g, versao);
+writeFileSync(dist('index.html'), paginaFinal, 'utf8');
+// Comprimida ao lado, como as bíblias e o conteúdo.
+writeFileSync(dist('index.html.gz'), gzipSync(Buffer.from(paginaFinal, 'utf8'), { level: 9 }));
 
 // ---------- tela de entrada ----------
 // Vive fora do index.html porque o servidor a entrega antes de saber quem é a
 // pessoa: mandar os 4 MB do aplicativo para quem ainda não entrou seria absurdo.
-// A privacidade também é pública: quem recebe um convite pode ler antes de criar conta.
+// A privacidade e os termos também são públicos: quem recebe um convite pode ler antes de criar conta.
 const simboloSvg = montarAbertura()
   .replace(/^[\s\S]*?(<svg)/, '$1').replace(/<\/svg>[\s\S]*$/, '</svg>');
-for (const pagina of ['entrar.html', 'privacidade.html']) {
+for (const pagina of ['entrar.html', 'privacidade.html', 'termos.html']) {
   const html = readFileSync(src(pagina), 'utf8')
     .replace(/\/\*FONTES\*\//g, () => fontes)
     .replace(/\/\*SIMBOLO\*\//g, () => simboloSvg)
@@ -144,7 +187,7 @@ const CACHE = 'caminho-${versao}';
 // cada arquivo só muda quando o texto muda, e baixar 4 MB a cada versão seria desperdício.
 const CACHE_BIBLIAS = 'caminho-biblias';
 const ARQUIVOS = ${JSON.stringify(
-  ['./', './index.html', './manifest.webmanifest', './apple-touch-icon.png', './icone-48.png']
+  ['./', './index.html', './' + arquivoConteudo, './manifest.webmanifest', './apple-touch-icon.png', './icone-48.png']
     .concat(icones.map((i) => './' + i.arquivo)))};
 const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
 
@@ -193,7 +236,7 @@ self.addEventListener('fetch', (ev) => {
 self.addEventListener('push', (ev) => {
   let d = {};
   try { d = ev.data ? ev.data.json() : {}; } catch (e) { d = { corpo: ev.data ? ev.data.text() : '' }; }
-  ev.waitUntil(self.registration.showNotification(d.titulo || 'Caminho com Cristo', {
+  ev.waitUntil(self.registration.showNotification(d.titulo || 'Geração Eleita', {
     body: d.corpo || '',
     icon: './icone-192.png',
     tag: d.tag || 'caminho',

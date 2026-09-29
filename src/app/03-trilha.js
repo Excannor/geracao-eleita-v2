@@ -113,22 +113,6 @@
       + '</div></div>';
   }
 
-  function figuraAoLado(u, numero, atual, passo) {
-    const lado = deslocamento(passo) > 0 ? 'esquerda' : 'direita';
-    if (numero === atual) {
-      return '<div class="figura-trilha ' + lado + ' mascote" aria-hidden="true">'
-        + CC.mascoteSvg(CC.leu(numero) ? 'feliz' : 'parado') + '</div>';
-    }
-    const elenco = CC.personagensDaUnidade(u.numero);
-    const total = u.ate - u.de + 1;
-    const vao = Math.floor(total / (elenco.length + 1));
-    const indice = elenco.findIndex((_, i) => numero === u.de + vao * (i + 1));
-    if (indice === -1) return '';
-    const nome = elenco[indice];
-    return '<div class="figura-trilha ' + lado + (CC.leu(numero) ? '' : ' adiante') + '" '
-      + 'title="' + CC.esc(nome) + '">' + CC.personagemSvg(nome) + '</div>';
-  }
-
   function faixa(u, aberta) {
     const p = progressoUnidade(u);
     const travada = p.feitos === 0 && u.de > CC.diaAtual();
@@ -174,7 +158,7 @@
     }
     const novo = CC.ler('lidos', []).length < 3 && CC.ler('licoes', []).length < D.licoes.length;
     const primeira = !CC.ler('lidos', []).length;
-    return (primeira ? '<p class="fala-bento pequena apresenta">Bem-vindo! Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
+    return (primeira ? '<p class="fala-bento pequena apresenta">Que bom ter você aqui! Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
       + '<div class="leitura-hoje">'
       + '<span class="etiqueta">Leitura de hoje · Dia ' + atual + '</span>'
       + '<b class="passagem-hoje">' + CC.esc(passagemDe(dia)) + '</b>'
@@ -185,23 +169,14 @@
       + '</div>';
   }
 
-  // ---------- atalho de amigos ----------
-  CC.cartaoAmigosTrilha = function (dados) {
-    if (!location.protocol.startsWith('http') || !dados || !dados.perfilCompleto) return '';
-    const amigos = dados.amigos || [];
-    if (!amigos.length) {
-      return '<button class="atalho-trilha vazio-proposito" data-convidar>'
-        + '<span class="marca-atalho c-azul">' + CC.ico('pessoas') + '</span>'
-        + '<span class="texto-atalho"><b>Convidar</b><small>ler junto</small></span></button>';
-    }
-    const melhor = amigos.reduce((m, a) => (a.dias > m.dias ? a : m), amigos[0]);
-    return '<a class="atalho-trilha com-amigos" href="#/novidades">'
-      + '<span class="rostos">' + amigos.slice(0, 3).map((a) => CC.retratoAmigo(a, 'mini')).join('') + '</span>'
-      + '<span class="texto-atalho"><b>' + CC.icoChama() + melhor.dias + '</b><small>' + (melhor.dias === 1 ? 'dia' : 'dias') + ' juntos</small></span></a>';
-  };
-
   // ---------- a tela ----------
   CC.vistaTrilha = function (raiz) {
+    // Quem está no Conhecer Jesus vê os 14 dias aqui, no lugar do plano anual: é o caminho
+    // dela até decidir seguir Jesus (ou trocar de volta pelo link discreto no fim da lista).
+    if (CC.quem && CC.quem.caminho === 'conhecer' && CC.vistaConhecer) {
+      CC.vistaConhecer(raiz, true);
+      return;
+    }
     const atual = CC.diaAtual();
     const uAtual = unidadeDoDia(atual);
     if (abertas === null) abertas = new Set([uAtual.numero]);
@@ -284,7 +259,7 @@
 
   // ---------- balão do nó ----------
   function fecharPop() {
-    document.querySelectorAll('.pop-no').forEach((p) => p.remove());
+    document.querySelectorAll('.pop-no').forEach((p) => CC.sair(p, 140));
     document.querySelectorAll('.no.aberto').forEach((n) => n.classList.remove('aberto'));
   }
   CC.fecharPopNo = fecharPop;
@@ -318,14 +293,14 @@
     const feito = CC.leu(numero);
     const atual = numero === CC.diaAtual();
     const adiante = !feito && !atual;
-    const fala = atual && !feito ? '<p class="fala-bento">' + CC.esc(CC.falaMascote(CC.amigosEmCache && CC.amigosEmCache())) + '</p>' : '';
+    const fala = atual && !feito ? '<p class="fala-bento">' + CC.esc(CC.falaDoDia(CC.amigosEmCache && CC.amigosEmCache())) + '</p>' : '';
     const pop = montarPop(botao, adiante ? 'adiante' : 'c-' + u.cor,
       '<b class="titulo-pop">' + CC.esc(passagemDe(dia)) + '</b>'
       + '<span class="sub-pop">Dia ' + numero + ' de ' + D.plano.length + ' · uns ' + CC.minutosDoDia(dia) + ' min</span>'
       + fala
       + (adiante ? '<span class="sub-pop">Este dia vem mais adiante, mas pode ler agora se quiser.</span>' : '')
       + '<button class="botao ' + (adiante ? 'contorno' : 'branco') + '" data-comecar="' + numero + '">'
-      + (feito ? 'Revisar' : (adiante ? 'Ler mesmo assim' : 'Começar <span class="xp-pop">+' + CC.XP_LEITURA + ' XP</span>')) + '</button>');
+      + (feito ? 'Revisar' : (adiante ? 'Ler mesmo assim' : 'Começar')) + '</button>');
     if (!pop) return;
     pop.querySelector('[data-comecar]').onclick = () => { fecharPop(); CC.abrirLicao(numero); };
   }
@@ -339,34 +314,7 @@
     if (pop) pop.onclick = (ev) => ev.stopPropagation();
   }
 
-  // ---------- baú e cartas ----------
-  CC.cartaHtml = function (nome) {
-    const id = '11 - Pessoas/' + nome;
-    const nota = D.notas[id];
-    const sub = nota && nota.sub ? nota.sub.split('·')[0].trim() : '';
-    return '<div class="carta">'
-      + '<div class="carta-arte">' + CC.personagemSvg(nome) + '</div>'
-      + '<div class="carta-texto"><span class="etiqueta">' + CC.esc(sub || 'Personagem') + '</span>'
-      + '<h2>' + CC.esc(nome) + '</h2>'
-      + (nota && nota.resumo ? '<p>' + CC.esc(nota.resumo) + '</p>' : '')
-      + '</div></div>';
-  };
-
-  CC.mostrarCarta = function (nome) {
-    const nota = D.notas['11 - Pessoas/' + nome];
-    CC.telaCheia('<div class="cena-carta">' + CC.cartaHtml(nome) + '</div>', {
-      classe: 'tela-carta',
-      rotulo: 'Carta de ' + nome,
-      pe: (nota ? '<button class="botao contorno" data-ler-nota>Ler sobre ' + CC.esc(nome) + '</button>' : '')
-        + '<button class="botao" data-fechar-tela>Fechar</button>',
-      ligar: (el, fechar) => {
-        el.querySelector('[data-fechar-tela]').onclick = fechar;
-        const ler = el.querySelector('[data-ler-nota]');
-        if (ler) ler.onclick = () => { fechar(); location.hash = '#/nota/' + encodeURIComponent('11 - Pessoas/' + nome); };
-      },
-    });
-  };
-
+  // ---------- baú ----------
   CC.telaBau = function (numero) {
     const u = unidadeDoDia(numero);
     CC.telaCheia('<div class="cena-bau">'

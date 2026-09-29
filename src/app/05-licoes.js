@@ -38,6 +38,4 @@
       + '<div class="lista-licoes caixa-lista">' + lista + '</div>';
   };
 
-  // O nome antigo da rota continua abrindo a tela.
-  CC.vistaLicoes = CC.vistaPassos;
 })(window.CC);

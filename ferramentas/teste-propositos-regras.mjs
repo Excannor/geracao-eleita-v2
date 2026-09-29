@@ -83,5 +83,23 @@ ok(R.sequenciaDoGrupo({ tipo: 'plano', batidaEm: (d) => batidos.has(d), desde: '
 ok(R.sequenciaDoGrupo({ tipo: 'livro', batidaEm: (d) => batidos.has(d), desde: '2026-03-01', hoje: '2026-03-06' }) === 4, 'grupo de livro soma os dias batidos, seguidos ou não');
 ok(R.sequenciaDoGrupo({ tipo: 'plano', batidaEm: () => true, desde: '2026-03-04', hoje: '2026-03-06' }) === 3, 'a sequência não conta antes de o grupo existir');
 
+// ---------- célula: quem precisa de atenção ----------
+{
+  const A = (candidatos, encontros, referencia = '2026-03-20') => R.quemPrecisaDeAtencao({ candidatos, encontros, referencia });
+  const enc = [{ data: '2026-03-12', presentes: ['bia'] }, { data: '2026-03-19', presentes: ['bia'] }];
+  const leu = (...d) => new Set(d);
+  const r1 = A([{ usuario: 'ana', nome: 'Ana', entrouEm: '2026-03-01', datas: leu('2026-03-19') },
+    { usuario: 'bia', nome: 'Bia', entrouEm: '2026-03-01', datas: leu('2026-03-19') }], enc);
+  ok(r1.length === 1 && r1[0].usuario === 'ana' && r1[0].motivo === 'faltou aos 2 últimos encontros', 'quem faltou aos 2 últimos encontros aparece, com o motivo');
+  ok(!A([{ usuario: 'caio', nome: 'Caio', entrouEm: '2026-03-15', datas: leu('2026-03-19') }], enc).length,
+    'quem entrou depois do penúltimo encontro não conta como quem faltou');
+  ok(!A([{ usuario: 'ana', nome: 'Ana', entrouEm: '2026-03-01', datas: leu() }], [enc[1]], '2026-03-04').length,
+    'com um encontro só, ninguém "faltou aos 2"; e 3 dias sem ler ainda não pede atenção');
+  const r4 = A([{ usuario: 'davi', nome: 'Davi', entrouEm: '2026-03-01', datas: leu('2026-03-10') }], []);
+  ok(r4.length === 1 && r4[0].motivo === 'sem ler há 10 dias', 'sem ler há 5 dias ou mais aparece com a contagem certa');
+  const muitos = Array.from({ length: 8 }, (_, i) => ({ usuario: 'u' + i, nome: 'Pessoa ' + i, entrouEm: '2026-03-01', datas: leu() }));
+  ok(A(muitos, []).length === R.LIMITE_ATENCAO, 'a lista mostra no máximo ' + R.LIMITE_ATENCAO + ' pessoas');
+}
+
 console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  as regras dos propósitos estão certas\n');
 process.exit(falhas ? 1 : 0);

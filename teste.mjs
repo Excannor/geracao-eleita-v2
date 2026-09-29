@@ -10,8 +10,10 @@ import { createHmac } from 'node:crypto';
 import { fecharBanco, arquivoDoBanco } from './db.mjs';
 import {
   Contas, diasDeProposito, resumoDeAmigo, somaDias, nascimentoValido,
+  somaAnos, idadeMinimaOk, hojeNoFuso, FUSO_PADRAO, IDADE_MINIMA,
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
+import { montarPainel } from './painel.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 let falhas = 0;
@@ -42,7 +44,9 @@ checar(D.plano.every((d) => d.antigo || d.novo), 'todo dia tem ao menos uma pass
 {
   const { notaOculta } = await import('./ferramentas/ajustes-conteudo.mjs');
   const visiveis = Object.keys(D.notas).filter((id) => !notaOculta(D, id));
-  const textoDe = (n) => [n.nome, n.sub, n.resumo, n.destaque, (n.html || '').replace(/<[^>]+>/g, ' ')].join(' ');
+  // A citação do versículo é o texto da tradução, como ela escreve: o travessão dela fica.
+  const textoDe = (n) => [n.nome, n.sub, n.resumo, n.destaque, (n.html || '')
+    .replace(/<blockquote data-verso="[^"]*">[\s\S]*?<\/blockquote>/, ' ').replace(/<[^>]+>/g, ' ')].join(' ');
   const comTravessao = visiveis.filter((id) => /[—–]/.test(textoDe(D.notas[id])));
   const citamArquivo = visiveis.filter((id) => /\bvault\b|obsidian|\btemplates?\b|frontmatter/i.test(textoDe(D.notas[id])));
   const linkOculto = visiveis.filter((id) => [...(D.notas[id].html || '').matchAll(/data-nota="([^"]+)"/g)].some((m) => notaOculta(D, m[1])));
@@ -50,6 +54,14 @@ checar(D.plano.every((d) => d.antigo || d.novo), 'todo dia tem ao menos uma pass
   checar(!citamArquivo.length, 'os textos visíveis não citam vault, modelos ou Obsidian' + (citamArquivo.length ? ' (' + citamArquivo.slice(0, 3).join(', ') + ')' : ''));
   checar(!linkOculto.length, 'nenhum texto visível leva a uma página de bastidor' + (linkOculto.length ? ' (' + linkOculto.slice(0, 3).join(', ') + ')' : ''));
   checar(D.unidades.every((u) => !/[—–]/.test(u.titulo)), 'os títulos das unidades não têm travessão');
+  // "Volta para: Home" era a navegação do vault, sem sentido no app.
+  const voltaPara = visiveis.filter((id) => /Volta para:/.test(textoDe(D.notas[id])));
+  checar(!voltaPara.length, 'nenhum texto visível manda "voltar para" uma página do vault' + (voltaPara.length ? ' (' + voltaPara.slice(0, 3).join(', ') + ')' : ''));
+  // O "Comece por aqui" do Explorar aponta para notas que existem e que a pessoa pode abrir.
+  const fonteExplorar = readFileSync(join(AQUI, 'src', 'app', '06-explorar.js'), 'utf8');
+  const blocoComece = (fonteExplorar.match(/const COMECE = \[([\s\S]*?)\]\.filter/) || [])[1] || '';
+  const idsComece = [...blocoComece.matchAll(/\['([^']+)'/g)].map((m) => m[1]).concat(/\[HISTORIA,/.test(blocoComece) ? ['00 - Início/A história bíblica em uma página'] : []);
+  checar(idsComece.length === 8 && idsComece.every((id) => D.notas[id] && !notaOculta(D, id)), 'os 8 passos do "Comece por aqui" são notas visíveis (' + idsComece.length + ')');
 }
 
 const LIVROS = new Set();
@@ -95,10 +107,15 @@ secao('arquivo gerado');
 const dist = (f) => join(AQUI, 'dist', f);
 checar(existsSync(dist('index.html')), 'dist/index.html existe');
 const html = readFileSync(dist('index.html'), 'utf8');
-for (const marcador of ['/*APP*/', '/*ESTILO*/', '/*DADOS*/', '/*FONTES*/', '/*ICONE*/']) {
+for (const marcador of ['/*APP*/', '/*ESTILO*/', '/*DADOS*/', '/*FONTES*/', '/*ICONE*/', '/*CONTEUDO_ARQUIVO*/']) {
   checar(!html.includes(marcador), 'o marcador ' + marcador + ' foi substituído');
 }
-checar(html.includes('window.DADOS=') && html.includes('@font-face') && html.includes('window.CC'), 'dados, fonte e app estão embutidos');
+checar(html.includes('@font-face') && html.includes('window.CC') && html.includes('window.iniciarApp'), 'fonte e app estão embutidos');
+// O conteúdo mora num arquivo à parte, com resumo no nome, e a página só aponta para ele.
+const arquivoConteudo = (html.match(/window\.CONTEUDO_ARQUIVO="(conteudo\.[0-9a-f]+\.json)"/) || [])[1];
+checar(!!arquivoConteudo && existsSync(dist(arquivoConteudo)) && !html.includes('"plano":'), 'o conteúdo saiu do index.html para ' + arquivoConteudo);
+checar(readFileSync(dist('sw.js'), 'utf8').includes('./' + arquivoConteudo), 'o service worker guarda o conteúdo para abrir sem rede');
+checar(Buffer.byteLength(html) < 1024 * 1024, 'o index.html ficou abaixo de 1 MB (' + Math.round(Buffer.byteLength(html) / 1024) + ' KB)');
 // Três blocos: o tema (uma linha, para a abertura já nascer no tema escolhido), os dados e o app.
 checar(html.split('<script').length - 1 === 3, 'há exatamente três blocos de script: tema da abertura, dados e aplicativo');
 checar(!html.includes('coluna-lado'), 'a coluna de resumo das telas largas saiu');
@@ -118,13 +135,14 @@ for (const n of Object.values(D.notas)) wikilinks += (n.html.match(/\[\[[^\]]*\]
 checar(wikilinks === 0, 'nenhum wikilink ficou sem virar link (' + wikilinks + ')');
 checar(statSync(dist('index.html')).size < 8 * 1024 * 1024, 'o arquivo cabe em 8 MB');
 
-for (const f of ['manifest.webmanifest', 'sw.js', 'icone-192.png', 'icone-512.png', 'icone-mascara-512.png', 'apple-touch-icon.png', 'icone-48.png', 'entrar.html', 'privacidade.html']) {
+for (const f of ['manifest.webmanifest', 'sw.js', 'icone-192.png', 'icone-512.png', 'icone-mascara-512.png', 'apple-touch-icon.png', 'icone-48.png', 'entrar.html', 'privacidade.html', 'termos.html']) {
   checar(existsSync(dist(f)), 'dist/' + f + ' existe');
 }
 const entrar = readFileSync(dist('entrar.html'), 'utf8');
 const semMarcador = (texto) => !/\/\*(FONTES|SIMBOLO|USUARIO)\*\//.test(texto);
 checar(semMarcador(entrar) && entrar.includes('type="date"') && entrar.includes('api/criar-conta'), 'a entrada tem o cadastro com data de nascimento');
 checar(semMarcador(readFileSync(dist('privacidade.html'), 'utf8')), 'a página de privacidade foi montada');
+checar(semMarcador(readFileSync(dist('termos.html'), 'utf8')) && readFileSync(dist('termos.html'), 'utf8').includes('Regras de convivência'), 'a página de termos de uso foi montada');
 checar(/rel="apple-touch-icon" href="apple-touch-icon\.png\?v=\w+"/.test(entrar) && entrar.includes('rel="manifest"')
   && /rel="icon" href="data:image\/png;base64,/.test(entrar), 'a entrada declara ícone e manifesto: é dela que se adiciona à tela de início');
 const paginaApp = readFileSync(dist('index.html'), 'utf8');
@@ -194,15 +212,42 @@ const CC = contexto.window.CC;
   for (const d of D.plano) {
     const r = CC.reflexaoDoDia(d.numero);
     if (!r.ref && !r.nota) { semReflexao.push(d.numero); continue; }
-    if (r.perguntas.length !== 3 || r.oracao.length !== 3) semReflexao.push(d.numero);
+    // 2 ou 3 perguntas: as reflexões revistas têm a quantidade que o texto pede
+    if (r.perguntas.length < 2 || r.perguntas.length > 3 || r.oracao.length !== 3) semReflexao.push(d.numero);
     if (!r.ref) continue;
     const m = /^(.+?) (\d+)\./.exec(r.ref);
     if (!d.trechos.some((t) => t.livro === m[1] && Number(m[2]) >= t.de && Number(m[2]) <= t.ate)) foraDaLeitura.push(d.numero);
     if (!existe(nbv, r.ref) || !existe(blivre, r.ref)) semTexto.push(d.numero);
   }
-  checar(!semReflexao.length, 'os 365 dias têm versículo ou nota, três perguntas e três começos de oração' + (semReflexao.length ? ' (' + semReflexao.join(', ') + ')' : ''));
+  checar(!semReflexao.length, 'os 365 dias têm versículo ou nota, 2 ou 3 perguntas e três começos de oração' + (semReflexao.length ? ' (' + semReflexao.join(', ') + ')' : ''));
   checar(!foraDaLeitura.length, 'o versículo para guardar está dentro da leitura do dia' + (foraDaLeitura.length ? ' (' + foraDaLeitura.join(', ') + ')' : ''));
   checar(!semTexto.length, 'todo versículo para guardar existe nas duas traduções' + (semTexto.length ? ' (' + semTexto.join(', ') + ')' : ''));
+
+  // Integridade das Bíblias (conferida em 2026-09-23): 66 livros com os mesmos nomes e na
+  // mesma ordem, nenhum versículo vazio, e a única diferença de contagem entre as duas é a
+  // versificação da NBV, que divide em dois o último versículo de Juízes 5, 1 Samuel 20 e
+  // 3 João (31.105 contra 31.102). Uma importação nova que desalinhe capítulos cai aqui.
+  const livrosN = Object.keys(nbv.livros);
+  const vazio = (b) => Object.values(b.livros).flat().flat().some((v) => !v || !String(v).trim());
+  const diferentes = [];
+  for (const l of livrosN) (nbv.livros[l] || []).forEach((cap, i) => {
+    if (cap.length !== ((blivre.livros[l] || [])[i] || []).length) diferentes.push(l + ' ' + (i + 1));
+  });
+  checar(livrosN.length === 66 && JSON.stringify(livrosN) === JSON.stringify(Object.keys(blivre.livros))
+    && !vazio(nbv) && !vazio(blivre) && diferentes.join() === 'Juízes 5,1 Samuel 20,3 João 1',
+    'as duas Bíblias têm os 66 livros alinhados, sem versículo vazio' + (diferentes.join() === 'Juízes 5,1 Samuel 20,3 João 1' ? '' : ' (capítulos diferentes: ' + diferentes.join(', ') + ')'));
+
+  // As notas de versículo do Explorar citavam a NVI, que não tem licença para o app: o texto
+  // tem de vir das Bíblias do app, uma versão por tradução.
+  const versiculos = Object.values(D.notas).filter((n) => n.pasta === '08 - Versículos' && /^.+ \d+\.\d+(-\d+)?$/.test(n.nome));
+  const foraDasBiblias = versiculos.filter((n) => !n.versos || !n.versos.nbv || !n.versos.blivre
+    || n.texto !== n.versos.nbv || !n.html.includes('<blockquote data-verso='));
+  checar(versiculos.length > 100 && !foraDasBiblias.length, 'as notas de versículo do Explorar trazem o texto da NBV e da Bíblia Livre, e não o da NVI'
+    + (foraDasBiblias.length ? ' (' + foraDasBiblias.slice(0, 5).map((n) => n.nome).join(', ') + ')' : ''));
+  const livros = Object.values(D.notas).filter((n) => n.pasta === '03 - Livros da Bíblia' && /<h2>Versículo-chave<\/h2>/.test(n.html));
+  const chaveForaDasBiblias = livros.filter((n) => !n.versos || !n.versos.nbv || !n.versos.blivre || !/<h2>Versículo-chave<\/h2>\s*<blockquote data-verso=/.test(n.html));
+  checar(livros.length === 66 && !chaveForaDasBiblias.length, 'o versículo-chave dos 66 livros vem da NBV e da Bíblia Livre'
+    + (chaveForaDasBiblias.length ? ' (' + chaveForaDasBiblias.slice(0, 5).map((n) => n.nome).join(', ') + ')' : ''));
 }
 const dias = (ini, n) => Array.from({ length: n }, (_, i) => somaDias(ini, i));
 
@@ -257,6 +302,108 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
 
+// --- conhecer jesus: fusão de "conhecidos" e ofensiva ---
+{
+  const c1 = CC.fundir({ conhecidos: { 1: '2026-03-05', 2: '2026-03-06' } }, { conhecidos: { 2: '2026-03-01', 3: '2026-03-07' } }).conhecidos;
+  checar(c1['1'] === '2026-03-05' && c1['2'] === '2026-03-01' && c1['3'] === '2026-03-07',
+    'conhecidos: união por dia, e no mesmo dia vale a data mais antiga (quando a pessoa terminou de verdade)');
+  const datas = CC.datasFeitas({ marcadoEm: { 1: '2026-03-01' }, licoesEm: {}, conhecidos: { 1: '2026-03-02', 2: '2026-03-03' } });
+  checar(datas.has('2026-03-02') && datas.has('2026-03-03') && datas.size === 3, 'datasFeitas conta também os dias do Conhecer Jesus');
+}
+
+// --- versículos: referência, marca-texto e notas (04e-versiculos.js) ---
+for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
+  runInContext(readFileSync(join(AQUI, 'src', 'app', f), 'utf8'), contexto, { filename: f });
+}
+{
+  const r = CC.lerRef('1 João 4.7-8');
+  checar(r && r.livro === '1 João' && r.cap === 4 && r.de === 7 && r.ate === 8 && CC.lerRef('Salmos 23.1').livro === 'Salmos',
+    'a referência lê livro com número, Salmos e trecho');
+  checar(!CC.lerRef('João 3.16-30') && !CC.lerRef('João 3.18-16') && !CC.lerRef('João 3') && CC.escreverRef('João', 3, 16, 18) === 'João 3.16-18',
+    'trecho acima de 10 versículos, invertido ou sem versículo não vale; escrever devolve o mesmo formato');
+  checar(CC.conferirNovidade('versiculo', { ref: 'João 3.16-18' }, null, '2026-03-01') && !CC.conferirNovidade('versiculo', { ref: 'João 3.1-36' }, null, '2026-03-01')
+    && !CC.conferirNovidade('versiculo', { ref: 'Livro Nenhum 1.1' }, null, '2026-03-01'),
+    'o Juntos aceita trecho de até 10 versículos de um livro que existe');
+
+  const agora = Date.now();
+  const a = { atualizadoEm: 10, marcas: { 'João 3:16': { cor: 2, em: agora - 1000 }, 'João 3:17': { cor: 1, em: agora - 5000 } } };
+  const b = { atualizadoEm: 20, marcas: { 'João 3:16': { cor: 0, em: agora - 500 }, 'João 3:17': { cor: 3, em: agora - 9000 },
+    'Rute 1:16': { cor: 0, em: agora - 100 * 864e5 }, 'Rute 1:17': { cor: 4, em: agora - 100 * 864e5 } } };
+  const m = CC.fundir(a, b).marcas;
+  checar(m['João 3:16'].cor === 0 && m['João 3:17'].cor === 1, 'marca-texto: vale a mudança mais recente, e apagar num aparelho não volta pelo outro');
+  checar(!m['Rute 1:16'] && m['Rute 1:17'].cor === 4, 'marca apagada há mais de 90 dias some; marca antiga de verdade fica');
+  checar(JSON.stringify(CC.fundir(a, b).marcas) === JSON.stringify(CC.fundir(b, a).marcas), 'a fusão das marcas dá o mesmo nos dois sentidos');
+
+  // --- minha história com Deus: fusão pelo "em" mais recente, sem misturar campos ---
+  const h1 = { antes: 'era perdido', encontro: 'numa célula', hoje: 'tenho paz', em: 1000 };
+  const h2 = { antes: 'outra versão', encontro: 'outro jeito', hoje: 'outra coisa', em: 2000 };
+  checar(CC.fundir({ historia: h1 }, { historia: h2 }).historia === h2, 'a história mais recente (maior "em") vence inteira, sem misturar campos');
+  checar(CC.fundir({ historia: h2 }, { historia: h1 }).historia === h2, 'a fusão da história dá o mesmo resultado nos dois sentidos');
+  checar(CC.fundir({ historia: h1 }, { historia: null }).historia === h1, 'sem história no outro lado, a que existe se mantém');
+  checar(CC.fundir({}, {}).historia === undefined || CC.fundir({}, {}).historia === null, 'sem história nos dois lados, continua vazia');
+
+  const E = CC.estado();
+  E.marcas = { 'João 3:16': { cor: 2, em: 3 }, 'João 3:17': { cor: 2, em: 4 }, 'João 3:18': { cor: 1, em: 5 }, 'João 3:19': { cor: 0, em: 6 } };
+  E.anotacoes = { 'verso:João 3.16-18': 'Deus amou primeiro.', 'nota:x': 'outra', 'verso:Rute 1.16': '  ' };
+  const marcados = CC.versiculos.marcados();
+  checar(marcados.length === 2 && marcados.some((t) => t.ref === 'João 3.16-17' && t.cor === 2) && marcados.some((t) => t.ref === 'João 3.18' && t.cor === 1),
+    'Meus versículos junta versículos seguidos da mesma cor num trecho e ignora marca apagada');
+  checar(CC.versiculos.comNota().length === 1 && CC.versiculos.comNota()[0].ref === 'João 3.16-18', 'nota vazia não aparece em Meus versículos');
+  const an = CC.minhasAnotacoes();
+  checar(an.porVerso.length === 1 && an.porVerso[0].href === '#/biblia/Jo%C3%A3o/3' && !an.porNota.some((n) => n.titulo.includes('verso')),
+    'Minhas anotações separa as notas de versículo das do Explorar, com link para a Bíblia');
+  const exp = CC.montarExportacao();
+  checar(exp.includes('## Notas nos versículos') && exp.includes('### João 3.16-18') && !exp.includes('verso:'), 'o arquivo baixado leva as notas de versículo com a referência como título');
+  E.marcas = {};
+  E.anotacoes = {};
+}
+
+// --- frases do carimbo da ofensiva (01c-arte.js) ---
+runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), contexto, { filename: '01c-arte.js' });
+{
+  const frases = CC.FRASES_OFENSIVA;
+  const biblias = ['nbv', 'blivre'].map((s) => JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', s + '.json'), 'utf8')));
+  const longas = frases.filter((f) => !f.linhas.length || f.linhas.length > 6 || f.linhas.some((l) => l.length > 20));
+  const refsRuins = frases.filter((f) => f.ref && (() => {
+    const r = CC.lerRef(f.ref);
+    return !r || biblias.some((b) => ((b.livros[r.livro] || [])[r.cap - 1] || []).slice(r.de - 1, r.ate).filter(Boolean).length !== r.ate - r.de + 1);
+  })());
+  checar(frases.length === 18 && !longas.length, 'as 18 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
+    + (longas.length ? ' (' + longas.map((f) => f.linhas[0]).join(', ') + ')' : ''));
+  checar(!refsRuins.length, 'toda frase da ofensiva com referência aponta para versículos que existem nas duas Bíblias'
+    + (refsRuins.length ? ' (' + refsRuins.map((f) => f.ref).join(', ') + ')' : ''));
+  let repetiu = false;
+  let antes = null;
+  for (let i = 0; i < 400; i++) { const f = CC.fraseDaOfensiva(); if (f === antes) repetiu = true; antes = f; }
+  checar(!repetiu, 'o sorteio da ofensiva nunca repete a frase da vez anterior');
+}
+
+// --- quebra de linhas e tamanho de letra do cartão de versículo (01c-arte.js) ---
+{
+  // Régua sintética: cada letra "pesa" o mesmo tanto (0.56 do tamanho da fonte), como uma
+  // fonte monoespaçada. Não precisa ser exata: só precisa crescer com o tamanho da fonte e
+  // com o comprimento do texto, do jeito que um medidor de canvas de verdade se comporta.
+  const medir = (t, f) => t.length * f * 0.56;
+
+  const curto = CC.ajustarTextoCartao('Deus é amor', { larguraMax: 900, alturaMax: 1200, fonteMax: 90, medir });
+  checar(curto.linhas.length === 1 && curto.tamanho === 90, 'texto curto cabe numa linha só, no tamanho máximo (' + curto.linhas.length + ' linha(s), ' + curto.tamanho + 'px)');
+
+  const versiculo = 'Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna';
+  const medio = CC.ajustarTextoCartao(versiculo, { larguraMax: 900, alturaMax: 1200, fonteMax: 90, medir });
+  checar(medio.linhas.length > 1, 'um versículo mais longo quebra em várias linhas (' + medio.linhas.length + ')');
+  checar(medio.linhas.every((l) => medir(l, medio.tamanho) <= 900 + 0.01), 'nenhuma linha passa da largura máxima, no tamanho escolhido');
+  checar(medio.linhas.length * medio.tamanho * 1.25 <= 1200 + 0.01, 'o bloco inteiro cabe na altura máxima');
+
+  // Trecho bem mais longo, numa caixa pequena: a letra tem que encolher bem mais que no caso médio.
+  const longo = 'Palavras '.repeat(80).trim();
+  const pequeno = CC.ajustarTextoCartao(longo, { larguraMax: 700, alturaMax: 500, fonteMax: 90, medir });
+  checar(pequeno.tamanho < medio.tamanho, 'um trecho bem mais longo, numa caixa menor, encolhe mais que o do caso médio (' + pequeno.tamanho.toFixed(1) + ' < ' + medio.tamanho.toFixed(1) + ')');
+  checar(pequeno.tamanho >= 90 * 0.35 - 0.01, 'a letra nunca encolhe além do tamanho mínimo (35% do máximo)');
+  checar(pequeno.linhas.join(' ') === longo, 'quebrar em linhas não perde nem repete nenhuma palavra');
+
+  checar(CC.ajustarTextoCartao('', { larguraMax: 900, alturaMax: 1200, fonteMax: 90, medir }).linhas.length === 0, 'texto vazio não gera linha nenhuma');
+}
+
 // --- trilhas do leitor ---
 let trilhaErrada = 0;
 for (const d of D.plano) {
@@ -266,6 +413,28 @@ for (const d of D.plano) {
   if (at.some((t) => !d.antigo.includes(t.livro)) || nt.some((t) => !d.novo.includes(t.livro))) trilhaErrada++;
 }
 checar(trilhaErrada === 0, 'o leitor separa cada dia nas trilhas do Antigo e do Novo Testamento (' + trilhaErrada + ')');
+
+// --- célula: rodízio de "ore hoje por" (08b-propositos.js) ---
+runInContext(readFileSync(join(AQUI, 'src', 'app', '08-amigos.js'), 'utf8'), contexto, { filename: '08-amigos.js' });
+runInContext(readFileSync(join(AQUI, 'src', 'app', '08b-propositos.js'), 'utf8'), contexto, { filename: '08b-propositos.js' });
+{
+  const gente = [{ usuario: 'ana', nome: 'Ana' }, { usuario: 'bia', nome: 'Bia' }, { usuario: 'caio', nome: 'Caio' },
+    { usuario: 'davi', nome: 'Davi' }, { usuario: 'eva', nome: 'Eva' }];
+  const alfabetica = gente.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  const r1 = CC.oreHojePor(gente, '2026-01-01', gente.length);
+  checar(r1.length === 2, 'célula de até 12 membros: o rodízio sugere 2 nomes');
+  const r2 = CC.oreHojePor(gente, '2026-01-01', 13);
+  checar(r2.length === 3, 'célula com mais de 12 membros: o rodízio sugere 3 nomes');
+  // Dia do ano 1 (2026-01-01), quantidade 2, total 5: índice inicial (1 * 2) % 5 = 2.
+  checar(r1[0].usuario === alfabetica[2].usuario && r1[1].usuario === alfabetica[3].usuario,
+    'o índice inicial é (dia do ano × quantidade) % total, em ordem alfabética');
+  const outroDia = CC.oreHojePor(gente, '2026-03-01', gente.length);
+  checar(JSON.stringify(outroDia) !== JSON.stringify(r1), 'dias diferentes tendem a sugerir gente diferente');
+  const mesmoDiaDeNovo = CC.oreHojePor(gente, '2026-01-01', gente.length);
+  checar(JSON.stringify(mesmoDiaDeNovo) === JSON.stringify(r1), 'o mesmo dia sempre devolve a mesma sugestão (determinístico, nada gravado)');
+  checar(CC.oreHojePor([], '2026-01-01', 0).length === 0, 'sem candidatos, não há o que sugerir');
+  checar(CC.oreHojePor([{ usuario: 'so', nome: 'Só' }], '2026-01-01', 1).length === 1, 'com um candidato só, a sugestão é ele mesmo');
+}
 
 // =========================================================================
 secao('contas, amizades e propósito');
@@ -284,11 +453,47 @@ checar(contas.relacao('ana', 'caio') === 'enviado' && contas.relacao('caio', 'an
 checar(contas.lista().every((c) => !c.segue && c.seloConvite && c.fuso), 'contas migradas ganham selo de convite e fuso');
 
 checar(!nascimentoValido('2999-01-01') && nascimentoValido('2004-02-29') && !nascimentoValido('2003-02-29'), 'data de nascimento é validada de verdade');
+
+// ---------- idade mínima (LGPD art. 14) e consentimento sobre dado de fé (LGPD art. 11) ----------
+checar(somaAnos('2024-02-29', -1) === '2023-02-28', 'somaAnos joga 29 de fevereiro para 28 num ano sem esse dia');
+checar(idadeMinimaOk('2000-01-01', '2012-01-01') && !idadeMinimaOk('2000-01-02', '2012-01-01'),
+  'idadeMinimaOk compara direitinho o dia do aniversário');
+
+const hojeTeste = hojeNoFuso(FUSO_PADRAO);
+const nasc11anos = somaAnos(hojeTeste, -(IDADE_MINIMA - 1));
+const nasc12anos = somaAnos(hojeTeste, -IDADE_MINIMA);
+
+let erroIdade = '';
+try {
+  await contas.criar({ usuario: 'crianca', senha: '12345678', nome: 'Crianca', email: 'crianca@x.com', nascimento: nasc11anos, consentimento: true });
+} catch (e) { erroIdade = e.message; }
+checar(erroIdade === 'o Geração Eleita é para quem tem 12 anos ou mais', 'com 11 anos, o cadastro é recusado pela idade');
+await contas.criar({ usuario: 'douze', senha: '12345678', nome: 'Doze', email: 'doze@x.com', nascimento: nasc12anos, consentimento: true });
+checar(!!contas.achar('douze'), 'com exatamente 12 anos completados hoje, o cadastro passa');
+
+let erroConsentimento = '';
+try {
+  await contas.criar({ usuario: 'semsim', senha: '12345678', nome: 'SemSim', email: 'semsim@x.com', nascimento: nasc12anos });
+} catch (e) { erroConsentimento = e.message; }
+checar(erroConsentimento === 'para criar a conta, é preciso concordar com o uso dos dados sobre a sua fé', 'sem marcar o consentimento, o cadastro é recusado');
+const comSim = await contas.criar({ usuario: 'comsim', senha: '12345678', nome: 'ComSim', email: 'comsim@x.com', nascimento: nasc12anos, consentimento: true });
+checar(contas.consentiu(comSim), 'com o consentimento marcado, a conta nasce com consentiu() verdadeiro');
+
+const antiga = await contas.criar({ usuario: 'antiga', senha: '12345678' }, { exigirPerfil: false });
+checar(!contas.consentiu(antiga), 'conta importada sem exigirPerfil nasce sem consentimento');
+await contas.registrarConsentimento('antiga');
+checar(contas.consentiu(contas.achar('antiga')), 'registrarConsentimento liga o consentimento numa conta antiga');
+
+await contas.salvar();
+const contasRecarregadas = await new Contas(arquivoContas).carregar();
+checar(contasRecarregadas.consentiu(contasRecarregadas.achar('comsim')) && contasRecarregadas.consentiu(contasRecarregadas.achar('antiga')),
+  'o consentimento sobrevive a salvar e recarregar do banco');
+
 let erro = '';
-try { await contas.criar({ usuario: 'dora', senha: '123456', nome: 'Dora' }); } catch (e) { erro = e.message; }
+try { await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora' }); } catch (e) { erro = e.message; }
 checar(/e-mail/.test(erro), 'cadastro sem e-mail é recusado');
-await contas.criar({ usuario: 'dora', senha: '123456', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03' });
-checar(!!(await contas.conferir('dora@x.com', '123456')), 'entra com o e-mail, sem diferenciar maiúsculas');
+await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03', consentimento: true });
+checar(!!(await contas.conferir('dora@x.com', '12345678')), 'entra com o e-mail, sem diferenciar maiúsculas');
 for (const u of ['ana', 'bia', 'caio']) await contas.completarPerfil(u, { email: u + '@x.com', nascimento: '2000-01-01' });
 checar(contas.procurar('dora', 'an') === null && contas.procurar('dora', 'ana').usuario === 'ana', 'a busca só acha pelo @ exato');
 
@@ -308,14 +513,14 @@ checar(contas.dados.convitesAceites.length === 2 && contas.dados.convitesAceites
 checar(contas.lerConvite(convite.token.slice(0, -3) + 'abc', assinar) === null, 'convite adulterado é recusado');
 
 for (const u of ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']) {
-  await contas.criar({ usuario: u, senha: '123456', nome: u, email: u + '@x.com', nascimento: '2000-01-01' });
+  await contas.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '2000-01-01', consentimento: true });
   await contas.pedir(u, 'ana', '2026-03-01');
   await contas.aceitar('ana', u, '2026-03-01');
 }
 checar(contas.ativasDe('ana') === 8, 'amigos sem limite: a Ana passa de 5 (' + contas.ativasDe('ana') + ')');
 
 const conviteDaAna = contas.gerarConvite('ana', assinar);
-await contas.criar({ usuario: 'novo1', senha: '123456', nome: 'Novo', email: 'novo1@x.com', nascimento: '2000-01-01' });
+await contas.criar({ usuario: 'novo1', senha: '12345678', nome: 'Novo', email: 'novo1@x.com', nascimento: '2000-01-01', consentimento: true });
 await contas.usarConvite('novo1', conviteDaAna.token, assinar, '2026-03-03', Date.now(), { contaNova: true });
 checar(contas.achar('novo1').convidadoPor === 'ana' && contas.semeadorDe('ana') === 0,
   'quem cria a conta pelo link fica anotado, mas só conta depois da primeira lição');
@@ -323,6 +528,23 @@ await contas.ativarConvidado('novo1');
 checar(contas.semeadorDe('ana') === 1, 'feita a primeira lição, a pessoa conta para quem convidou');
 await contas.apagar('novo1');
 checar(contas.semeadorDe('ana') === 0, 'conta apagada deixa de contar');
+
+// ---------- conhecer jesus: convite com modo ----------
+const conviteConhecer = contas.gerarConvite('ana', assinar, Date.now(), { modo: 'conhecer' });
+checar(contas.lerConvite(conviteConhecer.token, assinar).modo === 'conhecer' && contas.lerConvite(convite.token, assinar).modo === '',
+  'lerConvite devolve o modo do convite; o convite comum não tem modo');
+await contas.criar({ usuario: 'novo2', senha: '12345678', nome: 'Novo2', email: 'novo2@x.com', nascimento: '2000-01-01', consentimento: true });
+await contas.usarConvite('novo2', conviteConhecer.token, assinar, '2026-03-04', Date.now(), { contaNova: true });
+checar(contas.achar('novo2').caminho === 'conhecer' && contas.achar('novo2').acompanhadoPor === 'ana',
+  'o convite "conhecer" põe a conta nova nos 14 dias e anota quem convidou');
+checar(!contas.duplaPlano('novo2', 'ana'), 'quem entra pelo convite "conhecer" não ganha a dupla de leitura do plano');
+checar(contas.relacao('novo2', 'ana') === 'amigos', 'mesmo sem dupla, a amizade nasce normal');
+{
+  const [carga, firma] = conviteConhecer.token.split('.');
+  const dado = JSON.parse(Buffer.from(carga, 'base64url').toString('utf8'));
+  const cargaAdulterada = Buffer.from(JSON.stringify({ ...dado, m: '' })).toString('base64url');
+  checar(contas.lerConvite(cargaAdulterada + '.' + firma, assinar) === null, 'trocar o modo na carga do convite invalida a assinatura');
+}
 
 checar(await contas.tocar('bia', 'dora', { hoje: '2026-03-02', euLeu: true, eleLeu: false }) === 'enviado'
   && await contas.tocar('bia', 'dora', { hoje: '2026-03-02', euLeu: true, eleLeu: false }) === 'ja', 'um toque por amigo por dia');
@@ -346,6 +568,98 @@ checar(diasDeProposito(p(dias('2026-03-01', 5)), p(dias('2026-03-01', 5)), '2026
 // No Windows, arquivo aberto não se apaga: o banco da pasta temporária fecha antes.
 fecharBanco(arquivoDoBanco(pasta));
 rmSync(pasta, { recursive: true, force: true });
+
+// =========================================================================
+secao('painel pastoral agregado (Fase 5, seção 2)');
+// =========================================================================
+{
+  const HOJE = '2026-04-01';
+  // Uma igreja pequena de propósito: menos de 5 em quase tudo, para o "menos de 5" aparecer.
+  const contasPainel = [
+    { usuario: 'lider1', criadaEm: '2026-01-01', conversouEm: '' },
+    { usuario: 'joao1', criadaEm: '2026-01-01', conversouEm: '' },
+    { usuario: 'maria1', criadaEm: '2026-01-01', conversouEm: '2026-03-20' },
+    { usuario: 'pedro1', criadaEm: '2026-01-01', conversouEm: '' },
+  ];
+  const setDatas = (lista) => Object.fromEntries(lista.map((d, i) => [String(i + 1), d]));
+  const estadosPainel = {
+    // lidos em 5 dos últimos 7 (Power of 4: entra).
+    lider1: { lidos: [1, 2, 3, 4, 5], marcadoEm: setDatas(dias('2026-03-26', 5)) },
+    // só 2 dos últimos 7 (não entra no Power of 4).
+    joao1: { lidos: [1, 2], marcadoEm: setDatas(['2026-03-30', '2026-03-31']) },
+    // conheceu os 14 dias inteiros.
+    maria1: { lidos: [1], marcadoEm: { 1: '2026-03-15' }, conhecidos: setDatas(Array.from({ length: 14 }, () => '2026-03-15')) },
+    // começou a conhecer, mas não terminou.
+    pedro1: { lidos: [], marcadoEm: {}, conhecidos: { 1: '2026-03-10', 2: '2026-03-11' } },
+  };
+  const celulaPainel = {
+    id: 'pc1', celula: true, encerradoEm: '', tipo: 'plano',
+    mae: '', multiplicadaEm: '',
+    membros: [
+      { usuario: 'lider1', estado: 'ativo', papel: '', tornouMembroEm: '' },
+      { usuario: 'joao1', estado: 'ativo', papel: '', tornouMembroEm: '2026-03-25' }, // virou membro há 7 dias
+      { usuario: 'maria1', estado: 'ativo', papel: 'visitante', tornouMembroEm: '' },
+    ],
+    encontros: [
+      { data: '2026-03-28', presentes: ['lider1', 'joao1'], visitantes: 3 },
+      { data: '2026-01-14', presentes: ['lider1'], visitantes: 0 }, // fora das últimas 4 semanas (mais de 28 dias atrás)
+    ],
+  };
+  const filhaPainel = {
+    id: 'pc2', celula: true, encerradoEm: '', tipo: 'plano',
+    mae: 'pc1', multiplicadaEm: '2026-03-20',
+    membros: [{ usuario: 'pedro1', estado: 'ativo', papel: '', tornouMembroEm: '' }],
+    encontros: [],
+  };
+  const pedidosPainel = [
+    { tipo: 'oracao', estado: 'ativo', venceEm: '2026-04-10', denuncias: [] },
+    { tipo: 'oracao', estado: 'removido', venceEm: '2026-04-10', denuncias: [] },
+    { tipo: 'necessidade', estado: 'ativo', venceEm: '2026-04-10', denuncias: [] },
+    { tipo: 'oracao', estado: 'ativo', venceEm: '2026-04-10', denuncias: [{ usuario: 'a', motivo: 'x' }, { usuario: 'b', motivo: 'y' }] },
+  ];
+  const discipuladosPainel = [
+    { discipulador: 'lider1', discipulo: 'joao1', estado: 'ativo' },
+    { discipulador: 'joao1', discipulo: 'maria1', estado: 'ativo' }, // joao1 é discípulo e discipulador: 2ª geração
+    { discipulador: 'pedro1', discipulo: 'maria1', estado: 'encerrado' },
+  ];
+
+  const painel = montarPainel({
+    contas: contasPainel, estados: estadosPainel, propositos: [celulaPainel, filhaPainel],
+    comPush: [], hoje: HOJE, pedidos: pedidosPainel, discipulados: discipuladosPainel,
+  });
+  const c = painel.celulasECuidado;
+
+  checar(c.celulasAtivas === 2, 'as duas células (mãe e filha) contam como ativas: ' + c.celulasAtivas);
+  checar(c.celulasComEncontro === 1, 'só a célula mãe registrou encontro nas últimas 4 semanas: ' + c.celulasComEncontro);
+  checar(c.frequenciaMedia === 5, 'frequência média do único encontro recente (2 presentes + 3 visitantes): ' + c.frequenciaMedia);
+  checar(c.visitantesViraramMembros === 'menos de 5', 'com 1 pessoa (joao1), aparece "menos de 5": ' + c.visitantesViraramMembros);
+  checar(c.multiplicacoes === 1, 'uma multiplicação nos últimos 12 meses: ' + c.multiplicacoes);
+  checar(c.diasNaPalavra.pct === 25, 'só lider1 bate o Power of 4 entre as 4 contas ativas nos últimos 30 dias: ' + c.diasNaPalavra.pct);
+  checar(c.diasNaPalavra.base === 'menos de 5', 'a base do Power of 4 também é mascarada quando pequena: ' + c.diasNaPalavra.base);
+  checar(c.conhecer.comecaram === 'menos de 5' && c.conhecer.terminaram === 'menos de 5' && c.conhecer.quiseramConversar === 'menos de 5',
+    'conhecer Jesus: começaram (maria1, pedro1), terminaram (maria1) e quiseram conversar (maria1) aparecem mascarados');
+  checar(c.discipulado.ativos === 'menos de 5' && c.discipulado.segundaGeracao === 'menos de 5',
+    '2 relações ativas e 1 de 2ª geração (joao1), mascarados por serem poucos');
+  checar(c.cuidado.pedidosAtivos === 'menos de 5' && c.cuidado.denunciasAbertas === 'menos de 5',
+    '2 pedidos de oração ativos e 1 denúncia aberta (2 denúncias no mesmo pedido), mascarados');
+
+  const semNomeOuTexto = !/lider1|joao1|maria1|pedro1|@/.test(JSON.stringify(c));
+  checar(semNomeOuTexto, 'a saída do painel não leva nenhum nome, @ ou texto de ninguém');
+
+  // Com uma igreja "grande" (5 ou mais em cada conta), o número exato aparece.
+  const muitos = Array.from({ length: 6 }, (_, i) => 'gente' + i);
+  const contasGrandes = muitos.map((u) => ({ usuario: u, criadaEm: '2026-01-01', conversouEm: '' }));
+  const estadosGrandes = Object.fromEntries(muitos.map((u) => [u, {}]));
+  const celulaGrande = {
+    id: 'pg1', celula: true, encerradoEm: '', tipo: 'plano', mae: '', multiplicadaEm: '',
+    membros: muitos.map((u) => ({ usuario: u, estado: 'ativo', papel: '', tornouMembroEm: '2026-03-25' })),
+    encontros: [],
+  };
+  const painelGrande = montarPainel({
+    contas: contasGrandes, estados: estadosGrandes, propositos: [celulaGrande], comPush: [], hoje: HOJE, pedidos: [], discipulados: [],
+  });
+  checar(painelGrande.celulasECuidado.visitantesViraramMembros === 6, 'com 6 pessoas (5 ou mais), o painel mostra o número exato: ' + painelGrande.celulasECuidado.visitantesViraramMembros);
+}
 
 console.log('\n  ' + contagem + ' checagens' + (falhas ? ' · ' + falhas + ' FALHA(S)\n' : ' · todas passaram\n'));
 process.exit(falhas ? 1 : 0);

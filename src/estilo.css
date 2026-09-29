@@ -1,5 +1,5 @@
 /* =========================================================================
-   Caminho com Cristo: linguagem visual
+   Geração Eleita: linguagem visual
    Macia e redonda: contornos finos em tom próximo do fundo, poucos cartões, cor só
    onde há ação, relevo embaixo dos botões e dos nós. Mobile primeiro; em telas largas
    a barra inferior vira um trilho lateral.
@@ -101,6 +101,13 @@
   --arte-creme: #fff1c9;
   --rosa: #ff4f8b;
 
+  /* Marca-texto dos versículos (04e-versiculos.js): amarelo, verde, azul e rosa, suaves.
+     Ficam fora da paleta da marca de propósito: são do texto da pessoa, não da interface. */
+  --marca-1: #fff0a3;
+  --marca-2: #cdeccd;
+  --marca-3: #cfe4f7;
+  --marca-4: #f9d3e2;
+
   /* Cantos mais generosos que antes: é o que dá o acabamento de aplicativo em vez de
      página. Botão e pílula não usam raio nenhum destes — usam 999px, viram cápsula. */
   --raio: 20px;
@@ -108,7 +115,10 @@
   --raio-p: 14px;
   --raio-capsula: 999px;
   --alt-topo: 58px;
-  --alt-barra: 70px;
+  /* Cobre a barra inteira, do chão até o topo do botão da Bíblia levantado (ilha de 64px +
+     10px de respiro embaixo + o quanto o botão central sobe acima delas). Quem lê este
+     número em .conteudo e nos botões flutuantes evita ficar escondido atrás da barra nova. */
+  --alt-barra: 100px;
   /* Tinta sobre as cores cheias. No claro, branco; no escuro as cores são mais
      luminosas, e a tinta escura é que se lê, como no aplicativo de referência. */
   --sobre-cor: #ffffff;
@@ -126,7 +136,7 @@
        agora ....................... acento   (dia de hoje, barra correndo, link)
        concluído ................... inverso  (dia lido, ação principal: preto/branco)
        travado ..................... cinza    (trilho, tinta travada, cadeado)
-       ofensiva .................... chama    (só a lamparina e o número de dias)
+       ofensiva .................... chama    (só o fogo e o número de dias)
        alerta ...................... vermelho (erro, perigo, ponto de novidade)
      Nenhum estado se apoia só na cor: cada um carrega também ícone próprio (check,
      estrela, cadeado) e a linha da trilha muda de contínua para tracejada no trecho
@@ -191,6 +201,12 @@
 
   --sobre-cor: #0d0d0d;
   --sombra-flutuante: 0 10px 30px rgba(0, 0, 0, .55);
+
+  /* marca-texto no escuro: tons fundos, para o texto claro continuar lendo bem por cima */
+  --marca-1: #373010;
+  --marca-2: #183426;
+  --marca-3: #1c3350;
+  --marca-4: #4a2033;
 }
 
 /* famílias de cor aplicáveis a qualquer bloco */
@@ -284,8 +300,8 @@ button { font-family: inherit; }
 .contador:hover { background: var(--fundo-2); text-decoration: none; }
 .contador .ico-aba { width: 28px; height: 28px; display: block; }
 /* A ofensiva é o gancho: chip com peso próprio. Os outros contadores recuam para apoio. */
-/* A lamparina no centro do topo. O desenho tem a chama no alto e o vaso embaixo: o número e
-   a palavra "dias" se alinham ao vaso, e não ao meio do quadro, senão parecem tortos. */
+/* O fogo no centro do topo: o número e a palavra "dias" se alinham à base da chama, e não ao
+   meio do quadro, senão parecem tortos. */
 .contador.ofensiva { gap: 6px; margin: 0 auto; padding: 4px 12px 6px 8px; color: var(--tinta-fraca); align-items: flex-end; }
 .contador.ofensiva span, .contador.ofensiva small { line-height: 1; padding-bottom: 5px; }
 .contador.ofensiva small { padding-bottom: 6px; }
@@ -311,6 +327,32 @@ button { font-family: inherit; }
   background: var(--vermelho);
   border: 2px solid var(--fundo);
 }
+
+/* O Perfil saiu da barra de baixo e virou este retrato redondo no canto do topo, ao lado
+   do fogo da ofensiva: o que sobrou fica simétrico, duas abas de cada lado da Bíblia. .topo é
+   sticky, o que já o torna o contêiner posicionado de que este botão precisa. O alvo de
+   toque (a caixa inteira, 44px) é maior que o retrato visível (a área de dentro da borda,
+   40px): a borda de 2px é o que abre essa folga sem precisar de padding nem pseudo-elemento. */
+.perfil-topo {
+  position: absolute;
+  right: calc(16px + env(safe-area-inset-right));
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--borda);
+  border-radius: 50%;
+  background: var(--fundo-2);
+  color: var(--tinta-fraca);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.perfil-topo .retrato-topo { width: 100%; height: 100%; object-fit: cover; display: block; }
+.perfil-topo .ico-aba { width: 24px; height: 24px; }
+.perfil-topo.selecionado { border-color: var(--inverso); box-shadow: 0 0 0 2px var(--inverso); }
 
 .botao-icone {
   display: inline-grid;
@@ -342,7 +384,26 @@ button { font-family: inherit; }
 }
 .conteudo.largo { max-width: 720px; }
 
-/* ---------- barra inferior / trilho lateral ---------- */
+/* iPhone com o app instalado na tela de início (html.app-ios, marcado no primeiro script da
+   página). No iOS 26 o WebKit descola o que é "fixed" da borda enquanto a página rola, e mais
+   ainda depois que o teclado abre e fecha: a barra de abas subia para o meio da tela, com o
+   conteúdo aparecendo embaixo dela (bug 297779 do WebKit, sem correção oficial). Aqui a página
+   não rola: quem rola é a .aplicativo, e a barra vira um bloco comum no fim da coluna, sem
+   "fixed" nenhum. Fora do app instalado no iPhone, nada muda. */
+@media (max-width: 859px) {
+  html.app-ios, html.app-ios body { height: 100%; overflow: hidden; }
+  html.app-ios body { display: flex; flex-direction: column; padding-bottom: 0; }
+  html.app-ios .aplicativo { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+  html.app-ios .navegacao { position: relative; flex: 0 0 auto; }
+  /* a barra não cobre mais o fim do conteúdo: basta o respiro de sempre */
+  html.app-ios .conteudo { padding-bottom: 40px; }
+}
+
+/* ---------- barra inferior / trilho lateral ----------
+   No celular: uma barra só, de ponta a ponta, com duas metades (.ilha, sem fundo próprio)
+   de duas abas cada e o botão quadrado da Bíblia encaixado no meio. As .ilha existem para
+   dividir as abas por igual dos dois lados; no trilho lateral (>= 860px) elas somem
+   (display: contents) e tudo volta a ser lista. */
 .navegacao .marca-lateral { display: none; }
 
 .navegacao {
@@ -352,23 +413,40 @@ button { font-family: inherit; }
   bottom: 0;
   z-index: 50;
   display: flex;
-  justify-content: space-around;
   align-items: center;
-  gap: 2px;
-  height: calc(var(--alt-barra) + env(safe-area-inset-bottom));
-  padding: 6px 8px env(safe-area-inset-bottom);
+  justify-content: center;
+  gap: 4px;
+  padding: 0 8px env(safe-area-inset-bottom);
   background: var(--cartao);
   border-top: 1px solid var(--borda);
   border-radius: var(--raio-g) var(--raio-g) 0 0;
+  /* 0 a 320px, 1 a 390px (e além): a régua que encolhe ícone, rótulo e o botão da Bíblia
+     juntos, para a barra a 320px parecer a de 390px encolhida, e não apertada. Vale para
+     as quatro combinações de Célula/Discipulado, não só para quando a barra está cheia. */
+  --cresce: calc((100vw - 320px) / 70px);
 }
 
-.aba {
+.ilha {
   flex: 1 1 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 64px;
+  padding: 0 2px;
+}
+/* Célula e Discipulado (e, na barra cheia, também Juntos do outro lado) deixam a ilha com
+   três abas em vez de duas: mesma classe do mock aprovado. */
+.navegacao.cheia .ilha { padding: 0; }
+.navegacao.cheia .ilha .aba { max-width: none; }
+
+.aba {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 1px;
+  min-width: 44px;
   max-width: 76px;
   height: 58px;
   padding: 0;
@@ -379,28 +457,107 @@ button { font-family: inherit; }
   font-size: 0.85rem;
   font-weight: 800;
   cursor: pointer;
-  min-width: 0;
 }
 .aba .icone-aba { position: relative; display: grid; place-items: center; }
-.aba .ico-aba { width: 28px; height: 28px; display: block; transition: transform .2s var(--mola); }
+.aba .ico-aba { width: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); height: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); display: block; transition: transform .2s var(--mola); }
 /* o nome da aba à vista: ícone sozinho não diz a quem chegou agora o que há ali */
-.aba .rotulo-aba { font-family: var(--fonte-destaque); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.1; white-space: nowrap; color: inherit; }
+.aba .rotulo-aba { font-family: var(--fonte-destaque); font-size: clamp(0.67rem, calc(0.67rem + 0.05rem * var(--cresce)), 0.72rem); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.1; white-space: nowrap; color: inherit; }
+/* Com 6 botões (Célula e Discipulado juntos) o rótulo precisa de mais um passo de encolhida:
+   0.56rem a 320px, 0.6rem a 390px, na mesma régua --cresce. */
+.navegacao.cheia .aba:not(.aba-central) .rotulo-aba { font-size: clamp(0.56rem, calc(0.56rem + 0.04rem * var(--cresce)), 0.6rem); }
 .aba .ponto-aba { top: -2px; right: -4px; }
-/* aba ativa: pílula preta que inverte entre temas, dentro da barra --cartao */
-.aba.selecionada { color: var(--inverso-tinta); background: var(--inverso); border-radius: var(--raio-capsula); }
-.aba:hover:not(.selecionada) { background: var(--fundo-2); }
+/* Fantasmas: abas que só existem para o trilho lateral (Desafios quando o celular o trocou
+   por Célula/Discipulado, e o Explorar, que no celular mora dentro do Mais). No celular
+   somem de vez; o @media (min-width: 860px) no fim do arquivo as traz de volta. */
+.aba.so-trilho { display: none; }
+/* O botão de três pontinhos do Mais: uma bolinha neutra, que vira "invertida" quando a
+   pessoa está numa das telas do painel (Explorar, ou Desafios quando mora só ali dentro). */
+.mais-ico { display: grid; place-items: center; width: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); height: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); border-radius: 50%; background: var(--fundo-2); color: var(--tinta-fraca); }
+.mais-ico i { display: flex; gap: 3px; }
+.mais-ico i b { width: 4px; height: 4px; border-radius: 50%; background: currentColor; display: block; }
+.aba.selecionada .mais-ico { background: var(--inverso); color: var(--inverso-tinta); }
+/* Dentro da ilha, a aba ativa não ganha mais pílula preenchida: só cor e peso, como o
+   "Início" azul da referência do dono. A pílula preenchida (mais abaixo) volta a valer só
+   no trilho lateral, onde cada aba é uma linha inteira. */
+/* --acento e não --inverso: no tema escuro o --inverso é um petróleo fechado que some no
+   fundo preto; o acento clareia sozinho no escuro. */
+.aba.selecionada { color: var(--acento); font-weight: 900; background: none; }
+.aba.selecionada:not(.aba-central) .rotulo-aba::after { content: ''; display: block; width: 18px; height: 3px; margin: 3px auto 0; border-radius: 3px; background: currentColor; }
+/* Sem cinza de hover dentro da ilha: o fundo da própria ilha já é o acabamento. */
+.aba:hover:not(.selecionada) { background: none; }
 /* O ícone da aba encolhia para 82% e voltava a cada toque. Era esse o "zoom" na troca de
    aba: some junto com o resto das animações de escala. O toque já responde pela vibração
    e pela pílula que muda de lugar. */
-.aba .retrato-aba {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-  border: 2px solid var(--borda);
+
+/* Bíblia: quadrado de cantos arredondados, cheio, no meio da barra — a Bíblia é o texto por
+   trás de tudo, não mais um destino entre outros. Fica INTEIRO dentro da barra, de
+   propósito: as duas versões erguidas acima da borda (círculo solto, depois o "encaixe"
+   com borda da cor da barra) pareciam coladas por cima no celular. O destaque vem do
+   preenchimento, do tamanho e do brilho — exceção pedida pelo dono, a única peça do app
+   com sombra de destaque assim. */
+.aba.aba-central {
+  /* 56x50 a 320px, 64x56 a 390px, na mesma régua --cresce das outras abas: a Bíblia encolhe
+     junto com o resto, sem virar a peça desproporcional da barra estreita. */
+  flex: 0 0 clamp(56px, calc(56px + 8px * var(--cresce)), 64px);
+  width: clamp(56px, calc(56px + 8px * var(--cresce)), 64px);
+  height: clamp(50px, calc(50px + 6px * var(--cresce)), 56px);
+  max-width: none;
+  margin: 0 6px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--inverso);
+  color: var(--inverso-tinta);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--inverso) 35%, transparent);
 }
-.aba.selecionada .retrato-aba { border-color: var(--inverso); }
+.aba.aba-central .ico-aba { width: clamp(23px, calc(23px + 3px * var(--cresce)), 26px); height: clamp(23px, calc(23px + 3px * var(--cresce)), 26px); }
+.aba.aba-central .rotulo-aba { font-size: clamp(0.63rem, calc(0.63rem + 0.05rem * var(--cresce)), 0.68rem); }
+.aba.aba-central:hover { background: var(--inverso); }
+.aba.aba-central.selecionada { box-shadow: 0 4px 18px color-mix(in srgb, var(--inverso) 55%, transparent); }
+
+/* ---------- o painel do Mais ----------
+   Por cima da barra, e não no lugar dela: o véu escuro cobre a tela, mas a barra continua
+   à vista por baixo, como no mock aprovado. Fecha tocando fora, no próprio Mais, com Escape
+   ou com o voltar do celular (ver fecharPainelMais em 10-roteador.js). */
+.veu-mais {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, #000 45%, transparent);
+  animation: aparecer .2s ease;
+}
+.painel-mais {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  z-index: 65;
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--cartao);
+  border-radius: var(--raio-g) var(--raio-g) 0 0;
+  padding: 8px 0;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, .18);
+  animation: folha-sobe .28s var(--suave);
+}
+.painel-mais a {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 44px;
+  padding: 14px 22px;
+  color: var(--tinta);
+  font-weight: 800;
+  font-size: 1.02rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--borda);
+}
+.painel-mais a:last-child { border-bottom: 0; }
+.painel-mais a:hover { background: var(--fundo-2); }
+/* Todos os ícones do Mais no mesmo padrão (o dono pediu: nada de um verde cheio e outros
+   cinza). O mesmo fundo claro e o mesmo verde dos quadros do Explorar. */
+.painel-mais .q { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: var(--verde-fraco); color: var(--verde); }
+.painel-mais .q svg { width: 24px; height: 24px; }
+.painel-mais small { display: block; margin-top: 2px; font-weight: 600; font-size: 0.8rem; color: var(--tinta-fraca); }
 
 /* ---------- botões ----------
    Acabamento novo: cápsula, chapado. O botão principal é o par que se inverte entre
@@ -463,7 +620,6 @@ button { font-family: inherit; }
 .botao svg { width: 20px; height: 20px; flex: 0 0 auto; }
 
 .acoes { display: grid; gap: 10px; margin-top: 16px; }
-.acoes.lado-a-lado { grid-template-columns: 1fr 1fr; }
 .pe-duplo { display: grid; grid-template-columns: 56px 1fr; gap: 10px; }
 .pe-duplo-plano { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
 
@@ -568,6 +724,10 @@ button { font-family: inherit; }
 .selo-status.leu { background: var(--verde-fraco); color: var(--verde-3d); }
 :root[data-tema="escuro"] .selo-status.leu { color: var(--verde); }
 .selo-status svg { width: 14px; height: 14px; }
+/* Nos pedidos de oração o selo leva nomes e data: como parágrafo, ele quebra linha em vez
+   de empurrar a tela para fora da largura do celular. */
+p.selo-status { white-space: normal; display: flex; align-items: flex-start; border-radius: 16px; }
+p.selo-status svg { flex: 0 0 auto; margin-top: 2px; }
 
 .aviso-cadeado, .folha p.aviso-cadeado { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: var(--raio); background: var(--azul-fraco); color: var(--tinta); font-size: 0.88rem; font-weight: 600; line-height: 1.5; }
 .aviso-cadeado svg { width: 20px; height: 20px; flex: 0 0 auto; color: var(--azul); margin-top: 1px; }
@@ -635,46 +795,6 @@ button { font-family: inherit; }
 }
 .toque-recebido span { flex: 1; }
 .toque-recebido svg { width: 22px; height: 22px; color: var(--azul); flex: 0 0 auto; }
-
-/* três marcas pequenas no alto, no lugar de uma pilha de cartões */
-.atalhos-trilha { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; margin-bottom: 4px; }
-#trilha-amigos { display: contents; }
-.atalho-trilha {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 58px;
-  padding: 6px 8px;
-  border: 2px solid var(--borda);
-  border-bottom-width: 4px;
-  border-radius: var(--raio);
-  background: var(--cartao);
-  color: var(--tinta);
-  font: inherit;
-  text-align: left;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform .06s ease, border-bottom-width .06s ease;
-}
-.atalho-trilha:hover { text-decoration: none; background: var(--fundo-2); }
-.atalho-trilha:active { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; }
-.marca-atalho { flex: 0 0 auto; display: grid; place-items: center; width: 30px; height: 30px; border-radius: var(--raio-p); color: var(--cor, var(--azul)); background: var(--cor-fraca, transparent); }
-.marca-atalho svg { width: 22px; height: 22px; }
-.atalho-trilha.missoes .marca-atalho { background: none; width: 34px; }
-.atalho-trilha.missoes .marca-atalho svg { width: 34px; height: auto; }
-.texto-atalho { display: grid; flex: 1; min-width: 0; overflow: hidden; line-height: 1.15; }
-.texto-atalho b { display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden; color: var(--tinta-forte); font-size: clamp(0.82rem, 3.6vw, 1rem); font-weight: 900; white-space: nowrap; text-overflow: ellipsis; }
-/* no convite, o ícone encolhe para a palavra caber inteira até em 360 px */
-.atalho-trilha.vazio-proposito .marca-atalho { width: 26px; height: 26px; }
-.atalho-trilha.vazio-proposito .marca-atalho svg { width: 18px; height: 18px; }
-.atalho-trilha { overflow: hidden; }
-.texto-atalho b svg { width: 16px; height: 16px; color: var(--chama); }
-.texto-atalho small { overflow: hidden; color: var(--tinta-fraca); font-size: 0.72rem; font-weight: 800; white-space: nowrap; text-overflow: ellipsis; }
-.atalho-trilha .rostos { display: flex; flex: 0 0 auto; }
-.atalho-trilha .rostos .retrato-amigo + .retrato-amigo { margin-left: -10px; }
-.atalho-trilha.completas { border-color: color-mix(in srgb, var(--amarelo) 55%, transparent); background: var(--amarelo-fraco); }
 
 /* faixa da unidade */
 .faixa-unidade {
@@ -753,29 +873,6 @@ button { font-family: inherit; }
 .faixa-unidade:not(.aberta) { position: relative; top: auto; z-index: auto; }
 .faixa-unidade.travada { background: var(--fundo-2); color: var(--tinta-fraca); box-shadow: 0 4px 0 var(--borda); }
 .faixa-unidade.travada .guia { border-left-color: var(--borda); }
-
-/* gente à beira da estrada */
-.figura-trilha {
-  position: relative;
-  width: 100%;
-  display: flex;
-  margin: -30px 0 -20px;
-  pointer-events: none;
-}
-.figura-trilha.esquerda { justify-content: flex-start; padding-left: 10px; }
-.figura-trilha.direita { justify-content: flex-end; padding-right: 10px; }
-.figura-trilha svg { width: 84px; height: auto; display: block; animation: balancar 4s ease-in-out infinite; transform-origin: 50% 90%; }
-.figura-trilha.direita svg { animation-delay: 1.3s; }
-.figura-trilha.mascote svg, .figura-trilha.mascote .mascote-svg { width: 70px; animation-duration: 3s; }
-.figura-trilha.adiante svg { filter: grayscale(1); opacity: .22; }
-@keyframes balancar {
-  0%, 100% { transform: rotate(-1.5deg); }
-  50% { transform: rotate(1.5deg); }
-}
-@media (max-width: 359px) {
-  .figura-trilha svg { width: 64px; }
-  .figura-trilha.mascote svg, .figura-trilha.mascote .mascote-svg { width: 56px; }
-}
 
 /* os nós */
 .nos { display: flex; flex-direction: column; align-items: center; padding: 38px 0 22px; }
@@ -983,7 +1080,6 @@ button { font-family: inherit; }
 .pop-no .fala-bento { position: relative; margin: 4px 0 2px; padding: 8px 12px; border-radius: var(--raio-p); background: rgba(255, 255, 255, .18); font-size: 0.88rem; font-weight: 700; }
 :root[data-tema="escuro"] .pop-no .fala-bento { background: rgba(0, 0, 0, .1); }
 .pop-no .botao { position: relative; margin-top: 8px; }
-.pop-no .xp-pop { opacity: .75; }
 .pop-no.adiante { background: var(--cartao); color: var(--tinta); border: 2px solid var(--borda); }
 .pop-no.adiante::before { background: var(--cartao); border-left: 2px solid var(--borda); border-top: 2px solid var(--borda); }
 .pop-no.adiante .titulo-pop { color: var(--tinta-forte); }
@@ -1133,10 +1229,6 @@ button { font-family: inherit; }
 
 /* ---------- celebração ---------- */
 /* sem o topo, a grade da lição tem só palco e pé: sem isto, o pé pegava a linha que estica */
-.licao.tela-celebrar { grid-template-rows: 1fr auto; }
-.tela-celebrar .licao-palco > .interno { min-height: 100%; display: flex; flex-direction: column; justify-content: center; }
-.tela-celebrar .licao-pe { border-top-color: transparent; }
-.tela-celebrar .licao-palco { padding-top: calc(24px + env(safe-area-inset-top)); }
 
 .cena {
   display: flex;
@@ -1157,50 +1249,15 @@ button { font-family: inherit; }
 }
 .cena h1 { font-size: 1.9rem; margin: 0; text-wrap: balance; }
 .frase-cena { max-width: 340px; margin: 4px 0 0; font-size: 1.1rem; font-weight: 700; color: var(--tinta); text-wrap: balance; }
-.frase-cena.trocando { animation: trocar-frase .4s ease; }
-@keyframes trocar-frase { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-.mascote-festa { display: grid; place-items: center; }
-.mascote-festa svg, .mascote-festa .mascote-svg { width: 150px; height: auto; animation: mascote-pula .7s var(--mola); }
-.mascote-festa.pequeno svg { width: 92px; }
-@keyframes mascote-pula {
-  0% { transform: scale(.6) translateY(20px); opacity: 0; }
-  60% { transform: scale(1.06) translateY(-6px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); }
-}
-.cena-feito h1 { color: var(--amarelo-3d); }
-:root[data-tema="escuro"] .cena-feito h1 { color: var(--amarelo); }
-
-.placas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 380px; margin-top: 10px; }
-.placa { border: 2px solid var(--cor); border-radius: var(--raio); overflow: hidden; background: var(--cartao); animation: pop .45s var(--mola) both; }
-.placa:nth-child(2) { animation-delay: .12s; }
-.placa:nth-child(3) { animation-delay: .24s; }
-.cabeca-placa { display: block; padding: 4px; background: var(--cor); color: var(--sobre, var(--sobre-cor)); font-size: 0.7rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
-.valor-placa { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 12px 4px; color: var(--cor); font-size: 1.45rem; font-weight: 900; }
-.valor-placa svg { width: 22px; height: 22px; }
-
-/* a chama grande e o número da ofensiva */
+/* o fogo grande e o número da ofensiva */
 .chama-palco { position: relative; display: grid; place-items: center; width: 180px; height: 190px; }
-.arte-chama { width: 140px; height: auto; color: var(--tinta); overflow: visible; }
-.arte-chama .fogo { transform-box: fill-box; transform-origin: 50% 100%; }
-.arte-chama .brilho-fogo { transform-box: fill-box; transform-origin: 50% 50%; }
-.chama-palco .ico-chama { width: 150px; height: 150px; animation: surgir-lamparina .6s var(--mola) both; }
-.chama-palco .arte-chama .fogo { animation: acender .8s var(--mola) .35s both, tremular 2.2s ease-in-out 1.3s infinite; }
-.chama-palco .arte-chama .brilho-fogo { animation: brilhar 2.2s ease-in-out 1s infinite; }
-@keyframes surgir-lamparina { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
-@keyframes brilhar { 50% { opacity: .7; transform: scale(1.15); } }
-.versiculo-cena { max-width: 340px; margin: 8px 0 0; color: var(--tinta-fraca); font-size: 0.86rem; font-weight: 700; font-style: italic; text-wrap: balance; }
-.versiculo-cena:empty { display: none; }
-.versiculo-cena b { font-style: normal; white-space: nowrap; }
+.chama-palco .ico-chama { width: 150px; height: 150px; animation: surgir-fogo .6s var(--mola) both; }
+@keyframes surgir-fogo { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
 @keyframes acender {
   0% { transform: scale(.15) rotate(-12deg); opacity: 0; }
   60% { transform: scale(1.12) rotate(4deg); opacity: 1; }
   100% { transform: scale(1) rotate(0); }
-}
-@keyframes tremular {
-  0%, 100% { transform: scale(1, 1); }
-  30% { transform: scale(.97, 1.04); }
-  60% { transform: scale(1.03, .97); }
 }
 .numero-ofensiva {
   display: block;
@@ -1214,7 +1271,6 @@ button { font-family: inherit; }
 }
 .numero-ofensiva.subindo { animation: numero-sobe .5s var(--mola); }
 @keyframes numero-sobe { 0% { transform: scale(1); } 50% { transform: scale(1.22); } 100% { transform: scale(1); } }
-.cena-ofensiva h1.rotulo-ofensiva { font-size: 1.7rem; color: var(--chama); }
 
 .semana-ofensiva { width: 100%; max-width: 360px; margin-top: 14px; }
 .semana-ofensiva .nomes, .semana-ofensiva .trilho { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
@@ -1239,11 +1295,6 @@ button { font-family: inherit; }
 .marca-dia.escudo svg { color: var(--branco); }
 
 /* marcos de ofensiva: calendários numa estrada */
-.trilho-marcos { position: relative; display: flex; align-items: center; justify-content: center; gap: 22px; width: 100%; margin: 10px 0 18px; }
-.trilho-marcos::before { content: ''; position: absolute; left: -16px; right: -16px; top: 50%; height: 14px; margin-top: -7px; background: linear-gradient(90deg, #ffb13d 50%, var(--trilho) 50%); }
-.marco-lado, .marco-centro { position: relative; }
-.marco-lado.vazio { width: 64px; }
-.marco-centro { animation: pop .6s var(--mola) .2s both; }
 .arte-calendario {
   position: relative;
   display: grid;
@@ -1290,42 +1341,6 @@ button { font-family: inherit; }
 .missao.fechou-agora .premio-missao svg { animation: bau-pronto .7s var(--mola) 1.1s both; }
 @keyframes bau-pronto { 0% { transform: scale(1); } 40% { transform: scale(1.35) rotate(-8deg); } 100% { transform: scale(1) rotate(0); } }
 
-/* quadro do mês */
-.quadro {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 5px;
-  width: min(300px, 100%);
-  aspect-ratio: 1;
-  margin: 8px auto 0;
-  padding: 10px;
-  border-radius: var(--raio-g);
-  background: color-mix(in srgb, var(--cor) 22%, var(--fundo-2));
-  border: 2px solid var(--borda);
-  border-bottom-width: 6px;
-}
-.peca { position: relative; display: grid; place-items: center; overflow: hidden; border-radius: var(--raio-p); background: var(--cor); color: rgba(255, 255, 255, .75); }
-.peca svg { width: 26px; height: 26px; }
-.peca.revelada { background: #cfeefd; }
-.peca .recorte { position: absolute; width: calc(300% + 10px); height: calc(300% + 10px); left: calc(var(--c) * (-100% - 5px)); top: calc(var(--r) * (-100% - 5px)); }
-.cena-retrato { display: grid; place-items: end center; width: 100%; height: 100%; background: linear-gradient(180deg, var(--arte-ceu) 0%, var(--arte-ceu-claro) 55%, var(--arte-creme) 100%); }
-.cena-retrato svg { width: 74%; height: auto; }
-.peca.nova { animation: encaixar .7s var(--mola) .35s both; }
-@keyframes encaixar {
-  0% { transform: translateY(-60px) scale(1.5) rotate(-10deg); opacity: 0; }
-  100% { transform: none; opacity: 1; }
-}
-.quadro.completo { border-color: var(--amarelo); }
-.barra-quadro { width: min(300px, 100%); margin: 12px auto 0; }
-
-/* conquista, livro e unidade */
-.medalha-palco { position: relative; display: grid; place-items: center; width: 190px; height: 190px; }
-.medalha-palco > .arte-medalha, .medalha-palco > .arte-trofeu, .medalha-palco > .arte-livro { animation: girar-entrar .8s var(--mola) both; }
-@keyframes girar-entrar {
-  0% { transform: scale(.2) rotate(-25deg); opacity: 0; }
-  70% { transform: scale(1.1) rotate(4deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); }
-}
 .arte-medalha { position: relative; display: inline-grid; justify-items: center; flex: 0 0 auto; width: 64px; }
 .arte-medalha .escudo {
   display: grid;
@@ -1334,7 +1349,9 @@ button { font-family: inherit; }
   height: 62px;
   border-radius: 20px 20px 50% 50% / 20px 20px 42% 42%;
   background: var(--cor);
-  color: var(--sobre-cor);
+  /* --sobre: a cor que tem tinta própria (o amarelo, que virou preenchimento claro) leva
+     desenho escuro; sem isso a estrela branca sumia no escudo claro da conquista ganha. */
+  color: var(--sobre, var(--sobre-cor));
   box-shadow: inset 0 -6px 0 var(--cor-3d), 0 0 0 4px color-mix(in srgb, var(--cor) 28%, transparent);
 }
 .arte-medalha .escudo svg { width: 28px; height: 28px; }
@@ -1356,7 +1373,6 @@ button { font-family: inherit; }
 .arte-trofeu.ganho .copa { fill: var(--cor); }
 .arte-trofeu.ganho .alcas { stroke: var(--cor-3d); }
 .arte-trofeu.ganho .haste, .arte-trofeu.ganho .base { fill: var(--cor-3d); }
-.medalha-palco > .arte-trofeu { width: 130px; }
 
 /* faíscas que saem do centro */
 .faiscas { position: absolute; inset: 0; pointer-events: none; }
@@ -1452,7 +1468,6 @@ button { font-family: inherit; }
 .etapa-reflexao + .etapa-reflexao { margin-top: 22px; padding-top: 20px; border-top: 2px solid var(--borda); }
 .etapa-reflexao h2 { margin: 6px 0 12px; font-size: 1.18rem; }
 .etapa-reflexao .cartao-versiculo { margin-top: 0; }
-.avancar-reflexao { margin-top: 2px; }
 .contexto-reflexao { margin: -4px 0 14px; color: var(--tinta-fraca); font-size: 0.9rem; font-weight: 600; line-height: 1.5; }
 .contexto-reflexao b { color: var(--tinta); }
 /* O tamanho do ícone precisa estar aqui, na regra base, e não só nos lugares específicos:
@@ -1496,7 +1511,6 @@ button { font-family: inherit; }
 .pergunta-reflexao .rotulo-pergunta { color: var(--azul); font-size: 0.72rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
 .pergunta-reflexao[aria-pressed="true"] { border-color: var(--azul); background: var(--azul-fraco); }
 .dica-pensar { margin: 12px 0 12px; }
-.perguntas-reflexao + .avancar-reflexao, .dica-pensar + .avancar-reflexao { margin-top: 12px; }
 .oracao-guia { display: grid; gap: 10px; margin: 0 0 14px; padding: 0; list-style: none; }
 .oracao-guia li { padding: 12px 16px; border-radius: var(--raio); background: linear-gradient(160deg, var(--amarelo-fraco), var(--fundo-2)); color: var(--tinta-forte); font-size: 1.03rem; font-weight: 700; font-style: italic; animation: entrar-cena .45s var(--suave) both; }
 .oracao-guia li:nth-child(2) { animation-delay: .1s; }
@@ -1524,6 +1538,14 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .tela-cheia-palco { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(24px + env(safe-area-inset-top)) 16px 16px; overflow-y: auto; }
 .tela-cheia-pe { display: grid; gap: 10px; width: 100%; max-width: 560px; margin: 0 auto; padding: 12px 16px calc(18px + env(safe-area-inset-bottom)); }
 
+/* Modo encontro: letra grande, uma parte do roteiro por vez. A Palavra usa a estrutura de
+   sempre (com o cartão do versículo); as outras três são uma frase só, para ler em voz alta. */
+.modo-encontro { width: 100%; max-width: 420px; }
+.modo-encontro > .etiqueta { display: block; margin-bottom: 10px; font-size: 0.85rem; }
+.modo-encontro .frase-cena { max-width: none; font-size: 1.5rem; line-height: 1.4; }
+.modo-encontro-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.modo-encontro-nav span { color: var(--tinta-fraca); font-weight: 800; font-size: 0.88rem; }
+
 /* Fundo normal da tela, não a cor da unidade. Quando cada unidade tinha a sua cor, essa
    lavagem em tela cheia fazia sentido; com a paleta nova todas caem no petróleo, e o
    resultado era uma parede verde com o texto de apoio ilegível por cima dela. O que
@@ -1546,33 +1568,11 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 
 .cena-carta { display: flex; flex-direction: column; align-items: center; gap: 12px; perspective: 900px; text-align: center; }
 .tela-bau .cena-carta .etiqueta { color: inherit; font-size: 0.95rem; }
-.carta {
-  width: min(300px, 84vw);
-  border: 2px solid var(--borda);
-  border-bottom-width: 6px;
-  border-radius: var(--raio-g);
-  background: var(--cartao);
-  color: var(--tinta);
-  overflow: hidden;
-  text-align: left;
-}
-.cena-carta.revelando .carta { animation: virar-carta .8s var(--mola) both; }
-@keyframes virar-carta {
-  0% { transform: rotateY(90deg) scale(.7); opacity: 0; }
-  100% { transform: none; opacity: 1; }
-}
-.carta-arte { display: grid; place-items: end center; height: 210px; background: linear-gradient(170deg, var(--arte-ceu), var(--arte-creme)); }
-.carta-arte svg { width: auto; height: 190px; }
-.carta-texto { padding: 14px 18px 18px; }
-.carta-texto h2 { margin: 2px 0 6px; font-size: 1.5rem; }
-.carta-texto p { margin: 0; color: var(--tinta-fraca); font-size: 0.92rem; line-height: 1.45; }
 
 .cena-novo-proposito h1 { color: var(--azul); }
 .dupla-nomeada { display: flex; align-items: flex-end; justify-content: center; gap: 4px; margin: 18px 0 6px; }
 .dupla-nomeada > span { display: grid; justify-items: center; gap: 8px; }
 .dupla-nomeada b { color: var(--azul); font-size: 1.1rem; }
-.chama-meio .arte-chama { width: 84px; margin-bottom: 36px; }
-.chama-meio .arte-chama .fogo { animation: acender .8s var(--mola) .3s both, tremular 2.2s ease-in-out 1.2s infinite; }
 
 /* confete */
 .confete { position: fixed; inset: 0; z-index: 170; overflow: hidden; pointer-events: none; }
@@ -1639,6 +1639,15 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 }
 .retrato-amigo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .retrato-amigo.inicial { background: var(--cor); color: var(--sobre, var(--sobre-cor)); font-weight: 900; font-size: 1.15rem; }
+/* Pilha de retratos sem foto (cabeca(p), em célula e grupo): fundo suave por família de cor,
+   letra na cor forte da mesma família. Claro usa o tom -3d; verde, azul e amarelo trocam para
+   o tom cheio no escuro, onde o -3d perde contraste contra o fundo suave escuro da família
+   (conferido em ferramentas/contraste.mjs). Três classes, não duas: para vencer a regra acima
+   sem depender da ordem no arquivo. */
+.retrato-amigo.inicial.retrato-cor-verde { background: var(--verde-fraco); color: var(--verde-3d); }
+.retrato-amigo.inicial.retrato-cor-roxo { background: var(--roxo-fraco); color: var(--roxo-3d); }
+.retrato-amigo.inicial.retrato-cor-vermelho { background: var(--vermelho-fraco); color: var(--vermelho-3d); }
+:root[data-tema="escuro"] .retrato-amigo.inicial.retrato-cor-verde { color: var(--verde); }
 .retrato-amigo.mini { width: 30px; height: 30px; font-size: 0.8rem; border-width: 2px; border-color: var(--cartao); }
 .retrato-amigo.pequeno { width: 32px; height: 32px; font-size: 0.85rem; }
 .retrato-amigo.medio { width: 42px; height: 42px; font-size: 1rem; }
@@ -1698,18 +1707,75 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .cartao-proposito:hover { border-color: var(--azul); }
 .cartao-proposito p { margin: 0; }
 .cartao-proposito .selo-status { justify-self: start; }
-.cartao-proposito .barra-missao { margin-top: 0; }
+/* o rótulo "N de M pontos hoje" fica em cima da barra: o respiro é para ele não bater nos dias do cartão */
+.cartao-proposito .barra-missao { margin-top: 24px; }
 .cartao-proposito.convite { border-color: color-mix(in srgb, var(--azul) 45%, transparent); background: var(--azul-fraco); cursor: default; }
 .cabeca-proposito { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .retratos-grupo, .retratos-dupla { display: flex; flex: 0 0 auto; }
-.retratos-grupo .retrato-amigo, .retratos-dupla .retrato-amigo { box-shadow: 0 0 0 2px var(--cartao); }
-.retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -20px; }
+/* Borda fina na cor do cartão (não a do fundo da página, que é o padrão do retrato solto):
+   sem isso, a pilha somava a borda cinza de sempre com o contorno do cartão e virava um
+   borrão de duas cores por cima uma da outra. */
+.retratos-grupo .retrato-amigo, .retratos-dupla .retrato-amigo { border-color: var(--cartao); }
+/* Sobreposição pequena (8 a 10px): a pilha ainda separa uma pessoa da outra, em vez de
+   empilhar quase inteiro por cima, o que fazia as bordas se acumularem numa mancha só. */
+.retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -9px; }
+.retratos-grupo .retrato-mais { display: grid; place-items: center; background: var(--fundo-2); color: var(--tinta-forte); font-size: 0.72rem; font-weight: 900; }
+
+/* ---------- célula: líder, recado, encontro e estudo ---------- */
+/* A célula no Juntos: cartão próprio, com a cor de acento, acima dos propósitos. */
+.etiqueta-celula { display: flex; align-items: center; gap: 6px; color: var(--acento); font-size: 0.78rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
+.etiqueta-celula svg { flex: 0 0 auto; width: 16px; height: 16px; }
+.etiqueta-celula small { margin-left: auto; color: var(--tinta-fraca); font-size: 0.78rem; font-weight: 800; letter-spacing: 0; text-transform: none; }
+/* A tela da célula: cabeçalho com a contagem, abas e o painel de cada uma. */
+.cabeca-celula { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.cabeca-celula > div { flex: 1; min-width: 0; }
+.cabeca-celula h1 { margin: 4px 0 2px; overflow-wrap: anywhere; }
+.cabeca-celula .passo-dica { margin: 0; }
+.abas-celula button { position: relative; }
+.abas-celula .ponto-estudo { position: absolute; top: 8px; right: 12px; width: 7px; height: 7px; border-radius: 50%; background: var(--acento); }
+.painel-celula { display: grid; gap: 4px; }
+.painel-celula > .acoes { margin-top: 18px; }
+.botao-selo { justify-self: start; border: 0; font: inherit; cursor: pointer; }
+.lista-propositos + .convidar-largo { margin-top: 2px; }
+
+/* O recado do líder no feed: faixa da célula em cima e fundo de acento, diferente dos marcos. */
+
+.selo-lider { margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--azul-fraco); color: var(--acento); font-size: 0.7rem; font-weight: 800; vertical-align: middle; }
+.recado-lider { margin: 10px 0; padding: 12px 14px; border-left: 4px solid var(--acento); border-radius: var(--raio-p); background: var(--fundo-2); }
+.recado-lider p { margin: 4px 0 0; color: var(--tinta-forte); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.recado-cartao { margin: 0; padding: 8px 10px; border-radius: var(--raio-p); background: var(--fundo-2); color: var(--tinta); font-size: 0.86rem; font-weight: 600; line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.escolha-dia { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 12px 0; }
+/* Registro do encontro: o selo de "já registrado" e o botão de corrigir, lado a lado. */
+.registro-encontro { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0; }
+/* Contador de "pessoas sem conta que vieram": rótulo à esquerda, − e + de cada lado do número. */
+.conta-visitantes { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0; padding: 12px 14px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); font-weight: 700; }
+.conta-visitantes-controles { display: flex; align-items: center; gap: 10px; }
+.conta-visitantes-controles b { min-width: 22px; text-align: center; font-size: 1.05rem; }
+.conta-visitantes-controles .botao-icone { border: 2px solid var(--borda); font-size: 1.25rem; font-weight: 800; line-height: 1; }
+.escolha-trecho { display: grid; gap: 10px; }
+.roteiro { display: grid; gap: 16px; margin: 14px 0; padding-left: 22px; }
+.roteiro > li > b { color: var(--tinta-forte); }
+.roteiro > li > p { margin: 4px 0 0; }
+.roteiro .cartao-versiculo { margin: 8px 0; }
+.roteiro .botao.pequeno { margin-top: 6px; }
+.roteiro ul { display: grid; gap: 8px; margin: 6px 0 0; padding-left: 0; list-style: none; }
+.roteiro-dias li span { display: inline-block; min-width: 52px; color: var(--tinta-fraca); font-weight: 800; }
+.roteiro-dias small, .roteiro-perguntas small { display: block; color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 700; }
+.roteiro-perguntas li, .roteiro-oracao li { padding: 8px 10px; border-radius: var(--raio-p); background: var(--fundo-2); line-height: 1.45; }
+.estudo-livre { margin: 12px 0; line-height: 1.6; }
+.estudo-livre p { margin: 0 0 10px; overflow-wrap: anywhere; }
+/* Cada uma das quatro partes do roteiro (Acolhida, Adoração, Palavra, Testemunho). */
+.secao-w { margin: 16px 0; }
+.secao-w > .etiqueta { display: block; margin-bottom: 6px; }
+.secao-w > p { margin: 0; line-height: 1.5; }
 .cabeca-proposito .quem-amigo { flex: 1; }
 .retratos-grupo .retrato-amigo.fez, .retratos-dupla .retrato-amigo.fez { box-shadow: 0 0 0 2px var(--cartao), 0 0 0 4px var(--verde); }
 .tipo-proposito { display: inline-flex; align-items: center; gap: 4px; min-width: 0; margin: 0; color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 800; }
 .tipo-proposito svg { flex: 0 0 auto; width: 14px; height: 14px; }
 .tipo-proposito > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.folha .barra-missao { margin: 12px 0 10px; }
+/* o rótulo de pontos fica em cima da barra: o respiro é para ele não bater no texto de cima */
+.folha .barra-missao { margin: 30px 0 10px; }
 .dias-cartao { display: grid; justify-items: end; flex: 0 0 auto; margin-left: auto; color: var(--chama); font-size: 1.2rem; font-weight: 900; line-height: 1.1; }
 .dias-cartao svg { width: 16px; height: 16px; }
 .dias-cartao small { color: var(--tinta-fraca); font-size: 0.72rem; font-weight: 800; }
@@ -1748,10 +1814,7 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .corpo-mural p { flex: 1; margin: 0; color: var(--tinta); font-size: 1.08rem; font-weight: 600; line-height: 1.45; }
 .corpo-mural p b { color: var(--tinta-forte); font-weight: 800; }
 .arte-mural { flex: 0 0 auto; display: grid; place-items: center; width: 74px; }
-.arte-mural .arte-chama { width: 68px; }
 .arte-mural .arte-trofeu { width: 54px; }
-.arte-retrato { display: block; width: 70px; height: 70px; border-radius: var(--raio-g); overflow: hidden; background: linear-gradient(180deg, var(--arte-ceu), var(--arte-creme)); }
-.arte-retrato svg { width: 100%; height: 100%; }
 .versiculo-mural { margin: 0 0 12px; padding: 14px 16px; border-radius: var(--raio); background: var(--fundo-2); }
 .versiculo-mural p { margin: 0 0 6px; color: var(--tinta-forte); font-size: 1rem; font-weight: 600; line-height: 1.55; }
 .versiculo-mural b { color: var(--tinta-fraca); font-size: 0.82rem; }
@@ -1785,6 +1848,8 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .vazio-amigos svg { width: 40px; height: 40px; color: var(--tinta-travada); }
 .vazio-amigos p { margin: 0; max-width: 300px; }
 .vazio-amigos .botao { width: auto; }
+/* O ícone grande e apagado é da ilustração do vazio; dentro do botão, o ícone segue o botão. */
+.vazio-amigos .botao svg { width: 20px; height: 20px; color: currentColor; }
 
 .folha .mensagem-convite { padding: 12px 14px; border-radius: var(--raio); background: var(--fundo-2); color: var(--tinta); font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
 .mensagem-convite span { color: var(--azul); font-weight: 800; }
@@ -1864,22 +1929,6 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .cartao-pessoa .conta { display: block; padding-left: 8px; font-size: 0.9rem; font-weight: 700; color: var(--tinta-fraca); }
 
 .titulo-perfil { margin: 20px 0 12px; }
-.numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.numero-cartao {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 2px solid var(--borda);
-  border-radius: var(--raio);
-  background: var(--cartao);
-  color: inherit;
-  text-decoration: none;
-}
-.numero-cartao svg { width: 26px; height: 26px; flex: 0 0 auto; color: var(--cor, var(--tinta-fraca)); }
-.numero-cartao b { display: block; font-size: 1.3rem; font-weight: 900; color: var(--tinta-forte); line-height: 1.1; }
-.numero-cartao span { display: block; font-size: 0.8rem; font-weight: 700; color: var(--tinta-fraca); }
-a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
 
 .linha-ritmo { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; padding: 12px 14px; border-radius: var(--raio); background: var(--azul-fraco); font-size: 0.9rem; color: var(--tinta); font-weight: 700; }
 .linha-ritmo svg { width: 22px; height: 22px; flex: 0 0 auto; color: var(--azul); }
@@ -1895,33 +1944,10 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
 .estante { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
 .trofeu { display: grid; justify-items: center; align-content: start; gap: 4px; padding: 14px 6px 12px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); text-align: center; }
 .trofeu .arte-trofeu { width: 46px; }
-.trofeu .arte-retrato { width: 56px; height: 56px; border-radius: var(--raio-p); }
 .trofeu b { color: var(--tinta-forte); font-size: 0.8rem; line-height: 1.2; }
 .trofeu span { color: var(--tinta-fraca); font-size: 0.74rem; font-weight: 700; }
 .trofeu:not(.ganho) b { color: var(--tinta-fraca); }
 
-.fileira-cartas { display: flex; gap: 10px; margin: 0 -16px; padding: 2px 16px 8px; overflow-x: auto; scrollbar-width: none; }
-.fileira-cartas::-webkit-scrollbar { display: none; }
-.grade-cartas { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
-.carta-mini {
-  flex: 0 0 90px;
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-  padding: 8px 4px 6px;
-  border: 2px solid var(--borda);
-  border-bottom-width: 4px;
-  border-radius: var(--raio-p);
-  background: linear-gradient(180deg, #d6f0ff, var(--cartao) 80%);
-  color: var(--tinta-forte);
-  font: inherit;
-  cursor: pointer;
-}
-:root[data-tema="escuro"] .carta-mini { background: linear-gradient(180deg, #1d3a49, var(--cartao) 80%); }
-.carta-mini svg { width: auto; height: 78px; }
-.carta-mini b { font-size: 0.78rem; font-weight: 800; }
-.carta-mini.oculta { place-content: center; min-height: 118px; border-style: dashed; background: var(--fundo-2); color: var(--tinta-travada); cursor: default; }
-.carta-mini.oculta svg { width: 26px; height: 26px; margin: 0 auto; }
 
 .linha-ajuda { display: flex; gap: 12px; margin-top: 18px; padding: 14px; border-radius: var(--raio-g); background: var(--vermelho-fraco); }
 .linha-ajuda svg { width: 22px; height: 22px; color: var(--vermelho); flex: 0 0 auto; }
@@ -1933,7 +1959,6 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
 .folha-ofensiva { display: grid; gap: 14px; }
 .chama-grande { display: grid; justify-items: center; color: var(--chama); }
 .chama-grande .ico-chama { width: 96px; height: 96px; }
-.chama-grande .arte-chama .fogo { animation: acender .7s var(--mola) both, tremular 2.2s ease-in-out 1s infinite; }
 .chama-grande b { font-size: 2.8rem; font-weight: 900; line-height: 1.05; }
 .chama-grande span { color: var(--tinta-forte); font-weight: 800; }
 .chama-grande.apagada { color: var(--tinta-fraca); }
@@ -1990,7 +2015,8 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
   position: relative;
   width: 100%;
   max-width: 560px;
-  max-height: 92vh;
+  /* com o teclado aberto a cortina encolhe (visualViewport): a folha cabe no que sobrou */
+  max-height: min(92vh, calc(100% - 12px));
   overflow-y: auto;
   background: var(--cartao);
   border-radius: 24px 24px 0 0;
@@ -2018,8 +2044,8 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
   place-content: center;
   justify-items: center;
   gap: 22px;
-  /* o fundo do próprio app, e não mais o vermelho que destoava da paleta */
-  background: #fdfbf5;
+  /* o mesmo preto do ícone do app (#0b0b0b), nos dois temas: a abertura fica igual ao ícone */
+  background: #0b0b0b;
   transition: opacity .35s ease, visibility .35s ease;
 }
 .abertura.saindo { opacity: 0; visibility: hidden; }
@@ -2027,30 +2053,18 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
   width: 108px;
   height: auto;
   display: block;
-  color: #1c1812;
-  animation: mascote-respira 2.4s ease-in-out infinite;
+  color: #f6f1e6;
+  animation: simbolo-respira 2.4s ease-in-out infinite;
 }
-@keyframes mascote-respira {
+@keyframes simbolo-respira {
   0%, 100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-8px) scale(1.02); }
 }
-.abertura-marca { font-family: var(--fonte-destaque); font-size: 1.4rem; font-weight: 600; color: #1c1812; letter-spacing: 0.06em; text-transform: uppercase; }
-.abertura-barra { width: 150px; height: 8px; border-radius: 999px; background: #e3f5ee; overflow: hidden; }
-.abertura-barra i { display: block; height: 100%; width: 40%; border-radius: 999px; background: #18a877; animation: abertura-corre 1.1s ease-in-out infinite; }
-/* No escuro, as cores do tema escuro do app. Vale o tema escolhido e, sem escolha, o do
-   sistema: a abertura aparece antes de o aplicativo aplicar o tema. */
-:root[data-tema="escuro"] .abertura { background: #15110b; }
-:root[data-tema="escuro"] .abertura-simbolo svg { color: #f6f1e6; }
-:root[data-tema="escuro"] .abertura-marca { color: #f6f1e6; }
-:root[data-tema="escuro"] .abertura-barra { background: #16362b; }
-:root[data-tema="escuro"] .abertura-barra i { background: #3ecf8e; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema]) .abertura { background: #15110b; }
-  :root:not([data-tema]) .abertura-simbolo svg { color: #f6f1e6; }
-  :root:not([data-tema]) .abertura-marca { color: #f6f1e6; }
-  :root:not([data-tema]) .abertura-barra { background: #16362b; }
-  :root:not([data-tema]) .abertura-barra i { background: #3ecf8e; }
-}
+.abertura-marca { font-family: var(--fonte-destaque); font-size: 1.4rem; font-weight: 600; color: #f6f1e6; letter-spacing: 0.06em; text-transform: uppercase; }
+.abertura-erro { margin: 18px 24px 0; color: #f6f1e6; font-weight: 700; text-align: center; line-height: 1.5; }
+.abertura-erro button { margin-top: 10px; padding: 10px 18px; border: 2px solid currentColor; border-radius: 999px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.abertura-barra { width: 150px; height: 8px; border-radius: 999px; background: #1f2a2a; overflow: hidden; }
+.abertura-barra i { display: block; height: 100%; width: 40%; border-radius: 999px; background: #5fbdb9; animation: abertura-corre 1.1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .abertura-simbolo svg, .abertura-barra i { animation: none; }
 }
@@ -2077,7 +2091,6 @@ a.numero-cartao:hover { text-decoration: none; border-color: var(--azul); }
 .cabeca-pratica h1 { margin: 0 0 4px; color: inherit; }
 .cabeca-pratica p { margin: 0 0 14px; font-weight: 700; opacity: .92; }
 .cabeca-pratica .botao { width: auto; }
-.mascote-pratica svg, .mascote-pratica .mascote-svg { display: block; width: 92px; height: auto; animation: balancar 3.2s ease-in-out infinite; transform-origin: 50% 90%; }
 .lista-pratica.caixa-lista { gap: 0; }
 .lista-pratica.caixa-lista .cartao-pratica { padding: 12px 14px; border: 0; border-radius: 0; background: none; }
 .lista-pratica.caixa-lista .cartao-pratica:hover { background: var(--fundo-2); }
@@ -2260,7 +2273,7 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .cabeca-secao { display: flex; align-items: center; gap: 14px; margin: 4px 0 6px; }
 .cabeca-secao h1 { margin: 0 0 2px; }
 .cabeca-secao p { margin: 0; color: var(--tinta-fraca); font-size: 0.95rem; font-weight: 700; }
-.icone-secao { flex: 0 0 auto; display: grid; place-items: center; width: 56px; height: 56px; border-radius: var(--raio-g); background: var(--cor-fraca); color: var(--cor); }
+.icone-secao { flex: 0 0 auto; display: grid; place-items: center; width: 56px; height: 56px; border-radius: var(--raio-g); background: var(--verde-fraco); color: var(--verde); }
 .icone-secao svg { width: 28px; height: 28px; }
 .grade-secoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .bloco-secao {
@@ -2277,7 +2290,9 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
   animation: entrar-cartao .3s var(--suave) both;
 }
 .bloco-secao:hover { text-decoration: none; background: var(--fundo-2); }
-.bloco-secao .icone { width: 44px; height: 44px; border-radius: var(--raio-p); display: grid; place-items: center; background: var(--cor-fraca); color: var(--cor); margin-bottom: 6px; }
+/* Um padrão só para os ícones da grade (antes cada seção tinha uma cor, e depois da paleta
+   nova sobrou uma mistura de verde e cinza). */
+.bloco-secao .icone { width: 44px; height: 44px; border-radius: var(--raio-p); display: grid; place-items: center; background: var(--verde-fraco); color: var(--verde); margin-bottom: 6px; }
 .bloco-secao .icone svg { width: 24px; height: 24px; }
 .bloco-secao b { color: var(--tinta-forte); font-size: 1rem; }
 .bloco-secao span { font-size: 0.8rem; color: var(--tinta-fraca); font-weight: 700; line-height: 1.35; }
@@ -2313,19 +2328,64 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .item .resumo { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.9rem; color: var(--tinta-fraca); line-height: 1.45; margin-top: 4px; }
 .item .destaque { font-size: 0.92rem; font-style: italic; color: var(--tinta); margin-top: 6px; }
 
+/* ---------- Bíblia: lista de livros e grade de capítulos ---------- */
+.grade-livros { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; }
+@media (min-width: 600px) { .grade-livros { grid-template-columns: repeat(3, 1fr); } }
+.item-livro {
+  display: block;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--cartao);
+  color: var(--tinta-forte);
+  font-weight: 800;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.item-livro:hover { text-decoration: none; background: var(--fundo-2); }
+.item-livro { position: relative; display: flex; align-items: center; gap: 6px; overflow: hidden; }
+.item-livro > span { flex: 1; min-width: 0; }
+.item-livro > svg { flex: 0 0 auto; width: 18px; height: 18px; color: var(--acento); }
+.item-livro.completo { border-color: color-mix(in srgb, var(--acento) 45%, var(--borda)); }
+/* quanto do livro o plano já leu: um fio no pé do botão */
+.progresso-livro { position: absolute; left: 0; bottom: 0; height: 4px; width: var(--f); background: var(--acento); border-radius: 0 4px 0 0; }
+/* Continuar lendo */
+.cartao-continuar { display: flex; align-items: center; gap: 12px; margin: 4px 0 18px; padding: 14px 16px; border-radius: var(--raio-g); background: var(--inverso); color: var(--inverso-tinta); text-decoration: none; }
+.cartao-continuar:hover { text-decoration: none; filter: brightness(1.05); }
+.cartao-continuar .icone-continuar { display: grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; border-radius: var(--raio-p); background: color-mix(in srgb, var(--inverso-tinta) 16%, transparent); }
+.cartao-continuar .icone-continuar svg { width: 24px; height: 24px; }
+.cartao-continuar .textos { flex: 1; display: grid; min-width: 0; line-height: 1.25; }
+.cartao-continuar small { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.85; }
+.cartao-continuar b { font-size: 1.15rem; }
+.cartao-continuar > svg:last-child { flex: 0 0 auto; width: 20px; height: 20px; }
+
+.grade-capitulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.grade-capitulos a {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  aspect-ratio: 1;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--cartao);
+  color: var(--tinta-forte);
+  font-weight: 800;
+  text-decoration: none;
+}
+.grade-capitulos a:hover { text-decoration: none; background: var(--fundo-2); }
+.grade-capitulos a.atual { border-color: var(--inverso); background: var(--inverso); color: var(--inverso-tinta); }
+
+/* Os dois botões de navegar entre capítulos lado a lado; sozinho, o que existir ocupa
+   a largura toda (Gênesis 1 só tem "próximo", Apocalipse 22 só tem "anterior"). */
+.leitor-biblia .licao-pe .interno { display: flex; gap: 10px; }
+.leitor-biblia .licao-pe .interno .botao { flex: 1; width: auto; }
+
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .chip { font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--fundo-2); color: var(--tinta-fraca); }
 .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .filtro { border: 2px solid var(--borda); background: var(--cartao); color: var(--tinta-fraca); border-radius: 999px; padding: 8px 16px; min-height: 40px; font-weight: 800; font-size: 0.84rem; cursor: pointer; font-family: inherit; }
 .filtro.ligado { background: var(--azul); border-color: var(--azul); color: var(--sobre-cor); }
-
-.dobra-livros { margin-top: 12px; }
-.dobra-livros > summary { cursor: pointer; font-weight: 800; font-size: 0.86rem; color: var(--tinta-fraca); padding: 10px 2px; list-style: none; }
-.dobra-livros > summary::-webkit-details-marker { display: none; }
-.dobra-livros > summary::after { content: ' ⌄'; }
-.dobra-livros[open] > summary::after { content: ' ⌃'; }
-.dobra-livros > summary:hover { color: var(--azul); }
-.dobra-livros .pilulas { margin-top: 8px; }
 
 .notas-de-hoje { display: grid; gap: 8px; margin-top: 14px; }
 .notas-de-hoje b { color: var(--tinta-forte); }
@@ -2339,7 +2399,10 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 /* a nota lida como texto, sem moldura em volta */
 .nota-artigo { padding: 2px 0 6px; }
 .nota-artigo .nota-corpo > h1:first-child { margin: 4px 0 6px; font-size: 2rem; }
-.nota-artigo .nota-corpo h2 { color: var(--cor, var(--tinta-forte)); }
+/* Um verde só para os subtítulos das notas (antes cada seção tinha a sua cor, e depois da
+   paleta nova sobrou uma mistura de verde e cinza). */
+.nota-artigo .nota-corpo h2 { color: var(--verde-3d); }
+:root[data-tema="escuro"] .nota-artigo .nota-corpo h2 { color: var(--verde); }
 .nota-corpo { font-size: 1.05rem; font-weight: 500; line-height: 1.72; color: var(--tinta); }
 .nota-corpo strong, .nota-corpo b { font-weight: 800; }
 .nota-corpo h1, .nota-corpo h2 { margin-top: 26px; }
@@ -2349,12 +2412,47 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .nota-corpo li { margin-bottom: 6px; }
 .nota-corpo blockquote { margin: 16px 0; padding: 14px 16px; border-radius: var(--raio); background: var(--azul-fraco); font-style: italic; }
 .nota-corpo blockquote p:last-child { margin-bottom: 0; }
+.nota-corpo blockquote cite { display: block; margin-top: 8px; font-style: normal; font-size: 0.85rem; font-weight: 700; color: var(--tinta-suave, inherit); }
 .nota-corpo table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
 .nota-corpo th, .nota-corpo td { border: 1px solid var(--borda); padding: 8px 10px; text-align: left; vertical-align: top; }
 .nota-corpo th { background: var(--fundo-2); font-weight: 800; }
 .nota-corpo code { background: var(--fundo-2); padding: 2px 5px; border-radius: 6px; font-size: 0.88em; }
 .nota-corpo hr { border: 0; border-top: 2px solid var(--borda); margin: 24px 0; }
 .rolagem-tabela { overflow-x: auto; }
+
+/* ---------- comece por aqui (Explorar) ---------- */
+.comece { display: block; margin: 14px 0; }
+.comece .passo-dica { margin: 0; }
+.comece:not(.feito) > summary { display: flex; align-items: center; gap: 12px; cursor: pointer; list-style: none; }
+.comece > summary::-webkit-details-marker { display: none; }
+.comece > summary:focus-visible { outline: 3px solid var(--azul); outline-offset: 4px; border-radius: var(--raio-p); }
+.cabeca-comece { flex: 1; display: grid; gap: 4px; min-width: 0; }
+.cabeca-comece b { color: var(--tinta-forte); font-size: 1.15rem; }
+.seta-comece { flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--fundo-2); color: var(--tinta-fraca); }
+.seta-comece svg { width: 20px; height: 20px; transition: transform .2s ease; }
+.comece[open] .seta-comece svg { transform: rotate(180deg); }
+.corpo-comece { display: grid; gap: 10px; margin-top: 14px; }
+.barra-comece { display: block; height: 8px; margin-top: 4px; border-radius: 999px; background: var(--progresso-trilho, var(--borda)); overflow: hidden; }
+.barra-comece i { display: block; height: 100%; min-width: 4px; border-radius: 999px; background: var(--acento); }
+.lista-comece { display: grid; gap: 2px; margin: 4px 0 0; padding: 0; list-style: none; }
+.lista-comece a { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 4px; border-radius: var(--raio-p); color: var(--tinta); text-decoration: none; }
+.lista-comece a:hover { background: var(--fundo-2); text-decoration: none; }
+.lista-comece a > span:nth-child(2) { display: grid; min-width: 0; }
+.lista-comece b { color: var(--tinta-forte); font-size: 0.95rem; }
+.lista-comece small { color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 600; }
+.numero-comece { flex: 0 0 auto; display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid var(--borda); border-radius: 50%; color: var(--tinta-fraca); font-size: 0.85rem; font-weight: 900; }
+.numero-comece svg { width: 16px; height: 16px; }
+.lista-comece .lido .numero-comece { border-color: var(--inverso); background: var(--inverso); color: var(--inverso-tinta); }
+.lista-comece .lido b { color: var(--tinta-fraca); }
+.lista-comece .agora .numero-comece { border-color: var(--acento); color: var(--acento); }
+.link-passos { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--azul); font-weight: 800; }
+.link-passos svg { width: 18px; height: 18px; }
+.comece.feito summary { display: flex; align-items: center; gap: 12px; cursor: pointer; list-style: none; }
+.comece.feito summary::-webkit-details-marker { display: none; }
+.comece.feito summary > svg { width: 22px; height: 22px; color: var(--acento); flex: 0 0 auto; }
+.comece.feito summary > span { display: grid; }
+.comece-proximo { display: grid; gap: 10px; margin: 18px 0; }
+.comece-proximo p { margin: 0; }
 
 /* =========================================================================
    LEITOR
@@ -2408,12 +2506,51 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .leitor-verso sup { margin-right: 8px; color: var(--cor, var(--azul)); font-size: 0.66em; font-weight: 900; vertical-align: 0.4em; }
 .leitor-verso:hover { background: var(--fundo-2); }
 .leitor-verso.escolhido { background: color-mix(in srgb, var(--amarelo) 22%, transparent); box-shadow: inset 4px 0 0 var(--amarelo); }
+/* Marca-texto (04e-versiculos.js). Vem depois do .escolhido: o fundo é o da marca e a escolha
+   continua visível pelo filete à esquerda. */
+.leitor-verso.marca-1, .cartao-versiculo.marca-1, .item-versiculo.marca-1 .cartao-versiculo { background: var(--marca-1); }
+.leitor-verso.marca-2, .cartao-versiculo.marca-2, .item-versiculo.marca-2 .cartao-versiculo { background: var(--marca-2); }
+.leitor-verso.marca-3, .cartao-versiculo.marca-3, .item-versiculo.marca-3 .cartao-versiculo { background: var(--marca-3); }
+.leitor-verso.marca-4, .cartao-versiculo.marca-4, .item-versiculo.marca-4 .cartao-versiculo { background: var(--marca-4); }
+.leitor-verso.escolhido { box-shadow: inset 4px 0 0 var(--acento); }
+/* versículo com nota: um pontinho no fim, discreto */
+.leitor-verso.com-nota::after { content: ''; display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--acento); vertical-align: middle; }
 .leitor.corrido .versos { display: block; }
 .leitor.corrido .leitor-verso { display: inline; margin: 0; padding: 2px 0; border-radius: 4px; }
 .leitor.corrido .leitor-verso sup { margin: 0 4px 0 2px; }
 .acoes-verso { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; animation: subir .2s var(--suave); }
 .acoes-verso b { flex: 1 1 100%; color: var(--tinta-forte); font-size: 0.95rem; }
 .acoes-verso .botao { flex: 1; }
+.cores-marca { display: flex; align-items: center; gap: 10px; flex: 1 1 100%; }
+.cor-marca {
+  width: 34px; height: 34px; padding: 0; border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--tinta) 30%, transparent);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.cor-marca.marca-1 { background: var(--marca-1); }
+.cor-marca.marca-2 { background: var(--marca-2); }
+.cor-marca.marca-3 { background: var(--marca-3); }
+.cor-marca.marca-4 { background: var(--marca-4); }
+.cor-marca[aria-pressed="true"] { border-color: var(--tinta-forte); box-shadow: 0 0 0 3px var(--acento); }
+.cor-marca:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.cores-marca .tirar-marca { margin-left: auto; }
+.botoes-verso { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 1 100%; }
+.botoes-verso .botao { flex: 1 1 auto; }
+.botoes-verso .botao-icone { flex: 0 0 auto; }
+.acoes-verso.no-cartao { margin-top: 16px; animation: none; }
+.acoes-verso.no-cartao .botao { margin-top: 0; }
+/* no cartão a legenda já traz a referência: a da barra (útil na Bíblia, com o trecho escolhido) sobrava */
+.acoes-verso.no-cartao .ref-verso { display: none; }
+/* na Bíblia, com versículo escolhido, a barra toma o lugar dos botões de capítulo */
+.leitor-biblia.escolhendo [data-anterior], .leitor-biblia.escolhendo [data-proximo] { display: none; }
+.trecho-da-nota { margin: 0 0 14px; padding: 12px 14px; border-left: 4px solid var(--acento); border-radius: var(--raio-p); background: var(--fundo-2); color: var(--tinta); font-weight: 600; }
+.lista-notas-verso { display: grid; gap: 12px; margin: 4px 0 22px; }
+.nota-verso { padding: 14px 16px; border-radius: var(--raio); background: var(--cartao); border: 2px solid var(--borda); }
+.abrir-nota-verso { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.abrir-nota-verso b { display: block; color: var(--tinta-forte); }
+.abrir-nota-verso .resumo { display: block; margin-top: 4px; color: var(--tinta); }
+.nota-verso .botao { margin-top: 8px; }
+a.item-versiculo { display: block; color: inherit; text-decoration: none; }
 .acoes-verso .botao-icone { flex: 0 0 auto; }
 @media (min-width: 420px) { .acoes-verso b { flex: 1 1 auto; } .acoes-verso .botao { flex: 0 0 auto; } }
 
@@ -2454,6 +2591,13 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .linha-config .valor { max-width: 55%; overflow: hidden; color: var(--tinta-fraca); font-size: 0.9rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .linha-config svg { width: 18px; height: 18px; color: var(--tinta-fraca); flex: 0 0 auto; }
 .linha-config.perigo { color: var(--vermelho); }
+/* Painel do app (só o dono): barra de contagem com o número ao lado, e o campo de @ solto. */
+.painel-barra { flex-wrap: nowrap; }
+.painel-barra > span:first-child { flex: 0 0 34%; }
+.painel-trilho { flex: 1; height: 10px; border-radius: 999px; background: var(--trilho, var(--borda)); overflow: hidden; }
+.painel-trilho i { display: block; height: 100%; min-width: 2px; border-radius: 999px; background: var(--acento); }
+.painel-barra .valor { min-width: 2ch; text-align: right; }
+.painel-outro input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 12px; border: 2px solid var(--borda); border-radius: 12px; background: var(--fundo); color: var(--tinta); font: inherit; }
 .linha-config.sem-toque { cursor: default; flex-wrap: wrap; }
 .linha-config .segmentado { margin: 0; min-width: 210px; }
 a.linha-config:hover, button.linha-config:hover { text-decoration: none; background: var(--fundo-2); }
@@ -2466,6 +2610,9 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
 .campo-senha span { color: var(--tinta-fraca); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 .campo-senha input { width: 100%; min-height: 50px; padding: 13px 14px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--fundo-2); color: var(--tinta-forte); font-family: inherit; font-size: 1rem; font-weight: 700; }
 .campo-senha input:focus { outline: none; border-color: var(--azul); background: var(--cartao); }
+.campo-senha textarea { width: 100%; min-height: 110px; padding: 12px 14px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--fundo-2); color: var(--tinta-forte);
+  font-family: inherit; font-size: 1rem; font-weight: 600; line-height: 1.5; resize: vertical; }
+.campo-senha textarea:focus { outline: none; border-color: var(--azul); background: var(--cartao); }
 .recado-senha:empty { display: none; }
 .recado-senha { margin: 4px 0 0; padding: 10px 12px; border-radius: var(--raio); background: var(--vermelho-fraco); color: var(--vermelho-3d); font-size: 0.9rem; font-weight: 800; }
 :root[data-tema="escuro"] .recado-senha { color: var(--vermelho); }
@@ -2512,13 +2659,55 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
     border-right: 2px solid var(--borda);
     border-radius: 0;
     background: var(--fundo);
+    pointer-events: auto;
   }
   .navegacao .marca-lateral { display: flex; align-items: center; gap: 10px; font-family: var(--fonte-destaque); font-size: 1.15rem; font-weight: 600; color: var(--tinta-forte); text-decoration: none; padding: 8px 12px 20px; letter-spacing: 0.02em; text-transform: uppercase; }
   .navegacao .marca-lateral em { font-style: normal; color: var(--vermelho); }
   .navegacao .marca-lateral .simbolo { flex: 0 0 auto; display: grid; place-items: center; color: var(--tinta-forte); }
   .navegacao .marca-lateral .simbolo svg.ico-logo { width: 30px; height: auto; }
+  /* As ilhas eram só um agrupamento visual do celular: no trilho lateral elas somem do
+     layout (display: contents) e as abas voltam a ser itens soltos da lista vertical.
+     A ordem no celular muda de caso para caso (ver abasDoCelular em 10-roteador.js), mas
+     o trilho lateral sempre mostra a lista inteira, na mesma ordem: Trilha, Desafios,
+     Célula, Discipulado, Bíblia, Juntos, Explorar. Como .navegacao é o flex container aqui
+     (a ilha virou "contents"), `order` decide essa posição sem depender do HTML. */
+  .ilha { display: contents; }
   .aba { flex: 0 0 auto; flex-direction: row; justify-content: flex-start; gap: 14px; max-width: none; width: 100%; height: 54px; padding: 0 14px; }
   .aba .rotulo-aba { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .aba[data-papel="trilha"] { order: 1; }
+  .aba[data-papel="desafios"] { order: 2; }
+  .aba[data-papel="celula"] { order: 3; }
+  .aba[data-papel="discipulado"] { order: 4; }
+  .aba[data-papel="biblia"] { order: 5; }
+  .aba[data-papel="juntos"] { order: 6; }
+  .aba[data-papel="explorar"] { order: 7; }
+  /* O Mais só existe no celular: no trilho, Desafios e Explorar já têm lugar fixo na
+     lista, e Célula/Discipulado (quando existem) também são itens de verdade. */
+  .aba[data-papel="mais"] { display: none; }
+  /* Os "fantasmas" (Desafios trocado por Célula/Discipulado, e o Explorar, que no celular
+     mora dentro do Mais) só aparecem aqui. */
+  .aba.so-trilho { display: flex; }
+  /* No trilho lateral a aba ativa volta a ser a pílula preenchida de sempre: a troca para
+     "só cor", feita lá em cima, vale só na barra de baixo do celular. */
+  .aba.selecionada { color: var(--inverso-tinta); background: var(--inverso); border-radius: var(--raio-capsula); }
+  .aba:hover:not(.selecionada) { background: var(--fundo-2); }
+  /* No trilho lateral a Bíblia volta a ser um item comum da lista: o brilho e o quadrado
+     levantado só fazem sentido flutuando sobre a barra de baixo. */
+  .aba.aba-central {
+    margin: 0;
+    flex: 0 0 auto;
+    width: 100%;
+    height: 54px;
+    max-width: none;
+    border: 2px solid transparent;
+    border-radius: var(--raio-p);
+    background: none;
+    color: var(--tinta-fraca);
+    box-shadow: none;
+  }
+  .aba.aba-central .rotulo-aba { font-size: 0.95rem; }
+  .aba.aba-central:hover { background: var(--fundo-2); }
+  .aba.aba-central.selecionada { color: var(--inverso-tinta); background: var(--inverso); border-radius: var(--raio-capsula); box-shadow: none; }
   .aplicativo { padding-left: 240px; }
   .topo { padding-left: 24px; }
   .estatisticas { justify-content: center; gap: 14px; }
@@ -2616,7 +2805,7 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 /* =========================================================================
    AJUSTE VISUAL DE 2026-09
    ========================================================================= */
-/* ícone da lamparina no meio do texto (dias juntos, propósitos, listas) */
+/* ícone do fogo no meio do texto (dias juntos, propósitos, listas) */
 .ico-chama { width: 1.3em; height: 1.3em; vertical-align: -0.3em; flex: 0 0 auto; }
 /* O fogo dança. Presa na base (origem em 50% 96%), a chama estica e encolhe na vertical,
    se aperta na horizontal e balança de leve — fogo sobe, não infla no meio. Os dois ciclos
@@ -2642,14 +2831,54 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 /* balão do baú pronto: mesmo balão do "Começar", na cor de conquista */
 .balao.balao-bau { color: var(--amarelo-3d); }
 :root[data-tema="escuro"] .balao.balao-bau { color: var(--amarelo); }
-/* nome e versículo do estágio da chama, na folha da ofensiva */
-.estagio-chama { margin: 4px 0 14px; text-align: center; color: var(--tinta-fraca); font-size: 0.92rem; line-height: 1.45; }
-.estagio-chama b { color: var(--chama-texto); font-size: 1.05rem; }
-.estagio-chama span { color: var(--tinta); }
-.estagio-chama small { color: var(--tinta-fraca); font-weight: 800; }
+
+/* ---------- carimbo do lema ----------
+   A mesma arte do onboarding, trazida para dentro do app: chapas retas, letra de marcador
+   enchendo o bloco, e um empurrãozinho lateral em cada linha no lugar de rotação. A chapa
+   inverte com o tema, senão ela some no fundo preto. O portal (entrar.html) repete estas
+   regras na mão, porque é uma página à parte e não carrega este arquivo. */
+/* min-width:0 evita que uma frase comprida (nowrap) empurre a trilha do grid da folha
+   inteira: sem isso, o carimbo mais longo alargava a folha e cortava até a fileira dos
+   dias da semana lá embaixo, que não tem nada a ver com ele. */
+.selo-lema { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.selo-linha { position: relative; isolation: isolate; display: block; width: fit-content; max-width: 100%;
+  margin-top: -3px; padding: 8px 18px 4px; color: var(--fundo); font-family: 'Permanent Marker', cursive;
+  font-size: clamp(.95rem, 5.6vw, 1.35rem); line-height: 1.12; letter-spacing: .02em;
+  text-transform: uppercase; text-align: center; white-space: nowrap; overflow: hidden; }
+/* A tinta é um pseudo-elemento atrás do texto, e não o fundo da caixa: mascarar a caixa
+   mascararia as letras junto, comendo as bordas delas. A forma vem de um SVG embutido
+   (nada de arquivo externo: o app precisa abrir offline), esticado no tamanho do bloco —
+   é o que dá a borda irregular de pincel em vez de um retângulo chapado. */
+.selo-linha::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--tinta-forte);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60' preserveAspectRatio='none'%3E%3Cpath d='M3 11C42 5 84 12 124 7 168 2 214 11 256 6c18-2 34 3 42 0l0 44c-20 7-46-2-82 4-44 7-90-4-134 2-30 4-58-5-80 0z' fill='%23fff'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60' preserveAspectRatio='none'%3E%3Cpath d='M3 11C42 5 84 12 124 7 168 2 214 11 256 6c18-2 34 3 42 0l0 44c-20 7-46-2-82 4-44 7-90-4-134 2-30 4-58-5-80 0z' fill='%23fff'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+}
+/* a segunda pincelada é espelhada, para as linhas não saírem do mesmo carimbo */
+.selo-lema > :nth-child(even)::before { transform: scaleX(-1); }
+.selo-linha:first-child { margin-top: 0; }
+.selo-lema > :nth-child(1) { transform: translateX(3px); }
+.selo-lema > :nth-child(2) { transform: translateX(-8px); }
+.selo-lema > :nth-child(3) { transform: translateX(6px); }
+.selo-lema > :nth-child(4) { transform: translateX(-5px); }
+.selo-lema > :nth-child(5) { transform: translateX(4px); }
+.selo-lema > :nth-child(6) { transform: translateX(-7px); }
+.selo-ofensiva { margin: 6px 0 16px; }
+/* Letra do carimbo pelo tamanho da frase: quanto mais linhas, menor. O JS da folha ainda
+   encolhe o carimbo inteiro, por igual, se a linha mais larga não couber. */
+.selo-ofensiva { --tam-selo: clamp(.95rem, 5.6vw, 1.35rem); }
+.selo-ofensiva[data-linhas="3"] { --tam-selo: clamp(.9rem, 5.2vw, 1.22rem); }
+.selo-ofensiva[data-linhas="4"] { --tam-selo: clamp(.85rem, 4.8vw, 1.1rem); }
+.selo-ofensiva[data-linhas="5"], .selo-ofensiva[data-linhas="6"] { --tam-selo: clamp(.8rem, 4.4vw, 1rem); }
+.selo-ofensiva .selo-linha { font-size: var(--tam-selo); }
+/* referência em cima do carimbo, quando a frase é versículo (o mesmo desenho do portal) */
+.folha-ofensiva .selo-ref { justify-self: center; margin: 4px 0 -8px; font-family: var(--fonte-destaque); font-weight: 700;
+  font-style: italic; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-forte); }
 .marcas-barro { text-align: center; margin: -4px 0 12px; }
-.arte-chama .brasa { animation: brasa 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 50%; }
-@keyframes brasa { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
 
 /* ---------- trilha: leitura de hoje ---------- */
 .leitura-hoje {
@@ -2693,9 +2922,6 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 .acoes-reflexao .link-nota svg { width: 18px; height: 18px; }
 
 /* o resumo é uma tela sem topo, como a celebração antiga */
-.licao.tela-resumo { grid-template-rows: 1fr auto; }
-.tela-resumo .licao-pe { border-top-color: transparent; }
-.tela-resumo .licao-palco { padding-top: calc(20px + env(safe-area-inset-top)); }
 .resumo-dia { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0 12px; text-align: center; }
 .resumo-dia > * { animation: entrar-cena .45s var(--suave) both; }
 .resumo-dia > *:nth-child(n+3) { animation-delay: .1s; }
@@ -2727,16 +2953,14 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 /* ---------- desafios ---------- */
 .cartao-praticar { display: flex; align-items: center; gap: 12px; margin: 14px 0 4px; padding: 12px 14px; border: 2px solid var(--borda); border-bottom-width: 4px; border-radius: var(--raio-g); background: var(--cartao); color: var(--tinta-forte); text-decoration: none; }
 .cartao-praticar:hover { text-decoration: none; background: var(--fundo-2); }
-.cartao-praticar .icone-praticar .ico-aba { width: 36px; height: 36px; }
+.cartao-praticar .icone-praticar { display: grid; place-items: center; flex: 0 0 auto; width: 48px; height: 48px; border-radius: var(--raio-p); background: var(--vermelho-fraco); color: var(--vermelho); }
+.cartao-praticar .icone-praticar svg { width: 28px; height: 28px; }
 .cartao-praticar .textos { flex: 1; display: grid; }
 .cartao-praticar small { color: var(--tinta-fraca); font-weight: 700; }
 .cartao-praticar > svg { width: 20px; height: 20px; color: var(--tinta-fraca); }
 .estado-dupla { display: flex; align-items: center; gap: 4px; margin-top: 6px; color: var(--tinta-fraca); font-size: 0.84rem; font-weight: 800; }
 .estado-dupla svg { width: 16px; height: 16px; color: var(--verde); }
 .estado-dupla .link-nota { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; }
-/* peça ainda fechada: a silhueta apagada do retrato dá a pista do que vem */
-.peca .recorte.apagado { filter: grayscale(1); opacity: .28; }
-.peca:not(.revelada) { background: var(--fundo-2); }
 
 /* ---------- perfil ---------- */
 .visao-geral { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; margin: 6px 0 12px; }
@@ -2747,27 +2971,394 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .visao-item span { display: grid; min-width: 0; }
 .visao-item b { color: var(--tinta-forte); font-size: 1.15rem; font-weight: 900; line-height: 1.15; font-variant-numeric: tabular-nums; }
 .visao-item small { color: var(--tinta-fraca); font-size: 0.82rem; font-weight: 700; }
-.roda-junto { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; }
-.pessoa-junto { flex: 0 0 76px; display: grid; justify-items: center; gap: 2px; padding: 4px 0; border: 0; background: none; color: var(--tinta); font: inherit; text-align: center; text-decoration: none; cursor: pointer; }
-.pessoa-junto:hover { text-decoration: none; }
-.pessoa-junto b { color: var(--tinta-forte); font-size: 0.86rem; max-width: 76px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pessoa-junto small { color: var(--tinta-fraca); font-size: 0.72rem; font-weight: 700; line-height: 1.2; }
-.pessoa-junto.leu .retrato-amigo { box-shadow: 0 0 0 3px var(--progresso); }
-.pessoa-junto .mais { display: grid; place-items: center; width: 56px; height: 56px; border: 2px dashed var(--borda-3d); border-radius: 50%; color: var(--tinta-fraca); }
-.pessoa-junto .mais svg { width: 24px; height: 24px; }
-.colecao-atalhos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.colecao-atalhos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
 .colecao-atalhos a { display: grid; justify-items: center; gap: 2px; padding: 10px 6px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); color: var(--tinta-forte); text-align: center; text-decoration: none; }
 .colecao-atalhos a:hover { background: var(--fundo-2); text-decoration: none; }
 .colecao-atalhos svg { width: 24px; height: 24px; color: var(--tinta-fraca); }
 .colecao-atalhos small { color: var(--tinta-fraca); font-size: 0.78rem; font-weight: 800; }
-/* carta fechada: silhueta do personagem, sem o nome */
-.carta-mini.oculta .silhueta { display: grid; place-items: end center; width: 100%; filter: grayscale(1) brightness(.2); opacity: .22; }
-:root[data-tema="escuro"] .carta-mini.oculta .silhueta { filter: grayscale(1) brightness(2); opacity: .16; }
-.carta-mini.oculta .silhueta svg { width: 70%; height: auto; }
-.carta-mini.oculta b { color: var(--tinta-fraca); font-size: 0.78rem; }
 /* troféu a caminho: a copa enche até onde já foi */
 .arte-trofeu .copa-parte { fill: color-mix(in srgb, var(--cor) 55%, var(--trilho)); }
-.fileira-cartas.tres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 2px 0 8px; overflow: visible; }
-.fileira-cartas.tres .carta-mini { width: auto; min-width: 0; }
 /* alvos de toque de pelo menos 44px nos links de ação */
 .praticar-unidade, .acoes-reflexao .link-nota, .estado-dupla .link-nota, .leitura-hoje .novo-na-fe { min-height: 44px; }
+
+/* QR Code do convite: fundo branco nos dois temas (o leitor precisa de contraste claro). */
+.qr-convite { width: min(200px, 64%); margin: 2px auto 0; padding: 10px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px var(--borda); }
+.qr-convite svg { display: block; width: 100%; height: auto; }
+.qr-legenda { text-align: center; margin-top: 6px; }
+
+/* Referência da frase da ofensiva no fim da lição, embaixo da frase. */
+.frase-cena .ref-frase { display: block; margin-top: 6px; font-size: 0.8em; font-weight: 700; color: var(--tinta-fraca); }
+
+/* ---------- desafios de vários dias (09c-desafios.js) ---------- */
+.dsf-card { display: block; width: 100%; text-align: left; padding: 0; border-radius: 22px; overflow: hidden; background: var(--cartao); border: 2px solid var(--borda); margin: 0 0 14px; color: var(--tinta); font: inherit; cursor: pointer; }
+.dsf-topo { display: block; background: var(--inverso); color: var(--inverso-tinta); padding: 14px 16px 16px; }
+.dsf-linha { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.dsf-selo { background: var(--verde-fraco); color: var(--verde-3d); font-weight: 900; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; }
+.dsf-dias { border: 1.5px solid color-mix(in srgb, var(--inverso-tinta) 45%, transparent); font-weight: 800; font-size: .75rem; padding: 4px 10px; border-radius: 999px; }
+.dsf-nome { display: block; font-family: var(--fonte-destaque); font-size: 1.4rem; margin-top: 12px; line-height: 1.15; }
+.dsf-corpo { display: block; padding: 12px 16px 14px; }
+.dsf-stats { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--fundo-2); border-radius: 16px; padding: 10px 0; margin-bottom: 10px; }
+.dsf-stats span { text-align: center; }
+.dsf-stats b { display: block; font-size: 1.3rem; }
+.dsf-stats small { font-size: .66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-fraca); }
+.dsf-acao { display: block; text-align: center; font-weight: 900; padding: 11px; border-radius: 999px; background: var(--verde); color: var(--cartao); }
+.dsf-acao.feito { background: none; border: 2px solid var(--borda); color: var(--tinta); }
+.dsf-barra { display: block; height: 8px; border-radius: 8px; background: var(--fundo-2); margin-top: 12px; overflow: hidden; }
+.dsf-barra i { display: block; height: 100%; background: var(--verde); }
+.dsf-pe { display: block; font-size: .78rem; color: var(--tinta-fraca); font-weight: 700; text-align: center; margin-top: 6px; }
+.dsf-lista { display: grid; gap: 8px; margin-bottom: 8px; }
+.dsf-item { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px 14px; border: 2px solid var(--borda); border-radius: 16px; background: var(--cartao); color: var(--tinta); font: inherit; cursor: pointer; }
+.dsf-item b { display: block; }
+.dsf-item small { color: var(--tinta-fraca); font-weight: 700; }
+.dsf-n { margin-left: auto; font-weight: 900; color: var(--verde-3d); white-space: nowrap; font-size: .85rem; display: flex; align-items: center; }
+.dsf-n svg { width: 22px; height: 22px; }
+:root[data-tema="escuro"] .dsf-n, :root[data-tema="escuro"] .dsf-selo { color: var(--verde); }
+.dsf-base { margin: 10px 0; padding: 10px 14px; border-left: 4px solid var(--verde); background: var(--fundo-2); border-radius: 12px; font-style: italic; }
+.dsf-base cite { display: block; font-style: normal; font-weight: 800; font-size: .8rem; color: var(--tinta-fraca); margin-top: 4px; }
+.dsf-dicas { margin: 6px 0 10px; padding-left: 20px; display: grid; gap: 4px; }
+.dsf-estudo { display: grid; gap: 10px; padding: 14px; border-radius: 16px; background: var(--fundo-2); margin: 10px 0; }
+.dsf-estudo p { margin: 0; }
+.dsf-sobre { margin: 10px 0; }
+.dsf-sobre summary { font-weight: 800; cursor: pointer; }
+
+/* Painel do app: colunas por dia/semana (07e-painel.js). */
+.painel-colunas { display: flex; align-items: flex-end; gap: 3px; height: 150px; padding: 12px 10px 6px; }
+.painel-coluna { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
+.painel-coluna i { display: block; width: 100%; min-height: 2px; border-radius: 4px 4px 0 0; background: var(--verde); }
+.painel-coluna small { font-size: .6rem; font-weight: 800; color: var(--tinta-fraca); }
+.painel-coluna em { font-style: normal; font-size: .52rem; color: var(--tinta-fraca); writing-mode: vertical-rl; transform: rotate(180deg); height: 30px; }
+
+/* ---------- Apoiar o app ---------- */
+.apoiar-item { padding: 12px 14px; }
+.apoiar-pix { border: 2px solid var(--borda); border-radius: var(--raio-g); background: var(--cartao); padding: 14px; margin-bottom: 12px; }
+.apoiar-valores { display: flex; gap: 8px; margin-bottom: 12px; }
+.apoiar-valor { flex: 1; min-width: 0; padding: 12px 0; border: 2px solid var(--borda); border-radius: 12px; background: var(--cartao); color: var(--tinta-forte); font-weight: 700; font-size: 15px; cursor: pointer; }
+.apoiar-valor.sel { border-color: var(--acento); background: var(--acento-fraco); color: var(--acento); }
+.aviso-apoiar { background: var(--acento-fraco); color: var(--tinta-forte); border-radius: 12px; padding: 10px 12px; font-size: 14px; }
+
+/* ---------- resumo do painel ---------- */
+.painel-resumo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 4px 0 18px; }
+.painel-cartao { border: 2px solid var(--borda); border-radius: var(--raio-g); background: var(--cartao); padding: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.painel-cartao strong { font-size: 28px; line-height: 1.1; color: var(--tinta-forte); }
+.painel-cartao span { font-weight: 700; color: var(--tinta); }
+.painel-cartao small { font-size: 12.5px; color: var(--tinta-fraca); font-weight: 700; }
+.painel-cartao small em { font-style: normal; font-weight: 400; }
+.painel-cartao small.sobe { color: var(--acento); }
+.painel-cartao strong.texto { font-size: 19px; padding: 6px 0 3px; }
+.painel-linha2 { flex-direction: column; align-items: flex-start; gap: 2px; }
+.painel-linha2 small { color: var(--tinta-fraca); font-size: 14px; line-height: 1.35; }
+.arte-trofeu .detalhe { stroke: var(--cartao); opacity: .75; }
+.arte-trofeu.ganho .detalhe { stroke: #fff; opacity: .9; }
+
+/* ---------- ações dentro das lições e leituras da semana ---------- */
+.acoes-licao { margin: 14px 0 18px; }
+.leituras-semana { margin: 6px 0 16px; }
+
+/* =====================================================================================
+   POLIMENTO DE DESIGN · lote 1 (28/09/2026)
+   Revisão de acabamento (docs/revisao-2026-09-28/ux-polimento.md): hierarquia de moldura,
+   relevo só no que se aperta, divisórias finas, raios por família, pesos mais leves no
+   texto de apoio, vazio neutro e contornos de controle que se leem. Fica no fim do arquivo
+   de propósito: são decisões de acabamento que valem por cima das regras de cada tela.
+   ===================================================================================== */
+:root {
+  --moldura: 1px;          /* agrupador de lista e cartão de grade */
+  --moldura-forte: 2px;    /* só o cartão de ação da tela */
+  --linha: 1px;            /* divisória interna */
+  --rotulo-tam: 0.74rem; --rotulo-peso: 800; --rotulo-esp: 0.07em;
+  --trilho-neutro: var(--borda);
+  --progresso-trilho: var(--trilho-neutro);
+  --borda-controle: color-mix(in srgb, var(--tinta-fraca) 75%, var(--fundo));
+  --interruptor-off: color-mix(in srgb, var(--tinta-fraca) 70%, var(--cartao));
+}
+
+/* ---------- S1 · três níveis de moldura ---------- */
+.cartao, .caixa-lista, .lista-atalhos, .caixa-config, .lista-missoes, .bloco-secao, .trofeu,
+.painel-cartao, .colecao-atalhos a, .item-livro, .item, .linha-amigo, .cartao-proposito,
+.cartao-semeador, .cartao-caderno, .nivel-semeador, .dsf-item, .entrada-propositos { border-width: var(--moldura); }
+.leitura-hoje, .passagem, .cartao-push, .apoiar-pix, .dsf-card { border-width: var(--moldura-forte); }
+
+/* ---------- 1.1 · relevo só no que se aperta; estático é chapado; flutuante tem sombra ---------- */
+.leitura-hoje, .cartao-praticar, .cartao-pratica { border-bottom-width: var(--moldura-forte); }
+.cabeca-pratica, .cabeca-passos, .faixa-unidade.travada { box-shadow: none; }
+.item-licao .num, .item-licao.feita .num,
+.lista-licoes.caixa-lista .item-licao.proxima .num { box-shadow: none; }
+.segmentado button[aria-pressed="true"] { box-shadow: none; }
+.cartao-pratica:active { transform: translateY(1px); border-bottom-width: var(--moldura-forte); margin-bottom: 0; }
+.ir-atual { border-bottom-width: 2px; box-shadow: var(--sombra-flutuante); }
+
+/* ---------- 1.2 · os três heróis com o mesmo acabamento; botão branco legível ---------- */
+.cabeca-missoes, .cabeca-pratica, .cabeca-passos {
+  background: var(--inverso);
+  color: var(--inverso-tinta);
+  box-shadow: none;
+  padding: 20px;
+  margin-bottom: 8px;
+}
+.cabeca-missoes h1, .cabeca-pratica h1, .cabeca-passos h1 { color: inherit; }
+.botao.branco { background: var(--branco); color: var(--inverso); }
+
+/* ---------- 1.3 · divisórias que tinham sumido, e finas ---------- */
+.caixa-lista > * + *, .lista-atalhos > * + *, .caixa-config > * + *,
+.caixa-config > * + .linha-config,
+.lista-licoes.caixa-lista .item-licao + .item-licao,
+.lista-pratica.caixa-lista .cartao-pratica + .cartao-pratica,
+.missao + .missao, .painel-mais a + a { border-top: var(--linha) solid var(--borda); }
+.painel-mais a, .painel-mais a:last-child { border-bottom: 0; }
+.item-mural { border-bottom-width: var(--linha); }
+.cartao-pessoa { border-bottom-width: var(--linha); }
+.topo { border-bottom-width: 1px; }
+.botao.contorno { border-width: 2px; }
+.dsf-dias { border-width: 2px; }
+
+/* ---------- 1.4 · raios por família ---------- */
+.fala-bento, .dsf-card, .linha-amigo { border-radius: var(--raio-g); }
+.folha { border-radius: var(--raio-g) var(--raio-g) 0 0; }
+.dsf-item, .dsf-stats, .dsf-estudo, p.selo-status, .qr-convite, .aviso-apoiar,
+.trofeu, .colecao-atalhos a { border-radius: var(--raio); }
+.painel-mais .q, .apoiar-valor, .dsf-base, .painel-outro input,
+.icone-secao, .cartao-pratica .marca { border-radius: var(--raio-p); }
+.arte-livro { border-radius: var(--raio-g); }
+.aba.aba-central { border-radius: var(--raio); }
+
+/* ---------- 1.5 · botão desabilitado que ainda diz o que falta ---------- */
+.botao[disabled], .botao.cor[disabled], .botao.azul[disabled],
+.botao.vermelho[disabled], .botao.branco[disabled] {
+  background: var(--trilho-neutro);
+  color: var(--tinta-fraca);
+  border-color: transparent;
+}
+
+/* ---------- 1.6 · um rótulo em caixa-alta só; contadores em caixa normal ---------- */
+.etiqueta, .leitura-hoje .etiqueta, .passagem .rot, .cartao-pratica .rot, .faixa-unidade .rot,
+.cartao-continuar small, .corpo-semeador small, .leitor-titulo .rot,
+.campo-senha span, .rotulo-escolha, .etiqueta-celula, .item .sub, .dsf-selo, .dsf-stats small,
+.pergunta-reflexao .rotulo-pergunta, .premio .cabeca {
+  font-size: var(--rotulo-tam); font-weight: var(--rotulo-peso);
+  letter-spacing: var(--rotulo-esp); text-transform: uppercase; line-height: 1.2;
+}
+.faixa-unidade .rot { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.titulo-secao span, .titulo-secao a, .contagem-amigos, .titulo-bloco span {
+  font-size: 0.85rem; font-weight: 800; color: var(--tinta-fraca);
+  text-transform: none; letter-spacing: 0;
+}
+
+/* ---------- S2 · texto de apoio mais leve; rótulo de grupo sem gritar ---------- */
+.passo-dica, .dica-campo, .descricao-conquista, .cartao-pratica .sub, .item-licao .textos > span,
+.trofeu span, .folha p, .linha-config .valor, .visao-item small, .bloco-secao span,
+.quem-amigo .arroba, .cabeca-push p, .item .resumo { font-weight: 600; }
+.grupo-config h2.etiqueta { text-transform: none; letter-spacing: 0; font-size: 0.88rem; font-weight: 800; }
+
+/* ---------- 1.7 · campos e interruptor com contorno que se lê (3:1) ---------- */
+.busca-caixa input, .busca-exata input, .campo textarea,
+.campo-senha input, .campo-senha textarea, .campo-senha select,
+.seletor-config, .painel-outro input {
+  background: var(--cartao);
+  border-color: var(--borda-controle);
+}
+.interruptor { background: var(--interruptor-off); }
+[aria-checked="true"] .interruptor { background: var(--verde); }
+
+/* ---------- S4 · o vazio é neutro; o teal fica para a trilha e para o "hoje" ---------- */
+.leitor-progresso, .painel-trilho, .barra-comece { background: var(--trilho-neutro); }
+.estrelas i, .estrelas-fim i { color: var(--trilho-neutro); }
+
+/* ---------- S5 · ícones da visão geral na mesma caixa ---------- */
+.visao-item > svg { width: 24px; height: 24px; stroke-width: 2; }
+.visao-item > .ico-chama { width: 28px; height: 28px; }
+
+/* ---------- S7 · alinhamento ótico pela primeira linha ---------- */
+.dsf-n { align-self: flex-start; margin-top: 2px; }
+.linha-amigo .retrato-amigo { align-self: flex-start; }
+.cartao-pratica > svg { align-self: flex-start; margin-top: 14px; }
+.leitura-hoje .novo-na-fe { align-items: flex-start; }
+.leitura-hoje .novo-na-fe svg { margin-top: 3px; }
+
+/* ---------- S8 · linha que já é botão não precisa de seta ---------- */
+.lista-pratica.caixa-lista .cartao-pratica > svg { display: none; }
+
+/* ---------- S3 · ação secundária em botão pequeno, centrado ---------- */
+.acoes .botao.pequeno, .botao.pequeno.convidar-largo { justify-self: center; }
+
+/* ---------- 1.8 · barra de baixo ---------- */
+.aba .ponto-aba { border-color: var(--cartao); }
+.mais-ico { box-shadow: inset 0 0 0 2px var(--borda); }
+.navegacao.cheia .aba:not(.aba-central) .rotulo-aba {
+  font-size: clamp(0.62rem, calc(0.62rem + 0.04rem * var(--cresce)), 0.66rem);
+  letter-spacing: 0;
+}
+
+/* =====================================================================================
+   POLIMENTO DE DESIGN · lote 2: ajustes pontuais por tela (ux-polimento.md, seção 2)
+   ===================================================================================== */
+/* ritmo: 32 acima do título de seção, 12 abaixo, 12 entre cartões */
+.titulo-secao { margin-top: 32px; margin-bottom: 12px; }
+.titulo-perfil { margin: 32px 0 12px; }
+/* Trilha */
+.leitura-hoje { margin-bottom: 12px; }
+.faixa-unidade { margin: 12px 0 8px; }
+/* Lição: a barra do topo no tamanho de "dentro de cartão" */
+.licao-topo .barra { height: 10px; }
+/* Bíblia */
+.grade-livros { gap: 10px; }
+.leitor-cabeca { border-bottom: 0; }
+/* Desafios: azulejo do Praticar sem vermelho; o botão do cartão na família dos botões */
+.cartao-praticar .icone-praticar { background: var(--verde-fraco); color: var(--verde); }
+.dsf-acao { display: flex; align-items: center; justify-content: center; min-height: 50px; padding: 8px 16px;
+  font-family: var(--fonte-destaque); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+/* Praticar: estrela vazia que não parece sujeira; respiro na lista */
+.estrelas i, .estrelas-fim i { color: color-mix(in srgb, var(--tinta-fraca) 35%, var(--cartao)); }
+.lista-pratica.caixa-lista .cartao-pratica { gap: 12px; }
+/* Juntos: o coração de Propósitos ganha azulejo como os outros ícones de lista; o feed no corpo normal */
+.entrada-propositos > svg:first-child { box-sizing: border-box; width: 44px; height: 44px; padding: 10px; border-radius: var(--raio-p);
+  background: var(--verde-fraco); color: var(--verde); flex: 0 0 auto; }
+.corpo-mural p { font-size: 1rem; }
+/* Célula: sem o vão duplo antes de "Precisam de atenção"; botões do pé empilham a 320 */
+.painel-celula > .passo-dica { margin-bottom: 0; }
+.painel-celula .pe-duplo-plano { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+/* Discipulado: dentro do cartão os dois botões empilham */
+.linha-amigo .pe-duplo-plano { grid-template-columns: 1fr; }
+/* Explorar */
+.seta-comece { width: 44px; height: 44px; background: none; color: var(--tinta); }
+.grade-secoes { gap: 12px; }
+/* Nota: a tabela "Onde ler" com canto e linhas da família */
+.rolagem-tabela { border: var(--moldura) solid var(--borda); border-radius: var(--raio-p); }
+.nota-corpo .rolagem-tabela table { margin: 0; }
+.nota-corpo .rolagem-tabela th, .nota-corpo .rolagem-tabela td { border: 0; border-bottom: 1px solid var(--borda); }
+.nota-corpo .rolagem-tabela td + td, .nota-corpo .rolagem-tabela th + th { border-left: 1px solid var(--borda); }
+.nota-corpo .rolagem-tabela tr:last-child td { border-bottom: 0; }
+/* Primeiros passos: a "próxima" no acento do app (o roxo virava cinza no escuro) */
+.lista-licoes.caixa-lista .item-licao.proxima { background: var(--acento-fraco); }
+.lista-licoes.caixa-lista .item-licao.proxima .num { background: var(--inverso); color: var(--inverso-tinta); }
+.lista-licoes.caixa-lista .item-licao .marca-proxima { color: var(--acento); }
+/* Perfil */
+.visao-item small { font-size: 0.78rem; }
+.lista-atalhos { margin-top: 0; }
+/* Troféus */
+.estante { gap: 12px; }
+/* Minha história: sem a pílula vazia; contador com respiro */
+.selo-status:empty { display: none; }
+.dica-campo { margin-top: 6px; }
+/* Livros: contador legível */
+.conta-livro { opacity: 1; color: var(--tinta-fraca); }
+/* Configurações: o rótulo não é espremido pelo valor */
+.linha-config > span:first-child { flex: 1 1 auto; min-width: 45%; }
+.linha-config .valor { max-width: 50%; }
+/* Azulejos de ícone em 44 */
+.marca-push, .painel-mais .q { width: 44px; height: 44px; }
+.painel-mais .q { border-radius: var(--raio-p); }
+/* Painel: medidas em rem; gráfico vazio vira frase */
+.painel-cartao strong { font-size: 1.75rem; }
+.painel-cartao strong.texto { font-size: 1.2rem; }
+.painel-cartao small { font-size: 0.78rem; }
+.painel-linha2 small { font-size: 0.88rem; }
+.painel-vazio { padding: 12px 16px; margin: 0; }
+/* Apoiar */
+.apoiar-valor { font-size: 0.95rem; }
+.aviso-apoiar { font-size: 0.88rem; }
+.apoiar-pix .passo-dica { margin-top: 10px; }
+
+/* =====================================================================================
+   DESIGN · pacotes A e B (fable-sugestoes-design.md): tema escuro das abas de escolha,
+   números que não pulam, tipografia fina, aviso com ícone, alvos de toque, saídas
+   animadas, uma família para vazio/erro, carregando com forma e botão ocupado.
+   ===================================================================================== */
+
+/* ---------- A1 · aba escolhida visível no escuro; anel do retrato da cor do cartão ---------- */
+:root { --segmento-trilho: var(--fundo-2); --segmento-sel: var(--cartao); --segmento-anel: transparent; }
+:root[data-tema="escuro"] { --segmento-trilho: #111111; --segmento-sel: #2c2c2c; --segmento-anel: var(--borda-controle); }
+.segmentado { background: var(--segmento-trilho); }
+.segmentado button[aria-pressed="true"] { background: var(--segmento-sel); box-shadow: inset 0 0 0 1px var(--segmento-anel); }
+.linha-amigo .retrato-amigo, .cabeca-amigo .retrato-amigo, .escolha-amigo .retrato-amigo,
+.cartao-proposito .retrato-amigo { border-color: var(--cartao); }
+
+/* ---------- A4 · números que não pulam ---------- */
+.contador.ofensiva span, .chama-grande b, .numero-ofensiva, .quiz-contador, .leitor-verso sup,
+.titulo-conquista span, .trofeu span, .dsf-stats b, .dsf-dias, .dias-cartao, .dias-dupla b,
+.painel-cartao strong, .painel-barra .valor, .painel-coluna small, .dica-campo, .passo-dica[data-conta],
+.passo-dica[data-conta-acolhida], .passo-dica[data-conta-adoracao], .passo-dica[data-conta-testemunho],
+.rotulo-no, .faixa-unidade .rot, .contagem-amigos, .titulo-secao span, .conta-livro, .amigo-roda small,
+.lendo-junto-linha, .linha-recorde b, .visao-item b, .barra-missao + b, .corpo-missao b { font-variant-numeric: tabular-nums; }
+.numero-ofensiva { min-width: 2ch; text-align: center; }
+.contador.ofensiva span { min-width: 1.2ch; text-align: right; }
+
+/* ---------- A5 · tipografia fina (quem não entende, ignora) ---------- */
+h1, h2, h3, .passagem-hoje, .dsf-nome, .cabeca-comece b, .bloco-secao b, .titulo-conquista b,
+.cabeca-push b, .corpo-missao b, .item-licao .textos b { text-wrap: balance; }
+p, .passo-dica, .bloco-secao span, .descricao-conquista, .item-licao .textos > span, .nota-corpo p,
+.nota-corpo li, .leitor-verso, .cartao-versiculo blockquote, .pensamento-dia p, .item .resumo { text-wrap: pretty; }
+.nota-corpo, .leitor-texto, .passo-dica, .item .resumo { -webkit-hyphens: auto; hyphens: auto; }
+h1, h2, h3, .botao, .rotulo-aba, .etiqueta, .balao, .faixa-unidade { -webkit-hyphens: manual; hyphens: manual; }
+.leitor-texto { hanging-punctuation: first; }
+
+/* ---------- A12 · aviso flutuante com ícone de certo ou de erro ---------- */
+.aviso-flutuante { display: inline-flex; align-items: center; gap: 8px; }
+.aviso-ico { display: inline-grid; place-items: center; flex: 0 0 auto; }
+.aviso-ico svg { width: 18px; height: 18px; }
+.aviso-ico.aviso-certo { color: var(--verde); }
+.aviso-flutuante.bate { animation: bater .3s ease; }
+@keyframes bater { 0%, 100% { transform: translateX(-50%); } 35% { transform: translateX(calc(-50% - 4px)); } 70% { transform: translateX(calc(-50% + 3px)); } }
+
+/* ---------- ganhos rápidos ---------- */
+.roda-amigos { justify-content: flex-start; gap: 14px; }
+.bloco-secao { animation: none; }
+.amigo-roda, .vaga { animation: none; }
+.botao-reagir { min-height: 44px; }
+.cor-marca { position: relative; width: 36px; height: 36px; }
+.cor-marca::after { content: ''; position: absolute; inset: -6px; }
+.segmentado button, .seletor-config { min-height: 44px; }
+.painel-coluna em { font-size: .68rem; }
+.painel-coluna:not(:nth-child(5n+1)) em { visibility: hidden; }
+.painel-coluna small { font-size: .7rem; }
+
+/* ---------- B2 · o que entra animado sai animado ---------- */
+@keyframes sumir { to { opacity: 0; } }
+@keyframes folha-desce { from { transform: translateY(var(--dy, 0px)); } to { transform: translateY(28%); opacity: 0; } }
+@keyframes fechar-tela { to { opacity: 0; transform: translateY(18px) scale(.985); } }
+@keyframes aviso-desce { to { opacity: 0; transform: translate(-50%, 12px); } }
+.cortina.saindo { animation: sumir .18s ease forwards; pointer-events: none; }
+.cortina.saindo .folha { animation: folha-desce .2s var(--suave) forwards; }
+.veu-mais.saindo { animation: sumir .18s ease forwards; pointer-events: none; }
+.painel-mais.saindo { animation: folha-desce .2s var(--suave) forwards; pointer-events: none; }
+.licao.saindo, .leitor.saindo, .leitor-biblia.saindo { animation: fechar-tela .18s ease forwards; pointer-events: none; }
+.pop-no.saindo { animation: sumir .14s ease forwards; pointer-events: none; }
+.aviso-flutuante.saindo { animation: aviso-desce .2s ease forwards; }
+
+/* ---------- B8 · uma família só para vazio e erro ---------- */
+.estado, .vazio, .vazio-amigos { display: grid; justify-items: center; gap: 6px; padding: 32px 16px; text-align: center; color: var(--tinta-fraca); font-weight: 600; }
+.estado-ico { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 4px; border-radius: var(--raio-p); background: var(--verde-fraco); color: var(--verde); }
+.estado-ico svg { width: 26px; height: 26px; }
+.estado > b { color: var(--tinta-forte); font-size: 1rem; font-weight: 800; }
+.estado > p, .vazio-amigos p { margin: 0; max-width: 300px; }
+.estado .botao { width: auto; margin-top: 8px; }
+.estado.erro .estado-ico { background: var(--fundo-2); color: var(--tinta-fraca); }
+/* o vazio antigo ganha o mesmo azulejo no ícone */
+.vazio-amigos > svg { box-sizing: border-box; width: 56px; height: 56px; padding: 15px; margin-bottom: 4px; border-radius: var(--raio-p); background: var(--verde-fraco); color: var(--verde); }
+/* erro em linha, acima do que estava guardado: neutro (não é dica teal nem aviso vermelho) */
+.estado-linha { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 12px; padding: 10px 12px; border-radius: var(--raio); background: var(--fundo-2); color: var(--tinta-fraca); font-weight: 600; font-size: 0.88rem; }
+.estado-linha svg { flex: 0 0 auto; width: 18px; height: 18px; margin-top: 1px; }
+
+/* ---------- B9 · carregando com a forma do que vai chegar ---------- */
+.esqueleto { padding: 8px 0; }
+.esqueleto-corpo { display: grid; gap: 12px; }
+.esqueleto i { display: block; border-radius: var(--raio-p); background: var(--fundo-2); animation: esqueleto 1.4s ease-in-out infinite; }
+.esqueleto .texto { height: 14px; }
+.esqueleto .texto:nth-child(2n) { width: 82%; }
+.esqueleto .cartao { height: 92px; border-radius: var(--raio-g); border: 0; }
+.esqueleto .linha { display: grid; grid-template-columns: 46px 1fr; gap: 12px; align-items: center; }
+.esqueleto .linha::before { content: ''; width: 46px; height: 46px; border-radius: 50%; background: var(--fundo-2); animation: esqueleto 1.4s ease-in-out infinite; }
+.esqueleto .roda { display: flex; gap: 14px; }
+.esqueleto .roda i { width: 58px; height: 58px; border-radius: 50%; }
+.esqueleto .pilulas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.esqueleto .pilulas i { height: 52px; border-radius: var(--raio); }
+
+/* ---------- B10 · botão ocupado: mantém a cor e gira um anel ---------- */
+@keyframes girar { to { transform: rotate(360deg); } }
+.botao.ocupado { pointer-events: none; filter: none; transform: none; }
+.botao.ocupado > svg { display: none; }
+.botao.ocupado::before { content: ''; width: 16px; height: 16px; flex: 0 0 auto; box-sizing: border-box; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: girar .8s linear infinite; }
+.botao.ocupado[disabled] { background: var(--b); color: var(--inverso-tinta); }
+.botao.cor.ocupado[disabled], .botao.azul.ocupado[disabled], .botao.vermelho.ocupado[disabled] { color: var(--sobre-cor); }
+.botao.branco.ocupado[disabled] { background: var(--branco); color: var(--inverso); }
+.botao.contorno.ocupado[disabled] { background: transparent; color: var(--tinta-forte); border-color: var(--tinta-forte); }
+.botao.plano.ocupado[disabled] { background: none; color: var(--tinta-fraca); }

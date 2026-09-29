@@ -12,7 +12,7 @@ export const LICOES = {
     nome: '01 - Segurança da salvação',
     resumo: 'Dá pra ter certeza de que você pertence a Deus? A Bíblia diz que sim, e mostra onde essa certeza se apoia.',
     texto: `
-Se você colocou sua confiança em Jesus, cedo ou tarde vai bater a pergunta: será que estou salvo mesmo? E se eu errar de novo? E se um dia eu esfriar?
+Se você colocou sua confiança em Jesus, cedo ou tarde vai bater a pergunta: será que tenho a salvação mesmo? E se eu errar de novo? E se um dia eu esfriar?
 
 Esta lição vem primeiro porque quase tudo depende dela. Quem vive tentando garantir o próprio lugar diante de Deus gasta energia com medo e sobra pouco pra crescer.
 
@@ -26,11 +26,11 @@ Quase sempre a dúvida nasce de olhar pra si mesmo. A pessoa mede o próprio dia
 
 Efésios 2.8-9 diz que somos salvos pela graça, por meio da fé, e que isso vem de Deus como presente. Ninguém ganhou por merecer, e por isso ninguém tem do que se gabar.
 
-Pensa assim: se você não conquistou a salvação com esforço, também não é o seu esforço que vai mantê-la de pé. Paulo faz essa pergunta aos gálatas (Gálatas 3.3): vocês começaram pelo Espírito e agora querem terminar pela própria força?
+Pensa assim: se você não conquistou a salvação com esforço, também não é o seu esforço que vai mantê-la de pé. [[11 - Pessoas/Paulo|Paulo]] pergunta aos cristãos da Galácia (Gálatas 3.3) por que achavam que, depois de começar a vida com Deus sem nenhum mérito, iam ficar mais fortes na fé tentando cumprir regras por conta própria.
 
 Jesus usa uma imagem bonita em João 10.28-29. Ele dá vida eterna às suas ovelhas, e ninguém consegue arrancá-las da mão do Pai. Quem segura a ovelha é o pastor.
 
-E Romanos 8.1 afirma que agora já não existe condenação pra quem está em Cristo Jesus. O verbo está no presente. Vale no dia em que você acorda animado e no dia em que acorda mal.
+E Romanos 8.1 afirma que agora já não existe condenação pra quem está em Cristo Jesus. O verbo está no presente. Vale no dia em que você acorda de bom humor e no dia em que acorda mal.
 
 Ver [[06 - Estudos Temáticos/Graça|Graça]], [[06 - Estudos Temáticos/Justificação|Justificação]] e [[08 - Versículos/Efésios 2.8-9|Efésios 2.8-9]].
 
@@ -83,7 +83,7 @@ Em Mateus 16.15, Jesus fez uma pergunta direta aos amigos mais próximos: e voc�
 
 Quase ninguém diz que Jesus nunca existiu. A maioria das pessoas fala bem dele: foi um homem bom, um grande mestre, um exemplo de amor. Parece elogio, só que deixa o principal de fora.
 
-Um bom mestre humano não diria que perdoa pecados cometidos contra outras pessoas. Não aceitaria ser adorado. Não diria que já existia antes de Abraão (João 8.58). Jesus disse e fez tudo isso. Então sobram poucas saídas: ou ele estava enganado, ou estava enganando, ou é quem disse ser.
+Um bom mestre humano não diria que perdoa pecados cometidos contra outras pessoas. Não aceitaria ser adorado. Não diria que já existia antes de [[11 - Pessoas/Abraão|Abraão]] (João 8.58). Jesus disse e fez tudo isso. Então sobram poucas saídas: ou ele estava enganado, ou estava enganando, ou é quem disse ser.
 
 ## O que a Bíblia afirma sobre ele
 
@@ -103,9 +103,9 @@ E se ele não fosse as duas coisas, não haveria ponte entre nós e Deus. 1 Tim�
 
 ## O que ele fez
 
-Jesus viveu uma vida de obediência completa, coisa que nenhum de nós conseguiu. Morreu carregando uma condenação que era nossa. Em Marcos 10.45 ele mesmo diz que veio pra servir e dar a vida como resgate por muitos.
+Jesus viveu uma vida de obediência completa, coisa que nenhum de nós conseguiu. Morreu carregando uma condenação que era nossa. Em Marcos 10.45 ele mesmo diz que veio pra servir e dar a vida pra salvar muitos.
 
-E ressuscitou. Paulo diz em 1 Coríntios 15.14-17 que tudo depende disso: se Cristo não ressuscitou, a fé de vocês é inútil e vocês continuam nos seus pecados.
+E ressuscitou. Paulo diz em 1 Coríntios 15.14-17 que tudo depende disso: se Cristo não ressuscitou, a fé de vocês é inútil e vocês ainda estão sob condenação dos seus pecados.
 
 Ver [[12 - Eventos/Crucificação|Crucificação]], [[12 - Eventos/Ressurreição|Ressurreição]] e [[15 - Fios Bíblicos/Fio do servo sofredor|Fio do servo sofredor]].
 
@@ -134,14 +134,14 @@ João 1.1-18 · Marcos 8.27-38 · Colossenses 1.15-23 · Hebreus 1.1-4 e 2.14-18
 Próxima lição: [[${T}03 - O batismo|O batismo]]
 Pessoas: [[11 - Pessoas/Jesus Cristo|Jesus Cristo]]
 Temas: [[06 - Estudos Temáticos/Messias|Messias]] · [[06 - Estudos Temáticos/Redenção|Redenção]] · [[06 - Estudos Temáticos/Graça|Graça]]
-Fios: [[15 - Fios Bíblicos/Fio da semente prometida|Fio da semente prometida]] · [[15 - Fios Bíblicos/Fio do servo sofredor|Fio do servo sofredor]] · [[15 - Fios Bíblicos/Fio do rei prometido|Fio do rei prometido]]
+Conexões: [[15 - Fios Bíblicos/Fio da semente prometida|Fio da semente prometida]] · [[15 - Fios Bíblicos/Fio do servo sofredor|Fio do servo sofredor]] · [[15 - Fios Bíblicos/Fio do rei prometido|Fio do rei prometido]]
 `,
   },
 
   [T + '03 - O batismo']: {
-    resumo: 'O que o batismo significa, pra quem já passou pelas águas e pra quem ainda está pensando nesse passo.',
+    resumo: 'O que o batismo significa, pra quem já passou pelo batismo e pra quem ainda está pensando nesse passo.',
     texto: `
-Talvez você já tenha sido batizado. Talvez esteja pensando nisso, ou ainda nem saiba se quer. Esta lição serve pra todo mundo: mostra o que a Bíblia diz sobre o batismo e por que Jesus pediu que ele fizesse parte da vida de quem o segue.
+Talvez você já tenha passado pelo batismo. Talvez esteja pensando nisso, ou ainda nem saiba se quer. Esta lição serve pra todo mundo: mostra o que a Bíblia diz sobre o batismo e por que Jesus pediu que ele fizesse parte da vida de quem o segue.
 
 Muita gente é batizada sabendo que é importante, mas sem entender direito o que está sendo declarado ali. Vale entender antes, ou entender de novo.
 
@@ -167,15 +167,19 @@ Os pecados são perdoados: Colossenses 2.13-14 fala de uma dívida cancelada e p
 
 Ver [[${T}09 - Minha identidade em Cristo|Minha identidade em Cristo]] e [[14 - Alianças/Nova aliança|Nova aliança]].
 
-## Se você foi batizado e não sentiu nada
+## Se você já passou pelo batismo e não sentiu nada
 
 Isso acontece mais do que parece. Tem gente que chora muito e tem gente que sai da água pensando na roupa molhada. A diferença entre essas experiências não muda nada no que Deus fez.
 
 O batismo é um sinal, e um sinal aponta pra um fato. O fato continua de pé, forte ou fraca que tenha sido a emoção. Ver [[${T}01 - Segurança da Salvação|Segurança da salvação]].
 
-## Se você ainda não foi batizado
+## Se você ainda não passou pelo batismo
 
-Não precisa ter pressa nem medo. Se você crê em Jesus e quer segui-lo, o batismo é o passo que ele mesmo pediu. Converse com o pastor ou com alguém da liderança da sua igreja, conte o que você entende e pergunte o que ainda não está claro. Muitas igrejas têm um tempo de preparo antes, justamente pra isso.
+Não precisa ter pressa nem medo. Se você crê em Jesus e quer segui-lo, o batismo é o passo que ele mesmo pediu. Converse com alguém mais experiente na fé: quem te convidou pro app, o líder da célula ou o pastor da igreja que você frequenta. Conte o que você entende e pergunte o que ainda não está claro. Muitas igrejas têm um tempo de preparo antes, justamente pra isso.
+
+Se você tem menos de 18 anos, converse também com seus pais ou responsáveis: eles fazem parte dessa decisão.
+
+{{conversar-batismo}}
 
 Se você ainda tem dúvidas sobre a própria fé, tudo bem também. Continue lendo, orando e fazendo perguntas. O batismo faz mais sentido quando você sabe a que está dizendo sim.
 
@@ -183,7 +187,7 @@ Se você ainda tem dúvidas sobre a própria fé, tudo bem também. Continue len
 
 Igrejas diferentes batizam de jeitos diferentes, e é bom saber disso pra não estranhar. Algumas batizam por imersão, outras derramando ou aspergindo água. Algumas batizam só quem já professa a fé, outras batizam também os filhos pequenos de famílias cristãs. E cada tradição dá um peso um pouco diferente ao que acontece no batismo.
 
-Se você foi batizado quando era bebê e agora está entendendo a fé, converse com a liderança da sua igreja sobre como ela entende isso.
+Se você recebeu o batismo quando era bebê e agora está entendendo a fé, converse com a liderança da igreja que você frequenta agora sobre como ela entende isso, sem pressa.
 
 Essas diferenças são antigas e sérias. Mesmo assim, quase todos concordam no principal: Jesus mandou batizar, o batismo aponta pra união com a morte e a ressurreição dele, e a salvação vem pela graça, por meio da fé. Ver [[05 - Hermenêutica/Analogia da fé|Analogia da fé]], sobre separar o essencial do secundário.
 
@@ -195,7 +199,7 @@ Na prática, isso passa por três coisas: ler a Bíblia com constância, como na
 
 ## Pra anotar
 
-Se você já foi batizado, escreva em Suas anotações, no fim desta página, como foi: a data, quem estava lá, o que você entendia na hora e o que entende agora. Se ainda não foi, anote as perguntas que você quer levar pra conversar com alguém da sua igreja.
+Se você já passou pelo batismo, escreva em Suas anotações, no fim desta página, como foi: a data, quem estava lá, o que você entendia na hora e o que entende agora. Se ainda não passou, anote as perguntas que você quer levar pra conversar com alguém mais experiente na fé.
 
 ## Leia esta semana
 
@@ -204,7 +208,7 @@ Romanos 6.1-14 · Mateus 28.16-20 · Atos 2.36-41 · Colossenses 2.6-15
 ## Pra ir além
 
 Próxima lição: [[${T}04 - A Bíblia|A Bíblia]]
-Eventos: [[12 - Eventos/Crucificação|Crucificação]] · [[12 - Eventos/Ressurreição|Ressurreição]] · [[12 - Eventos/Pentecostes|Pentecostes]]
+Acontecimentos: [[12 - Eventos/Crucificação|Crucificação]] · [[12 - Eventos/Ressurreição|Ressurreição]] · [[12 - Eventos/Pentecostes|Pentecostes]]
 Temas: [[06 - Estudos Temáticos/Igreja|Igreja]] · [[06 - Estudos Temáticos/Perdão|Perdão]] · [[06 - Estudos Temáticos/Redenção|Redenção]]
 Alianças: [[14 - Alianças/Nova aliança|Nova aliança]]
 `,
@@ -257,7 +261,7 @@ Um jeito simples de fazer isso tem três passos: observar o que o texto diz, int
 
 ## Pra anotar
 
-Em Suas anotações, no fim desta página, escreva o que você já sabia sobre como a Bíblia chegou até nós e o que foi novidade. Se ficou alguma dúvida sobre cópias ou traduções, anote também. É normal a dúvida voltar, e ter isso escrito ajuda a conversar com alguém da sua igreja.
+Em Suas anotações, no fim desta página, escreva o que você já sabia sobre como a Bíblia chegou até nós e o que foi novidade. Se ficou alguma dúvida sobre cópias ou traduções, anote também. É normal a dúvida voltar, e ter isso escrito ajuda a conversar com alguém mais experiente na fé.
 
 ## Leia esta semana
 
@@ -284,7 +288,7 @@ Deus já sabe do que você precisa antes de você pedir (Mateus 6.8). A oração
 
 ## O Pai Nosso como roteiro
 
-Logo depois, Jesus ensina uma oração curta, em Mateus 6.9-13. Ela começa olhando pra Deus: que o nome dele seja santificado, que o reino dele venha, que a vontade dele seja feita. Depois vêm os pedidos: o pão de cada dia, o perdão das nossas dívidas, assim como perdoamos quem nos deve, e proteção contra a tentação e o mal.
+Logo depois, Jesus ensina uma oração curta, em Mateus 6.9-13. Ela começa olhando pra Deus: que o nome dele seja santificado, que o reino dele venha, que a vontade dele seja feita. Depois vêm os pedidos: o pão de cada dia, o perdão das nossas ofensas, assim como perdoamos quem nos ofendeu, e proteção contra a tentação e o mal.
 
 Repare na ordem: primeiro Deus, depois as nossas necessidades. E repare no tamanho. Nada na Bíblia diz que uma oração precisa ser longa pra valer.
 
@@ -340,7 +344,7 @@ O Espírito dá vida nova a quem estava longe de Deus (Tito 3.5; João 3.5-6). J
 
 Ele também é um selo (Efésios 1.13-14). Naquele tempo, o selo mostrava a quem uma coisa pertencia e garantia que o combinado seria cumprido. O Espírito em você é a garantia de que Deus vai completar o que prometeu.
 
-E ele produz fruto: amor, alegria, paz, paciência, amabilidade, bondade, fidelidade, mansidão e domínio próprio (Gálatas 5.22-23). Fruto cresce na árvore aos poucos. Você participa, cuidando da sua vida com Deus, e quem faz crescer é o Espírito.
+E ele produz fruto: amor, alegria, paz, paciência, retidão, bondade, fidelidade, mansidão e domínio próprio (Gálatas 5.22-23). Fruto cresce na árvore aos poucos. Você participa, cuidando da sua vida com Deus, e quem faz crescer é o Espírito.
 
 ## Dons
 
@@ -360,7 +364,7 @@ Paulo diz em 1 Coríntios 2.14 que quem não tem o Espírito acha loucura as coi
 
 ## Na prática
 
-Não existe técnica pra sentir mais o Espírito. A Bíblia fala de outro jeito: não apagar o Espírito (1 Tessalonicenses 5.19), não entristecê-lo com uma vida que vai contra quem ele é (Efésios 4.30) e viver guiado por ele (Gálatas 5.16).
+Não existe técnica pra sentir mais o Espírito. A Bíblia fala de outro jeito: não abafar o Espírito (1 Tessalonicenses 5.19), não entristecê-lo com uma vida que vai contra quem ele é (Efésios 4.30) e viver guiado por ele (Gálatas 5.16).
 
 Isso tem mais a ver com escolhas de todo dia do que com uma experiência de um momento. Pra quem crê, a presença dele já está garantida. O que muda é o quanto a gente vive de acordo com essa presença.
 
@@ -400,13 +404,13 @@ Boa parte do que a Bíblia pede só dá pra fazer com outras pessoas por perto: 
 
 É saudável esperar de uma igreja ensino fiel à Bíblia, cuidado, espaço pra servir e amizades de verdade. Perfeição ela não vai ter. A igreja é feita de gente resgatada que ainda está em processo, e isso inclui os líderes.
 
-Vai ter decisão com a qual você não concorda, gente cansada, conflito mal resolvido, alguém que magoa sem querer. Quem entra esperando pessoas prontas se decepciona rápido. Quem entra sabendo que todo mundo ali ainda está sendo cuidado por Deus, você incluído, consegue ficar.
+Vai ter decisão com a qual você não concorda, gente cansada, conflito mal resolvido, alguém que magoa sem querer. Quem entra esperando pessoas prontas se decepciona rápido. Quem entra sabendo que todo mundo ali ainda está sob o cuidado de Deus, inclusive você, consegue ficar.
 
 ## Quando alguém da igreja te decepciona
 
 Quando a decepção vier, sumir em silêncio ou expor a pessoa em público costuma piorar tudo. Jesus orienta procurar a pessoa e conversar a sós primeiro (Mateus 18.15). É desconfortável, por isso muita gente evita, mas é o caminho que dá chance real de reconciliação.
 
-Efésios 4.2 pede humildade, mansidão e paciência, suportando uns aos outros com amor. Conviver envolve atrito, e dá pra passar por ele sem desfazer a amizade a cada ferida.
+Efésios 4.2 pede humildade, gentileza e paciência, com tolerância uns pelos outros por causa do amor. Conviver envolve atrito, e dá pra passar por ele sem desfazer a amizade a cada ferida.
 
 Isso nunca significa aceitar tudo calado. Abuso, manipulação ou qualquer tipo de violência precisam ser levados a sério. Se algo assim acontecer, conte a um adulto de confiança, dentro ou fora da igreja, e procure ajuda.
 
@@ -414,7 +418,7 @@ Isso nunca significa aceitar tudo calado. Abuso, manipulação ou qualquer tipo 
 
 Duas práticas marcam a vida da igreja desde o começo. O batismo acontece uma vez e é o sinal público de união com Jesus na morte e na ressurreição dele (Romanos 6.3-4). A ceia do Senhor se repete: o pão e o cálice lembram o corpo de Jesus entregue e o sangue dele derramado, e a igreja celebra junta até ele voltar (1 Coríntios 11.23-26).
 
-As igrejas entendem de formas um pouco diferentes o que acontece na ceia, e cada uma tem seu jeito de celebrar. Todas concordam que ela é celebrada em comunidade e aponta pra Jesus. Se você ainda não participa, pergunte na sua igreja como ela entende a ceia e quem pode participar.
+As igrejas entendem de formas um pouco diferentes o que acontece na ceia, e cada uma tem seu jeito de celebrar. Todas concordam que ela é celebrada em comunidade e aponta pra Jesus. Se você ainda não participa, pergunte na igreja que você frequenta como ela entende a ceia e quem pode participar.
 
 ## Pra anotar
 
@@ -440,7 +444,7 @@ Você vai errar de novo. Todo cristão erra. O jeito como você lida com isso mo
 
 É fácil pensar em pecado como uma lista de coisas proibidas. A Bíblia vai mais fundo. Pecado é tudo o que se afasta do caráter e da vontade de Deus, em pensamento, palavra, atitude ou omissão. Romanos 3.23 diz que todos pecaram e estão longe da glória de Deus.
 
-A Bíblia usa a imagem de errar o alvo. Você foi criado pra refletir quem Deus é, e o pecado desvia disso. Por isso orgulho escondido, indiferença com quem sofre e amor colocado no lugar errado também são pecado, tanto quanto as coisas que todo mundo vê.
+Uma das palavras que a Bíblia usa pra pecado, na língua original, tem a ideia de errar o alvo. Deus criou você pra refletir quem ele é, e o pecado desvia disso. Por isso orgulho escondido, indiferença com quem sofre e amor colocado no lugar errado também são pecado, tanto quanto as coisas que todo mundo vê.
 
 Entender isso evita dois enganos: achar que pecado é só o que está na lista, ou achar que está tudo bem porque você não faz as coisas mais óbvias dela.
 
@@ -448,7 +452,7 @@ Entender isso evita dois enganos: achar que pecado é só o que está na lista, 
 
 Culpa é perceber que você fez algo errado. Vergonha é sentir que você é algo errado. A culpa aponta pra uma ação e pode ser resolvida com perdão. A vergonha ataca a pessoa inteira e paralisa, porque parece que não tem conserto.
 
-O evangelho cuida das duas. A culpa real é perdoada. E a vergonha perde força, porque em Cristo você deixa de ser definido pelo seu pior momento, assunto da próxima lição. Quem confunde as duas costuma cair no desespero, achando que não tem jeito, ou tenta abafar a vergonha sem nunca tratar a culpa de verdade.
+O evangelho, a boa notícia do que Jesus fez, cuida das duas. A culpa real é perdoada. E a vergonha perde força, porque em Cristo o seu pior momento deixa de definir quem você é, assunto da próxima lição. Quem confunde as duas costuma cair no desespero, achando que não tem jeito, ou tenta abafar a vergonha sem nunca tratar a culpa de verdade.
 
 ## Arrependimento de verdade
 
@@ -460,7 +464,7 @@ Arrependimento tem três partes: admitir o erro sem desculpa, mudar de direção
 
 ## Quando o mesmo pecado volta
 
-1 João 1.9 traz uma promessa central: se confessarmos os nossos pecados, Deus é fiel e justo pra nos perdoar e nos limpar de toda injustiça. Repare no que o texto deixa de fora. Ele não coloca limite de tentativas nem exige garantia de que você nunca mais vai falhar. Ele pede confissão sincera.
+1 João 1.9 traz uma promessa central: se confessarmos os nossos pecados, Deus é fiel e justo pra perdoar os nossos pecados e nos limpar de toda maldade. Repare no que o texto deixa de fora. Ele não coloca limite de tentativas nem exige garantia de que você nunca mais vai falhar. Ele pede confissão sincera.
 
 Isso vale também pro pecado que insiste em voltar. A mesma promessa cobre a primeira queda e a vigésima.
 
@@ -490,17 +494,17 @@ Temas: [[06 - Estudos Temáticos/Pecado|Pecado]] · [[06 - Estudos Temáticos/Ar
   },
 
   [T + '09 - Minha identidade em Cristo']: {
-    resumo: 'Quem você passa a ser quando recebe o perdão de Deus: adotado, declarado justo, nova criação e morada do Espírito.',
+    resumo: 'Quem você passa a ser quando recebe o perdão de Deus: da família de Deus, com a sentença de justo, nova criação e morada do Espírito.',
     texto: `
-A lição anterior falou de pecado e perdão. Esta fala de quem você passa a ser quando recebe esse perdão. Parece um assunto mais leve, mas é base pra tudo: o que você acredita sobre si mesmo define como você reage quando cai, quando é rejeitado, quando fracassa.
+A lição anterior falou de pecado e perdão. Esta fala de quem você passa a ser quando recebe esse perdão. Parece um assunto mais leve, mas é base pra tudo: o que você acredita sobre quem você é define como você reage quando cai, quando sofre rejeição, quando fracassa.
 
-## Adotado por Deus
+## Adoção na família de Deus
 
-Efésios 1.5 diz que Deus, por amor, decidiu nos adotar como filhos por meio de Jesus Cristo. No mundo romano, a adoção era um ato legal e definitivo. O adotado passava a ter os mesmos direitos de um filho de sangue, inclusive a herança.
+Efésios 1.5 diz que o plano de Deus sempre foi nos adotar na família dele, por meio de Jesus Cristo. No mundo romano, a adoção era um ato legal e definitivo. O adotado passava a ter os mesmos direitos de um filho de sangue, inclusive a herança.
 
 Romanos 8.15 completa: você não recebeu um espírito que te faz viver com medo, como escravo. Recebeu o Espírito que te faz filho ou filha, e por isso pode chamar Deus de Aba, Pai. Você chega perto de Deus como alguém que já tem lugar na casa. Ninguém precisa bater ponto pra continuar sendo da família.
 
-## Declarado justo
+## A sentença de justo
 
 Justificação é uma palavra de tribunal e quer dizer ser declarado justo. Romanos 5.1 diz que, justificados pela fé, temos paz com Deus por meio de Jesus.
 
@@ -508,13 +512,13 @@ Essa sentença já foi dada. Ela se apoia na justiça de Cristo colocada na sua 
 
 ## Nova criação
 
-2 Coríntios 5.17 diz que, se alguém está em Cristo, é nova criação: o que era velho passou e tudo se fez novo. A luta contra o pecado continua, como a lição anterior mostrou, mas algo mudou por dentro. Você deixa de ser definido pela sua pior versão ou pelo seu passado.
+2 Coríntios 5.17 diz que, quando alguém está em Cristo, se torna uma pessoa totalmente nova por dentro: as coisas antigas já passaram e começou uma nova vida. A luta contra o pecado continua, como a lição anterior mostrou, mas algo mudou por dentro. A sua pior versão e o seu passado deixam de definir quem você é.
 
-Colossenses 3.1-3 usa outra imagem: sua vida agora está escondida com Cristo em Deus. O centro de quem você é passou a estar nele.
+Colossenses 3.1-3 usa outra imagem: sua vida agora está escondida em Cristo e em Deus. O centro de quem você é passou a estar nele.
 
 ## Morada do Espírito
 
-O Espírito Santo mora em quem crê (1 Coríntios 6.19). Sua identidade vai além de um título dado de longe, porque Deus está presente em você. E Romanos 8.16 diz que o próprio Espírito confirma, junto com o seu espírito, que você é filho de Deus.
+O Espírito Santo mora em quem crê (1 Coríntios 6.19). Sua identidade vai além de um título dado de longe, porque Deus está presente em você. E Romanos 8.16 diz que o próprio Espírito confirma, junto com o seu espírito, que você é filho ou filha de Deus.
 
 ## Onde a gente costuma apoiar quem é
 
@@ -536,7 +540,7 @@ O esforço e a disciplina continuam. O que muda é o motivo por trás deles, com
 
 ## Pra anotar
 
-Em Suas anotações, no fim desta página, escreva em que você tem apoiado quem você é: desempenho, opinião dos outros ou passado. Depois escreva como seria pensar sobre si mesmo amanhã como filho ou filha de Deus, declarado justo e nova criação.
+Em Suas anotações, no fim desta página, escreva em que você tem apoiado quem você é: desempenho, opinião dos outros ou passado. Depois escreva como seria, amanhã, lembrar que você é filho ou filha de Deus, que já recebeu a sentença de justo e que é nova criação.
 
 ## Leia esta semana
 
@@ -571,9 +575,9 @@ O pecado começa quando a pessoa aceita e alimenta a tentação. Um pensamento e
 
 ## Uma promessa pra hora difícil
 
-1 Coríntios 10.13 diz que nenhuma tentação que chegou até você é diferente das que outras pessoas enfrentam. Deus é fiel e não vai deixar você ser tentado além do que consegue suportar. Junto com a tentação, ele dá uma saída, pra que você consiga aguentar.
+1 Coríntios 10.13 diz que as tentações que você enfrenta são as mesmas que os outros enfrentam. Deus não vai deixar a tentação ficar tão forte que você não consiga enfrentar, e ele dá forças pra suportar. A Bíblia Livre diz que, junto com a tentação, ele "também dará a saída".
 
-Três coisas aqui. O que você enfrenta é comum, outras pessoas passam por isso. Existe um limite, e quem garante é Deus. E sempre existe uma saída, mesmo quando você ainda não viu. A promessa não dispensa o esforço de resistir, mas derruba a mentira de que você está sozinho num teste que ninguém nunca enfrentou.
+Três coisas aqui. O que você enfrenta é comum, outras pessoas passam por isso. Existe um limite, e quem garante é Deus. E sempre existe uma saída, mesmo quando você ainda não viu. A promessa não dispensa o esforço de resistir, mas derruba a mentira de que você enfrenta, sem ninguém do lado, um teste que ninguém nunca enfrentou.
 
 ## A armadura de Deus no contexto
 
@@ -628,9 +632,9 @@ Nenhum dos dois textos elogia agenda lotada. Eles pedem intenção. De vez em qu
 
 ## Corpo e trabalho
 
-1 Coríntios 6.19-20 diz que o seu corpo é templo do Espírito Santo, que você foi comprado por um preço e que deve honrar a Deus com o corpo. Isso alcança muita coisa: sono, alimentação, saúde, sexualidade e o jeito como você trata o próprio corpo e o dos outros.
+1 Coríntios 6.19-20 diz que o seu corpo é morada do Espírito Santo, que Deus comprou você por um preço alto e que você deve glorificar a Deus com o corpo. Isso alcança muita coisa: sono, alimentação, saúde, sexualidade e o jeito como você trata o próprio corpo e o dos outros.
 
-Sobre trabalho, Colossenses 3.23 orienta fazer tudo de coração, como quem trabalha pro Senhor. Isso vale pro estágio, pro emprego, pra prova da faculdade e pra louça em casa. Na Bíblia, um trabalho comum feito com integridade honra a Deus tanto quanto uma função na igreja.
+Sobre trabalho, Colossenses 3.23 orienta fazer tudo de coração, como quem trabalha pro Senhor. Isso vale pro estágio, pro emprego, pra prova da escola ou da faculdade e pra louça em casa. Na Bíblia, um trabalho comum feito com integridade honra a Deus tanto quanto uma função na igreja.
 
 ## Talentos
 
@@ -638,7 +642,7 @@ Cada pessoa recebeu habilidades diferentes: música, cuidado com gente, organiza
 
 ## Dinheiro e generosidade
 
-2 Coríntios 8 e 9 são os capítulos do Novo Testamento que mais falam sobre doar. Paulo estava juntando uma oferta pros cristãos pobres de Jerusalém. Ele elogia as igrejas da Macedônia, que deram até além do que podiam, por vontade própria (2 Coríntios 8.3). E resume em 9.7: cada um dê conforme decidiu no coração, sem tristeza e sem obrigação, porque Deus ama quem dá com alegria.
+2 Coríntios 8 e 9 são os capítulos do Novo Testamento que mais falam sobre doar. Paulo estava juntando uma oferta pros cristãos pobres de Jerusalém. Ele elogia as igrejas da Macedônia, que deram até além do que podiam, por vontade própria (2 Coríntios 8.3). E resume em 9.7: cada um deve resolver por si quanto vai dar, sem ninguém ser forçado, porque Deus ama os que dão com alegria.
 
 No Novo Testamento, a generosidade nasce da gratidão. Ela é voluntária, alegre e proporcional ao que a pessoa recebe. Mesmo quem ganha pouco, ou ainda depende dos pais, já pode começar a praticar.
 
@@ -678,7 +682,7 @@ Esta é a última lição porque depende de todas as outras. Quem tenta falar da
 
 Se a fé cristã fosse só um jeito de melhorar a própria vida, guardar pra si seria uma escolha pessoal. Ela anuncia uma notícia: Jesus morreu e ressuscitou, isso aconteceu na história e diz respeito a todo mundo. Boa notícia guardada perde o sentido.
 
-Tem também uma promessa antiga. Deus disse a [[11 - Pessoas/Abraão|Abraão]] que todas as famílias da terra seriam abençoadas por meio dele (Gênesis 12.3). Essa promessa atravessa a Bíblia até a multidão de todas as nações em Apocalipse 7.9. Ver [[15 - Fios Bíblicos/Fio das nações|Fio das nações]] e [[06 - Estudos Temáticos/Missão|Missão]].
+Tem também uma promessa antiga. Deus disse a [[11 - Pessoas/Abraão|Abraão]] que todos os povos da terra seriam abençoados por meio dele (Gênesis 12.3). Essa promessa atravessa a Bíblia até a multidão de todas as nações em Apocalipse 7.9. Ver [[15 - Fios Bíblicos/Fio das nações|Fio das nações]] e [[06 - Estudos Temáticos/Missão|Missão]].
 
 ## O que atrapalha
 
@@ -690,13 +694,13 @@ Testemunhar também não depende de convencer. Em Atos 17, Paulo fala em Atenas 
 
 Testemunha é quem conta o que viu e viveu. Você não precisa ser especialista pra contar o que Jesus fez na sua vida. E dizer "não sei responder isso, mas vou pesquisar e te falo" é uma resposta honesta.
 
-1 Pedro 3.15 mostra o jeito: estejam sempre prontos pra explicar a razão da esperança que vocês têm a quem perguntar, com mansidão e respeito. Repare em três detalhes. O texto espera que alguém pergunte, ou seja, a vida do cristão desperta curiosidade. Fala de razão, então vale entender no que você crê. E define o tom: mansidão e respeito, sem agressividade e sem ar de superior.
+1 Pedro 3.15 mostra o jeito. Na Bíblia Livre, o texto pede prontidão pra responder com mansidão e respeito a quem pedir a razão da esperança que temos. Repare em três detalhes. O texto espera que alguém pergunte, ou seja, a vida do cristão desperta curiosidade. Fala de razão, então vale entender no que você crê. E define o tom: mansidão e respeito, sem agressividade e sem ar de superior.
 
 ## O que costuma abrir a conversa
 
 Muitas vezes a conversa começa com o jeito como você lida com um problema, com dinheiro, com a liderança num grupo, com o próprio erro.
 
-Em Mateus 5.14-16, Jesus diz que somos a luz do mundo e que a nossa luz deve brilhar diante das pessoas, pra que vejam o bem que fazemos e glorifiquem o Pai. É a mesma imagem da lamparina que acompanha a sua ofensiva aqui no app. Primeiro as pessoas veem, depois perguntam.
+Em Mateus 5.14-16, Jesus diz que somos a luz do mundo e que a nossa luz deve brilhar diante das pessoas, pra que vejam o bem que fazemos e louvem o Pai. É a mesma imagem do fogo que acompanha a sua ofensiva aqui no app. Primeiro as pessoas veem, depois perguntam.
 
 As palavras continuam necessárias. Uma vida diferente sem explicação nenhuma faz as pessoas admirarem você, e Deus fica de fora. As duas coisas andam juntas.
 
@@ -732,10 +736,10 @@ Em Suas anotações, no fim desta página, escreva o nome dessas pessoas. Depois
 
 ## Pra ir além
 
-Você chegou ao fim dos primeiros passos. Continue com a leitura do dia na Trilha e explore os Fios bíblicos no Explorar.
+Você chegou ao fim dos Primeiros passos. Continue com a leitura do dia na Trilha e explore as Conexões no Explorar, os fios que atravessam a Bíblia.
 Temas: [[06 - Estudos Temáticos/Missão|Missão]] · [[06 - Estudos Temáticos/Esperança|Esperança]] · [[06 - Estudos Temáticos/Igreja|Igreja]]
-Fios: [[15 - Fios Bíblicos/Fio das nações|Fio das nações]]
-Eventos: [[12 - Eventos/Pentecostes|Pentecostes]] · [[12 - Eventos/Missão aos gentios|Missão aos gentios]]
+Conexões: [[15 - Fios Bíblicos/Fio das nações|Fio das nações]]
+Acontecimentos: [[12 - Eventos/Pentecostes|Pentecostes]] · [[12 - Eventos/Missão aos gentios|Missão aos gentios]]
 `,
   },
 };
@@ -753,11 +757,28 @@ function linha(texto) {
     });
 }
 
+// "Leia esta semana": cada referência vira um atalho que abre o capítulo na Bíblia do app
+// ("Romanos 8.1-4 e 8.31-39" abre Romanos 8). O que não for referência fica como texto.
+const REF_LEITURA = /^((?:[1-3] )?[A-ZÀ-Ú][a-zà-ú]+(?: [a-zà-ú]+)*) (\d+)/;
+function leituras(texto) {
+  return '<div class="pilulas leituras-semana">' + texto.split(/\s*·\s*/).map((item) => {
+    const m = item.match(REF_LEITURA);
+    return m ? '<a class="pilula" href="#/biblia/' + encodeURIComponent(m[1] === 'Salmo' ? 'Salmos' : m[1]) + '/' + m[2] + '">' + esc(item) + '</a>' : '<span>' + esc(item) + '</span>';
+  }).join('') + '</div>';
+}
+
+// Marcadores de bloco inteiro, que viram ação na tela (ligada em 05b-conhecer.js).
+const ACOES = {
+  '{{conversar-batismo}}': '<div class="acoes-licao"><button type="button" class="botao contorno" data-conversar-batismo>Quero conversar sobre o batismo</button></div>',
+};
+
 export function montarHtml(nome, texto) {
   const blocos = texto.trim().split(/\n\s*\n/);
-  return '<h1>' + esc(semNumero(nome)) + '</h1>\n' + blocos.map((b) => {
+  return '<h1>' + esc(semNumero(nome)) + '</h1>\n' + blocos.map((b, i) => {
     const t = b.trim();
+    if (ACOES[t]) return ACOES[t];
     if (t.startsWith('## ')) return '<h2>' + linha(t.slice(3)) + '</h2>';
+    if (i > 0 && blocos[i - 1].trim() === '## Leia esta semana') return leituras(t);
     return '<p>' + t.split('\n').map(linha).join('<br>') + '</p>';
   }).join('\n');
 }

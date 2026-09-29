@@ -54,7 +54,7 @@ const api = async (rota, corpo, cookie) => {
   return { status: r.status, cookie: (r.headers.get('set-cookie') || '').split(';')[0], dado: await r.json().catch(() => ({})) };
 };
 const criarConta = (usuario, nome) => api('/api/criar-conta', {
-  usuario, nome, senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2003-04-05',
+  usuario, nome, senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2003-04-05', consentimento: true,
 });
 
 const perfil = mkdtempSync(join(tmpdir(), 'cc-redesenho-nav-'));
@@ -112,6 +112,8 @@ console.log('\n  Redesenho, de ponta a ponta\n');
 // ---------- privacidade pública ----------
 const privacidade = await fetch(base + '/privacidade.html');
 ok(privacidade.status === 200 && (await privacidade.text()).includes('Quem vê o quê'), 'a página de privacidade abre sem entrar');
+const termos = await fetch(base + '/termos.html');
+ok(termos.status === 200 && (await termos.text()).includes('Regras de convivência'), 'os termos de uso abrem sem entrar');
 
 // ---------- cadastro em três passos ----------
 await cmd('Page.navigate', { url: base + '/' });
@@ -137,6 +139,9 @@ await clicar('[data-mostrar="senha-nova"]');
 ok(await av(q('#senha-nova') + '.type === "text"'), 'o botão Mostrar revela a senha');
 await foto('2-cadastro-acesso');
 await clicar('#botao-cadastro');
+ok(await esperar(q('#erro-cadastro') + '.textContent.length > 0'), 'sem marcar o consentimento, o cadastro não completa');
+await clicar('#consentimento-cadastro');
+await clicar('#botao-cadastro');
 ok(await esperar(existe('.no.atual'), 12000), 'criar a conta abre o aplicativo');
 ok(await esperar('CC.quem && CC.quem.perfilCompleto === true'), 'a conta nova já nasce com o cadastro completo');
 ok(await av('CC.ler("lidos", []).length === 0 && CC.sequencia().atual === 0'),
@@ -145,11 +150,14 @@ ok(await av('CC.ler("lidos", []).length === 0 && CC.sequencia().atual === 0'),
 // ---------- trilha ----------
 ok(await esperar(existe('.leitura-hoje [data-abrir-dia]') + ' && ' + existe('.fala-bento.apresenta')),
   'a conta nova vê a leitura de hoje no alto da trilha, e o Bento se apresenta');
-ok(await av('document.querySelectorAll(".navegacao .aba").length === 5 && ' + existe('.aba[aria-current=page]')
+// Cinco abas de verdade na barra (Trilha, Desafios, Bíblia, Juntos, Mais): o
+// ".so-trilho" é o fantasma que só o trilho lateral usa (Explorar, aqui), escondido no
+// celular por CSS, então não conta como aba visível.
+ok(await av('document.querySelectorAll(".navegacao .aba:not(.so-trilho)").length === 5 && ' + existe('.aba[aria-current=page]')
   + ' && getComputedStyle(' + q('.aba .rotulo-aba') + ').position !== "absolute"'),
   'cinco abas com o nome à vista, e a atual marcada para leitor de tela');
 ok(await av('!' + existe('.topo .contador.lidos') + ' && !' + existe('.topo .contador.escudos') + ' && !' + existe('.topo .sino')),
-  'o topo mostra só a lamparina: sem dias lidos, escudos ou sino');
+  'o topo mostra só o fogo: sem dias lidos, escudos ou sino');
 ok(await av('!' + existe('.contador.xp') + ' && ' + existe('.contador.ofensiva')), 'o topo mostra a ofensiva e não o XP');
 ok(await av('document.querySelectorAll(".no-bau").length >= 4'), 'a trilha tem um baú a cada sete dias');
 await dormir(500);
@@ -174,8 +182,9 @@ ok(await esperar(existe('.cartao-versiculo'), 6000), 'o fim mostra um versículo
 await foto('4c-versiculo');
 ok(await av('!' + existe('[data-etapa-bloco="pensar"]:not([hidden])')), 'pensar e orar começam fechados');
 await clicar('[data-avancar]');
-ok(await esperar(existe('[data-etapa-bloco="pensar"]:not([hidden])') + ' && document.querySelectorAll(".pergunta-reflexao").length === 3'),
-  '"Pensar sobre isso" abre três perguntas');
+// 2 ou 3: as reflexões revistas têm a quantidade de perguntas que o texto pede
+ok(await esperar(existe('[data-etapa-bloco="pensar"]:not([hidden])') + ' && [2, 3].includes(document.querySelectorAll(".pergunta-reflexao").length)'),
+  '"Pensar sobre isso" abre as perguntas do dia');
 await clicar('[data-pergunta="0"]');
 ok(await av(q('[data-pergunta="0"]') + '.getAttribute("aria-pressed") === "true"'), 'a pessoa escolhe uma pergunta');
 await clicar('[data-avancar]');
@@ -299,14 +308,14 @@ await foto('5b-missoes');
 
 // ---------- perfil e configurações ----------
 await irPara('#/perfil');
-ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".estante .trofeu").length === 3 && document.querySelectorAll(".visao-geral .visao-item").length === 4'),
+ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".colecao-atalhos a").length === 2 && document.querySelectorAll(".visao-geral .visao-item").length === 4'),
   'o perfil mostra a visão geral, conquistas com nível e a coleção');
 ok(await av('/188/.test(' + q('.linha-ajuda') + '.innerText) && !/XP/.test(' + q('.conteudo') + '.innerText)'),
   'o perfil tem a linha do CVV e não mostra XP');
 await dormir(400);
 await foto('7-perfil');
 await irPara('#/perfil/conquistas');
-ok(await esperar('document.querySelectorAll(".linha-conquista").length === 10'), 'as dez conquistas aparecem com o nível');
+ok(await esperar('document.querySelectorAll(".linha-conquista").length === CC.CONQUISTAS.length'), 'todas as conquistas aparecem com o nível');
 await irPara('#/perfil/escritos');
 ok(await esperar('/oração de teste/.test(document.body.innerText)'), 'Meus escritos reúne o que foi escrito');
 await irPara('#/config');
@@ -329,7 +338,10 @@ await clicar('[data-ir="entrar"]');
 await preencher('#login', 'velho');
 await preencher('#senha-entrar', 'senha-velha');
 await clicar('#botao-entrar');
-ok(await esperar(existe('.cortina #cad-email'), 12000), 'a conta antiga entra e é convidada a completar o cadastro');
+// Conta antiga, sem consentimento: a folha de "Antes de continuar" vem antes de tudo.
+ok(await esperar(existe('.cortina [data-concordar]'), 12000), 'a conta antiga entra e é convidada a concordar com o uso do dado de fé');
+await clicar('.cortina [data-concordar]');
+ok(await esperar(existe('.cortina #cad-email'), 12000), 'depois de concordar, a conta antiga é convidada a completar o cadastro');
 await foto('9-completar-cadastro');
 await preencher('#cad-email', 'velho@teste.com');
 await preencher('#cad-nasc', '1999-09-09');

@@ -42,7 +42,7 @@ try {
   const base = 'http://127.0.0.1:' + PORTA;
   for (let i = 0; i < 80; i++) { try { await fetch(base + '/api/existe-conta'); break; } catch { await dormir(150); } }
   await fetch(base + '/api/criar-conta', { method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ usuario: 'ana', senha: 'senha-boa-1', nome: 'Ana', email: 'ana@teste.com', nascimento: '2000-01-01' }) });
+    body: JSON.stringify({ usuario: 'ana', senha: 'senha-boa-1', nome: 'Ana', email: 'ana@teste.com', nascimento: '2000-01-01', consentimento: true }) });
 
   perfil = mkdtempSync(join(tmpdir(), 'cc-at-'));
   nav = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--remote-debugging-port=' + PORTA_NAV,

@@ -1,4 +1,4 @@
-# DEV do Geração Eleita: o redesenho da identidade nova (preto, branco e verde-limão).
+# DEV do Geração Eleita: o redesenho da identidade nova (preto, branco e petróleo).
 #
 # Três ambientes vivos ao mesmo tempo, cada um na sua pasta e na sua porta:
 #   PRD: "Caminho com Cristo - App",     porta 8080, https://ccc.off-sec.net
@@ -23,12 +23,32 @@ services:
       context: .
     container_name: geracao-eleita
     restart: unless-stopped
+    # Só nesta máquina: de fora, o caminho é o túnel da Cloudflare. Aberta na rede, a porta
+    # deixava qualquer um da mesma Wi-Fi falar direto com o servidor, sem Cloudflare na frente.
     ports:
-      - "8082:8080"
+      - "127.0.0.1:8082:8080"
     volumes:
       - "./dados:/app/dados"
+      # Os backups cifrados podem ir para outro disco (no Pi, o pendrive em /mnt/externo):
+      # CAMINHO_PASTA_BACKUP no .env. Sem ela, ficam em dados/backup, como sempre.
+      - "${CAMINHO_PASTA_BACKUP:-./dados/backup}:/app/dados/backup"
     environment:
       CAMINHO_AMBIENTE: "hml"
+      CAMINHO_ENDERECO: "https://geracaoeleita.app"
+      # Quem vê o Painel do app (Configurações): métricas sem nomes e os pedidos de senha.
+      CAMINHO_ADMIN: "maarcos_e"
+      # E-mail da senha esquecida: desligado enquanto CAMINHO_SMTP_HOST estiver vazio no .env.
+      # Como ligar com uma conta Gmail: ver o topo de email.mjs.
+      CAMINHO_SMTP_HOST: "${CAMINHO_SMTP_HOST:-}"
+      CAMINHO_SMTP_PORTA: "${CAMINHO_SMTP_PORTA:-465}"
+      CAMINHO_SMTP_USUARIO: "${CAMINHO_SMTP_USUARIO:-}"
+      CAMINHO_SMTP_SENHA: "${CAMINHO_SMTP_SENHA:-}"
+      CAMINHO_SMTP_DE: "${CAMINHO_SMTP_DE:-}"
+      # A chave dos backups cifrados mora no .env, fora da pasta de dados: quem levar dados/
+      # não leva a chave junto. Guarde uma cópia dela: sem a chave, o backup não abre.
+      CAMINHO_BACKUP_CHAVE: "${CAMINHO_BACKUP_CHAVE:-}"
+      # Quantas cópias diárias guardar (com o disco externo cabem bem mais que 14).
+      CAMINHO_BACKUP_MANTER: "${CAMINHO_BACKUP_MANTER:-14}"
 
   # Túnel rápido: endereço novo a cada reinício. Só sobe se pedido, com
   #   docker compose --profile rapido up -d
@@ -58,3 +78,20 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+
+  # Segundo túnel nomeado: o endereço novo, geracaoeleita.app. Mesmo esquema do tunel-fixo
+  # (no painel da Cloudflare o serviço aponta para http://localhost:8080). Os dois
+  # endereços servem o MESMO app e o mesmo banco: os apps já instalados pelo endereço
+  # antigo continuam funcionando. Só sobe com o perfil "pi", para nunca ligar por engano
+  # num PC (dois lugares com o mesmo túnel dividem as visitas entre bancos diferentes).
+  #   docker compose --profile pi up -d tunel-app
+  tunel-app:
+    image: cloudflare/cloudflared:latest
+    container_name: geracao-eleita-tunel-app
+    restart: unless-stopped
+    profiles: [pi]
+    network_mode: "service:caminho"
+    depends_on: [caminho]
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN_APP}

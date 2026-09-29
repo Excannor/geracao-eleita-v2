@@ -9,7 +9,7 @@
 //
 // O combinado para não virar chatice: no máximo 3 automáticas por dia (manhã, meio-dia e
 // noite), silêncio das 22h30 às 7h, nada depois que a pessoa leu, e quem sumiu recebe
-// três recados espaçados e depois silêncio. Toque de amigo tem teto próprio.
+// avisos leves, diários no começo e cada vez mais espaçados. Toque de amigo tem teto próprio.
 import { readFile, writeFile, rename, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import {
@@ -98,6 +98,13 @@ export async function enviarPush(inscricao, mensagem, chaves, contato, opcoes = 
   // O tópico faz o serviço de push trocar o aviso ainda não entregue pelo mais novo.
   if (mensagem.tag) cabecalhos.topic = createHash('sha256').update(mensagem.tag).digest('base64url').slice(0, 32);
   const resposta = await (opcoes.fetch || fetch)(inscricao.endpoint, { method: 'POST', headers: cabecalhos, body: corpo });
+  // Inscrição feita com a chave de outro servidor (a Apple responde 400 VapidPkHashMismatch)
+  // nunca vai receber nada daqui: conta como aparelho que saiu (410), e o app pede de novo.
+  // No Chrome/Android o mesmo caso vem como 403 "does not correspond to the sender".
+  if (resposta.status === 400 || resposta.status === 403) {
+    const motivo = await resposta.text().catch(() => '');
+    if (/VapidPkHashMismatch|does not correspond/i.test(motivo)) return 410;
+  }
   return resposta.status;
 }
 
@@ -110,13 +117,22 @@ export const MAX_AUTOMATICAS_DIA = 3;
 export const LEMBRETE_MANHA = 9 * 60;
 export const LEMBRETE_MEIO = 12 * 60;
 export const MAX_TOQUES_RECEBIDOS_DIA = 3;
-export const DIAS_DE_VOLTA = [3, 7, 14];
+// Quem sumiu: diário na primeira semana, depois cada vez mais espaçado, sem nunca parar de
+// vez. É o que os apps de hábito fazem (a volta é mais provável entre o 3º e o 14º dia e
+// cai muito depois de 30), sem o tom de cobrança que alguns usam quando a pessoa some.
+//   3 a 7: todo dia · 9, 11, 14: dia sim, dia não · 21 e 30: semanal
+//   até 90: a cada 15 dias · depois: a cada 30
+export const DIAS_DE_VOLTA = [3, 4, 5, 6, 7, 9, 11, 14, 21, 30];
+export const diaDeVolta = (n) => DIAS_DE_VOLTA.includes(n) || (n > 30 && n <= 90 && (n - 30) % 15 === 0) || (n > 90 && (n - 90) % 30 === 0);
 export const HORA_OFENSIVA = 21 * 60;
+// Distância mínima entre dois avisos automáticos do mesmo dia.
+export const ESPACO_ENTRE_AVISOS = 90;
 export const PREFERENCIAS_PADRAO = { lembrete: true, hora: '19:00', ofensiva: true, amigos: true };
 const MARCOS = [7, 14, 30, 50, 100, 150, 200, 250, 300, 365];
 
 export const emSilencio = (minutos) => minutos >= SILENCIO.inicio || minutos < SILENCIO.fim;
 const paraMinutos = (hora) => { const [h, m] = String(hora).split(':').map(Number); return h * 60 + (m || 0); };
+const somarDias = (data, n) => new Date(Date.parse(data + 'T12:00:00Z') + n * 864e5).toISOString().slice(0, 10);
 const diasEntre = (de, ate) => Math.round((Date.parse(ate + 'T12:00:00Z') - Date.parse(de + 'T12:00:00Z')) / 864e5);
 
 export function horaValida(hora) {
@@ -146,17 +162,26 @@ export function decidir({ agora, pref, historico = {}, leitura }) {
   const referencia = leitura.ultimaLeitura || leitura.criadaEm || data;
   const semLer = diasEntre(referencia, data);
 
-  // Quem sumiu não recebe lembrete todo dia: três recados espaçados e depois silêncio.
+  // Quem sumiu recebe no máximo um aviso no dia, no horário escolhido, nos dias de diaDeVolta.
+  // Servidor fora no dia marcado: o aviso sai no dia seguinte, uma vez; atraso maior espera o
+  // próximo dia da lista, sem acumular.
   if (semLer >= DIAS_DE_VOLTA[0]) {
     if (!pref.lembrete || minutos < hora || historico.volta === data) return null;
-    return DIAS_DE_VOLTA.includes(semLer) ? { tipo: 'volta', dados: { dias: semLer } } : null;
+    let etapa = semLer;
+    while (etapa > DIAS_DE_VOLTA[0] && !diaDeVolta(etapa)) etapa--;
+    const devidoEm = somarDias(referencia, etapa);
+    if (semLer - etapa > 1 || (historico.volta && historico.volta >= devidoEm)) return null;
+    return { tipo: 'volta', dados: { dias: etapa } };
   }
 
   // Os três horários do dia. "enviadoAte" é o minuto do último lembrete de hoje: só sai o
   // horário que já passou e que é mais tarde que o último enviado, então cada um sai uma
   // vez só e nenhum atropela o outro quando a rodada roda de hora em hora.
   if (pref.lembrete) {
-    const enviadoAte = historico.lembrete === data ? (historico.lembreteMinutos || 0) : -1;
+    // Um lembrete que saiu atrasado (o servidor esteve desligado no horário) cobre também os
+    // horários da hora e meia seguinte: volta do servidor às 11h50 manda o da manhã e pula o do
+    // meio-dia, em vez de mandar os dois colados. Cada volta manda um aviso só, o do período.
+    const enviadoAte = historico.lembrete === data ? (historico.lembreteMinutos || 0) + ESPACO_ENTRE_AVISOS - 1 : -1;
     // O recado do escudo já é a mensagem da manhã. Sem isto, quem usou escudo recebia o
     // escudo e o lembrete das 9h em seguida, dois avisos colados no mesmo intervalo.
     const inicio = historico.escudo === data ? Math.max(enviadoAte, LEMBRETE_MANHA) : enviadoAte;
@@ -168,7 +193,7 @@ export function decidir({ agora, pref, historico = {}, leitura }) {
   }
 
   // A ofensiva em risco sai à noite, e nunca colada no lembrete.
-  const lembreteRecente = historico.lembrete === data && minutos - (historico.lembreteMinutos || 0) < 90;
+  const lembreteRecente = historico.lembrete === data && minutos - (historico.lembreteMinutos || 0) < ESPACO_ENTRE_AVISOS;
   if (pref.ofensiva && leitura.ofensiva >= 2 && minutos >= HORA_OFENSIVA && historico.ofensiva !== data && !lembreteRecente) {
     return { tipo: 'ofensiva', dados: { ofensiva: leitura.ofensiva } };
   }
@@ -192,7 +217,7 @@ const T = {
     ['Pausa boa pro seu dia ✨', 'Respira, abre o app e lê com calma.'],
   ],
   lembreteMarco: [
-    ['Falta 1 dia pra {marco} 🏆', 'Lê hoje e a sua ofensiva chega em {marco} dias seguidos!'],
+    ['Falta 1 dia pra bater {marco} dias 🏆', 'Lê hoje e a sua ofensiva chega em {marco} dias seguidos!'],
     ['Quase lá! 🎯', 'Mais uma leitura e você bate {marco} dias. Bora?'],
   ],
   lembreteDomingo: [
@@ -203,21 +228,21 @@ const T = {
   // vista. O app não inventa profecia nem fala em nome de Deus: quando quer animar, cita
   // o texto e deixa quem lê conferir de onde veio.
   lembreteManha: [
-    ['As misericórdias se renovam 🌅', '"As misericórdias do Senhor renovam-se a cada manhã" (Lm 3.22-23). Comece o dia na Palavra.'],
-    ['De manhã, Senhor ☀️', '"De manhã fazes ouvir a minha voz" (Sl 5.3). A leitura de hoje te espera.'],
-    ['Primeiro o Reino 📖', '"Buscai primeiro o Reino de Deus" (Mt 6.33). Uns minutos e o dia começa diferente.'],
-    ['Bom dia, {nome}! 🌤️', '"Ensina-me a fazer a tua vontade" (Sl 143.10). Bora abrir a lição de hoje?'],
+    ['A misericórdia se renova 🌅', 'A misericórdia do Senhor "se renova a cada manhã" (Lm 3.23). Comece o dia na Palavra.'],
+    ['De manhã ☀️', '"De manhã faço a minha oração e fico esperando a sua resposta" (Sl 5.3). A leitura de hoje te espera.'],
+    ['Primeiro o Reino 📖', '"Coloquem, pois, em primeiro lugar o Reino de Deus" (Mt 6.33). Uns minutos e o dia começa diferente.'],
+    ['Bom dia, {nome}! 🌤️', '"Ensine-me a fazer a sua vontade" (Sl 143.10). Bora abrir a lição de hoje?'],
   ],
   lembreteMeio: [
-    ['Uma pausa no meio do dia ☕', '"Aquietai-vos e sabei que eu sou Deus" (Sl 46.10). Dez minutos bastam.'],
-    ['Fome de quê? 🍞', '"Nem só de pão viverá o homem" (Mt 4.4). A leitura de hoje é rapidinha.'],
-    ['Respira fundo 🌿', '"Vinde a mim, todos os que estais cansados" (Mt 11.28). Abre a Palavra um instante.'],
-    ['No meio do corre 🕊️', '"A tua palavra é doce ao meu paladar" (Sl 119.103). Dá uma parada e lê.'],
+    ['Uma pausa no meio do dia ☕', '"Fiquem quietos e saibam, de uma vez por todas, que eu sou Deus!" (Sl 46.10). Dez minutos bastam.'],
+    ['Fome de quê? 🍞', '"Não é só de pão que vive o homem" (Mt 4.4). A leitura de hoje é rapidinha.'],
+    ['Respira fundo 🌿', '"Venham a mim, todos vocês que estão cansados" (Mt 11.28). Abre a Palavra um instante.'],
+    ['No meio do corre 🕊️', '"As suas palavras são doces, mais doces do que o mel" (Sl 119.103). Dá uma parada e lê.'],
   ],
   ofensiva: [
     ['Sua chama de {n} dias tá pedindo lenha 🔥', 'Ainda dá tempo! Faz a lição antes da meia-noite.'],
-    ['Última chamada do dia ⏰', 'Uma leitura rapidinha garante os seus {n} dias seguidos.'],
-    ['Ei, a ofensiva! 🚨', '{n} dias acesos. Bora salvar o de hoje?'],
+    ['Um minutinho antes de dormir? 🌙', 'A leitura de hoje é curta e mantém os seus {n} dias.'],
+    ['{n} dias acesos 🔥', 'Ainda dá para ler hoje, com calma.'],
   ],
   escudo: [
     ['Seu escudo segurou a onda 🛡️', 'Ontem ficou coberto e a ofensiva seguiu em {n}. Hoje é com você!'],
@@ -226,14 +251,34 @@ const T = {
   volta3: [['Saudade de você por aqui 👀', 'Seu progresso tá guardadinho. Bora retomar com a leitura de hoje?']],
   volta7: [['O caminho continua aberto 🛤️', 'Sem pressão: é só abrir e seguir de onde parou.']],
   volta14: [['Passando só pra lembrar 💛', 'Quando quiser voltar, está tudo guardado do jeito que você deixou.']],
+  // Do 4º ao 6º dia: "de onde parou", um convite leve, nunca contagem de dias perdidos.
+  voltaDiario: [
+    ['A leitura de hoje tá aqui 📖', 'Sem cobrança: abre quando der e lê com calma.'],
+    ['Um minutinho com a Palavra? 🌿', 'Seu progresso tá guardado. Dá pra seguir de onde parou.'],
+    ['Oi, {nome} 👋', 'A lição de hoje é curtinha. Que tal hoje?'],
+    ['Recomeçar é sempre possível 🌱', 'É só abrir o app e seguir do ponto em que você parou.'],
+  ],
+  // 9º e 11º dia: o que espera por ela, e que voltar não pede correr atrás do atraso.
+  voltaValor: [
+    ['Uma leitura curtinha muda o dia ✨', 'Dá pra voltar com uma lição só. Sem correr atrás do atraso.'],
+    ['Sua próxima leitura tá separada 📖', 'Ela continua ali, do ponto em que você parou.'],
+    ['Dez minutos com a Palavra 🌿', 'Não precisa recuperar nada. É só a leitura de hoje.'],
+  ],
+  // Do 21º dia em diante, espaçado: saudade e porta aberta.
+  voltaSaudade: [
+    ['Sentimos sua falta 💛', 'Quando quiser voltar, a leitura continua de onde você parou.'],
+    ['Faz um tempinho, {nome} 👋', 'Sem pressa e sem cobrança: o app tá aqui quando você quiser.'],
+    ['A porta continua aberta 🚪', 'Um dia de cada vez. Dá pra recomeçar hoje, com uma leitura só.'],
+    ['Oi, a gente lembrou de você 🌱', 'Tá tudo guardado do jeito que você deixou. Volta quando quiser.'],
+  ],
   toque: [
     ['{amigo} te deu um toque 👊', 'Bora ler hoje? A lição tá esperando vocês dois.'],
     ['{amigo} tá te chamando pra ler 📣', 'Faz a lição de hoje e a contagem de vocês sobe.'],
   ],
-  toques: [['{amigo} e mais {outros} te deram um toque 👊', 'A galera já leu. Bora você também?']],
+  toques: [['{amigo} e mais {outros} te deram um toque 👊', 'A galera lembrou de você. A leitura de hoje tá aqui.']],
   pedido: [['{amigo} quer ler a Bíblia com você 🙌', 'Abre o app pra aceitar e começar o propósito de vocês.']],
   aceito: [['{amigo} topou ler junto 🤝', 'Começou o propósito de vocês. Cada dia que os dois leem conta!']],
-  teste: [['Tudo certo por aqui ✅', 'É assim que os lembretes do Caminho vão chegar.']],
+  teste: [['Tudo certo por aqui ✅', 'É assim que os lembretes do Geração Eleita vão chegar.']],
   propositoConvite: [
     ['{amigo} te chamou para um propósito 🤝', '{titulo}. Abre o app pra ver e aceitar.'],
   ],
@@ -241,6 +286,26 @@ const T = {
     ['Faltam {faltam} pro grupo bater a meta 🎯', '{titulo}: bora fechar o dia juntos?'],
     ['O grupo tá quase lá 🙌', 'Falta pouco em {titulo}. A sua lição ajuda a bater a meta!'],
   ],
+  // O corpo não diz "leem": o propósito pode ser de oração.
+  propositoAceito: [['{amigo} entrou no propósito 🙌', '{titulo}: agora vocês estão juntos nessa.']],
+  // "Quero conversar com alguém", do Conhecer Jesus: só quem convidou (e o líder da célula
+  // dela, se houver) recebe, e nunca o que a pessoa escreveu. Assunto sério, sem emoji.
+  querConversar: [['{nome} quer conversar com você sobre Jesus.', 'Chame essa pessoa para uma conversa, do jeito que vocês costumam falar.']],
+  // Da lição do batismo nos Primeiros passos: mesmo cuidado do querConversar.
+  querBatismo: [['{nome} quer conversar com você sobre o batismo.', 'Procure essa pessoa para uma conversa, do jeito que vocês costumam falar.']],
+  metaBatida: [
+    ['O grupo bateu a meta de hoje 🎉', '{titulo}: vocês chegaram lá juntos.'],
+    ['Meta do grupo batida 🙌', 'Deu certo em {titulo}. Obrigado por estar junto!'],
+  ],
+  // Discipulado (Mateus 28.19-20; 2 Tm 2.2): assunto sério, sem emoji, como querConversar.
+  discipuladoConvite: [['{amigo} quer caminhar com você na fé.', 'Abra o app para ver o convite.']],
+  discipuladoAceito: [['{amigo} aceitou caminhar com você na fé.', 'Combinem juntos o primeiro encontro da semana.']],
+  // Cuidado mútuo (Atos 2.42; 2.44-45): assunto sério, sem emoji, sem detalhe do pedido.
+  pedidoConduz: [['{amigo} deixou um pedido de oração para você.', 'Abra a célula para ver.']],
+  possoAjudar: [['{amigo} pode ajudar com o que você pediu.', 'Combinem pessoalmente ou no WhatsApp.']],
+  denunciaPerigo: [['Um pedido da célula precisa da sua atenção.', 'Abra a célula para ver.']],
+  // Multiplicação de célula (Atos 2.47): quem foi para a célula nova recebe só isto, uma vez.
+  celulaMultiplicada: [['Você agora faz parte da {filha}.', 'O líder é {novoLider}.']],
 };
 export const TEXTOS = T;
 
@@ -268,14 +333,37 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
     tag = 'lembrete';
   }
   if (tipo === 'ofensiva' || tipo === 'escudo') { d.n = dados.ofensiva || 0; tag = 'lembrete'; }
-  if (tipo === 'volta') { lista = T['volta' + dados.dias] || T.volta3; tag = 'lembrete'; }
+  if (tipo === 'volta') {
+    const n = Number(dados.dias) || 0;
+    lista = T['volta' + n] || (n < 7 ? T.voltaDiario : n < 14 ? T.voltaValor : T.voltaSaudade);
+    tag = 'lembrete';
+  }
   if (tipo === 'toque') {
     if ((dados.outros || 0) > 0) lista = T.toques;
     tag = 'toque';
   }
   if (tipo === 'pedido' || tipo === 'aceito') { url = './#/amigos'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
-  if (tipo === 'propositoConvite') { url = './#/propositos'; tag = 'proposito:' + (dados.id || ''); }
-  if (tipo === 'metaDoGrupo') { url = './#/propositos'; tag = 'grupo:' + (dados.id || ''); }
+  if (tipo === 'querConversar') { url = './#/amigos'; tag = 'querConversar:' + (dados.deUsuario || ''); }
+  if (tipo === 'querBatismo') { url = './#/amigos'; tag = 'querBatismo:' + (dados.deUsuario || ''); }
+  // A célula mora no Juntos; duplas e grupos, em Juntos > Propósitos.
+  const telaDoProposito = dados.celula ? './#/novidades' : './#/novidades/propositos';
+  if (tipo === 'propositoConvite' || tipo === 'propositoAceito') { url = telaDoProposito; tag = 'proposito:' + (dados.id || ''); }
+  // A meta batida usa a mesma tag do "falta pouco": no celular, a boa notícia substitui o recado.
+  if (tipo === 'metaDoGrupo' || tipo === 'metaBatida') { url = telaDoProposito; tag = 'grupo:' + (dados.id || ''); }
+  // Discipulado tem aba própria (ou some por trás de #/perfil/discipulado para quem ainda
+  // não a tem na barra): o toque na notificação leva direto para lá, nunca para o Feed.
+  if (tipo === 'discipuladoConvite' || tipo === 'discipuladoAceito') { url = './#/discipulado'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
+  // Cuidado mútuo mora na célula (aba Oração), nunca no Feed: com o id da célula, o toque na
+  // notificação leva direto para lá; sem ele (aviso antigo, ainda na fila), cai no Juntos.
+  if (tipo === 'pedidoConduz' || tipo === 'possoAjudar' || tipo === 'denunciaPerigo') {
+    url = dados.celula ? './#/novidades/celula/' + encodeURIComponent(dados.celula) + '/oracao' : './#/novidades';
+    tag = tipo;
+  }
+  // A multiplicação leva direto para a célula nova, na aba Hoje (onde o aviso discreto mora).
+  if (tipo === 'celulaMultiplicada') {
+    url = dados.id ? './#/novidades/celula/' + encodeURIComponent(dados.id) : './#/novidades';
+    tag = tipo + ':' + (dados.id || '');
+  }
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = lista[semente(usuario + '|' + data + '|' + tipo) % lista.length];
   return { titulo: preencher(titulo, d), corpo: preencher(corpo, d), tag, url };
@@ -382,8 +470,10 @@ export class Notificacoes {
       if (tipo === 'lembrete') h.lembreteMinutos = minutos;
     }
     if (tipo === 'toque') h.toques = (h.toques || 0) + 1;
-    // o recado de meta de cada grupo sai no máximo uma vez por dia
-    if (tipo.startsWith('grupo:')) h[tipo] = data;
+    // o recado de meta e a comemoração de cada grupo saem no máximo uma vez por dia. A
+    // comemoração ("grupoBatida:") ficava de fora deste teste: nunca era anotada e saía de
+    // novo a cada rodada de lembretes, uma por minuto.
+    if (tipo.startsWith('grupo:') || tipo.startsWith('grupoBatida:')) h[tipo] = data;
     this.dados.historico[usuario] = h;
     await this.salvar();
     return h;

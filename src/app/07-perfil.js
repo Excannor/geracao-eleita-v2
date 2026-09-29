@@ -1,5 +1,5 @@
-/* Perfil: quem você é, a visão geral, quem lê junto com você, suas anotações e a coleção
-   (conquistas e troféus). O Perfil mostra fidelidade e comunhão, não placar: o XP
+/* Perfil: quem você é, a visão geral, a coleção (conquistas e troféus), o Semeador, o que
+   você escreveu e guardou, e o aplicativo. Quem lê junto com você mora no Juntos. O Perfil mostra fidelidade e comunhão, não placar: o XP
    saiu da vista, e os marcos só aparecem para amigos se você escolher mostrá-los no Feed. */
 (function (CC) {
   'use strict';
@@ -14,8 +14,9 @@
     + '<div class="barra-missao"><i style="width:' + (c.fracao * 100).toFixed(1) + '%"></i></div>'
     + '<span class="descricao-conquista">' + CC.esc(c.maximo ? 'Você chegou ao último nível!' : c.descricao) + '</span></div></div>';
 
+  const FORMA_DO_TIPO = { unidade: 'taca', colecao: 'livros', testamento: 'biblia', plano: 'calendario', desafio: 'bandeira' };
   const trofeuHtml = (t) => '<div class="trofeu' + (t.ganho ? ' ganho' : '') + '">'
-    + CC.arte.trofeu(t.cor || 'amarelo', t.ganho, t.total ? t.feitos / t.total : 0)
+    + CC.arte.trofeu(t.cor || 'amarelo', t.ganho, t.total ? t.feitos / t.total : 0, FORMA_DO_TIPO[t.tipo])
     + '<b>' + CC.esc(t.titulo) + '</b>'
     + '<span>' + (t.ganho ? 'Conquistado' : t.feitos + ' de ' + t.total) + '</span></div>';
 
@@ -29,22 +30,21 @@
     const atual = (s.niveis || []).find((n) => n.nivel === s.nivel);
     const anterior = atual ? atual.meta : 0;
     const fracao = s.proximo ? (s.pessoas - anterior) / (s.proximo.meta - anterior) : 1;
-    const pessoas = CC.plural(s.pessoas, 'pessoa trazida', 'pessoas trazidas');
+    const pessoas = CC.plural(s.pessoas, 'pessoa pelo seu convite', 'pessoas pelo seu convite');
     return '<button class="cartao-semeador' + (s.nivel ? ' ganho' : '') + '" data-abrir-semeador>'
       + CC.arte.semeador(atual ? atual.arte : 'broto', !!s.nivel)
       + '<span class="corpo-semeador"><small>Trilha do Semeador</small>'
       + '<b>' + CC.esc(atual ? atual.nome : 'Lance a primeira semente') + '</b>'
       + '<span class="barra-missao" style="--cor: var(--verde)"><i style="width:' + (Math.max(0, Math.min(1, fracao)) * 100).toFixed(1) + '%"></i></span>'
       + '<span class="descricao-conquista">' + pessoas
-      + (s.proximo ? ' · faltam ' + s.proximo.faltam + ' para ' + CC.esc(s.proximo.nome) : ' · último nível!') + '</span>'
+      + (s.proximo ? ' · ' + (s.proximo.faltam === 1 ? 'falta 1' : 'faltam ' + s.proximo.faltam) + ' para ' + CC.esc(s.proximo.nome) : ' · último nível!') + '</span>'
       + '</span>' + CC.ico('avancar') + '</button>';
   }
 
   function folhaSemeador(s) {
     if (!s) return;
     CC.folha('<h2>Trilha do Semeador</h2>'
-      + '<p class="passo-dica pequena">Conta quem criou a conta pelo seu convite e já fez a primeira lição. Até aqui, '
-      + CC.plural(s.pessoas, 'pessoa', 'pessoas') + '.</p>'
+      + '<p class="passo-dica pequena">Até aqui, ' + CC.plural(s.pessoas, 'pessoa chegou', 'pessoas chegaram') + ' pelo seu convite.</p>'
       + '<div class="niveis-semeador">' + (s.niveis || []).map((n) => {
         const ganho = s.nivel >= n.nivel;
         return '<details class="nivel-semeador' + (ganho ? ' ganho' : '') + '"' + (n.nivel === Math.max(1, s.nivel) ? ' open' : '') + '>'
@@ -116,7 +116,7 @@
     const ritmo = CC.ritmo();
     const conquistas = CC.conquistasComNivel();
     const trofeus = CC.trofeus();
-    const todos = [...trofeus.unidades, ...trofeus.colecoes];
+    const todos = [...trofeus.unidades, ...trofeus.colecoes, ...(trofeus.desafios || []), ...(trofeus.testamentos || [])];
     const ganhos = todos.filter((t) => t.ganho);
 
     // Visão geral: quatro números em grade simples, sem cartão colorido em volta de cada um
@@ -124,21 +124,8 @@
       : '<button class="visao-item"' + (dado ? ' ' + dado : '') + '>') + icone
       + '<span><b>' + valor + '</b><small>' + CC.esc(rotulo) + '</small></span>' + (href ? '</a>' : '</button>');
 
-    // Lendo junto: os dias da dupla, nunca o estágio da chama do outro. O "+" chama mais alguém.
-    const amigos = ((CC.amigosEmCache && CC.amigosEmCache()) || {}).amigos || [];
-    const lendoJunto = quem.comSenha
-      ? '<div class="titulo-secao"><h2>Lendo junto</h2><a href="#/novidades">Juntos</a></div>'
-        + '<div class="roda-junto">' + amigos.slice(0, 4).map((a) => '<a class="pessoa-junto' + (a.leuHoje ? ' leu' : '') + '" href="#/novidades">'
-          + CC.retratoAmigo(a, 'medio') + '<b>' + CC.esc(String(a.nome).split(' ')[0]) + '</b>'
-          + '<small>' + CC.plural(a.dias || 0, 'dia junto', 'dias juntos') + '</small></a>').join('')
-        + '<button class="pessoa-junto vaga" data-convidar-perfil aria-label="Convidar alguém para ler junto"><span class="mais">' + CC.ico('mais-sinal') + '</span><b>Convidar</b></button>'
-        + '</div>'
-      : '';
-
     // Primeiro as conquistas mais perto do próximo nível: é o que dá vontade de seguir.
     const vitrine = conquistas.slice().sort((a, b) => (a.maximo - b.maximo) || (b.fracao - a.fracao)).slice(0, 3);
-    // Troféus: os ganhos primeiro, depois os que estão mais perto.
-    const estante = todos.slice().sort((a, b) => (b.ganho - a.ganho) || ((b.feitos / b.total) - (a.feitos / a.total))).slice(0, 6);
 
     raiz.innerHTML = '<div class="cabeca-tela"><h1>Perfil</h1>'
       + '<a class="botao-icone" href="#/config" aria-label="Configurações">' + CC.ico('engrenagem') + '</a></div>'
@@ -154,7 +141,6 @@
       + '</div>'
       + '<input type="file" id="arquivo-foto" accept="image/*" hidden>'
       + '</div>'
-      + '<div data-semeador>' + cartaoSemeador((CC.quem || {}).semeador) + '</div>'
       + (semNada ? '<p class="passo-dica">Sua primeira lição acende tudo isso!</p>' : '')
       + '<h2 class="titulo-perfil">Visão geral</h2>'
       + '<div class="visao-geral">'
@@ -169,25 +155,41 @@
         ? '<div class="linha-ritmo">' + CC.ico('bussola') + '<span>No seu ritmo, você termina a Bíblia em <b>'
           + ritmo.termino.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) + '</b>.</span></div>'
         : '')
-      + lendoJunto
-      + '<div class="lista-atalhos">' + atalho('#/perfil/escritos', 'caneta', 'Minhas anotações') + '</div>'
-      // A coleção num lugar só: conquistas e troféus.
+      // A coleção num lugar só: as três conquistas mais perto do próximo nível e os atalhos.
       + '<div class="titulo-secao"><h2>Coleção</h2></div>'
       + '<div class="caixa-lista">' + vitrine.map(CC.linhaConquista).join('') + '</div>'
       + '<div class="colecao-atalhos">'
       + '<a href="#/perfil/conquistas">' + CC.ico('medalha') + '<b>Conquistas</b><small>' + conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length + '</small></a>'
       + '<a href="#/perfil/trofeus">' + CC.ico('trofeu') + '<b>Troféus</b><small>' + ganhos.length + ' de ' + todos.length + '</small></a>'
       + '</div>'
-      + '<div class="estante">' + estante.slice(0, 3).map(trofeuHtml).join('') + '</div>'
+      + '<div data-semeador>' + cartaoSemeador((CC.quem || {}).semeador) + '</div>'
+      // O que é da pessoa: o que escreveu, guardou e leu.
+      + '<div class="titulo-secao"><h2>Meus conteúdos</h2></div>'
       + '<div class="lista-atalhos">'
-      + atalho('#/perfil/versiculos', 'marcador', 'Versículos guardados')
+      + atalho('#/perfil/escritos', 'caneta', 'Minhas anotações')
+      + atalho('#/perfil/versiculos', 'marcador', 'Meus versículos')
       + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
-      + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
+      + atalho('#/perfil/discipulado', 'cruz', 'Discipulado')
+      + atalho('#/perfil/historia', 'aperto', 'Minha história com Deus')
+      // Só para quem ainda não está em nenhuma célula: quem já está numa (ou mais) usa a
+      // aba Célula da barra, que abre direto (ou lista, se for mais de uma).
+      + (CC.minhasCelulas && CC.minhasCelulas().length ? '' : '<button class="atalho" data-nova-celula>' + CC.ico('pessoas') + '<span>Criar uma célula</span>' + CC.ico('avancar') + '</button>')
       + '</div>'
+      // O app: instalar e as configurações com nome, não só o ícone do canto.
+      + '<div class="titulo-secao"><h2>O aplicativo</h2></div>'
+      + '<div class="lista-atalhos">'
+      + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
+      + atalho('#/config', 'engrenagem', 'Configurações e conta')
+      + '</div>'
+      // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.
+      + (CC.quem && CC.quem.admin ? '<div class="titulo-secao"><h2>Administração</h2></div><div class="lista-atalhos">'
+        + atalho('#/config/painel', 'grafico', 'Painel do administrador') + '</div>' : '')
       + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Precisa conversar com alguém? Fale com alguém de '
-      + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora.</p></div>';
+      + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora. Se for abuso ou violência, ligue <b>100</b>.</p></div>';
 
+    const novaCelula = raiz.querySelector('[data-nova-celula]');
+    if (novaCelula) novaCelula.onclick = () => CC.novaCelula();
     const arquivo = raiz.querySelector('#arquivo-foto');
     raiz.querySelector('[data-trocar-foto]').onclick = () => arquivo.click();
     arquivo.onchange = async () => {
@@ -198,7 +200,7 @@
         CC.avisar('Foto atualizada');
         CC.redesenhar();
       } catch (e) {
-        CC.avisar(e.message || 'não consegui usar essa imagem');
+        CC.avisar(e.message || 'Não consegui usar essa imagem.');
       }
       arquivo.value = '';
     };
@@ -207,8 +209,6 @@
     raiz.querySelector('[data-instalar]').onclick = () => CC.tutorialInstalar();
     const ofensiva = raiz.querySelector('[data-ofensiva-perfil]');
     if (ofensiva) ofensiva.onclick = CC.folhaOfensiva;
-    const convidar = raiz.querySelector('[data-convidar-perfil]');
-    if (convidar) convidar.onclick = () => CC.convidar();
     ligarSemeador(raiz);
   };
 
@@ -220,7 +220,6 @@
     const conquistas = CC.conquistasComNivel();
     const legado = CC.conquistasLegado();
     raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1>'
-      + '<p class="passo-dica">Cada conquista tem níveis. Elas contam leitura e constância, nunca o que você escreve ou ora.</p>'
       + '<div class="caixa-lista">' + conquistas.map(CC.linhaConquista).join('') + '</div>'
       + (legado.length
         ? CC.tituloSecao('Da primeira versão') + '<div class="caixa-lista">' + legado.map((c) => '<div class="linha-conquista ganha">'
@@ -233,40 +232,63 @@
   CC.vistaTrofeus = function (raiz) {
     const t = CC.trofeus();
     raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Troféus</h1>'
+      + CC.tituloSecao('A Bíblia toda', t.testamentos.filter((x) => x.ganho).length + ' de ' + t.testamentos.length)
+      + '<div class="estante">' + t.testamentos.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Unidades do plano', t.unidades.filter((x) => x.ganho).length + ' de ' + t.unidades.length)
       + '<div class="estante">' + t.unidades.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Partes da Bíblia', t.colecoes.filter((x) => x.ganho).length + ' de ' + t.colecoes.length)
-      + '<div class="estante">' + t.colecoes.map(trofeuHtml).join('') + '</div>';
+      + '<div class="estante">' + t.colecoes.map(trofeuHtml).join('') + '</div>'
+      + CC.tituloSecao('Desafios', t.desafios.filter((x) => x.ganho).length + ' de ' + t.desafios.length)
+      + '<div class="estante">' + t.desafios.map(trofeuHtml).join('') + '</div>';
   };
 
-  // ---------- versículos guardados ----------
-  // O que veio nos baús, do mais novo para o mais antigo. O texto de cada um chega depois,
-  // porque vem da tradução escolhida: a lista aparece inteira de cara, com a referência e o
-  // dia, e cada cartão se completa quando o texto carrega. Assim a tela não fica em branco
-  // esperando e continua servindo para quem está sem rede.
-  CC.vistaVersiculos = function (raiz) {
-    const guardados = CC.versiculosGuardados ? CC.versiculosGuardados() : [];
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Versículos guardados</h1>'
-      + (guardados.length
-        ? '<p class="passo-dica">' + CC.plural(guardados.length, 'versículo guardado', 'versículos guardados')
-          + ', um por baú da trilha.</p>'
-          + '<div class="lista-versiculos">' + guardados.map((v) => '<section class="item-versiculo" data-ref="'
-            + CC.esc(v.ref) + '"><span class="etiqueta">Dia ' + v.dia + '</span>'
-            + '<div class="cartao-do-versiculo"><p class="ref-carregando">' + CC.esc(v.ref) + '</p></div></section>').join('')
-          + '</div>'
-        : '<p class="passo-dica">Ainda não há nenhum. A cada sete dias de leitura, um baú aparece '
-          + 'na trilha com um versículo do trecho que você acabou de ler.</p>');
+  // ---------- meus versículos ----------
+  // Tudo o que a pessoa fez com versículos, num lugar só: os que marcou, os que têm nota e
+  // os que vieram nos baús, cada grupo do mais novo para o mais antigo. A lista aparece de
+  // cara só com a referência e cada cartão se completa quando o texto da tradução carrega,
+  // para a tela não ficar em branco e continuar servindo sem rede. Tocar num cartão abre o
+  // trecho na Bíblia já escolhido: as ações (marcar, nota, Juntos) moram lá, e não repetidas
+  // em cada cartão da lista.
+  const itemVersiculo = (ref, etiqueta, cor) => '<a class="item-versiculo' + (cor ? ' marca-' + cor : '') + '" href="'
+    + CC.hrefDoVerso(ref) + '" data-ref="' + CC.esc(ref) + '">'
+    + (etiqueta ? '<span class="etiqueta">' + CC.esc(etiqueta) + '</span>' : '')
+    + '<div class="cartao-do-versiculo"><p class="ref-carregando">' + CC.esc(ref) + '</p></div></a>';
 
-    if (!guardados.length || !CC.textoDoVersiculo) return;
+  CC.vistaVersiculos = function (raiz) {
+    const V = CC.versiculos;
+    const marcados = V.marcados();
+    const comNota = V.comNota();
+    const guardados = CC.versiculosGuardados ? CC.versiculosGuardados() : [];
+    const algum = marcados.length || comNota.length || guardados.length;
+
+    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Meus versículos</h1>'
+      + (algum ? '' : '<div class="vazio-amigos">' + CC.ico('marcador') + '<p>Enquanto lê, toque num versículo para marcar, escrever uma nota ou mostrar no Juntos. '
+        + 'Os baús da trilha também trazem versículos para cá.</p></div>')
+      + (marcados.length ? CC.tituloSecao('Marcados', String(marcados.length))
+        + '<div class="lista-versiculos">' + marcados.map((m) => itemVersiculo(m.ref, '', m.cor)).join('') + '</div>' : '')
+      + (comNota.length ? CC.tituloSecao('Com nota', String(comNota.length))
+        + '<div class="lista-notas-verso">' + comNota.map((n) => '<div class="nota-verso">'
+          + '<button class="abrir-nota-verso" data-nota="' + CC.esc(n.ref) + '"><b>' + CC.esc(n.ref) + '</b>'
+          + '<span class="resumo">' + CC.esc(n.texto.slice(0, 220)) + '</span></button>'
+          + '<button class="botao plano pequeno" data-abrir="' + CC.esc(n.ref) + '">' + CC.ico('livro') + 'Abrir na Bíblia</button></div>').join('')
+        + '</div>' : '')
+      + (guardados.length ? CC.tituloSecao('Dos baús', String(guardados.length))
+        + '<div class="lista-versiculos">' + guardados.map((v) => itemVersiculo(v.ref, 'Dia ' + v.dia)).join('') + '</div>' : '');
+
     raiz.querySelectorAll('.item-versiculo').forEach((item) => {
       const ref = item.dataset.ref;
+      item.onclick = (ev) => { ev.preventDefault(); V.irPara(ref); };
+      if (!CC.textoDoVersiculo) return;
       const alvo = item.querySelector('.cartao-do-versiculo');
       CC.textoDoVersiculo(ref).then((texto) => {
         if (!alvo.isConnected || !texto) return;
-        alvo.innerHTML = CC.cartaoVersiculo(ref, texto);
-        if (CC.ligarCartaoVersiculo) CC.ligarCartaoVersiculo(alvo, ref);
+        alvo.innerHTML = CC.cartaoVersiculo(ref, texto, { semAcoes: true });
       }).catch(() => { /* fica só a referência, que já diz qual é */ });
     });
+    raiz.querySelectorAll('[data-nota]').forEach((b) => {
+      b.onclick = () => V.abrirNota(b.dataset.nota, null, () => CC.vistaVersiculos(raiz));
+    });
+    raiz.querySelectorAll('[data-abrir]').forEach((b) => { b.onclick = () => V.irPara(b.dataset.abrir); });
   };
 
   // ---------- minhas anotações ----------
@@ -296,19 +318,26 @@
   }
 
   CC.vistaEscritos = function (raiz) {
-    const { porDia, porNota } = CC.minhasAnotacoes();
-    const total = porDia.reduce((s, d) => s + d.campos.length, 0) + porNota.length;
+    const { porDia, porNota, porVerso } = CC.minhasAnotacoes();
+    const total = porDia.reduce((s, d) => s + d.campos.length, 0) + porNota.length + porVerso.length;
     raiz.innerHTML = CC.botaoVoltar('Perfil')
       + '<h1>Minhas anotações</h1>'
       + (total
         ? '<p class="passo-dica">' + CC.plural(total, 'anotação', 'anotações')
           + (porDia.length ? ' em ' + CC.plural(porDia.length, 'dia de leitura', 'dias de leitura') : '') + '.</p>'
           + (porDia.length ? '<div class="cadernos-dias">' + porDia.map(cartaoDoDia).join('') + '</div>' : '')
+          + (porVerso.length ? '<h2 class="titulo-anotacoes-nota">Nos versículos</h2>'
+            + '<div class="grade">' + porVerso.map((n) => '<a class="item" href="' + n.href + '" data-ref-nota="' + CC.esc(n.ref) + '">'
+              + '<span class="sub">' + CC.esc(n.ref) + '</span><span class="resumo">' + CC.esc(n.texto.slice(0, 220)) + '</span></a>').join('')
+            + '</div>' : '')
           + (porNota.length ? '<h2 class="titulo-anotacoes-nota">No material do Explorar</h2>'
             + '<div class="grade">' + porNota.map(itemDaNota).join('') + '</div>' : '')
-        : '<div class="vazio">Quando você escrever sobre uma leitura ou anotar numa nota, aparece aqui.</div>')
+        : '<div class="vazio">Quando você escrever sobre uma leitura, um versículo ou uma nota, aparece aqui.</div>')
       + '<div class="acoes"><button class="botao contorno" data-exportar>' + CC.ico('baixar') + 'Baixar tudo o que escrevi</button></div>';
     if (porDia.length) raiz.querySelector('.cadernos-dias details').open = true;
+    raiz.querySelectorAll('[data-ref-nota]').forEach((a) => {
+      a.onclick = (ev) => { ev.preventDefault(); CC.versiculos.irPara(a.dataset.refNota); };
+    });
     raiz.querySelector('[data-exportar]').onclick = () => { CC.baixarExportacao(); CC.avisar('Arquivo gerado'); };
   };
 
@@ -332,5 +361,58 @@
       + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos. '
       + 'Cada livro se acende conforme você lê os dias que passam por ele.</p>'
       + '<div class="pilulas">' + vistos.map(pilula).join('') + '</div>';
+  };
+
+  // ---------- Minha história com Deus ----------
+  // Guia privado: nunca sai daqui, para amigo, célula, discipulado nem painel (só volta pela
+  // própria conta da pessoa, em api/estado). Três campos livres, com autosalvamento, como o
+  // "Escrever sobre hoje" da lição (04-licao.js).
+  const CAMPOS_HISTORIA = [
+    ['antes', 'Antes: como era a sua vida? O que você buscava?'],
+    ['encontro', 'O encontro: como você conheceu Jesus? Quem estava por perto?'],
+    ['hoje', 'Hoje: o que mudou? Conte uma coisa concreta.'],
+  ];
+  const MAX_HISTORIA = 600;
+
+  function campoHistoria(chave, pergunta, valor) {
+    return '<div class="campo"><label for="campo-historia-' + chave + '">' + CC.esc(pergunta) + '</label>'
+      + '<textarea id="campo-historia-' + chave + '" data-campo="' + chave + '" maxlength="' + MAX_HISTORIA
+      + '" rows="4" autocomplete="off" autocapitalize="sentences">' + CC.esc(valor || '') + '</textarea>'
+      + '<p class="passo-dica pequena" data-conta="' + chave + '"></p></div>';
+  }
+
+  CC.vistaHistoria = function (raiz) {
+    const h = CC.minhaHistoria() || {};
+    raiz.innerHTML = CC.botaoVoltar('Perfil')
+      + '<h1>Minha história com Deus</h1>'
+      + '<p class="passo-dica">Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus. Se você cresceu na igreja, conte quando a fé passou a ser sua. '
+      + 'Escreva só para você. Ninguém vê o que está aqui.</p>'
+      + '<span class="selo-status" id="salvo-historia" role="status"></span>'
+      + CAMPOS_HISTORIA.map(([chave, pergunta]) => campoHistoria(chave, pergunta, h[chave])).join('')
+      + '<p class="passo-dica pequena">Use palavras suas, sem termos de igreja. Três minutos de conversa bastam.</p>'
+      + '<div class="acoes"><button class="botao contorno pequeno" data-copiar>' + CC.ico('compartilhar') + 'Copiar minha história</button></div>';
+
+    const conta = (chave) => {
+      const campo = raiz.querySelector('[data-campo="' + chave + '"]');
+      const nota = raiz.querySelector('[data-conta="' + chave + '"]');
+      if (campo && nota) nota.textContent = campo.value.length + ' de ' + MAX_HISTORIA + ' caracteres';
+    };
+    const salvo = raiz.querySelector('#salvo-historia');
+    const salvar = () => {
+      const v = (chave) => (raiz.querySelector('[data-campo="' + chave + '"]') || {}).value || '';
+      CC.gravarHistoria(v('antes'), v('encontro'), v('hoje'));
+      if (salvo) { salvo.classList.add('leu'); salvo.innerHTML = CC.ico('certo') + 'Salvo'; }
+    };
+    CAMPOS_HISTORIA.forEach(([chave]) => {
+      conta(chave);
+      const campo = raiz.querySelector('[data-campo="' + chave + '"]');
+      campo.addEventListener('input', () => { conta(chave); salvar(); });
+    });
+    raiz.querySelector('[data-copiar]').onclick = async () => {
+      const atual = CC.minhaHistoria() || {};
+      const texto = ['antes', 'encontro', 'hoje'].map((c) => atual[c] || '').filter(Boolean).join('\n\n');
+      if (!texto) { CC.avisar('Escreva sua história antes de copiar.'); return; }
+      CC.avisar((await CC.copiar(texto)) ? 'História copiada' : 'Não consegui copiar');
+    };
   };
 })(window.CC);

@@ -13,6 +13,7 @@
     '2 Coríntios', 'Gálatas', 'Efésios', 'Filipenses', 'Colossenses', '1 Tessalonicenses',
     '2 Tessalonicenses', '1 Timóteo', '2 Timóteo', 'Tito', 'Filemom', 'Hebreus', 'Tiago',
     '1 Pedro', '2 Pedro', '1 João', '2 João', '3 João', 'Judas', 'Apocalipse']);
+  CC.ehNovoTestamento = (livro) => NOVO.has(livro);
 
   // Um dia do plano pode juntar dois livros na mesma trilha ("Rute 3-4; 1 Samuel 1"),
   // então a trilha é recortada pelos trechos, e não pela referência escrita.
@@ -32,6 +33,8 @@
   const letra = () => (LETRAS.includes(lerLocal(CHAVE_LETRA)) ? lerLocal(CHAVE_LETRA) : 'normal');
   // Um versículo por bloco é o padrão: texto corrido numa tela de celular vira um paredão.
   const corrido = () => lerLocal(CHAVE_MODO) === 'corrido';
+  CC.tamanhoDaLetra = letra;
+  CC.leituraCorrida = corrido;
 
   const posicoes = () => { try { return JSON.parse(lerLocal(CHAVE_POSICAO) || '{}'); } catch (e) { return {}; } };
   const guardarPosicao = (chave, valor) => {
@@ -45,6 +48,7 @@
 
   // ---------- carregar o texto ----------
   const servido = () => location.protocol.startsWith('http');
+  CC.appServido = servido;
   const carregadas = new Map();
 
   function carregar(b) {
@@ -58,20 +62,36 @@
     }
     return carregadas.get(b.sigla);
   }
+  CC.carregarBiblia = carregar;
 
   // "Marcos 1.35" ou "João 3.16-17": devolve o texto na tradução escolhida.
   CC.textoDoVersiculo = function (ref) {
     const b = CC.traducao();
+    // Aceita trecho longo (o estudo da célula pode pedir "Romanos 8.1-39"), mas a citação
+    // mostra no máximo MAX_TRECHO versículos: é um cartão, não o capítulo.
     const m = /^(.+?) (\d+)\.(\d+)(?:-(\d+))?/.exec(String(ref || ''));
     if (!b || !m || !servido()) return Promise.resolve(null);
     return carregar(b).then((biblia) => {
       const cap = ((biblia.livros[m[1]] || [])[Number(m[2]) - 1]) || [];
       const de = Number(m[3]);
-      const ate = Math.min(Number(m[4] || m[3]), de + 2);
+      const ate = Math.min(Number(m[4] || m[3]), de + CC.MAX_TRECHO - 1);
       // o cabeçalho acróstico da Bíblia Livre ("[Nun] :") não entra na citação
       const texto = cap.slice(de - 1, ate).filter(Boolean).join(' ').replace(/^\[[^\]]*\]\s*:?\s*/, '');
       return texto || null;
     }).catch(() => null);
+  };
+
+  // Notas de versículo do Explorar trazem o texto de cada tradução do app ("versos"):
+  // mostra a escolhida, sem esperar o arquivo da Bíblia carregar.
+  CC.textoDaNota = function (n) {
+    const b = CC.traducao();
+    return (n && n.versos && b && n.versos[b.sigla]) || (n && n.texto) || '';
+  };
+  CC.htmlDaNota = function (n) {
+    if (!n || !n.versos) return n ? n.html : '';
+    // a referência em <cite>, no versículo-chave das notas de livro, fica
+    return n.html.replace(/(<blockquote data-verso="[^"]*">)[\s\S]*?(<cite>[\s\S]*?<\/cite><\/blockquote>|<\/blockquote>)/,
+      (_, abre, fecha) => abre + CC.esc(CC.textoDaNota(n)) + fecha);
   };
 
   // Pede a tradução escolhida sem abri-la, só para o service worker guardá-la.
@@ -80,7 +100,7 @@
     if (!b || !servido() || !navigator.serviceWorker || !navigator.serviceWorker.controller) return;
     fetch(b.arquivo).then((r) => r.blob()).catch(() => { /* fica para a próxima abertura */ });
   }
-  addEventListener('load', () => setTimeout(guardarNoAparelho, 5000));
+  CC.quandoCarregar(() => setTimeout(guardarNoAparelho, 5000));
 
   // ---------- a tela ----------
   let aberto = null;
@@ -89,8 +109,7 @@
   CC.leitorAberto = () => !!aberto;
 
   CC.fecharLeitor = function () {
-    const el = document.querySelector('.leitor');
-    if (el) el.remove();
+    CC.sair(document.querySelector('.leitor:not(.saindo)'));
     aberto = null;
   };
 
@@ -103,13 +122,15 @@
 
   function desenhar() {
     const minha = ++geracao;
-    const { dia, chave, trilhas, cor } = aberto;
+    const { dia, chave, trilhas, cor, conhecer } = aberto;
     const [, rotulo, ref] = trilhas.find(([k]) => k === chave);
     const atual = CC.traducao();
     const lida = aberto.lida(chave);
+    // O Conhecer Jesus tem uma trilha só (o dia inteiro), sem Antigo/Novo Testamento para
+    // encadear: "seguinte" nunca existe ali.
     const seguinte = trilhas.find(([k]) => k !== chave && !aberto.lida(k));
 
-    let el = document.querySelector('.leitor');
+    let el = document.querySelector('.leitor:not(.saindo)');
     if (!el) {
       el = document.createElement('div');
       el.setAttribute('role', 'dialog');
@@ -121,6 +142,9 @@
 
     let principal = lida ? 'Voltar à lição' : 'Terminei a leitura';
     if (seguinte) principal = (lida ? 'Ler ' : 'Terminei! Ler ') + seguinte[2];
+    // No Conhecer Jesus o botão só fecha o leitor e volta ao dia: quem marca o dia como
+    // feito é o botão "Terminei o dia" na própria tela do dia, não o leitor.
+    if (conhecer) principal = 'Terminei a leitura';
 
     el.innerHTML = '<div class="leitor-cabeca">'
       + '<div class="licao-topo">'
@@ -137,10 +161,7 @@
       + '<span class="so-leitor" role="status"></span>'
       + '</div></div>'
       + '<div class="licao-pe"><div class="interno">'
-      + '<div class="acoes-verso" hidden><b></b>'
-      + '<button class="botao pequeno contorno" data-copiar-verso>' + CC.ico('folha') + 'Copiar</button>'
-      + (CC.podeCompartilharComAmigos && CC.podeCompartilharComAmigos() ? '<button class="botao pequeno contorno" data-verso-amigos>' + CC.ico('pessoas') + 'Amigos</button>' : '')
-      + '<button class="botao-icone" data-fechar-verso aria-label="Tirar a marca do versículo">' + CC.ico('fechar') + '</button></div>'
+      + '<div class="acoes-verso" hidden></div>'
       + '<button class="botao cor" data-terminei>' + CC.esc(principal) + '</button>'
       + '</div></div>';
 
@@ -148,6 +169,7 @@
     el.querySelector('[data-aa]').onclick = () => folhaAa(el);
     el.querySelector('[data-terminei]').onclick = () => {
       guardarPosicao(chavePosicao(), null);
+      if (conhecer) { CC.fecharLeitor(); return; }
       if (!lida) { CC.anotarDiario('leitor', 1); aberto.marcar(chave); }
       if (seguinte) {
         aberto.chave = seguinte[0];
@@ -204,12 +226,15 @@
       alvo.innerHTML = aviso('Aberto como arquivo solto, o aplicativo não tem de onde trazer o texto. Leia na sua Bíblia e marque a passagem na lição.');
       return;
     }
-    alvo.innerHTML = '<div class="leitor-esqueleto"><i></i><i></i><i></i><i></i></div>';
+    alvo.innerHTML = CC.esqueleto('texto');
     carregar(b).then((biblia) => {
       if (minha !== geracao) return;
-      alvo.innerHTML = textoDe(biblia, CC.trechosDaTrilha(dia, chave)) + credito(b);
+      // O Conhecer Jesus não separa Antigo e Novo Testamento como o plano: os trechos do
+      // dia entram todos juntos, na ordem em que o JSON os lista.
+      const trechos = aberto.conhecer ? (dia.trechos || []) : CC.trechosDaTrilha(dia, chave);
+      alvo.innerHTML = textoDe(biblia, trechos) + credito(b);
       status.textContent = 'Texto carregado';
-      ligarVersos(el);
+      CC.versiculos.ligar(el);
       retomar(el);
     }).catch(() => {
       if (minha !== geracao) return;
@@ -240,17 +265,23 @@
 
   // Cada versículo num bloco, com o número em destaque discreto e o capítulo como título.
   // A separação é só visual: o arquivo não tem parágrafos, e nenhuma palavra é mudada.
+  // Com "cap", o trecho não é um intervalo de capítulos (o plano da Bíblia), e sim
+  // de..ate dentro daquele único capítulo: é como o Conhecer Jesus cita passagens curtas.
   function textoDe(biblia, trechos) {
     let html = '';
     for (const t of trechos) {
       const capitulos = biblia.livros[t.livro] || [];
       const nome = t.livro === 'Salmos' ? 'Salmo' : t.livro;
-      for (let c = t.de; c <= t.ate; c++) {
+      const capDe = t.cap || t.de;
+      const capAte = t.cap || t.ate;
+      for (let c = capDe; c <= capAte; c++) {
         const versos = capitulos[c - 1] || [];
+        const vDe = t.cap ? t.de : 1;
+        const vAte = t.cap ? t.ate : versos.length;
         html += '<section class="leitor-capitulo" data-livro="' + CC.esc(t.livro) + '">'
           + '<h2><small>' + CC.esc(nome) + '</small> ' + c + '</h2>'
-          + (versos.some(Boolean)
-            ? '<div class="versos">' + versos.map((v, i) => (v
+          + (versos.slice(vDe - 1, vAte).some(Boolean)
+            ? '<div class="versos">' + versos.map((v, i) => (v && i + 1 >= vDe && i + 1 <= vAte
               ? '<p class="leitor-verso" data-v="' + c + ':' + (i + 1) + '"><sup>' + (i + 1) + '</sup>' + CC.esc(v) + ' </p>'
               : '')).join('') + '</div>'
             : '<p class="passo-dica">Este capítulo não veio nesta tradução.</p>')
@@ -259,48 +290,13 @@
     }
     return html;
   }
-
-  // Tocar num versículo marca e abre o que fazer com ele: copiar ou mostrar aos amigos.
-  function ligarVersos(el) {
-    const barra = el.querySelector('.acoes-verso');
-    const limpar = () => {
-      el.querySelectorAll('.leitor-verso.escolhido').forEach((v) => v.classList.remove('escolhido'));
-      barra.hidden = true;
-    };
-    el.querySelector('.leitor-texto').onclick = (ev) => {
-      const verso = ev.target.closest && ev.target.closest('.leitor-verso');
-      if (!verso) return;
-      const ja = verso.classList.contains('escolhido');
-      limpar();
-      if (ja) return;
-      verso.classList.add('escolhido');
-      const [c, v] = verso.dataset.v.split(':');
-      barra.dataset.ref = verso.closest('.leitor-capitulo').dataset.livro + ' ' + c + '.' + v;
-      barra.dataset.texto = verso.textContent.replace(/^\d+/, '').trim();
-      barra.querySelector('b').textContent = barra.dataset.ref;
-      barra.hidden = false;
-    };
-    barra.querySelector('[data-fechar-verso]').onclick = limpar;
-    barra.querySelector('[data-copiar-verso]').onclick = async () => {
-      const t = CC.traducao();
-      const certo = await CC.copiar('“' + barra.dataset.texto + '” ' + barra.dataset.ref + (t ? ' (' + t.abreviatura + ')' : ''));
-      CC.avisar(certo ? 'Versículo copiado' : 'Não consegui copiar');
-      limpar();
-    };
-    const amigos = barra.querySelector('[data-verso-amigos]');
-    if (amigos) {
-      amigos.onclick = async () => {
-        const certo = await CC.compartilharVersiculo(barra.dataset.ref);
-        CC.avisar(certo ? 'Seus amigos vão ver no Feed' : 'Não deu para mostrar agora');
-        limpar();
-      };
-    }
-  }
+  CC.htmlDoTrecho = textoDe;
 
   const credito = (b) => '<footer class="leitor-credito">'
     + b.credito.map((linha) => '<p>' + CC.esc(linha) + '</p>').join('')
     + '<p><a href="' + CC.esc(b.licencaUrl) + '" target="_blank" rel="noopener">Licença '
     + CC.esc(b.licenca) + '</a></p></footer>';
+  CC.creditoBiblia = credito;
 
   // ---------- folha Aa ----------
   function folhaAa(el) {
@@ -321,7 +317,6 @@
       + [['Sistema', null], ['Claro', false], ['Escuro', true]].map(([rot, v]) =>
         '<button data-tema="' + JSON.stringify(v) + '" aria-pressed="' + (tema === v) + '">' + rot + '</button>').join('')
       + '</div>'
-      + '<p class="passo-dica pequena">A Nova Bíblia Viva ajuda a ler bastante. Para estudar um trecho, compare com a Bíblia da sua igreja.</p>'
       + '<div class="acoes"><button class="botao contorno" data-fechar>Pronto</button></div>',
     {
       rotulo: 'Opções de leitura',

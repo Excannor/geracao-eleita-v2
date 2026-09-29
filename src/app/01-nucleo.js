@@ -14,8 +14,51 @@ window.CC = window.CC || {};
 
   // ---------- datas ----------
   const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  CC.iso = iso;
   CC.hojeIso = () => iso(new Date());
+
+  // O app começa depois que o conteúdo chega, e a página pode já ter terminado de carregar:
+  // aí o "load" não vem mais, e quem esperava por ele roda na hora.
+  // Quem rola: no iPhone com o app instalado é a .aplicativo (ver html.app-ios no estilo.css),
+  // em todo o resto é a página. Voltar ao topo e guardar a posição passam por aqui.
+  const areaRolavel = () => {
+    const el = document.documentElement.classList.contains('app-ios') && document.querySelector('.aplicativo');
+    return el && getComputedStyle(el).overflowY === 'auto' ? el : null;
+  };
+  CC.rolagemY = () => { const el = areaRolavel(); return el ? el.scrollTop : scrollY; };
+  CC.rolarPara = (y) => { const el = areaRolavel(); if (el) el.scrollTop = y; else scrollTo(0, y); };
+
+  // Referência de versículo, num lugar só: "João 3.16" ou "1 João 4.7-8". O trecho vai até
+  // MAX_TRECHO versículos seguidos do mesmo capítulo. Roda também no servidor.
+  CC.MAX_TRECHO = 10;
+  CC.lerRef = (ref) => {
+    const m = /^(.+?) (\d{1,3})\.(\d{1,3})(?:-(\d{1,3}))?$/.exec(String(ref || '').trim());
+    if (!m) return null;
+    const de = Number(m[3]);
+    const ate = Number(m[4] || m[3]);
+    if (!(de >= 1) || ate < de || ate - de + 1 > CC.MAX_TRECHO) return null;
+    return { livro: m[1], cap: Number(m[2]), de, ate };
+  };
+  CC.escreverRef = (livro, cap, de, ate) => livro + ' ' + cap + '.' + de + (ate && ate !== de ? '-' + ate : '');
+  CC.hrefDoVerso = (ref) => {
+    const r = CC.lerRef(ref);
+    return r ? '#/biblia/' + encodeURIComponent(r.livro) + '/' + r.cap : '#/biblia';
+  };
+
+  // No app instalado no iPhone a raiz nunca rola, mas o iOS rola a raiz sozinho para mostrar um
+  // campo acima do teclado (e o scrollIntoView da folha ajuda). Com overflow:hidden ninguém
+  // desfaz isso com o dedo: fechado o teclado, a tela inteira ficava deslocada para cima, com a
+  // barra de abas no meio e fundo vazio embaixo. Sem campo em foco, a raiz volta para o zero.
+  CC.endireitarRaiz = () => {
+    if (!areaRolavel()) return;
+    const foco = document.activeElement;
+    if (foco && /^(INPUT|TEXTAREA|SELECT)$/.test(foco.tagName)) return;
+    const raiz = document.scrollingElement || document.documentElement;
+    if (raiz.scrollTop || scrollY) { raiz.scrollTop = 0; scrollTo(0, 0); }
+  };
+  addEventListener('focusout', () => setTimeout(CC.endireitarRaiz, 120));
+  if (window.visualViewport) visualViewport.addEventListener('resize', () => setTimeout(CC.endireitarRaiz, 120));
+
+  CC.quandoCarregar = (fn) => (document.readyState === 'complete' ? setTimeout(fn, 0) : addEventListener('load', fn));
   CC.somaDias = (texto, n) => {
     const d = new Date(texto + 'T12:00:00');
     d.setDate(d.getDate() + n);
@@ -26,8 +69,19 @@ window.CC = window.CC || {};
 
   // ---------- ícones ----------
   // Traçado aberto, 2.2 de espessura: é o que dá o ar de aplicativo e não de documento.
-  const PREENCHIDOS = { chama: 1, coroa: 1, estrela: 1, raio: 1 };
+  const PREENCHIDOS = { chama: 1, coroa: 1, estrela: 1, raio: 1, pegadas: 1 };
   const P = {
+    // conquistas: um desenho por conceito, no mesmo traço (28/09/2026)
+    'dia-visto': '<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="m8.5 15 2.5 2.5 4.5-4.5"/>',
+    'estante': '<path d="M2.5 21h19"/><rect x="4.5" y="6" width="3.5" height="15" rx=".8"/><rect x="9.5" y="3.5" width="3.5" height="17.5" rx=".8"/><path d="m15 8.2 3.2-1 3.6 13.1-3.2 1z"/>',
+    'pegadas': '<path d="M6.6 23C4.2 23 3 20.4 3 17.2S4.5 10.8 6.9 10.8 10.4 13.6 10.4 17 9 23 6.6 23z"/><circle cx="3.9" cy="7.9" r="1.25"/><circle cx="6.5" cy="6.8" r="1.25"/><circle cx="9.1" cy="7.5" r="1.25"/><path d="M17.4 16.4c-2.4 0-3.6-2.6-3.6-5.8s1.5-6.4 3.9-6.4S21.2 7 21.2 10.4s-1.4 6-3.8 6z"/><circle cx="14.7" cy="1.3" r="1.25"/><circle cx="17.3" cy="1.2" r="1.25"/><circle cx="19.9" cy="1.5" r="1.25"/>',
+    'cartoes': '<rect x="7" y="3" width="14" height="13" rx="2"/><path d="M3.5 7.5V19a2 2 0 0 0 2 2H17"/><path d="M11 8h6M11 11.5h4"/>',
+    'lista-visto': '<path d="M10 6h11M10 12h11M10 18h11"/><path d="m3 6 1.6 1.6L7.5 4.7M3 12l1.6 1.6 2.9-2.9M3 18l1.6 1.6 2.9-2.9"/>',
+    'bau': '<path d="M3.5 11V8.5a4.5 4.5 0 0 1 4.5-4.5h8a4.5 4.5 0 0 1 4.5 4.5V11"/><rect x="3" y="11" width="18" height="9.5" rx="1.5"/><path d="M10.5 11v3.5h3V11"/>',
+    'semana': '<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><rect x="7" y="12" width="3.6" height="3" rx=".6" fill="currentColor"/><rect x="13.4" y="12" width="3.6" height="3" rx=".6" fill="currentColor"/><rect x="7" y="16.3" width="3.6" height="3" rx=".6" fill="currentColor"/><rect x="13.4" y="16.3" width="3.6" height="3" rx=".6" fill="currentColor"/>',
+    'broto': '<path d="M4 21h16"/><path d="M7.5 21v-4.5h9V21"/><path d="M12 16.5V9.5"/><path d="M12 11c0-3.3 2.2-5.5 5.5-5.5 0 3.3-2.2 5.5-5.5 5.5z"/><path d="M12 13c0-2.6-1.8-4.3-4.3-4.3 0 2.6 1.8 4.3 4.3 4.3z"/>',
+    'marca-texto': '<path d="m14.5 3.5 6 6-8.5 8.5h-4v-4z"/><path d="m12 6 6 6"/><path d="M3 21h9" stroke-width="3.2"/>',
+    'caderno': '<rect x="5.5" y="2.5" width="14" height="19" rx="2"/><path d="M3 7h4.5M3 12h4.5M3 17h4.5"/><path d="M10.5 8h5.5M10.5 12h5.5M10.5 16h3"/>',
     trilha: '<path d="M1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6z"/><path d="M8 2v16"/><path d="M16 6v16"/>',
     bandeira: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>',
     bussola: '<circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/>',
@@ -59,14 +113,17 @@ window.CC = window.CC || {};
     trofeu: '<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5H4v1a4 4 0 0 0 4 4"/><path d="M17 5h3v1a4 4 0 0 1-4 4"/><path d="M12 14v4"/><path d="M9 21h6"/><path d="M10 18h4v3h-4z"/>',
     baixar: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
     lixeira: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+    grafico: '<path d="M3 21h18M6 17v-6M11 17V5M16 17v-9M21 17v-3"/>',
     escudo: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
     cruz: '<path d="M10 2h4v6h6v4h-6v10h-4V12H4V8h6z"/>',
     compartilhar: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/>',
+    imagem: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>',
     bloquear: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
     'mais-sinal': '<path d="M12 5v14"/><path d="M5 12h14"/>',
     mais: '<circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/>',
     sino: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
-    engrenagem: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H1a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 2.6 7a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 7 2.6h.1A1.7 1.7 0 0 0 9 1V1a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 15 2.6a1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V7a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    // engrenagem do Feather Icons (MIT): a versão anterior tinha os dentes tortos e saía do quadro
+    engrenagem: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
     // preenchidos
     // chama e raio vêm do Bootstrap Icons (MIT), que desenha o fogo com o miolo vazado
     chama: '<path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15z"/>',
@@ -75,7 +132,7 @@ window.CC = window.CC || {};
     estrela: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8 5.8 21l1.2-6.9-5-4.9 6.9-1z"/>',
   };
 
-  const CAIXAS = { chama: '0 0 16 16' };
+  const CAIXAS = { chama: '0 0 16 16', pegadas: '0 -1 24 25' };
 
   CC.ico = (nome, extra) => {
     const d = P[nome];
@@ -94,11 +151,13 @@ window.CC = window.CC || {};
   // Os dois precisam ser diferentes — várias destas formas são chapas sobrepostas, e com
   // um tom só viram uma mancha sólida (foi o que aconteceu com a bússola e o alvo).
   const ICONES_ABA = {
-    // mapa dobrado em três painéis
-    trilha: (a, b) => '<path d="M5 13l13-6v30l-13 6z" fill="' + b + '"/>'
-      + '<path d="M18 7l12 6v30l-12-6z" fill="' + a + '"/>'
-      + '<path d="M30 13l13-6v30l-13 6z" fill="' + b + '"/>'
-      + '<path d="M18 7l12 6v30l-12-6z" fill="' + a + '"/>',
+    // três paradas ligadas por um caminho, com o alfinete na primeira (escolha do dono, 29/09)
+    trilha: (a, b) => '<ellipse cx="19" cy="40" rx="15" ry="6" fill="' + b + '"/>'
+    + '<ellipse cx="35" cy="27.5" rx="10.5" ry="4.8" fill="' + b + '"/>'
+    + '<ellipse cx="13" cy="19.5" rx="9" ry="4" fill="' + b + '"/>'
+    + '<path d="M13 19.5l22 8L19 40" fill="none" stroke="' + a + '" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<rect x="10.4" y="9.5" width="5.2" height="10" rx="2.6" fill="' + a + '"/>'
+    + '<path fill-rule="evenodd" d="M13 1.6a7.2 7.2 0 1 1 0 14.4A7.2 7.2 0 0 1 13 1.6zm0 4.6a2.6 2.6 0 1 0 0 5.2a2.6 2.6 0 1 0 0-5.2z" fill="' + a + '"/>',
     // bandeira fincada
     bandeira: (a, b) => '<rect x="9" y="6" width="6" height="37" rx="3" fill="' + b + '"/>'
       + '<path d="M15 9c7-4 15 4 23 0v17c-8 4-16-4-23 0z" fill="' + a + '"/>',
@@ -113,37 +172,53 @@ window.CC = window.CC || {};
     // pessoa de frente
     pessoa: (a, b) => '<circle cx="24" cy="16" r="8" fill="' + a + '"/>'
       + '<path d="M24 27c-8 0-14 5-14 12 0 2 1 3 3 3h22c2 0 3-1 3-3 0-7-6-12-14-12z" fill="' + b + '"/>',
-    // baú fechado, das missões
-    bau: (a, b) => '<rect x="6" y="20" width="36" height="22" rx="5" fill="' + b + '"/>'
-      + '<path d="M6 20c0-7 5-12 12-12h12c7 0 12 5 12 12v4H6z" fill="' + a + '"/>'
-      + '<rect x="6" y="22" width="36" height="5" fill="' + b + '" opacity=".55"/>'
-      + '<rect x="19" y="18" width="10" height="13" rx="3" fill="' + b + '"/><circle cx="24" cy="24" r="2" fill="' + a + '"/>',
-    // balão de conversa com um coração, das novidades
+    // baú dos desafios: tampa e fecho em cor cheia
+    bau: (a, b) => '<rect x="6" y="21" width="36" height="21" rx="4.5" fill="' + b + '"/>'
+    + '<path d="M6 21c0-7.2 5.8-13 13-13h10c7.2 0 13 5.8 13 13v2.5H6z" fill="' + a + '"/>'
+    + '<rect x="19.5" y="18" width="9" height="12" rx="3" fill="' + a + '"/>'
+    + '<circle cx="24" cy="24" r="1.8" fill="' + b + '"/>',
+    // balão de conversa com um coração, das novidades (o dono preferiu o desenho original)
     novidades: (a, b) => '<path d="M8 8h32a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H22l-9 7v-7H8a4 4 0 0 1-4-4V12a4 4 0 0 1 4-4z" fill="' + a + '"/>'
       + '<path d="M24 30s-9-5-9-11a4.6 4.6 0 0 1 9-1.6A4.6 4.6 0 0 1 33 19c0 6-9 11-9 11z" fill="' + b + '"/>'
       + '<path d="M40 8a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4h-6c5-8 5-20 0-28z" fill="' + b + '" opacity=".35"/>',
-    // livro aberto, dos dias lidos
-    livro: (a, b) => '<path d="M4 10c7-3 14-3 20 1v30c-6-4-13-4-20-1z" fill="' + a + '"/>'
-      + '<path d="M44 10c-7-3-14-3-20 1v30c6-4 13-4 20-1z" fill="' + b + '"/>',
-    // a lamparina de barro com a chama no bico
-    chama: (a, b) => '<path d="M13 2c2 5 9 9 10 15 1 6-3 10-8 10s-9-4-8-9c1 3 3 4 5 4-1-7 0-14 1-20z" fill="' + a + '"/>'
-      + '<path d="M15 15c1 3 4 5 4 8 0 3-2 4-4 4s-4-1-4-4c0-3 3-5 4-8z" fill="' + b + '"/>'
-      + '<path d="M7 31c6-5 24-7 34-4 6 2 6 7 3 11-6 6-22 8-31 4-5-2-8-6-6-11z" fill="#d4843f"/>'
-      + '<path d="M12 31c8-4 22-5 30-2 1 1 1 2 0 3-9-3-21-2-30 1z" fill="#eeae6b"/>'
-      + '<path d="M44 28c5 0 5 8 0 8" fill="none" stroke="#d4843f" stroke-width="3" stroke-linecap="round"/>',
-    'chama-apagada': () => '<path d="M15 26c-4-4 3-7-1-11-3-3 2-6 0-10" fill="none" stroke="#9aa7b0" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>'
-      + '<path d="M7 31c6-5 24-7 34-4 6 2 6 7 3 11-6 6-22 8-31 4-5-2-8-6-6-11z" fill="#9aa7b0"/>'
-      + '<path d="M12 31c8-4 22-5 30-2 1 1 1 2 0 3-9-3-21-2-30 1z" fill="#c9d0d5"/>'
-      + '<path d="M44 28c5 0 5 8 0 8" fill="none" stroke="#9aa7b0" stroke-width="3" stroke-linecap="round"/>',
+    // Bíblia aberta: a folha da esquerda cheia, a da direita suave e a fita
+    livro: (a, b) => '<path d="M4 10.5c7.2-3.2 14-3 19.2 1v30c-5.4-3.8-12.2-4-19.2-.9z" fill="' + a + '"/>'
+    + '<path d="M44 10.5c-7.2-3.2-14-3-19.2 1v30c5.4-3.8 12.2-4 19.2-.9z" fill="' + b + '"/>'
+    + '<path d="M29 12.5h4v12l-2-1.8-2 1.8z" fill="' + a + '"/>',
+    // fogo, o mesmo da ofensiva (a lamparina de barro saiu do app)
+    chama: (a, b) => '<path d="M24 4c3 7 12 12 12 22 0 9-6 16-12 16s-12-7-12-16c0-6 3-10 6-13 0 5 2 8 5 9-2-7-1-13 1-18z" fill="' + a + '"/>'
+      + '<path d="M24 24c2 4 6 7 6 11 0 4-3 7-6 7s-6-3-6-7c0-4 4-7 6-11z" fill="' + b + '"/>',
+    // brasa apagada: só a fumaça subindo
+    'chama-apagada': () => '<path d="M24 42c-6-5 4-9-1-15-4-5 3-9 0-15" fill="none" stroke="#9aa7b0" stroke-width="3" stroke-linecap="round" opacity=".7"/>'
+      + '<path d="M16 44h16" stroke="#9aa7b0" stroke-width="3" stroke-linecap="round"/>',
     escudo: (a, b) => '<path d="M24 4 40 10v12c0 11-7 19-16 22C15 41 8 33 8 22V10z" fill="' + a + '"/>'
       + '<path d="M24 4v40C15 41 8 33 8 22V10z" fill="' + b + '" opacity=".5"/>',
     sino: (a, b) => '<path d="M24 5c-8 0-13 6-13 14v8l-4 7h34l-4-7v-8c0-8-5-14-13-14z" fill="' + a + '"/>'
       + '<path d="M19 38a5 5 0 0 0 10 0z" fill="' + b + '"/>',
+    // marcador de página, dos versículos guardados
+    marcador: (a, b) => '<path d="M11 4h26c1.7 0 3 1.3 3 3v37l-16-10-16 10V7c0-1.7 1.3-3 3-3z" fill="' + a + '"/>'
+      + '<path d="M11 4h13v30L8 44V7c0-1.7 1.3-3 3-3z" fill="' + b + '"/>',
+    // lápis, da história escrita pela pessoa
+    caneta: (a, b) => '<path d="M33 5l10 10-24 24-10 1 1-10z" fill="' + a + '"/>'
+      + '<path d="M29 9l10 10-4 4-10-10z" fill="' + b + '"/>'
+      + '<rect x="6" y="42" width="36" height="3" rx="1.5" fill="' + b + '"/>',
     // duas pessoas lado a lado
     amigos: (a, b) => '<circle cx="17" cy="17" r="7" fill="' + a + '"/>'
       + '<path d="M17 27c-7 0-12 4-12 10 0 2 1 3 3 3h18c2 0 3-1 3-3 0-6-5-10-12-10z" fill="' + b + '"/>'
       + '<circle cx="33" cy="15" r="6" fill="' + b + '"/>'
       + '<path d="M33 24c-2 0-4 .4-5.5 1.2 3 2.4 4.5 6 4.5 10.3 0 1.3-.2 2.4-.6 3.5H41c2 0 3-1 3-3 0-7-5-12-11-12z" fill="' + a + '"/>',
+    // casa da célula (o dono preferiu o desenho original)
+    casa: (a, b) => '<path d="M24 5 3 23h6v19c0 1.7 1.3 3 3 3h24c1.7 0 3-1.3 3-3V23h6z" fill="' + b + '"/>'
+      + '<path d="M24 5 3 23h6l15-12.5L39 23h6z" fill="' + a + '"/>'
+      + '<path d="M19 45V32c0-1.7 1.3-3 3-3h4c1.7 0 3 1.3 3 3v13z" fill="' + a + '"/>',
+    // dupla do discipulado: quem conduz à frente, em cor cheia; quem caminha junto, atrás
+    dupla: (a, b) => '<circle cx="33" cy="12.5" r="5.8" fill="' + b + '"/>'
+    + '<path d="M24 44V31.5c0-5.2 4-9.5 9-9.5s9 4.3 9 9.5V44z" fill="' + b + '"/>'
+    + '<circle cx="17" cy="11" r="6.8" fill="' + a + '"/>'
+    + '<path d="M6 44V31c0-6.1 4.9-11 11-11s11 4.9 11 11v13z" fill="' + a + '"/>',
+    // Mais: o disco suave com os três pontos cheios (antes era um disco feito no CSS)
+    mais: (a, b) => '<circle cx="24" cy="24" r="19.5" fill="' + b + '"/>'
+    + '<circle cx="14.5" cy="24" r="3.4" fill="' + a + '"/><circle cx="24" cy="24" r="3.4" fill="' + a + '"/><circle cx="33.5" cy="24" r="3.4" fill="' + a + '"/>',
   };
 
   // Os ícones herdam a cor de quem os contém (currentColor) em vez de trazerem a sua: é o
@@ -159,6 +234,8 @@ window.CC = window.CC || {};
     bussola: HERDA,
     pessoa: HERDA,
     amigos: HERDA,
+    marcador: HERDA,
+    caneta: HERDA,
     bau: HERDA,
     novidades: HERDA,
     livro: HERDA,
@@ -166,6 +243,9 @@ window.CC = window.CC || {};
     'chama-apagada': HERDA,
     escudo: HERDA,
     sino: HERDA,
+    casa: HERDA,
+    dupla: HERDA,
+    mais: HERDA,
   };
 
   CC.icoAba = (nome) => {
@@ -208,20 +288,78 @@ window.CC = window.CC || {};
   };
 
   // ---------- avisos e folhas ----------
+  // Tira uma peça da tela com a animação de saída dela (classe "saindo", no estilo.css).
+  // Chamar duas vezes não faz nada a mais; com "menos movimento" sai no ato.
+  CC.sair = (el, ms = 180) => new Promise((fim) => {
+    if (!el || !el.isConnected || el.classList.contains('saindo')) { fim(); return; }
+    if (CC.semMovimento && CC.semMovimento()) { el.remove(); fim(); return; }
+    el.classList.add('saindo');
+    setTimeout(() => { el.remove(); fim(); }, ms);
+  });
+
+  // O aviso diz se deu certo ou não pelo ícone, e fica na tela o tempo de ler o texto.
+  const TIPO_DO_AVISO = [
+    [/^(não|nao) (consegui|deu|foi|dá)|^sem (internet|rede|conexão)|falhou/i, 'erro'],
+    [/^(copiad|guardad|salv|notificad|enviad|pronto|feito|marcad|anotad|que bom|obrigad|lembrete ligad)/i, 'certo'],
+  ];
   let avisoAtual;
-  CC.avisar = (texto) => {
+  CC.avisar = (texto, opcoes = {}) => {
     clearTimeout(avisoAtual);
+    texto = String(texto || '');
+    const tipo = opcoes.tipo || (TIPO_DO_AVISO.find(([re]) => re.test(texto)) || [])[1];
     let el = document.getElementById('aviso-flutuante');
-    if (!el) {
+    if (el && el.classList.contains('saindo')) { el.remove(); el = null; }
+    const novo = !el;
+    if (novo) {
       el = document.createElement('div');
       el.id = 'aviso-flutuante';
       el.className = 'aviso-flutuante';
       el.setAttribute('role', 'status');
       document.body.appendChild(el);
     }
-    el.textContent = texto;
-    avisoAtual = setTimeout(() => el.remove(), 2600);
+    el.innerHTML = (tipo ? '<i class="aviso-ico aviso-' + tipo + '">' + CC.ico(tipo === 'erro' ? 'info' : 'certo') + '</i>' : '') + '<span>' + CC.esc(texto) + '</span>';
+    // um aviso trocou o outro: bate de leve, para a troca não passar despercebida
+    if (!novo) { el.classList.remove('bate'); void el.offsetWidth; el.classList.add('bate'); }
+    avisoAtual = setTimeout(() => CC.sair(el, 200), Math.min(4200, 1800 + texto.length * 45));
   };
+
+  // Estado de tela (vazio ou erro): azulejo com ícone, título curto, linha de apoio e ação opcional.
+  CC.estado = ({ icone = 'info', titulo = '', texto = '', acao = '', erro = false } = {}) => '<div class="estado' + (erro ? ' erro' : '') + '">'
+    + '<span class="estado-ico" aria-hidden="true">' + CC.ico(icone) + '</span>'
+    + (titulo ? '<b>' + CC.esc(titulo) + '</b>' : '')
+    + (texto ? '<p>' + CC.esc(texto) + '</p>' : '')
+    + (acao ? '<button class="botao contorno pequeno" data-acao-estado>' + CC.esc(acao) + '</button>' : '')
+    + '</div>';
+
+  // Carregando com a forma do que vai chegar (o pulso de opacidade já existe: "esqueleto").
+  const FORMAS_ESQUELETO = {
+    texto: '<i class="texto"></i><i class="texto"></i><i class="texto"></i><i class="texto"></i>',
+    lista: '<i class="cartao"></i><span class="linha"><i class="texto"></i></span><span class="linha"><i class="texto"></i></span><span class="linha"><i class="texto"></i></span>',
+    cartoes: '<i class="cartao"></i><i class="cartao"></i><i class="cartao"></i>',
+    juntos: '<span class="roda"><i></i><i></i><i></i></span><i class="cartao"></i><span class="linha"><i class="texto"></i></span><span class="linha"><i class="texto"></i></span>',
+    biblia: '<i class="cartao"></i><span class="pilulas"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>',
+  };
+  CC.esqueleto = (forma = 'texto') => '<div class="esqueleto' + (forma === 'texto' ? ' leitor-esqueleto' : '') + '" role="status" aria-busy="true" aria-label="Carregando">'
+    + '<div class="esqueleto-corpo" aria-hidden="true">' + (FORMAS_ESQUELETO[forma] || FORMAS_ESQUELETO.texto) + '</div></div>';
+
+  // Botão ocupado: enquanto a tarefa roda, ele mantém a cor e mostra um anel girando
+  // (esperar a rede não é o mesmo que estar desligado).
+  CC.ocupado = async (botao, tarefa) => {
+    if (botao) { botao.classList.add('ocupado'); botao.setAttribute('aria-busy', 'true'); }
+    try { return await tarefa(); } finally {
+      if (botao && botao.isConnected) { botao.classList.remove('ocupado'); botao.removeAttribute('aria-busy'); }
+    }
+  };
+  // O último botão tocado: se o toque disparar uma chamada ao servidor logo em seguida, é ele
+  // que fica ocupado até a resposta, sem cada tela precisar lembrar disso.
+  let ultimoBotao = null;
+  let ultimoToque = 0;
+  if (typeof document.addEventListener === 'function') {
+    document.addEventListener('click', (ev) => {
+      const b = ev.target && ev.target.closest ? ev.target.closest('.botao') : null;
+      if (b) { ultimoBotao = b; ultimoToque = Date.now(); }
+    }, true);
+  }
 
   // Substitui o confirm() do navegador, que num aplicativo instalado parece um erro.
   CC.confirmar = ({ titulo, texto, acao, perigo }) => new Promise((resolver) => {
@@ -234,7 +372,7 @@ window.CC = window.CC || {};
       + '<button class="botao' + (perigo ? ' vermelho' : '') + '" data-sim>' + CC.esc(acao || 'Confirmar') + '</button>'
       + '<button class="botao plano" data-nao>Cancelar</button>'
       + '</div></div>';
-    const fechar = (v) => { cortina.remove(); resolver(v); };
+    const fechar = (v) => { CC.sair(cortina); resolver(v); };
     cortina.querySelector('[data-sim]').onclick = () => fechar(true);
     cortina.querySelector('[data-nao]').onclick = () => fechar(false);
     cortina.onclick = (ev) => { if (ev.target === cortina) fechar(false); };
@@ -291,9 +429,10 @@ window.CC = window.CC || {};
       avaliando = false;
       if (!ativo) return;
       ativo = false;
+      // passou do ponto: a saída começa de onde o dedo largou, sem voltar para cima antes
+      if (dy > LIMITE_FECHAR) { folha.style.setProperty('--dy', dy + 'px'); fechar(); return; }
       folha.style.transition = 'transform .22s var(--suave)';
       folha.style.transform = '';
-      if (dy > LIMITE_FECHAR) fechar();
     };
     folha.addEventListener('touchend', soltar);
     folha.addEventListener('touchcancel', soltar);
@@ -308,35 +447,58 @@ window.CC = window.CC || {};
       + (opcoes.rolavel ? ' style="max-height:86vh;overflow-y:auto"' : '')
       + '>' + interno + '</div>';
     const folha = cortina.firstChild;
+    // No iPhone o teclado cobre a tela sem mexer no que é "fixed": a cortina acompanha a área
+    // que sobra visível (visualViewport), e a folha, presa no fim dela, sobe junto com o teclado.
+    const vv = window.visualViewport;
+    const acompanharTeclado = () => {
+      cortina.style.top = vv.offsetTop + 'px';
+      cortina.style.height = vv.height + 'px';
+      cortina.style.bottom = 'auto';
+    };
+    if (vv) { vv.addEventListener('resize', acompanharTeclado); vv.addEventListener('scroll', acompanharTeclado); }
     const fechar = () => {
-      cortina.remove();
+      if (vv) { vv.removeEventListener('resize', acompanharTeclado); vv.removeEventListener('scroll', acompanharTeclado); }
+      CC.sair(cortina);
       if (origem && origem.focus && document.body.contains(origem)) origem.focus();
+      setTimeout(CC.endireitarRaiz, 120);
     };
     if (!opcoes.presa) cortina.onclick = (ev) => { if (ev.target === cortina) fechar(); };
     if (opcoes.presa) cortina.dataset.presa = '1';
     if (!opcoes.presa) arrastarParaFechar(folha, fechar);
     document.body.appendChild(cortina);
     if (opcoes.ligar) opcoes.ligar(folha, fechar);
-    const primeiro = folha.querySelector('input, textarea, button, a[href]');
-    (primeiro || folha).focus();
+    // No celular, abrir a folha não abre o teclado: ele cobria o texto antes de a pessoa ler.
+    // O teclado aparece quando ela toca no campo, e o campo rola para o meio da folha.
+    const toque = matchMedia('(pointer: coarse)').matches;
+    const primeiro = folha.querySelector(toque ? 'button, a[href]' : 'input, textarea, button, a[href]');
+    (toque ? folha : (primeiro || folha)).focus({ preventScroll: true });
+    folha.addEventListener('focusin', (ev) => {
+      if (!/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) return;
+      setTimeout(() => ev.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+    });
     return { folha, fechar };
   };
 
   // Pedido ao servidor com a mensagem de erro dele, pronta para a tela.
-  CC.api = (rota, corpo, metodo) => fetch(rota, {
-    method: metodo || (corpo ? 'POST' : 'GET'),
-    cache: 'no-store',
-    headers: corpo ? { 'content-type': 'application/json' } : undefined,
-    body: corpo ? JSON.stringify(corpo) : undefined,
-  }).then(async (r) => {
-    const dado = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      const e = new Error(dado.erro || (r.status === 401 ? 'entre de novo' : 'não deu certo agora'));
-      e.status = r.status;
-      throw e;
-    }
-    return dado;
-  });
+  CC.api = (rota, corpo, metodo) => {
+    const botao = ultimoBotao && ultimoBotao.isConnected && Date.now() - ultimoToque < 800 ? ultimoBotao : null;
+    if (botao) { botao.classList.add('ocupado'); botao.setAttribute('aria-busy', 'true'); }
+    const soltar = () => { if (botao) { botao.classList.remove('ocupado'); botao.removeAttribute('aria-busy'); } };
+    return fetch(rota, {
+      method: metodo || (corpo ? 'POST' : 'GET'),
+      cache: 'no-store',
+      headers: corpo ? { 'content-type': 'application/json' } : undefined,
+      body: corpo ? JSON.stringify(corpo) : undefined,
+    }).then(async (r) => {
+      const dado = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const e = new Error(dado.erro || (r.status === 401 ? 'Entre de novo.' : 'Não deu certo agora.'));
+        e.status = r.status;
+        throw e;
+      }
+      return dado;
+    }).finally(soltar);
+  };
 
   // Compartilhar pelo menu do celular; sem ele, copia o texto com o link.
   CC.compartilhar = async (texto, url) => {
@@ -372,17 +534,6 @@ window.CC = window.CC || {};
   CC.barra = (fracao, classe) =>
     '<div class="barra' + (classe ? ' ' + classe : '') + '"><i style="width:'
     + Math.max(0, Math.min(100, fracao * 100)).toFixed(2) + '%"></i></div>';
-
-  CC.anelMeta = (fracao, dentro) => {
-    const r = 22;
-    const volta = 2 * Math.PI * r;
-    const feito = Math.max(0, Math.min(1, fracao)) * volta;
-    return '<div class="anel-meta"><svg viewBox="0 0 52 52">'
-      + '<circle class="fundo" cx="26" cy="26" r="' + r + '"/>'
-      + '<circle class="frente" cx="26" cy="26" r="' + r + '" stroke-dasharray="'
-      + feito.toFixed(1) + ' ' + volta.toFixed(1) + '"/>'
-      + '</svg><b>' + dentro + '</b></div>';
-  };
 
   CC.tituloSecao = (texto, nota) =>
     '<div class="titulo-secao"><h2>' + CC.esc(texto) + '</h2>'

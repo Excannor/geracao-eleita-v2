@@ -18,22 +18,36 @@
 
   CC.carregarNovidades = function () {
     if (!comConta()) return Promise.resolve(null);
-    return CC.api('api/novidades').then((d) => { mural = d; return d; }).catch(() => null);
+    // O quadro do mês saiu da tela junto com os personagens (redesenho futuro): os já
+    // publicados ficam no servidor, mas não aparecem nem contam como novidade.
+    // As células vêm junto: o recado do líder também entra no feed.
+    const celulas = CC.carregarPropositos ? CC.carregarPropositos() : null;
+    return Promise.all([CC.api('api/novidades'), celulas]).then(([d]) => {
+      if (d && d.eventos) d.eventos = d.eventos.filter((e) => e.tipo !== 'quadro');
+      mural = d;
+      return d;
+    }).catch(() => null);
   };
+
   CC.novidadesEmCache = () => mural;
 
   const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const gravarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* segue */ } };
 
-  // O ponto no sino: pedido, toque ou novidade de amigo desde a última visita ao mural.
+  // O ponto no sino: pedido, toque ou novidade de amigo desde a última visita ao mural. O
+  // recado e o estudo da célula não entram mais aqui: a célula tem aba própria, e o Juntos
+  // não mostra nada dela.
   CC.pendenciasDeAmigos = () => {
     const visto = Number(lerLocal('cc.novidades.visto') || 0);
     const eu = (CC.quem || {}).usuario;
     const novas = ((mural && mural.eventos) || []).filter((e) => e.em > visto && e.autor.usuario !== eu).length;
-    return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) : 0) + novas;
+    return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) + (cache.pedidosConversa || []).length : 0) + novas;
   };
 
-  const TEXTO_CONVITE = 'Quer ler a Bíblia comigo? No Caminho com Cristo é uma lição por dia, e a gente mantém um propósito juntos. Aceita meu convite:';
+  const TEXTO_CONVITE = 'Bora ler a Bíblia inteira em um ano, junto? No Geração Eleita é uma leitura por dia, e dá pra gente ler junto. Aceita meu convite:';
+  // O convite do Conhecer Jesus não fala em "propósito" nem "ano": é para quem talvez nunca
+  // tenha lido a Bíblia, então o convite abre pelo caminho de 14 dias, sem pressa.
+  const TEXTO_CONVITE_CONHECER = 'Tô lendo a Bíblia num app e tem um caminho de 14 dias pra quem quer conhecer Jesus, sem pressão. Quer ver?';
   const FALA_TOQUE = 'Bora ler hoje?';
 
   // ---------- peças ----------
@@ -52,6 +66,38 @@
   const eu = () => ({ usuario: (CC.quem || {}).usuario || 'eu', nome: String(CC.apelido() || (CC.quem || {}).nome || 'Você').trim(), foto: CC.foto() });
   const acaoAmizade = (acao, usuario) => CC.api('api/amizade', { acao, usuario });
 
+  // ---------- pedidos de conversa ----------
+  // "Fulano quer conversar sobre Jesus / sobre o batismo": aparece para quem foi avisado (no
+  // Juntos e, para quem conduz, também na aba Célula) até tocar em "Já conversamos".
+  const ASSUNTO_CONVERSA = { conhecer: 'quer conversar sobre Jesus', batismo: 'quer conversar sobre o batismo' };
+  const quandoFoi = (iso) => (iso === CC.hojeIso() ? 'hoje' : iso === CC.somaDias(CC.hojeIso(), -1) ? 'ontem' : 'em ' + iso.slice(8, 10) + '/' + iso.slice(5, 7));
+  CC.linhaPedidoConversa = (x) => '<div class="linha-amigo pedido">'
+    + '<div class="quem-amigo"><b>' + CC.esc(x.nome) + '</b><span class="arroba">' + CC.esc((ASSUNTO_CONVERSA[x.tipo] || 'quer conversar') + ', ' + quandoFoi(x.em)) + '</span></div>'
+    + '<button class="botao plano pequeno" data-conversa-feita="' + CC.esc(x.usuario) + '" data-tipo="' + CC.esc(x.tipo) + '">Já conversamos</button></div>';
+  CC.blocoPedidosConversa = (lista) => (lista.length
+    ? CC.tituloSecao('Pedidos de conversa', String(lista.length))
+      + '<p class="passo-dica pequena">Procure a pessoa do jeito que vocês costumam falar. Só chega o pedido, nunca o que ela escreveu no app.</p>'
+      + '<div class="lista-pedidos">' + lista.map(CC.linhaPedidoConversa).join('') + '</div>'
+    : '');
+  CC.pedidosDeConversa = () => (cache && cache.pedidosConversa) || [];
+
+  // (o teste roda este arquivo sem DOM de verdade: só liga o clique quando existe)
+  if (typeof document.addEventListener === 'function') document.addEventListener('click', async (ev) => {
+    const bt = ev.target.closest && ev.target.closest('[data-conversa-feita]');
+    if (!bt) return;
+    ev.preventDefault();
+    bt.disabled = true;
+    try {
+      await CC.api('api/conversa/feita', { usuario: bt.dataset.conversaFeita, tipo: bt.dataset.tipo });
+    } catch (e) {
+      bt.disabled = false;
+      CC.avisar(e.message || 'Não consegui marcar agora');
+      return;
+    }
+    CC.avisar('Que bom que vocês conversaram');
+    recarregar();
+  });
+
   async function recarregar() {
     await Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]);
     CC.redesenhar();
@@ -62,21 +108,6 @@
     await CC.api('api/toques', { para: usuario });
   };
 
-  CC.ligarToques = function (raiz, depois) {
-    raiz.querySelectorAll('[data-tocar]').forEach((b) => {
-      b.onclick = async () => {
-        b.disabled = true;
-        try {
-          await enviarToque(b.dataset.tocar);
-          CC.avisar('Notificado!');
-        } catch (e) {
-          b.disabled = false;
-          CC.avisar(e.message);
-        }
-        if (depois) depois();
-      };
-    });
-  };
 
   // ---------- publicar no mural ----------
   CC.podeCompartilharComAmigos = () => comConta() && !!(cache && (cache.amigos || []).length);
@@ -96,7 +127,7 @@
   }
 
   // Os marcos saem daqui depois que o progresso já foi para o servidor, que confere tudo.
-  CC.publicarNovidades = async function ({ ofensiva, niveis, livros, unidade, quadro } = {}) {
+  CC.publicarNovidades = async function ({ ofensiva, niveis, livros, unidade } = {}) {
     if (!comConta()) return;
     if (!mural) await CC.carregarNovidades();
     if (!mural || !mural.ligado) return;
@@ -105,7 +136,6 @@
     for (const c of niveis || []) await publicar('conquista', { id: c.id, nivel: c.nivel });
     for (const l of livros || []) await publicar('livro', { livro: l });
     if (unidade) await publicar('unidade', { numero: unidade });
-    if (quadro) await publicar('quadro', { mes: quadro });
   };
 
   CC.compartilharVersiculo = async function (ref) {
@@ -113,7 +143,7 @@
     if (mural && !mural.ligado) {
       const ligar = await CC.confirmar({
         titulo: 'Mostrar aos amigos?',
-        texto: 'Seus amigos passam a ver no Feed os versículos que você guarda e seus marcos: ofensiva, livros e conquistas.',
+        texto: 'Seus amigos passam a ver no Feed os versículos que você compartilha e seus marcos: ofensiva, livros e conquistas.',
         acao: 'Mostrar',
       });
       if (!ligar) return false;
@@ -127,15 +157,52 @@
     if (mural) { mural.ligado = ligado; mural.perguntado = true; }
   }
 
+  // QR Code do convite, para o amigo que está do lado apontar a câmera em vez de receber
+  // mensagem. Gerado aqui mesmo (00-qrcode.js): o link não passa por nenhum serviço de fora.
+  // Fundo sempre branco, também no tema escuro: leitor de QR precisa de contraste claro.
+  CC.qrDoLink = function (link) {
+    try {
+      const q = qrcode(0, 'M');
+      q.addData(link);
+      q.make();
+      return '<div class="qr-convite" role="img" aria-label="QR Code do convite">' + q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }) + '</div>'
+        + '<p class="passo-dica pequena qr-legenda">Quem está do seu lado pode apontar a câmera do celular para o código.</p>';
+    } catch (e) {
+      return '';
+    }
+  };
+
   // ---------- convidar ----------
+  // Primeiro pergunta para quem é o convite: o link e o texto mudam, porque um vai para
+  // quem já lê a Bíblia com a pessoa e o outro para quem talvez nunca tenha lido nada.
   CC.convidar = async function () {
     if (cache && !cache.perfilCompleto) {
       const completou = await CC.completarCadastro(CC.quem || {});
       if (!completou) return;
     }
+    CC.folha('<h2>Para quem é o convite?</h2>'
+      + '<div class="acoes">'
+      + '<button class="botao azul" data-modo="plano">Alguém que já segue Jesus</button>'
+      + '<button class="botao contorno" data-modo="conhecer">Alguém que está conhecendo Jesus</button>'
+      + '<button class="botao plano" data-fechar>Cancelar</button>'
+      + '</div>',
+    {
+      rotulo: 'Para quem é o convite?',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelectorAll('[data-modo]').forEach((b) => {
+          b.onclick = () => { fechar(); gerarConvite(b.dataset.modo); };
+        });
+      },
+    });
+  };
+
+  async function gerarConvite(modo) {
+    const conhecer = modo === 'conhecer';
+    const corpo = conhecer ? { modo: 'conhecer' } : {};
     let link = '';
     try {
-      link = (await CC.api('api/convites', {})).link;
+      link = (await CC.api('api/convites', corpo)).link;
     } catch (e) {
       // O cache do perfil pode estar desatualizado: se o servidor recusou por cadastro
       // incompleto, oferece completar na hora em vez de só mostrar o erro sem saída.
@@ -143,7 +210,7 @@
         const completou = await CC.completarCadastro(CC.quem || {});
         if (!completou) return;
         try {
-          link = (await CC.api('api/convites', {})).link;
+          link = (await CC.api('api/convites', corpo)).link;
         } catch (e2) {
           CC.avisar(e2.message || 'Não consegui gerar o convite. Tente de novo em instantes.');
           return;
@@ -153,14 +220,18 @@
         return;
       }
     }
+    const texto = conhecer ? TEXTO_CONVITE_CONHECER : TEXTO_CONVITE;
+    // A busca por @ exato é para quem já tem conta no app: não faz sentido no convite de
+    // quem ainda está conhecendo Jesus, que chega pelo link, sem conta nenhuma ainda.
     CC.folha('<h2>Convide alguém para ler junto!</h2>'
-      + '<p class="mensagem-convite">' + CC.esc(TEXTO_CONVITE) + ' <span>' + CC.esc(link) + '</span></p>'
+      + '<p class="mensagem-convite">' + CC.esc(texto) + ' <span>' + CC.esc(link) + '</span></p>'
+      + CC.qrDoLink(link)
       + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Compartilhar convite</button>'
       + '<button class="botao contorno" data-copiar>Copiar link</button></div>'
-      + '<p class="separador"><span>ou pelo @ exato</span></p>'
-      + '<form class="busca-exata" data-pedido><label class="so-leitor" for="arroba">@usuário</label>'
-      + '<input id="arroba" placeholder="@usuario" autocomplete="off" autocapitalize="none" spellcheck="false">'
-      + '<button class="botao pequeno" type="submit">Enviar</button></form>'
+      + (conhecer ? '' : '<p class="separador"><span>ou pelo @ exato</span></p>'
+        + '<form class="busca-exata" data-pedido><label class="so-leitor" for="arroba">@usuário</label>'
+        + '<input id="arroba" placeholder="@usuario" autocomplete="off" autocapitalize="none" spellcheck="false">'
+        + '<button class="botao pequeno" type="submit">Enviar</button></form>')
       + '<p class="recado-senha" id="recado" role="status"></p>'
       + '<p class="passo-dica pequena">O link vale por 30 dias e serve para quantas pessoas você quiser chamar.</p>'
       + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>',
@@ -170,33 +241,36 @@
         const recado = folha.querySelector('#recado');
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelector('[data-compartilhar]').onclick = async () => {
-          const r = await CC.compartilhar(TEXTO_CONVITE, link);
+          const r = await CC.compartilhar(texto, link);
           if (r === 'copiado') CC.avisar('Convite copiado. É só colar na conversa.');
           else if (r === 'falhou') CC.avisar('Não consegui compartilhar. Toque em "Copiar link" e cole na conversa.');
         };
         folha.querySelector('[data-copiar]').onclick = async () => {
           CC.avisar((await CC.copiar(link)) ? 'Link copiado' : 'Não consegui copiar');
         };
-        folha.querySelector('[data-pedido]').onsubmit = async (ev) => {
-          ev.preventDefault();
-          const arroba = folha.querySelector('#arroba').value.trim().replace(/^@/, '');
-          if (!arroba) return;
-          recado.textContent = '';
-          try {
-            const { achado } = await CC.api('api/procurar?q=' + encodeURIComponent(arroba));
-            if (!achado) { recado.textContent = 'Não achei ninguém com esse @.'; return; }
-            if (achado.relacao === 'amigos') { recado.textContent = 'Vocês já leem juntos!'; return; }
-            await acaoAmizade('pedir', achado.usuario);
-            recado.textContent = 'Pedido enviado para @' + achado.usuario + '.';
-            folha.querySelector('#arroba').value = '';
-            CC.carregarAmigos().then(() => CC.redesenhar());
-          } catch (e) {
-            recado.textContent = e.message;
-          }
-        };
+        const pedido = folha.querySelector('[data-pedido]');
+        if (pedido) {
+          pedido.onsubmit = async (ev) => {
+            ev.preventDefault();
+            const arroba = folha.querySelector('#arroba').value.trim().replace(/^@/, '');
+            if (!arroba) return;
+            recado.textContent = '';
+            try {
+              const { achado } = await CC.api('api/procurar?q=' + encodeURIComponent(arroba));
+              if (!achado) { recado.textContent = 'Não achei ninguém com esse @.'; return; }
+              if (achado.relacao === 'amigos') { recado.textContent = 'Vocês já leem juntos!'; return; }
+              await acaoAmizade('pedir', achado.usuario);
+              recado.textContent = 'Pedido enviado para @' + achado.usuario + '.';
+              folha.querySelector('#arroba').value = '';
+              CC.carregarAmigos().then(() => CC.redesenhar());
+            } catch (e) {
+              recado.textContent = e.message;
+            }
+          };
+        }
       },
     });
-  };
+  }
 
   // ---------- telas cheias: novo propósito e toques ----------
   const duplaGrande = (a, b) => '<div class="dupla-grande">' + retrato(a, 'enorme') + retrato(b, 'enorme') + '</div>';
@@ -402,7 +476,7 @@
 
   function itemDoMural(ev) {
     const meu = ev.autor.usuario === (CC.quem || {}).usuario;
-    const quem = meu ? 'Você' : ev.autor.nome;
+    const quem = meu ? 'Você' : CC.esc(ev.autor.nome);
     const d = ev.dados || {};
     let frase = '';
     let arte = '';
@@ -422,18 +496,19 @@
       const u = CC.D.unidades.find((x) => x.numero === Number(d.numero));
       frase = quem + ' concluiu a <b>unidade ' + CC.esc(d.numero) + '</b> do plano!';
       arte = CC.arte.trofeu(u ? u.cor : 'amarelo', true);
-    } else if (ev.tipo === 'quadro') {
-      const q = CC.quadroDoMes(d.mes, { quadros: {} });
-      frase = quem + ' completou o <b>quadro de ' + CC.esc(q.nome) + '</b>!';
-      arte = '<span class="arte-retrato">' + CC.ico('camadas') + '</span>';
     } else if (ev.tipo === 'versiculo') {
-      frase = quem + ' guardou um versículo:';
+      frase = quem + ' compartilhou um versículo:';
       extra = '<div class="versiculo-mural" data-ref="' + CC.esc(d.ref) + '"><p class="texto-versiculo">…</p><b>' + CC.esc(d.ref) + '</b></div>';
-    } else if (ev.tipo === 'novoProposito' || ev.tipo === 'proposito') {
+    } else if (ev.tipo === 'novoProposito') {
+      // O nome ficou do tempo em que amizade e propósito eram a mesma coisa: hoje o evento
+      // marca um convite aceito (link, pedido de amizade ou entrada na célula), não um
+      // propósito. Quem aceitou é o autor; quem convidou vem em ev.com.
+      if (meu) frase = ev.com ? 'Você aceitou o <b>convite</b> de ' + CC.esc(ev.com.nome) + '!' : 'Você aceitou um <b>convite</b>!';
+      else frase = quem + ' aceitou o seu <b>convite</b>!';
+      arte = CC.icoChama();
+    } else if (ev.tipo === 'proposito') {
       const outro = meu ? ev.com : ev.autor;
-      frase = ev.tipo === 'novoProposito'
-        ? 'Você e ' + CC.esc(outro ? outro.nome : 'um amigo') + ' começaram um <b>propósito</b>!'
-        : 'Você e ' + CC.esc(outro ? outro.nome : 'um amigo') + ' chegaram a <b>' + d.dias + ' dias de propósito</b>!';
+      frase = 'Você e ' + CC.esc(outro ? outro.nome : 'um amigo') + ' chegaram a <b>' + d.dias + ' dias de propósito</b>!';
       arte = CC.icoChama();
     } else if (ev.tipo === 'semeador') {
       const artes = ['broto', 'bronze', 'prata', 'ouro', 'igreja'];
@@ -453,10 +528,45 @@
       : '';
     return '<article class="item-mural">'
       + '<div class="cabeca-mural">' + retrato(ev.autor, 'medio') + '<div><b>' + CC.esc(meu ? 'Você' : ev.autor.nome) + '</b><span>' + quando(ev.em) + '</span></div></div>'
-      + '<div class="corpo-mural"><p>' + frase.replace(/^(Você|[^<]+?)(?= )/, (m) => CC.esc(m)) + '</p>' + (arte ? '<span class="arte-mural">' + arte + '</span>' : '') + '</div>'
+      + '<div class="corpo-mural"><p>' + frase + '</p>' + (arte ? '<span class="arte-mural">' + arte + '</span>' : '') + '</div>'
       + extra
       + '<div class="pe-mural">' + reacao + celebrado + '</div>'
       + '</article>';
+  }
+
+  // O recado e o estudo da célula saíram do feed do Juntos: agora moram só na aba Célula
+  // (Hoje/Estudo). itemRecado/itemEstudo saíram junto, sem mais chamador.
+
+  // Quem a pessoa está acompanhando no Conhecer Jesus: só o número do dia, nunca o que foi
+  // escrito. O toque é o mesmo dos amigos de sempre; "Como acompanhar" abre as dicas do JSON.
+  function blocoAcompanhando(lista) {
+    if (!lista.length) return '';
+    return CC.tituloSecao('Conhecendo Jesus')
+      + '<div class="lista-pedidos">' + lista.map((p) => '<div class="linha-amigo">' + retrato(p)
+        + '<div class="quem-amigo"><b>' + CC.esc(p.nome) + '</b><span class="arroba">'
+        + (p.terminou ? 'terminou os 14 dias' : 'dia ' + p.dia + ' de 14') + '</span></div>'
+        + '<button class="botao-icone" data-toque-conhecer="' + CC.esc(p.usuario) + '" aria-label="Notificar '
+        + CC.esc(p.nome) + '">' + CC.ico('sino') + '</button>'
+        + '</div>'
+        + '<button class="link-nota" data-como-acompanhar="' + CC.esc(p.usuario) + '">Como acompanhar '
+        + CC.esc(String(p.nome).split(' ')[0]) + '</button>'
+        // Depois dos 14 dias, ou assim que a pessoa pede para conversar, o caminho natural é
+        // seguir acompanhando na fé (Discipulado, Fase 3), com o convite já como discipulador.
+        + (p.terminou || p.pediuConversa
+          ? '<button class="link-nota" data-acompanhar-fe="' + CC.esc(p.usuario) + '">Acompanhar '
+            + CC.esc(String(p.nome).split(' ')[0]) + ' na fé</button>' : '')).join('') + '</div>';
+  }
+
+  function folhaComoAcompanhar(pessoa) {
+    const A = CC.D.conhecer.acompanhar;
+    CC.folha('<h2>' + CC.esc(A.titulo) + ' ' + CC.esc(String(pessoa.nome).split(' ')[0]) + '</h2>'
+      + '<ul style="margin:0;padding-left:20px;display:grid;gap:10px">'
+      + A.itens.map((t) => '<li>' + CC.esc(t) + '</li>').join('') + '</ul>'
+      + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>',
+    {
+      rotulo: A.titulo,
+      ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; },
+    });
   }
 
   CC.vistaAmigos = function (raiz) {
@@ -485,18 +595,23 @@
         corpo = '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Complete seu cadastro para ler com amigos.</p>'
           + '<button class="botao" data-completar>Completar cadastro</button></div>';
       } else if (!dados) {
-        corpo = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>';
+        corpo = CC.esqueleto('juntos');
       } else {
+        // O recado e o estudo da célula saíram do Feed: a célula tem aba própria agora, e
+        // é lá (Hoje/Estudo) que eles aparecem.
         const eventos = m.eventos || [];
+        const linhaDoTempo = eventos.map((e) => ({ em: e.em, html: itemDoMural(e) })).sort((a, b) => b.em - a.em);
         const pedidoLigar = !m.ligado && !m.perguntado && amigos.length
           ? '<div class="pedido-mural">' + CC.ico('pessoas') + '<div><b>Mostrar seus marcos aos amigos?</b>'
-            + '<p>Ofensiva, livros terminados, conquistas e versículos que você guardar.</p>'
+            + '<p>Ofensiva, livros terminados, conquistas e os versículos que você compartilhar.</p>'
             + '<div class="pe-duplo-plano"><button class="botao pequeno" data-mural-ligar>Mostrar</button>'
             + '<button class="botao pequeno plano" data-mural-nao>Agora não</button></div></div></div>'
           : '';
-        corpo = '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
-          + '<button class="botao contorno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
-          + '<button class="entrada-propositos" data-propositos>' + CC.ico('pessoas')
+        corpo = CC.blocoPedidosConversa(d.pedidosConversa || [])
+          + '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
+          + blocoAcompanhando(d.acompanhando || [])
+          + '<button class="botao contorno pequeno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
+          + '<button class="entrada-propositos" data-propositos>' + CC.ico('aperto')
             + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
             + (d.convitesProposito ? '<i class="selo-numero" aria-label="' + CC.plural(d.convitesProposito, 'convite', 'convites') + '">' + d.convitesProposito + '</i>' : '')
             + CC.ico('avancar') + '</button>'
@@ -509,21 +624,21 @@
                 + '</div>').join('') + '</div>'
             : '')
           + pedidoLigar
-          + (eventos.length
-            ? '<div class="mural">' + eventos.map(itemDoMural).join('') + '</div>'
+          + (linhaDoTempo.length
+            ? '<div class="mural">' + linhaDoTempo.map((i) => i.html).join('') + '</div>'
             : '<div class="vazio-amigos">' + CC.ico('pessoas')
-              + '<p>' + (amigos.length ? 'Quando alguém bater uma meta, aparece aqui.' : 'Ler junto é mais fácil! Convide alguém para começar um propósito.') + '</p></div>')
+              + '<p>' + (amigos.length ? 'Quando alguém bater uma meta, aparece aqui.' : 'Ler junto é mais fácil! Chame a sua célula ou até 4 amigos e montem um propósito.') + '</p></div>')
           + (enviados.length
             ? CC.tituloSecao('Convites enviados') + '<div class="lista-pedidos">' + enviados.map((p) => '<div class="linha-amigo enviado">'
               + '<div class="quem-amigo"><b>@' + CC.esc(p.usuario) + '</b><span class="arroba">aguardando</span></div>'
               + '<button class="botao plano pequeno" data-cancelar="' + CC.esc(p.usuario) + '">Cancelar</button></div>').join('') + '</div>'
             : '')
-          + '<p class="rodape-privacidade"><span><a href="#/amigos/bloqueados">Pessoas bloqueadas</a> · <a href="privacidade.html">Privacidade</a></span></p>';
+          + '<p class="rodape-privacidade"><span><a href="#/amigos/bloqueados">Pessoas bloqueadas</a> · <a href="termos.html">Termos</a> · <a href="privacidade.html">Privacidade</a></span></p>';
       }
 
       raiz.innerHTML = '<div class="cabeca-tela"><h1>Juntos</h1>'
         + '<span class="contagem-amigos">' + CC.plural(amigos.length, 'amigo', 'amigos') + '</span></div>'
-        + (aviso ? '<p class="aviso-cadeado">' + CC.esc(aviso) + '</p>' : '')
+        + (aviso ? '<p class="estado-linha">' + CC.ico('info') + '<span>' + CC.esc(aviso) + '</span></p>' : '')
         + corpo;
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
@@ -531,6 +646,19 @@
       ligar('[data-propositos]', () => { location.hash = '#/novidades/propositos'; });
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));
       ligar('[data-amigo]', (el) => folhaAmigo(amigos.find((a) => a.usuario === el.dataset.amigo)));
+      const acompanhando = d.acompanhando || [];
+      ligar('[data-toque-conhecer]', (el) => {
+        const p = acompanhando.find((x) => x.usuario === el.dataset.toqueConhecer);
+        if (p) CC.telaToque({ usuario: p.usuario, nome: p.nome });
+      });
+      ligar('[data-como-acompanhar]', (el) => {
+        const p = acompanhando.find((x) => x.usuario === el.dataset.comoAcompanhar);
+        if (p) folhaComoAcompanhar(p);
+      });
+      ligar('[data-acompanhar-fe]', (el) => {
+        const p = acompanhando.find((x) => x.usuario === el.dataset.acompanharFe);
+        if (p && CC.folhaAcompanharNaFe) CC.folhaAcompanharNaFe(p);
+      });
       ligar('[data-aceitar]', async (el) => {
         el.disabled = true;
         const pessoa = recebidos.find((p) => p.usuario === el.dataset.aceitar);
@@ -544,6 +672,9 @@
       ligar('[data-celebrar]', async (el) => {
         const ev = (m.eventos || []).find((x) => x.id === el.dataset.celebrar);
         el.classList.toggle('ligado');
+        el.classList.remove('pulando');
+        void el.offsetWidth;
+        el.addEventListener('animationend', () => el.classList.remove('pulando'), { once: true });
         el.classList.add('pulando');
         try {
           const r = await CC.api('api/novidades/reagir', { id: el.dataset.celebrar });
@@ -565,17 +696,20 @@
     desenhar(cache, mural);
     // A resposta do servidor só redesenha se trouxe algo novo; e aí sem repetir a entrada, que
     // já tocou no primeiro desenho. Redesenhar igual fazia a tela piscar ao abrir o Feed.
-    const antes = JSON.stringify([cache, mural]);
+    const celulasAgora = () => (CC.minhasCelulas ? CC.minhasCelulas() : []);
+    const antes = JSON.stringify([cache, mural, celulasAgora()]);
     const jaMostrou = !!cache;
     Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]).then(([d, n]) => {
       if (!/^#\/(amigos|novidades)\/?$/.test(location.hash)) return;
       if (CC.pintarTopo) CC.pintarTopo();
-      if (d && JSON.stringify([d, n || mural]) === antes) return;
+      // A célula pode ter chegado agora (link, "fazer parte da célula"): a barra reflete na
+      // hora, sem esperar a próxima troca de tela.
+      if (CC.pintarNavegacao) CC.pintarNavegacao();
+      if (d && JSON.stringify([d, n || mural, celulasAgora()]) === antes) return;
       if (jaMostrou) raiz.classList.add('sem-entrada');
       desenhar(d || cache, n || mural, d ? '' : 'Não consegui falar com o servidor agora.');
     });
   };
-  CC.vistaNovidades = CC.vistaAmigos;
 
   CC.vistaBloqueados = function (raiz) {
     const desenhar = (d) => {

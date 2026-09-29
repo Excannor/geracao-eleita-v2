@@ -35,7 +35,7 @@ const pedir = (rota, corpo, cookie) => fetch(base + rota, {
   body: corpo ? JSON.stringify(corpo) : undefined,
 });
 const criar = async (usuario, senha, nome) => {
-  const r = await pedir('/api/criar-conta', { usuario, senha, nome, email: usuario + '@teste.com', nascimento: '2000-01-01' });
+  const r = await pedir('/api/criar-conta', { usuario, senha, nome, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true });
   return { status: r.status, cookie: (r.headers.get('set-cookie') || '').split(';')[0] };
 };
 const entrar = async (usuario, senha) => {
@@ -97,7 +97,9 @@ await dormir(300);
 // Um backup agora, com o Bento dentro: apagar a conta tem de tirá-lo dali também.
 await pedir('/api/teste/backup', {});
 const noBanco = (arquivo, sql) => { const b = new DatabaseSync(arquivo); try { return b.prepare(sql).get().n; } finally { b.close(); } };
-const backups = () => readdirSync(join(PASTA, 'backup')).filter((n) => n.endsWith('.db')).map((n) => join(PASTA, 'backup', n));
+const { abrirBackup } = await import(pathToFileURL(join(AQUI, 'db.mjs')).href);
+const backups = () => readdirSync(join(PASTA, 'backup')).filter((n) => n.endsWith('.db.cifrado'))
+  .map((n) => abrirBackup(join(PASTA, 'backup', n), join(PASTA, 'conferir-' + n + '.db')));
 const bentoNosBackups = () => backups().reduce((t, a) => t + noBanco(a, "SELECT count(*) n FROM estados WHERE usuario = 'bento'") + noBanco(a, "SELECT count(*) n FROM contas WHERE usuario = 'bento'"), 0);
 ok(noBanco(join(PASTA, 'caminho.db'), "SELECT count(*) n FROM estados WHERE usuario = 'bento'") === 1 && bentoNosBackups() >= 1,
   'o progresso do Bento está no banco e num backup');

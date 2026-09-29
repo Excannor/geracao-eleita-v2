@@ -1,9 +1,9 @@
 {
-  "name": "caminho-com-cristo",
+  "name": "geracao-eleita",
   "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Aplicativo de leitura biblica: plano de 365 dias em trilha, ofensiva de dias seguidos e material de consulta",
+  "description": "Geração Eleita: a Bíblia inteira em um ano, junto com a sua célula",
   "scripts": {
     "build": "node build.mjs",
     "servir": "node servidor.mjs",

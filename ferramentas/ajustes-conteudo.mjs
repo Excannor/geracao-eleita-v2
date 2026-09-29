@@ -11,6 +11,7 @@ import { aplicarPrimeirosPassos } from './primeiros-passos.mjs';
 import { aplicarPessoas } from './reescrita-pessoas.mjs';
 import { aplicarExplorar } from './reescrita-explorar.mjs';
 import { aplicarReflexoes } from './reflexoes.mjs';
+import { aplicarTextoDosVersiculos } from './versiculos-explorar.mjs';
 
 export const AJUSTES = [
   [
@@ -167,15 +168,18 @@ export function aplicarAjustes(dados) {
   const limpeza = limparMaterial(dados);
   // O resto do Explorar reescrito: vem depois da limpeza, porque foi escrito sobre o texto já limpo.
   const explorar = aplicarExplorar(dados);
+  // O texto dos versículos do Explorar vem das Bíblias do app (o material citava a NVI).
+  const versiculos = aplicarTextoDosVersiculos(dados);
   // As reflexões do dia: escritas sobre a passagem, no lugar das perguntas por gênero.
   const reflexoes = aplicarReflexoes(dados);
-  return { aplicados, pendentes: pendentes.concat(passos.faltando, pessoas.faltando, limpeza.faltando, explorar.faltando), reescritas: limpeza.reescritas, licoes: passos.trocadas, pessoas: pessoas.trocadas, pessoasSemReescrita: pessoas.semReescrita, explorar: explorar.trocadas, explorarDesatualizadas: explorar.desatualizadas, reflexoes };
+  return { aplicados, pendentes: pendentes.concat(passos.faltando, pessoas.faltando, limpeza.faltando, explorar.faltando, versiculos.semTexto), reescritas: limpeza.reescritas, versiculos: versiculos.trocadas, licoes: passos.trocadas, pessoas: pessoas.trocadas, pessoasSemReescrita: pessoas.semReescrita, explorar: explorar.trocadas, explorarDesatualizadas: explorar.desatualizadas, reflexoes };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const arquivo = join(dirname(fileURLToPath(import.meta.url)), '..', 'conteudo', 'conteudo.json');
   const dados = JSON.parse(readFileSync(arquivo, 'utf8'));
-  const { aplicados, pendentes, pessoas, pessoasSemReescrita, explorar, explorarDesatualizadas, reflexoes } = aplicarAjustes(dados);
+  const { aplicados, pendentes, pessoas, pessoasSemReescrita, explorar, explorarDesatualizadas, reflexoes, versiculos } = aplicarAjustes(dados);
+  console.log('versículos do Explorar com texto das Bíblias do app:', versiculos);
   console.log('pessoas reescritas:', pessoas, pessoasSemReescrita.length ? '· sem reescrita: ' + pessoasSemReescrita.join(', ') : '');
   console.log('explorar reescrito:', explorar, explorarDesatualizadas.length ? '· desatualizadas (reescrever de novo): ' + explorarDesatualizadas.join(', ') : '');
   console.log('reflexões do dia:', reflexoes.dias + ' de ' + dados.plano.length + ' dias · ' + reflexoes.total + ' escritas',

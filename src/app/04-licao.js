@@ -23,8 +23,7 @@
 
   CC.fecharLicao = function () {
     if (CC.fecharLeitor) CC.fecharLeitor();
-    const el = document.querySelector('.licao');
-    if (el) el.remove();
+    CC.sair(document.querySelector('.licao:not(.saindo)'));
     sessao = null;
   };
 
@@ -109,7 +108,7 @@
       fracao = 0.5 + 0.5 * (ETAPAS.indexOf(sessao.etapaReflexao || 'guardar') + 1) / 4;
     }
 
-    let el = document.querySelector('.licao');
+    let el = document.querySelector('.licao:not(.saindo)');
     if (!el) {
       el = document.createElement('div');
       el.setAttribute('role', 'dialog');
@@ -236,14 +235,12 @@
     const subiram = CC.conquistasComNivel().filter((c) => c.nivel > (sessao.antes.niveis[c.id] || 0));
     const livros = (dia.livros || []).filter((l) => CC.livroCompletoEm(l) && !sessao.antes.livros.includes(l));
     const unidade = !sessao.antes.unidade && CC.unidadeCompletaEm(u.numero);
-    const quadro = CC.quadroDoMes();
-    sessao.celebracao = { seq, missoes, quadro, subiram, livros, unidade, amigos: undefined };
+    sessao.celebracao = { seq, missoes, subiram, livros, unidade, amigos: undefined };
 
     if (CC.publicarNovidades) {
       CC.publicarNovidades({
         ofensiva: CC.MARCOS_OFENSIVA.includes(seq.atual) && seq.atual > sessao.antes.ofensiva ? seq.atual : 0,
         niveis: subiram, livros, unidade: unidade ? u.numero : 0,
-        quadro: missoes.peca && quadro.completo ? quadro.mes : '',
       });
     }
     // O servidor precisa desta leitura antes de contar o propósito com os amigos.
@@ -299,7 +296,7 @@
         // guardar: o versículo do dia, ou a nota nos dias em que um versículo solto confunde
         + '<section class="etapa-reflexao" data-etapa-bloco="guardar">'
         + '<div id="festa-versiculo">' + (r.ref
-          ? '<div class="leitor-esqueleto"><i></i><i></i></div>'
+          ? CC.esqueleto('texto')
           : '<figure class="cartao-versiculo nota-reflexao"><span class="etiqueta">Para entender hoje</span><p>' + CC.esc(r.nota) + '</p></figure>') + '</div>'
         + (r.contexto ? '<p class="contexto-reflexao"><b>Contexto:</b> ' + CC.esc(r.contexto)
           + ' <button class="link-nota" data-nota-reflexao>Ler a nota</button></p>' : '')
@@ -313,8 +310,13 @@
             + '<p>' + CC.esc(r.pensamento) + '</p></figure>'
           : '')
         + '<h2>' + (r.pensamento ? 'Para pensar' : 'Escolha uma pergunta') + '</h2>'
-        + '<div class="perguntas-reflexao">' + r.perguntas.map(([rotulo, pergunta], i) => '<button class="pergunta-reflexao" data-pergunta="' + i + '" aria-pressed="false">'
-          + '<span class="rotulo-pergunta">' + CC.esc(rotulo) + '</span><span>' + CC.esc(pergunta) + '</span></button>').join('') + '</div>'
+        // As reflexões escritas trazem só a pergunta; as genéricas por gênero ainda vêm como
+        // [rótulo, pergunta]. Sem rótulo não sai a etiqueta em cima.
+        + '<div class="perguntas-reflexao">' + r.perguntas.map((p, i) => {
+          const [rotulo, pergunta] = Array.isArray(p) ? p : ['', p];
+          return '<button class="pergunta-reflexao" data-pergunta="' + i + '" aria-pressed="false">'
+            + (rotulo ? '<span class="rotulo-pergunta">' + CC.esc(rotulo) + '</span>' : '') + '<span>' + CC.esc(pergunta) + '</span></button>';
+        }).join('') + '</div>'
         + '<p class="passo-dica pequena dica-pensar" hidden>Fique um minuto com essa pergunta. Se ajudar, volte ao texto.</p>'
         + '</section>'
         // orar: começos de frase para a pessoa completar, nunca uma oração pronta
@@ -385,7 +387,7 @@
   }
 
   // ---------- o resumo do dia ----------
-  // Uma tela só, no fim: a lamparina no estágio de hoje, a semana, e o que o dia trouxe
+  // Uma tela só, no fim: o fogo no estágio de hoje, a semana, e o que o dia trouxe
   // como destaque dentro dela (meta, chama que cresceu, conquista, livro, unidade, peça do
   // quadro, baú). O XP não aparece: ele é só um número para a própria pessoa, no Perfil.
   function telaResumo(dia, u) {
@@ -423,20 +425,10 @@
     item(CC.arte.bau(feitas === c.missoes.lista.length ? 'aberto' : 'travado', feitas === c.missoes.lista.length ? 'madeira' : ''),
       'Desafios do dia: ' + feitas + ' de ' + c.missoes.lista.length, feitas === c.missoes.lista.length ? 'Todos feitos' : '<a href="#/missoes" data-ver-desafios>Ver os desafios</a>', 'desafios');
 
-    // A frase do fim do dia, sempre no mesmo fio: quem acende é Deus, e o que mantém a chama
-    // é o azeite guardado por dentro, que ninguém vê. Varia com o dia para não virar refrão.
-    const FRASES_AZEITE = [
-      'Pavio sozinho acende e logo apaga. Cada leitura é azeite guardado por dentro.',
-      'O fogo que arde em você não foi você que acendeu. Cuidar dele é o seu trabalho de hoje.',
-      'O pavio queima do lado de fora, e todo mundo vê. O azeite fica do lado de dentro.',
-      'Não é chama passageira. É lenha posta cada manhã, como no altar que não se apagava.',
-      'O que separa quem permanece aceso de quem apaga no meio do caminho é o azeite guardado.',
-      'Deus está acendendo a sua chama. Volte amanhã para ela não faltar de azeite.',
-      'Constância vale mais que intensidade. Um dia de cada vez mantém o fogo.',
-    ];
-    const frase = seq.atual === 1
-      ? 'Sua lamparina acendeu! O que mantém a chama é o azeite de cada dia. Volte amanhã!'
-      : FRASES_AZEITE[(sessao.dia - 1) % FRASES_AZEITE.length];
+    // A frase do fim do dia é uma das frases da ofensiva (as mesmas do carimbo), sorteada,
+    // com a referência quando a frase tem uma.
+    const f = CC.fraseDaOfensiva();
+    const frase = CC.esc(f.linhas.join(' ')) + (f.ref ? ' <span class="ref-frase">' + CC.esc(f.ref) + '</span>' : '');
 
     return {
       semTopo: true,
@@ -476,7 +468,7 @@
         const desafios = el.querySelector('[data-ver-desafios]');
         if (desafios) desafios.onclick = (ev) => { ev.preventDefault(); CC.fecharLicao(); location.hash = '#/missoes'; };
         el.querySelector('[data-compartilhar]').onclick = async () => {
-          const r = await CC.compartilhar('Estou há ' + CC.plural(seq.atual, 'dia', 'dias') + ' lendo a Bíblia no Caminho com Cristo!', location.origin);
+          const r = await CC.compartilhar('Estou há ' + CC.plural(seq.atual, 'dia', 'dias') + ' lendo a Bíblia no Geração Eleita!', location.origin);
           if (r === 'copiado') CC.avisar('Copiado. É só colar na conversa.');
           else if (r === 'falhou') CC.avisar('Não consegui compartilhar nem copiar. Tente de novo.');
         };
@@ -531,24 +523,19 @@
     });
   }
 
-  CC.cartaoVersiculo = (ref, texto) => {
+  CC.cartaoVersiculo = (ref, texto, { semAcoes } = {}) => {
     const t = CC.traducao();
     return '<figure class="cartao-versiculo">'
       + '<span class="aspas" aria-hidden="true">“</span>'
       + '<blockquote>' + CC.esc(texto) + '</blockquote>'
       + '<figcaption><b>' + CC.esc(ref) + '</b>' + (t ? ' · ' + CC.esc(t.abreviatura) : '') + '</figcaption>'
-      + (CC.podeCompartilharComAmigos && CC.podeCompartilharComAmigos()
-        ? '<button class="botao pequeno contorno" data-versiculo-amigos>' + CC.ico('pessoas') + 'Mostrar aos amigos</button>' : '')
+      + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref))
       + '</figure>';
   };
+  // As ações são as mesmas dos leitores (04e-versiculos.js): marcar, nota, Juntos, copiar.
   CC.ligarCartaoVersiculo = (raiz, ref) => {
-    const b = raiz.querySelector('[data-versiculo-amigos]');
-    if (!b) return;
-    b.onclick = async () => {
-      b.disabled = true;
-      const certo = await CC.compartilharVersiculo(ref);
-      b.innerHTML = certo ? CC.ico('certo') + 'No Feed' : 'Tente depois';
-    };
+    const citacao = raiz.querySelector('.cartao-versiculo blockquote');
+    CC.versiculos.ligarCartao(raiz, ref, citacao ? citacao.textContent : '');
   };
 
   // ---------- ir mais fundo ----------
@@ -565,7 +552,7 @@
     return {
       corpo: '<span class="etiqueta">' + CC.esc(CC.passagemDe(dia)) + '</span>'
         + '<h1 class="passo-titulo">Ir mais fundo</h1>'
-        + '<p class="passo-dica">Notas sobre os livros de hoje. As conexões são sugestões de leitura, não doutrina.</p>'
+        + '<p class="passo-dica">Notas sobre os livros de hoje.</p>'
         + blocos,
       pe: botao('Voltar', 'data-voltar'),
       ligar(el) {
@@ -619,17 +606,4 @@
       },
     };
   }
-
-  // O registro de um dia como texto, pronto para colar em qualquer lugar.
-  CC.textoDoRegistro = function (numero) {
-    const dia = D.plano[numero - 1];
-    const r = CC.registro(numero);
-    const nl = String.fromCharCode(10);
-    const L = ['# Leitura do dia ' + numero, '', 'Passagem: ' + [dia.antigo, dia.novo].filter(Boolean).join(' | '), ''];
-    for (const [chave, rotulo] of [['o', 'Observação'], ['i', 'Interpretação'], ['a', 'Aplicação'], ['oracao', 'Oração']]) {
-      if (!(r[chave] || '').trim()) continue;
-      L.push('## ' + rotulo, '', r[chave].trim(), '');
-    }
-    return L.join(nl);
-  };
 })(window.CC);

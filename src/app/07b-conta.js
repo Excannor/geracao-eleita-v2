@@ -25,13 +25,16 @@
           '<button data-tema="' + JSON.stringify(v) + '" aria-pressed="' + (tema === v) + '">' + rot + '</button>').join('')
         + '</div></div>')
       + grupo('Leitura', linha('Tradução e créditos', traducao ? traducao.abreviatura : '', 'data-ir="#/config/textos"'))
+      + grupo('Seu caminho', linha('Seu caminho',
+        quem.caminho === 'conhecer' ? 'Conhecer Jesus' : 'Plano da Bíblia em um ano', 'data-caminho'))
       + grupo('Notificações', linha('Lembretes e avisos', CC.resumoNotificacoes(), 'data-ir="#/config/notificacoes"'))
       + grupo('Privacidade', (quem.comSenha
         ? '<button class="linha-config" data-mural role="switch" aria-checked="' + !!(CC.novidadesEmCache() || {}).ligado + '">'
           + '<span>Mostrar meus marcos no Feed</span><span class="interruptor" aria-hidden="true"><i></i></span></button>'
         : '')
         + linha('Pessoas bloqueadas', '', 'data-ir="#/amigos/bloqueados"')
-        + '<a class="linha-config" href="privacidade.html"><span>Privacidade</span>' + CC.ico('avancar') + '</a>')
+        + linha('Privacidade', '', 'data-privacidade')
+        + linha('Termos de Uso', '', 'data-termos'))
       + grupo('Seus dados', linha('Baixar o que escrevi', '', 'data-exportar')
         + linha('Zerar progresso', '', 'data-zerar', 'perigo'))
       + (quem.comSenha
@@ -40,11 +43,10 @@
           + '<div class="linha-config sem-toque"><span>Nascimento</span><span class="valor">' + CC.esc(dataBr(quem.nascimento) || 'falta completar') + '</span></div>'
           + (quem.perfilCompleto ? '' : linha('Completar cadastro', '', 'data-completar'))
           + linha('Trocar a senha', '', 'data-senha')
+          + linha('Sair dos outros aparelhos', '', 'data-sair-outros')
           + linha('Sair desta conta', '', 'data-sair')
           + linha('Apagar a conta', '', 'data-apagar', 'perigo'))
-        : '')
-      + '<p class="passo-dica pequena" style="text-align:center;margin-top:20px">Conteúdo de ' + D.importadoEm
-      + ' · ' + (CC.servidorVivo() ? 'progresso sincronizado entre seus aparelhos' : 'progresso salvo neste aparelho') + '</p>';
+        : '');
 
     raiz.querySelectorAll('[data-ir]').forEach((el) => { el.onclick = () => { location.hash = el.dataset.ir; }; });
     raiz.querySelectorAll('[data-tema]').forEach((b) => {
@@ -73,9 +75,21 @@
       await CC.carregarNovidades();
       CC.redesenhar();
     });
+    ligar('[data-privacidade]', () => CC.abrirPrivacidade(quem));
+    ligar('[data-termos]', () => window.open('termos.html', '_blank', 'noopener'));
+    ligar('[data-caminho]', () => folhaSeuCaminho(quem));
     ligar('[data-completar]', () => CC.completarCadastro(quem));
     ligar('[data-senha]', () => CC.trocarSenha());
     ligar('[data-apagar]', () => CC.apagarConta(quem.usuario));
+    ligar('[data-sair-outros]', async () => {
+      const certo = await CC.confirmar({
+        titulo: 'Sair dos outros aparelhos?',
+        texto: 'Todo celular ou computador onde a sua conta está aberta sai dela. Este aparelho continua dentro.',
+        acao: 'Sair dos outros',
+      });
+      if (!certo) return;
+      try { await CC.api('api/sair-dos-outros', {}); CC.avisar('Pronto: só este aparelho continua dentro'); } catch (e) { CC.avisar(e.message); }
+    });
     ligar('[data-sair]', async () => {
       const certo = await CC.confirmar({
         titulo: 'Sair da conta?',
@@ -88,6 +102,42 @@
       location.reload();
     });
   };
+
+  // ---------- seu caminho ----------
+  // Troca entre o plano da Bíblia em um ano e o Conhecer Jesus, os dois únicos caminhos que
+  // a conta pode seguir. Quem termina o Conhecer Jesus já vê esta troca oferecida lá mesmo;
+  // aqui é para quem muda de ideia a qualquer momento.
+  function folhaSeuCaminho(quem) {
+    const atual = quem.caminho === 'conhecer' ? 'conhecer' : 'plano';
+    CC.folha('<h2>Seu caminho</h2>'
+      + '<div class="acoes">'
+      + '<button class="botao ' + (atual === 'plano' ? 'azul' : 'contorno') + '" data-caminho-opcao="plano">Plano da Bíblia em um ano</button>'
+      + '<button class="botao ' + (atual === 'conhecer' ? 'azul' : 'contorno') + '" data-caminho-opcao="conhecer">Conhecer Jesus</button>'
+      + '<button class="botao plano" data-fechar>Cancelar</button>'
+      + '</div>',
+    {
+      rotulo: 'Seu caminho',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelectorAll('[data-caminho-opcao]').forEach((b) => {
+          b.onclick = async () => {
+            const novo = b.dataset.caminhoOpcao;
+            if (novo === atual) { fechar(); return; }
+            b.disabled = true;
+            try {
+              await CC.api('api/caminho', { caminho: novo });
+              if (CC.quem) CC.quem.caminho = novo;
+              fechar();
+              CC.redesenhar();
+            } catch (e) {
+              b.disabled = false;
+              CC.avisar(e.message);
+            }
+          };
+        });
+      },
+    });
+  }
 
   // ---------- textos bíblicos ----------
   // As licenças das traduções pedem o crédito à vista; ele aparece também no fim de cada leitura.
@@ -158,6 +208,87 @@
     });
   };
 
+  // ---------- consentimento sobre dado de fé (LGPD art. 11) ----------
+  // O mesmo texto do portal de entrada (src/entrar.html): leitura, anotação e participação
+  // em grupo de leitura e oração são dado sensível, e pedem um "sim" claro, não escondido
+  // em letra miúda.
+  const TEXTO_CONSENTIMENTO = 'Concordo que o Geração Eleita guarde minhas leituras, anotações e a minha '
+    + 'participação em grupos de leitura e oração. São informações sobre a minha fé, e só eu decido o que '
+    + 'meus amigos veem.';
+  const LINK_PRIVACIDADE = '<a href="privacidade.html" target="_blank" rel="noopener">Ler a política de privacidade</a>';
+
+  // Folha presa (sem fechar tocando fora) que a abertura do app mostra antes de tudo para
+  // quem tem conta e ainda não concordou. Só depois dela o convite, a célula e o cadastro
+  // seguem o caminho de sempre.
+  CC.pedirConsentimento = function () {
+    return new Promise((resolver) => {
+      CC.folha('', {
+        rotulo: 'Seus dados',
+        presa: true,
+        ligar: (folha, fechar) => {
+          const telaConcordar = () => {
+            folha.innerHTML = '<h3>Antes de continuar</h3>'
+              + '<p class="passo-dica">' + CC.esc(TEXTO_CONSENTIMENTO) + '</p>'
+              + '<p>' + LINK_PRIVACIDADE + '</p>'
+              + '<p class="recado-senha" id="recado" role="alert"></p>'
+              + '<div class="acoes"><button class="botao" data-concordar>Concordo</button>'
+              + '<button class="botao plano" data-nao-concordo>Não concordo</button></div>';
+            const recado = folha.querySelector('#recado');
+            const botao = folha.querySelector('[data-concordar]');
+            botao.onclick = async () => {
+              recado.textContent = '';
+              botao.disabled = true;
+              try {
+                await CC.api('api/consentimento', {});
+                if (CC.quem) CC.quem.consentimento = true;
+                fechar();
+                resolver(true);
+              } catch (e) {
+                botao.disabled = false;
+                recado.textContent = e.message;
+              }
+            };
+            folha.querySelector('[data-nao-concordo]').onclick = telaRecusar;
+          };
+          const telaRecusar = () => {
+            folha.innerHTML = '<h3>Antes de continuar</h3>'
+              + '<p class="passo-dica">Sem esse consentimento, não dá para guardar sua leitura na conta. '
+              + 'Você pode apagar a conta e tudo o que ela guarda.</p>'
+              + '<div class="acoes"><button class="botao vermelho" data-apagar>Apagar minha conta</button>'
+              + '<button class="botao plano" data-voltar>Voltar</button></div>';
+            folha.querySelector('[data-apagar]').onclick = () => { fechar(); location.hash = '#/config'; };
+            folha.querySelector('[data-voltar]').onclick = telaConcordar;
+          };
+          telaConcordar();
+        },
+      });
+    });
+  };
+
+  // Item "Privacidade" das Configurações: quando concordou, um jeito de rever a política e
+  // de saber que retirar o consentimento é apagar a conta (não dá para guardar leitura de
+  // fé sem concordar, e não dá para "meio guardar").
+  CC.abrirPrivacidade = function (quem) {
+    const dataConsentimento = quem && quem.comSenha && quem.consentimentoEm ? dataBr(String(quem.consentimentoEm).slice(0, 10)) : '';
+    CC.folha('<h3>Privacidade</h3>' + (dataConsentimento ? '<p class="passo-dica">Você concordou em ' + CC.esc(dataConsentimento) + '.</p>' : '')
+      + '<p>' + LINK_PRIVACIDADE + '</p>'
+      + '<p><a href="termos.html" target="_blank" rel="noopener">Ler os Termos de Uso</a></p>'
+      + '<p class="passo-dica">Dúvidas ou problemas: <a href="mailto:suporte@geracaoeleita.app">suporte@geracaoeleita.app</a></p>'
+      + (quem && quem.comSenha
+        ? '<h3>Retirar o consentimento</h3>'
+          + '<p class="passo-dica">O app só guarda leitura, anotação e participação em grupo com o seu consentimento. '
+          + 'Retirar o consentimento é apagar a conta, com todas as cópias.</p>'
+          + '<div class="acoes"><button class="botao plano perigo" data-apagar>Apagar a conta</button></div>'
+        : ''),
+    {
+      rotulo: 'Privacidade',
+      ligar: (folha, fechar) => {
+        const apagar = folha.querySelector('[data-apagar]');
+        if (apagar) apagar.onclick = () => { fechar(); CC.apagarConta(quem.usuario); };
+      },
+    });
+  };
+
   // ---------- trocar a senha ----------
   const campo = (id, rotulo, dica) =>
     '<label class="campo-senha"><span>' + CC.esc(rotulo) + '</span>'
@@ -182,7 +313,7 @@
         botao.onclick = async () => {
           const nova = folha.querySelector('#senha-nova').value;
           dizer('');
-          if (nova.length < 6) { dizer('A senha nova precisa de 6 caracteres ou mais.'); return; }
+          if (nova.length < 8) { dizer('A senha nova precisa de 8 caracteres ou mais.'); return; }
           if (nova !== folha.querySelector('#senha-repete').value) { dizer('As duas senhas novas não são iguais.'); return; }
           botao.disabled = true;
           try {

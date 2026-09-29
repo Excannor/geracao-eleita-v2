@@ -56,6 +56,9 @@
     padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
   section { flex: 1; display: flex; flex-direction: column; gap: 16px; }
   section[hidden] { display: none; }
+  /* Sem isto, qualquer elemento com display próprio (o .botao é flex, a .privacidade é
+     flex) vence o atributo hidden: ele ficava escondido no nome, mas continuava na tela. */
+  [hidden] { display: none !important; }
   .centro { align-items: center; text-align: center; justify-content: center; }
   #tela-boas { position: relative; }
   /* O selo do lema: um carimbo, sempre escuro com letra clara nos dois temas, como uma
@@ -137,7 +140,21 @@
   .privacidade { display: flex; gap: 12px; padding: 14px; border-radius: 16px; background: var(--azul-fraco); color: var(--tinta);
     font-size: .88rem; font-weight: 600; line-height: 1.5; }
   .privacidade svg { flex: 0 0 auto; width: 22px; height: 22px; color: var(--azul); }
+  /* A marcação de consentimento precisa ser vista, não uma letra miúda perto do botão:
+     por isso o mesmo tratamento de caixa da dica de "link enviado", com a caixinha grande
+     o bastante para o dedo (WCAG 2.5.5) e sublinhado só no link de dentro. */
+  .consentimento { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 16px;
+    background: var(--azul-fraco); cursor: pointer; }
+  .consentimento input { flex: 0 0 auto; width: 24px; height: 24px; margin-top: 1px; accent-color: var(--verde); }
+  .consentimento span { font-size: .88rem; font-weight: 600; line-height: 1.5; color: var(--tinta); }
+  .consentimento:has(input[aria-invalid="true"]) { outline: 2px solid var(--erro); }
   .convite { padding: 12px 14px; border-radius: 16px; background: var(--azul-fraco); font-weight: 700; color: var(--forte); }
+  /* A pergunta "Você já segue Jesus?": duas opções lado a lado, uma sempre marcada (o
+     padrão é "Sim"), sem exigir resposta, como um segmentado simples. */
+  .caminho-escolha { display: flex; gap: 10px; }
+  .opcao-caminho { flex: 1; min-height: 54px; padding: 10px; border: 2px solid var(--borda); border-radius: 16px;
+    background: var(--cartao); color: var(--tinta); font-family: inherit; font-size: 0.92rem; font-weight: 700; cursor: pointer; }
+  .opcao-caminho[aria-pressed="true"] { border-color: var(--azul); background: var(--azul-fraco); color: var(--forte); }
   :focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -164,14 +181,21 @@
       <span class="selo-linha">À sua face</span>
       <span class="selo-linha">E te adora</span>
     </div>
-    <h1 id="titulo-boas">A Bíblia inteira em um ano, uma lição por dia.</h1>
-    <p class="dica" id="dica-boas">De 10 a 20 minutos na maioria dos dias, com ofensiva e amigos lendo junto com você.</p>
+    <!-- Posicionamento (23/09/2026): o app do discipulado da juventude da igreja. A frase de
+         cima é a promessa (o dono escolheu "com seus amigos" para a porta de entrada); a de
+         baixo diz para quem é, e traz a célula. -->
+    <h1 id="titulo-boas">A Bíblia inteira em um ano, com seus amigos.</h1>
+    <p class="dica" id="dica-boas">Uma leitura por dia, de 10 a 20 minutos, com reflexões feitas para quem está começando. Leia com os amigos ou com a sua célula.</p>
     <div class="espaco"></div>
     <div class="botoes">
-      <button class="botao" data-ir="cadastro">Começar</button>
+      <button class="botao" data-ir="cadastro" id="botao-comecar">Começar</button>
+      <!-- Só aparecem com link de célula (ver "if (celula)" no script): a mesma escolha da
+           folha do app, antes de criar a conta. -->
+      <button class="botao" data-ir="cadastro" id="botao-entrar-celula" hidden>Entrar na célula</button>
+      <button class="botao contorno" data-ir="cadastro" id="botao-so-conhecer" hidden>Só quero conhecer</button>
       <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
     </div>
-    <div class="links"><a href="privacidade.html">Privacidade</a></div>
+    <div class="links"><a href="termos.html">Termos de Uso</a> · <a href="privacidade.html">Privacidade</a></div>
   </section>
 
   <!-- entrar -->
@@ -188,7 +212,39 @@
       <p class="erro" id="erro-entrar" role="alert"></p>
       <div class="espaco"></div>
       <button class="botao" type="submit" id="botao-entrar">Entrar</button>
+      <button class="botao plano" type="button" data-ir="esqueci">Esqueci minha senha</button>
       <button class="botao plano" type="button" data-ir="cadastro">Criar uma conta</button>
+    </form>
+  </section>
+
+  <!-- senha esquecida -->
+  <section id="tela-esqueci" hidden>
+    <div class="topo-passo"><button class="voltar" data-ir="entrar" aria-label="Voltar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button></div>
+    <h1>Esqueceu a senha?</h1>
+    <form id="form-esqueci" novalidate>
+      <p class="dica">Seu progresso não se perde. Diga qual é a sua conta e a gente manda um link para criar uma senha nova.</p>
+      <div class="campo"><label for="login-esqueci">@usuário ou e-mail</label>
+        <input id="login-esqueci" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
+      <p class="erro" id="erro-esqueci" role="alert"></p>
+      <div class="privacidade" id="pronto-esqueci" role="status" hidden></div>
+      <div class="espaco"></div>
+      <button class="botao" type="submit" id="botao-esqueci">Pedir o link</button>
+    </form>
+  </section>
+
+  <!-- nova senha, aberta pelo link -->
+  <section id="tela-redefinir" hidden>
+    <h1>Crie uma senha nova</h1>
+    <form id="form-redefinir" novalidate>
+      <div class="campo"><label for="senha-redefinir">Senha nova</label>
+        <div class="senha"><input id="senha-redefinir" name="new-password" type="password" autocomplete="new-password" required>
+          <button type="button" class="mostrar" data-mostrar="senha-redefinir" aria-pressed="false">Mostrar</button></div>
+        <span class="ajuda">Seis caracteres ou mais.</span></div>
+      <p class="erro" id="erro-redefinir" role="alert"></p>
+      <div class="espaco"></div>
+      <button class="botao" type="submit" id="botao-redefinir">Salvar e entrar</button>
+      <button class="botao plano" type="button" data-ir="esqueci">Pedir outro link</button>
     </form>
   </section>
 
@@ -202,12 +258,19 @@
     <form id="form-cadastro" autocomplete="on" novalidate>
       <div data-passo="1">
         <h1>Quem é você?</h1>
-        <div class="campo" style="margin-top:16px"><label for="nome">Como você quer ser chamado?</label>
+        <div class="campo" style="margin-top:16px"><label for="nome">Como você quer que a gente te chame?</label>
           <input id="nome" name="name" autocomplete="given-name" maxlength="20" required>
           <span class="ajuda">Até 20 letras. É assim que seus amigos veem você.</span></div>
         <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
           <input id="nascimento" name="bday" type="date" autocomplete="bday" required>
           <span class="ajuda">Não aparece para ninguém.</span></div>
+        <div class="campo" style="margin-top:16px" id="campo-caminho">
+          <label id="rotulo-caminho">Você já segue Jesus?</label>
+          <div class="caminho-escolha" role="group" aria-labelledby="rotulo-caminho">
+            <button type="button" class="opcao-caminho" data-caminho="plano" aria-pressed="true">Sim</button>
+            <button type="button" class="opcao-caminho" data-caminho="conhecer" aria-pressed="false">Estou conhecendo</button>
+          </div>
+        </div>
       </div>
       <div data-passo="2" hidden>
         <h1>Seu e-mail</h1>
@@ -224,11 +287,16 @@
           <div class="senha"><input id="senha-nova" name="new-password" type="password" autocomplete="new-password" required>
             <button type="button" class="mostrar" data-mostrar="senha-nova" aria-pressed="false">Mostrar</button></div>
           <span class="ajuda">Seis caracteres ou mais.</span></div>
+        <label class="consentimento" style="margin-top:16px" for="consentimento-cadastro">
+          <input type="checkbox" id="consentimento-cadastro">
+          <span>Concordo que o Geração Eleita guarde minhas leituras, anotações e a minha participação em grupos de leitura e oração. São informações sobre a minha fé, e só eu decido o que meus amigos veem.
+            <a href="privacidade.html" target="_blank" rel="noopener">Ler a política de privacidade</a></span>
+        </label>
       </div>
       <p class="erro" id="erro-cadastro" role="alert"></p>
       <div class="espaco"></div>
       <button class="botao" type="submit" id="botao-cadastro">Continuar</button>
-      <p class="ajuda" style="text-align:center">Ao criar a conta, você concorda com a <a href="privacidade.html">Privacidade</a>.</p>
+      <p class="ajuda" style="text-align:center">Ao criar a conta, você concorda com os <a href="termos.html">Termos de Uso</a> e com a <a href="privacidade.html">Privacidade</a>.</p>
     </form>
   </section>
 </main>
@@ -241,10 +309,25 @@
 
   var params = new URLSearchParams(location.search);
   var convite = params.get('convite');
+  var celula = params.get('celula');
   var passo = 1;
+  // "Sim" é o padrão: a pergunta não obriga resposta, só existe para quem quer dizer que
+  // ainda está conhecendo Jesus.
+  var caminhoEscolhido = 'plano';
+  // Com link de célula, a pessoa escolhe entre entrar de vez ou só conhecer (visitante) antes
+  // de criar a conta; sem link de célula, o valor não é usado (fica sempre false).
+  var celulaVisitante = false;
+  document.querySelectorAll('.opcao-caminho').forEach(function (b) {
+    b.addEventListener('click', function () {
+      caminhoEscolhido = b.dataset.caminho;
+      document.querySelectorAll('.opcao-caminho').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    });
+  });
+  $('botao-entrar-celula').addEventListener('click', function () { celulaVisitante = false; });
+  $('botao-so-conhecer').addEventListener('click', function () { celulaVisitante = true; });
 
   function mostrarTela(nome) {
-    ['boas', 'entrar', 'cadastro'].forEach(function (n) { $('tela-' + n).hidden = n !== nome; });
+    ['boas', 'entrar', 'cadastro', 'esqueci', 'redefinir'].forEach(function (n) { $('tela-' + n).hidden = n !== nome; });
     var foco = document.querySelector('#tela-' + nome + ' input, #tela-' + nome + ' button');
     if (nome !== 'boas' && foco) foco.focus();
     if (nome === 'cadastro') irPasso(1);
@@ -279,18 +362,33 @@
     if (campo) { campo.setAttribute('aria-invalid', 'true'); campo.focus(); }
     return false;
   }
+  // Mesma conta de idade do servidor (contas.mjs: somaAnos/idadeMinimaOk): soma anos à data
+  // de hoje mantendo mês e dia, e joga 29 de fevereiro para 28 num ano sem esse dia.
+  function somaAnos(texto, n) {
+    var p = texto.split('-');
+    var novoAno = Number(p[0]) + n;
+    var mes = Number(p[1]);
+    var diasNoMes = new Date(Date.UTC(novoAno, mes, 0)).getUTCDate();
+    var dia = String(Math.min(Number(p[2]), diasNoMes)).padStart(2, '0');
+    return novoAno + '-' + String(mes).padStart(2, '0') + '-' + dia;
+  }
   function validar(n) {
     document.querySelectorAll('#form-cadastro input').forEach(function (i) { i.removeAttribute('aria-invalid'); });
     if (n === 1) {
-      if (!$('nome').value.trim()) return erro($('nome'), 'Diga como quer ser chamado.');
+      if (!$('nome').value.trim()) return erro($('nome'), 'Diga como quer que a gente te chame.');
       var d = $('nascimento').value;
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= new Date().toISOString().slice(0, 10)) return erro($('nascimento'), 'Confira a data de nascimento.');
+      var hoje = new Date().toISOString().slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= hoje) return erro($('nascimento'), 'Confira a data de nascimento.');
+      if (d > somaAnos(hoje, -12)) return erro($('nascimento'), 'O Geração Eleita é para quem tem 12 anos ou mais.');
     }
     if (n === 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim())) return erro($('email'), 'Esse e-mail não parece certo.');
     if (n === 3) {
       $('usuario').value = $('usuario').value.trim().toLowerCase().replace(/^@/, '');
       if (!/^[a-z0-9][a-z0-9._-]{1,29}$/.test($('usuario').value)) return erro($('usuario'), 'O @ aceita letras minúsculas, números, ponto, hífen e sublinhado, de 2 a 30 caracteres.');
-      if ($('senha-nova').value.length < 6) return erro($('senha-nova'), 'A senha precisa de 6 caracteres ou mais.');
+      if ($('senha-nova').value.length < 8) return erro($('senha-nova'), 'A senha precisa de 8 caracteres ou mais.');
+      if (!$('consentimento-cadastro').checked) {
+        return erro($('consentimento-cadastro'), 'Marque que concorda com o uso dos dados sobre a sua fé para continuar.');
+      }
     }
     return true;
   }
@@ -319,14 +417,16 @@
     fetch('api/criar-conta', {
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: $('nascimento').value, email: $('email').value.trim(),
-        usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '' }),
+        usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '', celula: celula || '',
+        celulaVisitante: celula ? celulaVisitante : false,
+        consentimento: $('consentimento-cadastro').checked, caminho: caminhoEscolhido }),
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
         if (r.ok) {
           // Conta nova: o app abre com o tutorial de pôr o ícone na tela de início.
           try { localStorage.setItem('cc.instalar', '1'); } catch (e) { /* segue */ }
-          // O convite já foi aceito junto com o cadastro: o app não precisa perguntar de novo.
-          if (d.convidadoPor) { try { history.replaceState(null, '', location.pathname); } catch (e) { /* segue */ } }
+          // O convite (ou a célula) já foi aceito junto com o cadastro: o app não precisa perguntar de novo.
+          if (d.convidadoPor || d.celula) { try { history.replaceState(null, '', location.pathname); } catch (e) { /* segue */ } }
           entrarNoApp(d.usuario);
           return;
         }
@@ -334,7 +434,8 @@
         var msg = d.erro || 'Não consegui criar a conta.';
         msg = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
         if (/e-mail/.test(msg)) { irPasso(2); erro($('email'), msg); }
-        else if (/nascimento|chamado/.test(msg)) { irPasso(1); erro(null, msg); }
+        else if (/nascimento|chamado|12 anos/.test(msg)) { irPasso(1); erro(null, msg); }
+        else if (/concordar/.test(msg)) { irPasso(3); erro($('consentimento-cadastro'), msg); }
         else { erro(null, msg); }
       });
     }).catch(function () {
@@ -364,14 +465,96 @@
     });
   });
 
-  // Com convite no link, quem chamou aparece logo na primeira tela.
+  // ---------- senha esquecida ----------
+  $('form-esqueci').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var login = $('login-esqueci').value.trim();
+    if (!login) { $('erro-esqueci').textContent = 'Diga o seu @usuário ou e-mail.'; return; }
+    var botao = $('botao-esqueci');
+    botao.disabled = true;
+    $('erro-esqueci').textContent = '';
+    fetch('api/esqueci-senha', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ login: login }),
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        botao.disabled = false;
+        if (r.status === 429) { $('erro-esqueci').textContent = 'Muitas tentativas. Espere um pouco.'; return; }
+        if (!r.ok) { $('erro-esqueci').textContent = 'Não deu certo agora. Tente de novo.'; return; }
+        // A mesma resposta para conta que existe e que não existe: a tela não entrega quem tem cadastro.
+        $('pronto-esqueci').textContent = d.porEmail
+          ? 'Pronto! Se essa conta tiver e-mail cadastrado, o link chega em alguns minutos. Olhe também a caixa de spam. O link vale por 1 hora.'
+          : 'Pedido anotado! Quem cuida do app vai te mandar o link da senha nova, normalmente pelo WhatsApp. Se demorar, fale com o líder que te convidou.';
+        $('pronto-esqueci').hidden = false;
+      });
+    }).catch(function () {
+      botao.disabled = false;
+      $('erro-esqueci').textContent = 'Sem conexão com o servidor.';
+    });
+  });
+
+  var tokenSenha = params.get('redefinir');
+  $('form-redefinir').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var senha = $('senha-redefinir').value;
+    if (senha.length < 8) { $('erro-redefinir').textContent = 'A senha precisa de 8 caracteres ou mais.'; return; }
+    var botao = $('botao-redefinir');
+    botao.disabled = true;
+    $('erro-redefinir').textContent = '';
+    fetch('api/redefinir-senha', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: tokenSenha, senha: senha }),
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (r.ok) {
+          // Sem o ?redefinir, para o link não abrir de novo esta tela depois de entrar.
+          try { history.replaceState(null, '', location.pathname); } catch (e) { /* segue */ }
+          entrarNoApp(d.usuario);
+          return;
+        }
+        botao.disabled = false;
+        var msg = d.erro || 'Não consegui trocar a senha.';
+        $('erro-redefinir').textContent = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
+      });
+    }).catch(function () {
+      botao.disabled = false;
+      $('erro-redefinir').textContent = 'Sem conexão com o servidor.';
+    });
+  });
+  if (tokenSenha) mostrarTela('redefinir');
+
+  // Com convite no link, quem chamou aparece logo na primeira tela. O convite do Conhecer
+  // Jesus já decide o caminho sozinho: não faz sentido perguntar de novo.
   if (convite) {
     fetch('api/convites/' + encodeURIComponent(convite)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
       if (!d) return;
-      $('titulo-boas').textContent = d.nome + ' te chamou para ler a Bíblia junto!';
-      $('dica-boas').textContent = 'Uma lição por dia, e a contagem de vocês sobe nos dias em que os dois leem.';
+      if (d.modo === 'conhecer') {
+        $('titulo-boas').textContent = d.nome + ' te chamou para conhecer Jesus!';
+        $('dica-boas').textContent = 'Um caminho de 14 dias, sem pressa, pra quem quer conhecer Jesus.';
+        $('campo-caminho').hidden = true;
+        caminhoEscolhido = 'conhecer';
+      } else {
+        $('titulo-boas').textContent = d.nome + ' te chamou para ler a Bíblia junto!';
+        $('dica-boas').textContent = 'Uma lição por dia, e a contagem de vocês sobe nos dias em que os dois leem.';
+      }
       $('convite-cadastro').hidden = false;
       $('convite-cadastro').textContent = 'Convite de ' + d.nome + ' (@' + d.usuario + ')';
+    }).catch(function () {});
+  }
+  // Com link de célula, a primeira tela diz para onde a pessoa está entrando.
+  if (celula) {
+    fetch('api/celula/' + encodeURIComponent(celula)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d) return;
+      var nomeCelula = /^c[ée]lula(\s|$)/i.test(d.titulo) ? d.titulo : 'célula ' + d.titulo;
+      $('titulo-boas').textContent = d.nome + ' te chamou para a ' + nomeCelula + '!';
+      $('dica-boas').textContent = d.vagas > 0
+        ? 'A Bíblia inteira em um ano, lendo junto com o grupo. Crie sua conta e você já entra na célula.'
+        : 'Essa célula já está cheia, mas você pode criar sua conta e ler o plano do mesmo jeito.';
+      $('convite-cadastro').hidden = false;
+      $('convite-cadastro').textContent = nomeCelula.charAt(0).toUpperCase() + nomeCelula.slice(1) + ' · convite de ' + d.nome + ' (@' + d.usuario + ')';
+      // A mesma escolha da folha do app: entrar de vez ou só conhecer (visitante), antes
+      // de criar a conta.
+      $('botao-comecar').hidden = true;
+      $('botao-entrar-celula').hidden = false;
+      $('botao-so-conhecer').hidden = false;
     }).catch(function () {});
   }
   // Servidor sem nenhuma conta abre direto no cadastro: é o primeiro uso.

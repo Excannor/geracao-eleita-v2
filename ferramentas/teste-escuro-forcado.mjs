@@ -1,5 +1,5 @@
 // O Android com "modo escuro para sites" escurece a página por cima do tema claro e inverte
-// as cores escuras dos desenhos: a pupila do Bento ficava clara e ele parecia cego. Aqui o
+// as cores escuras dos desenhos (a pupila do antigo mascote Bento ficava clara). Aqui o
 // escurecimento forçado do Chrome é ligado e a cor dos pixels é medida na captura de tela,
 // porque o efeito é só de pintura: o CSS calculado não muda.
 // Uso: node ferramentas/teste-escuro-forcado.mjs
@@ -69,33 +69,17 @@ async function corNaTela(x, y) {
   })()`);
 }
 
-// Abre o app com um tema escolhido (ou nenhum), põe o Bento de olhos abertos numa área limpa
-// e mede o fundo e a pupila.
+// Abre o app com um tema escolhido (ou nenhum) e mede a cor do fundo.
 async function medirApp(tema, colorSchemeNaMao) {
   await cmd('Page.navigate', { url: base + '/#/' });
   await dormir(600);
   await av(tema === null ? 'localStorage.removeItem("cc.tema")' : 'localStorage.setItem("cc.tema", ' + JSON.stringify(JSON.stringify(tema)) + ')');
   await cmd('Page.reload');
   await dormir(2600);
-  const pos = await av(`(() => {
-    document.querySelectorAll('.cortina, #abertura').forEach(c => c.remove());
-    if (${JSON.stringify(colorSchemeNaMao || '')}) document.documentElement.style.setProperty('color-scheme', ${JSON.stringify(colorSchemeNaMao || '')});
-    const d = document.createElement('div');
-    d.style.cssText = 'position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:var(--fundo)';
-    d.innerHTML = '<div style="width:200px">' + CC.mascoteSvg('parado') + '</div>';
-    document.body.appendChild(d);
-    // O Bento é uma imagem, então a pupila não dá para procurar no documento: ela sai da
-    // geometria do desenho. No viewBox 220x250, a pupila esquerda está em (84, 89).
-    // A imagem pinta depois de decodificar, e medir antes disso lia o fundo.
-    const img = d.querySelector('.mascote-svg');
-    const quadro = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-    return img.decode().catch(() => {}).then(quadro).then(quadro).then(() => {
-      const c = img.getBoundingClientRect();
-      return { px: c.x + c.width * (84 / 220), py: c.y + c.height * (89 / 250) };
-    });
-  })()`);
+  await av("document.querySelectorAll('.cortina, #abertura').forEach(c => c.remove())");
+  if (colorSchemeNaMao) await av('document.documentElement.style.setProperty("color-scheme", ' + JSON.stringify(colorSchemeNaMao) + ')');
   await dormir(500);
-  return { fundo: await corNaTela(20, 20), pupila: await corNaTela(pos.px, pos.py) };
+  return { fundo: await corNaTela(20, 20) };
 }
 
 async function medirPortal(tema) {
@@ -115,7 +99,7 @@ console.log('\n  Escurecimento forçado do navegador\n');
 await cmd('Emulation.setAutoDarkModeOverride', { enabled: false });
 await sistema(false);
 const claroNormal = await medirApp(false);
-ok(claroIntacto(claroNormal.fundo.luz) && claroNormal.pupila.luz < 70, 'referência: tema claro com fundo claro e pupila escura');
+ok(claroIntacto(claroNormal.fundo.luz), 'referência: tema claro com fundo claro');
 
 // O caso relatado: tema claro escolhido no app, celular escurecendo sites. No Android o Chrome
 // só escurece sites com o sistema (ou o navegador) no escuro, e nesse estado a página recebe
@@ -127,7 +111,6 @@ await sistema(true);
 const antiga = process.env.ANTIGA === '1';
 const m = await medirApp(false, antiga ? 'light' : '');
 ok(claroIntacto(m.fundo.luz), 'tema claro escolhido: o navegador não escurece o fundo, luz ' + m.fundo.luz);
-ok(m.pupila.luz < 70, 'tema claro escolhido: a pupila do Bento continua escura, luz ' + m.pupila.luz);
 if (antiga) encerrar(falhas ? 1 : 0);
 
 // Sem escolha no app e sistema escuro: vale o tema escuro do próprio app, não o do navegador.
@@ -135,13 +118,9 @@ await sistema(true);
 const segueSistema = await medirApp(null);
 ok(Math.abs(segueSistema.fundo.r - ESCURO.r) < 8 && Math.abs(segueSistema.fundo.g - ESCURO.g) < 8 && Math.abs(segueSistema.fundo.b - ESCURO.b) < 8,
   'sem escolha e sistema escuro: aparece o escuro do app (' + ESCURO.hex + '), cor lida ' + JSON.stringify(segueSistema.fundo));
-ok(segueSistema.pupila.luz < 70, 'no escuro do app a pupila continua escura, luz ' + segueSistema.pupila.luz);
 
 const escuroEscolhido = await medirApp(true);
 ok(Math.abs(escuroEscolhido.fundo.r - ESCURO.r) < 8 && escuroEscolhido.fundo.luz < 40, 'tema escuro escolhido: o escuro do app, sem mistura');
-// Faltava medir o Bento neste caso: é o de quem usa o app no escuro, com o celular
-// escurecendo sites por cima. Se o navegador inverter o desenho, a pupila clareia.
-ok(escuroEscolhido.pupila.luz < 70, 'tema escuro escolhido: a pupila do Bento continua escura, luz ' + escuroEscolhido.pupila.luz);
 
 // O portal de entrada.
 ok(claroIntacto((await medirPortal(false)).luz), 'portal com tema claro escolhido: o navegador não escurece');

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#e6e6e6">
-<meta name="description" content="Plano de leitura bíblica de 365 dias, com trilha, ofensiva de dias seguidos e material de consulta.">
+<meta name="description" content="A Bíblia inteira em um ano, com os amigos e a sua célula: uma leitura por dia e reflexões para quem está começando.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Geração Eleita">
@@ -13,12 +13,14 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=/*VERSAO_ICONES*/">
 <link rel="icon" href="/*ICONE*/">
 <meta name="versao-app" content="/*VERSAO_APP*/">
+<!-- o conteúdo começa a descer junto com a página, antes do script que o pede -->
+<link rel="preload" href="/*CONTEUDO_ARQUIVO*/" as="fetch" crossorigin="anonymous">
 <title>Geração Eleita</title>
 <style>/*FONTES*/</style>
 <style>/*ESTILO*/</style>
 </head>
 <body>
-<script>try{var t=localStorage.getItem('cc.tema');if(t!==null)document.documentElement.dataset.tema=JSON.parse(t)?'escuro':'claro'}catch(e){}</script>
+<script>try{var t=localStorage.getItem('cc.tema');if(t!==null)document.documentElement.dataset.tema=JSON.parse(t)?'escuro':'claro'}catch(e){}if(navigator.standalone===true||/[?&]app-ios(&|$)/.test(location.search))document.documentElement.classList.add('app-ios')</script>
 /*ABERTURA*/
 <div class="aplicativo">
   <header class="topo" id="topo"></header>

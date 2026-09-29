@@ -18,6 +18,10 @@
     anotacoes: {},
     marcadoEm: {},
     licoesEm: {},
+    // Conhecer Jesus: número do dia (1 a 14) → data ISO em que a pessoa o terminou. Vive
+    // separado de "licoesEm" porque não é primeiro passo nem lição do plano, mas conta
+    // do mesmo jeito para a ofensiva.
+    conhecidos: {},
     pratica: {},
     foto: '',
     apelido: '',
@@ -26,19 +30,27 @@
     xpLegado: null,
     conquistasGanhas: {},
     maiorProposito: 0,
-    // o jogo: o que se fez em cada dia (para as missões), baús, quadro do mês e contadores
+    // o jogo: o que se fez em cada dia (para as missões), baús e contadores
     diario: {},
     bausAbertos: {},
-    quadros: {},
     notasVistas: [],
     acertosTotal: 0,
     missoesTotal: 0,
     semanasJuntos: {},
     // as datas do "Orei": só a data, para o propósito de oração; a oração continua só sua
     oradoEm: {},
+    // o último capítulo aberto na Bíblia livre: { livro, cap, em }, para continuar de onde parou
+    ultimaBiblia: null,
+    // marca-texto por versículo: { "João 3:16": { cor: 1..4, em } }; cor 0 é marca apagada
+    marcas: {},
+    // Minha história com Deus (Perfil): guia privado, nunca sai para amigo, célula,
+    // discipulado nem painel. { antes, encontro, hoje, em }.
+    historia: null,
+    // desafios de vários dias (aba Desafios): { [id]: { inicio, dias: [datas], ativo, concluidoEm, em } }
+    desafios: {},
   });
 
-  // O diário só precisa do mês corrente e do anterior: é o que as missões e o quadro leem.
+  // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
   const DIAS_DE_DIARIO = 70;
   function fundirDiario(a, b) {
     const saida = {};
@@ -57,19 +69,61 @@
     for (const velha of datas.slice(0, Math.max(0, datas.length - DIAS_DE_DIARIO))) delete saida[velha];
     return saida;
   }
-  function fundirQuadros(a, b) {
-    const saida = {};
-    for (const fonte of [a || {}, b || {}]) {
-      for (const [mes, pecas] of Object.entries(fonte)) saida[mes] = uniao(saida[mes], pecas).sort();
-    }
-    return saida;
-  }
   function fundirBaus(a, b) {
     const saida = { ...(b || {}) };
     for (const [chave, bau] of Object.entries(a || {})) {
       if (!saida[chave] || (bau.em || '') < (saida[chave].em || '')) saida[chave] = bau;
     }
     return saida;
+  }
+
+  // União por dia; quando os dois lados marcaram o mesmo dia do Conhecer, vale a data mais
+  // antiga: é a que corresponde a quando a pessoa terminou de verdade.
+  function fundirConhecidos(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [dia, data] of Object.entries(b || {})) {
+      if (!saida[dia] || data < saida[dia]) saida[dia] = data;
+    }
+    return saida;
+  }
+
+  // Vence a mudança mais recente de cada versículo. Apagar deixa { cor: 0 } com a data, senão
+  // o outro aparelho, que ainda tem a marca, a traria de volta na fusão. Passados 90 dias,
+  // todo aparelho já recebeu a lápide e ela pode sumir.
+  const LAPIDE_MS = 90 * 864e5;
+  function fundirMarcas(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [chave, m] of Object.entries(b || {})) {
+      if (!saida[chave] || (m.em || 0) > (saida[chave].em || 0)) saida[chave] = m;
+    }
+    const limite = Date.now() - LAPIDE_MS;
+    for (const [chave, m] of Object.entries(saida)) if (!m.cor && (m.em || 0) < limite) delete saida[chave];
+    return saida;
+  }
+
+  // Minha história com Deus: vence a cópia com "em" mais recente, sem misturar campo a
+  // campo (é um relato só, escrito de uma vez; misturar pedaços de dois textos não faz sentido).
+  // Desafios: os dias vencidos se somam entre aparelhos; "ativo" (e pausar) vale o mais recente.
+  function fundirDesafios(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [id, y] of Object.entries(b || {})) {
+      const x = saida[id];
+      if (!x) { saida[id] = y; continue; }
+      const novo = (y.em || 0) >= (x.em || 0) ? y : x;
+      saida[id] = {
+        inicio: [x.inicio, y.inicio].filter(Boolean).sort()[0] || '',
+        dias: uniao(x.dias, y.dias),
+        ativo: !!novo.ativo,
+        concluidoEm: [x.concluidoEm, y.concluidoEm].filter(Boolean).sort()[0] || '',
+        em: Math.max(x.em || 0, y.em || 0),
+      };
+    }
+    return saida;
+  }
+  function fundirHistoria(a, b) {
+    if (!a) return b || null;
+    if (!b) return a;
+    return (b.em || 0) >= (a.em || 0) ? b : a;
   }
 
   let E = VAZIO();
@@ -118,6 +172,7 @@
       anotacoes,
       marcadoEm: { ...(a.marcadoEm || {}), ...(b.marcadoEm || {}) },
       licoesEm: { ...(a.licoesEm || {}), ...(b.licoesEm || {}) },
+      conhecidos: fundirConhecidos(a.conhecidos, b.conhecidos),
       pratica: fundirPratica(a.pratica, b.pratica),
       foto: maisNovo.foto || a.foto || b.foto || '',
       apelido: maisNovo.apelido || a.apelido || b.apelido || '',
@@ -127,12 +182,16 @@
       maiorProposito: Math.max(a.maiorProposito || 0, b.maiorProposito || 0),
       diario: fundirDiario(a.diario, b.diario),
       bausAbertos: fundirBaus(a.bausAbertos, b.bausAbertos),
-      quadros: fundirQuadros(a.quadros, b.quadros),
       notasVistas: uniao(a.notasVistas, b.notasVistas).slice(-400),
       acertosTotal: Math.max(a.acertosTotal || 0, b.acertosTotal || 0),
       missoesTotal: Math.max(a.missoesTotal || 0, b.missoesTotal || 0),
       semanasJuntos: { ...(a.semanasJuntos || {}), ...(b.semanasJuntos || {}) },
       oradoEm: { ...(a.oradoEm || {}), ...(b.oradoEm || {}) },
+      // vale o capítulo aberto por último, em qualquer aparelho
+      ultimaBiblia: ((b.ultimaBiblia || {}).em || 0) >= ((a.ultimaBiblia || {}).em || 0) ? (b.ultimaBiblia || a.ultimaBiblia || null) : a.ultimaBiblia,
+      marcas: fundirMarcas(a.marcas, b.marcas),
+      historia: fundirHistoria(a.historia, b.historia),
+      desafios: fundirDesafios(a.desafios, b.desafios),
     };
   }
   function fundirPratica(a, b) {
@@ -172,17 +231,30 @@
     try { localStorage.setItem(CHAVE, JSON.stringify(E)); } catch (e) { /* segue */ }
   };
 
+  // O progresso vai inteiro a cada marcação, menos a foto: ela é quase todo o peso (uns 30 KB)
+  // e quase nunca muda. Vai só quando é diferente da que o servidor já tem; sem ela no
+  // pedido, a fusão do servidor fica com a que estava guardada.
+  let fotoNoServidor = null;
+  function corpoDoEnvio() {
+    const foto = E.foto || '';
+    if (foto && foto === fotoNoServidor) {
+      const { foto: _semFoto, ...resto } = E;
+      return { corpo: JSON.stringify(resto), foto };
+    }
+    return { corpo: JSON.stringify(E), foto };
+  }
+  function enviar() {
+    const { corpo, foto } = corpoDoEnvio();
+    return fetch('api/estado', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: corpo })
+      .then((r) => { if (r.ok) fotoNoServidor = foto; })
+      .catch(() => { servidorVivo = false; });
+  }
+
   let envioPendente;
   function enviarAoServidor() {
     if (!servidorVivo) return;
     clearTimeout(envioPendente);
-    envioPendente = setTimeout(() => {
-      fetch('api/estado', {
-        method: 'PUT',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(E),
-      }).catch(() => { servidorVivo = false; });
-    }, 600);
+    envioPendente = setTimeout(enviar, 600);
   }
 
   // Grava agora, sem esperar a pausa: o servidor precisa saber que a pessoa leu antes
@@ -190,11 +262,7 @@
   CC.salvarNoServidor = function () {
     if (!servidorVivo) return Promise.resolve();
     clearTimeout(envioPendente);
-    return fetch('api/estado', {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(E),
-    }).catch(() => { servidorVivo = false; });
+    return enviar();
   };
 
   CC.estado = () => E;
@@ -212,10 +280,26 @@
     const r = E.oia[dia];
     return !!r && Object.values(r).some((x) => (x || '').trim());
   };
+  // Marca-texto: a chave é "Livro cap:vers", um versículo por chave.
+  CC.marcaDe = (chave) => ((E.marcas || {})[chave] || {}).cor || 0;
+  CC.marcar = (chaves, cor) => {
+    const em = Date.now();
+    for (const k of chaves) (E.marcas ||= {})[k] = { cor, em };
+    CC.gravar('atualizadoEm', em);
+  };
+  CC.marcas = () => Object.entries(E.marcas || {}).filter(([, m]) => m.cor).map(([chave, m]) => ({ chave, cor: m.cor, em: m.em }));
+
   CC.anotacao = (chave) => (E.anotacoes || {})[chave] || '';
   CC.gravarAnotacao = (chave, texto) => {
     (E.anotacoes ||= {})[chave] = texto;
     CC.gravar('atualizadoEm', Date.now());
+  };
+
+  // Minha história com Deus: guia privado do Perfil. Só volta pela própria conta da pessoa
+  // (api/estado); nunca sai em amigos, célula, discipulado ou painel.
+  CC.minhaHistoria = () => E.historia || null;
+  CC.gravarHistoria = (antes, encontro, hoje) => {
+    CC.gravar('historia', { antes, encontro, hoje, em: Date.now() });
   };
 
   // ---------- marcação ----------
@@ -237,18 +321,27 @@
   };
 
   // O "Orei" do dia. Guarda só a data: é o que o propósito de oração enxerga.
-  CC.oreiHoje = () => !!(E.oradoEm || {})[CC.hojeIso()];
   CC.marcarOrei = () => {
     (E.oradoEm ||= {})[CC.hojeIso()] = 1;
     CC.gravar('oradoEm', E.oradoEm);
   };
 
+  // ---------- conhecer jesus ----------
+  CC.conhecido = (n) => !!(E.conhecidos || {})[n];
+  CC.marcarConhecido = (n) => {
+    (E.conhecidos ||= {})[n] = CC.hojeIso();
+    CC.gravar('conhecidos', E.conhecidos);
+  };
+  CC.conhecidos = () => Object.keys(E.conhecidos || {}).map(Number);
+
   // ---------- ofensiva e escudos ----------
-  // Uma data está feita quando houve lição do plano ou primeiros passos lidos até o fim.
+  // Uma data está feita quando houve lição do plano, primeiros passos lidos até o fim, ou
+  // um dia do Conhecer Jesus terminado: quem está nesse caminho também tem ofensiva.
   CC.datasFeitas = (estado) => {
     const s = new Set();
     for (const d of Object.values((estado || E).marcadoEm || {})) if (d) s.add(d);
     for (const d of Object.values((estado || E).licoesEm || {})) if (d) s.add(d);
+    for (const d of Object.values((estado || E).conhecidos || {})) if (d) s.add(d);
     return s;
   };
 
@@ -309,8 +402,6 @@
     return { ...s, recorde: Math.max(s.recorde, s.atual), total: datas.size };
   };
 
-  CC.protegido = (data) => CC.sequencia().protegidos.includes(data);
-
   // ---------- prática ----------
   CC.praticaDe = (unidade) => (E.pratica || {})[unidade] || { melhor: 0, total: 0, feitoEm: null };
 
@@ -351,16 +442,6 @@
   CC.xpTotal = () => E.lidos.length * CC.XP_LEITURA + E.licoes.length * CC.XP_LICAO
     + CC.xpPratica() + (E.xpLegado || 0);
 
-  CC.xpDoDia = (data) => {
-    const quando = data || CC.hojeIso();
-    let xp = 0;
-    for (const d of Object.values(E.marcadoEm || {})) if (d === quando) xp += CC.XP_LEITURA;
-    for (const d of Object.values(E.licoesEm || {})) if (d === quando) xp += CC.XP_LICAO;
-    for (const p of Object.values(E.pratica || {})) {
-      if (p.feitoEm === quando) xp += (p.melhor || 0) * CC.XP_PRATICA_ACERTO;
-    }
-    return xp;
-  };
 
   // ---------- livros ----------
   const DIAS_POR_LIVRO = (() => {
@@ -374,6 +455,12 @@
     return mapa;
   })();
   CC.totalLivros = DIAS_POR_LIVRO.size;
+  CC.ultimaBiblia = () => E.ultimaBiblia || null;
+  CC.guardarUltimaBiblia = (livro, cap) => {
+    const u = E.ultimaBiblia;
+    if (u && u.livro === livro && u.cap === cap) return;
+    CC.gravar('ultimaBiblia', { livro, cap, em: Date.now() });
+  };
   CC.progressoDoLivro = (livro) => {
     const dias = DIAS_POR_LIVRO.get(livro) || [];
     const lidos = new Set(E.lidos);
@@ -390,14 +477,14 @@
   CC.prepararFoto = function (arquivo) {
     return new Promise((resolver, rejeitar) => {
       if (!arquivo || !/^image\//.test(arquivo.type)) {
-        rejeitar(new Error('isso não é uma imagem'));
+        rejeitar(new Error('Isso não é uma imagem.'));
         return;
       }
       const leitor = new FileReader();
-      leitor.onerror = () => rejeitar(new Error('não consegui ler o arquivo'));
+      leitor.onerror = () => rejeitar(new Error('Não consegui ler o arquivo.'));
       leitor.onload = () => {
         const img = new Image();
-        img.onerror = () => rejeitar(new Error('não consegui abrir a imagem'));
+        img.onerror = () => rejeitar(new Error('Não consegui abrir a imagem.'));
         img.onload = () => {
           try {
             const lado = CC.LADO_FOTO;
@@ -409,7 +496,7 @@
             ctx.drawImage(img, (img.width - corte) / 2, (img.height - corte) / 2, corte, corte, 0, 0, lado, lado);
             resolver(tela.toDataURL('image/jpeg', 0.82));
           } catch (e) {
-            rejeitar(new Error('não consegui preparar a imagem'));
+            rejeitar(new Error('Não consegui preparar a imagem.'));
           }
         };
         img.src = leitor.result;
@@ -481,7 +568,7 @@
     const L = [];
     const nl = String.fromCharCode(10);
     const seq = CC.sequencia();
-    L.push('# Caminho com Cristo: meus registros', '');
+    L.push('# Geração Eleita: meus registros', '');
     L.push('Exportado em ' + CC.hojeIso() + '.', '');
     L.push('## Progresso', '');
     L.push('- Dias lidos: ' + E.lidos.length + ' de ' + D.plano.length);
@@ -506,7 +593,13 @@
     }
 
     const anot = E.anotacoes || {};
-    const chaves = Object.keys(anot).filter((k) => (anot[k] || '').trim()).sort();
+    const comTextoAnot = Object.keys(anot).filter((k) => (anot[k] || '').trim()).sort();
+    const deVerso = comTextoAnot.filter((k) => k.startsWith('verso:'));
+    if (deVerso.length) {
+      L.push('## Notas nos versículos', '');
+      for (const k of deVerso) L.push('### ' + k.slice(6), '', anot[k].trim(), '');
+    }
+    const chaves = comTextoAnot.filter((k) => !k.startsWith('verso:'));
     if (chaves.length) {
       L.push('## Anotações', '');
       for (const k of chaves) {
@@ -522,7 +615,7 @@
     const blob = new Blob([CC.montarExportacao()], { type: 'text/markdown;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'caminho-com-cristo-' + CC.hojeIso() + '.md';
+    a.download = 'geracao-eleita-' + CC.hojeIso() + '.md';
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
@@ -543,11 +636,10 @@
   };
 
   // ---------- tema ----------
-  CC.temaEscuro = () => document.documentElement.dataset.tema === 'escuro';
   CC.aplicarTema = (escuro) => {
     document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro';
     const cor = document.querySelector('meta[name="theme-color"]');
-    if (cor) cor.content = escuro ? '#15110b' : '#fdfbf5';
+    if (cor) cor.content = escuro ? '#0d0d0d' : '#e6e6e6'; // o --fundo de cada tema
   };
   // null segue o sistema; true e false fixam o escuro ou o claro.
   CC.guardarTema = (escuro) => {
@@ -594,6 +686,7 @@
           const d = await r.json();
           servidorVivo = true;
           doServidor = normalizar(d);
+          fotoNoServidor = (doServidor && doServidor.foto) || '';
         }
       } catch (e) { servidorVivo = false; }
     }

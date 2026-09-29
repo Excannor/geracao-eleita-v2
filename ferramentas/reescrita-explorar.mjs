@@ -8,6 +8,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { semAcento, textoPlano } from './texto-app.mjs';
+import { semCitacao } from './versiculos-explorar.mjs';
 
 const PASTA = join(dirname(fileURLToPath(import.meta.url)), 'explorar');
 const resumoDe = (html) => createHash('sha1').update(html).digest('hex').slice(0, 16);
@@ -24,7 +25,11 @@ export function aplicarExplorar(dados) {
       if (!n) { faltando.push(id); continue; }
       if (resumoDe(n.html) !== nova.origem) {
         // já aplicada numa rodada anterior: o html atual é o próprio texto novo
-        if (n.html !== nova.html) desatualizadas.push(id);
+        // a citação do versículo é trocada depois pelo texto das Bíblias do app
+        // (versiculos-explorar.mjs), então não conta como diferença
+        if (semCitacao(n.html) !== semCitacao(nova.html)) desatualizadas.push(id);
+        // a busca acompanha o texto que está na nota (correções feitas direto no html)
+        n.t = semAcento(n.nome + ' ' + textoPlano(n.html));
         continue;
       }
       n.html = nova.html;

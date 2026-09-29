@@ -1,4 +1,4 @@
-/* O jogo: missões do dia, baús da trilha, cartas, quadro do mês, conquistas com níveis e
+/* O jogo: missões do dia, baús da trilha, conquistas com níveis e
    troféus. Tudo é contado a partir de um estado e de uma data passados por parâmetro: o
    servidor carrega este mesmo arquivo para conferir o que alguém publica no Feed.
    Orar e escrever continuam fora de qualquer contagem. */
@@ -70,8 +70,8 @@
     licao: { texto: 'Conclua a lição do dia', alvo: 1, icone: 'livro', cor: 'verde' },
     capitulos: { texto: 'Leia 4 capítulos', alvo: 4, icone: 'marcador', cor: 'azul', familia: 'ler' },
     maratona: { texto: 'Leia 8 capítulos', alvo: 8, icone: 'marcador', cor: 'azul', familia: 'ler' },
-    pratica: { texto: 'Faça uma rodada no Praticar', alvo: 1, icone: 'alvo', cor: 'vermelho', familia: 'pratica' },
-    acertos: { texto: 'Acerte 6 perguntas no Praticar', alvo: 6, icone: 'alvo', cor: 'vermelho', familia: 'pratica' },
+    pratica: { texto: 'Faça uma rodada no Praticar', alvo: 1, icone: 'alvo', cor: 'verde', familia: 'pratica' },
+    acertos: { texto: 'Acerte 6 perguntas no Praticar', alvo: 6, icone: 'alvo', cor: 'verde', familia: 'pratica' },
     leitor: { texto: 'Termine uma leitura aqui no app', alvo: 1, icone: 'folha', cor: 'turquesa' },
     fundo: { texto: 'Abra 2 notas para ir mais fundo', alvo: 2, icone: 'bussola', cor: 'roxo' },
     passo: { texto: 'Leia um dos Primeiros passos', alvo: 1, icone: 'bandeira', cor: 'roxo', so: (e) => e.licoes.length < D.licoes.length },
@@ -128,8 +128,8 @@
     });
   };
 
-  // No aparelho: fixa as missões de hoje, soma as que ficaram prontas e entrega a peça
-  // do quadro quando as três fecham. Devolve o que mudou, para a tela celebrar.
+  // No aparelho: fixa as missões de hoje e soma as que ficaram prontas. Devolve o que
+  // mudou, para a tela celebrar.
   CC.conferirMissoes = (ctx) => {
     const E = CC.estado();
     const hoje = CC.hojeIso();
@@ -145,17 +145,15 @@
     if (mudou) CC.gravar('diario', diario);
     if (novas) CC.gravar('missoesTotal', (E.missoesTotal || 0) + novas);
 
-    let peca = false;
-    if (feitas === lista.length) {
-      const mes = hoje.slice(0, 7);
-      const quadros = { ...(E.quadros || {}) };
-      if (!(quadros[mes] || []).includes(hoje)) {
-        quadros[mes] = [...(quadros[mes] || []), hoje].sort();
-        CC.gravar('quadros', quadros);
-        peca = true;
-      }
-    }
-    return { lista, novas, peca };
+    return { lista, novas };
+  };
+
+  // Só para o pontinho do Mais, quando Desafios está lá dentro (sem mexer no diário, sem
+  // contar conquista): há algum dos três desafios de hoje ainda não feito?
+  CC.haDesafioPendenteHoje = () => {
+    const E = CC.estado();
+    const ctx = { amigos: !!((CC.amigosEmCache && CC.amigosEmCache()) || {}).amigos?.length };
+    return CC.missoesDoDia(CC.hojeIso(), E, ctx).some((m) => !m.feita);
   };
 
   // Horas até a meia-noite, para o "faltam 5 horas" das missões.
@@ -166,52 +164,10 @@
     return Math.max(1, Math.ceil((fim - agora) / 3600000));
   };
 
-  // ---------- quadro do mês ----------
-  // Cada dia com as três missões feitas revela uma peça do retrato do mês. Nove peças
-  // completam o quadro, que fica na estante de troféus.
-  CC.PECAS_QUADRO = 9;
-  const RETRATOS = ['Noé', 'Abraão', 'José', 'Moisés', 'Rute', 'Davi', 'Elias', 'Ester', 'Daniel', 'Jonas', 'Maria', 'Pedro'];
-  const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-  CC.nomeDoMes = (mes) => MESES[Number(String(mes).slice(5, 7)) - 1] || '';
-
-  CC.quadroDoMes = (mes, e) => {
-    mes = mes || CC.hojeIso().slice(0, 7);
-    const dias = ((est(e).quadros || {})[mes]) || [];
-    // a ordem em que as peças aparecem também sai do mês, e é igual em todo aparelho
-    const ordem = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    let h = semente(mes);
-    for (let i = ordem.length - 1; i > 0; i--) {
-      h = (Math.imul(h, 1103515245) + 12345) >>> 0;
-      const j = h % (i + 1);
-      [ordem[i], ordem[j]] = [ordem[j], ordem[i]];
-    }
-    const quantas = Math.min(CC.PECAS_QUADRO, dias.length);
-    return {
-      mes,
-      nome: CC.nomeDoMes(mes),
-      personagem: RETRATOS[Number(mes.slice(5, 7)) - 1] || 'Davi',
-      pecas: ordem.slice(0, quantas),
-      quantas,
-      completo: quantas >= CC.PECAS_QUADRO,
-    };
-  };
-  CC.quadrosCompletos = (e) => Object.keys(est(e).quadros || {})
-    .filter((mes) => CC.quadroDoMes(mes, e).completo).sort();
-
   // ---------- baús da trilha ----------
   // A cada sete dias lidos a trilha tem um baú, e dentro dele vai um versículo tirado
   // justamente desses sete dias: o baú guarda a memória do trecho que a pessoa acabou de
   // ler, e não um brinde avulso. A referência de cada dia já existe em CC.reflexaoDoDia.
-  //
-  // O array de personagens continua aqui, sem uso na tela, esperando a arte nova. Antes o
-  // baú sorteava uma carta daqui; quando os personagens saíram da interface, ele seguiu
-  // sorteando e gravando cartas que ninguém via.
-  CC.CARTAS = ['Noé', 'Abraão', 'Sara', 'José', 'Moisés', 'Josué', 'Rute', 'Samuel', 'Davi', 'Salomão',
-    'Elias', 'Ester', 'Jó', 'Isaías', 'Jeremias', 'Ezequiel', 'Daniel', 'Jonas', 'Maria', 'Pedro', 'João', 'Paulo'];
-  CC.cartas = (e) => {
-    const vistas = new Set(Object.values(est(e).bausAbertos || {}).map((b) => b.carta).filter(Boolean));
-    return CC.CARTAS.filter((c) => vistas.has(c));
-  };
   CC.temBau = (numero) => numero % 7 === 0;
   CC.chaveBau = (numero) => 'dia:' + numero;
   CC.bauAberto = (numero, e) => !!(est(e).bausAbertos || {})[CC.chaveBau(numero)];
@@ -262,28 +218,58 @@
     { id: 'chama', titulo: 'Chama acesa', icone: 'chama', cor: 'vermelho', niveis: [3, 7, 30, 100, 365],
       texto: (n) => 'Chegue a ' + n + ' dias de ofensiva',
       valor: (e, hoje) => CC.simularOfensiva(CC.datasFeitas(e), hoje).recorde },
-    { id: 'leitor', titulo: 'Todo dia na Palavra', icone: 'marcador', cor: 'verde', niveis: [10, 50, 100, 200, 365],
+    { id: 'leitor', titulo: 'Todo dia na Palavra', icone: 'dia-visto', cor: 'verde', niveis: [10, 50, 100, 200, 365],
       texto: (n) => 'Leia ' + n + ' dias do plano', valor: (e) => e.lidos.length },
     { id: 'capitulos', titulo: 'Página a página', icone: 'folha', cor: 'azul', niveis: [50, 200, 500, 900, 1189],
       texto: (n) => 'Leia ' + n + ' capítulos', valor: (e) => CC.capitulosLidos(e) },
-    { id: 'livros', titulo: 'Estante', icone: 'livro', cor: 'turquesa', niveis: [1, 5, 20, 40, 66],
+    { id: 'livros', titulo: 'Estante', icone: 'estante', cor: 'turquesa', niveis: [1, 5, 20, 40, 66],
       texto: (n) => (n === 1 ? 'Termine um livro da Bíblia' : 'Termine ' + n + ' livros'), valor: (e) => livrosCompletosDe(e) },
-    { id: 'passos', titulo: 'Alicerce', icone: 'bandeira', cor: 'roxo', niveis: [1, 4, 8, 12],
+    { id: 'passos', titulo: 'Primeiros passos', icone: 'pegadas', cor: 'roxo', niveis: [1, 4, 8, 12],
       texto: (n) => (n === 1 ? 'Leia o primeiro dos Primeiros passos' : 'Leia ' + n + ' dos Primeiros passos'), valor: (e) => e.licoes.length },
-    { id: 'memoria', titulo: 'Memória', icone: 'alvo', cor: 'vermelho', niveis: [10, 50, 150, 400, 1000],
+    { id: 'memoria', titulo: 'Memória', icone: 'cartoes', cor: 'turquesa', niveis: [10, 50, 150, 400, 1000],
       texto: (n) => 'Acerte ' + n + ' perguntas no Praticar', valor: (e) => e.acertosTotal || 0 },
     { id: 'proposito', titulo: 'Lado a lado', icone: 'pessoas', cor: 'azul', niveis: [3, 7, 30, 100, 365],
       texto: (n) => 'Chegue a ' + n + ' dias num propósito dos amigos', valor: (e) => e.maiorProposito || 0 },
-    { id: 'missoes', titulo: 'Dia após dia', icone: 'estrela', cor: 'amarelo', niveis: [5, 25, 100, 250, 500],
+    { id: 'missoes', titulo: 'Dia após dia', icone: 'lista-visto', cor: 'amarelo', niveis: [5, 25, 100, 250, 500],
       texto: (n) => 'Complete ' + n + ' desafios', valor: (e) => e.missoesTotal || 0 },
     // O id segue 'cartas' de propósito: quem já tinha nível guardado em conquistasGanhas
     // não perde o que conquistou. O que mudou foi o que se junta — versículos, não cartas.
     // Os níveis acompanham o ano: são 52 baús, um a cada sete dias.
-    { id: 'cartas', titulo: 'Versículos guardados', icone: 'marcador', cor: 'amarelo', niveis: [3, 10, 26, 52],
+    { id: 'cartas', titulo: 'Versículos guardados', icone: 'bau', cor: 'amarelo', niveis: [3, 10, 26, 52],
       texto: (n) => 'Guarde ' + n + ' versículos nos baús', valor: (e) => CC.versiculosGuardados(e).length },
     { id: 'explorador', titulo: 'Explorador', icone: 'bussola', cor: 'roxo', niveis: [5, 20, 60, 150],
       texto: (n) => 'Abra ' + n + ' notas de estudo', valor: (e) => (e.notasVistas || []).length },
+    // Constância, não sequência perfeita: semanas (segunda a domingo) com 4 dias ou mais de leitura.
+    { id: 'semanas', titulo: 'Semanas na Palavra', icone: 'semana', cor: 'verde', niveis: [4, 12, 26, 52],
+      texto: (n) => 'Leia 4 dias ou mais em ' + n + ' semanas', valor: (e) => semanasNaPalavra(e) },
+    // Voltar depois de uma pausa merece festa, não culpa (Lm 3.22-23).
+    { id: 'recomeco', titulo: 'Recomeço', icone: 'broto', cor: 'verde', niveis: [1, 3, 10],
+      texto: (n) => (n === 1 ? 'Volte a ler depois de uma pausa' : 'Volte a ler depois de ' + n + ' pausas'), valor: (e) => recomecos(e) },
+    { id: 'marcas', titulo: 'Marca-texto', icone: 'marca-texto', cor: 'amarelo', niveis: [5, 25, 100, 300],
+      texto: (n) => 'Marque ' + n + ' versículos', valor: (e) => Object.values(e.marcas || {}).filter((m) => m && m.cor).length },
+    // Conta só quantas notas existem; o texto nunca é lido aqui.
+    { id: 'notas', titulo: 'Caderno de notas', icone: 'caderno', cor: 'azul', niveis: [5, 25, 100],
+      texto: (n) => 'Escreva nota em ' + n + ' versículos',
+      valor: (e) => Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
   ];
+
+  // Semana de segunda a domingo, pela data da segunda-feira.
+  function segundaDe(iso) {
+    const d = new Date(iso + 'T12:00:00Z');
+    return CC.somaDias(iso, -((d.getUTCDay() + 6) % 7));
+  }
+  function semanasNaPalavra(e) {
+    const porSemana = new Map();
+    for (const d of CC.datasFeitas(e)) { const s = segundaDe(d); porSemana.set(s, (porSemana.get(s) || 0) + 1); }
+    return [...porSemana.values()].filter((n) => n >= 4).length;
+  }
+  // Quantas vezes a pessoa leu de novo depois de ficar 2 dias ou mais sem ler.
+  function recomecos(e) {
+    const datas = [...CC.datasFeitas(e)].sort();
+    let n = 0;
+    for (let i = 1; i < datas.length; i++) if (datas[i] > CC.somaDias(datas[i - 1], 2)) n++;
+    return n;
+  }
 
   CC.conquistasComNivel = (e, hoje) => {
     e = est(e);
@@ -320,7 +306,7 @@
     e = est(e);
     const colecoes = CC.COLECOES.map(([titulo, livros]) => {
       const feitos = livros.filter((l) => CC.livroCompletoEm(l, e)).length;
-      return { tipo: 'colecao', titulo, feitos, total: livros.length, ganho: feitos === livros.length };
+      return { tipo: 'colecao', cor: 'azul', titulo, feitos, total: livros.length, ganho: feitos === livros.length };
     });
     const lidos = new Set(e.lidos);
     const unidades = D.unidades.map((u) => {
@@ -329,8 +315,21 @@
       const total = u.ate - u.de + 1;
       return { tipo: 'unidade', numero: u.numero, titulo: 'Unidade ' + u.numero, sub: u.titulo, cor: u.cor, feitos, total, ganho: feitos === total };
     });
-    const quadros = CC.quadrosCompletos(e).map((mes) => ({ tipo: 'quadro', mes, ...CC.quadroDoMes(mes, e), ganho: true }));
-    return { colecoes, unidades, quadros };
+    // Desafios de vários dias (09c-desafios.js): um troféu por desafio concluído.
+    const desafios = (CC.DESAFIOS || []).map((d) => { const s = CC.situacaoDesafio(d, e); return { tipo: 'desafio', cor: 'vermelho', titulo: d.titulo, feitos: s.vencidos, total: d.dias, ganho: s.concluido }; });
+    // Testamentos: as cinco primeiras partes são o Antigo, as outras o Novo.
+    const livrosDe = (lista) => lista.flatMap(([, livros]) => livros);
+    const testamento = (titulo, livros) => {
+      const feitos = livros.filter((l) => CC.livroCompletoEm(l, e)).length;
+      return { tipo: 'testamento', cor: 'turquesa', titulo, feitos, total: livros.length, ganho: feitos === livros.length };
+    };
+    const testamentos = [
+      testamento('Antigo Testamento', livrosDe(CC.COLECOES.slice(0, 5))),
+      testamento('Novo Testamento', livrosDe(CC.COLECOES.slice(5))),
+      testamento('Bíblia inteira', livrosDe(CC.COLECOES)),
+      { tipo: 'plano', cor: 'verde', titulo: 'Plano de um ano', feitos: lidos.size, total: 365, ganho: lidos.size >= 365 },
+    ];
+    return { colecoes, unidades, desafios, testamentos };
   };
 
   // ---------- novidades: o que o servidor confere ----------
@@ -356,10 +355,9 @@
     }
     if (tipo === 'livro') return LIVROS.has(dados.livro) && CC.livroCompletoEm(dados.livro, e) ? 'livro:' + dados.livro : null;
     if (tipo === 'unidade') return CC.unidadeCompletaEm(dados.numero, e) ? 'unidade:' + Number(dados.numero) : null;
-    if (tipo === 'quadro') return /^\d{4}-\d{2}$/.test(dados.mes || '') && CC.quadroDoMes(dados.mes, e).completo ? 'quadro:' + dados.mes : null;
     if (tipo === 'versiculo') {
-      const m = /^(.+?) (\d{1,3})\.(\d{1,3})(?:-(\d{1,3}))?$/.exec(String(dados.ref || ''));
-      if (!m || !LIVROS.has(m[1])) return null;
+      const r = CC.lerRef(dados.ref);
+      if (!r || !LIVROS.has(r.livro)) return null;
       return 'versiculo:' + dados.ref + ':' + hoje;
     }
     return null;

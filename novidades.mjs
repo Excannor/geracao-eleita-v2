@@ -1,5 +1,5 @@
 // Novidades: o mural do que os amigos alcançaram. Só entra marco que o servidor confere
-// no progresso de quem publica (ofensiva, livro, unidade, conquista, quadro do mês) e
+// no progresso de quem publica (ofensiva, livro, unidade, conquista) e
 // o versículo que a pessoa escolheu guardar. Nada do que alguém escreve ou ora vira
 // novidade, e texto livre não existe aqui: o mural não precisa de moderação.
 import { readFile, writeFile, rename, mkdir } from 'node:fs/promises';
@@ -7,7 +7,6 @@ import { dirname } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { abrirModulo, concluirImportacao, lerTabela, sincronizar } from './db.mjs';
 
-export const MARCOS_OFENSIVA = [7, 14, 30, 50, 100, 150, 200, 250, 300, 365];
 export const MARCOS_PROPOSITO = [7, 30, 100, 365];
 export const VIDA_NOVIDADE = 30 * 24 * 60 * 60 * 1000;
 const POR_AUTOR = 80;

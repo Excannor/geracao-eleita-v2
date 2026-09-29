@@ -31,7 +31,9 @@
     const dados = await CC.carregarNotificacoes();
     if (Notification.permission === 'denied') return { situacao: 'bloqueado', dados };
     const sub = await inscricaoDoAparelho().catch(() => null);
-    const ativo = !!(sub && dados && (dados.aparelhos || []).includes(sub.endpoint));
+    // Inscrição feita com a chave de outro servidor não recebe nada: conta como desligada.
+    const chaveCerta = !(sub && sub.options && sub.options.applicationServerKey && dados && chaveEmTexto(sub.options.applicationServerKey) !== dados.chave);
+    const ativo = !!(sub && dados && chaveCerta && (dados.aparelhos || []).includes(sub.endpoint));
     return { situacao: ativo ? 'ativo' : 'desligado', dados };
   };
 
@@ -40,10 +42,10 @@
   CC.ativarNotificacoes = async function () {
     const permissao = await Notification.requestPermission();
     if (permissao !== 'granted') {
-      throw new Error(permissao === 'denied' ? 'as notificações ficaram bloqueadas neste aparelho' : 'sem permissão, sem notificação');
+      throw new Error(permissao === 'denied' ? 'As notificações ficaram bloqueadas neste aparelho.' : 'Sem permissão, sem notificação.');
     }
     const dados = cache || await CC.carregarNotificacoes();
-    if (!dados) throw new Error('não consegui falar com o servidor agora');
+    if (!dados) throw new Error('Não consegui falar com o servidor agora.');
     let reg = await navigator.serviceWorker.getRegistration();
     if (!reg) reg = await navigator.serviceWorker.register('sw.js');
     await navigator.serviceWorker.ready;
@@ -56,7 +58,7 @@
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: bytesDaChave(dados.chave) });
     await CC.api('api/notificacoes/inscrever', { inscricao: sub.toJSON() });
     await CC.carregarNotificacoes();
-    try { localStorage.setItem('cc.aviso.push', 'feito'); } catch (e) { /* segue */ }
+    try { localStorage.setItem('cc.aviso.push', 'feito'); localStorage.removeItem('cc.push.desligado'); } catch (e) { /* segue */ }
   };
 
   CC.desativarNotificacoes = async function () {
@@ -65,6 +67,8 @@
       await CC.api('api/notificacoes/cancelar', { endpoint: sub.endpoint }).catch(() => {});
       await sub.unsubscribe().catch(() => {});
     }
+    // Desligou por escolha: o conserto automático abaixo não religa.
+    try { localStorage.setItem('cc.push.desligado', '1'); } catch (e) { /* segue */ }
     await CC.carregarNotificacoes();
   };
 
@@ -94,7 +98,7 @@
   };
 
   CC.vistaNotificacoes = async function (raiz) {
-    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1><div class="leitor-esqueleto"><i></i><i></i></div>';
+    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1>' + CC.esqueleto('lista');
     const e = await CC.estadoNotificacoes();
     if (!location.hash.startsWith('#/config/notificacoes')) return;
     const p = (e.dados && e.dados.preferencias) || { lembrete: true, hora: '19:00', ofensiva: true, amigos: true };
@@ -109,7 +113,7 @@
         'A Apple só entrega notificações para o app aberto pelo ícone da tela de início.',
         '<button class="botao" data-instalar>Ver como instalar</button>'),
       bloqueado: cartao('cadeado', 'As notificações estão bloqueadas',
-        ehIos() ? 'Abra os Ajustes do iPhone, entre em Notificações, toque em Caminho e ative.'
+        ehIos() ? 'Abra os Ajustes do iPhone, entre em Notificações, toque em Geração Eleita e ative.'
           : 'Toque no cadeado ao lado do endereço, ou nas informações do app no celular, e permita notificações.', ''),
       'sem-suporte': cartao('info', 'Este navegador não recebe notificações', 'No Android, use o Chrome. No iPhone, instale o app pela tela de início.', ''),
       'sem-servidor': cartao('info', 'Sem servidor, sem notificação', 'Abra o app pelo endereço dele para ativar.', ''),
@@ -124,7 +128,6 @@
         + interruptor('ofensiva', 'Ofensiva em risco', 'Às 21h, se a sua chama ainda não foi acesa', p.ofensiva)
         + interruptor('amigos', 'Amigos', 'Toques, pedidos e convites aceitos', p.amigos)
         + '</div></section>'
-        + '<p class="passo-dica pequena">Nada chega entre 22h30 e 7h. Quem fica uns dias sem ler recebe só três recados espaçados, e depois o app espera você voltar.</p>'
       : '';
 
     raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1>' + topo + preferencias
@@ -172,15 +175,48 @@
     }
   };
 
+  // ---------- o conserto ----------
+  // A pessoa ligou as notificações, mas a inscrição deste aparelho não vale mais (o servidor
+  // trocou de chave, ou a descartou porque o serviço de push recusou). Ao abrir o app, ela é
+  // refeita em silêncio. Se o celular exigir um toque para isso, pergunta uma vez por dia.
+  async function religar() {
+    if (!(CC.quem && CC.quem.comSenha)) return;
+    try { if (localStorage.getItem('cc.push.desligado')) return; } catch (e) { return; }
+    const e = await CC.estadoNotificacoes().catch(() => null);
+    if (!e || e.situacao !== 'desligado') return;
+    try { await CC.ativarNotificacoes(); return; } catch (err) { /* segue para o pedido */ }
+    const marca = 'religar:' + CC.hojeIso();
+    try {
+      if (localStorage.getItem('cc.aviso.religar') === marca) return;
+      localStorage.setItem('cc.aviso.religar', marca);
+    } catch (err) { return; }
+    if (document.querySelector('.cortina, .tela-cheia')) return;
+    CC.folha('<p class="fala-bento pequena">As notificações pararam neste celular.</p>'
+      + '<p>Um toque e o lembrete da leitura volta a chegar.</p>'
+      + '<div class="acoes"><button class="botao" data-sim>Religar</button>'
+      + '<button class="botao plano" data-nao>Agora não</button></div>', {
+      rotulo: 'Notificações',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-nao]').onclick = fechar;
+        folha.querySelector('[data-sim]').onclick = async () => {
+          const ativando = CC.ativarNotificacoes();
+          fechar();
+          try { await ativando; CC.avisar('Notificações religadas!'); } catch (err) { CC.avisar(err.message); }
+        };
+      },
+    });
+  }
+
   // ---------- o convite para ativar ----------
   // Uma pergunta só, na hora em que faz sentido: o app já aberto pelo ícone (no iPhone é
   // o único jeito de receber) e a pessoa ainda não decidiu. "Agora não" pergunta de novo
   // uma única vez, uma semana depois, e nunca mais.
   CC.talvezOferecerNotificacoes = function () {
-    if (!suportado() || !CC.rodandoComoApp() || Notification.permission !== 'default') return;
+    if (suportado() && CC.rodandoComoApp() && Notification.permission === 'granted') { religar(); return; }
+    // No iPhone só há notificação com o app instalado (suportado() já dá falso fora dele); no
+    // Android o navegador também aceita, então o pedido vem logo depois do tutorial de instalar.
+    if (!suportado() || Notification.permission !== 'default') return;
     if (!(CC.quem && CC.quem.comSenha)) return;
-    // Primeiro a pessoa conhece o app lendo; o pedido vem depois da primeira leitura.
-    if (!CC.ler('lidos', []).length) return;
     let marca = '';
     try { marca = localStorage.getItem('cc.aviso.push') || ''; } catch (e) { return; }
     if (marca === 'feito' || marca === 'nunca') return;

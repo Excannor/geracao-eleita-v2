@@ -18,7 +18,7 @@ export const PESSOAS_C = {
   'Miriã': {
     sub: 'Êxodo e deserto',
     resumo: 'Irmã de Moisés. Ainda menina ajudou a salvar o irmão no rio Nilo e, adulta, liderou o louvor depois do mar Vermelho.',
-    quem: 'Irmã mais velha de Moisés e de Arão. Ainda menina, vigia o cesto do irmão bebê no rio Nilo e, quando a filha do faraó o encontra, sugere chamar uma mulher hebreia pra amamentá-lo: a própria mãe deles (Êxodo 2.4-8). Adulta e reconhecida como profetisa, pega um tamborim e lidera as mulheres num canto de vitória depois da travessia do mar Vermelho (Êxodo 15.20-21).',
+    quem: 'Irmã de Moisés e de Arão. Ainda menina, vigia o cesto do irmão bebê no rio Nilo e, quando a filha do faraó o encontra, sugere chamar uma mulher hebreia pra amamentá-lo: a própria mãe deles (Êxodo 2.4-8). Adulta e reconhecida como profetisa, pega um tamborim e lidera as mulheres num canto de vitória depois da travessia do mar Vermelho (Êxodo 15.20-21).',
     onde: 'Êxodo 2 e 15.20-21; Números 12 e 20.1.',
     deus: 'Deus usa Miriã pra salvar o irmão e pra liderar a adoração do povo. A mesma Miriã, mais tarde, se junta a Arão pra questionar a autoridade de Moisés e é atingida por uma doença de pele (Números 12).\n\nQuem já foi muito usado por Deus também precisa ser corrigido quando se levanta contra o que ele estabeleceu. E Moisés, o irmão criticado, ora pela cura dela. Deus corrige sem abandonar: depois de sete dias, Miriã volta ao acampamento.',
     erros: 'Com Arão, criticou Moisés por causa da esposa cuxita e questionou se Deus falava só por meio dele (Números 12.1-2).',
@@ -33,8 +33,8 @@ export const PESSOAS_C = {
   },
   'Natã': {
     sub: 'Reino de Israel · por volta de 1000 a.C.',
-    resumo: 'O profeta que levou a Davi a maior promessa e, anos depois, a acusação mais dura: você é esse homem.',
-    quem: 'Profeta na corte do rei Davi. Leva a Davi a promessa de que a família dele reinaria pra sempre (2 Samuel 7). Anos depois, volta com uma história sobre um homem rico que rouba a única ovelhinha de um pobre. Davi fica indignado e condena o homem, e Natã responde: você é esse homem. Era a história do pecado de Davi com Bate-Seba e Urias. Mais tarde, Natã ajuda a garantir que Salomão seja o rei.',
+    resumo: 'O profeta que levou a Davi a maior promessa e, anos depois, a acusação mais dura: você é o homem rico da história.',
+    quem: 'Profeta na corte do rei Davi. Leva a Davi a promessa de que a família dele reinaria pra sempre (2 Samuel 7). Anos depois, volta com uma história sobre um homem rico que rouba a única ovelhinha de um pobre. Davi fica indignado e condena o homem, e Natã responde: você é o homem rico da história. Era a história do pecado de Davi com Bate-Seba e Urias. Mais tarde, Natã ajuda a garantir que Salomão seja o rei.',
     onde: '2 Samuel 7 e 12; 1 Reis 1; 1 Crônicas 17.',
     deus: 'Natã levou a Davi tanto a promessa quanto a acusação, sem suavizar nenhuma das duas. Ser próximo de Deus não livrou Davi de ser confrontado quando pecou.\n\nNatã usou uma história pra Davi enxergar o próprio pecado. Davi se arrependeu, e o Salmo 51 mostra esse arrependimento. A correção de Deus busca trazer a pessoa de volta.',
   },
@@ -51,15 +51,15 @@ export const PESSOAS_C = {
     resumo: 'Um líder religioso que foi falar com Jesus de noite. Ouviu sobre nascer de novo e, aos poucos, tomou coragem.',
     quem: 'Fariseu e membro do conselho dos líderes judeus. Procura Jesus de noite pra conversar, e Jesus fala sobre nascer de novo, o que Nicodemos não entende de primeira. Mais tarde defende, sozinho, que Jesus tivesse um julgamento justo. Depois da crucificação, ajuda a preparar o corpo de Jesus pro sepultamento, com uma grande quantidade de perfumes.',
     onde: 'João 3, 7.50-52 e 19.39.',
-    deus: 'Foi pra Nicodemos, um líder religioso respeitado, que Jesus disse: Deus amou o mundo de tal maneira que deu o seu Filho único, pra que todo aquele que nele crê não morra, mas tenha a vida eterna (João 3.16). Ser religioso e conhecer a lei não bastava. Nicodemos precisava nascer de novo, como qualquer pessoa.\n\nA história dele vai da visita escondida, de noite, ao gesto público de cuidar do corpo de Jesus. A fé dele cresceu devagar, e cresceu.',
-    erros: 'Foi falar com Jesus de noite, provavelmente pra não ser visto pelos outros líderes, e só assumiu em público o cuidado com Jesus depois da crucificação.',
+    deus: 'Foi pra Nicodemos, um líder religioso respeitado, que Jesus disse: Deus amou tanto o mundo que deu o seu Filho único para que todo aquele que crer nele não pereça, mas tenha a vida eterna (João 3.16). Ser religioso e conhecer a lei não bastava. Nicodemos precisava nascer de novo, como qualquer pessoa.\n\nA história dele vai da visita de noite ao gesto público de cuidar do corpo de Jesus. A fé dele cresceu devagar, e cresceu.',
+    erros: 'Mesmo sendo mestre em Israel, não entendeu de primeira o que Jesus dizia sobre nascer de novo, e Jesus estranhou isso (João 3.9-10).',
   },
   'Noé': {
     sub: 'Início da história',
     resumo: 'Construiu a arca quando todo mundo tinha se corrompido. Depois do dilúvio, Deus fez com ele a aliança do arco-íris.',
-    quem: 'Gênesis descreve Noé como um homem justo e íntegro no meio de uma geração corrompida, alguém que andava com Deus. Deus manda Noé construir uma arca pra salvar a família e os animais do dilúvio. Depois que as águas baixam, Noé recomeça a vida na terra e recebe uma aliança de Deus.',
+    quem: 'Gênesis descreve Noé como um homem justo e íntegro no meio de uma geração corrompida, alguém que vivia de acordo com a vontade de Deus. Deus manda Noé construir uma arca pra salvar a família e os animais do dilúvio. Depois que as águas baixam, Noé recomeça a vida na terra e recebe uma aliança de Deus.',
     onde: 'Gênesis 6-9; citado em Hebreus 11.7 e 2 Pedro 2.5.',
-    deus: 'Deus leva o mal a sério e julga, e antes do julgamento abre um caminho de salvação. Pedro chama Noé de pregador da justiça (2 Pedro 2.5).\n\nDepois do dilúvio, Deus reconhece que o coração humano continua inclinado pro mal (Gênesis 8.21) e mesmo assim promete sustentar a terra. O arco-íris é o sinal desse compromisso.',
+    deus: 'Deus leva o mal a sério e julga, e antes do julgamento abre um caminho de salvação. Pedro lembra que Noé era o único homem que falava a favor de Deus (2 Pedro 2.5).\n\nDepois do dilúvio, Deus reconhece que o coração humano continua inclinado pro mal (Gênesis 8.21) e mesmo assim promete sustentar a terra. O arco-íris é o sinal desse compromisso.',
     erros: 'Depois do dilúvio, se embriagou e ficou nu dentro da tenda. O episódio termina com uma maldição sobre Canaã, um dos netos dele (Gênesis 9.20-27). Esse texto foi usado por muito tempo, de forma errada, pra justificar a escravidão de pessoas negras. A Bíblia não diz nada disso.',
   },
   'Paulo': {
@@ -90,7 +90,7 @@ export const PESSOAS_C = {
     resumo: 'Uma prostituta de Jericó que escondeu os espiões de Israel, confiou no Deus deles e entrou na família de Jesus.',
     quem: 'Mulher cananeia de Jericó, conhecida como prostituta. Esconde os dois espiões enviados por Josué e engana os soldados do rei sobre onde eles estavam. Em troca, pede que ela e a família sejam poupadas quando a cidade cair. Quando os muros de Jericó desabam, Raabe e os seus são salvos.',
     onde: 'Josué 2 e 6.22-25; citada em Mateus 1.5, Hebreus 11.31 e Tiago 2.25.',
-    deus: 'Raabe diz aos espiões que já tinha ouvido o que Deus fez por Israel e reconhece: o Senhor, o Deus de vocês, é Deus lá em cima no céu e aqui embaixo na terra (Josué 2.11). Hebreus 11.31 destaca a fé dela, e Tiago 2.25 destaca a atitude que mostrou essa fé. Os dois textos olham pra mesma história por lados diferentes.\n\nMateus 1.5 coloca Raabe na genealogia de Jesus. A família do Messias inclui uma estrangeira com um passado que muita gente preferiria esconder.',
+    deus: 'Raabe diz aos espiões que já tinha ouvido o que Deus fez por Israel e reconhece: o Senhor, o Deus de vocês, é o supremo Deus do céu e da terra (Josué 2.11). Hebreus 11.31 destaca a fé dela, e Tiago 2.25 destaca a atitude que mostrou essa fé. Os dois textos olham pra mesma história por lados diferentes.\n\nMateus 1.5 coloca Raabe na genealogia de Jesus. A família do Messias inclui uma estrangeira com um passado que muita gente preferiria esconder.',
     erros: 'Mentiu aos soldados do rei pra proteger os espiões (Josué 2.4-5). O texto não apresenta essa mentira como exemplo e se concentra na fé que a levou a escolher o lado de Deus.',
   },
   'Raquel': {
@@ -127,9 +127,9 @@ export const PESSOAS_C = {
   'Samuel': {
     sub: 'Tempo dos juízes · por volta de 1050 a.C.',
     resumo: 'Ouviu Deus chamar seu nome ainda menino, no santuário. Foi o último juiz de Israel e ungiu os dois primeiros reis.',
-    quem: 'Filho de Ana, entregue ainda pequeno pra servir no santuário de Siló. Numa noite, ouve alguém chamar seu nome e pensa que é o sacerdote Eli. Era Deus. Samuel responde: fala, porque o teu servo está ouvindo (1 Samuel 3.10). Cresce como o último juiz de Israel e um grande profeta, e unge Saul e depois Davi como reis.',
+    quem: 'Filho de Ana, entregue ainda pequeno pra servir no santuário de Siló. Numa noite, ouve alguém chamar seu nome e pensa que é o sacerdote Eli. Era Deus. Samuel responde: fale, o seu servo está ouvindo (1 Samuel 3.10). Cresce como o último juiz de Israel e um grande profeta, e unge Saul e depois Davi como reis.',
     onde: '1 Samuel 1-25.',
-    deus: 'Deus responde à oração de uma mulher que não conseguia ter filhos e, por meio desse filho, volta a falar com o povo numa época em que a palavra do Senhor era rara (1 Samuel 3.1).\n\nQuando o povo pede um rei pra ser como as outras nações, Deus atende, mesmo sabendo dos problemas que isso traria. Deus tem paciência com a insistência humana e continua levando adiante seus planos.',
+    deus: 'Deus responde à oração de uma mulher que não conseguia ter filhos e, por meio desse filho, volta a falar com o povo numa época em que as mensagens do Senhor eram muito raras (1 Samuel 3.1).\n\nQuando o povo pede um rei pra ser como as outras nações, Deus atende, mesmo sabendo dos problemas que isso traria. Deus tem paciência com a insistência humana e continua levando adiante seus planos.',
     erros: 'Colocou os próprios filhos como juízes, e eles eram desonestos e aceitavam suborno. Esse foi um dos motivos que o povo usou pra pedir um rei (1 Samuel 8.1-5).',
   },
   'Sansão': {
@@ -146,7 +146,7 @@ export const PESSOAS_C = {
     quem: 'Esposa de Abraão, que deixou Ur com ele rumo a uma terra desconhecida. Não conseguiu ter filhos por décadas. Já idosa, ouve escondida a promessa de que teria um filho e ri por dentro, sem acreditar. Depois nega que riu. Mesmo assim, dá à luz Isaque, cujo nome quer dizer riso.',
     onde: 'Gênesis 11-23; citada em Hebreus 11.11 e 1 Pedro 3.6.',
     deus: 'Diante do riso de Sara, Deus pergunta a Abraão: existe alguma coisa difícil demais pro Senhor? (Gênesis 18.14). E cumpre a promessa. Quando Isaque nasce, Sara diz que Deus a fez rir, e que todos iam rir com ela (Gênesis 21.6). O riso de dúvida vira riso de alegria.\n\nHebreus 11.11 fala da fé de Sara, e não só da de Abraão. Ela também faz parte da história da promessa.',
-    erros: 'Deu a serva Agar a Abraão pra ter um filho por meio dela. Quando Agar engravidou, Sara passou a maltratá-la e, anos depois, mandou Agar e Ismael embora (Gênesis 16 e 21).',
+    erros: 'Deu a serva Hagar a Abraão pra ter um filho por meio dela. Quando Hagar engravidou, Sara passou a maltratá-la e, anos depois, pediu a Abraão que mandasse Hagar e Ismael embora (Gênesis 16 e 21).',
   },
   'Saul': {
     sub: 'Reino de Israel · por volta de 1050 a 1010 a.C.',
@@ -165,10 +165,10 @@ export const PESSOAS_C = {
   },
   'Simeão e Ana': {
     sub: 'Evangelhos · séc. I',
-    resumo: 'Dois idosos que passaram a vida esperando o Messias e o reconheceram num bebê, no templo.',
-    quem: 'Dois idosos ligados ao templo de Jerusalém. Deus tinha revelado a Simeão que ele não morreria antes de ver o Messias. Quando Maria e José levam o bebê Jesus ao templo, Simeão pega a criança no colo e louva a Deus. Ana, viúva havia muitos anos, que passava os dias no templo orando e jejuando, começa a falar do menino a todos que esperavam a salvação de Jerusalém.',
+    resumo: 'Um homem devoto e uma profetisa idosa que esperavam o Messias e o reconheceram num bebê, no templo.',
+    quem: 'Duas pessoas de Jerusalém que esperavam o Messias. Deus tinha revelado a Simeão que ele não morreria antes de ver o Messias. Quando Maria e José levam o bebê Jesus ao templo, Simeão pega a criança no colo e louva a Deus. Ana, viúva havia muitos anos, que passava os dias no templo orando e jejuando, começa a falar do menino a todos em Jerusalém que esperavam a vinda do Salvador.',
     onde: 'Lucas 2.22-38.',
-    deus: 'Deus honra anos de espera fiel. Duas pessoas comuns, sem cargo nenhum, reconhecem o Messias antes de quase todo o povo.\n\nSimeão anuncia que aquela salvação seria luz pra todos os povos, e não só pra Israel (Lucas 2.32). E avisa Maria que uma espada atravessaria a alma dela, apontando pro sofrimento que viria na cruz.',
+    deus: 'Deus honra anos de espera fiel. Duas pessoas comuns, sem cargo nenhum, reconhecem o Messias antes de quase todo o povo.\n\nSimeão anuncia que aquela salvação seria luz pra todos os povos, e não só pra Israel (Lucas 2.32). E avisa Maria que a tristeza, como uma espada, atravessaria a alma dela (Lucas 2.35).',
   },
   'Tiago irmão de Jesus': {
     sub: 'Igreja primitiva · séc. I',
@@ -180,18 +180,18 @@ export const PESSOAS_C = {
   },
   'Timóteo': {
     sub: 'Igreja primitiva · séc. I',
-    resumo: 'Jovem acompanhado de perto por Paulo, que ouviu dele: ninguém despreze você por ser jovem.',
+    resumo: 'Jovem acompanhado de perto por Paulo, que ouviu dele: ninguém faça pouco caso de você porque você ainda é moço.',
     quem: 'Jovem de Listra, filho de mãe judia e pai grego. A mãe, Eunice, e a avó, Loide, ensinaram a ele as Escrituras desde criança (2 Timóteo 1.5 e 3.15). Torna-se companheiro próximo de Paulo, que o chama de filho na fé, e recebe duas cartas com orientações pra cuidar da igreja em Éfeso.',
     onde: 'Atos 16; 1 e 2 Timóteo; citado em Filipenses 2.19-22 e em outras cartas de Paulo.',
-    deus: 'A relação entre Paulo e Timóteo mostra o valor de ser acompanhado de perto, por muitos anos, por alguém mais maduro na fé.\n\nPaulo escreve a Timóteo: ninguém despreze você por ser jovem, mas seja um exemplo pros que creem, na palavra, no jeito de viver, no amor, na fé e na pureza (1 Timóteo 4.12). E lembra que Deus não nos deu espírito de medo, e sim de poder, de amor e de equilíbrio (2 Timóteo 1.7).',
+    deus: 'A relação entre Paulo e Timóteo mostra o valor de ser acompanhado de perto, por muitos anos, por alguém mais maduro na fé.\n\nPaulo escreve a Timóteo: ninguém faça pouco caso de você porque você ainda é moço, e seja modelo pra eles no amor, na fé e na pureza (1 Timóteo 4.12). E lembra que o Espírito que Deus nos deu não é de covardia, mas de poder, de amor e de equilíbrio (2 Timóteo 1.7).',
   },
   'Tomé': {
     sub: 'Evangelhos · séc. I',
     resumo: 'Ficou famoso pela dúvida, mas foi quem disse uma das frases mais claras da Bíblia sobre Jesus: meu Senhor e meu Deus.',
     quem: 'Um dos doze, também chamado Dídimo, que quer dizer gêmeo. É lembrado principalmente porque não acreditou quando os outros discípulos disseram que tinham visto Jesus ressuscitado. Ele queria ver e tocar as marcas da cruz.',
     onde: 'Mateus 10; Marcos 3; Lucas 6; João 11, 14, 20 e 21; Atos 1.',
-    deus: 'O apelido Tomé incrédulo simplifica a história. Tomé pediu a mesma prova que os outros discípulos já tinham recebido quando Jesus apareceu a eles. Jesus volta, mostra as mãos e o lado, e Tomé diz: meu Senhor e meu Deus (João 20.28). É uma das declarações mais claras de toda a Bíblia de que Jesus é Deus.\n\nAntes disso, quando Jesus decidiu voltar pra perto de Jerusalém, onde queriam matá-lo, foi Tomé quem disse: vamos também, pra morrer com ele (João 11.16). Tomé tinha dúvidas e coragem ao mesmo tempo.',
-    erros: 'Não acreditou no testemunho dos outros discípulos sobre a ressurreição sem ver as marcas da cruz. Jesus o atende e diz: felizes os que não viram e creram (João 20.29).',
+    deus: 'O apelido Tomé incrédulo simplifica a história. Tomé pediu a mesma prova que os outros discípulos já tinham recebido quando Jesus apareceu a eles. Jesus volta, mostra as mãos e o lado, e Tomé diz: meu Senhor e meu Deus (João 20.28). É uma das declarações mais claras de toda a Bíblia de que Jesus é Deus.\n\nAntes disso, quando Jesus decidiu voltar pra perto de Jerusalém, onde queriam matá-lo, foi Tomé quem disse: vamos até lá para morrermos com o Mestre (João 11.16). Tomé tinha dúvidas e coragem ao mesmo tempo.',
+    erros: 'Não acreditou no testemunho dos outros discípulos sobre a ressurreição sem ver as marcas da cruz. Jesus o atende e diz: felizes são aqueles que não me viram e mesmo assim creram (João 20.29).',
   },
   'Zacarias pai de João Batista': {
     sub: 'Evangelhos · séc. I',
@@ -204,9 +204,9 @@ export const PESSOAS_C = {
   'Zaqueu': {
     sub: 'Evangelhos · séc. I',
     resumo: 'Chefe dos cobradores de impostos, baixinho, subiu numa árvore pra ver Jesus. Jesus se convidou pra casa dele.',
-    quem: 'Chefe dos cobradores de impostos em Jericó, homem rico e de baixa estatura. Sobe numa figueira pra conseguir ver Jesus por cima da multidão. Jesus para, chama Zaqueu pelo nome e diz que precisa ficar na casa dele naquele dia. Zaqueu desce feliz e anuncia que vai dar metade dos bens aos pobres e devolver quatro vezes mais a quem tinha roubado.',
+    quem: 'Chefe dos cobradores de impostos em Jericó, homem rico e de baixa estatura. Sobe numa árvore, um sicômoro, pra conseguir ver Jesus por cima da multidão. Jesus para, chama Zaqueu pelo nome e diz que precisa ficar na casa dele naquele dia. Zaqueu desce feliz e anuncia que vai dar metade dos bens aos pobres e devolver quatro vezes mais a quem tivesse cobrado demais.',
     onde: 'Lucas 19.1-10.',
-    deus: 'O povo reclama porque Jesus vai se hospedar na casa de um homem visto como ladrão e traidor. Jesus resume o que aconteceu: o Filho do homem veio buscar e salvar o que estava perdido (Lucas 19.10).\n\nA mudança de Zaqueu aparece em atitudes concretas, com dinheiro devolvido e generosidade. Arrependimento de verdade mexe no bolso e conserta o que dá pra consertar.',
-    erros: 'Como chefe dos cobradores de impostos, tinha enriquecido cobrando mais do que devia do próprio povo.',
+    deus: 'O povo reclama porque Jesus vai se hospedar na casa de um homem visto como ladrão e traidor. Jesus resume o que aconteceu: o Filho do Homem veio buscar e salvar o que se havia perdido (Lucas 19.10).\n\nA mudança de Zaqueu aparece em atitudes concretas, com dinheiro devolvido e generosidade. Arrependimento de verdade mexe no bolso e conserta o que dá pra consertar.',
+    erros: 'Era chefe dos cobradores de impostos, rico e visto pelo povo como pecador. Ele mesmo admite que pode ter cobrado demais de alguém (Lucas 19.8).',
   },
 };

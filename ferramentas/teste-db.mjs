@@ -2,7 +2,7 @@
 // que mudou, transação que desfaz tudo quando algo falha, backup do dia e a pessoa que
 // apaga a conta saindo também dos backups.
 // Uso: node ferramentas/teste-db.mjs
-import { mkdtempSync, rmSync, existsSync, readdirSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -17,6 +17,8 @@ const ok = (cond, msg) => {
 };
 
 const pasta = mkdtempSync(join(tmpdir(), 'cc-db-'));
+const pastaV6 = mkdtempSync(join(tmpdir(), 'cc-db-v6-'));
+const pastaV7 = mkdtempSync(join(tmpdir(), 'cc-db-v7-'));
 console.log('\n  Banco: alicerce\n');
 
 try {
@@ -70,9 +72,13 @@ try {
   const pastaBackup = join(pasta, 'backup');
   ok(!!B.backupDoDia(db, pastaBackup, '2026-09-15') && B.backupDoDia(db, pastaBackup, '2026-09-15') === null, 'um backup por dia, sem repetir');
   for (let d = 1; d <= 16; d++) B.backupDoDia(db, pastaBackup, '2026-08-' + String(d).padStart(2, '0'));
-  const guardados = readdirSync(pastaBackup).filter((f) => f.endsWith('.db')).sort();
-  ok(guardados.length === 14 && guardados.includes('caminho-2026-09-15.db') && !guardados.includes('caminho-2026-08-01.db'), 'ficam os 14 backups mais novos');
-  const copia = new B.DatabaseSync(join(pastaBackup, 'caminho-2026-09-15.db'));
+  const guardados = readdirSync(pastaBackup).filter((f) => f.endsWith('.db.cifrado')).sort();
+  ok(guardados.length === 14 && guardados.includes('caminho-2026-09-15.db.cifrado') && !guardados.includes('caminho-2026-08-01.db.cifrado'), 'ficam os 14 backups mais novos');
+  const bruto = readFileSync(join(pastaBackup, 'caminho-2026-09-15.db.cifrado'));
+  ok(!bruto.includes('SQLite format') && !bruto.includes('só minha') && !readdirSync(pastaBackup).some((f) => f.endsWith('.db') || f.endsWith('.tmp')),
+    'o backup fica cifrado: nem o SQLite nem o texto de ninguém aparecem no arquivo, e não sobra cópia aberta');
+  const aberto = (f) => B.abrirBackup(join(pastaBackup, f), join(pasta, 'aberto-' + f + '.db'));
+  const copia = new B.DatabaseSync(aberto('caminho-2026-09-15.db.cifrado'));
   ok(copia.prepare("SELECT usuario FROM contas").all().length === 1 && copia.prepare("SELECT 1 FROM estados WHERE usuario = 'ana'").get(), 'o backup abre sozinho e tem os dados');
   copia.close();
 
@@ -82,27 +88,320 @@ try {
     { id: 'e2', autor: 'carla', tipo: 'novoProposito', dados: '{"com":"ana"}', chave: 'k2', em: 2 },
     { id: 'e3', autor: 'carla', tipo: 'ofensiva', dados: '{}', chave: 'k3', em: 3 },
   ] }]);
-  B.fazerBackup(db, join(pastaBackup, 'caminho-teste-extra.db'));
+  B.fazerBackup(db, join(pastaBackup, 'caminho-teste-extra.db.cifrado'));
   const limpos = B.apagarPessoaDosBackups(pastaBackup, 'ana');
   let sobrou = 0;
   let outrosFicaram = true;
-  for (const f of readdirSync(pastaBackup).filter((n) => n.endsWith('.db'))) {
-    const c = new B.DatabaseSync(join(pastaBackup, f));
+  for (const f of readdirSync(pastaBackup).filter((n) => n.endsWith('.db.cifrado'))) {
+    const c = new B.DatabaseSync(aberto(f));
     sobrou += c.prepare("SELECT count(*) n FROM contas WHERE usuario = 'ana'").get().n
       + c.prepare("SELECT count(*) n FROM estados WHERE usuario = 'ana'").get().n
       + c.prepare("SELECT count(*) n FROM amizades WHERE a = 'ana' OR b = 'ana'").get().n
       + c.prepare("SELECT count(*) n FROM novidades_eventos WHERE autor = 'ana' OR json_extract(dados, '$.com') = 'ana'").get().n;
-    if (f === 'caminho-teste-extra.db' && !c.prepare("SELECT 1 FROM novidades_eventos WHERE id = 'e3'").get()) outrosFicaram = false;
+    if (f === 'caminho-teste-extra.db.cifrado' && !c.prepare("SELECT 1 FROM novidades_eventos WHERE id = 'e3'").get()) outrosFicaram = false;
     c.close();
   }
   ok(limpos === 15 && sobrou === 0, 'apagar a conta tira a pessoa de todos os ' + limpos + ' backups (conta, progresso, amizades, novidades)');
   ok(outrosFicaram, 'o que é só de outra pessoa continua nos backups');
+  const outraChave = Buffer.alloc(32, 7);
+  let recusou = false;
+  try { B.abrirBackup(join(pastaBackup, 'caminho-2026-09-15.db.cifrado'), join(pasta, 'x.db'), outraChave); } catch { recusou = true; }
+  ok(recusou, 'com outra chave o backup não abre');
+  B.fazerBackup(db, join(pastaBackup, 'caminho-2026-07-01.db.cifrado'));
+  B.abrirBackup(join(pastaBackup, 'caminho-2026-07-01.db.cifrado'), join(pastaBackup, 'caminho-2026-07-01.db'));
+  ok(B.cifrarBackupsAbertos(pastaBackup) >= 1 && !readdirSync(pastaBackup).some((f) => f.endsWith('.db')),
+    'backup antigo guardado aberto vira cifrado, e o aberto some');
 
   B.fecharBanco(arquivo);
+
+  // ---------- migração v7 num banco v6 existente ----------
+  // Monta à mão um banco no esquema v6 (o texto exato das versões 1 a 6 de ESQUEMA em
+  // db.mjs), com uma célula de verdade dentro, e confere que reabrir com o código atual
+  // migra até v7 sem perder nada do que já existia.
+  console.log('\n  Banco: migração v6 -> v7\n');
+  const arquivoV6 = B.arquivoDoBanco(pastaV6);
+  const brutoV6 = new B.DatabaseSync(arquivoV6);
+  brutoV6.exec(`
+    CREATE TABLE contas (
+      usuario TEXT PRIMARY KEY, nome TEXT NOT NULL DEFAULT '', email TEXT NOT NULL DEFAULT '',
+      nascimento TEXT NOT NULL DEFAULT '', fuso TEXT NOT NULL DEFAULT '', sal TEXT NOT NULL, senha TEXT NOT NULL,
+      criada_em TEXT NOT NULL DEFAULT '', selo_convite TEXT NOT NULL DEFAULT '', extra TEXT NOT NULL DEFAULT '{}'
+    );
+    CREATE INDEX contas_email ON contas (email);
+    CREATE TABLE amizades (a TEXT NOT NULL, b TEXT NOT NULL, estado TEXT NOT NULL, pediu TEXT NOT NULL, em TEXT, aceita_em TEXT, PRIMARY KEY (a, b));
+    CREATE TABLE bloqueios (quem TEXT NOT NULL, alvo TEXT NOT NULL, ordem INTEGER NOT NULL, PRIMARY KEY (quem, alvo));
+    CREATE TABLE silenciados (quem TEXT NOT NULL, alvo TEXT NOT NULL, ordem INTEGER NOT NULL, PRIMARY KEY (quem, alvo));
+    CREATE TABLE convites_usados (nonce TEXT PRIMARY KEY, vence INTEGER NOT NULL);
+    CREATE TABLE toques (de TEXT NOT NULL, para TEXT NOT NULL, dia TEXT NOT NULL, PRIMARY KEY (de, para));
+    CREATE TABLE denuncias (ordem INTEGER PRIMARY KEY, de TEXT NOT NULL, contra TEXT NOT NULL, motivo TEXT NOT NULL, em TEXT NOT NULL);
+    CREATE TABLE novidades_eventos (id TEXT PRIMARY KEY, autor TEXT NOT NULL, tipo TEXT NOT NULL, dados TEXT NOT NULL, chave TEXT, em INTEGER NOT NULL);
+    CREATE INDEX novidades_eventos_autor ON novidades_eventos (autor);
+    CREATE TABLE novidades_reacoes (evento TEXT NOT NULL, usuario TEXT NOT NULL, ordem INTEGER NOT NULL, PRIMARY KEY (evento, usuario));
+    CREATE TABLE novidades_pessoas (usuario TEXT PRIMARY KEY, ligado INTEGER NOT NULL, perguntado INTEGER NOT NULL);
+    CREATE TABLE push_inscricoes (endpoint TEXT PRIMARY KEY, usuario TEXT NOT NULL, p256dh TEXT NOT NULL, auth TEXT NOT NULL, criada_em TEXT NOT NULL, ordem INTEGER NOT NULL);
+    CREATE INDEX push_inscricoes_usuario ON push_inscricoes (usuario);
+    CREATE TABLE push_preferencias (usuario TEXT PRIMARY KEY, dados TEXT NOT NULL);
+    CREATE TABLE push_historico (usuario TEXT PRIMARY KEY, dados TEXT NOT NULL);
+    CREATE TABLE estados (usuario TEXT PRIMARY KEY, dados TEXT NOT NULL, atualizado_em TEXT NOT NULL);
+    CREATE TABLE metadados (chave TEXT PRIMARY KEY, valor TEXT NOT NULL);
+
+    CREATE TABLE convites_aceites (
+      convite TEXT NOT NULL, de TEXT NOT NULL, para TEXT NOT NULL, em TEXT NOT NULL,
+      conta_nova INTEGER NOT NULL DEFAULT 0, ativado_em TEXT NOT NULL DEFAULT '', PRIMARY KEY (de, para)
+    );
+    CREATE INDEX convites_aceites_de ON convites_aceites (de);
+
+    CREATE TABLE propositos (
+      id TEXT PRIMARY KEY, tipo TEXT NOT NULL, alvo TEXT NOT NULL DEFAULT '', titulo TEXT NOT NULL DEFAULT '',
+      criado_por TEXT NOT NULL, criado_em TEXT NOT NULL, encerrado_em TEXT NOT NULL DEFAULT '', grupo INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE proposito_membros (
+      proposito TEXT NOT NULL, usuario TEXT NOT NULL, estado TEXT NOT NULL,
+      entrou_em TEXT NOT NULL DEFAULT '', saiu_em TEXT NOT NULL DEFAULT '', convidado_por TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (proposito, usuario)
+    );
+    CREATE INDEX proposito_membros_usuario ON proposito_membros (usuario);
+
+    CREATE TABLE proposito_dias (proposito TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (proposito, data));
+
+    ALTER TABLE propositos ADD COLUMN celula INTEGER NOT NULL DEFAULT 0;
+
+    ALTER TABLE propositos ADD COLUMN encontro INTEGER NOT NULL DEFAULT -1;
+    ALTER TABLE propositos ADD COLUMN recado TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN recado_em TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_tipo TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_ref TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_texto TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_em TEXT NOT NULL DEFAULT '';
+
+    CREATE TABLE schema_versao (versao INTEGER NOT NULL);
+    INSERT INTO schema_versao (versao) VALUES (6);
+
+    INSERT INTO propositos (id, tipo, alvo, titulo, criado_por, criado_em, encerrado_em, grupo, celula, encontro, recado, recado_em, estudo_tipo, estudo_ref, estudo_texto, estudo_em)
+      VALUES ('p1', 'plano', '', 'Célula de quinta', 'lider', '2026-01-01', '', 1, 1, 4, 'Tragam a Bíblia', '2026-01-01T00:00:00Z', '', '', '', '');
+    INSERT INTO proposito_membros (proposito, usuario, estado, entrou_em, saiu_em, convidado_por)
+      VALUES ('p1', 'lider', 'ativo', '2026-01-01', '', '');
+  `);
+  ok(Number(brutoV6.prepare('SELECT versao FROM schema_versao').get().versao) === 6, 'o banco de ensaio nasce na versão 6, como um HML de antes da Fase 2');
+  brutoV6.close();
+
+  const dbV7 = B.abrirBanco(arquivoV6);
+  ok(Number(dbV7.prepare('SELECT versao FROM schema_versao').get().versao) === B.versaoDoEsquema(), 'reabrir um banco v6 migra sozinho até a versão atual');
+  ok(dbV7.prepare("SELECT papel FROM proposito_membros WHERE proposito = 'p1' AND usuario = 'lider'").get().papel === '',
+    'proposito_membros ganha a coluna papel, vazia para quem já estava lá');
+  const p1 = dbV7.prepare("SELECT * FROM propositos WHERE id = 'p1'").get();
+  ok(p1.titulo === 'Célula de quinta' && p1.encontro === 4 && p1.recado === 'Tragam a Bíblia'
+    && p1.estudo_acolhida === '' && p1.estudo_adoracao === '' && p1.estudo_testemunho === '',
+    'os propósitos existentes ganham os três campos do roteiro 4 Ws vazios, sem perder o que já tinham');
+  const tabelasV7 = dbV7.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
+  ok(tabelasV7.includes('celula_encontros') && tabelasV7.includes('celula_presencas'), 'as tabelas de encontro e presença nascem na migração');
+  dbV7.prepare("INSERT INTO celula_encontros (proposito, data, visitantes, registrado_por, em) VALUES ('p1', '2026-01-08', 2, 'lider', '2026-01-08T20:00:00Z')").run();
+  dbV7.prepare("INSERT INTO celula_presencas (proposito, data, usuario) VALUES ('p1', '2026-01-08', 'lider')").run();
+  ok(dbV7.prepare("SELECT count(*) n FROM celula_presencas WHERE proposito = 'p1'").get().n === 1, 'as tabelas novas aceitam linhas de verdade');
+  B.fecharBanco(arquivoV6);
+
+  // ---------- migração v7 -> v8 num banco v7 existente ----------
+  // Um banco já na versão 7 (esquema completo da Fase 2), com uma conta e uma amizade de
+  // verdade dentro, e confere que reabrir com o código atual migra até v8 sem perder nada.
+  console.log('\n  Banco: migração v7 -> v8\n');
+  const arquivoV7 = B.arquivoDoBanco(pastaV7);
+  const brutoV7 = new B.DatabaseSync(arquivoV7);
+  brutoV7.exec(`
+    CREATE TABLE contas (
+      usuario TEXT PRIMARY KEY, nome TEXT NOT NULL DEFAULT '', email TEXT NOT NULL DEFAULT '',
+      nascimento TEXT NOT NULL DEFAULT '', fuso TEXT NOT NULL DEFAULT '', sal TEXT NOT NULL, senha TEXT NOT NULL,
+      criada_em TEXT NOT NULL DEFAULT '', selo_convite TEXT NOT NULL DEFAULT '', extra TEXT NOT NULL DEFAULT '{}'
+    );
+    CREATE INDEX contas_email ON contas (email);
+    CREATE TABLE amizades (a TEXT NOT NULL, b TEXT NOT NULL, estado TEXT NOT NULL, pediu TEXT NOT NULL, em TEXT, aceita_em TEXT, PRIMARY KEY (a, b));
+    CREATE TABLE bloqueios (quem TEXT NOT NULL, alvo TEXT NOT NULL, ordem INTEGER NOT NULL, PRIMARY KEY (quem, alvo));
+    CREATE TABLE silenciados (quem TEXT NOT NULL, alvo TEXT NOT NULL, ordem INTEGER NOT NULL, PRIMARY KEY (quem, alvo));
+    CREATE TABLE convites_usados (nonce TEXT PRIMARY KEY, vence INTEGER NOT NULL);
+    CREATE TABLE toques (de TEXT NOT NULL, para TEXT NOT NULL, dia TEXT NOT NULL, PRIMARY KEY (de, para));
+    CREATE TABLE denuncias (ordem INTEGER PRIMARY KEY, de TEXT NOT NULL, contra TEXT NOT NULL, motivo TEXT NOT NULL, em TEXT NOT NULL);
+    CREATE TABLE novidades_eventos (id TEXT PRIMARY KEY, autor TEXT NOT NULL, tipo TEXT NOT NULL, dados TEXT NOT NULL, chave TEXT, em INTEGER NOT NULL);
+    CREATE INDEX novidades_eventos_autor ON novidades_eventos (autor);
+    CREATE TABLE novidades_reacoes (evento TEXT NOT NULL, usuario TEXT NOT NULL, ordem INTEGER NOT NULL, PRIMARY KEY (evento, usuario));
+    CREATE TABLE novidades_pessoas (usuario TEXT PRIMARY KEY, ligado INTEGER NOT NULL, perguntado INTEGER NOT NULL);
+    CREATE TABLE push_inscricoes (endpoint TEXT PRIMARY KEY, usuario TEXT NOT NULL, p256dh TEXT NOT NULL, auth TEXT NOT NULL, criada_em TEXT NOT NULL, ordem INTEGER NOT NULL);
+    CREATE INDEX push_inscricoes_usuario ON push_inscricoes (usuario);
+    CREATE TABLE push_preferencias (usuario TEXT PRIMARY KEY, dados TEXT NOT NULL);
+    CREATE TABLE push_historico (usuario TEXT PRIMARY KEY, dados TEXT NOT NULL);
+    CREATE TABLE estados (usuario TEXT PRIMARY KEY, dados TEXT NOT NULL, atualizado_em TEXT NOT NULL);
+    CREATE TABLE metadados (chave TEXT PRIMARY KEY, valor TEXT NOT NULL);
+
+    CREATE TABLE convites_aceites (
+      convite TEXT NOT NULL, de TEXT NOT NULL, para TEXT NOT NULL, em TEXT NOT NULL,
+      conta_nova INTEGER NOT NULL DEFAULT 0, ativado_em TEXT NOT NULL DEFAULT '', PRIMARY KEY (de, para)
+    );
+    CREATE INDEX convites_aceites_de ON convites_aceites (de);
+
+    CREATE TABLE propositos (
+      id TEXT PRIMARY KEY, tipo TEXT NOT NULL, alvo TEXT NOT NULL DEFAULT '', titulo TEXT NOT NULL DEFAULT '',
+      criado_por TEXT NOT NULL, criado_em TEXT NOT NULL, encerrado_em TEXT NOT NULL DEFAULT '', grupo INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE proposito_membros (
+      proposito TEXT NOT NULL, usuario TEXT NOT NULL, estado TEXT NOT NULL,
+      entrou_em TEXT NOT NULL DEFAULT '', saiu_em TEXT NOT NULL DEFAULT '', convidado_por TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (proposito, usuario)
+    );
+    CREATE INDEX proposito_membros_usuario ON proposito_membros (usuario);
+
+    CREATE TABLE proposito_dias (proposito TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (proposito, data));
+
+    ALTER TABLE propositos ADD COLUMN celula INTEGER NOT NULL DEFAULT 0;
+
+    ALTER TABLE propositos ADD COLUMN encontro INTEGER NOT NULL DEFAULT -1;
+    ALTER TABLE propositos ADD COLUMN recado TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN recado_em TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_tipo TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_ref TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_texto TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_em TEXT NOT NULL DEFAULT '';
+
+    ALTER TABLE proposito_membros ADD COLUMN papel TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_acolhida TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_adoracao TEXT NOT NULL DEFAULT '';
+    ALTER TABLE propositos ADD COLUMN estudo_testemunho TEXT NOT NULL DEFAULT '';
+    CREATE TABLE celula_encontros (proposito TEXT NOT NULL, data TEXT NOT NULL, visitantes INTEGER NOT NULL DEFAULT 0,
+      registrado_por TEXT NOT NULL, em TEXT NOT NULL, PRIMARY KEY (proposito, data));
+    CREATE TABLE celula_presencas (proposito TEXT NOT NULL, data TEXT NOT NULL, usuario TEXT NOT NULL,
+      PRIMARY KEY (proposito, data, usuario));
+
+    CREATE TABLE schema_versao (versao INTEGER NOT NULL);
+    INSERT INTO schema_versao (versao) VALUES (7);
+
+    INSERT INTO contas (usuario, nome, email, nascimento, fuso, sal, senha, criada_em, selo_convite, extra)
+      VALUES ('ana', 'Ana', 'ana@x.com', '2000-01-01', 'America/Sao_Paulo', 's', 'h', '2026-01-01', 'x', '{}'),
+             ('bia', 'Bia', 'bia@x.com', '2000-01-01', 'America/Sao_Paulo', 's', 'h', '2026-01-01', 'y', '{}');
+    INSERT INTO amizades (a, b, estado, pediu, em, aceita_em) VALUES ('ana', 'bia', 'ativa', 'ana', '2026-01-02', '2026-01-02');
+  `);
+  ok(Number(brutoV7.prepare('SELECT versao FROM schema_versao').get().versao) === 7, 'o banco de ensaio nasce na versão 7, como um HML de antes da Fase 3');
+  brutoV7.close();
+
+  const dbV8 = B.abrirBanco(arquivoV7);
+  ok(Number(dbV8.prepare('SELECT versao FROM schema_versao').get().versao) === B.versaoDoEsquema(), 'reabrir um banco v7 migra sozinho até a versão atual');
+  ok(dbV8.prepare("SELECT count(*) n FROM contas").get().n === 2 && dbV8.prepare("SELECT 1 FROM amizades WHERE a = 'ana' AND b = 'bia'").get(),
+    'a migração não perde nenhuma conta nem amizade que já existia');
+  const tabelasV8 = dbV8.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
+  ok(tabelasV8.includes('discipulados') && tabelasV8.includes('discipulado_encontros'), 'as tabelas de discipulado nascem na migração');
+  dbV8.prepare("INSERT INTO discipulados (id, discipulador, discipulo, estado, pediu, criado_em, aceito_em, mostrar) VALUES ('d1', 'ana', 'bia', 'ativo', 'ana', '2026-01-03', '2026-01-03', '{}')").run();
+  dbV8.prepare("INSERT INTO discipulado_encontros (discipulado, data) VALUES ('d1', '2026-01-10')").run();
+  ok(dbV8.prepare("SELECT count(*) n FROM discipulado_encontros WHERE discipulado = 'd1'").get().n === 1, 'a tabela nova aceita linhas de verdade');
+  // Antes de fechar em v8, o banco já pode reabrir e migrar até v9 sozinho: confere logo a seguir.
+  ok(Number(dbV8.prepare('SELECT versao FROM schema_versao').get().versao) === B.versaoDoEsquema(), 'o mesmo banco, sem fechar, já está na versão atual (inclui a v9)');
+  const tabelasV9 = dbV8.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
+  ok(['pedidos', 'pedido_gestos', 'pedido_denuncias'].every((t) => tabelasV9.includes(t)), 'as tabelas de cuidado mútuo (v9) nascem na migração');
+  dbV8.prepare(`INSERT INTO pedidos (id, celula, autor, tipo, destino, texto, criado_em, vence_em, estado, removido_por)
+    VALUES ('r1', 'p1', 'ana', 'oracao', 'celula', 'ore por mim', '2026-01-05', '2026-01-12', 'ativo', '')`).run();
+  dbV8.prepare("INSERT INTO pedido_gestos (pedido, usuario, gesto, data) VALUES ('r1', 'bia', 'orei', '2026-01-06')").run();
+  dbV8.prepare("INSERT INTO pedido_denuncias (pedido, usuario, motivo, em) VALUES ('r1', 'bia', 'É ofensivo', '2026-01-06T10:00:00.000Z')").run();
+  ok(dbV8.prepare("SELECT count(*) n FROM pedido_gestos WHERE pedido = 'r1'").get().n === 1
+    && dbV8.prepare("SELECT count(*) n FROM pedido_denuncias WHERE pedido = 'r1'").get().n === 1,
+    'as tabelas novas de cuidado mútuo aceitam linhas de verdade');
+  B.fecharBanco(arquivoV7);
+
+  // ---------- migração v8 -> v9 num banco v8 existente, reaberto do zero ----------
+  console.log('\n  Banco: migração v8 -> v9\n');
+  const pastaV8 = mkdtempSync(join(tmpdir(), 'cc-db-v8-'));
+  const arquivoV8 = B.arquivoDoBanco(pastaV8);
+  const brutoV8 = new B.DatabaseSync(arquivoV8);
+  brutoV8.exec(`
+    CREATE TABLE contas (
+      usuario TEXT PRIMARY KEY, nome TEXT NOT NULL DEFAULT '', email TEXT NOT NULL DEFAULT '',
+      nascimento TEXT NOT NULL DEFAULT '', fuso TEXT NOT NULL DEFAULT '', sal TEXT NOT NULL, senha TEXT NOT NULL,
+      criada_em TEXT NOT NULL DEFAULT '', selo_convite TEXT NOT NULL DEFAULT '', extra TEXT NOT NULL DEFAULT '{}'
+    );
+    CREATE TABLE discipulados (
+      id TEXT PRIMARY KEY, discipulador TEXT NOT NULL, discipulo TEXT NOT NULL, estado TEXT NOT NULL, pediu TEXT NOT NULL,
+      criado_em TEXT NOT NULL, aceito_em TEXT NOT NULL DEFAULT '', encerrado_em TEXT NOT NULL DEFAULT '', mostrar TEXT NOT NULL DEFAULT '{}'
+    );
+    CREATE TABLE discipulado_encontros (discipulado TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (discipulado, data));
+    -- Uma célula de verdade já existe num banco v8 real (nasceu na v3, ganhou colunas até a
+    -- v7): entra aqui também, para a migração v9 -> v10 (que mexe em propositos) ter o que alterar.
+    CREATE TABLE propositos (
+      id TEXT PRIMARY KEY, tipo TEXT NOT NULL, alvo TEXT NOT NULL DEFAULT '', titulo TEXT NOT NULL DEFAULT '',
+      criado_por TEXT NOT NULL, criado_em TEXT NOT NULL, encerrado_em TEXT NOT NULL DEFAULT '', grupo INTEGER NOT NULL DEFAULT 0,
+      celula INTEGER NOT NULL DEFAULT 0, encontro INTEGER NOT NULL DEFAULT -1, recado TEXT NOT NULL DEFAULT '',
+      recado_em TEXT NOT NULL DEFAULT '', estudo_tipo TEXT NOT NULL DEFAULT '', estudo_ref TEXT NOT NULL DEFAULT '',
+      estudo_texto TEXT NOT NULL DEFAULT '', estudo_em TEXT NOT NULL DEFAULT '', estudo_acolhida TEXT NOT NULL DEFAULT '',
+      estudo_adoracao TEXT NOT NULL DEFAULT '', estudo_testemunho TEXT NOT NULL DEFAULT ''
+    );
+    CREATE TABLE proposito_membros (
+      proposito TEXT NOT NULL, usuario TEXT NOT NULL, estado TEXT NOT NULL,
+      entrou_em TEXT NOT NULL DEFAULT '', saiu_em TEXT NOT NULL DEFAULT '', convidado_por TEXT NOT NULL DEFAULT '',
+      papel TEXT NOT NULL DEFAULT '', PRIMARY KEY (proposito, usuario)
+    );
+    CREATE TABLE schema_versao (versao INTEGER NOT NULL);
+    INSERT INTO schema_versao (versao) VALUES (8);
+    INSERT INTO contas (usuario, nome, email, nascimento, fuso, sal, senha, criada_em, selo_convite, extra)
+      VALUES ('cae', 'Caê', 'cae@x.com', '2000-01-01', 'America/Sao_Paulo', 's', 'h', '2026-01-01', 'z', '{}');
+  `);
+  ok(Number(brutoV8.prepare('SELECT versao FROM schema_versao').get().versao) === 8, 'o banco de ensaio nasce na versão 8, como um HML de antes da Fase 4');
+  brutoV8.close();
+
+  const dbV9 = B.abrirBanco(arquivoV8);
+  ok(Number(dbV9.prepare('SELECT versao FROM schema_versao').get().versao) === B.versaoDoEsquema(), 'reabrir um banco v8 migra sozinho até a versão atual');
+  ok(dbV9.prepare("SELECT count(*) n FROM contas").get().n === 1, 'a migração v8 -> v9 não perde nenhuma conta que já existia');
+  const tabelasV9b = dbV9.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
+  ok(['pedidos', 'pedido_gestos', 'pedido_denuncias'].every((t) => tabelasV9b.includes(t)), 'as tabelas de cuidado mútuo nascem também na migração de um banco v8 de verdade');
+  B.fecharBanco(arquivoV8);
+  try { rmSync(pastaV8, { recursive: true, force: true }); } catch { /* ok */ }
+
+  // ---------- migração v9 -> v10 (multiplicação de célula) ----------
+  console.log('\n  Banco: migração v9 -> v10\n');
+  const pastaV9 = mkdtempSync(join(tmpdir(), 'cc-db-v9-'));
+  const arquivoV9 = B.arquivoDoBanco(pastaV9);
+  const brutoV9 = new B.DatabaseSync(arquivoV9);
+  brutoV9.exec(`
+    CREATE TABLE contas (
+      usuario TEXT PRIMARY KEY, nome TEXT NOT NULL DEFAULT '', email TEXT NOT NULL DEFAULT '',
+      nascimento TEXT NOT NULL DEFAULT '', fuso TEXT NOT NULL DEFAULT '', sal TEXT NOT NULL, senha TEXT NOT NULL,
+      criada_em TEXT NOT NULL DEFAULT '', selo_convite TEXT NOT NULL DEFAULT '', extra TEXT NOT NULL DEFAULT '{}'
+    );
+    CREATE TABLE propositos (
+      id TEXT PRIMARY KEY, tipo TEXT NOT NULL, alvo TEXT NOT NULL DEFAULT '', titulo TEXT NOT NULL DEFAULT '',
+      criado_por TEXT NOT NULL, criado_em TEXT NOT NULL, encerrado_em TEXT NOT NULL DEFAULT '', grupo INTEGER NOT NULL DEFAULT 0,
+      celula INTEGER NOT NULL DEFAULT 0, encontro INTEGER NOT NULL DEFAULT -1, recado TEXT NOT NULL DEFAULT '',
+      recado_em TEXT NOT NULL DEFAULT '', estudo_tipo TEXT NOT NULL DEFAULT '', estudo_ref TEXT NOT NULL DEFAULT '',
+      estudo_texto TEXT NOT NULL DEFAULT '', estudo_em TEXT NOT NULL DEFAULT '', estudo_acolhida TEXT NOT NULL DEFAULT '',
+      estudo_adoracao TEXT NOT NULL DEFAULT '', estudo_testemunho TEXT NOT NULL DEFAULT ''
+    );
+    CREATE TABLE proposito_membros (
+      proposito TEXT NOT NULL, usuario TEXT NOT NULL, estado TEXT NOT NULL,
+      entrou_em TEXT NOT NULL DEFAULT '', saiu_em TEXT NOT NULL DEFAULT '', convidado_por TEXT NOT NULL DEFAULT '',
+      papel TEXT NOT NULL DEFAULT '', PRIMARY KEY (proposito, usuario)
+    );
+    CREATE TABLE schema_versao (versao INTEGER NOT NULL);
+    INSERT INTO schema_versao (versao) VALUES (9);
+    INSERT INTO contas (usuario, nome, email, nascimento, fuso, sal, senha, criada_em, selo_convite, extra)
+      VALUES ('duda', 'Duda', 'duda@x.com', '2000-01-01', 'America/Sao_Paulo', 's', 'h', '2026-01-01', 'w', '{}');
+    INSERT INTO propositos (id, tipo, titulo, criado_por, criado_em, grupo, celula)
+      VALUES ('p1', 'plano', 'Célula da Duda', 'duda', '2026-01-01', 1, 1);
+    INSERT INTO proposito_membros (proposito, usuario, estado, entrou_em, papel) VALUES ('p1', 'duda', 'ativo', '2026-01-01', '');
+  `);
+  ok(Number(brutoV9.prepare('SELECT versao FROM schema_versao').get().versao) === 9, 'o banco de ensaio nasce na versão 9, como um HML de antes da Fase 5');
+  brutoV9.close();
+
+  const dbV10 = B.abrirBanco(arquivoV9);
+  ok(Number(dbV10.prepare('SELECT versao FROM schema_versao').get().versao) === B.versaoDoEsquema(), 'reabrir um banco v9 migra sozinho até a versão atual');
+  ok(dbV10.prepare("SELECT count(*) n FROM propositos").get().n === 1, 'a migração v9 -> v10 não perde nenhuma célula que já existia');
+  const linhaV10 = dbV10.prepare("SELECT mae, multiplicada_em FROM propositos WHERE id = 'p1'").get();
+  ok(linhaV10.mae === '' && linhaV10.multiplicada_em === '', 'as colunas novas (mae, multiplicada_em) nascem vazias para quem já existia');
+  dbV10.prepare("INSERT INTO propositos (id, tipo, titulo, criado_por, criado_em, grupo, celula, mae, multiplicada_em) VALUES ('p2', 'plano', 'Célula filha', 'aux', '2026-02-01', 1, 1, 'p1', '2026-02-01')").run();
+  ok(dbV10.prepare("SELECT mae FROM propositos WHERE id = 'p2'").get().mae === 'p1', 'a coluna nova aceita uma linha de verdade');
+  ok(dbV10.prepare("SELECT tornou_membro_em FROM proposito_membros WHERE proposito = 'p1' AND usuario = 'duda'").get().tornou_membro_em === '',
+    'proposito_membros ganha tornou_membro_em, vazia para quem já estava lá');
+  dbV10.prepare("INSERT INTO proposito_membros (proposito, usuario, estado, entrou_em, papel, tornou_membro_em) VALUES ('p1', 'nova', 'ativo', '2026-01-05', '', '2026-01-10')").run();
+  ok(dbV10.prepare("SELECT tornou_membro_em FROM proposito_membros WHERE usuario = 'nova'").get().tornou_membro_em === '2026-01-10', 'a coluna nova de proposito_membros aceita uma linha de verdade');
+  B.fecharBanco(arquivoV9);
+  try { rmSync(pastaV9, { recursive: true, force: true }); } catch { /* ok */ }
 } catch (e) {
   ok(false, 'o teste quebrou: ' + e.stack);
 } finally {
   try { rmSync(pasta, { recursive: true, force: true }); } catch { /* ok */ }
+  try { rmSync(pastaV6, { recursive: true, force: true }); } catch { /* ok */ }
+  try { rmSync(pastaV7, { recursive: true, force: true }); } catch { /* ok */ }
 }
 
 console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  o alicerce do banco está certo\n');

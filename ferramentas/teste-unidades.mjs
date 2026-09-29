@@ -43,7 +43,7 @@ for(let i=0;i<8;i++){
 }
 await dormir(400);
 ok(await av('!!document.querySelector(".estrelas-fim")'),'a tela final mostra as estrelas');
-ok(/XP/.test(await av('document.querySelector(".quiz").innerText')),'a tela final mostra XP');
+ok(await av('(t => /acertos/i.test(t) && !/XP/.test(t))(document.querySelector(".quiz").innerText)'),'a tela final mostra os acertos e não XP');
 // cada unidade guarda o proprio resultado
 await dormir(900);
 const est=await av('fetch("api/estado",{cache:"no-store"}).then(r=>r.json())');
