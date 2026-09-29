@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Perfil</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#0c0c0c;font-family:Manrope,ui-sans-serif,system-ui,sans-serif}
+a{color:#dff74a}a:hover{color:#ffffff}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #0c0c0c; color: #ffffff; font-family: Manrope, ui-sans-serif, system-ui, sans-serif; font-weight: 500; font-size: 16px; line-height: 1.45">
+
+  <div style="position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 20px; border-radius: 0 0 36px 36px; background: #ffffff; color: #111111">
+    <header style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; align-items: center; gap: 12px">
+      <span aria-hidden="true"></span>
+      <h1 style="margin: 0; text-align: center; font-size: 20px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; color: #111111">Perfil</h1>
+      <button type="button" aria-label="Configurações" style="width: 52px; height: 52px; padding: 0; border: 0; border-radius: 50%; background: #f2f2f2; color: #111111; display: grid; place-items: center; cursor: pointer"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </header>
+
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+      <div style="position: relative; width: 88px; height: 88px">
+        <span aria-hidden="true" style="width: 88px; height: 88px; border-radius: 50%; background: #dff74a; color: #111111; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></span>
+        <button type="button" aria-label="Escolher foto" style="position: absolute; right: -10px; bottom: -10px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer">
+          <span style="width: 32px; height: 32px; border-radius: 50%; background: #111111; color: #ffffff; box-shadow: 0 0 0 3px #ffffff; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>
+        </button>
+      </div>
+      <label for="perfil-nome" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap">Seu nome</label>
+      <input id="perfil-nome" type="text" autocomplete="name" placeholder="Seu nome" style="width: 240px; max-width: 100%; height: 48px; box-sizing: border-box; margin: 4px 0 0; padding: 0 20px; border: 0; border-radius: 999px; background: #f2f2f2; color: #111111; font-family: inherit; font-size: 20px; font-weight: 700; line-height: 28px; letter-spacing: -0.01em; text-align: center">
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px; height: 80px; box-sizing: border-box; padding: 0 10px 0 12px; border-radius: 26px; background: #dff74a; color: #111111">
+        <span style="display: flex; align-items: center; gap: 4px">
+          <b style="font-size: 22px; font-weight: 800; line-height: 28px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">12</b>
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 1.9c1.1 4.3 5.7 6.2 5.7 11.1a5.7 5.7 0 0 1-11.4 0c0-2.2 1-3.9 2.2-4.9.1 1.8 1.1 3 2.2 3 1.3 0 2-1.9 1.2-4.6-.4-1.6-.5-3.2.1-4.6Z" fill="#ff6a2b"/><path d="M12 10.6c.5 2 2.4 2.9 2.4 5.2a2.4 2.4 0 0 1-4.8 0c0-1 .4-1.8.9-2.3.1.8.5 1.4.9 1.4.6 0 .9-.9.6-2.2Z" fill="#ffc53d"/></svg>
+        </span>
+        <span style="font-size: 12px; font-weight: 600; line-height: 18px; white-space: nowrap; color: #111111">dias seguidos</span>
+      </div>
+      <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px; height: 80px; box-sizing: border-box; padding: 0 12px; border-radius: 26px; background: #f2f2f2; color: #111111">
+        <b style="font-size: 22px; font-weight: 800; line-height: 28px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">41</b>
+        <span style="font-size: 12px; font-weight: 600; line-height: 18px; white-space: nowrap; font-variant-numeric: tabular-nums; color: #6b6b6b">de 365 dias</span>
+      </div>
+      <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px; height: 80px; box-sizing: border-box; padding: 0 12px; border-radius: 26px; background: #f2f2f2; color: #111111">
+        <b style="font-size: 22px; font-weight: 800; line-height: 28px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">3</b>
+        <span style="font-size: 12px; font-weight: 600; line-height: 18px; white-space: nowrap; font-variant-numeric: tabular-nums; color: #6b6b6b">de 66 livros</span>
+      </div>
+    </div>
+  </div>
+
+  <main style="box-sizing: border-box; padding: 20px 16px 0; display: flex; flex-direction: column; gap: 16px">
+
+    <section aria-labelledby="estante-titulo" style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px">
+        <h2 id="estante-titulo" style="margin: 0; font-size: 20px; font-weight: 700; line-height: 28px; letter-spacing: -0.01em; color: #ffffff">Sua estante</h2>
+        <a href="R1Explorar.dc.html" style="margin: -8px 0; padding: 12px 0; font-size: 14px; font-weight: 600; line-height: 20px; color: #9d9d9d; text-decoration: none">Ver livros</a>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; padding: 16px; border-radius: 24px; background: #1c1c1c">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 13px; font-weight: 700; line-height: 18px; color: #ffffff">Antigo Testamento<span style="font-weight: 600; color: #9d9d9d"> · 39</span></span>
+          <div aria-label="Livros do Antigo Testamento" role="group" style="display: grid; grid-template-columns: repeat(39, minmax(0, 1fr)); align-items: end; height: 32px; gap: 2px">
+            <sc-for list="{{at}}" as="l" hint-placeholder-count="39">
+              <span role="img" aria-label="{{l.rotulo}}" style="height: {{l.altura}}; box-sizing: border-box; border-radius: 3px; background: {{l.cor}}; box-shadow: {{l.contorno}}"></span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 13px; font-weight: 700; line-height: 18px; color: #ffffff">Novo Testamento<span style="font-weight: 600; color: #9d9d9d"> · 27</span></span>
+          <div aria-label="Livros do Novo Testamento" role="group" style="display: grid; grid-template-columns: repeat(39, minmax(0, 1fr)); align-items: end; height: 32px; gap: 2px">
+            <sc-for list="{{nt}}" as="l" hint-placeholder-count="27">
+              <span role="img" aria-label="{{l.rotulo}}" style="height: {{l.altura}}; box-sizing: border-box; border-radius: 3px; background: {{l.cor}}; box-shadow: {{l.contorno}}"></span>
+            </sc-for>
+          </div>
+        </div>
+        <ul aria-label="Legenda" style="list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 16px; font-size: 13px; font-weight: 600; line-height: 18px; font-variant-numeric: tabular-nums; color: #9d9d9d">
+          <li style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 8px; height: 16px; border-radius: 2px; background: #dff74a"></span>3 lidos</li>
+          <li style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 8px; height: 16px; box-sizing: border-box; border-radius: 2px; box-shadow: inset 0 0 0 2px #ffffff"></span>2 lendo</li>
+          <li style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 8px; height: 10px; border-radius: 2px; background: #333333"></span>61 por ler</li>
+        </ul>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <button type="button" style="display: flex; align-items: center; gap: 12px; width: 100%; height: 56px; box-sizing: border-box; padding: 0 20px 0 8px; border: 0; border-radius: 999px; background: #1c1c1c; color: #ffffff; font-family: inherit; text-align: left; cursor: pointer">
+        <span aria-hidden="true" style="flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: #2a2a2a; color: #ffffff; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>
+        <span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 700; line-height: 22px; white-space: nowrap">Minhas anotações</span>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#9d9d9d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 auto"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+      <button type="button" style="display: flex; align-items: center; gap: 12px; width: 100%; height: 56px; box-sizing: border-box; padding: 0 20px 0 8px; border: 0; border-radius: 999px; background: #1c1c1c; color: #ffffff; font-family: inherit; text-align: left; cursor: pointer">
+        <span aria-hidden="true" style="flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: #2a2a2a; color: #ffffff; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.5"/><path d="m8.6 13.3-1.4 7.2 4.8-2.4 4.8 2.4-1.4-7.2"/></svg></span>
+        <span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 700; line-height: 22px; white-space: nowrap">Conquistas e troféus</span>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#9d9d9d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 auto"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+
+  </main>
+
+  <nav aria-label="Navegação principal" style="position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 3; height: 76px; box-sizing: border-box; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; border-radius: 38px; background: #262626">
+    <a href="R1Trilha.dc.html" aria-label="Trilha" style="width: 60px; height: 60px; border-radius: 50%; background: #363636; color: #e8e8e8; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8.2 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.8"/></svg></a>
+    <a href="R1Desafios.dc.html" aria-label="Desafios" style="width: 60px; height: 60px; border-radius: 50%; background: #363636; color: #e8e8e8; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11"/><path d="M17 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5"/><path d="M12 14v4"/><path d="M8 21h8"/></svg></a>
+    <a href="R1Juntos.dc.html" aria-label="Juntos, 2 novidades" style="position: relative; width: 60px; height: 60px; border-radius: 50%; background: #363636; color: #e8e8e8; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 14.3c2.1.7 3.5 2.8 3.5 5.7"/></svg><span aria-hidden="true" style="position: absolute; top: 12px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: #dff74a; box-shadow: 0 0 0 2px #363636"></span></a>
+    <a href="R1Explorar.dc.html" aria-label="Explorar" style="width: 60px; height: 60px; border-radius: 50%; background: #363636; color: #e8e8e8; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></a>
+    <a href="R1Perfil.dc.html" aria-label="Perfil" aria-current="page" style="width: 60px; height: 60px; border-radius: 50%; background: #000000; color: #dff74a; display: grid; place-items: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></a>
+  </nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const lidos = ['Gênesis', 'Êxodo', 'Mateus'];
+    const lendo = ['Levítico', 'Marcos'];
+    const livro = function (nome) {
+      if (lidos.indexOf(nome) >= 0) {
+        return { rotulo: nome + ', lido', cor: '#dff74a', contorno: 'none', altura: '32px' };
+      }
+      if (lendo.indexOf(nome) >= 0) {
+        return { rotulo: nome + ', lendo', cor: 'transparent', contorno: 'inset 0 0 0 2px #ffffff', altura: '32px' };
+      }
+      return { rotulo: nome + ', por ler', cor: '#333333', contorno: 'none', altura: '20px' };
+    };
+    const at = ['Gênesis', 'Êxodo', 'Levítico', 'Números', 'Deuteronômio', 'Josué', 'Juízes', 'Rute', '1 Samuel', '2 Samuel', '1 Reis', '2 Reis', '1 Crônicas', '2 Crônicas', 'Esdras', 'Neemias', 'Ester', 'Jó', 'Salmos', 'Provérbios', 'Eclesiastes', 'Cânticos', 'Isaías', 'Jeremias', 'Lamentações', 'Ezequiel', 'Daniel', 'Oseias', 'Joel', 'Amós', 'Obadias', 'Jonas', 'Miqueias', 'Naum', 'Habacuque', 'Sofonias', 'Ageu', 'Zacarias', 'Malaquias'];
+    const nt = ['Mateus', 'Marcos', 'Lucas', 'João', 'Atos', 'Romanos', '1 Coríntios', '2 Coríntios', 'Gálatas', 'Efésios', 'Filipenses', 'Colossenses', '1 Tessalonicenses', '2 Tessalonicenses', '1 Timóteo', '2 Timóteo', 'Tito', 'Filemom', 'Hebreus', 'Tiago', '1 Pedro', '2 Pedro', '1 João', '2 João', '3 João', 'Judas', 'Apocalipse'];
+    return { at: at.map(livro), nt: nt.map(livro) };
+  }
+}
+</script>
+</body>
+</html>
