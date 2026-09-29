@@ -889,16 +889,23 @@ const servidor = createServer(async (req, res) => {
       const recente = conta && Date.now() - (ultimoEnvioDeSenha.get(conta.usuario) || 0) < 5 * 60 * 1000;
       if (conta && !recente) {
         ultimoEnvioDeSenha.set(conta.usuario, Date.now());
+        // Sem e-mail, ou quando ele não sai (domínio ainda sem verificar, chave trocada,
+        // serviço fora do ar), o pedido vai para o painel do dono, que gera o link à mão.
+        const paraOPainel = () => guardarPedidosDeSenha(pedidosDeSenha().filter((p) => p.usuario !== conta.usuario)
+          .concat({ usuario: conta.usuario, em: Date.now() }));
         if (EMAIL && conta.email) {
-          semEsperar(enviarEmail(EMAIL, {
+          enviarEmail(EMAIL, {
             para: conta.email,
             assunto: 'Sua nova senha no Geração Eleita',
             texto: 'Olá, ' + primeiroNome(conta.nome) + '!\n\nRecebemos um pedido para criar uma nova senha para @' + conta.usuario
               + '. Abra o link abaixo em até 1 hora:\n\n' + linkDeSenha(conta.usuario)
               + '\n\nSe não foi você, ignore este e-mail: sua senha continua a mesma.\n\nGeração Eleita',
-          }));
+          }).catch((e) => {
+            console.log('  e-mail de senha não saiu, pedido vai para o painel: ' + e.message);
+            paraOPainel();
+          });
         } else {
-          guardarPedidosDeSenha(pedidosDeSenha().filter((p) => p.usuario !== conta.usuario).concat({ usuario: conta.usuario, em: Date.now() }));
+          paraOPainel();
         }
       }
       json(res, 200, { ok: true, porEmail: !!EMAIL });

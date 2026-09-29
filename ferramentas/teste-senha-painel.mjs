@@ -3,6 +3,7 @@
 // e só mostra contagens.
 // Uso: node ferramentas/teste-senha-painel.mjs
 import { spawn } from 'node:child_process';
+import { createServer } from 'node:net';
 import { rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -109,6 +110,48 @@ try {
   servidor.kill();
   await dormir(300);
   try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
+}
+
+// ---------- e-mail ligado, mas que não sai ----------
+// Aconteceu na produção: o domínio ainda não estava verificado no serviço de envio e o pedido
+// sumia. Um "servidor de e-mail" que derruba toda conexão faz o envio falhar na hora.
+const derruba = createServer((s) => s.destroy());
+await new Promise((r) => derruba.listen(0, '127.0.0.1', r));
+const PASTA2 = PASTA + '-email';
+try { rmSync(PASTA2, { recursive: true, force: true }); } catch { /* ok */ }
+const servidor2 = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA + 1)], {
+  env: { ...process.env, CAMINHO_ESTADO: join(PASTA2, 'estado.json'), CAMINHO_TESTE: '1', CAMINHO_ADMIN: 'dono',
+    CAMINHO_SMTP_HOST: '127.0.0.1', CAMINHO_SMTP_PORTA: String(derruba.address().port),
+    CAMINHO_SMTP_USUARIO: 'x', CAMINHO_SMTP_SENHA: 'y', CAMINHO_ENDERECO: 'https://exemplo.test' },
+  stdio: 'ignore',
+});
+const base2 = 'http://127.0.0.1:' + (PORTA + 1);
+for (let i = 0; i < 80; i++) { try { await fetch(base2 + '/api/existe-conta'); break; } catch { await dormir(150); } }
+const pedir2 = (rota, corpo, cookie) => fetch(base2 + rota, {
+  method: corpo ? 'POST' : 'GET',
+  headers: Object.assign({ 'content-type': 'application/json' }, cookie ? { cookie } : {}),
+  body: corpo ? JSON.stringify(corpo) : undefined,
+});
+const criar2 = async (usuario) => biscoito(await pedir2('/api/criar-conta',
+  { usuario, senha: 'senha-velha', nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true }));
+
+try {
+  console.log('\n  E-mail que não sai\n');
+  const dono = await criar2('dono');
+  await criar2('bia');
+  const r = await (await pedir2('/api/esqueci-senha', { login: 'bia' })).json();
+  ok(r.porEmail === true, 'com o e-mail ligado, a tela diz que o link vai por e-mail');
+  let lista = [];
+  for (let i = 0; i < 30 && !lista.length; i++) {
+    await dormir(150);
+    lista = (await (await pedir2('/api/painel', null, dono)).json()).pedidosDeSenha || [];
+  }
+  ok(lista.length === 1 && lista[0].usuario === 'bia', 'o envio falhou e o pedido caiu no painel do dono');
+} finally {
+  servidor2.kill();
+  derruba.close();
+  await dormir(300);
+  try { rmSync(PASTA2, { recursive: true, force: true }); } catch { /* ok */ }
 }
 
 console.log('\n  ' + (falhas ? falhas + ' falha(s)' : 'todas passaram') + '\n');
