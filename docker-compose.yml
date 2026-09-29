@@ -1,57 +1,55 @@
-# DEV do Geração Eleita: o redesenho da identidade nova (preto, branco e verde-limão).
+# Geração Eleita V2: o app redesenhado, servido à parte do app original.
 #
-# Três ambientes vivos ao mesmo tempo, cada um na sua pasta e na sua porta:
-#   PRD: "Caminho com Cristo - App",     porta 8080, https://ccc.off-sec.net
-#   HML: "Caminho com Cristo - App HML", porta 8081, o app como estava antes do redesenho
-#   DEV: esta pasta,                     porta 8082, onde o redesenho é feito
+# Tudo aqui tem nome próprio, com "-v2": o projeto do compose, os containers e a porta.
+# Assim ele pode rodar na mesma máquina que o app original sem que um "docker compose up"
+# daqui recrie ou derrube os containers de lá.
 #
-# O HML fica de pé de propósito, para comparar o antes e o depois lado a lado.
-# Backup das duas pastas originais: D:\Backups\caminho-com-cristo\2026-09-19\
+#   Porta no host: 8083 (troque com PORTA_V2 no .env se já estiver em uso)
+#   Dados:         ./dados desta pasta (banco, backups e chaves próprias do V2)
+#   Endereço:      o hostname público do túnel do V2, em CAMINHO_ENDERECO no .env
 #
-# O túnel rápido dá um endereço https (necessário para instalar no celular e testar
-# notificações) que muda a cada reinício. Para ver o endereço atual:
-#   docker compose logs tunel | findstr trycloudflare
-#
-# Os dados em ./dados vieram do HML, que por sua vez é uma cópia da produção sem as
-# chaves de sessão e de push: um login daqui não vale lá e nenhuma notificação sai
-# com a chave de produção.
-name: geracao-eleita
+# O .env desta pasta (que o git ignora) guarda:
+#   CLOUDFLARE_TUNNEL_TOKEN=...   token do túnel nomeado do V2 (nunca o do app original)
+#   CAMINHO_ENDERECO=https://...  o endereço público do V2 (entra na assinatura do push)
+#   PORTA_V2=8083                 opcional
+name: geracao-eleita-v2
 
 services:
   caminho:
     build:
       context: .
-    container_name: geracao-eleita
+    container_name: geracao-eleita-v2
     restart: unless-stopped
     ports:
-      - "8082:8080"
+      - "${PORTA_V2:-8083}:8080"
     volumes:
       - "./dados:/app/dados"
     environment:
-      CAMINHO_AMBIENTE: "hml"
+      CAMINHO_AMBIENTE: "v2"
+      CAMINHO_ENDERECO: "${CAMINHO_ENDERECO:-}"
 
-  # Túnel rápido: endereço novo a cada reinício. Só sobe se pedido, com
+  # Túnel rápido: endereço trycloudflare novo a cada reinício, bom para um teste sem
+  # configurar nada. Só sobe se pedido:
   #   docker compose --profile rapido up -d
+  #   docker compose logs tunel | grep trycloudflare
   tunel:
     image: cloudflare/cloudflared:latest
-    container_name: geracao-eleita-tunel
+    container_name: geracao-eleita-v2-tunel
     restart: unless-stopped
     profiles: [rapido]
     depends_on: [caminho]
     command: tunnel --no-autoupdate --url http://caminho:8080
 
-  # Túnel nomeado, endereço fixo. O token mora no .env desta pasta, que o git ignora.
-  # "network_mode: service:caminho" põe os dois na mesma pilha de rede, então no painel
-  # da Cloudflare o serviço aponta para http://localhost:8080 — e não para a porta 8082,
-  # que é só o mapeamento para fora, no host.
+  # Túnel nomeado, endereço fixo. "network_mode: service:caminho" põe os dois na mesma
+  # pilha de rede, então no painel da Cloudflare o serviço aponta para
+  # http://localhost:8080 (a porta de dentro do container), e não para a do host.
   #
   # ATENÇÃO ao publicar: recriar o container "caminho" destrói a pilha de rede que este
-  # aqui usa, e o túnel fica órfão ("network is unreachable"), no ar mas sem servir nada.
-  # Depois de todo deploy, reinicie os dois:
+  # usa, e o túnel fica no ar sem servir nada. Depois de todo deploy, reinicie os dois:
   #   docker compose up -d --build && docker compose restart tunel-fixo
   tunel-fixo:
     image: cloudflare/cloudflared:latest
-    container_name: geracao-eleita-tunel-fixo
+    container_name: geracao-eleita-v2-tunel-fixo
     restart: unless-stopped
     network_mode: "service:caminho"
     depends_on: [caminho]
