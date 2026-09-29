@@ -128,7 +128,7 @@
   }
 
   // ---------- convidar ----------
-  CC.convidar = async function () {
+  CC.convidar = async function (opcoes = {}) {
     if (cache && !cache.perfilCompleto) {
       const completou = await CC.completarCadastro(CC.quem || {});
       if (!completou) return;
@@ -168,6 +168,7 @@
       rotulo: 'Convidar',
       ligar: (folha, fechar) => {
         const recado = folha.querySelector('#recado');
+        if (opcoes.buscar) setTimeout(() => folha.querySelector('#arroba').focus(), 0);
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelector('[data-compartilhar]').onclick = async () => {
           const r = await CC.compartilhar(TEXTO_CONVITE, link);
@@ -459,9 +460,13 @@
       + '</article>';
   }
 
+  // Juntos abre em "Hoje" (quem já leu, quem ainda não) e tem o mural na outra aba.
+  let abaJuntos = 'hoje';
+
   CC.vistaAmigos = function (raiz) {
+    const convidarRedondo = '<button class="botao-redondo" data-convidar aria-label="Convidar amigo">' + CC.ico('mais-sinal') + '</button>';
     if (!servido()) {
-      raiz.innerHTML = '<h1>Juntos</h1><div class="vazio">Os amigos aparecem quando o aplicativo está aberto pelo servidor.</div>';
+      raiz.innerHTML = CC.cabecaTela('Juntos') + '<div class="vazio">Os amigos aparecem quando o aplicativo está aberto pelo servidor.</div>';
       return;
     }
 
@@ -471,14 +476,24 @@
       const recebidos = d.recebidos || [];
       const enviados = d.enviados || [];
       const m = novidades || {};
+      const euLi = CC.sequencia().feitoHoje;
 
-      const roda = amigos.map((a) => '<button class="amigo-roda' + (a.leuHoje ? ' leu' : '') + '" data-amigo="' + CC.esc(a.usuario) + '" '
-        + 'aria-label="' + CC.esc(a.nome) + ', ' + CC.plural(a.dias, 'dia', 'dias') + ' de propósito' + (a.leuHoje ? ', já leu hoje' : '') + '">'
-        + '<span class="moldura">' + retrato(a, 'grande') + (a.leuHoje ? '<i class="selo-leu">' + CC.ico('certo') + '</i>' : '') + '</span>'
-        + '<b>' + CC.esc(a.nome) + '</b><small>' + CC.icoChama() + a.dias + '</small></button>').join('')
-        // Amigos sem teto: uma vaga só, sempre no fim da roda, para chamar mais alguém.
-        + '<button class="vaga" data-convidar aria-label="Convidar alguém">'
-          + '<span class="moldura">' + CC.ico('mais-sinal') + '</span><b>Convidar</b></button>';
+      // Um amigo por cartão: quem é, há quantos dias leem juntos e como está hoje. Quem
+      // ainda não leu pode ser encorajado, mas só por quem já leu (é a regra do toque).
+      const cartaoAmigo = (a) => {
+        const primeiro = CC.esc(String(a.nome).split(' ')[0]);
+        let estado;
+        if (a.leuHoje) estado = '<span class="selo-status leu">' + CC.ico('certo') + 'Já leu hoje</span>';
+        else if (a.toqueEnviado) estado = '<span class="selo-status">Encorajado hoje</span>';
+        else if (euLi) estado = '<button class="botao pequeno" data-tocar-amigo="' + CC.esc(a.usuario) + '" aria-label="Encorajar ' + primeiro + '">Encorajar</button>';
+        else estado = '<span class="selo-status">Ainda não leu</span>';
+        return '<li class="cartao-amigo' + (a.leuHoje ? ' leu' : '') + '">'
+          + '<button class="quem-cartao" data-amigo="' + CC.esc(a.usuario) + '" '
+          + 'aria-label="' + CC.esc(a.nome) + ', ' + CC.plural(a.dias, 'dia', 'dias') + ' lendo juntos' + (a.leuHoje ? ', já leu hoje' : '') + '">'
+          + retrato(a, 'medio')
+          + '<span class="quem-amigo"><b>' + CC.esc(a.nome) + '</b><span class="arroba">' + CC.plural(a.dias || 0, 'dia junto', 'dias juntos') + '</span></span></button>'
+          + estado + '</li>';
+      };
 
       let corpo;
       if (dados && !d.perfilCompleto) {
@@ -494,40 +509,54 @@
             + '<div class="pe-duplo-plano"><button class="botao pequeno" data-mural-ligar>Mostrar</button>'
             + '<button class="botao pequeno plano" data-mural-nao>Agora não</button></div></div></div>'
           : '';
-        corpo = '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
-          + '<button class="botao contorno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
-          + '<button class="entrada-propositos" data-propositos>' + CC.ico('pessoas')
-            + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
-            + (d.convitesProposito ? '<i class="selo-numero" aria-label="' + CC.plural(d.convitesProposito, 'convite', 'convites') + '">' + d.convitesProposito + '</i>' : '')
-            + CC.ico('avancar') + '</button>'
-          + (recebidos.length
+        const hoje = (recebidos.length
             ? CC.tituloSecao('Pedidos', String(recebidos.length))
-              + '<div class="lista-pedidos">' + recebidos.map((p) => '<div class="linha-amigo pedido">' + retrato(p)
+              + '<div class="lista-pedidos">' + recebidos.map((p) => '<div class="linha-amigo pedido">' + retrato(p, 'medio')
                 + '<div class="quem-amigo"><b>' + CC.esc(p.nome) + '</b><span class="arroba">@' + CC.esc(p.usuario) + ' quer ler com você</span></div>'
                 + '<button class="botao pequeno" data-aceitar="' + CC.esc(p.usuario) + '">Aceitar</button>'
                 + '<button class="botao plano pequeno" data-recusar="' + CC.esc(p.usuario) + '">Recusar</button>'
                 + '</div>').join('') + '</div>'
             : '')
-          + pedidoLigar
-          + (eventos.length
-            ? '<div class="mural">' + eventos.map(itemDoMural).join('') + '</div>'
-            : '<div class="vazio-amigos">' + CC.ico('pessoas')
-              + '<p>' + (amigos.length ? 'Quando alguém bater uma meta, aparece aqui.' : 'Ler junto é mais fácil! Convide alguém para começar um propósito.') + '</p></div>')
+          + (amigos.length
+            ? '<ul class="lista-cartoes-amigos" aria-label="Amigos hoje">' + amigos.map(cartaoAmigo).join('') + '</ul>'
+            : '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Ler junto é mais fácil! Convide alguém para começar um propósito.</p></div>')
+          + '<button class="entrada-propositos" data-propositos>' + CC.ico('pessoas')
+            + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
+            + (d.convitesProposito ? '<i class="selo-numero" aria-label="' + CC.plural(d.convitesProposito, 'convite', 'convites') + '">' + d.convitesProposito + '</i>' : '')
+            + CC.ico('direita') + '</button>'
           + (enviados.length
             ? CC.tituloSecao('Convites enviados') + '<div class="lista-pedidos">' + enviados.map((p) => '<div class="linha-amigo enviado">'
               + '<div class="quem-amigo"><b>@' + CC.esc(p.usuario) + '</b><span class="arroba">aguardando</span></div>'
               + '<button class="botao plano pequeno" data-cancelar="' + CC.esc(p.usuario) + '">Cancelar</button></div>').join('') + '</div>'
             : '')
+          + '<button class="botao convidar-largo" data-convidar>' + CC.ico('mais-sinal') + 'Convidar amigo</button>';
+        const noMural = pedidoLigar
+          + (eventos.length
+            ? '<div class="mural">' + eventos.map(itemDoMural).join('') + '</div>'
+            : '<div class="vazio-amigos">' + CC.ico('pessoas')
+              + '<p>' + (amigos.length ? 'Quando alguém bater uma meta, aparece aqui.' : 'Quando você tiver amigos lendo junto, os marcos deles aparecem aqui.') + '</p></div>');
+        corpo = '<button class="busca-pilula" data-buscar-amigo>' + CC.ico('lupa') + 'Buscar amigo pelo @</button>'
+          + '<div class="segmentado abas-juntos" role="tablist" aria-label="O que ver">'
+          + '<button role="tab" id="aba-juntos-hoje" aria-controls="painel-juntos-hoje" aria-selected="' + (abaJuntos === 'hoje') + '" data-aba-juntos="hoje">Hoje</button>'
+          + '<button role="tab" id="aba-juntos-mural" aria-controls="painel-juntos-mural" aria-selected="' + (abaJuntos === 'mural') + '" data-aba-juntos="mural">Mural</button></div>'
+          + '<div class="painel-juntos" role="tabpanel" id="painel-juntos-hoje" aria-labelledby="aba-juntos-hoje"' + (abaJuntos === 'hoje' ? '' : ' hidden') + '>' + hoje + '</div>'
+          + '<div class="painel-juntos" role="tabpanel" id="painel-juntos-mural" aria-labelledby="aba-juntos-mural"' + (abaJuntos === 'mural' ? '' : ' hidden') + '>' + noMural + '</div>'
           + '<p class="rodape-privacidade"><span><a href="#/amigos/bloqueados">Pessoas bloqueadas</a> · <a href="privacidade.html">Privacidade</a></span></p>';
       }
 
-      raiz.innerHTML = '<div class="cabeca-tela"><h1>Juntos</h1>'
-        + '<span class="contagem-amigos">' + CC.plural(amigos.length, 'amigo', 'amigos') + '</span></div>'
+      raiz.innerHTML = CC.cabecaTela('Juntos', { sub: dados ? CC.plural(amigos.length, 'amigo', 'amigos') : '', direita: convidarRedondo })
         + (aviso ? '<p class="aviso-cadeado">' + CC.esc(aviso) + '</p>' : '')
         + corpo;
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
       ligar('[data-convidar]', () => CC.convidar());
+      ligar('[data-buscar-amigo]', () => CC.convidar({ buscar: true }));
+      ligar('[data-aba-juntos]', (el) => {
+        abaJuntos = el.dataset.abaJuntos;
+        raiz.querySelectorAll('[data-aba-juntos]').forEach((b) => b.setAttribute('aria-selected', String(b === el)));
+        raiz.querySelectorAll('.painel-juntos').forEach((p) => { p.hidden = p.id !== 'painel-juntos-' + abaJuntos; });
+      });
+      ligar('[data-tocar-amigo]', (el) => CC.telaToque(amigos.find((a) => a.usuario === el.dataset.tocarAmigo)));
       ligar('[data-propositos]', () => { location.hash = '#/novidades/propositos'; });
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));
       ligar('[data-amigo]', (el) => folhaAmigo(amigos.find((a) => a.usuario === el.dataset.amigo)));
@@ -580,7 +609,7 @@
   CC.vistaBloqueados = function (raiz) {
     const desenhar = (d) => {
       const lista = (d && d.bloqueados) || [];
-      raiz.innerHTML = CC.botaoVoltar('Juntos') + '<h1>Pessoas bloqueadas</h1>'
+      raiz.innerHTML = CC.cabecaTela('Pessoas bloqueadas', { voltar: 'Juntos' })
         + '<p class="passo-dica">Quem está aqui não vê você e não consegue te convidar.</p>'
         + (lista.length
           ? '<div class="lista-pedidos">' + lista.map((p) => '<div class="linha-amigo">' + retrato(p)

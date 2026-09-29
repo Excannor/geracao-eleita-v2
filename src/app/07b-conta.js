@@ -8,7 +8,7 @@
 
   const linha = (rotulo, valor, atributos, classe) => '<button class="linha-config' + (classe ? ' ' + classe : '') + '" ' + (atributos || '') + '>'
     + '<span>' + CC.esc(rotulo) + '</span>' + (valor ? '<span class="valor">' + CC.esc(valor) + '</span>' : '')
-    + CC.ico('avancar') + '</button>';
+    + CC.ico('direita') + '</button>';
   const grupo = (titulo, dentro) => '<section class="grupo-config"><h2 class="etiqueta">' + CC.esc(titulo) + '</h2>'
     + '<div class="caixa-config">' + dentro + '</div></section>';
 
@@ -17,8 +17,7 @@
     const tema = CC.temaGuardado();
     const traducao = CC.traducao();
 
-    raiz.innerHTML = CC.botaoVoltar('Perfil')
-      + '<h1>Configurações</h1>'
+    raiz.innerHTML = CC.cabecaTela('Configurações', { voltar: 'Perfil' })
       + grupo('Aparência', '<div class="linha-config sem-toque"><span>Tema</span>'
         + '<div class="segmentado" role="group" aria-label="Tema">'
         + [['Sistema', null], ['Claro', false], ['Escuro', true]].map(([rot, v]) =>
@@ -31,7 +30,7 @@
           + '<span>Mostrar meus marcos no Feed</span><span class="interruptor" aria-hidden="true"><i></i></span></button>'
         : '')
         + linha('Pessoas bloqueadas', '', 'data-ir="#/amigos/bloqueados"')
-        + '<a class="linha-config" href="privacidade.html"><span>Privacidade</span>' + CC.ico('avancar') + '</a>')
+        + '<a class="linha-config" href="privacidade.html"><span>Privacidade</span>' + CC.ico('direita') + '</a>')
       + grupo('Seus dados', linha('Baixar o que escrevi', '', 'data-exportar')
         + linha('Zerar progresso', '', 'data-zerar', 'perigo'))
       + (quem.comSenha
@@ -94,8 +93,7 @@
   CC.vistaTextos = function (raiz) {
     const biblias = CC.biblias();
     const atual = CC.traducao();
-    raiz.innerHTML = CC.botaoVoltar('Configurações')
-      + '<h1>Textos bíblicos</h1>'
+    raiz.innerHTML = CC.cabecaTela('Textos bíblicos', { voltar: 'Configurações' })
       + (atual
         ? '<div class="opcoes-traducao">' + biblias.map((b) => '<button class="opcao-traducao" data-traducao="'
           + CC.esc(b.sigla) + '" aria-pressed="' + (b.sigla === atual.sigla) + '"><b>'

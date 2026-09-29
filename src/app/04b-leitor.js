@@ -122,13 +122,20 @@
     let principal = lida ? 'Voltar à lição' : 'Terminei a leitura';
     if (seguinte) principal = (lida ? 'Ler ' : 'Terminei! Ler ') + seguinte[2];
 
+    // As traduções ficam à mão, num controle no alto; o "Aa" guarda a letra, o modo e o tema.
+    const traducoes = BIBLIAS.length > 1 && atual
+      ? '<div class="segmentado traducoes-leitor" role="group" aria-label="Tradução">'
+        + BIBLIAS.map((b) => '<button data-traducao-leitor="' + CC.esc(b.sigla) + '" aria-pressed="' + (b.sigla === atual.sigla) + '">'
+          + CC.esc(b.nome.replace(/Biblica® Open |™/g, '')) + '</button>').join('') + '</div>'
+      : '';
     el.innerHTML = '<div class="leitor-cabeca">'
       + '<div class="licao-topo">'
-      + '<button class="fechar" data-fechar-leitor aria-label="Voltar à lição">' + CC.ico('fechar') + '</button>'
-      + '<div class="leitor-titulo"><span class="rot">' + CC.esc(rotulo) + '</span>'
-      + '<b>' + CC.esc(ref) + '</b></div>'
-      + '<button class="botao-icone letra" data-aa aria-label="Tradução, letra e tema">Aa</button>'
+      + '<button class="fechar botao-redondo" data-fechar-leitor aria-label="Voltar à lição">' + CC.ico('voltar') + '</button>'
+      + '<div class="leitor-titulo"><b>' + CC.esc(ref) + '</b>'
+      + '<span class="rot">Dia ' + dia.numero + ' · ' + CC.esc(rotulo) + '</span></div>'
+      + '<button class="botao-redondo letra" data-aa aria-label="Tradução, letra e tema">Aa</button>'
       + '</div>'
+      + traducoes
       + '<div class="leitor-progresso"><i></i></div>'
       + '</div>'
       + '<div class="licao-palco"><div class="interno">'
@@ -141,11 +148,18 @@
       + '<button class="botao pequeno contorno" data-copiar-verso>' + CC.ico('folha') + 'Copiar</button>'
       + (CC.podeCompartilharComAmigos && CC.podeCompartilharComAmigos() ? '<button class="botao pequeno contorno" data-verso-amigos>' + CC.ico('pessoas') + 'Amigos</button>' : '')
       + '<button class="botao-icone" data-fechar-verso aria-label="Tirar a marca do versículo">' + CC.ico('fechar') + '</button></div>'
-      + '<button class="botao cor" data-terminei>' + CC.esc(principal) + '</button>'
+      + '<button class="botao cor" data-terminei>' + (lida ? '' : CC.ico('certo')) + CC.esc(principal) + '</button>'
       + '</div></div>';
 
     el.querySelector('[data-fechar-leitor]').onclick = CC.fecharLeitor;
     el.querySelector('[data-aa]').onclick = () => folhaAa(el);
+    el.querySelectorAll('[data-traducao-leitor]').forEach((b) => {
+      b.onclick = () => {
+        if (b.dataset.traducaoLeitor === atual.sigla) return;
+        CC.escolherTraducao(b.dataset.traducaoLeitor);
+        desenhar();
+      };
+    });
     el.querySelector('[data-terminei]').onclick = () => {
       guardarPosicao(chavePosicao(), null);
       if (!lida) { CC.anotarDiario('leitor', 1); aberto.marcar(chave); }

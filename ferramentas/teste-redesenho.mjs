@@ -143,14 +143,16 @@ ok(await av('CC.ler("lidos", []).length === 0 && CC.sequencia().atual === 0'),
   'a conta nova começa zerada, sem herdar progresso sem dono do aparelho');
 
 // ---------- trilha ----------
-ok(await esperar(existe('.leitura-hoje [data-abrir-dia]') + ' && ' + existe('.fala-bento.apresenta')),
-  'a conta nova vê a leitura de hoje no alto da trilha, e o Bento se apresenta');
+ok(await esperar(existe('.folha-topo .cartao-lima[data-abrir-dia]') + ' && ' + existe('.fala-bento.apresenta')),
+  'a conta nova vê a leitura de hoje na folha do alto da trilha, e o app se apresenta');
+// Na barra, os botões são redondos, só de ícone (como nas telas aprovadas): o nome de cada
+// aba continua no HTML, para o leitor de tela, e aparece no trilho lateral do computador.
 ok(await av('document.querySelectorAll(".navegacao .aba").length === 5 && ' + existe('.aba[aria-current=page]')
-  + ' && getComputedStyle(' + q('.aba .rotulo-aba') + ').position !== "absolute"'),
-  'cinco abas com o nome à vista, e a atual marcada para leitor de tela');
+  + ' && [...document.querySelectorAll(".aba .rotulo-aba")].every((r) => r.textContent.trim())'),
+  'cinco abas com nome para o leitor de tela, e a atual marcada');
 ok(await av('!' + existe('.topo .contador.lidos') + ' && !' + existe('.topo .contador.escudos') + ' && !' + existe('.topo .sino')),
   'o topo mostra só a lamparina: sem dias lidos, escudos ou sino');
-ok(await av('!' + existe('.contador.xp') + ' && ' + existe('.contador.ofensiva')), 'o topo mostra a ofensiva e não o XP');
+ok(await av('!' + existe('.contador.xp') + ' && ' + existe('.folha-topo .cartao-lima[data-ofensiva]')), 'a ofensiva fica no cartão da trilha, sem XP');
 ok(await av('document.querySelectorAll(".no-bau").length >= 4'), 'a trilha tem um baú a cada sete dias');
 await dormir(500);
 await foto('3-trilha');
@@ -217,8 +219,8 @@ const tokenAna = new URL(conviteAna).searchParams.get('convite');
 ok((await api('/api/convites/' + tokenAna)).dado.nome === 'Ana', 'quem abre o link vê quem convidou');
 ok((await api('/api/convites/aceitar', { token: tokenAna }, bruno.cookie)).status === 200, 'o Bruno aceita o convite');
 await irPara('#/amigos');
-ok(await esperar('document.querySelectorAll(".amigo-roda").length === 1 && /Bruno/.test(' + q('.amigo-roda') + '.innerText)'),
-  'O Feed mostra o propósito com o Bruno na roda de amigos');
+ok(await esperar('document.querySelectorAll(".cartao-amigo").length === 1 && /Bruno/.test(' + q('.cartao-amigo') + '.innerText)'),
+  'Juntos mostra o Bruno entre os amigos de hoje');
 await clicar('[data-amigo="bruno"]');
 ok(await esperar(existe('.cortina [data-toque]')), 'a Ana leu e o Bruno não: a folha do amigo oferece "Notificar"');
 await clicar('.cortina [data-toque]');
@@ -255,7 +257,7 @@ await dormir(300);
 await irPara('#/amigos');
 ok(await esperar(existe('[data-aceitar="dani"]')), 'o pedido aparece em Pedidos');
 await clicar('[data-aceitar="dani"]');
-ok(await esperar('document.querySelectorAll(".amigo-roda").length === 3'), 'aceitar o pedido cria o terceiro propósito');
+ok(await esperar('document.querySelectorAll(".cartao-amigo").length === 3'), 'aceitar o pedido cria o terceiro propósito');
 await av('document.querySelectorAll(".tela-cheia").forEach((t) => t.remove()), true');
 
 // bloquear
@@ -264,7 +266,7 @@ await esperar(existe('.cortina [data-bloquear]'));
 await clicar('.cortina [data-bloquear]');
 await esperar(existe('.cortina [data-sim]'));
 await clicar('.cortina [data-sim]');
-ok(await esperar('document.querySelectorAll(".amigo-roda").length === 2'), 'bloquear tira a pessoa da roda');
+ok(await esperar('document.querySelectorAll(".cartao-amigo").length === 2'), 'bloquear tira a pessoa da lista de amigos');
 await irPara('#/amigos/bloqueados');
 ok(await esperar(existe('[data-desbloquear="dani"]')), 'quem foi bloqueado aparece em Pessoas bloqueadas');
 ok((await api('/api/procurar?q=ana.teste', null, dani.cookie)).dado.achado === null, 'quem foi bloqueado não acha mais quem bloqueou');
@@ -299,8 +301,8 @@ await foto('5b-missoes');
 
 // ---------- perfil e configurações ----------
 await irPara('#/perfil');
-ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".estante .trofeu").length === 3 && document.querySelectorAll(".visao-geral .visao-item").length === 4'),
-  'o perfil mostra a visão geral, conquistas com nível e a coleção');
+ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".estante .trofeu").length === 3 && document.querySelectorAll(".numeros-perfil .numero-perfil").length === 3 && document.querySelectorAll(".barras-livros .livro-barra").length === 66'),
+  'o perfil mostra os três números, a estante dos 66 livros, conquistas com nível e a coleção');
 ok(await av('/188/.test(' + q('.linha-ajuda') + '.innerText) && !/XP/.test(' + q('.conteudo') + '.innerText)'),
   'o perfil tem a linha do CVV e não mostra XP');
 await dormir(400);

@@ -10,11 +10,11 @@
   // quem acabou de chegar que o baú é Desafios e a bússola é Explorar. Praticar mora dentro
   // de Desafios e no fim de cada unidade da trilha.
   const ABAS = [
-    ['#/', 'Trilha', 'trilha'],
-    ['#/missoes', 'Desafios', 'bau'],
-    ['#/novidades', 'Juntos', 'novidades'],
-    ['#/explorar', 'Explorar', 'bussola'],
-    ['#/perfil', 'Perfil', 'pessoa'],
+    ['#/', 'Trilha', 'aba-trilha'],
+    ['#/missoes', 'Desafios', 'aba-desafios'],
+    ['#/novidades', 'Juntos', 'aba-juntos'],
+    ['#/explorar', 'Explorar', 'aba-explorar'],
+    ['#/perfil', 'Perfil', 'aba-perfil'],
   ];
 
   const ABA_DA_ROTA = {
@@ -60,6 +60,18 @@
     topo.querySelectorAll('[data-ofensiva]').forEach((b) => { b.onclick = CC.folhaOfensiva; });
   }
   CC.pintarTopo = pintarTopo;
+
+  // A cor da barra do sistema segue o alto da tela: a folha branca na Trilha e no Perfil, o
+  // cinza nas outras, e o escuro no tema escuro.
+  function pintarCorDoSistema() {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) return;
+    const escuro = document.documentElement.dataset.tema === 'escuro';
+    const rota = document.documentElement.dataset.rota;
+    const comFolha = rota === 'trilha' || rota === 'dia' || rota === 'perfil';
+    meta.content = escuro ? (comFolha ? '#1c1c1c' : '#0c0c0c') : (comFolha ? '#ffffff' : '#efefef');
+  }
+  CC.pintarCorDoSistema = pintarCorDoSistema;
 
   // ---------- folha da ofensiva ----------
   CC.folhaOfensiva = function () {
@@ -113,9 +125,9 @@
       + '<span class="simbolo">' + CC.icoLogo() + '</span>'
       + '<span>Geração <em>Eleita</em></span></a>'
       + ABAS.map(([href, rotulo, icone]) => {
-        const foto = icone === 'pessoa' ? CC.foto() : '';
-        const marca = foto ? '<img class="retrato-aba" src="' + CC.esc(foto) + '" alt="">' : CC.icoAba(icone);
-        const ponto = icone === 'novidades' && pendencias ? '<i class="ponto-aba"></i>' : '';
+        const foto = icone === 'aba-perfil' ? CC.foto() : '';
+        const marca = foto ? '<img class="retrato-aba" src="' + CC.esc(foto) + '" alt="">' : CC.ico(icone, 'class="ico-aba"');
+        const ponto = icone === 'aba-juntos' && pendencias ? '<i class="ponto-aba"></i>' : '';
         return '<button class="aba' + (href === ativa ? ' selecionada' : '') + '" data-ir="' + href + '"'
           + (href === ativa ? ' aria-current="page"' : '') + '><span class="icone-aba">' + marca + ponto + '</span>'
           + '<span class="rotulo-aba">' + rotulo + '</span></button>';
@@ -157,6 +169,11 @@
 
     conteudo.classList.toggle('largo', rota === 'nota');
     conteudo.dataset.rota = rota || 'trilha';
+    // A Trilha e o Perfil têm a folha clara no alto e o resto em fundo escuro: a página
+    // inteira precisa saber em que tela está, e a barra do sistema acompanha a folha.
+    document.documentElement.dataset.rota = rota || 'trilha';
+    document.documentElement.dataset.sub = arg ? '1' : '';
+    pintarCorDoSistema();
     if (rota === 'dia') CC.montarLicao(Number(arg));
 
     pintarTopo();

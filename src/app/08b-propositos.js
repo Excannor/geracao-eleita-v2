@@ -98,9 +98,7 @@
       const convites = lista.filter((p) => p.euConvidado);
       const grupos = lista.filter((p) => !p.euConvidado && p.grupo);
       const duplas = lista.filter((p) => !p.euConvidado && !p.grupo);
-      raiz.innerHTML = CC.botaoVoltar('Juntos')
-        + '<div class="cabeca-tela"><h1>Propósitos</h1>'
-        + (d ? '<span class="contagem-amigos">' + CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') + '</span>' : '') + '</div>'
+      raiz.innerHTML = CC.cabecaTela('Propósitos', { voltar: 'Juntos', sub: d ? CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') : '' })
         + (aviso ? '<p class="aviso-cadeado">' + CC.esc(aviso) + '</p>' : '')
         + '<button class="botao azul" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito</button>'
         + (!d ? '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>' : '')

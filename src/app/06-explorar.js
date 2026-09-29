@@ -133,37 +133,49 @@
     return n.pasta === '00 - Início' && id !== HISTORIA;
   };
 
+  // Um atalho redondo para uma nota do dia: o ícone diz se é livro, pessoa ou lugar.
+  const chipNota = (id) => {
+    const n = D.notas[id];
+    if (!n) return '';
+    return '<a class="chip-nota" href="#/nota/' + encodeURIComponent(id) + '" data-nota="' + CC.esc(id) + '">'
+      + '<span class="circulo" aria-hidden="true">' + CC.ico(estilo(n.pasta)[0]) + '</span>'
+      + '<span class="nome">' + CC.esc(CC.semPrefixo(n.nome)) + '</span></a>';
+  };
+
   CC.vistaExplorar = function (raiz) {
+    // Cada seção num cartão com quantos textos ela tem; a descrição fica para quem entra nela.
     const blocos = GRUPOS.map(([titulo, pastas]) => {
       const cartoes = pastas.map((pasta) => {
         const s = secaoDe(pasta);
         if (!s) return '';
         const [icone, cor] = estilo(pasta);
-        return '<a class="bloco-secao c-' + cor + '" href="#/secao/' + encodeURIComponent(pasta) + '">'
-          + '<span class="icone">' + CC.ico(icone) + '</span>'
-          + '<b>' + CC.esc(s.rotulo) + '</b>'
-          + '<span>' + CC.esc(s.descricao) + '</span></a>';
+        const quantos = s.ids.length;
+        return '<a class="bloco-secao c-' + cor + '" href="#/secao/' + encodeURIComponent(pasta) + '" title="' + CC.esc(s.descricao) + '">'
+          + '<span class="textos-secao"><b>' + quantos + '</b><span>' + CC.esc(s.rotulo) + '</span></span>'
+          + '<span class="icone" aria-hidden="true">' + CC.ico(icone) + '</span></a>';
       }).join('');
       return CC.tituloSecao(titulo) + '<div class="grade-secoes">' + cartoes + '</div>';
     }).join('');
 
     const dia = D.plano[CC.diaAtual() - 1];
-    const deHoje = [...(dia.rel.livros || []), ...(dia.rel.pessoas || []), ...(dia.rel.eventos || [])].slice(0, 8);
+    const deHoje = [...(dia.rel.livros || []), ...(dia.rel.pessoas || []), ...(dia.rel.eventos || []), ...(dia.rel.lugares || [])].slice(0, 10);
     const total = Object.keys(D.notas).filter((id) => !CC.notaInterna(id)).length;
 
-    raiz.innerHTML = '<h1>Explorar</h1>'
-      + '<p class="passo-dica">Quer entender melhor o que leu? Aqui tem quem é quem, onde tudo aconteceu e o que cada livro conta.</p>'
+    raiz.innerHTML = '<header class="cabeca-explorar"><h1>Explorar</h1>'
+      + '<p>Quem é quem, onde tudo aconteceu e o que cada livro conta.</p></header>'
       + CC.campoBusca('')
       + (deHoje.length
-        ? '<div class="cartao notas-de-hoje"><span class="etiqueta">Pra ir além na leitura de hoje</span>'
+        ? '<section class="notas-de-hoje" aria-labelledby="titulo-hoje-explorar">'
+          + '<h2 id="titulo-hoje-explorar">Pra ir além na leitura de hoje</h2>'
           + '<b>' + CC.esc(CC.passagemDe(dia)) + '</b>'
-          + '<div class="pilulas">' + deHoje.map(CC.pilulaNota).join('') + '</div></div>'
+          + '<div class="fileira-notas">' + deHoje.map(chipNota).join('') + '</div></section>'
         : '')
-      + (D.notas[HISTORIA] ? '<a class="cartao cartao-historia" href="#/nota/' + encodeURIComponent(HISTORIA) + '">'
-        + CC.ico('livro') + '<span><b>A história da Bíblia em uma página</b>'
-        + '<span class="passo-dica">Veja o todo antes das partes.</span></span>' + CC.ico('avancar') + '</a>' : '')
+      + (D.notas[HISTORIA] ? '<a class="cartao-historia" href="#/nota/' + encodeURIComponent(HISTORIA) + '">'
+        + '<span class="textos-historia"><b>A história da Bíblia em uma página</b>'
+        + '<span>Veja o todo antes das partes.</span></span>'
+        + '<span class="redondo-preto" aria-hidden="true">' + CC.ico('direita') + '</span></a>' : '')
       + blocos
-      + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
+      + '<p class="passo-dica total-explorar">' + total + ' textos pra explorar.</p>';
     CC.ligarBusca(raiz);
   };
 
@@ -171,7 +183,7 @@
   CC.vistaSecao = function (raiz, pasta, filtro) {
     const s = secaoDe(pasta);
     if (!s) return CC.vazio(raiz, 'Não encontrei essa seção.');
-    const [icone, cor] = estilo(pasta);
+    const [, cor] = estilo(pasta);
     const ids = filtro ? s.ids.filter((id) => D.notas[id].filtro === filtro) : s.ids;
 
     const filtros = s.filtros.length
@@ -182,10 +194,8 @@
         + '</div>'
       : '';
 
-    raiz.innerHTML = CC.botaoVoltar('Explorar')
-      + '<div class="cabeca-secao c-' + cor + '">'
-      + '<span class="icone-secao">' + CC.ico(icone) + '</span>'
-      + '<div><h1>' + CC.esc(s.rotulo) + '</h1><p>' + CC.esc(s.descricao) + '</p></div></div>'
+    raiz.innerHTML = CC.cabecaTela(s.rotulo, { voltar: 'Explorar' })
+      + '<p class="subtitulo-tela c-' + cor + '">' + CC.esc(s.descricao) + '</p>'
       + CC.tituloSecao(filtro ? FILTRO_LEGIVEL[filtro] || filtro : 'Tudo', CC.plural(ids.length, 'texto', 'textos'))
       + filtros
       + (ids.length ? '<div class="grade">' + ids.map(CC.itemNota).join('') + '</div>'

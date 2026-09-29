@@ -56,13 +56,14 @@
         + (p.melhor ? ' · seu melhor: ' + p.melhor + ' de ' + (p.total || total) : ' · ainda não praticou') + '</span>'
         + '<span class="estrelas">' + [0, 1, 2].map((i) =>
           '<i class="' + (i < estrelas ? 'cheia' : '') + '">' + CC.ico('estrela') + '</i>').join('') + '</span>'
-        + '</span>' + CC.ico('avancar') + '</button>';
+        + '</span>' + CC.ico('direita') + '</button>';
     };
 
     // A unidade de agora ganha o destaque; as outras ficam numa lista só, sem pilha de cartões.
     const daVez = jogaveis.find((u) => u.numero === atual) || jogaveis[0];
-    raiz.innerHTML = '<div class="cabeca-pratica c-' + daVez.cor + '">'
-      + '<div class="textos"><h1>Praticar</h1>'
+    raiz.innerHTML = CC.cabecaTela('Praticar', { voltar: 'Desafios' })
+      + '<div class="cabeca-pratica c-' + daVez.cor + '">'
+      + '<div class="textos">'
       + '<p>Rodadas de ' + POR_SESSAO + ' perguntas, uns 2 minutos, pra guardar versículos na memória.</p>'
       + '<button class="botao branco" data-unidade="' + daVez.numero + '">' + CC.ico('alvo') + 'Praticar a unidade ' + daVez.numero + '</button></div>'
       + '</div>'
@@ -152,7 +153,7 @@
     const rodape = s.conferido ? rodapeConferido() : rodapeEscolha();
 
     el.innerHTML = '<div class="licao-topo">'
-      + '<button class="fechar" data-fechar aria-label="Fechar">' + CC.ico('fechar') + '</button>'
+      + '<button class="fechar botao-redondo" data-fechar aria-label="Fechar">' + CC.ico('fechar') + '</button>'
       + CC.barra(fracao)
       + '<span class="quiz-contador">' + (s.indice + 1) + '/' + s.perguntas.length + '</span>'
       + '</div>'
@@ -238,7 +239,7 @@
         : proporcao >= 0.4 ? 'Está fixando!' : 'Continue praticando';
     const estrelas = Math.round(proporcao * 3);
 
-    return '<div class="licao-topo"><button class="fechar" data-fechar aria-label="Fechar">'
+    return '<div class="licao-topo"><button class="fechar botao-redondo" data-fechar aria-label="Fechar">'
       + CC.ico('fechar') + '</button>' + CC.barra(1) + '</div>'
       + '<div class="licao-palco"><div class="interno"><div class="festa">'
       + '<div class="estrelas-fim">' + [0, 1, 2].map((i) =>

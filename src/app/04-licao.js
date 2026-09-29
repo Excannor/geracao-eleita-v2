@@ -57,6 +57,8 @@
   function guardarPartes(numero, marcadas) {
     try { localStorage.setItem(CHAVE_PARTES, JSON.stringify({ dono: donoPartes(), dia: numero, data: CC.hojeIso(), antigo: !!marcadas.antigo, novo: !!marcadas.novo })); } catch (e) { /* segue */ }
   }
+  // Quais partes do dia de hoje já foram marcadas: o cartão da trilha diz qual falta.
+  CC.partesMarcadas = (numero) => partesGuardadas(numero);
   CC.fracaoDoDia = (numero) => {
     if (CC.leu(numero)) return 1;
     const dia = D.plano[numero - 1];
@@ -121,7 +123,7 @@
 
     const tela = ({ leitura: telaLeitura, festa: telaFesta, resumo: telaResumo, fundo: telaFundo, escrever: telaEscrever })[sessao.tela](dia, u, trilhas);
     el.innerHTML = (tela.semTopo ? '' : '<div class="licao-topo">'
-      + '<button class="fechar" data-fechar aria-label="Fechar">' + CC.ico('fechar') + '</button>'
+      + '<button class="fechar botao-redondo" data-fechar aria-label="Fechar">' + CC.ico('fechar') + '</button>'
       + (tela.topo || CC.barra(fracao))
       + '</div>')
       + '<div class="licao-palco"><div class="interno">' + tela.corpo + '</div></div>'

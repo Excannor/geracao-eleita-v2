@@ -39,15 +39,19 @@ Para usar outra porta: `node servidor.mjs 3000`.
 ## As cinco telas
 
 **Trilha**: os 365 dias como nós de um caminho, agrupados em 12 unidades, uma por mês do
-plano. No alto fica o cartão **Leitura de hoje**, com a passagem do dia, quantos minutos leva
-e quem já leu hoje entre os seus amigos. Cada unidade traz no título os livros que percorre
+plano. No alto fica uma folha clara com a saudação e dois cartões: a **leitura de hoje**
+(quantas das partes do dia já foram marcadas; tocar abre a lição) e a **ofensiva** (tocar abre
+a folha da chama), e embaixo deles quem já leu hoje entre os seus amigos. A estrada fica em
+fundo escuro, nos dois temas: ao lado de cada nó vão o dia e a passagem, e ao lado do nó de
+hoje, um cartão com o que falta ler e o botão de seguir. A linha que liga os nós é contínua
+até hoje e pontilhada depois. Cada unidade traz no título os livros que percorre
 (*Gênesis a Êxodo · Mateus*), e no fim um troféu que só abre quando todos os dias dela foram
 lidos. Unidades fechadas ficam recolhidas, para não ter que rolar 365 nós até o dia de hoje.
 
-Cada nó conta o que houve naquele dia: visto verde para o dia lido, estrela a cada sete
-dias, caneta onde você escreveu o registro e um nó dourado com o nome do livro no dia que
-fecha um livro da Bíblia. O dia atual mostra um anel que se enche conforme você marca as
-passagens; os dias que ainda não chegaram ficam com cadeado.
+Cada nó conta o que houve naquele dia: visto para o dia lido, caneta onde você escreveu o
+registro e um livro no dia que fecha um livro da Bíblia (o rótulo ao lado diz qual). O dia
+atual é o nó verde-limão, com um anel que se enche conforme você marca as passagens; os dias
+que ainda não chegaram ficam com cadeado. A cada sete dias há um baú na estrada.
 
 À beira da estrada ficam o jumentinho, que caminha junto do dia atual, e o personagem
 bíblico da unidade: colorido onde você já passou, em silhueta mais adiante. As doze lições
@@ -60,20 +64,22 @@ unidades abrem desde o começo: decorar um versículo antes de chegar ao livro n
 Praticar também aparece no fim de cada unidade da trilha. Nesta tela ficam ainda a barra de
 **Lendo junto na semana**, somando o que a dupla leu, e o quadro de peças do mês.
 
-**Juntos**: o Feed dos amigos, os pedidos de amizade, os propósitos e o convite. Aparecem ali
-os versículos que os amigos guardaram e os marcos deles: ofensiva, livros terminados e
-conquistas.
+**Juntos**: em **Hoje**, cada amigo num cartão, com o selo de quem já leu e o botão de
+encorajar quem ainda não leu; ali ficam também os pedidos de amizade, os propósitos e o
+convite. Em **Mural**, os versículos que os amigos guardaram e os marcos deles: ofensiva,
+livros terminados e conquistas.
 
 **Explorar**: todo o material de consulta, com busca em texto integral que alcança também o
 que você escreveu.
 
-**Perfil**: a visão geral (ofensiva, dias lidos, livros e conquistas), os últimos sete dias,
-a previsão de quando você termina a Bíblia no seu ritmo, o progresso livro a livro, quem lê
-junto com você, dez conquistas, os troféus, as cartas de personagem e o botão de baixar tudo
-o que você escreveu.
+**Perfil**: no alto, a foto, o nome e três números (ofensiva, dias lidos e livros); embaixo,
+em fundo escuro, a previsão de quando você termina a Bíblia no seu ritmo, a estante com um
+traço por livro (lido, em andamento, por ler), quem lê junto com você, as conquistas, os
+troféus e o botão de baixar tudo o que você escreveu.
 
-No topo, em todas as telas, fica só a lamparina com os dias de ofensiva. Tocar nela abre a
-folha com o estágio da chama, o recorde e quanto falta para o próximo estágio.
+Cada tela abre com o próprio título no meio e botões redondos ao lado. A ofensiva fica no
+cartão da Trilha e no Perfil: tocar nela abre a folha com o estágio da chama, o recorde e
+quanto falta para o próximo estágio.
 ## O dia como uma lição
 
 Tocar num nó abre a tela cheia, com barra de progresso no topo, e passa por:
@@ -444,7 +450,7 @@ coisas que no app estavam certas.
 | `db.mjs` | o banco: esquema com versão, gravação só do que mudou, importação dos JSON, backups e limpeza de quem apaga a conta |
 | `src/index.html` | o molde, com os marcadores que o build substitui |
 | `src/estilo.css` | a linguagem visual: cores, botões com aresta, nós da trilha |
-| `src/fontes.css` | Nunito embutida em base64 (licença SIL OFL 1.1) |
+| `src/fontes.css` | Manrope, Literata, Oswald e Permanent Marker embutidas em base64 (licenças SIL OFL 1.1 e Apache 2.0) |
 | `src/app/01-nucleo.js` | ícones, texto, datas, avisos e peças de interface |
 | `src/app/02-estado.js` | progresso, fusão entre aparelhos, ofensiva, XP, conquistas |
 | `src/app/01c-arte.js` | a lamparina que cresce com a ofensiva, os troféus, o baú e as medalhas, em SVG |
@@ -491,25 +497,26 @@ Mecânica e forma inspiradas no Duolingo: trilha serpenteada, botões que afunda
 faixa de unidade grudada no topo, ofensiva com chama, tela de conclusão com o que se ganhou
 e movimento em toda transição.
 
-A paleta se afasta dela de propósito, para o aplicativo não ser uma cópia. O fundo claro é
-um pergaminho quente, não o branco clínico; o escuro é índigo-ardósia, não o petróleo
-esverdeado; o verde é eucalipto, não verde-grama; a ofensiva queima em brasa, não em
-laranja. As seis cores de unidade vêm da identidade que o projeto já usava, com verde e
-turquesa somados. Os nós da trilha são blocos de cantos macios, não círculos. Tipografia
-Nunito.
+O visual é o do redesenho (as telas aprovadas estão em `design/telas/`, com o guia em
+`design/guia-visual.md`): fundo cinza-claro, cartões brancos grandes e bem arredondados, sem
+contorno nem sombra, botões em pílula e botões redondos de ícone. O preto é a cor da ação
+(pílula preta com texto verde-limão) e o verde-limão aparece só em destaques, sempre com texto
+preto em cima. A Trilha e o Perfil têm uma folha clara no alto e o resto em fundo escuro.
+Uma fonte só, a Manrope; o texto bíblico usa a Literata, e o carimbo do lema na entrada
+continua na Permanent Marker.
 
 Todos os pares de cor passam na régua da WCAG nos dois temas, medidos por
 `ferramentas/contraste.mjs`. No tema escuro as cores são luminosas demais para texto branco
 por cima, então ali a tinta sobre as cores cheias é escura: é a variável `--sobre-cor` que
 decide isso, uma vez, para o aplicativo inteiro.
 
-Tema claro e escuro seguem o sistema, e o botão no topo muda quando você quiser. Em telas a
-partir de 860px a barra inferior vira um trilho lateral, e a partir de 1180px aparece uma
-coluna com ofensiva, XP e a próxima leitura.
+Tema claro e escuro seguem o sistema, e as Configurações mudam quando você quiser. A barra
+de abas é uma pílula escura flutuante com cinco botões redondos; a aba ativa é preta com o
+ícone em verde-limão. Em telas a partir de 860px ela vira um trilho lateral, escuro nos dois
+temas.
 
-Os ícones do conteúdo são traçados à mão em SVG. Os da barra de navegação são preenchidos e
-coloridos, um tom por aba, porque numa barra de cinco itens a cor é o que faz reconhecer o
-destino antes de ler o rótulo. A chama e o raio vêm do
+Os ícones são de traço fino, desenhados em SVG, os mesmos na barra e no conteúdo. A chama e o
+raio vêm do
 [Bootstrap Icons](https://icons.getbootstrap.com) (MIT).
 
 O mascote é um jumentinho de carga, o animal que levou Jesus a Jerusalém, com alforjes onde

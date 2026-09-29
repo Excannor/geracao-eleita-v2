@@ -37,7 +37,7 @@
       + '<span class="barra-missao" style="--cor: var(--verde)"><i style="width:' + (Math.max(0, Math.min(1, fracao)) * 100).toFixed(1) + '%"></i></span>'
       + '<span class="descricao-conquista">' + pessoas
       + (s.proximo ? ' · faltam ' + s.proximo.faltam + ' para ' + CC.esc(s.proximo.nome) : ' · último nível!') + '</span>'
-      + '</span>' + CC.ico('avancar') + '</button>';
+      + '</span>' + CC.ico('direita') + '</button>';
   }
 
   function folhaSemeador(s) {
@@ -119,11 +119,6 @@
     const todos = [...trofeus.unidades, ...trofeus.colecoes];
     const ganhos = todos.filter((t) => t.ganho);
 
-    // Visão geral: quatro números em grade simples, sem cartão colorido em volta de cada um
-    const numero = (icone, valor, rotulo, href, dado) => (href ? '<a class="visao-item" href="' + href + '">'
-      : '<button class="visao-item"' + (dado ? ' ' + dado : '') + '>') + icone
-      + '<span><b>' + valor + '</b><small>' + CC.esc(rotulo) + '</small></span>' + (href ? '</a>' : '</button>');
-
     // Lendo junto: os dias da dupla, nunca o estágio da chama do outro. O "+" chama mais alguém.
     const amigos = ((CC.amigosEmCache && CC.amigosEmCache()) || {}).amigos || [];
     const lendoJunto = quem.comSenha
@@ -138,55 +133,84 @@
     // Primeiro as conquistas mais perto do próximo nível: é o que dá vontade de seguir.
     const vitrine = conquistas.slice().sort((a, b) => (a.maximo - b.maximo) || (b.fracao - a.fracao)).slice(0, 3);
     // Troféus: os ganhos primeiro, depois os que estão mais perto.
-    const estante = todos.slice().sort((a, b) => (b.ganho - a.ganho) || ((b.feitos / b.total) - (a.feitos / a.total))).slice(0, 6);
+    const estante3 = todos.slice().sort((a, b) => (b.ganho - a.ganho) || ((b.feitos / b.total) - (a.feitos / a.total))).slice(0, 3);
 
-    raiz.innerHTML = '<div class="cabeca-tela"><h1>Perfil</h1>'
-      + '<a class="botao-icone" href="#/config" aria-label="Configurações">' + CC.ico('engrenagem') + '</a></div>'
+    const nomeTestamento = { lido: 'lido', lendo: 'lendo', 'por-ler': 'por ler' };
+    const estadoDoLivro = (l) => {
+      const p = CC.progressoDoLivro(l);
+      return p.total && p.lidos >= p.total ? 'lido' : (p.lidos ? 'lendo' : 'por-ler');
+    };
+    const todosLivros = CC.livrosEmOrdem || [];
+    const inicioNovo = todosLivros.indexOf('Mateus');
+    const testamentos = [['Antigo Testamento', todosLivros.slice(0, inicioNovo)], ['Novo Testamento', todosLivros.slice(inicioNovo)]];
+    const contagem = { lido: 0, lendo: 0, 'por-ler': 0 };
+    const estante = testamentos.map(([nome, livros]) => {
+      const estados = livros.map(estadoDoLivro);
+      const aqui = { lido: 0, lendo: 0, 'por-ler': 0 };
+      estados.forEach((e) => { aqui[e]++; contagem[e]++; });
+      return '<div class="testamento"><span class="nome-testamento">' + nome + '<span> · ' + livros.length + '</span></span>'
+        + '<div class="barras-livros" role="img" aria-label="' + nome + ': ' + aqui.lido + ' lidos, ' + aqui.lendo + ' lendo, ' + aqui['por-ler'] + ' por ler">'
+        + estados.map((e, i) => '<span class="livro-barra ' + e + '" title="' + CC.esc(livros[i] + ', ' + nomeTestamento[e]) + '"></span>').join('')
+        + '</div></div>';
+    }).join('');
+
+    raiz.innerHTML = '<section class="folha-topo folha-perfil" aria-label="Você">'
+      + CC.cabecaTela('Perfil', { direita: '<a class="botao-redondo" href="#/config" aria-label="Configurações">' + CC.ico('engrenagem') + '</a>' })
       + '<div class="cartao-pessoa">'
       + '<button class="retrato" data-trocar-foto aria-label="' + (foto ? 'Trocar a foto' : 'Escolher uma foto') + '">'
       + (foto ? '<img src="' + CC.esc(foto) + '" alt="">' : '<span class="sem-foto">' + CC.ico('pessoa') + '</span>')
       + '<span class="lapis">' + CC.ico('caneta') + '</span></button>'
-      + '<div class="quem">'
       + '<label class="so-leitor" for="apelido">Seu nome</label>'
       + '<input id="apelido" class="campo-apelido" value="' + CC.esc(CC.apelido() || quem.nome || '') + '" '
       + 'placeholder="Seu nome" maxlength="20">'
       + (quem.usuario && quem.comSenha ? '<span class="conta">@' + CC.esc(quem.usuario) + '</span>' : '')
-      + '</div>'
       + '<input type="file" id="arquivo-foto" accept="image/*" hidden>'
       + '</div>'
+      // Três números no alto: a ofensiva (que abre a folha da chama), os dias e os livros.
+      + '<div class="numeros-perfil">'
+      + '<button class="numero-perfil destaque" data-ofensiva-perfil aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva">'
+      + '<span class="valor"><b>' + seq.atual + '</b>' + CC.icoChama(seq.atual) + '</span><small>' + (seq.atual === 1 ? 'dia seguido' : 'dias seguidos') + '</small></button>'
+      + '<div class="numero-perfil"><b>' + lidos + '</b><small>de ' + D.plano.length + ' dias</small></div>'
+      + '<a class="numero-perfil" href="#/perfil/livros"><b>' + CC.livrosCompletos() + '</b><small>de ' + CC.totalLivros + ' livros</small></a>'
+      + '</div></section>'
+      + '<div class="zona-escura corpo-perfil">'
       + '<div data-semeador>' + cartaoSemeador((CC.quem || {}).semeador) + '</div>'
       + (semNada ? '<p class="passo-dica">Sua primeira lição acende tudo isso!</p>' : '')
-      + '<h2 class="titulo-perfil">Visão geral</h2>'
-      + '<div class="visao-geral">'
-      + numero(CC.icoChama(seq.atual), seq.atual, seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva', '', 'data-ofensiva-perfil')
-      + numero(CC.ico('trilha'), lidos + ' de ' + D.plano.length, 'dias do plano')
-      + numero(CC.ico('livro'), CC.livrosCompletos() + ' de ' + CC.totalLivros, 'livros terminados', '#/perfil/livros')
-      + numero(CC.ico('medalha'), conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length, 'conquistas', '#/perfil/conquistas')
-      + '</div>'
       // A previsão só aparece quando anima: em até um ano e três meses. Mais longe que isso, a
       // data vira cobrança para quem está lendo devagar.
       + (ritmo.termino && ritmo.faltam && ritmo.porSemana >= 1 && (ritmo.termino - Date.now()) < 456 * 864e5
         ? '<div class="linha-ritmo">' + CC.ico('bussola') + '<span>No seu ritmo, você termina a Bíblia em <b>'
           + ritmo.termino.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) + '</b>.</span></div>'
         : '')
+      // A estante: um traço por livro, na ordem da Bíblia. Cheio é lido, com contorno é o
+      // que está em andamento, baixinho é o que ainda vem.
+      + '<section class="estante-livros" aria-labelledby="titulo-estante">'
+      + '<div class="titulo-secao"><h2 id="titulo-estante">Sua estante</h2><a href="#/perfil/livros">Ver livros</a></div>'
+      + '<div class="cartao estante-cartao">' + estante
+      + '<ul class="legenda-estante" aria-hidden="true">'
+      + '<li><i class="livro-barra lido"></i>' + contagem.lido + (contagem.lido === 1 ? ' lido' : ' lidos') + '</li>'
+      + '<li><i class="livro-barra lendo"></i>' + contagem.lendo + ' lendo</li>'
+      + '<li><i class="livro-barra por-ler"></i>' + contagem['por-ler'] + ' por ler</li></ul>'
+      + '</div></section>'
       + lendoJunto
       + '<div class="lista-atalhos">' + atalho('#/perfil/escritos', 'caneta', 'Minhas anotações') + '</div>'
       // A coleção num lugar só: conquistas e troféus.
-      + '<div class="titulo-secao"><h2>Coleção</h2></div>'
+      + '<div class="titulo-secao"><h2>Coleção</h2><a href="#/perfil/conquistas">Ver tudo</a></div>'
       + '<div class="caixa-lista">' + vitrine.map(CC.linhaConquista).join('') + '</div>'
       + '<div class="colecao-atalhos">'
       + '<a href="#/perfil/conquistas">' + CC.ico('medalha') + '<b>Conquistas</b><small>' + conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length + '</small></a>'
       + '<a href="#/perfil/trofeus">' + CC.ico('trofeu') + '<b>Troféus</b><small>' + ganhos.length + ' de ' + todos.length + '</small></a>'
       + '</div>'
-      + '<div class="estante">' + estante.slice(0, 3).map(trofeuHtml).join('') + '</div>'
+      + '<div class="estante">' + estante3.map(trofeuHtml).join('') + '</div>'
       + '<div class="lista-atalhos">'
       + atalho('#/perfil/versiculos', 'marcador', 'Versículos guardados')
       + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
-      + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
+      + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('direita') + '</button>'
       + '</div>'
       + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Precisa conversar com alguém? Fale com alguém de '
-      + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora.</p></div>';
+      + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora.</p></div>'
+      + '</div>';
 
     const arquivo = raiz.querySelector('#arquivo-foto');
     raiz.querySelector('[data-trocar-foto]').onclick = () => arquivo.click();
@@ -213,13 +237,13 @@
   };
 
   const atalho = (href, icone, texto) => '<a class="atalho" href="' + href + '">' + CC.ico(icone)
-    + '<span>' + CC.esc(texto) + '</span>' + CC.ico('avancar') + '</a>';
+    + '<span>' + CC.esc(texto) + '</span>' + CC.ico('direita') + '</a>';
 
   // ---------- conquistas ----------
   CC.vistaConquistas = function (raiz) {
     const conquistas = CC.conquistasComNivel();
     const legado = CC.conquistasLegado();
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1>'
+    raiz.innerHTML = CC.cabecaTela('Conquistas', { voltar: 'Perfil' })
       + '<p class="passo-dica">Cada conquista tem níveis. Elas contam leitura e constância, nunca o que você escreve ou ora.</p>'
       + '<div class="caixa-lista">' + conquistas.map(CC.linhaConquista).join('') + '</div>'
       + (legado.length
@@ -232,7 +256,7 @@
   // ---------- troféus ----------
   CC.vistaTrofeus = function (raiz) {
     const t = CC.trofeus();
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Troféus</h1>'
+    raiz.innerHTML = CC.cabecaTela('Troféus', { voltar: 'Perfil' })
       + CC.tituloSecao('Unidades do plano', t.unidades.filter((x) => x.ganho).length + ' de ' + t.unidades.length)
       + '<div class="estante">' + t.unidades.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Partes da Bíblia', t.colecoes.filter((x) => x.ganho).length + ' de ' + t.colecoes.length)
@@ -246,7 +270,7 @@
   // esperando e continua servindo para quem está sem rede.
   CC.vistaVersiculos = function (raiz) {
     const guardados = CC.versiculosGuardados ? CC.versiculosGuardados() : [];
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Versículos guardados</h1>'
+    raiz.innerHTML = CC.cabecaTela('Versículos guardados', { voltar: 'Perfil' })
       + (guardados.length
         ? '<p class="passo-dica">' + CC.plural(guardados.length, 'versículo guardado', 'versículos guardados')
           + ', um por baú da trilha.</p>'
@@ -298,8 +322,7 @@
   CC.vistaEscritos = function (raiz) {
     const { porDia, porNota } = CC.minhasAnotacoes();
     const total = porDia.reduce((s, d) => s + d.campos.length, 0) + porNota.length;
-    raiz.innerHTML = CC.botaoVoltar('Perfil')
-      + '<h1>Minhas anotações</h1>'
+    raiz.innerHTML = CC.cabecaTela('Minhas anotações', { voltar: 'Perfil' })
       + (total
         ? '<p class="passo-dica">' + CC.plural(total, 'anotação', 'anotações')
           + (porDia.length ? ' em ' + CC.plural(porDia.length, 'dia de leitura', 'dias de leitura') : '') + '.</p>'
@@ -327,8 +350,7 @@
         ? '<a class="' + classe + '" href="#/nota/' + encodeURIComponent(id) + '">' + dentro + '</a>'
         : '<span class="' + classe + '">' + dentro + '</span>';
     };
-    raiz.innerHTML = CC.botaoVoltar('Perfil')
-      + '<h1>Livros da Bíblia</h1>'
+    raiz.innerHTML = CC.cabecaTela('Livros da Bíblia', { voltar: 'Perfil' })
       + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos. '
       + 'Cada livro se acende conforme você lê os dias que passam por ele.</p>'
       + '<div class="pilulas">' + vistos.map(pilula).join('') + '</div>';

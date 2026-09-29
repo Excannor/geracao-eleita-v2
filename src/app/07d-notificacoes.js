@@ -94,7 +94,7 @@
   };
 
   CC.vistaNotificacoes = async function (raiz) {
-    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1><div class="leitor-esqueleto"><i></i><i></i></div>';
+    raiz.innerHTML = CC.cabecaTela('Notificações', { voltar: 'Configurações' }) + '<div class="leitor-esqueleto"><i></i><i></i></div>';
     const e = await CC.estadoNotificacoes();
     if (!location.hash.startsWith('#/config/notificacoes')) return;
     const p = (e.dados && e.dados.preferencias) || { lembrete: true, hora: '19:00', ofensiva: true, amigos: true };
@@ -127,7 +127,7 @@
         + '<p class="passo-dica pequena">Nada chega entre 22h30 e 7h. Quem fica uns dias sem ler recebe só três recados espaçados, e depois o app espera você voltar.</p>'
       : '';
 
-    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1>' + topo + preferencias
+    raiz.innerHTML = CC.cabecaTela('Notificações', { voltar: 'Configurações' }) + topo + preferencias
       + (e.situacao === 'ativo' ? '<div class="acoes"><button class="botao plano" data-desativar>Desativar neste aparelho</button></div>' : '');
 
     const ligar = (sel, fn) => { const el = raiz.querySelector(sel); if (el) el.onclick = () => fn(el); };

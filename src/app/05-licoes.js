@@ -21,13 +21,13 @@
         + (id === proxima ? '<span class="marca-proxima">Próxima</span>' : '')
         + '<b>' + CC.esc(CC.semPrefixo(n.nome)) + (feita ? '<span class="so-leitor">, concluída</span>' : '') + '</b>'
         + '<span>' + CC.esc(n.resumo || '') + '</span></span>'
-        + CC.ico('avancar') + '</a>';
+        + CC.ico('direita') + '</a>';
     }).join('');
 
     const nomeProxima = proxima ? CC.semPrefixo(D.notas[proxima].nome) : '';
-    raiz.innerHTML = CC.botaoVoltar('Trilha')
+    raiz.innerHTML = CC.cabecaTela('Primeiros passos', { voltar: 'Trilha' })
       + '<div class="cabeca-passos c-roxo">'
-      + '<div class="textos"><h1>Primeiros passos</h1>'
+      + '<div class="textos">'
       + '<p>Doze lições pra firmar a fé. Cada uma conta quando você lê até o fim, e uma por semana é um bom ritmo.</p>'
       + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitas.length + ' de ' + D.licoes.length + '</b></div>'
       + (proxima

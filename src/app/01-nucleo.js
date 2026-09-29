@@ -25,7 +25,8 @@ window.CC = window.CC || {};
   CC.diaDaSemana = (texto) => CC.DIAS_CURTOS[new Date(texto + 'T12:00:00').getDay()];
 
   // ---------- ícones ----------
-  // Traçado aberto, 2.2 de espessura: é o que dá o ar de aplicativo e não de documento.
+  // Traçado aberto e fino (1.9), de pontas redondas: é o que dá o ar de aplicativo e não de
+  // documento. Onde o ícone precisa de mais peso (o visto dos nós), o CSS engrossa o traço.
   const PREENCHIDOS = { chama: 1, coroa: 1, estrela: 1, raio: 1 };
   const P = {
     trilha: '<path d="M1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6z"/><path d="M8 2v16"/><path d="M16 6v16"/>',
@@ -51,6 +52,15 @@ window.CC = window.CC || {};
     fechar: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
     voltar: '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>',
     avancar: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    direita: '<path d="m9 6 6 6-6 6"/>',
+    relogio: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    conversa: '<path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.2A8 8 0 1 1 20 11.5z"/><path d="M8.5 10h7"/><path d="M8.5 13.5h4.5"/>',
+    // os da barra de abas, de traço fino, como nas telas aprovadas
+    'aba-trilha': '<circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8.2 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.8"/>',
+    'aba-desafios': '<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11"/><path d="M17 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5"/><path d="M12 14v4"/><path d="M8 21h8"/>',
+    'aba-juntos': '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 14.3c2.1.7 3.5 2.8 3.5 5.7"/>',
+    'aba-explorar': '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+    'aba-perfil': '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>',
     baixo: '<path d="m6 9 6 6 6-6"/>',
     lua: '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
     sol: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2"/><path d="M12 21v2"/><path d="m4.2 4.2 1.4 1.4"/><path d="m18.4 18.4 1.4 1.4"/><path d="M1 12h2"/><path d="M21 12h2"/><path d="m4.2 19.8 1.4-1.4"/><path d="m18.4 5.6 1.4-1.4"/>',
@@ -83,7 +93,7 @@ window.CC = window.CC || {};
     const preenchido = nome in PREENCHIDOS;
     const pintura = preenchido
       ? 'fill="currentColor"'
-      : 'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
+      : 'fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"';
     return '<svg viewBox="' + (CAIXAS[nome] || '0 0 24 24') + '" ' + pintura + ' aria-hidden="true"'
       + (extra ? ' ' + extra : '') + '>' + d + '</svg>';
   };
@@ -388,6 +398,19 @@ window.CC = window.CC || {};
     '<div class="titulo-secao"><h2>' + CC.esc(texto) + '</h2>'
     + (nota ? '<span>' + CC.esc(nota) + '</span>' : '') + '</div>';
 
+  // Voltar é um botão redondo com a seta; para onde ele volta fica dito ao leitor de tela.
   CC.botaoVoltar = (rotulo) =>
-    '<button class="voltar" data-voltar>' + CC.ico('voltar') + CC.esc(rotulo || 'Voltar') + '</button>';
+    '<button class="voltar botao-redondo" data-voltar aria-label="Voltar' + (rotulo && rotulo !== 'Voltar' ? ' para ' + CC.esc(rotulo) : '') + '">'
+    + CC.ico('voltar') + '</button>';
+
+  // O alto de cada tela: título no meio, com um botão redondo de cada lado (ou o vão dele,
+  // para o título ficar centrado). "voltar" põe a seta à esquerda; "direita" é o HTML de
+  // um botão redondo; "sub" é uma linha fraca debaixo do título.
+  CC.cabecaTela = (titulo, opcoes = {}) => '<div class="cabeca-centro">'
+    + (opcoes.voltar ? CC.botaoVoltar(opcoes.voltar) : '<span class="vao" aria-hidden="true"></span>')
+    + (opcoes.sub
+      ? '<div class="titulos"><h1>' + CC.esc(titulo) + '</h1><span>' + CC.esc(opcoes.sub) + '</span></div>'
+      : '<h1>' + CC.esc(titulo) + '</h1>')
+    + (opcoes.direita || '<span class="vao" aria-hidden="true"></span>')
+    + '</div>';
 })(window.CC);
