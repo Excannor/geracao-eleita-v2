@@ -54,7 +54,7 @@ const leituraNbv = (plano) => plano.trechos.map((t) => {
 }).join(' ');
 // Expressões conferidas como redação de outra tradução (ARA/ACF), já usadas por engano.
 const OUTRA_TRADUCAO = ['proverá', 'achou graça', 'cana rachada', 'mecha que fumega', 'casa da escravidão',
-  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo', 'pesado de boca', 'pesado de língua', 'estarei com a tua boca', 'fazer três tendas', 'três tendas', 'lento para se irar', 'lento para se irritar', 'tardio em irar', 'convosco todos os dias', 'com vocês todos os dias', 'atire a primeira pedra', 'nada me faltará', 'nada me faltara', 'sombra da morte', 'verdes pastos', 'refrigera a minha alma', 'águas tranquilas', 'por que me desamparaste', 'céus proclamam a glória', 'este é o dia que o senhor fez', 'o fruto do espírito é', 'tudo posso naquele', 'tudo posso em cristo', 'as misericórdias do senhor', 'renovam-se cada manhã', 'não por força nem por violência', 'o justo viverá pela fé', 'ainda que a figueira não floresça', 'rasgai o vosso coração', 'prisioneiros da esperança'].map(normalizar);
+  'casa da servidão', 'creditado como justiça', 'imputado como justiça', 'aquietai', 'esconde de novo', 'escondeu de novo', 'pesado de boca', 'pesado de língua', 'estarei com a tua boca', 'fazer três tendas', 'três tendas', 'lento para se irar', 'lento para se irritar', 'tardio em irar', 'convosco todos os dias', 'com vocês todos os dias', 'atire a primeira pedra', 'nada me faltará', 'nada me faltara', 'sombra da morte', 'verdes pastos', 'refrigera a minha alma', 'águas tranquilas', 'por que me desamparaste', 'céus proclamam a glória', 'este é o dia que o senhor fez', 'o fruto do espírito é', 'tudo posso naquele', 'tudo posso em cristo', 'as misericórdias do senhor', 'renovam-se cada manhã', 'não por força nem por violência', 'o justo viverá pela fé', 'ainda que a figueira não floresça', 'rasgai o vosso coração', 'prisioneiros da esperança', 'não ter outros deuses', 'não terás outros deuses'].map(normalizar);
 // Palavras com maiúscula que não são nome de alguém da leitura (nomes de Deus, termos gerais).
 // Os nomes dos livros também passam: citar "Êxodo" ou "Marcos" é falar da própria leitura.
 const NOMES_LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia',
@@ -208,6 +208,16 @@ for (const dia of dias) {
   }
 }
 
+// O mesmo começo de oração em dias diferentes cansa quem lê todo dia (revisão de 2026-09-29).
+// Não reprova: lista para conferir, porque um começo curto pode se repetir de propósito.
+const oracoesPorTexto = new Map();
+for (const dia of dias) for (const r of reflexoes[dia]) for (const o of r.oracao || []) {
+  const chave = normalizar(o).replace(/[….]+$/, '').trim();
+  if (!oracoesPorTexto.has(chave)) oracoesPorTexto.set(chave, { texto: o, dias: [] });
+  if (!oracoesPorTexto.get(chave).dias.includes(dia)) oracoesPorTexto.get(chave).dias.push(dia);
+}
+const oracoesRepetidas = [...oracoesPorTexto.values()].filter((x) => x.dias.length > 1);
+
 const porUnidade = {};
 for (const n of Object.keys(reflexoes).map(Number)) {
   const u = unidadeDoDia(n);
@@ -226,6 +236,10 @@ if (conferir.length) {
 if (revisar.length) {
   console.log('\n  revisar sentido (' + revisar.length + '): palavra de sentido bíblico numa pergunta');
   for (const linha of revisar) console.log('    ' + linha);
+}
+if (oracoesRepetidas.length) {
+  console.log('\n  oração repetida (' + oracoesRepetidas.length + '): o mesmo começo em dias diferentes');
+  for (const x of oracoesRepetidas) console.log('    dias ' + x.dias.join(', ') + ' · ' + x.texto);
 }
 console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  as reflexões estão no formato\n');
 process.exit(falhas ? 1 : 0);

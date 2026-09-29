@@ -2539,6 +2539,8 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .botoes-verso .botao-icone { flex: 0 0 auto; }
 .acoes-verso.no-cartao { margin-top: 16px; animation: none; }
 .acoes-verso.no-cartao .botao { margin-top: 0; }
+/* no cartão a legenda já traz a referência: a da barra (útil na Bíblia, com o trecho escolhido) sobrava */
+.acoes-verso.no-cartao .ref-verso { display: none; }
 /* na Bíblia, com versículo escolhido, a barra toma o lugar dos botões de capítulo */
 .leitor-biblia.escolhendo [data-anterior], .leitor-biblia.escolhendo [data-proximo] { display: none; }
 .trecho-da-nota { margin: 0 0 14px; padding: 12px 14px; border-left: 4px solid var(--acento); border-radius: var(--raio-p); background: var(--fundo-2); color: var(--tinta); font-weight: 600; }

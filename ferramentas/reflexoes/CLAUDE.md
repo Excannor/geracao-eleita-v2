@@ -18,6 +18,12 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
    datas que a leitura não dá (já escaparam: os "quarenta anos" de Moisés, que estão em
    Atos 7; o bezerro de ouro, que é Êx 32, num dia que lia Êx 22-24).
 
+   **Olhar para trás pode (dono, 2026-09-29).** Lembrar a leitura de um dia anterior é
+   permitido, desde que o texto deixe claro que é de antes ("no capítulo anterior", "o
+   bezerro de ouro, lá do dia 33") e o que se lembra esteja de fato naquela leitura. Sem
+   aspas: a trava do teste só confere citação contra a leitura do dia. Adiantar o que ainda
+   vai ser lido continua proibido (ver "Não adiantar outros dias").
+
    **Citação é da NBV.** O app abre a Nova Bíblia Viva por padrão, e é ela que o leitor tem
    na frente. Toda frase apresentada como "o texto diz" e toda palavra da passagem repetida
    numa pergunta tem de bater com a NBV (`livros["Livro"][cap-1][vers-1]`). Redação de outra
@@ -186,6 +192,12 @@ pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergun
 6. **Recém-convertido primeiro.** O amor do Pai vem antes do convite; confronto vira convite,
    nunca acusação. Nada de palavra de igreja sem explicar (ex.: "Betel", "santificação").
 
+   **Pergunta sobre conversão, batismo ou "a sua fé" tem saída para quem está chegando**
+   (dono, 2026-09-29). Quem lê pode não ter feito essa escolha ainda. A pergunta oferece os
+   dois caminhos: "Se você já fez essa escolha, como foi o momento...? Se ainda está
+   conhecendo, o que pesa nessa decisão?" (dia 92). Nunca supor que todo leitor já crê ou já
+   foi batizado.
+
 7. **Clareza.** Um jovem que nunca leu a Bíblia entende de primeira. Nada de cena abstrata para
    imaginar ("se escrevessem uma linha sobre você...").
 
@@ -251,6 +263,12 @@ for feita.
 **Oração.** Começos de frase de uma conversa sincera, do jeito que a pessoa falaria com Deus
 no quarto: curtos, em primeira pessoa, sem linguagem de púlpito ("Senhor, eu te louvo e te
 bendigo porque..." não).
+
+**Sem repetir fórmula (revisão de 2026-09-29).** Quem lê todo dia percebe a repetição:
+"Como é saber que…" abria pergunta em 27 dos primeiros 181 dias, e o mesmo começo de oração
+aparecia em dias diferentes ("Hoje eu conto para…" em três). Uma abertura assim no máximo a
+cada dez dias; o começo de oração nasce da pergunta daquele dia. O teste lista em
+"oração repetida" os começos iguais em dias diferentes.
 
 **Tom.** Esperança e recomeço antes de exigência. Confronto existe, mas vem com a porta
 aberta: o erro é nomeado e em seguida vem o que Deus faz com quem erra.
