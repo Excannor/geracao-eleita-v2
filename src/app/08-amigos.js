@@ -476,7 +476,7 @@
 
   function itemDoMural(ev) {
     const meu = ev.autor.usuario === (CC.quem || {}).usuario;
-    const quem = meu ? 'Você' : ev.autor.nome;
+    const quem = meu ? 'Você' : CC.esc(ev.autor.nome);
     const d = ev.dados || {};
     let frase = '';
     let arte = '';
@@ -499,11 +499,16 @@
     } else if (ev.tipo === 'versiculo') {
       frase = quem + ' compartilhou um versículo:';
       extra = '<div class="versiculo-mural" data-ref="' + CC.esc(d.ref) + '"><p class="texto-versiculo">…</p><b>' + CC.esc(d.ref) + '</b></div>';
-    } else if (ev.tipo === 'novoProposito' || ev.tipo === 'proposito') {
+    } else if (ev.tipo === 'novoProposito') {
+      // O nome ficou do tempo em que amizade e propósito eram a mesma coisa: hoje o evento
+      // marca um convite aceito (link, pedido de amizade ou entrada na célula), não um
+      // propósito. Quem aceitou é o autor; quem convidou vem em ev.com.
+      if (meu) frase = ev.com ? 'Você aceitou o <b>convite</b> de ' + CC.esc(ev.com.nome) + '!' : 'Você aceitou um <b>convite</b>!';
+      else frase = quem + ' aceitou o seu <b>convite</b>!';
+      arte = CC.icoChama();
+    } else if (ev.tipo === 'proposito') {
       const outro = meu ? ev.com : ev.autor;
-      frase = ev.tipo === 'novoProposito'
-        ? 'Você e ' + CC.esc(outro ? outro.nome : 'um amigo') + ' começaram um <b>propósito</b>!'
-        : 'Você e ' + CC.esc(outro ? outro.nome : 'um amigo') + ' chegaram a <b>' + d.dias + ' dias de propósito</b>!';
+      frase = 'Você e ' + CC.esc(outro ? outro.nome : 'um amigo') + ' chegaram a <b>' + d.dias + ' dias de propósito</b>!';
       arte = CC.icoChama();
     } else if (ev.tipo === 'semeador') {
       const artes = ['broto', 'bronze', 'prata', 'ouro', 'igreja'];
@@ -523,7 +528,7 @@
       : '';
     return '<article class="item-mural">'
       + '<div class="cabeca-mural">' + retrato(ev.autor, 'medio') + '<div><b>' + CC.esc(meu ? 'Você' : ev.autor.nome) + '</b><span>' + quando(ev.em) + '</span></div></div>'
-      + '<div class="corpo-mural"><p>' + frase.replace(/^(Você|[^<]+?)(?= )/, (m) => CC.esc(m)) + '</p>' + (arte ? '<span class="arte-mural">' + arte + '</span>' : '') + '</div>'
+      + '<div class="corpo-mural"><p>' + frase + '</p>' + (arte ? '<span class="arte-mural">' + arte + '</span>' : '') + '</div>'
       + extra
       + '<div class="pe-mural">' + reacao + celebrado + '</div>'
       + '</article>';
