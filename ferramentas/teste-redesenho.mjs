@@ -112,6 +112,8 @@ console.log('\n  Redesenho, de ponta a ponta\n');
 // ---------- privacidade pública ----------
 const privacidade = await fetch(base + '/privacidade.html');
 ok(privacidade.status === 200 && (await privacidade.text()).includes('Quem vê o quê'), 'a página de privacidade abre sem entrar');
+const termos = await fetch(base + '/termos.html');
+ok(termos.status === 200 && (await termos.text()).includes('Regras de convivência'), 'os termos de uso abrem sem entrar');
 
 // ---------- cadastro em três passos ----------
 await cmd('Page.navigate', { url: base + '/' });

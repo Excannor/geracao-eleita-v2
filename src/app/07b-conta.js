@@ -33,7 +33,8 @@
           + '<span>Mostrar meus marcos no Feed</span><span class="interruptor" aria-hidden="true"><i></i></span></button>'
         : '')
         + linha('Pessoas bloqueadas', '', 'data-ir="#/amigos/bloqueados"')
-        + linha('Privacidade', '', 'data-privacidade'))
+        + linha('Privacidade', '', 'data-privacidade')
+        + linha('Termos de Uso', '', 'data-termos'))
       + grupo('Seus dados', linha('Baixar o que escrevi', '', 'data-exportar')
         + linha('Zerar progresso', '', 'data-zerar', 'perigo'))
       + (quem.comSenha
@@ -75,6 +76,7 @@
       CC.redesenhar();
     });
     ligar('[data-privacidade]', () => CC.abrirPrivacidade(quem));
+    ligar('[data-termos]', () => window.open('termos.html', '_blank', 'noopener'));
     ligar('[data-caminho]', () => folhaSeuCaminho(quem));
     ligar('[data-completar]', () => CC.completarCadastro(quem));
     ligar('[data-senha]', () => CC.trocarSenha());
@@ -270,6 +272,7 @@
     const dataConsentimento = quem && quem.comSenha && quem.consentimentoEm ? dataBr(String(quem.consentimentoEm).slice(0, 10)) : '';
     CC.folha('<h3>Privacidade</h3>' + (dataConsentimento ? '<p class="passo-dica">Você concordou em ' + CC.esc(dataConsentimento) + '.</p>' : '')
       + '<p>' + LINK_PRIVACIDADE + '</p>'
+      + '<p><a href="termos.html" target="_blank" rel="noopener">Ler os Termos de Uso</a></p>'
       + '<p class="passo-dica">Dúvidas ou problemas: <a href="mailto:suporte@geracaoeleita.app">suporte@geracaoeleita.app</a></p>'
       + (quem && quem.comSenha
         ? '<h3>Retirar o consentimento</h3>'

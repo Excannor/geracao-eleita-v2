@@ -633,7 +633,7 @@
               + '<div class="quem-amigo"><b>@' + CC.esc(p.usuario) + '</b><span class="arroba">aguardando</span></div>'
               + '<button class="botao plano pequeno" data-cancelar="' + CC.esc(p.usuario) + '">Cancelar</button></div>').join('') + '</div>'
             : '')
-          + '<p class="rodape-privacidade"><span><a href="#/amigos/bloqueados">Pessoas bloqueadas</a> · <a href="privacidade.html">Privacidade</a></span></p>';
+          + '<p class="rodape-privacidade"><span><a href="#/amigos/bloqueados">Pessoas bloqueadas</a> · <a href="termos.html">Termos</a> · <a href="privacidade.html">Privacidade</a></span></p>';
       }
 
       raiz.innerHTML = '<div class="cabeca-tela"><h1>Juntos</h1>'

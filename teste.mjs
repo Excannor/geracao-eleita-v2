@@ -135,13 +135,14 @@ for (const n of Object.values(D.notas)) wikilinks += (n.html.match(/\[\[[^\]]*\]
 checar(wikilinks === 0, 'nenhum wikilink ficou sem virar link (' + wikilinks + ')');
 checar(statSync(dist('index.html')).size < 8 * 1024 * 1024, 'o arquivo cabe em 8 MB');
 
-for (const f of ['manifest.webmanifest', 'sw.js', 'icone-192.png', 'icone-512.png', 'icone-mascara-512.png', 'apple-touch-icon.png', 'icone-48.png', 'entrar.html', 'privacidade.html']) {
+for (const f of ['manifest.webmanifest', 'sw.js', 'icone-192.png', 'icone-512.png', 'icone-mascara-512.png', 'apple-touch-icon.png', 'icone-48.png', 'entrar.html', 'privacidade.html', 'termos.html']) {
   checar(existsSync(dist(f)), 'dist/' + f + ' existe');
 }
 const entrar = readFileSync(dist('entrar.html'), 'utf8');
 const semMarcador = (texto) => !/\/\*(FONTES|SIMBOLO|USUARIO)\*\//.test(texto);
 checar(semMarcador(entrar) && entrar.includes('type="date"') && entrar.includes('api/criar-conta'), 'a entrada tem o cadastro com data de nascimento');
 checar(semMarcador(readFileSync(dist('privacidade.html'), 'utf8')), 'a página de privacidade foi montada');
+checar(semMarcador(readFileSync(dist('termos.html'), 'utf8')) && readFileSync(dist('termos.html'), 'utf8').includes('Regras de convivência'), 'a página de termos de uso foi montada');
 checar(/rel="apple-touch-icon" href="apple-touch-icon\.png\?v=\w+"/.test(entrar) && entrar.includes('rel="manifest"')
   && /rel="icon" href="data:image\/png;base64,/.test(entrar), 'a entrada declara ícone e manifesto: é dela que se adiciona à tela de início');
 const paginaApp = readFileSync(dist('index.html'), 'utf8');

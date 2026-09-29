@@ -166,10 +166,10 @@ writeFileSync(dist('index.html.gz'), gzipSync(Buffer.from(paginaFinal, 'utf8'), 
 // ---------- tela de entrada ----------
 // Vive fora do index.html porque o servidor a entrega antes de saber quem é a
 // pessoa: mandar os 4 MB do aplicativo para quem ainda não entrou seria absurdo.
-// A privacidade também é pública: quem recebe um convite pode ler antes de criar conta.
+// A privacidade e os termos também são públicos: quem recebe um convite pode ler antes de criar conta.
 const simboloSvg = montarAbertura()
   .replace(/^[\s\S]*?(<svg)/, '$1').replace(/<\/svg>[\s\S]*$/, '</svg>');
-for (const pagina of ['entrar.html', 'privacidade.html']) {
+for (const pagina of ['entrar.html', 'privacidade.html', 'termos.html']) {
   const html = readFileSync(src(pagina), 'utf8')
     .replace(/\/\*FONTES\*\//g, () => fontes)
     .replace(/\/\*SIMBOLO\*\//g, () => simboloSvg)

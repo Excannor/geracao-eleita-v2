@@ -87,7 +87,7 @@ const TODOS_LIVROS = [...new Set(PLANO_DO_CONTEUDO.flatMap((d) => d.livros))];
 // malicioso que escapasse para a tela não roda, e nada sai do app para outro endereço.
 function hashesDosScripts() {
   const hashes = new Set();
-  for (const pagina of ['index.html', 'entrar.html', 'privacidade.html']) {
+  for (const pagina of ['index.html', 'entrar.html', 'privacidade.html', 'termos.html']) {
     let html = '';
     try { html = readFileSync(join(RAIZ, pagina), 'utf8'); } catch { continue; }
     for (const m of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
@@ -940,7 +940,7 @@ const servidor = createServer(async (req, res) => {
     const eu = quemFala(req);
     if (!eu) {
       if (rota.startsWith('/api/')) { json(res, 401, { erro: 'entre primeiro' }); return; }
-      const livre = rota === '/entrar.html' || rota === '/privacidade.html'
+      const livre = rota === '/entrar.html' || rota === '/privacidade.html' || rota === '/termos.html'
         || rota.endsWith('.png') || rota === '/manifest.webmanifest' || rota === '/favicon.ico';
       if (!livre) {
         const pagina = await readFile(join(RAIZ, 'entrar.html')).catch(() => null);
