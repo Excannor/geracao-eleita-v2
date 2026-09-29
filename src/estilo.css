@@ -16,55 +16,55 @@
   /* Neutros de cinza puro, sem tempero: a logo é preto e branco, e qualquer matiz no
      papel brigaria com ela. O fundo é o cinza da tela e o cartão é branco puro — a
      diferença entre os dois já separa, por isso a borda quase não aparece. */
-  --fundo: #e6e6e6;
-  --fundo-2: #dbdbdb;
+  --fundo: #efefef;
+  --fundo-2: #e6e6e6;
   /* Off-white, não branco puro: com muitos cartões na tela, o branco chapado vira uma
      parede de luz e cansa a vista. O degrau para o fundo continua o suficiente para
      separar os dois, que é o único trabalho que a cor do cartão precisa fazer. */
-  --cartao: #f7f7f7;
-  --borda: #d9d9d9;
-  --borda-3d: #cccccc;
-  --tinta: #3c3c3c;
+  --cartao: #ffffff;
+  --borda: #e8e8e8;
+  --borda-3d: #dcdcdc;
+  --tinta: #2a2a2a;
   --tinta-forte: #111111;
-  --tinta-fraca: #5f5f5f;
+  --tinta-fraca: #6b6b6b;
   /* O trilho puxa para um petróleo bem claro, espelhando o escuro: a trilha vira uma
      escala de um tom só nos dois temas — travado (pálido), concluído (petróleo), hoje
      (claro). Tom serve para dizer estado; o que não pode é dizer categoria. */
-  --trilho: #cfdedd;
-  --tinta-travada: #4f6f6e;
+  --trilho: #e2e2e2;
+  --tinta-travada: #6f6f6f;
 
   /* ---------- acento ----------
      Um acento só, petróleo, e ele quer dizer AGORA: o dia de hoje, a barra que está
      correndo, o link que leva adiante. Escuro de propósito: assim serve de texto, de
      ícone e de preenchimento (com tinta branca em cima), os três papéis. Um acento
      claro só serviria de preenchimento e obrigaria a inventar uma segunda cor. */
-  --acento: #0f5c5c;
-  --acento-3d: #0a4444;
-  --acento-fraco: #e2f0f0;
+  --acento: #111111;
+  --acento-3d: #000000;
+  --acento-fraco: #eef9b8;
 
   /* A superfície cheia da marca: botão principal, faixa da unidade, dia concluído, aba
      ativa. Chama-se "inverso" por herança, de quando era o preto/branco que trocava de
      lado entre os temas; hoje é petróleo nos dois, de propósito — a trilha conta a mesma
      história no claro e no escuro, em vez de preto num tema e verde no outro. */
-  --inverso: #0f5c5c;
+  --inverso: #111111;
   --inverso-tinta: #ffffff;
 
   /* "Hoje" precisa de tom próprio, e não do acento: no tema claro o acento é o mesmo
      petróleo escuro do concluído, e os dois estados virariam a mesma cor. Este é o tom
      claro, com tinta escura em cima, igual nos dois temas. */
-  --hoje: #5fbdb9;
+  --hoje: #dff74a;
   --hoje-tinta: #111111;
 
   /* Os nomes de cor abaixo são históricos: vieram de quando cada unidade tinha a sua.
      Agora apontam para o acento ou para a escala de cinza, porque categoria não se diz
      mais por cor — quem diz é o cartão-divisa da unidade. Os nomes ficam para não
      reescrever 200 pontos do arquivo à toa. */
-  --verde: #0f5c5c;
-  --verde-3d: #0a4444;
-  --verde-fraco: #e2f0f0;
-  --azul: #0f5c5c;
-  --azul-3d: #0a4444;
-  --azul-fraco: #e2f0f0;
+  --verde: #111111;
+  --verde-3d: #000000;
+  --verde-fraco: #eef9b8;
+  --azul: #111111;
+  --azul-3d: #000000;
+  --azul-fraco: #eef9b8;
   --roxo: #4a4a4a;
   --roxo-3d: #333333;
   --roxo-fraco: #ebebeb;
@@ -72,16 +72,16 @@
   --turquesa-3d: #2a2a2a;
   --turquesa-fraco: #e8e8e8;
   /* conquista ganha: preenchimento claro que leva tinta escura própria (.c-amarelo) */
-  --amarelo: #cfe3e3;
-  --amarelo-3d: #0a4444;
-  --amarelo-fraco: #e2f0f0;
+  --amarelo: #dff74a;
+  --amarelo-3d: #111111;
+  --amarelo-fraco: #f4fcd0;
 
   /* Vermelho continua existindo e continua sendo só aviso, nunca identidade: trocar o
      erro por cinza tiraria o único sinal de que algo deu errado (WCAG 1.4.1). Fica num
      tom mais fechado que o da chama, para os dois não se confundirem. */
-  --vermelho: #b3261e;
-  --vermelho-3d: #8c1b15;
-  --vermelho-fraco: #fbeae8;
+  --vermelho: #d4261b;
+  --vermelho-3d: #a81c13;
+  --vermelho-fraco: #fde9e7;
 
   /* A chama da ofensiva é o único lugar em que a cor conta algo que o acento e o cinza
      não contam: fogo. Continua com o degradê de arte (fogo, laranja, ouro) logo abaixo;
@@ -103,20 +103,20 @@
 
   /* Cantos mais generosos que antes: é o que dá o acabamento de aplicativo em vez de
      página. Botão e pílula não usam raio nenhum destes — usam 999px, viram cápsula. */
-  --raio: 20px;
-  --raio-g: 26px;
-  --raio-p: 14px;
+  --raio: 22px;
+  --raio-g: 28px;
+  --raio-p: 16px;
   --raio-capsula: 999px;
   --alt-topo: 58px;
   --alt-barra: 70px;
   /* Tinta sobre as cores cheias. No claro, branco; no escuro as cores são mais
      luminosas, e a tinta escura é que se lê, como no aplicativo de referência. */
   --sobre-cor: #ffffff;
-  --sombra-flutuante: 0 10px 30px rgba(30, 25, 15, .12);
-  --fonte: 'Nunito', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sombra-flutuante: 0 10px 30px rgba(17, 17, 17, .12);
+  --fonte: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
   /* No tom forte e condensado da logo (Geração Eleita): títulos, botões e os rótulos
      das abas. O texto corrido continua na Nunito, mais confortável para ler muito. */
-  --fonte-destaque: 'Oswald', 'Arial Narrow', var(--fonte);
+  --fonte-destaque: var(--fonte);
   --mola: cubic-bezier(.2, 1.4, .4, 1);
   --suave: cubic-bezier(.2, .8, .3, 1);
 
@@ -140,46 +140,46 @@
 
   /* Preto de verdade, não grafite temperado: o cartão é um degrau acima do fundo, e é
      esse degrau que separa os dois, sem precisar de borda forte. */
-  --fundo: #0d0d0d;
-  --fundo-2: #1a1a1a;
-  --cartao: #171717;
-  --borda: #2b2b2b;
-  --borda-3d: #232323;
-  --tinta: #e2e2e2;
+  --fundo: #0c0c0c;
+  --fundo-2: #222222;
+  --cartao: #1c1c1c;
+  --borda: #2a2a2a;
+  --borda-3d: #262626;
+  --tinta: #e8e8e8;
   --tinta-forte: #ffffff;
-  --tinta-fraca: #9a9a9a;
+  --tinta-fraca: #9d9d9d;
   /* O trilho e o nó travado puxam para o petróleo bem escuro, em vez de cinza: assim a
      trilha inteira vira uma escala de um tom só — travado (escuro), concluído (médio),
      hoje (claro). Tom serve bem para dizer ESTADO; o que não pode é dizer categoria. */
-  --trilho: #17393a;
-  --tinta-travada: #86a9a7;
+  --trilho: #2a2a2a;
+  --tinta-travada: #9a9a9a;
 
   /* No escuro o acento clareia para continuar legível como texto e ícone. O inverso e o
      "hoje" são os mesmos dos dois temas: é o que faz a trilha ser lida igual no claro e
      no escuro. */
-  --acento: #5fbdb9;
-  --acento-3d: #3d9995;
-  --acento-fraco: #123230;
-  --inverso: #0f5c5c;
-  --inverso-tinta: #ffffff;
-  --hoje: #5fbdb9;
+  --acento: #dff74a;
+  --acento-3d: #c9e23a;
+  --acento-fraco: #2b320f;
+  --inverso: #ffffff;
+  --inverso-tinta: #111111;
+  --hoje: #dff74a;
   --hoje-tinta: #111111;
 
-  --verde: #5fbdb9;
-  --verde-3d: #3d9995;
-  --verde-fraco: #123230;
-  --azul: #5fbdb9;
-  --azul-3d: #3d9995;
-  --azul-fraco: #123230;
+  --verde: #dff74a;
+  --verde-3d: #c9e23a;
+  --verde-fraco: #2b320f;
+  --azul: #dff74a;
+  --azul-3d: #c9e23a;
+  --azul-fraco: #2b320f;
   --roxo: #c9c9c9;
   --roxo-3d: #a5a5a5;
   --roxo-fraco: #2c2c2c;
   --turquesa: #b8b8b8;
   --turquesa-3d: #949494;
   --turquesa-fraco: #282828;
-  --amarelo: #9fd6d2;
-  --amarelo-3d: #6fbdb8;
-  --amarelo-fraco: #123230;
+  --amarelo: #dff74a;
+  --amarelo-3d: #dff74a;
+  --amarelo-fraco: #2b320f;
 
   --vermelho: #ff6b6b;
   --vermelho-3d: #ff9a9a;
@@ -189,7 +189,7 @@
   --chama-3d: #d93d22;
   --chama-texto: #ff7a5c;
 
-  --sobre-cor: #0d0d0d;
+  --sobre-cor: #111111;
   --sombra-flutuante: 0 10px 30px rgba(0, 0, 0, .55);
 }
 
@@ -2491,6 +2491,67 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
 @keyframes contar { 0% { transform: scale(1); } 45% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
 /* =========================================================================
+   REDESENHO (v2): cinza-claro, cartões brancos sem contorno, preto como ação e
+   verde-limão só onde algo pede atenção. Uma fonte só, a Manrope. Esta camada vem
+   depois das regras de base e antes das telas largas, para o trilho lateral continuar
+   valendo no computador.
+   ========================================================================= */
+:root { --lima: #dff74a; --botao-tinta: #dff74a; }
+:root[data-tema="escuro"] { --botao-tinta: #111111; }
+
+html, body { font-weight: 500; }
+h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.01em; text-transform: none; }
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.3rem; }
+
+.topo { border-bottom: 0; background: var(--fundo); }
+
+/* Botões: pílula preta com texto lima; no escuro, pílula branca com texto preto. */
+.botao { min-height: 56px; padding: 14px 22px; font-size: 1rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--botao-tinta); }
+.botao.pequeno { min-height: 44px; padding: 10px 16px; font-size: 0.92rem; }
+.botao.cor, .botao.azul { color: var(--botao-tinta); }
+.botao.vermelho { color: #ffffff; }
+.botao.contorno { border-width: 1.5px; color: var(--tinta-forte); }
+.botao.plano { color: var(--tinta-fraca); }
+.botao[disabled] { background: var(--fundo-2); color: var(--tinta-fraca); }
+
+/* Cartões: branco sobre o cinza, sem sombra; a borda some no fundo. */
+.cartao, .caixa-lista, .lista-atalhos, .leitura-hoje, .cartao-proposito, .cartao-caderno,
+.cartao-push, .cartao-semeador, .cartao-praticar, .quadro { border-color: var(--borda); border-bottom-width: 2px; border-radius: var(--raio-g); }
+
+.pilula, .selo-status, .chip { border-radius: 999px; }
+.etiqueta, .titulo-secao span, .titulo-secao a, .leitura-hoje .etiqueta { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 0.8rem; }
+.titulo-secao a { color: var(--tinta-fraca); text-decoration: none; }
+
+/* Faixa da unidade: bloco preto (branco no escuro), número em círculo lima. */
+.faixa-unidade { border-radius: var(--raio-g); }
+.faixa-unidade .numero-unidade { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--lima); color: #111111; font-size: 1.05rem; font-weight: 800; letter-spacing: 0; }
+.faixa-unidade .rot { text-transform: none; letter-spacing: 0; font-weight: 600; }
+
+/* Nós da trilha: círculos. */
+.no { width: 64px; height: 64px; }
+.no.travado { background: var(--cartao); box-shadow: inset 0 0 0 2px var(--trilho); color: var(--tinta-travada); }
+.no.travado:active, .no.travado.aberto { box-shadow: inset 0 0 0 2px var(--trilho); }
+.no .anel-atual { border-color: color-mix(in srgb, var(--hoje) 45%, transparent); }
+.balao { border: 0; background: var(--inverso); color: var(--inverso-tinta); border-radius: 999px; text-transform: none; letter-spacing: 0; font-weight: 700; }
+.balao::after { background: var(--inverso); border: 0; }
+
+/* Barra de abas: pílula escura flutuante com botões redondos; a ativa é preta com ícone lima. */
+.navegacao {
+  left: 16px; right: 16px; bottom: calc(14px + env(safe-area-inset-bottom));
+  height: 76px; padding: 0 8px; gap: 4px;
+  border: 0; border-radius: 38px; background: #262626;
+  box-shadow: 0 10px 30px rgba(17, 17, 17, .18);
+}
+.aba { flex: 0 0 56px; width: 56px; max-width: none; height: 56px; border: 0; border-radius: 50%; background: #363636; color: #e8e8e8; }
+.aba .ico-aba { width: 26px; height: 26px; }
+.aba .rotulo-aba { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.aba.selecionada { background: #000000; color: var(--lima); border-radius: 50%; }
+.aba:hover:not(.selecionada) { background: #444444; }
+.aba .ponto-aba { top: 8px; right: 8px; background: var(--lima); border-color: #363636; }
+.conteudo { padding-bottom: calc(var(--alt-barra) + 64px); }
+
+/* =========================================================================
    TELAS LARGAS
    ========================================================================= */
 @media (min-width: 860px) {
@@ -2517,6 +2578,9 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
   .navegacao .marca-lateral em { font-style: normal; color: var(--vermelho); }
   .navegacao .marca-lateral .simbolo { flex: 0 0 auto; display: grid; place-items: center; color: var(--tinta-forte); }
   .navegacao .marca-lateral .simbolo svg.ico-logo { width: 30px; height: auto; }
+  .navegacao { left: 0; bottom: 0; box-shadow: none; background: var(--fundo); }
+  .aba { border-radius: 999px; background: none; color: var(--tinta-fraca); }
+  .aba.selecionada { background: var(--inverso); color: var(--botao-tinta); }
   .aba { flex: 0 0 auto; flex-direction: row; justify-content: flex-start; gap: 14px; max-width: none; width: 100%; height: 54px; padding: 0 14px; }
   .aba .rotulo-aba { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .aplicativo { padding-left: 240px; }
