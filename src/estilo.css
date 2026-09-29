@@ -3255,3 +3255,108 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 .apoiar-valor { font-size: 0.95rem; }
 .aviso-apoiar { font-size: 0.88rem; }
 .apoiar-pix .passo-dica { margin-top: 10px; }
+
+/* =====================================================================================
+   DESIGN · pacotes A e B (fable-sugestoes-design.md): tema escuro das abas de escolha,
+   números que não pulam, tipografia fina, aviso com ícone, alvos de toque, saídas
+   animadas, uma família para vazio/erro, carregando com forma e botão ocupado.
+   ===================================================================================== */
+
+/* ---------- A1 · aba escolhida visível no escuro; anel do retrato da cor do cartão ---------- */
+:root { --segmento-trilho: var(--fundo-2); --segmento-sel: var(--cartao); --segmento-anel: transparent; }
+:root[data-tema="escuro"] { --segmento-trilho: #111111; --segmento-sel: #2c2c2c; --segmento-anel: var(--borda-controle); }
+.segmentado { background: var(--segmento-trilho); }
+.segmentado button[aria-pressed="true"] { background: var(--segmento-sel); box-shadow: inset 0 0 0 1px var(--segmento-anel); }
+.linha-amigo .retrato-amigo, .cabeca-amigo .retrato-amigo, .escolha-amigo .retrato-amigo,
+.cartao-proposito .retrato-amigo { border-color: var(--cartao); }
+
+/* ---------- A4 · números que não pulam ---------- */
+.contador.ofensiva span, .chama-grande b, .numero-ofensiva, .quiz-contador, .leitor-verso sup,
+.titulo-conquista span, .trofeu span, .dsf-stats b, .dsf-dias, .dias-cartao, .dias-dupla b,
+.painel-cartao strong, .painel-barra .valor, .painel-coluna small, .dica-campo, .passo-dica[data-conta],
+.passo-dica[data-conta-acolhida], .passo-dica[data-conta-adoracao], .passo-dica[data-conta-testemunho],
+.rotulo-no, .faixa-unidade .rot, .contagem-amigos, .titulo-secao span, .conta-livro, .amigo-roda small,
+.lendo-junto-linha, .linha-recorde b, .visao-item b, .barra-missao + b, .corpo-missao b { font-variant-numeric: tabular-nums; }
+.numero-ofensiva { min-width: 2ch; text-align: center; }
+.contador.ofensiva span { min-width: 1.2ch; text-align: right; }
+
+/* ---------- A5 · tipografia fina (quem não entende, ignora) ---------- */
+h1, h2, h3, .passagem-hoje, .dsf-nome, .cabeca-comece b, .bloco-secao b, .titulo-conquista b,
+.cabeca-push b, .corpo-missao b, .item-licao .textos b { text-wrap: balance; }
+p, .passo-dica, .bloco-secao span, .descricao-conquista, .item-licao .textos > span, .nota-corpo p,
+.nota-corpo li, .leitor-verso, .cartao-versiculo blockquote, .pensamento-dia p, .item .resumo { text-wrap: pretty; }
+.nota-corpo, .leitor-texto, .passo-dica, .item .resumo { -webkit-hyphens: auto; hyphens: auto; }
+h1, h2, h3, .botao, .rotulo-aba, .etiqueta, .balao, .faixa-unidade { -webkit-hyphens: manual; hyphens: manual; }
+.leitor-texto { hanging-punctuation: first; }
+
+/* ---------- A12 · aviso flutuante com ícone de certo ou de erro ---------- */
+.aviso-flutuante { display: inline-flex; align-items: center; gap: 8px; }
+.aviso-ico { display: inline-grid; place-items: center; flex: 0 0 auto; }
+.aviso-ico svg { width: 18px; height: 18px; }
+.aviso-ico.aviso-certo { color: var(--verde); }
+.aviso-flutuante.bate { animation: bater .3s ease; }
+@keyframes bater { 0%, 100% { transform: translateX(-50%); } 35% { transform: translateX(calc(-50% - 4px)); } 70% { transform: translateX(calc(-50% + 3px)); } }
+
+/* ---------- ganhos rápidos ---------- */
+.roda-amigos { justify-content: flex-start; gap: 14px; }
+.bloco-secao { animation: none; }
+.amigo-roda, .vaga { animation: none; }
+.botao-reagir { min-height: 44px; }
+.cor-marca { position: relative; width: 36px; height: 36px; }
+.cor-marca::after { content: ''; position: absolute; inset: -6px; }
+.segmentado button, .seletor-config { min-height: 44px; }
+.painel-coluna em { font-size: .68rem; }
+.painel-coluna:not(:nth-child(5n+1)) em { visibility: hidden; }
+.painel-coluna small { font-size: .7rem; }
+
+/* ---------- B2 · o que entra animado sai animado ---------- */
+@keyframes sumir { to { opacity: 0; } }
+@keyframes folha-desce { from { transform: translateY(var(--dy, 0px)); } to { transform: translateY(28%); opacity: 0; } }
+@keyframes fechar-tela { to { opacity: 0; transform: translateY(18px) scale(.985); } }
+@keyframes aviso-desce { to { opacity: 0; transform: translate(-50%, 12px); } }
+.cortina.saindo { animation: sumir .18s ease forwards; pointer-events: none; }
+.cortina.saindo .folha { animation: folha-desce .2s var(--suave) forwards; }
+.veu-mais.saindo { animation: sumir .18s ease forwards; pointer-events: none; }
+.painel-mais.saindo { animation: folha-desce .2s var(--suave) forwards; pointer-events: none; }
+.licao.saindo, .leitor.saindo, .leitor-biblia.saindo { animation: fechar-tela .18s ease forwards; pointer-events: none; }
+.pop-no.saindo { animation: sumir .14s ease forwards; pointer-events: none; }
+.aviso-flutuante.saindo { animation: aviso-desce .2s ease forwards; }
+
+/* ---------- B8 · uma família só para vazio e erro ---------- */
+.estado, .vazio, .vazio-amigos { display: grid; justify-items: center; gap: 6px; padding: 32px 16px; text-align: center; color: var(--tinta-fraca); font-weight: 600; }
+.estado-ico { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 4px; border-radius: var(--raio-p); background: var(--verde-fraco); color: var(--verde); }
+.estado-ico svg { width: 26px; height: 26px; }
+.estado > b { color: var(--tinta-forte); font-size: 1rem; font-weight: 800; }
+.estado > p, .vazio-amigos p { margin: 0; max-width: 300px; }
+.estado .botao { width: auto; margin-top: 8px; }
+.estado.erro .estado-ico { background: var(--fundo-2); color: var(--tinta-fraca); }
+/* o vazio antigo ganha o mesmo azulejo no ícone */
+.vazio-amigos > svg { box-sizing: border-box; width: 56px; height: 56px; padding: 15px; margin-bottom: 4px; border-radius: var(--raio-p); background: var(--verde-fraco); color: var(--verde); }
+/* erro em linha, acima do que estava guardado: neutro (não é dica teal nem aviso vermelho) */
+.estado-linha { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 12px; padding: 10px 12px; border-radius: var(--raio); background: var(--fundo-2); color: var(--tinta-fraca); font-weight: 600; font-size: 0.88rem; }
+.estado-linha svg { flex: 0 0 auto; width: 18px; height: 18px; margin-top: 1px; }
+
+/* ---------- B9 · carregando com a forma do que vai chegar ---------- */
+.esqueleto { padding: 8px 0; }
+.esqueleto-corpo { display: grid; gap: 12px; }
+.esqueleto i { display: block; border-radius: var(--raio-p); background: var(--fundo-2); animation: esqueleto 1.4s ease-in-out infinite; }
+.esqueleto .texto { height: 14px; }
+.esqueleto .texto:nth-child(2n) { width: 82%; }
+.esqueleto .cartao { height: 92px; border-radius: var(--raio-g); border: 0; }
+.esqueleto .linha { display: grid; grid-template-columns: 46px 1fr; gap: 12px; align-items: center; }
+.esqueleto .linha::before { content: ''; width: 46px; height: 46px; border-radius: 50%; background: var(--fundo-2); animation: esqueleto 1.4s ease-in-out infinite; }
+.esqueleto .roda { display: flex; gap: 14px; }
+.esqueleto .roda i { width: 58px; height: 58px; border-radius: 50%; }
+.esqueleto .pilulas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.esqueleto .pilulas i { height: 52px; border-radius: var(--raio); }
+
+/* ---------- B10 · botão ocupado: mantém a cor e gira um anel ---------- */
+@keyframes girar { to { transform: rotate(360deg); } }
+.botao.ocupado { pointer-events: none; filter: none; transform: none; }
+.botao.ocupado > svg { display: none; }
+.botao.ocupado::before { content: ''; width: 16px; height: 16px; flex: 0 0 auto; box-sizing: border-box; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: girar .8s linear infinite; }
+.botao.ocupado[disabled] { background: var(--b); color: var(--inverso-tinta); }
+.botao.cor.ocupado[disabled], .botao.azul.ocupado[disabled], .botao.vermelho.ocupado[disabled] { color: var(--sobre-cor); }
+.botao.branco.ocupado[disabled] { background: var(--branco); color: var(--inverso); }
+.botao.contorno.ocupado[disabled] { background: transparent; color: var(--tinta-forte); border-color: var(--tinta-forte); }
+.botao.plano.ocupado[disabled] { background: none; color: var(--tinta-fraca); }

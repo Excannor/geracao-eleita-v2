@@ -313,7 +313,7 @@ ok(await av('/188/.test(' + q('.linha-ajuda') + '.innerText) && !/XP/.test(' +
 await dormir(400);
 await foto('7-perfil');
 await irPara('#/perfil/conquistas');
-ok(await esperar('document.querySelectorAll(".linha-conquista").length === 10'), 'as dez conquistas aparecem com o nível');
+ok(await esperar('document.querySelectorAll(".linha-conquista").length === CC.CONQUISTAS.length'), 'todas as conquistas aparecem com o nível');
 await irPara('#/perfil/escritos');
 ok(await esperar('/oração de teste/.test(document.body.innerText)'), 'Meus escritos reúne o que foi escrito');
 await irPara('#/config');

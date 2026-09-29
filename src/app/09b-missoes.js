@@ -29,7 +29,7 @@
     if (!location.protocol.startsWith('http')) return '';
     const amigos = (dados && dados.amigos) || [];
     const titulo = '<div class="titulo-bloco"><h2>Lendo junto na semana</h2><span>até domingo</span></div>';
-    if (!dados) return titulo + '<div class="leitor-esqueleto"><i></i></div>';
+    if (!dados) return titulo + CC.esqueleto('lista');
     if (!amigos.length) {
       return titulo + '<div class="missao-convite">' + CC.ico('pessoas')
         + '<p>Leiam juntos 4 dias na mesma semana. Chame alguém para começar!</p>'

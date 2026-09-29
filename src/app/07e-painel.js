@@ -68,12 +68,15 @@
   }
 
   CC.vistaPainel = async function (raiz) {
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1><div class="vazio">Carregando…</div>';
+    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1>' + CC.esqueleto('cartoes');
     let p;
     try {
       p = await CC.api('api/painel');
     } catch (e) {
-      raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1><div class="vazio">' + CC.esc(e.message) + '</div>';
+      raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1>'
+        + CC.estado({ erro: true, titulo: 'Não deu para carregar o painel', texto: e.message, acao: 'Tentar de novo' });
+      const b = raiz.querySelector('[data-acao-estado]');
+      if (b) b.onclick = () => CC.vistaPainel(raiz);
       return;
     }
     if (location.hash !== '#/config/painel') return;

@@ -186,7 +186,7 @@
   function fecharPainelMais(semVoltar) {
     if (!painelMaisAberto) return;
     painelMaisAberto = false;
-    document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => el.remove());
+    document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => CC.sair(el, 200));
     if (!semVoltar && history.state && history.state.painelMais) history.back();
   }
   CC.fecharPainelMais = fecharPainelMais;
@@ -224,7 +224,7 @@
       a.onclick = (ev) => {
         ev.preventDefault();
         painelMaisAberto = false;
-        document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => el.remove());
+        document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => CC.sair(el, 200));
         CC.vibrar('leve');
         irSemFantasma(a.dataset.irMais);
       };
@@ -301,7 +301,7 @@
     navegacao.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
         CC.vibrar('leve');
-        if (painelMaisAberto) { painelMaisAberto = false; document.querySelectorAll('.veu-mais, .painel-mais').forEach((x) => x.remove()); }
+        if (painelMaisAberto) { painelMaisAberto = false; document.querySelectorAll('.veu-mais, .painel-mais').forEach((x) => CC.sair(x, 200)); }
         if (location.hash === el.dataset.ir && !(history.state && history.state.painelMais)) { CC.redesenhar(); CC.rolarPara(0); } else irSemFantasma(el.dataset.ir);
       };
     });
@@ -533,9 +533,9 @@
     if (cortina) { if (!cortina.dataset.presa) cortina.remove(); return; }
     const telas = document.querySelectorAll('.tela-cheia');
     if (telas.length) { telas[telas.length - 1].remove(); return; }
-    if (document.querySelector('.pop-no')) { CC.fecharPopNo(); return; }
+    if (document.querySelector('.pop-no:not(.saindo)')) { CC.fecharPopNo(); return; }
     if (CC.leitorAberto && CC.leitorAberto()) { CC.fecharLeitor(); return; }
-    if (document.querySelector('.licao')) location.hash = '#/';
+    if (document.querySelector('.licao:not(.saindo)')) location.hash = '#/';
   });
 
   CC.sincronizar(true).then(async () => {

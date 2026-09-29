@@ -590,7 +590,7 @@
         corpo = '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Complete seu cadastro para ler com amigos.</p>'
           + '<button class="botao" data-completar>Completar cadastro</button></div>';
       } else if (!dados) {
-        corpo = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>';
+        corpo = CC.esqueleto('juntos');
       } else {
         // O recado e o estudo da célula saíram do Feed: a célula tem aba própria agora, e
         // é lá (Hoje/Estudo) que eles aparecem.
@@ -633,7 +633,7 @@
 
       raiz.innerHTML = '<div class="cabeca-tela"><h1>Juntos</h1>'
         + '<span class="contagem-amigos">' + CC.plural(amigos.length, 'amigo', 'amigos') + '</span></div>'
-        + (aviso ? '<p class="aviso-cadeado">' + CC.esc(aviso) + '</p>' : '')
+        + (aviso ? '<p class="estado-linha">' + CC.ico('info') + '<span>' + CC.esc(aviso) + '</span></p>' : '')
         + corpo;
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
@@ -667,6 +667,9 @@
       ligar('[data-celebrar]', async (el) => {
         const ev = (m.eventos || []).find((x) => x.id === el.dataset.celebrar);
         el.classList.toggle('ligado');
+        el.classList.remove('pulando');
+        void el.offsetWidth;
+        el.addEventListener('animationend', () => el.classList.remove('pulando'), { once: true });
         el.classList.add('pulando');
         try {
           const r = await CC.api('api/novidades/reagir', { id: el.dataset.celebrar });

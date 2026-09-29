@@ -259,7 +259,7 @@
 
   // ---------- balão do nó ----------
   function fecharPop() {
-    document.querySelectorAll('.pop-no').forEach((p) => p.remove());
+    document.querySelectorAll('.pop-no').forEach((p) => CC.sair(p, 140));
     document.querySelectorAll('.no.aberto').forEach((n) => n.classList.remove('aberto'));
   }
   CC.fecharPopNo = fecharPop;

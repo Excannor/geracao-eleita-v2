@@ -98,7 +98,7 @@
   };
 
   CC.vistaNotificacoes = async function (raiz) {
-    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1><div class="leitor-esqueleto"><i></i><i></i></div>';
+    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1>' + CC.esqueleto('lista');
     const e = await CC.estadoNotificacoes();
     if (!location.hash.startsWith('#/config/notificacoes')) return;
     const p = (e.dados && e.dados.preferencias) || { lembrete: true, hora: '19:00', ofensiva: true, amigos: true };

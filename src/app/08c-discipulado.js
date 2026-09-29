@@ -391,7 +391,7 @@
     const voltar = viaPerfil ? CC.botaoVoltar('Perfil') : '';
     const desenhar = (d) => {
       if (!d) {
-        raiz.innerHTML = voltar + '<h1>Discipulado</h1><div class="leitor-esqueleto"><i></i><i></i><i></i></div>';
+        raiz.innerHTML = voltar + '<h1>Discipulado</h1>' + CC.esqueleto('lista');
         return;
       }
       const marcos = d.marcos || {};

@@ -554,6 +554,6 @@
   };
 
   CC.vazio = function (raiz, mensagem) {
-    raiz.innerHTML = CC.botaoVoltar('Voltar') + '<div class="vazio">' + CC.esc(mensagem) + '</div>';
+    raiz.innerHTML = CC.botaoVoltar('Voltar') + CC.estado({ icone: 'info', texto: mensagem });
   };
 })(window.CC);

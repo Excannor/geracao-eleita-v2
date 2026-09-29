@@ -35,7 +35,9 @@ const js = modulos.map((f) => '/* ' + f + ' */\n' + readFileSync(join(pastaApp, 
 console.log('módulos:', modulos.join(', '));
 
 const fontes = readFileSync(src('fontes.css'), 'utf8');
-const estilo = readFileSync(src('estilo.css'), 'utf8');
+// Os comentários do estilo.css são a documentação de design: ficam no fonte e saem do
+// app entregue (economizam uns 30 KB do index.html, que tem teto de 1 MB).
+const estilo = readFileSync(src('estilo.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n\s*\n+/g, '\n');
 const molde = readFileSync(src('index.html'), 'utf8');
 
 mkdirSync(dist(), { recursive: true });

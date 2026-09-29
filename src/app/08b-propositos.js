@@ -118,7 +118,7 @@
     const nestaTela = () => meu === desenhoCelula && location.hash.startsWith('#/novidades/celula/');
 
     const desenhar = (d) => {
-      if (!d) { raiz.innerHTML = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>'; ligarVoltar(raiz); return; }
+      if (!d) { raiz.innerHTML = CC.esqueleto('lista'); ligarVoltar(raiz); return; }
       const p = (d.propositos || []).find((x) => x.id === id && x.celula && !x.euConvidado);
       if (!p) {
         raiz.innerHTML = voltarCelulas() + '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Essa célula não está mais na sua lista.</p></div>';
@@ -142,7 +142,7 @@
           + r + (k === 'estudo' && p.estudo ? '<i class="ponto-estudo" aria-hidden="true"></i>' : '') + '</button>').join('')
         + '</div>'
         + '<div class="painel-celula" role="tabpanel">'
-        + (aba === 'hoje' ? abaHoje(p) : aba === 'pessoas' ? abaPessoas(p, souLider) : '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>')
+        + (aba === 'hoje' ? abaHoje(p) : aba === 'pessoas' ? abaPessoas(p, souLider) : CC.esqueleto('lista'))
         + '</div>';
       ligarVoltar(raiz);
       // Trocar de aba não empilha histórico: o "voltar" do celular sai da célula de uma vez.
@@ -174,7 +174,7 @@
     const nestaTela = () => location.hash === '#/celula';
     const desenhar = (d, carregando) => {
       if (!nestaTela()) return;
-      if (carregando) { raiz.innerHTML = '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>'; return; }
+      if (carregando) { raiz.innerHTML = CC.esqueleto('lista'); return; }
       const celulas = CC.minhasCelulas ? CC.minhasCelulas() : [];
       if (celulas.length === 1) { CC.substituirRota(enderecoCelula(celulas[0].id)); return; }
       if (!celulas.length) {
@@ -490,9 +490,9 @@
       raiz.innerHTML = CC.botaoVoltar('Juntos')
         + '<div class="cabeca-tela"><h1>Propósitos</h1>'
         + (d ? '<span class="contagem-amigos">' + CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') + '</span>' : '') + '</div>'
-        + (aviso ? '<p class="aviso-cadeado">' + CC.esc(aviso) + '</p>' : '')
+        + (aviso ? '<p class="estado-linha">' + CC.ico('info') + '<span>' + CC.esc(aviso) + '</span></p>' : '')
         + '<button class="botao azul" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito com amigos</button>'
-        + (!d ? '<div class="leitor-esqueleto"><i></i><i></i><i></i></div>' : '')
+        + (!d ? CC.esqueleto('cartoes') : '')
         + (convites.length ? CC.tituloSecao('Convites', String(convites.length)) + '<div class="lista-propositos">' + convites.map(cartaoConvite).join('') + '</div>' : '')
         + (grupos.length ? CC.tituloSecao('Grupos') + '<div class="lista-propositos">' + grupos.map(cartao).join('') + '</div>' : '')
         + (duplas.length ? CC.tituloSecao('Em dupla') + '<div class="lista-propositos">' + duplas.map(cartao).join('') + '</div>' : '')

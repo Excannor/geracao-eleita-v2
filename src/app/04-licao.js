@@ -23,8 +23,7 @@
 
   CC.fecharLicao = function () {
     if (CC.fecharLeitor) CC.fecharLeitor();
-    const el = document.querySelector('.licao');
-    if (el) el.remove();
+    CC.sair(document.querySelector('.licao:not(.saindo)'));
     sessao = null;
   };
 
@@ -109,7 +108,7 @@
       fracao = 0.5 + 0.5 * (ETAPAS.indexOf(sessao.etapaReflexao || 'guardar') + 1) / 4;
     }
 
-    let el = document.querySelector('.licao');
+    let el = document.querySelector('.licao:not(.saindo)');
     if (!el) {
       el = document.createElement('div');
       el.setAttribute('role', 'dialog');
@@ -297,7 +296,7 @@
         // guardar: o versículo do dia, ou a nota nos dias em que um versículo solto confunde
         + '<section class="etapa-reflexao" data-etapa-bloco="guardar">'
         + '<div id="festa-versiculo">' + (r.ref
-          ? '<div class="leitor-esqueleto"><i></i><i></i></div>'
+          ? CC.esqueleto('texto')
           : '<figure class="cartao-versiculo nota-reflexao"><span class="etiqueta">Para entender hoje</span><p>' + CC.esc(r.nota) + '</p></figure>') + '</div>'
         + (r.contexto ? '<p class="contexto-reflexao"><b>Contexto:</b> ' + CC.esc(r.contexto)
           + ' <button class="link-nota" data-nota-reflexao>Ler a nota</button></p>' : '')

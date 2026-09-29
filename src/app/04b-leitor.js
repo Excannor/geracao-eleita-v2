@@ -109,8 +109,7 @@
   CC.leitorAberto = () => !!aberto;
 
   CC.fecharLeitor = function () {
-    const el = document.querySelector('.leitor');
-    if (el) el.remove();
+    CC.sair(document.querySelector('.leitor:not(.saindo)'));
     aberto = null;
   };
 
@@ -131,7 +130,7 @@
     // encadear: "seguinte" nunca existe ali.
     const seguinte = trilhas.find(([k]) => k !== chave && !aberto.lida(k));
 
-    let el = document.querySelector('.leitor');
+    let el = document.querySelector('.leitor:not(.saindo)');
     if (!el) {
       el = document.createElement('div');
       el.setAttribute('role', 'dialog');
@@ -227,7 +226,7 @@
       alvo.innerHTML = aviso('Aberto como arquivo solto, o aplicativo não tem de onde trazer o texto. Leia na sua Bíblia e marque a passagem na lição.');
       return;
     }
-    alvo.innerHTML = '<div class="leitor-esqueleto"><i></i><i></i><i></i><i></i></div>';
+    alvo.innerHTML = CC.esqueleto('texto');
     carregar(b).then((biblia) => {
       if (minha !== geracao) return;
       // O Conhecer Jesus não separa Antigo e Novo Testamento como o plano: os trechos do

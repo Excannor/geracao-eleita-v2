@@ -284,20 +284,78 @@ window.CC = window.CC || {};
   };
 
   // ---------- avisos e folhas ----------
+  // Tira uma peça da tela com a animação de saída dela (classe "saindo", no estilo.css).
+  // Chamar duas vezes não faz nada a mais; com "menos movimento" sai no ato.
+  CC.sair = (el, ms = 180) => new Promise((fim) => {
+    if (!el || !el.isConnected || el.classList.contains('saindo')) { fim(); return; }
+    if (CC.semMovimento && CC.semMovimento()) { el.remove(); fim(); return; }
+    el.classList.add('saindo');
+    setTimeout(() => { el.remove(); fim(); }, ms);
+  });
+
+  // O aviso diz se deu certo ou não pelo ícone, e fica na tela o tempo de ler o texto.
+  const TIPO_DO_AVISO = [
+    [/^(não|nao) (consegui|deu|foi|dá)|^sem (internet|rede|conexão)|falhou/i, 'erro'],
+    [/^(copiad|guardad|salv|notificad|enviad|pronto|feito|marcad|anotad|que bom|obrigad|lembrete ligad)/i, 'certo'],
+  ];
   let avisoAtual;
-  CC.avisar = (texto) => {
+  CC.avisar = (texto, opcoes = {}) => {
     clearTimeout(avisoAtual);
+    texto = String(texto || '');
+    const tipo = opcoes.tipo || (TIPO_DO_AVISO.find(([re]) => re.test(texto)) || [])[1];
     let el = document.getElementById('aviso-flutuante');
-    if (!el) {
+    if (el && el.classList.contains('saindo')) { el.remove(); el = null; }
+    const novo = !el;
+    if (novo) {
       el = document.createElement('div');
       el.id = 'aviso-flutuante';
       el.className = 'aviso-flutuante';
       el.setAttribute('role', 'status');
       document.body.appendChild(el);
     }
-    el.textContent = texto;
-    avisoAtual = setTimeout(() => el.remove(), 2600);
+    el.innerHTML = (tipo ? '<i class="aviso-ico aviso-' + tipo + '">' + CC.ico(tipo === 'erro' ? 'info' : 'certo') + '</i>' : '') + '<span>' + CC.esc(texto) + '</span>';
+    // um aviso trocou o outro: bate de leve, para a troca não passar despercebida
+    if (!novo) { el.classList.remove('bate'); void el.offsetWidth; el.classList.add('bate'); }
+    avisoAtual = setTimeout(() => CC.sair(el, 200), Math.min(4200, 1800 + texto.length * 45));
   };
+
+  // Estado de tela (vazio ou erro): azulejo com ícone, título curto, linha de apoio e ação opcional.
+  CC.estado = ({ icone = 'info', titulo = '', texto = '', acao = '', erro = false } = {}) => '<div class="estado' + (erro ? ' erro' : '') + '">'
+    + '<span class="estado-ico" aria-hidden="true">' + CC.ico(icone) + '</span>'
+    + (titulo ? '<b>' + CC.esc(titulo) + '</b>' : '')
+    + (texto ? '<p>' + CC.esc(texto) + '</p>' : '')
+    + (acao ? '<button class="botao contorno pequeno" data-acao-estado>' + CC.esc(acao) + '</button>' : '')
+    + '</div>';
+
+  // Carregando com a forma do que vai chegar (o pulso de opacidade já existe: "esqueleto").
+  const FORMAS_ESQUELETO = {
+    texto: '<i class="texto"></i><i class="texto"></i><i class="texto"></i><i class="texto"></i>',
+    lista: '<i class="cartao"></i><span class="linha"><i class="texto"></i></span><span class="linha"><i class="texto"></i></span><span class="linha"><i class="texto"></i></span>',
+    cartoes: '<i class="cartao"></i><i class="cartao"></i><i class="cartao"></i>',
+    juntos: '<span class="roda"><i></i><i></i><i></i></span><i class="cartao"></i><span class="linha"><i class="texto"></i></span><span class="linha"><i class="texto"></i></span>',
+    biblia: '<i class="cartao"></i><span class="pilulas"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>',
+  };
+  CC.esqueleto = (forma = 'texto') => '<div class="esqueleto' + (forma === 'texto' ? ' leitor-esqueleto' : '') + '" role="status" aria-busy="true" aria-label="Carregando">'
+    + '<div class="esqueleto-corpo" aria-hidden="true">' + (FORMAS_ESQUELETO[forma] || FORMAS_ESQUELETO.texto) + '</div></div>';
+
+  // Botão ocupado: enquanto a tarefa roda, ele mantém a cor e mostra um anel girando
+  // (esperar a rede não é o mesmo que estar desligado).
+  CC.ocupado = async (botao, tarefa) => {
+    if (botao) { botao.classList.add('ocupado'); botao.setAttribute('aria-busy', 'true'); }
+    try { return await tarefa(); } finally {
+      if (botao && botao.isConnected) { botao.classList.remove('ocupado'); botao.removeAttribute('aria-busy'); }
+    }
+  };
+  // O último botão tocado: se o toque disparar uma chamada ao servidor logo em seguida, é ele
+  // que fica ocupado até a resposta, sem cada tela precisar lembrar disso.
+  let ultimoBotao = null;
+  let ultimoToque = 0;
+  if (typeof document.addEventListener === 'function') {
+    document.addEventListener('click', (ev) => {
+      const b = ev.target && ev.target.closest ? ev.target.closest('.botao') : null;
+      if (b) { ultimoBotao = b; ultimoToque = Date.now(); }
+    }, true);
+  }
 
   // Substitui o confirm() do navegador, que num aplicativo instalado parece um erro.
   CC.confirmar = ({ titulo, texto, acao, perigo }) => new Promise((resolver) => {
@@ -310,7 +368,7 @@ window.CC = window.CC || {};
       + '<button class="botao' + (perigo ? ' vermelho' : '') + '" data-sim>' + CC.esc(acao || 'Confirmar') + '</button>'
       + '<button class="botao plano" data-nao>Cancelar</button>'
       + '</div></div>';
-    const fechar = (v) => { cortina.remove(); resolver(v); };
+    const fechar = (v) => { CC.sair(cortina); resolver(v); };
     cortina.querySelector('[data-sim]').onclick = () => fechar(true);
     cortina.querySelector('[data-nao]').onclick = () => fechar(false);
     cortina.onclick = (ev) => { if (ev.target === cortina) fechar(false); };
@@ -367,9 +425,10 @@ window.CC = window.CC || {};
       avaliando = false;
       if (!ativo) return;
       ativo = false;
+      // passou do ponto: a saída começa de onde o dedo largou, sem voltar para cima antes
+      if (dy > LIMITE_FECHAR) { folha.style.setProperty('--dy', dy + 'px'); fechar(); return; }
       folha.style.transition = 'transform .22s var(--suave)';
       folha.style.transform = '';
-      if (dy > LIMITE_FECHAR) fechar();
     };
     folha.addEventListener('touchend', soltar);
     folha.addEventListener('touchcancel', soltar);
@@ -395,7 +454,7 @@ window.CC = window.CC || {};
     if (vv) { vv.addEventListener('resize', acompanharTeclado); vv.addEventListener('scroll', acompanharTeclado); }
     const fechar = () => {
       if (vv) { vv.removeEventListener('resize', acompanharTeclado); vv.removeEventListener('scroll', acompanharTeclado); }
-      cortina.remove();
+      CC.sair(cortina);
       if (origem && origem.focus && document.body.contains(origem)) origem.focus();
       setTimeout(CC.endireitarRaiz, 120);
     };
@@ -417,20 +476,25 @@ window.CC = window.CC || {};
   };
 
   // Pedido ao servidor com a mensagem de erro dele, pronta para a tela.
-  CC.api = (rota, corpo, metodo) => fetch(rota, {
-    method: metodo || (corpo ? 'POST' : 'GET'),
-    cache: 'no-store',
-    headers: corpo ? { 'content-type': 'application/json' } : undefined,
-    body: corpo ? JSON.stringify(corpo) : undefined,
-  }).then(async (r) => {
-    const dado = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      const e = new Error(dado.erro || (r.status === 401 ? 'Entre de novo.' : 'Não deu certo agora.'));
-      e.status = r.status;
-      throw e;
-    }
-    return dado;
-  });
+  CC.api = (rota, corpo, metodo) => {
+    const botao = ultimoBotao && ultimoBotao.isConnected && Date.now() - ultimoToque < 800 ? ultimoBotao : null;
+    if (botao) { botao.classList.add('ocupado'); botao.setAttribute('aria-busy', 'true'); }
+    const soltar = () => { if (botao) { botao.classList.remove('ocupado'); botao.removeAttribute('aria-busy'); } };
+    return fetch(rota, {
+      method: metodo || (corpo ? 'POST' : 'GET'),
+      cache: 'no-store',
+      headers: corpo ? { 'content-type': 'application/json' } : undefined,
+      body: corpo ? JSON.stringify(corpo) : undefined,
+    }).then(async (r) => {
+      const dado = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const e = new Error(dado.erro || (r.status === 401 ? 'Entre de novo.' : 'Não deu certo agora.'));
+        e.status = r.status;
+        throw e;
+      }
+      return dado;
+    }).finally(soltar);
+  };
 
   // Compartilhar pelo menu do celular; sem ele, copia o texto com o link.
   CC.compartilhar = async (texto, url) => {

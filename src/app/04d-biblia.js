@@ -25,7 +25,7 @@
 
   function esqueleto(alvo, titulo, voltar) {
     alvo.innerHTML = (voltar ? CC.botaoVoltar(voltar) : '') + '<h1>' + CC.esc(titulo) + '</h1>'
-      + '<div class="leitor-esqueleto"><i></i><i></i><i></i><i></i></div>';
+      + CC.esqueleto('biblia');
     if (voltar) wireVoltar(alvo);
   }
 
@@ -37,9 +37,17 @@
   }
 
   function erroDeCarga(alvo) {
-    mostrarVazio(alvo, navigator.onLine === false
-      ? 'Esta tradução ainda não está guardada neste celular. Com internet, ela fica guardada para ler sem rede.'
-      : 'Não deu para abrir o texto agora.');
+    const semRede = navigator.onLine === false;
+    alvo.innerHTML = CC.botaoVoltar('Voltar') + CC.estado({
+      erro: true,
+      icone: 'info',
+      titulo: semRede ? 'Sem internet agora' : 'Não deu para abrir o texto',
+      texto: semRede ? 'Esta tradução ainda não está guardada neste celular. Com internet, ela fica guardada para ler sem rede.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
+      acao: 'Tentar de novo',
+    });
+    const b = alvo.querySelector('[data-acao-estado]');
+    if (b) b.onclick = () => CC.redesenhar();
+    wireVoltar(alvo);
   }
 
   // ---------- lista dos 66 livros ----------
@@ -190,7 +198,7 @@
     escOuvinte = (ev) => {
       if (ev.key !== 'Escape') return;
       if (document.querySelector('.cortina')) return; // a folha "Aa" fecha primeiro, pelo listener do roteador
-      const atual = document.querySelector('.leitor-biblia');
+      const atual = document.querySelector('.leitor-biblia:not(.saindo)');
       if (atual) voltarParaGrade(atual.dataset.livro);
     };
     document.addEventListener('keydown', escOuvinte);
@@ -209,14 +217,13 @@
 
   CC.fecharLeituraBiblia = function () {
     leitorSobreGrade = false;
-    const el = document.querySelector('.leitor-biblia');
-    if (el) el.remove();
+    CC.sair(document.querySelector('.leitor-biblia:not(.saindo)'));
     if (escOuvinte) { document.removeEventListener('keydown', escOuvinte); escOuvinte = null; }
   };
 
   function abrirLeitor(livro, n, biblia, b) {
     CC.guardarUltimaBiblia(livro, n);
-    let el = document.querySelector('.leitor-biblia');
+    let el = document.querySelector('.leitor-biblia:not(.saindo)');
     const novo = !el;
     if (!el) {
       el = document.createElement('div');
