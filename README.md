@@ -369,6 +369,12 @@ node ferramentas/teste-notificacoes.mjs          um serviço de push falso, de p
 
 ## Identidade visual
 
+**Redesenho em andamento (branch `redesenho-novo`)**: verde-sálvia suave, o mesmo desenho nos dois
+temas, escuro de leitura em grafite, **Manrope** na interface e **Literata** no texto bíblico. O guia
+é `design/guia-visual.md`; as fichas e peças de base ficam em `src/estilo-v2/` (entram depois do
+`estilo.css`, que ficou congelado), e `design/mapa-telas.md` divide as telas por grupo e explica
+como testar. O texto abaixo descreve a identidade anterior, que o redesenho substitui.
+
 Cinza neutro, preto e branco, sem tempero: a logo é preto e branco, e qualquer matiz no papel
 brigaria com ela. Um acento só, petróleo (`#0f5c5c` no tema claro, `#5fbdb9` no escuro), que
 quer dizer **agora**: o dia de hoje, a barra que está correndo, o link que leva adiante. A

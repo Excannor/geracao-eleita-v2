@@ -1,0 +1,572 @@
+/* =========================================================================
+   REDESENHO V2 · 01 · peças de base
+   Guia: design/guia-visual.md (versão 3). O que vale para o app inteiro: letra, topo,
+   barra de abas e painel Mais, botões, cartões, pílulas, selos, controle segmentado,
+   campos, interruptor, folhas, avisos, estados vazios, cabeçalho de tela e barras.
+
+   Entra depois do estilo.css (que fica congelado: ninguém edita mais) e antes das camadas
+   de cada grupo de telas (2N-*.css), que podem refinar estas peças dentro das suas telas.
+
+   Intocável: o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz,
+   .selo-ref). Nenhuma regra deste arquivo nem das camadas de tela pode mirar essas
+   classes. A única coisa feita aqui é devolver à folha da ofensiva a ficha de letra que
+   a referência do carimbo sempre usou (Oswald), já que a interface passou a ser Manrope.
+   ========================================================================= */
+
+/* sem borda cinza em volta de cartão: as molduras do polimento de 28/09 viram zero */
+:root { --moldura: 0px; --moldura-forte: 0px; --barra-rotulo: #b7bbb1; --alt-topo: 64px; }
+
+/* ---------- documento e letra ---------- */
+html, body {
+  font-family: var(--fonte);
+  font-weight: 500;
+  background: var(--fundo);
+  color: var(--tinta);
+  font-variant-numeric: tabular-nums;
+}
+h1, h2, h3, h4 { font-family: var(--fonte); font-weight: 800; letter-spacing: -0.02em; line-height: 1.18; text-transform: none; color: var(--tinta-forte); }
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.3rem; }
+h3 { font-size: 1.06rem; font-weight: 700; letter-spacing: -0.01em; }
+a { color: var(--salvia-texto); font-weight: 700; text-decoration-thickness: 1.5px; }
+:focus-visible { outline: 2.5px solid var(--tinta-forte); outline-offset: 3px; }
+::selection { background: var(--salvia); color: var(--salvia-tinta); }
+
+/* Sem caixa-alta forçada (o carimbo, que a usa, não passa por aqui): os rótulos que o
+   polimento pôs em maiúsculas voltam a caixa normal, legíveis, com 13px no mínimo. */
+.etiqueta, .leitura-hoje .etiqueta, .passagem .rot, .cartao-pratica .rot, .faixa-unidade .rot,
+.cartao-continuar small, .corpo-semeador small, .leitor-titulo .rot,
+.campo-senha span, .rotulo-escolha, .etiqueta-celula, .item .sub, .dsf-selo, .dsf-stats small,
+.pergunta-reflexao .rotulo-pergunta, .premio .cabeca {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.etiqueta { color: var(--tinta-fraca); }
+
+/* ---------- topo: retrato à esquerda, ofensiva à direita ----------
+   Como a referência: o avatar redondo abre o Perfil e o botão branco em pílula, com o
+   fogo e os dias, abre a folha da ofensiva. Os dois ficam na coluna do conteúdo. */
+.topo {
+  display: grid;
+  grid-template-columns: minmax(16px, 1fr) minmax(0, 528px) minmax(16px, 1fr);
+  align-items: center;
+  padding: env(safe-area-inset-top) 0 0;
+  background: var(--fundo);
+  border-bottom: 0;
+}
+.topo > .estatisticas { grid-area: 1 / 2; justify-self: end; width: auto; max-width: none; margin: 0; justify-content: flex-end; }
+.topo > .perfil-topo {
+  grid-area: 1 / 2;
+  justify-self: start;
+  position: relative;
+  top: auto;
+  right: auto;
+  transform: none;
+  width: var(--botao-redondo);
+  height: var(--botao-redondo);
+  border: 0;
+  background: var(--cartao);
+  color: var(--tinta-forte);
+}
+.perfil-topo .ico-aba { width: 22px; height: 22px; }
+.perfil-topo.selecionado { border: 0; box-shadow: 0 0 0 2.5px var(--fundo), 0 0 0 4.5px var(--tinta-forte); }
+.contador.ofensiva {
+  margin: 0;
+  min-height: var(--botao-redondo);
+  padding: 0 18px 0 12px;
+  gap: 6px;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--cartao);
+}
+.contador.ofensiva:hover { background: var(--cartao); }
+.contador.ofensiva span, .contador.ofensiva small { padding: 0; line-height: 1; }
+.contador.ofensiva .ico-chama { width: 24px; height: 24px; vertical-align: 0; }
+.contador.ofensiva span { font-size: 1.06rem; font-weight: 800; color: var(--tinta-forte); }
+.contador.ofensiva small { font-size: 0.875rem; font-weight: 600; color: var(--tinta-fraca); }
+.contador.ofensiva.ativo span { color: var(--chama-texto); }
+.contador.ofensiva.ativo small { color: var(--tinta-fraca); }
+
+/* ---------- botões ---------- */
+.botao {
+  min-height: 54px;
+  padding: 14px 22px;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--fonte);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.25;
+}
+.botao:hover { filter: none; background: color-mix(in srgb, var(--b) 88%, var(--fundo)); }
+/* acento: sálvia cheia com tinta escura, nos dois temas (nunca branco por cima) */
+.botao.cor, .botao.azul { --b: var(--salvia); color: var(--salvia-tinta); }
+.botao.vermelho { --b: var(--alerta); color: var(--v2-inverso-tinta); }
+/* secundário: pílula da cor do cartão (sobre o fundo) ou do campo (dentro de cartão/folha) */
+.botao.contorno { border: 0; background: var(--cartao); color: var(--tinta-forte); }
+.botao.contorno:hover { background: var(--campo); }
+.cartao .botao.contorno, .folha .botao.contorno, .caixa-lista .botao.contorno, .caixa-config .botao.contorno,
+.tela-cheia .botao.contorno, .licao .botao.contorno, .leitor .botao.contorno { background: var(--campo); }
+.cartao .botao.contorno:hover, .folha .botao.contorno:hover { background: var(--contorno); }
+.botao.branco { background: #ffffff; color: #151615; }
+.botao.plano { background: none; color: var(--tinta); min-height: 48px; }
+.botao.plano:hover { background: var(--campo); }
+.botao.plano.perigo { color: var(--alerta); }
+.botao.pequeno { min-height: 44px; padding: 10px 18px; font-size: 0.9375rem; }
+.botao svg { width: 20px; height: 20px; }
+.botao[disabled], .botao.cor[disabled], .botao.azul[disabled], .botao.vermelho[disabled], .botao.branco[disabled] {
+  background: var(--contorno);
+  color: var(--tinta-fraca);
+}
+.botao.ocupado[disabled] { background: var(--b); color: var(--inverso-tinta); }
+.botao.cor.ocupado[disabled], .botao.azul.ocupado[disabled] { color: var(--salvia-tinta); }
+.botao.vermelho.ocupado[disabled] { color: var(--v2-inverso-tinta); }
+.botao.contorno.ocupado[disabled] { background: var(--cartao); color: var(--tinta-forte); border: 0; }
+.botao.plano.ocupado[disabled] { background: none; color: var(--tinta); }
+
+/* botão redondo de ícone, 48px: branco sobre o fundo, campo dentro de cartão e folha */
+.botao-icone, .botao-redondo {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: var(--botao-redondo);
+  height: var(--botao-redondo);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cartao);
+  color: var(--tinta-forte);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao-icone:hover, .botao-redondo:hover { background: var(--campo); color: var(--tinta-forte); }
+.botao-icone svg, .botao-redondo svg { width: 22px; height: 22px; }
+.cartao .botao-icone, .folha .botao-icone, .caixa-lista .botao-icone,
+.cartao .botao-redondo, .folha .botao-redondo, .caixa-lista .botao-redondo { background: var(--campo); }
+.botao-redondo.salvia { background: var(--salvia); color: var(--salvia-tinta); }
+.botao-redondo.inverso { background: var(--inverso); color: var(--inverso-tinta); }
+
+/* ---------- cartões e listas ----------
+   O cartão se separa do fundo pela cor: raio grande, sem borda e sem sombra. Listas são um
+   cartão só, com divisória fina por dentro. */
+.cartao { border: 0; border-radius: var(--raio-cartao); padding: 20px; background: var(--cartao); box-shadow: none; }
+.caixa-lista, .lista-atalhos, .caixa-config { border: 0; border-radius: var(--raio-cartao); background: var(--cartao); box-shadow: none; }
+.caixa-lista > * + *, .lista-atalhos > * + *, .caixa-config > * + * { border-top: 1px solid var(--contorno); }
+.atalho { min-height: 60px; padding: 0 18px 0 12px; gap: 12px; color: var(--tinta-forte); font-weight: 700; }
+.atalho:hover { background: var(--campo); }
+.atalho > svg:first-child {
+  box-sizing: content-box;
+  width: 20px;
+  height: 20px;
+  padding: 10px;
+  border-radius: 50%;
+  background: var(--campo);
+  color: var(--tinta-forte);
+}
+.atalho > svg:last-child:not(:first-child) { width: 18px; height: 18px; color: var(--tinta-fraca); }
+.linha-config { min-height: 60px; padding: 8px 20px; font-weight: 700; color: var(--tinta-forte); }
+.linha-config .valor { color: var(--tinta-fraca); font-weight: 600; }
+.linha-config.perigo { color: var(--alerta); }
+a.linha-config:hover, button.linha-config:hover { background: var(--campo); }
+/* realce do item de hoje/selecionado: sálvia pálido com listras diagonais sutis */
+.realce { background: var(--realce); }
+
+.titulo-secao { align-items: center; margin: 32px 0 12px; }
+.titulo-secao h2 { font-size: 1.25rem; font-weight: 800; }
+.titulo-secao span, .titulo-secao a { font-size: 0.875rem; font-weight: 600; color: var(--tinta-fraca); text-transform: none; letter-spacing: 0; }
+.titulo-secao a { text-decoration: none; color: var(--tinta-forte); }
+
+.passo-dica { color: var(--tinta-fraca); font-weight: 500; font-size: 0.9375rem; }
+.passo-dica.pequena { font-size: 0.8125rem; }
+
+/* ---------- cabeçalho de tela ----------
+   Botão redondo de voltar à esquerda e título centralizado na mesma linha. O nome do
+   destino continua no botão (o roteador reescreve e o leitor de tela lê), só não aparece.
+   Quando o título vem logo depois do voltar, ele sobe para o lado do botão; telas com
+   ações à direita usam .cabeca-centro: [voltar ou .vao] [h1] [botões ou .vao]. */
+.voltar {
+  display: grid;
+  place-items: center;
+  width: var(--botao-redondo);
+  height: var(--botao-redondo);
+  min-height: 0;
+  margin: 0 0 12px;
+  padding: 0;
+  gap: 0;
+  border-radius: 50%;
+  background: var(--cartao);
+  color: var(--tinta-forte);
+  font-size: 0;
+}
+.voltar:hover { background: var(--campo); color: var(--tinta-forte); }
+.voltar svg { width: 22px; height: 22px; }
+.folha .voltar, .tela-cheia .voltar { background: var(--campo); }
+.voltar + h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--botao-redondo);
+  margin: calc(-1 * var(--botao-redondo) - 12px) 0 20px;
+  padding: 0 calc(var(--botao-redondo) + 8px);
+  font-size: 1.375rem;
+  text-align: center;
+}
+.cabeca-centro { display: grid; grid-template-columns: var(--botao-redondo) minmax(0, 1fr) var(--botao-redondo); align-items: center; gap: 8px; min-height: var(--botao-redondo); margin: 0 0 20px; }
+.cabeca-centro > h1, .cabeca-centro > .titulos { grid-column: 2; margin: 0; font-size: 1.375rem; text-align: center; }
+.cabeca-centro .voltar { margin: 0; }
+.cabeca-centro .vao { width: var(--botao-redondo); height: var(--botao-redondo); }
+.cabeca-centro .acoes-cabeca { display: flex; gap: 8px; justify-content: flex-end; }
+.subtitulo-tela { max-width: 34ch; margin: -12px auto 20px; color: var(--tinta-fraca); font-size: 0.9375rem; font-weight: 500; text-align: center; text-wrap: balance; }
+
+/* ---------- pílulas, chips e selos ---------- */
+.pilula { min-height: 44px; padding: 0 16px; border: 0; background: var(--cartao); color: var(--tinta-forte); font-size: 0.875rem; font-weight: 600; }
+.pilula:hover { border-color: transparent; background: var(--campo); }
+.cartao .pilula, .folha .pilula, .caixa-lista .pilula { background: var(--campo); }
+.pilula[aria-pressed="true"], .pilula.ativa { background: var(--inverso); color: var(--inverso-tinta); }
+.pilula.livro-feito, :root[data-tema="escuro"] .pilula.livro-feito { border: 0; background: var(--salvia); color: var(--salvia-tinta); }
+.pilula.livro-andando { border: 0; box-shadow: inset 0 0 0 1.5px var(--contorno); }
+.conta-livro { color: inherit; opacity: .75; }
+.chip { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 12px; border-radius: 999px; background: var(--campo); color: var(--tinta); font-size: 0.8125rem; font-weight: 600; }
+/* selo de estado: pílula de contorno; o visto num círculo cheio */
+.selo-status {
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--contorno);
+  color: var(--tinta-forte);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.selo-status.leu, :root[data-tema="escuro"] .selo-status.leu { padding-left: 8px; background: none; color: var(--tinta-forte); }
+.selo-status svg { box-sizing: border-box; width: 20px; height: 20px; padding: 4px; border-radius: 50%; background: var(--tinta-forte); color: var(--cartao); stroke-width: 3; }
+p.selo-status { padding: 10px 14px; border-radius: 20px; }
+
+/* ---------- controle segmentado ----------
+   Trilho claro; a opção escolhida em pílula escura (clara no tema escuro). */
+.segmentado { gap: 4px; padding: 5px; border-radius: 999px; background: var(--cartao); }
+.cartao .segmentado, .folha .segmentado, .caixa-config .segmentado, .caixa-lista .segmentado { background: var(--campo); }
+.segmentado button { min-height: 44px; border-radius: 999px; color: var(--tinta); font-family: var(--fonte); font-size: 0.9375rem; font-weight: 700; }
+.segmentado button[aria-pressed="true"], .segmentado button[aria-selected="true"] { background: var(--inverso); color: var(--inverso-tinta); box-shadow: none; }
+
+/* ---------- campos ---------- */
+.busca-caixa input, .busca-exata input, .campo textarea, .campo-senha input, .campo-senha textarea,
+.campo-senha select, .seletor-config, .painel-outro input, .campo-apelido {
+  border: 1.5px solid var(--contorno);
+  border-radius: var(--raio-campo);
+  background: var(--campo);
+  color: var(--tinta-forte);
+  font-family: var(--fonte);
+  font-weight: 600;
+}
+.busca-caixa input:focus, .busca-exata input:focus, .campo textarea:focus, .campo-senha input:focus,
+.campo-senha textarea:focus, .campo-senha select:focus, .seletor-config:focus, .painel-outro input:focus, .campo-apelido:focus {
+  outline: none;
+  border-color: var(--tinta-forte);
+  background: var(--cartao);
+}
+.campo label { font-size: 0.875rem; font-weight: 700; color: var(--tinta-forte); }
+.campo-senha span { color: var(--tinta-fraca); }
+input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 1; }
+
+/* ---------- interruptor ----------
+   Desligado: trilho claro com contorno e bolinha cinza que se lê; ligado: sálvia com a
+   bolinha escura. O estado se lê pela posição e pelo contraste, não só pela cor. */
+.interruptor { width: 52px; height: 32px; background: var(--campo); box-shadow: inset 0 0 0 1.5px var(--contorno); }
+.interruptor i { top: 5px; left: 5px; width: 22px; height: 22px; background: var(--tinta-fraca); box-shadow: none; }
+[aria-checked="true"] .interruptor { background: var(--salvia); box-shadow: none; }
+[aria-checked="true"] .interruptor i { background: var(--salvia-tinta); transform: translateX(20px); }
+
+/* ---------- barra de progresso: fina, escura, com o ponto sálvia na ponta ---------- */
+.barra { height: 10px; background: var(--progresso-trilho); }
+.cartao .barra, .folha .barra { background: var(--campo); }
+.barra > i { background: var(--progresso); }
+.barra > i::after { left: auto; right: 2px; top: 50%; width: 6px; height: 6px; transform: translateY(-50%); background: var(--salvia); }
+
+/* ---------- folhas, telas cheias e painéis ---------- */
+.cortina { background: var(--veu); }
+.folha {
+  max-width: 560px;
+  padding: 30px 20px calc(24px + env(safe-area-inset-bottom));
+  border-radius: var(--raio-folha) var(--raio-folha) 0 0;
+  background: var(--cartao);
+}
+.folha::before { top: 10px; width: 36px; height: 5px; margin-left: -18px; background: var(--contorno); }
+.folha h2 { font-size: 1.375rem; font-weight: 800; }
+.folha p { color: var(--tinta-fraca); font-weight: 500; font-size: 0.9375rem; }
+.tela-cheia { background: var(--fundo); }
+
+/* ---------- avisos ---------- */
+.aviso-flutuante {
+  padding: 12px 20px 12px 14px;
+  border-radius: 999px;
+  background: var(--inverso);
+  color: var(--inverso-tinta);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: left;
+}
+.aviso-ico { width: 24px; height: 24px; border-radius: 50%; }
+.aviso-ico svg { width: 14px; height: 14px; stroke-width: 3; }
+.aviso-ico.aviso-certo { background: var(--salvia); color: var(--salvia-tinta); }
+.aviso-ico.aviso-erro { background: var(--alerta); color: var(--v2-inverso-tinta); }
+.aviso-cadeado, .folha p.aviso-cadeado { gap: 12px; padding: 14px 16px; border-radius: 20px; background: var(--salvia-palido); color: var(--tinta); font-weight: 500; }
+.aviso-cadeado svg { color: var(--salvia-texto); }
+.estado-linha { border-radius: 20px; background: var(--campo); color: var(--tinta); }
+
+/* ---------- estados vazios e de erro ----------
+   Um círculo sálvia pálido com o ícone, título curto, uma linha de apoio e a ação. */
+.estado, .vazio, .vazio-amigos { gap: 8px; padding: 40px 20px; color: var(--tinta-fraca); font-weight: 500; }
+.estado-ico { width: 64px; height: 64px; margin-bottom: 6px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.estado-ico svg { width: 28px; height: 28px; }
+.estado > b { font-size: 1.06rem; font-weight: 800; color: var(--tinta-forte); }
+.estado > p, .vazio-amigos p { max-width: 32ch; font-size: 0.9375rem; }
+.estado .botao { margin-top: 10px; }
+.estado.erro .estado-ico { background: var(--campo); color: var(--tinta-fraca); }
+.vazio-amigos > svg { width: 64px; height: 64px; padding: 18px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+
+/* ---------- carregando ---------- */
+.esqueleto i, .leitor-esqueleto i, .esqueleto .linha::before { background: var(--cartao); }
+.cartao .esqueleto i, .folha .esqueleto i, .folha .leitor-esqueleto i, .leitor .leitor-esqueleto i { background: var(--campo); }
+
+/* ---------- a folha da ofensiva (aberta pelo topo; o JS mora em 10-roteador.js) ----------
+   O carimbo em pincel desta folha fica idêntico ao de antes do redesenho. As regras dele
+   (estilo.css) leem fichas gerais: --fonte-destaque (a Oswald da referência), --tinta-forte
+   (a chapa), --fundo (a letra) e herdam o peso 600 do corpo (a Permanent Marker só tem 400:
+   o navegador engrossa a letra, e é esse o traço do carimbo). Sem mirar as classes dele, a
+   folha devolve a essas fichas os valores de sempre, e as outras peças da folha voltam às
+   fichas novas logo abaixo. */
+.folha-ofensiva {
+  --fonte-destaque: var(--fonte-carimbo-ref);
+  --tinta-forte: #111111;
+  --fundo: #e6e6e6;
+  gap: 16px;
+  font-weight: 600;
+  font-variant-numeric: normal;
+}
+:root[data-tema="escuro"] .folha-ofensiva { --tinta-forte: #ffffff; --fundo: #0d0d0d; }
+.folha-ofensiva > .chama-grande, .folha-ofensiva > p, .folha-ofensiva > .semana-bolinhas,
+.folha-ofensiva > .etiqueta, .folha-ofensiva > .lista-proposito, .folha-ofensiva > .acoes {
+  --tinta-forte: var(--v2-tinta-forte);
+  --fundo: var(--v2-fundo);
+  font-variant-numeric: tabular-nums;
+}
+.chama-grande .ico-chama { width: 88px; height: 88px; }
+.chama-grande b { font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; color: var(--chama-texto); }
+.chama-grande span { font-weight: 700; }
+.chama-grande.apagada b { color: var(--tinta-fraca); }
+.bolinha { font-size: 0.8125rem; font-weight: 600; }
+.bolinha i { width: 38px; height: 38px; background: var(--campo); }
+.bolinha i svg { width: 16px; height: 16px; stroke-width: 3; }
+.bolinha.feito i { background: var(--chama); color: var(--v2-inverso-tinta); }
+.bolinha.escudo i { background: var(--salvia-palido); color: var(--salvia-texto); }
+.folha .linha-escudos { padding: 14px 16px; border-radius: 20px; background: var(--salvia-palido); font-weight: 500; }
+.linha-escudos i { color: var(--contorno); }
+.linha-escudos i.tem { color: var(--salvia-texto); }
+.folha .linha-recorde { padding: 0 4px; }
+.folha .linha-recorde b { color: var(--tinta-forte); }
+/* "Lendo junto": a contagem de cada amigo (span.estado) não é o estado vazio da tela */
+.lista-proposito .pessoa-proposito .estado { display: inline-flex; align-items: center; gap: 3px; padding: 0; text-align: left; color: var(--chama-texto); font-size: 0.8125rem; font-weight: 700; }
+.pessoa-proposito .quem { gap: 2px; }
+
+/* ---------- abertura ---------- */
+.abertura-marca { font-family: var(--fonte); font-weight: 800; letter-spacing: -0.01em; text-transform: none; }
+.abertura-barra { background: #2a2b29; }
+.abertura-barra i { background: #c8da8c; }
+
+/* =========================================================================
+   BARRA DE ABAS NO CELULAR
+   Duas ilhas em pílula escura, com botões redondos, e a Bíblia no meio, levantada, num
+   círculo sálvia maior. A aba ativa vira um círculo claro com ícone escuro e um ponto
+   sálvia. O nome de cada aba fica à vista embaixo do círculo (quem chega agora precisa
+   ler o que há ali); na barra cheia (Célula e Discipulado juntos) só o ícone, com o nome
+   no aria-label, porque seis nomes não cabem a 320px sem descer de 12px.
+   Uma faixa na cor do fundo passa por trás das ilhas, para o conteúdo sumir antes delas.
+   ========================================================================= */
+@media (max-width: 859px) {
+  :root { --alt-barra: 108px; }
+  .navegacao {
+    --circulo: clamp(42px, calc(42px + 4px * var(--cresce)), 46px);
+    --circulo-biblia: clamp(56px, calc(56px + 6px * var(--cresce)), 62px);
+    align-items: flex-end;
+    gap: clamp(4px, calc(4px + 6px * var(--cresce)), 10px);
+    padding: 0 clamp(4px, calc(4px + 8px * var(--cresce)), 12px) calc(10px + env(safe-area-inset-bottom));
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    pointer-events: none;
+  }
+  .navegacao::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    height: calc(82px + env(safe-area-inset-bottom));
+    background: var(--fundo);
+  }
+  .navegacao > * { pointer-events: auto; }
+  .ilha {
+    flex: 0 1 auto;
+    gap: clamp(2px, calc(2px + 6px * var(--cresce)), 8px);
+    height: auto;
+    padding: 6px clamp(8px, calc(8px + 4px * var(--cresce)), 12px) 5px;
+    border-radius: 30px;
+    background: var(--barra);
+    justify-content: center;
+  }
+  .navegacao.cheia .ilha { gap: 4px; padding: 6px; border-radius: 999px; }
+  .aba {
+    flex: 0 0 auto;
+    gap: 2px;
+    min-width: calc(var(--circulo) + 4px);
+    max-width: none;
+    height: auto;
+    padding: 0 2px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--barra-icone);
+    font-weight: 600;
+  }
+  .aba:hover:not(.selecionada) { background: none; }
+  .aba .icone-aba {
+    width: var(--circulo);
+    height: var(--circulo);
+    border-radius: 50%;
+    background: var(--barra-botao);
+    color: var(--barra-icone);
+    transition: background .15s ease;
+  }
+  .aba:hover:not(.selecionada) .icone-aba { background: color-mix(in srgb, var(--barra-botao) 80%, #ffffff); }
+  .aba .ico-aba { width: 22px; height: 22px; transition: none; }
+  .aba .rotulo-aba,
+  .navegacao.cheia .aba:not(.aba-central) .rotulo-aba {
+    font-family: var(--fonte);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    line-height: 1.2;
+    color: var(--barra-rotulo);
+  }
+  .aba.selecionada { color: var(--barra-ativa-tinta); font-weight: 600; background: none; }
+  .aba.selecionada .icone-aba { background: var(--barra-ativa); color: var(--barra-ativa-tinta); }
+  .aba.selecionada:not(.aba-central) .rotulo-aba { color: #ffffff; font-weight: 700; }
+  .aba.selecionada:not(.aba-central) .rotulo-aba::after { display: none; }
+  /* o ponto sálvia da aba ativa, embaixo do ícone, dentro do círculo */
+  .aba.selecionada:not(.aba-central) .icone-aba::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 50%;
+    background: #93aa4c;
+  }
+  .aba.selecionada:not(.aba-central) .ico-aba { transform: translateY(-2px); }
+  /* ponto de novidade: vermelho, recortado da cor da ilha */
+  .aba .ponto-aba { top: 1px; right: 1px; width: 11px; height: 11px; border: 2px solid var(--barra); background: #ff5b4d; }
+  /* barra cheia: só os círculos */
+  .navegacao.cheia .aba:not(.aba-central) .rotulo-aba {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* A Bíblia: círculo sálvia maior, levantado acima das ilhas, com o nome embaixo. */
+  .aba.aba-central {
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    min-width: var(--circulo-biblia);
+    margin: 0 0 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--salvia-tinta);
+  }
+  .aba.aba-central:hover, .aba.aba-central.selecionada { background: none; box-shadow: none; }
+  .aba.aba-central .icone-aba { width: var(--circulo-biblia); height: var(--circulo-biblia); background: var(--salvia); color: var(--salvia-tinta); }
+  .aba.aba-central:hover .icone-aba { background: color-mix(in srgb, var(--salvia) 88%, var(--tinta-forte)); }
+  .aba.aba-central .ico-aba { width: 26px; height: 26px; }
+  .aba.aba-central .rotulo-aba { margin-top: 2px; font-size: 0.75rem; font-weight: 700; color: var(--tinta-forte); }
+  .aba.aba-central.selecionada .icone-aba { box-shadow: 0 0 0 3px var(--fundo), 0 0 0 5px var(--tinta-forte); }
+
+  /* o painel do Mais sobe de cima da barra, como um cartão solto */
+  .painel-mais {
+    left: 12px;
+    right: 12px;
+    bottom: calc(var(--alt-barra) - 16px + env(safe-area-inset-bottom));
+    max-width: 536px;
+    padding: 8px;
+    border-radius: var(--raio-cartao);
+    box-shadow: var(--sombra-flutuante);
+  }
+}
+
+/* ---------- o painel do Mais (celular; no trilho lateral ele não existe) ---------- */
+.veu-mais { background: var(--veu); }
+.painel-mais { background: var(--cartao); }
+.painel-mais a, .painel-mais a:last-child {
+  gap: 14px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 22px;
+  color: var(--tinta-forte);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.painel-mais a + a { border-top: 0; }
+.painel-mais a:hover { background: var(--campo); }
+.painel-mais .q, .painel-mais .q.leve { width: 44px; height: 44px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.painel-mais .q svg { width: 22px; height: 22px; }
+.painel-mais small { margin-top: 2px; color: var(--tinta-fraca); font-size: 0.8125rem; font-weight: 500; }
+
+/* =========================================================================
+   TELAS LARGAS (>= 860px): a barra vira o trilho lateral, no mesmo visual
+   ========================================================================= */
+@media (min-width: 860px) {
+  .navegacao { padding: 20px 16px; gap: 4px; border-right: 0; background: var(--fundo); }
+  .navegacao .marca-lateral { font-family: var(--fonte); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.01em; text-transform: none; padding: 6px 12px 22px; }
+  .navegacao .marca-lateral em { color: inherit; }
+  .aba, .aba.aba-central {
+    height: 56px;
+    gap: 12px;
+    padding: 0 16px 0 6px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--tinta);
+    box-shadow: none;
+  }
+  .aba .icone-aba { width: 44px; height: 44px; border-radius: 50%; background: var(--cartao); color: var(--tinta-forte); }
+  .aba .ico-aba, .aba.aba-central .ico-aba { width: 22px; height: 22px; }
+  .aba .rotulo-aba, .aba.aba-central .rotulo-aba, .navegacao.cheia .aba:not(.aba-central) .rotulo-aba { font-family: var(--fonte); font-size: 0.9375rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: inherit; }
+  .aba:hover:not(.selecionada), .aba.aba-central:hover { background: var(--campo); }
+  .aba.selecionada, .aba.aba-central.selecionada { background: var(--cartao); color: var(--tinta-forte); border-radius: 999px; box-shadow: none; }
+  .aba.selecionada .icone-aba { background: var(--inverso); color: var(--inverso-tinta); }
+  .aba.selecionada:not(.aba-central) .rotulo-aba::after { display: none; }
+  .aba.aba-central .icone-aba { background: var(--salvia); color: var(--salvia-tinta); }
+  .aba .ponto-aba { top: 0; right: 0; border: 2px solid var(--fundo); }
+  .topo { padding-left: 0; }
+  .folha { border-radius: var(--raio-folha); }
+}

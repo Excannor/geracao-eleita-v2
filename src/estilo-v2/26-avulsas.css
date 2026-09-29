@@ -1,0 +1,12 @@
+/* =========================================================================
+   REDESENHO V2 · 26-avulsas
+   Páginas avulsas: entrada (entrar.html), privacidade e termos.
+   Camada exclusiva deste grupo (ver design/mapa-telas.md). Diferente das outras: NÃO
+   entra no app (index.html). O build.mjs a põe no marcador ESTILO_V2 (um bloco style
+   vazio) de cada página avulsa, logo depois do estilo de dentro dela, e ela NÃO recebe o
+   00-tokens.css nem o 01-base.css: as páginas têm fichas próprias (--fundo, --forte,
+   --fraca, --selo-bloco...). Copie os valores do guia (00-tokens.css) para as fichas
+   daqui, nos dois temas (@media prefers-color-scheme + :root[data-tema]).
+   Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz,
+   .selo-ref) nem as fichas dele (--selo-bloco, --selo-texto).
+   ========================================================================= */

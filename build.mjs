@@ -36,8 +36,36 @@ console.log('módulos:', modulos.join(', '));
 
 const fontes = readFileSync(src('fontes.css'), 'utf8');
 // Os comentários do estilo.css são a documentação de design: ficam no fonte e saem do
-// app entregue (economizam uns 30 KB do index.html, que tem teto de 1 MB).
-const estilo = readFileSync(src('estilo.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n\s*\n+/g, '\n');
+// app entregue (economizam uns 30 KB do index.html, que tem teto de 1 MB). O espaço em
+// volta de chaves, dois-pontos, ponto e vírgula e vírgulas sai também (mais uns 20 KB),
+// sem encostar no que está entre aspas (content, url("data:..."), nomes de fonte).
+const enxugarCss = (css) => css
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .split(/("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')/)
+  .map((trecho, i) => (i % 2 ? trecho : trecho
+    .replace(/\s+/g, ' ')
+    .replace(/\s*([{};,>])\s*/g, '$1')
+    .replace(/([{;]\s*[-a-z]+):\s+/g, '$1:')
+    .replace(/;}/g, '}')))
+  .join('')
+  .trim();
+// Depois do estilo.css entram, em ordem alfabética, as camadas do redesenho em
+// src/estilo-v2/ (00-tokens, 01-base, uma por grupo de telas). As que terminam em
+// "-avulsas.css" são das páginas avulsas (entrada, privacidade, termos) e ficam fora do app.
+const pastaEstiloV2 = src('estilo-v2');
+const camadasV2 = (existsSync(pastaEstiloV2) ? readdirSync(pastaEstiloV2) : [])
+  .filter((f) => f.endsWith('.css')).sort();
+const lerCamada = (f) => readFileSync(join(pastaEstiloV2, f), 'utf8');
+const estilo = enxugarCss([readFileSync(src('estilo.css'), 'utf8')]
+  .concat(camadasV2.filter((f) => !f.endsWith('-avulsas.css')).map(lerCamada)).join('\n'));
+// As páginas avulsas não carregam o estilo.css (têm o próprio, dentro delas): recebem só a
+// camada delas, no marcador /*ESTILO_V2*/, depois do estilo de dentro da página.
+const estiloAvulsas = enxugarCss(camadasV2.filter((f) => f.endsWith('-avulsas.css')).map(lerCamada).join('\n'));
+// Um "</style>" escrito dentro do CSS (até num comentário) fecharia o bloco no meio da página.
+if (/<\/style/i.test(estilo + estiloAvulsas)) throw new Error('um arquivo de estilo tem "</style>" dentro: tire do texto');
+const kb = (texto) => (Buffer.byteLength(texto) / 1024).toFixed(1) + ' KB';
+console.log('estilo: estilo.css ' + kb(enxugarCss(readFileSync(src('estilo.css'), 'utf8'))) + ' · '
+  + camadasV2.map((f) => f + ' ' + kb(enxugarCss(lerCamada(f)))).join(' · '));
 const molde = readFileSync(src('index.html'), 'utf8');
 
 mkdirSync(dist(), { recursive: true });
@@ -172,6 +200,7 @@ const simboloSvg = montarAbertura()
 for (const pagina of ['entrar.html', 'privacidade.html', 'termos.html']) {
   const html = readFileSync(src(pagina), 'utf8')
     .replace(/\/\*FONTES\*\//g, () => fontes)
+    .replace(/\/\*ESTILO_V2\*\//g, () => estiloAvulsas)
     .replace(/\/\*SIMBOLO\*\//g, () => simboloSvg)
     .replace(/\/\*ICONE\*\//g, () => iconeEmbutido)
     .replace(/\/\*VERSAO_ICONES\*\//g, () => versaoIcones);
@@ -259,5 +288,7 @@ self.addEventListener('notificationclick', (ev) => {
 writeFileSync(dist('sw.js'), sw, 'utf8');
 
 const mb = (Buffer.byteLength(html) / 1048576).toFixed(2);
-console.log('gerado: dist/index.html (' + mb + ' MB) · manifest · sw ' + versao
+// O teste.mjs exige o index.html abaixo de 1 MB: quanto ainda cabe (as camadas de estilo contam).
+const folga = ((1024 * 1024 - Buffer.byteLength(paginaFinal)) / 1024).toFixed(1);
+console.log('gerado: dist/index.html (' + mb + ' MB, folga de ' + folga + ' KB até 1 MB) · manifest · sw ' + versao
   + ' · ' + icones.length + ' ícones · ' + biblias.length + ' bíblias');

@@ -68,7 +68,8 @@ window.CC = window.CC || {};
   CC.diaDaSemana = (texto) => CC.DIAS_CURTOS[new Date(texto + 'T12:00:00').getDay()];
 
   // ---------- ícones ----------
-  // Traçado aberto, 2.2 de espessura: é o que dá o ar de aplicativo e não de documento.
+  // Traçado aberto, 2 de espessura em todos (redesenho v2: a mesma espessura na barra de
+  // abas, no topo e dentro das telas): é o que dá o ar de aplicativo e não de documento.
   const PREENCHIDOS = { chama: 1, coroa: 1, estrela: 1, raio: 1, pegadas: 1 };
   const P = {
     // conquistas: um desenho por conceito, no mesmo traço (28/09/2026)
@@ -140,7 +141,7 @@ window.CC = window.CC || {};
     const preenchido = nome in PREENCHIDOS;
     const pintura = preenchido
       ? 'fill="currentColor"'
-      : 'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
+      : 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
     return '<svg viewBox="' + (CAIXAS[nome] || '0 0 24 24') + '" ' + pintura + ' aria-hidden="true"'
       + (extra ? ' ' + extra : '') + '>' + d + '</svg>';
   };
@@ -248,7 +249,26 @@ window.CC = window.CC || {};
     mais: HERDA,
   };
 
+  // Redesenho v2: a barra de abas, o painel Mais e o retrato vazio do topo usam ícones de
+  // traço, na mesma espessura dos de dentro das telas. Os desenhos são os mesmos conceitos
+  // que o dono escolheu para os preenchidos acima (o alfinete na primeira parada do caminho,
+  // o balão com coração, a casa da célula, a dupla com quem conduz à frente, a Bíblia aberta
+  // com a fita); os preenchidos ficam para quem ainda pedir um nome sem versão de traço.
+  const TRACO_ABA = {
+    trilha: '<path d="M7 2.2a3.5 3.5 0 0 1 3.5 3.5C10.5 8.4 7 11 7 11S3.5 8.4 3.5 5.7A3.5 3.5 0 0 1 7 2.2z"/><path d="M7 14h9a3 3 0 0 1 0 6H9.5"/><circle cx="7" cy="20" r="1.3"/>',
+    novidades: '<path d="M4.5 4h15A2.5 2.5 0 0 1 22 6.5v9a2.5 2.5 0 0 1-2.5 2.5H11l-5 4v-4H4.5A2.5 2.5 0 0 1 2 15.5v-9A2.5 2.5 0 0 1 4.5 4z"/><path d="M12 14.2s-3.6-2-3.6-4.5a1.9 1.9 0 0 1 3.6-.9 1.9 1.9 0 0 1 3.6.9c0 2.5-3.6 4.5-3.6 4.5z"/>',
+    casa: '<path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9.5 22v-6.5a1.5 1.5 0 0 1 1.5-1.5h2a1.5 1.5 0 0 1 1.5 1.5V22"/>',
+    dupla: '<circle cx="9" cy="7" r="3.5"/><path d="M2.5 21v-2a5.5 5.5 0 0 1 5.5-5.5h2a5.5 5.5 0 0 1 5.5 5.5v2"/><path d="M16 3.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18.5 13.7a5.5 5.5 0 0 1 3 4.8V21"/>',
+    livro: '<path d="M2 4.5h6a4 4 0 0 1 4 4V21a3 3 0 0 0-3-3H2z"/><path d="M22 4.5h-6a4 4 0 0 0-4 4V21a3 3 0 0 1 3-3h7z"/><path d="M16.5 4.5v6l1.5-1.2 1.5 1.2v-6"/>',
+    mais: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+    bau: P.bau, bussola: P.bussola, marcador: P.marcador, caneta: P.caneta, pessoa: P.pessoa,
+  };
+
   CC.icoAba = (nome) => {
+    if (TRACO_ABA[nome]) {
+      return '<svg viewBox="0 0 24 24" class="ico-aba" fill="none" stroke="currentColor" stroke-width="2" '
+        + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + TRACO_ABA[nome] + '</svg>';
+    }
     const desenho = ICONES_ABA[nome];
     if (!desenho) return CC.ico(nome);
     const [a, b] = CORES_ABA[nome] || ['#888', '#555'];

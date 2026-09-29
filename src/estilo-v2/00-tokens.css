@@ -1,0 +1,174 @@
+/* =========================================================================
+   REDESENHO V2 · 00 · fichas de cor e de letra
+   Guia: design/guia-visual.md (versão 3). Verde-sálvia suave, o MESMO desenho nos dois
+   temas, escuro de leitura em grafite (não preto) e texto quase branco (não branco puro).
+
+   Este arquivo entra depois do estilo.css (build.mjs) e só redefine fichas. As fichas
+   novas têm o nome do guia (--salvia, --campo, --contorno...); as antigas, que o
+   estilo.css usa em centenas de regras (--acento, --verde, --azul, --inverso...), passam
+   a apontar para elas. Por isso o app inteiro já muda de cor só com este arquivo.
+
+   Regra de uso para as camadas de tela (2N-*.css):
+   - use as fichas NOVAS; nunca cor literal que valha só num tema;
+   - --salvia é preenchimento (com --salvia-tinta por cima, nunca branco);
+     --salvia-texto é o acento como texto ou ícone sobre fundo/cartão;
+   - chama e chama-texto só na ofensiva; --alerta só em erro e aviso.
+
+   O tema escuro liga por :root[data-tema="escuro"]: o app sempre marca o tema (CC.aplicarTema).
+   As páginas avulsas não usam este arquivo: têm o estilo delas (e a camada 26-avulsas.css).
+   O carimbo em pincel (Permanent Marker) não tem regra aqui: segue como estava.
+   ========================================================================= */
+
+:root {
+  /* ---------- as fichas do guia · tema claro ---------- */
+  --v2-fundo: #ececec;
+  --v2-cartao: #ffffff;
+  --campo: #f3f3f3;
+  --contorno: #e2e2e2;
+  --v2-tinta-forte: #151615;
+  --v2-tinta: #2c2d2b;
+  --v2-tinta-fraca: #686b66;
+  --salvia: #c8da8c;
+  --salvia-palido: #eef3de;
+  --salvia-texto: #5a6b2a;
+  /* tinta sobre a sálvia: escura nos dois temas */
+  --salvia-tinta: #151615;
+  --v2-inverso: #151615;
+  --v2-inverso-tinta: #ffffff;
+  --barra: #151615;
+  --barra-botao: #2a2b29;
+  --barra-icone: #e6e6e6;
+  /* a aba ativa: círculo claro com ícone escuro */
+  --barra-ativa: #ffffff;
+  --barra-ativa-tinta: #151615;
+  --v2-chama: #e23d1b;
+  --v2-chama-texto: #b3321a;
+  --alerta: #c62828;
+  --alerta-palido: #fbe9e7;
+  /* o realce do item de hoje/selecionado: sálvia pálido com listras diagonais sutis */
+  --listra: rgba(21, 22, 21, .045);
+  --realce: repeating-linear-gradient(135deg, transparent 0 10px, var(--listra) 10px 20px), var(--salvia-palido);
+  /* véu das folhas e do painel Mais */
+  --veu: rgba(21, 22, 21, .42);
+  /* sombra só do que flutua (folha, aviso, botão flutuante), nunca de cartão */
+  --v2-sombra-flutuante: 0 12px 32px rgba(21, 22, 21, .12);
+
+  /* ---------- letras ---------- */
+  --fonte-ui: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --fonte-biblia: 'Literata', Georgia, 'Times New Roman', serif;
+  /* Oswald só na referência (1 Pedro 2.9...) em cima do carimbo; ver .folha-ofensiva em 01-base */
+  --fonte-carimbo-ref: 'Oswald', 'Arial Narrow', sans-serif;
+
+  /* ---------- formas ---------- */
+  --raio-cartao: 28px;
+  --raio-folha: 32px;
+  --raio-campo: 18px;
+  --botao-redondo: 48px;
+}
+
+:root[data-tema="escuro"] {
+  --v2-fundo: #1b1c1a;
+  --v2-cartao: #252724;
+  --campo: #2e302c;
+  --contorno: #3a3d37;
+  --v2-tinta-forte: #eef0ea;
+  --v2-tinta: #d9dcd3;
+  --v2-tinta-fraca: #a4a99d;
+  --salvia: #bfd083;
+  --salvia-palido: #2c3324;
+  --salvia-texto: #c9d98f;
+  --v2-inverso: #eef0ea;
+  --v2-inverso-tinta: #1b1c1a;
+  --barra: #10110f;
+  --barra-botao: #2a2c28;
+  --barra-ativa: #eef0ea;
+  --barra-ativa-tinta: #151615;
+  --v2-chama: #ff7a52;
+  --v2-chama-texto: #ff9a7a;
+  --alerta: #ff8a80;
+  --alerta-palido: #3a2220;
+  --listra: rgba(255, 255, 255, .035);
+  --veu: rgba(0, 0, 0, .55);
+  --v2-sombra-flutuante: 0 12px 32px rgba(0, 0, 0, .45);
+}
+
+/* ---------- as fichas antigas, apontadas para as novas ----------
+   Declaradas uma vez só: como apontam para var(), trocam de tema sozinhas. Os nomes
+   "fundo", "cartao", "tinta" são os mesmos do guia; os demais são históricos. */
+:root, :root[data-tema="escuro"] {
+  --fundo: var(--v2-fundo);
+  --fundo-2: var(--campo);
+  --cartao: var(--v2-cartao);
+  --borda: var(--contorno);
+  --borda-3d: var(--contorno);
+  --tinta: var(--v2-tinta);
+  --tinta-forte: var(--v2-tinta-forte);
+  --tinta-fraca: var(--v2-tinta-fraca);
+  --trilho: var(--contorno);
+  --tinta-travada: var(--v2-tinta-fraca);
+
+  /* o acento: texto e ícone em sálvia escura (claro) ou clara (escuro) */
+  --acento: var(--salvia-texto);
+  --acento-3d: var(--salvia-texto);
+  --acento-fraco: var(--salvia-palido);
+  --inverso: var(--v2-inverso);
+  --inverso-tinta: var(--v2-inverso-tinta);
+  --hoje: var(--salvia);
+  --hoje-tinta: var(--salvia-tinta);
+
+  /* as antigas cores de categoria: acento ou escala neutra */
+  --verde: var(--salvia-texto);
+  --verde-3d: var(--salvia-texto);
+  --verde-fraco: var(--salvia-palido);
+  --azul: var(--salvia-texto);
+  --azul-3d: var(--salvia-texto);
+  --azul-fraco: var(--salvia-palido);
+  --roxo: var(--v2-tinta);
+  --roxo-3d: var(--v2-tinta-forte);
+  --roxo-fraco: var(--campo);
+  --turquesa: var(--v2-tinta);
+  --turquesa-3d: var(--v2-tinta-forte);
+  --turquesa-fraco: var(--campo);
+  /* conquista ganha: sálvia cheia com tinta escura (.c-amarelo já leva tinta escura) */
+  --amarelo: var(--salvia);
+  --amarelo-3d: var(--salvia-texto);
+  --amarelo-fraco: var(--salvia-palido);
+
+  --vermelho: var(--alerta);
+  --vermelho-3d: var(--alerta);
+  --vermelho-fraco: var(--alerta-palido);
+  --chama: var(--v2-chama);
+  --chama-texto: var(--v2-chama-texto);
+
+  /* tinta sobre as cores cheias antigas (--verde, --azul, --cor): no claro o acento é
+     sálvia escura (tinta branca); no escuro é sálvia clara (tinta escura) */
+  --sobre-cor: var(--v2-inverso-tinta);
+  --sombra-flutuante: var(--v2-sombra-flutuante);
+
+  /* Manrope na interface inteira, títulos e botões inclusive. A Oswald fica só na
+     referência do carimbo (ver .folha-ofensiva em 01-base.css). */
+  --fonte: var(--fonte-ui);
+  --fonte-destaque: var(--fonte-ui);
+
+  --raio: 22px;
+  --raio-g: var(--raio-cartao);
+  --raio-p: 16px;
+
+  /* polimento de 28/09 (fim do estilo.css): trilhos, controles e interruptor */
+  --trilho-neutro: var(--contorno);
+  --progresso: var(--v2-inverso);
+  --progresso-trilho: var(--contorno);
+  --borda-controle: var(--contorno);
+  --interruptor-off: var(--contorno);
+  --segmento-trilho: var(--v2-cartao);
+  --segmento-sel: var(--v2-inverso);
+  --segmento-anel: transparent;
+}
+/* marca-texto dos versículos: do texto da pessoa, fora da paleta; no escuro, fundos
+   baixos em grafite, para o texto claro continuar legível */
+:root[data-tema="escuro"] {
+  --marca-1: #3a3514;
+  --marca-2: #1f3322;
+  --marca-3: #1e3148;
+  --marca-4: #452234;
+}

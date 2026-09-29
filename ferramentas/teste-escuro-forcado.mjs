@@ -17,14 +17,16 @@ const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 let falhas = 0;
 const ok = (cond, msg) => { console.log((cond ? '  ok    ' : '  FALHA ') + msg); if (!cond) falhas++; };
 
-// O fundo do tema escuro, num lugar só: o app (estilo.css) e o portal (entrar.html) usam
-// o mesmo tom, e quando a paleta muda é aqui que se atualiza, não em quatro comparações
-// espalhadas pelo arquivo.
-const ESCURO = { r: 0x0d, g: 0x0d, b: 0x0d, hex: '#0d0d0d' };
+// O fundo do tema escuro, num lugar só: quando a paleta muda é aqui que se atualiza, não em
+// quatro comparações espalhadas pelo arquivo. O app (src/estilo-v2/00-tokens.css) já está no
+// grafite do redesenho; o portal (entrar.html) tem paleta própria e fica com o tom dele até
+// a camada das páginas avulsas trocar (aí o PORTAL passa a ser o mesmo do app).
+const ESCURO = { r: 0x1b, g: 0x1c, b: 0x1a, hex: '#1b1c1a' };
+const ESCURO_PORTAL = { r: 0x0d, g: 0x0d, b: 0x0d, hex: '#0d0d0d' };
 // E o claro. Aqui não dá para exigir "quase branco": o fundo do app é um cinza (#ececec,
 // luz 236), e o cartão é que é branco. O que este teste procura é o navegador escurecendo
 // a página por cima — e isso derruba a luz muito abaixo disso, não em três pontos.
-const CLARO = { luz: 230, hex: '#e6e6e6' };
+const CLARO = { luz: 230, hex: '#ececec' };
 const claroIntacto = (luz) => luz >= CLARO.luz - 10;
 
 const PORTA = await portaLivre();
@@ -79,7 +81,9 @@ async function medirApp(tema, colorSchemeNaMao) {
   await av("document.querySelectorAll('.cortina, #abertura').forEach(c => c.remove())");
   if (colorSchemeNaMao) await av('document.documentElement.style.setProperty("color-scheme", ' + JSON.stringify(colorSchemeNaMao) + ')');
   await dormir(500);
-  return { fundo: await corNaTela(20, 20) };
+  // Na margem esquerda do conteúdo, onde só há fundo: o canto (20, 20) caía dentro do retrato
+  // redondo do topo, que é da cor do cartão, desde que ele passou para a esquerda.
+  return { fundo: await corNaTela(6, 200) };
 }
 
 async function medirPortal(tema) {
@@ -126,7 +130,7 @@ ok(Math.abs(escuroEscolhido.fundo.r - ESCURO.r) < 8 && escuroEscolhido.fundo.luz
 ok(claroIntacto((await medirPortal(false)).luz), 'portal com tema claro escolhido: o navegador não escurece');
 await sistema(true);
 const portalSistema = await medirPortal(null);
-ok(Math.abs(portalSistema.r - ESCURO.r) < 8 && portalSistema.luz < 40, 'portal sem escolha e sistema escuro: o escuro do próprio portal');
+ok(Math.abs(portalSistema.r - ESCURO_PORTAL.r) < 8 && portalSistema.luz < 40, 'portal sem escolha e sistema escuro: o escuro do próprio portal (' + ESCURO_PORTAL.hex + ')');
 
 console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  o navegador não escurece mais o app por cima\n');
 encerrar(falhas ? 1 : 0);
