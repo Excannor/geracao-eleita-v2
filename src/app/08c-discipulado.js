@@ -388,15 +388,16 @@
     // rota antiga (#/perfil/discipulado) continua existindo por causa das notificações já
     // entregues antes desta mudança, e essa sim mostra o voltar de sempre.
     const viaPerfil = location.hash.startsWith('#/perfil/discipulado');
+    // A folha do alto (só apresentação, 24-juntos.css): o título e a linha de apoio.
     const cabeca = '<div class="cabeca-centro">' + (viaPerfil ? CC.botaoVoltar('Perfil') : '') + '<h1>Discipulado</h1></div>';
     const desenhar = (d) => {
       if (!d) {
-        raiz.innerHTML = cabeca + CC.esqueleto('lista');
+        raiz.innerHTML = '<div class="folha-juntos">' + cabeca + '</div>' + CC.esqueleto('lista');
         return;
       }
       const marcos = d.marcos || {};
-      raiz.innerHTML = cabeca
-        + '<p class="subtitulo-tela">Caminhe com alguém mais perto de Jesus. O que você escreve no app continua só seu.</p>'
+      raiz.innerHTML = '<div class="folha-juntos">' + cabeca
+        + '<p class="subtitulo-tela">Caminhe com alguém mais perto de Jesus. O que você escreve no app continua só seu.</p></div>'
         + CC.tituloSecao('Minha caminhada')
         + '<div class="caixa-config">' + MARCOS.map((chave) => linhaMarco(chave, marcos[chave])).join('') + '</div>'
         + (d.meuDiscipulador ? blocoMeuDiscipulador(d.meuDiscipulador) : '')

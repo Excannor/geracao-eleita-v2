@@ -225,6 +225,8 @@ button.cartao-proposito:hover { background: var(--campo); }
 
 /* ---------- discipulado ---------- */
 .linha-config > span:first-child { text-wrap: pretty; }
+/* "Comecei a acompanhar alguém / na fé": o rótulo longo quebra em duas linhas equilibradas */
+.linha-config:is([data-marco], [data-mostrar-meu], [data-escolha]) > span:first-child { text-wrap: balance; }
 .conteudo:has([data-marco]) .pe-duplo-plano { grid-template-columns: 1fr; gap: 4px; margin-top: 12px; }
 .folha:has([data-marcar]) .oracao-guia li { background: var(--campo); text-wrap: pretty; }
 .retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -4px; }
