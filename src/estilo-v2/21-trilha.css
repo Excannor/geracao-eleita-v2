@@ -348,6 +348,17 @@
 .tela-conhecer .licao-pe .botao.contorno { background: var(--cartao); }
 .cj .leitura-hoje { margin: 0 0 16px; }
 
+/* ---------- a folha da ofensiva (aberta pelo topo e pelo Início) ----------
+   Só o entorno do carimbo, que fica como está: o recorde vira um bloco como o dos escudos,
+   e os dois ficam com o mesmo raio. */
+.folha .linha-escudos, .folha .linha-recorde { border-radius: 20px; }
+.folha .linha-recorde { align-items: center; min-height: 52px; padding: 0 16px; background: var(--campo); font-weight: 600; }
+
+/* ---------- o painel do Mais: nas margens do conteúdo, com folga até a barra ---------- */
+@media (max-width: 859px) {
+  .painel-mais { left: 16px; right: 16px; bottom: calc(var(--alt-barra) - 12px + env(safe-area-inset-bottom)); }
+}
+
 @media (min-width: 860px) {
   .trilha { padding-bottom: 72px; }
   .folha-topo { margin-top: -16px; }
