@@ -247,7 +247,7 @@
 .topo > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
 .topo > .perfil-topo .ico-aba { width: 24px; height: 24px; }
 .topo > .perfil-topo.selecionado { box-shadow: 0 0 0 2.5px var(--folha), 0 0 0 4.5px var(--folha-tinta); }
-.folha-cabeca { margin: -52px -16px 20px; padding: 40px 30px 24px; border-radius: 0 0 36px 36px; background: var(--folha); }
+.folha-cabeca { margin: -52px -16px 24px; padding: 40px 30px 24px; border-radius: 0 0 36px 36px; background: var(--folha); }
 .folha-cabeca > :last-child, .folha-cabeca .textos > :last-child { margin-bottom: 0; }
 /* celular estreito: o título ao lado do voltar encolhe para caber numa linha ("Perguntas
    honestas" quebrava a 360px), como o título da Bíblia (22-leitura.css) */

@@ -29,7 +29,7 @@
   color: var(--folha-tinta);
 }
 .folha-desafios, .quiz > .licao-topo, .quiz .pergunta > .etiqueta, .quiz .festa { border-radius: 0 0 36px 36px; background: var(--folha); }
-.folha-desafios { margin: -52px -16px 20px; padding: 40px 30px 24px; }
+.folha-desafios { margin: -52px -16px 24px; padding: 40px 30px 24px; }
 
 /* o cartão de destaque do Início: branco no claro, sálvia no escuro, tinta escura; o número
    em bold e, à direita, o baú (Desafios) ou o botão redondo preto que começa a rodada
@@ -84,7 +84,7 @@
 
 /* ---------- os blocos da tela dos Desafios ---------- */
 .bloco-missoes, .cartao-praticar { margin-top: 32px; }
-.folha-desafios + .bloco-missoes, .folha-desafios + .titulo-secao { margin-top: 12px; }
+/* (da folha ao primeiro título também são 32px, como nas outras telas) */
 /* título do bloco numa linha só: se a pílula não couber ao lado ("Lendo junto na semana" a
    360px), ela desce para baixo do título, em vez de o título quebrar */
 .titulo-bloco { flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 12px; }

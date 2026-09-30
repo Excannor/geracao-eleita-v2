@@ -174,7 +174,7 @@
    em 21-trilha.css): preso em cima, com os cantos de baixo redondos. A .folha-biblia sobe por
    trás desses cantos e os dois viram uma peça só; ao rolar, ela passa por baixo e o topo fica
    sozinho. */
-.folha-biblia { margin: -52px -16px 20px; padding: 40px 30px 24px; }
+.folha-biblia { margin: -52px -16px 24px; padding: 40px 30px 24px; }
 .folha-biblia > .voltar + h1 { margin-bottom: 12px; }
 .folha-biblia > .subtitulo-tela:last-child { margin-bottom: 0; }
 .titulo-biblia { margin: 4px 0 18px; text-align: center; }
