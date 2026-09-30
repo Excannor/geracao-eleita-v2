@@ -186,7 +186,9 @@
 .botao-pilula svg { width: 16px; height: 16px; stroke-width: 2.2; }
 
 /* baú, troféu e o balão "Abrir" */
-.balao, .balao.balao-bau { bottom: calc(100% + 18px); padding: 6px 14px; border: 0; border-radius: 999px; background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
+/* (no escuro, o estilo.css pinta o "Abrir" do baú de sálvia sobre o balão sálvia: a mesma força
+   de seletor devolve a tinta escura, como no claro) */
+.balao, .balao.balao-bau, :root[data-tema="escuro"] .balao.balao-bau { bottom: calc(100% + 18px); padding: 6px 14px; border: 0; border-radius: 999px; background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
 .balao::after { border: 0; background: var(--salvia); }
 .no-bau svg, .no-marco .arte-trofeu { width: 64px; }
 .no-marco { padding: 8px; background: var(--cartao); box-shadow: inset 0 0 0 1.5px var(--contorno); }
@@ -202,8 +204,9 @@
 .pop-no .sub-pop, .pop-no.adiante .sub-pop { color: inherit; font-weight: 500; opacity: 1; }
 .pop-no .fala-bento { border: 0; margin: 8px 0 4px; padding: 12px 14px; border-radius: 18px; color: var(--tinta-forte); font-weight: 600; }
 .pop-no .botao.contorno { background: var(--campo); }
-/* aberto, o balão fica acima dos outros nós, mas passa por baixo da faixa da unidade e da
-   folha do alto, que são fixas (antes o nó e o balão rolavam por cima delas) */
+/* aberto, o balão fica acima dos outros nós, mas passa por baixo da faixa da unidade, que
+   gruda no alto (antes o nó e o balão rolavam por cima dela); a folha do Início rola com a
+   trilha (5bb4ad1) */
 .no-linha:has(.pop-no) { z-index: 15; }
 /* no dia de hoje, o balão toma o lugar do cartão ao lado do nó enquanto está aberto (a mesma
    passagem e o mesmo Começar): antes um cobria o outro. Fechado, a trilha fica como estava. */
