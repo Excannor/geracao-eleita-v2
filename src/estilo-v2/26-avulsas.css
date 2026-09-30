@@ -218,25 +218,59 @@ input[aria-invalid="true"] { border-color: var(--alerta); }
 .consentimento input { min-height: 0; width: 24px; height: 24px; padding: 0; accent-color: var(--inverso); }
 .consentimento:has(input[aria-invalid="true"]) { outline: 2px solid var(--alerta); outline-offset: 0; }
 
-/* ---------- privacidade e termos ---------- */
-body > main:has(.cabeca) { max-width: 720px; padding: calc(24px + env(safe-area-inset-top)) 16px calc(48px + env(safe-area-inset-bottom)); line-height: 1.65; }
-.cabeca { gap: 16px; margin-bottom: 12px; }
-.cabeca svg { width: 48px; }
-.cabeca h1 { font-size: 1.75rem; }
-.atualizada { margin: 0 0 24px; color: var(--fraca); font-size: .875rem; font-weight: 600; }
+/* ---------- privacidade e termos ----------
+   Símbolo e marca numa linha, título e data na folha do alto (o ::before da data), no
+   centro como o cabeçalho das telas do app; o resumo e o índice em cartões brancos; o
+   texto corrido no fundo, na coluna da página. */
+body > main:has(.cabeca) { position: relative; isolation: isolate; max-width: 720px;
+  padding: calc(20px + env(safe-area-inset-top)) var(--margem) calc(48px + env(safe-area-inset-bottom)); line-height: 1.65; }
+.cabeca { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 10px; margin: 0; padding: 0 var(--recuo-folha); color: var(--folha-tinta); }
+.cabeca > div { display: contents; }
+.cabeca svg { width: auto; height: 56px; }
+.cabeca h1 { flex: 1 0 100%; margin-top: 8px; font-size: clamp(1.375rem, 6.4vw, 1.75rem); line-height: 1.2; text-align: center; color: var(--folha-tinta); }
+.atualizada { position: relative; margin: 4px 0 24px; padding: 0 var(--recuo-folha) var(--fim-folha); color: var(--folha-tinta-fraca); font-size: .875rem; font-weight: 600; text-align: center; }
+.atualizada::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -3000px;
+  bottom: 0;
+  left: calc(-1 * var(--margem));
+  right: calc(-1 * var(--margem));
+  border-radius: 0 0 36px 36px;
+  background: var(--folha);
+  pointer-events: none;
+}
 .cabeca ~ h2 { margin: 32px 0 8px; font-size: 1.25rem; line-height: 1.25; scroll-margin-top: 16px; }
 .cabeca ~ p, .cabeca ~ ul li { font-weight: 500; }
-.resumo, nav.indice { border: 0; border-radius: 28px; padding: 20px; }
-.resumo { background: var(--salvia-palido); }
-nav.indice { margin-top: 16px; padding: 12px 12px 12px 8px; background: var(--cartao); }
+/* itens de lista: linhas equilibradas, sem palavra sozinha no fim (o "pretty" do Chrome não
+   evita a que vem depois de um hífen, como em "pelo e-mail.") */
+main:has(.cabeca) li { text-wrap: balance; }
+.resumo, nav.indice { border: 0; border-radius: 28px; padding: 20px; background: var(--cartao); }
+.resumo ul { margin-bottom: 0; }
+nav.indice { margin-top: 12px; padding: 12px 12px 12px 8px; }
 nav.indice ol { padding-left: 32px; }
 nav.indice li { margin: 0; font-size: .9375rem; }
 nav.indice li::marker { color: var(--fraca); font-weight: 700; }
 nav.indice a { display: flex; align-items: center; min-height: 44px; color: var(--v2-forte); font-weight: 600; text-decoration-color: var(--contorno); }
-table { border: 0; border-collapse: separate; border-spacing: 0; border-radius: 20px; background: var(--cartao); font-size: .875rem; line-height: 1.45; }
-th, td { padding: 12px; text-wrap: balance; border-top: 1px solid var(--contorno); }
+/* "Quem vê o quê": três colunas que cabem no celular; larguras fixas para a primeira levar
+   o texto e as respostas ("só se você ativar") não quebrarem palavra por palavra */
+table { table-layout: fixed; border: 0; border-collapse: separate; border-spacing: 0; border-radius: 20px; background: var(--cartao); font-size: .8125rem; line-height: 1.45; }
+th, td { padding: 10px 8px; text-wrap: balance; border-top: 1px solid var(--contorno); }
+th:first-child, td:first-child { padding-left: 12px; }
+th:nth-child(1) { width: 46%; }
+th:nth-child(2) { width: 32%; }
+th:nth-child(3) { width: 22%; }
+@media (max-width: 359px) {
+  th, td { padding: 10px 6px; }
+  th:first-child, td:first-child { padding-left: 10px; }
+  th:nth-child(1) { width: 40%; }
+  th:nth-child(2) { width: 34%; }
+  th:nth-child(3) { width: 26%; }
+}
 th { border-top: 0; background: var(--campo); color: var(--fraca); }
 td.sim { color: var(--salvia-texto); }
+td.nao { color: var(--fraca); }
 .cabeca ~ .ajuda { margin-top: 32px; padding: 16px 20px; border-radius: 20px; background: var(--alerta-palido); color: var(--tinta); font-size: 1rem; font-weight: 600; line-height: 1.6; }
-.cabeca ~ .voltar { justify-content: center; min-height: 52px; margin-top: 24px; padding: 0 24px; border-radius: 999px;
+.cabeca ~ .voltar { display: flex; justify-content: center; min-height: var(--alt-botao); margin-top: 24px; padding: 0 24px; border-radius: 999px;
   background: var(--inverso); color: var(--inverso-tinta); text-decoration: none; }
