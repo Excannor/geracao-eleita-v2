@@ -26,6 +26,13 @@
 
 
   const ref = (id) => CC.semPrefixo(D.notas[id].nome);
+  // Espaço inseparável entre número e livro ("1 Timóteo", "Salmos 23.1"), já escapado.
+  const nb = (t) => CC.esc(t).replace(/(\d) (?=\p{L})/gu, '$1&nbsp;').replace(/(\p{L}) (?=\d)/gu, '$1&nbsp;');
+  // Título de unidade ("Êxodo a Números · Mateus a Marcos"): cada trecho inteiro numa linha,
+  // a quebra só depois do ponto do meio.
+  const nbUnidade = (t) => t.split(' · ').map((x) => nb(x).replace(/ /g, '&nbsp;')).join('&nbsp;· ');
+  const estrelasDe = (n, classe) => '<span class="' + classe + '">' + [0, 1, 2].map((i) =>
+    '<i class="' + (i < n ? 'cheia' : '') + '">' + CC.ico('estrela') + '</i>').join('') + '</span>';
   const embaralhar = (a) => {
     const v = a.slice();
     for (let i = v.length - 1; i > 0; i--) {
@@ -51,24 +58,29 @@
         + '<span class="marca">' + CC.ico('alvo') + '</span>'
         + '<span class="textos">'
         + '<span class="rot">Unidade ' + u.numero + rot + '</span>'
-        + '<b>' + CC.esc(u.titulo) + '</b>'
+        + '<b>' + nbUnidade(u.titulo) + '</b>'
         + '<span class="sub">' + u.versiculos.length + ' versículos'
         + (p.melhor ? ' · seu melhor: ' + p.melhor + ' de ' + (p.total || total) : ' · ainda não praticou') + '</span>'
-        + '<span class="estrelas">' + [0, 1, 2].map((i) =>
-          '<i class="' + (i < estrelas ? 'cheia' : '') + '">' + CC.ico('estrela') + '</i>').join('') + '</span>'
+        + estrelasDe(estrelas, 'estrelas')
         + '</span>' + CC.ico('avancar') + '</button>';
     };
 
     // A unidade de agora ganha o destaque; as outras ficam numa lista só, sem pilha de cartões.
     const daVez = jogaveis.find((u) => u.numero === atual) || jogaveis[0];
-    raiz.innerHTML = '<div class="cabeca-pratica c-' + daVez.cor + '">'
-      + '<div class="textos"><h1>Praticar</h1>'
-      + '<p>Rodadas de ' + POR_SESSAO + ' perguntas, uns 2 minutos, pra guardar versículos na memória.</p>'
-      + '<button class="botao branco" data-unidade="' + daVez.numero + '">' + CC.ico('alvo') + 'Praticar a unidade ' + daVez.numero + '</button></div>'
+    // Cabeçalho: voltar para os Desafios (de onde o Praticar se abre) e o título no meio.
+    // O destaque é um cartão com a unidade em bold e o botão redondo sálvia que começa a rodada.
+    raiz.innerHTML = CC.botaoVoltar('Desafios') + '<h1>Praticar</h1>'
+      + '<div class="cabeca-pratica c-' + daVez.cor + '">'
+      + '<div class="textos"><span class="etiqueta">' + nbUnidade(daVez.titulo) + '</span>'
+      + '<b class="unidade-pratica">Unidade ' + daVez.numero + '</b>'
+      + '<p>Rodadas de ' + POR_SESSAO + ' perguntas, uns 2 minutos, pra guardar versículos na memória.</p></div>'
+      + '<button class="botao-redondo salvia" data-unidade="' + daVez.numero + '" aria-label="Praticar a unidade ' + daVez.numero + '">' + CC.ico('alvo') + '</button>'
       + '</div>'
       + CC.tituloSecao('Todas as unidades')
       + '<div class="lista-pratica caixa-lista">' + jogaveis.map(cartao).join('') + '</div>';
 
+    // O voltar tem destino próprio: o roteador não conhece o rótulo "Desafios".
+    raiz.querySelector('[data-voltar]').onclick = () => { location.hash = '#/missoes'; };
     raiz.querySelectorAll('[data-unidade]').forEach((el) => {
       el.onclick = () => iniciarSessao(Number(el.dataset.unidade));
     });
@@ -132,10 +144,10 @@
     const enunciado = q.tipo === 'refDoTexto'
       ? '<span class="etiqueta">Qual é a referência?</span>'
         + '<blockquote class="verso">' + CC.esc(CC.textoDaNota(D.notas[q.certo])) + '</blockquote>'
-      : '<span class="etiqueta">Qual texto é ' + CC.esc(ref(q.certo)) + '?</span>';
+      : '<span class="etiqueta">Qual texto é ' + nb(ref(q.certo)) + '?</span>';
 
     const opcoes = q.opcoes.map((id) => {
-      const rotulo = q.tipo === 'refDoTexto' ? ref(id) : trecho(CC.textoDaNota(D.notas[id]), 90);
+      const rotulo = q.tipo === 'refDoTexto' ? nb(ref(id)) : CC.esc(trecho(CC.textoDaNota(D.notas[id]), 90));
       let estado = '';
       if (s.conferido) {
         if (id === q.certo) estado = ' certo';
@@ -144,7 +156,7 @@
       } else if (id === s.escolhido) estado = ' marcado';
       return '<button class="opcao' + estado + '" data-opcao="' + CC.esc(id) + '"'
         + (s.conferido ? ' disabled' : '') + '>'
-        + '<span>' + CC.esc(rotulo) + '</span>'
+        + '<span>' + rotulo + '</span>'
         + (estado === ' certo' ? CC.ico('certo') : (estado === ' errado' ? CC.ico('fechar') : ''))
         + '</button>';
     }).join('');
@@ -158,7 +170,7 @@
       + '</div>'
       + '<div class="licao-palco"><div class="interno">'
       + '<div class="pergunta">' + enunciado + '</div>'
-      + '<div class="opcoes">' + opcoes + '</div>'
+      + '<div class="opcoes ' + (q.tipo === 'refDoTexto' ? 'de-ref' : 'de-texto') + '">' + opcoes + '</div>'
       + '</div></div>'
       + rodape;
 
@@ -198,7 +210,7 @@
       + '<div class="veredito">'
       + '<span class="selo-v">' + CC.ico(acertou ? 'certo' : 'fechar') + '</span>'
       + '<div><b>' + (acertou ? 'Isso!' : 'A resposta era') + '</b>'
-      + '<span>' + CC.esc(ref(q.certo))
+      + '<span>' + nb(ref(q.certo))
       + (mostraTexto ? ': ' + CC.esc(trecho(CC.textoDaNota(n), 80)) : '') + '</span></div>'
       + '</div>'
       + '<button class="botao ' + (acertou ? 'cor' : 'vermelho') + '" data-adiante>'
@@ -244,7 +256,7 @@
         '<i class="' + (i < estrelas ? 'cheia' : '') + '" style="animation-delay:'
         + (i * 0.15) + 's">' + CC.ico('estrela') + '</i>').join('') + '</div>'
       + '<h1>' + nota + '</h1>'
-      + '<p class="passo-dica">Unidade ' + s.unidade.numero + ' · ' + CC.esc(s.unidade.titulo) + '</p>'
+      + '<p class="passo-dica">Unidade ' + s.unidade.numero + ' · ' + nbUnidade(s.unidade.titulo) + '</p>'
       + '<div class="premios">'
       + '<div class="premio c-verde"><div class="cabeca">Acertos</div>'
       + '<div class="valor">' + CC.ico('certo') + s.acertos + '/' + total + '</div></div>'
