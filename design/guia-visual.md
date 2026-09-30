@@ -64,3 +64,11 @@ O Início/Trilha fica com o layout da primeira versão, que o dono aprovou ("est
 - abaixo, a trilha num bloco ESCURO suave (#1b1c1a) nos dois temas: faixa da unidade com o número em círculo escuro e algarismos sálvia, nós lidos brancos com ícone escuro, hoje em sálvia com anel, travados escuros com contorno e cadeado cinza, rótulo "Dia N" e passagens ao lado, linha branca até hoje e pontilhada depois;
 - a barra de abas continua na estrutura nova (ilhas com a Bíblia no meio), que combina com o bloco escuro.
 Referência visual exata: a tela Início do commit be99484 (git show be99484:src/app/03-trilha.js e a camada REDESENHO de be99484:src/estilo.css), com #dff74a trocado por sálvia.
+
+## Decisão do dono sobre TODAS as telas (30/09, vale sobre o resto deste guia)
+Todas as telas seguem o estilo da primeira versão do redesenho (commit be99484), que o dono aprovou, trocando o verde neon (#dff74a) pelo sálvia (#c8da8c, tinta #151615 por cima):
+- topo em folha BRANCA com cantos inferiores arredondados (título ou saudação, botões redondos cinza-claros) e o conteúdo principal em blocos ESCUROS suaves (#1b1c1a com cartões #252724), como o Início, o Perfil e os Desafios de be99484;
+- cartões de destaque (números, atalhos como Praticar e "A história da Bíblia") em sálvia com botão redondo preto;
+- nas telas de conteúdo longo (leitor, lição, Bíblia, notas) a página de leitura continua clara e confortável, como no leitor de be99484;
+- tema escuro: mesmo layout, a folha do topo vira #252724 e o resto fica no grafite suave.
+Referências exatas: as capturas da primeira versão em /tmp/claude-0/-home-user-geracao-eleita/f83429da-2006-5b51-8495-2381601c862d/scratchpad/app/final-*.png e o código de be99484 (git show be99484:src/estilo.css, camada REDESENHO; git show be99484:src/app/<arquivo>). Telas que não existiam na primeira versão (Bíblia inteira, versículos, célula, discipulado, painel, apoiar, Conhecer Jesus, Mais) seguem o mesmo padrão.
