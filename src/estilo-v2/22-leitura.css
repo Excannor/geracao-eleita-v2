@@ -17,14 +17,14 @@
 
 /* ---------- a folha do alto ----------
    Na lição, a cabeça de cada passo (.cabeca-licao) com o topo fixo por cima; no leitor, a
-   cabeça fixa. Por dentro, --cartao é a superfície da folha (botões redondos, pílulas,
-   trilhos) e as tintas são as da folha. */
-.cabeca-licao, .licao-dia > .licao-topo, .leitor-cabeca {
+   cabeça fixa; na Bíblia, a .folha-biblia com o topo do app. Por dentro, --cartao é a
+   superfície da folha (botões redondos, pílulas, trilhos) e as tintas são as da folha. */
+.cabeca-licao, .licao-dia > .licao-topo, .leitor-cabeca, .folha-biblia, .topo:has(~ .corpo .folha-biblia) {
   --cartao: var(--folha-campo); --campo: var(--folha-campo);
   --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
   color: var(--folha-tinta);
 }
-.cabeca-licao, .licao-dia > .licao-topo, .leitor-cabeca { border-radius: 0 0 36px 36px; background: var(--folha); }
+.cabeca-licao, .licao-dia > .licao-topo, .leitor-cabeca, .folha-biblia { border-radius: 0 0 36px 36px; background: var(--folha); }
 
 /* ---------- a lição: o topo fica, a cabeça do passo rola por baixo dele ----------
    O palco ocupa também a linha do topo: parada no começo, a cabeça do passo completa a
@@ -165,19 +165,33 @@
 .arte-destaque > .arte-livro { width: 48px; height: 48px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); box-shadow: none; }
 .arte-destaque > .arte-livro svg { width: 24px; height: 24px; }
 
-/* ---------- Bíblia: livros e capítulos ---------- */
-.titulo-biblia { margin: 8px 0 20px; text-align: center; }
+/* ---------- Bíblia: a folha do alto com o topo do app, livros e capítulos ----------
+   Com a folha na tela, o topo (retrato e ofensiva) vira o começo dela, no lugar e no tamanho
+   da saudação do Início: de ponta a ponta no celular (na largura da coluna no computador),
+   preso em cima, com os cantos de baixo redondos. A .folha-biblia sobe por trás desses cantos
+   e os dois viram uma peça só; ao rolar, ela passa por baixo e o topo fica sozinho. */
+.topo:has(~ .corpo .folha-biblia) { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
+.topo:has(~ .corpo .folha-biblia)::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
+.topo:has(~ .corpo .folha-biblia) > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
+.topo:has(~ .corpo .folha-biblia) > .perfil-topo .ico-aba { width: 24px; height: 24px; }
+.folha-biblia { margin: -52px -16px 20px; padding: 40px 30px 24px; }
+.folha-biblia > .voltar + h1 { margin-bottom: 12px; }
+.folha-biblia > .subtitulo-tela:last-child { margin-bottom: 0; }
+.titulo-biblia { margin: 4px 0 18px; text-align: center; }
 .titulo-biblia + .subtitulo-tela { max-width: none; margin-top: -12px; }
-.cartao-continuar { background: var(--cartao); color: var(--tinta-forte); }
-.cartao-continuar:hover { filter: none; background: var(--campo); }
-.cartao-continuar small { opacity: 1; color: var(--tinta-fraca); }
+/* continuar lendo: o cartão de destaque do Início (branco no claro, sálvia no escuro) com o
+   botão redondo preto */
+.cartao-continuar { gap: 12px; min-height: 84px; margin: 0; padding: 12px 12px 12px 20px; border-radius: 26px; background: var(--folha-destaque); color: var(--salvia-tinta); }
+.cartao-continuar:hover { filter: none; background: var(--folha-destaque); }
+.cartao-continuar:active { transform: scale(.98); }
+.cartao-continuar .icone-continuar { display: none; }
+.cartao-continuar small { opacity: 1; color: inherit; font-size: .8125rem; font-weight: 600; }
+.cartao-continuar b { color: inherit; font-size: 1.1875rem; font-weight: 800; letter-spacing: -.01em; }
 .cartao-continuar .parte { display: block; }
-.cartao-continuar .icone-continuar, .cartao-continuar > svg:last-child { box-sizing: content-box; padding: 12px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
-.cartao-continuar .icone-continuar { width: 24px; height: 24px; }
-.cartao-continuar > svg:last-child { background: var(--salvia); color: var(--salvia-tinta); }
+.cartao-continuar > svg:last-child { box-sizing: content-box; width: 20px; height: 20px; padding: 14px; border-radius: 50%; background: var(--salvia-tinta); color: #ffffff; stroke-width: 2.2; }
 #busca-livro { min-height: 52px; border-color: var(--cartao); border-radius: 999px; background: var(--cartao); }
 #busca-livro:focus { border-color: var(--tinta-forte); }
-.item-livro { padding: 12px 10px 12px 14px; font-size: 0.9375rem; overflow-wrap: normal; }
+.item-livro { padding: 12px 10px 12px 14px; font-size: .9375rem; overflow-wrap: normal; }
 @media (max-width: 599px) { .item-livro.longo { grid-column: span 2; } }
 .item-livro > svg { box-sizing: content-box; width: 14px; height: 14px; padding: 4px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); stroke-width: 3; }
 /* no meio do livro: um anel que enche, como o nó de hoje na trilha */
@@ -190,8 +204,19 @@
 }
 .titulo-biblia .sigla-versao {
   display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 10px 0 12px;
-  border-radius: 999px; background: var(--salvia-palido); color: var(--salvia-texto);
+  border-radius: 999px; background: var(--cartao); color: var(--tinta-forte);
   font-size: .8125rem; font-weight: 800; letter-spacing: .02em;
 }
 .titulo-biblia .sigla-versao svg { width: 16px; height: 16px; stroke-width: 2.4; }
 .titulo-biblia .botao-versao:active .sigla-versao { background: var(--salvia); color: var(--salvia-tinta); }
+/* celular pequeno: o título do livro encolhe para caber ao lado do voltar ("1 Tessalonicenses"
+   não quebra) e o cartão de continuar aperta o recuo e a seta, para o nome não correr por baixo dela */
+@media (max-width: 374px) {
+  .folha-biblia > .voltar + h1 { font-size: 1.25rem; }
+  .cartao-continuar { padding-left: 16px; }
+  .cartao-continuar > svg:last-child { padding: 12px; }
+}
+@media (max-width: 359px) {
+  .folha-biblia > .voltar + h1 { padding-inline: 52px; font-size: 1.0625rem; }
+  .cartao-continuar b { font-size: 1.0625rem; }
+}

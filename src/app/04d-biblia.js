@@ -26,8 +26,9 @@
     wireVoltar(alvo);
   }
 
+  // .folha-biblia: só apresentação, a folha do alto das telas da Bíblia (22-leitura.css)
   function esqueleto(alvo, titulo, voltar) {
-    alvo.innerHTML = (voltar ? CC.botaoVoltar(voltar) : '') + '<h1' + (voltar ? '' : ' class="titulo-biblia"') + '>' + nb(CC.esc(titulo)) + '</h1>'
+    alvo.innerHTML = '<div class="folha-biblia">' + (voltar ? CC.botaoVoltar(voltar) : '') + '<h1' + (voltar ? '' : ' class="titulo-biblia"') + '>' + nb(CC.esc(titulo)) + '</h1></div>'
       + CC.esqueleto('biblia');
     if (voltar) wireVoltar(alvo);
   }
@@ -103,11 +104,11 @@
       const antigo = livros.filter((l) => !CC.ehNovoTestamento(l));
       const novo = livros.filter((l) => CC.ehNovoTestamento(l));
       // O título abre a escolha da tradução: a sigla da atual fica à vista ao lado.
-      alvo.innerHTML = '<h1 class="titulo-biblia"><button class="botao-versao" data-versao aria-haspopup="dialog" aria-label="Bíblia, tradução '
+      alvo.innerHTML = '<div class="folha-biblia"><h1 class="titulo-biblia"><button class="botao-versao" data-versao aria-haspopup="dialog" aria-label="Bíblia, tradução '
         + CC.esc(b.nome.replace(/Biblica® Open |™/g, '')) + '. Trocar a tradução">Bíblia<span class="sigla-versao">'
         + CC.esc(b.abreviatura || b.sigla.toUpperCase()) + CC.ico('baixo') + '</span></button></h1>'
         + '<p class="subtitulo-tela">Escolha um livro e leia à vontade, no seu ritmo.</p>'
-        + cartaoContinuar(biblia)
+        + cartaoContinuar(biblia) + '</div>'
         + '<div class="busca-caixa">' + CC.ico('lupa') + '<input id="busca-livro" type="search" placeholder="Buscar livro (ex.: João 3)" aria-label="Buscar livro da Bíblia" autocomplete="off" spellcheck="false" enterkeyhint="go"></div>'
         + '<p class="passo-dica" id="busca-livro-vazia" hidden>Nenhum livro com esse nome.</p>'
         + '<div id="testamento-antigo">' + CC.tituloSecao('Antigo Testamento', CC.plural(antigo.length, 'livro', 'livros')) + gradeLivros(antigo) + '</div>'
@@ -164,9 +165,9 @@
       if (!caps) { mostrarVazio(alvo, 'Não encontrei esse livro.'); CC.fecharLeituraBiblia(); return; }
       const total = caps.length;
       const capValido = capitulo >= 1 && capitulo <= total ? capitulo : 0;
-      alvo.innerHTML = CC.botaoVoltar('Bíblia')
+      alvo.innerHTML = '<div class="folha-biblia">' + CC.botaoVoltar('Bíblia')
         + '<h1>' + nb(CC.esc(livro)) + '</h1>'
-        + '<p class="subtitulo-tela">' + CC.esc(CC.plural(total, 'capítulo', 'capítulos')) + '</p>'
+        + '<p class="subtitulo-tela">' + CC.esc(CC.plural(total, 'capítulo', 'capítulos')) + '</p></div>'
         + '<div class="grade-capitulos">' + Array.from({ length: total }, (_, i) => i + 1).map((n) => '<a href="#/biblia/'
           + encodeURIComponent(livro) + '/' + n + '"' + (n === capValido ? ' aria-current="true" class="atual"' : '')
           + '>' + n + '</a>').join('') + '</div>';
