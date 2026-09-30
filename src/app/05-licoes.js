@@ -26,12 +26,13 @@
 
     const nomeProxima = proxima ? CC.semPrefixo(D.notas[proxima].nome) : '';
     raiz.innerHTML = CC.botaoVoltar('Trilha')
+      + '<h1>Primeiros passos</h1>'
       + '<div class="cabeca-passos c-roxo">'
-      + '<div class="textos"><h1>Primeiros passos</h1>'
+      + '<div class="textos">'
       + '<p>Doze lições pra firmar a fé. Cada uma conta quando você lê até o fim, e uma por semana é um bom ritmo.</p>'
       + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitas.length + ' de ' + D.licoes.length + '</b></div>'
       + (proxima
-        ? '<a class="botao branco" href="#/nota/' + encodeURIComponent(proxima) + '">' + CC.ico('bandeira') + CC.esc(nomeProxima) + '</a>'
+        ? '<a class="botao" href="#/nota/' + encodeURIComponent(proxima) + '">' + CC.ico('bandeira') + CC.esc(nomeProxima) + '</a>'
         : '<p class="conquista-linha">' + CC.ico('estrela') + 'Você concluiu os primeiros passos!</p>')
       + '</div></div>'
       + CC.tituloSecao('As doze lições')

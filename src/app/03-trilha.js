@@ -51,6 +51,18 @@
 
   const deslocamento = (passo) => Math.round(Math.sin(passo * Math.PI / 4) * AMPLITUDE);
 
+  // Espaço inseparável entre número e livro ("1 Samuel 16", "Marcos 2")
+  CC.colarRef = (t) => String(t || '').replace(/(\d) (?=\p{L})/gu, '$1\u00a0').replace(/(\p{L}) (?=\d)/gu, '$1\u00a0').replace(/ · /g, '\u00a0· ');
+  const refHtml = (t) => CC.esc(CC.colarRef(t));
+
+  // "Dia N" vai do lado onde sobra estrada
+  const ladoDoRotulo = (x, passo) => (x > 0 || (x === 0 && passo % 8 === 0) ? 'esq' : 'dir');
+  const diaLidoHoje = () => {
+    const hoje = CC.hojeIso();
+    const marcados = CC.ler('marcadoEm', {});
+    return Object.keys(marcados).filter((k) => marcados[k] === hoje).map(Number).sort((a, b) => b - a)[0];
+  };
+
 
   // ---------- nós ----------
   function iconeDoDia(numero, feito, atual) {
@@ -77,15 +89,26 @@
     const legenda = 'Dia ' + numero + ', ' + passagemDe(dia) + (feito ? ', lido' : '')
       + (fechados.length ? '. Fecha ' + fechados.join(' e ') : '');
 
-    return '<div class="no-linha' + (atual ? ' com-balao' : '') + '" style="--x:' + deslocamento(passo) + 'px">'
+    // O nó de hoje vai à borda da curva, para o cartão ao lado caber.
+    const x0 = deslocamento(passo);
+    const x = atual ? (x0 > 0 || (x0 === 0 && passo % 8 === 0) ? AMPLITUDE : -AMPLITUDE) : x0;
+    const lado = ladoDoRotulo(x, passo);
+    const lidoHoje = diaLidoHoje();
+    // Repete a legenda do botão: fora do leitor de tela. O de hoje é um cartão.
+    const rotulo = '<span class="rotulo-dia lado-' + lado + (feito ? ' lido' : '') + (atual ? ' cartao-hoje' : '') + '" aria-hidden="true">'
+      + '<b>' + (atual ? (lidoHoje && lidoHoje !== numero ? 'Próximo' : 'Hoje') + ' · ' : '') + 'Dia ' + numero + '</b>'
+      + [dia.antigo, dia.novo].filter(Boolean).map((r) => '<span>' + refHtml(r) + '</span>').join('')
+      + (fechados.length && feito ? '<span class="fechou">Fecha ' + CC.esc(fechados.join(' e ')) + '</span>' : '')
+      + '</span>';
+
+    return '<div class="no-linha' + (atual ? ' com-balao hoje' : '') + '" style="--x:' + x + 'px;--xa:' + Math.abs(x) + 'px">'
       + '<div class="deslocado">'
       + (atual ? '<span class="balao">' + (feito ? 'Revisar' : 'Começar') + '</span>' : '')
       + '<button class="' + classes.join(' ') + '" data-dia="' + numero + '" '
       + 'aria-label="' + CC.esc(legenda) + '"' + (atual ? ' aria-current="step"' : '') + '>'
       + (atual ? '<span class="anel-atual" aria-hidden="true" style="--parte:' + Math.round((CC.fracaoDoDia ? CC.fracaoDoDia(numero) : 0) * 100) + '%"></span>' : '')
       + '<span class="face">' + CC.ico(iconeDoDia(numero, feito, atual)) + '</span></button>'
-      + (fechados.length && feito ? '<span class="rotulo-no fechou">' + CC.esc(fechados.join(' · ')) + '</span>' : '')
-      + '</div></div>';
+      + '</div>' + rotulo + '</div>';
   }
 
   function noBau(numero, passo) {
@@ -124,7 +147,7 @@
       + '<span class="numero-unidade" aria-hidden="true">' + String(u.numero).padStart(2, '0') + '</span>'
       + '<span class="textos-faixa">'
       + '<span class="rot">Unidade ' + u.numero + ' · ' + p.feitos + ' de ' + p.total + ' dias</span>'
-      + '<span class="nome">' + CC.esc(u.titulo) + '</span>'
+      + '<span class="nome">' + refHtml(u.titulo) + '</span>'
       + '</span>'
       + '</button>'
       + '<button class="guia" data-guia="' + u.numero + '" aria-label="Sobre esta unidade">'
@@ -152,7 +175,7 @@
     if (feito) {
       return '<div class="leitura-hoje feita">'
         + '<span class="selo-feito">' + CC.ico('certo') + '</span>'
-        + '<span class="texto"><b>Leitura de hoje feita</b><small>Dia ' + numero + ' · ' + CC.esc(passagemDe(dia)) + '</small></span>'
+        + '<span class="texto"><b>Leitura de hoje feita</b><small>Dia ' + numero + ' · ' + refHtml(passagemDe(dia)) + '</small></span>'
         + '<button class="botao plano pequeno" data-abrir-dia="' + numero + '">Rever</button>'
         + '</div>' + juntos;
     }
@@ -161,7 +184,7 @@
     return (primeira ? '<p class="fala-bento pequena apresenta">Que bom ter você aqui! Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
       + '<div class="leitura-hoje">'
       + '<span class="etiqueta">Leitura de hoje · Dia ' + atual + '</span>'
-      + '<b class="passagem-hoje">' + CC.esc(passagemDe(dia)) + '</b>'
+      + '<b class="passagem-hoje">' + refHtml(passagemDe(dia)) + '</b>'
       + '<small class="tempo">cerca de ' + CC.minutosDoDia(dia) + ' min</small>'
       + '<button class="botao" data-abrir-dia="' + atual + '">Começar</button>'
       + (novo ? '<a class="novo-na-fe" href="#/passos">' + CC.ico('bandeira') + 'Novo na fé? Comece pelos Primeiros passos</a>' : '')
@@ -233,8 +256,49 @@
     if (verToque) verToque.onclick = () => CC.folhaToque(toques[0]);
 
     vigiarAtual(raiz);
+    vigiarEstrada(raiz);
     if (CC.recemFeito) setTimeout(() => { CC.recemFeito = null; }, 1400);
   };
+
+  // ---------- a estrada ----------
+  // Faixa ligando os nós, com a linha contínua até hoje e pontilhada depois; refeita
+  // quando a largura muda. Só enfeite: fica fora do leitor de tela.
+  const caminhoPor = (p) => p.map((b, i) => (i ? 'C' + p[i - 1].x + ' ' + (p[i - 1].y + b.y) / 2 + ',' + b.x + ' ' + (p[i - 1].y + b.y) / 2 + ',' : 'M') + b.x + ' ' + b.y).join('');
+  const traco = (classe, p) => (p.length > 1 ? '<path class="' + classe + '" d="' + caminhoPor(p) + '"/>' : '');
+
+  function desenharEstradas(raiz) {
+    const atual = CC.diaAtual();
+    raiz.querySelectorAll('.nos').forEach((nos) => {
+      const caixa = nos.getBoundingClientRect();
+      const pontos = [...nos.querySelectorAll('.no, .no-bau, .no-marco')].map((el) => {
+        const r = el.getBoundingClientRect();
+        const d = el.dataset;
+        return { x: Math.round(r.left + r.width / 2 - caixa.left), y: Math.round(r.top + r.height / 2 - caixa.top), ate: d.marco ? 1e9 : +(d.dia || d.bau) + (d.bau ? 0.5 : 0) };
+      });
+      let corte = pontos.findIndex((p) => p.ate >= atual);
+      if (corte < 0) corte = pontos.length - 1;
+      const velha = nos.querySelector(':scope > .estrada');
+      if (velha) velha.remove();
+      if (caixa.width) {
+        nos.insertAdjacentHTML('afterbegin', '<svg class="estrada" aria-hidden="true" width="' + caixa.width + '" height="' + nos.scrollHeight + '">'
+          + traco('faixa-estrada', pontos) + traco('linha-feita', pontos.slice(0, corte + 1)) + traco('linha-adiante', pontos.slice(corte)) + '</svg>');
+      }
+    });
+  }
+
+  let observador = null;
+  function vigiarEstrada(raiz) {
+    const trilha = raiz.querySelector('.trilha');
+    const desenhar = () => { if (trilha.isConnected) desenharEstradas(raiz); };
+    requestAnimationFrame(desenhar);
+    if (document.fonts) document.fonts.ready.then(desenhar);
+    if (observador) observador.disconnect();
+    let largura = 0;
+    if (window.ResizeObserver) {
+      observador = new ResizeObserver(([r]) => { if (Math.round(r.contentRect.width) !== largura) { largura = Math.round(r.contentRect.width); desenhar(); } });
+      observador.observe(trilha);
+    }
+  }
 
   // A seta que aparece quando o dia de hoje sai da tela, como no aplicativo de referência.
   let vigia = null;
@@ -295,11 +359,11 @@
     const adiante = !feito && !atual;
     const fala = atual && !feito ? '<p class="fala-bento">' + CC.esc(CC.falaDoDia(CC.amigosEmCache && CC.amigosEmCache())) + '</p>' : '';
     const pop = montarPop(botao, adiante ? 'adiante' : 'c-' + u.cor,
-      '<b class="titulo-pop">' + CC.esc(passagemDe(dia)) + '</b>'
+      '<b class="titulo-pop">' + refHtml(passagemDe(dia)) + '</b>'
       + '<span class="sub-pop">Dia ' + numero + ' de ' + D.plano.length + ' · uns ' + CC.minutosDoDia(dia) + ' min</span>'
       + fala
       + (adiante ? '<span class="sub-pop">Este dia vem mais adiante, mas pode ler agora se quiser.</span>' : '')
-      + '<button class="botao ' + (adiante ? 'contorno' : 'branco') + '" data-comecar="' + numero + '">'
+      + '<button class="botao' + (adiante ? ' contorno' : '') + '" data-comecar="' + numero + '">'
       + (feito ? 'Revisar' : (adiante ? 'Ler mesmo assim' : 'Começar')) + '</button>');
     if (!pop) return;
     pop.querySelector('[data-comecar]').onclick = () => { fecharPop(); CC.abrirLicao(numero); };

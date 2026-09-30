@@ -65,30 +65,33 @@
         + '<span class="textos">'
         + (ehProxima ? '<span class="marca-proxima">Próximo</span>' : '')
         + '<b>' + CC.esc(dia.titulo) + (feita ? '<span class="so-leitor">, concluído</span>' : '') + '</b>'
-        + '<span>' + CC.esc(referencia) + '</span></span>'
+        + '<span>' + CC.esc(CC.colarRef(referencia)) + '</span></span>'
         + CC.ico('avancar') + '</a>';
     }).join('');
 
-    raiz.innerHTML = '<div class="cabeca-passos c-azul">'
+    raiz.innerHTML = '<div class="tela-conhecer-lista"><div class="cabeca-passos c-azul">'
       + '<div class="textos"><h1>' + CC.esc(C.titulo) + '</h1>'
       + '<p>' + CC.esc(C.subtitulo) + '</p>'
       + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitos.length + ' de ' + C.dias.length + '</b></div>'
       + (proximo
-        ? '<a class="botao branco" href="#/conhecer/' + proximo.numero + '">' + CC.ico('bandeira')
+        ? '<a class="botao" href="#/conhecer/' + proximo.numero + '">' + CC.ico('bandeira')
           + (feitos.length ? 'Continuar: ' : 'Começar: ') + CC.esc(proximo.titulo) + '</a>'
         : '<p class="conquista-linha">' + CC.ico('certo') + 'Você terminou os 14 dias!</p>')
       + '</div></div>'
       // Quem convidou vê em que dia a pessoa está (nunca o que ela escreve): dito aqui, às claras.
       + (CC.quem && CC.quem.acompanhadoPor
-        ? '<p class="passo-dica pequena" style="margin-top:12px">' + CC.esc(String(CC.quem.acompanhadoPor.nome).split(' ')[0])
+        ? '<p class="passo-dica pequena" style="margin:12px 4px 0">' + CC.esc(String(CC.quem.acompanhadoPor.nome).split(' ')[0])
           + ' vê em que dia você está. O que você escreve fica só com você.</p>'
         : '')
       + CC.tituloSecao('Os 14 dias')
       + '<div class="lista-licoes caixa-lista">' + lista + '</div>'
-      + '<a class="cartao-proposito" href="#/perguntas"><span class="etiqueta">' + CC.ico('balao') + 'Perguntas honestas</span>'
-      + '<span>Dúvidas comuns de quem está conhecendo Jesus.</span></a>'
-      + '<a class="link-nota" href="#/seguir">' + CC.ico('avancar') + CC.esc(C.seguir.titulo) + '</a>'
-      + (comLinkPlano ? '<div><button class="link-nota" data-ver-plano>Ver o plano da Bíblia em um ano</button></div>' : '');
+      + '<div class="lista-atalhos atalhos-conhecer">'
+      + '<a class="atalho" href="#/perguntas">' + CC.ico('balao') + '<span><b>Perguntas honestas</b>'
+      + '<small>Dúvidas comuns de quem está conhecendo Jesus.</small></span>' + CC.ico('avancar') + '</a>'
+      + '<a class="atalho" href="#/seguir">' + CC.ico('bandeira') + '<span><b>' + CC.esc(C.seguir.titulo) + '</b></span>' + CC.ico('avancar') + '</a>'
+      + '</div>'
+      + (comLinkPlano ? '<div class="ver-plano"><button class="link-nota" data-ver-plano>Ver o plano da Bíblia em um ano</button></div>' : '')
+      + '</div>';
 
     const verPlano = raiz.querySelector('[data-ver-plano]');
     if (verPlano) {
@@ -140,11 +143,11 @@
       el.setAttribute('aria-modal', 'true');
       document.body.appendChild(el);
     }
-    el.className = 'licao c-azul tela-conhecer';
+    el.className = 'licao c-azul tela-conhecer cj';
     el.setAttribute('aria-label', 'Dia ' + dia.numero + ' do Conhecer Jesus');
 
     const perguntasFixas = '<details class="cartao"><summary>Mais perguntas para pensar</summary>'
-      + '<ul style="margin:12px 0 0;padding-left:20px;display:grid;gap:10px">'
+      + '<ul class="perguntas-fixas">'
       + C.perguntasFixas.map((p) => '<li>' + CC.esc(p) + '</li>').join('') + '</ul></details>';
 
     const corpoLido = !lida ? '' : '<section class="etapa-reflexao">'
@@ -166,7 +169,7 @@
       + '<p class="passo-dica">' + CC.esc(dia.abertura) + '</p>'
       // Antes de ler, a tela mostra o que vem: sem isso, sobrava um vazio que parecia travado.
       + (lida ? '' : '<div class="leitura-hoje"><span class="etiqueta">O que você vai ler</span>'
-        + '<span class="passagem-hoje">' + CC.esc(dia.trechos.map((t) => CC.escreverRef(t.livro, t.cap, t.de, t.ate)).join(' e ')) + '</span>'
+        + '<span class="passagem-hoje">' + CC.esc(CC.colarRef(dia.trechos.map((t) => CC.escreverRef(t.livro, t.cap, t.de, t.ate)).join(' e '))) + '</span>'
         + '<span class="tempo">uns ' + minutosDoConhecer(dia) + ' minutos</span></div>')
       + corpoLido
       + '</div></div>'
@@ -237,12 +240,12 @@
   // ---------- #/perguntas: as 10 perguntas honestas ----------
   CC.vistaPerguntas = function (raiz) {
     const C = conteudoDe();
-    raiz.innerHTML = CC.botaoVoltar('Voltar')
+    raiz.innerHTML = '<div class="tela-perguntas cj">' + CC.botaoVoltar('Voltar')
       + '<h1>Perguntas honestas</h1>'
-      + '<p class="passo-dica">Dúvidas comuns de quem está conhecendo Jesus, ou de quem já segue e quer conversar com um amigo.</p>'
-      + '<div class="grade">' + C.perguntas.map((p) => '<a class="item" href="#/perguntas/' + encodeURIComponent(p.id) + '">'
-        + '<b>' + CC.esc(p.titulo) + '</b>'
-        + '<span class="resumo">' + CC.esc(p.resumo) + '</span></a>').join('') + '</div>';
+      + '<p class="subtitulo-tela">Dúvidas comuns de quem está conhecendo Jesus, ou de quem já segue e quer conversar com um amigo.</p>'
+      + '<div class="grade caixa-lista">' + C.perguntas.map((p) => '<a class="item" href="#/perguntas/' + encodeURIComponent(p.id) + '">'
+        + '<span class="textos"><b>' + CC.esc(p.titulo) + '</b>'
+        + '<span class="resumo">' + CC.esc(p.resumo) + '</span></span>' + CC.ico('avancar') + '</a>').join('') + '</div></div>';
   };
 
   CC.vistaPergunta = function (raiz, id) {
@@ -251,18 +254,18 @@
 
     const pilulas = (p.leia || []).map((ref) => {
       const m = /^(.+?)\s+(\d+)/.exec(ref);
-      return m ? '<a class="pilula" href="#/biblia/' + encodeURIComponent(m[1]) + '/' + m[2] + '">' + CC.esc(ref) + '</a>'
-        : '<span class="pilula">' + CC.esc(ref) + '</span>';
+      return m ? '<a class="pilula" href="#/biblia/' + encodeURIComponent(m[1]) + '/' + m[2] + '">' + CC.esc(CC.colarRef(ref)) + '</a>'
+        : '<span class="pilula">' + CC.esc(CC.colarRef(ref)) + '</span>';
     }).join('');
 
     const quem = CC.quem && CC.quem.acompanhadoPor;
 
-    raiz.innerHTML = CC.botaoVoltar('Voltar')
+    raiz.innerHTML = '<div class="tela-pergunta cj">' + CC.botaoVoltar('Voltar')
       + '<h1>' + CC.esc(p.titulo) + '</h1>'
-      + p.paragrafos.map((par) => '<p style="margin:0 0 14px;line-height:1.6">' + CC.esc(par) + '</p>').join('')
+      + '<div class="cartao texto-pergunta">' + p.paragrafos.map((par) => '<p>' + CC.esc(par) + '</p>').join('') + '</div>'
       + (pilulas ? CC.tituloSecao('Leia na Bíblia') + '<div class="pilulas">' + pilulas + '</div>' : '')
       + (quem ? '<div class="acoes"><button class="botao contorno" data-conversar>Converse com '
-        + CC.esc(primeiroNome(quem.nome)) + '</button></div>' : '');
+        + CC.esc(primeiroNome(quem.nome)) + '</button></div>' : '') + '</div>';
 
     const btn = raiz.querySelector('[data-conversar]');
     if (btn) btn.onclick = () => abrirFolhaConversar(primeiroNome(quem.nome));
@@ -274,11 +277,11 @@
     const quem = CC.quem && CC.quem.acompanhadoPor;
 
     const passos = S.passos.map((p) => '<section class="etapa-reflexao"><h2>' + CC.esc(p.titulo) + '</h2>'
-      + '<p style="margin:0;line-height:1.6">' + CC.esc(p.texto) + '</p></section>').join('');
+      + '<p>' + CC.esc(p.texto) + '</p></section>').join('');
 
-    raiz.innerHTML = CC.botaoVoltar('Voltar')
+    raiz.innerHTML = '<div class="tela-seguir cj">' + CC.botaoVoltar('Voltar')
       + '<h1>' + CC.esc(S.titulo) + '</h1>'
-      + '<p class="passo-dica">' + CC.esc(S.abertura) + '</p>'
+      + '<p class="cartao abertura-seguir">' + CC.esc(S.abertura) + '</p>'
       + passos
       + '<section class="etapa-reflexao"><h2>' + CC.esc(S.oracaoTitulo) + '</h2>'
       + '<p class="passo-dica">' + CC.esc(S.oracaoAbertura) + '</p>'
@@ -290,7 +293,7 @@
       // Integração com o Discipulado (Fase 3): depois de "Quero conversar", o caminho para
       // pedir alguém que acompanhe na fé, sem obrigar ninguém a fazer isso agora.
       + '<p class="passo-dica pequena">Quando quiser, peça para alguém te acompanhar na fé no Perfil.</p>'
-      + '<div class="acoes"><a class="botao contorno" href="#/passos">' + CC.esc(S.proximo) + '</a></div>';
+      + '<div class="acoes"><a class="botao contorno" href="#/passos">' + CC.esc(S.proximo) + '</a></div></div>';
 
     const btn = raiz.querySelector('[data-conversar]');
     if (btn) {

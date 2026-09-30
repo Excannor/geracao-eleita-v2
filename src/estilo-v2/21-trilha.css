@@ -4,4 +4,150 @@
    Camada exclusiva deste grupo de telas (ver design/mapa-telas.md). Use as fichas de
    00-tokens.css e as peças de 01-base.css; nada de cor literal que valha só num tema.
    Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz, .selo-ref).
+   As telas do Conhecer Jesus (dia, perguntas, pergunta, "E agora") levam a classe .cj.
    ========================================================================= */
+
+/* ---------- peças repetidas deste grupo ---------- */
+/* cartão branco, sem borda nem sombra */
+.toque-recebido, .faixa-unidade, .faixa-unidade.travada, .cabeca-passos, .praticar-unidade, .cj .etapa-reflexao {
+  border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta-forte); box-shadow: none;
+}
+/* realce do que é de hoje: sálvia pálido listrado */
+.leitura-hoje, .cartao-hoje, .pop-no .fala-bento, :root[data-tema="escuro"] .pop-no .fala-bento,
+.lista-licoes .item-licao.proxima, .cj .pensamento-dia { background: var(--realce); }
+/* círculo de ícone em sálvia pálido */
+.toque-recebido > svg:first-child, .numero-unidade, .atalhos-conhecer svg:first-child { background: var(--salvia-palido); color: var(--salvia-texto); }
+/* quebras bonitas (herdam) */
+.trilha, .pop-no, .cj, .tela-conhecer-lista { text-wrap: pretty; }
+.faixa-unidade .nome, .titulo-pop, .cj .textos > b, .lista-licoes .textos > span { text-wrap: balance; }
+
+/* ---------- trilha ---------- */
+/* o respiro do fim deixa o último cartão subir acima do botão flutuante .ir-atual */
+.trilha { padding-bottom: 56px; }
+.toque-recebido { gap: 12px; min-height: 64px; margin-bottom: 16px; padding: 10px 16px 10px 10px; font-weight: 600; }
+.toque-recebido > svg:first-child { box-sizing: content-box; padding: 11px; border-radius: 50%; }
+
+.leitura-hoje { margin-bottom: 16px; padding: 20px; border: 0; border-radius: var(--raio-cartao); }
+.leitura-hoje .etiqueta { color: var(--salvia-texto); }
+.leitura-hoje .passagem-hoje { font-size: 1.375rem; font-weight: 800; }
+.leitura-hoje .tempo { margin-bottom: 14px; }
+.leitura-hoje .novo-na-fe { min-height: 44px; }
+.leitura-hoje.feita { gap: 12px; padding: 12px 12px 12px 14px; background: var(--cartao); }
+.leitura-hoje.feita small { font-size: .8125rem; font-weight: 500; overflow-wrap: normal; }
+.leitura-hoje .selo-feito { width: 44px; height: 44px; background: var(--salvia); color: var(--salvia-tinta); }
+.leitura-hoje.feita .botao { background: var(--campo); color: var(--tinta-forte); }
+.fala-bento.apresenta { margin: 0 4px 12px; color: var(--tinta-fraca); font-weight: 500; }
+
+/* a faixa da unidade vira cartão, com o número num círculo */
+.faixa-unidade, .faixa-unidade.travada { margin: 16px 0 8px; padding: 10px; align-items: center; overflow: visible; }
+.faixa-unidade .corpo-faixa { padding: 0 8px 0 2px; }
+.faixa-unidade .numero-unidade { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; font-size: 1.0625rem; font-weight: 800; }
+.aberta .numero-unidade { background: var(--salvia); color: var(--salvia-tinta); }
+.travada .numero-unidade { background: var(--campo); color: var(--tinta-fraca); }
+.faixa-unidade .rot { opacity: 1; color: var(--tinta-fraca); }
+.faixa-unidade .nome { font-size: 1rem; white-space: normal; }
+.faixa-unidade .guia, .faixa-unidade.travada .guia { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--campo); }
+
+/* a estrada: faixa da cor do cartão, linha contínua até hoje e pontilhada depois */
+.nos { position: relative; padding: 40px 0 24px; }
+.estrada { position: absolute; inset: 0 auto auto 0; }
+.estrada path { fill: none; stroke-linecap: round; stroke-width: 3; }
+.estrada .faixa-estrada { stroke: var(--cartao); stroke-width: 18; }
+.linha-feita { stroke: var(--inverso); }
+.linha-adiante { stroke: var(--tinta-fraca); stroke-dasharray: 0 9; }
+.no-linha { margin-bottom: 24px; }
+.no-linha.hoje { margin-bottom: 40px; }
+
+/* nós: lido escuro, hoje sálvia com anel de progresso, adiante no cartão com cadeado,
+   fecha-livro escuro com ícone sálvia */
+.no { width: 58px; height: 58px; }
+.no .face svg { width: 24px; height: 24px; stroke-width: 2.4; }
+.no.feito.com-registro { --cor: var(--inverso); }
+.no.fecha-livro.feito { --cor: var(--barra); color: var(--salvia); box-shadow: inset 0 0 0 2px var(--salvia); }
+.no.travado, .no.travado:active, .no.travado.aberto { background: var(--cartao); box-shadow: inset 0 0 0 1.5px var(--contorno); }
+.no.travado .face svg { width: 20px; stroke-width: 2; }
+.no.atual { width: 64px; height: 64px; }
+.no.atual:not(.feito) { --cor: var(--salvia); }
+.no .anel-atual { inset: -10px; border-color: var(--salvia-palido); animation: none; --progresso: var(--salvia-texto); }
+
+/* "Dia N" e a passagem, ao lado do nó, do lado onde sobra estrada */
+.rotulo-dia { position: absolute; top: 29px; display: flex; flex-direction: column; gap: 1px; max-width: calc(50% + var(--xa) - 46px); transform: translateY(-50%); line-height: 1.3; pointer-events: none; font-size: .75rem; color: var(--tinta-fraca); }
+.lado-esq { right: calc(50% - var(--x) + 41px); align-items: flex-end; text-align: right; }
+.lado-dir { left: calc(50% + var(--x) + 41px); }
+.rotulo-dia b { color: var(--tinta); font-size: .8125rem; }
+.rotulo-dia.lido b { color: var(--tinta-forte); }
+.rotulo-dia .fechou, .cartao-hoje b { color: var(--salvia-texto); font-weight: 700; }
+/* o cartão de hoje, ao lado do nó */
+.rotulo-dia.cartao-hoje { top: 32px; max-width: calc(50% + var(--xa) - 60px); padding: 12px 16px; border-radius: 20px; color: var(--tinta-forte); font-size: .9375rem; font-weight: 700; }
+.cartao-hoje.lado-esq { right: calc(50% - var(--x) + 54px); }
+.cartao-hoje.lado-dir { left: calc(50% + var(--x) + 54px); }
+
+/* o balão "Começar" em cima do nó de hoje e o "Abrir" do baú */
+.balao, .balao.balao-bau { bottom: calc(100% + 18px); padding: 6px 14px; border: 0; border-radius: 999px; background: var(--inverso); color: var(--inverso-tinta); font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
+.balao::after { border: 0; background: var(--inverso); }
+.no-bau svg, .no-marco .arte-trofeu { width: 64px; }
+.no-marco { padding: 8px; background: var(--cartao); box-shadow: inset 0 0 0 1.5px var(--contorno); }
+.no-marco.ganho { box-shadow: inset 0 0 0 2px; }
+.rotulo-no { margin-top: 12px; font-size: .8125rem; font-weight: 600; }
+.praticar-unidade { min-height: 44px; padding: 0 18px 0 14px; font-size: .875rem; text-decoration: none; }
+
+/* o balão do dia: cartão solto, abaixo do nó e do cartão de hoje (nunca por cima dele) */
+.pop-no, .pop-no.adiante { top: calc(100% + 12px); padding: 20px; border: 0; background: var(--cartao); color: var(--tinta-fraca); }
+.no-linha.hoje .pop-no { top: calc(100% + 24px); }
+.pop-no::before, .pop-no.adiante::before { top: -7px; border: 0; background: var(--cartao); }
+.pop-no .titulo-pop { color: var(--tinta-forte); font-weight: 800; }
+.pop-no .sub-pop, .pop-no.adiante .sub-pop { color: inherit; font-weight: 500; opacity: 1; }
+.pop-no .fala-bento { border: 0; margin: 8px 0 4px; padding: 12px 14px; border-radius: 18px; color: var(--tinta-forte); font-weight: 600; }
+.ir-atual { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--inverso); color: var(--inverso-tinta); box-shadow: var(--sombra-flutuante); }
+
+/* folha da unidade */
+.cabeca-folha-unidade { gap: 16px; margin-bottom: 16px; }
+.cabeca-folha-unidade .arte-trofeu { flex: none; width: 64px; }
+
+/* ---------- primeiros passos e Conhecer Jesus: a cabeça vira cartão ---------- */
+.cabeca-passos { margin: 0 0 8px; padding: 20px; }
+.cabeca-passos p { color: var(--tinta-fraca); font-weight: 500; opacity: 1; }
+.cabeca-passos .progresso-passos .barra { background: var(--campo); }
+.cabeca-passos .progresso-passos .barra > i { background: var(--progresso); }
+.cabeca-passos .progresso-passos b { white-space: nowrap; }
+.cabeca-passos .conquista-linha, .cj .conquista-linha { min-height: 44px; background: var(--salvia-palido); color: var(--salvia-texto); }
+
+.lista-licoes { overflow: hidden; }
+.lista-licoes.caixa-lista .item-licao { min-height: 72px; padding: 14px 16px; }
+.lista-licoes.caixa-lista .item-licao:hover { background: var(--campo); }
+.item-licao .num, .item-licao.feita .num, .lista-licoes.caixa-lista .item-licao.proxima .num { width: 44px; height: 44px; background: var(--campo); color: var(--tinta-fraca); box-shadow: none; }
+.item-licao.feita .num { background: var(--inverso); color: var(--inverso-tinta); }
+.lista-licoes.caixa-lista .item-licao.proxima .num { background: var(--salvia); color: var(--salvia-tinta); }
+.item-licao .textos > span, .atalhos-conhecer small, .cj .resumo { display: block; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 500; }
+.lista-licoes.caixa-lista .item-licao .marca-proxima { color: var(--salvia-texto); font-size: .75rem; letter-spacing: 0; text-transform: none; }
+
+.atalhos-conhecer { margin-top: 16px; overflow: hidden; }
+.atalhos-conhecer .atalho { min-height: 72px; padding: 12px 18px 12px 14px; }
+.atalhos-conhecer .atalho > span, .cj .item .textos { display: grid; gap: 2px; color: var(--tinta-forte); }
+.ver-plano { margin-top: 16px; text-align: center; }
+
+/* perguntas honestas: uma lista num cartão só */
+.cj .grade { gap: 0; overflow: hidden; }
+.cj .item { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 16px 18px 16px 20px; border: 0; border-radius: 0; background: none; }
+.cj .item + .item { border-top: 1px solid var(--contorno); }
+.cj .item:hover { background: var(--campo); }
+.cj .item .textos { flex: 1; }
+.cj .item > svg { flex: none; width: 18px; color: var(--tinta-fraca); }
+.texto-pergunta p, .abertura-seguir, .cj .etapa-reflexao p { margin: 0; line-height: 1.65; }
+.texto-pergunta p + p { margin-top: 14px; }
+
+/* "E agora, o que eu faço?" e o dia do Conhecer Jesus: cada parte num cartão */
+.abertura-seguir, .cj .etapa-reflexao, .cj .etapa-reflexao + .etapa-reflexao { margin: 0 0 12px; padding: 20px; }
+.cj .etapa-reflexao h2 { margin: 0 0 8px; font-size: 1.125rem; }
+.tela-seguir .passo-dica { margin: 16px 4px 0; }
+.cj .etapa-reflexao .passo-dica { margin: 0 0 12px; }
+.cj .pensamento-dia { margin: 0; border: 0; border-radius: 20px; }
+.cj .pensamento-dia p { color: var(--tinta-forte); }
+.cj .oracao-guia { margin: 0; }
+.cj .oracao-guia li { border-radius: 20px; background: var(--salvia-palido); font-weight: 600; }
+.cj details.cartao { padding: 0; margin: 0; }
+.cj summary { padding: 10px 0; font-weight: 700; }
+.perguntas-fixas { display: grid; gap: 10px; margin: 8px 0 0; padding-left: 20px; }
+.cj .leitura-hoje { margin-top: 16px; }
+
+@media (min-width: 860px) { .trilha { padding-bottom: 72px; } }
