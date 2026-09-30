@@ -52,6 +52,13 @@
 .folha-perfil.titulo-frase > .voltar + h1 { justify-content: center; min-height: 0; margin: 0; padding: 0 4px; font-size: 1.5rem; text-wrap: balance; }
 .folha-perfil.titulo-frase > h1 + p { margin-top: 8px; }
 
+/* o cartão de destaque da folha, como os do Início: branco no claro, sálvia no escuro, tinta
+   escura e o círculo preto com o ícone branco (o estado das notificações, os números do painel) */
+.folha-perfil .cartao-push, .folha-perfil .painel-cartao { border: 0; background: var(--folha-destaque); color: var(--salvia-tinta); }
+.marca-push { box-sizing: border-box; width: 48px; height: 48px; border-radius: 50%; background: var(--salvia-tinta); color: #ffffff; }
+.marca-push svg { width: 20px; height: 20px; stroke-width: 2.2; }
+.folha-perfil .cartao-push .botao:not([disabled]) { --b: var(--salvia-tinta); background: var(--salvia-tinta); color: #ffffff; }
+
 /* sem palavra sozinha na última linha dos textos curtos (as regras de "balance" abaixo ganham desta) */
 :is([data-rota=perfil], [data-rota=config]) :is(small, label, em, b, span) { text-wrap: pretty; }
 
@@ -129,18 +136,36 @@
 [data-rota=config] .linha-config .valor { overflow: visible; white-space: normal; overflow-wrap: anywhere; text-align: right; text-wrap: balance; }
 [data-rota=config] .linha-config:has(.segmentado) { padding: 14px 20px 16px; row-gap: 12px; }
 .linha-config .segmentado { flex: 1 0 100%; display: grid; grid-template-columns: repeat(3, 1fr); }
-.cartao-push { margin: 0 0 8px; padding: 20px; border-radius: var(--raio-cartao); }
-.marca-push { width: 48px; height: 48px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+/* "Seu caminho": o valor é uma frase ("Plano da Bíblia em um ano"); desce para baixo do nome,
+   como a dica das notificações, em vez de quebrar em duas linhas à direita */
+[data-rota=config] .linha-config[data-caminho] { display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
+[data-rota=config] .linha-config[data-caminho] .valor { grid-row: 2; max-width: none; font-size: .875rem; text-align: left; }
+[data-rota=config] .linha-config[data-caminho] svg { grid-area: 1 / 2 / 3; }
+.dica-config { text-wrap: balance; }
+
+/* notificações: o estado deste aparelho é o cartão de destaque da folha */
+.cartao-push { margin: 4px 0 0; padding: 20px; border-radius: 26px; }
+.cabeca-push { gap: 14px; }
+.folha-perfil .cabeca-push b { color: inherit; font-size: 1.0625rem; font-weight: 800; line-height: 1.3; text-wrap: balance; }
+.folha-perfil .cabeca-push p { color: inherit; font-size: .875rem; font-weight: 500; text-wrap: pretty; }
+.cartao-push .acoes { margin-top: 16px; }
+
+.opcao-traducao span { text-wrap: balance; }
 .opcao-traducao { position: relative; min-height: 72px; padding: 16px 60px 16px 20px; border: 0; border-radius: 24px; }
 .opcao-traducao::after { content: ''; position: absolute; top: 50%; right: 20px; width: 24px; height: 24px; margin-top: -12px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--tinta-fraca); }
 .opcao-traducao[aria-pressed=true] { background: var(--realce); }
 .opcao-traducao[aria-pressed=true]::after { background: var(--cartao); box-shadow: inset 0 0 0 7px var(--inverso); }
 .credito-biblia { padding: 20px; border-radius: var(--raio-cartao); background: var(--cartao); font-size: .8125rem; overflow-wrap: anywhere; }
 .credito-biblia + .credito-biblia { margin-top: 8px; padding-top: 20px; border: 0; }
+
+/* painel: os quatro números são cartões de destaque na folha */
+.folha-perfil .painel-resumo { gap: 10px; margin: 16px 0 0; }
 .painel-cartao { padding: 16px; border-radius: 24px; }
-.painel-cartao strong { font-size: 2rem; font-weight: 800; }
-.painel-cartao strong.texto { padding: 10px 0 8px; color: var(--tinta-fraca); font-size: 1rem; }
-.painel-cartao small em { display: block; color: var(--tinta-fraca); }
+.painel-cartao strong { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; }
+.painel-cartao strong.texto { padding: 10px 0 8px; font-size: 1rem; font-weight: 700; text-wrap: balance; }
+.painel-cartao small em { display: block; font-weight: 500; }
+.folha-perfil .painel-cartao :is(strong, span, small, strong.texto) { color: inherit; }
+.painel-cartao span { font-weight: 700; text-wrap: balance; }
 .painel-coluna small, .painel-coluna em { font-size: .75rem; }
 .painel-coluna em { height: 40px; }
 
@@ -182,10 +207,14 @@
 
 /* ---------- celular estreito (360) ----------
    O título ao lado do voltar encolhe para caber numa linha; o nome do nível do Semeador
-   também; os cartões da estante apertam o recuo. */
+   também; os cartões do painel e da estante e as linhas das configurações apertam o recuo. */
 @media (max-width: 374px) {
   .folha-perfil:not(.titulo-frase) > .voltar + h1 { padding-inline: 52px; font-size: 1.25rem; }
   .corpo-semeador b { font-size: 1rem; }
+  .painel-cartao { padding: 14px; }
+  .painel-cartao span { font-size: .875rem; }
+  .painel-cartao strong.texto { font-size: .9375rem; }
+  [data-rota=config] .linha-config { padding-inline: 16px; }
   .estante { gap: 8px; }
   .trofeu { padding-inline: 4px; }
   .estante .trofeu b { font-size: .75rem; }

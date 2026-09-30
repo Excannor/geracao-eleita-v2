@@ -68,12 +68,15 @@
   }
 
   CC.vistaPainel = async function (raiz) {
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1>' + CC.esqueleto('cartoes');
+    // .folha-perfil: só apresentação, a folha do alto (25-perfil.css); o título longo desce
+    // para baixo do voltar (.titulo-frase) e os quatro números viram os cartões de destaque.
+    const cabeca = (dentro) => '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1>' + (dentro || '') + '</div>';
+    raiz.innerHTML = cabeca() + CC.esqueleto('cartoes');
     let p;
     try {
       p = await CC.api('api/painel');
     } catch (e) {
-      raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1>'
+      raiz.innerHTML = cabeca()
         + CC.estado({ erro: true, titulo: 'Não deu para carregar o painel', texto: e.message, acao: 'Tentar de novo' });
       const b = raiz.querySelector('[data-acao-estado]');
       if (b) b.onclick = () => CC.vistaPainel(raiz);
@@ -82,15 +85,13 @@
     if (location.hash !== '#/config/painel') return;
 
     const pedidos = p.pedidosDeSenha || [];
-    raiz.innerHTML = CC.botaoVoltar('Perfil')
-      + '<h1>Painel do administrador</h1>'
-      + '<p class="passo-dica">Só números, sem nomes. Calculado ' + CC.esc(atualizado(p.geradoEm)) + ', em ' + CC.esc(p.hoje.split('-').reverse().join('/')) + '.</p>'
+    raiz.innerHTML = cabeca('<p class="passo-dica">Só números, sem nomes. Calculado ' + CC.esc(atualizado(p.geradoEm)) + ', em ' + CC.esc(p.hoje.split('-').reverse().join('/')) + '.</p>'
       + (p.detalhe && p.detalhe.resumo ? '<div class="painel-resumo">'
         + cartaoResumo('abriram o app', p.detalhe.resumo.abriram) + cartaoResumo('leram', p.detalhe.resumo.leram)
         + cartaoResumo('contas novas', p.detalhe.resumo.novas)
         + (p.retorno[1] && p.retorno[1].pct !== null ? '<div class="painel-cartao"><strong>' + p.retorno[1].pct + '%' : '<div class="painel-cartao"><strong class="texto">ainda sem dado') + '</strong><span>voltaram depois de 7 dias</span>'
         + '<small><em>' + (p.retorno[1] ? p.retorno[1].voltaram + ' de ' + p.retorno[1].elegiveis + ' contas' : '') + '</em></small></div>'
-        + '</div>' : '')
+        + '</div>' : ''))
       + grupo('Senha esquecida',
         (pedidos.length
           ? pedidos.map((x) => '<div class="linha-config sem-toque"><span>@' + CC.esc(x.usuario) + ' <small class="valor">' + quando(x.em) + '</small></span>'

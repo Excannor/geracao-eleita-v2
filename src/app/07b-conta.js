@@ -17,8 +17,9 @@
     const tema = CC.temaGuardado();
     const traducao = CC.traducao();
 
-    raiz.innerHTML = CC.botaoVoltar('Perfil')
-      + '<h1>Configurações</h1>'
+    // .folha-perfil: só apresentação, a folha do alto das telas deste grupo (25-perfil.css).
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil')
+      + '<h1>Configurações</h1></div>'
       + grupo('Aparência', '<div class="linha-config sem-toque"><span>Tema</span>'
         + '<div class="segmentado" role="group" aria-label="Tema">'
         + [['Sistema', null], ['Claro', false], ['Escuro', true]].map(([rot, v]) =>
@@ -144,8 +145,8 @@
   CC.vistaTextos = function (raiz) {
     const biblias = CC.biblias();
     const atual = CC.traducao();
-    raiz.innerHTML = CC.botaoVoltar('Configurações')
-      + '<h1>Textos bíblicos</h1>'
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Configurações')
+      + '<h1>Textos bíblicos</h1></div>'
       + (atual
         ? '<div class="opcoes-traducao">' + biblias.map((b) => '<button class="opcao-traducao" data-traducao="'
           + CC.esc(b.sigla) + '" aria-pressed="' + (b.sigla === atual.sigla) + '"><b>'

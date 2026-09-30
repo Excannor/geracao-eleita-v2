@@ -98,7 +98,8 @@
   };
 
   CC.vistaNotificacoes = async function (raiz) {
-    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1>' + CC.esqueleto('lista');
+    // .folha-perfil: só apresentação, a folha do alto (25-perfil.css), com o cartão do estado.
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Configurações') + '<h1>Notificações</h1></div>' + CC.esqueleto('lista');
     const e = await CC.estadoNotificacoes();
     if (!location.hash.startsWith('#/config/notificacoes')) return;
     const p = (e.dados && e.dados.preferencias) || { lembrete: true, hora: '19:00', ofensiva: true, amigos: true };
@@ -130,7 +131,7 @@
         + '</div></section>'
       : '';
 
-    raiz.innerHTML = CC.botaoVoltar('Configurações') + '<h1>Notificações</h1>' + topo + preferencias
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Configurações') + '<h1>Notificações</h1>' + topo + '</div>' + preferencias
       + (e.situacao === 'ativo' ? '<div class="acoes"><button class="botao plano" data-desativar>Desativar neste aparelho</button></div>' : '');
 
     const ligar = (sel, fn) => { const el = raiz.querySelector(sel); if (el) el.onclick = () => fn(el); };
