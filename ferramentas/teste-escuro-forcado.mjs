@@ -22,7 +22,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok    ' : '  FALHA ') + msg);
 // grafite do redesenho; o portal (entrar.html) tem paleta própria e fica com o tom dele até
 // a camada das páginas avulsas trocar (aí o PORTAL passa a ser o mesmo do app).
 const ESCURO = { r: 0x1b, g: 0x1c, b: 0x1a, hex: '#1b1c1a' };
-const ESCURO_PORTAL = { r: 0x0d, g: 0x0d, b: 0x0d, hex: '#0d0d0d' };
+const ESCURO_PORTAL = { r: 0x1b, g: 0x1c, b: 0x1a, hex: '#1b1c1a' };
 // E o claro. Aqui não dá para exigir "quase branco": o fundo do app é um cinza (#ececec,
 // luz 236), e o cartão é que é branco. O que este teste procura é o navegador escurecendo
 // a página por cima — e isso derruba a luz muito abaixo disso, não em três pontos.

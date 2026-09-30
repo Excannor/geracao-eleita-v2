@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#e6e6e6">
+<meta name="theme-color" content="#ececec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1b1c1a" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/*ICONE*/">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=/*VERSAO_ICONES*/">
 <link rel="manifest" href="manifest.webmanifest">
@@ -50,7 +51,7 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--fundo); color: var(--tinta);
-    font-family: 'Nunito', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; }
+    font-family: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; }
   body { display: flex; justify-content: center; }
   main { width: 100%; max-width: 420px; min-height: 100dvh; display: flex; flex-direction: column;
     padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
@@ -185,6 +186,9 @@
     <!-- Posicionamento (23/09/2026): o app do discipulado da juventude da igreja. A frase de
          cima é a promessa (o dono escolheu "com seus amigos" para a porta de entrada); a de
          baixo diz para quem é, e traz a célula. -->
+    <!-- A folha de baixo (redesenho v2): título, convite e botões num cartão, como a porta de
+         entrada da referência; o carimbo fica em cima, sobre o fundo, sem mudar nada nele. -->
+    <div class="folha-boas">
     <h1 id="titulo-boas">A Bíblia inteira em um ano, com seus amigos.</h1>
     <p class="dica" id="dica-boas">Uma leitura por dia, de 10 a 20 minutos, com reflexões feitas para quem está começando. Leia com os amigos ou com a sua célula.</p>
     <div class="espaco"></div>
@@ -197,6 +201,7 @@
       <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
     </div>
     <div class="links"><a href="termos.html">Termos de Uso</a> · <a href="privacidade.html">Privacidade</a></div>
+    </div>
   </section>
 
   <!-- entrar -->
