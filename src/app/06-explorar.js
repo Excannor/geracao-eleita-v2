@@ -56,6 +56,19 @@
     : String(sub || '').replace(/\s*\((cronologia|sem data|sem consenso)[^)]*\)/gi, '').trim());
 
   // ---------- peças ----------
+  // Espaço inseparável entre número e nome de livro ("1 Samuel", "Salmo 51"), só no texto
+  // já desenhado: a quebra de linha nunca separa os dois. Campos de texto ficam de fora.
+  CC.inseparavel = function (raiz) {
+    if (!raiz || !document.createTreeWalker) return;
+    const andar = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentNode.closest('textarea, input, script, style') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    for (let n = andar.nextNode(); n; n = andar.nextNode()) {
+      const t = n.nodeValue.replace(/(^|[^\d.,])(\d) (?=\p{Lu})/gu, '$1$2\u00a0').replace(/(\p{Lu}\p{Ll}+) (?=\d)/gu, '$1\u00a0');
+      if (t !== n.nodeValue) n.nodeValue = t;
+    }
+  };
+
   CC.itemNota = function (id) {
     const n = D.notas[id];
     if (!n) return '';
@@ -285,6 +298,7 @@
       + blocos
       + (conhecendo ? '' : (terminou ? comece : ''))
       + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
+    CC.inseparavel(raiz);
     CC.ligarBusca(raiz);
     const cartaoComece = raiz.querySelector('[data-comece]');
     if (cartaoComece) cartaoComece.addEventListener('toggle', () => { comeceAberto = cartaoComece.open; });
@@ -322,6 +336,7 @@
       };
     });
     CC.ligarAnotacao(raiz);
+    CC.inseparavel(raiz);
   };
 
   // ---------- uma nota ----------
@@ -390,6 +405,7 @@
       };
     }
     CC.ligarAnotacao(raiz);
+    CC.inseparavel(raiz);
   };
 
   // ---------- anotações livres ----------
@@ -466,6 +482,7 @@
         : (q.length < 2 ? '<div class="vazio">Digite pelo menos duas letras.</div>'
           : '<div class="vazio">Não achei nada com “' + CC.esc(consulta) + '”. Tente outra palavra.</div>'));
     CC.ligarBusca(raiz);
+    CC.inseparavel(raiz);
   };
 
   // Tudo o que a pessoa escreveu, achatado, para a busca alcançar.

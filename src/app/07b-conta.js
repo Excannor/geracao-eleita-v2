@@ -116,7 +116,7 @@
       + '<button class="botao plano" data-fechar>Cancelar</button>'
       + '</div>',
     {
-      rotulo: 'Seu caminho',
+      rotulo: 'Seu caminho', classe: 'folha-conta',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelectorAll('[data-caminho-opcao]').forEach((b) => {
@@ -174,7 +174,7 @@
         + '<div class="acoes"><button class="botao" data-salvar>Salvar e continuar</button>'
         + '<button class="botao plano" data-depois>Agora não</button></div>',
       {
-        rotulo: 'Completar cadastro',
+        rotulo: 'Completar cadastro', classe: 'folha-conta',
         presa: true,
         ligar: (folha, fechar) => {
           const recado = folha.querySelector('#recado');
@@ -223,7 +223,7 @@
   CC.pedirConsentimento = function () {
     return new Promise((resolver) => {
       CC.folha('', {
-        rotulo: 'Seus dados',
+        rotulo: 'Seus dados', classe: 'folha-conta',
         presa: true,
         ligar: (folha, fechar) => {
           const telaConcordar = () => {
@@ -281,7 +281,7 @@
           + '<div class="acoes"><button class="botao plano perigo" data-apagar>Apagar a conta</button></div>'
         : ''),
     {
-      rotulo: 'Privacidade',
+      rotulo: 'Privacidade', classe: 'folha-conta',
       ligar: (folha, fechar) => {
         const apagar = folha.querySelector('[data-apagar]');
         if (apagar) apagar.onclick = () => { fechar(); CC.apagarConta(quem.usuario); };
@@ -304,7 +304,7 @@
       + '<div class="acoes"><button class="botao" data-trocar>Trocar a senha</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
-      rotulo: 'Trocar a senha',
+      rotulo: 'Trocar a senha', classe: 'folha-conta',
       ligar: (folha, fechar) => {
         const recado = folha.querySelector('#recado');
         const botao = folha.querySelector('[data-trocar]');
@@ -346,7 +346,7 @@
       + '<div class="acoes"><button class="botao vermelho" data-apagar>Apagar para sempre</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
-      rotulo: 'Apagar a conta',
+      rotulo: 'Apagar a conta', classe: 'folha-conta',
       ligar: (folha, fechar) => {
         const recado = folha.querySelector('#recado');
         const botao = folha.querySelector('[data-apagar]');

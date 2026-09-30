@@ -83,13 +83,13 @@
       if (!(await CC.copiar(codigo))) { CC.avisar('Não consegui copiar'); return; }
       CC.folha('<h3>Obrigado de coração</h3>'
         + '<p>O código Pix ' + rotulo() + 'foi copiado. Abra o app do seu banco, escolha "Pix copia e cola" e cole.</p>'
-        + '<p class="passo-dica">"Cada um deve resolver por si mesmo quanto vai dar. Não forcem ninguém a dar mais do que realmente deseja, pois Deus ama os que dão com alegria." <span class="ref-frase">2 Coríntios 9.7</span></p>'
-        + '<div class="acoes"><button class="botao" data-fechar>Voltar ao app</button></div>', { rotulo: 'Obrigado', ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
+        + '<p class="passo-dica">"Cada um deve resolver por si mesmo quanto vai dar. Não forcem ninguém a dar mais do que realmente deseja, pois Deus ama os que dão com alegria." <span class="ref-frase">2\u00a0Coríntios 9.7</span></p>'
+        + '<div class="acoes"><button class="botao" data-fechar>Voltar ao app</button></div>', { rotulo: 'Obrigado', classe: 'folha-conta', ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
     };
     raiz.querySelector('[data-qr-pix]').onclick = () => {
       CC.folha('<h3>Pix ' + (valor ? reais(valor) : '') + '</h3>' + qrPix(CC.codigoPix(valor))
         + '<p class="passo-dica pequena qr-legenda">Aponte a câmera do app do banco, em outro celular, para o código.</p>'
-        + '<div class="acoes"><button class="botao contorno" data-fechar>Fechar</button></div>', { rotulo: 'QR Code do Pix', ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
+        + '<div class="acoes"><button class="botao contorno" data-fechar>Fechar</button></div>', { rotulo: 'QR Code do Pix', classe: 'folha-conta', ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
     };
   };
 })();
