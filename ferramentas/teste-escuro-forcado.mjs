@@ -92,7 +92,10 @@ async function medirPortal(tema) {
   await av(tema === null ? 'localStorage.removeItem("cc.tema")' : 'localStorage.setItem("cc.tema", ' + JSON.stringify(JSON.stringify(tema)) + ')');
   await cmd('Page.reload');
   await dormir(1500);
-  return corNaTela(8, 8);
+  // No pé da tela, na margem esquerda, onde todas as telas do portal só têm fundo: o alto
+  // delas é a folha do alto (sálvia pálida no claro, grafite um tom acima no escuro), que
+  // cobre o canto (8, 8).
+  return corNaTela(8, 772);
 }
 
 const sistema = (escuro) => cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: escuro ? 'dark' : 'light' }] });

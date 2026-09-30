@@ -5,43 +5,52 @@
    entra no app (index.html). O build.mjs a põe no marcador ESTILO_V2 (um bloco style
    vazio) de cada página avulsa, logo depois do estilo de dentro dela, e ela NÃO recebe o
    00-tokens.css nem o 01-base.css: as páginas têm fichas próprias (--fundo, --forte,
-   --fraca, --selo-bloco...). Copie os valores do guia (00-tokens.css) para as fichas
-   daqui, nos dois temas (@media prefers-color-scheme + :root[data-tema]).
+   --fraca, --selo-bloco...). Os valores são os de 00-tokens.css (paleta C), nos dois temas
+   (@media prefers-color-scheme + :root[data-tema]).
+   Padrão aprovado (o Início de 0a11385): a folha do alto em sálvia pálida de ponta a ponta
+   (grafite um tom acima no escuro), com os cantos de baixo redondos, e o corpo no fundo do
+   tema, com cartões brancos (grafite no escuro) e a ação principal na pílula escura.
    Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz,
-   .selo-ref) nem as fichas dele (--selo-bloco, --selo-texto).
+   .selo-ref) nem as fichas dele (--selo-bloco, --selo-texto, --forte), e não mude o que
+   ele herda (peso da letra, cor, alinhamento): a entrada o deixa em 400, e é assim que fica.
 
    O --forte fica com o valor de antes de propósito: a cruz e a referência do carimbo
    (.selo-cruz, .selo-ref) pintam com ele, e o carimbo não muda nem um tom. O resto da
    página usa --v2-forte, a tinta forte do guia.
    ========================================================================= */
 
-/* ---------- fichas do guia, tema claro ---------- */
+/* ---------- fichas do guia, tema claro (paleta C) ---------- */
 :root {
-  --fundo: #ececec;
+  --fundo: #f4f5f0;
   --cartao: #ffffff;
-  --campo: #f3f3f3;
-  --contorno: #e2e2e2;
-  --borda: var(--contorno);
-  --fundo2: var(--campo);
+  --campo: #eff1ea;
+  --contorno: #e2e5db;
   --v2-forte: #151615;
   --tinta: #2c2d2b;
   --fraca: #686b66;
   --salvia: #c8da8c;
   --salvia-palido: #eef3de;
   --salvia-texto: #5a6b2a;
-  --alerta: #c62828;
-  --alerta-palido: #fbe9e7;
+  /* tinta sobre a sálvia e sobre o cartão de destaque da folha: escura nos dois temas */
+  --salvia-tinta: #151615;
   --inverso: #151615;
   --inverso-tinta: #ffffff;
-  --verde: var(--salvia-texto);
-  --azul: var(--salvia-texto);
-  --azul-fraco: var(--salvia-palido);
-  --destaque: var(--salvia-palido);
-  --erro: var(--alerta);
-  --vinho: var(--alerta);
-  --ajuda: var(--alerta-palido);
-  --trilho: var(--cartao);
+  /* a folha do alto: sálvia pálida, com o texto escuro e os botões redondos mais claros */
+  --folha: #dfe8c1;
+  --folha-tinta: #151615;
+  --folha-tinta-fraca: #4f5a36;
+  --folha-campo: #eef3de;
+  --folha-destaque: #ffffff;
+  --alerta: #c62828;
+  --alerta-palido: #fbe9e7;
   --v2-ui: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* medidas: margem da página; recuo a mais do que fica dentro da folha (30px da borda,
+     como a saudação do Início); quanto a folha passa do último elemento do cabeçalho;
+     altura dos botões e campos, a mesma dos botões do app */
+  --margem: 16px;
+  --recuo-folha: 14px;
+  --fim-folha: 24px;
+  --alt-botao: 54px;
 }
 /* ---------- tema escuro de leitura: grafite, texto quase branco ---------- */
 @media (prefers-color-scheme: dark) {
@@ -49,16 +58,25 @@
     --fundo: #1b1c1a; --cartao: #252724; --campo: #2e302c; --contorno: #3a3d37;
     --v2-forte: #eef0ea; --tinta: #d9dcd3; --fraca: #a4a99d;
     --salvia: #bfd083; --salvia-palido: #2c3324; --salvia-texto: #c9d98f;
+    --inverso: #eef0ea; --inverso-tinta: #1b1c1a;
+    --folha: #2e302c; --folha-tinta: #eef0ea; --folha-tinta-fraca: #a4a99d; --folha-campo: #3a3d37; --folha-destaque: #c8da8c;
     --alerta: #ff8a80; --alerta-palido: #3a2220;
-    --inverso: #eef0ea; --inverso-tinta: #1b1c1a; --sobre: #1b1c1a;
   }
 }
 :root[data-tema="escuro"] {
   --fundo: #1b1c1a; --cartao: #252724; --campo: #2e302c; --contorno: #3a3d37;
   --v2-forte: #eef0ea; --tinta: #d9dcd3; --fraca: #a4a99d;
   --salvia: #bfd083; --salvia-palido: #2c3324; --salvia-texto: #c9d98f;
+  --inverso: #eef0ea; --inverso-tinta: #1b1c1a;
+  --folha: #2e302c; --folha-tinta: #eef0ea; --folha-tinta-fraca: #a4a99d; --folha-campo: #3a3d37; --folha-destaque: #c8da8c;
   --alerta: #ff8a80; --alerta-palido: #3a2220;
-  --inverso: #eef0ea; --inverso-tinta: #1b1c1a; --sobre: #1b1c1a;
+}
+/* As fichas antigas das páginas apontam para as novas, nos dois temas. O segundo seletor
+   empata com o do tema escuro de dentro da entrar.html, que vem antes e perde. */
+:root, :root:not([data-tema="claro"]) {
+  --borda: var(--contorno); --fundo2: var(--campo); --trilho: var(--folha-campo);
+  --verde: var(--salvia-texto); --azul: var(--salvia-texto); --azul-fraco: var(--salvia-palido);
+  --destaque: var(--salvia-palido); --erro: var(--alerta); --vinho: var(--alerta); --ajuda: var(--alerta-palido);
 }
 
 /* ---------- comum às três páginas ---------- */
@@ -70,100 +88,189 @@ p, li, .dica, .ajuda, .privacidade, label span { text-wrap: pretty; }
 p a, ul a, .consentimento a { white-space: nowrap; }
 b { color: var(--v2-forte); }
 a { color: var(--salvia-texto); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
-.marca { font-family: var(--v2-ui); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.01em; text-transform: none; color: var(--v2-forte); }
-.mascote svg, .cabeca svg { color: var(--v2-forte); }
+.marca { font-family: var(--v2-ui); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.01em; text-transform: none; color: var(--folha-tinta); }
+.mascote svg, .cabeca svg { color: var(--folha-tinta); }
 :focus-visible { outline: 2.5px solid var(--v2-forte); outline-offset: 3px; }
 
+/* ---------- a folha do alto ----------
+   Cada tela desenha a folha no ::before do último elemento do cabeçalho (o título, ou o
+   texto logo abaixo dele): ela sobe até o alto da página, passa por baixo da barra de
+   status, encosta nas bordas e termina onde esse elemento termina (ele traz --fim-folha
+   de respiro embaixo), com os cantos de baixo redondos. A tela isola o empilhamento, e a
+   folha fica atrás de tudo o que vem antes dela. Na de boas-vindas o último elemento é o
+   carimbo, que nenhuma regra pode mirar: lá a folha é o ::before do bloco de baixo e
+   termina acima dele. No computador ela tem a largura da coluna, como a do Início. */
+#tela-boas, #tela-entrar, #tela-esqueci, #tela-redefinir, #tela-cadastro { position: relative; isolation: isolate; }
+#tela-entrar > h1, #form-esqueci > .dica:first-child, #tela-redefinir > h1, [data-passo] > h1, .folha-boas { position: relative; }
+#tela-entrar > h1::before, #form-esqueci > .dica:first-child::before, #tela-redefinir > h1::before, [data-passo] > h1::before, .folha-boas::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -3000px;
+  bottom: 0;
+  left: calc(-1 * var(--margem));
+  right: calc(-1 * var(--margem));
+  border-radius: 0 0 36px 36px;
+  background: var(--folha);
+  pointer-events: none;
+}
+
 /* ---------- entrada: moldura ---------- */
-main { max-width: 440px; padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); }
+main { max-width: 440px; padding: calc(20px + env(safe-area-inset-top)) var(--margem) calc(16px + env(safe-area-inset-bottom)); }
 section { gap: 16px; }
 
-/* boas-vindas: marca e carimbo sobre o fundo; título, texto e botões numa folha branca */
-#tela-boas { justify-content: flex-start; gap: 8px; }
-#tela-boas .mascote { margin-top: auto; }
-.mascote svg { width: 96px; }
-.folha-boas { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: auto;
-  padding: 24px 16px 4px; border-radius: 32px; background: var(--cartao); }
-#tela-boas h1 { font-size: 1.375rem; line-height: 1.25; }
-#tela-boas .dica { font-size: .9375rem; }
+/* boas-vindas: símbolo, marca e carimbo na folha do alto; título, texto e botões no fundo,
+   embaixo, perto do polegar. A marca fica ao lado do símbolo, numa linha só (o carimbo é o
+   protagonista da tela): a tela vira uma fila que quebra, e as margens do símbolo e da marca
+   completam a primeira linha, o que manda o carimbo sozinho para a seguinte (sem regra nele).
+   A altura que sobra se divide igual entre as linhas, dentro da folha: metade acima da marca
+   (a linha vazia do ::before e a da marca) e metade abaixo do carimbo (a dele e a do bloco
+   de baixo, que fica colado no pé da tela). */
+#tela-boas { flex-flow: row wrap; align-items: flex-start; align-content: stretch; gap: 0 10px; }
+#tela-boas::before { content: ""; flex: 1 0 100%; }
+#tela-boas .mascote { align-self: flex-end; margin: 0 0 0 calc(50% - 100px); }
+#tela-boas .marca { align-self: flex-end; margin-right: calc(50% - 100px); line-height: 56px; }
+/* o símbolo pela altura, a mesma da linha da marca: os dois ficam centrados um no outro */
+.mascote svg { width: auto; height: 56px; }
+.folha-boas { flex: 1 0 100%; align-self: flex-end; display: flex; flex-direction: column; gap: 12px;
+  margin: var(--fim-folha) 0 0; padding: 28px 0 0; border-radius: 0; background: none; }
+.folha-boas::before { bottom: 100%; }
+#tela-boas h1 { font-size: 1.5rem; line-height: 1.25; }
+#tela-boas .dica { max-width: 34ch; margin: 0 auto; font-size: .9375rem; }
 .folha-boas .espaco { display: none; }
-.folha-boas .botoes { margin-top: 8px; }
+.folha-boas .botoes { margin-top: 12px; }
 .links { gap: 4px; color: var(--fraca); }
 .links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; font-size: .9375rem; }
 
 /* títulos e textos */
-h1 { font-size: 1.75rem; line-height: 1.18; }
+h1 { font-size: 1.5rem; line-height: 1.2; }
 .dica { color: var(--fraca); font-weight: 500; font-size: 1rem; line-height: 1.55; }
-.etiqueta { font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--fraca); }
+.etiqueta { font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--folha-tinta-fraca); }
 
-/* botões em pílula, Manrope, sem caixa-alta */
-.botao { min-height: 56px; padding: 14px 22px; font-family: var(--v2-ui); font-size: 1rem; font-weight: 700;
+/* botões em pílula, Manrope, sem caixa-alta, na altura dos botões do app */
+.botao { min-height: var(--alt-botao); padding: 14px 22px; font-family: var(--v2-ui); font-size: 1rem; font-weight: 700;
   letter-spacing: 0; text-transform: none; line-height: 1.25; background: var(--inverso); color: var(--inverso-tinta); }
 .botao.contorno { border: 0; background: var(--cartao); color: var(--v2-forte); }
-.folha-boas .botao.contorno { background: var(--campo); }
 .botao.plano { min-height: 48px; background: none; color: var(--tinta); }
 .botao[disabled] { opacity: 1; background: var(--contorno); color: var(--fraca); }
 .botao.plano[disabled] { background: none; }
 
-/* topo dos passos: voltar redondo e barra de progresso com o ponto sálvia */
-.topo-passo { gap: 16px; }
-.topo-passo .voltar { width: 48px; height: 48px; margin: 0; border-radius: 50%; background: var(--cartao); color: var(--v2-forte); }
+/* ---------- entrada: o cabeçalho de cada passo, na folha ----------
+   Voltar redondo à esquerda (e a barra do cadastro ao lado) e o título no centro, como o
+   cabeçalho das telas do app, 30px da borda e com as tintas da folha. */
+#tela-entrar > .topo-passo, #tela-esqueci > .topo-passo, #tela-cadastro > .topo-passo, #tela-cadastro > .etiqueta,
+#tela-entrar > h1, #tela-esqueci > h1, #tela-redefinir > h1, [data-passo] > h1, #form-esqueci > .dica:first-child {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--recuo-folha);
+  padding-right: var(--recuo-folha);
+  color: var(--folha-tinta);
+}
+.topo-passo { gap: 16px; min-height: 48px; }
+.topo-passo .voltar { width: 48px; height: 48px; margin: 0; border-radius: 50%; background: var(--folha-campo); color: var(--folha-tinta); }
 .topo-passo .voltar svg { width: 22px; height: 22px; }
-.barra { height: 12px; background: var(--cartao); }
-.barra i { position: relative; min-width: 12px; background: var(--inverso); }
-.barra i::after { content: ""; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--salvia); }
-
+.barra { height: 10px; background: var(--folha-campo); }
+.barra i { position: relative; min-width: 10px; background: var(--folha-tinta); }
+.barra i::after { content: ""; position: absolute; top: 2px; right: 2px; width: 6px; height: 6px; border-radius: 50%; background: var(--salvia); }
+#tela-entrar > h1, #tela-esqueci > h1, #tela-redefinir > h1, [data-passo] > h1 { margin-top: 4px; text-align: center; }
+#tela-entrar > h1, #tela-redefinir > h1, [data-passo] > h1 { padding-bottom: var(--fim-folha); }
+/* o formulário começa 20px abaixo da folha (no cadastro os campos trazem margin-top: 16px
+   no próprio HTML: 4 + 16) */
+#tela-entrar > h1 + form, #tela-redefinir > h1 + form { margin-top: 4px; }
+[data-passo] > h1 { margin-bottom: 4px; }
 /* a tela da senha nova não tem voltar: o título desce para a mesma altura das outras */
-#tela-redefinir > h1 { margin-top: 64px; }
+#tela-redefinir > h1 { margin-top: 68px; }
+/* a explicação de "Esqueceu a senha?" é o subtítulo da folha */
+#form-esqueci > .dica:first-child { margin-top: -8px; padding-bottom: var(--fim-folha); color: var(--folha-tinta-fraca); font-size: .9375rem; text-align: center; }
+#form-esqueci > .dica:first-child + .campo { margin-top: 4px; }
+/* cadastro: "Passo 1 de 3" no centro e o convite num cartão de destaque da folha */
+#tela-cadastro > .etiqueta { margin-top: 4px; margin-bottom: -12px; text-align: center; }
+.convite { align-self: center; max-width: 100%; margin: 0 var(--recuo-folha); padding: 10px 16px; border-radius: 20px;
+  background: var(--folha-destaque); color: var(--salvia-tinta); font-size: .875rem; font-weight: 700; line-height: 1.4; text-align: center; text-wrap: balance; }
+/* no computador o botão fica logo abaixo dos campos, sem o vão até o pé da tela */
+@media (min-width: 860px) { form .espaco { flex: 0 0 8px; } }
 
 /* formulários */
 form { gap: 16px; }
 .campo { gap: 8px; }
 label { font-size: .875rem; font-weight: 700; color: var(--v2-forte); }
-input { min-height: 56px; padding: 14px 18px; border: 1.5px solid var(--contorno); border-radius: 18px;
+input { min-height: var(--alt-botao); padding: 14px 18px; border: 1.5px solid var(--contorno); border-radius: 18px;
   background: var(--cartao); color: var(--v2-forte); font-size: 1rem; font-weight: 600; }
 input:focus { border-color: var(--v2-forte); }
 input[aria-invalid="true"] { border-color: var(--alerta); }
 .ajuda { font-size: .8125rem; font-weight: 500; line-height: 1.45; color: var(--fraca); }
 .erro { min-height: 0; font-size: .875rem; font-weight: 700; line-height: 1.45; color: var(--alerta); }
 .senha input { padding-right: 104px; }
-.mostrar { top: 6px; right: 6px; min-width: 88px; border-radius: 999px; color: var(--v2-forte); font-family: var(--v2-ui); font-size: .875rem; }
+.mostrar { top: 5px; right: 5px; min-width: 88px; border-radius: 999px; color: var(--v2-forte); font-family: var(--v2-ui); font-size: .875rem; }
 .mostrar:hover { background: var(--campo); }
 
 /* "Você já segue Jesus?": segmentado em pílula, a escolhida escura */
 .caminho-escolha { gap: 4px; padding: 5px; border-radius: 999px; background: var(--cartao); }
-.opcao-caminho { flex: 1 1 0; white-space: nowrap; min-height: 46px; padding: 8px 12px; border: 0; border-radius: 999px; background: none;
+.opcao-caminho { flex: 1 1 0; white-space: nowrap; min-height: 44px; padding: 8px 12px; border: 0; border-radius: 999px; background: none;
   color: var(--tinta); font-size: .9375rem; }
 .opcao-caminho[aria-pressed="true"] { border: 0; background: var(--inverso); color: var(--inverso-tinta); }
 
-/* caixas de apoio: sálvia pálido, sem borda */
-.privacidade, .consentimento, .convite { padding: 16px; border-radius: 20px; background: var(--salvia-palido); color: var(--tinta); font-weight: 500; }
+/* caixas de apoio: sálvia pálido, sem borda, como o aviso de privacidade do app */
+.privacidade, .consentimento { padding: 16px; border-radius: 20px; background: var(--salvia-palido); color: var(--tinta); font-weight: 500; }
 .privacidade svg { color: var(--salvia-texto); }
-.convite { font-weight: 700; color: var(--v2-forte); }
 .consentimento { gap: 12px; }
 .consentimento span { font-weight: 500; color: var(--tinta); }
 .consentimento input { min-height: 0; width: 24px; height: 24px; padding: 0; accent-color: var(--inverso); }
 .consentimento:has(input[aria-invalid="true"]) { outline: 2px solid var(--alerta); outline-offset: 0; }
 
-/* ---------- privacidade e termos ---------- */
-body > main:has(.cabeca) { max-width: 720px; padding: calc(24px + env(safe-area-inset-top)) 16px calc(48px + env(safe-area-inset-bottom)); line-height: 1.65; }
-.cabeca { gap: 16px; margin-bottom: 12px; }
-.cabeca svg { width: 48px; }
-.cabeca h1 { font-size: 1.75rem; }
-.atualizada { margin: 0 0 24px; color: var(--fraca); font-size: .875rem; font-weight: 600; }
+/* ---------- privacidade e termos ----------
+   Símbolo e marca numa linha, título e data na folha do alto (o ::before da data), no
+   centro como o cabeçalho das telas do app; o resumo e o índice em cartões brancos; o
+   texto corrido no fundo, na coluna da página. */
+body > main:has(.cabeca) { position: relative; isolation: isolate; max-width: 720px;
+  padding: calc(20px + env(safe-area-inset-top)) var(--margem) calc(48px + env(safe-area-inset-bottom)); line-height: 1.65; }
+.cabeca { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 10px; margin: 0; padding: 0 var(--recuo-folha); color: var(--folha-tinta); }
+.cabeca > div { display: contents; }
+.cabeca svg { width: auto; height: 56px; }
+.cabeca h1 { flex: 1 0 100%; margin-top: 8px; font-size: clamp(1.375rem, 6.4vw, 1.75rem); line-height: 1.2; text-align: center; color: var(--folha-tinta); }
+.atualizada { position: relative; margin: 4px 0 24px; padding: 0 var(--recuo-folha) var(--fim-folha); color: var(--folha-tinta-fraca); font-size: .875rem; font-weight: 600; text-align: center; }
+.atualizada::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -3000px;
+  bottom: 0;
+  left: calc(-1 * var(--margem));
+  right: calc(-1 * var(--margem));
+  border-radius: 0 0 36px 36px;
+  background: var(--folha);
+  pointer-events: none;
+}
 .cabeca ~ h2 { margin: 32px 0 8px; font-size: 1.25rem; line-height: 1.25; scroll-margin-top: 16px; }
 .cabeca ~ p, .cabeca ~ ul li { font-weight: 500; }
-.resumo, nav.indice { border: 0; border-radius: 28px; padding: 20px; }
-.resumo { background: var(--salvia-palido); }
-nav.indice { margin-top: 16px; padding: 12px 12px 12px 8px; background: var(--cartao); }
+/* itens de lista: linhas equilibradas, sem palavra sozinha no fim (o "pretty" do Chrome não
+   evita a que vem depois de um hífen, como em "pelo e-mail.") */
+main:has(.cabeca) li { text-wrap: balance; }
+.resumo, nav.indice { border: 0; border-radius: 28px; padding: 20px; background: var(--cartao); }
+.resumo ul { margin-bottom: 0; }
+nav.indice { margin-top: 12px; padding: 12px 12px 12px 8px; }
 nav.indice ol { padding-left: 32px; }
 nav.indice li { margin: 0; font-size: .9375rem; }
 nav.indice li::marker { color: var(--fraca); font-weight: 700; }
 nav.indice a { display: flex; align-items: center; min-height: 44px; color: var(--v2-forte); font-weight: 600; text-decoration-color: var(--contorno); }
-table { border: 0; border-collapse: separate; border-spacing: 0; border-radius: 20px; background: var(--cartao); font-size: .875rem; line-height: 1.45; }
-th, td { padding: 12px; text-wrap: balance; border-top: 1px solid var(--contorno); }
+/* "Quem vê o quê": três colunas que cabem no celular; larguras fixas para a primeira levar
+   o texto e as respostas ("só se você ativar") não quebrarem palavra por palavra */
+table { table-layout: fixed; border: 0; border-collapse: separate; border-spacing: 0; border-radius: 20px; background: var(--cartao); font-size: .8125rem; line-height: 1.45; }
+th, td { padding: 10px 8px; text-wrap: balance; border-top: 1px solid var(--contorno); }
+th:first-child, td:first-child { padding-left: 12px; }
+th:nth-child(1) { width: 46%; }
+th:nth-child(2) { width: 32%; }
+th:nth-child(3) { width: 22%; }
+@media (max-width: 359px) {
+  th, td { padding: 10px 6px; }
+  th:first-child, td:first-child { padding-left: 10px; }
+  th:nth-child(1) { width: 40%; }
+  th:nth-child(2) { width: 34%; }
+  th:nth-child(3) { width: 26%; }
+}
 th { border-top: 0; background: var(--campo); color: var(--fraca); }
 td.sim { color: var(--salvia-texto); }
+td.nao { color: var(--fraca); }
 .cabeca ~ .ajuda { margin-top: 32px; padding: 16px 20px; border-radius: 20px; background: var(--alerta-palido); color: var(--tinta); font-size: 1rem; font-weight: 600; line-height: 1.6; }
-.cabeca ~ .voltar { justify-content: center; min-height: 52px; margin-top: 24px; padding: 0 24px; border-radius: 999px;
+.cabeca ~ .voltar { display: flex; justify-content: center; min-height: var(--alt-botao); margin-top: 24px; padding: 0 24px; border-radius: 999px;
   background: var(--inverso); color: var(--inverso-tinta); text-decoration: none; }
