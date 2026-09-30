@@ -205,14 +205,29 @@
 .pop-no .titulo-pop, .pop-no.adiante .titulo-pop { color: var(--tinta-forte); font-weight: 800; }
 .pop-no .sub-pop, .pop-no.adiante .sub-pop { color: inherit; font-weight: 500; opacity: 1; }
 .pop-no .fala-bento { border: 0; margin: 8px 0 4px; padding: 12px 14px; border-radius: 18px; color: var(--tinta-forte); font-weight: 600; }
+.pop-no .botao.contorno { background: var(--campo); }
+/* aberto, o balão fica acima dos outros nós, mas passa por baixo da faixa da unidade e da
+   folha do alto, que são fixas (antes o nó e o balão rolavam por cima delas) */
+.no-linha:has(.pop-no) { z-index: 15; }
+/* no dia de hoje, o balão toma o lugar do cartão ao lado do nó enquanto está aberto (a mesma
+   passagem e o mesmo Começar): antes um cobria o outro. Fechado, a trilha fica como estava. */
+.no-linha.hoje:has(.pop-no) .cartao-no-hoje { visibility: hidden; }
 
 /* a seta que volta ao dia de hoje */
 .trilha ~ .ir-atual { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--inverso); color: var(--inverso-tinta); box-shadow: var(--sombra-flutuante); }
 .trilha ~ .ir-atual svg { width: 22px; height: 22px; }
+/* com um balão aberto, a seta sai da frente dele (ela cobria o botão do balão no canto) */
+.trilha:has(.pop-no) ~ .ir-atual { visibility: hidden; }
 
-/* folha da unidade */
+/* folha da unidade: o nome quebra equilibrado; "Ir para o dia" é o botão principal, escuro */
 .cabeca-folha-unidade { gap: 16px; margin-bottom: 16px; }
 .cabeca-folha-unidade .arte-trofeu { flex: none; width: 64px; }
+.cabeca-folha-unidade h2 { text-wrap: balance; }
+.cabeca-folha-unidade ~ .acoes .botao.cor { --b: var(--inverso); color: var(--inverso-tinta); }
+
+/* o baú: o convite pisca sem descer de 4,5:1 (a piscada antiga chegava a 3,7:1) */
+.dica-bau { color: var(--tinta-forte); opacity: 1; animation: piscar-dica 1.8s ease-in-out infinite; }
+@keyframes piscar-dica { 50% { opacity: .72; } }
 
 /* =========================================================================
    O TOPO DO APP, FORA DO INÍCIO: o começo da folha do alto
