@@ -56,3 +56,11 @@ Quebras: nome de unidade com palavra sozinha; "1 / Timóteo"; "com / Ana"; "Marc
 - Capturas: `CHROME=... node ferramentas/foto.mjs <largura> <altura> <saida.png> '<#/rota>' <urlBase> [rolar] [tema]`.
 - Varredura automática de defeitos (vazamento, corte, reticências, quebra, palavra sozinha, fonte < 12, alvo < 44, contraste, fundo atrás da barra): `/tmp/claude-0/-home-user-geracao-eleita/f83429da-2006-5b51-8495-2381601c862d/scratchpad/rev/rev.mjs` com listas de trabalhos no formato de `rev/trab.mjs` (use `BASE=http://localhost:<porta>/`). Leia o código antes de usar.
 - Referências do primeiro redesenho, para reaproveitar peças: `git show be99484:src/estilo.css` (camada "REDESENHO (v2)"), `git show be99484:src/fontes.css` (Manrope e Literata embutidas), `git show be99484:src/app/<arquivo>` e as maquetes em `design/telas/`.
+
+## Decisão do dono sobre o Início (30/09, vale sobre o resto deste guia)
+O Início/Trilha fica com o layout da primeira versão, que o dono aprovou ("estava bem melhor"), só trocando o verde neon pelo sálvia:
+- folha BRANCA no topo com cantos inferiores arredondados: retrato redondo (leva ao Perfil), "Olá, Nome!", "Dia N de 365 do plano", dois botões redondos cinza-claros (mensagens/Juntos e sino) com ponto de novidade;
+- dois cartões de destaque lado a lado, em **sálvia** (#c8da8c) com tinta #151615: "N de 2 · leituras hoje" e "N dias · seguidos", cada um com botão redondo preto (seta/visto e a chama);
+- abaixo, a trilha num bloco ESCURO suave (#1b1c1a) nos dois temas: faixa da unidade com o número em círculo escuro e algarismos sálvia, nós lidos brancos com ícone escuro, hoje em sálvia com anel, travados escuros com contorno e cadeado cinza, rótulo "Dia N" e passagens ao lado, linha branca até hoje e pontilhada depois;
+- a barra de abas continua na estrutura nova (ilhas com a Bíblia no meio), que combina com o bloco escuro.
+Referência visual exata: a tela Início do commit be99484 (git show be99484:src/app/03-trilha.js e a camada REDESENHO de be99484:src/estilo.css), com #dff74a trocado por sálvia.
