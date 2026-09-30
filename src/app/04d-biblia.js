@@ -8,6 +8,9 @@
   const CHAVE_LETRA = 'cc.letra';
   const CHAVE_MODO = 'cc.leitor.modo';
   const LETRAS = ['menor', 'normal', 'maior', 'enorme'];
+  // espaço inseparável entre número e livro e entre livro e capítulo, só na tela
+  const nb = (t) => String(t).replace(/(\d) (?=\p{L})/gu, '$1\u00a0').replace(/(\p{L}) (?=\d)/gu, '$1\u00a0')
+    .replace(/(\d)-(?=\d)/g, '$1-\u2060');
   const gravarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* segue */ } };
 
   let geracao = 0;
@@ -24,7 +27,7 @@
   }
 
   function esqueleto(alvo, titulo, voltar) {
-    alvo.innerHTML = (voltar ? CC.botaoVoltar(voltar) : '') + '<h1>' + CC.esc(titulo) + '</h1>'
+    alvo.innerHTML = (voltar ? CC.botaoVoltar(voltar) : '') + '<h1' + (voltar ? '' : ' class="titulo-biblia"') + '>' + nb(CC.esc(titulo)) + '</h1>'
       + CC.esqueleto('biblia');
     if (voltar) wireVoltar(alvo);
   }
@@ -59,9 +62,11 @@
       const completo = p.total > 0 && p.lidos === p.total;
       const fracao = p.total ? p.lidos / p.total : 0;
       const rotulo = completo ? ', lido inteiro no plano' : p.lidos ? ', ' + p.lidos + ' de ' + p.total + ' dias do plano' : '';
-      return '<a class="item-livro' + (completo ? ' completo' : '') + '" href="#/biblia/' + encodeURIComponent(l) + '"'
+      // nome comprido (Deuteronômio, 1 Tessalonicenses) ocupa a linha inteira no celular, para
+      // não quebrar no meio da palavra nem separar o número do nome
+      return '<a class="item-livro' + (completo ? ' completo' : '') + (l.length >= 12 ? ' longo' : '') + '" href="#/biblia/' + encodeURIComponent(l) + '"'
         + (rotulo ? ' aria-label="' + CC.esc(l + rotulo) + '"' : '') + '>'
-        + '<span>' + CC.esc(l) + '</span>'
+        + '<span>' + nb(CC.esc(l)) + '</span>'
         + (completo ? CC.ico('certo') : fracao > 0 ? '<i class="progresso-livro" style="--f:' + (fracao * 100).toFixed(0) + '%"></i>' : '')
         + '</a>';
     }).join('') + '</div>';
@@ -74,7 +79,7 @@
     if (u && Object.hasOwn(biblia.livros, u.livro) && u.cap >= 1 && u.cap <= biblia.livros[u.livro].length) {
       return '<a class="cartao-continuar" href="#/biblia/' + encodeURIComponent(u.livro) + '/' + u.cap + '">'
         + '<span class="icone-continuar">' + CC.ico('livro') + '</span>'
-        + '<span class="textos"><small>Continuar lendo</small><b>' + CC.esc(u.livro + ' ' + u.cap) + '</b></span>'
+        + '<span class="textos"><small>Continuar lendo</small><b>' + nb(CC.esc(u.livro + ' ' + u.cap)) + '</b></span>'
         + CC.ico('avancar') + '</a>';
     }
     const dia = CC.D.plano[CC.diaAtual() - 1];
@@ -82,7 +87,9 @@
     if (!t || !Object.hasOwn(biblia.livros, t.livro)) return '';
     return '<a class="cartao-continuar" href="#/biblia/' + encodeURIComponent(t.livro) + '/' + t.de + '">'
       + '<span class="icone-continuar">' + CC.ico('livro') + '</span>'
-      + '<span class="textos"><small>Leitura de hoje no plano</small><b>' + CC.esc(CC.passagemDe(dia)) + '</b></span>'
+      // cada passagem numa linha, para o "·" nunca sobrar no fim da linha; o leitor de tela lê o "·"
+      + '<span class="textos"><small>Leitura de hoje no plano</small><b>' + CC.passagemDe(dia).split(' · ')
+        .map((p) => '<span class="parte">' + nb(CC.esc(p)) + '</span>').join('<span class="so-leitor"> · </span>') + '</b></span>'
       + CC.ico('avancar') + '</a>';
   }
 
@@ -95,8 +102,8 @@
       const livros = Object.keys(biblia.livros); // ordem canônica, do jeito que vem no arquivo
       const antigo = livros.filter((l) => !CC.ehNovoTestamento(l));
       const novo = livros.filter((l) => CC.ehNovoTestamento(l));
-      alvo.innerHTML = '<h1>Bíblia</h1>'
-        + '<p class="passo-dica">Escolha um livro e leia à vontade, no seu ritmo.</p>'
+      alvo.innerHTML = '<h1 class="titulo-biblia">Bíblia</h1>'
+        + '<p class="subtitulo-tela">Escolha um livro e leia à vontade, no seu ritmo.</p>'
         + cartaoContinuar(biblia)
         + '<div class="busca-caixa">' + CC.ico('lupa') + '<input id="busca-livro" type="search" placeholder="Buscar livro (ex.: João 3)" aria-label="Buscar livro da Bíblia" autocomplete="off" spellcheck="false" enterkeyhint="go"></div>'
         + '<p class="passo-dica" id="busca-livro-vazia" hidden>Nenhum livro com esse nome.</p>'
@@ -123,7 +130,7 @@
     campo.oninput = () => {
       const { nome } = separar(campo.value);
       const vistos = new Set(nome ? achados(nome) : livros);
-      alvo.querySelectorAll('.item-livro').forEach((a) => { a.hidden = !vistos.has(a.querySelector('span').textContent); });
+      alvo.querySelectorAll('.item-livro').forEach((a) => { a.hidden = !vistos.has(a.querySelector('span').textContent.replace(/\u00a0/g, ' ')); });
       ['#testamento-antigo', '#testamento-novo'].forEach((sel) => {
         const bloco = alvo.querySelector(sel);
         bloco.hidden = !bloco.querySelector('.item-livro:not([hidden])');
@@ -153,8 +160,8 @@
       const total = caps.length;
       const capValido = capitulo >= 1 && capitulo <= total ? capitulo : 0;
       alvo.innerHTML = CC.botaoVoltar('Bíblia')
-        + '<h1>' + CC.esc(livro) + '</h1>'
-        + '<p class="passo-dica">' + CC.esc(CC.plural(total, 'capítulo', 'capítulos')) + '</p>'
+        + '<h1>' + nb(CC.esc(livro)) + '</h1>'
+        + '<p class="subtitulo-tela">' + CC.esc(CC.plural(total, 'capítulo', 'capítulos')) + '</p>'
         + '<div class="grade-capitulos">' + Array.from({ length: total }, (_, i) => i + 1).map((n) => '<a href="#/biblia/'
           + encodeURIComponent(livro) + '/' + n + '"' + (n === capValido ? ' aria-current="true" class="atual"' : '')
           + '>' + n + '</a>').join('') + '</div>';
@@ -255,7 +262,7 @@
       + '<div class="licao-topo">'
       + '<button class="fechar" data-fechar-biblia aria-label="Voltar aos capítulos">' + CC.ico('fechar') + '</button>'
       + '<div class="leitor-titulo"><span class="rot">' + CC.esc(b.abreviatura) + '</span>'
-      + '<b>' + CC.esc(livro) + ' ' + n + '</b></div>'
+      + '<b>' + nb(CC.esc(livro) + ' ' + n) + '</b></div>'
       + '<button class="botao-icone letra" data-aa-biblia aria-label="Tradução, letra e tema">Aa</button>'
       + '</div>'
       + '<div class="leitor-progresso"><i></i></div>'
@@ -265,8 +272,8 @@
       + '</div></div>'
       + '<div class="licao-pe"><div class="interno">'
       + '<div class="acoes-verso" hidden></div>'
-      + (temAnterior ? '<button class="botao contorno" data-anterior>‹ ' + CC.esc(antLivro) + ' ' + antCap + '</button>' : '')
-      + (temProximo ? '<button class="botao contorno" data-proximo>' + CC.esc(proxLivro) + ' ' + proxCap + ' ›</button>' : '')
+      + (temAnterior ? '<button class="botao contorno" data-anterior>‹\u00a0' + nb(CC.esc(antLivro) + ' ' + antCap) + '</button>' : '')
+      + (temProximo ? '<button class="botao contorno" data-proximo>' + nb(CC.esc(proxLivro) + ' ' + proxCap) + '\u00a0›</button>' : '')
       + '</div></div>';
 
     el.querySelector('[data-fechar-biblia]').onclick = () => voltarParaGrade(livro);
@@ -313,6 +320,7 @@
       + '<div class="acoes"><button class="botao contorno" data-fechar>Pronto</button></div>',
     {
       rotulo: 'Opções de leitura',
+      classe: 'folha-aa',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelectorAll('[data-traducao]').forEach((b) => {

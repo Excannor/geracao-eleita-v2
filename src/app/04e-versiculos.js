@@ -10,6 +10,9 @@
   'use strict';
 
   const CORES = [[1, 'amarelo'], [2, 'verde'], [3, 'azul'], [4, 'rosa']];
+  // espaço inseparável entre número e livro e entre livro e capítulo, só na tela
+  const nb = (t) => String(t).replace(/(\d) (?=\p{L})/gu, '$1\u00a0').replace(/(\p{L}) (?=\d)/gu, '$1\u00a0')
+    .replace(/(\d)-(?=\d)/g, '$1-\u2060');
   const chaveVerso = (livro, cap, v) => livro + ' ' + cap + ':' + v;
   const chaveNota = (ref) => 'verso:' + ref;
   const chavesDoTrecho = (r) => {
@@ -40,7 +43,7 @@
     const r = CC.lerRef(ref);
     const atual = r ? corDoTrecho(r) : 0;
     const temNota = !!CC.anotacao(chaveNota(ref)).trim();
-    return '<b class="ref-verso">' + CC.esc(ref) + '</b>'
+    return '<b class="ref-verso">' + nb(CC.esc(ref)) + '</b>'
       + '<div class="cores-marca" role="group" aria-label="Marcar">'
       + CORES.map(([n, nome]) => '<button class="cor-marca marca-' + n + '" data-cor="' + n + '" aria-pressed="' + (atual === n)
         + '" aria-label="Marcar em ' + nome + '"></button>').join('')
@@ -101,7 +104,7 @@
   function abrirNota(ref, texto, depois) {
     const chave = chaveNota(ref);
     const atual = CC.anotacao(chave);
-    const { folha } = CC.folha('<h2>' + CC.esc(ref) + '</h2>'
+    const { folha } = CC.folha('<h2>' + nb(CC.esc(ref)) + '</h2>'
       + '<blockquote class="trecho-da-nota">…</blockquote>'
       + '<label class="campo-senha"><span>Sua nota</span>'
       + '<textarea data-nota name="nota-do-versiculo" rows="6" maxlength="3000" autocomplete="off" autocapitalize="sentences">'
@@ -291,59 +294,53 @@
     tela.height = CARTAO_ALTURA;
     const ctx = tela.getContext('2d');
 
-    // Fundo escuro do próprio app (o mesmo tom do tema escuro), com o creme e o laranja do
-    // pôster para o texto: não depende de qual tema a pessoa está usando agora.
-    const fundo = ctx.createLinearGradient(0, 0, 0, CARTAO_ALTURA);
-    fundo.addColorStop(0, '#161616');
-    fundo.addColorStop(1, '#0d0d0d');
+    // O fundo é o grafite do tema escuro de leitura, liso; o texto quase branco em Literata,
+    // a letra do texto bíblico no app, e a sálvia nos detalhes. Não depende do tema que a
+    // pessoa está usando agora.
+    const fundo = '#1b1c1a';
+    const texto1 = '#eef0ea';
+    const fraco = '#a4a99d';
+    const salvia = '#bfd083';
+    const margem = 104;
+    const larguraTexto = CARTAO_LARGURA - margem * 2;
     ctx.fillStyle = fundo;
     ctx.fillRect(0, 0, CARTAO_LARGURA, CARTAO_ALTURA);
 
-    const creme = '#fff1c9';
-    const laranja = '#ff9d1c';
-    const margem = 96;
-    const larguraTexto = CARTAO_LARGURA - margem * 2;
-
-    // “Aspas” discretas no topo, só decoração.
-    ctx.fillStyle = laranja;
-    ctx.globalAlpha = 0.5;
-    ctx.font = '900 160px Oswald, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText('“', margem - 12, 150);
-    ctx.globalAlpha = 1;
-
-    const medir = (texto, tamanho) => { ctx.font = '700 ' + tamanho + 'px Oswald, sans-serif'; return ctx.measureText(texto).width; };
+    const medir = (t, tamanho) => { ctx.font = '500 ' + tamanho + 'px Literata, Georgia, serif'; return ctx.measureText(t).width; };
     const texto = String(corpo || '').trim() || ref;
     const { linhas, tamanho } = CC.ajustarTextoCartao(texto, {
-      larguraMax: larguraTexto, alturaMax: CARTAO_ALTURA * 0.58, fonteMax: 84, fonteMin: 34, entreLinhas: 1.3, medir,
+      larguraMax: larguraTexto, alturaMax: CARTAO_ALTURA * 0.52, fonteMax: 72, fonteMin: 32, entreLinhas: 1.45, medir,
     });
-    ctx.font = '700 ' + tamanho + 'px Oswald, sans-serif';
-    ctx.fillStyle = creme;
+    const alturaBloco = linhas.length * tamanho * 1.45;
+
+    // “Aspas” discretas logo acima do texto, só decoração.
+    ctx.fillStyle = salvia;
+    ctx.globalAlpha = 0.7;
+    ctx.font = '600 180px Literata, Georgia, serif';
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('“', CARTAO_LARGURA / 2, Math.max(120, CARTAO_ALTURA / 2 - alturaBloco / 2 - 200));
+    ctx.globalAlpha = 1;
+    ctx.font = '500 ' + tamanho + 'px Literata, Georgia, serif';
+    ctx.fillStyle = texto1;
     ctx.textBaseline = 'middle';
-    const alturaBloco = linhas.length * tamanho * 1.3;
-    let y = CARTAO_ALTURA / 2 - alturaBloco / 2 + tamanho * 0.65;
-    for (const linha of linhas) { ctx.fillText(linha, CARTAO_LARGURA / 2, y); y += tamanho * 1.3; }
+    let y = CARTAO_ALTURA / 2 - alturaBloco / 2 + tamanho * 0.72;
+    for (const linha of linhas) { ctx.fillText(linha, CARTAO_LARGURA / 2, y); y += tamanho * 1.45; }
 
     // Referência e tradução, embaixo do texto (a licença da tradução pede o nome dela).
-    ctx.font = '700 40px Oswald, sans-serif';
-    ctx.fillStyle = laranja;
-    ctx.fillText(ref, CARTAO_LARGURA / 2, CARTAO_ALTURA - 220);
+    ctx.font = '800 44px Manrope, sans-serif';
+    ctx.fillStyle = salvia;
+    ctx.fillText(ref, CARTAO_LARGURA / 2, CARTAO_ALTURA - 250);
     if (nomeTraducao) {
-      ctx.font = '600 30px Nunito, sans-serif';
-      ctx.fillStyle = creme;
-      ctx.globalAlpha = 0.85;
-      ctx.fillText(nomeTraducao, CARTAO_LARGURA / 2, CARTAO_ALTURA - 170);
-      ctx.globalAlpha = 1;
+      ctx.font = '600 30px Manrope, sans-serif';
+      ctx.fillStyle = fraco;
+      ctx.fillText(nomeTraducao, CARTAO_LARGURA / 2, CARTAO_ALTURA - 192);
     }
 
     // O nome do app, pequeno, no pé.
-    ctx.font = '600 26px Nunito, sans-serif';
-    ctx.fillStyle = creme;
-    ctx.globalAlpha = 0.6;
-    ctx.fillText('Geração Eleita', CARTAO_LARGURA / 2, CARTAO_ALTURA - 80);
-    ctx.globalAlpha = 1;
+    ctx.font = '700 28px Manrope, sans-serif';
+    ctx.fillStyle = fraco;
+    ctx.fillText('Geração Eleita', CARTAO_LARGURA / 2, CARTAO_ALTURA - 96);
 
     return tela;
   }
@@ -354,7 +351,7 @@
       // sistema e o texto sai diferente do que a pessoa vê no app.
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
-        try { await Promise.all([document.fonts.load('700 84px Oswald'), document.fonts.load('600 30px Nunito')]); } catch (e) { /* segue com o que tiver */ }
+        try { await Promise.all([document.fonts.load('500 72px Literata'), document.fonts.load('800 44px Manrope')]); } catch (e) { /* segue com o que tiver */ }
       }
       const tela = await desenharCartaoVersiculo(ref, corpo);
       const blob = await new Promise((resolver) => tela.toBlob(resolver, 'image/png'));
