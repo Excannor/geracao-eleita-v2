@@ -72,3 +72,9 @@ Todas as telas seguem o estilo da primeira versão do redesenho (commit be99484)
 - nas telas de conteúdo longo (leitor, lição, Bíblia, notas) a página de leitura continua clara e confortável, como no leitor de be99484;
 - tema escuro: mesmo layout, a folha do topo vira #252724 e o resto fica no grafite suave.
 Referências exatas: as capturas da primeira versão em /tmp/claude-0/-home-user-geracao-eleita/f83429da-2006-5b51-8495-2381601c862d/scratchpad/app/final-*.png e o código de be99484 (git show be99484:src/estilo.css, camada REDESENHO; git show be99484:src/app/<arquivo>). Telas que não existiam na primeira versão (Bíblia inteira, versículos, célula, discipulado, painel, apoiar, Conhecer Jesus, Mais) seguem o mesmo padrão.
+
+## Ajuste do dono (30/09): o claro é claro e o escuro é escuro (vale sobre as duas decisões acima)
+O layout da primeira versão fica (folha do topo com saudação e botões redondos, cartões de destaque em sálvia, trilha com nós, rótulos e cartão de hoje), mas as cores de cada tema ficam coerentes com o tema:
+- **Tema claro:** o corpo (trilha e conteúdo) em fundo CLARO suave (#ececec, cartões #ffffff), igual ao tema novo; a FOLHA DO TOPO invertida, em grafite (ex.: #252724, texto #eef0ea, botões redondos #33352f), com os cartões sálvia por cima. Nós lidos pretos (#151615) com ícone branco, hoje em sálvia com anel, travados brancos com contorno e cadeado cinza, linha escura até hoje e pontilhada depois.
+- **Tema escuro:** o corpo em grafite suave (#1b1c1a, cartões #252724); a folha do topo em grafite um pouco mais claro (ex.: #2e302c) para se destacar sem virar um bloco branco; nós lidos em #eef0ea com ícone escuro, hoje em sálvia.
+- Nada de bloco preto no tema claro nem bloco branco no tema escuro. Valores finais escolhidos por contraste (texto ≥ 4,5:1, ícones de estado ≥ 3:1) e registrados na tabela de tokens.
