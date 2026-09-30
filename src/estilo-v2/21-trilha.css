@@ -13,92 +13,193 @@
   border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta-forte); box-shadow: none;
 }
 /* realce do que é de hoje: sálvia pálido listrado */
-.leitura-hoje, .cartao-hoje, .pop-no .fala-bento, :root[data-tema="escuro"] .pop-no .fala-bento,
+.leitura-hoje, .pop-no .fala-bento, :root[data-tema="escuro"] .pop-no .fala-bento,
 .lista-licoes .item-licao.proxima, .cj .pensamento-dia { background: var(--realce); }
 /* círculo de ícone em sálvia pálido */
-.toque-recebido > svg:first-child, .numero-unidade, .atalhos-conhecer svg:first-child { background: var(--salvia-palido); color: var(--salvia-texto); }
+.toque-recebido > svg:first-child, .atalhos-conhecer svg:first-child { background: var(--salvia-palido); color: var(--salvia-texto); }
 /* quebras bonitas (herdam) */
 .trilha, .pop-no, .cj, .tela-conhecer-lista { text-wrap: pretty; }
 .faixa-unidade .nome, .titulo-pop, .cj .textos > b, .lista-licoes .textos > span { text-wrap: balance; }
 
-/* ---------- trilha ---------- */
-/* o respiro do fim deixa o último cartão subir acima do botão flutuante .ir-atual */
-.trilha { padding-bottom: 56px; }
-.toque-recebido { gap: 12px; min-height: 64px; margin-bottom: 16px; padding: 10px 16px 10px 10px; font-weight: 600; }
-.toque-recebido > svg:first-child { box-sizing: content-box; padding: 11px; border-radius: 50%; }
-
+/* o cartão da leitura (também no dia do Conhecer Jesus) */
 .leitura-hoje { margin-bottom: 16px; padding: 20px; border: 0; border-radius: var(--raio-cartao); }
 .leitura-hoje .etiqueta { color: var(--salvia-texto); }
 .leitura-hoje .passagem-hoje { font-size: 1.375rem; font-weight: 800; }
 .leitura-hoje .tempo { margin-bottom: 14px; }
-.leitura-hoje .novo-na-fe { min-height: 44px; }
-.leitura-hoje.feita { gap: 12px; padding: 12px 12px 12px 14px; background: var(--cartao); }
-.leitura-hoje.feita small { font-size: .8125rem; font-weight: 500; overflow-wrap: normal; }
-.leitura-hoje .selo-feito { width: 44px; height: 44px; background: var(--salvia); color: var(--salvia-tinta); }
-.leitura-hoje.feita .botao { background: var(--campo); color: var(--tinta-forte); }
-.fala-bento.apresenta { margin: 0 4px 12px; color: var(--tinta-fraca); font-weight: 500; }
+.toque-recebido > svg:first-child { box-sizing: content-box; padding: 11px; border-radius: 50%; }
 
-/* a faixa da unidade vira cartão, com o número num círculo */
-.faixa-unidade, .faixa-unidade.travada { margin: 16px 0 8px; padding: 10px; align-items: center; overflow: visible; }
-.faixa-unidade .corpo-faixa { padding: 0 8px 0 2px; }
-.faixa-unidade .numero-unidade { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; font-size: 1.0625rem; font-weight: 800; }
-.aberta .numero-unidade { background: var(--salvia); color: var(--salvia-tinta); }
-.travada .numero-unidade { background: var(--campo); color: var(--tinta-fraca); }
-.faixa-unidade .rot { opacity: 1; color: var(--tinta-fraca); }
-.faixa-unidade .nome { font-size: 1rem; white-space: normal; }
-.faixa-unidade .guia, .faixa-unidade.travada .guia { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--campo); }
+/* =========================================================================
+   INÍCIO (decisão do dono, 30/09): o layout da primeira versão com sálvia, e cada tema
+   com as suas cores. Folha grafite no alto (saudação e dois cartões sálvia) e a trilha no
+   fundo do tema: clara no claro, grafite no escuro.
+   ========================================================================= */
+/* Nesta tela a folha já traz o retrato e a ofensiva: o topo global some. Quem está no
+   Conhecer Jesus não tem a folha e continua com o topo. */
+.topo:has(~ .corpo .folha-topo) { display: none; }
+.trilha { padding: 0 0 56px; }
+.trilha-caminho { position: relative; padding-top: 8px; }
 
-/* a estrada: faixa da cor do cartão, linha contínua até hoje e pontilhada depois */
-.nos { position: relative; padding: 40px 0 24px; }
-.estrada { position: absolute; inset: 0 auto auto 0; }
-.estrada path { fill: none; stroke-linecap: round; stroke-width: 3; }
+/* ---------- a folha do alto ---------- */
+.folha-topo {
+  --salvia-cheia: #c8da8c;
+  --preto: #151615;
+  /* grafite nos dois temas: no claro se destaca do fundo claro, no escuro é um tom acima */
+  --cartao: #252724; --campo: #33352f;
+  --tinta-forte: #eef0ea; --tinta: #d9dcd3; --tinta-fraca: #a4a99d;
+  --alerta: #ff8a80;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: calc(-16px - env(safe-area-inset-top)) 0 0;
+  padding: calc(20px + env(safe-area-inset-top)) 14px 16px;
+  border-radius: 0 0 36px 36px;
+  background: var(--cartao);
+  color: var(--tinta-forte);
+}
+:root[data-tema="escuro"] .folha-topo { --cartao: #2e302c; --campo: #3a3d37; }
+.saudacao { display: flex; align-items: center; gap: 12px; }
+.avatar-topo { flex: none; display: grid; place-items: center; width: 52px; height: 52px; overflow: hidden; border-radius: 50%; background: var(--salvia-cheia); color: var(--preto); text-decoration: none; }
+.avatar-topo svg { width: 24px; height: 24px; }
+.avatar-topo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.textos-saudacao { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.textos-saudacao b { overflow: hidden; color: var(--tinta-forte); font-size: 1.1875rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; white-space: nowrap; text-overflow: ellipsis; }
+.textos-saudacao span { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 500; white-space: nowrap; }
+.saudacao .botao-redondo { position: relative; flex: none; background: var(--campo); color: var(--tinta-forte); }
+.saudacao .botao-redondo .ponto { position: absolute; top: 11px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--alerta); box-shadow: 0 0 0 2px var(--campo); }
+@media (max-width: 374px) {
+  .saudacao { gap: 8px; }
+  .saudacao .botao-redondo { width: 44px; height: 44px; }
+  .avatar-topo { width: 48px; height: 48px; }
+}
+
+/* os dois cartões sálvia, com o botão redondo preto */
+.folha-topo .cartoes-hoje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+.cartao-salvia {
+  display: flex; align-items: center; gap: 8px; min-width: 0; height: 84px; padding: 0 12px 0 18px;
+  border: 0; border-radius: 26px; background: var(--salvia-cheia); color: var(--preto);
+  font: inherit; text-align: left; cursor: pointer;
+}
+.cartao-salvia:active { transform: scale(.98); }
+.textos-salvia { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.textos-salvia b { font-size: clamp(1.0625rem, 5.4vw, 1.375rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; }
+.textos-salvia b.subiu { animation: contar .5s var(--mola); }
+.textos-salvia span { font-size: .8125rem; font-weight: 600; line-height: 1.25; white-space: nowrap; }
+.redondo-preto { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--preto); color: #ffffff; }
+.redondo-preto svg { width: 20px; height: 20px; stroke-width: 2.2; }
+.redondo-preto .ico-chama { width: 28px; height: 28px; vertical-align: 0; color: #ff7a52; }
+.redondo-preto .ico-chama.apagada { color: #a4a99d; }
+@media (max-width: 374px) {
+  .cartao-salvia { padding: 0 10px 0 14px; }
+  .redondo-preto { width: 44px; height: 44px; }
+}
+
+.folha-topo .lendo-junto-linha { margin: -6px 0 0 4px; color: var(--tinta-fraca); }
+.folha-topo .fala-bento.apresenta { margin: -6px 0 0; padding: 10px 14px; border-radius: 20px; background: var(--campo); color: var(--tinta); font-size: .875rem; font-weight: 600; }
+.folha-topo .novo-na-fe { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; margin-top: -6px; padding: 8px 18px 8px 8px; border-radius: 999px; background: var(--campo); color: var(--tinta-forte); font-size: .875rem; font-weight: 600; line-height: 1.3; text-decoration: none; }
+.folha-topo .novo-na-fe svg { box-sizing: content-box; flex: none; width: 18px; height: 18px; margin: 0; padding: 7px; border-radius: 50%; background: var(--salvia-cheia); color: var(--preto); }
+.folha-topo .toque-recebido { gap: 12px; min-height: 56px; margin: 0; padding: 8px 16px 8px 8px; border-radius: 999px; background: var(--salvia-cheia); color: var(--preto); font-size: .875rem; font-weight: 600; }
+.folha-topo .toque-recebido svg { color: var(--preto); }
+.folha-topo .toque-recebido > svg:first-child { box-sizing: content-box; width: 18px; height: 18px; padding: 10px; border-radius: 50%; background: var(--preto); color: var(--salvia-cheia); }
+
+/* ---------- a faixa da unidade, escura ---------- */
+.trilha-caminho .faixa-unidade {
+  position: sticky; top: env(safe-area-inset-top); z-index: 20;
+  align-items: center; gap: 8px; margin: 12px -16px 0; padding: 12px 16px;
+  border-radius: 0; background: var(--fundo); color: var(--tinta-forte); overflow: visible;
+}
+.trilha-caminho .faixa-unidade:not(.aberta) { position: relative; top: auto; z-index: auto; margin: 10px 0 0; padding: 10px 10px 10px 12px; border-radius: 26px; background: var(--cartao); }
+.faixa-unidade .corpo-faixa { gap: 12px; padding: 0; }
+.faixa-unidade .numero-unidade { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--cartao); color: var(--salvia-texto); font-size: 1.0625rem; font-weight: 800; }
+.faixa-unidade:not(.aberta) .numero-unidade { background: var(--campo); }
+.faixa-unidade .rot { opacity: 1; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+.faixa-unidade .nome { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--tinta-forte); font-size: 1rem; font-weight: 700; line-height: 1.3; white-space: normal; }
+.faixa-unidade .guia, .faixa-unidade.travada .guia { width: 44px; height: 44px; flex: none; border: 0; border-radius: 50%; background: var(--cartao); color: var(--tinta-forte); }
+.faixa-unidade:not(.aberta) .guia { background: var(--campo); }
+.faixa-unidade .guia svg { width: 20px; height: 20px; }
+.faixa-unidade.travada .numero-unidade { color: var(--tinta-fraca); }
+.faixa-unidade.travada .nome { color: var(--tinta); }
+
+/* ---------- a estrada: faixa larga, linha clara até hoje e pontilhada depois ---------- */
+.nos { position: relative; padding: 34px 0 20px; }
+.estrada { position: absolute; inset: 0 auto auto 0; z-index: 0; overflow: visible; pointer-events: none; }
+.estrada path { fill: none; stroke-linecap: round; stroke-width: 2.5; }
 .estrada .faixa-estrada { stroke: var(--cartao); stroke-width: 18; }
 .linha-feita { stroke: var(--inverso); }
-.linha-adiante { stroke: var(--tinta-fraca); stroke-dasharray: 0 9; }
-.no-linha { margin-bottom: 24px; }
-.no-linha.hoje { margin-bottom: 40px; }
+.linha-adiante { stroke: var(--tinta-fraca); stroke-dasharray: 1 8; }
+.no-linha { z-index: 1; margin-bottom: 20px; }
+.no-linha.hoje { margin: 44px 0 52px; z-index: 3; }
 
-/* nós: lido escuro, hoje sálvia com anel de progresso, adiante no cartão com cadeado,
-   fecha-livro escuro com ícone sálvia */
+/* nós: lido claro com ícone escuro, hoje sálvia com anel, adiante escuro com cadeado */
 .no { width: 58px; height: 58px; }
-.no .face svg { width: 24px; height: 24px; stroke-width: 2.4; }
-.no.feito.com-registro { --cor: var(--inverso); }
-.no.fecha-livro.feito { --cor: var(--barra); color: var(--salvia); box-shadow: inset 0 0 0 2px var(--salvia); }
-.no.travado, .no.travado:active, .no.travado.aberto { background: var(--cartao); box-shadow: inset 0 0 0 1.5px var(--contorno); }
-.no.travado .face svg { width: 20px; stroke-width: 2; }
-.no.atual { width: 64px; height: 64px; }
-.no.atual:not(.feito) { --cor: var(--salvia); }
-.no .anel-atual { inset: -10px; border-color: var(--salvia-palido); animation: none; --progresso: var(--salvia-texto); }
+.no .face svg { width: 22px; height: 22px; stroke-width: 2.4; }
+.no.feito, .no.feito.fecha-livro, .no.feito.com-registro { --cor: var(--inverso); color: var(--inverso-tinta); }
+.no.feito.com-registro .face svg, .no.fecha-livro .face svg { stroke-width: 2; }
+.no.travado, .no.travado:active, .no.travado.aberto { background: var(--cartao); color: var(--tinta-fraca); box-shadow: inset 0 0 0 1.5px var(--contorno); }
+.no.travado .face svg { width: 18px; height: 18px; stroke-width: 2; }
+.no.atual { width: 64px; height: 64px; box-shadow: 0 0 0 14px var(--salvia-palido); }
+.no.atual:not(.feito) { --cor: var(--salvia); color: var(--salvia-tinta); }
+.no.atual .face svg { width: 26px; height: 26px; }
+.no .anel-atual {
+  inset: -7px; border: 0; animation: none;
+  background: conic-gradient(var(--salvia-texto) var(--parte, 0%), var(--contorno) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+}
+.no .anel-atual::before { display: none; }
 
 /* "Dia N" e a passagem, ao lado do nó, do lado onde sobra estrada */
-.rotulo-dia { position: absolute; top: 29px; display: flex; flex-direction: column; gap: 1px; max-width: calc(50% + var(--xa) - 46px); transform: translateY(-50%); line-height: 1.3; pointer-events: none; font-size: .75rem; color: var(--tinta-fraca); }
-.lado-esq { right: calc(50% - var(--x) + 41px); align-items: flex-end; text-align: right; }
-.lado-dir { left: calc(50% + var(--x) + 41px); }
-.rotulo-dia b { color: var(--tinta); font-size: .8125rem; }
+.rotulo-dia { position: absolute; top: 50%; display: flex; flex-direction: column; max-width: calc(50% + var(--xa, 0px) - 47px); transform: translateY(-50%); line-height: 1.25; pointer-events: none; }
+.lado-dir.rotulo-dia { left: calc(50% + var(--x, 0px) + 43px); align-items: flex-start; text-align: left; }
+.lado-esq.rotulo-dia { right: calc(50% - var(--x, 0px) + 43px); align-items: flex-end; text-align: right; }
+.rotulo-dia b { color: var(--tinta); font-size: .8125rem; font-weight: 700; }
+.rotulo-dia span { color: var(--tinta-fraca); font-size: .75rem; font-weight: 500; }
 .rotulo-dia.lido b { color: var(--tinta-forte); }
-.rotulo-dia .fechou, .cartao-hoje b { color: var(--salvia-texto); font-weight: 700; }
-/* o cartão de hoje, ao lado do nó */
-.rotulo-dia.cartao-hoje { top: 32px; max-width: calc(50% + var(--xa) - 60px); padding: 12px 16px; border-radius: 20px; color: var(--tinta-forte); font-size: .9375rem; font-weight: 700; }
-.cartao-hoje.lado-esq { right: calc(50% - var(--x) + 54px); }
-.cartao-hoje.lado-dir { left: calc(50% + var(--x) + 54px); }
+.rotulo-dia .fechou { color: var(--salvia-texto); font-weight: 700; }
 
-/* o balão "Começar" em cima do nó de hoje e o "Abrir" do baú */
-.balao, .balao.balao-bau { bottom: calc(100% + 18px); padding: 6px 14px; border: 0; border-radius: 999px; background: var(--inverso); color: var(--inverso-tinta); font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
-.balao::after { border: 0; background: var(--inverso); }
+/* o cartão de hoje, ao lado do nó de hoje */
+.cartao-no-hoje {
+  position: absolute; top: 50%; z-index: 2; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 2px;
+  width: min(200px, calc(50% + var(--xa, 0px) - 50px));
+  padding: 12px 12px 12px 16px; border-radius: 24px; background: var(--cartao); color: var(--tinta-forte);
+}
+.cartao-no-hoje.lado-esq { right: calc(50% - var(--x, 0px) + 50px); }
+.cartao-no-hoje.lado-dir { left: calc(50% + var(--x, 0px) + 50px); }
+.cartao-no-hoje::after { content: ''; position: absolute; top: 50%; width: 12px; height: 12px; margin-top: -6px; background: var(--cartao); transform: rotate(45deg); }
+.cartao-no-hoje.lado-esq::after { right: -5px; }
+.cartao-no-hoje.lado-dir::after { left: -5px; }
+.rot-hoje { color: var(--salvia-texto); font-size: .75rem; font-weight: 700; }
+.cartao-no-hoje b { color: var(--tinta-forte); font-size: 1.0625rem; font-weight: 700; line-height: 1.25; }
+.sub-hoje { color: var(--tinta-fraca); font-size: .75rem; font-weight: 500; line-height: 1.35; }
+.botao-pilula {
+  display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; margin-top: 8px; padding: 0 12px;
+  border: 0; border-radius: 999px; background: var(--inverso); color: var(--inverso-tinta);
+  font: inherit; font-size: .875rem; font-weight: 700; cursor: pointer;
+}
+.botao-pilula svg { width: 16px; height: 16px; stroke-width: 2.2; }
+
+/* baú, troféu e o balão "Abrir" */
+.balao, .balao.balao-bau { bottom: calc(100% + 18px); padding: 6px 14px; border: 0; border-radius: 999px; background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
+.balao::after { border: 0; background: var(--salvia); }
 .no-bau svg, .no-marco .arte-trofeu { width: 64px; }
 .no-marco { padding: 8px; background: var(--cartao); box-shadow: inset 0 0 0 1.5px var(--contorno); }
-.no-marco.ganho { box-shadow: inset 0 0 0 2px; }
-.rotulo-no { margin-top: 12px; font-size: .8125rem; font-weight: 600; }
-.praticar-unidade { min-height: 44px; padding: 0 18px 0 14px; font-size: .875rem; text-decoration: none; }
+.no-marco.ganho { box-shadow: inset 0 0 0 2px var(--salvia); }
+.rotulo-no { margin-top: 12px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+.praticar-unidade { min-height: 44px; padding: 0 18px 0 14px; color: var(--salvia-texto); font-size: .875rem; text-decoration: none; }
 
 /* o balão do dia: cartão solto, abaixo do nó e do cartão de hoje (nunca por cima dele) */
-.pop-no, .pop-no.adiante { top: calc(100% + 12px); padding: 20px; border: 0; background: var(--cartao); color: var(--tinta-fraca); }
+.pop-no, .pop-no.adiante { top: calc(100% + 12px); padding: 20px; border: 0; border-radius: 24px; background: var(--cartao); color: var(--tinta-fraca); box-shadow: var(--sombra-flutuante); }
 .no-linha.hoje .pop-no { top: calc(100% + 24px); }
 .pop-no::before, .pop-no.adiante::before { top: -7px; border: 0; background: var(--cartao); }
-.pop-no .titulo-pop { color: var(--tinta-forte); font-weight: 800; }
+.pop-no .titulo-pop, .pop-no.adiante .titulo-pop { color: var(--tinta-forte); font-weight: 800; }
 .pop-no .sub-pop, .pop-no.adiante .sub-pop { color: inherit; font-weight: 500; opacity: 1; }
 .pop-no .fala-bento { border: 0; margin: 8px 0 4px; padding: 12px 14px; border-radius: 18px; color: var(--tinta-forte); font-weight: 600; }
-.ir-atual { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--inverso); color: var(--inverso-tinta); box-shadow: var(--sombra-flutuante); }
+
+/* a seta que volta ao dia de hoje */
+.trilha ~ .ir-atual { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--inverso); color: var(--inverso-tinta); box-shadow: var(--sombra-flutuante); }
+.trilha ~ .ir-atual svg { width: 22px; height: 22px; }
 
 /* folha da unidade */
 .cabeca-folha-unidade { gap: 16px; margin-bottom: 16px; }
@@ -150,4 +251,7 @@
 .perguntas-fixas { display: grid; gap: 10px; margin: 8px 0 0; padding-left: 20px; }
 .cj .leitura-hoje { margin-top: 16px; }
 
-@media (min-width: 860px) { .trilha { padding-bottom: 72px; } }
+@media (min-width: 860px) {
+  .trilha { padding-bottom: 72px; }
+  .folha-topo { margin-top: -16px; }
+}

@@ -63,6 +63,50 @@
     return Object.keys(marcados).filter((k) => marcados[k] === hoje).map(Number).sort((a, b) => b - a)[0];
   };
 
+  // Ao lado de cada nó vai o "Dia N" e a passagem. Com as duas trilhas no mesmo dia, os
+  // livros vão abreviados, para o rótulo caber ao lado do nó sem empurrar o caminho.
+  const ABREVIATURAS = {
+    'Gênesis': 'Gn', 'Êxodo': 'Êx', 'Levítico': 'Lv', 'Números': 'Nm', 'Deuteronômio': 'Dt', 'Josué': 'Js',
+    'Juízes': 'Jz', 'Rute': 'Rt', '1 Samuel': '1Sm', '2 Samuel': '2Sm', '1 Reis': '1Rs', '2 Reis': '2Rs',
+    '1 Crônicas': '1Cr', '2 Crônicas': '2Cr', 'Esdras': 'Ed', 'Neemias': 'Ne', 'Ester': 'Et', 'Jó': 'Jó',
+    'Salmos': 'Sl', 'Provérbios': 'Pv', 'Eclesiastes': 'Ec', 'Cânticos': 'Ct', 'Isaías': 'Is', 'Jeremias': 'Jr',
+    'Lamentações': 'Lm', 'Ezequiel': 'Ez', 'Daniel': 'Dn', 'Oseias': 'Os', 'Joel': 'Jl', 'Amós': 'Am',
+    'Obadias': 'Ob', 'Jonas': 'Jn', 'Miqueias': 'Mq', 'Naum': 'Na', 'Habacuque': 'Hc', 'Sofonias': 'Sf',
+    'Ageu': 'Ag', 'Zacarias': 'Zc', 'Malaquias': 'Ml', 'Mateus': 'Mt', 'Marcos': 'Mc', 'Lucas': 'Lc',
+    'João': 'Jo', 'Atos': 'At', 'Romanos': 'Rm', '1 Coríntios': '1Co', '2 Coríntios': '2Co', 'Gálatas': 'Gl',
+    'Efésios': 'Ef', 'Filipenses': 'Fp', 'Colossenses': 'Cl', '1 Tessalonicenses': '1Ts',
+    '2 Tessalonicenses': '2Ts', '1 Timóteo': '1Tm', '2 Timóteo': '2Tm', 'Tito': 'Tt', 'Filemom': 'Fm',
+    'Hebreus': 'Hb', 'Tiago': 'Tg', '1 Pedro': '1Pe', '2 Pedro': '2Pe', '1 João': '1Jo', '2 João': '2Jo',
+    '3 João': '3Jo', 'Judas': 'Jd', 'Apocalipse': 'Ap',
+  };
+  const NOMES_LIVROS = Object.keys(ABREVIATURAS).sort((a, b) => b.length - a.length);
+  const abreviar = (ref) => NOMES_LIVROS.reduce((t, nome) => t.split(nome).join(ABREVIATURAS[nome]), String(ref || ''));
+  const passagemCurta = (dia) => (dia.antigo && dia.novo ? abreviar(dia.antigo) + ' · ' + abreviar(dia.novo)
+    : (dia.antigo || dia.novo).length > 22 ? abreviar(dia.antigo || dia.novo) : (dia.antigo || dia.novo));
+
+  // As trilhas do dia (Antigo e Novo): quantas já foram marcadas hoje, pela fração que a
+  // lição guarda (a mesma que enche o anel do nó).
+  function partesDoDia(numero) {
+    const dia = D.plano[numero - 1];
+    const trilhas = [dia.antigo, dia.novo].filter(Boolean);
+    const lidas = Math.round((CC.fracaoDoDia ? CC.fracaoDoDia(numero) : (CC.leu(numero) ? 1 : 0)) * trilhas.length);
+    return { total: trilhas.length, lidas };
+  }
+
+  // O cartão ao lado do nó de hoje: a passagem e o botão de seguir.
+  function cartaoDoNoDeHoje(numero, feito, lado) {
+    const jaLeuHoje = !feito && !!diaLidoHoje();
+    const dia = D.plano[numero - 1];
+    const { lidas } = partesDoDia(numero);
+    const acao = feito ? 'Revisar' : (lidas ? 'Continuar' : 'Começar');
+    return '<section class="cartao-no-hoje lado-' + lado + '" aria-label="' + (jaLeuHoje ? 'Próxima leitura' : 'Leitura de hoje') + '">'
+      + '<span class="rot-hoje">' + (jaLeuHoje ? 'Próximo' : 'Hoje') + ' · Dia ' + numero + '</span>'
+      + '<b>' + refHtml(passagemDe(dia)) + '</b>'
+      + '<span class="sub-hoje">' + (feito ? 'Leitura feita' : 'cerca de ' + CC.minutosDoDia(dia) + ' min') + '</span>'
+      + '<button class="botao-pilula" data-abrir-dia="' + numero + '">' + acao + CC.ico('avancar') + '</button>'
+      + '</section>';
+  }
+
 
   // ---------- nós ----------
   function iconeDoDia(numero, feito, atual) {
@@ -93,17 +137,15 @@
     const x0 = deslocamento(passo);
     const x = atual ? (x0 > 0 || (x0 === 0 && passo % 8 === 0) ? AMPLITUDE : -AMPLITUDE) : x0;
     const lado = ladoDoRotulo(x, passo);
-    const lidoHoje = diaLidoHoje();
-    // Repete a legenda do botão: fora do leitor de tela. O de hoje é um cartão.
-    const rotulo = '<span class="rotulo-dia lado-' + lado + (feito ? ' lido' : '') + (atual ? ' cartao-hoje' : '') + '" aria-hidden="true">'
-      + '<b>' + (atual ? (lidoHoje && lidoHoje !== numero ? 'Próximo' : 'Hoje') + ' · ' : '') + 'Dia ' + numero + '</b>'
-      + [dia.antigo, dia.novo].filter(Boolean).map((r) => '<span>' + refHtml(r) + '</span>').join('')
-      + (fechados.length && feito ? '<span class="fechou">Fecha ' + CC.esc(fechados.join(' e ')) + '</span>' : '')
-      + '</span>';
+    // Repete a legenda do botão: fora do leitor de tela. O de hoje é um cartão com o botão.
+    const rotulo = atual ? cartaoDoNoDeHoje(numero, feito, lado)
+      : '<span class="rotulo-dia lado-' + lado + (feito ? ' lido' : '') + '" aria-hidden="true">'
+        + '<b>Dia ' + numero + '</b><span>' + refHtml(passagemCurta(dia)) + '</span>'
+        + (fechados.length && feito ? '<span class="fechou">Fecha ' + CC.esc(fechados.join(' e ')) + '</span>' : '')
+        + '</span>';
 
-    return '<div class="no-linha' + (atual ? ' com-balao hoje' : '') + '" style="--x:' + x + 'px;--xa:' + Math.abs(x) + 'px">'
+    return '<div class="no-linha' + (atual ? ' hoje' : '') + '" style="--x:' + x + 'px;--xa:' + Math.abs(x) + 'px">'
       + '<div class="deslocado">'
-      + (atual ? '<span class="balao">' + (feito ? 'Revisar' : 'Começar') + '</span>' : '')
       + '<button class="' + classes.join(' ') + '" data-dia="' + numero + '" '
       + 'aria-label="' + CC.esc(legenda) + '"' + (atual ? ' aria-current="step"' : '') + '>'
       + (atual ? '<span class="anel-atual" aria-hidden="true" style="--parte:' + Math.round((CC.fracaoDoDia ? CC.fracaoDoDia(numero) : 0) * 100) + '%"></span>' : '')
@@ -155,41 +197,70 @@
       + '</div>';
   }
 
-  // ---------- leitura de hoje ----------
-  // Uma ação só no alto da trilha: a leitura do dia. Antes eram três atalhos (amigos, missões
-  // e passos) que repetiam as abas e cortavam o texto. Depois de ler, o cartão encolhe numa
-  // linha. Amigos aparecem só como sinal de quem já leu hoje, sem número nem comparação.
-  function cartaoLeituraDeHoje(atual, amigos) {
+  // ---------- a folha do alto ----------
+  // Uma folha clara no alto da trilha, com a saudação e dois cartões sálvia: a leitura de
+  // hoje (quantas das partes do dia já foram) e a ofensiva. Tocar no primeiro abre a lição;
+  // no segundo, a folha da chama. Amigos aparecem só como sinal de quem já leu hoje, sem
+  // número nem comparação.
+  let ofensivaVista = null;
+  function folhaDoTopo(atual, amigos, faixaToque) {
     // Quem já leu hoje vê a leitura feita, e não o dia seguinte oferecido como se faltasse.
-    const hoje = CC.hojeIso();
-    const marcados = CC.ler('marcadoEm', {});
-    const lidoHoje = Object.keys(marcados).filter((k) => marcados[k] === hoje).map(Number).sort((a, b) => b - a)[0];
+    const lidoHoje = diaLidoHoje();
     const feito = !!lidoHoje;
     const numero = feito ? lidoHoje : atual;
     const dia = D.plano[numero - 1];
+    const { total, lidas } = partesDoDia(numero);
+    const seq = CC.sequencia();
+    const subiu = ofensivaVista !== null && seq.atual > ofensivaVista;
+    ofensivaVista = seq.atual;
+
     const quemLeu = ((amigos && amigos.amigos) || []).filter((a) => a.leuHoje);
     const juntos = quemLeu.length
       ? '<span class="lendo-junto-linha"><span class="rostos">' + quemLeu.slice(0, 3).map((a) => CC.retratoAmigo(a, 'mini')).join('') + '</span>'
         + CC.esc(quemLeu.length === 1 ? quemLeu[0].nome.split(' ')[0] + ' já leu hoje' : quemLeu.length + ' amigos já leram hoje') + '</span>'
       : '';
-    if (feito) {
-      return '<div class="leitura-hoje feita">'
-        + '<span class="selo-feito">' + CC.ico('certo') + '</span>'
-        + '<span class="texto"><b>Leitura de hoje feita</b><small>Dia ' + numero + ' · ' + refHtml(passagemDe(dia)) + '</small></span>'
-        + '<button class="botao plano pequeno" data-abrir-dia="' + numero + '">Rever</button>'
-        + '</div>' + juntos;
-    }
-    const novo = CC.ler('lidos', []).length < 3 && CC.ler('licoes', []).length < D.licoes.length;
+    const novo = !feito && CC.ler('lidos', []).length < 3 && CC.ler('licoes', []).length < D.licoes.length;
     const primeira = !CC.ler('lidos', []).length;
-    return (primeira ? '<p class="fala-bento pequena apresenta">Que bom ter você aqui! Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
-      + '<div class="leitura-hoje">'
-      + '<span class="etiqueta">Leitura de hoje · Dia ' + atual + '</span>'
-      + '<b class="passagem-hoje">' + refHtml(passagemDe(dia)) + '</b>'
-      + '<small class="tempo">cerca de ' + CC.minutosDoDia(dia) + ' min</small>'
-      + '<button class="botao" data-abrir-dia="' + atual + '">Começar</button>'
+    const nome = String((CC.apelido && CC.apelido()) || (CC.quem || {}).nome || '').trim().split(/\s+/)[0];
+    const foto = CC.foto();
+    const servido = location.protocol.startsWith('http');
+    const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
+
+    const saudacao = '<header class="saudacao">'
+      + '<a class="avatar-topo" href="#/perfil" aria-label="Seu perfil">'
+      + (foto ? '<img src="' + CC.esc(foto) + '" alt="">' : CC.ico('pessoa')) + '</a>'
+      + '<div class="textos-saudacao"><b>' + CC.esc(primeira ? 'Bem-vindo!' : (nome ? 'Olá, ' + nome + '!' : 'Olá! Bora ler?')) + '</b>'
+      + '<span>Dia ' + numero + ' de ' + D.plano.length + ' do plano</span></div>'
+      + (servido
+        ? '<a class="botao-redondo" href="#/novidades" aria-label="Juntos' + (pendencias ? ', há novidades' : '') + '">'
+          + CC.ico('balao') + (pendencias ? '<i class="ponto"></i>' : '') + '</a>'
+          + '<a class="botao-redondo" href="#/config/notificacoes" aria-label="Lembretes">' + CC.ico('sino') + '</a>'
+        : '')
+      + '</header>';
+
+    const rotuloLeitura = feito
+      ? 'Leitura de hoje feita. Rever o dia ' + numero
+      : 'Leitura de hoje, dia ' + numero + ': ' + passagemDe(dia) + ', ' + lidas + ' de ' + total + ' lidas';
+    const cartoes = '<div class="cartoes-hoje leitura-hoje">'
+      + '<button class="cartao-salvia" data-abrir-dia="' + numero + '" aria-label="' + CC.esc(rotuloLeitura) + '">'
+      + '<span class="textos-salvia"><b>' + lidas + ' de ' + total + '</b>'
+      + '<span>' + (total === 1 ? 'leitura hoje' : 'leituras hoje') + '</span></span>'
+      + '<span class="redondo-preto" aria-hidden="true">' + CC.ico(feito ? 'certo' : 'avancar') + '</span></button>'
+      + '<button class="cartao-salvia" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva, '
+      + CC.esc(CC.estagioDaChama(seq.atual).nome) + '">'
+      + '<span class="textos-salvia"><b' + (subiu ? ' class="subiu"' : '') + '>' + CC.plural(seq.atual, 'dia', 'dias') + '</b>'
+      + '<span>seguidos</span></span>'
+      + '<span class="redondo-preto" aria-hidden="true">' + CC.icoChama(seq.atual) + '</span></button>'
+      + '</div>';
+
+    return '<section class="folha-topo" aria-label="Hoje">'
+      + saudacao
+      + faixaToque
+      + (primeira ? '<p class="fala-bento pequena apresenta">Que bom ter você aqui! Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
+      + cartoes
       + (novo ? '<a class="novo-na-fe" href="#/passos">' + CC.ico('bandeira') + 'Novo na fé? Comece pelos Primeiros passos</a>' : '')
       + juntos
-      + '</div>';
+      + '</section>';
   }
 
   // ---------- a tela ----------
@@ -226,9 +297,8 @@
     }).join('');
 
     raiz.innerHTML = '<div class="trilha">'
-      + faixaToque
-      + cartaoLeituraDeHoje(atual, amigos)
-      + corpo + '</div>'
+      + folhaDoTopo(atual, amigos, faixaToque)
+      + '<div class="trilha-caminho">' + corpo + '</div></div>'
       + '<button class="ir-atual" data-ir-atual hidden aria-label="Voltar ao dia de hoje">' + CC.ico('baixo') + '</button>';
 
     raiz.querySelectorAll('[data-dia]').forEach((el) => {
@@ -250,6 +320,7 @@
     raiz.querySelectorAll('[data-abrir-dia]').forEach((el) => {
       el.onclick = () => CC.abrirLicao(Number(el.dataset.abrirDia));
     });
+    raiz.querySelectorAll('[data-ofensiva]').forEach((el) => { el.onclick = CC.folhaOfensiva; });
     const convidar = raiz.querySelector('[data-convidar]');
     if (convidar) convidar.onclick = () => CC.convidar();
     const verToque = raiz.querySelector('[data-ver-toque]');
