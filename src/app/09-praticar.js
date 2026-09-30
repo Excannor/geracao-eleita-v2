@@ -67,15 +67,17 @@
 
     // A unidade de agora ganha o destaque; as outras ficam numa lista só, sem pilha de cartões.
     const daVez = jogaveis.find((u) => u.numero === atual) || jogaveis[0];
-    // Cabeçalho: voltar para os Desafios (de onde o Praticar se abre) e o título no meio.
-    // O destaque é um cartão com a unidade em bold e o botão redondo sálvia que começa a rodada.
-    raiz.innerHTML = CC.botaoVoltar('Desafios') + '<h1>Praticar</h1>'
+    // Cabeçalho na folha do alto (.folha-desafios, só apresentação; 23-desafios.css): voltar
+    // para os Desafios (de onde o Praticar se abre), o título no meio e, embaixo, o que é o
+    // Praticar. O destaque é o cartão do Início: a unidade em bold e o botão redondo preto
+    // que começa a rodada.
+    raiz.innerHTML = '<div class="folha-desafios">' + CC.botaoVoltar('Desafios') + '<h1>Praticar</h1>'
+      + '<p class="subtitulo-tela">Rodadas de ' + POR_SESSAO + ' perguntas, uns 2 minutos, pra guardar versículos na memória.</p>'
       + '<div class="cabeca-pratica c-' + daVez.cor + '">'
-      + '<div class="textos"><span class="etiqueta">' + nbUnidade(daVez.titulo) + '</span>'
-      + '<b class="unidade-pratica">Unidade ' + daVez.numero + '</b>'
-      + '<p>Rodadas de ' + POR_SESSAO + ' perguntas, uns 2 minutos, pra guardar versículos na memória.</p></div>'
-      + '<button class="botao-redondo salvia" data-unidade="' + daVez.numero + '" aria-label="Praticar a unidade ' + daVez.numero + '">' + CC.ico('alvo') + '</button>'
-      + '</div>'
+      + '<div class="textos"><b class="unidade-pratica">Unidade ' + daVez.numero + '</b>'
+      + '<span class="etiqueta">' + nbUnidade(daVez.titulo) + '</span></div>'
+      + '<button class="botao-redondo" data-unidade="' + daVez.numero + '" aria-label="Praticar a unidade ' + daVez.numero + '">' + CC.ico('alvo') + '</button>'
+      + '</div></div>'
       + CC.tituloSecao('Todas as unidades')
       + '<div class="lista-pratica caixa-lista">' + jogaveis.map(cartao).join('') + '</div>';
 

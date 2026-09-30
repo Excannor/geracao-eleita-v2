@@ -35,26 +35,25 @@
 .folha-desafios { margin: -52px -16px 20px; padding: 40px 30px 24px; }
 
 /* o cartão de destaque do Início: branco no claro, sálvia no escuro, tinta escura; o número
-   em bold e, à direita, o baú */
-.cabeca-missoes {
+   em bold e, à direita, o baú (Desafios) ou o botão redondo preto que começa a rodada
+   (Praticar), que vale para o cartão todo, como no Início */
+.cabeca-missoes, .cabeca-pratica {
   position: relative; display: flex; align-items: center; gap: 12px; min-height: 84px; margin: 0; padding: 12px 12px 12px 20px;
   border: 0; border-radius: 26px; background: var(--folha-destaque); color: var(--salvia-tinta); box-shadow: none;
 }
-.cabeca-missoes .textos { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.placar-missoes, .placar-missoes small { color: inherit; font-size: clamp(1.0625rem, 5.4vw, 1.375rem); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; }
-.cabeca-missoes p { display: block; margin: 0; color: inherit; font-size: .8125rem; font-weight: 600; line-height: 1.3; opacity: 1; text-wrap: balance; }
+.cabeca-missoes .textos, .cabeca-pratica .textos { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.placar-missoes, .placar-missoes small, .unidade-pratica { color: inherit; font-size: clamp(1.0625rem, 5.4vw, 1.375rem); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; }
+.cabeca-missoes p, .cabeca-pratica .etiqueta { display: block; margin: 0; color: inherit; font-size: .8125rem; font-weight: 600; line-height: 1.3; opacity: 1; text-wrap: balance; }
 .bau-cabeca { flex: none; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--folha); }
 .bau-cabeca svg { width: 44px; }
-/* o cabeçalho do Praticar: cartão com a unidade em bold e o botão redondo sálvia */
-.cabeca-pratica { display: flex; align-items: flex-end; gap: 16px; padding: 20px 20px 20px 24px; }
-.cabeca-pratica .textos { flex: 1; min-width: 0; }
-.cabeca-pratica p { margin: 6px 0 0; color: var(--tinta-fraca); font-weight: 500; opacity: 1; }
-.unidade-pratica { display: block; color: var(--tinta-forte); font-size: 2.5rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; }
-.cabeca-pratica .etiqueta { margin: 0 0 4px; }
+.cabeca-pratica .botao-redondo, .cabeca-pratica .botao-redondo:hover { position: static; background: var(--salvia-tinta); color: #fff; }
+.cabeca-pratica .botao-redondo svg { width: 20px; height: 20px; stroke-width: 2.2; }
+.cabeca-pratica .botao-redondo::after { content: ''; position: absolute; inset: 0; border-radius: 26px; }
+.cabeca-pratica:has(:active) { transform: scale(.98); }
 
 /* ---------- peças do corpo ---------- */
 /* cartão: cor do cartão, raio grande, sem borda nem sombra */
-.cabeca-pratica, .lista-missoes, .missao-convite, .cartao-praticar, .dsf-card, .quiz .verso, .quiz .premio {
+.lista-missoes, .missao-convite, .cartao-praticar, .dsf-card, .quiz .verso, .quiz .premio {
   margin: 0; border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta); box-shadow: none;
 }
 /* círculo de ícone de 48px: neutro; sálvia quando feito ou quando é a vez; sálvia pálido no atalho */
@@ -88,7 +87,7 @@
 
 /* ---------- os blocos da tela dos Desafios ---------- */
 .bloco-missoes, .cartao-praticar { margin-top: 32px; }
-.folha-desafios + .bloco-missoes { margin-top: 12px; }
+.folha-desafios + .bloco-missoes, .folha-desafios + .titulo-secao { margin-top: 12px; }
 /* título do bloco numa linha só: se a pílula não couber ao lado ("Lendo junto na semana" a
    360px), ela desce para baixo do título, em vez de o título quebrar */
 .titulo-bloco { flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 12px; }
@@ -150,10 +149,13 @@
 .dsf-sobre { margin: 16px 0 0; border-top: 1px solid var(--contorno); }
 .dsf-sobre summary { padding: 14px 0; color: var(--tinta-forte); }
 
-/* ---------- Praticar: lista das unidades ---------- */
+/* ---------- Praticar: a lista das unidades; a da vez com o realce do "hoje" ---------- */
 .lista-pratica.caixa-lista { overflow: hidden; }
 .lista-pratica.caixa-lista .cartao-pratica { align-items: flex-start; min-height: 80px; padding: 16px; }
 .lista-pratica.caixa-lista .cartao-pratica:hover { background: var(--campo); }
+/* (sobre as listras do realce, a legenda desce para a tinta fraca da folha: 4,5:1 ou mais) */
+.lista-pratica.caixa-lista .cartao-pratica:first-child:not(.adiante) { --tinta-fraca: var(--folha-tinta-fraca); background: var(--realce); }
+.lista-pratica.caixa-lista .cartao-pratica:first-child:not(.adiante) .rot { color: var(--salvia-texto); }
 .cartao-pratica .rot, .cartao-pratica.adiante .rot { color: var(--tinta-fraca); }
 .lista-pratica.caixa-lista .cartao-pratica b { margin: 2px 0; font-size: 1rem; font-weight: 700; line-height: 1.3; text-wrap: pretty; }
 
@@ -191,7 +193,8 @@
 .quiz .premio .cabeca { background: none; color: var(--tinta-fraca); }
 .quiz .conquista-linha { background: var(--realce); }
 
-/* celular pequeno: as linhas das listas apertam o recuo, e o texto ganha a largura */
+/* celular pequeno: as linhas das listas apertam o recuo, para o nome da unidade caber
+   inteiro ("Daniel a Malaquias · Apocalipse") em vez de deixar uma palavra sozinha */
 @media (max-width: 374px) {
-  .missao, .missao-convite, .cartao-praticar, .dsf-item { gap: 10px; padding-inline: 14px 12px; }
+  .missao, .missao-convite, .cartao-praticar, .dsf-item, .lista-pratica.caixa-lista .cartao-pratica { gap: 10px; padding-inline: 14px 12px; }
 }
