@@ -119,7 +119,7 @@
 
 /* troféus: estante de cartões; a arte ganha em sálvia, a que falta em cinza que se vê. O nome
    em até duas linhas equilibradas e a contagem no pé do cartão, alinhada com a dos vizinhos */
-.trofeu { grid-template-rows: auto 1fr auto; gap: 6px; padding: 16px 6px 14px; border-radius: 24px; }
+.trofeu { grid-template-rows: auto 1fr auto; gap: 6px; padding: 16px 6px 14px; border-radius: 26px; }
 .estante .trofeu b { align-self: start; text-wrap: balance; }
 .trofeu span { font-size: .75rem; }
 .trofeu .arte-trofeu { --cor: var(--salvia); --cor-3d: var(--salvia-texto); --trilho: color-mix(in srgb, var(--tinta-fraca) 30%, var(--cartao)); }
@@ -159,7 +159,7 @@
 .cartao-push .acoes { margin-top: 16px; }
 
 [data-rota=config] .opcao-traducao span { text-wrap: balance; }
-.opcao-traducao { position: relative; min-height: 72px; padding: 16px 60px 16px 20px; border: 0; border-radius: 24px; }
+.opcao-traducao { position: relative; min-height: 72px; padding: 16px 60px 16px 20px; border: 0; border-radius: var(--raio-cartao); }
 .opcao-traducao::after { content: ''; position: absolute; top: 50%; right: 20px; width: 24px; height: 24px; margin-top: -12px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--tinta-fraca); }
 .opcao-traducao[aria-pressed=true] { background: var(--realce); }
 .opcao-traducao[aria-pressed=true]::after { background: var(--cartao); box-shadow: inset 0 0 0 7px var(--inverso); }
@@ -168,7 +168,7 @@
 
 /* painel: os quatro números são cartões de destaque na folha */
 .folha-perfil .painel-resumo { gap: 10px; margin: 16px 0 0; }
-.painel-cartao { padding: 16px; border-radius: 24px; }
+.painel-cartao { padding: 16px; border-radius: 26px; }
 .painel-cartao strong { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; }
 .painel-cartao strong.texto { padding: 10px 0 8px; font-size: 1rem; font-weight: 700; text-wrap: balance; }
 .painel-cartao small em { display: block; font-weight: 500; }
@@ -192,7 +192,7 @@
 .folha-perfil .cabeca-secao h1 { display: flex; align-items: center; justify-content: center; min-height: 48px; margin: 0 0 8px; padding: 0 56px; font-size: 1.375rem; }
 .folha-perfil .cabeca-secao p { max-width: 34ch; margin: 0 auto; color: var(--folha-tinta-fraca); font-size: .9375rem; font-weight: 500; text-wrap: balance; }
 
-:is([data-rota=explorar], [data-rota=secao], [data-rota=busca], [data-rota=perfil]) .item { padding: 18px 20px; border-radius: 24px; }
+:is([data-rota=explorar], [data-rota=secao], [data-rota=busca], [data-rota=perfil]) .item { padding: 18px 20px; border-radius: var(--raio-cartao); }
 .item b { text-wrap: balance; }
 .item .chip { border-radius: 14px; }
 .item .destaque { display: block; font-family: var(--fonte-biblia); font-style: normal; font-weight: 400; }
