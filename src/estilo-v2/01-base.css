@@ -249,6 +249,13 @@ a.linha-config:hover, button.linha-config:hover { background: var(--campo); }
 .selo-status.leu, :root[data-tema="escuro"] .selo-status.leu { padding-left: 8px; background: none; color: var(--tinta-forte); }
 .selo-status svg { box-sizing: border-box; width: 20px; height: 20px; padding: 4px; border-radius: 50%; background: var(--tinta-forte); color: var(--cartao); stroke-width: 3; }
 p.selo-status { padding: 10px 14px; border-radius: 20px; }
+/* medalha de conquista (CC.arte.medalha) no app todo: Perfil, fim da lição e Juntos. Redonda,
+   sálvia quando ganha e de campo sem nível; a faixa do nível é uma pílula de 12px, "Nível 1"
+   sem caixa-alta forçada. O contorno da faixa é a cor do cartão, não sombra. */
+.arte-medalha .escudo { width: 56px; height: 56px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); box-shadow: none; }
+.arte-medalha.sem-nivel .escudo { background: var(--campo); color: var(--tinta-fraca); box-shadow: none; }
+.arte-medalha .faixa { margin-top: -10px; padding: 0 8px; border-radius: 9px; background: var(--inverso); color: var(--inverso-tinta); box-shadow: 0 0 0 2px var(--cartao); font-size: 0.75rem; font-weight: 700; line-height: 18px; letter-spacing: 0; text-transform: lowercase; }
+.arte-medalha .faixa::first-letter { text-transform: uppercase; }
 
 /* ---------- controle segmentado ----------
    Trilho claro; a opção escolhida em pílula escura (clara no tema escuro). */

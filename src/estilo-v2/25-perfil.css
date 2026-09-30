@@ -35,13 +35,8 @@
 .linha-ritmo{margin:8px 0 0;padding:14px 16px;border-radius:20px;background:var(--realce);font-weight:600}
 .linha-ritmo svg{color:var(--salvia-texto)}
 
-/* medalha redonda (sálvia quando ganha, campo sem nível) e a faixa do nível em pílula de
-   12px, "Nível 1" sem caixa-alta forçada */
+/* a medalha (redonda, faixa "Nível N" de 12px) vem de 01-base; aqui só a largura da linha */
 .linha-conquista .arte-medalha{width:60px}
-.linha-conquista .escudo{width:56px;height:56px;border-radius:50%;background:var(--salvia);color:var(--salvia-tinta);box-shadow:none}
-.linha-conquista .sem-nivel .escudo{background:var(--campo);color:var(--tinta-fraca);box-shadow:none}
-.linha-conquista .faixa{margin-top:-10px;padding:0 8px;border-radius:9px;background:var(--inverso);color:var(--inverso-tinta);box-shadow:0 0 0 2px var(--cartao);font-size:12px;font-weight:700;line-height:18px;letter-spacing:0;text-transform:lowercase}
-.linha-conquista .faixa::first-letter{text-transform:uppercase}
 .linha-conquista{padding:16px 20px 16px 16px}
 .titulo-conquista span,.descricao-conquista{font-size:13px}
 /* barra das conquistas e do Semeador: trilho de campo, progresso escuro, ponto sálvia */
@@ -101,6 +96,8 @@
 /* ---------- Explorar, seção, nota e busca ---------- */
 :is([data-rota=explorar],[data-rota=secao],[data-rota=busca],[data-rota=perfil]) .item{padding:18px 20px;border-radius:24px}
 .item b{text-wrap:balance}
+/* o versículo em destaque da nota é texto bíblico: Literata de pé, sem itálico falso */
+.item .destaque{font-family:var(--fonte-biblia);font-style:normal;font-weight:400}
 .bloco-secao{padding:18px 16px;border-radius:var(--raio-cartao)}
 .bloco-secao .icone,.icone-secao{width:48px;height:48px;border-radius:50%;background:var(--salvia-palido);color:var(--salvia-texto)}
 .filtro{min-height:44px;border:0;color:var(--tinta-forte);font-weight:600}

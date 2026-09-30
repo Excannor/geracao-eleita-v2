@@ -19,8 +19,8 @@ const ok = (cond, msg) => { console.log((cond ? '  ok    ' : '  FALHA ') + msg);
 
 // O fundo do tema escuro, num lugar só: quando a paleta muda é aqui que se atualiza, não em
 // quatro comparações espalhadas pelo arquivo. O app (src/estilo-v2/00-tokens.css) já está no
-// grafite do redesenho; o portal (entrar.html) tem paleta própria e fica com o tom dele até
-// a camada das páginas avulsas trocar (aí o PORTAL passa a ser o mesmo do app).
+// grafite do redesenho; o portal (entrar.html) tem paleta própria, e a camada das páginas
+// avulsas (src/estilo-v2/26-avulsas.css) já o deixou no mesmo grafite do app.
 const ESCURO = { r: 0x1b, g: 0x1c, b: 0x1a, hex: '#1b1c1a' };
 const ESCURO_PORTAL = { r: 0x1b, g: 0x1c, b: 0x1a, hex: '#1b1c1a' };
 // E o claro. Aqui não dá para exigir "quase branco": o fundo do app é um cinza (#ececec,
