@@ -275,7 +275,8 @@
 .folha-cabeca.cabeca-passos { margin-bottom: 8px; background: var(--folha); color: var(--folha-tinta); }
 .cabeca-passos p { color: var(--tinta-fraca); font-weight: 500; opacity: 1; }
 .cabeca-passos .subtitulo-tela { margin: -12px auto 20px; }
-.tela-conhecer-lista .cabeca-passos h1 { font-size: 1.5rem; }
+.tela-conhecer-lista .cabeca-passos .textos > h1 { display: flex; align-items: center; justify-content: center; min-height: var(--botao-redondo); margin: 0 0 20px; font-size: 1.375rem; text-align: center; }
+.tela-conhecer-lista .cabeca-passos .textos > h1 + p { max-width: 34ch; margin: -12px auto 20px; color: var(--tinta-fraca); font-size: .9375rem; font-weight: 500; text-align: center; text-wrap: balance; }
 .cabeca-passos .progresso-passos { gap: 14px; margin: 0 0 16px; }
 .cabeca-passos .progresso-passos .barra { background: var(--folha-campo); }
 .cabeca-passos .progresso-passos .barra > i { background: var(--progresso); }

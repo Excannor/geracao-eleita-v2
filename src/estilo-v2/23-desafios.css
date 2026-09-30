@@ -206,3 +206,6 @@
 @media (max-width: 374px) {
   .missao, .missao-convite, .cartao-praticar, .dsf-item, .lista-pratica.caixa-lista .cartao-pratica { gap: 10px; padding-inline: 14px 12px; }
 }
+
+/* revisão: subpágina estreita com o título do mesmo tamanho das outras subpáginas */
+@media (max-width: 374px) { .folha-desafios > .voltar + h1 { padding-inline: 52px; font-size: 1.25rem; } }

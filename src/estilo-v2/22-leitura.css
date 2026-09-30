@@ -220,3 +220,8 @@
   .folha-biblia > .voltar + h1 { padding-inline: 52px; font-size: 1.0625rem; }
   .cartao-continuar b { font-size: 1.0625rem; }
 }
+
+/* revisão: o título da Bíblia no tamanho dos títulos das outras abas; o selecionado do
+   tamanho da letra igual ao dos outros controles da folha Aa */
+.folha-biblia > .titulo-biblia { font-size: 1.375rem; }
+.folha-aa .tamanhos button[aria-pressed="true"] { background: var(--inverso); color: var(--inverso-tinta); box-shadow: none; }

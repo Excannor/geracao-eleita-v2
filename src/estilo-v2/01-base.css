@@ -664,3 +664,10 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 @media (max-width: 374px) {
   .navegacao .aba-central { width: 58px; height: 52px; }
 }
+
+/* revisão: a seta do voltar no centro do círculo; o botão principal das folhas sempre na
+   pílula inverso; o "Pronto/Fechar" das folhas como botão de texto, igual nas 15 folhas */
+.voltar { align-content: center; }
+.folha .acoes > .botao:is(.azul, .cor):not([data-caminho-opcao]) { --b: var(--inverso); color: var(--inverso-tinta); }
+.folha .acoes > .botao.contorno[data-fechar] { min-height: 48px; background: none; color: var(--tinta); }
+.folha .acoes > .botao.contorno[data-fechar]:hover { background: var(--campo); }

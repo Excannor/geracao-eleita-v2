@@ -30,7 +30,7 @@
 .folha-juntos > :last-child { margin-bottom: 0; }
 /* celular estreito: o título ao lado do voltar encolhe para caber numa linha ("Pessoas
    bloqueadas" quebrava a 360px), como nas folhas do grupo 1 e da Bíblia */
-@media (max-width: 374px) { .folha-juntos > .voltar + h1 { padding-inline: 52px; } .folha-juntos h1, .folha-juntos .cabeca-celula h1 { font-size: 1.25rem; } }
+@media (max-width: 374px) { .folha-juntos > .voltar + h1 { padding-inline: 52px; } .folha-juntos .voltar + h1 { font-size: 1.25rem; } }
 @media (max-width: 359px) { .folha-juntos > .voltar + h1 { font-size: 1rem; } }
 
 /* o cartão de destaque da folha, como os do Início: branco (sálvia no escuro), tinta escura e o
@@ -189,7 +189,7 @@ button.cartao-proposito:hover { background: var(--campo); }
 .painel-celula { gap: 12px; }
 .painel-celula > .titulo-secao { margin: 20px 0 0; }
 .painel-celula > * { margin: 0; }
-.painel-celula > .acoes { margin-top: 8px; }
+.painel-celula > .acoes { margin-top: 0; gap: 12px; }
 .painel-celula .acoes > .botao { width: 100%; min-height: 54px; font-size: 1rem; }
 .painel-celula > .botao-selo { min-height: 48px; background: var(--realce); }
 .recado-lider p { font-size: 1.0625rem; text-wrap: pretty; }
