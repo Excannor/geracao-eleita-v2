@@ -46,10 +46,12 @@
 
   CC.vistaApoiar = function (raiz) {
     let valor = 10;
-    raiz.innerHTML = CC.botaoVoltar('Voltar')
+    // .folha-perfil: só apresentação, a folha do alto (25-perfil.css); o título longo desce
+    // para baixo do voltar (.titulo-frase).
+    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Voltar')
       + '<h1>Ajude a manter o app</h1>'
       + '<p>O Geração Eleita é gratuito, sem anúncios, e não vende seus dados. Quem mantém são voluntários da igreja.</p>'
-      + '<p class="passo-dica">Doar é opcional. O app continua completo para todo mundo, doando ou não.</p>'
+      + '<p class="passo-dica">Doar é opcional. O app continua completo para todo mundo, doando ou não.</p></div>'
       + CC.tituloSecao('Para onde vai')
       + '<div class="caixa-lista apoiar-lista">'
       + ['Domínio, servidor e energia', 'Cópia de segurança dos dados', 'Estudo bíblico para escrever os textos',

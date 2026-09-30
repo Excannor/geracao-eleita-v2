@@ -231,6 +231,7 @@
 .apoiar-lista { margin-bottom: 12px; }
 .apoiar-item { padding: 16px 20px; color: var(--tinta-forte); }
 .apoiar-pix { margin-bottom: 8px; padding: 20px; border-radius: var(--raio-cartao); }
+.apoiar-pix .botao.contorno { background: var(--campo); }
 .apoiar-valores { margin-bottom: 16px; }
 .apoiar-valor { min-height: 48px; border: 0; border-radius: 24px; background: var(--campo); font-size: 1rem; }
 .apoiar-valor.sel { background: var(--inverso); color: var(--inverso-tinta); }
@@ -240,6 +241,10 @@
 :is(.folha-conta, .folha-instalar) .fala-bento { width: fit-content; padding: 12px 16px; border: 0; border-radius: 20px 20px 20px 6px; background: var(--campo); color: var(--tinta-forte); font-weight: 600; }
 .folha-conta h3 { margin: 0 0 8px; font-size: 1.375rem; font-weight: 800; }
 .folha-conta p > a { display: inline-flex; align-items: center; min-height: 44px; }
+/* o versículo do agradecimento (Apoiar) em Literata, com a referência na letra da interface */
+.folha-conta p:has(> .ref-frase) { color: var(--tinta); font-family: var(--fonte-biblia); font-size: 1rem; font-weight: 400; line-height: 1.6; }
+.qr-legenda { text-wrap: balance; }
+.folha-conta .ref-frase { display: block; margin-top: 6px; color: var(--tinta-fraca); font-family: var(--fonte); font-size: .8125rem; font-weight: 700; }
 .folha-conta p:has(> a) { margin-block: 4px; }
 /* a ação principal é a pílula escura, como no resto do app (o sálvia fica para o acento) */
 .folha-conta .acoes > .botao.azul[data-convidar-semeador], .tela-semeador .botao.azul { --b: var(--inverso); color: var(--inverso-tinta); }
