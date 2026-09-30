@@ -15,25 +15,20 @@
    ========================================================================= */
 
 /* ---------- a folha do alto ----------
-   Desafios e Praticar: o topo do app (retrato e ofensiva) fica preso em cima, no lugar e no
-   tamanho da saudação do Início, com os cantos de baixo redondos; a .folha-desafios sobe por
-   trás desses cantos e os dois viram uma peça só; ao rolar, ela passa por baixo e o topo fica
-   sozinho. São os valores do topo em folha da Bíblia (22-leitura): se o topo em folha chegar
-   para todas as telas, as regras do topo daqui ficam redundantes.
+   Desafios e Praticar: o topo do app (retrato e ofensiva) já é o começo da folha em todas as
+   telas (o topo global, em 21-trilha.css), preso em cima com os cantos de baixo redondos; a
+   .folha-desafios sobe por trás desses cantos e os dois viram uma peça só; ao rolar, ela passa
+   por baixo e o topo fica sozinho.
    Quiz: o topo (fechar e progresso) fica parado no alto e a pergunta, ou o fim da rodada,
    completa a folha por baixo dele, como na lição do dia.
    Por dentro, --cartao é a superfície da folha e as tintas são as dela. */
-.folha-desafios, .topo:has(~ .corpo .folha-desafios), .quiz > .licao-topo, .quiz .pergunta > .etiqueta, .quiz .festa {
+.folha-desafios, .quiz > .licao-topo, .quiz .pergunta > .etiqueta, .quiz .festa {
   --cartao: var(--folha-campo); --campo: var(--folha-campo);
   --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
   --progresso: var(--folha-tinta);
   color: var(--folha-tinta);
 }
 .folha-desafios, .quiz > .licao-topo, .quiz .pergunta > .etiqueta, .quiz .festa { border-radius: 0 0 36px 36px; background: var(--folha); }
-.topo:has(~ .corpo .folha-desafios) { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
-.topo:has(~ .corpo .folha-desafios)::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
-.topo:has(~ .corpo .folha-desafios) > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
-.topo:has(~ .corpo .folha-desafios) > .perfil-topo .ico-aba { width: 24px; height: 24px; }
 .folha-desafios { margin: -52px -16px 20px; padding: 40px 30px 24px; }
 
 /* o cartão de destaque do Início: branco no claro, sálvia no escuro, tinta escura; o número

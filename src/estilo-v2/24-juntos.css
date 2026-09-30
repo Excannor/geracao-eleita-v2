@@ -15,14 +15,12 @@
    ========================================================================= */
 
 /* ---------- a folha do alto ----------
-   Juntos, Propósitos, bloqueados, célula e discipulado: o topo do app (retrato e ofensiva) vira
-   o começo da folha, no lugar e no tamanho da saudação do Início, preso em cima com os cantos
-   de baixo redondos; a .folha-juntos (só apresentação) sobe por trás desses cantos e os dois
-   viram uma peça só; ao rolar, ela passa por baixo e o topo fica sozinho. São os valores do
-   topo em folha da Bíblia (22-leitura) e do grupo 1 (21-trilha): se o topo em folha valer para
-   todas as telas na integração, as regras do topo daqui ficam redundantes. Por dentro valem as
-   fichas da folha: --cartao vira --folha-campo e as tintas são as dela. */
-.folha-juntos, .topo:has(~ .corpo .folha-juntos) {
+   Juntos, Propósitos, bloqueados, célula e discipulado: o topo do app (retrato e ofensiva) já é
+   o começo da folha em todas as telas (o topo global, em 21-trilha.css), preso em cima com os
+   cantos de baixo redondos; a .folha-juntos (só apresentação) sobe por trás desses cantos e os
+   dois viram uma peça só; ao rolar, ela passa por baixo e o topo fica sozinho. Por dentro valem
+   as fichas da folha: --cartao vira --folha-campo e as tintas são as dela. */
+.folha-juntos {
   --cartao: var(--folha-campo); --campo: var(--folha-campo);
   --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
   --progresso: var(--folha-tinta);
@@ -30,11 +28,6 @@
 }
 .folha-juntos { margin: -52px -16px 24px; padding: 40px 30px 24px; border-radius: 0 0 36px 36px; background: var(--folha); }
 .folha-juntos > :last-child { margin-bottom: 0; }
-.topo:has(~ .corpo .folha-juntos) { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
-.topo:has(~ .corpo .folha-juntos)::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
-.topo:has(~ .corpo .folha-juntos) > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
-.topo:has(~ .corpo .folha-juntos) > .perfil-topo .ico-aba { width: 24px; height: 24px; }
-.topo:has(~ .corpo .folha-juntos) > .perfil-topo.selecionado { box-shadow: 0 0 0 2.5px var(--folha), 0 0 0 4.5px var(--folha-tinta); }
 /* celular estreito: o título ao lado do voltar encolhe para caber numa linha ("Pessoas
    bloqueadas" quebrava a 360px), como nas folhas do grupo 1 e da Bíblia */
 @media (max-width: 374px) { .folha-juntos > .voltar + h1 { padding-inline: 52px; } .folha-juntos h1, .folha-juntos .cabeca-celula h1 { font-size: 1.25rem; } }

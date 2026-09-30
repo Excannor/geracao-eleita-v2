@@ -233,6 +233,8 @@
    enquanto a tela rola (teste-app-ios). A tela que puser o cabeçalho (voltar, título,
    resumo) num bloco .folha-cabeca continua a folha: o bloco sobe por trás dos cantos do
    topo e os dois viram uma peça só; ao rolar, ele passa por baixo e o topo fica sozinho.
+   É o topo de todas as telas: os invólucros dos outros grupos (.folha-biblia, .folha-desafios,
+   .folha-juntos, .folha-perfil) são a mesma peça e contam com estas regras (integração).
    ========================================================================= */
 .topo, .folha-cabeca {
   --cartao: var(--folha-campo); --campo: var(--folha-campo);

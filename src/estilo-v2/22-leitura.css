@@ -19,7 +19,7 @@
    Na lição, a cabeça de cada passo (.cabeca-licao) com o topo fixo por cima; no leitor, a
    cabeça fixa; na Bíblia, a .folha-biblia com o topo do app. Por dentro, --cartao é a
    superfície da folha (botões redondos, pílulas, trilhos) e as tintas são as da folha. */
-.cabeca-licao, .licao-dia > .licao-topo, .leitor-cabeca, .folha-biblia, .topo:has(~ .corpo .folha-biblia) {
+.cabeca-licao, .licao-dia > .licao-topo, .leitor-cabeca, .folha-biblia {
   --cartao: var(--folha-campo); --campo: var(--folha-campo);
   --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
   color: var(--folha-tinta);
@@ -170,14 +170,10 @@
 .arte-destaque > .arte-livro svg { width: 24px; height: 24px; }
 
 /* ---------- Bíblia: a folha do alto com o topo do app, livros e capítulos ----------
-   Com a folha na tela, o topo (retrato e ofensiva) vira o começo dela, no lugar e no tamanho
-   da saudação do Início: de ponta a ponta no celular (na largura da coluna no computador),
-   preso em cima, com os cantos de baixo redondos. A .folha-biblia sobe por trás desses cantos
-   e os dois viram uma peça só; ao rolar, ela passa por baixo e o topo fica sozinho. */
-.topo:has(~ .corpo .folha-biblia) { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
-.topo:has(~ .corpo .folha-biblia)::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
-.topo:has(~ .corpo .folha-biblia) > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
-.topo:has(~ .corpo .folha-biblia) > .perfil-topo .ico-aba { width: 24px; height: 24px; }
+   O topo do app (retrato e ofensiva) já é o começo da folha em todas as telas (o topo global,
+   em 21-trilha.css): preso em cima, com os cantos de baixo redondos. A .folha-biblia sobe por
+   trás desses cantos e os dois viram uma peça só; ao rolar, ela passa por baixo e o topo fica
+   sozinho. */
 .folha-biblia { margin: -52px -16px 20px; padding: 40px 30px 24px; }
 .folha-biblia > .voltar + h1 { margin-bottom: 12px; }
 .folha-biblia > .subtitulo-tela:last-child { margin-bottom: 0; }
