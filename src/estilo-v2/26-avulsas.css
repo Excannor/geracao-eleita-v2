@@ -5,43 +5,52 @@
    entra no app (index.html). O build.mjs a põe no marcador ESTILO_V2 (um bloco style
    vazio) de cada página avulsa, logo depois do estilo de dentro dela, e ela NÃO recebe o
    00-tokens.css nem o 01-base.css: as páginas têm fichas próprias (--fundo, --forte,
-   --fraca, --selo-bloco...). Copie os valores do guia (00-tokens.css) para as fichas
-   daqui, nos dois temas (@media prefers-color-scheme + :root[data-tema]).
+   --fraca, --selo-bloco...). Os valores são os de 00-tokens.css (paleta C), nos dois temas
+   (@media prefers-color-scheme + :root[data-tema]).
+   Padrão aprovado (o Início de 0a11385): a folha do alto em sálvia pálida de ponta a ponta
+   (grafite um tom acima no escuro), com os cantos de baixo redondos, e o corpo no fundo do
+   tema, com cartões brancos (grafite no escuro) e a ação principal na pílula escura.
    Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz,
-   .selo-ref) nem as fichas dele (--selo-bloco, --selo-texto).
+   .selo-ref) nem as fichas dele (--selo-bloco, --selo-texto, --forte), e não mude o que
+   ele herda (peso da letra, cor, alinhamento): a entrada o deixa em 400, e é assim que fica.
 
    O --forte fica com o valor de antes de propósito: a cruz e a referência do carimbo
    (.selo-cruz, .selo-ref) pintam com ele, e o carimbo não muda nem um tom. O resto da
    página usa --v2-forte, a tinta forte do guia.
    ========================================================================= */
 
-/* ---------- fichas do guia, tema claro ---------- */
+/* ---------- fichas do guia, tema claro (paleta C) ---------- */
 :root {
-  --fundo: #ececec;
+  --fundo: #f4f5f0;
   --cartao: #ffffff;
-  --campo: #f3f3f3;
-  --contorno: #e2e2e2;
-  --borda: var(--contorno);
-  --fundo2: var(--campo);
+  --campo: #eff1ea;
+  --contorno: #e2e5db;
   --v2-forte: #151615;
   --tinta: #2c2d2b;
   --fraca: #686b66;
   --salvia: #c8da8c;
   --salvia-palido: #eef3de;
   --salvia-texto: #5a6b2a;
-  --alerta: #c62828;
-  --alerta-palido: #fbe9e7;
+  /* tinta sobre a sálvia e sobre o cartão de destaque da folha: escura nos dois temas */
+  --salvia-tinta: #151615;
   --inverso: #151615;
   --inverso-tinta: #ffffff;
-  --verde: var(--salvia-texto);
-  --azul: var(--salvia-texto);
-  --azul-fraco: var(--salvia-palido);
-  --destaque: var(--salvia-palido);
-  --erro: var(--alerta);
-  --vinho: var(--alerta);
-  --ajuda: var(--alerta-palido);
-  --trilho: var(--cartao);
+  /* a folha do alto: sálvia pálida, com o texto escuro e os botões redondos mais claros */
+  --folha: #dfe8c1;
+  --folha-tinta: #151615;
+  --folha-tinta-fraca: #4f5a36;
+  --folha-campo: #eef3de;
+  --folha-destaque: #ffffff;
+  --alerta: #c62828;
+  --alerta-palido: #fbe9e7;
   --v2-ui: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* medidas: margem da página; recuo a mais do que fica dentro da folha (30px da borda,
+     como a saudação do Início); quanto a folha passa do último elemento do cabeçalho;
+     altura dos botões e campos, a mesma dos botões do app */
+  --margem: 16px;
+  --recuo-folha: 14px;
+  --fim-folha: 24px;
+  --alt-botao: 54px;
 }
 /* ---------- tema escuro de leitura: grafite, texto quase branco ---------- */
 @media (prefers-color-scheme: dark) {
@@ -49,16 +58,25 @@
     --fundo: #1b1c1a; --cartao: #252724; --campo: #2e302c; --contorno: #3a3d37;
     --v2-forte: #eef0ea; --tinta: #d9dcd3; --fraca: #a4a99d;
     --salvia: #bfd083; --salvia-palido: #2c3324; --salvia-texto: #c9d98f;
+    --inverso: #eef0ea; --inverso-tinta: #1b1c1a;
+    --folha: #2e302c; --folha-tinta: #eef0ea; --folha-tinta-fraca: #a4a99d; --folha-campo: #3a3d37; --folha-destaque: #c8da8c;
     --alerta: #ff8a80; --alerta-palido: #3a2220;
-    --inverso: #eef0ea; --inverso-tinta: #1b1c1a; --sobre: #1b1c1a;
   }
 }
 :root[data-tema="escuro"] {
   --fundo: #1b1c1a; --cartao: #252724; --campo: #2e302c; --contorno: #3a3d37;
   --v2-forte: #eef0ea; --tinta: #d9dcd3; --fraca: #a4a99d;
   --salvia: #bfd083; --salvia-palido: #2c3324; --salvia-texto: #c9d98f;
+  --inverso: #eef0ea; --inverso-tinta: #1b1c1a;
+  --folha: #2e302c; --folha-tinta: #eef0ea; --folha-tinta-fraca: #a4a99d; --folha-campo: #3a3d37; --folha-destaque: #c8da8c;
   --alerta: #ff8a80; --alerta-palido: #3a2220;
-  --inverso: #eef0ea; --inverso-tinta: #1b1c1a; --sobre: #1b1c1a;
+}
+/* As fichas antigas das páginas apontam para as novas, nos dois temas. O segundo seletor
+   empata com o do tema escuro de dentro da entrar.html, que vem antes e perde. */
+:root, :root:not([data-tema="claro"]) {
+  --borda: var(--contorno); --fundo2: var(--campo); --trilho: var(--folha-campo);
+  --verde: var(--salvia-texto); --azul: var(--salvia-texto); --azul-fraco: var(--salvia-palido);
+  --destaque: var(--salvia-palido); --erro: var(--alerta); --vinho: var(--alerta); --ajuda: var(--alerta-palido);
 }
 
 /* ---------- comum às três páginas ---------- */
