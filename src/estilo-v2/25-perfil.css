@@ -130,3 +130,7 @@
 .item .resumo{-webkit-line-clamp:6}
 .item :is(.destaque,.chip){text-wrap:pretty}
 .corpo-semeador b{text-wrap:balance!important}
+/* Nome editável à vista: rótulo e campo com cara de campo (antes parecia texto solto). */
+.cartao-pessoa .rotulo-apelido{margin-top:4px;color:var(--tinta-fraca);font-size:13px;font-weight:700}
+.cartao-pessoa .campo-apelido{width:min(100%,300px);min-height:52px;background:var(--campo);font-size:22px}
+.cartao-pessoa .campo-apelido::placeholder{color:var(--tinta-fraca);font-weight:600;font-size:18px}

@@ -135,9 +135,12 @@
       + (foto ? '<img src="' + CC.esc(foto) + '" alt="">' : '<span class="sem-foto">' + CC.ico('pessoa') + '</span>')
       + '<span class="lapis">' + CC.ico('caneta') + '</span></button>'
       + '<div class="quem">'
-      + '<label class="so-leitor" for="apelido">Seu nome</label>'
-      + '<input id="apelido" class="campo-apelido" value="' + CC.esc(CC.apelido() || quem.nome || '') + '" '
-      + 'placeholder="Seu nome" maxlength="20">'
+      // O nome aparece na saudação do Início e para os amigos. Conta antiga sem nome (o nome
+      // é o próprio @) abre com o campo vazio, pedindo o nome, em vez de repetir o usuário.
+      + '<label class="rotulo-apelido" for="apelido">Seu nome no app</label>'
+      + '<input id="apelido" class="campo-apelido" value="'
+      + CC.esc(CC.apelido() || (quem.nome && quem.nome !== quem.usuario ? quem.nome : '')) + '" '
+      + 'placeholder="Como quer ser chamado?" maxlength="20" autocomplete="given-name">'
       + (quem.usuario && quem.comSenha ? '<span class="conta">@' + CC.esc(quem.usuario) + '</span>' : '')
       + '</div>'
       + '<input type="file" id="arquivo-foto" accept="image/*" hidden>'
