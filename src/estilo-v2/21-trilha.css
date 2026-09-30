@@ -1,15 +1,20 @@
 /* =========================================================================
    REDESENHO V2 · 21-trilha
-   Trilha, dia do plano (balão do nó, baú, folha da unidade, primeiros passos) e Conhecer Jesus.
+   Trilha, dia do plano (balão do nó, baú, folha da unidade, primeiros passos) e Conhecer Jesus;
+   e, pedidos a este grupo, o topo do app (retrato e ofensiva), o painel Mais e a folha da
+   ofensiva, que valem para todas as telas (o carimbo em pincel da folha fica como está).
    Camada exclusiva deste grupo de telas (ver design/mapa-telas.md). Use as fichas de
    00-tokens.css e as peças de 01-base.css; nada de cor literal que valha só num tema.
    Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz, .selo-ref).
    As telas do Conhecer Jesus (dia, perguntas, pergunta, "E agora") levam a classe .cj.
+   Padrão aprovado (o Início de 0a11385, paleta C): a folha do alto sálvia pálida de ponta a
+   ponta (grafite um tom acima no escuro), cartões de destaque brancos (sálvia no escuro) com o
+   botão redondo preto, e o corpo no fundo do tema com cartões brancos.
    ========================================================================= */
 
 /* ---------- peças repetidas deste grupo ---------- */
 /* cartão branco, sem borda nem sombra */
-.toque-recebido, .faixa-unidade, .faixa-unidade.travada, .cabeca-passos, .praticar-unidade, .cj .etapa-reflexao {
+.toque-recebido, .faixa-unidade, .faixa-unidade.travada, .praticar-unidade, .cj .etapa-reflexao {
   border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta-forte); box-shadow: none;
 }
 /* realce do que é de hoje: sálvia pálido listrado */
@@ -19,7 +24,7 @@
 .toque-recebido > svg:first-child, .atalhos-conhecer svg:first-child { background: var(--salvia-palido); color: var(--salvia-texto); }
 /* quebras bonitas (herdam) */
 .trilha, .pop-no, .cj, .tela-conhecer-lista { text-wrap: pretty; }
-.faixa-unidade .nome, .titulo-pop, .cj .textos > b, .lista-licoes .textos > span { text-wrap: balance; }
+.faixa-unidade .nome, .titulo-pop, .cj .textos > b, .lista-licoes .textos > span, .atalhos-conhecer b, .atalhos-conhecer small { text-wrap: balance; }
 
 /* o cartão da leitura (também no dia do Conhecer Jesus) */
 .leitura-hoje { margin-bottom: 16px; padding: 20px; border: 0; border-radius: var(--raio-cartao); }
@@ -196,28 +201,88 @@
 .pop-no .titulo-pop, .pop-no.adiante .titulo-pop { color: var(--tinta-forte); font-weight: 800; }
 .pop-no .sub-pop, .pop-no.adiante .sub-pop { color: inherit; font-weight: 500; opacity: 1; }
 .pop-no .fala-bento { border: 0; margin: 8px 0 4px; padding: 12px 14px; border-radius: 18px; color: var(--tinta-forte); font-weight: 600; }
+.pop-no .botao.contorno { background: var(--campo); }
+/* aberto, o balão fica acima dos outros nós, mas passa por baixo da faixa da unidade e da
+   folha do alto, que são fixas (antes o nó e o balão rolavam por cima delas) */
+.no-linha:has(.pop-no) { z-index: 15; }
+/* no dia de hoje, o balão toma o lugar do cartão ao lado do nó enquanto está aberto (a mesma
+   passagem e o mesmo Começar): antes um cobria o outro. Fechado, a trilha fica como estava. */
+.no-linha.hoje:has(.pop-no) .cartao-no-hoje { visibility: hidden; }
 
 /* a seta que volta ao dia de hoje */
 .trilha ~ .ir-atual { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--inverso); color: var(--inverso-tinta); box-shadow: var(--sombra-flutuante); }
 .trilha ~ .ir-atual svg { width: 22px; height: 22px; }
+/* com um balão aberto, a seta sai da frente dele (ela cobria o botão do balão no canto) */
+.trilha:has(.pop-no) ~ .ir-atual { visibility: hidden; }
 
-/* folha da unidade */
+/* folha da unidade: o nome quebra equilibrado; "Ir para o dia" é o botão principal, escuro */
 .cabeca-folha-unidade { gap: 16px; margin-bottom: 16px; }
 .cabeca-folha-unidade .arte-trofeu { flex: none; width: 64px; }
+.cabeca-folha-unidade h2 { text-wrap: balance; }
+.cabeca-folha-unidade ~ .acoes .botao.cor { --b: var(--inverso); color: var(--inverso-tinta); }
 
-/* ---------- primeiros passos e Conhecer Jesus: a cabeça vira cartão ---------- */
-.cabeca-passos { margin: 0 0 8px; padding: 20px; }
+/* o baú: o convite pisca sem descer de 4,5:1 (a piscada antiga chegava a 3,7:1) */
+.dica-bau { color: var(--tinta-forte); opacity: 1; animation: piscar-dica 1.8s ease-in-out infinite; }
+@keyframes piscar-dica { 50% { opacity: .72; } }
+
+/* =========================================================================
+   O TOPO DO APP, FORA DO INÍCIO: o começo da folha do alto
+   A folha sálvia pálida de ponta a ponta, por baixo da barra de status, com os cantos de
+   baixo redondos; no computador, na largura da coluna, como a folha do Início. O retrato
+   fica no mesmo lugar e tamanho da saudação do Início. O topo continua preso em cima
+   enquanto a tela rola (teste-app-ios). A tela que puser o cabeçalho (voltar, título,
+   resumo) num bloco .folha-cabeca continua a folha: o bloco sobe por trás dos cantos do
+   topo e os dois viram uma peça só; ao rolar, ele passa por baixo e o topo fica sozinho.
+   ========================================================================= */
+.topo, .folha-cabeca {
+  --cartao: var(--folha-campo); --campo: var(--folha-campo);
+  --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
+  --progresso: var(--folha-tinta);
+  color: var(--folha-tinta);
+}
+.topo { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
+.topo::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
+.topo > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
+.topo > .perfil-topo .ico-aba { width: 24px; height: 24px; }
+.topo > .perfil-topo.selecionado { box-shadow: 0 0 0 2.5px var(--folha), 0 0 0 4.5px var(--folha-tinta); }
+.folha-cabeca { margin: -52px -16px 20px; padding: 40px 30px 24px; border-radius: 0 0 36px 36px; background: var(--folha); }
+.folha-cabeca > :last-child, .folha-cabeca .textos > :last-child { margin-bottom: 0; }
+/* celular estreito: o título ao lado do voltar encolhe para caber numa linha ("Perguntas
+   honestas" quebrava a 360px), como o título da Bíblia (22-leitura.css) */
+@media (max-width: 374px) { .folha-cabeca:not(.titulo-frase) > .voltar + h1 { padding-inline: 52px; font-size: 1.25rem; } }
+@media (max-width: 359px) { .folha-cabeca:not(.titulo-frase) > .voltar + h1 { font-size: 1rem; } }
+
+/* o cartão de destaque da folha, como os do Início: branco (sálvia no escuro), botão redondo preto */
+.cartao-destaque {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 84px; padding: 12px 12px 12px 20px; border-radius: 26px;
+  background: var(--folha-destaque); color: var(--salvia-tinta);
+  font-size: 1.0625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-decoration: none; text-wrap: balance;
+}
+.cartao-destaque:hover { color: var(--salvia-tinta); text-decoration: none; }
+.cartao-destaque:active { transform: scale(.98); }
+.cartao-destaque svg, .folha-cabeca .conquista-linha svg { flex: none; box-sizing: content-box; width: 20px; height: 20px; padding: 14px; border-radius: 50%; background: var(--salvia-tinta); color: #ffffff; stroke-width: 2.2; }
+/* (três classes: o estilo.css pinta .conquista-linha de sálvia no escuro, que some no cartão) */
+.folha-cabeca .textos > .conquista-linha { display: flex; gap: 12px; min-height: 84px; margin: 0; padding: 12px 20px 12px 12px; border-radius: 26px; background: var(--folha-destaque); color: var(--salvia-tinta); font-size: 1rem; font-weight: 800; }
+.folha-cabeca .conquista-linha svg { color: var(--salvia); }
+
+/* ---------- primeiros passos e Conhecer Jesus: a cabeça na folha, a lista no corpo ---------- */
+.folha-cabeca.cabeca-passos { margin-bottom: 8px; background: var(--folha); color: var(--folha-tinta); }
 .cabeca-passos p { color: var(--tinta-fraca); font-weight: 500; opacity: 1; }
-.cabeca-passos .progresso-passos .barra { background: var(--campo); }
+.cabeca-passos .subtitulo-tela { margin: -12px auto 20px; }
+.tela-conhecer-lista .cabeca-passos h1 { font-size: 1.5rem; }
+.cabeca-passos .progresso-passos { gap: 14px; margin: 0 0 16px; }
+.cabeca-passos .progresso-passos .barra { background: var(--folha-campo); }
 .cabeca-passos .progresso-passos .barra > i { background: var(--progresso); }
-.cabeca-passos .progresso-passos b { white-space: nowrap; }
-.cabeca-passos .conquista-linha, .cj .conquista-linha { min-height: 44px; background: var(--salvia-palido); color: var(--salvia-texto); }
+.cabeca-passos .progresso-passos b { color: var(--folha-tinta); white-space: nowrap; }
+.cj .conquista-linha { min-height: 44px; background: var(--salvia-palido); color: var(--salvia-texto); }
 
 .lista-licoes { overflow: hidden; }
 .lista-licoes.caixa-lista .item-licao { min-height: 72px; padding: 14px 16px; }
 .lista-licoes.caixa-lista .item-licao:hover { background: var(--campo); }
 .item-licao .num, .item-licao.feita .num, .lista-licoes.caixa-lista .item-licao.proxima .num { width: 44px; height: 44px; background: var(--campo); color: var(--tinta-fraca); box-shadow: none; }
-.item-licao.feita .num { background: var(--inverso); color: var(--inverso-tinta); }
+/* feita: como o dia lido na trilha */
+.item-licao.feita .num { background: var(--no-lido); color: var(--no-lido-tinta); }
 .lista-licoes.caixa-lista .item-licao.proxima .num { background: var(--salvia); color: var(--salvia-tinta); }
 .item-licao .textos > span, .atalhos-conhecer small, .cj .resumo { display: block; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 500; }
 .lista-licoes.caixa-lista .item-licao .marca-proxima { color: var(--salvia-texto); font-size: .75rem; letter-spacing: 0; text-transform: none; }
@@ -226,6 +291,10 @@
 .atalhos-conhecer .atalho { min-height: 72px; padding: 12px 18px 12px 14px; }
 .atalhos-conhecer .atalho > span, .cj .item .textos { display: grid; gap: 2px; color: var(--tinta-forte); }
 .ver-plano { margin-top: 16px; text-align: center; }
+
+/* perguntas, pergunta e "E agora": o cabeçalho na folha; o título que é uma frase inteira
+   desce para baixo do voltar e usa a largura da folha, em vez de três linhas espremidas */
+.titulo-frase > .voltar + h1 { justify-content: center; min-height: 0; margin: 0; padding: 0 4px; font-size: 1.5rem; text-wrap: balance; }
 
 /* perguntas honestas: uma lista num cartão só */
 .cj .grade { gap: 0; overflow: hidden; }
@@ -245,11 +314,46 @@
 .cj .pensamento-dia { margin: 0; border: 0; border-radius: 20px; }
 .cj .pensamento-dia p { color: var(--tinta-forte); }
 .cj .oracao-guia { margin: 0; }
-.cj .oracao-guia li { border-radius: 20px; background: var(--salvia-palido); font-weight: 600; }
+.cj .oracao-guia li { border-radius: 20px; background: var(--salvia-palido); font-style: normal; font-weight: 600; text-wrap: balance; }
 .cj details.cartao { padding: 0; margin: 0; }
 .cj summary { padding: 10px 0; font-weight: 700; }
 .perguntas-fixas { display: grid; gap: 10px; margin: 8px 0 0; padding-left: 20px; }
-.cj .leitura-hoje { margin-top: 16px; }
+/* o botão principal do Conhecer Jesus (Ler, Terminei o dia, Quero conversar com alguém) é
+   a pílula escura, como na lição; a sálvia fica para os pontos de acento */
+.cj .botao.azul, .tela-conhecer .licao-pe .botao.cor { --b: var(--inverso); color: var(--inverso-tinta); }
+
+/* ---------- o dia do Conhecer Jesus (tela cheia): a moldura da lição do dia ----------
+   O mesmo desenho da lição (22-leitura.css): o topo (fechar e progresso) fica parado no
+   alto, numa folha, e a cabeça do dia completa a folha por baixo dele; ao rolar, ela passa
+   por baixo e o topo fica sozinho, uma folha menor. O pé perde a linha. */
+.tela-conhecer > .licao-topo, .cabeca-cj {
+  --cartao: var(--folha-campo); --campo: var(--folha-campo);
+  --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
+  --progresso: var(--folha-tinta);
+  border-radius: 0 0 36px 36px; background: var(--folha); color: var(--folha-tinta);
+}
+.tela-conhecer > .licao-topo { grid-area: 1 / 1; z-index: 2; align-self: start; justify-self: center; box-sizing: border-box; width: min(100%, 592px); gap: 12px; padding: calc(14px + env(safe-area-inset-top)) 16px 14px; }
+.tela-conhecer > .licao-palco { grid-area: 1 / 1 / 3; padding-top: 0; scroll-padding-top: calc(92px + env(safe-area-inset-top)); scrollbar-gutter: stable both-edges; }
+.tela-conhecer .fechar { width: var(--botao-redondo); height: var(--botao-redondo); margin: 0; border-radius: 50%; background: var(--cartao); color: var(--tinta-forte); }
+.tela-conhecer .licao-topo .barra { background: var(--cartao); }
+.cabeca-cj { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 0 -16px 20px; padding: calc(82px + env(safe-area-inset-top)) 30px 26px; text-align: center; }
+.cabeca-cj > * { max-width: 34ch; margin: 0; }
+.cabeca-cj h1 { max-width: 20ch; font-size: 1.5rem; text-wrap: balance; }
+.cabeca-cj .passo-dica { margin-top: 2px; text-wrap: balance; }
+.tela-conhecer .licao-pe { border-top: 0; }
+.tela-conhecer .licao-pe .botao.contorno { background: var(--cartao); }
+.cj .leitura-hoje { margin: 0 0 16px; }
+
+/* ---------- a folha da ofensiva (aberta pelo topo e pelo Início) ----------
+   Só o entorno do carimbo, que fica como está: o recorde vira um bloco como o dos escudos,
+   e os dois ficam com o mesmo raio. */
+.folha .linha-escudos, .folha .linha-recorde { border-radius: 20px; }
+.folha .linha-recorde { align-items: center; min-height: 52px; padding: 0 16px; background: var(--campo); font-weight: 600; }
+
+/* ---------- o painel do Mais: nas margens do conteúdo, com folga até a barra ---------- */
+@media (max-width: 859px) {
+  .painel-mais { left: 16px; right: 16px; bottom: calc(var(--alt-barra) - 12px + env(safe-area-inset-bottom)); }
+}
 
 @media (min-width: 860px) {
   .trilha { padding-bottom: 72px; }

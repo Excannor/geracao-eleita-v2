@@ -25,14 +25,16 @@
     }).join('');
 
     const nomeProxima = proxima ? CC.semPrefixo(D.notas[proxima].nome) : '';
-    raiz.innerHTML = CC.botaoVoltar('Trilha')
+    // A cabeça (voltar, título, resumo, progresso e a próxima lição) continua a folha do
+    // topo do app (.folha-cabeca, em 21-trilha.css); a próxima lição é o cartão de destaque.
+    raiz.innerHTML = '<div class="folha-cabeca cabeca-passos c-roxo">'
+      + CC.botaoVoltar('Trilha')
       + '<h1>Primeiros passos</h1>'
-      + '<div class="cabeca-passos c-roxo">'
       + '<div class="textos">'
-      + '<p>Doze lições pra firmar a fé. Cada uma conta quando você lê até o fim, e uma por semana é um bom ritmo.</p>'
+      + '<p class="subtitulo-tela">Doze lições pra firmar a fé. Cada uma conta quando você lê até o fim, e uma por semana é um bom ritmo.</p>'
       + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitas.length + ' de ' + D.licoes.length + '</b></div>'
       + (proxima
-        ? '<a class="botao" href="#/nota/' + encodeURIComponent(proxima) + '">' + CC.ico('bandeira') + CC.esc(nomeProxima) + '</a>'
+        ? '<a class="cartao-destaque" href="#/nota/' + encodeURIComponent(proxima) + '"><span>' + CC.esc(nomeProxima) + '</span>' + CC.ico('bandeira') + '</a>'
         : '<p class="conquista-linha">' + CC.ico('estrela') + 'Você concluiu os primeiros passos!</p>')
       + '</div></div>'
       + CC.tituloSecao('As doze lições')
