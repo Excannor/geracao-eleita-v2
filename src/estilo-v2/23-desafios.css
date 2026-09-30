@@ -20,14 +20,16 @@
    trás desses cantos e os dois viram uma peça só; ao rolar, ela passa por baixo e o topo fica
    sozinho. São os valores do topo em folha da Bíblia (22-leitura): se o topo em folha chegar
    para todas as telas, as regras do topo daqui ficam redundantes.
+   Quiz: o topo (fechar e progresso) fica parado no alto e a pergunta, ou o fim da rodada,
+   completa a folha por baixo dele, como na lição do dia.
    Por dentro, --cartao é a superfície da folha e as tintas são as dela. */
-.folha-desafios, .topo:has(~ .corpo .folha-desafios) {
+.folha-desafios, .topo:has(~ .corpo .folha-desafios), .quiz > .licao-topo, .quiz .pergunta > .etiqueta, .quiz .festa {
   --cartao: var(--folha-campo); --campo: var(--folha-campo);
   --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
   --progresso: var(--folha-tinta);
   color: var(--folha-tinta);
 }
-.folha-desafios { border-radius: 0 0 36px 36px; background: var(--folha); }
+.folha-desafios, .quiz > .licao-topo, .quiz .pergunta > .etiqueta, .quiz .festa { border-radius: 0 0 36px 36px; background: var(--folha); }
 .topo:has(~ .corpo .folha-desafios) { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
 .topo:has(~ .corpo .folha-desafios)::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
 .topo:has(~ .corpo .folha-desafios) > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
@@ -53,7 +55,7 @@
 
 /* ---------- peças do corpo ---------- */
 /* cartão: cor do cartão, raio grande, sem borda nem sombra */
-.lista-missoes, .missao-convite, .cartao-praticar, .dsf-card, .quiz .verso, .quiz .premio {
+.lista-missoes, .missao-convite, .cartao-praticar, .dsf-card, .quiz .verso {
   margin: 0; border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta); box-shadow: none;
 }
 /* círculo de ícone de 48px: neutro; sálvia quando feito ou quando é a vez; sálvia pálido no atalho */
@@ -159,13 +161,16 @@
 .cartao-pratica .rot, .cartao-pratica.adiante .rot { color: var(--tinta-fraca); }
 .lista-pratica.caixa-lista .cartao-pratica b { margin: 2px 0; font-size: 1rem; font-weight: 700; line-height: 1.3; text-wrap: pretty; }
 
-/* ---------- o quiz (tela cheia) ---------- */
-.quiz .licao-topo .fechar { margin: 0; border-radius: 50%; background: var(--cartao); color: var(--tinta-forte); }
+/* ---------- o quiz (tela cheia): a moldura da lição do dia ---------- */
+.quiz > .licao-topo { grid-area: 1 / 1; z-index: 2; align-self: start; justify-self: center; box-sizing: border-box; width: min(100%, 592px); gap: 12px; padding: calc(14px + env(safe-area-inset-top)) 16px 14px; }
+.quiz > .licao-palco { grid-area: 1 / 1 / 3; padding-top: 0; scroll-padding-top: calc(92px + env(safe-area-inset-top)); scrollbar-gutter: stable both-edges; }
+.quiz .pergunta > .etiqueta, .quiz .festa { margin: 0 -16px 20px; padding: calc(82px + env(safe-area-inset-top)) 30px 26px; }
+.quiz .pergunta > .etiqueta { display: block; font-size: 1.375rem; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; text-align: center; text-wrap: balance; }
+.quiz .fechar { width: var(--botao-redondo); height: var(--botao-redondo); margin: 0; border-radius: 50%; background: var(--cartao); color: var(--tinta-forte); }
 .quiz .licao-topo .barra { background: var(--cartao); }
 .quiz-contador { color: var(--tinta-forte); }
 .quiz .pergunta { margin-bottom: 20px; }
-.quiz .pergunta .etiqueta { color: var(--tinta-forte); font-size: 1.25rem; font-weight: 800; }
-.quiz .verso { margin-top: 16px; padding: 20px 24px; font: 1.1875rem/1.7 var(--fonte-biblia); }
+.quiz .verso { padding: 20px 24px; font: 1.1875rem/1.7 var(--fonte-biblia); text-wrap: pretty; }
 .quiz .opcoes { gap: 8px; }
 .quiz .opcoes .opcao { gap: 12px; min-height: 60px; padding: 14px 20px; border: 0; border-radius: 22px; background: var(--cartao); color: var(--tinta-forte); text-wrap: pretty; }
 .quiz .opcoes.de-texto .opcao { font: 1rem/1.55 var(--fonte-biblia); color: var(--tinta); }
@@ -179,19 +184,27 @@
 .quiz .opcao.certo svg, .quiz .veredito .selo-v { background: var(--salvia); color: var(--salvia-tinta); }
 .quiz .opcao.errado svg, .quiz .licao-pe.erro .selo-v { background: var(--alerta); color: var(--v2-inverso-tinta); }
 
-/* rodapé: folha clara com o veredito; acerto em sálvia pálido, erro em vermelho pálido */
-.quiz .licao-pe { padding: 20px 16px calc(16px + env(safe-area-inset-bottom)); border: 0; border-radius: var(--raio-folha) var(--raio-folha) 0 0; background: var(--cartao); }
+/* o pé: sem linha; a ação na pílula escura (clara no escuro); o veredito sobe numa folha:
+   acerto em sálvia pálido, erro em vermelho pálido. No fim da rodada, o pé volta ao fundo. */
+.quiz .licao-pe { padding: 20px 16px calc(16px + env(safe-area-inset-bottom)); border: 0; border-radius: var(--raio-folha) var(--raio-folha) 0 0; background: var(--fundo); }
 .quiz .licao-pe.certo { background: var(--salvia-palido); }
 .quiz .licao-pe.erro { background: var(--alerta-palido); }
+.quiz .licao-pe:has([data-repetir]) { background: var(--fundo); }
+.quiz .licao-pe .botao.cor, .quiz .licao-pe .botao.vermelho { --b: var(--inverso); color: var(--inverso-tinta); }
+.quiz .licao-pe .botao.cor[disabled] { background: var(--cartao); color: var(--tinta-fraca); }
 .quiz .veredito { margin-bottom: 4px; }
-.quiz .veredito div span { display: block; color: var(--tinta); }
+.quiz .veredito div span { display: block; color: var(--tinta); text-wrap: pretty; }
 
-/* fim da rodada */
-.quiz .festa h1 { margin: 0 0 4px; }
-.quiz .premios { grid-template-columns: minmax(0, 240px); justify-content: center; }
-.quiz .premio { padding: 16px; }
-.quiz .premio .cabeca { background: none; color: var(--tinta-fraca); }
-.quiz .conquista-linha { background: var(--realce); }
+/* fim da rodada: a folha inteira, com as estrelas, a nota e os acertos no cartão de destaque */
+.quiz .festa h1 { margin: 0 0 4px; font-size: 1.75rem; text-wrap: balance; }
+.quiz .festa .passo-dica { margin: 0; text-wrap: balance; }
+.quiz .estrelas-fim { margin: 0 0 12px; }
+.quiz .premios { display: block; width: min(100%, 260px); margin: 20px 0 0; }
+.quiz .premio { position: relative; display: flex; flex-direction: column-reverse; justify-content: center; gap: 2px; min-height: 84px; padding: 12px 72px 12px 20px; border: 0; border-radius: 26px; background: var(--folha-destaque); color: var(--salvia-tinta); text-align: left; }
+.quiz .premio .cabeca { padding: 0; background: none; color: inherit; font-weight: 600; }
+.quiz .premio .valor { display: block; padding: 0; color: inherit; font-size: 1.375rem; font-weight: 800; line-height: 1.1; }
+.quiz .premio .valor svg { position: absolute; top: 50%; right: 12px; box-sizing: content-box; width: 20px; height: 20px; margin-top: -24px; padding: 14px; border-radius: 50%; background: var(--salvia-tinta); color: #fff; stroke-width: 2.2; }
+.quiz .festa .conquista-linha { min-height: 44px; margin-top: 12px; background: var(--folha-destaque); color: var(--salvia-tinta); }
 
 /* celular pequeno: as linhas das listas apertam o recuo, para o nome da unidade caber
    inteiro ("Daniel a Malaquias · Apocalipse") em vez de deixar uma palavra sozinha */
