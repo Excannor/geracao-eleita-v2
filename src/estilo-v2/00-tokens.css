@@ -35,14 +35,15 @@
   --salvia-tinta: #151615;
   --v2-inverso: #151615;
   --v2-inverso-tinta: #ffffff;
-  /* a barra de abas: uma cápsula só, clara no claro; a aba ativa num círculo preto */
+  /* a barra de abas: de ponta a ponta, clara no claro; ícones soltos e a aba ativa em
+     sálvia-texto com um tracinho embaixo */
   --barra: #ffffff;
   --barra-botao: transparent;
-  --barra-icone: #2c2d2b;
+  --barra-icone: #686b66;
   --barra-rotulo: #686b66;
-  --barra-ativa: #151615;
+  --barra-ativa: #4d5d1f;
   --barra-ativa-tinta: #ffffff;
-  --barra-ativa-rotulo: #151615;
+  --barra-ativa-rotulo: #4d5d1f;
   /* a folha do alto das telas (Início...): sálvia pálida no claro, com cartões brancos
      por cima (paleta C, escolhida pelo dono em 30/09); grafite um tom acima no escuro */
   --folha: #dfe8c1;
@@ -91,13 +92,13 @@
   --salvia-texto: #c9d98f;
   --v2-inverso: #eef0ea;
   --v2-inverso-tinta: #1b1c1a;
-  --barra: #2a2c28;
+  --barra: #252724;
   --barra-botao: transparent;
-  --barra-icone: #e6e8e1;
-  --barra-rotulo: #b7bbb1;
-  --barra-ativa: #eef0ea;
+  --barra-icone: #a4a99d;
+  --barra-rotulo: #a4a99d;
+  --barra-ativa: #c9d98f;
   --barra-ativa-tinta: #151615;
-  --barra-ativa-rotulo: #eef0ea;
+  --barra-ativa-rotulo: #c9d98f;
   --folha: #2e302c;
   --folha-tinta: #eef0ea;
   --folha-tinta-fraca: #a4a99d;

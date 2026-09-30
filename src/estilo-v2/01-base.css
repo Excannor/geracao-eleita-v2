@@ -411,27 +411,26 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
     box-shadow: none;
     pointer-events: none;
   }
-  /* A faixa na cor do fundo (o conteúdo some antes da barra) e, por cima dela, a cápsula
-     única da barra, desenhada aqui para as duas ilhas e a Bíblia ficarem numa peça só. */
+  /* A barra de ponta a ponta, presa embaixo, com os cantos de cima arredondados (pedido
+     do dono, 30/09, a partir da barra do app original). Desenhada no ::before para as
+     duas ilhas e a Bíblia ficarem numa peça só. */
   .navegacao {
-    padding: 14px 18px calc(18px + env(safe-area-inset-bottom));
+    padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(to bottom, transparent, var(--fundo) 14px);
+    background: none;
   }
   .navegacao::before {
     content: '';
     position: absolute;
-    left: 10px;
-    right: 10px;
-    top: 6px;
-    bottom: calc(10px + env(safe-area-inset-bottom));
+    inset: 0;
     z-index: -1;
-    border-radius: 44px;
+    height: auto;
+    border-radius: 28px 28px 0 0;
     background: var(--barra);
-    box-shadow: 0 0 0 1px var(--contorno), 0 8px 24px rgba(21, 22, 21, .08);
+    box-shadow: 0 -1px 0 var(--contorno), 0 -8px 24px rgba(21, 22, 21, .06);
   }
-  :root[data-tema="escuro"] .navegacao::before { box-shadow: 0 0 0 1px var(--contorno); }
+  :root[data-tema="escuro"] .navegacao::before { box-shadow: 0 -1px 0 var(--contorno); }
   .navegacao > * { pointer-events: auto; }
   .ilha {
     flex: 0 1 auto;
@@ -599,20 +598,53 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
   .folha { border-radius: var(--raio-folha); }
 }
 
-/* Barra única: as abas dos dois lados se repartem por igual e a Bíblia fica no centro,
-   numa pílula sálvia de largura fixa (não um oval esticado). */
-@media (max-width: 859px) {
-  .navegacao .ilha { flex: 1 1 0; justify-content: space-evenly; gap: 0; }
-  .navegacao .aba-central { flex: 0 0 auto; width: 76px; min-width: 0; padding: 6px 0 5px; border-radius: 28px; }
-  .navegacao.cheia .aba-central { width: 64px; padding: 6px 0; border-radius: 999px; }
-}
 /* Barra cheia (seis abas) em tela estreita: círculos e Bíblia encolhem para caber na cápsula. */
 @media (max-width: 859px) {
   .navegacao.cheia { --circulo: clamp(40px, calc(40px + 4px * var(--cresce)), 44px); }
   .navegacao.cheia .aba:not(.aba-central) { min-width: var(--circulo); padding: 2px 0; }
   .navegacao.cheia .aba-central { width: clamp(52px, calc(52px + 12px * var(--cresce)), 64px); }
 }
+
+
+/* Barra de ponta a ponta: ícones soltos; a aba ativa ganha a cor sálvia-texto, o nome em
+   negrito e um tracinho embaixo; a Bíblia é um quadrado arredondado sálvia no centro,
+   com ícone e nome dentro. As abas dos dois lados se repartem por igual. */
+@media (max-width: 859px) {
+  .navegacao .ilha { flex: 1 1 0; justify-content: space-evenly; gap: 0; }
+  .navegacao .aba:not(.aba-central) .icone-aba,
+  .navegacao .aba.selecionada:not(.aba-central) .icone-aba,
+  .navegacao .aba:hover:not(.selecionada) .icone-aba { width: 40px; height: 34px; background: none; color: var(--barra-icone); }
+  .navegacao .aba .ico-aba { width: 24px; height: 24px; }
+  .navegacao .aba.selecionada:not(.aba-central) .icone-aba { color: var(--barra-ativa); }
+  .navegacao .aba.selecionada:not(.aba-central) .icone-aba::after { display: none; }
+  .navegacao .aba.selecionada:not(.aba-central) .ico-aba { transform: none; }
+  .navegacao .aba:not(.aba-central) .rotulo-aba { color: var(--barra-rotulo); }
+  .navegacao .aba.selecionada:not(.aba-central) .rotulo-aba { color: var(--barra-ativa); font-weight: 800; }
+  .navegacao .aba.selecionada:not(.aba-central) .rotulo-aba::after {
+    content: ''; display: block; width: 22px; height: 3px; margin: 4px auto 0; border-radius: 3px; background: var(--barra-ativa);
+  }
+  .navegacao .aba:not(.aba-central) { min-height: 56px; justify-content: flex-start; }
+  .navegacao .aba .ponto-aba { top: 2px; right: 4px; border-color: var(--barra); }
+  .navegacao .aba-central {
+    flex: 0 0 auto; width: 72px; min-width: 0; height: 64px; margin: 0 2px; padding: 0;
+    justify-content: center; gap: 2px; border-radius: 22px; background: var(--salvia);
+  }
+  .navegacao .aba-central .icone-aba { width: 30px; height: 30px; background: none; }
+  .navegacao .aba-central.selecionada .icone-aba { background: none; color: var(--salvia-tinta); }
+  .navegacao .aba-central.selecionada { box-shadow: 0 0 0 3px var(--barra), 0 0 0 5px var(--salvia-texto); }
+  .navegacao .aba-central .ico-aba { width: 26px; height: 26px; }
+  /* barra cheia: só os ícones, a ativa com o tracinho embaixo do ícone */
+  .navegacao.cheia .aba:not(.aba-central) { min-height: 48px; justify-content: center; }
+  .navegacao.cheia .aba.selecionada:not(.aba-central) .icone-aba::after {
+    content: ''; display: block; position: absolute; left: 50%; bottom: -6px; width: 18px; height: 3px; margin-left: -9px; border-radius: 3px; background: var(--barra-ativa);
+  }
+  .navegacao.cheia .aba-central { width: 60px; height: 56px; }
+}
 @media (max-width: 374px) {
-  .navegacao { padding-left: 14px; padding-right: 14px; }
-  .navegacao .aba-central { width: 68px; }
+  .navegacao { padding-left: 2px; padding-right: 2px; }
+  .navegacao .aba-central { width: 64px; height: 60px; border-radius: 20px; }
+  .navegacao.cheia .aba-central { width: 54px; height: 52px; }
+}
+@media (max-width: 859px) {
+  .navegacao.cheia .aba.aba-central { padding: 0; border-radius: 20px; }
 }
