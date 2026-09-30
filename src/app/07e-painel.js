@@ -159,7 +159,7 @@
         + '<div class="acoes"><a class="botao" href="https://wa.me/?text=' + encodeURIComponent(texto) + '" target="_blank" rel="noopener">Mandar pelo WhatsApp</a>'
         + '<button class="botao contorno" data-copiar>Copiar link</button></div>',
       {
-        rotulo: 'Link de senha nova',
+        rotulo: 'Link de senha nova', classe: 'folha-conta',
         ligar: (folha) => {
           folha.querySelector('[data-copiar]').onclick = async () => {
             try { await navigator.clipboard.writeText(r.link); CC.avisar('Link copiado'); } catch { CC.avisar('Não consegui copiar. Segure o link para copiar.'); }

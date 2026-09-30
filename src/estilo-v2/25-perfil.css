@@ -4,4 +4,132 @@
    Camada exclusiva deste grupo de telas (ver design/mapa-telas.md). Use as fichas de
    00-tokens.css e as peças de 01-base.css; nada de cor literal que valha só num tema.
    Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz, .selo-ref).
+
+   Escopo: as telas do grupo pelo #conteudo[data-rota] que o roteador marca (perfil, config,
+   explorar, secao, nota, busca, apoiar), as folhas do grupo pela classe que levam
+   (.folha-conta, .folha-instalar) e as classes que só este grupo desenha. Peças que outras
+   telas também usam (medalha, item de nota, linha de configuração) só mudam aqui dentro.
+   Escrito compacto (sem espaço depois dos dois-pontos, tamanhos em px): o orçamento da
+   camada é de 8 KB depois do build.
    ========================================================================= */
+
+/* ---------- Perfil: título centralizado; o nome parece título, não campo ---------- */
+[data-rota=perfil] .cartao-pessoa{flex-direction:column;gap:8px;padding:24px 20px 20px;border:0;border-radius:var(--raio-cartao);background:var(--cartao)}
+.cartao-pessoa .retrato{width:96px;height:96px;border:0;background:var(--salvia-palido)}
+.cartao-pessoa .sem-foto{color:var(--salvia-texto)}
+.cartao-pessoa .lapis{right:0;bottom:0;width:32px;height:32px;border:3px solid var(--cartao);background:var(--inverso);color:var(--inverso-tinta)}
+.cartao-pessoa .quem{display:grid;justify-items:center;gap:2px;width:100%}
+.cartao-pessoa .campo-apelido{min-height:48px;padding:4px 16px;border:0;border-radius:999px;background:none;font-size:24px;font-weight:800;letter-spacing:-.02em;text-align:center}
+.cartao-pessoa .campo-apelido:hover{background:var(--campo)}
+.cartao-pessoa .campo-apelido:focus{border:0;background:var(--campo);box-shadow:inset 0 0 0 2px var(--tinta-forte)}
+.cartao-pessoa .conta{padding:0;font-size:14px;font-weight:600}
+.titulo-perfil{margin:32px 0 12px;font-size:20px}
+
+/* visão geral: quatro números num cartão só, ícone em círculo */
+.visao-geral{gap:4px;margin:0;padding:8px;border-radius:var(--raio-cartao);background:var(--cartao)}
+.visao-item{gap:8px;min-height:64px;padding:8px 4px;border-radius:20px}
+.visao-item:hover{background:var(--campo)!important}
+.visao-item>svg,.visao-item>.ico-chama{box-sizing:content-box;width:18px;height:18px;padding:9px;border-radius:50%;background:var(--campo);color:var(--tinta-forte)}
+.visao-item small{font-size:13px;line-height:1.3}
+@media (max-width:379px){.visao-item{flex-direction:column;align-items:flex-start;padding:10px}}
+.linha-ritmo{margin:8px 0 0;padding:14px 16px;border-radius:20px;background:var(--realce);font-weight:600}
+.linha-ritmo svg{color:var(--salvia-texto)}
+
+/* medalha redonda (sálvia quando ganha, campo sem nível) e a faixa do nível em pílula de
+   12px, "Nível 1" sem caixa-alta forçada */
+.linha-conquista .arte-medalha{width:60px}
+.linha-conquista .escudo{width:56px;height:56px;border-radius:50%;background:var(--salvia);color:var(--salvia-tinta);box-shadow:none}
+.linha-conquista .sem-nivel .escudo{background:var(--campo);color:var(--tinta-fraca);box-shadow:none}
+.linha-conquista .faixa{margin-top:-10px;padding:0 8px;border-radius:9px;background:var(--inverso);color:var(--inverso-tinta);box-shadow:0 0 0 2px var(--cartao);font-size:12px;font-weight:700;line-height:18px;letter-spacing:0;text-transform:lowercase}
+.linha-conquista .faixa::first-letter{text-transform:uppercase}
+.linha-conquista{padding:16px 20px 16px 16px}
+.titulo-conquista span,.descricao-conquista{font-size:13px}
+/* barra das conquistas e do Semeador: trilho de campo, progresso escuro, ponto sálvia */
+[data-rota=perfil] .barra-missao{height:10px;margin:8px 0 6px;background:var(--campo)}
+[data-rota=perfil] .barra-missao i::after{left:auto;right:2px;top:2px;width:6px;height:6px;background:var(--salvia)}
+[data-rota=perfil] .barra-missao i[style="width:0.0%"]{visibility:hidden}
+
+.colecao-atalhos{margin:8px 0}
+.colecao-atalhos a{gap:4px;padding:16px 12px;border-radius:var(--raio-cartao)}
+.colecao-atalhos svg{box-sizing:content-box;margin-bottom:4px;padding:11px;border-radius:50%;background:var(--salvia-palido);color:var(--salvia-texto)}
+.cartao-semeador{margin:0;padding:16px 20px 16px 16px;border-radius:var(--raio-cartao)}
+.cartao-semeador.ganho{background:var(--realce)}
+.corpo-semeador small{color:var(--salvia-texto)}
+[data-rota=perfil] .linha-ajuda{margin-top:32px;padding:16px 20px;border-radius:var(--raio-cartao)}
+[data-rota=perfil] .linha-ajuda p{color:var(--tinta-forte);font-weight:500}
+
+/* troféus: estante de cartões; a arte ganha em sálvia, a que falta em cinza que se vê */
+.trofeu{gap:6px;padding:16px 8px 14px;border-radius:24px}
+.trofeu b{text-wrap:balance}
+.trofeu span{font-size:12px}
+.trofeu .arte-trofeu{--cor:var(--salvia);--cor-3d:var(--salvia-texto);--trilho:color-mix(in srgb,var(--tinta-fraca) 30%,var(--cartao))}
+.trofeu .detalhe{stroke:var(--cartao)!important}
+
+/* minhas anotações: o dia e a contagem em cima, a passagem inteira embaixo */
+.cartao-caderno{border-radius:var(--raio-cartao)}
+.cartao-caderno summary{flex-wrap:wrap;gap:6px 12px;min-height:64px;padding:16px 20px}
+.cartao-caderno .rotulo-dia-caderno{padding:4px 12px;background:var(--salvia-palido);color:var(--salvia-texto);font-size:13px;font-weight:700}
+.cartao-caderno .conta-caderno{order:1;margin-left:auto;font-size:13px}
+.cartao-caderno .passagem-caderno{order:2;flex:1 0 100%;white-space:normal}
+.cartao-caderno .campos-caderno{padding:16px 20px 12px;border-top:1px solid var(--contorno)}
+.cartao-caderno .campos-caderno b{font-size:13px;color:var(--tinta-fraca)}
+/* Minha história: as caixas de escrever são cartões sobre o fundo */
+[data-rota=perfil] textarea[id^=campo-historia]{min-height:128px;padding:14px 16px;border-color:var(--cartao);border-radius:22px;background:var(--cartao)}
+
+/* ---------- configurações, notificações e painel ---------- */
+[data-rota=config] .grupo-config{margin-top:24px}
+[data-rota=config] .grupo-config>.etiqueta,[data-rota=config] .grupo-config>.passo-dica{margin:8px 0;padding:0 20px;font-size:14px}
+[data-rota=config] .linha-config{gap:12px;padding:10px 20px}
+[data-rota=config] .linha-config .valor{overflow:visible;white-space:normal;overflow-wrap:anywhere;text-align:right;text-wrap:balance}
+[data-rota=config] .linha-config:has(.segmentado){padding:14px 20px 16px;row-gap:12px}
+.linha-config .segmentado{flex:1 0 100%;display:grid;grid-template-columns:repeat(3,1fr)}
+.cartao-push{margin:0 0 8px;padding:20px;border-radius:var(--raio-cartao)}
+.marca-push{width:48px;height:48px;border-radius:50%;background:var(--salvia-palido);color:var(--salvia-texto)}
+.opcao-traducao{position:relative;min-height:72px;padding:16px 60px 16px 20px;border:0;border-radius:24px}
+.opcao-traducao::after{content:'';position:absolute;top:50%;right:20px;width:24px;height:24px;margin-top:-12px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--tinta-fraca)}
+.opcao-traducao[aria-pressed=true]{background:var(--realce)}
+.opcao-traducao[aria-pressed=true]::after{background:var(--cartao);box-shadow:inset 0 0 0 7px var(--inverso)}
+.credito-biblia{padding:20px;border-radius:var(--raio-cartao);background:var(--cartao);font-size:13px;overflow-wrap:anywhere}
+.credito-biblia+.credito-biblia{margin-top:8px;padding-top:20px;border:0}
+.painel-cartao{padding:16px;border-radius:24px}
+.painel-cartao strong{font-size:32px;font-weight:800}
+.painel-cartao strong.texto{padding:10px 0 8px;color:var(--tinta-fraca);font-size:16px}
+.painel-cartao small em{display:block;color:var(--tinta-fraca)}
+.painel-coluna small,.painel-coluna em{font-size:12px}
+.painel-coluna em{height:40px}
+
+/* ---------- Explorar, seção, nota e busca ---------- */
+:is([data-rota=explorar],[data-rota=secao],[data-rota=busca],[data-rota=perfil]) .item{padding:18px 20px;border-radius:24px}
+.item b{text-wrap:balance}
+.bloco-secao{padding:18px 16px;border-radius:var(--raio-cartao)}
+.bloco-secao .icone,.icone-secao{width:48px;height:48px;border-radius:50%;background:var(--salvia-palido);color:var(--salvia-texto)}
+.filtro{min-height:44px;border:0;color:var(--tinta-forte);font-weight:600}
+.filtro.ligado{background:var(--inverso);color:var(--inverso-tinta)}
+:is([data-rota=explorar],[data-rota=busca]) .busca-caixa input{min-height:52px;border-color:var(--cartao);border-radius:26px;background:var(--cartao)}
+.nota-artigo .nota-corpo h2{color:var(--salvia-texto)!important}
+
+/* ---------- Apoiar ---------- */
+.apoiar-lista{margin-bottom:12px}
+.apoiar-item{padding:16px 20px;color:var(--tinta-forte)}
+.apoiar-pix{margin-bottom:8px;padding:20px;border-radius:var(--raio-cartao)}
+.apoiar-valores{margin-bottom:16px}
+.apoiar-valor{min-height:48px;border:0;border-radius:24px;background:var(--campo);font-size:16px}
+.apoiar-valor.sel{background:var(--inverso);color:var(--inverso-tinta)}
+.aviso-apoiar{padding:14px 16px;border-radius:20px;background:var(--realce)}
+
+/* ---------- folhas do grupo: fala em balão sem moldura, títulos iguais, alvos de 44px ---------- */
+:is(.folha-conta,.folha-instalar) .fala-bento{width:fit-content;padding:12px 16px;border:0;border-radius:20px 20px 20px 6px;background:var(--campo);color:var(--tinta-forte);font-weight:600}
+.folha-conta h3{margin:0 0 8px;font-size:22px;font-weight:800}
+.folha-conta p>a{display:inline-flex;align-items:center;min-height:44px}
+.folha-conta p:has(>a){margin-block:4px}
+.opcao-sistema,.passos-instalar li{border:0;border-radius:24px;background:var(--campo)}
+.opcao-sistema:active{transform:none;margin-bottom:0}
+.opcao-sistema .sugerido{font-size:12px;text-transform:none;letter-spacing:0}
+.opcao-sistema .sugerido,.passos-instalar li::before{background:var(--salvia);color:var(--salvia-tinta)}
+.passos-instalar .marca-passo{border-radius:50%;background:var(--cartao);color:var(--tinta-forte)}
+
+/* sem palavra sozinha na última linha dos textos curtos; resumo das notas com folga a 360px */
+:is([data-rota=perfil],[data-rota=config]) :is(small,label,em,b,span){text-wrap:pretty}
+.item .resumo{-webkit-line-clamp:6}
+.item :is(.destaque,.chip){text-wrap:pretty}
+.corpo-semeador b{text-wrap:balance!important}

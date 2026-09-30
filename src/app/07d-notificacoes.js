@@ -195,7 +195,7 @@
       + '<p>Um toque e o lembrete da leitura volta a chegar.</p>'
       + '<div class="acoes"><button class="botao" data-sim>Religar</button>'
       + '<button class="botao plano" data-nao>Agora não</button></div>', {
-      rotulo: 'Notificações',
+      rotulo: 'Notificações', classe: 'folha-conta',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-nao]').onclick = fechar;
         folha.querySelector('[data-sim]').onclick = async () => {
@@ -227,7 +227,7 @@
       + '<p>Um lembrete por dia, no horário que você escolher, e os avisos dos seus amigos. Nada de madrugada, nada de spam.</p>'
       + '<div class="acoes"><button class="botao" data-sim>Pode mandar</button>'
       + '<button class="botao plano" data-nao>Agora não</button></div>', {
-      rotulo: 'Notificações',
+      rotulo: 'Notificações', classe: 'folha-conta',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-nao]').onclick = fechar;
         folha.querySelector('[data-sim]').onclick = async () => {

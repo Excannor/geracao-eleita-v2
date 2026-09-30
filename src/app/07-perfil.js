@@ -56,6 +56,7 @@
       + '<button class="botao plano" data-fechar>Fechar</button></div>',
     {
       rotulo: 'Trilha do Semeador',
+      classe: 'folha-conta',
       rolavel: true,
       ligar: (folha, fechar) => {
         folha.querySelector('[data-fechar]').onclick = fechar;
@@ -127,8 +128,8 @@
     // Primeiro as conquistas mais perto do próximo nível: é o que dá vontade de seguir.
     const vitrine = conquistas.slice().sort((a, b) => (a.maximo - b.maximo) || (b.fracao - a.fracao)).slice(0, 3);
 
-    raiz.innerHTML = '<div class="cabeca-tela"><h1>Perfil</h1>'
-      + '<a class="botao-icone" href="#/config" aria-label="Configurações">' + CC.ico('engrenagem') + '</a></div>'
+    raiz.innerHTML = '<div class="cabeca-tela cabeca-centro"><span class="vao"></span><h1>Perfil</h1>'
+      + '<div class="acoes-cabeca"><a class="botao-icone" href="#/config" aria-label="Configurações">' + CC.ico('engrenagem') + '</a></div></div>'
       + '<div class="cartao-pessoa">'
       + '<button class="retrato" data-trocar-foto aria-label="' + (foto ? 'Trocar a foto' : 'Escolher uma foto') + '">'
       + (foto ? '<img src="' + CC.esc(foto) + '" alt="">' : '<span class="sem-foto">' + CC.ico('pessoa') + '</span>')
@@ -339,6 +340,7 @@
       a.onclick = (ev) => { ev.preventDefault(); CC.versiculos.irPara(a.dataset.refNota); };
     });
     raiz.querySelector('[data-exportar]').onclick = () => { CC.baixarExportacao(); CC.avisar('Arquivo gerado'); };
+    if (CC.inseparavel) CC.inseparavel(raiz);
   };
 
   // ---------- livros ----------
