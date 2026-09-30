@@ -182,7 +182,7 @@
     }
     CC.folha('<h2>Para quem é o convite?</h2>'
       + '<div class="acoes">'
-      + '<button class="botao azul" data-modo="plano">Alguém que já segue Jesus</button>'
+      + '<button class="botao" data-modo="plano">Alguém que já segue Jesus</button>'
       + '<button class="botao contorno" data-modo="conhecer">Alguém que está conhecendo Jesus</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button>'
       + '</div>',
@@ -285,7 +285,7 @@
       + '<p class="frase-cena">A contagem sobe nos dias em que vocês dois fazem a lição.</p></div>', {
       classe: 'tela-proposito',
       rotulo: 'Novo propósito',
-      pe: '<button class="botao azul" data-ver>Ver propósito</button>',
+      pe: '<button class="botao" data-ver>Ver propósito</button>',
       ligar: (el, fechar) => {
         CC.arte.confete(el, 30);
         el.querySelector('[data-ver]').onclick = () => { fechar(); location.hash = '#/novidades'; };
@@ -300,7 +300,7 @@
       + '<p class="dias-dupla">' + CC.icoChama() + '<b>' + (amigo.dias || 0) + '</b> ' + ((amigo.dias || 0) === 1 ? 'dia' : 'dias') + ' de propósito</p></div>', {
       classe: 'tela-toque',
       rotulo: 'Dar um toque',
-      pe: '<button class="botao azul" data-enviar-toque>' + CC.ico('sino') + 'Notificar</button>'
+      pe: '<button class="botao" data-enviar-toque>' + CC.ico('sino') + 'Notificar</button>'
         + '<button class="botao plano" data-fechar-tela>Continuar</button>',
       ligar: (el, fechar) => {
         el.querySelector('[data-fechar-tela]').onclick = fechar;
@@ -403,7 +403,7 @@
       + estado
       + (!euLi && !amigo.leuHoje ? '<p class="passo-dica pequena">Leia hoje para poder dar um toque.</p>' : '')
       + '<div class="acoes">'
-      + (podeTocar ? '<button class="botao azul" data-toque>' + CC.ico('sino') + 'Notificar</button>' : '')
+      + (podeTocar ? '<button class="botao" data-toque>' + CC.ico('sino') + 'Notificar</button>' : '')
       + (amigo.toqueEnviado ? '<button class="botao" disabled>' + CC.ico('certo') + 'Notificado hoje</button>' : '')
       + '<button class="botao contorno" data-novo-com>' + CC.ico('mais-sinal') + 'Novo propósito com&nbsp;' + CC.esc(amigo.nome) + '</button>'
       + '<button class="botao plano" data-encerrar>Desfazer amizade</button>'

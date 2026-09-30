@@ -7,6 +7,8 @@
 
    Os cabeçalhos das telas deste grupo usam as peças da base (.cabeca-centro, .subtitulo-tela),
    trocadas no HTML dos três arquivos: por isso quase nada de cabeçalho mora aqui.
+   A ação principal é a pílula escura (clara no escuro), como no resto do app: o sálvia fica
+   para o acento.
    ========================================================================= */
 
 /* ---------- retratos: redondos, nas cores do guia ----------
@@ -84,6 +86,8 @@ button.cartao-proposito:hover { background: var(--campo); }
 
 /* ---------- folha do amigo, convite e toques ---------- */
 .dias-proposito.aceso { color: var(--chama-texto); }
+/* os dias da folha de encontro e de registro: o escolhido em pílula escura, como o segmentado */
+.escolha-dia .botao.azul { --b: var(--inverso); color: var(--inverso-tinta); }
 .tela-cheia .titulo-toque { color: var(--tinta-forte) !important; font-size: 1.75rem; }
 .balao-fala, .balao-fala::after { border: 0; background: var(--cartao); }
 .balao-fala { border-radius: 22px; }

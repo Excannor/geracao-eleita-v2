@@ -213,7 +213,7 @@
       + (p.hoje ? barraDoGrupo(p.hoje) : '')
       + (conduzo ? blocoEncontro(p) : '')
       + '<div class="acoes">'
-      + (eu.papel === 'visitante' ? '<button class="botao azul" data-tornar-membro>' + CC.ico('mais-sinal') + 'Fazer parte da célula</button>' : '')
+      + (eu.papel === 'visitante' ? '<button class="botao" data-tornar-membro>' + CC.ico('mais-sinal') + 'Fazer parte da célula</button>' : '')
       + (eu.papel !== 'visitante' && eu.estado === 'ativo' && p.encontro >= 0
         ? '<button class="botao contorno" data-convidar-encontro>' + CC.ico('compartilhar') + 'Convidar para o encontro</button>' : '')
       + (podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno pequeno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
@@ -268,7 +268,7 @@
       painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('livro')
         + '<p>' + (conduzo ? 'O estudo do encontro ainda não foi preparado. Você escolhe: a leitura da semana, um trecho ou um estudo seu.'
           : CC.esc(nomeDoLider(p)) + ' ainda não preparou o estudo deste encontro.') + '</p>'
-        + (conduzo ? '<button class="botao azul" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>' : '') + '</div>';
+        + (conduzo ? '<button class="botao" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>' : '') + '</div>';
       const preparar = painel.querySelector('[data-preparar]');
       if (preparar) preparar.onclick = () => folhaPrepararEstudo(p);
       return;
@@ -276,7 +276,7 @@
     const { html, texto, ref } = await montarEstudo(p);
     if (!aindaAqui()) return;
     painel.innerHTML = html
-      + '<div class="acoes"><button class="botao azul" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
+      + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
       + '<button class="botao contorno" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button>'
       + (conduzo ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '') + '</div>';
     if (ref) CC.ligarCartaoVersiculo(painel, ref);
@@ -322,7 +322,7 @@
         + (souLider ? '<button class="botao plano pequeno" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar</button>' : '')
         + '</div>').join('') + '</div>' : '')
       + '<div class="acoes">'
-      + (eu.fezHoje && faltam.length ? '<button class="botao azul" data-notificar>' + CC.ico('sino')
+      + (eu.fezHoje && faltam.length ? '<button class="botao" data-notificar>' + CC.ico('sino')
         + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
       + (gente.length < limite ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar um amigo</button>' : '')
       + (souLider && p.membros.some((m) => m.estado === 'ativo' && m.papel === 'auxiliar')
@@ -409,7 +409,7 @@
         + '<input type="checkbox" value="' + CC.esc(m.usuario) + '" data-pessoa-multiplicar' + (m.papel === 'auxiliar' ? ' data-outro-auxiliar' : '') + '>' + retrato(m)
         + '<span class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + (m.papel === 'visitante' ? ' <small class="selo-lider">visitante</small>' : '') + '</b></span></label>').join('') + '</div>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-confirmar-multiplicar>Multiplicar</button>'
+      + '<div class="acoes"><button class="botao" data-confirmar-multiplicar>Multiplicar</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
       rotulo: 'Multiplicar a célula',
@@ -490,7 +490,7 @@
       raiz.innerHTML = '<div class="cabeca-centro">' + CC.botaoVoltar('Juntos') + '<h1>Propósitos</h1></div>'
         + (d ? '<p class="subtitulo-tela">' + CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') + '</p>' : '')
         + (aviso ? '<p class="estado-linha">' + CC.ico('info') + '<span>' + CC.esc(aviso) + '</span></p>' : '')
-        + '<button class="botao azul" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito com amigos</button>'
+        + '<button class="botao" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito com amigos</button>'
         + (!d ? CC.esqueleto('cartoes') : '')
         + (convites.length ? CC.tituloSecao('Convites', String(convites.length)) + '<div class="lista-propositos">' + convites.map(cartaoConvite).join('') + '</div>' : '')
         + (grupos.length ? CC.tituloSecao('Grupos') + '<div class="lista-propositos">' + grupos.map(cartao).join('') + '</div>' : '')
@@ -563,8 +563,8 @@
         : '<p class="passo-dica pequena">' + CC.esc(EXPLICA[p.tipo] || '') + '</p>')
       + '<div class="lista-pedidos">' + linhas + '</div>'
       + '<div class="acoes">'
-      + (podeNotificar ? '<button class="botao azul" data-notificar>' + CC.ico('sino') + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
-      + (p.celula ? '<button class="botao azul" data-roteiro>' + CC.ico('livro') + 'Estudo do encontro</button>' : '')
+      + (podeNotificar ? '<button class="botao" data-notificar>' + CC.ico('sino') + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
+      + (p.celula ? '<button class="botao" data-roteiro>' + CC.ico('livro') + 'Estudo do encontro</button>' : '')
       + (p.celula && podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno pequeno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
       + (souLider ? '<div class="pe-duplo-plano"><button class="botao plano pequeno" data-recado>' + (p.recado ? 'Mudar o recado' : 'Escrever um recado') + '</button>'
         + '<button class="botao plano pequeno" data-encontro>Dia do encontro</button></div>' : '')
@@ -682,7 +682,7 @@
       + '<p class="passo-dica">Vocês leem o plano juntos, até ' + limite + ' pessoas. Depois de criar, você manda o link no grupo do WhatsApp e quem abrir já entra.</p>'
       + '<label class="campo-senha"><span>Nome da célula</span><input data-titulo name="nome-da-celula" maxlength="30" placeholder="Ex.: Célula de quinta" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-criar>Criar e pegar o link</button>'
+      + '<div class="acoes"><button class="botao" data-criar>Criar e pegar o link</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
       rotulo: 'Criar uma célula',
@@ -842,7 +842,7 @@
       + '<label class="campo-senha"><span>Recado</span><textarea data-texto name="recado-da-celula" maxlength="' + max + '" rows="4" autocomplete="off">' + CC.esc(p.recado || '') + '</textarea></label>'
       + '<p class="passo-dica pequena" data-conta></p>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-salvar>Publicar recado</button>'
+      + '<div class="acoes"><button class="botao" data-salvar>Publicar recado</button>'
       + (p.recado ? '<button class="botao plano perigo" data-apagar>Apagar o recado</button>' : '')
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
@@ -919,7 +919,7 @@
       + '<b data-visitantes-valor>0</b>'
       + '<button type="button" class="botao-icone" data-visitantes-mais aria-label="Aumentar">+</button></div></div>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-salvar>Salvar</button>'
+      + '<div class="acoes"><button class="botao" data-salvar>Salvar</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
       rotulo: 'Quem foi ao encontro',
@@ -1043,7 +1043,7 @@
     }
     const { html, texto, ref } = await montarEstudo(p);
     CC.folha('<h2>Estudo do encontro</h2>' + html
-      + '<div class="acoes"><button class="botao azul" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
+      + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
       + '<button class="botao contorno" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button>'
       + (conduzo ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '')
       + '<button class="botao plano" data-fechar>Fechar</button></div>',
@@ -1193,7 +1193,7 @@
         + '<textarea data-texto name="estudo-do-lider" rows="5" maxlength="3000" autocomplete="off">' + CC.esc(atual.texto || '') + '</textarea></label>'
       + campoW('testemunho', 'Testemunho', 'quem vamos convidar e pelo que vamos orar', p.estudoTestemunho)
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-salvar>Salvar o estudo</button>'
+      + '<div class="acoes"><button class="botao" data-salvar>Salvar o estudo</button>'
       + (p.estudo ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '')
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
@@ -1266,7 +1266,7 @@
       + '<p class="recado-senha" id="recado" role="alert"></p>'
       // Quem só quer conhecer entra como visitante: não ocupa vaga de membro, não conta na
       // meta e pode virar membro de verdade depois, na aba Hoje.
-      + '<div class="acoes">' + (dentro ? '' : '<button class="botao azul" data-entrar' + (info.vagas > 0 ? '' : ' disabled') + '>Entrar na célula</button>'
+      + '<div class="acoes">' + (dentro ? '' : '<button class="botao" data-entrar' + (info.vagas > 0 ? '' : ' disabled') + '>Entrar na célula</button>'
         + '<button class="botao contorno" data-visitante>Só quero conhecer</button>')
       + '<button class="botao plano" data-fechar>' + (dentro ? 'Fechar' : 'Agora não') + '</button></div>',
     {
@@ -1319,7 +1319,7 @@
       + '<p class="passo-dica pequena" data-dica-grupo hidden>Com 3 ou mais pessoas, vira um grupo.</p>'
       + '<label class="campo-senha" data-bloco-nome hidden><span>Nome do grupo</span><input data-titulo name="nome-do-grupo" maxlength="30" placeholder="Ex.: Amigos da escola" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-criar disabled>Chamar para o propósito</button>'
+      + '<div class="acoes"><button class="botao" data-criar disabled>Chamar para o propósito</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
       rotulo: 'Novo propósito',
@@ -1422,7 +1422,7 @@
     } else {
       html += '<div class="pe-duplo-plano">'
         + (item.oreiHoje ? '<span class="selo-status leu">' + CC.ico('certo') + 'Você orou hoje</span>'
-          : '<button class="botao azul pequeno" data-orei="' + CC.esc(item.id) + '">Orei por você</button>')
+          : '<button class="botao pequeno" data-orei="' + CC.esc(item.id) + '">Orei por você</button>')
         + (necessidade ? (item.ajudei ? '<span class="selo-status leu">' + CC.ico('certo') + 'Você disse que pode ajudar</span>'
           : '<button class="botao contorno pequeno" data-ajudo="' + CC.esc(item.id) + '">Posso ajudar</button>') : '')
         + '</div>'
@@ -1450,7 +1450,7 @@
     if (!d) { painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('aperto') + '<p>Não consegui falar com o servidor agora.</p></div>'; return; }
     const conduzo = p.euConduzo;
     painel.innerHTML = (conduzo && d.denuncias && d.denuncias.length ? blocoRevisaoPedidos(d.denuncias) : '')
-      + '<div class="acoes"><button class="botao azul" data-pedir="oracao">' + CC.ico('aperto') + 'Pedir oração</button>'
+      + '<div class="acoes"><button class="botao" data-pedir="oracao">' + CC.ico('aperto') + 'Pedir oração</button>'
       + '<button class="botao contorno" data-pedir="necessidade">Pedir ajuda</button></div>'
       + (d.pedidos.length
         ? '<div class="lista-pedidos">' + d.pedidos.map(cartaoPedido).join('') + '</div>'
@@ -1554,7 +1554,7 @@
       + '<button type="button" data-dias="7" aria-pressed="true">7 dias</button>'
       + '<button type="button" data-dias="30" aria-pressed="false">30 dias</button></div>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-enviar>Pedir</button>'
+      + '<div class="acoes"><button class="botao" data-enviar>Pedir</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
       rotulo: titulo,
@@ -1617,7 +1617,7 @@
                 // A caixa de ajuda completa da seção 5, mostrada na hora para quem denunciou.
                 folha.innerHTML = '<h2>Obrigado por avisar</h2>'
                   + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>' + AJUDA_PERIGO_DENUNCIA + '</p></div>'
-                  + '<div class="acoes"><button class="botao azul" data-entendi>Entendi</button></div>';
+                  + '<div class="acoes"><button class="botao" data-entendi>Entendi</button></div>';
                 folha.querySelector('[data-entendi]').onclick = fechar;
               } else {
                 fechar();

@@ -79,7 +79,7 @@
       + '<label class="campo-senha"><span>Quando foi?</span>'
       + '<input type="date" data-quando max="' + hoje + '" value="' + CC.esc(atual || hoje) + '"></label>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-salvar>Salvar</button>'
+      + '<div class="acoes"><button class="botao" data-salvar>Salvar</button>'
       + (atual ? '<button class="botao plano perigo" data-desmarcar>Desmarcar</button>' : '')
       + '<button class="botao plano" data-fechar>Cancelar</button></div>', {
       rotulo: ROTULOS_MARCO[chave],
@@ -130,7 +130,7 @@
       + '<div class="escolha-dia" role="group" aria-label="Dia do encontro">' + opcoes.map((d, i) => '<button type="button" class="botao '
         + (i === 0 ? 'azul' : 'contorno') + ' pequeno" data-data="' + d + '" aria-pressed="' + (i === 0) + '">' + rotuloData(d) + '</button>').join('') + '</div>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-marcar>Marcar que nos encontramos</button>'
+      + '<div class="acoes"><button class="botao" data-marcar>Marcar que nos encontramos</button>'
       + '<button class="botao plano" data-fechar>Fechar</button></div>',
     {
       rotulo: 'Encontro da semana',
@@ -254,7 +254,7 @@
       + '<p class="passo-dica">' + CC.esc(pedido.de.nome) + ' vai ver só o que você deixar ligado, nunca o que você escreve. Você pode mudar isso quando quiser.</p>'
       + '<div class="caixa-config">' + ORDEM_MOSTRAR.map((chave) => linhaInterruptor('escolha', chave, ROTULOS_MOSTRAR[chave], estado[chave])).join('') + '</div>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-confirmar>Aceitar</button>'
+      + '<div class="acoes"><button class="botao" data-confirmar>Aceitar</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
       rotulo: 'O que você quer mostrar',
@@ -299,7 +299,7 @@
   function folhaEscolherPapel(amigo) {
     CC.folha('<h2>Convidar ' + CC.esc(amigo.nome) + '</h2>'
       + '<div class="acoes">'
-      + '<button class="botao azul" data-papel="discipulador">Quero te acompanhar na fé</button>'
+      + '<button class="botao" data-papel="discipulador">Quero te acompanhar na fé</button>'
       + '<button class="botao contorno" data-papel="discipulo">Quero que você me acompanhe</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button>'
       + '</div>',
@@ -357,7 +357,7 @@
     CC.folha('<h2>Acompanhar ' + CC.esc(nome) + ' na fé?</h2>'
       + '<p class="passo-dica">Você vai ver o que ' + CC.esc(nome) + ' escolher mostrar: os primeiros passos, quantos dias leu e a caminhada. Nunca o que ' + CC.esc(nome) + ' escreve.</p>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao azul" data-enviar>Convidar</button>'
+      + '<div class="acoes"><button class="botao" data-enviar>Convidar</button>'
       + '<button class="botao plano" data-fechar>Agora não</button></div>',
     {
       rotulo: 'Acompanhar na fé',
