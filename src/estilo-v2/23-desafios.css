@@ -1,34 +1,65 @@
 /* =========================================================================
    REDESENHO V2 · 23-desafios
-   Desafios do dia, desafios de vários dias e Praticar.
+   Desafios do dia, desafios de vários dias e Praticar (lista e quiz).
    Camada exclusiva deste grupo de telas (ver design/mapa-telas.md). Use as fichas de
    00-tokens.css e as peças de 01-base.css; nada de cor literal que valha só num tema.
    Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz, .selo-ref).
-   Peças que outras telas também usam (.barra-missao, .licao-pe, .premio, .conquista-linha)
-   só são tocadas dentro destas telas (.missao, .quiz).
+   Peças que outras telas também usam (.barra-missao, .licao-pe, .festa, .premio,
+   .conquista-linha) só são tocadas dentro destas telas (.missao, .quiz).
+
+   Padrão aprovado pelo dono (o Início de 0a11385, paleta C): a folha do alto de ponta a
+   ponta, com os cantos de baixo redondos, nas fichas --folha-* (sálvia pálida no claro,
+   grafite um tom acima no escuro), com o cartão de destaque do Início por cima (branco no
+   claro, sálvia no escuro, número em bold, botão redondo preto); o corpo no fundo do tema,
+   com cartões; a ação principal na pílula escura (clara no escuro).
    ========================================================================= */
 
-/* ---------- peças comuns destas telas ---------- */
-/* cartão: cor do cartão, raio grande, sem borda nem sombra */
-.cabeca-missoes, .cabeca-pratica, .lista-missoes, .missao-convite, .cartao-praticar, .dsf-card,
-.quiz .verso, .quiz .premio {
-  margin: 0;
-  border: 0;
-  border-radius: var(--raio-cartao);
-  background: var(--cartao);
-  color: var(--tinta);
-  box-shadow: none;
+/* ---------- a folha do alto ----------
+   Desafios e Praticar: o topo do app (retrato e ofensiva) fica preso em cima, no lugar e no
+   tamanho da saudação do Início, com os cantos de baixo redondos; a .folha-desafios sobe por
+   trás desses cantos e os dois viram uma peça só; ao rolar, ela passa por baixo e o topo fica
+   sozinho. São os valores do topo em folha da Bíblia (22-leitura): se o topo em folha chegar
+   para todas as telas, as regras do topo daqui ficam redundantes.
+   Por dentro, --cartao é a superfície da folha e as tintas são as dela. */
+.folha-desafios, .topo:has(~ .corpo .folha-desafios) {
+  --cartao: var(--folha-campo); --campo: var(--folha-campo);
+  --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
+  --progresso: var(--folha-tinta);
+  color: var(--folha-tinta);
 }
-/* círculo de ícone de 48px: neutro; sálvia quando feito, sálvia pálido no destaque */
+.folha-desafios { border-radius: 0 0 36px 36px; background: var(--folha); }
+.topo:has(~ .corpo .folha-desafios) { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
+.topo:has(~ .corpo .folha-desafios)::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
+.topo:has(~ .corpo .folha-desafios) > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
+.topo:has(~ .corpo .folha-desafios) > .perfil-topo .ico-aba { width: 24px; height: 24px; }
+.folha-desafios { margin: -52px -16px 20px; padding: 40px 30px 24px; }
+
+/* o cartão de destaque do Início: branco no claro, sálvia no escuro, tinta escura; o número
+   em bold e, à direita, o baú */
+.cabeca-missoes {
+  position: relative; display: flex; align-items: center; gap: 12px; min-height: 84px; margin: 0; padding: 12px 12px 12px 20px;
+  border: 0; border-radius: 26px; background: var(--folha-destaque); color: var(--salvia-tinta); box-shadow: none;
+}
+.cabeca-missoes .textos { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.placar-missoes, .placar-missoes small { color: inherit; font-size: clamp(1.0625rem, 5.4vw, 1.375rem); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; }
+.cabeca-missoes p { display: block; margin: 0; color: inherit; font-size: .8125rem; font-weight: 600; line-height: 1.3; opacity: 1; text-wrap: balance; }
+.bau-cabeca { flex: none; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--folha); }
+.bau-cabeca svg { width: 44px; }
+/* o cabeçalho do Praticar: cartão com a unidade em bold e o botão redondo sálvia */
+.cabeca-pratica { display: flex; align-items: flex-end; gap: 16px; padding: 20px 20px 20px 24px; }
+.cabeca-pratica .textos { flex: 1; min-width: 0; }
+.cabeca-pratica p { margin: 6px 0 0; color: var(--tinta-fraca); font-weight: 500; opacity: 1; }
+.unidade-pratica { display: block; color: var(--tinta-forte); font-size: 2.5rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; }
+.cabeca-pratica .etiqueta { margin: 0 0 4px; }
+
+/* ---------- peças do corpo ---------- */
+/* cartão: cor do cartão, raio grande, sem borda nem sombra */
+.cabeca-pratica, .lista-missoes, .missao-convite, .cartao-praticar, .dsf-card, .quiz .verso, .quiz .premio {
+  margin: 0; border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta); box-shadow: none;
+}
+/* círculo de ícone de 48px: neutro; sálvia quando feito ou quando é a vez; sálvia pálido no atalho */
 .icone-missao, .dsf-ico, .lista-pratica.caixa-lista .cartao-pratica .marca, .cartao-praticar .icone-praticar {
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--campo);
-  color: var(--tinta-forte);
+  flex: 0 0 auto; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--campo); color: var(--tinta-forte);
 }
 .icone-missao svg, .dsf-ico svg, .cartao-pratica .marca svg, .cartao-praticar .icone-praticar svg { width: 22px; height: 22px; }
 .missao.feita .icone-missao, .dsf-item.concluido .dsf-ico,
@@ -36,76 +67,68 @@
 .missao-convite .icone-missao, .cartao-praticar .icone-praticar { background: var(--salvia-palido); color: var(--salvia-texto); }
 /* pílulas de conta e de metadado (32px, 13px) */
 .titulo-bloco span, .conta-missao, .dsf-selo, .dsf-dias {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 32px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--campo);
-  color: var(--tinta-forte);
-  font-size: 0.8125rem;
-  font-weight: 700;
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 12px;
+  border: 0; border-radius: 999px; background: var(--campo); color: var(--tinta-forte); font-size: .8125rem; font-weight: 700;
 }
 .titulo-bloco span { background: var(--cartao); color: var(--tinta-fraca); }
 .conta-missao { min-width: 48px; min-height: 28px; padding: 0 10px; background: none; box-shadow: inset 0 0 0 1.5px var(--contorno); }
 .dsf-dias { background: none; box-shadow: inset 0 0 0 1.5px var(--contorno); }
 .missao.feita .conta-missao { background: var(--salvia); box-shadow: none; color: var(--salvia-tinta); }
-.dsf-selo, :root[data-tema="escuro"] .dsf-selo { background: var(--salvia-palido); color: var(--salvia-texto); }
+.dsf-selo { background: var(--salvia-palido); color: var(--salvia-texto); }
 .titulo-bloco svg, .dsf-n svg { width: 16px; height: 16px; color: inherit; }
-/* barras: trilho de contorno, enchimento escuro */
+/* barras: trilho de contorno, enchimento escuro (claro no escuro), sem o brilho antigo */
 .missao .barra-missao, .dsf-barra { flex: 1; height: 8px; margin: 0; border-radius: 999px; background: var(--contorno); overflow: hidden; }
 .missao .barra-missao i, .dsf-barra i { border-radius: 999px; background: var(--inverso); }
-/* estrelas: cheia em sálvia escura; vazia só com o contorno, visível nos dois temas */
+.missao .barra-missao i::after { display: none; }
+/* estrelas: cheia em sálvia escura (clara no escuro); vazia só com o contorno, visível nos dois temas */
 .estrelas i, .estrelas-fim i { color: var(--tinta-fraca); }
 .estrelas i:not(.cheia) svg, .estrelas-fim i:not(.cheia) svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
 .estrelas i.cheia, .estrelas-fim i.cheia { color: var(--salvia-texto); }
 .estrelas { gap: 4px; margin-top: 8px; }
 
-/* ---------- cabeçalho: título no meio e cartão de destaque com o número em bold ---------- */
-.cabeca-missoes, .cabeca-pratica { display: flex; align-items: center; gap: 16px; padding: 20px 20px 20px 24px; }
-.cabeca-pratica { align-items: flex-end; }
-.cabeca-missoes .textos, .cabeca-pratica .textos { flex: 1; min-width: 0; }
-.cabeca-missoes p, .cabeca-pratica p { margin: 6px 0 0; color: var(--tinta-fraca); font-weight: 500; opacity: 1; }
-.placar-missoes, .unidade-pratica { display: block; color: var(--tinta-forte); font-size: 2.5rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; }
-.placar-missoes small { color: var(--tinta-fraca); font-size: 1.25rem; letter-spacing: 0; }
-.bau-cabeca { flex: 0 0 auto; display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%; background: var(--salvia-palido); }
-.bau-cabeca svg { width: 64px; }
-.cabeca-pratica .etiqueta { margin: 0 0 4px; }
-
-/* ---------- blocos e listas dos desafios ---------- */
+/* ---------- os blocos da tela dos Desafios ---------- */
 .bloco-missoes, .cartao-praticar { margin-top: 32px; }
-.titulo-bloco { align-items: center; gap: 12px; margin: 0 0 12px; }
-.titulo-bloco ~ .titulo-bloco { margin-top: 32px; }
+.folha-desafios + .bloco-missoes { margin-top: 12px; }
+/* título do bloco numa linha só: se a pílula não couber ao lado ("Lendo junto na semana" a
+   360px), ela desce para baixo do título, em vez de o título quebrar */
+.titulo-bloco { flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 12px; }
+.titulo-bloco h2 { font-size: 1.25rem; }
+.titulo-bloco ~ .titulo-bloco { margin-top: 20px; }
 .missao, .missao-convite, .cartao-praticar, .dsf-item { gap: 12px; min-height: 80px; padding: 16px; }
 .missao + .missao { border-top: 1px solid var(--contorno); }
 .corpo-missao b, .dsf-item b { color: var(--tinta-forte); font-size: 1rem; font-weight: 700; line-height: 1.3; text-wrap: balance; }
 .linha-barra { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .premio-missao, .premio-missao svg { width: 40px; }
-.estado-dupla { gap: 6px; min-height: 36px; margin: 0; color: var(--tinta-fraca); font-size: 0.875rem; font-weight: 600; }
+.estado-dupla { gap: 6px; min-height: 36px; margin: 0; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; }
 .estado-dupla svg { color: var(--salvia-texto); }
 .estado-dupla .link-nota { margin: -4px 0; color: var(--tinta-forte); font-weight: 700; text-decoration: none; }
-.missao-convite p, .cartao-praticar small, .dsf-item small { color: var(--tinta-fraca); font-size: 0.875rem; font-weight: 500; }
+.missao-convite p, .cartao-praticar small, .dsf-item small { color: var(--tinta-fraca); font-size: .875rem; font-weight: 500; text-wrap: balance; }
+/* sem amigos: o convite em duas linhas, o texto ao lado do ícone e o botão embaixo, na largura toda */
+.missao-convite { display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: center; }
+.missao-convite .botao { grid-column: 1 / -1; }
+.missao-convite svg { color: inherit; }
+.missao-convite .botao svg { width: 20px; height: 20px; }
+/* o atalho do Praticar: o botão redondo na cor da ação, como o "Começar" do Início */
 .cartao-praticar:hover { background: var(--cartao); }
+.cartao-praticar .botao-redondo { background: var(--inverso); color: var(--inverso-tinta); }
 
-/* desafios de vários dias: lista num cartão só e o desafio em andamento sem chapa escura */
+/* desafios de vários dias: a lista num cartão só; o desafio em andamento num cartão, com a
+   ação do dia na pílula escura */
 .dsf-lista.caixa-lista { display: block; margin: 0; overflow: hidden; }
 .dsf-item { align-items: flex-start; border: 0; border-radius: 0; background: none; }
 .dsf-item:hover { background: var(--campo); }
 .dsf-textos { flex: 1; min-width: 0; }
 .dsf-item small { display: block; margin-top: 2px; }
-.dsf-n, :root[data-tema="escuro"] .dsf-n { display: flex; margin: 0 0 2px; color: var(--tinta-fraca); font-size: 0.8125rem; font-weight: 700; }
-.dsf-item.concluido .dsf-n { color: var(--salvia-texto); }
+.dsf-n, :root[data-tema="escuro"] .dsf-n { display: flex; margin: 0 0 2px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
+/* concluído: no lugar da duração, o visto num círculo sálvia, como os selos de estado */
+.dsf-item.concluido .dsf-n svg { box-sizing: border-box; width: 20px; height: 20px; padding: 4px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); stroke-width: 3; }
 .dsf-card { margin-bottom: 12px; }
 .dsf-topo { padding: 20px 20px 0; background: none; color: var(--tinta-forte); }
-.dsf-nome { margin-top: 12px; font: 800 1.375rem/1.2 var(--fonte); letter-spacing: -0.02em; }
+.dsf-nome { margin-top: 12px; font: 800 1.375rem/1.2 var(--fonte); letter-spacing: -.02em; text-wrap: balance; }
 .dsf-corpo { padding: 16px 20px 20px; }
 .dsf-stats { margin: 0 0 16px; padding: 12px 0; border-radius: 20px; background: var(--campo); }
 .dsf-stats b { color: var(--tinta-forte); font-size: 1.5rem; font-weight: 800; }
-.dsf-acao { gap: 8px; min-height: 52px; border: 0; background: var(--salvia); color: var(--salvia-tinta); font-family: var(--fonte); text-transform: none; letter-spacing: 0; }
+.dsf-acao { gap: 8px; min-height: 48px; border: 0; background: var(--inverso); color: var(--inverso-tinta); font: 700 .9375rem var(--fonte); text-transform: none; letter-spacing: 0; }
 .dsf-acao.feito { border: 0; background: var(--campo); color: var(--tinta-forte); }
 .dsf-acao svg { width: 20px; height: 20px; }
 .dsf-barra { display: block; margin-top: 16px; }
@@ -161,3 +184,8 @@
 .quiz .premio { padding: 16px; }
 .quiz .premio .cabeca { background: none; color: var(--tinta-fraca); }
 .quiz .conquista-linha { background: var(--realce); }
+
+/* celular pequeno: as linhas das listas apertam o recuo, e o texto ganha a largura */
+@media (max-width: 374px) {
+  .missao, .missao-convite, .cartao-praticar, .dsf-item { gap: 10px; padding-inline: 14px 12px; }
+}

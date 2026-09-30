@@ -64,11 +64,13 @@
     const feitas = lista.filter((m) => m.feita).length;
 
     // O título da tela fica no alto, no meio; o destaque é um cartão com a conta do dia em bold.
-    raiz.innerHTML = '<div class="cabeca-centro"><span class="vao"></span><h1>Desafios</h1><span class="vao"></span></div>'
+    // .folha-desafios: só apresentação, a folha do alto destas telas (23-desafios.css).
+    raiz.innerHTML = '<div class="folha-desafios">'
+      + '<div class="cabeca-centro"><span class="vao"></span><h1>Desafios</h1><span class="vao"></span></div>'
       + '<div class="cabeca-missoes">'
       + '<div class="textos"><b class="placar-missoes">' + feitas + '<small> de ' + lista.length + '</small></b>'
       + '<p>Complete os três desafios de hoje.</p></div>'
-      + '<span class="bau-cabeca">' + CC.arte.bau(feitas === lista.length ? 'aberto' : 'pronto') + '</span></div>'
+      + '<span class="bau-cabeca">' + CC.arte.bau(feitas === lista.length ? 'aberto' : 'pronto') + '</span></div></div>'
       + '<section class="bloco-missoes" id="desafios-longos">' + CC.blocoDesafiosLongos() + '</section>'
       + '<section class="bloco-missoes">'
       + '<div class="titulo-bloco"><h2>Desafios do dia</h2><span class="relogio">' + CC.ico('calendario') + CC.plural(CC.horasAteAmanha(), 'hora', 'horas') + '</span></div>'
