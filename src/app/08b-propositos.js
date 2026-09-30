@@ -487,10 +487,12 @@
       const convites = lista.filter((p) => p.euConvidado);
       const grupos = lista.filter((p) => !p.euConvidado && p.grupo && !p.celula);
       const duplas = lista.filter((p) => !p.euConvidado && !p.grupo);
-      raiz.innerHTML = '<div class="cabeca-centro">' + CC.botaoVoltar('Juntos') + '<h1>Propósitos</h1></div>'
+      // A folha do alto (só apresentação, 24-juntos.css): o título e o convite para um
+      // propósito novo, no cartão de destaque do Início.
+      raiz.innerHTML = '<div class="folha-juntos"><div class="cabeca-centro">' + CC.botaoVoltar('Juntos') + '<h1>Propósitos</h1></div>'
         + (d ? '<p class="subtitulo-tela">' + CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') + '</p>' : '')
         + (aviso ? '<p class="estado-linha">' + CC.ico('info') + '<span>' + CC.esc(aviso) + '</span></p>' : '')
-        + '<button class="botao" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito com amigos</button>'
+        + '<button class="destaque-juntos" data-novo-proposito><span>Novo propósito com amigos</span>' + CC.ico('mais-sinal') + '</button></div>'
         + (!d ? CC.esqueleto('cartoes') : '')
         + (convites.length ? CC.tituloSecao('Convites', String(convites.length)) + '<div class="lista-propositos">' + convites.map(cartaoConvite).join('') + '</div>' : '')
         + (grupos.length ? CC.tituloSecao('Grupos') + '<div class="lista-propositos">' + grupos.map(cartao).join('') + '</div>' : '')

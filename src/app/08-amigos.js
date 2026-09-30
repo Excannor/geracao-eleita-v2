@@ -590,6 +590,9 @@
         + '<button class="vaga" data-convidar aria-label="Convidar alguém">'
           + '<span class="moldura">' + CC.ico('mais-sinal') + '</span><b>Convidar</b></button>';
 
+      // A folha do alto (só apresentação, 24-juntos.css) leva o título, a roda de amigos, o
+      // convite e a entrada de Propósitos; o resto da tela vem embaixo, no fundo.
+      let naFolha = '';
       let corpo;
       if (dados && !d.perfilCompleto) {
         corpo = '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Complete seu cadastro para ler com amigos.</p>'
@@ -607,14 +610,14 @@
             + '<div class="pe-duplo-plano"><button class="botao pequeno" data-mural-ligar>Mostrar</button>'
             + '<button class="botao pequeno plano" data-mural-nao>Agora não</button></div></div></div>'
           : '';
-        corpo = CC.blocoPedidosConversa(d.pedidosConversa || [])
-          + '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
-          + blocoAcompanhando(d.acompanhando || [])
+        naFolha = '<div class="roda-amigos lista-amigos" role="list">' + roda + '</div>'
           + '<button class="botao contorno pequeno convidar-largo" data-convidar>' + CC.ico('compartilhar') + 'Convidar para ler junto</button>'
           + '<button class="entrada-propositos" data-propositos>' + CC.ico('aperto')
             + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
             + (d.convitesProposito ? '<i class="selo-numero" aria-label="' + CC.plural(d.convitesProposito, 'convite', 'convites') + '">' + d.convitesProposito + '</i>' : '')
-            + CC.ico('avancar') + '</button>'
+            + CC.ico('avancar') + '</button>';
+        corpo = CC.blocoPedidosConversa(d.pedidosConversa || [])
+          + blocoAcompanhando(d.acompanhando || [])
           + (recebidos.length
             ? CC.tituloSecao('Pedidos', String(recebidos.length))
               + '<div class="lista-pedidos">' + recebidos.map((p) => '<div class="linha-amigo pedido">' + retrato(p)
@@ -636,9 +639,10 @@
           + '<p class="rodape-privacidade"><span><a href="#/amigos/bloqueados">Pessoas bloqueadas</a> · <a href="termos.html">Termos</a> · <a href="privacidade.html">Privacidade</a></span></p>';
       }
 
-      raiz.innerHTML = '<div class="cabeca-centro"><h1>Juntos</h1></div>'
+      raiz.innerHTML = '<div class="folha-juntos"><div class="cabeca-centro"><h1>Juntos</h1></div>'
         + '<p class="subtitulo-tela">' + CC.plural(amigos.length, 'amigo', 'amigos') + '</p>'
         + (aviso ? '<p class="estado-linha">' + CC.ico('info') + '<span>' + CC.esc(aviso) + '</span></p>' : '')
+        + naFolha + '</div>'
         + corpo;
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
@@ -720,8 +724,8 @@
   CC.vistaBloqueados = function (raiz) {
     const desenhar = (d) => {
       const lista = (d && d.bloqueados) || [];
-      raiz.innerHTML = CC.botaoVoltar('Juntos') + '<h1>Pessoas bloqueadas</h1>'
-        + '<p class="subtitulo-tela">Quem está aqui não vê você e não consegue te convidar.</p>'
+      raiz.innerHTML = '<div class="folha-juntos">' + CC.botaoVoltar('Juntos') + '<h1>Pessoas bloqueadas</h1>'
+        + '<p class="subtitulo-tela">Quem está aqui não vê você e não consegue te convidar.</p></div>'
         + (lista.length
           ? '<div class="lista-pedidos">' + lista.map((p) => '<div class="linha-amigo">' + retrato(p)
             + '<div class="quem-amigo"><b>' + CC.esc(p.nome) + '</b><span class="arroba">@' + CC.esc(p.usuario) + '</span></div>'
