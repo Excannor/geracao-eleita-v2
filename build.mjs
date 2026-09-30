@@ -31,7 +31,19 @@ console.log('conhecer jesus:', conteudo.conhecer.dias.length, 'dias ·', conteud
 // Os módulos do app são concatenados na ordem do nome do arquivo: 01 antes de 02.
 const pastaApp = src('app');
 const modulos = readdirSync(pastaApp).filter((f) => f.endsWith('.js')).sort();
-const js = modulos.map((f) => '/* ' + f + ' */\n' + readFileSync(join(pastaApp, f), 'utf8')).join('\n');
+// Os comentários de linha inteira ("// ...") são a documentação do código: ficam no fonte e
+// saem do app entregue (uns 80 KB do index.html, que tem teto de 1 MB). Só a linha inteira
+// sai, nunca um pedaço dela, e nada dentro de um texto entre crases de várias linhas (a
+// contagem de crases das linhas de código diz quando se está dentro de um).
+const enxugarJs = (codigo) => {
+  let dentroDeCrases = false;
+  return codigo.split('\n').filter((linha) => {
+    const comentario = !dentroDeCrases && /^\s*\/\//.test(linha);
+    if (!comentario && (linha.match(/`/g) || []).length % 2) dentroDeCrases = !dentroDeCrases;
+    return !comentario;
+  }).join('\n');
+};
+const js = modulos.map((f) => '/* ' + f + ' */\n' + enxugarJs(readFileSync(join(pastaApp, f), 'utf8'))).join('\n');
 console.log('módulos:', modulos.join(', '));
 
 const fontes = readFileSync(src('fontes.css'), 'utf8');
