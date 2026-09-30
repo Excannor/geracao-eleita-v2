@@ -9,7 +9,8 @@
    ponta, com os cantos de baixo redondos, nas fichas --folha-* (sálvia pálida no claro,
    grafite um tom acima no escuro); os cartões de destaque em cima dela (brancos no claro,
    sálvia no escuro, tinta escura e o botão redondo preto); o corpo no fundo do tema, com
-   cartões brancos (grafite no escuro).
+   cartões brancos (grafite no escuro). A nota do Explorar é página de leitura: Literata, na
+   página do cartão, como o leitor.
 
    Escopo: cada tela do grupo põe o cabeçalho num invólucro .folha-perfil (só apresentação);
    as regras do corpo usam o #conteudo[data-rota] que o roteador marca (perfil, config,
@@ -38,11 +39,18 @@
 .topo:has(~ .corpo .folha-perfil) > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
 .topo:has(~ .corpo .folha-perfil) > .perfil-topo .ico-aba { width: 24px; height: 24px; }
 .topo:has(~ .corpo .folha-perfil) > .perfil-topo.selecionado { box-shadow: 0 0 0 2.5px var(--folha), 0 0 0 4.5px var(--folha-tinta); }
+/* no computador, a nota é mais larga (720px): o topo acompanha a folha dela */
+@media (min-width: 860px) {
+  .topo:has(~ .corpo .largo > .folha-perfil) { grid-template-columns: minmax(30px, 1fr) minmax(0, 660px) minmax(30px, 1fr); }
+  .topo:has(~ .corpo .largo > .folha-perfil)::before { inset: 0 max(0px, 50% - 360px); }
+}
 
-/* o cabeçalho: voltar à esquerda e título no meio, na mesma linha (01-base); a frase de apoio
-   embaixo, centralizada. O voltar fica por cima
+/* o cabeçalho: voltar à esquerda e título no meio, na mesma linha (01-base); sem voltar, o
+   título no meio (Explorar); a frase de apoio embaixo, centralizada. O voltar fica por cima
    do título, que se estende por trás dele: o toque na borda do círculo é do voltar. */
 .folha-perfil > .voltar { position: relative; z-index: 1; }
+.folha-perfil > .voltar:only-child { margin: 0; }
+.folha-perfil > h1:first-child { display: flex; align-items: center; justify-content: center; min-height: 48px; margin: 0 0 20px; font-size: 1.375rem; text-align: center; }
 .folha-perfil > p { max-width: 34ch; margin: -12px auto 12px; color: var(--folha-tinta-fraca); font-size: .9375rem; font-weight: 500; line-height: 1.45; text-align: center; text-wrap: balance; }
 .folha-perfil > p:not(.passo-dica) { color: var(--folha-tinta); }
 .folha-perfil > p + p { margin-top: 0; }
@@ -170,18 +178,54 @@
 .painel-coluna em { height: 40px; }
 
 /* ---------- Explorar, seção, nota e busca ---------- */
+/* a busca na folha: campo branco (grafite no escuro), como uma pílula, na largura dos cartões
+   do corpo (a lupa fica alinhada com o retrato do topo); a letra fica em 16px, senão o iPhone
+   aumenta a tela ao tocar no campo, e a frase "Buscar pessoas, lugares, temas…" cabe a 360 */
+.folha-perfil .busca-caixa { margin: 16px -14px 0; }
+.folha-perfil > .busca-caixa:first-child { margin: 0 -14px; }
+.folha-perfil .busca-caixa input { min-height: 52px; border: 0; border-radius: 26px; background: var(--v2-cartao); color: var(--v2-tinta-forte); }
+.folha-perfil .busca-caixa input:focus { background: var(--v2-cartao); box-shadow: inset 0 0 0 2px var(--folha-tinta); }
+.folha-perfil .busca-caixa input::placeholder, .folha-perfil .busca-caixa svg { color: var(--v2-tinta-fraca); }
+/* a seção: o nome no meio, ao lado do voltar, e a frase embaixo (o ícone fica no quadro do Explorar) */
+.folha-perfil > .voltar + .cabeca-secao { display: block; margin: -60px 0 0; text-align: center; }
+.folha-perfil .icone-secao { display: none; }
+.folha-perfil .cabeca-secao h1 { display: flex; align-items: center; justify-content: center; min-height: 48px; margin: 0 0 8px; padding: 0 56px; font-size: 1.375rem; }
+.folha-perfil .cabeca-secao p { max-width: 34ch; margin: 0 auto; color: var(--folha-tinta-fraca); font-size: .9375rem; font-weight: 500; text-wrap: balance; }
+
 :is([data-rota=explorar], [data-rota=secao], [data-rota=busca], [data-rota=perfil]) .item { padding: 18px 20px; border-radius: 24px; }
 .item b { text-wrap: balance; }
-/* o versículo em destaque da nota é texto bíblico: Literata de pé, sem itálico falso */
-.item .destaque { font-family: var(--fonte-biblia); font-style: normal; font-weight: 400; }
-.item .resumo { -webkit-line-clamp: 6; }
-.item :is(.destaque, .chip) { text-wrap: pretty; }
+.item .chip { border-radius: 14px; text-wrap: balance; }
+.item .destaque { display: block; font-family: var(--fonte-biblia); font-style: normal; font-weight: 400; text-wrap: balance; }
+.item .resumo { -webkit-line-clamp: 6; text-wrap: balance; }
 .bloco-secao { padding: 18px 16px; border-radius: var(--raio-cartao); }
+.bloco-secao > span:last-child { text-wrap: balance; }
 .bloco-secao .icone, .icone-secao { width: 48px; height: 48px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
 .filtro { min-height: 44px; border: 0; color: var(--tinta-forte); font-weight: 600; }
 .filtro.ligado { background: var(--inverso); color: var(--inverso-tinta); }
-:is([data-rota=explorar], [data-rota=busca]) .busca-caixa input { min-height: 52px; border-color: var(--cartao); border-radius: 26px; background: var(--cartao); }
-.nota-artigo .nota-corpo h2 { color: var(--salvia-texto) !important; }
+/* Comece por aqui: a ação é a pílula escura; o nome do passo é longo, então ela é um cartão
+   escuro com o texto à esquerda, e não um botão que quebra no meio */
+.comece { margin: 0 0 12px; }
+.lista-comece :is(b, small) { text-wrap: pretty; }
+:is(.corpo-comece, .comece-proximo) > .botao.azul { --b: var(--inverso); justify-content: flex-start; min-height: 56px; padding: 14px 20px; border-radius: 26px; color: var(--inverso-tinta); text-align: left; text-wrap: balance; }
+/* A história da Bíblia e Perguntas honestas: ícone em círculo sálvia pálido e o botão redondo
+   na cor da ação (preto no claro, claro no escuro), como o atalho do Praticar */
+.cartao-historia { gap: 14px; min-height: 84px; padding: 12px 12px 12px 16px; }
+.cartao-historia > svg:first-child { box-sizing: content-box; width: 22px; height: 22px; padding: 13px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.cartao-historia > svg:last-child { box-sizing: content-box; width: 20px; height: 20px; padding: 14px; border-radius: 50%; background: var(--inverso); color: var(--inverso-tinta); stroke-width: 2.2; }
+.cartao-historia b { color: var(--tinta-forte); font-size: 1.0625rem; font-weight: 800; }
+
+/* a nota: página de leitura, como o leitor (texto --tinta na página do cartão, em Literata);
+   títulos, tabelas e legendas na letra da interface */
+.nota-artigo { margin: 0 0 8px; padding: 24px 20px 28px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.nota-corpo { color: var(--tinta); font-family: var(--fonte-biblia); font-size: 1.0625rem; font-weight: 400; line-height: 1.7; }
+.nota-corpo :is(h1, h2, h3, table, cite) { font-family: var(--fonte); }
+.nota-corpo :is(strong, b) { font-weight: 600; }
+.nota-artigo .nota-corpo > h1:first-child { margin: 0 0 4px; font-size: 1.75rem; text-wrap: balance; }
+.nota-corpo h2 { margin: 28px 0 6px; color: var(--salvia-texto); font-size: 1.1875rem; text-wrap: balance; }
+.nota-corpo blockquote { margin: 16px 0; padding: 2px 0 2px 16px; border-left: 3px solid var(--salvia); border-radius: 0; background: none; font-style: normal; }
+.nota-corpo blockquote cite { color: var(--tinta-fraca); font-size: .8125rem; }
+.nota-corpo table { font-size: .875rem; line-height: 1.5; }
+.nota-corpo .link-nota { color: var(--salvia-texto); font-weight: 600; }
 
 /* ---------- Apoiar ---------- */
 .apoiar-lista { margin-bottom: 12px; }
@@ -207,13 +251,15 @@
 
 /* ---------- celular estreito (360) ----------
    O título ao lado do voltar encolhe para caber numa linha; o nome do nível do Semeador
-   também; os cartões do painel e da estante e as linhas das configurações apertam o recuo. */
+   também; a frase do campo de busca cabe inteira; os cartões do painel e os quadros do
+   Explorar apertam o recuo. */
 @media (max-width: 374px) {
-  .folha-perfil:not(.titulo-frase) > .voltar + h1 { padding-inline: 52px; font-size: 1.25rem; }
+  .folha-perfil:not(.titulo-frase) > .voltar + h1, .folha-perfil .cabeca-secao h1 { padding-inline: 52px; font-size: 1.25rem; }
   .corpo-semeador b { font-size: 1rem; }
   .painel-cartao { padding: 14px; }
   .painel-cartao span { font-size: .875rem; }
   .painel-cartao strong.texto { font-size: .9375rem; }
+  .bloco-secao { padding: 16px 10px; }
   [data-rota=config] .linha-config { padding-inline: 16px; }
   .estante { gap: 8px; }
   .trofeu { padding-inline: 4px; }
