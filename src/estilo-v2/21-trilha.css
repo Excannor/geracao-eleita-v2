@@ -281,6 +281,10 @@
 .atalhos-conhecer .atalho > span, .cj .item .textos { display: grid; gap: 2px; color: var(--tinta-forte); }
 .ver-plano { margin-top: 16px; text-align: center; }
 
+/* perguntas, pergunta e "E agora": o cabeçalho na folha; o título que é uma frase inteira
+   desce para baixo do voltar e usa a largura da folha, em vez de três linhas espremidas */
+.titulo-frase > .voltar + h1 { justify-content: center; min-height: 0; margin: 0; padding: 0 4px; font-size: 1.5rem; text-wrap: balance; }
+
 /* perguntas honestas: uma lista num cartão só */
 .cj .grade { gap: 0; overflow: hidden; }
 .cj .item { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 16px 18px 16px 20px; border: 0; border-radius: 0; background: none; }
@@ -303,6 +307,9 @@
 .cj details.cartao { padding: 0; margin: 0; }
 .cj summary { padding: 10px 0; font-weight: 700; }
 .perguntas-fixas { display: grid; gap: 10px; margin: 8px 0 0; padding-left: 20px; }
+/* o botão principal do Conhecer Jesus (Ler, Terminei o dia, Quero conversar com alguém) é
+   a pílula escura, como na lição; a sálvia fica para os pontos de acento */
+.cj .botao.azul, .tela-conhecer .licao-pe .botao.cor { --b: var(--inverso); color: var(--inverso-tinta); }
 .cj .leitura-hoje { margin-top: 16px; }
 
 @media (min-width: 860px) {

@@ -10,6 +10,9 @@
   const conteudoDe = () => D.conhecer;
 
   const primeiroNome = (nome) => String(nome || '').trim().split(/\s+/)[0];
+  // "por que" e "o que" não se separam na quebra de linha dos títulos (como o espaço
+  // inseparável das referências): nada de "por / que existe sofrimento?".
+  const colarTitulo = (t) => CC.esc(t).replace(/\b([Pp]or|[Oo]) que\b/g, '$1\u00a0que');
 
   // Pede a conversa ao servidor e devolve o texto pronto de "seguir" para mostrar depois:
   // o servidor decide sozinho quem avisa (quem convidou e, se houver, o líder da célula) e
@@ -28,6 +31,7 @@
       + '<button class="botao plano" data-fechar>Fechar</button></div>',
     {
       rotulo: 'Conversar',
+      classe: 'cj',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelector('[data-enviar]').onclick = async (ev) => {
@@ -90,7 +94,7 @@
       + '<div class="lista-atalhos atalhos-conhecer">'
       + '<a class="atalho" href="#/perguntas">' + CC.ico('balao') + '<span><b>Perguntas honestas</b>'
       + '<small>Dúvidas comuns de quem está conhecendo Jesus.</small></span>' + CC.ico('avancar') + '</a>'
-      + '<a class="atalho" href="#/seguir">' + CC.ico('bandeira') + '<span><b>' + CC.esc(C.seguir.titulo) + '</b></span>' + CC.ico('avancar') + '</a>'
+      + '<a class="atalho" href="#/seguir">' + CC.ico('bandeira') + '<span><b>' + colarTitulo(C.seguir.titulo) + '</b></span>' + CC.ico('avancar') + '</a>'
       + '</div>'
       + (comLinkPlano ? '<div class="ver-plano"><button class="link-nota" data-ver-plano>Ver o plano da Bíblia em um ano</button></div>' : '')
       + '</div>';
@@ -242,11 +246,11 @@
   // ---------- #/perguntas: as 10 perguntas honestas ----------
   CC.vistaPerguntas = function (raiz) {
     const C = conteudoDe();
-    raiz.innerHTML = '<div class="tela-perguntas cj">' + CC.botaoVoltar('Voltar')
+    raiz.innerHTML = '<div class="tela-perguntas cj"><div class="folha-cabeca">' + CC.botaoVoltar('Voltar')
       + '<h1>Perguntas honestas</h1>'
-      + '<p class="subtitulo-tela">Dúvidas comuns de quem está conhecendo Jesus, ou de quem já segue e quer conversar com um amigo.</p>'
+      + '<p class="subtitulo-tela">Dúvidas comuns de quem está conhecendo Jesus, ou de quem já segue e quer conversar com um amigo.</p></div>'
       + '<div class="grade caixa-lista">' + C.perguntas.map((p) => '<a class="item" href="#/perguntas/' + encodeURIComponent(p.id) + '">'
-        + '<span class="textos"><b>' + CC.esc(p.titulo) + '</b>'
+        + '<span class="textos"><b>' + colarTitulo(p.titulo) + '</b>'
         + '<span class="resumo">' + CC.esc(p.resumo) + '</span></span>' + CC.ico('avancar') + '</a>').join('') + '</div></div>';
   };
 
@@ -262,8 +266,9 @@
 
     const quem = CC.quem && CC.quem.acompanhadoPor;
 
-    raiz.innerHTML = '<div class="tela-pergunta cj">' + CC.botaoVoltar('Voltar')
-      + '<h1>' + CC.esc(p.titulo) + '</h1>'
+    // O título é uma frase inteira: desce para baixo do voltar, na largura da folha.
+    raiz.innerHTML = '<div class="tela-pergunta cj"><div class="folha-cabeca titulo-frase">' + CC.botaoVoltar('Voltar')
+      + '<h1>' + colarTitulo(p.titulo) + '</h1></div>'
       + '<div class="cartao texto-pergunta">' + p.paragrafos.map((par) => '<p>' + CC.esc(par) + '</p>').join('') + '</div>'
       + (pilulas ? CC.tituloSecao('Leia na Bíblia') + '<div class="pilulas">' + pilulas + '</div>' : '')
       + (quem ? '<div class="acoes"><button class="botao contorno" data-conversar>Converse com '
@@ -281,8 +286,8 @@
     const passos = S.passos.map((p) => '<section class="etapa-reflexao"><h2>' + CC.esc(p.titulo) + '</h2>'
       + '<p>' + CC.esc(p.texto) + '</p></section>').join('');
 
-    raiz.innerHTML = '<div class="tela-seguir cj">' + CC.botaoVoltar('Voltar')
-      + '<h1>' + CC.esc(S.titulo) + '</h1>'
+    raiz.innerHTML = '<div class="tela-seguir cj"><div class="folha-cabeca titulo-frase">' + CC.botaoVoltar('Voltar')
+      + '<h1>' + colarTitulo(S.titulo) + '</h1></div>'
       + '<p class="cartao abertura-seguir">' + CC.esc(S.abertura) + '</p>'
       + passos
       + '<section class="etapa-reflexao"><h2>' + CC.esc(S.oracaoTitulo) + '</h2>'
