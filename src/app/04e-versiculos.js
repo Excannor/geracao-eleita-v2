@@ -294,53 +294,79 @@
     tela.height = CARTAO_ALTURA;
     const ctx = tela.getContext('2d');
 
-    // O fundo é o grafite do tema escuro de leitura, liso; o texto quase branco em Literata,
-    // a letra do texto bíblico no app, e a sálvia nos detalhes. Não depende do tema que a
-    // pessoa está usando agora.
-    const fundo = '#1b1c1a';
-    const texto1 = '#eef0ea';
-    const fraco = '#a4a99d';
-    const salvia = '#bfd083';
-    const margem = 104;
-    const larguraTexto = CARTAO_LARGURA - margem * 2;
-    ctx.fillStyle = fundo;
+    // As cores da folha do Início (paleta C, a do tema claro): o fundo em sálvia pálida e o
+    // versículo num cartão branco, em Literata (a letra do texto bíblico no app), com as
+    // aspas no botão redondo preto do Início. Não depende do tema que a pessoa está usando.
+    const folha = '#dfe8c1';
+    const cartao = '#ffffff';
+    const tinta = '#2c2d2b';
+    const forte = '#151615';
+    const fraco = '#686b66';
+    const legenda = '#4f5a36';
+    const salvia = '#c8da8c';
+    const meio = CARTAO_LARGURA / 2;
+    const margem = 72;
+    const recuo = 84;
+    const larguraTexto = CARTAO_LARGURA - (margem + recuo) * 2;
+    const raioAspas = 64;
+    ctx.fillStyle = folha;
     ctx.fillRect(0, 0, CARTAO_LARGURA, CARTAO_ALTURA);
 
     const medir = (t, tamanho) => { ctx.font = '500 ' + tamanho + 'px Literata, Georgia, serif'; return ctx.measureText(t).width; };
     const texto = String(corpo || '').trim() || ref;
-    const { linhas, tamanho } = CC.ajustarTextoCartao(texto, {
-      larguraMax: larguraTexto, alturaMax: CARTAO_ALTURA * 0.52, fonteMax: 72, fonteMin: 32, entreLinhas: 1.45, medir,
-    });
+    const ajuste = { alturaMax: CARTAO_ALTURA * 0.5, fonteMax: 64, fonteMin: 30, entreLinhas: 1.45, medir };
+    const { tamanho, linhas: cheias } = CC.ajustarTextoCartao(texto, { ...ajuste, larguraMax: larguraTexto });
+    // Linhas equilibradas, como o text-wrap: balance da tela: a menor largura que mantém o
+    // mesmo número de linhas, para a última não ficar com uma palavra sozinha.
+    const quebrar = (largura) => CC.ajustarTextoCartao(texto, { ...ajuste, larguraMax: largura, fonteMax: tamanho, fonteMin: tamanho }).linhas;
+    let linhas = cheias;
+    for (let de = larguraTexto * 0.55, ate = larguraTexto, i = 0; i < 12 && cheias.length > 1; i++) {
+      const meioDoIntervalo = (de + ate) / 2;
+      const tentativa = quebrar(meioDoIntervalo);
+      if (tentativa.length === cheias.length) { linhas = tentativa; ate = meioDoIntervalo; } else de = meioDoIntervalo;
+    }
     const alturaBloco = linhas.length * tamanho * 1.45;
 
-    // “Aspas” discretas logo acima do texto, só decoração.
+    // O cartão cresce com o texto e fica no meio da área acima do nome do app.
+    const altura = raioAspas + 56 + alturaBloco + 56 + 44 + (nomeTraducao ? 46 : 0) + 84;
+    const topo = Math.max(150, Math.round((CARTAO_ALTURA - 170 - altura) / 2));
+    ctx.fillStyle = cartao;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(margem, topo, CARTAO_LARGURA - margem * 2, altura, 64);
+    else ctx.rect(margem, topo, CARTAO_LARGURA - margem * 2, altura);
+    ctx.fill();
+
+    // As aspas num círculo preto, metade para fora da borda de cima do cartão.
+    ctx.fillStyle = forte;
+    ctx.beginPath();
+    ctx.arc(meio, topo, raioAspas, 0, Math.PI * 2);
+    ctx.fill();
     ctx.fillStyle = salvia;
-    ctx.globalAlpha = 0.7;
-    ctx.font = '600 180px Literata, Georgia, serif';
+    ctx.font = '600 150px Literata, Georgia, serif';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText('“', CARTAO_LARGURA / 2, Math.max(120, CARTAO_ALTURA / 2 - alturaBloco / 2 - 200));
-    ctx.globalAlpha = 1;
-    ctx.font = '500 ' + tamanho + 'px Literata, Georgia, serif';
-    ctx.fillStyle = texto1;
     ctx.textBaseline = 'middle';
-    let y = CARTAO_ALTURA / 2 - alturaBloco / 2 + tamanho * 0.72;
-    for (const linha of linhas) { ctx.fillText(linha, CARTAO_LARGURA / 2, y); y += tamanho * 1.45; }
+    ctx.fillText('“', meio, topo + 50);
+
+    ctx.font = '500 ' + tamanho + 'px Literata, Georgia, serif';
+    ctx.fillStyle = tinta;
+    let y = topo + raioAspas + 56 + tamanho * 0.725;
+    for (const linha of linhas) { ctx.fillText(linha, meio, y); y += tamanho * 1.45; }
 
     // Referência e tradução, embaixo do texto (a licença da tradução pede o nome dela).
+    y = topo + raioAspas + 56 + alturaBloco + 56 + 22;
     ctx.font = '800 44px Manrope, sans-serif';
-    ctx.fillStyle = salvia;
-    ctx.fillText(ref, CARTAO_LARGURA / 2, CARTAO_ALTURA - 250);
+    ctx.fillStyle = forte;
+    ctx.fillText(ref, meio, y);
     if (nomeTraducao) {
       ctx.font = '600 30px Manrope, sans-serif';
       ctx.fillStyle = fraco;
-      ctx.fillText(nomeTraducao, CARTAO_LARGURA / 2, CARTAO_ALTURA - 192);
+      ctx.fillText(nomeTraducao, meio, y + 54);
     }
 
-    // O nome do app, pequeno, no pé.
-    ctx.font = '700 28px Manrope, sans-serif';
-    ctx.fillStyle = fraco;
-    ctx.fillText('Geração Eleita', CARTAO_LARGURA / 2, CARTAO_ALTURA - 96);
+    // O nome do app, pequeno, no pé, sobre a folha.
+    ctx.font = '700 30px Manrope, sans-serif';
+    ctx.fillStyle = legenda;
+    ctx.fillText('Geração Eleita', meio, CARTAO_ALTURA - 96);
 
     return tela;
   }

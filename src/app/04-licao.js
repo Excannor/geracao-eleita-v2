@@ -189,11 +189,12 @@
     };
 
     return {
-      corpo: '<span class="etiqueta">Unidade ' + u.numero + ' · Dia ' + sessao.dia + '</span>'
+      // .cabeca-licao: só apresentação, a folha do alto de cada passo (22-leitura.css)
+      corpo: '<div class="cabeca-licao"><span class="etiqueta">Unidade ' + u.numero + ' · Dia ' + sessao.dia + '</span>'
         + '<h1 class="passo-titulo">' + (sessao.antes.lido ? 'Revisar o dia ' + sessao.dia : 'Leitura de hoje') + '</h1>'
         + '<p class="passo-dica">' + (traducao
           ? 'Leia aqui ou na sua Bíblia e marque ao terminar.'
-          : 'Abra a sua Bíblia, leia as passagens e marque ao terminar.') + '</p>'
+          : 'Abra a sua Bíblia, leia as passagens e marque ao terminar.') + '</p></div>'
         + cartoes
         + (trilhas.length === 1 ? '<p class="passo-dica">Hoje é mais leve: uma leitura só!</p>' : ''),
       pe: botao(todas ? 'Concluir o dia' : 'Falta marcar ' + faltam.map(([, , r]) => nb(r)).join(' e '), 'data-concluir', todas),
@@ -293,12 +294,12 @@
     const avancar = { guardar: ['Pensar sobre isso', 'lupa'], pensar: ['Transformar em oração', 'aperto'], orar: ['Terminar', 'certo'] }[etapa];
 
     return {
-      corpo: '<div class="festa">'
+      corpo: '<div class="festa"><div class="cabeca-licao">'
         + (ganhou ? '<p class="retorno-lido" role="status">' + CC.icoChama(seq.atual) + '<span><b>Dia ' + sessao.dia + ' lido.</b> Sua chama está acesa.</span></p>' : '')
         + '<h1>' + (ganhou ? 'Para levar com você' : 'Revisão do dia ' + sessao.dia) + '</h1>'
         + '<ol class="passos-reflexao" aria-label="Guardar, pensar e orar">'
         + ['Guardar', 'Pensar', 'Orar'].map((nome, i) => '<li' + (i <= ETAPAS.indexOf(etapa) ? ' class="ativa"' : '')
-          + (i === ETAPAS.indexOf(etapa) ? ' aria-current="step"' : '') + '>' + nome + '</li>').join('') + '</ol>'
+          + (i === ETAPAS.indexOf(etapa) ? ' aria-current="step"' : '') + '>' + nome + '</li>').join('') + '</ol></div>'
         // guardar: o versículo do dia, ou a nota nos dias em que um versículo solto confunde
         + '<section class="etapa-reflexao" data-etapa-bloco="guardar">'
         + '<div id="festa-versiculo">' + (r.ref
@@ -438,12 +439,12 @@
 
     return {
       semTopo: true,
-      corpo: '<div class="resumo-dia">'
+      corpo: '<div class="resumo-dia"><div class="cabeca-licao">'
         + '<div class="chama-palco">' + CC.arte.faiscas() + CC.icoChama(seq.atual) + '</div>'
         + '<b class="numero-ofensiva" data-de="' + (subiuHoje ? sessao.antes.ofensiva : seq.atual) + '">' + (subiuHoje ? sessao.antes.ofensiva : seq.atual) + '</b>'
         + '<h1 class="rotulo-ofensiva">' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + '</h1>'
         + '<p class="passo-dica">Dia ' + sessao.dia + ' · ' + nb(CC.esc(CC.passagemDe(dia))) + '</p>'
-        + faixaDaSemana()
+        + faixaDaSemana() + '</div>'
         + '<p class="frase-cena">' + frase + '</p>'
         + '<ul class="destaques">' + destaques.join('') + '</ul>'
         + '<div id="resumo-amigos"></div>'
@@ -556,9 +557,9 @@
     }).join('');
 
     return {
-      corpo: '<span class="etiqueta">' + nb(CC.esc(CC.passagemDe(dia))) + '</span>'
+      corpo: '<div class="cabeca-licao"><span class="etiqueta">' + nb(CC.esc(CC.passagemDe(dia))) + '</span>'
         + '<h1 class="passo-titulo">Ir mais fundo</h1>'
-        + '<p class="passo-dica">Notas sobre os livros de hoje.</p>'
+        + '<p class="passo-dica">Notas sobre os livros de hoje.</p></div>'
         + blocos,
       pe: botao('Voltar', 'data-voltar'),
       ligar(el) {
@@ -577,8 +578,8 @@
 
     return {
       topo: '<span class="salvo" id="salvo" role="status"></span>',
-      corpo: '<span class="etiqueta">' + nb(CC.esc(CC.passagemDe(dia))) + '</span>'
-        + '<h1 class="passo-titulo">Escrever sobre hoje</h1>'
+      corpo: '<div class="cabeca-licao"><span class="etiqueta">' + nb(CC.esc(CC.passagemDe(dia))) + '</span>'
+        + '<h1 class="passo-titulo">Escrever sobre hoje</h1></div>'
         + '<div class="segmentado" role="group" aria-label="Como escrever">'
         + '<button data-modo="oracao" aria-pressed="' + (sessao.modo === 'oracao') + '">Oração</button>'
         + '<button data-modo="oia" aria-pressed="' + (sessao.modo === 'oia') + '">OIA completo</button>'
