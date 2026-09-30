@@ -54,7 +54,7 @@
 
   function barraDoGrupo(hoje) {
     const fracao = hoje.meta ? Math.min(1, hoje.pontos / hoje.meta) : 0;
-    return '<div class="barra-missao" style="--cor: var(--' + (hoje.batida ? 'verde' : 'azul') + ')">'
+    return '<div class="barra-missao barra-grupo" style="--cor: var(--' + (hoje.batida ? 'verde' : 'azul') + ')">'
       + '<i style="width:' + (fracao * 100).toFixed(1) + '%"></i>'
       + '<span>' + (hoje.batida ? 'Meta de hoje batida!' : hoje.pontos + ' de ' + hoje.meta + ' pontos hoje') + '</span></div>';
   }
@@ -178,10 +178,10 @@
       const celulas = CC.minhasCelulas ? CC.minhasCelulas() : [];
       if (celulas.length === 1) { CC.substituirRota(enderecoCelula(celulas[0].id)); return; }
       if (!celulas.length) {
-        raiz.innerHTML = '<h1>Célula</h1><div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Você ainda não está em nenhuma célula.</p></div>';
+        raiz.innerHTML = '<div class="cabeca-centro"><h1>Célula</h1></div><div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Você ainda não está em nenhuma célula.</p></div>';
         return;
       }
-      raiz.innerHTML = '<h1>Escolha uma célula</h1>'
+      raiz.innerHTML = '<div class="cabeca-centro"><h1>Escolha uma célula</h1></div>'
         + '<div class="lista-pedidos">' + celulas.map((p) => '<button type="button" class="cartao-proposito" data-ir-celula="' + CC.esc(p.id) + '">'
           + cabeca(p) + '</button>').join('') + '</div>';
       raiz.querySelectorAll('[data-ir-celula]').forEach((b) => { b.onclick = () => { location.hash = enderecoCelula(b.dataset.irCelula); }; });
@@ -487,9 +487,8 @@
       const convites = lista.filter((p) => p.euConvidado);
       const grupos = lista.filter((p) => !p.euConvidado && p.grupo && !p.celula);
       const duplas = lista.filter((p) => !p.euConvidado && !p.grupo);
-      raiz.innerHTML = CC.botaoVoltar('Juntos')
-        + '<div class="cabeca-tela"><h1>Propósitos</h1>'
-        + (d ? '<span class="contagem-amigos">' + CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') + '</span>' : '') + '</div>'
+      raiz.innerHTML = '<div class="cabeca-centro">' + CC.botaoVoltar('Juntos') + '<h1>Propósitos</h1></div>'
+        + (d ? '<p class="subtitulo-tela">' + CC.plural(grupos.length + duplas.length, 'propósito', 'propósitos') + '</p>' : '')
         + (aviso ? '<p class="estado-linha">' + CC.ico('info') + '<span>' + CC.esc(aviso) + '</span></p>' : '')
         + '<button class="botao azul" data-novo-proposito>' + CC.ico('mais-sinal') + 'Novo propósito com amigos</button>'
         + (!d ? CC.esqueleto('cartoes') : '')
