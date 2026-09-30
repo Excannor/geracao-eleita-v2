@@ -391,8 +391,8 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 
 /* =========================================================================
    BARRA DE ABAS NO CELULAR
-   Duas ilhas em pílula escura, com botões redondos, e a Bíblia no meio, levantada, num
-   círculo sálvia maior. A aba ativa vira um círculo claro com ícone escuro e um ponto
+   Duas ilhas em pílula escura, com botões redondos, e a Bíblia no meio, numa ilha sálvia
+   do mesmo tamanho, na mesma linha. A aba ativa vira um círculo claro com ícone escuro e um ponto
    sálvia. O nome de cada aba fica à vista embaixo do círculo (quem chega agora precisa
    ler o que há ali); na barra cheia (Célula e Discipulado juntos) só o ícone, com o nome
    no aria-label, porque seis nomes não cabem a 320px sem descer de 12px.
@@ -402,7 +402,6 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
   :root { --alt-barra: 108px; }
   .navegacao {
     --circulo: clamp(42px, calc(42px + 4px * var(--cresce)), 46px);
-    --circulo-biblia: clamp(56px, calc(56px + 6px * var(--cresce)), 62px);
     align-items: flex-end;
     gap: clamp(4px, calc(4px + 6px * var(--cresce)), 10px);
     padding: 0 clamp(4px, calc(4px + 8px * var(--cresce)), 12px) calc(10px + env(safe-area-inset-bottom));
@@ -496,26 +495,37 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
     white-space: nowrap;
   }
 
-  /* A Bíblia: círculo sálvia maior, levantado acima das ilhas, com o nome embaixo. */
+  /* A Bíblia: uma ilha sálvia do mesmo tamanho das outras, na mesma linha (o dono pediu
+     que ela não ficasse levantada acima da faixa). Ícone e nome dentro, como nas ilhas. */
   .aba.aba-central {
     flex: 0 0 auto;
     width: auto;
     height: auto;
-    min-width: var(--circulo-biblia);
-    margin: 0 0 4px;
-    padding: 0;
+    min-width: calc(var(--circulo) + 16px);
+    margin: 0;
+    padding: 6px 8px 5px;
     border: 0;
-    border-radius: 0;
-    background: none;
+    border-radius: 30px;
+    background: var(--salvia);
     box-shadow: none;
     color: var(--salvia-tinta);
   }
-  .aba.aba-central:hover, .aba.aba-central.selecionada { background: none; box-shadow: none; }
-  .aba.aba-central .icone-aba { width: var(--circulo-biblia); height: var(--circulo-biblia); background: var(--salvia); color: var(--salvia-tinta); }
-  .aba.aba-central:hover .icone-aba { background: color-mix(in srgb, var(--salvia) 88%, var(--tinta-forte)); }
-  .aba.aba-central .ico-aba { width: 26px; height: 26px; }
-  .aba.aba-central .rotulo-aba { margin-top: 2px; font-size: 0.75rem; font-weight: 700; color: var(--tinta-forte); }
-  .aba.aba-central.selecionada .icone-aba { box-shadow: 0 0 0 3px var(--fundo), 0 0 0 5px var(--tinta-forte); }
+  .aba.aba-central:hover { background: color-mix(in srgb, var(--salvia) 88%, var(--tinta-forte)); box-shadow: none; }
+  .aba.aba-central.selecionada { background: var(--salvia); box-shadow: none; }
+  .aba.aba-central .icone-aba { width: var(--circulo); height: var(--circulo); background: transparent; color: var(--salvia-tinta); }
+  .aba.aba-central:hover .icone-aba { background: transparent; }
+  .aba.aba-central.selecionada .icone-aba { background: #151615; color: #c8da8c; }
+  .aba.aba-central .ico-aba { width: 24px; height: 24px; }
+  .aba.aba-central .rotulo-aba { margin-top: 0; font-size: 0.75rem; font-weight: 700; color: #151615; }
+  .navegacao.cheia .aba.aba-central { padding: 6px; border-radius: 999px; }
+  .navegacao.cheia .aba.aba-central .rotulo-aba {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 
   /* o painel do Mais sobe de cima da barra, como um cartão solto */
   .painel-mais {
