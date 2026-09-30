@@ -688,7 +688,13 @@
       });
       raiz.querySelectorAll('.versiculo-mural').forEach((v) => {
         if (!CC.textoDoVersiculo) return;
-        CC.textoDoVersiculo(v.dataset.ref).then((t) => { if (t) v.querySelector('.texto-versiculo').textContent = t; });
+        // o texto vem na tradução de quem está lendo, e a sigla dela fica ao lado da referência
+        CC.textoDoVersiculo(v.dataset.ref).then((t) => {
+          if (!t) return;
+          v.querySelector('.texto-versiculo').textContent = t;
+          const b = CC.traducao && CC.traducao();
+          if (b) v.querySelector('b').textContent = v.dataset.ref + ' · ' + (b.abreviatura || b.sigla.toUpperCase());
+        });
       });
       if (m.eventos) gravarLocal('cc.novidades.visto', String(Date.now()));
     };
