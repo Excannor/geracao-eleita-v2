@@ -82,7 +82,7 @@
 .amigo-roda b, .vaga b { max-width: 96px; overflow: visible; color: var(--tinta-forte); font-size: .8125rem; font-weight: 700; line-height: 1.25; white-space: normal; text-overflow: clip; text-wrap: balance; }
 .amigo-roda small { align-self: end; color: var(--chama-texto); font-size: .8125rem; font-weight: 700; }
 .vaga .moldura { border: 0; background: var(--cartao); color: var(--tinta-forte); }
-.botao.convidar-largo { display: flex; width: 100%; min-height: 52px; margin: 12px 0; }
+.botao.convidar-largo { display: flex; width: 100%; min-height: 54px; margin: 12px 0; font-size: 1rem; }
 .entrada-propositos > span { flex: 1; gap: 2px; }
 .entrada-propositos b { color: inherit; font-size: 1.0625rem; font-weight: 800; letter-spacing: -.01em; }
 .entrada-propositos small { color: inherit; font-size: .8125rem; font-weight: 600; text-wrap: balance; }
@@ -208,7 +208,7 @@ button.cartao-proposito:hover { background: var(--campo); }
 
 /* o estudo: as quatro partes em cartões */
 .secao-w + .secao-w { margin-top: 12px; }
-.secao-w > .etiqueta, .modo-encontro > .etiqueta { color: var(--salvia-texto); }
+.secao-w > .etiqueta, .modo-encontro > .etiqueta { color: var(--salvia-texto); font-size: .8125rem; }
 .roteiro-perguntas li, .roteiro-oracao li { border-radius: 16px; text-wrap: pretty; }
 .folha .roteiro li li { background: var(--cartao); }
 .secao-w > p { text-wrap: balance; }
