@@ -639,7 +639,7 @@
   CC.aplicarTema = (escuro) => {
     document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro';
     const cor = document.querySelector('meta[name="theme-color"]');
-    if (cor) cor.content = escuro ? '#1b1c1a' : '#ececec'; // o --fundo de cada tema (estilo-v2/00-tokens.css)
+    if (cor) cor.content = escuro ? '#2e302c' : '#dfe8c1'; // a --folha de cada tema (estilo-v2/00-tokens.css): a folha do alto passa por baixo da barra de status, como nas páginas avulsas
   };
   // null segue o sistema; true e false fixam o escuro ou o claro.
   CC.guardarTema = (escuro) => {
