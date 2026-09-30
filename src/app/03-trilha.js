@@ -369,23 +369,6 @@
       observador = new ResizeObserver(([r]) => { if (Math.round(r.contentRect.width) !== largura) { largura = Math.round(r.contentRect.width); desenhar(); } });
       observador.observe(trilha);
     }
-    vigiarFolha(raiz);
-  }
-
-  // A folha do alto fica fixa enquanto a trilha rola: a faixa da unidade gruda logo abaixo
-  // dela e a seta de "hoje" conta como fora da tela o que está escondido atrás dela.
-  let observadorFolha = null;
-  function vigiarFolha(raiz) {
-    const folha = raiz.querySelector('.folha-topo');
-    const raizDoc = document.documentElement;
-    if (observadorFolha) observadorFolha.disconnect();
-    if (!folha) { raizDoc.style.removeProperty('--alt-folha'); return; }
-    const medir = () => {
-      if (!folha.isConnected) { raizDoc.style.removeProperty('--alt-folha'); if (observadorFolha) observadorFolha.disconnect(); return; }
-      raizDoc.style.setProperty('--alt-folha', Math.round(folha.getBoundingClientRect().height) + 'px');
-    };
-    medir();
-    if (window.ResizeObserver) { observadorFolha = new ResizeObserver(medir); observadorFolha.observe(folha); }
   }
 
   // A seta que aparece quando o dia de hoje sai da tela, como no aplicativo de referência.
@@ -395,12 +378,10 @@
     const alvo = raiz.querySelector('.no.atual');
     const seta = raiz.querySelector('[data-ir-atual]');
     if (!alvo || !seta || !('IntersectionObserver' in window)) return;
-    const folha = raiz.querySelector('.folha-topo');
-    const altFolha = folha ? Math.round(folha.getBoundingClientRect().height) : 0;
     vigia = new IntersectionObserver(([registro]) => {
       seta.hidden = registro.isIntersecting;
-      seta.classList.toggle('para-cima', registro.boundingClientRect.top < altFolha);
-    }, { rootMargin: '-' + altFolha + 'px 0px 0px 0px' });
+      seta.classList.toggle('para-cima', registro.boundingClientRect.top < 0);
+    });
     vigia.observe(alvo);
     seta.onclick = () => CC.rolarAteAtual(true);
   }
