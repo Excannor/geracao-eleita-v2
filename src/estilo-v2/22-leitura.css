@@ -97,7 +97,9 @@
 
 /* ---------- o cartão do versículo (reflexão, baú, perfil, célula): liso, em Literata ---------- */
 .cartao-versiculo { background: var(--cartao); }
-.cartao-versiculo blockquote, .trecho-da-nota { color: var(--tinta); font-family: var(--fonte-biblia); font-weight: 400; }
+.cartao-versiculo blockquote, .trecho-da-nota { color: var(--tinta); font-family: var(--fonte-biblia); font-weight: 400; text-wrap: pretty; }
+/* as aspas: cheias em sálvia escura (clara no escuro), e não um fantasma a 38% */
+.cartao-versiculo .aspas { top: 6px; color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: 3rem; font-weight: 600; opacity: 1; }
 
 /* ---------- a barra do versículo: cores, e as ações em botões redondos com nome ---------- */
 .acoes-verso { position: relative; display: grid; gap: 14px; }
@@ -107,8 +109,10 @@
 .botoes-verso { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 4px; }
 .acoes-verso .botoes-verso .botao { flex-direction: column; gap: 6px; min-height: 0; padding: 0; background: none; color: var(--tinta-forte); font-size: .8125rem; font-weight: 600; }
 .botoes-verso .botao svg { box-sizing: content-box; padding: 12px; border-radius: 50%; background: var(--campo); }
-.botoes-verso .botao:hover svg { background: var(--contorno); }
+.botoes-verso .botao:hover svg, .acoes-verso .botao-icone:hover { background: var(--contorno); }
 .acoes-verso [data-fechar-verso] { position: absolute; top: 12px; right: 12px; }
+/* desfazer e tirar a marca: botões redondos como os outros, e não um X solto no cartão */
+.acoes-verso .botao-icone { background: var(--campo); }
 /* no leitor, a barra é um cartão solto em cima do pé */
 .leitor .acoes-verso { flex: 1 1 100%; padding: 12px 16px 14px; border-radius: var(--raio-cartao); background: var(--cartao); }
 
