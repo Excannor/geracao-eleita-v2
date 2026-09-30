@@ -37,8 +37,8 @@
 .topo:has(~ .corpo .folha-juntos) > .perfil-topo.selecionado { box-shadow: 0 0 0 2.5px var(--folha), 0 0 0 4.5px var(--folha-tinta); }
 /* celular estreito: o título ao lado do voltar encolhe para caber numa linha ("Pessoas
    bloqueadas" quebrava a 360px), como nas folhas do grupo 1 e da Bíblia */
-@media (max-width: 374px) { .folha-juntos > .voltar + h1 { padding-inline: 52px; } .folha-juntos h1 { font-size: 1.25rem; } }
-@media (max-width: 359px) { .folha-juntos h1 { font-size: 1rem; } }
+@media (max-width: 374px) { .folha-juntos > .voltar + h1 { padding-inline: 52px; } .folha-juntos h1, .folha-juntos .cabeca-celula h1 { font-size: 1.25rem; } }
+@media (max-width: 359px) { .folha-juntos > .voltar + h1 { font-size: 1rem; } }
 
 /* o cartão de destaque da folha, como os do Início: branco (sálvia no escuro), tinta escura e o
    botão redondo preto na ponta (a entrada de Propósitos, o propósito novo e os dias da célula) */
@@ -231,7 +231,9 @@ button.cartao-proposito:hover { background: var(--campo); }
 .folha:has([data-marcar]) .oracao-guia li { background: var(--campo); text-wrap: pretty; }
 .retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -4px; }
 .retratos-grupo .retrato-mais { font-size: .75rem; }
-.entrada-propositos small, .tipo-proposito > span, .pedido-mural :is(b, p) { text-wrap: balance; }
+.tipo-proposito > span, .pedido-mural p { text-wrap: balance; }
+/* "Mostrar seus marcos aos / amigos?": o título do pedido em bloco, equilibrado */
+.pedido-mural b { display: block; text-wrap: balance; }
 .cartao-proposito .pe-duplo-plano .botao { padding-inline: 12px; }
 .cabeca-proposito:has(> .retratos-grupo) { flex-wrap: wrap; }
 .cabeca-proposito:has(> .retratos-grupo) > .quem-amigo { order: 1; flex-basis: 100%; }
