@@ -131,7 +131,9 @@
       // Visitante não vê a aba Oração: se chegou nela por um link antigo, cai em Hoje.
       const abasVisiveis = ABAS_CELULA.filter(([k]) => k !== 'oracao' || !visitante);
       const aba = abasVisiveis.some(([k]) => k === pedida) ? pedida : 'hoje';
-      raiz.innerHTML = voltarCelulas()
+      // A folha do alto (só apresentação, 24-juntos.css): o nome, os dias seguidos no cartão
+      // de destaque do Início e as abas; o painel da aba fica embaixo, no fundo.
+      raiz.innerHTML = '<div class="folha-juntos">' + voltarCelulas()
         + '<div class="cabeca-celula"><div><span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula</span>'
         + '<h1>' + CC.esc(p.titulo) + '</h1>'
         + '<p class="passo-dica">' + CC.plural(ativos(p).length, 'pessoa', 'pessoas')
@@ -140,7 +142,7 @@
         + '<div class="segmentado abas-celula" role="tablist" aria-label="Partes da célula">'
         + abasVisiveis.map(([k, r]) => '<button type="button" role="tab" data-aba="' + k + '" aria-selected="' + (k === aba) + '" aria-pressed="' + (k === aba) + '">'
           + r + (k === 'estudo' && p.estudo ? '<i class="ponto-estudo" aria-hidden="true"></i>' : '') + '</button>').join('')
-        + '</div>'
+        + '</div></div>'
         + '<div class="painel-celula" role="tabpanel">'
         + (aba === 'hoje' ? abaHoje(p) : aba === 'pessoas' ? abaPessoas(p, souLider) : CC.esqueleto('lista'))
         + '</div>';
@@ -178,10 +180,10 @@
       const celulas = CC.minhasCelulas ? CC.minhasCelulas() : [];
       if (celulas.length === 1) { CC.substituirRota(enderecoCelula(celulas[0].id)); return; }
       if (!celulas.length) {
-        raiz.innerHTML = '<div class="cabeca-centro"><h1>Célula</h1></div><div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Você ainda não está em nenhuma célula.</p></div>';
+        raiz.innerHTML = '<div class="folha-juntos"><div class="cabeca-centro"><h1>Célula</h1></div></div><div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Você ainda não está em nenhuma célula.</p></div>';
         return;
       }
-      raiz.innerHTML = '<div class="cabeca-centro"><h1>Escolha uma célula</h1></div>'
+      raiz.innerHTML = '<div class="folha-juntos"><div class="cabeca-centro"><h1>Escolha uma célula</h1></div></div>'
         + '<div class="lista-pedidos">' + celulas.map((p) => '<button type="button" class="cartao-proposito" data-ir-celula="' + CC.esc(p.id) + '">'
           + cabeca(p) + '</button>').join('') + '</div>';
       raiz.querySelectorAll('[data-ir-celula]').forEach((b) => { b.onclick = () => { location.hash = enderecoCelula(b.dataset.irCelula); }; });
@@ -280,6 +282,8 @@
       + '<button class="botao contorno" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button>'
       + (conduzo ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '') + '</div>';
     if (ref) CC.ligarCartaoVersiculo(painel, ref);
+    // "Mateus 26", "1 Samuel": a quebra de linha nunca separa o número do livro
+    if (CC.inseparavel) CC.inseparavel(painel);
     painel.querySelector('[data-compartilhar]').onclick = () => compartilharEstudo(texto);
     const modo = painel.querySelector('[data-modo-encontro]');
     if (modo) modo.onclick = () => CC.modoEncontro(p);
@@ -1061,6 +1065,7 @@
         folha.querySelector('[data-modo-encontro]').onclick = () => CC.modoEncontro(p);
         folha.querySelector('[data-compartilhar]').onclick = () => compartilharEstudo(texto);
         if (ref) CC.ligarCartaoVersiculo(folha, ref);
+        if (CC.inseparavel) CC.inseparavel(folha);
       },
     });
   };
@@ -1094,7 +1099,7 @@
       pe: '<div class="modo-encontro-nav">'
         + '<button type="button" class="botao contorno pequeno" data-anterior disabled>Anterior</button>'
         + '<span data-indice>1 de ' + partes.length + '</span>'
-        + '<button type="button" class="botao contorno pequeno" data-proximo>Próximo</button></div>'
+        + '<button type="button" class="botao pequeno" data-proximo>Próximo</button></div>'
         + '<button class="botao plano" data-fechar>Fechar</button>',
       ligar: (el, fechar) => {
         const palco = el.querySelector('.tela-cheia-palco');
@@ -1104,11 +1109,13 @@
           el.querySelector('[data-anterior]').disabled = i === 0;
           el.querySelector('[data-proximo]').disabled = i === partes.length - 1;
           if (partes[i].ref) CC.ligarCartaoVersiculo(palco, partes[i].ref);
+          if (CC.inseparavel) CC.inseparavel(palco);
         };
         el.querySelector('[data-fechar]').onclick = fechar;
         el.querySelector('[data-anterior]').onclick = () => { if (i > 0) { i--; mostrar(); } };
         el.querySelector('[data-proximo]').onclick = () => { if (i < partes.length - 1) { i++; mostrar(); } };
         if (partes[0].ref) CC.ligarCartaoVersiculo(palco, partes[0].ref);
+        if (CC.inseparavel) CC.inseparavel(palco);
       },
     });
   };
