@@ -78,3 +78,6 @@ O layout da primeira versão fica (folha do topo com saudação e botões redond
 - **Tema claro:** o corpo (trilha e conteúdo) em fundo CLARO suave (#ececec, cartões #ffffff), igual ao tema novo; a FOLHA DO TOPO invertida, em grafite (ex.: #252724, texto #eef0ea, botões redondos #33352f), com os cartões sálvia por cima. Nós lidos pretos (#151615) com ícone branco, hoje em sálvia com anel, travados brancos com contorno e cadeado cinza, linha escura até hoje e pontilhada depois.
 - **Tema escuro:** o corpo em grafite suave (#1b1c1a, cartões #252724); a folha do topo em grafite um pouco mais claro (ex.: #2e302c) para se destacar sem virar um bloco branco; nós lidos em #eef0ea com ícone escuro, hoje em sálvia.
 - Nada de bloco preto no tema claro nem bloco branco no tema escuro. Valores finais escolhidos por contraste (texto ≥ 4,5:1, ícones de estado ≥ 3:1) e registrados na tabela de tokens.
+
+## Paleta aprovada (30/09)
+O dono aprovou o Início do commit b1ef647 (src/app/03-trilha.js e src/estilo-v2/21-trilha.css): é a referência exata de cores e acabamento para todas as outras telas. Topo em folha grafite no claro (#2e302c no escuro), corpo claro #ececec com cartões brancos no claro (grafite #1b1c1a/#252724 no escuro), cartões de destaque sálvia #c8da8c com botão redondo preto, nós e botões principais em #151615 no claro / #eef0ea no escuro.
