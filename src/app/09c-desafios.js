@@ -161,27 +161,32 @@
 
   // ---------- telas ----------
   const selo = (t) => '<span class="dsf-selo">' + CC.esc(t) + '</span>';
+  // Espaço inseparável entre número e palavra ("21 dias", "1 Coríntios 6.12"): nada de "1 / Coríntios".
+  const nb = (t) => CC.esc(t).replace(/(\d) (?=\p{L})/gu, '$1&nbsp;').replace(/(\p{L}) (?=\d)/gu, '$1&nbsp;');
+  const vencido = () => CC.ico('certo') + 'Hoje vencido';
 
   function cartaoAtivo(d) {
     const s = CC.situacaoDesafio(d);
     return '<button type="button" class="dsf-card" data-desafio="' + d.id + '">'
       + '<span class="dsf-topo"><span class="dsf-linha">' + selo(d.dias + ' dias')
       + (s.seguidos ? '<span class="dsf-dias">' + CC.plural(s.seguidos, 'dia seguido', 'dias seguidos') + '</span>' : '') + '</span>'
-      + '<b class="dsf-nome">' + CC.esc(d.titulo) + '</b></span>'
+      + '<b class="dsf-nome">' + nb(d.titulo) + '</b></span>'
       + '<span class="dsf-corpo"><span class="dsf-stats">'
       + '<span><b>' + s.seguidos + '</b><small>Seguidos</small></span>'
       + '<span><b>' + s.vencidos + '</b><small>Vencidos</small></span>'
       + '<span><b>' + s.faltam + '</b><small>Faltam</small></span></span>'
-      + '<span class="dsf-acao' + (s.venceuHoje ? ' feito' : '') + '">' + (s.venceuHoje ? 'Hoje vencido ✓' : 'Ver o estudo do dia ' + s.numero) + '</span>'
+      + '<span class="dsf-acao' + (s.venceuHoje ? ' feito' : '') + '">' + (s.venceuHoje ? vencido() : 'Ver o estudo do dia ' + s.numero) + '</span>'
       + '<span class="dsf-barra"><i style="width:' + Math.round((s.vencidos / d.dias) * 100) + '%"></i></span>'
       + '<span class="dsf-pe">' + s.vencidos + ' de ' + d.dias + ' dias vencidos</span></span></button>';
   }
 
   function linhaNovo(d) {
     const s = CC.situacaoDesafio(d);
-    return '<button type="button" class="dsf-item" data-desafio="' + d.id + '"><span><b>' + CC.esc(d.titulo) + '</b>'
-      + '<small>' + CC.esc(s.concluido ? 'Concluído' : s.vencidos ? 'Pausado · ' + s.vencidos + ' de ' + d.dias + ' dias vencidos' : d.resumo) + '</small></span>'
-      + '<span class="dsf-n">' + (s.concluido ? CC.ico('trofeu') : d.dias + ' dias') + '</span></button>';
+    return '<button type="button" class="dsf-item' + (s.concluido ? ' concluido' : '') + '" data-desafio="' + d.id + '">'
+      // a duração vira a linha de cima, como o "Unidade N" do Praticar: o título fica com a largura toda
+      + '<span class="dsf-ico">' + CC.ico(s.concluido ? 'trofeu' : 'bandeira') + '</span><span class="dsf-textos">'
+      + '<span class="dsf-n">' + (s.concluido ? CC.ico('certo') : d.dias + '&nbsp;dias') + '</span><b>' + nb(d.titulo) + '</b>'
+      + '<small>' + CC.esc(s.concluido ? 'Concluído' : s.vencidos ? 'Pausado · ' + s.vencidos + ' de ' + d.dias + ' dias vencidos' : d.resumo) + '</small></span></button>';
   }
 
   // O bloco que entra na aba Desafios, acima dos desafios do dia.
@@ -190,7 +195,7 @@
     const outros = CC.DESAFIOS.filter((d) => !CC.situacaoDesafio(d).ativo);
     return (ativos.length ? '<div class="titulo-bloco"><h2>Meus desafios</h2></div>' + ativos.map(cartaoAtivo).join('') : '')
       + (outros.length ? '<div class="titulo-bloco"><h2>' + (ativos.length ? 'Começar um novo' : 'Desafios de consagração') + '</h2></div>'
-        + '<div class="dsf-lista">' + outros.map(linhaNovo).join('') + '</div>' : '');
+        + '<div class="dsf-lista caixa-lista">' + outros.map(linhaNovo).join('') + '</div>' : '');
   };
 
   CC.ligarDesafiosLongos = function (raiz, redesenhar) {
@@ -203,7 +208,7 @@
     if (!d) return;
     const s = CC.situacaoDesafio(d);
     const sobre = '<p class="passo-dica">' + CC.esc(d.desafio) + '</p>'
-      + '<blockquote class="dsf-base">' + CC.esc(d.base.texto) + ' <cite>' + CC.esc(d.base.ref) + '</cite></blockquote>'
+      + '<blockquote class="dsf-base">' + CC.esc(d.base.texto) + ' <cite>' + nb(d.base.ref) + '</cite></blockquote>'
       + '<p><b>No lugar disso:</b> ' + CC.esc(d.noLugar) + '</p>'
       + '<ul class="dsf-dicas">' + d.dicas.map((x) => '<li>' + CC.esc(x) + '</li>').join('') + '</ul>';
     let corpo;
@@ -211,11 +216,11 @@
       const [ref, pergunta, passo] = s.estudo;
       corpo = (s.escapou ? '<p class="aviso-cadeado">Escapou um dia? Tudo bem. Os dias que você venceu continuam valendo. Siga de onde parou.</p>' : '')
         + '<div class="dsf-estudo"><span class="etiqueta">Estudo do dia ' + s.numero + ' de ' + d.dias + '</span>'
-        + '<a class="botao contorno" href="' + CC.hrefDoVerso(ref) + '" data-fechar-e-ler>' + CC.ico('livro') + 'Ler ' + CC.esc(ref) + '</a>'
+        + '<a class="botao contorno" href="' + CC.hrefDoVerso(ref) + '" data-fechar-e-ler>' + CC.ico('livro') + 'Ler ' + nb(ref) + '</a>'
         + '<p><b>Para pensar:</b> ' + CC.esc(pergunta) + '</p>'
         + '<p><b>Hoje:</b> ' + CC.esc(passo) + '</p></div>'
         + '<div class="acoes">' + (s.venceuHoje
-          ? '<button class="botao contorno" disabled>Hoje vencido ✓</button>'
+          ? '<button class="botao contorno" disabled>' + vencido() + '</button>'
           : '<button class="botao azul" data-vencer>Vencer o dia de hoje</button>')
         + '</div>'
         + '<details class="dsf-sobre"><summary>Sobre o desafio</summary>' + sobre + '</details>'
@@ -229,8 +234,9 @@
         + '<div class="acoes"><button class="botao azul" data-comecar>' + (s.vencidos ? 'Continuar' : 'Começar hoje') + '</button>'
         + '<button class="botao plano" data-fechar>Agora não</button></div>';
     }
-    CC.folha('<span class="etiqueta">' + d.dias + ' dias</span><h2>' + CC.esc(d.titulo) + '</h2>' + corpo, {
+    CC.folha('<span class="etiqueta">' + d.dias + '&nbsp;dias</span><h2>' + nb(d.titulo) + '</h2>' + corpo, {
       rotulo: d.titulo,
+      classe: 'folha-desafio',
       rolavel: true,
       ligar: (folha, fechar) => {
         const q = (sel) => folha.querySelector(sel);

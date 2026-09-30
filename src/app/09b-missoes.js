@@ -13,8 +13,9 @@
     return '<div class="missao' + (m.feita ? ' feita' : '') + (de !== undefined && m.feita && inicio < m.alvo ? ' fechou-agora' : '') + '">'
       + '<span class="icone-missao c-' + m.cor + '">' + CC.ico(m.icone) + '</span>'
       + '<div class="corpo-missao"><b>' + CC.esc(m.texto) + '</b>'
-      + '<div class="barra-missao c-' + (m.feita ? 'amarelo' : m.cor) + '"><i style="width:' + pct(inicio, m.alvo) + '" data-encher="' + pct(m.valor, m.alvo) + '"></i>'
-      + '<span>' + m.valor + ' / ' + m.alvo + '</span></div></div>'
+      // a barra e a conta lado a lado: a conta numa pílula, fora da barra
+      + '<div class="linha-barra"><div class="barra-missao c-' + (m.feita ? 'amarelo' : m.cor) + '"><i style="width:' + pct(inicio, m.alvo) + '" data-encher="' + pct(m.valor, m.alvo) + '"></i></div>'
+      + '<span class="conta-missao">' + m.valor + '/' + m.alvo + '</span></div></div>'
       + '<span class="premio-missao">' + CC.arte.bau(m.feita ? 'aberto' : 'travado') + '</span>'
       + '</div>';
   };
@@ -31,7 +32,7 @@
     const titulo = '<div class="titulo-bloco"><h2>Lendo junto na semana</h2><span>até domingo</span></div>';
     if (!dados) return titulo + CC.esqueleto('lista');
     if (!amigos.length) {
-      return titulo + '<div class="missao-convite">' + CC.ico('pessoas')
+      return titulo + '<div class="missao-convite"><span class="icone-missao">' + CC.ico('pessoas') + '</span>'
         + '<p>Leiam juntos 4 dias na mesma semana. Chame alguém para começar!</p>'
         + '<button class="botao pequeno" data-convidar>' + CC.ico('compartilhar') + 'Convidar</button></div>';
     }
@@ -48,7 +49,7 @@
         + '<span class="dupla-mini">' + CC.retratoAmigo(eu, 'mini') + CC.retratoAmigo(a, 'mini') + '</span>'
         + '<div class="corpo-missao"><b>Leiam juntos ' + ALVO_SEMANA + ' dias com ' + CC.esc(a.nome) + '</b>'
         // a barra é da dupla: conta os dias em que os dois leram, nunca quanto cada um leu
-        + '<div class="barra-missao"><i style="width:' + pct(dias, ALVO_SEMANA) + '"></i><span>' + dias + ' / ' + ALVO_SEMANA + '</span></div>'
+        + '<div class="linha-barra"><div class="barra-missao"><i style="width:' + pct(dias, ALVO_SEMANA) + '"></i></div><span class="conta-missao">' + dias + '/' + ALVO_SEMANA + '</span></div>'
         + '<span class="estado-dupla">' + (a.leuHoje ? CC.ico('certo') + CC.esc(a.nome.split(' ')[0]) + ' já leu hoje'
           : (a.toqueEnviado ? CC.esc(a.nome.split(' ')[0]) + ' foi encorajado hoje'
             : '<button class="link-nota" data-encorajar="' + CC.esc(a.usuario) + '">' + CC.ico('aperto') + 'Encorajar ' + CC.esc(a.nome.split(' ')[0]) + '</button>')) + '</span></div>'
@@ -62,8 +63,11 @@
     const { lista } = CC.conferirMissoes();
     const feitas = lista.filter((m) => m.feita).length;
 
-    raiz.innerHTML = '<div class="cabeca-missoes">'
-      + '<div class="textos"><h1>Desafios</h1><p>Complete os três desafios de hoje.</p></div>'
+    // O título da tela fica no alto, no meio; o destaque é um cartão com a conta do dia em bold.
+    raiz.innerHTML = '<div class="cabeca-centro"><span class="vao"></span><h1>Desafios</h1><span class="vao"></span></div>'
+      + '<div class="cabeca-missoes">'
+      + '<div class="textos"><b class="placar-missoes">' + feitas + '<small> de ' + lista.length + '</small></b>'
+      + '<p>Complete os três desafios de hoje.</p></div>'
       + '<span class="bau-cabeca">' + CC.arte.bau(feitas === lista.length ? 'aberto' : 'pronto') + '</span></div>'
       + '<section class="bloco-missoes" id="desafios-longos">' + CC.blocoDesafiosLongos() + '</section>'
       + '<section class="bloco-missoes">'
@@ -71,7 +75,8 @@
       + '<div class="lista-missoes">' + lista.map((m) => CC.linhaMissao(m)).join('') + '</div></section>'
       // Praticar mora aqui: guardar versículos é o mesmo trabalho do "Guardar" da reflexão
       + '<a class="cartao-praticar" href="#/praticar"><span class="icone-praticar">' + CC.ico('alvo') + '</span>'
-      + '<span class="textos"><b>Praticar</b><small>Guarde os versículos das unidades num quiz rápido</small></span>' + CC.ico('avancar') + '</a>'
+      + '<span class="textos"><b>Praticar</b><small>Guarde os versículos das unidades num quiz rápido</small></span>'
+      + '<span class="botao-redondo salvia" aria-hidden="true">' + CC.ico('avancar') + '</span></a>'
       + '<section class="bloco-missoes" id="missao-amigos">' + missaoAmigos(CC.amigosEmCache && CC.amigosEmCache()) + '</section>';
 
     const ligarAmigos = () => {
