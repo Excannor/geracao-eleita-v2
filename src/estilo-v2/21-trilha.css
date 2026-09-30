@@ -46,8 +46,10 @@
   /* a folha do tema (00-tokens): sálvia pálida no claro, grafite um tom acima no escuro */
   --cartao: var(--folha); --campo: var(--folha-campo);
   --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
-  position: relative;
-  z-index: 2;
+  /* fixa no alto enquanto a trilha rola (decisão do dono, 30/09), como a barra embaixo */
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -105,7 +107,7 @@
 
 /* ---------- a faixa da unidade, escura ---------- */
 .trilha-caminho .faixa-unidade {
-  position: sticky; top: env(safe-area-inset-top); z-index: 20;
+  position: sticky; top: var(--alt-folha, env(safe-area-inset-top)); z-index: 20;
   align-items: center; gap: 8px; margin: 12px -16px 0; padding: 12px 16px;
   border-radius: 0; background: var(--fundo); color: var(--tinta-forte); overflow: visible;
 }
@@ -130,6 +132,8 @@
 .linha-adiante { stroke: var(--tinta-fraca); stroke-dasharray: 1 8; }
 .no-linha { z-index: 1; margin-bottom: 20px; }
 .no-linha.hoje { margin: 44px 0 52px; z-index: 3; }
+/* o que a trilha rola até fica abaixo da folha fixa do alto */
+.trilha .no, .trilha .faixa-unidade { scroll-margin-top: calc(var(--alt-folha, 0px) + 16px); }
 
 /* nós: lido claro com ícone escuro, hoje sálvia com anel, adiante escuro com cadeado */
 .no { width: 58px; height: 58px; }
