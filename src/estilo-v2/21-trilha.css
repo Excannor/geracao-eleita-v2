@@ -14,7 +14,7 @@
 
 /* ---------- peças repetidas deste grupo ---------- */
 /* cartão branco, sem borda nem sombra */
-.toque-recebido, .faixa-unidade, .faixa-unidade.travada, .cabeca-passos, .praticar-unidade, .cj .etapa-reflexao {
+.toque-recebido, .faixa-unidade, .faixa-unidade.travada, .praticar-unidade, .cj .etapa-reflexao {
   border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta-forte); box-shadow: none;
 }
 /* realce do que é de hoje: sálvia pálido listrado */
@@ -24,7 +24,7 @@
 .toque-recebido > svg:first-child, .atalhos-conhecer svg:first-child { background: var(--salvia-palido); color: var(--salvia-texto); }
 /* quebras bonitas (herdam) */
 .trilha, .pop-no, .cj, .tela-conhecer-lista { text-wrap: pretty; }
-.faixa-unidade .nome, .titulo-pop, .cj .textos > b, .lista-licoes .textos > span { text-wrap: balance; }
+.faixa-unidade .nome, .titulo-pop, .cj .textos > b, .lista-licoes .textos > span, .atalhos-conhecer b, .atalhos-conhecer small { text-wrap: balance; }
 
 /* o cartão da leitura (também no dia do Conhecer Jesus) */
 .leitura-hoje { margin-bottom: 16px; padding: 20px; border: 0; border-radius: var(--raio-cartao); }
@@ -241,19 +241,37 @@
 @media (max-width: 374px) { .folha-cabeca:not(.titulo-frase) > .voltar + h1 { padding-inline: 52px; font-size: 1.25rem; } }
 @media (max-width: 359px) { .folha-cabeca:not(.titulo-frase) > .voltar + h1 { font-size: 1rem; } }
 
-/* ---------- primeiros passos e Conhecer Jesus: a cabeça vira cartão ---------- */
-.cabeca-passos { margin: 0 0 8px; padding: 20px; }
+/* o cartão de destaque da folha, como os do Início: branco (sálvia no escuro), botão redondo preto */
+.cartao-destaque {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 84px; padding: 12px 12px 12px 20px; border-radius: 26px;
+  background: var(--folha-destaque); color: var(--salvia-tinta);
+  font-size: 1.0625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-decoration: none; text-wrap: balance;
+}
+.cartao-destaque:hover { color: var(--salvia-tinta); text-decoration: none; }
+.cartao-destaque:active { transform: scale(.98); }
+.cartao-destaque svg, .folha-cabeca .conquista-linha svg { flex: none; box-sizing: content-box; width: 20px; height: 20px; padding: 14px; border-radius: 50%; background: var(--salvia-tinta); color: #ffffff; stroke-width: 2.2; }
+/* (três classes: o estilo.css pinta .conquista-linha de sálvia no escuro, que some no cartão) */
+.folha-cabeca .textos > .conquista-linha { display: flex; gap: 12px; min-height: 84px; margin: 0; padding: 12px 20px 12px 12px; border-radius: 26px; background: var(--folha-destaque); color: var(--salvia-tinta); font-size: 1rem; font-weight: 800; }
+.folha-cabeca .conquista-linha svg { color: var(--salvia); }
+
+/* ---------- primeiros passos e Conhecer Jesus: a cabeça na folha, a lista no corpo ---------- */
+.folha-cabeca.cabeca-passos { margin-bottom: 8px; background: var(--folha); color: var(--folha-tinta); }
 .cabeca-passos p { color: var(--tinta-fraca); font-weight: 500; opacity: 1; }
-.cabeca-passos .progresso-passos .barra { background: var(--campo); }
+.cabeca-passos .subtitulo-tela { margin: -12px auto 20px; }
+.tela-conhecer-lista .cabeca-passos h1 { font-size: 1.5rem; }
+.cabeca-passos .progresso-passos { gap: 14px; margin: 0 0 16px; }
+.cabeca-passos .progresso-passos .barra { background: var(--folha-campo); }
 .cabeca-passos .progresso-passos .barra > i { background: var(--progresso); }
-.cabeca-passos .progresso-passos b { white-space: nowrap; }
-.cabeca-passos .conquista-linha, .cj .conquista-linha { min-height: 44px; background: var(--salvia-palido); color: var(--salvia-texto); }
+.cabeca-passos .progresso-passos b { color: var(--folha-tinta); white-space: nowrap; }
+.cj .conquista-linha { min-height: 44px; background: var(--salvia-palido); color: var(--salvia-texto); }
 
 .lista-licoes { overflow: hidden; }
 .lista-licoes.caixa-lista .item-licao { min-height: 72px; padding: 14px 16px; }
 .lista-licoes.caixa-lista .item-licao:hover { background: var(--campo); }
 .item-licao .num, .item-licao.feita .num, .lista-licoes.caixa-lista .item-licao.proxima .num { width: 44px; height: 44px; background: var(--campo); color: var(--tinta-fraca); box-shadow: none; }
-.item-licao.feita .num { background: var(--inverso); color: var(--inverso-tinta); }
+/* feita: como o dia lido na trilha */
+.item-licao.feita .num { background: var(--no-lido); color: var(--no-lido-tinta); }
 .lista-licoes.caixa-lista .item-licao.proxima .num { background: var(--salvia); color: var(--salvia-tinta); }
 .item-licao .textos > span, .atalhos-conhecer small, .cj .resumo { display: block; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 500; }
 .lista-licoes.caixa-lista .item-licao .marca-proxima { color: var(--salvia-texto); font-size: .75rem; letter-spacing: 0; text-transform: none; }

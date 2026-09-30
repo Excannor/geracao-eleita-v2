@@ -69,13 +69,15 @@
         + CC.ico('avancar') + '</a>';
     }).join('');
 
-    raiz.innerHTML = '<div class="tela-conhecer-lista"><div class="cabeca-passos c-azul">'
+    // A cabeça continua a folha do topo do app (.folha-cabeca, em 21-trilha.css), como a
+    // saudação do Início; o próximo dia é o cartão de destaque.
+    raiz.innerHTML = '<div class="tela-conhecer-lista"><div class="folha-cabeca cabeca-passos c-azul">'
       + '<div class="textos"><h1>' + CC.esc(C.titulo) + '</h1>'
       + '<p>' + CC.esc(C.subtitulo) + '</p>'
       + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitos.length + ' de ' + C.dias.length + '</b></div>'
       + (proximo
-        ? '<a class="botao" href="#/conhecer/' + proximo.numero + '">' + CC.ico('bandeira')
-          + (feitos.length ? 'Continuar: ' : 'Começar: ') + CC.esc(proximo.titulo) + '</a>'
+        ? '<a class="cartao-destaque" href="#/conhecer/' + proximo.numero + '"><span>'
+          + (feitos.length ? 'Continuar: ' : 'Começar: ') + CC.esc(proximo.titulo) + '</span>' + CC.ico('bandeira') + '</a>'
         : '<p class="conquista-linha">' + CC.ico('certo') + 'Você terminou os 14 dias!</p>')
       + '</div></div>'
       // Quem convidou vê em que dia a pessoa está (nunca o que ela escreve): dito aqui, às claras.
