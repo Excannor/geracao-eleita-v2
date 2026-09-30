@@ -41,26 +41,26 @@
 
 /* ---------- a folha do alto ---------- */
 .folha-topo {
-  --salvia-cheia: #c8da8c;
+  --salvia-cheia: var(--folha-destaque);
   --preto: #151615;
-  /* grafite nos dois temas: no claro se destaca do fundo claro, no escuro é um tom acima */
-  --cartao: #252724; --campo: #33352f;
-  --tinta-forte: #eef0ea; --tinta: #d9dcd3; --tinta-fraca: #a4a99d;
-  --alerta: #ff8a80;
+  /* a folha do tema (00-tokens): sálvia pálida no claro, grafite um tom acima no escuro */
+  --cartao: var(--folha); --campo: var(--folha-campo);
+  --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin: calc(-16px - env(safe-area-inset-top)) 0 0;
-  padding: calc(20px + env(safe-area-inset-top)) 14px 16px;
+  /* de ponta a ponta: a folha passa por baixo da barra de status e encosta nas bordas */
+  margin: calc(-16px - env(safe-area-inset-top)) calc(-1 * var(--margem-folha, 16px)) 0;
+  padding: calc(20px + env(safe-area-inset-top)) calc(14px + var(--margem-folha, 16px)) 16px;
   border-radius: 0 0 36px 36px;
   background: var(--cartao);
   color: var(--tinta-forte);
 }
-:root[data-tema="escuro"] .folha-topo { --cartao: #2e302c; --campo: #3a3d37; }
+:root[data-tema="escuro"] .folha-topo { --alerta: #ff8a80; }
 .saudacao { display: flex; align-items: center; gap: 12px; }
-.avatar-topo { flex: none; display: grid; place-items: center; width: 52px; height: 52px; overflow: hidden; border-radius: 50%; background: var(--salvia-cheia); color: var(--preto); text-decoration: none; }
+.avatar-topo { flex: none; display: grid; place-items: center; width: 52px; height: 52px; overflow: hidden; border-radius: 50%; background: var(--salvia); color: var(--preto); text-decoration: none; }
 .avatar-topo svg { width: 24px; height: 24px; }
 .avatar-topo img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .textos-saudacao { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
@@ -126,7 +126,7 @@
 .estrada { position: absolute; inset: 0 auto auto 0; z-index: 0; overflow: visible; pointer-events: none; }
 .estrada path { fill: none; stroke-linecap: round; stroke-width: 2.5; }
 .estrada .faixa-estrada { stroke: var(--cartao); stroke-width: 18; }
-.linha-feita { stroke: var(--inverso); }
+.linha-feita { stroke: var(--no-lido); }
 .linha-adiante { stroke: var(--tinta-fraca); stroke-dasharray: 1 8; }
 .no-linha { z-index: 1; margin-bottom: 20px; }
 .no-linha.hoje { margin: 44px 0 52px; z-index: 3; }
@@ -134,7 +134,7 @@
 /* nós: lido claro com ícone escuro, hoje sálvia com anel, adiante escuro com cadeado */
 .no { width: 58px; height: 58px; }
 .no .face svg { width: 22px; height: 22px; stroke-width: 2.4; }
-.no.feito, .no.feito.fecha-livro, .no.feito.com-registro { --cor: var(--inverso); color: var(--inverso-tinta); }
+.no.feito, .no.feito.fecha-livro, .no.feito.com-registro { --cor: var(--no-lido); color: var(--no-lido-tinta); }
 .no.feito.com-registro .face svg, .no.fecha-livro .face svg { stroke-width: 2; }
 .no.travado, .no.travado:active, .no.travado.aberto { background: var(--cartao); color: var(--tinta-fraca); box-shadow: inset 0 0 0 1.5px var(--contorno); }
 .no.travado .face svg { width: 18px; height: 18px; stroke-width: 2; }

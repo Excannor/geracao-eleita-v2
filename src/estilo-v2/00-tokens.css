@@ -21,10 +21,10 @@
 
 :root {
   /* ---------- as fichas do guia · tema claro ---------- */
-  --v2-fundo: #ececec;
+  --v2-fundo: #f4f5f0;
   --v2-cartao: #ffffff;
-  --campo: #f3f3f3;
-  --contorno: #e2e2e2;
+  --campo: #eff1ea;
+  --contorno: #e2e5db;
   --v2-tinta-forte: #151615;
   --v2-tinta: #2c2d2b;
   --v2-tinta-fraca: #686b66;
@@ -35,12 +35,24 @@
   --salvia-tinta: #151615;
   --v2-inverso: #151615;
   --v2-inverso-tinta: #ffffff;
-  --barra: #151615;
-  --barra-botao: #2a2b29;
-  --barra-icone: #e6e6e6;
-  /* a aba ativa: círculo claro com ícone escuro */
-  --barra-ativa: #ffffff;
-  --barra-ativa-tinta: #151615;
+  /* a barra de abas: uma cápsula só, clara no claro; a aba ativa num círculo preto */
+  --barra: #ffffff;
+  --barra-botao: transparent;
+  --barra-icone: #2c2d2b;
+  --barra-rotulo: #686b66;
+  --barra-ativa: #151615;
+  --barra-ativa-tinta: #ffffff;
+  --barra-ativa-rotulo: #151615;
+  /* a folha do alto das telas (Início...): sálvia pálida no claro, com cartões brancos
+     por cima (paleta C, escolhida pelo dono em 30/09); grafite um tom acima no escuro */
+  --folha: #dfe8c1;
+  --folha-tinta: #151615;
+  --folha-tinta-fraca: #4f5a36;
+  --folha-campo: #eef3de;
+  --folha-destaque: #ffffff;
+  /* dia lido na trilha: grafite com visto sálvia */
+  --no-lido: #2c2d2b;
+  --no-lido-tinta: #dfe8c1;
   --v2-chama: #e23d1b;
   --v2-chama-texto: #b3321a;
   --alerta: #c62828;
@@ -79,10 +91,20 @@
   --salvia-texto: #c9d98f;
   --v2-inverso: #eef0ea;
   --v2-inverso-tinta: #1b1c1a;
-  --barra: #10110f;
-  --barra-botao: #2a2c28;
+  --barra: #2a2c28;
+  --barra-botao: transparent;
+  --barra-icone: #e6e8e1;
+  --barra-rotulo: #b7bbb1;
   --barra-ativa: #eef0ea;
   --barra-ativa-tinta: #151615;
+  --barra-ativa-rotulo: #eef0ea;
+  --folha: #2e302c;
+  --folha-tinta: #eef0ea;
+  --folha-tinta-fraca: #a4a99d;
+  --folha-campo: #3a3d37;
+  --folha-destaque: #c8da8c;
+  --no-lido: #eef0ea;
+  --no-lido-tinta: #1b1c1a;
   --v2-chama: #ff7a52;
   --v2-chama-texto: #ff9a7a;
   --alerta: #ff8a80;

@@ -39,7 +39,10 @@ const PARES = [
   ['--salvia-tinta', '--salvia', 4.5, 'tinta sobre a sálvia'],
   ['--v2-tinta', '--salvia-palido', 4.5, 'texto no realce sálvia pálido'],
   ['--v2-inverso-tinta', '--v2-inverso', 4.5, 'botão principal'],
-  ['--barra-icone', '--barra-botao', 4.5, 'ícone inativo da barra'],
+  ['--barra-icone', '--barra', 4.5, 'ícone inativo da barra (sobre a cápsula)'],
+  ['--folha-tinta', '--folha', 4.5, 'texto da folha do alto'],
+  ['--folha-tinta-fraca', '--folha', 4.5, 'legenda da folha do alto'],
+  ['--no-lido-tinta', '--no-lido', 3, 'visto do dia lido'],
   ['--barra-ativa-tinta', '--barra-ativa', 4.5, 'ícone da aba ativa'],
   ['--barra-rotulo', '--barra', 4.5, 'nome da aba sobre a ilha'],
   ['--v2-chama-texto', '--v2-cartao', 4.5, 'número da ofensiva no cartão'],
@@ -49,8 +52,6 @@ const PARES = [
   ['--v2-tinta-fraca', '--campo', 3, 'bolinha do interruptor desligado'],
   ['--salvia-tinta', '--salvia', 3, 'bolinha do interruptor ligado'],
 ];
-// a barra de rótulos mora no 01-base.css
-claro['--barra-rotulo'] = escuro['--barra-rotulo'] = '#b7bbb1';
 
 let falhas = 0;
 for (const [nome, tema] of [['claro', claro], ['escuro', escuro]]) {
