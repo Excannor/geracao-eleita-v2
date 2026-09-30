@@ -4,4 +4,143 @@
    Camada exclusiva deste grupo de telas (ver design/mapa-telas.md). Use as fichas de
    00-tokens.css e as peças de 01-base.css; nada de cor literal que valha só num tema.
    Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz, .selo-ref).
+
+   Os cabeçalhos das telas deste grupo usam as peças da base (.cabeca-centro, .subtitulo-tela),
+   trocadas no HTML dos três arquivos: por isso quase nada de cabeçalho mora aqui.
    ========================================================================= */
+
+/* ---------- retratos: redondos, nas cores do guia ----------
+   O retrato é peça deste grupo (CC.retratoAmigo), usado também no Perfil e nos Desafios. As
+   famílias antigas viram sálvia, sálvia pálido e escuro (inverso); a pilha da célula perde o
+   vermelho de alerta (nada de alerta num rosto). As fichas são trocadas só dentro do retrato. */
+.retrato-amigo { --roxo: var(--inverso); --vermelho-fraco: var(--salvia); --vermelho-3d: var(--salvia-tinta); }
+.inicial:is(.c-verde, .c-amarelo, .c-turquesa) { background: var(--salvia); color: var(--salvia-tinta); }
+.inicial.c-azul { background: var(--salvia-palido); color: var(--salvia-texto); }
+.retrato-amigo.inicial { font-weight: 800; }
+.retrato-amigo.fez { box-shadow: 0 0 0 2px var(--cartao), 0 0 0 4px var(--salvia-texto) !important; }
+
+/* ---------- a roda de amigos ---------- */
+.roda-amigos { gap: 8px; padding: 6px 16px 10px; }
+.amigo-roda, .vaga { width: 64px; gap: 6px; }
+.amigo-roda .moldura, .vaga .moldura, .amigo-roda .retrato-amigo { width: 58px; height: 58px; }
+.amigo-roda .retrato-amigo { border: 0; font-size: 1.375rem; }
+.amigo-roda.leu .retrato-amigo { box-shadow: 0 0 0 3px var(--fundo), 0 0 0 5px var(--salvia-texto); }
+.selo-leu { right: -4px; bottom: -2px; width: 26px; height: 26px; border: 3px solid var(--fundo); background: var(--salvia); color: var(--salvia-tinta); }
+.amigo-roda b, .vaga b { max-width: 64px; font-size: .8125rem; font-weight: 700; color: var(--tinta-forte); }
+.amigo-roda small { color: var(--chama-texto); font-size: .8125rem; font-weight: 700; }
+.vaga .moldura { border: 0; background: var(--cartao); color: var(--tinta-forte); }
+.botao.convidar-largo { display: flex; width: 100%; min-height: 52px; margin: 8px 0 12px; }
+
+/* ---------- a entrada de Propósitos e o selo de número ---------- */
+.entrada-propositos { gap: 14px; min-height: 76px; margin: 0; padding: 14px 20px 14px 14px; border-radius: var(--raio-cartao); }
+.entrada-propositos:hover { background: var(--campo); }
+.entrada-propositos > svg:first-child, .pedido-mural > svg { box-sizing: border-box; width: 48px; height: 48px; padding: 13px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.entrada-propositos small, .quem-amigo .arroba, .cabeca-amigo .conta { font-size: .8125rem; font-weight: 500; text-wrap: pretty; }
+.selo-numero { background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; }
+
+/* ---------- o mural: um cartão por marco ---------- */
+.mural, .lista-propositos { display: grid; gap: 12px; }
+.mural { margin-top: 24px; }
+button.cartao-proposito:hover { background: var(--campo); }
+.item-mural, .cartao-proposito, .pedido-mural, .recado-lider, .secao-w { gap: 14px; margin: 0; padding: 20px; border: 0; border-radius: var(--raio-cartao); background: var(--cartao); }
+.item-mural { display: grid; }
+.cabeca-mural > div > b { font-size: .9375rem; }
+.cabeca-mural > div > span { font-size: .8125rem; font-weight: 500; }
+.corpo-mural { margin: 0; }
+.corpo-mural p { font-weight: 500; text-wrap: pretty; }
+.arte-mural { width: 48px; }
+.versiculo-mural { margin: 0; padding: 16px 18px; border-radius: 20px; background: var(--campo); }
+.versiculo-mural p { font-family: var(--fonte-biblia); font-size: 1.0625rem; font-weight: 400; line-height: 1.65; color: var(--tinta); text-wrap: pretty; }
+.botao-reagir { min-height: 44px; padding: 0 16px 0 14px; border: 0; border-radius: 999px; background: var(--campo); color: var(--tinta-forte); }
+.botao-reagir:active { transform: none; }
+.botao-reagir b:empty { display: none; }
+.botao-reagir.ligado { background: var(--salvia); color: var(--salvia-tinta); }
+.quem-celebrou { font-size: .8125rem; font-weight: 500; }
+.pedido-mural { margin-top: 24px; }
+.pedido-mural p { color: var(--tinta-fraca); text-wrap: pretty; }
+.rodape-privacidade { justify-content: center; }
+.rodape-privacidade span { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }
+.rodape-privacidade a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; color: var(--tinta-fraca); }
+
+/* ---------- listas de pessoas: um cartão só, com divisória fina ---------- */
+.lista-pedidos { gap: 0; border-radius: var(--raio-cartao); background: var(--cartao); overflow: hidden; }
+.lista-pedidos > * + .linha-amigo, .escolha-amigos > * + * { border-top: 1px solid var(--contorno); }
+.lista-pedidos:has(> .cartao-proposito) { gap: 12px; background: none; overflow: visible; }
+.linha-amigo { gap: 8px 12px; padding: 14px 16px; border-radius: var(--raio-cartao); }
+.lista-pedidos > .linha-amigo, .escolha-amigos > .linha-amigo { border-radius: 0; background: none; }
+.linha-amigo .retrato-amigo, .cabeca-mural .retrato-amigo { border: 0; width: 44px; height: 44px; font-size: 1.0625rem; }
+.quem-amigo b { white-space: normal; overflow-wrap: anywhere; text-wrap: balance; }
+.linha-amigo .botao.contorno, .cartao-proposito .botao.contorno { background: var(--campo); }
+.linha-amigo:has(> .botao + .botao) > .quem-amigo { flex-basis: 60%; }
+.linha-amigo:has(> .botao + .botao) > .botao { flex: 1; }
+.lista-pedidos > .link-nota { justify-content: flex-start; width: 100%; padding: 0 16px 6px 72px; color: var(--salvia-texto); }
+.linha-amigo > .selo-status { padding: 0; box-shadow: none; }
+.linha-amigo > .selo-status svg { width: 28px; height: 28px; padding: 6px; background: var(--salvia); color: var(--salvia-tinta); }
+.selo-lider { padding: 2px 8px; background: var(--salvia-palido); color: var(--salvia-texto); font-size: .75rem; }
+.folha .lista-pedidos, .escolha-amigos { gap: 0; border-radius: 24px; background: var(--campo); }
+.folha .linha-amigo .botao.contorno { background: var(--cartao); }
+.escolha-amigo { min-height: 64px; }
+.escolha-amigo:has(input:checked) { background: var(--realce); }
+
+/* ---------- folha do amigo, convite e toques ---------- */
+.dias-proposito.aceso { color: var(--chama-texto); }
+.tela-cheia .titulo-toque { color: var(--tinta-forte) !important; font-size: 1.75rem; }
+.balao-fala, .balao-fala::after { border: 0; background: var(--cartao); }
+.balao-fala { border-radius: 22px; }
+.balao-fala.enviado, .balao-fala.enviado::after { background: var(--salvia); color: var(--salvia-tinta); }
+.retrato-amigo.enorme { box-shadow: none; }
+
+/* ---------- propósitos ---------- */
+.cartao-proposito.convite { background: var(--realce); }
+.cartao-proposito > p:not([class]) { line-height: 1.5; overflow-wrap: anywhere; }
+.tipo-proposito { font-size: .8125rem; font-weight: 600; }
+.tipo-proposito > span { white-space: normal; }
+.dias-cartao { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 4px; color: var(--tinta-forte); font-size: 1.5rem; font-weight: 800; }
+.dias-cartao small { grid-column: 1 / -1; justify-self: end; font-size: .8125rem; font-weight: 600; white-space: nowrap; }
+.recado-cartao { background: var(--campo); font-weight: 500; }
+.barra-grupo { height: 10px; margin-top: 30px; background: var(--campo); }
+.painel-celula > .barra-grupo { background: var(--cartao); }
+.barra-grupo i { background: var(--inverso); }
+.barra-grupo i::after { left: auto; right: 2px; top: 2px; width: 6px; height: 6px; border-radius: 50%; background: var(--salvia); }
+.barra-grupo span { left: 0; right: auto; font-size: .8125rem; font-weight: 700; }
+
+/* ---------- a célula ---------- */
+.cabeca-celula { flex-direction: column; align-items: center; margin-bottom: 20px; text-align: center; }
+.cabeca-celula > div { display: grid; justify-items: center; gap: 4px; }
+.etiqueta-celula { color: var(--salvia-texto); }
+.cabeca-celula h1 { margin: 0; text-wrap: balance; }
+.cabeca-celula .dias-cartao { display: inline-flex; gap: 6px; min-height: 40px; margin: 0; padding: 0 16px 0 12px; border-radius: 999px; background: var(--cartao); font-size: 1rem; }
+.abas-celula button { padding: 0 6px; }
+.abas-celula .ponto-estudo { position: static; display: inline-block; margin: 0 0 8px 3px; vertical-align: middle; background: var(--salvia-texto); }
+.painel-celula { gap: 12px; }
+.painel-celula > .titulo-secao { margin: 20px 0 0; }
+.painel-celula > * { margin: 0; }
+.painel-celula > .acoes { margin-top: 8px; }
+.painel-celula .acoes > .botao { width: 100%; min-height: 54px; font-size: 1rem; }
+.painel-celula > .botao-selo { min-height: 48px; background: var(--realce); }
+.recado-lider p { font-size: 1.0625rem; text-wrap: pretty; }
+.folha .recado-lider, .folha .secao-w { background: var(--campo); }
+.secao-w .recado-lider { padding: 0; background: none; }
+.conta-visitantes, .conta-visitantes .botao-icone { border: 0; }
+.conta-visitantes { background: var(--campo); }
+.conta-visitantes .botao-icone, .modo-encontro-nav .botao.contorno { background: var(--cartao); }
+
+/* o estudo: as quatro partes em cartões */
+.secao-w + .secao-w { margin-top: 12px; }
+.secao-w > .etiqueta, .modo-encontro > .etiqueta { color: var(--salvia-texto); }
+.roteiro-perguntas li, .roteiro-oracao li { border-radius: 16px; text-wrap: pretty; }
+.folha .roteiro li li { background: var(--cartao); }
+.modo-encontro .frase-cena { color: var(--tinta-forte); }
+
+/* ---------- discipulado ---------- */
+.linha-config > span:first-child { text-wrap: pretty; }
+.conteudo:has([data-marco]) .pe-duplo-plano { grid-template-columns: 1fr; gap: 4px; margin-top: 12px; }
+.folha:has([data-marcar]) .oracao-guia li { background: var(--campo); text-wrap: pretty; }
+.cena-novo-proposito h1 { color: var(--tinta-forte); }
+.retratos-grupo .retrato-mais { font-size: .75rem; }
+.entrada-propositos small, .tipo-proposito > span, .pedido-mural :is(b, p) { text-wrap: balance; }
+.cartao-proposito .pe-duplo-plano .botao { padding-inline: 12px; }
+.cabeca-proposito:has(> .retratos-grupo) { flex-wrap: wrap; }
+.cabeca-proposito:has(> .retratos-grupo) > .quem-amigo { order: 1; flex-basis: 100%; }
+.folha:has([data-modo]) .botao { padding-inline: 16px; }
+.secao-w > p { text-wrap: balance; }

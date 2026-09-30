@@ -405,7 +405,7 @@
       + '<div class="acoes">'
       + (podeTocar ? '<button class="botao azul" data-toque>' + CC.ico('sino') + 'Notificar</button>' : '')
       + (amigo.toqueEnviado ? '<button class="botao" disabled>' + CC.ico('certo') + 'Notificado hoje</button>' : '')
-      + '<button class="botao contorno" data-novo-com>' + CC.ico('mais-sinal') + 'Novo propósito com ' + CC.esc(amigo.nome) + '</button>'
+      + '<button class="botao contorno" data-novo-com>' + CC.ico('mais-sinal') + 'Novo propósito com&nbsp;' + CC.esc(amigo.nome) + '</button>'
       + '<button class="botao plano" data-encerrar>Desfazer amizade</button>'
       + '<div class="pe-duplo-plano"><button class="botao plano" data-denunciar>' + CC.ico('bandeira') + 'Denunciar</button>'
       + '<button class="botao plano perigo" data-bloquear>' + CC.ico('bloquear') + 'Bloquear</button></div>'
@@ -636,8 +636,8 @@
           + '<p class="rodape-privacidade"><span><a href="#/amigos/bloqueados">Pessoas bloqueadas</a> · <a href="termos.html">Termos</a> · <a href="privacidade.html">Privacidade</a></span></p>';
       }
 
-      raiz.innerHTML = '<div class="cabeca-tela"><h1>Juntos</h1>'
-        + '<span class="contagem-amigos">' + CC.plural(amigos.length, 'amigo', 'amigos') + '</span></div>'
+      raiz.innerHTML = '<div class="cabeca-centro"><h1>Juntos</h1></div>'
+        + '<p class="subtitulo-tela">' + CC.plural(amigos.length, 'amigo', 'amigos') + '</p>'
         + (aviso ? '<p class="estado-linha">' + CC.ico('info') + '<span>' + CC.esc(aviso) + '</span></p>' : '')
         + corpo;
 
@@ -715,12 +715,12 @@
     const desenhar = (d) => {
       const lista = (d && d.bloqueados) || [];
       raiz.innerHTML = CC.botaoVoltar('Juntos') + '<h1>Pessoas bloqueadas</h1>'
-        + '<p class="passo-dica">Quem está aqui não vê você e não consegue te convidar.</p>'
+        + '<p class="subtitulo-tela">Quem está aqui não vê você e não consegue te convidar.</p>'
         + (lista.length
           ? '<div class="lista-pedidos">' + lista.map((p) => '<div class="linha-amigo">' + retrato(p)
             + '<div class="quem-amigo"><b>' + CC.esc(p.nome) + '</b><span class="arroba">@' + CC.esc(p.usuario) + '</span></div>'
             + '<button class="botao contorno pequeno" data-desbloquear="' + CC.esc(p.usuario) + '">Desbloquear</button></div>').join('') + '</div>'
-          : '<div class="vazio">Ninguém bloqueado.</div>');
+          : '<div class="vazio-amigos">' + CC.ico('bloquear') + '<p>Ninguém bloqueado.</p></div>');
       raiz.querySelectorAll('[data-desbloquear]').forEach((el) => {
         el.onclick = async () => { await acaoAmizade('desbloquear', el.dataset.desbloquear).catch(() => {}); recarregar(); };
       });
