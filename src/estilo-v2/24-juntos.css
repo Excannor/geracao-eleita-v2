@@ -7,7 +7,58 @@
 
    Os cabeçalhos das telas deste grupo usam as peças da base (.cabeca-centro, .subtitulo-tela),
    trocadas no HTML dos três arquivos: por isso quase nada de cabeçalho mora aqui.
+   A ação principal é a pílula escura (clara no escuro), como no resto do app: o sálvia fica
+   para o acento.
+   Padrão aprovado (o Início de 0a11385, paleta C): a folha do alto de ponta a ponta nas fichas
+   --folha-*, cartões de destaque brancos (sálvia no escuro) com o botão redondo preto, e o
+   corpo no fundo do tema com cartões brancos.
    ========================================================================= */
+
+/* ---------- a folha do alto ----------
+   Juntos, Propósitos, bloqueados, célula e discipulado: o topo do app (retrato e ofensiva) vira
+   o começo da folha, no lugar e no tamanho da saudação do Início, preso em cima com os cantos
+   de baixo redondos; a .folha-juntos (só apresentação) sobe por trás desses cantos e os dois
+   viram uma peça só; ao rolar, ela passa por baixo e o topo fica sozinho. São os valores do
+   topo em folha da Bíblia (22-leitura) e do grupo 1 (21-trilha): se o topo em folha valer para
+   todas as telas na integração, as regras do topo daqui ficam redundantes. Por dentro valem as
+   fichas da folha: --cartao vira --folha-campo e as tintas são as dela. */
+.folha-juntos, .topo:has(~ .corpo .folha-juntos) {
+  --cartao: var(--folha-campo); --campo: var(--folha-campo);
+  --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
+  --progresso: var(--folha-tinta);
+  color: var(--folha-tinta);
+}
+.folha-juntos { margin: -52px -16px 24px; padding: 40px 30px 24px; border-radius: 0 0 36px 36px; background: var(--folha); }
+.folha-juntos > :last-child { margin-bottom: 0; }
+.topo:has(~ .corpo .folha-juntos) { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
+.topo:has(~ .corpo .folha-juntos)::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
+.topo:has(~ .corpo .folha-juntos) > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
+.topo:has(~ .corpo .folha-juntos) > .perfil-topo .ico-aba { width: 24px; height: 24px; }
+.topo:has(~ .corpo .folha-juntos) > .perfil-topo.selecionado { box-shadow: 0 0 0 2.5px var(--folha), 0 0 0 4.5px var(--folha-tinta); }
+/* celular estreito: o título ao lado do voltar encolhe para caber numa linha ("Pessoas
+   bloqueadas" quebrava a 360px), como nas folhas do grupo 1 e da Bíblia */
+@media (max-width: 374px) { .folha-juntos > .voltar + h1 { padding-inline: 52px; } .folha-juntos h1, .folha-juntos .cabeca-celula h1 { font-size: 1.25rem; } }
+@media (max-width: 359px) { .folha-juntos > .voltar + h1 { font-size: 1rem; } }
+
+/* o cartão de destaque da folha, como os do Início: branco (sálvia no escuro), tinta escura e o
+   botão redondo preto na ponta (a entrada de Propósitos, o propósito novo e os dias da célula) */
+.entrada-propositos, .destaque-juntos, .cabeca-celula .dias-cartao {
+  position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 84px; margin: 0;
+  padding: 12px 12px 12px 20px; border: 0; border-radius: 26px; background: var(--folha-destaque); color: var(--salvia-tinta);
+  font: inherit; text-align: left; cursor: pointer;
+}
+.destaque-juntos { justify-content: space-between; font-size: 1.0625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
+:is(.entrada-propositos, .destaque-juntos):hover { background: var(--folha-destaque); }
+:is(.entrada-propositos, .destaque-juntos):active { transform: scale(.98); }
+.entrada-propositos > svg:first-child, .destaque-juntos > svg, .cabeca-celula .dias-cartao svg {
+  order: 3; flex: none; box-sizing: content-box; width: 20px; height: 20px; padding: 14px; border-radius: 50%;
+  background: var(--salvia-tinta); color: #ffffff; stroke-width: 2.2;
+}
+@media (max-width: 374px) {
+  .entrada-propositos, .destaque-juntos, .cabeca-celula .dias-cartao { gap: 10px; padding: 12px 10px 12px 16px; }
+  .destaque-juntos { font-size: 1rem; }
+  .entrada-propositos > svg:first-child, .destaque-juntos > svg { padding: 12px; }
+}
 
 /* ---------- retratos: redondos, nas cores do guia ----------
    O retrato é peça deste grupo (CC.retratoAmigo), usado também no Perfil e nos Desafios. As
@@ -19,24 +70,27 @@
 .retrato-amigo.inicial { font-weight: 800; }
 .retrato-amigo.fez { box-shadow: 0 0 0 2px var(--cartao), 0 0 0 4px var(--salvia-texto) !important; }
 
-/* ---------- a roda de amigos ---------- */
-.roda-amigos { gap: 8px; padding: 6px 16px 10px; }
-.amigo-roda, .vaga { width: 64px; gap: 6px; }
+/* ---------- Juntos: na folha, a roda de amigos, o convite e a entrada de Propósitos ---------- */
+.roda-amigos { gap: 8px; margin: 4px -30px 0; padding: 4px 30px 8px; }
+.amigo-roda, .vaga { grid-template-rows: auto auto 1fr; gap: 6px; width: auto; min-width: 64px; }
 .amigo-roda .moldura, .vaga .moldura, .amigo-roda .retrato-amigo { width: 58px; height: 58px; }
 .amigo-roda .retrato-amigo { border: 0; font-size: 1.375rem; }
-.amigo-roda.leu .retrato-amigo { box-shadow: 0 0 0 3px var(--fundo), 0 0 0 5px var(--salvia-texto); }
-.selo-leu { right: -4px; bottom: -2px; width: 26px; height: 26px; border: 3px solid var(--fundo); background: var(--salvia); color: var(--salvia-tinta); }
-.amigo-roda b, .vaga b { max-width: 64px; font-size: .8125rem; font-weight: 700; color: var(--tinta-forte); }
-.amigo-roda small { color: var(--chama-texto); font-size: .8125rem; font-weight: 700; }
+.amigo-roda.leu .retrato-amigo { box-shadow: 0 0 0 3px var(--folha), 0 0 0 5px var(--salvia-texto); }
+.selo-leu { right: -4px; bottom: -2px; width: 26px; height: 26px; border: 3px solid var(--folha); background: var(--salvia); color: var(--salvia-tinta); }
+/* o nome inteiro, sem reticências: o nome longo quebra em duas linhas e a contagem de todos
+   fica alinhada embaixo */
+.amigo-roda b, .vaga b { max-width: 96px; overflow: visible; color: var(--tinta-forte); font-size: .8125rem; font-weight: 700; line-height: 1.25; white-space: normal; text-overflow: clip; text-wrap: balance; }
+.amigo-roda small { align-self: end; color: var(--chama-texto); font-size: .8125rem; font-weight: 700; }
 .vaga .moldura { border: 0; background: var(--cartao); color: var(--tinta-forte); }
-.botao.convidar-largo { display: flex; width: 100%; min-height: 52px; margin: 8px 0 12px; }
-
-/* ---------- a entrada de Propósitos e o selo de número ---------- */
-.entrada-propositos { gap: 14px; min-height: 76px; margin: 0; padding: 14px 20px 14px 14px; border-radius: var(--raio-cartao); }
-.entrada-propositos:hover { background: var(--campo); }
-.entrada-propositos > svg:first-child, .pedido-mural > svg { box-sizing: border-box; width: 48px; height: 48px; padding: 13px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
-.entrada-propositos small, .quem-amigo .arroba, .cabeca-amigo .conta { font-size: .8125rem; font-weight: 500; text-wrap: pretty; }
-.selo-numero { background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; }
+.botao.convidar-largo { display: flex; width: 100%; min-height: 54px; margin: 12px 0; font-size: 1rem; }
+.entrada-propositos > span { flex: 1; gap: 2px; }
+.entrada-propositos b { color: inherit; font-size: 1.0625rem; font-weight: 800; letter-spacing: -.01em; }
+.entrada-propositos small { color: inherit; font-size: .8125rem; font-weight: 600; text-wrap: balance; }
+.entrada-propositos > svg:last-child:not(:first-child) { display: none; }
+/* os convites de propósito: o selo de novidade no canto do botão redondo */
+.entrada-propositos .selo-numero { position: absolute; top: 10px; right: 8px; min-width: 22px; height: 22px; padding: 0 6px; background: var(--alerta); color: var(--v2-inverso-tinta); box-shadow: 0 0 0 2px var(--folha-destaque); font-size: .75rem; font-weight: 800; }
+.pedido-mural > svg { box-sizing: border-box; width: 48px; height: 48px; padding: 13px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.quem-amigo .arroba, .cabeca-amigo .conta { font-size: .8125rem; font-weight: 500; text-wrap: pretty; }
 
 /* ---------- o mural: um cartão por marco ---------- */
 .mural, .lista-propositos { display: grid; gap: 12px; }
@@ -51,6 +105,7 @@ button.cartao-proposito:hover { background: var(--campo); }
 .arte-mural { width: 48px; }
 .versiculo-mural { margin: 0; padding: 16px 18px; border-radius: 20px; background: var(--campo); }
 .versiculo-mural p { font-family: var(--fonte-biblia); font-size: 1.0625rem; font-weight: 400; line-height: 1.65; color: var(--tinta); text-wrap: pretty; }
+.versiculo-mural b { white-space: nowrap; }
 .botao-reagir { min-height: 44px; padding: 0 16px 0 14px; border: 0; border-radius: 999px; background: var(--campo); color: var(--tinta-forte); }
 .botao-reagir:active { transform: none; }
 .botao-reagir b:empty { display: none; }
@@ -82,13 +137,33 @@ button.cartao-proposito:hover { background: var(--campo); }
 .escolha-amigo { min-height: 64px; }
 .escolha-amigo:has(input:checked) { background: var(--realce); }
 
-/* ---------- folha do amigo, convite e toques ---------- */
-.dias-proposito.aceso { color: var(--chama-texto); }
-.tela-cheia .titulo-toque { color: var(--tinta-forte) !important; font-size: 1.75rem; }
+/* ---------- folha do amigo e convite ---------- */
+.cabeca-amigo { gap: 16px; margin-bottom: 16px; }
+.cabeca-amigo > div { display: grid; gap: 2px; }
+.dias-proposito.aceso { margin-top: 4px; color: var(--chama-texto); font-size: .875rem; font-weight: 700; }
+.folha .mensagem-convite { padding: 14px 16px; border-radius: 20px; background: var(--campo); font-weight: 500; }
+.mensagem-convite span { color: var(--salvia-texto); font-weight: 700; }
+.qr-convite { border-radius: 20px; }
+/* os dias da folha de encontro e de registro: o escolhido em pílula escura, como o segmentado */
+.escolha-dia .botao.azul { --b: var(--inverso); color: var(--inverso-tinta); }
+
+/* ---------- telas cheias: toque, toque recebido, propósito novo e modo encontro ----------
+   A cena sobe para a folha do alto, de ponta a ponta (a coluna de 560px no computador) e com
+   os cantos de baixo redondos, e os botões ficam embaixo, no fundo, como no fim da rodada do
+   Praticar e no fim da lição. No modo encontro, a Palavra (o estudo inteiro, longo) é página
+   de leitura: fica no fundo, alinhada à esquerda, com as partes em cartões. */
+.tela-toque .tela-cheia-palco, .tela-proposito .tela-cheia-palco, .tela-modo-encontro .tela-cheia-palco { justify-content: flex-start; padding: 0; }
+.tela-toque .cena, .tela-proposito .cena, .tela-modo-encontro .cena:not(:has(.secao-w)) {
+  --cartao: var(--folha-campo); --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
+  --azul: var(--salvia-texto);
+  width: 100%; max-width: 560px; padding: calc(44px + env(safe-area-inset-top)) 30px 36px; border-radius: 0 0 36px 36px; background: var(--folha); color: var(--folha-tinta);
+}
+.tela-modo-encontro .cena:has(.secao-w) { align-items: stretch; max-width: 560px; padding: calc(24px + env(safe-area-inset-top)) 16px 16px; text-align: left; }
+.tela-cheia .titulo-toque, .cena-novo-proposito h1 { color: var(--tinta-forte) !important; font-size: 1.75rem; }
 .balao-fala, .balao-fala::after { border: 0; background: var(--cartao); }
 .balao-fala { border-radius: 22px; }
 .balao-fala.enviado, .balao-fala.enviado::after { background: var(--salvia); color: var(--salvia-tinta); }
-.retrato-amigo.enorme { box-shadow: none; }
+.retrato-amigo.enorme { border-color: var(--folha); box-shadow: none; }
 
 /* ---------- propósitos ---------- */
 .cartao-proposito.convite { background: var(--realce); }
@@ -104,14 +179,20 @@ button.cartao-proposito:hover { background: var(--campo); }
 .barra-grupo i::after { left: auto; right: 2px; top: 2px; width: 6px; height: 6px; border-radius: 50%; background: var(--salvia); }
 .barra-grupo span { left: 0; right: auto; font-size: .8125rem; font-weight: 700; }
 
-/* ---------- a célula ---------- */
-.cabeca-celula { flex-direction: column; align-items: center; margin-bottom: 20px; text-align: center; }
+/* ---------- a célula: na folha, o nome, os dias seguidos e as abas ---------- */
+.cabeca-celula { flex-direction: column; align-items: stretch; gap: 16px; margin: 0 0 16px; text-align: center; }
 .cabeca-celula > div { display: grid; justify-items: center; gap: 4px; }
 .etiqueta-celula { color: var(--salvia-texto); }
-.cabeca-celula h1 { margin: 0; text-wrap: balance; }
-.cabeca-celula .dias-cartao { display: inline-flex; gap: 6px; min-height: 40px; margin: 0; padding: 0 16px 0 12px; border-radius: 999px; background: var(--cartao); font-size: 1rem; }
-.abas-celula button { padding: 0 6px; }
+.cabeca-celula h1 { margin: 0; font-size: 1.375rem; text-wrap: balance; }
+/* os dias seguidos da célula no cartão de destaque, como a ofensiva no Início */
+.cabeca-celula .dias-cartao { display: grid; grid-template-columns: 1fr auto; align-content: center; justify-items: start; gap: 2px 12px; cursor: default; font-size: 1.375rem; font-weight: 800; line-height: 1.15; letter-spacing: -.02em; }
+.cabeca-celula .dias-cartao .ico-chama { grid-area: 1 / 2 / 3; width: 28px; height: 28px; padding: 10px; vertical-align: 0; color: #a4a99d; }
+.cabeca-celula .dias-cartao small { grid-column: 1; justify-self: start; color: inherit; font-size: .8125rem; font-weight: 600; letter-spacing: 0; white-space: nowrap; }
+.abas-celula button { padding: 0 4px; white-space: nowrap; }
+@media (max-width: 374px) { .abas-celula button { font-size: .875rem; } }
+@media (max-width: 359px) { .abas-celula button { font-size: .8125rem; } }
 .abas-celula .ponto-estudo { position: static; display: inline-block; margin: 0 0 8px 3px; vertical-align: middle; background: var(--salvia-texto); }
+.abas-celula [aria-selected="true"] .ponto-estudo { background: currentColor; }
 .painel-celula { gap: 12px; }
 .painel-celula > .titulo-secao { margin: 20px 0 0; }
 .painel-celula > * { margin: 0; }
@@ -127,20 +208,33 @@ button.cartao-proposito:hover { background: var(--campo); }
 
 /* o estudo: as quatro partes em cartões */
 .secao-w + .secao-w { margin-top: 12px; }
-.secao-w > .etiqueta, .modo-encontro > .etiqueta { color: var(--salvia-texto); }
+.secao-w > .etiqueta, .modo-encontro > .etiqueta { color: var(--salvia-texto); font-size: .8125rem; }
 .roteiro-perguntas li, .roteiro-oracao li { border-radius: 16px; text-wrap: pretty; }
 .folha .roteiro li li { background: var(--cartao); }
+.secao-w > p { text-wrap: balance; }
+/* preparar o estudo: as três escolhas da Palavra do tamanho do nome ("Leitura da semana"
+   quebrava em duas linhas na terça parte da folha) */
+.segmentado:has([data-tipo="semana"]) button { flex: 1 1 auto; padding-inline: 6px; white-space: nowrap; }
+@media (max-width: 374px) { .segmentado:has([data-tipo="semana"]) button { font-size: .8125rem; } }
+@media (max-width: 359px) { .segmentado:has([data-tipo="semana"]) button { font-size: .75rem; } }
+/* o versículo do roteiro sem o recuo da lista: os quatro botões dele numa linha só */
+.secao-w .cartao-versiculo { margin: 8px 0 8px -22px; padding: 26px 12px 4px; }
+.secao-w .cartao-versiculo .aspas { left: 12px; }
+.secao-w .botoes-verso { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .modo-encontro .frase-cena { color: var(--tinta-forte); }
 
 /* ---------- discipulado ---------- */
 .linha-config > span:first-child { text-wrap: pretty; }
+/* "Comecei a acompanhar alguém / na fé": o rótulo longo quebra em duas linhas equilibradas */
+.linha-config:is([data-marco], [data-mostrar-meu], [data-escolha]) > span:first-child { text-wrap: balance; }
 .conteudo:has([data-marco]) .pe-duplo-plano { grid-template-columns: 1fr; gap: 4px; margin-top: 12px; }
 .folha:has([data-marcar]) .oracao-guia li { background: var(--campo); text-wrap: pretty; }
-.cena-novo-proposito h1 { color: var(--tinta-forte); }
+.retratos-grupo .retrato-amigo + .retrato-amigo { margin-left: -4px; }
 .retratos-grupo .retrato-mais { font-size: .75rem; }
-.entrada-propositos small, .tipo-proposito > span, .pedido-mural :is(b, p) { text-wrap: balance; }
+.tipo-proposito > span, .pedido-mural p { text-wrap: balance; }
+/* "Mostrar seus marcos aos / amigos?": o título do pedido em bloco, equilibrado */
+.pedido-mural b { display: block; text-wrap: balance; }
 .cartao-proposito .pe-duplo-plano .botao { padding-inline: 12px; }
 .cabeca-proposito:has(> .retratos-grupo) { flex-wrap: wrap; }
 .cabeca-proposito:has(> .retratos-grupo) > .quem-amigo { order: 1; flex-basis: 100%; }
 .folha:has([data-modo]) .botao { padding-inline: 16px; }
-.secao-w > p { text-wrap: balance; }
