@@ -19,6 +19,12 @@
 
   let sessao = null;
 
+  // Espaço inseparável entre número e livro e entre livro e capítulo ("1 Samuel 16.7"):
+  // a referência nunca quebra no meio, nem no hífen do intervalo (15-17). Só na tela; o
+  // texto guardado fica igual.
+  const nb = (t) => String(t).replace(/(\d) (?=\p{L})/gu, '$1\u00a0').replace(/(\p{L}) (?=\d)/gu, '$1\u00a0')
+    .replace(/(\d)-(?=\d)/g, '$1-\u2060');
+
   CC.abrirLicao = function (dia) { location.hash = '#/dia/' + dia; };
 
   CC.fecharLicao = function () {
@@ -115,7 +121,7 @@
       el.setAttribute('aria-modal', 'true');
       document.body.appendChild(el);
     }
-    el.className = 'licao c-' + u.cor + ' tela-' + sessao.tela;
+    el.className = 'licao licao-dia c-' + u.cor + ' tela-' + sessao.tela;
     el.setAttribute('aria-label', 'Dia ' + sessao.dia);
 
     const tela = ({ leitura: telaLeitura, festa: telaFesta, resumo: telaResumo, fundo: telaFundo, escrever: telaEscrever })[sessao.tela](dia, u, trilhas);
@@ -162,7 +168,7 @@
         + '<div class="cabeca-passagem">'
         + '<span class="marca-trilha">' + CC.ico(feita ? 'certo' : (chave === 'antigo' ? 'marcador' : 'livro')) + '</span>'
         + '<span class="textos"><span class="rot">' + rot + '</span>'
-        + '<span class="ref">' + CC.esc(ref) + '</span>'
+        + '<span class="ref">' + nb(CC.esc(ref)) + '</span>'
         + '<span class="tempo">cerca de ' + minutos + ' min</span></span>'
         + '</div>'
         + '<div class="acoes-passagem">'
@@ -190,7 +196,7 @@
           : 'Abra a sua Bíblia, leia as passagens e marque ao terminar.') + '</p>'
         + cartoes
         + (trilhas.length === 1 ? '<p class="passo-dica">Hoje é mais leve: uma leitura só!</p>' : ''),
-      pe: botao(todas ? 'Concluir o dia' : 'Falta marcar ' + faltam.map(([, , r]) => r).join(' e '), 'data-concluir', todas),
+      pe: botao(todas ? 'Concluir o dia' : 'Falta marcar ' + faltam.map(([, , r]) => nb(r)).join(' e '), 'data-concluir', todas),
       ligar(el) {
         el.querySelectorAll('[data-ler]').forEach((b) => {
           b.onclick = () => CC.abrirLeitor({
@@ -303,7 +309,7 @@
         + '</section>'
         // pensar: uma pergunta, escolhida pela pessoa
         + '<section class="etapa-reflexao" data-etapa-bloco="pensar"' + (ETAPAS.indexOf(etapa) >= 1 ? '' : ' hidden') + '>'
-        + '<span class="etiqueta">' + CC.esc(r.pensamento ? (r.ref || r.passagem) : r.passagem + ' · ' + r.nomeGenero) + '</span>'
+        + '<span class="etiqueta">' + nb(CC.esc(r.pensamento ? (r.ref || r.passagem) : r.passagem + ' · ' + r.nomeGenero)) + '</span>'
         // a reflexão escrita para o dia, sobre o que acontece na leitura
         + (r.pensamento
           ? '<figure class="pensamento-dia">' + (r.titulo ? '<h2>' + CC.esc(r.titulo) + '</h2>' : '')
@@ -436,7 +442,7 @@
         + '<div class="chama-palco">' + CC.arte.faiscas() + CC.icoChama(seq.atual) + '</div>'
         + '<b class="numero-ofensiva" data-de="' + (subiuHoje ? sessao.antes.ofensiva : seq.atual) + '">' + (subiuHoje ? sessao.antes.ofensiva : seq.atual) + '</b>'
         + '<h1 class="rotulo-ofensiva">' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + '</h1>'
-        + '<p class="passo-dica">Dia ' + sessao.dia + ' · ' + CC.esc(CC.passagemDe(dia)) + '</p>'
+        + '<p class="passo-dica">Dia ' + sessao.dia + ' · ' + nb(CC.esc(CC.passagemDe(dia))) + '</p>'
         + faixaDaSemana()
         + '<p class="frase-cena">' + frase + '</p>'
         + '<ul class="destaques">' + destaques.join('') + '</ul>'
@@ -528,7 +534,7 @@
     return '<figure class="cartao-versiculo">'
       + '<span class="aspas" aria-hidden="true">“</span>'
       + '<blockquote>' + CC.esc(texto) + '</blockquote>'
-      + '<figcaption><b>' + CC.esc(ref) + '</b>' + (t ? ' · ' + CC.esc(t.abreviatura) : '') + '</figcaption>'
+      + '<figcaption><b>' + nb(CC.esc(ref)) + '</b>' + (t ? ' · ' + CC.esc(t.abreviatura) : '') + '</figcaption>'
       + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref))
       + '</figure>';
   };
@@ -550,7 +556,7 @@
     }).join('');
 
     return {
-      corpo: '<span class="etiqueta">' + CC.esc(CC.passagemDe(dia)) + '</span>'
+      corpo: '<span class="etiqueta">' + nb(CC.esc(CC.passagemDe(dia))) + '</span>'
         + '<h1 class="passo-titulo">Ir mais fundo</h1>'
         + '<p class="passo-dica">Notas sobre os livros de hoje.</p>'
         + blocos,
@@ -571,7 +577,7 @@
 
     return {
       topo: '<span class="salvo" id="salvo" role="status"></span>',
-      corpo: '<span class="etiqueta">' + CC.esc(CC.passagemDe(dia)) + '</span>'
+      corpo: '<span class="etiqueta">' + nb(CC.esc(CC.passagemDe(dia))) + '</span>'
         + '<h1 class="passo-titulo">Escrever sobre hoje</h1>'
         + '<div class="segmentado" role="group" aria-label="Como escrever">'
         + '<button data-modo="oracao" aria-pressed="' + (sessao.modo === 'oracao') + '">Oração</button>'

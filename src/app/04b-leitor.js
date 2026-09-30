@@ -8,6 +8,9 @@
   const CHAVE_POSICAO = 'cc.leitor.posicao';
   const CHAVE_MODO = 'cc.leitor.modo';
   const LETRAS = ['menor', 'normal', 'maior', 'enorme'];
+  // espaço inseparável entre número e livro e entre livro e capítulo, só na tela
+  const nb = (t) => String(t).replace(/(\d) (?=\p{L})/gu, '$1\u00a0').replace(/(\p{L}) (?=\d)/gu, '$1\u00a0')
+    .replace(/(\d)-(?=\d)/g, '$1-\u2060');
 
   const NOVO = new Set(['Mateus', 'Marcos', 'Lucas', 'João', 'Atos', 'Romanos', '1 Coríntios',
     '2 Coríntios', 'Gálatas', 'Efésios', 'Filipenses', 'Colossenses', '1 Tessalonicenses',
@@ -150,7 +153,7 @@
       + '<div class="licao-topo">'
       + '<button class="fechar" data-fechar-leitor aria-label="Voltar à lição">' + CC.ico('fechar') + '</button>'
       + '<div class="leitor-titulo"><span class="rot">' + CC.esc(rotulo) + '</span>'
-      + '<b>' + CC.esc(ref) + '</b></div>'
+      + '<b>' + nb(CC.esc(ref)) + '</b></div>'
       + '<button class="botao-icone letra" data-aa aria-label="Tradução, letra e tema">Aa</button>'
       + '</div>'
       + '<div class="leitor-progresso"><i></i></div>'
@@ -162,7 +165,7 @@
       + '</div></div>'
       + '<div class="licao-pe"><div class="interno">'
       + '<div class="acoes-verso" hidden></div>'
-      + '<button class="botao cor" data-terminei>' + CC.esc(principal) + '</button>'
+      + '<button class="botao cor" data-terminei>' + nb(CC.esc(principal)) + '</button>'
       + '</div></div>';
 
     el.querySelector('[data-fechar-leitor]').onclick = CC.fecharLeitor;
@@ -320,6 +323,7 @@
       + '<div class="acoes"><button class="botao contorno" data-fechar>Pronto</button></div>',
     {
       rotulo: 'Opções de leitura',
+      classe: 'folha-aa',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelectorAll('[data-traducao]').forEach((b) => {
