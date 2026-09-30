@@ -102,7 +102,10 @@
       const livros = Object.keys(biblia.livros); // ordem canônica, do jeito que vem no arquivo
       const antigo = livros.filter((l) => !CC.ehNovoTestamento(l));
       const novo = livros.filter((l) => CC.ehNovoTestamento(l));
-      alvo.innerHTML = '<h1 class="titulo-biblia">Bíblia</h1>'
+      // O título abre a escolha da tradução: a sigla da atual fica à vista ao lado.
+      alvo.innerHTML = '<h1 class="titulo-biblia"><button class="botao-versao" data-versao aria-haspopup="dialog" aria-label="Bíblia, tradução '
+        + CC.esc(b.nome.replace(/Biblica® Open |™/g, '')) + '. Trocar a tradução">Bíblia<span class="sigla-versao">'
+        + CC.esc(b.abreviatura || b.sigla.toUpperCase()) + CC.ico('baixo') + '</span></button></h1>'
         + '<p class="subtitulo-tela">Escolha um livro e leia à vontade, no seu ritmo.</p>'
         + cartaoContinuar(biblia)
         + '<div class="busca-caixa">' + CC.ico('lupa') + '<input id="busca-livro" type="search" placeholder="Buscar livro (ex.: João 3)" aria-label="Buscar livro da Bíblia" autocomplete="off" spellcheck="false" enterkeyhint="go"></div>'
@@ -110,6 +113,8 @@
         + '<div id="testamento-antigo">' + CC.tituloSecao('Antigo Testamento', CC.plural(antigo.length, 'livro', 'livros')) + gradeLivros(antigo) + '</div>'
         + '<div id="testamento-novo">' + CC.tituloSecao('Novo Testamento', CC.plural(novo.length, 'livro', 'livros')) + gradeLivros(novo) + '</div>';
       ligarBuscaLivro(alvo, biblia);
+      const versao = alvo.querySelector('[data-versao]');
+      if (versao) versao.onclick = () => folhaVersao(alvo);
     }).catch(() => { if (minha === geracao) erroDeCarga(alvo); });
   }
 
@@ -293,6 +298,32 @@
     CC.versiculos.ligar(el);
 
     if (novo) ligarEsc();
+  }
+
+  // ---------- escolher a tradução (pelo título da Bíblia) ----------
+  function folhaVersao(alvo) {
+    const atual = CC.traducao();
+    const biblias = CC.biblias();
+    CC.folha('<h2>Tradução</h2><div class="opcoes-traducao">'
+      + biblias.map((b) => '<button class="opcao-traducao" data-traducao="' + CC.esc(b.sigla) + '" aria-pressed="'
+        + (atual && b.sigla === atual.sigla) + '"><b>' + CC.esc(b.nome.replace(/Biblica® Open |™/g, '')) + '</b>'
+        + '<span>' + CC.esc(b.resumo) + '</span></button>').join('') + '</div>'
+      + '<div class="acoes"><button class="botao contorno" data-fechar>Pronto</button></div>',
+    {
+      rotulo: 'Escolher a tradução',
+      classe: 'folha-aa folha-versao',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelectorAll('[data-traducao]').forEach((b) => {
+          b.onclick = () => {
+            fechar();
+            if (atual && b.dataset.traducao === atual.sigla) return;
+            CC.escolherTraducao(b.dataset.traducao);
+            CC.vistaBiblia(alvo, '');
+          };
+        });
+      },
+    });
   }
 
   // ---------- folha "Aa" própria ----------
