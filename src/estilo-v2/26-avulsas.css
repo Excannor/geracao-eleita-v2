@@ -88,76 +88,131 @@ p, li, .dica, .ajuda, .privacidade, label span { text-wrap: pretty; }
 p a, ul a, .consentimento a { white-space: nowrap; }
 b { color: var(--v2-forte); }
 a { color: var(--salvia-texto); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
-.marca { font-family: var(--v2-ui); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.01em; text-transform: none; color: var(--v2-forte); }
-.mascote svg, .cabeca svg { color: var(--v2-forte); }
+.marca { font-family: var(--v2-ui); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.01em; text-transform: none; color: var(--folha-tinta); }
+.mascote svg, .cabeca svg { color: var(--folha-tinta); }
 :focus-visible { outline: 2.5px solid var(--v2-forte); outline-offset: 3px; }
 
+/* ---------- a folha do alto ----------
+   Cada tela desenha a folha no ::before do último elemento do cabeçalho (o título, ou o
+   texto logo abaixo dele): ela sobe até o alto da página, passa por baixo da barra de
+   status, encosta nas bordas e termina onde esse elemento termina (ele traz --fim-folha
+   de respiro embaixo), com os cantos de baixo redondos. A tela isola o empilhamento, e a
+   folha fica atrás de tudo o que vem antes dela. Na de boas-vindas o último elemento é o
+   carimbo, que nenhuma regra pode mirar: lá a folha é o ::before do bloco de baixo e
+   termina acima dele. No computador ela tem a largura da coluna, como a do Início. */
+#tela-boas, #tela-entrar, #tela-esqueci, #tela-redefinir, #tela-cadastro { position: relative; isolation: isolate; }
+#tela-entrar > h1, #form-esqueci > .dica:first-child, #tela-redefinir > h1, [data-passo] > h1, .folha-boas { position: relative; }
+#tela-entrar > h1::before, #form-esqueci > .dica:first-child::before, #tela-redefinir > h1::before, [data-passo] > h1::before, .folha-boas::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -3000px;
+  bottom: 0;
+  left: calc(-1 * var(--margem));
+  right: calc(-1 * var(--margem));
+  border-radius: 0 0 36px 36px;
+  background: var(--folha);
+  pointer-events: none;
+}
+
 /* ---------- entrada: moldura ---------- */
-main { max-width: 440px; padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); }
+main { max-width: 440px; padding: calc(20px + env(safe-area-inset-top)) var(--margem) calc(16px + env(safe-area-inset-bottom)); }
 section { gap: 16px; }
 
-/* boas-vindas: marca e carimbo sobre o fundo; título, texto e botões numa folha branca */
-#tela-boas { justify-content: flex-start; gap: 8px; }
-#tela-boas .mascote { margin-top: auto; }
-.mascote svg { width: 96px; }
-.folha-boas { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: auto;
-  padding: 24px 16px 4px; border-radius: 32px; background: var(--cartao); }
-#tela-boas h1 { font-size: 1.375rem; line-height: 1.25; }
-#tela-boas .dica { font-size: .9375rem; }
+/* boas-vindas: símbolo, marca e carimbo na folha do alto; título, texto e botões no fundo,
+   embaixo, perto do polegar. A marca fica ao lado do símbolo, numa linha só (o carimbo é o
+   protagonista da tela): a tela vira uma fila que quebra, e as margens do símbolo e da marca
+   completam a primeira linha, o que manda o carimbo sozinho para a seguinte (sem regra nele).
+   A altura que sobra se divide igual entre as linhas, dentro da folha: metade acima da marca
+   (a linha vazia do ::before e a da marca) e metade abaixo do carimbo (a dele e a do bloco
+   de baixo, que fica colado no pé da tela). */
+#tela-boas { flex-flow: row wrap; align-items: flex-start; align-content: stretch; gap: 0 10px; }
+#tela-boas::before { content: ""; flex: 1 0 100%; }
+#tela-boas .mascote { align-self: flex-end; margin: 0 0 0 calc(50% - 100px); }
+#tela-boas .marca { align-self: flex-end; margin-right: calc(50% - 100px); line-height: 56px; }
+/* o símbolo pela altura, a mesma da linha da marca: os dois ficam centrados um no outro */
+.mascote svg { width: auto; height: 56px; }
+.folha-boas { flex: 1 0 100%; align-self: flex-end; display: flex; flex-direction: column; gap: 12px;
+  margin: var(--fim-folha) 0 0; padding: 28px 0 0; border-radius: 0; background: none; }
+.folha-boas::before { bottom: 100%; }
+#tela-boas h1 { font-size: 1.5rem; line-height: 1.25; }
+#tela-boas .dica { max-width: 34ch; margin: 0 auto; font-size: .9375rem; }
 .folha-boas .espaco { display: none; }
-.folha-boas .botoes { margin-top: 8px; }
+.folha-boas .botoes { margin-top: 12px; }
 .links { gap: 4px; color: var(--fraca); }
 .links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; font-size: .9375rem; }
 
 /* títulos e textos */
-h1 { font-size: 1.75rem; line-height: 1.18; }
+h1 { font-size: 1.5rem; line-height: 1.2; }
 .dica { color: var(--fraca); font-weight: 500; font-size: 1rem; line-height: 1.55; }
-.etiqueta { font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--fraca); }
+.etiqueta { font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--folha-tinta-fraca); }
 
-/* botões em pílula, Manrope, sem caixa-alta */
-.botao { min-height: 56px; padding: 14px 22px; font-family: var(--v2-ui); font-size: 1rem; font-weight: 700;
+/* botões em pílula, Manrope, sem caixa-alta, na altura dos botões do app */
+.botao { min-height: var(--alt-botao); padding: 14px 22px; font-family: var(--v2-ui); font-size: 1rem; font-weight: 700;
   letter-spacing: 0; text-transform: none; line-height: 1.25; background: var(--inverso); color: var(--inverso-tinta); }
 .botao.contorno { border: 0; background: var(--cartao); color: var(--v2-forte); }
-.folha-boas .botao.contorno { background: var(--campo); }
 .botao.plano { min-height: 48px; background: none; color: var(--tinta); }
 .botao[disabled] { opacity: 1; background: var(--contorno); color: var(--fraca); }
 .botao.plano[disabled] { background: none; }
 
-/* topo dos passos: voltar redondo e barra de progresso com o ponto sálvia */
-.topo-passo { gap: 16px; }
-.topo-passo .voltar { width: 48px; height: 48px; margin: 0; border-radius: 50%; background: var(--cartao); color: var(--v2-forte); }
+/* ---------- entrada: o cabeçalho de cada passo, na folha ----------
+   Voltar redondo à esquerda (e a barra do cadastro ao lado) e o título no centro, como o
+   cabeçalho das telas do app, 30px da borda e com as tintas da folha. */
+#tela-entrar > .topo-passo, #tela-esqueci > .topo-passo, #tela-cadastro > .topo-passo, #tela-cadastro > .etiqueta,
+#tela-entrar > h1, #tela-esqueci > h1, #tela-redefinir > h1, [data-passo] > h1, #form-esqueci > .dica:first-child {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--recuo-folha);
+  padding-right: var(--recuo-folha);
+  color: var(--folha-tinta);
+}
+.topo-passo { gap: 16px; min-height: 48px; }
+.topo-passo .voltar { width: 48px; height: 48px; margin: 0; border-radius: 50%; background: var(--folha-campo); color: var(--folha-tinta); }
 .topo-passo .voltar svg { width: 22px; height: 22px; }
-.barra { height: 12px; background: var(--cartao); }
-.barra i { position: relative; min-width: 12px; background: var(--inverso); }
-.barra i::after { content: ""; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--salvia); }
-
+.barra { height: 10px; background: var(--folha-campo); }
+.barra i { position: relative; min-width: 10px; background: var(--folha-tinta); }
+.barra i::after { content: ""; position: absolute; top: 2px; right: 2px; width: 6px; height: 6px; border-radius: 50%; background: var(--salvia); }
+#tela-entrar > h1, #tela-esqueci > h1, #tela-redefinir > h1, [data-passo] > h1 { margin-top: 4px; text-align: center; }
+#tela-entrar > h1, #tela-redefinir > h1, [data-passo] > h1 { padding-bottom: var(--fim-folha); }
+/* o formulário começa 20px abaixo da folha (no cadastro os campos trazem margin-top: 16px
+   no próprio HTML: 4 + 16) */
+#tela-entrar > h1 + form, #tela-redefinir > h1 + form { margin-top: 4px; }
+[data-passo] > h1 { margin-bottom: 4px; }
 /* a tela da senha nova não tem voltar: o título desce para a mesma altura das outras */
-#tela-redefinir > h1 { margin-top: 64px; }
+#tela-redefinir > h1 { margin-top: 68px; }
+/* a explicação de "Esqueceu a senha?" é o subtítulo da folha */
+#form-esqueci > .dica:first-child { margin-top: -8px; padding-bottom: var(--fim-folha); color: var(--folha-tinta-fraca); font-size: .9375rem; text-align: center; }
+#form-esqueci > .dica:first-child + .campo { margin-top: 4px; }
+/* cadastro: "Passo 1 de 3" no centro e o convite num cartão de destaque da folha */
+#tela-cadastro > .etiqueta { margin-top: 4px; margin-bottom: -12px; text-align: center; }
+.convite { align-self: center; max-width: 100%; margin: 0 var(--recuo-folha); padding: 10px 16px; border-radius: 20px;
+  background: var(--folha-destaque); color: var(--salvia-tinta); font-size: .875rem; font-weight: 700; line-height: 1.4; text-align: center; text-wrap: balance; }
+/* no computador o botão fica logo abaixo dos campos, sem o vão até o pé da tela */
+@media (min-width: 860px) { form .espaco { flex: 0 0 8px; } }
 
 /* formulários */
 form { gap: 16px; }
 .campo { gap: 8px; }
 label { font-size: .875rem; font-weight: 700; color: var(--v2-forte); }
-input { min-height: 56px; padding: 14px 18px; border: 1.5px solid var(--contorno); border-radius: 18px;
+input { min-height: var(--alt-botao); padding: 14px 18px; border: 1.5px solid var(--contorno); border-radius: 18px;
   background: var(--cartao); color: var(--v2-forte); font-size: 1rem; font-weight: 600; }
 input:focus { border-color: var(--v2-forte); }
 input[aria-invalid="true"] { border-color: var(--alerta); }
 .ajuda { font-size: .8125rem; font-weight: 500; line-height: 1.45; color: var(--fraca); }
 .erro { min-height: 0; font-size: .875rem; font-weight: 700; line-height: 1.45; color: var(--alerta); }
 .senha input { padding-right: 104px; }
-.mostrar { top: 6px; right: 6px; min-width: 88px; border-radius: 999px; color: var(--v2-forte); font-family: var(--v2-ui); font-size: .875rem; }
+.mostrar { top: 5px; right: 5px; min-width: 88px; border-radius: 999px; color: var(--v2-forte); font-family: var(--v2-ui); font-size: .875rem; }
 .mostrar:hover { background: var(--campo); }
 
 /* "Você já segue Jesus?": segmentado em pílula, a escolhida escura */
 .caminho-escolha { gap: 4px; padding: 5px; border-radius: 999px; background: var(--cartao); }
-.opcao-caminho { flex: 1 1 0; white-space: nowrap; min-height: 46px; padding: 8px 12px; border: 0; border-radius: 999px; background: none;
+.opcao-caminho { flex: 1 1 0; white-space: nowrap; min-height: 44px; padding: 8px 12px; border: 0; border-radius: 999px; background: none;
   color: var(--tinta); font-size: .9375rem; }
 .opcao-caminho[aria-pressed="true"] { border: 0; background: var(--inverso); color: var(--inverso-tinta); }
 
-/* caixas de apoio: sálvia pálido, sem borda */
-.privacidade, .consentimento, .convite { padding: 16px; border-radius: 20px; background: var(--salvia-palido); color: var(--tinta); font-weight: 500; }
+/* caixas de apoio: sálvia pálido, sem borda, como o aviso de privacidade do app */
+.privacidade, .consentimento { padding: 16px; border-radius: 20px; background: var(--salvia-palido); color: var(--tinta); font-weight: 500; }
 .privacidade svg { color: var(--salvia-texto); }
-.convite { font-weight: 700; color: var(--v2-forte); }
 .consentimento { gap: 12px; }
 .consentimento span { font-weight: 500; color: var(--tinta); }
 .consentimento input { min-height: 0; width: 24px; height: 24px; padding: 0; accent-color: var(--inverso); }
