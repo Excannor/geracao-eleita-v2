@@ -81,3 +81,6 @@ O layout da primeira versão fica (folha do topo com saudação e botões redond
 
 ## Paleta aprovada (30/09)
 O dono aprovou o Início do commit b1ef647 (src/app/03-trilha.js e src/estilo-v2/21-trilha.css): é a referência exata de cores e acabamento para todas as outras telas. Topo em folha grafite no claro (#2e302c no escuro), corpo claro #ececec com cartões brancos no claro (grafite #1b1c1a/#252724 no escuro), cartões de destaque sálvia #c8da8c com botão redondo preto, nós e botões principais em #151615 no claro / #eef0ea no escuro.
+
+## Barra de abas (30/09, decisão do dono, vale sobre o resto deste guia)
+A Bíblia NÃO fica mais levantada acima das ilhas: é uma ilha sálvia do mesmo tamanho e na mesma linha das duas ilhas escuras, com ícone e nome dentro (commit a3ebfec, `src/estilo-v2/01-base.css`). Ativa, o ícone ganha o círculo escuro #151615 com ícone sálvia. Ao integrar ou corrigir, preserve isso; não volte ao círculo levantado.
