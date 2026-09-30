@@ -218,6 +218,7 @@
     itens.push(itemPainelMais(CC.icoAba('marcador'), true, 'Meus versículos', '', '#/perfil/versiculos'));
     itens.push(itemPainelMais(CC.icoAba('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
     itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
+    itens.push(itemPainelMais(CC.ico('engrenagem'), true, 'Configurações', 'Tema, notificações e conta', '#/config'));
     document.body.insertAdjacentHTML('beforeend', '<div class="veu-mais"></div><div class="painel-mais" role="dialog" aria-modal="true" aria-label="Mais">' + itens.join('') + '</div>');
     document.querySelector('.veu-mais').onclick = () => fecharPainelMais();
     document.querySelectorAll('[data-ir-mais]').forEach((a) => {
