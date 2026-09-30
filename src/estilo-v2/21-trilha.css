@@ -303,14 +303,35 @@
 .cj .pensamento-dia { margin: 0; border: 0; border-radius: 20px; }
 .cj .pensamento-dia p { color: var(--tinta-forte); }
 .cj .oracao-guia { margin: 0; }
-.cj .oracao-guia li { border-radius: 20px; background: var(--salvia-palido); font-weight: 600; }
+.cj .oracao-guia li { border-radius: 20px; background: var(--salvia-palido); font-style: normal; font-weight: 600; text-wrap: balance; }
 .cj details.cartao { padding: 0; margin: 0; }
 .cj summary { padding: 10px 0; font-weight: 700; }
 .perguntas-fixas { display: grid; gap: 10px; margin: 8px 0 0; padding-left: 20px; }
 /* o botão principal do Conhecer Jesus (Ler, Terminei o dia, Quero conversar com alguém) é
    a pílula escura, como na lição; a sálvia fica para os pontos de acento */
 .cj .botao.azul, .tela-conhecer .licao-pe .botao.cor { --b: var(--inverso); color: var(--inverso-tinta); }
-.cj .leitura-hoje { margin-top: 16px; }
+
+/* ---------- o dia do Conhecer Jesus (tela cheia): a moldura da lição do dia ----------
+   O mesmo desenho da lição (22-leitura.css): o topo (fechar e progresso) fica parado no
+   alto, numa folha, e a cabeça do dia completa a folha por baixo dele; ao rolar, ela passa
+   por baixo e o topo fica sozinho, uma folha menor. O pé perde a linha. */
+.tela-conhecer > .licao-topo, .cabeca-cj {
+  --cartao: var(--folha-campo); --campo: var(--folha-campo);
+  --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
+  --progresso: var(--folha-tinta);
+  border-radius: 0 0 36px 36px; background: var(--folha); color: var(--folha-tinta);
+}
+.tela-conhecer > .licao-topo { grid-area: 1 / 1; z-index: 2; align-self: start; justify-self: center; box-sizing: border-box; width: min(100%, 592px); gap: 12px; padding: calc(14px + env(safe-area-inset-top)) 16px 14px; }
+.tela-conhecer > .licao-palco { grid-area: 1 / 1 / 3; padding-top: 0; scroll-padding-top: calc(92px + env(safe-area-inset-top)); scrollbar-gutter: stable both-edges; }
+.tela-conhecer .fechar { width: var(--botao-redondo); height: var(--botao-redondo); margin: 0; border-radius: 50%; background: var(--cartao); color: var(--tinta-forte); }
+.tela-conhecer .licao-topo .barra { background: var(--cartao); }
+.cabeca-cj { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 0 -16px 20px; padding: calc(82px + env(safe-area-inset-top)) 30px 26px; text-align: center; }
+.cabeca-cj > * { max-width: 34ch; margin: 0; }
+.cabeca-cj h1 { max-width: 20ch; font-size: 1.5rem; text-wrap: balance; }
+.cabeca-cj .passo-dica { margin-top: 2px; text-wrap: balance; }
+.tela-conhecer .licao-pe { border-top: 0; }
+.tela-conhecer .licao-pe .botao.contorno { background: var(--cartao); }
+.cj .leitura-hoje { margin: 0 0 16px; }
 
 @media (min-width: 860px) {
   .trilha { padding-bottom: 72px; }

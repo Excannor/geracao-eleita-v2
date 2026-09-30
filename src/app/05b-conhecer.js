@@ -170,9 +170,10 @@
       + CC.barra(fracao)
       + '</div>'
       + '<div class="licao-palco"><div class="interno">'
-      + '<span class="etiqueta">Conhecer Jesus · Dia ' + dia.numero + ' de 14</span>'
+      // .cabeca-cj: só apresentação, a folha do alto do dia, por baixo do topo (21-trilha.css)
+      + '<div class="cabeca-cj"><span class="etiqueta">Conhecer Jesus · Dia ' + dia.numero + ' de 14</span>'
       + '<h1 class="passo-titulo">' + CC.esc(dia.titulo) + '</h1>'
-      + '<p class="passo-dica">' + CC.esc(dia.abertura) + '</p>'
+      + '<p class="passo-dica">' + CC.esc(dia.abertura) + '</p></div>'
       // Antes de ler, a tela mostra o que vem: sem isso, sobrava um vazio que parecia travado.
       + (lida ? '' : '<div class="leitura-hoje"><span class="etiqueta">O que você vai ler</span>'
         + '<span class="passagem-hoje">' + CC.esc(CC.colarRef(dia.trechos.map((t) => CC.escreverRef(t.livro, t.cap, t.de, t.ate)).join(' e '))) + '</span>'
