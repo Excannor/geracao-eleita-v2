@@ -648,3 +648,19 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 @media (max-width: 859px) {
   .navegacao.cheia .aba.aba-central { padding: 0; border-radius: 20px; }
 }
+/* Barra mais baixa (pedido do dono, 30/09): no iPhone o espaço do indicador de início já
+   dá o respiro de baixo, então o espaçamento próprio encolhe; a Bíblia fica 64x54. */
+@media (max-width: 859px) {
+  .navegacao { padding: 6px 6px max(6px, calc(env(safe-area-inset-bottom) - 14px)); }
+  .navegacao .aba:not(.aba-central) { min-height: 50px; gap: 0; }
+  .navegacao .aba:not(.aba-central) .icone-aba { height: 30px; }
+  .navegacao .aba.selecionada:not(.aba-central) .rotulo-aba::after { margin-top: 3px; }
+  .navegacao .aba-central { width: 64px; height: 54px; border-radius: 18px; gap: 0; }
+  .navegacao .aba-central .icone-aba { height: 28px; }
+  .navegacao .aba-central .ico-aba { width: 24px; height: 24px; }
+  .navegacao.cheia .aba-central { width: 56px; height: 48px; }
+  :root { --alt-barra: 88px; }
+}
+@media (max-width: 374px) {
+  .navegacao .aba-central { width: 58px; height: 52px; }
+}
