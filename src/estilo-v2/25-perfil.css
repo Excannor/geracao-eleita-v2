@@ -149,7 +149,7 @@
 [data-rota=config] .linha-config[data-caminho] { display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
 [data-rota=config] .linha-config[data-caminho] .valor { grid-row: 2; max-width: none; font-size: .875rem; text-align: left; }
 [data-rota=config] .linha-config[data-caminho] svg { grid-area: 1 / 2 / 3; }
-.dica-config { text-wrap: balance; }
+[data-rota=config] .dica-config { text-wrap: balance; }
 
 /* notificações: o estado deste aparelho é o cartão de destaque da folha */
 .cartao-push { margin: 4px 0 0; padding: 20px; border-radius: 26px; }
@@ -158,7 +158,7 @@
 .folha-perfil .cabeca-push p { color: inherit; font-size: .875rem; font-weight: 500; text-wrap: pretty; }
 .cartao-push .acoes { margin-top: 16px; }
 
-.opcao-traducao span { text-wrap: balance; }
+[data-rota=config] .opcao-traducao span { text-wrap: balance; }
 .opcao-traducao { position: relative; min-height: 72px; padding: 16px 60px 16px 20px; border: 0; border-radius: 24px; }
 .opcao-traducao::after { content: ''; position: absolute; top: 50%; right: 20px; width: 24px; height: 24px; margin-top: -12px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--tinta-fraca); }
 .opcao-traducao[aria-pressed=true] { background: var(--realce); }
@@ -194,9 +194,10 @@
 
 :is([data-rota=explorar], [data-rota=secao], [data-rota=busca], [data-rota=perfil]) .item { padding: 18px 20px; border-radius: 24px; }
 .item b { text-wrap: balance; }
-.item .chip { border-radius: 14px; text-wrap: balance; }
-.item .destaque { display: block; font-family: var(--fonte-biblia); font-style: normal; font-weight: 400; text-wrap: balance; }
-.item .resumo { -webkit-line-clamp: 6; text-wrap: balance; }
+.item .chip { border-radius: 14px; }
+.item .destaque { display: block; font-family: var(--fonte-biblia); font-style: normal; font-weight: 400; }
+.item .resumo { -webkit-line-clamp: 6; }
+:is([data-rota=explorar], [data-rota=secao], [data-rota=busca], [data-rota=perfil]) .item :is(.resumo, .destaque, .chip) { text-wrap: balance; }
 .bloco-secao { padding: 18px 16px; border-radius: var(--raio-cartao); }
 .bloco-secao > span:last-child { text-wrap: balance; }
 .bloco-secao .icone, .icone-secao { width: 48px; height: 48px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
@@ -243,7 +244,7 @@
 .folha-conta p > a { display: inline-flex; align-items: center; min-height: 44px; }
 /* o versículo do agradecimento (Apoiar) em Literata, com a referência na letra da interface */
 .folha-conta p:has(> .ref-frase) { color: var(--tinta); font-family: var(--fonte-biblia); font-size: 1rem; font-weight: 400; line-height: 1.6; }
-.qr-legenda { text-wrap: balance; }
+.folha-conta .qr-legenda { text-wrap: balance; }
 .folha-conta .ref-frase { display: block; margin-top: 6px; color: var(--tinta-fraca); font-family: var(--fonte); font-size: .8125rem; font-weight: 700; }
 .folha-conta p:has(> a) { margin-block: 4px; }
 /* a ação principal é a pílula escura, como no resto do app (o sálvia fica para o acento) */
