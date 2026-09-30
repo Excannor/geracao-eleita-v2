@@ -128,7 +128,9 @@
     // Primeiro as conquistas mais perto do próximo nível: é o que dá vontade de seguir.
     const vitrine = conquistas.slice().sort((a, b) => (a.maximo - b.maximo) || (b.fracao - a.fracao)).slice(0, 3);
 
-    raiz.innerHTML = '<div class="cabeca-tela cabeca-centro"><span class="vao"></span><h1>Perfil</h1>'
+    // .folha-perfil: só apresentação, a folha do alto das telas deste grupo (25-perfil.css):
+    // o título e quem você é; os números e o resto vêm embaixo, no fundo.
+    raiz.innerHTML = '<div class="folha-perfil"><div class="cabeca-tela cabeca-centro"><span class="vao"></span><h1>Perfil</h1>'
       + '<div class="acoes-cabeca"><a class="botao-icone" href="#/config" aria-label="Configurações">' + CC.ico('engrenagem') + '</a></div></div>'
       + '<div class="cartao-pessoa">'
       + '<button class="retrato" data-trocar-foto aria-label="' + (foto ? 'Trocar a foto' : 'Escolher uma foto') + '">'
@@ -145,7 +147,7 @@
       + '</div>'
       + '<input type="file" id="arquivo-foto" accept="image/*" hidden>'
       + '</div>'
-      + (semNada ? '<p class="passo-dica">Sua primeira lição acende tudo isso!</p>' : '')
+      + (semNada ? '<p class="passo-dica">Sua primeira lição acende tudo isso!</p>' : '') + '</div>'
       + '<h2 class="titulo-perfil">Visão geral</h2>'
       + '<div class="visao-geral">'
       + numero(CC.icoChama(seq.atual), seq.atual, seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva', '', 'data-ofensiva-perfil')
@@ -223,7 +225,7 @@
   CC.vistaConquistas = function (raiz) {
     const conquistas = CC.conquistasComNivel();
     const legado = CC.conquistasLegado();
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1>'
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1></div>'
       + '<div class="caixa-lista">' + conquistas.map(CC.linhaConquista).join('') + '</div>'
       + (legado.length
         ? CC.tituloSecao('Da primeira versão') + '<div class="caixa-lista">' + legado.map((c) => '<div class="linha-conquista ganha">'
@@ -235,7 +237,7 @@
   // ---------- troféus ----------
   CC.vistaTrofeus = function (raiz) {
     const t = CC.trofeus();
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Troféus</h1>'
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Troféus</h1></div>'
       + CC.tituloSecao('A Bíblia toda', t.testamentos.filter((x) => x.ganho).length + ' de ' + t.testamentos.length)
       + '<div class="estante">' + t.testamentos.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Unidades do plano', t.unidades.filter((x) => x.ganho).length + ' de ' + t.unidades.length)
@@ -265,7 +267,7 @@
     const guardados = CC.versiculosGuardados ? CC.versiculosGuardados() : [];
     const algum = marcados.length || comNota.length || guardados.length;
 
-    raiz.innerHTML = CC.botaoVoltar('Perfil') + '<h1>Meus versículos</h1>'
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Meus versículos</h1></div>'
       + (algum ? '' : '<div class="vazio-amigos">' + CC.ico('marcador') + '<p>Enquanto lê, toque num versículo para marcar, escrever uma nota ou mostrar no Juntos. '
         + 'Os baús da trilha também trazem versículos para cá.</p></div>')
       + (marcados.length ? CC.tituloSecao('Marcados', String(marcados.length))
@@ -324,12 +326,14 @@
   CC.vistaEscritos = function (raiz) {
     const { porDia, porNota, porVerso } = CC.minhasAnotacoes();
     const total = porDia.reduce((s, d) => s + d.campos.length, 0) + porNota.length + porVerso.length;
-    raiz.innerHTML = CC.botaoVoltar('Perfil')
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil')
       + '<h1>Minhas anotações</h1>'
       + (total
         ? '<p class="passo-dica">' + CC.plural(total, 'anotação', 'anotações')
           + (porDia.length ? ' em ' + CC.plural(porDia.length, 'dia de leitura', 'dias de leitura') : '') + '.</p>'
-          + (porDia.length ? '<div class="cadernos-dias">' + porDia.map(cartaoDoDia).join('') + '</div>' : '')
+        : '') + '</div>'
+      + (total
+        ? (porDia.length ? '<div class="cadernos-dias">' + porDia.map(cartaoDoDia).join('') + '</div>' : '')
           + (porVerso.length ? '<h2 class="titulo-anotacoes-nota">Nos versículos</h2>'
             + '<div class="grade">' + porVerso.map((n) => '<a class="item" href="' + n.href + '" data-ref-nota="' + CC.esc(n.ref) + '">'
               + '<span class="sub">' + CC.esc(n.ref) + '</span><span class="resumo">' + CC.esc(n.texto.slice(0, 220)) + '</span></a>').join('')
@@ -361,10 +365,10 @@
         ? '<a class="' + classe + '" href="#/nota/' + encodeURIComponent(id) + '">' + dentro + '</a>'
         : '<span class="' + classe + '">' + dentro + '</span>';
     };
-    raiz.innerHTML = CC.botaoVoltar('Perfil')
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil')
       + '<h1>Livros da Bíblia</h1>'
       + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos. '
-      + 'Cada livro se acende conforme você lê os dias que passam por ele.</p>'
+      + 'Cada livro se acende conforme você lê os dias que passam por ele.</p></div>'
       + '<div class="pilulas">' + vistos.map(pilula).join('') + '</div>';
   };
 
@@ -388,10 +392,10 @@
 
   CC.vistaHistoria = function (raiz) {
     const h = CC.minhaHistoria() || {};
-    raiz.innerHTML = CC.botaoVoltar('Perfil')
+    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Perfil')
       + '<h1>Minha história com Deus</h1>'
       + '<p class="passo-dica">Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus. Se você cresceu na igreja, conte quando a fé passou a ser sua. '
-      + 'Escreva só para você. Ninguém vê o que está aqui.</p>'
+      + 'Escreva só para você. Ninguém vê o que está aqui.</p></div>'
       + '<span class="selo-status" id="salvo-historia" role="status"></span>'
       + CAMPOS_HISTORIA.map(([chave, pergunta]) => campoHistoria(chave, pergunta, h[chave])).join('')
       + '<p class="passo-dica pequena">Use palavras suas, sem termos de igreja. Três minutos de conversa bastam.</p>'

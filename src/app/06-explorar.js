@@ -58,13 +58,16 @@
   // ---------- peças ----------
   // Espaço inseparável entre número e nome de livro ("1 Samuel", "Salmo 51"), só no texto
   // já desenhado: a quebra de linha nunca separa os dois. Campos de texto ficam de fora.
+  // Nos intervalos ("11-29", "1–3") vai um juntor invisível depois do traço: o navegador
+  // quebrava "11-" numa linha e "29" na outra.
   CC.inseparavel = function (raiz) {
     if (!raiz || !document.createTreeWalker) return;
     const andar = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => (n.parentNode.closest('textarea, input, script, style') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
     });
     for (let n = andar.nextNode(); n; n = andar.nextNode()) {
-      const t = n.nodeValue.replace(/(^|[^\d.,])(\d) (?=\p{Lu})/gu, '$1$2\u00a0').replace(/(\p{Lu}\p{Ll}+) (?=\d)/gu, '$1\u00a0');
+      const t = n.nodeValue.replace(/(^|[^\d.,])(\d) (?=\p{Lu})/gu, '$1$2\u00a0').replace(/(\p{Lu}\p{Ll}+) (?=\d)/gu, '$1\u00a0')
+        .replace(/(\d)([-–])(?=\d)/g, '$1$2\u2060');
       if (t !== n.nodeValue) n.nodeValue = t;
     }
   };
@@ -281,9 +284,10 @@
     // Bíblia inteira) não serve pra ela agora. As perguntas honestas tomam o lugar.
     const perguntas = cartaoPerguntasHonestas();
 
-    raiz.innerHTML = '<h1>Explorar</h1>'
+    // .folha-perfil: só apresentação, a folha do alto (25-perfil.css): o título, a frase e a busca.
+    raiz.innerHTML = '<div class="folha-perfil"><h1>Explorar</h1>'
       + '<p class="passo-dica">Quer entender melhor o que leu? Aqui tem quem é quem, onde tudo aconteceu e o que cada livro conta.</p>'
-      + CC.campoBusca('')
+      + CC.campoBusca('') + '</div>'
       // Quem ainda não fez o caminho vê ele primeiro; depois ele desce para o fim da tela.
       + (conhecendo ? perguntas : (terminou ? '' : comece))
       + (deHoje.length
@@ -319,10 +323,10 @@
         + '</div>'
       : '';
 
-    raiz.innerHTML = CC.botaoVoltar('Explorar')
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Explorar')
       + '<div class="cabeca-secao c-' + cor + '">'
       + '<span class="icone-secao">' + CC.ico(icone) + '</span>'
-      + '<div><h1>' + CC.esc(s.rotulo) + '</h1><p>' + CC.esc(s.descricao) + '</p></div></div>'
+      + '<div><h1>' + CC.esc(s.rotulo) + '</h1><p>' + CC.esc(s.descricao) + '</p></div></div></div>'
       + CC.tituloSecao(filtro ? FILTRO_LEGIVEL[filtro] || filtro : 'Tudo', CC.plural(ids.length, 'texto', 'textos'))
       + filtros
       + (ids.length ? '<div class="grade">' + ids.map(CC.itemNota).join('') + '</div>'
@@ -364,7 +368,7 @@
     const ehLicao = D.licoes.includes(id);
     const feita = ehLicao && CC.fezLicao(id);
 
-    raiz.innerHTML = CC.botaoVoltar(ehLicao ? 'Primeiros passos' : (s ? s.rotulo : 'Voltar'))
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar(ehLicao ? 'Primeiros passos' : (s ? s.rotulo : 'Voltar')) + '</div>'
       + '<article class="nota-artigo c-' + cor + '">'
       + (n.alerta ? '<p class="etiqueta" style="color:var(--vermelho)">Assunto delicado: leia com calma</p>' : '')
       + '<div class="nota-corpo">' + CC.htmlDaNota(n) + '</div></article>'
@@ -468,7 +472,7 @@
 
     const meus = q.length < 2 ? [] : CC.meusTextos().filter((x) => CC.semAcento(x.texto).includes(q));
 
-    raiz.innerHTML = CC.campoBusca(consulta)
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.campoBusca(consulta) + '</div>'
       + (meus.length
         ? CC.tituloSecao('No que você escreveu', CC.plural(meus.length, 'trecho', 'trechos'))
           + '<div class="grade">' + meus.slice(0, 12).map((x) =>
