@@ -1,10 +1,15 @@
 /* =========================================================================
    REDESENHO V2 · 21-trilha
-   Trilha, dia do plano (balão do nó, baú, folha da unidade, primeiros passos) e Conhecer Jesus.
+   Trilha, dia do plano (balão do nó, baú, folha da unidade, primeiros passos) e Conhecer Jesus;
+   e, pedidos a este grupo, o topo do app (retrato e ofensiva), o painel Mais e a folha da
+   ofensiva, que valem para todas as telas (o carimbo em pincel da folha fica como está).
    Camada exclusiva deste grupo de telas (ver design/mapa-telas.md). Use as fichas de
    00-tokens.css e as peças de 01-base.css; nada de cor literal que valha só num tema.
    Nunca mire o carimbo em pincel (.selo-lema, .selo-linha, .selo-com-cruz, .selo-cruz, .selo-ref).
    As telas do Conhecer Jesus (dia, perguntas, pergunta, "E agora") levam a classe .cj.
+   Padrão aprovado (o Início de 0a11385, paleta C): a folha do alto sálvia pálida de ponta a
+   ponta (grafite um tom acima no escuro), cartões de destaque brancos (sálvia no escuro) com o
+   botão redondo preto, e o corpo no fundo do tema com cartões brancos.
    ========================================================================= */
 
 /* ---------- peças repetidas deste grupo ---------- */
@@ -208,6 +213,33 @@
 /* folha da unidade */
 .cabeca-folha-unidade { gap: 16px; margin-bottom: 16px; }
 .cabeca-folha-unidade .arte-trofeu { flex: none; width: 64px; }
+
+/* =========================================================================
+   O TOPO DO APP, FORA DO INÍCIO: o começo da folha do alto
+   A folha sálvia pálida de ponta a ponta, por baixo da barra de status, com os cantos de
+   baixo redondos; no computador, na largura da coluna, como a folha do Início. O retrato
+   fica no mesmo lugar e tamanho da saudação do Início. O topo continua preso em cima
+   enquanto a tela rola (teste-app-ios). A tela que puser o cabeçalho (voltar, título,
+   resumo) num bloco .folha-cabeca continua a folha: o bloco sobe por trás dos cantos do
+   topo e os dois viram uma peça só; ao rolar, ele passa por baixo e o topo fica sozinho.
+   ========================================================================= */
+.topo, .folha-cabeca {
+  --cartao: var(--folha-campo); --campo: var(--folha-campo);
+  --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
+  --progresso: var(--folha-tinta);
+  color: var(--folha-tinta);
+}
+.topo { grid-template-columns: minmax(30px, 1fr) minmax(0, 500px) minmax(30px, 1fr); height: auto; padding: calc(20px + env(safe-area-inset-top)) 0 16px; background: none; }
+.topo::before { content: ''; position: absolute; z-index: -1; inset: 0 max(0px, 50% - 280px); border-radius: 0 0 36px 36px; background: var(--folha); }
+.topo > .perfil-topo { width: 52px; height: 52px; background: var(--salvia); color: var(--salvia-tinta); }
+.topo > .perfil-topo .ico-aba { width: 24px; height: 24px; }
+.topo > .perfil-topo.selecionado { box-shadow: 0 0 0 2.5px var(--folha), 0 0 0 4.5px var(--folha-tinta); }
+.folha-cabeca { margin: -52px -16px 20px; padding: 40px 30px 24px; border-radius: 0 0 36px 36px; background: var(--folha); }
+.folha-cabeca > :last-child, .folha-cabeca .textos > :last-child { margin-bottom: 0; }
+/* celular estreito: o título ao lado do voltar encolhe para caber numa linha ("Perguntas
+   honestas" quebrava a 360px), como o título da Bíblia (22-leitura.css) */
+@media (max-width: 374px) { .folha-cabeca:not(.titulo-frase) > .voltar + h1 { padding-inline: 52px; font-size: 1.25rem; } }
+@media (max-width: 359px) { .folha-cabeca:not(.titulo-frase) > .voltar + h1 { font-size: 1rem; } }
 
 /* ---------- primeiros passos e Conhecer Jesus: a cabeça vira cartão ---------- */
 .cabeca-passos { margin: 0 0 8px; padding: 20px; }
