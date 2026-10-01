@@ -402,3 +402,5 @@ main:has(> #tela-boas:not([hidden])) { max-width: none; padding: 0; }
 .lp-final + .links a { color: #c9d98f; }
 @media (min-width: 760px) { .lp-final { grid-template-columns: 340px 380px; justify-content: center; align-items: center; gap: 64px; } .lp-convite { text-align: left; } }
 @media (prefers-reduced-motion: reduce) { .lp-peca { animation: none; } }
+/* o símbolo GE na cor da marca (verde-oliva no claro, sálvia clara no escuro) */
+.lp-marca .mascote svg, .cabeca > svg { color: var(--salvia-texto); }
