@@ -277,7 +277,9 @@ button.cartao-proposito:hover { background: var(--campo); }
 .mini-barras { display: flex; align-items: flex-end; gap: 12px; height: 104px; padding: 0 4px; }
 .mini-barra { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
 .mini-barra small { color: var(--tinta-forte); font-size: .8125rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-.mini-barra i { display: block; width: 100%; max-width: 56px; min-height: 4px; border-radius: 10px 10px 4px 4px; background: var(--inverso); }
+/* a altura vem de --v (0 a 1) sobre uma área fixa: em % do .mini-barra, o flex encolhia todas
+   as barras para caber o número e a data, e 7, 8 e 9 saíam da mesma altura */
+.mini-barra i { flex: 0 0 auto; height: calc(var(--v, 0) * 60px); display: block; width: 100%; max-width: 56px; min-height: 4px; border-radius: 10px 10px 4px 4px; background: var(--inverso); }
 .mini-barra.sem i { box-sizing: border-box; height: 24px; border: 1.5px dashed var(--tinta-fraca); background: none; }
 .mini-barra.sem small { color: var(--tinta-fraca); font-weight: 600; }
 .mini-barra em { color: var(--tinta-fraca); font-size: .75rem; font-style: normal; font-weight: 600; font-variant-numeric: tabular-nums; }

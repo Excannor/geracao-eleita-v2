@@ -791,7 +791,7 @@
     const barras = f.encontros.length
       ? '<div class="mini-barras" role="img" aria-label="' + CC.esc(f.encontros.map((e) => ddmm(e.data) + ': ' + (e.semEncontro ? 'sem encontro' : CC.plural(e.pessoas, 'pessoa', 'pessoas'))).join(', ')) + '">'
         + f.encontros.map((e) => '<span class="mini-barra' + (e.semEncontro ? ' sem' : '') + '"><small>' + (e.semEncontro ? 'sem' : e.pessoas) + '</small>'
-          + '<i style="height:' + (e.semEncontro ? 0 : Math.max(8, Math.round((e.pessoas / maior) * 100))) + '%"></i><em>' + ddmm(e.data) + '</em></span>').join('')
+          + '<i style="--v:' + (e.semEncontro ? 0 : Math.max(0.08, e.pessoas / maior).toFixed(3)) + '"></i><em>' + ddmm(e.data) + '</em></span>').join('')
         + '</div>'
       : '<p class="passo-dica pequena">Registre os encontros e a frequência das últimas semanas aparece aqui.</p>';
     const d = f.diferenca;

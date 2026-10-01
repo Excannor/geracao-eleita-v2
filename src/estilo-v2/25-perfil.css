@@ -298,3 +298,13 @@
 .painel-celula-linha small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; text-wrap: pretty; }
 [data-rota=config] .painel-trilho { background: var(--campo); }
 [data-rota=config] .painel-trilho i { background: var(--inverso); }
+
+/* colunas do painel: a altura vem de --v (0 a 1) sobre uma área fixa (em %, o flex as deixava
+   quase iguais); e os trilhos de porcentagem com a mesma largura em toda linha, para 83% e 71%
+   não aparecerem do mesmo tamanho */
+.painel-coluna i { flex: 0 0 auto; height: calc(var(--v, 0) * 80px); }
+[data-rota=config] .painel-barra .painel-trilho { flex: 0 0 96px; }
+/* com o trilho de largura fixa, a porcentagem não pode descer para outra linha */
+[data-rota=config] .painel-barra { flex-wrap: nowrap; }
+[data-rota=config] .painel-barra > span:first-child { flex: 1 1 auto; min-width: 0; }
+[data-rota=config] .painel-barra .valor { flex: 0 0 auto; }
