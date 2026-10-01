@@ -119,29 +119,6 @@ a { color: var(--salvia-texto); font-weight: 700; text-decoration: underline; te
 main { max-width: 440px; padding: calc(20px + env(safe-area-inset-top)) var(--margem) calc(16px + env(safe-area-inset-bottom)); }
 section { gap: 16px; }
 
-/* boas-vindas: símbolo, marca e carimbo na folha do alto; título, texto e botões no fundo,
-   embaixo, perto do polegar. A marca fica ao lado do símbolo, numa linha só (o carimbo é o
-   protagonista da tela): a tela vira uma fila que quebra, e as margens do símbolo e da marca
-   completam a primeira linha, o que manda o carimbo sozinho para a seguinte (sem regra nele).
-   A altura que sobra se divide igual entre as linhas, dentro da folha: metade acima da marca
-   (a linha vazia do ::before e a da marca) e metade abaixo do carimbo (a dele e a do bloco
-   de baixo, que fica colado no pé da tela). */
-#tela-boas { flex-flow: row wrap; align-items: flex-start; align-content: stretch; gap: 0 10px; }
-#tela-boas::before { content: ""; flex: 1 0 100%; }
-#tela-boas .mascote { align-self: flex-end; margin: 0 0 0 calc(50% - 100px); }
-#tela-boas .marca { align-self: flex-end; margin-right: calc(50% - 100px); line-height: 56px; }
-/* o símbolo pela altura, a mesma da linha da marca: os dois ficam centrados um no outro */
-.mascote svg { width: auto; height: 56px; }
-.folha-boas { flex: 1 0 100%; align-self: flex-end; display: flex; flex-direction: column; gap: 12px;
-  margin: var(--fim-folha) 0 0; padding: 28px 0 0; border-radius: 0; background: none; }
-.folha-boas::before { bottom: 100%; }
-#tela-boas h1 { font-size: 1.5rem; line-height: 1.25; }
-#tela-boas .dica { max-width: 34ch; margin: 0 auto; font-size: .9375rem; }
-.folha-boas .espaco { display: none; }
-.folha-boas .botoes { margin-top: 12px; }
-.links { gap: 4px; color: var(--fraca); }
-.links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; font-size: .9375rem; }
-
 /* títulos e textos */
 h1 { font-size: 1.5rem; line-height: 1.2; }
 .dica { color: var(--fraca); font-weight: 500; font-size: 1rem; line-height: 1.55; }
@@ -274,3 +251,154 @@ td.nao { color: var(--fraca); }
 .cabeca ~ .ajuda { margin-top: 32px; padding: 16px 20px; border-radius: 20px; background: var(--alerta-palido); color: var(--tinta); font-size: 1rem; font-weight: 600; line-height: 1.6; }
 .cabeca ~ .voltar { display: flex; justify-content: center; min-height: var(--alt-botao); margin-top: 24px; padding: 0 24px; border-radius: 999px;
   background: var(--inverso); color: var(--inverso-tinta); text-decoration: none; }
+
+/* =========================================================================
+   BOAS-VINDAS COM PERSONALIDADE (01/10, a pedido do dono, referência: a home do Duolingo)
+   A porta de entrada deixa de ser uma tela do app e vira uma página: o carimbo em pincel
+   no centro (idêntico, nenhuma regra mira as classes dele), as peças do jogo flutuando em
+   volta, um "chão" sálvia em onda e o mural de lambe-lambes com versículos, cada um no
+   seu estilo. Os pôsteres são desenhados aqui, em CSS, com as fontes do app.
+   ========================================================================= */
+.links { gap: 4px; color: var(--fraca); }
+.links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; font-size: .9375rem; }
+
+:root { --lp-chao: #c8da8c; --lp-chao-tinta: #151615; --lp-sombra-botao: #8fa356; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) { --lp-chao: #2c3324; --lp-chao-tinta: #eef0ea; --lp-sombra-botao: #6f8040; } }
+:root[data-tema="escuro"] { --lp-chao: #2c3324; --lp-chao-tinta: #eef0ea; --lp-sombra-botao: #6f8040; }
+
+main:has(> #tela-boas:not([hidden])) { max-width: none; padding: 0; }
+#tela-boas.lp { display: block; flex: none; width: 100%; text-align: center; overflow-x: clip; }
+
+/* topo: marca à esquerda, Entrar à direita, preso em cima */
+.lp-topo { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  max-width: 1120px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 20px 10px; background: var(--fundo); }
+.lp-marca { display: flex; align-items: center; gap: 8px; }
+.lp-marca .mascote { margin: 0; }
+.lp-marca .mascote svg { width: auto; height: 40px; }
+.lp-marca .marca { font-size: 1.05rem; line-height: 1; }
+.lp-topo-entrar { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: var(--campo); color: var(--v2-forte);
+  font: 700 .9375rem var(--v2-ui); cursor: pointer; }
+
+/* o palco: carimbo, peças, título e botões */
+.lp-hero { position: relative; display: flex; flex-direction: column; align-items: center; gap: 16px;
+  max-width: 1120px; margin: 0 auto; padding: 28px 20px 8px; }
+.lp-selo { position: relative; z-index: 1; padding: 8px 0 4px; }
+#tela-boas.lp h1 { position: relative; z-index: 1; max-width: 13ch; margin: 10px 0 0; color: var(--salvia-texto);
+  font-family: var(--v2-ui); font-size: clamp(2.1rem, 8.4vw, 3.6rem); font-weight: 800; line-height: 1.04; letter-spacing: -.03em; text-wrap: balance; }
+#tela-boas.lp .dica { position: relative; z-index: 1; max-width: 38ch; margin: 0 auto; color: var(--tinta); font-size: 1.0625rem; }
+.lp-hero .botoes { position: relative; z-index: 1; width: min(100%, 380px); margin-top: 8px; gap: 14px; }
+.lp-gratis { margin: 2px 0 0; color: var(--fraca); font-size: .875rem; font-weight: 600; }
+
+/* botões gordinhos, com a sombra de baixo que "afunda" no toque */
+.lp .botao { min-height: 56px; border: 0; border-radius: 18px; background: var(--salvia); color: #151615;
+  box-shadow: 0 5px 0 var(--lp-sombra-botao); font-size: 1.0625rem; font-weight: 800; transition: transform .08s, box-shadow .08s; }
+.lp .botao:active { transform: translateY(5px); box-shadow: 0 0 0 var(--lp-sombra-botao); }
+.lp .botao.contorno { background: var(--cartao); color: var(--v2-forte); box-shadow: 0 5px 0 var(--contorno), inset 0 0 0 2px var(--contorno); }
+
+/* as peças do jogo, soltas em volta do carimbo, balançando devagar */
+.lp-pecas { position: absolute; inset: 0 0 auto; height: 300px; max-width: 760px; margin: 0 auto; pointer-events: none; }
+.lp-peca { position: absolute; width: 52px; height: auto; color: var(--v2-forte); filter: drop-shadow(0 6px 6px rgba(21, 22, 21, .14));
+  animation: lp-boia 5s ease-in-out infinite; }
+.p-biblia { left: 3%; top: 26px; width: 66px; --g: -8deg; }
+.p-visto { right: 6%; top: 18px; width: 46px; --g: 6deg; animation-delay: -1s; }
+.p-chama { right: 1%; top: 150px; width: 48px; --g: 8deg; animation-delay: -2.2s; }
+.p-bau { left: 1%; top: 220px; width: 68px; --g: -6deg; animation-delay: -3s; }
+.p-trofeu { right: 3%; top: 238px; width: 50px; --g: -4deg; animation-delay: -1.6s; }
+.p-cruz { display: none; }
+.p-coroa { left: 2%; top: 120px; width: 54px; --g: 10deg; animation-delay: -4s; }
+.p-gema1 { right: 6%; top: 104px; width: 20px; --g: 0deg; animation-delay: -2.8s; }
+.p-gema2 { left: 9%; top: 186px; width: 18px; --g: 0deg; animation-delay: -1.2s; }
+@keyframes lp-boia { 0%, 100% { transform: translateY(0) rotate(var(--g, 0deg)); } 50% { transform: translateY(-10px) rotate(calc(var(--g, 0deg) * -1)); } }
+@media (max-width: 374px) { .lp-peca { scale: .82; } .p-cruz, .p-gema2 { display: none; } }
+@media (min-width: 700px) {
+  .lp-hero { padding-top: 40px; }
+  .lp-pecas { height: 330px; }
+  .lp-peca { scale: 1.45; }
+  .p-biblia { left: 6%; } .p-bau { left: 4%; } .p-coroa { left: 16%; }
+  .p-chama { right: 6%; } .p-trofeu { right: 14%; } .p-visto { right: 16%; }
+  .p-gema1 { right: 26%; } .p-gema2 { left: 24%; }
+}
+
+/* o chão sálvia, em onda, que vira o fundo do mural */
+.lp-onda { display: block; width: 100%; height: 70px; margin-top: 28px; fill: var(--lp-chao); }
+.lp-mural { padding: 0 16px 64px; background: var(--lp-chao); }
+.lp-titulo-mural { margin: 0 auto 28px; color: var(--lp-chao-tinta); font-family: var(--v2-ui); font-size: clamp(1.9rem, 7vw, 3rem);
+  font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
+.lp-titulo-mural span { font-family: 'Permanent Marker', cursive; font-weight: 400; letter-spacing: 0; }
+.lp-posters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; max-width: 1080px; margin: 0 auto; }
+@media (min-width: 760px) { .lp-posters { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 26px; } }
+
+/* ---------- os pôsteres ---------- */
+.poster { position: relative; container-type: inline-size; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin: 0; aspect-ratio: 3 / 4; padding: 7% 6%; overflow: hidden; border-radius: 4px; box-shadow: 0 12px 26px rgba(21, 22, 21, .22);
+  font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 700; text-transform: uppercase; line-height: .9; text-align: center;
+  transform: rotate(var(--r, 0deg)); }
+.poster > span { display: block; }
+.poster small { display: block; margin-top: 5cqw; font-family: var(--v2-ui); font-size: 5cqw; font-weight: 800; letter-spacing: .12em; opacity: .85; }
+/* a fita crepe que segura o lambe-lambe */
+.poster::before { content: ""; position: absolute; top: -2px; left: 35%; width: 30%; height: 7%;
+  background: rgba(255, 255, 255, .45); transform: rotate(-4deg); }
+.lp-posters .poster:nth-child(4n+1) { --r: -2.5deg; }
+.lp-posters .poster:nth-child(4n+2) { --r: 2deg; margin-top: 18px; }
+.lp-posters .poster:nth-child(4n+3) { --r: 1.5deg; }
+.lp-posters .poster:nth-child(4n+4) { --r: -2deg; margin-top: 18px; }
+
+.po-raso { background: #efe8d8; color: #13284d; }
+.po-raso .l1 { color: #2f7ae5; font-size: 17cqw; } .po-raso .l2 { font-size: 21cqw; }
+.po-raso .po-onda { width: 62cqw; margin: 2cqw 0; color: #2f7ae5; }
+.po-raso .l3 { font-size: 30cqw; } .po-raso .l4 { color: #2f7ae5; font-size: 22cqw; }
+
+.po-vale { background: #ff4f8b; color: #151615; }
+.po-vale .l1 { color: #ffe1ec; font-size: 8.5cqw; letter-spacing: .04em; }
+.po-vale .l2 { margin: 3cqw 0; color: #fff; font-family: 'Permanent Marker', cursive; font-weight: 400; font-size: 15cqw; line-height: 1; text-shadow: 1cqw 1cqw 0 #151615; }
+.po-vale .l3 { font-size: 17cqw; } .po-vale small { color: #ffe1ec; }
+
+.po-venha { background: #1b2a52; color: #a9cdf2; }
+.po-venha .po-coroa { width: 34cqw; margin-bottom: 2cqw; }
+.po-venha .l1 { font-size: 12cqw; } .po-venha .l2 { color: #f2f0e8; font-size: 27cqw; } .po-venha .l3 { font-size: 30cqw; }
+
+.po-cristo { background: #5a3a24; color: #ecd3a8; }
+.po-cristo .l1 { font-size: 26cqw; } .po-cristo .l2 { font-size: 12cqw; }
+.po-cristo .po-coracao { width: 30cqw; margin: 2cqw 0; } .po-cristo .l3 { font-size: 30cqw; }
+
+.po-fundo { background: #0f2346; color: #e8d3ae; }
+.po-fundo .l1 { font-size: 9cqw; letter-spacing: .06em; } .po-fundo .l2 { margin: 1cqw 0; color: #fff; font-size: 22cqw; }
+.po-fundo .l3 { font-size: 24cqw; line-height: .82; }
+
+.po-moldando { background: #1c1c1c; color: #f0a33a; }
+.po-moldando small { margin: 0 0 4cqw; color: #f4e9d6; }
+.po-moldando .l1 { font-size: 26cqw; } .po-moldando .l2 { color: #f4e9d6; font-size: 20cqw; }
+.po-moldando .l3 { font-size: 17cqw; } .po-moldando .l4 { color: #f4e9d6; font-size: 23cqw; }
+
+.po-coracoes { background: #120d0a; color: #f5e6d0; }
+.po-coracoes .l1 { font-size: 19cqw; } .po-coracoes .po-fogo { width: 34cqw; margin: 3cqw 0; }
+.po-coracoes .l2 { color: #ff6a2b; font-size: 17cqw; } .po-coracoes small { color: #f5e6d0; }
+
+.po-atos { background: #f3e7d3; color: #c0501f; }
+.po-atos .l1 { font-size: 30cqw; }
+.po-atos .l2 { margin: 2cqw 0; color: #6b3a1e; font-family: 'Permanent Marker', cursive; font-weight: 400; font-size: 18cqw; line-height: 1; text-transform: none; }
+.po-atos .l3 { font-size: 26cqw; } .po-atos small { color: #6b3a1e; }
+
+/* ---------- como funciona ---------- */
+.lp-como { display: grid; gap: 40px; max-width: 900px; margin: 0 auto; padding: 64px 24px; }
+.lp-passo { display: flex; align-items: center; gap: 20px; text-align: left; }
+.lp-passo h2 { margin: 0 0 6px; color: var(--v2-forte); font-family: var(--v2-ui); font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.lp-passo p { margin: 0; color: var(--fraca); font-size: 1rem; line-height: 1.5; text-wrap: pretty; }
+.lp-arte { flex: none; width: 84px; height: auto; }
+.lp-rostos { display: flex; justify-content: center; }
+.lp-rostos i { display: grid; place-items: center; width: 40px; height: 40px; margin-left: -10px; border: 3px solid var(--fundo); border-radius: 50%;
+  background: var(--salvia); color: #151615; font: 800 1rem var(--v2-ui); }
+.lp-rostos i:first-child { margin-left: 0; } .lp-rostos i:last-child { background: #151615; color: var(--salvia); }
+@media (min-width: 700px) { .lp-como { grid-template-columns: repeat(3, 1fr); align-items: start; } .lp-passo { flex-direction: column; justify-content: flex-start; text-align: center; } .lp-arte { width: auto; height: 96px; } .lp-rostos { align-items: center; } }
+
+/* ---------- o fecho ---------- */
+.lp-final { display: grid; justify-items: center; gap: 32px; padding: 56px 24px 32px; background: #151615; }
+.po-volte { width: min(100%, 340px); justify-self: center; --r: -2deg; background: linear-gradient(90deg, #f1ead9 50%, #151615 50%); color: #f1ead9; box-shadow: 0 0 0 2px #2c2d2b; }
+.po-volte > span { mix-blend-mode: difference; }
+.po-volte .v1 { font-size: 31cqw; line-height: .86; } .po-volte .v2 { font-size: 9.5cqw; line-height: 1; } .po-volte .v3 { font-size: 15cqw; }
+.lp-convite { display: grid; gap: 20px; width: min(100%, 380px); }
+.lp-convite h2 { margin: 0; color: #eef0ea; font-family: var(--v2-ui); font-size: 1.75rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; text-wrap: balance; }
+.lp-final + .links { margin: 0; padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); background: #151615; }
+.lp-final + .links a { color: #c9d98f; }
+@media (min-width: 760px) { .lp-final { grid-template-columns: 340px 380px; justify-content: center; align-items: center; gap: 64px; } .lp-convite { text-align: left; } }
+@media (prefers-reduced-motion: reduce) { .lp-peca { animation: none; } }

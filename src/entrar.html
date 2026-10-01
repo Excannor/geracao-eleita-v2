@@ -163,45 +163,122 @@
 </head>
 <body>
 <main>
-  <!-- boas-vindas -->
-  <section id="tela-boas" class="centro">
-    <div class="mascote">/*SIMBOLO*/</div>
-    <div class="marca">Geração <em>Eleita</em></div>
-    <!-- O carimbo vem logo depois da marca, e não no meio da tela: ele é a declaração de
-         quem o app é, parte da identidade. Espremido entre o título e os botões, parecia
-         uma arte colada ali por falta de lugar melhor. -->
-    <div class="selo-lema">
-      <!-- A referência vem antes do carimbo: embaixo dele, parecia citar a frase, que não
-           é de 1 Pedro. Em cima, ela anuncia de onde vem o nome do app. -->
-      <span class="selo-ref">1 Pedro 2.9</span>
-      <span class="selo-linha">Somos a</span>
-      <span class="selo-com-cruz">
-        <svg class="selo-cruz" viewBox="0 0 24 30" fill="currentColor" aria-hidden="true"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z"/></svg>
-        <span class="selo-linha">Geração</span>
-      </span>
-      <span class="selo-linha">Que busca</span>
-      <span class="selo-linha">À sua face</span>
-      <span class="selo-linha">E te adora</span>
+  <!-- boas-vindas: a porta de entrada, com cara própria (redesenho de 01/10). O carimbo em
+       pincel continua o protagonista e idêntico; em volta dele flutuam as peças do jogo do
+       app (chama, baú, troféu, Bíblia, o visto do dia), e embaixo vem o mural de
+       lambe-lambes com versículos, desenhados em CSS (nenhuma arte de terceiros). -->
+  <section id="tela-boas" class="lp">
+    <header class="lp-topo">
+      <div class="lp-marca"><span class="mascote">/*SIMBOLO*/</span><span class="marca">Geração <em>Eleita</em></span></div>
+      <button class="lp-topo-entrar" data-ir="entrar">Entrar</button>
+    </header>
+
+    <div class="lp-hero">
+      <div class="lp-pecas" aria-hidden="true">
+        <svg class="lp-peca p-chama" viewBox="0 0 64 80"><path d="M32 78c17 0 28-11 28-27 0-12-6-21-14-30 1 8-3 13-8 14 2-13-5-25-16-33 2 14-4 21-11 29C5 38 4 45 4 51c0 16 11 27 28 27z" fill="#ff7a3d"/><path d="M32 76c-9 0-15-6-15-15 0-7 4-11 8-15 0 5 3 8 6 8-1-8 3-14 9-18-1 9 7 13 7 25 0 9-6 15-15 15z" fill="#ffc44d"/></svg>
+        <svg class="lp-peca p-bau" viewBox="0 0 96 80"><path d="M10 34h76v38a6 6 0 0 1-6 6H16a6 6 0 0 1-6-6z" fill="#a8672f"/><path d="M8 20c0-10 8-16 16-16h48c8 0 16 6 16 16v16H8z" fill="#c47d3c"/><rect x="8" y="32" width="80" height="8" fill="#7d4a1f"/><rect x="20" y="4" width="10" height="74" fill="#ffc44d"/><rect x="66" y="4" width="10" height="74" fill="#ffc44d"/><rect x="40" y="28" width="16" height="20" rx="4" fill="#ffc44d"/><circle cx="48" cy="38" r="3" fill="#7d4a1f"/></svg>
+        <svg class="lp-peca p-trofeu" viewBox="0 0 72 80"><path d="M14 6h44v22c0 13-10 24-22 24S14 41 14 28z" fill="#ffc44d"/><path d="M14 12H4v8c0 9 6 15 14 16M58 12h10v8c0 9-6 15-14 16" fill="none" stroke="#e8a51f" stroke-width="5"/><rect x="30" y="50" width="12" height="14" fill="#e8a51f"/><rect x="18" y="64" width="36" height="12" rx="3" fill="#7d4a1f"/><path d="M24 14h6v18h-6z" fill="#fff3c4" opacity=".7"/></svg>
+        <svg class="lp-peca p-biblia" viewBox="0 0 96 72"><path d="M48 14C38 6 22 4 6 6v56c16-2 32 0 42 8 10-8 26-10 42-8V6C74 4 58 6 48 14z" fill="#5a6b2a"/><path d="M48 16C39 9 25 8 11 10v46c14-1 27 1 37 7z" fill="#fffdf6"/><path d="M48 16c9-7 23-8 37-6v46c-14-1-27 1-37 7z" fill="#f4efe1"/><path d="M19 22h20M19 30h22M19 38h18M57 22h20M57 30h18M57 38h20" stroke="#c8bfa6" stroke-width="3" stroke-linecap="round"/><path d="M70 6v20l5-4 5 4V6" fill="#e2463b"/></svg>
+        <svg class="lp-peca p-visto" viewBox="0 0 72 72"><circle cx="36" cy="36" r="34" fill="#151615"/><path d="M21 37l10 10 20-22" fill="none" stroke="#c8da8c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg class="lp-peca p-cruz" viewBox="0 0 24 30"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z" fill="currentColor"/></svg>
+        <svg class="lp-peca p-coroa" viewBox="0 0 80 56"><path d="M6 50h68l6-40-20 14L40 2 20 24 0 10z" fill="#ffc44d"/><circle cx="40" cy="30" r="5" fill="#e2463b"/><rect x="6" y="46" width="68" height="8" rx="2" fill="#e8a51f"/></svg>
+        <svg class="lp-peca p-gema1" viewBox="0 0 40 40"><path d="M20 2l18 18-18 18L2 20z" fill="#c8da8c"/><path d="M20 2l18 18H20z" fill="#e4eec4"/></svg>
+        <svg class="lp-peca p-gema2" viewBox="0 0 40 40"><path d="M20 2l18 18-18 18L2 20z" fill="#7fb3ff"/><path d="M20 2l18 18H20z" fill="#b9d4ff"/></svg>
+      </div>
+
+      <!-- O carimbo vem logo depois da marca: é a declaração de quem o app é. A referência
+           vem antes dele (embaixo, parecia citar a frase, que não é de 1 Pedro). -->
+      <div class="lp-selo">
+        <div class="selo-lema">
+          <span class="selo-ref">1 Pedro 2.9</span>
+          <span class="selo-linha">Somos a</span>
+          <span class="selo-com-cruz">
+            <svg class="selo-cruz" viewBox="0 0 24 30" fill="currentColor" aria-hidden="true"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z"/></svg>
+            <span class="selo-linha">Geração</span>
+          </span>
+          <span class="selo-linha">Que busca</span>
+          <span class="selo-linha">À sua face</span>
+          <span class="selo-linha">E te adora</span>
+        </div>
+      </div>
+
+      <!-- Posicionamento (23/09/2026): o app do discipulado da juventude da igreja. -->
+      <h1 id="titulo-boas">A Bíblia inteira em um ano, com seus amigos.</h1>
+      <p class="dica" id="dica-boas">Uma leitura por dia, de 10 a 20 minutos, com reflexões feitas para quem está começando. Leia com os amigos ou com a sua célula.</p>
+      <div class="botoes">
+        <button class="botao" data-ir="cadastro" id="botao-comecar">Começar agora</button>
+        <!-- Só aparecem com link de célula (ver "if (celula)" no script). -->
+        <button class="botao" data-ir="cadastro" id="botao-entrar-celula" hidden>Entrar na célula</button>
+        <button class="botao contorno" data-ir="cadastro" id="botao-so-conhecer" hidden>Só quero conhecer</button>
+        <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
+      </div>
+      <p class="lp-gratis">De graça, sem anúncios.</p>
     </div>
-    <!-- Posicionamento (23/09/2026): o app do discipulado da juventude da igreja. A frase de
-         cima é a promessa (o dono escolheu "com seus amigos" para a porta de entrada); a de
-         baixo diz para quem é, e traz a célula. -->
-    <!-- A folha de baixo (redesenho v2): título, convite e botões num cartão, como a porta de
-         entrada da referência; o carimbo fica em cima, sobre o fundo, sem mudar nada nele. -->
-    <div class="folha-boas">
-    <h1 id="titulo-boas">A Bíblia inteira em um ano, com seus amigos.</h1>
-    <p class="dica" id="dica-boas">Uma leitura por dia, de 10 a 20 minutos, com reflexões feitas para quem está começando. Leia com os amigos ou com a sua célula.</p>
-    <div class="espaco"></div>
-    <div class="botoes">
-      <button class="botao" data-ir="cadastro" id="botao-comecar">Começar</button>
-      <!-- Só aparecem com link de célula (ver "if (celula)" no script): a mesma escolha da
-           folha do app, antes de criar a conta. -->
-      <button class="botao" data-ir="cadastro" id="botao-entrar-celula" hidden>Entrar na célula</button>
-      <button class="botao contorno" data-ir="cadastro" id="botao-so-conhecer" hidden>Só quero conhecer</button>
-      <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
+
+    <svg class="lp-onda" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64C180 10 340 0 520 40s320 84 520 52S1300 8 1440 30V120H0z"/></svg>
+
+    <!-- O mural: lambe-lambes tipográficos, cada um no seu estilo, colados meio tortos. -->
+    <div class="lp-mural">
+      <h2 class="lp-titulo-mural">Palavra que <span>gruda</span>.</h2>
+      <div class="lp-posters">
+        <figure class="poster po-raso" aria-label="O raso não me serve mais. Ezequiel 47.5">
+          <span class="l1">O raso</span><span class="l2">não me</span>
+          <svg class="po-onda" viewBox="0 0 120 40" aria-hidden="true"><path d="M2 30c14 0 14-14 28-14s14 14 28 14 14-24 30-24c10 0 18 8 30 8" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>
+          <span class="l3">serve</span><span class="l4">mais</span><small>Ezequiel 47.5</small>
+        </figure>
+        <figure class="poster po-vale" aria-label="Ainda que eu ande pelo vale da sombra da morte, não temerei. Salmos 23.4">
+          <span class="l1">Ainda que eu ande pelo</span><span class="l2">Vale da sombra da morte</span><span class="l3">não temerei</span><small>Salmos 23.4</small>
+        </figure>
+        <figure class="poster po-venha" aria-label="Até que o Senhor venha. 1 Coríntios 4.5">
+          <svg class="po-coroa" viewBox="0 0 80 40" aria-hidden="true"><path d="M4 36h72l4-30-20 12L40 0 20 18 0 6z" fill="currentColor"/></svg>
+          <span class="l1">Até que o</span><span class="l2">Senhor</span><span class="l3">venha</span><small>1 Coríntios 4.5</small>
+        </figure>
+        <figure class="poster po-cristo" aria-label="Cristo vive em mim. Gálatas 2.20">
+          <span class="l1">Cristo</span><span class="l2">vive em</span><svg class="po-coracao" viewBox="0 0 64 56" aria-hidden="true"><path d="M32 54S2 36 2 17C2 8 9 2 17 2c7 0 12 4 15 9 3-5 8-9 15-9 8 0 15 6 15 15 0 19-30 37-30 37z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M26 2v14M38 2v12" stroke="currentColor" stroke-width="4"/></svg><span class="l3">mim</span><small>Gálatas 2.20</small>
+        </figure>
+        <figure class="poster po-fundo" aria-label="Mergulhando em águas profundas. Ezequiel 47.1-5">
+          <span class="l1">Mergulhando em</span><span class="l2">águas</span><span class="l3">pro</span><span class="l3">fun</span><span class="l3">das</span><small>Ezequiel 47.1-5</small>
+        </figure>
+        <figure class="poster po-moldando" aria-label="Quem está moldando você? Provérbios 4.23">
+          <small>Provérbios 4.23</small><span class="l1">Quem</span><span class="l2">está</span><span class="l3">moldando</span><span class="l4">você?</span>
+        </figure>
+        <figure class="poster po-coracoes" aria-label="Corações queimando. Lucas 24.32">
+          <span class="l1">Corações</span><svg class="po-fogo" viewBox="0 0 64 80" aria-hidden="true"><path d="M32 78c17 0 28-11 28-27 0-12-6-21-14-30 1 8-3 13-8 14 2-13-5-25-16-33 2 14-4 21-11 29C5 38 4 45 4 51c0 16 11 27 28 27z" fill="#ff6a2b"/><path d="M32 76c-9 0-15-6-15-15 0-7 4-11 8-15 0 5 3 8 6 8-1-8 3-14 9-18-1 9 7 13 7 25 0 9-6 15-15 15z" fill="#ffb347"/></svg><span class="l2">queimando</span><small>Lucas 24.32</small>
+        </figure>
+        <figure class="poster po-atos" aria-label="Será através de nós. Atos 1.8">
+          <span class="l1">Será</span><span class="l2">através</span><span class="l3">de nós</span><small>Atos 1.8</small>
+        </figure>
+      </div>
     </div>
+
+    <!-- Como funciona: três promessas curtas, cada uma com uma peça do jogo do app. -->
+    <div class="lp-como">
+      <div class="lp-passo">
+        <svg class="lp-arte" viewBox="0 0 96 72" aria-hidden="true"><path d="M48 14C38 6 22 4 6 6v56c16-2 32 0 42 8 10-8 26-10 42-8V6C74 4 58 6 48 14z" fill="#5a6b2a"/><path d="M48 16C39 9 25 8 11 10v46c14-1 27 1 37 7z" fill="#fffdf6"/><path d="M48 16c9-7 23-8 37-6v46c-14-1-27 1-37 7z" fill="#f4efe1"/><path d="M19 22h20M19 30h22M19 38h18M57 22h20M57 30h18M57 38h20" stroke="#c8bfa6" stroke-width="3" stroke-linecap="round"/><path d="M70 6v20l5-4 5 4V6" fill="#e2463b"/></svg>
+        <div><h2>15 minutos por dia.</h2><p>Uma leitura curta, com uma reflexão feita para quem está começando. Em um ano, a Bíblia inteira.</p></div>
+      </div>
+      <div class="lp-passo">
+        <svg class="lp-arte" viewBox="0 0 64 80" aria-hidden="true"><path d="M32 78c17 0 28-11 28-27 0-12-6-21-14-30 1 8-3 13-8 14 2-13-5-25-16-33 2 14-4 21-11 29C5 38 4 45 4 51c0 16 11 27 28 27z" fill="#ff7a3d"/><path d="M32 76c-9 0-15-6-15-15 0-7 4-11 8-15 0 5 3 8 6 8-1-8 3-14 9-18-1 9 7 13 7 25 0 9-6 15-15 15z" fill="#ffc44d"/></svg>
+        <div><h2>Não deixe a chama apagar.</h2><p>Cada dia lido acende a ofensiva. Baús, troféus e conquistas marcam o caminho.</p></div>
+      </div>
+      <div class="lp-passo">
+        <span class="lp-arte lp-rostos" aria-hidden="true"><i>A</i><i>D</i><i>R</i><i>+</i></span>
+        <div><h2>Junto é melhor.</h2><p>Leia com amigos, com a sua célula ou com quem te discipula. Um toque lembra quem ainda não leu.</p></div>
+      </div>
+    </div>
+
+    <!-- O fecho: o pôster grande e o convite. -->
+    <div class="lp-final">
+      <figure class="poster po-volte" aria-label="Deus não espera que você volte perfeito. Ele só quer que você volte.">
+        <span class="v1">Deus</span><span class="v2">não espera</span><span class="v2">que você</span><span class="v1">volte</span><span class="v3">perfeito,</span><span class="v2">ele só quer que</span><span class="v2">você</span><span class="v1">volte.</span>
+      </figure>
+      <div class="lp-convite">
+        <h2>Comece hoje. O primeiro dia leva 15 minutos.</h2>
+        <button class="botao" data-ir="cadastro">Começar agora</button>
+      </div>
+    </div>
+
     <div class="links"><a href="termos.html">Termos de Uso</a> · <a href="privacidade.html">Privacidade</a></div>
-    </div>
   </section>
 
   <!-- entrar -->
@@ -334,6 +411,8 @@
 
   function mostrarTela(nome) {
     ['boas', 'entrar', 'cadastro', 'esqueci', 'redefinir'].forEach(function (n) { $('tela-' + n).hidden = n !== nome; });
+    // A boas-vindas é uma página longa: as outras telas abrem do topo.
+    window.scrollTo(0, 0);
     var foco = document.querySelector('#tela-' + nome + ' input, #tela-' + nome + ' button');
     if (nome !== 'boas' && foco) foco.focus();
     if (nome === 'cadastro') irPasso(1);
