@@ -168,6 +168,13 @@ semana e no mês, quantos voltaram 1, 7 e 30 dias depois de criar a conta, onde 
 no plano, Primeiros Passos, escrita, propósitos e notificações. A conta vem de `painel.mjs`
 (função pura, testada em `ferramentas/teste-senha-painel.mjs`).
 
+No alto do mesmo painel fica a **inteligência da igreja** (`inteligencia.mjs`, `GET /api/painel/igreja`):
+adoção e retenção, a chama das células (quanto de cada uma está com a chama acesa hoje, sem
+placar), os frutos do mês (marcos de Minha caminhada) e o check-in de todos em porcentagem. E quem
+conduz uma célula vê, na própria célula, o termômetro da chama, a frequência dos últimos encontros,
+o funil da caminhada e "Precisam de atenção" com gatilhos (inclusive quem perdeu uma ofensiva
+longa). Modelagem, endpoints e decisões de privacidade em [`docs/inteligencia.md`](docs/inteligencia.md).
+
 ## Não é placar
 
 O XP existe só por dentro: ele move as conquistas e não aparece em tela nenhuma, nem no
@@ -322,8 +329,9 @@ vem no Node (`node:sqlite`, nenhuma dependência nova). Roda em modo WAL.
 
 - **Tabelas:** contas, amizades, bloqueios, silenciados, convites; propósitos, seus membros e
   os dias em que cada grupo bateu a meta; novidades e reações; inscrições, preferências e
-  histórico das notificações; o progresso de cada conta (`estados`); metadados. O esquema
-  tem versão (`schema_versao`).
+  histórico das notificações; o progresso de cada conta (`estados`); a cópia achatada das datas
+  de leitura (`leitura_dias`, com as views do painel; ver `docs/inteligencia.md`); metadados. O
+  esquema tem versão (`schema_versao`).
 - **Gravação:** `Contas`, `Novidades` e `Notificacoes` gravam sobre o mesmo objeto em
   memória; a cada gravação, só as linhas que mudaram vão para o banco, numa transação.
 - **Backups:** um por dia (`dados/backup/caminho-AAAA-MM-DD.db.cifrado`, via `VACUUM INTO`),
@@ -444,6 +452,7 @@ node ferramentas/teste-instalar.mjs   o tutorial de pôr o app na tela de iníci
 node ferramentas/teste-foto.mjs       a foto de perfil: escolher, reduzir, sincronizar
 node ferramentas/teste-escuro-forcado.mjs  o escuro forçado do Android não pode inverter o desenho
 node ferramentas/teste-atualizacao.mjs     o app se atualiza mesmo quando abre do cache
+node ferramentas/teste-inteligencia.mjs    os painéis do líder e da igreja: regras, leitura_dias e quem vê o quê
 node ferramentas/textos.mjs           imprime o texto que a pessoa lê, tela por tela
 node ferramentas/foto.mjs 390 900 saida.png '#/'   fotografa uma rota
 ```
