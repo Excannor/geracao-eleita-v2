@@ -1968,7 +1968,8 @@ const servidor = createServer(async (req, res) => {
     // ---------- notificações ----------
     // A caixa do sino: os avisos que saíram para a pessoa (push e interações), mais novos antes.
     if (rota === '/api/avisos' && req.method === 'GET') {
-      if (!exigir(conta, 403, 'entre com uma conta')) return;
+      // Sem conta (só no servidor aberto das ferramentas de teste) a caixa é vazia, sem erro.
+      if (!conta) { json(res, 200, { avisos: [], naoLidos: 0 }); return; }
       json(res, 200, { avisos: NOTIFICACOES.caixaDe(eu), naoLidos: NOTIFICACOES.naoLidos(eu) });
       return;
     }
