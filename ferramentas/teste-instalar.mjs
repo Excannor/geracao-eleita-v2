@@ -99,6 +99,8 @@ const preencheu = await av(`(() => {
   $('email').value = 'ana@teste.com';
   $('usuario').value = 'ana';
   $('senha-nova').value = 'senha-boa-1';
+  // o consentimento sobre o dado de fé (LGPD art. 11) é obrigatório desde o cadastro em passos
+  if ($('consentimento-cadastro')) $('consentimento-cadastro').checked = true;
   return true;
 })()`);
 ok(preencheu, 'o formulário de cadastro está na tela de entrada');
@@ -106,24 +108,22 @@ for (let i = 0; i < 3; i++) {
   await av('document.getElementById("form-cadastro").requestSubmit(); 1', false);
   await dormir(500);
 }
-// A conta nova vai primeiro para a leitura: o tutorial espera a primeira leitura concluída.
+// Conta nova: o tutorial aparece logo na primeira abertura, antes de qualquer leitura (a927797),
+// depois que a abertura sai.
 await esperarAte('!!(window.CC && document.querySelector(".aba"))', 12000);
-await dormir(2500);
-ok(await av('!document.querySelector(".folha-instalar") && localStorage.getItem("cc.instalar") === "1"'),
-  'depois de criar a conta, o app abre na leitura, sem tutorial por cima');
-await av('CC.marcarLido(1, true); 1');
-await dormir(600);
-await cmd('Page.reload');
-const abriu = await esperarAte('!!(window.CC && document.querySelector(".folha-instalar"))', 12000);
-ok(abriu, 'com a primeira leitura feita, o app abre com o tutorial');
+const abriu = await esperarAte('!!document.querySelector(".folha-instalar")', 12000);
+ok(abriu, 'depois de criar a conta, o app abre com o tutorial de instalar');
 ok(await av('localStorage.getItem("cc.instalar") === null'), 'a marca de conta nova sai quando o tutorial aparece: não volta a cada abertura');
 ok(await av('!!document.querySelector(".folha-instalar [data-pular]")'), 'o tutorial tem como pular');
-ok(await av('document.querySelectorAll(".opcao-sistema").length === 2'), 'pergunta se é iPhone ou Android');
-ok(await av('(document.querySelector(\'[data-sistema="android"] .sugerido\') || {}).textContent === "o seu"'),
-  'sugere o sistema do próprio celular');
+// O navegador de teste (Chrome, Android) oferece instalar: a conta nova abre no botão de um
+// toque, e o passo a passo pelo menu fica a um clique, já nos passos do celular reconhecido.
+ok(await av('!!document.querySelector(".folha-instalar [data-instalar-ja]")'), 'com o navegador oferecendo, a conta nova abre no botão de um toque');
+await av('document.querySelector(".folha-instalar [data-passo-a-passo]").click(); 1', false);
+await dormir(300);
+ok(await av('!!document.querySelector(\'.folha-instalar [data-trocar="android"][aria-pressed="true"]\')'), 'o passo a passo reconhece o celular (Android)');
 
 // ---------- iPhone ----------
-await av('document.querySelector(\'[data-sistema="ios"]\').click()');
+await av('document.querySelector(\'[data-trocar="ios"]\').click()');
 await dormir(300);
 const passosIos = await av('[...document.querySelectorAll(".passos-instalar li b")].map((b) => b.textContent)');
 ok(Array.isArray(passosIos) && passosIos.length === 4 && passosIos.some((t) => /Compartilhar/.test(t))
