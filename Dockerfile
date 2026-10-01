@@ -6,7 +6,7 @@ FROM node:24-alpine
 
 WORKDIR /app
 
-COPY package.json build.mjs servidor.mjs contas.mjs novidades.mjs notificacoes.mjs db.mjs propositos.mjs semeador.mjs painel.mjs email.mjs discipulado.mjs cuidado.mjs desafios-grupo.mjs ./
+COPY package.json build.mjs servidor.mjs contas.mjs novidades.mjs notificacoes.mjs db.mjs propositos.mjs semeador.mjs painel.mjs email.mjs discipulado.mjs cuidado.mjs desafios-grupo.mjs inteligencia.mjs ./
 # A pasta inteira: o build importa dela, e copiar arquivo a arquivo já fez a imagem
 # ficar para trás em silêncio quando um novo import apareceu.
 COPY ferramentas ./ferramentas

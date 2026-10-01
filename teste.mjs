@@ -121,6 +121,23 @@ checar(html.includes('@font-face') && html.includes('window.CC') && html.include
 const arquivoConteudo = (html.match(/window\.CONTEUDO_ARQUIVO="(conteudo\.[0-9a-f]+\.json)"/) || [])[1];
 checar(!!arquivoConteudo && existsSync(dist(arquivoConteudo)) && !html.includes('"plano":'), 'o conteúdo saiu do index.html para ' + arquivoConteudo);
 checar(readFileSync(dist('sw.js'), 'utf8').includes('./' + arquivoConteudo), 'o service worker guarda o conteúdo para abrir sem rede');
+// Todo módulo local que o servidor carrega (direto ou por outro módulo) precisa estar na linha
+// COPY do Dockerfile: sem ele, o container nem sobe depois do deploy.
+{
+  const copia = (readFileSync(join(AQUI, 'Dockerfile'), 'utf8').match(/^COPY (.*\.mjs.*) \.\/$/m) || [])[1] || '';
+  const naImagem = new Set(copia.split(/\s+/));
+  const faltam = [];
+  const vistos = new Set();
+  const visitar = (arquivo) => {
+    if (vistos.has(arquivo)) return;
+    vistos.add(arquivo);
+    if (!naImagem.has(arquivo)) faltam.push(arquivo);
+    const fonte = readFileSync(join(AQUI, arquivo), 'utf8');
+    for (const m of fonte.matchAll(/from '\.\/([\w-]+\.mjs)'/g)) visitar(m[1]);
+  };
+  visitar('servidor.mjs');
+  checar(faltam.length === 0, 'todo módulo que o servidor carrega está no COPY do Dockerfile' + (faltam.length ? ' (faltam: ' + faltam.join(', ') + ')' : ''));
+}
 checar(Buffer.byteLength(html) < 1024 * 1024, 'o index.html ficou abaixo de 1 MB (' + Math.round(Buffer.byteLength(html) / 1024) + ' KB)');
 // Três blocos: o tema (uma linha, para a abertura já nascer no tema escolhido), os dados e o app.
 checar(html.split('<script').length - 1 === 3, 'há exatamente três blocos de script: tema da abertura, dados e aplicativo');
