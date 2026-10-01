@@ -49,7 +49,9 @@ export const FUSO_PADRAO = 'America/Sao_Paulo';
 export const IDADE_MINIMA = 12;
 // Versão do texto de consentimento sobre dado de fé (LGPD art. 11). Mudar o texto de um
 // jeito que precise de um "sim" de novo exige subir este número.
-export const CONSENTIMENTO_VERSAO = 1;
+// v2: quem conduz a célula e a administração da igreja passam a ver o painel da célula com
+// nomes (Módulo 5, docs/inteligencia.md §5); quem já tinha conta concorda de novo.
+export const CONSENTIMENTO_VERSAO = 2;
 export const MOTIVOS_DENUNCIA = [
   'Insiste ou incomoda',
   'Nome ou foto impróprios',

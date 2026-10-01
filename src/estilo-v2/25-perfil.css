@@ -298,6 +298,11 @@
 .painel-celula-linha small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; text-wrap: pretty; }
 [data-rota=config] .painel-trilho { background: var(--campo); }
 [data-rota=config] .painel-trilho i { background: var(--inverso); }
+/* cada célula do ranking é um link para a célula de perto */
+a.painel-celula-linha { color: inherit; text-decoration: none; }
+/* a célula aberta pelo admin usa os blocos da própria célula (24-juntos.css) */
+.painel-celula-aberta { display: grid; gap: 4px; padding: 0 var(--gutter, 16px) 24px; }
+.painel-celula-aberta .cartao-saude { margin-bottom: 8px; }
 
 /* colunas do painel: a altura vem de --v (0 a 1) sobre uma área fixa (em %, o flex as deixava
    quase iguais); e os trilhos de porcentagem com a mesma largura em toda linha, para 83% e 71%

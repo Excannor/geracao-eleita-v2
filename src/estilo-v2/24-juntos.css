@@ -283,7 +283,22 @@ button.cartao-proposito:hover { background: var(--campo); }
 .mini-barra.sem i { box-sizing: border-box; height: 24px; border: 1.5px dashed var(--tinta-fraca); background: none; }
 .mini-barra.sem small { color: var(--tinta-fraca); font-weight: 600; }
 .mini-barra em { color: var(--tinta-fraca); font-size: .75rem; font-style: normal; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* quem está com a chama acesa (com os dias seguidos) e apagada, e a presença de cada um nos
+   encontros das últimas semanas: nomes onde ajudam a agir, só para quem conduz e para o admin */
+.saude-nomes { margin: -6px 0 0; color: var(--tinta); font-size: .875rem; font-weight: 500; line-height: 1.5; text-wrap: pretty; }
+.saude-nomes b { color: var(--tinta-forte); font-weight: 700; }
+.presencas { display: grid; gap: 4px; margin-top: 4px; }
+.presencas-linha { display: grid; grid-template-columns: minmax(0, 1fr) repeat(var(--n, 4), 34px); align-items: center; gap: 4px; min-height: 28px; color: var(--tinta-forte); font-size: .875rem; font-weight: 600; }
+.presencas-linha > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.presencas-linha > span small { color: var(--tinta-fraca); font-size: .75rem; font-weight: 600; }
+.presencas-linha.cabeca { min-height: 20px; color: var(--salvia-texto); font-size: .75rem; font-weight: 700; }
+.presencas-linha.cabeca em { font-style: normal; text-align: center; font-variant-numeric: tabular-nums; }
+.presencas-linha i { display: grid; place-items: center; width: 26px; height: 26px; margin: 0 auto; border-radius: 50%; font-style: normal; font-size: .8125rem; font-weight: 800; background: var(--campo); color: var(--tinta-fraca); }
+.presencas-linha i.sim { background: var(--salvia-palido); color: var(--salvia-texto); }
+.presencas-linha i.nao { color: var(--tinta-forte); }
+.presencas-linha i.nulo { background: none; }
 .funil-celula { display: grid; gap: 10px; padding: 16px 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.funil-nomes { margin: -6px 0 2px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 500; line-height: 1.45; text-wrap: pretty; }
 .funil-linha { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 2ch; align-items: center; gap: 12px; min-height: 32px; color: var(--tinta-forte); font-size: .875rem; font-weight: 600; }
 .funil-linha > span:first-child { text-wrap: balance; }
 .funil-linha b { text-align: right; font-size: 1.0625rem; font-variant-numeric: tabular-nums; }

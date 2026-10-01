@@ -213,9 +213,11 @@
   // O mesmo texto do portal de entrada (src/entrar.html): leitura, anotação e participação
   // em grupo de leitura e oração são dado sensível, e pedem um "sim" claro, não escondido
   // em letra miúda.
+  // Versão 2 do texto (CONSENTIMENTO_VERSAO em contas.mjs): quem já tinha conta vê a folha de novo.
   const TEXTO_CONSENTIMENTO = 'Concordo que o Geração Eleita guarde minhas leituras, anotações e a minha '
-    + 'participação em grupos de leitura e oração. São informações sobre a minha fé, e só eu decido o que '
-    + 'meus amigos veem.';
+    + 'participação em grupos de leitura e oração. São informações sobre a minha fé. Só eu decido o que '
+    + 'meus amigos veem; quem conduz a minha célula e a administração da igreja veem como estou caminhando '
+    + '(leitura, presença, etapa de Minha caminhada), nunca o que eu escrevo.';
   const LINK_PRIVACIDADE = '<a href="privacidade.html" target="_blank" rel="noopener">Ler a política de privacidade</a>';
 
   // Folha presa (sem fechar tocando fora) que a abertura do app mostra antes de tudo para

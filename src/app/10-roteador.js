@@ -420,7 +420,7 @@
     else if (rota === 'apoiar') CC.vistaApoiar(conteudo);
     else if (rota === 'avisos') CC.vistaAvisos(conteudo);
     else if (rota === 'perfil') (PERFIL()[arg] || CC.vistaPerfil)(conteudo);
-    else if (rota === 'config') (arg === 'textos' ? CC.vistaTextos : arg === 'notificacoes' ? CC.vistaNotificacoes : arg === 'painel' ? CC.vistaPainel : CC.vistaConfig)(conteudo);
+    else if (rota === 'config') (arg === 'textos' ? CC.vistaTextos : arg === 'notificacoes' ? CC.vistaNotificacoes : arg.startsWith('painel') ? (r) => CC.vistaPainel(r, arg) : CC.vistaConfig)(conteudo);
     else CC.vazio(conteudo, 'Página não encontrada.');
 
     conteudo.classList.toggle('largo', rota === 'nota');

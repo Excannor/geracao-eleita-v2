@@ -2,7 +2,8 @@
 // de quem conduz a célula (chama, frequência, funil, ofensiva perdida, atenção com gatilhos) e
 // do painel da igreja (ranking das células, frutos do mês, check-in, adoção), a cópia achatada
 // das datas de leitura (leitura_dias) e, com servidor, quem vê o quê: o líder vê só a própria
-// célula, o membro comum não vê painel nenhum, só o admin vê a igreja, e nenhum nome sai dela.
+// célula (com nomes), o membro comum não vê painel nenhum, só o admin vê a igreja (sem nome de
+// pessoa) e abre qualquer célula; o que alguém escreveu e o check-in de uma pessoa nunca saem.
 // Uso: node ferramentas/teste-inteligencia.mjs
 import { spawn } from 'node:child_process';
 import { rmSync, readFileSync, mkdtempSync } from 'node:fs';
@@ -82,13 +83,16 @@ console.log('\n  Inteligência: a célula (regras puras)\n');
     { marcos: { decisao: '2026-09-01' }, acompanha: 0, caminho: 'plano', passos: 12 },
     { marcos: { decisao: '2026-01-01', batismo: '2026-06-01' }, acompanha: 0, caminho: 'plano', passos: 12 },
     { marcos: { batismo: '2020-01-01' }, acompanha: 2, caminho: 'plano', passos: 12 },
-    { marcos: { discipula: '2026-03-01' }, acompanha: 0, caminho: 'plano', passos: 5 },
+    { marcos: { discipula: '2026-03-01' }, acompanha: 0, caminho: 'plano', passos: 5, usuario: 'g', nome: 'Gabi' },
+    { marcos: {}, acompanha: 0, caminho: 'plano', passos: 1, usuario: 'h', nome: 'Zé' },
+    { marcos: {}, acompanha: 0, caminho: 'plano', passos: 1, usuario: 'i', nome: 'Ana' },
   ]);
   const por = Object.fromEntries(fu.map((x) => [x.etapa, x]));
   ok(fu.map((x) => x.etapa).join(',') === 'comecando,decidiu,batizado,acompanha', 'o funil tem as 4 etapas, na ordem da caminhada');
-  ok(por.comecando.pessoas === 3 && por.decidiu.pessoas === 1 && por.batizado.pessoas === 1 && por.acompanha.pessoas === 2, 'cada pessoa entra uma vez, na etapa mais adiante: 3 · 1 · 1 · 2');
+  ok(por.comecando.pessoas === 5 && por.decidiu.pessoas === 1 && por.batizado.pessoas === 1 && por.acompanha.pessoas === 2, 'cada pessoa entra uma vez, na etapa mais adiante: 5 · 1 · 1 · 2');
+  ok(por.acompanha.nomes.map((x) => x.nome).join(',') === 'Gabi' && por.comecando.nomes.map((x) => x.nome).join(',') === 'Ana,Zé' && por.decidiu.nomes.length === 0, 'quem trouxe nome sai em "nomes" da etapa, em ordem alfabética; quem não trouxe conta sem nome');
   ok(por.comecando.conhecendo === 1 && por.comecando.passosConcluidos === 1, 'no começo: 1 ainda conhecendo Jesus e 1 que já fechou os 12 passos');
-  ok(fu.reduce((s, x) => s + x.pessoas, 0) === 7, 'a soma do funil é o total de pessoas');
+  ok(fu.reduce((s, x) => s + x.pessoas, 0) === 9, 'a soma do funil é o total de pessoas');
   ok(I.funil([]).every((x) => x.pessoas === 0), 'funil vazio é só zero');
 
   // ofensiva perdida: 40 dias seguidos até 4 dias atrás, nada depois
@@ -170,15 +174,14 @@ console.log('\n  Inteligência: a igreja (regras puras)\n');
 {
   const HOJE = '2026-10-01';
   const r = I.rankingDaChama([
-    { id: 'c1', titulo: 'Célula Esperança', acesos: [true, true, false, true, true, true], frequencia: 8.75 },
-    { id: 'c2', titulo: 'Célula Vida', acesos: [true, false, false, false, false], frequencia: null },
-    { id: 'c3', titulo: 'Célula Nova', acesos: [true, true, true], frequencia: 3 },
+    { id: 'c1', titulo: 'Célula Esperança', lider: 'Marcos', acesos: [true, true, false, true, true, true], frequencia: 8.75 },
+    { id: 'c2', titulo: 'Célula Vida', lider: 'Rute', acesos: [true, false, false, false, false], frequencia: null },
+    { id: 'c3', titulo: 'Célula Nova', lider: 'Davi', acesos: [true, true, false], frequencia: 3 },
     { id: 'c4', titulo: 'Célula Luz', acesos: [true, true, true, true, true, true, true, true, true, true], frequencia: 12 },
   ]);
-  ok(r.map((x) => x.id).join(',') === 'c4,c1,c2,c3', 'as células saem da maior porcentagem para a menor; a pequena vai para o fim');
-  ok(r[1].pct === 83 && r[1].acesos === 5 && r[1].membros === 6 && r[1].frequencia === 8.8, 'cada célula leva porcentagem, acesos, membros e a frequência média arredondada');
-  ok(r[3].poucos && r[3].pct === null && r[3].acesos === null && r[3].membros === 'menos de 5', 'com menos de 5 membros não sai número nenhum: só "menos de 5"');
-  ok(!JSON.stringify(r).includes('total'), 'o total cru não vaza na saída da célula pequena');
+  ok(r.map((x) => x.id).join(',') === 'c4,c1,c3,c2', 'as células saem da maior porcentagem para a menor');
+  ok(r[1].pct === 83 && r[1].acesos === 5 && r[1].membros === 6 && r[1].frequencia === 8.8 && r[1].lider === 'Marcos', 'cada célula leva porcentagem, acesos, membros, o nome do líder e a frequência média arredondada');
+  ok(r[2].pct === 67 && r[2].acesos === 2 && r[2].membros === 3 && r[2].frequencia === 3, 'a célula pequena sai com os números exatos (decisão do dono: o admin abre qualquer célula de perto)');
 
   const contas = [
     { usuario: 'a', marcos: { decisao: '2026-09-28' } }, { usuario: 'b', marcos: { decisao: '2026-09-02', batismo: '2026-09-30' } },
@@ -187,19 +190,22 @@ console.log('\n  Inteligência: a igreja (regras puras)\n');
   ];
   const ev = I.evangelismoDoMes(contas, '2026-09-15');
   ok(ev.mes === '2026-09' && ev.anterior === '2026-08', 'o mês e o anterior saem da data de hoje');
-  ok(ev.deste.decisao === 'menos de 5' && ev.deste.batismo === 'menos de 5' && ev.deste.celula === 6 && ev.deste.discipula === 'menos de 5', 'os marcos do mês contam pessoas: 2 decisões e 1 batismo ficam "menos de 5", 6 entradas em célula saem exatas');
-  ok(ev.doAnterior.decisao === 'menos de 5', 'o mês anterior também passa pela máscara');
+  ok(ev.deste.decisao === 2 && ev.deste.batismo === 1 && ev.deste.celula === 6 && ev.deste.discipula === 0, 'os marcos do mês saem exatos: 2 decisões, 1 batismo, 6 entradas em célula');
+  ok(ev.doAnterior.decisao === 1 && ev.doAnterior.celula === 0, 'o mês anterior também');
   ok(I.evangelismoDoMes([], '2026-01-10').anterior === '2025-12', 'janeiro olha para dezembro do ano anterior');
 
   const ck = (u, data, c, m, e) => ({ usuario: u, data, corpo: c, mente: m, espirito: e });
   const poucos = I.saudeDosCheckins([ck('a', HOJE, 1, 1, 1), ck('b', HOJE, 3, 3, 3), ck('c', HOJE, 2, 1, 3), ck('d', HOJE, 1, 1, 2)]);
-  ok(!poucos.suficiente && poucos.esferas === null && poucos.base === 'menos de 5', 'com 4 pessoas nada sai: nem porcentagem nem base exata');
+  ok(!poucos.suficiente && poucos.esferas === null && poucos.base === 4 && poucos.minimo === 5, 'na igreja, com 4 pessoas não sai esfera nenhuma: só a base e o mínimo');
+  const daCelula = I.saudeDosCheckins([ck('a', HOJE, 1, 1, 1), ck('b', HOJE, 3, 3, 3), ck('c', HOJE, 2, 1, 3)], { minimo: I.MINIMO_CHECKIN_CELULA });
+  ok(I.MINIMO_CHECKIN_CELULA === 3 && daCelula.suficiente && daCelula.base === 3 && daCelula.esferas.mente.n.baixa === 2 && daCelula.esferas.mente.baixa === 67, 'na célula, a soma sai a partir de 3 pessoas, com a contagem (2 de 3 com a mente em baixa) e a porcentagem');
+  ok(!I.saudeDosCheckins([ck('a', HOJE, 1, 1, 1), ck('b', HOJE, 3, 3, 3)], { minimo: I.MINIMO_CHECKIN_CELULA }).suficiente, 'com 2 pessoas na célula, nada: "1 de 2 em baixa" seria quase um nome');
   const s = I.saudeDosCheckins([
     ck('a', somaDias(HOJE, -3), 1, 1, 1), ck('a', HOJE, 3, 3, 3), // o último da Ana vale, não o primeiro
     ck('b', HOJE, 3, 1, 3), ck('c', HOJE, 2, 1, 3), ck('d', HOJE, 1, 1, 2), ck('e', HOJE, 2, 2, 2),
   ]);
   ok(s.suficiente && s.base === 5, 'com 5 pessoas a saúde sai, com a base');
-  ok(s.esferas.mente.baixa === 60 && s.esferas.corpo.baixa === 20 && s.esferas.espirito.alta === 60, 'mente baixa em 60%, corpo baixo em 20%, espírito alto em 60% (vale o último check-in de cada um)');
+  ok(s.esferas.mente.baixa === 60 && s.esferas.corpo.baixa === 20 && s.esferas.espirito.alta === 60 && s.esferas.mente.n.baixa === 3, 'mente baixa em 60% (3 de 5), corpo baixo em 20%, espírito alto em 60% (vale o último check-in de cada um)');
   ok(!JSON.stringify(s).includes('"usuario"'), 'a saúde da igreja não leva quem respondeu');
 
   const contasUso = [
@@ -254,6 +260,7 @@ console.log('\n  Inteligência: leitura_dias\n');
   ok(freq.get('p1') === 3, 'a view celula_frequencia: média de (3 + 2) e (1 + 0), sem a semana sem encontro, dá 3');
   db.prepare('INSERT INTO checkins (usuario, data, corpo, mente, espirito, em) VALUES (?, ?, ?, ?, ?, ?)').run('ana', '2026-09-30', 1, 2, 3, 'x');
   ok(I.checkinsEntre(db, '2026-09-24', '2026-10-01').length === 1 && I.checkinsEntre(db, '2026-09-30', '2026-10-01').length === 0, 'os check-ins da janela (de, ate]');
+  ok(I.checkinsDe(db, ['ana', 'bia'], '2026-09-24', '2026-10-01').length === 1 && I.checkinsDe(db, ['bia'], '2026-09-24', '2026-10-01').length === 0 && I.checkinsDe(db, [], '2026-09-24', '2026-10-01').length === 0, 'os check-ins só de algumas pessoas (os membros de uma célula)');
 
   B.apagarPessoaDoBanco(db, 'ana');
   ok(db.prepare('SELECT COUNT(*) AS n FROM leitura_dias WHERE usuario = ?').get('ana').n === 0 && db.prepare('SELECT COUNT(*) AS n FROM checkins').get().n === 0, 'apagar a pessoa do banco leva as datas e os check-ins dela');
@@ -264,7 +271,7 @@ console.log('\n  Inteligência: leitura_dias\n');
 // ---------- com servidor: quem vê o quê ----------
 try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
 const servidor = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
-  env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_TESTE: '1', CAMINHO_ADMIN: 'lider' },
+  env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_TESTE: '1', CAMINHO_ADMIN: 'pastor' },
   stdio: 'ignore',
 });
 const base = 'http://127.0.0.1:' + PORTA;
@@ -308,6 +315,8 @@ try {
   const eva = await criar('eva');
   await pedir('/api/celula', { acao: 'entrar', token, visitante: true }, eva.cookie);
   const fora = await criar('fora');
+  const pastor = await criar('pastor'); // o administrador, que não é da célula
+  const outra = await dados(await pedir('/api/celula', { acao: 'criar', titulo: 'Célula do Fora' }, fora.cookie)); // o fora é líder de outra célula
 
   // o progresso de cada um: hoje (líder, Dora, Eva), ontem (Ana), 40 dias até 4 dias atrás (Bia), parado há 9 dias (Caio)
   progressoDireto('lider', [somaDias(HOJE, -1), HOJE]);
@@ -316,6 +325,7 @@ try {
   progressoDireto('caio', [somaDias(HOJE, -10), somaDias(HOJE, -9)]);
   progressoDireto('dora', [HOJE]);
   progressoDireto('eva', [HOJE]);
+  progressoDireto('pastor', [HOJE]);
   // os marcos: Ana decidiu seguir Jesus neste mês, Bia já se batizou, o líder acompanha alguém
   await pedir('/api/discipulado', { acao: 'marco', chave: 'decisao', data: HOJE }, ana.cookie);
   await pedir('/api/discipulado', { acao: 'marco', chave: 'batismo', data: '2024-05-05' }, bia.cookie);
@@ -329,11 +339,18 @@ try {
   ok(doLider && doLider.euConduzo && doLider.painel, 'quem conduz recebe o painel da célula no retrato de sempre (sem pedido a mais)');
   const pc = doLider.painel;
   ok(pc.chama.total === 5 && pc.chama.acesos === 3 && pc.chama.pct === 60, 'a chama da célula: 3 de 5 membros de verdade (60%); a visitante não entra');
+  ok(pc.chama.pessoas.map((x) => x.usuario + (x.acesa ? '+' : '-')).join(',') === 'ana+,lider+,dora+,bia-,caio-' && pc.chama.pessoas[0].dias === 2 && !pc.chama.pessoas.some((x) => x.usuario === 'eva'), 'quem conduz vê quem está com a chama acesa (com os dias seguidos, as maiores primeiro) e apagada, pelo nome; a visitante fica fora');
+  const presencaDe = (u) => pc.frequencia.presencas.find((x) => x.usuario === u);
+  // Todos entraram na célula hoje: os encontros de antes não contam para ninguém (null), só o de hoje.
+  ok(pc.frequencia.presencas.length === 6 && presencaDe('eva').papel === 'visitante' && presencaDe('caio').encontros.join(',') === ',,false' && presencaDe('dora').encontros.join(',') === ',,true' && presencaDe('eva').encontros[2] === true,
+    'a presença de cada um nos encontros da janela (a visitante inclusive): antes de entrar na célula é null, Caio faltou hoje e Dora foi');
   ok(pc.frequencia.encontros.length === 3 && pc.frequencia.encontros[0].pessoas === 4 && pc.frequencia.encontros[1].semEncontro && pc.frequencia.encontros[1].pessoas === null && pc.frequencia.encontros[2].pessoas === 6,
     'a frequência: 4 pessoas, semana sem encontro, 6 pessoas (5 com conta, inclusive a visitante, mais 1 sem conta)');
   ok(pc.frequencia.tendencia === 'subindo' && pc.frequencia.diferenca === 2, 'tendência: 2 a mais que o encontro anterior');
   const funilPor = Object.fromEntries(pc.funil.map((x) => [x.etapa, x.pessoas]));
   ok(funilPor.comecando === 2 && funilPor.decidiu === 1 && funilPor.batizado === 1 && funilPor.acompanha === 1, 'o funil: 2 começando (Caio, Dora), 1 decidiu (Ana), 1 batizada (Bia), 1 acompanha (o líder)');
+  ok(pc.funil.find((x) => x.etapa === 'comecando').nomes.map((x) => x.nome).join(',') === 'caio,dora' && pc.funil.find((x) => x.etapa === 'batizado').nomes[0].usuario === 'bia', 'cada etapa do funil leva os nomes de quem está nela');
+  ok(pc.saude && !pc.saude.suficiente && pc.saude.base === 0 && pc.saude.minimo === 3, 'o check-in da célula somado: sem check-in ainda, só a base e o mínimo');
   // Todos entraram na célula hoje: quem chega no dia não "faltou" ao encontro de hoje (regra de
   // propositos.mjs), então aqui só valem os gatilhos de leitura.
   const porUsuario = Object.fromEntries(doLider.atencao.map((x) => [x.usuario, x]));
@@ -344,35 +361,52 @@ try {
 
   const daAna = await celulaDe(ana.cookie, id);
   ok(daAna && !daAna.euConduzo && !('painel' in daAna) && !('atencao' in daAna) && !('semanaLider' in daAna), 'membro comum não recebe painel, atenção nem a semana do líder');
+  const textoAna = JSON.stringify(daAna);
+  ok(!/acesa|presencas|funil|saude|perdeu uma ofensiva|sem ler há/.test(textoAna), 'nada do painel (chama de cada um, presenças, funil, check-in, alertas) vaza no retrato do membro comum');
+  const daEva = await celulaDe(eva.cookie, id);
+  ok(daEva && !('painel' in daEva) && !/presencas|funil/.test(JSON.stringify(daEva)), 'nem no da visitante');
   const rotaPainel = '/api/painel/celula?id=' + encodeURIComponent(id);
   const direto = await pedir(rotaPainel, null, lider.cookie);
   const dp = await dados(direto);
   ok(direto.status === 200 && dp.chama.pct === 60 && dp.funil.length === 4 && dp.atencao.length === 2 && dp.id === id, 'GET /api/painel/celula?id devolve o mesmo painel para quem conduz');
   ok((await pedir(rotaPainel, null, ana.cookie)).status === 403, 'membro comum: 403 no painel da célula');
-  ok((await pedir(rotaPainel, null, fora.cookie)).status === 404, 'quem não é da célula: 404');
+  ok((await pedir(rotaPainel, null, eva.cookie)).status === 403, 'visitante: 403');
+  ok((await pedir(rotaPainel, null, fora.cookie)).status === 404, 'líder de outra célula: 404 (a célula nem existe para ele)');
   ok((await pedir('/api/painel/celula?id=inventada', null, lider.cookie)).status === 404, 'célula inventada: 404');
+  ok((await pedir('/api/painel/celula?id=' + encodeURIComponent(outra.proposito.id), null, lider.cookie)).status === 404, 'o líder não abre a célula do outro');
+  // O administrador abre qualquer célula, com o mesmo detalhe que o líder dela vê.
+  const doPastor = await pedir(rotaPainel, null, pastor.cookie);
+  const dpa = await dados(doPastor);
+  ok(doPastor.status === 200 && dpa.titulo === 'Célula de quinta' && dpa.lider === 'lider' && dpa.membros === 6 && dpa.chama.pct === 60 && dpa.chama.pessoas.length === 5 && dpa.funil[2].nomes[0].usuario === 'bia' && dpa.atencao.length === 2 && dpa.frequencia.presencas.length === 6,
+    'o admin, que não é da célula, recebe o painel inteiro dela: líder, membros, chama com nomes, funil com nomes, presenças e atenção');
+  ok((await pedir('/api/painel/celula?id=' + encodeURIComponent(outra.proposito.id), null, pastor.cookie)).status === 200, 'e abre a outra célula também');
+  ok(!/segredo|"oia"|reflex/.test(JSON.stringify(dpa) + JSON.stringify(dp)), 'nada do que alguém escreveu sai no painel da célula (nem para o admin)');
 
   console.log('\n  Com servidor: o painel da igreja\n');
   for (const [quem, c, m, e] of [[lider, 3, 1, 3], [ana, 2, 1, 2], [bia, 1, 1, 1], [caio, 3, 2, 3], [dora, 2, 2, 2]]) {
     await pedir('/api/discipulado', { acao: 'checkin', corpo: c, mente: m, espirito: e }, quem.cookie);
   }
+  const dpSaude = await dados(await pedir(rotaPainel, null, lider.cookie));
+  ok(dpSaude.saude.suficiente && dpSaude.saude.base === 5 && dpSaude.saude.esferas.mente.n.baixa === 3 && !JSON.stringify(dpSaude.saude).includes('usuario'), 'o check-in da célula sai somado para quem conduz (3 de 5 com a mente em baixa), nunca por pessoa');
   ok((await pedir('/api/painel/igreja', null, ana.cookie)).status === 403, 'quem não é admin: 403 no painel da igreja');
+  ok((await pedir('/api/painel/igreja', null, lider.cookie)).status === 403, 'nem o líder de célula');
   ok((await pedir('/api/painel/igreja', null, fora.cookie)).status === 403, 'nem quem está fora da célula');
-  const r = await pedir('/api/painel/igreja', null, lider.cookie);
+  const r = await pedir('/api/painel/igreja', null, pastor.cookie);
   const ig = await dados(r);
   ok(r.status === 200 && ig.hoje === HOJE && ig.geradoEm, 'o admin recebe o painel da igreja, com a data e a hora da conta');
-  ok(ig.adocao.contas === 7 && ig.adocao.hoje.abriram === 7 && ig.adocao.hoje.leram === 3, 'adoção: 7 contas, todas abriram hoje, 3 leram hoje (líder, Dora, Eva)');
+  ok(ig.adocao.contas === 8 && ig.adocao.hoje.abriram === 8 && ig.adocao.hoje.leram === 4, 'adoção: 8 contas, todas abriram hoje, 4 leram hoje (líder, Dora, Eva, pastor)');
   ok(ig.adocao.serie.length === 14 && ig.adocao.serie[13].dia === HOJE && ig.adocao.serie[12].leram === 2, 'a série de 14 dias: ontem leram 2 (líder e Ana)');
   ok(ig.adocao.retencao.base === 0 && ig.adocao.retencao.pct === null, 'retenção ainda sem base: ninguém tem 30 dias de conta');
-  ok(ig.chamaDasCelulas.length === 1 && ig.chamaDasCelulas[0].titulo === 'Célula de quinta' && ig.chamaDasCelulas[0].pct === 60 && ig.chamaDasCelulas[0].membros === 5 && ig.chamaDasCelulas[0].frequencia === 5,
-    'a chama das células: a célula com 60% (3 de 5) e frequência média 5 nos últimos encontros');
-  ok(ig.evangelismo.mes === HOJE.slice(0, 7) && ig.evangelismo.deste.decisao === 'menos de 5' && ig.evangelismo.deste.batismo === 'menos de 5', 'frutos do mês: 1 decisão vira "menos de 5"');
+  ok(ig.chamaDasCelulas.length === 2 && ig.chamaDasCelulas[0].titulo === 'Célula de quinta' && ig.chamaDasCelulas[0].pct === 60 && ig.chamaDasCelulas[0].membros === 5 && ig.chamaDasCelulas[0].frequencia === 5 && ig.chamaDasCelulas[0].lider === 'lider',
+    'a chama das células: a célula com 60% (3 de 5), o nome do líder e frequência média 5 nos últimos encontros');
+  ok(ig.chamaDasCelulas[1].titulo === 'Célula do Fora' && ig.chamaDasCelulas[1].membros === 1 && ig.chamaDasCelulas[1].pct === 0, 'a célula de 1 pessoa sai com o número exato');
+  ok(ig.evangelismo.mes === HOJE.slice(0, 7) && ig.evangelismo.deste.decisao === 1 && ig.evangelismo.deste.batismo === 0, 'frutos do mês: 1 decisão neste mês, exata');
   ok(ig.saude.suficiente && ig.saude.base === 5 && ig.saude.esferas.mente.baixa === 60 && ig.saude.esferas.corpo.baixa === 20, 'saúde: 5 check-ins bastam; 60% com a mente baixa, 20% com o corpo baixo');
   // O painel antigo, na mesma tela: a semana "sem encontro" não vira encontro com zero pessoas.
-  const antigoPainel = await dados(await pedir('/api/painel', null, lider.cookie));
+  const antigoPainel = await dados(await pedir('/api/painel', null, pastor.cookie));
   ok(antigoPainel.celulasECuidado && antigoPainel.celulasECuidado.frequenciaMedia === 5 && antigoPainel.celulasECuidado.celulasComEncontro === 1, 'a frequência média do painel antigo ignora a semana sem encontro: (4 + 6) / 2 = 5, e a célula conta como "registrou encontro"');
   const textoIgreja = JSON.stringify(ig);
-  ok(!/"(lider|ana|bia|caio|dora|eva|fora)"|@|usuario|teste\.com/.test(textoIgreja), 'o painel da igreja não leva nome, @, e-mail nem usuário de ninguém');
+  ok(!/"(ana|bia|caio|dora|eva)"|@|usuario|teste\.com|"pessoas":\[|presencas|nomes/.test(textoIgreja), 'o painel da igreja não leva nome de membro, @, e-mail nem usuário de ninguém (só o nome do líder de cada célula)');
   ok(!/corpo":1|"oia"|segredo/.test(textoIgreja), 'nem o check-in de uma pessoa nem o que alguém escreveu');
 
   // a cópia das datas acompanha a sincronização pela API
@@ -381,10 +415,10 @@ try {
   const deCaio = db.prepare('SELECT data FROM leitura_dias WHERE usuario = ? ORDER BY data').all('caio').map((l) => l.data);
   B.fecharBanco(B.arquivoDoBanco(PASTA));
   ok(deCaio.join(',') === [somaDias(HOJE, -10), somaDias(HOJE, -9), HOJE].join(','), 'PUT /api/estado atualiza leitura_dias (a lição de hoje entrou)');
-  const igDepois = await dados(await pedir('/api/painel/igreja', null, lider.cookie));
-  ok(igDepois.adocao.hoje.leram === 3 && igDepois.geradoEm === ig.geradoEm, 'o painel da igreja fica em cache por uns minutos: a mesma geração');
-  const aoMesmoTempo = await Promise.all([1, 2, 3].map(() => pedir('/api/painel/igreja', null, lider.cookie).then(dados)));
-  ok(aoMesmoTempo.every((x) => x.geradoEm === ig.geradoEm && x.adocao.contas === 7), 'três pedidos ao mesmo tempo recebem o mesmo painel, sem refazer a conta');
+  const igDepois = await dados(await pedir('/api/painel/igreja', null, pastor.cookie));
+  ok(igDepois.adocao.hoje.leram === 4 && igDepois.geradoEm === ig.geradoEm, 'o painel da igreja fica em cache por uns minutos: a mesma geração');
+  const aoMesmoTempo = await Promise.all([1, 2, 3].map(() => pedir('/api/painel/igreja', null, pastor.cookie).then(dados)));
+  ok(aoMesmoTempo.every((x) => x.geradoEm === ig.geradoEm && x.adocao.contas === 8), 'três pedidos ao mesmo tempo recebem o mesmo painel, sem refazer a conta');
 } finally {
   servidor.kill();
   await dormir(300);

@@ -1,6 +1,7 @@
-/* Painel do app: só o dono vê (CAMINHO_ADMIN no servidor). Números agregados, sem nome de
-   ninguém, para saber se o app funciona: quem volta, onde as pessoas param. E os pedidos de
-   senha esquecida, com o link que o dono manda à mão enquanto não há e-mail configurado. */
+/* Painel do app: só o administrador vê (CAMINHO_ADMIN no servidor). A igreja de longe (números
+   somados, sem nome de ninguém) e, tocando numa célula, a célula de perto, com o que o líder
+   dela vê. E os pedidos de senha esquecida, com o link que o dono manda à mão enquanto não há
+   e-mail configurado. */
 (function (CC) {
   'use strict';
 
@@ -68,8 +69,8 @@
   }
 
   // ---------- a igreja de longe (api/painel/igreja, inteligencia.mjs) ----------
-  // Adoção e retenção, a chama das células, os frutos do mês e o check-in de todos. Agregados
-  // sem ninguém pelo nome; onde o número contaria pessoas de menos, vem "menos de 5".
+  // Adoção e retenção, a chama das células (cada uma abre a célula de perto), os frutos do mês
+  // e o check-in de todos, somado. Sem ninguém pelo nome aqui.
   const ROTULOS_MARCO = { decisao: 'Decidi seguir Jesus', batismo: 'Me batizei', celula: 'Entrei numa célula', discipula: 'Comecei a acompanhar alguém' };
   const ESFERAS = { corpo: 'Corpo', mente: 'Mente', espirito: 'Espírito' };
   const mesNome = (m) => new Date(m + '-15T12:00:00Z').toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' });
@@ -84,11 +85,11 @@
       + colunas(a.serie.map((x) => ({ contas: x.abriram, dia: x.dia })), (x) => diaMes(x.dia));
     const celulas = g.chamaDasCelulas || [];
     const chamaHtml = celulas.length
-      ? celulas.map((c) => '<div class="linha-config sem-toque painel-barra painel-celula-linha"><span>' + CC.esc(c.titulo)
-        + '<small>' + (c.poucos ? 'menos de 5 pessoas' : CC.plural(c.membros, 'pessoa', 'pessoas'))
+      ? celulas.map((c) => '<a class="linha-config painel-barra painel-celula-linha" href="' + enderecoCelula(c.id) + '"><span>' + CC.esc(c.titulo)
+        + '<small>' + CC.plural(c.membros, 'pessoa', 'pessoas') + (c.lider ? ' · ' + CC.esc(c.lider) : '')
         + (c.frequencia === null ? '' : ' · ' + virgula(c.frequencia) + ' por encontro') + '</small></span>'
-        + (c.poucos ? '<span class="valor">sem número</span>'
-          : '<span class="painel-trilho" aria-hidden="true"><i style="width:' + c.pct + '%"></i></span><span class="valor">' + c.pct + '%</span>') + '</div>').join('')
+        + (c.pct === null ? '<span class="valor">sem membros</span>'
+          : '<span class="painel-trilho" aria-hidden="true"><i style="width:' + c.pct + '%"></i></span><span class="valor">' + c.pct + '%</span>') + '</a>').join('')
       : '<div class="linha-config sem-toque"><span>Nenhuma célula ativa ainda</span></div>';
     const ev = g.evangelismo;
     const frutosHtml = Object.keys(ROTULOS_MARCO).map((k) => linha2(ROTULOS_MARCO[k], 'Neste mês: ' + ev.deste[k] + ' · em ' + mesNome(ev.anterior) + ': ' + ev.doAnterior[k])).join('');
@@ -96,18 +97,44 @@
     const saudeHtml = s.suficiente
       ? Object.keys(ESFERAS).map((k) => '<div class="linha-config sem-toque painel-barra"><span>' + ESFERAS[k] + ' em baixa</span>'
         + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + s.esferas[k].baixa + '%"></i></span><span class="valor">' + s.esferas[k].baixa + '%</span></div>').join('')
-      : '<div class="linha-config sem-toque"><span>Ainda poucos check-ins nesta semana (' + CC.esc(String(s.base)) + ' pessoas)</span></div>';
+      : '<div class="linha-config sem-toque"><span>Ainda poucos check-ins nesta semana (' + CC.plural(s.base, 'pessoa', 'pessoas') + '; a soma aparece a partir de ' + s.minimo + ')</span></div>';
     return grupo('Adoção e retenção', adocaoHtml,
       'Quem abre o app a cada dia, nos últimos 14 dias. "Ainda leem": das contas com 30 dias ou mais, quantas leram nesta semana.')
       + grupo('Chama das células', chamaHtml,
-        'Quanto de cada célula está com a chama acesa hoje (leu hoje ou manteve a sequência). É um retrato do dia para animar os líderes, não um placar. Célula com menos de 5 pessoas fica sem número.')
+        'Quanto de cada célula está com a chama acesa hoje (leu hoje ou manteve a sequência). É um retrato do dia para animar os líderes, não um placar. Toque numa célula para vê-la de perto, como o líder dela vê.')
       + grupo('Frutos em ' + mesNome(ev.mes), frutosHtml,
-        'Marcos de Minha caminhada com data no mês, pelo que cada pessoa marcou. Com menos de 5, aparece "menos de 5".')
+        'Marcos de Minha caminhada com data no mês, pelo que cada pessoa marcou.')
       + grupo('Como a igreja está', saudeHtml,
-        'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (s.suficiente ? ' (' + s.base + ' pessoas)' : '') + '. Só porcentagens, sem nomes; com menos de 5 pessoas nada aparece.');
+        'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (s.suficiente ? ' (' + s.base + ' pessoas)' : '') + '. Só a soma, sem nomes: o check-in de uma pessoa nunca aparece aqui.');
   }
 
-  CC.vistaPainel = async function (raiz) {
+  // ---------- uma célula de perto (api/painel/celula) ----------
+  // O administrador abre qualquer célula e vê o que o líder dela vê (08b-propositos.js desenha
+  // os mesmos blocos): a chama de cada um, a presença, o check-in somado, a caminhada e quem
+  // precisa de atenção. Nunca o que alguém escreveu.
+  const enderecoCelula = (id) => '#/config/painel/celula/' + encodeURIComponent(id);
+  const DIAS_SEMANA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+  async function vistaPainelCelula(raiz, id) {
+    const cabeca = (titulo, dentro) => '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Painel') + '<h1>' + CC.esc(titulo) + '</h1>' + (dentro || '') + '</div>';
+    raiz.innerHTML = cabeca('Célula') + CC.esqueleto('cartoes');
+    let d;
+    try { d = await CC.api('api/painel/celula?id=' + encodeURIComponent(id)); } catch (e) {
+      raiz.innerHTML = cabeca('Célula') + CC.estado({ erro: true, titulo: 'Não deu para abrir a célula', texto: e.message, acao: 'Voltar ao painel' });
+      const b = raiz.querySelector('[data-acao-estado]');
+      if (b) b.onclick = () => { location.hash = '#/config/painel'; };
+      return;
+    }
+    if (location.hash !== enderecoCelula(id)) return;
+    const p = { ...d, painel: d, membros: [] };
+    raiz.innerHTML = cabeca(d.titulo, '<p class="passo-dica">' + CC.esc((d.lider ? 'Líder: ' + d.lider + ' · ' : '') + CC.plural(d.membros, 'pessoa', 'pessoas')
+      + (d.encontro >= 0 ? ' · encontro ' + (d.encontro === 0 || d.encontro === 6 ? 'aos ' + DIAS_SEMANA[d.encontro] + 's' : 'às ' + DIAS_SEMANA[d.encontro] + 's-feiras') : '')
+      + ' · em ' + d.referencia.split('-').reverse().join('/')) + '</p>')
+      + '<div class="painel-celula-aberta">' + CC.painelDaCelulaHtml(p) + '</div>';
+    raiz.querySelectorAll('[data-voltar]').forEach((b) => { b.onclick = () => { location.hash = '#/config/painel'; }; });
+  }
+
+  CC.vistaPainel = async function (raiz, arg) {
+    if (arg && arg.startsWith('painel/celula/')) return vistaPainelCelula(raiz, arg.slice('painel/celula/'.length));
     // .folha-perfil: só apresentação, a folha do alto (25-perfil.css); o título longo desce
     // para baixo do voltar (.titulo-frase) e os quatro números viram os cartões de destaque.
     const cabeca = (dentro) => '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1>' + (dentro || '') + '</div>';

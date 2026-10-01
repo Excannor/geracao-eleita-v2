@@ -31,7 +31,8 @@ import { montarPainel } from './painel.mjs';
 import {
   chamaAcesa, termometro, frequencia, funil, ofensivaPerdida, atencaoComGatilhos, rankingDaChama, evangelismoDoMes,
   saudeDosCheckins, adocao, sincronizarLeituraDias, preencherLeituraDias, apagarLeituraDias, leiturasPorDia, quemLeuEntre,
-  datasDesde, frequenciaMediaPorCelula, checkinsEntre, JANELA_CHAMA, JANELA_CHECKIN, DIAS_SERIE_ADOCAO,
+  datasDesde, frequenciaMediaPorCelula, checkinsEntre, checkinsDe, JANELA_CHAMA, JANELA_CHECKIN, DIAS_SERIE_ADOCAO,
+  MINIMO_CHECKIN_CELULA,
 } from './inteligencia.mjs';
 import { configDoEmail, enviarEmail } from './email.mjs';
 
@@ -589,7 +590,8 @@ async function avisarEntradaNaCelula(eu, r, hoje) {
 // ---------- propósitos ----------
 // O retrato de um propósito hoje, como o app mostra: quem já fez, os pontos do grupo e os dias
 // juntos. Leva só se cada um fez, nunca o que alguém escreveu ou orou.
-async function retratoDoProposito(p, eu) {
+// verTudo: o administrador abrindo uma célula que não é dele vê o que o líder dela vê.
+async function retratoDoProposito(p, eu, { verTudo = false } = {}) {
   const hojeEu = hojeDe(eu);
   const info = new Map();
   for (const m of p.membros) {
@@ -645,7 +647,7 @@ async function retratoDoProposito(p, eu) {
     id: p.id, tipo: p.tipo, alvo: p.alvo, titulo: p.titulo, grupo: p.grupo, celula: !!p.celula, limite: limiteDo(p),
     criadoPor: p.criadoPor, criadoEm: p.criadoEm,
     dias, hoje, membros, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
-    ...(p.celula ? celulaNoRetrato(p, eu, info, ativos, referencia) : {}),
+    ...(p.celula ? celulaNoRetrato(p, eu, info, ativos, referencia, verTudo) : {}),
   };
 }
 
@@ -677,7 +679,7 @@ function bannerMultiplicacao(p, referencia) {
   return { nasceuDe, multiplicouPara };
 }
 
-function celulaNoRetrato(p, eu, info, ativos, referencia) {
+function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const lider = info.get(p.criadoPor);
   const lidos = ((lider && lider.estado && lider.estado.lidos) || []).map(Number).filter((n) => n >= 1 && n <= PLANO_DO_CONTEUDO.length);
   const semanaAte = Math.max(7, lidos.length ? Math.max(...lidos) : 0);
@@ -689,7 +691,7 @@ function celulaNoRetrato(p, eu, info, ativos, referencia) {
     euConduzo: conduzo,
     ...bannerMultiplicacao(p, referencia),
   };
-  if (!conduzo) return extra;
+  if (!conduzo && !verTudo) return extra;
   const semana = new Set(Array.from({ length: 7 }, (_, i) => somaDias(referencia, -i)));
   let leram = 0;
   let leituras = 0;
@@ -727,20 +729,38 @@ function celulaNoRetrato(p, eu, info, ativos, referencia) {
   };
 }
 
-// O painel de quem conduz (inteligencia.mjs): a chama da célula, a frequência dos últimos
-// encontros e o funil da caminhada. Só contagens da própria célula, a partir do que o retrato
-// já carregou: nenhuma leitura a mais do banco. Quem conduz também conta na chama e no funil.
+// O painel de quem conduz (inteligencia.mjs), que o administrador também abre: a chama da célula
+// (com quem está acesa e apagada), a frequência das últimas 4 semanas (com a presença de cada
+// um), o funil da caminhada (com quem está em cada etapa) e o check-in da célula somado, sem
+// nome. Nomes onde ajudam a agir, pela decisão do dono (docs/inteligencia.md §5); nunca o que
+// alguém escreveu, e o check-in de uma pessoa nunca. Tudo a partir do que o retrato já carregou,
+// mais uma consulta aos check-ins dos membros. Quem conduz também conta na chama e no funil.
 function painelDaCelula(p, info, ativos, referencia) {
+  const nomeDe = (u) => { const x = info.get(u); return (x && ((x.estado && x.estado.apelido) || x.conta.nome)) || u; };
+  const freq = frequencia(p.encontros || [], referencia);
+  const porData = new Map((p.encontros || []).map((e) => [e.data, e]));
+  // Presença de cada pessoa ativa (visitante inclusive: ele vai ao encontro) nos encontros da
+  // janela: true/false, ou null quando não houve encontro ou a pessoa ainda não estava na célula.
+  const presencas = p.membros.filter((m) => m.estado === 'ativo' && info.has(m.usuario)).map((m) => ({
+    usuario: m.usuario, nome: nomeDe(m.usuario), papel: m.papel || '', conduz: podeConduzir(p, m.usuario),
+    encontros: freq.encontros.map((e) => (e.semEncontro || (m.entrouEm && e.data < m.entrouEm) ? null : ((porData.get(e.data) || {}).presentes || []).includes(m.usuario))),
+  })).sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
+  const pessoasChama = ativos.map((m) => {
+    const x = info.get(m.usuario);
+    return { usuario: m.usuario, nome: nomeDe(m.usuario), acesa: chamaAcesa(x.simulacao), dias: Number(x.simulacao.atual) || 0, conduz: podeConduzir(p, m.usuario) };
+  }).sort((a, b) => (b.acesa - a.acesa) || (b.dias - a.dias) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
   return {
-    chama: termometro(ativos.map((m) => chamaAcesa(info.get(m.usuario).simulacao))),
-    frequencia: frequencia(p.encontros || [], referencia),
+    chama: { ...termometro(pessoasChama.map((x) => x.acesa)), pessoas: pessoasChama },
+    frequencia: { ...freq, presencas },
     funil: funil(ativos.map((m) => {
       const x = info.get(m.usuario);
       return {
+        usuario: m.usuario, nome: nomeDe(m.usuario),
         marcos: x.conta.marcos || {}, acompanha: CONTAS.discipulosAtivosDe(m.usuario).length,
         caminho: x.conta.caminho || 'plano', passos: new Set((x.estado && x.estado.licoes) || []).size,
       };
     })),
+    saude: saudeDosCheckins(checkinsDe(DB, ativos.map((m) => m.usuario), somaDias(referencia, -JANELA_CHECKIN), referencia), { minimo: MINIMO_CHECKIN_CELULA }),
   };
 }
 
@@ -783,7 +803,7 @@ async function montarPainelDaIgreja(hoje) {
     if (i && i % CELULAS_POR_LOTE === 0) await respirar();
     const p = ativas[i];
     celulas.push({
-      id: p.id, titulo: p.titulo,
+      id: p.id, titulo: p.titulo, lider: await nomeDeExibicao(p.criadoPor),
       acesos: p.membros.filter(membroDeVerdade).map((m) => chamaAcesa(simular(m.usuario))),
       frequencia: frequencias.has(p.id) ? frequencias.get(p.id) : null,
     });
@@ -1143,13 +1163,20 @@ const servidor = createServer(async (req, res) => {
       json(res, 200, await painelDaIgreja(hojeDe(eu)));
       return;
     }
+    // Quem conduz vê a própria célula; o administrador abre qualquer uma, com o mesmo detalhe
+    // (decisão do dono). Membro comum, visitante e líder de outra célula: nada.
     if (rota === '/api/painel/celula') {
       if (!exigir(conta, 403, 'entre com uma conta')) return;
       const p = CONTAS.proposito(url.searchParams.get('id') || '');
-      if (!exigir(p && !p.encerradoEm && p.celula && p.membros.some((m) => m.usuario === eu && m.estado === 'ativo'), 404, 'célula não encontrada')) return;
-      if (!exigir(podeConduzir(p, eu), 403, 'só quem conduz a célula vê o painel dela')) return;
-      const retrato = await retratoDoProposito(p, eu);
-      json(res, 200, { id: p.id, titulo: p.titulo, referencia: hojeDe(eu), ...retrato.painel, atencao: retrato.atencao });
+      const admin = ehAdmin(eu);
+      if (!exigir(p && !p.encerradoEm && p.celula && (admin || p.membros.some((m) => m.usuario === eu && m.estado === 'ativo')), 404, 'célula não encontrada')) return;
+      if (!exigir(admin || podeConduzir(p, eu), 403, 'só quem conduz a célula vê o painel dela')) return;
+      const retrato = await retratoDoProposito(p, eu, { verTudo: admin });
+      json(res, 200, {
+        id: p.id, titulo: p.titulo, referencia: hojeDe(eu), lider: await nomeDeExibicao(p.criadoPor),
+        membros: retrato.membros.filter((m) => m.estado === 'ativo').length, encontro: retrato.encontro,
+        ...retrato.painel, atencao: retrato.atencao,
+      });
       return;
     }
 

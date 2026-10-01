@@ -1,14 +1,16 @@
 // Inteligência: as métricas de quem lidera. Dois perfis, duas perguntas:
 //   o líder de célula quer saber quem precisa de ajuda e como vai a saúde do pequeno grupo
-//   (visão tática, cuidado pastoral: só a própria célula, nunca o que alguém escreveu);
+//   (visão tática, cuidado pastoral: só a própria célula, com os nomes onde isso ajuda a agir,
+//   nunca o que alguém escreveu nem o check-in de uma pessoa);
 //   o administrador quer saber se a estratégia de Atos 2 está funcionando na igreja inteira
-//   (visão estratégica: só agregados, nunca pessoa por pessoa).
+//   (visão estratégica: a igreja de longe, e qualquer célula de perto, como o líder dela vê).
+// Decisão do dono, em docs/inteligencia.md §5 e em src/privacidade.html.
 // Aqui moram as regras puras, que os testes exercitam sem servidor, e as consultas à cópia
 // achatada das datas de leitura (leitura_dias, esquema v14). Quem junta os dados e serve é
 // servidor.mjs; a modelagem e as decisões de privacidade estão em docs/inteligencia.md.
 import { datasFeitas, somaDias } from './contas.mjs';
 import { quemPrecisaDeAtencao, LIMITE_ATENCAO } from './propositos.mjs';
-import { mascarar, MINIMO_PARA_MOSTRAR } from './painel.mjs';
+import { MINIMO_PARA_MOSTRAR } from './painel.mjs';
 import { transacao, lerEstadoDoBanco, lerMeta, gravarMeta } from './db.mjs';
 
 const DATA_VALIDA = /^\d{4}-\d{2}-\d{2}$/;
@@ -64,7 +66,8 @@ export function frequencia(encontros, referencia, quantos = ENCONTROS_NA_FREQUEN
 
 // ---------- o funil: onde cada um está na caminhada ----------
 // Cada pessoa entra numa etapa só, a mais adiante que alcançou, pelo que ela mesma marcou em
-// "Minha caminhada" (os marcos) e por quem ela acompanha no discipulado. Só contagens.
+// "Minha caminhada" (os marcos) e por quem ela acompanha no discipulado. Quem conduz a célula
+// (e o admin) vê também quem está em cada etapa: as pessoas que trazem "nome" saem em "nomes".
 export const ETAPAS_FUNIL = [
   ['comecando', 'Dando os primeiros passos'],
   ['decidiu', 'Decidiram seguir Jesus'],
@@ -72,7 +75,7 @@ export const ETAPAS_FUNIL = [
   ['acompanha', 'Acompanham alguém na fé'],
 ];
 export const PRIMEIROS_PASSOS_TOTAL = 12;
-// pessoas: [{ marcos: { decisao, batismo, discipula }, acompanha (discípulos ativos), caminho, passos }]
+// pessoas: [{ marcos: { decisao, batismo, discipula }, acompanha (discípulos ativos), caminho, passos, usuario?, nome? }]
 export function funil(pessoas) {
   const etapaDe = (p) => {
     const m = (p && p.marcos) || {};
@@ -82,17 +85,20 @@ export function funil(pessoas) {
     return 'comecando';
   };
   const contagem = Object.fromEntries(ETAPAS_FUNIL.map(([k]) => [k, 0]));
+  const nomes = Object.fromEntries(ETAPAS_FUNIL.map(([k]) => [k, []]));
   let conhecendo = 0;
   let passosConcluidos = 0;
   for (const p of pessoas || []) {
     const etapa = etapaDe(p);
     contagem[etapa]++;
+    if (p && p.nome) nomes[etapa].push({ usuario: p.usuario, nome: p.nome });
     if (etapa !== 'comecando') continue;
     if (p && p.caminho === 'conhecer') conhecendo++;
     else if (p && Number(p.passos) >= PRIMEIROS_PASSOS_TOTAL) passosConcluidos++;
   }
+  for (const k of Object.keys(nomes)) nomes[k].sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
   return ETAPAS_FUNIL.map(([etapa, rotulo]) => ({
-    etapa, rotulo, pessoas: contagem[etapa],
+    etapa, rotulo, pessoas: contagem[etapa], nomes: nomes[etapa],
     // no começo da caminhada, quem ainda está conhecendo Jesus e quem já fechou os 12 passos
     ...(etapa === 'comecando' ? { conhecendo, passosConcluidos } : {}),
   }));
@@ -177,42 +183,44 @@ export function atencaoComGatilhos({ candidatos, encontros, referencia, criadoEm
 // =========================================================================
 
 // ---------- o ranking das células pela chama coletiva ----------
-// celulas: [{ id, titulo, acesos: [true/false por membro de verdade], frequencia }]. Com menos
-// de MINIMO_PARA_MOSTRAR membros a porcentagem sairia como "1 de 2": a célula aparece, mas sem
-// número, para ninguém ser identificado numa célula pequena. O tom é de animar os líderes, não
-// de placar: por isso sai a porcentagem, e não um lugar no pódio.
+// celulas: [{ id, titulo, lider, acesos: [true/false por membro de verdade], frequencia }]. Cada
+// célula sai com os números exatos, inclusive a pequena: o admin pode abrir qualquer célula com
+// o mesmo detalhe que o líder dela vê (decisão do dono), então mascarar aqui não protegeria nada.
+// O tom é de animar os líderes, não de placar: por isso sai a porcentagem, e não um lugar no pódio.
 export function rankingDaChama(celulas) {
   return (celulas || []).map((c) => {
     const t = termometro(c.acesos);
-    const poucos = t.total < MINIMO_PARA_MOSTRAR;
     return {
-      id: c.id, titulo: c.titulo, poucos,
-      membros: mascarar(t.total), acesos: poucos ? null : t.acesos, pct: poucos ? null : t.pct,
+      id: c.id, titulo: c.titulo, lider: c.lider || '',
+      membros: t.total, acesos: t.acesos, pct: t.pct,
       frequencia: c.frequencia === undefined || c.frequencia === null ? null : Math.round(Number(c.frequencia) * 10) / 10,
-      total: t.total,
     };
-  }).sort((a, b) => ((b.pct ?? -1) - (a.pct ?? -1)) || (b.total - a.total) || String(a.titulo).localeCompare(String(b.titulo), 'pt-BR'))
-    .map(({ total, ...c }) => c);
+  }).sort((a, b) => ((b.pct ?? -1) - (a.pct ?? -1)) || (b.membros - a.membros) || String(a.titulo).localeCompare(String(b.titulo), 'pt-BR'));
 }
 
 // ---------- evangelismo: os frutos do mês ----------
-// Os marcos de "Minha caminhada" (contas.mjs, campo marcos) com data neste mês e no anterior.
-// Cada número conta pessoas, então passa pelo "menos de 5" do painel.
+// Os marcos de "Minha caminhada" (contas.mjs, campo marcos) com data neste mês e no anterior,
+// com a contagem exata (decisão do dono): são frutos da igreja inteira, sem o nome de ninguém.
 export const MARCOS_EVANGELISMO = ['decisao', 'batismo', 'celula', 'discipula'];
 export function evangelismoDoMes(contas, hoje) {
   const mes = String(hoje).slice(0, 7);
   const anterior = somaDias(mes + '-01', -1).slice(0, 7);
   const contar = (m) => Object.fromEntries(MARCOS_EVANGELISMO.map((k) => [k,
-    mascarar((contas || []).filter((c) => String(((c && c.marcos) || {})[k] || '').slice(0, 7) === m).length)]));
+    (contas || []).filter((c) => String(((c && c.marcos) || {})[k] || '').slice(0, 7) === m).length]));
   return { mes, anterior, deste: contar(mes), doAnterior: contar(anterior) };
 }
 
-// ---------- saúde: o check-in holístico da igreja ----------
+// ---------- saúde: o check-in holístico, somado ----------
 export const JANELA_CHECKIN = 7;
 export const ESFERAS = ['corpo', 'mente', 'espirito'];
+// O check-in de uma pessoa é dado de saúde: ele nunca sai por pessoa para a célula nem para a
+// igreja (só o discipulador vê o do discípulo, como já era). Aqui ele sai somado: na igreja,
+// a partir de MINIMO_PARA_MOSTRAR pessoas; na célula, a partir de MINIMO_CHECKIN_CELULA (numa
+// célula de 6, esperar 5 check-ins deixaria o bloco sempre vazio; abaixo de 3, "1 de 2 com a
+// mente em baixa" seria quase um nome).
+export const MINIMO_CHECKIN_CELULA = 3;
 // linhas: os check-ins da janela (usuario, data, corpo, mente, espirito de 1 a 3); vale o último
-// de cada pessoa. Com menos de MINIMO_PARA_MOSTRAR pessoas, nada sai além de "menos de 5":
-// uma porcentagem sobre 3 pessoas aponta para alguém.
+// de cada pessoa. Por esfera saem a porcentagem (pct) e a contagem (n) de cada faixa.
 export function saudeDosCheckins(linhas, { minimo = MINIMO_PARA_MOSTRAR } = {}) {
   const ultimo = new Map();
   for (const l of linhas || []) {
@@ -220,17 +228,15 @@ export function saudeDosCheckins(linhas, { minimo = MINIMO_PARA_MOSTRAR } = {}) 
     if (!atual || atual.data < l.data) ultimo.set(l.usuario, l);
   }
   const base = ultimo.size;
-  if (base < minimo) return { base: mascarar(base), suficiente: false, esferas: null };
+  if (base < minimo) return { base, minimo, suficiente: false, esferas: null };
   const esferas = {};
   for (const k of ESFERAS) {
     const valores = [...ultimo.values()].map((l) => Number(l[k]));
-    esferas[k] = {
-      baixa: pct(valores.filter((v) => v === 1).length, base),
-      media: pct(valores.filter((v) => v === 2).length, base),
-      alta: pct(valores.filter((v) => v === 3).length, base),
-    };
+    const faixa = (v) => { const n = valores.filter((x) => x === v).length; return { n, pct: pct(n, base) }; };
+    const b = faixa(1); const m = faixa(2); const a = faixa(3);
+    esferas[k] = { baixa: b.pct, media: m.pct, alta: a.pct, n: { baixa: b.n, media: m.n, alta: a.n } };
   }
-  return { base, suficiente: true, esferas };
+  return { base, minimo, suficiente: true, esferas };
 }
 
 // ---------- adoção e retenção ----------
@@ -341,5 +347,12 @@ export function frequenciaMediaPorCelula(db, de, ate) {
   return mapa;
 }
 
-// Os check-ins da janela (de, ate], para saudeDosCheckins. Só os níveis, nunca quem.
+// Os check-ins da janela (de, ate], para saudeDosCheckins. O usuario só serve para valer o último
+// de cada pessoa: nunca sai do servidor.
 export const checkinsEntre = (db, de, ate) => db.prepare('SELECT usuario, data, corpo, mente, espirito FROM checkins WHERE data > ? AND data <= ?').all(de, ate);
+// Os check-ins de algumas pessoas (os membros de uma célula) na janela (de, ate].
+export function checkinsDe(db, usuarios, de, ate) {
+  const lista = [...new Set(usuarios || [])];
+  if (!lista.length) return [];
+  return db.prepare('SELECT usuario, data, corpo, mente, espirito FROM checkins WHERE data > ? AND data <= ? AND usuario IN (' + lista.map(() => '?').join(',') + ')').all(de, ate, ...lista);
+}

@@ -4,8 +4,8 @@ Dois perfis de liderança, duas perguntas diferentes:
 
 | Perfil | Pergunta | Onde aparece | Vê |
 |---|---|---|---|
-| **Líder (ou auxiliar) de célula** | quem precisa de ajuda e como vai a saúde do pequeno grupo | na célula dele (aba Hoje, antes de "Precisam de atenção", e aba Pessoas) | só a própria célula; nomes só na lista de atenção, que já existia; nunca o que alguém escreveu ou orou |
-| **Administrador / pastor** (`CAMINHO_ADMIN`) | a estratégia de Atos 2 está funcionando na igreja inteira? | no Painel do administrador (Perfil › Administração), no alto | só agregados; nome de célula sim, nome de pessoa nunca; abaixo de 5 pessoas, "menos de 5" |
+| **Líder (ou auxiliar) de célula** | quem precisa de ajuda e como vai a saúde do pequeno grupo | na célula dele (aba Hoje, antes de "Precisam de atenção", e aba Pessoas) | só a própria célula, com os nomes onde ajudam a agir (quem está com a chama acesa, a presença de cada um, quem está em cada etapa, os alertas); o check-in só somado, sem nome; nunca o que alguém escreveu ou orou |
+| **Administrador / pastor** (`CAMINHO_ADMIN`) | a estratégia de Atos 2 está funcionando na igreja inteira? | no Painel do administrador (Perfil › Administração), no alto; tocar numa célula abre a célula de perto (`#/config/painel/celula/<id>`) | a igreja de longe sem nomes (números exatos, inclusive de célula pequena) e qualquer célula de perto, com o mesmo painel que o líder dela vê |
 
 Código: regras puras em `inteligencia.mjs` (testadas sem servidor), esquema v14 em `db.mjs`, os pedidos em
 `servidor.mjs`, as telas em `src/app/08b-propositos.js` (célula) e `src/app/07e-painel.js` (painel), o
@@ -17,7 +17,7 @@ estilo em `src/estilo-v2/24-juntos.css` e `25-perfil.css`. Teste: `node ferramen
 celular ──GET /api/propositos──▶ servidor.mjs: retratoDoProposito ──▶ celulaNoRetrato
           (a célula de sempre)      │  (lê o progresso dos até 20 membros, como já fazia)
                                     └▶ painelDaCelula + atencaoComGatilhos   [inteligencia.mjs]
-celular ──GET /api/painel/celula?id=X──▶ o mesmo painel, para quem conduz (403 para membro comum)
+celular ──GET /api/painel/celula?id=X──▶ o mesmo painel, para quem conduz e para o admin (403 para membro comum, 404 para quem não é da célula)
 
 celular ──GET /api/painel/igreja──▶ servidor.mjs: painelDaIgreja (cache de 5 min)
                                      ├▶ leitura_dias (tabela v14) e as views leituras_por_dia, celula_frequencia
@@ -90,20 +90,24 @@ pessoas, e o retrato dela já carrega o progresso dessas 20 para o que existia a
 ### `GET /api/propositos` (o retrato da célula) · `GET /api/painel/celula?id=<id>`
 
 Quem conduz (líder ou auxiliar, `podeConduzir`) recebe, no retrato da célula que o app já pedia,
-duas chaves a mais; `GET /api/painel/celula?id=` devolve o mesmo objeto sozinho (404 se a célula
-não existe ou a pessoa não é dela, 403 se é membro comum). Membro comum e visitante não recebem
-nada disto.
+duas chaves a mais; `GET /api/painel/celula?id=` devolve o mesmo objeto sozinho, com `lider`,
+`membros` e `encontro` no topo (404 se a célula não existe ou a pessoa não é dela, 403 se é membro
+comum). O administrador (`CAMINHO_ADMIN`) abre qualquer célula por essa rota (`verTudo` no retrato).
+Membro comum, visitante e líder de outra célula não recebem nada disto.
 
 ```json
 {
   "painel": {
-    "chama":      { "acesos": 5, "total": 7, "pct": 71 },
+    "chama":      { "acesos": 5, "total": 7, "pct": 71,
+                    "pessoas": [ { "usuario": "ana", "nome": "Ana", "acesa": true, "dias": 42, "conduz": false }, "… acesas primeiro, apagadas com dias 0" ] },
     "frequencia": { "encontros": [ { "data": "2026-09-09", "semEncontro": false, "pessoas": 8 },
                                    { "data": "2026-09-16", "semEncontro": true,  "pessoas": null },
                                    { "data": "2026-09-23", "semEncontro": false, "pessoas": 7 },
                                    { "data": "2026-09-30", "semEncontro": false, "pessoas": 9 } ],
-                    "diferenca": 2, "tendencia": "subindo" },
-    "funil": [ { "etapa": "comecando", "rotulo": "Dando os primeiros passos", "pessoas": 2, "conhecendo": 1, "passosConcluidos": 0 },
+                    "diferenca": 2, "tendencia": "subindo",
+                    "presencas": [ { "usuario": "ana", "nome": "Ana", "papel": "", "conduz": false, "encontros": [ true, null, true, true ] }, "… null: não houve encontro ou a pessoa ainda não estava na célula" ] },
+    "saude": { "base": 6, "minimo": 3, "suficiente": true, "esferas": { "corpo": { "baixa": 17, "media": 50, "alta": 33, "n": { "baixa": 1, "media": 3, "alta": 2 } }, "mente": "…", "espirito": "…" } },
+    "funil": [ { "etapa": "comecando", "rotulo": "Dando os primeiros passos", "pessoas": 2, "nomes": [ { "usuario": "dora", "nome": "Dora" }, { "usuario": "joao", "nome": "João" } ], "conhecendo": 1, "passosConcluidos": 0 },
                { "etapa": "decidiu",   "rotulo": "Decidiram seguir Jesus",     "pessoas": 2 },
                { "etapa": "batizado",  "rotulo": "Já se batizaram",            "pessoas": 2 },
                { "etapa": "acompanha", "rotulo": "Acompanham alguém na fé",    "pessoas": 1 } ]
@@ -125,13 +129,13 @@ nada disto.
               "media7": { "abriram": 12.1, "leram": 9 },          "… a média dos 7 dias fechados antes de hoje",
               "serie": [ { "dia": "2026-09-18", "abriram": 16, "leram": 8 }, "... 14 dias, até hoje" ],
               "retencao": { "base": 13, "ativas": 12, "pct": 92 } },
-  "chamaDasCelulas": [ { "id": "p7cb…", "titulo": "Célula Vida", "poucos": false, "membros": 6, "acesos": 5, "pct": 83, "frequencia": 5.7 },
-                       { "id": "p3d3…", "titulo": "Célula Nova", "poucos": true, "membros": "menos de 5", "acesos": null, "pct": null, "frequencia": null } ],
+  "chamaDasCelulas": [ { "id": "p7cb…", "titulo": "Célula Vida", "lider": "Rute", "membros": 6, "acesos": 5, "pct": 83, "frequencia": 5.7 },
+                       { "id": "p3d3…", "titulo": "Célula Nova", "lider": "Davi", "membros": 3, "acesos": 2, "pct": 67, "frequencia": null } ],
   "evangelismo": { "mes": "2026-10", "anterior": "2026-09",
-                   "deste":      { "decisao": "menos de 5", "batismo": "menos de 5", "celula": "menos de 5", "discipula": "menos de 5" },
-                   "doAnterior": { "decisao": 7, "batismo": "menos de 5", "celula": 12, "discipula": "menos de 5" } },
-  "saude": { "base": 9, "suficiente": true,
-             "esferas": { "corpo": { "baixa": 11, "media": 44, "alta": 44 }, "mente": { "baixa": 44, "media": 33, "alta": 22 }, "espirito": { "baixa": 11, "media": 44, "alta": 44 } } }
+                   "deste":      { "decisao": 0, "batismo": 0, "celula": 0, "discipula": 1 },
+                   "doAnterior": { "decisao": 4, "batismo": 1, "celula": 0, "discipula": 1 } },
+  "saude": { "base": 9, "minimo": 5, "suficiente": true,
+             "esferas": { "corpo": { "baixa": 11, "media": 44, "alta": 44, "n": { "baixa": 1, "media": 4, "alta": 4 } }, "mente": "…", "espirito": "…" } }
 }
 ```
 
@@ -150,9 +154,10 @@ limitado a 20 pessoas (`LIMITE_CELULA`).
 
 | Métrica | Regra (`inteligencia.mjs`) | De onde vem |
 |---|---|---|
-| **Termômetro da chama** | `chamaAcesa(simulacao)`: ofensiva de hoje maior que zero (leu hoje, ou ontem com a sequência de pé, inclusive por escudo). `termometro([bool])` → acesos, total, %. | a simulação de cada membro de verdade (ativo, não visitante; quem conduz conta) |
-| **Frequência das últimas 4 semanas** | `frequencia(encontros, referencia)`: os encontros registrados nas últimas 4 semanas (`data > referência-28`, a mesma janela `JANELA_FREQUENCIA` da frequência média do painel da igreja), no máximo 4, do mais antigo para o mais novo; um encontro de meses atrás não entra nem vira "encontro anterior" da tendência; `pessoas` = presentes com conta + pessoas sem conta; a semana "sem encontro" sai com `pessoas: null` (nunca zero); tendência = último encontro de verdade menos o anterior. | `p.encontros`, já em memória |
-| **Funil da caminhada** | `funil(pessoas)`: cada pessoa numa etapa só, a mais adiante: acompanha alguém (marco "discipula" ou discípulo ativo) › batizado (marco "batismo") › decidiu (marco "decisao") › começando (o resto; dentro dela, quantos ainda estão no Conhecer Jesus e quantos já fecharam os 12 Primeiros passos). | `conta.marcos`, `conta.caminho`, `discipulosAtivosDe`, `estado.licoes` |
+| **Termômetro da chama** | `chamaAcesa(simulacao)`: ofensiva de hoje maior que zero (leu hoje, ou ontem com a sequência de pé, inclusive por escudo). `termometro([bool])` → acesos, total, %; o servidor junta `pessoas` (nome, acesa, dias seguidos), acesas primeiro. | a simulação de cada membro de verdade (ativo, não visitante; quem conduz conta) |
+| **Frequência das últimas 4 semanas** | `frequencia(encontros, referencia)`: os encontros registrados nas últimas 4 semanas (`data > referência-28`, a mesma janela `JANELA_FREQUENCIA` da frequência média do painel da igreja), no máximo 4, do mais antigo para o mais novo; um encontro de meses atrás não entra nem vira "encontro anterior" da tendência; `pessoas` = presentes com conta + pessoas sem conta; a semana "sem encontro" sai com `pessoas: null` (nunca zero); tendência = último encontro de verdade menos o anterior. O servidor junta `presencas`: cada pessoa ativa (visitante inclusive) com true/false por encontro da janela, ou null quando não houve encontro ou ela ainda não estava na célula. | `p.encontros`, já em memória |
+| **Funil da caminhada** | `funil(pessoas)`: cada pessoa numa etapa só, a mais adiante: acompanha alguém (marco "discipula" ou discípulo ativo) › batizado (marco "batismo") › decidiu (marco "decisao") › começando (o resto; dentro dela, quantos ainda estão no Conhecer Jesus e quantos já fecharam os 12 Primeiros passos). Cada etapa leva `nomes` (quem trouxe nome), em ordem alfabética. | `conta.marcos`, `conta.caminho`, `discipulosAtivosDe`, `estado.licoes` |
+| **Check-in da célula, somado** | `saudeDosCheckins(checkinsDe(db, membros, hoje-7, hoje], { minimo: MINIMO_CHECKIN_CELULA = 3 })`: vale o último check-in de cada membro na semana; por esfera, quantos (e que %) estão em baixa, média e alta. Abaixo de 3 pessoas, só a base. Nunca o check-in de uma pessoa. | tabela `checkins`, índice por data |
 | **Alerta de risco** | `atencaoComGatilhos`: a lista de `quemPrecisaDeAtencao` (propositos.mjs: faltou ao último ou aos 2 últimos encontros; sem ler há 5 dias ou mais) ganha o gatilho `ofensivaPerdida`, que varre os 14 dias antes de hoje de trás para a frente: a quebra é o primeiro dia em branco (sem leitura e sem escudo) depois de um dia coberto; a sequência perdida são os dias lidos antes dela (os cobertos por escudo servem de ponte) e precisa ter 7 dias ou mais; se depois da quebra a pessoa já leu 3 dias seguidos, recomeçou e não há alerta; uma corrida curta (1 ou 2 dias) depois da perda não apaga a perda. Não usa `zerouEm` nem `recomeco` da simulação: o `recomeco` nunca volta a falso (quem já quebrou uma vez na vida sumiria do alerta) e o `zerouEm` pula para a quebra mais nova. O texto conta os dias desde a última leitura ("não lê há N dias", a mesma conta de "sem ler há N dias"), nunca desde o dia em que a chama apagou, e não repete o número quando a pessoa já aparece por "sem ler". Ordem: quem faltou, depois quem perdeu a ofensiva (a mais longa primeiro, mesmo que também esteja sem ler), depois quem só está sem ler; os gatilhos se juntam antes de ordenar e cortar, e o teto de 5 para quem não faltou vale só no fim. | a simulação e as datas de cada candidato |
 
 O texto do WhatsApp (`recadoDeCuidado`, `08b-propositos.js`) segue o primeiro gatilho; para a
@@ -166,7 +171,7 @@ ofensiva perdida é um convite para recomeçar, sem cobrança.
 | **Retenção simples** | das contas com 30 dias ou mais (`criadaEm`), quantas estão em `SELECT DISTINCT usuario FROM leitura_dias WHERE data > hoje-7 AND data <= hoje` | uma varredura do índice por data, 7 dias |
 | **Chama das células (ranking)** | `SELECT usuario, group_concat(data) FROM leitura_dias WHERE data >= hoje-120 GROUP BY usuario` (uma linha por pessoa, não por data) → um `Set` de datas por pessoa → `REGRAS.simularOfensiva` por membro de verdade de cada célula ativa, cada um no próprio dia (`hojeDe`, nunca depois do dia do admin, como no retrato da célula) → `rankingDaChama` | só as linhas da janela (500 pessoas × até 120 dias, na prática bem menos), uma consulta só, e a mesma regra de ofensiva do app, não uma aproximação nova. A janela de 120 dias só poderia mudar um escudo guardado há mais de 4 meses; para o retrato de uma pessoa vale o painel do líder, que usa o histórico inteiro |
 | **Frequência média por célula** | `SELECT proposito, AVG(presentes + visitantes) FROM celula_frequencia WHERE sem_encontro = 0 AND data > hoje-28 AND data <= hoje GROUP BY proposito` | encontros são poucos (uma linha por célula por semana) |
-| **Evangelismo (frutos do mês)** | `evangelismoDoMes(contas, hoje)`: marcos de Minha caminhada (`decisao`, `batismo`, `celula`, `discipula`) com data no mês e no anterior | em memória, 4 datas por conta |
+| **Evangelismo (frutos do mês)** | `evangelismoDoMes(contas, hoje)`: marcos de Minha caminhada (`decisao`, `batismo`, `celula`, `discipula`) com data no mês e no anterior, contagem exata | em memória, 4 datas por conta |
 | **Saúde global (check-in)** | `SELECT usuario, data, corpo, mente, espirito FROM checkins WHERE data > hoje-7 AND data <= hoje` → vale o último de cada pessoa → % em baixa, média e alta por esfera | índice `checkins_data`; no máximo uma linha por pessoa por dia |
 
 Tudo isso roda uma vez a cada 5 minutos, por `hoje`, e a simulação da chama anda em lotes de 5
@@ -187,31 +192,42 @@ entrava como encontro com zero pessoas e contradizia a frequência por célula l
 
 ## 5. Privacidade e LGPD: o que decidimos
 
-Dado de fé é sensível (LGPD, art. 11). As regras, na ordem em que valem:
+Dado de fé é sensível (LGPD, art. 11). A revisão apontou que o painel do líder deixava escapar,
+por diferença e em célula pequena, a etapa de cada pessoa, e que a política não dizia nada disso.
+O dono decidiu o contrário de apertar: "pode alterar a privacidade para termos métricas e
+dashboards mais eficientes", e "só o líder e o admin podem ver: admin todas as células, e líder só
+da célula que é líder". As regras, na ordem em que valem:
 
-1. **Admin nunca vê pessoa por pessoa.** O painel da igreja sai sem nome, @, e-mail ou texto
-   (o teste confere com uma varredura do JSON). Célula tem nome; pessoa não.
-2. **"Menos de 5"** (`MINIMO_PARA_MOSTRAR` de `painel.mjs`, a mesma regra do painel que já
-   existia) em todo número que conta pessoas numa condição: marcos do mês, membros de uma célula
-   no ranking e a base do check-in. Uma célula com menos de 5 membros aparece no ranking, mas
-   "sem número": "1 de 2 com a chama acesa" apontaria para alguém. O check-in com menos de 5
-   pessoas não mostra porcentagem nenhuma: 60% de 3 pessoas é quase um nome.
-3. **Quem abriu e quem leu saem sem máscara**: são contas de uso do app, não de fé, e o painel
-   já as mostrava assim.
-4. **O líder vê só a própria célula**, e só quem conduz (`podeConduzir`): membro comum não recebe
-   `painel` nem `atencao`, e `GET /api/painel/celula` responde 403. Os três blocos do líder são
-   contagens; os nomes continuam só em "Precisam de atenção", que já existia, agora com o motivo
-   mais rico. Nenhum gatilho usa o check-in (é do discípulo para o discipulador, não para a
-   célula) nem o que a pessoa escreveu.
-5. **Visitante não entra em conta nenhuma** (`membroDeVerdade`): nem na chama, nem no funil, nem
-   na atenção. Entra na frequência só como presença no encontro, que o líder registrou.
-6. **O funil é autodeclarado**: conta o que cada um marcou em Minha caminhada. O discípulo escolhe
-   mostrar ou não os marcos ao discipulador (`mostrar.marcos`); na célula eles entram só como
-   número da etapa, nunca com o nome, e a tela diz isso ("só números, para você saber por onde
-   cuidar"). Se um dia a igreja preferir, o interruptor pode passar a valer também aqui.
+1. **Quem vê é só quem conduz a célula (`podeConduzir`: líder e auxiliar) e o administrador
+   (`CAMINHO_ADMIN`).** Membro comum, visitante e líder de outra célula não recebem `painel` nem
+   `atencao` no retrato, e `GET /api/painel/celula` responde 403 (membro) ou 404 (quem não é da
+   célula). O admin abre qualquer célula pela mesma rota. O teste confere os quatro casos e varre
+   o JSON do membro comum.
+2. **Com nomes onde isso ajuda a agir**: quem está com a chama acesa e apagada (e há quantos dias
+   lê seguido), a presença de cada um nos encontros das últimas 4 semanas, quem está em cada
+   etapa de Minha caminhada e os alertas de cuidado. Para o líder são as pessoas que ele já
+   conhece pelo nome; o objetivo é saber quem procurar.
+3. **O que a pessoa escreve nunca sai**: reflexões, pedidos de oração, anotações, "Minha
+   história com Deus". Nada disso entra em painel nenhum (o teste varre `oia` e o texto da
+   reflexão semeada).
+4. **O check-in de Corpo, Mente e Espírito é dado de saúde**: por pessoa, só o discipulador vê
+   (como já era, com o interruptor `mostrar.checkin`). Para a célula (líder e admin) e para a
+   igreja sai só somado, sem nome, a partir de 3 pessoas na célula (`MINIMO_CHECKIN_CELULA`) e de 5
+   na igreja (`MINIMO_PARA_MOSTRAR`). O JSON da saúde nunca leva `usuario`.
+5. **A igreja de longe sai sem nome de pessoa**: adoção, retenção, chama por célula (com o nome do
+   líder), frutos do mês e check-in somado. As máscaras "menos de 5" do ranking e dos frutos
+   saíram: o admin pode abrir a célula de perto, então mascarar aqui não protegia nada e só
+   deixava o painel vazio numa igreja pequena.
+6. **Visitante não entra em conta nenhuma** (`membroDeVerdade`): nem na chama, nem no funil, nem
+   na atenção, nem no check-in da célula. Aparece só na grade de presença, porque vai ao encontro.
 7. **`leitura_dias` guarda só datas**: nenhuma lição, nota ou texto. Apagar a conta apaga as
    linhas, inclusive nos backups cifrados.
-8. **Tom**: o ranking das células é uma porcentagem do dia, sem pódio, e a nota da tela diz que é
+8. **Isso está escrito para a pessoa**: `src/privacidade.html` (resumo, §3 dados, §4 finalidades,
+   §5 usos, a tabela de §6 com a coluna "quem conduz a sua célula e a administração" e o §7) e o
+   texto de consentimento (`TEXTO_CONSENTIMENTO` em `07b-conta.js` e o cadastro em
+   `entrar.html`), que subiu para `CONSENTIMENTO_VERSAO = 2` em `contas.mjs`: quem já tinha conta
+   vê a folha "Seus dados" de novo na próxima abertura e precisa concordar com o texto novo.
+9. **Tom**: o ranking das células é uma porcentagem do dia, sem pódio, e a nota da tela diz que é
    para animar, não um placar. Nada de placar entre pessoas em lugar nenhum.
 
 ## 6. O que ficou de fora do MVP

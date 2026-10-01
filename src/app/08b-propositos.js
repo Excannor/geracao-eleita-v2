@@ -771,14 +771,39 @@
       + (p.encontro >= 0 && encontroHoje(p) ? '' : '<p class="passo-dica pequena">' + (p.encontro >= 0
         ? 'Encontro ' + nomeDoEncontro(p.encontro) + '.'
         : (conduzo ? 'Marque o dia do encontro para a célula ver "Encontro hoje" no dia.' : 'Quem conduz a célula ainda não marcou o dia do encontro.')) + '</p>')
-      // Só quem conduz vê, e nunca uma lista de presença: primeiro como a célula está (a chama
-      // e os últimos encontros), depois a pessoa a procurar, com o motivo, nunca um placar.
-      + (conduzo ? cartaoSaude(p) + blocoAtencao(p) : '');
+      // Só quem conduz vê: primeiro como a célula está (a chama de cada um, a presença nos
+      // últimos encontros e o check-in somado), depois a pessoa a procurar, com o motivo, nunca
+      // um placar.
+      + (conduzo ? cartaoSaude(p) + blocoCheckin(p) + blocoAtencao(p) : '');
   }
 
+  // O painel inteiro da célula, para o administrador que abre qualquer célula (07e-painel.js):
+  // o mesmo que o líder dela vê, com a caminhada junto (lá ela mora na aba Pessoas).
+  CC.painelDaCelulaHtml = (p) => cartaoSaude(p) + blocoCheckin(p) + blocoFunil(p) + blocoAtencao(p);
+
   // ---------- o painel de quem conduz (inteligencia.mjs) ----------
-  // A chama da célula e a frequência dos últimos encontros, num cartão só, antes de "Precisam
-  // de atenção". Vem pronto do servidor, só com contagens da própria célula: nenhum nome aqui.
+  // A chama da célula (com quem está acesa e apagada) e a frequência das últimas 4 semanas
+  // (com a presença de cada um), num cartão só, antes de "Precisam de atenção". Vem pronto do
+  // servidor, só para quem conduz a célula e para o administrador: os nomes ajudam a agir.
+  const nomeLista = (lista) => lista.map((x) => CC.esc(x.nome)).join(', ');
+  function quemEstaComo(c) {
+    const pessoas = c.pessoas || [];
+    if (!pessoas.length) return '';
+    const acesas = pessoas.filter((x) => x.acesa).map((x) => ({ nome: x.nome + (x.dias ? ' (' + x.dias + ')' : '') }));
+    const apagadas = pessoas.filter((x) => !x.acesa);
+    return '<p class="saude-nomes">' + (acesas.length ? '<b>Acesa:</b> ' + nomeLista(acesas) : '')
+      + (acesas.length && apagadas.length ? '<br>' : '') + (apagadas.length ? '<b>Apagada:</b> ' + nomeLista(apagadas) : '') + '</p>';
+  }
+  // Presença de cada pessoa nos encontros do gráfico: linha por pessoa, uma marca por semana.
+  function grelhaDePresenca(f) {
+    const lista = f.presencas || [];
+    if (!lista.length || !f.encontros.length) return '';
+    const marca = (v) => (v === null ? '<i class="nulo" aria-label="não conta">·</i>' : v ? '<i class="sim" aria-label="presente">✓</i>' : '<i class="nao" aria-label="faltou">–</i>');
+    return '<div class="presencas" style="--n:' + f.encontros.length + '">'
+      + '<div class="presencas-linha cabeca"><span>Presença</span>' + f.encontros.map((e) => '<em>' + ddmm(e.data) + '</em>').join('') + '</div>'
+      + lista.map((m) => '<div class="presencas-linha"><span>' + CC.esc(m.nome) + (m.papel === 'visitante' ? ' <small>visitante</small>' : '') + '</span>' + m.encontros.map(marca).join('') + '</div>').join('')
+      + '</div>';
+  }
   function cartaoSaude(p) {
     const s = p.painel;
     if (!s || !s.chama) return '';
@@ -802,14 +827,36 @@
     return '<div class="cartao-saude">'
       + '<div class="saude-chama' + (c.acesos ? ' acesa' : '') + '">' + CC.icoChama(c.acesos ? undefined : 0)
       + '<div><b>' + (c.pct === null ? 'sem membros' : c.pct + '%') + '</b><span>' + CC.esc(legenda) + '</span></div></div>'
-      + '<div class="saude-encontros"><span class="etiqueta">Últimos encontros</span>' + barras
-      + (tendencia || semEncontro ? '<p class="passo-dica pequena">' + CC.esc((tendencia + semEncontro).trim()) + '</p>' : '') + '</div>'
+      + quemEstaComo(c)
+      + '<div class="saude-encontros"><span class="etiqueta">Últimas 4 semanas</span>' + barras
+      + (tendencia || semEncontro ? '<p class="passo-dica pequena">' + CC.esc((tendencia + semEncontro).trim()) + '</p>' : '')
+      + grelhaDePresenca(f) + '</div>'
       + '</div>';
   }
 
+  // O check-in de Corpo, Mente e Espírito da célula, somado: quantos estão em baixa em cada
+  // esfera, nunca quem. É dado de saúde: o de uma pessoa só o discipulador dela vê.
+  const ESFERAS_CELULA = { corpo: 'Corpo', mente: 'Mente', espirito: 'Espírito' };
+  function blocoCheckin(p) {
+    const s = p.painel && p.painel.saude;
+    if (!s) return '';
+    if (!s.suficiente) {
+      return CC.tituloSecao('Como a célula está')
+        + '<p class="passo-dica pequena">' + (s.base ? CC.plural(s.base, 'pessoa fez', 'pessoas fizeram') + ' o check-in nesta semana; a soma aparece a partir de ' + s.minimo + '.' : 'Ninguém fez o check-in de Corpo, Mente e Espírito nesta semana.')
+        + ' O check-in de uma pessoa nunca aparece aqui.</p>';
+    }
+    return CC.tituloSecao('Como a célula está')
+      + '<div class="funil-celula">' + Object.keys(ESFERAS_CELULA).map((k) => {
+        const n = s.esferas[k].n.baixa;
+        return '<div class="funil-linha"><span>' + ESFERAS_CELULA[k] + ' em baixa</span>'
+          + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((n / s.base) * 100) + '%"></i></span><b>' + n + '</b></div>';
+      }).join('')
+      + '<p class="passo-dica pequena">Do último check-in de cada um nesta semana (' + CC.plural(s.base, 'pessoa', 'pessoas') + '). Só a soma: o check-in de uma pessoa nunca aparece aqui.</p></div>';
+  }
+
   // O funil da caminhada, na aba Pessoas de quem conduz: onde as pessoas da célula estão, pelo
-  // que cada uma marcou em Minha caminhada e por quem já acompanha alguém. Só contagens: o
-  // nome de quem está em cada etapa não sai do servidor.
+  // que cada uma marcou em Minha caminhada e por quem já acompanha alguém, com os nomes de
+  // cada etapa, para saber por onde cuidar.
   function blocoFunil(p) {
     const etapas = (p.painel && p.painel.funil) || [];
     const total = etapas.reduce((s, e) => s + e.pessoas, 0);
@@ -822,8 +869,9 @@
     ].filter(Boolean).join(' · ');
     return CC.tituloSecao('Caminhada da célula')
       + '<div class="funil-celula">' + etapas.map((e) => '<div class="funil-linha"><span>' + CC.esc(e.rotulo) + '</span>'
-        + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((e.pessoas / maior) * 100) + '%"></i></span><b>' + e.pessoas + '</b></div>').join('')
-      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada. Só números, para você saber por onde cuidar.</p></div>';
+        + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((e.pessoas / maior) * 100) + '%"></i></span><b>' + e.pessoas + '</b></div>'
+        + (e.nomes && e.nomes.length ? '<p class="funil-nomes">' + nomeLista(e.nomes) + '</p>' : '')).join('')
+      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada, para você saber por onde cuidar.</p></div>';
   }
 
   // Quem precisa de atenção: a conta vem pronta do servidor (propositos.mjs), sempre sem
