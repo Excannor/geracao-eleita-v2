@@ -519,13 +519,39 @@
   if (!location.hash) history.replaceState(null, '', location.pathname + location.search + '#/');
   rotear();
 
-  // A abertura sai assim que a primeira tela está desenhada.
+  // A abertura fica o bastante para ser vista. Com o app em cache ele fica pronto em uns
+  // 200 ms, e sair nessa hora era só um piscar. Na primeira abertura da sessão ela dura pelo
+  // menos ABERTURA_MINIMA desde que a página começou a carregar (o tempo carregando já conta,
+  // então numa rede lenta nada é somado); recarregar na mesma sessão (depois de atualizar,
+  // trocar de conta) e quem pede menos movimento ficam com ABERTURA_CURTA. Com tudo pronto,
+  // a barra completa e a abertura sai.
+  const ABERTURA_MINIMA = 1600;
+  const ABERTURA_CURTA = 700;
   const abertura = document.getElementById('abertura');
   if (abertura) {
-    requestAnimationFrame(() => {
-      abertura.classList.add('saindo');
-      setTimeout(() => abertura.remove(), 300);
-    });
+    let jaVista = false;
+    try {
+      jaVista = sessionStorage.getItem('cc.abertura') === '1';
+      sessionStorage.setItem('cc.abertura', '1');
+    } catch (e) { /* sem sessionStorage, vale a abertura inteira */ }
+    const calma = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const espera = Math.max(0, (jaVista || calma ? ABERTURA_CURTA : ABERTURA_MINIMA) - performance.now());
+    setTimeout(() => requestAnimationFrame(() => {
+      // A barra sai da animação para uma transição: fixa o ponto em que está e corre até o fim.
+      const barra = abertura.querySelector('.abertura-barra i');
+      if (barra) {
+        const agora = getComputedStyle(barra).transform;
+        if (agora && agora !== 'none') barra.style.transform = agora;
+      }
+      abertura.classList.add('pronta');
+      requestAnimationFrame(() => { if (barra) barra.style.transform = 'scaleX(1)'; });
+      setTimeout(() => {
+        abertura.classList.add('saindo');
+        // a barra de status volta para a cor da folha do tema (a abertura a deixou preta)
+        CC.aplicarTema(document.documentElement.dataset.tema === 'escuro');
+        setTimeout(() => abertura.remove(), 500);
+      }, calma ? 0 : 320);
+    }), espera);
   }
 
   addEventListener('hashchange', rotear);

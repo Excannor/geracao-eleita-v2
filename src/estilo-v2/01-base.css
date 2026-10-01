@@ -385,9 +385,31 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 .pessoa-proposito .quem { gap: 2px; }
 
 /* ---------- abertura ---------- */
-.abertura-marca { font-family: var(--fonte); font-weight: 800; letter-spacing: -0.01em; text-transform: none; }
-.abertura-barra { background: #2a2b29; }
-.abertura-barra i { background: #c8da8c; }
+/* O símbolo cresce até o lugar, o nome e a barra sobem logo atrás, e a barra ENCHE (não fica
+   só correndo): rápido até 78%, depois devagar até 95% enquanto o app não fica pronto. Pronto,
+   o JS (10-roteador.js) completa a barra e a abertura sai num fade com o símbolo crescendo.
+   As entradas usam "backwards": depois de terminar, o estilo volta ao normal e a saída pode
+   mexer no transform. */
+.abertura { transition: opacity .45s ease, visibility .45s ease; }
+.abertura-simbolo { animation: abertura-entra .65s cubic-bezier(.2, .8, .2, 1) backwards; }
+.abertura-marca { font-family: var(--fonte); font-weight: 800; letter-spacing: -0.01em; text-transform: none; animation: abertura-sobe .5s .15s ease-out backwards; }
+.abertura-barra { width: 160px; background: #2a2b29; animation: abertura-sobe .5s .25s ease-out backwards; }
+.abertura-barra i {
+  width: 100%; background: #c8da8c; transform-origin: left center; transform: scaleX(.04);
+  animation: abertura-enche 1.3s .35s cubic-bezier(.25, .7, .3, 1) forwards, abertura-espera 9s 1.65s ease-out forwards;
+}
+.abertura.pronta .abertura-barra i { animation: none; transition: transform .3s ease-out; }
+.abertura.saindo .abertura-simbolo { transform: scale(1.08); transition: transform .45s ease-in; }
+.abertura.falhou .abertura-barra { display: none; }
+@keyframes abertura-entra { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: none; } }
+@keyframes abertura-sobe { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes abertura-enche { from { transform: scaleX(.04); } to { transform: scaleX(.78); } }
+@keyframes abertura-espera { from { transform: scaleX(.78); } to { transform: scaleX(.95); } }
+@media (prefers-reduced-motion: reduce) {
+  .abertura-simbolo, .abertura-marca, .abertura-barra { animation: none; }
+  .abertura-barra i { animation: none; transform: scaleX(.6); }
+  .abertura.saindo .abertura-simbolo { transform: none; }
+}
 
 /* =========================================================================
    BARRA DE ABAS NO CELULAR

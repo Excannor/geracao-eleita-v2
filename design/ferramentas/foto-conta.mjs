@@ -50,7 +50,10 @@ await cmd('Page.enable');
 await cmd('Runtime.enable');
 await cmd('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: W < 800 ? 2 : 1, mobile: W < 800 });
 // Sem o convite de notificações e sem o tutorial de instalar por cima da tela.
-let pre = "try{localStorage.setItem('cc.aviso.push','nunca');localStorage.removeItem('cc.instalar')}catch(e){};" + (process.env.PRE || '');
+let pre = "try{localStorage.setItem('cc.aviso.push','nunca');localStorage.removeItem('cc.instalar')}catch(e){};"
+  // a abertura curta, como de quem já abriu o app nesta sessão (ABERTURA=1 mostra a inteira)
+  + (process.env.ABERTURA ? '' : "try{sessionStorage.setItem('cc.abertura','1')}catch(e){};")
+  + (process.env.PRE || '');
 if (tema) pre = "try{localStorage.setItem('cc.tema'," + JSON.stringify(JSON.stringify(tema === 'escuro')) + ')}catch(e){};' + pre;
 await cmd('Page.addScriptToEvaluateOnNewDocument', { source: pre });
 if (process.env.COOKIE) {
