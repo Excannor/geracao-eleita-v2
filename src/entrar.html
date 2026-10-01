@@ -217,39 +217,51 @@
 
     <svg class="lp-onda" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64C180 10 340 0 520 40s320 84 520 52S1300 8 1440 30V120H0z"/></svg>
 
-    <!-- O mural: lambe-lambes tipográficos, cada um no seu estilo, colados meio tortos. -->
+    <!-- A arte do meio, incorporada à página (uma faixa de ponta a ponta, não um cartaz):
+         João 14.6, desenhada aqui em SVG e CSS, nas cores do app (oliva da marca, sálvia e o
+         dourado das peças do jogo). O texto do versículo é o da Bíblia Livre. -->
     <div class="lp-mural">
-      <h2 class="lp-titulo-mural">Palavra que <span>gruda</span>.</h2>
-      <div class="lp-posters">
-        <figure class="poster po-raso" aria-label="O raso não me serve mais. Ezequiel 47.5">
-          <span class="l1">O raso</span><span class="l2">não me</span>
-          <svg class="po-onda" viewBox="0 0 120 40" aria-hidden="true"><path d="M2 30c14 0 14-14 28-14s14 14 28 14 14-24 30-24c10 0 18 8 30 8" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>
-          <span class="l3">serve</span><span class="l4">mais</span><small>Ezequiel 47.5</small>
-        </figure>
-        <figure class="poster po-vale" aria-label="Ainda que eu ande pelo vale da sombra da morte, não temerei. Salmos 23.4">
-          <span class="l1">Ainda que eu ande pelo</span><span class="l2">Vale da sombra da morte</span><span class="l3">não temerei</span><small>Salmos 23.4</small>
-        </figure>
-        <figure class="poster po-venha" aria-label="Até que o Senhor venha. 1 Coríntios 4.5">
-          <svg class="po-coroa" viewBox="0 0 80 40" aria-hidden="true"><path d="M4 36h72l4-30-20 12L40 0 20 18 0 6z" fill="currentColor"/></svg>
-          <span class="l1">Até que o</span><span class="l2">Senhor</span><span class="l3">venha</span><small>1 Coríntios 4.5</small>
-        </figure>
-        <figure class="poster po-cristo" aria-label="Cristo vive em mim. Gálatas 2.20">
-          <span class="l1">Cristo</span><span class="l2">vive em</span><svg class="po-coracao" viewBox="0 0 64 56" aria-hidden="true"><path d="M32 54S2 36 2 17C2 8 9 2 17 2c7 0 12 4 15 9 3-5 8-9 15-9 8 0 15 6 15 15 0 19-30 37-30 37z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M26 2v14M38 2v12" stroke="currentColor" stroke-width="4"/></svg><span class="l3">mim</span><small>Gálatas 2.20</small>
-        </figure>
-        <figure class="poster po-fundo" aria-label="Mergulhando em águas profundas. Ezequiel 47.1-5">
-          <span class="l1">Mergulhando em</span><span class="l2">águas</span><span class="l3">pro</span><span class="l3">fun</span><span class="l3">das</span><small>Ezequiel 47.1-5</small>
-        </figure>
-        <figure class="poster po-moldando" aria-label="Quem está moldando você? Provérbios 4.23">
-          <small>Provérbios 4.23</small><span class="l1">Quem</span><span class="l2">está</span><span class="l3">moldando</span><span class="l4">você?</span>
-        </figure>
-        <figure class="poster po-coracoes" aria-label="Corações queimando. Lucas 24.32">
-          <span class="l1">Corações</span><svg class="po-fogo" viewBox="0 0 64 80" aria-hidden="true"><path d="M32 78c17 0 28-11 28-27 0-12-6-21-14-30 1 8-3 13-8 14 2-13-5-25-16-33 2 14-4 21-11 29C5 38 4 45 4 51c0 16 11 27 28 27z" fill="#ff6a2b"/><path d="M32 76c-9 0-15-6-15-15 0-7 4-11 8-15 0 5 3 8 6 8-1-8 3-14 9-18-1 9 7 13 7 25 0 9-6 15-15 15z" fill="#ffb347"/></svg><span class="l2">queimando</span><small>Lucas 24.32</small>
-        </figure>
-        <figure class="poster po-atos" aria-label="Será através de nós. Atos 1.8">
-          <span class="l1">Será</span><span class="l2">através</span><span class="l3">de nós</span><small>Atos 1.8</small>
-        </figure>
-      </div>
+      <figure class="lp-arte-joao" aria-label="Jesus é o caminho, a verdade e a vida. João 14.6">
+        <div class="aj-ref" aria-hidden="true"><span>João 14.6</span><i></i><span>João 14.6</span></div>
+        <span class="aj-jesus" aria-hidden="true">Jesus</span>
+        <svg class="aj-cena" viewBox="0 0 360 220" aria-hidden="true">
+          <defs>
+            <clipPath id="aj-ceu"><rect width="360" height="120"/></clipPath>
+            <pattern id="aj-hachura" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 5h6" stroke="#2e3820" stroke-width="1"/></pattern>
+          </defs>
+          <rect width="360" height="120" fill="url(#aj-hachura)"/>
+          <g clip-path="url(#aj-ceu)">
+            <circle cx="232" cy="96" r="60" fill="none" stroke="#ffc44d" stroke-width="1" opacity=".35"/>
+            <circle cx="232" cy="96" r="48" fill="#ffc44d"/>
+            <path d="M184 92h96M184 99h96M184 106h96M184 113h96" stroke="#232b17" stroke-width="3.2"/>
+          </g>
+          <g fill="#3a4627"><rect x="40" y="40" width="46" height="9" rx="4.5"/><rect x="58" y="34" width="26" height="9" rx="4.5"/><rect x="290" y="52" width="40" height="8" rx="4"/><rect x="302" y="46" width="20" height="8" rx="4"/></g>
+          <path d="M150 56l5 3 5-3M168 46l4 2 4-2M136 64l3 2 3-2" fill="none" stroke="#c8da8c" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M0 118l40-22 26 12 38-26 34 22 30-14 26 16h20l30-20 40 24 34-12 42 20v20H0z" fill="#34401f"/>
+          <path d="M104 82v-12M99 75h10" stroke="#c8da8c" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M0 126c44-16 92-14 140-4s86 10 128 2 66-10 92-6v102H0z" fill="#46551f"/>
+          <path d="M10 132c40-10 84-10 124-2M190 132c34 4 70 2 104-6M30 142c44-6 92-4 132 4" fill="none" stroke="#5a6b2a" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M0 150c56-18 116-12 166 0s104 12 194-8v78H0z" fill="#5a6b2a"/>
+          <path d="M14 158c44-12 96-10 140 0M196 160c46 4 96-2 150-14M40 170c50-6 100-2 150 6M220 174c40 0 84-6 124-16" fill="none" stroke="#6f8233" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M0 184c70-16 140 4 210 2s110-12 150-10v44H0z" fill="#3a4a1c"/>
+          <path d="M70 220c40-16 104-26 94-40s-32-20 16-30c20-4 26-10 28-16l4 0c0 7-4 12-20 18-38 10 2 18 16 30 22 18-20 26-40 38z" fill="#e4eec4"/>
+          <path d="M70 220c40-16 104-26 94-40s-32-20 16-30c20-4 26-10 28-16" fill="none" stroke="#c8da8c" stroke-width="1.2"/>
+          <path d="M118 218c30-14 76-22 68-36s-18-18 16-27c11-3 14-9 15-14" fill="none" stroke="#5a6b2a" stroke-width="1.8" stroke-dasharray="5 6" stroke-linecap="round"/>
+          <g stroke="#232b17" stroke-linecap="round"><path d="M226 186v-10" stroke-width="2.4"/><path d="M240 180v-8" stroke-width="2"/><path d="M252 175v-6" stroke-width="1.7"/><path d="M262 171v-5" stroke-width="1.4"/><path d="M226 180l14-5 12-4 10-3" stroke-width="1" fill="none"/></g>
+          <path d="M306 168v-26" stroke="#1a2010" stroke-width="4.5" stroke-linecap="round"/>
+          <circle cx="306" cy="132" r="15" fill="#2b3618"/><circle cx="294" cy="140" r="10" fill="#2b3618"/><circle cx="318" cy="141" r="10" fill="#2b3618"/>
+          <circle cx="301" cy="128" r="6" fill="#46551f"/>
+          <path d="M48 140v-8M44 135h8" stroke="#2b3618" stroke-width="2" stroke-linecap="round"/><circle cx="48" cy="130" r="5" fill="#2b3618"/><circle cx="62" cy="134" r="4" fill="#2b3618"/>
+          <path d="M20 206l3-8 3 8M34 212l2-7 2 7M300 204l3-8 3 8M318 210l2-7 2 7M278 214l3-8 3 8" fill="none" stroke="#6f8233" stroke-width="1.4" stroke-linecap="round"/>
+          <g fill="#ff7a3d"><circle cx="26" cy="196" r="1.8"/><circle cx="292" cy="198" r="1.8"/><circle cx="330" cy="204" r="1.8"/></g>
+        </svg>
+        <span class="aj-caminho" aria-hidden="true">É o caminho, a</span>
+        <span class="aj-verdade" aria-hidden="true">Verdade</span>
+        <span class="aj-vida" aria-hidden="true">e a vida</span>
+        <figcaption class="aj-texto">Jesus lhe disse: Eu sou o caminho, e a verdade, e a vida. Ninguém vem ao Pai, a não ser por mim. <b>João 14.6 · Bíblia Livre</b></figcaption>
+      </figure>
     </div>
+    <svg class="lp-onda lp-onda-baixo" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64C180 10 340 0 520 40s320 84 520 52S1300 8 1440 30V120H0z"/></svg>
 
     <!-- Como funciona: três promessas curtas, cada uma com uma peça do jogo do app. -->
     <div class="lp-como">
