@@ -172,6 +172,15 @@ const ESQUEMA = [
   ALTER TABLE propositos ADD COLUMN multiplicada_em TEXT NOT NULL DEFAULT '';
   ALTER TABLE proposito_membros ADD COLUMN tornou_membro_em TEXT NOT NULL DEFAULT '';
   `,
+  // v11: a caixa de avisos (o sino do Início). Cada notificação que o app manda (lembrete,
+  // toque, pedido, convite...) fica guardada para a pessoa ver depois, mesmo sem aparelho
+  // inscrito ou com o aviso social desligado. Só as mais recentes de cada um (ver
+  // notificacoes.mjs, CAIXA_MAX).
+  `
+  CREATE TABLE push_caixa (id TEXT PRIMARY KEY, usuario TEXT NOT NULL, em INTEGER NOT NULL, tipo TEXT NOT NULL,
+    titulo TEXT NOT NULL, corpo TEXT NOT NULL, url TEXT NOT NULL, lido INTEGER NOT NULL DEFAULT 0);
+  CREATE INDEX push_caixa_usuario ON push_caixa (usuario, em);
+  `,
 ];
 
 function migrarEsquema(db) {

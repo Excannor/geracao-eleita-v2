@@ -375,10 +375,13 @@ export const primeiroNome = (nome) => String(nome || '').trim().split(/\s+/)[0] 
 // No banco (push_inscricoes, push_preferencias, push_historico): um aparelho por linha,
 // as preferências e o histórico do que já saiu, para as regras de limite sobreviverem a um
 // reinício. O notificacoes.json antigo é importado uma vez.
+// Quantos avisos cada pessoa guarda na caixa do sino (os mais antigos saem).
+export const CAIXA_MAX = 60;
+
 export class Notificacoes {
   constructor(arquivo) {
     this.arquivo = arquivo;
-    this.dados = { versao: 1, inscricoes: {}, preferencias: {}, historico: {} };
+    this.dados = { versao: 1, inscricoes: {}, preferencias: {}, historico: {}, caixa: {} };
   }
 
   async carregar() {
@@ -386,17 +389,20 @@ export class Notificacoes {
     this.db = db;
     const t = this.lerTabelas();
     if (legado) {
-      this.dados = { versao: 1, inscricoes: {}, preferencias: {}, historico: {}, ...legado };
+      this.dados = { versao: 1, inscricoes: {}, preferencias: {}, historico: {}, caixa: {}, ...legado };
       await this.salvar();
       concluirImportacao(db, 'notificacoes', this.arquivo);
       return this;
     }
-    const d = { versao: 1, inscricoes: {}, preferencias: {}, historico: {} };
+    const d = { versao: 1, inscricoes: {}, preferencias: {}, historico: {}, caixa: {} };
     for (const l of t.inscricoes) {
       (d.inscricoes[l.usuario] || (d.inscricoes[l.usuario] = [])).push({ endpoint: l.endpoint, p256dh: l.p256dh, auth: l.auth, criadaEm: l.criada_em });
     }
     for (const l of t.preferencias) d.preferencias[l.usuario] = JSON.parse(l.dados);
     for (const l of t.historico) d.historico[l.usuario] = JSON.parse(l.dados);
+    for (const l of t.caixa) {
+      (d.caixa[l.usuario] || (d.caixa[l.usuario] = [])).push({ id: l.id, em: l.em, tipo: l.tipo, titulo: l.titulo, corpo: l.corpo, url: l.url, lido: !!l.lido });
+    }
     this.dados = d;
     return this;
   }
@@ -406,6 +412,7 @@ export class Notificacoes {
       inscricoes: lerTabela(this.db, 'push_inscricoes', ['endpoint'], 'usuario, ordem'),
       preferencias: lerTabela(this.db, 'push_preferencias', ['usuario']),
       historico: lerTabela(this.db, 'push_historico', ['usuario']),
+      caixa: lerTabela(this.db, 'push_caixa', ['id'], 'usuario, em'),
     };
   }
 
@@ -418,6 +425,9 @@ export class Notificacoes {
       }))) },
       { tabela: 'push_preferencias', chaves: ['usuario'], linhas: Object.entries(d.preferencias).map(([usuario, p]) => ({ usuario, dados: JSON.stringify(p) })) },
       { tabela: 'push_historico', chaves: ['usuario'], linhas: Object.entries(d.historico).map(([usuario, h]) => ({ usuario, dados: JSON.stringify(h) })) },
+      { tabela: 'push_caixa', chaves: ['id'], linhas: Object.entries(d.caixa || {}).flatMap(([usuario, lista]) => (lista || []).map((a) => ({
+        id: a.id, usuario, em: a.em, tipo: a.tipo, titulo: a.titulo, corpo: a.corpo, url: a.url, lido: a.lido ? 1 : 0,
+      }))) },
     ]);
   }
 
@@ -479,6 +489,27 @@ export class Notificacoes {
     return h;
   }
 
+  // ---------- a caixa do sino ----------
+  caixaDe(usuario) { return ((this.dados.caixa || {})[usuario] || []).slice().sort((a, b) => b.em - a.em); }
+  naoLidos(usuario) { return this.caixaDe(usuario).filter((a) => !a.lido).length; }
+
+  async guardarNaCaixa(usuario, tipo, mensagem, em = Date.now()) {
+    if (!this.dados.caixa) this.dados.caixa = {};
+    const lista = this.dados.caixa[usuario] || [];
+    const id = em.toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    lista.push({ id, em, tipo: String(tipo || ''), titulo: String(mensagem.titulo || ''), corpo: String(mensagem.corpo || ''), url: String(mensagem.url || './#/'), lido: false });
+    this.dados.caixa[usuario] = lista.sort((a, b) => a.em - b.em).slice(-CAIXA_MAX);
+    await this.salvar();
+    return id;
+  }
+
+  async marcarLidos(usuario) {
+    const lista = (this.dados.caixa || {})[usuario] || [];
+    if (!lista.some((a) => !a.lido)) return;
+    this.dados.caixa[usuario] = lista.map((a) => ({ ...a, lido: true }));
+    await this.salvar();
+  }
+
   toquesHoje(usuario, data) {
     const h = this.historico(usuario);
     return h.data === data ? (h.toques || 0) : 0;
@@ -488,6 +519,7 @@ export class Notificacoes {
     delete this.dados.inscricoes[usuario];
     delete this.dados.preferencias[usuario];
     delete this.dados.historico[usuario];
+    if (this.dados.caixa) delete this.dados.caixa[usuario];
     await this.salvar();
   }
 }

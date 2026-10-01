@@ -497,7 +497,10 @@ const nomeDeExibicao = async (usuario) => {
 
 // Manda para todos os aparelhos da pessoa. O serviço que responde 404 ou 410 avisa que o
 // aparelho desinstalou ou revogou a permissão: a inscrição sai da lista.
+// Tudo o que sai também fica na caixa do sino (menos o teste e o que já foi guardado por
+// quem chamou, como o aviso social).
 async function enviarPara(usuario, mensagem, opcoes = {}) {
+  if (!opcoes.semCaixa) await NOTIFICACOES.guardarNaCaixa(usuario, opcoes.tipo || mensagem.tag || '', mensagem);
   let enviados = 0;
   for (const inscricao of NOTIFICACOES.inscricoesDe(usuario)) {
     try {
@@ -516,17 +519,26 @@ async function enviarPara(usuario, mensagem, opcoes = {}) {
 // pessoa, o silêncio da noite e, nos toques, o teto do dia de quem recebe.
 async function avisoSocial(para, tipo, dados) {
   const conta = CONTAS.achar(para);
-  if (!conta || !NOTIFICACOES.inscricoesDe(para).length || !NOTIFICACOES.preferencias(para).amigos) return false;
+  if (!conta) return false;
   const agora = agoraDoServidor();
-  if (emSilencio(minutosNoFuso(conta.fuso, agora))) return false;
-  const data = hojeNoFuso(conta.fuso, agora);
-  if (tipo === 'toque') {
-    const ja = NOTIFICACOES.toquesHoje(para, data);
-    if (ja >= MAX_TOQUES_RECEBIDOS_DIA) return;
-    dados = { ...dados, outros: ja };
+  // A interação vai para a caixa do sino sempre, mesmo sem aparelho inscrito, com o aviso
+  // desligado ou na hora do silêncio: só o push é que respeita essas escolhas.
+  {
+    const dataCaixa = hojeNoFuso(conta.fuso, agora);
+    const paraCaixa = montarMensagem(tipo, tipo === 'toque' ? { ...dados, outros: 0 } : dados, { usuario: para, data: dataCaixa, nome: await nomeDeExibicao(para) });
+    await NOTIFICACOES.guardarNaCaixa(para, tipo, paraCaixa);
   }
+  if (!NOTIFICACOES.inscricoesDe(para).length) return false;
+  // Decisão do dono (01/10): todo toque vira notificação no celular de quem recebe, sem a
+  // chave "avisos de amigos", sem o silêncio da noite e sem o teto de toques recebidos no
+  // dia. Os outros avisos sociais continuam respeitando essas escolhas.
+  const toque = tipo === 'toque';
+  if (!toque && !NOTIFICACOES.preferencias(para).amigos) return false;
+  if (!toque && emSilencio(minutosNoFuso(conta.fuso, agora))) return false;
+  const data = hojeNoFuso(conta.fuso, agora);
+  if (toque) dados = { ...dados, outros: NOTIFICACOES.toquesHoje(para, data) };
   const mensagem = montarMensagem(tipo, dados, { usuario: para, data, nome: await nomeDeExibicao(para) });
-  if (!(await enviarPara(para, mensagem))) return false;
+  if (!(await enviarPara(para, mensagem, { semCaixa: true }))) return false;
   await NOTIFICACOES.anotar(para, tipo, data, 0);
   return true;
 }
@@ -1566,8 +1578,8 @@ const servidor = createServer(async (req, res) => {
         const euLeu = (await diaDe(eu, hojeEu)).feitas.has(hojeEu);
         const eleLeu = outro ? (await diaDe(outro.usuario, hojeNoFuso(outro.fuso))).feitas.has(hojeNoFuso(outro.fuso)) : false;
         const resultado = await CONTAS.tocar(eu, para, { hoje: hojeEu, euLeu, eleLeu });
-        // O push só sai no toque novo: "Notificar" de novo no mesmo dia devolve "ja" e não dispara nada.
-        if (resultado === 'enviado') semEsperar(avisoSocial(outro.usuario, 'toque', { amigo: await nomeDeExibicao(eu) }));
+        // Todo toque aceito vira notificação, inclusive o segundo do mesmo dia ("ja").
+        if (resultado === 'enviado' || resultado === 'ja') semEsperar(avisoSocial(outro.usuario, 'toque', { amigo: await nomeDeExibicao(eu) }));
         return { resultado };
       });
       return;
@@ -1674,6 +1686,18 @@ const servidor = createServer(async (req, res) => {
     }
 
     // ---------- notificações ----------
+    // A caixa do sino: os avisos que saíram para a pessoa (push e interações), mais novos antes.
+    if (rota === '/api/avisos' && req.method === 'GET') {
+      if (!exigir(conta, 403, 'entre com uma conta')) return;
+      json(res, 200, { avisos: NOTIFICACOES.caixaDe(eu), naoLidos: NOTIFICACOES.naoLidos(eu) });
+      return;
+    }
+    if (rota === '/api/avisos/lidos') {
+      if (!exigir(conta, 403, 'entre com uma conta')) return;
+      await acao(async () => { await NOTIFICACOES.marcarLidos(eu); return {}; });
+      return;
+    }
+
     if (rota === '/api/notificacoes' && req.method === 'GET') {
       json(res, 200, {
         chave: CHAVES_PUSH.publica,
@@ -1706,7 +1730,7 @@ const servidor = createServer(async (req, res) => {
     if (rota === '/api/notificacoes/testar') {
       await acao(async () => {
         const mensagem = montarMensagem('teste', {}, { usuario: eu, data: hojeDe(eu) });
-        const enviados = await enviarPara(eu, mensagem, { ttl: 600, urgencia: 'high' });
+        const enviados = await enviarPara(eu, mensagem, { ttl: 600, urgencia: 'high', semCaixa: true });
         if (!enviados) throw Object.assign(new Error('nenhum aparelho recebeu. Ative de novo neste celular'), { publico: true });
         return { enviados };
       });

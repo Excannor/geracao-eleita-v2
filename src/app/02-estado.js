@@ -265,7 +265,11 @@
     return enviar();
   };
 
-  CC.estado = () => E;
+  // CC.estado() devolve o estado do aparelho; CC.estado({ ... }) é o azulejo de tela vazia ou
+  // de erro de 01-nucleo.js. Os dois nomes colidiam: este arquivo vem depois e apagava o
+  // azulejo, e as telas de erro mostravam "[object Object]".
+  const azulejo = CC.estado;
+  CC.estado = (opcoes) => (opcoes && typeof opcoes === 'object' && azulejo ? azulejo(opcoes) : E);
   CC.ler = (chave, padrao) => (E[chave] === undefined ? padrao : E[chave]);
   CC.gravar = (chave, valor) => {
     E[chave] = valor;

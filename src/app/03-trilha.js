@@ -234,7 +234,8 @@
       + (servido
         ? '<a class="botao-redondo" href="#/novidades" aria-label="Juntos' + (pendencias ? ', há novidades' : '') + '">'
           + CC.ico('balao') + (pendencias ? '<i class="ponto"></i>' : '') + '</a>'
-          + '<a class="botao-redondo" href="#/config/notificacoes" aria-label="Lembretes">' + CC.ico('sino') + '</a>'
+          + '<a class="botao-redondo" href="#/avisos" data-sino aria-label="Avisos">' + CC.ico('sino')
+          + (CC.avisosNaoLidos && CC.avisosNaoLidos() ? '<i class="ponto"></i>' : '') + '</a>'
         : '')
       + '</header>';
 
@@ -328,6 +329,7 @@
 
     vigiarAtual(raiz);
     vigiarEstrada(raiz);
+    if (CC.atualizarPontoDoSino) CC.atualizarPontoDoSino();
     if (CC.recemFeito) setTimeout(() => { CC.recemFeito = null; }, 1400);
   };
 
