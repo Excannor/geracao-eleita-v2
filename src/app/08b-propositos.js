@@ -845,6 +845,11 @@
     const hoje = CC.hojeIso();
     const alvo = dataDoEncontro(p, hoje);
     if (!alvo) return '';
+    if (p.ultimoEncontro && p.ultimoEncontro.data === alvo && p.ultimoEncontro.semEncontro) {
+      return '<div class="registro-encontro"><span class="selo-status">' + CC.ico('calendario')
+        + 'Sem encontro em ' + ddmm(alvo) + '</span>'
+        + '<button class="botao plano pequeno" data-corrigir-encontro>Corrigir</button></div>';
+    }
     if (p.ultimoEncontro && p.ultimoEncontro.data === alvo) {
       const total = p.ultimoEncontro.presentes + p.ultimoEncontro.visitantes;
       return '<div class="registro-encontro"><span class="selo-status leu">' + CC.ico('certo')
@@ -939,6 +944,8 @@
       + '<button type="button" class="botao-icone" data-visitantes-mais aria-label="Aumentar">+</button></div></div>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao" data-salvar>Salvar</button>'
+      // Feriado ou imprevisto: a semana fica registrada sem encontro e ninguém conta como falta.
+      + '<button class="botao contorno" data-sem-encontro>Não houve encontro nesta semana</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
       rotulo: 'Quem foi ao encontro',
@@ -964,6 +971,21 @@
         folha.querySelector('[data-visitantes-menos]').onclick = () => { n = Math.max(0, n - 1); valor.textContent = n; };
         folha.querySelector('[data-visitantes-mais]').onclick = () => { n = Math.min(30, n + 1); valor.textContent = n; };
         folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelector('[data-sem-encontro]').onclick = async () => {
+          const botao = folha.querySelector('[data-sem-encontro]');
+          botao.disabled = true;
+          try {
+            await CC.api('api/celula', { acao: 'registrarEncontro', id: p.id, data: dataEscolhida, semEncontro: true, presentes: [], visitantes: 0 });
+            fechar();
+            CC.avisar('Semana registrada sem encontro');
+            recarregar();
+          } catch (e) {
+            botao.disabled = false;
+            const erro = folha.querySelector('.erro-proposito');
+            erro.textContent = e.message || 'Não deu certo agora. Tente de novo.';
+            erro.hidden = false;
+          }
+        };
         folha.querySelector('[data-salvar]').onclick = async () => {
           const botao = folha.querySelector('[data-salvar]');
           botao.disabled = true;

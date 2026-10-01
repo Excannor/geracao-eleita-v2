@@ -130,7 +130,8 @@ export function quemPrecisaDeAtencao({ candidatos, encontros, referencia, criado
   // Os dois encontros mais recentes até a data de referência. Quem não foi marcado como
   // presente no último encontro (frequência do líder) entra na lista: é a pessoa a procurar
   // nesta semana. Quem faltou não tem teto; quem só está sem ler completa até LIMITE_ATENCAO.
-  const doisUltimos = (encontros || []).filter((e) => !referencia || e.data <= referencia)
+  // Semana marcada como "não houve encontro" não entra: ninguém faltou a um encontro que não houve.
+  const doisUltimos = (encontros || []).filter((e) => !e.semEncontro && (!referencia || e.data <= referencia))
     .sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0)).slice(0, 2);
   const faltaram = [];
   const semLerLista = [];

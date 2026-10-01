@@ -100,6 +100,11 @@ ok(R.sequenciaDoGrupo({ tipo: 'plano', batidaEm: () => true, desde: '2026-03-04'
   ok(r3.length === 1 && r3[0].motivo === 'faltou ao último encontro', 'quem não foi marcado no último encontro aparece');
   const r5 = A([{ usuario: 'eva', nome: 'Eva', entrouEm: '2026-03-19', datas: leu('2026-03-19') }], [enc[1]]);
   ok(!r5.length, 'quem entrou no dia do encontro não conta como falta');
+  const feriado = [{ data: '2026-03-12', presentes: ['bia'] }, { data: '2026-03-19', presentes: [], semEncontro: true }];
+  const rf = A([{ usuario: 'ana', nome: 'Ana', entrouEm: '2026-03-01', datas: leu('2026-03-19') }], feriado);
+  ok(rf.length === 1 && rf[0].motivo === 'faltou ao último encontro', 'semana sem encontro não conta: vale o encontro de antes');
+  ok(!A([{ usuario: 'bia', nome: 'Bia', entrouEm: '2026-03-01', datas: leu('2026-03-19') }], feriado).length,
+    'quem foi ao último encontro de verdade não aparece por causa da semana sem encontro');
   const faltosos = Array.from({ length: 8 }, (_, i) => ({ usuario: 'f' + i, nome: 'Falta ' + i, entrouEm: '2026-03-01', datas: leu('2026-03-19') }));
   ok(A(faltosos, enc).length === 8, 'quem faltou entra sempre, sem o teto da lista');
   const r4 = A([{ usuario: 'davi', nome: 'Davi', entrouEm: '2026-03-01', datas: leu('2026-03-10') }], []);

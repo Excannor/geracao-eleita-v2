@@ -181,6 +181,15 @@ const ESQUEMA = [
     titulo TEXT NOT NULL, corpo TEXT NOT NULL, url TEXT NOT NULL, lido INTEGER NOT NULL DEFAULT 0);
   CREATE INDEX push_caixa_usuario ON push_caixa (usuario, em);
   `,
+  // v12: a semana sem encontro (feriado, imprevisto): o líder registra que não houve
+  // encontro e ninguém conta como falta. E o check-in do discípulo (Corpo, Mente, Espírito,
+  // de 1 a 3), um por pessoa por dia, guardado por 180 dias para o histórico; o discipulador
+  // vê só o último.
+  `
+  ALTER TABLE celula_encontros ADD COLUMN sem_encontro INTEGER NOT NULL DEFAULT 0;
+  CREATE TABLE checkins (usuario TEXT NOT NULL, data TEXT NOT NULL, corpo INTEGER NOT NULL, mente INTEGER NOT NULL,
+    espirito INTEGER NOT NULL, em TEXT NOT NULL, PRIMARY KEY (usuario, data));
+  `,
 ];
 
 function migrarEsquema(db) {

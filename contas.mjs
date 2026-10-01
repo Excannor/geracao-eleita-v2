@@ -187,6 +187,7 @@ function paraLinhas(d) {
     { tabela: 'proposito_dias', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.diasBatidos || []).map((data) => ({ proposito: p.id, data }))) },
     { tabela: 'celula_encontros', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || []).map((e) => ({
       proposito: p.id, data: e.data, visitantes: Number(e.visitantes) || 0, registrado_por: e.registradoPor || '', em: e.em || '',
+      sem_encontro: e.semEncontro ? 1 : 0,
     }))) },
     { tabela: 'celula_presencas', chaves: ['proposito', 'data', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || [])
       .flatMap((e) => (e.presentes || []).map((usuario) => ({ proposito: p.id, data: e.data, usuario })))) },
@@ -279,7 +280,7 @@ function deLinhas(t, versao) {
   }
   for (const l of t.encontros || []) {
     const p = d.propositos[l.proposito];
-    if (p) p.encontros.push({ data: l.data, visitantes: Number(l.visitantes) || 0, registradoPor: l.registrado_por || '', em: l.em || '', presentes: [] });
+    if (p) p.encontros.push({ data: l.data, visitantes: Number(l.visitantes) || 0, registradoPor: l.registrado_por || '', em: l.em || '', presentes: [], semEncontro: !!l.sem_encontro });
   }
   for (const l of t.presencas || []) {
     const p = d.propositos[l.proposito];
@@ -1209,15 +1210,18 @@ export class Contas {
   // Quem conduz registra quem foi ao encontro: hoje ou um dos 7 dias anteriores, membros e
   // visitantes de verdade (não qualquer @ digitado), e regrava por cima se já havia registro
   // naquele dia. "visitantes" aqui é o contador de pessoas que vieram mas não têm conta no app.
-  async registrarEncontro(eu, id, { data, presentes, visitantes } = {}, hoje) {
+  // semEncontro: "não houve encontro nesta semana" (feriado, imprevisto). Fica registrado
+  // para aquela data, sem presenças, e não conta como falta de ninguém.
+  async registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro } = {}, hoje) {
     const p = this.celulaDeQuemConduz(eu, id);
     const d = String(data || '');
     if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d > hoje || d < somaDias(hoje, -7)) throw erro('escolha o dia do encontro, de hoje até 7 dias atrás');
-    const n = Number(visitantes);
+    const sem = semEncontro === true;
+    const n = sem ? 0 : Number(visitantes);
     if (!Number.isInteger(n) || n < 0 || n > 30) throw erro('o número de pessoas sem conta vai de 0 a 30');
     const validos = new Set(this.ativosDe(p).map((m) => m.usuario));
-    const lista = [...new Set((Array.isArray(presentes) ? presentes : []).map(limparNome))].filter((u) => validos.has(u));
-    const registro = { data: d, visitantes: n, registradoPor: limparNome(eu), em: new Date().toISOString(), presentes: lista };
+    const lista = sem ? [] : [...new Set((Array.isArray(presentes) ? presentes : []).map(limparNome))].filter((u) => validos.has(u));
+    const registro = { data: d, visitantes: n, registradoPor: limparNome(eu), em: new Date().toISOString(), presentes: lista, semEncontro: sem };
     const encontros = p.encontros || (p.encontros = []);
     const existente = encontros.find((e) => e.data === d);
     if (existente) Object.assign(existente, registro); else encontros.push(registro);

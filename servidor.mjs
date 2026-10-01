@@ -694,8 +694,8 @@ function celulaNoRetrato(p, eu, info, ativos, referencia) {
     ...extra,
     semanaLider: { pessoas: ativos.length, leram, leituras, possiveis: ativos.length * 7 },
     atencao,
-    ultimoEncontro: ultimo ? { data: ultimo.data, presentes: ultimo.presentes.length, visitantes: ultimo.visitantes } : null,
-    encontrosRegistrados: encontros.filter((e) => e.data >= limiteJanela && e.data <= referencia).length,
+    ultimoEncontro: ultimo ? { data: ultimo.data, presentes: ultimo.presentes.length, visitantes: ultimo.visitantes, semEncontro: !!ultimo.semEncontro } : null,
+    encontrosRegistrados: encontros.filter((e) => !e.semEncontro && e.data >= limiteJanela && e.data <= referencia).length,
   };
 }
 
@@ -1282,7 +1282,7 @@ const servidor = createServer(async (req, res) => {
     if (rota === '/api/celula') {
       await acao(async ({
         acao: qual, id, titulo, token, dia, texto, usuario, estudo, ref, acolhida, adoracao, testemunho,
-        visitante, sim, data, presentes, visitantes, auxiliar, pessoas,
+        visitante, sim, data, presentes, visitantes, semEncontro, auxiliar, pessoas,
       }) => {
         const hoje = hojeDe(eu);
         if (qual === 'criar') {
@@ -1304,7 +1304,7 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia); return {}; }
         if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto); return {}; }
         if (qual === 'estudo') { await CONTAS.definirEstudo(eu, id, { tipo: estudo, ref, texto, acolhida, adoracao, testemunho }, TODOS_LIVROS); return {}; }
-        if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes }, hoje); return {}; }
+        if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro }, hoje); return {}; }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
         if (qual === 'multiplicar') {
           const r = await CONTAS.multiplicarCelula(eu, id, { auxiliar, titulo, pessoas }, hoje);
