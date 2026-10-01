@@ -12,7 +12,7 @@ const AQUI=join(import.meta.dirname,'..');
 const EST=join(tmpdir(),'quiz.json');
 const srv=spawn(process.execPath,[join(AQUI,'servidor.mjs'),'8161'],{env:{...process.env,CAMINHO_ESTADO:EST,CAMINHO_ABERTO:'1'},stdio:'ignore'});
 const perfil=mkdtempSync(join(tmpdir(),'quiz-'));
-const nav=spawn('C:/Program Files/Google/Chrome/Application/chrome.exe',['--headless=new','--disable-gpu','--no-first-run','--remote-debugging-port=' + PORTA_NAV,'--user-data-dir='+perfil,'--window-size=390,844','about:blank'],{stdio:'ignore'});
+const nav=spawn(process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe',['--headless=new','--disable-gpu','--no-first-run','--remote-debugging-port=' + PORTA_NAV,'--user-data-dir='+perfil,'--window-size=390,844','about:blank'],{stdio:'ignore'});
 async function alvo(){for(let i=0;i<60;i++){try{const l=await(await fetch('http://127.0.0.1:' + PORTA_NAV + '/json/list')).json();const p=l.find(x=>x.type==='page');if(p)return p.webSocketDebuggerUrl;}catch{}await dormir(250);}throw 0;}
 const ws=new WebSocket(await alvo());let seq=0;const pend=new Map();const evs=[];
 ws.addEventListener('message',e=>{const m=JSON.parse(e.data);if(m.id&&pend.has(m.id)){pend.get(m.id)(m.result||{});pend.delete(m.id);}else if(m.method)evs.push(m);});

@@ -20,7 +20,7 @@
 <style>/*ESTILO*/</style>
 </head>
 <body>
-<script>try{var t=localStorage.getItem('cc.tema');if(t!==null)document.documentElement.dataset.tema=JSON.parse(t)?'escuro':'claro'}catch(e){}try{if(sessionStorage.getItem('cc.abertura'))document.documentElement.classList.add('sem-abertura')}catch(e){}if(navigator.standalone===true||/[?&]app-ios(&|$)/.test(location.search))document.documentElement.classList.add('app-ios')</script>
+<script>try{var t=localStorage.getItem('cc.tema');if(t!==null)document.documentElement.dataset.tema=JSON.parse(t)?'escuro':'claro'}catch(e){}try{var s=sessionStorage;if(s.getItem('cc.abertura.segue')){s.removeItem('cc.abertura.segue');document.documentElement.classList.add('abertura-segue')}else if(s.getItem('cc.abertura'))document.documentElement.classList.add('sem-abertura')}catch(e){}if(navigator.standalone===true||/[?&]app-ios(&|$)/.test(location.search))document.documentElement.classList.add('app-ios')</script>
 /*ABERTURA*/
 <div class="aplicativo">
   <header class="topo" id="topo"></header>

@@ -528,20 +528,33 @@
   // que a página começou a carregar (o tempo carregando já conta, então numa rede lenta nada
   // é somado); quem pede menos movimento fica com ABERTURA_CURTA. Pronto, a barra completa e
   // a abertura sai.
+  // A exceção é a atualização que chega no meio da abertura (logo depois de um deploy, a
+  // primeira abertura baixa a versão nova e recarrega): a página velha deixa a marca
+  // cc.abertura.segue, o script do tema troca sem-abertura por abertura-segue e a página nova
+  // continua a abertura de onde ela estava, sem entrar de novo, e sai assim que fica pronta.
+  // As folhas e avisos da partida (consentimento, check-in, escudo, convites) esperam
+  // CC.aberturaSaiu: abertos por baixo dela, gastariam o tempo de leitura escondidos.
   const ABERTURA_MINIMA = 1600;
   const ABERTURA_CURTA = 700;
+  const ABERTURA_SEGUE = 400;
   const abertura = document.getElementById('abertura');
+  let aberturaFora;
+  CC.aberturaSaiu = new Promise((r) => { aberturaFora = r; });
+  const segue = document.documentElement.classList.contains('abertura-segue');
   let jaVista = false;
   try {
     jaVista = sessionStorage.getItem('cc.abertura') === '1';
     sessionStorage.setItem('cc.abertura', '1');
   } catch (e) { /* sem sessionStorage, vale a abertura inteira */ }
-  if (abertura && jaVista) {
+  if (!abertura) {
+    aberturaFora();
+  } else if (jaVista && !segue) {
     abertura.remove();
     CC.aplicarTema(document.documentElement.dataset.tema === 'escuro');
-  } else if (abertura) {
+    aberturaFora();
+  } else {
     const calma = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const espera = Math.max(0, (calma ? ABERTURA_CURTA : ABERTURA_MINIMA) - performance.now());
+    const espera = Math.max(0, (segue ? ABERTURA_SEGUE : calma ? ABERTURA_CURTA : ABERTURA_MINIMA) - performance.now());
     setTimeout(() => requestAnimationFrame(() => {
       // A barra sai da animação para uma transição: fixa o ponto em que está e corre até o fim.
       const barra = abertura.querySelector('.abertura-barra i');
@@ -555,6 +568,7 @@
         abertura.classList.add('saindo');
         // a barra de status volta para a cor da folha do tema (a abertura a deixou preta)
         CC.aplicarTema(document.documentElement.dataset.tema === 'escuro');
+        aberturaFora();
         setTimeout(() => abertura.remove(), 500);
       }, calma ? 0 : 320);
     }), espera);
@@ -594,6 +608,8 @@
     // lista, mas herda aquela rolagem, escondendo o título. Corrige assim que o caminho
     // é conhecido, só na Trilha.
     if (quem && quem.caminho === 'conhecer' && (location.hash === '#/' || location.hash === '')) CC.rolarPara(0);
+    // Daqui para baixo vêm folhas e avisos: só com a abertura saindo.
+    await CC.aberturaSaiu;
 
     // Conta recém-criada: o tutorial de pôr o app na tela de início aparece logo na primeira
     // abertura, antes de qualquer leitura (quem entra pelo Conhecer Jesus nem lê o plano). A marca
@@ -698,8 +714,15 @@
     const podeRecarregar = () => !document.querySelector('.licao, .cortina, .tela-cheia')
       && !(CC.leitorAberto && CC.leitorAberto());
     const recarregarQuandoPuder = () => {
-      if (podeRecarregar()) location.reload();
-      else recarregarDepois = true;
+      if (podeRecarregar()) {
+        // Com a abertura ainda na tela, a página nova a continua em vez de cortá-la. A marca é
+        // gravada no pagehide, quando a página nova de fato assume (a velha pode seguir
+        // desenhando a abertura por um tempo depois do reload).
+        addEventListener('pagehide', () => {
+          if (document.querySelector('#abertura:not(.saindo)')) try { sessionStorage.setItem('cc.abertura.segue', '1'); } catch (e) { /* segue */ }
+        }, { once: true });
+        location.reload();
+      } else recarregarDepois = true;
     };
     addEventListener('hashchange', () => { if (recarregarDepois && podeRecarregar()) location.reload(); });
 
