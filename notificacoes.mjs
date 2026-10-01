@@ -310,6 +310,9 @@ const T = {
   denunciaPerigo: [['Um pedido da célula precisa da sua atenção.', 'Abra a célula para ver.']],
   // Multiplicação de célula (Atos 2.47): quem foi para a célula nova recebe só isto, uma vez.
   celulaMultiplicada: [['Você agora faz parte da {filha}.', 'O líder é {novoLider}.']],
+  // Desafio de consagração em grupo: um convite, sem cobrança. {grupo} é o nome da célula
+  // (vazio na dupla do discipulado).
+  desafioGrupo: [['{amigo} chamou {quem} para um desafio', '{titulo}. Entre também na aba Desafios.']],
 };
 export const TEXTOS = T;
 
@@ -368,6 +371,11 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   if (tipo === 'celulaMultiplicada') {
     url = dados.id ? './#/novidades/celula/' + encodeURIComponent(dados.id) : './#/novidades';
     tag = tipo + ':' + (dados.id || '');
+  }
+  if (tipo === 'desafioGrupo') {
+    d.quem = !dados.grupo ? 'você' : /^c[ée]lula\b/i.test(dados.grupo) ? 'a ' + dados.grupo : 'a célula ' + dados.grupo;
+    url = './#/missoes';
+    tag = 'desafioGrupo:' + (dados.amigoUsuario || '');
   }
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = lista[semente(usuario + '|' + data + '|' + tipo) % lista.length];

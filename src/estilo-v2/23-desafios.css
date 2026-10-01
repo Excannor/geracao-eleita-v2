@@ -214,3 +214,35 @@
 .botao.botao-presencial { gap: 6px; min-height: 36px; margin-top: 10px; padding: 6px 14px; }
 .botao-presencial svg, .selo-presencial svg { width: 16px; height: 16px; }
 .selo-presencial { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--salvia-texto); font-size: .8125rem; font-weight: 700; }
+
+/* desafio em grupo: o cartão do desafio com a lista de quem está junto. Venceu hoje fica com
+   o visto sálvia; quem ainda não entrou fica apagado, sem cobrança */
+.dsf-grupo { cursor: default; }
+.dsf-grupo .dsf-selo { gap: 6px; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dsf-grupo .dsf-selo svg { flex: 0 0 auto; width: 14px; height: 14px; }
+.dsf-placar { display: block; margin: 0 0 8px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
+.dsf-membros { margin: 0 0 16px; padding: 0; list-style: none; }
+.dsf-membro { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 0; }
+.dsf-membro + .dsf-membro { border-top: 1px solid var(--contorno); }
+.dsf-membro-txt { flex: 1; min-width: 0; }
+.dsf-membro-txt b { display: block; color: var(--tinta-forte); font-size: .9375rem; font-weight: 700; }
+.dsf-membro-txt small { display: inline-flex; align-items: center; gap: 4px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+.dsf-membro-txt small svg { width: 14px; height: 14px; }
+.dsf-membro.venceu small { color: var(--salvia-texto); }
+.dsf-membro.fora { opacity: .6; }
+.dsf-membro-n { flex: 0 0 auto; min-width: 48px; padding: 4px 10px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--contorno); color: var(--tinta-forte); font-size: .8125rem; font-weight: 700; text-align: center; }
+.dsf-membro.venceu .dsf-membro-n { background: var(--salvia); box-shadow: none; color: var(--salvia-tinta); }
+.dsf-grupo .dsf-acao { display: flex; align-items: center; justify-content: center; width: 100%; padding: 0 16px; border-radius: 999px; cursor: pointer; }
+.dsf-grupo span.dsf-acao { cursor: default; }
+.dsf-estudo-link, .dsf-encerrar { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 44px; margin-top: 8px; }
+.dsf-estudo-link { color: var(--tinta-forte); font-weight: 700; text-decoration: none; }
+.dsf-estudo-link svg { width: 16px; height: 16px; }
+.dsf-encerrar { border: 0; background: none; color: var(--tinta-fraca); font: 600 .875rem var(--fonte); }
+.dsf-grupo + .missao-convite { margin-top: 12px; }
+/* na folha do desafio: começar junto com a célula ou com a dupla */
+.dsf-junto { margin: 20px 0 8px; padding: 16px; border-radius: 20px; background: var(--campo); }
+.dsf-junto > b { color: var(--tinta-forte); }
+.dsf-junto .passo-dica { margin: 4px 0 12px; }
+.dsf-junto .botao { gap: 8px; width: 100%; }
+.dsf-junto .botao + .botao { margin-top: 8px; }
+.dsf-junto .botao svg { width: 18px; height: 18px; }

@@ -13,6 +13,7 @@
     [/^(querConversar|querBatismo|possoAjudar|pedidoConduz|denunciaPerigo)/, 'balao'],
     [/^(proposito|grupo|metaDoGrupo|metaBatida|celula)/, 'pessoas'],
     [/^discipulado/, 'cruz'],
+    [/^desafio/, 'bandeira'],
   ];
   const iconeDe = (tipo) => (ICONE.find(([re]) => re.test(tipo || '')) || [null, 'sino'])[1];
 

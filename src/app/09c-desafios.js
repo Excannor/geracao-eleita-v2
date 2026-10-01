@@ -198,6 +198,114 @@
         + '<div class="dsf-lista caixa-lista">' + outros.map(linhaNovo).join('') + '</div>' : '');
   };
 
+  // ---------- desafio em grupo (desafios-grupo.mjs no servidor) ----------
+  // A célula ou a dupla do discipulado fazem o mesmo desafio juntas. Cada um marca o próprio
+  // dia no mesmo registro do desafio pessoal; o servidor lê esses dias desde o começo do grupo
+  // e devolve o progresso de todos. A última resposta fica guardada para a folha do desafio.
+  let grupos = null;
+  CC.carregarDesafiosDoGrupo = async () => {
+    if (!CC.appServido || !CC.appServido()) return null;
+    try { grupos = (await CC.api('api/desafios-grupo')).grupos || []; } catch (e) { /* fica a última */ }
+    return grupos;
+  };
+
+  // A minha linha sai do aparelho: o dia vencido aparece na hora, sem esperar a sincronização.
+  function euAgora(m, g) {
+    const r = registro(g.desafio);
+    const hoje = CC.hojeIso();
+    const dias = [...new Set(((r && r.dias) || []).filter((x) => x >= g.inicio && x <= g.fim))];
+    const vencidos = Math.min(dias.length, g.dias);
+    return { ...m, entrou: !!(r && (r.ativo || dias.length)), vencidos, venceuHoje: dias.includes(hoje), concluido: vencidos >= g.dias };
+  }
+
+  function estadoMembro(m, g) {
+    if (!m.entrou) return 'Ainda não entrou';
+    if (m.concluido) return 'Concluiu os ' + g.dias + ' dias';
+    if (m.venceuHoje) return CC.ico('certo') + 'Venceu hoje';
+    if (m.escapou) return 'Escapou ontem';
+    return 'Falta marcar hoje';
+  }
+
+  function cartaoGrupo(gr) {
+    const g = gr.desafio;
+    const d = CC.DESAFIOS.find((x) => x.id === g.desafio);
+    if (!d) return '';
+    const membros = g.membros.map((m) => (m.eu ? euAgora(m, g) : m));
+    const eu = membros.find((m) => m.eu) || euAgora({}, g);
+    const numero = Math.min(g.dias, eu.vencidos + (eu.venceuHoje ? 0 : 1));
+    const linhas = membros.map((m) => '<li class="dsf-membro' + (m.venceuHoje ? ' venceu' : '') + (m.entrou ? '' : ' fora') + (m.escapou && !m.venceuHoje ? ' escapou' : '') + '">'
+      + CC.retratoAmigo(m, 'mini') + '<span class="dsf-membro-txt"><b>' + CC.esc(String(m.nome).split(' ')[0]) + (m.eu ? ' (você)' : '') + '</b>'
+      + '<small>' + estadoMembro(m, g) + (m.entrou && m.escapados ? ' · ' + CC.plural(m.escapados, 'dia escapado', 'dias escapados') : '') + '</small></span>'
+      + '<span class="dsf-membro-n">' + m.vencidos + '/' + g.dias + '</span></li>').join('');
+    const venceram = membros.filter((m) => m.venceuHoje).length;
+    const acao = eu.concluido ? '<span class="dsf-acao feito">' + CC.ico('trofeu') + 'Você concluiu</span>'
+      : eu.venceuHoje ? '<span class="dsf-acao feito">' + vencido() + '</span>'
+        : eu.entrou || registro(g.desafio)?.concluidoEm ? '<button type="button" class="dsf-acao" data-vencer-grupo="' + g.desafio + '">Vencer o dia de hoje</button>'
+          : '<button type="button" class="dsf-acao" data-entrar-grupo="' + g.desafio + '">Entrar no desafio</button>';
+    return '<div class="dsf-card dsf-grupo">'
+      + '<span class="dsf-topo"><span class="dsf-linha"><span class="dsf-selo">' + CC.ico(gr.tipo === 'celula' ? 'pessoas' : 'aperto') + CC.esc(gr.nome) + '</span>'
+      + '<span class="dsf-dias">Dia ' + Math.max(1, g.dia) + ' de ' + g.dias + '</span></span>'
+      + '<b class="dsf-nome">' + nb(g.titulo) + '</b></span>'
+      + '<span class="dsf-corpo"><span class="dsf-placar">' + venceram + ' de ' + membros.length + ' venceram hoje</span>'
+      + '<ul class="dsf-membros">' + linhas + '</ul>' + acao
+      + (eu.entrou && !eu.concluido ? '<a class="link-nota dsf-estudo-link" href="' + CC.hrefDoVerso(d.estudos[numero - 1][0]) + '">' + CC.ico('livro') + 'Estudo do dia ' + numero + ': ' + nb(d.estudos[numero - 1][0]) + '</a>' : '')
+      + (g.podeEncerrar ? '<button type="button" class="link-nota dsf-encerrar" data-encerrar-grupo="' + CC.esc(g.id) + '" data-tipo="' + gr.tipo + '" data-grupo="' + CC.esc(gr.grupo) + '">Encerrar o desafio do grupo</button>' : '')
+      + '</span></div>';
+  }
+
+  // O bloco "Desafios em grupo" da aba Desafios: os desafios abertos dos meus grupos e, para
+  // quem pode começar um, o convite para escolher.
+  CC.blocoDesafiosDoGrupo = function () {
+    if (!grupos || !grupos.length) return '';
+    const abertos = grupos.filter((g) => g.desafio);
+    const podeComecar = grupos.filter((g) => !g.desafio && g.podeIniciar);
+    if (!abertos.length && !podeComecar.length) return '';
+    return '<div class="titulo-bloco"><h2>Desafios em grupo</h2></div>' + abertos.map(cartaoGrupo).join('')
+      + (podeComecar.length ? '<div class="missao-convite"><span class="icone-missao">' + CC.ico('pessoas') + '</span>'
+        + '<p>Faça um desafio de consagração junto com ' + (podeComecar.length === 1 ? CC.esc(nomeDoGrupo(podeComecar[0])) : 'a sua célula ou o seu discipulado')
+        + ': abra um desafio e toque em “Fazer junto”.</p></div>' : '');
+  };
+  const nomeDoGrupo = (g) => (g.tipo === 'celula' ? (/^c[ée]lula\b/i.test(g.nome) ? 'a ' : 'a célula ') + g.nome : g.nome.replace(/^Você e /, ''));
+
+  CC.ligarDesafiosDoGrupo = function (raiz, redesenhar) {
+    const marcar = (id, ativar) => {
+      const hoje = CC.hojeIso();
+      gravarRegistro(id, (r) => {
+        if (ativar) return r.concluidoEm ? r : { ...r, ativo: true };
+        if (!r.dias.includes(hoje)) r.dias.push(hoje);
+        const d = CC.DESAFIOS.find((x) => x.id === id);
+        if (d && r.ativo && r.dias.length >= d.dias && !r.concluidoEm) { r.concluidoEm = hoje; r.ativo = false; }
+        return r;
+      });
+    };
+    raiz.querySelectorAll('[data-entrar-grupo]').forEach((b) => {
+      b.onclick = () => { marcar(b.dataset.entrarGrupo, true); CC.avisar('Você entrou. Agora é vencer um dia de cada vez.'); redesenhar(); };
+    });
+    raiz.querySelectorAll('[data-vencer-grupo]').forEach((b) => {
+      b.onclick = () => { marcar(b.dataset.vencerGrupo, false); CC.vibrar && CC.vibrar('sucesso'); CC.avisar('Dia vencido. O grupo vê o seu progresso.'); redesenhar(); };
+    });
+    raiz.querySelectorAll('[data-encerrar-grupo]').forEach((b) => {
+      b.onclick = async () => {
+        const ok = await CC.confirmar({ titulo: 'Encerrar o desafio do grupo?', texto: 'Ele sai da tela de todos. Os dias que cada um venceu continuam no desafio de cada um.', acao: 'Encerrar', perigo: true });
+        if (!ok) return;
+        try {
+          await CC.api('api/desafios-grupo', { acao: 'encerrar', id: b.dataset.encerrarGrupo, tipo: b.dataset.tipo, grupo: b.dataset.grupo });
+          await CC.carregarDesafiosDoGrupo();
+          redesenhar();
+        } catch (e) { CC.avisar(e.message); }
+      };
+    });
+  };
+
+  // Na folha do desafio: começar junto com um grupo que ainda não está em desafio nenhum.
+  function fazerJunto(d) {
+    const livres = (grupos || []).filter((g) => !g.desafio && g.podeIniciar);
+    if (!livres.length) return '';
+    return '<div class="dsf-junto"><b>Fazer junto</b><p class="passo-dica pequena">Todos recebem o convite e veem quem venceu cada dia.</p>'
+      + livres.map((g) => '<button type="button" class="botao contorno" data-fazer-grupo="' + g.tipo + '" data-grupo="' + CC.esc(g.grupo) + '">'
+        + CC.ico(g.tipo === 'celula' ? 'pessoas' : 'aperto') + 'Com ' + CC.esc(nomeDoGrupo(g)) + '</button>').join('') + '</div>';
+  }
+
   CC.ligarDesafiosLongos = function (raiz, redesenhar) {
     raiz.querySelectorAll('[data-desafio]').forEach((b) => {
       b.onclick = () => folhaDesafio(CC.DESAFIOS.find((d) => d.id === b.dataset.desafio), redesenhar);
@@ -223,16 +331,17 @@
           ? '<button class="botao contorno" disabled>' + vencido() + '</button>'
           : '<button class="botao azul" data-vencer>Vencer o dia de hoje</button>')
         + '</div>'
+        + fazerJunto(d)
         + '<details class="dsf-sobre"><summary>Sobre o desafio</summary>' + sobre + '</details>'
         + '<div class="acoes"><button class="botao plano" data-pausar>Deixar para depois</button><button class="botao plano" data-fechar>Fechar</button></div>';
     } else if (s.concluido) {
-      corpo = '<p class="aviso-cadeado">' + CC.ico('trofeu') + ' Você concluiu este desafio. O troféu está no seu Perfil.</p>' + sobre
+      corpo = '<p class="aviso-cadeado">' + CC.ico('trofeu') + ' Você concluiu este desafio. O troféu está no seu Perfil.</p>' + fazerJunto(d) + sobre
         + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>';
     } else {
       corpo = sobre + (s.vencidos ? '<p class="passo-dica">Você já venceu ' + CC.plural(s.vencidos, 'dia', 'dias') + '. Continue de onde parou.</p>' : '')
         + '<p class="passo-dica pequena">Todo dia tem um estudo curto: um trecho da Bíblia, uma pergunta e um passo prático.</p>'
         + '<div class="acoes"><button class="botao azul" data-comecar>' + (s.vencidos ? 'Continuar' : 'Começar hoje') + '</button>'
-        + '<button class="botao plano" data-fechar>Agora não</button></div>';
+        + '<button class="botao plano" data-fechar>Agora não</button></div>' + fazerJunto(d);
     }
     CC.folha('<span class="etiqueta">' + d.dias + '&nbsp;dias</span><h2>' + nb(d.titulo) + '</h2>' + corpo, {
       rotulo: d.titulo,
@@ -246,6 +355,18 @@
           gravarRegistro(d.id, (r) => ({ ...r, ativo: true }));
           fechar(); redesenhar(); folhaDesafio(d, redesenhar);
         };
+        folha.querySelectorAll('[data-fazer-grupo]').forEach((b) => {
+          b.onclick = async () => {
+            b.disabled = true;
+            try {
+              await CC.api('api/desafios-grupo', { acao: 'iniciar', tipo: b.dataset.fazerGrupo, grupo: b.dataset.grupo, desafio: d.id });
+              if (!CC.situacaoDesafio(d).concluido) gravarRegistro(d.id, (r) => ({ ...r, ativo: true }));
+              await CC.carregarDesafiosDoGrupo();
+              fechar(); redesenhar();
+              CC.avisar('Desafio começou. Avisamos o grupo.');
+            } catch (e) { b.disabled = false; CC.avisar(e.message); }
+          };
+        });
         if (q('[data-pausar]')) q('[data-pausar]').onclick = () => {
           gravarRegistro(d.id, (r) => ({ ...r, ativo: false }));
           fechar(); redesenhar(); CC.avisar('Pausado. Os dias vencidos ficam guardados.');

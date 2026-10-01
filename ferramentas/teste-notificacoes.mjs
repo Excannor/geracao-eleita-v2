@@ -134,10 +134,12 @@ ok(toque.resultado === 'enviado', 'a Ana leu e notifica o Bento, que ainda não 
 const aposToque = await esperarPush(celBento, antesDoToque + 1);
 const msgToque = aposToque[aposToque.length - 1];
 ok(msgToque && /Ana/.test(msgToque.titulo) && !/Clara/.test(msgToque.titulo) && msgToque.tag === 'toque', 'o Bento recebe o toque com o primeiro nome da Ana');
+// Decisão do dono (01/10): todo toque vira notificação no celular de quem recebe. O segundo
+// toque do mesmo amigo no dia não conta de novo (resultado "ja"), mas chega no celular.
 const denovo = await pedirJson('/api/toques', { para: 'bento' }, ana);
-await dormir(800);
-ok(denovo.resultado === 'ja' && doAparelho(celBento).length === antesDoToque + 1,
-  'concluir e notificar de novo no mesmo dia não manda outra notificação');
+const aposDenovo = await esperarPush(celBento, antesDoToque + 2);
+ok(denovo.resultado === 'ja' && aposDenovo.length === antesDoToque + 2,
+  'notificar de novo no mesmo dia não conta outro toque, mas chega no celular');
 
 // ---------- teto de quem recebe e preferências ----------
 const outros = [];
@@ -152,13 +154,13 @@ await dormir(300);
 let n = doAparelho(celBento).length;
 await pedirJson('/api/toques', { para: 'bento' }, outros[0]);
 const segundo = await esperarPush(celBento, n + 1);
-ok(segundo.length === n + 1 && /Carla e mais 1/.test(segundo[segundo.length - 1].titulo), 'o segundo toque do dia vem agrupado: "Carla e mais 1"');
+ok(segundo.length === n + 1 && /Carla e mais \d/.test(segundo[segundo.length - 1].titulo), 'o toque seguinte do dia vem agrupado: "Carla e mais N"');
 
 await pedirJson('/api/notificacoes/preferencias', { amigos: false }, bento);
 n = doAparelho(celBento).length;
 ok((await pedirJson('/api/toques', { para: 'bento' }, outros[1])).resultado === 'enviado', 'o Davi consegue notificar pelo app');
-await dormir(800);
-ok(doAparelho(celBento).length === n, 'com "Amigos" desligado, o toque não vira notificação');
+const comAmigosDesligado = await esperarPush(celBento, n + 1);
+ok(comAmigosDesligado.length === n + 1, 'com "Amigos" desligado, o toque ainda vira notificação (todo toque chega)');
 
 await pedirJson('/api/notificacoes/preferencias', { amigos: true }, bento);
 await pedirJson('/api/toques', { para: 'bento' }, outros[2]);
@@ -166,8 +168,8 @@ const terceiro = await esperarPush(celBento, n + 1);
 ok(terceiro.length === n + 1, 'religado, o toque volta a chegar');
 n = doAparelho(celBento).length;
 await pedirJson('/api/toques', { para: 'bento' }, outros[3]);
-await dormir(800);
-ok(doAparelho(celBento).length === n, 'no máximo 3 notificações de toque por dia para quem recebe');
+const semTeto = await esperarPush(celBento, n + 1);
+ok(semTeto.length === n + 1, 'toque não tem teto diário para quem recebe');
 
 // ---------- preferências ----------
 const pref = await pedirJson('/api/notificacoes/preferencias', { hora: '20:30', ofensiva: false, lembrete: 'sim', invasao: true }, bento);

@@ -332,6 +332,11 @@ try {
       entrou_em TEXT NOT NULL DEFAULT '', saiu_em TEXT NOT NULL DEFAULT '', convidado_por TEXT NOT NULL DEFAULT '',
       papel TEXT NOT NULL DEFAULT '', PRIMARY KEY (proposito, usuario)
     );
+    -- e o registro dos encontros da célula, que a v7 criou (a v12 acrescenta uma coluna nele)
+    CREATE TABLE celula_encontros (proposito TEXT NOT NULL, data TEXT NOT NULL, visitantes INTEGER NOT NULL DEFAULT 0,
+      registrado_por TEXT NOT NULL, em TEXT NOT NULL, PRIMARY KEY (proposito, data));
+    CREATE TABLE celula_presencas (proposito TEXT NOT NULL, data TEXT NOT NULL, usuario TEXT NOT NULL,
+      PRIMARY KEY (proposito, data, usuario));
     CREATE TABLE schema_versao (versao INTEGER NOT NULL);
     INSERT INTO schema_versao (versao) VALUES (8);
     INSERT INTO contas (usuario, nome, email, nascimento, fuso, sal, senha, criada_em, selo_convite, extra)
@@ -372,6 +377,10 @@ try {
       entrou_em TEXT NOT NULL DEFAULT '', saiu_em TEXT NOT NULL DEFAULT '', convidado_por TEXT NOT NULL DEFAULT '',
       papel TEXT NOT NULL DEFAULT '', PRIMARY KEY (proposito, usuario)
     );
+    CREATE TABLE celula_encontros (proposito TEXT NOT NULL, data TEXT NOT NULL, visitantes INTEGER NOT NULL DEFAULT 0,
+      registrado_por TEXT NOT NULL, em TEXT NOT NULL, PRIMARY KEY (proposito, data));
+    CREATE TABLE celula_presencas (proposito TEXT NOT NULL, data TEXT NOT NULL, usuario TEXT NOT NULL,
+      PRIMARY KEY (proposito, data, usuario));
     CREATE TABLE schema_versao (versao INTEGER NOT NULL);
     INSERT INTO schema_versao (versao) VALUES (9);
     INSERT INTO contas (usuario, nome, email, nascimento, fuso, sal, senha, criada_em, selo_convite, extra)

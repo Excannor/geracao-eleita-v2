@@ -75,6 +75,7 @@
       + '<div class="textos"><b class="placar-missoes">' + feitas + '<small> de ' + lista.length + '</small></b>'
       + '<p>Complete os três desafios de hoje.</p></div>'
       + '<span class="bau-cabeca">' + CC.arte.bau(feitas === lista.length ? 'aberto' : 'pronto') + '</span></div></div>'
+      + '<section class="bloco-missoes" id="desafios-grupo"' + (CC.blocoDesafiosDoGrupo() ? '' : ' hidden') + '>' + CC.blocoDesafiosDoGrupo() + '</section>'
       + '<section class="bloco-missoes" id="desafios-longos">' + CC.blocoDesafiosLongos() + '</section>'
       + '<section class="bloco-missoes">'
       + '<div class="titulo-bloco"><h2>Desafios do dia</h2><span class="relogio">' + CC.ico('calendario') + CC.plural(CC.horasAteAmanha(), 'hora', 'horas') + '</span></div>'
@@ -107,7 +108,21 @@
         CC.vistaMissoes(raiz);
       };
     });
-    CC.ligarDesafiosLongos(raiz, () => { if (location.hash.startsWith('#/missoes')) CC.vistaMissoes(raiz); });
+    const redesenhar = () => { if (location.hash.startsWith('#/missoes')) CC.vistaMissoes(raiz); };
+    CC.ligarDesafiosLongos(raiz, redesenhar);
+    CC.ligarDesafiosDoGrupo(raiz, redesenhar);
+    // Os desafios em grupo vêm do servidor: a tela abre com a última resposta e troca o bloco
+    // quando a nova chegar.
+    if (CC.carregarDesafiosDoGrupo) {
+      CC.carregarDesafiosDoGrupo().then(() => {
+        const alvo = raiz.querySelector('#desafios-grupo');
+        if (!alvo || !location.hash.startsWith('#/missoes')) return;
+        const html = CC.blocoDesafiosDoGrupo();
+        alvo.hidden = !html;
+        alvo.innerHTML = html;
+        CC.ligarDesafiosDoGrupo(alvo, redesenhar);
+      });
+    }
     if (CC.carregarAmigos) {
       CC.carregarAmigos().then((d) => {
         const alvo = raiz.querySelector('#missao-amigos');

@@ -554,10 +554,32 @@ export class Contas {
     return l ? { data: l.data, corpo: l.corpo, mente: l.mente, espirito: l.espirito } : null;
   }
 
+  // ---------- desafio de consagração em grupo ----------
+  // Como o check-in, fica fora da foto em memória: gravado e lido direto na tabela.
+  desafiosDoGrupo(tipo, grupo) {
+    if (!this.db) this.db = abrirModulo(this.arquivo, 'contas').db;
+    return this.db.prepare('SELECT * FROM desafios_grupo WHERE tipo = ? AND grupo = ? ORDER BY inicio DESC, em DESC')
+      .all(String(tipo), String(grupo)).map((l) => ({
+        id: l.id, tipo: l.tipo, grupo: l.grupo, desafio: l.desafio, inicio: l.inicio, criadoPor: l.criado_por, em: l.em, encerradoEm: l.encerrado_em,
+      }));
+  }
+  async iniciarDesafioDoGrupo({ tipo, grupo, desafio, inicio, criadoPor }) {
+    if (!this.db) this.db = abrirModulo(this.arquivo, 'contas').db;
+    const id = randomBytes(9).toString('base64url');
+    this.db.prepare('INSERT INTO desafios_grupo (id, tipo, grupo, desafio, inicio, criado_por, em) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .run(id, String(tipo), String(grupo), String(desafio), String(inicio), limparNome(criadoPor), new Date().toISOString());
+    return id;
+  }
+  async encerrarDesafioDoGrupo(id, data) {
+    if (!this.db) this.db = abrirModulo(this.arquivo, 'contas').db;
+    this.db.prepare("UPDATE desafios_grupo SET encerrado_em = ? WHERE id = ? AND encerrado_em = ''").run(String(data), String(id));
+  }
+
   async apagar(usuario) {
     const chave = limparNome(usuario);
     if (!this.dados.contas[chave]) throw erro('conta não encontrada', 404);
     if (this.db) this.db.prepare('DELETE FROM checkins WHERE usuario = ?').run(chave);
+    if (this.db) this.db.prepare('DELETE FROM desafios_grupo WHERE criado_por = ?').run(chave);
     delete this.dados.contas[chave];
     for (const k of Object.keys(this.dados.amizades)) {
       if (k.split('|').includes(chave)) delete this.dados.amizades[k];

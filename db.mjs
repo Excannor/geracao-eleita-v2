@@ -190,6 +190,14 @@ const ESQUEMA = [
   CREATE TABLE checkins (usuario TEXT NOT NULL, data TEXT NOT NULL, corpo INTEGER NOT NULL, mente INTEGER NOT NULL,
     espirito INTEGER NOT NULL, em TEXT NOT NULL, PRIMARY KEY (usuario, data));
   `,
+  // v13: desafio de consagração em grupo (desafios-grupo.mjs). "grupo" é o id da célula ou da
+  // relação de discipulado; no máximo um desafio aberto por grupo. O progresso de cada um não
+  // fica aqui: sai dos dias que a pessoa marca no próprio desafio.
+  `
+  CREATE TABLE desafios_grupo (id TEXT PRIMARY KEY, tipo TEXT NOT NULL, grupo TEXT NOT NULL, desafio TEXT NOT NULL,
+    inicio TEXT NOT NULL, criado_por TEXT NOT NULL, em TEXT NOT NULL, encerrado_em TEXT NOT NULL DEFAULT '');
+  CREATE INDEX desafios_grupo_grupo ON desafios_grupo (tipo, grupo);
+  `,
 ];
 
 function migrarEsquema(db) {

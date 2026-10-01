@@ -17,7 +17,8 @@ import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
 import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, quemPrecisaDeAtencao, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import { diasLidosNaSemana, resumoParaDiscipulador } from './discipulado.mjs';
-import { MOTIVOS_DENUNCIA_PEDIDO, MOTIVO_PERIGO, pedidoVisivelPara, gestosParaAutor, jaOrouHoje, jaAjudou } from './cuidado.mjs';
+import { MOTIVOS_DENUNCIA_PEDIDO, MOTIVO_PERIGO, pedidoVisivelPara, gestosParaAutor, jaOrouHoje, jaAjudou, membroDeVerdade } from './cuidado.mjs';
+import { DESAFIOS_GRUPO, TIPOS_GRUPO, progressoNoGrupo, diaDoGrupo, fimDoDesafio, desafioVisivel } from './desafios-grupo.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
@@ -1591,6 +1592,84 @@ const servidor = createServer(async (req, res) => {
         // Todo toque aceito vira notificação, inclusive o segundo do mesmo dia ("ja").
         if (resultado === 'enviado' || resultado === 'ja') semEsperar(avisoSocial(outro.usuario, 'toque', { amigo: await nomeDeExibicao(eu) }));
         return { resultado };
+      });
+      return;
+    }
+
+    // ---------- desafio de consagração em grupo (desafios-grupo.mjs) ----------
+    // Os grupos em que a pessoa pode fazer um desafio junto: as células de que participa de
+    // verdade (visitante fica de fora) e os discipulados ativos, dos dois lados. Na célula só
+    // quem conduz começa; na dupla, qualquer um dos dois.
+    const gruposDeDesafio = async () => {
+      const grupos = [];
+      for (const p of CONTAS.propositosDe(eu)) {
+        if (!p.celula || p.encerradoEm || !membroDeVerdade(p.membros.find((m) => m.usuario === eu))) continue;
+        grupos.push({ tipo: 'celula', grupo: p.id, nome: p.titulo, podeIniciar: podeConduzir(p, eu),
+          membros: p.membros.filter(membroDeVerdade).map((m) => m.usuario) });
+      }
+      for (const x of CONTAS.discipuladosDe(eu)) {
+        if (x.estado !== 'ativo') continue;
+        const outro = x.discipulador === eu ? x.discipulo : x.discipulador;
+        grupos.push({ tipo: 'discipulado', grupo: x.id, nome: 'Você e ' + await nomeDeExibicao(outro), podeIniciar: true,
+          membros: [x.discipulador, x.discipulo] });
+      }
+      return grupos;
+    };
+
+    if (rota === '/api/desafios-grupo' && req.method === 'GET') {
+      const hoje = hojeDe(eu);
+      const grupos = [];
+      for (const g of await gruposDeDesafio()) {
+        const aberto = CONTAS.desafiosDoGrupo(g.tipo, g.grupo).find((x) => desafioVisivel(x, hoje)) || null;
+        let desafio = null;
+        if (aberto) {
+          const membros = [];
+          for (const u of g.membros) {
+            const c = CONTAS.achar(u);
+            if (!c) continue;
+            const estado = (await lerEstado(arquivoDe(u))) || {};
+            const p = progressoNoGrupo({ desafio: aberto.desafio, inicio: aberto.inicio, hoje: hojeNoFuso(c.fuso), registro: (estado.desafios || {})[aberto.desafio] });
+            membros.push({ usuario: u, nome: estado.apelido || c.nome || u, foto: estado.foto || '', eu: u === eu, ...p });
+          }
+          // Quem já entrou primeiro (e, entre eles, quem venceu mais dias); quem não entrou, no fim.
+          membros.sort((a, b) => (b.entrou - a.entrou) || (b.vencidos - a.vencidos) || a.nome.localeCompare(b.nome, 'pt-BR'));
+          desafio = {
+            id: aberto.id, desafio: aberto.desafio, titulo: DESAFIOS_GRUPO[aberto.desafio].titulo, dias: DESAFIOS_GRUPO[aberto.desafio].dias,
+            inicio: aberto.inicio, fim: fimDoDesafio(aberto.inicio, aberto.desafio), dia: diaDoGrupo(aberto.inicio, aberto.desafio, hoje),
+            criadoPor: aberto.criadoPor, podeEncerrar: g.podeIniciar || aberto.criadoPor === eu, membros,
+          };
+        }
+        grupos.push({ tipo: g.tipo, grupo: g.grupo, nome: g.nome, podeIniciar: g.podeIniciar, pessoas: g.membros.length, desafio });
+      }
+      json(res, 200, { grupos });
+      return;
+    }
+
+    if (rota === '/api/desafios-grupo') {
+      await acao(async ({ acao: qual, tipo, grupo, desafio, id }) => {
+        const hoje = hojeDe(eu);
+        const g = (await gruposDeDesafio()).find((x) => x.tipo === tipo && x.grupo === String(grupo || ''));
+        if (!TIPOS_GRUPO.includes(tipo) || !g) throw Object.assign(new Error('grupo não encontrado'), { publico: true, codigo: 404 });
+        const abertos = CONTAS.desafiosDoGrupo(g.tipo, g.grupo).filter((x) => desafioVisivel(x, hoje));
+        if (qual === 'iniciar') {
+          if (!g.podeIniciar) throw Object.assign(new Error('na célula, quem começa o desafio é quem conduz'), { publico: true, codigo: 403 });
+          if (!DESAFIOS_GRUPO[desafio]) throw Object.assign(new Error('desafio desconhecido'), { publico: true });
+          if (abertos.length) throw Object.assign(new Error('o grupo já está num desafio: encerre antes de começar outro'), { publico: true, codigo: 409 });
+          const novo = await CONTAS.iniciarDesafioDoGrupo({ tipo: g.tipo, grupo: g.grupo, desafio, inicio: hoje, criadoPor: eu });
+          const quem = await nomeDeExibicao(eu);
+          for (const u of g.membros) {
+            if (u !== eu) semEsperar(avisoSocial(u, 'desafioGrupo', { amigo: quem, amigoUsuario: eu, titulo: DESAFIOS_GRUPO[desafio].titulo, grupo: g.tipo === 'celula' ? g.nome : '' }));
+          }
+          return { id: novo };
+        }
+        if (qual === 'encerrar') {
+          const x = abertos.find((a) => a.id === String(id || ''));
+          if (!x) throw Object.assign(new Error('desafio não encontrado'), { publico: true, codigo: 404 });
+          if (!g.podeIniciar && x.criadoPor !== eu) throw Object.assign(new Error('só quem conduz encerra o desafio da célula'), { publico: true, codigo: 403 });
+          await CONTAS.encerrarDesafioDoGrupo(x.id, hoje);
+          return {};
+        }
+        throw Object.assign(new Error('ação desconhecida'), { publico: true });
       });
       return;
     }
