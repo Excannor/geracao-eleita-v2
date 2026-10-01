@@ -104,9 +104,9 @@ nada disto.
                { "etapa": "acompanha", "rotulo": "Acompanham alguém na fé",    "pessoas": 1 } ]
   },
   "atencao": [ { "usuario": "bia", "nome": "Bia", "faltou": true,
-                 "motivo": "faltou ao último encontro · perdeu uma ofensiva de 40 dias há 3 dias",
+                 "motivo": "faltou ao último encontro · perdeu uma ofensiva de 40 dias e não lê há 4 dias",
                  "gatilhos": [ { "tipo": "faltou",   "texto": "faltou ao último encontro" },
-                               { "tipo": "ofensiva", "texto": "perdeu uma ofensiva de 40 dias há 3 dias" } ] } ]
+                               { "tipo": "ofensiva", "texto": "perdeu uma ofensiva de 40 dias e não lê há 4 dias" } ] } ]
 }
 ```
 
@@ -117,7 +117,7 @@ nada disto.
   "hoje": "2026-10-01", "geradoEm": "2026-10-01T20:26:39.684Z",
   "adocao": { "contas": 16,
               "hoje": { "abriram": 16, "leram": 10, "pctAbriram": 100 },
-              "media7": { "abriram": 12.1, "leram": 9 },
+              "media7": { "abriram": 12.1, "leram": 9 },          "… a média dos 7 dias fechados antes de hoje",
               "serie": [ { "dia": "2026-09-18", "abriram": 16, "leram": 8 }, "... 14 dias, até hoje" ],
               "retencao": { "base": 13, "ativas": 12, "pct": 92 } },
   "chamaDasCelulas": [ { "id": "p7cb…", "titulo": "Célula Vida", "poucos": false, "membros": 6, "acesos": 5, "pct": 83, "frequencia": 5.7 },
@@ -146,9 +146,9 @@ limitado a 20 pessoas (`LIMITE_CELULA`).
 | Métrica | Regra (`inteligencia.mjs`) | De onde vem |
 |---|---|---|
 | **Termômetro da chama** | `chamaAcesa(simulacao)`: ofensiva de hoje maior que zero (leu hoje, ou ontem com a sequência de pé, inclusive por escudo). `termometro([bool])` → acesos, total, %. | a simulação de cada membro de verdade (ativo, não visitante; quem conduz conta) |
-| **Frequência das últimas 4 semanas** | `frequencia(encontros, referencia)`: os 4 últimos encontros registrados até a data de referência, do mais antigo para o mais novo; `pessoas` = presentes com conta + pessoas sem conta; a semana "sem encontro" sai com `pessoas: null` (nunca zero); tendência = último encontro de verdade menos o anterior. | `p.encontros`, já em memória |
+| **Frequência das últimas 4 semanas** | `frequencia(encontros, referencia)`: os encontros registrados nas últimas 4 semanas (`data > referência-28`, a mesma janela `JANELA_FREQUENCIA` da frequência média do painel da igreja), no máximo 4, do mais antigo para o mais novo; um encontro de meses atrás não entra nem vira "encontro anterior" da tendência; `pessoas` = presentes com conta + pessoas sem conta; a semana "sem encontro" sai com `pessoas: null` (nunca zero); tendência = último encontro de verdade menos o anterior. | `p.encontros`, já em memória |
 | **Funil da caminhada** | `funil(pessoas)`: cada pessoa numa etapa só, a mais adiante: acompanha alguém (marco "discipula" ou discípulo ativo) › batizado (marco "batismo") › decidiu (marco "decisao") › começando (o resto; dentro dela, quantos ainda estão no Conhecer Jesus e quantos já fecharam os 12 Primeiros passos). | `conta.marcos`, `conta.caminho`, `discipulosAtivosDe`, `estado.licoes` |
-| **Alerta de risco** | `atencaoComGatilhos`: a lista de `quemPrecisaDeAtencao` (propositos.mjs: faltou ao último ou aos 2 últimos encontros; sem ler há 5 dias ou mais) ganha o gatilho `ofensivaPerdida`: a última quebra da sequência (`zerouEm` da simulação) foi há no máximo 14 dias, a sequência perdida tinha 7 dias ou mais (os dias cobertos por escudo servem de ponte) e a pessoa ainda não recomeçou (3 dias seguidos de novo). Ordem: quem faltou, quem perdeu a ofensiva, quem só está sem ler; o teto de 5 continua para quem não faltou. | a simulação e as datas de cada candidato |
+| **Alerta de risco** | `atencaoComGatilhos`: a lista de `quemPrecisaDeAtencao` (propositos.mjs: faltou ao último ou aos 2 últimos encontros; sem ler há 5 dias ou mais) ganha o gatilho `ofensivaPerdida`, que varre os 14 dias antes de hoje de trás para a frente: a quebra é o primeiro dia em branco (sem leitura e sem escudo) depois de um dia coberto; a sequência perdida são os dias lidos antes dela (os cobertos por escudo servem de ponte) e precisa ter 7 dias ou mais; se depois da quebra a pessoa já leu 3 dias seguidos, recomeçou e não há alerta; uma corrida curta (1 ou 2 dias) depois da perda não apaga a perda. Não usa `zerouEm` nem `recomeco` da simulação: o `recomeco` nunca volta a falso (quem já quebrou uma vez na vida sumiria do alerta) e o `zerouEm` pula para a quebra mais nova. O texto conta os dias desde a última leitura ("não lê há N dias", a mesma conta de "sem ler há N dias"), nunca desde o dia em que a chama apagou, e não repete o número quando a pessoa já aparece por "sem ler". Ordem: quem faltou, depois quem perdeu a ofensiva (a mais longa primeiro, mesmo que também esteja sem ler), depois quem só está sem ler; os gatilhos se juntam antes de ordenar e cortar, e o teto de 5 para quem não faltou vale só no fim. | a simulação e as datas de cada candidato |
 
 O texto do WhatsApp (`recadoDeCuidado`, `08b-propositos.js`) segue o primeiro gatilho; para a
 ofensiva perdida é um convite para recomeçar, sem cobrança.
@@ -157,16 +157,18 @@ ofensiva perdida é um convite para recomeçar, sem cobrança.
 
 | Métrica | Consulta | Custo e por que não pesa |
 |---|---|---|
-| **Adoção (DAU)** | `abriram`: `conta.acessos` (um dia por linha, 90 dias, já em memória); `leram`: `SELECT data, pessoas FROM leituras_por_dia WHERE data > ? AND data <= ?` (14 dias) | a view agrupa pelo índice `leitura_dias_data`; a janela de 14 dias devolve 14 linhas |
+| **Adoção (DAU)** | `abriram`: `conta.acessos` (um dia por linha, 90 dias, já em memória); `leram`: `SELECT data, pessoas FROM leituras_por_dia WHERE data > ? AND data <= ?` (14 dias); `media7` é a média dos 7 dias fechados antes de hoje (o dia de hoje, ainda em andamento, puxaria a média para baixo de manhã) | a view agrupa pelo índice `leitura_dias_data`; a janela de 14 dias devolve 14 linhas |
 | **Retenção simples** | das contas com 30 dias ou mais (`criadaEm`), quantas estão em `SELECT DISTINCT usuario FROM leitura_dias WHERE data > hoje-7 AND data <= hoje` | uma varredura do índice por data, 7 dias |
-| **Chama das células (ranking)** | `SELECT usuario, data FROM leitura_dias WHERE data >= hoje-120` → um `Set` de datas por pessoa → `REGRAS.simularOfensiva` por membro de verdade de cada célula ativa → `rankingDaChama` | só as linhas da janela (500 pessoas × até 120 dias, na prática bem menos), uma consulta só, e a mesma regra de ofensiva do app, não uma aproximação nova. A janela de 120 dias só poderia mudar um escudo guardado há mais de 4 meses; para o retrato de uma pessoa vale o painel do líder, que usa o histórico inteiro |
+| **Chama das células (ranking)** | `SELECT usuario, data FROM leitura_dias WHERE data >= hoje-120` → um `Set` de datas por pessoa → `REGRAS.simularOfensiva` por membro de verdade de cada célula ativa, cada um no próprio dia (`hojeDe`, nunca depois do dia do admin, como no retrato da célula) → `rankingDaChama` | só as linhas da janela (500 pessoas × até 120 dias, na prática bem menos), uma consulta só, e a mesma regra de ofensiva do app, não uma aproximação nova. A janela de 120 dias só poderia mudar um escudo guardado há mais de 4 meses; para o retrato de uma pessoa vale o painel do líder, que usa o histórico inteiro |
 | **Frequência média por célula** | `SELECT proposito, AVG(presentes + visitantes) FROM celula_frequencia WHERE sem_encontro = 0 AND data > hoje-28 AND data <= hoje GROUP BY proposito` | encontros são poucos (uma linha por célula por semana) |
 | **Evangelismo (frutos do mês)** | `evangelismoDoMes(contas, hoje)`: marcos de Minha caminhada (`decisao`, `batismo`, `celula`, `discipula`) com data no mês e no anterior | em memória, 4 datas por conta |
 | **Saúde global (check-in)** | `SELECT usuario, data, corpo, mente, espirito FROM checkins WHERE data > hoje-7 AND data <= hoje` → vale o último de cada pessoa → % em baixa, média e alta por esfera | índice `checkins_data`; no máximo uma linha por pessoa por dia |
 
 Tudo isso roda uma vez a cada 5 minutos, por `hoje`. O painel antigo (`painel.mjs`) continua como
 estava, com o cache de 1 minuto dele; a tela pede os dois em paralelo e mostra o resto mesmo se a
-parte nova falhar.
+parte nova falhar. Uma correção nele, por aparecer na mesma tela: a "frequência média por encontro
+(4 semanas)" e "registraram encontro" deixam de contar a semana marcada "não houve encontro" (ela
+entrava como encontro com zero pessoas e contradizia a frequência por célula logo ao lado).
 
 ## 5. Privacidade e LGPD: o que decidimos
 

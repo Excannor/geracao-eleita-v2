@@ -757,7 +757,13 @@ function painelDaIgreja(hoje) {
   const leramNaSemana = quemLeuEntre(DB, somaDias(hoje, -7), hoje);
   // A chama de cada membro pela mesma regra do Início, sobre as datas da janela.
   const datas = datasDesde(DB, somaDias(hoje, -JANELA_CHAMA));
-  const simular = (u) => REGRAS.simularOfensiva([...(datas.get(u) || [])], hoje);
+  // Cada pessoa no próprio dia (nunca depois do dia do admin), como no retrato da célula: quem
+  // está num fuso atrás do admin ainda não fechou o dia dela, e contá-la no dia do admin apagaria
+  // uma chama que o Início e o painel do líder mostram acesa.
+  const simular = (u) => {
+    const dele = hojeDe(u);
+    return REGRAS.simularOfensiva([...(datas.get(u) || [])], dele < hoje ? dele : hoje);
+  };
   const frequencias = frequenciaMediaPorCelula(DB, somaDias(hoje, -28), hoje);
   const celulas = CONTAS.propositosAtivos().filter((p) => p.celula && p.membros.some(membroDeVerdade)).map((p) => ({
     id: p.id, titulo: p.titulo,

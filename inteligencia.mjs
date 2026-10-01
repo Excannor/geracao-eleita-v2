@@ -32,14 +32,18 @@ export function termometro(acesos) {
   return { acesos: n, total, pct: pct(n, total) };
 }
 
-// ---------- a frequência dos últimos encontros ----------
+// ---------- a frequência das últimas 4 semanas ----------
 export const ENCONTROS_NA_FREQUENCIA = 4;
-// Os últimos encontros registrados até a referência, do mais antigo para o mais novo. A semana
-// marcada como "não houve encontro" entra como tal (pessoas: null), nunca como zero: ninguém
-// faltou a um encontro que não houve. A tendência compara os dois últimos encontros de verdade.
+export const JANELA_FREQUENCIA = 28; // a mesma janela de frequenciaMediaPorCelula (painel da igreja)
+// Os encontros registrados nas últimas 4 semanas até a referência (data > referência-28), do mais
+// antigo para o mais novo, no máximo 4. Um encontro de meses atrás não entra: a tela diz "últimas
+// 4 semanas" e a tendência não pode comparar com junho. A semana marcada como "não houve
+// encontro" entra como tal (pessoas: null), nunca como zero: ninguém faltou a um encontro que não
+// houve. A tendência compara os dois últimos encontros de verdade.
 export function frequencia(encontros, referencia, quantos = ENCONTROS_NA_FREQUENCIA) {
+  const desde = referencia ? somaDias(referencia, -JANELA_FREQUENCIA) : '';
   const lista = (encontros || [])
-    .filter((e) => e && DATA_VALIDA.test(String(e.data || '')) && (!referencia || e.data <= referencia))
+    .filter((e) => e && DATA_VALIDA.test(String(e.data || '')) && (!referencia || (e.data <= referencia && e.data > desde)))
     .sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0))
     .slice(-quantos)
     .map((e) => ({
@@ -97,54 +101,74 @@ export function funil(pessoas) {
 // ---------- a ofensiva perdida: o gatilho do cuidado ----------
 export const JANELA_OFENSIVA_PERDIDA = 14; // a perda só é recente dentro destes dias
 export const OFENSIVA_MINIMA_ALERTA = 7; // perder menos que uma semana não é gatilho
-// A última ofensiva que a pessoa perdeu: a sequência que vinha até o dia anterior à quebra
-// (zerouEm, da simulação de src/app/02-estado.js), com os dias cobertos por escudo servindo
-// de ponte. Só vira gatilho quando a quebra é recente, a sequência valia a pena e a pessoa
-// ainda não recomeçou (3 dias seguidos de novo): é a hora de alguém chegar perto.
+export const DIAS_PARA_RECOMECAR = 3; // 3 dias seguidos de novo: a pessoa recomeçou sozinha
+// A última ofensiva que a pessoa perdeu, varrendo os dias da janela de trás para a frente: a
+// quebra é o primeiro dia em branco (sem leitura e sem escudo) depois de um dia coberto, e a
+// sequência perdida são os dias lidos antes dela, com os dias cobertos por escudo servindo de
+// ponte. Só vira gatilho quando a quebra é recente, a sequência valia a pena e a pessoa ainda não
+// recomeçou (3 dias seguidos depois da quebra): é a hora de alguém chegar perto.
+// Não usa o zerouEm nem o recomeco da simulação (src/app/02-estado.js): o recomeco é global e
+// nunca volta a falso, então quem já quebrou e recomeçou uma vez na vida sumiria do alerta; e o
+// zerouEm move para a quebra mais nova, então ler 1 ou 2 dias depois da perda apagaria a perda.
+// Leva também semLerHa: os dias desde a última leitura (a mesma conta de "sem ler há N dias"),
+// que é o número que o líder lê, sem ambiguidade com o dia em que a chama apagou.
 export function ofensivaPerdida({ datas, hoje, simulacao, janela = JANELA_OFENSIVA_PERDIDA, minimo = OFENSIVA_MINIMA_ALERTA }) {
-  if (!simulacao || !simulacao.zerouEm || simulacao.recomeco) return null;
-  const quebra = simulacao.zerouEm;
-  const haDias = diasEntre(quebra, hoje);
-  if (haDias < 0 || haDias > janela) return null;
+  // Depois da última quebra a corrida nunca zera: "recomeçou depois da última quebra" é atual >= 3.
+  if (!simulacao || Number(simulacao.atual) >= DIAS_PARA_RECOMECAR) return null;
   const feitas = datas instanceof Set ? datas : new Set(datas || []);
   const protegidos = new Set(simulacao.protegidos || []);
-  let dias = 0;
-  for (let d = somaDias(quebra, -1); feitas.has(d) || protegidos.has(d); d = somaDias(d, -1)) if (feitas.has(d)) dias++;
-  if (dias < minimo) return null;
-  return { dias, em: quebra, haDias, voltou: Number(simulacao.atual) > 0 };
+  const coberto = (d) => feitas.has(d) || protegidos.has(d);
+  let corridaDepois = 0; // a maior corrida de leitura (com escudos de ponte) depois da quebra examinada
+  let corrida = 0;
+  for (let q = somaDias(hoje, -1), n = 1; n <= janela; q = somaDias(q, -1), n++) {
+    if (coberto(q)) { if (feitas.has(q)) corrida++; corridaDepois = Math.max(corridaDepois, corrida); continue; } // escudo é ponte, não zera
+    corrida = 0;
+    if (!coberto(somaDias(q, -1))) continue; // q não é o 1º dia do buraco que quebrou a sequência
+    if (corridaDepois >= DIAS_PARA_RECOMECAR) return null; // recomeçou depois desta quebra
+    let dias = 0;
+    for (let d = somaDias(q, -1); coberto(d); d = somaDias(d, -1)) if (feitas.has(d)) dias++;
+    // Sequência curta antes desta quebra: segue varrendo, porque uma perda longa pode estar logo
+    // atrás (quem leu 1 ou 2 dias depois de perder 40 e parou de novo).
+    if (dias < minimo) continue;
+    const ultimaLeitura = [...feitas].filter((d) => d < hoje).sort().pop() || somaDias(q, -1);
+    return { dias, em: q, haDias: diasEntre(q, hoje), semLerHa: diasEntre(ultimaLeitura, hoje), voltou: Number(simulacao.atual) > 0 };
+  }
+  return null;
 }
 
 // ---------- "Precisam de atenção" com gatilhos ----------
 // A lista de propositos.mjs (faltou ao encontro, dias sem ler) ganha quem perdeu uma ofensiva
 // longa há pouco. Cada pessoa aparece uma vez, com todos os seus gatilhos, em ordem de
-// urgência: quem faltou, quem perdeu a ofensiva, quem só está sem ler. O teto de
-// LIMITE_ATENCAO continua valendo para quem não faltou. candidatos: os de quemPrecisaDeAtencao,
-// cada um podendo trazer "perda" (o resultado de ofensivaPerdida).
+// urgência: quem faltou, quem perdeu a ofensiva (a mais longa primeiro), quem só está sem ler.
+// Os gatilhos se juntam ANTES de ordenar e cortar: quem perdeu a ofensiva e também está sem ler
+// fica entre os da ofensiva, com os dois textos, e o teto de LIMITE_ATENCAO (para quem não
+// faltou) só vale no fim. candidatos: os de quemPrecisaDeAtencao, cada um podendo trazer "perda"
+// (o resultado de ofensivaPerdida).
 export function atencaoComGatilhos({ candidatos, encontros, referencia, criadoEm = '' }) {
-  const base = quemPrecisaDeAtencao({ candidatos, encontros, referencia, criadoEm });
-  const textoDaPerda = (perda) => 'perdeu uma ofensiva de ' + perda.dias + ' dias'
-    + (perda.haDias === 0 ? ' hoje' : perda.haDias === 1 ? ' ontem' : ' há ' + perda.haDias + ' dias')
-    + (perda.voltou ? ', mas já voltou a ler' : '');
-  const porUsuario = new Map(base.map((x) => [x.usuario, {
+  const base = quemPrecisaDeAtencao({ candidatos, encontros, referencia, criadoEm, limite: Infinity });
+  // O texto conta os dias desde a última leitura (o mesmo número de "sem ler há N dias"), nunca
+  // desde o dia em que a chama apagou; quando a pessoa já aparece por "sem ler", não repete.
+  const textoDaPerda = (perda, jaDizSemLer) => 'perdeu uma ofensiva de ' + perda.dias + ' dias'
+    + (perda.voltou ? ', mas já voltou a ler' : jaDizSemLer || perda.semLerHa === undefined ? '' : ' e não lê há ' + perda.semLerHa + ' dias');
+  const perdaDe = new Map(candidatos.filter((c) => c.perda).map((c) => [c.usuario, c.perda]));
+  const itens = base.map((x) => ({
     usuario: x.usuario, nome: x.nome, motivo: x.motivo, faltou: !!x.faltou,
     gatilhos: [{ tipo: x.faltou ? 'faltou' : 'semLer', texto: x.motivo }],
-  }]));
-  const soPelaPerda = [];
-  for (const c of candidatos) {
-    if (!c.perda) continue;
-    const texto = textoDaPerda(c.perda);
-    const item = porUsuario.get(c.usuario);
-    if (item) {
-      item.gatilhos.push({ tipo: 'ofensiva', texto });
-      item.motivo += ' · ' + texto;
-      continue;
-    }
-    soPelaPerda.push({ usuario: c.usuario, nome: c.nome, motivo: texto, faltou: false, gatilhos: [{ tipo: 'ofensiva', texto }], dias: c.perda.dias });
+  }));
+  const naLista = new Set(itens.map((x) => x.usuario));
+  for (const c of candidatos) if (c.perda && !naLista.has(c.usuario)) itens.push({ usuario: c.usuario, nome: c.nome, motivo: '', faltou: false, gatilhos: [] });
+  for (const item of itens) {
+    const perda = perdaDe.get(item.usuario);
+    if (!perda) continue;
+    const texto = textoDaPerda(perda, item.gatilhos.some((g) => g.tipo === 'semLer'));
+    item.gatilhos.push({ tipo: 'ofensiva', texto });
+    item.motivo = item.motivo ? item.motivo + ' · ' + texto : texto;
   }
-  soPelaPerda.sort((a, b) => (b.dias - a.dias) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
-  const faltaram = [...porUsuario.values()].filter((x) => x.faltou);
-  const semLer = [...porUsuario.values()].filter((x) => !x.faltou);
-  const resto = soPelaPerda.map(({ dias, ...x }) => x).concat(semLer).slice(0, Math.max(0, LIMITE_ATENCAO - faltaram.length));
+  const faltaram = itens.filter((x) => x.faltou);
+  const diasDaPerda = (x) => (perdaDe.get(x.usuario) || { dias: -1 }).dias; // sem perda: depois de qualquer perda
+  const resto = itens.filter((x) => !x.faltou)
+    .sort((a, b) => (diasDaPerda(b) - diasDaPerda(a)) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'))
+    .slice(0, Math.max(0, LIMITE_ATENCAO - faltaram.length));
   return faltaram.concat(resto);
 }
 
@@ -215,7 +239,8 @@ export const IDADE_PARA_RETENCAO = 30;
 // contas: [{ usuario, criadaEm, acessos }] (acessos: os dias em que a conta abriu o app, já
 // anotados em contas.mjs); leramPorDia: Map dia -> pessoas (a view leituras_por_dia);
 // leramNaSemana: Set de quem leu nos últimos 7 dias. Quem abriu e quem leu são contas de
-// uso, não de fé: saem sem máscara, como no painel de hoje.
+// uso, não de fé: saem sem máscara, como no painel de hoje. media7 é a média dos 7 dias fechados
+// antes de hoje (DIAS_SERIE_ADOCAO cobre os 8 dias necessários).
 export function adocao({ contas, leramPorDia, leramNaSemana, hoje }) {
   const lista = contas || [];
   const abriramEm = (dia) => lista.filter((c) => (c.acessos || []).includes(dia)).length;
@@ -223,7 +248,7 @@ export function adocao({ contas, leramPorDia, leramNaSemana, hoje }) {
     const dia = somaDias(hoje, -(DIAS_SERIE_ADOCAO - 1 - i));
     return { dia, abriram: abriramEm(dia), leram: Number((leramPorDia && leramPorDia.get(dia)) || 0) };
   });
-  const ultimos7 = serie.slice(-7);
+  const ultimos7 = serie.slice(-8, -1); // os 7 dias fechados: hoje ainda está em andamento e puxaria a média para baixo
   const media = (campo) => Math.round((ultimos7.reduce((s, x) => s + x[campo], 0) / ultimos7.length) * 10) / 10;
   const deHoje = serie[serie.length - 1];
   // Retenção simples: das contas com 30 dias ou mais, quantas leram nos últimos 7 dias.

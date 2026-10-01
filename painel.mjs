@@ -74,8 +74,12 @@ export function montarPainel({
   const celulas = ativosProp.filter((p) => p.celula);
   const celulasAtivas = celulas.filter((p) => p.membros.some((m) => m.estado === 'ativo'));
   const desde4Semanas = desde(JANELA_ENCONTROS_PAINEL);
-  const encontrosRecentes = celulasAtivas.flatMap((p) => (p.encontros || []).filter((e) => e.data > desde4Semanas && e.data <= hoje));
-  const celulasComEncontro = new Set(celulasAtivas.filter((p) => (p.encontros || []).some((e) => e.data > desde4Semanas && e.data <= hoje)).map((p) => p.id));
+  // A semana marcada "não houve encontro" fica fora das duas contas: ninguém foi a um encontro
+  // que não houve, e ela não vira zero na média (a mesma regra da frequência por célula em
+  // inteligencia.mjs, que aparece na mesma tela).
+  const recente = (e) => !e.semEncontro && e.data > desde4Semanas && e.data <= hoje;
+  const encontrosRecentes = celulasAtivas.flatMap((p) => (p.encontros || []).filter(recente));
+  const celulasComEncontro = new Set(celulasAtivas.filter((p) => (p.encontros || []).some(recente)).map((p) => p.id));
   const frequenciaMedia = encontrosRecentes.length
     ? Math.round((encontrosRecentes.reduce((soma, e) => soma + (e.presentes || []).length + (Number(e.visitantes) || 0), 0) / encontrosRecentes.length) * 10) / 10
     : null;

@@ -79,7 +79,7 @@
     const a = g.adocao;
     const adocaoHtml = numero('Abriram o app hoje', a.hoje.abriram + ' de ' + a.contas + (a.hoje.pctAbriram === null ? '' : ' (' + a.hoje.pctAbriram + '%)'))
       + numero('Leram hoje', a.hoje.leram)
-      + numero('Por dia, nos últimos 7 dias', virgula(a.media7.abriram) + ' abriram · ' + virgula(a.media7.leram) + ' leram')
+      + numero('Por dia, nos 7 dias antes de hoje', virgula(a.media7.abriram) + ' abriram · ' + virgula(a.media7.leram) + ' leram')
       + numero('Ainda leem (contas com 30 dias ou mais)', a.retencao.pct === null ? 'ainda sem base' : a.retencao.pct + '% (' + a.retencao.ativas + ' de ' + a.retencao.base + ')')
       + colunas(a.serie.map((x) => ({ contas: x.abriram, dia: x.dia })), (x) => diaMes(x.dia));
     const celulas = g.chamaDasCelulas || [];

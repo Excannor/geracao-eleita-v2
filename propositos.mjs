@@ -126,10 +126,11 @@ export function sequenciaDoGrupo({ tipo, batidaEm, desde, hoje }) {
 export const LIMITE_ATENCAO = 5;
 export const DIAS_SEM_LER_ATENCAO = 5;
 const diasEntre = (a, b) => Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000);
-export function quemPrecisaDeAtencao({ candidatos, encontros, referencia, criadoEm = '' }) {
+export function quemPrecisaDeAtencao({ candidatos, encontros, referencia, criadoEm = '', limite = LIMITE_ATENCAO }) {
   // Os dois encontros mais recentes até a data de referência. Quem não foi marcado como
   // presente no último encontro (frequência do líder) entra na lista: é a pessoa a procurar
-  // nesta semana. Quem faltou não tem teto; quem só está sem ler completa até LIMITE_ATENCAO.
+  // nesta semana. Quem faltou não tem teto; quem só está sem ler completa até o limite (LIMITE_ATENCAO;
+  // inteligencia.mjs pede sem teto para juntar os gatilhos antes de cortar).
   // Semana marcada como "não houve encontro" não entra: ninguém faltou a um encontro que não houve.
   const doisUltimos = (encontros || []).filter((e) => !e.semEncontro && (!referencia || e.data <= referencia))
     .sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0)).slice(0, 2);
@@ -150,5 +151,5 @@ export function quemPrecisaDeAtencao({ candidatos, encontros, referencia, criado
     const semLer = desde ? diasEntre(desde, referencia) : 0;
     if (semLer >= DIAS_SEM_LER_ATENCAO) semLerLista.push({ usuario: m.usuario, nome: m.nome, motivo: 'sem ler há ' + semLer + ' dias' });
   }
-  return faltaram.concat(semLerLista.slice(0, Math.max(0, LIMITE_ATENCAO - faltaram.length)));
+  return faltaram.concat(semLerLista.slice(0, Math.max(0, limite - faltaram.length)));
 }

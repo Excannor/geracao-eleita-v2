@@ -57,19 +57,23 @@ console.log('\n  Inteligência: a célula (regras puras)\n');
   ok(I.chamaAcesa(comEscudo) && comEscudo.protegidos.length === 1 && comEscudo.atual === 18, 'o escudo do app cobre o dia em branco: a chama continua acesa, com os 18 dias');
 
   const f = I.frequencia([
-    { data: '2026-09-03', presentes: ['a', 'b', 'c'], visitantes: 2 },
-    { data: '2026-09-24', presentes: ['a', 'b', 'c', 'd'], visitantes: 1 },
-    { data: '2026-09-10', presentes: ['a', 'b'], visitantes: 0 },
-    { data: '2026-09-17', semEncontro: true, presentes: [], visitantes: 0 },
-    { data: '2026-08-27', presentes: ['a'], visitantes: 9 },
+    { data: '2026-09-10', presentes: ['a', 'b', 'c'], visitantes: 2 },
+    { data: '2026-10-01', presentes: ['a', 'b', 'c', 'd'], visitantes: 1 },
+    { data: '2026-09-17', presentes: ['a', 'b'], visitantes: 0 },
+    { data: '2026-09-24', semEncontro: true, presentes: [], visitantes: 0 },
+    { data: '2026-09-03', presentes: ['a'], visitantes: 9 }, // há exatamente 28 dias: fora da janela (data > referência-28)
+    { data: '2026-06-23', presentes: ['a', 'b', 'c', 'd', 'e', 'f'], visitantes: 0 }, // meses atrás: fora
     { data: '2026-10-08', presentes: ['a', 'b'], visitantes: 0 }, // depois da referência: fora
   ], HOJE);
-  ok(f.encontros.length === 4 && f.encontros.map((e) => e.data).join(',') === '2026-09-03,2026-09-10,2026-09-17,2026-09-24', 'os 4 últimos encontros até a referência, do mais antigo para o mais novo');
+  ok(f.encontros.length === 4 && f.encontros.map((e) => e.data).join(',') === '2026-09-10,2026-09-17,2026-09-24,2026-10-01', 'os encontros das últimas 4 semanas até a referência, do mais antigo para o mais novo (o de 28 dias atrás e o de junho ficam fora)');
   ok(f.encontros[0].pessoas === 5 && f.encontros[1].pessoas === 2 && f.encontros[3].pessoas === 5, 'pessoas por encontro: presentes com conta mais os sem conta');
   ok(f.encontros[2].semEncontro && f.encontros[2].pessoas === null, 'a semana sem encontro aparece como tal, não como zero');
   ok(f.diferenca === 3 && f.tendencia === 'subindo', 'a tendência compara os dois últimos encontros de verdade (2 -> 5: subindo)');
+  const antigo = I.frequencia([{ data: '2026-06-23', presentes: ['a', 'b', 'c', 'd', 'e', 'f'], visitantes: 0 }, { data: '2026-09-15', presentes: ['a', 'b', 'c', 'd'], visitantes: 1 }], HOJE);
+  ok(antigo.encontros.length === 1 && antigo.encontros[0].data === '2026-09-15' && antigo.tendencia === null, 'um líder que ficou meses sem registrar: o encontro de junho não vira "encontro anterior" da tendência');
   ok(I.frequencia([{ data: '2026-09-24', presentes: [], visitantes: 0 }], HOJE).tendencia === null, 'com um encontro só não há tendência');
   ok(I.frequencia([], HOJE).encontros.length === 0, 'sem encontro registrado, lista vazia');
+  ok(I.JANELA_FREQUENCIA === 28, 'a janela é a mesma da frequência média por célula no painel da igreja (28 dias)');
 
   const fu = I.funil([
     { marcos: {}, acompanha: 0, caminho: 'conhecer', passos: 0 },
@@ -90,7 +94,21 @@ console.log('\n  Inteligência: a célula (regras puras)\n');
   // ofensiva perdida: 40 dias seguidos até 4 dias atrás, nada depois
   const perdida = dias(somaDias(HOJE, -43), 40);
   const p = I.ofensivaPerdida({ datas: perdida, hoje: HOJE, simulacao: sim(perdida) });
-  ok(p && p.dias === 40 && p.em === somaDias(HOJE, -3) && p.haDias === 3 && !p.voltou, 'perdeu uma ofensiva de 40 dias há 3 dias (a quebra é o primeiro dia em branco)');
+  ok(p && p.dias === 40 && p.em === somaDias(HOJE, -3) && p.haDias === 3 && p.semLerHa === 4 && !p.voltou, 'perdeu uma ofensiva de 40 dias: a quebra é o primeiro dia em branco (há 3 dias) e a última leitura foi há 4');
+  // Um histórico antigo com quebra e recomeço (maio) não pode esconder a perda de agora: a flag
+  // "recomeco" da simulação nunca volta a falso, por isso a regra varre os dias da janela.
+  const comPassado = [...dias('2026-05-01', 10), ...dias('2026-05-20', 6), ...perdida];
+  const pp2 = I.ofensivaPerdida({ datas: comPassado, hoje: HOJE, simulacao: sim(comPassado) });
+  ok(sim(comPassado).recomeco && pp2 && pp2.dias === 40 && pp2.haDias === 3, 'quebra e recomeço antigos (em maio) não escondem a perda recente de 40 dias');
+  // Perdeu 40 dias, leu 1 ou 2 dias soltos e parou de novo: a perda longa continua sendo o gatilho.
+  const leuDoisDias = [...dias('2026-08-12', 40), '2026-09-25', '2026-09-26']; // 40 dias até 20/09
+  const pd = I.ofensivaPerdida({ datas: leuDoisDias, hoje: HOJE, simulacao: sim(leuDoisDias) });
+  ok(pd && pd.dias === 40 && pd.em === '2026-09-21' && pd.haDias === 10 && pd.semLerHa === 5 && !pd.voltou, 'leu 2 dias soltos depois de perder 40 e parou de novo: a perda de 40 dias segue como gatilho, "não lê há 5 dias"');
+  const leuUmDia = [...dias('2026-08-12', 40), '2026-09-25'];
+  ok((I.ofensivaPerdida({ datas: leuUmDia, hoje: HOJE, simulacao: sim(leuUmDia) }) || {}).dias === 40, 'um dia solto depois da perda também não apaga a perda');
+  const recomecouEParou = [...dias('2026-08-12', 40), ...dias('2026-09-22', 5)]; // 1 dia em branco coberto por escudo, 5 dias, parou há 5
+  const rp = I.ofensivaPerdida({ datas: recomecouEParou, hoje: HOJE, simulacao: sim(recomecouEParou) });
+  ok(rp && rp.dias === 45 && rp.haDias === 4, 'o dia em branco entre as duas corridas foi coberto por escudo: é uma ofensiva só, de 45 dias, perdida há 4');
   // Dois dias em branco com dois escudos guardados não quebram nada (o app cobre); a quebra
   // de verdade pede três dias em branco.
   const coberta = dias(somaDias(HOJE, -43), 40).concat([somaDias(HOJE, -1), HOJE]);
@@ -98,6 +116,8 @@ console.log('\n  Inteligência: a célula (regras puras)\n');
   const quaseVoltou = dias(somaDias(HOJE, -45), 40).concat([somaDias(HOJE, -1), HOJE]);
   const pv = I.ofensivaPerdida({ datas: quaseVoltou, hoje: HOJE, simulacao: sim(quaseVoltou) });
   ok(pv && pv.dias === 40 && pv.haDias === 5 && pv.voltou, 'quem leu de novo 2 dias ainda aparece, mas "já voltou a ler"');
+  const recomecoAntigoEParou = [...dias(somaDias(HOJE, -60), 20), ...dias(somaDias(HOJE, -9), 4)]; // perda fora da janela, recomeço de 4 dias e parou há 5
+  ok(I.ofensivaPerdida({ datas: recomecoAntigoEParou, hoje: HOJE, simulacao: sim(recomecoAntigoEParou) }) === null, 'recomeçou (4 dias) depois de uma perda antiga e parou: a corrida curta não é gatilho e a perda antiga já não é recente');
   const voltou = dias(somaDias(HOJE, -46), 40).concat([somaDias(HOJE, -2), somaDias(HOJE, -1), HOJE]);
   ok(I.ofensivaPerdida({ datas: voltou, hoje: HOJE, simulacao: sim(voltou) }) === null, 'com 3 dias seguidos de novo (recomeço) o gatilho sai');
   const curta = dias(somaDias(HOJE, -8), 5);
@@ -115,23 +135,34 @@ console.log('\n  Inteligência: a célula (regras puras)\n');
   const a = I.atencaoComGatilhos({
     candidatos: [
       { usuario: 'ana', nome: 'Ana', entrouEm: '2026-01-01', datas: new Set([HOJE]), perda: null },
-      { usuario: 'bia', nome: 'Bia', entrouEm: '2026-01-01', datas: semLer(3), perda: { dias: 40, em: somaDias(HOJE, -2), haDias: 2, voltou: false } },
+      { usuario: 'bia', nome: 'Bia', entrouEm: '2026-01-01', datas: semLer(3), perda: { dias: 40, em: somaDias(HOJE, -2), haDias: 2, semLerHa: 3, voltou: false } },
       { usuario: 'caio', nome: 'Caio', entrouEm: '2026-01-01', datas: new Set([HOJE]), perda: null },
-      { usuario: 'dora', nome: 'Dora', entrouEm: '2026-01-01', datas: semLer(9), perda: { dias: 12, em: somaDias(HOJE, -8), haDias: 8, voltou: false } },
+      { usuario: 'dora', nome: 'Dora', entrouEm: '2026-01-01', datas: semLer(9), perda: { dias: 12, em: somaDias(HOJE, -8), haDias: 8, semLerHa: 9, voltou: false } },
       { usuario: 'edu', nome: 'Edu', entrouEm: '2026-01-01', datas: semLer(6), perda: null },
     ],
     encontros, referencia: HOJE, criadoEm: '2026-01-01',
   });
-  ok(a.map((x) => x.usuario).join(',') === 'caio,bia,dora,edu', 'ordem: quem faltou (Caio), quem perdeu a ofensiva (Bia), e quem está sem ler (Dora, Edu)');
+  ok(a.map((x) => x.usuario).join(',') === 'caio,bia,dora,edu', 'ordem: quem faltou (Caio), quem perdeu a ofensiva (Bia 40, Dora 12), e quem só está sem ler (Edu)');
   ok(a[0].faltou && a[0].gatilhos.length === 1 && a[0].gatilhos[0].tipo === 'faltou', 'Caio: só o gatilho de falta');
-  ok(!a[1].faltou && a[1].gatilhos.length === 1 && a[1].gatilhos[0].tipo === 'ofensiva' && a[1].motivo === 'perdeu uma ofensiva de 40 dias há 2 dias', 'Bia: entrou só pela ofensiva perdida, com o texto pronto');
-  ok(a[2].gatilhos.map((g) => g.tipo).join(',') === 'semLer,ofensiva' && /sem ler há 9 dias · perdeu uma ofensiva de 12 dias há 8 dias/.test(a[2].motivo), 'Dora: sem ler e ofensiva perdida, os dois gatilhos numa pessoa só');
+  ok(!a[1].faltou && a[1].gatilhos.length === 1 && a[1].gatilhos[0].tipo === 'ofensiva' && a[1].motivo === 'perdeu uma ofensiva de 40 dias e não lê há 3 dias', 'Bia: entrou só pela ofensiva perdida, com o texto pronto (os dias contados desde a última leitura)');
+  ok(a[2].gatilhos.map((g) => g.tipo).join(',') === 'semLer,ofensiva' && /^sem ler há 9 dias · perdeu uma ofensiva de 12 dias$/.test(a[2].motivo), 'Dora: sem ler e ofensiva perdida, os dois gatilhos numa pessoa só, e um número só de dias');
+  const voltouTexto = I.atencaoComGatilhos({ candidatos: [{ usuario: 'f', nome: 'Fê', entrouEm: '2026-01-01', datas: new Set([HOJE]), perda: { dias: 30, em: somaDias(HOJE, -4), haDias: 4, semLerHa: 1, voltou: true } }], encontros: [], referencia: HOJE, criadoEm: '2026-01-01' });
+  ok(voltouTexto.length === 1 && voltouTexto[0].motivo === 'perdeu uma ofensiva de 30 dias, mas já voltou a ler', 'quem já voltou a ler leva isso no texto, sem "não lê há"');
   ok(!a.some((x) => x.usuario === 'ana'), 'Ana leu hoje e foi ao encontro: fora da lista');
   const muitos = I.atencaoComGatilhos({
     candidatos: Array.from({ length: 9 }, (_, i) => ({ usuario: 'u' + i, nome: 'U' + i, entrouEm: '2026-01-01', datas: semLer(10), perda: i < 2 ? { dias: 20, em: somaDias(HOJE, -9), haDias: 9, voltou: false } : null })),
     encontros: [], referencia: HOJE, criadoEm: '2026-01-01',
   });
   ok(muitos.length === 5 && muitos.every((x) => !x.faltou), 'o teto de 5 continua valendo para quem não faltou');
+  ok(muitos[0].usuario === 'u0' && muitos[1].usuario === 'u1' && muitos[0].gatilhos.map((g) => g.tipo).join(',') === 'semLer,ofensiva', 'quem tem os dois gatilhos vem antes de quem só está sem ler, com os dois textos, mesmo além do que o teto de "sem ler" deixaria');
+  // 5 perdas curtas e recentes mais o Zé, com a perda mais longa e também sem ler: ele não pode
+  // sair pelo teto (os gatilhos se juntam antes de ordenar e cortar).
+  const ze = I.atencaoComGatilhos({
+    candidatos: ['Ana', 'Beto', 'Caio', 'Duda', 'Enzo'].map((n) => ({ usuario: n.toLowerCase(), nome: n, entrouEm: '2026-01-01', datas: semLer(3), perda: { dias: 10, em: somaDias(HOJE, -2), haDias: 2, semLerHa: 3, voltou: false } }))
+      .concat([{ usuario: 'ze', nome: 'Zé', entrouEm: '2026-01-01', datas: semLer(9), perda: { dias: 30, em: somaDias(HOJE, -8), haDias: 8, semLerHa: 9, voltou: false } }]),
+    encontros: [], referencia: HOJE, criadoEm: '2026-01-01',
+  });
+  ok(ze.length === 5 && ze[0].usuario === 'ze' && ze[0].motivo === 'sem ler há 9 dias · perdeu uma ofensiva de 30 dias', 'a perda mais longa vem primeiro, mesmo quando a pessoa também está sem ler: o Zé abre a lista e não cai pelo teto');
 }
 
 // ---------- regras puras: o administrador ----------
@@ -181,7 +212,10 @@ console.log('\n  Inteligência: a igreja (regras puras)\n');
   const ad = I.adocao({ contas: contasUso, leramPorDia, leramNaSemana: new Set(['a', 'c']), hoje: HOJE });
   ok(ad.contas === 4 && ad.hoje.abriram === 3 && ad.hoje.leram === 2 && ad.hoje.pctAbriram === 75, 'hoje: 3 de 4 abriram (75%), 2 leram');
   ok(ad.serie.length === 14 && ad.serie[13].dia === HOJE && ad.serie[12].abriram === 1 && ad.serie[12].leram === 1 && ad.serie[0].abriram === 0, 'a série tem 14 dias, do mais antigo para hoje');
-  ok(ad.media7.abriram === 0.6 && ad.media7.leram === 0.4, 'a média dos últimos 7 dias, com uma casa');
+  ok(ad.media7.abriram === 0.1 && ad.media7.leram === 0.1, 'a média dos 7 dias fechados (de -7 a ontem, sem o hoje parcial), com uma casa');
+  const cheios = Array.from({ length: 10 }, (_, i) => ({ usuario: 'p' + i, criadaEm: '2026-01-01', acessos: dias(somaDias(HOJE, -7), 7) })); // 10 pessoas em cada dia fechado, ninguém ainda hoje
+  const manha = I.adocao({ contas: cheios, leramPorDia: new Map(dias(somaDias(HOJE, -7), 7).map((d) => [d, 10])), leramNaSemana: new Set(), hoje: HOJE });
+  ok(manha.media7.abriram === 10 && manha.media7.leram === 10 && manha.hoje.abriram === 0, 'de manhã cedo, com o dia de hoje ainda vazio, a média dos 7 dias não cai (10 por dia)');
   ok(ad.retencao.base === 3 && ad.retencao.ativas === 1 && ad.retencao.pct === 33, 'retenção: das 3 contas com 30 dias ou mais, 1 leu nesta semana (33%)');
 }
 
@@ -302,7 +336,7 @@ try {
   const porUsuario = Object.fromEntries(doLider.atencao.map((x) => [x.usuario, x]));
   ok(doLider.atencao.map((x) => x.usuario).join(',') === 'bia,caio', 'precisam de atenção: Bia (perdeu a ofensiva) antes de Caio (só sem ler)');
   ok(porUsuario.caio.gatilhos[0].tipo === 'semLer' && !porUsuario.caio.faltou && /sem ler há 9 dias/.test(porUsuario.caio.motivo), 'Caio está sem ler há 9 dias');
-  ok(porUsuario.bia.gatilhos.length === 1 && porUsuario.bia.gatilhos[0].tipo === 'ofensiva' && /perdeu uma ofensiva de 40 dias há 3 dias/.test(porUsuario.bia.motivo), 'Bia foi ao encontro e leu há 4 dias, mas perdeu uma ofensiva de 40 dias: é o gatilho');
+  ok(porUsuario.bia.gatilhos.length === 1 && porUsuario.bia.gatilhos[0].tipo === 'ofensiva' && porUsuario.bia.motivo === 'perdeu uma ofensiva de 40 dias e não lê há 4 dias', 'Bia foi ao encontro e leu há 4 dias, mas perdeu uma ofensiva de 40 dias: é o gatilho, com os dias desde a última leitura');
   ok(!('eva' in porUsuario), 'a visitante nunca entra em "precisam de atenção"');
 
   const daAna = await celulaDe(ana.cookie, id);
@@ -331,6 +365,9 @@ try {
     'a chama das células: a célula com 60% (3 de 5) e frequência média 5 nos últimos encontros');
   ok(ig.evangelismo.mes === HOJE.slice(0, 7) && ig.evangelismo.deste.decisao === 'menos de 5' && ig.evangelismo.deste.batismo === 'menos de 5', 'frutos do mês: 1 decisão vira "menos de 5"');
   ok(ig.saude.suficiente && ig.saude.base === 5 && ig.saude.esferas.mente.baixa === 60 && ig.saude.esferas.corpo.baixa === 20, 'saúde: 5 check-ins bastam; 60% com a mente baixa, 20% com o corpo baixo');
+  // O painel antigo, na mesma tela: a semana "sem encontro" não vira encontro com zero pessoas.
+  const antigoPainel = await dados(await pedir('/api/painel', null, lider.cookie));
+  ok(antigoPainel.celulasECuidado && antigoPainel.celulasECuidado.frequenciaMedia === 5 && antigoPainel.celulasECuidado.celulasComEncontro === 1, 'a frequência média do painel antigo ignora a semana sem encontro: (4 + 6) / 2 = 5, e a célula conta como "registrou encontro"');
   const textoIgreja = JSON.stringify(ig);
   ok(!/"(lider|ana|bia|caio|dora|eva|fora)"|@|usuario|teste\.com/.test(textoIgreja), 'o painel da igreja não leva nome, @, e-mail nem usuário de ninguém');
   ok(!/corpo":1|"oia"|segredo/.test(textoIgreja), 'nem o check-in de uma pessoa nem o que alguém escreveu');
