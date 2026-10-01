@@ -290,3 +290,11 @@
 .linha-ajustes-avisos { display: flex; align-items: center; gap: 12px; min-height: 56px; margin-top: 16px; padding: 0 16px; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta-forte); font-weight: 600; text-decoration: none; }
 .linha-ajustes-avisos span { flex: 1; }
 .linha-ajustes-avisos svg { width: 20px; height: 20px; color: var(--tinta-fraca); }
+
+/* ---------- o painel da igreja (07e-painel.js, inteligencia.mjs) ----------
+   A linha de cada célula na "Chama das células": o nome em cima e a contagem embaixo, ao lado
+   do trilho; o trilho e as barras de porcentagem na mesma peça das outras barras do painel. */
+.painel-celula-linha > span:first-child { display: grid; gap: 2px; }
+.painel-celula-linha small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; text-wrap: pretty; }
+[data-rota=config] .painel-trilho { background: var(--campo); }
+[data-rota=config] .painel-trilho i { background: var(--inverso); }

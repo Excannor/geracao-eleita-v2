@@ -67,14 +67,56 @@
       + numero('Cuidado: denúncias abertas', c.cuidado.denunciasAbertas);
   }
 
+  // ---------- a igreja de longe (api/painel/igreja, inteligencia.mjs) ----------
+  // Adoção e retenção, a chama das células, os frutos do mês e o check-in de todos. Agregados
+  // sem ninguém pelo nome; onde o número contaria pessoas de menos, vem "menos de 5".
+  const ROTULOS_MARCO = { decisao: 'Decidi seguir Jesus', batismo: 'Me batizei', celula: 'Entrei numa célula', discipula: 'Comecei a acompanhar alguém' };
+  const ESFERAS = { corpo: 'Corpo', mente: 'Mente', espirito: 'Espírito' };
+  const mesNome = (m) => new Date(m + '-15T12:00:00Z').toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' });
+  const virgula = (n) => String(n).replace('.', ',');
+  function blocosDaIgreja(g) {
+    if (!g || !g.adocao) return '';
+    const a = g.adocao;
+    const adocaoHtml = numero('Abriram o app hoje', a.hoje.abriram + ' de ' + a.contas + (a.hoje.pctAbriram === null ? '' : ' (' + a.hoje.pctAbriram + '%)'))
+      + numero('Leram hoje', a.hoje.leram)
+      + numero('Por dia, nos últimos 7 dias', virgula(a.media7.abriram) + ' abriram · ' + virgula(a.media7.leram) + ' leram')
+      + numero('Ainda leem (contas com 30 dias ou mais)', a.retencao.pct === null ? 'ainda sem base' : a.retencao.pct + '% (' + a.retencao.ativas + ' de ' + a.retencao.base + ')')
+      + colunas(a.serie.map((x) => ({ contas: x.abriram, dia: x.dia })), (x) => diaMes(x.dia));
+    const celulas = g.chamaDasCelulas || [];
+    const chamaHtml = celulas.length
+      ? celulas.map((c) => '<div class="linha-config sem-toque painel-barra painel-celula-linha"><span>' + CC.esc(c.titulo)
+        + '<small>' + (c.poucos ? 'menos de 5 pessoas' : CC.plural(c.membros, 'pessoa', 'pessoas'))
+        + (c.frequencia === null ? '' : ' · ' + virgula(c.frequencia) + ' por encontro') + '</small></span>'
+        + (c.poucos ? '<span class="valor">sem número</span>'
+          : '<span class="painel-trilho" aria-hidden="true"><i style="width:' + c.pct + '%"></i></span><span class="valor">' + c.pct + '%</span>') + '</div>').join('')
+      : '<div class="linha-config sem-toque"><span>Nenhuma célula ativa ainda</span></div>';
+    const ev = g.evangelismo;
+    const frutosHtml = Object.keys(ROTULOS_MARCO).map((k) => linha2(ROTULOS_MARCO[k], 'Neste mês: ' + ev.deste[k] + ' · em ' + mesNome(ev.anterior) + ': ' + ev.doAnterior[k])).join('');
+    const s = g.saude;
+    const saudeHtml = s.suficiente
+      ? Object.keys(ESFERAS).map((k) => '<div class="linha-config sem-toque painel-barra"><span>' + ESFERAS[k] + ' em baixa</span>'
+        + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + s.esferas[k].baixa + '%"></i></span><span class="valor">' + s.esferas[k].baixa + '%</span></div>').join('')
+      : '<div class="linha-config sem-toque"><span>Ainda poucos check-ins nesta semana (' + CC.esc(String(s.base)) + ' pessoas)</span></div>';
+    return grupo('Adoção e retenção', adocaoHtml,
+      'Quem abre o app a cada dia, nos últimos 14 dias. "Ainda leem": das contas com 30 dias ou mais, quantas leram nesta semana.')
+      + grupo('Chama das células', chamaHtml,
+        'Quanto de cada célula está com a chama acesa hoje (leu hoje ou manteve a sequência). É um retrato do dia para animar os líderes, não um placar. Célula com menos de 5 pessoas fica sem número.')
+      + grupo('Frutos em ' + mesNome(ev.mes), frutosHtml,
+        'Marcos de Minha caminhada com data no mês, pelo que cada pessoa marcou. Com menos de 5, aparece "menos de 5".')
+      + grupo('Como a igreja está', saudeHtml,
+        'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (s.suficiente ? ' (' + s.base + ' pessoas)' : '') + '. Só porcentagens, sem nomes; com menos de 5 pessoas nada aparece.');
+  }
+
   CC.vistaPainel = async function (raiz) {
     // .folha-perfil: só apresentação, a folha do alto (25-perfil.css); o título longo desce
     // para baixo do voltar (.titulo-frase) e os quatro números viram os cartões de destaque.
     const cabeca = (dentro) => '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1>' + (dentro || '') + '</div>';
     raiz.innerHTML = cabeca() + CC.esqueleto('cartoes');
     let p;
+    let igreja = null;
     try {
-      p = await CC.api('api/painel');
+      // O painel da igreja vem junto; se falhar, o resto do painel aparece mesmo assim.
+      [p, igreja] = await Promise.all([CC.api('api/painel'), CC.api('api/painel/igreja').catch(() => null)]);
     } catch (e) {
       raiz.innerHTML = cabeca()
         + CC.estado({ erro: true, titulo: 'Não deu para carregar o painel', texto: e.message, acao: 'Tentar de novo' });
@@ -92,6 +134,7 @@
         + (p.retorno[1] && p.retorno[1].pct !== null ? '<div class="painel-cartao"><strong>' + p.retorno[1].pct + '%' : '<div class="painel-cartao"><strong class="texto">ainda sem dado') + '</strong><span>voltaram depois de 7 dias</span>'
         + '<small><em>' + (p.retorno[1] ? p.retorno[1].voltaram + ' de ' + p.retorno[1].elegiveis + ' contas' : '') + '</em></small></div>'
         + '</div>' : ''))
+      + blocosDaIgreja(igreja)
       + grupo('Senha esquecida',
         (pedidos.length
           ? pedidos.map((x) => '<div class="linha-config sem-toque"><span>@' + CC.esc(x.usuario) + ' <small class="valor">' + quando(x.em) + '</small></span>'
