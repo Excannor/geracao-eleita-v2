@@ -243,6 +243,6 @@
 .dsf-junto { margin: 20px 0 8px; padding: 16px; border-radius: 20px; background: var(--campo); }
 .dsf-junto > b { color: var(--tinta-forte); }
 .dsf-junto .passo-dica { margin: 4px 0 12px; }
-.dsf-junto .botao { gap: 8px; width: 100%; }
+.dsf-junto .botao { gap: 8px; width: 100%; background: var(--cartao); }
 .dsf-junto .botao + .botao { margin-top: 8px; }
 .dsf-junto .botao svg { width: 18px; height: 18px; }

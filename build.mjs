@@ -192,6 +192,7 @@ const carregador = `(function () {
   function falhou() {
     var a = document.getElementById('abertura');
     if (!a) return;
+    a.classList.add('falhou');
     // sem onclick no HTML: a CSP não deixa rodar código escrito dentro da marcação
     a.insertAdjacentHTML('beforeend', '<p class="abertura-erro">Não consegui carregar o conteúdo agora.<br><button type="button">Tentar de novo</button></p>');
     a.querySelector('.abertura-erro button').addEventListener('click', function () { location.reload(); });

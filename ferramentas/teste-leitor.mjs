@@ -68,6 +68,8 @@ const esperar = async (expr, ms = 6000) => {
 
 mkdirSync(join(AQUI, 'capturas'), { recursive: true });
 const foto = async (nome) => {
+  // a abertura fica até 1,6 s por cima do app: a captura espera ela sair
+  await esperar('!document.getElementById("abertura")', 4000);
   const { data } = await cmd('Page.captureScreenshot', { format: 'png' });
   if (data) writeFileSync(join(AQUI, 'capturas', nome), Buffer.from(data, 'base64'));
 };

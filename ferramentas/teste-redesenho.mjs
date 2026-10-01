@@ -97,6 +97,8 @@ const irPara = (hash) => av('location.hash = ' + JSON.stringify(hash));
 
 mkdirSync(join(AQUI, 'capturas'), { recursive: true });
 const foto = async (nome) => {
+  // a abertura fica até 1,6 s por cima do app: a captura espera ela sair
+  await esperar('!document.getElementById("abertura")', 4000);
   const { data } = await cmd('Page.captureScreenshot', { format: 'png' });
   if (data) writeFileSync(join(AQUI, 'capturas', 'redesenho-' + nome + '.png'), Buffer.from(data, 'base64'));
 };
