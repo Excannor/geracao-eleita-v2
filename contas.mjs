@@ -325,6 +325,9 @@ export function podeConduzir(p, usuario) {
   return p.membros.some((m) => m.usuario === usuario && m.estado === 'ativo' && m.papel === 'auxiliar');
 }
 
+// Quantos dias de check-in do discípulo ficam guardados (o histórico para gráficos futuros).
+export const DIAS_CHECKIN = 180;
+
 export class Contas {
   constructor(arquivo) {
     this.arquivo = arquivo;
@@ -529,9 +532,32 @@ export class Contas {
 
   // Apagar a conta leva junto amizades, pedidos, bloqueios e toques: deixar o nome
   // pendurado faria a tela de amigos pedir ao servidor alguém que não existe.
+  // ---------- check-in do discípulo (Corpo, Mente, Espírito) ----------
+  // Um por pessoa por dia, de 1 (baixa) a 3 (alta), guardado por DIAS_CHECKIN dias para o
+  // histórico; o discipulador vê só o último. Fica fora da foto em memória: é gravado e lido
+  // direto na tabela checkins.
+  async registrarCheckin(usuario, data, { corpo, mente, espirito } = {}) {
+    const u = limparNome(usuario);
+    const nivel = (n) => { const x = Number(n); if (![1, 2, 3].includes(x)) throw erro('escolha baixa, média ou alta'); return x; };
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(data || ''))) throw erro('data inválida');
+    const c = nivel(corpo), m = nivel(mente), e = nivel(espirito);
+    if (!this.db) this.db = abrirModulo(this.arquivo, 'contas').db;
+    this.db.prepare('INSERT OR REPLACE INTO checkins (usuario, data, corpo, mente, espirito, em) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(u, data, c, m, e, new Date().toISOString());
+    this.db.prepare('DELETE FROM checkins WHERE usuario = ? AND data < ?').run(u, somaDias(data, -DIAS_CHECKIN));
+    return { data, corpo: c, mente: m, espirito: e };
+  }
+
+  ultimoCheckin(usuario) {
+    if (!this.db) this.db = abrirModulo(this.arquivo, 'contas').db;
+    const l = this.db.prepare('SELECT data, corpo, mente, espirito FROM checkins WHERE usuario = ? ORDER BY data DESC LIMIT 1').get(limparNome(usuario));
+    return l ? { data: l.data, corpo: l.corpo, mente: l.mente, espirito: l.espirito } : null;
+  }
+
   async apagar(usuario) {
     const chave = limparNome(usuario);
     if (!this.dados.contas[chave]) throw erro('conta não encontrada', 404);
+    if (this.db) this.db.prepare('DELETE FROM checkins WHERE usuario = ?').run(chave);
     delete this.dados.contas[chave];
     for (const k of Object.keys(this.dados.amizades)) {
       if (k.split('|').includes(chave)) delete this.dados.amizades[k];

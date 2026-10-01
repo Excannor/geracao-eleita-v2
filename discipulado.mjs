@@ -30,10 +30,12 @@ const somaDias = (texto, n) => {
 };
 
 // O que o discípulo escolhe mostrar: só os três interruptores, nunca outra chave e nunca texto.
-export const MOSTRAR_PADRAO = { passos: true, semana: true, marcos: false };
+// O check-in (Corpo, Mente, Espírito) vem ligado, inclusive nos vínculos antigos que ainda não
+// têm a chave: só sai se o discípulo desligar.
+export const MOSTRAR_PADRAO = { passos: true, semana: true, marcos: false, checkin: true };
 export function mostrarValido(m) {
   const o = m || {};
-  return { passos: !!o.passos, semana: !!o.semana, marcos: !!o.marcos };
+  return { passos: !!o.passos, semana: !!o.semana, marcos: !!o.marcos, checkin: o.checkin !== false };
 }
 
 // Em quantos dos últimos 7 dias (hoje incluso) a pessoa fez alguma leitura. O "Power of 4" só
@@ -67,10 +69,11 @@ export function marcosComData(marcos) {
 //           só o número de discípulos ativos que essa pessoa tem, nunca nomes.
 // Nenhuma chave sai se o discípulo não ligou aquele interruptor.
 export function resumoParaDiscipulador({
-  mostrar, passos = 0, semana = 0, marcos = null, acompanha = 0,
+  mostrar, passos = 0, semana = 0, marcos = null, acompanha = 0, checkin = null,
 }) {
   const m = mostrarValido(mostrar);
   const saida = {};
+  if (m.checkin && checkin) saida.checkin = checkin;
   if (m.passos) saida.passos = passos;
   if (m.semana) saida.semana = semana;
   if (m.marcos) {

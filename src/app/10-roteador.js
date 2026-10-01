@@ -632,6 +632,8 @@
       return;
     }
     avisosDoDia();
+    // O check-in do discípulo (uma vez por dia), só com a tela livre.
+    if (CC.talvezCheckin) CC.talvezCheckin();
     // O convite para ativar notificações só aparece quando nada mais está aberto na tela.
     if (!document.querySelector('.cortina, .tela-cheia')) CC.talvezOferecerNotificacoes();
   });

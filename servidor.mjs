@@ -1349,7 +1349,9 @@ const servidor = createServer(async (req, res) => {
         const acompanha = CONTAS.discipulosAtivosDe(x.discipulo).length;
         meusDiscipulos.push({
           id: x.id, usuario: outro.usuario, nome: outro.nome, desde: x.aceitoEm, ultimoEncontro: ultimoEncontroDiscipulado(x),
-          ...resumoParaDiscipulador({ mostrar: x.mostrar, passos, semana, marcos: outro.marcos, acompanha }),
+          // O último check-in, se for desta semana: um estado de dias atrás já não diz nada.
+          ...resumoParaDiscipulador({ mostrar: x.mostrar, passos, semana, marcos: outro.marcos, acompanha,
+            checkin: ((c) => (c && c.data >= somaDias(referencia, -6) ? c : null))(CONTAS.ultimoCheckin(x.discipulo)) }),
         });
       }
       meusDiscipulos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
@@ -1368,13 +1370,15 @@ const servidor = createServer(async (req, res) => {
       // qualquer lado (inclusive um convite que eu mandei e ainda não foi aceito, que não
       // aparece em nenhuma das listas acima).
       const algumVinculo = CONTAS.discipuladosDe(eu).some((x) => x.estado === 'ativo' || x.estado === 'convidado');
-      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {}, algumVinculo });
+      const meuCheckin = CONTAS.ultimoCheckin(eu);
+      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {}, algumVinculo, meuCheckin });
       return;
     }
 
     if (rota === '/api/discipulado') {
-      await acao(async ({ acao: qual, id, usuario, papel, mostrar, data, chave }) => {
+      await acao(async ({ acao: qual, id, usuario, papel, mostrar, data, chave, corpo, mente, espirito }) => {
         const hoje = hojeDe(eu);
+        if (qual === 'checkin') return { checkin: await CONTAS.registrarCheckin(eu, hoje, { corpo, mente, espirito }) };
         if (qual === 'convidar') {
           const outro = limparNome(usuario);
           const x = await CONTAS.convidarDiscipulado(eu, outro, papel, hoje);

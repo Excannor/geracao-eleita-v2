@@ -25,8 +25,12 @@ console.log('\n  Discipulado: regras puras\n');
 {
   const D = await import(pathToFileURL(join(AQUI, 'discipulado.mjs')).href);
   ok(D.papelValido('discipulador') && D.papelValido('discipulo') && !D.papelValido('outro'), 'só os dois papéis são válidos');
-  ok(JSON.stringify(D.mostrarValido({ passos: 1, marcos: 'sim' })) === JSON.stringify({ passos: true, semana: false, marcos: true }),
-    '"mostrar" vira sempre três booleanos, nunca outra chave');
+  ok(JSON.stringify(D.mostrarValido({ passos: 1, marcos: 'sim' })) === JSON.stringify({ passos: true, semana: false, marcos: true, checkin: true }),
+    '"mostrar" vira sempre quatro booleanos, nunca outra chave; o check-in vem ligado se não foi desligado');
+  ok(D.mostrarValido({ checkin: false }).checkin === false, 'o discípulo pode desligar o check-in');
+  const c = { data: '2026-10-01', corpo: 3, mente: 1, espirito: 2 };
+  ok(D.resumoParaDiscipulador({ mostrar: {}, checkin: c }).checkin === c && !('checkin' in D.resumoParaDiscipulador({ mostrar: { checkin: false }, checkin: c })),
+    'o discipulador vê o último check-in só se o discípulo mostrar');
 
   const datas = (...d) => new Set(d);
   ok(D.diasLidosNaSemana(datas('2026-03-20', '2026-03-19', '2026-03-13'), '2026-03-20') === 2,

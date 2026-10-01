@@ -238,3 +238,14 @@ button.cartao-proposito:hover { background: var(--campo); }
 .botao-whatsapp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px;
   background: #157a3c; color: #ffffff; font-size: .875rem; font-weight: 700; text-decoration: none; }
 .botao-whatsapp svg { width: 18px; height: 18px; }
+
+/* Check-in do discípulo: a folha diária e os níveis no cartão de quem acompanha */
+.folha-checkin .linha-checkin { display: grid; gap: 6px; margin-top: 12px; }
+.folha-checkin .segmentado { display: grid; grid-template-columns: repeat(3, 1fr); }
+.folha-checkin .segmentado button { min-height: 44px; }
+.checkin-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 4px; }
+.chip-checkin { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 999px; font-size: .8125rem; font-weight: 700; }
+.chip-checkin.nivel-1 { background: var(--alerta-palido); color: var(--alerta); }
+.chip-checkin.nivel-2 { background: var(--campo); color: var(--tinta-forte); }
+.chip-checkin.nivel-3 { background: var(--salvia-palido); color: var(--salvia-texto); }
+.checkin-quando { color: var(--tinta-fraca); font-size: .75rem; font-weight: 600; }

@@ -39,12 +39,80 @@
   };
 
   // O que o discípulo decide mostrar: os mesmos 3 interruptores em todo lugar que aparecem.
-  const ORDEM_MOSTRAR = ['passos', 'semana', 'marcos'];
+  const ORDEM_MOSTRAR = ['passos', 'semana', 'checkin', 'marcos'];
   const ROTULOS_MOSTRAR = {
     passos: 'Os Primeiros passos que concluí',
     semana: 'Em quantos dias li nesta semana',
+    checkin: 'Como estou: corpo, mente e espírito',
     marcos: 'Minha caminhada',
   };
+
+  // ---------- check-in: Corpo, Mente, Espírito ----------
+  // Uma pergunta por dia para quem é discipulado, na primeira abertura do dia. O discipulador
+  // vê o último, no cartão de quem ele acompanha, antes de puxar conversa.
+  const ESFERAS = [['corpo', 'Corpo'], ['mente', 'Mente'], ['espirito', 'Espírito']];
+  const NIVEIS = { 1: 'Baixa', 2: 'Média', 3: 'Alta' };
+  const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const gravarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* segue */ } };
+
+  function chipsCheckin(c) {
+    const quando = c.data === CC.hojeIso() ? 'hoje' : c.data === CC.somaDias(CC.hojeIso(), -1) ? 'ontem' : 'em ' + ddmm(c.data);
+    return '<div class="checkin-chips" aria-label="Como está, ' + quando + '">'
+      + ESFERAS.map(([k, rot]) => '<span class="chip-checkin nivel-' + c[k] + '">' + rot + ': ' + NIVEIS[c[k]] + '</span>').join('')
+      + '<span class="checkin-quando">' + quando + '</span></div>';
+  }
+
+  CC.talvezCheckin = function () {
+    const hoje = CC.hojeIso();
+    if (!cache || !cache.meuDiscipulador) return;
+    if (cache.meuCheckin && cache.meuCheckin.data === hoje) return;
+    if (lerLocal('cc.checkin.pulado') === hoje) return;
+    if (document.querySelector('.cortina, .tela-cheia')) return;
+    folhaCheckin();
+  };
+
+  function folhaCheckin() {
+    const escolha = {};
+    CC.folha('<h2>Como você está hoje?</h2>'
+      + '<p class="passo-dica">Três toques e pronto. ' + CC.esc((cache.meuDiscipulador.nome || '').split(' ')[0])
+      + ' vê só isto, para cuidar melhor de você.</p>'
+      + ESFERAS.map(([k, rot]) => '<div class="linha-checkin"><span class="etiqueta">' + rot + '</span>'
+        + '<div class="segmentado" role="group" aria-label="' + rot + '">'
+        + [1, 2, 3].map((n) => '<button type="button" data-esfera="' + k + '" data-nivel="' + n + '" aria-pressed="false">' + NIVEIS[n] + '</button>').join('')
+        + '</div></div>').join('')
+      + '<p class="erro-proposito" role="alert" hidden></p>'
+      + '<div class="acoes"><button class="botao" data-salvar disabled>Pronto</button>'
+      + '<button class="botao plano" data-fechar>Agora não</button></div>',
+    {
+      rotulo: 'Como você está hoje',
+      classe: 'folha-checkin',
+      ligar: (folha, fechar) => {
+        const salvar = folha.querySelector('[data-salvar]');
+        folha.querySelectorAll('[data-esfera]').forEach((b) => {
+          b.onclick = () => {
+            escolha[b.dataset.esfera] = Number(b.dataset.nivel);
+            folha.querySelectorAll('[data-esfera="' + b.dataset.esfera + '"]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+            salvar.disabled = ESFERAS.some(([k]) => !escolha[k]);
+          };
+        });
+        folha.querySelector('[data-fechar]').onclick = () => { gravarLocal('cc.checkin.pulado', CC.hojeIso()); fechar(); };
+        salvar.onclick = async () => {
+          salvar.disabled = true;
+          try {
+            const r = await acao({ acao: 'checkin', ...escolha });
+            if (cache) cache.meuCheckin = r.checkin;
+            fechar();
+            CC.avisar('Obrigado por contar como você está');
+          } catch (e) {
+            salvar.disabled = false;
+            const erro = folha.querySelector('.erro-proposito');
+            erro.textContent = e.message || 'Não deu certo agora. Tente de novo.';
+            erro.hidden = false;
+          }
+        };
+      },
+    });
+  }
 
   const grupo = (titulo, dentro) => '<section class="grupo-config"><h2 class="etiqueta">' + CC.esc(titulo) + '</h2>'
     + '<div class="caixa-config">' + dentro + '</div></section>';
@@ -63,7 +131,7 @@
       for (const chave of MARCOS) if (x.marcos[chave]) linhas.push(ROTULOS_MARCO[chave] + ' · ' + ddmm(x.marcos[chave]));
       if (x.acompanha) linhas.push('acompanha ' + CC.plural(x.acompanha, 'pessoa', 'pessoas'));
     }
-    if (!linhas.length) linhas.push('Ainda não mostra nada.');
+    if (!linhas.length && !x.checkin) linhas.push('Ainda não mostra nada.');
     return linhas;
   }
 
@@ -188,7 +256,7 @@
       + '<span class="arroba">Te acompanha desde ' + ddmm(m.desde) + '</span>'
       + '<span class="arroba">' + (m.ultimoEncontro ? 'Último encontro: ' + ddmm(m.ultimoEncontro) : 'Vocês ainda não marcaram um encontro') + '</span>'
       + '</div></div>'
-      + grupo('O que eu mostro', ORDEM_MOSTRAR.map((chave) => linhaInterruptor('mostrar-meu', chave, ROTULOS_MOSTRAR[chave], mostrar[chave])).join(''))
+      + grupo('O que eu mostro', ORDEM_MOSTRAR.map((chave) => linhaInterruptor('mostrar-meu', chave, ROTULOS_MOSTRAR[chave], chave === 'checkin' ? mostrar.checkin !== false : mostrar[chave])).join(''))
       + '<div class="pe-duplo-plano">'
       + '<button class="botao contorno" data-encontro-meu="' + CC.esc(m.id) + '">' + CC.ico('calendario') + 'Marcar que nos encontramos</button>'
       + '<button class="botao plano perigo" data-encerrar-meu="' + CC.esc(m.id) + '" data-nome-meu="' + CC.esc(m.nome) + '">Encerrar</button>'
@@ -226,6 +294,7 @@
     // .linha-amigo, dois botões de texto longo espremiam o nome e as linhas de texto até
     // sobrar quase nada, em vez de quebrar para a linha de baixo.
     return '<div class="linha-amigo">' + retrato(x) + '<div class="quem-amigo"><b>' + CC.esc(x.nome) + '</b>'
+      + (x.checkin ? chipsCheckin(x.checkin) : '')
       + linhas.map((l) => '<span class="arroba">' + CC.esc(l) + '</span>').join('') + '</div>'
       + '<div class="pe-duplo-plano" style="flex-basis:100%">'
       + '<button class="botao contorno pequeno" data-encontro="' + CC.esc(x.id) + '">Encontro da semana</button>'
@@ -249,7 +318,7 @@
   }
 
   function folhaAceitar(pedido) {
-    const estado = { passos: true, semana: true, marcos: false };
+    const estado = { passos: true, semana: true, checkin: true, marcos: false };
     CC.folha('<h2>O que você quer mostrar?</h2>'
       + '<p class="passo-dica">' + CC.esc(pedido.de.nome) + ' vai ver só o que você deixar ligado, nunca o que você escreve. Você pode mudar isso quando quiser.</p>'
       + '<div class="caixa-config">' + ORDEM_MOSTRAR.map((chave) => linhaInterruptor('escolha', chave, ROTULOS_MOSTRAR[chave], estado[chave])).join('') + '</div>'
