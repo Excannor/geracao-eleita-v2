@@ -340,8 +340,9 @@
     } else {
       corpo = sobre + (s.vencidos ? '<p class="passo-dica">Você já venceu ' + CC.plural(s.vencidos, 'dia', 'dias') + '. Continue de onde parou.</p>' : '')
         + '<p class="passo-dica pequena">Todo dia tem um estudo curto: um trecho da Bíblia, uma pergunta e um passo prático.</p>'
+        + fazerJunto(d)
         + '<div class="acoes"><button class="botao azul" data-comecar>' + (s.vencidos ? 'Continuar' : 'Começar hoje') + '</button>'
-        + '<button class="botao plano" data-fechar>Agora não</button></div>' + fazerJunto(d);
+        + '<button class="botao plano" data-fechar>Agora não</button></div>';
     }
     CC.folha('<span class="etiqueta">' + d.dias + '&nbsp;dias</span><h2>' + nb(d.titulo) + '</h2>' + corpo, {
       rotulo: d.titulo,
