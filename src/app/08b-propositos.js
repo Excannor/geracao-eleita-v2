@@ -321,6 +321,7 @@
           + (souLider && m.usuario !== p.criadoPor ? '<button class="botao plano pequeno" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar</button>' : '')
           + '</div>';
       }).join('') + '</div>'
+      + (p.euConduzo ? blocoFunil(p) : '')
       + (visitantes.length ? CC.tituloSecao('Visitantes') + '<div class="lista-pedidos">' + visitantes.map((m) => '<div class="linha-amigo">' + retrato(m)
         + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + '</b></div>'
         + (souLider ? '<button class="botao plano pequeno" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar</button>' : '')
@@ -770,9 +771,59 @@
       + (p.encontro >= 0 && encontroHoje(p) ? '' : '<p class="passo-dica pequena">' + (p.encontro >= 0
         ? 'Encontro ' + nomeDoEncontro(p.encontro) + '.'
         : (conduzo ? 'Marque o dia do encontro para a célula ver "Encontro hoje" no dia.' : 'Quem conduz a célula ainda não marcou o dia do encontro.')) + '</p>')
-      // Só quem conduz vê, e nunca uma lista de presença: no lugar do número do grupo de
-      // antes, é a pessoa a procurar, com o motivo, nunca um placar.
-      + (conduzo ? blocoAtencao(p) : '');
+      // Só quem conduz vê, e nunca uma lista de presença: primeiro como a célula está (a chama
+      // e os últimos encontros), depois a pessoa a procurar, com o motivo, nunca um placar.
+      + (conduzo ? cartaoSaude(p) + blocoAtencao(p) : '');
+  }
+
+  // ---------- o painel de quem conduz (inteligencia.mjs) ----------
+  // A chama da célula e a frequência dos últimos encontros, num cartão só, antes de "Precisam
+  // de atenção". Vem pronto do servidor, só com contagens da própria célula: nenhum nome aqui.
+  function cartaoSaude(p) {
+    const s = p.painel;
+    if (!s || !s.chama) return '';
+    const c = s.chama;
+    const f = s.frequencia || { encontros: [] };
+    const legenda = c.total
+      ? CC.plural(c.acesos, 'pessoa', 'pessoas') + ' de ' + c.total + ' com a chama acesa hoje'
+      : 'A chama acende quando alguém lê hoje ou mantém a sequência de ontem.';
+    const maior = Math.max(1, ...f.encontros.map((e) => e.pessoas || 0));
+    const barras = f.encontros.length
+      ? '<div class="mini-barras" role="img" aria-label="' + CC.esc(f.encontros.map((e) => ddmm(e.data) + ': ' + (e.semEncontro ? 'sem encontro' : CC.plural(e.pessoas, 'pessoa', 'pessoas'))).join(', ')) + '">'
+        + f.encontros.map((e) => '<span class="mini-barra' + (e.semEncontro ? ' sem' : '') + '"><small>' + (e.semEncontro ? 'sem' : e.pessoas) + '</small>'
+          + '<i style="height:' + (e.semEncontro ? 0 : Math.max(8, Math.round((e.pessoas / maior) * 100))) + '%"></i><em>' + ddmm(e.data) + '</em></span>').join('')
+        + '</div>'
+      : '<p class="passo-dica pequena">Registre os encontros e a frequência das últimas semanas aparece aqui.</p>';
+    const d = f.diferenca;
+    const tendencia = f.tendencia === null ? ''
+      : f.tendencia === 'estavel' ? 'O mesmo número de pessoas do encontro anterior.'
+        : CC.plural(Math.abs(d), 'pessoa', 'pessoas') + (d > 0 ? ' a mais' : ' a menos') + ' que no encontro anterior.';
+    const semEncontro = f.encontros.some((e) => e.semEncontro) ? ' Tracejado: semana sem encontro.' : '';
+    return '<div class="cartao-saude">'
+      + '<div class="saude-chama' + (c.acesos ? ' acesa' : '') + '">' + CC.icoChama(c.acesos ? undefined : 0)
+      + '<div><b>' + (c.pct === null ? 'sem membros' : c.pct + '%') + '</b><span>' + CC.esc(legenda) + '</span></div></div>'
+      + '<div class="saude-encontros"><span class="etiqueta">Últimos encontros</span>' + barras
+      + (tendencia || semEncontro ? '<p class="passo-dica pequena">' + CC.esc((tendencia + semEncontro).trim()) + '</p>' : '') + '</div>'
+      + '</div>';
+  }
+
+  // O funil da caminhada, na aba Pessoas de quem conduz: onde as pessoas da célula estão, pelo
+  // que cada uma marcou em Minha caminhada e por quem já acompanha alguém. Só contagens: o
+  // nome de quem está em cada etapa não sai do servidor.
+  function blocoFunil(p) {
+    const etapas = (p.painel && p.painel.funil) || [];
+    const total = etapas.reduce((s, e) => s + e.pessoas, 0);
+    if (!total) return '';
+    const maior = Math.max(1, ...etapas.map((e) => e.pessoas));
+    const comeco = etapas.find((e) => e.etapa === 'comecando') || {};
+    const nota = [
+      comeco.conhecendo ? CC.plural(comeco.conhecendo, 'pessoa ainda conhecendo Jesus', 'pessoas ainda conhecendo Jesus') : '',
+      comeco.passosConcluidos ? CC.plural(comeco.passosConcluidos, 'já concluiu os Primeiros passos', 'já concluíram os Primeiros passos') : '',
+    ].filter(Boolean).join(' · ');
+    return CC.tituloSecao('Caminhada da célula')
+      + '<div class="funil-celula">' + etapas.map((e) => '<div class="funil-linha"><span>' + CC.esc(e.rotulo) + '</span>'
+        + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((e.pessoas / maior) * 100) + '%"></i></span><b>' + e.pessoas + '</b></div>').join('')
+      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada. Só números, para você saber por onde cuidar.</p></div>';
   }
 
   // Quem precisa de atenção: a conta vem pronta do servidor (propositos.mjs), sempre sem
@@ -797,13 +848,15 @@
         : '<p class="passo-dica pequena">Ninguém sumido por aqui.</p>');
   }
 
-  // A mensagem pronta do WhatsApp, pelo motivo: falta no encontro ou dias sem ler.
+  // A mensagem pronta do WhatsApp, pelo primeiro gatilho: falta no encontro, uma ofensiva longa
+  // que parou há pouco, ou dias sem ler. Sem cobrança: é um convite para voltar.
   function recadoDeCuidado(p, m) {
     const nome = String(m.nome || '').split(' ')[0];
     const celula = /^c[ée]lula(\s|$)/i.test(p.titulo || '') ? p.titulo : 'célula';
-    return /faltou/.test(m.motivo || '')
-      ? 'Oi, ' + nome + '! Sentimos sua falta no encontro da ' + celula + '. Está tudo bem com você? Posso orar por alguma coisa?'
-      : 'Oi, ' + nome + '! Passando para saber como você está. Bora voltar a ler junto com a gente?';
+    const tipo = (m.gatilhos && m.gatilhos[0] && m.gatilhos[0].tipo) || (/faltou/.test(m.motivo || '') ? 'faltou' : 'semLer');
+    if (tipo === 'faltou') return 'Oi, ' + nome + '! Sentimos sua falta no encontro da ' + celula + '. Está tudo bem com você? Posso orar por alguma coisa?';
+    if (tipo === 'ofensiva') return 'Oi, ' + nome + '! Vi que sua sequência de leitura deu uma pausa depois de um tempão firme. Tudo bem por aí? Bora recomeçar juntos?';
+    return 'Oi, ' + nome + '! Passando para saber como você está. Bora voltar a ler junto com a gente?';
   }
 
   // Membros ativos que conduzem a célula (líder ou auxiliar): nunca entram no rodízio de

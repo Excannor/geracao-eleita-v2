@@ -260,3 +260,31 @@ button.cartao-proposito:hover { background: var(--campo); }
 .botao-cutucada:active { transform: scale(.97); }
 .botao-cutucada.enviada { background: var(--salvia-palido); color: var(--salvia-texto); }
 .botao-cutucada[disabled] { cursor: default; }
+
+/* O painel de quem conduz (inteligencia.mjs): a chama da célula e os últimos encontros num
+   cartão antes de "Precisam de atenção"; o funil da caminhada na aba Pessoas. Barras em HTML,
+   escuras (claras no escuro) sobre o campo; a semana sem encontro é um quadro tracejado. */
+.cartao-saude { display: grid; gap: 18px; padding: 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.saude-chama { display: flex; align-items: center; gap: 14px; }
+.saude-chama > .ico-chama { flex: none; box-sizing: content-box; width: 26px; height: 26px; padding: 11px; border-radius: 50%; background: var(--campo); color: var(--tinta-fraca); vertical-align: 0; }
+.saude-chama.acesa > .ico-chama { background: var(--salvia-palido); }
+.saude-chama > div { display: grid; gap: 2px; min-width: 0; }
+.saude-chama b { color: var(--tinta-forte); font-size: 1.75rem; font-weight: 800; line-height: 1.1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.saude-chama span { color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; text-wrap: balance; }
+.saude-encontros { display: grid; gap: 8px; }
+.saude-encontros > .etiqueta { color: var(--salvia-texto); font-size: .8125rem; }
+.saude-encontros > .passo-dica { margin: 0; text-wrap: pretty; }
+.mini-barras { display: flex; align-items: flex-end; gap: 12px; height: 104px; padding: 0 4px; }
+.mini-barra { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+.mini-barra small { color: var(--tinta-forte); font-size: .8125rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.mini-barra i { display: block; width: 100%; max-width: 56px; min-height: 4px; border-radius: 10px 10px 4px 4px; background: var(--inverso); }
+.mini-barra.sem i { box-sizing: border-box; height: 24px; border: 1.5px dashed var(--tinta-fraca); background: none; }
+.mini-barra.sem small { color: var(--tinta-fraca); font-weight: 600; }
+.mini-barra em { color: var(--tinta-fraca); font-size: .75rem; font-style: normal; font-weight: 600; font-variant-numeric: tabular-nums; }
+.funil-celula { display: grid; gap: 10px; padding: 16px 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.funil-linha { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 2ch; align-items: center; gap: 12px; min-height: 32px; color: var(--tinta-forte); font-size: .875rem; font-weight: 600; }
+.funil-linha > span:first-child { text-wrap: balance; }
+.funil-linha b { text-align: right; font-size: 1.0625rem; font-variant-numeric: tabular-nums; }
+.funil-celula .painel-trilho { height: 10px; background: var(--campo); }
+.funil-celula .painel-trilho i { background: var(--inverso); }
+.funil-celula > .passo-dica { margin: 4px 0 0; text-wrap: pretty; }
