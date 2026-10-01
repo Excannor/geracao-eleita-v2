@@ -519,23 +519,29 @@
   if (!location.hash) history.replaceState(null, '', location.pathname + location.search + '#/');
   rotear();
 
-  // A abertura fica o bastante para ser vista. Com o app em cache ele fica pronto em uns
-  // 200 ms, e sair nessa hora era só um piscar. Na primeira abertura da sessão ela dura pelo
-  // menos ABERTURA_MINIMA desde que a página começou a carregar (o tempo carregando já conta,
-  // então numa rede lenta nada é somado); recarregar na mesma sessão (depois de atualizar,
-  // trocar de conta) e quem pede menos movimento ficam com ABERTURA_CURTA. Com tudo pronto,
-  // a barra completa e a abertura sai.
+  // A abertura é só de quando o app foi fechado e aberto de novo (decisão do dono, 01/10).
+  // Voltar do segundo plano não recarrega a página; e o que recarrega dentro da mesma sessão
+  // (a atualização ao voltar para a tela, trocar de conta) não mostra abertura nenhuma: o
+  // script do tema, no index.html, já marca html.sem-abertura e ela nem chega a aparecer.
+  // Na abertura a frio ela fica o bastante para ser vista: com o app em cache ele fica pronto
+  // em uns 200 ms, e sair nessa hora era só um piscar. Dura pelo menos ABERTURA_MINIMA desde
+  // que a página começou a carregar (o tempo carregando já conta, então numa rede lenta nada
+  // é somado); quem pede menos movimento fica com ABERTURA_CURTA. Pronto, a barra completa e
+  // a abertura sai.
   const ABERTURA_MINIMA = 1600;
   const ABERTURA_CURTA = 700;
   const abertura = document.getElementById('abertura');
-  if (abertura) {
-    let jaVista = false;
-    try {
-      jaVista = sessionStorage.getItem('cc.abertura') === '1';
-      sessionStorage.setItem('cc.abertura', '1');
-    } catch (e) { /* sem sessionStorage, vale a abertura inteira */ }
+  let jaVista = false;
+  try {
+    jaVista = sessionStorage.getItem('cc.abertura') === '1';
+    sessionStorage.setItem('cc.abertura', '1');
+  } catch (e) { /* sem sessionStorage, vale a abertura inteira */ }
+  if (abertura && jaVista) {
+    abertura.remove();
+    CC.aplicarTema(document.documentElement.dataset.tema === 'escuro');
+  } else if (abertura) {
     const calma = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const espera = Math.max(0, (jaVista || calma ? ABERTURA_CURTA : ABERTURA_MINIMA) - performance.now());
+    const espera = Math.max(0, (calma ? ABERTURA_CURTA : ABERTURA_MINIMA) - performance.now());
     setTimeout(() => requestAnimationFrame(() => {
       // A barra sai da animação para uma transição: fixa o ponto em que está e corre até o fim.
       const barra = abertura.querySelector('.abertura-barra i');

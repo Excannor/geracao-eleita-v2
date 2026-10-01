@@ -401,6 +401,8 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 .abertura.pronta .abertura-barra i { animation: none; transition: transform .3s ease-out; }
 .abertura.saindo .abertura-simbolo { transform: scale(1.08); transition: transform .45s ease-in; }
 .abertura.falhou .abertura-barra { display: none; }
+/* recarregar dentro da mesma sessão (atualização, trocar de conta) não mostra abertura */
+.sem-abertura .abertura { display: none; }
 @keyframes abertura-entra { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: none; } }
 @keyframes abertura-sobe { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes abertura-enche { from { transform: scaleX(.04); } to { transform: scaleX(.78); } }

@@ -646,7 +646,7 @@
     // a --folha de cada tema (estilo-v2/00-tokens.css): a folha do alto passa por baixo da barra
     // de status, como nas páginas avulsas. Enquanto a abertura (preta) está na tela, a barra de
     // status fica preta com ela; a abertura chama de novo ao sair.
-    if (cor && !document.querySelector('#abertura:not(.saindo)')) cor.content = escuro ? '#2e302c' : '#dfe8c1';
+    if (cor && !document.querySelector('html:not(.sem-abertura) #abertura:not(.saindo)')) cor.content = escuro ? '#2e302c' : '#dfe8c1';
   };
   // null segue o sistema; true e false fixam o escuro ou o claro.
   CC.guardarTema = (escuro) => {
