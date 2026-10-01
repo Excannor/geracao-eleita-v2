@@ -46,7 +46,20 @@ const enxugarJs = (codigo) => {
 const js = modulos.map((f) => '/* ' + f + ' */\n' + enxugarJs(readFileSync(join(pastaApp, f), 'utf8'))).join('\n');
 console.log('módulos:', modulos.join(', '));
 
-const fontes = readFileSync(src('fontes.css'), 'utf8');
+// As fontes vêm embutidas em src/fontes.css, mas saem do index.html para arquivos próprios
+// (fonte-<nome>.<resumo>.woff2), uns 140 KB a menos na página que tem teto de 1 MB. O resumo
+// no nome faz o arquivo só mudar quando a fonte muda: o servidor o entrega com cache longo,
+// e o service worker o guarda para o app abrir sem rede.
+const arquivosFontes = [];
+const fontes = readFileSync(src('fontes.css'), 'utf8')
+  .replace(/font-family:\s*'([^']+)'([\s\S]*?)url\(data:font\/woff2;base64,([A-Za-z0-9+/=]+)\)/g, (_, familia, meio, b64) => {
+    const bin = Buffer.from(b64, 'base64');
+    const arquivo = 'fonte-' + familia.toLowerCase().replace(/\s+/g, '-') + '.'
+      + createHash('sha256').update(bin).digest('hex').slice(0, 10) + '.woff2';
+    arquivosFontes.push({ arquivo, bin, familia });
+    return "font-family: '" + familia + "'" + meio + 'url(./' + arquivo + ')';
+  });
+if (/data:font/.test(fontes)) throw new Error('src/fontes.css tem fonte em formato que o build não separa: use woff2');
 // Os comentários do estilo.css são a documentação de design: ficam no fonte e saem do
 // app entregue (economizam uns 30 KB do index.html, que tem teto de 1 MB). O espaço em
 // volta de chaves, dois-pontos, ponto e vírgula e vírgulas sai também (mais uns 20 KB),
@@ -81,6 +94,11 @@ console.log('estilo: estilo.css ' + kb(enxugarCss(readFileSync(src('estilo.css')
 const molde = readFileSync(src('index.html'), 'utf8');
 
 mkdirSync(dist(), { recursive: true });
+for (const velho of readdirSync(dist()).filter((f) => /^fonte-.*\.woff2$/.test(f))) rmSync(dist(velho));
+for (const f of arquivosFontes) writeFileSync(dist(f.arquivo), f.bin);
+// A fonte do texto (Manrope) é pedida junto com a página, para o texto não piscar trocando de letra.
+const preloadFontes = arquivosFontes.filter((f) => f.familia === 'Manrope')
+  .map((f) => '<link rel="preload" href="./' + f.arquivo + '" as="font" type="font/woff2" crossorigin>').join('');
 
 // ---------- bíblias ----------
 // Cada tradução vai num arquivo próprio ao lado do index.html, e não dentro dele: são
@@ -184,6 +202,7 @@ const carregador = `(function () {
     .catch(falhou);
 })();`;
 const html = molde
+  .replace('<style>/*FONTES*/</style>', () => preloadFontes + '<style>/*FONTES*/</style>')
   .replace(/\/\*FONTES\*\//g, () => fontes)
   .replace(/\/\*ESTILO\*\//g, () => estilo)
   .replace(/\/\*CONTEUDO_ARQUIVO\*\//g, () => arquivoConteudo)
@@ -229,7 +248,7 @@ const CACHE = 'caminho-${versao}';
 const CACHE_BIBLIAS = 'caminho-biblias';
 const ARQUIVOS = ${JSON.stringify(
   ['./', './index.html', './' + arquivoConteudo, './manifest.webmanifest', './apple-touch-icon.png', './icone-48.png']
-    .concat(icones.map((i) => './' + i.arquivo)))};
+    .concat(icones.map((i) => './' + i.arquivo), arquivosFontes.map((f) => './' + f.arquivo)))};
 const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
 
 self.addEventListener('install', (ev) => {

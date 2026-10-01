@@ -111,6 +111,12 @@ for (const marcador of ['/*APP*/', '/*ESTILO*/', '/*DADOS*/', '/*FONTES*/', '/*I
   checar(!html.includes(marcador), 'o marcador ' + marcador + ' foi substituído');
 }
 checar(html.includes('@font-face') && html.includes('window.CC') && html.includes('window.iniciarApp'), 'fonte e app estão embutidos');
+{
+  const fontesDaPagina = [...html.matchAll(/url\(\.\/(fonte-[a-z-]+\.[0-9a-f]{10}\.woff2)\)/g)].map((m) => m[1]);
+  const swTexto = readFileSync(dist('sw.js'), 'utf8');
+  checar(!html.includes('data:font') && fontesDaPagina.length === 4 && fontesDaPagina.every((f) => existsSync(dist(f)) && swTexto.includes('./' + f)),
+    'as 4 fontes saíram do index.html para arquivos próprios, guardados pelo service worker');
+}
 // O conteúdo mora num arquivo à parte, com resumo no nome, e a página só aponta para ele.
 const arquivoConteudo = (html.match(/window\.CONTEUDO_ARQUIVO="(conteudo\.[0-9a-f]+\.json)"/) || [])[1];
 checar(!!arquivoConteudo && existsSync(dist(arquivoConteudo)) && !html.includes('"plano":'), 'o conteúdo saiu do index.html para ' + arquivoConteudo);

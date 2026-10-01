@@ -97,6 +97,9 @@ function hashesDosScripts() {
   }
   return [...hashes].join(' ');
 }
+// As fontes que o build tira do index.html (fonte-<nome>.<resumo>.woff2): públicas, porque
+// a tela de entrada também as usa.
+const FONTE_COM_RESUMO = /^\/fonte-[a-z-]+\.[0-9a-f]{10}\.woff2$/;
 const CSP = [
   "default-src 'self'",
   "script-src 'self' " + hashesDosScripts(),
@@ -955,7 +958,8 @@ const servidor = createServer(async (req, res) => {
     if (!eu) {
       if (rota.startsWith('/api/')) { json(res, 401, { erro: 'entre primeiro' }); return; }
       const livre = rota === '/entrar.html' || rota === '/privacidade.html' || rota === '/termos.html'
-        || rota.endsWith('.png') || rota === '/manifest.webmanifest' || rota === '/favicon.ico';
+        || rota.endsWith('.png') || rota === '/manifest.webmanifest' || rota === '/favicon.ico'
+        || FONTE_COM_RESUMO.test(rota);
       if (!livre) {
         const pagina = await readFile(join(RAIZ, 'entrar.html')).catch(() => null);
         if (!pagina) { res.writeHead(503).end('rode "node build.mjs" antes de servir'); return; }
@@ -1804,7 +1808,8 @@ const servidor = createServer(async (req, res) => {
     res.writeHead(200, {
       'content-type': TIPOS[extname(alvo).toLowerCase()] || 'application/octet-stream',
       'content-length': corpo.length,
-      'cache-control': 'no-cache',
+      // a fonte tem o resumo no nome: o mesmo endereço é sempre o mesmo arquivo
+      'cache-control': FONTE_COM_RESUMO.test(rota) ? 'public, max-age=31536000, immutable' : 'no-cache',
       vary: 'accept-encoding',
       ...(comprimido ? { 'content-encoding': 'gzip' } : {}),
     });
