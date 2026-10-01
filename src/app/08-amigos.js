@@ -401,6 +401,11 @@
       + '<span class="conta">@' + CC.esc(amigo.usuario) + '</span>'
       + '<span class="dias-proposito aceso">' + CC.icoChama() + CC.plural(amigo.dias, 'dia', 'dias') + ' lendo juntos</span></div></div>'
       + estado
+      // Cutucadas com tema: um convite rápido que chega como notificação no celular.
+      + '<div class="cutucadas"><span class="etiqueta">Chamar ' + CC.esc(amigo.nome) + ' para</span><div class="botoes-cutucada">'
+      + [['cafe', '☕', 'Café'], ['oracao', '🙏', 'Oração'], ['treino', '💪', 'Treino']].map(([t, e, r]) => '<button type="button" class="botao-cutucada" data-cutucar="' + t
+        + '" aria-label="Chamar para ' + r.toLowerCase() + '"><span class="emoji-cutucada" aria-hidden="true">' + e + '</span><b>' + r + '</b></button>').join('')
+      + '</div></div>'
       + (!euLi && !amigo.leuHoje ? '<p class="passo-dica pequena">Leia hoje para poder dar um toque.</p>' : '')
       + '<div class="acoes">'
       + (podeTocar ? '<button class="botao" data-toque>' + CC.ico('sino') + 'Notificar</button>' : '')
@@ -414,6 +419,20 @@
       rotulo: amigo.nome,
       ligar: (folha, fechar) => {
         folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelectorAll('[data-cutucar]').forEach((b) => {
+          b.onclick = async () => {
+            b.disabled = true;
+            try {
+              await CC.api('api/cutucar', { para: amigo.usuario, tema: b.dataset.cutucar });
+              b.classList.add('enviada');
+              b.querySelector('b').textContent = 'Enviado';
+              CC.vibrar && CC.vibrar('leve');
+            } catch (e) {
+              b.disabled = false;
+              CC.avisar(e.message);
+            }
+          };
+        });
         const toque = folha.querySelector('[data-toque]');
         if (toque) toque.onclick = () => { fechar(); CC.telaToque(amigo); };
         folha.querySelector('[data-novo-com]').onclick = () => { fechar(); CC.novoProposito(amigo.usuario); };

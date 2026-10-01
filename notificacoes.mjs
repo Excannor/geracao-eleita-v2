@@ -276,6 +276,10 @@ const T = {
     ['{amigo} tá te chamando pra ler 📣', 'Faz a lição de hoje e a contagem de vocês sobe.'],
   ],
   toques: [['{amigo} e mais {outros} te deram um toque 👊', 'A galera lembrou de você. A leitura de hoje tá aqui.']],
+  // Cutucadas com tema (Juntos > um amigo): um convite rápido para a vida fora do app.
+  cutucadaCafe: [['{amigo} te chamou pra um café ☕', 'Bora marcar? Combinem o dia e o lugar.'], ['Café com {amigo}? ☕', 'Um convite pra conversar ao vivo. Responde quando puder.']],
+  cutucadaOracao: [['{amigo} quer orar com você 🙏', 'Combinem um momento, nem que seja por telefone.'], ['{amigo} te chamou pra orar 🙏', 'Juntos, um pelo outro. Bora marcar?']],
+  cutucadaTreino: [['{amigo} te chamou pra treinar 💪', 'Corpo também é cuidado. Bora combinar o treino?'], ['Treino com {amigo}? 💪', 'Um convite pra se mexer junto. Responde quando puder.']],
   pedido: [['{amigo} quer ler a Bíblia com você 🙌', 'Abre o app pra aceitar e começar o propósito de vocês.']],
   aceito: [['{amigo} topou ler junto 🤝', 'Começou o propósito de vocês. Cada dia que os dois leem conta!']],
   teste: [['Tudo certo por aqui ✅', 'É assim que os lembretes do Geração Eleita vão chegar.']],
@@ -343,6 +347,7 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
     tag = 'toque';
   }
   if (tipo === 'pedido' || tipo === 'aceito') { url = './#/amigos'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
+  if (tipo.startsWith('cutucada')) { url = './#/novidades'; tag = tipo + ':' + (dados.amigoUsuario || ''); }
   if (tipo === 'querConversar') { url = './#/amigos'; tag = 'querConversar:' + (dados.deUsuario || ''); }
   if (tipo === 'querBatismo') { url = './#/amigos'; tag = 'querBatismo:' + (dados.deUsuario || ''); }
   // A célula mora no Juntos; duplas e grupos, em Juntos > Propósitos.

@@ -249,3 +249,14 @@ button.cartao-proposito:hover { background: var(--campo); }
 .chip-checkin.nivel-2 { background: var(--campo); color: var(--tinta-forte); }
 .chip-checkin.nivel-3 { background: var(--salvia-palido); color: var(--salvia-texto); }
 .checkin-quando { color: var(--tinta-fraca); font-size: .75rem; font-weight: 600; }
+
+/* Cutucadas com tema na folha do amigo: três botões grandes lado a lado */
+.cutucadas { display: grid; gap: 8px; margin: 4px 0 8px; }
+.botoes-cutucada { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.botao-cutucada { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 84px; padding: 10px 6px;
+  border: 0; border-radius: 22px; background: var(--campo); color: var(--tinta-forte); font: inherit; cursor: pointer; }
+.botao-cutucada .emoji-cutucada { font-size: 1.75rem; line-height: 1; }
+.botao-cutucada b { font-size: .875rem; font-weight: 700; }
+.botao-cutucada:active { transform: scale(.97); }
+.botao-cutucada.enviada { background: var(--salvia-palido); color: var(--salvia-texto); }
+.botao-cutucada[disabled] { cursor: default; }

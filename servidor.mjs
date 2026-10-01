@@ -532,7 +532,8 @@ async function avisoSocial(para, tipo, dados) {
   // Decisão do dono (01/10): todo toque vira notificação no celular de quem recebe, sem a
   // chave "avisos de amigos", sem o silêncio da noite e sem o teto de toques recebidos no
   // dia. Os outros avisos sociais continuam respeitando essas escolhas.
-  const toque = tipo === 'toque';
+  // As cutucadas com tema (café, oração, treino) são toques também: seguem a mesma regra.
+  const toque = tipo === 'toque' || tipo.startsWith('cutucada');
   if (!toque && !NOTIFICACOES.preferencias(para).amigos) return false;
   if (!toque && emSilencio(minutosNoFuso(conta.fuso, agora))) return false;
   const data = hojeNoFuso(conta.fuso, agora);
@@ -542,6 +543,7 @@ async function avisoSocial(para, tipo, dados) {
   await NOTIFICACOES.anotar(para, tipo, data, 0);
   return true;
 }
+const CUTUCADAS = new Set();
 const semEsperar = (promessa) => { promessa.catch((e) => console.log('  aviso não saiu: ' + e.message)); };
 
 // A rodada dos lembretes: cada pessoa com aparelho inscrito é olhada no próprio fuso. As
@@ -1096,7 +1098,7 @@ const servidor = createServer(async (req, res) => {
 
     // ---------- amigos ----------
     if (rota.startsWith('/api/') && ['/api/amigos', '/api/procurar', '/api/amizade', '/api/convites',
-      '/api/convites/aceitar', '/api/convites/cancelar', '/api/toques', '/api/denuncias',
+      '/api/convites/aceitar', '/api/convites/cancelar', '/api/toques', '/api/cutucar', '/api/denuncias',
       '/api/novidades', '/api/novidades/reagir', '/api/novidades/preferencia', '/api/propositos',
       '/api/discipulado', '/api/cuidado'].includes(rota)) {
       if (!conta) { json(res, 403, { erro: 'entre com uma conta' }); return; }
@@ -1585,6 +1587,24 @@ const servidor = createServer(async (req, res) => {
         // Todo toque aceito vira notificação, inclusive o segundo do mesmo dia ("ja").
         if (resultado === 'enviado' || resultado === 'ja') semEsperar(avisoSocial(outro.usuario, 'toque', { amigo: await nomeDeExibicao(eu) }));
         return { resultado };
+      });
+      return;
+    }
+
+    // Cutucada com tema: café, oração ou treino, para um amigo. Uma de cada tema por dia
+    // para a mesma pessoa (a conta fica em memória: reiniciar o servidor só libera de novo).
+    if (rota === '/api/cutucar') {
+      await acao(async ({ para, tema }) => {
+        const TEMAS = { cafe: 'cutucadaCafe', oracao: 'cutucadaOracao', treino: 'cutucadaTreino' };
+        if (!TEMAS[tema]) throw Object.assign(new Error('escolha café, oração ou treino'), { publico: true });
+        const outro = CONTAS.achar(String(para || ''));
+        if (!outro || CONTAS.relacao(eu, outro.usuario) !== 'amigos') throw Object.assign(new Error('só dá para chamar um amigo'), { publico: true, codigo: 403 });
+        const chave = eu + '>' + outro.usuario + '>' + tema + '>' + hojeDe(eu);
+        if (CUTUCADAS.has(chave)) return { resultado: 'ja' };
+        CUTUCADAS.add(chave);
+        if (CUTUCADAS.size > 20000) CUTUCADAS.clear();
+        semEsperar(avisoSocial(outro.usuario, TEMAS[tema], { amigo: await nomeDeExibicao(eu), amigoUsuario: eu }));
+        return { resultado: 'enviado' };
       });
       return;
     }
