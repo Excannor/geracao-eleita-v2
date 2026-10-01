@@ -209,3 +209,8 @@
 
 /* revisão: subpágina estreita com o título do mesmo tamanho das outras subpáginas */
 @media (max-width: 374px) { .folha-desafios > .voltar + h1 { padding-inline: 52px; font-size: 1.25rem; } }
+
+/* missão presencial: o "Já fiz" fica debaixo da barra, à esquerda; feita, vira um selo */
+.botao.botao-presencial { gap: 6px; min-height: 36px; margin-top: 10px; padding: 6px 14px; }
+.botao-presencial svg, .selo-presencial svg { width: 16px; height: 16px; }
+.selo-presencial { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--salvia-texto); font-size: .8125rem; font-weight: 700; }

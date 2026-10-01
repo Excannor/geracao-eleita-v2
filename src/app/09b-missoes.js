@@ -15,7 +15,11 @@
       + '<div class="corpo-missao"><b>' + CC.esc(m.texto) + '</b>'
       // a barra e a conta lado a lado: a conta numa pílula, fora da barra
       + '<div class="linha-barra"><div class="barra-missao c-' + (m.feita ? 'amarelo' : m.cor) + '"><i style="width:' + pct(inicio, m.alvo) + '" data-encher="' + pct(m.valor, m.alvo) + '"></i></div>'
-      + '<span class="conta-missao">' + m.valor + '/' + m.alvo + '</span></div></div>'
+      + '<span class="conta-missao">' + m.valor + '/' + m.alvo + '</span></div>'
+      // a presencial o app não confere: vale a palavra da pessoa
+      + (m.presencial ? (m.feita ? '<span class="selo-presencial">' + CC.ico('certo') + 'Feito ao vivo</span>'
+        : '<button type="button" class="botao pequeno contorno botao-presencial" data-missao-presencial="' + m.id + '">' + CC.ico('certo') + 'Já fiz</button>') : '')
+      + '</div>'
       + '<span class="premio-missao">' + CC.arte.bau(m.feita ? 'aberto' : 'travado') + '</span>'
       + '</div>';
   };
@@ -95,6 +99,14 @@
       });
     };
     ligarAmigos();
+    raiz.querySelectorAll('[data-missao-presencial]').forEach((b) => {
+      b.onclick = () => {
+        CC.marcarNoDiario(CC.chaveMissaoPresencial(b.dataset.missaoPresencial));
+        const { novas } = CC.conferirMissoes();
+        if (novas && CC.vibrar) CC.vibrar();
+        CC.vistaMissoes(raiz);
+      };
+    });
     CC.ligarDesafiosLongos(raiz, () => { if (location.hash.startsWith('#/missoes')) CC.vistaMissoes(raiz); });
     if (CC.carregarAmigos) {
       CC.carregarAmigos().then((d) => {

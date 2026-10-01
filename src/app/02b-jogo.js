@@ -76,7 +76,15 @@
     fundo: { texto: 'Abra 2 notas para ir mais fundo', alvo: 2, icone: 'bussola', cor: 'roxo' },
     passo: { texto: 'Leia um dos Primeiros passos', alvo: 1, icone: 'bandeira', cor: 'roxo', so: (e) => e.licoes.length < D.licoes.length },
     juntos: { texto: 'Leia no mesmo dia que um amigo', alvo: 1, icone: 'pessoas', cor: 'azul', so: (e, ctx) => !!ctx.amigos },
+    // Presenciais: a fé fora da tela. O app não tem como conferir, então vale a palavra da
+    // pessoa (o botão "Feito" grava "irl_<id>" no diário). Todo dia há uma destas.
+    cafe: { texto: 'Tome um café ao vivo com alguém da fé', alvo: 1, icone: 'xicara', cor: 'amarelo', presencial: true },
+    mensagem: { texto: 'Mande uma mensagem de ânimo para alguém da célula', alvo: 1, icone: 'balao', cor: 'turquesa', presencial: true },
+    orarJunto: { texto: 'Ore junto com alguém, ao vivo ou por ligação', alvo: 1, icone: 'cruz', cor: 'roxo', presencial: true },
+    ligar: { texto: 'Ligue para alguém que você não vê faz tempo', alvo: 1, icone: 'telefone', cor: 'azul', presencial: true },
+    servir: { texto: 'Faça um favor para alguém sem que peçam', alvo: 1, icone: 'aperto', cor: 'vermelho', presencial: true },
   };
+  CC.chaveMissaoPresencial = (id) => 'irl_' + id;
 
   function valorDaMissao(id, e, data) {
     const dia = (e.diario || {})[data] || {};
@@ -91,28 +99,24 @@
       case 'fundo': return dia.notas || 0;
       case 'passo': return Object.values(e.licoesEm || {}).filter((v) => v === data).length;
       case 'juntos': return dia.juntos || 0;
-      default: return 0;
+      default: return CC.MISSOES[id] && CC.MISSOES[id].presencial ? (dia[CC.chaveMissaoPresencial(id)] ? 1 : 0) : 0;
     }
   }
 
   const semente = (texto) => [...String(texto)].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7);
 
-  // A lição do dia é sempre a primeira; as outras duas saem da data, sem repetir família.
-  // Uma vez mostradas, ficam guardadas no diário e não mudam mais naquele dia.
+  // A lição do dia é sempre a primeira; depois vem uma missão do app e uma presencial,
+  // as duas tiradas da data. Uma vez mostradas, ficam guardadas no diário e não mudam mais
+  // naquele dia.
   function escolherMissoes(e, data, ctx) {
     const elegiveis = Object.keys(CC.MISSOES)
       .filter((id) => id !== 'licao' && (!CC.MISSOES[id].so || CC.MISSOES[id].so(e, ctx || {})));
-    let h = semente(data);
+    const h = semente(data);
+    const doApp = elegiveis.filter((id) => !CC.MISSOES[id].presencial);
+    const presenciais = elegiveis.filter((id) => CC.MISSOES[id].presencial);
     const escolhidas = [];
-    const familias = new Set();
-    while (escolhidas.length < 2 && elegiveis.length) {
-      const id = elegiveis.splice(h % elegiveis.length, 1)[0];
-      h = (Math.imul(h, 1103515245) + 12345) >>> 0;
-      const f = CC.MISSOES[id].familia;
-      if (f && familias.has(f)) continue;
-      if (f) familias.add(f);
-      escolhidas.push(id);
-    }
+    if (doApp.length) escolhidas.push(doApp[h % doApp.length]);
+    if (presenciais.length) escolhidas.push(presenciais[(Math.imul(h, 1103515245) + 12345 >>> 0) % presenciais.length]);
     return ['licao', ...escolhidas];
   }
 
