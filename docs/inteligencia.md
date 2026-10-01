@@ -48,7 +48,7 @@ O painel antigo já faz isso uma vez por minuto; a inteligência não entra ness
 
 ```sql
 -- v14 (db.mjs, ESQUEMA[13])
-CREATE TABLE leitura_dias (usuario TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (usuario, data));
+CREATE TABLE leitura_dias (usuario TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (usuario, data)) WITHOUT ROWID;
 CREATE INDEX leitura_dias_data ON leitura_dias (data);
 CREATE INDEX checkins_data ON checkins (data);
 CREATE VIEW leituras_por_dia AS
@@ -62,7 +62,12 @@ CREATE VIEW celula_frequencia AS
 **`leitura_dias`** é a cópia achatada só das datas em que a pessoa "fez o dia" (lição do plano,
 Primeiro passo ou dia do Conhecer Jesus: a mesma `datasFeitas` de `contas.mjs` que a ofensiva usa).
 Uma linha por pessoa e dia, sem texto, sem nota, sem qual lição. Tamanho: pessoas × dias lidos
-(500 pessoas lendo metade do ano ≈ 90 mil linhas de 20 bytes).
+(500 pessoas lendo metade do ano ≈ 90 mil linhas; uns 45 bytes cada contando a chave e o índice por
+data, uns 4 MB). `WITHOUT ROWID` porque a chave primária é a própria árvore da tabela: sem ela
+eram três árvores (tabela de rowid, autoindex da chave e índice por data) para guardar só datas,
+e o índice por data leva a chave junto, então as consultas por janela de tempo não voltam à
+tabela. Medido num banco sintético de 2.004 contas com um ano de leitura (617 mil linhas): o
+banco compactado cai de 79,7 para 64,4 MB e a cópia de backup (`VACUUM INTO`) de 449 para 226 ms.
 
 Como fica em dia (tudo em `inteligencia.mjs`):
 
@@ -159,12 +164,22 @@ ofensiva perdida é um convite para recomeçar, sem cobrança.
 |---|---|---|
 | **Adoção (DAU)** | `abriram`: `conta.acessos` (um dia por linha, 90 dias, já em memória); `leram`: `SELECT data, pessoas FROM leituras_por_dia WHERE data > ? AND data <= ?` (14 dias); `media7` é a média dos 7 dias fechados antes de hoje (o dia de hoje, ainda em andamento, puxaria a média para baixo de manhã) | a view agrupa pelo índice `leitura_dias_data`; a janela de 14 dias devolve 14 linhas |
 | **Retenção simples** | das contas com 30 dias ou mais (`criadaEm`), quantas estão em `SELECT DISTINCT usuario FROM leitura_dias WHERE data > hoje-7 AND data <= hoje` | uma varredura do índice por data, 7 dias |
-| **Chama das células (ranking)** | `SELECT usuario, data FROM leitura_dias WHERE data >= hoje-120` → um `Set` de datas por pessoa → `REGRAS.simularOfensiva` por membro de verdade de cada célula ativa, cada um no próprio dia (`hojeDe`, nunca depois do dia do admin, como no retrato da célula) → `rankingDaChama` | só as linhas da janela (500 pessoas × até 120 dias, na prática bem menos), uma consulta só, e a mesma regra de ofensiva do app, não uma aproximação nova. A janela de 120 dias só poderia mudar um escudo guardado há mais de 4 meses; para o retrato de uma pessoa vale o painel do líder, que usa o histórico inteiro |
+| **Chama das células (ranking)** | `SELECT usuario, group_concat(data) FROM leitura_dias WHERE data >= hoje-120 GROUP BY usuario` (uma linha por pessoa, não por data) → um `Set` de datas por pessoa → `REGRAS.simularOfensiva` por membro de verdade de cada célula ativa, cada um no próprio dia (`hojeDe`, nunca depois do dia do admin, como no retrato da célula) → `rankingDaChama` | só as linhas da janela (500 pessoas × até 120 dias, na prática bem menos), uma consulta só, e a mesma regra de ofensiva do app, não uma aproximação nova. A janela de 120 dias só poderia mudar um escudo guardado há mais de 4 meses; para o retrato de uma pessoa vale o painel do líder, que usa o histórico inteiro |
 | **Frequência média por célula** | `SELECT proposito, AVG(presentes + visitantes) FROM celula_frequencia WHERE sem_encontro = 0 AND data > hoje-28 AND data <= hoje GROUP BY proposito` | encontros são poucos (uma linha por célula por semana) |
 | **Evangelismo (frutos do mês)** | `evangelismoDoMes(contas, hoje)`: marcos de Minha caminhada (`decisao`, `batismo`, `celula`, `discipula`) com data no mês e no anterior | em memória, 4 datas por conta |
 | **Saúde global (check-in)** | `SELECT usuario, data, corpo, mente, espirito FROM checkins WHERE data > hoje-7 AND data <= hoje` → vale o último de cada pessoa → % em baixa, média e alta por esfera | índice `checkins_data`; no máximo uma linha por pessoa por dia |
 
-Tudo isso roda uma vez a cada 5 minutos, por `hoje`. O painel antigo (`painel.mjs`) continua como
+Tudo isso roda uma vez a cada 5 minutos, por `hoje`, e a simulação da chama anda em lotes de 5
+células devolvendo o laço de eventos entre um e outro (`respirar`), para o pedido de outra pessoa
+não esperar o painel inteiro; dois pedidos no mesmo intervalo dividem a mesma promessa. Medido no
+banco sintético de 2.004 contas e 100 células de 20: o painel com cache frio levava 1,25 s com o
+servidor parado para todo mundo (um `GET /api/quem` de outra pessoa, mandado 50 ms depois, esperava
+1,2 s); só `datasDesde` custava 590 ms, porque devolvia 200 mil linhas, uma por data. Agrupado no
+SQLite ela cai para 72 ms, o painel frio para 0,76 s, e o pedido concorrente para 93 ms. O que
+resta é a simulação da ofensiva de 2.000 pessoas (uns 630 ms, a mesma regra do Início), que
+agora respira entre os lotes.
+
+O painel antigo (`painel.mjs`) continua como
 estava, com o cache de 1 minuto dele; a tela pede os dois em paralelo e mostra o resto mesmo se a
 parte nova falhar. Uma correção nele, por aparecer na mesma tela: a "frequência média por encontro
 (4 semanas)" e "registraram encontro" deixam de contar a semana marcada "não houve encontro" (ela

@@ -206,9 +206,12 @@ const ESQUEMA = [
   // a pessoa a cada sincronização do progresso dela. Nenhum texto, nenhuma nota: só a data.
   // Os índices por data servem às janelas de tempo (últimos 14, 30 dias) das consultas do
   // painel; as views são as consultas prontas que o servidor usa (o equivalente das views do
-  // Postgres, se um dia o banco mudar).
+  // Postgres, se um dia o banco mudar). WITHOUT ROWID: a chave primária (usuario, data) é a
+  // própria árvore da tabela, sem a tabela de rowid nem o autoindex por trás (eram três árvores
+  // para guardar só datas, uns 42 MB em 600 mil linhas; com duas, uns 26 MB), e o índice por data
+  // leva a chave junto, então as consultas por janela de tempo não precisam voltar à tabela.
   `
-  CREATE TABLE leitura_dias (usuario TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (usuario, data));
+  CREATE TABLE leitura_dias (usuario TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (usuario, data)) WITHOUT ROWID;
   CREATE INDEX leitura_dias_data ON leitura_dias (data);
   CREATE INDEX checkins_data ON checkins (data);
   CREATE VIEW leituras_por_dia AS

@@ -227,6 +227,8 @@ console.log('\n  Inteligência: leitura_dias\n');
   ok(B.versaoDoEsquema() === 14, 'o esquema está na v14');
   const objetos = db.prepare("SELECT name, type FROM sqlite_master WHERE name IN ('leitura_dias', 'leituras_por_dia', 'celula_frequencia', 'leitura_dias_data', 'checkins_data')").all();
   ok(objetos.length === 5 && objetos.filter((o) => o.type === 'view').length === 2 && objetos.filter((o) => o.type === 'index').length === 2, 'a tabela, as duas views e os dois índices da v14 existem');
+  ok(/WITHOUT ROWID/.test(db.prepare("SELECT sql FROM sqlite_master WHERE name = 'leitura_dias'").get().sql) && !db.prepare("SELECT name FROM sqlite_master WHERE name LIKE 'sqlite_autoindex_leitura_dias%'").get(), 'leitura_dias é WITHOUT ROWID: a chave primária é a própria tabela, sem autoindex por trás');
+  ok(/COVERING INDEX leitura_dias_data/.test(db.prepare('EXPLAIN QUERY PLAN SELECT DISTINCT usuario FROM leitura_dias WHERE data > ? AND data <= ?').all('2026-09-24', '2026-10-01').map((l) => l.detail).join(' ')), 'a consulta por janela de datas é coberta pelo índice (não volta à tabela)');
 
   B.gravarEstadoNoBanco(db, 'ana', { lidos: [1, 2, 3], marcadoEm: { 1: '2026-09-01', 2: '2026-09-02', 3: '2026-09-02' }, licoesEm: { x: '2026-09-05' }, conhecidos: { 1: '2026-09-07' }, oia: { 1: { o: 'segredo' } } });
   B.gravarEstadoNoBanco(db, 'bia', { lidos: [1], marcadoEm: { 1: '2026-09-02' } });
@@ -237,6 +239,7 @@ console.log('\n  Inteligência: leitura_dias\n');
   ok(porDia.get('2026-09-02') === 2 && porDia.get('2026-09-01') === 1 && porDia.get('2026-09-05') === 1 && !porDia.has('2026-09-03'), 'a view leituras_por_dia conta pessoas por dia');
   ok([...I.quemLeuEntre(db, '2026-09-04', '2026-09-10')].join(',') === 'ana', 'quem leu na janela');
   ok(I.datasDesde(db, '2026-09-02').get('ana').size === 3 && I.datasDesde(db, '2026-09-02').get('bia').size === 1, 'as datas de cada um desde uma data');
+  ok([...I.datasDesde(db, '2026-09-02').get('ana')].sort().join(',') === '2026-09-02,2026-09-05,2026-09-07' && !I.datasDesde(db, '2026-09-08').has('ana'), 'uma linha por pessoa (group_concat) dá exatamente as datas da janela, e quem não leu na janela fica fora');
   const mudou = I.sincronizarLeituraDias(db, 'ana', new Set(['2026-09-01', '2026-09-20']));
   ok(mudou === 4 && db.prepare('SELECT COUNT(*) AS n FROM leitura_dias WHERE usuario = ?').get('ana').n === 2, 'sincronizar regrava: entra o que faltava, sai o que a pessoa não tem mais');
   ok(I.sincronizarLeituraDias(db, 'ana', ['2026-09-01', '2026-09-20', 'lixo']) === 0, 'sem mudança não grava nada, e data inválida é ignorada');
@@ -380,6 +383,8 @@ try {
   ok(deCaio.join(',') === [somaDias(HOJE, -10), somaDias(HOJE, -9), HOJE].join(','), 'PUT /api/estado atualiza leitura_dias (a lição de hoje entrou)');
   const igDepois = await dados(await pedir('/api/painel/igreja', null, lider.cookie));
   ok(igDepois.adocao.hoje.leram === 3 && igDepois.geradoEm === ig.geradoEm, 'o painel da igreja fica em cache por uns minutos: a mesma geração');
+  const aoMesmoTempo = await Promise.all([1, 2, 3].map(() => pedir('/api/painel/igreja', null, lider.cookie).then(dados)));
+  ok(aoMesmoTempo.every((x) => x.geradoEm === ig.geradoEm && x.adocao.contas === 7), 'três pedidos ao mesmo tempo recebem o mesmo painel, sem refazer a conta');
 } finally {
   servidor.kill();
   await dormir(300);

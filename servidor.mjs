@@ -748,10 +748,22 @@ function painelDaCelula(p, info, ativos, referencia) {
 // pelo nome. Lê a cópia achatada das datas (leitura_dias) e as tabelas, nunca o JSON de
 // progresso de todo mundo; cinco minutos de cache, porque os números não mudam mais rápido que
 // isso e o Pi não precisa refazer a conta a cada abertura da tela.
+// A simulação da chama de cada membro (REGRAS.simularOfensiva) é o que resta de pesado: uns
+// 450 ms para 2.000 pessoas. Ela roda em lotes de células, devolvendo o laço de eventos entre
+// um lote e outro, para o pedido de outra pessoa não esperar o painel inteiro. Dois pedidos
+// no mesmo intervalo dividem a mesma promessa, em vez de refazer a conta.
 let cacheIgreja = null;
 const CACHE_IGREJA_MS = 5 * 60 * 1000;
-function painelDaIgreja(hoje) {
-  if (cacheIgreja && cacheIgreja.hoje === hoje && Date.now() - cacheIgreja.em < CACHE_IGREJA_MS) return cacheIgreja.painel;
+const CELULAS_POR_LOTE = 5;
+const respirar = () => new Promise((r) => setImmediate(r));
+async function painelDaIgreja(hoje) {
+  if (cacheIgreja && cacheIgreja.hoje === hoje && Date.now() - cacheIgreja.em < CACHE_IGREJA_MS) return cacheIgreja.promessa;
+  const em = Date.now();
+  const promessa = montarPainelDaIgreja(hoje).catch((e) => { if (cacheIgreja && cacheIgreja.promessa === promessa) cacheIgreja = null; throw e; });
+  cacheIgreja = { hoje, em, promessa };
+  return promessa;
+}
+async function montarPainelDaIgreja(hoje) {
   const contas = CONTAS.lista();
   const leramPorDia = leiturasPorDia(DB, somaDias(hoje, -DIAS_SERIE_ADOCAO), hoje);
   const leramNaSemana = quemLeuEntre(DB, somaDias(hoje, -7), hoje);
@@ -765,20 +777,25 @@ function painelDaIgreja(hoje) {
     return REGRAS.simularOfensiva([...(datas.get(u) || [])], dele < hoje ? dele : hoje);
   };
   const frequencias = frequenciaMediaPorCelula(DB, somaDias(hoje, -28), hoje);
-  const celulas = CONTAS.propositosAtivos().filter((p) => p.celula && p.membros.some(membroDeVerdade)).map((p) => ({
-    id: p.id, titulo: p.titulo,
-    acesos: p.membros.filter(membroDeVerdade).map((m) => chamaAcesa(simular(m.usuario))),
-    frequencia: frequencias.has(p.id) ? frequencias.get(p.id) : null,
-  }));
-  const painel = {
+  const ativas = CONTAS.propositosAtivos().filter((p) => p.celula && p.membros.some(membroDeVerdade));
+  const celulas = [];
+  for (let i = 0; i < ativas.length; i++) {
+    if (i && i % CELULAS_POR_LOTE === 0) await respirar();
+    const p = ativas[i];
+    celulas.push({
+      id: p.id, titulo: p.titulo,
+      acesos: p.membros.filter(membroDeVerdade).map((m) => chamaAcesa(simular(m.usuario))),
+      frequencia: frequencias.has(p.id) ? frequencias.get(p.id) : null,
+    });
+  }
+  return {
     hoje,
     adocao: adocao({ contas, leramPorDia, leramNaSemana, hoje }),
     chamaDasCelulas: rankingDaChama(celulas),
     evangelismo: evangelismoDoMes(contas, hoje),
     saude: saudeDosCheckins(checkinsEntre(DB, somaDias(hoje, -JANELA_CHECKIN), hoje)),
+    geradoEm: new Date().toISOString(),
   };
-  cacheIgreja = { hoje, em: Date.now(), painel };
-  return painel;
 }
 
 async function rodadaDeLembretes(agora = new Date()) {
@@ -1123,7 +1140,7 @@ const servidor = createServer(async (req, res) => {
     // ---------- inteligência: o painel da igreja (admin) e o da célula (quem conduz) ----------
     if (rota === '/api/painel/igreja') {
       if (!exigir(conta && ehAdmin(eu), 403, 'só o dono do app vê o painel')) return;
-      json(res, 200, { ...painelDaIgreja(hojeDe(eu)), geradoEm: new Date(cacheIgreja.em).toISOString() });
+      json(res, 200, await painelDaIgreja(hojeDe(eu)));
       return;
     }
     if (rota === '/api/painel/celula') {

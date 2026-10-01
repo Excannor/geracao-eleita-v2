@@ -318,12 +318,15 @@ export function quemLeuEntre(db, de, ate) {
 // As datas de cada pessoa desde "desde" (inclusive), para simular a chama de todo mundo numa
 // consulta só: usuario -> Set de datas. A janela limita as linhas (uns 120 dias bastam para a
 // ofensiva de hoje; o que vem antes só mudaria um escudo guardado).
+// Uma linha por pessoa (group_concat), não uma por data: com 2.000 contas e um ano de leitura são
+// 200 mil linhas na janela, e devolver cada uma como objeto JS custava uns 600 ms com o servidor
+// parado para todo mundo; agrupado no SQLite, pela chave primária (usuario, data), cai para uns
+// 70 ms. Datas ISO não têm vírgula, e a ordem não importa (simularOfensiva reordena).
 export const JANELA_CHAMA = 120;
 export function datasDesde(db, desde) {
   const mapa = new Map();
-  for (const l of db.prepare('SELECT usuario, data FROM leitura_dias WHERE data >= ?').all(desde)) {
-    if (!mapa.has(l.usuario)) mapa.set(l.usuario, new Set());
-    mapa.get(l.usuario).add(l.data);
+  for (const l of db.prepare('SELECT usuario, group_concat(data) AS datas FROM leitura_dias WHERE data >= ? GROUP BY usuario').all(desde)) {
+    mapa.set(l.usuario, new Set(String(l.datas || '').split(',').filter(Boolean)));
   }
   return mapa;
 }
