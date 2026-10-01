@@ -35,6 +35,7 @@ import {
   MINIMO_CHECKIN_CELULA,
 } from './inteligencia.mjs';
 import { configDoEmail, enviarEmail } from './email.mjs';
+import { csvDoRelatorio, htmlDoRelatorio, nomeDoArquivo, SCRIPT_RELATORIO } from './relatorio.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, 'dist');
@@ -122,6 +123,8 @@ const CSP = [
   "object-src 'none'",
 ].join('; ');
 
+// A página do relatório (relatorio.mjs) tem um script só, fixo: entra na CSP pelo hash dele.
+const CSP_RELATORIO = CSP.replace("script-src 'self'", "script-src 'self' 'sha256-" + createHash('sha256').update(SCRIPT_RELATORIO, 'utf8').digest('base64') + "'");
 function protecoes(req, res) {
   res.setHeader('content-security-policy', CSP);
   res.setHeader('x-content-type-options', 'nosniff');
@@ -1161,6 +1164,38 @@ const servidor = createServer(async (req, res) => {
     if (rota === '/api/painel/igreja') {
       if (!exigir(conta && ehAdmin(eu), 403, 'só o dono do app vê o painel')) return;
       json(res, 200, await painelDaIgreja(hojeDe(eu)));
+      return;
+    }
+    // O relatório que o administrador exporta (relatorio.mjs): o painel da igreja e cada célula
+    // de perto, em CSV (planilha) ou numa página para salvar em PDF. Só o admin; 403 para o resto.
+    if (rota === '/api/painel/relatorio') {
+      if (!exigir(conta && ehAdmin(eu), 403, 'só o dono do app exporta o relatório')) return;
+      const formato = url.searchParams.get('formato') === 'html' ? 'html' : 'csv';
+      const hoje = hojeDe(eu);
+      const igreja = await painelDaIgreja(hoje);
+      const celulas = [];
+      for (const p of CONTAS.propositosAtivos().filter((x) => x.celula && x.membros.some(membroDeVerdade))) {
+        const retrato = await retratoDoProposito(p, eu, { verTudo: true });
+        celulas.push({ id: p.id, titulo: p.titulo, lider: await nomeDeExibicao(p.criadoPor), membros: retrato.membros.filter((m) => m.estado === 'ativo').length, ...retrato.painel, atencao: retrato.atencao });
+      }
+      celulas.sort((a, b) => ((b.chama.pct ?? -1) - (a.chama.pct ?? -1)) || String(a.titulo).localeCompare(String(b.titulo), 'pt-BR'));
+      const geradoEm = new Date().toISOString();
+      const arquivo = nomeDoArquivo(hoje, formato);
+      let corpo;
+      if (formato === 'html') {
+        const simbolo = await readFile(join(AQUI, 'arte', 'logo-simbolo.svg'), 'utf8').catch(() => '');
+        const fonte = (existsSync(RAIZ) ? readdirSync(RAIZ) : []).find((f) => /^fonte-manrope\.[0-9a-f]{10}\.woff2$/.test(f)) || '';
+        corpo = Buffer.from(htmlDoRelatorio({ igreja, celulas, geradoEm, simbolo, fonteManrope: fonte ? '/' + fonte : '' }), 'utf8');
+        res.setHeader('content-security-policy', CSP_RELATORIO);
+      } else {
+        corpo = Buffer.from(csvDoRelatorio({ igreja, celulas, geradoEm }), 'utf8');
+      }
+      res.writeHead(200, {
+        'content-type': formato === 'html' ? 'text/html; charset=utf-8' : 'text/csv; charset=utf-8',
+        'content-disposition': (formato === 'html' ? 'inline' : 'attachment') + '; filename="' + arquivo + '"',
+        'content-length': corpo.length, 'cache-control': 'no-store',
+      });
+      res.end(corpo);
       return;
     }
     // Quem conduz vê a própria célula; o administrador abre qualquer uma, com o mesmo detalhe

@@ -105,7 +105,13 @@
       + grupo('Frutos em ' + mesNome(ev.mes), frutosHtml,
         'Marcos de Minha caminhada com data no mês, pelo que cada pessoa marcou.')
       + grupo('Como a igreja está', saudeHtml,
-        'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (s.suficiente ? ' (' + s.base + ' pessoas)' : '') + '. Só a soma, sem nomes: o check-in de uma pessoa nunca aparece aqui.');
+        'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (s.suficiente ? ' (' + s.base + ' pessoas)' : '') + '. Só a soma, sem nomes: o check-in de uma pessoa nunca aparece aqui.')
+      // O relatório para levar: o que esta tela mostra (a igreja e cada célula de perto), num
+      // arquivo só. CSV para planilha; a página de relatório abre o "Salvar como PDF" do navegador.
+      + grupo('Exportar relatório',
+        '<div class="painel-exportar"><a class="botao contorno" href="api/painel/relatorio?formato=csv" download>' + CC.ico('baixar') + 'Planilha (CSV)</a>'
+        + '<a class="botao contorno" href="api/painel/relatorio?formato=html" target="_blank" rel="noopener">' + CC.ico('compartilhar') + 'Relatório em PDF</a></div>',
+        'A igreja de longe e cada célula de perto, como nesta tela. O PDF abre numa página nova com o "Salvar como PDF" do navegador.');
   }
 
   // ---------- uma célula de perto (api/painel/celula) ----------

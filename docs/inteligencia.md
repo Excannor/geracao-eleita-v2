@@ -230,6 +230,25 @@ da célula que é líder". As regras, na ordem em que valem:
 9. **Tom**: o ranking das células é uma porcentagem do dia, sem pódio, e a nota da tela diz que é
    para animar, não um placar. Nada de placar entre pessoas em lugar nenhum.
 
+## 5b. O relatório exportado (`relatorio.mjs`)
+
+`GET /api/painel/relatorio?formato=csv|html`, só para o admin (403 para o resto), com
+`Content-Disposition` e nome `relatorio-geracao-eleita-AAAA-MM-DD.csv|html`. O conteúdo é o que
+o admin já vê: o painel da igreja (adoção por dia, retenção, frutos do mês, check-in somado) e
+cada célula de perto (líder, pessoas, chama com nomes, presença, funil com nomes, atenção, check-in
+somado), montado com `retratoDoProposito(p, admin, { verTudo: true })` célula a célula (é um
+pedido raro e manual; lê o progresso dos membros como o retrato de sempre). Nunca o que alguém
+escreveu, nunca o check-in de uma pessoa.
+
+- **CSV**: `;` como separador, BOM UTF-8 (o Excel em pt-BR abre com acento), decimais com vírgula,
+  blocos um embaixo do outro com o próprio cabeçalho (Igreja, Por dia, Frutos, Check-in, Células,
+  Pessoas). Campo com `;`, aspas ou quebra de linha vai entre aspas.
+- **PDF**: uma página HTML de relatório (A4 retrato, `@page`, `break-inside: avoid`, Manrope pelo
+  woff2 do build, o símbolo GE de `arte/logo-simbolo.svg`, paleta C) que chama `window.print()`
+  depois de carregar: o PDF é o "Salvar como PDF" do navegador, sem biblioteca nova e sem Chrome no
+  Pi. O único script da página é fixo e entra na CSP pelo hash (`CSP_RELATORIO`).
+- A política de privacidade (§5 e §7) diz que a administração pode exportar esses dados.
+
 ## 6. O que ficou de fora do MVP
 
 - **Pré-agregado diário por célula** (uma tabela `celula_dia`): a célula tem 20 pessoas no máximo

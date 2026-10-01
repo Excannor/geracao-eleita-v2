@@ -415,6 +415,29 @@ try {
   const deCaio = db.prepare('SELECT data FROM leitura_dias WHERE usuario = ? ORDER BY data').all('caio').map((l) => l.data);
   B.fecharBanco(B.arquivoDoBanco(PASTA));
   ok(deCaio.join(',') === [somaDias(HOJE, -10), somaDias(HOJE, -9), HOJE].join(','), 'PUT /api/estado atualiza leitura_dias (a lição de hoje entrou)');
+  console.log('\n  Com servidor: o relatório exportado\n');
+  ok((await pedir('/api/painel/relatorio?formato=csv', null, lider.cookie)).status === 403 && (await pedir('/api/painel/relatorio?formato=html', null, ana.cookie)).status === 403, 'quem não é admin não exporta: 403 nas duas saídas');
+  const rc = await pedir('/api/painel/relatorio?formato=csv', null, pastor.cookie);
+  const bytesCsv = new Uint8Array(await rc.arrayBuffer()); // .text() tiraria o BOM
+  const csv = new TextDecoder('utf-8').decode(bytesCsv);
+  ok(rc.status === 200 && /^text\/csv/.test(rc.headers.get('content-type')) && rc.headers.get('content-disposition') === 'attachment; filename="relatorio-geracao-eleita-' + HOJE + '.csv"', 'o admin baixa o CSV com o nome do dia');
+  ok(bytesCsv[0] === 0xef && bytesCsv[1] === 0xbb && bytesCsv[2] === 0xbf && csv.includes('Relatório da igreja;Geração Eleita') && csv.includes('Célula de quinta'), 'BOM UTF-8 no começo (EF BB BF) e acentos certos (Relatório, Geração, Célula)');
+  const linhasCsv = csv.split('\r\n');
+  ok(linhasCsv.includes('Igreja;Indicador;Valor') && linhasCsv.includes('Igreja;Contas;8') && linhasCsv.includes('Por dia;Dia;Abriram o app;Leram') && linhasCsv.some((l) => /^Frutos;Marco de Minha caminhada;[a-zç]+ de \d{4};[a-zç]+ de \d{4}$/.test(l)) && linhasCsv.includes('Check-in;Esfera;Em baixa (%);Média (%);Alta (%);Pessoas'), 'os blocos Igreja, Por dia, Frutos e Check-in, com os cabeçalhos esperados');
+  const cabCelulas = linhasCsv.find((l) => l.startsWith('Células;Célula;'));
+  ok(cabCelulas && cabCelulas.startsWith('Células;Célula;Líder;Pessoas;Chama acesa;Chama (%);Frequência média (4 semanas);Dando os primeiros passos;Decidiram seguir Jesus;Já se batizaram;Acompanham alguém na fé;Check-in: pessoas;Corpo em baixa'), 'o bloco das células tem as colunas esperadas');
+  // Caio acabou de ler hoje (o PUT acima): a chama da célula está em 4 de 5.
+  ok(linhasCsv.includes('Células;Célula de quinta;lider;6;4;80;5;2;1;1;1;5;1;3;1'), 'a linha da célula: líder, 6 pessoas, 4 acesos (80%), 5 por encontro, funil 2·1·1·1 e o check-in somado (5 pessoas; 1, 3 e 1 em baixa)');
+  const linhaBia = linhasCsv.find((l) => l.startsWith('Pessoas;Célula de quinta;bia;'));
+  ok(linhaBia && /^Pessoas;Célula de quinta;bia;apagada;0;Já se batizaram;.*presente;perdeu uma ofensiva de 40 dias e não lê há 4 dias$/.test(linhaBia), 'uma linha por pessoa: chama, dias, etapa, presença e o alerta');
+  ok(!/segredo|"oia"|corpo"/.test(csv) && linhasCsv.filter((l) => l.startsWith('Pessoas;')).every((l) => l.split(';').length === 8), 'nada do que alguém escreveu no CSV, e a linha de cada pessoa não leva check-in (só as 8 colunas)');
+  const rh = await pedir('/api/painel/relatorio?formato=html', null, pastor.cookie);
+  const html = await rh.text();
+  ok(rh.status === 200 && /^text\/html/.test(rh.headers.get('content-type')) && rh.headers.get('content-disposition') === 'inline; filename="relatorio-geracao-eleita-' + HOJE + '.html"', 'o admin abre a página do relatório (PDF pelo navegador)');
+  ok(html.includes('<h1>Relatório da igreja</h1>') && html.includes('Célula de quinta') && html.includes('@page { size: A4 portrait') && html.includes('window.print()') && /<svg/.test(html) && /url\(\/fonte-manrope\./.test(html), 'a página tem o título, a célula, A4, a chamada de impressão, o símbolo e a fonte do app');
+  const cspRel = rh.headers.get('content-security-policy') || '';
+  ok(/script-src 'self' 'sha256-[A-Za-z0-9+/=]+'/.test(cspRel) && !/onclick=/.test(html), 'o script da página entra na CSP pelo hash, sem onclick inline');
+  ok(!/segredo|"oia"/.test(html), 'nem na página sai o que alguém escreveu');
   const igDepois = await dados(await pedir('/api/painel/igreja', null, pastor.cookie));
   ok(igDepois.adocao.hoje.leram === 4 && igDepois.geradoEm === ig.geradoEm, 'o painel da igreja fica em cache por uns minutos: a mesma geração');
   const aoMesmoTempo = await Promise.all([1, 2, 3].map(() => pedir('/api/painel/igreja', null, pastor.cookie).then(dados)));
