@@ -146,7 +146,6 @@ Não rode `node build.mjs` enquanto um teste de navegador estiver rodando na mes
 servem o `dist/` dela. Situação nesta máquina (na base e também no commit anterior, sem o
 redesenho):
 
-- `ferramentas/teste-banco.mjs` sai com 1: "sem dados JSON para ensaiar" (precisa dos dados reais).
 - `ferramentas/teste-instalar.mjs` tem 12 falhas também antes do redesenho (ambiente sem instalação de PWA).
 - `ferramentas/teste-pratica.mjs` e `ferramentas/teste-unidades.mjs` têm o caminho do Chrome do
   Windows escrito no código: rode uma cópia temporária dentro de `ferramentas/` com

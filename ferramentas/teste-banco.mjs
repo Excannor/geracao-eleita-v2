@@ -1,10 +1,16 @@
-// Confere a migração dos arquivos JSON para o banco com dados reais: uma cópia dos dados
-// do HML (que já são uma cópia de produção) vai para uma pasta temporária, e o servidor
-// sobe em cima dela. Nenhum arquivo do HML é tocado.
+// Confere a migração dos arquivos JSON para o banco. Com dados reais à mão (uma cópia dos
+// dados do HML, que já são uma cópia de produção, em dados/ ou em json-legado-*), eles têm
+// preferência: vão para uma pasta temporária e o servidor sobe em cima dela, sem tocar em
+// nenhum arquivo do HML. Sem eles, o ensaio corre sobre um conjunto sintético no mesmo
+// formato (ferramentas/json-legado-sintetico.mjs): algumas dezenas de contas com acento e
+// fuso variados, célula com visitante, discipulado, novidades, notificações, uma conta sem
+// progresso e outra com um ano de leitura. O cabeçalho diz qual fonte foi usada.
 //
 // Confere conta a conta e progresso a progresso, a reinicialização sem reimportar, 50
 // gravações simultâneas, o exportador de volta para JSON, e a conta apagada saindo do
-// banco, dos backups e dos JSON guardados.
+// banco, dos backups e dos JSON guardados. Sobre o conjunto sintético, ainda apaga uma conta
+// que é membro de célula, discípula, amiga e autora de novidades e pedidos, e confere que
+// nada dela sobra em tabela nenhuma, nos backups nem nos JSON de legado.
 // Uso: node ferramentas/teste-banco.mjs
 import { spawn, execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -15,6 +21,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { DatabaseSync } = await import(pathToFileURL(join(AQUI, 'db.mjs')).href);
 const { Contas } = await import(pathToFileURL(join(AQUI, 'contas.mjs')).href);
+const { gerarJsonLegado, SENHAS } = await import(pathToFileURL(join(AQUI, 'ferramentas', 'json-legado-sintetico.mjs')).href);
 const PORTA = 8221;
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -24,19 +31,24 @@ const ok = (cond, msg) => {
   if (!cond) falhas++;
 };
 
-// ---------- a cópia dos dados reais ----------
-// Os JSON vêm da raiz de dados/ ou, se o HML já migrou, da pasta json-legado mais nova.
+// ---------- a fonte: a cópia dos dados reais ou o conjunto sintético ----------
+// Os JSON reais vêm da raiz de dados/ ou, se o HML já migrou, da pasta json-legado mais
+// nova. Sem nenhum dos dois, o conjunto sintético é gerado direto na pasta do ensaio.
 const dadosHml = join(AQUI, 'dados');
 const legados = existsSync(dadosHml) ? readdirSync(dadosHml).filter((n) => n.startsWith('json-legado-')).sort() : [];
 const temJsonNaRaiz = existsSync(join(dadosHml, 'contas.json'));
 const fonte = temJsonNaRaiz ? dadosHml : (legados.length ? join(dadosHml, legados[legados.length - 1]) : null);
-if (!fonte) { console.log('\n  sem dados JSON para ensaiar (nem em dados/ nem em json-legado-*)\n'); process.exit(1); }
+const SINTETICO = !fonte;
 
 const PASTA = mkdtempSync(join(tmpdir(), 'cc-banco-'));
 const copiados = [];
-for (const n of readdirSync(fonte)) {
-  const origem = join(fonte, n);
-  if (statSync(origem).isFile() && n.endsWith('.json')) { copyFileSync(origem, join(PASTA, n)); copiados.push(n); }
+if (fonte) {
+  for (const n of readdirSync(fonte)) {
+    const origem = join(fonte, n);
+    if (statSync(origem).isFile() && n.endsWith('.json')) { copyFileSync(origem, join(PASTA, n)); copiados.push(n); }
+  }
+} else {
+  copiados.push(...(await gerarJsonLegado(PASTA)).arquivos);
 }
 
 // Uma conta com senha conhecida entra no contas.json copiado, para conferir o login depois.
@@ -75,8 +87,9 @@ const pedir = (rota, corpo, cookie, metodo) => fetch(base + rota, {
 });
 const banco = (sql, ...p) => { const b = new DatabaseSync(join(PASTA, 'caminho.db')); try { return b.prepare(sql).all(...p); } finally { b.close(); } };
 
-console.log('\n  Banco: migração com os dados reais do HML\n');
-console.log('  fonte: ' + fonte.replace(AQUI, '.') + ' · ' + copiados.length + ' arquivos\n');
+console.log('\n  Banco: migração dos JSON antigos ' + (SINTETICO ? 'com um conjunto sintético' : 'com os dados reais do HML') + '\n');
+console.log('  fonte: ' + (SINTETICO ? 'sintética (ferramentas/json-legado-sintetico.mjs)' : fonte.replace(AQUI, '.'))
+  + ' · ' + copiados.length + ' arquivos · ' + Object.keys(antes.contas).length + ' contas\n');
 
 let servidor = subir();
 try {
@@ -173,6 +186,56 @@ try {
     'e sai dos JSON guardados na pasta de legado');
   ok(!readFileSync(join(legado, 'contas.json'), 'utf8').includes('texto que é só meu') && banco("SELECT count(*) n FROM contas")[0].n === nomesAntes.length - 1 + 5,
     'as outras contas continuam intactas');
+
+  // ---------- (só no conjunto sintético) apagar uma conta cheia de laços ----------
+  // A conta do ensaio acima não tem amigo nem célula. Esta é membro de célula, discípula,
+  // amiga de várias, autora de novidades e de pedidos, com aparelho inscrito e caixa de
+  // avisos: depois de apagada, o @ dela não pode aparecer em coluna nenhuma, de tabela nenhuma,
+  // nem no banco, nem nos backups, nem nos JSON de legado.
+  if (SINTETICO) {
+    const quem = 'despedida';
+    const mencoes = (db) => {
+      const tabelas = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'").all().map((t) => t.name);
+      const achadas = [];
+      for (const t of tabelas) {
+        for (const c of db.prepare('PRAGMA table_info(' + t + ')').all().map((x) => x.name)) {
+          const n = db.prepare('SELECT count(*) n FROM ' + t + ' WHERE ' + c + ' LIKE ?').get('%' + quem + '%').n;
+          if (n) achadas.push(t + '.' + c);
+        }
+      }
+      return achadas;
+    };
+    const noBanco = () => { const b = new DatabaseSync(join(PASTA, 'caminho.db')); try { return mencoes(b); } finally { b.close(); } };
+    const tabelasDe = (lista) => new Set(lista.map((x) => x.split('.')[0]));
+    const antesDela = tabelasDe(noBanco());
+    const esperadas = ['contas', 'amizades', 'toques', 'silenciados', 'convites_aceites', 'proposito_membros', 'celula_presencas', 'discipulados',
+      'pedidos', 'pedido_gestos', 'pedido_denuncias', 'novidades_eventos', 'push_inscricoes', 'push_preferencias', 'push_historico', 'push_caixa', 'estados', 'leitura_dias'];
+    ok(esperadas.every((t) => antesDela.has(t)), 'antes de apagar, ' + quem + ' está em ' + antesDela.size + ' tabelas'
+      + (esperadas.every((t) => antesDela.has(t)) ? '' : ' (faltou: ' + esperadas.filter((t) => !antesDela.has(t)).join(', ') + ')'));
+    const entrou2 = await pedir('/api/entrar', { login: quem, senha: SENHAS[quem] });
+    const cookie2 = (entrou2.headers.get('set-cookie') || '').split(';')[0];
+    ok(entrou2.status === 200, 'a conta sintética com senha conhecida entra');
+    ok((await pedir('/api/apagar-conta', { senha: SENHAS[quem] }, cookie2)).status === 200, 'e é apagada');
+    const sobrou = noBanco();
+    ok(sobrou.length === 0, 'o @ dela não sobra em coluna nenhuma do banco' + (sobrou.length ? ' (sobrou em ' + sobrou.join(', ') + ')' : ''));
+    let sobrouBackup = [];
+    for (const n of readdirSync(join(PASTA, 'backup')).filter((x) => x.endsWith('.db.cifrado'))) {
+      const b = new DatabaseSync(abrirBackup(join(PASTA, 'backup', n), join(PASTA, 'conferir2-' + n + '.db')));
+      try { sobrouBackup.push(...mencoes(b)); } finally { b.close(); }
+    }
+    ok(sobrouBackup.length === 0, 'nem nos backups' + (sobrouBackup.length ? ' (sobrou em ' + [...new Set(sobrouBackup)].join(', ') + ')' : ''));
+    const comEla = [];
+    for (const pasta of [PASTA, legado]) {
+      for (const n of readdirSync(pasta).filter((x) => x.endsWith('.json'))) {
+        if (n.startsWith('estado-' + quem + '.') || readFileSync(join(pasta, n), 'utf8').includes(quem)) comEla.push(pasta === legado ? 'legado/' + n : n);
+      }
+    }
+    ok(comEla.length === 0, 'nem nos JSON de legado e nas cópias .bak.json' + (comEla.length ? ' (sobrou em ' + comEla.join(', ') + ')' : ''));
+    ok(banco("SELECT count(*) n FROM propositos WHERE celula = 1 AND encerrado_em = ''")[0].n === 2
+      && banco("SELECT count(*) n FROM pedidos WHERE autor <> ?", quem)[0].n === 3
+      && banco("SELECT count(*) n FROM contas")[0].n === nomesAntes.length - 2 + 5,
+      'a célula, os pedidos dos outros e as outras contas continuam de pé');
+  }
 } catch (e) {
   ok(false, 'o teste quebrou: ' + e.stack);
 } finally {

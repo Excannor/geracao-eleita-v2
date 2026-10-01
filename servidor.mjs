@@ -253,9 +253,25 @@ function tirarDoJsonLegado(caminho, u) {
       for (const k of Object.keys(d[campo])) d[campo][k] = semEle(d[campo][k]);
     }
     for (const k of Object.keys(d.toques || {})) if (k.split('>').includes(u)) delete d.toques[k];
+    // o que um JSON exportado do banco traz a mais (propósitos, discipulados, pedidos e a Trilha
+    // do Semeador) sai pela mesma regra de Contas.apagar
+    d.convitesAceites = Array.isArray(d.convitesAceites) ? d.convitesAceites.filter((x) => x.de !== u && x.para !== u) : d.convitesAceites;
+    for (const [id, p] of Object.entries(d.propositos || {})) {
+      if (!Array.isArray(p.membros)) continue;
+      if (!p.grupo && p.membros.some((m) => m.usuario === u)) { delete d.propositos[id]; continue; }
+      p.membros = p.membros.filter((m) => m.usuario !== u);
+      for (const e of p.encontros || []) e.presentes = semEle(e.presentes || []);
+    }
+    for (const [id, x] of Object.entries(d.discipulados || {})) if (x.discipulador === u || x.discipulo === u) delete d.discipulados[id];
+    for (const [id, r] of Object.entries(d.pedidos || {})) {
+      if (r.autor === u) { delete d.pedidos[id]; continue; }
+      r.gestos = (r.gestos || []).filter((g) => g.usuario !== u);
+      r.denuncias = (r.denuncias || []).filter((n) => n.usuario !== u);
+    }
   }
   if (Array.isArray(d.eventos)) {
-    d.eventos = d.eventos.filter((e) => e.autor !== u && (e.dados || {}).com !== u).map((e) => ({ ...e, reacoes: semEle(e.reacoes || []) }));
+    d.eventos = d.eventos.filter((e) => e.autor !== u && (e.dados || {}).com !== u && !((e.dados || {}).membros || []).includes(u))
+      .map((e) => ({ ...e, reacoes: semEle(e.reacoes || []) }));
     d.ligados = semEle(d.ligados || []);
     d.perguntados = semEle(d.perguntados || []);
   }
@@ -263,6 +279,7 @@ function tirarDoJsonLegado(caminho, u) {
     delete d.inscricoes[u];
     if (d.preferencias) delete d.preferencias[u];
     if (d.historico) delete d.historico[u];
+    if (d.caixa) delete d.caixa[u];
   }
   writeFileSync(caminho, JSON.stringify(d), 'utf8');
 }

@@ -430,7 +430,7 @@ continua funcionando com o conteúdo que já tem.
 ```
 node teste.mjs                        checagens sobre o conteúdo, o arquivo gerado e as regras
 node ferramentas/teste-db.mjs         o alicerce do banco: gravação só do que mudou, transação, backups
-node ferramentas/teste-banco.mjs      migra uma cópia dos dados reais e confere conta a conta
+node ferramentas/teste-banco.mjs      migra os JSON antigos (cópia dos dados reais ou conjunto sintético) e confere conta a conta
 node ferramentas/teste-convites.mjs   convite multiuso, atribuição, teto por hora e cancelamento
 node ferramentas/teste-propositos-regras.mjs  tipos, dias juntos e meta coletiva, sem servidor
 node ferramentas/teste-propositos.mjs         duplas, grupos, sair, encerrar e privacidade pela API

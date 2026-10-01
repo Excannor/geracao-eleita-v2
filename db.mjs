@@ -383,6 +383,10 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['silenciados', 'DELETE FROM silenciados WHERE quem = ? OR alvo = ?', [u, u]],
     ['toques', 'DELETE FROM toques WHERE de = ? OR para = ?', [u, u]],
     ['convites_aceites', 'DELETE FROM convites_aceites WHERE de = ? OR para = ?', [u, u]],
+    // a dupla (grupo = 0) é relação de duas pontas só: sai inteira, com os dias batidos; o grupo
+    // e a célula ficam, só a pessoa sai deles (a mesma regra de Contas.apagar)
+    ['proposito_dias', 'DELETE FROM proposito_dias WHERE proposito IN (SELECT p.id FROM propositos p JOIN proposito_membros m ON m.proposito = p.id WHERE p.grupo = 0 AND m.usuario = ?)', [u]],
+    ['propositos', 'DELETE FROM propositos WHERE grupo = 0 AND id IN (SELECT proposito FROM proposito_membros WHERE usuario = ?)', [u]],
     ['proposito_membros', 'DELETE FROM proposito_membros WHERE usuario = ?', [u]],
     // o histórico do encontro fica (quem registrou, quantas pessoas), só a presença da pessoa some
     ['celula_presencas', 'DELETE FROM celula_presencas WHERE usuario = ?', [u]],
@@ -401,6 +405,10 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['push_inscricoes', 'DELETE FROM push_inscricoes WHERE usuario = ?', [u]],
     ['push_preferencias', 'DELETE FROM push_preferencias WHERE usuario = ?', [u]],
     ['push_historico', 'DELETE FROM push_historico WHERE usuario = ?', [u]],
+    // a caixa do sino (v11) e o desafio de grupo que a pessoa abriu (v13) são dela, como no
+    // apagar da conta ao vivo (Contas.apagar e Notificacoes.apagarDe)
+    ['push_caixa', 'DELETE FROM push_caixa WHERE usuario = ?', [u]],
+    ['desafios_grupo', 'DELETE FROM desafios_grupo WHERE criado_por = ?', [u]],
     ['estados', 'DELETE FROM estados WHERE usuario = ?', [u]],
     // o check-in diário e a cópia achatada das datas de leitura (v14) são só da pessoa
     ['checkins', 'DELETE FROM checkins WHERE usuario = ?', [u]],

@@ -596,11 +596,14 @@ export class Contas {
     }
     // quem foi trazido por esta conta, ou a trouxe, deixa de contar na Trilha do Semeador
     this.dados.convitesAceites = (this.dados.convitesAceites || []).filter((x) => x.de !== chave && x.para !== chave);
-    // sai de todos os propósitos: dupla sem ela acaba, grupo com menos de duas pessoas também
-    for (const p of Object.values(this.dados.propositos || {})) {
+    // sai de todos os propósitos. A dupla é relação de duas pontas só, como o discipulado: sem
+    // ela, some inteira (ficar encerrada guardaria o @ dela em criadoPor para sempre). O grupo
+    // fica, e acaba se sobrar menos de duas pessoas.
+    for (const [id, p] of Object.entries(this.dados.propositos || {})) {
       if (!p.membros.some((m) => m.usuario === chave)) continue;
+      if (!p.grupo) { delete this.dados.propositos[id]; continue; }
       p.membros = p.membros.filter((m) => m.usuario !== chave);
-      if (!p.encerradoEm && (!p.grupo || this.presentes(p).length < 2)) p.encerradoEm = hojeNoFuso(FUSO_PADRAO);
+      if (!p.encerradoEm && this.presentes(p).length < 2) p.encerradoEm = hojeNoFuso(FUSO_PADRAO);
     }
     // sai da lista de presentes de qualquer encontro já registrado; o encontro em si (quem
     // registrou, quantas pessoas vieram) continua de pé
