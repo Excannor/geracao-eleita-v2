@@ -15,7 +15,7 @@ import {
 } from './contas.mjs';
 import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs';
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
-import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, quemPrecisaDeAtencao, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
+import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import { diasLidosNaSemana, resumoParaDiscipulador } from './discipulado.mjs';
 import { MOTIVOS_DENUNCIA_PEDIDO, MOTIVO_PERIGO, pedidoVisivelPara, gestosParaAutor, jaOrouHoje, jaAjudou, membroDeVerdade } from './cuidado.mjs';
 import { DESAFIOS_GRUPO, TIPOS_GRUPO, progressoNoGrupo, diaDoGrupo, fimDoDesafio, desafioVisivel } from './desafios-grupo.mjs';
@@ -28,6 +28,11 @@ import {
   MAX_TOQUES_RECEBIDOS_DIA,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
+import {
+  chamaAcesa, termometro, frequencia, funil, ofensivaPerdida, atencaoComGatilhos, rankingDaChama, evangelismoDoMes,
+  saudeDosCheckins, adocao, sincronizarLeituraDias, preencherLeituraDias, apagarLeituraDias, leiturasPorDia, quemLeuEntre,
+  datasDesde, frequenciaMediaPorCelula, checkinsEntre, JANELA_CHAMA, JANELA_CHECKIN, DIAS_SERIE_ADOCAO,
+} from './inteligencia.mjs';
 import { configDoEmail, enviarEmail } from './email.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -208,6 +213,7 @@ async function gravarEstado(dados, chave) {
 async function apagarProgressoDe(usuario) {
   const chave = arquivoDe(usuario);
   DB.prepare('DELETE FROM estados WHERE usuario = ?').run(chave);
+  apagarLeituraDias(DB, chave);
   apagarPessoaDosBackups(join(PASTA_DADOS, 'backup'), chave);
   limparLegadoDe(chave);
 }
@@ -304,6 +310,12 @@ function importarEstadosLegados() {
   if (achados.length) console.log('  progresso importado para o banco: ' + achados.length + ' arquivo(s)');
 }
 importarEstadosLegados();
+// A cópia achatada das datas de leitura (inteligencia.mjs, esquema v14): na primeira subida com
+// ela, as datas de quem já tinha progresso entram na tabela; depois, cada sincronização mantém.
+{
+  const linhas = preencherLeituraDias(DB);
+  if (linhas) console.log('  datas de leitura copiadas para leitura_dias: ' + linhas + ' linha(s)');
+}
 // O serviço de push pede um contato de quem manda: o endereço do app, e não o e-mail de ninguém.
 // Endereço que vai nos links de convite e de célula: o oficial (CAMINHO_ENDERECO), mesmo
 // quando quem convida usa o app pelo endereço antigo. Sem ele (testes, HML), o da própria visita.
@@ -481,7 +493,9 @@ async function diaDe(usuario, hoje) {
   const estado = await lerEstado(arquivoDe(usuario));
   const feitas = datasFeitas(estado);
   const simulacao = REGRAS.simularOfensiva([...feitas], hoje);
-  return { estado, feitas, protegidos: new Set(simulacao.protegidos) };
+  // A simulação inteira vai junto: a chama da célula e a ofensiva perdida (inteligencia.mjs)
+  // saem dela, sem refazer a conta.
+  return { estado, feitas, protegidos: new Set(simulacao.protegidos), simulacao };
 }
 
 // ---------- notificações ----------
@@ -584,7 +598,10 @@ async function retratoDoProposito(p, eu) {
     const hojeDele = hojeNoFuso(c.fuso);
     const referencia = hojeDele < hojeEu ? hojeDele : hojeEu;
     const dia = await diaDe(m.usuario, referencia);
-    info.set(m.usuario, { conta: c, estado: dia.estado, protegidos: dia.protegidos, datas: datasDoTipo(p.tipo, p.alvo, dia.estado, PLANO_DO_CONTEUDO), referencia });
+    info.set(m.usuario, {
+      conta: c, estado: dia.estado, protegidos: dia.protegidos, datas: datasDoTipo(p.tipo, p.alvo, dia.estado, PLANO_DO_CONTEUDO), referencia,
+      feitas: dia.feitas, simulacao: dia.simulacao,
+    });
   }
   const referencia = [...info.values()].reduce((menor, x) => (x.referencia < menor ? x.referencia : menor), hojeEu);
   // Visitante (só está conhecendo a célula) fica fora da meta do dia e de "quem leu": não é
@@ -688,10 +705,14 @@ function celulaNoRetrato(p, eu, info, ativos, referencia) {
   const nomeDe = (u) => { const x = info.get(u); return (x && ((x.estado && x.estado.apelido) || x.conta.nome)) || u; };
 
   // Quem precisa de atenção: nunca quem conduz, nunca visitante (já fora de "ativos"). A regra
-  // mora em propositos.mjs, onde os testes a exercitam sem servidor.
-  const atencao = quemPrecisaDeAtencao({
+  // mora em propositos.mjs (faltou, dias sem ler) e ganha, em inteligencia.mjs, o gatilho de
+  // quem perdeu uma ofensiva longa há pouco. Os testes exercitam as duas sem servidor.
+  const atencao = atencaoComGatilhos({
     candidatos: ativos.filter((m) => !podeConduzir(p, m.usuario))
-      .map((m) => ({ usuario: m.usuario, nome: nomeDe(m.usuario), entrouEm: m.entrouEm, datas: info.get(m.usuario).datas })),
+      .map((m) => {
+        const x = info.get(m.usuario);
+        return { usuario: m.usuario, nome: nomeDe(m.usuario), entrouEm: m.entrouEm, datas: x.datas, perda: ofensivaPerdida({ datas: x.feitas, hoje: referencia, simulacao: x.simulacao }) };
+      }),
     encontros, referencia, criadoEm: p.criadoEm,
   });
 
@@ -702,7 +723,56 @@ function celulaNoRetrato(p, eu, info, ativos, referencia) {
     atencao,
     ultimoEncontro: ultimo ? { data: ultimo.data, presentes: ultimo.presentes.length, visitantes: ultimo.visitantes, semEncontro: !!ultimo.semEncontro } : null,
     encontrosRegistrados: encontros.filter((e) => !e.semEncontro && e.data >= limiteJanela && e.data <= referencia).length,
+    painel: painelDaCelula(p, info, ativos, referencia),
   };
+}
+
+// O painel de quem conduz (inteligencia.mjs): a chama da célula, a frequência dos últimos
+// encontros e o funil da caminhada. Só contagens da própria célula, a partir do que o retrato
+// já carregou: nenhuma leitura a mais do banco. Quem conduz também conta na chama e no funil.
+function painelDaCelula(p, info, ativos, referencia) {
+  return {
+    chama: termometro(ativos.map((m) => chamaAcesa(info.get(m.usuario).simulacao))),
+    frequencia: frequencia(p.encontros || [], referencia),
+    funil: funil(ativos.map((m) => {
+      const x = info.get(m.usuario);
+      return {
+        marcos: x.conta.marcos || {}, acompanha: CONTAS.discipulosAtivosDe(m.usuario).length,
+        caminho: x.conta.caminho || 'plano', passos: new Set((x.estado && x.estado.licoes) || []).size,
+      };
+    })),
+  };
+}
+
+// O painel da igreja (só o administrador): a estratégia de Atos 2 vista de longe, sem ninguém
+// pelo nome. Lê a cópia achatada das datas (leitura_dias) e as tabelas, nunca o JSON de
+// progresso de todo mundo; cinco minutos de cache, porque os números não mudam mais rápido que
+// isso e o Pi não precisa refazer a conta a cada abertura da tela.
+let cacheIgreja = null;
+const CACHE_IGREJA_MS = 5 * 60 * 1000;
+function painelDaIgreja(hoje) {
+  if (cacheIgreja && cacheIgreja.hoje === hoje && Date.now() - cacheIgreja.em < CACHE_IGREJA_MS) return cacheIgreja.painel;
+  const contas = CONTAS.lista();
+  const leramPorDia = leiturasPorDia(DB, somaDias(hoje, -DIAS_SERIE_ADOCAO), hoje);
+  const leramNaSemana = quemLeuEntre(DB, somaDias(hoje, -7), hoje);
+  // A chama de cada membro pela mesma regra do Início, sobre as datas da janela.
+  const datas = datasDesde(DB, somaDias(hoje, -JANELA_CHAMA));
+  const simular = (u) => REGRAS.simularOfensiva([...(datas.get(u) || [])], hoje);
+  const frequencias = frequenciaMediaPorCelula(DB, somaDias(hoje, -28), hoje);
+  const celulas = CONTAS.propositosAtivos().filter((p) => p.celula && p.membros.some(membroDeVerdade)).map((p) => ({
+    id: p.id, titulo: p.titulo,
+    acesos: p.membros.filter(membroDeVerdade).map((m) => chamaAcesa(simular(m.usuario))),
+    frequencia: frequencias.has(p.id) ? frequencias.get(p.id) : null,
+  }));
+  const painel = {
+    hoje,
+    adocao: adocao({ contas, leramPorDia, leramNaSemana, hoje }),
+    chamaDasCelulas: rankingDaChama(celulas),
+    evangelismo: evangelismoDoMes(contas, hoje),
+    saude: saudeDosCheckins(checkinsEntre(DB, somaDias(hoje, -JANELA_CHECKIN), hoje)),
+  };
+  cacheIgreja = { hoje, em: Date.now(), painel };
+  return painel;
 }
 
 async function rodadaDeLembretes(agora = new Date()) {
@@ -1044,6 +1114,22 @@ const servidor = createServer(async (req, res) => {
       return;
     }
 
+    // ---------- inteligência: o painel da igreja (admin) e o da célula (quem conduz) ----------
+    if (rota === '/api/painel/igreja') {
+      if (!exigir(conta && ehAdmin(eu), 403, 'só o dono do app vê o painel')) return;
+      json(res, 200, { ...painelDaIgreja(hojeDe(eu)), geradoEm: new Date(cacheIgreja.em).toISOString() });
+      return;
+    }
+    if (rota === '/api/painel/celula') {
+      if (!exigir(conta, 403, 'entre com uma conta')) return;
+      const p = CONTAS.proposito(url.searchParams.get('id') || '');
+      if (!exigir(p && !p.encerradoEm && p.celula && p.membros.some((m) => m.usuario === eu && m.estado === 'ativo'), 404, 'célula não encontrada')) return;
+      if (!exigir(podeConduzir(p, eu), 403, 'só quem conduz a célula vê o painel dela')) return;
+      const retrato = await retratoDoProposito(p, eu);
+      json(res, 200, { id: p.id, titulo: p.titulo, referencia: hojeDe(eu), ...retrato.painel, atencao: retrato.atencao });
+      return;
+    }
+
     if (rota === '/api/perfil') {
       if (!exigir(post && conta, 405, 'método não suportado')) return;
       try {
@@ -1089,6 +1175,8 @@ const servidor = createServer(async (req, res) => {
           const junto = atual ? REGRAS.fundir(atual, novo) : novo;
           if (novo.dono) junto.dono = novo.dono;
           await gravarEstado(limparPerfilDoEstado(conferirProgresso(atual, junto, hojeDe(eu))), arquivo);
+          // A cópia achatada das datas (inteligencia.mjs) acompanha o progresso: só as datas.
+          sincronizarLeituraDias(DB, arquivo, datasFeitas(junto));
           // A primeira lição de quem veio por um convite conta para quem convidou.
           if (conta && conta.convidadoPor && datasFeitas(junto).size && await CONTAS.ativarConvidado(eu)) await marcoDoSemeador(conta.convidadoPor);
           json(res, 200, { ok: true });

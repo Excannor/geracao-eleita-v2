@@ -7,8 +7,8 @@ import { escondidoPorDenuncia } from './cuidado.mjs';
 // Com menos de 5 pessoas numa conta, o número exato pode identificar alguém numa igreja
 // pequena (Fase 5, seção 2): todo número que conta pessoas (nunca célula ou evento) passa
 // por aqui antes de sair do painel.
-const MINIMO_PARA_MOSTRAR = 5;
-const mascarar = (n) => (n < MINIMO_PARA_MOSTRAR ? 'menos de 5' : n);
+export const MINIMO_PARA_MOSTRAR = 5;
+export const mascarar = (n) => (n < MINIMO_PARA_MOSTRAR ? 'menos de 5' : n);
 const JANELA_ENCONTROS_PAINEL = 28; // 4 semanas
 const JANELA_MULTIPLICACOES = 365; // 12 meses
 const JANELA_DIAS_NA_PALAVRA = 30;

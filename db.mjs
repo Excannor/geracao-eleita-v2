@@ -198,6 +198,26 @@ const ESQUEMA = [
     inicio TEXT NOT NULL, criado_por TEXT NOT NULL, em TEXT NOT NULL, encerrado_em TEXT NOT NULL DEFAULT '');
   CREATE INDEX desafios_grupo_grupo ON desafios_grupo (tipo, grupo);
   `,
+  // v14: inteligência (métricas do líder de célula e do administrador; ver docs/inteligencia.md).
+  // O progresso de cada pessoa é um JSON na tabela estados, e as datas em que ela leu ficam
+  // dentro dele: contar "quem leu hoje" ou a chama de uma célula inteira exigiria abrir o JSON
+  // de todo mundo a cada pedido. leitura_dias é a cópia achatada só dessas datas (uma linha por
+  // pessoa e dia feito: lição do plano, Primeiro passo ou dia do Conhecer Jesus), regravada para
+  // a pessoa a cada sincronização do progresso dela. Nenhum texto, nenhuma nota: só a data.
+  // Os índices por data servem às janelas de tempo (últimos 14, 30 dias) das consultas do
+  // painel; as views são as consultas prontas que o servidor usa (o equivalente das views do
+  // Postgres, se um dia o banco mudar).
+  `
+  CREATE TABLE leitura_dias (usuario TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (usuario, data));
+  CREATE INDEX leitura_dias_data ON leitura_dias (data);
+  CREATE INDEX checkins_data ON checkins (data);
+  CREATE VIEW leituras_por_dia AS
+    SELECT data, COUNT(*) AS pessoas FROM leitura_dias GROUP BY data;
+  CREATE VIEW celula_frequencia AS
+    SELECT e.proposito, e.data, e.sem_encontro, e.visitantes,
+      (SELECT COUNT(*) FROM celula_presencas p WHERE p.proposito = e.proposito AND p.data = e.data) AS presentes
+    FROM celula_encontros e;
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -379,6 +399,9 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['push_preferencias', 'DELETE FROM push_preferencias WHERE usuario = ?', [u]],
     ['push_historico', 'DELETE FROM push_historico WHERE usuario = ?', [u]],
     ['estados', 'DELETE FROM estados WHERE usuario = ?', [u]],
+    // o check-in diário e a cópia achatada das datas de leitura (v14) são só da pessoa
+    ['checkins', 'DELETE FROM checkins WHERE usuario = ?', [u]],
+    ['leitura_dias', 'DELETE FROM leitura_dias WHERE usuario = ?', [u]],
   ];
   transacao(db, () => {
     for (const [tabela, sql, params] of passos) if (existe(tabela)) db.prepare(sql).run(...params);
