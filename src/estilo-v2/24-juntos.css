@@ -231,3 +231,10 @@ button.cartao-proposito:hover { background: var(--campo); }
 .cabeca-proposito:has(> .retratos-grupo) { flex-wrap: wrap; }
 .cabeca-proposito:has(> .retratos-grupo) > .quem-amigo { order: 1; flex-basis: 100%; }
 .folha:has([data-modo]) .botao { padding-inline: 16px; }
+
+/* Precisam de atenção: o WhatsApp e o toque abaixo do nome, lado a lado */
+.linha-atencao { align-items: flex-start; }
+.acoes-atencao { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.botao-whatsapp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px;
+  background: #157a3c; color: #ffffff; font-size: .875rem; font-weight: 700; text-decoration: none; }
+.botao-whatsapp svg { width: 18px; height: 18px; }

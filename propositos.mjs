@@ -127,22 +127,27 @@ export const LIMITE_ATENCAO = 5;
 export const DIAS_SEM_LER_ATENCAO = 5;
 const diasEntre = (a, b) => Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000);
 export function quemPrecisaDeAtencao({ candidatos, encontros, referencia, criadoEm = '' }) {
-  const doisUltimos = (encontros || []).slice().sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0)).slice(0, 2);
-  const saida = [];
+  // Os dois encontros mais recentes até a data de referência. Quem não foi marcado como
+  // presente no último encontro (frequência do líder) entra na lista: é a pessoa a procurar
+  // nesta semana. Quem faltou não tem teto; quem só está sem ler completa até LIMITE_ATENCAO.
+  const doisUltimos = (encontros || []).filter((e) => !referencia || e.data <= referencia)
+    .sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0)).slice(0, 2);
+  const faltaram = [];
+  const semLerLista = [];
   for (const m of candidatos.slice().sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'pt-BR'))) {
-    if (saida.length >= LIMITE_ATENCAO) break;
-    // Só contam encontros de quando a pessoa já estava na célula: quem entrou depois não "faltou".
+    // Só contam encontros depois do dia em que a pessoa entrou: quem chegou depois (ou no
+    // próprio dia) não "faltou".
     const entrou = m.entrouEm || '';
-    let motivo = '';
-    if (doisUltimos.length >= 2 && doisUltimos.every((e) => e.data >= entrou && !e.presentes.includes(m.usuario))) {
-      motivo = 'faltou aos 2 últimos encontros';
-    } else {
-      const feitas = [...(m.datas || [])].filter((d) => d <= referencia).sort();
-      const desde = feitas[feitas.length - 1] || entrou || criadoEm;
-      const semLer = desde ? diasEntre(desde, referencia) : 0;
-      if (semLer >= DIAS_SEM_LER_ATENCAO) motivo = 'sem ler há ' + semLer + ' dias';
+    const faltou = (e) => e.data > entrou && !e.presentes.includes(m.usuario);
+    if (doisUltimos.length && faltou(doisUltimos[0])) {
+      const aos2 = doisUltimos.length >= 2 && faltou(doisUltimos[1]);
+      faltaram.push({ usuario: m.usuario, nome: m.nome, motivo: aos2 ? 'faltou aos 2 últimos encontros' : 'faltou ao último encontro', faltou: true });
+      continue;
     }
-    if (motivo) saida.push({ usuario: m.usuario, nome: m.nome, motivo });
+    const feitas = [...(m.datas || [])].filter((d) => d <= referencia).sort();
+    const desde = feitas[feitas.length - 1] || entrou || criadoEm;
+    const semLer = desde ? diasEntre(desde, referencia) : 0;
+    if (semLer >= DIAS_SEM_LER_ATENCAO) semLerLista.push({ usuario: m.usuario, nome: m.nome, motivo: 'sem ler há ' + semLer + ' dias' });
   }
-  return saida;
+  return faltaram.concat(semLerLista.slice(0, Math.max(0, LIMITE_ATENCAO - faltaram.length)));
 }

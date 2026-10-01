@@ -786,11 +786,24 @@
     return (pedidos.length && CC.blocoPedidosConversa ? CC.blocoPedidosConversa(pedidos) : '')
       + CC.tituloSecao('Precisam de atenção')
       + (lista.length
-        ? '<div class="lista-pedidos">' + lista.map((m) => '<div class="linha-amigo">' + retrato(m)
-          + '<div class="quem-amigo"><b>' + CC.esc(m.nome) + '</b><span class="arroba">' + CC.esc(m.motivo) + '</span></div>'
+        ? '<div class="lista-pedidos lista-atencao">' + lista.map((m) => '<div class="linha-amigo linha-atencao">' + retrato(m)
+          + '<div class="quem-amigo"><b>' + CC.esc(m.nome) + '</b><span class="arroba">' + CC.esc(m.motivo) + '</span>'
+          // O cuidado fora do app: abre o WhatsApp já com uma mensagem, para quem conduz
+          // escolher o contato da pessoa.
+          + '<div class="acoes-atencao"><a class="botao-whatsapp" href="https://wa.me/?text=' + encodeURIComponent(recadoDeCuidado(p, m))
+          + '" target="_blank" rel="noopener">' + CC.ico('balao') + 'Chamar no WhatsApp</a>'
           + (amigos.includes(m.usuario) ? '<button class="botao plano pequeno" data-toque="' + CC.esc(m.usuario) + '" data-nome="' + CC.esc(m.nome) + '">Dar um toque</button>' : '')
-          + '</div>').join('') + '</div>'
+          + '</div></div></div>').join('') + '</div>'
         : '<p class="passo-dica pequena">Ninguém sumido por aqui.</p>');
+  }
+
+  // A mensagem pronta do WhatsApp, pelo motivo: falta no encontro ou dias sem ler.
+  function recadoDeCuidado(p, m) {
+    const nome = String(m.nome || '').split(' ')[0];
+    const celula = /^c[ée]lula(\s|$)/i.test(p.titulo || '') ? p.titulo : 'célula';
+    return /faltou/.test(m.motivo || '')
+      ? 'Oi, ' + nome + '! Sentimos sua falta no encontro da ' + celula + '. Está tudo bem com você? Posso orar por alguma coisa?'
+      : 'Oi, ' + nome + '! Passando para saber como você está. Bora voltar a ler junto com a gente?';
   }
 
   // Membros ativos que conduzem a célula (líder ou auxiliar): nunca entram no rodízio de

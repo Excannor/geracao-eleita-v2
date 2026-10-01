@@ -91,10 +91,17 @@ ok(R.sequenciaDoGrupo({ tipo: 'plano', batidaEm: () => true, desde: '2026-03-04'
   const r1 = A([{ usuario: 'ana', nome: 'Ana', entrouEm: '2026-03-01', datas: leu('2026-03-19') },
     { usuario: 'bia', nome: 'Bia', entrouEm: '2026-03-01', datas: leu('2026-03-19') }], enc);
   ok(r1.length === 1 && r1[0].usuario === 'ana' && r1[0].motivo === 'faltou aos 2 últimos encontros', 'quem faltou aos 2 últimos encontros aparece, com o motivo');
-  ok(!A([{ usuario: 'caio', nome: 'Caio', entrouEm: '2026-03-15', datas: leu('2026-03-19') }], enc).length,
-    'quem entrou depois do penúltimo encontro não conta como quem faltou');
+  const rc = A([{ usuario: 'caio', nome: 'Caio', entrouEm: '2026-03-15', datas: leu('2026-03-19') }], enc);
+  ok(rc.length === 1 && rc[0].motivo === 'faltou ao último encontro',
+    'quem entrou depois do penúltimo encontro só responde pelo último');
   ok(!A([{ usuario: 'ana', nome: 'Ana', entrouEm: '2026-03-01', datas: leu() }], [enc[1]], '2026-03-04').length,
-    'com um encontro só, ninguém "faltou aos 2"; e 3 dias sem ler ainda não pede atenção');
+    'encontro depois da data de referência não conta; e 3 dias sem ler ainda não pede atenção');
+  const r3 = A([{ usuario: 'ana', nome: 'Ana', entrouEm: '2026-03-01', datas: leu('2026-03-19') }], [enc[1]]);
+  ok(r3.length === 1 && r3[0].motivo === 'faltou ao último encontro', 'quem não foi marcado no último encontro aparece');
+  const r5 = A([{ usuario: 'eva', nome: 'Eva', entrouEm: '2026-03-19', datas: leu('2026-03-19') }], [enc[1]]);
+  ok(!r5.length, 'quem entrou no dia do encontro não conta como falta');
+  const faltosos = Array.from({ length: 8 }, (_, i) => ({ usuario: 'f' + i, nome: 'Falta ' + i, entrouEm: '2026-03-01', datas: leu('2026-03-19') }));
+  ok(A(faltosos, enc).length === 8, 'quem faltou entra sempre, sem o teto da lista');
   const r4 = A([{ usuario: 'davi', nome: 'Davi', entrouEm: '2026-03-01', datas: leu('2026-03-10') }], []);
   ok(r4.length === 1 && r4[0].motivo === 'sem ler há 10 dias', 'sem ler há 5 dias ou mais aparece com a contagem certa');
   const muitos = Array.from({ length: 8 }, (_, i) => ({ usuario: 'u' + i, nome: 'Pessoa ' + i, entrouEm: '2026-03-01', datas: leu() }));
