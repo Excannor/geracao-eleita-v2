@@ -343,10 +343,17 @@
     const atual = CC.diaAtual();
     raiz.querySelectorAll('.nos').forEach((nos) => {
       const caixa = nos.getBoundingClientRect();
+      // O centro de cada nó pela geometria do layout, e não pelo que está na tela: medir com
+      // getBoundingClientRect pegava o nó no meio de uma animação (o baú pulando, o nó
+      // encolhendo ao toque, a entrada da tela) e a estrada saía torta, fora do centro.
+      // x: o meio da linha mais o --x dela (o desvio do zigue-zague é um translateX); y: a
+      // soma dos offsetTop até .nos, que ignora transformações.
+      const topoEm = (el) => { let y = 0; for (let e = el; e && e !== nos; e = e.offsetParent) y += e.offsetTop; return y; };
       const pontos = [...nos.querySelectorAll('.no, .no-bau, .no-marco')].map((el) => {
-        const r = el.getBoundingClientRect();
+        const linha = el.closest('.no-linha');
         const d = el.dataset;
-        return { x: Math.round(r.left + r.width / 2 - caixa.left), y: Math.round(r.top + r.height / 2 - caixa.top), ate: d.marco ? 1e9 : +(d.dia || d.bau) + (d.bau ? 0.5 : 0) };
+        const x = (linha ? linha.offsetLeft + linha.offsetWidth / 2 + (parseFloat(linha.style.getPropertyValue('--x')) || 0) : el.offsetLeft + el.offsetWidth / 2);
+        return { x: Math.round(x), y: Math.round(topoEm(el) + el.offsetHeight / 2), ate: d.marco ? 1e9 : +(d.dia || d.bau) + (d.bau ? 0.5 : 0) };
       });
       let corte = pontos.findIndex((p) => p.ate >= atual);
       if (corte < 0) corte = pontos.length - 1;
