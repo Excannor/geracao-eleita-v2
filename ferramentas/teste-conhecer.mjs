@@ -70,7 +70,8 @@ function conferirTexto(onde, s) {
 C.perguntasFixas.forEach((t, i) => conferirTexto('fixa ' + (i + 1), t));
 for (const d of C.dias) {
   for (const t of d.trechos) if (versos(t.livro, t.cap, t.de, t.ate) === null) problemas.push('dia ' + d.numero + ': trecho não existe: ' + JSON.stringify(t));
-  for (const k of ['titulo', 'abertura', 'repare', 'pergunta', 'conversa']) conferirTexto('dia ' + d.numero + ' ' + k, d[k]);
+  // contexto e procure: o cartão "Onde estamos" antes de ler (03c-contexto.js), com as mesmas regras
+  for (const k of ['titulo', 'abertura', 'contexto', 'procure', 'repare', 'pergunta', 'conversa']) conferirTexto('dia ' + d.numero + ' ' + k, d[k] || '');
   if (!d.conversa.endsWith('…')) problemas.push('dia ' + d.numero + ': a conversa deve terminar em "…"');
 }
 for (const [k, v] of Object.entries(C.seguir)) {
@@ -93,6 +94,7 @@ for (const { onde, dia, texto } of semReferenciaLogoDepois) {
 
 for (const msg of problemas) console.log('  FALHA  ' + msg);
 ok(C.dias.length === 14, 'os 14 dias do Conhecer Jesus estão todos aqui');
+ok(C.dias.every((d) => d.contexto && d.procure), 'cada dia diz onde estamos na história (contexto) e o que procurar enquanto lê');
 ok(P.length === 10, 'as 10 perguntas honestas estão todas aqui');
 ok(problemas.length === 0, 'nenhuma referência quebrada, citação fora da NBV, travessão, tique de IA ou emoji'
   + (problemas.length ? ' (' + problemas.length + ')' : ''));

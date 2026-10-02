@@ -177,7 +177,10 @@
       // Antes de ler, a tela mostra o que vem: sem isso, sobrava um vazio que parecia travado.
       + (lida ? '' : '<div class="leitura-hoje"><span class="etiqueta">O que você vai ler</span>'
         + '<span class="passagem-hoje">' + CC.esc(CC.colarRef(dia.trechos.map((t) => CC.escreverRef(t.livro, t.cap, t.de, t.ate)).join(' e '))) + '</span>'
-        + '<span class="tempo">uns ' + minutosDoConhecer(dia) + ' minutos</span></div>')
+        + '<span class="tempo">uns ' + minutosDoConhecer(dia) + ' minutos</span></div>'
+        // ...e onde aquilo está na história: o mapa, quem escreveu e uma coisa só para procurar
+        // (03c-contexto.js, com o contexto e o "procure" de cada dia em conteudo/conhecer.json)
+        + (CC.cartaoOndeEstamosConhecer ? CC.cartaoOndeEstamosConhecer(dia) : ''))
       + corpoLido
       + '</div></div>'
       + '<div class="licao-pe' + (peDoConhecer(dia, lida, terminado) ? '' : ' vazio') + '"><div class="interno">'

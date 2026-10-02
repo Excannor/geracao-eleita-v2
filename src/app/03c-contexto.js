@@ -50,15 +50,11 @@
   CC.livroQueComeca = (numero) => ((D.plano[numero - 1] || {}).livros || [])
     .find((l) => PRIMEIRO_DIA.get(l) === numero && dados().livros[l]) || '';
 
-  // O cartão da lição, antes das passagens: o mapa (as paradas acesas), o texto do dia (ou a
-  // apresentação do livro que começa hoje) e o "procure".
-  CC.cartaoOndeEstamos = function (numero) {
+  // O cartão em si: o mapa com as paradas acesas, o texto e o "procure". A lição do dia e o
+  // dia do Conhecer Jesus montam o mesmo cartão, cada um com as próprias paradas e textos.
+  function cartao(acesas, texto, procure) {
     const paradas = dados().paradas || [];
     if (!paradas.length) return '';
-    const acesas = CC.paradasDoDia(numero);
-    const ctx = CC.contextoDoDia(numero);
-    const livro = ctx ? '' : CC.livroQueComeca(numero);
-    const texto = ctx ? ctx.contexto : (livro ? dados().livros[livro] : '');
     const nomes = paradas.filter((p) => acesas.has(p.id)).map((p) => p.nome);
     const lista = nomes.length > 1 ? nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1] : (nomes[0] || '');
     return '<section class="onde-estamos" aria-label="' + CC.esc('Onde estamos na história' + (lista ? ': ' + lista : '')) + '">'
@@ -67,9 +63,29 @@
       + paradas.map((p) => '<li' + (acesas.has(p.id) ? ' class="acesa"' : '') + '>' + CC.esc(p.nome) + '</li>').join('')
       + '</ol>'
       + (texto ? '<p class="contexto-dia">' + CC.esc(texto) + '</p>' : '')
-      + (ctx && ctx.procure ? '<p class="procure">' + CC.ico('lupa') + '<span><b>Enquanto lê, procure:</b> ' + CC.esc(ctx.procure) + '</span></p>' : '')
+      + (procure ? '<p class="procure">' + CC.ico('lupa') + '<span><b>Enquanto lê, procure:</b> ' + CC.esc(procure) + '</span></p>' : '')
       + '</section>';
+  }
+
+  // O cartão da lição, antes das passagens: o mapa (as paradas acesas), o texto do dia (ou a
+  // apresentação do livro que começa hoje) e o "procure".
+  CC.cartaoOndeEstamos = function (numero) {
+    const ctx = CC.contextoDoDia(numero);
+    const livro = ctx ? '' : CC.livroQueComeca(numero);
+    const texto = ctx ? ctx.contexto : (livro ? dados().livros[livro] : '');
+    return cartao(CC.paradasDoDia(numero), texto, ctx ? ctx.procure : '');
   };
+
+  // O dia do Conhecer Jesus (05b-conhecer.js): os trechos têm livro e capítulo, e o contexto e
+  // o "procure" moram no próprio dia (conteudo/conhecer.json). Antes de ler, a tela dizia só o
+  // que vem e quanto tempo leva; agora diz também quem escreveu e onde aquilo está na história.
+  CC.paradasDoConhecer = (dia) => {
+    const acesas = new Set();
+    for (const t of (dia && dia.trechos) || []) { const p = CC.paradaDe(t.livro, t.cap); if (p) acesas.add(p); }
+    return acesas;
+  };
+  CC.cartaoOndeEstamosConhecer = (dia) => (dia && (dia.contexto || dia.procure)
+    ? cartao(CC.paradasDoConhecer(dia), dia.contexto || '', dia.procure || '') : '');
 
   // ---------- os guias dos trechos de lista, no leitor ----------
   CC.guiaDoCapitulo = (livro, cap) => dados().guias[livro + ' ' + cap] || null;

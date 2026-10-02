@@ -164,7 +164,9 @@ O que aparece, na ordem, e quem decide:
    marca que o cadastro grava) e, fechado ele, o convite de notificações. O script dispensa os dois
    e os conta como "folhas depois do dia feito".
 6. **Conhecer Jesus** `05b-conhecer.js` (`.licao.tela-conhecer`): "O que você vai ler" com "uns N
-   minutos" → `[data-ler]` → leitor → "Terminei a leitura" fecha o leitor → "Repare", a pergunta, a
+   minutos" e, desde 02/10/2026, a placa "Onde estamos na história" (`.onde-estamos`, o mesmo
+   cartão da lição: mapa, contexto e "Enquanto lê, procure", com `contexto` e `procure` de cada dia
+   em `conteudo/conhecer.json`) → `[data-ler]` → leitor → "Terminei a leitura" fecha o leitor → "Repare", a pergunta, a
    conversa → `[data-terminar]` "Terminei o dia" (é o que conta para a ofensiva; na conta nova,
    dispara o mesmo `CC.depoisDoPrimeiroDia`) → `[data-fechar]`.
 
