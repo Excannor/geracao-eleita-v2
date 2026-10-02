@@ -144,6 +144,37 @@ const biblias = (existsSync(pastaBiblias) ? readdirSync(pastaBiblias) : [])
   .sort((a, b) => posicao(a.sigla) - posicao(b.sigla));
 console.log('bíblias:', biblias.map((b) => b.abreviatura).join(', ') || 'nenhuma');
 
+// ---------- mapas dos livros ----------
+// Um arquivo por livro publicado (conteudo/mapas/indice.json diz quais vão ao ar), com os
+// desenhos (conteudo/mapas/desenhos/<id>.svg) embutidos e o resumo no nome, como as bíblias:
+// o index.html só leva a lista (window.MAPAS), e o service worker guarda cada mapa quando
+// ele é aberto. Os 66 mapas não caberiam no index.html (teto de 1 MB). O <style> e os
+// comentários de cada SVG servem só para vê-lo sozinho e saem aqui: na tela, as classes de
+// traço (.k .h .p .s .e) vêm do 27-mapas.css, que segue o tema claro e o escuro.
+const pastaMapas = join(AQUI, 'conteudo', 'mapas');
+for (const velho of readdirSync(dist()).filter((f) => /^mapa-.*\.json(\.gz)?$/.test(f))) rmSync(dist(velho));
+const lerDesenho = (id) => {
+  const arquivo = join(pastaMapas, 'desenhos', id + '.svg');
+  if (!/^[a-z0-9-]+$/.test(id) || !existsSync(arquivo)) throw new Error('falta o desenho conteudo/mapas/desenhos/' + id + '.svg');
+  return readFileSync(arquivo, 'utf8').replace(/<style>[\s\S]*?<\/style>/g, '').replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\s+xmlns="[^"]*"/, '').replace(/\n\s*/g, '').trim();
+};
+const indiceMapas = existsSync(join(pastaMapas, 'indice.json'))
+  ? JSON.parse(readFileSync(join(pastaMapas, 'indice.json'), 'utf8')) : { publicados: [] };
+const mapas = (indiceMapas.publicados || []).map((slug) => {
+  const arquivoFonte = join(pastaMapas, slug + '.json');
+  if (!/^[a-z0-9-]+$/.test(slug) || !existsSync(arquivoFonte)) throw new Error('conteudo/mapas/indice.json publica "' + slug + '", mas falta conteudo/mapas/' + slug + '.json');
+  const mapa = JSON.parse(readFileSync(arquivoFonte, 'utf8'));
+  const ids = new Set([(mapa.autoria || {}).desenho].concat((mapa.ramos || []).map((r) => r.desenho), (mapa.cristo || {}).desenho).filter(Boolean));
+  mapa.desenhos = Object.fromEntries([...ids].map((id) => [id, lerDesenho(id)]));
+  const texto = JSON.stringify(mapa);
+  const arquivo = 'mapa-' + slug + '.' + createHash('sha256').update(texto).digest('hex').slice(0, 10) + '.json';
+  writeFileSync(dist(arquivo), texto, 'utf8');
+  writeFileSync(dist(arquivo + '.gz'), gzipSync(Buffer.from(texto, 'utf8'), { level: 9 }));
+  return { slug, nome: mapa.nome, grupo: mapa.grupo, numero: mapa.numero, capitulos: mapa.capitulos, arquivo };
+});
+console.log('mapas dos livros:', mapas.map((m) => m.nome).join(', ') || 'nenhum');
+
 // ---------- ícones ----------
 // Vêm prontos de src/icones/, gerados da arte em arte/icone-app.png por
 // ferramentas/icones.ps1. Reduzir um PNG exige decodificá-lo, e o build roda no Docker
@@ -227,7 +258,9 @@ const html = molde
   .replace(/\/\*FONTES\*\//g, () => fontes)
   .replace(/\/\*ESTILO\*\//g, () => estilo)
   .replace(/\/\*CONTEUDO_ARQUIVO\*\//g, () => arquivoConteudo)
+  // window.BIBLIAS fica por último: os testes leem a lista de traduções até o ";</script>".
   .replace(/\/\*DADOS\*\//g, () => 'window.CONTEUDO_ARQUIVO=' + JSON.stringify(arquivoConteudo) + ';'
+    + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
   .replace(/\/\*APP\*\//g, () => 'window.iniciarApp = function () {\n' + js + '\n};\n' + carregador)
   .replace(/\/\*ICONE\*\//g, () => iconeEmbutido)
@@ -267,10 +300,15 @@ const CACHE = 'caminho-${versao}';
 // As bíblias têm cache próprio, que sobrevive às atualizações do aplicativo: o nome de
 // cada arquivo só muda quando o texto muda, e baixar 4 MB a cada versão seria desperdício.
 const CACHE_BIBLIAS = 'caminho-biblias';
+// Os mapas dos livros também têm cache próprio: um arquivo por livro, com resumo no nome,
+// guardado quando o mapa é aberto pela primeira vez.
+const CACHE_MAPAS = 'caminho-mapas';
 const ARQUIVOS = ${JSON.stringify(
   ['./', './index.html', './' + arquivoConteudo, './manifest.webmanifest', './apple-touch-icon.png', './icone-48.png']
     .concat(icones.map((i) => './' + i.arquivo), arquivosFontes.map((f) => './' + f.arquivo)))};
 const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
+const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo))};
+const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS]];
 
 self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE)
@@ -281,13 +319,13 @@ self.addEventListener('install', (ev) => {
 self.addEventListener('activate', (ev) => {
   ev.waitUntil(caches.keys()
     .then((nomes) => Promise.all(nomes
-      .filter((n) => n !== CACHE && n !== CACHE_BIBLIAS)
+      .filter((n) => n !== CACHE && !GUARDADOS.some(([nome]) => nome === n))
       .map((n) => caches.delete(n))))
-    // do cache das bíblias sai só o texto que o build deixou de gerar
-    .then(() => caches.open(CACHE_BIBLIAS))
-    .then((c) => c.keys().then((pedidos) => Promise.all(pedidos
-      .filter((p) => !BIBLIAS.includes(new URL(p.url).pathname.split('/').pop()))
-      .map((p) => c.delete(p)))))
+    // dos caches das bíblias e dos mapas sai só o que o build deixou de gerar
+    .then(() => Promise.all(GUARDADOS.map(([nome, lista]) => caches.open(nome)
+      .then((c) => c.keys().then((pedidos) => Promise.all(pedidos
+        .filter((p) => !lista.includes(new URL(p.url).pathname.split('/').pop()))
+        .map((p) => c.delete(p))))))))
     .then(() => self.clients.claim()));
 });
 
@@ -295,11 +333,12 @@ self.addEventListener('activate', (ev) => {
 self.addEventListener('fetch', (ev) => {
   const url = new URL(ev.request.url);
   if (ev.request.method !== 'GET' || url.pathname.includes('/api/')) return;
-  if (BIBLIAS.includes(url.pathname.split('/').pop())) {
+  const guardado = GUARDADOS.find(([, lista]) => lista.includes(url.pathname.split('/').pop()));
+  if (guardado) {
     // Guardada na primeira vez que é pedida: daí em diante a leitura abre sem rede.
     // Só entra no cache o que é JSON, porque sem sessão o servidor responde com a
     // tela de entrada, e ela não pode ficar guardada no lugar do texto.
-    ev.respondWith(caches.open(CACHE_BIBLIAS).then((c) => c.match(ev.request, { ignoreSearch: true })
+    ev.respondWith(caches.open(guardado[0]).then((c) => c.match(ev.request, { ignoreSearch: true })
       .then((achado) => achado || fetch(ev.request).then((r) => {
         if (r.ok && (r.headers.get('content-type') || '').includes('json')) c.put(ev.request, r.clone());
         return r;
@@ -343,4 +382,4 @@ const mb = (Buffer.byteLength(html) / 1048576).toFixed(2);
 // O teste.mjs exige o index.html abaixo de 1 MB: quanto ainda cabe (as camadas de estilo contam).
 const folga = ((1024 * 1024 - Buffer.byteLength(paginaFinal)) / 1024).toFixed(1);
 console.log('gerado: dist/index.html (' + mb + ' MB, folga de ' + folga + ' KB até 1 MB) · manifest · sw ' + versao
-  + ' · ' + icones.length + ' ícones · ' + biblias.length + ' bíblias');
+  + ' · ' + icones.length + ' ícones · ' + biblias.length + ' bíblias · ' + mapas.length + ' mapas');

@@ -108,6 +108,10 @@ function hashesDosScripts() {
 // As fontes que o build tira do index.html (fonte-<nome>.<resumo>.woff2): públicas, porque
 // a tela de entrada também as usa.
 const FONTE_COM_RESUMO = /^\/fonte-[a-z-]+\.[0-9a-f]{10}\.woff2$/;
+// Os mapas dos livros (mapa-<slug>.<resumo>.json) também são públicos: são material de
+// estudo, não dado de ninguém, e o resumo no nome deixa o cache ser longo, como nas fontes.
+const MAPA_COM_RESUMO = /^\/mapa-[a-z0-9-]+\.[0-9a-f]{10}\.json$/;
+const PUBLICO_COM_RESUMO = (rota) => FONTE_COM_RESUMO.test(rota) || MAPA_COM_RESUMO.test(rota);
 const CSP = [
   "default-src 'self'",
   "script-src 'self' " + hashesDosScripts(),
@@ -1093,7 +1097,7 @@ const servidor = createServer(async (req, res) => {
       if (rota.startsWith('/api/')) { json(res, 401, { erro: 'entre primeiro' }); return; }
       const livre = rota === '/entrar.html' || rota === '/privacidade.html' || rota === '/termos.html'
         || rota.endsWith('.png') || rota === '/manifest.webmanifest' || rota === '/favicon.ico'
-        || FONTE_COM_RESUMO.test(rota);
+        || PUBLICO_COM_RESUMO(rota);
       if (!livre) {
         const pagina = await readFile(join(RAIZ, 'entrar.html')).catch(() => null);
         if (!pagina) { res.writeHead(503).end('rode "node build.mjs" antes de servir'); return; }
@@ -2078,8 +2082,8 @@ const servidor = createServer(async (req, res) => {
     res.writeHead(200, {
       'content-type': TIPOS[extname(alvo).toLowerCase()] || 'application/octet-stream',
       'content-length': corpo.length,
-      // a fonte tem o resumo no nome: o mesmo endereço é sempre o mesmo arquivo
-      'cache-control': FONTE_COM_RESUMO.test(rota) ? 'public, max-age=31536000, immutable' : 'no-cache',
+      // a fonte e o mapa têm o resumo no nome: o mesmo endereço é sempre o mesmo arquivo
+      'cache-control': PUBLICO_COM_RESUMO(rota) ? 'public, max-age=31536000, immutable' : 'no-cache',
       vary: 'accept-encoding',
       ...(comprimido ? { 'content-encoding': 'gzip' } : {}),
     });
