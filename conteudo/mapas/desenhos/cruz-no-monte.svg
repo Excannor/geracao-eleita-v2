@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a cruz no alto do monte, para "Deuteronômio e Cristo" (Dt 21.23; Gl 3.13: "pendurado num madeiro"): a cruz menor, com a tabuleta, no cume de um monte alto e largo, e o caminho subindo até o pé dela (as beiras se abrem para baixo). Com a cruz grande sobre um monte raso, parecia uma sepultura. Feito para o disco: as pontas mais longe do centro (60,60) são os pés do monte (50 de distância) e a tabuleta (42), dentro do raio 54 com o traço -->
+<path class="k p" d="M57 27H63V35H75V41H63V66H57V41H45V35H57Z"/>
+<path class="h" d="M59 44V62M61.2 46V60M59 29V32M48 38H55M65 38H72"/>
+<path class="k p" d="M52 20H68V27H52Z"/>
+<path class="h" d="M55.5 23H64.5"/>
+<path class="k s" d="M20 92C27 84 38 70 50 66.5C55 65 65 65 70 66.5C82 70 93 84 100 92C80 98 40 98 20 92Z"/>
+<path class="h" d="M57.5 66.5C55 73 60 80 52 95.5M62.5 66.5C63 73 70 80 69 95.5"/>
+<path class="h" d="M33 84l3-2M84 82l3 2M42 77l3-2"/>
+</svg>

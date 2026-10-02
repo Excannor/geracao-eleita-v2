@@ -49,7 +49,8 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    numa fenda da rocha", Êx 33.22), não como fato que já aconteceu. Promessa com condição leva o
    "se" junto ("Se o povo espalhado confessar o pecado, Deus promete...", Lv 26.40-42), e quem
    sofre a consequência é quem o versículo diz (em Lv 7.18 perde a oferta quem a apresentou).
-   Palavra de lugar, de gênero e de retomada também: "em Jerusalém" quando o versículo ainda é na
+   Palavra de lugar, de gênero e de retomada também, inclusive no texto do NT (em Mt 4, só a
+   primeira resposta ao Diabo é "no deserto"; as outras são no templo e num monte): "em Jerusalém" quando o versículo ainda é na
    estrada (Mc 11.10), "o salmo" quando o texto só diz "Escrituras", "outro grito" num item que não
    traz o primeiro (vira "um grito").
    Palavra de recorte também: "só", "o primeiro", "o último", "do capítulo X em diante" se
@@ -57,6 +58,10 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    os filhos de Nm 14.31; o "último dia" de Nm 29.32 não era o último, há o oitavo em 29.35).
    Lei em curiosidade fica no presente da ordem ("a lei manda", "quem faz o voto não come"),
    nunca no imperfeito de costume ("servia", "entrava").
+   Verbo de fim ("encerra", "fecha com") só com o último versículo do trecho (Dt 33.27 não fecha a
+   bênção, que vai até 33.29). Dado de tempo, festa ou lugar de uma curiosidade ("no sétimo ano", "da
+   Páscoa") se procura nos versículos vizinhos, e a referência se amplia para incluí-lo (Dt 15.12;
+   16.2). Lei também nos galhos fica como ordem: "o rei não pode juntar", não "não junta".
 5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
    sequência; um relato retrospectivo (Mt 14.3-12, a morte de João) se conta no passado. "O livro
    abre com" e "fecha com" só com o primeiro e o último versículo de verdade.
@@ -90,8 +95,9 @@ do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua"
 - **Ramos:** de 4 a 6 pilares, cada um com nome curto e forte e uma linha de subtítulo (até uns
   30 caracteres, para caber numa linha ao lado do desenho a 390px) que resuma o ramo inteiro,
   não só um galho. O nome no pincel cabe numa linha com até uns 16 caracteres ("Santos no dia a
-  dia", com 19, quebrou; virou "Vida santa"); confira a 360px, porque "O povo abençoado", com 16,
-  cabia a 390 e quebrou a 360 (virou "Povo abençoado"). Nada de pronome com hífen no
+  dia", com 19, quebrou; virou "Vida santa"); confira a 390, 375 e 360px, porque "O povo abençoado", com 16,
+  cabia a 390 e quebrou a 360 (virou "Povo abençoado"), e "Justiça e cuidado", com 17, só quebrou
+  a 375 (virou "Justiça diária"). Nada de pronome com hífen no
   fim de frase ("odiá-lo"): a linha quebra no hífen.
 - **Ramificações:** de 3 a 6 por ramo, cada uma com a referência no fim.
 - **Conexões:** entre um ramo e o seguinte, uma frase que mostra o raciocínio do autor bíblico
@@ -108,7 +114,8 @@ do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua"
 Depois dos ramos vêm, nesta ordem, as seções fixas: **Significado do nome**, **Autoria e
 época** (só o que o livro diz), **[Livro] e Cristo**, **Estrutura do livro** (partes com
 capítulos e o "você está aqui"), **Curiosidades do texto** (só fatos que estão no livro) e
-**Enquanto lê, procure** (uma palavra ou expressão que se repete no livro). No topo da tela, o
+**Enquanto lê, procure** (uma palavra ou expressão que se repete no livro; se ela volta com variações, o texto diz "quase com
+as mesmas palavras", conferido em cada ocorrência na NBV). No topo da tela, o
 grupo (Profetas maiores...), o nome, "Livro N de 66" e o número de capítulos.
 
 Antes de entregar o texto:
@@ -117,10 +124,13 @@ Antes de entregar o texto:
 - cada referência foi conferida na Bíblia do app (`conteudo/biblias`), lendo a folha de
   `node ferramentas/rever-mapa.mjs <slug>`, que põe cada item ao lado do texto da NBV das
   referências dele: sujeito, verbo, número, lugar, quantas vezes e se é ordem ou fato;
-- nenhum item começa igual ao anterior, e nenhuma palavra se repete na mesma frase ("No barco,
-  as ondas inundam o barco");
+- nenhum item começa igual ao anterior ("Na colheita" e "Nas vendas" contam como a mesma abertura),
+  e nenhuma palavra se repete na mesma frase ("No barco, as ondas inundam o barco"; "um profeta...
+  na boca desse profeta");
 - nenhuma palavra com hífen sobrando no texto (`grep -o -E '[[:alpha:]]+-[[:alpha:]]+' <mapa>.json`
-  e tirar da lista só os ids de desenho; em Marcos, "tornou-se" de 1Pe 2.7 escapou dentro de aspas);
+  e tirar da lista só os ids de desenho; em Marcos, "tornou-se" de 1Pe 2.7 escapou dentro de aspas;
+  em Deuteronômio, o impessoal "vende-se", "passaram-se" e a citação "levá-los": troca-se por sujeito
+  ("o povo pode vender"), outro verbo ou paráfrase);
 - nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen (nos galhos,
   nas conexões e nas curiosidades) só se não houver outra ("boas-novas" e "beira-mar" quebraram
   no hífen a 390px; "perto do mar", "No meio da noite"); quando o hífen está na própria citação
@@ -179,6 +189,12 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   cheia). Área sálvia dentro de outra peça vai só com `.s`, sem traço (com `.k`, vira uma orelha
   dentro da outra). Animal em busto fica com o pescoço aberto embaixo: o papel fecha sem traço.
   Nada que o versículo não traga: a serpente de Nm 21.8 está num "poste", sem trave.
+  Espigas vizinhas se abrem em V, com as espigas acima das frutas (lado a lado, os grãos de dentro
+  se encostam); talo de cacho sai do alto de uma uva, nunca do vão entre duas; terra vista de longe
+  desce até o chão numa curva (fechada por reta vertical vira bloco, e com uma palmeira, ilha), e
+  fica baixa e larga, com o rio descendo pelo vale (alta e estreita vira moita; rio em ondas
+  horizontais vira mar). Tracinho solto numa área lisa se confere no tamanho da tela (96px): três
+  traços curtos viram olhos e boca de um rosto (o Nebo de Deuteronômio).
 - papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de
   uma peça vira caixa branca sobre o fundo cinza da página (o barco de Mateus). Para pôr o casco
   dentro da água, o fundo do casco é a própria curva da onda (pontos tirados da curva).
@@ -236,7 +252,7 @@ para olhar peça por peça, porque a página inteira reduzida esconde defeito.
   pulo nem a página poluída. Aberto: Antigo/Novo Testamento (começa no do livro de hoje), a grade
   de duas colunas só daquele testamento, os prontos primeiro e os "em breve" depois, mais
   apagados (só contorno), e um "Fechar" no fim, que fecha sem o resto da página pular. O nome
-  nunca quebra no meio da palavra (fonte de 20, 17 ou 14px conforme o tamanho do nome).
+  nunca quebra no meio da palavra (fonte de 20, 17, 15 ou 14px conforme o tamanho do nome; "Deuteronômio", com 12 letras, passou da célula pronta a 17px).
 - **A ficha e o mapa ligados:** a ficha do livro (Explorar > Livros) ganha "Ver o mapa" logo
   abaixo do nome quando o mapa existe, e o mapa termina com "Ver a ficha do livro". Um nome só
   para cada coisa (ficha, mapa), sem outra lista dos 66.

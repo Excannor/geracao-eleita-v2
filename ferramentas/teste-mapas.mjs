@@ -151,7 +151,7 @@ const tamanhosNT = JSON.parse(await tamanhosDaGrade());
 await av('document.querySelector("[data-testamento=at]").click()');
 const tamanhos = JSON.stringify([...new Set(tamanhosNT.concat(JSON.parse(await tamanhosDaGrade())))].sort());
 await av('document.querySelector("[data-testamento=nt]").click()');
-ok(tamanhos === '["14px","17px","20px"]', 'o tamanho do nome vem do comprimento: 20, 17 ou 14px (' + tamanhos + ')');
+ok(tamanhos === '["14px","15px","17px","20px"]', 'o tamanho do nome vem do comprimento: 20, 17, 15 ou 14px (' + tamanhos + ')');
 ok(await av('document.documentElement.scrollWidth - innerWidth') <= 0, 'nada estoura a largura do Explorar');
 // fechar pelo "Fechar" do fim: o resto do Explorar fica parado e o foco volta à cabeça
 await av('document.querySelector("[data-fechar-mapas]").scrollIntoView({ block: "center" })');

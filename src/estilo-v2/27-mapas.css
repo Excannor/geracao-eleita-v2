@@ -71,7 +71,7 @@
 }
 /* os "em breve" vêm depois e mais apagados: sem fundo, só o contorno e a tinta fraca */
 .celula-mapa.breve { min-height: 48px; padding-right: 14px; background: none; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--folha-tinta) 22%, transparent); color: var(--folha-tinta-fraca); }
-/* o nome nunca quebra no meio da palavra: o tamanho (20, 17 ou 14px) vem do comprimento */
+/* o nome nunca quebra no meio da palavra: o tamanho (20, 17, 15 ou 14px) vem do comprimento */
 .nome-mapa { font-family: 'Permanent Marker', cursive; font-weight: 400; line-height: 1.15; white-space: nowrap; overflow-wrap: normal; word-break: keep-all; hyphens: none; }
 .marca-mapa { position: absolute; top: 50%; right: 10px; display: grid; place-items: center; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; color: var(--v2-tinta-fraca); }
 .marca-mapa svg { width: 16px; height: 16px; }
@@ -182,7 +182,7 @@
 .mapa-cristo { gap: 14px; padding: 20px; border-radius: var(--raio-cartao); background: var(--v2-inverso); color: var(--v2-inverso-tinta); }
 .mapa-cristo-cabeca { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; align-items: center; }
 .mapa-cristo .desenho { border-radius: 50%; background: var(--v2-fundo); }
-.mapa-rotulo-claro { color: var(--salvia); font-size: .875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.mapa-rotulo-claro { color: var(--salvia); font-size: .875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; text-wrap: balance; }
 .mapa-cristo .mapa-textos > span:last-child { font-size: .9375rem; line-height: 1.5; }
 .mapa-pares { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 10px 12px; padding-top: 12px; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); font-size: .875rem; line-height: 1.45; }
 .mapa-par-at { color: var(--salvia); font-weight: 800; }

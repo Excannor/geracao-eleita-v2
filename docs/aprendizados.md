@@ -392,6 +392,48 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   terminando no ar, fora do desenho, e a correia da face parando 4 unidades abaixo do contorno
   da cabeça (ponta solta a 520px) → correia termina num contorno (ponto tirado da curva), e
   linha que não chega a nada sai do desenho.
+- 2026-10-02 · conteúdo · Deuteronômio, na releitura com o `rever-mapa` (checador já verde): o destaque
+  `jesus` dizia que as três respostas de Jesus ao Diabo foram "no deserto", mas a segunda é no templo
+  e a terceira num monte (Mt 4.5, 8); a raiz dizia "antes da travessia" com refs que só põem o povo
+  a leste do Jordão; o "procure" dizia que "a frase volta" quando ela volta com variações ("Lembre-se
+  de que", "Não esqueçam nunca de que") → circunstância de lugar vale também para o texto do NT; e
+  frase que se repete com variação se descreve como "a lembrança volta, quase com as mesmas
+  palavras", depois de conferir cada ocorrência na NBV.
+- 2026-10-02 · estilo · O português impessoal traz hífen sem pedir licença: "vende-se, leva-se e
+  compra-se", "passaram-se trinta e oito anos", e a citação “Não posso levá-los sozinho” → o `grep`
+  de hífen da skill pega; a troca é pôr sujeito ("o povo pode vender... levar... comprar"), outro
+  verbo ("foram trinta e oito anos") ou paráfrase da citação.
+- 2026-10-02 · desenho · Deuteronômio: no cesto da colheita, as duas espigas lado a lado encostavam os
+  grãos de dentro e embolavam com as uvas; o talo do cacho saía do vão entre duas uvas e ficava solto;
+  no monte Nebo, a terra sálvia fechada por uma reta vertical na direita parecia um bloco (e, antes,
+  com a palmeira, uma ilha) → espigas vizinhas se abrem em V, com as espigas acima das frutas; talo
+  sai do alto de uma uva (ponto tirado do círculo); terra distante desce até o chão numa curva.
+- 2026-10-02 · tela · Deuteronômio no índice: o `teste-mapas` reprovou duas coisas que só aparecem com o
+  mapa no ar. O nome "Deuteronômio" (12 letras, 17px) passou da célula pronta do Explorar a 360px,
+  porque a célula pronta tem a seta à direita e a "em breve" não; e o título "Justiça e cuidado"
+  (17 caracteres) quebrou em duas linhas a 375px, mas não a 360 nem a 390 (a coluna muda de largura
+  entre os tamanhos) → nomes de 12 letras a 15px (a 14px ficava miúdo ao lado dos vizinhos); o
+  ramo virou "Justiça diária". O título se confere nos três tamanhos do teste, não só a 360.
+- 2026-10-02 · tela · O rótulo "DEUTERONÔMIO E CRISTO" quebrou a 360px deixando o "E" pendurado no fim
+  da primeira linha → o rótulo do cartão escuro ganhou `text-wrap: balance` ("DEUTERONÔMIO / E
+  CRISTO"); vale para todo livro de nome longo.
+- 2026-10-02 · conteúdo · Revisão adversarial de Deuteronômio (checador e `teste-mapas` já verdes): fato no
+  versículo vizinho em duas curiosidades ("no sétimo ano" está em Dt 15.12, não em 15.16-17; "Páscoa"
+  está em 16.1-2, não em 16.3); "encerra" com Dt 33.27, mas a bênção vai até 33.29; "o texto marca o
+  dia" sem dia em Dt 31.24; "conversar com os filhos" juntava duas ordens de Dt 6.7 (ensinar aos
+  filhos; conversar em casa e no caminho); "cortadas" nas tábuas de Dt 10.3, onde a NBV diz
+  "preparei"; lei do rei no presente de fato ("não junta") → "não pode juntar"; "profeta" duas vezes
+  na mesma frase; e dois pares de itens seguidos abrindo igual ("Na colheita" / "Nas vendas"; "Na
+  desobediência" / "Nas planícies") → verbo de fim ("encerra", "fecha") só com o último versículo do
+  trecho; todo dado de tempo, festa ou lugar de uma curiosidade se procura nos versículos vizinhos e a
+  referência se amplia; "Na X" / "Nas Y" conta como a mesma abertura.
+- 2026-10-02 · desenho · Deuteronômio na revisão: a cruz grande num monte raso de "Deuteronômio e Cristo"
+  parecia sepultura (a regra já existia e escapou); o monte Nebo, com palmeira e ondas, virava ilha na
+  praia, depois moita (terra alta e estreita) e, com três tracinhos de campo, um rosto na tela pequena;
+  no cesto, a espiga da esquerda passava por trás das uvas → a cruz encolheu e o monte subiu (pés a 50
+  do centro, dentro do disco); a terra do Nebo virou colinas baixas e largas com o rio descendo pelo
+  vale, sem tracinhos; o cesto ficou com uma espiga só. Tracinho solto dentro de área lisa se confere
+  no tamanho da tela (96px): três traços curtos viram olhos e boca.
 
 ## Entrada, sessão e página inicial
 

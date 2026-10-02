@@ -70,10 +70,12 @@
   const DESENHO_CARTAO = '@@DESENHO:pena-e-rolo@@';
   const AT = 39; // os 39 primeiros livros da tabela são do Antigo Testamento
   const testamentoDe = (nome) => (LIVROS.findIndex(([l]) => l === nome) < AT ? 'at' : 'nt');
-  // Duas colunas, nomes no pincel: 20, 17 ou 14px conforme o tamanho do nome, para
+  // Duas colunas, nomes no pincel: 20, 17, 15 ou 14px conforme o tamanho do nome, para
   // "1 Tessalonicenses" nunca quebrar no meio da palavra nem sair da célula a 360px (dentro do
   // cartão a célula é mais estreita que na grade antiga, e 15px já encostava na borda).
-  const tamanhoDoNome = (nome) => (nome.length <= 8 ? 20 : nome.length <= 12 ? 17 : 14);
+  // Doze letras pedem 15px: "Deuteronômio" a 17px passou da célula pronta (que tem a seta à
+  // direita) a 360px quando o mapa foi ao ar, e a 14px ficava miúdo ao lado dos vizinhos.
+  const tamanhoDoNome = (nome) => (nome.length <= 8 ? 20 : nome.length <= 11 ? 17 : nome.length <= 12 ? 15 : 14);
 
   function celula([nome]) {
     const m = porSlug.get(CC.slugDoLivro(nome));

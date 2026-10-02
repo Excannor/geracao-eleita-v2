@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o cesto da colheita (Dt 26.2; 28.5): os primeiros frutos da terra numa cesta: um cacho de uvas à esquerda (o talo sai do alto de uma uva), uma espiga no meio, longe das uvas (com duas, os grãos embolavam com o cacho), e uma romã à direita (a única área sálvia, com a coroa em cima). Tudo desce até abaixo da borda da frente, que cobre a parte de baixo dos frutos -->
+<ellipse class="k p" cx="60" cy="64" rx="34" ry="9"/>
+<path class="k" d="M64 68L67.5 42.8"/>
+<path class="h" d="M63.5 34.8L60.5 30.9M73.4 36.2L77.4 33.2M64.5 27.9L61.5 24.0M74.4 29.3L78.3 26.3M65.4 21.0L62.4 17.0M75.3 22.3L79.3 19.3M71.3 14.7L72.0 10.1"/>
+<ellipse class="k p" cx="64.6" cy="38.8" rx="2.5" ry="4.2" transform="rotate(-18.2 64.6 38.8)"/>
+<ellipse class="k p" cx="71.3" cy="39.8" rx="2.5" ry="4.2" transform="rotate(33.8 71.3 39.8)"/>
+<ellipse class="k p" cx="65.5" cy="31.9" rx="2.5" ry="4.2" transform="rotate(-18.2 65.5 31.9)"/>
+<ellipse class="k p" cx="72.3" cy="32.8" rx="2.5" ry="4.2" transform="rotate(33.8 72.3 32.8)"/>
+<ellipse class="k p" cx="66.5" cy="25.0" rx="2.5" ry="4.2" transform="rotate(-18.2 66.5 25.0)"/>
+<ellipse class="k p" cx="73.2" cy="25.9" rx="2.5" ry="4.2" transform="rotate(33.8 73.2 25.9)"/>
+<ellipse class="k p" cx="70.7" cy="19.0" rx="2.4" ry="4.2" transform="rotate(7.8 70.7 19.0)"/>
+<path class="k" d="M36 39L33 32.5"/>
+<g class="k p"><circle cx="36" cy="44" r="5"/><circle cx="46" cy="44" r="5"/><circle cx="31" cy="53" r="5"/><circle cx="41" cy="53" r="5"/><circle cx="51" cy="53" r="5"/><circle cx="36" cy="62" r="5"/><circle cx="46" cy="62" r="5"/></g>
+<path class="h" d="M33.4 42.8l1.6-1.6M43.4 42.8l1.6-1.6M28.4 51.8l1.6-1.6M38.4 51.8l1.6-1.6M48.4 51.8l1.6-1.6M33.4 60.8l1.6-1.6M43.4 60.8l1.6-1.6"/>
+<path class="k s" d="M77.5 44.5L76.5 38.5L79.5 41L82 37L84.5 41L87.5 38.5L86.5 44.5A12 12 0 1 1 77.5 44.5Z"/>
+<path class="h" d="M75 52C74 56 74.5 60 76.5 63"/>
+<path class="k p" d="M26 64L34 100C42 106 78 106 86 100L94 64C86 72 34 72 26 64Z"/>
+<path class="h" d="M29 76C42 82 78 82 91 76M31 86C44 92 76 92 89 86M33 95C46 100 74 100 87 95"/>
+<path class="h" d="M38 70L42 103M50 72L52 105M60 73V106M70 72L68 105M82 70L78 103"/>
+</svg>

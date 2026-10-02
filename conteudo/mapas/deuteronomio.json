@@ -1,0 +1,158 @@
+{
+  "nome": "Deuteronômio",
+  "grupo": "Lei",
+  "numero": 5,
+  "capitulos": 34,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "דְּבָרִים",
+    "transliteracao": "Devarim",
+    "traducao": "palavras",
+    "texto": "O nome hebraico sai da primeira frase do livro, que apresenta as palavras de Moisés a todo o Israel. Deuteronômio vem do grego e quer dizer segunda lei."
+  },
+  "autoria": {
+    "texto": "O livro mostra Moisés falando e também escrevendo: “Moisés escreveu esta lei e a deu aos sacerdotes”. E o texto registra quando ele termina “de escrever todas as leis registradas neste livro”.",
+    "apoio": "O último capítulo conta a morte dele e acrescenta: “até hoje ninguém sabe o ponto exato onde fica a sepultura dele”.",
+    "refs": ["Dt 31.9", "Dt 31.24", "Dt 34.6"],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "No quadragésimo ano, na terra de Moabe, a leste do Jordão, Moisés fala a todo o Israel. Relembra o caminho do deserto, expõe a lei e põe no centro de tudo uma frase: “Ouça, ó Israel: O Senhor é o nosso Deus, o Senhor somente!”",
+    "apoio": "Moisés resume o que Deus pede: “que tema o Senhor, o seu Deus, que ande em todos os seus caminhos, que ame e sirva”. E põe diante do povo uma escolha: “Escolham a vida, para que vocês e os seus filhos possam viver”.",
+    "refs": ["Dt 1.1", "Dt 1.3", "Dt 1.5", "Dt 6.4", "Dt 10.12", "Dt 30.19"]
+  },
+  "ramos": [
+    {
+      "titulo": "Quarenta anos",
+      "sub": "Moisés reconta o deserto",
+      "desenho": "muralha",
+      "galhos": [
+        { "texto": "Moisés lembra que não dava conta de levar o povo sozinho. Mandou cada tribo escolher homens sábios e os pôs como líderes de grupos de mil, de cem, de cinquenta e de dez.", "ref": "Dt 1.9, 13-15" },
+        { "texto": "Foi o povo que pediu para enviar espiões. Eles voltam com produtos da terra e dizem que ela “é boa mesmo”, mas o povo fica murmurando nas tendas: “Certamente o Senhor nos odeia”.", "ref": "Dt 1.22-27" },
+        { "texto": "O Senhor os conduziu “como um pai conduz o seu filho”, e mesmo assim não confiaram. Ele jurou que ninguém daquela geração veria a boa terra, com exceção de Calebe. Os filhos, sim, entrariam, com Josué à frente.", "ref": "Dt 1.31-39" },
+        { "texto": "Deus proíbe lutar contra Edom, Moabe e Amom: deu aquelas terras aos descendentes de Esaú e de Ló. De Edom, Israel não terá “nenhum palmo daquela terra” e paga até pela água.", "ref": "Dt 2.4-6, 9, 19" },
+        { "texto": "Seom, rei de Hesbom, recusa a proposta de paz e sai para a batalha. O Senhor o entrega, e Moisés conta: “Não houve cidade com muros altos demais para nós”.", "ref": "Dt 2.26, 30-36" },
+        { "texto": "Moisés suplica para atravessar o Jordão e ver “essa boa terra”. O Senhor responde “Não fale mais nisso” e o manda subir ao ponto mais alto do Pisga, para ver a terra de longe.", "ref": "Dt 3.25-27" }
+      ],
+      "conexao": "“Ouça com atenção”, pede Moisés: obedecer é o caminho para viver e tomar posse da terra (Dt 4.1)."
+    },
+    {
+      "titulo": "Ouça, Israel",
+      "sub": "Mandamentos e amor a Deus",
+      "desenho": "tabuas-da-lei",
+      "galhos": [
+        { "texto": "No Horebe, o Senhor falou do meio do fogo, e Moisés lembra: “vocês não viram forma alguma”. Por isso, nada de ídolo com forma de homem, de animal, de ave ou de peixe.", "ref": "Dt 4.12, 15-18" },
+        { "texto": "Moisés repete os Dez Mandamentos e diz que a aliança do Horebe foi feita “não com os nossos antepassados, mas conosco, que hoje estamos vivos aqui”.", "ref": "Dt 5.2-3, 6-21" },
+        { "texto": "Os mandamentos são para meditar sempre, ensinar aos filhos, conversar em casa, no caminho, ao deitar e ao levantar, e para pôr nos braços, na testa e nos batentes das portas.", "ref": "Dt 6.6-9" },
+        { "texto": "O Senhor não escolheu Israel por ser numeroso: “vocês eram o menor de todos os povos”. Escolheu “porque o Senhor os amou” e para cumprir a palavra dada aos antepassados.", "ref": "Dt 7.6-8" },
+        { "texto": "Quarenta anos de deserto foram uma prova. Deus deixou o povo passar fome e o sustentou com o maná, para mostrar “que não só de pão vive o homem”. E a roupa não envelheceu.", "ref": "Dt 8.2-4" },
+        { "texto": "No monte, Moisés recebe as tábuas escritas “pelo próprio dedo de Deus”. Ao descer, vê o bezerro fundido, atira as tábuas no chão e fica quarenta dias e quarenta noites prostrado diante do Senhor, que atende à oração.", "ref": "Dt 9.10, 15-19" }
+      ],
+      "jesus": {
+        "texto": "Tentado pelo Diabo, Jesus responde três vezes com palavras deste livro. No deserto, com fome, depois de jejuar quarenta dias, ele diz: “não é só de pão que vive o homem; mas de toda palavra que procede da boca de Deus”.",
+        "refs": ["Mt 4.1-4", "Mt 4.7-10"]
+      },
+      "conexao": "Israel está prestes a atravessar o Jordão (Dt 11.31). Vêm as leis para quando chegarem à terra (Dt 12.1)."
+    },
+    {
+      "titulo": "Um só lugar",
+      "sub": "Culto, dízimo, rei e profeta",
+      "desenho": "altar-com-brasas",
+      "galhos": [
+        { "texto": "As ofertas queimadas não vão para qualquer lugar: vão ao altar do lugar que o Senhor escolher “para ali pôr o seu Nome”. Lá as famílias comem diante dele e se alegram.", "ref": "Dt 12.5-7, 13-14, 27" },
+        { "texto": "Um profeta pode prever um sinal que de fato acontece e, mesmo assim, chamar para outros deuses. Não deem ouvidos: é o Senhor “provando vocês para ver se de fato amam o Senhor”.", "ref": "Dt 13.1-3" },
+        { "texto": "O dízimo é comido diante do Senhor. Se o lugar for longe, o povo pode vender a parte do dízimo, levar o dinheiro e comprar lá “o que a sua alma desejar”, para festejar com a família.", "ref": "Dt 14.22-26" },
+        { "texto": "A cada sete anos, as dívidas são canceladas, e a proximidade desse ano não é desculpa para negar ajuda ao irmão pobre: “abram as mãos e emprestem”.", "ref": "Dt 15.1-2, 7-9" },
+        { "texto": "O rei que o povo um dia pedir não pode juntar muitos cavalos, muitas mulheres nem muita prata e ouro. Tem de fazer uma cópia da lei e ler esse livro “todos os dias da sua vida”.", "ref": "Dt 17.14-19" },
+        { "texto": "No Horebe, o povo pediu para não ouvir mais a voz do Senhor. A resposta vem em promessa: Deus vai levantar “um profeta, como você” e pôr as suas palavras na boca dele.", "ref": "Dt 18.15-18" }
+      ],
+      "jesus": {
+        "texto": "O profeta como Moisés é Jesus. Pedro lembra essa promessa ao anunciar “Jesus, o Cristo de vocês”, e o próprio Jesus diz de Moisés: “Ele escreveu a meu respeito”.",
+        "refs": ["At 3.12, 20-22", "Jo 5.46"]
+      },
+      "conexao": "“Sigam a justiça e somente a justiça”, ordena Moisés (Dt 16.20). As leis seguintes levam essa ordem ao dia a dia."
+    },
+    {
+      "titulo": "Justiça diária",
+      "sub": "Próximo, pobre e colheita",
+      "desenho": "balanca",
+      "galhos": [
+        { "texto": "Três cidades de refúgio protegem quem mata sem querer, como o homem que corta lenha e vê o ferro do machado saltar do cabo e atingir o amigo. Assim o vingador não mata um inocente.", "ref": "Dt 19.2-6" },
+        { "texto": "Viu o boi ou a ovelha de alguém fugindo? “Não finja que não o viu!” Leve o animal de volta ao dono, ou cuide dele até o dono aparecer.", "ref": "Dt 22.1-3" },
+        { "texto": "A manta dada por um pobre como garantia volta para ele ao pôr do sol, para que durma coberto. O salário de quem ganha por dia se paga “antes do pôr do sol”.", "ref": "Dt 24.12-15" },
+        { "texto": "Na colheita, o feixe esquecido fica no campo, e ninguém repassa a oliveira nem a vinha: o que sobra é “para o estrangeiro, para o órfão e para a viúva”.", "ref": "Dt 24.19-21" },
+        { "texto": "Pesos e medidas têm de ser iguais em todo negócio: nada de “dois pesos e duas medidas”. Com pesos exatos e justos, o povo viverá muito tempo na terra.", "ref": "Dt 25.13-15" },
+        { "texto": "Com a cesta dos primeiros frutos, cada um declara diante do Senhor: “Os meus pais eram arameus emigrantes”. Conta a opressão no Egito e entrega os frutos da terra que o Senhor lhe deu.", "ref": "Dt 26.2-10" }
+      ],
+      "conexao": "O povo declara que o Senhor é o seu Deus (Dt 26.17) e ouve: “Hoje você se tornou o povo do Senhor” (Dt 27.9)."
+    },
+    {
+      "titulo": "Vida ou morte",
+      "sub": "Bênção, maldição e volta",
+      "desenho": "cesto-de-colheita",
+      "galhos": [
+        { "texto": "Depois do Jordão, no monte Ebal, o povo deve levantar pedras grandes, pintar com cal e escrever nelas “todas as palavras desta lei”, ao lado de um altar de pedras brutas.", "ref": "Dt 27.2-8" },
+        { "texto": "Seis tribos ficam no monte Gerizim para abençoar e seis no Ebal. Os levitas gritam as maldições, e a cada uma o povo responde: “Amém!”", "ref": "Dt 27.12-26" },
+        { "texto": "Se o povo obedecer, as bênçãos o acompanham: na cidade e no campo, nos filhos, nos rebanhos, nos cestos e no pão. O Senhor fará de Israel “cabeça, e não cauda”.", "ref": "Dt 28.1-6, 13" },
+        { "texto": "Na desobediência, as maldições alcançam Israel, e o Senhor o espalhará entre os povos. Lá, de manhã, dirão: “Ah! Quem me dera já fosse noite!”", "ref": "Dt 28.15, 64-67" },
+        { "texto": "Moisés confirma a aliança nas planícies de Moabe com todos: líderes, crianças, mulheres, estrangeiros, lenhadores e carregadores de água. E também com as futuras gerações.", "ref": "Dt 29.1, 10-15" },
+        { "texto": "Quando os espalhados voltarem para o Senhor de todo o coração, ele promete reunir Israel de todas as nações e dar “um coração fiel” ao povo e aos descendentes.", "ref": "Dt 30.1-6" }
+      ],
+      "conexao": "Moisés põe diante do povo a vida e a morte (Dt 30.15). Aos cento e vinte anos, não atravessará o Jordão (Dt 31.2)."
+    },
+    {
+      "titulo": "Adeus de Moisés",
+      "sub": "Josué, a canção e o Nebo",
+      "desenho": "monte-nebo",
+      "galhos": [
+        { "texto": "Diante de todo o Israel, Moisés chama Josué: “Seja forte! Seja corajoso!” É ele quem vai levar o povo à terra, e o Senhor irá à frente dele.", "ref": "Dt 31.7-8" },
+        { "texto": "A cada sete anos, na festa dos Tabernáculos, a lei deve ser lida para todos: homens, mulheres, crianças e os estrangeiros das cidades.", "ref": "Dt 31.10-12" },
+        { "texto": "O Senhor avisa que, depois da morte de Moisés, o povo vai seguir outros deuses. Manda escrever uma canção que servirá de testemunha, e Moisés a ensina naquele mesmo dia.", "ref": "Dt 31.16, 19-22" },
+        { "texto": "A canção chama o Senhor de Rocha e lembra que ele guardou Israel “como se fosse a menina dos seus olhos”, como a águia que carrega os filhotes nas asas.", "ref": "Dt 32.4, 10-11" },
+        { "texto": "Antes de morrer, Moisés abençoa as tribos, de Rúben a Aser, e proclama: “O Deus eterno é o seu refúgio. Ele sustenta Israel com braços eternos”.", "ref": "Dt 33.1-27" },
+        { "texto": "No monte Nebo, o Senhor mostra a Moisés a terra prometida e diz: “mas você não vai entrar nela”. Moisés morre ali, com cento e vinte anos, e Israel chora por ele trinta dias.", "ref": "Dt 34.1-5, 7-8" }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "A lei manda enterrar no mesmo dia quem morreu pendurado, “porque todo aquele que for pendurado para morrer é maldito por Deus!” Paulo cita essa lei e diz que Cristo nos redimiu da maldição da Lei quando se tornou maldição em nosso lugar (Gl 3.13).",
+    "ref": "Dt 21.23",
+    "desenho": "cruz-no-monte",
+    "pares": [
+      { "at": "Dt 6.5", "texto": "Ame o Senhor, o seu Deus, de todo o seu coração, de toda a sua alma e com todas as suas forças.", "nt": "Mc 12.29-30", "nota": "Jesus diz que este é o mandamento mais importante" },
+      { "at": "Dt 30.14", "texto": "Pois esta palavra está bem perto de vocês, está em seus lábios e em seus corações.", "nt": "Rm 10.8-9", "nota": "a palavra perto é a da fé: confessar que Jesus Cristo é o Senhor" },
+      { "at": "Dt 34.10", "texto": "Nunca mais apareceu um profeta como Moisés, pois o Senhor falava face a face com ele.", "nt": "Jo 1.17-18", "nota": "Moisés deu a Lei; Jesus Cristo trouxe a graça e a verdade e tornou Deus conhecido" }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Moisés relembra o deserto", "de": 1, "ate": 4 },
+    { "titulo": "Os Dez Mandamentos e o amor a Deus", "de": 5, "ate": 11 },
+    { "titulo": "As leis para a vida na terra", "de": 12, "ate": 26 },
+    { "titulo": "Bênçãos, maldições e a aliança em Moabe", "de": 27, "ate": 30 },
+    { "titulo": "Josué, a canção e a morte de Moisés", "de": 31, "ate": 34 }
+  ],
+  "curiosidades": [
+    { "texto": "Do monte Horebe a Cades são onze dias de caminho. Da saída de Cades até a travessia do ribeiro de Zerede, foram trinta e oito anos (Dt 2.14).", "ref": "Dt 1.2" },
+    { "texto": "Quando subiram para lutar contra a ordem do Senhor, os israelitas foram perseguidos pelos amorreus “como abelhas”, de Seir até Hormá.", "ref": "Dt 1.42-44" },
+    { "texto": "Ogue, rei de Basã, foi o último dos gigantes refains. A cama de ferro dele, que está em Rabá, media quatro metros de comprimento por um metro e oitenta de largura.", "ref": "Dt 3.11" },
+    { "texto": "Ainda a leste do Jordão, Moisés separa três cidades de refúgio: Bezer, Ramote e Golã.", "ref": "Dt 4.41-43" },
+    { "texto": "As tábuas novas, preparadas como as primeiras, foram guardadas numa arca de madeira de acácia feita por Moisés.", "ref": "Dt 10.3-5" },
+    { "texto": "Um parêntese no meio do discurso conta que Arão morreu em Moserá e foi sepultado ali. Eleazar, o filho, ficou no lugar dele como sacerdote.", "ref": "Dt 10.6" },
+    { "texto": "No Egito, a plantação precisava de rega, “como se rega uma horta”. A nova terra é de montes e vales, onde não falta chuva, e “os olhos do Senhor estão sobre ela continuamente”.", "ref": "Dt 11.10-12" },
+    { "texto": "Longe do lugar escolhido, a carne pode ser comida em casa, à vontade. O sangue não, porque “o sangue é vida”.", "ref": "Dt 12.21-23" },
+    { "texto": "Se o escravo hebreu não quiser ir embora no sétimo ano, porque ama o dono e a família, a lei manda furar a orelha dele, usando a porta como apoio, e ele fica para sempre.", "ref": "Dt 15.12, 16-17" },
+    { "texto": "O pão sem fermento da Páscoa tem outro nome, “o pão da aflição”: lembra que a saída do Egito foi com tanta pressa que a massa não teve tempo de crescer.", "ref": "Dt 16.2-3" },
+    { "texto": "Ninguém é declarado culpado pelo depoimento de uma testemunha só: toda acusação precisa de “duas ou três testemunhas”.", "ref": "Dt 19.15" },
+    { "texto": "No cerco de uma cidade, a lei poupa as árvores que dão fruto: “Por acaso as árvores do campo são inimigos para que vocês as destruam?”", "ref": "Dt 20.19" },
+    { "texto": "Quem achar um ninho no chão ou numa árvore pode pegar os filhotes, mas deixa a mãe ir embora. E toda casa nova deve ter um parapeito em volta do terraço, para ninguém cair de lá.", "ref": "Dt 22.6-8" },
+    { "texto": "Na plantação de uvas do vizinho, quem passa come quantas quiser, mas não leva nenhuma na cesta. No trigo, apanha espigas com a mão, sem usar foice.", "ref": "Dt 23.24-25" },
+    { "texto": "O homem que acabou de casar não vai para a guerra: pode ficar um ano inteiro em casa “para alegrar a esposa com quem se casou”.", "ref": "Dt 24.5" },
+    { "texto": "Nem o boi fica de fora: “Não amordacem a boca do boi quando este estiver debulhando o cereal”.", "ref": "Dt 25.4" },
+    { "texto": "A última maldição do capítulo 28 é voltar ao Egito em navios e ser oferecido como escravo, “mas não haverá quem compre vocês!”", "ref": "Dt 28.68" },
+    { "texto": "Josué ficou cheio de sabedoria porque Moisés tinha imposto as mãos sobre ele, e os israelitas passaram a obedecer a Josué.", "ref": "Dt 34.9" }
+  ],
+  "procure": {
+    "texto": "“Lembre que você foi escravo no Egito.” A lembrança volta, quase com as mesmas palavras, junto com a libertação do escravo, a festa das Semanas e o cuidado com o estrangeiro, o órfão e a viúva. Marque cada vez e veja quem sai ganhando.",
+    "ref": "Dt 5.15"
+  }
+}

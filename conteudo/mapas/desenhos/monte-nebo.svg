@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o monte Nebo e a terra vista do alto (Dt 34.1-4): à esquerda, o monte de pedra com o caminho subindo até o cume (beiras que se abrem para baixo); à direita, mais baixa e larga, a terra prometida em sálvia (a única área de cor), em colinas que descem até o chão numa curva longa, com o rio descendo pelo vale (os traços de campo, pequenos na tela, viravam olhos e boca de um rosto). Sem palmeira e sem ondas (a terra virava ilha e o rio, mar); com a terra estreita e alta, ela parecia uma moita -->
+<path class="s" d="M50 100V80C58 76.5 66 74.5 74 76C82 70 92 69 100 72C108 76 112 86 114 100Z"/>
+<path class="k" d="M57 77.2C62 75.6 68 74.8 74 76C82 70 92 69 100 72C108 76 112 86 114 100"/>
+<path class="h" d="M75 77C72 84 80 90 74 100M77.5 77C77 84 87 90 83.5 100"/>
+<path class="k p" d="M6 100L14 86L20 80L25 64L30 50L35 32L39 38L42 35L46 46L51 62L56 74L64 100Z"/>
+<path class="h" d="M41 42L44 49M46 54L49 62M51 68L54 76"/>
+<path class="h" d="M35 37C32 50 38 64 26 99M37 38C36 52 43 66 35 99"/>
+<path class="k" d="M4 100H116"/>
+</svg>
