@@ -8,8 +8,9 @@ description: Padrão do "Mapa do livro" do Geração Eleita V2, o mapa mental qu
 Antes de começar, leia `docs/aprendizados.md`. Ao terminar cada mapa, registre lá o que deu errado
 ou o que dá para fazer melhor, e passe para esta skill o que virar regra.
 
-O mapa é uma página por livro, aberta no dia em que o livro começa no plano, no leitor (botão
-Mapa) e no Explorar (os 66 mapas). Referência visual: `design/mapas/mock-isaias.dc.html` (a tela
+O mapa é uma página por livro e mora **no Explorar** (a seção dos 66 mapas). **A Bíblia do app
+não muda**: a leitura livre da Bíblia (`#/biblia`, `04d-biblia.js`, `conteudo/biblias`) fica
+como está, sem botão, sem cartão e sem dado novo (regra do dono, 2026-10-02). Referência visual: `design/mapas/mock-isaias.dc.html` (a tela
 inteira de Isaías) e `design/mapas/ilustracoes-isaias.html` (os desenhos aprovados).
 
 A ideia veio das Bíblias com mapas mentais da Editora Vida (mapas de Philippe Azevedo). O formato

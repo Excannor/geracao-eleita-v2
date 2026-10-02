@@ -32,6 +32,9 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
 - 2026-10-02 · canvas · Um publish foi recusado porque o `canvas.json` tinha mudado do lado de lá
   → ler o índice publicado logo antes de mandar mudança de layout.
 
+- 2026-10-02 · mapa · O mock punha o mapa no cartão do dia e no leitor; o dono esclareceu que os
+  mapas vão para o Explorar e a Bíblia do app não muda → mapa só no Explorar.
+
 ## Geral
 
 - 2026-10-02 · servidor · Depois de cada build, os hashes da CSP mudam; servidor antigo deixa o
