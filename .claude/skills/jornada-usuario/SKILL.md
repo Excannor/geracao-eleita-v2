@@ -192,6 +192,19 @@ kill "$(cat /tmp/dia5/servidor.pid)"
 remove `cc.instalar`) e pula a abertura; `ABERTURA=1` mostra a abertura inteira, e para ver as
 interrupções use `jornada.mjs`, que não silencia nada.
 
+Dois atalhos que pouparam tempo nas capturas "antes e depois" de 02/10/2026:
+
+- **A lição de um dia ainda não lido** (título do dia, "Onde estamos", o "procure") só aparece
+  para quem não leu aquele dia; as contas semeadas já leram. Num servidor limpo, crie uma conta
+  por `curl -c jar.txt -H 'content-type: application/json' -d '{"nome":"Foto","nascimento":"2004-05-10","email":"foto@exemplo.com","usuario":"foto","senha":"senha123","fuso":"UTC","consentimento":true}' http://localhost:8696/api/criar-conta`,
+  pegue o cookie `cc_sessao` do jar e abra `#/dia/12` direto: a lição abre em qualquer dia,
+  sem precisar ler os anteriores.
+- **`ACAO` aceita uma IIFE `async`** (o `av()` espera a promessa): dá para clicar em "Ler aqui",
+  esperar o leitor montar e rolar até um elemento numa captura só, por exemplo
+  `(async()=>{document.querySelector('[data-ler="antigo"]').click();await new Promise(r=>setTimeout(r,2500));const g=[...document.querySelectorAll('.leitor-guia')].find(x=>/Quetura/.test(x.textContent));g.scrollIntoView({block:'start'});return 'ok';})()`.
+  Para o "antes", um `git archive HEAD | tar -x -C <pasta>` e `node build.mjs` nessa pasta
+  servem o app de antes sem mexer no worktree.
+
 Por que não `CAMINHO_RELOGIO`: ela só vale com `CAMINHO_PUSH_TESTE=1` e só move o relógio dos
 avisos sociais (`agoraDoServidor` em `servidor.mjs`); o "hoje" das leituras vem de
 `hojeNoFuso(conta.fuso)` em `contas.mjs`, que usa `new Date()`. O `relogio.mjs` troca o `Date` do

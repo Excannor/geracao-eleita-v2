@@ -6,6 +6,14 @@ do conteúdo dos primeiros dias (Primeiros passos, Conhecer Jesus e a Unidade 1)
 implementado a partir disto está no histórico (`git log --grep="Primeiros dias"`), um commit por
 correção; o que ficou como recomendação está na seção 8, em lista para marcar.
 
+**Estado em 02/10/2026, fim do dia.** Oito commits a partir deste diagnóstico, nesta ordem:
+`da986ce` (este documento), `b5e562a` (nada entre a conta criada e o texto bíblico), `81b2c54`
+("Onde estamos", contexto dos dias 1 a 7 e guias de leitura), `75a0bec` (o resumo diz o que vem
+amanhã, festeja o segundo dia e chama um amigo), `081dca3` (minutos nos Primeiros passos),
+`040028a` (o funil dos primeiros dias no painel), `3d06c94` (o Conhecer Jesus com o mapa e o
+contexto dos 14 dias) e `6b99121` (os dias 8 a 31 da Unidade 1). O que ficou para o dono decidir
+está na seção 8, com o porquê.
+
 ## 1. Resumo
 
 - **O que mais custa:** a pessoa só vê a Bíblia depois de 9 toques e 5 campos, atravessando duas
@@ -54,9 +62,31 @@ Tamanho real dos dias da Unidade 1 (palavras da NBV, a 200 por minuto; o app pro
 todos. Os pesados da unidade vêm depois: dias 11 (3153), 12 (3745), 18 (3389), 25 (3541) e 31
 (3503), todos acima de 15 min.
 
+### Depois das correções (a mesma jornada, em `depois-*/relatorio.md`)
+
+| Caminho | Dia | Até o texto bíblico | Interrupções antes do texto | Folhas depois do dia feito | Palavras até o texto | Rodada |
+|---|---|---|---|---|---|---|
+| plano | 1 | 7 toques + 5 campos (era 9 + 5) | 0 (eram 2) | 2 (Instalar no celular, Notificações) | 530 (era 620) | `depois-a-plano-2`, depois de `b5e562a` |
+| plano | 1 | 7 toques + 5 campos | 0 | 2 | 625 (as 95 a mais são "Onde estamos": contexto, não tela de app) | `depois-c-plano-2`, depois de `75a0bec` |
+| plano | 2 | 2 toques | 0 | 0 | 539 (era 453; o cartão "Amanhã" e o "Onde estamos" do dia 2) | `depois-c-plano-2` |
+| conhecer | 1 | 8 toques + 5 campos (era 10 + 5) | 0 (eram 2) | 2 | 306 (era 315 antes de tudo; 225 depois de `b5e562a`; os 81 a mais são o "Onde estamos") | `depois-f-conhecer-2`, depois de `3d06c94` |
+| conhecer | 2 | 2 toques | 0 | 0 | 277 (era 184) | `depois-f-conhecer-2` |
+
+Zero erros de console em todas as rodadas; a ofensiva e os escudos fecham iguais aos de antes.
+As capturas de cada correção (antes e depois, tema claro e escuro) ficam na mesma pasta:
+`antes-d-passos.png`/`depois-d-passos.png` (minutos nos Primeiros passos),
+`antes-e-painel-funil.png`/`depois-e-painel-funil.png` (o funil no painel),
+`antes-f-conhecer-dia1.png`/`depois-f-conhecer-dia1.png` (o Conhecer com o mapa) e
+`antes-g-dia12.png`/`depois-g-dia12.png`, `depois-g-dia10-leitor.png` (os dias 8 a 31 e os guias).
+
 ## 3. Causas, por impacto
 
 Ordem = impacto × certeza, não esforço. "Quem atinge" é a pessoa nova no plano, salvo quando dito.
+Estado de cada causa em 02/10/2026: 1 feita (`b5e562a`); 2 feita (`81b2c54`, `6b99121` e, no
+Conhecer, `3d06c94`); 3 feita (`75a0bec`); 4 feita (`040028a`); 5 recomendação (muda uma regra
+que vale no aparelho e no servidor: seção 8); 6 em parte (o convite de push mudou de lugar com a
+causa 1; o lembrete do 2º dia e a hora ao fim do dia 1 são decisão do dono); 7 em parte (os
+minutos entraram com `081dca3`; a pergunta de um toque e o convite da trilha são decisão).
 
 | # | Causa | Evidência | Quem atinge | Impacto | Esforço | Correção |
 |---|---|---|---|---|---|---|
@@ -226,25 +256,38 @@ bíblico sempre da NBV. Nada de número, data ou tradição de pregação fora d
 
 ### 4.5 Primeiros passos (12 lições)
 
-Lidas inteiras (777, 698, 877, 825, 635, 651, 654, 705, 656, 760, 812 e 831 palavras).
+Lidas inteiras, duas vezes (a segunda em `scratchpad/retencao/licoes/NN.txt`, o texto da nota sem
+HTML: 769, 688, 869, 820, 632, 648, 651, 702, 652, 757, 809 e 826 palavras, 3 a 4 minutos cada a
+200 por minuto). As três notas, lição a lição, com o trecho que as sustenta:
 
-- **Personalidade: 4.** Não são genéricas: têm voz ("Pensa assim: se você não conquistou a salvação
-  com esforço, também não é o seu esforço que vai mantê-la de pé", "Uma energia não fica triste.
-  Uma pessoa fica."), admitem onde os cristãos discordam, explicam cada palavra de igreja e terminam
-  com "Pra anotar" e as leituras da semana.
-- **Tchan: 3.** Cada uma abre com uma pergunta que pega ("será que tenho a salvação mesmo? E se eu
-  errar de novo?"; "e vocês, quem dizem que eu sou?"), mas o pagamento vem 700 palavras depois, sem
-  nada no meio. Lição 1 fala com quem já crê ("Se você colocou sua confiança em Jesus"), o que a
-  própria lição reconhece no terceiro parágrafo; para quem chega pelo Conhecer, a lição 2 seria o
-  começo natural, e o app não oferece isso.
-- **Contexto: 4.** Cada lição diz por que vem naquela ordem ("Esta lição vem primeiro porque quase
-  tudo depende dela"; "A lição anterior falou de pecado e perdão. Esta fala de quem você passa a
-  ser").
-- **O que falta, como produto:** a lista (`05-licoes.js`) mostra nome e resumo, sem tempo (uma
-  lição de 877 palavras são uns 5 minutos); dentro da nota não há progresso nem pausa; o único
-  convite na trilha ("Novo na fé? Comece pelos Primeiros passos") some depois de 3 dias lidos.
-  Implementado: os minutos na lista. Recomendação: uma pergunta de um toque no fim de cada lição e
-  o convite da trilha enquanto a lição 1 não foi lida, mesmo depois de 3 dias.
+| # | Lição (palavras · min) | Pers. | Tchan | Ctx. | O que sustenta a nota |
+|---|---|---|---|---|---|
+| 1 | Segurança da salvação (769 · 4) | 4 | 3 | 4 | "Pensa assim: se você não conquistou a salvação com esforço, também não é o seu esforço que vai mantê-la de pé"; abre com "será que tenho a salvação mesmo? E se eu errar de novo?" e paga em "Quem segura a ovelha é o pastor" e "O verbo está no presente", 400 palavras depois; "Esta lição vem primeiro porque quase tudo depende dela", e manda quem ainda está conhecendo para a lição 2 |
+| 2 | Quem é Jesus (688 · 3) | 4 | 4 | 4 | "ou ele estava enganado, ou estava enganando, ou é quem disse ser"; a pergunta de Mateus 16.15 abre e fecha ("Daqui a um ano, responda de novo e compare"); "A certeza da lição anterior só faz sentido se estiver apoiada em alguém capaz de sustentar esse peso" |
+| 3 | O batismo (869 · 4, a mais longa) | 4 | 3 | 5 | "tem gente que sai da água pensando na roupa molhada"; o criminoso ao lado de Jesus "ouviu a promessa do paraíso sem ter passado pela água"; serve a quem já passou, a quem pensa, a quem foi batizado bebê, a quem tem menos de 18, com o botão "Quero conversar sobre o batismo" |
+| 4 | A Bíblia (820 · 4) | 3 | 3 | 4 | A mais "aula" das doze (cânone, cópias, traduções); a voz aparece em "Pergunta honesta: não existe nenhum original escrito pela mão de Moisés, de Mateus ou de Paulo"; "66 livros, uns quarenta autores, três línguas, mais de mil anos" contando "uma história só"; "Todo dia, aqui no app, você lê um pedaço da Bíblia. Então vale entender que livro é esse" |
+| 5 | Oração (632 · 3, a mais curta) | 5 | 4 | 4 | "Um simples 'não sei nem o que pedir, mas o Senhor sabe' já é oração"; "Orar sempre importa mais do que orar muito"; Romanos 8.26 e "Deus responde como Pai"; "as duas andam juntas: na Bíblia Deus fala com você, na oração você fala com ele" |
+| 6 | O Espírito Santo (648 · 3) | 4 | 4 | 4 | "Uma energia não fica triste. Uma pessoa fica."; "Se hoje você tem interesse por Jesus, isso também é obra dele"; "Falta apresentar quem está por trás das duas" |
+| 7 | Igreja e comunhão (651 · 3) | 4 | 3 | 4 | "Ninguém pratica um 'uns aos outros' sozinho no quarto"; "Quem entra esperando pessoas prontas se decepciona rápido"; o aviso sobre abuso ("conte a um adulto de confiança"); "Agora o foco se abre" |
+| 8 | Pecado, arrependimento e perdão (702 · 4) | 5 | 4 | 4 | "Você vai errar de novo. Todo cristão erra."; "A mesma promessa cobre a primeira queda e a vigésima"; culpa × vergonha ("Culpa é perceber que você fez algo errado. Vergonha é sentir que você é algo errado"); "A primeira lição já tocou nesse assunto" |
+| 9 | Minha identidade em Cristo (652 · 3) | 4 | 4 | 4 | "Ninguém precisa bater ponto pra continuar sendo da família"; "refém de curtida, elogio e crítica"; as três bases falsas (desempenho, opinião, passado) "sobem e descem, e por isso nunca dão descanso" |
+| 10 | Tentação e batalha espiritual (757 · 4) | 4 | 4 | 4 | "Viver apavorado só porque uma tentação apareceu confunde as coisas, e brincar com ela também"; "Se ser tentado já fosse pecado, Jesus teria pecado"; manda procurar psicólogo ou médico quando a raiz pede |
+| 11 | Tempo, dinheiro e talentos (809 · 4) | 4 | 3 | 4 | "pra louça em casa"; "incluindo o tempo de tela"; "O sinal de alerta aparece quando a oferta vira promessa de lucro"; é a mais "lista" das doze (cinco blocos) |
+| 12 | Testemunho e missão (826 · 4) | 4 | 4 | 5 | "dizer 'não sei responder isso, mas vou pesquisar e te falo' é uma resposta honesta"; "Pense em três a cinco pessoas próximas e ore por elas... é o passo que mais gente pula"; liga a luz de Mateus 5.14 ao fogo da ofensiva do app; "Esta é a última lição porque depende de todas as outras" |
+
+**Em resumo: personalidade 4,2, tchan 3,6, contexto 4,2.** Não são genéricas: têm voz, admitem
+onde os cristãos discordam (salvação, dons, dízimo, batismo), explicam cada palavra de igreja e
+terminam com "Pra anotar" e as leituras da semana. O tchan é bom mas chega no fim: cada lição abre
+com uma pergunta que pega e paga 400 a 700 palavras depois, sem nada no meio. O contexto é o ponto
+forte: toda lição diz por que vem naquela ordem.
+
+**O que falta, como produto:** a lista (`05-licoes.js`) mostrava nome e resumo, sem tempo;
+dentro da nota não há progresso nem pausa; o único convite na trilha ("Novo na fé? Comece pelos
+Primeiros passos", `03-trilha.js`: só enquanto há menos de 3 dias lidos e alguma lição por ler)
+some depois de 3 dias lidos. Feito: os minutos na lista e no cartão da próxima (`081dca3`).
+Recomendação (seção 8): uma pergunta de um toque no fim de cada lição; o convite da trilha
+enquanto a lição 1 não foi lida, mesmo depois de 3 dias; para quem vem do Conhecer, começar pela
+lição 2 (a própria lição 1 diz isso no terceiro parágrafo, mas o app não oferece).
 
 ### 4.6 Conhecer Jesus (dias 1 e 2 medidos; os 14 lidos)
 
@@ -255,35 +298,68 @@ Lidas inteiras (777, 698, 877, 825, 635, 651, 654, 705, 656, 760, 812 e 831 pala
   ("A Bíblia começa com Deus fazendo tudo o que existe. Leia devagar, como quem ouve uma história
   pela primeira vez.") e no dia 2 já é boa ("o ser humano diz não a Deus e resolve decidir sozinho
   o que é bom e o que é mau").
-- **Contexto: 3.** A tela diz o que vem e quanto tempo leva (`antes-conhecer-2/d01-p17`), que é o
-  que o plano não faz; não diz quem escreveu nem onde está na história, e nos dias 3 (Isaías 53) e
-  4 (Lucas 2) isso faria diferença ("escrito uns 700 anos antes de Jesus" é afirmação que precisa
-  de fonte; a ficha de Isaías do Explorar tem a data). Recomendação: o mesmo mapa da história no
-  dia do Conhecer.
+- **Contexto: 2.** A tela diz o que vem e quanto tempo leva (`antes-conhecer-2/d01-p17`), que é o
+  que o plano não fazia; não diz quem escreveu nem onde está na história, e nos dias 3 (Isaías 53)
+  e 4 (Lucas 2) isso faria diferença ("escrito uns 700 anos antes de Jesus" é afirmação que precisa
+  de fonte; a ficha de Isaías do Explorar tem a data).
 - O tutorial de instalar e o convite de push aparecem antes do dia 1 também aqui (as mesmas 2
   interrupções): a correção da causa 1 vale para os dois caminhos.
 
+**Feito (`3d06c94`):** cada um dos 14 dias abre com a mesma placa "Onde estamos na história" da
+lição (mapa com a parada acesa, contexto com os fatos das fichas dos livros, "Enquanto lê,
+procure"), em `conteudo/conhecer.json` e conferido por `teste-conhecer.mjs`. Dia a dia, as três
+notas da tela de antes de ler, antes → depois (o "Repare" e a pergunta, que vêm depois de ler, não
+mudaram):
+
+| Dia | Título (livro) | Pers. | Tchan antes → depois | Ctx. antes → depois | O que entrou antes de ler |
+|---|---|---|---|---|---|
+| 1 | No começo (Gn 1-2.3) | 4 | 1 → 3 | 2 → 4 | Gênesis quer dizer começo; Moisés pela tradição, para um povo recém-saído do Egito; procure: quem foi criado "à imagem de Deus" (1.27) e o sétimo dia (2.2) |
+| 2 | O que deu errado (Gn 3) | 4 | 2 → 3 | 2 → 4 | A promessa no meio do castigo (3.15), que o resto da Bíblia acompanha; procure: a serpente começa com uma pergunta (3.1) |
+| 3 | Uma promessa (Is 53) | 4 | 2 → 3 | 1 → 4 | Isaías, profeta de Judá, séculos VIII e VII a.C. pela ficha (antes a abertura dizia "muito antes de Jesus" sem fonte); procure: com o que o texto compara todos nós (53.6) |
+| 4 | Deus chega perto (Lc 2.1-20) | 4 | 2 → 3 | 2 → 4 | Lucas, médico que viajava com Paulo pela tradição, escreveu para Teófilo; o censo; procure: a primeira coisa que o anjo diz (2.10) e o sinal (2.12) |
+| 5 | Quem te carrega (Lc 5.17-26) | 5 | 2 → 3 | 1 → 3 | Galileia, começo do ministério; "mestres da lei" explicados; procure: "Que é mais fácil dizer" (5.23) |
+| 6 | Conhecido por inteiro (Jo 4.1-26) | 4 | 2 → 3 | 2 → 4 | João, um dos doze pela tradição, e o objetivo do livro; Samaria no caminho; procure: a hora do dia (4.6) e quem pede água a quem (4.7) |
+| 7 | O pai que corre (Lc 15.11-32) | 5 | 2 → 4 | 1 → 3 | "Parábola" explicada; só em Lucas pela ficha; procure: o pai corre para um filho (15.20) e sai para insistir com o outro (15.28) |
+| 8 | Na tempestade (Mc 4.35-41) | 4 | 2 → 3 | 1 → 4 | Marcos, ligado à pregação de Pedro, o evangelho mais curto, para cristãos perseguidos; procure: a almofada (4.38) |
+| 9 | Jesus chorou (Jo 11.1-44) | 5 | 2 → 4 | 2 → 4 | Betânia a 3 km de Jerusalém (11.18) e a tentativa de apedrejar (11.8); procure: os dois dias de espera (11.6) e "adormeceu" (11.11) |
+| 10 | A cruz (Lc 23.32-49) | 4 | 2 → 3 | 2 → 4 | Última semana, Caveira (23.33); procure: o letreiro (23.38) e a escuridão ao meio-dia (23.44-45) |
+| 11 | Ele está vivo (Lc 24) | 4 | 2 → 3 | 2 → 4 | Terceiro dia; Lucas investigou e dá os nomes; procure: os nomes das mulheres (24.10) e "tolice" (24.11) |
+| 12 | Nascer de novo (Jo 3.1-21) | 4 | 2 → 3 | 2 → 4 | Nicodemos "uma autoridade religiosa entre os judeus" (3.1); 3.16 é o versículo-chave da ficha; procure: a serpente no deserto (3.14) |
+| 13 | E agora? (At 2.22-41) | 4 | 2 → 3 | 2 → 4 | Atos, segundo volume de Lucas; o mesmo Pedro do dia 11; procure: quantos se uniram naquele dia (2.41) |
+| 14 | Uma família (At 2.42-47) | 4 | 2 → 3 | 2 → 4 | "Igreja, aqui, não é um prédio"; procure: as quatro coisas em que continuavam firmes (2.42) e onde se reuniam (2.46) |
+
+Medido na jornada do Conhecer depois disso (`depois-f-conhecer-2`): 8 toques + 5 campos até o
+texto, 0 interrupções, 0 erros; as palavras até o texto sobem de 225 para 306 no dia 1 e de 184
+para 277 no dia 2, todas de contexto. Capturas: `antes-f-conhecer-dia1.png`,
+`depois-f-conhecer-dia1.png`, `depois-f-conhecer-dia1-escuro.png`, `depois-f-conhecer-dia2.png`.
+
 ## 5. Plano, em rodadas
 
-**Rodada 1 (barato, seguro, reversível; feita neste diagnóstico, um commit por item):**
+**Rodada 1 (barato, seguro, reversível; feita, um commit por item):**
 
-1. Tutorial de instalar e convite de notificações só depois do primeiro dia feito (plano e
-   Conhecer); o convite de notificações nunca antes da primeira leitura. Métrica: interrupções
-   antes do texto no dia 1, de 2 para 0; toques até o texto, de 9 para 7 (plano) e de 10 para 8
-   (Conhecer). O `jornada.mjs` passa a contar as folhas que aparecem depois do dia feito.
-2. "Onde estamos" na lição (mapa + contexto + "procure"), guia de leitura com salto nos trechos de
-   lista, balão do dia 1 com personalidade. Métrica: palavras até o texto sobem (são palavras de
-   contexto, não de tela de app); no painel, "abriram a lição no dia 1 → terminaram uma leitura".
-3. Resumo com "Amanhã" (passagem, minutos e o título da reflexão do dia seguinte), marco do dia 2
-   e "Chamar alguém para ler junto" para quem não tem amigo. Métrica: "leram no dia 2" no funil;
-   `origens` (convite) no painel.
-4. Minutos estimados na lista dos Primeiros passos.
+1. `b5e562a`: tutorial de instalar e convite de notificações só depois do primeiro dia feito
+   (plano e Conhecer); o convite de notificações nunca antes da primeira leitura. Métrica:
+   interrupções antes do texto no dia 1, de 2 para 0; toques até o texto, de 9 para 7 (plano) e
+   de 10 para 8 (Conhecer). O `jornada.mjs` passa a contar as folhas que aparecem depois do dia
+   feito.
+2. `81b2c54` (dias 1 a 7) e `6b99121` (dias 8 a 31): "Onde estamos" na lição (mapa + contexto +
+   "procure"), guia de leitura com salto nos trechos de lista, balão do dia 1 com personalidade.
+   Métrica: palavras até o texto sobem de 530 para 625 (são palavras de contexto, não de tela de
+   app); no painel, "abriram a lição no dia 1 → terminaram uma leitura".
+3. `75a0bec`: resumo com "Amanhã" (passagem, minutos de verdade e o gancho do dia seguinte),
+   "Você voltou!" no segundo dia seguido e "Chamar alguém para ler junto" para quem não tem amigo.
+   Métrica: "leram no dia 2" no funil; `origens` (convite) no painel.
+4. `081dca3`: minutos estimados na lista dos Primeiros passos e no cartão da próxima lição.
+5. `3d06c94`: a mesma placa "Onde estamos" nos 14 dias do Conhecer Jesus.
 
 **Rodada 2 (regras; para o dono decidir, seção 8):** escudo do iniciante; lembrete do 2º dia para
-conta nova; "Amanhã, a que horas?" ao fim do dia 1; lembrete com o gancho do dia.
+conta nova; "Amanhã, a que horas?" ao fim do dia 1; lembrete com o gancho do dia. Nenhum item desta
+rodada foi feito, de propósito: cada um muda uma regra que a pessoa sente (quantos dias a chama
+aguenta, quando o app manda mensagem) e o README documenta como promessa.
 
-**Rodada 3 (dado novo; feita):** o funil dos primeiros dias no painel, com o sinal "abriu a lição"
-anotado no diário do dia (só um contador por data, como `leitor` e `notas` já são).
+**Rodada 3 (dado novo; feita em `040028a`):** o funil dos primeiros dias no painel, com o sinal
+"abriu a lição" anotado no diário do dia (só um contador por data, como `leitor` e `notas` já
+são). Contas de antes de 02/10/2026 contam "abriram a lição" pela leitura marcada.
 
 ## 6. O que não muda
 
@@ -295,9 +371,15 @@ em 3 passos.
 ## 7. Como vamos saber
 
 - A jornada de novo, nos dois caminhos, com a mesma tabela da seção 2 (o relatório `depois-*`).
-- No painel, o funil novo: a partir de agora, a cada semana, "criaram → leram no dia 1 → voltaram no
-  dia 2 → leram no dia 2 → leram 3 ou mais dos 7 primeiros". É a resposta direta à frase do dono.
-- `retorno` D1 e D7 e `turmas` s1 nas próximas semanas, antes contra depois.
+- No painel (`#/config/painel`, grupo "Os primeiros dias de quem chega", desde `040028a`): no dia
+  do cadastro, quantas contas criaram, abriram a lição, terminaram uma leitura no app e marcaram o
+  dia como lido; em cada um dos dias 2 a 7, quantas abriram o app e quantas leram, entre as contas
+  que já completaram aquele dia; e quantas leram 3 ou mais dos 7 primeiros. Só contagens e
+  percentuais, sem nome. É a resposta direta à frase do dono: a partir de agora, a cada semana,
+  "criaram → leram no dia 1 → voltaram no dia 2 → leram no dia 2 → leram 3 ou mais dos 7".
+- `retorno` D1 e D7 e `turmas` s1 nas próximas semanas, antes contra depois. O que mudou entrou
+  em 02/10/2026: a turma que se cadastrar a partir de 03/10 é a primeira a chegar inteira pelo
+  caminho novo.
 
 ## 8. Decisões para o dono
 
@@ -312,7 +394,17 @@ em 3 passos.
 - [ ] **Lembrete com o gancho do dia** ("Hoje: O pecado está à sua espera, Gênesis 4-5, 5 min") em
   vez das frases fixas de `T.lembreteSemOfensiva`.
 - [ ] **Primeiros passos:** uma pergunta de um toque no fim de cada lição; o convite da trilha fica
-  enquanto a lição 1 não foi lida; para quem vem do Conhecer, começar pela lição 2.
-- [ ] **Conhecer Jesus:** o mapa da história também no dia do Conhecer.
+  enquanto a lição 1 não foi lida (hoje, `03-trilha.js`: só com menos de 3 dias lidos); para quem
+  vem do Conhecer, começar pela lição 2.
+- [x] **Conhecer Jesus:** o mapa da história também no dia do Conhecer (feito em `3d06c94`, com o
+  contexto e o "procure" dos 14 dias).
 - [ ] **Dias pesados da Unidade 1** (11, 12, 18, 25, 31, todos acima de 3100 palavras): dividir a
-  leitura em duas sessões ("Ler a metade agora") sem mudar o plano, ou aceitar e avisar.
+  leitura em duas sessões ("Ler a metade agora") sem mudar o plano, ou aceitar e avisar. Por
+  enquanto, avisa: o contexto desses dias diz "uns 19 minutos: vale dividir", e o gancho de
+  "amanhã" no resumo do dia anterior já diz o tempo.
+
+Por que estes ficaram como recomendação e não como commit: todos mudam uma regra que a pessoa
+sente ou uma promessa que o README faz (a chama, os lembretes, a hora da mensagem), ou mudam o
+fluxo de uma tela que o dono aprovou (o convite da trilha, a ordem das lições). O que foi feito
+sem perguntar é o que acrescenta camadas sem tirar nada: ordem das folhas, contexto antes de ler,
+o que vem amanhã, minutos, e uma medida nova no painel.
