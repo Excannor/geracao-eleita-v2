@@ -5,6 +5,12 @@
 
   const D = CC.D;
 
+  // Quanto tempo leva cada lição: as palavras da nota a 200 por minuto, nunca menos de 2.
+  // A lista mostrava só nome e resumo; sem o tempo, uma lição de 877 palavras parecia um
+  // texto sem fim para quem está decidindo se abre.
+  const minutosDaLicao = (n) => Math.max(2, Math.round(String(n.html || '').replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length / (CC.PALAVRAS_POR_MINUTO || 200)));
+  CC.minutosDaLicao = minutosDaLicao;
+
   CC.vistaPassos = function (raiz) {
     const feitas = CC.ler('licoes', []);
     const proxima = D.licoes.find((id) => !feitas.includes(id));
@@ -19,7 +25,8 @@
         + '<span class="num" aria-hidden="true">' + (feita ? CC.ico('certo') : (i + 1)) + '</span>'
         + '<span class="textos">'
         + (id === proxima ? '<span class="marca-proxima">Próxima</span>' : '')
-        + '<b>' + CC.esc(CC.semPrefixo(n.nome)) + (feita ? '<span class="so-leitor">, concluída</span>' : '') + '</b>'
+        + '<b>' + CC.esc(CC.semPrefixo(n.nome)) + (feita ? '<span class="so-leitor">, concluída</span>' : '')
+        + ' <small class="minutos-licao">· uns ' + minutosDaLicao(n) + ' min</small></b>'
         + '<span>' + CC.esc(n.resumo || '') + '</span></span>'
         + CC.ico('avancar') + '</a>';
     }).join('');
@@ -34,7 +41,7 @@
       + '<p class="subtitulo-tela">Doze lições pra firmar a fé. Cada uma conta quando você lê até o fim, e uma por semana é um bom ritmo.</p>'
       + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitas.length + ' de ' + D.licoes.length + '</b></div>'
       + (proxima
-        ? '<a class="cartao-destaque" href="#/nota/' + encodeURIComponent(proxima) + '"><span>' + CC.esc(nomeProxima) + '</span>' + CC.ico('bandeira') + '</a>'
+        ? '<a class="cartao-destaque" href="#/nota/' + encodeURIComponent(proxima) + '"><span>' + CC.esc(nomeProxima) + '<small class="minutos-licao">uns ' + minutosDaLicao(D.notas[proxima]) + ' min</small></span>' + CC.ico('bandeira') + '</a>'
         : '<p class="conquista-linha">' + CC.ico('estrela') + 'Você concluiu os primeiros passos!</p>')
       + '</div></div>'
       + CC.tituloSecao('As doze lições')

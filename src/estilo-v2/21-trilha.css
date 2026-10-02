@@ -365,3 +365,7 @@
   .trilha { padding-bottom: 72px; }
   .folha-topo { margin-top: -16px; }
 }
+
+/* ---------- Primeiros passos: o tempo de cada lição, ao lado do nome e no cartão da próxima ---------- */
+.item-licao .textos b .minutos-licao { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; white-space: nowrap; }
+.cartao-destaque .minutos-licao { display: block; margin-top: 2px; color: inherit; font-size: .8125rem; font-weight: 600; opacity: .8; }
