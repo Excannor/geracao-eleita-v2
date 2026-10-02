@@ -262,7 +262,9 @@ const html = molde
   .replace(/\/\*DADOS\*\//g, () => 'window.CONTEUDO_ARQUIVO=' + JSON.stringify(arquivoConteudo) + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
-  .replace(/\/\*APP\*\//g, () => 'window.iniciarApp = function () {\n' + js + '\n};\n' + carregador)
+  // O cartão dos mapas no Explorar leva um desenho só (o rolo com a pena): ele entra no código
+  // no lugar da marca '@@DESENHO:<id>@@', sem o <style>, como nos mapas.
+  .replace(/\/\*APP\*\//g, () => 'window.iniciarApp = function () {\n' + js.replace(/'@@DESENHO:([a-z0-9-]+)@@'/g, (_, id) => JSON.stringify(lerDesenho(id))) + '\n};\n' + carregador)
   .replace(/\/\*ICONE\*\//g, () => iconeEmbutido)
   .replace(/\/\*VERSAO_ICONES\*\//g, () => versaoIcones)
   .replace(/\/\*ABERTURA\*\//g, () => montarAbertura());

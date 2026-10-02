@@ -295,14 +295,14 @@
           + '<b>' + CC.esc(CC.passagemDe(dia)) + '</b>'
           + '<div class="pilulas">' + deHoje.map(CC.pilulaNota).join('') + '</div></div>'
         : '')
+      // Os mapas dos livros: um cartão só, que abre e fecha no lugar, com o atalho para o mapa
+      // do livro de hoje (06b-mapas.js).
+      + CC.cartaoMapas()
       // A história em uma página é o passo 1 do caminho; o atalho próprio só volta depois dele.
       + (terminou && D.notas[HISTORIA] ? '<a class="cartao cartao-historia" href="#/nota/' + encodeURIComponent(HISTORIA) + '">'
         + CC.ico('livro') + '<span><b>A história da Bíblia em uma página</b>'
         + '<span class="passo-dica">Veja o todo antes das partes.</span></span>' + CC.ico('avancar') + '</a>' : '')
-      // O mapa do livro de hoje (ou o atalho para a grade dos 66, lá embaixo): 06b-mapas.js.
-      + CC.cartaoMapas()
       + blocos
-      + CC.secaoMapas()
       + (conhecendo ? '' : (terminou ? comece : ''))
       + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
     CC.inseparavel(raiz);
@@ -348,6 +348,14 @@
   };
 
   // ---------- uma nota ----------
+  // A ficha de um livro que já tem mapa ganha o link "Ver o mapa" logo abaixo do nome.
+  const comMapa = (n, html) => {
+    if (n.pasta !== '03 - Livros da Bíblia' || !CC.linkDoMapa) return html;
+    const link = CC.linkDoMapa(CC.semPrefixo(n.nome || ''));
+    if (!link) return html;
+    const fim = html.indexOf('</h1>');
+    return fim < 0 ? link + html : html.slice(0, fim + 5) + link + html.slice(fim + 5);
+  };
   CC.vistaNota = function (raiz, id) {
     const n = D.notas[id];
     if (!n) return CC.vazio(raiz, 'Não encontrei esse texto.');
@@ -375,7 +383,7 @@
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar(ehLicao ? 'Primeiros passos' : (s ? s.rotulo : 'Voltar')) + '</div>'
       + '<article class="nota-artigo c-' + cor + '">'
       + (n.alerta ? '<p class="etiqueta" style="color:var(--vermelho)">Assunto delicado: leia com calma</p>' : '')
-      + '<div class="nota-corpo">' + CC.htmlDaNota(n) + '</div></article>'
+      + '<div class="nota-corpo">' + comMapa(n, CC.htmlDaNota(n)) + '</div></article>'
       + (ehLicao
         ? '<div class="fim-da-licao" id="fim-da-licao">'
           + (feita

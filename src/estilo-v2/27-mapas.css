@@ -15,24 +15,84 @@
    skill do mapa (.claude/skills/mapa-do-livro/SKILL.md), aprovada com o mock.
    ========================================================================= */
 
-/* ---------- a grade dos 66 no Explorar ---------- */
-.mapas-dica { margin: -4px 0 4px; }
-.grupo-mapas { margin: 18px 0 8px; padding: 0 4px; color: var(--salvia-texto); font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+/* ---------- o cartão "Mapas dos livros" no Explorar ---------- */
+/* Um cartão só, no fundo sálvia da folha do alto (grafite no escuro), que abre e fecha no lugar.
+   Fechado: o rolo com a pena, o título no pincel, o progresso e o atalho do mapa de hoje.
+   Aberto: Antigo/Novo Testamento, a grade dos prontos e a dos "em breve", e o "Fechar". */
+.cartao-mapas {
+  --mapa-tinta: var(--folha-tinta); --mapa-papel: var(--folha-campo); --mapa-cheio: var(--folha-tinta);
+  display: flex; flex-direction: column; gap: 10px; margin: 0 0 16px; padding: 8px 8px 12px;
+  border-radius: var(--raio-cartao); background: var(--folha); color: var(--folha-tinta);
+}
+/* o título ocupa a linha inteira ao lado do desenho, para caber numa linha só a 360px; o
+   progresso e a seta de abrir ficam na linha de baixo */
+.mapas-cabeca {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px; grid-template-rows: auto auto; align-items: center; column-gap: 10px; row-gap: 2px;
+  width: 100%; min-height: 88px; padding: 6px 4px 0 6px; border: 0; border-radius: 22px;
+  background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.mapas-cabeca > .mapas-desenho { grid-row: 1 / 3; }
+.mapas-textos { display: contents; }
+.mapas-titulo { grid-column: 2 / 4; grid-row: 1; }
+.mapas-linha { display: flex; flex-direction: column; gap: 3px; min-width: 0; grid-column: 2; grid-row: 2; }
+.mapas-seta { grid-column: 3; grid-row: 2; }
+.mapas-cabeca:focus-visible, .mapas-hoje:focus-visible, .segmento-mapas:focus-visible { outline: 3px solid var(--folha-tinta); outline-offset: 2px; }
+.mapas-desenho.desenho { width: 64px; height: 64px; }
+.mapas-titulo { color: var(--folha-tinta); font-family: 'Permanent Marker', cursive; font-size: 24px; font-weight: 400; line-height: 1.15; white-space: nowrap; }
+.mapas-progresso { color: var(--folha-tinta-fraca); font-size: .875rem; font-weight: 700; }
+.barra-mapas { display: block; height: 8px; margin-top: 3px; border-radius: 999px; background: var(--folha-campo); overflow: hidden; }
+.barra-mapas i { display: block; height: 100%; border-radius: 999px; background: var(--folha-tinta); }
+.mapas-seta { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--folha-campo); color: var(--folha-tinta); }
+.mapas-seta svg { width: 20px; height: 20px; transition: transform .2s ease; }
+.mapas-cabeca[aria-expanded="true"] .mapas-seta svg { transform: rotate(180deg); }
+.mapas-hoje {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 48px; margin: 0 4px; padding: 0 8px 0 16px; border-radius: 999px;
+  background: var(--folha-campo); color: var(--folha-tinta); font-size: .9375rem; text-decoration: none;
+}
+.mapas-hoje b { font-weight: 800; }
+.mapas-hoje svg { flex: none; width: 18px; height: 18px; }
+.mapas-corpo { display: flex; flex-direction: column; padding: 2px 0 0; }
+.mapas-corpo[hidden] { display: none; }
+.mapas-dica { margin: 0 4px 10px; color: var(--folha-tinta-fraca); }
+.segmentos-mapas { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; border-radius: 999px; background: var(--folha-campo); }
+.segmento-mapas {
+  min-height: 44px; padding: 0 8px; border: 0; border-radius: 999px; background: none;
+  color: var(--folha-tinta); font: inherit; font-size: .875rem; font-weight: 800; cursor: pointer;
+}
+.segmento-mapas[aria-pressed="true"] { background: var(--folha-tinta); color: var(--folha); }
+.grupo-mapas { margin: 16px 0 8px; padding: 0 4px; color: var(--folha-tinta-fraca); font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.mapas-nenhum { margin: 14px 4px 0; color: var(--folha-tinta-fraca); }
 .grade-mapas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .celula-mapa {
   position: relative; display: flex; flex-direction: column; justify-content: center; gap: 1px;
   min-height: 56px; padding: 9px 36px 9px 14px; border-radius: 18px;
   background: var(--v2-cartao); color: var(--v2-tinta-forte); text-decoration: none;
 }
-.celula-mapa.breve { padding-right: 14px; background: none; box-shadow: inset 0 0 0 1.5px var(--contorno); color: var(--v2-tinta-fraca); }
-.celula-mapa small { color: var(--v2-tinta-fraca); font-size: .75rem; font-weight: 700; }
-/* o nome nunca quebra no meio da palavra: o tamanho (20, 17 ou 15px) vem do comprimento */
+/* os "em breve" vêm depois e mais apagados: sem fundo, só o contorno e a tinta fraca */
+.celula-mapa.breve { min-height: 48px; padding-right: 14px; background: none; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--folha-tinta) 22%, transparent); color: var(--folha-tinta-fraca); }
+/* o nome nunca quebra no meio da palavra: o tamanho (20, 17 ou 14px) vem do comprimento */
 .nome-mapa { font-family: 'Permanent Marker', cursive; font-weight: 400; line-height: 1.15; white-space: nowrap; overflow-wrap: normal; word-break: keep-all; hyphens: none; }
 .marca-mapa { position: absolute; top: 50%; right: 10px; display: grid; place-items: center; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; color: var(--v2-tinta-fraca); }
 .marca-mapa svg { width: 16px; height: 16px; }
 .celula-mapa.lido .marca-mapa { background: var(--salvia); color: var(--salvia-tinta); }
 .celula-mapa.lido .marca-mapa svg { width: 13px; height: 13px; stroke-width: 3; }
-.cartao-mapas { margin-bottom: 16px; }
+.mapas-fechar { margin-top: 14px; }
+.cartao-mapas .botao.contorno.mapas-fechar { background: var(--folha-campo); color: var(--folha-tinta); }
+/* no escuro, os prontos ficam no grafite mais claro, acima do fundo do cartão */
+:root[data-tema="escuro"] .cartao-mapas .celula-mapa.pronto { background: var(--folha-campo); }
+
+/* na ficha do livro (Explorar > Livros): "Ver o mapa", logo abaixo do nome */
+.link-mapa {
+  display: flex; align-items: center; gap: 12px; min-height: 64px; margin: 4px 0 18px; padding: 8px 12px 8px 8px;
+  border-radius: 22px; background: var(--folha); color: var(--folha-tinta); font-family: var(--fonte-ui); line-height: 1.3; text-decoration: none;
+}
+.link-mapa:hover { text-decoration: none; }
+.link-mapa > span:nth-child(2) { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.link-mapa b { font-family: 'Permanent Marker', cursive; font-size: 1.25rem; font-weight: 400; line-height: 1.2; }
+.link-mapa small { color: var(--folha-tinta-fraca); font-size: .8125rem; font-weight: 700; }
+.link-mapa-icone { display: grid; place-items: center; flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--folha-campo); }
+.link-mapa svg { flex: none; width: 20px; height: 20px; }
 
 /* ---------- a tela do mapa: a folha do alto ---------- */
 /* Como a .folha-perfil: sobe por trás do topo do app e os dois viram uma peça só. */
@@ -111,7 +171,7 @@
    abaixo dele; o texto fica no canto que a curva deixa livre. A altura é acertada pelo JS (a
    menor em que nenhum ponto do S cai no texto). O passo do pontilhado vem no style do caminho,
    acertado pelo comprimento da curva, para o último ponto cair no bico da seta. */
-.mapa-conexao { position: relative; height: 150px; }
+.mapa-conexao { position: relative; height: 150px; margin-top: 8px; }
 .mapa-conexao .seta { position: absolute; inset: 0; }
 .mapa-ligacao { position: absolute; top: 0; width: 64%; margin: 0; color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: .875rem; font-style: italic; line-height: 1.4; text-wrap: pretty; }
 .mapa-ligacao.dir { right: 0; }
@@ -144,8 +204,11 @@
 .mapa-procure { gap: 8px; padding: 20px; border-radius: var(--raio-cartao); background: var(--salvia-palido); }
 .mapa-procure-texto { color: var(--v2-tinta-forte); font-family: var(--fonte-biblia); font-size: 1.125rem; line-height: 1.45; }
 .mapa-ler { margin-top: 20px; }
+.mapa-ficha { margin-top: 10px; }
 
 @media (max-width: 374px) {
+  .mapas-titulo { font-size: 22px; }
+  .segmento-mapas { padding: 0 4px; font-size: .8125rem; }
   .mapa-nome { font-size: 56px; }
   .mapa-capitulos b { font-size: 48px; }
   .mapa-ramo-nome { font-size: 24px; }

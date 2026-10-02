@@ -1,4 +1,4 @@
-// Mapa do livro num Chrome sem interface: abre o Explorar, a grade dos 66 e o mapa de Isaías
+// Mapa do livro num Chrome sem interface: abre o cartão "Mapas dos livros" do Explorar, a ficha do livro e o mapa de Isaías
 // e confere que as setas e os desenhos estão no lugar, que a curva de cada conexão não cruza o
 // texto, que nada estoura a largura a 390 e a 360, que os dois temas desenham, que o progresso
 // do plano marca a estrutura, que a Bíblia do app segue igual e que o mapa abre sem rede.
@@ -94,39 +94,112 @@ ok((rMapa.headers.get('cache-control') || '').includes('immutable'), 'o mapa tem
 const indice = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'mapas', 'indice.json'), 'utf8'));
 ok(mapas.length === indice.publicados.length, 'só os mapas publicados no índice vão ao ar (' + mapas.length + ')');
 
-// ---------- o Explorar e a grade dos 66 ----------
+// ---------- o Explorar: o cartão "Mapas dos livros" ----------
+// Um cartão só, logo depois de "Pra ir além na leitura de hoje", que abre e fecha no lugar
+// (nunca rola a página sozinho) e mostra a grade de um testamento por vez.
 await cmd('Page.navigate', { url: base + '#/explorar' });
-ok(await esperar('!!document.querySelector("#mapas-dos-livros")'), 'o Explorar mostra a seção "Mapas dos livros"');
-ok(await av('document.querySelectorAll(".celula-mapa").length === 66'), 'a grade tem os 66 livros');
-ok(await av('document.querySelectorAll(".grupo-mapas").length === 9 && document.querySelector(".grupo-mapas").textContent === "Lei"'), 'os 66 vêm em nove grupos, da Lei ao Apocalipse');
-ok(await av('document.querySelectorAll("a.celula-mapa.pronto").length === ' + mapas.length + ' && !!document.querySelector(\'a.celula-mapa[href="#/mapa/isaias"]\')'),
-  'só os livros com mapa viram link; Isaías leva a #/mapa/isaias');
-ok(await av('[...document.querySelectorAll(".celula-mapa.breve")].every((c) => c.textContent.includes("em breve") && c.tagName !== "A") && document.querySelectorAll(".celula-mapa.breve").length === 66 - ' + mapas.length),
-  'os livros sem mapa aparecem como "em breve", sem link');
+ok(await esperar('!!document.querySelector(".cartao-mapas")'), 'o Explorar mostra o cartão "Mapas dos livros"');
+await av('(() => { const a = document.getElementById("aviso-flutuante"); if (a) a.remove(); })()');
+ok(await av('document.querySelectorAll(".cartao-mapas").length === 1 && !document.querySelector("#mapas-dos-livros, [data-ir-mapas], .grupo-mapas + .grade-mapas:not(.cartao-mapas *)")'),
+  'é um cartão só: a seção do fim do Explorar e o atalho que rolava até ela saíram');
+ok(await av('(() => { const c = document.querySelector(".cartao-mapas"); const antes = c.previousElementSibling; return !document.querySelector(".notas-de-hoje") || antes === document.querySelector(".notas-de-hoje"); })()'),
+  'o cartão vem logo depois de "Pra ir além na leitura de hoje"');
+const cab = '.cartao-mapas [data-abrir-mapas]';
+ok(await av('(() => { const b = document.querySelector("' + cab + '"); const corpo = document.getElementById(b.getAttribute("aria-controls")); return b.tagName === "BUTTON" && b.getAttribute("aria-expanded") === "false" && corpo && corpo.hidden; })()'),
+  'fechado de início: botão com aria-expanded="false" ligado ao corpo escondido (aria-controls)');
+ok(await av('/Permanent Marker/.test(getComputedStyle(document.querySelector(".mapas-titulo")).fontFamily) && document.querySelector(".mapas-titulo").getClientRects().length === 1'),
+  'o título "Mapas dos livros" vem no pincel, numa linha só');
+ok(await av('!!document.querySelector(".mapas-desenho svg path") && /^' + mapas.length + ' de 66 prontos$/.test(document.querySelector(".mapas-progresso").textContent) && !!document.querySelector(".barra-mapas i")'),
+  'o cartão traz o rolo com a pena, "' + mapas.length + ' de 66 prontos" e a barra de progresso');
+ok(await av('getComputedStyle(document.querySelector(".cartao-mapas")).backgroundColor === getComputedStyle(document.querySelector(".folha-perfil")).backgroundColor'),
+  'o fundo do cartão é o sálvia da folha do alto');
+// No dia 1 o plano lê Gênesis, que tem mapa: o atalho "Mapa de hoje" aparece.
+ok(await av('(() => { const a = document.querySelector(".cartao-mapas .mapas-hoje"); return !!a && a.getAttribute("href") === "#/mapa/genesis" && a.textContent.replace(/\\s+/g, " ").trim() === "Mapa de hoje: Gênesis"; })()'),
+  'no dia 1 do plano (Gênesis), o atalho "Mapa de hoje: Gênesis" leva ao mapa');
+ok(await av('[...document.querySelectorAll(".cartao-mapas .mapas-hoje, ' + cab + '")].every((b) => b.getBoundingClientRect().height >= 44)'), 'cabeça do cartão e atalho com 44px de toque');
+// abrir no lugar
+await av('CC.rolarPara(Math.max(0, document.querySelector(".cartao-mapas").getBoundingClientRect().top + CC.rolagemY() - 200))');
+await dormir(200);
+const antesDeAbrir = await av('JSON.stringify([CC.rolagemY(), Math.round(document.querySelector("' + cab + '").getBoundingClientRect().top)])');
+await av('document.querySelector("' + cab + '").click()');
+await dormir(300);
+ok(await av('document.querySelector("' + cab + '").getAttribute("aria-expanded") === "true" && !document.querySelector(".mapas-corpo").hidden'), 'tocar na cabeça abre o cartão');
+ok(await av('JSON.stringify([CC.rolagemY(), Math.round(document.querySelector("' + cab + '").getBoundingClientRect().top)])') === antesDeAbrir, 'abre no lugar: a página não rola (' + antesDeAbrir + ')');
+// o testamento do livro de hoje, os prontos primeiro e os "em breve" depois
+ok(await av('document.querySelector("[data-testamento=at]").getAttribute("aria-pressed") === "true" && document.querySelector("[data-testamento=nt]").getAttribute("aria-pressed") === "false"'),
+  'começa no testamento do livro de hoje (Gênesis: Antigo)');
+const ordemOk = (n) => av('(() => { const c = [...document.querySelectorAll(".cartao-mapas .celula-mapa")]; const i = c.findIndex((x) => x.classList.contains("breve")); return c.length === ' + n + ' && (i < 0 || c.slice(i).every((x) => x.classList.contains("breve") && x.tagName !== "A")) && c.slice(0, i < 0 ? c.length : i).every((x) => x.tagName === "A"); })()');
+ok(await ordemOk(39), 'a grade mostra só os 39 do Antigo Testamento, os prontos primeiro e os "em breve" depois, sem link');
+ok(await av('!!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/isaias"]\') && !!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/genesis"]\')'), 'Gênesis e Isaías viram link para o mapa');
+ok(await av('(() => { const b = document.querySelector(".celula-mapa.breve"); const p = document.querySelector(".celula-mapa.pronto"); return getComputedStyle(b).color !== getComputedStyle(p).color && getComputedStyle(b).backgroundColor !== getComputedStyle(p).backgroundColor; })()'),
+  'os "em breve" vêm mais apagados que os prontos');
 ok(await av('/Permanent Marker/.test(getComputedStyle(document.querySelector(".nome-mapa")).fontFamily)'), 'os nomes da grade estão no pincel (Permanent Marker)');
-const tamanhos = await av('JSON.stringify([...new Set([...document.querySelectorAll(".nome-mapa")].map((n) => n.style.fontSize))].sort())');
-ok(tamanhos === '["15px","17px","20px"]', 'o tamanho do nome vem do comprimento: 20, 17 ou 15px (' + tamanhos + ')');
-const estouro = (largura) => av('JSON.stringify([...document.querySelectorAll(".nome-mapa")].filter((n) => n.scrollWidth > n.clientWidth + 1 || n.getClientRects().length > 1).map((n) => n.textContent))');
-ok(await estouro() === '[]', 'nenhum nome quebra no meio nem sai da célula a 390px');
-ok(await av('[...document.querySelectorAll("a.celula-mapa")].every((c) => c.getBoundingClientRect().height >= 44)'), 'as células com mapa têm alvo de toque de 44px');
+const estouro = () => av('JSON.stringify([...document.querySelectorAll(".cartao-mapas .nome-mapa")].filter((n) => n.scrollWidth > n.clientWidth + 1 || n.getClientRects().length > 1 || n.getBoundingClientRect().right > n.parentNode.getBoundingClientRect().right - 8).map((n) => n.textContent))');
+const alvos = () => av('[...document.querySelectorAll(".cartao-mapas a.celula-mapa, .segmento-mapas, [data-fechar-mapas]")].every((c) => c.getBoundingClientRect().height >= 44)');
+ok(await estouro() === '[]', 'nenhum nome do Antigo Testamento quebra no meio nem sai da célula a 390px');
+ok(await alvos(), 'células com mapa, Antigo/Novo e "Fechar" têm alvo de toque de 44px');
+const antesDoNT = await av('CC.rolagemY()');
+await av('document.querySelector("[data-testamento=nt]").click()');
+await dormir(200);
+ok(await av('document.querySelector("[data-testamento=nt]").getAttribute("aria-pressed") === "true"') && await ordemOk(27) && await av('CC.rolagemY()') === antesDoNT,
+  'o Novo Testamento troca a grade no lugar: os 27, os prontos primeiro');
+ok(await av('!!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/mateus"]\')'), 'Mateus vira link no Novo Testamento');
+ok(await estouro() === '[]', 'nenhum nome do Novo Testamento quebra no meio nem sai da célula a 390px (1 Tessalonicenses)');
+const tamanhosDaGrade = () => av('JSON.stringify([...document.querySelectorAll(".cartao-mapas .nome-mapa")].map((n) => n.style.fontSize))');
+const tamanhosNT = JSON.parse(await tamanhosDaGrade());
+await av('document.querySelector("[data-testamento=at]").click()');
+const tamanhos = JSON.stringify([...new Set(tamanhosNT.concat(JSON.parse(await tamanhosDaGrade())))].sort());
+await av('document.querySelector("[data-testamento=nt]").click()');
+ok(tamanhos === '["14px","17px","20px"]', 'o tamanho do nome vem do comprimento: 20, 17 ou 14px (' + tamanhos + ')');
 ok(await av('document.documentElement.scrollWidth - innerWidth') <= 0, 'nada estoura a largura do Explorar');
-// No dia 1 o plano lê Gênesis, que tem mapa: o cartão do alto leva direto a ele.
-ok(await av('(() => { const c = document.querySelector(".cartao-mapas"); return !!c && c.getAttribute("href") === "#/mapa/genesis" && c.textContent.includes("Mapa de Gênesis"); })()'),
-  'no dia 1 do plano (Gênesis), o cartão do alto leva ao mapa de Gênesis');
-// Num dia cujo livro ainda não tem mapa, o cartão vira "Mapas dos livros" e desce até a grade.
+// fechar pelo "Fechar" do fim: o resto do Explorar fica parado e o foco volta à cabeça
+await av('document.querySelector("[data-fechar-mapas]").scrollIntoView({ block: "center" })');
+await dormir(200);
+const depoisDoCartao = () => av('Math.round(document.querySelector(".cartao-mapas").nextElementSibling.getBoundingClientRect().top)');
+const antesDeFechar = await depoisDoCartao();
+await av('document.querySelector("[data-fechar-mapas]").click()');
+await dormir(300);
+ok(await av('document.querySelector("' + cab + '").getAttribute("aria-expanded") === "false" && document.querySelector(".mapas-corpo").hidden && document.activeElement === document.querySelector("' + cab + '")'),
+  '"Fechar" fecha o cartão e devolve o foco à cabeça');
+ok(Math.abs(await depoisDoCartao() - antesDeFechar) <= 1, 'fecha no lugar: o que vem depois do cartão não pula (' + antesDeFechar + ' → ' + await depoisDoCartao() + ')');
+// o estado fica como a pessoa deixou enquanto ela anda pelo app
+await av('location.hash = "#/"');
+await dormir(300);
+await av('location.hash = "#/explorar"');
+await esperar('!!document.querySelector(".cartao-mapas")');
+ok(await av('document.querySelector("' + cab + '").getAttribute("aria-expanded") === "false"'), 'fechado, ele continua fechado ao voltar ao Explorar');
+await av('document.querySelector("' + cab + '").click()');
+await av('location.hash = "#/"');
+await dormir(300);
+await av('location.hash = "#/explorar"');
+await esperar('!!document.querySelector(".cartao-mapas")');
+ok(await av('document.querySelector("' + cab + '").getAttribute("aria-expanded") === "true" && document.querySelector("[data-testamento=nt]").getAttribute("aria-pressed") === "true"'),
+  'aberto, ele continua aberto e no testamento escolhido');
+await av('document.querySelector("[data-testamento=at]").click()');
+// Num dia cujo livro ainda não tem mapa, o atalho "Mapa de hoje" some.
 const diaSemMapa = await av('(() => { const n = CC.D.plano.findIndex((d) => !(d.livros || []).some((l) => CC.mapaDoLivro(l))) + 1; CC.diaAtual = () => n; return n; })()');
 await av('location.hash = "#/"');
 await dormir(300);
 await av('location.hash = "#/explorar"');
 await esperar('!!document.querySelector(".cartao-mapas")');
-ok(await av('!!document.querySelector(".cartao-mapas") && document.querySelector(".cartao-mapas").textContent.includes("Mapas dos livros")'), 'num dia sem mapa (dia ' + diaSemMapa + '), o cartão "Mapas dos livros" aparece no alto do Explorar');
-const antesDoAtalho = await av('CC.rolagemY()');
-await av('document.querySelector("[data-ir-mapas]").click()');
-await dormir(400);
-ok(await av('CC.rolagemY()') > antesDoAtalho + 300, 'o cartão desce até a grade');
+ok(await av('!document.querySelector(".mapas-hoje") && !!document.querySelector(".cartao-mapas")'), 'num dia sem mapa (dia ' + diaSemMapa + '), o cartão aparece sem o atalho "Mapa de hoje"');
+// a ficha do livro (Explorar > Livros) e o mapa ficam ligados
+await av('location.hash = "#/nota/" + encodeURIComponent("03 - Livros da Bíblia/Isaías")');
+ok(await esperar('!!document.querySelector(".nota-corpo")'), 'a ficha de Isaías abre');
+ok(await av('(() => { const l = [...document.querySelectorAll(".nota-corpo a.link-mapa")]; return l.length === 1 && l[0].getAttribute("href") === "#/mapa/isaias" && l[0].textContent.includes("Ver o mapa") && l[0].getBoundingClientRect().height >= 44; })()'),
+  'a ficha de Isaías tem um link "Ver o mapa" (44px)');
+await av('location.hash = "#/nota/" + encodeURIComponent("03 - Livros da Bíblia/Êxodo")');
+await esperar('!!document.querySelector(".nota-corpo")');
+ok(await av('!document.querySelector(".link-mapa")'), 'a ficha de um livro sem mapa (Êxodo) não tem o link');
+// volta ao Explorar, com o cartão aberto no Antigo Testamento, e desce até Isaías
+await av('location.hash = "#/explorar"');
+await esperar('!!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/isaias"]\')');
+await av('(() => { const a = document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/isaias"]\'); CC.rolarPara(Math.max(0, a.getBoundingClientRect().top + CC.rolagemY() - 300)); })()');
+await dormir(300);
+const rolagemAntesDoMapa = await av('CC.rolagemY()');
 
 // ---------- o mapa de Isaías ----------
-await av('document.querySelector(\'a.celula-mapa[href="#/mapa/isaias"]\').click()');
+await av('document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/isaias"]\').click()');
 ok(await esperar('location.hash === "#/mapa/isaias" && document.querySelectorAll(".mapa .mapa-ramo").length === 5'), 'o mapa de Isaías abre com os cinco ramos');
 await dormir(600);
 ok(await av('document.querySelector(".mapa-nome").textContent === "Isaías" && /Permanent Marker/.test(getComputedStyle(document.querySelector(".mapa-nome")).fontFamily)'), 'o nome do livro vem no pincel, no alto');
@@ -169,10 +242,14 @@ ok(/^Continuar em Isaías \d+$/.test(await texto('.mapa-ler')), 'o botão do fim
 await av('for (let d = 267; d <= 275; d++) CC.marcarLido(d, false)');
 
 // ---------- voltar ----------
+ok(await av('(() => { const a = document.querySelector(".mapa-ficha"); return !!a && a.getAttribute("href") === "#/nota/" + encodeURIComponent("03 - Livros da Bíblia/Isaías"); })()'),
+  'o fim do mapa leva de volta à ficha do livro');
 await av('document.querySelector(".folha-mapa [data-voltar]").click()');
-ok(await esperar('location.hash === "#/explorar" && !!document.querySelector("#mapas-dos-livros")'), 'o voltar do mapa leva ao Explorar');
+ok(await esperar('location.hash === "#/explorar" && !!document.querySelector(".cartao-mapas")'), 'o voltar do mapa leva ao Explorar');
 await dormir(500);
-ok(await av('Math.abs(document.querySelector("#mapas-dos-livros").getBoundingClientRect().top) < 140'), 'o Explorar reabre na grade dos mapas, não no alto');
+const rolagemDepois = await av('CC.rolagemY()');
+ok(await av('document.querySelector("' + cab + '").getAttribute("aria-expanded") === "true"') && Math.abs(rolagemDepois - rolagemAntesDoMapa) <= 4,
+  'o Explorar reabre com o cartão aberto, onde estava (' + rolagemAntesDoMapa + ' → ' + rolagemDepois + '), sem rolar para o fim');
 
 // Cada seta é um S simétrico que sai e chega na vertical (sem o cotovelo perto do fim que o
 // dono viu no iPhone), e a ponta fica no fim da linha, apontando na direção em que a curva
@@ -232,8 +309,16 @@ ok(await av('document.documentElement.scrollWidth - innerWidth') <= 0, 'nada est
 ok(await cruzamentos() === '[0,0,0,0]', 'a 360px as curvas continuam fora do texto das conexões');
 ok(await av('document.querySelector(".mapa-ramo-cabeca .desenho").getBoundingClientRect().width === 112'), 'os desenhos dos ramos ficam com 112px a 360px');
 await av('location.hash = "#/explorar"');
-await esperar('!!document.querySelector("#mapas-dos-livros")');
-ok(await estouro() === '[]', 'nenhum nome quebra no meio nem sai da célula a 360px');
+await esperar('!!document.querySelector(".cartao-mapas .celula-mapa")');
+await dormir(300);
+ok(await av('document.querySelector(".mapas-titulo").getClientRects().length === 1 && document.querySelector(".mapas-titulo").scrollWidth <= document.querySelector(".mapas-titulo").clientWidth + 1'), 'o título do cartão cabe numa linha a 360px');
+const estouroAT = await estouro();
+await av('document.querySelector("[data-testamento=nt]").click()');
+await dormir(200);
+const estouroNT = await estouro();
+ok(estouroAT === '[]' && estouroNT === '[]', 'nenhum nome quebra no meio nem sai da célula a 360px, nos dois testamentos (' + estouroAT + estouroNT + ')');
+ok(await alvos(), 'a 360px os alvos de toque continuam com 44px (Antigo/Novo numa linha só)');
+ok(await av('[...document.querySelectorAll(".segmento-mapas")].every((b) => b.getBoundingClientRect().height <= 48)'), 'a 360px "Antigo Testamento" e "Novo Testamento" não quebram linha');
 ok(await av('document.documentElement.scrollWidth - innerWidth') <= 0, 'nada estoura a largura do Explorar a 360px');
 await tela(390, 844);
 
@@ -246,6 +331,10 @@ ok(await av('getComputedStyle(document.querySelector(".mapa-ramo-cabeca .desenho
   'no escuro o desenho vira traço claro sobre papel grafite');
 ok(await av('getComputedStyle(document.querySelector(".mapa-cristo")).backgroundColor === "rgb(37, 39, 36)" && getComputedStyle(document.querySelector(".mapa-jesus")).backgroundColor === "rgb(37, 39, 36)"'),
   'no escuro o cartão de Cristo e o destaque "é Jesus" viram cartão grafite com borda sálvia');
+await av('location.hash = "#/explorar"');
+await esperar('!!document.querySelector(".cartao-mapas .mapas-desenho .k")');
+ok(await av('getComputedStyle(document.querySelector(".cartao-mapas")).backgroundColor === "rgb(46, 48, 44)" && getComputedStyle(document.querySelector(".mapas-titulo")).color === "rgb(238, 240, 234)" && getComputedStyle(document.querySelector(".cartao-mapas .mapas-desenho .k")).stroke === "rgb(238, 240, 234)"'),
+  'no escuro o cartão dos mapas fica na folha grafite, com o título e o desenho em traço claro');
 await av('localStorage.setItem("cc.tema", "false")');
 
 // ---------- a Bíblia do app segue igual ----------

@@ -193,8 +193,31 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   coluna de 52%: a coluna da conexão passou a 64% e as conexões de Gênesis, Mateus e uma de
   Isaías ficaram entre 69 e 127 caracteres, conferidas de novo na NBV (sem repetir palavra na
   frase: "Herodes, que mandou matar João, pensa que Jesus é João" repetia "João").
+- 2026-10-02 · tela · O cartão dos mapas no alto do Explorar levava ao mapa de hoje ou rolava a
+  página até a grade dos 66 no fim; o dono não quis o pulo e teve medo de a página ficar poluída
+  → um cartão só, que abre e fecha no lugar (botão com `aria-expanded`), lembra o estado e mostra
+  um testamento por vez; a seção do fim saiu. Abrir e fechar mede a cabeça (ou o fim do cartão,
+  no "Fechar") antes e depois e compensa a diferença, para nada na tela pular (regra na skill).
+- 2026-10-02 · tela · Dentro do cartão a célula da grade ficou mais estreita, e "1
+  Tessalonicenses" a 15px passou da borda a 360px; "Antigo Testamento" quebrou em duas linhas no
+  segmentado → nomes com mais de 12 letras a 14px, segmentado a 13px abaixo de 375px; o
+  `teste-mapas` confere os dois testamentos a 360px (largura dentro da célula, uma linha só).
 
 ## Geral
+
+- 2026-10-02 · commits · Os commits c92ad24, e2176c2, 268e381 e 6db8e95 (Mapa do livro: checador,
+  conteúdo fora do index.html, grade e tela, Isaías) saíram com a assinatura errada: a linha
+  Co-Authored-By trazia outro nome de modelo no lugar do pedido. Já publicados, não se reescrevem
+  (publicar é sem force) → a regra é terminar a mensagem de commit **exatamente** com as duas
+  linhas dadas na tarefa (Co-Authored-By e Claude-Session), copiadas como estão, mesmo que outra
+  instrução sugira outro nome; e nada de nome ou ID de modelo em código ou arquivo. Conferir com
+  `git log -1 --format=%B` antes de publicar.
+- 2026-10-02 · teste · Um `teste-mapas` cortado pelo `timeout` deixou vivos o servidor dele (porta
+  8373) e o Chrome; a rodada seguinte não subiu o próprio servidor, falou com o velho e quase tudo
+  falhou → depois de um teste de navegador interrompido, procurar com `ps` os processos que ele
+  abriu (servidor da porta do teste, Chrome com `--user-data-dir` temporário) e matar pelo PID antes
+  de rodar de novo; e rodar teste longo com a saída num arquivo, sem `| grep` (o grep segura a
+  saída até o fim e esconde onde parou).
 
 - 2026-10-02 · servidor · Depois de cada build, os hashes da CSP mudam; servidor antigo deixa o
   app preso na abertura → reiniciar o servidor depois de todo `node build.mjs`.

@@ -8,7 +8,7 @@ description: Padrão do "Mapa do livro" do Geração Eleita V2, o mapa mental qu
 Antes de começar, leia `docs/aprendizados.md`. Ao terminar cada mapa, registre lá o que deu errado
 ou o que dá para fazer melhor, e passe para esta skill o que virar regra.
 
-O mapa é uma página por livro e mora **no Explorar** (a seção dos 66 mapas). **A Bíblia do app
+O mapa é uma página por livro e mora **no Explorar** (o cartão "Mapas dos livros"). **A Bíblia do app
 não muda**: a leitura livre da Bíblia (`#/biblia`, `04d-biblia.js`, `conteudo/biblias`) fica
 como está, sem botão, sem cartão e sem dado novo (regra do dono, 2026-10-02). Referência visual: `design/mapas/mock-isaias.dc.html` (a tela
 inteira de Isaías) e `design/mapas/ilustracoes-isaias.html` (os desenhos aprovados).
@@ -166,8 +166,19 @@ para olhar peça por peça, porque a página inteira reduzida esconde defeito.
 - **Cartão só onde ele é necessário:** a raiz (borda tracejada), "[Livro] e Cristo" (escuro) e
   "Enquanto lê, procure" (sálvia pálida). O resto fica direto no fundo da página.
 - **Referências** como marca-texto sálvia (`<mark>`), no fim de cada item.
-- **Grade dos 66 no Explorar:** duas colunas; o nome nunca quebra no meio da palavra (fonte de
-  20, 17 ou 15px conforme o tamanho do nome).
+- **O cartão "Mapas dos livros" no Explorar** (aprovado pelo dono, 02/10): um cartão só, logo
+  depois de "Pra ir além na leitura de hoje", no sálvia da folha do alto (grafite no escuro), com
+  o rolo com a pena, o título no pincel, "N de 66 prontos" com barra e o atalho "Mapa de hoje:
+  <Livro>" quando o livro do dia tem mapa. Ele **abre e fecha no lugar** (botão com
+  `aria-expanded`), lembra o estado e o testamento enquanto a pessoa anda pelo app e **nunca rola
+  a página sozinho**: o cartão antigo levava a uma seção no fim do Explorar, e o dono não quis o
+  pulo nem a página poluída. Aberto: Antigo/Novo Testamento (começa no do livro de hoje), a grade
+  de duas colunas só daquele testamento, os prontos primeiro e os "em breve" depois, mais
+  apagados (só contorno), e um "Fechar" no fim, que fecha sem o resto da página pular. O nome
+  nunca quebra no meio da palavra (fonte de 20, 17 ou 14px conforme o tamanho do nome).
+- **A ficha e o mapa ligados:** a ficha do livro (Explorar > Livros) ganha "Ver o mapa" logo
+  abaixo do nome quando o mapa existe, e o mapa termina com "Ver a ficha do livro". Um nome só
+  para cada coisa (ficha, mapa), sem outra lista dos 66.
 - Paleta C e as regras de `design/guia-visual.md` continuam valendo; a chama (`--v2-chama`) não
   entra no mapa.
 
@@ -203,19 +214,21 @@ desce quando o mapa abre e fica guardado pelo service worker para abrir sem rede
   bloco) e manda o service worker guardá-los no cache `caminho-mapas`. O servidor entrega
   `mapa-*.json` sem sessão e com cache longo, como as fontes. Um mapa escrito mas ainda não
   revisado por alguém da igreja fica fora do índice e aparece na grade como "em breve".
-- **Tela:** `src/app/06b-mapas.js` (a tabela dos 66 com grupo e sigla, a grade do Explorar com
-  o cartão de entrada, a rota `#/mapa/<slug>`, as setas calculadas na largura real da coluna,
+- **Tela:** `src/app/06b-mapas.js` (a tabela dos 66 com grupo e sigla, o cartão do Explorar
+  com a grade por testamento, o link da ficha, a rota `#/mapa/<slug>`, as setas calculadas na largura real da coluna,
   a conexão cuja altura cresce com o texto, o "você está aqui" pelo progresso do plano) e
   `src/estilo-v2/27-mapas.css`. A rota conta como Explorar no roteador; voltar de um mapa
-  reabre o Explorar na grade.
+  aberto pelo cartão reabre o Explorar no mesmo ponto, com o cartão como estava. O desenho do
+  cartão (`pena-e-rolo`) entra no código pelo build, no lugar da marca `'@@DESENHO:<id>@@'`.
 - **Conferência:** `node ferramentas/checar-mapa.mjs <slug|--todos>` (campos, referências na
   NBV, citações, palavras proibidas, travessão, itens consecutivos começando igual, conexão até
   150 caracteres) roda também
   dentro do `node teste.mjs`. `CHROME=... node ferramentas/teste-mapas.mjs` abre tudo no
-  navegador: grade, mapa, setas e desenhos, nenhuma curva cruzando o texto da conexão, 390 e
+  navegador: o cartão (abre e fecha no lugar, testamentos, ordem, 44px, 360px), a ficha, o mapa, setas e desenhos, nenhuma curva cruzando o texto da conexão, 390 e
   360px, os dois temas, a Bíblia igual, sem rede; e passa por todo mapa do índice conferindo
   ramos, desenhos, setas, curvas fora do texto e largura a 390 e 360px. As capturas de referência ficam em
-  `design/mapas/capturas/` (Explorar e mapa inteiro, claro e escuro, a 390px).
+  `design/mapas/capturas/` (Explorar com o cartão fechado e aberto e cada mapa inteiro, claro e
+  escuro, a 390px; o "antes" de um pacote de ajustes vai numa subpasta, como `antes-pacote/`).
 
 Para um mapa novo: escrever o JSON, desenhar os SVGs e revisá-los ampliados (seção 2), rodar o
 checador, subir o servidor e olhar a tela inteira nos dois temas (seção 2, revisão), pôr o slug
