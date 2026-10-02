@@ -116,6 +116,8 @@
   // fogo pequeno, quem está há um ano vê o maior. É a mesma escada de seis estágios do
   // resto do app. Cresce a partir da base (12, 21), para o fogo subir em vez de inchar.
   const ESCALA_FOGO = [0.58, 0.72, 0.84, 0.94, 1.04, 1.14];
+  // O mesmo fogo, desenhado no <canvas> da imagem de story (01d-story.js).
+  CC.CAMINHOS_FOGO = { fora: FOGO_FORA, dentro: FOGO_DENTRO, escala: ESCALA_FOGO };
   CC.icoChama = (dias) => {
     const nivel = dias === undefined ? 2 : CC.estagioDaChama(dias).nivel;
     const apagada = nivel === 0;

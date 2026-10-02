@@ -489,6 +489,30 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
   checar(!repetiu, 'o sorteio da ofensiva nunca repete a frase da vez anterior');
 }
 
+// --- imagem de story (01d-story.js): nomes, texto junto e a frase do estágio no carimbo ---
+runInContext(readFileSync(join(AQUI, 'src', 'app', '01d-story.js'), 'utf8'), contexto, { filename: '01d-story.js' });
+{
+  const S = CC.story;
+  checar(S.L === 1080 && S.A === 1920 && S.SEGURA === 250, 'a imagem de story tem 1080x1920 e área segura de 250px em cima e embaixo');
+  checar(S.nomeDoArquivo({ tipo: 'ofensiva', dias: 16 }) === 'geracao-eleita-ofensiva-16-dias.png'
+    && S.nomeDoArquivo({ tipo: 'ofensiva', dias: 1 }) === 'geracao-eleita-ofensiva-1-dia.png',
+  'o arquivo da ofensiva se chama geracao-eleita-ofensiva-N-dias.png (1 dia no singular)');
+  checar(S.nomeDoArquivo({ tipo: 'versiculo', ref: '1 Coríntios 13.4-7' }) === 'geracao-eleita-1-corintios-13-4-7.png',
+    'o arquivo do versículo leva a referência sem acento (' + S.nomeDoArquivo({ tipo: 'versiculo', ref: '1 Coríntios 13.4-7' }) + ')');
+  checar(/16 dias.*geracaoeleita\.app/.test(S.textoDe({ tipo: 'ofensiva', dias: 16 })) && /^João 3\.16 \(NBV\).*geracaoeleita\.app/.test(S.textoDe({ tipo: 'versiculo', ref: 'João 3.16', traducao: 'NBV' })),
+    'o texto que vai junto com a imagem tem a contagem ou a referência e o endereço do app');
+  // A frase do estágio (sem linhas prontas) quebrada como o carimbo: nenhuma palavra perdida,
+  // linhas parecidas, nenhuma palavra sozinha numa ponta.
+  const ruins = CC.ESTAGIOS_CHAMA.filter((e) => {
+    const linhas = S.linhasDoCarimbo(e.frase);
+    const tam = linhas.map((l) => l.length);
+    return linhas.join(' ') !== e.frase.split(/\s+/).join(' ') || Math.max(...tam) > 28
+      || (linhas.length > 1 && (linhas[0].split(' ').length < 2 || linhas[linhas.length - 1].split(' ').length < 2));
+  });
+  checar(!ruins.length, 'a frase de cada estágio da chama quebra em linhas de carimbo equilibradas, sem palavra sozinha'
+    + (ruins.length ? ' (' + ruins.map((e) => S.linhasDoCarimbo(e.frase).join(' / ')).join('; ') + ')' : ''));
+}
+
 // --- quebra de linhas e tamanho de letra do cartão de versículo (01c-arte.js) ---
 {
   // Régua sintética: cada letra "pesa" o mesmo tanto (0.56 do tamanho da fonte), como uma

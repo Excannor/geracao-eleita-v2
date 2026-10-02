@@ -295,6 +295,30 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   uma → quando a tarefa pede um commit por parte, fechar cada parte (tela, teste, commit) antes
   de começar a próxima; sai mais barato que separar no fim.
 
+## Compartilhar (imagem de story)
+
+- 2026-10-02 · compartilhar · O pedido dizia para o fim da lição usar a frase do estágio da
+  chama ("sem carimbo à vista"), mas o fim da lição mostra uma frase de `CC.FRASES_OFENSIVA`
+  sorteada (`.frase-cena`) → a regra que vale é a de cima: a imagem leva a frase que a pessoa
+  está vendo; antes de seguir um exemplo do pedido, conferir na tela o que aparece ali. A frase
+  do estágio ficou para quem chama sem frase.
+- 2026-10-02 · compartilhar · O Safari só abre o `navigator.share` logo depois de um toque, e
+  gerar o PNG no toque (fontes, canvas, toBlob) pode passar desse tempo → a folha prepara a
+  imagem assim que abre (`CC.story.preparar`, guardada pelo pedido) e, se o navegador recusar
+  (`NotAllowedError`), o aviso pede um toque de novo, que já sai com a imagem pronta.
+- 2026-10-02 · desenho · Na primeira rodada da ofensiva, a chama grande de 365 dias comia o
+  espaço e o carimbo de seis linhas (Lucas 9.23) saía miúdo; a frase do estágio, quebrada pelo
+  tamanho, deixava "VOCÊ." e depois "JEREMIAS" sozinhos → o texto tem o lugar reservado antes
+  do enfeite (a chama e o número encolhem juntos se faltar), e frase sem linhas prontas quebra
+  pela menor diferença entre as linhas.
+- 2026-10-02 · desenho · O versículo de dez versículos saía em letra de 24px, ilegível no story
+  → letra mínima de 34px na imagem de 1080; o que passar para na última palavra que cabe, com
+  reticências, e a referência diz o trecho inteiro.
+- 2026-10-02 · teste · O primeiro `teste-compartilhar` abriu a folha antes de o app assentar
+  (a primeira pintura da rota fecha folhas abertas cedo), parou num TypeError e deixou servidor e
+  Chrome vivos → teste de navegador com a limpeza num `finally` e espera o app assentar antes
+  de abrir folha; o que sobrou foi morto pelo PID.
+
 ## Geral
 
 - 2026-10-02 · commits · Os commits c92ad24, e2176c2, 268e381 e 6db8e95 (Mapa do livro: checador,

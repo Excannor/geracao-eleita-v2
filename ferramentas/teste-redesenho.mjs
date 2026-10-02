@@ -253,6 +253,17 @@ await esperar(existe('[data-avancar]'));
 await clicar('[data-avancar]');
 ok(await esperar(existe('.licao.tela-resumo .resumo-dia')), 'terminar de orar leva a uma tela só de resumo do dia');
 ok(await av('!/XP/.test(' + q('.resumo-dia') + '.innerText)'), 'o resumo não mostra XP');
+// Compartilhar no fim do dia: a imagem de story da ofensiva leva a frase que está na tela
+// (.frase-cena), não outra sorteada de novo (01d-story.js). A folha do sistema é simulada.
+await av('(() => { navigator.canShare = (d) => !!(d && d.files); navigator.share = async (d) => { window.__compartilhado = d; }; return true; })()');
+await clicar('.pe-duplo [data-compartilhar]');
+ok(await esperar('!!window.__compartilhado'), 'Compartilhar no fim do dia abre o compartilhamento com a imagem');
+ok(await av('(async () => { const d = window.__compartilhado; const vista = ' + q('.frase-cena') + '.childNodes[0].textContent.trim();'
+  + ' const ref = (' + q('.frase-cena .ref-frase') + ' || { textContent: "" }).textContent;'
+  + ' const f = CC.FRASES_OFENSIVA.find((x) => x.linhas.join(" ") === vista);'
+  + ' const esperado = await CC.story.preparar({ tipo: "ofensiva", dias: CC.sequencia().atual, frase: { linhas: f.linhas, ref } });'
+  + ' return d.files.length === 1 && d.files[0] === esperado && /^geracao-eleita-ofensiva-\\d+-dias?\\.png$/.test(d.files[0].name); })()'),
+'a imagem do fim do dia leva a mesma frase que está na tela');
 await dormir(900);
 await foto('4e-resumo');
 await clicar('[data-voltar-trilha]');

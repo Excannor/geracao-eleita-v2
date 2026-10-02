@@ -550,10 +550,15 @@
         };
         const desafios = el.querySelector('[data-ver-desafios]');
         if (desafios) desafios.onclick = (ev) => { ev.preventDefault(); CC.fecharLicao(); location.hash = '#/missoes'; };
-        el.querySelector('[data-compartilhar]').onclick = async () => {
-          const r = await CC.compartilhar('Estou há ' + CC.plural(seq.atual, 'dia', 'dias') + ' lendo a Bíblia no Geração Eleita!', location.origin);
-          if (r === 'copiado') CC.avisar('Copiado. É só colar na conversa.');
-          else if (r === 'falhou') CC.avisar('Não consegui compartilhar nem copiar. Tente de novo.');
+        // Compartilhar gera a imagem de story da ofensiva com a frase que está na tela (f),
+        // a mesma do parágrafo acima, e não uma sorteada de novo (01d-story.js).
+        const compartilhar = el.querySelector('[data-compartilhar]');
+        const pedido = { tipo: 'ofensiva', dias: seq.atual, frase: { linhas: f.linhas, ref: f.ref || '' } };
+        setTimeout(() => { if (compartilhar.isConnected) CC.story.preparar(pedido).catch(() => null); }, 1200);
+        compartilhar.onclick = async () => {
+          compartilhar.disabled = true;
+          await CC.imagemStory(pedido);
+          compartilhar.disabled = false;
         };
         const alvo = el.querySelector('#resumo-amigos');
         if (c.amigos === undefined) c.pedidoAmigos.then(() => { if (alvo.isConnected) pintarAmigosDoResumo(alvo, c); });

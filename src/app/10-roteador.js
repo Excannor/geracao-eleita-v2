@@ -159,12 +159,27 @@
           + amigos.map((a) => '<span class="pessoa-proposito">' + CC.retratoAmigo(a, 'pequeno') + '<span class="quem"><b>'
             + CC.esc(a.nome) + '</b><span class="estado">' + CC.icoChama() + a.dias + '</span></span></span>').join('') + '</div>'
         : '')
-      + '<div class="acoes"><button class="botao contorno" data-ver-amigos>Ver amigos</button></div>'
+      // Compartilhar leva a imagem de story com a mesma frase deste carimbo (01d-story.js).
+      + '<div class="acoes">' + (seq.atual ? '<button class="botao" data-compartilhar-ofensiva>' + CC.ico('compartilhar') + 'Compartilhar</button>' : '')
+      + '<button class="botao contorno" data-ver-amigos>Ver amigos</button></div>'
       + '</div>',
     {
       rotulo: 'Ofensiva',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-ver-amigos]').onclick = () => { fechar(); location.hash = '#/novidades'; };
+        // A imagem leva exatamente a frase sorteada para esta abertura (lema), não outra; e
+        // fica pronta logo depois que a folha assenta, para o toque abrir direto o
+        // compartilhamento do sistema.
+        const compartilhar = folha.querySelector('[data-compartilhar-ofensiva]');
+        if (compartilhar) {
+          const pedido = { tipo: 'ofensiva', dias: seq.atual, frase: { linhas: lema.linhas, ref: lema.ref || '' } };
+          setTimeout(() => { if (folha.isConnected) CC.story.preparar(pedido).catch(() => null); }, 450);
+          compartilhar.onclick = async () => {
+            compartilhar.disabled = true;
+            await CC.imagemStory(pedido);
+            compartilhar.disabled = false;
+          };
+        }
         // A frase do carimbo é sorteada (CC.FRASES_OFENSIVA), de 2 a 6 linhas. O tamanho de
         // partida já vem do CSS pela quantidade de linhas (data-linhas): frase curta em letra
         // grande, frase longa menor, para não virar um cartaz que empurra a folha inteira.
