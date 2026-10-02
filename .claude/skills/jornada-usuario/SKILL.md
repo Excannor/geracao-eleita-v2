@@ -147,9 +147,13 @@ O que aparece, na ordem, e quem decide:
    os nós (`.no.atual` abre o balão com `[data-abrir-dia]` "Começar", 2 toques).
    Conta do Conhecer Jesus: `#/` vira `CC.vistaConhecer` com o cartão "Começar/Continuar: <título>"
    (`a.cartao-destaque[href^="#/conhecer/"]`).
-5. **Lição** `04-licao.js` (`.licao.tela-leitura`, `role=dialog` com `aria-label="Dia N"`): cada
+5. **Lição** `04-licao.js` (`.licao.tela-leitura`, `role=dialog` com `aria-label="Dia N"`): a
+   cabeça com o título do dia (`conteudo/primeiros-dias.json`, dias 1 a 7 e 20; nos outros,
+   "Leitura de hoje"), a placa "Onde estamos" (`.onde-estamos`, `03c-contexto.js`: o mapa da
+   história em pílulas com as paradas do dia acesas, o contexto e o "Enquanto lê, procure"), e cada
    passagem tem "Ler aqui" (`[data-ler]`, abre o leitor `04b-leitor.js` `.leitor` com
-   `[data-terminei]`: "Terminei! Ler Mateus 1" encadeia a segunda passagem) e "Marcar como lido"
+   `[data-terminei]`: "Terminei! Ler Mateus 1" encadeia a segunda passagem; nos capítulos de lista
+   o leitor abre com o guia `.leitor-guia` e o botão `[data-saltar]`, como em Mateus 1) e "Marcar como lido"
    (`[data-trilha]`, para quem lê na Bíblia de papel); "Concluir o dia" (`[data-concluir]`) conta a
    leitura e abre a reflexão (`tela-festa`: Guardar → `[data-avancar]` → Pensar, `[data-pergunta]`
    → Orar, `[data-orei]` → `tela-resumo` → `[data-voltar-trilha]` "Até amanhã, Nome!"). "Pular por

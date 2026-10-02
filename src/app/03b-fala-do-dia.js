@@ -9,7 +9,7 @@
   // a frase nunca fala em nome de Deus.
   const FALAS = {
     primeiroDia: [
-      'Seu primeiro dia é {passagem}. Leva de 10 a 20 minutos. Bora?',
+      'Seu primeiro dia é {passagem}: a primeira página da Bíblia e a primeira do Novo Testamento, juntas de propósito. Uns {min} minutos. Bora?',
     ],
     comecando: [
       'Hoje tem {passagem}. Vamos?',
@@ -45,7 +45,7 @@
     const semente = Number(hoje.slice(8, 10)) + Number(hoje.slice(5, 7));
     const atual = CC.diaAtual();
     const passagem = CC.passagemDe(CC.D.plano[atual - 1]).replace(' · ', ' e ');
-    const trocar = (t) => t.replace('{passagem}', passagem).replace('{n}', seq.atual);
+    const trocar = (t) => t.replace('{passagem}', passagem).replace('{n}', seq.atual).replace('{min}', CC.minutosDoDia(CC.D.plano[atual - 1]));
 
     if (!lidos) return trocar(FALAS.primeiroDia[0]);
     const leuAmigo = ((amigos && amigos.amigos) || []).find((a) => a.leuHoje);

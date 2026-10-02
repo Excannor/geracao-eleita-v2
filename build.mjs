@@ -25,8 +25,12 @@ console.log('conteúdo:', conteudo.totalNotas, 'notas ·', conteudo.plano.length
 const conhecer = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
 const perguntasHonestas = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'perguntas-honestas.json'), 'utf8'));
 conteudo.conhecer = { ...conhecer, perguntas: perguntasHonestas };
+// O que a pessoa vê antes de ler nos primeiros dias (o mapa da história, o contexto do dia, o
+// "procure", o gancho de amanhã e os guias dos trechos de lista): CC.D.primeirosDias.
+conteudo.primeirosDias = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'primeiros-dias.json'), 'utf8'));
 dados = JSON.stringify(conteudo);
 console.log('conhecer jesus:', conteudo.conhecer.dias.length, 'dias ·', conteudo.conhecer.perguntas.length, 'perguntas honestas');
+console.log('primeiros dias:', Object.keys(conteudo.primeirosDias.dias).length, 'dias com contexto ·', Object.keys(conteudo.primeirosDias.guias).length, 'guias de leitura');
 
 // Os módulos do app são concatenados na ordem do nome do arquivo: 01 antes de 02.
 const pastaApp = src('app');

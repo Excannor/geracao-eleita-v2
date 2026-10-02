@@ -283,6 +283,8 @@
         const vAte = t.cap ? t.ate : versos.length;
         html += '<section class="leitor-capitulo" data-livro="' + CC.esc(t.livro) + '">'
           + '<h2><small>' + CC.esc(nome) + '</small> ' + c + '</h2>'
+          // o guia dos trechos de lista (genealogias, tabelas de povos), quando o capítulo tem um
+          + (!t.cap && CC.htmlDoGuia ? CC.htmlDoGuia(t.livro, c) : '')
           + (versos.slice(vDe - 1, vAte).some(Boolean)
             ? '<div class="versos">' + versos.map((v, i) => (v && i + 1 >= vDe && i + 1 <= vAte
               ? '<p class="leitor-verso" data-v="' + c + ':' + (i + 1) + '"><sup>' + (i + 1) + '</sup>' + CC.esc(v) + ' </p>'

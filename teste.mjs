@@ -272,6 +272,44 @@ const CC = contexto.window.CC;
   checar(livros.length === 66 && !chaveForaDasBiblias.length, 'o versículo-chave dos 66 livros vem da NBV e da Bíblia Livre'
     + (chaveForaDasBiblias.length ? ' (' + chaveForaDasBiblias.slice(0, 5).map((n) => n.nome).join(', ') + ')' : ''));
 }
+// --- os primeiros dias: o contexto antes de ler (conteudo/primeiros-dias.json) ---
+// O mesmo cuidado das reflexões: toda citação entre aspas existe na NBV da leitura do dia, nada
+// de travessão nem emoji, e cada guia aponta para um capítulo e versículos que existem.
+{
+  const P = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'primeiros-dias.json'), 'utf8'));
+  const nbv = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', 'nbv.json'), 'utf8')).livros;
+  const normalizar = (t) => String(t).normalize('NFC').toLowerCase().replace(/[“”"'‘’«».,;:!?()[\]…—–-]/g, ' ').replace(/\s+/g, ' ').trim();
+  const leituraDe = (n) => normalizar(D.plano[n - 1].trechos.map((t) => (nbv[t.livro] || []).slice(t.de - 1, t.ate).map((c) => c.join(' ')).join(' ')).join(' '));
+  const campos = (d) => ['titulo', 'sub', 'contexto', 'procure', 'amanha'].map((k) => d[k] || '');
+  const textos = [...Object.values(P.dias).flatMap(campos), ...Object.values(P.guias).map((g) => g.texto), ...Object.values(P.livros), ...P.paradas.map((p) => p.nome)];
+  checar(P.paradas.length === 10 && P.paradas.every((p) => p.id && p.nome), 'o mapa da história tem as dez paradas, com nome');
+  checar([1, 2, 3, 4, 5, 6, 7].every((n) => P.dias[n] && campos(P.dias[n]).every(Boolean)), 'os dias 1 a 7 têm título, subtítulo, contexto, "procure" e o gancho de amanhã');
+  checar(!textos.some((t) => /[—–]/.test(t)), 'os textos dos primeiros dias não têm travessão');
+  checar(!textos.some((t) => /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(t)), 'os textos dos primeiros dias não têm emoji');
+  checar(!textos.some((t) => /\bjornada\b|\bmergulh(ar|e)\b|\bdesvend(ar|a)\b/i.test(t)), 'os textos dos primeiros dias não têm os tiques de texto de IA');
+  const foraDaNbv = [];
+  for (const [n, d] of Object.entries(P.dias)) {
+    if (!D.plano[n - 1]) { foraDaNbv.push('dia ' + n + ' não existe no plano'); continue; }
+    const L = leituraDe(Number(n));
+    for (const k of ['titulo', 'sub', 'contexto', 'procure']) {
+      for (const m of String(d[k] || '').matchAll(/“([^”]+)”/g)) if (!L.includes(normalizar(m[1]))) foraDaNbv.push('dia ' + n + ' (' + k + '): ' + m[1]);
+    }
+  }
+  checar(!foraDaNbv.length, 'toda citação do contexto está, palavra por palavra, na NBV da leitura do dia' + (foraDaNbv.length ? ' (' + foraDaNbv.join('; ') + ')' : ''));
+  const guiasRuins = Object.entries(P.guias).filter(([chave, g]) => {
+    const m = /^(.+) (\d+)$/.exec(chave);
+    const cap = m && (nbv[m[1]] || [])[Number(m[2]) - 1];
+    if (!cap) return true;
+    if (!(g.de >= 1 && g.ate >= g.de && g.ate <= cap.length && g.texto)) return true;
+    if (!g.salto) return false;
+    const s = /^(\d+):(\d+)$/.exec(String(g.salto));
+    const capSalto = s && (nbv[m[1]] || [])[Number(s[1]) - 1];
+    return !(capSalto && Number(s[2]) >= 1 && Number(s[2]) <= capSalto.length);
+  }).map(([chave]) => chave);
+  checar(Object.keys(P.guias).length >= 5 && !guiasRuins.length, 'cada guia de leitura aponta para um capítulo, versículos e salto que existem na NBV' + (guiasRuins.length ? ' (' + guiasRuins.join(', ') + ')' : ''));
+  checar(html.includes('"primeirosDias"') || readFileSync(dist(arquivoConteudo), 'utf8').includes('"primeirosDias"'), 'o conteúdo publicado leva os primeiros dias');
+}
+
 const dias = (ini, n) => Array.from({ length: n }, (_, i) => somaDias(ini, i));
 
 // --- ofensiva e escudos ---

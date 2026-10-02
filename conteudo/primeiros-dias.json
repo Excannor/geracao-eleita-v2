@@ -1,0 +1,162 @@
+{
+  "versao": 1,
+  "nota": "O que a pessoa vê ANTES de ler, nos primeiros dias do plano: o mapa da história (as paradas), o contexto do dia em duas ou três frases, uma coisa para procurar enquanto lê, o gancho do dia seguinte e os guias dos trechos de lista. Fatos de autoria e data vêm das fichas dos livros (03 - Livros da Bíblia) em conteudo.json; toda citação é da NBV da leitura do dia. Regras: ferramentas/reflexoes/CLAUDE.md. Conferido por teste.mjs.",
+  "paradas": [
+    {
+      "id": "criacao",
+      "nome": "Criação"
+    },
+    {
+      "id": "queda",
+      "nome": "Queda"
+    },
+    {
+      "id": "promessa",
+      "nome": "Promessa"
+    },
+    {
+      "id": "povo",
+      "nome": "Povo"
+    },
+    {
+      "id": "reino",
+      "nome": "Reino"
+    },
+    {
+      "id": "exilio",
+      "nome": "Exílio"
+    },
+    {
+      "id": "espera",
+      "nome": "Espera"
+    },
+    {
+      "id": "jesus",
+      "nome": "Jesus"
+    },
+    {
+      "id": "igreja",
+      "nome": "Igreja"
+    },
+    {
+      "id": "fim",
+      "nome": "Nova criação"
+    }
+  ],
+  "livros": {
+    "Gênesis": "Gênesis quer dizer começo. Pela tradição foi escrito por Moisés, para um povo recém-saído do Egito, e responde de onde vieram o mundo, o pecado e a promessa que o resto da Bíblia acompanha.",
+    "Mateus": "Mateus, um dos doze discípulos pela tradição, escreveu para leitores que conheciam as Escrituras de Israel. A marca dele é mostrar que Jesus é o rei prometido: a cada passo, algo aconteceu para que se cumprisse o que os profetas disseram.",
+    "Êxodo": "Êxodo quer dizer saída. Pela tradição também é de Moisés, e conta como a família de Abraão, agora um povo escravo no Egito, é libertada por Deus e vira uma nação com uma aliança no Sinai."
+  },
+  "dias": {
+    "1": {
+      "titulo": "O começo de tudo",
+      "sub": "A primeira página da Bíblia e a primeira do Novo Testamento, juntas de propósito.",
+      "contexto": "Gênesis quer dizer começo: pela tradição, Moisés o escreveu para um povo recém-saído do Egito. Mateus, um dos doze pela tradição, abre o Novo Testamento provando a leitores judeus que Jesus é o rei prometido, “filho de Davi, filho de Abraão”. Hoje você lê as duas pontas da mesma história.",
+      "procure": "A promessa que Deus faz dentro do castigo, em Gênesis 3.15: um descendente da mulher. Mateus 1 abre com a família dele.",
+      "amanha": "Dois irmãos, um aviso de Deus antes do crime, e uma lista de gerações em que alguém não morre."
+    },
+    "2": {
+      "titulo": "Dois irmãos e um aviso",
+      "sub": "Caim, Abel, e a lista de Adão até Noé.",
+      "contexto": "Fora do jardim, a história segue com os filhos de Adão e Eva. Gênesis 4 é uma cena só, Caim e Abel, com Deus falando com Caim antes e depois do crime. Gênesis 5 é a lista das gerações, de Adão a Noé.",
+      "procure": "Em Gênesis 5, a mesma frase fecha quase todas as gerações. Procure quem “andou com Deus e um dia desapareceu, porque Deus o levou”.",
+      "amanha": "Uma embarcação de 150 metros, e um bebê que precisa fugir de um rei."
+    },
+    "3": {
+      "titulo": "A chuva, a arca e um rei com medo",
+      "sub": "Noé constrói; em Mateus, Herodes manda matar.",
+      "contexto": "A maldade cresce até Deus recomeçar com uma família: a de Noé, que “agradava ao Senhor com a sua vida”. Em Mateus 2, Jesus é um bebê em Belém: sábios do Oriente vêm adorá-lo, o rei Herodes quer matá-lo, e a família foge para o Egito.",
+      "procure": "Quem fecha a porta da embarcação, em Gênesis 7.16. E para onde a família de Jesus foge, em Mateus 2.13.",
+      "amanha": "Um sinal no céu para Deus se lembrar, e uma voz do céu no batismo de Jesus."
+    },
+    "4": {
+      "titulo": "Um sinal no céu, uma voz do céu",
+      "sub": "O arco-íris de Noé e o batismo de Jesus.",
+      "contexto": "Depois do dilúvio, Deus faz uma aliança (um compromisso) com Noé e com todo ser vivo, e dá um sinal. Gênesis 10 lista os povos que vieram dos filhos de Noé. Em Mateus 3, João Batista prepara o caminho e Jesus é batizado no Jordão.",
+      "procure": "Para quem é o sinal do arco-íris: leia Gênesis 9.15 e veja quem diz “me lembrarei”.",
+      "amanha": "Uma torre, um chamado que muda a história, e Jesus respondendo ao Diabo com as Escrituras."
+    },
+    "5": {
+      "titulo": "O nome que a gente faz, o nome que Deus dá",
+      "sub": "Babel, o chamado de Abrão e Jesus no deserto.",
+      "contexto": "Gênesis 11 fecha a história de todo mundo (Babel) e abre a de uma família: Deus chama Abrão e promete que por meio dele “serão abençoados todos os povos da terra”. O resto da Bíblia acompanha essa promessa. Em Mateus 4, Jesus é tentado no deserto e chama os primeiros discípulos.",
+      "procure": "Compare quem diz “nos tornaremos famosos” (Gênesis 11.4) com quem diz “tornarei o seu nome famoso” (Gênesis 12.2).",
+      "amanha": "Um dia leve: Abrão recusa um presente de rei e recebe uma promessa olhando o céu."
+    },
+    "6": {
+      "titulo": "Conte as estrelas",
+      "sub": "Abrão recusa uma recompensa e recebe uma promessa.",
+      "contexto": "Hoje é só Gênesis, e é leve. Abrão resgata o sobrinho Ló de uma guerra entre reis (os nomes do começo do capítulo 14 podem passar rápido) e recusa a recompensa do rei de Sodoma. Depois, Deus faz com ele uma aliança.",
+      "procure": "O que Deus manda Abrão fazer fora da tenda, em Gênesis 15.5, e como o versículo seguinte descreve a resposta dele.",
+      "amanha": "O sétimo dia: uma escrava dá um nome a Deus, Sara ri, Jesus ensina no monte, e o baú da estrada abre."
+    },
+    "7": {
+      "titulo": "O Deus que me vê",
+      "sub": "Hagar no deserto, Sara rindo, e Jesus no monte.",
+      "contexto": "Dia 7: Abrão vira Abraão, Sarai vira Sara, e uma escrava egípcia fugindo é quem dá um nome a Deus. Em Mateus 5 começa o Sermão do Monte: Jesus sentado, ensinando como vive quem é do Reino. É a leitura mais longa da semana; vale ler em dois tempos.",
+      "procure": "O nome que Hagar dá a Deus, em Gênesis 16.13. E o que Jesus diz que vocês são, em Mateus 5.13-14.",
+      "amanha": "Sodoma, Ló tirado pela mão, e Jesus ensinando a orar."
+    },
+    "20": {
+      "titulo": "Começa Êxodo",
+      "sub": "Gênesis termina no Egito, e Êxodo começa lá.",
+      "contexto": "Jacó morre, José morre, e Gênesis termina com a família de Abraão no Egito. Êxodo quer dizer saída: pela tradição também é de Moisés, e conta como essa família, agora um povo escravo, é libertada por Deus. O capítulo 1 começa com os mesmos nomes do fim de Gênesis.",
+      "procure": "O que muda em Êxodo 1.8: um rei novo, que não conhecia José.",
+      "amanha": "Uma sarça em chamas que o fogo não consome, e Deus dizendo o próprio nome."
+    }
+  },
+  "guias": {
+    "Mateus 1": {
+      "de": 1,
+      "ate": 17,
+      "salto": "1:18",
+      "texto": "Os versículos 1 a 17 são a árvore genealógica de Jesus: três blocos de catorze gerações (v. 17), de Abraão a Davi, de Davi ao exílio e do exílio até Cristo. Leia rápido. Repare só nas quatro mulheres (Tamar, Raabe, Rute e a viúva de Urias) e no fim da lista, que desemboca em Jesus. A história começa no versículo 18."
+    },
+    "Gênesis 5": {
+      "de": 1,
+      "ate": 32,
+      "texto": "Este capítulo é uma lista: de Adão a Noé, geração por geração, com a idade de cada um e a mesma frase no fim. Dá para ler em um minuto. Pare só no versículo 24: Enoque não tem a frase dos outros."
+    },
+    "Gênesis 10": {
+      "de": 1,
+      "ate": 32,
+      "salto": "11:1",
+      "texto": "A tabela dos povos: de onde vieram as nações a partir dos três filhos de Noé. Pode ler rápido; o versículo 32 resume tudo. A história volta no capítulo 11, com a torre de Babel."
+    },
+    "Gênesis 11": {
+      "de": 10,
+      "ate": 32,
+      "salto": "12:1",
+      "texto": "Do versículo 10 em diante vem a lista de Sem até Abrão. Ela existe para chegar num nome só: Abrão, no versículo 26. O chamado dele abre o capítulo 12."
+    },
+    "Gênesis 14": {
+      "de": 1,
+      "ate": 12,
+      "salto": "14:13",
+      "texto": "Os versículos 1 a 12 contam uma guerra entre nove reis de nomes difíceis. O que importa está no 12: Ló, sobrinho de Abrão, é levado. A história de Abrão recomeça no 13."
+    },
+    "Gênesis 36": {
+      "de": 1,
+      "ate": 43,
+      "texto": "A lista dos descendentes de Esaú, o irmão de Jacó, que vira o povo de Edom. Pode ler rápido: a história de José começa no capítulo 37, a leitura de amanhã."
+    },
+    "Gênesis 46": {
+      "de": 8,
+      "ate": 27,
+      "salto": "46:28",
+      "texto": "Do versículo 8 ao 27, os nomes de quem desceu ao Egito com Jacó: setenta pessoas (v. 27). O reencontro de Jacó com José vem no 28."
+    },
+    "Êxodo 6": {
+      "de": 14,
+      "ate": 27,
+      "salto": "6:28",
+      "texto": "Do versículo 14 ao 27, a lista das famílias de Rúben, Simeão e Levi, para dizer de que família vêm Moisés e Arão (v. 26). A conversa com Deus continua no 28."
+    },
+    "Êxodo 25": {
+      "de": 1,
+      "ate": 40,
+      "texto": "Daqui em diante vêm as instruções do Tabernáculo, a tenda em que Deus ia morar no meio do povo. Leia como quem olha a planta de uma casa, sem decorar medidas. O motivo de tudo está no versículo 8."
+    }
+  }
+}

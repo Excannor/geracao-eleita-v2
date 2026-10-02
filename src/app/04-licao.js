@@ -180,6 +180,13 @@
 
     const faltam = trilhas.filter(([k]) => !marcadas[k]);
     const todas = !faltam.length;
+    // Antes de ler: o título do dia e a placa "Onde estamos" (03c-contexto.js), com o mapa da
+    // história, o contexto e o que procurar. Sem eles o dia 1 abria em "Leitura de hoje" e
+    // caía, sem aviso, na genealogia de Mateus 1.
+    const ctx = CC.contextoDoDia ? CC.contextoDoDia(sessao.dia) : null;
+    const titulo = sessao.antes.lido ? 'Revisar o dia ' + sessao.dia : (ctx && ctx.titulo ? ctx.titulo : 'Leitura de hoje');
+    const dica = ctx && ctx.sub && !sessao.antes.lido ? ctx.sub
+      : (traducao ? 'Leia aqui ou na sua Bíblia e marque ao terminar.' : 'Abra a sua Bíblia, leia as passagens e marque ao terminar.');
 
     const marcar = (k, valor) => {
       marcadas[k] = valor;
@@ -191,10 +198,9 @@
     return {
       // .cabeca-licao: só apresentação, a folha do alto de cada passo (22-leitura.css)
       corpo: '<div class="cabeca-licao"><span class="etiqueta">Unidade ' + u.numero + ' · Dia ' + sessao.dia + '</span>'
-        + '<h1 class="passo-titulo">' + (sessao.antes.lido ? 'Revisar o dia ' + sessao.dia : 'Leitura de hoje') + '</h1>'
-        + '<p class="passo-dica">' + (traducao
-          ? 'Leia aqui ou na sua Bíblia e marque ao terminar.'
-          : 'Abra a sua Bíblia, leia as passagens e marque ao terminar.') + '</p></div>'
+        + '<h1 class="passo-titulo">' + CC.esc(titulo) + '</h1>'
+        + '<p class="passo-dica">' + CC.esc(dica) + '</p></div>'
+        + (CC.cartaoOndeEstamos ? CC.cartaoOndeEstamos(sessao.dia) : '')
         + cartoes
         + (trilhas.length === 1 ? '<p class="passo-dica">Hoje é mais leve: uma leitura só!</p>' : ''),
       pe: botao(todas ? 'Concluir o dia' : 'Falta marcar ' + faltam.map(([, , r]) => nb(r)).join(' e '), 'data-concluir', todas),

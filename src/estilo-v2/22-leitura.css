@@ -225,3 +225,28 @@
    tamanho da letra igual ao dos outros controles da folha Aa */
 .folha-biblia > .titulo-biblia { font-size: 1.375rem; }
 .folha-aa .tamanhos button[aria-pressed="true"] { background: var(--inverso); color: var(--inverso-tinta); box-shadow: none; }
+
+/* ---------- onde estamos: a placa antes de ler (03c-contexto.js) ----------
+   Um cartão branco entre a cabeça da lição e as passagens: o mapa da história em pílulas (as
+   paradas do dia acesas em sálvia), o contexto em poucas frases e o "procure" no realce listrado. */
+.onde-estamos { display: grid; gap: 10px; margin: 0 0 16px; padding: 16px 20px 18px; border-radius: var(--raio-cartao); background: var(--cartao); text-align: left; }
+.onde-estamos > .etiqueta { color: var(--salvia-texto); }
+.mapa-historia { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
+/* dez pílulas em duas linhas a 390px: letra de 12px, nunca menos */
+.mapa-historia li { display: inline-flex; align-items: center; min-height: 26px; padding: 2px 9px; border-radius: 999px; background: var(--campo); color: var(--tinta-fraca); font-size: .75rem; font-weight: 700; line-height: 1.2; }
+.mapa-historia li.acesa { background: var(--salvia); color: var(--salvia-tinta); }
+.onde-estamos .contexto-dia { margin: 0; color: var(--tinta); font-size: .9375rem; font-weight: 500; line-height: 1.5; text-wrap: pretty; }
+.onde-estamos .procure { display: flex; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 18px; background: var(--realce); color: var(--tinta-forte); font-size: .875rem; font-weight: 500; line-height: 1.45; text-wrap: pretty; }
+.onde-estamos .procure svg { flex: none; width: 18px; height: 18px; margin-top: 2px; color: var(--salvia-texto); }
+.onde-estamos .procure b { font-weight: 800; }
+
+/* ---------- o guia de leitura nos trechos de lista, dentro do leitor ----------
+   Em Manrope (o texto bíblico segue em Literata), no realce listrado, com o botão de salto
+   para o versículo em que a história recomeça. */
+.leitor-guia { display: grid; gap: 10px; margin: 0 0 20px; padding: 14px 16px 16px; border-radius: 20px; background: var(--realce); color: var(--tinta); font-family: var(--fonte); font-size: .9rem; font-weight: 500; line-height: 1.45; text-wrap: pretty; }
+.leitor-guia > .etiqueta { display: inline-flex; align-items: center; gap: 6px; color: var(--salvia-texto); }
+.leitor-guia > .etiqueta svg { width: 16px; height: 16px; }
+.leitor-guia p { margin: 0; }
+.leitor-guia .botao { justify-self: start; width: auto; min-height: 44px; margin: 0; padding: 0 16px 0 18px; background: var(--cartao); font-size: .875rem; }
+.leitor-guia .botao svg { width: 16px; height: 16px; }
+
