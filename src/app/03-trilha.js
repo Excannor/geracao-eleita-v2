@@ -336,7 +336,18 @@
   // ---------- a estrada ----------
   // Faixa ligando os nós, com a linha contínua até hoje e pontilhada depois; refeita
   // quando a largura muda. Só enfeite: fica fora do leitor de tela.
-  const caminhoPor = (p) => p.map((b, i) => (i ? 'C' + p[i - 1].x + ' ' + (p[i - 1].y + b.y) / 2 + ',' + b.x + ' ' + (p[i - 1].y + b.y) / 2 + ',' : 'M') + b.x + ' ' + b.y).join('');
+  // Curva Catmull-Rom pelos centros: em cada nó a tangente segue a direção do nó de antes
+  // para o de depois, e o traço entra no círculo apontando para o centro. Com a tangente
+  // sempre vertical, ele chegava de raspão, em diagonal, e o caminho parecia torto.
+  const caminhoPor = (p) => p.map((b, i) => {
+    if (!i) return 'M' + b.x + ' ' + b.y;
+    const a = p[i - 1];
+    const antes = p[i - 2] || a;
+    const depois = p[i + 1] || b;
+    const r = (n) => Math.round(n * 10) / 10;
+    return 'C' + r(a.x + (b.x - antes.x) / 6) + ' ' + r(a.y + (b.y - antes.y) / 6) + ','
+      + r(b.x - (depois.x - a.x) / 6) + ' ' + r(b.y - (depois.y - a.y) / 6) + ',' + b.x + ' ' + b.y;
+  }).join('');
   const traco = (classe, p) => (p.length > 1 ? '<path class="' + classe + '" d="' + caminhoPor(p) + '"/>' : '');
 
   function desenharEstradas(raiz) {
