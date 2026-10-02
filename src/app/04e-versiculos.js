@@ -126,7 +126,8 @@
         };
         const apagar = f.querySelector('[data-apagar]');
         if (apagar) {
-          apagar.onclick = () => {
+          apagar.onclick = async () => {
+            if (!await CC.confirmar({ titulo: 'Apagar esta nota?', texto: 'Não há como desfazer.', acao: 'Apagar', perigo: true })) return;
             CC.gravarAnotacao(chave, '');
             CC.avisar('Nota apagada');
             fechar();

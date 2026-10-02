@@ -992,7 +992,10 @@
         };
         folha.querySelector('[data-salvar]').onclick = () => enviar(campo.value);
         const apagar = folha.querySelector('[data-apagar]');
-        if (apagar) apagar.onclick = () => enviar('');
+        if (apagar) apagar.onclick = async () => {
+          if (!await CC.confirmar({ titulo: 'Apagar o recado?', texto: 'Ele some do alto da célula para todo mundo.', acao: 'Apagar', perigo: true })) return;
+          enviar('');
+        };
       },
     });
   }
@@ -1388,7 +1391,10 @@
           });
         };
         const tirar = q('[data-tirar]');
-        if (tirar) tirar.onclick = () => salvar({ estudo: '' });
+        if (tirar) tirar.onclick = async () => {
+          if (!await CC.confirmar({ titulo: 'Tirar o estudo?', texto: 'A célula volta a ver que o estudo ainda não foi preparado.', acao: 'Tirar', perigo: true })) return;
+          salvar({ estudo: '' });
+        };
       },
     });
   }

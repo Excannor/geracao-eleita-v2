@@ -475,7 +475,7 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
   .aba {
     flex: 0 0 auto;
     gap: 2px;
-    min-width: calc(var(--circulo) + 4px);
+    min-width: max(44px, calc(var(--circulo) + 4px));
     max-width: none;
     height: auto;
     padding: 0 2px;
@@ -631,7 +631,8 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 /* Barra cheia (seis abas) em tela estreita: círculos e Bíblia encolhem para caber na cápsula. */
 @media (max-width: 859px) {
   .navegacao.cheia { --circulo: clamp(40px, calc(40px + 4px * var(--cresce)), 44px); }
-  .navegacao.cheia .aba:not(.aba-central) { min-width: var(--circulo); padding: 2px 0; }
+  /* revisão: a área de toque de cada aba nunca fica abaixo de 44px, mesmo com o círculo de 40px */
+  .navegacao.cheia .aba:not(.aba-central) { min-width: max(44px, var(--circulo)); padding: 2px 0; }
   .navegacao.cheia .aba-central { width: clamp(52px, calc(52px + 12px * var(--cresce)), 64px); }
 }
 
@@ -701,3 +702,12 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 .folha .acoes > .botao:is(.azul, .cor):not([data-caminho-opcao]) { --b: var(--inverso); color: var(--inverso-tinta); }
 .folha .acoes > .botao.contorno[data-fechar] { min-height: 48px; background: none; color: var(--tinta); }
 .folha .acoes > .botao.contorno[data-fechar]:hover { background: var(--campo); }
+
+/* ---------- revisão (toque): o dedo recebe resposta em toda linha ou cartão tocável ----------
+   Os botões já encolhem no :active (estilo.css). As linhas de lista, os atalhos e os cartões
+   que abrem alguma coisa só tinham :hover, que não existe no celular: no toque ganham o mesmo
+   fundo de campo que o hover dá no computador. */
+.linha-config:active, .item:active, .item-licao:active, .item-livro:active, .atalho:active, .visao-item:active,
+.cartao-proposito:active, .dsf-item:active, .opcao-traducao:active, .amigo-roda:active, .corpo-faixa:active, .item-aviso:active { background: var(--campo); }
+.botao-pilula:active, .botao-redondo:active, .botao-icone:active, .guia:active, .no-bau:active, .no-marco:active { transform: scale(.96); }
+
