@@ -194,9 +194,9 @@ do app), `ESPERA` (ms, padrão 2600), `CHEIA=1` (a página inteira). As páginas
 `entrar.html`, sem `COOKIE`. O `ferramentas/foto.mjs` do repositório também funciona, mas sem
 conta (`CAMINHO_ABERTO=1`): `CHROME=... node ferramentas/foto.mjs 390 844 saida.png '#/' http://localhost:8101/ 0 escuro`.
 
-Varredura automática de defeitos: `scratchpad/rev/rev.mjs` (listas no formato de `rev/trab.mjs`,
-`BASE=http://localhost:<porta>/`, `COOKIE=...`). Ele importa o `navegador.mjs` de outra pasta e
-grava em `scratchpad/app/`: use uma cópia sua com o import trocado para
-`<worktree>/ferramentas/navegador.mjs` e um prefixo próprio.
+Varredura automática de defeitos: `design/ferramentas/analise/rev.mjs` com os catálogos de
+`design/ferramentas/analise/rotas/` (`BASE=http://localhost:<porta>/`, `COOKIE=...`, saída em
+`SAIDA=` ou em `capturas/analise/revisao/`). O método das cinco frentes está em
+`.claude/skills/revisao-uiux/SKILL.md`; a jornada de uma pessoa nova, em `.claude/skills/jornada-usuario/SKILL.md`.
 
 Confira sempre os dois temas, 360 e 390 de largura (e 320 na barra), e 1280 para o trilho lateral.

@@ -54,7 +54,7 @@ Quebras: nome de unidade com palavra sozinha; "1 / Timóteo"; "com / Ana"; "Marc
 - Build: `node build.mjs`; testes: `node teste.mjs` e os de navegador em `ferramentas/` (exporte `CHROME=/tmp/claude-0/-home-user-geracao-eleita/f83429da-2006-5b51-8495-2381601c862d/scratchpad/chrome.sh`).
 - Servidor de teste: `CAMINHO_ABERTO=1 CAMINHO_ESTADO=<pasta própria>/estado.json nohup node servidor.mjs <porta própria> &` a partir da sua pasta de trabalho, depois do build (confira no servidor.mjs se as variáveis continuam as mesmas).
 - Capturas: `CHROME=... node ferramentas/foto.mjs <largura> <altura> <saida.png> '<#/rota>' <urlBase> [rolar] [tema]`.
-- Varredura automática de defeitos (vazamento, corte, reticências, quebra, palavra sozinha, fonte < 12, alvo < 44, contraste, fundo atrás da barra): `/tmp/claude-0/-home-user-geracao-eleita/f83429da-2006-5b51-8495-2381601c862d/scratchpad/rev/rev.mjs` com listas de trabalhos no formato de `rev/trab.mjs` (use `BASE=http://localhost:<porta>/`). Leia o código antes de usar.
+- Varredura automática de defeitos (vazamento, corte, reticências, quebra, palavra sozinha, fonte < 12, alvo < 44, contraste, fundo atrás da barra): `design/ferramentas/analise/rev.mjs` com os catálogos de `design/ferramentas/analise/rotas/` (use `BASE=http://localhost:<porta>/`). O método inteiro está em `.claude/skills/revisao-uiux/SKILL.md`.
 - Referências do primeiro redesenho, para reaproveitar peças: `git show be99484:src/estilo.css` (camada "REDESENHO (v2)"), `git show be99484:src/fontes.css` (Manrope e Literata embutidas), `git show be99484:src/app/<arquivo>` e as maquetes em `design/telas/`.
 
 ## Decisão do dono sobre o Início (30/09, vale sobre o resto deste guia)
