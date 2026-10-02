@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- cordeiro (Is 53.7): a lã em nuvem, a cabeça para a direita, quatro patas no chão -->
+<path class="k p" d="M26 66c-8-2-8-12 0-14 0-8 10-12 16-6 4-6 14-6 18 0 6-4 14-2 16 4 8 0 12 8 6 14 4 6-2 12-8 10-4 4-12 4-16 0-6 4-14 4-18 0-8 2-14-2-14-8z"/>
+<path class="h" d="M36 58c2-2 4-2 6 0M48 54c2-2 4-2 6 0M60 58c2-2 4-2 6 0M42 66c2-2 4-2 6 0M56 66c2-2 4-2 6 0M70 64c2-2 4-2 6 0"/>
+<path class="k p" d="M84 50c4-8 18-8 22 2 3 8-2 16-10 16-8 0-14-8-12-18z"/>
+<path class="k p" d="M90 48c-2-8-8-10-12-6 2 4 6 6 12 6z"/>
+<circle class="e" cx="98" cy="56" r="1.8"/>
+<path class="k" d="M100 63c2 1 4 1 5 0"/>
+<path class="k" d="M36 76v20M46 78v18M64 78v18M74 76v20"/>
+<path class="h" d="M20 98h80"/>
+</svg>

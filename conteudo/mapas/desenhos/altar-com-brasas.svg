@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- altar com brasas (Is 6.6): a brasa que limpa os lábios do profeta -->
+<path class="k p" d="M30 50h60v52H30z"/>
+<path class="k p" d="M26 42h68v8H26zM26 102h68v6H26z"/>
+<path class="k" d="M26 42l-2-8 8 8M94 42l2-8-8 8"/>
+<path class="h" d="M30 60h60M30 72h60M30 84h60M30 96h60M44 50v10M66 50v10M56 60v12M80 60v12M40 72v12M70 72v12M52 84v12M78 84v12"/>
+<path class="k e" d="M40 42c0-6 6-6 8-2 2-6 10-6 12-1 2-5 10-4 11 1 3-3 9-1 9 2"/>
+<path class="k s" d="M52 38c-6-6-2-14 4-18 0 6 6 6 4 12 4-2 6-8 4-12 8 6 8 14 2 18z"/>
+<path class="h" d="M58 16c-2-4 2-6 0-10M70 18c2-4-2-6 0-10"/>
+</svg>

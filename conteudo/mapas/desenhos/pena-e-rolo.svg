@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- pena e rolo: o profeta escreve (Is 8.1; Is 30.8). Traço de pena: .k contorno, .h hachura, .p papel, .s sálvia, .e cheio -->
+<path class="k p" d="M18 70h64v28H18z"/>
+<path class="k" d="M18 70c-6 0-8 4-8 7s2 7 8 7M18 84c-6 0-8 4-8 7s2 7 8 7"/>
+<path class="k" d="M82 70c6 0 8 4 8 7s-2 7-8 7c6 0 8 4 8 7s-2 7-8 7"/>
+<path class="h" d="M26 78h30M26 84h44M26 90h36"/>
+<path class="h" d="M84 88l4 4M84 93l3 3M85 83l3 3"/>
+<path class="k p" d="M104 8C84 12 66 30 58 62c14-10 32-28 46-54z"/>
+<path class="k" d="M104 8L54 70"/>
+<path class="h" d="M96 18l-8 2M92 24l-9 2M87 31l-9 3M82 38l-9 3M77 45l-8 3M72 52l-7 3M98 14l1 6M94 20l2 7M89 27l2 7M84 34l2 6M79 41l2 6"/>
+<path class="k" d="M54 70l-3 6"/>
+</svg>

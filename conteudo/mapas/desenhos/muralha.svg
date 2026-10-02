@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- muralha de Jerusalém (Is 36–37): ameias, torre e o portão em sálvia -->
+<path class="k p" d="M12 100V54h10v-8h8v8h8v-8h8v8h4V40h8v-8h8v8h8v14h4v-8h8v8h8v-8h8v8h8v46z"/>
+<path class="k s" d="M50 100V80a10 10 0 0 1 20 0v20z"/>
+<path class="h" d="M16 64h30M16 74h30M16 84h30M16 94h30M74 64h30M74 74h30M74 84h30M74 94h30M28 64v10M38 74v10M24 84v10M86 64v10M96 74v10M82 84v10"/>
+<path class="k" d="M56 56v-6a4 4 0 0 1 8 0v6z"/>
+<path class="k" d="M4 100h112"/>
+</svg>

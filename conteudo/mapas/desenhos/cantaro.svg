@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- cântaro de barro (Is 55.1): a água de graça para quem tem sede -->
+<path class="k p" d="M48 18h24v6c0 4-4 4-4 8 12 4 22 16 22 32 0 20-14 34-30 34S30 84 30 64c0-16 10-28 22-32 0-4-4-4-4-8z"/>
+<path class="k" d="M46 18h28"/>
+<path class="k" d="M50 30c-10-2-16 4-12 14M70 30c10-2 16 4 12 14"/>
+<path class="s" d="M32 58h56v10H32z"/>
+<path class="k" d="M32 58h56M32 68h56"/>
+<path class="h" d="M36 76c6 3 10 3 14 0s8-3 14 0 10 3 14 0M38 84c6 3 10 3 14 0s8-3 14 0 8 3 12 0"/>
+<path class="k p" d="M96 74c-4 6-4 10 0 12 4-2 4-6 0-12zM104 92c-3 4-3 7 0 8 3-1 3-4 0-8z"/>
+</svg>

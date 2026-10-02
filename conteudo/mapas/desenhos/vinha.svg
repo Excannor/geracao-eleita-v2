@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- vinha (Is 5.1-7): o cacho pendurado no ramo, com uma folha de cada lado -->
+<path class="k" d="M8 28c20-8 44-6 58 6s30 12 46 6"/>
+<path class="k p" d="M38 31c-14-2-24 6-26 18 12 2 24-4 26-18z"/>
+<path class="h" d="M38 31L14 48M30 36l-2 7M24 40l-1 6M32 36l6 2"/>
+<path class="k p" d="M98 42c-2 12 4 20 12 22 2-10-4-18-12-22z"/>
+<path class="h" d="M98 42l12 22M102 50l4-2M104 56l4-1"/>
+<path class="k" d="M66 36v12"/>
+<g class="k p"><circle cx="60" cy="54" r="6"/><circle cx="72" cy="54" r="6"/><circle cx="54" cy="65" r="6"/><circle cx="66" cy="65" r="6"/><circle cx="78" cy="65" r="6"/><circle cx="60" cy="76" r="6"/><circle cx="72" cy="76" r="6"/><circle cx="66" cy="87" r="6"/></g>
+<path class="h" d="M57 52l2-2M69 52l2-2M51 63l2-2M63 63l2-2M75 63l2-2M57 74l2-2M69 74l2-2M63 85l2-2"/>
+</svg>
