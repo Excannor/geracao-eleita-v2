@@ -595,6 +595,34 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   "membro comum não começa...", "o convite chega na caixa do sino...") e para num TypeError; falha
   igual no ac51a46, antes desta rodada → fica registrado para investigar à parte.
 
+- 2026-10-02 · senha · O dono: o link de nova senha dizia "venceu ou já foi usado" já na primeira
+  vez. Causa provada com o servidor de antes (pedido pelo painel e POST com o token como a página o
+  lê): o link é "nome.validade.assinatura" e o @ com ponto sai escapado ("pedro%2Esilva"), mas o
+  `URLSearchParams` da página devolve o ponto decodificado, o token chega com quatro partes e o
+  servidor, que exigia exatamente três, recusava todo @ com ponto; "pedro" passava. Não era o
+  pré-visualizador (o GET nunca gastou nada: o link morre só quando a senha muda), nem o prazo, nem
+  o service worker → o servidor lê o token de trás para a frente (assinatura e validade são as duas
+  últimas partes) e diz qual dos dois aconteceu: "venceu (1 hora)" ou "não vale mais (senha já
+  trocada / link cortado)"; a página confere o link com um GET que não gasta e, se ele não vale,
+  troca o título e o botão principal para "Pedir outro link". Regra: **token que passa por URL é
+  testado com o caractere que se escapa** (ponto, +, /, =) e lido do jeito que a página o lê, não
+  como o servidor o escreveu (`ferramentas/teste-conta.mjs`, com SMTP falso, pré-visualizador,
+  link usado duas vezes, cortado e vencido com `CAMINHO_VALIDADE_LINK_SENHA` só em teste).
+- 2026-10-02 · cadastro · No Android a 360x800, com o teclado aberto (a tela encolhe uns 330px), a
+  mensagem de erro do cadastro ficava junto do botão, debaixo do teclado: a pessoa tocava em
+  "Continuar" e nada parecia acontecer → a mensagem mora logo abaixo do campo errado
+  (`aria-describedby`), o campo deixa de ficar vermelho ao ser corrigido, e o erro do servidor (@
+  repetido, senha) volta ao passo e ao campo certos. O teste encolhe a tela como o teclado e
+  confere mensagem e campo à vista.
+- 2026-10-02 · cadastro · A trilha da conta nova abria rolada até o dia 1 centralizado, cortando a
+  saudação e os cartões do alto; e "Sair desta conta" recarregava em `#/config`, de modo que quem
+  entrava de novo caía nas Configurações → ao abrir, o dia de hoje que já cabe acima da barra não
+  rola; sair vai para `./`.
+- 2026-10-02 · teste · Um toque por `Input.dispatchTouchEvent` medido logo depois do
+  `scrollIntoView` caiu no link de baixo ("Prefiro fazer pelo menu") em vez de "Pular por agora":
+  a folha ainda se mexia → no toque emulado, rolar (`behavior: 'instant'`), esperar, medir de novo
+  e só então tocar; e a mensagem de falha do toque diz o que está na tela (folhas abertas).
+
 ## Instalar no celular
 
 - 2026-10-02 · instalar · O dono: "instalar não funciona no Android". No Chrome sem interface tudo
@@ -625,6 +653,17 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   geracaoeleita.app, que é o outro app → saiu. Ao sincronizar com o original, procurar por
   nomes de domínio (`grep -rn "off-sec\|geracaoeleita.app" src`) e conferir se cada um vale
   para o V2.
+- 2026-10-02 · instalar · Quem abre o link pelo Instagram/Facebook/TikTok/WebView chegava na
+  entrada sem saber que dali não se instala; o aviso só existia dentro do tutorial, depois do
+  primeiro dia → a entrada mostra a faixa "Para instalar, abra no Chrome" (no iPhone, "abra no
+  Safari", com `x-safari-https://` e sem salto automático) e, no Android, tenta abrir no Chrome
+  sozinha com `intent://<host><caminho><busca>#Intent;scheme=...;package=com.android.chrome;
+  S.browser_fallback_url=<url codificada>;end`, uma vez por aba (`sessionStorage`, para não virar
+  laço quando o Chrome não existe). O app com sessão faz o mesmo e mostra a folha "Abra no
+  Chrome", também uma vez por aba, menos para a conta recém-criada (ela vê no fim do primeiro
+  dia). Num navegador de verdade (Chrome, Samsung Internet, Firefox, Edge, Safari) nada disso
+  aparece. O teste ouve `Page.frameRequestedNavigation` para ver o salto (a página não sai do
+  lugar no Chrome sem interface).
 
 ## Revisão do dia (Guardar, Pensar, Orar)
 
