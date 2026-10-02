@@ -330,6 +330,9 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
 - 2026-10-02 · versículo · Na barra do leitor, todo botão desfaz a escolha depois de agir; se o
   Compartilhar fizesse o mesmo quando o navegador recusa o compartilhamento, o "toque de novo"
   ficava sem botão → a barra só se desfaz quando a imagem foi compartilhada ou baixada.
+- 2026-10-02 · painel · Nas atualizações do painel de progresso escrevi a hora de cabeça ("16:10",
+  "16:40") quando o relógio de Brasília marcava antes das 15:40 → a hora do painel e do registro
+  sai sempre de `TZ=America/Sao_Paulo date`, na hora de escrever.
 
 ## Geral
 
