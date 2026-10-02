@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a cruz no alto do monte (Mc 8.34; 15.22-26): as duas traves de madeira com veios e a tabuleta pregada em cima; o monte é largo e alto, com o caminho subindo até o pé da cruz (as duas beiras se abrem para baixo, em perspectiva; em paralelo pareciam rachadura); o chão fecha por uma curva rasa -->
+<path class="k p" d="M55 26H65V40H86V50H65V86H55V50H34V40H55Z"/>
+<path class="h" d="M58 54V82M62 58V78M58 30V36M38 44H50M70 44H82"/>
+<path class="k p" d="M50 16H70V26H50Z"/>
+<path class="h" d="M54 20H66M54 23H62"/>
+<path class="k s" d="M6 108C18 98 30 90 44 86C50 84 56 83 60 83C64 83 70 84 76 86C90 90 102 98 114 108C80 112 40 112 6 108Z"/>
+<path class="h" d="M57.5 87C55 92 60 96 55 101C51 104 50 107 46 110M62.5 87C62 92 67 96 64 101C62 104 66 107 72 110"/>
+</svg>

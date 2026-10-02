@@ -285,6 +285,61 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   diz que ele não oferece sacrifícios diários pelos próprios pecados) → os destaques de um mesmo
   mapa abrem de jeitos diferentes (o checador só compara itens vizinhos da mesma lista) e não
   dizem mais que o versículo do NT (regra na skill).
+- 2026-10-02 · conteúdo · Marcos: antes de escrever, montei a tabela dos versículos-chave (1.1,
+  10.45, 15.39 e 16.20 na raiz; 14.61-62 no destaque `jesus`; 15.34 e 15.27-28 nos pares) e a lista
+  das faixas de cada item; com isso nenhuma referência caiu em dois lugares e não precisei refazer
+  trecho nenhum, ao contrário de Levítico → a tabela vale a pena também em livro curto.
+- 2026-10-02 · conteúdo · Na releitura de Marcos versículo por versículo, depois do checador passar:
+  "Herodes acha" (6.16 diz que ele "dizia"), "os outros o prendem" (14.46: "a multidão"), "passa
+  quarenta dias no deserto" sem o Espírito que o leva (1.12), "os familiares vêm buscar Jesus"
+  (3.21: "vieram tentar levá-lo"), "palavras estrangeiras" (o livro só traduz; chamar de
+  estrangeiras é dedução) → a regra da paráfrase fiel pega até sujeito e verbo auxiliar; a
+  releitura item por item continua obrigatória mesmo com o checador verde.
+- 2026-10-02 · estilo · Marcos: o destaque `jesus` citava 1Pe 2.7 com "tornou-se" dentro das aspas, e
+  o `grep` da skill não procura hífen → a lista de antes de entregar ganhou um `grep` de palavra com
+  hífen (regra na skill).
+- 2026-10-02 · tela · Marcos: conexões de 113 a 118 caracteres com duas referências e uma citação
+  longa ("Que vocês não sejam encontrados dormindo") deram 5 linhas a 390px no `teste-mapas`, e três
+  delas 5 linhas a 360px → com duas referências entre parênteses, mirar em uns 100 caracteres;
+  citação longa na conexão vira palavra solta entre aspas ("Vigiem") (regra na skill).
+- 2026-10-02 · captura · A captura da página inteira a 360px saiu cortada no meio das curiosidades,
+  sem erro: o `foto-conta` para em 12.000px de CSS e Marcos tem uns 12.300 a 360px → o
+  `foto-conta` passou a avisar quando corta e a dizer o `rolar` para pegar o resto; o fim da página
+  se captura sem `CHEIA`, com `rolar` (regra na skill).
+- 2026-10-02 · desenho · Marcos: a pomba de lado parecia uma lesma com uma orelha (a asa de trás
+  aparecia como um triângulo solto) e a água sálvia, uma salsicha; a cruz num montinho sálvia
+  parecia túmulo; a moeda em pé tinha a base em cima da borda da moeda deitada → pomba que desce se
+  desenha de frente, cabeça para baixo, asas abertas e cauda em leque (simétrica, lê na hora); a
+  cruz fica no alto de um monte largo, com o caminho subindo, não num montinho; peça apoiada em
+  outra tem o ponto de apoio calculado dentro da face de cima (elipse), não chutado (regra na
+  skill).
+- 2026-10-02 · revisão · Marcos, na revisão adversarial (versículo por versículo na NBV, depois do
+  escritor e do checador verdes): "região de Tiro" (7.24 diz "Tiro e Sidom"); "dar o pão aos
+  cachorrinhos" (7.27: "tirar o pão... e jogá-lo"); "Em Jerusalém, o povo saúda" (11.10 é ainda na
+  estrada, 11.11 é que entra na cidade); "o mesmo salmo" no destaque de 1Pe 2.7 (nem Marcos nem
+  Pedro dizem que é salmo: é nome de fora); "um cego vê primeiro árvores andando" (8.24: vê homens
+  que parecem árvores); "Jesus solta outro forte grito" num galho que não traz o primeiro grito
+  (15.34 ficou nos pares); "Quem narra conversa com quem lê" na autoria (13.14 está dentro da fala
+  de Jesus; dizer que é o narrador é dedução) → palavra de lugar ("em Jerusalém"), de gênero ("salmo")
+  e de retomada ("outro", "de novo") também se confere no versículo; "outro" sem o primeiro no
+  mesmo item vira "um" (regra na skill).
+- 2026-10-02 · exaustividade · Marcos tinha deixado fora a troca de nome de Simão para Pedro (3.16),
+  o sepultamento (15.43-46) e Jesus levado aos céus (16.19), embora a skill peça toda troca de nome
+  e o fim do livro; a raiz dizia que "o livro fecha" com 16.20 sem o 16.19 → viraram duas
+  curiosidades e a raiz passou a citar 16.19-20. Ao listar os marcos, incluir também sepultamento e
+  subida aos céus (regra na skill).
+- 2026-10-02 · desenho · Marcos, revisão: a água sálvia da pomba continuava uma salsicha (faixa
+  fechada nas pontas), o caminho da cruz em duas linhas paralelas parecia rachadura e, no cesto,
+  os pães tinham a base reta na altura da borda (pareciam colados numa tampa) e o peixe flutuava
+  acima da borda da frente → rio em ondas de traço, sem área sálvia; caminho com as beiras se
+  abrindo para baixo; o que está dentro de um cesto ou de uma vasilha desce até abaixo da borda
+  da frente, que o cobre (regra na skill).
+- 2026-10-02 · tela · Marcos: a conexão do ramo 3 com 115 caracteres deu 4 linhas a 390px e 5 a
+  360px, e o `teste-mapas` só conta as linhas a 390 → depois de mexer numa conexão, olhar também a
+  captura de 360px; a frase saiu com 99 caracteres.
+- 2026-10-02 · captura · Juntar a captura da página inteira (que para em 12.000px) com o resto
+  capturado com `rolar` duplica a barra de baixo, que fica fixa no fim da janela grande → o resto
+  se cola a partir de uns 150px abaixo do topo dele, cobrindo a barra da primeira captura.
 
 ## Entrada, sessão e página inicial
 
@@ -413,6 +468,10 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
 - 2026-10-02 · versículo · Na barra do leitor, todo botão desfaz a escolha depois de agir; se o
   Compartilhar fizesse o mesmo quando o navegador recusa o compartilhamento, o "toque de novo"
   ficava sem botão → a barra só se desfaz quando a imagem foi compartilhada ou baixada.
+- 2026-10-02 · painel · Marcos: pela terceira vez a hora do painel saiu de cabeça ("16:40" às 16:36;
+  "17:02" às 16:47), porque mandei o `date` na mesma leva de chamadas que o update, em paralelo, e
+  o update já tinha partido com a hora inventada → o `date` vai numa chamada própria, ANTES, e o
+  update só sai depois de ler a resposta dele; nunca em paralelo.
 - 2026-10-02 · painel · Nas atualizações do painel de progresso escrevi a hora de cabeça ("16:10",
   "16:40") quando o relógio de Brasília marcava antes das 15:40 → a hora do painel e do registro
   sai sempre de `TZ=America/Sao_Paulo date`, na hora de escrever.

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as duas moedinhas de cobre da viúva (Mc 12.42): uma deitada, com a espessura à vista, e outra em pé, apoiada na face de cima da primeira (a base da moeda em pé cai dentro da elipse de cima, conferido na conta); cada uma com a borda em relevo -->
+<path class="k p" d="M16 76V84C16 92 32 98 52 98C72 98 88 92 88 84V76"/>
+<path class="h" d="M24 90V94M34 93V97M44 94V98M56 94V98M68 93V97M78 90V94"/>
+<ellipse class="k p" cx="52" cy="76" rx="36" ry="13"/>
+<ellipse class="h" cx="52" cy="76" rx="27" ry="9"/>
+<path class="h" d="M38 74l4 3M46 72l4 3M54 72l4 3"/>
+<ellipse class="k p" cx="78" cy="52" rx="17" ry="28"/>
+<ellipse class="k s" cx="74" cy="52" rx="17" ry="28"/>
+<ellipse class="h" cx="74" cy="52" rx="11.5" ry="20"/>
+<path class="h" d="M78 40l4 4M79 50l4 4M78 60l4 4"/>
+</svg>

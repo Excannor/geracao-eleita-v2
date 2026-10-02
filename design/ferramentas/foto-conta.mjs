@@ -70,6 +70,9 @@ if (process.env.ACAO) { console.log('acao:', await av(process.env.ACAO)); await 
 if (Number(rolar)) { await av('(document.documentElement.classList.contains("app-ios") ? document.querySelector(".aplicativo") : window).scrollTo(0,' + Number(rolar) + ')'); await dormir(700); }
 if (process.env.CHEIA) {
   const alt = await av('Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)');
+  // A página inteira para em 12.000px (mais que isso trava o Chrome sem cabeça). Página mais alta
+  // sai cortada sem erro nenhum: avisa e diz como pegar o resto (o mapa de Marcos a 360px passou).
+  if (alt > 12000) console.warn('AVISO: a página tem ' + alt + 'px e a captura para em 12000px; capture o resto sem CHEIA, com rolar=' + (alt - H));
   await cmd('Emulation.setDeviceMetricsOverride', { width: W, height: Math.min(alt, 12000), deviceScaleFactor: ESCALA, mobile: W < 800 });
   await dormir(600);
 }

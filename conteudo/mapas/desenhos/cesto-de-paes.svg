@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o cesto com os pães e o peixe (Mc 6.38-43): pães redondos com o corte em cima e um peixe saindo da borda; a frente do cesto cobre a parte de baixo de tudo (pães e peixe descem até abaixo da borda da frente; com a base reta na altura da borda, os pães pareciam colados numa tampa e o peixe, flutuando) -->
+<ellipse class="k p" cx="60" cy="62" rx="34" ry="9"/>
+<path class="k s" d="M64 50C72 40 84 36 94 38L102 30C104 36 104 44 102 50L96 46C90 54 80 62 66 68Z"/>
+<circle class="e" cx="88" cy="41" r="1.4"/>
+<path class="h" d="M80 40C82 44 82 48 80 52"/>
+<path class="k p" d="M30 70V62C30 50 38 44 48 44C58 44 64 50 64 62V70Z"/>
+<path class="h" d="M40 52l6-4M46 54l6-4M52 55l5-3"/>
+<path class="k p" d="M50 70V62C50 54 56 48 64 48C72 48 78 54 78 62V70Z"/>
+<path class="h" d="M58 55l5-3M64 56l5-3"/>
+<path class="k p" d="M26 62L34 98C42 104 78 104 86 98L94 62C86 70 34 70 26 62Z"/>
+<path class="h" d="M29 74C42 80 78 80 91 74M31 84C44 90 76 90 89 84M33 93C46 98 74 98 87 93"/>
+<path class="h" d="M38 68L42 101M50 70L52 103M60 71V104M70 70L68 103M82 68L78 101"/>
+</svg>

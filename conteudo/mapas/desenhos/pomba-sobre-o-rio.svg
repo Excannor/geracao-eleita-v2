@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a pomba descendo sobre Jesus quando ele sai da água do Jordão (Mc 1.10): vista de frente, cabeça para baixo, asas abertas para os lados e a cauda em leque no alto; embaixo, a água do rio em ondas de traço (a faixa sálvia fechada nas pontas parecia uma salsicha) -->
+<path class="k p" d="M54 38L48 18C52 16 56 18 60 21C64 18 68 16 72 18L66 38Z"/>
+<path class="h" d="M56 36L54 22M60 36V24M64 36L66 22"/>
+<path class="k p" d="M54 52C44 44 30 36 12 34C16 40 20 42 24 43C22 46 24 48 28 49C27 52 30 54 34 54C34 57 38 59 43 58C46 60 51 60 55 59Z"/>
+<path class="h" d="M24 43C32 44 40 47 48 51M28 49C35 50 42 53 50 55M34 54C40 55 45 56 51 57"/>
+<path class="k p" d="M66 52C76 44 90 36 108 34C104 40 100 42 96 43C98 46 96 48 92 49C93 52 90 54 86 54C86 57 82 59 77 58C74 60 69 60 65 59Z"/>
+<path class="h" d="M96 43C88 44 80 47 72 51M92 49C85 50 78 53 70 55M86 54C80 55 75 56 69 57"/>
+<path class="k p" d="M53 36C50 44 50 56 53 64C55 69 57 71 60 71C63 71 65 69 67 64C70 56 70 44 67 36C64 34 56 34 53 36Z"/>
+<path class="k p" d="M57.5 70.5L60 77L62.5 70.5"/>
+<circle class="e" cx="56.5" cy="64" r="1.3"/>
+<circle class="e" cx="63.5" cy="64" r="1.3"/>
+<path class="k" d="M15 94c6-4 12-4 18 0s12 4 18 0 12-4 18 0 12 4 18 0 12-4 18 0"/>
+<path class="k" d="M24 104c5-3 10-3 15 0s10 3 15 0 10-3 15 0 10 3 15 0"/>
+<path class="h" d="M36 112c5-3 9-3 13 0s9 3 13 0 9-3 13 0"/>
+</svg>

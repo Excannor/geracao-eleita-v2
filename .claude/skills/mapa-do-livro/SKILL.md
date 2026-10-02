@@ -49,11 +49,14 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    numa fenda da rocha", Êx 33.22), não como fato que já aconteceu. Promessa com condição leva o
    "se" junto ("Se o povo espalhado confessar o pecado, Deus promete...", Lv 26.40-42), e quem
    sofre a consequência é quem o versículo diz (em Lv 7.18 perde a oferta quem a apresentou).
+   Palavra de lugar, de gênero e de retomada também: "em Jerusalém" quando o versículo ainda é na
+   estrada (Mc 11.10), "o salmo" quando o texto só diz "Escrituras", "outro grito" num item que não
+   traz o primeiro (vira "um grito").
 5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
    sequência; um relato retrospectivo (Mt 14.3-12, a morte de João) se conta no passado. "O livro
    abre com" e "fecha com" só com o primeiro e o último versículo de verdade.
-6. **Marcos completos.** Toda troca de nome, aliança, reencontro, mudança de terra e morte de
-   protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
+6. **Marcos completos.** Toda troca de nome, aliança, reencontro, mudança de terra, morte,
+   sepultamento e subida aos céus de protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
    e 46). Liste os capítulos do livro e marque onde cada um aparece (galho, conexão, curiosidade,
    autoria): Mateus tinha deixado de fora os capítulos 15, 19 e 22 e a Grande Comissão (28.19-20).
    Cada referência aparece uma vez no mapa; curiosidades seguem a ordem dos capítulos. Antes de
@@ -90,7 +93,9 @@ do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua"
   rebento de Is 11.1). **No máximo 150 caracteres e 4 linhas a 390px** (regra do dono, 02/10):
   uma frase de ligação, não um resumo. Na prática, mire em até uns 115 caracteres: com aspas,
   duas referências entre parênteses e palavras longas, as de 122 a 138 de Êxodo deram 5 linhas.
-  Confira as linhas no `teste-mapas`, não só a contagem. Conexão longa empurra o cruzamento do S para
+  Com duas referências e uma citação longa, mire em uns 100: em Marcos, 113 caracteres deram 5
+  linhas; a citação longa vira uma palavra entre aspas ("“Vigiem”, pede Jesus").
+  Confira as linhas no `teste-mapas` (que conta a 390px) e na captura de 360px, não só a contagem. Conexão longa empurra o cruzamento do S para
   baixo e a área fica alta demais (a de 247 do ramo 3 de Mateus chegou a fazer a curva cruzar o
   texto a 360px). O `checar-mapa` barra o que passar de 150.
 
@@ -106,6 +111,8 @@ Antes de entregar o texto:
 - cada referência foi conferida na Bíblia do app (`conteudo/biblias`);
 - nenhum item começa igual ao anterior, e nenhuma palavra se repete na mesma frase ("No barco,
   as ondas inundam o barco");
+- nenhuma palavra com hífen sobrando no texto (`grep -o -E '[[:alpha:]]+-[[:alpha:]]+' <mapa>.json`
+  e tirar da lista só os ids de desenho; em Marcos, "tornou-se" de 1Pe 2.7 escapou dentro de aspas);
 - nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen (nos galhos,
   nas conexões e nas curiosidades) só se não houver outra ("boas-novas" e "beira-mar" quebraram
   no hífen a 390px; "perto do mar", "No meio da noite"); quando o hífen está na própria citação
@@ -148,6 +155,14 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   e gota em círculo vira botão (a rocha de Êxodo precisou de cinco tentativas). O jorro cai sobre
   a borda de cima de uma poça larga, não no centro dela: entrando no meio da elipse, vira cano
   enfiado num bueiro.
+- ave que desce (a pomba de Mc 1.10) se desenha de frente: cabeça para baixo, asas abertas para os
+  lados com a borda de trás em penas, cauda em leque no alto. De lado, a asa de trás vira orelha e
+  o corpo, lesma. Cruz fica no alto de um monte largo, com o caminho subindo; num montinho, vira
+  túmulo; o caminho tem as beiras se abrindo para baixo (em paralelo vira rachadura). Rio sob
+  outra peça vai em ondas de traço: faixa sálvia fechada nas pontas vira salsicha. O que está
+  dentro de um cesto ou vasilha desce até abaixo da borda da frente, que o cobre (base reta na
+  altura da borda parece tampa). Peça apoiada em outra (a moeda em pé sobre a deitada) tem a base calculada dentro da
+  face de cima, não em cima da borda.
 - papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de
   uma peça vira caixa branca sobre o fundo cinza da página (o barco de Mateus). Para pôr o casco
   dentro da água, o fundo do casco é a própria curva da onda (pontos tirados da curva).
@@ -165,7 +180,9 @@ fontes de `dist/` e use `CHROME=... --headless --screenshot` (como em `design/ma
 app no ar (cookie da pasta de estado desse servidor; se a folha de consentimento aparecer, mande
 `POST api/consentimento` com o cookie antes), a tela de verdade sai com `CHEIA=1 node design/ferramentas/foto-conta.mjs 390 844
 <saida.png> '#/mapa/<slug>' 0 <claro|escuro>` (página inteira; com mais de uns 10.000px de
-altura, passe `ESCALA=1.5`, porque a 2x o Chrome trava sem erro, e rode sempre com `timeout`); recorte em pedaços de 1500px
+altura, passe `ESCALA=1.5`, porque a 2x o Chrome trava sem erro, e rode sempre com `timeout`;
+a página inteira para em 12.000px e o `foto-conta` avisa quando corta: o resto sai sem `CHEIA`,
+com o `rolar` que o aviso indica); recorte em pedaços de 1500px
 para olhar peça por peça, porque a página inteira reduzida esconde defeito.
 
 ## 3. Como montar a tela
