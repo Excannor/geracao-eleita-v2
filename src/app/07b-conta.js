@@ -100,7 +100,9 @@
       if (!certo) return;
       await fetch('api/sair', { method: 'POST' }).catch(() => {});
       CC.zerarLocal();
-      location.reload();
+      // Sem o #/config: quem entra de novo (ou outra pessoa no mesmo aparelho) começa pela
+      // trilha, e não nas Configurações de onde a outra saiu.
+      location.replace('./');
     });
   };
 

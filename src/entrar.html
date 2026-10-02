@@ -357,7 +357,7 @@
       <div data-passo="1">
         <h1>Quem é você?</h1>
         <div class="campo" style="margin-top:16px"><label for="nome">Como você quer que a gente te chame?</label>
-          <input id="nome" name="name" autocomplete="given-name" maxlength="20" required>
+          <input id="nome" name="name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="20" required>
           <span class="ajuda">Até 20 letras. É assim que seus amigos veem você.</span></div>
         <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
           <input id="nascimento" name="bday" type="date" autocomplete="bday" required>
@@ -373,16 +373,16 @@
       <div data-passo="2" hidden>
         <h1>Seu e-mail</h1>
         <div class="campo" style="margin-top:16px"><label for="email">E-mail</label>
-          <input id="email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" required>
           <span class="ajuda">Fica guardado e nunca aparece para ninguém. Com ele você também entra em outro aparelho.</span></div>
       </div>
       <div data-passo="3" hidden>
         <h1>Crie seu acesso</h1>
         <div class="campo" style="margin-top:16px"><label for="usuario">Escolha um @usuário</label>
-          <input id="usuario" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" required>
+          <input id="usuario" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" maxlength="30" required>
           <span class="ajuda">Letras minúsculas, números, ponto, hífen e sublinhado. É por ele que um amigo te encontra.</span></div>
         <div class="campo" style="margin-top:16px"><label for="senha-nova">Crie uma senha</label>
-          <div class="senha"><input id="senha-nova" name="new-password" type="password" autocomplete="new-password" required>
+          <div class="senha"><input id="senha-nova" name="new-password" type="password" autocomplete="new-password" enterkeyhint="done" minlength="8" required>
             <button type="button" class="mostrar" data-mostrar="senha-nova" aria-pressed="false">Mostrar</button></div>
           <span class="ajuda">Oito caracteres ou mais.</span></div>
         <label class="consentimento" style="margin-top:16px" for="consentimento-cadastro">
@@ -403,6 +403,8 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
+  // Onde a mensagem de erro do cadastro mora quando não é de um campo: logo acima do botão.
+  var lugarDoErro = $('erro-cadastro').nextElementSibling;
   try { var t = localStorage.getItem('cc.tema'); if (t !== null) document.documentElement.dataset.tema = JSON.parse(t) ? 'escuro' : 'claro'; } catch (e) {}
 
   var params = new URLSearchParams(location.search);
@@ -468,16 +470,39 @@
     $('passo-rotulo').textContent = 'Passo ' + n + ' de 3';
     $('botao-cadastro').textContent = n === 3 ? 'Criar minha conta' : 'Continuar';
     $('erro-cadastro').textContent = '';
+    lugarDoErro.before($('erro-cadastro'));
     var primeiro = document.querySelector('[data-passo="' + n + '"] input');
     if (primeiro) primeiro.focus();
   }
   $('voltar-cadastro').addEventListener('click', function () { if (passo > 1) irPasso(passo - 1); else mostrarTela('boas'); });
 
+  // A mensagem de erro vai para logo abaixo do campo que precisa de conserto: no celular, o
+  // teclado aberto cobria a metade de baixo da tela, e a mensagem, que ficava junto do botão,
+  // não aparecia (02/10, cadastro no Android). Sem campo, volta para o lugar dela, acima do botão.
   function erro(campo, texto) {
-    $('erro-cadastro').textContent = texto;
-    if (campo) { campo.setAttribute('aria-invalid', 'true'); campo.focus(); }
+    var p = $('erro-cadastro');
+    var caixa = campo && campo.closest('.campo, .consentimento');
+    if (caixa) caixa.after(p); else lugarDoErro.before(p);
+    p.textContent = texto;
+    if (campo) {
+      campo.setAttribute('aria-invalid', 'true');
+      campo.setAttribute('aria-describedby', 'erro-cadastro');
+      campo.focus();
+    }
+    // O foco rola até o campo; a mensagem, logo abaixo dele, vem junto.
+    try { p.scrollIntoView({ block: 'nearest' }); } catch (e) { /* segue */ }
     return false;
   }
+  // Ao corrigir, o campo deixa de ser marcado como errado na hora (antes, ficava vermelho até o
+  // próximo "Continuar").
+  document.querySelectorAll('#form-cadastro input').forEach(function (i) {
+    i.addEventListener(i.type === 'checkbox' ? 'change' : 'input', function () {
+      if (i.getAttribute('aria-invalid') !== 'true') return;
+      i.removeAttribute('aria-invalid');
+      i.removeAttribute('aria-describedby');
+      $('erro-cadastro').textContent = '';
+    });
+  });
   // Mesma conta de idade do servidor (contas.mjs: somaAnos/idadeMinimaOk): soma anos à data
   // de hoje mantendo mês e dia, e joga 29 de fevereiro para 28 num ano sem esse dia.
   function somaAnos(texto, n) {
@@ -489,7 +514,7 @@
     return novoAno + '-' + String(mes).padStart(2, '0') + '-' + dia;
   }
   function validar(n) {
-    document.querySelectorAll('#form-cadastro input').forEach(function (i) { i.removeAttribute('aria-invalid'); });
+    document.querySelectorAll('#form-cadastro input').forEach(function (i) { i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); });
     if (n === 1) {
       if (!$('nome').value.trim()) return erro($('nome'), 'Diga como quer que a gente te chame.');
       var d = $('nascimento').value;
@@ -550,8 +575,13 @@
         var msg = d.erro || 'Não consegui criar a conta.';
         msg = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
         if (/e-mail/.test(msg)) { irPasso(2); erro($('email'), msg); }
-        else if (/nascimento|chamado|12 anos/.test(msg)) { irPasso(1); erro(null, msg); }
+        else if (/nascimento/.test(msg)) { irPasso(1); erro($('nascimento'), msg); }
+        else if (/12 anos/.test(msg)) { irPasso(1); erro($('nascimento'), msg); }
+        else if (/chamado/.test(msg)) { irPasso(1); erro($('nome'), msg); }
         else if (/concordar/.test(msg)) { irPasso(3); erro($('consentimento-cadastro'), msg); }
+        // "Esse @ já existe" e as regras do @: a mensagem vai para o campo do @, que fica marcado.
+        else if (/@/.test(msg)) { irPasso(3); erro($('usuario'), msg); }
+        else if (/senha/.test(msg)) { irPasso(3); erro($('senha-nova'), msg); }
         else { erro(null, msg); }
       });
     }).catch(function () {

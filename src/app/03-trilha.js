@@ -506,6 +506,14 @@
   CC.rolarAteAtual = function (suave) {
     const alvo = document.querySelector('.no.atual');
     if (!alvo) return;
+    // Ao abrir, o dia de hoje que já aparece inteiro acima da barra fica onde está: centralizar
+    // o dia 1 da conta nova escondia a saudação e cortava os cartões do alto no meio (02/10,
+    // cadastro no Android a 360x800). A seta (suave) continua sempre centralizando.
+    if (!suave) {
+      const r = alvo.getBoundingClientRect();
+      const barra = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alt-barra')) || 0;
+      if (r.top >= 0 && r.bottom + 40 <= innerHeight - barra) return;
+    }
     alvo.scrollIntoView({ block: 'center', behavior: suave ? 'smooth' : 'auto' });
   };
 
