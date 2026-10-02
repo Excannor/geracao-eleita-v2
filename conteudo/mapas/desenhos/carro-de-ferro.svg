@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- carro de ferro (Jz 1.19): Judá não expulsa os moradores do vale, "pois estes tinham carros
+     de ferro". Carro de guerra de lado: a caixa aberta atrás e alta na frente, a roda grande de
+     oito raios na frente dela e a lança que sai até a canga. O chão vai antes de tudo, e a roda
+     encosta nele (centro a 21 do chão). -->
+<path class="k" d="M8 98h104"/>
+<path class="k s" d="M20 78V58c12 4 28 2 40-5 9-5 15-12 18-22 9 14 11 32 5 47z"/>
+<path class="h" d="M30 62v14M40 62v14M50 60v16M60 57v19M70 50v26"/>
+<path class="k" d="M83 72c10-1 18-5 25-12M103 53l9 14"/>
+<circle class="k p" cx="44" cy="78" r="20"/>
+<circle class="k" cx="44" cy="78" r="16"/>
+<path class="k" d="M48.6 79.9L58.8 84.1M45.9 82.6L50.1 92.8M42.1 82.6L37.9 92.8M39.4 79.9L29.2 84.1M39.4 76.1L29.2 71.9M42.1 73.4L37.9 63.2M45.9 73.4L50.1 63.2M48.6 76.1L58.8 71.9"/>
+<circle class="k e" cx="44" cy="78" r="5"/>
+</svg>

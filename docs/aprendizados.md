@@ -523,6 +523,63 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   Na tela, a curiosidade de Dã terminava em "para Dã." (palavra de duas letras antes da referência,
   que a 360px pode cair sozinha na linha) → ganhou o fim do versículo, "em homenagem ao pai deles".
 
+- 2026-10-02 · conteúdo · Juízes, na releitura com o `rever-mapa` (checador já verde): "Mica faz um ídolo"
+  (Jz 17.4: a mãe entrega a prata ao fabricante, que faz a imagem); "os líderes destroem" uma cidade com
+  a ref 21.7-12 (a palavra "líderes" é de 21.16); "Quando os amonitas atacam" com a ref 11.5-7 (o ataque
+  é 11.4); "Josué morre" no presente em Jz 2.7-10, que volta atrás (o livro abriu com Josué já morto, 1.1)
+  → quem faz é quem o versículo diz, também quando há um intermediário (a mãe, o fabricante); relato
+  retrospectivo vai no passado em livro histórico também, não só nos evangelhos (regra na skill).
+- 2026-10-02 · estilo · Juízes: nome próprio com hífen aparece em todo capítulo de livro histórico
+  (Adoni-Bezeque, Cusã-Risataim, Baal-Berite, Jabes-Gileade, En-Hacoré, Havote-Jair, e o "poste-ídolo")
+  e quebra a linha como pronome com hífen → escreve-se sem o nome ("um rei encontrado em Bezeque", "um rei
+  da Mesopotâmia", "uma cidade que faltou à assembleia", "tiradas de um templo") ou com outra palavra da
+  NBV do mesmo trecho ("o ídolo que ficava ao lado", Jz 6.28) (regra na skill).
+- 2026-10-02 · conteúdo · Juízes: o NT quase não cita Juízes. A ligação com Jesus veio dos resumos que
+  nomeiam a época ou os juízes: At 13.20-23 (juízes, rei, Davi, "o Salvador Jesus") e Hb 11.32-34, 39 com
+  Hb 12.2 (Gideão, Baraque, Sansão e Jefté na lista da fé, e o "olhar firme em Jesus"). Antes de escrever,
+  dividi esses versículos sem repetir nenhum: "Juízes e Cristo" com At 13.21-23 sobre Jz 21.25, um par com
+  At 13.20, dois pares com Hb 11.33 e 11.34 e o destaque `jesus` com Hb 11.32, 11.39 e 12.2 → em livro que
+  o NT quase não cita, procurar os resumos do NT (discursos de Atos, Hb 11) e repartir os versículos
+  entre cristo, pares e destaque na tabela dos versículos-chave (regra na skill).
+- 2026-10-02 · desenho · Juízes: o carro de ferro saiu pequeno, de caixa baixa e roda miúda, e lia como
+  carrinho de mão; com a frente alta e curva, a roda grande de oito raios na frente da caixa e a lança até
+  a canga, virou carro de guerra. A coluna do templo inclinada girava pelo meio da base e afundava 1 unidade
+  no chão; a viga partida em duas metades sálvia dava duas áreas sálvia; a amarra do saco de prata passava
+  do pescoço nas duas pontas (dois tocos a 520px) → peça inclinada gira sobre o canto em que se apoia (o
+  outro canto levanta); peça partida conta como duas áreas; amarra termina no contorno (regra na skill).
+- 2026-10-02 · tela · Juízes: palavra de uma letra sozinha no fim de uma linha no meio do item ("?” O /
+  povo") muda de lugar com a largura: corrigida a 360px, outra apareceu a 390px → só se persegue no fim do
+  item, antes da referência (a regra que já existe); no meio do item é quebra natural.
+- 2026-10-02 · captura · Juízes: o `semear.mjs` deixou de novo `cookie-marcos.txt` com "cc_sessao=" vazio.
+  Causa provável: um pedido seguinte com o crachá já invalidado recebe do servidor "cc_sessao=; Max-Age=0"
+  (`limparCookie`, servidor.mjs, no pedido sem sessão) e o semear grava esse valor vazio por cima
+  (`sc.split(';')[0]`) → o semear devia guardar só cookie com valor (melhoria para quem mexer nele); até
+  lá, conferir o arquivo e, se vazio, `POST api/entrar` e gravar o `cc_sessao` da resposta.
+- 2026-10-02 · captura · Juízes, com 18 curiosidades, tem 11.700px a 390px e 12.500px a 360px: a captura de
+  360px passa do teto de 12.000px do `foto-conta` e o fim sai com `rolar` (o aviso já diz o valor) →
+  livro com muitas curiosidades: contar com a segunda captura a 360px.
+- 2026-10-02 · conteúdo · Juízes, revisão adversarial (o checador e o `rever-mapa` do escritor já verdes):
+  nome próprio fora da referência em três itens ("Os homens de Judá" em Jz 15.13-15, que está em 15.11-12;
+  "Gaza" em 16.2-3, que está em 16.1; "os homens de Dã" e "o levita" em 18.17-20, que estão em 18.15-16),
+  "jovem levita" com a ref 17.10, 13 (o "jovem" é de 17.7 e 17.12), "homens da cidade" em 19.22 (a NBV diz
+  "alguns homens, filhos de Belial"), "encharcada" para a lã (o texto diz "molhada"), "Paulo" com At
+  13.20-23 (o nome está em 13.16), e dois marcos que faltavam: Siquém proclama Abimeleque rei (9.6), sem o que
+  o ramo "O rei e o voto" não tinha rei, e Jefté cumpre o voto (11.39) → o revisor relê cada nome próprio
+  e cada adjetivo contra o texto da ref na folha do `rever-mapa`, não só os verbos; e confere, ramo a ramo,
+  se o fato que dá nome ao ramo está em algum galho.
+- 2026-10-02 · estilo · Juízes: a tela escreve a nota do par depois de "Hebreus 11.33:" e "Atos 13.20:", e as
+  notas diziam "Hebreus diz que..." e "Atos resume..." (na tela, "Hebreus 11.33: Hebreus diz que..."). A
+  terceira nota começava com "e algumas delas", pendurada na anterior → a nota do par não repete o nome do
+  livro do NT e fica de pé sozinha (regra na skill). Josué tem a mesma repetição ("Hebreus 13.5-6: Hebreus
+  repete a promessa"), a corrigir no próximo pacote de Josué.
+- 2026-10-02 · estilo · Juízes: palavra repetida na mesma frase passou no escritor ("Jael pega uma estaca e um
+  martelo e crava a estaca"; "Ele manda o ajudante de armas acabar com ele") e "e" encadeado três vezes
+  ("perde os polegares... e reconhece"; "com os batentes e a tranca e leva") → ler em voz alta pega o que o
+  grep não pega; a releitura em voz alta continua obrigatória na revisão.
+- 2026-10-02 · captura · Juízes: o arquivo de cookie gravado a partir do `curl -i` do `api/entrar` saiu com
+  duas linhas (`cc_sessao` e `cc_logado`), e o `foto-conta` capturou a página de entrada sem avisar → grave
+  só a primeira linha (`head -1 | tr -d '\n'`) e confira a primeira captura antes de seguir.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de

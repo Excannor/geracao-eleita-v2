@@ -1,4 +1,4 @@
 {
   "nota": "Os mapas que vão ao ar, pelo slug do arquivo (conteudo/mapas/<slug>.json). Um mapa escrito mas ainda não revisado por alguém da igreja fica fora desta lista: o build só publica o que está aqui, e o Explorar mostra os outros 65 como 'em breve'.",
-  "publicados": ["genesis", "exodo", "levitico", "numeros", "deuteronomio", "josue", "isaias", "mateus", "marcos", "lucas"]
+  "publicados": ["genesis", "exodo", "levitico", "numeros", "deuteronomio", "josue", "juizes", "isaias", "mateus", "marcos", "lucas"]
 }

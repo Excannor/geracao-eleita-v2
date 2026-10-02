@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- saco de prata (Jz 17.2-4, 10): a prata da mãe de Mica, que vira ídolo, e o salário do
+     levita, "cento e vinte gramas de prata por ano". O saco amarrado no pescoço, apoiado no
+     chão, e duas moedas empilhadas na frente dele. -->
+<path class="k" d="M14 108h92"/>
+<path class="k s" d="M46 52c-16 8-20 34-14 46 2 5 6 9 12 10h32c6-1 10-5 12-10 6-12 2-38-14-46z"/>
+<path class="k p" d="M48 52c-4-6-8-14-4-20 4 2 8 1 10-3 3 3 7 3 10 0 2 4 6 5 10 3 4 6 0 14-4 20z"/>
+<path class="k" d="M47 51c9 4 17 4 26 0"/>
+<path class="k" d="M58 54c-6 6-8 12-6 18M62 54c4 5 8 8 12 8"/>
+<path class="h" d="M40 74c-1 8 0 16 4 22M80 70c2 6 2 12 0 18"/>
+<path class="k p" d="M70 99v4a13 4.5 0 0 0 26 0v-4z"/>
+<ellipse class="k p" cx="83" cy="99" rx="13" ry="4.5"/>
+<path class="k p" d="M72 92v4a12 4 0 0 0 24 0v-4z"/>
+<ellipse class="k p" cx="84" cy="92" rx="12" ry="4"/>
+<path class="h" d="M78 91l6-1M76 99l5-1"/>
+</svg>

@@ -1,0 +1,171 @@
+{
+  "nome": "Juízes",
+  "grupo": "Históricos",
+  "numero": 7,
+  "capitulos": 21,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "שֹׁפְטִים",
+    "transliteracao": "Shofetim",
+    "traducao": "juízes",
+    "texto": "O livro leva o nome dos líderes que o Senhor levanta para o povo. A palavra fala de quem julga e governa, mas aqui o juiz é, antes de tudo, quem livra Israel dos inimigos."
+  },
+  "autoria": {
+    "texto": "O livro não diz quem o escreveu, mas o narrador deixa pistas do próprio tempo. Os jebuseus vivem em Jerusalém “até a data em que este livro foi escrito”, e a família sacerdotal de Dã serve “até a data em que foram levados para o cativeiro”.",
+    "apoio": "E ele fala daquela época como de um tempo que já passou: “Como já foi dito, Israel não tinha rei naquela época.”",
+    "refs": ["Jz 1.21", "Jz 18.1", "Jz 18.30"],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Israel abandona o Senhor e é entregue nas mãos de saqueadores. Quando o povo geme, o Senhor tem compaixão e coloca um juiz, que o livra dos inimigos “enquanto esse juiz vivia”. Morto o juiz, tudo recomeça, e pior: o texto diz que o povo “se corrompia ainda mais do que os seus pais”.",
+    "refs": ["Jz 2.12-14", "Jz 2.18-19"]
+  },
+  "ramos": [
+    {
+      "titulo": "Não expulsaram",
+      "sub": "Tribos param e o ciclo começa",
+      "desenho": "carro-de-ferro",
+      "galhos": [
+        { "texto": "Depois da morte de Josué, os israelitas perguntam ao Senhor qual tribo deve ir primeiro contra os cananeus. A resposta: “Judá será o primeiro. Já entreguei a terra em suas mãos”.", "ref": "Jz 1.1-2" },
+        { "texto": "Com o Senhor ao lado, Judá elimina os povos das montanhas, mas não expulsa os moradores do vale, que “tinham carros de ferro”. Manassés, Efraim, Zebulom, Aser e Naftali deixam cananeus no meio deles, e Dã é forçada pelos amorreus a ficar nas montanhas.", "ref": "Jz 1.19, 27-34" },
+        { "texto": "Em Boquim, o anjo do Senhor cobra a aliança: “Ordenei que destruíssem os seus altares. Por que vocês não obedeceram?” Em alta voz, o povo chora, e daí vem o nome do lugar.", "ref": "Jz 2.1-5" },
+        { "texto": "Durante a vida de Josué e dos anciãos que viram os milagres, o povo tinha sido fiel. Josué morreu aos cento e dez anos e, quando toda aquela geração se foi, surgiu “uma outra geração, que não conhecia o Senhor e o que ele havia feito a Israel”.", "ref": "Jz 2.7-10" },
+        { "texto": "Irado, Deus avisa que não vai expulsar as nações que Josué deixou: elas vão servir para “colocar o meu povo à prova, para ver se vai obedecer ao Senhor”.", "ref": "Jz 2.20-22" }
+      ],
+      "conexao": "Os israelitas se casam com os povos da terra e passam a servir aos deuses deles (Jz 3.6)."
+    },
+    {
+      "titulo": "Espada e estaca",
+      "sub": "Otoniel, Eúde, Débora e Jael",
+      "desenho": "tenda-e-estrelas",
+      "galhos": [
+        { "texto": "Um rei da Mesopotâmia domina Israel por oito anos. Quando o povo pede socorro, o Senhor manda Otoniel, sobrinho de Calebe, e a terra fica em paz quarenta anos, até a morte dele.", "ref": "Jz 3.8-9, 11" },
+        { "texto": "Depois de dezoito anos sob Eglom, rei de Moabe, Israel clama, e o Senhor dá um libertador canhoto: Eúde, filho do benjamita Gera. Ele faz uma espada de dois gumes e a prende do lado direito da coxa, debaixo da roupa.", "ref": "Jz 3.14-16" },
+        { "texto": "“A mensagem que trago é da parte do Senhor”, diz Eúde ao rei. Com a mão esquerda, crava a espada no ventre dele, tranca as portas e foge. Os criados, cansados de esperar, abrem a sala com uma chave e veem o seu senhor estendido no chão.", "ref": "Jz 3.20-21, 23, 25" },
+        { "texto": "Débora, profetisa, julga Israel sentada debaixo de uma palmeira, e o povo a procura para resolver as suas questões. Ela manda chamar Baraque com uma ordem do Senhor: reunir dez mil homens e ir com eles ao monte Tabor.", "ref": "Jz 4.4-6" },
+        { "texto": "“Eu só vou se você for comigo”, responde Baraque. Débora vai, mas avisa que a honra de vencer não será dele: “o Senhor entregará Sísera nas mãos de uma mulher”.", "ref": "Jz 4.8-9" },
+        { "texto": "Derrotado, Sísera foge a pé para a tenda de Jael. Pede água, ela lhe dá leite e o cobre. Enquanto ele dorme, Jael pega uma estaca e um martelo e a crava nas têmporas dele.", "ref": "Jz 4.15, 17, 19, 21" }
+      ],
+      "conexao": "Débora e Baraque cantam a vitória (Jz 5.1), mas o povo volta a pecar, e vem o domínio de Midiã (Jz 6.1)."
+    },
+    {
+      "titulo": "Os trezentos",
+      "sub": "Gideão, a lã e as tochas",
+      "desenho": "vaso-com-tocha",
+      "galhos": [
+        { "texto": "Gideão malha trigo no lagar, para esconder o grão dos midianitas, quando o Anjo do Senhor aparece: “Homem valente, o Senhor está com você!” Ele responde que, na família, é “o mais insignificante!”", "ref": "Jz 6.11-12, 15" },
+        { "texto": "De noite, com dez criados, Gideão derruba o altar de Baal e corta o ídolo que ficava ao lado. A cidade exige a morte dele, mas Joás pergunta: “Será que o deus Baal precisa ser salvo?” Daí em diante, Gideão passa a ser chamado de Jerubaal.", "ref": "Jz 6.27-32" },
+        { "texto": "Para ter certeza, Gideão deixa lã no pátio: ela amanhece molhada, com a terra seca em volta, e ele espreme dela uma tigela de orvalho. Na noite seguinte, pede o contrário, e Deus faz: só a lã fica seca.", "ref": "Jz 6.37-40" },
+        { "texto": "“Você está com gente demais”, diz o Senhor, para que Israel não se orgulhe de vencer sozinho. Vão embora vinte e dois mil medrosos, e dos dez mil ficam só os trezentos que bebem água levando as mãos à boca.", "ref": "Jz 7.2-3, 6-7" },
+        { "texto": "Cada soldado recebe uma corneta e um vaso de barro com uma tocha dentro. No meio da noite, tocam as cornetas, quebram os vasos e gritam: “À espada pelo Senhor e por Gideão!”", "ref": "Jz 7.16, 19-20" },
+        { "texto": "Gideão não aceita reinar: “O Senhor será o nosso Rei!” Mas pede as argolas de ouro tomadas dos inimigos e manda fazer um manto sacerdotal. Todo o Israel passa a adorar o manto, que vira “uma armadilha e tentação para Gideão e para sua família”.", "ref": "Jz 8.23-24, 27" }
+      ],
+      "conexao": "Gideão morre em idade bem avançada, e logo o povo volta a adorar os baalins (Jz 8.32-33)."
+    },
+    {
+      "titulo": "O rei e o voto",
+      "sub": "Abimeleque, Jotão e Jefté",
+      "desenho": "tamborim",
+      "galhos": [
+        { "texto": "Com setenta peças de prata tiradas de um templo, Abimeleque contrata homens sem caráter e vadios, vai à casa do pai em Ofra e mata todos os irmãos sobre uma rocha. Só o mais novo, Jotão, escapa, e Siquém proclama Abimeleque rei.", "ref": "Jz 9.4-6" },
+        { "texto": "Do alto do monte Gerizim, Jotão grita uma história: a oliveira, a figueira e a videira recusam reinar sobre as árvores, e o espinheiro responde: “venham procurar abrigo debaixo da minha sombra! Se não, saia fogo de mim e queime os grandes cedros do Líbano!”", "ref": "Jz 9.7-15" },
+        { "texto": "Em Tebes, uma mulher joga do terraço da torre uma pedra de moinho e quebra o crânio de Abimeleque. Ele ordena ao ajudante de armas que o mate, para ninguém dizer que morreu pelas mãos de uma mulher. Assim se cumpre a maldição de Jotão.", "ref": "Jz 9.50-54, 57" },
+        { "texto": "Quando os israelitas clamam, o Senhor responde: “Vão pedir socorro aos deuses que escolheram!” O povo insiste, destrói os deuses estrangeiros e serve somente ao Senhor, que “já não pôde mais conter a sua compaixão por causa da angústia de Israel!”", "ref": "Jz 10.10, 14-16" },
+        { "texto": "Filho de uma prostituta, Jefté foi expulso de casa pelos irmãos. Quando os amonitas atacam, os oficiais de Gileade vão chamar o guerreiro em Tobe, e ele pergunta: “Por que me chamam agora que estão em dificuldades?”", "ref": "Jz 11.1-2, 4-7" },
+        { "texto": "Jefté faz um voto: se o Senhor ajudar Israel a vencer, o primeiro que sair de casa ao seu encontro será oferecido em sacrifício. Na volta, quem corre até ele é a filha única, tocando pandeiro. “Fiz um voto ao Senhor, e não posso voltar atrás!”", "ref": "Jz 11.30-31, 34-35" }
+      ],
+      "conexao": "O povo torna a pecar, e os filisteus dominam Israel por quarenta anos (Jz 13.1)."
+    },
+    {
+      "titulo": "Nazireu de Deus",
+      "sub": "Sansão, do leão ao templo",
+      "desenho": "duas-colunas",
+      "galhos": [
+        { "texto": "O Anjo do Senhor aparece à mulher estéril de Manoá: ela terá um filho, cujo cabelo “nunca poderá ser cortado, porque ele será nazireu”, e que vai iniciar a libertação de Israel do domínio dos filisteus.", "ref": "Jz 13.2-5" },
+        { "texto": "Manoá pergunta o nome do visitante, que responde: “Meu nome é maravilhoso”. Quando as chamas do altar vão para o céu, o Anjo do Senhor sobe nelas. O menino nasce e recebe o nome de Sansão.", "ref": "Jz 13.17-18, 20, 24" },
+        { "texto": "A caminho de Timna, o Espírito do Senhor toma posse de Sansão, e ele rasga um leão com as próprias mãos. Mais tarde, acha abelhas e mel no cadáver do animal e faz disso uma charada: “Do comedor saiu comida, e do forte saiu doçura”.", "ref": "Jz 14.5-6, 8, 14" },
+        { "texto": "Os homens de Judá entregam Sansão aos filisteus, amarrado com duas cordas novas. Em Leí, ele arrebenta as amarras “como se fossem barbantes de linho chamuscados!” e mata mil inimigos com uma queixada de jumento.", "ref": "Jz 15.12-15" },
+        { "texto": "Dalila insiste até ele contar: “Meu cabelo nunca foi cortado”. Ela faz Sansão dormir nos joelhos dela e manda cortar o cabelo. Ele acorda achando que vai se soltar como das outras vezes, mas “não percebeu que o Senhor já não estava com ele”.", "ref": "Jz 16.16-17, 19-20" },
+        { "texto": "No templo cheio de filisteus, Sansão ora: “só mais esta vez me dê força”. Empurra as duas colunas, o prédio cai, e ele mata “mais gente quando morreu do que durante todo o tempo em que viveu!”", "ref": "Jz 16.27-30" }
+      ],
+      "jesus": {
+        "texto": "Hebreus põe Gideão, Baraque, Sansão e Jefté na lista da fé, mas diz que nenhum deles recebeu o que Deus havia prometido. Depois, pede: “Mantenham o olhar firme em Jesus, autor e consumador da nossa fé.”",
+        "refs": ["Hb 11.32", "Hb 11.39", "Hb 12.2"]
+      },
+      "conexao": "Sem rei em Israel, “cada um fazia o que queria, agindo de acordo com o que achava certo” (Jz 17.6)."
+    },
+    {
+      "titulo": "Sem rei",
+      "sub": "Mica, Dã, Gibeá e Benjamim",
+      "desenho": "saco-de-prata",
+      "galhos": [
+        { "texto": "A mãe de Mica entrega prata a um fabricante, que faz uma imagem e um ídolo para a casa do filho. Mica contrata um levita como sacerdote e comemora: “Agora tenho certeza de que o Senhor vai abençoar a minha vida”.", "ref": "Jz 17.4, 10, 13" },
+        { "texto": "Os homens de Dã levam os ídolos de Mica e fazem uma oferta ao levita: “Ser sacerdote de uma tribo inteira de Israel não é melhor do que ser sacerdote de um homem?” Ele aceita, contente, e Mica protesta: “Vocês fogem, levando os deuses que eu mesmo fiz e o meu sacerdote!”", "ref": "Jz 18.15-20, 24" },
+        { "texto": "Em Gibeá, de Benjamim, ninguém hospeda um levita que viaja com a mulher, até que um homem idoso os leva para casa. Durante a refeição, alguns homens cercam a casa, e a mulher é entregue a eles, que abusam dela até o amanhecer.", "ref": "Jz 19.14-15, 20-22, 25-26" },
+        { "texto": "O levita leva o corpo dela para casa, corta em doze partes e manda uma para cada tribo. Todos os que veem reagem: “Nunca se viu coisa tão horrível, desde que Israel saiu do Egito!”", "ref": "Jz 19.28-30" },
+        { "texto": "Benjamim não entrega os culpados e vence duas batalhas, mas no terceiro dia é derrotado. Seiscentos homens escapam para a rocha de Rimom.", "ref": "Jz 20.13, 21, 25, 30, 35, 47" },
+        { "texto": "Em Betel, o povo chora: “Por que agora ficamos sem uma das tribos em Israel?” Presos ao juramento, mandam destruir uma cidade que faltou à assembleia, poupam quatrocentas virgens e orientam os homens de Benjamim a raptar jovens na festa de Siló.", "ref": "Jz 21.2-3, 7-12, 19-21, 23" }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "O livro termina assim: “Naquele tempo não havia rei em Israel. Cada um fazia o que achava que estava certo.” Atos conta o que veio depois: o povo pediu um rei, e Deus deu Saul e, em seguida, Davi (At 13.21-22). Da descendência de Davi, Deus trouxe a Israel o Salvador, Jesus, como tinha prometido (At 13.23).",
+    "ref": "Jz 21.25",
+    "desenho": "tronco-que-brota",
+    "pares": [
+      {
+        "at": "Jz 2.16",
+        "texto": "Então o Senhor levantou juízes que livraram Israel dos inimigos que os atacavam.",
+        "nt": "At 13.20",
+        "nota": "Deus deu juízes ao povo até o tempo do profeta Samuel"
+      },
+      {
+        "at": "Jz 4.14",
+        "texto": "Então Baraque e os dez mil soldados de Israel desceram do monte Tabor para a batalha.",
+        "nt": "Hb 11.33",
+        "nota": "pela fé, os que creram ganharam batalhas"
+      },
+      {
+        "at": "Jz 7.21",
+        "texto": "Todos os midianitas fugiam correndo e gritando.",
+        "nt": "Hb 11.34",
+        "nota": "alguns deles fizeram exércitos inteiros recuar e fugir"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Tribos que não expulsaram e o ciclo dos juízes", "de": 1, "ate": 2 },
+    { "titulo": "Otoniel, Eúde e Sangar", "de": 3, "ate": 3 },
+    { "titulo": "Débora, Baraque e Jael", "de": 4, "ate": 5 },
+    { "titulo": "Gideão e os midianitas", "de": 6, "ate": 8 },
+    { "titulo": "Abimeleque, Tola, Jair e o clamor do povo", "de": 9, "ate": 10 },
+    { "titulo": "Jefté e os juízes depois dele", "de": 11, "ate": 12 },
+    { "titulo": "Sansão e os filisteus", "de": 13, "ate": 16 },
+    { "titulo": "Mica e a tribo de Dã", "de": 17, "ate": 18 },
+    { "titulo": "Gibeá e a guerra contra Benjamim", "de": 19, "ate": 21 }
+  ],
+  "curiosidades": [
+    { "texto": "Um rei encontrado em Bezeque foge, mas é preso e perde os polegares das mãos e dos pés. Ele tinha feito o mesmo com setenta reis e reconhece: “Agora Deus me fez pagar pelo que fiz!”", "ref": "Jz 1.5-7" },
+    { "texto": "Em Betel, um homem mostra aos espias a entrada da cidade e é poupado com a família. Ele vai embora e funda outra cidade com o nome antigo de Betel, Luz, “que é o nome dela até hoje”.", "ref": "Jz 1.23-26" },
+    { "texto": "Depois de Eúde, que deixa a terra em paz por oitenta anos, vem Sangar, filho de Anate: ele mata seiscentos filisteus com um ferrão de tocar bois.", "ref": "Jz 3.30-31" },
+    { "texto": "No cântico de Débora, a luta não fica só no chão: “As estrelas do céu lá nas suas órbitas lutaram contra Sísera!”", "ref": "Jz 5.20" },
+    { "texto": "Atrás da grade da janela, a mãe de Sísera pergunta: “Por que demora o carro dele?” As damas de companhia respondem que os homens dele devem estar repartindo despojos.", "ref": "Jz 5.28-30" },
+    { "texto": "Com a vara que trazia, o Anjo do Senhor toca a carne e os bolos, e da rocha sobe fogo que consome tudo. Gideão constrói ali um altar chamado “O Senhor é paz”, que ainda está em Ofra.", "ref": "Jz 6.21, 24" },
+    { "texto": "Um homem do acampamento inimigo sonha com um pão de cevada que rola até a tenda do comandante e a derruba. O companheiro explica: “É a espada de Gideão que vem sobre nós”.", "ref": "Jz 7.13-14" },
+    { "texto": "Tola julga Israel vinte e três anos. Depois dele, Jair, de Gileade, “tinha trinta filhos, que costumavam montar trinta jumentos, e que possuíam trinta cidades”.", "ref": "Jz 10.1-4" },
+    { "texto": "A filha de Jefté passa dois meses nos montes com as amigas, chorando porque nunca vai casar. Quando ela volta, o pai cumpre o voto, e daí nasce um costume: todo ano, as moças de Israel saem por quatro dias para celebrar a memória dela.", "ref": "Jz 11.37-40" },
+    { "texto": "Para achar os fugitivos de Efraim, os guardas de Gileade mandam dizer “Chibolete”. Quem fala “Sibolete” é preso e morto.", "ref": "Jz 12.5-6" },
+    { "texto": "Jefté julga Israel seis anos e é enterrado em Gileade. Depois vêm Ibsã, com trinta filhos e o mesmo número de filhas, Elom, que julga dez anos, e Abdom, cujos quarenta filhos e trinta netos montavam setenta jumentos.", "ref": "Jz 12.7-14" },
+    { "texto": "Sansão amarra trezentas raposas pelas caudas, aos pares, prende uma tocha em cada par e as solta nas lavouras dos filisteus.", "ref": "Jz 15.4-5" },
+    { "texto": "Morrendo de sede depois da batalha, Sansão clama a Deus, e o Senhor faz brotar água de um buraco em Leí. A fonte ganha um nome e, diz o texto, “ela existe ainda”.", "ref": "Jz 15.18-19" },
+    { "texto": "Em Gaza, os filisteus esperam o dia clarear para matar Sansão, mas ele sai no meio da noite, arranca as portas da cidade, com os batentes e a tranca, e leva tudo nos ombros até o alto de um monte.", "ref": "Jz 16.1-3" },
+    { "texto": "Cego, preso com correntes de bronze, Sansão move um moinho na prisão. E o cabelo dele começa a crescer de novo.", "ref": "Jz 16.21-22" },
+    { "texto": "Os irmãos buscam o corpo, e Sansão é enterrado entre Zorá e Estaol, no túmulo de Manoá, o pai dele.", "ref": "Jz 16.31" },
+    { "texto": "Laís, cidade de um povo pacífico e tranquilo, é queimada, reconstruída e passa a se chamar Dã, “em homenagem ao pai da tribo, filho de Israel”.", "ref": "Jz 18.27-29" },
+    { "texto": "No exército de Benjamim há setecentos canhotos capazes de atirar com a funda e “acertar com precisão num fio de cabelo!”", "ref": "Jz 20.16" }
+  ],
+  "procure": {
+    "texto": "“O Espírito do Senhor controlou completamente Otoniel.” Essa expressão volta sobre Gideão, sobre Jefté e, quatro vezes, sobre Sansão, com verbos que variam: o Espírito se apodera, se apossa, toma posse, começa a agir. Marque cada uma e veja o que o juiz faz logo depois.",
+    "ref": "Jz 3.10"
+  }
+}

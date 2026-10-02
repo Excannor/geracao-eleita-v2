@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as duas colunas do templo (Jz 16.29-30): Sansão empurra as colunas centrais e o templo
+     cai. A coluna da direita já inclina, girando sobre o canto de baixo (a base não afunda no chão), a viga do alto parte ao meio e pedras caem no vão. -->
+<path class="k" d="M12 100h96"/>
+<rect class="k p" x="24" y="92" width="22" height="8"/>
+<rect class="k p" x="29" y="46" width="12" height="46"/>
+<path class="h" d="M33 50v38M37 50v38"/>
+<rect class="k p" x="25" y="40" width="20" height="6"/>
+<g transform="rotate(6 95 100)">
+<rect class="k p" x="73" y="92" width="22" height="8"/>
+<rect class="k p" x="78" y="46" width="12" height="46"/>
+<path class="h" d="M82 50v38M86 50v38"/>
+<rect class="k p" x="74" y="40" width="20" height="6"/>
+</g>
+<path class="k p" d="M14 30l44 6-2 10-42-6z"/>
+<path class="k p" d="M64 37l44-8v10l-42 8z"/>
+<path class="h" d="M22 36l12 2M44 40l8 1M74 41l10-2M94 37l8-1"/>
+<path class="k p" d="M55 58l7-2 3 6-6 3-5-3z"/>
+<path class="k p" d="M60 76l8-1 2 7-7 2-4-4z"/>
+<path class="h" d="M58 50v4M64 68v4M57 70v4"/>
+</svg>

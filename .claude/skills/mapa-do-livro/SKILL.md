@@ -51,7 +51,9 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    tempo do verbo: promessa ou ordem de Deus se conta como promessa ("Deus promete pôr Moisés
    numa fenda da rocha", Êx 33.22), não como fato que já aconteceu. Promessa com condição leva o
    "se" junto ("Se o povo espalhado confessar o pecado, Deus promete...", Lv 26.40-42), e quem
-   sofre a consequência é quem o versículo diz (em Lv 7.18 perde a oferta quem a apresentou).
+   sofre a consequência é quem o versículo diz (em Lv 7.18 perde a oferta quem a apresentou), e quem
+   faz também, mesmo com intermediário (Jz 17.4: a mãe de Mica entrega a prata ao fabricante, que faz
+   a imagem; "Mica faz um ídolo" estava errado).
    Palavra de lugar, de gênero e de retomada também, inclusive no texto do NT (em Mt 4, só a
    primeira resposta ao Diabo é "no deserto"; as outras são no templo e num monte): "em Jerusalém" quando o versículo ainda é na
    estrada (Mc 11.10), "o salmo" quando o texto só diz "Escrituras", "outro grito" num item que não
@@ -66,7 +68,8 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    Páscoa") se procura nos versículos vizinhos, e a referência se amplia para incluí-lo (Dt 15.12;
    16.2). Lei também nos galhos fica como ordem: "o rei não pode juntar", não "não junta".
 5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
-   sequência; um relato retrospectivo (Mt 14.3-12, a morte de João) se conta no passado. "O livro
+   sequência; um relato retrospectivo (Mt 14.3-12, a morte de João; Jz 2.6-9, a morte de Josué, que o
+   livro já deu em 1.1) se conta no passado. "O livro
    abre com" e "fecha com" só com o primeiro e o último versículo de verdade.
 6. **Marcos completos.** Toda troca de nome, aliança, reencontro, mudança de terra, morte,
    sepultamento e subida aos céus de protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
@@ -94,6 +97,13 @@ profecia que o livro cita (texto da NBV do AT) e em `nt` o trecho do livro que a
 (`Mq 5.2` → `Mt 2.1-6`). O destaque `jesus` vai onde o texto identifica uma figura com Jesus,
 com referência do próprio livro ("O Filho do Homem é o agricultor", Mt 13.37) ou de outro livro
 do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua": "grego"`).
+
+**Livro que o NT quase não cita** (Juízes, 02/10): a ligação vem dos resumos do NT que nomeiam a
+época ou as pessoas do livro, como os discursos de Atos (At 13.20-23: juízes, rei, Davi, "o Salvador
+Jesus") e a lista da fé (Hb 11.32-34, 39, com Hb 12.2). Na tabela dos versículos-chave, esses
+versículos se repartem entre o texto de "[Livro] e Cristo", os pares e o destaque `jesus`, sem
+nenhum repetido; o par diz só o que o versículo do NT diz (Hb 11.34 fala dos que "fizeram exércitos
+inteiros recuar e fugir", sem nomear Gideão).
 
 **Estrutura**
 - **A raiz:** a ideia central em um parágrafo direto (mais uma frase de apoio, se precisar).
@@ -137,7 +147,9 @@ Antes de entregar o texto:
   e tirar da lista só os ids de desenho; em Marcos, "tornou-se" de 1Pe 2.7 escapou dentro de aspas;
   em Deuteronômio, o impessoal "vende-se", "passaram-se" e a citação "levá-los": troca-se por sujeito
   ("o povo pode vender"), outro verbo ou paráfrase; em Lucas, as falas da NBV trazem "lembre-se",
-  "Alegrem-se", "perdoa-lhes", e "meia-noite" vira "no meio da noite");
+  "Alegrem-se", "perdoa-lhes", e "meia-noite" vira "no meio da noite"; nos livros históricos, o nome
+  próprio com hífen (Adoni-Bezeque, Cusã-Risataim, Jabes-Gileade, "poste-ídolo") sai: "um rei
+  encontrado em Bezeque", "um rei da Mesopotâmia", "uma cidade que faltou à assembleia", "o ídolo");
 - nenhum galho termina com palavra de uma ou duas letras antes da referência ("Maria descobriu o
   que é." deixou o "é." sozinho na linha a 360px), nem com citação cortada em reticências logo depois
   dela ("pensa que é...?”": a citação vai até o fim da frase); a palavra curta que abre uma citação
@@ -157,6 +169,13 @@ Antes de entregar o texto:
 - no texto de "[Livro] e Cristo", aspas só para o versículo da `ref` (o checador confere contra
   ela); o Novo Testamento entra em paráfrase com a referência entre parênteses;
 - toda conexão que mudou foi medida de novo (até 150 caracteres; o checador barra).
+- a nota de cada par fica de pé sozinha e não repete o nome do livro do NT: a tela já escreve
+  "Hebreus 11.33:" antes dela ("Hebreus 11.33: Hebreus diz que..." saiu em Juízes); também não começa com
+  "e" pendurado na nota anterior;
+- cada nome próprio, número e adjetivo do item está no texto da própria referência (Juízes: "os homens
+  de Judá" e "Gaza" estavam no versículo anterior; "jovem levita" em outro; "Paulo" em At 13.16, fora da
+  ref), e o fato que dá nome ao ramo está em algum galho ("O rei e o voto" não dizia que Abimeleque foi
+  proclamado rei, Jz 9.6);
 
 ## 2. Como desenhar
 
@@ -218,7 +237,11 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   cavalete em X da manjedoura tem o cruzamento escondido atrás da frente do cocho, sem pontas
   passando por trás do que está dentro (a manjedoura de Lucas).
   Pedra se desenha em polígono de quinas (redonda vira pão ou batata), e o chão sob peças apoiadas
-  vai antes delas no SVG, para o papel delas cobrir a linha (as doze pedras de Josué); lua crescente
+  vai antes delas no SVG, para o papel delas cobrir a linha (as doze pedras de Josué); peça inclinada
+  gira sobre o canto em que se apoia, para não afundar no chão (a coluna do templo de Juízes), e peça
+  partida em duas conta como duas áreas na regra da sálvia (a viga); carro de guerra se lê pela frente
+  alta e curva, a roda grande de raios na frente da caixa e a lança até a canga (baixo e de roda
+  pequena, vira carrinho de mão); lua crescente
   com raio de uns 16 e miolo de 6 ou mais (fina e pequena, vira parêntese); topo de tronco fica
   dentro da copa, sem tampa reta à mostra no vão entre os lobos.
 - papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de
