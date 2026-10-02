@@ -64,7 +64,14 @@
 .retrato-amigo.fez { box-shadow: 0 0 0 2px var(--cartao), 0 0 0 4px var(--salvia-texto) !important; }
 
 /* ---------- Juntos: na folha, a roda de amigos, o convite e a entrada de Propósitos ---------- */
-.roda-amigos { gap: 8px; margin: 4px -30px 0; padding: 4px 30px 8px; }
+/* A faixa rola de lado, e quem rola corta o que passa da caixa também em cima: o anel de "já
+   leu hoje" (5px para fora da foto) saía achatado no alto (foto do dono, 02/10). O respiro de
+   cima passou da margem para dentro (8px), com a foto no mesmo lugar. Nas pontas, um esmaecido
+   de 28px: cai no espaço vazio do começo e do fim, e no meio da rolagem avisa que há mais
+   (antes "Convidar" aparecia cortado na borda, sem pista). */
+.roda-amigos { gap: 8px; margin: 0 -30px; padding: 8px 30px; scroll-padding-inline: 30px;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent); }
 .amigo-roda, .vaga { grid-template-rows: auto auto 1fr; gap: 6px; width: auto; min-width: 64px; }
 .amigo-roda .moldura, .vaga .moldura, .amigo-roda .retrato-amigo { width: 58px; height: 58px; }
 .amigo-roda .retrato-amigo { border: 0; font-size: 1.375rem; }
