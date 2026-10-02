@@ -663,6 +663,19 @@
     } catch (e) { return null; }
   };
 
+  // ---------- sessão ----------
+  // A marca cc_logado (servidor.mjs: acertarMarca) diz, sem rede, se há sessão neste aparelho.
+  // O index.html já confere antes de pintar; isto vale para a página que volta do bfcache e
+  // para a que volta do segundo plano depois que a sessão acabou.
+  CC.semSessao = () => location.protocol.startsWith('http') && !/(?:^|;\s*)cc_logado=1/.test(document.cookie);
+  // Esconde tudo antes de trocar de página: nenhum quadro do app de quem saiu fica na tela
+  // enquanto a página de entrada chega. O hash vai junto: um link para #/mapa/x aberto sem
+  // sessão volta para o mesmo lugar depois de entrar.
+  CC.irParaEntrada = () => {
+    document.documentElement.style.visibility = 'hidden';
+    location.replace('entrar.html' + location.search + location.hash);
+  };
+
   // ---------- partida e sincronização ----------
   CC.carregarLocal = function () {
     E = localLer(CHAVE) || localLer(CHAVE_ANTIGA) || VAZIO();
@@ -678,7 +691,7 @@
         // sem conta, e a pessoa precisa voltar à tela de entrada. Sem rede, o fetch
         // falha antes de chegar aqui e o aplicativo segue funcionando com o que tem.
         if (q.status === 401) {
-          location.replace('entrar.html' + location.search);
+          CC.irParaEntrada();
           return false;
         }
         if (q.ok) {

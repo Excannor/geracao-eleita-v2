@@ -395,14 +395,47 @@ function donoDoCracha(cracha) {
   return usuario;
 }
 
+// A marca "cc_logado" anda junto com o crachá, com a mesma validade, mas sem HttpOnly e sem
+// segredo nenhum (vale "1"): é o que o index.html guardado pelo service worker lê, antes de
+// pintar qualquer coisa, para saber se ainda há sessão neste aparelho. Sem ela, o app do cache
+// abria e pintava a trilha guardada no localStorage de quem saiu (ou cuja sessão venceu) até o
+// /api/quem responder 401 (o "pisca" ao voltar da privacidade, 02/10).
+const MARCA = 'cc_logado';
+// Cada cookie aparece uma vez só na resposta, e o crachá sempre primeiro: as ferramentas de
+// teste leem o crachá como o primeiro cookie da resposta.
+function anexarCookie(res, linha) {
+  const nome = linha.split('=')[0];
+  const lista = [].concat(res.getHeader('set-cookie') || []).filter((l) => l.split('=')[0] !== nome).concat(linha);
+  lista.sort((a, b) => (b.startsWith(COOKIE + '=') ? 1 : 0) - (a.startsWith(COOKIE + '=') ? 1 : 0));
+  res.setHeader('set-cookie', lista);
+}
+function porMarca(req, res, segundos) {
+  const seguro = (req.headers['x-forwarded-proto'] || '') === 'https';
+  anexarCookie(res, MARCA + '=1; Path=/; Max-Age=' + Math.max(0, Math.floor(segundos)) + '; SameSite=Lax' + (seguro ? '; Secure' : ''));
+}
 function porCookie(req, res, usuario) {
   const seguro = (req.headers['x-forwarded-proto'] || '') === 'https';
-  res.setHeader('set-cookie', COOKIE + '=' + novoCracha(usuario)
+  anexarCookie(res, COOKIE + '=' + novoCracha(usuario)
     + '; Path=/; Max-Age=' + Math.floor(DURACAO / 1000)
     + '; HttpOnly; SameSite=Lax' + (seguro ? '; Secure' : ''));
+  porMarca(req, res, DURACAO / 1000);
 }
-const limparCookie = (res) =>
-  res.setHeader('set-cookie', COOKIE + '=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax');
+const limparCookie = (res) => {
+  anexarCookie(res, COOKIE + '=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax');
+  anexarCookie(res, MARCA + '=; Path=/; Max-Age=0; SameSite=Lax');
+};
+// A marca segue o crachá em todo pedido: com sessão e sem marca (quem entrou antes de a marca
+// existir, ou apagou só ela), ela volta com o tempo que resta ao crachá; sem sessão e com marca
+// ou crachá sobrando (crachá vencido, de senha trocada ou de "sair dos outros aparelhos"), os
+// dois são limpos. Assim o próximo app aberto do cache já sabe que não há ninguém dentro.
+function acertarMarca(req, res, eu) {
+  const marca = lerCookie(req, MARCA);
+  const cracha = lerCookie(req, COOKIE);
+  if (!eu) { if (marca || cracha) limparCookie(res); return; }
+  if (marca) return;
+  const vence = Number(String(cracha).split('.')[1]);
+  porMarca(req, res, vence > Date.now() ? (vence - Date.now()) / 1000 : DURACAO / 1000);
+}
 
 function lerCookie(req, nome) {
   for (const parte of (req.headers.cookie || '').split(';')) {
@@ -1093,6 +1126,7 @@ const servidor = createServer(async (req, res) => {
 
     // ---------- porteiro ----------
     const eu = quemFala(req);
+    acertarMarca(req, res, eu);
     if (!eu) {
       if (rota.startsWith('/api/')) { json(res, 401, { erro: 'entre primeiro' }); return; }
       const livre = rota === '/entrar.html' || rota === '/privacidade.html' || rota === '/termos.html'

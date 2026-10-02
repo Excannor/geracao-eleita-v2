@@ -270,8 +270,13 @@ td.nao { color: var(--fraca); }
 main:has(> #tela-boas:not([hidden])) { max-width: none; padding: 0; }
 #tela-boas.lp { display: block; flex: none; width: 100%; text-align: center; overflow-x: clip; }
 
-/* topo: marca à esquerda, Entrar à direita, preso em cima */
+/* topo: marca à esquerda, Entrar à direita, preso em cima. Firme ao rolar (02/10): altura fixa
+   (nada dentro dela muda o tamanho), `contain` para o resto da página não refazer o layout
+   dela, nenhuma classe trocada por rolagem e nenhum efeito por cima (sem transform, sem
+   backdrop-filter). O que tremia vinha de fora dela: a altura da página em dvh, mudando com a
+   barra de endereço, e as peças animadas repintando a sombra a cada quadro logo abaixo. */
 .lp-topo { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  box-sizing: border-box; height: calc(64px + env(safe-area-inset-top)); contain: layout style;
   max-width: 1120px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 20px 10px; background: var(--fundo); }
 .lp-marca { display: flex; align-items: center; gap: 8px; }
 .lp-marca .mascote { margin: 0; }
@@ -298,8 +303,11 @@ main:has(> #tela-boas:not([hidden])) { max-width: none; padding: 0; }
 
 /* as peças do jogo, soltas em volta do carimbo, balançando devagar */
 .lp-pecas { position: absolute; inset: 0 0 auto; height: 300px; max-width: 760px; margin: 0 auto; pointer-events: none; }
+/* will-change: cada peça vira uma camada própria, com a sombra desenhada uma vez só; a animação
+   só move a camada. Sem isso o celular repintava a sombra (filter) das oito peças a cada quadro,
+   bem embaixo da barra presa, enquanto a pessoa rolava. */
 .lp-peca { position: absolute; width: 52px; height: auto; color: var(--v2-forte); filter: drop-shadow(0 6px 6px rgba(21, 22, 21, .14));
-  animation: lp-boia 5s ease-in-out infinite; }
+  animation: lp-boia 5s ease-in-out infinite; will-change: transform; }
 .p-biblia { left: 3%; top: 26px; width: 66px; --g: -8deg; }
 .p-visto { right: 6%; top: 18px; width: 46px; --g: 6deg; animation-delay: -1s; }
 .p-chama { right: 1%; top: 150px; width: 48px; --g: 8deg; animation-delay: -2.2s; }
@@ -330,7 +338,12 @@ main:has(> #tela-boas:not([hidden])) { max-width: none; padding: 0; }
    É arte: fica igual nos dois temas. */
 .lp-onda { fill: #232b17; }
 .lp-onda-baixo { display: block; margin-top: -1px; transform: scaleY(-1); }
-.lp-mural { position: relative; padding: 8px 20px 0; background: #232b17; }
+/* isolation: o grão em overlay se mistura só com a faixa, num grupo próprio, e não obriga a
+   página (e a barra presa que passa por cima) a recompor a mistura a cada quadro da rolagem. */
+/* overflow: a cena de João 14.6 tem 118% da largura e passa da tela: quem corta é a própria
+   faixa, também nos navegadores sem `overflow: clip` (iOS antes do 16), onde a página ficava
+   mais larga que a tela e balançava de lado durante a rolagem. */
+.lp-mural { position: relative; isolation: isolate; overflow: hidden; padding: 8px 20px 0; background: #232b17; }
 .lp-mural::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .18; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E"); }
 .lp-arte-joao { position: relative; container-type: inline-size; display: flex; flex-direction: column; align-items: center;

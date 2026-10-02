@@ -308,13 +308,16 @@ const CACHE_MAPAS = 'caminho-mapas';
 const ARQUIVOS = ${JSON.stringify(
   ['./', './index.html', './' + arquivoConteudo, './manifest.webmanifest', './apple-touch-icon.png', './icone-48.png']
     .concat(icones.map((i) => './' + i.arquivo), arquivosFontes.map((f) => './' + f.arquivo)))};
+// As páginas avulsas vêm primeiro da rede e só do cache sem rede: o app guardado, aberto sem
+// sessão, vai para a página de entrada, e ela precisa abrir também longe do Wi-Fi.
+const AVULSAS = ['entrar.html', 'privacidade.html', 'termos.html'];
 const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
 const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo))};
 const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS]];
 
 self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE)
-    .then((c) => c.addAll(ARQUIVOS.map((u) => new Request(u, { cache: 'reload' }))))
+    .then((c) => c.addAll(ARQUIVOS.concat(AVULSAS.map((a) => './' + a)).map((u) => new Request(u, { cache: 'reload' }))))
     .then(() => self.skipWaiting()));
 });
 
@@ -345,6 +348,13 @@ self.addEventListener('fetch', (ev) => {
         if (r.ok && (r.headers.get('content-type') || '').includes('json')) c.put(ev.request, r.clone());
         return r;
       }))));
+    return;
+  }
+  if (AVULSAS.includes(url.pathname.split('/').pop())) {
+    ev.respondWith(fetch(ev.request).then((r) => {
+      if (r.ok) { const copia = r.clone(); caches.open(CACHE).then((c) => c.put(new Request(url.pathname), copia)); }
+      return r;
+    }).catch(() => caches.match(ev.request, { ignoreSearch: true }).then((achado) => achado || Response.error())));
     return;
   }
   ev.respondWith(

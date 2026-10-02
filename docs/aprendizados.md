@@ -203,6 +203,37 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   segmentado → nomes com mais de 12 letras a 14px, segmentado a 13px abaixo de 375px; o
   `teste-mapas` confere os dois testamentos a 360px (largura dentro da célula, uma linha só).
 
+## Entrada, sessão e página inicial
+
+- 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
+  entrada. Causa confirmada com quadros a cada 50ms: o service worker serve "/" do cache (o app,
+  cache-first) sem perguntar ao servidor; o app pintava a trilha guardada no localStorage (a de
+  quem saiu, ou de quem teve a sessão vencida) e só depois o `/api/quem` respondia 401 e mandava
+  para `entrar.html`. O link "Voltar ao aplicativo" (href "./") da privacidade era o caminho mais
+  curto até isso → o servidor põe e tira, junto com o crachá HttpOnly, a marca `cc_logado=1`
+  (mesma validade, sem segredo), e o primeiro script do `index.html` confere a marca antes de
+  qualquer pintura: sem ela, esconde a página e troca para a entrada. Dado de conta nunca é
+  pintado antes de saber, sem rede, que há sessão; e o 401 não pode ser a única porta.
+- 2026-10-02 · sessão · A primeira medição não pegava o problema porque a página de entrada
+  aberta direto, sem service worker, já vinha certa do servidor → teste de fluxo de entrada
+  roda num perfil só (como o celular), com o app já guardado pelo service worker, e conta os
+  quadros pintados (espião em `requestAnimationFrame` por `Runtime.addBinding`), não só o
+  estado final (`ferramentas/teste-fluxo-entrada.mjs`).
+- 2026-10-02 · sessão · Passo de teste que "abre de novo" com `Page.navigate` para o mesmo
+  endereço mudando só o hash não recarrega a página (é navegação no mesmo documento) → para
+  reabrir, `Page.reload` ou outro caminho.
+- 2026-10-02 · entrada · A barra presa no alto da página inicial tremia ao rolar no celular. Não
+  havia ouvinte de rolagem; o que mexia com ela vinha de fora: `min-height: 100dvh` na página
+  (muda enquanto a barra de endereço some e volta, e refaz o layout com a barra presa), oito
+  peças animadas com `filter: drop-shadow` repintando a cada quadro logo abaixo dela, o grão em
+  `mix-blend-mode` sem grupo próprio e a cena de 118% passando da tela onde não há `overflow:
+  clip` → altura em `svh`, barra com altura fixa e `contain`, peças com `will-change`, a faixa
+  com `isolation` e `overflow: hidden`. O teste rola com toque a 390 e 360 (densidade 3),
+  cresce a janela no meio (a barra de endereço sumindo) e exige a barra igual ao pixel.
+- 2026-10-02 · teste · `Input.synthesizeScrollGesture` com toque não rola nada no Chrome sem
+  interface (scrollY fica 0, sem erro) → rolar com `Input.dispatchTouchEvent` (touchStart, vários
+  touchMove, touchEnd) e conferir que a página rolou antes de concluir que algo ficou parado.
+
 ## Revisão do dia (Guardar, Pensar, Orar)
 
 - 2026-10-02 · captura · Para fotografar a lição inteira, aumentei a janela até caber o palco: a

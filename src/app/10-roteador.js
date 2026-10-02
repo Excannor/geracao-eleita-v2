@@ -512,6 +512,11 @@
   }
 
   // ---------- partida ----------
+  // Sem sessão o index.html já está indo para a página de entrada: o app não desenha nada.
+  if (document.documentElement.classList.contains('sem-sessao')) return;
+  // Voltar (bfcache) para o app de quem já saiu, em outra aba ou porque a sessão venceu,
+  // também vai direto para a entrada, sem mostrar a página guardada.
+  addEventListener('pageshow', (ev) => { if (ev.persisted && CC.semSessao()) CC.irParaEntrada(); });
   const guardado = CC.temaGuardado();
   CC.aplicarTema(guardado === null ? matchMedia('(prefers-color-scheme: dark)').matches : guardado);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (ev) => {
@@ -686,6 +691,7 @@
 
   addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') return;
+    if (CC.semSessao()) { CC.irParaEntrada(); return; }
     CC.sincronizar(false)
       .then(() => Promise.all([CC.carregarAmigos(), CC.carregarNovidades(), CC.carregarDiscipulado ? CC.carregarDiscipulado() : null]))
       .then(() => { pintarTopo(); pintarNavegacao(); });

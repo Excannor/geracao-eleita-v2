@@ -50,10 +50,13 @@
     --selo-bloco: #f2f2f2; --selo-texto: #121212;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--fundo); color: var(--tinta);
+  /* svh, não dvh: a altura "dinâmica" muda enquanto a barra de endereço do Safari/Chrome
+     some e volta durante a rolagem, e cada mudança refazia o layout da página com a barra do
+     alto presa em cima (ela tremia ao rolar no celular, 02/10). A altura pequena é fixa. */
+  html, body { margin: 0; min-height: 100vh; min-height: 100svh; background: var(--fundo); color: var(--tinta);
     font-family: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; }
   body { display: flex; justify-content: center; }
-  main { width: 100%; max-width: 420px; min-height: 100dvh; display: flex; flex-direction: column;
+  main { width: 100%; max-width: 420px; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column;
     padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
   section { flex: 1; display: flex; flex-direction: column; gap: 16px; }
   section[hidden] { display: none; }
@@ -403,6 +406,13 @@
   try { var t = localStorage.getItem('cc.tema'); if (t !== null) document.documentElement.dataset.tema = JSON.parse(t) ? 'escuro' : 'claro'; } catch (e) {}
 
   var params = new URLSearchParams(location.search);
+  // Com a marca de sessão (cc_logado, que o servidor tira junto com o crachá vencido), a pessoa
+  // já está dentro: a página de entrada leva direto ao app, no mesmo endereço e hash. Vale ao
+  // abrir e ao voltar do bfcache. O link de nova senha fica: quem pediu quer trocar a senha.
+  var logado = function () { return /(?:^|;\s*)cc_logado=1/.test(document.cookie) && !params.get('redefinir'); };
+  var irAoApp = function () { document.documentElement.style.visibility = 'hidden'; location.replace('./' + location.search + location.hash); };
+  if (logado()) { irAoApp(); return; }
+  addEventListener('pageshow', function (ev) { if (ev.persisted && logado()) irAoApp(); });
   var convite = params.get('convite');
   var celula = params.get('celula');
   var passo = 1;
@@ -499,7 +509,7 @@
         if (bruto && (!usuario || dono !== usuario)) localStorage.removeItem(chave);
       });
     } catch (e) { /* segue */ }
-    location.replace('./' + location.search);
+    location.replace('./' + location.search + location.hash);
   }
 
   $('form-cadastro').addEventListener('submit', function (ev) {

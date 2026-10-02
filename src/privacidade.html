@@ -189,5 +189,21 @@
   <p class="ajuda">Precisa conversar com alguém? Fale com alguém de confiança ou ligue 188 (CVV), a qualquer hora. Se for abuso ou violência, ligue 100. Em emergência, 192 (SAMU) ou 190 (Polícia).</p>
   <a class="voltar" href="./">Voltar ao aplicativo</a>
 </main>
+<script>
+// "Voltar" volta de verdade: para a página de entrada (no mesmo ponto da rolagem) ou para o
+// perfil, de onde a pessoa veio. Sem página anterior do app (aberta numa aba nova), o link
+// leva a "./", e o servidor decide entre o app e a entrada. Sem sessão, o texto não promete
+// o aplicativo.
+(function () {
+  var a = document.querySelector('a.voltar');
+  if (!a) return;
+  if (!/(?:^|;\s*)cc_logado=1/.test(document.cookie)) a.textContent = 'Voltar ao início';
+  a.addEventListener('click', function (ev) {
+    try {
+      if (history.length > 1 && document.referrer && new URL(document.referrer).origin === location.origin) { ev.preventDefault(); history.back(); }
+    } catch (e) { /* segue pelo link */ }
+  });
+})();
+</script>
 </body>
 </html>
