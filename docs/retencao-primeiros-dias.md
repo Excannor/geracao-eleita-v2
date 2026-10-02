@@ -102,6 +102,56 @@ contexto, 0 em tchan); depois de ler, é bom (a reflexão escrita sobe para 3 a 
 tchan). O problema é a ordem: o melhor do dia chega depois do esforço, e a pessoa que para no meio
 de Mateus 1 nunca chega lá.
 
+**Depois das correções** (commit "Primeiros dias: onde estamos, o contexto e o guia de leitura antes
+do texto"): a tela de antes de ler dos dias 1 a 7 fica em personalidade 4 (título próprio, "O
+começo de tudo", "O Deus que me vê"), tchan 3 (o "Enquanto lê, procure" adianta o detalhe que a
+reflexão paga depois) e contexto 4 (mapa + quem escreveu + por que as duas passagens). O que a
+reflexão faz depois de ler não mudou.
+
+### 4.1b Dias 8 a 31 (a unidade inteira)
+
+Os dias 8 a 31 foram lidos inteiros na NBV (`scratchpad/retencao/nbv/dia-NN.txt`, um arquivo por
+dia) e receberam as três notas da tela de antes de ler, como ela estava depois do commit do mapa
+(título "Leitura de hoje" e o mapa sem texto): personalidade 2, tchan 0 e contexto 1 em todos,
+menos o dia 20, que já tinha o contexto de "Começa Êxodo" (4). O tchan de cada dia abaixo foi
+achado no texto, com a referência, e virou o "Enquanto lê, procure" e o gancho de "amanhã"; o
+título com personalidade e o contexto entraram em `conteudo/primeiros-dias.json` (commit
+"Primeiros dias: os dias 8 a 31 da Unidade 1 com título, contexto e o que procurar"). Minutos a
+200 palavras por minuto, a mesma régua de `CC.minutosDoDia`.
+
+| Dia | Leitura (palavras · min) | O tchan achado no texto | O que entrou antes de ler |
+|---|---|---|---|
+| 8 | Gn 19-20 · Mt 6 (2129 · 11) | Os anjos tiram Ló à força "porque o Senhor teve misericórdia deles" (Gn 19.16); "seu Pai sabe exatamente o que vocês precisam, até mesmo antes que vocês peçam" (Mt 6.8) | "Fogo em Sodoma, e a oração que Jesus ensinou"; o aviso de que o fim do capítulo 19 é duro |
+| 9 | Gn 21-23 (1543 · 8) | "Deus me fez rir" (Gn 21.6); dois "Aqui estou!" (Gn 22.1 e 22.11); "O Senhor Proverá" (Gn 22.14) | "O riso de Sara e o monte de Abraão"; o aviso de ler o capítulo 22 até o fim, porque o texto resolve (regra do desfecho de `ferramentas/reflexoes/CLAUDE.md`) |
+| 10 | Gn 24-25 · Mt 7 (2777 · 14) | O servo "observava em silêncio" (Gn 24.21); Gênesis 24 é o capítulo mais longo do livro (67 versículos) e a história é contada duas vezes; "ensinava como alguém que tinha grande autoridade" (Mt 7.29) | "A noiva do poço e a casa na rocha"; guia novo para Gn 25.1-18 (salto para o 19, onde começam os gêmeos) |
+| 11 | Gn 26-28 · Mt 8 (3153 · 16) | A pedra de travesseiro (Gn 28.11) e "Certamente o Senhor está neste lugar e eu não sabia!" (Gn 28.16); Jesus toca o leproso antes de falar (Mt 8.3) | "A bênção roubada e a escada no sonho"; o aviso de leitura longa (vale dividir) |
+| 12 | Gn 29-31 · Mt 9 (3745 · 19, a mais longa da unidade) | Sete anos que "pareceram poucos dias" (Gn 29.20); os nomes dos filhos de Lia como frases inteiras; Jesus "ficou com pena delas" (Mt 9.36) | "O enganador enganado"; o aviso da leitura mais longa |
+| 13 | Gn 32-33 (1200 · 6) | "Não mereço nenhuma das suas bondades" (Gn 32.10); inclinou-se sete vezes (Gn 33.3); "Vi Deus face a face, e continuo vivo!" (Gn 32.30) | "A luta de uma noite inteira" |
+| 14 | Gn 34-36 · Mt 10 (2894 · 14) | "ao Deus que me ouviu no dia da minha angústia" (Gn 35.3); "os próprios cabelos da cabeça de vocês estão todos contados" (Mt 10.30) | "De volta a Betel"; o aviso do capítulo duro (Diná); o guia de Gn 36 já existia |
+| 15 | Gn 37-38 · Mt 11 (2293 · 11) | Perez e Zerá, os gêmeos do fim de Gn 38, estão em Mt 1.3, lido no dia 1; os irmãos "já não conseguiam falar amigavelmente com ele" (Gn 37.4); "Venham a mim, todos vocês que estão cansados" (Mt 11.28) | "O sonhador no poço" |
+| 16 | Gn 39-41 (2331 · 12) | "o Senhor estava com José" quatro vezes (Gn 39.2, 3, 21 e 23); o copeiro "não se lembrou de José" (Gn 40.23) | "Da cadeia ao palácio"; o "procure" manda contar as quatro vezes |
+| 17 | Gn 42-43 · Mt 12 (2858 · 14) | José sai para chorar escondido duas vezes (Gn 42.24 e 43.30); "quanto mais vale uma pessoa do que uma ovelha!" (Mt 12.12) | "Os irmãos diante de José" |
+| 18 | Gn 44-46 · Mt 13 (3389 · 17) | "Eu sou José, o irmão que vocês venderam ao Egito!" (Gn 45.4); "não foram vocês que me mandaram para cá, mas sim Deus" (Gn 45.8); o homem vende tudo "na sua alegria" (Mt 13.44) | "Eu sou José"; o guia de Gn 46.8-27 já existia |
+| 19 | Gn 47-48 · Mt 14 (2129 · 11) | Jacó "cruzando os braços" (Gn 48.14) e "Eu sei, meu filho, eu sei" (Gn 48.19); Pedro "olhou em volta e sentiu a força do vento" (Mt 14.30) | "Braços cruzados e um passo sobre a água" |
+| 20 | Gn 49-50; Êx 1 (1748 · 9) | "vocês planejaram o mal contra mim, mas Deus tornou o mal em bem" (Gn 50.20); "um novo rei que não conhecia José" (Êx 1.8) | Já tinha ("Começa Êxodo") |
+| 21 | Êx 2-3 · Mt 15 (2026 · 10) | "tenho visto", "tenho ouvido", "Conheço bem" (Êx 3.7); "Eu Sou o que Sou" (Êx 3.14); "sua fé é grande" (Mt 15.28) | "O cesto no rio e a sarça que não queima" |
+| 22 | Êx 4-6 · Mt 16 (2646 · 13) | "O que você tem na mão?" (Êx 4.2); "Mande outro no meu lugar!" (Êx 4.13); "E vocês, quem vocês dizem que eu sou?" (Mt 16.15) | "Mande outro no meu lugar"; o guia de Êx 6.14-27 já existia |
+| 23 | Êx 7-9 (2423 · 12) | "Isso é o dedo de Deus!" (Êx 8.19); Gósen sem moscas (Êx 8.22); "Finalmente vejo que pequei" (Êx 9.27) e a volta atrás (Êx 9.34) | "As pragas começam"; o aviso de reparar no ciclo do faraó |
+| 24 | Êx 10-11 · Mt 17 (1696 · 8) | "onde os israelitas moravam não faltou luz" (Êx 10.23); "não viram mais ninguém a não ser Jesus" (Mt 17.8) | "Escuridão no Egito, luz no monte" |
+| 25 | Êx 12-14 · Mt 18 (3541 · 18) | A pergunta dos filhos e a resposta pronta (Êx 12.26-27); "Por que você está clamando a mim? Mande o povo de Israel marchar!" (Êx 14.15); "setenta vezes sete" (Mt 18.22) | "A noite da Páscoa e o mar que se abre"; o aviso da leitura mais longa da semana |
+| 26 | Êx 15-16 · Mt 19 (2184 · 11) | Miriã dança (Êx 15.20); o maná guardado "criou bichos" (Êx 16.20); "para Deus, tudo é possível" (Mt 19.26) | "A canção, a sede e o pão do céu" |
+| 27 | Êx 17-19 (1633 · 8) | "O Senhor está conosco ou não?" (Êx 17.7); Arão e Hur sustentando as mãos (Êx 17.12); "sobre asas de águias" (Êx 19.4) | "Chegada ao Sinai" |
+| 28 | Êx 20-21 · Mt 20 (2051 · 10) | "Eu sou o Senhor, seu Deus. Eu tirei você do Egito" antes de qualquer "não" (Êx 20.2); "não veio para ser servido, mas para servir" (Mt 20.28) | "Antes da ordem, a apresentação"; o aviso de que as leis de Êx 21 são de um povo antigo, não ordem para hoje |
+| 29 | Êx 22-24 · Mt 21 (2974 · 15) | "porque sou misericordioso" (Êx 22.27); "Não esqueça que você foi estrangeiro no Egito" (Êx 22.21); os setenta "viram a Deus! E ali comeram e beberam" (Êx 24.11) | "A aliança selada e a entrada em Jerusalém" |
+| 30 | Êx 25-26 (1455 · 7) | "para que eu possa morar no meio deles" (Êx 25.8); a oferta "de todo aquele que quiser ofertar de coração" (Êx 25.2) | "A planta da tenda"; guia novo para Êx 26 |
+| 31 | Êx 27-29 · Mt 22 (3503 · 18) | Os nomes das tribos nos ombros e sobre o coração de Arão (Êx 28.12 e 28.29); "Toda a Lei e os Profetas dependem desses dois mandamentos" (Mt 22.40) | "O fim da primeira unidade"; guias novos para Êx 28 e 29 |
+
+O que ficou de fora de propósito: nada de número ou data que a leitura não dá (as "dez pragas"
+viram "as sete primeiras pragas" no dia 23, porque a conta das dez não está nos capítulos 7 a 9),
+nada de tradição de pregação (o "monte Sinai = Horebe" ficou de fora no dia 27), e os dias
+pesados ganharam o aviso "vale ler em dois tempos" em vez de uma divisão da leitura (decisão do
+dono, seção 8).
+
 ### 4.2 Trechos que soam genéricos, e a versão com personalidade
 
 Textos reais do app hoje, com a troca proposta (as trocas de tela foram implementadas; as de
@@ -156,14 +206,17 @@ Curto e visual, sem muro de texto:
    e do capítulo (Gênesis 1-2 é Criação, 3-11 é Queda, 12-50 é Promessa; Êxodo a Deuteronômio é
    Povo; Mateus é Jesus) e por isso vale para os 365 dias sem escrever nada. É a mesma divisão da
    nota "A história bíblica em uma página" do Explorar.
-2. **Duas ou três frases do dia**, escritas para os dias 1 a 7 (e para a primeira vez de cada
-   livro da Unidade 1): quem escreveu (como a ficha do livro diz: "pela tradição, Moisés", "Mateus,
-   um dos doze"), para quem, e o que ligar.
+2. **Duas ou três frases do dia**, escritas primeiro para os dias 1 a 7 e para a primeira vez de
+   cada livro da Unidade 1, e depois para os dias 8 a 31 (seção 4.1b): quem escreveu (como a ficha
+   do livro diz: "pela tradição, Moisés", "Mateus, um dos doze"), para quem, e o que ligar. Fora
+   da Unidade 1, o cartão fica só com o mapa e, no primeiro dia de cada livro com ficha, a
+   apresentação do livro.
 3. **"Enquanto lê, procure"**: uma coisa só para achar no texto (a frase que se repete, o único que
    não morre, as quatro mulheres). Vira a pergunta de um toque que o dia já tem na etapa Pensar.
-4. **Guia de leitura dentro do leitor**, só nos trechos de lista (Mt 1.1-17, Gn 5, Gn 10, Gn
-   11.10-32, Gn 14.1-12, Gn 36, Gn 46.8-27, Êx 6.14-27): o que é, como ler (rápido), o que não
-   perder, e um botão para pular ao versículo em que a história recomeça.
+4. **Guia de leitura dentro do leitor**, só nos trechos de lista e de planta (Mt 1.1-17, Gn 5, Gn
+   10, Gn 11.10-32, Gn 14.1-12, Gn 25.1-18, Gn 36, Gn 46.8-27, Êx 6.14-27, Êx 25, 26, 28 e 29): o
+   que é, como ler (rápido), o que não perder, e um botão para pular ao versículo em que a
+   história recomeça.
 
 Fatos usados e de onde vêm: autoria e datas das fichas dos livros em `conteudo.json` ("03 - Livros
 da Bíblia/Gênesis", ".../Mateus", ".../Êxodo": Gênesis e Êxodo "Moisés (tradicionalmente)", Mateus

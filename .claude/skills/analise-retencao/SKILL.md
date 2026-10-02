@@ -233,6 +233,22 @@ O diagnóstico ganha uma seção própria, "Conteúdo e interesse", com a tabela
 dia, os trechos genéricos com a versão proposta, o tchan de cada dia (criado quando não há) e a
 proposta de contexto. Modelo: `docs/retencao-primeiros-dias.md`, seção 4.
 
+Como ler uma unidade inteira sem errar citação (feito para os 31 dias da Unidade 1 e os 14 do
+Conhecer em 02/10/2026):
+
+1. Despeje a NBV de cada dia num arquivo (`plano[n-1].trechos` → `livros[livro][cap-1]`, um
+   `dia-NN.txt` por dia, com número de versículo) e leia o arquivo inteiro antes de escrever uma
+   linha; o tchan está sempre num versículo que dá para citar, não numa impressão.
+2. `teste.mjs` só confere o que está entre aspas curvas (“…”) contra a NBV da leitura do dia; tudo
+   o mais que é número ou contagem ("quatro vezes", "67 versículos", "o capítulo mais longo",
+   "setenta pessoas") confere-se à mão com um `node -e` antes de entrar no JSON. Conte; não lembre.
+3. O que NÃO entra, mesmo sendo verdade: número que a leitura não dá ("dez pragas" num dia que lê
+   as sete primeiras), identificação de tradição ("Sinai = Horebe", "execução romana"), e
+   qualquer frase sobre o que o texto não conta. Na dúvida, o contexto fica mais curto.
+4. O gancho de "amanhã" é escrito com a leitura do dia seguinte aberta, nunca de memória, e nos
+   dias pesados diz quanto leva ("uns 19 minutos: vale dividir"), porque é esse o dia em que a
+   pessoa decide se abre.
+
 ## 10. Armadilhas conhecidas
 
 - Servidor de teste: `CAMINHO_ESTADO=<pasta>/estado.json [CAMINHO_ADMIN=marcos] node servidor.mjs <porta>`,
