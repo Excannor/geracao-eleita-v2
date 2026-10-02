@@ -55,8 +55,8 @@
         // a barra é da dupla: conta os dias em que os dois leram, nunca quanto cada um leu
         + '<div class="linha-barra"><div class="barra-missao"><i style="width:' + pct(dias, ALVO_SEMANA) + '"></i></div><span class="conta-missao">' + dias + '/' + ALVO_SEMANA + '</span></div>'
         + '<span class="estado-dupla">' + (a.leuHoje ? CC.ico('certo') + CC.esc(a.nome.split(' ')[0]) + ' já leu hoje'
-          : (a.toqueEnviado ? CC.esc(a.nome.split(' ')[0]) + ' foi encorajado hoje'
-            : '<button class="link-nota" data-encorajar="' + CC.esc(a.usuario) + '">' + CC.ico('aperto') + 'Encorajar ' + CC.esc(a.nome.split(' ')[0]) + '</button>')) + '</span></div>'
+          : (a.toqueEnviado ? 'Toque enviado para ' + CC.esc(a.nome.split(' ')[0])
+            : '<button class="link-nota" data-encorajar="' + CC.esc(a.usuario) + '">' + CC.ico('aperto') + 'Dar um toque em ' + CC.esc(a.nome.split(' ')[0]) + '</button>')) + '</span></div>'
         + '<span class="premio-missao">' + CC.arte.bau(feita ? 'aberto' : 'travado', feita ? 'madeira' : '') + '</span></div>';
     }).join('');
     if (mudou) CC.gravar('semanasJuntos', juntos);
@@ -94,7 +94,7 @@
           e.disabled = true;
           try {
             await CC.api('api/toques', { para: e.dataset.encorajar });
-            e.outerHTML = '<span>' + CC.ico('certo') + 'Encorajado hoje</span>';
+            e.outerHTML = '<span>' + CC.ico('certo') + 'Toque enviado</span>';
           } catch (erro) { e.disabled = false; CC.avisar(erro.message); }
         };
       });

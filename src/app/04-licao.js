@@ -499,7 +499,7 @@
     alvo.innerHTML = '<div class="amigos-resumo">'
       + (leram.length ? '<p class="lendo-junto-linha"><span class="rostos">' + leram.slice(0, 3).map((a) => CC.retratoAmigo(a, 'mini')).join('') + '</span>'
         + (leram.length === 1 ? primeiro(leram[0]) + ' também leu hoje' : leram.length + ' amigos também leram hoje') + '</p>' : '')
-      + (semLer ? '<button class="botao contorno pequeno" data-encorajar="' + CC.esc(semLer.usuario) + '">' + CC.ico('aperto') + 'Encorajar ' + primeiro(semLer) + '</button>' : '')
+      + (semLer ? '<button class="botao contorno pequeno" data-encorajar="' + CC.esc(semLer.usuario) + '">' + CC.ico('aperto') + 'Dar um toque em ' + primeiro(semLer) + '</button>' : '')
       + '</div>';
     const b = alvo.querySelector('[data-encorajar]');
     if (b) {
@@ -509,7 +509,7 @@
           await CC.salvarNoServidor();
           await CC.api('api/toques', { para: semLer.usuario });
           semLer.toqueEnviado = true;
-          b.innerHTML = CC.ico('certo') + primeiro(semLer) + ' foi encorajado';
+          b.innerHTML = CC.ico('certo') + 'Toque enviado para ' + primeiro(semLer);
         } catch (e) {
           b.disabled = false;
           CC.avisar(e.message);

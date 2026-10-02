@@ -143,7 +143,7 @@
     if (mural && !mural.ligado) {
       const ligar = await CC.confirmar({
         titulo: 'Mostrar aos amigos?',
-        texto: 'Seus amigos passam a ver no Feed os versículos que você compartilha e seus marcos: ofensiva, livros e conquistas.',
+        texto: 'Seus amigos passam a ver no Juntos os versículos que você compartilha e seus marcos: ofensiva, livros e conquistas.',
         acao: 'Mostrar',
       });
       if (!ligar) return false;

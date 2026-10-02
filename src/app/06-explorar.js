@@ -417,7 +417,7 @@
     const texto = CC.anotacao(chave);
     return CC.tituloSecao(titulo, texto ? 'escrito' : '')
       + '<div class="cartao"><div class="campo" style="margin:0">'
-      + '<textarea data-anotacao="' + CC.esc(chave) + '" placeholder="Escreva aqui o que você quer lembrar."'
+      + '<textarea data-anotacao="' + CC.esc(chave) + '" aria-label="' + CC.esc(titulo || 'Sua anotação') + '" placeholder="Escreva aqui o que você quer lembrar."'
       + ' style="min-height:110px">' + CC.esc(texto) + '</textarea></div>'
       + '<div class="acoes"><button class="botao contorno pequeno" data-copiar-anotacao '
       + 'style="width:auto">Copiar</button></div></div>';

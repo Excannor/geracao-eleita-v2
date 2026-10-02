@@ -562,7 +562,7 @@
         + '</div>';
     }).join('');
 
-    CC.folha('<h2>' + CC.esc(p.grupo ? p.titulo : 'Propósito de ' + p.titulo.toLowerCase()) + '</h2>'
+    CC.folha('<h2>' + CC.esc(p.grupo ? p.titulo : 'Propósito de ' + (/^Bíblia/.test(p.titulo) ? p.titulo : p.titulo.charAt(0).toLowerCase() + p.titulo.slice(1))) + '</h2>'
       + '<p class="tipo-proposito">' + CC.ico(ICONE[p.tipo] || 'trilha') + CC.esc(ROTULO_TIPO[p.tipo] || '') + (p.tipo === 'livro' ? ': ' + CC.esc(p.titulo) : '')
       + (oracao ? '' : ' · ' + CC.plural(p.dias, 'dia', 'dias')) + '</p>'
       + (p.celula ? topoDaCelula(p) : '')

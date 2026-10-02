@@ -58,7 +58,7 @@
       + numero('Frequência média por encontro (4 semanas)', c.frequenciaMedia === null ? 'sem encontros' : c.frequenciaMedia)
       + numero('Visitantes que viraram membros (4 semanas)', c.visitantesViraramMembros)
       + numero('Multiplicações nos últimos 12 meses', c.multiplicacoes)
-      + numero('Dias na Palavra (Power of 4, 30 dias)', c.diasNaPalavra.pct === null ? 'sem dado' : c.diasNaPalavra.pct + '% (base ' + c.diasNaPalavra.base + ')')
+      + numero('Dias na Palavra (4 dias ou mais por semana, últimos 30 dias)', c.diasNaPalavra.pct === null ? 'sem dado' : c.diasNaPalavra.pct + '% (base ' + c.diasNaPalavra.base + ')')
       + numero('Conhecer Jesus: começaram', c.conhecer.comecaram)
       + numero('Conhecer Jesus: terminaram os 14 dias', c.conhecer.terminaram)
       + numero('Conhecer Jesus: tocaram "Quero conversar"', c.conhecer.quiseramConversar)
@@ -180,7 +180,7 @@
           : 'Sem e-mail configurado. Gere o link e mande pela conversa com a pessoa. Vale 1 hora e só uma vez.')
       + (p.backup ? grupo('Cópias de segurança',
         linha2(p.backup.externo ? 'No disco externo' : 'No cartão do Pi (o disco externo não está sendo usado)',
-          p.backup.quantos ? p.backup.quantos + ' cópias diárias cifradas · a última em ' + p.backup.ultimo.split('-').reverse().join('/')
+          p.backup.quantos ? CC.plural(p.backup.quantos, 'cópia diária cifrada', 'cópias diárias cifradas') + ' · a última em ' + p.backup.ultimo.split('-').reverse().join('/')
             + (p.backup.livreGB !== null ? ' · ' + String(p.backup.livreGB).replace('.', ',') + ' GB livres' : '') : 'Nenhuma cópia ainda'),
         p.backup.externo ? '' : 'Confira se o pendrive está ligado no Pi e montado em /mnt/externo.') : '')
       + grupo('Contas', numero('Total', p.contas.total) + numero('Novas nos últimos 7 dias', p.contas.novas7)
@@ -214,10 +214,10 @@
         p.retorno.map((r) => numero(r.dias === 1 ? 'Depois de 1 dia' : 'Depois de ' + r.dias + ' dias', porcento(r))).join(''),
         'É a pergunta "o hábito pegou?". Conta quem leu de novo a partir desse dia, entre as contas com idade para isso.')
       + grupo('Onde as pessoas param', barras(p.ondeParam.faixas),
-        p.ondeParam.total + ' conta(s) sem ler há 7 dias ou mais, pelo número de dias do plano que chegaram a ler.')
+        CC.plural(p.ondeParam.total, 'conta', 'contas') + ' sem ler há 7 dias ou mais, pelo número de dias do plano que chegaram a ler.')
       + grupo('Progresso de todos no plano', barras(p.progresso))
-      + grupo('Uso', numero('Começaram os Primeiros Passos', p.primeirosPassos.comecaram)
-        + numero('Terminaram os 12 Primeiros Passos', p.primeirosPassos.concluiram)
+      + grupo('Uso', numero('Começaram os Primeiros passos', p.primeirosPassos.comecaram)
+        + numero('Terminaram os 12 Primeiros passos', p.primeirosPassos.concluiram)
         + numero('Escreveram sobre algum dia', p.escreveram)
         + numero('Estão em algum propósito', p.propositos.contasEmAlgum)
         + numero('Propósitos ativos (grupos)', p.propositos.ativos + ' (' + p.propositos.grupos + ')')

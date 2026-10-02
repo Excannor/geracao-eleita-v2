@@ -31,7 +31,7 @@
       + grupo('Notificações', linha('Lembretes e avisos', CC.resumoNotificacoes(), 'data-ir="#/config/notificacoes"'))
       + grupo('Privacidade', (quem.comSenha
         ? '<button class="linha-config" data-mural role="switch" aria-checked="' + !!(CC.novidadesEmCache() || {}).ligado + '">'
-          + '<span>Mostrar meus marcos no Feed</span><span class="interruptor" aria-hidden="true"><i></i></span></button>'
+          + '<span>Mostrar meus marcos no Juntos</span><span class="interruptor" aria-hidden="true"><i></i></span></button>'
         : '')
         + linha('Pessoas bloqueadas', '', 'data-ir="#/amigos/bloqueados"')
         + linha('Privacidade', '', 'data-privacidade')
@@ -71,7 +71,7 @@
       const agora = !((CC.novidadesEmCache() || {}).ligado);
       try {
         await CC.preferirNovidades(agora);
-        CC.avisar(agora ? 'Seus amigos vão ver seus marcos' : 'Seus marcos saíram do Feed');
+        CC.avisar(agora ? 'Seus amigos vão ver seus marcos' : 'Seus marcos saíram do Juntos');
       } catch (e) { CC.avisar(e.message); }
       await CC.carregarNovidades();
       CC.redesenhar();
