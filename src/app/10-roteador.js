@@ -694,7 +694,9 @@
     if (CC.semSessao()) { CC.irParaEntrada(); return; }
     CC.sincronizar(false)
       .then(() => Promise.all([CC.carregarAmigos(), CC.carregarNovidades(), CC.carregarDiscipulado ? CC.carregarDiscipulado() : null]))
-      .then(() => { pintarTopo(); pintarNavegacao(); });
+      // A folha do alto da trilha também: o "já leu hoje" muda com a meia-noite e com a
+      // leitura dos amigos enquanto o app estava em segundo plano.
+      .then(() => { pintarTopo(); pintarNavegacao(); if (CC.repintarQuemLeu) CC.repintarQuemLeu(); });
   });
 
   if (location.protocol.startsWith('http')) {

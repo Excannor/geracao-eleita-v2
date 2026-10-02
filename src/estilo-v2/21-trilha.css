@@ -101,6 +101,32 @@
 }
 
 .folha-topo .lendo-junto-linha { margin: -6px 0 0 4px; color: var(--tinta-fraca); }
+/* O letreiro de quem já leu hoje (03-trilha.js: linhaQuemLeu). É um link para o Juntos com 44px
+   de altura para o dedo; as margens negativas deixam o texto e as fotos exatamente onde a
+   linha de antes ficava (30px de altura, 14px abaixo dos cartões). A janela tem altura fixa e
+   os nomes passam por dentro dela, um de cada vez, só com opacidade e um deslize de 14px:
+   nada em volta muda de tamanho na troca. */
+.folha-topo .lendo-junto-linha.letreiro { position: relative; min-height: 44px; margin: -13px 0 -7px 4px; color: var(--tinta-fraca);
+  text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.letreiro-janela { position: relative; flex: 1; min-width: 0; height: 30px; overflow: hidden; }
+.letreiro-item, .letreiro-parado { display: flex; align-items: center; gap: 8px; min-width: 0; height: 30px; }
+.letreiro-texto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* quem sai sobe e some depressa; quem entra vem de baixo logo depois, para os dois nomes não
+   ficarem um por cima do outro no meio da troca */
+.letreiro.varios .letreiro-item { position: absolute; inset: 0; opacity: 0; transform: translateY(14px);
+  transition: opacity .3s ease, transform .4s ease; }
+.letreiro.varios .letreiro-item.ativo { opacity: 1; transform: none; transition-delay: .16s; }
+.letreiro.varios .letreiro-item.saindo { opacity: 0; transform: translateY(-14px); transition-duration: .2s, .3s; }
+.letreiro-parado { display: none; }
+.letreiro:focus-visible { outline: 3px solid var(--salvia-texto); outline-offset: 2px; border-radius: 12px; }
+/* Menos movimento: nada troca; a linha parada diz os primeiros nomes e quantos mais. */
+@media (prefers-reduced-motion: reduce) {
+  .letreiro.varios .letreiro-janela { display: none; }
+  /* parada, a linha pode ter duas linhas: nada troca, então nada pula */
+  .letreiro.varios .letreiro-parado { display: flex; flex: 1; height: auto; min-height: 30px; }
+  .letreiro-parado .letreiro-texto { white-space: normal; line-height: 1.3; }
+  .letreiro.varios .letreiro-item { transition: none; }
+}
 .folha-topo .fala-bento.apresenta { margin: -6px 0 0; padding: 10px 14px; border-radius: 20px; background: var(--campo); color: var(--tinta); font-size: .875rem; font-weight: 600; }
 .folha-topo .novo-na-fe { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; margin-top: -6px; padding: 8px 18px 8px 8px; border-radius: 999px; background: var(--campo); color: var(--tinta-forte); font-size: .875rem; font-weight: 600; line-height: 1.3; text-decoration: none; }
 .folha-topo .novo-na-fe svg { box-sizing: content-box; flex: none; width: 18px; height: 18px; margin: 0; padding: 7px; border-radius: 50%; background: var(--salvia-cheia); color: var(--preto); }

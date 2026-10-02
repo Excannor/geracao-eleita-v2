@@ -203,6 +203,100 @@
       + '</div>';
   }
 
+  // ---------- quem já leu hoje (o letreiro) ----------
+  // Os amigos que já leram hoje, um de cada vez: "Sheyla já leu hoje" → "Samara já leu hoje",
+  // com a foto, trocando de 3 em 3 segundos com um deslize vertical curto (pedido do dono,
+  // 02/10; antes era "N amigos já leram hoje"). Na ordem da lista do servidor, que não guarda a
+  // hora da leitura (e nenhum dado novo do amigo entra por isto: nome, foto e se leu hoje).
+  // A linha tem altura fixa, então nada pula ao trocar. Com um amigo só, fica parada; com
+  // menos movimento pedido, não troca e mostra "Sheyla, Samara e mais 3 já leram hoje". O
+  // leitor de tela lê um texto fixo com todos, sem anúncio a cada troca. Tocar abre o Juntos.
+  const primeiroNome = (a) => String(a.nome || a.usuario || '').trim().split(/\s+/)[0];
+  const emLista = (nomes) => (nomes.length < 2 ? nomes.join('') : nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1]);
+  function linhaQuemLeu(amigos) {
+    const quem = ((amigos && amigos.amigos) || []).filter((a) => a.leuHoje);
+    if (!quem.length) return '';
+    const nomes = quem.map(primeiroNome);
+    const verbo = quem.length === 1 ? ' já leu hoje' : ' já leram hoje';
+    const todos = emLista(nomes) + verbo;
+    const parado = (quem.length > 3 ? nomes.slice(0, 2).join(', ') + ' e mais ' + (quem.length - 2) : emLista(nomes)) + verbo;
+    const itens = quem.map((a, i) => '<span class="letreiro-item' + (i === 0 ? ' ativo' : '') + '">'
+      + CC.retratoAmigo(a, 'mini') + '<span class="letreiro-texto">' + CC.esc(primeiroNome(a)) + ' já leu hoje</span></span>').join('');
+    return '<a class="lendo-junto-linha letreiro' + (quem.length > 1 ? ' varios' : '') + '" href="#/novidades" data-quem-leu>'
+      + '<span class="so-leitor">' + CC.esc(todos) + '. Abrir o Juntos</span>'
+      + '<span class="letreiro-janela" aria-hidden="true">' + itens + '</span>'
+      + (quem.length > 1
+        ? '<span class="letreiro-parado" aria-hidden="true"><span class="rostos">' + quem.slice(0, 2).map((a) => CC.retratoAmigo(a, 'mini')).join('') + '</span>'
+          + '<span class="letreiro-texto">' + CC.esc(parado) + '</span></span>'
+        : '')
+      + '</a>';
+  }
+  // O movimento: um só letreiro vivo por vez (o da folha na tela). Pausa quando a linha sai da
+  // tela, quando a aba fica oculta e enquanto a pessoa toca ou segura; para de vez quando a
+  // linha sai do documento (a trilha redesenhou).
+  const TROCA_LETREIRO = 3000;
+  let pararLetreiro = () => {};
+  function ligarLetreiro(raiz) {
+    pararLetreiro();
+    pararLetreiro = () => {};
+    const el = raiz && typeof raiz.querySelector === 'function' ? raiz.querySelector('[data-quem-leu].varios') : null;
+    if (!el || typeof matchMedia !== 'function' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const itens = [...el.querySelectorAll('.letreiro-item')];
+    let i = 0;
+    let visivel = true;
+    let segurando = false;
+    let relogio = null;
+    const parar = () => { clearTimeout(relogio); relogio = null; };
+    // Só começa a contar se não estiver contando: um aviso repetido do observador (a mesma
+    // linha, ainda na tela) não pode zerar a espera, senão o nome nunca troca.
+    const agendar = () => {
+      if (!el.isConnected) { pararLetreiro(); return; }
+      if (!(visivel && !segurando && document.visibilityState === 'visible')) { parar(); return; }
+      if (!relogio) relogio = setTimeout(trocar, TROCA_LETREIRO);
+    };
+    function trocar() {
+      relogio = null;
+      if (!el.isConnected) { pararLetreiro(); return; }
+      const sai = itens[i];
+      i = (i + 1) % itens.length;
+      const entra = itens[i];
+      sai.classList.remove('ativo');
+      sai.classList.add('saindo');
+      entra.classList.remove('saindo');
+      entra.classList.add('ativo');
+      setTimeout(() => sai.classList.remove('saindo'), 600);
+      agendar();
+    }
+    const olho = 'IntersectionObserver' in window
+      ? new IntersectionObserver((e) => { visivel = e[e.length - 1].isIntersecting; agendar(); })
+      : null;
+    if (olho) olho.observe(el);
+    const aba = () => agendar();
+    document.addEventListener('visibilitychange', aba);
+    const segurar = () => { segurando = true; parar(); };
+    const soltar = () => { segurando = false; agendar(); };
+    el.addEventListener('pointerdown', segurar);
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((t) => el.addEventListener(t, soltar));
+    pararLetreiro = () => { parar(); if (olho) olho.disconnect(); document.removeEventListener('visibilitychange', aba); };
+    agendar();
+  }
+  // Depois de recarregar os amigos (a volta do segundo plano), só a linha de quem leu é
+  // repintada, se a folha do alto estiver no documento: o resto da trilha fica como está.
+  CC.repintarQuemLeu = () => {
+    const folha = document.querySelector('.folha-topo');
+    if (!folha) return;
+    const velha = folha.querySelector('[data-quem-leu]');
+    const html = linhaQuemLeu(CC.amigosEmCache ? CC.amigosEmCache() : null);
+    if (velha && velha.outerHTML === html) return;
+    const caixa = document.createElement('div');
+    caixa.innerHTML = html;
+    const nova = caixa.firstChild;
+    if (velha && nova) velha.replaceWith(nova);
+    else if (velha) velha.remove();
+    else if (nova) folha.appendChild(nova);
+    ligarLetreiro(folha);
+  };
+
   // ---------- a folha do alto ----------
   // Uma folha clara no alto da trilha, com a saudação e dois cartões sálvia: a leitura de
   // hoje (quantas das partes do dia já foram) e a ofensiva. Tocar no primeiro abre a lição;
@@ -220,11 +314,7 @@
     const subiu = ofensivaVista !== null && seq.atual > ofensivaVista;
     ofensivaVista = seq.atual;
 
-    const quemLeu = ((amigos && amigos.amigos) || []).filter((a) => a.leuHoje);
-    const juntos = quemLeu.length
-      ? '<span class="lendo-junto-linha"><span class="rostos">' + quemLeu.slice(0, 3).map((a) => CC.retratoAmigo(a, 'mini')).join('') + '</span>'
-        + CC.esc(quemLeu.length === 1 ? quemLeu[0].nome.split(' ')[0] + ' já leu hoje' : quemLeu.length + ' amigos já leram hoje') + '</span>'
-      : '';
+    const juntos = linhaQuemLeu(amigos);
     const novo = !feito && CC.ler('lidos', []).length < 3 && CC.ler('licoes', []).length < D.licoes.length;
     const primeira = !CC.ler('lidos', []).length;
     const nome = String((CC.apelido && CC.apelido()) || (CC.quem || {}).nome || '').trim().split(/\s+/)[0];
@@ -307,6 +397,7 @@
       + folhaDoTopo(atual, amigos, faixaToque)
       + '<div class="trilha-caminho">' + corpo + '</div></div>'
       + '<button class="ir-atual" data-ir-atual hidden aria-label="Voltar ao dia de hoje">' + CC.ico('baixo') + '</button>';
+    ligarLetreiro(raiz);
 
     raiz.querySelectorAll('[data-dia]').forEach((el) => {
       el.onclick = (ev) => { ev.stopPropagation(); abrirPop(Number(el.dataset.dia), el); };

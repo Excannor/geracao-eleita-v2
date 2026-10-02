@@ -6,15 +6,24 @@
 
   const servido = () => location.protocol.startsWith('http');
   const comConta = () => servido() && !(CC.quem && !CC.quem.comSenha);
-  let cache = null;
+  let cacheBruto = null;
+  // O dia (no fuso de quem usa) em que a lista veio do servidor. O "já leu hoje" de um amigo é
+  // calculado lá com as datas de leitura dele; vindo de ontem, ele não vale mais: o app aberto
+  // em segundo plano passava da meia-noite mostrando "Fulano já leu hoje" de ontem, e se a
+  // recarga falhar o cache antigo fica. Os campos do dia (leu, toque enviado, toques recebidos)
+  // de uma lista de outro dia saem como "ainda não".
+  let cacheDia = '';
+  const doDia = (d) => (!d || cacheDia === CC.hojeIso() ? d
+    : { ...d, toques: [], amigos: (d.amigos || []).map((a) => ({ ...a, leuHoje: false, toqueEnviado: false })) });
   let mural = null;
 
   CC.carregarAmigos = function () {
     // Sem conta (servidor aberto das ferramentas de teste) não há amigos a pedir.
     if (!comConta()) return Promise.resolve(null);
-    return CC.api('api/amigos').then((d) => { cache = d; return d; }).catch(() => null);
+    return CC.api('api/amigos').then((d) => { cacheBruto = d; cacheDia = CC.hojeIso(); return d; }).catch(() => null);
   };
-  CC.amigosEmCache = () => cache;
+  const emCache = () => doDia(cacheBruto);
+  CC.amigosEmCache = emCache;
 
   CC.carregarNovidades = function () {
     if (!comConta()) return Promise.resolve(null);
@@ -41,6 +50,7 @@
     const visto = Number(lerLocal('cc.novidades.visto') || 0);
     const eu = (CC.quem || {}).usuario;
     const novas = ((mural && mural.eventos) || []).filter((e) => e.em > visto && e.autor.usuario !== eu).length;
+    const cache = emCache();
     return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) + (cache.pedidosConversa || []).length : 0) + novas;
   };
 
@@ -79,7 +89,7 @@
       + '<p class="passo-dica pequena">Procure a pessoa do jeito que vocês costumam falar. Só chega o pedido, nunca o que ela escreveu no app.</p>'
       + '<div class="lista-pedidos">' + lista.map(CC.linhaPedidoConversa).join('') + '</div>'
     : '');
-  CC.pedidosDeConversa = () => (cache && cache.pedidosConversa) || [];
+  CC.pedidosDeConversa = () => (emCache() && emCache().pedidosConversa) || [];
 
   // (o teste roda este arquivo sem DOM de verdade: só liga o clique quando existe)
   if (typeof document.addEventListener === 'function') document.addEventListener('click', async (ev) => {
@@ -110,7 +120,7 @@
 
 
   // ---------- publicar no mural ----------
-  CC.podeCompartilharComAmigos = () => comConta() && !!(cache && (cache.amigos || []).length);
+  CC.podeCompartilharComAmigos = () => comConta() && !!(emCache() && (emCache().amigos || []).length);
 
   async function publicar(tipo, dados) {
     if (!comConta() || !mural || !mural.ligado) return false;
@@ -176,7 +186,7 @@
   // Primeiro pergunta para quem é o convite: o link e o texto mudam, porque um vai para
   // quem já lê a Bíblia com a pessoa e o outro para quem talvez nunca tenha lido nada.
   CC.convidar = async function () {
-    if (cache && !cache.perfilCompleto) {
+    if (emCache() && !emCache().perfilCompleto) {
       const completou = await CC.completarCadastro(CC.quem || {});
       if (!completou) return;
     }
@@ -456,7 +466,7 @@
   }
 
   function folhaDenuncia(pessoa) {
-    const motivos = (cache && cache.motivos) || [];
+    const motivos = (emCache() && emCache().motivos) || [];
     CC.folha('<h2>Denunciar @' + CC.esc(pessoa.usuario) + '</h2>'
       + '<p>Escolha o motivo. A denúncia fica guardada para quem cuida do app, e a pessoa não é avisada.</p>'
       + '<div class="opcoes-traducao">' + motivos.map((m) => '<button class="opcao-traducao" data-motivo="' + CC.esc(m) + '"><b>'
@@ -722,12 +732,12 @@
       if (m.eventos) gravarLocal('cc.novidades.visto', String(Date.now()));
     };
 
-    desenhar(cache, mural);
+    desenhar(emCache(), mural);
     // A resposta do servidor só redesenha se trouxe algo novo; e aí sem repetir a entrada, que
     // já tocou no primeiro desenho. Redesenhar igual fazia a tela piscar ao abrir o Feed.
     const celulasAgora = () => (CC.minhasCelulas ? CC.minhasCelulas() : []);
-    const antes = JSON.stringify([cache, mural, celulasAgora()]);
-    const jaMostrou = !!cache;
+    const antes = JSON.stringify([emCache(), mural, celulasAgora()]);
+    const jaMostrou = !!emCache();
     Promise.all([CC.carregarAmigos(), CC.carregarNovidades()]).then(([d, n]) => {
       if (!/^#\/(amigos|novidades)\/?$/.test(location.hash)) return;
       if (CC.pintarTopo) CC.pintarTopo();
@@ -736,7 +746,7 @@
       if (CC.pintarNavegacao) CC.pintarNavegacao();
       if (d && JSON.stringify([d, n || mural, celulasAgora()]) === antes) return;
       if (jaMostrou) raiz.classList.add('sem-entrada');
-      desenhar(d || cache, n || mural, d ? '' : 'Não consegui falar com o servidor agora.');
+      desenhar(d || emCache(), n || mural, d ? '' : 'Não consegui falar com o servidor agora.');
     });
   };
 
@@ -754,8 +764,8 @@
         el.onclick = async () => { await acaoAmizade('desbloquear', el.dataset.desbloquear).catch(() => {}); recarregar(); };
       });
     };
-    desenhar(cache);
-    CC.carregarAmigos().then((d) => { if (location.hash.startsWith('#/amigos/bloqueados')) desenhar(d || cache); });
+    desenhar(emCache());
+    CC.carregarAmigos().then((d) => { if (location.hash.startsWith('#/amigos/bloqueados')) desenhar(d || emCache()); });
   };
 
   // Para a tela de configurações.
