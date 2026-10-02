@@ -37,6 +37,14 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
 2. **Interpretação lógica.** Pode agrupar, ligar pontos e usar analogias simples, mas a premissa é
    sempre a do texto.
 3. **Exaustividade.** Completo e detalhado; não cortar o que importa para ficar curto.
+4. **Paráfrase fiel.** O verbo e o fato vêm do versículo da referência ("dominem" em Gn 1.28,
+   não "cuidar", que é de Gn 2.15), e a referência cobre todo fato da frase. Palavra tirada do
+   meio de uma citação vira reticências.
+   Vale também para adjetivo e circunstância ("quase cego", "fugindo", "no monte Moriá",
+   "velha demais"): se não está no trecho citado, ou amplia a referência ou sai da frase.
+5. **Marcos completos.** Toda troca de nome, aliança, reencontro, mudança de terra e morte de
+   protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
+   e 46). Cada referência aparece uma vez no mapa; curiosidades seguem a ordem dos capítulos.
 
 Fora do próprio livro só entram, e marcados como tal: o **significado do nome** (é tradução, não
 fato novo), a seção **"[Livro] e Cristo"**, com as citações do Novo Testamento (livro, capítulo e
@@ -48,7 +56,9 @@ fora.
 
 **Estrutura**
 - **A raiz:** a ideia central em um parágrafo direto (mais uma frase de apoio, se precisar).
-- **Ramos:** de 4 a 6 pilares, cada um com nome curto e forte e uma linha de subtítulo.
+- **Ramos:** de 4 a 6 pilares, cada um com nome curto e forte e uma linha de subtítulo (até uns
+  30 caracteres, para caber numa linha ao lado do desenho a 390px). Nada de pronome com hífen no
+  fim de frase ("odiá-lo"): a linha quebra no hífen.
 - **Ramificações:** de 3 a 6 por ramo, cada uma com a referência no fim.
 - **Conexões:** entre um ramo e o seguinte, uma frase que mostra o raciocínio do autor bíblico
   (de preferência ligando dois versículos do próprio livro, como o toco de Is 6.13 que vira o
@@ -82,7 +92,13 @@ entrar. Renderize ampliado (280px ou mais) e confira:
 - nada torto, solto, cortado pela borda ou sobrando para fora do contorno;
 - nenhuma peça sobreposta a outra sem querer (folha em cima das uvas, alça dentro do corpo);
 - partes ligadas onde deveriam estar (cabeça no corpo, cacho no ramo, pena tocando o rolo);
-- dá para dizer o que é sem legenda.
+- dá para dizer o que é sem legenda;
+- o desenho de "[Livro] e Cristo" fica sobre um disco: tudo cabe num círculo de raio 54 em volta
+  de (60,60), senão a borda corta (a escada de Gênesis cortou o chão e a pedra).
+- encaixes calculados, não chutados: cabo que toca o galho e a fruta, pé que nasce no bojo da
+  panela (ponto tirado da curva); traço que não representa nada sai.
+`CHROME=... node ferramentas/ver-desenhos.mjs <saida.png> <id...>` mostra cada desenho a 280px no
+claro, no escuro e sobre o disco; olhe a imagem com Read.
 Depois, renderize a tela inteira a 390px e confira cada seta: a ponta aponta para o bloco certo,
 a curva não cruza texto, a conexão escrita não encosta na linha pontilhada. Confira nos dois
 temas: no escuro o desenho vira traço claro sobre papel grafite (as classes de traço seguem o
@@ -90,7 +106,8 @@ tema; nunca cor literal dentro do SVG).
 
 Para renderizar sem o runtime do canvas, troque a linha do `support.js` por `@font-face` com as
 fontes de `dist/` e use `CHROME=... --headless --screenshot` (como em `design/mapas/`). Com o
-app no ar, a tela de verdade sai com `CHEIA=1 node design/ferramentas/foto-conta.mjs 390 844
+app no ar (cookie da pasta de estado desse servidor; se a folha de consentimento aparecer, mande
+`POST api/consentimento` com o cookie antes), a tela de verdade sai com `CHEIA=1 node design/ferramentas/foto-conta.mjs 390 844
 <saida.png> '#/mapa/<slug>' 0 <claro|escuro>` (página inteira); recorte em pedaços de 1500px
 para olhar peça por peça, porque a página inteira reduzida esconde defeito.
 
@@ -155,7 +172,8 @@ desce quando o mapa abre e fica guardado pelo service worker para abrir sem rede
   NBV, citações, palavras proibidas, travessão, itens consecutivos começando igual) roda também
   dentro do `node teste.mjs`. `CHROME=... node ferramentas/teste-mapas.mjs` abre tudo no
   navegador: grade, mapa, setas e desenhos, nenhuma curva cruzando o texto da conexão, 390 e
-  360px, os dois temas, a Bíblia igual, sem rede. As capturas de referência ficam em
+  360px, os dois temas, a Bíblia igual, sem rede; e passa por todo mapa do índice conferindo
+  ramos, desenhos, setas, curvas fora do texto e largura a 390 e 360px. As capturas de referência ficam em
   `design/mapas/capturas/` (Explorar e mapa inteiro, claro e escuro, a 390px).
 
 Para um mapa novo: escrever o JSON, desenhar os SVGs e revisá-los ampliados (seção 2), rodar o

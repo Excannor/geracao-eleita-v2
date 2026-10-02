@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- luz sobre as águas (Gn 1.2-3): o sol nasce no horizonte do mar, com os raios por cima -->
+<path class="k s" d="M40 72a20 20 0 0 1 40 0z"/>
+<path class="k" d="M80.8 60L88.6 55.5M72 51.2L76.5 43.4M60 48V39M48 51.2L43.5 43.4M39.2 60L31.4 55.5"/>
+<path class="k" d="M10 72h100"/>
+<path class="k" d="M14 82c6-4 12-4 18 0s12 4 18 0 12-4 18 0 12 4 18 0 12-4 18 0"/>
+<path class="h" d="M24 92c5-3 10-3 15 0s10 3 15 0 10-3 15 0 10 3 15 0"/>
+<path class="h" d="M36 101c5-3 9-3 13 0s9 3 13 0 9-3 13 0"/>
+</svg>

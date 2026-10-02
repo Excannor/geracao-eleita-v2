@@ -178,7 +178,7 @@
 
     const significado = rotulo('alfinete', 'Significado do nome')
       + '<p>Em ' + CC.esc(s.lingua || 'hebraico') + ', '
-      + (s.original ? '<span class="mapa-original" lang="' + (LANG[s.lingua] || 'he') + '" dir="rtl">' + CC.esc(s.original) + '</span>, ' : '')
+      + (s.original ? '<span class="mapa-original" lang="' + (LANG[s.lingua] || 'he') + '" dir="' + (s.lingua === 'grego' ? 'ltr' : 'rtl') + '">' + CC.esc(s.original) + '</span>, ' : '')
       + (s.transliteracao ? '<i>' + CC.esc(s.transliteracao) + '</i>: ' : '')
       + '<b>“' + CC.esc(s.traducao) + '”</b>. ' + CC.esc(s.texto) + '</p>';
 

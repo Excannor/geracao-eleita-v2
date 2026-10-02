@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- panela de ensopado (Gn 25.29-34): o ensopado de lentilhas que custou o direito de filho mais velho -->
+<path class="h" d="M46 38c-4-4 4-8 0-12s4-8 0-12M60 36c-4-4 4-8 0-12s4-8 0-12M74 38c-4-4 4-8 0-12s4-8 0-12"/>
+<path class="k p" d="M22 54c0 24 16 42 38 42s38-18 38-42"/>
+<path class="k" d="M23 62c-8-2-12 8-4 11M97 62c8-2 12 8 4 11"/>
+<ellipse class="k p" cx="60" cy="54" rx="38" ry="8"/>
+<ellipse class="k s" cx="60" cy="54" rx="31" ry="4.5"/>
+<circle class="e" cx="48" cy="54" r="1.4"/><circle class="e" cx="58" cy="52.5" r="1.4"/><circle class="e" cx="68" cy="55" r="1.4"/><circle class="e" cx="76" cy="53" r="1.4"/><circle class="e" cx="40" cy="53" r="1.2"/>
+<path class="h" d="M30 70c8 6 18 9 30 9s22-3 30-9M38 82c6 4 14 6 22 6s16-2 22-6"/>
+<path class="k" d="M40 90l-5 14M80 90l5 14M30 104h60"/>
+</svg>

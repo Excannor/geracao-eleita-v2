@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a escada de Betel (Gn 28.12): da terra até o céu, entrando na nuvem; a pedra de travesseiro no chão. Tudo cabe num círculo de raio 54, porque em "Gênesis e Cristo" o desenho fica sobre um disco -->
+<circle class="s" cx="70" cy="18" r="8"/>
+<path class="k" d="M42 100L54 34M78 100L66 34"/>
+<path class="k" d="M43.8 90H76.2M46 78H74M48.2 66H71.8M50.4 54H69.6M52.5 42H67.5"/>
+<path class="k p" d="M35 38c-8 0-10-10-2-12 0-8 10-10 15-4 4-8 16-8 20 0 4-6 14-4 14 4 9 0 11 10 2 12z"/>
+<path class="k p" d="M28 100c0-4 2-7 6-7s6 3 6 7z"/>
+<path class="h" d="M31 99l3-3M34 99l3-3"/>
+<path class="k" d="M26 100h68"/>
+</svg>

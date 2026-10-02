@@ -110,7 +110,16 @@ const estouro = (largura) => av('JSON.stringify([...document.querySelectorAll(".
 ok(await estouro() === '[]', 'nenhum nome quebra no meio nem sai da célula a 390px');
 ok(await av('[...document.querySelectorAll("a.celula-mapa")].every((c) => c.getBoundingClientRect().height >= 44)'), 'as células com mapa têm alvo de toque de 44px');
 ok(await av('document.documentElement.scrollWidth - innerWidth') <= 0, 'nada estoura a largura do Explorar');
-ok(await av('!!document.querySelector(".cartao-mapas") && document.querySelector(".cartao-mapas").textContent.includes("Mapas dos livros")'), 'o cartão "Mapas dos livros" aparece no alto do Explorar');
+// No dia 1 o plano lê Gênesis, que tem mapa: o cartão do alto leva direto a ele.
+ok(await av('(() => { const c = document.querySelector(".cartao-mapas"); return !!c && c.getAttribute("href") === "#/mapa/genesis" && c.textContent.includes("Mapa de Gênesis"); })()'),
+  'no dia 1 do plano (Gênesis), o cartão do alto leva ao mapa de Gênesis');
+// Num dia cujo livro ainda não tem mapa, o cartão vira "Mapas dos livros" e desce até a grade.
+const diaSemMapa = await av('(() => { const n = CC.D.plano.findIndex((d) => !(d.livros || []).some((l) => CC.mapaDoLivro(l))) + 1; CC.diaAtual = () => n; return n; })()');
+await av('location.hash = "#/"');
+await dormir(300);
+await av('location.hash = "#/explorar"');
+await esperar('!!document.querySelector(".cartao-mapas")');
+ok(await av('!!document.querySelector(".cartao-mapas") && document.querySelector(".cartao-mapas").textContent.includes("Mapas dos livros")'), 'num dia sem mapa (dia ' + diaSemMapa + '), o cartão "Mapas dos livros" aparece no alto do Explorar');
 const antesDoAtalho = await av('CC.rolagemY()');
 await av('document.querySelector("[data-ir-mapas]").click()');
 await dormir(400);
@@ -164,6 +173,30 @@ await av('document.querySelector(".folha-mapa [data-voltar]").click()');
 ok(await esperar('location.hash === "#/explorar" && !!document.querySelector("#mapas-dos-livros")'), 'o voltar do mapa leva ao Explorar');
 await dormir(500);
 ok(await av('Math.abs(document.querySelector("#mapas-dos-livros").getBoundingClientRect().top) < 140'), 'o Explorar reabre na grade dos mapas, não no alto');
+
+// ---------- todos os mapas publicados ----------
+// Cada mapa do índice abre inteiro: um ramo por item do JSON, um desenho por ramo mais Cristo
+// (e a autoria, quando tem), as setas entre os blocos (oito fixas mais uma entre cada par de
+// ramos), nenhuma curva por cima do texto das conexões e nada estourando a largura, a 390 e a 360.
+for (const slug of indice.publicados) {
+  const m = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'mapas', slug + '.json'), 'utf8'));
+  const n = m.ramos.length;
+  const desenhos = n + 1 + (m.autoria && m.autoria.desenho ? 1 : 0);
+  for (const [w, h] of [[390, 844], [360, 740]]) {
+    await tela(w, h);
+    await av('location.hash = "#/explorar"');
+    await dormir(300);
+    await av('location.hash = "#/mapa/' + slug + '"');
+    const abriu = await esperar('document.querySelectorAll(".mapa .mapa-ramo").length === ' + n + ' && document.querySelector(".mapa-nome").textContent === ' + JSON.stringify(m.nome));
+    await dormir(700);
+    const desenhosNaTela = await av('[...document.querySelectorAll(".mapa .desenho svg")].filter((s) => s.querySelector("path, circle, ellipse")).length');
+    const setas = await av('document.querySelectorAll(".mapa svg.seta").length');
+    const cruz = await cruzamentos();
+    const largura = await av('document.documentElement.scrollWidth - innerWidth');
+    ok(abriu && desenhosNaTela === desenhos && setas === n - 1 + 8 && cruz === JSON.stringify(Array(n - 1).fill(0)) && largura <= 0,
+      m.nome + ' a ' + w + 'px: ' + n + ' ramos, ' + desenhosNaTela + '/' + desenhos + ' desenhos, ' + setas + ' setas, curvas fora do texto (' + cruz + '), largura ok');
+  }
+}
 
 // ---------- 360px ----------
 await tela(360, 740);

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- túnica longa de diversas cores (Gn 37.3): mangas compridas, barra até os pés e faixas, uma delas em sálvia -->
+<path class="k p" d="M48 16h24l20 10 14 32-12 4-12-24 8 70H30l8-70-12 24-12-4 14-32z"/>
+<path class="s" d="M34.8 66H85.2L86.3 76H33.7z"/>
+<path class="k" d="M34.8 66H85.2M33.7 76H86.3"/>
+<path class="k" d="M48 16c2 8 22 8 24 0"/>
+<path class="h" d="M36.4 52H83.6M35.7 58H84.3M32.5 86H87.5M31.6 94H88.4M30.9 100H89.1"/>
+<path class="h" d="M102.5 50L91 56M17.5 50L29 56"/>
+</svg>

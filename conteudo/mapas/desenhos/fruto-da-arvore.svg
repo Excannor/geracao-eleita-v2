@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o fruto da árvore (Gn 3.6): a fruta pendurada no galho, com folhas -->
+<g transform="translate(0 10)">
+<path class="k" d="M8 26c20-6 40-6 52 0s34 8 52 2"/>
+<path class="k p" d="M30 25c-6-9-17-11-23-6 5 7 15 9 23 6z"/>
+<path class="h" d="M29 24c-7-3-13-4-20-5"/>
+<path class="k p" d="M96 30c3 9 12 13 19 11-2-8-11-13-19-11z"/>
+<path class="h" d="M97 31c6 2 11 5 17 9"/>
+<path class="k" d="M60 26v22"/>
+<path class="k p" d="M61 38c6-6 15-7 21-2-5 6-14 7-21 2z"/>
+<path class="h" d="M62 38c6-1 13-2 19-2"/>
+<path class="k s" d="M60 48c-5-4-15-5-21 1-8 8-6 26 4 34 6 5 12 4 17 1 5 3 11 4 17-1 10-8 12-26 4-34-6-6-16-5-21-1z"/>
+<path class="h" d="M46 58c-3 5-3 11 0 16"/>
+</g>
+</svg>

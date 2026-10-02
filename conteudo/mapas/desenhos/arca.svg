@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a arca (Gn 6.14-16): o casco de madeira, a casa com telhado, a janela e a porta lateral, sobre as águas -->
+<path class="k s" d="M30 52l30-16 30 16z"/>
+<path class="k p" d="M36 52h48v22H36z"/>
+<path class="k p" d="M42 58h10v8H42z"/>
+<path class="k" d="M62 74V60h12v14"/>
+<path class="k p" d="M12 74h96l-12 22H24z"/>
+<path class="h" d="M17 81h86M21 88h78M40 74v7M70 81v7M54 88v8M86 74v7"/>
+<path class="k" d="M4 102c6-4 12-4 18 0s12 4 18 0 12-4 18 0 12 4 18 0 12-4 18 0 12 4 18 0"/>
+<path class="h" d="M16 110c5-3 10-3 15 0s10 3 15 0 10-3 15 0 10 3 15 0 10-3 15 0"/>
+</svg>

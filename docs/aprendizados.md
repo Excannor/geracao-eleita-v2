@@ -57,6 +57,60 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
 - 2026-10-02 · revisão · A captura da página inteira (11.800px) reduzida numa imagem só esconde
   qualquer defeito de seta ou desenho → recortar em pedaços de 1500px e olhar um a um (regra na
   skill).
+- 2026-10-02 · desenho · Gênesis: a escada de "Gênesis e Cristo" ia de borda a borda e, sobre o
+  disco claro do cartão escuro, a linha do chão e a pedra saíram cortadas pelo círculo. O tronco
+  de Isaías (já publicado) tem o mesmo defeito nas raízes → o desenho de "[Livro] e Cristo" cabe
+  num círculo de raio 54 em volta de (60,60); conferir com `ferramentas/ver-desenhos.mjs`, que
+  mostra o desenho também sobre o disco (regra na skill). O tronco de Isaías fica para corrigir.
+- 2026-10-02 · desenho · A túnica de José saiu com cara de camiseta, e o disco sálvia atrás da
+  nuvem da escada vazava por baixo dela → roupa se reconhece pelo traço que a define (manga
+  comprida, barra até os pés); forma escondida atrás de outra tem de ficar toda escondida ou
+  aparecer de propósito (o sol espiando por cima da nuvem).
+- 2026-10-02 · conteúdo · "o homem... encarregado de cuidar do resto" em Gn 1.26-28, que diz
+  "dominem": o verbo veio de Gn 2.15. E o choro de José estava em 45.2 com a referência 45.3-8 →
+  a paráfrase usa o verbo do versículo citado, e a referência cobre todo fato da frase.
+- 2026-10-02 · conteúdo · Tirei "(isto é, Jerusalém)" do meio da citação de Gn 14.18 sem marcar,
+  e o checador barrou → palavra cortada no meio de citação vira reticências ("rei de Salém...
+  sacerdote").
+- 2026-10-02 · tela · "odiá-lo" quebrou no hífen ("odiá-" / "lo") e o subtítulo do ramo 4 deixou
+  "povos" sozinho na linha → fim de frase sem pronome com hífen; subtítulo do ramo com até uns 30
+  caracteres, para caber numa linha ao lado do desenho a 390px (regra na skill).
+- 2026-10-02 · teste · O teste-mapas supunha que o livro do dia 1 do plano não tinha mapa; com
+  Gênesis publicado o cartão do Explorar passou a ser "Mapa de Gênesis" e duas checagens caíram.
+  E a geometria (curvas fora do texto, desenhos, setas, largura) só era conferida em Isaías → o
+  teste confere os dois casos do cartão e passa por todo mapa do índice a 390 e 360px.
+- 2026-10-02 · tela · O nome original no significado saía sempre com `dir="rtl"`, certo para o
+  hebraico e errado para o grego dos mapas do NT → `dir` pela língua.
+- 2026-10-02 · publicação · Para ver um mapa novo na tela é preciso pô-lo no índice, que é também
+  o que o publica → o mapa entra no índice para a revisão em tela, e quem revisa decide se ele
+  fica antes do commit (o índice diz o que vai ao ar).
+- 2026-10-02 · revisão · A revisão de Gênesis achou fatos fora da referência do item: "quase
+  cego" (27.1) em 27.15-23, "Fugindo" sem 27.41-45, "No monte Moriá" (22.2) em 22.7-13, "Velha
+  demais" (18.11) em 21.1-6, "Sem filhos" (15.2-3) em 15.5-6, "acusação falsa" fora de 39.19-23,
+  "Judá, que sugeriu vender José" (37.26) em 44.18-34, "chega do campo" onde a NBV diz "em casa",
+  e "sai levando só uma promessa" quando 12.5 conta que Abrão levou Ló e todos os bens → conferir
+  cada adjetivo e cada circunstância contra o trecho exato da referência, não só o fato principal
+  (o checador só vê citações entre aspas; o resto é leitura humana, versículo por versículo).
+- 2026-10-02 · conteúdo · Gênesis saiu sem a mudança de nome Abrão/Abraão e a aliança (Gn 17), sem
+  o reencontro de Jacó e Esaú (Gn 33) e sem a descida de Jacó ao Egito (Gn 46): o mapa passava de
+  "Abrão creu" para "Abraão intercede" sem explicar, e o ramo de José parava no capítulo 45 →
+  exaustividade: listar os capítulos de cada ramo e conferir que todo marco narrativo (troca de
+  nome, aliança, reencontro, mudança de terra, morte do protagonista) aparece num galho, numa
+  conexão ou numa curiosidade; juntar dois galhos de um mesmo capítulo para abrir espaço.
+- 2026-10-02 · conteúdo · A curiosidade de Gn 32.32 repetia a autoria (o "até hoje" da mesma
+  referência), e as curiosidades não seguiam a ordem do livro (Gn 16 depois de Gn 6 trocado) →
+  cada referência aparece uma vez no mapa; curiosidades na ordem dos capítulos.
+- 2026-10-02 · desenho · Na revisão ampliada: o cabo da fruta não tocava o galho nem a fruta (3
+  unidades de folga em cada ponta), os pés da panela começavam abaixo do bojo, soltos, e a tenda
+  tinha dois riscos saindo para baixo do chão, sem função → calcular o ponto de encontro na curva
+  (não chutar a coordenada) e apagar todo traço que não representa nada.
+- 2026-10-02 · tela · Subtítulo do ramo 1 com 36 caracteres ("Deus fala, e o mundo passa a
+  existir") passou da regra dos 30 que tinha acabado de entrar na skill → contar os caracteres do
+  `sub` antes de entregar (o checador podia avisar).
+- 2026-10-02 · captura · A captura do mapa saiu escurecida, com a folha "Antes de continuar" por
+  cima, porque a conta de teste ainda não tinha dado o consentimento da versão nova; e o cookie da
+  pasta errada abriu a página de entrada → usar o cookie da pasta de estado do servidor que está no
+  ar e, se a folha aparecer, mandar `POST api/consentimento` com esse cookie antes de capturar.
 
 ## Geral
 
