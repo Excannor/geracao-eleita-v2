@@ -108,7 +108,8 @@
   //   Pessoas: quem leu hoje, notificar quem falta, chamar alguém, sair ou encerrar
   // Visitante (só está conhecendo) não vê a aba Oração: pedido é dado sensível, e ele ainda
   // não é membro de verdade.
-  const ABAS_CELULA = [['hoje', 'Hoje'], ['estudo', 'Estudo'], ['oracao', 'Oração'], ['pessoas', 'Pessoas']];
+  // Painel: as estatísticas da célula, só para quem conduz (líder e auxiliar).
+  const ABAS_CELULA = [['hoje', 'Hoje'], ['estudo', 'Estudo'], ['oracao', 'Oração'], ['pessoas', 'Pessoas'], ['painel', 'Painel']];
   const enderecoCelula = (id, aba) => '#/novidades/celula/' + encodeURIComponent(id) + (aba && aba !== 'hoje' ? '/' + aba : '');
   let desenhoCelula = 0;
 
@@ -129,7 +130,7 @@
       const euMembro = p.membros.find((m) => m.usuario === euUsuario()) || {};
       const visitante = euMembro.papel === 'visitante';
       // Visitante não vê a aba Oração: se chegou nela por um link antigo, cai em Hoje.
-      const abasVisiveis = ABAS_CELULA.filter(([k]) => k !== 'oracao' || !visitante);
+      const abasVisiveis = ABAS_CELULA.filter(([k]) => (k !== 'oracao' || !visitante) && (k !== 'painel' || p.euConduzo));
       const aba = abasVisiveis.some(([k]) => k === pedida) ? pedida : 'hoje';
       // A folha do alto (só apresentação, 24-juntos.css): o nome, os dias seguidos no cartão
       // de destaque do Início e as abas; o painel da aba fica embaixo, no fundo.
@@ -144,7 +145,7 @@
           + r + (k === 'estudo' && p.estudo ? '<i class="ponto-estudo" aria-hidden="true"></i>' : '') + '</button>').join('')
         + '</div></div>'
         + '<div class="painel-celula" role="tabpanel">'
-        + (aba === 'hoje' ? abaHoje(p) : aba === 'pessoas' ? abaPessoas(p, souLider) : CC.esqueleto('lista'))
+        + (aba === 'hoje' ? abaHoje(p) : aba === 'pessoas' ? abaPessoas(p, souLider) : aba === 'painel' ? abaPainel(p) : CC.esqueleto('lista'))
         + '</div>';
       ligarVoltar(raiz);
       // Trocar de aba não empilha histórico: o "voltar" do celular sai da célula de uma vez.
@@ -321,7 +322,6 @@
           + (souLider && m.usuario !== p.criadoPor ? '<button class="botao plano pequeno" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar</button>' : '')
           + '</div>';
       }).join('') + '</div>'
-      + (p.euConduzo ? blocoFunil(p) : '')
       + (visitantes.length ? CC.tituloSecao('Visitantes') + '<div class="lista-pedidos">' + visitantes.map((m) => '<div class="linha-amigo">' + retrato(m)
         + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + '</b></div>'
         + (souLider ? '<button class="botao plano pequeno" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar</button>' : '')
@@ -771,10 +771,15 @@
       + (p.encontro >= 0 && encontroHoje(p) ? '' : '<p class="passo-dica pequena">' + (p.encontro >= 0
         ? 'Encontro ' + nomeDoEncontro(p.encontro) + '.'
         : (conduzo ? 'Marque o dia do encontro para a célula ver "Encontro hoje" no dia.' : 'Quem conduz a célula ainda não marcou o dia do encontro.')) + '</p>')
-      // Só quem conduz vê: primeiro como a célula está (a chama de cada um, a presença nos
-      // últimos encontros e o check-in somado), depois a pessoa a procurar, com o motivo, nunca
-      // um placar.
-      + (conduzo ? cartaoSaude(p) + blocoCheckin(p) + blocoAtencao(p) : '');
+      // Só quem conduz vê a pessoa a procurar, com o motivo, nunca um placar. As estatísticas
+      // (chama, encontros, check-in, caminhada) moram na aba Painel.
+      + (conduzo ? blocoAtencao(p) : '');
+  }
+
+  // A aba Painel, só de quem conduz: como a célula está, num lugar só.
+  function abaPainel(p) {
+    if (!p.painel) return CC.esqueleto('lista');
+    return cartaoSaude(p) + blocoCheckin(p) + blocoFunil(p);
   }
 
   // O painel inteiro da célula, para o administrador que abre qualquer célula (07e-painel.js):
