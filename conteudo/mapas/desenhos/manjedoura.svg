@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a manjedoura (Lc 2.7, 12, 16): cocho de madeira sobre cavaletes em X (o cruzamento fica atrás da frente do cocho, e embaixo aparecem as pernas abertas), palha saindo pelas pontas e o menino enrolado no cobertor (a área sálvia, com as dobras em diagonal: faixas em pé faziam uma lagarta) deitado dentro; a frente do cocho cobre a parte de baixo do menino. Traço de pena: .k contorno, .h hachura, .p papel, .s sálvia, .e cheio -->
+<path class="k" d="M26 50L46 98M46 50L26 98M74 50L94 98M94 50L74 98"/>
+<path class="k p" d="M28 48H92L97 56H23Z"/>
+<path class="h" d="M27 54L23 45M30 54L29 43M90 54L92 43M93 54L97 45"/>
+<ellipse class="k s" cx="66" cy="47" rx="23" ry="10"/>
+<path class="h" d="M54 38.5C58 45 61 51 64 56.9M68 37.1C72 44 76 50 79 55.2"/>
+<circle class="k p" cx="41" cy="44" r="8.5"/>
+<path class="h" d="M37 44.5Q38.6 45.8 40.2 44.5"/>
+<path class="k p" d="M23 56H97L88 80H32Z"/>
+<path class="h" d="M27 64H93M30 72H90"/>
+<path class="k" d="M14 98H106"/>
+</svg>

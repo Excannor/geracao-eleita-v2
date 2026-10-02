@@ -42,6 +42,8 @@
 
   // espaço inseparável entre sigla e capítulo e um juntor depois do traço, só na tela
   const nb = (t) => String(t).replace(/(\S) (?=\d)/g, '$1 ').replace(/(\d)([-–])(?=\d)/g, '$1$2⁠');
+  // citação que abre com palavra curta (“O nome...”, “o Filho...”) não deixa o “O sozinho no fim da linha
+  const tx = (t) => CC.esc(t).replace(/([“‘]\S{1,2}) /g, '$1\u00a0');
   const marca = (ref) => '<mark>' + nb(CC.esc(ref)) + '</mark>';
   const marcas = (refs) => (refs || []).map(marca).join(' ');
   // "Mt 1.23" por extenso: "Mateus 1.23"
@@ -238,7 +240,7 @@
   // Entre dois ramos, com a conexão escrita no canto que a curva deixa livre. A altura é
   // acertada depois, pelo tamanho real do texto (ajustarConexoes).
   const longa = (x1, x2, texto, lado) => '<div class="mapa-conexao" data-x1="' + Math.round(x1) + '" data-x2="' + Math.round(x2) + '" data-lado="' + lado + '">' + seta(x1, x2, 150)
-    + (texto ? '<p class="mapa-ligacao ' + lado + '">' + CC.esc(texto) + '</p>' : '') + '</div>';
+    + (texto ? '<p class="mapa-ligacao ' + lado + '">' + tx(texto) + '</p>' : '') + '</div>';
   // A curva só cruza para o lado do texto abaixo dele: a área tem a menor altura em que nenhum
   // ponto do S cai no retângulo do texto (com 10px de folga). Com o S simétrico, ela fica
   // perto do dobro da altura do texto.
@@ -289,17 +291,17 @@
 
     const a = mapa.autoria || {};
     const autoria = '<div class="mapa-textos">' + rotulo('pena', 'Autoria e época')
-      + '<p>' + CC.esc(a.texto) + ' ' + marcas(a.refs) + '</p>'
-      + (a.apoio ? '<p>' + CC.esc(a.apoio) + '</p>' : '') + '</div>' + desenho(mapa, a.desenho);
+      + '<p>' + tx(a.texto) + ' ' + marcas(a.refs) + '</p>'
+      + (a.apoio ? '<p>' + tx(a.apoio) + '</p>' : '') + '</div>' + desenho(mapa, a.desenho);
 
     const r = mapa.raiz || {};
-    const raiz = rotulo('raiz', 'A raiz do livro') + '<p class="mapa-raiz-texto">' + CC.esc(r.texto) + '</p>'
-      + (r.apoio ? '<p>' + CC.esc(r.apoio) + ' ' + marcas(r.refs) + '</p>' : '<p>' + marcas(r.refs) + '</p>');
+    const raiz = rotulo('raiz', 'A raiz do livro') + '<p class="mapa-raiz-texto">' + tx(r.texto) + '</p>'
+      + (r.apoio ? '<p>' + tx(r.apoio) + ' ' + marcas(r.refs) + '</p>' : '<p>' + marcas(r.refs) + '</p>');
 
     const ramos = (mapa.ramos || []).map((ramo, i) => {
       const lado = i % 2 ? 'lado-dir' : 'lado-esq';
-      const galhos = (ramo.galhos || []).map((g) => '<li>' + CC.esc(g.texto) + ' ' + marca(g.ref) + '</li>').join('')
-        + (ramo.jesus ? '<li class="mapa-jesus">' + CC.esc(ramo.jesus.texto) + ' ' + marcas(ramo.jesus.refs) + '</li>' : '');
+      const galhos = (ramo.galhos || []).map((g) => '<li>' + tx(g.texto) + ' ' + marca(g.ref) + '</li>').join('')
+        + (ramo.jesus ? '<li class="mapa-jesus">' + tx(ramo.jesus.texto) + ' ' + marcas(ramo.jesus.refs) + '</li>' : '');
       const proximo = mapa.ramos[i + 1];
       // do desenho deste ramo até o desenho do seguinte, que fica do outro lado
       const ligacao = proximo ? longa(i % 2 ? dir : esq, i % 2 ? esq : dir, ramo.conexao, i % 2 ? 'esq' : 'dir') : '';
@@ -314,7 +316,7 @@
 
     const c = mapa.cristo || {};
     const cristo = '<div class="mapa-cristo-cabeca"><div class="mapa-textos"><span class="mapa-rotulo-claro">' + CC.esc(nome + ' e Cristo') + '</span>'
-      + '<span>' + CC.esc(c.texto) + ' ' + marca(c.ref) + '</span></div>' + desenho(mapa, c.desenho) + '</div>'
+      + '<span>' + tx(c.texto) + ' ' + marca(c.ref) + '</span></div>' + desenho(mapa, c.desenho) + '</div>'
       + '<div class="mapa-pares">' + (c.pares || []).map((p) => '<span class="mapa-par-at">' + nb(CC.esc(p.at)) + '</span>'
         + '<span><span class="mapa-par-texto">' + CC.esc(p.texto) + '</span><br><span class="mapa-par-nt">' + nb(CC.esc(porExtenso(p.nt)))
         + (p.nota ? ': ' + CC.esc(p.nota) : '') + '</span></span>').join('') + '</div>';
@@ -334,9 +336,9 @@
     }).join('') + '</ol>';
 
     const curiosidades = rotulo('lampada', 'Curiosidades do texto') + '<ul class="mapa-curiosidades">'
-      + (mapa.curiosidades || []).map((x) => '<li>' + CC.esc(x.texto) + ' ' + marca(x.ref) + '</li>').join('') + '</ul>';
+      + (mapa.curiosidades || []).map((x) => '<li>' + tx(x.texto) + ' ' + marca(x.ref) + '</li>').join('') + '</ul>';
 
-    const procure = rotulo('lupa', 'Enquanto lê, procure') + '<p class="mapa-procure-texto">' + CC.esc((mapa.procure || {}).texto) + '</p>';
+    const procure = rotulo('lupa', 'Enquanto lê, procure') + '<p class="mapa-procure-texto">' + tx((mapa.procure || {}).texto) + '</p>';
 
     // O botão do fim leva à Bíblia do app, no capítulo em que o plano parou (ou no 1).
     let proximoCap = 1;

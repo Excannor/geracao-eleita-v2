@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o frasco de alabastro com perfume (Lc 7.37-38): boca larga e chata, gargalo estreito e corpo comprido que engorda embaixo, com veios da pedra e uma faixa sálvia; a faixa sai dos pontos tirados da curva do corpo (x em y=60 e y=68) -->
+<path class="k p" d="M55 36C47 40 40 56 40 74C40 94 49 101 60 101C71 101 80 94 80 74C80 56 73 40 65 36Z"/>
+<path class="s" d="M41.43 60C52 63.5 68 63.5 78.57 60L79.74 68C68 71.5 52 71.5 40.26 68Z"/>
+<path class="h" d="M41.43 60C52 63.5 68 63.5 78.57 60M40.26 68C52 71.5 68 71.5 79.74 68"/>
+<path class="h" d="M50 46C54 50 52 54 56 57M68 76C64 82 70 86 66 92M48 78C51 83 49 88 53 93"/>
+<path class="k p" d="M55 36V28H65V36"/>
+<ellipse class="k p" cx="60" cy="26" rx="13" ry="3.5"/>
+<path class="h" d="M34 104H86"/>
+</svg>

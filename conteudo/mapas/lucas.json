@@ -1,0 +1,187 @@
+{
+  "nome": "Lucas",
+  "grupo": "Evangelhos e Atos",
+  "numero": 42,
+  "capitulos": 24,
+  "significado": {
+    "lingua": "grego",
+    "original": "Λουκᾶς",
+    "transliteracao": "Loukas",
+    "traducao": "luminoso",
+    "texto": "É a forma grega de um nome latino ligado a lux, que quer dizer luz. Nenhum versículo do livro traz esse nome."
+  },
+  "autoria": {
+    "texto": "O livro não traz o nome de quem o escreveu, mas o autor fala em primeira pessoa logo na abertura. Outros já tinham escrito relatos a partir do que contaram as testemunhas oculares, e ele achou bom, “depois de uma investigação completa”, mandar um resumo ao “querido amigo Teófilo”.",
+    "apoio": "O objetivo vem em seguida: que Teófilo “tenha plena certeza de todas as verdades que foram ensinadas”.",
+    "refs": [
+      "Lc 1.1-4"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Lucas conta a história de Jesus como a chegada do Salvador para todo o povo: ele nasce numa manjedoura, leva boas notícias aos pobres, come com pecadores, segue decidido para Jerusalém, morre na cruz e volta à vida. No fim, o próprio Jesus resume: estava escrito que “o Cristo devia sofrer, morrer e ressuscitar dos mortos ao terceiro dia” e que o perdão seria anunciado “a todas as nações, começando por Jerusalém”.",
+    "apoio": "“Vou começar com um sacerdote judaico, Zacarias”, avisa o autor, e o relato abre no templo, com o incenso queimando. Fecha com Jesus elevado ao céu e os discípulos “sempre no templo, louvando a Deus”.",
+    "refs": [
+      "Lc 24.46-47",
+      "Lc 1.5-10",
+      "Lc 24.50-53"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Nada impossível",
+      "sub": "Do anúncio ao menino no templo",
+      "desenho": "manjedoura",
+      "galhos": [
+        { "texto": "No santuário, um anjo aparece a Zacarias à direita do altar do incenso: Isabel, já muito idosa, vai dar à luz um filho, e ele se chamará João. Zacarias pergunta “Como vou saber que isso é verdade?” e fica mudo até a criança nascer.", "ref": "Lc 1.11-20" },
+        { "texto": "Em Nazaré, Gabriel anuncia a Maria, uma virgem prometida em casamento a José, que ela vai ter um menino e lhe dará o nome de Jesus. Ela pergunta como, ouve que “para Deus nada é impossível” e responde: “Eu sou a serva do Senhor”.", "ref": "Lc 1.26-38" },
+        { "texto": "Quando Maria chega à casa de Zacarias, o bebê se agita no ventre de Isabel, que chama a visita de “a mãe do meu Senhor”. Maria engrandece o Senhor, que “derrubou governantes dos seus tronos e exaltou os humildes”.", "ref": "Lc 1.39-55" },
+        { "texto": "Um decreto de César Augusto leva José, da linhagem de Davi, de Nazaré a Belém, com Maria grávida. Ali nasce o primeiro filho dela, enrolado num cobertor e deitado numa manjedoura, porque não havia lugar na hospedaria.", "ref": "Lc 2.1-7" },
+        { "texto": "Naquela noite, um anjo aparece a pastores nos campos com “boas notícias de grande alegria, e isso é para todo o povo!” Um exército de anjos louva a Deus, e os pastores correm a Belém para ver a criancinha na manjedoura.", "ref": "Lc 2.8-10, 13-16" },
+        { "texto": "No templo, Simeão toma o menino nos braços e louva a Deus: ele é “a luz que trará iluminação espiritual às nações”. A Maria, avisa que a tristeza, “como uma espada, atravessará a sua alma”.", "ref": "Lc 2.25-35" }
+      ],
+      "conexao": "Aos 12 anos, Jesus já fala da “casa do meu Pai” (Lc 2.42-49). Com cerca de 30, começa o ministério (Lc 3.23)."
+    },
+    {
+      "titulo": "Boa notícia",
+      "sub": "O Ungido começa a missão",
+      "desenho": "pomba-sobre-o-rio",
+      "galhos": [
+        { "texto": "À multidão que pergunta “O que devemos fazer?”, João responde com coisas práticas: quem tem duas túnicas deve dar uma a quem não tem, e o soldado deve se contentar com o salário. E anuncia alguém com mais autoridade, que batizará “com o Espírito Santo e com fogo”.", "ref": "Lc 3.10-16" },
+        { "texto": "Depois de batizado, enquanto Jesus ora, os céus se abrem, o Espírito Santo desce sobre ele na forma de uma pomba, e uma voz diz: “Você é meu Filho muito amado; em você está o meu prazer”.", "ref": "Lc 3.21-22" },
+        { "texto": "Cheio do Espírito Santo, Jesus é levado às terras desertas e tentado pelo diabo durante 40 dias. Responde às três propostas com as Escrituras, e o diabo o deixa “até ocasião oportuna”.", "ref": "Lc 4.1-13" },
+        { "texto": "Na sinagoga da cidade dele, todos se admiram das palavras de Jesus, mas perguntam: “Este não é o filho de José?” Quando ele lembra que Elias foi enviado a uma viúva de Sarepta e que Eliseu purificou Naamã, o sírio, a sinagoga se enfurece e o leva à encosta do monte para o empurrar precipício abaixo. Ele passa pelo meio da multidão e vai embora.", "ref": "Lc 4.22-30" },
+        { "texto": "Depois de uma noite inteira sem pegar nada, os pescadores lançam as redes por ordem de Jesus, e elas começam a se romper. Simão Pedro cai de joelhos: “sou pecador demais para andar ao seu lado”. A resposta: “De agora em diante você será pescador de homens!” Eles deixam tudo e o seguem.", "ref": "Lc 5.4-11" },
+        { "texto": "Sem conseguir passar pela multidão, alguns homens sobem ao teto, tiram telhas e descem um paralítico na maca bem na frente de Jesus. Ele diz: “Amigo, os seus pecados estão perdoados!” E, para provar essa autoridade, manda o homem pegar a maca e ir para casa.", "ref": "Lc 5.18-25" }
+      ],
+      "jesus": {
+        "texto": "Quem viria depois de João, com mais autoridade, é Jesus. Em Atos, Paulo diz que era preciso “crer em Jesus, aquele que João disse que viria depois dele”.",
+        "refs": [
+          "At 19.4"
+        ]
+      },
+      "conexao": "À mesa do cobrador Levi, Jesus diz que veio “convidar os pecadores” ao arrependimento (Lc 5.27-32)."
+    },
+    {
+      "titulo": "O Cristo de Deus",
+      "sub": "Ensina, cura e é reconhecido",
+      "desenho": "frasco-de-alabastro",
+      "galhos": [
+        { "texto": "“Felizes são vocês, os pobres”, diz Jesus aos discípulos. E vai além: amem os inimigos, tratem os outros como querem ser tratados e sejam misericordiosos, “assim como o Pai de vocês é misericordioso”.", "ref": "Lc 6.20-36" },
+        { "texto": "Um centurião romano manda pedir a cura de um escravo e depois avisa que não é digno de receber Jesus em casa: “Fale apenas uma palavra, e o meu servo será curado!” Jesus se admira: “Nunca encontrei entre todos os judeus de Israel um homem com tanta fé!”", "ref": "Lc 7.2-10" },
+        { "texto": "Perto do portão de Naim, sai o enterro do único filho de uma viúva. Cheio de compaixão, Jesus diz “Não chore!”, toca no caixão e manda o jovem se levantar. Ele senta e começa a falar, e o povo diz: “Vimos a mão de Deus agindo hoje em favor do seu povo”.", "ref": "Lc 7.11-16" },
+        { "texto": "Na casa de um fariseu, uma prostituta molha os pés de Jesus com lágrimas, enxuga com os cabelos e derrama perfume. Jesus conta de dois devedores perdoados e diz que “aquele a quem pouco foi perdoado, pouco ama”. Os outros à mesa se perguntam: “Quem este homem pensa que é, andando por aí a perdoar pecados?”", "ref": "Lc 7.37-49" },
+        { "texto": "Durante a travessia do lago, uma tempestade enche o barco enquanto Jesus dorme. Despertado, ele repreende a tempestade; o vento e as ondas se acalmam, e vem a pergunta: “Onde está a sua fé?” Os discípulos se espantam: “Quem é este, que até os ventos e as ondas lhe obedecem?”", "ref": "Lc 8.22-25" },
+        { "texto": "Enquanto ora sozinho, com os discípulos por perto, Jesus pergunta: “Quem vocês dizem que eu sou?” Pedro responde: “O Cristo de Deus!” E Jesus explica que o Filho do Homem precisa sofrer, ser rejeitado, morrer e ressuscitar no terceiro dia.", "ref": "Lc 9.18-22" }
+      ],
+      "conexao": "No monte, Moisés e Elias falam da partida de Jesus (Lc 9.28-31). Ele resolve ir a Jerusalém (Lc 9.51)."
+    },
+    {
+      "titulo": "No caminho",
+      "sub": "Lições rumo a Jerusalém",
+      "desenho": "jumenta",
+      "galhos": [
+        { "texto": "Pelo caminho, três homens ouvem o que custa seguir Jesus: ele não tem “onde repousar a sua cabeça”, e “todo aquele que põe a mão no arado e olha para trás não está apto para o Reino de Deus”.", "ref": "Lc 9.57-62" },
+        { "texto": "Um especialista da Lei pergunta: “Quem é o meu próximo?” Na história de Jesus, um homem é atacado na estrada de Jerusalém para Jericó. Um sacerdote e um levita passam sem ajudar, e um samaritano cuida das feridas, leva o homem no jumento e deixa duas moedas com o dono da hospedaria. “Agora vá e faça o mesmo”.", "ref": "Lc 10.25-37" },
+        { "texto": "Na casa de Marta, a irmã dela, Maria, fica sentada aos pés de Jesus, ouvindo. Marta, preocupada com todo o serviço, reclama e ouve que há “apenas uma coisa necessária”, e que a irmã a descobriu.", "ref": "Lc 10.38-42" },
+        { "texto": "Quando um discípulo pede para aprender a orar, Jesus ensina: “Pai! Que o seu nome seja reverenciado pela sua santidade; venha o seu Reino”. Depois conta do amigo que bate à porta no meio da noite pedindo três pães e é atendido “por causa da sua insistência”.", "ref": "Lc 11.1-8" },
+        { "texto": "Um rico de colheita farta planeja derrubar os celeiros, construir outros maiores e então descansar, comer e beber. Deus lhe diz: “Louco! Você morrerá esta noite”. Assim é quem junta riquezas para si e “não é rico para com Deus”.", "ref": "Lc 12.16-21" },
+        { "texto": "Num sábado, na sinagoga, Jesus impõe as mãos sobre uma mulher encurvada havia 18 anos, e ela se endireita louvando a Deus. Ao dirigente indignado, lembra que eles mesmos desamarram o boi no sábado para dar água.", "ref": "Lc 13.10-17" }
+      ],
+      "conexao": "Na parábola do banquete, os convidados se desculpam, e o dono chama pobres, aleijados, cegos e coxos (Lc 14.16-21)."
+    },
+    {
+      "titulo": "Perdido e achado",
+      "sub": "A busca por quem se perdeu",
+      "desenho": "cordeiro",
+      "galhos": [
+        { "texto": "Os fariseus reclamam que Jesus come com gente de má fama, e ele responde com histórias. Quem tem 100 ovelhas e perde uma deixa as 99 e volta com ela nos ombros; a mulher que perde uma moeda acende a lamparina e procura em cada canto. Nas duas, quem acha chama os vizinhos para se alegrarem juntos, e no céu há mais alegria por um pecador que volta para Deus.", "ref": "Lc 15.1-10" },
+        { "texto": "Depois de pedir a herança, o filho mais novo gasta tudo numa terra distante e chega a querer comer as vagens dos porcos. Volta para pedir lugar de empregado, e o pai, que o vê de longe, corre, abraça e beija. Ao irmão mais velho, irado com a festa, o pai explica: “estava perdido e foi achado!”", "ref": "Lc 15.11-32" },
+        { "texto": "Lázaro, um mendigo coberto de feridas, fica à porta de um rico que se veste de púrpura e linho fino. Depois da morte, Lázaro está com Abraão, e o rico, sofrendo, pede um aviso para os cinco irmãos. A resposta: quem não ouve Moisés e os profetas não vai ouvir nem alguém que ressuscite dos mortos.", "ref": "Lc 16.19-31" },
+        { "texto": "Na divisa entre a Galileia e Samaria, dez leprosos gritam por misericórdia e ficam curados a caminho dos sacerdotes. Só um volta para agradecer, e ele é samaritano. Jesus pergunta: “Onde estão os outros nove?”", "ref": "Lc 17.11-19" },
+        { "texto": "Dois homens oram no templo. O fariseu agradece por não ser como os outros; o cobrador de impostos, de longe, bate no peito: “Ó Deus, tenha misericórdia de mim, um pecador!” Quem volta para casa perdoado é o cobrador.", "ref": "Lc 18.9-14" },
+        { "texto": "Muito baixo para ver Jesus por cima do povo, Zaqueu, um dos cobradores de impostos mais influentes, sobe num sicômoro. Jesus o chama pelo nome e se hospeda na casa dele. Zaqueu promete dar metade da riqueza aos pobres e devolver quatro vezes mais a quem cobrou demais, e ouve: “Hoje chegou a salvação a esta casa”.", "ref": "Lc 19.2-9" }
+      ],
+      "jesus": {
+        "texto": "Na casa de Zaqueu, Jesus diz a que veio: “o Filho do Homem veio buscar e salvar o que se havia perdido”. É ele quem sai à procura de quem se perdeu.",
+        "refs": [
+          "Lc 19.10"
+        ]
+      },
+      "conexao": "Jesus avisa os Doze: em Jerusalém, o Filho do Homem será morto e ressuscitará ao terceiro dia (Lc 18.31-33)."
+    },
+    {
+      "titulo": "Ele está vivo",
+      "sub": "Entrada, cruz e túmulo vazio",
+      "desenho": "tumulo-aberto",
+      "galhos": [
+        { "texto": "Montado num jumentinho, Jesus desce o monte das Oliveiras sobre mantos estendidos na estrada, e a multidão louva: “Bendito é aquele que vem em nome do Senhor!” Aos fariseus que pedem silêncio, responde: “se eles ficarem calados, as pedras gritarão!”", "ref": "Lc 19.35-40" },
+        { "texto": "À mesa da Páscoa, Jesus diz que esperava ansiosamente aquela refeição. Parte o pão: “Isto é o meu corpo, entregue por vocês. Comam dele em memória de mim”. Depois da ceia, o cálice é “a nova aliança do meu sangue, derramado em favor de vocês”.", "ref": "Lc 22.15-20" },
+        { "texto": "Ajoelhado, Jesus ora: “Pai, se o Senhor quiser, afaste de mim este cálice. Porém, eu quero fazer a sua vontade, e não a minha”. Um anjo do céu aparece e o fortalece, e ele começa a suar sangue, com gotas caindo ao chão.", "ref": "Lc 22.41-44" },
+        { "texto": "No lugar chamado Caveira, Jesus é crucificado entre dois criminosos e pede ao Pai perdão para quem não sabe o que está fazendo. Um dos criminosos zomba; o outro pede que Jesus se lembre dele quando entrar em seu Reino e ouve: “Hoje você estará comigo no paraíso”.", "ref": "Lc 23.33-34, 39-43" },
+        { "texto": "Bem cedo, no primeiro dia da semana, as mulheres encontram a pedra rolada e o sepulcro sem o corpo. Dois homens de mantos brilhantes perguntam: “Por que vocês estão procurando entre os mortos aquele que está vivo?” E elas se lembram das palavras de Jesus.", "ref": "Lc 24.1-8" },
+        { "texto": "A caminho de Emaús, dois seguidores andam com Jesus sem saber que é ele. Começando por Moisés, ele explica o que as Escrituras dizem a seu respeito. À mesa, parte o pão, os olhos deles se abrem, e ele desaparece. “Não estava queimando o nosso coração...?”", "ref": "Lc 24.13-32" }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Era necessário que se cumprisse tudo o que a meu respeito está escrito na Lei de Moisés, nos Profetas e nos Salmos!” Ressuscitado, Jesus abre a mente dos discípulos para entenderem as Escrituras (Lc 24.45). Lucas mostra esse cumprimento da sinagoga de Nazaré até a última palavra na cruz.",
+    "ref": "Lc 24.44",
+    "desenho": "rolo-aberto",
+    "pares": [
+      {
+        "at": "Is 40.5",
+        "texto": "A glória do Senhor será revelada e vista por todos os homens.",
+        "nt": "Lc 3.2-6",
+        "nota": "João Batista prepara o caminho para o Senhor"
+      },
+      {
+        "at": "Is 61.1",
+        "texto": "O Espírito do Soberano, o Senhor, está sobre mim, porque o Senhor me escolheu para levar as boas notícias de salvação aos pobres.",
+        "nt": "Lc 4.16-21",
+        "nota": "Na sinagoga de Nazaré, Jesus lê e diz que se cumpriu"
+      },
+      {
+        "at": "Is 53.12",
+        "texto": "Foi considerado um pecador; pois levou sobre si os pecados de muitos e orou em favor dos pecadores.",
+        "nt": "Lc 22.37",
+        "nota": "Jesus diz que essa profecia vai se cumprir nele"
+      },
+      {
+        "at": "Sl 31.5",
+        "texto": "Nas suas mãos entrego o meu espírito.",
+        "nt": "Lc 23.46",
+        "nota": "Ao morrer, Jesus clama ao Pai com as palavras do salmo"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Os nascimentos de João e Jesus", "de": 1, "ate": 2 },
+    { "titulo": "João, o batismo e Nazaré", "de": 3, "ate": 4 },
+    { "titulo": "Na Galileia", "de": 5, "ate": 9 },
+    { "titulo": "A caminho de Jerusalém", "de": 10, "ate": 18 },
+    { "titulo": "Chegada e ensino no templo", "de": 19, "ate": 21 },
+    { "titulo": "Ceia, prisão e cruz", "de": 22, "ate": 23 },
+    { "titulo": "Ressurreição e subida ao céu", "de": 24, "ate": 24 }
+  ],
+  "curiosidades": [
+    { "texto": "Os parentes achavam que o menino se chamaria Zacarias, como o pai. Ainda mudo, Zacarias pede por sinais uma tabuinha e escreve: “O nome dele é João!” Na mesma hora, volta a falar e louva a Deus.", "ref": "Lc 1.59-64" },
+    { "texto": "A profetisa Ana, “viúva de 84 anos”, nunca saía do templo e adorava a Deus com jejum e oração, dia e noite. Chegando naquela hora, ela dá graças e fala do menino a todos que esperavam o Salvador.", "ref": "Lc 2.36-38" },
+    { "texto": "De pai em pai, a lista dos antepassados de Jesus sobe, passa por Davi e Abraão, chega a Adão e termina assim: “o pai de Adão foi Deus”.", "ref": "Lc 3.24-38" },
+    { "texto": "Antes de escolher os doze apóstolos, Jesus passa a noite toda orando no monte. Simão recebe o nome de Pedro, e a lista fecha com Judas Iscariotes, “que mais tarde o traiu”.", "ref": "Lc 6.12-16" },
+    { "texto": "Viajam com Jesus e os Doze algumas mulheres que ele tinha curado, e elas sustentam o grupo com os próprios recursos: Maria Madalena, Joana, esposa de um administrador do rei Herodes, Suzana e muitas outras.", "ref": "Lc 8.1-3" },
+    { "texto": "Jesus devolve a vida à filha de Jairo e, logo em seguida, dá uma ordem bem prática: “Deem alguma coisa para ela comer!”", "ref": "Lc 8.49-55" },
+    { "texto": "Uma aldeia samaritana não recebe Jesus, e Tiago e João perguntam se podem pedir fogo do céu para queimar todos. Jesus chama a atenção dos dois e segue para outra aldeia.", "ref": "Lc 9.52-56" },
+    { "texto": "Os saduceus, que não acreditam na ressurreição, perguntam de quem será esposa uma mulher que casou com sete irmãos. Jesus lembra que, no relato da sarça, Moisés fala de Deus como o Deus de Abraão, de Isaque e de Jacó: “Ele não é Deus de mortos, mas de vivos”.", "ref": "Lc 20.27-38" },
+    { "texto": "Enquanto os ricos depositam ofertas, uma viúva pobre dá duas moedinhas de cobre. Para Jesus, ela deu mais que todos, porque deu “tudo o que tinha para viver”.", "ref": "Lc 21.1-4" },
+    { "texto": "Judas chega com a multidão e beija Jesus, que pergunta: “Judas, com um beijo você está traindo o Filho do Homem?” Um discípulo corta a orelha direita do servo do sumo sacerdote, e Jesus toca na orelha e o cura.", "ref": "Lc 22.47-51" },
+    { "texto": "Pedro nega Jesus três vezes no pátio do sumo sacerdote. Quando o galo canta, Jesus volta o olhar para ele, e Pedro sai chorando amargamente.", "ref": "Lc 22.54-62" },
+    { "texto": "Herodes, que cortou a cabeça de João Batista (Lc 9.9), fica alegre ao ver Jesus e espera um milagre, mas não recebe resposta nenhuma. Depois de zombar dele, manda Jesus de volta a Pilatos, e os dois, antes inimigos, ficam amigos naquele dia.", "ref": "Lc 23.8-12" },
+    { "texto": "José de Arimateia, membro do Conselho que não concordava com a decisão dos outros, pede o corpo de Jesus a Pilatos e o põe num sepulcro novo, cavado na rocha.", "ref": "Lc 23.50-53" },
+    { "texto": "Para provar que não é um espírito, o Ressuscitado mostra as mãos e os pés, pede algo para comer e come um pedaço de peixe assado diante de todos.", "ref": "Lc 24.37-43" }
+  ],
+  "procure": {
+    "texto": "“Hoje.” Os pastores ouvem que hoje nasceu o Salvador, e a palavra volta nos momentos decisivos do livro: na sinagoga de Nazaré, na casa de Zaqueu e na cruz, ao lado de um criminoso. Marque cada vez que ela aparecer e veja o que Deus faz no “hoje” de Lucas.",
+    "ref": "Lc 2.11"
+  }
+}

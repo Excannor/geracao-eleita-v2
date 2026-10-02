@@ -434,6 +434,46 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   do centro, dentro do disco); a terra do Nebo virou colinas baixas e largas com o rio descendo pelo
   vale, sem tracinhos; o cesto ficou com uma espiga só. Tracinho solto dentro de área lisa se confere
   no tamanho da tela (96px): três traços curtos viram olhos e boca.
+- 2026-10-02 · conteúdo · Lucas tem 24 capítulos e a viagem para Jerusalém (9.51 a 19.27) ocupa quase
+  metade: com o teto de 6 ramos, a Galileia (6 a 9.50) virou um ramo só e vários milagres foram para
+  as curiosidades → em livro longo, montar primeiro a tabela de capítulos por ramo e decidir o que vai
+  para curiosidade antes de escrever galho; a fala de Lc 24.44 ("Lei de Moisés, Profetas e Salmos")
+  deu a moldura natural para os pares de "[Livro] e Cristo".
+- 2026-10-02 · conteúdo · Lucas, na releitura com o `rever-mapa` (checador já verde): "Aos 12 anos"
+  com a ref Lc 2.49 (o número está em 2.42); "Nazaré" num galho de 4.22-30, quando o nome está em 4.16,
+  que o par de Is 61 já usava; "Maria canta" onde a NBV diz "Maria disse"; "querem pedir fogo" onde
+  9.54 é pergunta ("podemos pedir?"); "queriam dar o nome" onde 1.59 diz "julgavam"; "Deus se apresenta"
+  na sarça, quando em 20.37 é Moisés quem fala de Deus assim; "a primeira pregação, em Nazaré" (4.15
+  já conta o ensino nas sinagogas antes) → número e idade se conferem como nome e lugar; quando outro
+  item já usa o versículo do nome do lugar, o galho escreve em volta ("na sinagoga da cidade dele",
+  4.23) em vez de repetir a referência.
+- 2026-10-02 · estilo · A NBV de Lucas é cheia de pronome com hífen dentro das falas: "lembre-se de
+  mim", "Alegrem-se comigo", "ensine-nos a orar", "perdoa-lhes", "empurrá-lo", e ainda "meia-noite" →
+  o `grep` de hífen pegou dois que escaparam ("lembre-se", "meia-noite"); em livro com muita fala, já
+  escrever a paráfrase na hora ("pede que Jesus se lembre dele", "no meio da noite").
+- 2026-10-02 · desenho · Lucas: o menino na manjedoura, com as faixas do cobertor em pé (três arcos
+  paralelos), parecia uma lagarta; e as pontas do cavalete em X passariam por trás da cabeça dele →
+  faixas de enrolar em diagonal; o cruzamento do X fica escondido atrás da frente do cocho, e embaixo
+  só aparecem as pernas abertas.
+- 2026-10-02 · tela · Lucas a 360px: um galho que terminava em "descobriu o que é." deixou o "é." sozinho
+  na linha antes da referência; e citação que começa com palavra de uma letra ("“O nome dele...",
+  "“o Filho...") às vezes deixa "“O" pendurado no fim da linha → galho termina com palavra de mais de
+  duas letras; o "“O" pendurado é quebra natural da linha e ficou, mas a tela poderia prender a
+  primeira palavra curta de uma citação à seguinte (melhoria para quem mexe em `06b-mapas.js`).
+- 2026-10-02 · conteúdo · Revisão de Lucas (checador verde, folha do `rever-mapa` lida de novo): seis
+  frases diziam mais ou outra coisa que o versículo. "Repreende o vento e as ondas" (Lc 8.24: ele
+  repreende a tempestade, e o vento e as ondas se acalmam); "o leva à beira do precipício" (4.29: à
+  encosta do monte, para empurrá-lo precipício abaixo); "No monte" com a ref 9.30-31 (o monte está em
+  9.28); "a história acaba em festa com amigos e vizinhos" (15.6, 9: "Alegrem-se comigo", e na moeda
+  são amigas e vizinhas); "Jesus morre orando" na nota do par (23.46: "gritou em alta voz"); "Moisés
+  chama o Senhor de Deus de Abraão" (20.37: ele fala de Deus assim). E dois galhos seguidos abriam com
+  artigo e sujeito ("Os fariseus...", "O filho mais novo...") → o objeto do verbo também se confere
+  (quem repreende o quê); a nota do par e a curiosidade passam pela mesma releitura dos galhos.
+- 2026-10-02 · tela · Lucas: o "“O" pendurado no fim da linha virou correção na tela, não no texto:
+  `06b-mapas.js` liga a palavra de uma ou duas letras que abre uma citação à palavra seguinte com espaço
+  inseparável (`tx`, em galhos, destaques, conexões, raiz, autoria, curiosidades e "procure"). E a
+  reticência no fim de uma citação curta ("Quem este homem pensa que é...?”") deixou o "é...?”" sozinho
+  na linha a 360px → a citação vai até o fim da frase da NBV ("...que é, andando por aí a perdoar pecados?”").
 
 ## Entrada, sessão e página inicial
 
@@ -605,6 +645,10 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   ("17:20" às 17:10), porque o update foi na mesma leva de chamadas que a leitura das regras, antes
   de ler este arquivo → no começo, a primeira chamada de todas é `TZ=America/Sao_Paulo date`; o
   painel só se mexe depois de ler a resposta dela, mesmo no "get" inicial.
+- 2026-10-02 · painel · Lucas: o "get" inicial do painel saiu antes do `date`, na mesma leva da leitura
+  da skill, ainda sem ler este arquivo (o update veio depois do `date` e saiu com a hora certa) → a
+  regra de cima vale também para quem chega: ler este arquivo e rodar o `date` vêm antes de qualquer
+  chamada ao painel.
 
 ## Geral
 

@@ -44,6 +44,9 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    diz "o agricultor", não "o semeador"; Mt 27.9 diz "peças de prata", não "moedas").
    Vale também para adjetivo e circunstância ("quase cego", "fugindo", "no monte Moriá",
    "velha demais"): se não está no trecho citado, ou amplia a referência ou sai da frase.
+   Vale para número e idade ("Aos 12 anos" é Lc 2.42, não 2.49) e, quando outro item já usa o
+   versículo com o nome do lugar, o galho escreve em volta ("na sinagoga da cidade dele", Lc 4.23,
+   porque Nazaré está em 4.16, do par de Is 61) em vez de repetir a referência.
    Vale para nome próprio ("Jetro" não está em Êx 18.13-25, só "o sogro de Moisés") e para o
    tempo do verbo: promessa ou ordem de Deus se conta como promessa ("Deus promete pôr Moisés
    numa fenda da rocha", Êx 33.22), não como fato que já aconteceu. Promessa com condição leva o
@@ -69,6 +72,8 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    sepultamento e subida aos céus de protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
    e 46). Liste os capítulos do livro e marque onde cada um aparece (galho, conexão, curiosidade,
    autoria): Mateus tinha deixado de fora os capítulos 15, 19 e 22 e a Grande Comissão (28.19-20).
+   Em livro longo (Lucas, 24 capítulos, com a viagem de 9.51 a 19.27), a tabela de capítulos por
+   ramo vem antes de tudo: com o teto de 6 ramos, decida já o que vira curiosidade.
    Cada referência aparece uma vez no mapa; curiosidades seguem a ordem dos capítulos. Antes de
    escrever, monte a tabela dos versículos-chave e decida onde cada um mora (raiz, galho,
    conexão, par, curiosidade): em Levítico, 16.16, 16.30, 19.18 e 12.8 eram disputados.
@@ -130,7 +135,14 @@ Antes de entregar o texto:
 - nenhuma palavra com hífen sobrando no texto (`grep -o -E '[[:alpha:]]+-[[:alpha:]]+' <mapa>.json`
   e tirar da lista só os ids de desenho; em Marcos, "tornou-se" de 1Pe 2.7 escapou dentro de aspas;
   em Deuteronômio, o impessoal "vende-se", "passaram-se" e a citação "levá-los": troca-se por sujeito
-  ("o povo pode vender"), outro verbo ou paráfrase);
+  ("o povo pode vender"), outro verbo ou paráfrase; em Lucas, as falas da NBV trazem "lembre-se",
+  "Alegrem-se", "perdoa-lhes", e "meia-noite" vira "no meio da noite");
+- nenhum galho termina com palavra de uma ou duas letras antes da referência ("Maria descobriu o
+  que é." deixou o "é." sozinho na linha a 360px), nem com citação cortada em reticências logo depois
+  dela ("pensa que é...?”": a citação vai até o fim da frase); a palavra curta que abre uma citação
+  (“O nome...) a tela já prende à seguinte (`tx` em `06b-mapas.js`);
+- o verbo se confere com o sujeito e com o objeto: em Lc 8.24 Jesus repreende a tempestade, e o vento
+  e as ondas se acalmam; a nota dos pares e as curiosidades passam pela mesma releitura dos galhos;
 - nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen (nos galhos,
   nas conexões e nas curiosidades) só se não houver outra ("boas-novas" e "beira-mar" quebraram
   no hífen a 390px; "perto do mar", "No meio da noite"); quando o hífen está na própria citação
@@ -195,6 +207,9 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   fica baixa e larga, com o rio descendo pelo vale (alta e estreita vira moita; rio em ondas
   horizontais vira mar). Tracinho solto numa área lisa se confere no tamanho da tela (96px): três
   traços curtos viram olhos e boca de um rosto (o Nebo de Deuteronômio).
+  Bebê enrolado leva as dobras do cobertor em diagonal (faixas em pé, paralelas, viram lagarta), e o
+  cavalete em X da manjedoura tem o cruzamento escondido atrás da frente do cocho, sem pontas
+  passando por trás do que está dentro (a manjedoura de Lucas).
 - papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de
   uma peça vira caixa branca sobre o fundo cinza da página (o barco de Mateus). Para pôr o casco
   dentro da água, o fundo do casco é a própria curva da onda (pontos tirados da curva).

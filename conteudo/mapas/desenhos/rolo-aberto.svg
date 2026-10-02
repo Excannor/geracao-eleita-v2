@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o rolo aberto (Lc 4.17-20; 24.44): a folha entre os dois cilindros, com as colunas do texto e uma linha marcada em sálvia, o lugar onde está escrito. Tudo cabe num círculo de raio 54 em volta de (60,60): as pontas dos puxadores ficam a uns 46 do centro -->
+<path class="k p" d="M30 41H90V79H30Z"/>
+<path class="s" d="M63 51H83V57H63Z"/>
+<path class="h" d="M38 48H56M38 54H56M38 60H56M38 66H56M38 72H52M64 48H82M64 54H82M64 60H82M64 66H82M64 72H76"/>
+<path class="k" d="M27 36V31M93 36V31M27 84V89M93 84V89"/>
+<ellipse class="k p" cx="27" cy="30" rx="3.5" ry="1.8"/>
+<ellipse class="k p" cx="93" cy="30" rx="3.5" ry="1.8"/>
+<ellipse class="k p" cx="27" cy="90" rx="3.5" ry="1.8"/>
+<ellipse class="k p" cx="93" cy="90" rx="3.5" ry="1.8"/>
+<rect class="k p" x="21" y="36" width="12" height="48" rx="4"/>
+<rect class="k p" x="87" y="36" width="12" height="48" rx="4"/>
+<path class="h" d="M25 40V80M29 40V80M91 40V80M95 40V80"/>
+</svg>
