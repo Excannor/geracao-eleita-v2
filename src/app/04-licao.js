@@ -294,6 +294,11 @@
   // Um botão principal só, que muda a cada etapa, e "Pular por hoje" discreto. O que é do dia
   // fica dentro da etapa (escrever no cartão do versículo, ir mais fundo logo abaixo do
   // contexto); o que leva a outro dia ("Ler o dia N") só aparece no fim.
+  const ICONE_ETAPA = { guardar: 'marcador', pensar: 'lupa', orar: 'maos' };
+  // O título da etapa leva o ícone dela, no mesmo círculo sálvia dos passos do topo.
+  const tituloEtapa = (etapa, texto) => '<h2 class="titulo-etapa"><span class="ico-etapa">' + CC.ico(ICONE_ETAPA[etapa]) + '</span>'
+    + '<span>' + CC.esc(texto) + '</span></h2>';
+
   function telaFesta(dia) {
     const lido = CC.leu(sessao.dia);
     const ganhou = lido && !sessao.antes.lido && !!sessao.celebracao;
@@ -303,6 +308,10 @@
     const seq = CC.sequencia();
     const escrever = CC.temRegistro(sessao.dia) ? 'Escrever mais' : 'Escrever';
     const apoio = totalApoio(dia);
+    const escolhida = Number.isInteger(sessao.pergunta) ? sessao.pergunta : -1;
+    // ao passar para orar, pensar encolhe e fica só a pergunta escolhida, como lembrete
+    const encolhida = etapa === 'orar';
+    const textoPergunta = (p) => (Array.isArray(p) ? p[1] : p);
 
     const avancar = { guardar: ['Pensar sobre isso', 'lupa'], pensar: ['Transformar em oração', 'aperto'], orar: ['Terminar', 'certo'] }[etapa];
 
@@ -328,22 +337,36 @@
           + CC.ico('direita') + '</button>' : '')
         + '</section>'
         // pensar: uma pergunta, escolhida pela pessoa
-        + '<section class="etapa-reflexao" data-etapa-bloco="pensar"' + (ETAPAS.indexOf(etapa) >= 1 ? '' : ' hidden') + '>'
+        + '<section class="etapa-reflexao etapa-pensar' + (encolhida ? ' encolhida' : '') + '" data-etapa-bloco="pensar"'
+        + (ETAPAS.indexOf(etapa) >= 1 ? '' : ' hidden') + '>'
+        + (encolhida
+          ? '<div class="pensar-lembrete">' + tituloEtapa('pensar', 'Para pensar')
+            + (escolhida >= 0 ? '<p class="lembrete-pergunta">' + CC.esc(textoPergunta(r.perguntas[escolhida])) + '</p>' : '') + '</div>'
+          : '')
+        + '<div class="pensar-inteiro" id="pensar-inteiro">'
         + '<span class="etiqueta">' + nb(CC.esc(r.pensamento ? (r.ref || r.passagem) : r.passagem + ' · ' + r.nomeGenero)) + '</span>'
         // a reflexão escrita para o dia, sobre o que acontece na leitura
         + (r.pensamento
           ? '<figure class="pensamento-dia">' + (r.titulo ? '<h2>' + CC.esc(r.titulo) + '</h2>' : '')
             + '<p>' + CC.esc(r.pensamento) + '</p></figure>'
           : '')
-        + '<h2>' + (r.pensamento ? 'Para pensar' : 'Escolha uma pergunta') + '</h2>'
+        + tituloEtapa('pensar', r.pensamento ? 'Para pensar' : 'Escolha uma pergunta')
         // As reflexões escritas trazem só a pergunta; as genéricas por gênero ainda vêm como
-        // [rótulo, pergunta]. Sem rótulo não sai a etiqueta em cima.
-        + '<div class="perguntas-reflexao">' + r.perguntas.map((p, i) => {
+        // [rótulo, pergunta]. Sem rótulo não sai a etiqueta em cima. São opções: um círculo
+        // marca a escolhida, e só uma fica escolhida por vez.
+        + '<div class="perguntas-reflexao" role="group" aria-label="Perguntas para pensar">' + r.perguntas.map((p, i) => {
           const [rotulo, pergunta] = Array.isArray(p) ? p : ['', p];
-          return '<button class="pergunta-reflexao" data-pergunta="' + i + '" aria-pressed="false">'
-            + (rotulo ? '<span class="rotulo-pergunta">' + CC.esc(rotulo) + '</span>' : '') + '<span>' + CC.esc(pergunta) + '</span></button>';
+          return '<button class="pergunta-reflexao" data-pergunta="' + i + '" aria-pressed="' + (i === escolhida) + '">'
+            + '<span class="marca-escolha" aria-hidden="true"></span><span class="texto-pergunta">'
+            + (rotulo ? '<span class="rotulo-pergunta">' + CC.esc(rotulo) + '</span>' : '') + '<span>' + CC.esc(pergunta) + '</span></span></button>';
         }).join('') + '</div>'
-        + '<p class="passo-dica pequena dica-pensar" hidden>Fique um minuto com essa pergunta. Se ajudar, volte ao texto.</p>'
+        + '<p class="passo-dica pequena dica-pensar"' + (escolhida >= 0 ? '' : ' hidden') + '>Fique um minuto com essa pergunta. Se ajudar, volte ao texto.</p>'
+        + '</div>'
+        // encolhida, só o título e a pergunta escolhida; o botão do fim abre tudo de novo
+        + (encolhida
+          ? '<button class="abrir-pensar" data-abrir-pensar aria-expanded="false" aria-controls="pensar-inteiro">'
+            + '<span>' + (escolhida >= 0 ? 'Ver a reflexão e as perguntas' : 'Ver as perguntas') + '</span>' + CC.ico('baixo') + '</button>'
+          : '')
         + '</section>'
         // orar: começos de frase para a pessoa completar, nunca uma oração pronta
         + '<section class="etapa-reflexao" data-etapa-bloco="orar"' + (etapa === 'orar' ? '' : ' hidden') + '>'
@@ -389,10 +412,21 @@
 
         el.querySelectorAll('[data-pergunta]').forEach((b) => {
           b.onclick = () => {
+            sessao.pergunta = Number(b.dataset.pergunta);
             el.querySelectorAll('[data-pergunta]').forEach((x) => x.setAttribute('aria-pressed', x === b));
             el.querySelector('.dica-pensar').hidden = false;
           };
         });
+        const abrirPensar = el.querySelector('[data-abrir-pensar]');
+        if (abrirPensar) {
+          abrirPensar.onclick = () => {
+            const bloco = el.querySelector('.etapa-pensar');
+            const aberto = bloco.classList.toggle('encolhida') === false;
+            abrirPensar.setAttribute('aria-expanded', aberto);
+            abrirPensar.querySelector('span').textContent = aberto ? 'Recolher'
+              : (escolhida >= 0 || Number.isInteger(sessao.pergunta) ? 'Ver a reflexão e as perguntas' : 'Ver as perguntas');
+          };
+        }
         const notaReflexao = el.querySelector('[data-nota-reflexao]');
         if (notaReflexao) notaReflexao.onclick = () => CC.folhaNota(r.idNota);
         el.querySelector('[data-orar-escrevendo]').onclick = () => {

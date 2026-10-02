@@ -200,11 +200,24 @@ await clicar('[data-avancar]');
 // 2 ou 3: as reflexões revistas têm a quantidade de perguntas que o texto pede
 ok(await esperar(existe('[data-etapa-bloco="pensar"]:not([hidden])') + ' && [2, 3].includes(document.querySelectorAll(".pergunta-reflexao").length)'),
   '"Pensar sobre isso" abre as perguntas do dia');
+ok(await av('[...document.querySelectorAll(".pergunta-reflexao")].every((b) => b.getAttribute("aria-pressed") === "false" && b.querySelector(".marca-escolha"))'),
+  'as perguntas são opções, com o círculo de escolha e nenhuma escolhida');
+ok(await av(existe('.etapa-pensar .titulo-etapa .ico-etapa svg')), 'o título de pensar leva o ícone da etapa');
 await clicar('[data-pergunta="0"]');
 ok(await av(q('[data-pergunta="0"]') + '.getAttribute("aria-pressed") === "true"'), 'a pessoa escolhe uma pergunta');
+ok(await av('!' + q('.dica-pensar') + '.hidden'), 'escolher a pergunta mostra "Fique um minuto com essa pergunta"');
+const perguntaEscolhida = await av(q('[data-pergunta="0"] .texto-pergunta') + '.textContent.trim()');
 await clicar('[data-avancar]');
 ok(await esperar(existe('[data-etapa-bloco="orar"]:not([hidden])') + ' && document.querySelectorAll(".oracao-guia li").length === 3'),
   '"Transformar em oração" mostra três começos de oração');
+ok(await av(existe('.etapa-pensar.encolhida') + ' && getComputedStyle(' + q('#pensar-inteiro') + ').display === "none" && '
+  + q('.lembrete-pergunta') + '.textContent.trim() === ' + JSON.stringify(perguntaEscolhida)),
+  'em orar, pensar encolhe e mostra só a pergunta escolhida');
+ok(await av(q('[data-abrir-pensar]') + '.getAttribute("aria-expanded") === "false"'), 'o botão de abrir pensar diz que está fechado');
+await clicar('[data-abrir-pensar]');
+ok(await av(q('[data-abrir-pensar]') + '.getAttribute("aria-expanded") === "true" && getComputedStyle(' + q('#pensar-inteiro') + ').display !== "none"'),
+  'abrir pensar de novo mostra a reflexão e as perguntas');
+await clicar('[data-abrir-pensar]');
 await dormir(900);
 await foto('4d-orar');
 await clicar('[data-orei]');
