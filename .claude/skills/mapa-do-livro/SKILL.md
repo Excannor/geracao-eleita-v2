@@ -35,8 +35,11 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
 3. **Exaustividade.** Completo e detalhado; não cortar o que importa para ficar curto.
 
 Fora do próprio livro só entram, e marcados como tal: o **significado do nome** (é tradução, não
-fato novo) e a seção **"[Livro] e Cristo"**, com as citações do Novo Testamento (livro, capítulo e
-versículo, para conferir). Datas em a.C., achados arqueológicos e opiniões de comentaristas ficam
+fato novo), a seção **"[Livro] e Cristo"**, com as citações do Novo Testamento (livro, capítulo e
+versículo, para conferir), e **o nome de Jesus dentro do ramo** quando o Novo Testamento liga a
+passagem a ele. O mapa é para quem lê com fé em Cristo, então diz com todas as letras: "Esse
+Servo é Jesus" (At 8.32-35; Lc 22.37), num destaque escuro no fim do ramo, com as referências do
+NT que provam a ligação. Sem a referência do NT, não se faz a ligação. Datas em a.C., achados arqueológicos e opiniões de comentaristas ficam
 fora.
 
 **Estrutura**
