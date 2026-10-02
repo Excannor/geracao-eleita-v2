@@ -217,6 +217,10 @@ const manifesto = {
   // ícone (#0b0b0b), para a abertura ser igual ao app instalado. O creme era da paleta antiga.
   background_color: '#0b0b0b',
   theme_color: '#0b0b0b',
+  // O próprio app como "aplicativo relacionado": no Android, o Chrome responde por
+  // navigator.getInstalledRelatedApps() se ele já está instalado, e o tutorial deixa de
+  // mandar procurar "Instalar app" num menu que só mostra "Abrir app" (07c-instalar.js).
+  related_applications: [{ platform: 'webapp', url: './manifest.webmanifest' }],
   icons: icones.map(({ tamanho, arquivo, proposito }) => ({
     src: './' + arquivo + '?v=' + versaoIcones,
     sizes: tamanho + 'x' + tamanho,

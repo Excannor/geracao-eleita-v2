@@ -507,6 +507,32 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   "membro comum não começa...", "o convite chega na caixa do sino...") e para num TypeError; falha
   igual no ac51a46, antes desta rodada → fica registrado para investigar à parte.
 
+## Instalar no celular
+
+- 2026-10-02 · instalar · O dono: "instalar não funciona no Android". No Chrome sem interface tudo
+  passava (`Page.getInstallabilityErrors` vazio, manifesto e ícones certos, service worker
+  controlando), porque o teste só via o caso em que o Chrome manda o `beforeinstallprompt`. No
+  celular há outros: o link aberto pelo WhatsApp/Instagram cai numa aba do app (Custom Tab ou
+  WebView) que nunca oferece instalar e cujo menu ⋮ tem "Abrir no Chrome" e não "Instalar app";
+  o app já instalado (o menu mostra "Abrir app"); Samsung Internet e Firefox com outros nomes; e
+  `prompt()` que falha sem nada na tela. O tutorial só conhecia "com o evento" e "Chrome com menu";
+  no computador, "pelo menu" ainda quebrava (`guia('')`) → o tutorial decide pelo lugar: com o
+  evento, o botão chama `prompt()` e, se ela falhar ou for recusada, mostra o passo manual; sem
+  ele, os passos do navegador certo; em WebView/Instagram/Facebook ou com referrer `android-app://`
+  (guardado pela página de entrada), "Abra no Chrome" com `intent://` e "Copiar o link"; já
+  instalado (`getInstalledRelatedApps`, com o próprio manifesto em `related_applications`), diz
+  onde está o ícone. E um "Não funcionou?" com uma linha de diagnóstico para o print. Regra:
+  **teste de instalar cobre cada lugar de onde a pessoa instala**, com evento sintético
+  (`prompt()`/`userChoice` falsos) e com o evento real engolido por um ouvinte de captura; nenhum
+  botão pode ficar mudo (`ferramentas/teste-instalar.mjs`).
+- 2026-10-02 · instalar · O `beforeinstallprompt` chega uma vez por página e o app só existe depois
+  de 4 MB de conteúdo → o primeiro script do `index.html` guarda o evento em
+  `window.__pedidoInstalar`, e o tutorial o lê de lá.
+- 2026-10-02 · teste · O servidor de exploração "reiniciado" depois do build era o velho: o PID
+  guardado era o do shell, o novo morreu com a porta ocupada e o app ficou parado na CSP (hashes
+  velhos) → guardar o PID com `$!` do próprio `node` e conferir o log ("porta em uso") antes de
+  medir.
+
 ## Revisão do dia (Guardar, Pensar, Orar)
 
 - 2026-10-02 · captura · Para fotografar a lição inteira, aumentei a janela até caber o palco: a

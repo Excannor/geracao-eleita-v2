@@ -406,6 +406,10 @@
   try { var t = localStorage.getItem('cc.tema'); if (t !== null) document.documentElement.dataset.tema = JSON.parse(t) ? 'escuro' : 'claro'; } catch (e) {}
 
   var params = new URLSearchParams(location.search);
+  // O link aberto de dentro de outro app (a aba do WhatsApp, por exemplo) chega com referrer
+  // android-app://<pacote>. Fica guardado nesta aba: o tutorial de instalar (07c-instalar.js)
+  // manda abrir no Chrome, porque ali dentro o menu não tem "Instalar app".
+  try { if (/^android-app:\/\//.test(document.referrer)) sessionStorage.setItem('cc.origemApp', document.referrer); } catch (e) { /* segue */ }
   // O app guardado no aparelho manda para cá quem está sem a marca de sessão (cc_logado) e
   // deixa a nota cc.semMarca. Se a sessão ainda vale (quem entrou antes de a marca existir), o
   // servidor já devolveu a marca na resposta desta página: volta direto ao app, no mesmo

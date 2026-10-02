@@ -247,6 +247,14 @@
 .opcao-sistema .sugerido { font-size: .75rem; text-transform: none; letter-spacing: 0; }
 .opcao-sistema .sugerido, .passos-instalar li::before { background: var(--salvia); color: var(--salvia-tinta); }
 .passos-instalar .marca-passo { border-radius: 50%; background: var(--cartao); color: var(--tinta-forte); }
+/* "Não funcionou?" do tutorial: o que fazer quando o menu não tem a opção e a linha do que o app
+   enxerga (navegador, janela de instalar, service worker), para um print ajudar quem ajuda. */
+.ajuda-instalar { margin-top: 4px; text-align: center; }
+.ajuda-instalar-corpo { display: grid; gap: 8px; margin-top: 4px; padding: 14px 16px; border-radius: 20px; background: var(--campo); text-align: left; font-size: .875rem; line-height: 1.5; }
+.ajuda-instalar-corpo p { margin: 0; }
+.diagnostico-instalar { color: var(--tinta-fraca); font-size: .75rem; overflow-wrap: anywhere; }
+.folha-instalar .aviso-instalar { padding: 10px 14px; border-radius: 16px; background: var(--salvia-palido); color: var(--tinta-forte); font-weight: 700; }
+.folha-instalar a.botao { text-decoration: none; }
 
 /* ---------- celular estreito (360) ----------
    O título ao lado do voltar encolhe para caber numa linha; o nome do nível do Semeador

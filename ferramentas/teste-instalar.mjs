@@ -1,7 +1,11 @@
 // Confere o tutorial de instalar no celular: aparece depois de criar a conta pelo
-// formulário de verdade, pergunta o celular, mostra os passos, dá para pular, não volta
-// sozinho, e fica no Perfil. Confere também os ícones da tela de início.
-// Uso: node ferramentas/teste-instalar.mjs
+// formulário de verdade, mostra os passos, dá para pular, não volta sozinho, e fica no Perfil.
+// Confere também os ícones da tela de início e, num Chrome por caso, cada lugar de onde a
+// pessoa pode estar instalando (02/10, "instalar não funciona no Android"): com a janela do
+// navegador (evento sintético: o botão chama prompt()), sem ela no Chrome do Android (passo
+// manual), dentro do WhatsApp/Instagram/WebView ("Abra no Chrome" com intent://), Samsung
+// Internet, Firefox, iPhone, computador e já instalado. Nenhum botão pode ficar mudo.
+// Uso: CHROME=<chrome> node ferramentas/teste-instalar.mjs   (PORTA=<n> para fixar a porta)
 import { spawn } from 'node:child_process';
 import { portaLivre, fecharArvore } from './navegador.mjs';
 // Porta sorteada a cada rodada: com porta fixa, um Chrome que sobrou da rodada anterior era
@@ -10,11 +14,13 @@ const PORTA_NAV = await portaLivre();
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8207;
-const PASTA = join(tmpdir(), 'cc-instalar');
+const { abrir } = await import(pathToFileURL(join(AQUI, 'design', 'ferramentas', 'analise', 'cdp.mjs')).href);
+// Porta livre a cada rodada: com a 8207 fixa, duas baterias ao mesmo tempo falavam com o mesmo servidor.
+const PORTA = Number(process.env.PORTA) || await portaLivre();
+const PASTA = mkdtempSync(join(tmpdir(), 'cc-instalar-'));
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -24,7 +30,6 @@ const ok = (cond, msg) => {
   if (!cond) falhas++;
 };
 
-try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
 const servidor = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
   env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_ABERTO: '' },
   stdio: 'ignore',
@@ -44,6 +49,20 @@ ok(apple.status === 200 && (apple.headers.get('content-type') || '').startsWith(
 const manifesto = await (await fetch(base + '/manifest.webmanifest')).json();
 ok(manifesto.icons.some((i) => i.purpose === 'maskable') && manifesto.icons.every((i) => /\?v=\w+$/.test(i.src)),
   'o manifesto traz o ícone recortável do Android, com versão no endereço');
+// O que o Chrome do Android exige para oferecer instalar, e que tem de sair sem sessão (o
+// manifesto e os ícones são buscados sem cookie, e o servidor do WebAPK nem tem cookie).
+ok(manifesto.name && manifesto.short_name && manifesto.start_url && manifesto.scope && manifesto.display === 'standalone',
+  'o manifesto tem nome, nome curto, início, escopo e tela cheia');
+for (const tamanho of ['192x192', '512x512']) {
+  const icone = manifesto.icons.find((i) => i.sizes === tamanho && i.purpose === 'any');
+  const r = icone ? await fetch(new URL(icone.src, base + '/manifest.webmanifest')) : null;
+  const corpo = r && r.ok ? Buffer.from(await r.arrayBuffer()) : Buffer.alloc(0);
+  ok(r && r.ok && (r.headers.get('content-type') || '') === 'image/png' && corpo.length > 24
+    && corpo.readUInt32BE(16) + 'x' + corpo.readUInt32BE(20) === tamanho,
+  'o ícone ' + tamanho + ' sai sem sessão, como PNG, e tem mesmo ' + tamanho);
+}
+ok((manifesto.related_applications || []).some((a) => a.platform === 'webapp'),
+  'o manifesto aponta para ele mesmo em related_applications (o tutorial sabe se já está instalado)');
 const portal = await (await fetch(base + '/')).text();
 ok(/rel="apple-touch-icon" href="apple-touch-icon\.png\?v=\w+"/.test(portal) && portal.includes('rel="manifest"'),
   'a tela de entrada declara o ícone da tela de início');
@@ -187,8 +206,138 @@ const erros = evs.filter((e) => e.method === 'Runtime.exceptionThrown');
 ok(erros.length === 0, 'nenhuma exceção no caminho'
   + (erros[0] ? ': ' + (erros[0].params.exceptionDetails.exception?.description || erros[0].params.exceptionDetails.text) : ''));
 
-console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  o tutorial de instalar funciona\n');
 try { fecharArvore(nav, perfil); } catch { /* ok */ }
-try { servidor.kill(); } catch { /* ok */ }
 try { rmSync(perfil, { recursive: true, force: true }); } catch { /* ok */ }
+
+// ---------- cada lugar de onde se instala, um Chrome limpo por caso ----------
+// A conta "ana" já existe; o crachá vem de um login pela API, como o navegador faria.
+console.log('\n  Onde a pessoa está\n');
+const entrada = await fetch(base + '/api/entrar', { method: 'POST', headers: { 'content-type': 'application/json', origin: base },
+  body: JSON.stringify({ login: 'ana', senha: 'senha-boa-1' }) });
+const cracha = (entrada.headers.getSetCookie ? entrada.headers.getSetCookie() : [entrada.headers.get('set-cookie')])
+  .map((l) => String(l).split(';')[0]).find((l) => l.startsWith('cc_sessao='));
+ok(!!cracha, 'a conta do teste entra pela API');
+const UA = {
+  chrome: 'Mozilla/5.0 (Linux; Android 14; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+  webview: 'Mozilla/5.0 (Linux; Android 14; SM-A546E; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/129.0.0.0 Mobile Safari/537.36',
+  instagram: 'Mozilla/5.0 (Linux; Android 14; SM-A546E; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/129.0.0.0 Mobile Safari/537.36 Instagram 350.0.0.0 Android',
+  samsung: 'Mozilla/5.0 (Linux; Android 14; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/25.0 Chrome/121.0.0.0 Mobile Safari/537.36',
+  firefox: 'Mozilla/5.0 (Android 14; Mobile; rv:130.0) Gecko/130.0 Firefox/130.0',
+  iphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+  iphoneInsta: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 350.0.0.0',
+  computador: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+};
+// Sem o aviso de verdade: um ouvinte de captura registrado antes de tudo engole o evento que o
+// Chrome sem interface dispara, e o app fica como no celular em que o Chrome não ofereceu.
+const SEM_AVISO = "addEventListener('beforeinstallprompt', (e) => { if (!e.__sintetico) e.stopImmediatePropagation(); }, true);";
+// O aviso sintético: prompt() e userChoice falsos, e um contador de chamadas em window.__prompts.
+const avisoSintetico = (desfecho) => `(() => {
+  const e = new Event('beforeinstallprompt', { cancelable: true });
+  e.__sintetico = true;
+  window.__prompts = 0;
+  e.prompt = () => { window.__prompts++; return ${desfecho === 'falha' ? "Promise.reject(new DOMException('não deixou', 'NotAllowedError'))" : 'Promise.resolve()'}; };
+  e.userChoice = Promise.resolve({ outcome: '${desfecho === 'aceito' ? 'accepted' : 'dismissed'}', platform: 'web' });
+  window.dispatchEvent(e);
+  return true;
+})()`;
+async function caso(nome, { ua, pre = '', antes = '', sintetico = '' }, conferir) {
+  const c = await abrir({ cookie: cracha, base: base + '/', largura: 390, altura: 844, pre: SEM_AVISO + pre });
+  const excecoes = [];
+  c.ouvir('Runtime.exceptionThrown', (p) => excecoes.push(p.exceptionDetails?.exception?.description || p.exceptionDetails?.text));
+  try {
+    await c.cmd('Emulation.setUserAgentOverride', { userAgent: ua });
+    await c.cmd('Network.setCookie', { name: 'cc_logado', value: '1', url: base + '/' });
+    await c.cmd('Page.navigate', { url: base + '/#/perfil' });
+    const pronto = async (expr, ms = 15000) => { for (let t = 0; t < ms; t += 200) { const v = await c.av(expr); if (v && !v.erro) return true; await dormir(200); } return false; };
+    await pronto('!!(window.CC && document.querySelector("[data-instalar]")) && !document.querySelector("#abertura:not(.saindo)")');
+    await dormir(600);
+    await c.av('document.querySelectorAll(".cortina").forEach((x) => x.remove()); 1');
+    if (antes) await c.av(antes);
+    if (sintetico) await c.av(avisoSintetico(sintetico));
+    await c.av('document.querySelector("[data-instalar]").click(); 1');
+    await pronto('!!document.querySelector(".folha-instalar h2")', 5000);
+    await dormir(300);
+    const texto = await c.av('document.querySelector(".folha-instalar") ? document.querySelector(".folha-instalar").innerText : ""');
+    await conferir({ ...c, texto: String(texto || ''), pronto }, nome);
+  } finally {
+    ok(excecoes.length === 0, nome + ': nenhuma exceção' + (excecoes[0] ? ': ' + excecoes[0] : ''));
+    await c.fechar();
+  }
+}
+
+await caso('Chrome no Android, com a janela do navegador (aceita)', { ua: UA.chrome, sintetico: 'aceito' }, async ({ av, texto, pronto }, nome) => {
+  ok(await av('!!document.querySelector(".folha-instalar [data-instalar-ja]")'), nome + ': abre no botão de um toque');
+  await av('document.querySelector(".folha-instalar [data-instalar-ja]").click(); 1');
+  await pronto('!document.querySelector(".folha-instalar")', 3000);
+  ok(await av('window.__prompts') === 1, nome + ': o botão chama prompt() da janela do navegador');
+  ok(await av('!document.querySelector(".folha-instalar")'), nome + ': aceito, a folha fecha');
+  ok(await av('localStorage.getItem("cc.instalado") !== null'), nome + ': fica anotado que instalou');
+});
+await caso('Chrome no Android, janela recusada', { ua: UA.chrome, sintetico: 'recusado' }, async ({ av, pronto }, nome) => {
+  await av('document.querySelector(".folha-instalar [data-instalar-ja]").click(); 1');
+  await pronto('!!document.querySelector(".folha-instalar .passos-instalar")', 3000);
+  ok(await av('window.__prompts') === 1, nome + ': prompt() foi chamado');
+  ok(await av('!!document.querySelector(".folha-instalar .passos-instalar") && /mudar de ideia/.test(document.querySelector(".folha-instalar").innerText)'),
+    nome + ': recusada, mostra os passos pelo menu');
+});
+await caso('Chrome no Android, a janela não abre (prompt falha)', { ua: UA.chrome, sintetico: 'falha' }, async ({ av, pronto }, nome) => {
+  await av('document.querySelector(".folha-instalar [data-instalar-ja]").click(); 1');
+  await pronto('!!document.querySelector(".folha-instalar .passos-instalar")', 3000);
+  const t = await av('document.querySelector(".folha-instalar").innerText');
+  ok(/não abriu/.test(t) && /três pontinhos/.test(t) && /Instalar app/.test(t), nome + ': o botão não fica mudo: diz que não abriu e mostra o menu ⋮ > Instalar app');
+  ok(await av('!document.querySelector(".folha-instalar [data-instalar-ja]")'), nome + ': e não oferece de novo um botão que já não funciona');
+});
+await caso('Chrome no Android, sem a janela do navegador', { ua: UA.chrome }, async ({ av, texto }, nome) => {
+  ok(!(await av('!!document.querySelector(".folha-instalar [data-instalar-ja]")')), nome + ': nenhum botão de instalar sem o aviso do navegador');
+  ok(/três pontinhos/.test(texto) && /Instalar app/.test(texto) && /Adicionar à tela inicial/.test(texto) && /Abrir no Chrome/.test(texto),
+    nome + ': passo manual ⋮ > Instalar app (ou Adicionar à tela inicial), e o que fazer se o menu só tiver "Abrir no Chrome"');
+  ok(await av('document.querySelectorAll(".folha-instalar .passos-instalar li .marca-passo svg").length') >= 3, nome + ': cada passo tem desenho');
+  ok(!/Qual celular/.test(texto), nome + ': não pergunta o celular que o navegador já disse');
+  await av('document.querySelector(".folha-instalar [data-nao-funcionou]").click(); 1');
+  const ajuda = await av('document.querySelector(".ajuda-instalar-corpo:not([hidden])") ? document.querySelector(".ajuda-instalar-corpo").innerText : ""');
+  ok(/Abrir app/.test(ajuda) && /janela de instalar: não veio/.test(ajuda) && /service worker: ativo/.test(ajuda),
+    nome + ': "Não funcionou?" explica o "Abrir app" e mostra o diagnóstico (janela não veio, service worker ativo)');
+});
+await caso('Aba aberta pelo WhatsApp (Chrome com referrer android-app)', { ua: UA.chrome, pre: "try{sessionStorage.setItem('cc.origemApp','android-app://com.whatsapp/')}catch(e){}" }, async ({ av, texto }, nome) => {
+  ok(/Abra no Chrome/.test(texto) && /WhatsApp/.test(texto), nome + ': pede para abrir no Chrome e diz que veio pelo WhatsApp');
+  const href = await av('(document.querySelector(".folha-instalar [data-abrir-chrome]") || {}).href || ""');
+  ok(/^intent:\/\/127\.0\.0\.1:\d+\/#Intent;scheme=http;package=com\.android\.chrome;S\.browser_fallback_url=[^;]+;end$/.test(href), nome + ': botão Abrir no Chrome com intent:// (' + href.slice(0, 60) + '...)');
+  ok(await av('!!document.querySelector(".folha-instalar [data-copiar-link]")'), nome + ': e Copiar o link como alternativa');
+});
+await caso('Navegador de dentro de um app (WebView "; wv)")', { ua: UA.webview }, async ({ av, texto }, nome) => {
+  ok(/Abra no Chrome/.test(texto) && await av('!!document.querySelector(".folha-instalar [data-abrir-chrome]")'), nome + ': "Abra no Chrome" com o botão que abre o Chrome');
+  ok(!(await av('!!document.querySelector(".folha-instalar [data-instalar-ja]")')), nome + ': sem botão de instalar ali dentro');
+});
+await caso('Instagram no Android', { ua: UA.instagram }, async ({ texto }, nome) => {
+  ok(/Abra no Chrome/.test(texto) && /Instagram/.test(texto), nome + ': "Abra no Chrome", dizendo que é o Instagram');
+});
+await caso('Samsung Internet', { ua: UA.samsung }, async ({ texto }, nome) => {
+  ok(/Samsung Internet/.test(texto) && /três tracinhos/.test(texto) && /Adicionar página a/.test(texto), nome + ': os passos do menu dele (≡ > Adicionar página a > Tela inicial)');
+});
+await caso('Firefox no Android', { ua: UA.firefox }, async ({ texto }, nome) => {
+  ok(/Firefox/.test(texto) && /Instalar/.test(texto), nome + ': os passos do Firefox');
+});
+await caso('iPhone (Safari)', { ua: UA.iphone }, async ({ texto }, nome) => {
+  ok(/Compartilhar/.test(texto) && /Tela de Início/.test(texto), nome + ': Compartilhar > Adicionar à Tela de Início');
+});
+await caso('Instagram no iPhone', { ua: UA.iphoneInsta }, async ({ av, texto }, nome) => {
+  ok(/Abra no Safari/.test(texto) && !(await av('!!document.querySelector("[data-abrir-chrome]")')), nome + ': "Abra no Safari", sem o link do Chrome');
+});
+await caso('Computador', { ua: UA.computador }, async ({ av, texto }, nome) => {
+  ok(/Qual celular/.test(texto), nome + ': pergunta qual celular');
+  await av('document.querySelector(\'[data-sistema="android"]\').click(); 1');
+  ok(/três pontinhos/.test(await av('document.querySelector(".folha-instalar").innerText')), nome + ': escolhido Android, os passos do Chrome');
+});
+await caso('Computador com a janela do navegador, pelo menu', { ua: UA.computador, sintetico: 'recusado' }, async ({ av }, nome) => {
+  await av('document.querySelector(".folha-instalar [data-passo-a-passo]").click(); 1');
+  await dormir(300);
+  ok(await av('!!document.querySelector(".folha-instalar .passos-instalar")'), nome + ': "pelo menu" abre os passos (antes, um computador sem sistema reconhecido quebrava aqui)');
+});
+await caso('Já instalado no Android', { ua: UA.chrome, pre: 'Object.defineProperty(navigator, "getInstalledRelatedApps", { value: () => Promise.resolve([{ platform: "webapp" }]) });' }, async ({ av, texto }, nome) => {
+  ok(/já está instalado/.test(texto) && !(await av('!!document.querySelector(".folha-instalar [data-instalar-ja]")')), nome + ': diz que já está instalado e não oferece instalar');
+});
+
+console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  o tutorial de instalar funciona\n');
+try { servidor.kill(); } catch { /* ok */ }
+try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
 process.exit(falhas ? 1 : 0);
