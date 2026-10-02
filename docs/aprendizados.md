@@ -532,6 +532,11 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   guardado era o do shell, o novo morreu com a porta ocupada e o app ficou parado na CSP (hashes
   velhos) → guardar o PID com `$!` do próprio `node` e conferir o log ("porta em uso") antes de
   medir.
+- 2026-10-02 · instalar · O V2 mora em ge.off-sec.net, mas uma folha herdada do app original
+  ("O app tem endereço novo") aparecia ali uma vez por dia mandando abrir e instalar o
+  geracaoeleita.app, que é o outro app → saiu. Ao sincronizar com o original, procurar por
+  nomes de domínio (`grep -rn "off-sec\|geracaoeleita.app" src`) e conferir se cada um vale
+  para o V2.
 
 ## Revisão do dia (Guardar, Pensar, Orar)
 

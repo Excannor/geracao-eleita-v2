@@ -139,7 +139,7 @@ O que aparece, na ordem, e quem decide:
    com `Notification.permission === 'default'`, conta com senha, nunca antes da primeira leitura
    (`CC.datasFeitas` vazio devolve sem perguntar), e nunca duas vezes: "Agora não" guarda a hora e
    pergunta de novo uma vez, 7 dias depois; no iPhone só com o app instalado) → consentimento, se faltar
-   (`CC.pedirConsentimento`) → aviso de endereço novo (só em ge.off-sec.net) → link de célula ou
+   (`CC.pedirConsentimento`) → link de célula ou
    convite da URL → completar cadastro (contas antigas) → `avisosDoDia()`: escudo que cobriu ontem
    (aviso flutuante), ofensiva zerada nos últimos 14 dias (folha "Ainda tem brasa", `[data-ler]`
    Reavivar hoje / `[data-fechar]` Agora não), toque de amigo (`CC.folhaToque`) → check-in do

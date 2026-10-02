@@ -646,29 +646,9 @@
     // segue para convite, célula ou completar cadastro antes de decidir isso.
     if (quem && quem.comSenha && !quem.consentimento) await CC.pedirConsentimento();
 
-    // Endereço novo: quem ainda usa o app pelo endereço antigo (o ícone instalado fica preso
-    // a ele) recebe, no máximo uma vez por dia, o convite para abrir e instalar o novo. A
-    // conta é a mesma: tudo fica no servidor.
-    if (location.hostname === 'ge.off-sec.net') {
-      let visto = '';
-      try { visto = localStorage.getItem('cc.enderecoNovo') || ''; } catch (e) { /* segue */ }
-      if (visto !== CC.hojeIso()) {
-        try { localStorage.setItem('cc.enderecoNovo', CC.hojeIso()); } catch (e) { /* segue */ }
-        {
-          CC.folha('<h2>O app tem endereço novo</h2>'
-            + '<p>Agora o Geração Eleita fica em <b>geracaoeleita.app</b>. Abra por lá, entre com o mesmo usuário e senha e instale de novo na tela de início. Suas leituras, amigos e célula continuam todos lá.</p>'
-            + '<p class="passo-dica pequena">Depois de instalar o novo, você pode apagar este ícone antigo. Se usa notificações, ative de novo no app novo.</p>'
-            + '<div class="acoes"><a class="botao azul" href="https://geracaoeleita.app/" target="_blank" rel="noopener" data-fechar-novo>Abrir o endereço novo</a>'
-            + '<button class="botao plano" data-fechar>Agora não</button></div>', {
-            rotulo: 'Endereço novo',
-            ligar: (folha, fechar) => {
-              folha.querySelector('[data-fechar]').onclick = fechar;
-              folha.querySelector('[data-fechar-novo]').addEventListener('click', () => fechar());
-            },
-          });
-        }
-      }
-    }
+    // (Até 02/10 vinha aqui, em ge.off-sec.net, a folha "O app tem endereço novo", herdada do app
+    // original: ela mandava quem usa o V2, que mora justamente em ge.off-sec.net, abrir e instalar
+    // o geracaoeleita.app, que é o outro app. Saiu: no V2, este é o endereço do app.)
 
     const celula = new URLSearchParams(location.search).get('celula');
     if (celula) {
