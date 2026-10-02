@@ -107,11 +107,13 @@
 :root[data-tema="escuro"] .mapa-jesus { background: var(--v2-cartao); color: var(--v2-tinta); box-shadow: inset 0 0 0 2px var(--salvia); }
 :root[data-tema="escuro"] .mapa-jesus mark { background: var(--folha); color: var(--folha-tinta); }
 
-/* a conexão entre dois ramos: a curva desce primeiro e cruza depois; o texto fica no canto
-   que ela deixa livre. A altura é acertada pelo JS pelo tamanho do texto. */
+/* a conexão entre dois ramos: o S sai vertical do lado de cima e só cruza para o lado do texto
+   abaixo dele; o texto fica no canto que a curva deixa livre. A altura é acertada pelo JS (a
+   menor em que nenhum ponto do S cai no texto). O passo do pontilhado vem no style do caminho,
+   acertado pelo comprimento da curva, para o último ponto cair no bico da seta. */
 .mapa-conexao { position: relative; height: 150px; }
 .mapa-conexao .seta { position: absolute; inset: 0; }
-.mapa-ligacao { position: absolute; top: 0; width: 52%; margin: 0; color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: .875rem; font-style: italic; line-height: 1.4; text-wrap: pretty; }
+.mapa-ligacao { position: absolute; top: 0; width: 60%; margin: 0; color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: .875rem; font-style: italic; line-height: 1.4; text-wrap: pretty; }
 .mapa-ligacao.dir { right: 0; }
 .mapa-ligacao.esq { left: 0; }
 

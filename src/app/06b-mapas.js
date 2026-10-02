@@ -131,31 +131,73 @@
   const desenho = (mapa, id) => (mapa.desenhos && mapa.desenhos[id] ? '<span class="desenho" aria-hidden="true">' + mapa.desenhos[id] + '</span>' : '');
   const POR_EXTENSO = { 2: 'dois', 3: 'três', 4: 'quatro', 5: 'cinco', 6: 'seis', 7: 'sete' };
 
-  // Uma curva pontilhada de (x1, 4) a (x2, alt - 8), que desce primeiro e cruza depois, com a
-  // ponta de seta em cima do bloco seguinte. A largura é a da coluna de verdade: assim a ponta
-  // cai em cima do desenho ou do título certo em qualquer tela.
+  // Uma curva pontilhada de (x1, 4) até a ponta, em alt - 6, com a ponta de seta em cima do bloco
+  // seguinte. A largura é a da coluna de verdade: assim a ponta cai em cima do desenho ou do
+  // título certo em qualquer tela.
+  // A curva é um S simétrico, como a estrada da trilha: sai vertical do bloco de cima, cruza com
+  // a mesma curvatura dos dois lados e chega vertical em cima do bloco de baixo (cada ponto de
+  // controle a 55% da altura, um em cada ponta). Antes, o primeiro ponto de controle ficava quase
+  // no fundo: a linha descia reta e dobrava num cotovelo perto do fim, e a ponta, um "v" fixo
+  // para baixo, nem sempre seguia a direção em que a curva chegava (o dono viu no iPhone).
   let W = 358;
-  function seta(x1, x2, alt, c1, c2) {
-    const fim = alt - 8;
-    const a = Math.round(x1); const b = Math.round(x2);
+  const K = 0.55;
+  const r1 = (n) => Math.round(n * 10) / 10;
+  // os quatro pontos da cúbica e um ponto dela em t
+  const curvaS = (a, b, y0, y1) => { const d = (y1 - y0) * K; return [[a, y0], [a, y0 + d], [b, y1 - d], [b, y1]]; };
+  const ponto = (P, t) => {
+    const u = 1 - t;
+    const k = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t];
+    return [k[0] * P[0][0] + k[1] * P[1][0] + k[2] * P[2][0] + k[3] * P[3][0], k[0] * P[0][1] + k[1] * P[1][1] + k[2] * P[2][1] + k[3] * P[3][1]];
+  };
+  const comprimento = (P) => {
+    let L = 0; let [x, y] = P[0];
+    for (let i = 1; i <= 64; i++) { const [nx, ny] = ponto(P, i / 64); L += Math.hypot(nx - x, ny - y); x = nx; y = ny; }
+    return L;
+  };
+  function seta(x1, x2, alt) {
+    const fim = alt - 6;
+    const P = curvaS(Math.round(x1), Math.round(x2), 4, fim);
+    // Os pontos caem certos nas duas pontas: o passo do pontilhado é acertado pelo comprimento
+    // da curva, para o último ponto ficar na ponta da seta (sem vão antes dela).
+    const L = comprimento(P);
+    const passo = r1(L / Math.max(1, Math.round(L / 7.1)) - 0.1);
+    // A ponta segue a tangente no fim da curva (a direção do último ponto de controle ao fim),
+    // com o bico exatamente no fim da linha.
+    const ang = Math.atan2(P[3][1] - P[2][1], P[3][0] - P[2][0]);
+    const asa = (lado) => { const t = ang + Math.PI + lado * 0.68; return r1(P[3][0] + 10 * Math.cos(t)) + ' ' + r1(P[3][1] + 10 * Math.sin(t)); };
     return '<svg class="seta" width="' + W + '" height="' + alt + '" viewBox="0 0 ' + W + ' ' + alt + '" aria-hidden="true">'
-      + '<path class="pontos" d="M' + a + ' 4C' + a + ' ' + c1 + ' ' + b + ' ' + c2 + ' ' + b + ' ' + fim + '"/>'
-      + '<path class="ponta" d="M' + (b - 7) + ' ' + (fim - 7) + 'l7 9 7-9"/></svg>';
+      + '<path class="pontos" style="stroke-dasharray:0.1 ' + passo + '" d="M' + P[0].join(' ') + 'C' + P[1].map(r1).join(' ') + ' ' + P[2].map(r1).join(' ') + ' ' + P[3].join(' ') + '"/>'
+      + '<path class="ponta" d="M' + asa(-1) + 'L' + P[3].join(' ') + 'L' + asa(1) + '"/></svg>';
   }
-  const curta = (x1, x2) => seta(x1, x2, 70, 52, 18);
-  // Entre dois ramos: 150px de altura, com a conexão escrita no canto que a curva deixa livre.
-  // A altura e a curva são acertadas depois, pelo tamanho real do texto (ajustarConexoes).
-  const longa = (x1, x2, texto, lado) => '<div class="mapa-conexao" data-x1="' + Math.round(x1) + '" data-x2="' + Math.round(x2) + '">' + seta(x1, x2, 150, 140, 70)
+  // A altura da curva entre dois blocos cresce com a distância de um lado ao outro, para o S
+  // não deitar quando atravessa a coluna inteira.
+  const curta = (x1, x2) => seta(x1, x2, Math.round(Math.min(110, Math.max(64, 64 + Math.abs(x2 - x1) * 0.16))));
+  // Entre dois ramos, com a conexão escrita no canto que a curva deixa livre. A altura é
+  // acertada depois, pelo tamanho real do texto (ajustarConexoes).
+  const longa = (x1, x2, texto, lado) => '<div class="mapa-conexao" data-x1="' + Math.round(x1) + '" data-x2="' + Math.round(x2) + '" data-lado="' + lado + '">' + seta(x1, x2, 150)
     + (texto ? '<p class="mapa-ligacao ' + lado + '">' + CC.esc(texto) + '</p>' : '') + '</div>';
-  // A curva só cruza para o outro lado abaixo do texto: com um texto comprido, a área cresce
-  // e o ponto de controle desce junto. Antes disso, a linha pontilhada atravessava a conexão.
+  // A curva só cruza para o lado do texto abaixo dele: a área tem a menor altura em que nenhum
+  // ponto do S cai no retângulo do texto (com 10px de folga). Com o S simétrico, ela fica
+  // perto do dobro da altura do texto.
+  function alturaLivre(x1, x2, caixa) {
+    for (let alt = 150; alt < 900; alt += 4) {
+      const P = curvaS(x1, x2, 4, alt - 6);
+      let livre = true;
+      for (let i = 0; i <= 80 && livre; i++) {
+        const [x, y] = ponto(P, i / 80);
+        if (x > caixa.esq - 10 && x < caixa.dir + 10 && y < caixa.baixo + 10) livre = false;
+      }
+      if (livre) return alt;
+    }
+    return 900;
+  }
   function ajustarConexoes(raiz) {
     raiz.querySelectorAll('.mapa-conexao').forEach((el) => {
       const p = el.querySelector('.mapa-ligacao');
-      const texto = p ? p.offsetHeight : 0;
-      const alt = Math.max(150, texto + 64);
+      const x1 = Number(el.dataset.x1); const x2 = Number(el.dataset.x2);
+      const alt = p ? alturaLivre(x1, x2, { esq: p.offsetLeft, dir: p.offsetLeft + p.offsetWidth, baixo: p.offsetTop + p.offsetHeight }) : 150;
       el.style.height = alt + 'px';
-      el.querySelector('.seta').outerHTML = seta(Number(el.dataset.x1), Number(el.dataset.x2), alt, alt - 10, Math.max(70, texto + 18));
+      el.querySelector('.seta').outerHTML = seta(x1, x2, alt);
     });
   }
   // O nome no pincel encolhe até caber na coluna (Deuteronômio, 2 Tessalonicenses).
@@ -241,7 +283,7 @@
       + (tudoLido ? 'Reler ' + CC.esc(nome) + ' 1' : (comecou ? 'Continuar em ' : 'Ler ') + CC.esc(nome) + ' ' + proximoCap) + '</a>';
 
     return '<div class="mapa">'
-      + seta(96, 40, 64, 40, 24) + '<section class="mapa-bloco mapa-significado">' + significado + '</section>'
+      + seta(96, 40, 64) + '<section class="mapa-bloco mapa-significado">' + significado + '</section>'
       + curta(60, W - 52) + '<section class="mapa-bloco mapa-autoria">' + autoria + '</section>'
       + curta(W - 52, meio) + '<section class="mapa-bloco mapa-raiz">' + raiz + '</section>'
       + curta(meio, 64) + '<div class="mapa-ramos-titulo"><span>Os ' + (POR_EXTENSO[n] || n) + ' ramos</span><span>siga as setas</span></div>'

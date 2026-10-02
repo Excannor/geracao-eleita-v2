@@ -177,6 +177,13 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   comando matou o shell de novo → `foto-conta` ganhou `ESCALA` (use 1.5 em página com mais de uns
   10.000px) e todo comando de captura vai com `timeout`; processo se mata pelo PID que `ps` mostra,
   nunca por padrão de texto (regra na skill).
+- 2026-10-02 · tela · O dono viu no iPhone as setas "tortas e quebradas": a cúbica tinha o
+  primeiro ponto de controle quase no fundo (alt - 10) e o segundo lá em cima, então a linha
+  descia reta e dobrava num cotovelo perto do fim; e a ponta era um "v" fixo para baixo, que não
+  seguia a direção em que a curva chegava → S simétrico (pontos de controle a 55% da altura, um em
+  cada ponta, saindo e chegando na vertical), ponta desenhada na tangente do fim com o bico no fim
+  da linha, passo do pontilhado acertado pelo comprimento da curva; o `teste-mapas` mede tudo isso
+  a 390, 375 e 360px (regra na skill).
 
 ## Geral
 

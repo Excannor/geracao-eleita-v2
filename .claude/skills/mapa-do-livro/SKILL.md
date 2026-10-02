@@ -145,11 +145,21 @@ para olhar peça por peça, porque a página inteira reduzida esconde defeito.
   traço de 20px na frente ("SIGNIFICADO DO NOME"). Corpo em Manrope; a raiz e os versículos em
   Literata.
 - **Setas curvas pontilhadas, como a trilha:** os blocos não ficam empilhados como cartões. Eles
-  alternam de lado, e cada passagem tem uma curva pontilhada (`stroke-dasharray: 0.1 7`, ponta
-  redonda, 2.4px) que termina numa ponta de seta em cima do próximo bloco. A conexão entre ramos
-  fica em Literata itálico, no espaço livre acima da curva: a curva desce primeiro e só cruza
-  para o outro lado abaixo do texto, e a área cresce com o texto (medida de novo quando as
-  fontes terminam de carregar, porque medida com a letra de reserva ela saía curta).
+  alternam de lado, e cada passagem tem uma curva pontilhada (pontos de 2.4px, ponta redonda,
+  passo de uns 7px acertado pelo comprimento da curva para o último ponto cair no bico) que
+  termina numa ponta de seta em cima do próximo bloco.
+  A curva é **um S simétrico** (regra do dono, 02/10): sai vertical do bloco de cima, cruza com a
+  mesma curvatura dos dois lados e chega vertical em cima do bloco de baixo, com os pontos de
+  controle a 55% da altura, um em cada ponta. Ponto de controle perto do fundo faz a linha
+  descer reta e dobrar num cotovelo perto do fim ("torta e quebrada" no iPhone). A **ponta segue
+  a tangente** no fim da curva, com o bico exatamente no fim da linha: nada de "v" fixo para
+  baixo. Entre blocos, a altura cresce com a distância de um lado ao outro (64 a 110px), para o
+  S não deitar.
+  A conexão entre ramos fica em Literata itálico, no canto que a curva deixa livre (60% da
+  coluna): a área tem a menor altura em que nenhum ponto do S cai no texto (com 10px de folga),
+  medida de novo quando as fontes terminam de carregar, porque medida com a letra de reserva ela
+  saía curta. O `teste-mapas` confere a 390, 375 e 360px que cada seta é um S simétrico, que
+  sai e chega na vertical e que a ponta está no fim e na tangente.
 - **Cartão só onde ele é necessário:** a raiz (borda tracejada), "[Livro] e Cristo" (escuro) e
   "Enquanto lê, procure" (sálvia pálida). O resto fica direto no fundo da página.
 - **Referências** como marca-texto sálvia (`<mark>`), no fim de cada item.

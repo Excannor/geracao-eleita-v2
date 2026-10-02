@@ -174,6 +174,25 @@ ok(await esperar('location.hash === "#/explorar" && !!document.querySelector("#m
 await dormir(500);
 ok(await av('Math.abs(document.querySelector("#mapas-dos-livros").getBoundingClientRect().top) < 140'), 'o Explorar reabre na grade dos mapas, não no alto');
 
+// Cada seta é um S simétrico que sai e chega na vertical (sem o cotovelo perto do fim que o
+// dono viu no iPhone), e a ponta fica no fim da linha, apontando na direção em que a curva
+// chega. Devolve as setas que fogem disso.
+const setasTortas = () => av(`JSON.stringify([...document.querySelectorAll(".mapa svg.seta")].map((s, i) => {
+  const linha = s.querySelector(".pontos"); const L = linha.getTotalLength();
+  const p0 = linha.getPointAtLength(0); const p1 = linha.getPointAtLength(L); const meio = linha.getPointAtLength(L / 2);
+  const antes = linha.getPointAtLength(L - 0.5); const depois = linha.getPointAtLength(0.5);
+  const v = s.querySelector(".ponta").getAttribute("d").match(/-?[\\d.]+/g).map(Number);
+  const bico = { x: v[2], y: v[3] };
+  const dir = Math.atan2(p1.y - antes.y, p1.x - antes.x);
+  const bissetriz = Math.atan2(bico.y - (v[1] + v[5]) / 2, bico.x - (v[0] + v[4]) / 2);
+  const erros = [];
+  if (Math.hypot(bico.x - p1.x, bico.y - p1.y) > 0.6) erros.push("ponta fora do fim");
+  if (Math.abs(dir - bissetriz) > 0.09) erros.push("ponta fora da tangente");
+  if (Math.abs(depois.x - p0.x) > 0.1 || Math.abs(antes.x - p1.x) > 0.1) erros.push("não sai ou não chega na vertical");
+  if (Math.hypot(meio.x - (p0.x + p1.x) / 2, meio.y - (p0.y + p1.y) / 2) > 2) erros.push("S assimétrico");
+  return erros.length ? i + ": " + erros.join(", ") : "";
+}).filter(Boolean))`);
+
 // ---------- todos os mapas publicados ----------
 // Cada mapa do índice abre inteiro: um ramo por item do JSON, um desenho por ramo mais Cristo
 // (e a autoria, quando tem), as setas entre os blocos (oito fixas mais uma entre cada par de
@@ -182,7 +201,7 @@ for (const slug of indice.publicados) {
   const m = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'mapas', slug + '.json'), 'utf8'));
   const n = m.ramos.length;
   const desenhos = n + 1 + (m.autoria && m.autoria.desenho ? 1 : 0);
-  for (const [w, h] of [[390, 844], [360, 740]]) {
+  for (const [w, h] of [[390, 844], [375, 812], [360, 740]]) {
     await tela(w, h);
     await av('location.hash = "#/explorar"');
     await dormir(300);
@@ -193,8 +212,9 @@ for (const slug of indice.publicados) {
     const setas = await av('document.querySelectorAll(".mapa svg.seta").length');
     const cruz = await cruzamentos();
     const largura = await av('document.documentElement.scrollWidth - innerWidth');
-    ok(abriu && desenhosNaTela === desenhos && setas === n - 1 + 8 && cruz === JSON.stringify(Array(n - 1).fill(0)) && largura <= 0,
-      m.nome + ' a ' + w + 'px: ' + n + ' ramos, ' + desenhosNaTela + '/' + desenhos + ' desenhos, ' + setas + ' setas, curvas fora do texto (' + cruz + '), largura ok');
+    const tortas = await setasTortas();
+    ok(abriu && desenhosNaTela === desenhos && setas === n - 1 + 8 && cruz === JSON.stringify(Array(n - 1).fill(0)) && largura <= 0 && tortas === '[]',
+      m.nome + ' a ' + w + 'px: ' + n + ' ramos, ' + desenhosNaTela + '/' + desenhos + ' desenhos, ' + setas + ' setas em S com a ponta na tangente ' + (tortas === '[]' ? '' : tortas) + ', curvas fora do texto (' + cruz + '), largura ok');
   }
 }
 
