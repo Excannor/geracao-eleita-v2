@@ -5,6 +5,9 @@ description: Padrão do "Mapa do livro" do Geração Eleita V2, o mapa mental qu
 
 # Mapa do livro
 
+Antes de começar, leia `docs/aprendizados.md`. Ao terminar cada mapa, registre lá o que deu errado
+ou o que dá para fazer melhor, e passe para esta skill o que virar regra.
+
 O mapa é uma página por livro, aberta no dia em que o livro começa no plano, no leitor (botão
 Mapa) e no Explorar (os 66 mapas). Referência visual: `design/mapas/mock-isaias.dc.html` (a tela
 inteira de Isaías) e `design/mapas/ilustracoes-isaias.html` (os desenhos aprovados).
