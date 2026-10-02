@@ -191,7 +191,43 @@ tom: direto, em português de conversa, com "nada disto foi publicado" quando fo
 4. Textos novos: português de conversa, sem travessão (o `teste.mjs` reprova travessão no conteúdo),
    sem emoji, sem cobrança; passe pela skill `revisao-uiux` (frente "texto").
 
-## 9. Armadilhas conhecidas
+## 9. Conteúdo e interesse (as três notas)
+
+Barreira removida não segura ninguém se o dia não interessa. Além das hipóteses da seção 2, o
+diagnóstico julga o CONTEÚDO dos primeiros dias como produto, com três notas de 0 a 5, dia a dia
+(dias 1 a 7 do plano, os dois primeiros do Conhecer Jesus e os Primeiros passos), olhando a tela
+inteira (o que a pessoa vê antes, durante e depois de ler), e não só o texto da reflexão:
+
+- **Personalidade** (o contrário de genérico): o texto poderia estar em qualquer app devocional?
+  Cite o trecho real (`04-licao.js telaLeitura`: "Leitura de hoje. Leia aqui ou na sua Bíblia e
+  marque ao terminar"; `03b-fala-do-dia.js FALAS`; a frase sorteada de `CC.FRASES_OFENSIVA` no
+  resumo; `notificacoes.mjs T`) e escreva a versão com personalidade ao lado.
+- **Tchan**: o momento "uau" do dia (um detalhe do texto, uma ligação entre as duas passagens, uma
+  pergunta que incomoda) e EM QUE PONTO ele chega. No plano, o melhor do dia (a reflexão escrita,
+  `ferramentas/reflexoes/unidade-NN.json`) só aparece depois de "Concluir o dia"; quem para no meio
+  da leitura nunca o vê. Procure o tchan na NBV da leitura (`conteudo/biblias/nbv.json`), nunca de
+  memória, e sob as regras de `ferramentas/reflexoes/CLAUDE.md` (só a leitura do dia, citação da
+  NBV, sem absoluto sem prova, sem tradição de pregação).
+- **Contexto**: antes de ler, a pessoa sabe quem escreveu, para quem, quando, onde está na grande
+  história (criação → queda → promessa → povo → reino → exílio → espera → Jesus → igreja → nova
+  criação, a divisão da nota "00 - Início/A história bíblica em uma página") e por que as duas
+  passagens andam juntas? Os fatos de autoria e data vêm das fichas "03 - Livros da Bíblia/<livro>"
+  em `conteudo.json` (sempre com "pela tradição" quando a ficha diz "tradicionalmente").
+
+Onde o conteúdo dos primeiros dias mora: `conteudo/conteudo.json` (`plano`, `licoes` e as notas que
+elas abrem, `reflexoes`), `conteudo/conhecer.json`, `conteudo/perguntas-honestas.json`,
+`conteudo/primeiros-dias.json` (o contexto, o "procure", o "amanhã" e os guias de leitura dos
+trechos de lista; `src/app/03c-contexto.js` desenha), `ferramentas/reflexoes/unidade-01.json`
+(os 31 dias da Unidade 1, com título, texto, perguntas e oração). Medidas que ajudam: palavras de
+cada trecho (o comando da seção 3), quantos versículos são lista (Mateus 1.1-17 tem 333 das 527
+palavras do capítulo; Gênesis 5 repete "morreu" 8 vezes), tamanho de cada Primeiro passo
+(`txt(n.html).split(' ').length`: 635 a 877 palavras).
+
+O diagnóstico ganha uma seção própria, "Conteúdo e interesse", com a tabela das três notas por
+dia, os trechos genéricos com a versão proposta, o tchan de cada dia (criado quando não há) e a
+proposta de contexto. Modelo: `docs/retencao-primeiros-dias.md`, seção 4.
+
+## 10. Armadilhas conhecidas
 
 - Servidor de teste: `CAMINHO_ESTADO=<pasta>/estado.json [CAMINHO_ADMIN=marcos] node servidor.mjs <porta>`,
   sempre com o PID guardado (`echo $! > servidor.pid`) e morto por ele; se não cair em 2 s, `kill -9`.
@@ -202,5 +238,9 @@ tom: direto, em português de conversa, com "nada disto foi publicado" quando fo
 - `CAMINHO_RELOGIO` não move o "hoje" das leituras (só os avisos sociais, com `CAMINHO_PUSH_TESTE=1`);
   para simular dias use `design/ferramentas/analise/relogio.mjs` (veja a skill `jornada-usuario`).
 - `node build.mjs` nunca durante um teste de navegador na mesma pasta.
+- O que aparece na partida ganha do que aparece depois: até 02/10/2026 `10-roteador.js` mostrava o
+  tutorial de instalar na primeira abertura e apagava `cc.instalar`, e o código de `04-licao.js
+  telaResumo` que faria isso depois da primeira leitura nunca rodava. Quando duas telas disputam a
+  mesma marca, confira na jornada qual delas de fato aparece (e onde), não só no código.
 - Os números do painel com dados semeados são de brinquedo: servem para ver as telas e conferir
   fórmulas, não para concluir nada sobre pessoas.
