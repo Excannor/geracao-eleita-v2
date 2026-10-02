@@ -294,7 +294,7 @@
   // Um botão principal só, que muda a cada etapa, e "Pular por hoje" discreto. O que é do dia
   // fica dentro da etapa (escrever no cartão do versículo, ir mais fundo logo abaixo do
   // contexto); o que leva a outro dia ("Ler o dia N") só aparece no fim.
-  const ICONE_ETAPA = { guardar: 'marcador', pensar: 'lupa', orar: 'maos' };
+  const ICONE_ETAPA = { guardar: 'marcador', pensar: 'lupa', orar: 'oracao' };
   // O título da etapa leva o ícone dela, no mesmo círculo sálvia dos passos do topo.
   const tituloEtapa = (etapa, texto) => '<h2 class="titulo-etapa"><span class="ico-etapa">' + CC.ico(ICONE_ETAPA[etapa]) + '</span>'
     + '<span>' + CC.esc(texto) + '</span></h2>';
@@ -316,7 +316,7 @@
     const encolhida = etapa === 'orar';
     const textoPergunta = (p) => (Array.isArray(p) ? p[1] : p);
 
-    const avancar = { guardar: ['Pensar sobre isso', 'lupa'], pensar: ['Transformar em oração', 'maos'], orar: ['Terminar', 'certo'] }[etapa];
+    const avancar = { guardar: ['Pensar sobre isso', 'lupa'], pensar: ['Transformar em oração', 'oracao'], orar: ['Terminar', 'certo'] }[etapa];
 
     return {
       corpo: '<div class="festa"><div class="cabeca-licao">'
