@@ -520,11 +520,11 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
     height: 5px;
     margin-left: -2.5px;
     border-radius: 50%;
-    background: #93aa4c;
+    background: var(--salvia);
   }
   .aba.selecionada:not(.aba-central) .ico-aba { transform: translateY(-2px); }
-  /* ponto de novidade: vermelho, recortado da cor da ilha */
-  .aba .ponto-aba { top: 1px; right: 1px; width: 11px; height: 11px; border: 2px solid var(--barra); background: #ff5b4d; }
+  /* ponto de novidade: o vermelho de aviso da paleta, recortado da cor da ilha */
+  .aba .ponto-aba { top: 1px; right: 1px; width: 11px; height: 11px; border: 2px solid var(--barra); background: var(--alerta); }
   /* barra cheia: só os círculos */
   .navegacao.cheia .aba:not(.aba-central) .rotulo-aba {
     position: absolute;

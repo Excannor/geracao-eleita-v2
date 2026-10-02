@@ -371,7 +371,8 @@ main:has(> #tela-boas:not([hidden])) { max-width: none; padding: 0; }
 .po-volte .v3 { font-size: 15cqw; }
 .lp-convite { display: grid; gap: 20px; width: min(100%, 380px); }
 .lp-convite h2 { margin: 0; color: #e8efcf; font-family: var(--v2-ui); font-size: 1.75rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; text-wrap: balance; }
-.lp-final + .links { margin: 0; padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); background: #232b17; }
+/* revisão: o separador entre os links, legível sobre o fundo escuro do rodapé (era --fraca, 2,7:1) */
+.lp-final + .links { margin: 0; padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); background: #232b17; color: #a4a99d; }
 .lp-final + .links a { color: #c8da8c; }
 @media (min-width: 760px) { .lp-final { grid-template-columns: 360px 380px; justify-content: center; align-items: center; gap: 72px; } .lp-convite { text-align: left; } }
 @media (prefers-reduced-motion: reduce) { .lp-peca { animation: none; } }
