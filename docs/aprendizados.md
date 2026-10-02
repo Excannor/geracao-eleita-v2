@@ -184,6 +184,15 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   cada ponta, saindo e chegando na vertical), ponta desenhada na tangente do fim com o bico no fim
   da linha, passo do pontilhado acertado pelo comprimento da curva; o `teste-mapas` mede tudo isso
   a 390, 375 e 360px (regra na skill).
+- 2026-10-02 · conteúdo · As conexões chegaram a 166 (Gênesis) e 178 caracteres (Mateus), dentro
+  dos "uns 180" da skill, e mesmo assim davam seis linhas a 390px numa coluna estreita: a área da
+  curva ficava alta e o mapa, comprido. A regra de 180 tinha saído de um defeito (a curva cruzando
+  o texto), não do que fica bom de ler → conexão é uma frase de ligação com até 150 caracteres
+  (3 a 4 linhas a 390px); o `checar-mapa` barra o que passar e o `teste-mapas` confere as 4
+  linhas na tela (regra na skill). Medido na tela, 150 caracteres ainda davam 5 a 6 linhas na
+  coluna de 52%: a coluna da conexão passou a 64% e as conexões de Gênesis, Mateus e uma de
+  Isaías ficaram entre 69 e 127 caracteres, conferidas de novo na NBV (sem repetir palavra na
+  frase: "Herodes, que mandou matar João, pensa que Jesus é João" repetia "João").
 
 ## Geral
 

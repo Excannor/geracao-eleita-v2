@@ -213,6 +213,11 @@ for (const slug of indice.publicados) {
     const cruz = await cruzamentos();
     const largura = await av('document.documentElement.scrollWidth - innerWidth');
     const tortas = await setasTortas();
+    // a conexão é uma frase de ligação: até 4 linhas na tela de 390px
+    if (w === 390) {
+      const linhas = await av('JSON.stringify([...document.querySelectorAll(".mapa-ligacao")].map((p) => Math.round(p.offsetHeight / parseFloat(getComputedStyle(p).lineHeight))))');
+      ok(JSON.parse(linhas).every((n) => n <= 4), m.nome + ': cada conexão cabe em até 4 linhas a 390px (' + linhas + ')');
+    }
     ok(abriu && desenhosNaTela === desenhos && setas === n - 1 + 8 && cruz === JSON.stringify(Array(n - 1).fill(0)) && largura <= 0 && tortas === '[]',
       m.nome + ' a ' + w + 'px: ' + n + ' ramos, ' + desenhosNaTela + '/' + desenhos + ' desenhos, ' + setas + ' setas em S com a ponta na tangente ' + (tortas === '[]' ? '' : tortas) + ', curvas fora do texto (' + cruz + '), largura ok');
   }

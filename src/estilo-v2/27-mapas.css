@@ -113,7 +113,7 @@
    acertado pelo comprimento da curva, para o último ponto cair no bico da seta. */
 .mapa-conexao { position: relative; height: 150px; }
 .mapa-conexao .seta { position: absolute; inset: 0; }
-.mapa-ligacao { position: absolute; top: 0; width: 60%; margin: 0; color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: .875rem; font-style: italic; line-height: 1.4; text-wrap: pretty; }
+.mapa-ligacao { position: absolute; top: 0; width: 64%; margin: 0; color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: .875rem; font-style: italic; line-height: 1.4; text-wrap: pretty; }
 .mapa-ligacao.dir { right: 0; }
 .mapa-ligacao.esq { left: 0; }
 

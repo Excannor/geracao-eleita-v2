@@ -5,7 +5,8 @@
 //      existindo na NBV, a tradução padrão do app: livro, capítulo e versículo dentro do tamanho real;
 //   3. toda citação entre aspas batendo, palavra por palavra, com a NBV da referência do item;
 //   4. as palavras proibidas da skill (vícios de IA) e o travessão;
-//   5. itens consecutivos de uma lista começando com a mesma palavra (só aviso).
+//   5. itens consecutivos de uma lista começando com a mesma palavra (só aviso);
+//   6. a conexão entre dois ramos com até 150 caracteres.
 // O mesmo módulo roda dentro do teste.mjs para todos os mapas da pasta.
 // Uso: node ferramentas/checar-mapa.mjs <slug|--todos>
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -48,6 +49,9 @@ export const PROIBIDAS = [
   [/é importante notar/i, '"é importante notar"'], [/no fim das contas/i, '"no fim das contas"'],
   [/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u, 'emoji'],
 ];
+
+// O tamanho máximo da conexão entre dois ramos, em caracteres.
+export const CONEXAO_MAX = 150;
 
 let nbvCache = null;
 const nbv = () => (nbvCache ||= JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', 'nbv.json'), 'utf8')).livros);
@@ -168,6 +172,9 @@ export function checarMapa(slug, mapa) {
     }
     if (i < ramos.length - 1 && !texto(ramo.conexao)) aviso(onde + ': sem conexão com o ramo seguinte');
     if (texto(ramo.conexao)) {
+      // Até 150 caracteres (3 a 4 linhas a 390px): conexão mais longa empurra a curva para baixo,
+      // a área cresce e o mapa fica comprido (regra do dono, 02/10).
+      if (ramo.conexao.length > CONEXAO_MAX) erro(onde + ': a conexão tem ' + ramo.conexao.length + ' caracteres (até ' + CONEXAO_MAX + ')');
       const dentro = refsNoTexto(ramo.conexao);
       const refsConexao = dentro.flatMap((x) => ref(onde + ' conexão', x));
       if (/[“"]/.test(ramo.conexao) && !refsConexao.length) aviso(onde + ': a conexão cita entre aspas sem referência entre parênteses');

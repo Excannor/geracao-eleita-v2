@@ -77,8 +77,11 @@ do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua"
 - **Ramificações:** de 3 a 6 por ramo, cada uma com a referência no fim.
 - **Conexões:** entre um ramo e o seguinte, uma frase que mostra o raciocínio do autor bíblico
   (de preferência ligando dois versículos do próprio livro, como o toco de Is 6.13 que vira o
-  rebento de Is 11.1). Até uns 180 caracteres: a conexão de 247 do ramo 3 de Mateus fez a
-  curva cruzar o texto a 360px (as de Gênesis ficam entre 116 e 166).
+  rebento de Is 11.1). **No máximo 150 caracteres e 4 linhas a 390px** (regra do dono, 02/10):
+  uma frase de ligação, não um resumo. Na prática, até uns 125 caracteres cabem em 4 linhas; com
+  aspas e referências, menos. Conexão longa empurra o cruzamento do S para
+  baixo e a área fica alta demais (a de 247 do ramo 3 de Mateus chegou a fazer a curva cruzar o
+  texto a 360px). O `checar-mapa` barra o que passar de 150.
 
 Depois dos ramos vêm, nesta ordem, as seções fixas: **Significado do nome**, **Autoria e
 época** (só o que o livro diz), **[Livro] e Cristo**, **Estrutura do livro** (partes com
@@ -94,7 +97,7 @@ Antes de entregar o texto:
   as ondas inundam o barco");
 - nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen nos galhos só
   se não houver outra ("boas-novas" quebrou no hífen a 390px);
-- toda conexão que mudou foi medida de novo (até uns 180 caracteres).
+- toda conexão que mudou foi medida de novo (até 150 caracteres; o checador barra).
 
 ## 2. Como desenhar
 
@@ -155,8 +158,8 @@ para olhar peça por peça, porque a página inteira reduzida esconde defeito.
   a tangente** no fim da curva, com o bico exatamente no fim da linha: nada de "v" fixo para
   baixo. Entre blocos, a altura cresce com a distância de um lado ao outro (64 a 110px), para o
   S não deitar.
-  A conexão entre ramos fica em Literata itálico, no canto que a curva deixa livre (60% da
-  coluna): a área tem a menor altura em que nenhum ponto do S cai no texto (com 10px de folga),
+  A conexão entre ramos fica em Literata itálico, no canto que a curva deixa livre (64% da
+  coluna, até 4 linhas a 390px, conferido no `teste-mapas`): a área tem a menor altura em que nenhum ponto do S cai no texto (com 10px de folga),
   medida de novo quando as fontes terminam de carregar, porque medida com a letra de reserva ela
   saía curta. O `teste-mapas` confere a 390, 375 e 360px que cada seta é um S simétrico, que
   sai e chega na vertical e que a ponta está no fim e na tangente.
@@ -206,7 +209,8 @@ desce quando o mapa abre e fica guardado pelo service worker para abrir sem rede
   `src/estilo-v2/27-mapas.css`. A rota conta como Explorar no roteador; voltar de um mapa
   reabre o Explorar na grade.
 - **Conferência:** `node ferramentas/checar-mapa.mjs <slug|--todos>` (campos, referências na
-  NBV, citações, palavras proibidas, travessão, itens consecutivos começando igual) roda também
+  NBV, citações, palavras proibidas, travessão, itens consecutivos começando igual, conexão até
+  150 caracteres) roda também
   dentro do `node teste.mjs`. `CHROME=... node ferramentas/teste-mapas.mjs` abre tudo no
   navegador: grade, mapa, setas e desenhos, nenhuma curva cruzando o texto da conexão, 390 e
   360px, os dois temas, a Bíblia igual, sem rede; e passa por todo mapa do índice conferindo
