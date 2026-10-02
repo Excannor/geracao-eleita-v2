@@ -202,6 +202,43 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   Tessalonicenses" a 15px passou da borda a 360px; "Antigo Testamento" quebrou em duas linhas no
   segmentado → nomes com mais de 12 letras a 14px, segmentado a 13px abaixo de 375px; o
   `teste-mapas` confere os dois testamentos a 360px (largura dentro da célula, uma linha só).
+- 2026-10-02 · desenho · Êxodo: a água da rocha (Êx 17.6) precisou de quatro tentativas: um retângulo
+  sálvia reto parecia uma régua, três traços saindo de um ponto pareciam raízes, e um jorro
+  descendo pela frente da rocha parecia uma bandeira fincada no chão; bolinhas de papel como
+  gotas viraram botões → água se reconhece pelo arco: sai de lado, da borda da rocha, curva e cai
+  numa poça, com traços de respingo; nada de gota em círculo. E o cesto de Moisés, aberto e com o
+  fundo sálvia, parecia uma tigela de sopa até ganhar o menino enrolado no pano lá dentro (regra
+  da água na skill).
+- 2026-10-02 · conteúdo · Êxodo tem 40 capítulos e, com seis ramos, os do Tabernáculo (25 a 31 e
+  35 a 40) ficavam sem galho → um galho pode citar um bloco de capítulos quando o fato é o bloco
+  ("Êx 25–27", o modelo das peças), e vários versículos do mesmo capítulo vão numa referência só
+  ("Êx 28.12, 29, 36-38"; "Êx 32.1-4, 19, 31-32") para caber o capítulo inteiro num galho.
+- 2026-10-02 · teste · O `teste-mapas` usava Êxodo, fixo, como "livro sem mapa" e caiu quando
+  Êxodo ganhou o seu → o teste escolhe o primeiro livro do cânon fora do índice; nada de livro
+  fixo em teste que depende de quais mapas já saíram.
+- 2026-10-02 · tela · As conexões de Êxodo tinham de 122 a 138 caracteres e deram 5 linhas a
+  390px (as de Gênesis, com até 127, davam 4): referência entre parênteses e palavra longa pesam
+  mais que a contagem → mirar em até uns 115 caracteres e conferir as linhas no `teste-mapas`.
+  E "à beira-mar" quebrou no hífen numa conexão ("beira-" / "mar"): a regra do hífen vale também
+  para conexão e curiosidade, não só para galho ("perto do mar", "No meio da noite") (regra na
+  skill).
+- 2026-10-02 · conteúdo · Na releitura contra a NBV: "No deserto de Sim" com a ref 16.3-18 (o nome
+  é de 16.1), "setenta líderes" em 24.9 (lá são "setenta oficiais"), "pavimento de safira" (a NBV
+  diz "pavimento de pedras de safira") e uma curiosidade que trazia um fato de 8.19 sob a ref
+  31.18 → a releitura item por item acha o que o checador não acha; fato de outro versículo vai
+  com a referência dele entre parênteses.
+- 2026-10-02 · conteúdo · Na revisão de Êxodo, depois do escritor: "manda tirar a palha dos tijolos"
+  (Êx 5.7 diz que o povo passa a juntar a palha, não que ela sai do tijolo); a fenda da rocha
+  contada como fato ("Deus o põe numa fenda") quando Êx 33.21-23 é promessa; "Jetro" num item
+  com ref 18.13-25 (o nome está em 18.1; ali é "o sogro de Moisés"); "Na oferta do
+  recenseamento" com ref 30.15 (a palavra está em 30.12); e os capítulos 35, 37 e 39 sem lugar
+  no mapa → promessa e ordem se contam como promessa e ordem, nome próprio só se está no trecho
+  citado, e a lista de capítulos se confere de verdade, um por um, antes de entregar (regra na
+  skill).
+- 2026-10-02 · desenho · A água da rocha de Êxodo, na quarta versão, ainda entrava no meio de uma
+  poça pequena e parecia um cano verde enfiado num bueiro → o jorro cai sobre a borda de cima de
+  uma poça larga, com respingos dos dois lados e uma ondinha dentro; nada de jorro entrando no
+  centro da elipse (regra da água na skill).
 
 ## Entrada, sessão e página inicial
 

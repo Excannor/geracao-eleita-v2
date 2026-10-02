@@ -44,6 +44,9 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    diz "o agricultor", não "o semeador"; Mt 27.9 diz "peças de prata", não "moedas").
    Vale também para adjetivo e circunstância ("quase cego", "fugindo", "no monte Moriá",
    "velha demais"): se não está no trecho citado, ou amplia a referência ou sai da frase.
+   Vale para nome próprio ("Jetro" não está em Êx 18.13-25, só "o sogro de Moisés") e para o
+   tempo do verbo: promessa ou ordem de Deus se conta como promessa ("Deus promete pôr Moisés
+   numa fenda da rocha", Êx 33.22), não como fato que já aconteceu.
 5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
    sequência; um relato retrospectivo (Mt 14.3-12, a morte de João) se conta no passado. "O livro
    abre com" e "fecha com" só com o primeiro e o último versículo de verdade.
@@ -78,8 +81,9 @@ do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua"
 - **Conexões:** entre um ramo e o seguinte, uma frase que mostra o raciocínio do autor bíblico
   (de preferência ligando dois versículos do próprio livro, como o toco de Is 6.13 que vira o
   rebento de Is 11.1). **No máximo 150 caracteres e 4 linhas a 390px** (regra do dono, 02/10):
-  uma frase de ligação, não um resumo. Na prática, até uns 125 caracteres cabem em 4 linhas; com
-  aspas e referências, menos. Conexão longa empurra o cruzamento do S para
+  uma frase de ligação, não um resumo. Na prática, mire em até uns 115 caracteres: com aspas,
+  duas referências entre parênteses e palavras longas, as de 122 a 138 de Êxodo deram 5 linhas.
+  Confira as linhas no `teste-mapas`, não só a contagem. Conexão longa empurra o cruzamento do S para
   baixo e a área fica alta demais (a de 247 do ramo 3 de Mateus chegou a fazer a curva cruzar o
   texto a 360px). O `checar-mapa` barra o que passar de 150.
 
@@ -95,8 +99,9 @@ Antes de entregar o texto:
 - cada referência foi conferida na Bíblia do app (`conteudo/biblias`);
 - nenhum item começa igual ao anterior, e nenhuma palavra se repete na mesma frase ("No barco,
   as ondas inundam o barco");
-- nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen nos galhos só
-  se não houver outra ("boas-novas" quebrou no hífen a 390px);
+- nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen (nos galhos,
+  nas conexões e nas curiosidades) só se não houver outra ("boas-novas" e "beira-mar" quebraram
+  no hífen a 390px; "perto do mar", "No meio da noite");
 - toda conexão que mudou foi medida de novo (até 150 caracteres; o checador barra).
 
 ## 2. Como desenhar
@@ -123,6 +128,11 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   raízes do tronco de Isaías iam a 60 e saíam cortadas; corrigido em 02/10).
 - encaixes calculados, não chutados: cabo que toca o galho e a fruta, pé que nasce no bojo da
   panela (ponto tirado da curva); traço que não representa nada sai.
+- água se reconhece pelo arco: sai de lado, da borda da rocha ou do jarro, curva e cai numa poça,
+  com traços curtos de respingo. Faixa reta vira régua, traços saindo de um ponto viram raízes,
+  e gota em círculo vira botão (a rocha de Êxodo precisou de cinco tentativas). O jorro cai sobre
+  a borda de cima de uma poça larga, não no centro dela: entrando no meio da elipse, vira cano
+  enfiado num bueiro.
 - papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de
   uma peça vira caixa branca sobre o fundo cinza da página (o barco de Mateus). Para pôr o casco
   dentro da água, o fundo do casco é a própria curva da onda (pontos tirados da curva).

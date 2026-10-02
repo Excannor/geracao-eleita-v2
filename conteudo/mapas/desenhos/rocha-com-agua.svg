@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a rocha de Horebe (Êx 17.6): a vara toca a rocha, e da fenda no lado dela a água sai em arco e cai numa poça, com respingos dos dois lados. Tudo cabe num círculo de raio 54 em volta de (60,60), porque em "Êxodo e Cristo" o desenho fica sobre um disco -->
+<path class="k" d="M16 82h62"/>
+<path class="k p" d="M18 82L20 64L26 50L36 41L50 35L64 38L73 46L78 56L79 63L80 72L78 82Z"/>
+<path class="h" d="M49 38l4 8-4 6 4 8M30 58l6 3M34 70l6-2M66 50l-5 5M70 70l-5 1M40 50l4-4"/>
+<ellipse class="k p" cx="90" cy="86.5" rx="13" ry="4"/>
+<path class="h" d="M83 87.5c4 1.4 10 1.4 14 0"/>
+<path class="k s" d="M78.6 56.5C86 56.5 92 64 93.5 84H87C86.5 73 84 66 79.2 63.5Z"/>
+<path class="h" d="M81 59.5c5 1.5 8 8 9.5 21"/>
+<path class="h" d="M83.5 82l-4.5-3M81 77l-2.5-1.5M96.5 82l4.5-3M99 77l2.5-1.5"/>
+<path class="k" d="M77 54L96 31c3-3 1-8-3-7"/>
+</svg>

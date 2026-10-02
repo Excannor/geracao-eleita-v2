@@ -1,0 +1,164 @@
+{
+  "nome": "Êxodo",
+  "grupo": "Lei",
+  "numero": 2,
+  "capitulos": 40,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "שְׁמוֹת",
+    "transliteracao": "Shemot",
+    "traducao": "nomes",
+    "texto": "O nome hebraico sai da primeira frase do livro, que começa pelos nomes dos filhos de Israel. Êxodo vem do grego e quer dizer saída."
+  },
+  "autoria": {
+    "texto": "O livro não diz quem o escreveu do começo ao fim, mas mostra Moisés escrevendo. Depois da batalha contra Amaleque, Deus manda: “Escreva isso num rolo para que seja lembrado”. No Sinai, “Moisés escreveu todas as palavras do Senhor”.",
+    "apoio": "Os fatos vão da morte de José e da sua geração até o Tabernáculo montado “no primeiro dia do primeiro mês do segundo ano”.",
+    "refs": ["Êx 17.14", "Êx 24.4", "Êx 1.6", "Êx 40.17"],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Um povo escravo geme no Egito. Deus ouve, atenta para a aliança feita com Abraão, Isaque e Jacó e tira Israel de lá com grandes demonstrações de poder. No deserto, faz desses escravos o seu povo e vem morar no meio deles.",
+    "apoio": "O próprio Senhor diz por que tirou Israel do Egito: “para morar no meio deles”. Os tijolos feitos para o faraó, nos primeiros capítulos, dão lugar a uma tenda feita para Deus, e o livro termina com a nuvem do Senhor sobre ela.",
+    "refs": ["Êx 2.23-24", "Êx 6.7", "Êx 13.9", "Êx 29.46", "Êx 1.14", "Êx 40.38"]
+  },
+  "ramos": [
+    {
+      "titulo": "Escravos no Egito",
+      "sub": "Opressão e um menino salvo",
+      "desenho": "cesto-de-junco",
+      "galhos": [
+        { "texto": "Os israelitas se multiplicam até encher a terra. Um novo rei, que não conhecia José, avisa: “Precisamos ser astutos para com esse povo”.", "ref": "Êx 1.7-10" },
+        { "texto": "Forçados a trabalhos pesados, eles constroem para o faraó as cidades de Pitom e Ramessés. E o plano falha: “quanto mais os maltratavam, mais eles se multiplicavam”.", "ref": "Êx 1.11-12" },
+        { "texto": "As parteiras Sifrá e Puá recebem ordem de matar os meninos hebreus. Temem a Deus, desobedecem ao rei, e Deus é bom com elas.", "ref": "Êx 1.15-21" },
+        { "texto": "Uma mãe da tribo de Levi esconde o filho por três meses. Depois o põe num cesto de junco vedado com betume, entre os juncos à beira do rio.", "ref": "Êx 2.1-3" },
+        { "texto": "A filha do faraó encontra o bebê chorando e tem compaixão. A irmã do menino oferece uma ama hebreia e vai chamar a mãe dele. Mais tarde, a princesa lhe dá o nome de Moisés: “Porque eu o tirei das águas”.", "ref": "Êx 2.5-10" },
+        { "texto": "Já adulto, Moisés mata um egípcio que espancava um hebreu. O faraó decreta a sua morte, e ele foge para a terra de Midiã.", "ref": "Êx 2.11-12, 15" }
+      ],
+      "conexao": "Um hebreu pergunta quem fez de Moisés “príncipe e juiz” (Êx 2.14). Na sarça, quem o envia é Deus (Êx 3.10)."
+    },
+    {
+      "titulo": "A sarça e o chamado",
+      "sub": "Deus chama quem não quer ir",
+      "desenho": "sarca-ardente",
+      "galhos": [
+        { "texto": "Perto de Horebe, Moisés vê uma sarça em chamas que o fogo não consumia. Do meio dela, Deus o chama e ordena: “Tire as sandálias, pois você está pisando em terra santa”.", "ref": "Êx 3.1-5" },
+        { "texto": "O Senhor diz que viu a opressão, ouviu o clamor e desceu para libertar o povo. Moisés recua: “Quem sou eu para ir ao faraó...?”", "ref": "Êx 3.7-8, 11" },
+        { "texto": "Quando pergunta o nome de quem o envia, ouve a resposta: “Eu Sou o que Sou”.", "ref": "Êx 3.13-14" },
+        { "texto": "Para o povo acreditar, Moisés recebe sinais: a vara de pastor vira serpente, e a mão fica leprosa e depois volta curada.", "ref": "Êx 4.1-7" },
+        { "texto": "“Mande outro no meu lugar!”, replica Moisés, que diz nunca ter sido bom para falar. O Senhor fica irado e dá a ele um intermediário: Arão, o irmão que tem facilidade para falar.", "ref": "Êx 4.10-16" },
+        { "texto": "Diante do pedido, o faraó pergunta: “Quem é esse Senhor, para que eu lhe obedeça...?” E corta a palha dos tijolos: o povo que a junte, sem baixar a cota.", "ref": "Êx 5.1-9" }
+      ],
+      "conexao": "Moisés reclama que o povo não foi libertado (Êx 5.23). Deus responde: “Agora você verá o que vou fazer ao faraó!” (Êx 6.1)"
+    },
+    {
+      "titulo": "Pragas e Páscoa",
+      "sub": "O Egito vê quem é o Senhor",
+      "desenho": "cordeiro",
+      "galhos": [
+        { "texto": "A vara de Arão vira serpente diante do faraó. Os mágicos do Egito fazem o mesmo, mas a serpente de Arão devora as deles.", "ref": "Êx 7.10-12" },
+        { "texto": "Com os piolhos, os mágicos já não conseguem imitar e avisam o faraó: “Isso é o dedo de Deus!”", "ref": "Êx 8.18-19" },
+        { "texto": "Na chuva de pedras, o faraó confessa: “Finalmente vejo que pequei”. Quando a tempestade para, ele volta a pecar e endurece o coração.", "ref": "Êx 9.27-34" },
+        { "texto": "Três dias de trevas cobrem o Egito, mas “onde os israelitas moravam não faltou luz”.", "ref": "Êx 10.21-23" },
+        { "texto": "Cada família mata um cordeiro sem defeito e passa o sangue no alto e nas laterais da porta. Deus promete: “Quando eu vir o sangue, passarei por cima, sem ferir ninguém”.", "ref": "Êx 12.3-7, 13" },
+        { "texto": "No meio da noite, morrem os filhos mais velhos do Egito, desde o do faraó até o do preso no calabouço. O rei chama Moisés e Arão e manda: “Vão embora e me abençoem também!”", "ref": "Êx 12.29-32" }
+      ],
+      "jesus": {
+        "texto": "O Cordeiro da Páscoa é Jesus. Paulo escreve: “Cristo, o Cordeiro de Deus, foi sacrificado por nós”. E quando os soldados não quebram as pernas de Jesus na cruz, João vê ali a Escritura cumprida: “Nenhum dos seus ossos será quebrado”.",
+        "refs": ["1Co 5.7", "Jo 19.33-36"]
+      },
+      "conexao": "Deus manda acampar perto do mar, para o faraó pensar: “Eles estão presos entre o deserto e o mar!” (Êx 14.2-3)"
+    },
+    {
+      "titulo": "O mar e o deserto",
+      "sub": "Deus abre caminho e sustenta",
+      "desenho": "tamborim",
+      "galhos": [
+        { "texto": "Com o exército do faraó chegando, o povo apavorado reclama: “seria melhor ter ficado no Egito!” Moisés responde: “O próprio Senhor vai lutar por vocês”.", "ref": "Êx 14.10-14" },
+        { "texto": "Moisés estende a vara, e Israel passa em terra seca, entre uma parede de água à direita e outra à esquerda. Os carros do faraó vão atrás, e as águas voltam e os cobrem.", "ref": "Êx 14.21-28" },
+        { "texto": "Miriã, a profetisa, toma um tamborim, as mulheres a acompanham, e ela canta: “Precipitou no mar o cavalo e o seu cavaleiro!”", "ref": "Êx 15.20-21" },
+        { "texto": "Três dias sem água, e a que encontram em Mara é amarga. Moisés lança nela um arbusto que o Senhor lhe mostrou, e a água fica boa.", "ref": "Êx 15.22-25" },
+        { "texto": "No deserto, o povo reclama de fome e lembra das panelas de carne do Egito. Deus manda codornizes ao entardecer e, de manhã, flocos finos no chão. “Que é isso?”, perguntam. É o maná: medido na tigela, não sobrava nem faltava.", "ref": "Êx 16.2-18" },
+        { "texto": "Contra Amaleque, Israel vence enquanto Moisés mantém as mãos erguidas. Quando sente o peso delas, senta numa pedra, e Arão e Hur seguram as mãos dele até o pôr do sol.", "ref": "Êx 17.11-12" }
+      ],
+      "jesus": {
+        "texto": "O pão do céu é Jesus. Ele diz que não foi Moisés quem deu o pão do céu, e sim o Pai, e completa: “Eu sou o pão da vida. Aquele que vem a mim nunca terá fome”.",
+        "refs": ["Jo 6.32-35"]
+      },
+      "conexao": "O sinal dado na sarça era o culto “neste monte” (Êx 3.12). No terceiro mês, Israel acampa diante dele (Êx 19.1-2)."
+    },
+    {
+      "titulo": "Aliança no Sinai",
+      "sub": "A Lei para um povo santo",
+      "desenho": "tabuas-da-lei",
+      "galhos": [
+        { "texto": "Deus lembra que trouxe Israel até ele como “sobre asas de águias” e propõe: se guardarem a aliança, serão “um reino de sacerdotes, uma nação santa”.", "ref": "Êx 19.4-6" },
+        { "texto": "No terceiro dia, o monte solta fumaça como uma fornalha e treme inteiro, entre trovões, relâmpagos e o som cada vez mais forte da trombeta.", "ref": "Êx 19.16-19" },
+        { "texto": "Antes de qualquer ordem, Deus se apresenta: “Eu tirei você do Egito, onde você foi um povo escravo”. Depois vêm os mandamentos, do “Não creia nem adore outros deuses” ao “Não cobice”.", "ref": "Êx 20.2-17" },
+        { "texto": "Com medo, o povo fica de longe e pede a Moisés: “É melhor você falar conosco”. Ele se aproxima da nuvem escura em que Deus estava.", "ref": "Êx 20.18-21" },
+        { "texto": "As leis descem ao dia a dia: não explorar o estrangeiro, não maltratar viúvas e órfãos, devolver antes do pôr do sol a capa tomada como garantia, porque “a capa é o seu cobertor”.", "ref": "Êx 22.21-27" },
+        { "texto": "Moisés, Arão e setenta oficiais sobem o monte e veem o Deus de Israel, com os pés sobre um pavimento de pedras de safira. E ali comem e bebem.", "ref": "Êx 24.9-11" }
+      ],
+      "conexao": "Moisés fica no monte “quarenta dias e quarenta noites” (Êx 24.18), e Deus lhe mostra o modelo do Tabernáculo (Êx 25.9)."
+    },
+    {
+      "titulo": "A morada de Deus",
+      "sub": "O bezerro, o perdão e a glória",
+      "desenho": "candelabro",
+      "galhos": [
+        { "texto": "No monte, Deus dá o modelo de cada peça da casa onde vai morar: a arca coberta de ouro, com dois querubins na tampa, a mesa dos pães da Presença, o candelabro de sete lâmpadas, as cortinas e o altar.", "ref": "Êx 25–27" },
+        { "texto": "Arão leva nos ombros e no peitoral os nomes das tribos de Israel, “sobre o seu coração”, e na testa uma lâmina de ouro com a frase “Consagrado ao Senhor”.", "ref": "Êx 28.12, 29, 36-38" },
+        { "texto": "Vendo que Moisés demora, o povo pede deuses a Arão, e ele faz um bezerro de ouro. Moisés quebra as tábuas ao pé do monte e depois implora: “perdoe o pecado deles. Senão, peço que me risque do livro que o Senhor escreveu”.", "ref": "Êx 32.1-4, 19, 31-32" },
+        { "texto": "“Peço que me deixe ver a sua glória”, diz Moisés. Deus promete pôr Moisés numa fenda da rocha, cobrir com a mão e deixar que ele o veja pelas costas, porque “a minha face ninguém poderá ver”.", "ref": "Êx 33.18-23" },
+        { "texto": "Com duas tábuas novas, Moisés sobe outra vez. O Senhor passa diante dele, proclama “Eu, somente eu, sou Deus compassivo e cheio de graça” e declara: “Faço uma aliança”.", "ref": "Êx 34.4-6, 10" },
+        { "texto": "Quando Moisés acaba a obra, a nuvem cobre o Tabernáculo, e a glória do Senhor o enche tanto que nem Moisés consegue entrar.", "ref": "Êx 40.33-35" }
+      ],
+      "jesus": {
+        "texto": "Deus morando no meio do seu povo, cheio de glória: isso é Jesus. João escreve que a Palavra “tornou-se um ser humano e morou aqui na terra entre nós” e completa: “vimos a sua glória”.",
+        "refs": ["Jo 1.14"]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "“Bata com a vara na rocha, e dela sairá água, e o povo terá água para beber.” Paulo lembra que, no deserto, o povo bebeu da rocha que o acompanhava, e diz que Cristo estava lá com eles, como uma rocha espiritual (1Co 10.4).",
+    "ref": "Êx 17.6",
+    "desenho": "rocha-com-agua",
+    "pares": [
+      { "at": "Êx 3.14", "texto": "Eu Sou o que Sou.", "nt": "Jo 8.58", "nota": "Jesus diz: antes de Abraão nascer, Eu Sou" },
+      { "at": "Êx 24.8", "texto": "Este é o sangue da minha aliança que o Senhor fez com vocês.", "nt": "Mt 26.28", "nota": "na ceia, Jesus fala do seu sangue da nova aliança" },
+      { "at": "Êx 34.33", "texto": "Quando Moisés acabou de falar com eles, cobriu o rosto com um véu.", "nt": "2Co 3.14-16", "nota": "esse véu só é removido por meio de Cristo" }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Escravidão e o menino do rio", "de": 1, "ate": 2},
+    { "titulo": "A sarça e o chamado", "de": 3, "ate": 6},
+    { "titulo": "As pragas no Egito", "de": 7, "ate": 11},
+    { "titulo": "A Páscoa e a saída", "de": 12, "ate": 13},
+    { "titulo": "O mar e o deserto", "de": 14, "ate": 18},
+    { "titulo": "A aliança e as leis", "de": 19, "ate": 24},
+    { "titulo": "O modelo do Tabernáculo", "de": 25, "ate": 31},
+    { "titulo": "O bezerro e a aliança renovada", "de": 32, "ate": 34},
+    { "titulo": "A construção e a glória", "de": 35, "ate": 40}
+  ],
+  "curiosidades": [
+    { "texto": "Em Midiã, Moisés defende as sete filhas de um sacerdote contra os pastores, casa com Zípora e dá ao filho o nome de Gérson: “Sou forasteiro em terra estrangeira”.", "ref": "Êx 2.16-22" },
+    { "texto": "Moisés tinha oitenta anos, e Arão, oitenta e três, quando foram falar com o faraó.", "ref": "Êx 7.7" },
+    { "texto": "Na última praga, Deus avisa que, contra os israelitas, “nem sequer um cão latirá”.", "ref": "Êx 11.1, 7" },
+    { "texto": "Os israelitas moraram no Egito por quatrocentos e trinta anos e saíram no fim desse período.", "ref": "Êx 12.40-41" },
+    { "texto": "O cordeiro da Páscoa era comido numa só casa, e “nenhum osso do cordeiro poderá ser quebrado”.", "ref": "Êx 12.46" },
+    { "texto": "Na saída, Moisés levou os ossos de José, que tinha feito os israelitas jurarem: “levem daqui os meus ossos”.", "ref": "Êx 13.19" },
+    { "texto": "O maná era branco, parecido com semente de coentro, e tinha “gosto de bolo de mel”.", "ref": "Êx 16.31" },
+    { "texto": "Vendo Moisés julgar o povo da manhã ao pôr do sol, o sogro avisa: “Você não pode realizá-lo sozinho”. Daí surgem chefes de mil, de cem, de cinquenta e de dez.", "ref": "Êx 18.13-25" },
+    { "texto": "Se um dono inutilizasse o olho de um escravo, ou quebrasse um dente dele, tinha de dar a liberdade ao escravo como compensação.", "ref": "Êx 21.26-27" },
+    { "texto": "A Lei manda levar de volta o boi perdido do inimigo e ajudar a erguer o jumento de quem odeia você, caído sob a carga.", "ref": "Êx 23.4-5" },
+    { "texto": "Na oferta do recenseamento, “o rico não dará mais de seis gramas, nem o pobre menos que seis gramas”.", "ref": "Êx 30.12, 15" },
+    { "texto": "As tábuas da aliança eram de pedra, “escritas pelo dedo de Deus”. Os mágicos do Egito tinham usado a mesma expressão diante dos piolhos (Êx 8.19).", "ref": "Êx 31.18" },
+    { "texto": "Cheio do Espírito de Deus, Bezalel, da tribo de Judá, recebe habilidade para trabalhar em ouro, prata e bronze, lapidar pedras e entalhar madeira. Foi ele quem fez a arca (Êx 37.1).", "ref": "Êx 35.30-33" },
+    { "texto": "O povo trouxe tanta oferta para o santuário que Moisés teve de proibir: “Nenhum homem ou mulher traga mais oferta alguma”.", "ref": "Êx 36.5-7" },
+    { "texto": "A bacia de bronze foi feita com os espelhos doados pelas mulheres que serviam na entrada do Tabernáculo.", "ref": "Êx 38.8" },
+    { "texto": "Pronta a obra, Moisés confere cada peça, vê que tudo foi feito conforme o Senhor tinha ordenado e abençoa os israelitas.", "ref": "Êx 39.42-43" }
+  ],
+  "procure": {
+    "texto": "“E os egípcios saberão que eu sou o Senhor.” A frase volta muitas vezes: nas pragas, no mar, no maná e na promessa de morar no meio do povo. Marque cada “saberão que eu sou o Senhor” e veja quem fica sabendo.",
+    "ref": "Êx 14.18"
+  }
+}

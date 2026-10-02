@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as duas tábuas de pedra (Êx 24.12; 31.18): lado a lado, de topo redondo, com as linhas escritas -->
+<path class="k p" d="M23 98V44A18 18 0 0 1 59 44V98Z"/>
+<path class="k p" d="M61 98V44A18 18 0 0 1 97 44V98Z"/>
+<path class="h" d="M30 42h22M29 52h24M29 60h24M29 68h24M29 76h20M29 84h24M29 92h14"/>
+<path class="h" d="M68 42h22M67 52h24M67 60h20M67 68h24M67 76h24M67 84h18M67 92h24"/>
+<path class="k" d="M18 98h84"/>
+</svg>

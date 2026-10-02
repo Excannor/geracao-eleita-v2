@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o candelabro de ouro (Êx 25.31-37): a haste no meio, três braços de cada lado e sete lâmpadas acesas na mesma altura -->
+<path class="k" d="M51 34A9 9 0 0 0 69 34M42 34A18 18 0 0 0 78 34M33 34A27 27 0 0 0 87 34M60 34V93"/>
+<path class="k p" d="M46 102L52 93H68L74 102Z"/>
+<path class="k" d="M40 102h40"/>
+<circle class="k p" cx="60" cy="74" r="2.5"/>
+<path class="k p" d="M30 34h6l-1 3h-4zM39 34h6l-1 3h-4zM48 34h6l-1 3h-4zM57 34h6l-1 3h-4zM66 34h6l-1 3h-4zM75 34h6l-1 3h-4zM84 34h6l-1 3h-4z"/>
+<path class="k p" d="M33 31c-3-3-3-7 0-11 3 4 3 8 0 11zM42 31c-3-3-3-7 0-11 3 4 3 8 0 11zM51 31c-3-3-3-7 0-11 3 4 3 8 0 11zM69 31c-3-3-3-7 0-11 3 4 3 8 0 11zM78 31c-3-3-3-7 0-11 3 4 3 8 0 11zM87 31c-3-3-3-7 0-11 3 4 3 8 0 11z"/>
+<path class="k s" d="M60 31c-3-3-3-7 0-11 3 4 3 8 0 11z"/>
+</svg>

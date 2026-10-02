@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a sarça em chamas que o fogo não consumia (Êx 3.2): três línguas de fogo saem de dentro do arbusto, que continua inteiro -->
+<path class="k p" d="M41 72C34 60 34 48 38 34C42 46 48 52 50 62C52 66 50 70 47 72Z"/>
+<path class="k p" d="M79 72C86 60 86 48 82 34C78 46 72 52 70 62C68 66 70 70 73 72Z"/>
+<path class="k p" d="M50 70C44 56 48 38 60 18C72 38 76 56 70 70Z"/>
+<path class="k s" d="M55 68C52 58 54 48 60 38C66 48 68 58 65 68Z"/>
+<path class="h" d="M40 44c1 6 3 10 6 14M80 44c-1 6-3 10-6 14"/>
+<path class="k p" d="M30 98c-8-2-8-14 0-16-4-10 6-18 14-14 2-8 14-10 18-4 4-6 16-4 16 4 8-2 14 6 10 14 8 2 8 14 0 16z"/>
+<path class="h" d="M46 97l3-9-4-6M60 97v-10l-4-7M60 87l5-6M74 97l-3-9 4-6M38 86c3 0 5 2 6 4M82 86c-3 0-5 2-6 4"/>
+<path class="k" d="M18 98h84"/>
+</svg>

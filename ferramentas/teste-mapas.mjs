@@ -9,6 +9,7 @@ import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LIVROS, slugDoLivro } from './checar-mapa.mjs';
 
 const PORTA_NAV = await portaLivre();
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -188,9 +189,11 @@ await av('location.hash = "#/nota/" + encodeURIComponent("03 - Livros da Bíblia
 ok(await esperar('!!document.querySelector(".nota-corpo")'), 'a ficha de Isaías abre');
 ok(await av('(() => { const l = [...document.querySelectorAll(".nota-corpo a.link-mapa")]; return l.length === 1 && l[0].getAttribute("href") === "#/mapa/isaias" && l[0].textContent.includes("Ver o mapa") && l[0].getBoundingClientRect().height >= 44; })()'),
   'a ficha de Isaías tem um link "Ver o mapa" (44px)');
-await av('location.hash = "#/nota/" + encodeURIComponent("03 - Livros da Bíblia/Êxodo")');
+// o primeiro livro do cânon que ainda não tem mapa no índice (era Êxodo até Êxodo ganhar o seu)
+const livroSemMapa = LIVROS.map(([nome]) => nome).find((nome) => !indice.publicados.includes(slugDoLivro(nome)));
+await av('location.hash = "#/nota/" + encodeURIComponent("03 - Livros da Bíblia/' + livroSemMapa + '")');
 await esperar('!!document.querySelector(".nota-corpo")');
-ok(await av('!document.querySelector(".link-mapa")'), 'a ficha de um livro sem mapa (Êxodo) não tem o link');
+ok(await av('!document.querySelector(".link-mapa")'), 'a ficha de um livro sem mapa (' + livroSemMapa + ') não tem o link');
 // volta ao Explorar, com o cartão aberto no Antigo Testamento, e desce até Isaías
 await av('location.hash = "#/explorar"');
 await esperar('!!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/isaias"]\')');

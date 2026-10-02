@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o tamborim de Miriã (Êx 15.20): o aro inclinado, com as platinelas nas janelas do aro e o couro por cima; traços curtos de som dos dois lados -->
+<g transform="rotate(-10 60 60)">
+<path class="k s" d="M22 52V66A38 18 0 0 0 98 66V52Z"/>
+<ellipse class="k p" cx="60" cy="52" rx="38" ry="18"/>
+<path class="h" d="M34 46c8-6 22-9 34-8M30 54c2-4 5-7 9-9"/>
+<rect class="k p" x="54" y="71" width="12" height="9" rx="1.5"/>
+<rect class="k p" x="32" y="67" width="11" height="9" rx="1.5" transform="rotate(16 37.5 71.5)"/>
+<rect class="k p" x="77" y="67" width="11" height="9" rx="1.5" transform="rotate(-16 82.5 71.5)"/>
+<ellipse class="k" cx="60" cy="75.5" rx="4" ry="1.6"/>
+<ellipse class="k" cx="37.5" cy="71.5" rx="3.6" ry="1.5" transform="rotate(16 37.5 71.5)"/>
+<ellipse class="k" cx="82.5" cy="71.5" rx="3.6" ry="1.5" transform="rotate(-16 82.5 71.5)"/>
+</g>
+<path class="h" d="M14 40l-7-4M12 52H4M106 34l7-5M109 46h8"/>
+</svg>
