@@ -70,7 +70,7 @@ window.CC = window.CC || {};
   // ---------- ícones ----------
   // Traçado aberto, 2 de espessura em todos (redesenho v2: a mesma espessura na barra de
   // abas, no topo e dentro das telas): é o que dá o ar de aplicativo e não de documento.
-  const PREENCHIDOS = { chama: 1, coroa: 1, estrela: 1, raio: 1, pegadas: 1 };
+  const PREENCHIDOS = { chama: 1, coroa: 1, estrela: 1, raio: 1, pegadas: 1, oracao: 1 };
   const P = {
     // conquistas: um desenho por conceito, no mesmo traço (28/09/2026)
     'dia-visto': '<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="m8.5 15 2.5 2.5 4.5-4.5"/>',
@@ -111,9 +111,10 @@ window.CC = window.CC || {};
     avancar: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
     baixo: '<path d="m6 9 6 6 6-6"/>',
     direita: '<path d="m9 6 6 6-6 6"/>',
-    // oração: um balão de conversa com a cruz, "fale com Deus". As mãos postas viravam bico de
-    // caneta ou rabisco a 20px (frente e perfil testados); o balão se lê em qualquer tamanho.
-    oracao: '<path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.3 0-2.6-.3-3.7-.8L4 19.5l1.2-3.6C4.4 14.6 4 13.1 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/><path d="M12 7.5v8M9.6 10h4.8"/>',
+    // oração: uma pessoa ajoelhada com as mãos juntas diante do rosto, cheia (desenho próprio, a
+    // partir da referência que o dono mandou). As mãos postas sozinhas viravam bico de caneta a
+    // 20px, e o balão com a cruz não dizia "orar". O braço é um traço grosso por cima do corpo.
+    oracao: '<circle cx="14.3" cy="4.5" r="2.5"/><path d="M8.7 8.1c1.8-1.3 4.4-.8 5.2 1.3l.5 1.4-2.7 4.6H7.1l.6-4.7c.1-1.1.4-2 1-2.6z"/><path d="M11.5 10.3l1.9 3.1 3.6-4.7" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.6 14h5.6c2.9 0 5 1.6 5 3.8 0 1.2-.9 2.2-2 2.2H5.6c-1.2 0-2.2-1-2.2-2.2s1-2.2 2.2-2.2c1 0 1.6-.6 2-1.6z"/>',
     lua: '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
     sol: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2"/><path d="M12 21v2"/><path d="m4.2 4.2 1.4 1.4"/><path d="m18.4 18.4 1.4 1.4"/><path d="M1 12h2"/><path d="M21 12h2"/><path d="m4.2 19.8 1.4-1.4"/><path d="m18.4 5.6 1.4-1.4"/>',
     alvo: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
