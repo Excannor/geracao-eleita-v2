@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a casa de Raabe no muro de Jericó (Js 2.15, 18): o muro de pedra com ameias, a casa em cima dele, a janela escura e a corda de fios vermelhos (em sálvia) pendurada até perto do chão -->
+<path class="k p" d="M10 104V48h7v-6h7v6h12V22h48v26h12v-6h7v6h7v56z"/>
+<path class="k" d="M36 28h48"/>
+<path class="h" d="M12 60h96M12 72h96M12 84h96M12 96h96M22 48v12M100 48v12M24 60v12M48 60v12M74 60v12M98 60v12M18 72v12M36 72v12M86 72v12M104 72v12M28 84v12M50 84v12M70 84v12M94 84v12"/>
+<path class="k e" d="M52 33h16v13H52z"/>
+<path class="k s" d="M57.5 45.5C58 60 61 76 60 96h5C66 76 63 60 62.5 45.5z"/>
+<path class="h" d="M58 52l4 2M58.6 58l4.2 2M59.4 64l4.4 2M60.2 70l4.4 2M60.8 76l4.4 2M61 82l4.4 2M60.8 88l4.4 2"/>
+<path class="k" d="M56 46.5h9M60.5 96l-1.5 4M62.5 96v4.5M64.5 96l1.5 4"/>
+<path class="k" d="M4 104h112"/>
+</svg>

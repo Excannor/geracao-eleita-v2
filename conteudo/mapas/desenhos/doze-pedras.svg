@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o monumento das doze pedras tiradas do meio do Jordão (Js 4.5-7, 20): cinco, quatro e três pedras empilhadas, uma por tribo, sobre a linha do chão de Gilgal, sem área sálvia (com o chão em sálvia, a pilha parecia pães num prato); pedras em polígono de quinas (arredondadas, pareciam pães ou batatas) e o chão logo abaixo da fileira de baixo, sem cortar as pedras -->
+<path class="k" d="M4 97h112"/>
+<path class="k p" d="M29.1 91.9 L23.7 96.8 L13.4 96 L9.2 90 L14.8 83 L25.5 84.9Z"/>
+<path class="k p" d="M49.5 93.8 L41.3 96.7 L31.6 96.2 L31.2 88.8 L37.4 83.2 L46.5 85.4Z"/>
+<path class="k p" d="M69.4 95 L61 96.2 L52.4 95.2 L52.4 87.3 L60.3 82.6 L68.1 87.1Z"/>
+<path class="k p" d="M88.7 96.2 L78.6 97.4 L71.9 93.3 L74.4 85.4 L83.8 82.5 L90.5 88.8Z"/>
+<path class="k p" d="M111.9 92.8 L104.4 96.9 L93.1 96.3 L91.9 89.5 L97.6 82.8 L107.5 85.5Z"/>
+<path class="k p" d="M38.8 79.3 L29.6 80.6 L22.5 78.2 L22.6 71.4 L30.2 67.7 L39.4 70.9Z"/>
+<path class="k p" d="M60.6 76.1 L54.1 81.4 L43.9 80.9 L41.2 74.1 L45.7 66 L55.9 67.6Z"/>
+<path class="k p" d="M80.4 78.4 L71.3 80.6 L62.1 79.1 L61.2 71.9 L69.5 67.5 L79.7 70.4Z"/>
+<path class="k p" d="M94.4 81.4 L84.4 81.2 L80.9 74.6 L85.8 67.4 L94.5 67.9 L100.1 75.5Z"/>
+<path class="k p" d="M47.3 64.1 L37.8 65 L31.8 61.2 L34.1 53.9 L42.1 51.1 L48.2 56.8Z"/>
+<path class="k p" d="M70.2 59.7 L64.2 64.6 L52.9 64.2 L47.9 58.3 L54.9 52.1 L65.2 52.8Z"/>
+<path class="k p" d="M91 62.8 L81.9 65 L72.5 63.4 L71.5 55.3 L80.5 51.1 L88.8 55Z"/>
+<path class="h" d="M17.8 89.9l4 1.6M37.2 89.3l4.5 1.7M59 89.2l4.3 1.6M27.9 73.4l3.9 1.2M47.9 72.9l4.4 2.2M56.5 57.3l3.7 1.3M79.3 56.7l3.2 2.5"/>
+</svg>

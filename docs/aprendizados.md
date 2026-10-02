@@ -475,6 +475,54 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   reticência no fim de uma citação curta ("Quem este homem pensa que é...?”") deixou o "é...?”" sozinho
   na linha a 360px → a citação vai até o fim da frase da NBV ("...que é, andando por aí a perdoar pecados?”").
 
+- 2026-10-02 · conteúdo · Josué: o rascunho achado no disco (de uma rodada interrompida) tinha passado
+  no checador e ainda assim, na releitura com o `rever-mapa`, trazia palavra repetida na mesma frase em
+  oito itens, quase todas com uma das ocorrências DENTRO da citação ("lança grandes pedras... “chuva de
+  pedras”"; "ergue uma grande pedra: “Esta pedra...”"; "o rei de Tirza: “Trinta e um reis”"; "Levi...
+  “herança de Levi”"; "escolhemos... a própria escolha"), além de "Doze homens tiram doze pedras", "seis
+  dias com uma volta por dia" e "quando... quando" → a regra da palavra repetida conta também a palavra
+  que está na citação; quem escreve em volta da citação troca a própria palavra, nunca a da NBV.
+- 2026-10-02 · conteúdo · Josué, na mesma releitura: "No norte" com a ref 11.1, 4-6, 9 (o norte é 11.2);
+  "Os gibeonitas chegam" onde 9.4 diz "embaixadores" (e o nome Gibeom é 9.3, a ref foi ampliada);
+  "confessa" onde Raabe "disse" (2.9); "oficial do rei" onde a NBV diz "oficial encarregado" (2.4);
+  "o povo segue novecentos metros atrás" quando 3.4 é ordem; "o povo dá a Josué a cidade que ele
+  escolhe" (19.49-50: o povo dá uma parte, e Josué escolhe a cidade); "reclamam" onde 17.14 diz
+  "perguntaram"; "Mateus põe o nome dela na lista" (Mt 1.5 só diz "Raabe"; quem liga as duas é o
+  leitor) → além de verbo e lugar, conferir quem age em cada parte da frase e não afirmar uma
+  identificação que o NT não faz: cita-se o versículo e o leitor liga.
+- 2026-10-02 · estilo · Josué: curiosidades seguidas "Os ossos de José..." e "O livro termina..." abriam
+  com o mesmo artigo; e a transliteração "Iesous" saiu "lesous" na Manrope, onde I maiúsculo e l
+  minúsculo são iguais → "O"/"Os" e "A"/"As" contam como a mesma abertura (como "Na"/"Nas"); palavra
+  estrangeira que comece com I maiúsculo no corpo em Manrope se evita (ou vai em itálico).
+- 2026-10-02 · desenho · Josué: as doze pedras redondas pareciam pães ou batatas, e a linha do chão,
+  desenhada depois delas, cortava a base das pedras de baixo (meia-lua de pedra abaixo do chão); a lua
+  crescente com 6 unidades de espessura e raio 13 parecia um parêntese → pedra se desenha em polígono de
+  quinas, não em curva; o chão vai antes das peças apoiadas (o papel delas cobre a linha); lua crescente
+  com raio de uns 16 e miolo de 6 ou mais. E o tronco do carvalho tinha a tampa reta (H) logo abaixo da
+  copa, aparecendo como um risco no vão entre dois lobos a 520px → o topo do tronco sobe para dentro
+  da copa, que o cobre.
+- 2026-10-02 · captura · Josué: a pasta de servidor da rodada interrompida tinha cookies vazios
+  ("cc_sessao=" sem valor) e o servidor morto; com eles o `foto-conta` cairia na entrada → antes de
+  capturar, `curl api/quem` com o cookie; se vier "entre primeiro", `POST api/entrar` (senha123 do
+  `semear.mjs`) e gravar o cookie de novo.
+- 2026-10-02 · revisão · Josué, na revisão adversarial (depois do escritor): a mesma folha do
+  `rever-mapa` ainda escondia nove pontos. Ordem contada como fato ("o exército marcha uma vez em
+  volta", "depois o exército inteiro grita", Js 6.3-5, que é o plano do Senhor; virou "deve marchar",
+  "gritará"); ordem dada sem o cumprimento na referência ("Doze homens tiram pedras", Js 4.5-7, que
+  é a ordem; o fato está em 4.8, e a ref cresceu); "deixam os gibeonitas viver" com 9.19-21, que diz
+  "aquele povo" (o nome está em 9.16); "Perto de Jericó" onde 5.13 diz que Josué "estava observando a
+  cidade"; "Mateus registra... na lista dos antepassados de Jesus" com Mt 1.16, quando quem diz
+  "antepassados de Jesus" é Mt 1.1; 9.3 citado na conexão e no galho seguinte (cada referência uma vez:
+  o galho ficou com 9.4-6 e a conexão traz o "soube de Jericó e Ai"); pronome que se agarra ao
+  substantivo errado ("Otoniel conquista a cidade e casa com ela": casa com a cidade); "a água que
+  vem de cima para e forma" (o "para" verbo lido como preposição); "mostra Josué escrevendo: “Josué
+  gravou...”" (palavra repetida com a citação); e curiosidades seguidas "O território" e "Os ossos",
+  que o próprio escritor tinha posto como regra → quem revisa relê cada item contra a folha
+  perguntando "isso é ordem ou fato?", "o nome está neste versículo?" e "a referência já foi usada?",
+  e lê cada frase em voz alta procurando pronome ambíguo e "para" verbo antes de "e".
+  Na tela, a curiosidade de Dã terminava em "para Dã." (palavra de duas letras antes da referência,
+  que a 360px pode cair sozinha na linha) → ganhou o fim do versículo, "em homenagem ao pai deles".
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de

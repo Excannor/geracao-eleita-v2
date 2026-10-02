@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o sol parado sobre Gibeom e a lua sobre o vale de Aijalom (Js 10.12-13): o sol em sálvia com oito raios curtos, a lua crescente e as colinas com o vale no meio -->
+<circle class="k s" cx="38" cy="40" r="12"/>
+<path class="h" d="M38 21v-6M38 59v6M19 40h-6M57 40h6M24.6 26.6l-4.3-4.3M51.4 53.4l4.3 4.3M51.4 26.6l4.3-4.3M24.6 53.4l-4.3 4.3"/>
+<path class="k p" d="M92 22A16 16 0 0 0 92 54A10 16 0 0 1 92 22z"/>
+<path class="k p" d="M6 102C14 84 30 72 44 74C54 76 58 88 62 92C68 84 82 66 96 68C106 70 112 84 114 102z"/>
+<path class="h" d="M30 82l-6 8M90 76l-6 8M104 84l3 8"/>
+<path class="k" d="M4 102h112"/>
+</svg>

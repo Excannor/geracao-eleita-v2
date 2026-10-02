@@ -129,9 +129,10 @@ Antes de entregar o texto:
 - cada referência foi conferida na Bíblia do app (`conteudo/biblias`), lendo a folha de
   `node ferramentas/rever-mapa.mjs <slug>`, que põe cada item ao lado do texto da NBV das
   referências dele: sujeito, verbo, número, lugar, quantas vezes e se é ordem ou fato;
-- nenhum item começa igual ao anterior ("Na colheita" e "Nas vendas" contam como a mesma abertura),
-  e nenhuma palavra se repete na mesma frase ("No barco, as ondas inundam o barco"; "um profeta...
-  na boca desse profeta");
+- nenhum item começa igual ao anterior ("Na colheita" e "Nas vendas", "O livro" e "Os ossos" contam
+  como a mesma abertura), e nenhuma palavra se repete na mesma frase ("No barco, as ondas inundam o
+  barco"; "um profeta... na boca desse profeta"), contando também a palavra que está dentro da
+  citação ("ergue uma grande pedra: “Esta pedra...”", Josué): troca-se a palavra de fora, nunca a da NBV;
 - nenhuma palavra com hífen sobrando no texto (`grep -o -E '[[:alpha:]]+-[[:alpha:]]+' <mapa>.json`
   e tirar da lista só os ids de desenho; em Marcos, "tornou-se" de 1Pe 2.7 escapou dentro de aspas;
   em Deuteronômio, o impessoal "vende-se", "passaram-se" e a citação "levá-los": troca-se por sujeito
@@ -141,6 +142,12 @@ Antes de entregar o texto:
   que é." deixou o "é." sozinho na linha a 360px), nem com citação cortada em reticências logo depois
   dela ("pensa que é...?”": a citação vai até o fim da frase); a palavra curta que abre uma citação
   (“O nome...) a tela já prende à seguinte (`tx` em `06b-mapas.js`);
+- em cada item, três perguntas contra a folha do `rever-mapa`: é ordem ou fato (o plano de Js 6.3-5
+  fica em "deve marchar", "gritará"; "Doze homens tiram pedras" pede o 4.8, onde a ordem é cumprida)?
+  o nome próprio está nesta referência ("os gibeonitas" não está em Js 9.19-21)? a referência já foi
+  usada em outro item (conexão e galho seguinte disputavam Js 9.3)? E lida em voz alta, nenhuma frase
+  deixa pronome agarrar o substantivo errado ("conquista a cidade e casa com ela") nem o verbo "para"
+  colado num "e" ("a água para e forma": vira "para de repente");
 - o verbo se confere com o sujeito e com o objeto: em Lc 8.24 Jesus repreende a tempestade, e o vento
   e as ondas se acalmam; a nota dos pares e as curiosidades passam pela mesma releitura dos galhos;
 - nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen (nos galhos,
@@ -210,6 +217,10 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   Bebê enrolado leva as dobras do cobertor em diagonal (faixas em pé, paralelas, viram lagarta), e o
   cavalete em X da manjedoura tem o cruzamento escondido atrás da frente do cocho, sem pontas
   passando por trás do que está dentro (a manjedoura de Lucas).
+  Pedra se desenha em polígono de quinas (redonda vira pão ou batata), e o chão sob peças apoiadas
+  vai antes delas no SVG, para o papel delas cobrir a linha (as doze pedras de Josué); lua crescente
+  com raio de uns 16 e miolo de 6 ou mais (fina e pequena, vira parêntese); topo de tronco fica
+  dentro da copa, sem tampa reta à mostra no vão entre os lobos.
 - papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de
   uma peça vira caixa branca sobre o fundo cinza da página (o barco de Mateus). Para pôr o casco
   dentro da água, o fundo do casco é a própria curva da onda (pontos tirados da curva).

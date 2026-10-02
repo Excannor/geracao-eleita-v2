@@ -1,0 +1,167 @@
+{
+  "nome": "Josué",
+  "grupo": "Históricos",
+  "numero": 6,
+  "capitulos": 24,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "יְהוֹשֻׁעַ",
+    "transliteracao": "Yehoshua",
+    "traducao": "o Senhor salva",
+    "texto": "O livro leva o nome do homem que conduz o povo. A palavra junta o nome de Deus ao verbo salvar e, em grego, é o mesmo nome de Jesus."
+  },
+  "autoria": {
+    "texto": "O livro não traz o nome de quem o escreveu, mas mostra o líder escrevendo diante do povo: “Josué gravou nas pedras uma cópia das leis escritas por Moisés”. E cita outra obra: “O Livro dos Justos faz uma descrição mais detalhada deste fato”.",
+    "apoio": "O último capítulo conta que Josué morreu aos cento e dez anos e foi enterrado na terra que recebeu por herança. E lembra os anciãos “que ainda viveram muito tempo depois da morte de Josué”.",
+    "refs": ["Js 8.32", "Js 10.13", "Js 24.29-31"],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Moisés morreu, e o Senhor manda Josué levar Israel através do Jordão. Vêm a travessia, as batalhas e a partilha, e o livro deixa claro de onde veio cada pedaço de chão: “Assim o Senhor deu a Israel todas as terras que havia prometido sob juramento aos primeiros pais.”",
+    "apoio": "Perto de morrer, Josué diz ao povo: “Todas as coisas boas que ele prometeu já são uma realidade, e nada falta.”",
+    "refs": ["Js 1.1-2", "Js 21.43", "Js 23.14"]
+  },
+  "ramos": [
+    {
+      "titulo": "Seja forte",
+      "sub": "Josué assume e Raabe esconde",
+      "desenho": "corda-na-janela",
+      "galhos": [
+        { "texto": "Deus põe uma condição para o sucesso: obedecer à Lei “sem se desviar para a direita nem para a esquerda” e meditar nela “todos os dias e todas as noites”.", "ref": "Js 1.7-8" },
+        { "texto": "“Seja forte e corajoso! Nada de desânimo e não fique com medo!” A razão vem em seguida: o Senhor estará com Josué onde ele estiver.", "ref": "Js 1.9" },
+        { "texto": "Rúben, Gade e a meia tribo de Manassés já têm terra a leste do Jordão, mas os guerreiros delas têm de atravessar à frente dos irmãos. A resposta: “Obedeceremos às suas ordens como obedecemos a Moisés”.", "ref": "Js 1.12-17" },
+        { "texto": "Dois espiões vão a Jericó e ficam na casa da prostituta Raabe. Ela os esconde entre as fibras de linho no terraço e diz ao oficial encarregado que eles já saíram.", "ref": "Js 2.1-6" },
+        { "texto": "Raabe conta que Jericó inteira está apavorada com a notícia do mar Vermelho e declara: “Ele é o supremo Deus do céu e da terra”.", "ref": "Js 2.9-11" },
+        { "texto": "Pela janela da casa, que fica no muro, os espiões descem por uma corda. O sinal combinado é a “corda de fios vermelhos” pendurada ali, com toda a família dentro de casa.", "ref": "Js 2.15, 18-19" }
+      ],
+      "jesus": {
+        "texto": "Hebreus conta que, pela fé, Raabe não morreu com os outros da cidade. E, na lista dos antepassados de Jesus, Mateus registra: “Salmom foi o pai de Boaz, e a mãe deste foi Raabe”.",
+        "refs": ["Hb 11.31", "Mt 1.1", "Mt 1.5"]
+      },
+      "conexao": "Os espiões dizem que o Senhor entregará a terra (Js 2.24), e o povo parte para o Jordão (Js 3.1)."
+    },
+    {
+      "titulo": "O Jordão parou",
+      "sub": "Arca, pedras, Gilgal e Páscoa",
+      "desenho": "doze-pedras",
+      "galhos": [
+        { "texto": "Os sacerdotes levam a arca da aliança na frente, como guias, porque “Vocês nunca estiveram no lugar para onde vamos”. O povo deve seguir cerca de novecentos metros atrás.", "ref": "Js 3.3-4" },
+        { "texto": "Era época de colheita, e o Jordão transbordava. Quando os sacerdotes molham os pés, a água que vem de cima para de repente e forma uma muralha. O povo inteiro passa por eles, parados no meio do rio.", "ref": "Js 3.15-17" },
+        { "texto": "Doze homens tiram pedras do meio do rio, uma por tribo, e as levam até o acampamento. No futuro, quando os filhos perguntarem “Para que servem estas pedras?”, os pais vão contar que as águas pararam de correr enquanto o povo atravessava com a arca.", "ref": "Js 4.5-8" },
+        { "texto": "Naquele dia, o Senhor faz o povo reconhecer o valor de Josué, que passa a ser respeitado como Moisés tinha sido, “durante toda a vida dele”.", "ref": "Js 4.14" },
+        { "texto": "Os meninos nascidos no deserto não tinham sido circuncidados. Josué faz facas de pedra e circuncida todos, e o Senhor diz: “Hoje removi a vergonha e a humilhação sofridas no Egito”.", "ref": "Js 5.2-9" },
+        { "texto": "Em Gilgal, o povo comemora a Páscoa e, no dia seguinte, come dos produtos da terra. Daí em diante, o maná não cai mais.", "ref": "Js 5.10-12" }
+      ],
+      "conexao": "Josué observa Jericó, e o Comandante dos Exércitos do Senhor diz: “o lugar em que você está é santo” (Js 5.13-15)."
+    },
+    {
+      "titulo": "Jericó e Ai",
+      "sub": "Muros, Acã e a emboscada",
+      "desenho": "corneta-de-chifre",
+      "galhos": [
+        { "texto": "O Senhor dá o plano: durante seis dias, o exército deve marchar uma vez em volta da cidade. No sétimo, serão sete voltas, com sacerdotes tocando cornetas de chifre de carneiro, e então o exército inteiro gritará.", "ref": "Js 6.3-5" },
+        { "texto": "Até a ordem de Josué, ninguém pode levantar a voz. Na sétima volta, ele manda: “Gritem! O Senhor entregou a cidade em nossas mãos!”", "ref": "Js 6.10, 15-16" },
+        { "texto": "Os dois espiões cumprem o que prometeram e tiram da cidade Raabe com a família. O livro registra: “Eles vivem até hoje entre os israelitas”.", "ref": "Js 6.22-25" },
+        { "texto": "Um homem, Acã, da tribo de Judá, fica com coisas consagradas. Em Ai, cerca de três mil israelitas fogem e trinta e seis morrem. Josué rasga as roupas, e o Senhor diz: “Israel pecou”.", "ref": "Js 7.1, 4-6, 11" },
+        { "texto": "Acã confessa que viu uma bela capa da Babilônia, prata e uma barra de ouro, cobiçou e escondeu tudo num buraco no chão da tenda. No vale de Acor, o povo apedreja os condenados.", "ref": "Js 7.20-21, 24-25" },
+        { "texto": "Na segunda vez, o Senhor manda preparar uma emboscada. Josué estende a lança em direção a Ai, os homens escondidos invadem a cidade, e ele fica com a arma apontada até que todos os habitantes sejam destruídos.", "ref": "Js 8.1-2, 18-19, 26" }
+      ],
+      "conexao": "Os reis da região se unem contra Israel (Js 9.1-2), mas Gibeom, que soube de Jericó e Ai, tenta outra saída (Js 9.3)."
+    },
+    {
+      "titulo": "Gibeom e o sol",
+      "sub": "Um tratado e muitas batalhas",
+      "desenho": "sol-e-lua",
+      "galhos": [
+        { "texto": "Os embaixadores chegam a Gilgal com sacos gastos, vasilhas de couro remendadas, roupas velhas e pão bolorento: “Viemos de uma terra distante para fazer um tratado de paz com vocês”.", "ref": "Js 9.4-6" },
+        { "texto": "Sem consultar o Senhor, os israelitas examinam as provisões e acreditam. Três dias depois do tratado, descobrem que aqueles homens viviam ali perto.", "ref": "Js 9.14-16" },
+        { "texto": "Por causa do juramento feito diante do Senhor, os líderes deixam aquele povo viver, mas como lenhadores e carregadores de água.", "ref": "Js 9.19-21" },
+        { "texto": "Cinco reis amorreus cercam Gibeom, que pede socorro. Josué marcha durante a noite, e o livro conta: “mais gente foi morta pela chuva de pedras do que pelas espadas dos israelitas!”", "ref": "Js 10.5-6, 9-11" },
+        { "texto": "Josué ora em alta voz: “Que o sol pare sobre Gibeom, e que a lua fique onde está, sobre o vale de Aijalom!” Depois vem o comentário: “Nunca antes nem depois houve um dia como esse!”", "ref": "Js 10.12, 14" },
+        { "texto": "Jabim, rei de Hazor, envia mensagens urgentes, e as tropas que se juntam formam um exército “tão numeroso como a areia da praia”. O Senhor manda cortar os tendões dos cavalos e queimar os carros, e Josué obedece.", "ref": "Js 11.1, 4-6, 9" }
+      ],
+      "conexao": "Josué está velho e resta muita terra (Js 13.1), mas ela também deve entrar na partilha (Js 13.7)."
+    },
+    {
+      "titulo": "Terra repartida",
+      "sub": "Sorteio, Calebe e refúgio",
+      "desenho": "rolo-aberto",
+      "galhos": [
+        { "texto": "Aos oitenta e cinco anos, Calebe pede a região montanhosa prometida a ele e diz: “estando o Senhor comigo, expulsarei aqueles homens de grande estatura”. Josué o abençoa e lhe dá Hebrom.", "ref": "Js 14.10-13" },
+        { "texto": "Calebe promete a filha a quem tomar a cidade de Debir. Otoniel, sobrinho dele, conquista a cidade e casa com Acsa, que depois pede ao pai: “A terra que o senhor me deu é um deserto. Quero uma que tenha fontes de água!”", "ref": "Js 15.15-19" },
+        { "texto": "Zelofeade só teve filhas: Maalá, Noa, Hogla, Milca e Tirza. Elas lembram a ordem dada a Moisés e recebem herança entre os irmãos do pai.", "ref": "Js 17.3-4" },
+        { "texto": "Em Siló, onde armam o Tabernáculo, sete tribos ainda não receberam herança. Três homens de cada tribo percorrem a terra e anotam as cidades num livro, e Josué faz o sorteio diante do Senhor.", "ref": "Js 18.1-4, 9-10" },
+        { "texto": "Depois de repartidas as terras, o povo dá a Josué uma parte especial como herança. Ele escolhe uma cidade na região montanhosa de Efraim e a reconstrói.", "ref": "Js 19.49-50" },
+        { "texto": "Quem matar alguém sem intenção pode fugir para uma cidade de refúgio, onde fica protegido do vingador. Deve ficar lá até ser julgado e morar ali enquanto viver o sumo sacerdote; depois, pode voltar para casa.", "ref": "Js 20.3-6" }
+      ],
+      "conexao": "O Senhor dá paz a Israel “de todos os lados” (Js 21.44), e as tribos do leste podem voltar para casa (Js 22.4)."
+    },
+    {
+      "titulo": "A escolha",
+      "sub": "Altar, despedida e Siquém",
+      "desenho": "pedra-sob-o-carvalho",
+      "galhos": [
+        { "texto": "Na volta, as tribos do leste constroem junto ao Jordão “um altar grande e vistoso”. As outras se reúnem em Siló, prontas para guerrear.", "ref": "Js 22.10-12" },
+        { "texto": "As tribos explicam que o altar não é para sacrifícios: é um testemunho de que os filhos delas também têm parte no Senhor. Ele ganha o nome de “Altar do Testemunho”.", "ref": "Js 22.26-27, 34" },
+        { "texto": "Já velho, Josué avisa: um só israelita põe mil inimigos em fuga, porque o Senhor luta pelo povo. Mas, se Israel se associar às nações que restaram, elas serão “armadilha e laço”.", "ref": "Js 23.2, 10, 12-13" },
+        { "texto": "Em Siquém, Josué lembra que Deus deu terras que o povo não trabalhou e cidades que não construiu. Então desafia: “escolham hoje a quem irão servir”. E completa: “Eu e a minha casa serviremos ao Senhor!”", "ref": "Js 24.1, 13-15" },
+        { "texto": "Josué adverte que o Senhor “é Deus santo e zeloso”. O povo insiste: “Nós escolhemos servir ao Senhor!” Josué lembra que a decisão é deles, e o povo confirma: “Somos testemunhas”.", "ref": "Js 24.19-22" },
+        { "texto": "Naquele dia, Josué faz um acordo com o povo, registra a resposta no Livro da Lei de Deus e ergue debaixo do carvalho uma grande pedra que, segundo ele, “ouviu todas as palavras que o Senhor nos disse”.", "ref": "Js 24.25-27" }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Depois de tantas batalhas, o livro anota: “E por fim a terra descansou da guerra!” Hebreus explica que o descanso de que Deus fala não é a terra para onde Josué conduziu o povo: há um repouso completo e perfeito para quem pertence a ele (Hb 4.8-9). Só os que creem entram nele (Hb 4.3), e Hebreus pede que ninguém deixe de confiar em Jesus, o Filho de Deus (Hb 4.14).",
+    "ref": "Js 11.23",
+    "desenho": "cruz-no-monte",
+    "pares": [
+      {
+        "at": "Js 1.5",
+        "texto": "Eu estarei com você, assim como estive com Moisés; não o abandonarei nem deixarei de ajudar você.",
+        "nt": "Hb 13.5-6",
+        "nota": "Hebreus repete a promessa aos leitores, que podem dizer com confiança que o Senhor é o ajudador deles"
+      },
+      {
+        "at": "Js 2.21",
+        "texto": "Ela os despediu, e eles partiram. E ela deixou amarrada a corda vermelha na janela.",
+        "nt": "Tg 2.25",
+        "nota": "Raabe foi justificada pelo que fez ao esconder os espiões"
+      },
+      {
+        "at": "Js 6.20",
+        "texto": "De repente, os muros da cidade vieram abaixo!",
+        "nt": "Hb 11.30",
+        "nota": "foi pela fé que as muralhas de Jericó caíram"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Josué assume e Raabe esconde os espiões", "de": 1, "ate": 2 },
+    { "titulo": "A travessia do Jordão", "de": 3, "ate": 5 },
+    { "titulo": "Jericó, Acã e Ai", "de": 6, "ate": 8 },
+    { "titulo": "Gibeom e as batalhas no sul e no norte", "de": 9, "ate": 12 },
+    { "titulo": "A terra repartida entre as tribos", "de": 13, "ate": 21 },
+    { "titulo": "O altar junto ao Jordão e o adeus de Josué", "de": 22, "ate": 24 }
+  ],
+  "curiosidades": [
+    { "texto": "A data ficou registrada: o povo cruzou o Jordão no décimo dia do primeiro mês e acampou em Gilgal, no lado oeste da cidade de Jericó.", "ref": "Js 4.19" },
+    { "texto": "Josué jura: “Maldito seja o homem diante do Senhor que se levantar e reedificar a cidade de Jericó”. E avisa que quem fizer isso perderá o filho mais velho no alicerce e o mais moço na hora de pôr as portas.", "ref": "Js 6.26" },
+    { "texto": "Sobre Acã fica um montão de pedras, e por isso o lugar é chamado de “vale de Acor” até hoje.", "ref": "Js 7.26" },
+    { "texto": "No monte Ebal, Josué constrói um altar de pedras brutas, como Moisés tinha ordenado, e lê a Lei inteira diante de todos, inclusive das mulheres, das crianças e dos estrangeiros.", "ref": "Js 8.30-31, 34-35" },
+    { "texto": "Os cinco reis se escondem numa caverna em Maquedá, e Josué manda rolar grandes pedras à entrada e deixar guardas ali.", "ref": "Js 10.16-18" },
+    { "texto": "Nenhum enaquim, o povo de gigantes, sobrevive no território de Israel. Alguns ficam em Gaza, em Gate e em Asdode.", "ref": "Js 11.21-22" },
+    { "texto": "As conquistas a oeste do Jordão viram uma lista que começa em Jericó e termina em Tirza: “Trinta e um reis ao todo”.", "ref": "Js 12.7, 9, 24" },
+    { "texto": "Até o adivinho Balaão, filho de Beor, morreu pela espada dos israelitas.", "ref": "Js 13.22" },
+    { "texto": "Os levitas não recebem território: “o Senhor, o Deus de Israel, era a herança de Levi”. Ganham quarenta e oito cidades com pastagens (Js 21.41).", "ref": "Js 13.33" },
+    { "texto": "Judá não consegue expulsar os jebuseus de Jerusalém, que vivem entre eles “até hoje”. Em Gezer, os cananeus também ficam, mas como escravos (Js 16.10).", "ref": "Js 15.63" },
+    { "texto": "As tribos de José perguntam a Josué por que receberam só uma pequena parte. Ele responde que elas formam uma tribo grande e forte, capaz de derrubar as matas e, mais tarde, expulsar os cananeus, “por mais carros de ferro que tenham”.", "ref": "Js 17.14-18" },
+    { "texto": "Simeão recebe a herança dentro do território de Judá, que era grande demais para eles.", "ref": "Js 19.9" },
+    { "texto": "Dã tinha um território pequeno. As tropas da tribo conquistam a cidade de Lesém e mudam o nome dela para Dã, em homenagem ao pai deles.", "ref": "Js 19.47" },
+    { "texto": "Os ossos de José, trazidos do Egito, são enterrados no terreno que Jacó tinha comprado dos filhos de Hamor por cem peças de prata.", "ref": "Js 24.32" },
+    { "texto": "Mais uma morte encerra o livro: Eleazar, filho de Arão, é enterrado em Gibeá, cidade dada ao filho dele, Fineias.", "ref": "Js 24.33" }
+  ],
+  "procure": {
+    "texto": "“E essas pedras estão lá até o dia de hoje.” O narrador escreve “até hoje” ou “até o dia de hoje” mais de dez vezes: nas pedras do Jordão, no nome de Gilgal, nos montes de pedras sobre Acã, sobre o rei de Ai e à entrada da caverna dos cinco reis, e nos povos que continuaram na terra. Marque cada vez e veja o que ficou para contar a história.",
+    "ref": "Js 4.9"
+  }
+}
