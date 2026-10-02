@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a chave (Mt 16.19): "eu darei a você as chaves do Reino dos céus"; argola com o furo, colar, haste e os dentes do palhetão -->
+<g transform="rotate(-38 60 60)">
+<circle class="k s" cx="24" cy="60" r="14"/>
+<circle class="k p" cx="24" cy="60" r="5.5"/>
+<path class="k p" d="M37.5 56.5H104v7H37.5z"/>
+<path class="k p" d="M38 52h6v16h-6z"/>
+<path class="k p" d="M86 63.5V80h6v-8h5v8h7V63.5"/>
+<path class="h" d="M50 60h28"/>
+</g>
+</svg>

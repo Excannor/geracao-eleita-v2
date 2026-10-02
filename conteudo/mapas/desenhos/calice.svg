@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o cálice da ceia (Mt 26.27-28): a taça com o vinho, a haste com o nó e o pé -->
+<path class="k p" d="M32 30C32 56 44 70 60 70C76 70 88 56 88 30"/>
+<ellipse class="k p" cx="60" cy="30" rx="28" ry="6"/>
+<ellipse class="k s" cx="60" cy="30.6" rx="22.5" ry="3.6"/>
+<path class="h" d="M80 40C79 52 73 61 65 65M76 46C74 54 70 59 65 62"/>
+<path class="k p" d="M57 70h6v24h-6z"/>
+<ellipse class="k p" cx="60" cy="80" rx="7" ry="3.2"/>
+<path class="k p" d="M40 104C42 97 50 94 60 94C70 94 78 97 80 104z"/>
+<path class="k" d="M34 104h52"/>
+</svg>

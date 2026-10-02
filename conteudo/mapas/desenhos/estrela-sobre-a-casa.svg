@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a estrela sobre a casa (Mt 2.9-11): a estrela que foi adiante dos sábios para acima do lugar onde estava o menino; a casa de teto plano, a porta aberta -->
+<path class="k s" d="M60 9L61.4 22.7L66.4 19.6L63.3 24.6L77 26L63.3 27.4L66.4 32.4L61.4 29.3L60 43L58.6 29.3L53.6 32.4L56.7 27.4L43 26L56.7 24.6L53.6 19.6L58.6 22.7z"/>
+<path class="h" d="M56 47L48 60M64 47L72 60M60 48v12"/>
+<path class="k p" d="M30 66h60v38H30z"/>
+<path class="k p" d="M26 60h68v6H26z"/>
+<path class="k e" d="M52 104V88c0-5 3.6-8 8-8s8 3 8 8v16z"/>
+<path class="k p" d="M74 74h8v8h-8z"/>
+<path class="h" d="M34 74h12M34 82h10M34 90h12M34 98h10M72 92h14M76 98h10"/>
+<path class="k" d="M14 104h92"/>
+</svg>

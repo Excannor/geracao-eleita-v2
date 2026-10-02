@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o lírio do campo (Mt 6.28-29): a flor de três pétalas no alto da haste, duas folhas compridas (só a da direita em sálvia: uma área por desenho), a relva no chão -->
+<path class="k" d="M60 106C61 90 59 74 60 58"/>
+<path class="k p" d="M60 98C50 94 40 84 34 68C46 72 55 81 60 92z"/>
+<path class="k s" d="M60 88C68 82 78 72 86 58C74 62 64 70 60 80z"/>
+<path class="h" d="M58 95C51 89 43 80 37 71M62 84C69 77 76 69 83 61"/>
+<path class="k p" d="M60 58C47 56 38 45 32 28C43 32 50 37 54 44C54 32 56 24 60 14C64 24 66 32 66 44C70 37 77 32 88 28C82 45 73 56 60 58z"/>
+<path class="h" d="M60 54C59 44 59 32 60 22M57 54C51 49 44 41 37 32M63 54C69 49 76 41 83 32"/>
+<path class="h" d="M30 106c2-5 4-7 6-8M40 106c0-4 1-6 3-8M76 106c1-4 3-6 5-7M86 106c0-4 1-6 3-7"/>
+<path class="k" d="M22 106h76"/>
+</svg>

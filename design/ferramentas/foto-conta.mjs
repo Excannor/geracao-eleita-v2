@@ -4,7 +4,7 @@
 //   CHROME=<chrome> BASE=http://localhost:8095/ COOKIE="$(cat <pasta>/cookie-marcos.txt)" \
 //     node design/ferramentas/foto-conta.mjs <largura> <altura> <saida.png> '<#/rota>' [rolar] [claro|escuro]
 // Variáveis opcionais: PRE (JS antes do app), ACAO (JS depois de abrir; pode devolver texto),
-// ESPERA (ms até a captura, padrão 2600), CHEIA=1 (a página inteira, não só a janela).
+// ESPERA (ms até a captura, padrão 2600), CHEIA=1 (a página inteira, não só a janela), ESCALA.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -18,6 +18,9 @@ const [, , wArg, hArg, saida, hash = '#/', rolar = '0', tema = ''] = process.arg
 const W = Number(wArg) || 390;
 const H = Number(hArg) || 844;
 const CHROME = process.env.CHROME || 'chromium';
+// ESCALA: densidade da captura (padrão 2 no celular). Página inteira com mais de uns 10.000px de
+// altura trava o Chrome sem cabeça a 2x (a imagem passa de 20.000px); use ESCALA=1.5 ou 1.
+const ESCALA = Number(process.env.ESCALA) || (W < 800 ? 2 : 1);
 const BASE = (process.env.BASE || 'http://localhost:8095/').replace(/\/?$/, '/');
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -48,7 +51,7 @@ const av = async (e) => {
 };
 await cmd('Page.enable');
 await cmd('Runtime.enable');
-await cmd('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: W < 800 ? 2 : 1, mobile: W < 800 });
+await cmd('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: ESCALA, mobile: W < 800 });
 // Sem o convite de notificações e sem o tutorial de instalar por cima da tela.
 let pre = "try{localStorage.setItem('cc.aviso.push','nunca');localStorage.removeItem('cc.instalar')}catch(e){};"
   // sem abertura, como quem recarrega dentro da mesma sessão (ABERTURA=1 mostra a inteira)
@@ -67,7 +70,7 @@ if (process.env.ACAO) { console.log('acao:', await av(process.env.ACAO)); await 
 if (Number(rolar)) { await av('(document.documentElement.classList.contains("app-ios") ? document.querySelector(".aplicativo") : window).scrollTo(0,' + Number(rolar) + ')'); await dormir(700); }
 if (process.env.CHEIA) {
   const alt = await av('Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)');
-  await cmd('Emulation.setDeviceMetricsOverride', { width: W, height: Math.min(alt, 12000), deviceScaleFactor: W < 800 ? 2 : 1, mobile: W < 800 });
+  await cmd('Emulation.setDeviceMetricsOverride', { width: W, height: Math.min(alt, 12000), deviceScaleFactor: ESCALA, mobile: W < 800 });
   await dormir(600);
 }
 await dormir(300);

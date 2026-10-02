@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o barco na tempestade (Mt 8.24-26): o casco de tábuas com uma faixa pintada, o vento e a chuva riscando o céu, as ondas cobrindo a parte de baixo do casco. O fundo do casco é a própria linha da onda (pontos tirados da curva), para não precisar de um retângulo de papel escondendo o casco: papel fora do desenho vira caixa branca sobre o fundo da página -->
+<path class="h" d="M30 12l-8 14M46 10l-8 14M62 12l-8 14M78 10l-8 14M94 12l-8 14M38 30l-6 10M70 30l-6 10M102 28l-6 10"/>
+<path class="k p" d="M12 58L98 50C102 48 106 44 108 38C108 58 102 74 93.25 86.25C88.5 86.5 84 85 80 82C72 76 62 76 54 82C46 88 38 88 30 84C22 78 15 69 12 58z"/>
+<path class="k s" d="M12 58L98 50L98.6 57L14.2 64.6z"/>
+<path class="h" d="M22 73C42 74 72 70 101 63"/>
+<path class="k" d="M4 90C12 82 22 80 30 84C38 88 46 88 54 82C62 76 72 76 80 82C88 88 98 88 108 80C111 78 114 77 116 77"/>
+<path class="k" d="M12 102C20 96 28 96 36 100S52 104 60 98S76 92 84 98S100 104 108 98"/>
+<path class="h" d="M20 112c6-4 12-4 18 0s12 4 18 0M66 112c6-4 12-4 18 0s12 4 18 0"/>
+</svg>

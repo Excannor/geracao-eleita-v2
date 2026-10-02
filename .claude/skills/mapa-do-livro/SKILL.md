@@ -40,11 +40,18 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
 4. **Paráfrase fiel.** O verbo e o fato vêm do versículo da referência ("dominem" em Gn 1.28,
    não "cuidar", que é de Gn 2.15), e a referência cobre todo fato da frase. Palavra tirada do
    meio de uma citação vira reticências.
+   Vale também para o destaque `jesus`, a nota dos pares e o "Enquanto lê, procure" (Mt 13.37
+   diz "o agricultor", não "o semeador"; Mt 27.9 diz "peças de prata", não "moedas").
    Vale também para adjetivo e circunstância ("quase cego", "fugindo", "no monte Moriá",
    "velha demais"): se não está no trecho citado, ou amplia a referência ou sai da frase.
-5. **Marcos completos.** Toda troca de nome, aliança, reencontro, mudança de terra e morte de
+5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
+   sequência; um relato retrospectivo (Mt 14.3-12, a morte de João) se conta no passado. "O livro
+   abre com" e "fecha com" só com o primeiro e o último versículo de verdade.
+6. **Marcos completos.** Toda troca de nome, aliança, reencontro, mudança de terra e morte de
    protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
-   e 46). Cada referência aparece uma vez no mapa; curiosidades seguem a ordem dos capítulos.
+   e 46). Liste os capítulos do livro e marque onde cada um aparece (galho, conexão, curiosidade,
+   autoria): Mateus tinha deixado de fora os capítulos 15, 19 e 22 e a Grande Comissão (28.19-20).
+   Cada referência aparece uma vez no mapa; curiosidades seguem a ordem dos capítulos.
 
 Fora do próprio livro só entram, e marcados como tal: o **significado do nome** (é tradução, não
 fato novo), a seção **"[Livro] e Cristo"**, com as citações do Novo Testamento (livro, capítulo e
@@ -54,15 +61,24 @@ Servo é Jesus" (At 8.32-35; Lc 22.37), num destaque escuro no fim do ramo, com 
 NT que provam a ligação. Sem a referência do NT, não se faz a ligação. Datas em a.C., achados arqueológicos e opiniões de comentaristas ficam
 fora.
 
+**Livros do Novo Testamento** (Mateus, 02/10): o livro inteiro já fala de Jesus, então
+"[Livro] e Cristo" mostra como o próprio livro lê o Antigo Testamento: cada par leva em `at` a
+profecia que o livro cita (texto da NBV do AT) e em `nt` o trecho do livro que a cumpre
+(`Mq 5.2` → `Mt 2.1-6`). O destaque `jesus` vai onde o texto identifica uma figura com Jesus,
+com referência do próprio livro ("O Filho do Homem é o agricultor", Mt 13.37) ou de outro livro
+do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua": "grego"`).
+
 **Estrutura**
 - **A raiz:** a ideia central em um parágrafo direto (mais uma frase de apoio, se precisar).
 - **Ramos:** de 4 a 6 pilares, cada um com nome curto e forte e uma linha de subtítulo (até uns
-  30 caracteres, para caber numa linha ao lado do desenho a 390px). Nada de pronome com hífen no
+  30 caracteres, para caber numa linha ao lado do desenho a 390px) que resuma o ramo inteiro,
+  não só um galho. Nada de pronome com hífen no
   fim de frase ("odiá-lo"): a linha quebra no hífen.
 - **Ramificações:** de 3 a 6 por ramo, cada uma com a referência no fim.
 - **Conexões:** entre um ramo e o seguinte, uma frase que mostra o raciocínio do autor bíblico
   (de preferência ligando dois versículos do próprio livro, como o toco de Is 6.13 que vira o
-  rebento de Is 11.1).
+  rebento de Is 11.1). Até uns 180 caracteres: a conexão de 247 do ramo 3 de Mateus fez a
+  curva cruzar o texto a 360px (as de Gênesis ficam entre 116 e 166).
 
 Depois dos ramos vêm, nesta ordem, as seções fixas: **Significado do nome**, **Autoria e
 época** (só o que o livro diz), **[Livro] e Cristo**, **Estrutura do livro** (partes com
@@ -71,9 +87,14 @@ capítulos e o "você está aqui"), **Curiosidades do texto** (só fatos que est
 grupo (Profetas maiores...), o nome, "Livro N de 66" e o número de capítulos.
 
 Antes de entregar o texto:
-- `grep -n -i -E "—|mergulh|crucial|fundamental|dança|em resumo|vale ressaltar|teia|jornada|multifacet"` não acha nada;
+- `grep -n -i -E "—|mergulh|crucial|fundamental|\bdança\b|em resumo|vale ressaltar|\bteia\b|jornada|multifacet"` não acha nada
+  (com `\b`: sem ele, "plateia" acusa "teia");
 - cada referência foi conferida na Bíblia do app (`conteudo/biblias`);
-- nenhum item começa igual ao anterior.
+- nenhum item começa igual ao anterior, e nenhuma palavra se repete na mesma frase ("No barco,
+  as ondas inundam o barco");
+- nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen nos galhos só
+  se não houver outra ("boas-novas" quebrou no hífen a 390px);
+- toda conexão que mudou foi medida de novo (até uns 180 caracteres).
 
 ## 2. Como desenhar
 
@@ -97,6 +118,11 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   de (60,60), senão a borda corta (a escada de Gênesis cortou o chão e a pedra).
 - encaixes calculados, não chutados: cabo que toca o galho e a fruta, pé que nasce no bojo da
   panela (ponto tirado da curva); traço que não representa nada sai.
+- papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de
+  uma peça vira caixa branca sobre o fundo cinza da página (o barco de Mateus). Para pôr o casco
+  dentro da água, o fundo do casco é a própria curva da onda (pontos tirados da curva).
+- confira as três linhas do `ver-desenhos` e também o desenho na tela de verdade: o fundo da
+  folha do `ver-desenhos` é branco como o papel e esconde esse defeito.
 `CHROME=... node ferramentas/ver-desenhos.mjs <saida.png> <id...>` mostra cada desenho a 280px no
 claro, no escuro e sobre o disco; olhe a imagem com Read.
 Depois, renderize a tela inteira a 390px e confira cada seta: a ponta aponta para o bloco certo,
@@ -108,7 +134,8 @@ Para renderizar sem o runtime do canvas, troque a linha do `support.js` por `@fo
 fontes de `dist/` e use `CHROME=... --headless --screenshot` (como em `design/mapas/`). Com o
 app no ar (cookie da pasta de estado desse servidor; se a folha de consentimento aparecer, mande
 `POST api/consentimento` com o cookie antes), a tela de verdade sai com `CHEIA=1 node design/ferramentas/foto-conta.mjs 390 844
-<saida.png> '#/mapa/<slug>' 0 <claro|escuro>` (página inteira); recorte em pedaços de 1500px
+<saida.png> '#/mapa/<slug>' 0 <claro|escuro>` (página inteira; com mais de uns 10.000px de
+altura, passe `ESCALA=1.5`, porque a 2x o Chrome trava sem erro, e rode sempre com `timeout`); recorte em pedaços de 1500px
 para olhar peça por peça, porque a página inteira reduzida esconde defeito.
 
 ## 3. Como montar a tela

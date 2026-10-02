@@ -111,6 +111,72 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   cima, porque a conta de teste ainda não tinha dado o consentimento da versão nova; e o cookie da
   pasta errada abriu a página de entrada → usar o cookie da pasta de estado do servidor que está no
   ar e, se a folha aparecer, mandar `POST api/consentimento` com esse cookie antes de capturar.
+- 2026-10-02 · desenho · Mateus: o barco escondia o fundo do casco atrás de um retângulo de papel
+  (`.p`) sob a onda. No `ver-desenhos` (fundo branco) não aparecia; na tela, sobre o fundo cinza da
+  página, virou uma caixa branca atrás do desenho → papel só dentro de um contorno do objeto; para
+  pôr o casco na água, o fundo do casco é a própria curva da onda (pontos tirados da curva). Olhar
+  o desenho também na tela de verdade, não só na folha do `ver-desenhos` (regra na skill).
+- 2026-10-02 · tela · As conexões de Mateus saíram com até 247 caracteres (Gênesis: até 166), e a
+  curva do ramo 3 cruzou o texto a 360px no `teste-mapas` → conexão até uns 180 caracteres; o teste
+  de navegador a 360px é o que pega isso (regra na skill).
+- 2026-10-02 · conteúdo · O `grep` da skill acusou "plateia" por causa de "teia" (o checador já usa
+  `\bteia\b`) → o grep da skill passou a usar `\b` em "teia" e "dança" (regra na skill).
+- 2026-10-02 · conteúdo · Na leitura versículo por versículo, ainda antes da tela, saíram fatos fora
+  da referência do item: "jejum" em Mt 6.1-9 (o jejum é 6.16-18), "Na ceia da Páscoa" em 26.26-28 (a
+  Páscoa é 26.17-20), "as trinta moedas" em 27.3-8 (o número é de 27.9), "Nazaré" com a ref 13.57 (a
+  cidade é 13.54) e "abre os braços", que nenhum versículo diz → a regra da paráfrase fiel vale; a
+  conferência é por item, lendo o trecho exato, e figura de linguagem que parece fato sai.
+- 2026-10-02 · conteúdo · Ao trocar "as trinta moedas" por "o dinheiro", o pronome da frase seguinte
+  ficou "pô-las", sem concordância, e só a captura mostrou → depois de mexer num substantivo, reler
+  a frase inteira e a seguinte.
+- 2026-10-02 · desenho · O primeiro túmulo de "Mateus e Cristo" parecia um iglu: cúpula lisa e
+  hachuras em arco → rocha se reconhece pelo contorno irregular e por rachaduras retas e curtas.
+- 2026-10-02 · conteúdo · Num evangelho, "[Livro] e Cristo" não tinha modelo: Gênesis e Isaías
+  ligam o AT ao NT → no NT, os pares vão da profecia que o próprio livro cita (`at`, texto da NBV do
+  AT) ao trecho do livro que a cumpre (`nt`); o destaque `jesus` usa a referência do próprio livro
+  quando o texto identifica a figura (Mt 13.37) ou outro livro do NT (At 4.10-11) (regra na skill).
+- 2026-10-02 · captura · Com Mateus no índice, as capturas do Explorar em `design/mapas/capturas/`
+  (feitas com Gênesis e Isaías) ficam desatualizadas: Mateus deixa de ser "em breve" → quem decidir
+  publicar o mapa refaz `explorar-390-*` junto.
+- 2026-10-02 · revisão · A revisão adversarial de Mateus ainda achou fatos fora do trecho ou
+  trocados: "o corpo roubado" (28.13) com a ref 28.15, José que "pensa em" romper o noivado (a NBV
+  diz "decidiu"), a frase "Venham comigo..." posta na boca de Jesus para os "dois pares de irmãos"
+  (foi dita a Pedro e André), "sábios do Oriente" em 2.9-16 (o Oriente dos sábios é 2.1), "saem
+  dali", "Pedro tenta impedir", "afunda" (começou a afundar), "estrangeiro" (a NBV diz "estranho"),
+  "Arrependido" (remorso), Pedro "falando a todo o povo" em At 4.10 (falava aos líderes), "trinta
+  moedas" (são "peças de prata") e "O semeador é Jesus" quando Mt 13.37 diz "o agricultor" →
+  conferir cada verbo e cada substantivo contra a NBV, inclusive no destaque `jesus` e no "procure".
+- 2026-10-02 · conteúdo · A conexão do ramo 4 dizia "Logo depois, Herodes manda decapitar João",
+  mas Mt 14.3-12 é um flashback: João já tinha morrido quando Herodes ouve falar de Jesus → "logo
+  depois", "então" e "a partir daí" só quando o livro narra em sequência; relato retrospectivo
+  ("Pois Herodes tinha mandado...") se conta como passado (regra na skill).
+- 2026-10-02 · conteúdo · A raiz dizia que "o livro abre com um nome, Emanuel", mas o livro abre
+  com a lista de antepassados (Mt 1.1); Emanuel é 1.23 → "abre com" e "fecha com" só com o
+  primeiro e o último versículo de verdade.
+- 2026-10-02 · conteúdo · O chamado de Mateus (9.9) aparecia na autoria e num galho, e 4.17 na
+  raiz e na conexão → a autoria fica com a lista dos Doze (10.3) e a raiz com a Grande Comissão
+  (28.19-20), que antes não aparecia em lugar nenhum.
+- 2026-10-02 · conteúdo · Exaustividade: os capítulos 15, 19 e 22 de Mateus não apareciam em
+  nenhum item, e o ramo 5 (14 a 20) pulava dois deles → listar os 28 (ou N) capítulos e marcar
+  onde cada um aparece (galho, conexão, curiosidade, autoria); o que faltar entra numa curiosidade
+  (a cananeia, o camelo e a agulha, a moeda de César) (regra na skill).
+- 2026-10-02 · conteúdo · O subtítulo do ramo 4 ("O Reino contado em histórias") só valia para três
+  dos seis galhos (os outros são a dúvida de João e a recusa das cidades) → o subtítulo resume o
+  ramo inteiro, não o galho mais bonito.
+- 2026-10-02 · estilo · "No barco, as ondas começam a inundar o barco"; "homens!”. Logo" e "sou?”.
+  Pedro" (ponto depois de exclamação ou interrogação que fecha a citação); e "boas-novas" quebrou
+  no hífen ("boas-" / "novas") a 390px → nada de palavra repetida na mesma frase, nenhum ponto
+  depois de "!”" ou "?”", e palavra com hífen nos galhos só se não houver outra (regra na skill).
+- 2026-10-02 · desenho · O lírio tinha as duas folhas em sálvia (a regra é uma área só), e o sol
+  do túmulo era um disco sálvia solto que parecia uma bola → conferir a contagem de áreas `.s`;
+  sol se reconhece pelos raios curtos (oito traços de hachura em volta).
+- 2026-10-02 · conteúdo · A conexão do ramo 4, reescrita na revisão, saiu com 187 caracteres →
+  medir de novo toda conexão que mudar (até uns 180).
+- 2026-10-02 · captura · A página inteira de Mateus (10.575px) a 2x travou o `foto-conta` (a
+  imagem passaria de 21.000px) sem erro nenhum, e um `pgrep -f` com o padrão dentro do próprio
+  comando matou o shell de novo → `foto-conta` ganhou `ESCALA` (use 1.5 em página com mais de uns
+  10.000px) e todo comando de captura vai com `timeout`; processo se mata pelo PID que `ps` mostra,
+  nunca por padrão de texto (regra na skill).
 
 ## Geral
 
