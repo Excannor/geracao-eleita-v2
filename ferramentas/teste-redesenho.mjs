@@ -182,6 +182,19 @@ await dormir(1200);
 await foto('4-reflexao');
 ok(await esperar(existe('.cartao-versiculo'), 6000), 'o fim mostra um versículo do trecho, na tradução escolhida');
 await foto('4c-versiculo');
+// Escrever mora no cartão do versículo (no lugar de "Nota"), com um nome só; nada de links
+// soltos entre o conteúdo e o botão principal, e o próximo dia só no fim.
+ok(await esperar(existe('.festa .cartao-versiculo [data-escrever]')) && await av(q('.festa [data-escrever]') + '.textContent.trim() === "Escrever"')
+  && await av('!' + existe('.festa [data-nota-verso]')), 'o botão "Escrever" do cartão do versículo toma o lugar de "Nota"');
+ok(await av('!' + existe('.festa .link-nota') + ' && !' + existe('.festa .acoes-reflexao') + ' && !' + existe('.licao [data-proximo]')),
+  'sem links soltos no meio da revisão, e sem "Ler o dia" antes do fim');
+ok(await av(existe('[data-etapa-bloco="guardar"] .linha-fundo[data-fundo]') + ' && /Ir mais fundo\\s*\\d+ notas?/.test(' + q('.linha-fundo') + '.textContent)'),
+  '"Ir mais fundo" é uma linha com a contagem, dentro de Guardar');
+// sem caixa: o botão não passa da altura de uma linha do parágrafo (com min-height de 44px, a
+// linha dele descia)
+ok(await av('(() => { const b = ' + q('.contexto-reflexao [data-nota-reflexao]') + '; if (!b) return true;'
+  + ' const linha = parseFloat(getComputedStyle(b.parentElement).lineHeight); return b.getBoundingClientRect().height <= linha + 1; })()'),
+  '"Ler a nota" é um link da própria linha do contexto, sem caixa');
 ok(await av('!' + existe('[data-etapa-bloco="pensar"]:not([hidden])')), 'pensar e orar começam fechados');
 await clicar('[data-avancar]');
 // 2 ou 3: as reflexões revistas têm a quantidade de perguntas que o texto pede

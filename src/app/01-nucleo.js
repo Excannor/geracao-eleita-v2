@@ -110,6 +110,7 @@ window.CC = window.CC || {};
     voltar: '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>',
     avancar: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
     baixo: '<path d="m6 9 6 6 6-6"/>',
+    direita: '<path d="m9 6 6 6-6 6"/>',
     lua: '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
     sol: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2"/><path d="M12 21v2"/><path d="m4.2 4.2 1.4 1.4"/><path d="m18.4 18.4 1.4 1.4"/><path d="M1 12h2"/><path d="M21 12h2"/><path d="m4.2 19.8 1.4-1.4"/><path d="m18.4 5.6 1.4-1.4"/>',
     alvo: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',

@@ -85,7 +85,8 @@ await dormir(900);
 mostrar('LIÇÃO 2 · celebração', await av('document.querySelector(".licao").innerText'));
 await av('(async () => { for (let i = 0; i < 14 && !document.querySelector("[data-voltar-trilha]"); i++) { const b = document.querySelector("[data-seguir]"); if (b) b.click(); await new Promise((r) => setTimeout(r, 350)); } return !!document.querySelector(".festa"); })()');
 mostrar('LIÇÃO 2b · versículo', await av('document.querySelector(".licao").innerText'));
-await av('document.querySelector("[data-escrever]").click()');
+// o botão Escrever mora no cartão do versículo, que carrega à parte
+await av('(async () => { for (let i = 0; i < 40 && !document.querySelector("[data-escrever]"); i++) await new Promise((r) => setTimeout(r, 150)); document.querySelector("[data-escrever]").click(); })()');
 await dormir(500);
 mostrar('LIÇÃO 3 · escrever (oração)', await av('document.querySelector(".licao").innerText'));
 await av('document.querySelector("[data-modo=\\"oia\\"]").click()');

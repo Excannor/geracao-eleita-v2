@@ -291,8 +291,9 @@
   }
 
   // ---------- a reflexão: guardar, pensar, orar ----------
-  // Um botão principal só, que muda a cada etapa, e "Pular por hoje" discreto. Escrever e
-  // ir mais fundo ficam à mão, sem disputar com o próximo passo.
+  // Um botão principal só, que muda a cada etapa, e "Pular por hoje" discreto. O que é do dia
+  // fica dentro da etapa (escrever no cartão do versículo, ir mais fundo logo abaixo do
+  // contexto); o que leva a outro dia ("Ler o dia N") só aparece no fim.
   function telaFesta(dia) {
     const lido = CC.leu(sessao.dia);
     const ganhou = lido && !sessao.antes.lido && !!sessao.celebracao;
@@ -300,6 +301,8 @@
     const etapa = sessao.etapaReflexao || 'guardar';
     const r = CC.reflexaoDoDia(sessao.dia);
     const seq = CC.sequencia();
+    const escrever = CC.temRegistro(sessao.dia) ? 'Escrever mais' : 'Escrever';
+    const apoio = totalApoio(dia);
 
     const avancar = { guardar: ['Pensar sobre isso', 'lupa'], pensar: ['Transformar em oração', 'aperto'], orar: ['Terminar', 'certo'] }[etapa];
 
@@ -310,13 +313,19 @@
         + '<ol class="passos-reflexao" aria-label="Guardar, pensar e orar">'
         + ['Guardar', 'Pensar', 'Orar'].map((nome, i) => '<li' + (i <= ETAPAS.indexOf(etapa) ? ' class="ativa"' : '')
           + (i === ETAPAS.indexOf(etapa) ? ' aria-current="step"' : '') + '>' + nome + '</li>').join('') + '</ol></div>'
-        // guardar: o versículo do dia, ou a nota nos dias em que um versículo solto confunde
+        // guardar: o versículo do dia, ou a nota nos dias em que um versículo solto confunde.
+        // O botão de escrever fica no cartão, com o mesmo nome em todo lugar.
         + '<section class="etapa-reflexao" data-etapa-bloco="guardar">'
         + '<div id="festa-versiculo">' + (r.ref
           ? CC.esqueleto('texto')
-          : '<figure class="cartao-versiculo nota-reflexao"><span class="etiqueta">Para entender hoje</span><p>' + CC.esc(r.nota) + '</p></figure>') + '</div>'
+          : '<figure class="cartao-versiculo nota-reflexao"><span class="etiqueta">Para entender hoje</span><p>' + CC.esc(r.nota) + '</p>'
+            + '<div class="acoes-verso no-cartao"><div class="botoes-verso"><button class="botao pequeno contorno" data-escrever>'
+            + CC.ico('caneta') + escrever + '</button></div></div></figure>') + '</div>'
         + (r.contexto ? '<p class="contexto-reflexao"><b>Contexto:</b> ' + CC.esc(r.contexto)
-          + ' <button class="link-nota" data-nota-reflexao>Ler a nota</button></p>' : '')
+          + ' <button class="link-inline" data-nota-reflexao>Ler a nota</button></p>' : '')
+        + (apoio ? '<button class="linha-fundo" data-fundo><span class="ico-linha">' + CC.ico('camadas') + '</span>'
+          + '<span class="rotulo-linha">Ir mais fundo</span><span class="conta-linha">' + CC.plural(apoio, 'nota', 'notas') + '</span>'
+          + CC.ico('direita') + '</button>' : '')
         + '</section>'
         // pensar: uma pergunta, escolhida pela pessoa
         + '<section class="etapa-reflexao" data-etapa-bloco="pensar"' + (ETAPAS.indexOf(etapa) >= 1 ? '' : ' hidden') + '>'
@@ -344,15 +353,11 @@
         + '<button class="botao plano" data-orei>Orei</button></div>'
         + '<p class="amem" hidden>Amém!</p>'
         + '</section>'
-        + '<div class="acoes-reflexao">'
-        // na etapa de orar o botão Escrever da oração já está ali: o link repetiria o mesmo nome
-        + (etapa === 'orar' ? '' : '<button class="link-nota" data-escrever>' + CC.ico('caneta') + (CC.temRegistro(sessao.dia) ? 'Escrever mais' : 'Escrever sobre hoje') + '</button>')
-        + (totalApoio(dia) ? '<button class="link-nota" data-fundo>' + CC.ico('camadas') + 'Ir mais fundo</button>' : '')
-        + (proximo <= D.plano.length && !ganhou ? '<button class="link-nota" data-proximo>' + CC.ico('avancar') + 'Ler o dia ' + proximo + '</button>' : '')
-        + '</div>'
         + '</div>',
       pe: '<button class="botao cor" data-avancar>' + CC.ico(avancar[1]) + CC.esc(avancar[0]) + '</button>'
-        + (etapa === 'orar' ? '' : '<button class="botao plano" data-pular>Pular por hoje</button>'),
+        + (etapa !== 'orar' ? '<button class="botao plano" data-pular>Pular por hoje</button>'
+          // na revisão de um dia já lido, o próximo dia é a ação de quem terminou
+          : (proximo <= D.plano.length && !ganhou ? '<button class="botao plano" data-proximo>' + CC.ico('avancar') + 'Ler o dia ' + proximo + '</button>' : '')),
       ligar(el) {
         const terminar = () => {
           if (ganhou) { ir('resumo'); return; }
@@ -372,13 +377,15 @@
         };
         const pular = el.querySelector('[data-pular]');
         if (pular) pular.onclick = terminar;
-        const escrever = el.querySelector('[data-escrever]');
-        if (escrever) escrever.onclick = () => ir('escrever');
+        // o botão de escrever do cartão chega depois (o versículo carrega à parte)
+        el.querySelector('.festa').addEventListener('click', (ev) => {
+          if (ev.target.closest('[data-escrever]')) ir('escrever');
+        });
         const fundo = el.querySelector('[data-fundo]');
         if (fundo) fundo.onclick = () => ir('fundo');
         const prox = el.querySelector('[data-proximo]');
         if (prox) prox.onclick = () => { CC.fecharLicao(); CC.abrirLicao(proximo); };
-        if (r.ref) pintarVersiculo(el.querySelector('#festa-versiculo'), r.ref);
+        if (r.ref) pintarVersiculo(el.querySelector('#festa-versiculo'), r.ref, { escrever });
 
         el.querySelectorAll('[data-pergunta]').forEach((b) => {
           b.onclick = () => {
@@ -544,30 +551,31 @@
   }
 
   // O versículo vem da tradução escolhida, para a pessoa guardar a mesma redação que leu.
-  function pintarVersiculo(alvo, ref) {
+  // Na revisão do dia o botão de escrever mora no cartão: sem o texto (sem tradução ou sem
+  // rede), o cartão sai só com a referência, para o botão não sumir junto.
+  function pintarVersiculo(alvo, ref, opcoes) {
     if (!alvo) return;
     const pedido = CC.textoDoVersiculo ? CC.textoDoVersiculo(ref) : Promise.resolve(null);
     pedido.then((texto) => {
       if (!alvo.isConnected) return;
-      if (!texto) { alvo.innerHTML = ''; return; }
-      alvo.innerHTML = CC.cartaoVersiculo(ref, texto);
-      CC.ligarCartaoVersiculo(alvo, ref);
+      if (!texto && !(opcoes && opcoes.escrever)) { alvo.innerHTML = ''; return; }
+      alvo.innerHTML = CC.cartaoVersiculo(ref, texto || '', opcoes);
+      CC.ligarCartaoVersiculo(alvo, ref, opcoes);
     });
   }
 
-  CC.cartaoVersiculo = (ref, texto, { semAcoes } = {}) => {
+  CC.cartaoVersiculo = (ref, texto, { semAcoes, escrever } = {}) => {
     const t = CC.traducao();
-    return '<figure class="cartao-versiculo">'
-      + '<span class="aspas" aria-hidden="true">“</span>'
-      + '<blockquote>' + CC.esc(texto) + '</blockquote>'
-      + '<figcaption><b>' + nb(CC.esc(ref)) + '</b>' + (t ? ' · ' + CC.esc(t.abreviatura) : '') + '</figcaption>'
-      + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref))
+    return '<figure class="cartao-versiculo' + (texto ? '' : ' sem-texto') + '">'
+      + (texto ? '<span class="aspas" aria-hidden="true">“</span><blockquote>' + CC.esc(texto) + '</blockquote>' : '')
+      + '<figcaption><b>' + nb(CC.esc(ref)) + '</b>' + (t && texto ? ' · ' + CC.esc(t.abreviatura) : '') + '</figcaption>'
+      + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref, { escrever }))
       + '</figure>';
   };
   // As ações são as mesmas dos leitores (04e-versiculos.js): marcar, nota, Juntos, copiar.
-  CC.ligarCartaoVersiculo = (raiz, ref) => {
+  CC.ligarCartaoVersiculo = (raiz, ref, opcoes) => {
     const citacao = raiz.querySelector('.cartao-versiculo blockquote');
-    CC.versiculos.ligarCartao(raiz, ref, citacao ? citacao.textContent : '');
+    CC.versiculos.ligarCartao(raiz, ref, citacao ? citacao.textContent : '', opcoes);
   };
 
   // ---------- ir mais fundo ----------
@@ -600,6 +608,9 @@
     const r = CC.registro(sessao.dia);
     if (r.o || r.i || r.a) sessao.modo = sessao.modo === 'oracao' && !sessao.escolheu ? 'oia' : sessao.modo;
     const campos = sessao.modo === 'oia' ? ['o', 'i', 'a', 'oracao'] : ['oracao'];
+    // A nota do versículo do dia (feita nos leitores) continua à mão aqui, onde se escreve.
+    const refDoDia = CC.reflexaoDoDia(sessao.dia).ref;
+    const temNotaVerso = !!(refDoDia && CC.anotacao(CC.versiculos.chaveNota(refDoDia)).trim());
 
     return {
       topo: '<span class="salvo" id="salvo" role="status"></span>',
@@ -616,7 +627,8 @@
             + '<textarea id="campo-' + chave + '" data-campo="' + chave + '" placeholder="' + CC.esc(chave === 'oracao' && sessao.dicaOracao ? sessao.dicaOracao : exemplo) + '"'
             + (campos.length === 1 ? ' class="alto"' : '') + '>' + CC.esc(r[chave] || '') + '</textarea></div>';
         }).join('')
-        ,
+        + (temNotaVerso ? '<p class="nota-do-verso">' + CC.ico('caneta') + '<span>Você tem uma nota em ' + nb(CC.esc(refDoDia)) + '. '
+          + '<button class="link-inline" data-nota-do-verso>Ver a nota</button></span></p>' : ''),
       pe: botao('Pronto', 'data-pronto'),
       ligar(el) {
         const salvo = el.querySelector('#salvo');
@@ -628,6 +640,8 @@
             if (salvo) salvo.innerHTML = CC.ico('certo') + 'Salvo';
           });
         });
+        const notaVerso = el.querySelector('[data-nota-do-verso]');
+        if (notaVerso) notaVerso.onclick = () => CC.versiculos.abrirNota(refDoDia, null, () => desenhar());
         el.querySelectorAll('[data-modo]').forEach((b) => {
           b.onclick = () => { sessao.modo = b.dataset.modo; sessao.escolheu = true; desenhar(); };
         });

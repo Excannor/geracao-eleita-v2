@@ -91,6 +91,30 @@
 .pergunta-reflexao[aria-pressed="true"], .folha-aa [aria-pressed="true"] { background: var(--realce); box-shadow: inset 0 0 0 2px var(--salvia-texto); }
 .licao-dia .oracao-guia li { background: var(--cartao); font-style: normal; text-wrap: balance; }
 .dica-pensar, .contexto-reflexao { text-wrap: balance; }
+
+/* "Ler a nota" no meio do contexto: link da própria linha, sem caixa, sem empurrar a entrelinha */
+.link-inline { display: inline; min-height: 0; margin: 0; padding: 0; border: 0; background: none; color: var(--salvia-texto); font: inherit; font-weight: 700; line-height: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.contexto-reflexao { margin: 14px 0 0; }
+
+/* ir mais fundo: uma linha de navegação, com a contagem e a seta, logo abaixo do contexto */
+.linha-fundo {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin: 14px 0 0; padding: 8px 14px 8px 8px;
+  border: 0; border-radius: 22px; background: var(--cartao); color: var(--tinta-forte); font: inherit; text-align: left; cursor: pointer;
+}
+.linha-fundo:active { background: var(--campo); }
+.linha-fundo .ico-linha { display: grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.linha-fundo .ico-linha svg { width: 20px; height: 20px; }
+.linha-fundo .rotulo-linha { flex: 1; font-size: .9375rem; font-weight: 800; }
+.linha-fundo .conta-linha { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; white-space: nowrap; }
+.linha-fundo > svg:last-child { flex: none; width: 18px; height: 18px; color: var(--tinta-fraca); }
+
+/* o cartão sem o texto (sem tradução ou sem rede): só a referência e as ações */
+.cartao-versiculo.sem-texto figcaption { margin-top: 0; }
+
+/* a nota do versículo, quando existe, à mão na tela de escrever */
+.nota-do-verso { display: flex; gap: 10px; margin: 4px 0 0; color: var(--tinta-fraca); font-size: .875rem; font-weight: 500; line-height: 1.5; }
+.nota-do-verso svg { flex: none; width: 18px; height: 18px; margin-top: 2px; color: var(--salvia-texto); }
+
 /* ir mais fundo: a etiqueta longa das fichas quebra como caixinha, não como pílula esmagada */
 .licao-dia .chip { border-radius: 14px; line-height: 1.35; text-wrap: balance; }
 .amem { color: var(--salvia-texto); }

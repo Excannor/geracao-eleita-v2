@@ -183,7 +183,8 @@ checar(await avaliar('!document.querySelector("[data-seguir]")'), 'sem telas de 
 checar(await avaliar('CC.xpTotal() === 10'), 'a leitura vale 10 XP');
 await capturar('licao-3-conclusao');
 
-await avaliar('document.querySelector("[data-escrever]").click()');
+// o botão Escrever mora no cartão do versículo, que carrega à parte
+await avaliar('(async () => { for (let i = 0; i < 40 && !document.querySelector("[data-escrever]"); i++) await new Promise((r) => setTimeout(r, 150)); document.querySelector("[data-escrever]").click(); })()');
 await dormir(400);
 await avaliar('document.querySelector(\'[data-modo="oia"]\').click()');
 await dormir(400);

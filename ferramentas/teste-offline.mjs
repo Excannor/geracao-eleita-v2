@@ -127,7 +127,8 @@ ok(await av('!!document.querySelector(".festa .retorno-lido")'), 'a reflexão ab
 ok(await av('!document.querySelector("[data-seguir]")'), 'sem telas de festa no caminho, sem rede');
 
 // escrever e guardar
-await av('document.querySelector("[data-escrever]").click()');
+// o botão Escrever mora no cartão do versículo, que carrega à parte
+await av('(async () => { for (let i = 0; i < 40 && !document.querySelector("[data-escrever]"); i++) await new Promise((r) => setTimeout(r, 150)); document.querySelector("[data-escrever]").click(); })()');
 await dormir(500);
 await av('(() => { const t = document.querySelector("textarea"); t.value = "escrito sem rede";'
   + ' t.dispatchEvent(new Event("input", { bubbles: true })); })()');

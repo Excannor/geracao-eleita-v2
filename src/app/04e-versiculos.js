@@ -39,7 +39,10 @@
   }
 
   // ---------- a barra de ações ----------
-  function barraHtml(ref, { fechar } = {}) {
+  // escrever: o rótulo do botão que, na revisão do dia, toma o lugar de "Nota" e leva à tela
+  // de escrever da lição (um lugar só para escrever sobre o dia; a nota do versículo continua
+  // nos leitores e aparece nessa tela quando existe).
+  function barraHtml(ref, { fechar, escrever } = {}) {
     const r = CC.lerRef(ref);
     const atual = r ? corDoTrecho(r) : 0;
     const temNota = !!CC.anotacao(chaveNota(ref)).trim();
@@ -50,7 +53,9 @@
       + (r && algumMarcado(r) ? '<button class="botao-icone tirar-marca" data-cor="0" aria-label="Tirar a marca">' + CC.ico('fechar') + '</button>' : '')
       + '</div>'
       + '<div class="botoes-verso">'
-      + '<button class="botao pequeno contorno" data-nota-verso>' + CC.ico('caneta') + (temNota ? 'Ver nota' : 'Nota') + '</button>'
+      + (escrever
+        ? '<button class="botao pequeno contorno" data-escrever>' + CC.ico('caneta') + CC.esc(escrever) + '</button>'
+        : '<button class="botao pequeno contorno" data-nota-verso>' + CC.ico('caneta') + (temNota ? 'Ver nota' : 'Nota') + '</button>')
       + (CC.podeCompartilharComAmigos && CC.podeCompartilharComAmigos()
         ? '<button class="botao pequeno contorno" data-juntos-verso>' + CC.ico('pessoas') + 'Juntos</button>' : '')
       + '<button class="botao pequeno contorno" data-copiar-verso>' + CC.ico('folha') + 'Copiar</button>'
@@ -70,7 +75,8 @@
         aoMudar('marca');
       };
     });
-    barra.querySelector('[data-nota-verso]').onclick = () => abrirNota(ref, texto, () => aoMudar('nota'));
+    const nota = barra.querySelector('[data-nota-verso]');
+    if (nota) nota.onclick = () => abrirNota(ref, texto, () => aoMudar('nota'));
     const juntos = barra.querySelector('[data-juntos-verso]');
     if (juntos) {
       juntos.onclick = async () => {
@@ -240,8 +246,8 @@
 
   // ---------- no cartão de versículo ----------
   // Trecho longo demais para marcar (um capítulo inteiro no estudo da célula) fica sem barra.
-  const acoesDoCartao = (ref) => (CC.lerRef(ref) ? '<div class="acoes-verso no-cartao">' + barraHtml(ref) + '</div>' : '');
-  function ligarCartao(raiz, ref, texto) {
+  const acoesDoCartao = (ref, opcoes) => (CC.lerRef(ref) ? '<div class="acoes-verso no-cartao">' + barraHtml(ref, opcoes) + '</div>' : '');
+  function ligarCartao(raiz, ref, texto, opcoes) {
     const barra = raiz.querySelector('.acoes-verso.no-cartao');
     if (!barra) return;
     const figura = barra.closest('.cartao-versiculo');
@@ -249,7 +255,7 @@
       const r = CC.lerRef(ref);
       const cor = r ? corDoTrecho(r) : 0;
       if (figura) for (const [n] of CORES) figura.classList.toggle('marca-' + n, cor === n);
-      barra.innerHTML = barraHtml(ref);
+      barra.innerHTML = barraHtml(ref, opcoes);
       ligarBarra(barra, ref, () => texto, repintar);
     };
     repintar();
