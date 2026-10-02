@@ -112,9 +112,10 @@ window.CC = window.CC || {};
     baixo: '<path d="m6 9 6 6 6-6"/>',
     direita: '<path d="m9 6 6 6-6 6"/>',
     // oração: uma pessoa ajoelhada com as mãos juntas diante do rosto, cheia (desenho próprio, a
-    // partir da referência que o dono mandou). As mãos postas sozinhas viravam bico de caneta a
-    // 20px, e o balão com a cruz não dizia "orar". O braço é um traço grosso por cima do corpo.
-    oracao: '<circle cx="14.3" cy="4.5" r="2.5"/><path d="M8.7 8.1c1.8-1.3 4.4-.8 5.2 1.3l.5 1.4-2.7 4.6H7.1l.6-4.7c.1-1.1.4-2 1-2.6z"/><path d="M11.5 10.3l1.9 3.1 3.6-4.7" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.6 14h5.6c2.9 0 5 1.6 5 3.8 0 1.2-.9 2.2-2 2.2H5.6c-1.2 0-2.2-1-2.2-2.2s1-2.2 2.2-2.2c1 0 1.6-.6 2-1.6z"/>',
+    // partir da referência que o dono mandou). Montada com formas de verdade, na caixa de 48:
+    // cabeça, tronco, braço e antebraço, coxa e canela no chão, cada uma uma cápsula de ponta
+    // redonda, para o contorno sair liso em qualquer tamanho (o traçado à mão saía torto).
+    oracao: '<path d="M22.5 9.2a5 5 0 1 0 10 0a5 5 0 1 0 -10 0ZM15.81 17.91L9.81 29.91A5.8 5.8 0 0 0 20.19 35.09L26.19 23.09A5.8 5.8 0 0 0 15.81 17.91ZM19.45 21.18L22.05 29.58A3.3 3.3 0 0 0 28.35 27.62L25.75 19.22A3.3 3.3 0 0 0 19.45 21.18ZM27.88 30.52L34.48 21.32A3.3 3.3 0 0 0 29.12 17.48L22.52 26.68A3.3 3.3 0 0 0 27.88 30.52ZM15.61 40.33L31.11 42.93A5.4 5.4 0 0 0 32.89 32.27L17.39 29.67A5.4 5.4 0 0 0 15.61 40.33ZM12 45.6L33 45.6A4.4 4.4 0 0 0 33 36.8L12 36.8A4.4 4.4 0 0 0 12 45.6ZM22.08 27.52L20.38 32.42A3.3 3.3 0 0 0 26.62 34.58L28.32 29.68A3.3 3.3 0 0 0 22.08 27.52Z"/>',
     lua: '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
     sol: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2"/><path d="M12 21v2"/><path d="m4.2 4.2 1.4 1.4"/><path d="m18.4 18.4 1.4 1.4"/><path d="M1 12h2"/><path d="M21 12h2"/><path d="m4.2 19.8 1.4-1.4"/><path d="m18.4 5.6 1.4-1.4"/>',
     alvo: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
@@ -141,7 +142,7 @@ window.CC = window.CC || {};
     estrela: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8 5.8 21l1.2-6.9-5-4.9 6.9-1z"/>',
   };
 
-  const CAIXAS = { chama: '0 0 16 16', pegadas: '0 -1 24 25' };
+  const CAIXAS = { chama: '0 0 16 16', pegadas: '0 -1 24 25', oracao: '0 0 48 48' };
 
   CC.ico = (nome, extra) => {
     const d = P[nome];
