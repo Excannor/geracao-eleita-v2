@@ -334,6 +334,8 @@
   <!-- nova senha, aberta pelo link -->
   <section id="tela-redefinir" hidden>
     <h1>Crie uma senha nova</h1>
+    <p class="dica" id="conta-redefinir" hidden></p>
+    <div class="privacidade" id="link-ruim" role="alert" hidden></div>
     <form id="form-redefinir" novalidate>
       <div class="campo"><label for="senha-redefinir">Senha nova</label>
         <div class="senha"><input id="senha-redefinir" name="new-password" type="password" autocomplete="new-password" required>
@@ -342,7 +344,7 @@
       <p class="erro" id="erro-redefinir" role="alert"></p>
       <div class="espaco"></div>
       <button class="botao" type="submit" id="botao-redefinir">Salvar e entrar</button>
-      <button class="botao plano" type="button" data-ir="esqueci">Pedir outro link</button>
+      <button class="botao plano" type="button" data-ir="esqueci" id="outro-link">Pedir outro link</button>
     </form>
   </section>
 
@@ -658,14 +660,42 @@
         }
         botao.disabled = false;
         var msg = d.erro || 'Não consegui trocar a senha.';
-        $('erro-redefinir').textContent = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
+        msg = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
+        if (r.status === 410) { linkRuim(msg); return; }
+        $('erro-redefinir').textContent = msg;
       });
     }).catch(function () {
       botao.disabled = false;
       $('erro-redefinir').textContent = 'Sem conexão com o servidor.';
     });
   });
-  if (tokenSenha) mostrarTela('redefinir');
+  // Link vencido ou já usado: diz qual dos dois logo ao abrir, e o caminho é pedir outro (o
+  // botão principal vira "Pedir outro link"). A conferência é um GET que não gasta o link: o
+  // pré-visualizador do WhatsApp ou do e-mail abrir antes da pessoa não muda nada.
+  function linkRuim(msg) {
+    // O título "Crie uma senha nova" prometia o que a tela não deixa fazer.
+    $('tela-redefinir').querySelector('h1').textContent = 'Este link não serve mais';
+    $('link-ruim').textContent = msg;
+    $('link-ruim').hidden = false;
+    $('form-redefinir').querySelector('.campo').hidden = true;
+    $('botao-redefinir').hidden = true;
+    $('outro-link').className = 'botao';
+    $('outro-link').focus();
+  }
+  if (tokenSenha) {
+    mostrarTela('redefinir');
+    fetch('api/redefinir-senha?token=' + encodeURIComponent(tokenSenha)).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (r.ok && d.usuario) {
+          $('conta-redefinir').textContent = 'Para a conta @' + d.usuario + '.';
+          $('conta-redefinir').hidden = false;
+        } else if (r.status === 410) {
+          var msg = d.erro || 'esse link não vale mais. Peça outro';
+          linkRuim(msg.charAt(0).toUpperCase() + msg.slice(1) + '.');
+        }
+      });
+    }).catch(function () { /* sem rede: o formulário segue e o POST avisa */ });
+  }
 
   // Com convite no link, quem chamou aparece logo na primeira tela. O convite do Conhecer
   // Jesus já decide o caminho sozinho: não faz sentido perguntar de novo.

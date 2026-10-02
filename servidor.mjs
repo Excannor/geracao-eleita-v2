@@ -449,7 +449,8 @@ function lerCookie(req, nome) {
 // O link de nova senha é "nome.validade.assinatura", como o crachá, mas assinado com outro
 // prefixo (um não serve no lugar do outro). A assinatura leva o selo da senha atual: trocada
 // a senha, o link morre sozinho, então ele vale uma vez só, sem precisar anotar no banco.
-const VALIDADE_LINK_SENHA = 60 * 60 * 1000;
+// 1 hora. Só as ferramentas de teste (CAMINHO_TESTE=1) encurtam, para provar o link vencido.
+const VALIDADE_LINK_SENHA = (process.env.CAMINHO_TESTE === '1' && Number(process.env.CAMINHO_VALIDADE_LINK_SENHA)) || 60 * 60 * 1000;
 const firmaDoLink = (nome, vence, usuario) =>
   assinar('redefinir.' + nome + '.' + vence + '.' + seloDaConta(CONTAS.achar(usuario)));
 function linkDeSenha(usuario) {
@@ -457,16 +458,31 @@ function linkDeSenha(usuario) {
   const nome = paraCracha(usuario);
   return CONTATO_PUSH.replace(/\/$/, '') + '/entrar.html?redefinir=' + nome + '.' + vence + '.' + firmaDoLink(nome, vence, usuario);
 }
-function donoDoLink(token) {
-  const partes = String(token || '').split('.');
-  if (partes.length !== 3) return '';
-  const [nome, vence, firma] = partes;
-  if (!(Number(vence) > Date.now())) return '';
+// Lê o link sem gastar nada: abrir a página (ou um pré-visualizador do WhatsApp, do Gmail, um
+// antivírus) não muda o link; ele só deixa de valer quando a senha é trocada (POST).
+// Devolve { usuario, motivo }: motivo '' (vale), 'venceu' (passou de 1 hora) ou 'invalido'
+// (já usado, senha trocada depois, ou link de outro endereço/adulterado).
+//
+// O nome vem de trás para a frente (firma e validade são as duas últimas partes): o @ com ponto
+// ("ana.clara") sai no link como "ana%2Eclara", e o URLSearchParams da página devolve o ponto
+// decodificado ("ana.clara.<vence>.<firma>", quatro partes). Lido da frente, esse link dava
+// "venceu ou já foi usado" já na primeira vez para todo @ com ponto (02/10, relato do dono).
+function lerLinkDeSenha(token) {
+  const partes = String(token || '').trim().split('.');
+  if (partes.length < 3) return { usuario: '', motivo: 'invalido' };
+  const firma = partes.pop();
+  const vence = partes.pop();
   let usuario;
-  try { usuario = decodeURIComponent(nome); } catch { return ''; }
-  if (!CONTAS.achar(usuario)) return '';
-  return iguais(firma, firmaDoLink(nome, vence, usuario)) ? usuario : '';
+  try { usuario = decodeURIComponent(partes.join('.')); } catch { return { usuario: '', motivo: 'invalido' }; }
+  if (!CONTAS.achar(usuario) || !/^\d+$/.test(vence)) return { usuario: '', motivo: 'invalido' };
+  if (!iguais(firma, firmaDoLink(paraCracha(usuario), vence, usuario))) return { usuario: '', motivo: 'invalido' };
+  if (!(Number(vence) > Date.now())) return { usuario: '', motivo: 'venceu' };
+  return { usuario, motivo: '' };
 }
+const ERRO_LINK = {
+  venceu: 'esse link venceu: ele vale por 1 hora. Peça outro',
+  invalido: 'esse link não vale mais: a senha já foi trocada com ele, ou ele foi copiado pela metade. Peça outro',
+};
 
 // Sem e-mail configurado, o pedido fica anotado para o dono ver no painel e mandar o link à
 // mão. Guarda só o @ e quando pediu, e some em 7 dias ou quando o link é gerado.
@@ -1100,12 +1116,20 @@ const servidor = createServer(async (req, res) => {
       return;
     }
 
+    // GET: a página do link confere se ele vale antes de pedir a senha nova, sem gastar nada.
+    if (rota === '/api/redefinir-senha' && req.method === 'GET') {
+      if (!podeTentar(ip)) { json(res, 429, MUITAS); return; }
+      const { usuario, motivo } = lerLinkDeSenha(url.searchParams.get('token'));
+      if (!usuario) { anotarErro(ip); json(res, 410, { erro: ERRO_LINK[motivo], motivo }); return; }
+      json(res, 200, { ok: true, usuario });
+      return;
+    }
     if (rota === '/api/redefinir-senha') {
       if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
       if (!podeTentar(ip)) { json(res, 429, MUITAS); return; }
       const { token, senha } = await lerJson(req);
-      const usuario = donoDoLink(token);
-      if (!usuario) { anotarErro(ip); json(res, 410, { erro: 'esse link venceu ou já foi usado. Peça outro' }); return; }
+      const { usuario, motivo } = lerLinkDeSenha(token);
+      if (!usuario) { anotarErro(ip); json(res, 410, { erro: ERRO_LINK[motivo], motivo }); return; }
       try {
         await CONTAS.trocarSenha(usuario, senha);
       } catch (e) {
