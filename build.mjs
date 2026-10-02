@@ -28,6 +28,22 @@ conteudo.conhecer = { ...conhecer, perguntas: perguntasHonestas };
 // O que a pessoa vê antes de ler nos primeiros dias (o mapa da história, o contexto do dia, o
 // "procure", o gancho de amanhã e os guias dos trechos de lista): CC.D.primeirosDias.
 conteudo.primeirosDias = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'primeiros-dias.json'), 'utf8'));
+// As palavras de cada trecho na NBV, a tradução padrão: é daí que sai a estimativa de tempo
+// honesta de cada dia (CC.minutosDoDia, a 200 palavras por minuto). "Cerca de 10 min" no dia 2,
+// que tem 5, fazia o segundo dia parecer tão pesado quanto o primeiro.
+{
+  const arquivoNbv = join(AQUI, 'conteudo', 'biblias', 'nbv.json');
+  const livros = existsSync(arquivoNbv) ? JSON.parse(readFileSync(arquivoNbv, 'utf8')).livros : null;
+  if (livros) {
+    for (const d of conteudo.plano) {
+      for (const t of d.trechos || []) {
+        let n = 0;
+        for (let c = t.de; c <= t.ate; c++) for (const v of (livros[t.livro] || [])[c - 1] || []) n += String(v).split(/\s+/).filter(Boolean).length;
+        t.palavras = n;
+      }
+    }
+  }
+}
 dados = JSON.stringify(conteudo);
 console.log('conhecer jesus:', conteudo.conhecer.dias.length, 'dias ·', conteudo.conhecer.perguntas.length, 'perguntas honestas');
 console.log('primeiros dias:', Object.keys(conteudo.primeirosDias.dias).length, 'dias com contexto ·', Object.keys(conteudo.primeirosDias.guias).length, 'guias de leitura');

@@ -83,9 +83,11 @@ O código de saída é 1 quando algum dia parou no meio (`erroFatal` no relatór
   "Reavivar hoje", que já leva à lição, e é esse que ele toma.
 - **Palavras até o texto** soma as palavras das telas distintas que a pessoa atravessou (o que
   estava escrito, não o que ela leu de fato). Compare com o que o texto bíblico tem.
-- **O que o app prometeu × leu de fato**: a lição diz "cerca de N min" (`CC.minutosDoDia`, 4 min
-  por capítulo arredondado a 5, em `src/app/03-trilha.js`; no Conhecer, 6 versículos por minuto em
-  `05b-conhecer.js`). O relatório conta as palavras do leitor e estima a 200 palavras/min.
+- **O que o app prometeu × leu de fato**: a lição diz "cerca de N min" (`CC.minutosDoDia` em
+  `src/app/03-trilha.js`: desde 02/10/2026, as palavras do trecho na NBV, que o build grava em
+  `trechos[i].palavras`, a 200 por minuto; antes eram 4 min por capítulo arredondado a 5, e o dia 2
+  prometia 10 tendo 5; no Conhecer, 6 versículos por minuto em `05b-conhecer.js`). O relatório conta
+  as palavras do leitor e estima a 200 palavras/min: promessa e leitura devem bater.
 - **Erros** são exceções, `console.error`, entradas de erro do log e respostas 4xx/5xx. O aviso do
   `navigator.vibrate` (clique sintético não é gesto da pessoa) já sai filtrado: é do ambiente.
 
@@ -115,8 +117,8 @@ feito (commit "Primeiros dias: nada entre a conta criada e o texto bíblico"):
 | conhecer | 1 | 8 toques + 5 campos | 10 toques + 5 campos | 0 | as mesmas 2 | 225 |
 | conhecer | 2 | 2 toques | 4 toques | 0 | 0 | 184 |
 
-Dia 1 do plano: Gênesis 1-3 + Mateus 1, 2480 palavras no leitor (uns 12 min), e o app promete
-"cerca de 10 min" + "cerca de 5 min". A promessa fecha; o custo está antes dela.
+Dia 1 do plano: Gênesis 1-3 + Mateus 1, 2480 palavras no leitor (uns 12 min); o app prometia
+"cerca de 10 min" + "cerca de 5 min" e agora promete 9 + 3. O custo está antes dela.
 
 ## 5. O mapa da jornada (para andar à mão ou estender o script)
 

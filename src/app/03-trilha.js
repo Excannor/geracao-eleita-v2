@@ -28,9 +28,15 @@
   const passagemDe = (dia) => [dia.antigo, dia.novo].filter(Boolean).join(' · ');
   CC.passagemDe = passagemDe;
 
-  // Uma estimativa honesta de tempo: uns 4 minutos por capítulo, arredondado para 5.
+  // Uma estimativa honesta de tempo: as palavras do trecho na NBV (o build grava t.palavras) a
+  // 200 por minuto, nunca menos de 3. Sem a contagem, uns 4 minutos por capítulo, arredondado
+  // para 5. Antes era só a segunda regra, e o dia 2 (5 min de verdade) prometia 10.
+  CC.PALAVRAS_POR_MINUTO = 200;
   CC.minutosDoDia = (dia) => {
-    const capitulos = (dia.trechos || []).reduce((s, t) => s + (t.ate - t.de + 1), 0);
+    const trechos = dia.trechos || [];
+    const palavras = trechos.reduce((s, t) => s + (t.palavras || 0), 0);
+    if (palavras) return Math.max(3, Math.round(palavras / CC.PALAVRAS_POR_MINUTO));
+    const capitulos = trechos.reduce((s, t) => s + (t.ate - t.de + 1), 0);
     return Math.max(5, Math.round((capitulos * 4) / 5) * 5);
   };
 

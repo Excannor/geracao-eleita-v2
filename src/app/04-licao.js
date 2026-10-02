@@ -434,6 +434,19 @@
     for (const l of c.livros.slice(0, 2)) item('<span class="arte-livro">' + CC.ico('livro') + '</span>', 'Você terminou ' + CC.esc(l) + '!', 'Fica marcado em Livros da Bíblia', 'livro');
     if (c.unidade) item(CC.arte.trofeu(u.cor, true), 'Unidade ' + u.numero + ' concluída!', CC.esc(u.titulo), 'unidade');
     if (CC.temBau(sessao.dia) && !CC.bauAberto(sessao.dia)) item(CC.arte.bau('pronto', 'madeira'), 'O baú do dia ' + sessao.dia + ' está pronto', 'Abra na trilha para ver o que tem dentro', 'bau');
+    // O segundo dia seguido é o que mais decide: merece a sua própria festa, pequena.
+    if (subiuHoje && seq.atual === 2) item('<span class="arte-volta">' + CC.ico('broto') + '</span>', 'Você voltou!', 'Voltar no dia seguinte é a parte mais difícil. Você voltou.', 'volta');
+    // O gancho de amanhã: a passagem, o tempo de verdade e uma frase do que vem (escrita para os
+    // primeiros dias; depois, o título da reflexão do dia seguinte). Sem isto o dia terminava em
+    // "Até amanhã" sem dizer o que amanhã tem.
+    const proximoDia = D.plano[sessao.dia];
+    if (proximoDia && !CC.leu(proximoDia.numero)) {
+      const ctxHoje = CC.contextoDoDia ? CC.contextoDoDia(sessao.dia) : null;
+      const escritaAmanha = CC.reflexaoEscrita ? CC.reflexaoEscrita(proximoDia.numero) : null;
+      const gancho = (ctxHoje && ctxHoje.amanha) || (escritaAmanha && escritaAmanha.titulo ? escritaAmanha.titulo + '.' : '');
+      item('<span class="arte-amanha">' + CC.ico('avancar') + '</span>',
+        'Amanhã: ' + CC.esc(CC.colarRef(CC.passagemDe(proximoDia))) + ', uns ' + CC.minutosDoDia(proximoDia) + ' min', CC.esc(gancho), 'amanha');
+    }
     const feitas = c.missoes.lista.filter((m) => m.feita).length;
     item(CC.arte.bau(feitas === c.missoes.lista.length ? 'aberto' : 'travado', feitas === c.missoes.lista.length ? 'madeira' : ''),
       'Desafios do dia: ' + feitas + ' de ' + c.missoes.lista.length, feitas === c.missoes.lista.length ? 'Todos feitos' : '<a href="#/missoes" data-ver-desafios>Ver os desafios</a>', 'desafios');
@@ -490,8 +503,15 @@
   // Amigos no resumo: quem também leu hoje, e um botão pequeno para encorajar quem ainda não
   // leu. Nada de número de dias ao lado de um zero, nem ação principal empurrando a cobrar.
   function pintarAmigosDoResumo(alvo, c) {
-    const amigos = (c.amigos && c.amigos.amigos) || [];
-    if (!amigos.length) { alvo.innerHTML = ''; return; }
+    if (!c.amigos) { alvo.innerHTML = ''; return; }
+    const amigos = c.amigos.amigos || [];
+    // Sem amigo ainda: o convite de Juntos aqui mesmo, no fim do dia, que é quando se chama
+    // alguém. "Com seus amigos" é a promessa da entrada, e nada nos primeiros dias a cumpria.
+    if (!amigos.length) {
+      alvo.innerHTML = '<div class="amigos-resumo"><button class="botao contorno pequeno" data-chamar>' + CC.ico('pessoas') + 'Chamar alguém para ler junto</button></div>';
+      alvo.querySelector('[data-chamar]').onclick = () => { if (CC.convidar) CC.convidar(); };
+      return;
+    }
     for (const a of amigos) CC.anotarProposito(a.dias);
     const leram = amigos.filter((a) => a.leuHoje);
     if (leram.length) CC.marcarNoDiario('juntos');

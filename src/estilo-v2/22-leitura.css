@@ -250,3 +250,10 @@
 .leitor-guia .botao { justify-self: start; width: auto; min-height: 44px; margin: 0; padding: 0 16px 0 18px; background: var(--cartao); font-size: .875rem; }
 .leitor-guia .botao svg { width: 16px; height: 16px; }
 
+/* ---------- o resumo: o gancho de amanhã e o "você voltou" do segundo dia ---------- */
+.destaque-dia.amanha { background: var(--realce); }
+.arte-destaque > .arte-amanha, .arte-destaque > .arte-volta { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; }
+.arte-destaque > .arte-amanha { background: var(--salvia); color: var(--salvia-tinta); }
+.arte-destaque > .arte-volta { background: var(--salvia-palido); color: var(--salvia-texto); }
+.arte-destaque > .arte-amanha svg, .arte-destaque > .arte-volta svg { width: 22px; height: 22px; }
+.amigos-resumo .botao { width: auto; }
