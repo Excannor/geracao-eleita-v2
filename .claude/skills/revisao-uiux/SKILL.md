@@ -213,3 +213,23 @@ Configurações; a entrada sem conta. O resto conforme o que mudou (a tabela de 
 - Dados semeados valem para o dia da semeadura: noutro dia, apague a pasta e semeie de novo.
 - Chrome sem interface: `foto-conta.mjs` e `cdp.mjs` silenciam o convite de notificações e o
   tutorial de instalar por padrão; para ver essas folhas use `jornada-usuario`.
+
+## 8. Padrões de interação já decididos (revisão do dia, 02/10)
+
+- **Ação do dia e navegação não se misturam.** Nada de links sublinhados soltos entre o conteúdo e
+  o botão principal. O que é ação sobre o conteúdo mora na peça dele (escrever fica no cartão do
+  versículo, no lugar de "Nota", e se chama "Escrever" ou "Escrever mais" em todo lugar); o que
+  leva a outra tela é uma linha de navegação com ícone, nome, contagem e seta (›), alvo de 44px
+  ou mais ("Ir mais fundo · 38 notas ›"); o que leva a outro dia só aparece no fim ("Ler o dia N",
+  no pé da última etapa).
+- **Link dentro de parágrafo é `.link-inline`** (inline, sem caixa, `line-height: inherit`): o
+  `.link-nota` tem `min-height: 44px` e `inline-flex`, e dentro de um parágrafo desce a linha.
+- **Escolha parece escolha.** Botão com `aria-pressed` que a pessoa escolhe tem indicador (o
+  círculo à esquerda, cheio quando escolhido) e borda/fundo sálvia no escolhido; o que não se
+  escolhe não pode ter a mesma cara (frases de oração viram linhas de texto, sem cartão).
+- **Etapa vencida encolhe para um lembrete** (o que a pessoa escolheu), com um botão
+  `aria-expanded` para abrir de novo.
+- **Ícone figurativo se confere no tamanho de uso** (20px no círculo e no botão), não só
+  ampliado; se o traço não se lê pequeno, silhueta cheia (como chama, coroa e as mãos de orar).
+- **A lição se fotografa rolando o `.licao-palco`** em pedaços do tamanho da janela; aumentar a
+  janela até caber tudo muda o layout (faixa vazia em cima) e não é o que a pessoa vê.

@@ -203,6 +203,26 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   segmentado → nomes com mais de 12 letras a 14px, segmentado a 13px abaixo de 375px; o
   `teste-mapas` confere os dois testamentos a 360px (largura dentro da célula, uma linha só).
 
+## Revisão do dia (Guardar, Pensar, Orar)
+
+- 2026-10-02 · captura · Para fotografar a lição inteira, aumentei a janela até caber o palco: a
+  tela saiu com uma faixa vazia de 230px em cima, porque a lição se ajusta à altura da janela e
+  aquilo não é o que a pessoa vê → a lição se fotografa rolando o `.licao-palco` em pedaços do
+  tamanho da janela (740px de CSS a 2x = 1480px), com o topo e o pé fixos em cada pedaço
+  (`scratchpad/revdia/cap-festa.mjs`).
+- 2026-10-02 · ícone · As mãos postas em traço (de frente ou de lado) pareciam foguete, árvore ou
+  rabisco a 20px, embora a 200px até lembrassem mãos → ícone figurativo pequeno se confere no
+  tamanho de uso (20px no círculo e no botão), não só ampliado; quando o traço não se lê, a
+  silhueta cheia (como a chama e a coroa) resolve. Ficou a silhueta das mãos de lado.
+- 2026-10-02 · teste · O primeiro teste de "Ler a nota sem caixa" comparava o `display`
+  computado do botão com "inline" e falhou, embora a tela estivesse certa (botão não se comporta
+  como um span) → testar pelo efeito que importa: a altura do botão não passa de uma linha do
+  parágrafo (com o `min-height` de 44px, passava).
+- 2026-10-02 · commits · Fiz as três partes da tarefa de uma vez e só depois separei os commits
+  (links, pensar, orar), montando à mão as versões intermediárias e rodando os testes em cada
+  uma → quando a tarefa pede um commit por parte, fechar cada parte (tela, teste, commit) antes
+  de começar a próxima; sai mais barato que separar no fim.
+
 ## Geral
 
 - 2026-10-02 · commits · Os commits c92ad24, e2176c2, 268e381 e 6db8e95 (Mapa do livro: checador,

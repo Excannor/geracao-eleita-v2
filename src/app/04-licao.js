@@ -298,6 +298,9 @@
   // O título da etapa leva o ícone dela, no mesmo círculo sálvia dos passos do topo.
   const tituloEtapa = (etapa, texto) => '<h2 class="titulo-etapa"><span class="ico-etapa">' + CC.ico(ICONE_ETAPA[etapa]) + '</span>'
     + '<span>' + CC.esc(texto) + '</span></h2>';
+  // As frases de oração terminam em reticências: é um começo para a pessoa completar.
+  const comReticencias = (f) => (/(…|\.\.\.)$/.test(f) ? f : f + '…');
+  const semReticencias = (f) => f.replace(/\s*(…|\.\.\.)$/, '');
 
   function telaFesta(dia) {
     const lido = CC.leu(sessao.dia);
@@ -313,7 +316,7 @@
     const encolhida = etapa === 'orar';
     const textoPergunta = (p) => (Array.isArray(p) ? p[1] : p);
 
-    const avancar = { guardar: ['Pensar sobre isso', 'lupa'], pensar: ['Transformar em oração', 'aperto'], orar: ['Terminar', 'certo'] }[etapa];
+    const avancar = { guardar: ['Pensar sobre isso', 'lupa'], pensar: ['Transformar em oração', 'maos'], orar: ['Terminar', 'certo'] }[etapa];
 
     return {
       corpo: '<div class="festa"><div class="cabeca-licao">'
@@ -368,10 +371,13 @@
             + '<span>' + (escolhida >= 0 ? 'Ver a reflexão e as perguntas' : 'Ver as perguntas') + '</span>' + CC.ico('baixo') + '</button>'
           : '')
         + '</section>'
-        // orar: começos de frase para a pessoa completar, nunca uma oração pronta
-        + '<section class="etapa-reflexao" data-etapa-bloco="orar"' + (etapa === 'orar' ? '' : ' hidden') + '>'
-        + '<h2>Ore com as suas palavras</h2>'
-        + '<ul class="oracao-guia">' + r.oracao.map((frase) => '<li>' + CC.esc(frase) + '</li>').join('') + '</ul>'
+        // orar: começos de frase para a pessoa completar, nunca uma oração pronta. Tocar numa
+        // frase abre a escrita da oração já começando por ela.
+        + '<section class="etapa-reflexao painel-orar" data-etapa-bloco="orar"' + (etapa === 'orar' ? '' : ' hidden') + '>'
+        + tituloEtapa('orar', 'Ore com as suas palavras')
+        + '<p class="dica-orar">Toque numa frase para começar a escrever por ela.</p>'
+        + '<ul class="oracao-guia">' + r.oracao.map((frase, i) => '<li><button class="frase-oracao" data-frase-oracao="' + i + '">'
+          + '<span>' + CC.esc(comReticencias(frase)) + '</span>' + CC.ico('caneta') + '</button></li>').join('') + '</ul>'
         + '<div class="pe-duplo-plano"><button class="botao contorno" data-orar-escrevendo>' + CC.ico('caneta') + 'Escrever</button>'
         + '<button class="botao plano" data-orei>Orei</button></div>'
         + '<p class="amem" hidden>Amém!</p>'
@@ -387,13 +393,16 @@
           sair();
           setTimeout(() => CC.rolarAteAtual(true), 120);
         };
+        const irPara = (bloco, suave) => {
+          const alvo = document.querySelector('.licao [data-etapa-bloco="' + bloco + '"]');
+          if (alvo) requestAnimationFrame(() => alvo.scrollIntoView({ block: 'start', behavior: suave && !CC.semMovimento() ? 'smooth' : 'auto' }));
+        };
         el.querySelector('[data-avancar]').onclick = () => {
           const i = ETAPAS.indexOf(etapa);
           if (i < ETAPAS.length - 1) {
             sessao.etapaReflexao = ETAPAS[i + 1];
             desenhar();
-            const bloco = document.querySelector('.licao [data-etapa-bloco="' + sessao.etapaReflexao + '"]');
-            if (bloco) requestAnimationFrame(() => bloco.scrollIntoView({ block: 'start', behavior: CC.semMovimento() ? 'auto' : 'smooth' }));
+            irPara(sessao.etapaReflexao, true);
             return;
           }
           terminar();
@@ -429,17 +438,25 @@
         }
         const notaReflexao = el.querySelector('[data-nota-reflexao]');
         if (notaReflexao) notaReflexao.onclick = () => CC.folhaNota(r.idNota);
-        el.querySelector('[data-orar-escrevendo]').onclick = () => {
+        const escreverOracao = (frase) => {
           sessao.modo = 'oracao';
           sessao.escolheu = true;
           sessao.dicaOracao = r.oracao.join('\n');
+          sessao.frasePronta = frase || '';
+          sessao.voltarPara = 'orar';
           ir('escrever');
         };
+        el.querySelector('[data-orar-escrevendo]').onclick = () => escreverOracao('');
+        el.querySelectorAll('[data-frase-oracao]').forEach((b) => {
+          b.onclick = () => escreverOracao(semReticencias(r.oracao[Number(b.dataset.fraseOracao)]) + ' ');
+        });
         el.querySelector('[data-orei]').onclick = (ev) => {
           ev.currentTarget.disabled = true;
           CC.marcarOrei();
           el.querySelector('.amem').hidden = false;
         };
+        // de volta da escrita da oração: a tela reabre na etapa de orar, e não no alto
+        if (sessao.voltarPara && etapa === 'orar') { const b = sessao.voltarPara; sessao.voltarPara = ''; irPara(b, false); }
       },
     };
   }
@@ -642,6 +659,11 @@
     const r = CC.registro(sessao.dia);
     if (r.o || r.i || r.a) sessao.modo = sessao.modo === 'oracao' && !sessao.escolheu ? 'oia' : sessao.modo;
     const campos = sessao.modo === 'oia' ? ['o', 'i', 'a', 'oracao'] : ['oracao'];
+    // Tocar numa frase de oração abre aqui com ela já escrita, depois do que já havia.
+    const frase = sessao.modo === 'oracao' ? (sessao.frasePronta || '') : '';
+    const valor = (chave) => (chave === 'oracao' && frase
+      ? ((r.oracao || '').trim() ? r.oracao.trimEnd() + '\n\n' : '') + frase
+      : r[chave] || '');
     // A nota do versículo do dia (feita nos leitores) continua à mão aqui, onde se escreve.
     const refDoDia = CC.reflexaoDoDia(sessao.dia).ref;
     const temNotaVerso = !!(refDoDia && CC.anotacao(CC.versiculos.chaveNota(refDoDia)).trim());
@@ -659,7 +681,7 @@
           return '<div class="campo"><label for="campo-' + chave + '">' + rotulo + '</label>'
             + '<span class="dica-campo">' + dica + '</span>'
             + '<textarea id="campo-' + chave + '" data-campo="' + chave + '" placeholder="' + CC.esc(chave === 'oracao' && sessao.dicaOracao ? sessao.dicaOracao : exemplo) + '"'
-            + (campos.length === 1 ? ' class="alto"' : '') + '>' + CC.esc(r[chave] || '') + '</textarea></div>';
+            + (campos.length === 1 ? ' class="alto"' : '') + '>' + CC.esc(valor(chave)) + '</textarea></div>';
         }).join('')
         + (temNotaVerso ? '<p class="nota-do-verso">' + CC.ico('caneta') + '<span>Você tem uma nota em ' + nb(CC.esc(refDoDia)) + '. '
           + '<button class="link-inline" data-nota-do-verso>Ver a nota</button></span></p>' : ''),
@@ -671,15 +693,28 @@
             const atual = { ...CC.registro(sessao.dia) };
             atual[ta.dataset.campo] = ta.value;
             CC.gravarRegistro(sessao.dia, atual);
+            if (ta.dataset.campo === 'oracao') sessao.frasePronta = '';
             if (salvo) salvo.innerHTML = CC.ico('certo') + 'Salvo';
           });
         });
+        // com a frase já escrita, o cursor vai para o fim dela (depois do foco no título)
+        const campoOracao = el.querySelector('#campo-oracao');
+        if (frase && campoOracao) {
+          setTimeout(() => {
+            if (!campoOracao.isConnected) return;
+            campoOracao.focus({ preventScroll: true });
+            const fim = campoOracao.value.length;
+            campoOracao.setSelectionRange(fim, fim);
+            campoOracao.scrollTop = campoOracao.scrollHeight;
+          }, 0);
+        }
         const notaVerso = el.querySelector('[data-nota-do-verso]');
         if (notaVerso) notaVerso.onclick = () => CC.versiculos.abrirNota(refDoDia, null, () => desenhar());
         el.querySelectorAll('[data-modo]').forEach((b) => {
           b.onclick = () => { sessao.modo = b.dataset.modo; sessao.escolheu = true; desenhar(); };
         });
         el.querySelector('[data-pronto]').onclick = () => {
+          sessao.frasePronta = '';
           if (CC.temRegistro(sessao.dia)) CC.avisar('Guardado');
           ir('festa');
         };

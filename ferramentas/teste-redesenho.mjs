@@ -218,10 +218,25 @@ await clicar('[data-abrir-pensar]');
 ok(await av(q('[data-abrir-pensar]') + '.getAttribute("aria-expanded") === "true" && getComputedStyle(' + q('#pensar-inteiro') + ').display !== "none"'),
   'abrir pensar de novo mostra a reflexão e as perguntas');
 await clicar('[data-abrir-pensar]');
+ok(await av(existe('.painel-orar .titulo-etapa .ico-etapa svg') + ' && /Ore com as suas palavras/.test(' + q('.painel-orar h2') + '.textContent)'),
+  'orar tem painel próprio, com o ícone das mãos no título');
+ok(await av('[...document.querySelectorAll(".painel-orar .frase-oracao")].length === 3 && [...document.querySelectorAll(".frase-oracao")].every((b) => /…$/.test(b.textContent.trim()))'),
+  'as frases de oração são botões, uma por linha, terminando em reticências');
 await dormir(900);
 await foto('4d-orar');
 await clicar('[data-orei]');
 ok(await esperar(existe('.amem:not([hidden])')) && await av('CC.xpTotal() === 10'), '"Orei" responde com amém e não vale XP');
+// tocar numa frase abre a escrita da oração já começando por ela, com o cursor no fim
+const frase0 = await av('CC.reflexaoDoDia(1).oracao[0].replace(/\\s*(…|\\.\\.\\.)$/, "")');
+await clicar('[data-frase-oracao="0"]');
+ok(await esperar(existe('#campo-oracao') + ' && ' + q('#campo-oracao') + '.value.startsWith(' + JSON.stringify(frase0) + ')'),
+  'tocar numa frase abre a escrita com a frase já escrita');
+await dormir(200);
+ok(await av('document.activeElement === ' + q('#campo-oracao') + ' && ' + q('#campo-oracao') + '.selectionStart === ' + q('#campo-oracao') + '.value.length'),
+  'o cursor fica no fim da frase');
+ok(await av('!CC.temRegistro(1)'), 'a frase sozinha não vira registro antes de a pessoa escrever');
+await clicar('[data-pronto]');
+ok(await esperar(existe('[data-etapa-bloco="orar"]:not([hidden])')), 'depois da frase, a revisão volta para a etapa de orar');
 await clicar('[data-orar-escrevendo]');
 // Comparado com a oração do próprio dia, não com um texto fixo: cada dia tem a sua desde
 // que as reflexões deixaram de ser as mesmas para todo texto do mesmo gênero.
