@@ -160,12 +160,28 @@
     background: var(--cartao); color: var(--tinta); font-family: inherit; font-size: 0.92rem; font-weight: 700; cursor: pointer; }
   .opcao-caminho[aria-pressed="true"] { border-color: var(--azul); background: var(--azul-fraco); color: var(--forte); }
   :focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+  .faixa-fora { display: grid; gap: 10px; margin: 0 0 14px; padding: 14px 16px; border-radius: 20px;
+    background: var(--inverso); color: var(--inverso-tinta); font-weight: 700; font-size: .92rem; line-height: 1.45; }
+  .faixa-fora p { margin: 0; }
+  .faixa-fora-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .faixa-fora .botao { min-height: 44px; padding: 8px 12px; background: var(--inverso-tinta); color: var(--inverso); font-size: .9rem; }
+  .faixa-fora .botao.contorno { background: transparent; color: var(--inverso-tinta); border-color: var(--inverso-tinta); }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 <style>/*ESTILO_V2*/</style>
 </head>
 <body>
 <main>
+<!-- Navegador de dentro de outro app (Instagram, Facebook, WebView): dali não se instala. No
+     Android a página tenta abrir no Chrome sozinha, uma vez por aba, e a faixa fica com o botão
+     (muitos desses navegadores só deixam sair com um toque); no iPhone, o botão do Safari. -->
+<div class="faixa-fora" id="faixa-fora" role="region" aria-label="Abrir no navegador" hidden>
+  <p id="faixa-fora-texto"></p>
+  <div class="faixa-fora-botoes">
+    <a class="botao" id="faixa-fora-abrir" href="#"></a>
+    <button class="botao contorno" type="button" id="faixa-fora-copiar">Copiar o link</button>
+  </div>
+</div>
   <!-- boas-vindas: a porta de entrada, com cara própria (redesenho de 01/10). O carimbo em
        pincel continua o protagonista e idêntico; em volta dele flutuam as peças do jogo do
        app (chama, baú, troféu, Bíblia, o visto do dia), e embaixo vem o mural de
@@ -414,6 +430,41 @@
   // android-app://<pacote>. Fica guardado nesta aba: o tutorial de instalar (07c-instalar.js)
   // manda abrir no Chrome, porque ali dentro o menu não tem "Instalar app".
   try { if (/^android-app:\/\//.test(document.referrer)) sessionStorage.setItem('cc.origemApp', document.referrer); } catch (e) { /* segue */ }
+
+  // Navegador de dentro de outro app (WebView com "; wv)", Instagram, Facebook, TikTok...): dali
+  // não dá para instalar, e o Chrome não oferece o atalho. No Android, tenta abrir esta mesma
+  // página no Chrome (intent://), uma vez por aba: sem o Chrome, o Android volta para o endereço
+  // de reserva, que é esta página, e a marca impede o laço. No iPhone, só o botão do Safari.
+  // O mesmo teste do userAgent mora em 07c-instalar.js (CC.navegadorProvavel).
+  (function () {
+    var ua = navigator.userAgent || '';
+    var ios = /iPhone|iPad|iPod/i.test(ua);
+    var embutido = /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|TikTok|musical_ly|Snapchat|Pinterest|LinkedInApp|Twitter/i.test(ua)
+      || (/Android/i.test(ua) && (/; ?wv\)/.test(ua) || /Version\/\d+(\.\d+)* Chrome\/[\d.]+ Mobile/.test(ua)));
+    if (!embutido) return;
+    var resto = location.host + location.pathname + location.search;
+    var abrir = $('faixa-fora-abrir');
+    if (ios) {
+      abrir.href = 'x-safari-' + location.protocol.replace(':', '') + '://' + resto;
+      abrir.textContent = 'Abrir no Safari';
+      $('faixa-fora-texto').textContent = 'Você está no navegador de outro app. Para instalar o Geração Eleita, abra no Safari: no iPhone, só ele coloca o app na Tela de Início.';
+    } else {
+      abrir.href = 'intent://' + resto + '#Intent;scheme=' + location.protocol.replace(':', '')
+        + ';package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(location.href) + ';end';
+      abrir.textContent = 'Abrir no Chrome';
+      $('faixa-fora-texto').textContent = 'Você está no navegador de outro app. Para instalar o Geração Eleita, abra no Chrome.';
+      var tentou = '';
+      try { tentou = sessionStorage.getItem('cc.tentouChrome') || ''; sessionStorage.setItem('cc.tentouChrome', '1'); } catch (e) { tentou = '1'; }
+      if (!tentou) setTimeout(function () { location.href = abrir.href; }, 300);
+    }
+    $('faixa-fora-copiar').addEventListener('click', function () {
+      var link = location.href.split('#')[0];
+      var feito = function () { $('faixa-fora-copiar').textContent = 'Link copiado'; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(feito, function () { window.prompt('Copie o link:', link); });
+      else window.prompt('Copie o link:', link);
+    });
+    $('faixa-fora').hidden = false;
+  })();
   // O app guardado no aparelho manda para cá quem está sem a marca de sessão (cc_logado) e
   // deixa a nota cc.semMarca. Se a sessão ainda vale (quem entrou antes de a marca existir), o
   // servidor já devolveu a marca na resposta desta página: volta direto ao app, no mesmo

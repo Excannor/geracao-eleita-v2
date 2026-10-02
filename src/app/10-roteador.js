@@ -650,6 +650,10 @@
     // original: ela mandava quem usa o V2, que mora justamente em ge.off-sec.net, abrir e instalar
     // o geracaoeleita.app, que é o outro app. Saiu: no V2, este é o endereço do app.)
 
+    // Aberto no navegador de dentro do Instagram/Facebook/WebView: "Abra no Chrome/Safari"
+    // (07c-instalar.js), uma vez por aba. Num navegador de verdade, nada.
+    if (CC.talvezAbrirNoNavegador) await CC.talvezAbrirNoNavegador();
+
     const celula = new URLSearchParams(location.search).get('celula');
     if (celula) {
       history.replaceState(null, '', location.pathname + (location.hash || '#/'));

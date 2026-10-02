@@ -144,11 +144,13 @@
   const NOME = { ios: 'iPhone', android: 'Android' };
   const NOME_NAVEGADOR = { chrome: 'Chrome', samsung: 'Samsung Internet', firefox: 'Firefox', edge: 'Edge', safari: 'Safari' };
 
-  // O link que abre esta mesma página no Chrome do Android (padrão intent:// do Android). Sem
-  // o Chrome instalado, o próprio Android cai no endereço normal.
-  const linkDoChrome = () => 'intent://' + location.host + location.pathname
+  // O link que abre esta mesma página no Chrome do Android (padrão intent:// do Android), com a
+  // busca (?convite=...) junto. Sem o Chrome instalado, o Android volta ao endereço de reserva.
+  const linkDoChrome = () => 'intent://' + location.host + location.pathname + location.search
     + '#Intent;scheme=' + location.protocol.replace(':', '') + ';package=com.android.chrome;S.browser_fallback_url='
-    + encodeURIComponent(location.origin + location.pathname) + ';end';
+    + encodeURIComponent(location.href.split('#')[0]) + ';end';
+  // No iPhone, o navegador de dentro do Instagram/Facebook abre o Safari por x-safari-https://.
+  const linkDoSafari = () => 'x-safari-' + location.protocol.replace(':', '') + '://' + location.host + location.pathname + location.search;
 
   // Uma linha para quem ajuda a pessoa (ou o dono, num print): o que o app enxerga daqui.
   CC.diagnosticoInstalar = () => {
@@ -190,7 +192,7 @@
 
   // Abre o tutorial e resolve quando ele fecha, por qualquer caminho: pular, pronto,
   // toque fora ou Esc. Assim a partida do app espera por ele antes de abrir outra folha.
-  CC.tutorialInstalar = function ({ contaNova = false } = {}) {
+  CC.tutorialInstalar = function ({ contaNova = false, fora = false } = {}) {
     return new Promise((resolver) => {
       const { folha, fechar } = CC.folha('', { classe: 'folha-instalar', rolavel: true, rotulo: 'Instalar no celular' });
       const cortina = folha.parentNode;
@@ -290,13 +292,15 @@
         folha.innerHTML = fala(contaNova)
           + '<h2>Abra no ' + (ios ? 'Safari' : 'Chrome') + '</h2>'
           + '<p>' + (app ? 'Você abriu o link pelo ' + app + '. ' : 'Você está no navegador de outro app. ')
-          + 'Daqui não dá para instalar: abra no ' + (ios ? 'Safari' : 'Chrome') + ' e entre com o mesmo @usuário e senha.</p>'
+          + 'Daqui não dá para instalar: abra no ' + (ios ? 'Safari' : 'Chrome') + ' e entre com o mesmo @usuário e senha.'
+          + (ios ? ' No iPhone, só o Safari coloca o app na Tela de Início.' : '') + '</p>'
           + listaPassos(ios
             ? [['menu', 'Toque nos três pontinhos', 'Ou no ícone de compartilhar do app.'], ['navegador', 'Abrir no Safari', 'Ou "Abrir no navegador".']]
             : [['menu', 'Toque nos três pontinhos', 'Ficam no canto de cima, à direita.'], ['sair', 'Abrir no Chrome', 'Ou "Abrir no navegador". Lá, o menu tem "Instalar app".']])
           + '<div class="acoes">'
-          + (ios ? '' : '<a class="botao" data-abrir-chrome href="' + CC.esc(linkDoChrome()) + '">Abrir no Chrome</a>')
-          + '<button class="botao' + (ios ? '' : ' contorno') + '" data-copiar-link>Copiar o link</button>'
+          + (ios ? '<a class="botao" data-abrir-safari href="' + CC.esc(linkDoSafari()) + '">Abrir no Safari</a>'
+            : '<a class="botao" data-abrir-chrome href="' + CC.esc(linkDoChrome()) + '">Abrir no Chrome</a>')
+          + '<button class="botao contorno" data-copiar-link>Copiar o link</button>'
           + botaoFechar
           + '</div>'
           + ajuda(ios ? 'safari' : 'chrome');
@@ -336,6 +340,7 @@
       };
 
       const comecar = async () => {
+        if (fora) { abrirFora(); return; }
         if (pedidoInstalar && !CC.rodandoComoApp()) { umToque(); return; }
         if (!CC.rodandoComoApp() && await CC.jaInstalado()) { instalado(); return; }
         const sistema = sistemaProvavel() || (contaNova ? '' : lembrado());
@@ -344,5 +349,26 @@
       };
       comecar().then(() => folha.focus());
     });
+  };
+
+  // Chegou ao app (já com sessão) pelo navegador de dentro de outro app: no Android, tenta abrir
+  // no Chrome sozinho, uma vez por aba (a página de entrada faz o mesmo); depois, nos dois
+  // sistemas, a folha "Abra no Chrome/Safari", também uma vez por aba. Quem está num navegador
+  // de verdade (Chrome, Samsung Internet, Firefox, Edge, Safari) nunca é empurrado: lá ele instala.
+  CC.talvezAbrirNoNavegador = async () => {
+    if (CC.navegadorProvavel() !== 'embutido' || CC.rodandoComoApp()) return;
+    if (sistemaProvavel() === 'android') {
+      let tentou = '1';
+      try { tentou = sessionStorage.getItem('cc.tentouChrome') || ''; sessionStorage.setItem('cc.tentouChrome', '1'); } catch (e) { /* segue */ }
+      if (!tentou) location.href = linkDoChrome();
+    }
+    // Conta recém-criada não vê folha antes do texto bíblico: o tutorial do fim do primeiro dia
+    // já abre em "Abra no Chrome/Safari" (abrirFora), e a faixa da entrada já avisou.
+    let nova = false;
+    try { nova = localStorage.getItem('cc.instalar') === '1'; } catch (e) { /* segue */ }
+    if (nova || document.querySelector('.cortina, .tela-cheia')) return;
+    let visto = '1';
+    try { visto = sessionStorage.getItem('cc.folhaFora') || ''; sessionStorage.setItem('cc.folhaFora', '1'); } catch (e) { /* segue */ }
+    if (!visto) await CC.tutorialInstalar({ fora: true });
   };
 })(window.CC);

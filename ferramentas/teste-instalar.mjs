@@ -337,6 +337,84 @@ await caso('Já instalado no Android', { ua: UA.chrome, pre: 'Object.definePrope
   ok(/já está instalado/.test(texto) && !(await av('!!document.querySelector(".folha-instalar [data-instalar-ja]")')), nome + ': diz que já está instalado e não oferece instalar');
 });
 
+// ---------- abrir no navegador certo, já na página de entrada ----------
+// Dentro do WebView/Instagram/Facebook do Android, a entrada tenta abrir no Chrome sozinha
+// (intent://, uma vez por aba) e mostra a faixa "abra no Chrome" com o botão e "Copiar o link";
+// no iPhone, só o botão do Safari (x-safari-https://), sem nada automático; num navegador de
+// verdade, nem faixa nem salto. FOTOS=<pasta> guarda uma captura por navegador.
+console.log('\n  Abrir no navegador certo\n');
+UA.edge = 'Mozilla/5.0 (Linux; Android 14; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36 EdgA/129.0.0.0';
+UA.facebook = 'Mozilla/5.0 (Linux; Android 14; SM-A546E Build/UP1A; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/129.0.0.0 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/480.0.0.0;]';
+UA.tiktok = 'Mozilla/5.0 (Linux; Android 14; SM-A546E; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/129.0.0.0 Mobile Safari/537.36 musical_ly_2023 BytedanceWebview/d8a21c6';
+const FOTOS = process.env.FOTOS ? join(process.cwd(), process.env.FOTOS) : '';
+const { mkdirSync, writeFileSync } = await import('node:fs');
+async function naEntrada(nome, ua, { cookie = '', rota = '/entrar.html?convite=abc' } = {}) {
+  const c = await abrir({ cookie, base: base + '/', largura: 360, altura: 800, pre: SEM_AVISO });
+  const saltos = [];
+  const excecoes = [];
+  c.ouvir('Page.frameRequestedNavigation', (p) => { if (!/^https?:/.test(p.url)) saltos.push(p.url); });
+  c.ouvir('Runtime.exceptionThrown', (p) => excecoes.push(p.exceptionDetails?.exception?.description || p.exceptionDetails?.text));
+  await c.cmd('Page.enable');
+  await c.cmd('Emulation.setUserAgentOverride', { userAgent: ua });
+  if (cookie) await c.cmd('Network.setCookie', { name: 'cc_logado', value: '1', url: base + '/' });
+  await c.cmd('Page.navigate', { url: base + rota });
+  await dormir(cookie ? 4500 : 1800);
+  const ver = () => c.av(`(() => { const f = document.getElementById('faixa-fora'); const a = document.getElementById('faixa-fora-abrir');
+    const folha = document.querySelector('.folha-instalar');
+    return { faixa: !!f && !f.hidden, texto: f && !f.hidden ? f.innerText : '', href: a ? a.getAttribute('href') : '', folha: folha ? folha.innerText : '',
+      folhaHref: folha && folha.querySelector('[data-abrir-chrome], [data-abrir-safari]') ? folha.querySelector('[data-abrir-chrome], [data-abrir-safari]').getAttribute('href') : '' }; })()`);
+  const r = await ver();
+  if (FOTOS) {
+    mkdirSync(FOTOS, { recursive: true });
+    const f = await c.cmd('Page.captureScreenshot', { format: 'jpeg', quality: 78 });
+    writeFileSync(join(FOTOS, nome + '.jpg'), Buffer.from(f.data, 'base64'));
+  }
+  // Recarregar na mesma aba: o salto não se repete (sem laço quando o Chrome não existe).
+  const antes = saltos.length;
+  await c.cmd('Page.reload');
+  await dormir(cookie ? 4500 : 1800);
+  r.repetiu = saltos.length > antes;
+  r.saltos = saltos.slice(0, antes);
+  r.depois = await ver();
+  r.excecoes = excecoes;
+  await c.fechar();
+  return r;
+}
+const intentCerto = (u, rota) => new RegExp('^intent://127\\.0\\.0\\.1:\\d+' + rota.replace(/[?.]/g, '\\$&') + '#Intent;scheme=http;package=com\\.android\\.chrome;S\\.browser_fallback_url=http%3A%2F%2F127\\.0\\.0\\.1%3A\\d+' + encodeURIComponent(rota).replace(/[.]/g, '\\.') + ';end$').test(u);
+for (const [nome, ua, app] of [['webview-android', UA.webview, ''], ['instagram-android', UA.instagram, 'Instagram'], ['facebook-android', UA.facebook, ''], ['tiktok-android', UA.tiktok, '']]) {
+  const r = await naEntrada(nome, ua);
+  ok(r.faixa && /abra no Chrome/.test(r.texto) && /Copiar o link/.test(r.texto), nome + ': a faixa "Para instalar o Geração Eleita, abra no Chrome", com o botão e Copiar o link');
+  ok(intentCerto(r.href, '/entrar.html?convite=abc'), nome + ': o botão é o intent:// do Chrome, com a busca (?convite) e o endereço de volta (' + r.href.slice(0, 70) + '...)');
+  ok(r.saltos.length === 1 && r.saltos[0] === r.href, nome + ': ao carregar, tenta abrir no Chrome sozinha, uma vez');
+  ok(!r.repetiu && r.depois.faixa, nome + ': recarregar na mesma aba não tenta de novo (sem laço), e a faixa continua');
+  ok(r.excecoes.length === 0, nome + ': nenhuma exceção' + (r.excecoes[0] ? ': ' + r.excecoes[0] : ''));
+}
+{
+  const r = await naEntrada('instagram-iphone', UA.iphoneInsta);
+  ok(r.faixa && /Safari/.test(r.texto) && /Tela de Início/.test(r.texto), 'instagram-iphone: a faixa manda abrir no Safari e diz que só ele põe na Tela de Início');
+  ok(/^x-safari-http:\/\/127\.0\.0\.1:\d+\/entrar\.html\?convite=abc$/.test(r.href), 'instagram-iphone: o botão é x-safari-http(s):// com a mesma página (' + r.href + ')');
+  ok(r.saltos.length === 0 && !r.repetiu, 'instagram-iphone: nada automático');
+}
+for (const [nome, ua] of [['chrome-android', UA.chrome], ['samsung-internet', UA.samsung], ['firefox-android', UA.firefox], ['edge-android', UA.edge], ['safari-iphone', UA.iphone]]) {
+  const r = await naEntrada(nome, ua);
+  ok(!r.faixa && r.saltos.length === 0 && !r.repetiu, nome + ': navegador de verdade: sem faixa e sem salto para outro navegador');
+}
+// Já com sessão, aberto por um link no navegador de dentro de outro app.
+{
+  const r = await naEntrada('app-webview-logado', UA.webview, { cookie: cracha, rota: '/' });
+  ok(r.saltos.length === 1 && /^intent:\/\/127\.0\.0\.1:\d+\/#Intent;/.test(r.saltos[0]), 'app com sessão no WebView: tenta abrir no Chrome, uma vez');
+  ok(/Abra no Chrome/.test(r.folha) && /^intent:\/\//.test(r.folhaHref) && /Copiar o link/.test(r.folha), 'app com sessão no WebView: a folha "Abra no Chrome" com o botão e Copiar o link');
+  ok(!r.repetiu && !/Abra no Chrome/.test(r.depois.folha), 'app com sessão no WebView: recarregar não repete o salto nem a folha');
+}
+{
+  const r = await naEntrada('app-instagram-iphone-logado', UA.iphoneInsta, { cookie: cracha, rota: '/' });
+  ok(r.saltos.length === 0 && /Abra no Safari/.test(r.folha) && /^x-safari-http:\/\//.test(r.folhaHref), 'app com sessão no Instagram do iPhone: a folha "Abra no Safari", sem salto automático');
+}
+{
+  const r = await naEntrada('app-chrome-logado', UA.chrome, { cookie: cracha, rota: '/' });
+  ok(r.saltos.length === 0 && !/Abra no/.test(r.folha), 'app com sessão no Chrome do Android: nada de mandar abrir em outro navegador');
+}
+
 console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  o tutorial de instalar funciona\n');
 try { servidor.kill(); } catch { /* ok */ }
 try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
