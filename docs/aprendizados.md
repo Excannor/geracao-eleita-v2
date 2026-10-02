@@ -234,6 +234,38 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   interface (scrollY fica 0, sem erro) → rolar com `Input.dispatchTouchEvent` (touchStart, vários
   touchMove, touchEnd) e conferir que a página rolou antes de concluir que algo ficou parado.
 
+- 2026-10-02 · amigos · "Fulano já leu hoje" é real (o servidor calcula com as datas de leitura
+  do amigo, no fuso dele), mas o cache de amigos ficava na memória sem data: com o app em segundo
+  plano, depois da meia-noite, a folha ainda dizia "já leu hoje" de ontem; a volta do segundo
+  plano recarregava os amigos e não repintava a trilha, e uma recarga que falhava deixava o cache
+  velho → todo cache de dado "de hoje" guarda o dia em que veio e, noutro dia, os campos do dia
+  valem "ainda não"; quem recarrega ao voltar repinta o que mostra esse dado.
+- 2026-10-02 · teste · `document.dispatchEvent(new Event('visibilitychange'))` não chega a quem
+  ouve na `window` (o evento de verdade borbulha; o criado à mão, não) e o teste da volta do
+  segundo plano "falhou" com o app certo → evento simulado com `{ bubbles: true }`.
+- 2026-10-02 · amigos · No letreiro, o observador de interseção avisa de novo a cada captura de
+  tela (e em toda mudança de layout), e cada aviso zerava a espera de 3s: o nome nunca trocava
+  enquanto alguém mexia na página → um temporizador de troca só recomeça quando estava parado;
+  aviso repetido com o mesmo estado não mexe nele.
+- 2026-10-02 · amigos · Com menos movimento, "Aime, Bruna e mais 4 já leram hoje" com três fotos
+  saiu com reticências a 360px → a linha parada usa duas fotos e pode quebrar em duas linhas (não
+  troca, então não pula); o teste confere que nenhum texto do letreiro está cortado a 360px.
+- 2026-10-02 · aviso · O aviso flutuante saía em três linhas, numa pílula enorme, porque
+  `left: 50%` + `translateX(-50%)` deixa só metade da tela para a largura pelo conteúdo, e o
+  `max-width: 90vw` não ajudava → elemento fixo centralizado com `left`/`right` + `width:
+  fit-content` + `margin: auto`; raio de 20px (pílula só serve para uma linha); animações no eixo
+  vertical, sem depender do translateX.
+- 2026-10-02 · juntos · O anel de "já leu hoje" (box-shadow 5px para fora da foto) saía achatado
+  em cima: a roda rola de lado, e `overflow-x: auto` também corta em cima e embaixo; o respiro de
+  4px era margem, fora da caixa que corta → todo enfeite que passa da peça numa faixa rolável
+  precisa de espaço interno (padding) do tamanho dele; e a ponta da faixa ganha um esmaecido no
+  espaço vazio, para o item cortado na borda parecer "tem mais", não um erro.
+- 2026-10-02 · desenho · O tronco de "Isaías e Cristo" tinha as raízes até x=14 (60 de distância
+  do centro) e o papel do tronco aberto embaixo: no disco, as raízes saíam cortadas e o papel
+  branco virava uma caixa → medir a distância de cada ponta ao centro (60,60) antes de entregar
+  (até uns 50, com o traço, para sobrar respiro dentro do raio 54) e não dar papel a contorno
+  aberto.
+
 ## Revisão do dia (Guardar, Pensar, Orar)
 
 - 2026-10-02 · captura · Para fotografar a lição inteira, aumentei a janela até caber o palco: a

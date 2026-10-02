@@ -256,3 +256,17 @@ ou `?celula=<token>`, uma conta antiga sem perfil completo, "Marcar como lido" e
 "Pular por hoje" na reflexão), copie a função, troque os seletores da seção 5 e registre cada ação
 com `toque(sel, nome)`, `digitar(sel, valor, nome)` ou `registrar(nome)`. Mantenha o padrão de
 contar o toque mais brando nas interrupções, para os números continuarem comparáveis.
+
+## 10. Sessão e página de entrada (regra do dono, 02/10)
+
+- **Quem não tem sessão nunca vê nada do app.** O service worker serve "/" do cache sem passar
+  pelo servidor; por isso o servidor põe e tira, junto com o crachá HttpOnly, a marca
+  `cc_logado=1` (mesma validade, sem segredo), e o primeiro script do `index.html` confere a
+  marca antes de pintar. Ferramenta que põe só o `cc_sessao` no navegador funciona: a primeira
+  resposta do servidor devolve a marca. Para simular sessão vencida, apague os dois cookies;
+  crachá derrubado (marca ainda lá) cai no 401 e o servidor limpa os dois.
+- Mexeu em entrada, sessão, service worker ou páginas avulsas: rode
+  `CHROME=... node ferramentas/teste-fluxo-entrada.mjs` (um perfil só, como o celular, com espião
+  de quadros: conta se algum quadro do app foi pintado sem sessão).
+- Evento simulado de volta do segundo plano: `new Event('visibilitychange', { bubbles: true })`
+  (o app ouve na `window`); sem `bubbles`, nada acontece e o teste mente.

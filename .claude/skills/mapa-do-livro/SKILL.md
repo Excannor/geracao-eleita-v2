@@ -118,7 +118,9 @@ entrar. Renderize ampliado (280px ou mais) e confira:
 - partes ligadas onde deveriam estar (cabeça no corpo, cacho no ramo, pena tocando o rolo);
 - dá para dizer o que é sem legenda;
 - o desenho de "[Livro] e Cristo" fica sobre um disco: tudo cabe num círculo de raio 54 em volta
-  de (60,60), senão a borda corta (a escada de Gênesis cortou o chão e a pedra).
+  de (60,60), senão a borda corta (a escada de Gênesis cortou o chão e a pedra). Meça: a
+  distância de cada ponta ao centro, somando o traço, fica em uns 50 para sobrar respiro (as
+  raízes do tronco de Isaías iam a 60 e saíam cortadas; corrigido em 02/10).
 - encaixes calculados, não chutados: cabo que toca o galho e a fruta, pé que nasce no bojo da
   panela (ponto tirado da curva); traço que não representa nada sai.
 - papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de

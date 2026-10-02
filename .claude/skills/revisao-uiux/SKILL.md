@@ -233,3 +233,25 @@ Configurações; a entrada sem conta. O resto conforme o que mudou (a tabela de 
   ampliado; se o traço não se lê pequeno, silhueta cheia (como chama, coroa e as mãos de orar).
 - **A lição se fotografa rolando o `.licao-palco`** em pedaços do tamanho da janela; aumentar a
   janela até caber tudo muda o layout (faixa vazia em cima) e não é o que a pessoa vê.
+
+## 9. Regras que vieram de erros (fluxo de entrada e detalhes, 02/10)
+
+- **Elemento fixo centrado** (aviso flutuante, botão solto): `left`/`right` com a margem da tela,
+  `width: fit-content` e `margin: auto`. Nunca `left: 50%` + `translateX(-50%)` com largura pelo
+  conteúdo: sobra só meia tela para o texto. Caixa que pode ter duas linhas não usa raio de
+  pílula (999px); 18 a 20px serve para uma e para duas. Confira os textos mais longos que passam
+  pela peça (`grep` nas chamadas) a 360 e 390px.
+- **Faixa que rola de lado** (`overflow-x: auto`) também corta em cima e embaixo: anel, sombra
+  ou selo que passa da peça precisa de espaço interno (padding) do tamanho dele, não margem. O
+  item cortado na borda ganha pista (esmaecido de ~28px nas pontas, caindo no padding vazio).
+- **Barra presa no alto** (sticky/fixed): altura fixa, nada trocado por rolagem, sem transform
+  nem backdrop-filter; a página em volta não usa `100dvh` (muda com a barra de endereço) e o que
+  anima logo abaixo dela é camada própria (`will-change: transform`), sem repintar filtro a cada
+  quadro. Prova: `ferramentas/teste-fluxo-entrada.mjs` rola com toque a 390 e 360 (densidade 3)
+  e exige a barra igual ao pixel.
+- **Letreiro / texto que troca sozinho**: altura fixa, só opacidade e um deslize curto, quem
+  sai some antes de quem entra aparecer; pausa fora da tela, com a aba oculta e enquanto o dedo
+  segura; um temporizador que só recomeça parado (aviso repetido do observador não zera a
+  espera); com menos movimento, parado; leitor de tela com um texto fixo, sem `aria-live`.
+- **Dado "de hoje" em cache** (leu hoje, toque de hoje) guarda o dia em que veio; noutro dia vale
+  "ainda não", e quem recarrega na volta do segundo plano repinta o que mostra o dado.
