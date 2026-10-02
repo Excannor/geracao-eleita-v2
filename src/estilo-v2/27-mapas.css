@@ -1,0 +1,151 @@
+/* =========================================================================
+   REDESENHO V2 · 27-mapas
+   Mapa do livro: a grade dos 66 no Explorar e a tela de cada mapa (#/mapa/<slug>).
+   Referência aprovada pelo dono: design/mapas/mock-isaias.dc.html (a tela inteira de Isaías) e
+   design/mapas/ilustracoes-isaias.html (os desenhos). Fichas de 00-tokens.css, nada de cor
+   literal que valha só num tema. Nunca mire o carimbo em pincel (.selo-*).
+
+   Os desenhos (SVG embutidos no JSON de cada mapa) usam cinco classes de traço: .k contorno,
+   .h hachura, .p papel, .s sálvia, .e cheio. As cores vêm de --mapa-tinta, --mapa-papel e
+   --mapa-cheio, que seguem o tema: tinta escura sobre papel branco no claro, traço claro sobre
+   grafite no escuro. Dentro do cartão "[Livro] e Cristo" (escuro no claro), o desenho fica sobre
+   um disco de papel claro.
+
+   Os rótulos em maiúsculas espaçadas e os nomes no pincel (Permanent Marker) são a regra da
+   skill do mapa (.claude/skills/mapa-do-livro/SKILL.md), aprovada com o mock.
+   ========================================================================= */
+
+/* ---------- a grade dos 66 no Explorar ---------- */
+.mapas-dica { margin: -4px 0 4px; }
+.grupo-mapas { margin: 18px 0 8px; padding: 0 4px; color: var(--salvia-texto); font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.grade-mapas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.celula-mapa {
+  position: relative; display: flex; flex-direction: column; justify-content: center; gap: 1px;
+  min-height: 56px; padding: 9px 36px 9px 14px; border-radius: 18px;
+  background: var(--v2-cartao); color: var(--v2-tinta-forte); text-decoration: none;
+}
+.celula-mapa.breve { padding-right: 14px; background: none; box-shadow: inset 0 0 0 1.5px var(--contorno); color: var(--v2-tinta-fraca); }
+.celula-mapa small { color: var(--v2-tinta-fraca); font-size: .75rem; font-weight: 700; }
+/* o nome nunca quebra no meio da palavra: o tamanho (20, 17 ou 15px) vem do comprimento */
+.nome-mapa { font-family: 'Permanent Marker', cursive; font-weight: 400; line-height: 1.15; white-space: nowrap; overflow-wrap: normal; word-break: keep-all; hyphens: none; }
+.marca-mapa { position: absolute; top: 50%; right: 10px; display: grid; place-items: center; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; color: var(--v2-tinta-fraca); }
+.marca-mapa svg { width: 16px; height: 16px; }
+.celula-mapa.lido .marca-mapa { background: var(--salvia); color: var(--salvia-tinta); }
+.celula-mapa.lido .marca-mapa svg { width: 13px; height: 13px; stroke-width: 3; }
+.cartao-mapas { margin-bottom: 16px; }
+
+/* ---------- a tela do mapa: a folha do alto ---------- */
+/* Como a .folha-perfil: sobe por trás do topo do app e os dois viram uma peça só. */
+.folha-mapa {
+  --cartao: var(--folha-campo); --campo: var(--folha-campo);
+  --tinta-forte: var(--folha-tinta); --tinta: var(--folha-tinta); --tinta-fraca: var(--folha-tinta-fraca);
+  display: flex; flex-direction: column; gap: 16px;
+  margin: -52px -16px 0; padding: 40px 16px 22px; border-radius: 0 0 36px 36px;
+  background: var(--folha); color: var(--folha-tinta);
+}
+.mapa-barra { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mapa-barra .botao-redondo { flex: none; width: 44px; height: 44px; min-width: 44px; background: var(--folha-campo); color: var(--folha-tinta); }
+.mapa-barra-titulo { color: var(--folha-tinta); font-size: .9375rem; font-weight: 800; }
+.mapa-cabeca { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; }
+.mapa-cabeca-nome { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mapa-grupo, .mapa-capitulos span { color: var(--folha-tinta-fraca); font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+/* o nome no pincel; quando não cabe na coluna, o JS encolhe a letra até caber */
+.mapa-nome { margin: 0; color: var(--folha-tinta); font-family: 'Permanent Marker', cursive; font-size: 64px; font-weight: 400; letter-spacing: 0; line-height: 1.05; white-space: nowrap; }
+.mapa-ordem { color: var(--folha-tinta-fraca); font-size: .875rem; font-weight: 700; }
+.mapa-capitulos { display: flex; flex-direction: column; align-items: flex-end; padding-bottom: 4px; }
+.mapa-capitulos b { color: var(--folha-tinta); font-size: 54px; font-weight: 800; line-height: .9; font-variant-numeric: tabular-nums; }
+/* nome comprido (Deuteronômio, 2 Tessalonicenses): os capítulos descem para baixo do nome */
+.mapa-cabeca.longo { grid-template-columns: minmax(0, 1fr); }
+.mapa-cabeca.longo .mapa-nome { font-size: 40px; }
+.mapa-cabeca.longo .mapa-capitulos { flex-direction: row; align-items: baseline; gap: 6px; padding: 0; }
+.mapa-cabeca.longo .mapa-capitulos b { font-size: 28px; }
+
+/* ---------- o corpo: blocos ligados por setas pontilhadas ---------- */
+.mapa { --mapa-tinta: var(--v2-tinta-forte); --mapa-papel: var(--v2-cartao); --mapa-cheio: var(--v2-tinta); display: flex; flex-direction: column; }
+.seta { display: block; flex: none; max-width: 100%; }
+.seta .pontos { fill: none; stroke: var(--v2-tinta-forte); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 0.1 7; }
+.seta .ponta { fill: none; stroke: var(--v2-tinta-forte); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.mapa-bloco { display: flex; flex-direction: column; gap: 6px; color: var(--v2-tinta); font-size: .9375rem; line-height: 1.55; }
+.mapa-bloco p { margin: 0; text-wrap: pretty; }
+.mapa-rotulo { display: flex; align-items: center; gap: 8px; color: var(--v2-tinta-forte); font-size: .875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.mapa-rotulo svg { flex: none; width: 20px; height: 20px; }
+.mapa mark { padding: 1px 6px; border-radius: 6px; background: var(--folha); color: var(--folha-tinta); font-size: .875em; font-weight: 800; white-space: nowrap; }
+.mapa-significado { max-width: 300px; }
+.mapa-original { color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: 1.125rem; }
+.mapa-textos { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.mapa-autoria { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 12px; align-items: center; }
+
+.desenho { display: block; flex: none; width: 112px; height: 112px; }
+.desenho svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.mapa-autoria .desenho, .mapa-cristo .desenho { width: 96px; height: 96px; }
+.desenho .k { fill: none; stroke: var(--mapa-tinta); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.desenho .h { fill: none; stroke: var(--mapa-tinta); stroke-width: 1; stroke-linecap: round; opacity: .7; }
+.desenho .p { fill: var(--mapa-papel); }
+.desenho .s { fill: var(--salvia); }
+.desenho .e { fill: var(--mapa-cheio); }
+
+.mapa-raiz { gap: 10px; padding: 20px 18px; border: 2px dashed var(--v2-tinta-forte); border-radius: var(--raio-cartao); background: var(--v2-cartao); }
+.mapa-raiz-texto { color: var(--v2-tinta-forte); font-family: var(--fonte-biblia); font-size: 1.1875rem; line-height: 1.5; }
+
+/* os ramos: desenho de um lado, nome no pincel do outro, alternando */
+.mapa-ramos-titulo { display: flex; align-items: baseline; justify-content: space-between; padding: 0 2px 6px; }
+.mapa-ramos-titulo span:first-child { color: var(--v2-tinta-forte); font-size: .875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.mapa-ramos-titulo span:last-child { color: var(--v2-tinta-fraca); font-size: .75rem; font-weight: 700; }
+.mapa-ramo-cabeca { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; align-items: center; }
+.lado-dir .mapa-ramo-cabeca { grid-template-columns: minmax(0, 1fr) 112px; }
+.lado-dir .mapa-ramo-cabeca .desenho { order: 2; }
+.mapa-ramo-textos { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mapa-ramo-rotulo { color: var(--salvia-texto); font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.mapa-ramo-nome { color: var(--v2-tinta-forte); font-family: 'Permanent Marker', cursive; font-size: 26px; line-height: 1.15; text-wrap: balance; }
+.mapa-ramo-sub { color: var(--v2-tinta-fraca); font-size: .8125rem; }
+.mapa-galhos, .mapa-curiosidades, .mapa-estrutura { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0 0 0 20px; color: var(--v2-tinta); font-size: .9375rem; line-height: 1.5; }
+.mapa-galhos { margin-top: 8px; }
+.mapa-galhos li, .mapa-curiosidades li, .mapa-estrutura li { text-wrap: pretty; }
+/* o destaque "é Jesus": escuro no claro; no escuro, o cartão com a borda sálvia */
+.mapa-jesus { margin: 6px 0 0 -20px; padding: 14px 16px; border-radius: 18px; background: var(--v2-inverso); color: var(--v2-inverso-tinta); font-weight: 600; list-style: none; }
+.mapa-jesus mark, .mapa-cristo mark { background: var(--salvia); color: var(--salvia-tinta); }
+:root[data-tema="escuro"] .mapa-jesus { background: var(--v2-cartao); color: var(--v2-tinta); box-shadow: inset 0 0 0 2px var(--salvia); }
+:root[data-tema="escuro"] .mapa-jesus mark { background: var(--folha); color: var(--folha-tinta); }
+
+/* a conexão entre dois ramos: a curva desce primeiro e cruza depois; o texto fica no canto
+   que ela deixa livre. A altura é acertada pelo JS pelo tamanho do texto. */
+.mapa-conexao { position: relative; height: 150px; }
+.mapa-conexao .seta { position: absolute; inset: 0; }
+.mapa-ligacao { position: absolute; top: 0; width: 52%; margin: 0; color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: .875rem; font-style: italic; line-height: 1.4; text-wrap: pretty; }
+.mapa-ligacao.dir { right: 0; }
+.mapa-ligacao.esq { left: 0; }
+
+/* "[Livro] e Cristo": cartão escuro no claro, com o desenho sobre um disco de papel; no
+   escuro, cartão grafite com a borda sálvia e o desenho no traço do tema */
+.mapa-cristo { gap: 14px; padding: 20px; border-radius: var(--raio-cartao); background: var(--v2-inverso); color: var(--v2-inverso-tinta); }
+.mapa-cristo-cabeca { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; align-items: center; }
+.mapa-cristo .desenho { border-radius: 50%; background: var(--v2-fundo); }
+.mapa-rotulo-claro { color: var(--salvia); font-size: .875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.mapa-cristo .mapa-textos > span:last-child { font-size: .9375rem; line-height: 1.5; }
+.mapa-pares { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 10px 12px; padding-top: 12px; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); font-size: .875rem; line-height: 1.45; }
+.mapa-par-at { color: var(--salvia); font-weight: 800; }
+.mapa-par-texto { font-family: var(--fonte-biblia); }
+.mapa-par-nt { font-size: .75rem; font-weight: 700; opacity: .8; }
+:root[data-tema="escuro"] .mapa-cristo { background: var(--v2-cartao); color: var(--v2-tinta); box-shadow: inset 0 0 0 2px var(--salvia); }
+:root[data-tema="escuro"] .mapa-cristo .desenho { background: none; }
+:root[data-tema="escuro"] .mapa-rotulo-claro, :root[data-tema="escuro"] .mapa-par-at { color: var(--salvia-texto); }
+:root[data-tema="escuro"] .mapa-cristo mark { background: var(--folha); color: var(--folha-tinta); }
+
+/* a estrutura: partes já lidas no plano em cinza com o visto, a atual em negrito com "você está aqui" */
+.mapa-estrutura { padding-left: 22px; line-height: 1.45; }
+.mapa-estrutura li.lida { color: var(--v2-tinta-fraca); }
+.mapa-estrutura li svg { display: inline-block; width: 14px; height: 14px; margin-right: 4px; vertical-align: -1px; stroke-width: 3; }
+.mapa-estrutura li.aqui { color: var(--v2-tinta-forte); font-weight: 800; }
+.mapa-aqui { display: inline-block; padding: 3px 8px; border-radius: 999px; background: var(--v2-inverso); color: var(--folha); font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; vertical-align: 1px; }
+:root[data-tema="escuro"] .mapa-aqui { color: var(--v2-inverso-tinta); }
+
+.mapa-procure { gap: 8px; padding: 20px; border-radius: var(--raio-cartao); background: var(--salvia-palido); }
+.mapa-procure-texto { color: var(--v2-tinta-forte); font-family: var(--fonte-biblia); font-size: 1.125rem; line-height: 1.45; }
+.mapa-ler { margin-top: 20px; }
+
+@media (max-width: 374px) {
+  .mapa-nome { font-size: 56px; }
+  .mapa-capitulos b { font-size: 48px; }
+  .mapa-ramo-nome { font-size: 24px; }
+  .celula-mapa { padding-left: 12px; }
+}

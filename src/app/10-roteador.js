@@ -49,6 +49,8 @@
     // O Explorar não é mais aba própria: mora dentro do Mais, mas continua marcando o Mais
     // como selecionado enquanto a pessoa está nele (ver maisSelecionado, abaixo).
     explorar: '#/explorar', secao: '#/explorar', nota: '#/explorar', busca: '#/explorar',
+    // O mapa de cada livro mora no Explorar (decisão do dono, 02/10): a Bíblia não muda.
+    mapa: '#/explorar',
     // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
     // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
     conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
@@ -414,6 +416,7 @@
     else if (rota === 'secao') CC.vistaSecao(conteudo, arg, consulta ? decodeURIComponent(consulta) : '');
     else if (rota === 'nota') CC.vistaNota(conteudo, arg);
     else if (rota === 'busca') CC.vistaBusca(conteudo, arg);
+    else if (rota === 'mapa') CC.vistaMapa(conteudo, arg);
     else if (rota === 'conhecer') CC.vistaConhecer(conteudo);
     else if (rota === 'perguntas') (arg ? (r) => CC.vistaPergunta(r, arg) : CC.vistaPerguntas)(conteudo);
     else if (rota === 'seguir') CC.vistaSeguir(conteudo);

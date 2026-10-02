@@ -299,11 +299,15 @@
       + (terminou && D.notas[HISTORIA] ? '<a class="cartao cartao-historia" href="#/nota/' + encodeURIComponent(HISTORIA) + '">'
         + CC.ico('livro') + '<span><b>A história da Bíblia em uma página</b>'
         + '<span class="passo-dica">Veja o todo antes das partes.</span></span>' + CC.ico('avancar') + '</a>' : '')
+      // O mapa do livro de hoje (ou o atalho para a grade dos 66, lá embaixo): 06b-mapas.js.
+      + CC.cartaoMapas()
       + blocos
+      + CC.secaoMapas()
       + (conhecendo ? '' : (terminou ? comece : ''))
       + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
     CC.inseparavel(raiz);
     CC.ligarBusca(raiz);
+    CC.ligarMapas(raiz);
     const cartaoComece = raiz.querySelector('[data-comece]');
     if (cartaoComece) cartaoComece.addEventListener('toggle', () => { comeceAberto = cartaoComece.open; });
   };
