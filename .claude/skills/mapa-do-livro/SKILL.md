@@ -52,6 +52,11 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    Palavra de lugar, de gênero e de retomada também: "em Jerusalém" quando o versículo ainda é na
    estrada (Mc 11.10), "o salmo" quando o texto só diz "Escrituras", "outro grito" num item que não
    traz o primeiro (vira "um grito").
+   Palavra de recorte também: "só", "o primeiro", "o último", "do capítulo X em diante" se
+   conferem nos versículos vizinhos e contando no livro ("só Calebe e Josué entrarão" esquecia
+   os filhos de Nm 14.31; o "último dia" de Nm 29.32 não era o último, há o oitavo em 29.35).
+   Lei em curiosidade fica no presente da ordem ("a lei manda", "quem faz o voto não come"),
+   nunca no imperfeito de costume ("servia", "entrava").
 5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
    sequência; um relato retrospectivo (Mt 14.3-12, a morte de João) se conta no passado. "O livro
    abre com" e "fecha com" só com o primeiro e o último versículo de verdade.
@@ -85,7 +90,8 @@ do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua"
 - **Ramos:** de 4 a 6 pilares, cada um com nome curto e forte e uma linha de subtítulo (até uns
   30 caracteres, para caber numa linha ao lado do desenho a 390px) que resuma o ramo inteiro,
   não só um galho. O nome no pincel cabe numa linha com até uns 16 caracteres ("Santos no dia a
-  dia", com 19, quebrou; virou "Vida santa"). Nada de pronome com hífen no
+  dia", com 19, quebrou; virou "Vida santa"); confira a 360px, porque "O povo abençoado", com 16,
+  cabia a 390 e quebrou a 360 (virou "Povo abençoado"). Nada de pronome com hífen no
   fim de frase ("odiá-lo"): a linha quebra no hífen.
 - **Ramificações:** de 3 a 6 por ramo, cada uma com a referência no fim.
 - **Conexões:** entre um ramo e o seguinte, uma frase que mostra o raciocínio do autor bíblico
@@ -108,7 +114,9 @@ grupo (Profetas maiores...), o nome, "Livro N de 66" e o número de capítulos.
 Antes de entregar o texto:
 - `grep -n -i -E "—|mergulh|crucial|fundamental|\bdança\b|em resumo|vale ressaltar|\bteia\b|jornada|multifacet"` não acha nada
   (com `\b`: sem ele, "plateia" acusa "teia");
-- cada referência foi conferida na Bíblia do app (`conteudo/biblias`);
+- cada referência foi conferida na Bíblia do app (`conteudo/biblias`), lendo a folha de
+  `node ferramentas/rever-mapa.mjs <slug>`, que põe cada item ao lado do texto da NBV das
+  referências dele: sujeito, verbo, número, lugar, quantas vezes e se é ordem ou fato;
 - nenhum item começa igual ao anterior, e nenhuma palavra se repete na mesma frase ("No barco,
   as ondas inundam o barco");
 - nenhuma palavra com hífen sobrando no texto (`grep -o -E '[[:alpha:]]+-[[:alpha:]]+' <mapa>.json`
@@ -163,13 +171,22 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   dentro de um cesto ou vasilha desce até abaixo da borda da frente, que o cobre (base reta na
   altura da borda parece tampa). Peça apoiada em outra (a moeda em pé sobre a deitada) tem a base calculada dentro da
   face de cima, não em cima da borda.
+- folha de cacho fica ao lado do talo, nunca sobre as uvas, e o talo encosta na primeira uva; flor
+  se desenha com pétalas (cinco elipses em volta de um miolo cheio) na ponta de um galho reto:
+  círculos viram frutinhas e galho curvo vira gancho (a vara de Números). Correia de arreio fecha
+  na argola e a outra ponta morre num contorno (ponto tirado da curva; rédea que sai do desenho
+  e acaba no ar é ponta solta), e linha que sai de um ponto do contorno abre ângulo largo com ele (senão vira cunha
+  cheia). Área sálvia dentro de outra peça vai só com `.s`, sem traço (com `.k`, vira uma orelha
+  dentro da outra). Animal em busto fica com o pescoço aberto embaixo: o papel fecha sem traço.
+  Nada que o versículo não traga: a serpente de Nm 21.8 está num "poste", sem trave.
 - papel (`.p`) só dentro de um contorno do objeto: um retângulo de papel para esconder parte de
   uma peça vira caixa branca sobre o fundo cinza da página (o barco de Mateus). Para pôr o casco
   dentro da água, o fundo do casco é a própria curva da onda (pontos tirados da curva).
 - confira as três linhas do `ver-desenhos` e também o desenho na tela de verdade: o fundo da
   folha do `ver-desenhos` é branco como o papel e esconde esse defeito.
 `CHROME=... node ferramentas/ver-desenhos.mjs <saida.png> <id...>` mostra cada desenho a 280px no
-claro, no escuro e sobre o disco; olhe a imagem com Read.
+claro, no escuro e sobre o disco; olhe a imagem com Read. Depois rode de novo com `TAMANHO=520`,
+um ou dois desenhos por vez: ponta solta, cunha e peça sobreposta só aparecem nesse tamanho.
 Depois, renderize a tela inteira a 390px e confira cada seta: a ponta aponta para o bloco certo,
 a curva não cruza texto, a conexão escrita não encosta na linha pontilhada. Confira nos dois
 temas: no escuro o desenho vira traço claro sobre papel grafite (as classes de traço seguem o
@@ -270,7 +287,8 @@ desce quando o mapa abre e fica guardado pelo service worker para abrir sem rede
   dentro do `node teste.mjs`. `CHROME=... node ferramentas/teste-mapas.mjs` abre tudo no
   navegador: o cartão (abre e fecha no lugar, testamentos, ordem, 44px, 360px), a ficha, o mapa, setas e desenhos, nenhuma curva cruzando o texto da conexão, 390 e
   360px, os dois temas, a Bíblia igual, sem rede; e passa por todo mapa do índice conferindo
-  ramos, desenhos, setas, curvas fora do texto e largura a 390 e 360px. As capturas de referência ficam em
+  ramos, desenhos, setas, curvas fora do texto, largura e o nome de cada ramo numa linha só a 390,
+  375 e 360px (os nomes antigos que já quebravam ficam numa lista de exceções, como aviso). As capturas de referência ficam em
   `design/mapas/capturas/` (Explorar com o cartão fechado e aberto e cada mapa inteiro, claro e
   escuro, a 390px; o "antes" de um pacote de ajustes vai numa subpasta, como `antes-pacote/`).
 

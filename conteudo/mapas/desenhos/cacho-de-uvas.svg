@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o cacho de Escol (Nm 13.23): tão grande que ia pendurado numa vara entre dois homens.
+     A vara atravessa o alto, cortada nas pontas; uma amarra prende o talo, a folha sai de lado
+     (fora do cacho) e as uvas descem dali. -->
+<path class="k p" d="M6 20h108v7H6z"/>
+<ellipse class="k p" cx="6" cy="23.5" rx="2" ry="3.5"/>
+<path class="h" d="M14 23h34M72 23h34"/>
+<path class="k" d="M60 30v17"/>
+<path class="k p" d="M56 18.5h8v10h-8z"/>
+<path class="h" d="M56 22h8M56 25h8"/>
+<path class="k s" d="M60 36c-8-6-20-7-28-2 8 6 20 7 28 2z"/>
+<path class="h" d="M60 36H33M46 36l-3-3M52 36l-3-3M46 36l-3 3"/>
+<g class="k p"><circle cx="34" cy="52" r="6.5"/><circle cx="47" cy="52" r="6.5"/><circle cx="60" cy="52" r="6.5"/><circle cx="73" cy="52" r="6.5"/><circle cx="86" cy="52" r="6.5"/><circle cx="40.5" cy="63" r="6.5"/><circle cx="53.5" cy="63" r="6.5"/><circle cx="66.5" cy="63" r="6.5"/><circle cx="79.5" cy="63" r="6.5"/><circle cx="47" cy="74" r="6.5"/><circle cx="60" cy="74" r="6.5"/><circle cx="73" cy="74" r="6.5"/><circle cx="53.5" cy="85" r="6.5"/><circle cx="66.5" cy="85" r="6.5"/><circle cx="60" cy="96" r="6.5"/></g>
+<path class="h" d="M31 49l2-2M44 49l2-2M57 49l2-2M70 49l2-2M83 49l2-2M37.5 60l2-2M50.5 60l2-2M63.5 60l2-2M76.5 60l2-2M44 71l2-2M57 71l2-2M70 71l2-2M50.5 82l2-2M63.5 82l2-2M57 93l2-2"/>
+</svg>

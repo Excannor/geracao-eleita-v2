@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a jumenta de Balaão (Nm 22.23-31): cabeça e pescoço de perfil, orelhas compridas em pé,
+     cabresto com a correia do queixo que vai da argola até a beira de trás do pescoço (nada de linha solta saindo do desenho). O pescoço fica aberto embaixo
+     (o papel fecha sem traço), para não parecer busto cortado. O cabresto fecha na argola (focinheira e peça da face),
+     e a parte de dentro da orelha da frente é a única área em sálvia. -->
+<path class="k p" d="M73 36C75 24 79 13 86 6c3 9 1 21-5 32z"/>
+<path class="k p" d="M60 38C55 27 52 15 54 5c7 6 12 18 13 31z"/>
+<path class="s" d="M59.5 31c-2.5-6-3.5-13-3-19 3.5 4.5 6 11 7 18z"/>
+<path class="p" d="M68 34C61 34 55 38 51 44C45 52 37 62 31 70C27 75 26 81 30 84C34 87 41 87 46 84C52 81 57 79 63 77C67 76 70 79 72 84L75 116H108C100 94 92 72 87 55C84 44 78 36 68 34z"/>
+<path class="k" d="M68 34C61 34 55 38 51 44C45 52 37 62 31 70C27 75 26 81 30 84C34 87 41 87 46 84C52 81 57 79 63 77C67 76 70 79 72 84L75 116M108 116C100 94 92 72 87 55C84 44 78 36 68 34"/>
+<path class="k" d="M69 50C74 60 72 72 63 77"/>
+<path class="h" d="M81 42l6-3M84 48l6-3M87 54l6-3M89 60l6-2.5M91 66l6-2.5"/>
+<path class="h" d="M80 80c3 8 6 18 8 28M88 82c2 6 5 14 7 24"/>
+<circle class="e" cx="57" cy="48" r="2.4"/>
+<path class="h" d="M52 44c3-2 6-2 9 0"/>
+<path class="k" d="M34 72c2-2 4.5-1.5 5 1"/>
+<path class="k" d="M30.5 81.5c4 1 8.5 0.5 12-1.5"/>
+<path class="k" d="M64.4 34.8L57 67.6M54.5 68.7L36.4 63.4"/>
+<path class="k" d="M59.4 70.6C70 74 82 76.8 94.2 77.6"/>
+<circle class="k p" cx="57" cy="70" r="2.6"/>
+</svg>

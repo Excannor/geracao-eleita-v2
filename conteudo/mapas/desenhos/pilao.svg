@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- pilão (Nm 11.8): o povo moía o maná e o socava em pilões. A mão do pilão entra pela boca
+     e some atrás da borda da frente; o maná moído (sálvia) fica dentro; sementes no chão. -->
+<ellipse class="k s" cx="52" cy="56" rx="30" ry="8"/>
+<path class="k p" d="M53.5 62L88 17a4.5 4.5 0 0 1 7 5.6L62 66.5z"/>
+<path class="h" d="M70 44l12-15"/>
+<path class="k p" d="M22 56c0 4.4 13.4 8 30 8s30-3.6 30-8c0 14-6 28-16 34H38C28 84 22 70 22 56z"/>
+<path class="h" d="M70 70c-1 6-3 11-6 15M76 66c-1 6-3 11-6 16M30 68c1 5 3 10 6 14"/>
+<path class="k p" d="M38 90h28l3 9H35z"/>
+<path class="k" d="M10 99h100"/>
+<g class="e"><ellipse cx="82" cy="96" rx="1.8" ry="1.2"/><ellipse cx="89" cy="97.2" rx="1.8" ry="1.2"/><ellipse cx="95" cy="95.8" rx="1.8" ry="1.2"/><ellipse cx="86" cy="93.6" rx="1.8" ry="1.2"/><ellipse cx="24" cy="96.4" rx="1.8" ry="1.2"/></g>
+</svg>

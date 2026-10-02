@@ -340,6 +340,58 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
 - 2026-10-02 · captura · Juntar a captura da página inteira (que para em 12.000px) com o resto
   capturado com `rolar` duplica a barra de baixo, que fica fixa no fim da janela grande → o resto
   se cola a partir de uns 150px abaixo do topo dele, cobrindo a barra da primeira captura.
+- 2026-10-02 · conteúdo · Números, na releitura item por item depois do checador verde: "Moisés se
+  queixa" onde Nm 11.11 diz "perguntou"; "ciúmes" no título de um ramo cujo ciúme (11.29) mora numa
+  curiosidade; "vinte anos ou mais" onde 14.29 diz "mais de vinte"; "menos Calebe e Josué" ligado a
+  "morrerá" quando 14.30 os exclui de entrar na terra; nome de lugar (Hor, 20.27), nome de pessoa
+  (Seom, 21.23), número (seis, 35.13) e o pagamento do resgate (3.49) fora da referência; quem tem
+  medo em 22.3 é Moabe, não o rei; a jumenta que "se desvia três vezes" (sai do caminho, se
+  espreme no muro e se deita); e leis contadas como costume ("Cada israelita usava pingentes")
+  → além do verbo, conferir quem faz, quantas vezes e se é ordem ou fato; a folha de releitura que
+  põe cada item ao lado do texto da referência virou `ferramentas/rever-mapa.mjs` (regra na skill).
+- 2026-10-02 · tela · Números: o título "O povo abençoado" (16 caracteres) cabia numa linha a 390px
+  e quebrou em duas a 360px ao lado da jumenta: letras largas (ç, ã, maiúsculas do pincel) pesam
+  mais que a contagem → o título do ramo se confere na captura de 360px, não só na de 390; virou
+  "Povo abençoado" (regra na skill).
+- 2026-10-02 · teste · Números: o `teste-mapas` passou a contar as linhas do nome de cada ramo
+  (caixas do texto) a 390, 375 e 360px. Na primeira rodada, quatro mapas já publicados reprovaram:
+  "A promessa a Abraão" (Gênesis), "Escravos no Egito", "A sarça e o chamado", "O mar e o deserto"
+  e "A morada de Deus" (Êxodo), "O Santo no trono", "Juízo sobre as nações" e "Consolo e o Servo"
+  (Isaías), "Sermão do monte", "Sementes do Reino" e "O Rei em Jerusalém" (Mateus) quebram em duas
+  linhas, alguns só a 375 e 360px, mesmo com 15 ou 16 caracteres → ficaram numa lista de exceções
+  do teste (aviso, não reprovação), para quem revisa cada mapa trocar o nome; nome novo que quebrar
+  reprova. A regra dos 16 caracteres é um ponto de partida, a medida é a tela de 360px.
+- 2026-10-02 · desenho · Números, na revisão ampliada: a folha do cacho de Escol caiu de novo por cima
+  das uvas de cima e o talo parava antes da primeira uva; na vara de Arão, flores feitas de
+  círculos pareciam frutinhas e galhos curvos pareciam ganchos; a serpente ganhou uma trave em T
+  que o texto não tem (Nm 21.8 diz "poste") e o pescoço se embolou com ela; na jumenta, a
+  focinheira terminava solta, longe da argola, e a rédea saía colada na linha da garganta,
+  formando uma cunha cheia → folha de cacho vai ao lado do talo, nunca sobre as uvas; flor se
+  desenha com pétalas (cinco elipses em volta de um miolo cheio) na ponta de galho reto; peça
+  que o versículo não traz sai do desenho; correia de arreio fecha na argola, e linha que sai de
+  um ponto do contorno abre ângulo largo com ele. Um zoom a 520px achou defeitos que a folha de
+  280px escondia → o `ver-desenhos` ganhou `TAMANHO=520` (regra na skill).
+- 2026-10-02 · desenho · Parte sálvia com contorno `.k` dentro de outra peça (o miolo da orelha)
+  desenha uma orelha dentro da outra → área de cor interna vai só com `.s`, sem traço.
+- 2026-10-02 · desenho · Animal em busto (a jumenta) com o pescoço fechado por uma reta parece
+  estátua cortada → o papel `.p` fecha por baixo sem traço e o contorno `.k` fica aberto.
+- 2026-10-02 · conteúdo · Números, na revisão adversarial (depois da releitura do escritor e do
+  checador verde), ainda havia: "só Calebe e Josué entrarão na terra" (14.30 exclui só os de mais
+  de vinte anos; os filhos entram, 14.31); "Seom, rei dos amorreus" e "o grupo de Coré" com o
+  título e o nome fora da referência da conexão (21.21; 16.1-2); "a palavra que sai da boca de
+  Balaão" onde 23.5 diz que o Senhor a põe ali; "Moisés revela" com Moisés fora da referência
+  (31.15); "longe do Tabernáculo" onde 11.26 diz só que não foram; "o primeiro nome da lista é
+  Calebe" quando Eleazar e Josué vêm antes (34.17); "até sete no último" numa festa que tem oitavo
+  dia (29.35); três curiosidades de lei ainda no imperfeito de costume ("entrava", "servia",
+  "carregavam"); e o "procure" dizendo que "queixa" se repete do capítulo 11 em diante, quando a
+  contagem na NBV dá só os capítulos 11, 14, 16, 17 e 21 → "só", "primeiro", "último" e "do
+  capítulo X em diante" se conferem lendo também os versículos vizinhos e contando no livro
+  (regra na skill); curiosidade de lei se escreve no presente da ordem ("a lei manda", "quem faz
+  o voto não come").
+- 2026-10-02 · desenho · Números, na revisão: a jumenta ainda tinha a rédea saindo do pescoço e
+  terminando no ar, fora do desenho, e a correia da face parando 4 unidades abaixo do contorno
+  da cabeça (ponta solta a 520px) → correia termina num contorno (ponto tirado da curva), e
+  linha que não chega a nada sai do desenho.
 
 ## Entrada, sessão e página inicial
 
@@ -475,6 +527,11 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
 - 2026-10-02 · painel · Nas atualizações do painel de progresso escrevi a hora de cabeça ("16:10",
   "16:40") quando o relógio de Brasília marcava antes das 15:40 → a hora do painel e do registro
   sai sempre de `TZ=America/Sao_Paulo date`, na hora de escrever.
+
+- 2026-10-02 · painel · Números: o primeiro update do painel saiu de novo com a hora de cabeça
+  ("17:20" às 17:10), porque o update foi na mesma leva de chamadas que a leitura das regras, antes
+  de ler este arquivo → no começo, a primeira chamada de todas é `TZ=America/Sao_Paulo date`; o
+  painel só se mexe depois de ler a resposta dela, mesmo no "get" inicial.
 
 ## Geral
 

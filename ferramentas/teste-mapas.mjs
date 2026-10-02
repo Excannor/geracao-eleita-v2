@@ -277,6 +277,12 @@ const setasTortas = () => av(`JSON.stringify([...document.querySelectorAll(".map
 // Cada mapa do índice abre inteiro: um ramo por item do JSON, um desenho por ramo mais Cristo
 // (e a autoria, quando tem), as setas entre os blocos (oito fixas mais uma entre cada par de
 // ramos), nenhuma curva por cima do texto das conexões e nada estourando a largura, a 390 e a 360.
+// Nomes de ramo que já iam ao ar em duas linhas quando a checagem entrou (02/10, no mapa de
+// Números): ficam como aviso até quem revisa cada mapa trocar o nome (docs/aprendizados.md).
+// Nome novo que quebrar reprova; nome desta lista que for trocado sai dela.
+const NOMES_QUE_JA_QUEBRAVAM = new Set(['A promessa a Abraão', 'Escravos no Egito', 'A sarça e o chamado',
+  'O mar e o deserto', 'A morada de Deus', 'O Santo no trono', 'Juízo sobre as nações', 'Consolo e o Servo',
+  'Sermão do monte', 'Sementes do Reino', 'O Rei em Jerusalém']);
 for (const slug of indice.publicados) {
   const m = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'mapas', slug + '.json'), 'utf8'));
   const n = m.ramos.length;
@@ -298,6 +304,13 @@ for (const slug of indice.publicados) {
       const linhas = await av('JSON.stringify([...document.querySelectorAll(".mapa-ligacao")].map((p) => Math.round(p.offsetHeight / parseFloat(getComputedStyle(p).lineHeight))))');
       ok(JSON.parse(linhas).every((n) => n <= 4), m.nome + ': cada conexão cabe em até 4 linhas a 390px (' + linhas + ')');
     }
+    // o nome do ramo, no pincel, cabe numa linha ao lado do desenho ("O povo abençoado" cabia a
+    // 390 e quebrou a 360; Números, 02/10): conta as linhas pelas caixas do texto
+    const nomes = await av('JSON.stringify([...document.querySelectorAll(".mapa-ramo-nome")].map((el) => { const r = document.createRange(); r.selectNodeContents(el); return new Set([...r.getClientRects()].map((q) => Math.round(q.top))).size; }))');
+    const quebrados = JSON.parse(nomes).map((x, i) => (x > 1 ? m.ramos[i].titulo : null)).filter(Boolean);
+    const novos = quebrados.filter((t) => !NOMES_QUE_JA_QUEBRAVAM.has(t));
+    if (quebrados.length > novos.length) console.log('  aviso ' + m.nome + ' a ' + w + 'px: nome em duas linhas já no ar (' + quebrados.filter((t) => NOMES_QUE_JA_QUEBRAVAM.has(t)).join('; ') + ')');
+    ok(!novos.length, m.nome + ' a ' + w + 'px: o nome de cada ramo cabe numa linha (' + nomes + ')');
     ok(abriu && desenhosNaTela === desenhos && setas === n - 1 + 8 && cruz === JSON.stringify(Array(n - 1).fill(0)) && largura <= 0 && tortas === '[]',
       m.nome + ' a ' + w + 'px: ' + n + ' ramos, ' + desenhosNaTela + '/' + desenhos + ' desenhos, ' + setas + ' setas em S com a ponta na tangente ' + (tortas === '[]' ? '' : tortas) + ', curvas fora do texto (' + cruz + '), largura ok');
   }

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- duas trombetas de prata batida (Nm 10.2): cruzadas, bocal embaixo e campana em cima,
+     com o som saindo em arcos curtos. A da frente cobre a de trás no cruzamento. -->
+<g transform="translate(102 100) rotate(-132)">
+  <path class="k p" d="M0-4.5L6-3.2H76C84-3.6 92-8 98-12V12C92 8 84 3.6 76 3.2H6L0 4.5z"/>
+  <path class="h" d="M10-0.8H72M30-3.2v6.4M54-3.2v6.4"/>
+  <ellipse class="k p" cx="98" cy="0" rx="3.2" ry="12"/>
+</g>
+<g transform="translate(18 100) rotate(-48)">
+  <path class="k p" d="M0-4.5L6-3.2H76C84-3.6 92-8 98-12V12C92 8 84 3.6 76 3.2H6L0 4.5z"/>
+  <path class="h" d="M10-0.8H72M30-3.2v6.4M54-3.2v6.4"/>
+  <ellipse class="k s" cx="98" cy="0" rx="3.2" ry="12"/>
+</g>
+<path class="h" d="M96 16c3 2 5 5 5 9M101 10c5 3 8 8 8 14M24 16c-3 2-5 5-5 9M19 10c-5 3-8 8-8 14"/>
+</svg>
