@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o bode emissário (Lv 16.21-22): de perfil, chifres para trás e barbicha, andando no deserto -->
+<path class="s" d="M14 99C30 91 50 91 62 96C76 91 94 91 106 98C94 102 74 103 60 103C42 103 26 102 14 99z"/>
+<path class="k" d="M14 99C30 91 50 91 62 96C76 91 94 91 106 98"/>
+<path class="k" d="M39 75L37 89.8M47 76L47 89.7M70 76L69 91M78 74L80 89.5"/>
+<path class="k e" d="M35 89.3h4l0.8 3.5h-5.6z"/>
+<path class="k e" d="M45 89.2h4l0.8 3.5h-5.6z"/>
+<path class="k e" d="M67 90.5h4l0.8 3.5h-5.6z"/>
+<path class="k e" d="M78 89h4l0.8 3.5h-5.6z"/>
+<path class="k" d="M33 57C29 53 27 49 27 45C31 48 33 51 35 55"/>
+<path class="k p" d="M34 54C42 47 70 47 79 51C86 54 87 69 81 74C70 79 42 79 34 75C28 71 28 58 34 54z"/>
+<path class="h" d="M40 60l2 4M48 58l2 4M56 59l2 4M64 58l2 4M44 68l2 4M52 68l2 4M60 68l2 4M68 67l2 4"/>
+<path class="k" d="M87 34C84 25 78 21 71 21M91 32C89 23 84 17 77 16"/>
+<path class="k p" d="M74.2 49.6C80 44 82 37 86 34C89 31 94 31 97 34C100 38 104 43 105 47C106 50 104 52 101 52C98 52 95 52 92 53C90 58 89 64 84.9 65.2"/>
+<path class="k p" d="M88 38C84 38 79 41 77 45C81 45 86 43 89 41z"/>
+<path class="k p" d="M99 52C99 56 98 59 96 61C95 58 94 55 94 52.5"/>
+<path class="k" d="M104 49l-3 0.8"/>
+<circle class="e" cx="95" cy="39" r="1.8"/>
+</svg>

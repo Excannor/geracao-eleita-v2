@@ -46,7 +46,9 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    "velha demais"): se não está no trecho citado, ou amplia a referência ou sai da frase.
    Vale para nome próprio ("Jetro" não está em Êx 18.13-25, só "o sogro de Moisés") e para o
    tempo do verbo: promessa ou ordem de Deus se conta como promessa ("Deus promete pôr Moisés
-   numa fenda da rocha", Êx 33.22), não como fato que já aconteceu.
+   numa fenda da rocha", Êx 33.22), não como fato que já aconteceu. Promessa com condição leva o
+   "se" junto ("Se o povo espalhado confessar o pecado, Deus promete...", Lv 26.40-42), e quem
+   sofre a consequência é quem o versículo diz (em Lv 7.18 perde a oferta quem a apresentou).
 5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
    sequência; um relato retrospectivo (Mt 14.3-12, a morte de João) se conta no passado. "O livro
    abre com" e "fecha com" só com o primeiro e o último versículo de verdade.
@@ -54,14 +56,18 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
    e 46). Liste os capítulos do livro e marque onde cada um aparece (galho, conexão, curiosidade,
    autoria): Mateus tinha deixado de fora os capítulos 15, 19 e 22 e a Grande Comissão (28.19-20).
-   Cada referência aparece uma vez no mapa; curiosidades seguem a ordem dos capítulos.
+   Cada referência aparece uma vez no mapa; curiosidades seguem a ordem dos capítulos. Antes de
+   escrever, monte a tabela dos versículos-chave e decida onde cada um mora (raiz, galho,
+   conexão, par, curiosidade): em Levítico, 16.16, 16.30, 19.18 e 12.8 eram disputados.
 
 Fora do próprio livro só entram, e marcados como tal: o **significado do nome** (é tradução, não
 fato novo), a seção **"[Livro] e Cristo"**, com as citações do Novo Testamento (livro, capítulo e
 versículo, para conferir), e **o nome de Jesus dentro do ramo** quando o Novo Testamento liga a
 passagem a ele. O mapa é para quem lê com fé em Cristo, então diz com todas as letras: "Esse
 Servo é Jesus" (At 8.32-35; Lc 22.37), num destaque escuro no fim do ramo, com as referências do
-NT que provam a ligação. Sem a referência do NT, não se faz a ligação. Datas em a.C., achados arqueológicos e opiniões de comentaristas ficam
+NT que provam a ligação. Sem a referência do NT, não se faz a ligação. Os destaques de um mesmo mapa abrem de jeitos
+diferentes (em Levítico, dois começavam com "O sumo sacerdote que...") e não dizem mais que o
+versículo do NT (Hb 7.27 fala de sacrifícios diários, não de "nada"). Datas em a.C., achados arqueológicos e opiniões de comentaristas ficam
 fora.
 
 **Livros do Novo Testamento** (Mateus, 02/10): o livro inteiro já fala de Jesus, então
@@ -75,7 +81,8 @@ do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua"
 - **A raiz:** a ideia central em um parágrafo direto (mais uma frase de apoio, se precisar).
 - **Ramos:** de 4 a 6 pilares, cada um com nome curto e forte e uma linha de subtítulo (até uns
   30 caracteres, para caber numa linha ao lado do desenho a 390px) que resuma o ramo inteiro,
-  não só um galho. Nada de pronome com hífen no
+  não só um galho. O nome no pincel cabe numa linha com até uns 16 caracteres ("Santos no dia a
+  dia", com 19, quebrou; virou "Vida santa"). Nada de pronome com hífen no
   fim de frase ("odiá-lo"): a linha quebra no hífen.
 - **Ramificações:** de 3 a 6 por ramo, cada uma com a referência no fim.
 - **Conexões:** entre um ramo e o seguinte, uma frase que mostra o raciocínio do autor bíblico
@@ -101,7 +108,10 @@ Antes de entregar o texto:
   as ondas inundam o barco");
 - nenhum ponto depois de "!”" ou "?”" (`grep -n '[!?]”\.'`), e palavra com hífen (nos galhos,
   nas conexões e nas curiosidades) só se não houver outra ("boas-novas" e "beira-mar" quebraram
-  no hífen a 390px; "perto do mar", "No meio da noite");
+  no hífen a 390px; "perto do mar", "No meio da noite"); quando o hífen está na própria citação
+  da NBV (“Levantem-se...”), a citação vira paráfrase;
+- no texto de "[Livro] e Cristo", aspas só para o versículo da `ref` (o checador confere contra
+  ela); o Novo Testamento entra em paráfrase com a referência entre parênteses;
 - toda conexão que mudou foi medida de novo (até 150 caracteres; o checador barra).
 
 ## 2. Como desenhar
@@ -128,6 +138,11 @@ entrar. Renderize ampliado (280px ou mais) e confira:
   raízes do tronco de Isaías iam a 60 e saíam cortadas; corrigido em 02/10).
 - encaixes calculados, não chutados: cabo que toca o galho e a fruta, pé que nasce no bojo da
   panela (ponto tirado da curva); traço que não representa nada sai.
+- raios de barbatana (ou de leque) saem da base e param a uns 60% do caminho até o bico, para
+  ficar dentro do contorno; pescoço e cabeça de animal num `path` aberto com `.p` (o papel fecha
+  por dentro do corpo e esconde a junção sem traço sobrando); casco é um trapézio cheio (`.e`)
+  assentado na curva do chão, nunca um "T"; preenchimento de chão fecha por uma curva rasa, não
+  por uma reta (o peixe e o bode de Levítico).
 - água se reconhece pelo arco: sai de lado, da borda da rocha ou do jarro, curva e cai numa poça,
   com traços curtos de respingo. Faixa reta vira régua, traços saindo de um ponto viram raízes,
   e gota em círculo vira botão (a rocha de Êxodo precisou de cinco tentativas). O jorro cai sobre

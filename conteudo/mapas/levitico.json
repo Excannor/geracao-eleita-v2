@@ -1,0 +1,160 @@
+{
+  "nome": "Levítico",
+  "grupo": "Lei",
+  "numero": 3,
+  "capitulos": 27,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "וַיִּקְרָא",
+    "transliteracao": "Vayikra",
+    "traducao": "e chamou",
+    "texto": "O nome hebraico é a primeira palavra do livro: o Senhor chamou Moisés. Levítico vem do grego e quer dizer referente aos levitas."
+  },
+  "autoria": {
+    "texto": "O livro não diz quem o escreveu, mas diz de quem vem cada lei. Capítulo após capítulo, a abertura se repete: “Disse o Senhor a Moisés”.",
+    "apoio": "Ninguém viaja no livro inteiro: tudo acontece “no deserto do Sinai”, e a última frase fecha assim: “O Senhor deu esses mandamentos a Moisés, no monte Sinai, para o povo de Israel”.",
+    "refs": ["Lv 12.1", "Lv 7.38", "Lv 27.34"],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O livro abre com o Senhor chamando Moisés ao Tabernáculo, a tenda de Deus que está “no meio de um povo impuro”. Como esse povo vive perto de um Deus santo? Ofertas, sacerdotes, leis de pureza e um dia de perdão abrem o caminho, debaixo de uma ordem que volta muitas vezes: “Sejam santos, porque eu sou santo”.",
+    "apoio": "Na boca do Senhor, ser santo anda junto com ser separado: “separei vocês dos outros povos para serem meus”. E a promessa é de presença: “Andarei entre vocês e serei o seu Deus, e vocês serão o meu povo”.",
+    "refs": ["Lv 1.1", "Lv 16.16", "Lv 11.45", "Lv 20.26", "Lv 26.12"]
+  },
+  "ramos": [
+    {
+      "titulo": "As ofertas",
+      "sub": "Como chegar perto de Deus",
+      "desenho": "altar-com-brasas",
+      "galhos": [
+        { "texto": "Quem traz o animal põe a mão sobre a cabeça dele. O texto explica o gesto: o animal é sacrificado, “sofrendo no lugar do homem o castigo dos seus pecados”.", "ref": "Lv 1.4" },
+        { "texto": "Farinha da melhor qualidade, com azeite e incenso, também é oferta. Fermento e mel não vão ao fogo, e o sal nunca falta, “pois o sal lembra a aliança de Deus com seu povo”.", "ref": "Lv 2.1, 11, 13" },
+        { "texto": "Na oferta de gratidão, o animal pode ser macho ou fêmea, desde que sem defeito. A gordura queima no altar, porque “Toda a gordura é do Senhor”.", "ref": "Lv 3.1, 6, 16" },
+        { "texto": "Até o pecado cometido sem intenção pede sacrifício. A lei passa pelo sacerdote ungido, pela comunidade inteira, pelo líder e por qualquer pessoa do povo.", "ref": "Lv 4.2-3, 13, 22, 27" },
+        { "texto": "Sem recursos para uma ovelha, a pessoa traz duas rolinhas; sem recursos nem para as aves, um jarro de farinha. E o texto garante: “ela será perdoada”.", "ref": "Lv 5.7, 11, 13" },
+        { "texto": "Quem roubou ou explorou o próximo devolve tudo ao dono, com um quinto do valor a mais, quando apresenta a sua oferta pela culpa.", "ref": "Lv 6.2-5" }
+      ],
+      "jesus": {
+        "texto": "O sacrifício que tira o pecado de uma vez é Jesus. Paulo diz que Cristo “se entregou a Deus como sacrifício a fim de tirar os seus pecados”. Hebreus completa: foi “um único sacrifício duma vez para sempre”.",
+        "refs": ["Ef 5.2", "Hb 10.12"]
+      },
+      "conexao": "O fogo do altar não pode se apagar (Lv 6.13). Na estreia de Arão, sai fogo da presença do Senhor (Lv 9.24)."
+    },
+    {
+      "titulo": "Os sacerdotes",
+      "sub": "Consagrados para o altar",
+      "desenho": "peitoral",
+      "galhos": [
+        { "texto": "Diante da comunidade reunida, Moisés lava Arão e os filhos dele, veste Arão com o manto, o peitoral e o turbante e derrama o óleo da unção sobre a cabeça dele.", "ref": "Lv 8.4-12" },
+        { "texto": "Com o sangue do carneiro da consagração, Moisés molha a ponta da orelha direita de Arão, o polegar da mão direita e o polegar do pé direito. Nos filhos, faz o mesmo.", "ref": "Lv 8.22-24" },
+        { "texto": "Moisés manda que, por sete dias, dia e noite, os novos sacerdotes não saiam da entrada do Tabernáculo, “para que não morram”.", "ref": "Lv 8.33-35" },
+        { "texto": "No oitavo dia, Arão apresenta as ofertas pelos próprios pecados e pelos do povo. Depois abençoa o povo, e a glória do Senhor aparece a toda a comunidade.", "ref": "Lv 9.1, 8, 15, 22-23" },
+        { "texto": "Nadabe e Abiú, filhos de Arão, trazem “fogo profano perante o Senhor”. Sai fogo da presença do Senhor e os consome.", "ref": "Lv 10.1-2" },
+        { "texto": "Moisés repete a palavra do Senhor: “Mostrarei a minha santidade para aqueles que chegam perto de mim”. Arão fica em silêncio.", "ref": "Lv 10.3" }
+      ],
+      "jesus": {
+        "texto": "O sumo sacerdote sem pecado próprio para cobrir é Jesus. Hebreus diz que ele “é santo e irrepreensível” e não oferece sacrifícios diários para “cobrir primeiro os seus próprios pecados”: acabou com todos quando “se ofereceu a si próprio”.",
+        "refs": ["Hb 7.26-27"]
+      },
+      "conexao": "Os sacerdotes têm de separar “o impuro e o puro” (Lv 10.10). As leis seguintes “mostram a diferença” (Lv 11.47)."
+    },
+    {
+      "titulo": "Puro e impuro",
+      "sub": "Comida, corpo, pele e casa",
+      "desenho": "peixe",
+      "galhos": [
+        { "texto": "Pode ser comido o animal de casco fendido que rumina e, da água, o que tem barbatanas e escamas. Camelo, porco e morcego ficam fora da mesa.", "ref": "Lv 11.3-19" },
+        { "texto": "Depois do parto, a mãe espera os dias da purificação e leva ao sacerdote um cordeiro de um ano e um pombinho ou uma rolinha.", "ref": "Lv 12.2-6" },
+        { "texto": "Mancha na pele vai ao sacerdote, que examina, isola por sete dias e examina de novo. Com lepra, a pessoa mora “sozinha, fora do acampamento”, gritando “Impuro! Impuro!”", "ref": "Lv 13.2-6, 45-46" },
+        { "texto": "Na cura, o sacerdote sai do acampamento para examinar a pessoa. Uma ave morre sobre água corrente; a outra, molhada no sangue, é solta “em campo aberto”.", "ref": "Lv 14.3-7" },
+        { "texto": "A mancha pode surgir nas paredes de uma casa. As pedras afetadas saem, a casa é raspada e rebocada e, se a mancha voltar, vem abaixo.", "ref": "Lv 14.34-45" },
+        { "texto": "O que sai do corpo também entra na lei: corrimento e menstruação tornam impuros a pessoa, a cama e o lugar onde ela senta.", "ref": "Lv 15.2-4, 19-20" }
+      ],
+      "conexao": "A impureza contamina “o meu Tabernáculo que está entre eles” (Lv 15.31). A saída é a cerimônia da purificação (Lv 16.33)."
+    },
+    {
+      "titulo": "O Dia do Perdão",
+      "sub": "Sangue que cobre o pecado",
+      "desenho": "bode",
+      "galhos": [
+        { "texto": "Arão só entra no Lugar Santíssimo com um novilho e um carneiro, depois de tomar banho e vestir as roupas sagradas de linho.", "ref": "Lv 16.3-4" },
+        { "texto": "Dois bodes são sorteados. Um é sacrificado ao Senhor; o outro, o bode emissário, vai vivo para o deserto, “levando com ele o pecado do povo”.", "ref": "Lv 16.8-10" },
+        { "texto": "Atrás do véu, a fumaça do incenso cobre a tampa da arca, e Arão borrifa o sangue sete vezes diante dela.", "ref": "Lv 16.12-14" },
+        { "texto": "Com as duas mãos sobre a cabeça do bode vivo, Arão confessa os pecados do povo. O bode leva tudo embora “para uma terra solitária”.", "ref": "Lv 16.21-22" },
+        { "texto": "A cerimônia volta “uma vez por ano”, no décimo dia do sétimo mês, com jejum e sem trabalho para ninguém.", "ref": "Lv 16.29, 34" },
+        { "texto": "Sangue não se come, e Deus dá o motivo: “a vida da carne está no sangue”. Ele deu o sangue para o altar, “a fim de obter o perdão dos pecados do povo”.", "ref": "Lv 17.11-12" }
+      ],
+      "jesus": {
+        "texto": "Quem entra no Santo dos Santos com o próprio sangue é Jesus. O sumo sacerdote de Israel entrava “apenas uma vez por ano”; Cristo entrou “uma vez por todas”, e não com “sangue de bodes nem de bezerros”.",
+        "refs": ["Hb 9.7", "Hb 9.12"]
+      },
+      "conexao": "O Dia do Perdão deixa o povo puro “de todos os seus pecados” (Lv 16.30). O dia a dia também pede santidade (Lv 19.2)."
+    },
+    {
+      "titulo": "Vida santa",
+      "sub": "Família, próximo e altar",
+      "desenho": "balanca",
+      "galhos": [
+        { "texto": "Nada de imitar o povo do Egito, onde Israel morou, nem o de Canaã, para onde o Senhor o leva. A promessa é direta: “Obedeçam fielmente às minhas leis e aos meus mandamentos e vocês viverão”.", "ref": "Lv 18.3-5" },
+        { "texto": "Relações com parentes próximos e com a mulher de outro homem estão proibidas. Por práticas assim, a terra “vomitou o povo que nela habitava”.", "ref": "Lv 18.6, 20, 28" },
+        { "texto": "Na colheita, os cantos do campo e as uvas que caem ficam no lugar: “Elas são para o necessitado e para o estrangeiro”.", "ref": "Lv 19.9-10" },
+        { "texto": "O salário de quem trabalha por dia não fica para o dia seguinte, ninguém amaldiçoa o surdo, e o comércio usa “balanças justas, pesos e medidas exatas”.", "ref": "Lv 19.13-14, 36" },
+        { "texto": "Estrangeiro se trata como alguém do próprio povo: “Amem os estrangeiros como a vocês mesmos”, porque Israel também foi estrangeiro no Egito.", "ref": "Lv 19.33-34" },
+        { "texto": "Sacerdote com defeito físico come das ofertas sagradas, mas não se aproxima do véu nem do altar.", "ref": "Lv 21.17, 22-23" }
+      ],
+      "conexao": "“Guardem os meus sábados”, repete o Senhor (Lv 19.3, 30). O sábado abre o calendário das festas (Lv 23.3)."
+    },
+    {
+      "titulo": "Festas e jubileu",
+      "sub": "Tempo, terra e promessas",
+      "desenho": "espigas-de-trigo",
+      "galhos": [
+        { "texto": "O ano ganha datas marcadas com o Senhor: a Páscoa, os pães sem fermento, o primeiro feixe da colheita e, cinquenta dias depois, os dois pães da nova oferta.", "ref": "Lv 23.4-17" },
+        { "texto": "Durante sete dias, os israelitas moram em tendas, para os filhos nunca esquecerem que Deus fez Israel viver em tendas quando o tirou do Egito.", "ref": "Lv 23.42-43" },
+        { "texto": "A cada sétimo ano, a terra descansa: ninguém semeia nem poda. Deus promete que o sexto ano dará colheita para três.", "ref": "Lv 25.4, 21" },
+        { "texto": "No ano cinquenta, o Ano do Jubileu, quem foi vendido como escravo volta livre para a família, e a terra volta ao primeiro dono. O motivo: “a terra é minha”.", "ref": "Lv 25.10, 23" },
+        { "texto": "Obedecer traz chuva no tempo certo e paz; a rebeldia traz castigo “sete vezes mais”. Se o povo espalhado confessar o pecado, Deus promete: “eu me lembrarei da minha aliança com Jacó”.", "ref": "Lv 26.4-6, 18, 40-42" }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Diga a seu irmão Arão que não entre a qualquer hora, sem necessidade, no Lugar Santíssimo, atrás do véu.” Quando Jesus morreu, a cortina do Templo que separava o Lugar Santíssimo se rasgou de cima até embaixo (Mt 27.51). E Hebreus diz que, pelo sangue de Jesus, agora podemos entrar (Hb 10.19-20).",
+    "ref": "Lv 16.2",
+    "desenho": "veu-rasgado",
+    "pares": [
+      { "at": "Lv 12.8", "texto": "Mas se ela não tiver recursos para oferecer um cordeiro, poderá trazer dois pombinhos ou duas rolinhas.", "nt": "Lc 2.22-24", "nota": "José e Maria apresentam Jesus e oferecem um par de rolinhas" },
+      { "at": "Lv 16.27", "texto": "O novilho e o bode sacrificado como oferta pelo pecado... serão levados para fora do acampamento.", "nt": "Hb 13.11-12", "nota": "por isso Jesus sofreu fora das portas da cidade" },
+      { "at": "Lv 19.18", "texto": "Ame o seu próximo como a si mesmo.", "nt": "Mt 22.37-39", "nota": "Jesus o põe logo depois do maior mandamento" }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "As ofertas", "de": 1, "ate": 7 },
+    { "titulo": "A consagração dos sacerdotes", "de": 8, "ate": 10 },
+    { "titulo": "Puro e impuro", "de": 11, "ate": 15 },
+    { "titulo": "O Dia do Perdão e o sangue", "de": 16, "ate": 17 },
+    { "titulo": "A santidade no dia a dia", "de": 18, "ate": 22 },
+    { "titulo": "Festas, sábado e jubileu", "de": 23, "ate": 25 },
+    { "titulo": "Bênçãos, avisos e votos", "de": 26, "ate": 27 }
+  ],
+  "curiosidades": [
+    { "texto": "Carne de oferta de paz que chegasse ao terceiro dia ia para o fogo. Se alguém a comesse, a oferta perdia o valor: “será como se a pessoa não tivesse apresentado a oferta”.", "ref": "Lv 7.17-18" },
+    { "texto": "Arão e os filhos não podiam beber vinho nem bebida forte antes de entrar no Tabernáculo.", "ref": "Lv 10.9" },
+    { "texto": "Moisés se irrita porque a carne da oferta pelo pecado foi queimada, não comida. Arão lembra o que tinha acontecido naquele dia, e Moisés aceita a explicação.", "ref": "Lv 10.16-20" },
+    { "texto": "Entre os insetos, a lei libera para a mesa a locusta, o gafanhoto devorador e o grilo.", "ref": "Lv 11.21-22" },
+    { "texto": "Cabelo caindo não torna ninguém impuro: o homem “está apenas ficando calvo, porém puro”.", "ref": "Lv 13.40" },
+    { "texto": "A lei da lepra alcança também roupas de lã ou de linho e objetos de couro. Mancha que se espalha manda a peça para o fogo.", "ref": "Lv 13.47-52" },
+    { "texto": "O caçador que abate um animal derrama o sangue no chão e o cobre com terra.", "ref": "Lv 17.13" },
+    { "texto": "Dos frutos de uma árvore nova, ninguém come nos três primeiros anos de produção. No quarto, a produção é do Senhor; só no quinto o dono come.", "ref": "Lv 19.23-25" },
+    { "texto": "A lei manda ficar de pé diante das pessoas idosas e honrar os anciãos, no mesmo capítulo do amor ao próximo.", "ref": "Lv 19.32" },
+    { "texto": "Doze pães ficavam em duas fileiras sobre a mesa de ouro e eram arrumados de novo todo sábado.", "ref": "Lv 24.5-8" },
+    { "texto": "O texto guarda o nome da mãe do homem que blasfemou no acampamento: Selomite, filha de Dibri, da tribo de Dã.", "ref": "Lv 24.10-11" },
+    { "texto": "“Olho por olho, dente por dente” é uma regra de Levítico, junto com “fratura por fratura”.", "ref": "Lv 24.20" },
+    { "texto": "Ao irmão que empobreceu, empréstimo sem juros e comida sem lucro.", "ref": "Lv 25.35-37" },
+    { "texto": "Dos que sobrevivessem nas terras dos inimigos, Deus diz que “fugirão assustados ao movimento de uma folha”.", "ref": "Lv 26.36" },
+    { "texto": "De cada dez animais do gado ou do rebanho, um pertence ao Senhor, seja bom ou ruim, e não pode ser trocado.", "ref": "Lv 27.32-33" }
+  ],
+  "procure": {
+    "texto": "“Eu sou o Senhor.” A frase assina ordem atrás de ordem, e só no capítulo 19 aparece mais de dez vezes. Marque cada uma e repare no tipo de ordem que ela fecha.",
+    "ref": "Lv 22.31"
+  }
+}

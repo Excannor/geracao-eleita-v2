@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o véu rasgado (Mt 27.51): a cortina do Lugar Santíssimo partida de cima até embaixo, com a luz no meio -->
+<path class="k s" d="M50 31h20l4 64H46z"/>
+<path class="k p" d="M31 31H58L56 39L59 47L55 56L57 65L52 74L54 84L49 95Q40 98 31 95z"/>
+<path class="k p" d="M89 31H62L64 40L61 48L65 57L63 66L68 75L66 85L71 95Q80 98 89 95z"/>
+<path class="h" d="M37 33C39 52 36 74 38 94M44 33C46 54 43 74 45 95M51 33C52 50 49 66 51 82"/>
+<path class="h" d="M83 33C81 52 84 74 82 94M76 33C74 54 77 74 75 95M69 33C68 50 71 66 69 82"/>
+<path class="k" d="M30 27H90"/>
+<circle class="k p" cx="28" cy="27" r="2.6"/>
+<circle class="k p" cx="92" cy="27" r="2.6"/>
+<path class="k" d="M34 27v4M44 27v4M54 27v4M66 27v4M76 27v4M86 27v4"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- balança de dois pratos (Lv 19.36): o travessão nivelado, cereal num prato e os pesos no outro -->
+<path class="k p" d="M42 104h36l-5-8H47z"/>
+<path class="k" d="M60 96V36"/>
+<path class="k" d="M24 36h72"/>
+<circle class="k p" cx="60" cy="36" r="4"/>
+<path class="k" d="M60 24v8"/>
+<path class="k p" d="M56 22l4-6 4 6z"/>
+<path class="h" d="M26 38L12 70M26 38L40 70M26 38V70M94 38L80 70M94 38L108 70M94 38V70"/>
+<path class="k s" d="M15 70C17 60 35 60 37 70z"/>
+<path class="h" d="M21 66l2-1M27 63l2 0M31 66l2-1M25 68l1-1"/>
+<path class="k p" d="M11 70h30c0 7-7 11-15 11s-15-4-15-11z"/>
+<path class="k p" d="M85 70v-7h18v7z"/>
+<path class="k p" d="M89 63v-6h10v6z"/>
+<path class="k p" d="M79 70h30c0 7-7 11-15 11s-15-4-15-11z"/>
+</svg>

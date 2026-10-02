@@ -239,6 +239,52 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   poça pequena e parecia um cano verde enfiado num bueiro → o jorro cai sobre a borda de cima de
   uma poça larga, com respingos dos dois lados e uma ondinha dentro; nada de jorro entrando no
   centro da elipse (regra da água na skill).
+- 2026-10-02 · painel · Levítico: mesmo com a regra registrada logo acima, o primeiro update do
+  painel saiu com a hora de cabeça ("16:20" quando eram 16:12) → rodar `TZ=America/Sao_Paulo date`
+  no mesmo passo em que se lê o documento do painel, antes de montar o update; ler a regra não basta.
+- 2026-10-02 · conteúdo · Levítico: os versículos mais fortes (16.16, 16.30, 19.18, 12.8) eram
+  disputados pela raiz, pelas conexões, pelos galhos e pelos pares, e a regra "cada referência uma
+  vez" obrigou a refazer três trechos → antes de escrever, montar a tabela dos versículos-chave e
+  decidir onde cada um mora (raiz, galho, conexão, par, curiosidade); o resto se escreve em volta.
+- 2026-10-02 · conteúdo · Na releitura de Levítico, antes do checador: "roupas simples de linho"
+  (16.4 não diz "simples"), "Deus garante" sobre 26.42, que é promessa com condição ("se
+  confessarem", 26.40-41), "quem a comesse perdia tudo" em 7.18 (quem perde é quem ofereceu),
+  "frutos guardados" em 19.23 (a NBV diz "não comam") e a ordem de 8.33-35 contada como fato →
+  promessa condicional leva o "se" junto; quem sofre a consequência é quem o versículo diz (regra
+  na skill).
+- 2026-10-02 · conteúdo · No texto de "[Livro] e Cristo" o checador só confere as aspas contra a
+  `ref` do Antigo Testamento; uma citação do NT entre aspas ali reprova → no cartão, o NT entra em
+  paráfrase com a referência entre parênteses (Mt 27.51, Hb 10.19-20); aspas do NT só no destaque
+  `jesus`, que tem `refs` próprias (regra na skill).
+- 2026-10-02 · estilo · Uma curiosidade abria com a citação “Levantem-se...” (19.32): o hífen está
+  na própria NBV e quebraria a linha a 390px → quando o hífen vem da citação, troca-se a citação
+  por paráfrase ("ficar de pé diante das pessoas idosas").
+- 2026-10-02 · tela · O título "Santos no dia a dia" (19 letras no pincel) quebrou em duas linhas
+  ao lado da balança a 390px; "O Dia do Perdão" e "Festas e jubileu" (15 e 16) couberam → título
+  de ramo com até uns 16 caracteres; mais que isso, conferir na captura (regra na skill).
+- 2026-10-02 · desenho · Levítico, na revisão ampliada: os raios da barbatana do peixe passavam do
+  contorno; a barbatana de baixo parecia um balde pendurado; o bode tinha cascos em "T" (pés de
+  mesa), orelha que parecia prato, barbicha que parecia presa e a duna sálvia fechada por uma reta
+  (virou uma laje) → raio de barbatana sai da base e para a 60% do caminho até o bico (fica dentro
+  de qualquer contorno convexo); pescoço e cabeça num `path` aberto com `.p`, que o papel fecha por
+  dentro do corpo e esconde a junção sem traço sobrando; casco é um trapézio cheio (`.e`) assentado
+  na curva do chão; preenchimento de chão fecha por uma curva rasa, não por uma reta (regra na
+  skill). Peça que não ajuda a ler o objeto (a barbatana de baixo) sai.
+- 2026-10-02 · servidor · Ao começar Levítico havia um `servidor.mjs 8110` vivo nesta pasta, de uma
+  sessão anterior, servindo um build velho (hashes da CSP de antes) → quem termina uma rodada mata
+  o próprio servidor pelo PID; quem chega não usa servidor que não subiu, sobe o seu numa porta
+  própria.
+- 2026-10-02 · conteúdo · Revisão de Levítico, versículo por versículo na NBV, depois do checador
+  passar: "um dia de purificação" com Lv 16.33 (o versículo fala da cerimônia, o "dia" é de 16.30);
+  "Canaã, para onde está indo" (18.3 diz "para onde estou levando vocês": o sujeito é o Senhor);
+  "natural da terra" (19.34 diz "naturais do povo de Israel"); "derrama o sangue na terra e o
+  cobre com terra" (palavra repetida na frase) → o checador só pega aspas e palavras proibidas;
+  sujeito, verbo e substantivo da paráfrase se conferem lendo o versículo inteiro, item por item.
+- 2026-10-02 · conteúdo · Levítico: os destaques `jesus` dos ramos 2 e 4 abriam igual ("O sumo
+  sacerdote que...") e o do ramo 2 exagerava Hb 7.27 ("não precisa oferecer nada", quando o texto
+  diz que ele não oferece sacrifícios diários pelos próprios pecados) → os destaques de um mesmo
+  mapa abrem de jeitos diferentes (o checador só compara itens vizinhos da mesma lista) e não
+  dizem mais que o versículo do NT (regra na skill).
 
 ## Entrada, sessão e página inicial
 
