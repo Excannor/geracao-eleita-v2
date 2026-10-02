@@ -311,16 +311,37 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 .folha p { color: var(--tinta-fraca); font-weight: 500; font-size: 0.9375rem; }
 .tela-cheia { background: var(--fundo); }
 
-/* ---------- avisos ---------- */
+/* ---------- avisos ----------
+   Centralizado sem o truque do left: 50% + translateX(-50%): com ele, a largura disponível
+   para o texto era só a metade da tela (180px a 360), e "Seu escudo cobriu ontem. A ofensiva
+   segue em 16!" saía em três linhas, numa pílula enorme por cima do texto (foto do dono no
+   mapa de Gênesis, 02/10). Agora: 16px de cada lado, largura pelo conteúdo, até 520px; o raio
+   de 20px serve para uma linha e para duas; e as animações só mexem no eixo vertical. */
 .aviso-flutuante {
-  padding: 12px 20px 12px 14px;
-  border-radius: 999px;
+  left: 16px;
+  right: 16px;
+  width: fit-content;
+  max-width: min(520px, calc(100% - 32px));
+  margin: 0 auto;
+  transform: none;
+  padding: 11px 18px 11px 12px;
+  border-radius: 20px;
   background: var(--inverso);
   color: var(--inverso-tinta);
   font-size: 0.9375rem;
   font-weight: 600;
+  line-height: 1.35;
   text-align: left;
+  text-wrap: pretty;
+  animation: aviso-entra .3s var(--mola);
 }
+.aviso-flutuante > span { min-width: 0; }
+.aviso-flutuante.bate { animation: aviso-bate .3s ease; }
+.aviso-flutuante.saindo { animation: aviso-sai .2s ease forwards; }
+@keyframes aviso-entra { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes aviso-bate { 0%, 100% { transform: none; } 35% { transform: translateX(-4px); } 70% { transform: translateX(3px); } }
+@keyframes aviso-sai { to { opacity: 0; transform: translateY(12px); } }
+@media (prefers-reduced-motion: reduce) { .aviso-flutuante, .aviso-flutuante.bate { animation: none; } }
 .aviso-ico { width: 24px; height: 24px; border-radius: 50%; }
 .aviso-ico svg { width: 14px; height: 14px; stroke-width: 3; }
 .aviso-ico.aviso-certo { background: var(--salvia); color: var(--salvia-tinta); }

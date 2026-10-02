@@ -2,7 +2,8 @@
 // troca os nomes dos amigos que já leram (0, 1, 2 e 6 amigos), a altura fixa, a ordem, o texto
 // fixo para o leitor de tela, o modo com menos movimento, as pausas (tocar e segurar, linha
 // fora da tela, aba oculta), o toque que abre o Juntos, os dois temas a 360px; e o "já leu
-// hoje" que não pode sobreviver à meia-noite num app deixado em segundo plano.
+// hoje" que não pode sobreviver à meia-noite num app deixado em segundo plano. No fim, o aviso
+// flutuante e a roda de amigos do Juntos (detalhes de UI da mesma rodada).
 // Uso: CHROME=<chrome> node ferramentas/teste-letreiro.mjs [pasta-das-capturas]
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -228,6 +229,32 @@ ok(e && e.itens.length === 2 && e.varios && /Noemi/.test(e.leitor), 'segundo pla
 const campos = await s.av('Object.keys(CC.amigosEmCache().amigos[0]).sort().join(",")');
 ok(!/hora|lidoEm|marcadoEm|lidos/.test(campos), 'o amigo continua sem hora de leitura nem lista de leituras (' + campos + ')');
 await s.fechar();
+
+// ---------- detalhes de UI da mesma rodada (02/10) ----------
+// O aviso flutuante: largura útil, até duas linhas a 360px, raio que serve para duas linhas,
+// acima da barra de abas. A roda de amigos do Juntos: o anel de "já leu hoje" inteiro dentro
+// da faixa que rola, e o último item inteiro no fim da rolagem.
+for (const largura of [360, 390]) {
+  s = await abrirComo('v6');
+  await s.cmd('Emulation.setDeviceMetricsOverride', { width: largura, height: 780, deviceScaleFactor: 2, mobile: true });
+  await s.av('location.hash = "#/mapa/genesis"');
+  await dormir(1500);
+  const av = await s.av(`(() => { CC.avisar('Seu escudo cobriu ontem. A ofensiva segue em 16!'); const a = document.getElementById('aviso-flutuante');
+    const r = a.getBoundingClientRect(); const nav = document.querySelector('.navegacao'); const lh = parseFloat(getComputedStyle(a.querySelector('span')).lineHeight);
+    return { l: r.left, w: r.width, linhas: Math.round(a.querySelector('span').getBoundingClientRect().height / lh), raio: getComputedStyle(a).borderTopLeftRadius,
+      acima: !nav || r.bottom <= nav.getBoundingClientRect().top + 1 }; })()`);
+  ok(av.w > largura * 0.75 && av.linhas <= 2 && av.raio === '20px' && av.acima && Math.abs(av.l - (largura - av.w - av.l)) < 1,
+    largura + 'px: aviso do escudo centrado, ' + Math.round(av.w) + 'px de largura, ' + av.linhas + ' linha(s), raio ' + av.raio + ', acima da barra');
+  await s.av('location.hash = "#/novidades"');
+  await dormir(2000);
+  const roda = await s.av(`(() => { const r = document.querySelector('.roda-amigos'); const caixa = r.getBoundingClientRect();
+    const aneis = [...r.querySelectorAll('.amigo-roda.leu .retrato-amigo')].map((x) => x.getBoundingClientRect().top - 5);
+    r.scrollLeft = r.scrollWidth; const ultimo = r.lastElementChild.getBoundingClientRect();
+    return { anel: Math.min(...aneis) >= caixa.top, ultimo: ultimo.right <= caixa.right - 20 }; })()`);
+  ok(roda.anel, largura + 'px: o anel de "já leu hoje" cabe inteiro na roda de amigos');
+  ok(roda.ultimo, largura + 'px: no fim da rolagem, o último item da roda aparece inteiro, com respiro');
+  await s.fechar();
+}
 
 servidor.kill();
 rmSync(pastaEstado, { recursive: true, force: true });
