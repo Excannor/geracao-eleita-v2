@@ -406,13 +406,18 @@
   try { var t = localStorage.getItem('cc.tema'); if (t !== null) document.documentElement.dataset.tema = JSON.parse(t) ? 'escuro' : 'claro'; } catch (e) {}
 
   var params = new URLSearchParams(location.search);
-  // Com a marca de sessão (cc_logado, que o servidor tira junto com o crachá vencido), a pessoa
-  // já está dentro: a página de entrada leva direto ao app, no mesmo endereço e hash. Vale ao
-  // abrir e ao voltar do bfcache. O link de nova senha fica: quem pediu quer trocar a senha.
-  var logado = function () { return /(?:^|;\s*)cc_logado=1/.test(document.cookie) && !params.get('redefinir'); };
-  var irAoApp = function () { document.documentElement.style.visibility = 'hidden'; location.replace('./' + location.search + location.hash); };
-  if (logado()) { irAoApp(); return; }
-  addEventListener('pageshow', function (ev) { if (ev.persisted && logado()) irAoApp(); });
+  // O app guardado no aparelho manda para cá quem está sem a marca de sessão (cc_logado) e
+  // deixa a nota cc.semMarca. Se a sessão ainda vale (quem entrou antes de a marca existir), o
+  // servidor já devolveu a marca na resposta desta página: volta direto ao app, no mesmo
+  // endereço e hash. Aberta de propósito (link de senha nova, convite, o teste do portal),
+  // a página fica, mesmo com sessão.
+  var veioDoApp = false;
+  try { veioDoApp = sessionStorage.getItem('cc.semMarca') === '1'; sessionStorage.removeItem('cc.semMarca'); } catch (e) { /* segue */ }
+  if (veioDoApp && /(?:^|;\s*)cc_logado=1/.test(document.cookie) && !params.get('redefinir')) {
+    document.documentElement.style.visibility = 'hidden';
+    location.replace('./' + location.search + location.hash);
+    return;
+  }
   var convite = params.get('convite');
   var celula = params.get('celula');
   var passo = 1;

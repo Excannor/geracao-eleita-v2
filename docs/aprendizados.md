@@ -266,6 +266,15 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   (até uns 50, com o traço, para sobrar respiro dentro do raio 54) e não dar papel a contorno
   aberto.
 
+- 2026-10-02 · sessão · A primeira versão da entrada mandava para o app todo mundo com a marca
+  de sessão, e o `teste-escuro-forcado` (que abre `entrar.html` no servidor aberto de teste, onde
+  todos "têm sessão") passou a medir o app no lugar do portal → só volta ao app quem veio do app
+  sem a marca (nota `cc.semMarca` no sessionStorage); quem abre a entrada de propósito fica nela.
+  Rodar a bateria inteira antes de publicar pegou isso.
+- 2026-10-02 · teste · `teste-desafios-grupo` falha em 3 checagens ("membro vê a célula...",
+  "membro comum não começa...", "o convite chega na caixa do sino...") e para num TypeError; falha
+  igual no ac51a46, antes desta rodada → fica registrado para investigar à parte.
+
 ## Revisão do dia (Guardar, Pensar, Orar)
 
 - 2026-10-02 · captura · Para fotografar a lição inteira, aumentei a janela até caber o palco: a

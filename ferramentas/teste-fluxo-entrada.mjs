@@ -267,6 +267,11 @@ await passo(() => cmd('Page.reload'), { esperaMs: 2500 });
 await noApp();
 caso('sessão válida sem a marca', 'volta ao app (a entrada põe a marca e devolve)', 'hash=' + (await av('location.hash')) + ', cookies=' + (await cookies()).join(','),
   (await cookies()).includes('cc_logado') && (await av('location.hash')) === '#/explorar');
+// aberta de propósito (o teste do portal, um link antigo), a entrada fica, mesmo com sessão
+await passo(() => ir(BASE + 'entrar.html'), { esperaMs: 1500 });
+caso('logado abre entrar.html de propósito', 'a página de entrada fica (só volta ao app quem veio do app sem marca)',
+  'url=' + (await av('location.pathname')) + ', entrada=' + (await av('!!document.getElementById("tela-boas")')),
+  (await av('location.pathname')) === '/entrar.html' && !!(await av('!!document.getElementById("tela-boas")')));
 await s.fechar();
 
 // ---------- 9. a barra do alto da entrada, rolando no celular ----------
