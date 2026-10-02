@@ -1,11 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
 <style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
-<!-- tronco que brota (Is 11.1; Is 6.13): do toco cortado sai o rebento com duas folhas -->
-<path class="k p" d="M34 98l6-38h40l6 38"/>
-<ellipse class="k p" cx="60" cy="60" rx="20" ry="6"/>
-<ellipse class="h" cx="60" cy="60" rx="12" ry="3"/>
-<path class="h" d="M44 70l-2 22M50 68l-1 26M70 68l1 26M76 70l2 22"/>
-<path class="k" d="M34 98c-8 2-14 2-20 0M86 98c8 2 14 2 20 0M46 98c-2 4-6 6-12 6M74 98c2 4 6 6 12 6"/>
-<path class="k" d="M64 58c0-14 2-26 8-36"/>
-<path class="k s" d="M67 40c-10-2-15-9-15-14 10 0 15 7 15 14zM70 30c7-5 15-5 20-2-4 6-12 7-20 2z"/>
+<!-- tronco que brota (Is 11.1; Is 6.13): do toco cortado sai o rebento com duas folhas.
+     Cabe no disco de "Isaías e Cristo": tudo a menos de 50 de (60,60), contando o traço (as
+     raízes de fora iam até x=14 e saíam cortadas pelo círculo de raio 54; 02/10). O tronco
+     não tem papel: aberto embaixo, o papel branco virava uma caixa sobre o disco. -->
+<path class="k" d="M34 92l6-38h40l6 38"/>
+<ellipse class="k p" cx="60" cy="54" rx="20" ry="6"/>
+<ellipse class="h" cx="60" cy="54" rx="12" ry="3"/>
+<path class="h" d="M44 64l-2 22M50 62l-1 26M70 62l1 26M76 64l2 22"/>
+<path class="k" d="M34 92c-5 2-8 2-10 0M86 92c5 2 8 2 10 0M46 92c-2 4-6 6-12 6M74 92c2 4 6 6 12 6"/>
+<path class="k" d="M64 52c0-14 2-26 8-36"/>
+<path class="k s" d="M67 34c-10-2-15-9-15-14 10 0 15 7 15 14zM70 24c7-5 15-5 20-2-4 6-12 7-20 2z"/>
 </svg>
