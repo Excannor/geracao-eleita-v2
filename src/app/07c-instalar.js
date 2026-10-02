@@ -1,8 +1,22 @@
 /* Instalar no celular: o tutorial que transforma o site num ícone na tela de início.
-   Abre sozinho logo depois de criar a conta, perguntando qual celular a pessoa usa, e
-   fica à mão no Perfil. Sempre dá para pular: ninguém fica preso nele. */
+   Abre sozinho depois do primeiro dia feito pela conta nova (nunca antes da primeira
+   leitura), perguntando qual celular a pessoa usa, e fica à mão no Perfil. Sempre dá para
+   pular: ninguém fica preso nele. */
 (function (CC) {
   'use strict';
+
+  // O fim do primeiro dia da conta nova (o "Até amanhã" da lição, o "Terminei o dia" do Conhecer
+  // Jesus): agora sim, instalar e lembretes. A marca cc.instalar vem do cadastro (entrar.html) e
+  // sai aqui, para o tutorial não voltar a cada dia; o convite de notificações decide sozinho se
+  // ainda cabe (07d-notificacoes.js). Com algo aberto na tela, espera a próxima vez.
+  CC.depoisDoPrimeiroDia = function () {
+    let nova = false;
+    try { nova = localStorage.getItem('cc.instalar') === '1'; if (nova) localStorage.removeItem('cc.instalar'); } catch (e) { /* segue */ }
+    setTimeout(async () => {
+      if (nova && !CC.rodandoComoApp() && !document.querySelector('.cortina, .tela-cheia')) await CC.tutorialInstalar({ contaNova: true });
+      if (!document.querySelector('.cortina, .tela-cheia') && CC.talvezOferecerNotificacoes) CC.talvezOferecerNotificacoes();
+    }, 900);
+  };
 
   // No Android, o Chrome oferece a própria janela de instalar. Guardada aqui, ela vira
   // o botão "Instalar agora" no tutorial, que poupa a pessoa de procurar no menu.

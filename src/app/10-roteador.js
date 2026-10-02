@@ -611,17 +611,12 @@
     // Daqui para baixo vêm folhas e avisos: só com a abertura saindo.
     await CC.aberturaSaiu;
 
-    // Conta recém-criada: o tutorial de pôr o app na tela de início aparece logo na primeira
-    // abertura, antes de qualquer leitura (quem entra pelo Conhecer Jesus nem lê o plano). A marca
-    // sai quando ele aparece, para não repetir a cada abertura.
-    let novaConta = false;
-    try { novaConta = localStorage.getItem('cc.instalar') === '1'; } catch (e) { /* segue */ }
-    if (novaConta) {
-      try { localStorage.removeItem('cc.instalar'); } catch (e) { /* segue */ }
-      if (!CC.rodandoComoApp()) await CC.tutorialInstalar({ contaNova: true });
-    }
-    // Depois do tutorial de instalar (ou na primeira abertura do app já instalado), o pedido
-    // para mandar notificações. A função só pergunta quando ainda não foi respondido.
+    // Conta recém-criada: nada entre a conta criada e o texto bíblico. O tutorial de pôr o app
+    // na tela de início e o convite de notificações vêm depois do primeiro dia feito (o "Até
+    // amanhã" da lição ou o "Terminei o dia" do Conhecer Jesus: CC.depoisDoPrimeiroDia), quando a
+    // pessoa já sentiu o valor. Medido em 02/10/2026: as duas folhas aqui custavam 2 dos 9 toques
+    // até a primeira linha da Bíblia, e quem dizia "Agora não" ficava 7 dias sem lembrete nenhum.
+    // Quem já leu algum dia e ainda não respondeu recebe o convite aqui, como antes.
     if (CC.talvezOferecerNotificacoes && !document.querySelector('.cortina')) CC.talvezOferecerNotificacoes();
 
     // Conta com senha que ainda não concordou com o uso do dado de fé (LGPD art. 11) não

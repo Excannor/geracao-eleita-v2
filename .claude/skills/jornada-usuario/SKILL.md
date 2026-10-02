@@ -89,17 +89,31 @@ O código de saída é 1 quando algum dia parou no meio (`erroFatal` no relatór
 - **Erros** são exceções, `console.error`, entradas de erro do log e respostas 4xx/5xx. O aviso do
   `navigator.vibrate` (clique sintético não é gesto da pessoa) já sai filtrado: é do ambiente.
 
-### Referência medida em 02/10/2026 (commit 3b66c59)
+### Referência medida em 02/10/2026
 
-Guarde para comparar: uma mudança no onboarding tem de mexer nestes números.
+Guarde para comparar: uma mudança no onboarding tem de mexer nestes números. "Folhas depois do
+dia feito" são as que o app abre depois do primeiro "Até amanhã" (ou do "Terminei o dia" do
+Conhecer): vêm depois do valor, e por isso contam à parte das interrupções.
+
+Antes das correções dos primeiros dias (commit `3b66c59`):
 
 | Caminho | Dia | Até o texto bíblico | Até concluir | Interrupções | Palavras até o texto |
 |---|---|---|---|---|---|
 | plano | 1 | 9 toques + 5 campos | 12 toques + 5 campos | 2: "Instalar no celular" (Pular por agora), "Notificações" (Agora não) | 620 |
-| plano | 2 em diante | 2 toques | 4 toques | 0 | ~80 |
+| plano | 2 em diante | 2 toques | 4 toques | 0 | ~450 |
 | plano | volta depois de 2 dias sem ler | 2 toques | 4 toques | 1: "Ainda tem brasa" (Reavivar hoje) | 76 |
 | conhecer | 1 | 10 toques + 5 campos | 12 toques + 5 campos | as mesmas 2 | 315 |
 | conhecer | 2 | 2 toques | 4 toques | 0 | 184 |
+
+Depois de mover o tutorial de instalar e o convite de notificações para depois do primeiro dia
+feito (commit "Primeiros dias: nada entre a conta criada e o texto bíblico"):
+
+| Caminho | Dia | Até o texto bíblico | Até concluir | Interrupções | Folhas depois do dia feito | Palavras até o texto |
+|---|---|---|---|---|---|---|
+| plano | 1 | 7 toques + 5 campos | 10 toques + 5 campos | 0 | 2: "Instalar no celular", "Notificações" | 530 |
+| plano | 2 | 2 toques | 4 toques | 0 | 0 | 453 |
+| conhecer | 1 | 8 toques + 5 campos | 10 toques + 5 campos | 0 | as mesmas 2 | 225 |
+| conhecer | 2 | 2 toques | 4 toques | 0 | 0 | 184 |
 
 Dia 1 do plano: Gênesis 1-3 + Mateus 1, 2480 palavras no leitor (uns 12 min), e o app promete
 "cerca de 10 min" + "cerca de 5 min". A promessa fecha; o custo está antes dela.
@@ -119,11 +133,10 @@ O que aparece, na ordem, e quem decide:
    `localStorage cc.instalar=1` → `location.replace('./')`.
 3. **Partida do app** `src/app/10-roteador.js` (procure `// ---------- partida`): abertura
    (`#abertura`, fica até o app estar pronto; `sessionStorage cc.abertura` evita repetir na mesma
-   sessão) → **tutorial de instalar** se `cc.instalar` (`07c-instalar.js CC.tutorialInstalar`,
-   folha "Instalar no celular", `[data-pular]`) → **convite de notificações**
-   (`07d-notificacoes.js CC.talvezOferecerNotificacoes`: só com `Notification.permission ===
-   'default'`, conta com senha, e nunca duas vezes: "Agora não" guarda a hora e pergunta de novo uma
-   vez, 7 dias depois; no iPhone só com o app instalado) → consentimento, se faltar
+   sessão) → **convite de notificações** (`07d-notificacoes.js CC.talvezOferecerNotificacoes`: só
+   com `Notification.permission === 'default'`, conta com senha, nunca antes da primeira leitura
+   (`CC.datasFeitas` vazio devolve sem perguntar), e nunca duas vezes: "Agora não" guarda a hora e
+   pergunta de novo uma vez, 7 dias depois; no iPhone só com o app instalado) → consentimento, se faltar
    (`CC.pedirConsentimento`) → aviso de endereço novo (só em ge.off-sec.net) → link de célula ou
    convite da URL → completar cadastro (contas antigas) → `avisosDoDia()`: escudo que cobriu ontem
    (aviso flutuante), ofensiva zerada nos últimos 14 dias (folha "Ainda tem brasa", `[data-ler]`
@@ -140,10 +153,14 @@ O que aparece, na ordem, e quem decide:
    (`[data-trilha]`, para quem lê na Bíblia de papel); "Concluir o dia" (`[data-concluir]`) conta a
    leitura e abre a reflexão (`tela-festa`: Guardar → `[data-avancar]` → Pensar, `[data-pergunta]`
    → Orar, `[data-orei]` → `tela-resumo` → `[data-voltar-trilha]` "Até amanhã, Nome!"). "Pular por
-   hoje" (`[data-pular]`) encurta.
+   hoje" (`[data-pular]`) encurta. **Depois do primeiro "Até amanhã" da conta nova**
+   (`CC.depoisDoPrimeiroDia`, em `07c-instalar.js`): o tutorial de instalar (se `cc.instalar`, a
+   marca que o cadastro grava) e, fechado ele, o convite de notificações. O script dispensa os dois
+   e os conta como "folhas depois do dia feito".
 6. **Conhecer Jesus** `05b-conhecer.js` (`.licao.tela-conhecer`): "O que você vai ler" com "uns N
    minutos" → `[data-ler]` → leitor → "Terminei a leitura" fecha o leitor → "Repare", a pergunta, a
-   conversa → `[data-terminar]` "Terminei o dia" (é o que conta para a ofensiva) → `[data-fechar]`.
+   conversa → `[data-terminar]` "Terminei o dia" (é o que conta para a ofensiva; na conta nova,
+   dispara o mesmo `CC.depoisDoPrimeiroDia`) → `[data-fechar]`.
 
 ## 6. Simular dias à mão (fora do script)
 

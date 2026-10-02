@@ -225,12 +225,22 @@ async function voltar() {
 // Tudo o que se põe na frente da pessoa antes de ela pedir algo. Cada folha é dispensada com a
 // opção mais branda e conta como interrupção e como toque. A folha "Ainda tem brasa"
 // (ofensiva zerada) tem um caminho positivo, "Reavivar hoje", que já leva à lição: esse é tomado.
-async function interrupcoes() {
+// Com { depois: true }, são as folhas que o app abre depois do dia feito (o tutorial de instalar
+// e o convite de notificações da conta nova, desde 02/10/2026): contam à parte, porque vêm
+// depois do valor, não antes dele.
+async function interrupcoes({ depois = false } = {}) {
   for (let i = 0; i < 6; i++) {
-    await dormir(900);
+    await dormir(depois && !i ? 1500 : 900);
     const r = await av(RETRATO);
     const folha = (r.camadas || []).filter((c) => c.tipo.startsWith('.folha')).pop();
     if (!folha) break;
+    if (depois) {
+      const como = await av(DISPENSAR);
+      await dormir(500);
+      await registrar('Folha depois do dia feito: ' + (folha.rotulo || folha.titulo) + (folha.titulo && folha.titulo !== folha.rotulo ? ' ("' + folha.titulo + '")' : '') + '. Dispensada com "' + como + '"', { toque: true, dados: { folha } });
+      D.depois.push({ passo: D.passos.length, tela: folha.rotulo || folha.titulo, titulo: folha.titulo || '', palavras: folha.palavras || 0, botoes: folha.botoes || [], dispensada: como || '' });
+      continue;
+    }
     if (/Recomeçar/.test(folha.rotulo) && (await av(existe('.cortina [data-ler]')))) {
       await toque('.cortina [data-ler]', 'Interrupção: "' + folha.titulo + '" (ofensiva zerou). Tocou em "Reavivar hoje"', { dados: { interrupcao: folha } });
       D.interrupcoes.push({ passo: D.passos.length, tela: folha.rotulo, titulo: folha.titulo, palavras: folha.palavras, botoes: folha.botoes, dispensada: 'Reavivar hoje (leva à lição)' });
@@ -335,7 +345,7 @@ async function fimDoDia(erros) {
   const vistos = new Set();
   D.erros = erros.filter((e) => { const k = e.tipo + e.texto; if (vistos.has(k)) return false; vistos.add(k); return true; });
   D.tempoMs = D.passos.reduce((s, p) => s + p.ms, 0);
-  console.log('  fim do dia ' + D.dia + ': ofensiva ' + resumo.ofensiva + ', escudos ' + resumo.escudos + ', ' + D.toques + ' toques, ' + D.interrupcoes.length + ' interrupções, ' + D.erros.length + ' erros');
+  console.log('  fim do dia ' + D.dia + ': ofensiva ' + resumo.ofensiva + ', escudos ' + resumo.escudos + ', ' + D.toques + ' toques, ' + D.interrupcoes.length + ' interrupções, ' + D.depois.length + ' folhas depois do dia, ' + D.erros.length + ' erros');
 }
 
 // ---------------------------------------------------------------- os dias
@@ -343,7 +353,7 @@ const hojeMais = (n) => { const d = new Date(Date.now() + n * DIA_MS); return ne
 console.log('\n  Jornada ' + CAMINHO + ', ' + DIAS + ' dia(s), conta @' + USUARIO + ' · ' + BASE + ' · saída em ' + SAIDA + '\n');
 for (let dia = 1; dia <= DIAS; dia++) {
   const desvio = dia - 1;
-  D = { dia, data: hojeMais(desvio), passos: [], toques: 0, campos: 0, interrupcoes: [], leituras: [], marcos: {}, erros: [], prometido: [] };
+  D = { dia, data: hojeMais(desvio), passos: [], toques: 0, campos: 0, interrupcoes: [], depois: [], leituras: [], marcos: {}, erros: [], prometido: [] };
   relatorio.dias.push(D);
   if (PULAR.has(dia)) { D.pulado = true; console.log('  dia ' + dia + ' (' + D.data + '): não abriu o app'); continue; }
   console.log('  dia ' + dia + ' (' + D.data + ')');
@@ -356,6 +366,7 @@ for (let dia = 1; dia <= DIAS; dia++) {
     if (dia === 1) await cadastrar(); else await voltar();
     await interrupcoes();
     if (CAMINHO === 'plano') await lerDiaPlano(); else await lerDiaConhecer();
+    await interrupcoes({ depois: true });
     await fimDoDia(erros);
   } catch (e) {
     D.erroFatal = e.message;
@@ -384,14 +395,15 @@ L.push('Toques = cliques em botões, links, nós e caixas; campos = o que a pess
 L.push('');
 L.push('## Resumo');
 L.push('');
-L.push('| Dia | Data | Até o texto bíblico | Até concluir o dia | Interrupções | Palavras até o texto | Tempo da automação | Ofensiva · escudos ao fim | Erros |');
-L.push('|---|---|---|---|---|---|---|---|---|');
+L.push('| Dia | Data | Até o texto bíblico | Até concluir o dia | Interrupções | Folhas depois do dia feito | Palavras até o texto | Tempo da automação | Ofensiva · escudos ao fim | Erros |');
+L.push('|---|---|---|---|---|---|---|---|---|---|');
 for (const d of relatorio.dias) {
-  if (d.pulado) { L.push('| ' + d.dia + ' | ' + d.data + ' | não abriu o app | | | | | | |'); continue; }
+  if (d.pulado) { L.push('| ' + d.dia + ' | ' + d.data + ' | não abriu o app | | | | | | | |'); continue; }
   const m1 = d.marcos.leitura; const m2 = d.marcos.dia;
   L.push('| ' + d.dia + ' | ' + d.data + ' | ' + (m1 ? m1.toques + ' toques' + (m1.campos ? ' + ' + m1.campos + ' campos' : '') + ' (passo ' + m1.passo + ')' : 'não chegou') + ' | '
     + (m2 ? m2.toques + ' toques' + (m2.campos ? ' + ' + m2.campos + ' campos' : '') + ' (passo ' + m2.passo + ')' : 'não chegou') + ' | '
     + d.interrupcoes.length + (d.interrupcoes.length ? ' (' + d.interrupcoes.map((i) => i.tela).join(', ') + ')' : '') + ' | '
+    + (d.depois || []).length + ((d.depois || []).length ? ' (' + d.depois.map((i) => i.tela).join(', ') + ')' : '') + ' | '
     + (m1 ? palavrasAte(d, m1.limite) : palavrasAte(d)) + ' | ' + seg(d.tempoMs || 0) + ' | '
     + (d.fim ? d.fim.ofensiva + ' · ' + d.fim.escudos : '?') + ' | ' + d.erros.length + (d.erroFatal ? ' + parou' : '') + ' |');
 }
@@ -410,6 +422,10 @@ for (const d of relatorio.dias) {
     L.push('**Interrupções (' + d.interrupcoes.length + '):**');
     for (const i of d.interrupcoes) L.push('- passo ' + i.passo + ': ' + i.tela + (i.titulo ? ' ("' + i.titulo + '")' : '') + ', ' + i.palavras + ' palavras, botões: ' + (i.botoes || []).join(' · ') + '. Dispensada com "' + i.dispensada + '".');
   } else L.push('**Interrupções:** nenhuma.');
+  if ((d.depois || []).length) {
+    L.push('**Folhas depois do dia feito (' + d.depois.length + '):**');
+    for (const i of d.depois) L.push('- passo ' + i.passo + ': ' + i.tela + (i.titulo ? ' ("' + i.titulo + '")' : '') + ', ' + i.palavras + ' palavras, botões: ' + (i.botoes || []).join(' · ') + '. Dispensada com "' + i.dispensada + '".');
+  }
   L.push('');
   L.push('| # | Passo | Tela | Camadas abertas | Palavras | Aviso | ms | Captura |');
   L.push('|---|---|---|---|---|---|---|---|');

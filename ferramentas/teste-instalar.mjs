@@ -108,11 +108,26 @@ for (let i = 0; i < 3; i++) {
   await av('document.getElementById("form-cadastro").requestSubmit(); 1', false);
   await dormir(500);
 }
-// Conta nova: o tutorial aparece logo na primeira abertura, antes de qualquer leitura (a927797),
-// depois que a abertura sai.
+// Conta nova: nada entre a conta criada e o texto bíblico. O tutorial (e o convite de
+// notificações) só vem depois do primeiro dia feito, no "Até amanhã" da lição (02/10/2026:
+// antes, as duas folhas vinham logo na primeira abertura e custavam 2 dos 9 toques até a Bíblia).
 await esperarAte('!!(window.CC && document.querySelector(".aba"))', 12000);
+await esperarAte('!document.getElementById("abertura")', 12000);
+await dormir(1500);
+ok(await av('!document.querySelector(".cortina")'), 'depois de criar a conta, o app abre sem folha nenhuma na frente da trilha');
+ok(await av('localStorage.getItem("cc.instalar") === "1"'), 'a marca de conta nova fica guardada até o primeiro dia feito');
+// o primeiro dia: marca as duas passagens, conclui, pula a reflexão e volta à trilha
+await av('document.querySelector(".cartao-salvia[data-abrir-dia]").click(); 1', false);
+ok(await esperarAte('!!document.querySelector(".licao [data-trilha]")'), 'o cartão de hoje abre a lição do dia 1');
+await av('document.querySelectorAll(".licao [data-trilha]").forEach((b) => b.click()); 1', false);
+await esperarAte('!document.querySelector(".licao [data-concluir]").disabled');
+await av('document.querySelector(".licao [data-concluir]").click(); 1', false);
+ok(await esperarAte('!!document.querySelector(".licao.tela-festa [data-pular]")'), '"Concluir o dia" leva à reflexão, sem folha no meio');
+await av('document.querySelector(".licao.tela-festa [data-pular]").click(); 1', false);
+ok(await esperarAte('!!document.querySelector(".licao.tela-resumo [data-voltar-trilha]")'), '"Pular por hoje" leva ao resumo do dia');
+await av('document.querySelector(".licao.tela-resumo [data-voltar-trilha]").click(); 1', false);
 const abriu = await esperarAte('!!document.querySelector(".folha-instalar")', 12000);
-ok(abriu, 'depois de criar a conta, o app abre com o tutorial de instalar');
+ok(abriu, 'depois do primeiro "Até amanhã", a conta nova vê o tutorial de instalar');
 ok(await av('localStorage.getItem("cc.instalar") === null'), 'a marca de conta nova sai quando o tutorial aparece: não volta a cada abertura');
 ok(await av('!!document.querySelector(".folha-instalar [data-pular]")'), 'o tutorial tem como pular');
 // O navegador de teste (Chrome, Android) oferece instalar: a conta nova abre no botão de um

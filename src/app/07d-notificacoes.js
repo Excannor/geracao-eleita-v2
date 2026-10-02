@@ -218,6 +218,10 @@
     // Android o navegador também aceita, então o pedido vem logo depois do tutorial de instalar.
     if (!suportado() || Notification.permission !== 'default') return;
     if (!(CC.quem && CC.quem.comSenha)) return;
+    // Nunca antes da primeira leitura: quem ainda não fez um dia (do plano, dos Primeiros passos
+    // ou do Conhecer Jesus) não sabe do que o lembrete serve, e "Agora não" custava 7 dias sem
+    // convite. O pedido vem no fim do primeiro dia feito (CC.depoisDoPrimeiroDia).
+    if (CC.datasFeitas && !CC.datasFeitas().size) return;
     let marca = '';
     try { marca = localStorage.getItem('cc.aviso.push') || ''; } catch (e) { return; }
     if (marca === 'feito' || marca === 'nunca') return;

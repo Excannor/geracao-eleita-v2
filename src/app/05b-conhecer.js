@@ -206,6 +206,8 @@
         CC.vibrar('certo');
         CC.marcarConhecido(dia.numero);
         desenharConhecerDia();
+        // o primeiro dia feito pela conta nova: agora o tutorial de instalar e os lembretes
+        if (CC.depoisDoPrimeiroDia) CC.depoisDoPrimeiroDia();
       };
     }
     const continuarPlano = el.querySelector('[data-continuar-plano]');

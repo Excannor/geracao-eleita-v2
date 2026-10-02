@@ -465,12 +465,7 @@
           sair();
           setTimeout(() => CC.rolarAteAtual(true), 120);
           // conta nova que acabou de ler pela primeira vez: agora sim, instalar e lembretes
-          let nova = false;
-          try { nova = localStorage.getItem('cc.instalar') === '1'; if (nova) localStorage.removeItem('cc.instalar'); } catch (e) { /* segue */ }
-          setTimeout(async () => {
-            if (nova && !CC.rodandoComoApp()) await CC.tutorialInstalar({ contaNova: true });
-            if (!document.querySelector('.cortina, .tela-cheia') && CC.talvezOferecerNotificacoes) CC.talvezOferecerNotificacoes();
-          }, 900);
+          if (CC.depoisDoPrimeiroDia) CC.depoisDoPrimeiroDia();
         };
         const desafios = el.querySelector('[data-ver-desafios]');
         if (desafios) desafios.onclick = (ev) => { ev.preventDefault(); CC.fecharLicao(); location.hash = '#/missoes'; };
