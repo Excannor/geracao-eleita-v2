@@ -217,10 +217,9 @@ button.cartao-proposito:hover { background: var(--campo); }
 .segmentado:has([data-tipo="semana"]) button { flex: 1 1 auto; padding-inline: 6px; white-space: nowrap; }
 @media (max-width: 374px) { .segmentado:has([data-tipo="semana"]) button { font-size: .8125rem; } }
 @media (max-width: 359px) { .segmentado:has([data-tipo="semana"]) button { font-size: .75rem; } }
-/* o versículo do roteiro sem o recuo da lista: os quatro botões dele numa linha só */
+/* o versículo do roteiro sem o recuo da lista (os botões já ficam numa linha só, 22-leitura) */
 .secao-w .cartao-versiculo { margin: 8px 0 8px -22px; padding: 26px 12px 4px; }
 .secao-w .cartao-versiculo .aspas { left: 12px; }
-.secao-w .botoes-verso { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .modo-encontro .frase-cena { color: var(--tinta-forte); }
 
 /* ---------- discipulado ---------- */

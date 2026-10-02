@@ -255,3 +255,23 @@ Configurações; a entrada sem conta. O resto conforme o que mudou (a tabela de 
   espera); com menos movimento, parado; leitor de tela com um texto fixo, sem `aria-live`.
 - **Dado "de hoje" em cache** (leu hoje, toque de hoje) guarda o dia em que veio; noutro dia vale
   "ainda não", e quem recarrega na volta do segundo plano repinta o que mostra o dado.
+
+## 10. Imagem de compartilhar (story), 02/10
+
+- **O que se compartilha é o que está na tela.** A imagem leva exatamente a frase, o número e o
+  texto que a pessoa vê naquele momento (o carimbo sorteado na abertura da folha, a frase do fim
+  do dia), nunca um sorteio novo. Prova: o mesmo pedido montado com o texto lido da tela dá o
+  mesmo arquivo (`CC.story.preparar` guarda pelo pedido; `ferramentas/teste-compartilhar.mjs`).
+- **Story 1080x1920 com área segura:** nada que importe nos 250px de cima e de baixo; a marca
+  (símbolo, nome e endereço) fica logo acima da faixa de baixo. Letra mínima de 34px; o texto
+  tem o lugar reservado antes do enfeite.
+- **Web Share com arquivo** (`navigator.share({ files })`) é o máximo que um app web faz: abre
+  a folha do sistema com a imagem (Instagram > Story, WhatsApp > Meu status); não há como abrir
+  o editor de story direto. Sem `canShare({ files })`, baixa e avisa como postar. A imagem fica
+  pronta antes do toque (o Safari recusa o share longe do toque) e a recusa pede outro toque.
+- **Um nome só para cada ação:** "Compartilhar" leva para fora do app (imagem); "Juntos" mostra
+  aos amigos dentro do app. Nada de dois botões quase iguais com nomes diferentes.
+- **Composição antes do código:** três composições de cada imagem, olhadas com Read, a escolhida
+  refinada em duas rodadas ou mais (`design/compartilhar/gerar.mjs` gera tudo fora do app, com as
+  fontes de verdade); depois, a imagem que sai do app é recortada em pedaços e conferida peça por
+  peça (carimbo, chama, aspas, marca).

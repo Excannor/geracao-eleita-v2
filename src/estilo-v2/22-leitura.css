@@ -175,7 +175,9 @@
 .acoes-verso .ref-verso { line-height: 48px; padding-right: 56px; }
 .cor-marca { width: 44px; height: 44px; }
 .cor-marca::after { inset: -2px; }
-.botoes-verso { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 4px; }
+/* uma linha só, cada botão com pelo menos a largura do nome ("Compartilhar" a 360px passava
+   da coluna igual às outras) e o que sobra dividido por igual */
+.botoes-verso { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(max-content, 1fr); gap: 4px; }
 .acoes-verso .botoes-verso .botao { flex-direction: column; gap: 6px; min-height: 0; padding: 0; background: none; color: var(--tinta-forte); font-size: .8125rem; font-weight: 600; }
 .botoes-verso .botao svg { box-sizing: content-box; padding: 12px; border-radius: 50%; background: var(--campo); }
 .botoes-verso .botao:hover svg, .acoes-verso .botao-icone:hover { background: var(--contorno); }

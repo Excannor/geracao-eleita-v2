@@ -184,6 +184,78 @@ await esperar('!!document.querySelector(".folha-ofensiva")');
 ok(await av('!document.querySelector("[data-compartilhar-ofensiva]")'), 'com 0 dias a folha não oferece Compartilhar');
 await av('document.querySelectorAll(".folha, .veu").forEach((e) => e.remove())');
 
+// ---------- o versículo ----------
+// A barra do versículo tem um botão só para levar o versículo para fora do app (Compartilhar,
+// a imagem de story) e outro, Juntos, que mostra aos amigos dentro do app. O antigo "Imagem"
+// fazia quase o mesmo que Compartilhar e saiu.
+// página nova: as folhas tiradas à mão acima deixam a cortina do app para trás. Mudar só o
+// hash não recarrega (é o mesmo documento): troca o hash e recarrega.
+await av('location.hash = "#/biblia/" + encodeURIComponent("João") + "/3"');
+await dormir(300);
+await cmd('Page.reload', {});
+await esperar('!!(window.CC && CC.story)', 15000);
+await dormir(1500);
+await av(SIMULAR);
+ok(await esperar('!!document.querySelector(\'.leitor-verso[data-v="3:16"]\')', 15000), 'a Bíblia abre em João 3');
+// com amigos, para o Juntos aparecer; o envio ao Juntos é simulado
+await av('CC.podeCompartilharComAmigos = () => true; window.__juntos = null; CC.compartilharVersiculo = async (ref) => { window.__juntos = ref; return true; }; true');
+await av('document.querySelector(\'.leitor-verso[data-v="3:16"]\').click()');
+ok(await esperar('!!document.querySelector(".acoes-verso [data-compartilhar-verso]")'), 'escolher João 3.16 mostra a barra com Compartilhar');
+const rotulos = await av('[...document.querySelectorAll(".acoes-verso .botoes-verso .botao")].map((b) => b.textContent.trim())');
+ok(JSON.stringify(rotulos) === JSON.stringify(['Nota', 'Juntos', 'Copiar', 'Compartilhar']), 'a barra tem Nota, Juntos, Copiar e Compartilhar, sem "Imagem" (' + rotulos.join(', ') + ')');
+ok(await av('!document.querySelector("[data-imagem-verso]")'), 'não sobra o botão Imagem');
+for (const largura of [390, 360]) {
+  await cmd('Emulation.setDeviceMetricsOverride', { width: largura, height: 844, deviceScaleFactor: 2, mobile: true });
+  await dormir(300);
+  const medidas = await av('[...document.querySelectorAll(".acoes-verso .botoes-verso .botao")].map((b) => { const r = b.getBoundingClientRect(); return b.textContent.trim() + ":" + b.scrollWidth + "/" + b.clientWidth + "," + Math.round(r.right) + "," + Math.round(r.height); })');
+  ok(await av('[...document.querySelectorAll(".acoes-verso .botoes-verso .botao")].every((b) => b.scrollWidth <= b.clientWidth + 1 && b.getBoundingClientRect().right <= innerWidth && b.getBoundingClientRect().height >= 44)'),
+    'a ' + largura + 'px, nenhum rótulo da barra passa do botão nem da tela, e todo botão tem 44px (' + medidas.join(' ') + ')');
+}
+for (const tema of ['claro', 'escuro']) {
+  await av('CC.guardarTema(' + (tema === 'escuro') + ')');
+  await av('(() => { const a = document.getElementById("aviso-flutuante"); if (a) a.remove(); document.querySelector(".acoes-verso").scrollIntoView({ block: "center" }); return true; })()');
+  await dormir(400);
+  const foto = await cmd('Page.captureScreenshot', { format: 'png' });
+  writeFileSync(join(SAIDA, 'barra-versiculo-360-' + tema + '.png'), Buffer.from(foto.data, 'base64'));
+}
+await av('CC.guardarTema(false)');
+await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+// Juntos continua mandando ao Feed dos amigos, sem imagem
+await av('document.querySelector(".acoes-verso [data-juntos-verso]").click()');
+ok(await esperar('window.__juntos === "João 3.16"'), 'Juntos continua mostrando o versículo aos amigos (' + await av('window.__juntos') + ')');
+await av('document.querySelector(\'.leitor-verso[data-v="3:16"]\').click()');
+await esperar('!!document.querySelector(".acoes-verso [data-compartilhar-verso]")');
+await av('__simular("aceita")');
+await dormir(900);
+await av('document.querySelector(".acoes-verso [data-compartilhar-verso]").click()');
+ok(await esperar('!!window.__compartilhado'), 'Compartilhar no versículo abre o compartilhamento com a imagem');
+const verso = await av('(async () => { const d = window.__compartilhado; const p = await __png(d.files[0]); return { ...p, texto: d.text }; })()');
+ok(verso.w === 1080 && verso.h === 1920 && verso.nome === 'geracao-eleita-joao-3-16.png', 'vai a imagem 1080x1920 geracao-eleita-joao-3-16.png (' + verso.nome + ')');
+ok(/^João 3\.16 \(Nova Bíblia Viva\)/.test(verso.texto) && /geracaoeleita\.app/.test(verso.texto), 'o texto junto leva a referência, a tradução e o endereço (' + verso.texto + ')');
+ok(await av('CC.story.preparar({ tipo: "versiculo", ref: "João 3.16", texto: [...document.querySelectorAll(\'.leitor-verso[data-v="3:16"]\')].map((p) => p.textContent.replace(/^\\d+/, "").trim()).join(" "), traducao: "Nova Bíblia Viva" }).then((f) => f === window.__compartilhado.files[0])'),
+  'a imagem leva o texto do versículo escolhido');
+ok(await av('!document.querySelector(".acoes-verso:not([hidden]) [data-compartilhar-verso]")'), 'depois de compartilhar, a escolha se desfaz, como nos outros botões');
+guardarPng('versiculo-joao-3-16.png', verso.url);
+// recusado pelo navegador: a barra fica para o segundo toque
+await av('document.querySelector(\'.leitor-verso[data-v="3:16"]\').click()');
+await esperar('!!document.querySelector(".acoes-verso [data-compartilhar-verso]")');
+await av('__simular("nega")');
+await av('document.querySelector(".acoes-verso [data-compartilhar-verso]").click()');
+ok(await esperar('/Toque de novo/.test((document.getElementById("aviso-flutuante") || {}).textContent || "")')
+  && await av('!!document.querySelector(".acoes-verso:not([hidden]) [data-compartilhar-verso]")'), 'se o navegador recusa, a barra fica e o aviso pede outro toque');
+await av('document.querySelector(".acoes-verso [data-compartilhar-verso]").click()');
+ok(await esperar('!!window.__compartilhado'), 'o segundo toque no versículo compartilha');
+const versos = await av(`(async () => {
+  const saida = {};
+  for (const [nome, ref] of [["versiculo-curto", "João 11.35"], ["versiculo-longo", "1 Coríntios 13.4-7"], ["versiculo-dez", "Salmos 119.1-10"]]) {
+    const texto = await CC.textoDoVersiculo(ref);
+    saida[nome] = (await __png(await CC.story.preparar({ tipo: "versiculo", ref, texto, traducao: "Nova Bíblia Viva" }))).url;
+  }
+  return saida;
+})()`);
+for (const [nome, url] of Object.entries(versos || {})) guardarPng(nome + '.png', url);
+ok(Object.keys(versos || {}).length === 3, 'as imagens de versículo curto, longo e de dez versículos saem');
+
 // as imagens de referência, para a revisão a olho: 1, 100 e 365 dias com a frase mais curta e
 // a mais longa da lista, e a frase do estágio (sem carimbo à vista)
 const casos = await av(`(async () => {

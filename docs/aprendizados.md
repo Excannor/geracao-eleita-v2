@@ -318,6 +318,18 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   (a primeira pintura da rota fecha folhas abertas cedo), parou num TypeError e deixou servidor e
   Chrome vivos → teste de navegador com a limpeza num `finally` e espera o app assentar antes
   de abrir folha; o que sobrou foi morto pelo PID.
+- 2026-10-02 · versículo · Trocar "Imagem" por "Compartilhar" na barra do versículo fez o nome
+  passar da coluna a 360px (77px de texto numa coluna de 71px): a grade dividia a largura em
+  partes iguais → cada botão com pelo menos a largura do nome (`grid-auto-columns:
+  minmax(max-content, 1fr)`); o `teste-compartilhar` mede os rótulos a 390 e 360px.
+- 2026-10-02 · teste · Para limpar a tela no meio do teste, naveguei para o mesmo endereço
+  mudando só o hash, e a página não recarregou: as capturas da barra saíram com a cortina de
+  folhas antigas por cima. O erro já estava registrado ("Passo de teste que abre de novo") →
+  antes de escrever teste de navegador novo, reler a parte de testes desta página; para
+  recarregar, trocar o hash e mandar `Page.reload`.
+- 2026-10-02 · versículo · Na barra do leitor, todo botão desfaz a escolha depois de agir; se o
+  Compartilhar fizesse o mesmo quando o navegador recusa o compartilhamento, o "toque de novo"
+  ficava sem botão → a barra só se desfaz quando a imagem foi compartilhada ou baixada.
 
 ## Geral
 

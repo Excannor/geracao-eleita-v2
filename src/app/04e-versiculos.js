@@ -1,6 +1,7 @@
 /* Versículos: tudo o que se faz com um versículo, igual em todo lugar. Os dois leitores (o da
    lição e o da Bíblia) e o cartão de versículo (baú, versículo da semana) usam esta mesma
-   barra: marcar em quatro cores, escrever uma nota, mostrar no Juntos e copiar.
+   barra: marcar em quatro cores, escrever uma nota, mostrar no Juntos (aos amigos, dentro do
+   app), copiar e compartilhar como imagem de story (fora do app, 01d-story.js).
 
    Onde cada coisa fica guardada, no estado que já vai para o servidor:
    - marca: E.marcas["João 3:16"] = { cor, em }, um versículo por chave (02-estado.js);
@@ -59,7 +60,7 @@
       + (CC.podeCompartilharComAmigos && CC.podeCompartilharComAmigos()
         ? '<button class="botao pequeno contorno" data-juntos-verso>' + CC.ico('pessoas') + 'Juntos</button>' : '')
       + '<button class="botao pequeno contorno" data-copiar-verso>' + CC.ico('folha') + 'Copiar</button>'
-      + '<button class="botao pequeno contorno" data-imagem-verso>' + CC.ico('imagem') + 'Imagem</button>'
+      + '<button class="botao pequeno contorno" data-compartilhar-verso>' + CC.ico('compartilhar') + 'Compartilhar</button>'
       + (fechar ? '<button class="botao-icone" data-fechar-verso aria-label="Desfazer a escolha">' + CC.ico('fechar') + '</button>' : '')
       + '</div>';
   }
@@ -94,14 +95,22 @@
       CC.avisar(certo ? 'Versículo copiado' : 'Não consegui copiar');
       aoMudar('copiar');
     };
-    const imagem = barra.querySelector('[data-imagem-verso]');
-    if (imagem) {
-      imagem.onclick = async () => {
-        imagem.disabled = true;
-        const corpo = await Promise.resolve(texto()).catch(() => '');
-        await CC.gerarImagemVersiculo(ref, corpo);
-        imagem.disabled = false;
-        aoMudar('imagem');
+    // Compartilhar: a imagem de story do trecho (01d-story.js) para o Instagram e o WhatsApp,
+    // fora do app. "Juntos", acima, é outra coisa: mostra o versículo aos amigos dentro do app.
+    const compartilhar = barra.querySelector('[data-compartilhar-verso]');
+    if (compartilhar) {
+      const t = CC.traducao();
+      const pedido = async () => ({ tipo: 'versiculo', ref, texto: await Promise.resolve(texto()).catch(() => ''),
+        traducao: t ? t.nome.replace(/Biblica® Open |™/g, '') : '' });
+      // A imagem fica pronta pouco depois de a barra aparecer (o Safari só abre o
+      // compartilhamento logo depois do toque); quem segue escolhendo versículos não paga nada.
+      setTimeout(() => { if (compartilhar.isConnected) pedido().then(CC.story.preparar).catch(() => null); }, 700);
+      compartilhar.onclick = async () => {
+        compartilhar.disabled = true;
+        const r = await CC.imagemStory(await pedido());
+        compartilhar.disabled = false;
+        // recusado pelo navegador ou cancelado: a barra fica, para tentar de novo
+        if (r === 'compartilhado' || r === 'baixado') aoMudar('compartilhar');
       };
     }
   }
@@ -286,135 +295,6 @@
       .filter(([k, t]) => k.startsWith('verso:') && (t || '').trim())
       .map(([k, t]) => ({ ref: k.slice(6), texto: t.trim() }));
   }
-
-  // ---------- cartão de versículo em imagem ----------
-  // Formato de status e stories (1080x1920), no aparelho, com <canvas>: nada sai daqui, nada
-  // vai para o servidor. A letra encolhe para caber (mesma lógica do carimbo da ofensiva, só
-  // que quebrando o texto na hora, porque o versículo não vem pré-quebrado).
-  const CARTAO_LARGURA = 1080;
-  const CARTAO_ALTURA = 1920;
-  async function desenharCartaoVersiculo(ref, corpo) {
-    const t = CC.traducao();
-    const nomeTraducao = t ? t.nome.replace(/Biblica® Open |™/g, '') : '';
-    const tela = document.createElement('canvas');
-    tela.width = CARTAO_LARGURA;
-    tela.height = CARTAO_ALTURA;
-    const ctx = tela.getContext('2d');
-
-    // As cores da folha do Início (paleta C, a do tema claro): o fundo em sálvia pálida e o
-    // versículo num cartão branco, em Literata (a letra do texto bíblico no app), com as
-    // aspas no botão redondo preto do Início. Não depende do tema que a pessoa está usando.
-    const folha = '#dfe8c1';
-    const cartao = '#ffffff';
-    const tinta = '#2c2d2b';
-    const forte = '#151615';
-    const fraco = '#686b66';
-    const legenda = '#4f5a36';
-    const salvia = '#c8da8c';
-    const meio = CARTAO_LARGURA / 2;
-    const margem = 72;
-    const recuo = 84;
-    const larguraTexto = CARTAO_LARGURA - (margem + recuo) * 2;
-    const raioAspas = 64;
-    ctx.fillStyle = folha;
-    ctx.fillRect(0, 0, CARTAO_LARGURA, CARTAO_ALTURA);
-
-    const medir = (t, tamanho) => { ctx.font = '500 ' + tamanho + 'px Literata, Georgia, serif'; return ctx.measureText(t).width; };
-    const texto = String(corpo || '').trim() || ref;
-    const ajuste = { alturaMax: CARTAO_ALTURA * 0.5, fonteMax: 64, fonteMin: 30, entreLinhas: 1.45, medir };
-    const { tamanho, linhas: cheias } = CC.ajustarTextoCartao(texto, { ...ajuste, larguraMax: larguraTexto });
-    // Linhas equilibradas, como o text-wrap: balance da tela: a menor largura que mantém o
-    // mesmo número de linhas, para a última não ficar com uma palavra sozinha.
-    const quebrar = (largura) => CC.ajustarTextoCartao(texto, { ...ajuste, larguraMax: largura, fonteMax: tamanho, fonteMin: tamanho }).linhas;
-    let linhas = cheias;
-    for (let de = larguraTexto * 0.55, ate = larguraTexto, i = 0; i < 12 && cheias.length > 1; i++) {
-      const meioDoIntervalo = (de + ate) / 2;
-      const tentativa = quebrar(meioDoIntervalo);
-      if (tentativa.length === cheias.length) { linhas = tentativa; ate = meioDoIntervalo; } else de = meioDoIntervalo;
-    }
-    const alturaBloco = linhas.length * tamanho * 1.45;
-
-    // O cartão cresce com o texto e fica no meio da área acima do nome do app.
-    const altura = raioAspas + 56 + alturaBloco + 56 + 44 + (nomeTraducao ? 46 : 0) + 84;
-    const topo = Math.max(150, Math.round((CARTAO_ALTURA - 170 - altura) / 2));
-    ctx.fillStyle = cartao;
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(margem, topo, CARTAO_LARGURA - margem * 2, altura, 64);
-    else ctx.rect(margem, topo, CARTAO_LARGURA - margem * 2, altura);
-    ctx.fill();
-
-    // As aspas num círculo preto, metade para fora da borda de cima do cartão.
-    ctx.fillStyle = forte;
-    ctx.beginPath();
-    ctx.arc(meio, topo, raioAspas, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = salvia;
-    ctx.font = '600 150px Literata, Georgia, serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('“', meio, topo + 50);
-
-    ctx.font = '500 ' + tamanho + 'px Literata, Georgia, serif';
-    ctx.fillStyle = tinta;
-    let y = topo + raioAspas + 56 + tamanho * 0.725;
-    for (const linha of linhas) { ctx.fillText(linha, meio, y); y += tamanho * 1.45; }
-
-    // Referência e tradução, embaixo do texto (a licença da tradução pede o nome dela).
-    y = topo + raioAspas + 56 + alturaBloco + 56 + 22;
-    ctx.font = '800 44px Manrope, sans-serif';
-    ctx.fillStyle = forte;
-    ctx.fillText(ref, meio, y);
-    if (nomeTraducao) {
-      ctx.font = '600 30px Manrope, sans-serif';
-      ctx.fillStyle = fraco;
-      ctx.fillText(nomeTraducao, meio, y + 54);
-    }
-
-    // O nome do app, pequeno, no pé, sobre a folha.
-    ctx.font = '700 30px Manrope, sans-serif';
-    ctx.fillStyle = legenda;
-    ctx.fillText('Geração Eleita', meio, CARTAO_ALTURA - 96);
-
-    return tela;
-  }
-
-  CC.gerarImagemVersiculo = async function (ref, corpo) {
-    try {
-      // As fontes precisam estar prontas antes de desenhar, senão o canvas usa a fonte de
-      // sistema e o texto sai diferente do que a pessoa vê no app.
-      if (document.fonts && document.fonts.ready) {
-        await document.fonts.ready;
-        try { await Promise.all([document.fonts.load('500 72px Literata'), document.fonts.load('800 44px Manrope')]); } catch (e) { /* segue com o que tiver */ }
-      }
-      const tela = await desenharCartaoVersiculo(ref, corpo);
-      const blob = await new Promise((resolver) => tela.toBlob(resolver, 'image/png'));
-      if (!blob) throw new Error('sem imagem');
-      const nomeArquivo = 'versiculo-' + ref.replace(/[^\w]+/g, '-').toLowerCase() + '.png';
-      const arquivo = new File([blob], nomeArquivo, { type: 'image/png' });
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
-        try {
-          await navigator.share({ files: [arquivo] });
-          CC.avisar('Imagem pronta.');
-          return true;
-        } catch (e) {
-          if (e && e.name === 'AbortError') return false;
-        }
-      }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = nomeArquivo;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
-      CC.avisar('Imagem pronta.');
-      return true;
-    } catch (e) {
-      CC.avisar('Não consegui gerar a imagem agora.');
-      return false;
-    }
-  };
 
   CC.versiculos = { CORES, chaveNota, chavesDoTrecho, ligar, irPara, abrirNota, acoesDoCartao, ligarCartao, marcados, comNota };
 })(window.CC);
