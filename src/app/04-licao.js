@@ -82,6 +82,10 @@
         marcadas: { antigo: antes.lido || partesGuardadas(numero).antigo, novo: antes.lido || partesGuardadas(numero).novo },
       };
       CC.gravar('dia', numero);
+      // A lição de um dia ainda não lido foi aberta: um contador por data no diário (como
+      // "leitor" e "notas"), nunca texto. É o que deixa o painel do dono ver quem abre a
+      // lição e não termina, nos primeiros dias de conta.
+      if (!antes.lido && CC.marcarNoDiario) CC.marcarNoDiario('abriu');
     }
     desenhar();
   };

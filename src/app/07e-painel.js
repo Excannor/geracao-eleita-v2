@@ -193,6 +193,12 @@
         'Quantas pessoas leram em cada dia. Média de ' + p.detalhe.mediaDiasLidos + ' dias lidos por quem leu no último mês; maior ofensiva hoje: ' + p.detalhe.maiorOfensiva + ' dias.')
         + grupo('Contas novas por semana', colunas(p.detalhe.novasPorSemana, (x) => diaMes(x.de)))
         + grupo('Funil da leitura', barras(p.detalhe.funil), 'De todas as contas, quantas chegaram a cada marca de dias lidos.')
+        + (p.detalhe.primeirosDias ? grupo('Os primeiros dias de quem chega',
+          barras(p.detalhe.primeirosDias.dia1)
+          + p.detalhe.primeirosDias.dias.map((d) => linha2('Dia ' + d.dia + ' depois do cadastro (' + CC.plural(d.base, 'conta', 'contas') + ')',
+            d.base ? d.abriram + ' abriram o app · ' + d.leram + ' leram' : 'Nenhuma conta com essa idade ainda')).join('')
+          + barras([p.detalhe.primeirosDias.semana]),
+          'Das contas com idade para cada marca: o que fizeram no dia do cadastro (dia 1) e em cada um dos seis dias seguintes. É a resposta a "onde a pessoa nova para". "Abriram a lição" é anotado desde 02/10/2026; antes disso conta pela leitura marcada.') : '')
         + grupo('Ofensivas de agora', barras(p.detalhe.ofensivas))
         + grupo('Dia da semana em que mais se lê', barras(p.detalhe.diasDaSemana), 'Soma das leituras dos últimos 30 dias.')
         + grupo('Uso das funções', barras(p.detalhe.funcoes))

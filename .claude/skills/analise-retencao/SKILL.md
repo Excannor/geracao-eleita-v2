@@ -80,6 +80,12 @@ Painel do administrador (`CAMINHO_ADMIN`), em `#/config/painel` (`src/app/07e-pa
   - `funil`: Criaram a conta → Leram 1 dia → 7 → 30 → 90 (por dias lidos no total).
   - `turmas`: 6 turmas semanais pela semana do cadastro; `s1`, `s2`, `s4` = % que leu na 1ª, 2ª e 4ª
     semana depois do cadastro (só quando a semana já fechou). É a retenção por coorte.
+  - `primeirosDias` (desde 02/10/2026): o funil de quem chega, por idade da conta. `dia1`: criaram,
+    abriram a lição no dia do cadastro (`diario[data].abriu`, que `04-licao.js montarLicao` grava ao
+    abrir um dia não lido; contas de antes contam pela leitura marcada), terminaram uma leitura no
+    app (`diario[data].leitor`), marcaram lido; `dias` 2 a 7: abriram o app (`acessos`) e leram, entre
+    as contas que já completaram aquele dia; `semana`: leram 3 ou mais dos 7 primeiros. É a resposta
+    a "não passa de 2 dias". Tela: grupo "Os primeiros dias de quem chega" em `07e-painel.js`.
   - `porDia` (30 dias: quantas contas leram e quantas abriram o app), `resumo` (esta semana contra a
     anterior: abriram, leram, novas), `novasPorSemana`, `ofensivas` por faixa, `parados` por faixa
     de dias lidos (quem não lê há 7 dias ou mais), `origens` (direto, convite, Conhecer, célula),
@@ -113,8 +119,8 @@ relê as tabelas da célula na subida: histórico longo entra com o servidor par
 ## 5. Acrescentar um funil sem nomes
 
 O lugar é o `funil` de `painel.mjs montarPainel()`: uma lista de `{ faixa, contas }` calculada a
-partir do que cada pessoa tem (`datas`, `acessos`, `criadaEm`, `origem`, `comPush`), sem nome e sem
-texto. Etapas que faltam hoje e cabem no mesmo molde:
+partir do que cada pessoa tem (`datas`, `acessos`, `criadaEm`, `origem`, `comPush`, `diario`), sem
+nome e sem texto. O `primeirosDias` (seção 4) nasceu deste molde; outras etapas que cabem nele:
 
 ```js
 // painel.mjs, dentro de montarPainel(), depois do funil atual

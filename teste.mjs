@@ -720,6 +720,34 @@ secao('painel pastoral agregado (Fase 5, seção 2)');
     contas: contasGrandes, estados: estadosGrandes, propositos: [celulaGrande], comPush: [], hoje: HOJE, pedidos: [], discipulados: [],
   });
   checar(painelGrande.celulasECuidado.visitantesViraramMembros === 6, 'com 6 pessoas (5 ou mais), o painel mostra o número exato: ' + painelGrande.celulasECuidado.visitantesViraramMembros);
+
+  // --- os primeiros dias de quem chega: só contagens, por idade da conta ---
+  {
+    const HOJE2 = '2026-04-10';
+    const contasNovas = [
+      { usuario: 'nova1', criadaEm: '2026-04-01', acessos: ['2026-04-01', '2026-04-02', '2026-04-04'] }, // leu nos dias 1 e 2; abriu no 4 sem ler
+      { usuario: 'nova2', criadaEm: '2026-04-01', acessos: ['2026-04-01'] }, // abriu a lição no dia 1 e não terminou
+      { usuario: 'nova3', criadaEm: '2026-04-05', acessos: ['2026-04-05', '2026-04-06'] }, // leu 3 dias seguidos; conta antiga sem diário
+      { usuario: 'hoje1', criadaEm: HOJE2, acessos: [HOJE2] }, // criada hoje: ainda sem idade para nada
+    ];
+    const estadosNovos = {
+      nova1: { lidos: [1, 2], marcadoEm: { 1: '2026-04-01', 2: '2026-04-02' }, diario: { '2026-04-01': { abriu: 1, leitor: 2 }, '2026-04-02': { abriu: 1, leitor: 1 } } },
+      nova2: { lidos: [], marcadoEm: {}, diario: { '2026-04-01': { abriu: 1 } } },
+      nova3: { lidos: [1, 2, 3], marcadoEm: { 1: '2026-04-05', 2: '2026-04-06', 3: '2026-04-07' } },
+      hoje1: { lidos: [1], marcadoEm: { 1: HOJE2 }, diario: { [HOJE2]: { abriu: 1 } } },
+    };
+    const f = montarPainel({ contas: contasNovas, estados: estadosNovos, hoje: HOJE2 }).detalhe.primeirosDias;
+    checar(f.dia1[0].contas === 3 && f.dia1[0].base === 3, 'criaram a conta há 1 dia ou mais: 3 (a de hoje fica de fora)');
+    checar(f.dia1[1].contas === 3, 'abriram a lição no dia do cadastro: 3 (sem diário, conta pela leitura marcada)');
+    checar(f.dia1[2].contas === 1, 'terminaram uma leitura no app no dia do cadastro: só uma');
+    checar(f.dia1[3].contas === 2 && f.dia1[3].pct === 67, 'marcaram o dia como lido no dia do cadastro: 2 de 3 (67%)');
+    const dia = (n) => f.dias.find((d) => d.dia === n);
+    checar(dia(2).base === 3 && dia(2).abriram === 2 && dia(2).leram === 2, 'dia 2: 3 contas com idade, 2 abriram e 2 leram');
+    checar(dia(4).base === 3 && dia(4).abriram === 1 && dia(4).leram === 0, 'dia 4: uma abriu o app sem ler');
+    checar(dia(7).base === 2 && dia(7).abriram === 0 && dia(7).leram === 0, 'dia 7: só as contas com 7 dias completos entram');
+    checar(f.semana.base === 2 && f.semana.contas === 0, 'leram 3 ou mais dos 7 primeiros dias: nenhuma das duas com idade');
+    checar(!/nova1|nova2|nova3|hoje1|@/.test(JSON.stringify(f)), 'o funil dos primeiros dias não leva nome nenhum');
+  }
 }
 
 console.log('\n  ' + contagem + ' checagens' + (falhas ? ' · ' + falhas + ' FALHA(S)\n' : ' · todas passaram\n'));

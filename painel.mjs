@@ -36,6 +36,9 @@ export function montarPainel({
       registrosDesafio: e.desafios || {},
       criadaEm: c.criadaEm || datas[0] || hoje,
       acessos: new Set(c.acessos || []),
+      datasSet: new Set(datas),
+      // o diário do dia (02b-jogo.js): só contadores por data, nunca texto
+      diario: e.diario || {},
       // Contas antigas não têm origem gravada: deduz pelo que ficou anotado no convite.
       origem: c.origem || (c.acompanhadoPor ? 'conhecer' : c.convidadoPor ? 'convite' : 'direto'),
       datas,
@@ -162,6 +165,37 @@ export function montarPainel({
   ];
   const ativos30 = pessoas.filter((p) => p.ultima && p.ultima > desde(30));
 
+  // ---------- os primeiros dias de quem chega: onde a pessoa nova para ----------
+  // A pergunta do dono ("muita gente não passa de 2 dias") em números, sem nome. O dia 1 é o
+  // dia do cadastro; o dia k só conta para as contas que já completaram k dias (criadaEm até
+  // hoje menos k). "Abriram a lição" vem do diário do dia (diario[data].abriu, que a lição grava
+  // ao abrir desde 02/10/2026; antes disso, conta pela leitura marcada), "terminaram uma leitura
+  // no app" de diario[data].leitor, "leram" de datasFeitas, "abriram o app" de acessos
+  // (contas.mjs anotarAcesso, desde 28/09/2026) ou da leitura.
+  const diarioDe = (p, data) => p.diario[data] || {};
+  const comIdade = (n) => pessoas.filter((p) => p.criadaEm <= desde(n));
+  const noDia = (p, n) => somaDias(p.criadaEm, n);
+  const leuNoDia = (p, n) => p.datasSet.has(noDia(p, n));
+  const abriuNoDia = (p, n) => p.acessos.has(noDia(p, n)) || leuNoDia(p, n);
+  const etapa = (faixa, lista, teste) => {
+    const contas = lista.filter(teste).length;
+    return { faixa, contas, base: lista.length, pct: pct(contas, lista.length) };
+  };
+  const pessoasDia1 = comIdade(1);
+  const primeirosDias = {
+    dia1: [
+      etapa('Criaram a conta', pessoasDia1, () => true),
+      etapa('Abriram a lição no dia do cadastro', pessoasDia1, (p) => diarioDe(p, p.criadaEm).abriu > 0 || leuNoDia(p, 0)),
+      etapa('Terminaram uma leitura no app', pessoasDia1, (p) => diarioDe(p, p.criadaEm).leitor > 0),
+      etapa('Marcaram o dia como lido', pessoasDia1, (p) => leuNoDia(p, 0)),
+    ],
+    dias: [1, 2, 3, 4, 5, 6].map((n) => {
+      const lista = comIdade(n + 1);
+      return { dia: n + 1, base: lista.length, abriram: lista.filter((p) => abriuNoDia(p, n)).length, leram: lista.filter((p) => leuNoDia(p, n)).length };
+    }),
+    semana: etapa('Leram 3 ou mais dos 7 primeiros dias', comIdade(7), (p) => [0, 1, 2, 3, 4, 5, 6].filter((n) => leuNoDia(p, n)).length >= 3),
+  };
+
   // Resumo do topo: esta semana (últimos 7 dias) contra a anterior (8 a 14 dias atrás).
   const naJanela = (datas, de, ate) => [...datas].some((d) => d > desde(de) && d <= desde(ate));
   const semana = (conta) => ({ agora: conta(7, 0), antes: conta(14, 7) });
@@ -222,7 +256,7 @@ export function montarPainel({
     return { faixa, contas: grupo.length, ficaram, pct: pct(ficaram, grupo.length) };
   });
   const detalhe = {
-    porDia, novasPorSemana, ofensivas, diasDaSemana, funil, resumo, origens, turmas, desafios, notificacao,
+    porDia, novasPorSemana, ofensivas, diasDaSemana, funil, primeirosDias, resumo, origens, turmas, desafios, notificacao,
     mediaDiasLidos: ativos30.length ? Math.round(ativos30.reduce((s2, p) => s2 + p.diasLidos, 0) / ativos30.length) : 0,
     maiorOfensiva: ofensiva.length ? Math.max(...ofensiva) : 0,
     funcoes: [

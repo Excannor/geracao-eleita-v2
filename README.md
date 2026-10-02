@@ -164,7 +164,9 @@ por e-mail, basta configurar um SMTP (uma conta Gmail com senha de app serve): v
 
 Em **Configurações → Painel do app**, visível só para quem está em `CAMINHO_ADMIN`
 (`docker-compose.yml`). Só contagens, sem nome de ninguém: contas novas, quem leu hoje, na
-semana e no mês, quantos voltaram 1, 7 e 30 dias depois de criar a conta, onde as pessoas param
+semana e no mês, quantos voltaram 1, 7 e 30 dias depois de criar a conta, os primeiros dias de
+quem chega (o que a conta nova fez no dia do cadastro e em cada um dos seis dias seguintes:
+abriu a lição, terminou uma leitura, marcou lido, abriu o app, leu), onde as pessoas param
 no plano, Primeiros Passos, escrita, propósitos e notificações. A conta vem de `painel.mjs`
 (função pura, testada em `ferramentas/teste-senha-painel.mjs`).
 
