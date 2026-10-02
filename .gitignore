@@ -2,6 +2,8 @@
 node_modules/
 dist/
 capturas/
+# As capturas de referência dos mapas dos livros são versionadas (design/mapas/capturas)
+!design/mapas/capturas/
 
 # Dados de quem usa o app: banco (contas, e-mails, progresso), backups, JSON legados
 # e as chaves de sessão e de push. Nunca vão para o repositório.

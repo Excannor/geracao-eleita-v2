@@ -203,6 +203,56 @@ checar(listaBiblias.every((b) => existsSync(dist(b.arquivo)) && existsSync(dist(
 checar(sw.includes("'caminho-biblias'"), 'o service worker guarda as bíblias num cache próprio');
 
 // =========================================================================
+secao('mapas dos livros');
+// =========================================================================
+// Cada mapa (conteudo/mapas/<slug>.json) passa pelo checador: campos, referências na NBV,
+// citações, palavras proibidas. O índice diz quais vão ao ar; o build publica só esses, com
+// os desenhos embutidos, e o service worker guarda cada um. A Bíblia do app não muda.
+{
+  const { checarMapa, listarMapas, lerIndice, LIVROS: LIVROS_MAPA, GRUPOS: GRUPOS_MAPA } = await import('./ferramentas/checar-mapa.mjs');
+  const slugs = listarMapas();
+  checar(slugs.length >= 1, 'há ao menos um mapa escrito em conteudo/mapas (' + slugs.length + ')');
+  for (const slug of slugs) {
+    const { erros, avisos } = checarMapa(slug, JSON.parse(readFileSync(join(AQUI, 'conteudo', 'mapas', slug + '.json'), 'utf8')));
+    checar(erros.length === 0, 'o mapa ' + slug + ' passa no checador' + (erros.length ? ': ' + erros.slice(0, 3).join(' · ') : ''));
+    for (const a of avisos) console.log('  aviso  ' + slug + ': ' + a);
+  }
+  const indice = lerIndice();
+  checar(Array.isArray(indice.publicados) && indice.publicados.every((s) => slugs.includes(s)), 'todo mapa publicado no índice existe na pasta');
+  const inicioMapas = html.indexOf('window.MAPAS=');
+  const listaMapas = inicioMapas > -1 ? JSON.parse(html.slice(inicioMapas + 'window.MAPAS='.length, html.indexOf(';window.BIBLIAS=', inicioMapas))) : null;
+  checar(Array.isArray(listaMapas) && listaMapas.length === indice.publicados.length && listaMapas.every((m) => indice.publicados.includes(m.slug)),
+    'o aplicativo conhece exatamente os mapas publicados (' + (listaMapas || []).map((m) => m.slug).join(', ') + ')');
+  for (const m of listaMapas || []) {
+    checar(/^mapa-[a-z0-9-]+\.[0-9a-f]{10}\.json$/.test(m.arquivo) && existsSync(dist(m.arquivo)) && existsSync(dist(m.arquivo + '.gz')),
+      'o mapa ' + m.slug + ' saiu para ' + m.arquivo + ', com versão comprimida');
+    checar(sw.includes(m.arquivo) && sw.includes("'caminho-mapas'"), 'o service worker guarda o mapa ' + m.slug + ' num cache próprio');
+    if (!existsSync(dist(m.arquivo))) continue;
+    const publicado = JSON.parse(readFileSync(dist(m.arquivo), 'utf8'));
+    const ids = [(publicado.autoria || {}).desenho].concat((publicado.ramos || []).map((r) => r.desenho), (publicado.cristo || {}).desenho).filter(Boolean);
+    checar(ids.every((id) => typeof (publicado.desenhos || {})[id] === 'string' && /^<svg/.test(publicado.desenhos[id]) && !/<style|xmlns|<!--/.test(publicado.desenhos[id])),
+      'o mapa ' + m.slug + ' leva os ' + ids.length + ' desenhos embutidos, sem o estilo de visualização avulsa');
+    checar(!html.includes(JSON.stringify(publicado.raiz.texto).slice(1, 40)), 'o conteúdo do mapa ' + m.slug + ' não entra no index.html');
+  }
+  // A mesma tabela dos 66 no app e no checador: um nome só para cada coisa.
+  const ctx = createContext({ window: { CC: { D: { plano: [] } }, MAPAS: [] }, addEventListener: () => {}, document: {}, setTimeout, clearTimeout, requestAnimationFrame: () => {}, Math, JSON, Map, Set, Number, String, Array, Object });
+  runInContext(readFileSync(join(AQUI, 'src', 'app', '06b-mapas.js'), 'utf8'), ctx, { filename: '06b-mapas.js' });
+  const tabelaApp = ctx.window.CC.LIVROS_MAPA;
+  checar(JSON.stringify(tabelaApp) === JSON.stringify(LIVROS_MAPA) && JSON.stringify(ctx.window.CC.GRUPOS_MAPA) === JSON.stringify(GRUPOS_MAPA),
+    'o app e o checador usam a mesma tabela dos 66 livros, grupos e siglas');
+  checar(tabelaApp.length === 66 && tabelaApp.every(([nome]) => LIVROS.has(nome)), 'a tabela dos mapas usa os nomes dos livros do plano');
+  const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
+  checar(servidorTexto.includes('MAPA_COM_RESUMO') && servidorTexto.includes("|| PUBLICO_COM_RESUMO(rota);") && servidorTexto.includes("'cache-control': PUBLICO_COM_RESUMO(rota)"),
+    'o servidor entrega os mapas sem sessão e com cache longo, como as fontes');
+  // Os mapas moram só no Explorar: a Bíblia, o leitor, a lição e a trilha não os conhecem.
+  const foraDoExplorar = ['04d-biblia.js', '04b-leitor.js', '04-licao.js', '03-trilha.js', '03c-contexto.js']
+    .filter((f) => /vistaMapa|#\/mapa|secaoMapas|cartaoMapas|mapaDoLivro/.test(readFileSync(join(AQUI, 'src', 'app', f), 'utf8')));
+  checar(foraDoExplorar.length === 0, 'a Bíblia, o leitor, a lição e a trilha não ganharam nada do mapa' + (foraDoExplorar.length ? ' (' + foraDoExplorar.join(', ') + ')' : ''));
+  const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
+  checar(roteador.includes("mapa: '#/explorar'") && roteador.includes("rota === 'mapa'"), 'a rota #/mapa/<slug> existe e marca o Explorar');
+}
+
+// =========================================================================
 secao('regras de progresso');
 // =========================================================================
 const contexto = createContext({

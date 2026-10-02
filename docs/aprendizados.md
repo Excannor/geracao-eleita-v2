@@ -34,6 +34,29 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
 
 - 2026-10-02 · mapa · O mock punha o mapa no cartão do dia e no leitor; o dono esclareceu que os
   mapas vão para o Explorar e a Bíblia do app não muda → mapa só no Explorar.
+- 2026-10-02 · conteúdo · Cinco citações do mock de Isaías vinham de memória (Almeida/NVI) e não
+  batiam com a NBV ("eis-me aqui", "a semente santa é o seu toco", "foi contado com os
+  transgressores", "Um ramo surgirá do tronco de Jessé", "rápido para o saque") → toda citação
+  entre aspas vem da NBV da referência do item; `ferramentas/checar-mapa.mjs` barra o que não bate
+  (regra na skill).
+- 2026-10-02 · desenho · Traço escuro sobre papel branco some no tema escuro → cinco classes de
+  traço (.k .h .p .s .e) com as cores por variável do tema, nenhuma cor literal dentro do SVG; no
+  cartão escuro "[Livro] e Cristo" o desenho fica sobre um disco de papel claro (regra na skill).
+- 2026-10-02 · tela · A altura da conexão era medida logo depois de desenhar, antes de a Literata
+  chegar: medida com a letra de reserva, saía mais curta, e a curva atravessou a última linha de
+  um texto de seis linhas → medir de novo no quadro seguinte e em `document.fonts.ready`; o
+  teste de navegador confere que nenhum ponto da curva cai no retângulo do texto (regra na skill).
+- 2026-10-02 · tela · Voltar de um mapa levava ao alto do Explorar, longe da grade (o roteador
+  rola para o topo a cada troca de rota) → vindo de um mapa, o Explorar reabre na grade.
+- 2026-10-02 · build · `window.MAPAS` entrou depois de `window.BIBLIAS` e quebrou o teste.mjs e
+  o teste-leitor, que leem a lista de bíblias até `;</script>` → dado novo no bloco de dados
+  entra antes do BIBLIAS, e quem lê um dado do bloco para no próximo `;window.`.
+- 2026-10-02 · teste · Comparar texto da tela sem tirar o espaço inseparável e o juntor que
+  `CC.inseparavel` e `nb()` põem ("Isaías 1", "6.1-4") deu quatro falhas falsas → nos testes de
+  navegador, normalizar ` ` e `⁠` antes de comparar texto.
+- 2026-10-02 · revisão · A captura da página inteira (11.800px) reduzida numa imagem só esconde
+  qualquer defeito de seta ou desenho → recortar em pedaços de 1500px e olhar um a um (regra na
+  skill).
 
 ## Geral
 

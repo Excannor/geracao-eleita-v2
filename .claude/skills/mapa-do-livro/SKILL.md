@@ -84,10 +84,15 @@ entrar. Renderize ampliado (280px ou mais) e confira:
 - partes ligadas onde deveriam estar (cabeça no corpo, cacho no ramo, pena tocando o rolo);
 - dá para dizer o que é sem legenda.
 Depois, renderize a tela inteira a 390px e confira cada seta: a ponta aponta para o bloco certo,
-a curva não cruza texto, a conexão escrita não encosta na linha pontilhada.
+a curva não cruza texto, a conexão escrita não encosta na linha pontilhada. Confira nos dois
+temas: no escuro o desenho vira traço claro sobre papel grafite (as classes de traço seguem o
+tema; nunca cor literal dentro do SVG).
 
 Para renderizar sem o runtime do canvas, troque a linha do `support.js` por `@font-face` com as
-fontes de `dist/` e use `CHROME=... --headless --screenshot` (como em `design/mapas/`).
+fontes de `dist/` e use `CHROME=... --headless --screenshot` (como em `design/mapas/`). Com o
+app no ar, a tela de verdade sai com `CHEIA=1 node design/ferramentas/foto-conta.mjs 390 844
+<saida.png> '#/mapa/<slug>' 0 <claro|escuro>` (página inteira); recorte em pedaços de 1500px
+para olhar peça por peça, porque a página inteira reduzida esconde defeito.
 
 ## 3. Como montar a tela
 
@@ -98,7 +103,9 @@ fontes de `dist/` e use `CHROME=... --headless --screenshot` (como em `design/ma
 - **Setas curvas pontilhadas, como a trilha:** os blocos não ficam empilhados como cartões. Eles
   alternam de lado, e cada passagem tem uma curva pontilhada (`stroke-dasharray: 0.1 7`, ponta
   redonda, 2.4px) que termina numa ponta de seta em cima do próximo bloco. A conexão entre ramos
-  fica em Literata itálico, no espaço livre acima da curva.
+  fica em Literata itálico, no espaço livre acima da curva: a curva desce primeiro e só cruza
+  para o outro lado abaixo do texto, e a área cresce com o texto (medida de novo quando as
+  fontes terminam de carregar, porque medida com a letra de reserva ela saía curta).
 - **Cartão só onde ele é necessário:** a raiz (borda tracejada), "[Livro] e Cristo" (escuro) e
   "Enquanto lê, procure" (sálvia pálida). O resto fica direto no fundo da página.
 - **Referências** como marca-texto sálvia (`<mark>`), no fim de cada item.
@@ -107,12 +114,51 @@ fontes de `dist/` e use `CHROME=... --headless --screenshot` (como em `design/ma
 - Paleta C e as regras de `design/guia-visual.md` continuam valendo; a chama (`--v2-chama`) não
   entra no mapa.
 
-## 4. Onde o conteúdo vai morar
+## 4. Onde o conteúdo mora (o formato final, 02/10)
 
-Os 66 mapas não cabem no `index.html` (limite de 1 MB). Ficam num arquivo à parte, carregado só
-quando o mapa abre e guardado pelo service worker para uso offline. Cada livro deve ter: nome,
-grupo, número, capítulos, significado, autoria (com referência), raiz, ramos (título, subtítulo,
-desenho, ramificações com referência, conexão), Cristo (pares AT → NT), estrutura (título, de,
-até), curiosidades (com referência) e "procure".
+Os 66 mapas não cabem no `index.html` (teto de 1 MB): cada um vive num arquivo próprio, que só
+desce quando o mapa abre e fica guardado pelo service worker para abrir sem rede.
 
-Cada mapa novo passa por revisão de alguém da igreja antes de ir ao ar.
+- **Conteúdo:** `conteudo/mapas/<slug>.json`, um por livro. O slug é o nome do livro sem acento,
+  minúsculo, com hífen no lugar do espaço (`isaias`, `1-samuel`, `genesis`: `CC.slugDoLivro`).
+  Campos: `nome` (como a NBV escreve), `grupo` (um dos nove da grade), `numero` (posição no
+  cânon), `capitulos`, `significado {lingua, original, transliteracao, traducao, texto}`,
+  `autoria {texto, apoio?, refs[], desenho?}`, `raiz {texto, apoio?, refs[]}`,
+  `ramos[4-6] {titulo, sub, desenho, galhos[3-6] {texto, ref}, jesus? {texto, refs[]}, conexao?}`,
+  `cristo {texto, ref, desenho, pares[] {at, texto, nt, nota?}}`, `estrutura[] {titulo, de, ate}`
+  (cobre o livro inteiro, sem buraco), `curiosidades[] {texto, ref}` e `procure {texto, ref?}`.
+  O exemplo completo é `conteudo/mapas/isaias.json`.
+- **Referências:** sempre com a sigla da tabela dos 66 (`Is 6.1-4`; `Is 13–23` com meia-risca
+  entre capítulos; `Is 65.17, 25`; `At 8.32-35`). Dentro de um texto corrido (a conexão), entre
+  parênteses: "(Is 6.13)". O destaque `jesus` só com referência do Novo Testamento.
+- **Citações:** toda citação entre aspas bate, palavra por palavra, com a NBV da referência do
+  item (`conteudo/biblias/nbv.json`), porque é a NBV que a pessoa abre no app. O mock de Isaías
+  tinha cinco de memória (Almeida/NVI) que não batiam; o checador barra isso.
+- **Desenhos:** `conteudo/mapas/desenhos/<id>.svg`, reutilizáveis entre livros,
+  `viewBox="0 0 120 120"`, só com as cinco classes de traço (`.k` contorno, `.h` hachura, `.p`
+  papel, `.s` sálvia, `.e` cheio) e um `<style>` para vê-los sozinhos. Nada de cor literal nas
+  formas: as cores vêm do `27-mapas.css` e seguem o tema (traço claro sobre papel grafite no
+  escuro; no cartão escuro "[Livro] e Cristo", o desenho fica sobre um disco de papel claro).
+  O build tira o `<style>` e embute no JSON publicado só os desenhos que o mapa usa.
+- **Publicação:** `conteudo/mapas/indice.json` lista os `publicados`. O build (`build.mjs`)
+  gera `dist/mapa-<slug>.<resumo>.json` (+ `.gz`) só para esses, injeta a lista em
+  `window.MAPAS` (antes de `window.BIBLIAS`: os testes leem a lista de bíblias até o fim do
+  bloco) e manda o service worker guardá-los no cache `caminho-mapas`. O servidor entrega
+  `mapa-*.json` sem sessão e com cache longo, como as fontes. Um mapa escrito mas ainda não
+  revisado por alguém da igreja fica fora do índice e aparece na grade como "em breve".
+- **Tela:** `src/app/06b-mapas.js` (a tabela dos 66 com grupo e sigla, a grade do Explorar com
+  o cartão de entrada, a rota `#/mapa/<slug>`, as setas calculadas na largura real da coluna,
+  a conexão cuja altura cresce com o texto, o "você está aqui" pelo progresso do plano) e
+  `src/estilo-v2/27-mapas.css`. A rota conta como Explorar no roteador; voltar de um mapa
+  reabre o Explorar na grade.
+- **Conferência:** `node ferramentas/checar-mapa.mjs <slug|--todos>` (campos, referências na
+  NBV, citações, palavras proibidas, travessão, itens consecutivos começando igual) roda também
+  dentro do `node teste.mjs`. `CHROME=... node ferramentas/teste-mapas.mjs` abre tudo no
+  navegador: grade, mapa, setas e desenhos, nenhuma curva cruzando o texto da conexão, 390 e
+  360px, os dois temas, a Bíblia igual, sem rede. As capturas de referência ficam em
+  `design/mapas/capturas/` (Explorar e mapa inteiro, claro e escuro, a 390px).
+
+Para um mapa novo: escrever o JSON, desenhar os SVGs e revisá-los ampliados (seção 2), rodar o
+checador, subir o servidor e olhar a tela inteira nos dois temas (seção 2, revisão), pôr o slug
+no índice e só então publicar. Cada mapa novo passa por revisão de alguém da igreja antes de ir
+ao ar.
