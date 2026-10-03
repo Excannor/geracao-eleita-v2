@@ -10,6 +10,21 @@ Deus e da Bíblia.
 Nada pode fazer a pessoa entender a Bíblia diferente do que ela diz. Na dúvida entre uma
 pergunta bonita e uma fiel, fica a fiel. Na dúvida sobre a fidelidade, a pergunta sai.
 
+## Voz e interpretação (regra do dono, 2026-10-03)
+
+**Voz.** Todo texto desta área (contexto do dia, "procure", guias, reflexões) segue o catálogo de
+voz humana de `.claude/skills/mapa-do-livro/voz.md`: alguém da célula explicando para um amigo,
+ordem direta, frases curtas, sem dois-pontos de resumo, sem clivada, sem coisa agindo ("o
+capítulo traz"), sem lista entre parênteses, referência no fim. O dono reprovou o contexto do dia
+de Êxodo 20 / Mateus 20 por esses vícios.
+
+**Interpretação pode, presa ao texto.** Nas explicações antes da leitura, dá para dizer o que a
+passagem ensina ou como ler ("São regras daquele povo, naquela época"), desde que a leitura saia
+da própria passagem e do contexto dela, sem doutrina de grupo e sem tradição de pregação
+apresentada como fato. O pastor do dono revisa esses textos; quem escreve marca onde entrou
+interpretação, para ele olhar primeiro. As regras de fidelidade abaixo continuam valendo para
+fatos e citações.
+
 ## As regras
 
 1. **Só a leitura do dia.** Toda afirmação sobre a passagem tem de estar nos trechos lidos
