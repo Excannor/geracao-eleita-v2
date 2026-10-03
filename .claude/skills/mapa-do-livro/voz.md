@@ -303,8 +303,8 @@ fala de si nem da paginação.
 "A vinha é o próprio Israel", "a parte mais importante do edifício" como aposto. Escreve-se logo a
 tradução.
 
-5.8 **Diminutivo e cor inventada.** "criancinha", "tabuinha" (se não é NBV); "Na hora da faca, o
-Anjo grita" (o texto diz chamou), "A serpente planta a dúvida", "Israel geme no Egito", "Na estreia
+5.8 **Diminutivo e cor inventada.** "criancinha", "tabuinha" (se não é NBV); "Na hora da faca" (sem
+faca na hora em Gn 22.11; o Anjo grita, isso sim, é NBV), "A serpente planta a dúvida", "Israel geme no Egito", "Na estreia
 de Arão", "Ele se levanta depressa" (sem depressa no texto), "O rosto dele começa a brilhar" (Marcos
 só fala da roupa), "Algumas mães trazem" (texto: algumas pessoas), "suar sangue" (texto: suor como
 gotas de sangue), "a mesa é de graça" (sem mesa em Is 55.1). Humano não é inventivo.

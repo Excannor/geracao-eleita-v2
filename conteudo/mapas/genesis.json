@@ -8,18 +8,28 @@
     "original": "בְּרֵאשִׁית",
     "transliteracao": "Bereshit",
     "traducao": "no princípio",
-    "texto": "O livro leva o nome da sua primeira palavra. Gênesis vem do grego e quer dizer origem."
+    "texto": "Bereshit é a primeira palavra do livro em hebraico. O nome Gênesis vem do grego e quer dizer origem."
   },
   "autoria": {
-    "texto": "Em lugar nenhum aparece o nome de quem escreveu. Quem narra vive depois dos fatos: fala de costumes que valem “até hoje” e de reis de Edom que reinaram “antes de haver rei sobre os israelitas”.",
-    "apoio": "Quem escreveu conta da criação até o caixão de José no Egito, e começa várias partes com a mesma frase: “Esta é a história”.",
-    "refs": ["Gn 32.32", "Gn 36.31", "Gn 2.4", "Gn 6.9", "Gn 50.26"],
+    "texto": "O autor não diz o nome dele, mas escreve depois dos fatos. Fala de um costume que os israelitas guardam “até hoje” e de reis de Edom que reinaram “antes de haver rei sobre os israelitas”.",
+    "apoio": "O livro vai da criação até o caixão de José no Egito. O autor repete a mesma abertura em várias partes: “Esta é a história”.",
+    "refs": [
+      "Gn 32.32",
+      "Gn 36.31",
+      "Gn 2.4",
+      "Gn 6.9",
+      "Gn 50.26"
+    ],
     "desenho": "pena-e-rolo"
   },
   "raiz": {
-    "texto": "Nenhum outro livro começa antes de existir qualquer coisa. Deus faz o mundo em seis dias, olha tudo e vê que “havia ficado muito bom”. Não dura: o ser humano desobedece, um irmão mata o outro, vem o dilúvio, e em Babel Deus espalha os povos. Então ele chama um homem só, Abrão, e promete: “por seu intermédio serão abençoados todos os povos da terra”.",
-    "apoio": "Dali até o fim, quem carrega a promessa engana e é enganado, e ela segue de pé. No último capítulo, José diz aos irmãos o que Deus esteve fazendo o tempo todo: “vocês planejaram o mal contra mim, mas Deus tornou o mal em bem”.",
-    "refs": ["Gn 1.31", "Gn 12.3", "Gn 50.20"]
+    "texto": "Nenhum outro livro começa antes de existir qualquer coisa. Deus faz o mundo em seis dias e vê que tudo “havia ficado muito bom”. O ser humano desobedece, Caim mata Abel, e Deus manda o dilúvio. Depois ele chama Abrão e promete: “por seu intermédio serão abençoados todos os povos da terra”.",
+    "apoio": "Os homens que carregam a promessa mentem e fogem. Deus não desfaz o que prometeu. No fim do livro, José diz aos irmãos o que Deus fez com tudo aquilo: “vocês planejaram o mal contra mim, mas Deus tornou o mal em bem”.",
+    "refs": [
+      "Gn 1.31",
+      "Gn 12.3",
+      "Gn 50.20"
+    ]
   },
   "ramos": [
     {
@@ -27,121 +37,293 @@
       "sub": "Deus fala, e o mundo existe",
       "desenho": "luz-sobre-as-aguas",
       "galhos": [
-        { "texto": "A terra era vazia e sem forma, e bastou uma frase: “Haja luz”, e houve luz.", "ref": "Gn 1.1-3" },
-        { "texto": "Nos primeiros dias, Deus separa luz e escuridão, águas de cima e de baixo, mar e terra seca. Depois enche o que separou com sol, lua, peixes, aves e animais.", "ref": "Gn 1.3-25" },
-        { "texto": "Por último, Deus faz o ser humano à sua imagem, homem e mulher, e manda que se multipliquem, encham a terra e a dominem.", "ref": "Gn 1.26-28" },
-        { "texto": "No sétimo dia, Deus descansa, abençoa esse dia e o declara santo.", "ref": "Gn 2.2-3" },
-        { "texto": "O Senhor forma o homem do pó da terra, sopra nas narinas dele o fôlego da vida, e ele vira um ser vivo.", "ref": "Gn 2.7" },
-        { "texto": "Sozinho, o homem não encontra quem lhe corresponda. Da costela dele vem a mulher, e os dois se tornam um só ser.", "ref": "Gn 2.18-24" }
+        {
+          "texto": "A terra está vazia e sem forma, e o Espírito de Deus se move sobre as águas. Então Deus diz: “Haja luz”, e a luz aparece.",
+          "ref": "Gn 1.1-3"
+        },
+        {
+          "texto": "Nos primeiros dias, Deus separa a luz da escuridão e junta as águas, e a parte seca aparece. Depois põe o sol e a lua no céu e enche o mar e a terra de animais.",
+          "ref": "Gn 1.3-25"
+        },
+        {
+          "texto": "Deus faz o ser humano por último, à sua imagem, homem e mulher. Ele abençoa os dois e diz que eles devem encher a terra e mandar nos animais.",
+          "ref": "Gn 1.26-28"
+        },
+        {
+          "texto": "No sétimo dia, Deus descansa de tudo o que fez. Ele abençoa esse dia e diz que é santo.",
+          "ref": "Gn 2.2-3"
+        },
+        {
+          "texto": "O Senhor forma o homem do pó da terra, sopra nas narinas dele o fôlego da vida, e ele vira um ser vivo.",
+          "ref": "Gn 2.7"
+        },
+        {
+          "texto": "Deus diz que não é bom o homem ficar sozinho. O homem dá nome a todos os animais e não acha companheira entre eles. Então Deus tira uma costela do homem, faz uma mulher dela, e os dois se tornam um só ser.",
+          "ref": "Gn 2.18-24"
+        }
       ],
       "jesus": {
-        "texto": "João começa o evangelho dele com as mesmas duas palavras, “No princípio”. Ele está falando de Jesus, a Palavra: “Por seu intermédio tudo o que existe foi criado”. E essa Palavra, ele conta, virou um ser humano e morou aqui entre nós.",
-        "refs": ["Jo 1.1-3", "Jo 1.14", "Jo 1.17"]
+        "texto": "João começa o evangelho dele com as duas palavras que abrem Gênesis. Para João, Jesus é a Palavra: “Por seu intermédio tudo o que existe foi criado”. Depois conta que essa Palavra virou um ser humano e morou aqui na terra.",
+        "refs": [
+          "Jo 1.1-3",
+          "Jo 1.14",
+          "Jo 1.17"
+        ]
       },
-      "conexao": "Deus avisa: quem comer da árvore do conhecimento morre (Gn 2.17). A serpente põe esse aviso em dúvida (Gn 3.1-4)."
+      "conexao": "Deus avisa que quem comer da árvore do conhecimento vai morrer (Gn 2.17). A serpente diz que não (Gn 3.1-4)."
     },
     {
       "titulo": "O jardim perdido",
       "sub": "O ser humano diz não a Deus",
       "desenho": "fruto-da-arvore",
       "galhos": [
-        { "texto": "A serpente planta a dúvida, “É verdade que Deus disse...?”, e depois desmente o aviso: “Certamente vocês não morrerão!”", "ref": "Gn 3.1-4" },
-        { "texto": "Os dois comem, descobrem que estão nus e se escondem entre as árvores. Deus vem chamando: “Onde você está?”", "ref": "Gn 3.6-9" },
-        { "texto": "Ninguém assume a culpa: o homem aponta para a mulher, e a mulher, para a serpente.", "ref": "Gn 3.12-13" },
-        { "texto": "No meio da sentença, uma promessa: o descendente da mulher esmagará a cabeça da serpente.", "ref": "Gn 3.15" },
-        { "texto": "Deus veste os dois com roupas de pele, mas querubins e uma espada flamejante passam a guardar o caminho da árvore da vida.", "ref": "Gn 3.21-24" },
-        { "texto": "Fora do Éden, Caim mata Abel e ainda pergunta: “Será que sou o responsável pelo meu irmão?”", "ref": "Gn 4.8-10" }
+        {
+          "texto": "A serpente pergunta à mulher se Deus disse para não comer do fruto das árvores do jardim. A mulher repete o aviso, e a serpente responde: “Certamente vocês não morrerão!”",
+          "ref": "Gn 3.1-4"
+        },
+        {
+          "texto": "Então a mulher come o fruto e oferece ao marido. Os dois percebem que estão nus e se escondem entre as árvores. O Senhor Deus chama o homem: “Onde você está?”",
+          "ref": "Gn 3.6-9"
+        },
+        {
+          "texto": "O homem põe a culpa na mulher. A mulher responde: “A serpente me enganou, e eu comi”.",
+          "ref": "Gn 3.12-13"
+        },
+        {
+          "texto": "Deus diz à serpente que ela e a mulher vão ser inimigas. Um descendente da mulher vai esmagar a cabeça da serpente.",
+          "ref": "Gn 3.15"
+        },
+        {
+          "texto": "O Senhor faz roupas de pele e veste os dois. Depois ele expulsa o homem do jardim e põe querubins com uma espada de fogo guardando o caminho da árvore da vida.",
+          "ref": "Gn 3.21-24"
+        },
+        {
+          "texto": "Caim chama Abel para o campo e mata o irmão ali. Deus pergunta onde está Abel, e Caim responde: “Será que sou o responsável pelo meu irmão?”",
+          "ref": "Gn 4.8-10"
+        }
       ],
-      "conexao": "Lameque se gaba de ser vingado “setenta e sete” vezes (Gn 4.24). Mais adiante, a terra está “cheia de crime” (Gn 6.13)."
+      "conexao": "Lameque se gaba de que vai ser vingado setenta e sete vezes (Gn 4.24). Deus vê a terra “cheia de crime” e decide acabar com tudo (Gn 6.13)."
     },
     {
       "titulo": "Dilúvio e Babel",
       "sub": "Deus recomeça com uma família",
       "desenho": "arca",
       "galhos": [
-        { "texto": "O Senhor vê a maldade crescer, se arrepende de ter criado o ser humano, e isso “cortou o seu coração”. Noé, porém, agradava ao Senhor.", "ref": "Gn 6.5-8" },
-        { "texto": "Deus manda Noé construir uma embarcação de cipreste, coberta de piche, com três andares e uma porta lateral.", "ref": "Gn 6.14-16" },
-        { "texto": "Entram os animais aos pares, e quem fecha a porta é o próprio Senhor.", "ref": "Gn 7.15-16" },
-        { "texto": "Quando as águas baixam, Noé solta uma pomba, e ela volta com uma folha nova de oliveira no bico.", "ref": "Gn 8.8-11" },
-        { "texto": "O arco nas nuvens vira o sinal da aliança: “Nunca mais haverá um dilúvio para destruir a terra”.", "ref": "Gn 9.11-16" },
-        { "texto": "Em Babel, fazem tijolos para erguer uma torre “que chegue até os céus”. O Senhor confunde a língua deles, e eles param de construir.", "ref": "Gn 11.3-9" }
+        {
+          "texto": "O Senhor vê a maldade dos homens crescer e se arrepende de ter criado o ser humano. Noé agrada ao Senhor com a vida que leva.",
+          "ref": "Gn 6.5-8"
+        },
+        {
+          "texto": "Deus manda Noé construir um barco de madeira de cipreste, coberto de piche por dentro e por fora, com três andares e uma porta do lado.",
+          "ref": "Gn 6.14-16"
+        },
+        {
+          "texto": "Os animais entram aos pares, um macho e uma fêmea de cada espécie. Depois o Senhor fecha a porta.",
+          "ref": "Gn 7.15-16"
+        },
+        {
+          "texto": "Quando as águas baixam, Noé solta uma pomba, e ela volta com uma folha nova de oliveira no bico.",
+          "ref": "Gn 8.8-11"
+        },
+        {
+          "texto": "Deus faz uma aliança com Noé e os filhos dele e promete: “Nunca mais haverá um dilúvio para destruir a terra”. O arco nas nuvens é o sinal dessa aliança.",
+          "ref": "Gn 9.11-16"
+        },
+        {
+          "texto": "Em Babel, o povo faz tijolos e começa uma torre que chegue até o céu. O Senhor confunde a língua de todos, e eles param de construir.",
+          "ref": "Gn 11.3-9"
+        }
       ],
-      "conexao": "Em Babel, querem fama (Gn 11.4). No capítulo seguinte, Deus promete a Abrão: “tornarei o seu nome famoso” (Gn 12.2)."
+      "conexao": "Em Babel, o povo quer ficar famoso (Gn 11.4). Deus promete a Abrão: “tornarei o seu nome famoso” (Gn 12.2)."
     },
     {
       "titulo": "A promessa a Abraão",
-      "sub": "Bênção para todos os povos",
+      "sub": "Um homem sem filhos vira pai de nações",
       "desenho": "tenda-e-estrelas",
       "galhos": [
-        { "texto": "Deus manda Abrão sair de Harã “para a terra que eu lhe mostrar”, e ele vai, aos 75 anos. Leva uma promessa: “você será uma bênção para muitos”.", "ref": "Gn 12.1-4" },
-        { "texto": "Ainda sem filhos, Abrão ouve do Senhor, fora da tenda: “Olhe para o céu e conte as estrelas, se puder”. “Abrão creu no Senhor”, e Deus o considera justo por causa dessa fé.", "ref": "Gn 15.2-6" },
-        { "texto": "Com 99 anos, ganha nome novo: Abrão vira Abraão, “pai de numerosas nações”, e a circuncisão passa a ser o sinal da aliança.", "ref": "Gn 17.1-11" },
-        { "texto": "Abraão pede por Sodoma: se houver cinquenta justos na cidade, o Senhor não a destrói. Vai baixando o número até dez. “Não destruirei a cidade por amor aos dez.”", "ref": "Gn 18.23-32" },
-        { "texto": "Já em plena velhice, Sara dá à luz Isaque e diz: “Deus me fez rir”.", "ref": "Gn 21.1-7" },
-        { "texto": "Num monte da terra de Moriá, Isaque pergunta onde está o cordeiro. O pai responde: “Deus vai prover o cordeiro para o sacrifício, meu filho”. Na hora da faca, o Anjo do Senhor grita do céu, e um carneiro preso pelos chifres num arbusto morre em lugar de Isaque.", "ref": "Gn 22.2-13" }
+        {
+          "texto": "O Senhor manda Abrão deixar a casa do pai e ir para uma terra que Deus vai mostrar. Abrão sai de Harã aos 75 anos e leva uma promessa: “você será uma bênção para muitos”.",
+          "ref": "Gn 12.1-4"
+        },
+        {
+          "texto": "Abrão reclama ao Senhor que continua sem filhos. O Senhor leva Abrão para fora da tenda e manda: “Olhe para o céu e conte as estrelas, se puder”. Abrão crê no Senhor, e Deus aceita essa fé como justiça.",
+          "ref": "Gn 15.2-6"
+        },
+        {
+          "texto": "Quando Abrão tem 99 anos, o Senhor aparece a ele e troca o nome dele para Abraão, pai de muitas nações. Todo homem da casa tem de ser circuncidado, e esse é o sinal da aliança.",
+          "ref": "Gn 17.1-11"
+        },
+        {
+          "texto": "Abraão pede pela cidade de Sodoma. Se houver cinquenta justos ali, o Senhor não destrói a cidade. Abraão vai baixando o número até dez, e o Senhor responde: “Não destruirei a cidade por amor aos dez”.",
+          "ref": "Gn 18.23-32"
+        },
+        {
+          "texto": "Sara tem um filho quando Abraão já está com cem anos. Abraão põe nele o nome de Isaque, e Sara diz: “Deus me fez rir”.",
+          "ref": "Gn 21.1-7"
+        },
+        {
+          "texto": "A caminho do monte, na terra de Moriá, Isaque pergunta ao pai onde está o cordeiro. Abraão responde: “Deus vai prover o cordeiro para o sacrifício, meu filho”. Quando Abraão pega a faca, o Anjo do Senhor grita do céu, e um carneiro preso pelos chifres num arbusto morre no lugar de Isaque.",
+          "ref": "Gn 22.2-13"
+        }
       ],
       "jesus": {
-        "texto": "Paulo lê essa promessa feita a Abraão “e ao seu descendente” e diz quem é ele: “a saber, Cristo”. O próprio Jesus conta que Abraão “exultou ao ver o tempo da minha vinda”.",
-        "refs": ["Gl 3.16", "Jo 8.56"]
+        "texto": "Paulo diz que Deus fez a promessa a Abraão e a um descendente só, “a saber, Cristo”. Jesus diz aos judeus: “Abraão, o pai de vocês, exultou ao ver o tempo da minha vinda”.",
+        "refs": [
+          "Gl 3.16",
+          "Jo 8.56"
+        ]
       },
-      "conexao": "Rebeca também não podia ter filhos até Isaque orar por ela (Gn 25.21). Vêm gêmeos, e a briga começa ainda no ventre."
+      "conexao": "Rebeca também não pode ter filhos. Isaque ora por ela, e o Senhor atende (Gn 25.21)."
     },
     {
       "titulo": "Jacó vira Israel",
       "sub": "Deus trabalha com um enganador",
       "desenho": "panela-de-ensopado",
       "galhos": [
-        { "texto": "Antes do parto, o Senhor avisa: “o mais velho servirá ao mais novo”. Jacó nasce segurando o calcanhar de Esaú. Anos depois, Esaú chega em casa exausto e pede um prato de ensopado de lentilhas. Jacó cobra: o direito de filho mais velho.", "ref": "Gn 25.22-34" },
-        { "texto": "Vestido com a roupa do irmão e pele de cabrito nas mãos, Jacó engana o pai, que quase não enxerga: “A voz é de Jacó, mas as mãos são de Esaú”.", "ref": "Gn 27.1-23" },
-        { "texto": "A caminho de Harã, dorme com a cabeça numa pedra, sonha com uma escada até o céu e acorda: “Certamente o Senhor está neste lugar e eu não sabia!”", "ref": "Gn 28.10-16" },
-        { "texto": "Em Harã, quem engana é Labão: depois de sete anos de trabalho por Raquel, Jacó amanhece casado com Lia.", "ref": "Gn 29.20-25" },
-        { "texto": "No Jaboque, um homem luta com Jacó até o amanhecer e desloca a coxa dele. Jacó não solta: “Não deixarei que vá embora, enquanto não me abençoar”. Sai mancando, com outro nome: Israel.", "ref": "Gn 32.22-31" },
-        { "texto": "De longe, Jacó vê Esaú chegando com quatrocentos homens e se inclina sete vezes. Esaú corre, abraça o irmão, e os dois choram.", "ref": "Gn 33.1-4" }
+        {
+          "texto": "Antes dos gêmeos nascerem, o Senhor avisa Rebeca: “o mais velho servirá ao mais novo”. Esaú sai primeiro, e Jacó vem segurando o calcanhar dele. Anos depois, Esaú chega em casa com fome, e Jacó só dá o ensopado de lentilhas em troca do direito de filho mais velho.",
+          "ref": "Gn 25.22-34"
+        },
+        {
+          "texto": "Rebeca veste Jacó com a roupa de Esaú e cobre as mãos dele com pele de cabrito. Isaque quase não enxerga. Ele apalpa o filho e estranha: “A voz é de Jacó, mas as mãos são de Esaú”.",
+          "ref": "Gn 27.1-23"
+        },
+        {
+          "texto": "Jacó sai para Harã e passa a noite no caminho com a cabeça numa pedra. Ele sonha com uma escada que vai da terra até o céu. Quando acorda, diz: “Certamente o Senhor está neste lugar e eu não sabia!”",
+          "ref": "Gn 28.10-16"
+        },
+        {
+          "texto": "Em Harã, Jacó trabalha sete anos para casar com Raquel. Na noite da festa, Labão entrega Lia no lugar dela, e Jacó só descobre quando amanhece.",
+          "ref": "Gn 29.20-25"
+        },
+        {
+          "texto": "No Jaboque, Jacó luta com um homem até o amanhecer e fica com a coxa deslocada. Mesmo assim não solta: “Não deixarei que vá embora, enquanto não me abençoar”. Ali Jacó vira Israel e sai mancando.",
+          "ref": "Gn 32.22-31"
+        },
+        {
+          "texto": "De longe, Jacó vê Esaú chegando com quatrocentos homens e se inclina sete vezes. Esaú corre, abraça o irmão, e os dois choram.",
+          "ref": "Gn 33.1-4"
+        }
       ],
-      "conexao": "Isaque preferia Esaú, e Rebeca, Jacó (Gn 25.28). Agora Jacó prefere José, e os irmãos o odeiam (Gn 37.3-4)."
+      "conexao": "Isaque tem Esaú como favorito, e Rebeca tem Jacó (Gn 25.28). Agora Jacó prefere José, e os irmãos ficam com ódio (Gn 37.3-4)."
     },
     {
       "titulo": "José no Egito",
       "sub": "O mal que Deus virou em bem",
       "desenho": "tunica",
       "galhos": [
-        { "texto": "Filho preferido, José ganha uma túnica colorida e sonha com feixes e estrelas que se inclinam diante dele. Os irmãos o vendem a mercadores por vinte moedas de prata. Ao pai mandam a túnica, molhada no sangue de um bode.", "ref": "Gn 37.3-33" },
-        { "texto": "Preso por uma acusação falsa, ele acaba cuidando da cadeia inteira, porque “o Senhor estava com José”.", "ref": "Gn 39.11-23" },
-        { "texto": "Interpreta os sonhos do faraó, sete vacas gordas e sete magras, e sai dali como a maior autoridade sobre toda a terra do Egito. Tinha trinta anos.", "ref": "Gn 41.25-46" },
-        { "texto": "Judá implora a José e se oferece para ficar como escravo no lugar do irmão mais novo: não suportaria ver o sofrimento do pai.", "ref": "Gn 44.18-34" },
-        { "texto": "“Eu sou José”, diz ele aos irmãos, chorando. E completa: “não foram vocês que me mandaram para cá, mas sim Deus”.", "ref": "Gn 45.1-8" },
-        { "texto": "Deus manda Jacó descer sem medo, porque “lá eu farei de você uma grande nação”. A família chega ao Egito com setenta pessoas.", "ref": "Gn 46.3-27" }
+        {
+          "texto": "Jacó gosta mais de José e dá a ele uma túnica colorida. José sonha que feixes e estrelas se inclinam diante dele. Os irmãos vendem José a mercadores por vinte moedas de prata e mandam ao pai a túnica molhada no sangue de um bode.",
+          "ref": "Gn 37.3-33"
+        },
+        {
+          "texto": "A mulher do patrão acusa José de um crime que ele não cometeu, e ele vai para a prisão. Ali o Senhor está com José, e o carcereiro deixa a cadeia inteira nas mãos dele.",
+          "ref": "Gn 39.11-23"
+        },
+        {
+          "texto": "José explica ao faraó os sonhos das sete vacas gordas e das sete magras. O faraó põe o anel real no dedo de José e faz dele a maior autoridade sobre toda a terra do Egito. José tem trinta anos.",
+          "ref": "Gn 41.25-46"
+        },
+        {
+          "texto": "Judá pede a José para ficar como escravo no lugar do irmão mais novo: “Eu não suportaria ver o sofrimento de meu pai!”",
+          "ref": "Gn 44.18-34"
+        },
+        {
+          "texto": "José manda todos saírem da sala e chora tão alto que os egípcios ouvem. Então ele diz aos irmãos: “Eu sou José”. Pede que ninguém fique triste por ter vendido ele, porque Deus mandou José na frente para salvar vidas.",
+          "ref": "Gn 45.1-8"
+        },
+        {
+          "texto": "Deus diz a Jacó para não ter medo de descer ao Egito: “lá eu farei de você uma grande nação”. A família chega ao Egito com setenta pessoas.",
+          "ref": "Gn 46.3-27"
+        }
       ]
     }
   ],
   "cristo": {
-    "texto": "“Ele sonhou que havia uma escada que ia da terra até o céu, e os anjos de Deus subiam e desciam pela escada.” Jesus retoma essa cena para falar de si mesmo: os anjos sobem e descem sobre o Filho do Homem (Jo 1.51).",
+    "texto": "“Ele sonhou que havia uma escada que ia da terra até o céu, e os anjos de Deus subiam e desciam pela escada.” Jesus fala de si mesmo com essa cena. Ele diz que o céu vai se abrir e os anjos de Deus vão subir e descer sobre o Filho do Homem (Jo 1.51).",
     "ref": "Gn 28.12",
     "desenho": "escada",
     "pares": [
-      { "at": "Gn 2.7", "texto": "O Senhor Deus formou o corpo humano do pó da terra e soprou em suas narinas o fôlego da vida.", "nt": "1Co 15.45", "nota": "Jesus é o último Adão" },
-      { "at": "Gn 14.18", "texto": "Melquisedeque, rei de Salém (isto é, Jerusalém) e sacerdote do Deus Altíssimo", "nt": "Hb 6.20", "nota": "Cristo é sacerdote na ordem de Melquisedeque" },
-      { "at": "Gn 49.9-10", "texto": "Judá é um leãozinho... Ninguém tirará o cetro dele, até que venha aquele a quem ele pertence.", "nt": "Ap 5.5", "nota": "o Leão da tribo de Judá venceu" }
+      {
+        "at": "Gn 2.7",
+        "texto": "O Senhor Deus formou o corpo humano do pó da terra e soprou em suas narinas o fôlego da vida.",
+        "nt": "1Co 15.45",
+        "nota": "Jesus é o último Adão"
+      },
+      {
+        "at": "Gn 14.18",
+        "texto": "Melquisedeque, rei de Salém (isto é, Jerusalém) e sacerdote do Deus Altíssimo",
+        "nt": "Hb 6.20",
+        "nota": "Cristo é sacerdote na ordem de Melquisedeque"
+      },
+      {
+        "at": "Gn 49.9-10",
+        "texto": "Judá é um leãozinho... Ninguém tirará o cetro dele, até que venha aquele a quem ele pertence.",
+        "nt": "Ap 5.5",
+        "nota": "o Leão da tribo de Judá venceu"
+      }
     ]
   },
   "estrutura": [
-    { "titulo": "A criação e o jardim", "de": 1, "ate": 2 },
-    { "titulo": "A queda e os filhos de Adão", "de": 3, "ate": 5 },
-    { "titulo": "Dilúvio, arco nas nuvens e Babel", "de": 6, "ate": 11 },
-    { "titulo": "Abraão e a promessa", "de": 12, "ate": 24 },
-    { "titulo": "Isaque, Jacó e Esaú", "de": 25, "ate": 36 },
-    { "titulo": "José e a descida ao Egito", "de": 37, "ate": 50 }
+    {
+      "titulo": "A criação e o jardim",
+      "de": 1,
+      "ate": 2
+    },
+    {
+      "titulo": "Adão e Eva saem do jardim",
+      "de": 3,
+      "ate": 5
+    },
+    {
+      "titulo": "O dilúvio e a torre de Babel",
+      "de": 6,
+      "ate": 11
+    },
+    {
+      "titulo": "Abraão e a promessa",
+      "de": 12,
+      "ate": 24
+    },
+    {
+      "titulo": "Jacó e Esaú",
+      "de": 25,
+      "ate": 36
+    },
+    {
+      "titulo": "A família de Jacó vai para o Egito",
+      "de": 37,
+      "ate": 50
+    }
   ],
   "curiosidades": [
-    { "texto": "Enoque “andou com Deus e um dia desapareceu, porque Deus o levou”. O filho dele, Matusalém, é quem mais vive na lista: 969 anos.", "ref": "Gn 5" },
-    { "texto": "A arca tinha 150 metros de comprimento, 25 de largura e 15 de altura, pelas medidas que Deus deu a Noé.", "ref": "Gn 6.15" },
-    { "texto": "O Anjo do Senhor encontra Hagar, grávida, fugindo da patroa, perto de uma fonte no deserto. Ela dá ao Senhor um nome: “O Deus que me vê”.", "ref": "Gn 16.7-13" },
-    { "texto": "Raquel roubou os ídolos do pai e, enquanto Labão revirava a tenda, ficou sentada em cima deles, escondidos na sela do camelo.", "ref": "Gn 31.19, 33-35" },
-    { "texto": "No parto de Tamar, a parteira amarra um fio vermelho no pulso do gêmeo que pôs a mão para fora, mas quem nasce primeiro é o irmão, Perez.", "ref": "Gn 38.27-30" },
-    { "texto": "Antes de morrer, José faz os irmãos jurarem: quando Deus tirar o povo do Egito, “levem os meus ossos daqui”.", "ref": "Gn 50.24-25" }
+    {
+      "texto": "Enoque anda com Deus e um dia desaparece, porque Deus leva ele. O filho Matusalém vive 969 anos, mais do que qualquer outro da lista.",
+      "ref": "Gn 5"
+    },
+    {
+      "texto": "Deus manda Noé fazer a arca com 150 metros de comprimento, 25 de largura e 15 de altura.",
+      "ref": "Gn 6.15"
+    },
+    {
+      "texto": "Hagar foge da patroa. O Anjo do Senhor encontra Hagar perto de uma fonte no deserto e diz que o filho dela vai se chamar Ismael. Ela dá ao Senhor um nome: “O Deus que me vê”.",
+      "ref": "Gn 16.7-13"
+    },
+    {
+      "texto": "Raquel rouba os ídolos do pai e esconde tudo na sela do camelo. Labão revira a tenda, e ela fica sentada em cima deles.",
+      "ref": "Gn 31.19, 33-35"
+    },
+    {
+      "texto": "Tamar tem gêmeos. Um deles põe a mão para fora, e a parteira amarra um fio vermelho no pulso dele. Então o menino puxa a mão de volta, e o irmão sai primeiro.",
+      "ref": "Gn 38.27-30"
+    },
+    {
+      "texto": "Antes de morrer, José diz aos irmãos que Deus vai tirar o povo do Egito e faz todos jurarem: “levem os meus ossos daqui”.",
+      "ref": "Gn 50.24-25"
+    }
   ],
   "procure": {
-    "texto": "“Todas as nações da terra serão abençoadas.” A promessa feita a Abraão volta para Isaque e para Jacó quase com as mesmas palavras. Marque cada vez que ela aparecer.",
+    "texto": "“Todas as nações da terra serão abençoadas.” Deus promete isso a Abraão e depois repete a Isaque e a Jacó, quase palavra por palavra. Conte quantas vezes essa promessa aparece no livro.",
     "ref": "Gn 22.18"
   }
 }
