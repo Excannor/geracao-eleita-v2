@@ -11,6 +11,11 @@ quatro leitores céticos passaram pelos 11 mapas e acharam uns 600 trechos que a
 Tudo o que acharam está aqui, por família, com exemplos reais do que saiu. O `checar-mapa`
 (lista `VOZ`) barra o que dá para pegar por regra; o resto só a leitura em voz alta pega.
 
+**Vale para o app inteiro (dono, 03/10):** mapas, contexto do dia, "procure", guias, lições,
+reflexões e textos de tela seguem este catálogo. **O único texto que não se altera é o da Bíblia**:
+os arquivos de `conteudo/biblias` não se mexem, e toda citação entre aspas fica palavra por
+palavra como está na NBV. O resto pode e deve ser reescrito na voz humana.
+
 ## A voz
 
 Alguém da célula contando o livro para um amigo que nunca o leu, numa mesa de café. O amigo

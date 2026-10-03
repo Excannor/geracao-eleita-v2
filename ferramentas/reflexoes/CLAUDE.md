@@ -18,6 +18,9 @@ ordem direta, frases curtas, sem dois-pontos de resumo, sem clivada, sem coisa a
 capítulo traz"), sem lista entre parênteses, referência no fim. O dono reprovou o contexto do dia
 de Êxodo 20 / Mateus 20 por esses vícios.
 
+**A Bíblia não muda.** O único texto que não se altera é o da Bíblia: `conteudo/biblias` fica
+intacto e citação entre aspas é palavra por palavra da NBV. Todo o resto pode ser reescrito.
+
 **Interpretação pode, presa ao texto.** Nas explicações antes da leitura, dá para dizer o que a
 passagem ensina ou como ler ("São regras daquele povo, naquela época"), desde que a leitura saia
 da própria passagem e do contexto dela, sem doutrina de grupo e sem tradição de pregação
