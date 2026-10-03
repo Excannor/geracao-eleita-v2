@@ -97,6 +97,7 @@ const VOZ_BRUTA = [
   [/\b(bronca|enrola|muda a régua|sacou|manda ver|na lata)\b/i, 'gíria (5.9)'],
   [/\.\.\.(?!”)|…(?!”)/, 'reticências fora de citação (3.7)'],
   [/[!?]”\./, 'ponto depois de !” ou ?”'],
+  [/\b(nenhum outro (livro|evangelho|profeta)|só neste livro|único na Bíblia|no resto da Bíblia)\b/i, 'comparação com outros livros (6.9)'],
 ];
 export const VOZ = VOZ_BRUTA.map(([re, nome]) => [comAcento(re), nome]);
 // Texto que o dono escreveu ou aprovou palavra por palavra: o checador de voz não mexe nele.

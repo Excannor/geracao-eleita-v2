@@ -910,3 +910,10 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   mapa e testa num `git worktree` limpo do HEAD (`scratchpad/limpo`) antes de publicar. E o
   limite semanal de um modelo pode cortar um agente no meio: o arquivo fica pela metade no disco,
   e o próximo agente parte dele (`git diff`) em vez de recomeçar.
+- 2026-10-03 · mapas · Os 11 mapas reescritos pelo catálogo completo; a leitura final de amostras
+  ainda achou três raízes com afirmação de fora do livro ("Nenhum outro livro começa...", "Só neste
+  livro...", "nenhum outro evangelho tem") e um "o autor diz" → raiz não compara o livro com os
+  outros 65 nem afirma o que outro livro tem ou não tem: o "o que só esse livro tem" se mostra pelo
+  próprio texto (Lucas começa e termina no templo), nunca dizendo "só aqui". E agentes, para
+  variar molde, diluíram texto que o dono pediu ("Esse Servo é Jesus"): pedido do dono não entra na
+  regra de variar molde.

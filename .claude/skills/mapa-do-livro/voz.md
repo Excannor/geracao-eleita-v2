@@ -376,7 +376,11 @@ citação sem cena, galho de 40 palavras, referência enfiada no meio da frase (
 17.22-23) e a caminho de Jerusalém"), ordem de capítulos pulando sem aviso (Is 6 → 44 → 40). Um
 galho, uma cena, de duas a quatro frases, referência no fim.
 
-6.9 **Raiz como resumo.** Lista de seis verbos, tese de resenha, sem dizer o que faz esse livro
+6.9 **Raiz que compara com outros livros.** "Nenhum outro livro começa...", "Só neste livro...",
+"histórias que nenhum outro evangelho tem" afirmam o que o livro não diz. O que só esse livro tem
+se mostra pelo próprio texto ("Lucas começa e termina no templo"), nunca dizendo "só aqui".
+
+6.10 **Raiz como resumo.** Lista de seis verbos, tese de resenha, sem dizer o que faz esse livro
 diferente dos outros 65. A raiz é um convite de umas 4 frases: a primeira diz o que só esse
 livro tem; a última, o que Jesus (ou o autor) diz que está fazendo ali. Aprovada pelo dono
 (Marcos): "Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus.
@@ -387,7 +391,7 @@ Jesus explica por que veio: não para ser servido, mas para servir e dar a vida 
 livro termina com ele voltando para o céu e os discípulos levando essa notícia para todo lugar."
 Repare: paráfrase no lugar da citação longa, "soldado romano", "o livro termina com".
 
-6.10 **Palavras proibidas antigas.** Travessão (—), "mergulhar", "crucial", "fundamental",
+6.11 **Palavras proibidas antigas.** Travessão (—), "mergulhar", "crucial", "fundamental",
 "dança", "em resumo", "vale ressaltar", "teia", "jornada", "multifacetado", "vamos explorar", "é
 importante notar", "no fim das contas", "ou seja", "isso significa", "culmina", "por sua vez",
 "nesse sentido", emoji.
