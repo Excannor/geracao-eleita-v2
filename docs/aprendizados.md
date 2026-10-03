@@ -904,3 +904,9 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   fidelidade" apontadas por um leitor (rosto em Mc 9.3, mães em Mc 10.13, "não pare" em Mc 1.44)
   estavam erradas, a NBV dizia exatamente aquilo → apontamento de fidelidade de leitor se confere
   na folha do `rever-mapa` antes de virar ordem.
+- 2026-10-03 · processo · Com agentes editando mapas no mesmo worktree, o `node build.mjs` de um
+  quebrava o teste de navegador do outro, e o teste.mjs falhava por mapa alheio pela metade →
+  agentes de texto não rodam build nem teste; o coordenador faz o commit só com os arquivos do
+  mapa e testa num `git worktree` limpo do HEAD (`scratchpad/limpo`) antes de publicar. E o
+  limite semanal de um modelo pode cortar um agente no meio: o arquivo fica pela metade no disco,
+  e o próximo agente parte dele (`git diff`) em vez de recomeçar.
