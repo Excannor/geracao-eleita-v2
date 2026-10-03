@@ -44,227 +44,227 @@
     }
   ],
   "livros": {
-    "Gênesis": "Gênesis quer dizer começo. Pela tradição foi escrito por Moisés, para um povo recém-saído do Egito, e responde de onde vieram o mundo, o pecado e a promessa que o resto da Bíblia acompanha.",
-    "Mateus": "Mateus, um dos doze discípulos pela tradição, escreveu para leitores que conheciam as Escrituras de Israel. A marca dele é mostrar que Jesus é o rei prometido: a cada passo, algo aconteceu para que se cumprisse o que os profetas disseram.",
-    "Êxodo": "Êxodo quer dizer saída. Pela tradição também é de Moisés, e conta como a família de Abraão, agora um povo escravo no Egito, é libertada por Deus e vira uma nação com uma aliança no Sinai."
+    "Gênesis": "Gênesis quer dizer começo. Pela tradição, Moisés escreveu o livro para um povo que tinha acabado de sair do Egito. Gênesis conta de onde vieram o mundo e o pecado. Depois conta a história da família de Abraão e da promessa que Deus faz a ele.",
+    "Mateus": "Mateus era um dos doze discípulos, segundo a tradição. Ele escreveu para gente que conhecia as Escrituras de Israel e queria mostrar que Jesus é o rei prometido. Por isso, muitas vezes ele conta que algo aconteceu para que se cumprisse o que um profeta tinha dito.",
+    "Êxodo": "Êxodo quer dizer saída. A tradição também diz que Moisés escreveu este livro. Êxodo conta como Deus liberta a família de Abraão, que virou um povo escravo no Egito, e faz com ela uma aliança no monte Sinai."
   },
   "dias": {
     "1": {
       "titulo": "O começo de tudo",
-      "sub": "A primeira página da Bíblia e a primeira do Novo Testamento, juntas de propósito.",
-      "contexto": "Gênesis quer dizer começo: pela tradição, Moisés o escreveu para um povo recém-saído do Egito. Mateus, um dos doze pela tradição, abre o Novo Testamento provando a leitores judeus que Jesus é o rei prometido, “filho de Davi, filho de Abraão”. Hoje você lê as duas pontas da mesma história.",
-      "procure": "A promessa que Deus faz dentro do castigo, em Gênesis 3.15: um descendente da mulher. Mateus 1 abre com a família dele.",
-      "amanha": "Dois irmãos, um aviso de Deus antes do crime, e uma lista de gerações em que alguém não morre."
+      "sub": "Hoje você lê a primeira página da Bíblia e a primeira do Novo Testamento.",
+      "contexto": "Gênesis começa com Deus criando os céus e a terra. Mateus abre o Novo Testamento com a lista dos antepassados de Jesus, de Abraão ao rei Davi e de Davi até José, o marido de Maria. Mateus escreve para mostrar que Jesus é o Messias, o rei da família de Davi. Hoje você lê as duas pontas da mesma história.",
+      "procure": "a promessa que Deus faz no meio do castigo, quando fala de um descendente da mulher (Gênesis 3.15). Em Mateus 1.16, veja como Mateus chama Jesus no fim da lista.",
+      "amanha": "Deus avisa Caim antes do crime. Na lista de gerações que vem depois, um homem desaparece porque Deus o levou."
     },
     "2": {
       "titulo": "Dois irmãos e um aviso",
-      "sub": "Caim, Abel, e a lista de Adão até Noé.",
-      "contexto": "Fora do jardim, a história segue com os filhos de Adão e Eva. Gênesis 4 é uma cena só, Caim e Abel, com Deus falando com Caim antes e depois do crime. Gênesis 5 é a lista das gerações, de Adão a Noé.",
-      "procure": "Em Gênesis 5, a mesma frase fecha quase todas as gerações. Procure quem “andou com Deus e um dia desapareceu, porque Deus o levou”.",
-      "amanha": "Uma embarcação de 150 metros, e um bebê que precisa fugir de um rei."
+      "sub": "Caim mata Abel, e a família de Adão cresce até chegar a Noé.",
+      "contexto": "Adão e Eva já vivem fora do jardim e têm dois filhos, Caim e Abel. Deus fala com Caim antes do crime e fala com ele de novo depois. Gênesis 5 é a lista das gerações, de Adão até Noé.",
+      "procure": "a frase que se repete no fim de quase toda geração de Gênesis 5. Depois, veja quem “sempre andou com Deus e um dia desapareceu” (Gênesis 5.24).",
+      "amanha": "Noé constrói uma arca de 150 metros, e o menino Jesus precisa fugir de um rei."
     },
     "3": {
-      "titulo": "A chuva, a arca e um rei com medo",
-      "sub": "Noé constrói; em Mateus, Herodes manda matar.",
-      "contexto": "A maldade cresce até Deus recomeçar com uma família: a de Noé, que “agradava ao Senhor com a sua vida”. Em Mateus 2, Jesus é um bebê em Belém: sábios do Oriente vêm adorá-lo, o rei Herodes quer matá-lo, e a família foge para o Egito.",
-      "procure": "Quem fecha a porta da embarcação, em Gênesis 7.16. E para onde a família de Jesus foge, em Mateus 2.13.",
-      "amanha": "Um sinal no céu para Deus se lembrar, e uma voz do céu no batismo de Jesus."
+      "titulo": "A chuva, a arca e a fuga para o Egito",
+      "sub": "Noé constrói a arca, e em Mateus o rei Herodes quer matar o menino.",
+      "contexto": "O Senhor vê que a maldade das pessoas só piora e decide acabar com a vida na terra. Noé agrada ao Senhor, e Deus manda Noé construir uma arca para salvar a família. Em Mateus 2, uns sábios do Oriente chegam para adorar o menino Jesus. O rei Herodes quer matar Jesus, e a família foge para o Egito.",
+      "procure": "quem fecha a porta da arca depois que todos entram (Gênesis 7.16). Em Mateus 2.13, veja como José descobre que precisa fugir.",
+      "amanha": "Deus põe um sinal nas nuvens para lembrar da aliança, e no batismo de Jesus uma voz fala do céu."
     },
     "4": {
       "titulo": "Um sinal no céu, uma voz do céu",
-      "sub": "O arco-íris de Noé e o batismo de Jesus.",
-      "contexto": "Depois do dilúvio, Deus faz uma aliança (um compromisso) com Noé e com todo ser vivo, e dá um sinal. Gênesis 10 lista os povos que vieram dos filhos de Noé. Em Mateus 3, João Batista prepara o caminho e Jesus é batizado no Jordão.",
-      "procure": "Para quem é o sinal do arco-íris: leia Gênesis 9.15 e veja quem diz “me lembrarei”.",
-      "amanha": "Uma torre, um chamado que muda a história, e Jesus respondendo ao Diabo com as Escrituras."
+      "sub": "Deus põe o arco-íris nas nuvens, e Jesus é batizado no Jordão.",
+      "contexto": "Depois do dilúvio, Deus faz uma aliança com Noé e com todos os seres vivos. Aliança é um compromisso, e esta tem um sinal no céu. Gênesis 10 é a lista dos povos que vieram dos filhos de Noé. Em Mateus 3, João Batista prega no deserto, e Jesus vai até ele no rio Jordão para ser batizado.",
+      "procure": "quem diz “me lembrarei” quando o arco-íris aparece (Gênesis 9.15). Em Mateus 3.17, veja o que a voz do céu diz de Jesus.",
+      "amanha": "O povo constrói uma torre para ficar famoso, e Deus chama Abrão. Em Mateus, Jesus responde ao Diabo com as Escrituras."
     },
     "5": {
       "titulo": "O nome que a gente faz, o nome que Deus dá",
-      "sub": "Babel, o chamado de Abrão e Jesus no deserto.",
-      "contexto": "Gênesis 11 fecha a história de todo mundo (Babel) e abre a de uma família: Deus chama Abrão e promete que por meio dele “serão abençoados todos os povos da terra”. O resto da Bíblia acompanha essa promessa. Em Mateus 4, Jesus é tentado no deserto e chama os primeiros discípulos.",
-      "procure": "Compare quem diz “nos tornaremos famosos” (Gênesis 11.4) com quem diz “tornarei o seu nome famoso” (Gênesis 12.2).",
-      "amanha": "Um dia leve: Abrão recusa um presente de rei e recebe uma promessa olhando o céu."
+      "sub": "Em Babel o povo quer fama, e Deus promete fama a Abrão.",
+      "contexto": "Em Babel, o povo quer construir uma torre que chegue até os céus, e o Senhor espalha todos pela terra. Depois Deus chama Abrão e promete que, por meio dele, todos os povos da terra vão ser abençoados (Gênesis 12.3). O resto da Bíblia acompanha essa promessa. Em Mateus 4, o Diabo tenta Jesus no deserto, e Jesus chama os primeiros discípulos.",
+      "procure": "quem diz “nos tornaremos famosos” em Gênesis 11.4. Em Gênesis 12.2, veja quem diz “tornarei o seu nome famoso”.",
+      "amanha": "É um dia leve. Abrão não aceita nada do rei de Sodoma, e Deus leva Abrão para fora da tenda para contar as estrelas."
     },
     "6": {
       "titulo": "Conte as estrelas",
-      "sub": "Abrão recusa uma recompensa e recebe uma promessa.",
-      "contexto": "Hoje é só Gênesis, e é leve. Abrão resgata o sobrinho Ló de uma guerra entre reis (os nomes do começo do capítulo 14 podem passar rápido) e recusa a recompensa do rei de Sodoma. Depois, Deus faz com ele uma aliança.",
-      "procure": "O que Deus manda Abrão fazer fora da tenda, em Gênesis 15.5, e como o versículo seguinte descreve a resposta dele.",
-      "amanha": "O sétimo dia: uma escrava dá um nome a Deus, Sara ri, Jesus ensina no monte, e o baú da estrada abre."
+      "sub": "Abrão vai atrás do sobrinho Ló, e Deus faz uma aliança com Abrão.",
+      "contexto": "Hoje é só Gênesis, e é leve. Uns reis em guerra levam Ló, o sobrinho de Abrão, e Abrão vai atrás com 318 homens. Pode passar rápido pelos nomes dos reis no começo do capítulo 14. Na volta, Abrão não aceita nada do rei de Sodoma. Depois, Deus faz uma aliança com Abrão.",
+      "procure": "o que Deus manda Abrão fazer do lado de fora da tenda (Gênesis 15.5). No versículo 6, veja o que Abrão faz depois disso e como Deus vê Abrão.",
+      "amanha": "Uma escrava que fugiu dá um nome a Deus, e Sara ri por dentro. Em Mateus, Jesus ensina no monte. No sétimo dia, o baú da estrada abre."
     },
     "7": {
       "titulo": "O Deus que me vê",
-      "sub": "Hagar no deserto, Sara rindo, e Jesus no monte.",
-      "contexto": "Dia 7: Abrão vira Abraão, Sarai vira Sara, e uma escrava egípcia fugindo é quem dá um nome a Deus. Em Mateus 5 começa o Sermão do Monte: Jesus sentado, ensinando como vive quem é do Reino. É a leitura mais longa da semana; vale ler em dois tempos.",
-      "procure": "O nome que Hagar dá a Deus, em Gênesis 16.13. E o que Jesus diz que vocês são, em Mateus 5.13-14.",
-      "amanha": "Sodoma, Ló tirado pela mão, e Jesus ensinando a orar."
+      "sub": "Hagar dá um nome a Deus, e Jesus ensina no monte.",
+      "contexto": "Hagar é uma escrava egípcia de Sarai. Ela foge para o deserto e ali dá um nome a Deus. No capítulo 17, Deus muda o nome de Abrão para Abraão e o de Sarai para Sara. Em Mateus 5, Jesus sobe o monte, senta e começa a ensinar como vive quem é do Reino. É a leitura mais longa da semana, e dá para ler em duas vezes.",
+      "procure": "o nome que Hagar dá a Deus (Gênesis 16.13). Em Mateus 5.13-14, veja com que duas coisas Jesus compara quem está ouvindo.",
+      "amanha": "Os anjos tiram Ló de Sodoma pela mão, e Jesus ensina a orar."
     },
     "8": {
-      "titulo": "Fogo em Sodoma, e a oração que Jesus ensinou",
-      "sub": "Ló é tirado da cidade pela mão; Jesus ensina a orar e a não se preocupar.",
-      "contexto": "Gênesis 19 continua a cena de ontem: os dois anjos chegam a Sodoma, onde Ló mora. É um capítulo duro (a cidade é destruída, e o fim dele conta o que as filhas de Ló fazem na caverna). Gênesis 20 mostra Abraão repetindo um erro antigo: dizer que Sara é sua irmã. Em Mateus 6, o Sermão do Monte continua: Jesus ensina a dar, a orar e a não se preocupar com o amanhã.",
-      "procure": "Em Gênesis 19.16, o motivo que o texto dá para os anjos tirarem Ló à força. E, em Mateus 6.8, o que o Pai sabe antes mesmo de você pedir.",
-      "amanha": "Isaque nasce e Sara ri de novo; depois Deus põe Abraão à prova no monte (leia até o fim: o texto resolve). Dia leve, só Gênesis."
+      "titulo": "Fogo em Sodoma e a oração que Jesus ensina",
+      "sub": "Os anjos tiram Ló da cidade à força, e Jesus ensina a não viver preocupado.",
+      "contexto": "Dois anjos chegam a Sodoma, onde Ló mora. Gênesis 19 é duro. O Senhor destrói a cidade, e no fim do capítulo as filhas de Ló embebedam o pai numa caverna. No capítulo 20, Abraão faz de novo o que tinha feito no Egito e diz que Sara é irmã dele. Em Mateus 6, Jesus continua o Sermão do Monte e ensina a orar e a não viver preocupado com o dia de amanhã.",
+      "procure": "por que os anjos tiram Ló e a família da cidade à força (Gênesis 19.16). Em Mateus 6.8, veja o que o Pai sabe antes de a gente pedir.",
+      "amanha": "Isaque nasce, e Sara ri de novo. Depois Deus põe Abraão à prova no monte. Leia o capítulo 22 até o fim, porque o Anjo do Senhor manda parar."
     },
     "9": {
       "titulo": "O riso de Sara e o monte de Abraão",
-      "sub": "Isaque nasce; no monte Moriá, Deus põe Abraão à prova.",
-      "contexto": "Só Gênesis hoje, e leve. Isaque, o filho prometido há tantos capítulos, nasce, e Sara diz: “Deus me fez rir”. Depois Deus põe Abraão à prova pedindo esse filho: leia o capítulo 22 inteiro, porque o Anjo do Senhor grita do céu antes que aconteça qualquer coisa com o rapaz. O capítulo 23 é a morte de Sara e a compra de um túmulo.",
-      "procure": "Quantas vezes Abraão responde “Aqui estou!” em Gênesis 22 (uma a Deus, outra ao Anjo). E o nome que ele dá ao lugar, em Gênesis 22.14.",
-      "amanha": "Um servo ora em silêncio ao lado de um poço e pede um sinal bem específico; Rebeca aparece antes de ele terminar. E Jesus fecha o Sermão do Monte com duas casas."
+      "sub": "Isaque nasce, e no monte Deus põe Abraão à prova.",
+      "contexto": "Sara tem o filho que Deus prometeu quando Abraão está com cem anos. Ela diz: “Deus me fez rir”. Depois Deus põe Abraão à prova e pede esse filho em sacrifício. Leia o capítulo 22 até o fim. O Anjo do Senhor grita do céu e manda Abraão não tocar no rapaz. No capítulo 23, Sara morre, e Abraão compra um lugar para enterrar a mulher.",
+      "procure": "quantas vezes Abraão responde “Aqui estou!” em Gênesis 22, e para quem. No versículo 14, veja o nome que Abraão dá ao lugar.",
+      "amanha": "O servo de Abraão ora em silêncio perto de uma fonte e pede um sinal. Rebeca chega antes de ele terminar a oração. Em Mateus, Jesus fecha o Sermão do Monte com duas casas."
     },
     "10": {
       "titulo": "A noiva do poço e a casa na rocha",
-      "sub": "O servo de Abraão encontra Rebeca; Jesus termina o Sermão do Monte.",
-      "contexto": "Abraão, já muito idoso, manda o servo mais antigo da casa buscar uma esposa para Isaque na terra natal dele. É o capítulo mais longo de Gênesis (67 versículos), e a história é contada duas vezes, a segunda na boca do servo. Gênesis 25 fecha a vida de Abraão e abre a dos gêmeos, Esaú e Jacó. Mateus 7 é o fim do Sermão do Monte.",
-      "procure": "Em Gênesis 24.21, o que o servo faz enquanto Rebeca dá água aos camelos. E, em Mateus 7.28-29, por que as multidões ficaram maravilhadas.",
-      "amanha": "Jacó se veste de Esaú para enganar o pai cego, foge do irmão e dorme com uma pedra de travesseiro: é ali que Deus aparece. Leitura longa, uns 16 minutos; vale dividir."
+      "sub": "O servo de Abraão encontra Rebeca, e Jesus termina o Sermão do Monte.",
+      "contexto": "Abraão está muito velho e manda o servo mais antigo da casa buscar uma esposa para Isaque na terra natal de Abraão. Gênesis 24 é o capítulo mais longo do livro, com 67 versículos. O servo vive a história e depois conta tudo de novo para a família de Rebeca. No capítulo 25, Abraão morre, e Rebeca tem gêmeos, Esaú e Jacó. Mateus 7 é o fim do Sermão do Monte.",
+      "procure": "o que o servo faz enquanto Rebeca dá água aos camelos (Gênesis 24.21). Em Mateus 7.28-29, veja por que as multidões ficam maravilhadas.",
+      "amanha": "Jacó se veste com a roupa de Esaú para enganar o pai, que quase não enxerga. Depois foge e dorme com a cabeça numa pedra, e ali Deus fala com ele num sonho. A leitura é longa, e vale dividir."
     },
     "11": {
       "titulo": "A bênção roubada e a escada no sonho",
-      "sub": "Isaque repete o pai, Jacó engana o pai e foge; em Mateus, Jesus cura.",
-      "contexto": "Isaque repete a história do pai: fome, Gerar, “Ela é minha irmã”, poços. Em Gênesis 27, Jacó se veste de Esaú para enganar o pai cego e levar a bênção; depois foge. Mateus 8 abre a parte dos milagres: um leproso, o servo de um capitão romano, a sogra de Pedro, uma tempestade. É a leitura mais longa até aqui, uns 16 minutos: vale ler em dois tempos.",
-      "procure": "Em Gênesis 28.11, o que Jacó usa como travesseiro. Em Mateus 8.3, o que Jesus faz antes de falar com o leproso: estende a mão e toca nele.",
-      "amanha": "Jacó, o enganador, é enganado: trabalha sete anos por uma mulher e acorda casado com a irmã dela. E Deus vê quem ninguém escolheu. A leitura mais longa da unidade: uns 19 minutos."
+      "sub": "Jacó engana o pai e foge de casa, e Jesus toca num leproso.",
+      "contexto": "Isaque passa pelo mesmo que o pai. Falta comida na terra, ele vai para Gerar e diz que Rebeca é irmã dele. No capítulo 27, Jacó se veste com a roupa de Esaú para enganar o pai e ficar com a bênção. Depois foge do irmão. Em Mateus 8, Jesus cura muita gente e acalma uma tempestade. É a leitura mais longa até aqui, uns 16 minutos, e dá para ler em duas vezes.",
+      "procure": "o que Jacó usa como travesseiro (Gênesis 28.11). Em Mateus 8.3, veja o que Jesus faz antes de falar com o leproso.",
+      "amanha": "Jacó trabalha sete anos para casar com Raquel e acorda casado com a irmã dela, Lia. O Senhor vê que Jacó despreza Lia. É a leitura mais longa da unidade."
     },
     "12": {
-      "titulo": "O enganador enganado",
-      "sub": "Lia, Raquel, vinte anos na casa de Labão; em Mateus, um cobrador de impostos vira discípulo.",
-      "contexto": "Jacó chega à casa do tio Labão, e quem engana agora é enganado: trabalha sete anos por Raquel e recebe Lia. Os capítulos 29 e 30 contam o nascimento dos filhos (cada nome é uma frase inteira, dita pela mãe); o 31 é a fuga, vinte anos depois. Em Mateus 9, Jesus chama Mateus, o cobrador de impostos, pela tradição o autor deste evangelho. É a leitura mais longa da unidade, uns 19 minutos: vale dividir.",
-      "procure": "Em Gênesis 29.20, quanto tempo pareceram os sete anos de trabalho. E, em Mateus 9.36, o que Jesus sente ao ver as multidões.",
-      "amanha": "Um dia leve, só Gênesis: Jacó luta a noite inteira com um desconhecido, sai mancando e com nome novo, e reencontra o irmão que queria matá-lo."
+      "titulo": "Sete anos por Raquel",
+      "sub": "Jacó passa vinte anos na casa de Labão, e Jesus chama um cobrador de impostos.",
+      "contexto": "Jacó chega à casa do tio Labão e trabalha sete anos para casar com Raquel. De manhã, vê que a noiva é Lia e pergunta a Labão: “Por que você me enganou?” Nos capítulos 29 e 30, Lia e Raquel dão nome aos filhos, e cada nome vem com uma frase. Em Mateus 9, Jesus chama um cobrador de impostos chamado Mateus. A tradição diz que ele escreveu este evangelho. É a leitura mais longa da unidade, e vale dividir.",
+      "procure": "quanto tempo os sete anos de trabalho parecem para Jacó (Gênesis 29.20). Em Mateus 9.36, veja o que Jesus sente quando olha as multidões.",
+      "amanha": "É um dia leve, só de Gênesis. Jacó luta com um homem até o amanhecer e sai mancando, com nome novo. Depois reencontra Esaú."
     },
     "13": {
       "titulo": "A luta de uma noite inteira",
-      "sub": "Jacó com medo de Esaú, uma luta até o amanhecer, e um abraço.",
-      "contexto": "Só dois capítulos hoje, uns 6 minutos. Jacó volta para casa depois de vinte anos e fica sabendo que Esaú vem ao encontro dele com quatrocentos homens. O que ele faz com o medo (divide o grupo, ora, manda presentes) ocupa o capítulo 32 até a noite em que fica sozinho.",
-      "procure": "O que Jacó diz de si mesmo na oração de Gênesis 32.10, e quantas vezes ele se inclina antes de chegar a Esaú (Gênesis 33.3).",
-      "amanha": "Um capítulo duro (o que fazem com Diná, e a vingança dos irmãos), a volta de Jacó ao lugar onde tudo começou, e Jesus enviando os doze. Gênesis 36 é uma lista: tem guia."
+      "sub": "Jacó tem medo do encontro, e Esaú corre para abraçar o irmão.",
+      "contexto": "Vinte anos depois, Jacó volta para casa e descobre que Esaú vem com quatrocentos homens. Jacó fica com muito medo e divide o grupo em dois. Depois ora e manda presentes para o irmão. Na noite em que fica sozinho, um homem luta com ele até o amanhecer. São só dois capítulos, uns 6 minutos.",
+      "procure": "o que Jacó diz de si mesmo quando ora (Gênesis 32.10). Em Gênesis 33.3, conte quantas vezes Jacó se inclina antes de chegar perto de Esaú.",
+      "amanha": "Gênesis 34 conta o que fazem com Diná e a vingança dos irmãos dela, e é duro. Depois Jacó volta a Betel, e Jesus envia os doze. Gênesis 36 é uma lista e tem guia."
     },
     "14": {
       "titulo": "De volta a Betel",
-      "sub": "Um capítulo duro, a volta ao lugar do sonho, e Jesus enviando os doze.",
-      "contexto": "Gênesis 34 é duro: o que fazem com Diná, e a vingança de Simeão e Levi. No 35, Deus manda Jacó voltar a Betel, o lugar da escada no sonho (dia 11), e repete ali o nome novo, Israel. O 36 é a lista dos descendentes de Esaú (tem guia: pode ler rápido). Em Mateus 10, Jesus chama os doze pelo nome e os envia.",
-      "procure": "Como Jacó descreve Deus em Gênesis 35.3: o que o ouviu no dia da angústia. E, em Mateus 10.30, o que o Pai tem contado.",
-      "amanha": "Começa a história de José: a túnica colorida, os sonhos, o poço e a venda pelos próprios irmãos. E o convite de Jesus a quem está cansado."
+      "sub": "Jacó volta ao lugar do sonho, e Jesus envia os doze.",
+      "contexto": "Gênesis 34 é duro. Siquém força Diná, a filha de Jacó. Para se vingar, os irmãos dela, Simeão e Levi, matam todos os homens da cidade. No capítulo 35, Deus manda Jacó voltar a Betel, onde ele viu a escada no sonho (dia 11). Ali Deus repete o nome novo, Israel. O 36 é a lista dos descendentes de Esaú e tem guia. Em Mateus 10, Jesus chama os doze e manda todos pregar.",
+      "procure": "como Jacó fala de Deus quando chama a família para subir a Betel (Gênesis 35.3). Em Mateus 10.30, veja o que Jesus diz que está contado.",
+      "amanha": "A história de José começa. Os irmãos jogam José num poço e depois vendem ele. Em Mateus, Jesus chama quem está cansado."
     },
     "15": {
       "titulo": "O sonhador no poço",
-      "sub": "José é vendido pelos irmãos; Jesus convida quem está cansado.",
-      "contexto": "Começa a última parte de Gênesis, a história de José (a ficha do livro divide assim: José vai do capítulo 37 ao 50). O 38 interrompe a história com Judá e Tamar, um capítulo cru; os gêmeos do fim dele, Perez e Zerá, estão na primeira página de Mateus, lida no dia 1. Em Mateus 11, João Batista, preso, manda perguntar se Jesus é mesmo quem esperavam.",
-      "procure": "Em Gênesis 37.4, o que os irmãos já não conseguiam fazer com José. E, em Mateus 11.28, para quem é o convite de Jesus.",
-      "amanha": "Só Gênesis: José escravo, José preso, José interpretando sonhos, e a frase que o capítulo 39 repete quatro vezes."
+      "sub": "Os irmãos vendem José, e Jesus chama quem está cansado.",
+      "contexto": "Do capítulo 37 até o fim, Gênesis conta a história de José. No 38, Gênesis deixa José de lado e conta a história de Judá e Tamar, que é crua. Tamar tem gêmeos, Perez e Zerá, e os dois estão na lista de Mateus 1, lida no dia 1. Em Mateus 11, João Batista está preso e manda perguntar se Jesus é mesmo quem eles esperavam.",
+      "procure": "o que os irmãos de José já não conseguem fazer com ele (Gênesis 37.4). Em Mateus 11.28, veja para quem Jesus faz o convite.",
+      "amanha": "A leitura é só de Gênesis. José vai de escravo a preso e de preso a governador do Egito, e Gênesis 39 diz quatro vezes a mesma frase sobre ele."
     },
     "16": {
       "titulo": "Da cadeia ao palácio",
-      "sub": "José escravo, preso e depois governador do Egito.",
-      "contexto": "Só Gênesis hoje. José, vendido como escravo, vai parar na casa de um oficial do faraó, depois na prisão, e dois anos depois diante do próprio faraó. Em tudo isso, o capítulo 39 repete uma frase, quatro vezes: o Senhor estava com José.",
-      "procure": "Conte quantas vezes Gênesis 39 diz que “o Senhor estava com José”. E o que o chefe dos copeiros faz em Gênesis 40.23.",
-      "amanha": "Os irmãos de José chegam ao Egito sem saber quem está na frente deles; e Mateus explica quem é Jesus com um galho quebrado e uma luz fraca."
+      "sub": "José sai da cadeia e vai governar o Egito.",
+      "contexto": "José vai parar como escravo na casa de Potifar, no Egito, e de lá vai para a cadeia. Um dia, o faraó tem um sonho e manda chamar José. Gênesis 39 diz quatro vezes que o Senhor estava com José, na casa e na cadeia. A leitura de hoje é só de Gênesis.",
+      "procure": "os lugares onde o Senhor está com José, em Gênesis 39. Em Gênesis 40.23, veja o que o chefe dos copeiros faz quando sai da cadeia.",
+      "amanha": "Os irmãos de José chegam ao Egito e não sabem quem está na frente deles. Em Mateus, Jesus cumpre uma profecia sobre alguém que não esmaga o galho quebrado."
     },
     "17": {
       "titulo": "Os irmãos diante de José",
-      "sub": "Eles não o reconhecem; em Mateus, o Servo que não apaga a luz fraca.",
-      "contexto": "A fome chega a Canaã, e os irmãos de José descem ao Egito para comprar trigo sem saber quem é o governador que os recebe. José os reconhece; eles não. Em Mateus 12, os fariseus começam a planejar a morte de Jesus (12.14), e Mateus explica quem ele é com uma profecia de Isaías.",
-      "procure": "Quantas vezes José sai para chorar escondido (Gênesis 42.24 e 43.30). E, em Mateus 12.12, quanto vale uma pessoa, segundo Jesus.",
-      "amanha": "A taça escondida no saco de Benjamim, Judá oferecendo a própria vida, e José sem conseguir se conter. Em Mateus, o tesouro escondido no campo. Leitura longa, uns 17 minutos; Gênesis 46.8-27 é lista, tem guia."
+      "sub": "José reconhece os irmãos, e eles não reconhecem José.",
+      "contexto": "Falta comida em Canaã, e os irmãos de José descem ao Egito para comprar mantimentos. Eles se inclinam diante do governador sem saber que é José. José reconhece os irmãos, mas finge que não conhece. Em Mateus 12, os fariseus se reúnem para planejar a morte de Jesus. Mateus cita uma profecia de Isaías e diz que ela fala de Jesus.",
+      "procure": "as vezes em que José sai de perto dos irmãos para chorar (Gênesis 42.24 e 43.30). Em Mateus 12.12, veja com o que Jesus compara o valor de uma pessoa.",
+      "amanha": "José manda esconder a taça dele no saco de Benjamim. Judá se oferece como escravo no lugar do irmão, e José não consegue mais se conter. Gênesis 46.8-27 é uma lista e tem guia."
     },
     "18": {
       "titulo": "Eu sou José",
-      "sub": "A taça, o pedido de Judá, o choro que o palácio ouve; Jesus e as parábolas do Reino.",
-      "contexto": "O ponto alto da história de José: a taça aparece no saco de Benjamim, Judá se oferece como escravo no lugar do irmão, e José se revela. Depois a família inteira desce ao Egito (os nomes de Gênesis 46.8-27 são lista: tem guia). Mateus 13 é o capítulo das parábolas, as histórias curtas com que Jesus explica o Reino. Uma das leituras longas da unidade: uns 17 minutos.",
-      "procure": "A frase com que José se apresenta aos irmãos em Gênesis 45.4, e o que ele diz sobre quem o mandou ao Egito (Gênesis 45.8). Em Mateus 13.44, o que o homem sente ao vender tudo.",
-      "amanha": "Jacó abençoa o faraó e cruza os braços para abençoar os netos; João Batista é morto, Jesus alimenta cinco mil e anda sobre a água."
+      "sub": "José chora tão alto que dá para ouvir no palácio do faraó.",
+      "contexto": "O administrador de José acha a taça no saco de Benjamim, e Judá pede para ficar como escravo no lugar do irmão. José não aguenta e conta quem é. Depois a família inteira desce ao Egito, e os nomes de Gênesis 46.8-27 têm guia. Em Mateus 13, Jesus conta parábolas, histórias curtas sobre o Reino dos céus. A leitura é das longas, uns 17 minutos.",
+      "procure": "o que José diz sobre quem mandou ele para o Egito (Gênesis 45.8). Em Mateus 13.44, veja o que o homem sente quando vende tudo.",
+      "amanha": "Jacó abençoa o faraó e cruza os braços para abençoar os netos. Em Mateus, Jesus dá de comer a uma multidão e anda por cima da água."
     },
     "19": {
       "titulo": "Braços cruzados e um passo sobre a água",
-      "sub": "Jacó abençoa os netos de José; Pedro sai do barco.",
-      "contexto": "Jacó, com 130 anos, é apresentado ao faraó e o abençoa (Gênesis 47.7-10); no capítulo 48, já doente, abençoa os dois filhos de José cruzando os braços, de propósito. Mateus 14 tem a morte de João Batista, a multiplicação dos pães e Jesus andando sobre a água.",
-      "procure": "Por que Jacó cruza os braços (Gênesis 48.14 e 48.19). E, em Mateus 14.30, o que Pedro faz antes de começar a afundar: olha em volta.",
-      "amanha": "Jacó abençoa os doze filhos e morre; José perdoa os irmãos de vez; e Êxodo começa com um rei que não conhecia José."
+      "sub": "Jacó abençoa os netos, e Pedro sai do barco.",
+      "contexto": "José leva o pai até o faraó, e Jacó abençoa o faraó (Gênesis 47.7-10). No capítulo 48, Jacó está doente e abençoa os dois filhos de José com os braços cruzados, de propósito. Em Mateus 14, Herodes manda matar João Batista. Depois Jesus dá de comer a uma multidão com cinco pães e anda por cima da água.",
+      "procure": "por que Jacó cruza os braços (Gênesis 48.14 e 48.19). Em Mateus 14.30, veja o que Pedro faz um pouco antes de começar a afundar.",
+      "amanha": "Jacó abençoa os doze filhos e morre, e José acalma os irmãos com medo. Êxodo começa com um rei novo, que não conhecia José."
     },
     "20": {
-      "titulo": "Começa Êxodo",
+      "titulo": "Êxodo começa",
       "sub": "Gênesis termina no Egito, e Êxodo começa lá.",
-      "contexto": "Jacó morre, José morre, e Gênesis termina com a família de Abraão no Egito. Êxodo quer dizer saída: pela tradição também é de Moisés, e conta como essa família, agora um povo escravo, é libertada por Deus. O capítulo 1 começa com os mesmos nomes do fim de Gênesis.",
-      "procure": "O que muda em Êxodo 1.8: um rei novo, que não conhecia José.",
-      "amanha": "Uma sarça em chamas que o fogo não consome, e Deus dizendo o próprio nome."
+      "contexto": "Gênesis termina com a família de Abraão no Egito, depois que Jacó e José morrem. Êxodo quer dizer saída, e a tradição diz que Moisés também escreveu este livro. Êxodo conta como Deus liberta essa família, que agora é um povo escravo.",
+      "procure": "o que muda para os israelitas quando sobe ao trono um rei novo (Êxodo 1.8). Em Êxodo 1.17, veja o que as parteiras fazem com a ordem do rei.",
+      "amanha": "Moisés vê uma sarça pegando fogo, e o fogo não queima a sarça. Ali Deus conta a Moisés como se chama."
     },
     "21": {
       "titulo": "O cesto no rio e a sarça que não queima",
-      "sub": "Moisés nasce, foge e é chamado; Jesus e a mulher de Canaã.",
-      "contexto": "Moisés nasce sob a ordem de matar os meninos hebreus e é escondido num cesto no rio; cresce no palácio, mata um egípcio, foge para Midiã e passa muito tempo cuidando de ovelhas, até o dia da sarça em chamas. Em Mateus 15, Jesus discute com os fariseus o que torna alguém impuro e atende uma mulher estrangeira de fé grande.",
-      "procure": "Em Êxodo 3.7, três coisas que Deus diz ter visto, ouvido e conhecido do seu povo. E, em Mateus 15.28, o que Jesus diz da fé da mulher de Canaã.",
-      "amanha": "Moisés tenta escapar do chamado (mande outro no meu lugar), o faraó aperta a escravidão, e Pedro responde quem Jesus é. Êxodo 6.14-27 é lista: tem guia."
+      "sub": "Deus chama Moisés de dentro da sarça, e Jesus atende uma mulher de Canaã.",
+      "contexto": "O faraó manda matar os meninos hebreus, e a mãe de Moisés esconde o bebê num cesto, na beira do rio. A filha do faraó cria o menino. Quando cresce, Moisés mata um egípcio e foge para Midiã. Lá cuida das ovelhas do sogro até o dia da sarça. Em Mateus 15, Jesus discute com os fariseus o que deixa alguém impuro e atende o pedido de uma mulher de Canaã.",
+      "procure": "o que Deus diz que viu, ouviu e conhece do povo dele (Êxodo 3.7). Em Mateus 15.28, veja o que Jesus diz da fé da mulher de Canaã.",
+      "amanha": "Moisés pede a Deus: “Mande outro no meu lugar!” O faraó deixa o trabalho dos escravos mais pesado, e Pedro diz quem Jesus é. Êxodo 6.14-27 é uma lista e tem guia."
     },
     "22": {
       "titulo": "Mande outro no meu lugar",
-      "sub": "Moisés resiste, o faraó endurece, e Pedro diz quem Jesus é.",
-      "contexto": "Moisés ainda está na sarça e faz mais duas objeções: não vão acreditar, e eu não sei falar. Depois, a primeira ida ao faraó piora tudo: o povo perde a palha e mantém a cota de tijolos. Êxodo 6.14-27 é uma lista de famílias (tem guia). Em Mateus 16, Jesus pergunta aos discípulos quem eles dizem que ele é, e é Pedro quem responde.",
-      "procure": "A pergunta que Deus faz a Moisés em Êxodo 4.2: “O que você tem na mão?”. E, em Mateus 16.15, a pergunta que Jesus faz aos discípulos.",
-      "amanha": "Só Êxodo: as sete primeiras pragas, e um faraó que pede oração quando aperta e volta atrás quando passa."
+      "sub": "Moisés pede a Deus que mande outro, e Pedro diz quem Jesus é.",
+      "contexto": "Diante da sarça, Moisés ainda tenta escapar. Diz que o povo não vai acreditar nele e que ele não sabe falar. Depois o faraó deixa tudo pior, e os israelitas têm de fazer a mesma quantidade de tijolos sem receber palha. Êxodo 6.14-27 é uma lista e tem guia. Em Mateus 16, Jesus pergunta aos discípulos quem eles dizem que ele é.",
+      "procure": "o que Moisés tem na mão quando Deus pergunta (Êxodo 4.2). Em Mateus 16.15-16, veja a pergunta de Jesus e a resposta de Pedro.",
+      "amanha": "A leitura é só de Êxodo. Deus manda as primeiras pragas, e o faraó pede oração quando aperta e volta atrás quando passa."
     },
     "23": {
       "titulo": "As pragas começam",
-      "sub": "Sangue, rãs, piolhos, moscas, peste, úlceras e chuva de pedras.",
-      "contexto": "Só Êxodo hoje. Moisés tem oitenta anos quando fala com o faraó (Êxodo 7.7). Vêm as sete primeiras pragas: a água vira sangue, rãs, piolhos, moscas, a peste nos rebanhos, as úlceras e a chuva de pedras. A cada uma, repare no que o faraó promete quando aperta e no que faz quando passa.",
-      "procure": "Em Êxodo 8.19, o que os mágicos do faraó dizem quando não conseguem repetir a praga. E, em Êxodo 8.22, o lugar onde as moscas não entram.",
-      "amanha": "Gafanhotos, três dias de escuridão e o aviso da última praga; no monte, o rosto de Jesus brilha como o sol. Dia leve."
+      "sub": "Deus manda sete pragas sobre o Egito, uma depois da outra.",
+      "contexto": "Moisés tem oitenta anos quando fala com o faraó (Êxodo 7.7). São sete pragas, da água do rio que vira sangue até a chuva de pedras. A cada uma, veja o que o faraó promete quando aperta e o que faz quando passa. A leitura de hoje é só de Êxodo.",
+      "procure": "o que os mágicos do faraó dizem quando não conseguem repetir a praga (Êxodo 8.19). Em Êxodo 8.22, veja que terra Deus deixa sem moscas.",
+      "amanha": "É um dia leve. Os gafanhotos cobrem o Egito, e depois são três dias de escuridão. No monte, o rosto de Jesus brilha como o sol."
     },
     "24": {
       "titulo": "Escuridão no Egito, luz no monte",
-      "sub": "As últimas pragas anunciadas; Jesus transfigurado diante de três discípulos.",
-      "contexto": "Dia leve. Gafanhotos, três dias de escuridão e o anúncio da última praga, a que vai tirar o povo do Egito. Em Mateus 17, Jesus sobe um monte com Pedro, Tiago e João, e o rosto dele brilha como o sol; Moisés, o mesmo de Êxodo, aparece conversando com ele.",
-      "procure": "Em Êxodo 10.23, onde não faltou luz durante os três dias de escuridão. E, em Mateus 17.8, quem sobra quando os discípulos levantam os olhos.",
-      "amanha": "A noite da Páscoa, a saída do Egito e o mar que se abre; Jesus e o perdão setenta vezes sete. A leitura mais longa desta semana: uns 18 minutos."
+      "sub": "O Egito fica três dias no escuro, e o rosto de Jesus brilha no monte.",
+      "contexto": "Hoje a leitura é leve. Depois dos gafanhotos, o Egito fica três dias no escuro, e Deus avisa que vai mandar mais uma praga. Em Mateus 17, Jesus sobe um monte com Pedro, Tiago e João, e o rosto dele brilha como o sol. Moisés e Elias conversam com Jesus ali.",
+      "procure": "o lugar onde não falta luz nos três dias de escuridão (Êxodo 10.23). Em Mateus 17.8, veja quem os discípulos enxergam quando levantam os olhos.",
+      "amanha": "Na noite da Páscoa, o povo sai do Egito, e o mar se abre na frente deles. Jesus fala de perdoar setenta vezes sete. É a leitura mais longa da semana."
     },
     "25": {
       "titulo": "A noite da Páscoa e o mar que se abre",
-      "sub": "O povo sai do Egito; Jesus fala de perdoar setenta vezes sete.",
-      "contexto": "A noite que Israel nunca mais esqueceu: o sangue do cordeiro nas portas, a última praga, a saída às pressas e, logo depois, o mar na frente e o exército atrás. Em Mateus 18, Pedro pergunta quantas vezes perdoar, e Jesus responde com uma história de dívidas. É a leitura mais longa desta semana, uns 18 minutos: vale ler em dois tempos.",
-      "procure": "Em Êxodo 12.26-27, a pergunta que os filhos vão fazer um dia e a resposta pronta. E, em Mateus 18.22, quantas vezes Jesus manda perdoar.",
-      "amanha": "O povo canta na beira do mar e três dias depois reclama de sede; pão do céu toda manhã, só o suficiente; e Jesus com as crianças e um jovem rico."
+      "sub": "O povo sai do Egito, e Jesus fala de perdoar setenta vezes sete.",
+      "contexto": "Os israelitas passam sangue de cordeiro nas portas de casa, e naquela noite Deus manda a última praga. O povo sai do Egito às pressas. Pouco depois, eles têm o mar na frente e o exército do faraó atrás. Em Mateus 18, Pedro pergunta quantas vezes deve perdoar, e Jesus responde com uma história de dívidas. É a leitura mais longa da semana, uns 18 minutos, e dá para ler em duas vezes.",
+      "procure": "a pergunta que os filhos vão fazer um dia, e o que os pais devem responder (Êxodo 12.26-27). Em Mateus 18.22, veja quantas vezes Jesus manda perdoar.",
+      "amanha": "O povo canta na beira do mar, e três dias depois já reclama de sede. Deus manda pão do céu toda manhã, só o bastante para o dia. Jesus recebe as crianças e conversa com um jovem rico."
     },
     "26": {
       "titulo": "A canção, a sede e o pão do céu",
-      "sub": "Miriã dança; o maná vem de manhã; Jesus e o jovem rico.",
-      "contexto": "Êxodo 15 é uma canção, cantada na beira do mar, com Miriã dançando ao som do tamborim; três dias depois o povo reclama de sede e, no capítulo 16, de fome. Em Mateus 19, Jesus recebe crianças e conversa com um jovem rico que vai embora triste.",
-      "procure": "A regra do maná em Êxodo 16.19 e o que acontece com quem não a segue (16.20). E, em Mateus 19.26, a resposta de Jesus a “quem neste mundo pode ser salvo?”.",
-      "amanha": "Só Êxodo, e leve: água da rocha, as mãos de Moisés sustentadas por dois amigos, o conselho do sogro e o povo ao pé do Sinai."
+      "sub": "Miriã dança com o tamborim, e Deus manda pão do céu.",
+      "contexto": "Na beira do mar, Moisés e o povo cantam para o Senhor, e Miriã dança com o tamborim. Três dias depois, o povo reclama de sede, e no capítulo 16 reclama de fome. Em Mateus 19, Jesus recebe crianças e conversa com um jovem rico, que vai embora triste.",
+      "procure": "o que Moisés manda fazer com o maná e o que acontece com quem não obedece (Êxodo 16.19-20). Em Mateus 19.26, veja o que Jesus responde quando os discípulos perguntam quem pode ser salvo.",
+      "amanha": "A leitura é só de Êxodo, e é leve. Moisés bate na rocha e sai água. Arão e Hur seguram as mãos dele na batalha, e o povo chega ao monte Sinai."
     },
     "27": {
       "titulo": "Chegada ao Sinai",
-      "sub": "Água da rocha, uma batalha vencida de braços erguidos, e o monte que treme.",
-      "contexto": "Só Êxodo hoje, uns 8 minutos. Três meses depois da saída do Egito (Êxodo 19.1), o povo chega ao monte Sinai e acampa diante dele. Antes disso: água da rocha, a batalha contra Amaleque e o conselho de Jetro, o sogro de Moisés.",
-      "procure": "A pergunta que o povo faz em Êxodo 17.7: “O Senhor está conosco ou não?”. E a imagem que Deus usa em Êxodo 19.4 para contar como trouxe o povo até ele.",
-      "amanha": "Os mandamentos no monte, que começam com uma apresentação e não com uma ordem; e Jesus dizendo que veio para servir."
+      "sub": "O povo chega ao Sinai, e o monte treme.",
+      "contexto": "No caminho, Moisés bate na rocha e sai água, e Israel luta contra os amalequitas. Jetro vem visitar o genro e dá um conselho a Moisés. No terceiro mês depois de sair do Egito, o povo chega ao deserto do Sinai e acampa diante do monte (Êxodo 19.1-2). Hoje é só Êxodo, uns 8 minutos.",
+      "procure": "o nome que Moisés dá ao lugar onde o povo pergunta se o Senhor está com eles (Êxodo 17.7). Em Êxodo 19.4, veja a imagem que Deus usa para contar como trouxe o povo até ele.",
+      "amanha": "No monte, Deus diz quem é antes de dar qualquer ordem. Em Mateus, Jesus diz que veio para servir."
     },
     "28": {
-      "titulo": "Antes da ordem, a apresentação",
-      "sub": "Os mandamentos no Sinai, as primeiras leis, e Jesus que veio para servir.",
-      "contexto": "Os mandamentos que Deus dá no monte (Êxodo 20.1-17) começam com uma apresentação, não com uma ordem: quem fala é quem acabou de libertar. O capítulo 21 traz as primeiras leis do dia a dia daquele povo (escravos, brigas, bois): leia como quem olha a vida de um povo antigo, não como ordem para você hoje. Em Mateus 20, Jesus conta a parábola dos trabalhadores da última hora e diz por que veio.",
-      "procure": "A primeira frase de Deus em Êxodo 20.2, antes de qualquer “não”. E, em Mateus 20.28, para que o Filho do Homem diz que veio.",
-      "amanha": "Leis para proteger o estrangeiro, a viúva e o pobre; o povo diz sim à aliança e os líderes veem Deus e comem com ele; Jesus entra em Jerusalém num jumentinho."
+      "titulo": "Eu sou o Senhor, seu Deus",
+      "sub": "Deus dá os dez mandamentos, e Jesus diz que veio para servir.",
+      "contexto": "No monte, antes de dar qualquer ordem, Deus diz quem é. Ele é o Senhor que tirou o povo do Egito, onde eram escravos (Êxodo 20.2). Só depois vêm os dez mandamentos. No capítulo 21 estão as leis do dia a dia de Israel, sobre escravos, brigas e bois. São regras daquele povo, naquela época. Em Mateus 20, Jesus conta dos trabalhadores que chegam na última hora e ganham o mesmo que os outros. No fim do capítulo, ele diz que veio para servir e dar a vida por muita gente.",
+      "procure": "o que Deus fala primeiro em Êxodo 20.2, antes de qualquer “não”. Em Mateus 20.28, veja por que o Filho do Homem diz que veio.",
+      "amanha": "Deus manda cuidar do estrangeiro, da viúva e do pobre. O povo diz sim à aliança, e Jesus entra em Jerusalém montado num jumentinho."
     },
     "29": {
-      "titulo": "A aliança selada e a entrada em Jerusalém",
-      "sub": "O povo responde a uma só voz; Jesus entra na cidade montado num jumentinho.",
-      "contexto": "Mais leis (Êxodo 22 e 23), com uma marca: cuidado com o estrangeiro, a viúva, o órfão e o pobre, “porque sou misericordioso” (Êxodo 22.27). No capítulo 24, a aliança é selada com sangue e o povo responde. Em Mateus 21 começa a última semana de Jesus: a entrada em Jerusalém, o templo, as parábolas contra os líderes. Leitura longa: uns 15 minutos.",
-      "procure": "O motivo que Deus dá para não explorar o estrangeiro, em Êxodo 22.21 e 23.9. E o que os setenta líderes fazem no monte, em Êxodo 24.11.",
-      "amanha": "Só Êxodo, e curto: a planta de uma tenda, com o motivo de tudo no versículo 8 do capítulo 25. Tem guia."
+      "titulo": "O povo diz sim à aliança",
+      "sub": "Jesus entra em Jerusalém montado num jumentinho.",
+      "contexto": "Deus dá mais leis nos capítulos 22 e 23, e muitas protegem quem é mais fraco, como o estrangeiro e a viúva. Quem pega a capa de um pobre como garantia tem de devolver antes do pôr do sol, porque Deus é misericordioso (Êxodo 22.26-27). No capítulo 24, o povo promete fazer tudo o que o Senhor falou. Em Mateus 21, Jesus entra em Jerusalém e expulsa os negociantes do templo. A leitura é longa, uns 15 minutos.",
+      "procure": "o motivo que Deus dá para ninguém explorar o estrangeiro (Êxodo 22.21 e 23.9). Em Êxodo 24.9-11, veja o que os líderes de Israel fazem no monte.",
+      "amanha": "A leitura é só de Êxodo, e é curta. Deus dá a Moisés a planta de uma tenda, e o motivo de tudo está em Êxodo 25.8. Tem guia."
     },
     "30": {
       "titulo": "A planta da tenda",
-      "sub": "Arca, mesa, candelabro e cortinas: Deus desenha onde vai morar.",
-      "contexto": "Só Êxodo, uns 7 minutos, e é diferente de tudo até aqui: medidas, materiais, cortinas. Não decore nada; leia como quem olha a planta de uma casa. O motivo da tenda inteira está numa frase, no versículo 8 do capítulo 25. O guia de leitura dentro do leitor ajuda.",
-      "procure": "Em Êxodo 25.2, de quem Deus quer receber a oferta. E onde Deus diz que vai se apresentar a Moisés (Êxodo 25.22).",
-      "amanha": "O último dia da unidade: as roupas e a consagração dos sacerdotes, e Jesus respondendo qual é o mandamento mais importante. Leitura longa, uns 18 minutos; o guia ajuda nas medidas."
+      "sub": "Deus mostra a Moisés o modelo da tenda onde vai morar.",
+      "contexto": "A leitura de hoje é só de Êxodo, uns 7 minutos, e é diferente de tudo até aqui. São medidas, materiais e cortinas. Leia como quem olha a planta de uma casa, sem se preocupar em decorar. Deus diz para que serve a tenda inteira numa frase só (Êxodo 25.8). O guia de leitura ajuda.",
+      "procure": "de quem Deus quer receber a oferta (Êxodo 25.2). Em Êxodo 25.22, veja o lugar onde Deus diz que vai se apresentar a Moisés.",
+      "amanha": "É o último dia da unidade. Deus manda fazer as roupas dos sacerdotes, e Jesus diz qual é o mandamento mais importante. A leitura é longa, e o guia ajuda nas medidas."
     },
     "31": {
       "titulo": "O fim da primeira unidade",
-      "sub": "As roupas dos sacerdotes, e os dois mandamentos de que tudo depende.",
-      "contexto": "Último dia da Unidade 1. Êxodo 27 a 29 continua a planta: o altar, o pátio, as roupas de Arão (com os nomes das tribos nos ombros e no peito) e a consagração dos sacerdotes. Em Mateus 22, os líderes tentam pegar Jesus com perguntas, e um mestre da lei pergunta qual é o mandamento mais importante. Uns 18 minutos; vale em dois tempos.",
-      "procure": "Onde Arão carrega os nomes das tribos de Israel (Êxodo 28.12 e 28.29). E, em Mateus 22.40, de que toda a Lei e os Profetas dependem.",
-      "amanha": "A Unidade 2 começa: Deus enche um artesão do seu Espírito para trabalhar com as mãos, e Jesus fala duro com os mestres da lei (Mateus 23)."
+      "sub": "Deus manda fazer as roupas de Arão, e Jesus diz qual é o maior mandamento.",
+      "contexto": "Este é o último dia da Unidade 1. Em Êxodo 27 a 29, Deus continua a planta com o altar, o pátio e as roupas de Arão. Deus também ensina como consagrar os sacerdotes, num rito de sete dias. Em Mateus 22, os fariseus tentam pegar Jesus com perguntas, e um mestre da lei pergunta qual é o mandamento mais importante. A leitura tem uns 18 minutos, e vale ler em duas vezes.",
+      "procure": "os dois lugares onde Arão leva os nomes das tribos de Israel (Êxodo 28.12 e 28.29). Em Mateus 22.40, veja do que dependem toda a Lei e os Profetas.",
+      "amanha": "A Unidade 2 começa. Deus enche o artesão Bezalel do Espírito de Deus, e Jesus fala duro com os fariseus e os mestres da lei."
     }
   },
   "guias": {
@@ -272,73 +272,73 @@
       "de": 1,
       "ate": 17,
       "salto": "1:18",
-      "texto": "Os versículos 1 a 17 são a árvore genealógica de Jesus: três blocos de catorze gerações (v. 17), de Abraão a Davi, de Davi ao exílio e do exílio até Cristo. Leia rápido. Repare só nas quatro mulheres (Tamar, Raabe, Rute e a viúva de Urias) e no fim da lista, que desemboca em Jesus. A história começa no versículo 18."
+      "texto": "Os versículos 1 a 17 são a lista dos antepassados de Jesus. Mateus divide os nomes em três grupos de quatorze gerações, de Abraão a Davi, de Davi até o exílio e do exílio até Cristo (v. 17). Dá para ler rápido. Pare nas mulheres que estão no meio dos nomes, como Tamar, Raabe e Rute. A história começa no versículo 18."
     },
     "Gênesis 5": {
       "de": 1,
       "ate": 32,
-      "texto": "Este capítulo é uma lista: de Adão a Noé, geração por geração, com a idade de cada um e a mesma frase no fim. Dá para ler em um minuto. Pare só no versículo 24: Enoque não tem a frase dos outros."
+      "texto": "Gênesis 5 é uma lista de Adão até Noé, geração por geração, com a idade de cada um. Quase toda geração termina com a mesma frase. Dá para ler em um minuto. Pare no versículo 24, porque Enoque termina de outro jeito."
     },
     "Gênesis 10": {
       "de": 1,
       "ate": 32,
       "salto": "11:1",
-      "texto": "A tabela dos povos: de onde vieram as nações a partir dos três filhos de Noé. Pode ler rápido; o versículo 32 resume tudo. A história volta no capítulo 11, com a torre de Babel."
+      "texto": "Gênesis 10 é a tabela dos povos que vieram dos três filhos de Noé. Pode ler rápido. No versículo 32 está o resumo de tudo. A história continua no capítulo 11, com a torre de Babel."
     },
     "Gênesis 11": {
       "de": 10,
       "ate": 32,
       "salto": "12:1",
-      "texto": "Do versículo 10 em diante vem a lista de Sem até Abrão. Ela existe para chegar num nome só: Abrão, no versículo 26. O chamado dele abre o capítulo 12."
+      "texto": "Do versículo 10 em diante são os nomes de Sem até Abrão. O nome que importa é Abrão, no versículo 26. Deus chama Abrão no começo do capítulo 12."
     },
     "Gênesis 14": {
       "de": 1,
       "ate": 12,
       "salto": "14:13",
-      "texto": "Os versículos 1 a 12 contam uma guerra entre nove reis de nomes difíceis. O que importa está no 12: Ló, sobrinho de Abrão, é levado. A história de Abrão recomeça no 13."
+      "texto": "Os versículos 1 a 12 falam de uma guerra entre nove reis de nomes difíceis. Pare no versículo 12, quando os inimigos levam Ló, o sobrinho de Abrão. No 13, um homem escapa e vai contar tudo a Abrão."
     },
     "Gênesis 36": {
       "de": 1,
       "ate": 43,
-      "texto": "A lista dos descendentes de Esaú, o irmão de Jacó, que vira o povo de Edom. Pode ler rápido: a história de José começa no capítulo 37, a leitura de amanhã."
+      "texto": "Gênesis 36 é a lista dos descendentes de Esaú, o irmão de Jacó. Esaú também se chama Edom (Gênesis 36.1). Pode ler rápido. A história de José começa amanhã, no capítulo 37."
     },
     "Gênesis 46": {
       "de": 8,
       "ate": 27,
       "salto": "46:28",
-      "texto": "Do versículo 8 ao 27, os nomes de quem desceu ao Egito com Jacó: setenta pessoas (v. 27). O reencontro de Jacó com José vem no 28."
+      "texto": "Do versículo 8 ao 27 estão os nomes de quem foi para o Egito com Jacó. No fim, a conta dá setenta pessoas (v. 27). No versículo 29, José abraça o pai e chora."
     },
     "Êxodo 6": {
       "de": 14,
       "ate": 27,
       "salto": "6:28",
-      "texto": "Do versículo 14 ao 27, a lista das famílias de Rúben, Simeão e Levi, para dizer de que família vêm Moisés e Arão (v. 26). A conversa com Deus continua no 28."
+      "texto": "Do versículo 14 ao 27 estão as famílias de Rúben, Simeão e Levi. A lista serve para mostrar de que família vêm Moisés e Arão (v. 26). No 28, Deus fala de novo com Moisés."
     },
     "Êxodo 25": {
       "de": 1,
       "ate": 40,
-      "texto": "Daqui em diante vêm as instruções do Tabernáculo, a tenda em que Deus ia morar no meio do povo. Leia como quem olha a planta de uma casa, sem decorar medidas. O motivo de tudo está no versículo 8."
+      "texto": "Daqui em diante, Deus dá as instruções para fazer o Tabernáculo, a tenda onde ele vai morar no meio do povo. Leia como quem olha a planta de uma casa, sem decorar medidas. O motivo de tudo está no versículo 8."
     },
     "Gênesis 25": {
       "de": 1,
       "ate": 18,
       "salto": "25:19",
-      "texto": "Os versículos 1 a 18 fecham a vida de Abraão: os filhos que ele teve com Quetura, a morte dele aos 175 anos (v. 7) e a lista dos doze filhos de Ismael. Pode ler rápido. A história dos gêmeos, Esaú e Jacó, começa no versículo 19."
+      "texto": "Nos versículos 1 a 18, Abraão tem filhos com Quetura e morre com 175 anos (v. 7). Depois estão os nomes dos doze filhos de Ismael. Pode ler rápido. A história dos gêmeos Esaú e Jacó começa no versículo 19."
     },
     "Êxodo 26": {
       "de": 1,
       "ate": 37,
-      "texto": "Cortinas, armações e travessões, com medidas. Leia como quem passa os olhos por uma planta. Pare no versículo 30 (tudo segue o modelo mostrado no monte) e no 33: o véu que separa o Lugar Santo do Lugar Santíssimo."
+      "texto": "Êxodo 26 tem cortinas, armações e travessões, tudo com medidas. Passe os olhos como quem olha uma planta. Pare no versículo 30, onde Deus manda seguir o modelo que mostrou no monte. Pare também no 33, onde está o véu que separa o Lugar Santo do Lugar Santíssimo."
     },
     "Êxodo 28": {
       "de": 1,
       "ate": 43,
-      "texto": "As roupas de Arão, peça por peça. O que não perder: os nomes das tribos gravados nas pedras dos ombros (v. 12) e no peitoral, sobre o coração (v. 29), e a lâmina de ouro na testa com a frase gravada (v. 36)."
+      "texto": "Aqui estão as roupas de Arão, peça por peça. Não perca os nomes das tribos gravados nas pedras dos ombros (v. 12) e no peitoral, sobre o coração (v. 29). Na testa, Arão leva uma lâmina de ouro com uma frase gravada (v. 36)."
     },
     "Êxodo 29": {
       "de": 1,
       "ate": 46,
-      "texto": "O rito da consagração dos sacerdotes, repetido por sete dias (v. 35). Dá para ler sem parar em cada detalhe. O motivo de tudo volta no fim, nos versículos 45 e 46: Deus tirou o povo do Egito para morar no meio dele."
+      "texto": "Neste capítulo, Deus ensina como consagrar os sacerdotes, num rito de sete dias (v. 35). Dá para ler sem parar em cada detalhe. Nos versículos 45 e 46, Deus diz que tirou o povo do Egito para morar no meio dele."
     }
   }
 }
