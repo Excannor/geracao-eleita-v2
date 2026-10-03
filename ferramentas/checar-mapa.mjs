@@ -50,6 +50,19 @@ export const PROIBIDAS = [
   [/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u, 'emoji'],
 ];
 
+// Construções de redação que a regra da voz humana barra (skill, 2026-10-03): o livro agindo
+// como personagem e o conectivo de dissertação. Valem para todo mapa novo; dos 11 publicados
+// antes da regra, só para os que já foram reescritos (AINDA_NA_VOZ_ANTIGA, que encolhe a cada
+// reescrita e some quando acabar).
+export const VOZ = [
+  [/\bo relato\b/i, '"o relato" (quem age é gente)'], [/\ba narrativa\b/i, '"a narrativa"'],
+  [/daí em diante/i, '"daí em diante"'], [/serve de título/i, '"serve de título"'],
+  [/\b(fecha|encerra|abre) com\b/i, '"fecha/encerra/abre com" (diga "a última coisa que X conta")'],
+  [/o texto (se volta|mostra|revela|destaca|aponta)/i, '"o texto se volta/mostra/revela"'],
+  [/\bculmina/i, '"culmina"'], [/por sua vez/i, '"por sua vez"'], [/nesse sentido/i, '"nesse sentido"'],
+];
+export const AINDA_NA_VOZ_ANTIGA = ['genesis', 'exodo', 'levitico', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'marcos', 'lucas'];
+
 // O tamanho máximo da conexão entre dois ramos, em caracteres.
 export const CONEXAO_MAX = 150;
 
@@ -249,6 +262,7 @@ export function checarMapa(slug, mapa) {
 
   for (const [onde, t, refs] of campos) {
     for (const [re, nome] of PROIBIDAS) if (re.test(t)) erro(onde + ': ' + nome + ' em "' + t.slice(0, 70) + '"');
+    if (!AINDA_NA_VOZ_ANTIGA.includes(slug)) for (const [re, nome] of VOZ) if (re.test(t)) erro(onde + ': ' + nome + ' em "' + t.slice(0, 70) + '"');
     // o traço "–" só em intervalo de capítulos dentro de uma referência, nunca no texto corrido
     if (/–/.test(t.replace(/\(([^()]*)\)/g, ''))) erro(onde + ': travessão (–) no texto');
     if (onde === 'significado') continue;

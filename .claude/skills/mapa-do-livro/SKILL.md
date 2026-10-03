@@ -31,6 +31,53 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
 4. **Tom cativante e acessível.** Um comunicador brilhante explicando algo fascinante para gente
    atenta. Nada robótico ou acadêmico engessado.
 
+**Voz humana (regra do dono, 2026-10-03).** Os primeiros 11 mapas passaram na lista de palavras
+proibidas e ainda assim saíram com cara de IA ("o relato tem pressa", em Marcos: "ninguém escreve
+assim"). A lista acima barra palavras; esta regra barra o jeito de escrever. O mapa é alguém da
+célula contando o livro para um amigo que nunca o leu, e esse amigo precisa querer abrir o livro.
+
+1. **Quem faz as coisas é gente.** O sujeito da frase é Jesus, Moisés, o povo, Deus, o leitor.
+   Nunca o livro, o relato, o texto, a narrativa, a linha, a cena ou o capítulo fazendo coisas:
+   "o relato tem pressa", "o livro fecha com", "a primeira linha anunciou", "o texto se volta para
+   quem lê", "uma linha que serve de título". Quando precisar falar do livro, fale como quem fala
+   de uma pessoa que escreve: "Marcos começa dizendo", "a última coisa que Marcos conta é".
+2. **Sem conectivo de redação.** "Daí em diante", "Ao lado dela", "Nesse ponto", "Por sua vez",
+   "A partir daí", "Nesse sentido", "Dito isso", "Em seguida" só quando a sequência é mesmo a do
+   livro, e mesmo assim prefira o que uma pessoa diz: "Depois", "E então", "No caminho", "Ali".
+3. **Uma coisa de cada vez.** Nada de lista de verbos comprimida ("ensina, cura, enfrenta os
+   líderes e sobe a Jerusalém"). Se são quatro coisas, são duas frases curtas, ou se escolhe a que
+   importa. Frase curta, uma ideia, palavra do dia a dia ("bate de frente", "vai direto ao ponto",
+   "muita gente") em vez da palavra de resumo escolar ("enfrenta", "confronta", "culmina").
+4. **Gancho, não tese.** O parágrafo começa pelo que surpreende ou pelo que a pessoa vai ver, não
+   por uma frase que resume o parágrafo inteiro. A raiz abre com uma frase que daria vontade de
+   continuar lendo ("Marcos vai direto ao ponto.").
+5. **Teste de voz alta.** Antes de entregar, leia cada parágrafo em voz alta como se contasse para
+   um amigo. Se em algum trecho você jamais diria aquilo falando (ou pararia para respirar no meio
+   da frase), reescreva. Nenhuma frase passa de umas 25 palavras.
+6. **Humano não é raso.** Toda a fidelidade da seção abaixo continua valendo: cada fato, cada
+   referência, cada citação da NBV. Muda só a voz. Humor leve e espanto são bem-vindos quando o
+   próprio texto dá motivo (os discípulos riem, Jonas foge, Pedro corta uma orelha).
+
+Antes (Marcos, reprovado):
+
+> Marcos abre com uma linha que serve de título: “Aqui começa a boa notícia de Jesus Cristo, o
+> Filho de Deus”. Daí em diante, o relato tem pressa: Jesus ensina, cura, enfrenta os líderes e
+> sobe a Jerusalém, onde morre numa cruz. Ao lado dela, um centurião romano diz o que a primeira
+> linha anunciou: “Verdadeiramente, este homem era o Filho de Deus!”
+
+Depois (aprovado pelo dono):
+
+> Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois,
+> tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para
+> Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma
+> coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”
+
+Repare: o sujeito é Marcos, Jesus e o soldado; "centurião" virou "soldado romano"; as quatro ações
+viraram cena ("tudo acontece rápido"); a frase final junta começo e fim sem a palavra "anunciou".
+O `checar-mapa` barra as construções mais fáceis de pegar ("o relato", "a narrativa", "daí em
+diante", "serve de título", "fecha com", "o texto se volta"); o resto só a leitura em voz alta pega,
+e quem revisa o mapa de outro agente faz essa leitura em cada parágrafo, não só nos galhos.
+
 **Fidelidade (anti-alucinação)**
 1. **Ancoragem total.** Só o que está no texto do livro. Nada de datas, números, nomes ou fatos
    que o livro não traga. Toda ramificação leva a referência (`Is 6.1-4`).
@@ -63,14 +110,15 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
    os filhos de Nm 14.31; o "último dia" de Nm 29.32 não era o último, há o oitavo em 29.35).
    Lei em curiosidade fica no presente da ordem ("a lei manda", "quem faz o voto não come"),
    nunca no imperfeito de costume ("servia", "entrava").
-   Verbo de fim ("encerra", "fecha com") só com o último versículo do trecho (Dt 33.27 não fecha a
-   bênção, que vai até 33.29). Dado de tempo, festa ou lugar de uma curiosidade ("no sétimo ano", "da
+   Verbo de fim ("a última coisa que Moisés diz") só com o último versículo do trecho (Dt 33.27 não
+   fecha a bênção, que vai até 33.29). Dado de tempo, festa ou lugar de uma curiosidade ("no sétimo ano", "da
    Páscoa") se procura nos versículos vizinhos, e a referência se amplia para incluí-lo (Dt 15.12;
    16.2). Lei também nos galhos fica como ordem: "o rei não pode juntar", não "não junta".
 5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
    sequência; um relato retrospectivo (Mt 14.3-12, a morte de João; Jz 2.6-9, a morte de Josué, que o
-   livro já deu em 1.1) se conta no passado. "O livro
-   abre com" e "fecha com" só com o primeiro e o último versículo de verdade.
+   livro já deu em 1.1) se conta no passado. "Marcos começa
+   dizendo" e "a última cena" só com o primeiro e o último versículo de verdade (e nunca "o livro
+   abre/fecha com": regra da voz humana).
 6. **Marcos completos.** Toda troca de nome, aliança, reencontro, mudança de terra, morte,
    sepultamento e subida aos céus de protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
    e 46). Liste os capítulos do livro e marque onde cada um aparece (galho, conexão, curiosidade,

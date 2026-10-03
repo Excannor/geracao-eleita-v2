@@ -857,3 +857,12 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   defeito do tema → ponto de medida tirado da tela (8px abaixo da `.folha-topo`), e o `ANTIGA=1`
   continua provando que o teste enxerga o escurecimento. Coordenada fixa em teste de tela envelhece
   com o layout: medir relativo a um elemento.
+- 2026-10-03 · mapas · Os 11 mapas publicados passaram na lista de palavras proibidas e o dono
+  reprovou a escrita de Marcos ("o relato tem pressa? Ninguém escreve assim"): lista de palavras
+  não pega voz de IA. Os vícios eram o livro agindo como personagem ("o relato", "a linha
+  anunciou", "o livro fecha com"), conectivo de redação ("Daí em diante", "Ao lado dela"), lista de
+  verbos comprimida ("ensina, cura, enfrenta e sobe") e parágrafo denso de resumo → regra "Voz
+  humana" na skill (sujeito é gente, uma coisa por frase, gancho em vez de tese, teste de voz
+  alta), o `checar-mapa` barra as construções mais fáceis, e os 11 mapas são reescritos um a um
+  antes de qualquer mapa novo. O revisor de mapa lê cada parágrafo em voz alta, não só confere
+  referência.
