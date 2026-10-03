@@ -17,8 +17,12 @@
       + '<div class="linha-barra"><div class="barra-missao c-' + (m.feita ? 'amarelo' : m.cor) + '"><i style="width:' + pct(inicio, m.alvo) + '" data-encher="' + pct(m.valor, m.alvo) + '"></i></div>'
       + '<span class="conta-missao">' + m.valor + '/' + m.alvo + '</span></div>'
       // a presencial o app não confere: vale a palavra da pessoa
-      + (m.presencial ? (m.feita ? '<span class="selo-presencial">' + CC.ico('certo') + 'Feito ao vivo</span>'
-        : '<button type="button" class="botao pequeno contorno botao-presencial" data-missao-presencial="' + m.id + '">' + CC.ico('certo') + 'Já fiz</button>') : '')
+      + (m.presencial && m.feita ? '<span class="selo-presencial">' + CC.ico('certo') + 'Feito ao vivo</span>' : '')
+      // cada desafio aberto leva para onde ele se faz; a presencial ainda tem o "Já fiz"
+      + (!m.feita && (m.ir || m.presencial) ? '<div class="acoes-missao">'
+        + (m.ir ? '<a class="botao pequeno contorno botao-ir-missao" href="' + m.ir + '">' + CC.esc(m.botao || 'Ir agora') + CC.ico('avancar') + '</a>' : '')
+        + (m.presencial ? '<button type="button" class="botao pequeno contorno botao-presencial" data-missao-presencial="' + m.id + '">' + CC.ico('certo') + 'Já fiz</button>' : '')
+        + '</div>' : '')
       + '</div>'
       + '<span class="premio-missao">' + CC.arte.bau(m.feita ? 'aberto' : 'travado') + '</span>'
       + '</div>';

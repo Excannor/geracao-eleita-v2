@@ -67,20 +67,21 @@
 
   // ---------- missões do dia ----------
   CC.MISSOES = {
-    licao: { texto: 'Conclua a lição do dia', alvo: 1, icone: 'livro', cor: 'verde' },
-    capitulos: { texto: 'Leia 4 capítulos', alvo: 4, icone: 'marcador', cor: 'azul', familia: 'ler' },
-    maratona: { texto: 'Leia 8 capítulos', alvo: 8, icone: 'marcador', cor: 'azul', familia: 'ler' },
-    pratica: { texto: 'Faça uma rodada no Praticar', alvo: 1, icone: 'alvo', cor: 'verde', familia: 'pratica' },
-    acertos: { texto: 'Acerte 6 perguntas no Praticar', alvo: 6, icone: 'alvo', cor: 'verde', familia: 'pratica' },
-    leitor: { texto: 'Termine uma leitura aqui no app', alvo: 1, icone: 'folha', cor: 'turquesa' },
-    fundo: { texto: 'Abra 2 notas para ir mais fundo', alvo: 2, icone: 'bussola', cor: 'roxo' },
-    passo: { texto: 'Leia um dos Primeiros passos', alvo: 1, icone: 'bandeira', cor: 'roxo', so: (e) => e.licoes.length < D.licoes.length },
-    juntos: { texto: 'Leia no mesmo dia que um amigo', alvo: 1, icone: 'pessoas', cor: 'azul', so: (e, ctx) => !!ctx.amigos },
+    licao: { texto: 'Conclua a lição do dia', alvo: 1, icone: 'livro', cor: 'verde', ir: '#/', botao: 'Abrir a lição' },
+    capitulos: { texto: 'Leia 4 capítulos', alvo: 4, icone: 'marcador', cor: 'azul', familia: 'ler', ir: '#/', botao: 'Ler agora' },
+    maratona: { texto: 'Leia 8 capítulos', alvo: 8, icone: 'marcador', cor: 'azul', familia: 'ler', ir: '#/', botao: 'Ler agora' },
+    pratica: { texto: 'Faça uma rodada no Praticar', alvo: 1, icone: 'alvo', cor: 'verde', familia: 'pratica', ir: '#/praticar', botao: 'Praticar' },
+    acertos: { texto: 'Acerte 6 perguntas no Praticar', alvo: 6, icone: 'alvo', cor: 'verde', familia: 'pratica', ir: '#/praticar', botao: 'Praticar' },
+    leitor: { texto: 'Termine uma leitura aqui no app', alvo: 1, icone: 'folha', cor: 'turquesa', ir: '#/', botao: 'Ler agora' },
+    fundo: { texto: 'Abra 2 notas para ir mais fundo', alvo: 2, icone: 'bussola', cor: 'roxo', ir: '#/', botao: 'Ler agora' },
+    passo: { texto: 'Leia um dos Primeiros passos', alvo: 1, icone: 'bandeira', cor: 'roxo', ir: '#/passos', botao: 'Ver os Primeiros passos', so: (e) => e.licoes.length < D.licoes.length },
+    juntos: { texto: 'Leia no mesmo dia que um amigo', alvo: 1, icone: 'pessoas', cor: 'azul', ir: '#/amigos', botao: 'Ver amigos', so: (e, ctx) => !!ctx.amigos },
     // Presenciais: a fé fora da tela. O app não tem como conferir, então vale a palavra da
-    // pessoa (o botão "Feito" grava "irl_<id>" no diário). Todo dia há uma destas.
-    cafe: { texto: 'Tome um café ao vivo com alguém da fé', alvo: 1, icone: 'xicara', cor: 'amarelo', presencial: true },
+    // pessoa (o botão "Já fiz" grava "irl_<id>" no diário). Todo dia há uma destas.
+    // "ir" e "botao": para onde o desafio leva, para ninguém ficar procurando onde se faz.
+    cafe: { texto: 'Tome um café ao vivo com alguém da fé', alvo: 1, icone: 'xicara', cor: 'amarelo', presencial: true, ir: '#/amigos', botao: 'Chamar alguém' },
     mensagem: { texto: 'Mande uma mensagem de ânimo para alguém da célula', alvo: 1, icone: 'balao', cor: 'turquesa', presencial: true },
-    orarJunto: { texto: 'Ore junto com alguém, ao vivo ou por ligação', alvo: 1, icone: 'cruz', cor: 'roxo', presencial: true },
+    orarJunto: { texto: 'Ore junto com alguém, ao vivo ou por ligação', alvo: 1, icone: 'cruz', cor: 'roxo', presencial: true, ir: '#/amigos', botao: 'Chamar alguém' },
     ligar: { texto: 'Ligue para alguém que você não vê faz tempo', alvo: 1, icone: 'telefone', cor: 'azul', presencial: true },
     servir: { texto: 'Faça um favor para alguém sem que peçam', alvo: 1, icone: 'aperto', cor: 'vermelho', presencial: true },
   };

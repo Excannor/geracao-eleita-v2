@@ -932,3 +932,6 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   amostra deixou passar. Lição: o que é contável se conta na trava; o olho humano fica para o que
   não é. Falsos positivos da trava (reticências no fim da oração, "e diz:" no meio, "Obrigado,
   Pai", "enrola", "funda", "ungido") fazem o escritor torcer o texto: corrigir a trava no dia.
+
+## Todo pedido de ação precisa de um caminho (2026-10-03)
+Um usuário viu "Leia um dos Primeiros passos" e "Tome um café ao vivo" nos Desafios e não achou onde fazer. Regra: toda tela que pede uma ação (desafio, meta, convite) leva até ela com um botão. Cada desafio em `CC.MISSOES` tem `ir` (rota) e `botao` (rótulo); desafio novo sem `ir` só se a ação for fora do app (ligar, servir), e aí o "Já fiz" basta.

@@ -212,8 +212,9 @@
 
 /* missão presencial: o "Já fiz" fica debaixo da barra, à esquerda; feita, vira um selo.
    Revisão: com 44px e o fundo de campo, para parecer (e ser) um botão, não um texto solto. */
-.botao.botao-presencial { gap: 6px; min-height: 44px; margin-top: 8px; padding: 8px 16px; background: var(--campo); }
-.botao-presencial svg, .selo-presencial svg { width: 16px; height: 16px; }
+.acoes-missao { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.botao.botao-presencial, .botao.botao-ir-missao { gap: 6px; min-height: 44px; padding: 8px 16px; background: var(--campo); text-decoration: none; }
+.botao-presencial svg, .botao-ir-missao svg, .selo-presencial svg { width: 16px; height: 16px; }
 .selo-presencial { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--salvia-texto); font-size: .8125rem; font-weight: 700; }
 
 /* desafio em grupo: o cartão do desafio com a lista de quem está junto. Venceu hoje fica com
