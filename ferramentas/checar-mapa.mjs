@@ -60,7 +60,11 @@ const MULETAS = 'ganha[m]? (o nome|um nome|nome novo|uma túnica|força)|recebe[
 const CONECTIVOS = 'daí em diante|a partir daí|ao lado dela|em seguida|nesse ponto|nesse sentido|por sua vez|dito isso|dessa forma|mais adiante|mais tarde|dali até|capítulo após capítulo|por práticas assim|no meio disso|diante disso|logo adiante|logo depois|logo em seguida|na mesma hora|no mesmo instante|responde na hora|serve de título';
 const META = 'neste ramo|nesse ramo|como vimos|repare|note que|capítulo seguinte|mesmo capítulo|leis seguintes|segunda metade|primeiro capítulo|último capítulo|o livro inteiro|virada do livro|em prosa|ou seja|em outras palavras|isso significa|que significa|como prova|para provar que|um nome que';
 const ABSTRATOS = '(o medo|a promessa|a cura|a bênção|as maldições|a lembrança|a obediência|a rebelião|a razão|a morte|a impureza|a cerimônia|o sábado|o dia a dia|o pecado|a mancha|o juízo|a porta|a pergunta|a resposta|o relato|o texto|a narrativa|a linha|a cena|a lista|a sinagoga|a cidade|a aldeia|o decreto) (vence|vem|volta|morre|repete|alcança[m]?|encerra|tem motivo|pede|abre|contamina|traz|entra|se abre|vira|sai|anuncia|anunciou|mostra|revela|destaca|aponta|se volta|fecha|ganha|leva|registra|conta|se enfurece|se escandaliza)';
-export const VOZ = [
+// O \b do JavaScript não conhece acento ("o Batista" casava com "João Batista"): troca-se por uma
+// fronteira que olha letra e número de qualquer alfabeto.
+const FRONTEIRA = '(?:(?<=[\\p{L}\\p{N}])(?![\\p{L}\\p{N}])|(?<![\\p{L}\\p{N}])(?=[\\p{L}\\p{N}]))';
+const comAcento = (re) => new RegExp(re.source.replace(/\\b/g, FRONTEIRA), re.flags.replace('u', '') + 'u');
+const VOZ_BRUTA = [
   [new RegExp('\\b(' + FORMAIS + ')\\b', 'i'), 'formalismo (5.1)'],
   [new RegExp('\\b(' + CULTOS + ')\\b', 'i'), 'verbo de registro culto (4.3)'],
   [new RegExp('\\b(' + MULETAS + ')', 'i'), 'verbo-muleta de narrador (4.1)'],
@@ -89,17 +93,18 @@ export const VOZ = [
   [/\b(depois d[ae]|até|com) (morte|saída|travessia|partilha|libertação|opressão|proximidade|desobediência|sentença|vitória|chegada|rejeição|confirmação|crucificação|sepultamento) d[aeo]/i, 'nominalização em adjunto (4.6)'],
   [/\b(?!semente|sementes|demente|clemente)[a-záéíóúç]{4,}mente\b/i, 'advérbio em -mente (5.3)'],
   [/\b(terrível|enorme|carinhos[oa]|que ninguém esquece|profund[oa]|decisiv[oa]s?|cruel|apavorad[oa]|impactante|marcante|emblemátic[oa]|icônic[oa]|poderos[oa])\b/i, 'adjetivo de narrador (5.3)'],
-  [/\b(criancinha|tabuinha|jumentinho|moedinhas?)\b/, 'diminutivo (5.8)'],
+  [/\b(criancinha|tabuinha|pezinho|casinha)\b/, 'diminutivo (5.8)'],  // jumentinho e moedinhas são palavras da NBV
   [/\b(bronca|enrola|muda a régua|sacou|manda ver|na lata)\b/i, 'gíria (5.9)'],
   [/\.\.\.(?!”)|…(?!”)/, 'reticências fora de citação (3.7)'],
   [/[!?]”\./, 'ponto depois de !” ou ?”'],
 ];
+export const VOZ = VOZ_BRUTA.map(([re, nome]) => [comAcento(re), nome]);
 // Texto que o dono escreveu ou aprovou palavra por palavra: o checador de voz não mexe nele.
 export const TEXTO_DO_DONO = [
   'Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”',
   'No caminho, Jesus explica por que veio: não para ser servido, mas para servir e dar a vida por muita gente. O livro termina com ele voltando para o céu e os discípulos levando essa notícia para todo lugar.',
 ];
-export const AINDA_NA_VOZ_ANTIGA = ['exodo', 'levitico', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'marcos', 'lucas'];
+export const AINDA_NA_VOZ_ANTIGA = ['levitico', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'marcos', 'lucas'];
 
 // O tamanho máximo da conexão entre dois ramos, em caracteres.
 export const CONEXAO_MAX = 150;

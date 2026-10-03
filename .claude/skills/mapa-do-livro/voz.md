@@ -420,5 +420,7 @@ importante notar", "no fim das contas", "ou seja", "isso significa", "culmina", 
   a primeira palavra de cada campo irmão (6.3) e procura o mesmo achado nos outros mapas (6.4).
   Não devolve o mapa nem escreve relatório; devolve só a lista do que mudou. Roda o checador e os
   testes de novo.
-- Sem captura de tela para texto: o `teste-mapas` mede as linhas a 390px. Nenhum nome de modelo
+- Sem captura de tela para texto: o `teste-mapas` mede as linhas a 390px (conexão de 120
+  caracteres com palavras longas já deu 5 linhas: mire em 115). Ele roda com a pasta `dist`
+  parada: enquanto outro agente faz `node build.mjs`, o teste quebra à toa. Nenhum nome de modelo
   de IA em arquivo nenhum. Com outro agente editando no mesmo worktree, mexa só nos seus arquivos.

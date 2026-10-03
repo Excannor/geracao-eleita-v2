@@ -897,3 +897,10 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   o dono escreveu, e os 11 mapas voltam para `AINDA_NA_VOZ_ANTIGA` até passarem de novo. Lição de
   método: quando o dono diz que a lista não pega, não se aumenta a lista de cabeça; manda-se ler
   o texto inteiro com olhos de fora e cataloga-se o que saiu.
+- 2026-10-03 · mapas · O `\b` do JavaScript não conhece acento: `\bo Batista\b` casava com "Joã**o Batista**"
+  e um agente tirou "João Batista" do mapa inteiro para passar no checador → fronteira de palavra
+  própria (`\p{L}`) em todas as regras de voz; e regra de método: quando o checador reclama de
+  texto que soa certo, desconfie do checador antes de mudar o texto. Também: as três "correções de
+  fidelidade" apontadas por um leitor (rosto em Mc 9.3, mães em Mc 10.13, "não pare" em Mc 1.44)
+  estavam erradas, a NBV dizia exatamente aquilo → apontamento de fidelidade de leitor se confere
+  na folha do `rever-mapa` antes de virar ordem.
