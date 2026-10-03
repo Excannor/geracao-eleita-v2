@@ -941,3 +941,6 @@ A primeira passada do revisor corrigiu 29–43% dos campos, e a segunda 13–18%
 
 ## Publicar só com a bateria verde, por script (2026-10-03)
 Uma publicação saiu com 1 falha: o comando encadeava `node teste.mjs | grep checagens && git push`, e o grep acha "checagens" também quando há falha. Ficou no ar alguns minutos até a correção. Agora a publicação passa por `scratchpad/publicar.sh`, que testa o HEAD na cópia limpa e só envia se a linha disser "todas passaram". E a minha própria edição de coordenador também roda a trava antes do commit: o vício (um "próprios") entrou na minha correção, não na do revisor.
+
+## Reflexões: as 12 unidades na voz nova (2026-10-03)
+Fechado com o filtro de 4 camadas. Números da primeira passada do revisor: U5–U7 29–43% (o escritor errava fato), U8 41,6% (repetição de ângulo com unidades já publicadas), U9 27%, U10 22,6%, U11 27%, U12 29%, U1 19,8% (escritor já comparando com as 11 outras). O que mais baixou a taxa: dar ao escritor a lista de erros que o revisor achou e mandar comparar perguntas com TODAS as unidades publicadas. Duas passadas não convergem abaixo de 20% quando o problema é repetição entre unidades; aí a leitura do coordenador decide. Toda a trava de voz agora cobre as unidades 1 a 12.
