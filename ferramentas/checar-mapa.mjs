@@ -52,8 +52,8 @@ export const PROIBIDAS = [
 
 // O catálogo de voz (.claude/skills/mapa-do-livro/voz.md, 03/10): o que dá para pegar por regra.
 // Testado no texto SEM as citações entre aspas (a NBV pode dizer "lhe", "clama", "declara").
-// Dos 11 mapas de antes do catálogo, cobra só os que já passaram pela segunda reescrita
-// (AINDA_NA_VOZ_ANTIGA encolhe a cada mapa e some quando acabar).
+// Os 11 mapas de antes do catálogo já foram todos reescritos (03/10): a lista fica vazia e
+// serve só se um mapa antigo precisar voltar a ser cobrado aos poucos.
 const FORMAIS = 'centurião|coletoria|guichê|oráculos?|cativos|quebrantad[oa]s?|enviados|embarcação|intermediário|recenseamento|pavimento|território|região montanhosa|produtos da terra|provisões|despojos|ventre|têmporas|cadáver|homicida|condenados|culpados|depoimento|numeroso|quadragésimo|paternos|futuras gerações|testemunhas oculares|ministério|Ungido|dirigente|encarregado|família sacerdotal|damas de companhia|mocidade|malícia|trajetória|episódio|contexto|dinâmica|relato|narrativa|recursos|grandes quantias|compensação|junto a[os]?|junto à|através d[aeo]|em direção a|com exceção de|prestes a|por meio de|referente|mediante|em plena|em meio à|em lugar de|ao encontro de|na forma de|por ordem de|a seu respeito|diante de todos|em primeira pessoa|desse período|como com|a cada sétimo|tem compaixão|dias da purificação|cerimônia|tomar posse|em fuga|inclusive|capazes de|o mesmo número de|e sim\b|dizia ser|desde que sem';
 const CULTOS = 'declara|proclama|adverte|suplica|clama|clamam|implora|engrandece|protesta|comemora|reagem|conduz|elimina|domina|percorrem|ergue|funda|consome|crava|incita[m]?|censura|atribuem|expõe|restaura|retoma|realiza|efetua|decreta|replica|se prostra|repousa|abate|pertence|deposita[m]?|inutiliza|removid[oa]|presta[rm]? culto|culmina|retrata|evidencia|ressalta|aborda';
 const MULETAS = 'ganha[m]? (o nome|um nome|nome novo|uma túnica|força)|recebe[m]? (o nome|um nome|sinais|a boa notícia|habilidade|herança|ordem)|surge[m]?|surgiu|vem então|vêm então|vem a (voz|pergunta|resposta)|passa[m]? a (ser|se chamar|ouvir|guardar|adorar|servir|falar)|segue para|volta a falar|acaba [a-zç]+ndo|aparece[m]? pelo nome|leva o nome|se agita|vai além|devolve:|acerta:|completa:|e completa|E diz:';
@@ -104,7 +104,7 @@ export const TEXTO_DO_DONO = [
   'Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”',
   'No caminho, Jesus explica por que veio: não para ser servido, mas para servir e dar a vida por muita gente. O livro termina com ele voltando para o céu e os discípulos levando essa notícia para todo lugar.',
 ];
-export const AINDA_NA_VOZ_ANTIGA = ['lucas'];
+export const AINDA_NA_VOZ_ANTIGA = [];
 
 // O tamanho máximo da conexão entre dois ramos, em caracteres.
 export const CONEXAO_MAX = 150;
