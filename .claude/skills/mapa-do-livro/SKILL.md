@@ -99,6 +99,10 @@ para o meu amigo? Se não, está errado, mesmo que cada palavra seja permitida.
 15. **Cantilena de três.** Trio de adjetivos ou substantivos por ritmo ("poder, autoridade e
     compaixão"). Um ou dois bastam; três é vício de IA.
 
+16. **Gíria.** Palavra do dia a dia, sim; gíria, tom de piada ou de esperteza sobre Jesus, Deus
+    ou o texto, não ("Jesus não enrola" saiu em Marcos e o dono barrou; virou "Jesus responde na
+    hora"). É alguém da célula falando de quem ele adora: direto, com respeito.
+
 **Como escrever para não cair.** Primeiro conte o ramo em voz alta (literalmente, ou digitando
 como se falasse), sem olhar a versão anterior, só com a folha do `rever-mapa` ao lado. Depois
 conserte a fidelidade (nomes, números, citações da NBV exatas, referências). Nunca ao contrário:
@@ -110,7 +114,7 @@ certo uma vez custa menos que escrever e consertar).
 
 **Como revisar.** Quem revisa lê cada campo de texto (raiz, apoio, galhos, conexões, destaques,
 "[Livro] e Cristo" e notas, estrutura, curiosidades, procure, autoria, significado) em voz alta,
-um por um, com a lista dos 15 vícios ao lado, e **corrige ali mesmo** o que pegar, no próprio
+um por um, com a lista dos 16 vícios ao lado, e **corrige ali mesmo** o que pegar, no próprio
 JSON, conferindo a fidelidade do trecho mexido na folha do `rever-mapa`. Não devolve o mapa nem
 escreve relatório para o escritor consertar (regra do dono, 03/10: um ciclo só, sem ida e volta);
 devolve só a lista do que mudou, para o registro. A revisão de voz é separada da revisão de fidelidade: as duas são

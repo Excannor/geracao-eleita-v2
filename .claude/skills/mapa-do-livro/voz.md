@@ -11,7 +11,7 @@ Alguém da célula contando o livro para um amigo que nunca o leu, numa mesa de 
 sair querendo abrir o livro. Pergunta de controle, em cada parágrafo: eu falaria isso assim, em voz
 alta, para o meu amigo? Se não, está errado, mesmo que cada palavra seja permitida.
 
-## Os 15 vícios (todos barrados)
+## Os 16 vícios (todos barrados)
 
 1. **Coisa agindo como gente.** O que ninguém diz falando: "o relato tem pressa", "a linha
    anunciou", "o texto se volta", "serve de título", "a narrativa ganha ritmo", "o capítulo
@@ -46,6 +46,10 @@ alta, para o meu amigo? Se não, está errado, mesmo que cada palavra seja permi
 14. **Explicação por cima.** "Isso significa que", "ou seja", "em outras palavras". Escreve-se logo
     a tradução.
 15. **Cantilena de três.** "Poder, autoridade e compaixão". Um ou dois bastam.
+16. **Gíria.** Palavra do dia a dia, sim ("bate de frente", "muita gente"); gíria, tom de piada ou
+    de esperteza sobre Jesus, Deus ou o texto, não ("Jesus não enrola" saiu em Marcos e o dono
+    barrou; virou "Jesus responde na hora"). É alguém da célula falando de quem ele adora: direto,
+    com respeito.
 
 Também proibidos (lista antiga): travessão (—), "mergulhar", "crucial", "fundamental", "dança",
 "em resumo", "vale ressaltar", "teia", "jornada", "multifacetado", "vamos explorar", "é importante
@@ -66,10 +70,6 @@ notar", "no fim das contas", emoji.
   dar a vida por muita gente", sem aspas, com a referência garantindo a fidelidade. Citação longa
   (mais de umas 12 palavras) no meio de um parágrafo é paráfrase; galho pode guardar uma fala
   curta de Jesus. Quando citar, é texto exato da NBV.
-- **Humano não é gíria.** Palavra do dia a dia, sim ("bate de frente", "muita gente"); gíria, tom
-  de piada ou de esperteza sobre Jesus, Deus ou o texto, não ("Jesus não enrola" saiu em Marcos,
-  dono, 03/10: "Jesus não enrola?"; virou "Jesus responde na hora"). É alguém da célula falando
-  de quem ele adora: direto, com respeito.
 - **Humano não é inventivo.** A voz puxa cor ("dramático", "a multidão em choque"); espanto só do
   que o texto traz.
 
