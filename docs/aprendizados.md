@@ -924,3 +924,11 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   larga com faixa na cintura. Pilha de rolos lia como papel higiênico: autoria usa a pena e o rolo
   de sempre. Raiz de livro novo se confere contra as raízes dos outros (João abria igual a
   Gênesis). O checador deixou de barrar "funda" e "ungido", que são palavras da NBV.
+- 2026-10-03 · reflexões · Filtro em quatro camadas (escritor, revisor cético de outro agente, trava
+  no teste, leitura do coordenador). As passadas do revisor não convergem sozinhas (U3: 28% e depois
+  36% de campos corrigidos), porque boa parte do vício é repetição entre os dias, que nenhum leitor
+  de um dia por vez vê → trava nova no teste: começo de oração ou pergunta com as mesmas duas palavras
+  em mais de 20% da unidade. Ela pegou na hora 20 orações "Hoje eu..." na U2, que a minha leitura de
+  amostra deixou passar. Lição: o que é contável se conta na trava; o olho humano fica para o que
+  não é. Falsos positivos da trava (reticências no fim da oração, "e diz:" no meio, "Obrigado,
+  Pai", "enrola", "funda", "ungido") fazem o escritor torcer o texto: corrigir a trava no dia.

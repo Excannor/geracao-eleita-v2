@@ -443,7 +443,10 @@ Nenhum texto do app vai ao ar com uma leitura só. Toda leva passa por quatro ca
 2. **Revisor cético, outro agente.** Não escreveu o texto e não vê o relatório do escritor. Lê
    tudo em voz alta com o catálogo inteiro e procura o que passou, como os leitores que acharam os
    600 trechos dos 11 mapas. Corrige direto e devolve a lista do que mudou. Se achar mais de um
-   vício a cada cinco campos, a leva volta para uma segunda passada do revisor.
+   vício a cada cinco campos, a leva volta para uma segunda passada do revisor. Mais passadas
+   não convergem sozinhas (a Unidade 3 de reflexões teve 28% e depois 36%): cada revisor acha uma
+   camada nova. O que se repete entre os dias (começo de oração, tema de pergunta) vira regra na
+   trava, e depois da segunda passada quem decide é a leitura do coordenador.
 3. **Trava automática.** `vozDoTexto` (em `ferramentas/checar-mapa.mjs`) roda dentro do `node
    teste.mjs` sobre os mapas, os primeiros dias, o Conhecer Jesus e as unidades de reflexão já
    revistas (`REFLEXOES_NA_VOZ_NOVA`). Texto com vício não passa no teste e não é publicado. Toda
