@@ -95,7 +95,7 @@ const VOZ_BRUTA = [
   [/\b(?!semente|sementes|demente|clemente)[a-záéíóúç]{4,}mente\b/i, 'advérbio em -mente (5.3)'],
   [/\b(terrível|enorme|carinhos[oa]|que ninguém esquece|profund[oa]|decisiv[oa]s?|cruel|apavorad[oa]|impactante|marcante|emblemátic[oa]|icônic[oa]|poderos[oa])\b/i, 'adjetivo de narrador (5.3)'],
   [/\b(criancinha|tabuinha|pezinho|casinha)\b/, 'diminutivo (5.8)'],  // jumentinho e moedinhas são palavras da NBV
-  [/\b(bronca|enrola|muda a régua|sacou|manda ver|na lata)\b/i, 'gíria (5.9)'],
+  [/\b(bronca|não enrola|muda a régua|sacou|manda ver|na lata)\b/i, 'gíria (5.9)'],
   [/\.\.\.(?!”|\s*$)|…(?!”|\s*$)/, 'reticências fora de citação (3.7)'],  // no fim do texto pode: é o começo de oração que a pessoa completa
   [/[!?]”\./, 'ponto depois de !” ou ?”'],
   [/\b(nenhum outro (livro|evangelho|profeta)|só neste livro|único na Bíblia|no resto da Bíblia)\b/i, 'comparação com outros livros (6.9)'],
