@@ -917,3 +917,10 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   próprio texto (Lucas começa e termina no templo), nunca dizendo "só aqui". E agentes, para
   variar molde, diluíram texto que o dono pediu ("Esse Servo é Jesus"): pedido do dono não entra na
   regra de variar molde.
+- 2026-10-03 · mapas novos · 1 Samuel e João: o teste de tela "não abriu" o mapa de 1 Samuel porque
+  o app prende o "1" ao "Samuel" com espaço que não quebra e o teste comparava com espaço comum
+  → teste compara ignorando o tipo de espaço (vale para os livros com número). Nos desenhos, a
+  roupa com gola e manga justa lia como jaqueta ou moletom; roupa bíblica é túnica longa de manga
+  larga com faixa na cintura. Pilha de rolos lia como papel higiênico: autoria usa a pena e o rolo
+  de sempre. Raiz de livro novo se confere contra as raízes dos outros (João abria igual a
+  Gênesis). O checador deixou de barrar "funda" e "ungido", que são palavras da NBV.
