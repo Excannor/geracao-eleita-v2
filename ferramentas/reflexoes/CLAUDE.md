@@ -21,6 +21,15 @@ de Êxodo 20 / Mateus 20 por esses vícios.
 **A Bíblia não muda.** O único texto que não se altera é o da Bíblia: `conteudo/biblias` fica
 intacto e citação entre aspas é palavra por palavra da NBV. Todo o resto pode ser reescrito.
 
+**Perguntas "Para pensar" (dono, 03/10).** Pergunta é feita para a pessoa responder de cabeça,
+sobre a vida dela, em palavras concretas. Modelo do dono: "O que toma, na sua vida, o tempo e a
+dedicação que deveriam ser dele?" Reprovadas: "De que escravidão Deus já te tirou?" (metáfora
+abstrata; vira "De que lugar Deus já tirou você, e para onde às vezes você pensa em voltar?") e
+"O que disputa com ele o primeiro lugar no seu tempo e no seu dinheiro?" (coisa agindo, palavra de
+redação). Também barradas: jogo de palavras ("proibição e não proteção"), repetir na pergunta o
+que o contexto e a reflexão do dia já disseram, misturar "você" e "te" na mesma pergunta, citar
+fala da Bíblia sem aspas.
+
 **Interpretação pode, presa ao texto.** Nas explicações antes da leitura, dá para dizer o que a
 passagem ensina ou como ler ("São regras daquele povo, naquela época"), desde que a leitura saia
 da própria passagem e do contexto dela, sem doutrina de grupo e sem tradição de pregação
