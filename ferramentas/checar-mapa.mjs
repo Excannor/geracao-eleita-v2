@@ -50,19 +50,56 @@ export const PROIBIDAS = [
   [/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u, 'emoji'],
 ];
 
-// Construções de redação que a regra da voz humana barra (skill, 2026-10-03): o livro agindo
-// como personagem e o conectivo de dissertação. Valem para todo mapa novo; dos 11 publicados
-// antes da regra, só para os que já foram reescritos (AINDA_NA_VOZ_ANTIGA, que encolhe a cada
-// reescrita e some quando acabar).
+// O catálogo de voz (.claude/skills/mapa-do-livro/voz.md, 03/10): o que dá para pegar por regra.
+// Testado no texto SEM as citações entre aspas (a NBV pode dizer "lhe", "clama", "declara").
+// Dos 11 mapas de antes do catálogo, cobra só os que já passaram pela segunda reescrita
+// (AINDA_NA_VOZ_ANTIGA encolhe a cada mapa e some quando acabar).
+const FORMAIS = 'centurião|coletoria|guichê|oráculos?|cativos|quebrantad[oa]s?|enviados|embarcação|intermediário|recenseamento|pavimento|território|região montanhosa|produtos da terra|provisões|despojos|ventre|têmporas|cadáver|homicida|condenados|culpados|depoimento|numeroso|quadragésimo|paternos|futuras gerações|testemunhas oculares|ministério|Ungido|dirigente|encarregado|família sacerdotal|damas de companhia|mocidade|malícia|trajetória|episódio|contexto|dinâmica|relato|narrativa|recursos|grandes quantias|compensação|junto a[os]?|junto à|através d[aeo]|em direção a|com exceção de|prestes a|por meio de|referente|mediante|em plena|em meio à|em lugar de|ao encontro de|na forma de|por ordem de|a seu respeito|diante de todos|em primeira pessoa|desse período|como com|a cada sétimo|tem compaixão|dias da purificação|cerimônia|tomar posse|em fuga|inclusive|capazes de|o mesmo número de|e sim\b|dizia ser|desde que sem';
+const CULTOS = 'declara|proclama|adverte|suplica|clama|clamam|implora|engrandece|protesta|comemora|reagem|conduz|elimina|domina|percorrem|ergue|funda|consome|crava|incita[m]?|censura|atribuem|expõe|restaura|retoma|realiza|efetua|decreta|replica|se prostra|repousa|abate|pertence|deposita[m]?|inutiliza|removid[oa]|presta[rm]? culto|culmina|retrata|evidencia|ressalta|aborda';
+const MULETAS = 'ganha[m]? (o nome|um nome|nome novo|uma túnica|força)|recebe[m]? (o nome|um nome|sinais|a boa notícia|habilidade|herança|ordem)|surge[m]?|surgiu|vem então|vêm então|vem a (voz|pergunta|resposta)|passa[m]? a (ser|se chamar|ouvir|guardar|adorar|servir|falar)|segue para|volta a falar|acaba [a-zç]+ndo|aparece[m]? pelo nome|leva o nome|se agita|vai além|devolve:|acerta:|completa:|e completa|E diz:';
+const CONECTIVOS = 'daí em diante|a partir daí|ao lado dela|em seguida|nesse ponto|nesse sentido|por sua vez|dito isso|dessa forma|mais adiante|mais tarde|dali até|capítulo após capítulo|por práticas assim|no meio disso|diante disso|logo adiante|logo depois|logo em seguida|na mesma hora|no mesmo instante|responde na hora|serve de título';
+const META = 'neste ramo|nesse ramo|como vimos|repare|note que|capítulo seguinte|mesmo capítulo|leis seguintes|segunda metade|primeiro capítulo|último capítulo|o livro inteiro|virada do livro|em prosa|ou seja|em outras palavras|isso significa|que significa|como prova|para provar que|um nome que';
+const ABSTRATOS = '(o medo|a promessa|a cura|a bênção|as maldições|a lembrança|a obediência|a rebelião|a razão|a morte|a impureza|a cerimônia|o sábado|o dia a dia|o pecado|a mancha|o juízo|a porta|a pergunta|a resposta|o relato|o texto|a narrativa|a linha|a cena|a lista|a sinagoga|a cidade|a aldeia|o decreto) (vence|vem|volta|morre|repete|alcança[m]?|encerra|tem motivo|pede|abre|contamina|traz|entra|se abre|vira|sai|anuncia|anunciou|mostra|revela|destaca|aponta|se volta|fecha|ganha|leva|registra|conta|se enfurece|se escandaliza)';
 export const VOZ = [
-  [/\bo relato\b/i, '"o relato" (quem age é gente)'], [/\ba narrativa\b/i, '"a narrativa"'],
-  [/daí em diante/i, '"daí em diante"'], [/serve de título/i, '"serve de título"'],
-  [/o texto (se volta|mostra|revela|destaca|aponta)/i, '"o texto se volta/mostra/revela"'],
-  [/\bculmina/i, '"culmina"'], [/por sua vez/i, '"por sua vez"'], [/nesse sentido/i, '"nesse sentido"'],  [/\bou seja\b/i, '"ou seja"'], [/em outras palavras/i, '"em outras palavras"'], [/isso significa/i, '"isso significa"'],
-  [/\bdito isso\b/i, '"dito isso"'], [/\bdessa forma\b/i, '"dessa forma"'], [/\b(impactante|marcante|emblemátic|icônic)/i, 'adjetivo de contracapa'],
-  [/\b(retrata|evidencia|ressalta|aborda)\b/i, 'palavra de resumo escolar'], [/\b(neste|nesse) ramo\b/i, 'metalinguagem'], [/\bcomo vimos\b/i, 'metalinguagem'],
+  [new RegExp('\\b(' + FORMAIS + ')\\b', 'i'), 'formalismo (5.1)'],
+  [new RegExp('\\b(' + CULTOS + ')\\b', 'i'), 'verbo de registro culto (4.3)'],
+  [new RegExp('\\b(' + MULETAS + ')', 'i'), 'verbo-muleta de narrador (4.1)'],
+  [new RegExp('\\b(' + CONECTIVOS + ')\\b', 'i'), 'conectivo de redação ou tique (5.4, 5.5)'],
+  [new RegExp('\\b(' + META + ')\\b', 'i'), 'metalinguagem ou explicação por cima (5.6, 5.7)'],
+  [new RegExp('\\b' + ABSTRATOS + '\\b', 'i'), 'coisa ou abstração agindo (1.1)'],
+  [/\b(Marcos|Lucas|Mateus|Josué|Moisés|Isaías|o autor|o livro|o texto|o narrador) (explica|anota|registra|faz questão|deixa claro|faz isso)\b|avisa o autor|diz o texto|vem o comentário/i, 'autor virando comentarista (1.2)'],
+  [/\b(o Ressuscitado|o Batista|o rapaz|a visita|o escolhido|o guerreiro|o visitante)\b/i, 'sinônimo de redação (1.5)'],
+  [/\b[oa]s? própri[oa]s?\b|\b(ele|ela|eles|elas) mesm[oa]s?\b|\bmesm[oa]s? (palavras|texto|expressão)\b|\bSenhor mesmo\b/i, 'reforço vazio: próprio, mesmo (1.6)'],
+  [/\b[Ee] ouve\b|\b[Aa] resposta( é| são|:| dela:)/, '"e ouve" / "a resposta é" (4.2)'],
+  [/\b(lhe|lhes)\b/, 'pronome oblíquo "lhe" (2.x, clítico)'],
+  [/\b(e|que|mas|Jesus|ele|ela|Deus|Senhor|Moisés|Josué|Pedro|João) (o|a|os|as) (declara|considera|destrói|odeiam|vendem|põe|põem|acompanham|cobrem|enche|consome|leva|levam|veja|envia|repreendem?|defende|toma|fortalece|seguem|entrega|abençoa|encontram|golpeia|crava|acordam|adoram|seguem|cumprimenta|traiu|prende|prendem|mandam?|segue)\b/, 'clítico antes do verbo (2.x)'],
+  [/;/, 'ponto e vírgula (3.2)'],
+  [/(^|[.!?”] )(E|Mas),? [a-záéíóúçãõ]/, '"E"/"Mas" abrindo frase (3.3)'],
+  [/[a-záéíóúçãõ]: [a-záéíóúçãõ]/, 'dois-pontos de resumo (3.1)'],
+  [/(^|[.!?”] )(Curioso|O motivo|A razão|A data ficou registrada|e pior|Nem o boi|O objetivo|Para quem o segue)[:,]/i, 'rótulo sem verbo (2.9)'],
+  [/\? [A-ZÁÉÍÓÚ][^ .?!]{1,12}\.( |$)/, 'pergunta e resposta de uma palavra (3.5)'],
+  [/(^|[.!?”] )(?!Quando|Enquanto|Segundo|Durante|Dado|Sendo)[A-ZÁÉÍÓÚ][a-záéíóúç]+(ad[oa]s?|id[oa]s?|ando|endo|indo)\b[^,.:]{0,30}, [A-ZÁÉÍÓÚa-z]/, 'particípio ou gerúndio abrindo a frase (2.1)'],
+  [/(^|[.!?”] )(A|Ao|Aos|À|Às) [^,.]{2,45}, ([a-záéíóú]+ )?(responde|avisa|lembra|pede|explica|diz|ensina|dá|mandam?)\b/, 'objeto na frente, sujeito escondido (2.2)'],
+  [/(^|[.!?”] )(Entram|Vêm|Vem|Sai|Saem|Morrem|Surgem|Viajam|Vão embora) [a-záéíóú]/, 'verbo na frente (2.3)'],
+  [/\b(é|foi) (ele|ela|dali|ali|aqui) (que|quem)\b|\b[Ff]oi (ele|ela|Deus|o povo|o Senhor) quem\b|\b[Qq]uem [^.,]{2,30} é (o|a) (próprio|própria)\b/, 'frase clivada (2.4)'],
+  [/, (um|uma) (homem|mulher|mendigo|dos|das|cobrador|rico|membro|virgem|jovem|profetisa|sacerdote|velho) [^,]{2,45}, |, (membro d[oa]|filh[oa]s? de|homem justo|furios[oa]|a profetisa|apavorad[oa]|irad[oa]) [^,]{0,40}, /, 'aposto de ficha entre vírgulas (2.5)'],
+  [/, e [A-ZÁÉÍÓÚ][a-záéíóúç]+, [a-záéíóú]/, 'elipse com vírgula (2.8)'],
+  [/, [a-záéíóúç]+(ad[oa]s?|id[oa]s?) por [a-záéíóúA-Z]/, 'particípio pendurado no fim (2.7)'],
+  [/(^|, )(achando|querendo|ouvindo|sofrendo|louvando|pedindo|citando|começando|chegando|levando|voltando|caindo|gritando|tocando|murmurando|proclamando)\b|\b(fica|ficam) [a-záéíóúç]+(ando|endo|indo)\b/, 'gerúndio de encadeamento (4.8)'],
+  [/\b(depois d[ae]|até|com) (morte|saída|travessia|partilha|libertação|opressão|proximidade|desobediência|sentença|vitória|chegada|rejeição|confirmação|crucificação|sepultamento) d[aeo]/i, 'nominalização em adjunto (4.6)'],
+  [/\b(?!semente|sementes|demente|clemente)[a-záéíóúç]{4,}mente\b/i, 'advérbio em -mente (5.3)'],
+  [/\b(terrível|enorme|carinhos[oa]|que ninguém esquece|profund[oa]|decisiv[oa]s?|cruel|apavorad[oa]|impactante|marcante|emblemátic[oa]|icônic[oa]|poderos[oa])\b/i, 'adjetivo de narrador (5.3)'],
+  [/\b(criancinha|tabuinha|jumentinho|moedinhas?)\b/, 'diminutivo (5.8)'],
+  [/\b(bronca|enrola|muda a régua|sacou|manda ver|na lata)\b/i, 'gíria (5.9)'],
+  [/\.\.\.(?!”)|…(?!”)/, 'reticências fora de citação (3.7)'],
+  [/[!?]”\./, 'ponto depois de !” ou ?”'],
 ];
-export const AINDA_NA_VOZ_ANTIGA = ['numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'lucas'];
+// Texto que o dono escreveu ou aprovou palavra por palavra: o checador de voz não mexe nele.
+export const TEXTO_DO_DONO = [
+  'Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”',
+  'No caminho, Jesus explica por que veio: não para ser servido, mas para servir e dar a vida por muita gente. O livro termina com ele voltando para o céu e os discípulos levando essa notícia para todo lugar.',
+];
+export const AINDA_NA_VOZ_ANTIGA = ['genesis', 'exodo', 'levitico', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'marcos', 'lucas'];
 
 // O tamanho máximo da conexão entre dois ramos, em caracteres.
 export const CONEXAO_MAX = 150;
@@ -263,7 +300,11 @@ export function checarMapa(slug, mapa) {
 
   for (const [onde, t, refs] of campos) {
     for (const [re, nome] of PROIBIDAS) if (re.test(t)) erro(onde + ': ' + nome + ' em "' + t.slice(0, 70) + '"');
-    if (!AINDA_NA_VOZ_ANTIGA.includes(slug)) for (const [re, nome] of VOZ) if (re.test(t)) erro(onde + ': ' + nome + ' em "' + t.slice(0, 70) + '"');
+    if (!AINDA_NA_VOZ_ANTIGA.includes(slug) && !TEXTO_DO_DONO.includes(t.trim())) {
+      const semAspas = t.replace(/“[^”]*”/g, '“”');
+      for (const [re, nome] of VOZ) { const m = semAspas.match(re); if (m) erro(onde + ': ' + nome + ' em "' + semAspas.slice(Math.max(0, m.index - 20), m.index + 50).trim() + '"'); }
+      if ((semAspas.match(/:/g) || []).length > 1) erro(onde + ': dois dois-pontos no mesmo campo (3.1)');
+    }
     // o traço "–" só em intervalo de capítulos dentro de uma referência, nunca no texto corrido
     if (/–/.test(t.replace(/\(([^()]*)\)/g, ''))) erro(onde + ': travessão (–) no texto');
     if (onde === 'significado') continue;

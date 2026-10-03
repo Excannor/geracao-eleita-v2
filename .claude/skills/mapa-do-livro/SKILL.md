@@ -19,9 +19,9 @@ não**: tudo no app é escrito e desenhado por nós.
 
 ## 1. Como escrever (regra do dono, 2026-10-02)
 
-Quem só escreve ou revisa texto lê `voz.md` (nesta pasta), o cartão com os 15 vícios, o que faz
-querer abrir o livro, a fidelidade essencial e o fluxo escritor/revisor; esta seção é a versão
-completa, com o histórico dos erros. Quem reescreve um mapa antigo não toca no campo que já passa
+Quem escreve ou revisa texto lê `voz.md` (nesta pasta), o catálogo completo da voz humana, com
+os exemplos reais e o fluxo escritor/revisor; esta seção guarda o resto do padrão e o histórico
+de fidelidade. Quem reescreve um mapa antigo não toca no campo que já passa
 pela lista (boa parte dos galhos é cena concreta); e, dos 11 mapas de antes da regra, Marcos vai
 primeiro como calibração do tom, e os outros de 3 em 3.
 
@@ -37,113 +37,40 @@ bíblico e transformá-lo num mapa mental textual completo e que prenda a leitur
 4. **Tom cativante e acessível.** Um comunicador brilhante explicando algo fascinante para gente
    atenta. Nada robótico ou acadêmico engessado.
 
-**Voz humana (regra do dono, 2026-10-03).** Os primeiros 11 mapas passaram na lista de palavras
-proibidas e ainda assim saíram com cara de IA ("o relato tem pressa", em Marcos: "ninguém escreve
-assim"). Lista de palavras não mata vício de linguagem; só leitura e reescrita matam. O que segue
-é o guia completo: quem escreve aplica enquanto escreve, e quem revisa relê cada parágrafo contra
-ele. O `checar-mapa` pega só a sobra mais grosseira (uma rede, não a revisão).
+**Voz humana (regra do dono, 2026-10-03).** O catálogo completo está em `voz.md`, nesta pasta,
+e é ele que vale: seis famílias (quem age, ordem da frase, pontuação, verbos, palavras, forma do
+campo), cada vício com os exemplos reais que saíram nos 11 primeiros mapas, os modelos do que
+saiu certo e o fluxo escritor/revisor. Resumo do que não se negocia:
 
-**A voz.** Alguém da célula contando o livro para um amigo que nunca o leu, numa mesa de café, e
-o amigo precisa sair querendo abrir o livro. Não é professor dando aula, não é resumo de prova, não
-é texto de contracapa. Pergunta de controle em cada parágrafo: eu falaria isso assim, em voz alta,
-para o meu amigo? Se não, está errado, mesmo que cada palavra seja permitida.
+- A voz é alguém da célula contando o livro para um amigo numa mesa de café. Pergunta de controle
+  em cada frase: eu diria isso assim, em voz alta? Segunda: o amigo repetiria isso no almoço?
+- Ordem direta (quem faz, o que faz), uma coisa por frase, curta depois de longa, nenhum
+  dois-pontos de resumo, nenhum ponto e vírgula, nenhum pronome oblíquo ("lhe", "o põe"), nenhuma
+  frase começando com "E" por ritmo, nenhum particípio abrindo frase, nenhum aposto de ficha.
+- Quem age é gente; o livro, o relato, a lista, a cidade e a abstração não fazem nada. O autor
+  pode começar e terminar o livro, não narra por cima da cena.
+- Citação só quando as palavras exatas são o soco, curta, dita por alguém nomeado. O resto é
+  paráfrase em palavras nossas, com a referência garantindo a fidelidade.
+- Palavra do dia a dia, sem formalismo, sem jargão, sem adjetivo de narrador, sem gíria sobre
+  Jesus e Deus ("Jesus não enrola" e "bronca" foram barrados pelo dono).
+- Lei é ordem ("a lei manda"), presente histórico o mapa inteiro, verbo no lugar da nominalização.
+- Cada campo abre pela cena, termina na última coisa que aconteceu, sem tese nem moral; molde
+  não se repete entre campos irmãos nem entre mapas; cada achado mora num lugar só.
+- Humano não é inventivo: nenhum fato, cor ou adjetivo fora da referência.
 
-**Os vícios, um a um (todos barrados):**
+Lista de palavras não mata vício: só a leitura em voz alta mata. O `checar-mapa` (lista `VOZ`,
+testada fora das aspas) pega umas 30 famílias por regra e barra todo mapa novo; dos 11 de antes do
+catálogo, cobra conforme cada um sai de `AINDA_NA_VOZ_ANTIGA`. Texto que o dono escreveu palavra
+por palavra fica em `TEXTO_DO_DONO` e o checador de voz não mexe nele.
 
-1. **Coisa agindo como gente.** O que ninguém diz falando: "o relato tem pressa", "a linha
-   anunciou", "o texto se volta", "serve de título", "a narrativa ganha ritmo", "o capítulo
-   revela". Quem age é Jesus, Moisés, o povo, Deus, o autor. O que a gente diz, pode: "Marcos
-   começa com", "o livro termina com Jesus voltando para o céu", "Gênesis conta". O teste é a
-   boca, não a gramática (dono, 03/10: "A última coisa que Marcos conta é Jesus sendo levado" é
-   escrita contorcida; "O livro termina com ele voltando para o céu" é gente falando).
-2. **Conectivo de redação.** "Daí em diante", "Ao lado dela", "A partir daí", "Em seguida",
-   "Nesse ponto", "Nesse sentido", "Por sua vez", "Dito isso", "Assim", "Dessa forma", "Portanto",
-   "Logo depois disso", "Ao mesmo tempo", "Enquanto isso" no começo de frase para costurar
-   parágrafo. Quem fala diz "Depois", "E então", "No caminho", "Ali", "Naquela noite", ou
-   simplesmente começa a frase seguinte.
-3. **Lista de verbos comprimida.** "Ensina, cura, enfrenta os líderes e sobe a Jerusalém",
-   "cria, chama, separa e promete". Ou escolhe o que importa, ou vira cena em frases curtas.
-   Três verbos seguidos com o mesmo sujeito já é resumo de prova.
-4. **Palavra de resumo escolar.** "Enfrenta", "confronta", "culmina", "retrata", "aborda",
-   "evidencia", "destaca", "apresenta", "estabelece", "demonstra", "ressalta", "constitui",
-   "configura", "centurião", "trajetória", "episódio", "contexto", "dinâmica", "elemento". Troca
-   pela palavra que a gente diz: "bate de frente", "termina", "conta", "mostra", "soldado romano",
-   "caminho", "história", "aquela noite".
-5. **Tese no começo.** Parágrafo que abre com a frase que o resume ("Marcos é o evangelho da
-   ação", "Este ramo mostra a autoridade de Jesus") e depois prova. O amigo quer a cena, não o
-   tema: abre pelo que surpreende ("Quatro homens abrem um buraco no teto.").
-6. **Fecho de efeito.** Última frase que amarra tudo com moral ou síntese ("E é assim que...",
-   "Tudo converge para...", "Aqui está o coração do livro"). O parágrafo termina na última coisa
-   que aconteceu ou no que a pessoa disse.
-7. **Par que soa igual.** Dois galhos seguidos com a mesma cadência ("No rio... / No mar..."),
-   dois destaques que abrem com o mesmo "O X que..." , dois parágrafos com a mesma música de
-   frase longa, dois-pontos, citação. Varia o tamanho das frases: uma de quatro palavras depois de
-   uma de vinte.
-8. **Frase que não cabe na boca.** Mais de umas 25 palavras, ou com dois apostos e um parêntese
-   no meio. Quebra em duas. Oração intercalada entre vírgulas ("Jesus, depois de orar no monte,
-   desce") vira ordem direta ("Jesus ora no monte. Depois desce.").
-9. **Nominalização.** "A chegada de Jesus a Jerusalém provoca", "a rejeição dos líderes", "a
-   confirmação da mensagem". Volta para o verbo: "Jesus chega a Jerusalém e", "os líderes
-   rejeitam", "o Senhor confirma".
-10. **Voz passiva sem motivo.** "É confirmado", "são enviados", "é entregue" quando se sabe quem
-    fez: "Deus confirma", "Jesus envia os doze", "Judas entrega".
-11. **Adjetivo de contracapa.** "Impactante", "marcante", "profundo", "poderoso", "surpreendente",
-    "intenso", "belíssimo", "emblemático", "icônico". Nada de qualificar a cena; a cena se
-    qualifica sozinha. Se o fato é surpreendente, conte o fato e deixe o amigo se espantar.
-12. **Pergunta retórica de apresentação.** "Quem é este homem?", "O que faz um livro ser...?"
-    como abertura de parágrafo. Só se a pergunta está no próprio texto bíblico, entre aspas.
-13. **Metalinguagem.** "Neste ramo", "como vimos", "a seguir", "o leitor perceberá", "repare
-    como", "note que". O mapa não fala de si mesmo.
-14. **Explicação por cima do texto.** "Isso significa que", "ou seja", "em outras palavras", "o
-    que mostra que". Se a frase precisa de tradução, escreve-se logo a tradução.
-15. **Cantilena de três.** Trio de adjetivos ou substantivos por ritmo ("poder, autoridade e
-    compaixão"). Um ou dois bastam; três é vício de IA.
-
-16. **Gíria.** Palavra do dia a dia, sim; gíria, tom de piada ou de esperteza sobre Jesus, Deus
-    ou o texto, não ("Jesus não enrola" saiu em Marcos e o dono barrou; virou "Jesus responde na
-    hora"). É alguém da célula falando de quem ele adora: direto, com respeito.
-
-**Como escrever para não cair.** Primeiro conte o ramo em voz alta (literalmente, ou digitando
-como se falasse), sem olhar a versão anterior, só com a folha do `rever-mapa` ao lado. Depois
-conserte a fidelidade (nomes, números, citações da NBV exatas, referências). Nunca ao contrário:
-quem parte do texto antigo e "humaniza" mantém a estrutura de resumo. Palavras do dia a dia,
-frases curtas, cena antes de ideia, e um só "achado" por parágrafo (a coisa que faz o amigo
-levantar a sobrancelha). Cada campo é escrito e relido em voz alta na hora, corrigido ali, e
-pronto: não se escreve o mapa inteiro para voltar revisando depois (regra do dono, 03/10: escrever
-certo uma vez custa menos que escrever e consertar).
-
-**Como revisar.** Quem revisa lê cada campo de texto (raiz, apoio, galhos, conexões, destaques,
-"[Livro] e Cristo" e notas, estrutura, curiosidades, procure, autoria, significado) em voz alta,
-um por um, com a lista dos 16 vícios ao lado, e **corrige ali mesmo** o que pegar, no próprio
-JSON, conferindo a fidelidade do trecho mexido na folha do `rever-mapa`. Não devolve o mapa nem
-escreve relatório para o escritor consertar (regra do dono, 03/10: um ciclo só, sem ida e volta);
-devolve só a lista do que mudou, para o registro. A revisão de voz é separada da revisão de fidelidade: as duas são
-obrigatórias, e nenhuma substitui a outra. A passada de voz de outro agente é curta: só os campos
-novos contra a lista, sem reler a Bíblia (fidelidade é do `rever-mapa` e do checador). Captura de
-tela só quando muda desenho ou tela; para texto, o `teste-mapas` já mede as linhas a 390px.
-
-Antes (Marcos, reprovado):
-
-> Marcos abre com uma linha que serve de título: “Aqui começa a boa notícia de Jesus Cristo, o
-> Filho de Deus”. Daí em diante, o relato tem pressa: Jesus ensina, cura, enfrenta os líderes e
-> sobe a Jerusalém, onde morre numa cruz. Ao lado dela, um centurião romano diz o que a primeira
-> linha anunciou: “Verdadeiramente, este homem era o Filho de Deus!”
-
-Vícios 1 ("o relato tem pressa", "a linha anunciou", "abre com", "serve de título"), 2 ("Daí em
-diante", "Ao lado dela"), 3 ("ensina, cura, enfrenta e sobe"), 4 ("enfrenta", "centurião").
-
-Depois (aprovado pelo dono):
-
-> Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois,
-> tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para
-> Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma
-> coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”
-
-O `checar-mapa` barra as sobras mais fáceis (lista `VOZ`: "o relato", "a narrativa", "daí em
-diante", "serve de título", "o texto se volta", "culmina", "por sua vez", "nesse sentido", "ou
-seja"...) e, para os 11 mapas de antes da regra, só cobra depois que cada um sai da lista
-`AINDA_NA_VOZ_ANTIGA`. Passar no checador não quer dizer nada sobre a voz: a leitura em voz alta é
-a revisão.
+Antes (Marcos, reprovado): "Marcos abre com uma linha que serve de título: “Aqui começa a boa
+notícia de Jesus Cristo, o Filho de Deus”. Daí em diante, o relato tem pressa: Jesus ensina, cura,
+enfrenta os líderes e sobe a Jerusalém, onde morre numa cruz. Ao lado dela, um centurião romano diz
+o que a primeira linha anunciou." Depois (do dono): "Marcos vai direto ao ponto. Na primeira frase
+ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de
+frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus
+morrer, que um soldado romano diz a mesma coisa que o livro disse no começo: “Verdadeiramente, este
+homem era o Filho de Deus!”"
 
 **Fidelidade (anti-alucinação)**
 1. **Ancoragem total.** Só o que está no texto do livro. Nada de datas, números, nomes ou fatos

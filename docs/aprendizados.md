@@ -886,3 +886,14 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
 - 2026-10-03 · mapas · A voz humana puxou gíria: "Jesus não enrola" (destaque de Mc 14.61-62) e o
   dono barrou → palavra do dia a dia sim, gíria e tom de piada sobre Jesus e Deus não; regra no
   cartão e na skill. O revisor lê também o registro, não só os vícios.
+- 2026-10-03 · mapas · A lista de 16 vícios deixou passar centenas de trechos (o dono: "tem muitos
+  vícios que você não pegou"). Quatro leitores céticos varreram os 11 mapas e acharam uns 600
+  trechos em ~50 padrões: dois-pontos de resumo (o mais frequente), clítico ("o põe", "lhe"),
+  particípio abrindo frase, aposto de ficha, "E" abrindo frase, "e ouve:", verbo-muleta (ganha,
+  recebe, passa a), abstração agindo ("o medo vence"), autor comentarista ("Marcos anota"),
+  sinônimo de redação ("o Batista"), tempo misturado, formalismo, molde repetido entre mapas,
+  achado contado duas vezes → catálogo completo em `voz.md` (seis famílias, exemplos reais, modelos
+  do que saiu certo), 32 regras no checador testadas fora das aspas, `TEXTO_DO_DONO` para o que
+  o dono escreveu, e os 11 mapas voltam para `AINDA_NA_VOZ_ANTIGA` até passarem de novo. Lição de
+  método: quando o dono diz que a lista não pega, não se aumenta a lista de cabeça; manda-se ler
+  o texto inteiro com olhos de fora e cataloga-se o que saiu.
