@@ -8,152 +8,379 @@
     "original": "בְּמִדְבַּר",
     "transliteracao": "Bemidbar",
     "traducao": "no deserto",
-    "texto": "O nome hebraico é uma palavra do primeiro versículo: foi no deserto que o Senhor deu as ordens a Moisés. Números vem do grego e lembra as duas contagens do povo."
+    "texto": "Bemidbar quer dizer no deserto. A palavra está no primeiro versículo, onde o Senhor dá as ordens a Moisés no Sinai. Números vem do grego e lembra as duas vezes em que o povo é contado."
   },
   "autoria": {
-    "texto": "Ninguém assina o livro. Mas, na lista dos acampamentos, o texto mostra quem a fez: “Moisés escreveu as etapas”, uma por uma, conforme as ordens do Senhor.",
-    "apoio": "A última frase diz de onde vêm as leis: “Esses são os mandamentos e as ordens que o Senhor deu ao povo de Israel por meio de Moisés nas campinas de Moabe”.",
-    "refs": ["Nm 33.2", "Nm 36.13"],
+    "texto": "O livro conta quem fez a lista das paradas pelo deserto. Moisés escreveu as etapas, uma por uma, como o Senhor mandou.",
+    "apoio": "A última frase do livro diz que o Senhor deu essas ordens a Israel por Moisés, nas campinas de Moabe.",
+    "refs": [
+      "Nm 33.2",
+      "Nm 36.13"
+    ],
     "desenho": "pena-e-rolo"
   },
   "raiz": {
-    "texto": "Números abre no deserto do Sinai, no segundo ano depois da saída do Egito. Deus manda contar o povo e organizar o acampamento em volta do Tabernáculo, e depois o põe em marcha para a terra prometida. Na fronteira, o medo vence, e o Senhor faz o povo “andar sem destino durante 40 anos pelo deserto”, até morrer aquela geração. No fim, a geração seguinte acampa “nas campinas de Moabe ao lado do rio Jordão”.",
-    "apoio": "A promessa não morre com os pais: “quanto aos seus filhos... eu os levarei com segurança”, diz o Senhor. E até Balaão, chamado para amaldiçoar Israel, tem de admitir: “Deus não é homem, pois não mente”.",
-    "refs": ["Nm 1.1", "Nm 32.13", "Nm 33.48", "Nm 14.31", "Nm 23.19"]
+    "texto": "Números é o livro dos quarenta anos no deserto. Começa no Sinai, no segundo ano depois que Israel sai do Egito. Deus manda contar os homens e arrumar o acampamento em volta do Tabernáculo. Depois põe o povo a caminho da terra prometida. Na fronteira, o povo tem medo de entrar, e o Senhor faz todos andarem “sem destino durante 40 anos pelo deserto”, até morrer aquela geração. No fim, os filhos acampam “nas campinas de Moabe ao lado do rio Jordão”.",
+    "apoio": "O Senhor diz aos pais que vai levar os filhos deles com segurança para a terra que os pais desprezaram. Balaque chama Balaão para amaldiçoar Israel, e até ele diz: “Deus não é homem, pois não mente”.",
+    "refs": [
+      "Nm 1.1",
+      "Nm 32.13",
+      "Nm 33.48",
+      "Nm 14.31",
+      "Nm 23.19"
+    ]
   },
   "ramos": [
     {
       "titulo": "Tudo em ordem",
-      "sub": "Censo, tribos e nuvem",
+      "sub": "A nuvem guia o acampamento",
       "desenho": "duas-trombetas",
       "galhos": [
-        { "texto": "Deus manda contar, um por um, os homens de vinte anos ou mais aptos para a guerra. A soma dá 603.550.", "ref": "Nm 1.2-3, 46" },
-        { "texto": "Cada tribo acampa junto à sua bandeira, ao redor do Tabernáculo. Judá fica do lado leste e marcha primeiro.", "ref": "Nm 2.2-3, 9" },
-        { "texto": "O Senhor escolhe os levitas “em lugar do primeiro filho de cada mulher israelita” e avisa: “Os levitas me pertencem”.", "ref": "Nm 3.12" },
-        { "texto": "Arão e os filhos recebem as palavras certas para abençoar o povo: “Que o Senhor os abençoe e proteja”. E Deus promete: “eu mesmo responderei e os abençoarei”.", "ref": "Nm 6.23-27" },
-        { "texto": "Sobre o Tabernáculo fica a nuvem, que à noite tem aparência de fogo. Quando ela se levanta, o povo parte; quando para, todos acampam, por dois dias, um mês ou um ano.", "ref": "Nm 9.15-17, 22" },
-        { "texto": "Duas trombetas de prata batida dão os sinais: toques longos reúnem o povo, toques curtos e fortes mandam partir. Quem toca são só os sacerdotes.", "ref": "Nm 10.2, 5-8" }
+        {
+          "texto": "Deus manda contar, um por um, os homens de vinte anos ou mais que podem ir à guerra. A soma dá 603.550.",
+          "ref": "Nm 1.2-3, 46"
+        },
+        {
+          "texto": "As tribos acampam em volta do Tabernáculo, cada uma perto da bandeira dela. Judá fica do lado leste e marcha primeiro.",
+          "ref": "Nm 2.2-3, 9"
+        },
+        {
+          "texto": "O Senhor escolhe os levitas no lugar do primeiro filho de cada mulher israelita. Ele diz: “Os levitas me pertencem”.",
+          "ref": "Nm 3.12"
+        },
+        {
+          "texto": "Deus manda Arão e os filhos dele abençoarem o povo com estas palavras: “Que o Senhor os abençoe e proteja”. Depois promete que vai responder e abençoar o povo.",
+          "ref": "Nm 6.23-27"
+        },
+        {
+          "texto": "A nuvem fica sobre o Tabernáculo e à noite parece fogo. Quando ela se levanta, o povo parte. Quando para, todos acampam, por dois dias, um mês ou um ano.",
+          "ref": "Nm 9.15-17, 22"
+        },
+        {
+          "texto": "Deus manda fazer duas trombetas de prata batida, e só os sacerdotes podem tocar. Para reunir o povo, eles dão toques longos. Para mandar o povo partir, dão toques curtos e fortes.",
+          "ref": "Nm 10.2, 5-8"
+        }
       ],
-      "conexao": "A nuvem se levanta, e o povo deixa o Sinai (Nm 10.11-12). Mas logo começa a se queixar (Nm 11.1)."
+      "conexao": "A nuvem se levanta, e o povo deixa o Sinai (Nm 10.11-12). Logo o povo começa a se queixar (Nm 11.1)."
     },
     {
-      "titulo": "Fome e críticas",
-      "sub": "Do maná à lepra de Miriã",
+      "titulo": "Saudade do Egito",
+      "sub": "O povo reclama do maná",
       "desenho": "pilao",
       "galhos": [
-        { "texto": "Estrangeiros no meio do povo desejam carne, e os israelitas voltam a reclamar. Lembram os peixes e as cebolas do Egito: “todos os dias temos de comer este maná!”", "ref": "Nm 11.4-6" },
-        { "texto": "O maná parece semente de coentro. O povo o recolhe do chão, mói, soca no pilão e cozinha; o gosto lembra “o bolo amassado com azeite”.", "ref": "Nm 11.7-8" },
-        { "texto": "Moisés pergunta ao Senhor por que tem de “carregar o povo no colo, como uma babá”. O Senhor tira do Espírito que está sobre ele e o põe sobre setenta líderes.", "ref": "Nm 11.11-12, 16-17, 25" },
-        { "texto": "Um vento traz codornizes do lado do mar e as espalha pelo acampamento. Com a carne ainda entre os dentes, o povo é castigado com uma epidemia.", "ref": "Nm 11.31-33" },
-        { "texto": "Miriã e Arão criticam Moisés por ter se casado com uma mulher cusita. E perguntam se o Senhor só fala por meio dele.", "ref": "Nm 12.1-2" },
-        { "texto": "Quando a nuvem sai do Tabernáculo, Miriã está com lepra. Moisés clama “eu peço que a cure!”, ela fica sete dias fora do acampamento, e o povo só parte quando ela volta.", "ref": "Nm 12.10, 13-15" }
+        {
+          "texto": "Um grupo de estrangeiros no meio do povo quer carne, e os israelitas reclamam junto. Eles lembram os peixes e as cebolas do Egito e dizem: “todos os dias temos de comer este maná!”",
+          "ref": "Nm 11.4-6"
+        },
+        {
+          "texto": "O maná parece semente de coentro. O povo recolhe o maná do chão e soca no pilão. Depois cozinha, e o gosto é de bolo amassado com azeite.",
+          "ref": "Nm 11.7-8"
+        },
+        {
+          "texto": "Moisés pergunta ao Senhor se é pai daquela gente toda, para ter de carregar o povo no colo como uma babá. O Senhor tira do Espírito que está sobre Moisés e põe sobre setenta líderes.",
+          "ref": "Nm 11.11-12, 16-17, 25"
+        },
+        {
+          "texto": "O Senhor manda um vento que traz codornizes do lado do mar e espalha pelo acampamento. Os israelitas ainda estão com a carne entre os dentes quando o Senhor castiga o povo com uma epidemia.",
+          "ref": "Nm 11.31-33"
+        },
+        {
+          "texto": "Miriã e Arão criticam Moisés por ter se casado com uma mulher cusita. Os dois perguntam: “Será que o Senhor só fala por meio de Moisés?”",
+          "ref": "Nm 12.1-2"
+        },
+        {
+          "texto": "Quando a nuvem sai do Tabernáculo, Miriã está com lepra e com a pele branca como a neve. Moisés grita ao Senhor: “Ó Deus, eu peço que a cure!” Miriã fica sete dias fora do acampamento, e o povo só parte quando ela volta.",
+          "ref": "Nm 12.10, 13-15"
+        }
       ],
       "jesus": {
-        "texto": "O pão que dá vida eterna é Jesus. Ele lembra que os pais “comeram o maná no deserto, mas morreram”, e diz: “eu sou esse pão vivo que desceu do céu”.",
-        "refs": ["Jo 6.49-51"]
+        "texto": "Jesus lembra ao povo que os pais comeram o maná no deserto e morreram. O pão vivo que desceu do céu é Jesus, e quem comer desse pão vai viver para sempre.",
+        "refs": [
+          "Jo 6.49-51"
+        ]
       },
-      "conexao": "O povo que reclamava da comida ouve falar de “uma terra que produz muito leite e mel” (Nm 13.27)."
+      "conexao": "Esse povo que reclama da comida ouve os espiões falarem de “uma terra que produz muito leite e mel” (Nm 13.27)."
     },
     {
       "titulo": "Medo de entrar",
-      "sub": "Espiões e quarenta anos",
+      "sub": "Os espiões voltam com medo",
       "desenho": "cacho-de-uvas",
       "galhos": [
-        { "texto": "Moisés muda o nome de Oseias, filho de Num, para Josué e manda os espiões verem se a terra é fértil e se o povo de lá é forte ou fraco.", "ref": "Nm 13.16-20" },
-        { "texto": "No vale de Escol, cortam um cacho de uvas tão grande que dois homens o carregam pendurado numa vara. Levam também romãs e figos.", "ref": "Nm 13.23-24" },
-        { "texto": "Calebe diz: “Vamos partir e tomar a terra”. Os outros espiões espalham notícias negativas: “Perto deles nos sentíamos como gafanhotos”.", "ref": "Nm 13.30-33" },
-        { "texto": "Naquela noite o povo chora e quer um líder para voltar ao Egito. Josué e Calebe rasgam as roupas e dizem: “O Senhor está conosco”. A resposta é falar em apedrejar os dois.", "ref": "Nm 14.1-4, 6-10" },
-        { "texto": "Deus fala em ferir o povo com pragas. Moisés pede perdão “por causa da sua grande misericórdia” e ouve: “Vou perdoar este povo como você me pediu”.", "ref": "Nm 14.11-12, 19-20" },
-        { "texto": "Quem tem mais de vinte anos e se queixou morrerá no deserto; desses, só Calebe e Josué entrarão na terra. Serão quarenta anos sem rumo, “um ano para cada dia” de espionagem.", "ref": "Nm 14.29-30, 33-34" }
+        {
+          "texto": "Moisés muda o nome de Oseias para Josué e manda os espiões verem se a terra é fértil e se o povo de lá é forte ou fraco.",
+          "ref": "Nm 13.16-20"
+        },
+        {
+          "texto": "No vale de Escol, os espiões cortam um cacho de uvas tão grande que dois homens levam pendurado numa vara. Trazem também romãs e figos.",
+          "ref": "Nm 13.23-24"
+        },
+        {
+          "texto": "Calebe diz: “Vamos partir e tomar a terra”. Os outros espiões falam mal da terra e dizem que, perto dos gigantes de lá, se sentiam como gafanhotos.",
+          "ref": "Nm 13.30-33"
+        },
+        {
+          "texto": "Naquela noite o povo chora e quer escolher um líder para voltar ao Egito. Josué e Calebe rasgam as roupas e dizem: “O Senhor está conosco”. O povo fala em apedrejar os dois.",
+          "ref": "Nm 14.1-4, 6-10"
+        },
+        {
+          "texto": "Deus fala em ferir o povo com pragas. Moisés pede perdão por causa da grande misericórdia do Senhor, e o Senhor responde: “Vou perdoar este povo como você me pediu”.",
+          "ref": "Nm 14.11-12, 19-20"
+        },
+        {
+          "texto": "O Senhor dá a sentença. Quem tem mais de vinte anos e se queixou vai morrer no deserto, e só Calebe e Josué vão entrar na terra. Os filhos vão andar quarenta anos sem rumo, um ano para cada dia que os espiões passaram na terra.",
+          "ref": "Nm 14.29-30, 33-34"
+        }
       ],
-      "conexao": "Deus pede um povo santo (Nm 15.40). Coré e seu grupo enfrentam Moisés: “A assembleia toda é santa” (Nm 16.1-3)."
+      "conexao": "Deus manda o povo ser santo (Nm 15.40). Coré e o grupo dele dizem a Moisés: “A assembleia toda é santa” (Nm 16.1-3)."
     },
     {
       "titulo": "A vara de Arão",
-      "sub": "Coré, a praga e Meribá",
+      "sub": "A terra engole Coré",
       "desenho": "vara-que-floresce",
       "galhos": [
-        { "texto": "Para Moisés, a rebelião tem motivo: os levitas que seguem Coré “também querem ser sacerdotes”. Datã e Abirão nem atendem ao chamado: “Não iremos”.", "ref": "Nm 16.8-14" },
-        { "texto": "A terra se abre e engole Coré, Datã e Abirão, com as famílias e os bens. Depois, o Senhor manda fogo sobre os duzentos e cinquenta que ofereciam incenso.", "ref": "Nm 16.31-35" },
-        { "texto": "No dia seguinte o povo acusa Moisés e Arão, e começa uma praga. Arão corre com o incensário para o meio do povo, fica “entre os vivos e os mortos”, e a praga para.", "ref": "Nm 16.41, 46-48" },
-        { "texto": "Doze varas, uma por tribo, ficam diante da arca. Quando Moisés entra, a de Arão tem “brotos, flores e amêndoas”; ela volta para lá como sinal para os rebeldes.", "ref": "Nm 17.2, 7-8, 10-11" },
-        { "texto": "Em Cades, Miriã morre e falta água. Deus manda Moisés falar à rocha, mas ele a golpeia duas vezes com a vara. A água jorra.", "ref": "Nm 20.1-2, 8-11" },
-        { "texto": "Por não crerem, Moisés e Arão não vão levar o povo à terra. No alto do monte Hor, Moisés tira as vestes sacerdotais de Arão, veste com elas o filho, Eleazar, e o sacerdote morre ali.", "ref": "Nm 20.12, 27-28" }
+        {
+          "texto": "Moisés responde a Coré na frente de todos. Os levitas do grupo dele já servem perto de Deus, e agora querem ser sacerdotes também. Datã e Abirão nem vão quando Moisés manda chamar: “Não iremos”.",
+          "ref": "Nm 16.8-14"
+        },
+        {
+          "texto": "A terra se abre e engole Coré, Datã e Abirão, com as famílias e os bens. Depois o Senhor manda fogo e mata os duzentos e cinquenta homens que ofereciam incenso.",
+          "ref": "Nm 16.31-35"
+        },
+        {
+          "texto": "No dia seguinte o povo acusa Moisés e Arão: “Vocês mataram o povo do Senhor”. Uma praga começa, e Arão corre com o incensário para o meio do povo. Ele fica entre os vivos e os mortos, e a praga para.",
+          "ref": "Nm 16.41, 46-48"
+        },
+        {
+          "texto": "Moisés põe doze varas diante da arca, uma por tribo. Quando Moisés entra no Tabernáculo, a vara de Arão tem brotos, flores e amêndoas. O Senhor manda deixar a vara ali, como sinal para os rebeldes.",
+          "ref": "Nm 17.2, 7-8, 10-11"
+        },
+        {
+          "texto": "Em Cades, Miriã morre, e falta água. Deus manda Moisés falar à rocha, mas Moisés bate nela duas vezes com a vara. A água jorra.",
+          "ref": "Nm 20.1-2, 8-11"
+        },
+        {
+          "texto": "O Senhor diz que Moisés e Arão não creram nele, e por isso não vão levar o povo à terra. No alto do monte Hor, Moisés tira de Arão as vestes de sacerdote e veste o filho Eleazar com elas. Arão morre ali no alto do monte.",
+          "ref": "Nm 20.12, 27-28"
+        }
       ],
       "conexao": "Israel derrota Seom e os amorreus (Nm 21.23-24). O rei Balaque vê tudo, e Moabe tem muito medo (Nm 22.2-3)."
     },
     {
       "titulo": "Povo abençoado",
-      "sub": "Balaão, a jumenta e Peor",
+      "sub": "A jumenta fala com Balaão",
       "desenho": "jumenta",
       "galhos": [
-        { "texto": "Balaque manda buscar Balaão para amaldiçoar Israel, porque o povo “é muito mais forte do que eu”. Deus avisa Balaão: “é um povo abençoado”.", "ref": "Nm 22.5-6, 12" },
-        { "texto": "Na estrada, a jumenta vê o Anjo do Senhor com a espada: sai do caminho, se espreme no muro e se deita. Apanha três vezes, até que o Senhor a faz falar e abre os olhos de Balaão.", "ref": "Nm 22.23-31" },
-        { "texto": "Balaque constrói sete altares, mas é o Senhor quem põe a palavra na boca de Balaão: “Como posso amaldiçoar quem Deus não amaldiçoou?”", "ref": "Nm 23.1-2, 5, 8" },
-        { "texto": "Na terceira vez, o Espírito de Deus vem sobre Balaão, e a bênção se repete. Com raiva, Balaque bate palmas: “você já os abençoou três vezes”.", "ref": "Nm 24.2, 10" },
-        { "texto": "Antes de ir embora, Balaão vê o futuro: “aparecerá uma estrela de Jacó; e de Israel se levantará um rei”.", "ref": "Nm 24.14, 17" },
-        { "texto": "Em Sitim, os homens se entregam às mulheres de Moabe e passam a adorar os deuses delas. Fineias, neto de Arão, atravessa com a lança um israelita e uma midianita, e a praga para.", "ref": "Nm 25.1-3, 7-8" }
+        {
+          "texto": "Balaque vê que Israel é muito mais forte do que ele e manda buscar Balaão para amaldiçoar o povo. Deus não deixa Balaão ir, porque Israel é um povo abençoado.",
+          "ref": "Nm 22.5-6, 12"
+        },
+        {
+          "texto": "Na estrada, a jumenta vê o Anjo do Senhor com uma espada na mão e sai do caminho. Balaão bate nela, até que o Senhor faz a jumenta falar: “O que foi que eu fiz a você, para você me bater três vezes?” Depois o Senhor abre os olhos de Balaão, e ele vê o Anjo.",
+          "ref": "Nm 22.23-31"
+        },
+        {
+          "texto": "Balaque constrói sete altares, e o Senhor põe uma palavra na boca de Balaão: “Como posso amaldiçoar quem Deus não amaldiçoou?”",
+          "ref": "Nm 23.1-2, 5, 8"
+        },
+        {
+          "texto": "Na terceira vez, o Espírito de Deus vem sobre Balaão, e ele abençoa Israel de novo. Balaque fica com raiva e bate palmas: “você já os abençoou três vezes”.",
+          "ref": "Nm 24.2, 10"
+        },
+        {
+          "texto": "Antes de ir embora, Balaão vê o futuro: “aparecerá uma estrela de Jacó; e de Israel se levantará um rei”.",
+          "ref": "Nm 24.14, 17"
+        },
+        {
+          "texto": "Em Sitim, os homens de Israel se entregam à imoralidade com as mulheres de Moabe e adoram os deuses delas. Fineias segue um israelita e uma midianita até dentro da tenda e atravessa os dois com a lança. A praga para.",
+          "ref": "Nm 25.1-3, 7-8"
+        }
       ],
-      "conexao": "Terminada a praga, o Senhor manda contar o povo de novo (Nm 26.1-2)."
+      "conexao": "Depois que a praga termina, o Senhor manda contar o povo de novo (Nm 26.1-2)."
     },
     {
       "titulo": "A nova geração",
-      "sub": "Herança, sucessor e refúgio",
+      "sub": "Josué fica no lugar de Moisés",
       "desenho": "muralha",
       "galhos": [
-        { "texto": "Nas campinas de Moabe, a nova contagem dá 601.730 homens. Dos contados no Sinai, ninguém sobreviveu, “exceto Calebe, filho de Jefoné, e Josué, filho de Num”.", "ref": "Nm 26.51, 63-65" },
-        { "texto": "Maalá, Noa, Hogla, Milca e Tirza pedem a herança do pai, que morreu sem filhos. O Senhor responde: “As filhas de Zelofeade estão certas”.", "ref": "Nm 27.1-7" },
-        { "texto": "Deus manda Moisés subir o monte Abarim para olhar a terra dada a Israel. Depois disso, avisa, ele morrerá como o irmão Arão, pela desobediência nas águas de Meribá.", "ref": "Nm 27.12-14" },
-        { "texto": "Moisés pede um líder para o povo. O Senhor aponta Josué, “que tem o Espírito”, e Moisés impõe as mãos sobre ele diante de Eleazar e de toda a comunidade.", "ref": "Nm 27.15-16, 18-23" },
-        { "texto": "As tribos de Rúben e Gade, donas de muito gado, pedem para ficar com aquela terra, em vez de cruzar o Jordão. Moisés aceita com uma condição: os homens atravessam armados e lutam junto com os irmãos.", "ref": "Nm 32.1-6, 20-22" },
-        { "texto": "Seis cidades de refúgio recebem quem matou alguém sem querer, até o povo julgar o caso. O homicida mora ali até a morte do sumo sacerdote.", "ref": "Nm 35.11-13, 25" }
+        {
+          "texto": "Nas campinas de Moabe, a nova contagem dá 601.730 homens. Dos contados no Sinai, só Calebe e Josué ainda estão vivos.",
+          "ref": "Nm 26.51, 63-65"
+        },
+        {
+          "texto": "As cinco filhas de Zelofeade pedem a herança do pai, que morreu sem filhos. O Senhor responde: “As filhas de Zelofeade estão certas”.",
+          "ref": "Nm 27.1-7"
+        },
+        {
+          "texto": "Deus manda Moisés subir o monte Abarim e olhar a terra de Israel. Depois de ver a terra, Moisés vai morrer como o irmão Arão, porque os dois desobedeceram nas águas de Meribá.",
+          "ref": "Nm 27.12-14"
+        },
+        {
+          "texto": "Moisés pede ao Senhor um homem para liderar o povo. O Senhor manda chamar Josué, que tem o Espírito, e Moisés põe as mãos sobre Josué na frente de Eleazar e de todo o povo.",
+          "ref": "Nm 27.15-16, 18-23"
+        },
+        {
+          "texto": "As tribos de Rúben e Gade têm muito gado e pedem para ficar com a terra de Gileade, em vez de cruzar o Jordão. Moisés aceita, se os homens atravessarem armados e lutarem junto com os irmãos.",
+          "ref": "Nm 32.1-6, 20-22"
+        },
+        {
+          "texto": "Quem matar alguém sem querer pode fugir para uma das seis cidades de refúgio, longe do vingador da vítima, e tem de morar ali até o sumo sacerdote morrer.",
+          "ref": "Nm 35.11-13, 25"
+        }
       ]
     }
   ],
   "cristo": {
-    "texto": "Picado por serpentes venenosas, o povo pede a Moisés que ore (Nm 21.6-7). A cura vem de olhar para o alto: “Todas as pessoas que eram mordidas por uma serpente e olhavam para a serpente de bronze, permaneciam vivas.” Jesus disse que, como Moisés levantou a serpente no deserto, ele, o Filho do Homem, também precisava ser levantado, para que todo aquele que nele crer tenha a vida eterna (Jo 3.14-15).",
+    "texto": "No deserto, o Senhor manda serpentes venenosas, e muitos morrem. O povo pede a Moisés que ore (Nm 21.6-7). Moisés faz uma serpente de bronze e põe no alto de um poste. Quem é mordido e olha para a serpente de bronze fica vivo. Jesus diz que o Filho do Homem precisa ser levantado como a serpente que Moisés pôs no alto, no deserto, e quem crer nele vai ter a vida eterna (Jo 3.14-15).",
     "ref": "Nm 21.9",
     "desenho": "serpente-no-poste",
     "pares": [
-      { "at": "Nm 12.7", "texto": "Não é assim, porém, com o meu servo Moisés, que é fiel em toda a minha casa.", "nt": "Hb 3.5-6", "nota": "Moisés serviu na casa como servo; Cristo é o Filho, responsável por ela" },
-      { "at": "Nm 19.9", "texto": "As cinzas serão guardadas pelo povo de Israel para o preparo de uma água purificadora que serve como oferta pelo pecado.", "nt": "Hb 9.13-14", "nota": "as cinzas limpavam por fora; o sangue de Cristo purifica a consciência" },
-      { "at": "Nm 27.17", "texto": "Alguém que guie o povo e vá com ele à guerra, para que o povo de Israel não seja como ovelha sem pastor.", "nt": "Mc 6.34", "nota": "Jesus vê a multidão assim, tem compaixão e ensina" }
+      {
+        "at": "Nm 12.7",
+        "texto": "Não é assim, porém, com o meu servo Moisés, que é fiel em toda a minha casa.",
+        "nt": "Hb 3.5-6",
+        "nota": "Moisés foi um servo fiel na casa de Deus, e Cristo é o Filho que cuida dela"
+      },
+      {
+        "at": "Nm 19.9",
+        "texto": "As cinzas serão guardadas pelo povo de Israel para o preparo de uma água purificadora que serve como oferta pelo pecado.",
+        "nt": "Hb 9.13-14",
+        "nota": "as cinzas da novilha limpavam só por fora, e o sangue de Cristo limpa a consciência"
+      },
+      {
+        "at": "Nm 27.17",
+        "texto": "Alguém que guie o povo e vá com ele à guerra, para que o povo de Israel não seja como ovelha sem pastor.",
+        "nt": "Mc 6.34",
+        "nota": "Jesus vê a multidão como ovelhas sem pastor e ensina muitas coisas a ela"
+      }
     ]
   },
   "estrutura": [
-    { "titulo": "Censo, acampamento e leis no Sinai", "de": 1, "ate": 8 },
-    { "titulo": "A Páscoa, a nuvem e a partida", "de": 9, "ate": 10 },
-    { "titulo": "Queixas no deserto", "de": 11, "ate": 12 },
-    { "titulo": "Os espiões e os quarenta anos", "de": 13, "ate": 14 },
-    { "titulo": "Leis, Coré e o sacerdócio", "de": 15, "ate": 19 },
-    { "titulo": "De Cades às campinas de Moabe", "de": 20, "ate": 21 },
-    { "titulo": "Balaão e Peor", "de": 22, "ate": 25 },
-    { "titulo": "Novo censo, herança e ofertas", "de": 26, "ate": 30 },
-    { "titulo": "Midiã, a partilha e o refúgio", "de": 31, "ate": 36 }
+    {
+      "titulo": "O acampamento no Sinai",
+      "de": 1,
+      "ate": 8
+    },
+    {
+      "titulo": "A nuvem se levanta",
+      "de": 9,
+      "ate": 10
+    },
+    {
+      "titulo": "Queixas no deserto",
+      "de": 11,
+      "ate": 12
+    },
+    {
+      "titulo": "Os espiões e os quarenta anos",
+      "de": 13,
+      "ate": 14
+    },
+    {
+      "titulo": "A revolta de Coré",
+      "de": 15,
+      "ate": 19
+    },
+    {
+      "titulo": "De Cades às campinas de Moabe",
+      "de": 20,
+      "ate": 21
+    },
+    {
+      "titulo": "Balaão e Peor",
+      "de": 22,
+      "ate": 25
+    },
+    {
+      "titulo": "A segunda contagem",
+      "de": 26,
+      "ate": 30
+    },
+    {
+      "titulo": "A partilha da terra",
+      "de": 31,
+      "ate": 36
+    }
   ],
   "curiosidades": [
-    { "texto": "Os filhos mais velhos de Israel eram 273 a mais que os levitas. Cada um desses foi resgatado com sessenta gramas de prata.", "ref": "Nm 3.46-49" },
-    { "texto": "Na partida, a lei manda Arão e os filhos cobrirem a arca com o véu. Os coatitas carregam os utensílios sagrados, mas sem tocar neles: “Se o fizerem, morrerão”.", "ref": "Nm 4.5, 15" },
-    { "texto": "Leprosos e impuros ficam do lado de fora, para não contaminarem “o acampamento onde eu habito”, diz o Senhor.", "ref": "Nm 5.2-4" },
-    { "texto": "Quem faz o voto de nazireu não come nada da videira, nem as sementes nem as cascas das uvas. No fim, rapa o cabelo e o joga no fogo da oferta de paz.", "ref": "Nm 6.4, 18" },
-    { "texto": "Moisés ouvia a voz do Senhor de cima da tampa da arca, entre os dois querubins.", "ref": "Nm 7.89" },
-    { "texto": "O levita serve no Tabernáculo dos vinte e cinco aos cinquenta anos. Depois disso, pode ajudar os colegas, mas não faz mais o trabalho.", "ref": "Nm 8.24-26" },
-    { "texto": "Eldade e Medade profetizam no acampamento, sem ter ido ao Tabernáculo. Josué quer proibir, e Moisés responde: “Que bom seria se todo o povo do Senhor fosse profeta”.", "ref": "Nm 11.26-29" },
-    { "texto": "No dia seguinte à sentença, o povo resolve subir para a terra. Moisés avisa: “É tarde demais!” Eles vão assim mesmo, são derrotados e perseguidos até Hormá.", "ref": "Nm 14.40-45" },
-    { "texto": "Deus manda pôr pingentes, presos num cordão azul, nos cantos das roupas, para o povo lembrar os mandamentos “sempre que olharem para os pingentes”.", "ref": "Nm 15.38-39" },
-    { "texto": "Arão não recebe terra. O Senhor explica: “eu sou a propriedade e a herança de vocês”.", "ref": "Nm 18.20" },
-    { "texto": "Israel pede para atravessar Edom só pela estrada principal, pagando até a água. Edom responde com um exército grande e forte.", "ref": "Nm 20.17-20" },
-    { "texto": "Coré foi engolido pela terra, mas o texto faz questão de registrar que os filhos dele não morreram.", "ref": "Nm 26.10-11" },
-    { "texto": "Todo dia, a lei pede um cordeiro de manhã e outro no fim da tarde.", "ref": "Nm 28.3-4" },
-    { "texto": "Na festa de sete dias do sétimo mês, a lei pede treze novilhos no primeiro dia, doze no segundo e assim por diante, até sete no sétimo.", "ref": "Nm 29.12-13, 17, 32" },
-    { "texto": "Quem faz um voto ao Senhor “não poderá quebrar a palavra”: tem de fazer tudo o que prometeu.", "ref": "Nm 30.2" },
-    { "texto": "Balaão morre na guerra contra Midiã. E Moisés acusa as mulheres poupadas: foram elas que seguiram “o conselho de Balaão” em Peor.", "ref": "Nm 31.8, 15-16" },
-    { "texto": "Arão tinha 123 anos quando morreu no monte Hor, quarenta anos depois da saída do Egito.", "ref": "Nm 33.38-39" },
-    { "texto": "Eleazar e Josué vão repartir a terra com um líder de cada tribo. O primeiro dessa lista é Calebe, filho de Jefoné, da tribo de Judá.", "ref": "Nm 34.17-19" },
-    { "texto": "No último capítulo, as filhas de Zelofeade se casam com primos paternos, da tribo de Manassés, e a terra fica na tribo do pai.", "ref": "Nm 36.10-12" }
+    {
+      "texto": "Os filhos mais velhos de Israel são 273 a mais que os levitas. Moisés recolhe sessenta gramas de prata por cada um desses e entrega a Arão.",
+      "ref": "Nm 3.46-49"
+    },
+    {
+      "texto": "Na hora de partir, a lei manda Arão e os filhos cobrirem a arca com o véu. Os coatitas carregam os utensílios sagrados, mas não podem tocar neles. Se tocarem, morrem.",
+      "ref": "Nm 4.5, 15"
+    },
+    {
+      "texto": "O Senhor manda tirar os leprosos e os impuros do acampamento, para não contaminarem o lugar onde ele habita.",
+      "ref": "Nm 5.2-4"
+    },
+    {
+      "texto": "Quem faz o voto de nazireu não pode comer nada da videira, nem as sementes nem as cascas das uvas. No fim do voto, rapa o cabelo e joga no fogo da oferta de paz.",
+      "ref": "Nm 6.4, 18"
+    },
+    {
+      "texto": "Moisés ouvia a voz do Senhor de cima da tampa da arca, entre os dois querubins.",
+      "ref": "Nm 7.89"
+    },
+    {
+      "texto": "O levita trabalha no Tabernáculo dos vinte e cinco aos cinquenta anos. Depois disso, pode ajudar os outros levitas, mas não faz mais o serviço.",
+      "ref": "Nm 8.24-26"
+    },
+    {
+      "texto": "Eldade e Medade profetizam no acampamento, sem ter ido ao Tabernáculo. Josué quer proibir, e Moisés responde: “Que bom seria se todo o povo do Senhor fosse profeta”.",
+      "ref": "Nm 11.26-29"
+    },
+    {
+      "texto": "Um dia depois da sentença, o povo resolve subir para a terra. Moisés avisa: “É tarde demais!” Eles vão, e os amalequitas e os cananeus descem das montanhas e perseguem o povo até Hormá.",
+      "ref": "Nm 14.40-45"
+    },
+    {
+      "texto": "Deus manda o povo prender pingentes num cordão azul nos cantos das roupas. Sempre que olharem para os pingentes, vão lembrar os mandamentos.",
+      "ref": "Nm 15.38-39"
+    },
+    {
+      "texto": "O Senhor diz a Arão que ele não vai ter terra em Israel: “eu sou a propriedade e a herança de vocês”.",
+      "ref": "Nm 18.20"
+    },
+    {
+      "texto": "Israel pede para atravessar Edom só pela estrada principal e promete pagar até a água. O rei de Edom não deixa e manda vir um exército grande e forte.",
+      "ref": "Nm 20.17-20"
+    },
+    {
+      "texto": "A terra engole Coré, mas os filhos dele não morrem.",
+      "ref": "Nm 26.10-11"
+    },
+    {
+      "texto": "Todo dia, a lei manda oferecer um cordeiro de manhã e outro no fim da tarde.",
+      "ref": "Nm 28.3-4"
+    },
+    {
+      "texto": "Na festa do sétimo mês, que dura uma semana, a lei manda oferecer treze novilhos no primeiro dia, doze no segundo, e assim vai baixando até sete no último.",
+      "ref": "Nm 29.12-13, 17, 32"
+    },
+    {
+      "texto": "Quem faz um voto ao Senhor não pode quebrar a palavra. Tem de fazer tudo o que prometeu.",
+      "ref": "Nm 30.2"
+    },
+    {
+      "texto": "Balaão morre na guerra contra Midiã. Moisés pergunta por que deixaram as mulheres vivas, já que elas seguiram o conselho de Balaão e levaram Israel a adorar ídolos em Peor.",
+      "ref": "Nm 31.8, 15-16"
+    },
+    {
+      "texto": "Arão morre no monte Hor com 123 anos, quarenta anos depois que Israel sai do Egito.",
+      "ref": "Nm 33.38-39"
+    },
+    {
+      "texto": "Eleazar e Josué vão repartir a terra com um líder de cada tribo. O primeiro da lista é Calebe, pela tribo de Judá.",
+      "ref": "Nm 34.17-19"
+    },
+    {
+      "texto": "As filhas de Zelofeade se casam com primos do lado do pai, e a herança fica dentro da tribo de Manassés.",
+      "ref": "Nm 36.10-12"
+    }
   ],
   "procure": {
-    "texto": "“Tudo o que o Senhor ordenava a Moisés, eles faziam.” Nos dez primeiros capítulos, a obediência volta como um refrão. Do capítulo 11 ao 21, aparece outra palavra: queixa. Marque as duas e veja onde uma dá lugar à outra.",
+    "texto": "“Tudo o que o Senhor ordenava a Moisés, eles faziam.” Até o povo sair do Sinai, Moisés escreve essa frase muitas vezes. Depois disso, o que mais se repete é gente se queixando. Conte quantas queixas até o povo chegar a Moabe.",
     "ref": "Nm 9.23"
   }
 }
