@@ -104,7 +104,7 @@ export const TEXTO_DO_DONO = [
   'Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”',
   'No caminho, Jesus explica por que veio: não para ser servido, mas para servir e dar a vida por muita gente. O livro termina com ele voltando para o céu e os discípulos levando essa notícia para todo lugar.',
 ];
-export const AINDA_NA_VOZ_ANTIGA = ['levitico', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'lucas'];
+export const AINDA_NA_VOZ_ANTIGA = ['numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'lucas'];
 
 // O tamanho máximo da conexão entre dois ramos, em caracteres.
 export const CONEXAO_MAX = 150;
