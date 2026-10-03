@@ -336,7 +336,7 @@ const CC = contexto.window.CC;
 // escrita E revista por outra leitura; daí em diante o teste barra qualquer vício que volte.
 {
   const { vozDoTexto } = await import('./ferramentas/checar-mapa.mjs');
-  const REFLEXOES_NA_VOZ_NOVA = [2];
+  const REFLEXOES_NA_VOZ_NOVA = [2, 3];
   const achados = [];
   const ver = (onde, t) => { for (const x of vozDoTexto(t)) achados.push(onde + ': ' + x); };
   const PD = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'primeiros-dias.json'), 'utf8'));
@@ -348,6 +348,21 @@ const CC = contexto.window.CC;
   for (const u of REFLEXOES_NA_VOZ_NOVA) {
     const R = JSON.parse(readFileSync(join(AQUI, 'ferramentas', 'reflexoes', 'unidade-' + String(u).padStart(2, '0') + '.json'), 'utf8'));
     for (const [dia, lista] of Object.entries(R)) for (const r of lista) [r.titulo, r.texto, ...(r.perguntas || []), ...(r.oracao || [])].forEach((t) => ver('reflexão do dia ' + dia, t));
+  }
+  // Repetição entre os dias de uma unidade: começo de oração ou de pergunta com as mesmas duas
+  // palavras em mais de 20% dos itens vira molde (a Unidade 3 tinha "Hoje eu..." em 15 de 31
+  // orações). "Senhor, tu" e "O que você" abaixo disso são o jeito normal de orar e de perguntar.
+  for (const u of REFLEXOES_NA_VOZ_NOVA) {
+    const R = JSON.parse(readFileSync(join(AQUI, 'ferramentas', 'reflexoes', 'unidade-' + String(u).padStart(2, '0') + '.json'), 'utf8'));
+    for (const campo of ['oracao', 'perguntas']) {
+      const conta = new Map(); let total = 0;
+      for (const lista of Object.values(R)) for (const r of lista) for (const t of r[campo] || []) {
+        total++;
+        const k = String(t).toLowerCase().replace(/[^a-záéíóúâêôãõç ]/g, '').split(/\s+/).slice(0, 2).join(' ');
+        conta.set(k, (conta.get(k) || 0) + 1);
+      }
+      for (const [k, n] of conta) if (n > Math.max(4, total * 0.2)) achados.push('unidade ' + u + ': ' + n + ' começos de ' + campo + ' com "' + k + '"');
+    }
   }
   checar(achados.length === 0, 'os textos de leitura passam no catálogo de voz' + (achados.length ? ' (' + achados.length + '): ' + achados.slice(0, 4).join(' · ') : ''));
 }
