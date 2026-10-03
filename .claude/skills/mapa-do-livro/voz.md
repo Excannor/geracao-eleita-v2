@@ -29,8 +29,8 @@ Modelos do que já saiu certo (guarde o som deles):
   No trigo, apanha espigas com a mão, sem usar foice."
 - "Pedro garante que nunca vai negar Jesus. Na mesma noite, nega três vezes, o galo canta, e ele
   sai chorando amargamente."
-- "Um leproso se ajoelha: “se o Senhor quiser, pode curar-me”. Jesus estende a mão, toca no homem
-  e responde: “Eu quero”."
+- "Um leproso se ajoelha e diz que Jesus pode curar ele, se quiser. Jesus estende a mão, toca no
+  homem e responde: “Eu quero”." (a fala com hífen da NBV virou paráfrase; o eco ficou)
 - "Só um volta para agradecer, e ele é samaritano."
 - "Na hora do aperto, o povo corre atrás de cavalos do Egito em vez de buscar o Santo de Israel."
 - "Do meio do dia até as três da tarde, uma escuridão cobre toda a terra. Então Jesus dá um forte

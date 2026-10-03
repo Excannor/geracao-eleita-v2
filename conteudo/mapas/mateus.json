@@ -8,11 +8,11 @@
     "original": "Ματθαῖος",
     "transliteracao": "Matthaios",
     "traducao": "presente do Senhor",
-    "texto": "A forma grega vem de um nome hebraico, Matityahu, que diz a mesma coisa."
+    "texto": "Em hebraico, o nome é Matityahu e quer dizer a mesma coisa."
   },
   "autoria": {
-    "texto": "O livro não traz o nome de quem o escreveu. Quem narra escreve depois da ressurreição, quando a história do corpo roubado “ainda é repetida até o dia de hoje”, e no meio de um discurso conversa direto com quem lê: “que o leitor entenda!”",
-    "apoio": "O título leva o nome de um dos Doze, aquele que a lista dos apóstolos apresenta como “Mateus, o cobrador de impostos”.",
+    "texto": "Os guardas do túmulo aceitam dinheiro para dizer que os discípulos roubaram o corpo de Jesus. O autor conta que essa história ainda corre entre os judeus no tempo dele. No meio de um discurso de Jesus, o autor para e pede a quem lê que entenda.",
+    "apoio": "O livro tem o nome de um dos Doze. Na lista dos apóstolos, Mateus é o cobrador de impostos.",
     "refs": [
       "Mt 28.13-15",
       "Mt 24.15",
@@ -21,8 +21,8 @@
     "desenho": "pena-e-rolo"
   },
   "raiz": {
-    "texto": "Mateus apresenta Jesus como o Rei que Israel esperava, “filho de Davi, filho de Abraão”. Ele anuncia o Reino dos céus, cumpre o que os profetas escreveram, é rejeitado pelos líderes do próprio povo e morre numa cruz com a acusação posta em cima: “Este é Jesus, o Rei dos Judeus”.",
-    "apoio": "Logo no primeiro capítulo, o menino é anunciado como Emanuel, que significa “Deus está conosco”. No último, o Ressuscitado manda os discípulos fazerem discípulos de todas as nações e promete: “Eu estarei sempre com vocês, até o fim dos tempos”.",
+    "texto": "Antes de Jesus nascer, Mateus lembra o profeta que chamou o menino de Emanuel, Deus está conosco. Jesus é da família do rei Davi e de Abraão. Na cruz, ele tem em cima da cabeça uma tabuleta com a acusação: “Este é Jesus, o Rei dos Judeus”.",
+    "apoio": "No fim do livro, Jesus ressuscitado manda os seguidores fazerem discípulos de todas as nações. Ele promete: “Eu estarei sempre com vocês, até o fim dos tempos”.",
     "refs": [
       "Mt 1.1",
       "Mt 1.23",
@@ -33,94 +33,202 @@
   "ramos": [
     {
       "titulo": "O Rei prometido",
-      "sub": "Filho de Davi, filho de Abraão",
+      "sub": "Os sábios seguem a estrela",
       "desenho": "estrela-sobre-a-casa",
       "galhos": [
-        { "texto": "A lista de antepassados abre o livro ligando Jesus a Abraão e ao rei Davi. No meio dela aparecem quatro mulheres: Tamar, Raabe, Rute e “a viúva de Urias”.", "ref": "Mt 1.1-6" },
-        { "texto": "Maria fica grávida pelo Espírito Santo. José, homem justo, decide romper o noivado em segredo, até que um anjo lhe diz em sonho que o menino “salvará o seu povo dos pecados deles”.", "ref": "Mt 1.18-21" },
-        { "texto": "A estrela que os sábios viram no Oriente vai à frente deles e para sobre o lugar onde está o menino. Eles se ajoelham e abrem seus tesouros: ouro, incenso e mirra. Avisado em sonho, José foge à noite para o Egito, e Herodes, furioso, manda matar os meninos de Belém.", "ref": "Mt 2.9-16" },
-        { "texto": "No rio Jordão, João batiza Jesus. Os céus se abrem, o Espírito desce como pomba, e uma voz declara: “Este é o meu Filho amado, em quem tenho grande alegria”.", "ref": "Mt 3.13-17" },
-        { "texto": "Depois de quarenta dias de jejum no deserto, Jesus enfrenta três tentações do Diabo e responde a cada uma com as Escrituras.", "ref": "Mt 4.1-11" },
-        { "texto": "Na praia do mar da Galileia, chama Pedro e André, que pescavam com uma rede: “Venham comigo e eu lhes mostrarei como se tornar pescadores de homens!” Logo adiante, Tiago e João deixam o pai no barco e o seguem também.", "ref": "Mt 4.18-22" }
+        {
+          "texto": "Mateus abre o livro com os antepassados de Jesus. Entre tantos pais, ele cita quatro mães. São Tamar, Raabe, Rute e a viúva de Urias.",
+          "ref": "Mt 1.1-6"
+        },
+        {
+          "texto": "Maria está prometida a José e fica grávida pelo Espírito Santo. José é um homem justo e decide romper o noivado em segredo, para não desonrar Maria. Num sonho, um anjo diz a José que o menino vai se chamar Jesus, porque vai salvar o seu povo dos pecados.",
+          "ref": "Mt 1.18-21"
+        },
+        {
+          "texto": "A estrela que os sábios viram no Oriente vai na frente deles e para em cima do lugar onde está o menino. Eles ficam muito alegres. Na casa, os sábios se ajoelham diante do menino e dão presentes de ouro, incenso e mirra.",
+          "ref": "Mt 2.9-16"
+        },
+        {
+          "texto": "Quando Jesus chega ao rio Jordão para ser batizado, João não quer. “Eu é que preciso ser batizado pelo Senhor”, diz João. Jesus responde que deve fazer tudo o que Deus quer, e João batiza. Quando Jesus sai da água, o Espírito de Deus desce como uma pomba e pousa sobre ele.",
+          "ref": "Mt 3.13-17"
+        },
+        {
+          "texto": "O Diabo leva Jesus a um monte muito alto e mostra as nações do mundo. Ele promete tudo aquilo, caso Jesus se ajoelhe e adore. Jesus responde: “Saia daqui, Satanás”. O Diabo vai embora, e os anjos cuidam de Jesus.",
+          "ref": "Mt 4.1-11"
+        },
+        {
+          "texto": "Na praia do mar da Galileia, Jesus chama Pedro e André, que estão pescando com uma rede. Os dois deixam as redes e seguem Jesus. Na mesma praia, Tiago e João consertam as redes no barco, com o pai. Jesus chama os dois, e eles deixam o pai no barco e vão com ele.",
+          "ref": "Mt 4.18-22"
+        }
       ],
-      "conexao": "Jesus começa a pregar que o Reino dos céus está próximo (Mt 4.17). No monte, mostra como vive quem é desse Reino."
+      "conexao": "Jesus prega que o Reino dos céus está próximo (Mt 4.17). Multidões da Galileia e de Jerusalém vão atrás dele (Mt 4.25)."
     },
     {
       "titulo": "Sermão do monte",
-      "sub": "Como vive quem é do Reino",
+      "sub": "Os passarinhos não semeiam",
       "desenho": "lirio-do-campo",
       "galhos": [
-        { "texto": "Sentado na encosta do monte, Jesus chama de felizes os humildes, os que choram, os mansos, os que têm fome e sede de justiça e os perseguidos por serem justos.", "ref": "Mt 5.1-10" },
-        { "texto": "Para quem o segue, duas imagens: “Vocês são o sal da terra” e “Vocês são a luz do mundo”.", "ref": "Mt 5.13-14" },
-        { "texto": "Ele não veio abolir a Lei, e sim cumprir. Seis vezes cita o que a Lei ou um ditado manda e completa: “Porém eu digo”. A raiva já merece julgamento, o olhar de desejo já é adultério, e o inimigo merece amor e oração.", "ref": "Mt 5.17-44" },
-        { "texto": "Esmola, oração e jejum se fazem em segredo, sem buscar admiração, porque o Pai “conhece todos os segredos”. No meio disso, Jesus ensina a orar: “Nosso Pai do céu, seja santificado o seu nome”.", "ref": "Mt 6.1-18" },
-        { "texto": "Passarinhos não semeiam, e o Pai os alimenta; lírios não tecem e se vestem melhor que o rei Salomão. Então, nada de preocupação: “Coloquem, pois, em primeiro lugar o Reino de Deus e a sua justiça”.", "ref": "Mt 6.26-33" },
-        { "texto": "O sermão termina com duas casas na mesma tempestade. A que está na rocha fica de pé, a que está na areia cai, e a diferença é praticar o que se ouviu.", "ref": "Mt 7.24-27" }
+        {
+          "texto": "Jesus senta na encosta de um monte e ensina a multidão. Ele chama de felizes os que choram, porque vão ser consolados. Também chama de felizes os perseguidos por serem justos, porque o Reino dos céus é deles.",
+          "ref": "Mt 5.1-10"
+        },
+        {
+          "texto": "“Vocês são o sal da terra”, diz Jesus aos que ouvem. O sal que perde o sabor só serve para ser jogado fora. Jesus também chama essa gente de luz do mundo. Ninguém consegue esconder uma cidade no alto de um monte.",
+          "ref": "Mt 5.13-14"
+        },
+        {
+          "texto": "As pessoas dizem que é para amar o próximo e odiar o inimigo. Mas Jesus diz: “Amem os seus inimigos! Orem por aqueles que perseguem vocês!”",
+          "ref": "Mt 5.17-44"
+        },
+        {
+          "texto": "Jesus fala dos hipócritas, que oram nas esquinas para todo mundo ver. Ele manda orar no quarto, de porta fechada, porque o Pai conhece os segredos. Depois ensina a oração: “Nosso Pai do céu, seja santificado o seu nome”.",
+          "ref": "Mt 6.1-18"
+        },
+        {
+          "texto": "Os passarinhos não semeiam nem colhem, e o Pai do céu dá comida a eles. Nem o rei Salomão se vestiu como os lírios do campo. Por isso, Jesus pede: “Coloquem, pois, em primeiro lugar o Reino de Deus e a sua justiça”.",
+          "ref": "Mt 6.26-33"
+        },
+        {
+          "texto": "No fim do sermão, Jesus fala de dois homens que constroem casas, um na rocha e outro na areia. Quem ouve os ensinos de Jesus e pratica é como o primeiro. Na tempestade, a casa da rocha fica de pé, e a da areia cai com um barulho medonho.",
+          "ref": "Mt 7.24-27"
+        }
       ],
-      "conexao": "Ele ensina “como alguém que tinha grande autoridade” (Mt 7.29), e essa autoridade vence doença, vento e demônios."
+      "conexao": "Jesus ensina com grande autoridade (Mt 7.29). Quando ele desce do monte, multidões vão atrás dele (Mt 8.1)."
     },
     {
       "titulo": "Mãos que curam",
       "sub": "Até o vento e o mar obedecem",
       "desenho": "barco-nas-ondas",
       "galhos": [
-        { "texto": "Um leproso se ajoelha: “se o Senhor quiser, pode curar-me”. Jesus estende a mão, toca no homem e responde: “Eu quero”.", "ref": "Mt 8.2-3" },
-        { "texto": "Em Cafarnaum, um capitão do exército romano pede só uma palavra, porque entende de autoridade. Jesus se admira: “Eu ainda não vi uma fé assim em toda a terra de Israel!”", "ref": "Mt 8.5-10" },
-        { "texto": "Uma tempestade terrível joga ondas para dentro do barco, e Jesus dorme. Ele repreende o vento e as ondas, e os discípulos perguntam: “Quem é este... que até mesmo os ventos e o mar lhe obedecem?”", "ref": "Mt 8.24-27" },
-        { "texto": "Diante de um paralítico trazido numa esteira, Jesus fala primeiro de outra coisa: “os seus pecados estão perdoados”. Para provar que tem essa autoridade, manda o homem se levantar, e ele vai para casa.", "ref": "Mt 9.2-7" },
-        { "texto": "Na coletoria, um cobrador de impostos chamado Mateus ouve “Venha tornar-se meu discípulo” e se levanta. À mesa, cercado de cobradores e “pecadores”, Jesus explica: “As pessoas que têm saúde não precisam de médico, mas sim os doentes”.", "ref": "Mt 9.9-12" },
-        { "texto": "Aos Doze, Jesus dá autoridade para curar e expulsar espíritos maus, e os envia sem ouro, sem prata e sem saco de viagem: “Deem tão liberalmente como vocês receberam!”", "ref": "Mt 10.1-10" }
+        {
+          "texto": "Um leproso se ajoelha e diz que Jesus pode curar ele, se quiser. Jesus estende a mão, toca no homem e responde: “Eu quero”.",
+          "ref": "Mt 8.2-3"
+        },
+        {
+          "texto": "Em Cafarnaum, um capitão do exército romano pede a Jesus que cure o servo dele. O capitão diz que Jesus não precisa ir até a casa. Basta uma palavra dali mesmo, e o servo fica bom. Jesus fica maravilhado: “Eu ainda não vi uma fé assim em toda a terra de Israel!”",
+          "ref": "Mt 8.5-10"
+        },
+        {
+          "texto": "Uma tempestade joga ondas para dentro do barco, e Jesus está dormindo. Os discípulos acordam Jesus gritando que estão afundando. Jesus pergunta por que eles têm tanto medo e só depois manda parar o vento e as ondas. Tudo fica calmo.",
+          "ref": "Mt 8.24-27"
+        },
+        {
+          "texto": "Alguns homens trazem a Jesus um paralítico deitado numa esteira. Jesus vê a fé deles e diz ao paralítico: “os seus pecados estão perdoados!” Uns mestres da lei acham que isso é blasfêmia. Jesus manda o paralítico enrolar a esteira e ir para casa, e ele vai.",
+          "ref": "Mt 9.2-7"
+        },
+        {
+          "texto": "Um cobrador de impostos chamado Mateus está trabalhando quando Jesus passa e chama. Mateus se levanta e vai com ele. Depois, na casa de Mateus, muitos cobradores e “pecadores” almoçam com Jesus. Os fariseus reclamam, e Jesus responde: “As pessoas que têm saúde não precisam de médico, mas sim os doentes”.",
+          "ref": "Mt 9.9-12"
+        },
+        {
+          "texto": "Jesus dá aos Doze autoridade para expulsar espíritos maus e curar doenças. Depois manda os discípulos saírem sem levar ouro nem prata. Jesus pede: “Deem tão liberalmente como vocês receberam!”",
+          "ref": "Mt 10.1-10"
+        }
       ],
-      "conexao": "Os fariseus atribuem o poder dele ao “príncipe dos demônios” (Mt 9.34), e Jesus avisa os Doze: com vocês será igual (Mt 10.25)."
+      "conexao": "Para os fariseus, o poder de Jesus vem do príncipe dos demônios (Mt 9.34). Os Doze vão ouvir o mesmo (Mt 10.25)."
     },
     {
       "titulo": "Sementes do Reino",
-      "sub": "Dúvida, recusa e parábolas",
+      "sub": "O joio cresce no meio do trigo",
       "desenho": "espigas-de-trigo",
       "galhos": [
-        { "texto": "Da prisão, João Batista manda perguntar se Jesus é mesmo aquele que esperavam. A resposta são os fatos: “Os cegos veem, os coxos andam”, e os pobres recebem a boa notícia.", "ref": "Mt 11.2-5" },
-        { "texto": "Depois de repreender as cidades que viram milagres e não se voltaram para Deus, Jesus faz um convite: “Venham a mim, todos vocês que estão cansados e sobrecarregados, e eu lhes darei descanso”.", "ref": "Mt 11.20-28" },
-        { "texto": "Jesus se diz “Senhor até mesmo do sábado” e, na sinagoga, restaura a mão defeituosa de um homem. Os fariseus se reúnem para planejar a morte de Jesus.", "ref": "Mt 12.8-14" },
-        { "texto": "Do barco, conta do lavrador que semeia: parte cai no caminho, parte nas pedras, parte entre espinhos, e a que cai em solo bom dá 30, 60 e até 100 vezes o que foi plantado.", "ref": "Mt 13.2-8" },
-        { "texto": "Enquanto todos dormem, um inimigo semeia joio no meio do trigo. O dono manda deixar os dois crescerem juntos até a colheita, quando o joio vai para o fogo e o trigo, para o depósito.", "ref": "Mt 13.24-30" },
-        { "texto": "O Reino é tesouro escondido num campo e pérola de grande valor: quem acha vende tudo o que tem para ficar com ele.", "ref": "Mt 13.44-46" }
+        {
+          "texto": "Da prisão, João Batista manda os discípulos perguntarem a Jesus se ele é mesmo aquele que esperam. Jesus manda contar a João o que eles viram: “Os cegos veem, os coxos andam”.",
+          "ref": "Mt 11.2-5"
+        },
+        {
+          "texto": "Jesus fala duro com Corazim e Betsaida, que viram os milagres e não se voltaram para Deus. Depois faz um convite: “Venham a mim, todos vocês que estão cansados e sobrecarregados, e eu lhes darei descanso”.",
+          "ref": "Mt 11.20-28"
+        },
+        {
+          "texto": "Na sinagoga, os fariseus veem um homem com a mão defeituosa e perguntam a Jesus se é permitido curar no sábado. Jesus diz que qualquer um tira a ovelha do poço no sábado, e uma pessoa vale muito mais do que um animal. Ele manda o homem estender o braço, e a mão fica boa. Os fariseus se reúnem para planejar como matar Jesus.",
+          "ref": "Mt 12.8-14"
+        },
+        {
+          "texto": "A multidão é tão grande que Jesus entra num barco e ensina de lá, com o povo na praia. Ele conta de um lavrador que sai a semear. A semente que cai em solo bom dá 30, 60 e até 100 vezes mais.",
+          "ref": "Mt 13.2-8"
+        },
+        {
+          "texto": "Uma noite, enquanto todos dormem, um inimigo semeia joio no meio do trigo. Os servos querem arrancar o joio, mas o dono do campo manda deixar os dois crescerem juntos. Na colheita, os ceifeiros vão queimar o joio e guardar o trigo no depósito.",
+          "ref": "Mt 13.24-30"
+        },
+        {
+          "texto": "Jesus compara o Reino dos céus a um tesouro escondido num campo. O homem que acha fica tão alegre que vende tudo o que tem para comprar aquele campo.",
+          "ref": "Mt 13.44-46"
+        }
       ],
       "jesus": {
-        "texto": "O agricultor da boa semente é Jesus. Ao explicar a parábola do joio, ele mesmo diz: “O Filho do Homem é o agricultor que lançou a semente escolhida”.",
+        "texto": "Jesus explica aos discípulos a parábola do joio: “O Filho do Homem é o agricultor que lançou a semente escolhida”. O dono do campo é Jesus.",
         "refs": [
           "Mt 13.37"
         ]
       },
-      "conexao": "Nazaré se escandaliza com Jesus (Mt 13.54-57). Herodes, que mandou decapitar o Batista, acha que João ressuscitou (Mt 14.1-10)."
+      "conexao": "Em Nazaré, o povo se escandaliza com Jesus (Mt 13.54-57). Herodes acha que ele é João Batista de volta (Mt 14.1-10)."
     },
     {
       "titulo": "A rocha e a cruz",
       "sub": "O Cristo que vai sofrer",
       "desenho": "chaves",
       "galhos": [
-        { "texto": "De madrugada, Jesus vem andando sobre o mar. Pedro sai do barco, sente a força do vento, começa a afundar e grita “Salve-me, Senhor!” No barco, os outros o adoram: “Realmente o Senhor é o Filho de Deus!”", "ref": "Mt 14.25-33" },
-        { "texto": "Em Cesareia de Filipe, a pergunta vira pessoal: “E vocês, quem vocês dizem que eu sou?” Pedro responde “O Senhor é o Cristo, o Filho do Deus vivo” e ouve que sobre esta rocha a igreja será edificada, com a promessa das chaves do Reino dos céus.", "ref": "Mt 16.13-19" },
-        { "texto": "A partir daí, Jesus fala claramente: vai sofrer em Jerusalém, ser morto e ressuscitar três dias depois. Pedro o chama de lado para protestar e ouve: “Afaste-se de mim, Satanás!”", "ref": "Mt 16.21-23" },
-        { "texto": "No alto de um monte, o rosto de Jesus brilha como o sol, Moisés e Elias aparecem, e uma voz sai da nuvem: “Este é o meu Filho amado, em quem tenho muita alegria. Ouçam-no”.", "ref": "Mt 17.1-5" },
-        { "texto": "Pedro pergunta se basta perdoar sete vezes, e a resposta é “até setenta vezes sete”. Vem então a história do servo perdoado de uma dívida enorme que manda prender o companheiro por uma dívida pequena.", "ref": "Mt 18.21-35" },
-        { "texto": "Quando a mãe de Tiago e João pede para os filhos os tronos ao lado dele, Jesus muda a régua: quem quiser ser o primeiro deve servir, como o Filho do Homem, que veio “para servir, e dar a sua vida para salvar a muitos”.", "ref": "Mt 20.20-28" }
+        {
+          "texto": "De madrugada, Jesus vem andando sobre o mar, e Pedro pede para ir até ele. Pedro sai do barco e anda por cima da água. Quando sente a força do vento, fica com medo e começa a afundar. Jesus segura Pedro e pergunta: “Ó homem de pequena fé, por que você duvidou?”",
+          "ref": "Mt 14.25-33"
+        },
+        {
+          "texto": "Em Cesareia de Filipe, Jesus pergunta aos discípulos quem eles dizem que ele é. Pedro responde que Jesus é o Cristo, o Filho do Deus vivo. Jesus diz: “Você é Pedro, e sobre esta rocha edificarei a minha igreja”. Depois promete a Pedro as chaves do Reino dos céus.",
+          "ref": "Mt 16.13-19"
+        },
+        {
+          "texto": "Jesus começa a dizer aos discípulos que vai ser morto em Jerusalém e ressuscitar três dias depois. Pedro leva Jesus para um lado e diz que isso não vai acontecer. Jesus chama Pedro de Satanás: “Você é uma armadilha perigosa para mim”.",
+          "ref": "Mt 16.21-23"
+        },
+        {
+          "texto": "No alto de um monte, o rosto de Jesus brilha como o sol. Moisés e Elias conversam com ele. Uma nuvem brilhante cobre os discípulos, e uma voz diz: “Este é o meu Filho amado, em quem tenho muita alegria”.",
+          "ref": "Mt 17.1-5"
+        },
+        {
+          "texto": "Pedro pergunta se basta perdoar o irmão sete vezes. “Não sete vezes!”, responde Jesus. “Mas até setenta vezes sete!” Depois Jesus conta de um rei que perdoa um servo que deve muita prata. Na saída, esse servo agarra pela garganta um companheiro que deve 100 denários e manda prender o homem.",
+          "ref": "Mt 18.21-35"
+        },
+        {
+          "texto": "A mãe de Tiago e João se inclina diante de Jesus e pede um favor. Ela quer que os dois filhos se sentem em tronos ao lado dele, um à direita e outro à esquerda. Jesus responde: “Vocês não sabem o que estão pedindo!”",
+          "ref": "Mt 20.20-28"
+        }
       ],
-      "conexao": "Na Galileia (Mt 17.22-23) e a caminho de Jerusalém, Jesus avisa que será crucificado (Mt 20.18-19). E segue para lá."
+      "conexao": "Jesus avisa que vai morrer, e os discípulos ficam tristes (Mt 17.22-23). Depois sobe para Jerusalém (Mt 20.18-19)."
     },
     {
       "titulo": "O Rei em Jerusalém",
-      "sub": "Aclamado e crucificado",
+      "sub": "Jesus entra montado num jumentinho",
       "desenho": "calice",
       "galhos": [
-        { "texto": "Montado num jumentinho, Jesus entra em Jerusalém sobre mantos e ramos. A multidão grita “Hosana ao Filho de Davi!”, e a cidade inteira se agita: “Quem é este?”", "ref": "Mt 21.7-10" },
-        { "texto": "Na parábola dos lavradores, o dono da plantação manda servos e, por último, o próprio filho, que os lavradores matam para ficar com a herança. Jesus completa com as Escrituras: “A pedra rejeitada pelos construtores tornou-se a pedra mais importante de todas”.", "ref": "Mt 21.33-42" },
-        { "texto": "Quando o Filho do Homem vier em glória, vai separar as pessoas como o pastor separa ovelhas e bodes. A medida é o que fizeram ao faminto, ao estranho, ao doente e ao preso: “estavam fazendo a mim!”", "ref": "Mt 25.31-40" },
-        { "texto": "Enquanto comem, Jesus parte o pão, “isto é o meu corpo”, e passa o cálice: “isto é o meu sangue da nova aliança, que é derramado para perdoar os pecados de muitos”.", "ref": "Mt 26.26-28" },
-        { "texto": "No Getsêmani, com o rosto no chão, ora: “Meu Pai! Se for possível, afaste este cálice de mim. Contudo, eu quero que seja feita a sua vontade, e não a minha”. Pedro, Tiago e João dormem.", "ref": "Mt 26.36-40" },
-        { "texto": "Ao meio-dia a terra escurece. Jesus clama “Meu Deus, meu Deus, por que o Senhor me abandonou?” e morre. A cortina do templo se rasga de cima até embaixo, e o centurião reconhece: “Verdadeiramente, este era o Filho de Deus”.", "ref": "Mt 27.45-54" }
+        {
+          "texto": "Os discípulos trazem a jumenta e o jumentinho e põem as roupas em cima dos animais. Jesus monta, e uma multidão estende os mantos na estrada e grita: “Hosana ao Filho de Davi!” Quando Jesus entra, o povo de Jerusalém fica agitado e pergunta quem é esse homem.",
+          "ref": "Mt 21.7-10"
+        },
+        {
+          "texto": "Jesus conta de um dono de plantação de uvas que arrenda a terra a uns lavradores. Os lavradores atacam os servos do dono e, por último, matam o filho dele para ficar com a herança. Jesus pergunta o que o dono vai fazer com aqueles homens. Os ouvintes respondem que ele vai dar aos maus uma morte horrível.",
+          "ref": "Mt 21.33-42"
+        },
+        {
+          "texto": "Quando o Filho do Homem vier na glória dele, vai separar as pessoas como o pastor separa ovelhas de bodes. Ele chama para o Reino quem está à direita: “eu tive fome, e vocês me deram de comer”. Eles perguntam quando foi isso. Ele responde que o que fizeram ao menor dos irmãos dele, fizeram a ele.",
+          "ref": "Mt 25.31-40"
+        },
+        {
+          "texto": "Durante a refeição, Jesus dá o pão aos discípulos: “Tomem e comam, porque isto é o meu corpo”. Depois passa o cálice e manda cada um beber. Jesus diz que aquele é o sangue dele, derramado para perdoar os pecados de muitos.",
+          "ref": "Mt 26.26-28"
+        },
+        {
+          "texto": "No Getsêmani, Jesus pede a Pedro, Tiago e João que vigiem com ele. Ele vai um pouco adiante e ora com o rosto no chão. Quando volta, os três estão dormindo. Jesus pergunta a Pedro: “vocês não puderam ficar acordados comigo nem mesmo uma hora?”",
+          "ref": "Mt 26.36-40"
+        },
+        {
+          "texto": "Jesus dá mais um grito e entrega o espírito. A terra treme, e as rochas se partem. Muitos homens e mulheres que tinham morrido ressuscitam e saem dos túmulos. Depois que Jesus ressuscita, eles entram em Jerusalém, e muita gente vê essas pessoas.",
+          "ref": "Mt 27.45-54"
+        }
       ],
       "jesus": {
-        "texto": "A pedra rejeitada é Jesus. Depois da ressurreição, Pedro aplica a ele o mesmo texto: “esse Jesus é ‘a pedra rejeitada pelos construtores e que se tornou a pedra principal’”.",
+        "texto": "Pedro fala aos líderes que crucificaram Jesus e diz que Deus ressuscitou o homem que eles mataram. Depois cita: “esse Jesus é ‘a pedra rejeitada pelos construtores e que se tornou a pedra principal’”.",
         "refs": [
           "At 4.10-11"
         ]
@@ -128,7 +236,7 @@
     }
   ],
   "cristo": {
-    "texto": "“Ele não está aqui! Ressuscitou, tal como havia dito.” O anjo aponta para o lugar vazio e para a palavra cumprida. Mateus faz isso o livro inteiro: põe as palavras dos profetas ao lado do que Jesus viveu, para mostrar que o Messias esperado é ele.",
+    "texto": "Jesus se compara a Jonas. Jonas ficou três dias e três noites dentro do grande peixe, e o Filho do Homem vai ficar o mesmo tempo no fundo da terra (Mt 12.40). No túmulo vazio, o anjo diz: “Ele não está aqui! Ressuscitou, tal como havia dito”.",
     "ref": "Mt 28.6",
     "desenho": "tumulo-aberto",
     "pares": [
@@ -136,31 +244,31 @@
         "at": "Mq 5.2",
         "texto": "Ó Belém Efrata, você é apenas uma pequena vila da Judeia, mas será o lugar onde vai nascer o rei de Israel.",
         "nt": "Mt 2.1-6",
-        "nota": "Jesus nasce em Belém da Judeia"
+        "nota": "Os líderes dizem a Herodes que o Messias nasce em Belém"
       },
       {
         "at": "Is 9.2",
         "texto": "O povo que está andando na escuridão verá uma grande luz.",
         "nt": "Mt 4.13-16",
-        "nota": "Jesus vai morar em Cafarnaum, na Galileia"
+        "nota": "Jesus deixa Nazaré e vai morar em Cafarnaum"
       },
       {
         "at": "Is 53.4",
         "texto": "Ele tomou sobre si as nossas enfermidades, ele mesmo carregou nosso sofrimento.",
         "nt": "Mt 8.16-17",
-        "nota": "Jesus cura todos os doentes que levam a ele"
+        "nota": "Com uma palavra, Jesus expulsa demônios e cura os doentes"
       },
       {
         "at": "Zc 9.9",
         "texto": "Vejam todos, o seu Rei está chegando! Ele é o justo, o vencedor, humilde e vem montado num jumento...",
         "nt": "Mt 21.4-5",
-        "nota": "Jesus é o Rei que chega num jumentinho"
+        "nota": "O Rei entra em Jerusalém montado num jumentinho"
       }
     ]
   },
   "estrutura": [
     {
-      "titulo": "Nascimento e preparação",
+      "titulo": "Jesus nasce em Belém",
       "de": 1,
       "ate": 4
     },
@@ -170,12 +278,12 @@
       "ate": 7
     },
     {
-      "titulo": "Milagres e o envio dos Doze",
+      "titulo": "Curas na Galileia",
       "de": 8,
       "ate": 10
     },
     {
-      "titulo": "Resistência e parábolas",
+      "titulo": "As parábolas do Reino",
       "de": 11,
       "ate": 13
     },
@@ -185,27 +293,60 @@
       "ate": 20
     },
     {
-      "titulo": "Em Jerusalém: o templo e o fim",
+      "titulo": "Jesus ensina no templo",
       "de": 21,
       "ate": 25
     },
     {
-      "titulo": "Morte e ressurreição",
+      "titulo": "Jesus morre e ressuscita",
       "de": 26,
       "ate": 28
     }
   ],
   "curiosidades": [
-    { "texto": "Mateus conta os antepassados em três blocos de quatorze gerações: de Abraão a Davi, de Davi ao exílio e do exílio até Cristo.", "ref": "Mt 1.17" },
-    { "texto": "Uma mulher de Canaã implora pela filha e ouve que não parece direito dar o pão das crianças aos cachorros. A resposta dela: “até os cachorros podem comer as migalhas que caem da mesa dos seus donos”. Jesus diz que a fé dela é grande, e a filha é curada.", "ref": "Mt 15.22-28" },
-    { "texto": "Jesus multiplica pão duas vezes: cinco pães para 5.000 e sete pães para 4.000. Quando os discípulos se preocupam por terem esquecido o pão, ele cobra a memória das duas.", "ref": "Mt 16.5-10" },
-    { "texto": "Para pagar o imposto do templo, Jesus manda Pedro pescar: a moeda está na boca do primeiro peixe que ele pegar.", "ref": "Mt 17.24-27" },
-    { "texto": "Sobre os ricos e o Reino, Jesus escolhe uma imagem que ninguém esquece: “É mais fácil um camelo passar pelo fundo de uma agulha do que um rico entrar no Reino de Deus!”", "ref": "Mt 19.23-24" },
-    { "texto": "Perguntam se é certo pagar impostos a César. Jesus pede uma moeda, quer saber de quem é o retrato e responde: “deem a César o que é dele, e deem a Deus tudo quanto pertence a Deus”.", "ref": "Mt 22.17-21" },
-    { "texto": "O camelo volta numa bronca aos fariseus que dão o dízimo até da hortelã e esquecem a justiça: “Vocês coam um mosquito e engolem um camelo”.", "ref": "Mt 23.23-24" },
-    { "texto": "Pedro garante que nunca vai negar Jesus. Na mesma noite, nega três vezes, o galo canta, e ele sai chorando amargamente.", "ref": "Mt 26.33-35, 69-75" },
-    { "texto": "Com remorso, Judas atira o dinheiro no chão do templo. Os sacerdotes não podem pôr esse dinheiro na coleta e compram com ele um campo para enterrar estrangeiros, que passa a se chamar “O Campo de Sangue”.", "ref": "Mt 27.3-8" },
-    { "texto": "No meio do julgamento, a esposa de Pilatos manda um recado: teve um pesadelo e pede que ele deixe “esse bom homem em paz”. Pilatos acaba lavando as mãos diante da multidão.", "ref": "Mt 27.19-24" }
+    {
+      "texto": "Mateus divide os antepassados de Jesus em três grupos de quatorze gerações. O primeiro grupo vai de Abraão até o rei Davi. O segundo termina no exílio, e o terceiro começa ali e chega até Cristo.",
+      "ref": "Mt 1.17"
+    },
+    {
+      "texto": "Uma mulher de Canaã grita atrás de Jesus pela filha. Jesus não diz nem uma palavra, e os discípulos querem mandar a mulher embora. Ela insiste, e no fim Jesus responde: “sua fé é grande, e o seu pedido será atendido”.",
+      "ref": "Mt 15.22-28"
+    },
+    {
+      "texto": "Jesus manda os discípulos tomarem cuidado com o fermento dos fariseus e dos saduceus. Eles acham que é porque esqueceram o pão. Jesus pergunta se eles não lembram dos cinco pães para os 5.000 e dos sete para os 4.000.",
+      "ref": "Mt 16.5-10"
+    },
+    {
+      "texto": "Os cobradores do imposto do templo perguntam a Pedro se o mestre dele paga. Jesus manda Pedro jogar um anzol no mar e abrir a boca do primeiro peixe. Dentro, Pedro vai achar uma moeda que paga o imposto dos dois.",
+      "ref": "Mt 17.24-27"
+    },
+    {
+      "texto": "Jesus diz aos discípulos: “É mais fácil um camelo passar pelo fundo de uma agulha do que um rico entrar no Reino de Deus!”",
+      "ref": "Mt 19.23-24"
+    },
+    {
+      "texto": "Alguns homens perguntam a Jesus se está certo pagar impostos a César. Jesus chama os homens de hipócritas e pede uma moeda. Eles dizem de quem é o retrato, e Jesus responde: “deem a César o que é dele, e deem a Deus tudo quanto pertence a Deus”.",
+      "ref": "Mt 22.17-21"
+    },
+    {
+      "texto": "Os fariseus dão o dízimo até da folha de hortelã, mas esquecem a justiça e a misericórdia. Jesus chama os fariseus de guias cegos: “Vocês coam um mosquito e engolem um camelo”.",
+      "ref": "Mt 23.23-24"
+    },
+    {
+      "texto": "Pedro garante que nunca vai negar Jesus, nem que tenha de morrer com ele. Na mesma noite, nega três vezes no pátio. Na última, os homens reconhecem Pedro pelo modo de falar. O galo canta, e Pedro sai dali chorando.",
+      "ref": "Mt 26.33-35, 69-75"
+    },
+    {
+      "texto": "Judas fica com remorso e atira o dinheiro no chão do templo. Os sacerdotes não podem pôr na coleta dinheiro pago por um assassinato, então compram um campo para enterrar estrangeiros. O povo chama esse cemitério de “O Campo de Sangue”.",
+      "ref": "Mt 27.3-8"
+    },
+    {
+      "texto": "Durante o julgamento, a esposa de Pilatos manda um recado para o marido. Ela teve um pesadelo com Jesus e pede: “Deixe esse bom homem em paz”. Depois, Pilatos pega uma bacia d’água e lava as mãos na frente da multidão.",
+      "ref": "Mt 27.19-24"
+    }
   ],
-  "procure": { "texto": "“Isso aconteceu para que se cumprisse a mensagem que o Senhor tinha dito pelo seu profeta.” Mateus repete essa ideia o livro inteiro, com palavras um pouco diferentes: no Egito, em Nazaré, nas curas, nas parábolas, na entrada em Jerusalém e até nas trinta peças de prata de Judas. Marque cada vez que ela aparecer e veja quem Mateus está citando.", "ref": "Mt 1.22" }
+  "procure": {
+    "texto": "Quando o anjo fala com José, Mateus escreve: “Isso aconteceu para que se cumprisse a mensagem que o Senhor tinha dito pelo seu profeta”. Ele escreve quase a mesma coisa quando José foge com o menino para o Egito. Escreve de novo quando os sacerdotes compram um campo com as trinta peças de prata. Procure essa frase no livro e anote qual profeta Mateus cita a cada vez.",
+    "ref": "Mt 1.22"
+  }
 }

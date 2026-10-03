@@ -74,7 +74,7 @@ const VOZ_BRUTA = [
   [/\b(Marcos|Lucas|Mateus|Josué|Moisés|Isaías|o autor|o livro|o texto|o narrador) (explica|anota|registra|faz questão|deixa claro|faz isso)\b|avisa o autor|diz o texto|vem o comentário/i, 'autor virando comentarista (1.2)'],
   [/\b(o Ressuscitado|o Batista|o rapaz|a visita|o escolhido|o guerreiro|o visitante)\b/i, 'sinônimo de redação (1.5)'],
   [/\b[oa]s? própri[oa]s?\b|\b(ele|ela|eles|elas) mesm[oa]s?\b|\bmesm[oa]s? (palavras|texto|expressão)\b|\bSenhor mesmo\b/i, 'reforço vazio: próprio, mesmo (1.6)'],
-  [/\b[Ee] ouve\b|\b[Aa] resposta( é| são|:| dela:)/, '"e ouve" / "a resposta é" (4.2)'],
+  [/\b[Ee] ouvem?\b|\b[Aa] resposta( é| são|:| dela:)/, '"e ouve" / "a resposta é" (4.2)'],
   [/\b(lhe|lhes)\b/, 'pronome oblíquo "lhe" (2.x, clítico)'],
   [/\b(e|que|mas|Jesus|ele|ela|Deus|Senhor|Moisés|Josué|Pedro|João) (o|a|os|as) (declara|considera|destrói|odeiam|vendem|põe|põem|acompanham|cobrem|enche|consome|leva|levam|veja|envia|repreendem?|defende|toma|fortalece|seguem|entrega|abençoa|encontram|golpeia|crava|acordam|adoram|seguem|cumprimenta|traiu|prende|prendem|mandam?|segue)\b/, 'clítico antes do verbo (2.x)'],
   [/;/, 'ponto e vírgula (3.2)'],
@@ -104,7 +104,7 @@ export const TEXTO_DO_DONO = [
   'Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”',
   'No caminho, Jesus explica por que veio: não para ser servido, mas para servir e dar a vida por muita gente. O livro termina com ele voltando para o céu e os discípulos levando essa notícia para todo lugar.',
 ];
-export const AINDA_NA_VOZ_ANTIGA = ['mateus', 'lucas'];
+export const AINDA_NA_VOZ_ANTIGA = ['lucas'];
 
 // O tamanho máximo da conexão entre dois ramos, em caracteres.
 export const CONEXAO_MAX = 150;
