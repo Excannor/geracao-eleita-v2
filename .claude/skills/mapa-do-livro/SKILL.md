@@ -104,8 +104,10 @@ certo uma vez custa menos que escrever e consertar).
 
 **Como revisar.** Quem revisa lê cada campo de texto (raiz, apoio, galhos, conexões, destaques,
 "[Livro] e Cristo" e notas, estrutura, curiosidades, procure, autoria, significado) em voz alta,
-um por um, com a lista dos 15 vícios ao lado, e anota o número do vício e o trecho. Um vício em
-qualquer campo devolve o mapa. A revisão de voz é separada da revisão de fidelidade: as duas são
+um por um, com a lista dos 15 vícios ao lado, e **corrige ali mesmo** o que pegar, no próprio
+JSON, conferindo a fidelidade do trecho mexido na folha do `rever-mapa`. Não devolve o mapa nem
+escreve relatório para o escritor consertar (regra do dono, 03/10: um ciclo só, sem ida e volta);
+devolve só a lista do que mudou, para o registro. A revisão de voz é separada da revisão de fidelidade: as duas são
 obrigatórias, e nenhuma substitui a outra. A passada de voz de outro agente é curta: só os campos
 novos contra a lista, sem reler a Bíblia (fidelidade é do `rever-mapa` e do checador). Captura de
 tela só quando muda desenho ou tela; para texto, o `teste-mapas` já mede as linhas a 390px.
