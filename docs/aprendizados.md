@@ -838,3 +838,16 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   passou a aceitar `font/*` além de JSON). O grego da Noto é mais alto: um passo menor (17px).
   A fonte se baixa do registro do npm (`npm pack @fontsource/...`): o GitHub e o Google Fonts
   recusam pelo proxy.
+- 2026-10-03 · build · Folga do index.html em 42 KB. Medido antes de mexer: JS 719 KB (o maior,
+  08b-propositos, 100 KB), CSS 265 KB (já enxuto), SVG embutido 14 KB, dados só a lista de bíblias
+  e mapas (o conteúdo já mora fora). CSS morto quase não há (uns 1 KB em regras simples do
+  estilo.css, que é congelado). O peso solto era o recuo das linhas do JS e os comentários de
+  bloco: 83 KB → o `enxugarJs` do build tira também recuo, linhas em branco e comentário de bloco
+  de linha inteira, nunca dentro de texto entre crases; folga de 123 KB, captura igual ao pixel.
+  A prova não é "os testes passaram": `ferramentas/provar-enxugar.mjs` compara a árvore sintática
+  (acorn) do fonte e do enxugado, módulo por módulo, e acusa um espaço a mais dentro de um texto.
+- 2026-10-03 · captura · Um lote de `foto-conta` com caminho de saída relativo errado parou no
+  `writeFileSync` e deixou 8 Chromes vivos (o fechamento não roda depois da exceção) → caminho de
+  saída sempre absoluto; o `foto-conta` passou a fechar o Chrome em qualquer erro (conferido com
+  uma saída numa pasta que não existe). Depois de um erro de captura, ainda assim, `ps` nos
+  Chromes com `--user-data-dir=/tmp/foto-conta-*` e matar pelo PID.

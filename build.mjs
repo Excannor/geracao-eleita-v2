@@ -51,19 +51,46 @@ console.log('primeiros dias:', Object.keys(conteudo.primeirosDias.dias).length, 
 // Os módulos do app são concatenados na ordem do nome do arquivo: 01 antes de 02.
 const pastaApp = src('app');
 const modulos = readdirSync(pastaApp).filter((f) => f.endsWith('.js')).sort();
-// Os comentários de linha inteira ("// ...") são a documentação do código: ficam no fonte e
-// saem do app entregue (uns 80 KB do index.html, que tem teto de 1 MB). Só a linha inteira
-// sai, nunca um pedaço dela, e nada dentro de um texto entre crases de várias linhas (a
-// contagem de crases das linhas de código diz quando se está dentro de um).
-const enxugarJs = (codigo) => {
+// O que é só para quem lê o fonte sai do app entregue (o index.html tem teto de 1 MB):
+// - os comentários de linha inteira ("// ...", uns 80 KB) e os de bloco que começam numa
+//   linha e terminam no fim de outra ("/* ... */"), a documentação do código;
+// - o recuo do começo de cada linha e as linhas em branco: fora de um texto,
+//   espaço no começo da linha não muda nada em JavaScript (a quebra de linha, que conta para
+//   a inserção automática de ponto e vírgula, fica).
+// Nada dentro de um texto entre crases de várias linhas muda (lá o recuo e a linha em branco
+// são texto): a contagem de crases das linhas de código diz quando se está dentro de um, e
+// um módulo que termine "dentro" de um texto para o build (a contagem se perdeu). Nenhuma
+// linha do app termina em "\" (texto continuado na linha seguinte): o build confere.
+// Os comentários de bloco, o recuo e as linhas em branco somavam 83 KB (o JS foi de 719 para
+// 636 KB em 03/10/2026, e a folga do index.html de 42 para 123 KB, sem mudar o que a pessoa
+// vê). A equivalência se prova com ferramentas/provar-enxugar.mjs (o acorn monta a árvore
+// sintática do fonte e do enxugado e as compara; rode ao mexer aqui); a CSP não muda de regra, porque os hashes saem do index.html na subida.
+const enxugarJs = (codigo, arquivo) => {
   let dentroDeCrases = false;
-  return codigo.split('\n').filter((linha) => {
-    const comentario = !dentroDeCrases && /^\s*\/\//.test(linha);
-    if (!comentario && (linha.match(/`/g) || []).length % 2) dentroDeCrases = !dentroDeCrases;
-    return !comentario;
-  }).join('\n');
+  let dentroDeBloco = false;
+  const saida = [];
+  for (const linha of codigo.split('\n')) {
+    if (dentroDeBloco) {
+      if (/\*\/\s*$/.test(linha)) dentroDeBloco = false;
+      else if (linha.includes('*/')) throw new Error(arquivo + ': comentário de bloco que termina no meio de uma linha');
+      continue;
+    }
+    if (!dentroDeCrases) {
+      if (/^\s*\/\//.test(linha) || /^\s*$/.test(linha)) continue;
+      if (/^\s*\/\*/.test(linha)) {
+        const fim = linha.indexOf('*/', linha.indexOf('/*') + 2);
+        if (fim < 0) { dentroDeBloco = true; continue; }
+        if (/^\s*$/.test(linha.slice(fim + 2))) continue;
+      }
+      if (/\\$/.test(linha)) throw new Error(arquivo + ': linha que termina em "\\" (o enxugamento do build não a trata)');
+    }
+    saida.push(dentroDeCrases ? linha : linha.replace(/^\s+/, ''));
+    if ((linha.match(/`/g) || []).length % 2) dentroDeCrases = !dentroDeCrases;
+  }
+  if (dentroDeCrases || dentroDeBloco) throw new Error(arquivo + ': a contagem de crases ou de comentários se perdeu no enxugamento');
+  return saida.join('\n');
 };
-const js = modulos.map((f) => '/* ' + f + ' */\n' + enxugarJs(readFileSync(join(pastaApp, f), 'utf8'))).join('\n');
+const js = modulos.map((f) => '/* ' + f + ' */\n' + enxugarJs(readFileSync(join(pastaApp, f), 'utf8'), f)).join('\n');
 console.log('módulos:', modulos.join(', '));
 
 // As fontes vêm embutidas em src/fontes.css, mas saem do index.html para arquivos próprios
