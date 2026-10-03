@@ -8,7 +8,7 @@
     "original": "Μᾶρκος",
     "transliteracao": "Markos",
     "traducao": "consagrado a Marte",
-    "texto": "Marcos é a forma grega de Marcus, um nome latino muito comum na época. Ele vem de Marte, o deus romano da guerra. Curioso: o próprio livro não traz esse nome em nenhum versículo."
+    "texto": "Marcos é a forma grega de Marcus, um nome latino muito comum na época. Ele vem de Marte, o deus romano da guerra. Curioso: o nome Marcos não aparece em nenhum versículo do livro."
   },
   "autoria": {
     "texto": "Em nenhum lugar o autor diz o próprio nome. Mas ele conversa com quem está lendo. No meio de um discurso de Jesus, ele para e avisa: “que o leitor entenda o que isso quer dizer”. Ele também explica os nomes que cita. Quando Jesus chama Tiago e João de Boanerges, o autor completa: “que quer dizer ‘filhos do trovão’”.",
@@ -21,7 +21,7 @@
     "desenho": "pena-e-rolo"
   },
   "raiz": {
-    "texto": "Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”",
+    "texto": "Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma coisa que Marcos disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”",
     "apoio": "Jesus mesmo explica a que veio: “não está aqui para ser servido, mas para servir os outros e dar a sua vida a fim de salvar a muitos”. A última coisa que Marcos conta é Jesus sendo levado para os céus. Os discípulos saem pregando por toda parte, e o Senhor confirma a mensagem deles com milagres.",
     "refs": [
       "Mc 1.1",
@@ -77,7 +77,7 @@
           "ref": "Mc 4.26-32"
         },
         {
-          "texto": "Na travessia, cai uma tempestade, e o barco começa a encher de água. E Jesus? Dorme na popa, com a cabeça numa almofada. Os discípulos o acordam aos gritos, e ele repreende o vento e manda o mar se calar. Aí eles se perguntam: “Quem é este, que até os ventos e as ondas lhe obedecem?”",
+          "texto": "Na travessia, cai uma tempestade, e o barco começa a encher de água. Jesus dorme na popa, com a cabeça numa almofada. Os discípulos o acordam aos gritos, e ele repreende o vento e manda o mar se calar. Aí eles se perguntam: “Quem é este, que até os ventos e as ondas lhe obedecem?”",
           "ref": "Mc 4.35-41"
         },
         {
@@ -105,7 +105,7 @@
           "ref": "Mc 6.7-13"
         },
         {
-          "texto": "Herodes diz que Jesus é João, “o homem cuja cabeça cortei”, ressuscitado dos mortos. Ele mesmo tinha mandado prender o Batista, que dizia ser errado viver com a mulher do irmão. Na festa de aniversário dele, a filha de Herodias entra dançando e agrada a todos. Mandada pela mãe, ela pede a cabeça de João Batista numa bandeja, e o rei, para não quebrar o juramento, manda cortar.",
+          "texto": "Herodes diz que Jesus é João, “o homem cuja cabeça cortei”, ressuscitado dos mortos. Ele mesmo tinha mandado prender o Batista, que dizia ser errado viver com a mulher do irmão. Na festa de aniversário dele, a filha de Herodias entra dançando e agrada a todos. Ela consulta a mãe e volta pedindo a cabeça de João Batista numa bandeja. O rei, para não quebrar o juramento, manda cortar.",
           "ref": "Mc 6.16-28"
         },
         {
@@ -137,7 +137,7 @@
           "ref": "Mc 8.27-33"
         },
         {
-          "texto": "Jesus chama o povo e os discípulos. Quem quiser ser seguidor dele precisa pôr de lado os próprios interesses e tomar a cruz nos ombros. Quem insiste em salvar a própria vida acaba perdendo. E ele pergunta: “qual é o proveito que um homem tira se ele ganhar o mundo inteiro e perder a sua alma?”",
+          "texto": "Jesus chama o povo e os discípulos. Para ir com ele, diz, é preciso pôr de lado os próprios interesses e tomar a cruz nos ombros. Quem insiste em salvar a própria vida vai perdê-la, e só a salva quem a entrega por causa dele e da boa notícia. E pergunta: “qual é o proveito que um homem tira se ele ganhar o mundo inteiro e perder a sua alma?”",
           "ref": "Mc 8.34-36"
         },
         {
@@ -149,7 +149,7 @@
           "ref": "Mc 9.17-27"
         },
         {
-          "texto": "Chega um homem correndo. Ele se ajoelha diante de Jesus e pergunta o que fazer para receber a vida eterna. Ele diz que guarda os mandamentos desde a mocidade. Jesus olha para ele com amor e diz que falta só uma coisa: vender tudo, dar o dinheiro aos pobres e vir atrás dele. O homem fica contrariado e vai embora triste, “porque era muito rico”.",
+          "texto": "Chega um homem correndo. Ele se ajoelha diante de Jesus e pergunta o que fazer para receber a vida eterna. Diz que guarda os mandamentos desde a mocidade. Jesus olha para ele com amor e diz que falta só uma coisa: vender tudo, dar o dinheiro aos pobres e vir atrás dele. O homem fica contrariado e vai embora triste, “porque era muito rico”.",
           "ref": "Mc 10.17-22"
         },
         {
@@ -196,7 +196,7 @@
         }
       ],
       "jesus": {
-        "texto": "Essa pedra é Jesus, e Pedro explica isso na primeira carta dele. Lá Cristo é a pedra viva que os homens rejeitaram. E a mesma Escritura volta: ele é “a pedra que foi rejeitada pelos construtores”, agora a parte mais importante do edifício.",
+        "texto": "Essa pedra é Jesus. Pedro, na primeira carta dele, chama Cristo de pedra viva: os homens o rejeitaram, mas para Deus ele é muito precioso. E Pedro repete a mesma Escritura que Jesus citou na vinha: “a pedra que foi rejeitada pelos construtores” virou a pedra de esquina, a parte mais importante do edifício.",
         "refs": [
           "1Pe 2.4",
           "1Pe 2.7"
@@ -322,7 +322,7 @@
       "ref": "Mc 15.21"
     },
     {
-      "texto": "José de Arimateia, membro do Sinédrio, toma coragem e pede a Pilatos o corpo de Jesus. Pilatos custa a acreditar que ele já morreu e chama o centurião para confirmar. Só então libera o corpo. José compra um lençol de linho, envolve Jesus e o põe num sepulcro aberto na rocha.",
+      "texto": "José de Arimateia, membro do Sinédrio, toma coragem e pede a Pilatos o corpo de Jesus. Pilatos custa a acreditar que ele já morreu e chama o soldado romano encarregado para confirmar. Só então libera o corpo. José compra um lençol de linho, envolve Jesus e o põe num sepulcro aberto na rocha.",
       "ref": "Mc 15.43-46"
     },
     {
@@ -331,7 +331,7 @@
     }
   ],
   "procure": {
-    "texto": "“Imediatamente.” Marcos adora essa palavra. Dois irmãos deixam o pai Zebedeu no barco “imediatamente” e vão atrás de Jesus, e a palavra volta muitas vezes, até a noite da prisão. Marque cada vez que ela aparecer e repare na pressa com que Marcos conta tudo.",
+    "texto": "“Imediatamente.” Dois irmãos deixam o pai Zebedeu no barco “imediatamente” e vão atrás de Jesus. Marcos escreve essa palavra quinze vezes, a última na noite da prisão, quando o galo canta pela segunda vez e Pedro lembra do aviso de Jesus. Marque cada uma e repare na pressa com que Marcos conta tudo.",
     "ref": "Mc 1.20"
   }
 }

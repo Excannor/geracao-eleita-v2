@@ -874,3 +874,7 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   alta), o `checar-mapa` barra as construções mais fáceis, e os 11 mapas são reescritos um a um
   antes de qualquer mapa novo. O revisor de mapa lê cada parágrafo em voz alta, não só confere
   referência.
+- 2026-10-03 · git · Enquanto um agente reescrevia `marcos.json`, os commits da skill usaram
+  `git add -A` e levaram o mapa pela metade (b604bc5) sem rodar a bateria → com agente editando
+  arquivo no mesmo worktree, `git add` só com os caminhos do próprio passo, nunca `-A`; e todo
+  commit que leva conteúdo roda `node build.mjs && node teste.mjs` antes.
