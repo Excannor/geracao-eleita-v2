@@ -883,3 +883,6 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   ele voltando para o céu" é gente falando → o teste é a boca, não a gramática; o checador deixou de
   barrar "fecha/abre com". E citação longa da NBV no meio do parágrafo trava a fala ("a fim de salvar
   a muitos"): vira paráfrase em palavras nossas; aspas só quando as palavras exatas são o soco.
+- 2026-10-03 · mapas · A voz humana puxou gíria: "Jesus não enrola" (destaque de Mc 14.61-62) e o
+  dono barrou → palavra do dia a dia sim, gíria e tom de piada sobre Jesus e Deus não; regra no
+  cartão e na skill. O revisor lê também o registro, não só os vícios.

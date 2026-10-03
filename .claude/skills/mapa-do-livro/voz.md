@@ -66,6 +66,10 @@ notar", "no fim das contas", emoji.
   dar a vida por muita gente", sem aspas, com a referência garantindo a fidelidade. Citação longa
   (mais de umas 12 palavras) no meio de um parágrafo é paráfrase; galho pode guardar uma fala
   curta de Jesus. Quando citar, é texto exato da NBV.
+- **Humano não é gíria.** Palavra do dia a dia, sim ("bate de frente", "muita gente"); gíria, tom
+  de piada ou de esperteza sobre Jesus, Deus ou o texto, não ("Jesus não enrola" saiu em Marcos,
+  dono, 03/10: "Jesus não enrola?"; virou "Jesus responde na hora"). É alguém da célula falando
+  de quem ele adora: direto, com respeito.
 - **Humano não é inventivo.** A voz puxa cor ("dramático", "a multidão em choque"); espanto só do
   que o texto traz.
 
