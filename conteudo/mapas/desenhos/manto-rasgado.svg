@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o manto rasgado (1Sm 15.27-28): Saul agarra a ponta do manto de Samuel e ela rasga. Túnica longa de mangas largas, com a faixa na cintura (camisa de manga justa, ou aberta com gola, virava blusa de hoje). O canto de baixo à direita saiu, com a beira em dentes igual à do rasgo, afastado e girado. A faixa sálvia fica só na cintura. -->
+<path class="k p" d="M50 12H70L98 22L112 54L96 58L90 42L95 72L89 77L93 83L86 87L89 93L83 97L85 106H20L30 42L24 58L8 54L22 22Z"/>
+<path class="k p" d="M95 72L89 77L93 83L86 87L89 93L83 97L85 106H101Z" transform="translate(9 0) rotate(10 95 90)"/>
+<path class="k" d="M50 12C52 19 68 19 70 12"/>
+<path class="s" d="M28.6 56H92.5L93.3 63H27.6Z"/>
+<path class="k" d="M28.6 56H92.5M27.6 63H93.3"/>
+<path class="h" d="M40 68L37 102M52 68L51 102M66 68L67 102M80 68L82 94M44 24L42 50M76 24L78 50"/>
+</svg>

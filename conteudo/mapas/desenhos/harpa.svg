@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a harpa de Davi (1Sm 16.23): quando o espírito maligno perturba Saul, Davi toca e Saul se acalma. Harpa de mão: os dois braços sobem da caixa e se abrem até a travessa com as cravelhas; as cordas descem da travessa até o cavalete na caixa. Os braços vão antes da caixa, para o papel dela cobrir as pontas. A caixa é a única área sálvia. -->
+<path class="k p" d="M41 80C37 62 27 46 31 27L37 27C35 46 45 62 47 80Z"/>
+<path class="k p" d="M79 80C83 62 93 46 89 27L83 27C85 46 75 62 73 80Z"/>
+<path class="k p" d="M24 21H96V27H24Z"/>
+<path class="k" d="M30 21V17M42 21V17M54 21V17M66 21V17M78 21V17M90 21V17"/>
+<path class="k s" d="M36 82C36 77 40 76 46 76H74C80 76 84 77 84 82V96C84 101 80 102 74 102H46C40 102 36 101 36 96Z"/>
+<path class="h" d="M48 27V85M54 27V85M60 27V85M66 27V85M72 27V85"/>
+<path class="k p" d="M45 85H75V89H45Z"/>
+<ellipse class="k e" cx="60" cy="95" rx="5" ry="2.5"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o arco e as flechas dos filisteus que acertam Saul no monte Gilboa (1Sm 31.3): o arco curvo em pé, com a corda esticada e uma flecha armada, solto no ar como num emblema (com o chão e uma flecha caída, o arco parecia em pé sozinho e a flecha boiava). A ponta da flecha armada é a única área sálvia. -->
+<path class="k p" d="M40 14C70 30 70 82 40 98C64 80 64 32 40 14Z"/>
+<path class="k" d="M40 14V98"/>
+<path class="k" d="M40 56H96"/>
+<path class="k s" d="M96 51L108 56L96 61Z"/>
+<path class="k" d="M40 56L32 50M40 56L32 62M46 56L38 50M46 56L38 62"/>
+</svg>

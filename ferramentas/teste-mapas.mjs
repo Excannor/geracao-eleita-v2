@@ -292,7 +292,7 @@ for (const slug of indice.publicados) {
     await av('location.hash = "#/explorar"');
     await dormir(300);
     await av('location.hash = "#/mapa/' + slug + '"');
-    const abriu = await esperar('document.querySelectorAll(".mapa .mapa-ramo").length === ' + n + ' && document.querySelector(".mapa-nome").textContent === ' + JSON.stringify(m.nome));
+    const abriu = await esperar('document.querySelectorAll(".mapa .mapa-ramo").length === ' + n + ' && document.querySelector(".mapa-nome").textContent.replace(/\\s/g, " ") === ' + JSON.stringify(m.nome));
     await dormir(700);
     const desenhosNaTela = await av('[...document.querySelectorAll(".mapa .desenho svg")].filter((s) => s.querySelector("path, circle, ellipse")).length');
     const setas = await av('document.querySelectorAll(".mapa svg.seta").length');

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a arca na carroça nova (1Sm 6.7-12): o baú com a tampa em dois degraus (as asas dos querubins viraram garra e livro aberto nas tentativas, e saíram); a vara passa pelas argolas; a carroça de tábuas sobre a roda grande e o cabeçalho que vai até a canga das vacas. O chão vai primeiro, e a roda encosta nele. O baú é a única área sálvia. -->
+<path class="k" d="M6 98H114"/>
+<path class="k" d="M94 70L110 62"/>
+<path class="k" d="M106 56L114 68"/>
+<path class="k s" d="M34 44H80V68H34Z"/>
+<path class="k p" d="M31 38H83V44H31Z"/>
+<path class="k p" d="M36 32H78V38H36Z"/>
+<path class="h" d="M40 35H74"/>
+<path class="k p" d="M22 54H92V57H22Z"/>
+<circle class="k p" cx="42" cy="55.5" r="3"/>
+<circle class="k p" cx="72" cy="55.5" r="3"/>
+<path class="h" d="M40 62H74"/>
+<path class="k p" d="M16 68H98V76H16Z"/>
+<path class="h" d="M28 68V76M44 68V76M70 68V76M86 68V76"/>
+<circle class="k p" cx="57" cy="84" r="14"/>
+<circle class="k e" cx="57" cy="84" r="3.5"/>
+<path class="k" d="M57 80.5V71M57 87.5V97M53.5 84H44M60.5 84H70M54.5 81.5L48 75M59.5 86.5L66 93M59.5 81.5L66 75M54.5 86.5L48 93"/>
+</svg>

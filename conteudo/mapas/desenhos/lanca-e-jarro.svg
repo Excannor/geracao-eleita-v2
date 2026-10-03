@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a lança e o jarro de água de Saul (1Sm 26.7, 12): a lança fincada no chão perto da cabeça do rei e o jarro ao lado. O chão vai primeiro; a lança para nele (passando da linha, cortava o chão) e o jarro pousa nele. A água no jarro é a única área sálvia. -->
+<path class="k" d="M6 100C30 97 90 97 114 100"/>
+<path class="k" d="M41.6 98L51 35"/>
+<path class="k p" d="M49 32C44 24 46 14 55 4C61 14 60 24 55 32Z"/>
+<path class="k p" d="M48 32H56V35H48Z"/>
+<path class="h" d="M54 10L52 28"/>
+<path class="k p" d="M80 50H96V56C96 60 106 66 106 80C106 92 98 98 88 98C78 98 70 92 70 80C70 66 80 60 80 56Z"/>
+<path class="k" d="M78 50H98"/>
+<path class="k" d="M96 58C106 54 110 62 104 70"/>
+<path class="s" d="M71 76H105V82H71Z"/>
+<path class="k" d="M71 76H105M71 82H105"/>
+<path class="h" d="M76 88C82 92 94 92 100 88"/>
+</svg>

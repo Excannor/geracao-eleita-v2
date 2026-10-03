@@ -1,0 +1,377 @@
+{
+  "nome": "1 Samuel",
+  "grupo": "Históricos",
+  "numero": 9,
+  "capitulos": 31,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "שְׁמוּאֵל",
+    "transliteracao": "Shemuel",
+    "traducao": "nome de Deus",
+    "texto": "Em hebraico, shem quer dizer nome, e El quer dizer Deus. Shemuel é o nome do menino que Ana pediu ao Senhor."
+  },
+  "autoria": {
+    "texto": "Samuel escreve num livro os direitos e as obrigações de um rei e põe esse livro num lugar especial, diante do Senhor. Quem escreveu 1 Samuel não deixa o nome em lugar nenhum. Ele conta que, em outros tempos, quem ia consultar Deus em Israel dizia “Vamos ao vidente”, porque o profeta era chamado assim.",
+    "apoio": "Aquis dá a Davi a cidade de Ziclague, e o autor diz que ela é dos reis de Judá até hoje. Então ele escreve no tempo em que Judá tem reis.",
+    "refs": [
+      "1Sm 9.9",
+      "1Sm 10.25",
+      "1Sm 27.6"
+    ],
+    "desenho": "rolo-amarrado"
+  },
+  "raiz": {
+    "texto": "1 Samuel vai de uma mulher que chora porque não tem filhos até um rei morto no monte Gilboa. No meio, o povo pede um rei para ser igual às outras nações. Deus dá Saul. Depois rejeita Saul e escolhe um dos filhos de Jessé, o que cuida das ovelhas.",
+    "apoio": "Samuel olha para Eliabe e tem certeza de que o Senhor escolheu esse. O Senhor diz a Samuel: “o homem vê a aparência exterior, mas o Senhor examina os pensamentos e as intenções do coração”.",
+    "refs": [
+      "1Sm 1.10",
+      "1Sm 8.19-20",
+      "1Sm 16.6-7",
+      "1Sm 31.8"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Ana e Samuel",
+      "sub": "Ana pede e o Senhor chama",
+      "desenho": "lamparina-acesa",
+      "galhos": [
+        {
+          "texto": "Elcana tem duas mulheres, Penina e Ana. Penina tem filhos, e Ana não tem nenhum. Todo ano, em Siló, Penina provoca Ana até ela chorar e perder a vontade de comer. Elcana pergunta: “Será que eu não sou melhor para você do que dez filhos?”",
+          "ref": "1Sm 1.2, 7-8"
+        },
+        {
+          "texto": "No Tabernáculo, Ana faz um voto. Se o Senhor der a ela um filho, ela vai dedicar o menino ao Senhor, e ninguém vai cortar o cabelo dele. Eli vê a boca de Ana se mexer sem som nenhum e pensa que ela está bêbada.",
+          "ref": "1Sm 1.9, 11-13"
+        },
+        {
+          "texto": "Ana tem um menino e põe nele o nome de Samuel. Quando ele desmama, Ana leva Samuel a Siló e diz a Eli: “Pedi ao Senhor que me desse este filho, e ele atendeu ao meu pedido”. Agora ela entrega o filho ao Senhor pela vida inteira.",
+          "ref": "1Sm 1.20, 24-28"
+        },
+        {
+          "texto": "Os filhos de Eli são homens maus e não amam o Senhor. Quando alguém oferece sacrifício, um empregado deles enfia um garfo de três dentes na panela. O sacerdote fica com tudo o que vem no garfo. Às vezes o empregado quer a carne crua, antes de queimarem a gordura no altar.",
+          "ref": "1Sm 2.12-15"
+        },
+        {
+          "texto": "Samuel dorme no templo, perto da arca. O Senhor chama Samuel, e ele corre ao quarto de Eli, três vezes. Na terceira, Eli entende que é o Senhor. Quando o Senhor chama de novo, Samuel responde: “Fale, o seu servo está ouvindo!”",
+          "ref": "1Sm 3.3-10"
+        },
+        {
+          "texto": "O Senhor diz a Samuel que vai julgar a família de Eli para sempre, por causa dos filhos. De manhã, Samuel tem medo de contar. Eli insiste, e Samuel conta tudo. Eli responde: “Ele é o Senhor; que ele faça segundo a sua vontade”.",
+          "ref": "1Sm 3.13-18"
+        }
+      ],
+      "conexao": "Israel inteiro sabe que Samuel é profeta (1Sm 3.20), e os israelitas saem à guerra contra os filisteus (1Sm 4.1)."
+    },
+    {
+      "titulo": "A arca tomada",
+      "sub": "A arca volta numa carroça",
+      "desenho": "carroca-com-a-arca",
+      "galhos": [
+        {
+          "texto": "Os filisteus vencem uma batalha e matam uns quatro mil israelitas. Os anciãos mandam buscar a arca da aliança em Siló e dizem que, com ela ali, o Senhor vai salvar o povo. Quando a arca chega, os israelitas gritam tão alto que o chão treme.",
+          "ref": "1Sm 4.2-5"
+        },
+        {
+          "texto": "Na segunda batalha, os filisteus tomam a arca e matam os dois filhos de Eli. Eli tem noventa e oito anos e espera notícias à beira da estrada. Quando o mensageiro fala da arca, Eli cai da cadeira para trás e morre com o pescoço quebrado.",
+          "ref": "1Sm 4.10-11, 13-18"
+        },
+        {
+          "texto": "No templo de Dagom, os filisteus põem a arca ao lado da estátua. De manhã, Dagom está caído de cara no chão diante da arca. Eles levantam a estátua. Na outra manhã, Dagom está no chão de novo, e a cabeça e as mãos estão caídas na porta.",
+          "ref": "1Sm 5.2-4"
+        },
+        {
+          "texto": "Os sacerdotes filisteus mandam pôr a arca numa carroça nova, com duas vacas que acabaram de dar cria. Os bezerros ficam presos no curral. As vacas seguem direto pela estrada, mugindo, e não viram nem para a direita nem para a esquerda.",
+          "ref": "1Sm 6.2, 7, 10-12"
+        },
+        {
+          "texto": "Enquanto Samuel oferece um cordeiro, os filisteus atacam. O Senhor troveja do céu, e os filisteus entram em pânico. Samuel coloca uma pedra entre Mispá e Sem e chama ela de Ebenézer. Ele diz: “Até aqui o Senhor nos ajudou!”",
+          "ref": "1Sm 7.9-10, 12"
+        }
+      ],
+      "conexao": "Samuel fica velho e põe os filhos como juízes. Os dois têm cobiça por dinheiro e são corruptos (1Sm 8.1-3)."
+    },
+    {
+      "titulo": "Queremos um rei",
+      "sub": "Saul é ungido e rejeitado",
+      "desenho": "manto-rasgado",
+      "galhos": [
+        {
+          "texto": "Os chefes de Israel vão a Ramá e pedem um rei a Samuel. Samuel não gosta do pedido e ora. O Senhor responde: “é a mim que rejeitam, não a você”. Mesmo assim, o Senhor manda dar um rei ao povo.",
+          "ref": "1Sm 8.4-7"
+        },
+        {
+          "texto": "As jumentas do pai de Saul se perdem, e Saul passa três dias atrás delas. Um dia antes, o Senhor avisa Samuel que vai mandar um homem de Benjamim para ele ungir. Quando Saul chega, Samuel diz que as jumentas já foram encontradas.",
+          "ref": "1Sm 9.3, 15-16, 20"
+        },
+        {
+          "texto": "Samuel derrama um vaso de azeite na cabeça de Saul e fala: “o Senhor ungiu você para ser o líder de Israel”. Quando Saul vira as costas para ir embora, Deus muda o coração dele.",
+          "ref": "1Sm 10.1, 9"
+        },
+        {
+          "texto": "Em Gilgal, Saul espera Samuel sete dias. Os soldados começam a ir embora, e Saul oferece o sacrifício sem Samuel. Quando Saul termina, Samuel chega e fala: “Você agiu como um tolo!”",
+          "ref": "1Sm 13.7-10, 13"
+        },
+        {
+          "texto": "Saul tem ordem de destruir os amalequitas por completo. Ele poupa o rei Agague e o melhor das ovelhas e dos bois. Samuel chega e pergunta que balido de ovelhas é esse. Saul diz que os animais são para o Senhor, e Samuel responde: “Obedecer é muito melhor do que sacrificar”.",
+          "ref": "1Sm 15.3, 9, 14-15, 22"
+        },
+        {
+          "texto": "Quando Samuel se vira para ir embora, Saul agarra o manto dele e rasga. Samuel diz: “Também o Senhor hoje rasgou de você o reino de Israel”. Deus já deu o reino a outro, melhor do que Saul.",
+          "ref": "1Sm 15.27-28"
+        }
+      ],
+      "conexao": "Samuel lamenta a sorte de Saul (1Sm 15.35) até o Senhor mandar ele a Belém, à casa de Jessé (1Sm 16.1)."
+    },
+    {
+      "titulo": "Davi e Golias",
+      "sub": "O pastor derruba o gigante",
+      "desenho": "harpa",
+      "galhos": [
+        {
+          "texto": "Sete filhos de Jessé passam diante de Samuel, e o Senhor não escolhe nenhum. Jessé manda buscar o mais novo, que está com as ovelhas. Quando Davi chega, o Senhor diz: “É este o escolhido”. Samuel derrama o azeite na cabeça dele, ali no meio dos irmãos.",
+          "ref": "1Sm 16.10-13"
+        },
+        {
+          "texto": "O Espírito do Senhor sai de Saul. Agora um espírito maligno atormenta Saul, e os servos procuram um bom tocador de harpa. Saul manda chamar Davi. Toda vez que Saul fica perturbado, Davi toca, e o espírito maligno vai embora.",
+          "ref": "1Sm 16.14-19, 23"
+        },
+        {
+          "texto": "Os filisteus têm um guerreiro de Gate chamado Golias, com dois metros e noventa. A haste da lança dele parece o eixo de um tear. Golias grita para o exército de Israel: “Mandem um homem que venha lutar comigo!” Saul e os soldados tremem de medo.",
+          "ref": "1Sm 17.4, 7, 10-11"
+        },
+        {
+          "texto": "Saul diz que Davi é jovem demais para lutar. Davi conta que, quando um leão ou um urso pega um cordeiro do rebanho, ele vai atrás e tira da boca do bicho. “O Senhor que me salvou das garras do leão e do urso me salvará das mãos desse filisteu!”, diz Davi.",
+          "ref": "1Sm 17.33-37"
+        },
+        {
+          "texto": "Davi escolhe cinco pedras lisas no riacho e vai até Golias com a funda na mão. Golias zomba porque Davi é muito jovem. Davi responde: “eu venho contra você em nome do Senhor dos Exércitos”. Uma pedra da funda acerta a testa de Golias, e ele cai.",
+          "ref": "1Sm 17.40, 42, 45, 49"
+        },
+        {
+          "texto": "O filho de Saul se chama Jônatas, e ele ama Davi como a si mesmo. Os dois fazem uma aliança, e Jônatas dá a capa e a espada para Davi.",
+          "ref": "1Sm 18.1, 3-4"
+        }
+      ],
+      "jesus": {
+        "texto": "Um anjo diz a Maria que ela vai ter um filho e chamar o menino de Jesus. O Senhor Deus vai dar a ele o trono do seu antepassado Davi, e o Reino dele nunca vai acabar. O rei da família de Davi que vai reinar para sempre é Jesus.",
+        "refs": [
+          "Lc 1.31-33"
+        ]
+      },
+      "conexao": "As mulheres cantam: “Saul matou milhares, e Davi matou dezenas de milhares!” Saul fica com ciúmes (1Sm 18.7-9)."
+    },
+    {
+      "titulo": "Fuga no deserto",
+      "sub": "Davi tem Saul na mão e poupa",
+      "desenho": "lanca-e-jarro",
+      "galhos": [
+        {
+          "texto": "Saul está em casa com a lança na mão enquanto Davi toca harpa. Saul atira a lança em Davi. Davi desvia, e ela fica fincada na parede. Naquela noite, Davi foge pela janela com a ajuda de Mical, a mulher dele.",
+          "ref": "1Sm 19.9-12"
+        },
+        {
+          "texto": "Jônatas leva um moço ao campo e atira uma flecha para além dele. Jônatas grita: “A flecha está adiante de você!” É o sinal combinado para Davi fugir. Davi sai do esconderijo, e os dois se abraçam e choram.",
+          "ref": "1Sm 20.22, 35-37, 41"
+        },
+        {
+          "texto": "Davi vive escondido no deserto. Saul vai atrás dele todo dia, mas o Senhor não deixa os dois se encontrarem. Em Horesa, Jônatas vai ver Davi e fala: “Você vai ser o rei de Israel, e serei o segundo abaixo de você”.",
+          "ref": "1Sm 23.14-17"
+        },
+        {
+          "texto": "Saul entra numa caverna para fazer as necessidades, e Davi e os homens dele estão escondidos lá dentro. Davi chega com todo o cuidado e corta a barra do manto de Saul. Lá fora, Davi mostra o pedaço do manto. Saul chora alto e fala a Davi: “Você é um homem melhor do que eu”.",
+          "ref": "1Sm 24.3-4, 8, 11, 16-17"
+        },
+        {
+          "texto": "Nabal tem três mil ovelhas e não quer dar nada aos homens de Davi. Davi pega a espada e sai com quatrocentos homens. Abigail é a mulher de Nabal, e ela encontra Davi no caminho com os jumentos carregados de comida. Davi diz a ela: “Que você seja abençoada por me impedir de matar esse homem”.",
+          "ref": "1Sm 25.2-3, 10-13, 18-20, 33"
+        },
+        {
+          "texto": "De noite, Davi e Abisai entram no acampamento e acham Saul dormindo, com a lança fincada no chão perto da cabeça. Abisai quer atravessar Saul com a lança num golpe só. Davi não deixa, e os dois levam embora a lança e o jarro de água. Ninguém acorda.",
+          "ref": "1Sm 26.7-12"
+        }
+      ],
+      "conexao": "Davi pensa que um dia Saul vai pegar ele e se esconde na terra dos filisteus (1Sm 27.1-2)."
+    },
+    {
+      "titulo": "O fim de Saul",
+      "sub": "Saul morre no monte Gilboa",
+      "desenho": "arco-e-flecha",
+      "galhos": [
+        {
+          "texto": "Saul vê o exército dos filisteus e treme de medo. O Senhor não dá resposta, nem por sonhos nem pelos profetas. Saul tinha expulsado os médiuns do país. Agora ele se disfarça e pede a uma mulher que faça Samuel subir.",
+          "ref": "1Sm 28.3, 5-8, 11"
+        },
+        {
+          "texto": "Quando a mulher vê Samuel, ela solta um grito: “O senhor é Saul!” Ela descreve um velho que sobe enrolado num manto, e Saul se curva com o rosto no chão.",
+          "ref": "1Sm 28.12-14"
+        },
+        {
+          "texto": "Samuel diz a Saul que o Senhor tirou o reino das mãos dele e deu a Davi. Samuel ainda avisa: “amanhã, você e seus filhos estarão aqui comigo”. Saul cai estendido no chão, sem forças, porque não comeu nada o dia todo.",
+          "ref": "1Sm 28.17, 19-20"
+        },
+        {
+          "texto": "Davi chega a Ziclague e acha a cidade queimada. Os amalequitas levaram todo mundo, até as duas esposas de Davi. Os homens falam em apedrejar Davi, e o Senhor dá forças a ele. Davi vai atrás do bando e traz tudo de volta, sem faltar nada.",
+          "ref": "1Sm 30.1-2, 5-6, 9, 18-19"
+        },
+        {
+          "texto": "No monte Gilboa, os filisteus matam Jônatas e dois irmãos dele. Os arqueiros acertam Saul. Ele quer morrer pela espada do escudeiro, mas o moço tem medo. Então Saul se joga sobre a ponta da espada.",
+          "ref": "1Sm 31.1-4"
+        },
+        {
+          "texto": "Os filisteus cortam a cabeça de Saul e amarram o corpo no muro de uma cidade. Os guerreiros de Jabes viajam a noite inteira e tiram do muro os corpos de Saul e dos filhos. Eles enterram os restos debaixo de um carvalho e jejuam sete dias.",
+          "ref": "1Sm 31.9-13"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Ana termina a oração falando de um rei muito antes de o povo pedir um. Ela diz que o Senhor “dará grande glória ao seu ungido”. No livro de Atos, Pedro diz ao povo que Samuel e os outros profetas falaram do que está acontecendo agora (At 3.12, 24). Pedro está falando de Jesus, que o povo negou e Deus ressuscitou dos mortos (At 3.13-15).",
+    "ref": "1Sm 2.10",
+    "desenho": "vaso-de-azeite",
+    "pares": [
+      {
+        "at": "1Sm 2.5",
+        "texto": "Os que tinham muito, agora passam fome; Os que passavam fome, agora têm alimento.",
+        "nt": "Lc 1.53",
+        "nota": "Maria canta que Deus satisfaz os famintos e manda os ricos embora de mãos vazias"
+      },
+      {
+        "at": "1Sm 13.14",
+        "texto": "O Senhor já encontrou um homem segundo o seu coração, e já o indicou líder de seu povo",
+        "nt": "At 13.22",
+        "nota": "Deus afasta Saul do trono e diz que Davi é um homem de acordo com o seu coração"
+      },
+      {
+        "at": "1Sm 21.6",
+        "texto": "Então, já que não havia outro alimento disponível, o sacerdote deu a Davi os pães sagrados",
+        "nt": "Mt 12.3-4",
+        "nota": "Jesus lembra o dia em que Davi e os amigos estavam com fome e comeram os pães da Presença"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Ana pede um filho e Samuel ouve o Senhor",
+      "de": 1,
+      "ate": 3
+    },
+    {
+      "titulo": "A arca na terra dos filisteus",
+      "de": 4,
+      "ate": 7
+    },
+    {
+      "titulo": "O povo pede um rei",
+      "de": 8,
+      "ate": 12
+    },
+    {
+      "titulo": "Saul desobedece",
+      "de": 13,
+      "ate": 15
+    },
+    {
+      "titulo": "Davi enfrenta Golias",
+      "de": 16,
+      "ate": 17
+    },
+    {
+      "titulo": "Jônatas protege Davi",
+      "de": 18,
+      "ate": 20
+    },
+    {
+      "titulo": "Davi foge de Saul",
+      "de": 21,
+      "ate": 27
+    },
+    {
+      "titulo": "A médium e o monte Gilboa",
+      "de": 28,
+      "ate": 31
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Todo ano, a mãe de Samuel faz uma túnica e leva para ele em Siló. O Senhor abençoa Ana, e ela tem mais três filhos e duas filhas.",
+      "ref": "1Sm 2.19, 21"
+    },
+    {
+      "texto": "A nora de Eli entra em trabalho de parto quando sabe que os filisteus tomaram a arca. Antes de morrer, ela diz: “Chamem o menino de Icabode, pois acabou a glória de Israel”.",
+      "ref": "1Sm 4.19, 21"
+    },
+    {
+      "texto": "Os sacerdotes filisteus mandam devolver a arca com cinco tumores e cinco ratos feitos de ouro. É um de cada para cada governante filisteu.",
+      "ref": "1Sm 6.4"
+    },
+    {
+      "texto": "A carroça para no campo de um homem chamado Josué, e o povo que colhe trigo no vale grita de alegria. Depois o Senhor mata setenta homens dali, porque olharam dentro da arca.",
+      "ref": "1Sm 6.13-14, 19"
+    },
+    {
+      "texto": "Em Mispá, o povo tira água do poço e derrama diante do Senhor. Eles jejuam o dia todo e dizem: “Temos pecado contra o Senhor”.",
+      "ref": "1Sm 7.6"
+    },
+    {
+      "texto": "Samuel faz o sorteio das tribos e das famílias, e o nome que sai é Saul. Só que ninguém encontra ele. O Senhor diz que Saul está escondido no meio da bagagem. Quando ele fica de pé no meio do povo, os mais altos chegam só no ombro dele.",
+      "ref": "1Sm 10.20-23"
+    },
+    {
+      "texto": "Naás cerca a cidade de Jabes com o exército de Amom e quer arrancar o olho direito de todos os moradores. O Espírito de Deus toma conta de Saul. Ele corta dois bois e manda os pedaços por todo o Israel.",
+      "ref": "1Sm 11.1-2, 6-7"
+    },
+    {
+      "texto": "Na colheita do trigo, quando não chove, Samuel ora, e o Senhor manda trovões e chuva no mesmo dia. O povo fica com medo do Senhor e de Samuel.",
+      "ref": "1Sm 12.17-18"
+    },
+    {
+      "texto": "Os filisteus não deixam ter ferreiro em Israel. Para afiar um arado, o israelita tem de ir aos ferreiros filisteus. No dia da batalha, só Saul e Jônatas têm espada e lança.",
+      "ref": "1Sm 13.19-22"
+    },
+    {
+      "texto": "Saul jura que ninguém come nada antes da noite. Jônatas não sabe da ordem e prova o mel na ponta da vara. Saul quer matar o filho, mas o povo não deixa.",
+      "ref": "1Sm 14.24, 27, 43-45"
+    },
+    {
+      "texto": "Davi experimenta a armadura de Saul, com capacete de bronze e couraça. Ele mal consegue andar e tira tudo.",
+      "ref": "1Sm 17.38-39"
+    },
+    {
+      "texto": "Saul quer que Davi morra na luta e pede como dote cem filisteus mortos. Davi e os homens dele matam duzentos, e Saul tem de dar a filha Mical em casamento.",
+      "ref": "1Sm 18.25-27"
+    },
+    {
+      "texto": "Mical põe a imagem do lar na cama, com um travesseiro de pelo de cabra na cabeceira. Ela diz aos soldados de Saul que Davi está doente. Quando eles entram para levar Davi, só acham a imagem.",
+      "ref": "1Sm 19.13-16"
+    },
+    {
+      "texto": "Davi foge para perto de Samuel, em Ramá. Saul manda soldados atrás dele, e eles começam a profetizar. A mesma coisa acontece com mais dois grupos. Saul vai até lá e fica um dia e uma noite deitado, profetizando diante de Samuel.",
+      "ref": "1Sm 19.18-24"
+    },
+    {
+      "texto": "Em Gate, Davi tem medo do rei Aquis e se finge de louco. Ele arranha as portas da cidade e deixa a saliva escorrer pela barba. Aquis pergunta aos homens se já não tem malucos de sobra por ali.",
+      "ref": "1Sm 21.12-15"
+    },
+    {
+      "texto": "Saul manda matar os sacerdotes de Nobe porque ajudaram Davi, e os soldados se recusam. Doegue é edomita e mata oitenta e cinco sacerdotes. Só Abiatar escapa e foge para junto de Davi.",
+      "ref": "1Sm 22.17-20"
+    },
+    {
+      "texto": "Na manhã seguinte, Abigail conta a Nabal o que aconteceu. O coração dele fica como uma pedra, e dez dias depois o Senhor mata Nabal.",
+      "ref": "1Sm 25.37-38"
+    },
+    {
+      "texto": "Os homens de Davi acham um moço egípcio no campo. Ele está há três dias sem comer e sem beber. Depois de comer bolo de figo e passas, o moço leva Davi até o acampamento dos amalequitas.",
+      "ref": "1Sm 30.11-12, 16"
+    },
+    {
+      "texto": "Duzentos homens ficam cansados demais e não vão à luta. Na volta, alguns querem deixar esses homens sem nada. Davi manda dividir igual entre quem luta e quem fica com a bagagem, e faz disso uma lei para Israel até hoje.",
+      "ref": "1Sm 30.21-25"
+    }
+  ],
+  "procure": {
+    "texto": "Na caverna, Davi diz que não vai estender a mão contra o ungido do Senhor. Ele chama Saul assim mais quatro vezes, na caverna e no acampamento. Sublinhe cada uma. Nas duas cenas, Saul está nas mãos de Davi e sai vivo.",
+    "ref": "1Sm 24.6"
+  }
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o livro que Samuel escreve e põe diante do Senhor (1Sm 10.25): um rolo enrolado, deitado em diagonal, com a folha enrolada nas duas pontas e uma fita amarrada no meio; o nó e as duas pontas da fita caem para baixo. A fita é a única área sálvia. -->
+<g transform="rotate(-24 60 60)">
+<path class="k p" d="M22 48H98V72H22Z"/>
+<ellipse class="k p" cx="98" cy="60" rx="5" ry="12"/>
+<ellipse class="k" cx="98" cy="60" rx="1.8" ry="5"/>
+<ellipse class="k p" cx="22" cy="60" rx="5" ry="12"/>
+<ellipse class="k" cx="22" cy="60" rx="1.8" ry="5"/>
+<path class="h" d="M30 52H52M30 66H50M70 52H90M72 66H90"/>
+<path class="k s" d="M56 48H64V72H56Z"/>
+</g>
+<path class="k" d="M62 69C58 73 60 78 55 82M66 69C68 73 66 78 71 81"/>
+<circle class="k e" cx="64" cy="67" r="3"/>
+</svg>

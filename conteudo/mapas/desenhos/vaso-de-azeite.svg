@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o vaso de azeite derramado na cabeça do ungido (1Sm 2.10; 10.1; 16.13): o vaso virado, com a boca para baixo e à direita, e as gotas de azeite caindo em fila da boca. Fica sobre o disco do cartão escuro: tudo cabe num círculo de raio uns 50 em volta de (60,60). A faixa do vaso é a única área sálvia. -->
+<g transform="translate(-10 -8) rotate(125 52 56)">
+<path class="k p" d="M44 24H60V31C60 35 72 40 72 56C72 70 64 78 52 78C40 78 32 70 32 56C32 40 44 35 44 31Z"/>
+<path class="k" d="M42 24H62"/>
+<path class="s" d="M33 52H71V59H33Z"/>
+<path class="k" d="M33 52H71M33 59H71"/>
+<path class="h" d="M38 66C44 71 60 71 66 66"/>
+</g>
+<path class="k p" d="M70 72C67 77 67 81 70 82C73 81 73 77 70 72Z"/>
+<path class="k p" d="M72 84C69 89 69 93 72 94C75 93 75 89 72 84Z"/>
+<path class="k p" d="M74 96C71 100 71 103 74 104C77 103 77 100 74 96Z"/>
+</svg>
