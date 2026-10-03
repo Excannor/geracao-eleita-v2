@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a porta do curral das ovelhas (Jo 10.1, 9): o muro baixo de pedras com a entrada no meio, os dois postes e a trave de madeira, a porta aberta para fora e, pela entrada, o pasto em sálvia -->
+<path class="s" d="M52 46H70V98H52Z"/>
+<path class="k p" d="M10 98V64L14 60H48V98Z"/>
+<path class="k p" d="M74 98V60H106L110 64V98Z"/>
+<path class="h" d="M10 74H48M10 86H48M24 60V74M40 60V74M18 74V86M34 74V86M26 86V98M42 86V98M74 72H110M74 85H110M84 60V72M100 60V72M90 72V85M106 72V85M82 85V98M98 85V98"/>
+<path class="k p" d="M46 42H52V98H46Z"/>
+<path class="k p" d="M70 42H76V98H70Z"/>
+<path class="k p" d="M40 36H82V42H40Z"/>
+<path class="h" d="M49 46V94M73 46V94M44 39H78"/>
+<path class="k p" d="M70 47L58 52V99L70 96Z"/>
+<path class="h" d="M62 51V97M66 49V97M58 62L70 58M58 86L70 84"/>
+<path class="k" d="M8 98H52M70 98H112"/>
+</svg>

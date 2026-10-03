@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os cinco pães de cevada e os dois peixes do rapaz (Jo 6.9): os pães redondos em pirâmide, três na frente e dois atrás, com os cortes em cima; os dois peixes deitados embaixo, um para cada lado, um deles em sálvia -->
+<path class="k p" d="M34 56C34 42 60 42 60 56Z"/>
+<path class="h" d="M41 52l3 -4M46 52l3 -4M51 52l3 -4"/>
+<path class="k p" d="M60 56C60 42 86 42 86 56Z"/>
+<path class="h" d="M67 52l3 -4M72 52l3 -4M77 52l3 -4"/>
+<path class="k p" d="M21 69C21 55 47 55 47 69Z"/>
+<path class="h" d="M28 65l3 -4M33 65l3 -4M38 65l3 -4"/>
+<path class="k p" d="M47 69C47 55 73 55 73 69Z"/>
+<path class="h" d="M54 65l3 -4M59 65l3 -4M64 65l3 -4"/>
+<path class="k p" d="M73 69C73 55 99 55 99 69Z"/>
+<path class="h" d="M80 65l3 -4M85 65l3 -4M90 65l3 -4"/>
+<path class="k p" d="M36 82L25 75C28 80 28 84 25 89Z"/>
+<path class="k s" d="M34 82C46.5 72 70 72 84 82C70 92 46.5 92 34 82Z"/>
+<path class="h" d="M73 76C70 80 70 84 73 88M49 79c2 2 2 4 0 6M56.5 79c2 2 2 4 0 6M64 79c2 2 2 4 0 6"/>
+<circle class="e" cx="78" cy="80" r="1.6"/>
+<path class="k p" d="M84 99L95 92C92 97 92 101 95 106Z"/>
+<path class="k p" d="M86 99C73.5 89 50 89 36 99C50 109 73.5 109 86 99Z"/>
+<path class="h" d="M47 93C50 97 50 101 47 105M71 96c-2 2 -2 4 0 6M63.5 96c-2 2 -2 4 0 6M56 96c-2 2 -2 4 0 6"/>
+<circle class="e" cx="42" cy="97" r="1.6"/>
+</svg>

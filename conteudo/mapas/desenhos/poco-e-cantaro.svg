@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o poço de Jacó e o cântaro que a samaritana deixa ao lado dele (Jo 4.6, 28): o poço de pedra em fiadas, com a boca escura de poço fundo, e o cântaro em sálvia no chão, à direita, sem encostar no poço -->
+<path class="k" d="M10 96H112"/>
+<path class="k p" d="M16 50V86A30 9 0 0 0 76 86V50"/>
+<ellipse class="k p" cx="46" cy="50" rx="30" ry="9"/>
+<ellipse class="k e" cx="46" cy="50" rx="22" ry="5.5"/>
+<path class="h" d="M16 64A30 9 0 0 0 76 64M16 76A30 9 0 0 0 76 76"/>
+<path class="h" d="M31 59V70.6M61 59V70.6M22 70.6V80.2M46 74.2V83.8M70 70.6V80.2M34 85.4V93M58 85.4V93"/>
+<path class="k s" d="M91 62H99V66C99 68 97 68 97 70C104 72 108 78 108 85C108 92 102 96 95 96C88 96 82 92 82 85C82 78 86 72 93 70C93 68 91 68 91 66Z"/>
+<path class="k" d="M89 62H101"/>
+<path class="h" d="M85 82C91 85 99 85 105 82"/>
+</svg>

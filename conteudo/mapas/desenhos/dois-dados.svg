@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os dados que os soldados jogam para ver quem fica com a túnica sem costura (Jo 19.24, Sl 22.18): dois cubos vistos de cima, o da frente apoiado na frente do outro, com os pontos em cada face; a face de cima do maior em sálvia. Tudo cabe num círculo de raio 54 em volta de (60,60): a ponta mais longe (a quina de baixo do dado menor) fica a uns 49 do centro -->
+<path class="k p" d="M39 34L63 45L39 56L15 45Z"/>
+<path class="s" d="M39 34L63 45L39 56L15 45Z"/>
+<path class="k" d="M39 34L63 45L39 56L15 45Z"/>
+<path class="k p" d="M15 45L39 56V82L15 71Z"/>
+<path class="k p" d="M39 56L63 45V71L39 82Z"/>
+<ellipse class="e" cx="39" cy="45" rx="3" ry="1.6"/>
+<ellipse class="e" cx="21" cy="55" rx="2.2" ry="2.2"/><ellipse class="e" cx="33" cy="72.5" rx="2.2" ry="2.2"/>
+<ellipse class="e" cx="45" cy="59.5" rx="2.2" ry="2.2"/><ellipse class="e" cx="51" cy="63.5" rx="2.2" ry="2.2"/><ellipse class="e" cx="57" cy="67.5" rx="2.2" ry="2.2"/>
+<path class="k p" d="M82 60L100 68L82 76L64 68Z"/>
+<path class="k p" d="M64 68L82 76V96L64 88Z"/>
+<path class="k p" d="M82 76L100 68V88L82 96Z"/>
+<ellipse class="e" cx="74.8" cy="68" rx="2" ry="1.2"/><ellipse class="e" cx="82" cy="71.2" rx="2" ry="1.2"/><ellipse class="e" cx="82" cy="64.8" rx="2" ry="1.2"/><ellipse class="e" cx="89.2" cy="68" rx="2" ry="1.2"/>
+<ellipse class="e" cx="73" cy="82" rx="1.8" ry="2"/>
+<ellipse class="e" cx="87" cy="79.6" rx="1.8" ry="2"/><ellipse class="e" cx="95" cy="85.4" rx="1.8" ry="2"/>
+</svg>

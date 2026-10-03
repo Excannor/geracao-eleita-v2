@@ -1,0 +1,368 @@
+{
+  "nome": "João",
+  "grupo": "Evangelhos e Atos",
+  "numero": 43,
+  "capitulos": 21,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἰωάννης",
+    "transliteracao": "Iōannēs",
+    "traducao": "o Senhor é gracioso",
+    "texto": "Ioannes é a forma grega do nome hebraico Yohanan. Ele junta o nome do Senhor com a palavra graça. No livro, João é o homem que batiza no Jordão e também o pai de Simão Pedro."
+  },
+  "autoria": {
+    "texto": "Depois da pesca, Pedro se vira e vê o discípulo que Jesus ama seguindo os dois. É o mesmo que se inclinou para perto de Jesus na ceia e perguntou quem ia trair. No fim, ele se apresenta: “Eu sou aquele discípulo!”",
+    "apoio": "Ele diz que é testemunha do que escreveu. Se tudo o que Jesus fez fosse escrito, ele acha que os livros não caberiam no mundo inteiro.",
+    "refs": [
+      "Jo 21.20",
+      "Jo 21.24-25"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "João começa no princípio de tudo. Ali, aquele que é a Palavra já estava com Deus e era Deus. Um dia ele se torna um ser humano e vem morar aqui entre nós. Quem crê nele tem o direito de se tornar filho de Deus.",
+    "apoio": "Quase no fim, o autor conta por que escreveu. Ele quer que você creia que Jesus é o Cristo, o Filho de Deus, e tenha vida no nome dele.",
+    "refs": [
+      "Jo 1.1-3",
+      "Jo 1.12, 14",
+      "Jo 20.31"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Água viva",
+      "sub": "Jesus pede água no poço",
+      "desenho": "poco-e-cantaro",
+      "galhos": [
+        {
+          "texto": "João está batizando do outro lado do rio Jordão. Um dia ele vê Jesus chegando e fala: “Vejam! Aí está o Cordeiro de Deus que tira o pecado do mundo!” João conta que Jesus é bem mais importante do que ele, porque já existia muito antes dele.",
+          "ref": "Jo 1.28-30"
+        },
+        {
+          "texto": "Dois discípulos de João ouvem isso e vão atrás de Jesus. Jesus olha em volta e pergunta o que eles querem. Os dois perguntam onde ele mora, e Jesus responde: “Venham ver”. Eles ficam com Jesus das quatro horas da tarde até o anoitecer.",
+          "ref": "Jo 1.37-39"
+        },
+        {
+          "texto": "Numa festa de casamento em Caná, o vinho acaba. Ali há seis talhas de pedra, e em cada uma cabem de 80 a 120 litros. Jesus manda os empregados encherem as talhas de água e levarem um pouco ao mestre de cerimônias. O mestre de cerimônias prova a água, que já virou vinho, e chama o noivo: “Mas o senhor guardou o melhor para o fim!”",
+          "ref": "Jo 2.1-10"
+        },
+        {
+          "texto": "Nicodemos é uma autoridade religiosa dos judeus e vai falar com Jesus de noite. Jesus diz que ninguém vê o Reino de Deus sem nascer de novo. Nicodemos pergunta como um homem velho pode nascer outra vez. Jesus conta que Deus amou tanto o mundo que deu o seu Filho único, para que quem crer nele tenha a vida eterna.",
+          "ref": "Jo 3.1-4, 16"
+        },
+        {
+          "texto": "No meio do dia, Jesus está cansado da longa caminhada e senta ao lado do poço de Jacó, em Samaria. Uma samaritana vem tirar água, e Jesus pede um pouco. Ela fica surpresa, porque os judeus não se dão com os samaritanos. Jesus responde: “quem beber da água que eu dou nunca mais terá sede”.",
+          "ref": "Jo 4.5-14"
+        },
+        {
+          "texto": "Jesus manda a mulher buscar o marido, e ela diz que não tem. Jesus sabe que ela já teve cinco maridos e que vive agora com outro homem. Quando ela fala do Cristo que vai vir, Jesus responde: “Eu sou o Messias! Eu, que estou falando com você”. A mulher deixa o cântaro ao lado do poço e volta à aldeia para chamar todo mundo.",
+          "ref": "Jo 4.16-18, 25-26, 28-29"
+        }
+      ],
+      "jesus": {
+        "texto": "Os judeus pedem a Jesus um milagre que prove a autoridade dele. Jesus responde: “Destruam este santuário, e em três dias eu o levantarei!” Eles dizem que o templo levou 46 anos para ficar pronto. O santuário de que Jesus fala é o corpo dele. Quando Jesus ressuscita, os discípulos lembram dessa frase e creem.",
+        "refs": [
+          "Jo 2.18-22"
+        ]
+      },
+      "conexao": "De volta a Caná, Jesus cura de longe o filho de um funcionário do rei (Jo 4.46-53)."
+    },
+    {
+      "titulo": "Pão da vida",
+      "sub": "Um rapaz tem cinco pães",
+      "desenho": "cinco-paes-e-dois-peixes",
+      "galhos": [
+        {
+          "texto": "Muitos doentes esperam a água se mexer no tanque de Betesda, perto do portão das Ovelhas. Um deles está paralítico há 38 anos e não tem ninguém para ajudar a entrar no tanque. Jesus manda que ele pegue a maca e ande. O homem fica curado e sai andando com a maca, num sábado.",
+          "ref": "Jo 5.2-9"
+        },
+        {
+          "texto": "Os líderes judeus reclamam porque o homem carrega a maca no sábado. Depois começam a perseguir Jesus, e ele responde: “Meu Pai trabalha até agora e eu trabalho também”. Os líderes ficam com ainda mais vontade de matar Jesus, porque ele diz que Deus é o Pai dele.",
+          "ref": "Jo 5.10, 16-18"
+        },
+        {
+          "texto": "Jesus vê a multidão subindo o monte e pergunta a Filipe onde comprar pão para tanta gente. Filipe diz que nem duzentos denários bastam. André mostra um rapaz com cinco pães de cevada e dois peixes. Todo mundo come, e com as sobras os discípulos enchem 12 cestos.",
+          "ref": "Jo 6.5-13"
+        },
+        {
+          "texto": "O povo vê o milagre e diz que Jesus é o profeta que eles esperavam. Jesus percebe que eles querem fazer dele rei à força e volta sozinho para o monte.",
+          "ref": "Jo 6.14-15"
+        },
+        {
+          "texto": "Depois o povo entra nos barcos e atravessa para Cafarnaum atrás de Jesus. Eles pedem um sinal e lembram que os pais comeram o maná no deserto. Jesus responde: “Eu sou o pão da vida. Aquele que vem a mim nunca terá fome”.",
+          "ref": "Jo 6.24, 30-31, 35"
+        },
+        {
+          "texto": "Muitos discípulos acham esse ensino difícil demais e abandonam Jesus. Ele pergunta aos Doze se eles também querem ir embora. Simão Pedro responde: “Mestre, para quem iremos nós?” Pedro diz que só Jesus tem as palavras que dão a vida eterna.",
+          "ref": "Jo 6.60, 66-69"
+        }
+      ],
+      "conexao": "Na festa, Jesus chama quem tem sede para vir beber (Jo 7.37). Cedo, no outro dia, ele volta ao templo (Jo 8.2)."
+    },
+    {
+      "titulo": "Luz do mundo",
+      "sub": "Um cego de nascença enxerga",
+      "desenho": "porta-do-curral",
+      "galhos": [
+        {
+          "texto": "Os mestres da lei trazem a Jesus uma mulher apanhada em adultério. A Lei de Moisés manda apedrejar, e eles querem saber o que Jesus diz. Ele escreve na terra com o dedo e depois fala que quem estiver sem pecado atire a primeira pedra. Os homens saem um a um, e Jesus diz à mulher: “Eu também não a condeno. Vá embora e não peque mais”.",
+          "ref": "Jo 8.3-11"
+        },
+        {
+          "texto": "No templo, Jesus diz que Abraão ficou alegre ao ver o tempo da vinda dele. Os líderes perguntam como ele viu Abraão, se não tem nem cinquenta anos. Jesus responde: “A verdade é que antes de Abraão nascer, Eu Sou!” Eles pegam pedras para matar Jesus, mas ele se esconde e sai dali.",
+          "ref": "Jo 8.56-59"
+        },
+        {
+          "texto": "Jesus vê um homem que nasceu cego e diz aos discípulos: “enquanto eu ainda estiver no mundo, eu sou a luz do mundo”. Depois faz barro com saliva e passa nos olhos do homem. Jesus manda o cego se lavar no tanque de Siloé, e ele volta enxergando.",
+          "ref": "Jo 9.1-7"
+        },
+        {
+          "texto": "Os fariseus chamam o homem pela segunda vez e dizem que Jesus é pecador. O homem responde que não sabe se Jesus é pecador ou não. “...isto eu sei: eu era cego e agora vejo!” Os fariseus expulsam o homem.",
+          "ref": "Jo 9.24-25, 34"
+        },
+        {
+          "texto": "Quando Jesus sabe que expulsaram o homem, vai procurar por ele. Jesus pergunta se ele crê no Filho do Homem. O homem quer saber quem é. Jesus responde que é aquele que está falando com ele. O homem diz que crê e adora Jesus.",
+          "ref": "Jo 9.35-38"
+        },
+        {
+          "texto": "Jesus fala do curral das ovelhas. Ele diz: “Eu sou a porta”. Quem entra por ele é salvo e acha pastagens verdes. Ele também diz que é o bom Pastor e que dá a vida pelas ovelhas. Já o empregado foge quando vê o lobo chegando.",
+          "ref": "Jo 10.1, 9-12"
+        }
+      ],
+      "conexao": "Jesus diz que tem autoridade para entregar a vida e tomar de novo (Jo 10.18). Lázaro está doente (Jo 11.1)."
+    },
+    {
+      "titulo": "A ressurreição",
+      "sub": "Lázaro sai do sepulcro",
+      "desenho": "folhas-de-palmeira",
+      "galhos": [
+        {
+          "texto": "Marta e Maria mandam avisar Jesus que o amigo que ele ama está doente. Jesus ama os três irmãos, mas fica mais dois dias onde está. Depois diz que Lázaro dormiu e que vai acordar o amigo. Os discípulos não entendem, e Jesus fala claro: “Lázaro está morto”.",
+          "ref": "Jo 11.3-6, 11-14"
+        },
+        {
+          "texto": "Jesus está chegando, e Marta vai até ele. Ela diz que, se Jesus estivesse ali, o irmão não teria morrido. Jesus responde: “Eu sou a ressurreição e a vida”. Ele diz que quem crê nele vai viver, mesmo que morra. Marta crê que Jesus é o Cristo, o Filho de Deus.",
+          "ref": "Jo 11.20-27"
+        },
+        {
+          "texto": "Maria cai aos pés de Jesus e diz o mesmo que a irmã. Jesus vê Maria e os judeus chorando e fica muito perturbado. Ele pergunta onde puseram Lázaro, e eles respondem: “Venha ver, Senhor”. Jesus chora.",
+          "ref": "Jo 11.32-35"
+        },
+        {
+          "texto": "Jesus manda tirar a pedra do sepulcro, e Marta avisa que o irmão está morto há quatro dias. Depois Jesus grita bem alto: “Lázaro, venha para fora!” Lázaro sai com faixas de linho nas mãos e nos pés e um pano em volta do rosto.",
+          "ref": "Jo 11.39-44"
+        },
+        {
+          "texto": "Uma multidão pega folhas de palmeiras e sai para encontrar Jesus. O povo grita: “Bendito é o Rei de Israel!” Muita gente vai porque ouviu falar de Lázaro. Os fariseus dizem uns aos outros que todo mundo vai atrás de Jesus.",
+          "ref": "Jo 12.12-13, 17-19"
+        },
+        {
+          "texto": "Alguns gregos que vieram para a festa pedem a Filipe: “Senhor, nós queremos ver a Jesus”. Filipe e André levam o pedido a Jesus. Ele fala de um grão de trigo. Se não cai na terra e não morre, o grão fica sozinho. Se morre, produz muitos grãos novos.",
+          "ref": "Jo 12.20-22, 24"
+        }
+      ],
+      "jesus": {
+        "texto": "Caifás é o sumo sacerdote naquele ano. Ele diz aos outros que é melhor morrer um homem só pelo povo do que a nação inteira. Essa frase não vem dele. Como sumo sacerdote, Caifás profetiza que Jesus vai morrer pela nação e para reunir os filhos de Deus espalhados pelo mundo.",
+        "refs": [
+          "Jo 11.49-52"
+        ]
+      },
+      "conexao": "Jesus avisa que a luz vai brilhar só mais um pouco (Jo 12.35). Antes da Páscoa, ama os seus até o fim (Jo 13.1)."
+    },
+    {
+      "titulo": "Até o fim",
+      "sub": "Jesus lava os pés na ceia",
+      "desenho": "bacia-e-toalha",
+      "galhos": [
+        {
+          "texto": "Na ceia, Jesus se levanta e prende uma toalha na cintura. Ele põe água numa bacia e começa a lavar os pés dos discípulos. Pedro não quer deixar. Jesus diz que, se não lavar, Pedro não vai ter parte com ele. Depois Jesus manda os discípulos lavarem os pés uns dos outros, como ele fez.",
+          "ref": "Jo 13.4-8, 14-15"
+        },
+        {
+          "texto": "Jesus fica triste e avisa que um dos discípulos vai trair. Ele molha um pedaço de pão e dá a Judas. Quando Judas come o pão, Satanás entra nele, e Jesus diz: “O que você vai fazer, faça depressa”. Judas sai e desaparece na noite.",
+          "ref": "Jo 13.21, 26-27, 30"
+        },
+        {
+          "texto": "Depois que Judas sai, Jesus dá aos discípulos um mandamento novo. Eles devem amar uns aos outros como Jesus amou. Pedro diz que está pronto a morrer por ele. Jesus responde que, antes de o galo cantar, Pedro vai negar três vezes.",
+          "ref": "Jo 13.31, 34-38"
+        },
+        {
+          "texto": "Tomé diz que eles não sabem para onde Jesus vai, nem o caminho. Jesus responde: “Eu sou o Caminho, a Verdade e a Vida”. Depois Filipe pede para ver o Pai, e Jesus diz que quem olha para ele já vê o Pai.",
+          "ref": "Jo 14.5-9"
+        },
+        {
+          "texto": "Jesus diz: “Eu sou a videira verdadeira, e meu Pai é o lavrador”. Ele conta que o Pai corta o ramo que não dá fruto e poda os outros, para produzirem ainda mais. Os discípulos são os ramos, e separados de Jesus não podem fazer coisa alguma.",
+          "ref": "Jo 15.1-5"
+        },
+        {
+          "texto": "Em oração, Jesus pede ao Pai que proteja os discípulos do Maligno. Ele ora também por quem vai crer no futuro por causa deles. Ele pede que todos sejam um, para que o mundo creia que o Pai enviou Jesus.",
+          "ref": "Jo 17.9, 15, 20-21"
+        }
+      ],
+      "conexao": "Os discípulos vão deixar Jesus sozinho (Jo 16.32). Judas conhece o bosque aonde ele vai (Jo 18.1-2)."
+    },
+    {
+      "titulo": "Tudo consumado",
+      "sub": "Jesus chama Maria pelo nome",
+      "desenho": "coroa-de-espinhos",
+      "galhos": [
+        {
+          "texto": "Os soldados chegam ao bosque com tochas e armas. Jesus vai até eles e pergunta quem procuram. Eles dizem que procuram Jesus de Nazaré, e ele responde: “Sou eu”. Os homens recuam e caem no chão.",
+          "ref": "Jo 18.3-6"
+        },
+        {
+          "texto": "Pilatos manda açoitar Jesus. Os soldados põem uma coroa de espinhos na cabeça dele e vestem nele um manto vermelho. Pilatos leva Jesus para fora e fala aos judeus: “Aqui está o homem!” Os sacerdotes principais gritam para crucificar.",
+          "ref": "Jo 19.1-6"
+        },
+        {
+          "texto": "Na cruz, Jesus sabe que tudo terminou e diz que está com sede. Os que estão ali põem uma esponja com vinho azedo num caniço e levam até a boca dele. Jesus prova o vinho e fala: “Está tudo consumado”. Depois inclina a cabeça e entrega o espírito.",
+          "ref": "Jo 19.28-30"
+        },
+        {
+          "texto": "Maria Madalena chora do lado de fora do sepulcro. Ela vê Jesus em pé, mas não reconhece e pensa que é o guarda do jardim. Jesus diz o nome dela: “Maria!” Ela se vira e chama Jesus de Rabôni, que quer dizer Mestre.",
+          "ref": "Jo 20.11, 14-16"
+        },
+        {
+          "texto": "Quando os outros contam que viram Jesus, Tomé diz que só vai acreditar se puser o dedo nas marcas dos cravos. Oito dias depois, Jesus aparece de novo, com as portas trancadas, e manda Tomé pôr o dedo nas mãos dele. Tomé diz: “Meu Senhor e meu Deus!” Jesus chama de felizes os que não viram e mesmo assim creram.",
+          "ref": "Jo 20.24-29"
+        },
+        {
+          "texto": "Depois da refeição, Jesus pergunta a Pedro: “Simão, filho de João, você me ama mais do que estes outros?” Jesus repete a pergunta, e na terceira vez Pedro fica triste. A cada resposta, Jesus manda Pedro cuidar das ovelhas dele. Depois diz a Pedro que vá atrás dele.",
+          "ref": "Jo 21.15-17, 19"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Isaías teve uma visão da glória de Jesus e falou dele. Jesus diz aos líderes que as Escrituras falam dele (Jo 5.39). No túmulo vazio, os discípulos ainda não entendem que, pelas Escrituras, Jesus tinha de ressuscitar (Jo 20.9).",
+    "ref": "Jo 12.41",
+    "desenho": "dois-dados",
+    "pares": [
+      {
+        "at": "Sl 69.9",
+        "texto": "O grande zelo que tenho pela sua casa me consome.",
+        "nt": "Jo 2.15-17",
+        "nota": "No templo, Jesus faz um chicote de cordas e vira as mesas"
+      },
+      {
+        "at": "Is 53.1",
+        "texto": "Quem creu naquilo que nós anunciamos? A quem foi revelado o poder do Senhor?",
+        "nt": "Jo 12.37-38",
+        "nota": "Muita gente vê os milagres e mesmo assim não crê"
+      },
+      {
+        "at": "Sl 41.9",
+        "texto": "Até meu melhor amigo, em quem eu confiava, me traiu! Quantas e quantas vezes nós comemos juntos!",
+        "nt": "Jo 13.18",
+        "nota": "Na ceia, Jesus diz que um dos que comem com ele vai trair"
+      },
+      {
+        "at": "Sl 22.18",
+        "texto": "Repartiram entre si as minhas roupas e lançaram sorte para ver quem ficava com a minha capa.",
+        "nt": "Jo 19.23-24",
+        "nota": "Os soldados jogam os dados pela túnica sem costura"
+      },
+      {
+        "at": "Zc 12.10",
+        "texto": "...todos olharão para aquele a quem atravessaram com a lança.",
+        "nt": "Jo 19.34, 37",
+        "nota": "Um soldado fura o lado de Jesus, e sai sangue com água"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "A Palavra vem ao mundo",
+      "de": 1,
+      "ate": 1
+    },
+    {
+      "titulo": "Os primeiros sinais",
+      "de": 2,
+      "ate": 4
+    },
+    {
+      "titulo": "Jesus e os líderes",
+      "de": 5,
+      "ate": 10
+    },
+    {
+      "titulo": "Lázaro sai do sepulcro",
+      "de": 11,
+      "ate": 12
+    },
+    {
+      "titulo": "A última noite com os discípulos",
+      "de": 13,
+      "ate": 17
+    },
+    {
+      "titulo": "A cruz",
+      "de": 18,
+      "ate": 19
+    },
+    {
+      "titulo": "Jesus está vivo",
+      "de": 20,
+      "ate": 21
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Filipe conta a Natanael que encontrou o Messias, e que ele é de Nazaré. Natanael pergunta: “Pode vir alguma coisa boa de lá?” Jesus diz que viu Natanael debaixo da figueira antes de Filipe chamar. Natanael responde que Jesus é o Filho de Deus, o Rei de Israel.",
+      "ref": "Jo 1.45-49"
+    },
+    {
+      "texto": "Os discípulos de João reclamam que agora todo mundo vai atrás de Jesus. João responde que é o amigo do noivo e que está cheio de alegria. Ele diz que precisa diminuir, enquanto Jesus fica cada vez maior.",
+      "ref": "Jo 3.26-30"
+    },
+    {
+      "texto": "Na época da Festa dos Tabernáculos, os irmãos de Jesus dizem que ele deve ir para a Judeia e se mostrar a todos. Nem os irmãos dele creem nele.",
+      "ref": "Jo 7.2-5"
+    },
+    {
+      "texto": "Os guardas do templo voltam aos sacerdotes principais sem trazer Jesus. Os sacerdotes perguntam por quê, e os guardas respondem: “Nós nunca ouvimos alguém falar assim”.",
+      "ref": "Jo 7.45-46"
+    },
+    {
+      "texto": "Jesus decide voltar para a Judeia, e os discípulos lembram que os líderes de lá tentaram apedrejar ele. Tomé diz aos outros: “Vamos até lá para morrermos com o Mestre”.",
+      "ref": "Jo 11.7-8, 16"
+    },
+    {
+      "texto": "Maria derrama um perfume caro de nardo nos pés de Jesus e enxuga com os cabelos. Judas Iscariotes reclama que o perfume vale trezentos denários e devia ser vendido para ajudar os pobres. Judas não liga para os pobres. Ele cuida da caixa dos discípulos e é ladrão.",
+      "ref": "Jo 12.3-6"
+    },
+    {
+      "texto": "Os sacerdotes principais resolvem matar Lázaro também, porque muitos judeus creem em Jesus por causa dele.",
+      "ref": "Jo 12.10-11"
+    },
+    {
+      "texto": "Jesus diz a Pilatos que veio ao mundo para testemunhar da verdade. Pilatos pergunta: “Que é a verdade?” Depois sai e diz ao povo que não acha nada contra Jesus.",
+      "ref": "Jo 18.37-38"
+    },
+    {
+      "texto": "Pilatos prega em cima da cruz uma tabuleta escrita em hebraico, latim e grego. Os sacerdotes principais pedem que ele mude a tabuleta, e Pilatos responde: “O que escrevi, escrevi”.",
+      "ref": "Jo 19.19-22"
+    },
+    {
+      "texto": "Perto da cruz estão três mulheres chamadas Maria, e uma é a mãe de Jesus. O discípulo que Jesus ama está junto dela. Jesus diz à mãe: “Aí está o seu filho”. O discípulo leva Maria para a casa dele.",
+      "ref": "Jo 19.25-27"
+    },
+    {
+      "texto": "O homem que tinha ido ver Jesus de noite volta no enterro. Nicodemos traz uns trinta e quatro quilos de perfume de mirra e aloés. Ele e José de Arimateia enrolam o corpo de Jesus num pano de linho com esses perfumes.",
+      "ref": "Jo 19.38-40"
+    },
+    {
+      "texto": "Pedro e o outro discípulo correm até o sepulcro. O outro chega primeiro, mas não entra. Pedro entra e vê as faixas de linho e o pano da cabeça de Jesus enrolado e posto de lado. O outro discípulo entra depois, vê e crê.",
+      "ref": "Jo 20.3-8"
+    },
+    {
+      "texto": "Os discípulos pescam a noite toda e não pegam nada. De manhã, Jesus manda jogar a rede do lado direito do barco. Pedro arrasta a rede para a praia com 153 peixes grandes, e ela não rebenta.",
+      "ref": "Jo 21.3-11"
+    }
+  ],
+  "procure": {
+    "texto": "Em Jerusalém, os líderes tentam prender Jesus, mas ninguém põe a mão nele, porque a hora dele ainda não chegou. Em Caná, Jesus já tinha dito à mãe que a hora dele ainda não chegou. Quando uns gregos querem ver Jesus, ele diz que a hora chegou. Siga essa palavra pelo livro até a última noite com os discípulos.",
+    "ref": "Jo 7.30"
+  }
+}

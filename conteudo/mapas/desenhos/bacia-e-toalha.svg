@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a bacia com água e a toalha (Jo 13.4-5): a bacia larga e rasa com o pé, a água em sálvia na boca, e a toalha dobrada por cima da borda: uma aba deitada por dentro, sobre a água, e o resto caindo do lado de fora, com duas listras e as franjas embaixo -->
+<path class="k p" d="M48 84L45 92H75L72 84"/>
+<path class="k p" d="M18 60C20 78 38 86 60 86C82 86 100 78 102 60"/>
+<ellipse class="k p" cx="60" cy="60" rx="42" ry="11"/>
+<ellipse class="s" cx="61" cy="61" rx="35" ry="7.5"/>
+<path class="h" d="M50 60c4 -2 8 -2 12 0M66 63c4 -2 8 -2 12 0M40 63c3 -1.5 6 -1.5 9 0"/>
+<path class="k p" d="M29 62.5C35 61.5 44 62 51 64L48 70.5Q40 70 32 68.2Z"/>
+<path class="h" d="M37 63L36 68.5M43 63.3L42.5 69.5"/>
+<path class="k p" d="M32 68.2Q40 70 48 70.5C49 80 50 88 52 97C46 99 38 99 30 96C32 88 31 78 32 68.2Z"/>
+<path class="h" d="M38 72C39 80 38 88 37 96M44 73C45 81 45 89 46 97"/>
+<path class="h" d="M30.5 88Q41 91 51 89M30.3 91.5Q41 94.5 51.5 92.5"/>
+<path class="h" d="M32 97.5v4M36 98.5v4M40 99v4M44 99v4M48 98.5v4"/>
+</svg>
