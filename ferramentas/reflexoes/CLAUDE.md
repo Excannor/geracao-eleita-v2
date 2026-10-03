@@ -41,7 +41,10 @@ do revisor mexeu em 29% a 43% dos campos. Os erros que mais apareceram:
   "fazer algo por Deus".
 - Fala de personagem como verdade do narrador (amigos de Jó, Eliú): sempre "Elifaz acha que…".
 - Mesma pergunta em dias diferentes (o "até quando", "quem sou eu", "ajudar alguém", "o que você
-  quer dizer a Deus sobre isso"). Antes de escrever, leia as perguntas da unidade inteira.
+  quer dizer a Deus sobre isso", "hora e lugar para ficar com Deus"). Antes de escrever, leia as
+  perguntas de TODAS as unidades já publicadas, não só da sua: na Unidade 8, umas 25 perguntas
+  repetiam o ângulo das Unidades 6 e 7. Compare o ângulo, não só as palavras.
+- O modelo do dono ("o que toma o tempo e a dedicação…") é exemplo de tom; não copie ao pé da letra.
 - Pergunta que repete o texto do dia, ou que faz duas perguntas, ou que tem resposta óbvia.
 - Duas leituras do dia numa frase só. Cada leitura ganha as suas frases ("Em 2 Reis… Em Atos…").
 - Citação longa que não é o versículo-âncora: vira paráfrase.
