@@ -98,13 +98,17 @@ como se falasse), sem olhar a versão anterior, só com a folha do `rever-mapa` 
 conserte a fidelidade (nomes, números, citações da NBV exatas, referências). Nunca ao contrário:
 quem parte do texto antigo e "humaniza" mantém a estrutura de resumo. Palavras do dia a dia,
 frases curtas, cena antes de ideia, e um só "achado" por parágrafo (a coisa que faz o amigo
-levantar a sobrancelha).
+levantar a sobrancelha). Cada campo é escrito e relido em voz alta na hora, corrigido ali, e
+pronto: não se escreve o mapa inteiro para voltar revisando depois (regra do dono, 03/10: escrever
+certo uma vez custa menos que escrever e consertar).
 
 **Como revisar.** Quem revisa lê cada campo de texto (raiz, apoio, galhos, conexões, destaques,
 "[Livro] e Cristo" e notas, estrutura, curiosidades, procure, autoria, significado) em voz alta,
 um por um, com a lista dos 15 vícios ao lado, e anota o número do vício e o trecho. Um vício em
 qualquer campo devolve o mapa. A revisão de voz é separada da revisão de fidelidade: as duas são
-obrigatórias, e nenhuma substitui a outra.
+obrigatórias, e nenhuma substitui a outra. A passada de voz de outro agente é curta: só os campos
+novos contra a lista, sem reler a Bíblia (fidelidade é do `rever-mapa` e do checador). Captura de
+tela só quando muda desenho ou tela; para texto, o `teste-mapas` já mede as linhas a 390px.
 
 Antes (Marcos, reprovado):
 
