@@ -814,3 +814,12 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   app preso na abertura → reiniciar o servidor depois de todo `node build.mjs`.
 - 2026-10-02 · shell · `pkill -f` com um padrão que aparece no próprio comando mata o shell →
   matar por PID.
+- 2026-10-03 · acessibilidade · O "Comece por aqui" fechado: no Chrome o conteúdo do `<details>`
+  fechado fica só com `content-visibility: hidden`, com caixa e sem texto legível, e a varredura
+  acusava 5 links sem nome (e um "colado" falso entre um link escondido e uma pílula). Não eram
+  focáveis no Chrome, mas outro navegador pode tratar diferente → `details:not([open]) >
+  :not(summary) { display: none }` no 01-base: o fechado some de verdade em todo lugar.
+- 2026-10-03 · ferramenta · O `semear.mjs` gravava cookies vazios: o servidor passou a mandar dois
+  `set-cookie` (cc_sessao e cc_logado) e `headers.get('set-cookie')` junta os dois → ler com
+  `getSetCookie()` e ficar com o `cc_sessao` que tem valor; conferir os arquivos de cookie antes da
+  varredura.

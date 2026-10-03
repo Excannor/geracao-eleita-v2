@@ -29,8 +29,9 @@ async function api(quem, rota, corpo, metodo) {
     headers: { 'content-type': 'application/json', origin: B.replace(/\/$/, ''), cookie: cookies[quem] || '' },
     body: corpo ? JSON.stringify(corpo) : undefined,
   });
-  const sc = r.headers.get('set-cookie');
-  if (sc) cookies[quem] = sc.split(';')[0];
+  // O servidor manda dois cookies (cc_sessao e a marca cc_logado=1): fica só o crachá com valor.
+  const sessao = r.headers.getSetCookie().map((c) => c.split(';')[0]).find((c) => /^cc_sessao=./.test(c));
+  if (sessao) cookies[quem] = sessao;
   const texto = await r.text();
   let dado = {};
   try { dado = JSON.parse(texto); } catch { /* texto */ }

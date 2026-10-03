@@ -24,6 +24,10 @@ html, body {
   color: var(--tinta);
   font-variant-numeric: tabular-nums;
 }
+/* <details> fechado: o conteúdo some de verdade (sem caixa, sem foco, fora do leitor de tela).
+   O Chrome só o esconde com content-visibility, e os links do "Comece por aqui" fechado ainda
+   tinham caixa e nenhum texto legível: a varredura os acusava sem nome. */
+details:not([open]) > :not(summary) { display: none; }
 h1, h2, h3, h4 { font-family: var(--fonte); font-weight: 800; letter-spacing: -0.02em; line-height: 1.18; text-transform: none; color: var(--tinta-forte); }
 h1 { font-size: 1.75rem; }
 h2 { font-size: 1.3rem; }
