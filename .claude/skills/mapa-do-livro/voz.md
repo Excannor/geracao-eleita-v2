@@ -434,3 +434,20 @@ importante notar", "no fim das contas", "ou seja", "isso significa", "culmina", 
   caracteres com palavras longas já deu 5 linhas: mire em 115). Ele roda com a pasta `dist`
   parada: enquanto outro agente faz `node build.mjs`, o teste quebra à toa. Nenhum nome de modelo
   de IA em arquivo nenhum. Com outro agente editando no mesmo worktree, mexa só nos seus arquivos.
+
+## O filtro (dono, 03/10: "já fizemos essas revisões mais de 10 vezes")
+
+Nenhum texto do app vai ao ar com uma leitura só. Toda leva passa por quatro camadas, nesta ordem:
+
+1. **Escritor.** Escreve campo por campo pelo catálogo, relendo na hora.
+2. **Revisor cético, outro agente.** Não escreveu o texto e não vê o relatório do escritor. Lê
+   tudo em voz alta com o catálogo inteiro e procura o que passou, como os leitores que acharam os
+   600 trechos dos 11 mapas. Corrige direto e devolve a lista do que mudou. Se achar mais de um
+   vício a cada cinco campos, a leva volta para uma segunda passada do revisor.
+3. **Trava automática.** `vozDoTexto` (em `ferramentas/checar-mapa.mjs`) roda dentro do `node
+   teste.mjs` sobre os mapas, os primeiros dias, o Conhecer Jesus e as unidades de reflexão já
+   revistas (`REFLEXOES_NA_VOZ_NOVA`). Texto com vício não passa no teste e não é publicado. Toda
+   frase que o dono reprovar vira regra nela no mesmo dia, testada contra o exemplo dele.
+4. **Leitura do coordenador.** Antes de publicar, o coordenador lê amostras de cada leva (uma de
+   cada tipo de campo) e o que o escritor e o revisor marcaram como fraco. Interpretação vai
+   marcada para o pastor do dono.

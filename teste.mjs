@@ -330,6 +330,28 @@ const CC = contexto.window.CC;
   checar(livros.length === 66 && !chaveForaDasBiblias.length, 'o versículo-chave dos 66 livros vem da NBV e da Bíblia Livre'
     + (chaveForaDasBiblias.length ? ' (' + chaveForaDasBiblias.slice(0, 5).map((n) => n.nome).join(', ') + ')' : ''));
 }
+// --- a voz humana nos textos de leitura (catálogo .claude/skills/mapa-do-livro/voz.md) ---
+// Contexto, procure, guias, Conhecer Jesus e as reflexões já revistas passam pelo mesmo filtro
+// dos mapas, fora das citações. Unidade de reflexão só entra em REFLEXOES_NA_VOZ_NOVA depois de
+// escrita E revista por outra leitura; daí em diante o teste barra qualquer vício que volte.
+{
+  const { vozDoTexto } = await import('./ferramentas/checar-mapa.mjs');
+  const REFLEXOES_NA_VOZ_NOVA = [];
+  const achados = [];
+  const ver = (onde, t) => { for (const x of vozDoTexto(t)) achados.push(onde + ': ' + x); };
+  const PD = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'primeiros-dias.json'), 'utf8'));
+  for (const [k, v] of Object.entries(PD.dias)) for (const c of ['titulo', 'sub', 'contexto', 'procure', 'amanha']) if (v[c]) ver('primeiros dias ' + k + ' ' + c, v[c]);
+  for (const [k, v] of Object.entries(PD.livros)) ver('primeiros dias, livro ' + k, v);
+  for (const [k, v] of Object.entries(PD.guias)) (Array.isArray(v) ? v : [v]).forEach((g) => ver('guia ' + k, g.texto));
+  const CJ = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
+  (Array.isArray(CJ.dias) ? CJ.dias : Object.values(CJ.dias)).forEach((d, i) => { for (const c of ['abertura', 'contexto', 'procure', 'repare', 'pergunta']) if (typeof d[c] === 'string') ver('conhecer ' + (i + 1) + ' ' + c, d[c]); });
+  for (const u of REFLEXOES_NA_VOZ_NOVA) {
+    const R = JSON.parse(readFileSync(join(AQUI, 'ferramentas', 'reflexoes', 'unidade-' + String(u).padStart(2, '0') + '.json'), 'utf8'));
+    for (const [dia, lista] of Object.entries(R)) for (const r of lista) [r.titulo, r.texto, ...(r.perguntas || []), ...(r.oracao || [])].forEach((t) => ver('reflexão do dia ' + dia, t));
+  }
+  checar(achados.length === 0, 'os textos de leitura passam no catálogo de voz' + (achados.length ? ' (' + achados.length + '): ' + achados.slice(0, 4).join(' · ') : ''));
+}
+
 // --- os primeiros dias: o contexto antes de ler (conteudo/primeiros-dias.json) ---
 // O mesmo cuidado das reflexões: toda citação entre aspas existe na NBV da leitura do dia, nada
 // de travessão nem emoji, e cada guia aponta para um capítulo e versículos que existem.

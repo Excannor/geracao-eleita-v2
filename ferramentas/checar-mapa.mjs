@@ -99,6 +99,15 @@ const VOZ_BRUTA = [
   [/[!?]”\./, 'ponto depois de !” ou ?”'],
   [/\b(nenhum outro (livro|evangelho|profeta)|só neste livro|único na Bíblia|no resto da Bíblia)\b/i, 'comparação com outros livros (6.9)'],
 ];
+// Fórmulas que o dono reprovou nos textos de leitura (03/10), valem para todo texto do app.
+VOZ_BRUTA.push(
+  [/\bnão (começa|começam|vem|vêm|é|são|está|fala|pede)\b[^.;:]{2,60}, (começa|começam|vem|vêm|é|são|está|fala|pede)\b/i, '"não X, Y" de efeito (dono, 03/10)'],
+  [/\bnão é [^.,;:]{2,50}, é\b/i, '"não é X, é Y" (6.2)'],
+  [/\b[Qq]uem [^.,;:]{2,40} é quem\b/, 'clivada "quem ... é quem" (2.4)'],
+  [/\b(disputa|disputam) (com|o primeiro)\b/i, 'coisa agindo: "disputa o primeiro lugar" (dono, 03/10)'],
+  [/"/, 'aspas retas (use “ ”)'],
+  [/\bte\b[^.?!]*\bvocê\b|\bvocê\b[^.?!]*\bte\b/i, '"você" e "te" na mesma frase'],
+);
 export const VOZ = VOZ_BRUTA.map(([re, nome]) => [comAcento(re), nome]);
 // Texto que o dono escreveu ou aprovou palavra por palavra: o checador de voz não mexe nele.
 export const TEXTO_DO_DONO = [
@@ -361,4 +370,14 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   }
   console.log('');
   process.exit(falhas ? 1 : 0);
+}
+
+// Confere a voz de um texto qualquer do app (fora das citações entre “ ”). Devolve a lista de
+// vícios achados; vazia, o texto passou. Usada nos textos de leitura (teste.mjs) e pelos agentes.
+export function vozDoTexto(t) {
+  const s = String(t || '').replace(/“[^”]*”/g, '“”');
+  const achados = [];
+  for (const [re, nome] of VOZ) { const m = s.match(re); if (m) achados.push(nome + ' em "' + s.slice(Math.max(0, m.index - 20), m.index + 50).trim() + '"'); }
+  if ((s.match(/:/g) || []).length > 2) achados.push('dois-pontos demais no mesmo texto (3.1)');
+  return achados;
 }
