@@ -8,115 +8,250 @@
     "original": "יְשַׁעְיָהוּ",
     "transliteracao": "Yesha‘yahu",
     "traducao": "o Senhor salva",
-    "texto": "O nome do profeta já anuncia o final do livro."
+    "texto": "O nome junta a palavra hebraica para salvar com um pedaço do nome de Deus. Pela boca de Isaías, Deus diz a Israel que, além dele, não há outro Salvador."
   },
   "autoria": {
-    "texto": "O profeta Isaías, filho de Amoz, viu o que está no livro nos dias de quatro reis de Judá: Uzias, Jotão, Acaz e Ezequias.",
-    "apoio": "O recado vai para Judá e Jerusalém, enquanto a Assíria avança sobre os vizinhos.",
-    "refs": ["Is 1.1", "Is 36.1"],
+    "texto": "Isaías é filho de Amoz. Deus mostra a ele em visões o que vai acontecer a Judá e a Jerusalém, no tempo de quatro reis, de Uzias até Ezequias.",
+    "apoio": "Ezequias está no décimo quarto ano de reinado quando o rei da Assíria ataca Judá e conquista todas as cidades com muralha.",
+    "refs": [
+      "Is 1.1",
+      "Is 36.1"
+    ],
     "desenho": "pena-e-rolo"
   },
   "raiz": {
-    "texto": "Isaías vê o Senhor no trono, cercado de serafins que gritam “Santo, santo, santo”, e sai dali com um recado duplo para um povo que virou as costas a Deus: a queda vem, e o resgate também.",
-    "apoio": "A mesma boca que anuncia a ruína de Jerusalém promete um Servo ferido no lugar dos culpados e uma terra refeita onde o lobo come ao lado do cordeiro.",
-    "refs": ["Is 6.1-8", "Is 53.5", "Is 65.25"]
+    "texto": "Isaías vê o Senhor num trono, com serafins voando em volta. Eles gritam uns para os outros que ele é santo, e o templo treme até os alicerces. Depois Isaías fala de um Servo ferido por causa dos pecados do povo e de um monte onde o leão vai comer palha com o boi.",
+    "apoio": "No templo, Deus pergunta quem vai levar o recado ao povo. Isaías responde: “Eu irei, Senhor”.",
+    "refs": [
+      "Is 6.1-8",
+      "Is 53.5",
+      "Is 65.25"
+    ]
   },
   "ramos": [
     {
       "titulo": "O Santo no trono",
-      "sub": "Quem é o Deus que fala",
+      "sub": "Isaías vê o Senhor no templo",
       "desenho": "altar-com-brasas",
       "galhos": [
-        { "texto": "O templo treme, a fumaça sobe, e serafins de seis asas repetem três vezes a mesma palavra: santo.", "ref": "Is 6.1-4" },
-        { "texto": "Diante disso, Isaías se vê perdido, de lábios impuros, morando no meio de gente igual.", "ref": "Is 6.5" },
-        { "texto": "Uma brasa do altar encosta na boca do profeta, a culpa sai, e ele responde “Eu irei, Senhor. Envie-me!”", "ref": "Is 6.6-8" },
-        { "texto": "O escultor assa a carne com parte da lenha e faz um deus com o que sobrou. Isaías expõe o absurdo com ironia.", "ref": "Is 44.14-17" },
-        { "texto": "Esse Deus não cansa, e quem espera nele ganha força nova, como águia que sobe.", "ref": "Is 40.28-31" }
+        {
+          "texto": "No ano em que o rei Uzias morre, Isaías vê o Senhor num trono alto. Os serafins cobrem o rosto com duas asas e os pés com outras duas.",
+          "ref": "Is 6.1-4"
+        },
+        {
+          "texto": "Isaías diz que vai morrer, porque tem lábios impuros e acabou de ver o Rei.",
+          "ref": "Is 6.5"
+        },
+        {
+          "texto": "Um serafim voa até Isaías com uma brasa que tirou do altar e toca a boca dele. Depois fala: “Os seus pecados foram perdoados”.",
+          "ref": "Is 6.6-8"
+        },
+        {
+          "texto": "Isaías pergunta se o povo ainda não ouviu falar que o Criador nunca se cansa. Até os jovens se cansam e caem. Quem espera no Senhor sobe voando como as águias.",
+          "ref": "Is 40.28-31"
+        },
+        {
+          "texto": "O escultor derruba um cedro e assa carne com parte da lenha. Com o resto da madeira, ele faz um ídolo, se ajoelha e ora: “Você é o meu deus”.",
+          "ref": "Is 44.14-17"
+        }
       ],
-      "conexao": "Quem viu a santidade enxerga a doença. A brasa que limpou Isaías é o remédio que falta ao povo."
+      "conexao": "O escultor se ajoelha diante de um pedaço de madeira (Is 44.17). Deus diz que até o boi conhece o seu dono (Is 1.3)."
     },
     {
       "titulo": "Um povo doente",
-      "sub": "O diagnóstico de Judá",
+      "sub": "Deus reclama dos filhos que criou",
       "desenho": "vinha",
       "galhos": [
-        { "texto": "O boi reconhece o dono e o jumento sabe onde come. Israel esqueceu quem o criou.", "ref": "Is 1.2-3" },
-        { "texto": "Da cabeça aos pés não sobra parte sã: só feridas abertas.", "ref": "Is 1.5-6" },
-        { "texto": "Sacrifícios e festas viraram peso para Deus enquanto o órfão e a viúva ficam sem defesa.", "ref": "Is 1.11-17" },
-        { "texto": "Numa canção de amor, a vinha bem cuidada só dá uvas azedas. A vinha é o próprio Israel.", "ref": "Is 5.1-7" },
-        { "texto": "Na hora do aperto, o povo corre atrás de cavalos do Egito em vez de buscar o Santo de Israel.", "ref": "Is 31.1" }
+        {
+          "texto": "Isaías chama o céu e a terra para escutar o Senhor. Os filhos que Deus criou se revoltaram contra ele. O jumento conhece o dono da manjedoura, mas Israel não entende nada.",
+          "ref": "Is 1.2-3"
+        },
+        {
+          "texto": "Deus pergunta ao povo se ainda não cansou de apanhar. Todos estão doentes da cabeça aos pés, cheios de feridas abertas que ninguém enfaixou.",
+          "ref": "Is 1.5-6"
+        },
+        {
+          "texto": "O povo leva sacrifícios ao templo e faz festas, e Deus diz que não aguenta mais. Eles podem orar com as mãos levantadas, que ele não vai atender. Essas mãos estão sujas de sangue.",
+          "ref": "Is 1.11-17"
+        },
+        {
+          "texto": "Isaías canta uma canção sobre a vinha do seu amado. O dono tira todas as pedras e planta as melhores mudas, mas a vinha só dá uva azeda. No fim, Isaías diz que a vinha é Israel.",
+          "ref": "Is 5.1-7"
+        },
+        {
+          "texto": "Na hora do aperto, o povo corre atrás de cavalos do Egito em vez de buscar o Santo de Israel.",
+          "ref": "Is 31.1"
+        }
       ],
-      "conexao": "O juízo é o fruto da vinha azeda. A Assíria vira a vara que Deus usa."
+      "conexao": "O povo corre ao Egito atrás de cavalos. Deus avisa que a vara para castigar esse povo vai ser a Assíria (Is 10.5)."
     },
     {
       "titulo": "Juízo sobre as nações",
-      "sub": "Nenhum império escapa",
+      "sub": "A Assíria cerca Jerusalém",
       "desenho": "muralha",
       "galhos": [
-        { "texto": "A Assíria é a vara na mão de Deus, mas a vara que se acha dona da mão também será quebrada.", "ref": "Is 10.5-15" },
-        { "texto": "Babilônia, Moabe, Damasco, Egito, Tiro: um oráculo para cada potência da vizinhança.", "ref": "Is 13–23" },
-        { "texto": "Senaqueribe cerca Jerusalém e zomba do Deus de Ezequias. O rei abre a carta diante do Senhor e ora.", "ref": "Is 36–37" },
-        { "texto": "Numa só noite, cento e oitenta e cinco mil soldados assírios caem no acampamento.", "ref": "Is 37.36" },
-        { "texto": "Ezequias mostra os tesouros aos enviados da Babilônia e ouve que tudo será levado para lá.", "ref": "Is 39.5-7" }
+        {
+          "texto": "O rei da Assíria se gaba de juntar as riquezas das nações como quem pega ovos num ninho abandonado. Deus pergunta se o machado pode se achar mais forte que o lenhador.",
+          "ref": "Is 10.5-15"
+        },
+        {
+          "texto": "Numa visão, Isaías põe um vigia no alto do muro. O vigia passa dias e noites na torre. Um dia, ele vê cavaleiros em fila de dois e grita: “Ela caiu! A Babilônia caiu!”",
+          "ref": "Is 13–23"
+        },
+        {
+          "texto": "Senaqueribe manda uma carta a Ezequias. Diz que nenhum deus salvou as cidades que os reis da Assíria destruíram. Ezequias sobe ao templo e abre a carta diante do Senhor.",
+          "ref": "Is 36–37"
+        },
+        {
+          "texto": "Naquela noite, o anjo do Senhor entra no acampamento assírio e mata cento e oitenta e cinco mil soldados. De manhã, quem sobrou se levanta e vê mortos por todo lado.",
+          "ref": "Is 37.36"
+        },
+        {
+          "texto": "Isaías avisa Ezequias que um dia a Babilônia vai levar todas as riquezas do palácio. Alguns netos de Ezequias vão junto.",
+          "ref": "Is 39.5-7"
+        }
       ],
-      "conexao": "Da árvore cortada fica um toco: “a santa semente que voltará a crescer” (Is 6.13). Dali brota o consolo."
+      "conexao": "O Senhor avisa que nada vai ficar em Jerusalém (Is 39.6). Depois, manda dizer a ela que o sofrimento acabou (Is 40.2)."
     },
     {
       "titulo": "Consolo e o Servo",
-      "sub": "A virada do livro: o Servo é Jesus",
+      "sub": "Deus manda consolar o povo",
       "desenho": "cordeiro",
       "galhos": [
-        { "texto": "A segunda metade abre com uma ordem carinhosa: “Consolem, consolem o meu povo”.", "ref": "Is 40.1-2" },
-        { "texto": "Ciro aparece pelo nome, escolhido para mandar reconstruir Jerusalém.", "ref": "Is 44.28" },
-        { "texto": "O Servo é manso: não quebra o caniço rachado nem apaga a chama que quase não dá luz.", "ref": "Is 42.1-4" },
-        { "texto": "Sua missão passa de Israel: ser luz para o mundo e levar salvação a todos os habitantes da terra.", "ref": "Is 49.6" },
-        { "texto": "Ele foi ferido por causa dos nossos pecados, e o Senhor fez cair sobre ele a maldade de cada um de nós.", "ref": "Is 53.5-6" }
+        {
+          "texto": "Deus diz: “Consolem, consolem o meu povo”. Os pecados de Jerusalém estão perdoados, e ela já levou o dobro do castigo.",
+          "ref": "Is 40.1-2"
+        },
+        {
+          "texto": "O Senhor põe o seu Espírito sobre o Servo que escolheu. Esse Servo não grita na rua. Ele não quebra o caniço rachado nem apaga a chama que quase não dá luz.",
+          "ref": "Is 42.1-4"
+        },
+        {
+          "texto": "Ciro vai mandar reconstruir Jerusalém e pôr os alicerces do templo. Deus chama Ciro de “meu pastor”.",
+          "ref": "Is 44.28"
+        },
+        {
+          "texto": "Deus diz ao Servo que ele vai fazer mais do que trazer Israel de volta. Vai ser luz para o mundo e levar a salvação a todo mundo na terra.",
+          "ref": "Is 49.6"
+        },
+        {
+          "texto": "O Servo é ferido por causa dos nossos pecados. Todo mundo anda perdido como ovelha, e o Senhor faz cair sobre ele a maldade de cada um de nós.",
+          "ref": "Is 53.5-6"
+        }
       ],
       "jesus": {
-        "texto": "Esse Servo é Jesus. Filipe parte do capítulo 53 para anunciar a boa-nova dele, e o próprio Jesus diz que nele se cumpre “Ele será condenado como um criminoso”.",
-        "refs": ["At 8.32-35", "Lc 22.37"]
+        "texto": "Esse Servo é Jesus. Um eunuco lê o trecho da ovelha levada ao matadouro e pergunta a Filipe de quem Isaías está falando. Filipe começa por ali e conta a ele sobre Jesus. Jesus também diz que nele vai se cumprir outra frase do Servo: “Ele será condenado como um criminoso!”",
+        "refs": [
+          "At 8.32-35",
+          "Lc 22.37"
+        ]
       },
-      "conexao": "Com a culpa paga pelo Servo, a porta se abre: logo depois do capítulo 53 vem o convite a quem tem sede."
+      "conexao": "O Servo carrega a culpa de todos nós (Is 53.6). Depois, Deus chama quem tem sede para vir às águas (Is 55.1)."
     },
     {
       "titulo": "A terra refeita",
-      "sub": "Para onde a história vai",
+      "sub": "Deus chama todos os povos",
       "desenho": "cantaro",
       "galhos": [
-        { "texto": "Quem tem sede pode vir, e quem não tem dinheiro também: a mesa é de graça.", "ref": "Is 55.1" },
-        { "texto": "Gente de outros povos entra, e a casa de Deus passa a se chamar casa de oração para todos os povos.", "ref": "Is 56.6-7" },
-        { "texto": "O escolhido traz boas notícias aos pobres, consolo ao coração quebrantado e liberdade aos cativos.", "ref": "Is 61.1-3" },
-        { "texto": "Novos céus e nova terra, com o lobo e o cordeiro pastando juntos.", "ref": "Is 65.17, 25" }
+        {
+          "texto": "Quem não tem dinheiro também pode vir. Deus manda que venham comprar vinho e leite de graça.",
+          "ref": "Is 55.1"
+        },
+        {
+          "texto": "Deus vai levar ao seu monte santo gente de outros povos que guarda o sábado. O templo dele vai se chamar casa de oração para todos os povos.",
+          "ref": "Is 56.6-7"
+        },
+        {
+          "texto": "Alguém que o Senhor escolheu vem consolar quem está de luto em Sião. Quem tinha cinzas na cabeça vai usar uma coroa.",
+          "ref": "Is 61.1-3"
+        },
+        {
+          "texto": "Deus promete criar novos céus e nova terra, e ninguém vai lembrar do que passou. O lobo e o cordeiro vão pastar juntos.",
+          "ref": "Is 65.17, 25"
+        }
       ]
     }
   ],
   "cristo": {
-    "texto": "“Surgirá um descendente do rei Davi, filho de Jessé, como um rebento que brota de uma árvore.” O Novo Testamento abre Isaías e aponta para Jesus.",
+    "texto": "“Surgirá um descendente do rei Davi, filho de Jessé, como um rebento que brota de uma árvore.” Paulo diz que Jesus Cristo veio também para que os outros povos deem glória a Deus (Rm 15.8-9). Depois cita Isaías, que chama esse herdeiro de Jessé de rei sobre esses povos (Rm 15.12).",
     "ref": "Is 11.1",
     "desenho": "tronco-que-brota",
     "pares": [
-      { "at": "Is 7.14", "texto": "Uma virgem ficará grávida e dará à luz um filho e o chamará de Emanuel.", "nt": "Mt 1.23" },
-      { "at": "Is 53.7", "texto": "Foi levado como um cordeiro vai para o matadouro.", "nt": "At 8.32-35" },
-      { "at": "Is 61.1", "texto": "O Espírito do Soberano, o Senhor, está sobre mim.", "nt": "Lc 4.17-21", "nota": "Jesus lê isso na sinagoga" }
+      {
+        "at": "Is 7.14",
+        "texto": "Uma virgem ficará grávida e dará à luz um filho e o chamará de Emanuel.",
+        "nt": "Mt 1.23"
+      },
+      {
+        "at": "Is 53.7",
+        "texto": "Foi levado como um cordeiro vai para o matadouro.",
+        "nt": "At 8.32-35"
+      },
+      {
+        "at": "Is 61.1",
+        "texto": "O Espírito do Soberano, o Senhor, está sobre mim.",
+        "nt": "Lc 4.17-21",
+        "nota": "Jesus lê isso na sinagoga"
+      }
     ]
   },
   "estrutura": [
-    { "titulo": "Um povo doente e um Rei que vem", "de": 1, "ate": 12 },
-    { "titulo": "Oráculos contra as nações", "de": 13, "ate": 23 },
-    { "titulo": "A terra julgada e a festa no monte", "de": 24, "ate": 27 },
-    { "titulo": "Confiar em Deus ou no Egito?", "de": 28, "ate": 35 },
-    { "titulo": "Ezequias e o exército na porta", "de": 36, "ate": 39 },
-    { "titulo": "Consolem o meu povo", "de": 40, "ate": 55 },
-    { "titulo": "Novos céus e nova terra", "de": 56, "ate": 66 }
+    {
+      "titulo": "Um povo doente e um Rei que vem",
+      "de": 1,
+      "ate": 12
+    },
+    {
+      "titulo": "Os vizinhos de Judá",
+      "de": 13,
+      "ate": 23
+    },
+    {
+      "titulo": "A terra julgada e a festa no monte",
+      "de": 24,
+      "ate": 27
+    },
+    {
+      "titulo": "Ai de quem corre ao Egito",
+      "de": 28,
+      "ate": 35
+    },
+    {
+      "titulo": "Ezequias e o exército na porta",
+      "de": 36,
+      "ate": 39
+    },
+    {
+      "titulo": "Consolem o meu povo",
+      "de": 40,
+      "ate": 55
+    },
+    {
+      "titulo": "Novos céus e nova terra",
+      "de": 56,
+      "ate": 66
+    }
   ],
   "curiosidades": [
-    { "texto": "Os filhos do profeta carregavam recados no nome. Um deles se chamava Maher-shalal-hash-baz, um nome que “indica que os inimigos de Judá serão destruídos em breve”.", "ref": "Is 8.1-4" },
-    { "texto": "Por ordem de Deus, Isaías andou nu e descalço durante três anos, como sinal contra o Egito e a Etiópia.", "ref": "Is 20.2-4" },
-    { "texto": "Ezequias ganhou quinze anos de vida, e a sombra no relógio de sol de Acaz voltou dez graus como prova.", "ref": "Is 38.5-8" },
-    { "texto": "A história de Senaqueribe, da doença do rei e dos enviados da Babilônia ocupa quatro capítulos em prosa no meio da poesia.", "ref": "Is 36–39" }
+    {
+      "texto": "Deus manda Isaías escrever numa placa grande o nome de um filho que ainda nem foi gerado. O nome quer dizer que os inimigos de Judá vão ser destruídos em breve.",
+      "ref": "Is 8.1-4"
+    },
+    {
+      "texto": "Isaías tira o pano de saco e as sandálias porque Deus mandou, e anda nu e descalço durante três anos. Do mesmo jeito, o rei da Assíria vai levar os egípcios presos, nus e descalços.",
+      "ref": "Is 20.2-4"
+    },
+    {
+      "texto": "Deus vê as lágrimas de Ezequias e acrescenta quinze anos à vida dele. Para Ezequias saber que é verdade, a sombra volta dez graus no relógio de sol de Acaz.",
+      "ref": "Is 38.5-8"
+    },
+    {
+      "texto": "Os homens de Ezequias pedem ao comandante assírio que fale em aramaico, para o povo no muro não entender. O comandante se levanta e grita em hebraico para o povo do muro.",
+      "ref": "Is 36–39"
+    }
   ],
   "procure": {
-    "texto": "“O Santo de Israel.” O título aparece no primeiro capítulo e não larga mais o livro. Marque cada vez que ele surgir.",
+    "texto": "Isaías chama Deus de Santo de Israel vinte e oito vezes. Às vezes é para acusar o povo, às vezes é para consolar. Procure os dois jeitos.",
     "ref": "Is 1.4"
   }
 }
