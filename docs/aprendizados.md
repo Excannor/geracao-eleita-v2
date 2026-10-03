@@ -938,3 +938,6 @@ Um usuário viu "Leia um dos Primeiros passos" e "Tome um café ao vivo" nos Des
 
 ## Reflexões U5–U7: o escritor errava fato, não só voz (2026-10-03)
 A primeira passada do revisor corrigiu 29–43% dos campos, e a segunda 13–18%. Boa parte não era estilo: era fato trocado (quem canta, quem acredita), Deus escondido, motivo inventado, fala de personagem lida como verdade. A lista ficou em `ferramentas/reflexoes/CLAUDE.md` ("O que o revisor mais corrigiu") para o escritor das unidades seguintes evitar antes de chegar ao revisor. Medir se a primeira passada de U8–U10 cai abaixo de 20%.
+
+## Publicar só com a bateria verde, por script (2026-10-03)
+Uma publicação saiu com 1 falha: o comando encadeava `node teste.mjs | grep checagens && git push`, e o grep acha "checagens" também quando há falha. Ficou no ar alguns minutos até a correção. Agora a publicação passa por `scratchpad/publicar.sh`, que testa o HEAD na cópia limpa e só envia se a linha disser "todas passaram". E a minha própria edição de coordenador também roda a trava antes do commit: o vício (um "próprios") entrou na minha correção, não na do revisor.
