@@ -404,7 +404,8 @@ importante notar", "no fim das contas", "ou seja", "isso significa", "culmina", 
   referência. Nenhuma palavra se repete na mesma frase (troca-se a de fora, nunca a da NBV).
 - Fora do livro só entram o significado do nome, "[Livro] e Cristo" e o destaque `jesus`, sempre
   com referência do Novo Testamento, dizendo "é Jesus" com todas as letras (mas não todos abrindo
-  com "O X é Jesus."). A nota de um par não repete o nome do livro do NT.
+  com "O X é Jesus."). Exceção do dono: o destaque do Servo em Isaías abre com "Esse Servo é Jesus.",
+  pedido dele, e o `teste-mapas` confere. A nota de um par não repete o nome do livro do NT.
 - Cada referência aparece uma vez no mapa; não troque `ref`, só acrescente quando um fato novo
   pede.
 
