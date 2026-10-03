@@ -13,10 +13,12 @@ alta, para o meu amigo? Se não, está errado, mesmo que cada palavra seja permi
 
 ## Os 15 vícios (todos barrados)
 
-1. **Coisa agindo como gente.** O livro, o relato, o texto, a narrativa, a cena, a linha, o
-   capítulo nunca fazem nada ("o relato tem pressa", "a linha anunciou", "o livro fecha com", "o
-   texto se volta", "serve de título"). Quem age é Jesus, Moisés, o povo, Deus, o autor como
-   pessoa: "Marcos começa dizendo", "a última coisa que Lucas conta".
+1. **Coisa agindo como gente.** O que ninguém diz falando: "o relato tem pressa", "a linha
+   anunciou", "o texto se volta", "serve de título", "a narrativa ganha ritmo", "o capítulo
+   revela". Quem age é Jesus, Moisés, o povo, Deus, o autor. O que a gente diz, pode: "Marcos
+   começa com", "o livro termina com Jesus voltando para o céu", "Gênesis conta". O teste é a
+   boca, não a gramática (dono, 03/10: "A última coisa que Marcos conta é Jesus sendo levado" é
+   escrita contorcida; "O livro termina com ele voltando para o céu" é gente falando).
 2. **Conectivo de redação.** "Daí em diante", "Ao lado dela", "A partir daí", "Em seguida", "Nesse
    ponto", "Por sua vez", "Dito isso", "Dessa forma", "Portanto". Quem fala diz "Depois", "E então",
    "No caminho", "Ali", ou só começa a frase seguinte.
@@ -58,6 +60,12 @@ notar", "no fim das contas", emoji.
 - **A conexão é uma ponte falada**: a palavra que o fim de um ramo e o começo do outro compartilham
   ("Jairo ouve “apenas creia”; em Nazaré, ninguém crê"). Até 100 caracteres de preferência, teto 150.
 - **Ritmo**: curta depois de longa.
+- **Citação só quando as palavras exatas são o soco.** "Verdadeiramente, este homem era o Filho
+  de Deus!" fica entre aspas. "não está aqui para ser servido, mas para servir os outros e dar a
+  sua vida a fim de salvar a muitos" trava a fala: vira "não para ser servido, mas para servir e
+  dar a vida por muita gente", sem aspas, com a referência garantindo a fidelidade. Citação longa
+  (mais de umas 12 palavras) no meio de um parágrafo é paráfrase; galho pode guardar uma fala
+  curta de Jesus. Quando citar, é texto exato da NBV.
 - **Humano não é inventivo.** A voz puxa cor ("dramático", "a multidão em choque"); espanto só do
   que o texto traz.
 

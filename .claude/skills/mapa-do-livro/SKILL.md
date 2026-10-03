@@ -50,12 +50,12 @@ para o meu amigo? Se não, está errado, mesmo que cada palavra seja permitida.
 
 **Os vícios, um a um (todos barrados):**
 
-1. **Coisa agindo como gente.** O livro, o relato, o texto, a narrativa, a cena, a linha, o
-   capítulo, a seção, o versículo nunca fazem nada: não "tem pressa", não "anuncia", não "se
-   volta", não "mostra", não "fecha com", não "abre com", não "serve de título", não "ganha
-   ritmo", não "revela", não "aponta", não "retoma", não "ecoa". Quem age é Jesus, Moisés, o
-   povo, Deus, o leitor e o autor como pessoa: "Marcos começa dizendo", "a última coisa que Lucas
-   conta", "Moisés repete".
+1. **Coisa agindo como gente.** O que ninguém diz falando: "o relato tem pressa", "a linha
+   anunciou", "o texto se volta", "serve de título", "a narrativa ganha ritmo", "o capítulo
+   revela". Quem age é Jesus, Moisés, o povo, Deus, o autor. O que a gente diz, pode: "Marcos
+   começa com", "o livro termina com Jesus voltando para o céu", "Gênesis conta". O teste é a
+   boca, não a gramática (dono, 03/10: "A última coisa que Marcos conta é Jesus sendo levado" é
+   escrita contorcida; "O livro termina com ele voltando para o céu" é gente falando).
 2. **Conectivo de redação.** "Daí em diante", "Ao lado dela", "A partir daí", "Em seguida",
    "Nesse ponto", "Nesse sentido", "Por sua vez", "Dito isso", "Assim", "Dessa forma", "Portanto",
    "Logo depois disso", "Ao mesmo tempo", "Enquanto isso" no começo de frase para costurar
@@ -136,8 +136,8 @@ Depois (aprovado pelo dono):
 > coisa que o livro disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”
 
 O `checar-mapa` barra as sobras mais fáceis (lista `VOZ`: "o relato", "a narrativa", "daí em
-diante", "serve de título", "fecha/encerra/abre com", "o texto se volta", "culmina", "por sua vez",
-"nesse sentido") e, para os 11 mapas de antes da regra, só cobra depois que cada um sai da lista
+diante", "serve de título", "o texto se volta", "culmina", "por sua vez", "nesse sentido", "ou
+seja"...) e, para os 11 mapas de antes da regra, só cobra depois que cada um sai da lista
 `AINDA_NA_VOZ_ANTIGA`. Passar no checador não quer dizer nada sobre a voz: a leitura em voz alta é
 a revisão.
 
@@ -180,8 +180,7 @@ a revisão.
 5. **Ordem do relato.** "Logo depois", "então" e "a partir daí" só quando o livro narra em
    sequência; um relato retrospectivo (Mt 14.3-12, a morte de João; Jz 2.6-9, a morte de Josué, que o
    livro já deu em 1.1) se conta no passado. "Marcos começa
-   dizendo" e "a última cena" só com o primeiro e o último versículo de verdade (e nunca "o livro
-   abre/fecha com": regra da voz humana).
+   com" e "o livro termina com" só com o primeiro e o último versículo de verdade.
 6. **Marcos completos.** Toda troca de nome, aliança, reencontro, mudança de terra, morte,
    sepultamento e subida aos céus de protagonista aparece em algum galho, conexão ou curiosidade (Gênesis tinha perdido Gn 17, 33
    e 46). Liste os capítulos do livro e marque onde cada um aparece (galho, conexão, curiosidade,

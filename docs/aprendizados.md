@@ -878,3 +878,8 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   `git add -A` e levaram o mapa pela metade (b604bc5) sem rodar a bateria → com agente editando
   arquivo no mesmo worktree, `git add` só com os caminhos do próprio passo, nunca `-A`; e todo
   commit que leva conteúdo roda `node build.mjs && node teste.mjs` antes.
+- 2026-10-03 · mapas · A regra "o livro nunca é sujeito" era exagero: o agente trocou "O livro fecha
+  com" por "A última coisa que Marcos conta é Jesus sendo levado", pior. O dono: "O livro termina com
+  ele voltando para o céu" é gente falando → o teste é a boca, não a gramática; o checador deixou de
+  barrar "fecha/abre com". E citação longa da NBV no meio do parágrafo trava a fala ("a fim de salvar
+  a muitos"): vira paráfrase em palavras nossas; aspas só quando as palavras exatas são o soco.

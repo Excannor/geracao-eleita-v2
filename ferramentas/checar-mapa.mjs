@@ -57,13 +57,12 @@ export const PROIBIDAS = [
 export const VOZ = [
   [/\bo relato\b/i, '"o relato" (quem age é gente)'], [/\ba narrativa\b/i, '"a narrativa"'],
   [/daí em diante/i, '"daí em diante"'], [/serve de título/i, '"serve de título"'],
-  [/\b(fecha|encerra|abre) com\b/i, '"fecha/encerra/abre com" (diga "a última coisa que X conta")'],
   [/o texto (se volta|mostra|revela|destaca|aponta)/i, '"o texto se volta/mostra/revela"'],
   [/\bculmina/i, '"culmina"'], [/por sua vez/i, '"por sua vez"'], [/nesse sentido/i, '"nesse sentido"'],  [/\bou seja\b/i, '"ou seja"'], [/em outras palavras/i, '"em outras palavras"'], [/isso significa/i, '"isso significa"'],
   [/\bdito isso\b/i, '"dito isso"'], [/\bdessa forma\b/i, '"dessa forma"'], [/\b(impactante|marcante|emblemátic|icônic)/i, 'adjetivo de contracapa'],
   [/\b(retrata|evidencia|ressalta|aborda)\b/i, 'palavra de resumo escolar'], [/\b(neste|nesse) ramo\b/i, 'metalinguagem'], [/\bcomo vimos\b/i, 'metalinguagem'],
 ];
-export const AINDA_NA_VOZ_ANTIGA = ['genesis', 'exodo', 'levitico', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'lucas'];
+export const AINDA_NA_VOZ_ANTIGA = ['genesis', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'lucas'];
 
 // O tamanho máximo da conexão entre dois ramos, em caracteres.
 export const CONEXAO_MAX = 150;

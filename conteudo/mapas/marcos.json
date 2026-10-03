@@ -22,7 +22,7 @@
   },
   "raiz": {
     "texto": "Marcos vai direto ao ponto. Na primeira frase ele já diz quem é Jesus: o Filho de Deus. Depois, tudo acontece rápido: Jesus cura, ensina, bate de frente com os líderes religiosos e vai para Jerusalém, onde é crucificado. E é ali, vendo Jesus morrer, que um soldado romano diz a mesma coisa que Marcos disse no começo: “Verdadeiramente, este homem era o Filho de Deus!”",
-    "apoio": "Jesus mesmo explica a que veio: “não está aqui para ser servido, mas para servir os outros e dar a sua vida a fim de salvar a muitos”. A última coisa que Marcos conta é Jesus sendo levado para os céus. Os discípulos saem pregando por toda parte, e o Senhor confirma a mensagem deles com milagres.",
+    "apoio": "No caminho, Jesus explica por que veio: não para ser servido, mas para servir e dar a vida por muita gente. O livro termina com ele voltando para o céu e os discípulos levando essa notícia para todo lugar, enquanto o Senhor confirma a mensagem deles com milagres.",
     "refs": [
       "Mc 1.1",
       "Mc 15.39",
@@ -268,13 +268,41 @@
     ]
   },
   "estrutura": [
-    { "titulo": "Autoridade na Galileia", "de": 1, "ate": 3 },
-    { "titulo": "Parábolas e milagres", "de": 4, "ate": 5 },
-    { "titulo": "Os Doze e os pães", "de": 6, "ate": 7 },
-    { "titulo": "A caminho de Jerusalém", "de": 8, "ate": 10 },
-    { "titulo": "No templo", "de": 11, "ate": 13 },
-    { "titulo": "Ceia, prisão e cruz", "de": 14, "ate": 15 },
-    { "titulo": "O túmulo vazio", "de": 16, "ate": 16 }
+    {
+      "titulo": "Autoridade na Galileia",
+      "de": 1,
+      "ate": 3
+    },
+    {
+      "titulo": "Parábolas e milagres",
+      "de": 4,
+      "ate": 5
+    },
+    {
+      "titulo": "Os Doze e os pães",
+      "de": 6,
+      "ate": 7
+    },
+    {
+      "titulo": "A caminho de Jerusalém",
+      "de": 8,
+      "ate": 10
+    },
+    {
+      "titulo": "No templo",
+      "de": 11,
+      "ate": 13
+    },
+    {
+      "titulo": "Ceia, prisão e cruz",
+      "de": 14,
+      "ate": 15
+    },
+    {
+      "titulo": "O túmulo vazio",
+      "de": 16,
+      "ate": 16
+    }
   ],
   "curiosidades": [
     {
