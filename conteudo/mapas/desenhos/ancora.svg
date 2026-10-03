@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- uma das quatro âncoras do navio de Paulo (At 27.29): a argola no alto, o cepo de madeira atravessado em sálvia, a haste e os dois braços curvos com as unhas em ponta de seta nas pontas -->
+<circle class="k p" cx="60" cy="20" r="8"/>
+<path class="k p" d="M56 27H64V92H56Z"/>
+<path class="k s" d="M34 34H86V42H34Z"/>
+<circle class="k p" cx="31" cy="38" r="4"/>
+<circle class="k p" cx="89" cy="38" r="4"/>
+<path class="k p" d="M22 70C26 92 42 102 60 102C78 102 94 92 98 70L90 72C86 86 74 94 60 94C46 94 34 86 30 72Z"/>
+<path class="k p" d="M15 75L34 68L21 54Z"/>
+<path class="k p" d="M105 75L86 68L99 54Z"/>
+<path class="h" d="M58.5 32V88"/>
+</svg>

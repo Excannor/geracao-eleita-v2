@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- Saulo descido num cesto pelo muro de Damasco (At 9.25): o muro de pedras com ameias, a janela escura no alto, a corda saindo da janela e o cesto trançado em sálvia pendurado no meio do muro, com as alças da corda presas na borda -->
+<path class="k p" d="M10 104V26h8v-8h9v8h12v-8h9v8h24v-8h9v8h12v-8h9v8h8v78z"/>
+<path class="h" d="M12 38H108M12 50H108M12 62H108M12 74H108M12 86H108M12 98H108M24 26V38M50 26V38M94 26V38M18 38V50M36 38V50M84 38V50M102 38V50M28 50V62M92 50V62M20 62V74M100 62V74M30 74V86M90 74V86M22 86V98M98 86V98"/>
+<path class="k e" d="M52 30H68V44H52Z"/>
+<path class="k" d="M60 44V64"/>
+<path class="k" d="M60 64L45 74M60 64L75 74"/>
+<path class="k p" d="M42 74H78L73 94H47Z"/>
+<path class="s" d="M44.5 76H75.5L71.5 92H48.5Z"/>
+<path class="h" d="M44 80H76M45.5 86H74.5M47 91.5H73M52 74L54 94M60 74V94M68 74L66 94"/>
+<path class="k" d="M40 74H80"/>
+<path class="k" d="M4 104H116"/>
+</svg>

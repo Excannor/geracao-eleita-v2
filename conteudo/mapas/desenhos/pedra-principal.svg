@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a pedra principal (Sl 118.22; At 4.11): um arco de pedras lavradas sobre dois pilares, com a pedra do alto, a que segura as outras, em sálvia e um pouco mais alta. Tudo cabe num círculo de raio 54, porque em "Atos e Cristo" o desenho fica sobre um disco -->
+<path class="k p" d="M26 94V62A34 34 0 0 1 94 62V94H78V62A18 18 0 0 0 42 62V94Z"/>
+<path class="k" d="M26 62H42M78 62H94"/>
+<path class="h" d="M26 72H42M26 83H42M78 72H94M78 83H94M34 62V72M34 83V94M86 62V72M86 83V94"/>
+<path class="k" d="M27.9 50.6L43.1 55.8M37.6 36.3L48.7 48.4M82.4 36.3L71.3 48.4M92.1 50.6L76.9 55.8"/>
+<path class="k s" d="M51 23H69L66 45H54Z"/>
+<path class="k" d="M20 94H100"/>
+</svg>

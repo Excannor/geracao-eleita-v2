@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o navio das viagens de Paulo (At 13.4; 16.11): o casco de tábuas com a proa e a popa levantadas, o mastro, a verga e a vela quadrada estufada pelo vento, em sálvia, e as ondas. O fundo do casco é a própria linha da onda (pontos tirados da curva) -->
+<path class="k" d="M58 14V70"/>
+<path class="k" d="M30 20H86"/>
+<path class="k s" d="M32 22H84C89 36 89 50 84 62H32C37 50 37 36 32 22Z"/>
+<path class="h" d="M45 22C48 36 48 50 45 62M58 22V62M71 22C68 36 68 50 71 62"/>
+<path class="k p" d="M8 56C14 62 18 68 22 70H100C104 66 108 58 112 52C110 62 104 74 96 85C90 87 84 87 78 84C68 79 54 79 44 84C38 87 32 87 26 85C18 78 12 68 8 56Z"/>
+<path class="h" d="M22 76H98"/>
+<path class="k" d="M4 88C12 82 20 82 26 85C32 87 38 87 44 84C54 79 68 79 78 84C84 87 90 87 96 85C104 82 110 82 116 86"/>
+<path class="k" d="M12 100C20 94 28 94 36 98S52 102 60 96S76 90 84 96S100 102 108 96"/>
+<path class="h" d="M20 110c6-4 12-4 18 0s12 4 18 0M66 110c6-4 12-4 18 0s12 4 18 0"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a porta do templo chamada Formosa (At 3.2): a parede de pedras lavradas, o arco enfeitado em volta da entrada e as duas folhas da porta, com tachas e almofadas, em sálvia. Dois degraus na frente -->
+<path class="k p" d="M14 96V34H106V96Z"/>
+<path class="k" d="M10 34H110M12 28H108"/>
+<path class="h" d="M14 46H34M86 46H106M14 58H34M86 58H106M14 70H34M86 70H106M14 82H34M86 82H106M24 34V46M96 34V46M20 46V58M100 46V58M26 58V70M94 58V70M20 70V82M100 70V82M26 82V96M94 82V96"/>
+<path class="k p" d="M34 96V60A26 26 0 0 1 86 60V96Z"/>
+<path class="h" d="M38 96V61A22 22 0 0 1 82 61V96"/>
+<path class="k s" d="M42 96V62A18 18 0 0 1 78 62V96Z"/>
+<path class="k" d="M60 44V96"/>
+<path class="h" d="M46 64H56V78H46ZM64 64H74V78H64ZM46 82H56V92H46ZM64 82H74V92H64Z"/>
+<circle class="e" cx="55" cy="72" r="1.6"/>
+<circle class="e" cx="65" cy="72" r="1.6"/>
+<path class="k p" d="M26 96H94V102H26Z"/>
+<path class="k p" d="M18 102H102V108H18Z"/>
+</svg>

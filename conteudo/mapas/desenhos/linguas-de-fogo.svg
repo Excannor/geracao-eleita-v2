@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- vento e fogo no Pentecoste (At 2.2-3): três línguas de fogo soltas no ar, a do meio maior, com o miolo em sálvia, e embaixo o vento em linhas que terminam enroladas -->
+<path class="k p" d="M60 14C66 28 78 38 78 54C78 66 70 74 60 74C50 74 42 66 42 54C42 46 47 40 50 33C52 39 54 42 57 43C56 34 57 24 60 14Z"/>
+<path class="s" d="M60 40C64 48 69 52 69 59C69 65 65 68 60 68C55 68 51 65 51 59C51 54 55 50 57 46C58 49 59 50 60 50C60 46 60 43 60 40Z"/>
+<path class="k p" d="M27 36C31 45 38 51 38 61C38 68 33 73 27 73C21 73 16 68 16 61C16 56 19 52 21 48C22 52 23 53 25 54C25 48 25 42 27 36Z"/>
+<path class="k p" d="M93 36C95 42 95 48 95 54C97 53 98 52 99 48C101 52 104 56 104 61C104 68 99 73 93 73C87 73 82 68 82 61C82 51 89 45 93 36Z"/>
+<path class="h" d="M27 58C25 61 25 65 27 67M93 58C95 61 95 65 93 67"/>
+<path class="k" d="M10 88H76C84 88 88 82 84 78C81 75 76 77 77 81"/>
+<path class="k" d="M24 98H96C104 98 108 92 104 88C101 85 96 87 97 91"/>
+<path class="k" d="M14 106H58"/>
+</svg>

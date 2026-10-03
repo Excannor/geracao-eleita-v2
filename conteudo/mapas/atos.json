@@ -1,0 +1,417 @@
+{
+  "nome": "Atos",
+  "grupo": "Evangelhos e Atos",
+  "numero": 44,
+  "capitulos": 28,
+  "significado": {
+    "lingua": "grego",
+    "original": "Πράξεις",
+    "transliteracao": "Práxeis",
+    "traducao": "feitos",
+    "texto": "Práxeis quer dizer feitos, as coisas que uma pessoa faz. O nome combina com o livro, em que os apóstolos falam de Jesus por onde passam, até presos."
+  },
+  "autoria": {
+    "texto": "O autor já tinha escrito a Teófilo um primeiro livro sobre a vida e os ensinos de Jesus, até o dia em que ele subiu ao céu. Agora ele escreve de novo para o amigo.",
+    "apoio": "Em Trôade, o autor entra na história e escreve: “Nós tínhamos de ir à Macedônia”.",
+    "refs": [
+      "At 1.1-2",
+      "At 16.10-11"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Jesus promete aos apóstolos que o Espírito Santo vai descer sobre eles e dar poder para eles serem testemunhas dele. Eles vão falar de Jesus em Jerusalém, na Judeia e em Samaria, e até os confins da terra. Atos conta como essa notícia sai de Jerusalém e chega a Roma.",
+    "apoio": "No fim, Paulo mora dois anos numa casa alugada em Roma. Ele conversa com todos que vão visitar e fala do Reino de Deus com toda a coragem, sem ninguém impedir.",
+    "refs": [
+      "At 1.8",
+      "At 28.30-31"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Vento e fogo",
+      "sub": "O Espírito desce em Pentecoste",
+      "desenho": "linguas-de-fogo",
+      "galhos": [
+        {
+          "texto": "No monte das Oliveiras, Jesus sobe ao céu e desaparece numa nuvem. Os discípulos não tiram os olhos do céu. De repente, dois homens vestidos de branco estão na frente deles e avisam que Jesus vai voltar do jeito que eles viram ele subir.",
+          "ref": "At 1.9-12"
+        },
+        {
+          "texto": "Os crentes estão todos reunidos no Dia de Pentecoste quando um barulho do céu, como de um vendaval, enche a casa. Algo parecido com línguas de fogo pousa sobre a cabeça de cada um. Todos ficam cheios do Espírito Santo e começam a falar em línguas que eles não conhecem.",
+          "ref": "At 2.1-4"
+        },
+        {
+          "texto": "Muitos judeus de todas as nações estão em Jerusalém e vêm correndo quando ouvem o barulho. Cada um escuta os discípulos falarem na língua da terra onde nasceu. O povo pergunta como pode ser, porque esses homens são da Galileia. Outros zombam e dizem: “Eles estão bêbados, isso sim!”",
+          "ref": "At 2.5-13"
+        },
+        {
+          "texto": "Com os onze ao lado, Pedro dá um passo à frente e avisa a multidão que ninguém fica bêbado às nove da manhã. No fim, ele diz que Deus fez Senhor e Cristo esse Jesus que eles crucificaram. O povo fica comovido e pergunta: “Irmãos, que devemos fazer?”",
+          "ref": "At 2.14-15, 36-37"
+        },
+        {
+          "texto": "Pedro responde que cada um deve abandonar o pecado, voltar para Deus e ser batizado no nome de Jesus Cristo para o perdão dos pecados. Ele promete que eles também vão receber o dom do Espírito Santo. Naquele dia, umas 3.000 pessoas se juntam aos seguidores de Jesus.",
+          "ref": "At 2.38-41"
+        },
+        {
+          "texto": "Os que creem vivem unidos e têm tudo em comum. Eles vendem o que possuem e repartem com quem precisa. Todo dia vão juntos ao templo e partem o pão nas casas, com alegria. A cada dia, o Senhor junta à igreja os que estão sendo salvos.",
+          "ref": "At 2.44-47"
+        }
+      ],
+      "conexao": "Os apóstolos fazem muitos sinais (At 2.43). Pedro e João sobem ao templo na hora da oração (At 3.1)."
+    },
+    {
+      "titulo": "O nome de Jesus",
+      "sub": "Pedro e João não se calam",
+      "desenho": "porta-formosa",
+      "galhos": [
+        {
+          "texto": "Na porta do templo chamada Formosa, um homem coxo de nascença pede esmola a Pedro e João. Pedro diz: “Não tenho prata nem ouro para você”. Em nome de Jesus, ele manda o homem andar e pega o coxo pela mão. O homem se levanta de um pulo. Ele entra no templo com Pedro e João e louva a Deus aos pulos.",
+          "ref": "At 3.2-8"
+        },
+        {
+          "texto": "No outro dia, os líderes do conselho perguntam com que poder Pedro e João curaram o homem. Pedro está cheio do Espírito Santo e responde a eles com coragem. Os líderes ficam admirados, porque Pedro e João são homens simples e sem estudo, e percebem o que andar com Jesus fez nos dois.",
+          "ref": "At 4.5-8, 13"
+        },
+        {
+          "texto": "O conselho manda os dois nunca mais falarem de Jesus. Pedro e João respondem que não conseguem ficar quietos sobre o que viram e ouviram. Depois de uma oração com os irmãos, o lugar onde eles estão treme, e todos ficam cheios do Espírito Santo.",
+          "ref": "At 4.18-20, 31"
+        },
+        {
+          "texto": "Ananias e Safira vendem um terreno e escondem uma parte do dinheiro. Ananias leva o resto aos apóstolos e diz que é o preço todo. Pedro diz que ele mentiu ao Espírito Santo, e Ananias cai morto. Umas três horas depois, Safira chega e conta a mesma mentira. Ela também cai morta.",
+          "ref": "At 5.1-10"
+        },
+        {
+          "texto": "O sumo sacerdote tem inveja e põe os apóstolos na prisão, mas de noite um anjo do Senhor abre os portões. Ao amanhecer, os apóstolos já estão ensinando no templo. Quando o conselho cobra a ordem de silêncio, Pedro e os apóstolos respondem: “Devemos primeiro obedecer a Deus, e depois aos homens”.",
+          "ref": "At 5.17-21, 28-29"
+        },
+        {
+          "texto": "Estêvão olha para o céu e diz que vê o Filho do Homem em pé, à direita de Deus. Todos ali tapam os ouvidos, arrastam Estêvão para fora da cidade e começam a atirar pedras nele. As testemunhas deixam os casacos aos pés de um jovem chamado Saulo.",
+          "ref": "At 7.55-58"
+        }
+      ],
+      "jesus": {
+        "texto": "Moisés tinha avisado que Deus ia levantar um profeta parecido com ele. Pedro lembra esse aviso ao povo e fala de Jesus, o Servo que Deus ressuscitou e mandou primeiro a Israel. Jesus é o profeta que Moisés anunciou.",
+        "refs": [
+          "At 3.20-26"
+        ]
+      },
+      "conexao": "Estêvão cai de joelhos e pede que Deus não condene aquela gente (At 7.60). Saulo aprova a morte dele (At 8.1)."
+    },
+    {
+      "titulo": "Para todos",
+      "sub": "Os gentios também creem",
+      "desenho": "cesto-no-muro",
+      "galhos": [
+        {
+          "texto": "Os crentes que se espalharam com a perseguição anunciam Jesus por onde passam. Filipe vai a uma cidade de Samaria e fala de Cristo ao povo. Muitos paralíticos e coxos são curados, e há muita alegria naquela cidade.",
+          "ref": "At 8.4-8"
+        },
+        {
+          "texto": "Um eunuco da Etiópia volta de Jerusalém na carruagem, lendo o profeta Isaías em voz alta. Filipe corre até ele e pergunta: “O senhor entende o que está lendo?” No caminho, os dois chegam a um lugar com água, e o eunuco pede para ser batizado. Filipe desce com ele para a água e batiza o eunuco.",
+          "ref": "At 8.27-30, 36-38"
+        },
+        {
+          "texto": "Saulo está chegando a Damasco quando uma luz do céu brilha em volta dele. Ele cai no chão, e uma voz pergunta: “Saulo! Saulo! Por que você está me perseguindo?” É Jesus. Saulo se levanta cego e passa três dias sem comer nem beber.",
+          "ref": "At 9.3-9"
+        },
+        {
+          "texto": "Em Damasco, o Senhor manda um crente chamado Ananias pôr as mãos sobre Saulo. Ananias tem medo, mas o Senhor diz que escolheu Saulo para levar o nome dele aos gentios e aos reis. Saulo volta a enxergar e começa a pregar, e os líderes querem matar ele. De noite, os discípulos descem Saulo num cesto por uma janela do muro.",
+          "ref": "At 9.10-25"
+        },
+        {
+          "texto": "Pedro está em Jope. Ele sobe ao terraço para orar e tem uma visão. Um lençol desce do céu, cheio de todo tipo de animal, e uma voz manda Pedro matar e comer. Pedro diz que nunca comeu nada impuro. A voz responde: “Não chame de impuro o que Deus purificou!”",
+          "ref": "At 10.8-15"
+        },
+        {
+          "texto": "Cornélio comanda soldados romanos em Cesareia e reúne parentes e amigos para receber Pedro. Pedro ainda está falando quando o Espírito Santo desce sobre todos os que ouvem. Os judeus que vieram com ele se espantam ao ouvir os gentios falarem em línguas e louvarem a Deus. Pedro manda batizar todos em nome de Jesus Cristo.",
+          "ref": "At 10.1, 24, 44-48"
+        }
+      ],
+      "conexao": "Em Antioquia, os discípulos são chamados de cristãos (At 11.26). Ali o Espírito separa Barnabé e Saulo (At 13.1-2)."
+    },
+    {
+      "titulo": "A porta da fé",
+      "sub": "Paulo viaja e anuncia Jesus",
+      "desenho": "navio-a-vela",
+      "galhos": [
+        {
+          "texto": "Em Listra, Paulo manda um aleijado de nascença ficar em pé, e o homem pula e começa a andar. A multidão acha que Barnabé é o deus Júpiter e que Paulo é Mercúrio. O sacerdote do templo traz bois para oferecer aos dois. Os apóstolos rasgam a roupa e correm para o meio do povo.",
+          "ref": "At 14.8-14"
+        },
+        {
+          "texto": "Uns judeus de Antioquia e Icônio chegam e viram o povo contra Paulo. Eles apedrejam Paulo e arrastam ele para fora da cidade, porque pensam que ele morreu. Os discípulos ficam em volta de Paulo, e ele se levanta e entra de novo na cidade. De volta a Antioquia, Paulo e Barnabé contam como Deus abriu a porta da fé aos gentios.",
+          "ref": "At 14.19-20, 27"
+        },
+        {
+          "texto": "Alguns homens da Judeia chegam a Antioquia e ensinam que, sem a circuncisão, ninguém pode ser salvo. Em Jerusalém, os apóstolos e os presbíteros se reúnem para decidir. Pedro pergunta por que pôr nos gentios um peso que nem eles nem os antepassados aguentaram. Ele diz que todos são salvos pela graça do Senhor Jesus, tanto os judeus como os gentios.",
+          "ref": "At 15.1, 6-11"
+        },
+        {
+          "texto": "Em Trôade, Paulo vê de noite um homem da Macedônia que pede: “Venha para cá e nos ajude”. O grupo vai a Filipos e, no sábado, conversa com algumas mulheres na beira do rio. Uma delas é Lídia, que vende tecido de púrpura. O Senhor abre o coração dela, e Lídia é batizada com toda a casa.",
+          "ref": "At 16.8-9, 12-15"
+        },
+        {
+          "texto": "Paulo e Silas apanham e vão para o cárcere com os pés presos no tronco. No meio da noite, eles oram e cantam hinos, e os outros presos escutam. Num terremoto, as portas se abrem e as correntes de todos se soltam. O carcereiro pergunta o que deve fazer, e Paulo e Silas respondem: “Creia no Senhor Jesus, e será salvo você e a sua casa”.",
+          "ref": "At 16.23-31"
+        },
+        {
+          "texto": "Em Atenas, Paulo vê ídolos por toda parte e fica muito perturbado. No monte de Marte, ele fala de um altar com a inscrição “Ao Deus Desconhecido”. Paulo diz que esse Deus fez o mundo e não mora em templos feitos por mãos humanas. Quando ele fala da ressurreição, uns zombam, e outros querem ouvir mais.",
+          "ref": "At 17.16, 22-24, 32"
+        }
+      ],
+      "jesus": {
+        "texto": "Paulo diz que Deus marcou um dia para julgar o mundo com justiça, e o juiz vai ser um homem que ele ressuscitou. Esse homem é Jesus. Em Atenas, Paulo já falava de Jesus e da ressurreição aos filósofos.",
+        "refs": [
+          "At 17.18",
+          "At 17.31"
+        ]
+      },
+      "conexao": "Paulo diz que o Espírito avisa em cada cidade que prisão e sofrimento esperam por ele (At 20.23)."
+    },
+    {
+      "titulo": "Diante de reis",
+      "sub": "Paulo preso fala de Jesus",
+      "desenho": "correntes",
+      "galhos": [
+        {
+          "texto": "Em Cesareia, um profeta chamado Ágabo pega o cinto de Paulo e se amarra pelos pés e pelas mãos. Ele diz que o dono daquele cinto vai ser amarrado em Jerusalém e entregue aos gentios. Todos choram e pedem que Paulo não vá. Paulo responde que está pronto não só para ser preso, mas também para morrer pelo Senhor Jesus.",
+          "ref": "At 21.8-13"
+        },
+        {
+          "texto": "No templo, uns judeus da Ásia agarram Paulo e gritam que ele leva gregos para dentro do lugar santo. O povo arrasta Paulo para fora e quer matar ele. O comandante romano chega com os soldados e manda prender Paulo com duas correntes. A multidão está tão violenta que os soldados carregam Paulo nos ombros pela escada.",
+          "ref": "At 21.27-35"
+        },
+        {
+          "texto": "Mais de 40 homens juram não comer nem beber até matar Paulo. O sobrinho de Paulo descobre o plano e avisa o tio. Paulo manda o sobrinho ao comandante. Naquela noite, o comandante manda Paulo para Cesareia com 200 soldados, 200 lanceiros e 70 cavaleiros.",
+          "ref": "At 23.12-24"
+        },
+        {
+          "texto": "O governador Félix e a esposa Drusila mandam chamar Paulo para ouvir sobre a fé em Cristo Jesus. Paulo fala da justiça, do domínio de si e do juízo que vai vir, e Félix fica com medo. Ele diz: “Por agora basta”. Félix espera que Paulo dê dinheiro para ser solto e deixa ele dois anos na prisão.",
+          "ref": "At 24.24-27"
+        },
+        {
+          "texto": "Festo quer agradar aos judeus e pergunta se Paulo aceita ser julgado em Jerusalém. Paulo responde que é inocente e diz: “Eu apelo para César”. Festo conversa com os conselheiros e responde que Paulo vai para César.",
+          "ref": "At 25.9-12"
+        },
+        {
+          "texto": "Paulo conta ao rei Agripa como Jesus falou com ele na estrada de Damasco. Festo interrompe e grita que Paulo está louco. Agripa pergunta se Paulo acha que convence o rei a ser seguidor de Cristo em tão pouco tempo. Paulo responde que queria ver o rei e todos ali iguais a ele, só que sem aquelas correntes.",
+          "ref": "At 26.13-15, 24, 28-29"
+        }
+      ],
+      "conexao": "Agripa diz a Festo que Paulo podia ser solto, se não tivesse apelado para César (At 26.32)."
+    },
+    {
+      "titulo": "Rumo a Roma",
+      "sub": "O navio quebra e todos escapam",
+      "desenho": "ancora",
+      "galhos": [
+        {
+          "texto": "Um vento forte chamado Nordeste bate no navio e arrasta o barco para o mar. A tripulação joga a carga na água. No terceiro dia, eles jogam fora até a armação do navio. Por muitos dias ninguém vê o sol nem as estrelas, e todos perdem a esperança de se salvar.",
+          "ref": "At 27.14-20"
+        },
+        {
+          "texto": "Ninguém come há muito tempo. Paulo se levanta no meio da tripulação e lembra que eles deviam ter ficado em Bons Portos. Ele conta que um anjo de Deus parou ao lado dele de noite. O anjo disse que Paulo vai ser julgado diante de César e que Deus vai salvar todos os que viajam com ele.",
+          "ref": "At 27.21-24"
+        },
+        {
+          "texto": "Depois de catorze noites de tempestade, os marinheiros desconfiam que a terra está perto. Com medo das pedras, eles jogam quatro âncoras e oram para o dia chegar. Quando começa a clarear, Paulo dá graças a Deus pelo pão na frente de todos e come. As 276 pessoas a bordo se animam e comem também.",
+          "ref": "At 27.27-29, 33-37"
+        },
+        {
+          "texto": "O navio encalha num banco de areia, e as ondas começam a partir a popa. Os soldados querem matar os presos para ninguém fugir nadando. O chefe da guarda dos presos quer salvar Paulo e não deixa. Uns nadam, outros se seguram em tábuas, e todos chegam à praia.",
+          "ref": "At 27.1, 41-44"
+        },
+        {
+          "texto": "Na ilha de Malta, os moradores acendem uma fogueira na praia. Paulo põe gravetos no fogo, e uma cobra venenosa sai do calor e se prende na mão dele. Paulo sacode a cobra no fogo e não sofre nada. O povo espera ver Paulo cair morto, mas nada acontece, e eles dizem que ele é um deus.",
+          "ref": "At 28.2-6"
+        },
+        {
+          "texto": "Em Roma, Paulo pode morar onde quiser, mas um soldado vigia ele. Ele chama os líderes judeus da cidade e passa o dia inteiro falando de Jesus com os livros de Moisés e os Profetas. Alguns creem no que ele diz, e outros não aceitam.",
+          "ref": "At 28.16-17, 23-24"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Paulo diz que não ensina nada além do que os profetas e Moisés anunciaram. O Cristo ia sofrer e ser o primeiro a ressuscitar dos mortos. Em Bereia, o povo examina as Escrituras todo dia para conferir se o que Paulo e Silas dizem é verdade (At 17.11).",
+    "ref": "At 26.22-23",
+    "desenho": "pedra-principal",
+    "pares": [
+      {
+        "at": "Jl 2.28",
+        "texto": "Eu derramarei o meu Espírito sobre todos os povos! Seus filhos e filhas profetizarão.",
+        "nt": "At 2.16-18",
+        "nota": "No Pentecoste, Pedro diz que o povo está vendo o que Joel anunciou"
+      },
+      {
+        "at": "Sl 118.22",
+        "texto": "A pedra que os construtores rejeitaram acabou se tornando a pedra mais importante de toda a construção.",
+        "nt": "At 4.10-12",
+        "nota": "Pedro diz ao conselho que essa pedra é Jesus, e que não há salvação em nenhum outro nome"
+      },
+      {
+        "at": "Is 53.7",
+        "texto": "Foi levado como um cordeiro vai para o matadouro; como a ovelha fica muda diante de quem corta a sua lã, ele não abriu a boca.",
+        "nt": "At 8.32-35",
+        "nota": "O eunuco lê esse trecho na carruagem, e Filipe começa por ele a anunciar Jesus"
+      },
+      {
+        "at": "Is 49.6",
+        "texto": "Também farei de você uma luz para o mundo, para levar a minha salvação a todos os habitantes da terra",
+        "nt": "At 13.46-47",
+        "nota": "Com essas palavras, Paulo e Barnabé se voltam para os gentios"
+      },
+      {
+        "at": "Am 9.11",
+        "texto": "Naquele dia, reconstruirei a tenda caída de Davi, que agora está em ruínas.",
+        "nt": "At 15.13-17",
+        "nota": "Em Jerusalém, Tiago lembra o profeta para mostrar que os gentios também buscam o Senhor"
+      },
+      {
+        "at": "Is 6.10",
+        "texto": "Torne insensível o coração deste povo; tampe os ouvidos e feche os olhos deles.",
+        "nt": "At 28.25-28",
+        "nota": "Em Roma, Paulo lembra Isaías aos judeus que não creram e diz que os gentios vão ouvir"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Jesus sobe e o Espírito desce",
+      "de": 1,
+      "ate": 2
+    },
+    {
+      "titulo": "A igreja em Jerusalém",
+      "de": 3,
+      "ate": 7
+    },
+    {
+      "titulo": "A notícia chega aos gentios",
+      "de": 8,
+      "ate": 12
+    },
+    {
+      "titulo": "Paulo e Barnabé viajam",
+      "de": 13,
+      "ate": 14
+    },
+    {
+      "titulo": "A reunião em Jerusalém",
+      "de": 15,
+      "ate": 15
+    },
+    {
+      "titulo": "Paulo vai à Grécia",
+      "de": 16,
+      "ate": 18
+    },
+    {
+      "titulo": "Paulo em Éfeso",
+      "de": 19,
+      "ate": 20
+    },
+    {
+      "titulo": "Paulo é preso em Jerusalém",
+      "de": 21,
+      "ate": 23
+    },
+    {
+      "titulo": "Paulo diante dos governadores",
+      "de": 24,
+      "ate": 26
+    },
+    {
+      "titulo": "A viagem até Roma",
+      "de": 27,
+      "ate": 28
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Pedro diz que eles precisam escolher um homem para o lugar de Judas, alguém que andou com o grupo desde o batismo de João. Eles indicam José Barsabás e Matias, oram e tiram a sorte. A sorte cai em Matias.",
+      "ref": "At 1.21-26"
+    },
+    {
+      "texto": "José é um levita de Chipre, e os apóstolos chamam ele de Barnabé, que quer dizer “encorajador”. Ele vende um campo e põe o dinheiro aos pés dos apóstolos.",
+      "ref": "At 4.36-37"
+    },
+    {
+      "texto": "Os líderes querem matar os apóstolos, mas um fariseu chamado Gamaliel pede cuidado. Ele diz que, se o que os apóstolos fazem é coisa de homens, vai se desfazer. Se vem do céu, ninguém vai conseguir parar, e o conselho vai estar lutando contra Deus.",
+      "ref": "At 5.33-39"
+    },
+    {
+      "texto": "Na distribuição de comida, os judeus que falam grego reclamam que as viúvas deles ficam de lado. Os Doze pedem que a igreja escolha sete homens cheios do Espírito Santo e de sabedoria para cuidar disso. O primeiro da lista é Estêvão, um homem cheio de fé e do Espírito Santo.",
+      "ref": "At 6.1-5"
+    },
+    {
+      "texto": "Um feiticeiro de Samaria chamado Simão crê e é batizado. Pedro e João chegam de Jerusalém e põem as mãos sobre os novos irmãos, que recebem o Espírito Santo. Simão vê isso e oferece dinheiro pelo mesmo poder. Pedro responde: “Que o seu dinheiro morra com você”.",
+      "ref": "At 8.13-20"
+    },
+    {
+      "texto": "Tabita mora em Jope e vive fazendo o bem. Quando ela morre, as viúvas choram e mostram a Pedro as roupas que ela fez para elas. Pedro pede que todas saiam e ora de joelhos. Ele manda Tabita se levantar, e ela abre os olhos e senta.",
+      "ref": "At 9.36-40"
+    },
+    {
+      "texto": "Em Jerusalém, alguns reclamam que Pedro comeu com gente que não é circuncidada. Pedro conta tudo e pergunta quem era ele para discutir com Deus. Os outros ficam sem o que dizer e louvam a Deus.",
+      "ref": "At 11.2-4, 17-18"
+    },
+    {
+      "texto": "O rei Herodes manda matar Tiago, irmão de João, com a espada, e depois prende Pedro. Na noite antes do julgamento, Pedro dorme entre dois soldados, preso com duas correntes. Um anjo acorda Pedro, e as correntes caem dos pulsos dele.",
+      "ref": "At 12.1-7"
+    },
+    {
+      "texto": "Pedro vai à casa da mãe de João Marcos, onde muita gente está orando, e bate à porta. A serva Rode reconhece a voz dele e fica tão contente que corre para dentro sem abrir. Ninguém acredita nela, e Pedro não para de bater.",
+      "ref": "At 12.12-16"
+    },
+    {
+      "texto": "Em Pafos, um feiticeiro chamado Elimas tenta impedir que o governador creia. Saulo também se chama Paulo. Ele olha bem nos olhos de Elimas e diz que o feiticeiro vai ficar cego por um tempo. O governador vê Elimas tateando no escuro e crê.",
+      "ref": "At 13.6-12"
+    },
+    {
+      "texto": "Tiago propõe que os gentios só deixem a carne oferecida aos ídolos, a imoralidade sexual e o animal estrangulado sem sangrar. Os irmãos de Antioquia leem a carta com essa decisão e ficam muito alegres.",
+      "ref": "At 15.19-20, 30-31"
+    },
+    {
+      "texto": "Barnabé quer levar João Marcos na viagem. Paulo não quer, porque Marcos abandonou os dois na Panfília. Eles discordam tanto que se separam. Barnabé vai com Marcos para Chipre, e Paulo escolhe Silas.",
+      "ref": "At 15.37-40"
+    },
+    {
+      "texto": "Em Tessalônica, uns homens da rua atacam a casa de Jasom atrás de Paulo e Silas. Como não acham os dois, arrastam Jasom até as autoridades e gritam: “Esses homens viraram o resto do mundo de cabeça para baixo”.",
+      "ref": "At 17.5-6"
+    },
+    {
+      "texto": "Paulo mora em Corinto com Áquila e Priscila, que fazem tendas como ele. Uma noite, o Senhor diz a Paulo numa visão: “Não tenha medo! Fale! Não se cale!” Paulo fica um ano e meio na cidade ensinando a palavra de Deus.",
+      "ref": "At 18.2-3, 9-11"
+    },
+    {
+      "texto": "Os sete filhos de Cevá tentam expulsar um espírito mau com o nome de Jesus, a quem Paulo prega. O espírito responde: “Eu conheço Jesus e conheço Paulo, mas quem são vocês?” O homem pula em cima deles, e eles fogem da casa nus e feridos.",
+      "ref": "At 19.13-16"
+    },
+    {
+      "texto": "O ourives Demétrio vive de fazer modelos de prata do templo de Ártemis. Ele reclama que Paulo convenceu muita gente de que imagens feitas por mãos humanas não são deuses. A multidão corre para o anfiteatro e grita por umas duas horas: “Grande é a Ártemis dos efésios!”",
+      "ref": "At 19.24-29, 34"
+    },
+    {
+      "texto": "Em Trôade, Paulo fala até o meio da noite. Um jovem chamado Êutico pega no sono na janela e cai de uma altura de três andares. Quando levantam Êutico, ele está morto. Paulo desce até ele e diz: “Não se assustem”. No fim, Êutico volta vivo para casa.",
+      "ref": "At 20.6-12"
+    },
+    {
+      "texto": "Na despedida de Mileto, Paulo lembra aos presbíteros de Éfeso uma frase do Senhor Jesus: “Há maior bênção em dar do que em receber”. Depois ele ajoelha e ora com eles, e todos choram abraçados com Paulo.",
+      "ref": "At 20.17, 35-37"
+    },
+    {
+      "texto": "Os soldados amarram Paulo para o açoite, e ele pergunta se a lei deixa açoitar um cidadão romano sem julgamento. O comandante conta que pagou muito dinheiro para ser cidadão. Paulo responde: “Mas eu sou cidadão por nascimento!”",
+      "ref": "At 22.25-28"
+    },
+    {
+      "texto": "No Sinédrio, Paulo grita que é fariseu e que está sendo julgado porque crê na ressurreição dos mortos. Os saduceus negam a ressurreição, e logo eles e os fariseus estão brigando. Na noite seguinte, o Senhor fica ao lado de Paulo e diz que ele vai falar de Jesus em Roma.",
+      "ref": "At 23.6-8, 11"
+    }
+  ],
+  "procure": {
+    "texto": "Paulo diz ao governador Félix que crê no Caminho, que os acusadores dele chamam de seita. Em Damasco, Saulo queria prender os seguidores do Caminho (At 9.2). Conte quantas vezes o Caminho aparece no livro.",
+    "ref": "At 24.10, 14"
+  }
+}
