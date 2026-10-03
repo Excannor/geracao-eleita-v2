@@ -851,3 +851,9 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   saída sempre absoluto; o `foto-conta` passou a fechar o Chrome em qualquer erro (conferido com
   uma saída numa pasta que não existe). Depois de um erro de captura, ainda assim, `ps` nos
   Chromes com `--user-data-dir=/tmp/foto-conta-*` e matar pelo PID.
+- 2026-10-03 · teste · `teste-escuro-forcado` reprovava já antes desta rodada (conferido no commit
+  anterior, f0e23ee): media o fundo do Início no ponto fixo (6, 200), e a folha do alto cresceu
+  (boas-vindas e "Novo na fé?") até uns 320px; a cor lida era o grafite da folha (#2e302c), não um
+  defeito do tema → ponto de medida tirado da tela (8px abaixo da `.folha-topo`), e o `ANTIGA=1`
+  continua provando que o teste enxerga o escurecimento. Coordenada fixa em teste de tela envelhece
+  com o layout: medir relativo a um elemento.

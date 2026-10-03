@@ -82,8 +82,11 @@ async function medirApp(tema, colorSchemeNaMao) {
   if (colorSchemeNaMao) await av('document.documentElement.style.setProperty("color-scheme", ' + JSON.stringify(colorSchemeNaMao) + ')');
   await dormir(500);
   // Na margem esquerda do conteúdo, onde só há fundo: o canto (20, 20) caía dentro do retrato
-  // redondo do topo, que é da cor do cartão, desde que ele passou para a esquerda.
-  return { fundo: await corNaTela(6, 200) };
+  // redondo do topo, que é da cor do cartão, desde que ele passou para a esquerda. E a altura
+  // fixa (6, 200) caiu dentro da folha do alto quando ela ganhou a frase de boas-vindas e o
+  // "Novo na fé?" (o fundo lido era o grafite da folha, #2e302c): o ponto fica logo abaixo dela.
+  const y = await av('(() => { const f = document.querySelector(".folha-topo"); return f ? Math.round(f.getBoundingClientRect().bottom) + 8 : 200; })()');
+  return { fundo: await corNaTela(6, y) };
 }
 
 async function medirPortal(tema) {

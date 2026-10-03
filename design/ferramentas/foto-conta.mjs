@@ -28,6 +28,16 @@ const PORTA_NAV = await portaLivre();
 const perfil = mkdtempSync(join(tmpdir(), 'foto-conta-'));
 const nav = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--hide-scrollbars',
   '--remote-debugging-port=' + PORTA_NAV, '--user-data-dir=' + perfil, '--window-size=' + W + ',' + H, 'about:blank'], { stdio: 'ignore' });
+// Qualquer erro daqui em diante (pasta de saída que não existe, navegador que não responde)
+// fecha o Chrome antes de sair: sem isso ele ficava vivo, um por captura do lote.
+const encerrar = (erro) => {
+  console.error(erro && erro.stack ? erro.stack : erro);
+  try { fecharArvore(nav, perfil); } catch { /* ok */ }
+  try { rmSync(perfil, { recursive: true, force: true }); } catch { /* ok */ }
+  process.exit(1);
+};
+process.on('uncaughtException', encerrar);
+process.on('unhandledRejection', encerrar);
 async function alvo() {
   for (let i = 0; i < 80; i++) {
     try {
