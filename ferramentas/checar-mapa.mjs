@@ -56,7 +56,7 @@ export const PROIBIDAS = [
 // serve só se um mapa antigo precisar voltar a ser cobrado aos poucos.
 const FORMAIS = 'centurião|coletoria|guichê|oráculos?|cativos|quebrantad[oa]s?|enviados|embarcação|intermediário|recenseamento|pavimento|território|região montanhosa|produtos da terra|provisões|despojos|ventre|têmporas|cadáver|homicida|condenados|culpados|depoimento|numeroso|quadragésimo|paternos|futuras gerações|testemunhas oculares|ministério|dirigente|encarregado|família sacerdotal|damas de companhia|mocidade|malícia|trajetória|episódio|contexto|dinâmica|relato|narrativa|recursos|grandes quantias|compensação|junto a[os]?|junto à|através d[aeo]|em direção a|com exceção de|prestes a|por meio de|referente|mediante|em plena|em meio à|em lugar de|ao encontro de|na forma de|por ordem de|a seu respeito|diante de todos|em primeira pessoa|desse período|como com|a cada sétimo|tem compaixão|dias da purificação|cerimônia|tomar posse|em fuga|inclusive|capazes de|o mesmo número de|e sim\b|dizia ser|desde que sem';
 const CULTOS = 'declara|proclama|adverte|suplica|clama|clamam|implora|engrandece|protesta|comemora|reagem|conduz|elimina|domina|percorrem|ergue|consome|crava|incita[m]?|censura|atribuem|expõe|restaura|retoma|realiza|efetua|decreta|replica|se prostra|repousa|abate|pertence|deposita[m]?|inutiliza|removid[oa]|presta[rm]? culto|culmina|retrata|evidencia|ressalta|aborda';
-const MULETAS = 'ganha[m]? (o nome|um nome|nome novo|uma túnica|força)|recebe[m]? (o nome|um nome|sinais|a boa notícia|habilidade|herança|ordem)|surge[m]?|surgiu|vem então|vêm então|vem a (voz|pergunta|resposta)|passa[m]? a (ser|se chamar|ouvir|guardar|adorar|servir|falar)|segue para|volta a falar|acaba [a-zç]+ndo|aparece[m]? pelo nome|leva o nome|se agita|vai além|devolve:|acerta:|completa:|e completa|E diz:';
+const MULETAS = 'ganha[m]? (o nome|um nome|nome novo|uma túnica|força)|recebe[m]? (o nome|um nome|sinais|a boa notícia|habilidade|herança|ordem)|surge[m]?|surgiu|vem então|vêm então|vem a (voz|pergunta|resposta)|passa[m]? a (ser|se chamar|ouvir|guardar|adorar|servir|falar)|segue para|volta a falar|acaba [a-zç]+ndo|aparece[m]? pelo nome|leva o nome|se agita|vai além|devolve:|acerta:';
 const CONECTIVOS = 'daí em diante|a partir daí|ao lado dela|em seguida|nesse ponto|nesse sentido|por sua vez|dito isso|dessa forma|mais adiante|mais tarde|dali até|capítulo após capítulo|por práticas assim|no meio disso|diante disso|logo adiante|logo depois|logo em seguida|na mesma hora|no mesmo instante|responde na hora|serve de título';
 const META = 'neste ramo|nesse ramo|como vimos|repare|note que|capítulo seguinte|mesmo capítulo|leis seguintes|segunda metade|primeiro capítulo|último capítulo|o livro inteiro|virada do livro|em prosa|ou seja|em outras palavras|isso significa|que significa|como prova|para provar que|um nome que';
 const ABSTRATOS = '(o medo|a promessa|a cura|a bênção|as maldições|a lembrança|a obediência|a rebelião|a razão|a morte|a impureza|a cerimônia|o sábado|o dia a dia|o pecado|a mancha|o juízo|a porta|a pergunta|a resposta|o relato|o texto|a narrativa|a linha|a cena|a lista|a sinagoga|a cidade|a aldeia|o decreto) (vence|vem|volta|morre|repete|alcança[m]?|encerra|tem motivo|pede|abre|contamina|traz|entra|se abre|vira|sai|anuncia|anunciou|mostra|revela|destaca|aponta|se volta|fecha|ganha|leva|registra|conta|se enfurece|se escandaliza)';
@@ -74,6 +74,7 @@ const VOZ_BRUTA = [
   [/\b(Marcos|Lucas|Mateus|Josué|Moisés|Isaías|o autor|o livro|o texto|o narrador) (explica|anota|registra|faz questão|deixa claro|faz isso)\b|avisa o autor|diz o texto|vem o comentário/i, 'autor virando comentarista (1.2)'],
   [/\b(o Ressuscitado|o Batista|o rapaz|a visita|o escolhido|o guerreiro|o visitante)\b/i, 'sinônimo de redação (1.5)'],
   [/\b[oa]s? própri[oa]s?\b|\b(ele|ela|eles|elas) mesm[oa]s?\b|\bmesm[oa]s? (palavras|texto|expressão)\b|\bSenhor mesmo\b/i, 'reforço vazio: próprio, mesmo (1.6)'],
+  [/(^|[.!?”] )E (diz|completa):/, '"E diz:" / "E completa:" abrindo frase (4.1)'],
   [/\b[Ee] ouvem?\b|\b[Aa] resposta( é| são|:| dela:)/, '"e ouve" / "a resposta é" (4.2)'],
   [/\b(lhe|lhes)\b/, 'pronome oblíquo "lhe" (2.x, clítico)'],
   [/\b(e|que|mas|Jesus|ele|ela|Deus|Senhor|Moisés|Josué|Pedro|João) (o|a|os|as) (declara|considera|destrói|odeiam|vendem|põe|põem|acompanham|cobrem|enche|consome|leva|levam|veja|envia|repreendem?|defende|toma|fortalece|seguem|entrega|abençoa|encontram|golpeia|crava|acordam|adoram|seguem|cumprimenta|traiu|prende|prendem|mandam?|segue)\b/, 'clítico antes do verbo (2.x)'],
@@ -82,20 +83,20 @@ const VOZ_BRUTA = [
   [/[a-záéíóúçãõ]: [a-záéíóúçãõ]/, 'dois-pontos de resumo (3.1)'],
   [/(^|[.!?”] )(Curioso|O motivo|A razão|A data ficou registrada|e pior|Nem o boi|O objetivo|Para quem o segue)[:,]/i, 'rótulo sem verbo (2.9)'],
   [/\? [A-ZÁÉÍÓÚ][^ .?!]{1,12}\.( |$)/, 'pergunta e resposta de uma palavra (3.5)'],
-  [/(^|[.!?”] )(?!Quando|Enquanto|Segundo|Durante|Dado|Sendo)[A-ZÁÉÍÓÚ][a-záéíóúç]+(ad[oa]s?|id[oa]s?|ando|endo|indo)\b[^,.:]{0,30}, [A-ZÁÉÍÓÚa-z]/, 'particípio ou gerúndio abrindo a frase (2.1)'],
+  [/(^|[.!?”] )(?!Quando|Enquanto|Segundo|Durante|Dado|Sendo|Obrigad)[A-ZÁÉÍÓÚ][a-záéíóúç]+(ad[oa]s?|id[oa]s?|ando|endo|indo)\b[^,.:]{0,30}, [A-ZÁÉÍÓÚa-z]/, 'particípio ou gerúndio abrindo a frase (2.1)'],
   [/(^|[.!?”] )(A|Ao|Aos|À|Às) [^,.]{2,45}, ([a-záéíóú]+ )?(responde|avisa|lembra|pede|explica|diz|ensina|dá|mandam?)\b/, 'objeto na frente, sujeito escondido (2.2)'],
   [/(^|[.!?”] )(Entram|Vêm|Vem|Sai|Saem|Morrem|Surgem|Viajam|Vão embora) [a-záéíóú]/, 'verbo na frente (2.3)'],
   [/\b(é|foi) (ele|ela|dali|ali|aqui) (que|quem)\b|\b[Ff]oi (ele|ela|Deus|o povo|o Senhor) quem\b|\b[Qq]uem [^.,]{2,30} é (o|a) (próprio|própria)\b/, 'frase clivada (2.4)'],
   [/, (um|uma) (homem|mulher|mendigo|dos|das|cobrador|rico|membro|virgem|jovem|profetisa|sacerdote|velho) [^,]{2,45}, |, (membro d[oa]|filh[oa]s? de|homem justo|furios[oa]|a profetisa|apavorad[oa]|irad[oa]) [^,]{0,40}, /, 'aposto de ficha entre vírgulas (2.5)'],
   [/, e [A-ZÁÉÍÓÚ][a-záéíóúç]+, [a-záéíóú]/, 'elipse com vírgula (2.8)'],
-  [/, [a-záéíóúç]+(ad[oa]s?|id[oa]s?) por [a-záéíóúA-Z]/, 'particípio pendurado no fim (2.7)'],
+  [/, (?!obrigad)[a-záéíóúç]+(ad[oa]s?|id[oa]s?) por [a-záéíóúA-Z]/, 'particípio pendurado no fim (2.7)'],
   [/(^|, )(achando|querendo|ouvindo|sofrendo|louvando|pedindo|citando|começando|chegando|levando|voltando|caindo|gritando|tocando|murmurando|proclamando)\b|\b(fica|ficam) [a-záéíóúç]+(ando|endo|indo)\b/, 'gerúndio de encadeamento (4.8)'],
   [/\b(depois d[ae]|até|com) (morte|saída|travessia|partilha|libertação|opressão|proximidade|desobediência|sentença|vitória|chegada|rejeição|confirmação|crucificação|sepultamento) d[aeo]/i, 'nominalização em adjunto (4.6)'],
   [/\b(?!semente|sementes|demente|clemente)[a-záéíóúç]{4,}mente\b/i, 'advérbio em -mente (5.3)'],
   [/\b(terrível|enorme|carinhos[oa]|que ninguém esquece|profund[oa]|decisiv[oa]s?|cruel|apavorad[oa]|impactante|marcante|emblemátic[oa]|icônic[oa]|poderos[oa])\b/i, 'adjetivo de narrador (5.3)'],
   [/\b(criancinha|tabuinha|pezinho|casinha)\b/, 'diminutivo (5.8)'],  // jumentinho e moedinhas são palavras da NBV
   [/\b(bronca|enrola|muda a régua|sacou|manda ver|na lata)\b/i, 'gíria (5.9)'],
-  [/\.\.\.(?!”)|…(?!”)/, 'reticências fora de citação (3.7)'],
+  [/\.\.\.(?!”|\s*$)|…(?!”|\s*$)/, 'reticências fora de citação (3.7)'],  // no fim do texto pode: é o começo de oração que a pessoa completa
   [/[!?]”\./, 'ponto depois de !” ou ?”'],
   [/\b(nenhum outro (livro|evangelho|profeta)|só neste livro|único na Bíblia|no resto da Bíblia)\b/i, 'comparação com outros livros (6.9)'],
 ];
