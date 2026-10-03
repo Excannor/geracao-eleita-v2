@@ -8,11 +8,11 @@
     "original": "Μᾶρκος",
     "transliteracao": "Markos",
     "traducao": "consagrado a Marte",
-    "texto": "Marcos é a forma grega de Marcus, um nome latino muito comum na época. Ele vem de Marte, o deus romano da guerra. Curioso: o nome Marcos não aparece em nenhum versículo do livro."
+    "texto": "Marcos é a forma grega de Marcus, um nome latino muito comum naquele tempo. O nome vem de Marte, o deus romano da guerra. A palavra Marcos não aparece em nenhum versículo do livro."
   },
   "autoria": {
-    "texto": "Em nenhum lugar o autor diz o próprio nome. Mas ele conversa com quem está lendo. No meio de um discurso de Jesus, ele para e avisa: “que o leitor entenda o que isso quer dizer”. Ele também explica os nomes que cita. Quando Jesus chama Tiago e João de Boanerges, o autor completa: “que quer dizer ‘filhos do trovão’”.",
-    "apoio": "Ele até abre um parêntese para explicar que os fariseus não comem sem lavar as mãos, “conforme suas antigas tradições exigiam”.",
+    "texto": "O autor não diz o nome dele em lugar nenhum, mas conversa com quem está lendo. No meio de um discurso de Jesus, ele para e avisa: “que o leitor entenda o que isso quer dizer”. Quando Jesus chama Tiago e João de Boanerges, o autor traduz o apelido para quem lê. Boanerges quer dizer filhos do trovão.",
+    "apoio": "Ele até abre um parêntese para contar que os fariseus não comem sem lavar as mãos, por causa das tradições antigas deles.",
     "refs": [
       "Mc 13.14",
       "Mc 3.17",
@@ -33,200 +33,200 @@
   "ramos": [
     {
       "titulo": "Com autoridade",
-      "sub": "Ensina, cura, perdoa e chama",
+      "sub": "Jesus perdoa e cura o paralítico",
       "desenho": "pomba-sobre-o-rio",
       "galhos": [
         {
-          "texto": "No rio Jordão, João batiza Jesus. Quando Jesus sai da água, os céus se abrem e o Espírito desce sobre ele como uma pomba. E uma voz diz: “Você é meu Filho amado. Você é minha alegria”. Logo depois, o Espírito leva Jesus para o deserto. Ele fica lá quarenta dias, entre animais selvagens, tentado por Satanás.",
+          "texto": "No rio Jordão, João batiza Jesus. Quando Jesus sai da água, os céus se abrem e o Espírito desce sobre ele como uma pomba. Uma voz dos céus diz: “Você é meu Filho amado. Você é minha alegria”. Depois o Espírito leva Jesus para o deserto. Ele passa quarenta dias lá, sozinho, no meio dos animais selvagens. Satanás tenta Jesus ali, e os anjos cuidam dele.",
           "ref": "Mc 1.9-13"
         },
         {
-          "texto": "Simão e André estão jogando as redes no mar da Galileia quando Jesus passa e chama: “farei de vocês pescadores de homens!” Os dois largam as redes na mesma hora e vão com ele.",
+          "texto": "Simão e André estão jogando as redes no mar da Galileia quando Jesus passa e chama: “farei de vocês pescadores de homens!” Os dois largam as redes e vão com ele.",
           "ref": "Mc 1.16-18"
         },
         {
-          "texto": "Em Cafarnaum, o povo da sinagoga fica admirado, porque Jesus ensina com autoridade, “e não como os mestres da lei”. Um homem possesso começa a gritar, e Jesus manda o espírito imundo se calar e sair dele. Todo mundo comenta: “até os espíritos imundos obedecem às ordens dele!”",
+          "texto": "Em Cafarnaum, Jesus ensina na sinagoga num sábado, e o povo fica admirado, porque ele fala com autoridade, não como os mestres da lei. Um homem com um espírito imundo começa a gritar. Jesus manda o espírito se calar e sair do homem. Todo mundo comenta: “até os espíritos imundos obedecem às ordens dele!”",
           "ref": "Mc 1.21-27"
         },
         {
-          "texto": "Quatro homens não conseguem chegar até Jesus por causa da multidão. Então abrem um buraco no teto e descem um paralítico numa esteira. Jesus vê a fé deles e diz: “Filho, os seus pecados estão perdoados!” Os mestres da lei pensam: “Quem pode perdoar pecados a não ser Deus?” No mesmo instante, o paralítico se levanta e sai carregando a esteira.",
+          "texto": "Quatro homens carregam um paralítico numa esteira e não conseguem chegar até Jesus por causa da multidão. Então abrem um buraco no teto e descem o paralítico por ali. Jesus vê a fé deles e fala com o doente: “Filho, os seus pecados estão perdoados!” Alguns mestres da lei pensam que isso é blasfêmia, porque só Deus pode perdoar pecados. Jesus manda o paralítico pegar a esteira e ir para casa. O homem se levanta na frente de todos e sai carregando a esteira.",
           "ref": "Mc 2.3-12"
         },
         {
-          "texto": "Levi está no guichê de cobrança de impostos quando Jesus o chama. Ele se levanta depressa e vai atrás. À noite, cobradores de impostos e pecadores jantam com Jesus, e os mestres da lei querem saber como ele come com essa gente. Jesus responde: “Eu não vim chamar os justos, mas os pecadores”.",
+          "texto": "Levi está sentado no posto de cobrança de impostos. Jesus passa e chama. Levi se levanta depressa e vai atrás dele. À noite, cobradores de impostos e pecadores jantam com Jesus, e os mestres da lei querem saber como ele come com essa gente. Jesus responde: “Eu não vim chamar os justos, mas os pecadores”.",
           "ref": "Mc 2.14-17"
         },
         {
-          "texto": "Num sábado, Jesus encontra na sinagoga um homem com a mão aleijada. Ele pergunta: “O que é permitido realizar no sábado: o bem ou o mal?” Ninguém abre a boca. Jesus fica profundamente triste com o coração endurecido deles e cura a mão do homem. Os fariseus saem na mesma hora e vão combinar com os herodianos um plano para matar Jesus.",
+          "texto": "Num sábado, Jesus encontra na sinagoga um homem com a mão aleijada. Os inimigos vigiam de perto para ver se Jesus vai curar. Ele pergunta se é permitido fazer o bem ou o mal no sábado, e ninguém abre a boca. Jesus fica triste com o coração endurecido deles e manda o homem estender a mão. A mão fica curada. Os fariseus saem e vão combinar com os herodianos um plano para matar Jesus.",
           "ref": "Mc 3.1-6"
         }
       ],
-      "conexao": "A família de Jesus fica “do lado de fora” (Mc 3.31). Aos de fora, ele ensina tudo em parábolas (Mc 4.11)."
+      "conexao": "A mãe e os irmãos de Jesus ficam do lado de fora da casa (Mc 3.31). Para quem está fora, ele só fala em parábolas (Mc 4.11)."
     },
     {
-      "titulo": "Quem é este?",
-      "sub": "Parábolas e poder no lago",
+      "titulo": "Poder no lago",
+      "sub": "Jesus dorme numa almofada",
       "desenho": "barco-nas-ondas",
       "galhos": [
         {
-          "texto": "Jesus senta num barco e conta a história de um lavrador que saiu para semear. A semente cai no caminho, em solo raso e entre espinhos. A que cai em terra boa produz até cem grãos por um. Depois ele explica: o lavrador semeia a palavra de Deus.",
+          "texto": "Jesus senta num barco e conta a história de um lavrador que sai para semear. Uma parte da semente cai à beira do caminho, e as aves comem tudo. Outra cai em solo raso e murcha no sol quente. A que cai em terra boa dá até cem grãos por um. Depois Jesus diz aos discípulos que o lavrador semeia a palavra de Deus.",
           "ref": "Mc 4.1-8, 14"
         },
         {
-          "texto": "O Reino de Deus, diz Jesus, se parece com um lavrador que lança a semente na terra. Ela germina e cresce dia e noite, “sem ele saber como isso acontecia”. O Reino também é como uma semente de mostarda, uma das menores que se plantam. Mesmo assim ela vira uma planta grande, com ramos onde as aves fazem ninho.",
+          "texto": "Noutra parábola, Jesus compara o Reino de Deus a um lavrador que joga a semente na terra. Ela germina e cresce dia e noite, sem ele saber como. Jesus também compara o Reino a uma semente de mostarda, uma das menores que se plantam. Mesmo assim ela vira uma das maiores plantas, com ramos grandes onde as aves fazem ninho.",
           "ref": "Mc 4.26-32"
         },
         {
-          "texto": "Na travessia, cai uma tempestade, e o barco começa a encher de água. Jesus dorme na popa, com a cabeça numa almofada. Os discípulos o acordam aos gritos, e ele repreende o vento e manda o mar se calar. Aí eles se perguntam: “Quem é este, que até os ventos e as ondas lhe obedecem?”",
+          "texto": "Na travessia, uma tempestade cai sobre o barco, e a água começa a entrar. Jesus dorme na popa, com a cabeça numa almofada. Os discípulos acordam Jesus aos gritos, e ele se levanta e manda o vento e o mar se calarem. Tudo fica calmo. Aí eles perguntam uns aos outros: “Quem é este, que até os ventos e as ondas lhe obedecem?”",
           "ref": "Mc 4.35-41"
         },
         {
-          "texto": "Do outro lado, um homem que mora entre os túmulos vem correndo ao encontro de Jesus. Ninguém consegue dominar esse homem: ele quebra algemas e despedaça correntes. Jesus quer saber como ele se chama, e o demônio responde: “Meu nome é Legião, porque há muitos de nós neste homem”. Os espíritos imploram para entrar numa manada de porcos. Jesus deixa, e cerca de dois mil porcos se atiram no lago.",
+          "texto": "Do outro lado do mar, um homem que mora entre os túmulos vem correndo na direção de Jesus. Ninguém consegue segurar esse homem. Ele quebra algemas e despedaça correntes. Jesus pergunta o nome dele, e o demônio responde: “Meu nome é Legião, porque há muitos de nós neste homem”. Os demônios pedem para entrar numa manada de porcos. Jesus deixa, e cerca de dois mil porcos se atiram no lago.",
           "ref": "Mc 5.1-13"
         },
         {
-          "texto": "No meio da multidão, uma mulher que sofre de hemorragia há doze anos toca no manto de Jesus. Na mesma hora fica curada. Jesus sente que saiu poder dele e pergunta quem foi. Ela vem tremendo, cai aos pés dele e conta tudo. E ouve: “Filha, a sua fé a salvou!”",
+          "texto": "No meio da multidão, uma mulher que sofre de hemorragia há doze anos vem por trás de Jesus e toca no manto dele. A hemorragia para, e ela sente que está curada. Jesus sente que saiu poder dele e pergunta quem tocou no manto. A mulher vem tremendo, cai aos pés dele e conta tudo. Jesus responde: “Filha, a sua fé a salvou!”",
           "ref": "Mc 5.25-34"
         },
         {
-          "texto": "Na casa de Jairo, Jesus encontra choro e confusão. Ele diz que a criança não morreu, está só dormindo, e todos riem dele. Jesus manda todo mundo sair, segura a menina pela mão e fala: “Talita cumi!” A menina tem doze anos. Ela se levanta e começa a andar.",
+          "texto": "Na casa de Jairo, Jesus encontra choro e confusão. Ele diz que a criança não morreu, está só dormindo, e todos riem dele. Jesus manda todo mundo sair e entra no quarto com o pai, a mãe e três discípulos. Ele segura a menina pela mão e fala: “Talita cumi!” A menina tem doze anos. Ela se levanta e começa a andar.",
           "ref": "Mc 5.37-42"
         }
       ],
-      "conexao": "A Jairo, Jesus pede: “Apenas creia” (Mc 5.36). Na terra dele falta fé, e Jesus fica admirado (Mc 6.4-6)."
+      "conexao": "Jesus pede a Jairo que apenas creia (Mc 5.36). Na terra dele, ninguém crê, e Jesus fica admirado com isso (Mc 6.4-6)."
     },
     {
       "titulo": "Pão no deserto",
-      "sub": "Pães e corações endurecidos",
+      "sub": "Cinco pães para cinco mil homens",
       "desenho": "cesto-de-paes",
       "galhos": [
         {
-          "texto": "Jesus manda os Doze saírem de dois em dois. Só podem levar o bordão e as sandálias: nada de comida, sacola ou dinheiro no cinto. Pelo caminho, eles dizem a todos que se arrependam. Expulsam muitos demônios e curam doentes com óleo.",
+          "texto": "Jesus manda os Doze saírem de dois em dois, só com o bordão e as sandálias. Ele proíbe até o dinheiro no cinto. Os discípulos saem dizendo a todos que se arrependam. Pelo caminho, expulsam muitos demônios e curam doentes com óleo.",
           "ref": "Mc 6.7-13"
         },
         {
-          "texto": "Herodes diz que Jesus é João, “o homem cuja cabeça cortei”, ressuscitado dos mortos. Ele mesmo tinha mandado prender o Batista, que dizia ser errado viver com a mulher do irmão. Na festa de aniversário dele, a filha de Herodias entra dançando e agrada a todos. Ela consulta a mãe e volta pedindo a cabeça de João Batista numa bandeja. O rei, para não quebrar o juramento, manda cortar.",
+          "texto": "Herodes ouve falar de Jesus e acha que João voltou dos mortos. Ele tinha mandado prender João por dizer que era errado viver com a mulher do irmão. No aniversário de Herodes, a filha de Herodias vem dançar para os convidados, e ele promete a ela qualquer coisa. Ela consulta a mãe e volta pedindo a cabeça de João numa bandeja. Herodes não quer quebrar o juramento na frente dos convidados e manda um soldado cortar a cabeça de João.",
           "ref": "Mc 6.16-28"
         },
         {
-          "texto": "Jesus desce do barco, vê uma multidão enorme e sente compaixão, porque são “como ovelhas sem pastor”. Fica tarde, e os discípulos querem mandar o povo embora. Jesus pede que todos sentem em grupos na grama verde. Com cinco pães e dois peixes, ele alimenta cerca de 5.000 homens, e ainda sobram doze cestos cheios.",
+          "texto": "Jesus desce do barco e vê uma grande multidão. Ele sente compaixão, porque são como ovelhas sem pastor. No fim da tarde, os discípulos querem mandar o povo embora para comprar comida. Jesus pede que todos sentem em grupos na grama verde. Com cinco pães e dois peixes, ele alimenta cerca de 5.000 homens, e ainda sobram doze cestos cheios.",
           "ref": "Mc 6.34-44"
         },
         {
-          "texto": "De madrugada, os discípulos remam contra o vento no meio do lago. Jesus vem andando sobre a água, e eles gritam de medo, achando que é um fantasma. Ele fala: “Sou eu! Não tenham medo”. O vento para, e eles ficam assustados, sem entender nada. Marcos explica: não tinham entendido o milagre dos pães, “seus corações estavam endurecidos!”",
+          "texto": "De madrugada, os discípulos remam contra o vento no meio do lago. Jesus vem andando sobre a água, e eles gritam de medo. Acham que é um fantasma. Ele fala: “Sou eu! Não tenham medo”. Jesus sobe no barco, e o vento para. Os discípulos ficam assustados, sem entender nada. Eles nem tinham entendido o milagre dos pães, porque o coração deles estava endurecido.",
           "ref": "Mc 6.47-52"
         },
         {
-          "texto": "Na região de Tiro e Sidom, uma estrangeira cai aos pés de Jesus e implora pela filha, dominada por um espírito imundo. Jesus diz que não é correto tirar o pão dos filhos e jogar aos cachorrinhos. Ela não desiste: “até mesmo os cachorrinhos debaixo da mesa comem as migalhas das crianças”. Por causa dessa resposta, ele a manda voltar: o demônio já deixou a menina. Ela chega em casa e encontra a filha deitada na cama, livre.",
+          "texto": "Na região de Tiro e Sidom, uma mulher estrangeira cai aos pés de Jesus e pede que ele livre a filha dela de um espírito imundo. Jesus diz que não é correto tirar o pão dos filhos e jogar aos cachorrinhos. Ela não desiste: “até mesmo os cachorrinhos debaixo da mesa comem as migalhas das crianças”. Por causa dessa resposta, Jesus manda a mulher voltar para casa, porque o demônio já saiu da menina. Ela chega e encontra a filha deitada na cama, livre.",
           "ref": "Mc 7.24-30"
         },
         {
-          "texto": "No barco, os discípulos só têm um pão, porque esqueceram de levar mais. Eles discutem por isso, e Jesus pergunta: “Vocês têm olhos, mas não veem?” Depois faz as contas: quantos cestos sobraram com os 5.000? Doze. E com os 4.000? Sete. “Será que vocês ainda não entendem?”",
+          "texto": "No barco, os discípulos só têm um pão, porque esqueceram de levar mais. Eles discutem por isso. Jesus percebe e pergunta se eles têm olhos, mas não veem. Ele lembra os cinco pães para 5.000 homens e quer saber quantos cestos sobraram. Doze, eles respondem. Com os sete pães para 4.000, sobraram sete cestos. Jesus insiste: “Será que vocês ainda não entendem?”",
           "ref": "Mc 8.14-21"
         }
       ],
-      "conexao": "Um cego vê homens como “árvores andando” e depois tudo claro (Mc 8.24-25). Com Pedro vai ser assim."
+      "conexao": "Jesus toca duas vezes nos olhos de um cego, e ele vê tudo claro (Mc 8.24-25). Depois pergunta aos discípulos quem ele é."
     },
     {
       "titulo": "Tomar a cruz",
-      "sub": "O Cristo que sofre e serve",
+      "sub": "O Filho do Homem vai sofrer",
       "desenho": "cruz",
       "galhos": [
         {
-          "texto": "A caminho de Cesareia de Filipe, Jesus pergunta aos discípulos: “Quem vocês dizem que eu sou?” Pedro acerta: “O Senhor é o Cristo”. Então Jesus avisa que o Filho do Homem vai sofrer muito, ser morto e ressuscitar depois de três dias. Pedro leva Jesus para um lado e chama a atenção dele. E ouve uma bronca: “Satanás, vá para trás de mim!”",
+          "texto": "A caminho de Cesareia de Filipe, Jesus pergunta aos discípulos quem eles acham que ele é. Pedro responde que é o Cristo. Então Jesus avisa que o Filho do Homem vai sofrer muito, ser morto e ressuscitar depois de três dias. Pedro leva Jesus para um lado e chama a atenção dele. Jesus se vira para os discípulos e repreende Pedro: “Satanás, vá para trás de mim!”",
           "ref": "Mc 8.27-33"
         },
         {
-          "texto": "Jesus chama o povo e os discípulos. Para ir com ele, diz, é preciso pôr de lado os próprios interesses e tomar a cruz nos ombros. Quem insiste em salvar a própria vida vai perdê-la, e só a salva quem a entrega por causa dele e da boa notícia. E pergunta: “qual é o proveito que um homem tira se ele ganhar o mundo inteiro e perder a sua alma?”",
+          "texto": "Jesus chama o povo e os discípulos. Quem quiser ir com ele tem de pôr os interesses de lado e tomar a cruz nos ombros. Se alguém insiste em salvar a vida, vai perder. Só quem entrega a vida por causa de Jesus e da boa notícia fica com ela. Depois ele pergunta de que adianta ganhar o mundo inteiro e perder a alma.",
           "ref": "Mc 8.34-36"
         },
         {
-          "texto": "Seis dias depois, Jesus leva Pedro, Tiago e João ao alto de um monte. O rosto dele começa a brilhar, e a roupa fica tão branca que nada na terra conseguiria deixar assim. Elias e Moisés aparecem e conversam com Jesus. Pedro, apavorado, quer fazer três abrigos. Então uma nuvem cobre todos, e de dentro dela vem a voz: “Este é o meu Filho amado. Escutem o que ele diz!”",
+          "texto": "Seis dias depois, Jesus leva Pedro, Tiago e João ao alto de um monte. A roupa dele fica branca e brilhante, mais do que qualquer lavagem na terra conseguiria deixar. Elias e Moisés aparecem e conversam com Jesus. Pedro quer fazer três abrigos, um para cada, porque não sabe o que dizer de tanto medo. Então uma nuvem cobre todos, e de dentro dela uma voz diz: “Este é o meu Filho amado. Escutem o que ele diz!”",
           "ref": "Mc 9.2-7"
         },
         {
-          "texto": "Um pai traz o filho, dominado por um espírito que o joga no chão e o deixa rígido. Os discípulos tentaram expulsar o espírito e não conseguiram. O pai suplica ajuda, “se o Senhor pode fazer alguma coisa”. Jesus devolve: “Qualquer coisa é possível para aquele que crê”. O homem responde que crê e pede ajuda para ter mais fé. Jesus expulsa o espírito, e o menino cai como morto. Mas Jesus o toma pela mão, e ele se levanta.",
+          "texto": "Um pai traz a Jesus o filho, que um espírito mudo joga no chão e deixa rígido. Os discípulos não conseguiram expulsar o espírito. O pai pergunta se Jesus pode fazer alguma coisa. Jesus responde: “Qualquer coisa é possível para aquele que crê”. O pai diz que crê e pede ajuda para a fé pequena dele. Jesus expulsa o espírito, e o menino cai como morto. Depois Jesus pega o menino pela mão, e ele fica em pé.",
           "ref": "Mc 9.17-27"
         },
         {
-          "texto": "Chega um homem correndo. Ele se ajoelha diante de Jesus e pergunta o que fazer para receber a vida eterna. Diz que guarda os mandamentos desde a mocidade. Jesus olha para ele com amor e diz que falta só uma coisa: vender tudo, dar o dinheiro aos pobres e vir atrás dele. O homem fica contrariado e vai embora triste, “porque era muito rico”.",
+          "texto": "Quando Jesus está saindo, um homem chega correndo e se ajoelha diante dele. Ele pergunta o que fazer para receber a vida eterna e diz que guarda os mandamentos desde jovem. Jesus olha para ele com amor e diz que falta só uma coisa. O homem tem de vender tudo, dar o dinheiro aos pobres e seguir Jesus. Ele fica contrariado e vai embora triste, porque é muito rico.",
           "ref": "Mc 10.17-22"
         },
         {
-          "texto": "Tiago e João pedem a Jesus os lugares à direita e à esquerda dele na glória. Os outros discípulos ficam muito indignados quando descobrem. Então Jesus os chama. Entre eles não vai ser como com os reis da terra, que dominam o povo. “Todo aquele que quiser ser o primeiro, deve ser o escravo de todos”.",
+          "texto": "Tiago e João pedem a Jesus os lugares à direita e à esquerda dele na glória. Os outros discípulos ficam muito indignados quando descobrem. Então Jesus chama todos e diz que entre eles não vai ser como entre os reis da terra, que dominam o povo. “Todo aquele que quiser ser o primeiro, deve ser o escravo de todos”.",
           "ref": "Mc 10.35-44"
         }
       ],
       "jesus": {
-        "texto": "Esse Filho do Homem que vai sofrer é o próprio Jesus. O sumo sacerdote pergunta se ele é o Cristo, o Filho do Deus Bendito. Jesus responde na hora: “Sou, e vocês verão o Filho do Homem assentado à direita...”",
+        "texto": "O sumo sacerdote pergunta a Jesus se ele é o Cristo, o Filho do Deus Bendito. Jesus responde: “Sou”. Depois avisa que eles vão ver o Filho do Homem assentado à direita de Deus, vindo com as nuvens do céu. O Filho do Homem que vai sofrer é Jesus.",
         "refs": [
           "Mc 14.61-62"
         ]
       },
-      "conexao": "Bartimeu grita pelo “Filho de Davi” (Mc 10.47). Logo o povo celebra o “Reino do nosso pai Davi” (Mc 11.10)."
+      "conexao": "O cego Bartimeu grita por Jesus, Filho de Davi (Mc 10.47). Na estrada, o povo grita pelo Reino do nosso pai Davi (Mc 11.10)."
     },
     {
       "titulo": "Em Jerusalém",
-      "sub": "Aclamado e posto à prova",
+      "sub": "Jesus derruba as mesas no templo",
       "desenho": "duas-moedinhas",
       "galhos": [
         {
-          "texto": "Os discípulos forram um jumentinho com os mantos, e Jesus monta nele. Muita gente estende os mantos pela estrada, outros espalham ramos. Jesus vai no meio do povo, com gente na frente e atrás, e todos gritam: “Bendito seja aquele que vem em nome do Senhor!”",
+          "texto": "Os discípulos forram um jumento novo com os mantos, e Jesus monta nele. Muita gente estende os mantos pela estrada, e outros espalham ramos apanhados nos campos. Jesus vai no meio do povo, com gente na frente e atrás, e todos gritam: “Bendito seja aquele que vem em nome do Senhor!”",
           "ref": "Mc 11.7-9"
         },
         {
-          "texto": "Numa figueira cheia de folhas, Jesus procura figos e não acha nenhum. Ele diz à árvore: “Você nunca mais dará fruto!” Em Jerusalém, ele entra no templo e derruba as mesas dos cambistas: “A minha casa será chamada casa de oração para todos os povos”. Na manhã seguinte, os discípulos passam pela figueira: seca desde as raízes.",
+          "texto": "Numa figueira cheia de folhas, Jesus procura figos e não acha nenhum, porque ainda não é tempo de fruto. Ele diz à árvore: “Você nunca mais dará fruto!” Em Jerusalém, ele entra no templo, expulsa os negociantes e derruba as mesas dos cambistas. Jesus diz que a casa de Deus é para oração, e eles fizeram dela um esconderijo de ladrões. Na manhã seguinte, os discípulos passam pela figueira e veem a árvore seca desde as raízes.",
           "ref": "Mc 11.13-21"
         },
         {
-          "texto": "Jesus conta a parábola de um homem que arrenda a vinha a uns lavradores. O dono manda servos buscar a parte dele na colheita, e os lavradores espancam uns e matam outros. Por último vai o filho amado, e eles o matam e jogam o corpo fora da vinha. Jesus termina citando a Escritura: “A pedra que os construtores rejeitaram acabou se tornando a pedra mais importante de toda a construção”.",
+          "texto": "Jesus conta a parábola de um homem que arrenda a vinha a uns lavradores e sai do país. O dono manda servos buscar a parte dele na colheita, e os lavradores espancam uns e matam outros. Por último vai o filho amado. Os lavradores matam e jogam o corpo fora da vinha. Jesus termina com um versículo. A pedra que os construtores rejeitaram virou a mais importante de toda a construção.",
           "ref": "Mc 12.1-10"
         },
         {
-          "texto": "Fariseus e herodianos chegam cheios de elogios, querendo pegar Jesus numa palavra: pode pagar imposto a César ou não? Ele percebe a malícia e pede uma moeda. De quem é a figura? De César. “Deem a César o que é de César e a Deus o que é de Deus”. Muita gente fica admirada com a resposta.",
+          "texto": "Fariseus e herodianos chegam cheios de elogios e perguntam se está certo pagar imposto a César. Jesus percebe a má intenção deles e pede uma moeda. Ele pergunta de quem é a figura, e eles respondem que é de César. Jesus diz: “Deem a César o que é de César e a Deus o que é de Deus”. Muita gente fica admirada com a resposta.",
           "ref": "Mc 12.13-17"
         },
         {
-          "texto": "Um mestre da lei quer saber qual é o mandamento mais importante. Jesus responde com dois. Amar a Deus “de todo o seu coração, de toda a sua alma, de todo o seu entendimento e com todas as suas forças”. E amar o próximo como a si mesmo. O homem concorda, e ouve de Jesus: “Você não está longe do Reino de Deus”.",
+          "texto": "Um mestre da lei pergunta a Jesus qual é o mandamento mais importante. Jesus responde com dois. O primeiro é amar o Senhor de todo o coração. O segundo é amar o próximo como a si mesmo. O homem concorda, e Jesus diz a ele: “Você não está longe do Reino de Deus”. Depois disso, ninguém mais tem coragem de perguntar nada a Jesus.",
           "ref": "Mc 12.28-34"
         },
         {
-          "texto": "Perto dos cofres do templo, Jesus senta e fica olhando o povo colocar dinheiro. Os ricos põem grandes quantias. Uma viúva pobre coloca duas moedinhas de cobre. Jesus chama os discípulos: aquela viúva deu mais do que todos os ricos juntos, porque entregou “tudo o que possuía para viver”.",
+          "texto": "Perto dos cofres do templo, Jesus senta e observa o povo colocar dinheiro. Alguns ricos põem muito. Uma viúva pobre coloca duas moedas de cobre, de pouco valor. Jesus chama os discípulos e diz que aquela viúva deu mais do que todos os ricos juntos. Eles deram das sobras da riqueza. Ela deu tudo o que tinha para viver.",
           "ref": "Mc 12.41-44"
         }
       ],
       "jesus": {
-        "texto": "Essa pedra é Jesus. Pedro, na primeira carta dele, chama Cristo de pedra viva: os homens o rejeitaram, mas para Deus ele é muito precioso. E Pedro repete a mesma Escritura que Jesus citou na vinha: “a pedra que foi rejeitada pelos construtores” virou a pedra de esquina, a parte mais importante do edifício.",
+        "texto": "Na primeira carta, Pedro chama Cristo de pedra viva. Os homens rejeitaram essa pedra, mas para Deus ela é muito preciosa. Pedro repete o versículo que Jesus citou na vinha. A pedra que os construtores rejeitaram virou a pedra de esquina, a mais importante da construção. A pedra rejeitada é Jesus.",
         "refs": [
           "1Pe 2.4",
           "1Pe 2.7"
         ]
       },
-      "conexao": "“Vigiem”, pede Jesus (Mc 13.35-37). No Getsêmani, ele volta e encontra os três dormindo (Mc 14.37)."
+      "conexao": "“Vigiem”, pede Jesus, porque o dono volta a qualquer hora (Mc 13.35-37). No Getsêmani, acha os três dormindo (Mc 14.37)."
     },
     {
       "titulo": "A hora chegou",
-      "sub": "Perfume, pão, cálice e cruz",
+      "sub": "O véu do templo se rasga",
       "desenho": "calice",
       "galhos": [
         {
-          "texto": "Em Betânia, durante um jantar, uma mulher quebra um frasco de alabastro e derrama perfume de nardo puro na cabeça de Jesus. Alguns ficam indignados com o desperdício e a repreendem. Jesus a defende: ela fez o que podia e ungiu o corpo dele antes do tempo, para o sepultamento. E em todo lugar onde a boa notícia for pregada, vão lembrar do que ela fez.",
+          "texto": "Em Betânia, durante um jantar, uma mulher quebra um frasco de alabastro e derrama perfume de nardo puro na cabeça de Jesus. Alguns ficam indignados com o desperdício e repreendem a mulher. Jesus manda deixarem ela em paz. Ela fez o que podia e ungiu o corpo dele antes do tempo, para o dia do enterro. Em todo lugar onde a boa notícia for pregada, vão lembrar do que ela fez.",
           "ref": "Mc 14.3-9"
         },
         {
-          "texto": "Enquanto comem, Jesus pega um pão, dá graças e parte: “Isto é o meu corpo”. Depois toma um cálice, e todos bebem. “Isto é o meu sangue, derramado em favor de muitos, para firmar a nova aliança entre Deus e o homem”.",
+          "texto": "Enquanto comem, Jesus pega um pão e dá graças. Ele parte o pão, entrega aos discípulos e fala: “Isto é o meu corpo”. Depois pega um cálice de vinho, e todos bebem. Jesus chama o vinho de sangue dele, derramado em favor de muitos para firmar a nova aliança entre Deus e o homem.",
           "ref": "Mc 14.22-24"
         },
         {
-          "texto": "No Getsêmani, Jesus leva Pedro, Tiago e João e começa a sentir uma angústia profunda. Ele diz que a alma dele está “esmagada pela tristeza a ponto de morrer”. Vai um pouco adiante, se prostra e ora: “Afaste esse cálice de mim. Contudo, seja feita a sua vontade, e não a minha”.",
+          "texto": "No Getsêmani, Jesus leva Pedro, Tiago e João e começa a se encher de aflição. Ele diz aos três: “A minha alma está esmagada pela tristeza a ponto de morrer”. Jesus vai um pouco mais para a frente, se joga no chão e ora para que, se possível, aquela hora não chegue. Ele pede ao Pai que afaste o cálice, mas que seja feita a vontade do Pai, e não a dele.",
           "ref": "Mc 14.32-36"
         },
         {
-          "texto": "Judas, um dos Doze, chega com uma multidão armada de espadas e cacetes. O sinal combinado é um beijo. Ele vai até Jesus, diz “Mestre!” e o cumprimenta com um beijo. A multidão agarra Jesus e o prende.",
+          "texto": "Judas chega com uma multidão armada de espadas e cacetes. Ele é um dos Doze, e o sinal combinado é um beijo. Judas vai até Jesus, chama de Mestre e cumprimenta com um beijo. A multidão agarra e prende Jesus.",
           "ref": "Mc 14.43-46"
         },
         {
-          "texto": "Pilatos pergunta se Jesus é o rei dos judeus, e ele confirma. Depois Jesus não diz mais nada, e Pilatos fica espantado. Os sacerdotes principais incitam a multidão a pedir Barrabás no lugar dele, e todos gritam pela crucificação. Pilatos quer agradar ao povo. Solta Barrabás, manda açoitar Jesus e o entrega para ser crucificado.",
+          "texto": "Pilatos pergunta se Jesus é o rei dos judeus, e ele confirma. Depois Jesus não diz mais nada, e Pilatos fica espantado. Os sacerdotes principais agitam a multidão para pedir Barrabás no lugar de Jesus, e o povo grita para crucificar. Pilatos quer agradar a todos. Ele solta Barrabás, manda açoitar Jesus e entrega ele para ser crucificado.",
           "ref": "Mc 15.2-15"
         },
         {
@@ -237,7 +237,7 @@
     }
   ],
   "cristo": {
-    "texto": "“Ele não está aqui! Ele ressuscitou!” O anjo mostra às mulheres o lugar onde o corpo estava. Jesus tinha avisado que ia ressuscitar depois de três dias (Mc 10.34). E, na hora da prisão, disse que tudo estava acontecendo para cumprir as profecias (Mc 14.49). Marcos faz isso várias vezes: mostra a Escritura se cumprindo em Jesus, do deserto até a cruz.",
+    "texto": "No túmulo, um anjo diz às mulheres: “Ele não está aqui! Ele ressuscitou!” Depois mostra o lugar onde o corpo estava. Jesus tinha avisado que ia ser morto e ressuscitar depois de três dias (Mc 10.34). Na noite da prisão, ele disse que tudo aquilo estava acontecendo para cumprir as profecias a respeito dele (Mc 14.49).",
     "ref": "Mc 16.6",
     "desenho": "tumulo-aberto",
     "pares": [
@@ -245,7 +245,7 @@
         "at": "Is 40.3",
         "texto": "Preparem um caminho para o Senhor através do deserto; preparem um caminho reto e plano no deserto para o nosso Deus.",
         "nt": "Mc 1.2-4",
-        "nota": "João Batista prepara o caminho no deserto"
+        "nota": "João batiza no deserto e prepara o caminho"
       },
       {
         "at": "Zc 13.7",
@@ -257,13 +257,13 @@
         "at": "Is 53.12",
         "texto": "Foi considerado um pecador; pois levou sobre si os pecados de muitos e orou em favor dos pecadores.",
         "nt": "Mc 15.27-28",
-        "nota": "Jesus é crucificado entre dois assaltantes"
+        "nota": "Dois assaltantes ficam nas cruzes ao lado de Jesus"
       },
       {
         "at": "Sl 22.1",
         "texto": "Meu Deus! Meu Deus! Por que me abandonou?",
         "nt": "Mc 15.34",
-        "nota": "Jesus clama em voz alta essas mesmas palavras"
+        "nota": "Na cruz, Jesus grita essas palavras com grande voz"
       }
     ]
   },
@@ -274,12 +274,12 @@
       "ate": 3
     },
     {
-      "titulo": "Parábolas e milagres",
+      "titulo": "No lago",
       "de": 4,
       "ate": 5
     },
     {
-      "titulo": "Os Doze e os pães",
+      "titulo": "Pão para a multidão",
       "de": 6,
       "ate": 7
     },
@@ -294,7 +294,7 @@
       "ate": 13
     },
     {
-      "titulo": "Ceia, prisão e cruz",
+      "titulo": "A cruz",
       "de": 14,
       "ate": 15
     },
@@ -306,60 +306,60 @@
   ],
   "curiosidades": [
     {
-      "texto": "João Batista anda vestido de pelo de camelo, com um cinto de couro. E come gafanhotos e mel do campo.",
+      "texto": "A roupa de João é de pelo de camelo, com um cinto de couro. A comida dele é gafanhoto e mel do campo.",
       "ref": "Mc 1.6"
     },
     {
-      "texto": "Um leproso se ajoelha e pede a cura. Jesus, “levado pela compaixão”, toca nele e o cura. Depois avisa que ele não deve parar no caminho para falar com ninguém. O homem faz o contrário, espalha a notícia, e Jesus já não pode entrar publicamente em cidade nenhuma.",
+      "texto": "Um leproso se ajoelha diante de Jesus e pede para ser curado. Jesus sente compaixão, toca nele e cura o homem. Depois manda ele ir direto ao sacerdote, sem parar no caminho para falar com ninguém. O homem faz o contrário e espalha a notícia, e Jesus já não pode entrar às claras em cidade nenhuma. Ele fica fora, nos lugares desertos.",
       "ref": "Mc 1.40-45"
     },
     {
-      "texto": "Jesus escolhe doze para ficarem com ele e dá a Simão o nome de Pedro. O último da lista é Judas Iscariotes, “aquele que traiu Jesus”.",
+      "texto": "Jesus escolhe doze para ficarem com ele e põe o nome de Pedro em Simão. O último da lista é Judas Iscariotes, aquele que traiu Jesus.",
       "ref": "Mc 3.14-16, 19"
     },
     {
-      "texto": "Tanta gente se junta na casa que não sobra tempo nem para comer. Os parentes ficam sabendo e dizem: “Ele está fora de si”. E vêm tentar levar Jesus para casa.",
+      "texto": "Tanta gente se junta na casa que ninguém acha tempo nem para comer. Os parentes de Jesus sabem disso e vêm para levar ele para casa. Eles dizem: “Ele está fora de si”.",
       "ref": "Mc 3.20-21"
     },
     {
-      "texto": "Na sinagoga, quem ouve Jesus fica admirado e pergunta: “Não é ele o carpinteiro, o filho de Maria...?” Eles ainda citam os irmãos pelo nome: Tiago, José, Judas e Simão.",
+      "texto": "Na sinagoga da terra dele, quem ouve Jesus fica admirado e pergunta: “Não é ele o carpinteiro, o filho de Maria...?” Eles conhecem os irmãos dele pelo nome, Tiago, José, Judas e Simão, e as irmãs moram ali no meio deles. Todos ficam escandalizados com Jesus.",
       "ref": "Mc 6.2-3"
     },
     {
-      "texto": "Para curar um surdo e gago, Jesus o tira do meio da multidão. Põe os dedos nos ouvidos dele, cospe, toca a língua do homem, olha para o céu e suspira. Depois ordena: “Efatá!” Na mesma hora, o homem passa a ouvir e a falar direito.",
+      "texto": "Jesus tira um surdo e gago do meio da multidão. Põe os dedos nos ouvidos do homem, cospe e toca a língua dele com a saliva. Depois olha para o céu, suspira e fala: “Efatá!” O homem ouve e começa a falar direito.",
       "ref": "Mc 7.32-35"
     },
     {
-      "texto": "Algumas mães trazem as crianças para Jesus tocar nelas, e os discípulos as repreendem. Jesus fica muito indignado: “Deixem que as crianças venham a mim”. Depois ele toma as crianças nos braços, põe as mãos sobre a cabeça delas e as abençoa.",
+      "texto": "Algumas mães levam as crianças a Jesus para ele tocar nelas, e os discípulos mandam não incomodar. Jesus fica muito indignado com os discípulos: “Deixem que as crianças venham a mim”. Depois ele pega as crianças nos braços, põe as mãos na cabeça delas e abençoa todas.",
       "ref": "Mc 10.13-16"
     },
     {
-      "texto": "Jesus diz que ninguém sabe o dia ou a hora em que essas coisas vão acontecer, “nem os anjos no céu, nem o Filho”. Só o Pai sabe.",
+      "texto": "Jesus diz que ninguém sabe o dia ou a hora em que essas coisas vão acontecer. Nem os anjos no céu sabem, nem o Filho. Só o Pai sabe.",
       "ref": "Mc 13.32"
     },
     {
-      "texto": "Um jovem segue Jesus vestido só com um lençol de linho. Quando a multidão tenta agarrar o rapaz, ele escapa nu e deixa o lençol para trás.",
+      "texto": "Um jovem segue Jesus vestido só com um lençol de linho. Quando a multidão tenta agarrar o jovem, ele escapa nu e deixa o lençol para trás.",
       "ref": "Mc 14.51-52"
     },
     {
-      "texto": "No pátio do sumo sacerdote, Pedro nega Jesus três vezes. Na terceira ele chega a praguejar e jurar que nem conhece o homem. Aí o galo canta pela segunda vez, Pedro lembra do aviso de Jesus e começa a chorar.",
+      "texto": "Uma criada do sumo sacerdote vê Pedro se esquentando na fogueira do pátio e diz que ele também estava com Jesus. Pedro nega três vezes. Na terceira, chega a praguejar e jurar que nem conhece o homem. O galo canta pela segunda vez, Pedro lembra do aviso de Jesus e começa a chorar.",
       "ref": "Mc 14.66-72"
     },
     {
-      "texto": "Simão, um homem de Cirene, está chegando do campo quando os soldados o obrigam a carregar a cruz de Jesus. Marcos ainda anota que ele é pai de Alexandre e de Rufo.",
+      "texto": "No caminho, os soldados encontram um homem de Cirene chamado Simão. Ele está chegando do campo, e os soldados obrigam Simão a carregar a cruz de Jesus. Simão é pai de Alexandre e de Rufo.",
       "ref": "Mc 15.21"
     },
     {
-      "texto": "José de Arimateia, membro do Sinédrio, toma coragem e pede a Pilatos o corpo de Jesus. Pilatos custa a acreditar que ele já morreu e chama o soldado romano encarregado para confirmar. Só então libera o corpo. José compra um lençol de linho, envolve Jesus e o põe num sepulcro aberto na rocha.",
+      "texto": "José de Arimateia é membro do Sinédrio. Ele toma coragem e vai pedir a Pilatos o corpo de Jesus. Pilatos custa a acreditar que Jesus já morreu e chama o soldado romano responsável para confirmar. Só depois deixa José levar o corpo. José compra um lençol de linho, envolve Jesus e deixa num sepulcro aberto na rocha.",
       "ref": "Mc 15.43-46"
     },
     {
-      "texto": "Maria Madalena é a primeira a ver Jesus ressuscitado, e os discípulos não acreditam nela. Dois homens o encontram a caminho do campo, e também ninguém acredita neles. Depois Jesus aparece aos onze, censura a incredulidade deles e manda: “Vão ao mundo inteiro”.",
+      "texto": "Maria Madalena é a primeira a ver Jesus ressuscitado, e os discípulos não acreditam nela. Dois homens encontram Jesus a caminho do campo, e também ninguém acredita neles. Depois Jesus aparece aos onze enquanto comem e repreende eles por não terem acreditado em quem viu. Então manda: “Vão ao mundo inteiro”.",
       "ref": "Mc 16.9-15"
     }
   ],
   "procure": {
-    "texto": "“Imediatamente.” Dois irmãos deixam o pai Zebedeu no barco “imediatamente” e vão atrás de Jesus. Marcos escreve essa palavra quinze vezes, a última na noite da prisão, quando o galo canta pela segunda vez e Pedro lembra do aviso de Jesus. Marque cada uma e repare na pressa com que Marcos conta tudo.",
+    "texto": "Os filhos de Zebedeu deixam o pai no barco “imediatamente” e vão atrás de Jesus. Essa palavra aparece quinze vezes no livro. A lepra some assim, a menina de doze anos se levanta assim, o pai do menino responde assim que crê. Procure as outras catorze pelo livro. A última é na noite da prisão.",
     "ref": "Mc 1.20"
   }
 }
