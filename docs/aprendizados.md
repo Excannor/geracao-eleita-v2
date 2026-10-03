@@ -935,3 +935,6 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
 
 ## Todo pedido de ação precisa de um caminho (2026-10-03)
 Um usuário viu "Leia um dos Primeiros passos" e "Tome um café ao vivo" nos Desafios e não achou onde fazer. Regra: toda tela que pede uma ação (desafio, meta, convite) leva até ela com um botão. Cada desafio em `CC.MISSOES` tem `ir` (rota) e `botao` (rótulo); desafio novo sem `ir` só se a ação for fora do app (ligar, servir), e aí o "Já fiz" basta.
+
+## Reflexões U5–U7: o escritor errava fato, não só voz (2026-10-03)
+A primeira passada do revisor corrigiu 29–43% dos campos, e a segunda 13–18%. Boa parte não era estilo: era fato trocado (quem canta, quem acredita), Deus escondido, motivo inventado, fala de personagem lida como verdade. A lista ficou em `ferramentas/reflexoes/CLAUDE.md` ("O que o revisor mais corrigiu") para o escritor das unidades seguintes evitar antes de chegar ao revisor. Medir se a primeira passada de U8–U10 cai abaixo de 20%.

@@ -30,6 +30,24 @@ redação). Também barradas: jogo de palavras ("proibição e não proteção")
 que o contexto e a reflexão do dia já disseram, misturar "você" e "te" na mesma pergunta, citar
 fala da Bíblia sem aspas.
 
+**O que o revisor mais corrigiu nas Unidades 5 a 7 (o escritor já evita).** A primeira passada
+do revisor mexeu em 29% a 43% dos campos. Os erros que mais apareceram:
+- Fato trocado: quem faz o quê (Asafe canta em 1 Cr 16.7, não Davi; Rode acredita em At 12;
+  Apolo "ensinava de modo correto" em At 18). Confira cada ação no capítulo do dia, na NBV.
+- Deus escondido: "uma peste mata", "os inimigos lutam entre si". Se o texto diz que foi o
+  Senhor, diga que foi o Senhor.
+- Motivo inventado: dar a alguém um porquê que o texto não dá (Obede, Jeú).
+- Violência suavizada ou aplicada ao leitor (Jeú). Conte sem aplaudir e não ligue a matança a
+  "fazer algo por Deus".
+- Fala de personagem como verdade do narrador (amigos de Jó, Eliú): sempre "Elifaz acha que…".
+- Mesma pergunta em dias diferentes (o "até quando", "quem sou eu", "ajudar alguém", "o que você
+  quer dizer a Deus sobre isso"). Antes de escrever, leia as perguntas da unidade inteira.
+- Pergunta que repete o texto do dia, ou que faz duas perguntas, ou que tem resposta óbvia.
+- Duas leituras do dia numa frase só. Cada leitura ganha as suas frases ("Em 2 Reis… Em Atos…").
+- Citação longa que não é o versículo-âncora: vira paráfrase.
+- Promessa que vira teologia da prosperidade (o dobro de Jó, as riquezas de Salomão) ou que
+  pressiona quem foi ferido a perdoar.
+
 **Interpretação pode, presa ao texto.** Nas explicações antes da leitura, dá para dizer o que a
 passagem ensina ou como ler ("São regras daquele povo, naquela época"), desde que a leitura saia
 da própria passagem e do contexto dela, sem doutrina de grupo e sem tradição de pregação
