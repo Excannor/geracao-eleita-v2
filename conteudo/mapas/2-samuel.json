@@ -1,0 +1,376 @@
+{
+  "nome": "2 Samuel",
+  "grupo": "Históricos",
+  "numero": 10,
+  "capitulos": 24,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "שְׁמוּאֵל",
+    "transliteracao": "Shemuel",
+    "traducao": "nome de Deus",
+    "texto": "Shemuel junta duas palavras hebraicas que querem dizer nome e Deus. Ninguém chamado Samuel aparece nestes 24 capítulos. A história continua de onde 1 Samuel parou, com Saul morto no monte Gilboa."
+  },
+  "autoria": {
+    "texto": "Davi escreve um hino triste para Saul e Jônatas e manda ensinar aos homens de Judá. Esse lamento está escrito no Livro de Jasar. O nome de quem escreveu 2 Samuel não aparece em lugar nenhum.",
+    "apoio": "Na corte, Josafá escreve os acontecimentos do reino de Davi. Absalão faz para si um monumento no vale do Rei, que todo mundo conhece pelo nome dele até hoje.",
+    "refs": [
+      "2Sm 1.17-18",
+      "2Sm 8.16",
+      "2Sm 18.18"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "No começo de 2 Samuel, Davi e os homens dele choram e jejuam por Saul e Jônatas. Davi vira rei de todo o Israel, e Deus promete que o trono da família dele vai durar para sempre. Depois, Davi toma a mulher de Urias e manda matar o marido. O profeta Natã avisa que a espada nunca vai sair de cima da família de Davi, e o filho Absalão chega a tomar o trono do pai.",
+    "apoio": "Num cântico de louvor, Davi diz: “O Senhor é a minha rocha, a minha fortaleza e o meu salvador”.",
+    "refs": [
+      "2Sm 1.11-12",
+      "2Sm 12.9-10",
+      "2Sm 22.1-2"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Rei em Hebrom",
+      "sub": "Davi chora por Saul e Jônatas",
+      "desenho": "coroa-e-pulseira",
+      "galhos": [
+        {
+          "texto": "Três dias depois que Davi volta a Ziclague, um homem chega com a roupa rasgada e terra na cabeça. Ele é amalequita e diz que matou Saul porque o rei pediu. Depois entrega a Davi a coroa e uma pulseira de Saul. Davi manda um soldado matar o homem.",
+          "ref": "2Sm 1.1-2, 8-10, 15"
+        },
+        {
+          "texto": "No hino, Davi canta que os heróis caíram no meio da batalha. Para Jônatas, ele diz: “Como eu choro por você, meu irmão Jônatas”.",
+          "ref": "2Sm 1.19, 25-26"
+        },
+        {
+          "texto": "Davi pergunta ao Senhor para qual cidade de Judá deve ir, e o Senhor responde: “Para Hebrom”. Lá, os homens de Judá fazem de Davi o rei de Judá. Abner comanda o exército de Saul. Ele leva um filho de Saul para Maanaim e faz dele rei de Israel.",
+          "ref": "2Sm 2.1, 4, 8-9"
+        },
+        {
+          "texto": "Asael é irmão de Joabe e corre como uma cabra dos montes. Na batalha, ele vai atrás de Abner sem desviar. Abner pede duas vezes que ele pare. Asael não ouve, e Abner mata Asael com a parte de trás da lança.",
+          "ref": "2Sm 2.18-23"
+        },
+        {
+          "texto": "Abner manda propor um acordo a Davi, e os dois se despedem em paz em Hebrom. Joabe chama Abner de volta sem Davi saber. Perto do portão da cidade, Joabe mata Abner para vingar o irmão Asael. No enterro, Davi chora alto ao lado da sepultura.",
+          "ref": "2Sm 3.12, 21, 26-27, 32"
+        },
+        {
+          "texto": "Recabe e Baaná entram na casa do filho de Saul na hora do descanso e matam o homem na cama, enquanto ele dorme. Eles levam a cabeça dele a Davi e dizem que Deus deu ao rei vingança contra Saul. Davi chama os dois de homens perversos e manda matar os irmãos.",
+          "ref": "2Sm 4.5-8, 11-12"
+        }
+      ],
+      "conexao": "Todas as tribos vão a Hebrom e dizem a Davi: “Nós somos seus irmãos, sangue do seu sangue” (2Sm 5.1)."
+    },
+    {
+      "titulo": "A arca chega",
+      "sub": "Davi salta diante do Senhor",
+      "desenho": "arca-com-varas",
+      "galhos": [
+        {
+          "texto": "Os líderes de Israel vão a Hebrom, e Davi faz uma aliança com eles. Eles ungem Davi rei de Israel. Ele tem trinta anos quando começa a reinar e reina quarenta.",
+          "ref": "2Sm 5.3-4"
+        },
+        {
+          "texto": "Em Jerusalém, os jebuseus zombam de Davi: “Até os cegos e os aleijados são capazes de expulsar você daqui!” Davi manda os soldados entrarem pelo canal de água e toma a fortaleza de Sião. Ele vai morar ali e chama o lugar de Cidade de Davi.",
+          "ref": "2Sm 5.6-9"
+        },
+        {
+          "texto": "Os filisteus voltam a se espalhar pelo vale de Refaim. O Senhor manda Davi dar a volta por trás deles e atacar pelo lado das amoreiras. Quando Davi ouvir um som de marcha nas copas das árvores, pode atacar, porque o Senhor saiu na frente dele.",
+          "ref": "2Sm 5.22-24"
+        },
+        {
+          "texto": "Uzá e Aiô guiam o carro novo com a arca, e Davi e o povo vão atrás com liras e címbalos. Nas terras de Nacom, os bois tropeçam, e Uzá põe a mão na arca para segurar. Deus se ira com Uzá, e ele cai morto ali.",
+          "ref": "2Sm 6.3, 5-7"
+        },
+        {
+          "texto": "Naquele dia, Davi fica com medo do Senhor e deixa a arca na casa de um homem de Gate. Em três meses, o Senhor abençoa esse homem e toda a família dele. Quando sabe disso, Davi manda buscar a arca para a Cidade de Davi.",
+          "ref": "2Sm 6.9-12"
+        },
+        {
+          "texto": "Davi veste o colete de linho dos sacerdotes e vai dançando diante do Senhor com todas as forças. Mical vê da janela e despreza Davi no coração. Davi responde a ela: “Eu dançava diante do Senhor”.",
+          "ref": "2Sm 6.14, 16, 21"
+        }
+      ],
+      "conexao": "A arca fica na tenda que Davi armou (2Sm 6.17). O Senhor dá a Davi descanso das guerras (2Sm 7.1)."
+    },
+    {
+      "titulo": "O trono de Davi",
+      "sub": "Natã leva a promessa a Davi",
+      "desenho": "mesa-posta",
+      "galhos": [
+        {
+          "texto": "Davi diz ao profeta Natã que mora num palácio de cedro, enquanto a arca de Deus fica numa simples tenda. Naquela noite, o Senhor manda Natã perguntar a Davi: “Será você o que vai construir uma casa para eu morar?”",
+          "ref": "2Sm 7.2-5"
+        },
+        {
+          "texto": "Deus lembra que escolheu Davi quando ele ainda era um simples pastor de ovelhas. Agora o Senhor promete que vai construir uma casa para Davi, uma família de reis. Um filho de Davi vai construir a casa de Deus, e o reino desse filho vai ficar de pé para sempre.",
+          "ref": "2Sm 7.8, 11, 13"
+        },
+        {
+          "texto": "No Tabernáculo, Davi senta diante do Senhor. Ele pergunta por que Deus abençoa tanto alguém de uma família tão pequena. Depois ora: “Quão grande é o Senhor Deus!”",
+          "ref": "2Sm 7.18, 22"
+        },
+        {
+          "texto": "Davi vence o exército do rei Hadadezer e leva para Jerusalém os escudos de ouro dos oficiais dele. O Senhor dá vitória a Davi por onde ele vai. Davi é um rei justo e trata todo o povo de Israel com igualdade.",
+          "ref": "2Sm 8.3, 6-7, 15"
+        },
+        {
+          "texto": "Por amor a Jônatas, Davi quer ser bom com alguém da família de Saul. Ziba conta que um filho de Jônatas está vivo e é aleijado dos dois pés. Mefibosete chega e se inclina com o rosto no chão. Davi diz a ele: “você comerá sempre à minha mesa!”",
+          "ref": "2Sm 9.1, 3, 6-7"
+        },
+        {
+          "texto": "O rei dos amonitas morre, e Davi manda mensageiros consolar o filho dele, Hanum. Os oficiais de Hanum dizem que os homens são espiões. Hanum corta metade da barba de cada mensageiro. Ele também deixa a roupa deles curta, na altura das nádegas. Davi manda os homens esperarem em Jericó até a barba crescer.",
+          "ref": "2Sm 10.1-5"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus diz no Apocalipse: “Eu tanto sou a Raiz quanto o Descendente de Davi”. O filho que Deus promete a Davi, com um reino que fica de pé para sempre, é Jesus.",
+        "refs": [
+          "Ap 22.16"
+        ]
+      },
+      "conexao": "Na época das guerras, Davi manda Joabe cercar a cidade de Rabá e fica em Jerusalém (2Sm 11.1)."
+    },
+    {
+      "titulo": "Davi e Urias",
+      "sub": "Natã conta da ovelha do pobre",
+      "desenho": "ovelha-e-tigela",
+      "galhos": [
+        {
+          "texto": "Numa tarde, Davi não consegue dormir e sobe ao terraço do palácio. Lá de cima, ele vê uma mulher muito bonita tomando banho e manda perguntar quem é. Ela é a mulher de Urias, o heteu. Davi manda buscar a mulher e tem relações com ela.",
+          "ref": "2Sm 11.2-4"
+        },
+        {
+          "texto": "A mulher fica grávida e manda avisar Davi. Davi chama Urias da guerra e manda ele descansar em casa. Urias dorme na porta do palácio. Ele diz que não vai para casa enquanto a arca e os soldados estão acampados ao ar livre.",
+          "ref": "2Sm 11.5-6, 8-11"
+        },
+        {
+          "texto": "Davi escreve uma carta a Joabe e manda Urias levar. Na carta, Davi manda Joabe pôr Urias na linha de frente e abandonar ele onde a luta for mais dura, para ser morto. Urias morre na batalha. Quando acaba o luto, Davi traz a viúva para o palácio e casa com ela. O que Davi fez desagrada a Deus.",
+          "ref": "2Sm 11.14-15, 17, 26-27"
+        },
+        {
+          "texto": "O Senhor manda Natã contar uma história a Davi. Um homem rico tem muitas ovelhas e bois. Um pobre tem uma ovelha só, que come no prato dele e dorme nos braços dele. Quando chega uma visita, o rico pega a ovelha do pobre para fazer o banquete.",
+          "ref": "2Sm 12.1-4"
+        },
+        {
+          "texto": "Davi fica furioso e jura que o homem que fez isso deve morrer. Natã responde: “Você é o homem rico da história!” Davi diz a Natã que pecou contra o Senhor. Natã diz que Deus perdoou e que Davi não vai morrer.",
+          "ref": "2Sm 12.5, 7, 13"
+        },
+        {
+          "texto": "O filho de Davi com a mulher de Urias fica muito doente. Davi passa a noite no chão, sem comer, e pede a Deus pelo menino. No sétimo dia, a criança morre. Davi se levanta e vai adorar o Senhor. Depois diz: “Eu, sim, irei para onde ela está; ela, porém, nunca voltará a mim”.",
+          "ref": "2Sm 12.15-16, 18, 20, 23"
+        }
+      ],
+      "conexao": "Natã avisa que a família de Davi vai se revoltar contra ele (2Sm 12.11). Amnom se apaixona por Tamar (2Sm 13.1)."
+    },
+    {
+      "titulo": "A espada em casa",
+      "sub": "Absalão toma o trono do pai",
+      "desenho": "corneta-de-chifre",
+      "galhos": [
+        {
+          "texto": "Amnom é filho de Davi e se apaixona por Tamar, a irmã de Absalão. Ele finge que está doente e pede que Tamar venha preparar bolos para ele. Tamar diz: “Não faça essa loucura!” Amnom é mais forte e obriga Tamar a deitar com ele.",
+          "ref": "2Sm 13.1, 6, 12, 14"
+        },
+        {
+          "texto": "Depois, Amnom manda pôr Tamar para fora e fechar a porta. Ela rasga a túnica longa que as filhas do rei usam e sai chorando alto, com cinzas na cabeça. Tamar vai morar na casa de Absalão como uma mulher desolada.",
+          "ref": "2Sm 13.17-20"
+        },
+        {
+          "texto": "Absalão não diz nada a Amnom, mas guarda um ódio muito grande. Dois anos depois, ele faz uma festa no corte da lã das ovelhas e convida os irmãos. Os homens de Absalão matam Amnom no meio da festa. Absalão foge para Gesur, e Davi chora pelo filho todos os dias.",
+          "ref": "2Sm 13.22-23, 28-29, 37"
+        },
+        {
+          "texto": "De manhã cedo, Absalão fica no portão da cidade, esperando quem vem pedir justiça ao rei. Ele diz a cada um que a pessoa tem razão e que é pena o rei não ter quem ouça. Quando alguém se curva, Absalão abraça e beija a pessoa. Assim ele conquista o coração do povo de Israel.",
+          "ref": "2Sm 15.2-6"
+        },
+        {
+          "texto": "Em Hebrom, Absalão avisa Israel em segredo que, quando a trombeta tocar, todos devem dizer que ele é rei. Davi foge de Jerusalém com a família. Ele sobe o monte das Oliveiras chorando, com a cabeça coberta e os pés descalços.",
+          "ref": "2Sm 15.9-10, 14, 16, 30"
+        },
+        {
+          "texto": "Aitofel quer sair naquela noite com doze mil homens atrás de Davi. Husai diz que o conselho de Aitofel não é bom e aconselha juntar o exército de Dã até Berseba. Absalão escolhe o conselho de Husai. O Senhor faz isso para Absalão ser derrotado.",
+          "ref": "2Sm 17.1, 7, 11, 14"
+        }
+      ],
+      "conexao": "Davi pede aos comandantes: “Por amor a mim, sejam bondosos com o jovem Absalão!” (2Sm 18.5)"
+    },
+    {
+      "titulo": "O rei volta",
+      "sub": "Davi compra a eira de Araúna",
+      "desenho": "jarro-derramado",
+      "galhos": [
+        {
+          "texto": "Na floresta, a mula de Absalão passa debaixo de um grande carvalho, e o cabelo dele fica preso nos galhos. Joabe mata Absalão ali. Quando sabe, Davi chora no quarto: “Meu filho Absalão, meu filho, meu filho Absalão!”",
+          "ref": "2Sm 18.9, 14, 33"
+        },
+        {
+          "texto": "O exército volta para a cidade em silêncio, envergonhado. Davi cobre o rosto e chora por Absalão. Joabe diz ao rei: “Parece que o senhor ama aqueles que o odeiam, e odeia aqueles que o amam”. Davi sai e senta de novo na porta da cidade.",
+          "ref": "2Sm 19.3-6, 8"
+        },
+        {
+          "texto": "Barzilai tem oitenta anos e sustentou Davi em Maanaim. Davi convida Barzilai para morar com ele em Jerusalém. Barzilai diz que nem sente mais o gosto do que come e quer morrer na cidade dele. Davi beija e abençoa Barzilai.",
+          "ref": "2Sm 19.32-35, 37, 39"
+        },
+        {
+          "texto": "Seba se revolta contra Davi e se fecha na cidade de Abel. Os soldados de Joabe cercam a cidade e tentam derrubar o muro. Uma mulher sábia chama Joabe e combina com ele. O povo corta a cabeça de Seba e joga para Joabe do alto do muro.",
+          "ref": "2Sm 20.14-18, 21-22"
+        },
+        {
+          "texto": "Davi entrega sete descendentes de Saul aos gibeonitas, e eles são enforcados no começo da colheita. Rispa é mãe de dois deles. Ela estende um pano de saco numa rocha e fica ali até a chuva, para as aves e os animais não comerem os corpos.",
+          "ref": "2Sm 21.8-10"
+        },
+        {
+          "texto": "Logo que manda contar o povo, Davi sente que pecou. O Senhor manda uma praga, e o anjo chega perto da eira de Araúna. Araúna quer dar a eira e os bois de graça. Davi paga e diz que não vai oferecer ao Senhor um sacrifício “daquilo que não me custou nada”. Ele constrói um altar ali, e a praga acaba.",
+          "ref": "2Sm 24.10, 15-16, 22-25"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Deus manda Natã dizer a Davi: “o seu trono será estabelecido para sempre”. Pedro lembra aos irmãos que Davi morreu e que o túmulo dele ainda está ali (At 2.29). Davi era profeta e sabia que um descendente dele ia sentar no trono (At 2.30). Pedro diz que Davi falava de Jesus, que Deus ressuscitou dos mortos (At 2.31-32).",
+    "ref": "2Sm 7.16",
+    "desenho": "trono",
+    "pares": [
+      {
+        "at": "2Sm 7.12",
+        "texto": "escolherei um dos seus filhos para ocupar o trono",
+        "nt": "Jo 7.41-42",
+        "nota": "O povo discute se o Cristo pode vir da Galileia, porque as Escrituras dizem que ele vem da família de Davi e de Belém"
+      },
+      {
+        "at": "2Sm 7.14",
+        "texto": "Eu serei para ele pai, e ele será o meu filho.",
+        "nt": "Hb 1.5",
+        "nota": "Deus nunca disse a nenhum anjo o que diz ao Filho"
+      },
+      {
+        "at": "2Sm 23.2",
+        "texto": "O Espírito do Senhor falou por meio de mim; e a sua palavra estava na minha boca.",
+        "nt": "Mt 22.42-43",
+        "nota": "Jesus pergunta de quem o Messias é filho. Ele lembra que Davi fala pelo Espírito Santo e chama o Messias de Senhor"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Davi reina em Hebrom",
+      "de": 1,
+      "ate": 4
+    },
+    {
+      "titulo": "Jerusalém e a arca",
+      "de": 5,
+      "ate": 6
+    },
+    {
+      "titulo": "Deus promete uma casa a Davi",
+      "de": 7,
+      "ate": 10
+    },
+    {
+      "titulo": "Davi e a mulher de Urias",
+      "de": 11,
+      "ate": 12
+    },
+    {
+      "titulo": "Amnom, Tamar e Absalão",
+      "de": 13,
+      "ate": 14
+    },
+    {
+      "titulo": "Absalão se revolta",
+      "de": 15,
+      "ate": 18
+    },
+    {
+      "titulo": "Davi volta a Jerusalém",
+      "de": 19,
+      "ate": 20
+    },
+    {
+      "titulo": "Os últimos anos de Davi",
+      "de": 21,
+      "ate": 24
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Na represa de Gibeom, doze homens do lado do filho de Saul e doze de Davi lutam agarrados pelos cabelos. Os vinte e quatro caem mortos juntos.",
+      "ref": "2Sm 2.14-16"
+    },
+    {
+      "texto": "Davi tem seis filhos em Hebrom, cada um de uma mulher. O terceiro é Absalão, e a mãe dele é filha do rei de Gesur.",
+      "ref": "2Sm 3.2-5"
+    },
+    {
+      "texto": "Para fazer o acordo com Abner, Davi pede de volta Mical, a mulher com quem casou. Paltiel é o marido dela agora e vai atrás chorando até Baurim. Abner manda Paltiel voltar para casa.",
+      "ref": "2Sm 3.13-16"
+    },
+    {
+      "texto": "Mefibosete tem cinco anos quando chega a notícia da morte de Saul e Jônatas. A ama pega o menino no colo e foge, mas deixa ele cair, e ele fica aleijado.",
+      "ref": "2Sm 4.4"
+    },
+    {
+      "texto": "Hirão é rei de Tiro e manda a Davi madeira de cedro, carpinteiros e pedreiros para construir o palácio.",
+      "ref": "2Sm 5.11"
+    },
+    {
+      "texto": "Mical é filha de Saul e não tem filhos a vida inteira.",
+      "ref": "2Sm 6.23"
+    },
+    {
+      "texto": "A mulher de Urias tem outro filho, e Davi põe nele o nome de Salomão. O Senhor ama o menino e manda Natã chamar ele de Jedidias.",
+      "ref": "2Sm 12.24-25"
+    },
+    {
+      "texto": "Davi toma Rabá e põe na cabeça a coroa do rei de lá. A coroa é de ouro puro, com pedras preciosas, e pesa uns trinta e cinco quilos.",
+      "ref": "2Sm 12.29-30"
+    },
+    {
+      "texto": "Joabe manda uma mulher sábia de Tecoa vestir roupa de luto e contar ao rei uma história. Ela diz que um dos dois filhos dela matou o outro numa briga no campo. Davi promete proteger o filho dela e depois manda Joabe trazer Absalão de volta.",
+      "ref": "2Sm 14.2, 5-8, 21"
+    },
+    {
+      "texto": "Absalão corta o cabelo uma vez por ano, porque fica pesado demais. O cabelo cortado pesa uns dois quilos e quatrocentos gramas.",
+      "ref": "2Sm 14.26"
+    },
+    {
+      "texto": "Joabe não atende Absalão duas vezes. Absalão manda os empregados pôr fogo no campo de trigo de Joabe, e Joabe vai até ele perguntar o motivo.",
+      "ref": "2Sm 14.29-31"
+    },
+    {
+      "texto": "Simei é da família de Saul. Ele joga pedras em Davi pelo caminho e grita que Davi é um assassino. Abisai quer cortar a cabeça dele. Davi não deixa e diz que talvez o Senhor tenha mandado aquele homem.",
+      "ref": "2Sm 16.5-11"
+    },
+    {
+      "texto": "Jônatas e Aimaás levam notícias para Davi e se escondem num poço em Baurim. A dona da casa estende um pano na boca do poço e espalha grãos por cima para secar. Os homens de Absalão passam e não acham ninguém.",
+      "ref": "2Sm 17.18-20"
+    },
+    {
+      "texto": "Mefibosete passa o tempo todo da fuga do rei sem fazer a barba e sem lavar a roupa. Ele diz que o servo Ziba enganou o rei. Quando Davi manda dividir os bens, Mefibosete diz que Ziba pode ficar com tudo.",
+      "ref": "2Sm 19.24, 26-27, 29-30"
+    },
+    {
+      "texto": "Numa batalha, Davi fica sem forças, e um gigante filisteu quer matar o rei. Abisai mata o gigante. Os soldados dizem que Davi não vai mais à guerra com eles, porque não querem que se apague a lâmpada de Israel.",
+      "ref": "2Sm 21.15-17"
+    },
+    {
+      "texto": "Em Gate, um gigante tem seis dedos em cada mão e seis em cada pé, vinte e quatro dedos ao todo. Jônatas é filho de um irmão de Davi e mata esse gigante.",
+      "ref": "2Sm 21.20-21"
+    },
+    {
+      "texto": "Davi diz que está com sede da água do poço perto da porta de Belém. Três guerreiros passam pelo meio dos filisteus e trazem a água. Davi não bebe e derrama tudo no chão para o Senhor, porque a água é como o sangue daqueles homens.",
+      "ref": "2Sm 23.15-17"
+    },
+    {
+      "texto": "Na lista dos trinta valentes de Davi, o último nome é Urias, o heteu.",
+      "ref": "2Sm 23.39"
+    }
+  ],
+  "procure": {
+    "texto": "Davi conta que um homem trouxe a notícia da morte de Saul pensando que ele ia se alegrar. Sublinhe a palavra notícia toda vez que alguém chega para contar a Davi uma morte. Leia com calma o dia em que dois homens correm até a porta da cidade com a notícia de Absalão.",
+    "ref": "2Sm 4.10"
+  }
+}

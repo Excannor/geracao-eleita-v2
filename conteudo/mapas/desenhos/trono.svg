@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o trono da família de Davi (2Sm 7.16): o trono que fica firme para sempre. Encosto alto de topo em arco, braços, assento, pernas e um degrau embaixo; o encosto acolchoado é a única área sálvia, só com .s, dentro do contorno. Tudo cabe num círculo de raio 54 em volta de (60,60), para o disco de "2 Samuel e Cristo". -->
+<path class="k p" d="M32 92H88V99H32Z"/>
+<path class="k p" d="M37 68H42V92H37ZM78 68H83V92H78Z"/>
+<path class="h" d="M42 84H78"/>
+<path class="k p" d="M40 62V30C40 18 80 18 80 30V62Z"/>
+<path class="s" d="M46 56V33C46 25 74 25 74 33V56Z"/>
+<path class="k" d="M46 56V33C46 25 74 25 74 33V56"/>
+<circle class="k p" cx="60" cy="16" r="3"/>
+<path class="k p" d="M28 50H40V64H28ZM80 50H92V64H80Z"/>
+<path class="k p" d="M32 62H88L84 70H36Z"/>
+<path class="h" d="M33 54H39M81 54H87M52 40H68M52 46H68"/>
+</svg>

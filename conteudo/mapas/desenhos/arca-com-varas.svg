@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a arca de Deus que Davi leva para a Cidade de Davi (2Sm 6.12-15): o baú com a tampa em dois degraus (as asas dos querubins viraram chifres e saíram, como em 1 Samuel) e as duas varas compridas passando pelas argolas, para os homens carregarem nos ombros. O chão vai primeiro, e os pés do baú pousam nele. O baú é a única área sálvia. -->
+<path class="k" d="M10 96H110"/>
+<path class="k p" d="M40 88H46V96H40ZM74 88H80V96H74Z"/>
+<path class="k s" d="M36 56H84V88H36Z"/>
+<path class="k p" d="M33 50H87V56H33Z"/>
+<path class="k p" d="M38 44H82V50H38Z"/>
+<path class="h" d="M42 47H78M40 62H80M40 82H80"/>
+<path class="k p" d="M8 69H112V73H8Z"/>
+<circle class="k p" cx="46" cy="71" r="3.2"/>
+<circle class="k p" cx="74" cy="71" r="3.2"/>
+</svg>

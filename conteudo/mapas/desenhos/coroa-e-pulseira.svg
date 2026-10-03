@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a coroa e a pulseira de Saul (2Sm 1.10): o amalequita traz as duas a Davi. Coroa de pontas com bolinhas, a faixa da base em sálvia (a única área sálvia) com três pedras; a pulseira deitada na frente, à direita, um aro com o furo vazado (fill-rule evenodd), para a coroa aparecer por dentro. -->
+<path class="k p" d="M18 88V58L28 71L37 46L47 68L56 38L65 68L75 46L84 71L94 58V88Q56 95 18 88Z"/>
+<path class="s" d="M19 76Q56 82 93 76V87Q56 94 19 87Z"/>
+<path class="k" d="M18 76Q56 82 94 76"/>
+<circle class="k p" cx="18" cy="56" r="3"/>
+<circle class="k p" cx="37" cy="44" r="3"/>
+<circle class="k p" cx="56" cy="36" r="3"/>
+<circle class="k p" cx="75" cy="44" r="3"/>
+<circle class="k p" cx="94" cy="56" r="3"/>
+<ellipse class="k p" cx="37" cy="83" rx="3.5" ry="2.5"/>
+<ellipse class="k p" cx="56" cy="85" rx="3.5" ry="2.5"/>
+<ellipse class="k p" cx="75" cy="83" rx="3.5" ry="2.5"/>
+<path class="h" d="M37 52V73M56 44V73M75 52V73"/>
+<path class="k p" fill-rule="evenodd" d="M76 100A18 7 0 1 0 112 100A18 7 0 1 0 76 100ZM83 100A11 3.6 0 1 0 105 100A11 3.6 0 1 0 83 100Z"/>
+<path class="h" d="M80 103L82 101M88 106L89 104M98 106L97 104M106 103L104 101"/>
+</svg>

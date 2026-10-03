@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a ovelhinha do pobre (2Sm 12.3): ela come no mesmo prato do dono. Ovelha pequena de lã em nuvem, cabeça comprida baixa para a tigela no chão, a orelha solta para trás; o chão vai primeiro, e a tigela pousa nele. A comida na boca da tigela é a única área sálvia. -->
+<path class="h" d="M8 96H114"/>
+<path class="k" d="M29 73V96M37 74V96M53 74V96M61 73V96"/>
+<path class="k p" d="M20 66c-7-2-7-11 0-13 0-7 9-10 14-5 4-5 12-5 16 0 5-4 12-2 14 3 7 0 10 7 5 12 3 5-2 10-7 9-3 4-10 4-14 0-5 4-12 4-16 0-7 2-12-2-12-7z"/>
+<path class="h" d="M28 58c2-2 4-2 6 0M40 54c2-2 4-2 6 0M52 58c2-2 4-2 6 0M34 65c2-2 4-2 6 0M48 65c2-2 4-2 6 0"/>
+<path class="k p" d="M62 54C70 47 81 52 85 64C88 72 90 79 86 82C81 85 75 79 71 73C67 67 60 61 62 54Z"/>
+<path class="k p" d="M72 56C78 49 87 49 90 51C86 56 80 59 75 60Z"/>
+<circle class="e" cx="79" cy="65" r="1.8"/>
+<path class="k" d="M83 79.5L86.5 78.5"/>
+<path class="k p" d="M80 86C82 99.5 106 99.5 108 86Z"/>
+<ellipse class="k s" cx="94" cy="86" rx="14" ry="3.5"/>
+</svg>

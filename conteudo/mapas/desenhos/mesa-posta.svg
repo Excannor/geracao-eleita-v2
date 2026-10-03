@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a mesa do rei (2Sm 9.7): Mefibosete vai comer sempre à mesa de Davi. Mesa baixa vista de frente e um pouco de cima, com um pão redondo e uma taça; as pernas de trás vão antes do tampo, para o papel dele cobrir as pontas. O vinho na boca da taça é a única área sálvia. -->
+<path class="k" d="M34 60V92M86 60V92"/>
+<path class="k p" d="M28 54H92L102 64H18Z"/>
+<path class="k p" d="M18 64H102V71H18Z"/>
+<path class="k p" d="M23 71H29V100H23ZM91 71H97V100H91Z"/>
+<path class="k p" d="M30 60C30 46 54 44 56 60C48 62 38 62 30 60Z"/>
+<path class="h" d="M37 52L41 48M43 53L47 49M49 54L52 51"/>
+<path class="k p" d="M67 36H89C89 47 84 52 78 52C72 52 67 47 67 36Z"/>
+<ellipse class="k s" cx="78" cy="36" rx="11" ry="3"/>
+<path class="k" d="M78 52V57"/>
+<path class="k p" d="M71 59.5C71 56 85 56 85 59.5C85 61 71 61 71 59.5Z"/>
+<path class="h" d="M22 67H98"/>
+</svg>

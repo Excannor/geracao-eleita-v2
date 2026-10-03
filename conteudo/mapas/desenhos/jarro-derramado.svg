@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a água de Belém derramada no chão (2Sm 23.16): Davi não bebe e despeja a água para o Senhor. O cântaro deitado no alto, com o gargalo afinando até a boca aberta para a direita e uma alça em cima; a água sai em arco da boca e cai na borda de cima de uma poça larga, com respingos dos dois lados. O jorro é a única área sálvia. -->
+<path class="k" d="M10 98H112"/>
+<ellipse class="k p" cx="88" cy="94" rx="20" ry="4.5"/>
+<path class="h" d="M78 95.5c6 1.6 14 1.6 20 0"/>
+<path class="k" d="M57 36C55 23 43 22 40 29"/>
+<path class="k p" d="M70 41V57L66 53C60 62 50 67 38 67C24 67 13 56 16 44C19 31 36 25 50 31C58 35 62 45 66 45Z"/>
+<path class="k" d="M66 45V53"/>
+<path class="h" d="M24 38C20 44 20 52 26 58M22 52C30 58 46 60 58 54"/>
+<path class="k s" d="M70.5 43C80 44 88 58 91 90H85C84 70 79 58 70.5 55Z"/>
+<path class="h" d="M73 46c7 2 11 14 13.5 39"/>
+<path class="h" d="M80 88l-5-3M77 83l-3-1.5M94 88l5-3M97 83l3-1.5"/>
+</svg>
