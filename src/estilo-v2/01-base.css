@@ -232,7 +232,14 @@ a.linha-config:hover, button.linha-config:hover { background: var(--campo); }
 /* ---------- pílulas, chips e selos ---------- */
 .pilula { min-height: 44px; padding: 0 16px; border: 0; background: var(--cartao); color: var(--tinta-forte); font-size: 0.875rem; font-weight: 600; }
 .pilula:hover { border-color: transparent; background: var(--campo); }
-.cartao .pilula, .folha .pilula, .caixa-lista .pilula { background: var(--campo); }
+.cartao .pilula, .folha .pilula, .caixa-lista .pilula, .nota-artigo .pilula { background: var(--campo); }
+/* Dentro do texto de uma nota ("Leia esta semana") a pílula pegava a letra da Bíblia e o fundo
+   do próprio cartão: virava texto solto, sem forma. Ganha a letra e o fundo das outras. */
+.nota-corpo .pilula { font-family: var(--fonte); line-height: 1.3; text-decoration: none; }
+/* O vão entre as pílulas é o gap de 8px do .pilulas. Safari antes do 14.1 (iPhone 6 e outros
+   presos no iOS 12) não conhece gap em flex e as deixava coladas; "inset" chegou na mesma
+   versão, então sem ele as pílulas ganham a margem no lugar do gap (o resto não muda). */
+@supports not (inset: 0) { .pilulas { margin: 0 -8px -8px 0; } .pilulas > * { margin: 0 8px 8px 0; } }
 .pilula[aria-pressed="true"], .pilula.ativa { background: var(--inverso); color: var(--inverso-tinta); }
 .pilula.livro-feito, :root[data-tema="escuro"] .pilula.livro-feito { border: 0; background: var(--salvia); color: var(--salvia-tinta); }
 .pilula.livro-andando { border: 0; box-shadow: inset 0 0 0 1.5px var(--contorno); }

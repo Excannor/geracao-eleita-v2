@@ -823,3 +823,10 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   `set-cookie` (cc_sessao e cc_logado) e `headers.get('set-cookie')` junta os dois → ler com
   `getSetCookie()` e ficar com o `cc_sessao` que tem valor; conferir os arquivos de cookie antes da
   varredura.
+- 2026-10-03 · tela · "Pílulas coladas": no Chrome o `.pilulas` do Explorar e do "Aparece também em"
+  já tinha 8px de vão (medido: 8px/8px); o que aparecia mal eram as pílulas dentro do texto da
+  nota ("Leia esta semana"), sem fundo (o do próprio cartão) e na letra da Bíblia, como texto
+  solto. E o Safari antes do 14.1 não tem `gap` em flex → `.nota-artigo .pilula` com o fundo
+  `--campo` e a letra da interface, e margem no lugar do gap só onde `inset` não existe (chegou
+  na mesma versão). Antes de corrigir "colado", medir o vão no DOM: a captura do Chrome não mostra
+  o que um iPhone velho mostra.
