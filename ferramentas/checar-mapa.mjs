@@ -63,7 +63,7 @@ export const VOZ = [
   [/\bdito isso\b/i, '"dito isso"'], [/\bdessa forma\b/i, '"dessa forma"'], [/\b(impactante|marcante|emblemátic|icônic)/i, 'adjetivo de contracapa'],
   [/\b(retrata|evidencia|ressalta|aborda)\b/i, 'palavra de resumo escolar'], [/\b(neste|nesse) ramo\b/i, 'metalinguagem'], [/\bcomo vimos\b/i, 'metalinguagem'],
 ];
-export const AINDA_NA_VOZ_ANTIGA = ['genesis', 'exodo', 'levitico', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'marcos', 'lucas'];
+export const AINDA_NA_VOZ_ANTIGA = ['genesis', 'exodo', 'levitico', 'numeros', 'deuteronomio', 'josue', 'juizes', 'isaias', 'mateus', 'lucas'];
 
 // O tamanho máximo da conexão entre dois ramos, em caracteres.
 export const CONEXAO_MAX = 150;

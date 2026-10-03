@@ -19,6 +19,12 @@ não**: tudo no app é escrito e desenhado por nós.
 
 ## 1. Como escrever (regra do dono, 2026-10-02)
 
+Quem só escreve ou revisa texto lê `voz.md` (nesta pasta), o cartão com os 15 vícios, o que faz
+querer abrir o livro, a fidelidade essencial e o fluxo escritor/revisor; esta seção é a versão
+completa, com o histórico dos erros. Quem reescreve um mapa antigo não toca no campo que já passa
+pela lista (boa parte dos galhos é cena concreta); e, dos 11 mapas de antes da regra, Marcos vai
+primeiro como calibração do tom, e os outros de 3 em 3.
+
 Papel: especialista em síntese de informações e design instrucional. A tarefa é desmontar o livro
 bíblico e transformá-lo num mapa mental textual completo e que prenda a leitura.
 
