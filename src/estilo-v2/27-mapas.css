@@ -131,7 +131,13 @@
 .mapa-rotulo svg { flex: none; width: 20px; height: 20px; }
 .mapa mark { padding: 1px 6px; border-radius: 6px; background: var(--folha); color: var(--folha-tinta); font-size: .875em; font-weight: 800; white-space: nowrap; }
 .mapa-significado { max-width: 300px; }
-.mapa-original { color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: 1.125rem; }
+.mapa-original { color: var(--salvia-texto); font-family: 'Texto Original', var(--fonte-biblia); font-size: 1.125rem; }
+/* A fonte do original (src/fontes-originais/originais.css) chega só com a tela do mapa; até ela
+   chegar, ou sem rede na primeira vez, uma letra serifada do sistema que tenha os glifos. */
+.mapa-original:lang(he), .mapa-original:lang(arc) { font-family: 'Texto Original', 'SBL Hebrew', 'Noto Serif Hebrew', 'Times New Roman', serif; }
+/* a letra grega da Noto Serif é mais alta que a hebraica: um passo menor, para a maiúscula
+   ficar na altura da do texto em volta */
+.mapa-original:lang(el) { font-family: 'Texto Original', 'Noto Serif', 'Times New Roman', serif; font-size: 1.0625rem; }
 .mapa-textos { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .mapa-autoria { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 12px; align-items: center; }
 

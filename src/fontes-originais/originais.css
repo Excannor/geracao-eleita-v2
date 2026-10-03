@@ -1,0 +1,33 @@
+/* O nome original dos livros no "Significado do nome" dos mapas (hebraico e grego).
+   A Literata embutida não tem esses glifos, e o nome saía na letra que o sistema achasse.
+   Noto Serif Hebrew e Noto Serif (grego e grego estendido, para os acentos politônicos),
+   Fonte: Google Fonts pelo pacote @fontsource 5.3.0, licença SIL Open Font License 1.1
+   (OFL.txt nesta pasta). Os blocos inteiros, não só as letras de hoje: o mapa de um livro
+   novo não precisa de fonte nova (uns 23 KB nos três arquivos).
+   Não entram no index.html: o build copia cada uma para fonte-original-<nome>.<resumo>.woff2,
+   e o unicode-range faz o navegador só baixar o arquivo quando um texto da página usa a
+   letra (hoje, só a tela do mapa). O service worker guarda o que foi baixado, como os mapas. */
+@font-face {
+  font-family: 'Texto Original';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./hebraico.woff2) format('woff2');
+  unicode-range: U+0590-05FF, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Texto Original';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./grego.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Texto Original';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./grego-ext.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}

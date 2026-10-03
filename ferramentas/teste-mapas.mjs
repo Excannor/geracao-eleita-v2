@@ -371,6 +371,10 @@ await av('location.hash = "#/mapa/isaias"');
 await esperar('document.querySelectorAll(".mapa .mapa-ramo").length === 5');
 const guardou = await esperar('caches.open("caminho-mapas").then((c) => c.keys()).then((k) => k.length >= 1)', 10000);
 ok(guardou, 'o mapa aberto ficou guardado no cache dos mapas');
+// O nome original (hebraico em Isaías) vem numa fonte própria, baixada só pela tela do mapa e
+// guardada junto com ele.
+const fonteHebraico = await esperar('caches.open("caminho-mapas").then((c) => c.keys()).then((k) => k.some((p) => /fonte-original-hebraico\\.[0-9a-f]{10}\\.woff2$/.test(p.url)))', 10000);
+ok(fonteHebraico, 'a fonte do hebraico ficou guardada no cache dos mapas');
 await cmd('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
 servidor.kill();
 await dormir(500);
@@ -380,6 +384,8 @@ await cmd('Page.reload', {});
 ok(await esperar('!!document.querySelector(".no")'), 'o aplicativo abre sem rede');
 await av('location.hash = "#/mapa/isaias"');
 ok(await esperar('document.querySelectorAll(".mapa .mapa-ramo").length === 5 && document.querySelectorAll(".mapa .desenho svg").length === 7'), 'sem rede, o mapa guardado continua abrindo inteiro');
+ok(await esperar('document.fonts.ready.then(() => [...document.fonts].some((f) => f.family.includes("Texto Original") && f.status === "loaded") && document.fonts.check("18px \\"Texto Original\\"", "\u05D0"))', 6000),
+  'sem rede, o nome original sai na fonte do hebraico guardada');
 
 const erros = evs
   .filter((e) => e.method === 'Runtime.exceptionThrown')

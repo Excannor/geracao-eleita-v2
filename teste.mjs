@@ -114,8 +114,16 @@ checar(html.includes('@font-face') && html.includes('window.CC') && html.include
 {
   const fontesDaPagina = [...html.matchAll(/url\(\.\/(fonte-[a-z-]+\.[0-9a-f]{10}\.woff2)\)/g)].map((m) => m[1]);
   const swTexto = readFileSync(dist('sw.js'), 'utf8');
-  checar(!html.includes('data:font') && fontesDaPagina.length === 4 && fontesDaPagina.every((f) => existsSync(dist(f)) && swTexto.includes('./' + f)),
+  const daInterface = fontesDaPagina.filter((f) => !f.startsWith('fonte-original-'));
+  checar(!html.includes('data:font') && daInterface.length === 4 && daInterface.every((f) => existsSync(dist(f)) && swTexto.includes('./' + f)),
     'as 4 fontes saíram do index.html para arquivos próprios, guardados pelo service worker');
+  // As do nome original nos mapas (hebraico, grego, grego estendido): só a regra com
+  // unicode-range na página; o service worker as guarda quando a tela do mapa as pede.
+  const originais = fontesDaPagina.filter((f) => f.startsWith('fonte-original-'));
+  const listaMapas = (swTexto.match(/const MAPAS = (\[.*\]);/) || [])[1] || '[]';
+  checar(originais.length === 3 && originais.every((f) => existsSync(dist(f)) && JSON.parse(listaMapas).includes(f) && !swTexto.includes("'./" + f + "'") && !swTexto.includes('"./' + f + '"'))
+    && /unicode-range:U\+0590-05FF/.test(html),
+    'as fontes do hebraico e do grego ficam fora da instalação e entram no cache dos mapas quando usadas');
 }
 // O conteúdo mora num arquivo à parte, com resumo no nome, e a página só aponta para ele.
 const arquivoConteudo = (html.match(/window\.CONTEUDO_ARQUIVO="(conteudo\.[0-9a-f]+\.json)"/) || [])[1];

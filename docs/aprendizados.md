@@ -830,3 +830,11 @@ Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
   `--campo` e a letra da interface, e margem no lugar do gap só onde `inset` não existe (chegou
   na mesma versão). Antes de corrigir "colado", medir o vão no DOM: a captura do Chrome não mostra
   o que um iPhone velho mostra.
+- 2026-10-03 · mapa · O nome original (בְּרֵאשִׁית, Ματθαῖος) saía na letra que o sistema achasse: a
+  Literata embutida tem 224 glifos, nenhum hebraico ou grego (conferido com fontTools) →
+  `src/fontes-originais/` com Noto Serif Hebrew e Noto Serif (grego e grego estendido, 23 KB nos
+  três), por `@font-face` com `unicode-range`: o navegador só baixa na tela do mapa (medido: o
+  Explorar não pede nenhuma), e o service worker guarda junto com os mapas (o cache dos mapas
+  passou a aceitar `font/*` além de JSON). O grego da Noto é mais alto: um passo menor (17px).
+  A fonte se baixa do registro do npm (`npm pack @fontsource/...`): o GitHub e o Google Fonts
+  recusam pelo proxy.

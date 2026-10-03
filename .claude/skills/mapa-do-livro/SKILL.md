@@ -97,6 +97,8 @@ profecia que o livro cita (texto da NBV do AT) e em `nt` o trecho do livro que a
 (`Mq 5.2` → `Mt 2.1-6`). O destaque `jesus` vai onde o texto identifica uma figura com Jesus,
 com referência do próprio livro ("O Filho do Homem é o agricultor", Mt 13.37) ou de outro livro
 do NT (a pedra rejeitada, At 4.10-11). O significado do nome é grego (`"lingua": "grego"`).
+O `original` sai na fonte de `src/fontes-originais` (Noto Serif Hebrew e Noto Serif, blocos inteiros
+do hebraico e do grego, baixada só pela tela do mapa): o `checar-mapa` barra letra fora desses blocos.
 
 **Livro que o NT quase não cita** (Juízes, 02/10): a ligação vem dos resumos do NT que nomeiam a
 época ou as pessoas do livro, como os discursos de Atos (At 13.20-23: juízes, rei, Davi, "o Salvador

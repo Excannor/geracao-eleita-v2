@@ -79,6 +79,19 @@ const fontes = readFileSync(src('fontes.css'), 'utf8')
     arquivosFontes.push({ arquivo, bin, familia });
     return "font-family: '" + familia + "'" + meio + 'url(./' + arquivo + ')';
   });
+// As fontes do nome original nos mapas (hebraico e grego, src/fontes-originais/) não vão
+// para a página nem para a lista que o service worker baixa na instalação: só a regra
+// @font-face, com unicode-range, entra no estilo. O navegador baixa o arquivo quando um texto
+// usa a letra (a tela do mapa), e o service worker o guarda nessa hora, como os mapas.
+const pastaOriginais = src('fontes-originais');
+const fontesOriginais = [];
+const fontesOriginaisCss = readFileSync(join(pastaOriginais, 'originais.css'), 'utf8')
+  .replace(/url\(\.\/([a-z-]+)\.woff2\)/g, (_, nome) => {
+    const bin = readFileSync(join(pastaOriginais, nome + '.woff2'));
+    const arquivo = 'fonte-original-' + nome + '.' + createHash('sha256').update(bin).digest('hex').slice(0, 10) + '.woff2';
+    fontesOriginais.push({ arquivo, bin });
+    return 'url(./' + arquivo + ')';
+  });
 if (/data:font/.test(fontes)) throw new Error('src/fontes.css tem fonte em formato que o build não separa: use woff2');
 // Os comentários do estilo.css são a documentação de design: ficam no fonte e saem do
 // app entregue (economizam uns 30 KB do index.html, que tem teto de 1 MB). O espaço em
@@ -115,7 +128,7 @@ const molde = readFileSync(src('index.html'), 'utf8');
 
 mkdirSync(dist(), { recursive: true });
 for (const velho of readdirSync(dist()).filter((f) => /^fonte-.*\.woff2$/.test(f))) rmSync(dist(velho));
-for (const f of arquivosFontes) writeFileSync(dist(f.arquivo), f.bin);
+for (const f of arquivosFontes.concat(fontesOriginais)) writeFileSync(dist(f.arquivo), f.bin);
 // A fonte do texto (Manrope) é pedida junto com a página, para o texto não piscar trocando de letra.
 const preloadFontes = arquivosFontes.filter((f) => f.familia === 'Manrope')
   .map((f) => '<link rel="preload" href="./' + f.arquivo + '" as="font" type="font/woff2" crossorigin>').join('');
@@ -259,7 +272,7 @@ const carregador = `(function () {
 })();`;
 const html = molde
   .replace('<style>/*FONTES*/</style>', () => preloadFontes + '<style>/*FONTES*/</style>')
-  .replace(/\/\*FONTES\*\//g, () => fontes)
+  .replace(/\/\*FONTES\*\//g, () => fontes + enxugarCss(fontesOriginaisCss))
   .replace(/\/\*ESTILO\*\//g, () => estilo)
   .replace(/\/\*CONTEUDO_ARQUIVO\*\//g, () => arquivoConteudo)
   // window.BIBLIAS fica por último: os testes leem a lista de traduções até o ";</script>".
@@ -316,7 +329,8 @@ const ARQUIVOS = ${JSON.stringify(
 // sessão, vai para a página de entrada, e ela precisa abrir também longe do Wi-Fi.
 const AVULSAS = ['entrar.html', 'privacidade.html', 'termos.html'];
 const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
-const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo))};
+// As fontes do nome original (fonte-original-*) vão no cache dos mapas: só a tela do mapa as usa.
+const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo).concat(fontesOriginais.map((f) => f.arquivo)))};
 const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS]];
 
 self.addEventListener('install', (ev) => {
@@ -345,11 +359,11 @@ self.addEventListener('fetch', (ev) => {
   const guardado = GUARDADOS.find(([, lista]) => lista.includes(url.pathname.split('/').pop()));
   if (guardado) {
     // Guardada na primeira vez que é pedida: daí em diante a leitura abre sem rede.
-    // Só entra no cache o que é JSON, porque sem sessão o servidor responde com a
+    // Só entra no cache o que é JSON (ou fonte), porque sem sessão o servidor responde com a
     // tela de entrada, e ela não pode ficar guardada no lugar do texto.
     ev.respondWith(caches.open(guardado[0]).then((c) => c.match(ev.request, { ignoreSearch: true })
       .then((achado) => achado || fetch(ev.request).then((r) => {
-        if (r.ok && (r.headers.get('content-type') || '').includes('json')) c.put(ev.request, r.clone());
+        if (r.ok && /json|font/.test(r.headers.get('content-type') || '')) c.put(ev.request, r.clone());
         return r;
       }))));
     return;

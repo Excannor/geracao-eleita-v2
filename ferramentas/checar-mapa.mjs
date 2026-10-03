@@ -144,6 +144,13 @@ export function checarMapa(slug, mapa) {
   const s = mapa.significado || {};
   if (!texto(s.traducao) || !texto(s.texto)) erro('significado precisa de traducao e texto');
   campo('significado', s.texto);
+  // O nome original sai na fonte de src/fontes-originais (hebraico, grego e grego estendido):
+  // letra fora desses blocos cairia na letra do sistema.
+  if (s.original) {
+    const fora = [...s.original].filter((c) => !/[\u0590-\u05FF\uFB1D-\uFB4F\u0370-\u03FF\u1F00-\u1FFF]/.test(c));
+    if (fora.length) erro('significado.original tem letra que a fonte do original não cobre: ' + fora.join(' '));
+    if (!['hebraico', 'grego', 'aramaico'].includes(s.lingua || 'hebraico')) erro('significado.lingua deve ser hebraico, grego ou aramaico');
+  }
   const a = mapa.autoria || {};
   if (!texto(a.texto)) erro('autoria precisa de texto');
   const refsAutoria = refsDe('autoria', a.refs);
