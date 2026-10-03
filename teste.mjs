@@ -336,7 +336,7 @@ const CC = contexto.window.CC;
 // escrita E revista por outra leitura; daí em diante o teste barra qualquer vício que volte.
 {
   const { vozDoTexto } = await import('./ferramentas/checar-mapa.mjs');
-  const REFLEXOES_NA_VOZ_NOVA = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12];
+  const REFLEXOES_NA_VOZ_NOVA = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const achados = [];
   const ver = (onde, t) => { for (const x of vozDoTexto(t)) achados.push(onde + ': ' + x); };
   const PD = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'primeiros-dias.json'), 'utf8'));
