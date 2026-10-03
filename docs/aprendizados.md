@@ -8,6 +8,14 @@ aqui a linha com a data.
 
 Formato: `AAAA-MM-DD · área · o que aconteceu → regra`.
 
+Regra do dono (2026-10-03): **máxima eficiência**, sempre pesando velocidade, qualidade e
+economia de tokens, e **evoluir enquanto o app é construído**. Na prática: não reler o que já
+está bom; escrever certo uma vez (reler na hora) em vez de escrever e consertar; um revisor por
+mapa que corrige direto, nunca ida e volta; agente de texto lê o cartão (`voz.md`), não a skill
+inteira; captura de tela só quando muda desenho ou tela; trabalho independente em paralelo (de 3
+em 3); e quem acha um jeito mais barato ou melhor de fazer registra aqui e muda a skill na hora,
+sem esperar pedido. O coordenador é coautor: propõe, não só executa.
+
 ## Mapa do livro
 
 - 2026-10-02 · mapa · O primeiro mock foi montado só pelo print, sem pesquisar como a Bíblia de
