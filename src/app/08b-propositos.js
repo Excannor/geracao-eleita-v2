@@ -153,6 +153,7 @@
       const painel = raiz.querySelector('.painel-celula');
       if (aba === 'hoje') ligarHoje(painel, p);
       if (aba === 'pessoas') ligarPessoas(painel, p, souLider);
+      if (aba === 'painel') ligarPainel(painel, p);
       if (aba === 'estudo') preencherEstudo(painel, p, () => meu === desenhoCelula);
       if (aba === 'oracao') preencherOracao(painel, p, () => meu === desenhoCelula);
     };
@@ -210,11 +211,17 @@
     // Visitante não conta contra o limite de membros: o link fica disponível para quem
     // ainda tem vaga de membro de verdade, mesmo com a célula cheia de gente conhecendo.
     const podeChamar = p.membros.filter((m) => m.estado !== 'saiu' && m.papel !== 'visitante').length < (p.limite || (cache && cache.limiteCelula) || 20);
+    const membro = eu.estado === 'ativo' && eu.papel !== 'visitante';
     return topoDaCelula(p)
       + (conduzo ? oreHojePorHtml(p) : '')
       + (encontroHoje(p) ? '<button class="selo-status leu botao-selo" data-ir-estudo>' + CC.ico('livro') + 'Encontro hoje · veja o estudo</button>' : '')
       + (p.hoje ? barraDoGrupo(p.hoje) : '')
+      // A meta ainda não foi batida e falta a minha leitura: o caminho até ela, sem rodeio.
+      + (p.hoje && !p.hoje.batida && eu.estado === 'ativo' && !eu.fezHoje
+        ? '<div class="acoes-missao acoes-meta"><a class="botao pequeno botao-ir-missao botao-ir-escuro" href="#/" data-ler-agora>Ler agora' + CC.ico('avancar') + '</a></div>' : '')
       + (conduzo ? blocoEncontro(p) : '')
+      + (membro ? blocoCheckinHoje() : '')
+      + (membro ? blocoCaminhadaHoje() : '')
       + '<div class="acoes">'
       + (eu.papel === 'visitante' ? '<button class="botao" data-tornar-membro>' + CC.ico('mais-sinal') + 'Fazer parte da célula</button>' : '')
       + (eu.papel !== 'visitante' && eu.estado === 'ativo' && p.encontro >= 0
@@ -233,6 +240,19 @@
     ligar('[data-encontro]', () => folhaEncontro(p));
     ligar('[data-registrar-encontro]', () => folhaRegistrarEncontro(p));
     ligar('[data-corrigir-encontro]', () => folhaRegistrarEncontro(p));
+    ligar('[data-checkin]', () => { if (CC.abrirCheckin) CC.abrirCheckin(() => CC.redesenhar()); });
+    ligar('[data-agenda]', () => baixarAgenda(p));
+    // "Orei": anota no diário de hoje e a linha some até amanhã.
+    painel.querySelectorAll('[data-orei]').forEach((b) => {
+      b.onclick = () => {
+        if (CC.marcarNoDiario) CC.marcarNoDiario('orei_' + b.dataset.orei);
+        const linha = b.closest('.linha-amigo');
+        const lista = linha && linha.parentElement;
+        if (linha) linha.remove();
+        if (lista && !lista.children.length) lista.remove();
+        CC.avisar('Anotado. Até amanhã!');
+      };
+    });
     ligar('[data-convidar-encontro]', async () => {
       let link = '';
       try {
@@ -271,7 +291,8 @@
       painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('livro')
         + '<p>' + (conduzo ? 'O estudo do encontro ainda não foi preparado. Você escolhe: a leitura da semana, um trecho ou um estudo seu.'
           : CC.esc(nomeDoLider(p)) + ' ainda não preparou o estudo deste encontro.') + '</p>'
-        + (conduzo ? '<button class="botao" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>' : '') + '</div>';
+        + (conduzo ? '<button class="botao" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>'
+          : '<a class="botao" href="' + leituraDaSemana(p) + '" data-leitura-semana>Ler a leitura da semana' + CC.ico('avancar') + '</a>') + '</div>';
       const preparar = painel.querySelector('[data-preparar]');
       if (preparar) preparar.onclick = () => folhaPrepararEstudo(p);
       return;
@@ -779,8 +800,19 @@
   // A aba Painel, só de quem conduz: como a célula está, num lugar só.
   function abaPainel(p) {
     if (!p.painel) return CC.esqueleto('lista');
-    return cartaoSaude(p) + blocoCheckin(p) + blocoFunil(p);
+    return cartaoSaude(p, true) + blocoCheckin(p, true) + blocoFunil(p, true);
   }
+
+  function ligarPainel(painel, p) {
+    const registrar = painel.querySelector('[data-registrar-encontro]');
+    if (registrar) registrar.onclick = () => folhaRegistrarEncontro(p);
+  }
+
+  // Um link do WhatsApp com o recado pronto: quem conduz escolhe o grupo da célula.
+  const linkZap = (texto) => 'https://wa.me/?text=' + encodeURIComponent(texto);
+  const enderecoApp = (rota) => (location.protocol.startsWith('http') ? ' ' + location.origin + location.pathname + rota : '');
+  const botaoZap = (texto, rotulo, attr) => '<a class="botao-whatsapp" ' + attr + ' href="' + linkZap(texto) + '" target="_blank" rel="noopener">'
+    + CC.ico('balao') + rotulo + '</a>';
 
   // O painel inteiro da célula, para o administrador que abre qualquer célula (07e-painel.js):
   // o mesmo que o líder dela vê, com a caminhada junto (lá ela mora na aba Pessoas).
@@ -809,7 +841,7 @@
       + lista.map((m) => '<div class="presencas-linha"><span>' + CC.esc(m.nome) + (m.papel === 'visitante' ? ' <small>visitante</small>' : '') + '</span>' + m.encontros.map(marca).join('') + '</div>').join('')
       + '</div>';
   }
-  function cartaoSaude(p) {
+  function cartaoSaude(p, comAcoes) {
     const s = p.painel;
     if (!s || !s.chama) return '';
     const c = s.chama;
@@ -823,7 +855,9 @@
         + f.encontros.map((e) => '<span class="mini-barra' + (e.semEncontro ? ' sem' : '') + '"><small>' + (e.semEncontro ? 'sem' : e.pessoas) + '</small>'
           + '<i style="--v:' + (e.semEncontro ? 0 : Math.max(0.08, e.pessoas / maior).toFixed(3)) + '"></i><em>' + ddmm(e.data) + '</em></span>').join('')
         + '</div>'
-      : '<p class="passo-dica pequena">Registre os encontros e a frequência das últimas semanas aparece aqui.</p>';
+      : '<p class="passo-dica pequena">Registre os encontros e a frequência das últimas semanas aparece aqui.</p>'
+        + (comAcoes ? '<div class="acoes-missao"><button type="button" class="botao pequeno contorno botao-ir-missao" data-registrar-encontro>'
+          + CC.ico('calendario') + 'Registrar o encontro</button></div>' : '');
     const d = f.diferenca;
     const tendencia = f.tendencia === null ? ''
       : f.tendencia === 'estavel' ? 'O mesmo número de pessoas do encontro anterior.'
@@ -842,13 +876,18 @@
   // O check-in de Corpo, Mente e Espírito da célula, somado: quantos estão em baixa em cada
   // esfera, nunca quem. É dado de saúde: o de uma pessoa só o discipulador dela vê.
   const ESFERAS_CELULA = { corpo: 'Corpo', mente: 'Mente', espirito: 'Espírito' };
-  function blocoCheckin(p) {
+  function blocoCheckin(p, comAcoes) {
     const s = p.painel && p.painel.saude;
     if (!s) return '';
+    // Quem conduz não sabe quem fez: só que falta gente. O lembrete vai para o grupo todo.
+    const membros = ativos(p).filter((m) => m.papel !== 'visitante').length;
+    const lembrar = comAcoes && s.base < membros
+      ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quando der, façam o check-in de hoje no app: na aba Célula, "Fazer meu check-in". São 10 segundos, e quem conduz vê só a soma da célula, nunca o de cada um.' + enderecoApp('#/celula'), 'Lembrar a célula', 'data-lembrar-checkin') + '</div>'
+      : '';
     if (!s.suficiente) {
       return CC.tituloSecao('Como a célula está')
         + '<p class="passo-dica pequena">' + (s.base ? CC.plural(s.base, 'pessoa fez', 'pessoas fizeram') + ' o check-in nesta semana; a soma aparece a partir de ' + s.minimo + '.' : 'Ninguém fez o check-in de Corpo, Mente e Espírito nesta semana.')
-        + ' O check-in de uma pessoa nunca aparece aqui.</p>';
+        + ' O check-in de uma pessoa nunca aparece aqui.</p>' + lembrar;
     }
     return CC.tituloSecao('Como a célula está')
       + '<div class="funil-celula">' + Object.keys(ESFERAS_CELULA).map((k) => {
@@ -856,13 +895,13 @@
         return '<div class="funil-linha"><span>' + ESFERAS_CELULA[k] + ' em baixa</span>'
           + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((n / s.base) * 100) + '%"></i></span><b>' + n + '</b></div>';
       }).join('')
-      + '<p class="passo-dica pequena">Do último check-in de cada um nesta semana (' + CC.plural(s.base, 'pessoa', 'pessoas') + '). Só a soma: o check-in de uma pessoa nunca aparece aqui.</p></div>';
+      + '<p class="passo-dica pequena">Do último check-in de cada um nesta semana (' + CC.plural(s.base, 'pessoa', 'pessoas') + '). Só a soma: o check-in de uma pessoa nunca aparece aqui.</p>' + lembrar + '</div>';
   }
 
   // O funil da caminhada, na aba Pessoas de quem conduz: onde as pessoas da célula estão, pelo
   // que cada uma marcou em Minha caminhada e por quem já acompanha alguém, com os nomes de
   // cada etapa, para saber por onde cuidar.
-  function blocoFunil(p) {
+  function blocoFunil(p, comAcoes) {
     const etapas = (p.painel && p.painel.funil) || [];
     const total = etapas.reduce((s, e) => s + e.pessoas, 0);
     if (!total) return '';
@@ -876,7 +915,10 @@
       + '<div class="funil-celula">' + etapas.map((e) => '<div class="funil-linha"><span>' + CC.esc(e.rotulo) + '</span>'
         + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((e.pessoas / maior) * 100) + '%"></i></span><b>' + e.pessoas + '</b></div>'
         + (e.nomes && e.nomes.length ? '<p class="funil-nomes">' + nomeLista(e.nomes) + '</p>' : '')).join('')
-      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada, para você saber por onde cuidar.</p></div>';
+      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada, para você saber por onde cuidar.</p>'
+      // Quem ainda não marcou nada não sabe onde marcar: o líder manda o caminho no grupo.
+      + (comAcoes && comeco.pessoas ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quem puder, marque no app o que já aconteceu na sua caminhada: decisão, batismo, célula. Fica em Minha caminhada, no Discipulado. Ajuda a gente a cuidar melhor de cada um.' + enderecoApp('#/perfil/discipulado'), 'Pedir para a célula marcar', 'data-pedir-caminhada') + '</div>' : '')
+      + '</div>';
   }
 
   // Quem precisa de atenção: a conta vem pronta do servidor (propositos.mjs), sempre sem
@@ -927,13 +969,130 @@
     return Array.from({ length: quantidade }, (_, i) => nomes[(inicio + i) % total]);
   };
 
+  // Uma linha por pessoa do rodízio, com "Orei" (anota no diário de hoje e some até amanhã)
+  // e "Mandar uma mensagem" (o WhatsApp com o recado pronto, como o de quem sumiu).
   function oreHojePorHtml(p) {
     const candidatos = ativos(p).filter((m) => m.papel !== 'visitante' && !conduzCelula(p, m)).map((m) => ({ usuario: m.usuario, nome: m.nome }));
     if (!candidatos.length) return '';
     const totalMembrosAtivos = ativos(p).filter((m) => m.papel !== 'visitante').length;
-    const nomes = CC.oreHojePor(candidatos, CC.hojeIso(), totalMembrosAtivos).map((m) => '<b>' + CC.esc(m.nome) + '</b>');
-    const texto = nomes.length === 1 ? nomes[0] : nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1];
-    return '<p class="passo-dica pequena">Ore hoje por ' + texto + '.</p>';
+    const diario = CC.diaDoDiario ? CC.diaDoDiario() : {};
+    const hoje = CC.oreHojePor(candidatos, CC.hojeIso(), totalMembrosAtivos).filter((m) => !diario['orei_' + m.usuario]);
+    if (!hoje.length) return '';
+    return '<div class="lista-pedidos lista-atencao lista-ore-hoje">' + hoje.map((c) => {
+      const m = p.membros.find((x) => x.usuario === c.usuario) || c;
+      const nome = String(c.nome || '').split(' ')[0];
+      return '<div class="linha-amigo linha-atencao" data-ore-hoje="' + CC.esc(c.usuario) + '">' + retrato(m)
+        + '<div class="quem-amigo"><b>Ore hoje por ' + CC.esc(c.nome) + '</b><span class="arroba">Rodízio de oração de quem conduz</span></div>'
+        + '<div class="acoes-missao acoes-linha"><button type="button" class="botao pequeno contorno botao-ir-missao" data-orei="' + CC.esc(c.usuario) + '">' + CC.ico('certo') + 'Orei</button>'
+        + botaoZap('Oi, ' + nome + '! Hoje eu orei por você. Tem alguma coisa que você quer que eu leve a Deus?', 'Mandar uma mensagem', 'data-mensagem-oracao="' + CC.esc(c.usuario) + '"')
+        + '</div></div>';
+    }).join('') + '</div>';
+  }
+
+  // ---------- o que todo membro faz na aba Hoje ----------
+  // O check-in de Corpo, Mente e Espírito: some quando o de hoje já foi feito.
+  function blocoCheckinHoje() {
+    if (!CC.abrirCheckin || !CC.checkinFeitoHoje || CC.checkinFeitoHoje()) return '';
+    return '<div class="bloco-acao bloco-checkin"><h3>Como você está hoje?</h3>'
+      + '<p class="passo-dica pequena">Corpo, mente e espírito, em 10 segundos. Só a soma da célula aparece para quem conduz.</p>'
+      + '<div class="acoes-missao"><button type="button" class="botao pequeno" data-checkin>Fazer meu check-in</button></div></div>';
+  }
+  // Minha caminhada: o atalho fica até a pessoa marcar alguma coisa.
+  function blocoCaminhadaHoje() {
+    const marcos = CC.meusMarcos ? CC.meusMarcos() : null;
+    if (!marcos || Object.values(marcos).some(Boolean)) return '';
+    return '<div class="bloco-acao bloco-caminhada"><h3>Sua caminhada</h3>'
+      + '<p class="passo-dica pequena">Batismo, decisão, célula: marque o que já aconteceu com você.</p>'
+      + '<div class="acoes-missao"><a class="botao pequeno contorno botao-ir-missao" href="#/perfil/discipulado" data-marcar-caminhada>Marcar minha caminhada' + CC.ico('avancar') + '</a></div></div>';
+  }
+
+  // A leitura da semana da célula (os 7 dias do plano até onde o líder leu): abre o primeiro
+  // dia dela que eu ainda não li; com tudo lido, ou no Conhecer Jesus, a Trilha.
+  function leituraDaSemana(p) {
+    if (!CC.D || !CC.D.plano || !CC.leu || (CC.quem && CC.quem.caminho === 'conhecer')) return '#/';
+    const ate = Math.min(CC.D.plano.length, Math.max(7, p.semanaAte || 7));
+    for (let n = ate - 6; n <= ate; n++) if (!CC.leu(n)) return '#/dia/' + n;
+    return '#/';
+  }
+
+  // ---------- o próximo encontro e a agenda (recado com dia e hora) ----------
+  const DIA_CURTO = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  const DIA_LONGO = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  const partesQuando = (q) => { const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(String(q || '')); return m ? m.slice(1).map(Number) : null; };
+  const horaCurta = (h, mi) => h + 'h' + (mi ? String(mi).padStart(2, '0') : '');
+  const diaDaSemana = (a, m, d) => new Date(Date.UTC(a, m - 1, d, 12)).getUTCDay();
+  // O dia e a hora do recado valem até 2 horas depois do começo (o encontro pode estar rolando).
+  function quandoValendo(p) {
+    const x = partesQuando(p.recadoQuando);
+    if (!x || !p.recado) return false;
+    const [a, m, d, h, mi] = x;
+    return new Date(a, m - 1, d, h, mi).getTime() > Date.now() - 2 * 3600 * 1000;
+  }
+  // "qui, 9/10, 20h"
+  function rotuloAgenda(q) {
+    const [a, m, d, h, mi] = partesQuando(q);
+    return DIA_CURTO[diaDaSemana(a, m, d)] + ', ' + d + '/' + m + ', ' + horaCurta(h, mi);
+  }
+  CC.rotuloAgenda = rotuloAgenda;
+
+  // O cartão do alto: o dia e a hora do recado quando houver; senão, o próximo dia da semana
+  // marcado. Sem nenhum dos dois, não aparece (o aviso de marcar o dia fica na aba Hoje).
+  function cartaoProximoEncontro(p) {
+    let texto = '';
+    if (quandoValendo(p)) {
+      const [a, m, d, h, mi] = partesQuando(p.recadoQuando);
+      const iso = a + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      texto = (iso === CC.hojeIso() ? 'Hoje' : DIA_LONGO[diaDaSemana(a, m, d)] + ', ' + d + '/' + m) + ', às ' + horaCurta(h, mi);
+    } else if (p.encontro >= 0) {
+      const hoje = CC.hojeIso();
+      for (let i = 0; i < 7; i++) {
+        const dia = CC.somaDias(hoje, i);
+        if (new Date(dia + 'T12:00:00').getDay() !== p.encontro) continue;
+        texto = i === 0 ? 'Hoje' : DIA_LONGO[p.encontro] + ', ' + Number(dia.slice(8, 10)) + '/' + Number(dia.slice(5, 7));
+        break;
+      }
+    }
+    if (!texto) return '';
+    return '<div class="cartao-encontro"><span class="textos"><b>Próximo encontro</b><span>' + CC.esc(texto) + '</span></span>' + CC.ico('calendario') + '</div>';
+  }
+
+  // O evento para a agenda do celular (.ics): hora local, sem fuso (o encontro é na cidade de
+  // quem lê), duas horas de duração e um lembrete 1 hora antes. Função pura, testada no navegador.
+  const escIcs = (t) => String(t || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/([,;])/g, '\\$1');
+  CC.icsDoEncontro = function (p, agora = new Date()) {
+    const x = partesQuando(p.recadoQuando);
+    if (!x) return '';
+    const [a, m, d, h, mi] = x;
+    const fmt = (dt) => dt.getUTCFullYear() + String(dt.getUTCMonth() + 1).padStart(2, '0') + String(dt.getUTCDate()).padStart(2, '0')
+      + 'T' + String(dt.getUTCHours()).padStart(2, '0') + String(dt.getUTCMinutes()).padStart(2, '0') + '00';
+    // As contas de data em UTC só como calendário: o resultado sai sem "Z" (hora local).
+    const inicio = new Date(Date.UTC(a, m - 1, d, h, mi));
+    const fim = new Date(inicio.getTime() + 2 * 3600 * 1000);
+    return [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Geracao Eleita//Celula//PT-BR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      'UID:' + p.id + '-' + fmt(inicio) + '@geracaoeleita',
+      'DTSTAMP:' + fmt(agora) + 'Z',
+      'DTSTART:' + fmt(inicio),
+      'DTEND:' + fmt(fim),
+      'SUMMARY:' + escIcs('Encontro da ' + comoCelula(p.titulo)),
+      'DESCRIPTION:' + escIcs(p.recado),
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'TRIGGER:-PT1H', 'DESCRIPTION:' + escIcs('Encontro da ' + comoCelula(p.titulo) + ' em 1 hora'), 'END:VALARM',
+      'END:VEVENT', 'END:VCALENDAR', '',
+    ].join('\r\n');
+  };
+  // Baixa o .ics por um link de download (funciona no PWA): o celular oferece pôr na agenda.
+  function baixarAgenda(p) {
+    const ics = CC.icsDoEncontro(p);
+    if (!ics) return;
+    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'encontro-da-celula.ics';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
   }
 
   // A data do último encontro (hoje ou um dos 6 dias anteriores) no dia da semana marcado.

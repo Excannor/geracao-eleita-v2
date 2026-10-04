@@ -311,3 +311,16 @@ button.cartao-proposito:hover { background: var(--campo); }
 .funil-celula .painel-trilho { height: 10px; background: var(--campo); }
 .funil-celula .painel-trilho i { background: var(--inverso); }
 .funil-celula > .passo-dica { margin: 4px 0 0; text-wrap: pretty; }
+
+/* ---------- célula: cada frase que pede uma ação tem o botão (Fase 0 do plano de UI/UX) ----------
+   Os botões são o par .acoes-missao / .botao-ir-missao da base; o WhatsApp é o .botao-whatsapp. */
+/* um bloco da aba Hoje com título, uma linha de apoio e o botão (check-in e caminhada) */
+.bloco-acao { display: grid; gap: 6px; padding: 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.bloco-acao h3 { margin: 0; color: var(--tinta-forte); font-size: 1.0625rem; font-weight: 800; text-wrap: balance; }
+.bloco-acao .passo-dica { margin: 0; text-wrap: pretty; }
+.bloco-acao .acoes-missao { margin-top: 6px; }
+.painel-celula > .acoes-meta { margin-top: -4px; }
+/* "Ore hoje por": a mesma lista de quem precisa de atenção, com o "Orei" e a mensagem */
+.lista-atencao .acoes-missao:not(.acoes-linha) { margin-top: 10px; }
+/* a fila de botões de uma linha de pessoa ocupa a largura toda, abaixo do retrato e do nome */
+.linha-amigo > .acoes-linha { flex-basis: 100%; margin-top: 0; }

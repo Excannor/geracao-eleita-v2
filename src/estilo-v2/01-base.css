@@ -182,6 +182,17 @@ a.linha-config:hover, button.linha-config:hover { background: var(--campo); }
 /* realce do item de hoje/selecionado: sálvia pálido com listras diagonais sutis */
 .realce { background: var(--realce); }
 
+/* ---------- a frase que pede uma ação e o botão que leva até ela ----------
+   Nasceu nos Desafios (CC.linhaMissao) e vale para o app inteiro: toda frase que pede ou
+   mostra uma ação ganha, logo abaixo, um botão de 44px que leva aonde ela se faz. O par
+   .acoes-missao (a fila) e .botao-ir-missao (o botão claro, com seta ou ícone de 16px). */
+.acoes-missao { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.botao.botao-ir-missao { gap: 6px; min-height: 44px; padding: 8px 16px; background: var(--campo); color: var(--tinta-forte); text-decoration: none; }
+.botao.botao-ir-missao:hover { background: var(--contorno); }
+.botao-ir-missao svg { width: 16px; height: 16px; }
+/* a ação principal do bloco: a mesma peça, na pílula escura */
+.botao.botao-ir-missao.botao-ir-escuro { background: var(--inverso); color: var(--inverso-tinta); }
+
 .titulo-secao { align-items: center; margin: 32px 0 12px; }
 .titulo-secao h2 { font-size: 1.25rem; font-weight: 800; }
 .titulo-secao span, .titulo-secao a { font-size: 0.875rem; font-weight: 600; color: var(--tinta-fraca); text-transform: none; letter-spacing: 0; }

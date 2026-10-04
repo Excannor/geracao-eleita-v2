@@ -49,7 +49,9 @@
 
   // ---------- check-in: Corpo, Mente, Espírito ----------
   // Uma pergunta por dia para quem é discipulado, na primeira abertura do dia. O discipulador
-  // vê o último, no cartão de quem ele acompanha, antes de puxar conversa.
+  // vê o último, no cartão de quem ele acompanha, antes de puxar conversa. Quem está numa
+  // célula faz pelo botão da aba Hoje (CC.abrirCheckin), com ou sem discipulador: ali só a
+  // soma da célula aparece para quem conduz, nunca o de uma pessoa.
   const ESFERAS = [['corpo', 'Corpo'], ['mente', 'Mente'], ['espirito', 'Espírito']];
   const NIVEIS = { 1: 'Baixa', 2: 'Média', 3: 'Alta' };
   const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -71,11 +73,22 @@
     folhaCheckin();
   };
 
-  function folhaCheckin() {
+  // O check-in de hoje já foi feito? (do cache do boot; sem conta ou sem cache, "não")
+  CC.checkinFeitoHoje = () => !!(cache && cache.meuCheckin && cache.meuCheckin.data === CC.hojeIso());
+  // Os marcos de "Minha caminhada" (null enquanto o cache não chegou)
+  CC.meusMarcos = () => (cache ? cache.marcos || {} : null);
+  // Aberto pelo botão "Fazer meu check-in" da célula; depois de salvar, chama "pronto".
+  CC.abrirCheckin = (pronto) => folhaCheckin({ naCelula: true, pronto });
+
+  function folhaCheckin(opcoes = {}) {
     const escolha = {};
+    const disc = cache && cache.meuDiscipulador;
+    // Quem vê o quê: o discipulador vê o último check-in; a célula, só a soma.
+    const quemVe = disc
+      ? CC.esc(primeiroNome(disc.nome)) + ' vê só isto, para cuidar melhor de você.' + (opcoes.naCelula ? ' Na célula, só a soma aparece para quem conduz.' : '')
+      : 'Na célula, só a soma aparece para quem conduz. O seu nunca aparece sozinho.';
     CC.folha('<h2>Como você está hoje?</h2>'
-      + '<p class="passo-dica">Três toques e pronto. ' + CC.esc((cache.meuDiscipulador.nome || '').split(' ')[0])
-      + ' vê só isto, para cuidar melhor de você.</p>'
+      + '<p class="passo-dica">Três toques e pronto. ' + quemVe + '</p>'
       + ESFERAS.map(([k, rot]) => '<div class="linha-checkin"><span class="etiqueta">' + rot + '</span>'
         + '<div class="segmentado" role="group" aria-label="' + rot + '">'
         + [1, 2, 3].map((n) => '<button type="button" data-esfera="' + k + '" data-nivel="' + n + '" aria-pressed="false">' + NIVEIS[n] + '</button>').join('')
@@ -95,7 +108,7 @@
             salvar.disabled = ESFERAS.some(([k]) => !escolha[k]);
           };
         });
-        folha.querySelector('[data-fechar]').onclick = () => { gravarLocal('cc.checkin.pulado', CC.hojeIso()); fechar(); };
+        folha.querySelector('[data-fechar]').onclick = () => { if (!opcoes.naCelula) gravarLocal('cc.checkin.pulado', CC.hojeIso()); fechar(); };
         salvar.onclick = async () => {
           salvar.disabled = true;
           try {
@@ -103,6 +116,7 @@
             if (cache) cache.meuCheckin = r.checkin;
             fechar();
             CC.avisar('Obrigado por contar como você está');
+            if (opcoes.pronto) opcoes.pronto();
           } catch (e) {
             salvar.disabled = false;
             const erro = folha.querySelector('.erro-proposito');
