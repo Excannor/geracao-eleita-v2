@@ -379,6 +379,8 @@
 .cabeca-cj h1 { max-width: 20ch; font-size: 1.5rem; text-wrap: balance; }
 .cabeca-cj .passo-dica { margin-top: 2px; text-wrap: balance; }
 .tela-conhecer .licao-pe { border-top: 0; }
+/* o resumo do fim do dia (revisão de fluxo, item 7): a folha encosta no alto, como no plano */
+.tela-conhecer .resumo-dia { padding-top: 0; }
 .tela-conhecer .licao-pe .botao.contorno { background: var(--cartao); }
 .cj .leitura-hoje { margin: 0 0 16px; }
 

@@ -190,6 +190,11 @@ async function primeiroDiaConhecer(t) {
   ok(await t.ate('!!document.querySelector(".tela-conhecer [data-terminar]")'), 'conhecer: depois de ler, "Terminei o dia"');
   await t.foto('conhecer-depois-de-ler');
   await t.tocar('.tela-conhecer [data-terminar]');
+  // o fim do dia mostra o resumo primeiro; o tutorial de instalar vem depois de "Até amanhã"
+  ok(await t.ate('!!document.querySelector(".tela-conhecer [data-ate-amanha]")'), 'conhecer: "Terminei o dia" mostra o resumo com "Até amanhã"');
+  ok(!(await t.av('!!document.querySelector(".folha-instalar")')), 'conhecer: nenhuma folha por cima do resumo do dia');
+  await t.foto('conhecer-resumo');
+  await t.tocar('.tela-conhecer [data-ate-amanha]');
 }
 // Depois do primeiro dia: o tutorial de instalar (conta nova) e depois o convite de notificações.
 async function depoisDoPrimeiroDia(t, nome) {

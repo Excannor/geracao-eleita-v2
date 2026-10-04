@@ -133,6 +133,63 @@
     desenharConhecerDia();
   };
 
+  // O fim do dia, logo depois de "Terminei o dia": a chama, o que a pessoa conheceu e o que
+  // amanhã traz, como o resumo do plano (04-licao.js). O tutorial de instalar e o convite dos
+  // lembretes só vêm depois de "Até amanhã"; antes eles subiam por cima da festa.
+  function desenharResumoConhecer(el, dia) {
+    const C = conteudoDe();
+    const seq = CC.sequencia();
+    const nome = primeiroNome((CC.apelido && CC.apelido()) || (CC.quem || {}).nome);
+    const refDe = (d) => CC.colarRef(d.trechos.map((t) => CC.escreverRef(t.livro, t.cap, t.de, t.ate)).join(' e ')).replace(/(\d)-(?=\d)/g, '$1-\u2060');
+    const proximo = C.dias[dia.numero];
+    const amanha = proximo && !CC.conhecido(proximo.numero) ? proximo : null;
+    const destaque = (classe, arte, ico, titulo, sub) => '<li class="destaque-dia ' + classe + '"><span class="arte-destaque"><span class="' + arte + '">'
+      + CC.ico(ico) + '</span></span><span class="texto-destaque"><b>' + titulo + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span></li>';
+    const pe = amanha
+      ? '<button class="botao cor" data-ate-amanha>' + CC.esc(nome ? 'Até amanhã, ' + nome + '!' : 'Até amanhã!') + '</button>'
+      : (peDoConhecer(dia, true, true) || '<button class="botao cor" data-ate-amanha>Fechar</button>');
+    el.className = 'licao c-azul tela-conhecer cj tela-resumo';
+    el.innerHTML = '<div class="licao-palco"><div class="interno"><div class="resumo-dia resumo-conhecer"><div class="cabeca-licao">'
+      + '<div class="chama-palco">' + CC.arte.faiscas() + CC.icoChama(seq.atual) + '</div>'
+      + '<b class="numero-ofensiva">' + seq.atual + '</b>'
+      + '<h1 class="rotulo-ofensiva">' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + '</h1>'
+      + '<p class="passo-dica">Conhecer Jesus · Dia ' + dia.numero + ' de ' + C.dias.length + '</p></div>'
+      + '<ul class="destaques">'
+      + destaque('conheceu', 'arte-volta', 'certo', CC.esc(dia.titulo), 'Você conheceu · ' + CC.esc(refDe(dia)))
+      + (amanha
+        ? destaque('amanha', 'arte-amanha', 'avancar', 'Amanhã: ' + CC.esc(amanha.titulo), CC.esc(refDe(amanha)) + ' · uns ' + minutosDoConhecer(amanha) + ' minutos')
+        : destaque('amanha', 'arte-amanha', 'bandeira', 'Você terminou os 14 dias!', ''))
+      + '</ul></div></div></div>'
+      + '<div class="licao-pe"><div class="interno">' + pe + '</div></div>';
+    if (CC.arte.confete) CC.arte.confete(el, 26);
+    const titulo = el.querySelector('h1');
+    if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
+    const sair = el.querySelector('[data-ate-amanha]');
+    if (sair) {
+      sair.onclick = () => {
+        location.hash = '#/conhecer';
+        // o primeiro dia feito pela conta nova: agora o tutorial de instalar e os lembretes
+        if (CC.depoisDoPrimeiroDia) CC.depoisDoPrimeiroDia();
+      };
+    }
+    const continuarPlano = el.querySelector('[data-continuar-plano]');
+    if (continuarPlano) ligarContinuarPlano(continuarPlano);
+  }
+
+  function ligarContinuarPlano(botao) {
+    botao.onclick = async () => {
+      botao.disabled = true;
+      try {
+        await CC.api('api/caminho', { caminho: 'plano' });
+        if (CC.quem) CC.quem.caminho = 'plano';
+        location.hash = '#/';
+      } catch (e) {
+        botao.disabled = false;
+        CC.avisar(e.message);
+      }
+    };
+  }
+
   function desenharConhecerDia() {
     const C = conteudoDe();
     const dia = C.dias[sessaoDia.numero - 1];
@@ -149,6 +206,8 @@
       el.setAttribute('aria-modal', 'true');
       document.body.appendChild(el);
     }
+    // um redesenho no meio do resumo (a volta do segundo plano) não o apaga
+    if (sessaoDia.resumo) { desenharResumoConhecer(el, dia); return; }
     el.className = 'licao c-azul tela-conhecer cj';
     el.setAttribute('aria-label', 'Dia ' + dia.numero + ' do Conhecer Jesus');
 
@@ -208,25 +267,12 @@
       terminar.onclick = () => {
         CC.vibrar('certo');
         CC.marcarConhecido(dia.numero);
-        desenharConhecerDia();
-        // o primeiro dia feito pela conta nova: agora o tutorial de instalar e os lembretes
-        if (CC.depoisDoPrimeiroDia) CC.depoisDoPrimeiroDia();
+        sessaoDia.resumo = true;
+        desenharResumoConhecer(el, dia);
       };
     }
     const continuarPlano = el.querySelector('[data-continuar-plano]');
-    if (continuarPlano) {
-      continuarPlano.onclick = async () => {
-        continuarPlano.disabled = true;
-        try {
-          await CC.api('api/caminho', { caminho: 'plano' });
-          if (CC.quem) CC.quem.caminho = 'plano';
-          location.hash = '#/';
-        } catch (e) {
-          continuarPlano.disabled = false;
-          CC.avisar(e.message);
-        }
-      };
-    }
+    if (continuarPlano) ligarContinuarPlano(continuarPlano);
     CC.ligarAnotacao(el);
   }
 

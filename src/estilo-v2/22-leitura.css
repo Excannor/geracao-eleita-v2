@@ -328,3 +328,15 @@
 .arte-destaque > .arte-volta { background: var(--salvia-palido); color: var(--salvia-texto); }
 .arte-destaque > .arte-amanha svg, .arte-destaque > .arte-volta svg { width: 22px; height: 22px; }
 .amigos-resumo .botao { width: auto; }
+
+/* Guardar: o rótulo das bolinhas de cor, logo acima delas (revisão de fluxo, item 11) */
+.acoes-verso .rotulo-cores { flex: 1 1 100%; margin-bottom: -2px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
+/* Pensar: a reflexão do dia recolhida no título, com "Ver o texto" (item 12) */
+.licao-dia .pensamento-dia.recolhivel { padding: 6px 8px 6px 20px; }
+.pensamento-dia .cabeca-pensamento { display: flex; align-items: center; gap: 8px; }
+.pensamento-dia .cabeca-pensamento h2 { flex: 1; min-width: 0; margin: 0; text-wrap: balance; }
+.ver-texto-reflexao { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px; border: 0; border-radius: 22px; background: none; color: var(--salvia-texto); font: inherit; font-size: .875rem; font-weight: 700; cursor: pointer; }
+.ver-texto-reflexao:active { background: var(--campo); }
+.ver-texto-reflexao svg { width: 18px; height: 18px; transition: transform .2s ease; }
+.ver-texto-reflexao[aria-expanded="true"] svg { transform: rotate(180deg); }
+.pensamento-dia.recolhivel p { padding: 4px 12px 14px 0; }

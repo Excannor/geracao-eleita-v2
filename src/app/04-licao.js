@@ -207,18 +207,24 @@
         + (CC.cartaoOndeEstamos ? CC.cartaoOndeEstamos(sessao.dia) : '')
         + cartoes
         + (trilhas.length === 1 ? '<p class="passo-dica">Hoje é mais leve: uma leitura só!</p>' : ''),
-      pe: botao(todas ? 'Concluir o dia' : 'Falta marcar ' + faltam.map(([, , r]) => nb(r)).join(' e '), 'data-concluir', todas),
+      // O rodapé diz a próxima leitura que falta e abre o texto dela; depois da última, vira
+      // "Concluir o dia". Antes era um botão cinza parado ("Falta marcar…") e o "Ler aqui"
+      // ficava abaixo da dobra. Sem tradução no app, a pessoa lê na Bíblia dela e só marca.
+      pe: todas || !traducao
+        ? botao(todas ? 'Concluir o dia' : 'Falta marcar ' + faltam.map(([, , r]) => nb(r)).join(' e '), 'data-concluir', todas)
+        : '<button class="botao cor" data-ler-pe="' + faltam[0][0] + '">' + CC.ico('folha') + 'Ler ' + nb(CC.esc(faltam[0][2])) + '</button>',
       ligar(el) {
-        el.querySelectorAll('[data-ler]').forEach((b) => {
-          b.onclick = () => CC.abrirLeitor({
-            dia,
-            chave: b.dataset.ler,
-            trilhas,
-            cor: u.cor,
-            lida: (k) => !!marcadas[k],
-            marcar: (k) => { if (!marcadas[k]) marcar(k, true); },
-          });
+        const abrir = (chave) => CC.abrirLeitor({
+          dia,
+          chave,
+          trilhas,
+          cor: u.cor,
+          lida: (k) => !!marcadas[k],
+          marcar: (k) => { if (!marcadas[k]) marcar(k, true); },
         });
+        el.querySelectorAll('[data-ler]').forEach((b) => { b.onclick = () => abrir(b.dataset.ler); });
+        const lerPe = el.querySelector('[data-ler-pe]');
+        if (lerPe) lerPe.onclick = () => abrir(lerPe.dataset.lerPe);
         el.querySelectorAll('[data-trilha]').forEach((b) => {
           b.onclick = () => {
             const ligando = !marcadas[b.dataset.trilha];
@@ -349,9 +355,13 @@
         + '<div class="pensar-inteiro" id="pensar-inteiro">'
         + '<span class="etiqueta">' + nb(CC.esc(r.pensamento ? (r.ref || r.passagem) : r.passagem + ' · ' + r.nomeGenero)) + '</span>'
         // a reflexão escrita para o dia, sobre o que acontece na leitura
+        // recolhida no título, com "Ver o texto": as perguntas sobem para o alto da etapa
         + (r.pensamento
-          ? '<figure class="pensamento-dia">' + (r.titulo ? '<h2>' + CC.esc(r.titulo) + '</h2>' : '')
-            + '<p>' + CC.esc(r.pensamento) + '</p></figure>'
+          ? '<figure class="pensamento-dia recolhivel"><div class="cabeca-pensamento">'
+            + '<h2>' + CC.esc(r.titulo || 'A reflexão de hoje') + '</h2>'
+            + '<button class="ver-texto-reflexao" data-ver-texto aria-expanded="false" aria-controls="texto-reflexao">'
+            + '<span>Ver o texto</span>' + CC.ico('baixo') + '</button></div>'
+            + '<p id="texto-reflexao" hidden>' + CC.esc(r.pensamento) + '</p></figure>'
           : '')
         + tituloEtapa('pensar', r.pensamento ? 'Para pensar' : 'Escolha uma pergunta')
         // As reflexões escritas trazem só a pergunta; as genéricas por gênero ainda vêm como
@@ -417,7 +427,7 @@
         if (fundo) fundo.onclick = () => ir('fundo');
         const prox = el.querySelector('[data-proximo]');
         if (prox) prox.onclick = () => { CC.fecharLicao(); CC.abrirLicao(proximo); };
-        if (r.ref) pintarVersiculo(el.querySelector('#festa-versiculo'), r.ref, { escrever });
+        if (r.ref) pintarVersiculo(el.querySelector('#festa-versiculo'), r.ref, { escrever, rotuloCor: true });
 
         el.querySelectorAll('[data-pergunta]').forEach((b) => {
           b.onclick = () => {
@@ -426,6 +436,15 @@
             el.querySelector('.dica-pensar').hidden = false;
           };
         });
+        const verTexto = el.querySelector('[data-ver-texto]');
+        if (verTexto) {
+          verTexto.onclick = () => {
+            const texto = el.querySelector('#texto-reflexao');
+            texto.hidden = !texto.hidden;
+            verTexto.setAttribute('aria-expanded', !texto.hidden);
+            verTexto.querySelector('span').textContent = texto.hidden ? 'Ver o texto' : 'Recolher';
+          };
+        }
         const abrirPensar = el.querySelector('[data-abrir-pensar]');
         if (abrirPensar) {
           abrirPensar.onclick = () => {
@@ -620,12 +639,12 @@
     });
   }
 
-  CC.cartaoVersiculo = (ref, texto, { semAcoes, escrever } = {}) => {
+  CC.cartaoVersiculo = (ref, texto, { semAcoes, escrever, rotuloCor } = {}) => {
     const t = CC.traducao();
     return '<figure class="cartao-versiculo' + (texto ? '' : ' sem-texto') + '">'
       + (texto ? '<span class="aspas" aria-hidden="true">“</span><blockquote>' + CC.esc(texto) + '</blockquote>' : '')
       + '<figcaption><b>' + nb(CC.esc(ref)) + '</b>' + (t && texto ? ' · ' + CC.esc(t.abreviatura) : '') + '</figcaption>'
-      + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref, { escrever }))
+      + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref, { escrever, rotuloCor }))
       + '</figure>';
   };
   // As ações são as mesmas dos leitores (04e-versiculos.js): marcar, nota, Juntos, copiar.
