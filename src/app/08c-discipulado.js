@@ -150,9 +150,13 @@
   }
 
   // ---------- Minha caminhada ----------
+  // Um marco de vida é algo que aconteceu, não uma configuração: caixa de marcar com a data,
+  // em vez de interruptor. Tocar abre a escolha da data (a mesma folha de antes).
   function linhaMarco(chave, data) {
-    return linhaInterruptor('marco', chave, ROTULOS_MARCO[chave], !!data, data ? ddmm(data) : '')
-      .replace('data-marco=', 'data-data-marco="' + CC.esc(data || '') + '" data-marco=');
+    return '<button type="button" class="linha-config linha-marco" role="checkbox" aria-checked="' + !!data + '"'
+      + ' data-data-marco="' + CC.esc(data || '') + '" data-marco="' + CC.esc(chave) + '">'
+      + '<span class="caixa-marcar" aria-hidden="true">' + (data ? CC.ico('certo') : '') + '</span>'
+      + '<span>' + CC.esc(ROTULOS_MARCO[chave]) + (data ? '<small class="dica-config">Em ' + ddmm(data) + '</small>' : '') + '</span></button>';
   }
 
   function folhaDataMarco(chave, atual) {
@@ -311,7 +315,10 @@
       + (x.checkin ? chipsCheckin(x.checkin) : '')
       + linhas.map((l) => '<span class="arroba">' + CC.esc(l) + '</span>').join('') + '</div>'
       + '<div class="pe-duplo-plano" style="flex-basis:100%">'
-      + '<button class="botao contorno pequeno" data-encontro="' + CC.esc(x.id) + '">Encontro da semana</button>'
+      // Sem encontro marcado, o botão diz a ação e com quem; depois, volta a ser o da semana.
+      + (x.ultimoEncontro
+        ? '<button class="botao contorno pequeno" data-encontro="' + CC.esc(x.id) + '">Encontro da semana</button>'
+        : '<button class="botao pequeno" data-encontro="' + CC.esc(x.id) + '">' + CC.ico('calendario') + 'Marcar o encontro com ' + CC.esc(primeiroNome(x.nome)) + '</button>')
       + '<button class="botao plano perigo pequeno" data-encerrar="' + CC.esc(x.id) + '" data-nome="' + CC.esc(x.nome) + '">Encerrar</button>'
       + '</div></div>';
   }

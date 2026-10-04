@@ -37,6 +37,7 @@ const rotas = [
   { nome: 'c-painel', hash: '#/novidades/celula/' + C + '/painel', espera: 2500, precisaCelula: true },
   { nome: 't-encontro', hash: '#/novidades/celula/' + C + '/estudo', espera: 2500, soTopo: true, acao: clic('[data-modo-encontro]'), precisaCelula: true },
   { nome: 'f-registrar', hash: '#/novidades/celula/' + C, acao: clic('[data-registrar-encontro]'), rolar: '.folha', precisaCelula: true },
+  { nome: 'f-recado', hash: '#/novidades/celula/' + C, acao: clic('[data-recado]'), rolar: '.folha', precisaCelula: true },
   { nome: 'f-pedir', hash: '#/novidades/celula/' + C + '/oracao', espera: 2500, acao: clic('[data-pedir=oracao]'), rolar: '.folha', precisaCelula: true },
   { nome: 'discipulado', hash: '#/discipulado' },
   { nome: 'f-encontro-sem', hash: '#/discipulado', acao: clic('[data-encontro]'), rolar: '.folha' },
