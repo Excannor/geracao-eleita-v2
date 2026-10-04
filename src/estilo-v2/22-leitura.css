@@ -263,7 +263,14 @@
 #busca-livro { min-height: 52px; border-color: var(--cartao); border-radius: 999px; background: var(--cartao); }
 #busca-livro:focus { border-color: var(--tinta-forte); }
 .item-livro { padding: 12px 10px 12px 14px; font-size: .9375rem; overflow-wrap: normal; }
-@media (max-width: 599px) { .item-livro.longo { grid-column: span 2; } }
+@media (max-width: 599px) { .item-livro.longo, .celula-livro.longo { grid-column: span 2; } }
+/* livro com mapa publicado: o ícone de mapa à direita, um alvo de 44px que abre #/mapa/<slug> (item 10) */
+.celula-livro { position: relative; display: grid; min-width: 0; }
+.celula-livro[hidden] { display: none; }
+.item-livro.com-mapa { padding-right: 50px; }
+.mapa-livro { position: absolute; top: 50%; right: 4px; display: grid; place-items: center; width: 44px; height: 44px; margin-top: -22px; border-radius: 50%; color: var(--salvia-texto); }
+.mapa-livro:active { background: var(--campo); }
+.mapa-livro svg { width: 20px; height: 20px; }
 .item-livro > svg { box-sizing: content-box; width: 14px; height: 14px; padding: 4px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); stroke-width: 3; }
 /* no meio do livro: um anel que enche, como o nó de hoje na trilha */
 .progresso-livro { position: static; flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; background: conic-gradient(var(--salvia-texto) var(--f), var(--contorno) 0); mask: radial-gradient(farthest-side, transparent 70%, #000 72%); }
@@ -340,3 +347,7 @@
 .ver-texto-reflexao svg { width: 18px; height: 18px; transition: transform .2s ease; }
 .ver-texto-reflexao[aria-expanded="true"] svg { transform: rotate(180deg); }
 .pensamento-dia.recolhivel p { padding: 4px 12px 14px 0; }
+/* o mapa do livro no fim do dia (item 10): a mesma linha de navegação do "Ir mais fundo" */
+.resumo-dia .linha-mapa { max-width: 400px; margin-top: 8px; text-decoration: none; }
+.linha-mapa .ico-linha { background: var(--salvia); color: var(--salvia-tinta); }
+.linha-mapa .rotulo-linha small { display: block; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }

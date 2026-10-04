@@ -547,6 +547,7 @@
         + faixaDaSemana() + '</div>'
         + '<p class="frase-cena">' + frase + '</p>'
         + '<ul class="destaques">' + destaques.join('') + '</ul>'
+        + linhaDoMapa(dia)
         + '<div id="resumo-amigos"></div>'
         + '<div class="progresso-plano"><span>' + lidos + ' de ' + D.plano.length + ' dias lidos</span>' + CC.barra(lidos / D.plano.length, 'fina') + '</div>'
         + '</div>',
@@ -567,6 +568,8 @@
           // conta nova que acabou de ler pela primeira vez: agora sim, instalar e lembretes
           if (CC.depoisDoPrimeiroDia) CC.depoisDoPrimeiroDia();
         };
+        const verMapa = el.querySelector('[data-ver-mapa]');
+        if (verMapa) verMapa.onclick = (ev) => { ev.preventDefault(); CC.recemFeito = diaDaSessao; CC.fecharLicao(); location.hash = verMapa.getAttribute('href'); };
         const desafios = el.querySelector('[data-ver-desafios]');
         if (desafios) desafios.onclick = (ev) => { ev.preventDefault(); CC.fecharLicao(); location.hash = '#/missoes'; };
         // Compartilhar gera a imagem de story da ofensiva com a frase que está na tela (f),
@@ -584,6 +587,15 @@
         else pintarAmigosDoResumo(alvo, c);
       },
     };
+  }
+
+  // No fim do dia, o mapa do livro que a pessoa acabou de ler, quando ele já foi publicado
+  // (conteudo/mapas/indice.json): os mapas moravam só no fim do Explorar (item 10).
+  function linhaDoMapa(dia) {
+    const mapa = CC.mapaDoLivro ? (dia.livros || []).map((l) => CC.mapaDoLivro(l)).find(Boolean) : null;
+    if (!mapa) return '';
+    return '<a class="linha-fundo linha-mapa" href="#/mapa/' + mapa.slug + '" data-ver-mapa><span class="ico-linha">' + CC.ico('mapa') + '</span>'
+      + '<span class="rotulo-linha">Ver o mapa de ' + CC.esc(mapa.nome) + '<small>A história do livro numa tela</small></span>' + CC.ico('direita') + '</a>';
   }
 
   // Amigos no resumo: quem também leu hoje, e um botão pequeno para encorajar quem ainda não

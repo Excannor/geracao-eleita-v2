@@ -353,11 +353,18 @@ ok(await av('getComputedStyle(document.querySelector(".cartao-mapas")).backgroun
   'no escuro o cartão dos mapas fica na folha grafite, com o título e o desenho em traço claro');
 await av('localStorage.setItem("cc.tema", "false")');
 
-// ---------- a Bíblia do app segue igual ----------
+// ---------- a Bíblia do app: só o ícone de mapa nos livros publicados ----------
+// Desde 04/10/2026 (revisão de fluxo, item 10) cada livro com mapa publicado ganha um ícone que
+// leva a #/mapa/<slug>; nada de cartão nem do mapa desenhado dentro da Bíblia.
 await av('location.hash = "#/biblia"');
 ok(await esperar('document.querySelectorAll(".grade-livros .item-livro").length === 66'), 'a Bíblia lista os 66 livros como antes');
-ok(await av('!document.querySelector(\'#conteudo [href^="#/mapa"]\') && !document.querySelector("#conteudo .mapa, #conteudo .celula-mapa, #conteudo .cartao-mapas") && !document.querySelector("#conteudo").textContent.includes("Mapa do livro")'),
-  'a Bíblia não ganhou botão, cartão nem link de mapa');
+const linksMapa = await av('[...document.querySelectorAll(\'#conteudo .grade-livros a.mapa-livro[href^="#/mapa/"]\')].map((a) => a.getAttribute("href").slice(7))');
+const publicados = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'mapas', 'indice.json'), 'utf8')).publicados;
+ok(linksMapa.length === publicados.length && publicados.every((p) => linksMapa.includes(p)), 'a Bíblia mostra o ícone de mapa só nos ' + publicados.length + ' livros com mapa publicado');
+ok(await av('!document.querySelector("#conteudo .mapa, #conteudo .celula-mapa, #conteudo .cartao-mapas") && !document.querySelector("#conteudo").textContent.includes("Mapa do livro")'),
+  'a Bíblia não ganhou cartão nem o mapa desenhado');
+await av('document.querySelector(\'#conteudo a.mapa-livro[href="#/mapa/genesis"]\').click()');
+ok(await esperar('location.hash === "#/mapa/genesis" && document.querySelectorAll(".mapa .mapa-ramo").length > 0'), 'tocar no ícone de Gênesis abre o mapa de Gênesis');
 await av('location.hash = "#/biblia/Isa%C3%ADas/1"');
 ok(await esperar('document.querySelectorAll(".leitor-verso, .verso").length > 5 || document.querySelector("#conteudo").textContent.includes("Uzias")'), 'Isaías 1 abre na Bíblia pelo endereço que o mapa usa');
 ok(await av('!document.querySelector("#conteudo").textContent.includes("Mapa do livro")'), 'o capítulo da Bíblia não menciona o mapa');

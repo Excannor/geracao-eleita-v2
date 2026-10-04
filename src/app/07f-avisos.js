@@ -86,6 +86,8 @@
     CC.ligarVoltarDoTopo(raiz);
     if (r.naoLidos) {
       naoLidos = 0;
+      // o sino do topo (o mesmo em todas as abas) perde o ponto na hora
+      document.querySelectorAll('[data-sino] .ponto').forEach((p) => p.remove());
       CC.api('api/avisos/lidos', {}).catch(() => {});
     }
   };

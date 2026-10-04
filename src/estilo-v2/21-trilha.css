@@ -71,12 +71,21 @@
 .textos-saudacao { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 /* a saudação quebra em duas linhas em vez de cortar com reticências ("Que bom ter você aqui, Joana!") */
 .textos-saudacao b { color: var(--tinta-forte); font-size: 1.1875rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; overflow-wrap: anywhere; text-wrap: balance; }
-.textos-saudacao span { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 500; white-space: nowrap; }
-.saudacao .botao-redondo { position: relative; flex: none; background: var(--campo); color: var(--tinta-forte); }
-.saudacao .botao-redondo .ponto { position: absolute; top: 11px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--alerta); box-shadow: 0 0 0 2px var(--campo); }
+.textos-saudacao span { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 500; text-wrap: balance; }
+.saudacao .botao-redondo, .topo .sino-topo { position: relative; flex: none; background: var(--campo); color: var(--tinta-forte); }
+.saudacao .botao-redondo .ponto, .topo .sino-topo .ponto { position: absolute; top: 11px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--alerta); box-shadow: 0 0 0 2px var(--campo); }
+/* primeiro dia: retrato, chama e sino na linha de cima, e "Que bom ter você aqui, <nome>!" embaixo */
+.saudacao-longa { flex-wrap: wrap; row-gap: 14px; }
+.saudacao-longa .textos-saudacao { order: 1; flex-basis: 100%; }
+.saudacao-longa .avatar-topo { margin-right: auto; }
+/* o mesmo topo em todas as abas (item 9): a pílula da chama, só a chama e o número, ao lado do sino */
+.saudacao .contador.ofensiva { flex: none; min-height: var(--botao-redondo); padding: 0 14px 0 10px; gap: 4px; background: var(--campo); }
+.topo > .estatisticas { gap: 10px; }
+.topo .contador.ofensiva { padding: 0 14px 0 10px; gap: 4px; }
 @media (max-width: 374px) {
   .saudacao { gap: 8px; }
   .saudacao .botao-redondo { width: 44px; height: 44px; }
+  .saudacao .contador.ofensiva { min-height: 44px; padding: 0 12px 0 8px; }
   .avatar-topo { width: 48px; height: 48px; }
 }
 

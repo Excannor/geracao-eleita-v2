@@ -188,9 +188,7 @@
       + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
       + atalho('#/config', 'engrenagem', 'Configurações e conta')
       + '</div>'
-      // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.
-      + (CC.quem && CC.quem.admin ? '<div class="titulo-secao"><h2>Administração</h2></div><div class="lista-atalhos">'
-        + atalho('#/config/painel', 'grafico', 'Painel do administrador') + '</div>' : '')
+      // O painel do administrador saiu daqui: mora no Mais, só para o admin (10-roteador.js).
       + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Precisa conversar com alguém? Fale com alguém de '
       + 'confiança ou ligue <b>188 (CVV)</b>, a qualquer hora. Se for abuso ou violência, ligue <b>100</b>.</p></div>';
 

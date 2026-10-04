@@ -252,10 +252,16 @@ secao('mapas dos livros');
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   checar(servidorTexto.includes('MAPA_COM_RESUMO') && servidorTexto.includes("|| PUBLICO_COM_RESUMO(rota);") && servidorTexto.includes("'cache-control': PUBLICO_COM_RESUMO(rota)"),
     'o servidor entrega os mapas sem sessão e com cache longo, como as fontes');
-  // Os mapas moram só no Explorar: a Bíblia, o leitor, a lição e a trilha não os conhecem.
-  const foraDoExplorar = ['04d-biblia.js', '04b-leitor.js', '04-licao.js', '03-trilha.js', '03c-contexto.js']
-    .filter((f) => /vistaMapa|#\/mapa|secaoMapas|cartaoMapas|mapaDoLivro/.test(readFileSync(join(AQUI, 'src', 'app', f), 'utf8')));
-  checar(foraDoExplorar.length === 0, 'a Bíblia, o leitor, a lição e a trilha não ganharam nada do mapa' + (foraDoExplorar.length ? ' (' + foraDoExplorar.join(', ') + ')' : ''));
+  // Os mapas moram no Explorar. Desde 04/10/2026 (revisão de fluxo, item 10, aprovado pelo
+  // dono) a lista de livros da Bíblia e o fim da lição levam a eles por um link #/mapa/<slug>,
+  // só quando o livro tem mapa publicado; o leitor e a trilha continuam sem eles, e nenhuma
+  // dessas telas desenha o mapa nem o cartão do Explorar.
+  const app = (f) => readFileSync(join(AQUI, 'src', 'app', f), 'utf8');
+  const foraDoExplorar = ['04b-leitor.js', '03-trilha.js', '03c-contexto.js']
+    .filter((f) => /vistaMapa|#\/mapa|secaoMapas|cartaoMapas|mapaDoLivro/.test(app(f)));
+  checar(foraDoExplorar.length === 0, 'o leitor e a trilha não ganharam nada do mapa' + (foraDoExplorar.length ? ' (' + foraDoExplorar.join(', ') + ')' : ''));
+  const soLink = ['04d-biblia.js', '04-licao.js'].filter((f) => /vistaMapa|secaoMapas|cartaoMapas/.test(app(f)) || !/CC\.mapaDoLivro/.test(app(f)));
+  checar(soLink.length === 0, 'a Bíblia e o fim da lição só levam ao mapa publicado, com um link' + (soLink.length ? ' (' + soLink.join(', ') + ')' : ''));
   const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
   checar(roteador.includes("mapa: '#/explorar'") && roteador.includes("rota === 'mapa'"), 'a rota #/mapa/<slug> existe e marca o Explorar');
 }

@@ -330,20 +330,17 @@
     const primeira = !CC.ler('lidos', []).length;
     const nome = String((CC.apelido && CC.apelido()) || (CC.quem || {}).nome || '').trim().split(/\s+/)[0];
     const foto = CC.foto();
-    const servido = location.protocol.startsWith('http');
-    const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
 
-    const saudacao = '<header class="saudacao">'
+    // a saudação comprida do primeiro dia desce para a linha de baixo, inteira: ao lado da
+    // chama e do sino ela quebrava em três linhas a 360px
+    const saudacao = '<header class="saudacao' + (primeira ? ' saudacao-longa' : '') + '">'
       + '<a class="avatar-topo" href="#/perfil" aria-label="Seu perfil">'
       + (foto ? '<img src="' + CC.esc(foto) + '" alt="">' : CC.ico('pessoa')) + '</a>'
       + '<div class="textos-saudacao"><b>' + CC.esc(primeira ? (nome ? 'Que bom ter você aqui, ' + nome + '!' : 'Que bom ter você aqui!') : (nome ? 'Olá, ' + nome + '!' : 'Olá! Bora ler?')) + '</b>'
       + '<span>Dia ' + numero + ' de ' + D.plano.length + ' do plano</span></div>'
-      + (servido
-        ? '<a class="botao-redondo" href="#/novidades" aria-label="Juntos' + (pendencias ? ', há novidades' : '') + '">'
-          + CC.ico('balao') + (pendencias ? '<i class="ponto"></i>' : '') + '</a>'
-          + '<a class="botao-redondo" href="#/avisos" data-sino aria-label="Avisos">' + CC.ico('sino')
-          + (CC.avisosNaoLidos && CC.avisosNaoLidos() ? '<i class="ponto"></i>' : '') + '</a>'
-        : '')
+      // a mesma pílula da chama e o mesmo sino do topo das outras abas (10-roteador.js); o
+      // balão do Juntos saiu daqui: a aba Juntos, com o ponto de novidade, fica logo abaixo
+      + CC.pilulaDaChama(seq) + CC.sinoDoTopo()
       + '</header>';
 
     const rotuloLeitura = feito
@@ -532,6 +529,23 @@
       const r = alvo.getBoundingClientRect();
       const barra = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alt-barra')) || 0;
       if (r.top >= 0 && r.bottom + 40 <= innerHeight - barra) return;
+      // Longe do alto (dia 23, por exemplo), a trilha abre já rolada até hoje, com dois dias
+      // lidos acima para dar contexto: antes abria no topo da unidade e a pessoa passava por
+      // 22 dias lidos até chegar ao de hoje (revisão de fluxo, item 14).
+      const nos = alvo.closest('.nos');
+      const dias = [...nos.querySelectorAll('.no[data-dia]')];
+      const i = dias.indexOf(alvo);
+      // os dois primeiros dias do plano ficam com a saudação à vista (conta nova a 360x740)
+      if (i < 2 && nos === document.querySelector('.trilha-caminho .nos')) return;
+      const antes = dias[Math.max(0, i - 2)];
+      const linha = antes && antes.closest('.no-linha');
+      if (linha) {
+        // a faixa da unidade fica presa no alto ao rolar: os dois dias ficam logo abaixo dela
+        const presa = alvo.closest('.nos').previousElementSibling;
+        const alto = presa ? Math.max(0, presa.getBoundingClientRect().height) : 0;
+        CC.rolarPara(Math.max(0, linha.getBoundingClientRect().top + CC.rolagemY() - alto - 24));
+        return;
+      }
     }
     alvo.scrollIntoView({ block: 'center', behavior: suave ? 'smooth' : 'auto' });
   };
