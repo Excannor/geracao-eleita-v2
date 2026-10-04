@@ -43,12 +43,14 @@
   // escrever: o rótulo do botão que, na revisão do dia, toma o lugar de "Nota" e leva à tela
   // de escrever da lição (um lugar só para escrever sobre o dia; a nota do versículo continua
   // nos leitores e aparece nessa tela quando existe).
-  function barraHtml(ref, { fechar, escrever } = {}) {
+  function barraHtml(ref, { fechar, escrever, rotuloCor } = {}) {
     const r = CC.lerRef(ref);
     const atual = r ? corDoTrecho(r) : 0;
     const temNota = !!CC.anotacao(chaveNota(ref)).trim();
+    // rotuloCor: no Guardar da reflexão, as bolinhas dizem para que servem
     return '<b class="ref-verso">' + nb(CC.esc(ref)) + '</b>'
-      + '<div class="cores-marca" role="group" aria-label="Marcar">'
+      + (rotuloCor ? '<span class="rotulo-cores" aria-hidden="true">Marcar com cor</span>' : '')
+      + '<div class="cores-marca" role="group" aria-label="' + (rotuloCor ? 'Marcar com cor' : 'Marcar') + '">'
       + CORES.map(([n, nome]) => '<button class="cor-marca marca-' + n + '" data-cor="' + n + '" aria-pressed="' + (atual === n)
         + '" aria-label="Marcar em ' + nome + '"></button>').join('')
       + (r && algumMarcado(r) ? '<button class="botao-icone tirar-marca" data-cor="0" aria-label="Tirar a marca">' + CC.ico('fechar') + '</button>' : '')

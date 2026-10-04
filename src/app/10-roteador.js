@@ -49,7 +49,8 @@
     // O Explorar não é mais aba própria: mora dentro do Mais, mas continua marcando o Mais
     // como selecionado enquanto a pessoa está nele (ver maisSelecionado, abaixo).
     explorar: '#/explorar', secao: '#/explorar', nota: '#/explorar', busca: '#/explorar',
-    // O mapa de cada livro mora no Explorar (decisão do dono, 02/10): a Bíblia não muda.
+    // O mapa de cada livro mora no Explorar (decisão do dono, 02/10); desde 04/10 a lista da
+    // Bíblia e o fim da lição levam a ele, e ele continua marcando o Mais.
     mapa: '#/explorar',
     // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
     // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
@@ -85,6 +86,19 @@
   let ofensivaAnterior = null;
 
   let topoDesenhado = '';
+  // A pílula da chama (abre a folha da ofensiva) e o sino (abre os avisos), iguais no topo das
+  // abas e na folha do Início. O ponto do sino vem do último número que 07f-avisos.js contou.
+  CC.pilulaDaChama = (seq, extra) => '<button class="contador ofensiva' + (seq.atual ? ' ativo' : '') + (seq.feitoHoje ? ' hoje' : '') + (extra || '')
+    + '" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva, ' + CC.estagioDaChama(seq.atual).nome + '">'
+    + CC.icoChama(seq.atual) + '<span>' + seq.atual + '</span></button>';
+  CC.sinoDoTopo = () => {
+    if (!location.protocol.startsWith('http')) return '';
+    const n = CC.avisosNaoLidos ? CC.avisosNaoLidos() : 0;
+    return '<a class="botao-redondo sino-topo" href="#/avisos" data-sino aria-label="' + (n ? 'Avisos, ' + n + ' novos' : 'Avisos') + '">'
+      + CC.ico('sino') + (n ? '<i class="ponto"></i>' : '') + '</a>';
+  };
+
+  let sinoContado = false;
   function pintarTopo() {
     const seq = CC.sequencia();
     const subiu = ofensivaAnterior !== null && seq.atual > ofensivaAnterior;
@@ -94,18 +108,21 @@
     // lado do fogo. `pintarTopo` não recebe a rota do roteador: lê direto daqui, e o
     // estado de selecionado entra no próprio HTML para o cache abaixo redesenhar ao mudar.
     const rota = partesDaRota().rota;
-    const naContaOuConfig = rota === 'perfil' || rota === 'config';
+    const { arg: argDaRota } = partesDaRota();
+    const naContaOuConfig = rota === 'perfil' || (rota === 'config' && !String(argDaRota || '').startsWith('painel'));
     const foto = CC.foto();
     const retrato = foto ? '<img class="retrato-topo" src="' + CC.esc(foto) + '" alt="">' : CC.icoAba('pessoa');
 
+    // O mesmo topo em todas as abas (revisão de fluxo, item 9): retrato, a pílula da chama e o
+    // sino com o ponto de avisos. O Início desenha a mesma peça na folha dele, com a saudação.
     const html = '<div class="estatisticas">'
-      + '<button class="contador ofensiva' + (seq.atual ? ' ativo' : '') + (seq.feitoHoje ? ' hoje' : '') + (subiu ? ' subiu' : '')
-      + '" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva, ' + CC.estagioDaChama(seq.atual).nome + '">'
-      + CC.icoChama(seq.atual)
-      + '<span>' + seq.atual + '</span><small>' + (seq.atual === 1 ? 'dia' : 'dias') + '</small></button>'
+      + CC.pilulaDaChama(seq, subiu ? ' subiu' : '')
+      + CC.sinoDoTopo()
       + '</div>'
       + '<button class="perfil-topo' + (naContaOuConfig ? ' selecionado' : '') + '" data-ir="#/perfil" aria-label="Perfil"'
       + (naContaOuConfig ? ' aria-current="page"' : '') + '>' + retrato + '</button>';
+    // o ponto do sino é contado uma vez na abertura, qualquer que seja a aba (o Início conta de novo)
+    if (!sinoContado && CC.atualizarPontoDoSino) { sinoContado = true; CC.atualizarPontoDoSino(); }
     if (html === topoDesenhado && topo.firstChild) return;
     topoDesenhado = html;
     topo.innerHTML = html;
@@ -151,7 +168,7 @@
         : (seq.feitoHoje ? '' : '<p class="passo-dica">A lenha de hoje ainda não entrou. Leia para manter o fogo aceso!</p>'))
       + '<div class="semana-bolinhas">' + semana + '</div>'
       + '<p class="linha-escudos">' + [0, 1].map((i) => '<i class="' + (i < seq.escudos ? 'tem' : '') + '">' + CC.ico('escudo') + '</i>').join('')
-      + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Um dia em branco usa um. Você ganha um todo mês e outro a cada 7 dias seguidos.</span></p>'
+      + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Um dia em branco usa um. Você ganha um todo mês e outro a cada 7 dias de ofensiva.</span></p>'
       + '<p class="linha-recorde"><span>Recorde</span><b>' + CC.plural(seq.recorde, 'dia', 'dias') + '</b></p>'
       + (seq.recorde >= 7 ? '<p class="passo-dica pequena marcas-barro">Seu recorde guarda até onde você já chegou. Até aqui o Senhor nos ajudou! (1Sm 7.12)</p>' : '')
       + (amigos.length
@@ -237,6 +254,8 @@
     itens.push(itemPainelMais(CC.icoAba('marcador'), true, 'Meus versículos', '', '#/perfil/versiculos'));
     itens.push(itemPainelMais(CC.icoAba('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
     itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
+    // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.
+    if (CC.quem && CC.quem.admin) itens.push(itemPainelMais(CC.ico('grafico'), true, 'Painel do administrador', 'Números da igreja e do app', '#/config/painel'));
     itens.push(itemPainelMais(CC.ico('engrenagem'), true, 'Configurações', 'Tema, notificações e conta', '#/config'));
     document.body.insertAdjacentHTML('beforeend', '<div class="veu-mais"></div><div class="painel-mais" role="dialog" aria-modal="true" aria-label="Mais">' + itens.join('') + '</div>');
     document.querySelector('.veu-mais').onclick = () => fecharPainelMais();
@@ -272,7 +291,9 @@
     // Meus versículos e Minha história abrem pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
     const anteriorNav = pilha.length >= 2 ? pilha[pilha.length - 2] : '';
     const doMais = rota === 'perfil' && (arg === 'versiculos' || arg === 'historia') && !anteriorNav.startsWith('#/perfil');
-    const maisSelecionado = !naBiblia && (doMais || ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
+    // O painel do administrador também abre pelo Mais (só para o admin): com ele aberto, o Mais fica aceso.
+    const noPainel = rota === 'config' && String(arg || '').startsWith('painel');
+    const maisSelecionado = !naBiblia && (doMais || noPainel || ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
     const pontoMais = !desafiosNaBarra && !!(CC.haDesafioPendenteHoje && CC.haDesafioPendenteHoje());
     const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
     const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
@@ -631,6 +652,10 @@
     // lista, mas herda aquela rolagem, escondendo o título. Corrige assim que o caminho
     // é conhecido, só na Trilha.
     if (quem && quem.caminho === 'conhecer' && (location.hash === '#/' || location.hash === '')) CC.rolarPara(0);
+    // No plano, a Trilha abre no dia de hoje (com dois dias lidos acima) já com o progresso de
+    // verdade: num aparelho sem nada guardado, o primeiro desenho era o do dia 1 e a pessoa
+    // caía no topo da unidade, longe de hoje (revisão de fluxo, item 14).
+    else if (location.hash === '#/' || location.hash === '') requestAnimationFrame(() => CC.rolarAteAtual(false));
     // Daqui para baixo vêm folhas e avisos: só com a abertura saindo.
     await CC.aberturaSaiu;
 

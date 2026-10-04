@@ -158,8 +158,9 @@ ok(await esperar(existe('.leitura-hoje [data-abrir-dia]') + ' && ' + existe('.fa
 ok(await av('document.querySelectorAll(".navegacao .aba:not(.so-trilho)").length === 5 && ' + existe('.aba[aria-current=page]')
   + ' && getComputedStyle(' + q('.aba .rotulo-aba') + ').position !== "absolute"'),
   'cinco abas com o nome à vista, e a atual marcada para leitor de tela');
-ok(await av('!' + existe('.topo .contador.lidos') + ' && !' + existe('.topo .contador.escudos') + ' && !' + existe('.topo .sino')),
-  'o topo mostra só o fogo: sem dias lidos, escudos ou sino');
+// Desde 04/10/2026 o topo é o mesmo em todas as abas: retrato, a chama e o sino dos avisos.
+ok(await av('!' + existe('.topo .contador.lidos') + ' && !' + existe('.topo .contador.escudos') + ' && ' + existe('.topo [data-sino]') + ' && ' + existe('.folha-topo .saudacao [data-sino]') + ' && ' + existe('.folha-topo .saudacao [data-ofensiva]')),
+  'o topo mostra a chama e o sino, sem dias lidos nem escudos, no Início e nas outras abas');
 ok(await av('!' + existe('.contador.xp') + ' && ' + existe('.contador.ofensiva')), 'o topo mostra a ofensiva e não o XP');
 ok(await av('document.querySelectorAll(".no-bau").length >= 4'), 'a trilha tem um baú a cada sete dias');
 await dormir(500);

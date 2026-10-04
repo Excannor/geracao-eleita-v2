@@ -65,11 +65,18 @@
       const rotulo = completo ? ', lido inteiro no plano' : p.lidos ? ', ' + p.lidos + ' de ' + p.total + ' dias do plano' : '';
       // nome comprido (Deuteronômio, 1 Tessalonicenses) ocupa a linha inteira no celular, para
       // não quebrar no meio da palavra nem separar o número do nome
-      return '<a class="item-livro' + (completo ? ' completo' : '') + (l.length >= 12 ? ' longo' : '') + '" href="#/biblia/' + encodeURIComponent(l) + '"'
+      // O livro com mapa publicado ganha o ícone de mapa, que leva direto a #/mapa/<slug>
+      // (revisão de fluxo, item 10): os mapas moravam só no fim do Explorar.
+      const mapa = CC.mapaDoLivro ? CC.mapaDoLivro(l) : null;
+      const item = '<a class="item-livro' + (completo ? ' completo' : '') + (l.length >= 12 && !mapa ? ' longo' : '') + (mapa ? ' com-mapa' : '') + '" href="#/biblia/' + encodeURIComponent(l) + '"'
         + (rotulo ? ' aria-label="' + CC.esc(l + rotulo) + '"' : '') + '>'
         + '<span>' + nb(CC.esc(l)) + '</span>'
         + (completo ? CC.ico('certo') : fracao > 0 ? '<i class="progresso-livro" style="--f:' + (fracao * 100).toFixed(0) + '%"></i>' : '')
         + '</a>';
+      return mapa
+        ? '<div class="celula-livro' + (l.length >= 12 ? ' longo' : '') + '">' + item
+          + '<a class="mapa-livro" href="#/mapa/' + mapa.slug + '" aria-label="Ver o mapa de ' + CC.esc(l) + '">' + CC.ico('mapa') + '</a></div>'
+        : item;
     }).join('') + '</div>';
   }
 
@@ -136,7 +143,11 @@
     campo.oninput = () => {
       const { nome } = separar(campo.value);
       const vistos = new Set(nome ? achados(nome) : livros);
-      alvo.querySelectorAll('.item-livro').forEach((a) => { a.hidden = !vistos.has(a.querySelector('span').textContent.replace(/\u00a0/g, ' ')); });
+      alvo.querySelectorAll('.item-livro').forEach((a) => {
+        a.hidden = !vistos.has(a.querySelector('span').textContent.replace(/\u00a0/g, ' '));
+        const celula = a.closest('.celula-livro');
+        if (celula) celula.hidden = a.hidden;
+      });
       ['#testamento-antigo', '#testamento-novo'].forEach((sel) => {
         const bloco = alvo.querySelector(sel);
         bloco.hidden = !bloco.querySelector('.item-livro:not([hidden])');

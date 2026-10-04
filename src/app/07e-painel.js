@@ -143,7 +143,7 @@
     if (arg && arg.startsWith('painel/celula/')) return vistaPainelCelula(raiz, arg.slice('painel/celula/'.length));
     // .folha-perfil: só apresentação, a folha do alto (25-perfil.css); o título longo desce
     // para baixo do voltar (.titulo-frase) e os quatro números viram os cartões de destaque.
-    const cabeca = (dentro) => '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Perfil') + '<h1>Painel do administrador</h1>' + (dentro || '') + '</div>';
+    const cabeca = (dentro) => '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Voltar') + '<h1>Painel do administrador</h1>' + (dentro || '') + '</div>';
     raiz.innerHTML = cabeca() + CC.esqueleto('cartoes');
     let p;
     let igreja = null;

@@ -283,7 +283,12 @@ async function lerDiaPlano() {
   const cabeca = await av('(() => ({ dia: (document.querySelector(".licao .etiqueta") || {}).innerText, passagens: [...document.querySelectorAll(".licao .passagem")].map((p) => ({ ref: (p.querySelector(".ref") || {}).innerText, tempo: (p.querySelector(".tempo") || {}).innerText })) }))()');
   D.prometido = cabeca.passagens;
   await registrar('A lição abriu: ' + (cabeca.dia || '') + ' · ' + cabeca.passagens.map((p) => p.ref + ' (' + p.tempo + ')').join(' e '), { dados: cabeca });
-  if (await av(existe('.licao .passagem:not(.feita) [data-ler]'))) {
+  if (await av(existe('.licao .licao-pe [data-ler-pe]'))) {
+    // desde 04/10/2026 o rodapé da lição diz a próxima leitura ("Ler Gênesis 1-3") e abre o texto
+    const rotulo = await av('(' + q('.licao .licao-pe [data-ler-pe]') + ').innerText.trim()');
+    await toque('.licao .licao-pe [data-ler-pe]', 'Tocou em "' + rotulo + '" no rodapé da lição', { espera: 1200 });
+    await lerNoLeitor('Terminei a leitura');
+  } else if (await av(existe('.licao .passagem:not(.feita) [data-ler]'))) {
     await toque('.licao .passagem:not(.feita) [data-ler]', 'Tocou em "Ler aqui" na primeira passagem', { espera: 1200 });
     await lerNoLeitor('Terminei a leitura');
   } else {
@@ -334,7 +339,14 @@ async function lerDiaConhecer() {
   await toque('.licao.tela-conhecer [data-terminar]', 'Tocou em "Terminei o dia"', { espera: 1000 });
   D.marcos.dia = { passo: D.passos.length, toques: D.toques, campos: D.campos };
   await registrar('Dia concluído (conta para a ofensiva)');
-  await toque('.licao.tela-conhecer [data-fechar]', 'Fechou o dia (X): volta à lista dos 14 dias', { espera: 1000 });
+  // desde 04/10/2026 o fim do dia mostra o resumo (chama, o que conheceu, amanhã) e sai por "Até amanhã"
+  if (await av(existe('.licao.tela-conhecer [data-ate-amanha]'))) {
+    await registrar('Resumo do dia (chama, o que conheceu, amanhã)');
+    const rotulo = await av('(' + q('.licao.tela-conhecer [data-ate-amanha]') + ').innerText.trim()');
+    await toque('.licao.tela-conhecer [data-ate-amanha]', 'Tocou em "' + rotulo + '": volta à lista dos 14 dias', { espera: 1000 });
+  } else {
+    await toque('.licao.tela-conhecer [data-fechar]', 'Fechou o dia (X): volta à lista dos 14 dias', { espera: 1000 });
+  }
 }
 
 async function fimDoDia(erros) {
