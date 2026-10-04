@@ -22,7 +22,7 @@
       'Passo dado é passo que não se perde.',
     ],
     ofensiva: [
-      '{n} dias seguidos! A leitura está virando hábito.',
+      '{n} dias de ofensiva! A leitura está virando hábito.',
       '{n} dias de estrada. Olha até onde chegamos!',
     ],
     voltando: [

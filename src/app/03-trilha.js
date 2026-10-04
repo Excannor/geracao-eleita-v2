@@ -303,6 +303,17 @@
   // no segundo, a folha da chama. Amigos aparecem só como sinal de quem já leu hoje, sem
   // número nem comparação.
   let ofensivaVista = null;
+  // "Novo na fé?" é só para quem respondeu "Estou conhecendo" no cadastro (a marca que o
+  // entrar.html grava, ou algum dia do Conhecer Jesus feito) e depois veio para o plano. Some
+  // de vez quando a pessoa abre o primeiro passo (notasVistas, igual em todo aparelho) ou toca no X.
+  const CHAVE_NOVO_NA_FE = 'cc.novoNaFe';
+  const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  function mostrarNovoNaFe() {
+    const conheceu = lerLocal('cc.conhecendo') === '1' || (CC.conhecidos && CC.conhecidos().length > 0);
+    if (!conheceu || lerLocal(CHAVE_NOVO_NA_FE) === 'fora') return false;
+    const vistas = new Set(CC.estado().notasVistas || []);
+    return !CC.ler('licoes', []).length && !D.licoes.some((id) => vistas.has(id));
+  }
   function folhaDoTopo(atual, amigos, faixaToque) {
     // Quem já leu hoje vê a leitura feita, e não o dia seguinte oferecido como se faltasse.
     const lidoHoje = diaLidoHoje();
@@ -315,7 +326,7 @@
     ofensivaVista = seq.atual;
 
     const juntos = linhaQuemLeu(amigos);
-    const novo = !feito && CC.ler('lidos', []).length < 3 && CC.ler('licoes', []).length < D.licoes.length;
+    const novo = mostrarNovoNaFe();
     const primeira = !CC.ler('lidos', []).length;
     const nome = String((CC.apelido && CC.apelido()) || (CC.quem || {}).nome || '').trim().split(/\s+/)[0];
     const foto = CC.foto();
@@ -325,7 +336,7 @@
     const saudacao = '<header class="saudacao">'
       + '<a class="avatar-topo" href="#/perfil" aria-label="Seu perfil">'
       + (foto ? '<img src="' + CC.esc(foto) + '" alt="">' : CC.ico('pessoa')) + '</a>'
-      + '<div class="textos-saudacao"><b>' + CC.esc(primeira ? 'Bem-vindo!' : (nome ? 'Olá, ' + nome + '!' : 'Olá! Bora ler?')) + '</b>'
+      + '<div class="textos-saudacao"><b>' + CC.esc(primeira ? (nome ? 'Que bom ter você aqui, ' + nome + '!' : 'Que bom ter você aqui!') : (nome ? 'Olá, ' + nome + '!' : 'Olá! Bora ler?')) + '</b>'
       + '<span>Dia ' + numero + ' de ' + D.plano.length + ' do plano</span></div>'
       + (servido
         ? '<a class="botao-redondo" href="#/novidades" aria-label="Juntos' + (pendencias ? ', há novidades' : '') + '">'
@@ -346,16 +357,17 @@
       + '<button class="cartao-salvia" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva, '
       + CC.esc(CC.estagioDaChama(seq.atual).nome) + '">'
       + '<span class="textos-salvia"><b' + (subiu ? ' class="subiu"' : '') + '>' + CC.plural(seq.atual, 'dia', 'dias') + '</b>'
-      + '<span>seguidos</span></span>'
+      + '<span>de ofensiva</span></span>'
       + '<span class="redondo-preto" aria-hidden="true">' + CC.icoChama(seq.atual) + '</span></button>'
       + '</div>';
 
     return '<section class="folha-topo" aria-label="Hoje">'
       + saudacao
       + faixaToque
-      + (primeira ? '<p class="fala-bento pequena apresenta">Que bom ter você aqui! Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
+      + (primeira ? '<p class="fala-bento pequena apresenta">Vamos caminhar juntos pela Bíblia, um dia de cada vez.</p>' : '')
       + cartoes
-      + (novo ? '<a class="novo-na-fe" href="#/passos">' + CC.ico('bandeira') + 'Novo na fé? Comece pelos Primeiros passos</a>' : '')
+      + (novo ? '<div class="faixa-novo-na-fe"><a class="novo-na-fe" href="#/passos">' + CC.ico('bandeira') + '<span>Novo na fé? Comece pelos Primeiros passos</span></a>'
+        + '<button class="dispensar-novo-na-fe" data-dispensar-novo aria-label="Dispensar o convite dos Primeiros passos">' + CC.ico('fechar') + '</button></div>' : '')
       + juntos
       + '</section>';
   }
@@ -418,6 +430,13 @@
     raiz.querySelectorAll('[data-abrir-dia]').forEach((el) => {
       el.onclick = () => CC.abrirLicao(Number(el.dataset.abrirDia));
     });
+    const dispensar = raiz.querySelector('[data-dispensar-novo]');
+    if (dispensar) {
+      dispensar.onclick = () => {
+        try { localStorage.setItem(CHAVE_NOVO_NA_FE, 'fora'); } catch (e) { /* segue */ }
+        dispensar.closest('.faixa-novo-na-fe').remove();
+      };
+    }
     raiz.querySelectorAll('[data-ofensiva]').forEach((el) => { el.onclick = CC.folhaOfensiva; });
     const convidar = raiz.querySelector('[data-convidar]');
     if (convidar) convidar.onclick = () => CC.convidar();

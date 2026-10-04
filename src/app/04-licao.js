@@ -487,7 +487,7 @@
     }
     if (CC.MARCOS_OFENSIVA.includes(seq.atual) && seq.atual > sessao.antes.ofensiva) {
       const proximoMarco = CC.MARCOS_OFENSIVA[CC.MARCOS_OFENSIVA.indexOf(seq.atual) + 1];
-      item(CC.arte.calendario(seq.atual, 'agora'), 'Meta de ' + seq.atual + ' dias seguidos', proximoMarco ? 'Próxima meta: ' + proximoMarco + ' dias' : '', 'marco');
+      item(CC.arte.calendario(seq.atual, 'agora'), 'Meta de ' + seq.atual + ' dias de ofensiva', proximoMarco ? 'Próxima meta: ' + proximoMarco + ' dias' : '', 'marco');
     }
     for (const q of c.subiram.slice(0, 3)) {
       const def = CC.CONQUISTAS.find((x) => x.id === q.id);

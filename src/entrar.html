@@ -378,8 +378,8 @@
           <input id="nome" name="name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="20" required>
           <span class="ajuda">Até 20 letras. É assim que seus amigos veem você.</span></div>
         <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
-          <input id="nascimento" name="bday" type="date" autocomplete="bday" required>
-          <span class="ajuda">Não aparece para ninguém.</span></div>
+          <input id="nascimento" name="bday" type="date" lang="pt-BR" placeholder="dd/mm/aaaa" autocomplete="bday" aria-describedby="ajuda-nascimento" required>
+          <span class="ajuda" id="ajuda-nascimento">Dia, mês e ano (dd/mm/aaaa). Não aparece para ninguém.</span></div>
         <div class="campo" style="margin-top:16px" id="campo-caminho">
           <label id="rotulo-caminho">Você já segue Jesus?</label>
           <div class="caminho-escolha" role="group" aria-labelledby="rotulo-caminho">
@@ -619,6 +619,8 @@
         if (r.ok) {
           // Conta nova: o app abre com o tutorial de pôr o ícone na tela de início.
           try { localStorage.setItem('cc.instalar', '1'); } catch (e) { /* segue */ }
+          // Quem respondeu "Estou conhecendo" vê o convite dos Primeiros passos se um dia for para o plano.
+          if (caminhoEscolhido === 'conhecer') { try { localStorage.setItem('cc.conhecendo', '1'); } catch (e) { /* segue */ } }
           // O convite (ou a célula) já foi aceito junto com o cadastro: o app não precisa perguntar de novo.
           if (d.convidadoPor || d.celula) { try { history.replaceState(null, '', location.pathname); } catch (e) { /* segue */ } }
           entrarNoApp(d.usuario);

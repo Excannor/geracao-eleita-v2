@@ -69,7 +69,8 @@
 .avatar-topo svg { width: 24px; height: 24px; }
 .avatar-topo img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .textos-saudacao { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.textos-saudacao b { overflow: hidden; color: var(--tinta-forte); font-size: 1.1875rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; white-space: nowrap; text-overflow: ellipsis; }
+/* a saudação quebra em duas linhas em vez de cortar com reticências ("Que bom ter você aqui, Joana!") */
+.textos-saudacao b { color: var(--tinta-forte); font-size: 1.1875rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; overflow-wrap: anywhere; text-wrap: balance; }
 .textos-saudacao span { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 500; white-space: nowrap; }
 .saudacao .botao-redondo { position: relative; flex: none; background: var(--campo); color: var(--tinta-forte); }
 .saudacao .botao-redondo .ponto { position: absolute; top: 11px; right: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--alerta); box-shadow: 0 0 0 2px var(--campo); }
@@ -128,7 +129,12 @@
   .letreiro.varios .letreiro-item { transition: none; }
 }
 .folha-topo .fala-bento.apresenta { margin: -6px 0 0; padding: 10px 14px; border-radius: 20px; background: var(--campo); color: var(--tinta); font-size: .875rem; font-weight: 600; }
-.folha-topo .novo-na-fe { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; margin-top: -6px; padding: 8px 18px 8px 8px; border-radius: 999px; background: var(--campo); color: var(--tinta-forte); font-size: .875rem; font-weight: 600; line-height: 1.3; text-decoration: none; }
+/* "Novo na fé?": a faixa com o link e o X de dispensar; pode ter duas linhas a 360, por isso raio de 20 */
+.folha-topo .faixa-novo-na-fe { display: flex; align-items: center; gap: 4px; margin-top: -6px; padding-right: 2px; border-radius: 20px; background: var(--campo); }
+.folha-topo .novo-na-fe { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 4px 8px 8px; color: var(--tinta-forte); font-size: .875rem; font-weight: 600; line-height: 1.3; text-decoration: none; border-radius: 20px; }
+.folha-topo .dispensar-novo-na-fe { flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--tinta-fraca); cursor: pointer; }
+.folha-topo .dispensar-novo-na-fe svg { width: 18px; height: 18px; }
+.folha-topo .dispensar-novo-na-fe:active, .folha-topo .novo-na-fe:active { background: var(--contorno); }
 .folha-topo .novo-na-fe svg { box-sizing: content-box; flex: none; width: 18px; height: 18px; margin: 0; padding: 7px; border-radius: 50%; background: var(--salvia-cheia); color: var(--preto); }
 .folha-topo .toque-recebido { gap: 12px; min-height: 56px; margin: 0; padding: 8px 16px 8px 8px; border-radius: 999px; background: var(--salvia-cheia); color: var(--preto); font-size: .875rem; font-weight: 600; }
 .folha-topo .toque-recebido svg { color: var(--preto); }

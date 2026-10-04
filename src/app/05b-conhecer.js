@@ -77,7 +77,7 @@
     // saudação do Início; o próximo dia é o cartão de destaque.
     raiz.innerHTML = '<div class="tela-conhecer-lista"><div class="folha-cabeca cabeca-passos c-azul">'
       + '<div class="textos"><h1>' + CC.esc(C.titulo) + '</h1>'
-      + '<p>' + CC.esc(C.subtitulo) + '</p>'
+      + '<p>' + CC.esc(subtituloDoConhecer(C)) + '</p>'
       + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitos.length + ' de ' + C.dias.length + '</b></div>'
       + (proximo
         ? '<a class="cartao-destaque" href="#/conhecer/' + proximo.numero + '"><span>'
@@ -233,8 +233,19 @@
   // O rodapé muda com o estado do dia: primeiro só "Ler"; depois de ler, "Terminei o dia";
   // terminado, só nos dias 13 e 14 aparece um próximo passo, senão o rodapé fica vazio e a
   // pessoa sai pelo X.
-  // Uns 6 versículos por minuto, arredondado; os trechos do Conhecer são curtos e por versículo.
-  const minutosDoConhecer = (dia) => Math.max(3, Math.round(dia.trechos.reduce((n, t) => n + (t.ate - t.de + 1), 0) / 6));
+  // A mesma conta do plano (CC.minutosDoDia): as palavras do trecho na NBV, que o build grava,
+  // a 200 por minuto, nunca menos de 3. Antes eram 6 versículos por minuto, e o dia 1 prometia
+  // 6 minutos para uma leitura de 4.
+  const minutosDoConhecer = (dia) => {
+    const palavras = dia.trechos.reduce((n, t) => n + (t.palavras || 0), 0);
+    if (palavras) return Math.max(3, Math.round(palavras / (CC.PALAVRAS_POR_MINUTO || 200)));
+    return Math.max(3, Math.round(dia.trechos.reduce((n, t) => n + (t.ate - t.de + 1), 0) / 6));
+  };
+  // A capa diz a média de verdade dos 14 dias, e não um número escrito à mão.
+  const subtituloDoConhecer = (C) => {
+    const media = Math.round(C.dias.reduce((s, d) => s + minutosDoConhecer(d), 0) / (C.dias.length || 1));
+    return C.dias.length + ' dias, uns ' + media + ' minutos por dia';
+  };
 
   function peDoConhecer(dia, lida, terminado) {
     if (!lida) return '<button class="botao cor" data-ler>Ler</button>';

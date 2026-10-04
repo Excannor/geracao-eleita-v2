@@ -42,6 +42,14 @@ conteudo.primeirosDias = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'primeir
         t.palavras = n;
       }
     }
+    // O Conhecer Jesus vai por versículo (cap, de, ate): a mesma conta, só dos versículos do trecho.
+    for (const d of conteudo.conhecer.dias) {
+      for (const t of d.trechos || []) {
+        let n = 0;
+        for (const v of ((livros[t.livro] || [])[t.cap - 1] || []).slice(t.de - 1, t.ate)) n += String(v).split(/\s+/).filter(Boolean).length;
+        t.palavras = n;
+      }
+    }
   }
 }
 dados = JSON.stringify(conteudo);

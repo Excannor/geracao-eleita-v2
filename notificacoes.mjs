@@ -205,7 +205,7 @@ export function decidir({ agora, pref, historico = {}, leitura }) {
 // dias seguidos, e ninguém recebe "você falhou".
 const T = {
   lembreteComOfensiva: [
-    ['🔥 {n} dias seguidos!', 'Bora fazer o dia {n1}? A lição de hoje já tá pronta.'],
+    ['🔥 {n} dias de ofensiva!', 'Bora fazer o dia {n1}? A lição de hoje já tá pronta.'],
     ['Pausa pro café com a Palavra ☕', 'Uns 15 minutinhos e a sua chama de {n} dias segue acesa.'],
     ['Ei, {nome}! 👋', 'A leitura de hoje já está separada. Bora manter os {n} dias?'],
     ['Seu momento do dia chegou 📖', '{n} dias de caminho. Hoje é o dia {n1}!'],
@@ -217,7 +217,7 @@ const T = {
     ['Pausa boa pro seu dia ✨', 'Respira, abre o app e lê com calma.'],
   ],
   lembreteMarco: [
-    ['Falta 1 dia pra bater {marco} dias 🏆', 'Lê hoje e a sua ofensiva chega em {marco} dias seguidos!'],
+    ['Falta 1 dia pra bater {marco} dias 🏆', 'Lê hoje e a sua ofensiva chega a {marco} dias!'],
     ['Quase lá! 🎯', 'Mais uma leitura e você bate {marco} dias. Bora?'],
   ],
   lembreteDomingo: [
