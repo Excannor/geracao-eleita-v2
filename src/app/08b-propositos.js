@@ -46,7 +46,9 @@
   function contagem(p) {
     if (p.tipo === 'oracao') return '<span class="dias-cartao orando">' + CC.ico('aperto') + '<small>orando juntos</small></span>';
     const um = p.dias === 1;
-    const rotulo = p.grupo
+    // Na célula, a contagem diz o que conta: não é a ofensiva da pessoa, é a célula inteira.
+    const rotulo = p.celula ? (um ? 'dia com a célula inteira lendo' : 'dias com a célula inteira lendo')
+      : p.grupo
       ? (p.tipo === 'livro' ? (um ? 'dia de meta' : 'dias de meta') : (um ? 'dia seguido' : 'dias seguidos'))
       : (p.tipo === 'livro' ? (um ? 'dia lido' : 'dias lidos') : (um ? 'dia junto' : 'dias juntos'));
     return '<span class="dias-cartao">' + CC.icoChama() + p.dias + '<small>' + rotulo + '</small></span>';
@@ -137,9 +139,8 @@
       raiz.innerHTML = '<div class="folha-juntos">' + voltarCelulas()
         + '<div class="cabeca-celula"><div><span class="etiqueta-celula">' + CC.ico('pessoas') + 'Célula</span>'
         + '<h1>' + CC.esc(p.titulo) + '</h1>'
-        + '<p class="passo-dica">' + CC.plural(ativos(p).length, 'pessoa', 'pessoas')
-        + (p.encontro >= 0 ? ' · encontro ' + nomeDoEncontro(p.encontro) : '') + '</p></div>'
-        + contagem(p) + '</div>'
+        + '<p class="passo-dica">' + CC.plural(ativos(p).length, 'pessoa', 'pessoas') + '</p></div>'
+        + cartaoProximoEncontro(p) + contagem(p) + '</div>'
         + '<div class="segmentado abas-celula" role="tablist" aria-label="Partes da célula">'
         + abasVisiveis.map(([k, r]) => '<button type="button" role="tab" data-aba="' + k + '" aria-selected="' + (k === aba) + '" aria-pressed="' + (k === aba) + '">'
           + r + (k === 'estudo' && p.estudo ? '<i class="ponto-estudo" aria-hidden="true"></i>' : '') + '</button>').join('')
@@ -337,15 +338,17 @@
           + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + selo + '</b>'
           + '<span class="arroba">' + situacao + '</span></div>'
           + (m.fezHoje ? '<span class="selo-status leu">' + CC.ico('certo') + '</span>' : '')
-          + (souLider && m.usuario !== p.criadoPor && m.estado === 'ativo'
-            ? '<button class="botao plano pequeno" data-auxiliar="' + CC.esc(m.usuario) + '" data-sim="' + (m.papel === 'auxiliar' ? '0' : '1') + '">'
-              + (m.papel === 'auxiliar' ? 'Tirar de auxiliar' : 'Tornar auxiliar') + '</button>' : '')
-          + (souLider && m.usuario !== p.criadoPor ? '<button class="botao plano pequeno" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar</button>' : '')
+          // Tirar da célula é sério: fica separado, em vermelho, e ainda pede confirmação.
+          + (souLider && m.usuario !== p.criadoPor ? '<div class="acoes-pessoa">'
+            + (m.estado === 'ativo'
+              ? '<button class="botao contorno pequeno" data-auxiliar="' + CC.esc(m.usuario) + '" data-sim="' + (m.papel === 'auxiliar' ? '0' : '1') + '">'
+                + (m.papel === 'auxiliar' ? 'Tirar de auxiliar' : 'Tornar auxiliar') + '</button>' : '')
+            + botaoTirar(m) + '</div>' : '')
           + '</div>';
       }).join('') + '</div>'
       + (visitantes.length ? CC.tituloSecao('Visitantes') + '<div class="lista-pedidos">' + visitantes.map((m) => '<div class="linha-amigo">' + retrato(m)
         + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + '</b></div>'
-        + (souLider ? '<button class="botao plano pequeno" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar</button>' : '')
+        + (souLider ? '<div class="acoes-pessoa">' + botaoTirar(m) + '</div>' : '')
         + '</div>').join('') + '</div>' : '')
       + '<div class="acoes">'
       + (eu.fezHoje && faltam.length ? '<button class="botao" data-notificar>' + CC.ico('sino')
@@ -356,6 +359,8 @@
       + (souLider ? '<button class="botao plano perigo" data-encerrar>Encerrar a célula</button>' : '<button class="botao plano perigo" data-sair>Sair da célula</button>')
       + '</div>';
   }
+
+  const botaoTirar = (m) => '<button class="botao contorno pequeno botao-perigo" data-remover="' + CC.esc(m.usuario) + '" aria-label="Tirar ' + CC.esc(m.nome) + ' da célula">Tirar da célula</button>';
 
   // Só quem é amigo recebe o toque: o "Notificar" é o mesmo toque de amigo de sempre.
   // Visitante fica fora: ainda não é membro de verdade, então não entra em "quem falta".
@@ -785,13 +790,16 @@
     return (p.nasceuDe ? '<div class="recado-lider"><p>Esta célula nasceu da ' + CC.esc(comoCelula(p.nasceuDe.titulo)) + '.</p></div>' : '')
       + (p.multiplicouPara ? '<div class="recado-lider"><p>Nasceu a ' + CC.esc(comoCelula(p.multiplicouPara.titulo)) + ' a partir desta célula.</p></div>' : '')
       + (p.recado
-      ? '<div class="recado-lider"><span class="etiqueta">Recado de ' + CC.esc(nomeDoLider(p)) + '</span><p>' + CC.esc(p.recado) + '</p></div>'
+      ? '<div class="recado-lider"><span class="etiqueta">Recado de ' + CC.esc(nomeDoLider(p)) + '</span><p>' + CC.esc(p.recado) + '</p>'
+        // Com dia e hora escolhidos pelo líder, o recado vira evento na agenda do celular.
+        + (quandoValendo(p) ? '<div class="acoes-missao"><button type="button" class="botao pequeno contorno botao-ir-missao" data-agenda>'
+          + CC.ico('calendario') + 'Pôr na agenda · ' + CC.esc(rotuloAgenda(p.recadoQuando)) + '</button></div>' : '')
+        + '</div>'
       : '')
-      // No dia do encontro o botão "Encontro hoje · veja o estudo" (logo abaixo, na aba Hoje)
-      // já diz isso: a linha aqui só repetiria a mesma informação duas vezes seguidas.
-      + (p.encontro >= 0 && encontroHoje(p) ? '' : '<p class="passo-dica pequena">' + (p.encontro >= 0
-        ? 'Encontro ' + nomeDoEncontro(p.encontro) + '.'
-        : (conduzo ? 'Marque o dia do encontro para a célula ver "Encontro hoje" no dia.' : 'Quem conduz a célula ainda não marcou o dia do encontro.')) + '</p>')
+      // O dia do encontro mora no cartão "Próximo encontro", no alto: aqui só o aviso de
+      // que ainda não há dia marcado.
+      + (p.encontro >= 0 || quandoValendo(p) ? '' : '<p class="passo-dica pequena">'
+        + (conduzo ? 'Marque o dia do encontro para a célula ver "Encontro hoje" no dia.' : 'Quem conduz a célula ainda não marcou o dia do encontro.') + '</p>')
       // Só quem conduz vê a pessoa a procurar, com o motivo, nunca um placar. As estatísticas
       // (chama, encontros, check-in, caminhada) moram na aba Painel.
       + (conduzo ? blocoAtencao(p) : '');
@@ -1126,10 +1134,15 @@
 
   function folhaRecado(p) {
     const max = 280;
+    const quandoAtual = quandoValendo(p) ? p.recadoQuando : '';
     CC.folha('<h2>Recado para a célula</h2>'
       + '<p class="passo-dica">Aparece no alto da célula para todos: um lembrete do encontro, um pedido de oração, uma palavra de ânimo.</p>'
       + '<label class="campo-senha"><span>Recado</span><textarea data-texto name="recado-da-celula" maxlength="' + max + '" rows="4" autocomplete="off">' + CC.esc(p.recado || '') + '</textarea></label>'
       + '<p class="passo-dica pequena" data-conta></p>'
+      // Dia e hora à parte (opcionais): é o que deixa a célula pôr o encontro na agenda.
+      + '<div class="campos-quando"><label class="campo-senha"><span>Dia do encontro</span><input type="date" data-quando-dia min="' + CC.hojeIso() + '" value="' + CC.esc(quandoAtual.slice(0, 10)) + '"></label>'
+      + '<label class="campo-senha"><span>Hora</span><input type="time" data-quando-hora step="900" value="' + CC.esc(quandoAtual.slice(11, 16)) + '"></label></div>'
+      + '<p class="passo-dica pequena">Opcional. Com dia e hora, a célula ganha o botão "Pôr na agenda".</p>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao" data-salvar>Publicar recado</button>'
       + (p.recado ? '<button class="botao plano perigo" data-apagar>Apagar o recado</button>' : '')
@@ -1142,19 +1155,27 @@
         campo.oninput = conta;
         conta();
         folha.querySelector('[data-fechar]').onclick = fechar;
-        const enviar = async (texto) => {
+        const erro = folha.querySelector('.erro-proposito');
+        const enviar = async (texto, quando = '') => {
           try {
-            await CC.api('api/celula', { acao: 'recado', id: p.id, texto });
+            await CC.api('api/celula', { acao: 'recado', id: p.id, texto, quando });
             fechar();
             CC.avisar(texto ? 'Recado publicado' : 'Recado apagado');
             recarregar();
           } catch (e) {
-            const erro = folha.querySelector('.erro-proposito');
             erro.textContent = e.message;
             erro.hidden = false;
           }
         };
-        folha.querySelector('[data-salvar]').onclick = () => enviar(campo.value);
+        folha.querySelector('[data-salvar]').onclick = () => {
+          const dia = folha.querySelector('[data-quando-dia]').value;
+          const hora = folha.querySelector('[data-quando-hora]').value;
+          erro.hidden = true;
+          if (dia && !hora) { erro.textContent = 'Escolha a hora do encontro também.'; erro.hidden = false; return; }
+          if (hora && !dia) { erro.textContent = 'Escolha o dia do encontro também.'; erro.hidden = false; return; }
+          if (dia && dia < CC.hojeIso()) { erro.textContent = 'Escolha um dia de hoje em diante.'; erro.hidden = false; return; }
+          enviar(campo.value, dia && hora ? dia + 'T' + hora.slice(0, 5) : '');
+        };
         const apagar = folha.querySelector('[data-apagar]');
         if (apagar) apagar.onclick = async () => {
           if (!await CC.confirmar({ titulo: 'Apagar o recado?', texto: 'Ele some do alto da célula para todo mundo.', acao: 'Apagar', perigo: true })) return;
@@ -1200,8 +1221,15 @@
     const opcoes = opcoesDataEncontro(hoje);
     const gente = p.membros.filter((m) => m.estado === 'ativo');
     const rotuloData = (d) => (d === hoje ? 'Hoje' : d === CC.somaDias(hoje, -1) ? 'Ontem' : ddmm(d));
+    // A data em destaque é a do encontro desta semana; as outras ficam atrás de "Outra data".
+    const doEncontro = dataDoEncontro(p, hoje);
+    const nomeData = (d) => (d === hoje ? 'Hoje' : d === CC.somaDias(hoje, -1) ? 'Ontem' : DIA_LONGO[new Date(d + 'T12:00:00').getDay()])
+      + ', ' + Number(d.slice(8, 10)) + '/' + Number(d.slice(5, 7));
+    const realce = (d) => '<b>' + nomeData(d) + '</b>' + (d === doEncontro ? ' <span>· o encontro desta semana</span>' : '');
     CC.folha('<h2>Quem foi ao encontro?</h2>'
-      + '<div class="escolha-dia" role="group" aria-label="Dia do encontro">' + opcoes.map((d) => '<button type="button" class="botao '
+      + '<div class="data-encontro-realce realce" data-realce-data>' + realce(alvo) + '</div>'
+      + '<button type="button" class="botao contorno pequeno" data-outra-data aria-expanded="false">' + CC.ico('calendario') + 'Outra data</button>'
+      + '<div class="escolha-dia" role="group" aria-label="Dia do encontro" data-outras-datas hidden>' + opcoes.map((d) => '<button type="button" class="botao '
         + (d === alvo ? 'azul' : 'contorno') + ' pequeno" data-data="' + d + '" aria-pressed="' + (d === alvo) + '">' + rotuloData(d) + '</button>').join('') + '</div>'
       + '<div class="escolha-amigos">' + gente.map((m) => '<label class="linha-amigo escolha-amigo">'
         + '<input type="checkbox" value="' + CC.esc(m.usuario) + '"' + (m.usuario === euUsuario() ? ' checked' : '') + '>' + retrato(m)
@@ -1223,9 +1251,17 @@
         let n = (p.ultimoEncontro && p.ultimoEncontro.data === alvo) ? p.ultimoEncontro.visitantes : 0;
         const valor = folha.querySelector('[data-visitantes-valor]');
         valor.textContent = n;
+        const outra = folha.querySelector('[data-outra-data]');
+        const outras = folha.querySelector('[data-outras-datas]');
+        outra.onclick = () => {
+          const abrir = outras.hidden;
+          outras.hidden = !abrir;
+          outra.setAttribute('aria-expanded', String(abrir));
+        };
         folha.querySelectorAll('[data-data]').forEach((b) => {
           b.onclick = () => {
             dataEscolhida = b.dataset.data;
+            folha.querySelector('[data-realce-data]').innerHTML = realce(dataEscolhida);
             folha.querySelectorAll('[data-data]').forEach((x) => {
               const sel = x === b;
               x.classList.toggle('azul', sel);

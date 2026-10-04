@@ -230,7 +230,8 @@ console.log('\n  Inteligência: leitura_dias\n');
 {
   const pasta = mkdtempSync(join(tmpdir(), 'cc-intel-db-'));
   const db = B.abrirBanco(B.arquivoDoBanco(pasta));
-  ok(B.versaoDoEsquema() === 14, 'o esquema está na v14');
+  ok(B.versaoDoEsquema() >= 14, 'o esquema já tem a v14 (hoje na v' + B.versaoDoEsquema() + ')');
+  ok(db.prepare('PRAGMA table_info(propositos)').all().some((c) => c.name === 'recado_quando'), 'a v15 dá ao recado da célula o dia e a hora do encontro (recado_quando)');
   const objetos = db.prepare("SELECT name, type FROM sqlite_master WHERE name IN ('leitura_dias', 'leituras_por_dia', 'celula_frequencia', 'leitura_dias_data', 'checkins_data')").all();
   ok(objetos.length === 5 && objetos.filter((o) => o.type === 'view').length === 2 && objetos.filter((o) => o.type === 'index').length === 2, 'a tabela, as duas views e os dois índices da v14 existem');
   ok(/WITHOUT ROWID/.test(db.prepare("SELECT sql FROM sqlite_master WHERE name = 'leitura_dias'").get().sql) && !db.prepare("SELECT name FROM sqlite_master WHERE name LIKE 'sqlite_autoindex_leitura_dias%'").get(), 'leitura_dias é WITHOUT ROWID: a chave primária é a própria tabela, sem autoindex por trás');

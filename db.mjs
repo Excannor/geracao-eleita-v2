@@ -221,6 +221,11 @@ const ESQUEMA = [
       (SELECT COUNT(*) FROM celula_presencas p WHERE p.proposito = e.proposito AND p.data = e.data) AS presentes
     FROM celula_encontros e;
   `,
+  // v15: o recado da célula pode levar o dia e a hora do encontro ("2026-10-08T20:00", hora
+  // local, sem fuso): é o que deixa o membro pôr o encontro na agenda do celular.
+  `
+  ALTER TABLE propositos ADD COLUMN recado_quando TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrarEsquema(db) {

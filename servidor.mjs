@@ -758,7 +758,7 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const semanaAte = Math.max(7, lidos.length ? Math.max(...lidos) : 0);
   const conduzo = podeConduzir(p, eu);
   const extra = {
-    encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', semanaAte,
+    encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     estudo: p.estudo || null,
     estudoAcolhida: p.estudoAcolhida || '', estudoAdoracao: p.estudoAdoracao || '', estudoTestemunho: p.estudoTestemunho || '',
     euConduzo: conduzo,
@@ -1541,7 +1541,7 @@ const servidor = createServer(async (req, res) => {
     if (rota === '/api/celula') {
       await acao(async ({
         acao: qual, id, titulo, token, dia, texto, usuario, estudo, ref, acolhida, adoracao, testemunho,
-        visitante, sim, data, presentes, visitantes, semEncontro, auxiliar, pessoas,
+        visitante, sim, data, presentes, visitantes, semEncontro, auxiliar, pessoas, quando,
       }) => {
         const hoje = hojeDe(eu);
         if (qual === 'criar') {
@@ -1561,7 +1561,7 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'tornarMembro') { await CONTAS.tornarMembro(eu, id, hoje); return {}; }
         if (qual === 'auxiliar') { await CONTAS.definirAuxiliar(eu, id, usuario, !!sim); return {}; }
         if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia); return {}; }
-        if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto); return {}; }
+        if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto, new Date(), { quando, hoje }); return {}; }
         if (qual === 'estudo') { await CONTAS.definirEstudo(eu, id, { tipo: estudo, ref, texto, acolhida, adoracao, testemunho }, TODOS_LIVROS); return {}; }
         if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro }, hoje); return {}; }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }

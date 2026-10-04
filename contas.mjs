@@ -34,6 +34,21 @@ export const LIMITE_ACEITES_HORA = 30;
 export const LIMITE_TOQUES_DIA = 5;
 export const VALIDADE_CONVITE = 30 * 24 * 60 * 60 * 1000;
 export const RECADO_MAX = 280;
+// O dia e a hora do encontro no recado: vazio, ou "AAAA-MM-DDTHH:MM" de verdade (sem 31/02 nem
+// 25h), de hoje até 366 dias para a frente.
+export function validarQuandoDoEncontro(quando, hoje) {
+  const q = String(quando || '').trim();
+  if (!q) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(q);
+  if (!m) throw erro('o dia e a hora do encontro não estão certos');
+  const [a, me, d, h, mi] = m.slice(1).map(Number);
+  const dt = new Date(Date.UTC(a, me - 1, d));
+  if (dt.getUTCFullYear() !== a || dt.getUTCMonth() !== me - 1 || dt.getUTCDate() !== d || h > 23 || mi > 59) throw erro('o dia e a hora do encontro não estão certos');
+  const dia = q.slice(0, 10);
+  const limite = new Date(Date.parse(hoje + 'T12:00:00Z') + 366 * 86400000).toISOString().slice(0, 10);
+  if (dia < hoje || dia > limite) throw erro('escolha um dia de hoje até um ano para a frente');
+  return q;
+}
 export const ESTUDO_MAX = 3000;
 // Acolhida, adoração e testemunho são só um empurrão para a conversa: bem mais curtos que a
 // Palavra, que pode ser um estudo inteiro.
@@ -176,7 +191,7 @@ function paraLinhas(d) {
     { tabela: 'propositos', chaves: ['id'], linhas: Object.values(d.propositos || {}).map((p) => ({
       id: p.id, tipo: p.tipo, alvo: p.alvo || '', titulo: p.titulo || '', criado_por: p.criadoPor, criado_em: p.criadoEm,
       encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0, celula: p.celula ? 1 : 0,
-      encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recado_em: p.recadoEm || '',
+      encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recado_em: p.recadoEm || '', recado_quando: p.recadoQuando || '',
       estudo_tipo: (p.estudo && p.estudo.tipo) || '', estudo_ref: (p.estudo && p.estudo.ref) || '',
       estudo_texto: (p.estudo && p.estudo.texto) || '', estudo_em: (p.estudo && p.estudo.em) || '',
       estudo_acolhida: p.estudoAcolhida || '', estudo_adoracao: p.estudoAdoracao || '', estudo_testemunho: p.estudoTestemunho || '',
@@ -260,7 +275,7 @@ function deLinhas(t, versao) {
     d.propositos[l.id] = {
       id: l.id, tipo: l.tipo, alvo: l.alvo || '', titulo: l.titulo || '', criadoPor: l.criado_por, criadoEm: l.criado_em,
       encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, celula: !!l.celula,
-      encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '',
+      encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '', recadoQuando: l.recado_quando || '',
       estudo: l.estudo_tipo ? { tipo: l.estudo_tipo, ref: l.estudo_ref || '', texto: l.estudo_texto || '', em: l.estudo_em || '' } : null,
       estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
       mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '',
@@ -1188,12 +1203,16 @@ export class Contas {
     return p;
   }
 
-  async definirRecado(eu, id, texto, agora = new Date()) {
+  // "quando" (opcional) é o dia e a hora do encontro, "AAAA-MM-DDTHH:MM" na hora local da
+  // célula: de hoje até um ano para a frente. Sem recado, não há "quando".
+  async definirRecado(eu, id, texto, agora = new Date(), { quando = '', hoje = '' } = {}) {
     const p = this.celulaDeQuemConduz(eu, id);
     const limpo = String(texto || '').replace(/\s+/g, ' ').trim();
     if (limpo.length > RECADO_MAX) throw erro('o recado tem no máximo ' + RECADO_MAX + ' caracteres');
+    const q = limpo ? validarQuandoDoEncontro(quando, hoje || agora.toISOString().slice(0, 10)) : '';
     p.recado = limpo;
     p.recadoEm = limpo ? agora.toISOString() : '';
+    p.recadoQuando = q;
     await this.salvar();
     return p;
   }
