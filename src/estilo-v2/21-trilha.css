@@ -248,7 +248,13 @@
 /* aberto, o balão fica acima dos outros nós, mas passa por baixo da faixa da unidade, que
    gruda no alto (antes o nó e o balão rolavam por cima dela); a folha do Início rola com a
    trilha (5bb4ad1) */
-.no-linha:has(.pop-no) { z-index: 15; }
+.no-linha:has(.pop-no) {
+  z-index: 15;
+  /* O balão é absoluto para continuar ancorado ao nó, mas a altura dele precisa participar
+     do ritmo da trilha. Sem esta reserva, abrir um dia lido põe o balão por cima do cartão
+     do dia atual e deixa a estrada desenhada sobre posições que já não correspondem aos nós. */
+  margin-bottom: calc(20px + var(--altura-pop, 180px) + 24px);
+}
 /* no dia de hoje, o balão toma o lugar do cartão ao lado do nó enquanto está aberto (a mesma
    passagem e o mesmo Começar): antes um cobria o outro. Fechado, a trilha fica como estava. */
 .no-linha.hoje:has(.pop-no) .cartao-no-hoje { visibility: hidden; }

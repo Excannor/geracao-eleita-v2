@@ -349,10 +349,10 @@ button.cartao-proposito:hover { background: var(--campo); }
 .folha [data-outras-datas]:not([hidden]) { margin-bottom: 12px; }
 
 /* Minha caminhada: caixa de marcar com a data, em vez de interruptor */
-.linha-marco { justify-content: flex-start; gap: 14px; text-align: left; }
+.linha-config.linha-marco { justify-content: flex-start; gap: 14px; text-align: left; }
 .linha-config.linha-marco > .caixa-marcar { flex: 0 0 26px; min-width: 0; }
 .linha-config.linha-marco > span:last-child { flex: 1 1 auto; text-wrap: balance; }
 .linha-config.linha-marco .caixa-marcar svg { color: var(--salvia-tinta); }
 .caixa-marcar { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; box-shadow: inset 0 0 0 2px var(--tinta-fraca); color: var(--salvia-tinta); }
-.linha-marco[aria-checked="true"] .caixa-marcar { background: var(--salvia); box-shadow: none; }
+.linha-config.linha-marco[aria-checked="true"] .caixa-marcar { background: var(--salvia); box-shadow: none; }
 .caixa-marcar svg { width: 16px; height: 16px; stroke-width: 3; }
