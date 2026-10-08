@@ -341,6 +341,48 @@
   .lp-rodape .links a { color: var(--lp-salvia); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
   .lp-rodape .lp-marca .mascote svg { height: 34px; }
 
+  /* ---------- celular (abaixo de 700px) ----------
+     Escala de letra mais contida no celular: título da abertura ~45px, títulos de seção ~33px,
+     corpo em 16px. Quase tudo em vw, para que título, foto e adesivo guardem a mesma
+     proporção de 320 a 699px (a foto do alto já é 68vw). O adesivo do lema fica no torso do
+     rapaz, abaixo do símbolo da camiseta e à direita do título e do subtítulo, sem cobrir
+     o símbolo, a cabeça, o título nem os botões. */
+  @media (max-width: 699.98px) {
+    .lp-hero { gap: 16px; padding-top: 24px; padding-bottom: 36px; }
+    .lp-hero-texto { gap: 14px; }
+    .lp-titulo { font-size: clamp(2.3rem, 11.6vw, 3.5rem); }
+    .lp-titulo + .lp-sub { margin-top: 2px; }
+    .lp-sub { max-width: calc(69vw - 34px); font-size: .9375rem; letter-spacing: .1em; line-height: 1.5; text-wrap: wrap; }
+    .lp-convidado .lp-sub { max-width: 30ch; }
+    .lp-etiqueta { top: calc(24px + 37vw); right: 3vw; transform: rotate(-5deg); }
+    .lp-etiqueta-corpo > span { padding: 3px 8px 1px; font-size: clamp(.7rem, 3.15vw, 1.1rem); }
+    .lp-convidado .lp-etiqueta { display: none; }
+
+    .lp-faixa { gap: 24px; padding-top: 40px; padding-bottom: 44px; }
+    .lp-passos-titulo { font-size: clamp(1.85rem, 8.6vw, 2.6rem); line-height: 1; }
+    .lp-passos-lista { gap: 20px; }
+    .lp-passos-lista h3 { font-size: 1.0625rem; }
+    .lp-passos-lista p { font-size: .9375rem; }
+
+    .lp-joao-jesus { font-size: clamp(3.8rem, 20vw, 6.4rem); }
+    .lp-joao-meio { font-size: clamp(1.5rem, 7vw, 2.3rem); }
+    .lp-joao-vida { font-size: clamp(2.4rem, 11.6vw, 3.8rem); }
+    .lp-joao-versiculo { text-wrap: pretty; }
+
+    .lp-app { gap: 32px; }
+    .lp-app-titulo { font-size: clamp(1.85rem, 8.6vw, 2.6rem); }
+    .lp-texto { font-size: 1rem; }
+    .lp-comunidade-titulo { font-size: clamp(1.85rem, 8.6vw, 2.6rem); }
+    .lp-comunidade-lista li { font-size: 1rem; }
+
+    .lp-volte-a, .lp-volte-c { font-size: clamp(1rem, 4.6vw, 1.5rem); }
+    .lp-volte-b { font-size: clamp(1.9rem, 9.2vw, 3rem); }
+    .lp-volte-d { font-size: clamp(3.4rem, 18.5vw, 5.6rem); }
+    .lp-convite h2 { font-size: 1.1875rem; }
+    .lp-papel { padding: 14px 22px 12px; font-size: 1.125rem; }
+    .lp-papel svg { width: 38px; }
+  }
+
   /* ---------- telas largas ---------- */
   @media (min-width: 700px) {
     .lp { --lp-margem: 32px; }
@@ -460,7 +502,7 @@
         <!-- Com convite ou link de célula, o script troca este título pelo nome de quem chamou
              (e põe .lp-convidado na seção, que diminui a letra). -->
         <h1 id="titulo-boas" class="lp-titulo"><span>Mais que</span> <span>um app,</span> <span>é <em>um</em></span> <span><em class="lp-risco">movimento.</em></span></h1>
-        <p class="lp-sub" id="dica-boas">Uma geração que lê, busca, adora e vive a Palavra.</p>
+        <p class="lp-sub" id="dica-boas">Uma geração que lê, busca, adora e vive a&nbsp;Palavra.</p>
         <div class="botoes lp-botoes">
           <button class="botao" data-ir="cadastro" id="botao-comecar">Começar agora <svg class="lp-seta" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <!-- Só aparecem com link de célula (ver "if (celula)" no script). -->
