@@ -146,9 +146,27 @@
 
   // O link que abre esta mesma página no Chrome do Android (padrão intent:// do Android), com a
   // busca (?convite=...) junto. Sem o Chrome instalado, o Android volta ao endereço de reserva.
-  const linkDoChrome = () => 'intent://' + location.host + location.pathname + location.search
-    + '#Intent;scheme=' + location.protocol.replace(':', '') + ';package=com.android.chrome;S.browser_fallback_url='
-    + encodeURIComponent(location.href.split('#')[0]) + ';end';
+  const linkDoChrome = (passagem) => {
+    const busca = new URLSearchParams(location.search);
+    if (passagem) busca.set('passagem', passagem);
+    const q = busca.toString() ? '?' + busca.toString() : '';
+    return 'intent://' + location.host + location.pathname + q
+      + '#Intent;scheme=' + location.protocol.replace(':', '') + ';package=com.android.chrome;S.browser_fallback_url='
+      + encodeURIComponent(location.href.split('#')[0]) + ';end';
+  };
+  // Com sessão, o Chrome não enxerga os cookies deste navegador embutido: leva junto uma
+  // passagem de uso único (3 min), que o servidor troca pelo crachá ao abrir no Chrome.
+  const pedirPassagem = async () => {
+    try { return (await CC.api('api/passagem', {})).passagem || ''; } catch (e) { return ''; }
+  };
+  const irProChrome = async () => { location.href = linkDoChrome(await pedirPassagem()); };
+  // O botão "Abrir no Chrome" das folhas também leva a passagem (o href fica de reserva).
+  document.addEventListener('click', (ev) => {
+    const a = ev.target.closest && ev.target.closest('[data-abrir-chrome]');
+    if (!a || !(CC.quem && CC.quem.usuario)) return;
+    ev.preventDefault();
+    irProChrome();
+  });
   // No iPhone, o navegador de dentro do Instagram/Facebook abre o Safari por x-safari-https://.
   const linkDoSafari = () => 'x-safari-' + location.protocol.replace(':', '') + '://' + location.host + location.pathname + location.search;
 
@@ -360,7 +378,7 @@
     if (sistemaProvavel() === 'android') {
       let tentou = '1';
       try { tentou = sessionStorage.getItem('cc.tentouChrome') || ''; sessionStorage.setItem('cc.tentouChrome', '1'); } catch (e) { /* segue */ }
-      if (!tentou) location.href = linkDoChrome();
+      if (!tentou) { await irProChrome(); return; }
     }
     // Conta recém-criada não vê folha antes do texto bíblico: o tutorial do fim do primeiro dia
     // já abre em "Abra no Chrome/Safari" (abrirFora), e a faixa da entrada já avisou.

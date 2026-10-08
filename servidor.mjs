@@ -413,6 +413,8 @@ function porMarca(req, res, segundos) {
   const seguro = (req.headers['x-forwarded-proto'] || '') === 'https';
   anexarCookie(res, MARCA + '=1; Path=/; Max-Age=' + Math.max(0, Math.floor(segundos)) + '; SameSite=Lax' + (seguro ? '; Secure' : ''));
 }
+// Passagens de sessão para o Chrome (ver "passagem de sessão" no roteamento): só em memória.
+const PASSAGENS = new Map();
 function porCookie(req, res, usuario) {
   const seguro = (req.headers['x-forwarded-proto'] || '') === 'https';
   anexarCookie(res, COOKIE + '=' + novoCracha(usuario)
@@ -979,6 +981,22 @@ const servidor = createServer(async (req, res) => {
     const mudaAlgo = !['GET', 'HEAD', 'OPTIONS'].includes(req.method);
     if (mudaAlgo && rota.startsWith('/api/') && !origemAceita(req)) { json(res, 403, { erro: 'pedido de outra origem' }); return; }
 
+    // ---------- passagem de sessão para o Chrome ----------
+    // O navegador de dentro do WhatsApp/Instagram não divide cookies com o Chrome. Quem criou a
+    // conta ali e é mandado ao Chrome (para instalar o app) chegava sem sessão e caía de novo na
+    // entrada. O app pede uma passagem (uso único, 3 min) e a leva no endereço: aqui ela vira o
+    // crachá deste navegador e some do endereço.
+    if ((rota === '/' || rota === '/index.html') && url.searchParams.has('passagem') && !mudaAlgo) {
+      const t = String(url.searchParams.get('passagem') || '');
+      const p = PASSAGENS.get(t);
+      PASSAGENS.delete(t);
+      if (p && p.vence > Date.now() && CONTAS.achar(p.usuario)) porCookie(req, res, p.usuario);
+      url.searchParams.delete('passagem');
+      const resto = url.searchParams.toString();
+      res.writeHead(302, { location: './' + (resto ? '?' + resto : ''), 'cache-control': 'no-store' }).end();
+      return;
+    }
+
     // ---------- públicas ----------
     if (rota === '/api/existe-conta') { json(res, 200, { existe: !CONTAS.vazio }); return; }
     if (rota === '/api/versao') { json(res, 200, { versao: await versaoPublicada() }); return; }
@@ -1173,6 +1191,15 @@ const servidor = createServer(async (req, res) => {
 
     const conta = CONTAS.achar(eu);
     const exigir = (condicao, codigo, erro) => { if (!condicao) { json(res, codigo, { erro }); return false; } return true; };
+
+    if (rota === '/api/passagem') {
+      if (!post) { json(res, 405, { erro: 'método não suportado' }); return; }
+      for (const [k, v] of PASSAGENS) if (v.vence <= Date.now()) PASSAGENS.delete(k);
+      const token = randomBytes(24).toString('base64url');
+      PASSAGENS.set(token, { usuario: eu, vence: Date.now() + 3 * 60 * 1000 });
+      json(res, 200, { passagem: token });
+      return;
+    }
 
     if (rota === '/api/quem') {
       const semeador = conta ? await marcoDoSemeador(eu) : null;
