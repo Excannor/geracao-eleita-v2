@@ -229,11 +229,13 @@
   .lp-sub { max-width: 30ch; color: var(--lp-creme); font-size: 1rem; font-weight: 700; letter-spacing: .14em; line-height: 1.55; text-transform: uppercase; text-wrap: balance; }
   .lp-convidado .lp-sub { letter-spacing: .02em; text-transform: none; font-size: 1.0625rem; }
   .lp-hero .lp-botoes { max-width: 380px; }
-  .lp-etiqueta { position: relative; z-index: 1; justify-self: end; display: grid; gap: 6px; width: fit-content; margin: 8px 6px 0 0; transform: rotate(-4deg); }
-  .lp-etiqueta-ref { font: 700 italic .875rem 'Oswald', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--lp-creme); }
+  /* no celular, um adesivo pequeno sobre a foto, como a coroa (antes vinha solto depois dos
+     botões, na rolagem) */
+  .lp-etiqueta { position: absolute; z-index: 2; top: clamp(84px, 24vw, 104px); right: 10px; display: grid; width: fit-content; margin: 0; transform: rotate(-6deg);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, .45)); pointer-events: none; }
   .lp-etiqueta-corpo { display: grid; justify-items: start; }
-  .lp-etiqueta-corpo > span { display: block; margin-top: -2px; padding: 5px 14px 2px; background: var(--lp-salvia); color: var(--lp-tinta);
-    font: 400 clamp(1.25rem, 6.4vw, 1.7rem)/1.15 'Permanent Marker', cursive; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; }
+  .lp-etiqueta-corpo > span { display: block; margin-top: -2px; padding: 4px 9px 2px; background: var(--lp-salvia); color: var(--lp-tinta);
+    font: 400 clamp(.72rem, 3.3vw, .9rem)/1.15 'Permanent Marker', cursive; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; }
   .lp-etiqueta-corpo > span:nth-child(2) { margin-left: 8px; }
   .lp-etiqueta-corpo > span:nth-child(3) { margin-left: 2px; }
   .lp-etiqueta-corpo > span:nth-child(4) { margin-left: 12px; }
@@ -368,7 +370,8 @@
     .lp-titulo + .lp-sub { margin-top: 14px; }
     .lp-coroa { top: 0; left: 26%; width: 34%; }
     .lp-titulo { font-size: clamp(3.8rem, 5.2vw, 4.6rem); }
-    .lp-etiqueta { grid-column: 3; grid-row: 1; justify-self: end; align-self: start; margin: 40px 0 0; transform: rotate(-6deg); }
+    .lp-etiqueta { position: relative; top: auto; right: auto; grid-column: 3; grid-row: 1; justify-self: end; align-self: start; margin: 40px 0 0; transform: rotate(-6deg); filter: none; }
+    .lp-etiqueta-corpo > span { padding: 5px 14px 2px; }
     .lp-etiqueta-corpo > span { font-size: 1.75rem; }
     .lp-hero .lp-botoes { grid-template-columns: auto auto; justify-content: start; max-width: none; }
     .lp-hero .lp-botoes .botao { width: auto; min-width: 180px; }
@@ -468,9 +471,9 @@
         <p class="lp-gratis">De graça, sem anúncios.</p>
       </div>
 
-      <!-- O lema da geração, em etiqueta sálvia. A referência vem antes (a frase não é de
-           1 Pedro: o versículo é a fonte do nome). -->
-      <p class="lp-etiqueta"><span class="lp-etiqueta-ref">1 Pedro 2.9</span><span class="lp-etiqueta-corpo"><span>Somos a</span> <span>geração</span> <span>que busca</span> <span>à sua face</span> <span>e te adora</span></span></p>
+      <!-- O lema da geração, em etiqueta sálvia, sem referência: a frase é o lema do
+           Geração Eleita, não um versículo. No celular ela é um adesivo sobre a foto. -->
+      <p class="lp-etiqueta"><span class="lp-etiqueta-corpo"><span>Somos a</span> <span>geração</span> <span>que busca</span> <span>à sua face</span> <span>e te adora</span></span></p>
 
       <p class="lp-nota lp-nota-esq" aria-hidden="true">Jovens que leem, buscam, adoram e vivem a Palavra.</p>
       <p class="lp-nota lp-nota-dir" aria-hidden="true"><span>Bíblia</span> <span>comunidade</span> <span>propósito</span> <span>disciplina</span> <span>geração</span> <svg viewBox="0 0 24 30" fill="currentColor"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z"/></svg></p>
