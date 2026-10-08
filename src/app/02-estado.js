@@ -208,7 +208,7 @@
   }
   CC.fundir = fundir;
 
-  // O aplicativo antigo guardava as lições em "trilha" e tinha meta e protetor guardados.
+  // Estados gravados num formato antigo guardavam as lições em "trilha" e tinham meta e protetor.
   function normalizar(bruto) {
     if (!bruto || typeof bruto !== 'object' || bruto.vazio) return null;
     const e = { ...VAZIO(), ...bruto };

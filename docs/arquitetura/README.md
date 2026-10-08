@@ -1,7 +1,8 @@
 # Arquitetura do Geração Eleita
 
 Documentação de como o app é montado, como as telas se ligam e por onde os dados passam.
-Atualizada em 24/09/2026.
+As capturas de `telas/` e o quadro `fluxo.html` são de 24/09/2026; o texto foi revisto em
+08/10/2026.
 
 | Arquivo | O que tem |
 |---|---|
@@ -21,7 +22,7 @@ flowchart LR
   subgraph CF["Cloudflare"]
     T["Túnel nomeado<br/>ge.off-sec.net"]
   end
-  subgraph Casa["Computador de casa (Docker)"]
+  subgraph Casa["Raspberry Pi (Docker)"]
     S["servidor.mjs<br/>Node 24, sem dependências"]
     DB[("dados/caminho.db<br/>SQLite")]
     BK[("dados/backup/<br/>*.db.cifrado")]
@@ -55,34 +56,41 @@ A versão publicada (`/api/versao`) é o hash do `index.html`. O app compara a v
 
 | Módulo | Responsabilidade |
 |---|---|
+| `00-qrcode.js` | o QR Code do convite (qrcode-generator, MIT) |
 | `01-nucleo.js` | utilidades (`CC.esc`, datas, ícones, folhas e confirmações) |
 | `01c-arte.js` | ilustrações em SVG: medalha, troféu, baú, chama, confete |
+| `01d-story.js` | a imagem de story com a ofensiva e o versículo, feita no aparelho |
 | `02-estado.js` | progresso: leitura local, **fusão entre aparelhos**, envio ao servidor, tema, foto |
 | `02b-jogo.js` | ofensiva, escudos, desafios, baús, conquistas, troféus e a conferência de novidades (rodam também no servidor) |
-| `03-trilha.js` | a Trilha e o balão do dia |
+| `03-trilha.js` · `03b-fala-do-dia.js` · `03c-contexto.js` | a Trilha, o balão do dia e o "Onde estamos" antes de ler |
 | `04-licao.js` | a lição: leitura, reflexão (guardar, pensar, orar) e celebração |
 | `04b-leitor.js`, `04d-biblia.js` | o leitor da passagem do dia e a Bíblia livre |
 | `04c-reflexao.js` | as reflexões por dia e as perguntas por gênero |
-| `05-licoes.js` | os Primeiros passos |
-| `06-explorar.js` | Explorar: seções, busca, notas, "Comece por aqui" |
-| `07-perfil.js` · `07b-conta.js` · `07c-instalar.js` · `07d-notificacoes.js` · `07e-painel.js` | perfil, configurações e conta, tutorial de instalar, notificações, painel do dono |
-| `08-amigos.js` · `08b-propositos.js` | Juntos: amigos, feed, convites, célula, propósitos |
-| `09-praticar.js` · `09b-missoes.js` | Praticar e Desafios |
+| `04e-versiculos.js` | o que se faz com um versículo (marcar, guardar, anotar), igual nos dois leitores |
+| `05-licoes.js` · `05b-conhecer.js` | os Primeiros passos e o Conhecer Jesus (14 dias e perguntas honestas) |
+| `06-explorar.js` · `06b-mapas.js` | Explorar: seções, busca, notas, "Comece por aqui" e o mapa de cada livro |
+| `07-perfil.js` · `07b-conta.js` · `07c-instalar.js` · `07d-notificacoes.js` · `07e-painel.js` · `07f-avisos.js` | perfil, configurações e conta, tutorial de instalar, notificações, painel do administrador, caixa do sino |
+| `08-amigos.js` · `08b-propositos.js` · `08c-discipulado.js` | Juntos: amigos, feed, convites, célula, propósitos; discipulado |
+| `09-praticar.js` · `09b-missoes.js` · `09c-desafios.js` | Praticar, a tela de Desafios e os desafios de vários dias |
+| `09d-apoiar.js` | Apoiar o app (doação opcional pelo Pix) |
 | `10-roteador.js` | rotas por `#`, barra de abas, topo, avisos do dia |
 
 ### Rotas
 
 | Rota | Tela | Aba |
 |---|---|---|
-| `#/` · `#/dia/N` · `#/passos` | Trilha · lição do dia N · Primeiros passos | Trilha |
-| `#/missoes` · `#/praticar` | Desafios · Praticar | Desafios |
+| `#/` · `#/dia/N` · `#/passos` · `#/avisos` | Trilha · lição do dia N · Primeiros passos · caixa do sino | Trilha |
+| `#/conhecer[/N]` · `#/seguir` | Conhecer Jesus (o outro caminho, no lugar do plano anual) | Trilha |
+| `#/missoes` · `#/praticar` | Desafios · Praticar | Desafios, ou Mais quando a barra tem Célula ou Discipulado |
 | `#/biblia` · `#/biblia/Livro/N` | livros · leitor | Bíblia (centro) |
-| `#/explorar` · `#/secao/…` · `#/nota/…` · `#/busca/…` | Explorar | Explorar |
-| `#/novidades` · `#/novidades/celula/<id>[/estudo\|/pessoas]` · `#/novidades/propositos` · `#/amigos/bloqueados` | Juntos · célula (Hoje, Estudo, Pessoas) · Propósitos · bloqueados | Juntos |
-| `#/perfil` · `#/perfil/{conquistas,trofeus,livros,versiculos,escritos}` | Perfil e subtelas | retrato do topo |
-| `#/config` · `#/config/{notificacoes,textos,painel}` | Configurações | retrato do topo |
+| `#/novidades` · `#/novidades/propositos` · `#/amigos/bloqueados` | Juntos · Propósitos · bloqueados | Juntos |
+| `#/celula` · `#/novidades/celula/<id>[/estudo\|/pessoas]` | escolher a célula · célula (Hoje, Estudo, Pessoas) | Célula |
+| `#/discipulado` · `#/perfil/discipulado` | Discipulado | Discipulado |
+| `#/explorar` · `#/secao/…` · `#/nota/…` · `#/busca/…` · `#/mapa/<livro>` · `#/perguntas[/…]` · `#/apoiar` | Explorar, mapa do livro, perguntas honestas, Apoiar o app | Mais |
+| `#/perfil` · `#/perfil/{conquistas,trofeus,livros,versiculos,escritos,historia}` | Perfil e subtelas | retrato do topo (versículos e história também pelo Mais) |
+| `#/config` · `#/config/{notificacoes,textos}` · `#/config/painel` | Configurações · Painel do administrador | retrato do topo · Mais |
 
-A ofensiva, os convites e as confirmações abrem como **folhas** (painéis que sobem de baixo), sem mudar a rota. `#/propositos`, rota antiga de notificações já entregues, redireciona para `#/novidades/propositos`.
+A barra muda conforme a pessoa tem célula, discipulado, os dois ou nenhum (`abasDoCelular` em `10-roteador.js`). A ofensiva, os convites e as confirmações abrem como **folhas** (painéis que sobem de baixo), sem mudar a rota. `#/propositos`, que ainda aparece em notificações já entregues, redireciona para `#/novidades/propositos`.
 
 ## O servidor
 
@@ -95,7 +103,9 @@ A ofensiva, os convites e as confirmações abrem como **folhas** (painéis que 
 | `novidades.mjs` | o feed: marcos publicados e reações |
 | `notificacoes.mjs` | Web Push (VAPID e criptografia sem biblioteca), regras de quando avisar, mensagens |
 | `semeador.mjs` | a Trilha do Semeador (quem trouxe quem) |
-| `painel.mjs` | números do app para o dono, sem nomes |
+| `painel.mjs` | números do app para o administrador, sem nomes |
+| `inteligencia.mjs` · `relatorio.mjs` | os painéis da igreja e do líder de célula, e o relatório exportado |
+| `discipulado.mjs` · `cuidado.mjs` · `desafios-grupo.mjs` | discipulado 1 a 1, pedidos de oração e cuidado, desafios em grupo |
 | `email.mjs` | e-mail de senha esquecida (desligado sem SMTP) |
 | `db.mjs` | SQLite: esquema com versão, gravação só do que mudou, importação dos JSON antigos, backups cifrados |
 
@@ -150,21 +160,17 @@ Inscrição recusada pelo serviço (410, ou chave de outro servidor) sai da list
 - **Cabeçalhos:** CSP com o hash dos scripts do app, nosniff, bloqueio de iframe, Referrer-Policy, Permissions-Policy, COOP e HSTS. Pedidos de outra origem são recusados.
 - **Dados de terceiros:** a foto e o nome que vão para os amigos são limpos no servidor, e todo texto é escapado ao entrar na tela.
 - **Backups:** um por dia, AES-256-GCM, 14 guardados, chave no `.env`. Quem apaga a conta sai também dos backups.
-- **Docker:** usuário `node` (não root), porta `8082` só em `127.0.0.1`, acesso de fora só pelo túnel.
+- **Docker:** usuário `node` (não root), porta `8083` (`PORTA_V2`) só em `127.0.0.1`, acesso de fora só pelo túnel.
 
 ### iPhone com o app instalado
 
 No iOS 26 o WebKit descola da borda o que é `position: fixed` durante a rolagem (bug 297779), e a barra de abas subia para o meio da tela. No app instalado (`navigator.standalone`), o primeiro script marca `html.app-ios`: a página não rola, quem rola é a `.aplicativo`, e a barra é um bloco comum no fim da coluna. `CC.rolarPara` e `CC.rolagemY` sabem quem rola. `ferramentas/teste-app-ios.mjs` simula o modo com `?app-ios`.
 
-## Ambientes
+## Onde roda
 
-| Ambiente | Pasta | Porta | Endereço |
-|---|---|---|---|
-| PRD | `Caminho com Cristo - App` | 8080 | ccc.off-sec.net (parado desde 23/09) |
-| HML | `Caminho com Cristo - App HML` | 8081 | (parado desde 23/09) |
-| DEV (em uso) | `Geracao Eleita - App` | 8082 | ge.off-sec.net |
+O app no ar mora num Raspberry Pi, com Docker, atrás do túnel nomeado da Cloudflare em `ge.off-sec.net`. No host, o container escuta só em `127.0.0.1:8083`; dentro dele, o servidor usa a 8080.
 
-Deploy: `docker compose up -d --build && docker compose restart tunel-fixo`. O túnel fixo usa a rede do container do app e fica órfão se ele for recriado, por isso o segundo comando.
+Para publicar: `.\publicar.ps1`, que leva o último commit para o Pi, refaz o container `caminho` e recria o `tunel-fixo`. O túnel fixo usa a rede do container do app e fica órfão quando ele é recriado, por isso ele é recriado junto. Noutra máquina, o mesmo par de comandos: `docker compose up -d --build caminho && docker compose up -d --force-recreate tunel-fixo`.
 
 ## Testes
 

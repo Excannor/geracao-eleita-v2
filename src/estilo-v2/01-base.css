@@ -485,7 +485,7 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
     pointer-events: none;
   }
   /* A barra de ponta a ponta, presa embaixo, com os cantos de cima arredondados (pedido
-     do dono, 30/09, a partir da barra do app original). Desenhada no ::before para as
+     do dono, 30/09). Desenhada no ::before para as
      duas ilhas e a Bíblia ficarem numa peça só. */
   .navegacao {
     padding: 10px 6px calc(10px + env(safe-area-inset-bottom));

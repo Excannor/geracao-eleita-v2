@@ -375,7 +375,7 @@ Cada fase termina com: bateria de testes verde, capturas conferidas, commit, bac
 6. **Bateria completa verde:** `teste.mjs`, `teste-propositos-regras.mjs`, `teste-celula.mjs`, `teste-convites.mjs`, `contraste.mjs`, `inspecionar.mjs` a 320 e 390 px, `teste-redesenho.mjs`, `teste-escuro-forcado.mjs` e o percurso novo da fase. O `responsivo.mjs` só pode mostrar a falha antiga "a lição não abriu".
 7. **Capturas conferidas por mim,** não só pelo agente (relatório de agente se confere contra o código).
 8. **Publicação:** backup de `~/geracao-eleita/dados` no Pi, depois `publicar.ps1` (que já recria o túnel), depois HTTP 200 e confirmação da versão dentro do container. Nunca religar o túnel do PC.
-9. **Nada no Caminho com Cristo (PRD/HML antigos)** nem no túnel do PC.
+9. **Nada nos ambientes antigos (PRD/HML desligados)** nem no túnel do PC.
 10. **Relatório ao dono no fim de cada fase:** o que entrou, capturas, decisões tomadas sozinho e o que ficou pendente.
 
 ### 8.3 Pendências que não travam as fases, mas precisam de resposta

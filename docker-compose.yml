@@ -1,21 +1,21 @@
-# Geração Eleita V2: o app redesenhado, servido à parte do app original.
+# Geração Eleita: o app e os túneis da Cloudflare.
 #
-# Tudo aqui tem nome próprio, com "-v2": o projeto do compose, os containers e a porta.
-# Assim ele pode rodar na mesma máquina que o app original sem que um "docker compose up"
-# daqui recrie ou derrube os containers de lá. ATENÇÃO ao sincronizar com o original: este
-# arquivo NÃO pode voltar a ser o de lá (name: geracao-eleita, porta 8082).
+# Tudo aqui tem nome próprio, com "-v2": o projeto do compose, os containers e a porta. Assim
+# ele pode rodar na mesma máquina que outro projeto chamado geracao-eleita (porta 8082) sem
+# que um "docker compose up" daqui recrie ou derrube os containers de lá. Não troque esses
+# nomes nem a porta.
 #
 #   Porta no host: 8083, só nesta máquina (troque com PORTA_V2 no .env se já estiver em uso)
-#   Dados:         ./dados desta pasta (banco, backups e chaves próprias do V2)
-#   Endereço:      https://ge.off-sec.net, pelo túnel nomeado do V2
+#   Dados:         ./dados desta pasta (banco, backups e chaves)
+#   Endereço:      https://ge.off-sec.net, pelo túnel nomeado
 #
 # O .env desta pasta (que o git ignora) guarda:
-#   CLOUDFLARE_TUNNEL_TOKEN=...   token do túnel nomeado do V2 (nunca o do app original)
-#   CAMINHO_ENDERECO=https://...  o endereço público do V2 (entra na assinatura do push)
+#   CLOUDFLARE_TUNNEL_TOKEN=...   token do túnel nomeado de ge.off-sec.net
+#   CAMINHO_ENDERECO=https://...  o endereço público do app (entra na assinatura do push)
 #   PORTA_V2=8083                 opcional
 #   CAMINHO_ADMIN=...             opcional: quem vê o Painel (padrão maarcos_e; vários com vírgula)
-#   CAMINHO_SMTP_*, CAMINHO_BACKUP_CHAVE, CAMINHO_BACKUP_MANTER, CAMINHO_PASTA_BACKUP: opcionais,
-#   como no app original (ver o topo de email.mjs para o e-mail).
+#   CAMINHO_SMTP_*, CAMINHO_BACKUP_CHAVE, CAMINHO_BACKUP_MANTER, CAMINHO_PASTA_BACKUP: opcionais
+#   (ver o topo de email.mjs para o e-mail).
 name: geracao-eleita-v2
 
 services:
@@ -30,7 +30,7 @@ services:
     volumes:
       - "./dados:/app/dados"
       # Backups cifrados: outra pasta/disco só se CAMINHO_PASTA_BACKUP estiver no .env DESTA
-      # pasta. Sem ela, ficam em dados/backup do V2 (nunca na pasta do original).
+      # pasta. Sem ela, ficam em dados/backup desta pasta.
       - "${CAMINHO_PASTA_BACKUP:-./dados/backup}:/app/dados/backup"
     environment:
       CAMINHO_AMBIENTE: "v2"
@@ -62,8 +62,9 @@ services:
   # http://localhost:8080 (a porta de dentro do container), e não para a do host.
   #
   # ATENÇÃO ao publicar: recriar o container "caminho" destrói a pilha de rede que este
-  # usa, e o túnel fica no ar sem servir nada. Depois de todo deploy, reinicie os dois:
-  #   docker compose up -d --build && docker compose restart tunel-fixo
+  # usa, e o túnel fica no ar sem servir nada. Depois de todo deploy, recrie o túnel também
+  # (o publicar.ps1 já faz isso):
+  #   docker compose up -d --build caminho && docker compose up -d --force-recreate tunel-fixo
   tunel-fixo:
     image: cloudflare/cloudflared:latest
     container_name: geracao-eleita-v2-tunel-fixo

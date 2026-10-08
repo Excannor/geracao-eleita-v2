@@ -2,8 +2,7 @@
 
 Aplicativo de leitura bíblica para jovens, muitos deles recém-convertidos: o plano de 365
 dias virou uma **trilha** de nós, com **ofensiva** de dias seguidos e uma chama que cresce, a
-mecânica do Duolingo aplicada à leitura da Bíblia. Nasceu como "Caminho com Cristo" e, em
-setembro de 2026, ganhou nome e identidade novos: Geração Eleita, de 1 Pedro 2.9 ("vocês são
+mecânica do Duolingo aplicada à leitura da Bíblia. O nome vem de 1 Pedro 2.9 ("vocês são
 geração eleita"). O material de consulta (546 notas: livros, pessoas, eventos, lugares,
 versículos, temas e conexões) continua ali, como apoio de uma tela, não como centro. O texto
 bíblico está dentro, em duas traduções de licença livre, e a Bíblia inteira pode ser lida à
@@ -22,15 +21,13 @@ na tela de boas-vindas, no manifesto, na descrição da página e no texto do co
 Não depende do Obsidian. O conteúdo está congelado em `conteudo/conteudo.json`, dentro do
 projeto.
 
-## Ambientes
+## Onde o app roda
 
-Esta pasta é o **Geração Eleita**: porta 8082, túnel fixo `https://ge.off-sec.net`.
-
-O **Caminho com Cristo** é o aplicativo de antes, em outras pastas: PRD em
-`Caminho com Cristo - App` (porta 8080, `https://ccc.off-sec.net`) e HML em
-`Caminho com Cristo - App HML` (porta 8081, cópia de homologação). Os dois foram desligados
-em 23/09/2026 a pedido do dono, com `docker compose stop`: os containers ficaram guardados e
-voltam com `docker compose start` na pasta de cada um. Não mexer nessas pastas sem pedido.
+O app no ar mora num Raspberry Pi, com Docker, e sai para a internet pelo túnel nomeado da
+Cloudflare em `https://ge.off-sec.net`. Para publicar o último commit, rode `.\publicar.ps1`
+(PowerShell, nesta pasta): ele leva só o que está commitado, refaz o container e o túnel e
+confere se o site respondeu. Veja **Rodar com Docker** para subir o mesmo conjunto noutra
+máquina.
 
 ## Começar
 
@@ -61,18 +58,23 @@ Para usar outra porta: `node servidor.mjs 3000`.
 
 ## Navegação
 
-A barra de baixo tem quatro abas, com um botão quadrado da Bíblia no meio:
+A barra de baixo tem a **Bíblia** (`#/biblia`) no meio, num quadrado arredondado, e muda
+conforme a pessoa participa de uma célula ou de um discipulado:
 
-- **Trilha** (`#/`)
-- **Desafios** (`#/missoes`, antes "Missões")
-- **Bíblia** (`#/biblia`), o botão central
-- **Juntos** (`#/novidades`)
-- **Explorar** (`#/explorar`)
+| Quem | Esquerda | Direita |
+|---|---|---|
+| sem célula nem discipulado | Trilha · Desafios | Juntos · Mais |
+| com célula | Trilha · Célula | Juntos · Mais |
+| com discipulado | Trilha · Discipulado | Juntos · Mais |
+| com os dois | Trilha · Juntos · Célula | Discipulado · Mais |
 
-O Perfil saiu da barra: virou a foto redonda no canto do topo, ao lado do fogo da
-ofensiva. No computador, em telas a partir de 860px, a barra vira um trilho lateral, com a
-marca "Geração Eleita" no alto. Tudo isto mora em `src/app/10-roteador.js` (`ABAS`,
-`pintarNavegacao`, `pintarTopo`).
+O **Mais** abre um painel com Desafios (quando não está na barra), Explorar, Meus versículos,
+Minha história com Deus, Apoiar o app, Configurações e, só para o administrador, o Painel. O
+Perfil fica na foto redonda no canto do topo, ao lado do fogo da ofensiva. No computador, em
+telas a partir de 860px, a barra vira um trilho lateral, com a marca "Geração Eleita" no alto.
+Tudo isto mora em `src/app/10-roteador.js` (`abasDoCelular`, `abrirPainelMais`,
+`pintarNavegacao`, `pintarTopo`). A rota de Desafios é `#/missoes`, e o arquivo,
+`09b-missoes.js`: os nomes ficaram assim para não quebrar links guardados.
 
 ## As telas
 
@@ -162,8 +164,8 @@ por e-mail, basta configurar um SMTP (uma conta Gmail com senha de app serve): v
 
 ## Painel do app
 
-Em **Configurações → Painel do app**, visível só para quem está em `CAMINHO_ADMIN`
-(`docker-compose.yml`). Só contagens, sem nome de ninguém: contas novas, quem leu hoje, na
+No painel **Mais → Painel do administrador** (`#/config/painel`), visível só para quem está
+em `CAMINHO_ADMIN` (`docker-compose.yml`). Só contagens, sem nome de ninguém: contas novas, quem leu hoje, na
 semana e no mês, quantos voltaram 1, 7 e 30 dias depois de criar a conta, os primeiros dias de
 quem chega (o que a conta nova fez no dia do cadastro e em cada um dos seis dias seguintes:
 abriu a lição, terminou uma leitura, marcou lido, abriu o app, leu), onde as pessoas param
@@ -203,13 +205,11 @@ ofensiva. Um dia esquecido não derruba tudo: uma vez por mês o aplicativo cobr
 esqueceu, não para quem parou: ele só cobre o dia de ontem, e só se havia uma sequência viva
 antes dele.
 
-## Personagens, mascote e cartas
+## Sem mascote
 
-Os personagens bíblicos, o mascote Bento, as cartas de personagem, o quadro do mês e o desenho
-da lamparina saíram da tela no rebrand e, em setembro de 2026, também do código (continuam no
-histórico do git, se um redesenho futuro quiser partir deles). Da fala do Bento ficou só o
-texto do balão do dia na trilha, em `src/app/03b-fala-do-dia.js`. O baú hoje revela um
-versículo.
+O app não tem mascote, cartas de personagem nem lamparina (o dono pediu que a lamparina não
+aparecesse em lugar nenhum). O balão do dia na trilha vem de `src/app/03b-fala-do-dia.js`, e o
+baú revela um versículo.
 
 ## O texto bíblico
 
@@ -235,7 +235,7 @@ Cada tradução é um arquivo à parte em `dist/` (uns 4 MB cada), não dentro d
 para o aparelho não baixar tudo de novo a cada atualização. O service worker guarda as
 bíblias num cache próprio, baixado em segundo plano depois de abrir o app, para que a
 leitura funcione sem rede depois. As duas licenças pedem crédito à vista, no fim de cada
-leitura e em **Perfil › Textos bíblicos**; o importador não toca em nenhuma palavra do texto.
+leitura e em **Configurações › Tradução e créditos** (`#/config/textos`); o importador não toca em nenhuma palavra do texto.
 
 Para atualizar o texto, baixe os arquivos "um versículo por linha" do eBible.org, junte os
 dois `.txt` numa pasta e rode:
@@ -301,19 +301,19 @@ que o aparelho grava no progresso muda esse número.
 Tocar no cartão abre os cinco níveis, cada um com o seu texto. Subir de nível celebra em tela
 cheia uma vez por aparelho e vira marco no Feed, uma vez por nível.
 
-Em **Perfil › Amigos** dá para procurar alguém e passar a acompanhar, de mão única, sem
-convite nem resposta. O que um amigo vê de você são só os números: dias seguidos, quanto do
+Na folha **Convidar**, em Juntos, além do link dá para mandar um pedido de amizade pelo @
+exato de quem já tem conta; a pessoa aceita ou recusa. O que um amigo vê de você são só os números: dias seguidos, quanto do
 plano você andou, se leu hoje, sua foto e seu nome. **Registros, orações e anotações nunca
 saem da sua conta** (`resumoPublico` em `contas.mjs`).
 
 ### Cuidar da própria conta
 
-Em **Perfil › Sua conta**:
+Em **Configurações › Conta**:
 
 - **Trocar a senha** pede a senha atual mesmo com a sessão aberta. Ao trocar, **todos os
   outros aparelhos caem** e precisam entrar de novo; só o aparelho que fez a troca segue
   aberto.
-- **Apagar minha conta** pergunta duas vezes, pede a senha, e leva junto o progresso, os
+- **Apagar a conta** pergunta duas vezes, pede a senha, e leva junto o progresso, os
   registros, as orações e as cópias diárias do servidor. Não há desfazer.
 
 ## Onde o seu progresso mora
@@ -321,8 +321,8 @@ Em **Perfil › Sua conta**:
 Em dois lugares: no `localStorage` de cada aparelho e, quando `servidor.mjs` está rodando, na
 tabela `estados` do banco. Os dois são **fundidos**, nunca substituídos: uma marcação feita
 no celular e outra no computador sobrevivem às duas. A única operação que apaga é **Zerar
-progresso**, e ela apaga em todos os aparelhos. Em **Perfil › Baixar tudo o que escrevi**,
-sai um arquivo Markdown com os registros e as anotações.
+progresso**, e ela apaga em todos os aparelhos. Em **Configurações › Baixar o que escrevi**
+(ou no fim dos seus escritos, no Perfil), sai um arquivo Markdown com os registros e as anotações.
 
 ## Banco de dados
 
@@ -379,39 +379,38 @@ node ferramentas/teste-notificacoes.mjs          um serviço de push falso, de p
 
 ## Identidade visual
 
-**Redesenho em andamento (branch `redesenho-novo`)**: verde-sálvia suave, o mesmo desenho nos dois
-temas, escuro de leitura em grafite, **Manrope** na interface e **Literata** no texto bíblico. O guia
-é `design/guia-visual.md`; as fichas e peças de base ficam em `src/estilo-v2/` (entram depois do
-`estilo.css`, que ficou congelado), e `design/mapa-telas.md` divide as telas por grupo e explica
-como testar. O texto abaixo descreve a identidade anterior, que o redesenho substitui.
+Verde-sálvia suave, o mesmo desenho nos dois temas, e um escuro de leitura em grafite (não
+preto), com texto quase branco. **Manrope** na interface inteira e **Literata** no texto
+bíblico. O carimbo em pincel da entrada e da folha da ofensiva usa **Permanent Marker**, com a
+referência em **Oswald**. A chama da ofensiva é fogo de verdade, não um ícone genérico, e a cor
+da chama só aparece ali. Cor diz estado, nunca categoria: todo estado tem também ícone ou forma
+própria.
 
-Cinza neutro, preto e branco, sem tempero: a logo é preto e branco, e qualquer matiz no papel
-brigaria com ela. Um acento só, petróleo (`#0f5c5c` no tema claro, `#5fbdb9` no escuro), que
-quer dizer **agora**: o dia de hoje, a barra que está correndo, o link que leva adiante. A
-chama da ofensiva é fogo de verdade, não um ícone genérico. Cor diz estado, nunca categoria:
-as seis cores que antes marcavam cada unidade hoje apontam quase todas para o acento ou para
-a escala de cinza (`src/estilo.css`, `:root`). Tipografia: **Oswald** nos títulos e na
-navegação, **Nunito** no texto corrido, **Permanent Marker** só no carimbo do lema da
-ofensiva. Todos os pares de cor passam na régua da WCAG nos dois temas, medidos por
-`ferramentas/contraste.mjs`.
+O guia é `design/guia-visual.md`, e `design/mapa-telas.md` diz qual arquivo cuida de cada tela
+e como testar. As fichas de cor e as camadas de cada tela ficam em `src/estilo-v2/`, que entra
+por cima de `src/estilo.css` (a base, que não recebe regra nova). O contraste das fichas nos
+dois temas é medido por `node design/ferramentas/contraste-v2.mjs`.
 
 Em telas a partir de 860px a barra inferior vira um trilho lateral. Todas as animações
-respeitam `prefers-reduced-motion`. Isto é um aplicativo pessoal: não usa o nome, o logotipo
-nem qualquer marca de denominação alguma.
+respeitam `prefers-reduced-motion`. O app não usa o nome, o logotipo nem a marca de nenhuma
+denominação.
 
 ## Rodar com Docker
 
 ```
-docker compose up -d --build && docker compose restart tunel-fixo
+docker compose up -d --build caminho && docker compose up -d --force-recreate tunel-fixo
 ```
 
 O segundo comando é obrigatório. O túnel fixo (`tunel-fixo`) usa
 `network_mode: "service:caminho"`: ele empresta a pilha de rede do container principal em vez
 de ter a sua própria. Recriar o container `caminho` (o que `up --build` faz) destrói essa
-pilha, e o túnel fica órfão, no ar mas sem servir nada, até ser reiniciado.
+pilha, e o túnel fica órfão, no ar mas sem servir nada, até ser recriado também. Um simples
+`restart` do túnel nem sempre basta, porque ele continua preso ao container antigo; o
+`publicar.ps1` já faz assim. O token do túnel vem do `.env` (`CLOUDFLARE_TUNNEL_TOKEN`).
 
-Abra `http://localhost:8082`. O `docker-compose.yml` monta só a pasta `dados/`, onde ficam o
-banco, os backups e as chaves; o conteúdo vai dentro da imagem, construído junto com ela.
+Abra `http://localhost:8083` (a porta muda com `PORTA_V2` no `.env`). O `docker-compose.yml`
+monta só a pasta `dados/`, onde ficam o banco, os backups e as chaves; o conteúdo vai dentro
+da imagem, construído junto com ela.
 
 ## Atualizar o conteúdo
 
@@ -444,7 +443,7 @@ node ferramentas/contraste.mjs        mede o contraste das cores nos dois temas
 node ferramentas/teste-pratica.mjs    joga uma rodada inteira do quiz
 node ferramentas/teste-unidades.mjs   confere que as 12 unidades abrem e guardam resultado
 node ferramentas/teste-leitor.mjs     abre o texto, troca tradução e letra, marca pelo leitor, lê sem rede
-node ferramentas/teste-redesenho.mjs  o redesenho de ponta a ponta: contas, Feed, Desafios e Perfil
+node ferramentas/teste-redesenho.mjs  contas, Feed, Desafios e Perfil de ponta a ponta
 node ferramentas/teste-conta-gerir.mjs   trocar a senha, apagar a conta e derrubar os outros aparelhos
 node ferramentas/teste-troca-pessoa.mjs  aparelho compartilhado: uma conta não herda o que era da outra
 node ferramentas/teste-notificacoes.mjs        Web Push de ponta a ponta, do registro ao envio
@@ -469,11 +468,11 @@ salva capturas em `capturas/`. `contraste.mjs` mede os pares de cor contra a ré
 Ao rodar no Docker, confira o que o container serve contra o que você acabou de gerar:
 
 ```
-curl -s http://localhost:8082/api/versao
+curl -s http://localhost:8083/api/versao
 ```
 
 Se a versão não bater com o que `node build.mjs` acabou de gerar, o build dentro da imagem
-falhou e o container está servindo a versão anterior.
+falhou e o container continua servindo o build de antes.
 
 ## Arquivos
 
@@ -484,7 +483,8 @@ falhou e o container está servindo a versão anterior.
 | `build.mjs` | junta conteúdo, estilo e código em `dist/`; gera ícones, manifesto, service worker e os arquivos das bíblias |
 | `servidor.mjs` | serve `dist/`, as rotas da API, os backups e a rodada das notificações |
 | `db.mjs` | o banco: esquema com versão, gravação só do que mudou, importação, backups |
-| `src/estilo.css` | a linguagem visual: cores, botões com aresta, nós da trilha |
+| `src/estilo.css` | a base do estilo: peças, telas e nós da trilha |
+| `src/estilo-v2/` | as fichas de cor e de letra (`00-tokens.css`) e o desenho de cada tela, por cima da base |
 | `src/app/02-estado.js` | progresso, fusão entre aparelhos, ofensiva, XP, conquistas |
 | `src/app/01c-arte.js` | os estágios do fogo da ofensiva, os troféus, o baú e as medalhas, em SVG |
 | `src/app/02b-jogo.js` | as conquistas com nível, os desafios do dia e os baús |

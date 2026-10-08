@@ -1,7 +1,7 @@
 # Brief: nova direção visual para o app Geração Eleita
 
 ## O app
-- PWA de leitura bíblica em português do Brasil, nome público **Geração Eleita** (1 Pedro 2.9). O código original fica em Excannor/geracao-eleita e não é alterado; este repositório (V2) recebe o redesenho.
+- PWA de leitura bíblica em português do Brasil, nome público **Geração Eleita** (1 Pedro 2.9).
 - Plano de 365 dias virou uma **trilha** de nós (mecânica do Duolingo aplicada à leitura), agrupada em **12 unidades** (uma por mês).
 - **Ofensiva**: dias seguidos de leitura, mostrada no topo com um pequeno ícone de fogo e o número.
 - **Desafios**: 3 desafios diários (ex.: "Conclua a lição do dia", "Leia 4 capítulos", "Faça uma rodada no Praticar"), um baú de recompensa, o quiz **Praticar** (memorizar versículos), e um desafio em dupla ("Leiam juntos 4 dias com Ana").

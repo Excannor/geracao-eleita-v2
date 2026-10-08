@@ -103,7 +103,7 @@ const erros = () => eventos
   .map((e) => e.params.exceptionDetails?.exception?.description || e.params.entry?.text)
   .filter((texto) => !AVISO_VIBRAR_SEM_TOQUE.test(texto || ''));
 
-console.log('\n  Caminho com Cristo, inspeção a ' + LARGURA + 'px\n');
+console.log('\n  Geração Eleita, inspeção a ' + LARGURA + 'px\n');
 
 checar(erros().length === 0, 'nenhum erro de JavaScript ao carregar' + (erros()[0] ? ': ' + erros()[0] : ''));
 checar(await avaliar('!!document.querySelector(".no")'), 'a trilha desenhou os nós dos dias');
