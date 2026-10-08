@@ -267,11 +267,13 @@ await passo(() => cmd('Page.reload'), { esperaMs: 2500 });
 await noApp();
 caso('sessão válida sem a marca', 'volta ao app (a entrada põe a marca e devolve)', 'hash=' + (await av('location.hash')) + ', cookies=' + (await cookies()).join(','),
   (await cookies()).includes('cc_logado') && (await av('location.hash')) === '#/explorar');
-// aberta de propósito (o teste do portal, um link antigo), a entrada fica, mesmo com sessão
+// No Android/PWA, o navegador pode restaurar entrar.html como a última URL depois do cadastro.
+// Com sessão válida, essa URL precisa voltar ao app em vez de reapresentar o login.
 await passo(() => ir(BASE + 'entrar.html'), { esperaMs: 1500 });
-caso('logado abre entrar.html de propósito', 'a página de entrada fica (só volta ao app quem veio do app sem marca)',
-  'url=' + (await av('location.pathname')) + ', entrada=' + (await av('!!document.getElementById("tela-boas")')),
-  (await av('location.pathname')) === '/entrar.html' && !!(await av('!!document.getElementById("tela-boas")')));
+await noApp();
+caso('Android restaura entrar.html com sessão válida', 'o app abre, sem reapresentar o login',
+  'url=' + (await av('location.pathname')) + ', app=' + (await av('!!document.querySelector("#conteudo > *")')),
+  (await av('location.pathname')) === '/' && !!(await av('document.querySelector("#conteudo > *")')));
 await s.fechar();
 
 // ---------- 9. a barra do alto da entrada, rolando no celular ----------
@@ -312,8 +314,15 @@ for (const [larg, alt] of [[390, 844], [360, 800]]) {
 
 console.log('\n  Casos (esperado → obtido)\n');
 for (const c of casos) console.log('  ' + (c.passou ? 'ok   ' : 'FALHA') + ' ' + c.nome + ' | ' + c.esperado + ' | ' + c.obtido);
-servidor.kill();
-rmSync(pastaEstado, { recursive: true, force: true });
-rmSync(perfil, { recursive: true, force: true });
+// No Windows, kill() apenas solicita o encerramento. Esperar o processo realmente sair evita
+// um falso erro EPERM ao remover o banco temporário que o servidor ainda mantinha aberto.
+await new Promise((resolve) => {
+  if (servidor.exitCode !== null) return resolve();
+  const limite = setTimeout(resolve, 2000);
+  servidor.once('exit', () => { clearTimeout(limite); resolve(); });
+  servidor.kill();
+});
+rmSync(pastaEstado, { recursive: true, force: true, maxRetries: 5, retryDelay: 120 });
+rmSync(perfil, { recursive: true, force: true, maxRetries: 5, retryDelay: 120 });
 console.log(falhas ? '\n  ' + falhas + ' falha(s)\n' : '\n  tudo certo\n');
 process.exit(falhas ? 1 : 0);

@@ -465,13 +465,12 @@
     });
     $('faixa-fora').hidden = false;
   })();
-  // O app guardado no aparelho manda para cá quem está sem a marca de sessão (cc_logado) e
-  // deixa a nota cc.semMarca. Se a sessão ainda vale (quem entrou antes de a marca existir), o
-  // servidor já devolveu a marca na resposta desta página: volta direto ao app, no mesmo
-  // endereço e hash. Aberta de propósito (link de senha nova, convite, o teste do portal),
-  // a página fica, mesmo com sessão.
-  var veioDoApp = false;
-  try { veioDoApp = sessionStorage.getItem('cc.semMarca') === '1'; sessionStorage.removeItem('cc.semMarca'); } catch (e) { /* segue */ }
+  // Uma sessão válida nunca deve parar na tela de entrada. No Android, o Chrome/PWA pode
+  // restaurar entrar.html como a última URL depois do cadastro; antes, só voltava ao app se
+  // houvesse a nota cc.semMarca, então uma pessoa já autenticada reaparecia no login.
+  // O servidor repõe cc_logado ao servir esta página quando o crachá HttpOnly ainda vale.
+  // A única exceção é o link explícito de senha nova, que precisa continuar nesta página.
+  try { sessionStorage.removeItem('cc.semMarca'); } catch (e) { /* segue */ }
   // Abrir o app é sempre carregar uma página nova. Sem sessão, o servidor entrega esta página no
   // próprio endereço do app (/, /#/, /#/mapa/genesis do link compartilhado, /?convite=...): ali,
   // './' + hash é o mesmo endereço com âncora, e location.replace só rola até a âncora, sem
@@ -482,7 +481,7 @@
     if (alvo.split('#')[0] === location.href.split('#')[0]) location.reload();
     else location.replace(alvo);
   }
-  if (veioDoApp && /(?:^|;\s*)cc_logado=1/.test(document.cookie) && !params.get('redefinir')) {
+  if (/(?:^|;\s*)cc_logado=1/.test(document.cookie) && !params.get('redefinir')) {
     document.documentElement.style.visibility = 'hidden';
     abrirApp();
     return;

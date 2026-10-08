@@ -273,6 +273,22 @@ await esperar('!' + existe('.licao'));
 ok(await esperar(existe('.cortina'), 4000), 'depois da primeira leitura, a conta nova vê o tutorial de instalar');
 await av('document.querySelectorAll(".cortina").forEach((c) => c.remove()), true');
 
+// Com o dia 1 lido, o dia 2 tem o cartão lateral. Abrir a revisão do dia 1 não pode pôr o
+// balão por cima desse cartão, e o troféu precisa continuar no mesmo centro usado pela estrada.
+await clicar('.no[data-dia="1"]');
+ok(await esperar(existe('.no-linha:has(.no[data-dia="1"]) .pop-no')), 'o dia lido abre o balão de revisão');
+ok(await av(`(() => {
+  const pop = document.querySelector('.no-linha:has(.no[data-dia="1"]) .pop-no').getBoundingClientRect();
+  const hoje = document.querySelector('.no-linha.hoje').getBoundingClientRect();
+  return pop.bottom + 8 <= hoje.top;
+})()`), 'o balão de revisão reserva espaço e não cobre o cartão do dia atual');
+ok(await av(`(() => {
+  const linha = document.querySelector('.nos .linha-marco').getBoundingClientRect();
+  const trofeu = document.querySelector('.nos .linha-marco .no-marco').getBoundingClientRect();
+  return Math.abs((linha.left + linha.width / 2) - (trofeu.left + trofeu.width / 2)) <= 1;
+})()`), 'o troféu fica no centro usado pelo fim da estrada');
+await clicar('.no[data-dia="1"]');
+
 // ---------- convite e propósito ----------
 const bruno = await criarConta('bruno', 'Bruno');
 const conviteAna = await av('CC.api("api/convites", {}).then((d) => d.link)');

@@ -562,8 +562,18 @@
 
   // ---------- balão do nó ----------
   function fecharPop() {
-    document.querySelectorAll('.pop-no').forEach((p) => CC.sair(p, 140));
+    const raizes = new Set();
+    document.querySelectorAll('.pop-no').forEach((p) => {
+      const linha = p.closest('.no-linha');
+      const raiz = p.closest('.conteudo') || document;
+      if (linha) linha.style.removeProperty('--altura-pop');
+      raizes.add(raiz);
+      CC.sair(p, 140);
+    });
     document.querySelectorAll('.no.aberto').forEach((n) => n.classList.remove('aberto'));
+    // O pop sai com animação; redesenha depois de ele deixar o documento e de as margens
+    // voltarem ao tamanho normal.
+    if (raizes.size) setTimeout(() => raizes.forEach((raiz) => desenharEstradas(raiz)), 160);
   }
   CC.fecharPopNo = fecharPop;
   document.addEventListener('click', (ev) => {
@@ -581,6 +591,11 @@
     pop.innerHTML = interno;
     linha.appendChild(pop);
     botao.classList.add('aberto');
+    // Reserva no fluxo exatamente a altura do balão. Assim o próximo nó/cartão desce e a
+    // estrada pode ser recalculada pelos novos offsetTop, sem estimativas por conteúdo.
+    linha.style.setProperty('--altura-pop', Math.ceil(pop.getBoundingClientRect().height) + 'px');
+    const raiz = linha.closest('.conteudo') || document;
+    desenharEstradas(raiz);
     // Perto do fim da tela, a trilha rola o suficiente para o balão caber inteiro.
     requestAnimationFrame(() => {
       const caixa = pop.getBoundingClientRect();
