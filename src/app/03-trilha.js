@@ -41,6 +41,13 @@
   };
 
   let abertas = null;
+  // A unidade que a trilha abriu sozinha (a do dia de hoje) e se a pessoa já abriu ou fechou
+  // alguma. A primeira pintura pode sair antes do progresso chegar do servidor (aparelho novo):
+  // o dia de hoje ainda é o 1 e a unidade 1 abria; quando o progresso chegava, ficava aberta a
+  // unidade 1 e a de hoje fechada, sem o nó de hoje. Enquanto a pessoa não mexe, a unidade
+  // aberta acompanha o dia de hoje.
+  let unidadeAuto = 0;
+  let mexeuNasUnidades = false;
   CC.recemFeito = null;
 
   const FECHA_LIVRO = (() => {
@@ -379,7 +386,9 @@
     }
     const atual = CC.diaAtual();
     const uAtual = unidadeDoDia(atual);
-    if (abertas === null) abertas = new Set([uAtual.numero]);
+    if (abertas === null || (!mexeuNasUnidades && unidadeAuto !== uAtual.numero)) abertas = new Set([uAtual.numero]);
+    else if (unidadeAuto !== uAtual.numero) abertas.add(uAtual.numero);
+    unidadeAuto = uAtual.numero;
     const amigos = CC.amigosEmCache ? CC.amigosEmCache() : null;
 
     const toques = (amigos && amigos.toques) || [];
@@ -420,6 +429,7 @@
     raiz.querySelectorAll('[data-abrir]').forEach((el) => {
       el.onclick = () => {
         const n = Number(el.dataset.abrir);
+        mexeuNasUnidades = true;
         if (abertas.has(n)) abertas.delete(n); else abertas.add(n);
         CC.redesenhar();
       };

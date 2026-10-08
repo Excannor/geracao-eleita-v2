@@ -176,6 +176,9 @@
 .linha-adiante { stroke: var(--tinta-fraca); stroke-dasharray: 1 8; }
 .no-linha { z-index: 1; margin-bottom: 20px; }
 .no-linha.hoje { margin: 44px 0 52px; z-index: 3; }
+/* hoje no último dia da unidade: o cartão de hoje, mais alto que o nó, passa do meio da tela;
+   o troféu, que vem logo depois no meio, desce um pouco para não encostar nele */
+.no-linha.hoje + .linha-marco { margin-top: 28px; }
 
 /* nós: lido claro com ícone escuro, hoje sálvia com anel, adiante escuro com cadeado */
 .no { width: 58px; height: 58px; }
@@ -249,9 +252,11 @@
    gruda no alto (antes o nó e o balão rolavam por cima dela); a folha do Início rola com a
    trilha (5bb4ad1) */
 .no-linha:has(.pop-no) { z-index: 15; }
-/* no dia de hoje, o balão toma o lugar do cartão ao lado do nó enquanto está aberto (a mesma
-   passagem e o mesmo Começar): antes um cobria o outro. Fechado, a trilha fica como estava. */
-.no-linha.hoje:has(.pop-no) .cartao-no-hoje { visibility: hidden; }
+/* um balão por vez: com o balão de qualquer nó aberto (de hoje, de um dia lido, de um dia
+   adiante ou do baú), o cartão de hoje e o "Abrir" do baú saem de vista; ao fechar, voltam.
+   Antes só o balão do próprio dia de hoje escondia o cartão, e o balão do dia anterior abria
+   por cima dele, os dois ao mesmo tempo. */
+.trilha:has(.pop-no) .cartao-no-hoje, .trilha:has(.pop-no) .balao { visibility: hidden; }
 
 /* a seta que volta ao dia de hoje */
 .trilha ~ .ir-atual { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--inverso); color: var(--inverso-tinta); box-shadow: var(--sombra-flutuante); }
