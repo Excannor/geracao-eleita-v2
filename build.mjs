@@ -336,8 +336,26 @@ writeFileSync(dist('index.html.gz'), gzipSync(Buffer.from(paginaFinal, 'utf8'), 
 // A privacidade e os termos também são públicos: quem recebe um convite pode ler antes de criar conta.
 const simboloSvg = montarAbertura()
   .replace(/^[\s\S]*?(<svg)/, '$1').replace(/<\/svg>[\s\S]*$/, '</svg>');
+// As fotos da página de boas-vindas (src/landing/<nome>.webp ou .jpg) saem como
+// landing-<nome>.<resumo>.<ext>, como as fontes: o servidor as entrega sem sessão e com cache
+// longo, e a página as pede pelo marcador /*LANDING:<nome>*/. Não vão para o service worker:
+// quem já entrou nunca vê a página, e sem rede o texto dela continua legível sem as fotos.
+const pastaLanding = src('landing');
+const fotosLanding = {};
+for (const velho of readdirSync(dist()).filter((f) => /^landing-.*\.(webp|jpg)$/.test(f))) rmSync(dist(velho));
+for (const f of existsSync(pastaLanding) ? readdirSync(pastaLanding).filter((x) => /^[a-z0-9-]+\.(webp|jpg)$/.test(x)) : []) {
+  const bin = readFileSync(join(pastaLanding, f));
+  const [, nome, ext] = /^(.+)\.(webp|jpg)$/.exec(f);
+  const arquivo = 'landing-' + nome + '.' + createHash('sha256').update(bin).digest('hex').slice(0, 10) + '.' + ext;
+  writeFileSync(dist(arquivo), bin);
+  fotosLanding[nome] = arquivo;
+}
+const comFotos = (html, pagina) => html.replace(/\/\*LANDING:([a-z0-9-]+)\*\//g, (_, nome) => {
+  if (!fotosLanding[nome]) throw new Error(pagina + ': a foto "' + nome + '" não está em src/landing/');
+  return './' + fotosLanding[nome];
+});
 for (const pagina of ['entrar.html', 'privacidade.html', 'termos.html']) {
-  const html = readFileSync(src(pagina), 'utf8')
+  const html = comFotos(readFileSync(src(pagina), 'utf8'), pagina)
     .replace(/\/\*FONTES\*\//g, () => fontes)
     .replace(/\/\*ESTILO_V2\*\//g, () => estiloAvulsas)
     .replace(/\/\*SIMBOLO\*\//g, () => simboloSvg)

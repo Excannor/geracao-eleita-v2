@@ -64,50 +64,15 @@
      flex) vence o atributo hidden: ele ficava escondido no nome, mas continuava na tela. */
   [hidden] { display: none !important; }
   .centro { align-items: center; text-align: center; justify-content: center; }
-  #tela-boas { position: relative; }
-  /* O selo do lema: um carimbo, sempre escuro com letra clara nos dois temas, como uma
-     etiqueta impressa, não um cartão que devia seguir o tema. Linhas curtas de propósito:
-     a Permanent Marker é uma fonte larga, e frases longas numa linha só quebravam feio. */
-  .selo-lema { display: flex; flex-direction: column; align-items: center; margin: 14px 0 6px; }
-  /* Chapa preta lisa, sem contorno nem sombra: com borda e relevo o bloco virava adesivo
-     colado por cima da tela, em vez de tinta carimbada nela. A letra enche o bloco — é o
-     tamanho que dá o peso da arte; pequena, ela vira legenda. */
-  .selo-linha { display: block; width: fit-content; max-width: 100%; margin-top: -3px; padding: 7px 16px 3px;
-    background: var(--selo-bloco); color: var(--selo-texto); font-family: 'Permanent Marker', cursive;
-    font-size: clamp(1.3rem, 7.4vw, 1.8rem); line-height: 1.12; letter-spacing: .02em;
-    text-transform: uppercase; text-align: center; white-space: nowrap; }
-  /* Sem rotação: na arte de referência os blocos estão retos, e o que quebra a régua é um
-     empurrãozinho lateral em cada linha. Inclinar dava aspecto de etiqueta torta.
-     A contagem começa em 2 porque a referência é a primeira filha. */
-  .selo-lema > :nth-child(2) { margin-top: 0; transform: translateX(3px); }
-  .selo-lema > :nth-child(3) { transform: translateX(15px); }
-  .selo-lema > :nth-child(4) { transform: translateX(-7px); }
-  .selo-lema > :nth-child(5) { transform: translateX(5px); }
-  .selo-lema > :nth-child(6) { transform: translateX(-10px); }
-  /* A cruz acompanha a linha "Geração", fora do bloco escuro, na tinta da página. Fica
-     posicionada por cima e não no fluxo: ocupando espaço, ela empurrava essa linha para
-     a direita e quebrava o eixo do carimbo. */
-  .selo-com-cruz { position: relative; display: block; width: fit-content; margin-top: -3px; }
-  .selo-com-cruz .selo-linha { margin-top: 0; transform: none; }
-  .selo-cruz { position: absolute; right: 100%; top: 52%; margin-right: 9px; transform: translateY(-50%);
-    width: 16px; height: 22px; color: var(--forte); }
-  .selo-ref { margin-bottom: 10px; font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 700;
-    font-style: italic; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--forte); }
   .marca { position: relative; font-family: 'Oswald', 'Arial Narrow', var(--fonte, sans-serif); font-size: 1.15rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--forte); }
   .marca em { font-style: normal; }
   .mascote { position: relative; margin: 0 auto; }
   .mascote svg { width: 108px; height: auto; display: block; color: var(--forte); }
   h1 { margin: 0; color: var(--forte); font-size: 1.65rem; line-height: 1.2; text-wrap: balance; }
-  /* Na tela de boas-vindas o carimbo é o protagonista; o título vira apoio dele. */
-  #tela-boas h1 { font-size: 1.24rem; }
-  #tela-boas .dica { font-size: .88rem; }
   p { margin: 0; }
   .dica { color: var(--fraca); font-weight: 600; font-size: .95rem; line-height: 1.5; }
   .etiqueta { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fraca); }
   .espaco { flex: 1; }
-  /* Nas telas de formulário o vão empurra o botão para o rodapé, que é o certo. Na de
-     boas-vindas não há formulário: sem limite, sobrava um buraco no meio da tela. */
-  #tela-boas .espaco { max-height: 72px; }
   .botoes { display: grid; gap: 12px; width: 100%; }
   button, .botao { font-family: inherit; }
   /* Cápsula e sem relevo: o botão principal é o preto/branco que inverte com o tema. */
@@ -169,6 +134,287 @@
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 <style>/*ESTILO_V2*/</style>
+<style>
+  /* =========================================================================
+     LANDING (a tela de boas-vindas, #tela-boas.lp), no desenho do dono de 08/10
+     Sempre escura, nos dois temas: as cores são escritas aqui, sem as fichas do tema
+     (--fundo, --forte...), que trocam de lado. Vem depois da camada 26-avulsas para vencer
+     as regras gerais dela (h1, h2, a, .botao, .marca). Nada aqui mira as outras telas.
+     Fundo quase preto com grão de papel (ruído em SVG, um ladrilho só, rola junto com a
+     página: nada fixo por cima da barra do alto, que tem de ficar parada ao pixel), fotos
+     em preto e branco, sálvia e amarelo, bordas rasgadas (clip-path) e riscos de marcador.
+     ========================================================================= */
+  .lp {
+    --lp-preto: #0d0e0c; --lp-faixa: #171815; --lp-creme: #f2efdc; --lp-texto: #c9cabd; --lp-fraco: #a3a69a;
+    --lp-salvia: #c8da8c; --lp-salvia-escura: #9fb266; --lp-amarelo: #ffc44d; --lp-tinta: #12130f;
+    --lp-largura: 1160px; --lp-margem: 16px;
+    --lp-grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .2 -.05'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+    --lp-risco-salvia: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 16' preserveAspectRatio='none'%3E%3Cpath d='M3 10C70 4 160 3 297 5l-2 5C190 10 96 11 6 15z' fill='%23c8da8c'/%3E%3Cpath d='M30 13c80-3 160-4 240-3' stroke='%23c8da8c' stroke-width='1.4' fill='none' opacity='.6'/%3E%3C/svg%3E");
+    --lp-risco-amarelo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 16' preserveAspectRatio='none'%3E%3Cpath d='M3 10C70 4 160 3 297 5l-2 5C190 10 96 11 6 15z' fill='%23ffc44d'/%3E%3C/svg%3E");
+    color-scheme: dark;
+  }
+  html:has(#tela-boas:not([hidden])), body:has(#tela-boas:not([hidden])) { background: #0d0e0c; }
+  main:has(> #tela-boas:not([hidden])) { max-width: none; padding: 0; }
+  #tela-boas.lp { display: block; flex: none; width: 100%; overflow-x: clip; position: relative; isolation: isolate;
+    background: var(--lp-grao),
+      radial-gradient(ellipse 60% 420px at 85% 260px, rgba(200, 204, 190, .07), transparent),
+      radial-gradient(ellipse 50% 500px at 10% 52%, rgba(200, 204, 190, .05), transparent),
+      var(--lp-preto); color: var(--lp-texto); text-align: left;
+    font-family: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; font-variant-numeric: normal; }
+  .lp h1, .lp h2, .lp h3 { margin: 0; color: var(--lp-creme); letter-spacing: 0; }
+  .lp p { margin: 0; }
+  .lp em { font-style: normal; }
+  .lp b { color: var(--lp-creme); }
+  .lp img { display: block; max-width: 100%; }
+  .lp img.lp-sem-foto { visibility: hidden; }
+  .lp :focus-visible { outline: 3px solid var(--lp-amarelo); outline-offset: 3px; }
+  .lp [id^="lp-"] { scroll-margin-top: calc(72px + env(safe-area-inset-top)); }
+  /* o risco de marcador embaixo de uma palavra */
+  .lp-risco { background: var(--lp-risco-salvia) no-repeat 0 100% / 100% .2em; padding-bottom: .1em; }
+  .lp-nota { font-family: 'Permanent Marker', cursive; color: var(--lp-creme); text-transform: uppercase; line-height: 1.25; letter-spacing: .03em; }
+
+  /* ---------- barra do alto ----------
+     Presa em cima e firme ao rolar: altura fixa, fundo opaco (nada da página aparece através
+     dela), `contain`, sem transform, sem backdrop-filter e nada que mude com a rolagem. */
+  .lp-topo { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    box-sizing: border-box; height: calc(64px + env(safe-area-inset-top)); contain: layout style;
+    padding: calc(10px + env(safe-area-inset-top)) max(var(--lp-margem), env(safe-area-inset-right)) 10px max(var(--lp-margem), env(safe-area-inset-left));
+    background: var(--lp-preto); border-bottom: 1px solid #22241f; }
+  .lp-marca { display: flex; align-items: center; gap: 10px; }
+  .lp .lp-marca .mascote { margin: 0; }
+  .lp .lp-marca .mascote svg { width: auto; height: 38px; color: var(--lp-creme); }
+  .lp .marca { font: 800 1.0625rem/1 'Manrope', sans-serif; letter-spacing: -.01em; text-transform: none; color: var(--lp-creme); }
+  .lp-nav { display: none; }
+  .lp-nav a { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; color: var(--lp-creme);
+    font-size: .9375rem; font-weight: 600; text-decoration: none; }
+  .lp-nav a:hover { color: var(--lp-salvia); }
+  .lp-nav .lp-nav-atual { color: var(--lp-salvia); }
+  .lp-nav .lp-nav-atual::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 8px; height: 2px; border-radius: 2px; background: var(--lp-salvia); }
+  .lp-topo-entrar { min-height: 44px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--lp-salvia); color: var(--lp-tinta);
+    font: 800 .9375rem 'Manrope', sans-serif; cursor: pointer; }
+  .lp-topo-entrar:hover { background: #d6e6a0; }
+
+  /* ---------- botões ---------- */
+  .lp .botao { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 54px; padding: 12px 22px;
+    border: 0; border-radius: 14px; background: var(--lp-salvia); color: var(--lp-tinta); box-shadow: none;
+    font: 800 1.0625rem/1.2 'Manrope', sans-serif; letter-spacing: 0; text-transform: none; text-decoration: none; cursor: pointer; transition: transform .08s, background .15s; }
+  .lp .botao:hover { background: #d6e6a0; }
+  .lp .botao:active { transform: translateY(2px); }
+  .lp .botao.contorno { background: transparent; color: var(--lp-creme); box-shadow: inset 0 0 0 1.5px #8d907f; }
+  .lp .botao.contorno:hover { background: rgba(242, 239, 220, .08); }
+  .lp-seta { width: 20px; height: 20px; flex: none; }
+  .lp-botoes { display: grid; gap: 12px; width: 100%; margin-top: 8px; }
+  .lp-gratis { color: var(--lp-fraco); font-size: .875rem; font-weight: 600; }
+
+  /* ---------- 1. abertura ----------
+     No celular a foto fica atrás do título, à direita, apagando para a esquerda e para
+     baixo; no computador ela é a coluna do meio, com a etiqueta do lema por cima da borda. */
+  .lp-hero { position: relative; display: grid; gap: 18px; max-width: var(--lp-largura); margin: 0 auto;
+    padding: 28px var(--lp-margem) 44px; }
+  /* a máscara fica no quadro, não na foto: assim o grão (::after) apaga junto com ela */
+  .lp-hero-foto { position: absolute; z-index: 0; top: 0; right: 0; width: min(68%, 330px); aspect-ratio: 565 / 935; margin: 0;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 45%), linear-gradient(to bottom, #000 55%, transparent 100%);
+    -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent 0, #000 45%), linear-gradient(to bottom, #000 55%, transparent 100%); mask-composite: intersect; }
+  .lp-hero-foto img { width: 100%; height: 100%; object-fit: cover; opacity: .62; }
+  .lp-hero-foto::after { content: ""; position: absolute; inset: 0; background: var(--lp-grao); opacity: .7; pointer-events: none; }
+  .lp-coroa { position: absolute; z-index: 1; top: -1%; left: 50%; width: 26%; height: auto; color: var(--lp-salvia); transform: rotate(-8deg); }
+  .lp-hero-texto { position: relative; z-index: 1; display: grid; gap: 16px; }
+  .lp-titulo + .lp-sub { margin-top: 6px; }
+  .lp-titulo { font: 700 clamp(3rem, 15.2vw, 5.4rem)/.92 'Oswald', 'Arial Narrow', sans-serif; text-transform: uppercase; color: var(--lp-creme);
+    text-shadow: 0 2px 18px rgba(0, 0, 0, .55); }
+  .lp-titulo > span { display: block; }
+  .lp-titulo em { color: var(--lp-amarelo); }
+  .lp-titulo .lp-risco { background-size: 100% .14em; padding-bottom: .08em; }
+  .lp-convidado .lp-titulo { font-size: clamp(2.1rem, 9.5vw, 3.6rem); line-height: 1; text-wrap: balance; }
+  .lp-sub { max-width: 30ch; color: var(--lp-creme); font-size: 1rem; font-weight: 700; letter-spacing: .14em; line-height: 1.55; text-transform: uppercase; text-wrap: balance; }
+  .lp-convidado .lp-sub { letter-spacing: .02em; text-transform: none; font-size: 1.0625rem; }
+  .lp-hero .lp-botoes { max-width: 380px; }
+  .lp-etiqueta { position: relative; z-index: 1; justify-self: end; display: grid; gap: 6px; width: fit-content; margin: 8px 6px 0 0; transform: rotate(-4deg); }
+  .lp-etiqueta-ref { font: 700 italic .875rem 'Oswald', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--lp-creme); }
+  .lp-etiqueta-corpo { display: grid; justify-items: start; }
+  .lp-etiqueta-corpo > span { display: block; margin-top: -2px; padding: 5px 14px 2px; background: var(--lp-salvia); color: var(--lp-tinta);
+    font: 400 clamp(1.25rem, 6.4vw, 1.7rem)/1.15 'Permanent Marker', cursive; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; }
+  .lp-etiqueta-corpo > span:nth-child(2) { margin-left: 8px; }
+  .lp-etiqueta-corpo > span:nth-child(3) { margin-left: 2px; }
+  .lp-etiqueta-corpo > span:nth-child(4) { margin-left: 12px; }
+  .lp-etiqueta-corpo > span:nth-child(5) { margin-left: 4px; }
+  .lp-nota-esq, .lp-nota-dir { display: none; }
+
+  /* ---------- 2. pequenos passos ---------- */
+  .lp-passos { padding: 8px 0; }
+  .lp-faixa { position: relative; display: grid; gap: 28px; padding: 44px var(--lp-margem) 48px; background: var(--lp-grao), var(--lp-faixa);
+    clip-path: polygon(0.0% 0px,3.6% 11px,7.1% 3px,10.7% 3px,14.3% 9px,17.9% 6px,21.4% 4px,25.0% 9px,28.6% 9px,32.1% 7px,35.7% 8px,39.3% 8px,42.9% 10px,46.4% 3px,50.0% 4px,53.6% 8px,57.1% 8px,60.7% 1px,64.3% 8px,67.9% 6px,71.4% 11px,75.0% 10px,78.6% 1px,82.1% 6px,85.7% 11px,89.3% 8px,92.9% 8px,96.4% 7px,100.0% 11px,100.0% calc(100% - 3px),96.4% calc(100% - 5px),92.9% calc(100% - 2px),89.3% calc(100% - 6px),85.7% calc(100% - 11px),82.1% calc(100% - 8px),78.6% calc(100% - 4px),75.0% calc(100% - 4px),71.4% calc(100% - 1px),67.9% calc(100% - 11px),64.3% calc(100% - 2px),60.7% calc(100% - 5px),57.1% calc(100% - 6px),53.6% calc(100% - 7px),50.0% calc(100% - 3px),46.4% calc(100% - 1px),42.9% calc(100% - 11px),39.3% calc(100% - 9px),35.7% calc(100% - 7px),32.1% calc(100% - 11px),28.6% calc(100% - 4px),25.0% calc(100% - 5px),21.4% calc(100% - 4px),17.9% calc(100% - 2px),14.3% calc(100% - 4px),10.7% calc(100% - 10px),7.1% calc(100% - 4px),3.6% calc(100% - 4px),0.0% calc(100% - 11px)); }
+  .lp-passos-titulo { font: 700 clamp(2.2rem, 10.5vw, 3rem)/.98 'Oswald', 'Arial Narrow', sans-serif; text-transform: uppercase; }
+  .lp-passos-titulo > * { display: block; }
+  .lp-passos-titulo em { color: var(--lp-amarelo); }
+  .lp-passos-titulo .lp-risco { width: fit-content; background-size: 100% .14em; }
+  .lp-passos-lista { display: grid; gap: 24px; margin: 0; padding: 0; list-style: none; }
+  .lp-passos-lista li { display: grid; grid-template-columns: 64px 1fr; column-gap: 16px; row-gap: 4px; align-items: start; }
+  .lp-passos-lista .lp-icone { grid-row: span 2; width: 64px; height: 52px; }
+  .lp-passos-lista h3 { font: 800 1.1875rem/1.25 'Manrope', sans-serif; letter-spacing: -.01em; }
+  .lp-passos-lista p { color: var(--lp-texto); font-size: .9375rem; line-height: 1.55; text-wrap: pretty; }
+  .lp-coroa-mini { display: none; }
+
+  /* ---------- 3. João 14.6 ---------- */
+  .lp-joao { position: relative; max-width: var(--lp-largura); margin: 0 auto; padding: 24px 0 40px; }
+  .lp-joao-arte { position: relative; display: grid; margin: 0; }
+  .lp-joao-foto { position: relative; height: 230px; overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent); mask-image: linear-gradient(to bottom, #000 60%, transparent); }
+  .lp-joao-foto img { width: 100%; height: 100%; object-fit: cover; object-position: 22% 50%; }
+  .lp-joao-foto::after { content: ""; position: absolute; inset: 0; background: var(--lp-grao); opacity: .6; pointer-events: none; }
+  .lp-joao-texto { position: relative; display: grid; justify-items: start; margin-top: -40px; padding: 0 var(--lp-margem);
+    font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 700; text-transform: uppercase; line-height: .9; color: var(--lp-creme); }
+  .lp-joao-ref { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font: 800 .8125rem 'Manrope', sans-serif; letter-spacing: .22em; color: var(--lp-salvia); }
+  .lp-joao-ref::before, .lp-joao-ref::after { content: ""; width: 34px; height: 2px; background: currentColor; opacity: .7; }
+  .lp-joao-jesus { font-size: clamp(4.6rem, 26vw, 8.4rem); text-shadow: 0 2px 22px rgba(0, 0, 0, .6); }
+  .lp-joao-meio { margin-top: 6px; font-size: clamp(1.9rem, 9vw, 2.9rem); font-weight: 600; line-height: .98; }
+  .lp-joao-vida { margin-top: 8px; font-size: clamp(3rem, 15vw, 5.2rem); color: var(--lp-amarelo); background-size: 100% .12em; }
+  .lp-joao-versiculo { max-width: 46ch; margin-top: 22px; font: 500 .9375rem/1.6 'Manrope', sans-serif; text-transform: none; letter-spacing: 0; color: var(--lp-texto); }
+  .lp-joao-versiculo b { display: block; margin-top: 4px; font-weight: 800; color: var(--lp-amarelo); }
+  .lp-nota-joao { display: none; }
+
+  /* ---------- 4. o app ---------- */
+  .lp-app { position: relative; display: grid; gap: 36px; max-width: var(--lp-largura); margin: 0 auto; padding: 40px var(--lp-margem) 56px; }
+  .lp-app-texto { display: grid; gap: 16px; }
+  .lp-rotulo { color: var(--lp-salvia); font-size: .8125rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+  .lp-app-titulo { font: 700 clamp(2.2rem, 10.4vw, 3.6rem)/.98 'Oswald', 'Arial Narrow', sans-serif; text-transform: uppercase; }
+  .lp-app-titulo > * { display: block; }
+  .lp-app-titulo em { width: fit-content; color: var(--lp-salvia); background-size: 100% .12em; }
+  .lp-texto { max-width: 46ch; color: var(--lp-texto); font-size: 1.0625rem; line-height: 1.6; text-wrap: pretty; }
+  .lp-nota-app { display: none; }
+  .lp-celulares { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; max-width: 560px; width: 100%; margin: 0 auto; }
+  .lp-celular { position: relative; padding: 7px; border-radius: 34px; background: #1c1d1a;
+    box-shadow: inset 0 0 0 1.5px #3b3d36, inset 0 0 0 4px #0b0c0a, 0 24px 50px rgba(0, 0, 0, .55); transform: rotate(-2deg); }
+  .lp-celular::before { content: ""; position: absolute; z-index: 1; top: 13px; left: 50%; width: 30%; height: 12px; border-radius: 999px; background: #0b0c0a; transform: translateX(-50%); }
+  /* a faixa do alto (a cor do topo do app) abre espaço para a ilha: sem ela, a ilha cobria o "Olá".
+     1218 = 1169 da captura + os 9% da faixa (49 px a 540 de largura): a tela cabe inteira */
+  .lp-celular img { box-sizing: border-box; width: 100%; height: auto; aspect-ratio: 540 / 1218; padding-top: 9%; border-radius: 27px;
+    background: #2d302d; object-fit: cover; object-position: top; }
+  .lp-celular-2 { margin-top: 44px; transform: rotate(3deg); }
+  .lp-nota-palavra { display: none; }
+
+  /* ---------- 5. comunidade ---------- */
+  .lp-comunidade { display: grid; gap: 28px; max-width: var(--lp-largura); margin: 0 auto; padding: 24px var(--lp-margem) 56px; }
+  .lp-comunidade-foto { position: relative; aspect-ratio: 500 / 469; max-width: 520px; transform: rotate(-1.5deg);
+    clip-path: polygon(0 2%, 6% 0, 18% 1.5%, 33% 0, 51% 1%, 68% 0, 84% 1.8%, 100% 0, 99% 22%, 100% 47%, 98.8% 71%, 100% 100%, 81% 98.6%, 63% 100%, 44% 98.4%, 27% 100%, 9% 98.8%, 0 100%, 1.2% 74%, 0 50%, 1% 26%); }
+  .lp-comunidade-foto img { width: 100%; height: 100%; object-fit: cover; }
+  .lp-comunidade-foto::after { content: ""; position: absolute; inset: 0; background: var(--lp-grao); opacity: .6; pointer-events: none; }
+  .lp-comunidade-texto { display: grid; gap: 16px; align-content: center; }
+  .lp-comunidade-titulo { font: 700 clamp(2.2rem, 10.4vw, 3.4rem)/.98 'Oswald', 'Arial Narrow', sans-serif; text-transform: uppercase; }
+  .lp-comunidade-titulo em { display: inline-block; color: var(--lp-salvia); background-size: 100% .12em; }
+  .lp-comunidade-lista { display: grid; gap: 14px; margin: 4px 0 0; padding: 0; list-style: none; }
+  .lp-comunidade-lista li { position: relative; padding-left: 26px; color: var(--lp-texto); font-size: 1.0625rem; line-height: 1.55; text-wrap: pretty; }
+  .lp-comunidade-lista li::before { content: ""; position: absolute; left: 2px; top: .5em; width: 12px; height: 12px; background: var(--lp-amarelo);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+
+  /* ---------- 6. o chamado final ---------- */
+  .lp-final { position: relative; display: grid; gap: 28px; padding: 0 0 48px; background: var(--lp-grao), var(--lp-faixa);
+    clip-path: polygon(0.0% 0px,3.6% 0px,7.1% 10px,10.7% 5px,14.3% 9px,17.9% 8px,21.4% 8px,25.0% 2px,28.6% 3px,32.1% 6px,35.7% 12px,39.3% 5px,42.9% 3px,46.4% 5px,50.0% 4px,53.6% 5px,57.1% 5px,60.7% 9px,64.3% 11px,67.9% 7px,71.4% 4px,75.0% 12px,78.6% 4px,82.1% 1px,85.7% 9px,89.3% 2px,92.9% 1px,96.4% 9px,100.0% 2px,100% 100%,0 100%); }
+  .lp-final-foto { position: relative; height: 250px; overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent); mask-image: linear-gradient(to bottom, #000 55%, transparent); }
+  .lp-final-foto img { width: 100%; height: 100%; object-fit: cover; object-position: 40% 30%; }
+  .lp-final-foto::after { content: ""; position: absolute; inset: 0; background: var(--lp-grao); opacity: .6; pointer-events: none; }
+  .lp-volte { display: grid; justify-items: center; margin-top: -64px; padding: 0 var(--lp-margem); position: relative; text-align: center;
+    font-family: 'Oswald', 'Arial Narrow', sans-serif; font-weight: 700; text-transform: uppercase; line-height: .95; color: var(--lp-creme); }
+  .lp-volte > span { display: block; }
+  .lp-volte-a, .lp-volte-c { font-size: clamp(1.15rem, 5.6vw, 1.75rem); font-weight: 600; letter-spacing: .02em; }
+  .lp-volte-b { font-size: clamp(2.3rem, 11.4vw, 3.9rem); }
+  .lp-volte-c { margin-top: 8px; color: var(--lp-amarelo); }
+  .lp-volte-d { font-size: clamp(4.4rem, 24vw, 7.6rem); color: var(--lp-amarelo); background-size: 100% .1em; }
+  .lp-convite { display: grid; gap: 14px; width: min(100% - 2 * var(--lp-margem), 380px); margin: 0 auto; }
+  .lp-convite h2 { font: 800 1.375rem/1.25 'Manrope', sans-serif; letter-spacing: -.01em; text-wrap: balance; }
+  .lp-papel { justify-self: center; display: grid; justify-items: start; padding: 18px 26px 16px; background: var(--lp-grao), var(--lp-salvia);
+    color: var(--lp-tinta); font: 400 1.375rem/1.15 'Permanent Marker', cursive; text-transform: uppercase; transform: rotate(-3deg);
+    clip-path: polygon(0 4%, 12% 0, 30% 3%, 52% 0, 75% 2.5%, 100% 0, 98% 30%, 100% 62%, 97.5% 100%, 70% 97%, 44% 100%, 20% 97.5%, 0 100%, 2% 66%, 0 34%); }
+  .lp-papel > span { display: block; }
+  .lp-papel svg { justify-self: end; width: 46px; height: auto; margin-top: 4px; }
+
+  /* ---------- 7. rodapé ---------- */
+  .lp-rodape { display: grid; justify-items: center; gap: 10px; padding: 32px var(--lp-margem) calc(24px + env(safe-area-inset-bottom));
+    background: #0a0b09; border-top: 1px solid #22241f; text-align: center; }
+  .lp-rodape-nav { display: flex; flex-wrap: wrap; justify-content: center; }
+  .lp-rodape-nav a, .lp-rodape .links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; color: var(--lp-creme);
+    font-size: .9375rem; font-weight: 600; text-decoration: none; }
+  .lp-rodape .links { display: flex; justify-content: center; align-items: center; gap: 2px; min-height: 44px; color: var(--lp-fraco); }
+  .lp-rodape .links a { color: var(--lp-salvia); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+  .lp-rodape .lp-marca .mascote svg { height: 34px; }
+
+  /* ---------- telas largas ---------- */
+  @media (min-width: 700px) {
+    .lp { --lp-margem: 32px; }
+    .lp-passos-lista { grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .lp-passos-lista li { grid-template-columns: 1fr; justify-items: start; }
+    .lp-passos-lista .lp-icone { grid-row: auto; margin-bottom: 10px; }
+    .lp-joao-foto { height: 340px; }
+    .lp-final-foto { height: 340px; }
+    .lp-comunidade { grid-template-columns: 1fr 1fr; align-items: center; gap: 48px; }
+    .lp-botoes-linha { grid-template-columns: auto auto; justify-content: start; }
+    .lp-botoes-linha .botao { width: auto; }
+  }
+  @media (min-width: 960px) {
+    .lp-nav { display: flex; align-items: center; margin-left: auto; margin-right: 20px; }
+    .lp-topo { padding-left: max(32px, calc(50% - var(--lp-largura) / 2 + 32px)); padding-right: max(32px, calc(50% - var(--lp-largura) / 2 + 32px)); }
+
+    .lp-hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, .9fr) minmax(0, .65fr); align-items: center; gap: 0; min-height: 560px; padding: 32px 32px 24px; }
+    .lp-hero-texto { grid-column: 1; grid-row: 1; padding-right: 8px; }
+    .lp-hero-foto { position: relative; grid-column: 2 / 4; grid-row: 1; justify-self: start; width: 100%; max-width: 440px; margin-left: -6%;
+      aspect-ratio: 565 / 800; }
+    .lp-hero-foto img { object-position: top; }
+    /* a coroa fica fora da máscara: a máscara vai na foto e no grão, cada um */
+    .lp-hero-foto { -webkit-mask-image: none; mask-image: none; }
+    .lp-hero-foto img, .lp-hero-foto::after { -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 46%, #000 45%, transparent 100%);
+      mask-image: radial-gradient(ellipse 50% 50% at 50% 46%, #000 45%, transparent 100%); }
+    .lp-hero-foto img { opacity: .8; }
+    .lp-titulo + .lp-sub { margin-top: 14px; }
+    .lp-coroa { top: 0; left: 26%; width: 34%; }
+    .lp-titulo { font-size: clamp(3.8rem, 5.2vw, 4.6rem); }
+    .lp-etiqueta { grid-column: 3; grid-row: 1; justify-self: end; align-self: start; margin: 40px 0 0; transform: rotate(-6deg); }
+    .lp-etiqueta-corpo > span { font-size: 1.75rem; }
+    .lp-hero .lp-botoes { grid-template-columns: auto auto; justify-content: start; max-width: none; }
+    .lp-hero .lp-botoes .botao { width: auto; min-width: 180px; }
+
+    .lp-faixa { grid-template-columns: 340px 1fr; align-items: center; gap: 32px; padding: 52px max(96px, calc(50% - var(--lp-largura) / 2 + 96px)) 56px max(32px, calc(50% - var(--lp-largura) / 2 + 32px)); }
+    .lp-passos-titulo { font-size: 2.5rem; }
+    .lp-passos-lista { gap: 0; }
+    .lp-passos-lista li { justify-items: center; padding: 0 24px; text-align: center; border-left: 1px solid #34362f; }
+    .lp-passos-lista .lp-icone { width: 76px; height: 60px; }
+    .lp-coroa-mini { display: block; position: absolute; right: max(28px, calc(50% - var(--lp-largura) / 2 + 28px)); top: 34px; width: 48px; color: var(--lp-creme); transform: rotate(8deg); }
+
+    .lp-joao { padding: 40px 0 48px; }
+    .lp-joao-arte { grid-template-columns: 1.15fr 1fr; align-items: center; }
+    .lp-joao-foto { height: 400px; -webkit-mask-image: linear-gradient(to right, #000 60%, transparent); mask-image: linear-gradient(to right, #000 60%, transparent); }
+    .lp-joao-foto img { -webkit-mask-image: none; mask-image: none; object-position: 30% 50%; }
+    .lp-joao-texto { margin: 0 0 0 -60px; padding: 0 32px 0 0; justify-items: center; text-align: center; }
+    .lp-joao-versiculo { text-align: left; }
+    .lp-joao-jesus { font-size: 8.4rem; }
+
+    .lp-app { grid-template-columns: 1fr 1fr; align-items: center; gap: 48px; padding: 56px 32px 72px; }
+    .lp-celulares { gap: 22px; }
+    .lp-nota-app { display: flex; align-items: flex-end; gap: 6px; position: absolute; right: 0; bottom: -40px; width: 160px; color: var(--lp-creme); font-size: 1rem; transform: rotate(-8deg); }
+    .lp-app .lp-texto { max-width: 40ch; }
+    .lp-app-texto { position: relative; }
+    .lp-nota-app svg { width: 46px; height: 38px; margin-bottom: 18px; }
+
+    .lp-final { grid-template-columns: minmax(0, 1fr) auto minmax(0, .9fr) 220px; align-items: center; gap: 28px; padding: 0 32px 0 0; min-height: 360px; }
+    .lp-final-foto { height: 100%; min-height: 360px; -webkit-mask-image: linear-gradient(to right, #000 55%, transparent); mask-image: linear-gradient(to right, #000 55%, transparent); }
+    .lp-final-foto img { -webkit-mask-image: none; mask-image: none; }
+    .lp-volte { margin: 0 0 0 -90px; padding: 32px 0; }
+    .lp-convite { width: auto; padding-left: 28px; border-left: 1px solid #3a3c35; }
+    .lp-papel { font-size: 1.5rem; }
+  }
+  /* as anotações das margens só onde sobra margem */
+  @media (min-width: 1320px) {
+    .lp-nota-esq, .lp-nota-dir, .lp-nota-joao, .lp-nota-palavra { display: block; position: absolute; font-size: 1rem; }
+    .lp-nota-esq { left: -110px; top: 190px; width: 120px; transform: rotate(-12deg); }
+    .lp-nota-esq::after { content: ""; display: block; height: 10px; margin-top: 6px; background: var(--lp-risco-salvia) no-repeat 0 0 / 100% 100%; }
+    .lp-nota-dir { right: -120px; top: 70px; width: 130px; transform: rotate(-10deg); }
+    .lp-nota-dir > span { display: block; }
+    .lp-nota-dir svg { width: 16px; height: 22px; margin: 8px 0 0 40px; }
+    .lp-nota-joao { right: -110px; top: 70px; width: 140px; transform: rotate(-10deg); }
+    .lp-nota-palavra { right: -110px; top: 46%; width: 130px; transform: rotate(-10deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { .lp .botao { transition: none; } }
+</style>
 </head>
 <body>
 <main>
@@ -182,134 +428,161 @@
     <button class="botao contorno" type="button" id="faixa-fora-copiar">Copiar o link</button>
   </div>
 </div>
-  <!-- boas-vindas: a porta de entrada, com cara própria (redesenho de 01/10). O carimbo em
-       pincel continua o protagonista e idêntico; em volta dele flutuam as peças do jogo do
-       app (chama, baú, troféu, Bíblia, o visto do dia), e embaixo vem o mural de
-       lambe-lambes com versículos, desenhados em CSS (nenhuma arte de terceiros). -->
+  <!-- boas-vindas: a porta de entrada, no desenho do dono (08/10): página escura de papel
+       gasto, fotos em preto e branco, sálvia e amarelo, letra condensada e anotações a
+       marcador. Sempre escura, nos dois temas (o estilo dela é o bloco "landing" do <head>).
+       As fotos vêm de src/landing/ (o build.mjs as copia com resumo no nome) e as duas telas
+       do app são capturas de verdade, com nomes fictícios. Sem foto (sem rede), o texto
+       continua legível no fundo escuro. -->
   <section id="tela-boas" class="lp">
     <header class="lp-topo">
       <div class="lp-marca"><span class="mascote">/*SIMBOLO*/</span><span class="marca">Geração <em>Eleita</em></span></div>
+      <nav class="lp-nav" aria-label="Seções da página">
+        <a href="#lp-inicio" class="lp-nav-atual">Início</a>
+        <a href="#lp-como">Como funciona</a>
+        <a href="#lp-comunidade">Comunidade</a>
+      </nav>
       <button class="lp-topo-entrar" data-ir="entrar">Entrar</button>
     </header>
 
-    <div class="lp-hero">
-      <div class="lp-pecas" aria-hidden="true">
-        <svg class="lp-peca p-chama" viewBox="0 0 64 80"><path d="M32 78c17 0 28-11 28-27 0-12-6-21-14-30 1 8-3 13-8 14 2-13-5-25-16-33 2 14-4 21-11 29C5 38 4 45 4 51c0 16 11 27 28 27z" fill="#ff7a3d"/><path d="M32 76c-9 0-15-6-15-15 0-7 4-11 8-15 0 5 3 8 6 8-1-8 3-14 9-18-1 9 7 13 7 25 0 9-6 15-15 15z" fill="#ffc44d"/></svg>
-        <svg class="lp-peca p-bau" viewBox="0 0 96 80"><path d="M10 34h76v38a6 6 0 0 1-6 6H16a6 6 0 0 1-6-6z" fill="#a8672f"/><path d="M8 20c0-10 8-16 16-16h48c8 0 16 6 16 16v16H8z" fill="#c47d3c"/><rect x="8" y="32" width="80" height="8" fill="#7d4a1f"/><rect x="20" y="4" width="10" height="74" fill="#ffc44d"/><rect x="66" y="4" width="10" height="74" fill="#ffc44d"/><rect x="40" y="28" width="16" height="20" rx="4" fill="#ffc44d"/><circle cx="48" cy="38" r="3" fill="#7d4a1f"/></svg>
-        <svg class="lp-peca p-trofeu" viewBox="0 0 72 80"><path d="M14 6h44v22c0 13-10 24-22 24S14 41 14 28z" fill="#ffc44d"/><path d="M14 12H4v8c0 9 6 15 14 16M58 12h10v8c0 9-6 15-14 16" fill="none" stroke="#e8a51f" stroke-width="5"/><rect x="30" y="50" width="12" height="14" fill="#e8a51f"/><rect x="18" y="64" width="36" height="12" rx="3" fill="#7d4a1f"/><path d="M24 14h6v18h-6z" fill="#fff3c4" opacity=".7"/></svg>
-        <svg class="lp-peca p-biblia" viewBox="0 0 96 72"><path d="M48 14C38 6 22 4 6 6v56c16-2 32 0 42 8 10-8 26-10 42-8V6C74 4 58 6 48 14z" fill="#5a6b2a"/><path d="M48 16C39 9 25 8 11 10v46c14-1 27 1 37 7z" fill="#fffdf6"/><path d="M48 16c9-7 23-8 37-6v46c-14-1-27 1-37 7z" fill="#f4efe1"/><path d="M19 22h20M19 30h22M19 38h18M57 22h20M57 30h18M57 38h20" stroke="#c8bfa6" stroke-width="3" stroke-linecap="round"/><path d="M70 6v20l5-4 5 4V6" fill="#e2463b"/></svg>
-        <svg class="lp-peca p-visto" viewBox="0 0 72 72"><circle cx="36" cy="36" r="34" fill="#151615"/><path d="M21 37l10 10 20-22" fill="none" stroke="#c8da8c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <svg class="lp-peca p-cruz" viewBox="0 0 24 30"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z" fill="currentColor"/></svg>
-        <svg class="lp-peca p-coroa" viewBox="0 0 80 56"><path d="M6 50h68l6-40-20 14L40 2 20 24 0 10z" fill="#ffc44d"/><circle cx="40" cy="30" r="5" fill="#e2463b"/><rect x="6" y="46" width="68" height="8" rx="2" fill="#e8a51f"/></svg>
-        <svg class="lp-peca p-gema1" viewBox="0 0 40 40"><path d="M20 2l18 18-18 18L2 20z" fill="#c8da8c"/><path d="M20 2l18 18H20z" fill="#e4eec4"/></svg>
-        <svg class="lp-peca p-gema2" viewBox="0 0 40 40"><path d="M20 2l18 18-18 18L2 20z" fill="#7fb3ff"/><path d="M20 2l18 18H20z" fill="#b9d4ff"/></svg>
-      </div>
+    <!-- 1. abertura -->
+    <div class="lp-hero" id="lp-inicio">
+      <figure class="lp-hero-foto">
+        <img src="/*LANDING:abertura*/" width="565" height="935" fetchpriority="high"
+          alt="Jovem de costas, olhando a cidade ao anoitecer, com o símbolo da Geração Eleita na camiseta">
+        <svg class="lp-coroa" viewBox="0 0 120 84" aria-hidden="true"><path d="M10 74 6 22l26 26L58 6l22 40 30-22-6 50z" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 70c30-4 60-5 92-1M17 60l-4-30M101 61l4-30" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".55"/></svg>
+      </figure>
 
-      <!-- O carimbo vem logo depois da marca: é a declaração de quem o app é. A referência
-           vem antes dele (embaixo, parecia citar a frase, que não é de 1 Pedro). -->
-      <div class="lp-selo">
-        <div class="selo-lema">
-          <span class="selo-ref">1 Pedro 2.9</span>
-          <span class="selo-linha">Somos a</span>
-          <span class="selo-com-cruz">
-            <svg class="selo-cruz" viewBox="0 0 24 30" fill="currentColor" aria-hidden="true"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z"/></svg>
-            <span class="selo-linha">Geração</span>
-          </span>
-          <span class="selo-linha">Que busca</span>
-          <span class="selo-linha">À sua face</span>
-          <span class="selo-linha">E te adora</span>
+      <div class="lp-hero-texto">
+        <!-- Com convite ou link de célula, o script troca este título pelo nome de quem chamou
+             (e põe .lp-convidado na seção, que diminui a letra). -->
+        <h1 id="titulo-boas" class="lp-titulo"><span>Mais que</span> <span>um app,</span> <span>é <em>um</em></span> <span><em class="lp-risco">movimento.</em></span></h1>
+        <p class="lp-sub" id="dica-boas">Uma geração que lê, busca, adora e vive a Palavra.</p>
+        <div class="botoes lp-botoes">
+          <button class="botao" data-ir="cadastro" id="botao-comecar">Começar agora <svg class="lp-seta" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <!-- Só aparecem com link de célula (ver "if (celula)" no script). -->
+          <button class="botao" data-ir="cadastro" id="botao-entrar-celula" hidden>Entrar na célula</button>
+          <button class="botao contorno" data-ir="cadastro" id="botao-so-conhecer" hidden>Só quero conhecer</button>
+          <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
         </div>
+        <p class="lp-gratis">De graça, sem anúncios.</p>
       </div>
 
-      <!-- Posicionamento (23/09/2026): o app do discipulado da juventude da igreja. -->
-      <h1 id="titulo-boas">A Bíblia inteira em um ano, com seus amigos.</h1>
-      <p class="dica" id="dica-boas">Uma leitura por dia, de 10 a 20 minutos, com reflexões feitas para quem está começando. Leia com os amigos ou com a sua célula.</p>
-      <div class="botoes">
-        <button class="botao" data-ir="cadastro" id="botao-comecar">Começar agora</button>
-        <!-- Só aparecem com link de célula (ver "if (celula)" no script). -->
-        <button class="botao" data-ir="cadastro" id="botao-entrar-celula" hidden>Entrar na célula</button>
-        <button class="botao contorno" data-ir="cadastro" id="botao-so-conhecer" hidden>Só quero conhecer</button>
-        <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
-      </div>
-      <p class="lp-gratis">De graça, sem anúncios.</p>
+      <!-- O lema da geração, em etiqueta sálvia. A referência vem antes (a frase não é de
+           1 Pedro: o versículo é a fonte do nome). -->
+      <p class="lp-etiqueta"><span class="lp-etiqueta-ref">1 Pedro 2.9</span><span class="lp-etiqueta-corpo"><span>Somos a</span> <span>geração</span> <span>que busca</span> <span>à sua face</span> <span>e te adora</span></span></p>
+
+      <p class="lp-nota lp-nota-esq" aria-hidden="true">Jovens que leem, buscam, adoram e vivem a Palavra.</p>
+      <p class="lp-nota lp-nota-dir" aria-hidden="true"><span>Bíblia</span> <span>comunidade</span> <span>propósito</span> <span>disciplina</span> <span>geração</span> <svg viewBox="0 0 24 30" fill="currentColor"><path d="M10.4 1h3.2v6.6H20v3.2h-6.4V29h-3.2V10.8H4V7.6h6.4z"/></svg></p>
     </div>
 
-    <svg class="lp-onda" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64C180 10 340 0 520 40s320 84 520 52S1300 8 1440 30V120H0z"/></svg>
+    <!-- 2. pequenos passos (como funciona) -->
+    <div class="lp-passos" id="lp-como">
+      <div class="lp-faixa">
+        <h2 class="lp-passos-titulo"><span>Pequenos</span> <span>passos,</span> <em>grandes</em> <em class="lp-risco">transformações.</em></h2>
+        <ul class="lp-passos-lista">
+          <li>
+            <svg class="lp-icone" viewBox="0 0 96 72" aria-hidden="true"><path d="M48 14C38 6 22 4 6 6v56c16-2 32 0 42 8 10-8 26-10 42-8V6C74 4 58 6 48 14z" fill="#5a6b2a"/><path d="M48 16C39 9 25 8 11 10v46c14-1 27 1 37 7z" fill="#fffdf6"/><path d="M48 16c9-7 23-8 37-6v46c-14-1-27 1-37 7z" fill="#f4efe1"/><path d="M19 22h20M19 30h22M19 38h18M57 22h20M57 30h18M57 38h20" stroke="#c8bfa6" stroke-width="3" stroke-linecap="round"/><path d="M70 6v20l5-4 5 4V6" fill="#e2463b"/></svg>
+            <h3>Uns 15 minutos por dia.</h3>
+            <p>Uma leitura curta, com uma reflexão feita para quem está começando. Em um ano, a Bíblia inteira.</p>
+          </li>
+          <li>
+            <svg class="lp-icone" viewBox="0 0 64 80" aria-hidden="true"><path d="M32 78c17 0 28-11 28-27 0-12-6-21-14-30 1 8-3 13-8 14 2-13-5-25-16-33 2 14-4 21-11 29C5 38 4 45 4 51c0 16 11 27 28 27z" fill="#ff7a3d"/><path d="M32 76c-9 0-15-6-15-15 0-7 4-11 8-15 0 5 3 8 6 8-1-8 3-14 9-18-1 9 7 13 7 25 0 9-6 15-15 15z" fill="#ffc44d"/></svg>
+            <h3>Não deixe a chama apagar.</h3>
+            <p>Cada dia lido fortalece a sua constância. Troféus, ofensiva e progresso marcam o caminho.</p>
+          </li>
+          <li>
+            <svg class="lp-icone" viewBox="0 0 96 72" aria-hidden="true"><g fill="#c8da8c"><circle cx="48" cy="16" r="11"/><path d="M28 62c0-14 9-24 20-24s20 10 20 24z"/></g><g fill="#9fb266"><circle cx="20" cy="24" r="8.5"/><path d="M4 64c0-11 7-19 16-19 5 0 9 2 12 6-3 4-5 8-5 13z"/><circle cx="76" cy="24" r="8.5"/><path d="M92 64c0-11-7-19-16-19-5 0-9 2-12 6 3 4 5 8 5 13z"/></g></svg>
+            <h3>Junto é melhor.</h3>
+            <p>Leia com amigos, com a sua célula ou com quem te discipula. Um toque lembra quem ainda não leu.</p>
+          </li>
+        </ul>
+        <svg class="lp-coroa-mini" viewBox="0 0 120 84" aria-hidden="true"><path d="M10 74 6 22l26 26L58 6l22 40 30-22-6 50z" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
 
-    <!-- A arte do meio, incorporada à página (uma faixa de ponta a ponta, não um cartaz):
-         João 14.6, desenhada aqui em SVG e CSS, nas cores do app (oliva da marca, sálvia e o
-         dourado das peças do jogo). O texto do versículo é o da Bíblia Livre. -->
-    <div class="lp-mural">
-      <figure class="lp-arte-joao" aria-label="Jesus é o caminho, a verdade e a vida. João 14.6">
-        <div class="aj-ref" aria-hidden="true"><span>João 14.6</span><i></i><span>João 14.6</span></div>
-        <span class="aj-jesus" aria-hidden="true">Jesus</span>
-        <svg class="aj-cena" viewBox="0 0 360 220" aria-hidden="true">
-          <defs>
-            <clipPath id="aj-ceu"><rect width="360" height="120"/></clipPath>
-            <pattern id="aj-hachura" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 5h6" stroke="#2e3820" stroke-width="1"/></pattern>
-          </defs>
-          <rect width="360" height="120" fill="url(#aj-hachura)"/>
-          <g clip-path="url(#aj-ceu)">
-            <circle cx="232" cy="96" r="60" fill="none" stroke="#ffc44d" stroke-width="1" opacity=".35"/>
-            <circle cx="232" cy="96" r="48" fill="#ffc44d"/>
-            <path d="M184 92h96M184 99h96M184 106h96M184 113h96" stroke="#232b17" stroke-width="3.2"/>
-          </g>
-          <g fill="#3a4627"><rect x="40" y="40" width="46" height="9" rx="4.5"/><rect x="58" y="34" width="26" height="9" rx="4.5"/><rect x="290" y="52" width="40" height="8" rx="4"/><rect x="302" y="46" width="20" height="8" rx="4"/></g>
-          <path d="M150 56l5 3 5-3M168 46l4 2 4-2M136 64l3 2 3-2" fill="none" stroke="#c8da8c" stroke-width="1.4" stroke-linecap="round"/>
-          <path d="M0 118l40-22 26 12 38-26 34 22 30-14 26 16h20l30-20 40 24 34-12 42 20v20H0z" fill="#34401f"/>
-          <path d="M104 82v-12M99 75h10" stroke="#c8da8c" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M0 126c44-16 92-14 140-4s86 10 128 2 66-10 92-6v102H0z" fill="#46551f"/>
-          <path d="M10 132c40-10 84-10 124-2M190 132c34 4 70 2 104-6M30 142c44-6 92-4 132 4" fill="none" stroke="#5a6b2a" stroke-width="1.3" stroke-linecap="round"/>
-          <path d="M0 150c56-18 116-12 166 0s104 12 194-8v78H0z" fill="#5a6b2a"/>
-          <path d="M14 158c44-12 96-10 140 0M196 160c46 4 96-2 150-14M40 170c50-6 100-2 150 6M220 174c40 0 84-6 124-16" fill="none" stroke="#6f8233" stroke-width="1.4" stroke-linecap="round"/>
-          <path d="M0 184c70-16 140 4 210 2s110-12 150-10v44H0z" fill="#3a4a1c"/>
-          <path d="M70 220c40-16 104-26 94-40s-32-20 16-30c20-4 26-10 28-16l4 0c0 7-4 12-20 18-38 10 2 18 16 30 22 18-20 26-40 38z" fill="#e4eec4"/>
-          <path d="M70 220c40-16 104-26 94-40s-32-20 16-30c20-4 26-10 28-16" fill="none" stroke="#c8da8c" stroke-width="1.2"/>
-          <path d="M119 220C149 206 202 197 186 181C174 168 143 161 186 151C204 146 209 140.5 210 134" fill="none" stroke="#5a6b2a" stroke-width="1.8" stroke-dasharray="5 6" stroke-linecap="round"/>
-          <g stroke="#232b17" stroke-linecap="round"><path d="M226 186v-10" stroke-width="2.4"/><path d="M240 180v-8" stroke-width="2"/><path d="M252 175v-6" stroke-width="1.7"/><path d="M262 171v-5" stroke-width="1.4"/><path d="M226 180l14-5 12-4 10-3" stroke-width="1" fill="none"/></g>
-          <path d="M306 168v-26" stroke="#1a2010" stroke-width="4.5" stroke-linecap="round"/>
-          <circle cx="306" cy="132" r="15" fill="#2b3618"/><circle cx="294" cy="140" r="10" fill="#2b3618"/><circle cx="318" cy="141" r="10" fill="#2b3618"/>
-          <circle cx="301" cy="128" r="6" fill="#46551f"/>
-          <path d="M48 140v-8M44 135h8" stroke="#2b3618" stroke-width="2" stroke-linecap="round"/><circle cx="48" cy="130" r="5" fill="#2b3618"/><circle cx="62" cy="134" r="4" fill="#2b3618"/>
-          <path d="M20 206l3-8 3 8M34 212l2-7 2 7M300 204l3-8 3 8M318 210l2-7 2 7M278 214l3-8 3 8" fill="none" stroke="#6f8233" stroke-width="1.4" stroke-linecap="round"/>
-          <g fill="#ff7a3d"><circle cx="26" cy="196" r="1.8"/><circle cx="292" cy="198" r="1.8"/><circle cx="330" cy="204" r="1.8"/></g>
-        </svg>
-        <span class="aj-caminho" aria-hidden="true">É o caminho, a</span>
-        <span class="aj-verdade" aria-hidden="true">Verdade</span>
-        <span class="aj-vida" aria-hidden="true">e a vida</span>
-        <figcaption class="aj-texto">Jesus lhe disse: Eu sou o caminho, e a verdade, e a vida. Ninguém vem ao Pai, a não ser por mim. <b>João 14.6 · Bíblia Livre</b></figcaption>
+    <!-- 3. João 14.6, sobre a foto da cruz. O texto do versículo é o da Bíblia Livre. -->
+    <div class="lp-joao">
+      <figure class="lp-joao-arte" aria-label="Jesus é o caminho, a verdade e a vida. João 14.6">
+        <div class="lp-joao-foto"><img src="/*LANDING:cruz*/" width="1089" height="456" loading="lazy" alt=""></div>
+        <div class="lp-joao-texto">
+          <span class="lp-joao-ref" aria-hidden="true">João 14.6</span>
+          <span class="lp-joao-jesus" aria-hidden="true">Jesus</span>
+          <span class="lp-joao-meio" aria-hidden="true">é o caminho,<br>a verdade</span>
+          <span class="lp-joao-vida lp-risco" aria-hidden="true">e a vida.</span>
+          <figcaption class="lp-joao-versiculo">Jesus lhe disse: Eu sou o caminho, e a verdade, e a vida. Ninguém vem ao Pai, a não ser por mim. <b>João 14.6 · Bíblia Livre</b></figcaption>
+        </div>
       </figure>
-    </div>
-    <svg class="lp-onda lp-onda-baixo" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64C180 10 340 0 520 40s320 84 520 52S1300 8 1440 30V120H0z"/></svg>
-
-    <!-- Como funciona: três promessas curtas, cada uma com uma peça do jogo do app. -->
-    <div class="lp-como">
-      <div class="lp-passo">
-        <svg class="lp-arte" viewBox="0 0 96 72" aria-hidden="true"><path d="M48 14C38 6 22 4 6 6v56c16-2 32 0 42 8 10-8 26-10 42-8V6C74 4 58 6 48 14z" fill="#5a6b2a"/><path d="M48 16C39 9 25 8 11 10v46c14-1 27 1 37 7z" fill="#fffdf6"/><path d="M48 16c9-7 23-8 37-6v46c-14-1-27 1-37 7z" fill="#f4efe1"/><path d="M19 22h20M19 30h22M19 38h18M57 22h20M57 30h18M57 38h20" stroke="#c8bfa6" stroke-width="3" stroke-linecap="round"/><path d="M70 6v20l5-4 5 4V6" fill="#e2463b"/></svg>
-        <div><h2>15 minutos por dia.</h2><p>Uma leitura curta, com uma reflexão feita para quem está começando. Em um ano, a Bíblia inteira.</p></div>
-      </div>
-      <div class="lp-passo">
-        <svg class="lp-arte" viewBox="0 0 64 80" aria-hidden="true"><path d="M32 78c17 0 28-11 28-27 0-12-6-21-14-30 1 8-3 13-8 14 2-13-5-25-16-33 2 14-4 21-11 29C5 38 4 45 4 51c0 16 11 27 28 27z" fill="#ff7a3d"/><path d="M32 76c-9 0-15-6-15-15 0-7 4-11 8-15 0 5 3 8 6 8-1-8 3-14 9-18-1 9 7 13 7 25 0 9-6 15-15 15z" fill="#ffc44d"/></svg>
-        <div><h2>Não deixe a chama apagar.</h2><p>Cada dia lido acende a ofensiva. Baús, troféus e conquistas marcam o caminho.</p></div>
-      </div>
-      <div class="lp-passo">
-        <span class="lp-arte lp-rostos" aria-hidden="true"><i>A</i><i>D</i><i>R</i><i>+</i></span>
-        <div><h2>Junto é melhor.</h2><p>Leia com amigos, com a sua célula ou com quem te discipula. Um toque lembra quem ainda não leu.</p></div>
-      </div>
+      <p class="lp-nota lp-nota-joao" aria-hidden="true">Ele transforma histórias reais todos os dias.</p>
     </div>
 
-    <!-- O fecho: o pôster grande e o convite. -->
+    <!-- 4. o app: duas telas de verdade (Início e Juntos, tema escuro, 390 de largura) -->
+    <div class="lp-app">
+      <div class="lp-app-texto">
+        <p class="lp-rotulo">App Geração Eleita</p>
+        <!-- Posicionamento (23/09/2026): o app do discipulado da juventude da igreja. -->
+        <h2 class="lp-app-titulo"><span>A Bíblia inteira</span> <span>em um ano,</span> <em class="lp-risco">com seus amigos.</em></h2>
+        <p class="lp-texto">Uma leitura por dia, de 10 a 20 minutos, com reflexões feitas para quem está começando. Leia com os amigos ou com a sua célula.</p>
+        <div class="lp-botoes lp-botoes-linha">
+          <button class="botao" data-ir="cadastro">Começar agora <svg class="lp-seta" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="botao contorno" data-ir="entrar">Já tenho conta</button>
+        </div>
+        <p class="lp-gratis">De graça, sem anúncios.</p>
+        <p class="lp-nota lp-nota-app" aria-hidden="true">Disciplina que aproxima. <svg viewBox="0 0 60 50"><path d="M4 46C14 30 30 16 52 8M40 4l13 4-6 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+      </div>
+      <div class="lp-celulares">
+        <div class="lp-celular"><img src="/*LANDING:app-inicio*/" width="540" height="1169" loading="lazy"
+          alt="Tela Início do app: saudação, a leitura de hoje, os dias de ofensiva e a trilha do plano com os dias lidos"></div>
+        <div class="lp-celular lp-celular-2"><img src="/*LANDING:app-juntos*/" width="540" height="1169" loading="lazy"
+          alt="Tela Juntos do app: os amigos que leem junto, o convite para ler junto e os propósitos de leitura e oração"></div>
+      </div>
+      <p class="lp-nota lp-nota-palavra" aria-hidden="true">Mesma Palavra. Novas histórias.</p>
+    </div>
+
+    <!-- 5. comunidade -->
+    <div class="lp-comunidade" id="lp-comunidade">
+      <div class="lp-comunidade-foto"><img src="/*LANDING:comunidade*/" width="500" height="469" loading="lazy"
+        alt="Jovens sentados em roda, cada um com a sua Bíblia aberta, lendo juntos"></div>
+      <div class="lp-comunidade-texto">
+        <p class="lp-rotulo">Comunidade</p>
+        <h2 class="lp-comunidade-titulo">Ninguém precisa <em class="lp-risco">ler sozinho.</em></h2>
+        <ul class="lp-comunidade-lista">
+          <li><b>Célula.</b> O grupo lê o mesmo plano e combina o próximo encontro.</li>
+          <li><b>Discipulado.</b> Quem te acompanha vê como você está caminhando, nunca o que você escreve.</li>
+          <li><b>Amigos.</b> Leiam no mesmo dia e a contagem de vocês sobe junto.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 6. o chamado final -->
     <div class="lp-final">
-      <figure class="poster po-volte" aria-label="Deus não espera que você volte perfeito. Ele só quer que você volte.">
-        <span class="v1">Deus</span><span class="v2">não espera</span><span class="v2">que você</span><span class="v1">volte</span><span class="v3">perfeito,</span><span class="v2">ele só quer que</span><span class="v2">você</span><span class="v1">volte.</span>
-      </figure>
+      <div class="lp-final-foto"><img src="/*LANDING:culto*/" width="577" height="469" loading="lazy"
+        alt="Jovens num culto, de mãos levantadas; um deles veste a camiseta Geração que busca"></div>
+      <p class="lp-volte" aria-label="Deus não espera que você volte perfeito, ele só quer que você volte.">
+        <span class="lp-volte-a" aria-hidden="true">Deus não espera que você</span>
+        <span class="lp-volte-b" aria-hidden="true">volte perfeito,</span>
+        <span class="lp-volte-c" aria-hidden="true">ele só quer que você</span>
+        <span class="lp-volte-d lp-risco" aria-hidden="true">volte.</span>
+      </p>
       <div class="lp-convite">
         <h2>Comece hoje. O primeiro dia leva 15 minutos.</h2>
-        <button class="botao" data-ir="cadastro">Começar agora</button>
+        <button class="botao" data-ir="cadastro">Começar agora <svg class="lp-seta" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <p class="lp-gratis">De graça, sem anúncios.</p>
       </div>
+      <p class="lp-papel" aria-hidden="true"><span>Uma geração</span> <span>para a sua</span> <span>glória.</span> <svg viewBox="0 0 120 84"><path d="M10 74 6 22l26 26L58 6l22 40 30-22-6 50z" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
     </div>
 
-    <div class="links"><a href="termos.html">Termos de Uso</a> · <a href="privacidade.html">Privacidade</a></div>
+    <!-- 7. rodapé -->
+    <footer class="lp-rodape">
+      <div class="lp-marca"><span class="mascote">/*SIMBOLO*/</span><span class="marca">Geração <em>Eleita</em></span></div>
+      <nav class="lp-rodape-nav" aria-label="Rodapé">
+        <a href="#lp-inicio">Início</a>
+        <a href="#lp-como">Como funciona</a>
+        <a href="#lp-comunidade">Comunidade</a>
+      </nav>
+      <div class="links"><a href="termos.html">Termos de Uso</a> · <a href="privacidade.html">Privacidade</a></div>
+      <p class="lp-gratis">De graça, sem anúncios.</p>
+    </footer>
   </section>
 
   <!-- entrar -->
@@ -514,6 +787,25 @@
   }
   document.querySelectorAll('[data-ir]').forEach(function (b) {
     b.addEventListener('click', function () { mostrarTela(b.dataset.ir); });
+  });
+  // As âncoras da página de boas-vindas rolam até a seção sem pôr nada no endereço: o hash é
+  // do app (abrirApp leva location.hash junto), e "#lp-como" viraria uma rota desconhecida.
+  document.querySelectorAll('.lp a[href^="#lp-"]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var alvo = $(a.getAttribute('href').slice(1));
+      if (!alvo) return;
+      ev.preventDefault();
+      var suave = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+      if (alvo.id === 'lp-inicio') window.scrollTo({ top: 0, behavior: suave ? 'smooth' : 'auto' });
+      else alvo.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
+    });
+  });
+  // Sem rede (a página aberta do cache), as fotos não vêm: some o quadro da imagem quebrada e
+  // fica o fundo escuro, com o texto legível por cima.
+  document.querySelectorAll('.lp img').forEach(function (img) {
+    var falhou = function () { img.classList.add('lp-sem-foto'); };
+    if (img.complete && img.src && !img.naturalWidth) falhou();
+    else img.addEventListener('error', falhou);
   });
   document.querySelectorAll('[data-mostrar]').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -773,6 +1065,7 @@
         $('titulo-boas').textContent = d.nome + ' te chamou para ler a Bíblia junto!';
         $('dica-boas').textContent = 'Uma lição por dia, e a contagem de vocês sobe nos dias em que os dois leem.';
       }
+      $('tela-boas').classList.add('lp-convidado');
       $('convite-cadastro').hidden = false;
       $('convite-cadastro').textContent = 'Convite de ' + d.nome + ' (@' + d.usuario + ')';
     }).catch(function () {});
@@ -783,6 +1076,7 @@
       if (!d) return;
       var nomeCelula = /^c[ée]lula(\s|$)/i.test(d.titulo) ? d.titulo : 'célula ' + d.titulo;
       $('titulo-boas').textContent = d.nome + ' te chamou para a ' + nomeCelula + '!';
+      $('tela-boas').classList.add('lp-convidado');
       $('dica-boas').textContent = d.vagas > 0
         ? 'A Bíblia inteira em um ano, lendo junto com o grupo. Crie sua conta e você já entra na célula.'
         : 'Essa célula já está cheia, mas você pode criar sua conta e ler o plano do mesmo jeito.';
