@@ -286,7 +286,10 @@
   .lp-celular { position: relative; padding: 7px; border-radius: 34px; background: #1c1d1a;
     box-shadow: inset 0 0 0 1.5px #3b3d36, inset 0 0 0 4px #0b0c0a, 0 24px 50px rgba(0, 0, 0, .55); transform: rotate(-2deg); }
   .lp-celular::before { content: ""; position: absolute; z-index: 1; top: 13px; left: 50%; width: 30%; height: 12px; border-radius: 999px; background: #0b0c0a; transform: translateX(-50%); }
-  .lp-celular img { width: 100%; height: auto; aspect-ratio: 540 / 1169; border-radius: 27px; background: #1b1c1a; }
+  /* a faixa do alto (a cor do topo do app) abre espaço para a ilha: sem ela, a ilha cobria o "Olá".
+     1218 = 1169 da captura + os 9% da faixa (49 px a 540 de largura): a tela cabe inteira */
+  .lp-celular img { box-sizing: border-box; width: 100%; height: auto; aspect-ratio: 540 / 1218; padding-top: 9%; border-radius: 27px;
+    background: #2d302d; object-fit: cover; object-position: top; }
   .lp-celular-2 { margin-top: 44px; transform: rotate(3deg); }
   .lp-nota-palavra { display: none; }
 
@@ -352,9 +355,11 @@
     .lp-nav { display: flex; align-items: center; margin-left: auto; margin-right: 20px; }
     .lp-topo { padding-left: max(32px, calc(50% - var(--lp-largura) / 2 + 32px)); padding-right: max(32px, calc(50% - var(--lp-largura) / 2 + 32px)); }
 
-    .lp-hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, .9fr) minmax(0, .65fr); align-items: center; gap: 0; min-height: 600px; padding: 40px 32px 56px; }
+    .lp-hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, .9fr) minmax(0, .65fr); align-items: center; gap: 0; min-height: 560px; padding: 32px 32px 24px; }
     .lp-hero-texto { grid-column: 1; grid-row: 1; padding-right: 8px; }
-    .lp-hero-foto { position: relative; grid-column: 2 / 4; grid-row: 1; justify-self: start; width: 100%; max-width: 440px; margin-left: -6%; }
+    .lp-hero-foto { position: relative; grid-column: 2 / 4; grid-row: 1; justify-self: start; width: 100%; max-width: 440px; margin-left: -6%;
+      aspect-ratio: 565 / 800; }
+    .lp-hero-foto img { object-position: top; }
     /* a coroa fica fora da máscara: a máscara vai na foto e no grão, cada um */
     .lp-hero-foto { -webkit-mask-image: none; mask-image: none; }
     .lp-hero-foto img, .lp-hero-foto::after { -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 46%, #000 45%, transparent 100%);
