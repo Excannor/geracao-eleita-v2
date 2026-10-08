@@ -104,7 +104,9 @@ for (const [W, H] of [[360, 740], [390, 844]]) {
     await cmd('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 2, mobile: true });
     await av("try{localStorage.setItem('cc.tema'," + JSON.stringify(JSON.stringify(tema === 'escuro')) + ')}catch(e){}; 1');
     await cmd('Page.navigate', { url: base + '?r=' + Math.random() + '#/' });
-    await dormir(2200);
+    // espera a trilha aparecer (até 15 s): numa máquina lenta a abertura passa de 2 s
+    for (let i = 0; i < 75 && !(await av("!!document.querySelector('.trilha .nos')")); i++) await dormir(200);
+    await dormir(400);
     ok(await av("!!document.querySelector('.trilha .nos')"), W + ' ' + tema + ': a trilha abre');
     for (const caso of CASOS) {
       for (const todas of [false, true]) {
