@@ -378,7 +378,8 @@
     if (sistemaProvavel() === 'android') {
       let tentou = '1';
       try { tentou = sessionStorage.getItem('cc.tentouChrome') || ''; sessionStorage.setItem('cc.tentouChrome', '1'); } catch (e) { /* segue */ }
-      if (!tentou) { await irProChrome(); return; }
+      // Se o Chrome não abrir, a folha abaixo continua aqui com o botão e o Copiar o link.
+      if (!tentou) await irProChrome();
     }
     // Conta recém-criada não vê folha antes do texto bíblico: o tutorial do fim do primeiro dia
     // já abre em "Abra no Chrome/Safari" (abrirFora), e a faixa da entrada já avisou.

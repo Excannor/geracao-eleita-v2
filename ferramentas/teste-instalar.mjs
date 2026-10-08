@@ -402,7 +402,7 @@ for (const [nome, ua] of [['chrome-android', UA.chrome], ['samsung-internet', UA
 // Já com sessão, aberto por um link no navegador de dentro de outro app.
 {
   const r = await naEntrada('app-webview-logado', UA.webview, { cookie: cracha, rota: '/' });
-  ok(r.saltos.length === 1 && /^intent:\/\/127\.0\.0\.1:\d+\/#Intent;/.test(r.saltos[0]), 'app com sessão no WebView: tenta abrir no Chrome, uma vez');
+  ok(r.saltos.length === 1 && /^intent:\/\/127\.0\.0\.1:\d+\/\?passagem=[\w-]{24,}#Intent;/.test(r.saltos[0]), 'app com sessão no WebView: tenta abrir no Chrome, uma vez, levando a passagem da sessão');
   ok(/Abra no Chrome/.test(r.folha) && /^intent:\/\//.test(r.folhaHref) && /Copiar o link/.test(r.folha), 'app com sessão no WebView: a folha "Abra no Chrome" com o botão e Copiar o link');
   ok(!r.repetiu && !/Abra no Chrome/.test(r.depois.folha), 'app com sessão no WebView: recarregar não repete o salto nem a folha');
 }
