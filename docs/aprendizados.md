@@ -607,6 +607,16 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
 - 2026-10-02 · sessão · Passo de teste que "abre de novo" com `Page.navigate` para o mesmo
   endereço mudando só o hash não recarrega a página (é navegação no mesmo documento) → para
   reabrir, `Page.reload` ou outro caminho.
+- 2026-10-08 · entrada · No Android, "criei a conta e ele fica voltando pra tela inicial". A
+  mesma armadilha do item acima, no app: sem sessão, o servidor entrega a entrada no próprio
+  endereço do app; chegando por um link com âncora (`/#/`, o `/#/mapa/x` do "Compartilhar
+  mapa", aba reaberta depois de limpar os dados do site), o `location.replace('./' + hash)` do
+  fim do cadastro e do "Entrar" era o mesmo endereço e só rolava até a âncora. Conta criada,
+  cookie gravado, e a pessoa parada na entrada; ao tentar de novo, mesma coisa → abrir o app é
+  sempre carregar página nova: endereço igual (fora a âncora) vira `location.reload()`
+  (`abrirApp` em `entrar.html`). Cookies, túnel e service worker estavam certos. Prova:
+  `ferramentas/teste-android-entrada.mjs` (Android, instalado, atrás do túnel, recarregar e
+  reabrir).
 - 2026-10-02 · entrada · A barra presa no alto da página inicial tremia ao rolar no celular. Não
   havia ouvinte de rolagem; o que mexia com ela vinha de fora: `min-height: 100dvh` na página
   (muda enquanto a barra de endereço some e volta, e refaz o layout com a barra presa), oito

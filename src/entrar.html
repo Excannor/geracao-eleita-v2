@@ -472,9 +472,19 @@
   // a página fica, mesmo com sessão.
   var veioDoApp = false;
   try { veioDoApp = sessionStorage.getItem('cc.semMarca') === '1'; sessionStorage.removeItem('cc.semMarca'); } catch (e) { /* segue */ }
+  // Abrir o app é sempre carregar uma página nova. Sem sessão, o servidor entrega esta página no
+  // próprio endereço do app (/, /#/, /#/mapa/genesis do link compartilhado, /?convite=...): ali,
+  // './' + hash é o mesmo endereço com âncora, e location.replace só rola até a âncora, sem
+  // carregar nada. A conta era criada, o cookie gravado, e a pessoa ficava no cadastro com o
+  // botão parado; voltava e tentava de novo, e de novo ficava na entrada (Android, 08/10).
+  function abrirApp() {
+    var alvo = new URL('./' + location.search + location.hash, location.href).href;
+    if (alvo.split('#')[0] === location.href.split('#')[0]) location.reload();
+    else location.replace(alvo);
+  }
   if (veioDoApp && /(?:^|;\s*)cc_logado=1/.test(document.cookie) && !params.get('redefinir')) {
     document.documentElement.style.visibility = 'hidden';
-    location.replace('./' + location.search + location.hash);
+    abrirApp();
     return;
   }
   var convite = params.get('convite');
@@ -596,7 +606,7 @@
         if (bruto && (!usuario || dono !== usuario)) localStorage.removeItem(chave);
       });
     } catch (e) { /* segue */ }
-    location.replace('./' + location.search + location.hash);
+    abrirApp();
   }
 
   $('form-cadastro').addEventListener('submit', function (ev) {

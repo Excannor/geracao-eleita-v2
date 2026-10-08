@@ -11,16 +11,28 @@ import { createServer } from 'node:net';
 import { execFileSync } from 'node:child_process';
 
 // Uma porta que ninguém está usando agora: o sistema escolhe (porta 0) e ela é devolvida.
-export function portaLivre() {
-  return new Promise((resolver, rejeitar) => {
-    const s = createServer();
-    s.unref();
-    s.on('error', rejeitar);
-    s.listen(0, '127.0.0.1', () => {
-      const { port } = s.address();
-      s.close(() => resolver(port));
-    });
+// Com PORTAS=8731-8739 (máquina com portas reservadas), a escolha fica dentro da faixa: a
+// primeira livre que esta rodada ainda não entregou (esgotadas, a primeira livre de novo).
+const entregues = new Set();
+const tentar = (porta) => new Promise((resolver, rejeitar) => {
+  const s = createServer();
+  s.unref();
+  s.on('error', rejeitar);
+  s.listen(porta, '127.0.0.1', () => {
+    const { port } = s.address();
+    s.close(() => resolver(port));
   });
+});
+export async function portaLivre() {
+  const faixa = /^(\d+)-(\d+)$/.exec(process.env.PORTAS || '');
+  if (!faixa) return tentar(0);
+  const faixaToda = [];
+  for (let p = Number(faixa[1]); p <= Number(faixa[2]); p++) faixaToda.push(p);
+  // Primeiro as que esta rodada não entregou; esgotadas, qualquer uma que esteja livre agora.
+  for (const p of faixaToda.filter((x) => !entregues.has(x)).concat(faixaToda.filter((x) => entregues.has(x)))) {
+    try { await tentar(p); entregues.add(p); return p; } catch { /* ocupada */ }
+  }
+  throw new Error('nenhuma porta livre na faixa PORTAS=' + process.env.PORTAS);
 }
 
 // Fecha o processo e todos os filhos. No Windows, taskkill /T; nos outros, o kill comum.

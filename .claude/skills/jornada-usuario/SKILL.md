@@ -267,6 +267,12 @@ contar o toque mais brando nas interrupções, para os números continuarem comp
   crachá derrubado (marca ainda lá) cai no 401 e o servidor limpa os dois.
 - Mexeu em entrada, sessão, service worker ou páginas avulsas: rode
   `CHROME=... node ferramentas/teste-fluxo-entrada.mjs` (um perfil só, como o celular, com espião
-  de quadros: conta se algum quadro do app foi pintado sem sessão).
+  de quadros: conta se algum quadro do app foi pintado sem sessão) e
+  `ferramentas/teste-android-entrada.mjs` (criar conta e entrar chegando por `/`, `/#/` e link
+  com âncora, instalado e atrás do túnel: o app abre e fica 10 s, recarregado e reaberto).
+- **Abrir o app depois de entrar é sempre carregar página nova** (08/10). Sem sessão, o servidor
+  entrega a entrada no endereço do próprio app; dali, `location.replace('./#/x')` é o mesmo
+  endereço com âncora e não carrega nada (a pessoa fica na entrada com a conta já criada). Use
+  `abrirApp()` da `entrar.html`, que troca o mesmo endereço por `location.reload()`.
 - Evento simulado de volta do segundo plano: `new Event('visibilitychange', { bubbles: true })`
   (o app ouve na `window`); sem `bubbles`, nada acontece e o teste mente.
