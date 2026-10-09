@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "nota": "O que a pessoa vê ANTES de ler, dia a dia no plano anual (o arquivo nasceu com os 31 dias da Unidade 1 e cresce unidade por unidade): o mapa da história (as paradas), o contexto do dia em duas a cinco frases, uma coisa para procurar enquanto lê, o gancho do dia seguinte e os guias dos trechos de lista. Fatos de autoria e data vêm das fichas dos livros (03 - Livros da Bíblia) em conteudo.json; toda citação é da NBV da leitura do dia (o gancho, da leitura do dia seguinte). Regras: ferramentas/reflexoes/CLAUDE.md e .claude/skills/mapa-do-livro/voz.md. Conferido por ferramentas/checar-contexto.mjs, que o teste.mjs roda.",
+  "nota": "O que a pessoa vê ANTES de ler, dia a dia no plano anual (o arquivo nasceu com os 31 dias da Unidade 1 e hoje cobre os 365 dias): o mapa da história (as paradas), o contexto do dia em duas a cinco frases, uma coisa para procurar enquanto lê, o gancho do dia seguinte e os guias dos trechos de lista. Fatos de autoria e data vêm das fichas dos livros (03 - Livros da Bíblia) em conteudo.json; toda citação é da NBV da leitura do dia (o gancho, da leitura do dia seguinte). Regras: ferramentas/reflexoes/CLAUDE.md e .claude/skills/mapa-do-livro/voz.md. Conferido por ferramentas/checar-contexto.mjs, que o teste.mjs roda.",
   "paradas": [
     {
       "id": "criacao",
@@ -2386,6 +2386,222 @@
       "contexto": "Em Ezequiel 47, uma corrente de água sai de debaixo do templo e vira um rio que leva vida até o mar Morto. Depois Deus manda repartir a terra entre as tribos e dar parte dela aos estrangeiros que vivem com o povo. No 48 está a lista das tribos, e no último versículo está o nome da cidade. Judas é uma carta de um capítulo só. Judas se apresenta como irmão de Tiago e avisa sobre homens que entraram na igreja sem ser notados. É o último dia da Unidade 11.",
       "procure": "o que acontece onde o rio passa (Ezequiel 47.9). Em Judas 1.24-25, veja o que Judas diz de quem guarda a gente de cair.",
       "amanha": "A Unidade 12 começa. Três amigos de Daniel não se curvam diante de uma estátua de ouro, e começa o Apocalipse."
+    },
+    "335": {
+      "titulo": "Não se curvar",
+      "sub": "Daniel e os amigos ficam fiéis na Babilônia, e João começa o Apocalipse.",
+      "contexto": "Hoje começa a Unidade 12, a última. Em Daniel 1, Daniel e três amigos são levados para servir no palácio da Babilônia e recebem nomes novos. No 2, Daniel conta ao rei o sonho dele e o que o sonho quer dizer. No 3, Sadraque, Mesaque e Abede-Nego não se curvam diante da estátua de ouro e são jogados na fornalha. Hoje também começa o Apocalipse. João está na ilha de Patmos e vê Jesus numa visão. O livro é cheio de imagens, e não é preciso decifrar cada uma para seguir a leitura.",
+      "procure": "quantos homens o rei vê andando no fogo (Daniel 3.25). Em Apocalipse 1.17-18, veja o que Jesus diz a João quando ele cai como morto.",
+      "amanha": "Nabucodonosor perde o juízo e depois olha para o céu, e uma mão escreve na parede de um palácio. A leitura é só de Daniel."
+    },
+    "336": {
+      "titulo": "Uma mão na parede",
+      "sub": "Nabucodonosor aprende a olhar para o céu, e Belsazar vê uma mão escrevendo.",
+      "contexto": "Em Daniel 4, o rei Nabucodonosor conta numa mensagem a todos os povos o que aconteceu com ele. Ele sonhou com uma árvore cortada, e Daniel disse que a árvore era o rei. Por causa do orgulho, ele passa sete anos vivendo como os animais do campo, até olhar para o céu e louvar a Deus. No 5, o rei Belsazar faz uma festa e bebe nas taças que vieram do templo de Jerusalém. Uma mão escreve na parede, e Daniel lê a mensagem. A leitura de hoje é só de Daniel.",
+      "procure": "o que Nabucodonosor faz no fim dos sete anos (Daniel 4.34). Em Daniel 5.27, veja o que quer dizer a palavra TEQUEL.",
+      "amanha": "Daniel ora com as janelas abertas e vai para a cova dos leões, e Jesus manda cartas às igrejas."
+    },
+    "337": {
+      "titulo": "As janelas abertas",
+      "sub": "Daniel continua orando apesar da lei, e Jesus manda cartas às igrejas.",
+      "contexto": "Em Daniel 6, os ministros convencem o rei Dario a proibir pedidos a qualquer deus durante trinta dias. Daniel continua orando três vezes por dia e é jogado na cova dos leões. Deus manda um anjo fechar a boca dos leões. Nos capítulos 7 e 8, Daniel tem visões de animais que representam reis e vê alguém semelhante a um filho do homem receber um reino que não acaba. Em Apocalipse 2, Jesus manda cartas às igrejas de Éfeso, Esmirna, Pérgamo e Tiatira.",
+      "procure": "para onde ficavam as janelas do quarto de Daniel (Daniel 6.10). Em Apocalipse 2.4, veja o que Jesus tem contra a igreja de Éfeso.",
+      "amanha": "Daniel lê Jeremias e ora pelo povo, e Jesus diz que está à porta, batendo."
+    },
+    "338": {
+      "titulo": "Por causa da misericórdia",
+      "sub": "Daniel ora pelo povo, e Jesus fala às últimas três igrejas.",
+      "contexto": "Em Daniel 9, Daniel lê o que o Senhor disse a Jeremias sobre os setenta anos de exílio, lido no dia 304. Ele começa a orar e jejuar e confessa os pecados do povo como se fossem dele também. No 10, no reinado de Ciro, um mensageiro vem até Daniel e diz que a oração dele foi ouvida no primeiro dia. Em Apocalipse 3, Jesus manda cartas às igrejas de Sardes, Filadélfia e Laodiceia.",
+      "procure": "por que Daniel diz que está pedindo (Daniel 9.18). Em Apocalipse 3.20, veja o que Jesus faz à porta.",
+      "amanha": "Daniel ouve uma longa história de reis e termina o livro, e Oseias começa."
+    },
+    "339": {
+      "titulo": "Até o fim",
+      "sub": "Daniel termina com uma promessa, e Oseias começa.",
+      "contexto": "Daniel 11 é uma longa história de guerras entre o rei do norte e o rei do sul. No meio dela, o mensageiro diz que quem conhece o seu Deus vai resistir com firmeza. No 12, Daniel não entende tudo, e o mensageiro manda ele seguir a vida até o fim. Hoje começa Oseias. Oseias falou ao povo de Israel no reino do norte, antes de ele cair nas mãos da Assíria. Deus manda Oseias casar com uma mulher infiel, e os filhos recebem nomes que são mensagens ao povo.",
+      "procure": "o que as pessoas que conhecem o seu Deus vão fazer (Daniel 11.32). Em Oseias 1.10, veja como Deus vai chamar o povo no futuro.",
+      "amanha": "Deus fala de levar o povo ao deserto e de uma porta de esperança, e João vê uma porta aberta no céu."
+    },
+    "340": {
+      "titulo": "Uma porta de esperança",
+      "sub": "Oseias compara Israel a uma esposa infiel, e João vê o trono no céu.",
+      "contexto": "Em Oseias 2, o Senhor compara Israel a uma esposa que corre atrás de outros e esquece quem dava tudo a ela. Depois do castigo, ele promete levar o povo ao deserto e falar do seu amor. No 3, o Senhor manda Oseias buscar a mulher dele e voltar com ela para casa, como sinal de que ainda ama Israel. Em Apocalipse 4, João vê uma porta aberta no céu e um trono cercado de seres que louvam a Deus dia e noite. É um dia curto, uns 6 minutos.",
+      "procure": "em que o Senhor vai transformar o vale da desgraça (Oseias 2.15). Em Apocalipse 4.8, veja o que os seres viventes dizem dia e noite.",
+      "amanha": "Deus diz que quer amor, e não sacrifícios, e um Cordeiro recebe o livro com sete selos."
+    },
+    "341": {
+      "titulo": "Quero o seu amor",
+      "sub": "Oseias acusa os sacerdotes, e o Cordeiro recebe o livro.",
+      "contexto": "Em Oseias 4 e 5, o Senhor diz que não há fidelidade, nem amor, nem conhecimento de Deus na terra, e põe a culpa nos sacerdotes e nos líderes. No 6, o povo fala em voltar ao Senhor, e ele responde que o amor deles some como o orvalho. Em Apocalipse 5, ninguém consegue abrir um livro fechado com sete selos, e João chora muito. Então aparece um Cordeiro que parece ter sido oferecido em sacrifício, e o céu canta um cântico novo.",
+      "procure": "o que o Senhor quer em vez de sacrifícios (Oseias 6.6). Em Apocalipse 5.9, veja quem o Cordeiro comprou para Deus.",
+      "amanha": "Israel é como uma pomba tola, e o Cordeiro começa a quebrar os selos."
+    },
+    "342": {
+      "titulo": "Semear vento",
+      "sub": "Oseias fala de um povo que pede ajuda a todos, menos a Deus, e os selos são quebrados.",
+      "contexto": "Em Oseias 7, Israel é como uma pomba tola que pede ajuda ao Egito e voa para a Assíria. O povo geme de medo e não ora de coração. No 8, Deus diz que os israelitas semeiam vento e colhem tempestade. Em Apocalipse 6, o Cordeiro quebra os selos um por um. João vê quatro cavaleiros e, debaixo do altar, as almas dos que morreram por pregar a palavra de Deus. São imagens da visão, para ler sem pressa de decifrar.",
+      "procure": "com que ave Israel é comparado (Oseias 7.11). Em Apocalipse 6.10, veja o que as almas perguntam ao Senhor.",
+      "amanha": "Deus lembra que ensinou Israel a andar como uma criança. A leitura é só de Oseias."
+    },
+    "343": {
+      "titulo": "Ensinei você a andar",
+      "sub": "Oseias fala do castigo e do amor de Deus por Israel desde criança.",
+      "contexto": "Em Oseias 9 e 10, o Senhor fala do castigo que vem por causa dos ídolos. Quanto mais Israel ficava rico, mais altares construía para os ídolos. No 10, Deus chama o povo a plantar justiça e passar arado no coração duro. No 11, ele lembra que amou Israel como um filho e chamou o filho do Egito. Ele diz que não é capaz de abandonar Israel. A leitura de hoje é só de Oseias.",
+      "procure": "de onde Deus chamou o filho dele (Oseias 11.1). Em Oseias 11.8, veja o que Deus diz que nunca seria capaz de fazer.",
+      "amanha": "Oseias termina chamando Israel de volta, e João vê uma multidão que ninguém consegue contar."
+    },
+    "344": {
+      "titulo": "Volte para o Senhor",
+      "sub": "Oseias termina com um convite, e João vê uma multidão de todas as nações.",
+      "contexto": "Em Oseias 12 e 13, o Senhor lembra a história de Jacó e o tempo em que cuidou do povo no deserto. No 14, Oseias chama Israel a voltar para o Senhor e dá ao povo as palavras para pedir perdão. Deus promete curar a infidelidade do povo. Em Apocalipse 7, João vê uma multidão grande demais para ser contada, de todas as nações e línguas, diante do trono e do Cordeiro.",
+      "procure": "do que Deus promete curar Israel (Oseias 14.4). Em Apocalipse 7.17, veja o que Deus vai fazer com as lágrimas.",
+      "amanha": "Joel fala de uma praga de gafanhotos e chama o povo a rasgar o coração."
+    },
+    "345": {
+      "titulo": "Rasguem o coração",
+      "sub": "Joel fala de uma praga de gafanhotos, e o sétimo selo traz silêncio no céu.",
+      "contexto": "Hoje começa Joel. Uma praga de gafanhotos comeu as plantações, um tipo de gafanhoto atrás do outro. Joel usa esse desastre para chamar o povo a voltar para Deus. No capítulo 2, o Senhor promete devolver as colheitas que os gafanhotos comeram e derramar o seu Espírito sobre todos os povos. Em Apocalipse 8, o Cordeiro quebra o sétimo selo, e há silêncio no céu durante cerca de meia hora.",
+      "procure": "o que o povo deve rasgar além da roupa (Joel 2.13). Em Apocalipse 8.4, veja o que sobe para Deus junto com o incenso.",
+      "amanha": "Joel termina, e o pastor Amós fala contra os povos vizinhos e contra Israel."
+    },
+    "346": {
+      "titulo": "Por um par de sandálias",
+      "sub": "Joel termina, e Amós começa a falar contra os povos e contra Israel.",
+      "contexto": "Em Joel 3, o Senhor reúne as nações para o julgamento e promete que Judá vai prosperar para sempre. Hoje começa Amós. Amós era um pastor de Tecoa, em Judá, e Deus mandou ele falar ao reino do norte, num tempo de riqueza. Em Amós 1 e 2, o Senhor fala contra Damasco, Gaza, Tiro, Edom, Amom e Moabe. Depois fala contra Judá e, por último, contra Israel, que vendia o pobre por um par de sandálias.",
+      "procure": "pelo que Israel vende o pobre (Amós 2.6). Em Joel 3.10, veja o que as nações devem fazer com os arados.",
+      "amanha": "Amós fala com as mulheres ricas de Samaria, e o quinto anjo toca a trombeta."
+    },
+    "347": {
+      "titulo": "Duas pessoas caminhando juntas",
+      "sub": "Amós avisa Israel, e João vê as pragas das trombetas.",
+      "contexto": "Em Amós 3, o Senhor pergunta como duas pessoas podem caminhar juntas se não estão de acordo. Ele diz que revela os planos dele aos profetas antes do castigo. No 4, Amós fala com as mulheres ricas de Samaria, que maltratam os pobres. O Senhor lembra a fome, a seca e as pragas que mandou, e o povo não voltou para ele. Em Apocalipse 9, o quinto e o sexto anjos tocam a trombeta, e os que ficam vivos não se arrependem.",
+      "procure": "a pergunta sobre duas pessoas (Amós 3.3). Em Apocalipse 9.20, veja o que os homens que ficaram vivos não quiseram deixar.",
+      "amanha": "Amós pede justiça correndo como um rio, e João come um livrinho doce e amargo."
+    },
+    "348": {
+      "titulo": "Justiça como um rio",
+      "sub": "Amós fala de festas sem justiça, e João come um livrinho.",
+      "contexto": "Em Amós 5, o Senhor chama Israel a buscar ele para viver. O povo fazia festas e cantava, e nos tribunais negava justiça ao pobre. No 6, Amós fala contra os ricos que vivem no luxo e não ligam para os irmãos que precisam de ajuda. No 7, o sacerdote Amazias manda Amós ir embora para Judá. Amós responde que não nasceu em família de profetas e que o Senhor tirou ele de junto dos rebanhos. Em Apocalipse 10, João come um livrinho doce na boca e amargo no estômago.",
+      "procure": "o que o Senhor quer ver correndo como um rio (Amós 5.24). Em Amós 7.15, veja de onde o Senhor tirou Amós.",
+      "amanha": "Amós vê um cesto de frutas maduras e fala de uma fome de ouvir a Palavra do Senhor."
+    },
+    "349": {
+      "titulo": "Fome de ouvir",
+      "sub": "Amós termina com a promessa da volta, e o sétimo anjo toca a trombeta.",
+      "contexto": "Em Amós 8, o Senhor mostra um cesto de frutas maduras, porque Israel está maduro para o castigo. Os comerciantes usam balanças falsas e compram o pobre com uma moeda de prata. O Senhor avisa que vai mandar fome de ouvir a Palavra do Senhor. No fim do capítulo 9, ele promete mudar a sorte do povo e trazer Israel de volta à terra. Em Apocalipse 11, o sétimo anjo toca a trombeta, e vozes no céu dizem que o reino deste mundo agora é do Senhor.",
+      "procure": "de que tipo de fome o Senhor fala (Amós 8.11). Em Amós 9.14, veja o que o povo vai fazer nas cidades destruídas.",
+      "amanha": "Obadias fala contra Edom, e Jonas foge do Senhor num navio. A leitura é só do Antigo Testamento."
+    },
+    "350": {
+      "titulo": "Fugir para Társis",
+      "sub": "Obadias fala contra Edom, e Jonas foge do Senhor.",
+      "contexto": "Obadias é o menor livro do Antigo Testamento. Ele fala contra Edom, que zombou de Judá no dia da desgraça. Hoje começa Jonas. O Senhor manda Jonas falar contra Nínive, a grande cidade, e Jonas pega um navio para Társis, para se esconder do Senhor. No meio de uma tempestade, os marinheiros jogam Jonas no mar, e um grande peixe engole ele. No capítulo 2, Jonas ora de dentro do peixe.",
+      "procure": "para onde Jonas compra a passagem (Jonas 1.3). Em Jonas 2.9, veja quem Jonas diz que é capaz de salvar.",
+      "amanha": "Nínive se arrepende, e Jonas fica aborrecido com a bondade de Deus."
+    },
+    "351": {
+      "titulo": "Uma planta e uma cidade",
+      "sub": "Nínive se arrepende, Jonas reclama, e João vê uma mulher e um dragão.",
+      "contexto": "Em Jonas 3, Jonas vai a Nínive e avisa que a cidade vai ser destruída. O povo crê em Deus, e Deus desiste de destruir a cidade. No capítulo 4, Jonas fica muito aborrecido e diz que fugiu porque sabia que Deus é misericordioso. No fim, Deus faz uma pergunta a Jonas, e a resposta de Jonas não aparece. Em Apocalipse 12, João vê uma mulher vestida de sol e um dragão pronto para devorar o filho dela. É um dia curto, uns 5 minutos.",
+      "procure": "por que Jonas diz que fugiu (Jonas 4.2). Em Jonas 4.11, veja por que Deus se importa com Nínive.",
+      "amanha": "Miqueias fala contra quem toma a casa dos outros, e João vê uma besta que sobe do mar."
+    },
+    "352": {
+      "titulo": "A casa dos outros",
+      "sub": "Miqueias fala contra os poderosos, e João vê duas bestas.",
+      "contexto": "Hoje começa Miqueias. Ele vivia em Moresete e falou a Samaria e a Jerusalém no tempo dos reis Jotão, Acaz e Ezequias. Em Miqueias 2, ele fala contra quem passa a noite planejando tomar o terreno ou a casa de outra pessoa. No 3, ele acusa os líderes que aceitam suborno e os profetas que falam em troca de prata. Em Apocalipse 13, João vê uma besta que sobe do mar e outra que sobe da terra. São imagens da visão, e o capítulo pede perseverança ao povo de Deus.",
+      "procure": "o que os poderosos fazem quando querem um terreno (Miqueias 2.2). Em Apocalipse 13.10, veja o que o povo de Deus é chamado a ser.",
+      "amanha": "Miqueias fala de espadas que viram arados e de um rei que vai nascer na pequena Belém. A leitura é só de Miqueias."
+    },
+    "353": {
+      "titulo": "A pequena Belém",
+      "sub": "Miqueias fala de paz entre as nações e de um rei que vem de Belém.",
+      "contexto": "Em Miqueias 4, gente de toda a terra sobe ao monte do Senhor para aprender os caminhos dele. Os homens derretem as espadas para fazer arados, e cada um vive tranquilo debaixo da sua videira. No 5, Miqueias diz que o rei de Israel vai nascer em Belém, uma pequena vila da Judeia. Em Mateus 2, lido no dia 3, os sábios ouvem essa profecia em Jerusalém. É um dia curto, uns 4 minutos, e a leitura é só de Miqueias.",
+      "procure": "o que os homens vão fazer com as espadas (Miqueias 4.3). Em Miqueias 5.2, veja onde vai nascer o rei de Israel.",
+      "amanha": "Miqueias diz o que Deus deseja, Naum fala contra Nínive, e João vê o Cordeiro no monte Sião."
+    },
+    "354": {
+      "titulo": "O que Deus pede",
+      "sub": "Miqueias termina, Naum começa, e João vê o Cordeiro no monte Sião.",
+      "contexto": "Em Miqueias 6, o Senhor chama os montes como testemunhas e lembra tudo o que fez pelo povo. Miqueias pergunta o que oferecer a Deus e lembra o que o Senhor já disse que deseja. No 7, Miqueias diz que não há outro Deus que perdoa como o Senhor. Hoje começa Naum. Naum anuncia o julgamento de Nínive, a cidade que tinha se arrependido no tempo de Jonas, lido no dia 351. Em Apocalipse 14, João vê o Cordeiro no monte Sião e anjos que anunciam o julgamento.",
+      "procure": "o que o Senhor deseja (Miqueias 6.8). Em Miqueias 7.19, veja onde o Senhor vai jogar os pecados.",
+      "amanha": "Nínive cai, e Habacuque pergunta a Deus quanto tempo ainda vai ter de pedir ajuda."
+    },
+    "355": {
+      "titulo": "Quanto tempo ainda?",
+      "sub": "Naum anuncia a queda de Nínive, e Habacuque reclama com Deus.",
+      "contexto": "Em Naum 2 e 3, Nínive é cercada e cai. Naum chama a cidade de sanguinária, cheia de mentiras e de roubos, e diz que todos que ouvirem o que aconteceu vão bater palmas. Hoje começa Habacuque. Habacuque conversa com Deus e pergunta por que a violência fica sem castigo. Deus responde que está preparando os caldeus, que são cruéis e violentos. Em Apocalipse 15, os que venceram cantam o cântico de Moisés e o cântico do Cordeiro.",
+      "procure": "a primeira pergunta de Habacuque (Habacuque 1.2). Em Apocalipse 15.3, veja o que os vencedores cantam sobre os caminhos de Deus.",
+      "amanha": "Habacuque espera a resposta numa torre de vigia e resolve se alegrar no Senhor sem frutos e sem colheita."
+    },
+    "356": {
+      "titulo": "Alegria sem colheita",
+      "sub": "Habacuque recebe a resposta e termina com uma oração, e os anjos derramam as taças.",
+      "contexto": "Em Habacuque 2, o profeta sobe à torre de vigia para esperar a resposta. Deus manda escrever a visão e diz que, se parecer que está demorando, é para ter paciência, porque o justo confia nele e vai viver. No 3, Habacuque faz uma oração. Ele diz que vai se alegrar no Senhor ainda que não haja figos, uvas nem rebanhos. Em Apocalipse 16, os sete anjos derramam as taças da ira de Deus, e Jesus avisa que vem como um ladrão.",
+      "procure": "o que o justo faz (Habacuque 2.4). Em Habacuque 3.17-18, veja o que Habacuque vai fazer quando faltar tudo.",
+      "amanha": "Sofonias anuncia o dia do Senhor e termina dizendo que Deus se alegra no seu povo. A leitura é só de Sofonias."
+    },
+    "357": {
+      "titulo": "Ele se alegra em vocês",
+      "sub": "Sofonias anuncia o dia do Senhor e uma alegria no fim.",
+      "contexto": "Sofonias falou no tempo do rei Josias, em Judá. Ele anuncia o dia do Senhor contra a idolatria e contra os acomodados que pensam que o Senhor não vai incomodar ninguém. No capítulo 2, Sofonias chama os humildes a buscar o Senhor e fazer o que é certo. No 3, depois de falar contra Jerusalém, ele promete que o Senhor vai estar no meio do povo e se alegrar com gritos de alegria. A leitura de hoje é só de Sofonias.",
+      "procure": "onde o Senhor vai procurar os acomodados (Sofonias 1.12). Em Sofonias 3.17, veja como o Senhor se alegra no povo.",
+      "amanha": "Ageu chama o povo que voltou do exílio a terminar o templo, e João vê uma mulher sentada sobre muitas águas."
+    },
+    "358": {
+      "titulo": "Não desanime",
+      "sub": "Ageu chama o povo a reconstruir o templo, e João vê a grande Babilônia.",
+      "contexto": "O povo tinha voltado do exílio, e a obra do templo estava parada. Ageu aparece em Esdras 5, lido no dia 161. Ele pergunta se é hora de morar em casas confortáveis com a casa do Senhor em ruínas. Zorobabel, o sumo sacerdote Josué e o povo obedecem. No capítulo 2, o Senhor pergunta quem se lembra do templo antigo e manda o povo não desanimar. Em Apocalipse 17, um anjo mostra a João uma mulher sentada sobre muitas águas, com o nome de Babilônia escrito na testa.",
+      "procure": "o que o Senhor pergunta sobre as casas do povo (Ageu 1.4). Em Ageu 2.4, veja por que o povo deve ter coragem.",
+      "amanha": "Zacarias vê um sumo sacerdote ganhar roupas novas, e João ouve que a grande Babilônia caiu."
+    },
+    "359": {
+      "titulo": "Roupas novas de festa",
+      "sub": "Zacarias começa com visões, e João ouve que a Babilônia caiu.",
+      "contexto": "Hoje começa Zacarias. Ele falou no tempo de Ageu e também animou o povo a reconstruir o templo. Em Zacarias 1, o Senhor diz ao povo: “Voltem para mim, e eu me voltarei para vocês”. No 2, um anjo diz que Jerusalém vai ter tanta gente que muitos vão morar fora dos muros. No 3, o sumo sacerdote Josué está com roupas impuras, e o Anjo do Senhor manda trocar por roupas novas de festa. Em Apocalipse 18, um anjo anuncia que a grande Babilônia caiu.",
+      "procure": "o que o Senhor vai ser em volta de Jerusalém (Zacarias 2.5). Em Zacarias 3.4, veja o que o Anjo faz com o pecado de Josué.",
+      "amanha": "Zacarias vê um castiçal de ouro e um rolo voando. A leitura é só de Zacarias, e é bem curta."
+    },
+    "360": {
+      "titulo": "Pelo meu Espírito",
+      "sub": "Zacarias vê um castiçal de ouro, duas oliveiras e um rolo voando.",
+      "contexto": "Em Zacarias 4, o anjo mostra um castiçal de ouro com sete lâmpadas e duas oliveiras. O recado é para Zorobabel, que colocou os alicerces do templo. O Senhor diz que a obra vai acontecer pelo Espírito dele e manda não desprezar um começo humilde. No 5, Zacarias vê um rolo voando, com a maldição contra quem rouba e mente, e uma mulher sentada dentro de um cesto. É um dia bem curto, uns 3 minutos.",
+      "procure": "como o Senhor diz que a obra vai acontecer (Zacarias 4.6). Em Zacarias 4.10, veja o que não se deve desprezar.",
+      "amanha": "Um grupo pergunta se ainda deve jejuar, e Zacarias fala de crianças brincando nas praças. No céu, a multidão canta aleluia."
+    },
+    "361": {
+      "titulo": "Crianças nas praças",
+      "sub": "Zacarias fala de jejum e de uma Jerusalém em paz, e o céu canta aleluia.",
+      "contexto": "Em Zacarias 6, uma coroa é colocada na cabeça do sumo sacerdote Josué, e o Senhor fala de um homem chamado Ramo Novo, que vai edificar o templo. No 7, um grupo pergunta se ainda deve jejuar, e o Senhor lembra que pediu bondade e justiça. No 8, ele promete idosos sentados nas praças e crianças brincando nas ruas de Jerusalém. Em Apocalipse 19, uma multidão no céu canta aleluia porque chegou a hora do casamento do Cordeiro.",
+      "procure": "o que o Senhor mandou o povo fazer (Zacarias 7.9-10). Em Zacarias 8.5, veja quem vai encher as ruas da cidade.",
+      "amanha": "Zacarias vê o rei chegando num jumentinho, e João vê os livros abertos diante do trono."
+    },
+    "362": {
+      "titulo": "Montado num jumentinho",
+      "sub": "Zacarias anuncia um rei humilde, e João vê o julgamento diante do trono.",
+      "contexto": "Em Zacarias 9, o Senhor fala contra as cidades em volta de Israel, até Tiro. Depois Zacarias chama Jerusalém a gritar de felicidade, porque o rei dela está chegando montado num jumentinho. Em Mateus 21, lido no dia 29, Jesus entra em Jerusalém assim. No 10, o Senhor promete fortalecer o povo e responder às orações dele. Em Apocalipse 20, João vê o dragão preso, um grande trono branco e os mortos julgados de acordo com as obras.",
+      "procure": "como o rei chega a Jerusalém (Zacarias 9.9). Em Apocalipse 20.12, veja de acordo com o que os mortos são julgados.",
+      "amanha": "Zacarias fala de trinta moedas de prata, e João vê um novo céu e uma nova terra."
+    },
+    "363": {
+      "titulo": "Todas as coisas novas",
+      "sub": "Zacarias fala de um pastor rejeitado, e João vê a nova Jerusalém.",
+      "contexto": "Em Zacarias 11, Zacarias recebe trinta moedas de prata como salário de pastor e joga as moedas ao oleiro no templo. No 12, o povo de Jerusalém olha para aquele a quem atravessaram com a lança e chora. No 13, o Senhor promete uma fonte para limpar os pecados do povo. Em Apocalipse 21, João vê um novo céu, uma nova terra e a nova Jerusalém descendo de Deus. Deus vai enxugar todas as lágrimas.",
+      "procure": "o que vai jorrar para o povo de Jerusalém (Zacarias 13.1). Em Apocalipse 21.4, veja o que não vai mais existir.",
+      "amanha": "Zacarias termina, e Malaquias começa com uma pergunta do povo a Deus."
+    },
+    "364": {
+      "titulo": "De que maneira o Senhor nos amou?",
+      "sub": "Zacarias termina com o Senhor como rei, e Malaquias começa.",
+      "contexto": "No capítulo 14, Zacarias fala do Dia do Senhor e diz que o Senhor vai ser Rei em toda a terra. Hoje começa Malaquias. Ele escreveu cerca de cem anos depois que o povo voltou do exílio, quando a empolgação do começo já tinha esfriado. Em Malaquias 1, o Senhor diz que sempre amou o povo, e o povo pergunta de que maneira. Os sacerdotes ofereciam a Deus animais cegos, aleijados e doentes. É um dia curto, uns 6 minutos.",
+      "procure": "a pergunta que o povo faz ao Senhor (Malaquias 1.2). Em Malaquias 1.8, veja que animais os sacerdotes ofereciam.",
+      "amanha": "É o último dia do plano. Malaquias fecha o Antigo Testamento, e o Apocalipse termina com o rio da água da vida."
+    },
+    "365": {
+      "titulo": "Vem, Senhor Jesus",
+      "sub": "Malaquias fecha o Antigo Testamento, e o Apocalipse fecha a Bíblia.",
+      "contexto": "Em Malaquias 2, o Senhor fala contra os sacerdotes e contra os maridos que abandonaram as esposas. No 3, ele promete mandar um mensageiro para preparar o caminho, e os que amavam o Senhor conversam uns com os outros. No 4, Malaquias fala do profeta Elias, que vai unir pais e filhos de coração. Em Apocalipse 22, João vê o rio da água da vida e a árvore da vida. Jesus diz que vem em breve. É o último dia do plano, e hoje você termina a Bíblia inteira.",
+      "procure": "quem o Senhor promete mandar antes dele (Malaquias 3.1). Em Apocalipse 22.20, veja o que Jesus diz e o que João responde."
     }
   },
   "guias": {
@@ -2751,6 +2967,18 @@
       "ate": 35,
       "inteiro": true,
       "texto": "Ezequiel 48 é a lista das tribos e da terra de cada uma. Pode ler rápido. Pare nos versículos 30 a 35, com as portas da cidade e o nome que ela recebe."
+    },
+    "Daniel 11": {
+      "de": 1,
+      "ate": 45,
+      "inteiro": true,
+      "texto": "Daniel 11 é uma longa história de reis do norte e do sul. Não é preciso saber quem é cada rei. Pode ler rápido e parar no versículo 32, sobre as pessoas que conhecem o seu Deus."
+    },
+    "Apocalipse 7": {
+      "de": 4,
+      "ate": 8,
+      "salto": "7:9",
+      "texto": "Os versículos 4 a 8 contam os selados de cada tribo de Israel. Pode ler rápido. No versículo 9, João vê uma multidão grande demais para ser contada."
     }
   }
 }
