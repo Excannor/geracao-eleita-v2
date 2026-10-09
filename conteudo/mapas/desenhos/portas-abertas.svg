@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as portas do templo que Ezequias abre de novo (2Cr 29.3): o batente de pedra, as duas folhas da porta abertas para fora, com as tábuas riscadas, e o vão de dentro em sálvia. -->
+<path class="k" d="M8 100C40 98 80 98 112 100"/>
+<path class="k p" d="M34 99V36C34 24 86 24 86 36V99Z"/>
+<path class="k s" d="M42 99V40C42 32 78 32 78 40V99Z"/>
+<path class="k p" d="M42 40L18 30V92L42 99Z"/>
+<path class="k p" d="M78 40L102 30V92L78 99Z"/>
+<path class="h" d="M26 36V91M34 38V95M86 38V95M94 36V91M22 60L38 64M82 64L98 60"/>
+</svg>

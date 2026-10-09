@@ -627,6 +627,16 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   retângulo com duas bolinhas na ponta) nas duas tentativas; a espada na bainha com a ponteira pontuda em
   sálvia virou lápis → planta baixa não se lê em 96px, troca-se o objeto (ficou a harpa dos cantores); bainha
   termina arredondada, com a cor no bocal.
+- 2026-10-09 · conteúdo · Ao escrever 2 Crônicas, achei "Paulo escreve" e "Paulo pede a Timóteo" em textos
+  de Rute, 1 Reis, 1 Crônicas e 2 Crônicas com refs (2Tm 2.8, Rm 11.2-4, Rm 1.3-4, Fp 2.8-9) que não trazem o
+  nome de Paulo, o mesmo erro que a revisão de Juízes pegou (At 13.16) → o nome do autor da carta só entra se
+  está no versículo citado; senão, a frase vai direto ao que o versículo diz. Vale `grep -n "Paulo"` no mapa
+  antes de entregar.
+- 2026-10-09 · conteúdo · 2 Crônicas: o fio do livro é "humilhar-se" (7.14, Roboão, Ezequias, Manassés,
+  Josias, e Amom que não se humilha), e ele ficou no "procure" e na raiz. A ligação com Cristo ficou onde o NT
+  diz com as próprias palavras: Jesus se humilhou (Fp 2.8-9), ninguém se faz sacerdote por conta própria, nem
+  Cristo (Hb 5.4-5, ao lado de Uzias no incenso), e Jesus sobre a cidade que mata os profetas (Mt 23.37, junto
+  de 2Cr 36.15-16). O Zacarias apedrejado (2Cr 24) não foi ligado ao de Lc 11.51: o NT não diz que é o mesmo.
 
 ## Entrada, sessão e página inicial
 
