@@ -529,7 +529,36 @@
     try { rotear(); } finally { redesenhando = false; }
     ultimaRota = guardar;
     CC.rolarPara(y);
+    segurarRolagem(y);
   };
+
+  // Telas que desenham um esqueleto e só depois o conteúdo (a lista de livros da Bíblia, que
+  // espera a tradução carregar) encolhiam no redesenho: o navegador cortava a rolagem para
+  // caber no esqueleto e ela não voltava mais, e a página ia para o topo. Aqui a posição de
+  // antes é reposta conforme a tela cresce, até chegar nela, até 3 s, ou até a própria
+  // pessoa mexer (tocar, rolar, teclar) ou ir para outra tela.
+  let soltarRolagem = null;
+  function segurarRolagem(y) {
+    if (soltarRolagem) soltarRolagem();
+    if (y <= 0 || CC.rolagemY() >= y - 1 || typeof ResizeObserver === 'undefined') return;
+    const endereco = location.hash;
+    const gestos = ['touchstart', 'wheel', 'keydown', 'pointerdown'];
+    const olho = new ResizeObserver(() => {
+      if (location.hash !== endereco) { soltar(); return; }
+      CC.rolarPara(y);
+      if (CC.rolagemY() >= y - 1) soltar();
+    });
+    const prazo = setTimeout(() => soltar(), 3000);
+    function soltar() {
+      olho.disconnect();
+      clearTimeout(prazo);
+      gestos.forEach((g) => removeEventListener(g, soltar, true));
+      if (soltarRolagem === soltar) soltarRolagem = null;
+    }
+    gestos.forEach((g) => addEventListener(g, soltar, { capture: true, passive: true }));
+    olho.observe(conteudo);
+    soltarRolagem = soltar;
+  }
 
   // ---------- avisos da abertura ----------
   // Cada aviso aparece uma vez: o escudo que cobriu ontem, a ofensiva que zerou e o
