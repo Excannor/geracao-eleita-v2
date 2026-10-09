@@ -62,7 +62,19 @@
   })();
   CC.livrosQueFecham = (numero) => FECHA_LIVRO.get(numero) || [];
 
-  const deslocamento = (passo) => Math.round(Math.sin(passo * Math.PI / 4) * AMPLITUDE);
+  // O zigue-zague é uma senoide: um nó a cada 45°. O nó de hoje precisa estar numa crista (±70),
+  // para o cartão ao lado caber; antes só ele pulava para a borda e a estrada fazia um cotovelo
+  // (+49 → -70 → -49) ou um trecho reto longo. Agora a fase é que se ajusta, devagar, nos JANELA
+  // passos em volta de hoje: a crista cai no nó de hoje e os vizinhos acompanham a curva, sem
+  // quina. Fora da janela (e nas unidades sem hoje) a trilha é a senoide de sempre.
+  const JANELA = 16;
+  let passoHoje = null;
+  const ajusteDeFase = (p) => [2, 1, 0, -1][((p % 4) + 4) % 4];
+  const deslocamento = (passo) => {
+    let fase = passo;
+    if (passoHoje !== null) fase += ajusteDeFase(passoHoje) * Math.max(0, 1 - Math.abs(passo - passoHoje) / JANELA);
+    return Math.round(Math.sin(fase * Math.PI / 4) * AMPLITUDE);
+  };
 
   // Espaço inseparável entre número e livro ("1 Samuel 16", "Marcos 2")
   CC.colarRef = (t) => String(t || '').replace(/(\d) (?=\p{L})/gu, '$1\u00a0').replace(/(\p{L}) (?=\d)/gu, '$1\u00a0').replace(/ · /g, '\u00a0· ');
@@ -114,9 +126,11 @@
     const acao = feito ? 'Revisar' : (lidas ? 'Continuar' : 'Começar');
     return '<section class="cartao-no-hoje lado-' + lado + '" aria-label="' + (jaLeuHoje ? 'Próxima leitura' : 'Leitura de hoje') + '">'
       + '<span class="rot-hoje">' + (jaLeuHoje ? 'Próximo' : 'Hoje') + ' · Dia ' + numero + '</span>'
-      + '<b>' + refHtml(passagemDe(dia)) + '</b>'
+      // abreviada, como nos rótulos dos outros dias: o cartão é baixo para caber no passo da
+      // trilha, e a passagem por extenso está no balão do dia
+      + '<b>' + refHtml(abreviar(passagemDe(dia))) + '</b>'
       + '<span class="sub-hoje">' + (feito ? 'Leitura feita' : 'cerca de ' + CC.minutosDoDia(dia) + ' min') + '</span>'
-      + '<button class="botao-pilula" data-abrir-dia="' + numero + '">' + acao + CC.ico('avancar') + '</button>'
+      + '<button class="botao-pilula" data-abrir-dia="' + numero + '" aria-label="' + acao + ' o dia ' + numero + '">' + CC.ico('avancar') + '</button>'
       + '</section>';
   }
 
@@ -146,11 +160,8 @@
     const legenda = 'Dia ' + numero + ', ' + passagemDe(dia) + (feito ? ', lido' : '')
       + (fechados.length ? '. Fecha ' + fechados.join(' e ') : '');
 
-    // O nó de hoje vai à borda da curva, para o cartão ao lado caber. No meio da curva (x0 = 0)
-    // ele ia de uma vez à borda oposta à do dia anterior (+49, -70, -49) e a estrada fazia um
-    // cotovelo; agora vai só até o lado do dia seguinte (+49, -49, -49), que já está a caminho.
-    const x0 = deslocamento(passo);
-    const x = !atual ? x0 : x0 === 0 ? deslocamento(passo + 1) : (x0 > 0 ? AMPLITUDE : -AMPLITUDE);
+    // O nó de hoje já cai na crista da curva (ver deslocamento), com espaço para o cartão.
+    const x = deslocamento(passo);
     const lado = ladoDoRotulo(x, passo);
     // Repete a legenda do botão: fora do leitor de tela. O de hoje é um cartão com o botão.
     const rotulo = atual ? cartaoDoNoDeHoje(numero, feito, lado)
@@ -175,8 +186,11 @@
     const legenda = aberto ? 'Baú aberto do dia ' + numero : (pronto ? 'Abrir o baú do dia ' + numero : 'Baú do dia ' + numero + ', ainda fechado');
     // Fechado em cinza e pronto em madeira, com o balão "Abrir": antes os dois saíam de
     // madeira, e o baú do dia 7 passava sem ninguém notar que já podia ser aberto.
-    return '<div class="no-linha linha-bau' + (pronto ? ' com-balao' : '') + '" style="--x:' + deslocamento(passo) + 'px"><div class="deslocado">'
-      + (pronto ? '<span class="balao balao-bau">Abrir</span>' : '')
+    // O "Abrir" vai ao lado do baú (do lado onde sobra estrada), não em cima: em cima ele
+    // pedia 44px a mais acima da linha e o passo da trilha mudava em todo baú pronto.
+    const x = deslocamento(passo);
+    return '<div class="no-linha linha-bau" style="--x:' + x + 'px"><div class="deslocado">'
+      + (pronto ? '<span class="balao balao-bau lado-' + ladoDoRotulo(x, passo) + '">Abrir</span>' : '')
       + '<button class="no-bau ' + estado + '" data-bau="' + numero + '" aria-label="' + legenda + '">'
       + CC.arte.bau(estado, estado === 'travado' ? '' : 'madeira') + '</button></div></div>';
   }
@@ -404,12 +418,18 @@
       if (!aberta) return faixa(u, false);
       const nos = [];
       let passo = 0;
+      passoHoje = null;
+      if (atual >= u.de && atual <= u.ate) {
+        passoHoje = 0;
+        for (let n = u.de; n < atual; n++) passoHoje += CC.temBau(n) && n !== u.ate ? 2 : 1;
+      }
       for (let n = u.de; n <= u.ate; n++) {
         nos.push(no(n, passo, n === atual));
         passo++;
         if (CC.temBau(n) && n !== u.ate) { nos.push(noBau(n, passo)); passo++; }
       }
       nos.push(marco(u));
+      passoHoje = null;
       return faixa(u, true) + '<div class="nos c-' + u.cor + '">' + nos.join('') + '</div>';
     }).join('');
 
@@ -637,7 +657,9 @@
       if (a - d < alto) d = a - alto;
       const destino = Math.min(maxRolagem, Math.max(0, rolagem + d));
       if (a - (destino - rolagem) < alto - 1 || b - (destino - rolagem) > baixo + 1) continue;
-      const custo = Math.abs(d) + o.peso;
+      // rolar só quando nenhum lugar cabe na tela como ela está: a tela andando sozinha também
+      // parece a trilha mudando
+      const custo = (Math.abs(destino - rolagem) >= 1 ? 10000 + Math.abs(destino - rolagem) : 0) + o.peso;
       if (!melhor || custo < melhor.custo) melhor = { ...o, d: destino - rolagem, custo };
     }
     if (!melhor) melhor = { ...opcoes[0], d: 0 };
