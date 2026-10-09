@@ -161,9 +161,10 @@
       // (CC.FRASES_OFENSIVA), com a referência em cima quando é versículo, como no portal.
       // Só o carimbo, sem texto corrido embaixo: o dono quer a frase sozinha, motivando.
       + (lema.ref ? '<span class="selo-ref">' + CC.esc(lema.ref) + '</span>' : '')
-      + '<div class="selo-lema selo-ofensiva" data-linhas="' + lema.linhas.length + '">'
-      + lema.linhas.map((l) => '<span class="selo-linha">' + CC.esc(l) + '</span>').join('')
-      + '</div>'
+      // A frase que é só arte (o cartaz de procurado) não tem carimbo: fica a referência.
+      + (lema.linhas.length ? '<div class="selo-lema selo-ofensiva" data-linhas="' + lema.linhas.length + '">'
+        + lema.linhas.map((l) => '<span class="selo-linha">' + CC.esc(l) + '</span>').join('')
+        + '</div>' : '')
       + (seq.atual === 0 ? '<p class="passo-dica">Leia hoje para acender o seu fogo.</p>'
         : (seq.feitoHoje ? '' : '<p class="passo-dica">A lenha de hoje ainda não entrou. Leia para manter o fogo aceso!</p>'))
       + '<div class="semana-bolinhas">' + semana + '</div>'
@@ -203,6 +204,7 @@
         // Se a linha mais larga ainda não couber, o carimbo TODO encolhe junto, na mesma
         // medida: linhas de tamanhos diferentes davam aparência de carimbo remendado.
         const selo = folha.querySelector('.selo-ofensiva');
+        if (!selo) return;
         const linhas = [...selo.querySelectorAll('.selo-linha')];
         let tamanho = parseFloat(getComputedStyle(linhas[0]).fontSize);
         const minimo = tamanho * 0.7;

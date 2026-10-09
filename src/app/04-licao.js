@@ -534,7 +534,7 @@
 
     // A frase do fim do dia é uma das frases da ofensiva (as mesmas do carimbo), sorteada,
     // com a referência quando a frase tem uma.
-    const f = CC.fraseDaOfensiva();
+    const f = CC.fraseDaOfensiva({ comTexto: true });
     const frase = CC.esc(f.linhas.join(' ')) + (f.ref ? ' <span class="ref-frase">' + CC.esc(f.ref) + '</span>' : '');
 
     return {

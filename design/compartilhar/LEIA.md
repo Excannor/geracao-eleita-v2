@@ -40,3 +40,15 @@ Versículo:
    versículo vai de 92px (curto) a 34px (o mínimo legível no celular) e, se um trecho de dez
    versículos não couber, para na última palavra que cabe, com reticências (a referência diz o
    trecho inteiro).
+
+## Frases com arte própria (`src/app/01e-story-artes.js`)
+
+Algumas frases da ofensiva (as que têm `arte` em `CC.FRASES_OFENSIVA`) vieram de artes que o
+dono mandou e ganharam um modelo próprio, redesenhado em canvas (nada de imagem embutida):
+envergonho (só tipografia), luz (lâmpada), ninguem (globo com ovelhas), oleiro (só
+tipografia), procurado (cartaz com a ovelha 100, sem frase), suficiente (bandeira e
+multidão, ilustração própria a partir de uma foto), praticantes (livro aberto, Tiago 1.22 na
+NBV) e porta (porta entreaberta, Apocalipse 3.20 na NBV). Em todas: chama e dias no topo, a
+arte no meio (encolhe por igual para caber entre y 560 e 1480) e só a marca no pé.
+Para gerar: `CHROME=... node design/compartilhar/gerar.mjs <pasta> artes`. O teste de
+navegador é `ferramentas/teste-story.mjs`.

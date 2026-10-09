@@ -259,7 +259,7 @@ ok(Object.keys(versos || {}).length === 3, 'as imagens de versículo curto, long
 // as imagens de referência, para a revisão a olho: 1, 100 e 365 dias com a frase mais curta e
 // a mais longa da lista, e a frase do estágio (sem carimbo à vista)
 const casos = await av(`(async () => {
-  const por = [...CC.FRASES_OFENSIVA].sort((a, b) => a.linhas.join(" ").length - b.linhas.join(" ").length);
+  const por = CC.FRASES_OFENSIVA.filter((f) => !f.arte).sort((a, b) => a.linhas.join(" ").length - b.linhas.join(" ").length);
   const curta = por[0], longa = por[por.length - 1];
   const saida = {};
   for (const [nome, p] of [["ofensiva-1-curta", { dias: 1, frase: curta }], ["ofensiva-100-longa", { dias: 100, frase: longa }],

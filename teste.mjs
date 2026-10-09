@@ -525,12 +525,12 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
 {
   const frases = CC.FRASES_OFENSIVA;
   const biblias = ['nbv', 'blivre'].map((s) => JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', s + '.json'), 'utf8')));
-  const longas = frases.filter((f) => !f.linhas.length || f.linhas.length > 6 || f.linhas.some((l) => l.length > 20));
+  const longas = frases.filter((f) => (!f.linhas.length && !f.arte) || f.linhas.length > 6 || f.linhas.some((l) => l.length > 20));
   const refsRuins = frases.filter((f) => f.ref && (() => {
     const r = CC.lerRef(f.ref);
     return !r || biblias.some((b) => ((b.livros[r.livro] || [])[r.cap - 1] || []).slice(r.de - 1, r.ate).filter(Boolean).length !== r.ate - r.de + 1);
   })());
-  checar(frases.length === 18 && !longas.length, 'as 18 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
+  checar(frases.length === 30 && !longas.length, 'as 30 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
     + (longas.length ? ' (' + longas.map((f) => f.linhas[0]).join(', ') + ')' : ''));
   checar(!refsRuins.length, 'toda frase da ofensiva com referência aponta para versículos que existem nas duas Bíblias'
     + (refsRuins.length ? ' (' + refsRuins.map((f) => f.ref).join(', ') + ')' : ''));
@@ -538,6 +538,9 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
   let antes = null;
   for (let i = 0; i < 400; i++) { const f = CC.fraseDaOfensiva(); if (f === antes) repetiu = true; antes = f; }
   checar(!repetiu, 'o sorteio da ofensiva nunca repete a frase da vez anterior');
+  let semTexto = false;
+  for (let i = 0; i < 400; i++) if (!CC.fraseDaOfensiva({ comTexto: true }).linhas.length) semTexto = true;
+  checar(!semTexto, 'o fim da lição (comTexto) nunca sorteia a frase que é só arte');
 }
 
 // --- imagem de story (01d-story.js): nomes, texto junto e a frase do estágio no carimbo ---
@@ -562,6 +565,18 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01d-story.js'), 'utf8'), con
   });
   checar(!ruins.length, 'a frase de cada estágio da chama quebra em linhas de carimbo equilibradas, sem palavra sozinha'
     + (ruins.length ? ' (' + ruins.map((e) => S.linhasDoCarimbo(e.frase).join(' / ')).join('; ') + ')' : ''));
+}
+
+// --- modelos de story das frases com arte própria (01e-story-artes.js) ---
+runInContext(readFileSync(join(AQUI, 'src', 'app', '01e-story-artes.js'), 'utf8'), contexto, { filename: '01e-story-artes.js' });
+{
+  const S = CC.story;
+  const comArte = CC.FRASES_OFENSIVA.filter((f) => f.arte);
+  const sem = comArte.filter((f) => typeof S.artes[f.arte] !== 'function' || S.arteDaFrase({ linhas: f.linhas, ref: f.ref || '' }) !== f.arte);
+  checar(comArte.length === 8 && !sem.length, 'as 8 frases com arte têm modelo de story e o pedido da folha chega a ele'
+    + (sem.length ? ' (' + sem.map((f) => f.arte).join(', ') + ')' : ''));
+  checar(S.arteDaFrase({ linhas: ['Geração', 'inconformada'], ref: '' }) === null && S.arteDaFrase({ linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14' }) === 'luz',
+    'frase sem arte usa o modelo de sempre; "Luz do mundo" usa o da lâmpada');
 }
 
 // --- quebra de linhas e tamanho de letra do cartão de versículo (01c-arte.js) ---
