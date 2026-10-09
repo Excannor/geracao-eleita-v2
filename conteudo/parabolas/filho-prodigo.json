@@ -1,0 +1,119 @@
+{
+  "titulo": "O filho pródigo",
+  "ref": "Lc 15.11-32",
+  "grupo": "lucas",
+  "linha": "O filho volta para casa, e o pai sai correndo",
+  "desenho": "caminho-de-casa",
+  "desenhoLista": "anel-e-sandalia",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Os fariseus e os mestres da lei ainda reclamam porque Jesus come com cobradores de impostos e outras pessoas de má fama.",
+          "ref": "Lc 15.1-2"
+        },
+        {
+          "texto": "Jesus já contou a da ovelha e a da moeda, as duas perdidas e achadas. Agora ele conta a terceira história da mesma conversa.",
+          "ref": "Lc 15.3-11"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "estrada",
+      "blocos": [
+        {
+          "texto": "Um homem tem dois filhos. O mais novo pede a parte dele da herança, e o pai divide tudo entre os dois.",
+          "ref": "Lc 15.11-12"
+        },
+        {
+          "texto": "Poucos dias depois, o filho mais novo junta tudo e vai para uma terra distante. Lá, ele gasta todo o dinheiro à toa. Quando o dinheiro acaba, a terra passa por uma grande fome, e ele vai cuidar dos porcos de um fazendeiro.",
+          "ref": "Lc 15.13-15"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "porco-e-vagens",
+              "titulo": "No meio dos porcos",
+              "fala": "desejava encher seu estômago com as vagens que os porcos comiam",
+              "ref": "Lc 15.16"
+            },
+            {
+              "desenho": "caminho-para-belem",
+              "titulo": "O caminho de volta",
+              "fala": "Eu vou para casa, junto do meu pai",
+              "ref": "Lc 15.18"
+            },
+            {
+              "desenho": "anel-e-sandalia",
+              "titulo": "Anel e sandálias",
+              "fala": "Coloquem um anel em seu dedo e sandálias em seus pés!",
+              "ref": "Lc 15.22"
+            }
+          ]
+        },
+        {
+          "texto": "O filho ainda está longe quando o pai vê ele chegando. O pai corre até ele, abraça e beija o filho.",
+          "ref": "Lc 15.20"
+        },
+        {
+          "fala": "Pai, eu pequei contra o céu e contra o senhor, e não mereço ser chamado seu filho",
+          "ref": "Lc 15.21"
+        },
+        {
+          "texto": "O pai chama os servos e manda trazer a melhor roupa da casa, um anel e sandálias. Depois, eles matam o novilho gordo, e a festa começa.",
+          "ref": "Lc 15.22-24"
+        }
+      ]
+    },
+    {
+      "titulo": "O filho mais velho",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "O filho mais velho está trabalhando no campo. Na volta, ele ouve a música e pergunta a um servo o que está acontecendo. O servo conta que o irmão voltou e que o pai matou o novilho gordo.",
+          "ref": "Lc 15.25-27"
+        },
+        {
+          "texto": "O filho mais velho fica irado e não quer entrar. O pai sai de casa para falar com ele. O filho diz que trabalhou anos como escravo, e o pai nunca deu a ele nem um cabrito para fazer festa com os amigos.",
+          "ref": "Lc 15.28-30"
+        },
+        {
+          "fala": "Olhe, meu filho... você está sempre comigo e tudo o que tenho é seu",
+          "ref": "Lc 15.31"
+        },
+        {
+          "texto": "Jesus para a história aí. Ele não conta se o filho mais velho entra na festa.",
+          "ref": "Lc 15.32"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O filho mais novo lembra os cobradores de impostos que vêm ouvir Jesus. O mais velho lembra os fariseus, que reclamam da festa. O pai sai de casa atrás dos dois.",
+    "apoio": "O pai diz ao filho mais velho por que tem festa. “estava morto e voltou a viver, estava perdido e foi achado!”",
+    "ref": "Lc 15.1-32"
+  },
+  "perguntas": [
+    "Com qual dos dois filhos você se parece mais hoje?",
+    "Tem alguém voltando para Deus com quem você ainda não consegue fazer festa?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 15.1-7",
+      "titulo": "A ovelha perdida",
+      "slug": "ovelha-perdida",
+      "rotulo": "Da mesma conversa",
+      "linha": "o dono deixa as noventa e nove e vai atrás de uma"
+    },
+    {
+      "ref": "Lc 15.8-10",
+      "titulo": "A moeda perdida",
+      "slug": "moeda-perdida",
+      "rotulo": "Da mesma conversa",
+      "linha": "a mulher acende a lamparina e procura em cada canto"
+    }
+  ]
+}
