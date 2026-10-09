@@ -129,7 +129,9 @@ await esperar('!' + q('#tela-cadastro') + '.hidden');
 await clicar('#botao-cadastro');
 ok(await esperar(q('#erro-cadastro') + '.textContent.length > 0'), 'o passo 1 pede o nome antes de seguir');
 await preencher('#nome', 'Ana');
-await preencher('#nascimento', '2004-05-06');
+await preencher('#nascimento', '06052004');
+ok(await av(q('#nascimento') + '.type') === 'text' && await av(q('#nascimento') + '.value') === '06/05/2004',
+  'a data de nascimento é digitada (sem o calendário do Android) e as barras entram sozinhas');
 await clicar('#botao-cadastro');
 ok(await esperar('!' + q('[data-passo="2"]') + '.hidden'), 'nome e data de nascimento levam ao e-mail');
 await preencher('#email', 'ana@teste.com');
@@ -426,7 +428,7 @@ await clicar('.cortina [data-concordar]');
 ok(await esperar(existe('.cortina #cad-email'), 12000), 'depois de concordar, a conta antiga é convidada a completar o cadastro');
 await foto('9-completar-cadastro');
 await preencher('#cad-email', 'velho@teste.com');
-await preencher('#cad-nasc', '1999-09-09');
+await preencher('#cad-nasc', '09091999');
 await clicar('.cortina [data-salvar]');
 ok(await esperar('CC.quem && CC.quem.perfilCompleto === true'), 'completar o cadastro libera os amigos');
 const { DatabaseSync } = await import(pathToFileURL(join(AQUI, 'db.mjs')).href);
@@ -434,6 +436,7 @@ const bancoRedesenho = new DatabaseSync(join(pasta, 'caminho.db'));
 const velhoNoBanco = bancoRedesenho.prepare("SELECT email FROM contas WHERE usuario = 'velho'").get();
 const versaoContas = (bancoRedesenho.prepare("SELECT valor FROM metadados WHERE chave = 'contas_versao'").get() || {}).valor;
 bancoRedesenho.close();
+ok(await av('CC.quem.nascimento') === '1999-09-09', 'a data digitada em dd/mm/aaaa chega ao servidor como 1999-09-09');
 ok(versaoContas === '2' && !!velhoNoBanco && velhoNoBanco.email === 'velho@teste.com' && !existsSync(arquivoContas),
   'a conta antiga foi migrada do JSON para o banco e completada');
 

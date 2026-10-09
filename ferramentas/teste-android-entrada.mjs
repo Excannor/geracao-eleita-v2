@@ -92,7 +92,7 @@ async function criarConta(s, usuario) {
   await tocar(s, 'botao-comecar');
   await esperar(s.av, '!document.getElementById("tela-cadastro").hidden');
   await preencher(s, 'nome', 'Pessoa ' + usuario);
-  await preencher(s, 'nascimento', '2001-03-04');
+  await preencher(s, 'nascimento', '04032001');
   await tocar(s, 'botao-cadastro');
   await preencher(s, 'email', usuario + '@exemplo.com');
   await tocar(s, 'botao-cadastro');

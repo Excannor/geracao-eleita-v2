@@ -5,6 +5,20 @@
 
   const D = CC.D;
   const dataBr = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
+  // Data digitada (dd/mm/aaaa) no lugar do calendário do aparelho, que no Android obriga a
+  // voltar ano por ano. As barras entram sozinhas; dataIso devolve '' se a data não existe.
+  const mascaraData = (v) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+    const n = v.replace(/\D/g, '').slice(0, 8);
+    return n.slice(0, 2) + (n.length > 2 ? '/' + n.slice(2, 4) : '') + (n.length > 4 ? '/' + n.slice(4) : '');
+  };
+  const dataIso = (v) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v) || /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
+    if (!m) return '';
+    const iso = m[1].length === 4 ? m[1] + '-' + m[2] + '-' + m[3] : m[3] + '-' + m[2] + '-' + m[1];
+    const d = new Date(iso + 'T12:00:00Z');
+    return !isNaN(d) && d.toISOString().slice(0, 10) === iso && iso >= '1900-01-01' ? iso : '';
+  };
 
   const linha = (rotulo, valor, atributos, classe) => '<button class="linha-config' + (classe ? ' ' + classe : '') + '" ' + (atributos || '') + '>'
     + '<span>' + CC.esc(rotulo) + '</span>' + (valor ? '<span class="valor">' + CC.esc(valor) + '</span>' : '')
@@ -187,7 +201,7 @@
           : '<label class="campo-senha"><span>E-mail</span><input type="email" id="cad-email" autocomplete="email"></label>')
         + (quem.nascimento
           ? '<div class="campo-senha so-leitura" data-nascimento><span>Data de nascimento</span><b>' + CC.esc(dataBr(quem.nascimento)) + '</b>' + dicaNascimento + '</div>'
-          : '<label class="campo-senha"><span>Data de nascimento</span><input type="date" id="cad-nasc"></label>')
+          : '<label class="campo-senha"><span>Data de nascimento</span><input type="text" id="cad-nasc" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" autocomplete="bday"></label>')
         + '<p class="recado-senha" id="recado" role="alert"></p>'
         + '<div class="acoes"><button class="botao" data-salvar>Salvar e continuar</button>'
         + '<button class="botao plano" data-depois>Agora não</button></div>',
@@ -197,6 +211,8 @@
         ligar: (folha, fechar) => {
           const recado = folha.querySelector('#recado');
           const botao = folha.querySelector('[data-salvar]');
+          const nasc = folha.querySelector('#cad-nasc');
+          if (nasc) nasc.oninput = () => { const v = mascaraData(nasc.value); if (v !== nasc.value) nasc.value = v; };
           folha.querySelector('[data-depois]').onclick = () => { fechar(); resolver(false); };
           botao.onclick = async () => {
             recado.textContent = '';
@@ -205,7 +221,8 @@
               const campoEmail = folha.querySelector('#cad-email');
               const campoNasc = folha.querySelector('#cad-nasc');
               const email = campoEmail ? campoEmail.value.trim().toLowerCase() : quem.email;
-              const nascimento = campoNasc ? campoNasc.value : quem.nascimento;
+              const nascimento = campoNasc ? dataIso(campoNasc.value) : quem.nascimento;
+              if (campoNasc && !nascimento) throw new Error('Confira a data de nascimento (dd/mm/aaaa).');
               await CC.api('api/perfil', { email, nascimento });
               if (CC.quem) {
                 CC.quem.perfilCompleto = true;

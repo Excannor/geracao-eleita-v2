@@ -172,7 +172,7 @@ for (const f of ['manifest.webmanifest', 'sw.js', 'icone-192.png', 'icone-512.pn
 }
 const entrar = readFileSync(dist('entrar.html'), 'utf8');
 const semMarcador = (texto) => !/\/\*(FONTES|SIMBOLO|USUARIO)\*\//.test(texto);
-checar(semMarcador(entrar) && entrar.includes('type="date"') && entrar.includes('api/criar-conta'), 'a entrada tem o cadastro com data de nascimento');
+checar(semMarcador(entrar) && /id="nascimento"[^>]*inputmode="numeric"/.test(entrar) && !/id="nascimento"[^>]*type="date"/.test(entrar) && entrar.includes('api/criar-conta'), 'a entrada tem o cadastro com data de nascimento');
 checar(semMarcador(readFileSync(dist('privacidade.html'), 'utf8')), 'a página de privacidade foi montada');
 checar(semMarcador(readFileSync(dist('termos.html'), 'utf8')) && readFileSync(dist('termos.html'), 'utf8').includes('Regras de convivência'), 'a página de termos de uso foi montada');
 checar(/rel="apple-touch-icon" href="apple-touch-icon\.png\?v=\w+"/.test(entrar) && entrar.includes('rel="manifest"')

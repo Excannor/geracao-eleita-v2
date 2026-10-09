@@ -130,7 +130,7 @@ await av('document.getElementById("botao-comecar").click()');
 await esperar('!document.getElementById("tela-cadastro").hidden');
 const preencher = (id, v) => av('(() => { const e = document.getElementById(' + JSON.stringify(id) + '); e.value = ' + JSON.stringify(v) + '; e.dispatchEvent(new Event("input", { bubbles: true })); })()');
 await preencher('nome', 'Sheyla');
-await preencher('nascimento', '2001-03-04');
+await preencher('nascimento', '04032001');
 await av('document.getElementById("botao-cadastro").click()');
 await preencher('email', 'sheyla@exemplo.com');
 await av('document.getElementById("botao-cadastro").click()');
