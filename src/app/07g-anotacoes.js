@@ -1,6 +1,7 @@
 /* Minhas anotações: um lugar só para tudo o que a pessoa escreveu e marcou. Junta as notas
    (nota, oração, estudo: E.notas, 02-estado.js), os versículos marcados, as reflexões dos dias
-   (OIA do plano), as anotações do Explorar e os versículos dos baús. Busca, filtros e ordem
+   (OIA do plano), as anotações do Explorar e os versículos dos baús. No topo, fixo, o cartão de
+   Minha história com Deus (o editor mora em 07-perfil.js, #/perfil/historia). Busca, filtros e ordem
    rodam aqui mesmo, sem rede. Tudo privado: nada desta tela sai para amigo, célula,
    discipulado nem liderança. O editor de nota mora em 04e-versiculos.js.
    Rotas: #/perfil/anotacoes; #/perfil/versiculos e #/perfil/escritos (as duas telas antigas)
@@ -116,6 +117,30 @@
       + '</article>';
   }
 
+  // ---------- Minha história com Deus: um cartão fixo no topo ----------
+  // Os três campos (antes, o encontro, hoje) moram em E.historia e são escritos em
+  // #/perfil/historia (07-perfil.js). Aqui só aparece o começo do texto; a busca também olha
+  // a história, mas ela nunca vira item da lista nem passa pelos filtros.
+  const textoDaHistoria = () => { const h = CC.minhaHistoria() || {}; return ['antes', 'encontro', 'hoje'].map((c) => (h[c] || '').trim()).filter(Boolean).join(' '); };
+  const historiaNaBusca = () => {
+    if (!F.q) return true;
+    const alvo = CC.semAcento(textoDaHistoria() + ' Minha história com Deus');
+    return CC.semAcento(F.q).trim().split(/\s+/).every((p) => alvo.includes(p));
+  };
+  function cartaoHistoria() {
+    const texto = textoDaHistoria();
+    const h = CC.minhaHistoria() || {};
+    const q = texto && h.em ? CC.quando(h.em) : '';
+    return '<a class="cartao-historia' + (texto ? '' : ' vazia') + '" href="#/perfil/historia" data-historia>'
+      + '<div class="linha-tipo">' + CC.ico('aperto') + '<b>Minha história com Deus</b>'
+      + (q ? '<span class="quando">Editada ' + (/^\d/.test(q) ? 'em ' : '') + q + '</span>' : '') + '</div>'
+      + (texto
+        ? '<p class="texto-anot">' + CC.esc(texto.slice(0, 280)) + '</p>'
+        : '<p class="texto-anot">Escreva como era antes, como você conheceu Jesus e o que mudou hoje. Quando alguém perguntar, sua história já está pronta.</p>'
+          + '<span class="botao cor pequeno">' + CC.ico('caneta') + 'Escrever minha história</span>')
+      + '</a>';
+  }
+
   // ---------- a lista ----------
   function grupos(lista) {
     const saida = [];
@@ -158,7 +183,7 @@
   function lista(todos) {
     const vistos = todos.filter((it) => passa(it));
     if (!vistos.length) {
-      return '<div class="vazio">' + (F.q ? 'Nada com “' + CC.esc(F.q) + '”. Tente outra palavra.' : 'Nada com esses filtros.')
+      return '<div class="vazio">' + (F.q ? 'Nada ' + (textoDaHistoria() && historiaNaBusca() ? 'mais ' : '') + 'com “' + CC.esc(F.q) + '”. Tente outra palavra.' : 'Nada com esses filtros.')
         + '</div><div class="acoes"><button class="botao contorno pequeno" data-limpar>Tirar os filtros</button></div>';
     }
     const fixadas = vistos.filter((it) => it.fixada);
@@ -188,6 +213,7 @@
       + '<button class="botao-redondo salvia nova-anot" data-nova aria-label="Escrever uma nota livre">' + CC.ico('mais-sinal') + '</button>'
       + (todos.length ? '<div class="busca-caixa">' + CC.ico('lupa') + '<input id="busca-anot" type="search" placeholder="Buscar no que escrevi" aria-label="Buscar no que escrevi" autocomplete="off" enterkeyhint="search" value="' + CC.esc(F.q) + '"></div>' : '')
       + '</div>'
+      + '<div class="topo-historia" data-topo-historia>' + cartaoHistoria() + '</div>'
       + (todos.length ? '<div data-controles></div><div class="lista-anot" data-lista></div>' : vazioHtml())
       + '<div class="rodape-anot">'
       + (todos.length ? '<button class="botao contorno" data-exportar>' + CC.ico('baixar') + 'Baixar tudo o que escrevi</button>' : '')
@@ -201,6 +227,7 @@
       const alvo = raiz.querySelector('[data-lista]');
       if (!alvo) return;
       raiz.querySelector('[data-controles]').innerHTML = controles(todos);
+      raiz.querySelector('[data-topo-historia]').innerHTML = historiaNaBusca() ? cartaoHistoria() : '';
       alvo.innerHTML = lista(todos);
       ligarControles();
       ligarCartoes(alvo, todos, redesenhar);
