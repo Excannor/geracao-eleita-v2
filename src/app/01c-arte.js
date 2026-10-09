@@ -84,6 +84,8 @@
     { linhas: ['Seu chamado é', 'ser diferente'], arte: 'diferente' },
     { linhas: ['O chamado não', 'é caro. Ele', 'custa tudo'], arte: 'custatudo' },
     { linhas: ['Um coração disposto', 'não cumpre chamado', 'se a boca não fala'], arte: 'coracao' },
+    // Lema com a referência: a NBV diz "eu próprio não vivo mais, e sim é Cristo quem vive em mim".
+    { linhas: ['Não vivo mais eu,', 'mas Cristo', 'vive em mim'], ref: 'Gálatas 2.20', arte: 'naovivo' },
     // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
     { linhas: ['É tudo', 'sobre Ele'] },
     { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },

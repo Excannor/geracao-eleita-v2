@@ -1656,6 +1656,28 @@
     ctx.restore();
   }
 
+  // ---------- (q) Não vivo mais eu: só tipografia em pincel ----------
+  // A redação da NBV em Gálatas 2.20 é outra ("eu próprio não vivo mais"): aqui é o lema,
+  // com a referência.
+  function arteNaoVivo(ctx) {
+    const branco = '#f4f1ea';
+    const { c, ctx: k } = camada();
+    k.fillStyle = branco;
+    const r = sorteio(220);
+    const fonte = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
+    let y = 600;
+    for (const [linha, max] of [['NÃO', 260], ['VIVO', 260], ['MAIS EU', 230]]) {
+      k.font = fonte(100);
+      const tam = Math.min(max, 100 * 820 / k.measureText(linha).width);
+      y += tam * 0.98;
+      aMao(k, linha, L / 2, y, tam, r, { alinhar: 'center', espaco: -4 });
+    }
+    gastar(c, { x: 60, y: 560, w: L - 120, h: y - 480 }, { pontos: 7000, manchas: 0, riscos: 80, semente: 220 });
+    ctx.drawImage(c, 0, 0);
+    S.escrever(ctx, 'MAS CRISTO VIVE EM MIM', L / 2, y + 120, S.Mn(800, 50), branco, { espaco: 50 * 0.12 });
+    referencia(ctx, 'Gálatas 2.20', L / 2, y + 196, 32, 'rgba(244,241,234,.66)');
+  }
+
   // ---------- a ofensiva no topo, a arte no meio, a marca no pé ----------
   // A ofensiva continua em destaque em todo modelo: a chama do app e o número de dias no
   // alto, como no story de sempre. A arte vem abaixo, na faixa do meio (Z0 a Z1); a que foi
@@ -1707,6 +1729,7 @@
     custatudo: { fundo: ['#2b2b2a', { x: L / 2, y: 820, r: 900, cor: 'rgba(120,120,116,.35)' }], caixa: [560, 1560],
       tema: { ...ESCURO, numero: '#f0441e', rotulo: '#f1eee6', marca: '#f1eee6', marcaFraca: '#a3a29d' }, desenhar: arteCustaTudo, grao: [30, 13] },
     coracao: { fundo: ['#131110'], caixa: [580, 1540], tema: ESCURO, desenhar: arteCoracao, grao: [20, 15] },
+    naovivo: { fundo: ['#0f0e0d', { x: L / 2, y: 1000, r: 800, cor: 'rgba(255,255,255,.05)' }], caixa: [560, 1510], tema: ESCURO, desenhar: arteNaoVivo, grao: [22, 220] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
   };
   function montar(m) {

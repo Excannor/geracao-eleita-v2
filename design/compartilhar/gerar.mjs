@@ -75,8 +75,8 @@ const casos = [];
 const folhas = [];
 if (conjunto === 'artes') {
   // os modelos das frases com arte própria (01e-story-artes.js), com 1 e 16 dias
-  for (const arte of ['chama', 'luz', 'ninguem', 'oleiro', 'procurado', 'suficiente', 'praticantes', 'porta', 'mesa', 'quemdeusdiz', 'comprado', 'momento', 'tenda', 'diferente', 'custatudo', 'coracao']) for (const dias of [16, 1]) casos.push({ nome: 'arte-' + arte + '-' + dias, fn: 'ofensiva', dados: { dias, frase: arte } });
-  folhas.push({ nome: 'folha-artes', casos: ['arte-chama-16', 'arte-luz-16', 'arte-ninguem-16', 'arte-oleiro-16', 'arte-procurado-16', 'arte-suficiente-16', 'arte-praticantes-16', 'arte-porta-16', 'arte-mesa-16', 'arte-quemdeusdiz-16', 'arte-comprado-16', 'arte-momento-16', 'arte-tenda-16', 'arte-diferente-16', 'arte-custatudo-16', 'arte-coracao-16'] });
+  for (const arte of ['chama', 'luz', 'ninguem', 'oleiro', 'procurado', 'suficiente', 'praticantes', 'porta', 'mesa', 'quemdeusdiz', 'comprado', 'momento', 'tenda', 'diferente', 'custatudo', 'coracao', 'naovivo']) for (const dias of [16, 1]) casos.push({ nome: 'arte-' + arte + '-' + dias, fn: 'ofensiva', dados: { dias, frase: arte } });
+  folhas.push({ nome: 'folha-artes', casos: ['arte-chama-16', 'arte-luz-16', 'arte-ninguem-16', 'arte-oleiro-16', 'arte-procurado-16', 'arte-suficiente-16', 'arte-praticantes-16', 'arte-porta-16', 'arte-mesa-16', 'arte-quemdeusdiz-16', 'arte-comprado-16', 'arte-momento-16', 'arte-tenda-16', 'arte-diferente-16', 'arte-custatudo-16', 'arte-coracao-16', 'arte-naovivo-16'] });
 } else if (conjunto === 'variantes') {
   const of = { dias: 16, frase: 'atos' };
   for (const v of ['A', 'B', 'C']) casos.push({ nome: 'ofensiva-' + v, fn: 'ofensiva' + v, dados: of });

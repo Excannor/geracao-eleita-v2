@@ -51,7 +51,7 @@ multidão, ilustração própria a partir de uma foto), praticantes (livro abert
 NBV), porta (porta entreaberta, Apocalipse 3.20 na NBV) e, na segunda leva, mesa (99 não é
 100), quemdeusdiz (texto em arcos de digital e o carimbo "Somos Geração Eleita"), comprado
 (código de barras com as cruzes), momento (a poltrona vazia), tenda (a tenda do encontro),
-diferente (a ovelha branca entre as escuras), custatudo (quem anda sozinho, com os outros borrados) e coracao (as brasas embaixo do texto). Em todas: chama e dias no topo, a
+diferente (a ovelha branca entre as escuras), custatudo (quem anda sozinho, com os outros borrados) coracao (as brasas embaixo do texto) e naovivo (só tipografia em pincel, Gálatas 2.20 como lema). Em todas: chama e dias no topo, a
 arte no meio (encolhe por igual para caber entre y 560 e 1480) e só a marca no pé.
 O arquivo não entra no index.html: o build o publica à parte (`story-artes.<resumo>.js`), o
 app o carrega só na hora de gerar um story desses e o service worker o guarda; sem ele, o
