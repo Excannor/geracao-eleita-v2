@@ -44,7 +44,7 @@
     { linhas: ['Nele vivemos,', 'nos movemos', 'e existimos'], ref: 'Atos 17.28' },
     { linhas: ['Prepara-te,', 'Ele vem'] },
     { linhas: ['Até que', 'Ele venha'] },
-    { linhas: ['Quem já foi', 'comprado', 'não se vende'] },
+    { linhas: ['Quem já foi', 'comprado', 'não se vende'], ref: '1 Coríntios 6.20', arte: 'comprado' },
     { linhas: ['Atraídos pela', 'Sua presença'] },
     { linhas: ['Marcados pela', 'diferença'] },
     { linhas: ['Perseverando', 'até o fim'] },
@@ -76,6 +76,14 @@
     // A porta entreaberta: arte própria a partir de uma tipográfica que o dono mandou. A frase é
     // o lema conhecido; o trecho que o story cita é o da NBV.
     { linhas: ['Eis que estou', 'à porta e bato'], ref: 'Apocalipse 3.20', arte: 'porta' },
+    // Segunda leva de artes (o dono, 2026-10-09), também redesenhadas como arte própria.
+    { linhas: ['Até que a mesa', 'esteja cheia'], ref: 'Lucas 15.4-7', arte: 'mesa' },
+    { linhas: ['Eu não sou o que', 'dizem sobre mim,', 'sou quem Deus', 'diz que eu sou'], ref: '1 Pedro 2.9-10', arte: 'quemdeusdiz' },
+    { linhas: ['Jesus não nos chamou', 'para um momento,', 'mas para uma vida', 'inteira Nele'], arte: 'momento' },
+    { linhas: ['É você que', 'me encontra'], ref: 'Êxodo 33.7-11', arte: 'tenda' },
+    { linhas: ['Seu chamado é', 'ser diferente'], arte: 'diferente' },
+    { linhas: ['O chamado não', 'é caro. Ele', 'custa tudo'], arte: 'custatudo' },
+    { linhas: ['Um coração disposto', 'não cumpre chamado', 'se a boca não fala'], arte: 'coracao' },
     // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
     { linhas: ['É tudo', 'sobre Ele'] },
     { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },

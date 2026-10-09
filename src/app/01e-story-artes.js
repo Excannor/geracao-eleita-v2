@@ -314,22 +314,22 @@
     ctx.restore();
   }
   // Uma ovelha em traço: corpo de lã em ondas, cabeça, orelha, olho e pernas. (x, y) é o
-  // chão debaixo do meio do corpo; s, a escala; lado = 1 olha para a direita.
-  function ovelha(ctx, x, y, s, lado, papel) {
+  // chão debaixo do meio do corpo; s, a escala; lado = 1 olha para a direita; tinta, a cor do traço.
+  function ovelha(ctx, x, y, s, lado, papel, tinta = '#1d1b19') {
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(s * lado, s);
     ctx.lineWidth = 3.2 / s;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#1d1b19';
+    ctx.strokeStyle = tinta;
     // pernas
     for (const px of [-62, -38, 34, 56]) {
       ctx.beginPath();
       ctx.moveTo(px, -70);
       ctx.lineTo(px + (px < 0 ? -2 : 2), -4);
       ctx.lineWidth = 9;
-      ctx.strokeStyle = '#1d1b19';
+      ctx.strokeStyle = tinta;
       ctx.stroke();
     }
     // corpo de lã: uma elipse contornada de ondinhas
@@ -377,7 +377,7 @@
     ctx.fill();
     ctx.stroke();
     // olho e focinho
-    ctx.fillStyle = '#1d1b19';
+    ctx.fillStyle = tinta;
     ctx.beginPath();
     ctx.arc(4, -6, 4.5, 0, Math.PI * 2);
     ctx.fill();
@@ -1138,6 +1138,524 @@
     referencia(ctx, 'Apocalipse 3.20', L / 2, y, 32, tinta);
   }
 
+  // ---------- (i) Até que a mesa esteja cheia: 99 não é 100 ----------
+  // A ovelha em traço verde na frente de um 99 vazado: falta uma para a conta fechar.
+  function arteMesa(ctx) {
+    const verde = '#8fd14f';
+    const creme = '#f1eee6';
+    const oswald = (t) => '700 ' + t + 'px Oswald, sans-serif';
+    S.escrever(ctx, 'ATÉ QUE A MESA', L / 2, 650, oswald(76), creme, { espaco: 76 * 0.08 });
+    ctx.font = oswald(96);
+    const wEst = ctx.measureText('ESTEJA ').width;
+    const wTudo = ctx.measureText('ESTEJA CHEIA').width;
+    S.escrever(ctx, 'ESTEJA', L / 2 - wTudo / 2, 760, oswald(96), creme, { alinhar: 'left' });
+    S.escrever(ctx, 'CHEIA', L / 2 - wTudo / 2 + wEst, 760, oswald(96), verde, { alinhar: 'left' });
+    // o 99 grande, só o contorno
+    ctx.save();
+    ctx.font = '800 470px Manrope, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 7;
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(241,238,230,.85)';
+    ctx.strokeText('99', L / 2, 1180);
+    ctx.restore();
+    // a ovelha na frente, em traço verde
+    ovelha(ctx, L / 2 - 10, 1250, 1.45, 1, '#0e0f0d', verde);
+    capim(ctx, L / 2 - 250, L / 2 + 250, 1254, sorteio(100));
+    ctx.font = oswald(130);
+    const wNao = ctx.measureText('NÃO É ').width;
+    const wLinha = ctx.measureText('NÃO É 100').width;
+    S.escrever(ctx, 'NÃO É', L / 2 - wLinha / 2, 1420, oswald(130), creme, { alinhar: 'left' });
+    S.escrever(ctx, '100', L / 2 - wLinha / 2 + wNao, 1420, oswald(130), verde, { alinhar: 'left' });
+    referencia(ctx, 'Lucas 15.4-7', L / 2, 1490, 30, 'rgba(241,238,230,.7)');
+  }
+
+  // ---------- (j) Sou quem Deus diz que eu sou: o texto em arcos de digital ----------
+  // As linhas do texto correm sobre arcos, como as cristas de uma impressão digital (quem
+  // a pessoa é); embaixo, o carimbo do app: "Somos Geração Eleita" (1 Pedro 2.9-10).
+  function arteQuemDeusDiz(ctx) {
+    const claro = '#ebe8e1';
+    const cx = L / 2;
+    const cy = 1720;
+    // as cristas da digital, atrás do texto
+    const r = sorteio(29);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 560, L, 680);
+    ctx.clip();
+    ctx.lineCap = 'round';
+    for (let raio = 560; raio < 1260; raio += 22) {
+      ctx.strokeStyle = 'rgba(235,232,225,' + (0.07 + r() * 0.07).toFixed(3) + ')';
+      ctx.lineWidth = 2.5 + r() * 2;
+      let a = -Math.PI / 2 - 0.62 + r() * 0.1;
+      while (a < -Math.PI / 2 + 0.62) {
+        const comp = 0.08 + r() * 0.4;
+        ctx.beginPath();
+        ctx.arc(cx, cy, raio, a, Math.min(a + comp, -Math.PI / 2 + 0.62));
+        ctx.stroke();
+        a += comp + 0.015 + r() * 0.03;
+      }
+    }
+    ctx.restore();
+    // o texto, linha a linha, sobre arcos cada vez menores
+    const linhas = [
+      ['EU NÃO SOU O QUE', 1080, 84],
+      ['DIZEM SOBRE MIM,', 960, 84],
+      ['SOU QUEM DEUS', 840, 96],
+      ['DIZ QUE EU SOU.', 720, 84],
+    ];
+    const oswald = (t) => '700 ' + t + 'px Oswald, sans-serif';
+    for (const [texto, raio, tam] of linhas) {
+      ctx.font = oswald(tam);
+      ctx.save();
+      try { ctx.letterSpacing = (tam * 0.04) + 'px'; } catch (e) { /* idem */ }
+      const larg = ctx.measureText(texto).width;
+      ctx.restore();
+      // halo escuro por baixo, para as cristas não atravessarem as letras
+      for (const [cor, borda] of [['#141414', true], [claro, false]]) {
+        ctx.save();
+        ctx.font = oswald(tam);
+        let a = -Math.PI / 2 - (larg / raio) / 2;
+        const deus = texto.indexOf('DEUS');
+        [...texto].forEach((l, i) => {
+          const w = ctx.measureText(l).width + tam * 0.04;
+          a += (w / 2) / raio;
+          ctx.save();
+          ctx.translate(cx + Math.cos(a) * raio, cy + Math.sin(a) * raio);
+          ctx.rotate(a + Math.PI / 2);
+          ctx.textAlign = 'center';
+          if (borda) { ctx.lineWidth = 14; ctx.lineJoin = 'round'; ctx.strokeStyle = cor; ctx.strokeText(l, 0, 0); } else {
+            // DEUS em branco puro; o resto um pouco mais apagado
+            ctx.fillStyle = deus >= 0 && i >= deus && i < deus + 4 ? '#ffffff' : '#c9c5bc';
+            ctx.fillText(l, 0, 0);
+          }
+          ctx.restore();
+          a += (w / 2) / raio;
+        });
+        ctx.restore();
+      }
+    }
+    // o carimbo do app e a referência
+    const sl = ['Somos', 'Geração Eleita'];
+    const tam = S.tamanhoDoCarimbo(ctx, sl, 720, 170, 56);
+    S.carimbo(ctx, sl, L / 2, 1215, tam, { chapa: '#eef0ea', letra: '#141414' });
+    referencia(ctx, '1 Pedro 2.9-10', L / 2, 1486, 30, 'rgba(235,232,225,.72)');
+  }
+
+  // ---------- (k) Quem já foi comprado não se vende: o código de barras com as cruzes ----------
+  // As três barras mais altas do código terminam em cruz (o Calvário); o código é o preço
+  // pago. Embaixo, o começo de 1 Coríntios 6.20 na NBV, palavra por palavra.
+  function arteComprado(ctx) {
+    const tinta = '#141414';
+    const r = sorteio(620);
+    const x0 = 230;
+    const x1 = 850;
+    const topo = 760;
+    const pe = 960;
+    ctx.fillStyle = tinta;
+    const altas = new Map([[0.62, 150], [0.72, 210], [0.82, 150]]);
+    for (let x = x0; x < x1;) {
+      const w = [4, 6, 9, 14][Math.floor(r() * 4)];
+      const t = (x - x0) / (x1 - x0);
+      let alta = 0;
+      for (const [k, h] of altas) if (Math.abs(t - k) < 0.012) alta = h;
+      if (alta) {
+        // a barra que sobe e vira cruz
+        const xc = x0 + [...altas.keys()].find((k) => Math.abs(t - k) < 0.012) * (x1 - x0);
+        ctx.fillRect(xc - 6, topo - alta, 12, pe - topo + alta);
+        ctx.fillRect(xc - 32, topo - alta + 38, 64, 12);
+        x = xc + 14;
+        continue;
+      }
+      ctx.fillRect(x, topo, w, pe - topo);
+      x += w + [4, 6, 9][Math.floor(r() * 3)];
+    }
+    S.escrever(ctx, '1 CORÍNTIOS 6.20', L / 2, pe + 52, '600 34px Manrope, sans-serif', tinta, { espaco: 34 * 0.5 });
+    const mn = (t) => S.Mn(800, t);
+    S.escrever(ctx, 'Quem já foi', L / 2, 1150, mn(92), tinta, { espaco: -2 });
+    ctx.font = mn(100);
+    const tamC = Math.min(210, 100 * 880 / ctx.measureText('comprado').width);
+    S.escrever(ctx, 'comprado', L / 2, 1150 + tamC * 0.9, mn(tamC), tinta, { espaco: -4 });
+    S.escrever(ctx, 'não se vende.', L / 2, 1150 + tamC * 0.9 + 110, mn(92), tinta, { espaco: -2 });
+    S.escrever(ctx, 'Porque Deus comprou vocês por preço elevado.', L / 2, 1150 + tamC * 0.9 + 190, '500 36px Literata, Georgia, serif', '#55524c');
+  }
+
+  // ---------- (l) Jesus não nos chamou para um momento: a poltrona vazia ----------
+  // O título em letra condensada vermelha, a poltrona vazia num morro escuro e a resposta em
+  // etiquetas pretas: "mas para uma vida inteira Nele".
+  function arteMomento(ctx) {
+    const vermelho = '#c3301c';
+    const escuro = '#2a2521';
+    const oswald = (t) => '700 ' + t + 'px Oswald, sans-serif';
+    let y = 590;
+    for (const linha of ['JESUS NÃO NOS', 'CHAMOU PARA', 'UM MOMENTO']) {
+      ctx.font = oswald(100);
+      const tam = Math.min(190, 100 * 880 / ctx.measureText(linha).width);
+      y += tam * 0.86;
+      S.escrever(ctx, linha, L / 2, y, oswald(tam), vermelho);
+      y += 14;
+    }
+    // o morro e a poltrona vazia, com a mesinha ao lado
+    const chao = y + 290;
+    ctx.fillStyle = escuro;
+    ctx.beginPath();
+    ctx.moveTo(60, chao + 60);
+    ctx.bezierCurveTo(260, chao - 10, 820, chao - 10, 1020, chao + 60);
+    ctx.lineTo(1020, chao + 76);
+    ctx.lineTo(60, chao + 76);
+    ctx.closePath();
+    ctx.fill();
+    const px = L / 2 - 60;
+    const pb = chao + 4;
+    ctx.save();
+    ctx.translate(px, pb);
+    ctx.scale(0.82, 0.82);
+    ctx.translate(-px, -pb);
+    const caixa = (x, yy, w, h, raio) => { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, yy, w, h, raio); else ctx.rect(x, yy, w, h); ctx.fill(); };
+    caixa(px - 105, pb - 300, 210, 190, 46); // encosto
+    caixa(px - 130, pb - 140, 260, 64, 18); // assento
+    caixa(px - 168, pb - 196, 58, 140, 26); // braços
+    caixa(px + 110, pb - 196, 58, 140, 26);
+    caixa(px - 150, pb - 84, 300, 30, 10); // base
+    caixa(px - 140, pb - 60, 16, 60, 6); // pés
+    caixa(px + 124, pb - 60, 16, 60, 6);
+    const mx = px + 280;
+    caixa(mx - 62, pb - 140, 124, 16, 6); // a mesinha
+    caixa(mx - 7, pb - 130, 14, 130, 4);
+    caixa(mx - 40, pb - 10, 80, 12, 6);
+    caixa(mx - 20, pb - 186, 40, 46, 8); // um copo em cima
+    ctx.restore();
+    // as etiquetas pretas, levemente tortas
+    let ye = chao + 140;
+    [['mas para', -0.02], ['uma vida', 0.015], ['inteira Nele', -0.012]].forEach(([t, ang]) => {
+      ctx.font = S.Mn(800, 56);
+      const w = ctx.measureText(t).width + 56;
+      ctx.save();
+      ctx.translate(L / 2, ye);
+      ctx.rotate(ang);
+      ctx.fillStyle = '#141210';
+      ctx.fillRect(-w / 2, -50, w, 72);
+      S.escrever(ctx, t, 0, 4, S.Mn(800, 56), '#f5efe3');
+      ctx.restore();
+      ye += 84;
+    });
+  }
+
+  // ---------- (m) É você que me encontra: a tenda do encontro ----------
+  // A tenda em traço de gravura, com a coluna de nuvem subindo dela (Êxodo 33.9), e o fim de
+  // Êxodo 33.11 na NBV, palavra por palavra.
+  function arteTenda(ctx) {
+    const tinta = '#3a291b';
+    const fundoCor = '#d9cba9';
+    const serif = (peso, t) => peso + ' ' + t + 'px Literata, Georgia, serif';
+    // o título em itálico (a Literata do app, inclinada)
+    for (const [t, y] of [['É você que', 720], ['me encontra', 860]]) {
+      ctx.save();
+      ctx.translate(L / 2 + 20, y);
+      ctx.transform(1, 0, -0.22, 1, 0, 0);
+      S.escrever(ctx, t, 0, 0, serif(600, 128), tinta);
+      ctx.restore();
+    }
+    referencia(ctx, 'Êxodo 33.7-11', L / 2, 930, 30, tinta);
+    const cx = L / 2;
+    const chao = 1400;
+    const topo = chao - 230;
+    ctx.strokeStyle = tinta;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    // a coluna de nuvem, atrás da tenda: bolotas subindo do meio da cumeeira
+    const r = sorteio(33);
+    const bolota = (x, y, raio) => {
+      ctx.beginPath();
+      ctx.arc(x, y, raio, 0, Math.PI * 2);
+      ctx.fillStyle = fundoCor;
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    };
+    const nx = cx + 70;
+    for (const [dx, dy, raio] of [[-56, 1010, 46], [56, 1016, 46], [0, 996, 52]]) bolota(nx + dx, dy, raio);
+    for (let y = 1046; y < topo + 30; y += 34) {
+      const k = 1 - (y - 1046) / 600;
+      bolota(nx - 44 * k + (r() - 0.5) * 12, y, 36 * k + 6);
+      bolota(nx + 44 * k + (r() - 0.5) * 12, y + 12, 36 * k + 6);
+      bolota(nx + (r() - 0.5) * 10, y + 6, 40 * k + 6);
+    }
+    // a tenda vista de quina: a empena da frente com a porta e o telhado de lado, em gravura
+    const P = [cx - 90, topo];
+    const Q = [cx + 230, topo + 34];
+    const A0 = [cx - 270, chao];
+    const B = [cx + 90, chao];
+    const C = [cx + 350, chao - 14];
+    const lado = new Path2D();
+    lado.moveTo(P[0], P[1]); lado.lineTo(Q[0], Q[1]); lado.lineTo(C[0], C[1]); lado.lineTo(B[0], B[1]); lado.closePath();
+    const frente = new Path2D();
+    frente.moveTo(A0[0], A0[1]); frente.lineTo(P[0], P[1]); frente.lineTo(B[0], B[1]); frente.closePath();
+    ctx.fillStyle = fundoCor;
+    ctx.fill(lado);
+    ctx.fill(frente);
+    ctx.save();
+    ctx.clip(lado);
+    ctx.lineWidth = 2;
+    for (let t = -0.2; t < 1.2; t += 0.035) {
+      ctx.beginPath();
+      ctx.moveTo(P[0] + (Q[0] - P[0]) * t, P[1] + (Q[1] - P[1]) * t);
+      ctx.lineTo(B[0] + (C[0] - B[0]) * t, B[1] + (C[1] - B[1]) * t);
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.lineWidth = 5;
+    ctx.stroke(lado);
+    ctx.stroke(frente);
+    // a porta: o vão escuro e as abas abertas
+    const pm = (A0[0] + B[0]) / 2;
+    ctx.fillStyle = tinta;
+    ctx.beginPath();
+    ctx.moveTo(pm - 70, chao);
+    ctx.lineTo(pm - 8, topo + 90);
+    ctx.lineTo(pm + 8, topo + 90);
+    ctx.lineTo(pm + 70, chao);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 3;
+    for (const l of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(pm + l * 8, topo + 90);
+      ctx.quadraticCurveTo(pm + l * 80, topo + 170, pm + l * 120, chao);
+      ctx.stroke();
+    }
+    // as varas, as cordas e o chão
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(P[0], P[1]); ctx.lineTo(P[0], P[1] - 28);
+    ctx.moveTo(Q[0], Q[1]); ctx.lineTo(Q[0], Q[1] - 28);
+    ctx.stroke();
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(P[0], P[1] - 20); ctx.lineTo(cx - 380, chao);
+    ctx.moveTo(Q[0], Q[1] - 20); ctx.lineTo(cx + 420, chao);
+    ctx.moveTo(cx - 420, chao); ctx.lineTo(cx + 440, chao);
+    ctx.stroke();
+    // o fim de Êxodo 33.11 (NBV)
+    const trecho = 'O Senhor falava com Moisés face a face, como quem fala com um amigo.';
+    const tx = S.textoEquilibrado(ctx, trecho, { fonte: (x) => serif(500, x), larguraMax: 800, alturaMax: 110, fonteMax: 38, fonteMin: 30, entreLinhas: 1.3 });
+    let y = chao + 30;
+    for (const l of tx.linhas) { y += tx.tamanho * 1.3; S.escrever(ctx, l, cx, y, serif(500, tx.tamanho), tinta); }
+  }
+
+  // ---------- (n) Seu chamado é ser diferente: a ovelha branca no meio das escuras ----------
+  // Ovelha de frente, simplificada: cabeça de lã, rosto, orelhas e olhos.
+  function ovelhaDeFrente(ctx, x, y, s, { la, rosto, traco, olho, orelha }) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(s, s);
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = traco;
+    ctx.lineWidth = 4;
+    const corpo = laCacheada(0, 230, 190, 170, 18, 1.08);
+    ctx.fillStyle = la;
+    ctx.fill(corpo);
+    if (traco !== la) ctx.stroke(corpo);
+    for (const l of [-1, 1]) {
+      ctx.save();
+      ctx.translate(l * 108, -10);
+      ctx.rotate(l * 0.3);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 52, 20, 0, 0, Math.PI * 2);
+      ctx.fillStyle = orelha;
+      ctx.fill();
+      if (traco !== la) ctx.stroke();
+      ctx.restore();
+    }
+    const cabeca = laCacheada(0, -40, 110, 92, 14, 1.12);
+    ctx.fillStyle = la;
+    ctx.fill(cabeca);
+    if (traco !== la) ctx.stroke(cabeca);
+    const r = new Path2D();
+    r.moveTo(-58, -30);
+    r.bezierCurveTo(-62, 50, -40, 116, 0, 120);
+    r.bezierCurveTo(40, 116, 62, 50, 58, -30);
+    r.bezierCurveTo(46, -54, -46, -54, -58, -30);
+    ctx.fillStyle = rosto;
+    ctx.fill(r);
+    if (traco !== la) ctx.stroke(r);
+    ctx.fillStyle = olho;
+    for (const l of [-1, 1]) { ctx.beginPath(); ctx.arc(l * 28, 6, 8, 0, Math.PI * 2); ctx.fill(); }
+    ctx.beginPath();
+    ctx.moveTo(-12, 86); ctx.quadraticCurveTo(0, 96, 12, 86);
+    ctx.strokeStyle = olho;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.restore();
+  }
+  function arteDiferente(ctx) {
+    const escura = { la: '#2b2926', rosto: '#1b1a18', traco: '#2b2926', olho: '#55514b', orelha: '#22201e' };
+    const r = sorteio(12);
+    const fila = (y, s, n, deslocar) => {
+      for (let i = 0; i < n; i++) ovelhaDeFrente(ctx, (i + 0.5 + deslocar) * (L / n) + (r() - 0.5) * 30, y + (r() - 0.5) * 20, s, escura);
+    };
+    fila(660, 0.62, 6, 0);
+    fila(800, 0.8, 5, 0.1);
+    ovelhaDeFrente(ctx, L / 2, 880, 1.25, { la: '#f2eee5', rosto: '#f7f3ec', traco: '#cfc8bb', olho: '#1b1a18', orelha: '#e8b9ad' });
+    // as escuras da frente, nas pontas, um pouco cortadas pela borda
+    ovelhaDeFrente(ctx, 90, 1000, 0.95, escura);
+    ovelhaDeFrente(ctx, L - 90, 1010, 0.95, escura);
+    // um degradê escuro embaixo, para o texto assentar
+    const g = ctx.createLinearGradient(0, 1080, 0, 1260);
+    g.addColorStop(0, 'rgba(18,17,16,0)');
+    g.addColorStop(1, 'rgba(18,17,16,1)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 1080, L, 420);
+    const oswald = (t) => '700 ' + t + 'px Oswald, sans-serif';
+    const laranja = '#f2552c';
+    for (const [a, b, y] of [['SEU ', 'CHAMADO É', 1340], ['SER ', 'DIFERENTE.', 1470]]) {
+      ctx.font = oswald(130);
+      const wa = ctx.measureText(a).width;
+      const w = ctx.measureText(a + b).width;
+      const x = L / 2 - w / 2;
+      S.escrever(ctx, a, x, y, oswald(130), '#f4f1ea', { alinhar: 'left' });
+      S.escrever(ctx, b, x + wa, y, oswald(130), laranja, { alinhar: 'left' });
+    }
+  }
+
+  // ---------- (o) O chamado não é caro. Ele custa tudo: quem anda sozinho ----------
+  // Vista de cima, chão cinza granulado: uma pessoa andando sozinha, nítida, com a sombra
+  // longa, e outras passando borradas em volta. O borrão é a sombra do canvas (shadowBlur,
+  // que todo navegador tem), desenhada com a forma fora da tela.
+  function pessoa(x, y, h) {
+    const p = new Path2D();
+    p.arc(x, y - h * 0.9, h * 0.07, 0, Math.PI * 2);
+    p.moveTo(x - h * 0.11, y - h * 0.78);
+    p.quadraticCurveTo(x, y - h * 0.86, x + h * 0.11, y - h * 0.78);
+    p.lineTo(x + h * 0.1, y - h * 0.36);
+    p.lineTo(x + h * 0.06, y);
+    p.lineTo(x + h * 0.012, y);
+    p.lineTo(x, y - h * 0.3);
+    p.lineTo(x - h * 0.012, y);
+    p.lineTo(x - h * 0.06, y);
+    p.lineTo(x - h * 0.1, y - h * 0.36);
+    p.closePath();
+    return p;
+  }
+  function borrado(ctx, forma, cor, raio) {
+    ctx.save();
+    ctx.shadowColor = cor;
+    ctx.shadowBlur = raio;
+    // o deslocamento da sombra não passa pela escala do desenho; a forma, sim
+    const esc = ctx.getTransform ? ctx.getTransform().a : 1;
+    ctx.shadowOffsetX = 4000;
+    ctx.translate(-4000 / esc, 0);
+    ctx.fillStyle = '#000';
+    ctx.fill(forma);
+    ctx.restore();
+  }
+  function arteCustaTudo(ctx) {
+    // os que passam, borrados (e um pouco esticados, como em movimento)
+    for (const [x, y, h, raio, a] of [[240, 860, 420, 22, 0.95], [970, 720, 330, 26, 0.8], [330, 1330, 380, 34, 0.75], [880, 1400, 360, 40, 0.7]]) {
+      borrado(ctx, pessoa(x, y, h), 'rgba(8,8,8,' + a + ')', raio);
+      ctx.save();
+      ctx.translate(0, -h * 0.12);
+      borrado(ctx, pessoa(x, y, h), 'rgba(8,8,8,' + (a * 0.4) + ')', raio * 1.4);
+      ctx.restore();
+    }
+    // a sombra longa e quem anda sozinho, nítido
+    const x = 560;
+    const y = 1000;
+    const h = 300;
+    const sombra = new Path2D();
+    sombra.ellipse(x + h * 0.62, y - 6, h * 0.62, h * 0.07, -0.04, 0, Math.PI * 2);
+    borrado(ctx, sombra, 'rgba(0,0,0,.55)', 10);
+    ctx.fillStyle = '#0b0b0b';
+    ctx.fill(pessoa(x, y, h));
+    // o texto: branco condensado, e o TUDO à mão em laranja, circulado
+    const branco = '#f1eee6';
+    const laranja = '#f0441e';
+    const linhas = ['O CHAMADO NÃO É', 'CARO. ELE CUSTA'];
+    ctx.font = S.Mn(800, 100);
+    const tam = Math.min(130, 100 * 900 / (0.84 * Math.max(...linhas.map((l) => ctx.measureText(l).width))));
+    linhas.forEach((l, i) => {
+      ctx.save();
+      ctx.translate(L / 2, 1300 + i * tam * 1.02);
+      ctx.scale(0.84, 1);
+      S.escrever(ctx, l, 0, 0, S.Mn(800, tam), branco, { espaco: -tam * 0.03 });
+      ctx.restore();
+    });
+    const yTudo = 1300 + tam * 1.02 + 150;
+    ctx.fillStyle = laranja;
+    aMao(ctx, 'TUDO', L / 2, yTudo, 104, sorteio(14), { alinhar: 'center', espaco: 6 });
+    ctx.strokeStyle = laranja;
+    ctx.lineCap = 'round';
+    for (const [d, w] of [[0, 6], [5, 3]]) {
+      ctx.lineWidth = w;
+      ctx.beginPath();
+      ctx.ellipse(L / 2 + d, yTudo - 36 + d, 210, 72, -0.06, Math.PI * 0.12, Math.PI * 2.05);
+      ctx.stroke();
+    }
+  }
+
+  // ---------- (p) Um coração disposto não cumpre chamado se a boca não fala: as brasas ----------
+  // O texto branco condensado, a condição à mão em laranja e, embaixo, o fogo do app (a
+  // mesma chama da ofensiva, em vários tamanhos) com brilho e fagulhas subindo.
+  function arteCoracao(ctx) {
+    const branco = '#f3f0ea';
+    const laranja = '#f2662a';
+    const linhas = ['UM CORAÇÃO', 'DISPOSTO NÃO', 'CUMPRE CHAMADO'];
+    ctx.font = S.Mn(800, 100);
+    const tam = Math.min(150, 100 * 920 / (0.84 * Math.max(...linhas.map((l) => ctx.measureText(l).width))));
+    linhas.forEach((l, i) => {
+      ctx.save();
+      ctx.translate(L / 2, 700 + i * tam * 1.0);
+      ctx.scale(0.84, 1);
+      S.escrever(ctx, l, 0, 0, S.Mn(800, tam), branco, { espaco: -tam * 0.03 });
+      ctx.restore();
+    });
+    const yMao = 700 + 2 * tam + 140;
+    ctx.fillStyle = laranja;
+    const w = aMao(ctx, 'SE A BOCA NÃO FALA', L / 2, yMao, 66, sorteio(15), { alinhar: 'center', espaco: 2 });
+    ctx.strokeStyle = laranja;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(L / 2 - w / 2 - 10, yMao + 26);
+    ctx.quadraticCurveTo(L / 2, yMao + 14, L / 2 + w / 2 + 16, yMao + 22);
+    ctx.stroke();
+    // o fogo: brilho, as chamas e as fagulhas
+    const base = 1500;
+    const brilho = ctx.createRadialGradient(L / 2, base, 0, L / 2, base, 620);
+    brilho.addColorStop(0, 'rgba(242,102,42,.55)');
+    brilho.addColorStop(0.5, 'rgba(242,102,42,.18)');
+    brilho.addColorStop(1, 'rgba(242,102,42,0)');
+    ctx.fillStyle = brilho;
+    ctx.fillRect(-200, base - 700, L + 400, 2000);
+    const r = sorteio(1502);
+    for (let i = 0; i < 11; i++) {
+      const x = 60 + i * 96 + (r() - 0.5) * 40;
+      const meio = 1 - Math.abs(x - L / 2) / (L / 2);
+      ctx.save();
+      ctx.globalAlpha = 0.75 + r() * 0.25;
+      S.chama(ctx, x, base + 30, 120 + meio * 170 + r() * 60, false);
+      ctx.restore();
+    }
+    // o pé do fogo some no escuro, como brasa
+    const pe = ctx.createLinearGradient(0, base - 70, 0, base + 40);
+    pe.addColorStop(0, 'rgba(19,17,16,0)');
+    pe.addColorStop(1, 'rgba(19,17,16,1)');
+    ctx.fillStyle = pe;
+    ctx.fillRect(-200, base - 70, L + 400, 2000);
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,140,40,.9)';
+    ctx.shadowBlur = 10;
+    for (let i = 0; i < 70; i++) {
+      const y = base - 40 - Math.pow(r(), 1.6) * 420;
+      ctx.fillStyle = r() < 0.5 ? '#ffb347' : '#ff7a2e';
+      ctx.globalAlpha = 0.5 + r() * 0.5;
+      ctx.beginPath();
+      ctx.arc(80 + r() * (L - 160), y, 1.5 + r() * 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   // ---------- a ofensiva no topo, a arte no meio, a marca no pé ----------
   // A ofensiva continua em destaque em todo modelo: a chama do app e o número de dias no
   // alto, como no story de sempre. A arte vem abaixo, na faixa do meio (Z0 a Z1); a que foi
@@ -1177,6 +1695,18 @@
     suficiente: { fundo: ['#0b0c0e'], tema: { ...ESCURO, rotulo: '#f4f1ea', marcaFraca: '#9aa0a8' }, desenhar: arteSuficiente, grao: [18, 22] },
     praticantes: { fundo: ['#46502f', { x: L / 2, y: 900, r: 1000, cor: 'rgba(150,165,100,.22)' }], caixa: [350, 1420],
       tema: { ...ESCURO, numero: '#ffb08a', rotulo: '#efe7cf', marca: '#efe7cf', marcaFraca: '#c2c7a4', brilho: false }, desenhar: artePraticantes, grao: [18, 122] },
+    mesa: { fundo: ['#0e0f0d', { x: L / 2, y: 1050, r: 700, cor: 'rgba(143,209,79,.10)' }], caixa: [590, 1500],
+      tema: { ...ESCURO, numero: '#8fd14f', rotulo: '#f1eee6', marca: '#f1eee6', marcaFraca: '#9aa392' }, desenhar: arteMesa, grao: [20, 99] },
+    quemdeusdiz: { fundo: ['#141414', { x: L / 2, y: 900, r: 900, cor: 'rgba(255,255,255,.06)' }], caixa: [560, 1495],
+      tema: { ...ESCURO, rotulo: '#ebe8e1', marca: '#ebe8e1', marcaFraca: '#9a978f' }, desenhar: arteQuemDeusDiz, grao: [18, 29] },
+    comprado: { fundo: ['#f7f6f2'], caixa: [580, 1530], tema: { ...CLARO, rotulo: '#141414', marca: '#141414', marcaFraca: '#6b6863' }, desenhar: arteComprado, grao: [10, 620] },
+    momento: { fundo: ['#efe6d6', { x: L / 2, y: 900, r: 1000, cor: 'rgba(255,255,255,.4)' }], caixa: [590, 1640], tema: CLARO, desenhar: arteMomento, grao: [14, 7] },
+    tenda: { fundo: ['#d9cba9', { x: L / 2, y: 1000, r: 1000, cor: 'rgba(255,250,235,.35)' }], caixa: [600, 1520], tema: CLARO, desenhar: arteTenda, grao: [14, 3311] },
+    diferente: { fundo: ['#121110', { x: L / 2, y: 820, r: 700, cor: 'rgba(255,255,255,.07)' }], caixa: [560, 1490],
+      tema: { ...ESCURO, numero: '#f2552c' }, desenhar: arteDiferente, grao: [18, 1212] },
+    custatudo: { fundo: ['#2b2b2a', { x: L / 2, y: 820, r: 900, cor: 'rgba(120,120,116,.35)' }], caixa: [560, 1560],
+      tema: { ...ESCURO, numero: '#f0441e', rotulo: '#f1eee6', marca: '#f1eee6', marcaFraca: '#a3a29d' }, desenhar: arteCustaTudo, grao: [30, 13] },
+    coracao: { fundo: ['#131110'], caixa: [580, 1540], tema: ESCURO, desenhar: arteCoracao, grao: [20, 15] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
   };
   function montar(m) {
