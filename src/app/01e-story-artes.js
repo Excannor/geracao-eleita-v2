@@ -1593,6 +1593,69 @@
     }
   }
 
+  // ---------- (p) Um coração disposto não cumpre chamado se a boca não fala: as brasas ----------
+  // O texto branco condensado, a condição à mão em laranja e, embaixo, o fogo do app (a
+  // mesma chama da ofensiva, em vários tamanhos) com brilho e fagulhas subindo.
+  function arteCoracao(ctx) {
+    const branco = '#f3f0ea';
+    const laranja = '#f2662a';
+    const linhas = ['UM CORAÇÃO', 'DISPOSTO NÃO', 'CUMPRE CHAMADO'];
+    ctx.font = S.Mn(800, 100);
+    const tam = Math.min(150, 100 * 920 / (0.84 * Math.max(...linhas.map((l) => ctx.measureText(l).width))));
+    linhas.forEach((l, i) => {
+      ctx.save();
+      ctx.translate(L / 2, 700 + i * tam * 1.0);
+      ctx.scale(0.84, 1);
+      S.escrever(ctx, l, 0, 0, S.Mn(800, tam), branco, { espaco: -tam * 0.03 });
+      ctx.restore();
+    });
+    const yMao = 700 + 2 * tam + 140;
+    ctx.fillStyle = laranja;
+    const w = aMao(ctx, 'SE A BOCA NÃO FALA', L / 2, yMao, 66, sorteio(15), { alinhar: 'center', espaco: 2 });
+    ctx.strokeStyle = laranja;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(L / 2 - w / 2 - 10, yMao + 26);
+    ctx.quadraticCurveTo(L / 2, yMao + 14, L / 2 + w / 2 + 16, yMao + 22);
+    ctx.stroke();
+    // o fogo: brilho, as chamas e as fagulhas
+    const base = 1500;
+    const brilho = ctx.createRadialGradient(L / 2, base, 0, L / 2, base, 620);
+    brilho.addColorStop(0, 'rgba(242,102,42,.55)');
+    brilho.addColorStop(0.5, 'rgba(242,102,42,.18)');
+    brilho.addColorStop(1, 'rgba(242,102,42,0)');
+    ctx.fillStyle = brilho;
+    ctx.fillRect(-200, base - 700, L + 400, 2000);
+    const r = sorteio(1502);
+    for (let i = 0; i < 11; i++) {
+      const x = 60 + i * 96 + (r() - 0.5) * 40;
+      const meio = 1 - Math.abs(x - L / 2) / (L / 2);
+      ctx.save();
+      ctx.globalAlpha = 0.75 + r() * 0.25;
+      S.chama(ctx, x, base + 30, 120 + meio * 170 + r() * 60, false);
+      ctx.restore();
+    }
+    // o pé do fogo some no escuro, como brasa
+    const pe = ctx.createLinearGradient(0, base - 70, 0, base + 40);
+    pe.addColorStop(0, 'rgba(19,17,16,0)');
+    pe.addColorStop(1, 'rgba(19,17,16,1)');
+    ctx.fillStyle = pe;
+    ctx.fillRect(-200, base - 70, L + 400, 2000);
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,140,40,.9)';
+    ctx.shadowBlur = 10;
+    for (let i = 0; i < 70; i++) {
+      const y = base - 40 - Math.pow(r(), 1.6) * 420;
+      ctx.fillStyle = r() < 0.5 ? '#ffb347' : '#ff7a2e';
+      ctx.globalAlpha = 0.5 + r() * 0.5;
+      ctx.beginPath();
+      ctx.arc(80 + r() * (L - 160), y, 1.5 + r() * 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   // ---------- a ofensiva no topo, a arte no meio, a marca no pé ----------
   // A ofensiva continua em destaque em todo modelo: a chama do app e o número de dias no
   // alto, como no story de sempre. A arte vem abaixo, na faixa do meio (Z0 a Z1); a que foi
@@ -1643,6 +1706,7 @@
       tema: { ...ESCURO, numero: '#f2552c' }, desenhar: arteDiferente, grao: [18, 1212] },
     custatudo: { fundo: ['#2b2b2a', { x: L / 2, y: 820, r: 900, cor: 'rgba(120,120,116,.35)' }], caixa: [560, 1560],
       tema: { ...ESCURO, numero: '#f0441e', rotulo: '#f1eee6', marca: '#f1eee6', marcaFraca: '#a3a29d' }, desenhar: arteCustaTudo, grao: [30, 13] },
+    coracao: { fundo: ['#131110'], caixa: [580, 1540], tema: ESCURO, desenhar: arteCoracao, grao: [20, 15] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
   };
   function montar(m) {

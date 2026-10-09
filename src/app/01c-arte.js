@@ -83,6 +83,7 @@
     { linhas: ['É você que', 'me encontra'], ref: 'Êxodo 33.7-11', arte: 'tenda' },
     { linhas: ['Seu chamado é', 'ser diferente'], arte: 'diferente' },
     { linhas: ['O chamado não', 'é caro. Ele', 'custa tudo'], arte: 'custatudo' },
+    { linhas: ['Um coração disposto', 'não cumpre chamado', 'se a boca não fala'], arte: 'coracao' },
     // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
     { linhas: ['É tudo', 'sobre Ele'] },
     { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },
