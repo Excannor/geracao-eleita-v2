@@ -21,8 +21,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { DatabaseSync } = await import(pathToFileURL(join(AQUI, 'db.mjs')).href);
 const { Contas } = await import(pathToFileURL(join(AQUI, 'contas.mjs')).href);
+const { chavesDasNotas, abrirEstado } = await import(pathToFileURL(join(AQUI, 'cofre.mjs')).href);
+const CHAVES_NOTAS = chavesDasNotas({ ...process.env, CAMINHO_TESTE: '1' });
 const { gerarJsonLegado, SENHAS } = await import(pathToFileURL(join(AQUI, 'ferramentas', 'json-legado-sintetico.mjs')).href);
-const PORTA = 8221;
+const PORTA = Number(process.env.PORTA) || 8221;
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let falhas = 0;
@@ -110,8 +112,11 @@ try {
   ok(banco('SELECT count(*) n FROM toques')[0].n === Object.keys(antes.toques || {}).length, 'os toques vieram junto');
 
   const estadosBanco = new Map(banco('SELECT usuario, dados FROM estados').map((l) => [l.usuario, l.dados]));
-  const iguais = estadosAntes.filter(([u, texto]) => estadosBanco.has(u) && JSON.stringify(JSON.parse(estadosBanco.get(u))) === JSON.stringify(JSON.parse(texto)));
-  ok(estadosAntes.length > 1 && iguais.length === estadosAntes.length, 'o progresso de cada um é idêntico ao do arquivo (' + iguais.length + ' de ' + estadosAntes.length + ')');
+  // No banco, os textos privados ficam cifrados (cofre.mjs): abertos, são os mesmos do arquivo.
+  const iguais = estadosAntes.filter(([u, texto]) => estadosBanco.has(u)
+    && JSON.stringify(abrirEstado(JSON.parse(estadosBanco.get(u)), u, CHAVES_NOTAS)) === JSON.stringify(JSON.parse(texto)));
+  ok(estadosAntes.length > 1 && iguais.length === estadosAntes.length, 'o progresso de cada um, aberto, é idêntico ao do arquivo (' + iguais.length + ' de ' + estadosAntes.length + ')');
+  ok(!/texto que é só meu/.test(estadosBanco.get('ensaio.banco') || ''), 'a reflexão importada do JSON fica cifrada no banco');
 
   const vivos = (novidadesAntes.eventos || []).filter((e) => Date.now() - e.em < 30 * 24 * 60 * 60 * 1000).length;
   ok(banco('SELECT count(*) n FROM novidades_eventos')[0].n === vivos, 'as novidades dos últimos 30 dias vieram junto (' + vivos + ')');

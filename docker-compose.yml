@@ -14,6 +14,11 @@
 #   CAMINHO_ENDERECO=https://...  o endereço público do app (entra na assinatura do push)
 #   PORTA_V2=8083                 opcional
 #   CAMINHO_ADMIN=...             opcional: quem vê o Painel (padrão maarcos_e; vários com vírgula)
+#   CAMINHO_CHAVE_NOTAS=...       OBRIGATÓRIA: 64 hexadecimais (openssl rand -hex 32). Cifra
+#                                 reflexões, anotações e a Minha história no banco; sem ela o
+#                                 app não sobe. Guarde uma cópia fora do servidor: perdida, os
+#                                 textos não abrem mais. Para trocar: a antiga vai para
+#                                 CAMINHO_CHAVE_NOTAS_ANTERIOR e a nova entra aqui.
 #   CAMINHO_SMTP_*, CAMINHO_BACKUP_CHAVE, CAMINHO_BACKUP_MANTER, CAMINHO_PASTA_BACKUP: opcionais
 #   (ver o topo de email.mjs para o e-mail).
 name: geracao-eleita-v2
@@ -46,6 +51,9 @@ services:
       # Chave dos backups cifrados (no .env, fora de dados/). Sem a chave, o backup não abre.
       CAMINHO_BACKUP_CHAVE: "${CAMINHO_BACKUP_CHAVE:-}"
       CAMINHO_BACKUP_MANTER: "${CAMINHO_BACKUP_MANTER:-14}"
+      # Chave das anotações (obrigatória, no .env). Sem ela o container não sobe.
+      CAMINHO_CHAVE_NOTAS: "${CAMINHO_CHAVE_NOTAS:-}"
+      CAMINHO_CHAVE_NOTAS_ANTERIOR: "${CAMINHO_CHAVE_NOTAS_ANTERIOR:-}"
 
   # Túnel rápido: endereço trycloudflare novo a cada reinício. Só sobe se pedido:
   #   docker compose --profile rapido up -d

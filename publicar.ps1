@@ -17,6 +17,13 @@ if (git status --porcelain -- src conteudo arte *.mjs Dockerfile docker-compose.
 $commit = git log --oneline -1
 Write-Host "Publicando: $commit"
 
+# Sem a chave das anotações o container novo não sobe (cofre.mjs): confere antes de derrubar o atual.
+ssh @ssh $pi 'grep -Eq "^CAMINHO_CHAVE_NOTAS=[0-9a-fA-F]{64}\s*$" ~/geracao-eleita/.env'
+if ($LASTEXITCODE) {
+  Write-Host 'Falta CAMINHO_CHAVE_NOTAS (64 hexadecimais) no .env do Pi. Gere com: openssl rand -hex 32, guarde uma cópia fora do Pi e publique de novo.' -ForegroundColor Yellow
+  exit 1
+}
+
 # Arquivo em vez de pipe: o PowerShell 5 corrompe dados binários em pipe para programas externos.
 $tar = Join-Path $env:TEMP 'geracao-eleita-publicar.tar'
 git archive --format=tar -o $tar HEAD

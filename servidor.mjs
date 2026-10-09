@@ -35,6 +35,7 @@ import {
   MINIMO_CHECKIN_CELULA,
 } from './inteligencia.mjs';
 import { configDoEmail, enviarEmail } from './email.mjs';
+import { chavesDasNotas, selarEstado, abrirEstado, migrarEstadosCifrados } from './cofre.mjs';
 import { csvDoRelatorio, htmlDoRelatorio, nomeDoArquivo, SCRIPT_RELATORIO } from './relatorio.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -217,8 +218,16 @@ async function lerEstado(chave) {
   try { return lerEstadoDoBanco(DB, chave); } catch { return null; }
 }
 
+// lerEstado devolve os textos privados ainda cifrados (cofre.mjs): é o que amigos, célula,
+// discipulado e painel leem, e lá só contam datas, chaves e "tem texto". Em claro, só pelo
+// lerEstadoAberto, na rota do próprio dono. Erro ao abrir (dado adulterado, chave errada)
+// sobe para quem chamou: nada é servido nem gravado por cima.
+async function lerEstadoAberto(chave) {
+  return abrirEstado(await lerEstado(chave), chave, CHAVES_NOTAS);
+}
+
 async function gravarEstado(dados, chave) {
-  gravarEstadoNoBanco(DB, chave, dados);
+  gravarEstadoNoBanco(DB, chave, selarEstado(dados, chave, CHAVES_NOTAS));
 }
 
 // Apaga o progresso de uma conta e as cópias dele: a linha no banco, a pessoa em cada
@@ -310,6 +319,18 @@ const lerJson = async (req) => {
   try { return JSON.parse((await corpoDaRequisicao(req)) || '{}') || {}; } catch { return {}; }
 };
 
+// ---------- a chave das anotações ----------
+// Sem CAMINHO_CHAVE_NOTAS em produção o servidor não sobe: subir gravaria os textos de todo
+// mundo sem cifra (cofre.mjs).
+let CHAVES_NOTAS;
+try {
+  CHAVES_NOTAS = chavesDasNotas();
+} catch (e) {
+  console.error('\n  ' + e.message + '\n');
+  process.exit(1);
+}
+if (CHAVES_NOTAS.teste && process.env.CAMINHO_TESTE !== '1') console.log('  aviso: sem CAMINHO_CHAVE_NOTAS, as anotações usam a chave de teste (só fora de produção)');
+
 // ---------- contas e sessão ----------
 // Um banco só para tudo: dados/caminho.db. Na primeira subida, cada módulo importa o seu
 // JSON antigo e o guarda em json-legado-AAAA-MM-DD/.
@@ -340,6 +361,13 @@ function importarEstadosLegados() {
   if (achados.length) console.log('  progresso importado para o banco: ' + achados.length + ' arquivo(s)');
 }
 importarEstadosLegados();
+// Contas de antes do cofre (e o que acabou de ser importado) ficam com os textos cifrados;
+// com chave nova, o que estava na anterior é recifrado. Rodar de novo não muda nada.
+{
+  const { cifrados, falhas } = migrarEstadosCifrados(DB, CHAVES_NOTAS);
+  if (cifrados) console.log('  anotações cifradas no banco: ' + cifrados + ' conta(s)');
+  if (falhas) console.log('  anotações que não abriram com as chaves atuais: ' + falhas + ' conta(s), deixadas como estavam');
+}
 // A cópia achatada das datas de leitura (inteligencia.mjs, esquema v14): na primeira subida com
 // ela, as datas de quem já tinha progresso entram na tabela; depois, cada sincronização mantém.
 {
@@ -1362,12 +1390,19 @@ const servidor = createServer(async (req, res) => {
     // o que outro marcou. A ofensiva dos amigos depende dessas datas.
     if (rota === '/api/estado') {
       const arquivo = arquivoDe(eu);
-      if (req.method === 'GET') { json(res, 200, (await lerEstado(arquivo)) || { vazio: true }); return; }
+      if (req.method === 'GET') {
+        let aberto;
+        try { aberto = await lerEstadoAberto(arquivo); } catch { json(res, 500, { erro: 'não consegui abrir suas anotações' }); return; }
+        json(res, 200, aberto || { vazio: true });
+        return;
+      }
       if (req.method === 'PUT' || post) {
+        let atualAberto;
+        try { atualAberto = await lerEstadoAberto(arquivo); } catch { json(res, 500, { erro: 'não consegui abrir suas anotações' }); return; }
         try {
           const novo = REGRAS.normalizarEstado(JSON.parse(await corpoDaRequisicao(req, LIMITE_ESTADO)));
           if (!novo) throw new Error('formato inválido');
-          const atual = REGRAS.normalizarEstado(await lerEstado(arquivo));
+          const atual = REGRAS.normalizarEstado(atualAberto);
           const junto = atual ? REGRAS.fundir(atual, novo) : novo;
           if (novo.dono) junto.dono = novo.dono;
           await gravarEstado(limparPerfilDoEstado(conferirProgresso(atual, junto, hojeDe(eu))), arquivo);
