@@ -659,6 +659,11 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   1.26-27 ficou fora dos galhos e Rm 13.1-5 (autoridades) não virou galho: só os impostos e a dívida do amor (13.7-9).
   O checador barra "declara" (verbo culto), o que pega o vocabulário da justificação: "aceita como justo", "considera".
 
+- 2026-10-09 · desenho · 1 Coríntios: o `cesto-de-paes` reaproveitado para o fermento de 1Co 5 traz o peixe da
+  multiplicação e só na captura deu para ver que não servia → desenho reaproveitado se confere pelo que tem dentro,
+  não pelo nome do arquivo; virou `massa-na-tigela`. Temas sensíveis da carta (1Co 7, 11.2-16, 14.34-35, a lista de
+  6.9-10) ficaram só como título da estrutura ou fora dos galhos; 1Co 7 entra pelo "cada um tem o seu dom" (7.7, 17).
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
