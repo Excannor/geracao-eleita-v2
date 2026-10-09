@@ -73,6 +73,19 @@
   const gravarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* segue */ } };
 
   let ultimaRota = null;
+  // A tela que está aberta, para saber quando a rolagem volta ao topo: só quando a pessoa vai
+  // para OUTRA tela. Antes contava só o primeiro pedaço do endereço, e do Perfil rolado para
+  // Minhas anotações (#/perfil → #/perfil/anotacoes), ou de uma nota para a seguinte, a tela
+  // nova abria no meio. Ficam de fora o que abre POR CIMA da tela de baixo (a lição, o dia do
+  // Conhecer Jesus, o capítulo da Bíblia sobre a grade: fechar devolve a tela como estava), a
+  // busca (o endereço muda a cada letra) e as abas da célula (trocar de aba não é sair dela).
+  let ultimaTela = null;
+  const SOBRE_A_TELA = new Set(['dia', 'conhecer', 'biblia', 'busca']);
+  function telaDe(rota, arg) {
+    if (SOBRE_A_TELA.has(rota)) return rota;
+    if (arg.startsWith('celula/')) return rota + '/' + arg.split('/').slice(0, 2).join('/');
+    return rota + '/' + arg;
+  }
 
   function partesDaRota() {
     const bruto = (location.hash || '#/').slice(2);
@@ -487,9 +500,11 @@
     if ((rota === '' || rota === 'dia') && ultimaRota !== rota) {
       requestAnimationFrame(() => CC.rolarAteAtual(false));
     }
-    if (rota !== ultimaRota && rota !== 'busca') CC.rolarPara(0);
+    const tela = telaDe(rota, arg);
+    if (tela !== ultimaTela && rota !== 'busca') CC.rolarPara(0);
     entradaDaTela(rota);
     ultimaRota = rota;
+    ultimaTela = tela;
   }
 
   // A tela entra pelo lado de onde a pessoa veio: da direita quando anda para frente na barra
@@ -517,7 +532,36 @@
     try { rotear(); } finally { redesenhando = false; }
     ultimaRota = guardar;
     CC.rolarPara(y);
+    segurarRolagem(y);
   };
+
+  // Telas que desenham um esqueleto e só depois o conteúdo (a lista de livros da Bíblia, que
+  // espera a tradução carregar) encolhiam no redesenho: o navegador cortava a rolagem para
+  // caber no esqueleto e ela não voltava mais, e a página ia para o topo. Aqui a posição de
+  // antes é reposta conforme a tela cresce, até chegar nela, até 3 s, ou até a própria
+  // pessoa mexer (tocar, rolar, teclar) ou ir para outra tela.
+  let soltarRolagem = null;
+  function segurarRolagem(y) {
+    if (soltarRolagem) soltarRolagem();
+    if (y <= 0 || CC.rolagemY() >= y - 1 || typeof ResizeObserver === 'undefined') return;
+    const endereco = location.hash;
+    const gestos = ['touchstart', 'wheel', 'keydown', 'pointerdown'];
+    const olho = new ResizeObserver(() => {
+      if (location.hash !== endereco) { soltar(); return; }
+      CC.rolarPara(y);
+      if (CC.rolagemY() >= y - 1) soltar();
+    });
+    const prazo = setTimeout(() => soltar(), 3000);
+    function soltar() {
+      olho.disconnect();
+      clearTimeout(prazo);
+      gestos.forEach((g) => removeEventListener(g, soltar, true));
+      if (soltarRolagem === soltar) soltarRolagem = null;
+    }
+    gestos.forEach((g) => addEventListener(g, soltar, { capture: true, passive: true }));
+    olho.observe(conteudo);
+    soltarRolagem = soltar;
+  }
 
   // ---------- avisos da abertura ----------
   // Cada aviso aparece uma vez: o escudo que cobriu ontem, a ofensiva que zerou e o
