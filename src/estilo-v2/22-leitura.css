@@ -166,7 +166,7 @@
 
 /* ---------- o cartão do versículo (reflexão, baú, perfil, célula): liso, em Literata ---------- */
 .cartao-versiculo { background: var(--cartao); }
-.cartao-versiculo blockquote, .trecho-da-nota { color: var(--tinta); font-family: var(--fonte-biblia); font-weight: 400; text-wrap: pretty; }
+.cartao-versiculo blockquote { color: var(--tinta); font-family: var(--fonte-biblia); font-weight: 400; text-wrap: pretty; }
 /* as aspas: cheias em sálvia escura (clara no escuro), e não um fantasma a 38% */
 .cartao-versiculo .aspas { top: 6px; color: var(--salvia-texto); font-family: var(--fonte-biblia); font-size: 3rem; font-weight: 600; opacity: 1; }
 

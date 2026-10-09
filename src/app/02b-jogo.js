@@ -255,7 +255,8 @@
     // Conta só quantas notas existem; o texto nunca é lido aqui.
     { id: 'notas', titulo: 'Caderno de notas', icone: 'caderno', cor: 'azul', niveis: [5, 25, 100],
       texto: (n) => 'Escreva nota em ' + n + ' versículos',
-      valor: (e) => Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
+      valor: (e) => Object.values(e.notas || {}).filter((n) => n && !n.apagadaEm && (n.versos || []).length).length
+        + Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
   ];
 
   // Semana de segunda a domingo, pela data da segunda-feira.

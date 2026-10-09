@@ -702,7 +702,8 @@
       : r[chave] || '');
     // A nota do versículo do dia (feita nos leitores) continua à mão aqui, onde se escreve.
     const refDoDia = CC.reflexaoDoDia(sessao.dia).ref;
-    const temNotaVerso = !!(refDoDia && CC.anotacao(CC.versiculos.chaveNota(refDoDia)).trim());
+    const notasVerso = refDoDia && CC.lerRef(refDoDia) ? CC.versiculos.notasDoTrecho(CC.lerRef(refDoDia)) : [];
+    const temNotaVerso = notasVerso.length > 0;
 
     return {
       topo: '<span class="salvo" id="salvo" role="status"></span>',
@@ -745,7 +746,7 @@
           }, 0);
         }
         const notaVerso = el.querySelector('[data-nota-do-verso]');
-        if (notaVerso) notaVerso.onclick = () => CC.versiculos.abrirNota(refDoDia, null, () => desenhar());
+        if (notaVerso) notaVerso.onclick = () => CC.versiculos.abrirPrevia(notasVerso, () => desenhar());
         el.querySelectorAll('[data-modo]').forEach((b) => {
           b.onclick = () => { sessao.modo = b.dataset.modo; sessao.escolheu = true; desenhar(); };
         });

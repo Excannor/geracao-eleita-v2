@@ -15,6 +15,7 @@ window.CC = window.CC || {};
   // ---------- datas ----------
   const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   CC.hojeIso = () => iso(new Date());
+  CC.isoDe = iso;
 
   // O app começa depois que o conteúdo chega, e a página pode já ter terminado de carregar:
   // aí o "load" não vem mais, e quem esperava por ele roda na hora.
@@ -109,6 +110,8 @@ window.CC = window.CC || {};
     folha: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/>',
     info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
     caneta: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+    // alfinete de fixar (Lucide, ISC)
+    pino: '<path d="M12 17v5"/><path d="M9 10.8a2 2 0 0 1-1.1 1.8l-1.8.9A2 2 0 0 0 5 15.2V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.8a2 2 0 0 0-1.1-1.8l-1.8-.9a2 2 0 0 1-1.1-1.8V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
     lupa: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
     cadeado: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
     certo: '<path d="M20 6 9 17l-5-5"/>',

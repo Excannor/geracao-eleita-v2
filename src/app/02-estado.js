@@ -48,6 +48,10 @@
     historia: null,
     // desafios de vários dias (aba Desafios): { [id]: { inicio, dias: [datas], ativo, concluidoEm, em } }
     desafios: {},
+    // Minhas anotações: { [id]: { versos: ["João 3.16-17"], tipo: nota|oracao|estudo, texto, tags,
+    // cor, fixada, respondidaEm, criadaEm, editadaEm, apagadaEm } }. Privadas: só voltam pela
+    // conta da própria pessoa. Os nomes "texto" e "tags" são os que o servidor cifra.
+    notas: {},
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -126,6 +130,66 @@
     return (b.em || 0) >= (a.em || 0) ? b : a;
   }
 
+  // ---------- notas ----------
+  // Cada nota vale por si entre aparelhos: vence a de "editadaEm" mais recente. Apagar marca
+  // "apagadaEm" (a nota vai para Apagadas); passados 30 dias o texto some e fica só a lápide,
+  // que impede o outro aparelho de trazer a nota de volta; aos 90, a lápide também some.
+  const TIPOS_NOTA = ['nota', 'oracao', 'estudo'];
+  const APAGADA_MS = 30 * 864e5;
+  CC.DIAS_APAGADAS = 30;
+  const numero = (x) => (Number(x) > 0 ? Number(x) : 0);
+  // O que vem de fora (o servidor também passa por aqui). Texto e tags podem chegar cifrados
+  // no servidor: string fora do formato fica como veio, sem ser cortada.
+  function limparNota(n) {
+    if (!n || typeof n !== 'object') return null;
+    return {
+      versos: (Array.isArray(n.versos) ? n.versos : []).filter((r) => typeof r === 'string' && r.length <= 60).slice(0, 12),
+      tipo: TIPOS_NOTA.includes(n.tipo) ? n.tipo : 'nota',
+      texto: typeof n.texto === 'string' ? n.texto : '',
+      tags: Array.isArray(n.tags) ? n.tags.filter((t) => typeof t === 'string').map((t) => t.slice(0, 30)).slice(0, 12)
+        : (typeof n.tags === 'string' ? n.tags : []),
+      cor: [1, 2, 3, 4].includes(n.cor) ? n.cor : 0,
+      fixada: !!n.fixada,
+      respondidaEm: numero(n.respondidaEm),
+      criadaEm: numero(n.criadaEm),
+      editadaEm: numero(n.editadaEm),
+      apagadaEm: numero(n.apagadaEm),
+    };
+  }
+  // As notas do formato antigo (E.anotacoes["verso:João 3.16"], só o texto) viram notas com id
+  // fixo, "v:" + a referência: os dois aparelhos e o servidor migram para a mesma nota.
+  function migrarNotas(e) {
+    const anot = e.anotacoes || {};
+    const chaves = Object.keys(anot).filter((k) => k.startsWith('verso:'));
+    const notas = {};
+    for (const [id, n] of Object.entries(e.notas || {})) { const x = limparNota(n); if (x) notas[id] = x; }
+    const anotacoes = { ...anot };
+    const em = numero(e.atualizadoEm);
+    for (const k of chaves) {
+      const texto = String(anotacoes[k] || '').trim();
+      delete anotacoes[k];
+      const id = 'v:' + k.slice(6);
+      if (!texto || (notas[id] && notas[id].editadaEm >= em)) continue;
+      notas[id] = { versos: [k.slice(6)], tipo: 'nota', texto, tags: [], cor: 0, fixada: false,
+        respondidaEm: 0, criadaEm: (notas[id] || {}).criadaEm || em, editadaEm: em, apagadaEm: 0 };
+    }
+    return { ...e, notas, anotacoes };
+  }
+  CC.migrarNotas = migrarNotas;
+  function fundirNotas(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [id, n] of Object.entries(b || {})) {
+      if (!saida[id] || (n.editadaEm || 0) > (saida[id].editadaEm || 0)) saida[id] = n;
+    }
+    const agora = Date.now();
+    for (const [id, n] of Object.entries(saida)) {
+      if (!n.apagadaEm) continue;
+      if (n.apagadaEm < agora - LAPIDE_MS) delete saida[id];
+      else if (n.apagadaEm < agora - APAGADA_MS && (n.texto || n.versos.length)) saida[id] = { ...n, texto: '', tags: [], versos: [] };
+    }
+    return saida;
+  }
+
   let E = VAZIO();
   let servidorVivo = false;
   CC.servidorVivo = () => servidorVivo;
@@ -150,10 +214,12 @@
   // Nunca perde uma marcação: conjuntos são unidos, e só os campos únicos seguem
   // o carimbo de tempo mais recente.
   function fundir(a, b) {
-    if (!a) return b || VAZIO();
-    if (!b) return a;
+    if (!a) return b ? migrarNotas(b) : VAZIO();
+    if (!b) return migrarNotas(a);
+    a = migrarNotas(a);
+    b = migrarNotas(b);
     // Zerar é a única operação que apaga, e só o andamento da trilha: o lado zerado vale
-    // inteiro nele; o resto se funde como sempre, para nada escrito se perder.
+    // inteiro nele; o resto (notas inclusive) se funde como sempre, para nada escrito se perder.
     const zerado = (b.zeradoEm || 0) > (a.atualizadoEm || 0) ? b : (a.zeradoEm || 0) > (b.atualizadoEm || 0) ? a : null;
     if (zerado) {
       const junto = fundirTudo(a, b);
@@ -208,6 +274,7 @@
       marcas: fundirMarcas(a.marcas, b.marcas),
       historia: fundirHistoria(a.historia, b.historia),
       desafios: fundirDesafios(a.desafios, b.desafios),
+      notas: fundirNotas(a.notas, b.notas),
     };
   }
   function fundirPratica(a, b) {
@@ -233,7 +300,7 @@
     delete e.meta;
     delete e.protegidos;
     e.lidos = (e.lidos || []).map(Number).filter((n) => n >= 1 && n <= D.plano.length);
-    return e;
+    return migrarNotas(e);
   }
   CC.normalizarEstado = normalizar;
 
@@ -313,6 +380,53 @@
   CC.gravarAnotacao = (chave, texto) => {
     (E.anotacoes ||= {})[chave] = texto;
     CC.gravar('atualizadoEm', Date.now());
+  };
+
+  // ---------- notas (Minhas anotações) ----------
+  const comId = ([id, n]) => ({ id, ...n, tags: Array.isArray(n.tags) ? n.tags : [] });
+  const viva = (n) => !n.apagadaEm && (n.texto || '').trim();
+  CC.notas = () => Object.entries(E.notas || {}).map(comId).filter(viva);
+  CC.notasApagadas = () => Object.entries(E.notas || {}).map(comId).filter((n) => n.apagadaEm && (n.texto || '').trim());
+  CC.nota = (id) => ((E.notas || {})[id] ? comId([id, E.notas[id]]) : null);
+  const mudarNota = (id, campos) => {
+    const n = (E.notas ||= {})[id];
+    if (!n) return;
+    E.notas[id] = { ...n, ...campos, editadaEm: Math.max(Date.now(), (n.editadaEm || 0) + 1) };
+    CC.gravar('notas', E.notas);
+  };
+  // Guarda (nova ou editada) e devolve o id.
+  CC.gravarNota = (id, dados) => {
+    const agora = Date.now();
+    const atual = id && (E.notas || {})[id];
+    const novoId = atual ? id : 'n' + agora.toString(36) + Math.random().toString(36).slice(2, 6);
+    const n = limparNota({ ...(atual || { criadaEm: agora }), ...dados, apagadaEm: 0 });
+    n.texto = n.texto.trim();
+    (E.notas ||= {})[novoId] = n;
+    mudarNota(novoId, {});
+    return novoId;
+  };
+  CC.apagarNota = (id) => mudarNota(id, { apagadaEm: Date.now(), fixada: false });
+  CC.recuperarNota = (id) => mudarNota(id, { apagadaEm: 0 });
+  // Apagar de vez: fica só a lápide (sem texto), para o outro aparelho não trazer de volta.
+  CC.apagarNotaDeVez = (id) => mudarNota(id, { texto: '', tags: [], versos: [], apagadaEm: (E.notas[id] || {}).apagadaEm || Date.now() });
+  CC.MAX_FIXADAS = 5;
+  CC.fixarNota = (id, fixar) => {
+    if (fixar && CC.notas().filter((n) => n.fixada).length >= CC.MAX_FIXADAS) return false;
+    mudarNota(id, { fixada: !!fixar });
+    return true;
+  };
+  CC.responderOracao = (id, sim) => mudarNota(id, { respondidaEm: sim ? Date.now() : 0 });
+  // Tudo o que a pessoa escreveu e marcou, sem apagar a conta: notas viram lápide, marcas
+  // ficam sem cor, reflexões dos dias e anotações do Explorar ficam em branco.
+  CC.apagarTodasAnotacoes = () => {
+    const agora = Date.now();
+    for (const [id, n] of Object.entries(E.notas || {})) {
+      E.notas[id] = { ...n, texto: '', tags: [], versos: [], fixada: false, apagadaEm: n.apagadaEm || agora, editadaEm: agora };
+    }
+    for (const k of Object.keys(E.marcas || {})) E.marcas[k] = { cor: 0, em: agora };
+    for (const k of Object.keys(E.oia || {})) E.oia[k] = { o: '', i: '', a: '', oracao: '' };
+    for (const k of Object.keys(E.anotacoes || {})) E.anotacoes[k] = '';
+    CC.gravar('atualizadoEm', agora);
   };
 
   // Minha história com Deus: guia privado do Perfil. Só volta pela própria conta da pessoa
@@ -612,14 +726,30 @@
       }
     }
 
-    const anot = E.anotacoes || {};
-    const comTextoAnot = Object.keys(anot).filter((k) => (anot[k] || '').trim()).sort();
-    const deVerso = comTextoAnot.filter((k) => k.startsWith('verso:'));
-    if (deVerso.length) {
-      L.push('## Notas nos versículos', '');
-      for (const k of deVerso) L.push('### ' + k.slice(6), '', anot[k].trim(), '');
+    // Notas, orações e estudos: com datas, versículos e tags; as fixadas primeiro.
+    const data = (ms) => (ms ? new Date(ms).toISOString().slice(0, 10) : '');
+    const notas = CC.notas().sort((a, b) => (b.fixada - a.fixada) || (b.criadaEm - a.criadaEm));
+    for (const [tipo, titulo] of [['nota', 'Notas nos versículos'], ['oracao', 'Orações'], ['estudo', 'Estudos']]) {
+      const lista = notas.filter((n) => n.tipo === tipo);
+      if (!lista.length) continue;
+      L.push('## ' + titulo, '');
+      for (const n of lista) {
+        L.push('### ' + (n.versos.join('; ') || 'Nota livre'), '');
+        L.push('Escrita em ' + data(n.criadaEm) + (n.editadaEm - n.criadaEm > 6e4 ? ' · editada em ' + data(n.editadaEm) : '')
+          + (n.respondidaEm ? ' · respondida em ' + data(n.respondidaEm) : '') + (n.fixada ? ' · fixada' : '') + '.', '');
+        L.push(n.texto.trim(), '');
+        if (n.tags.length) L.push(n.tags.map((t) => '#' + t).join(' '), '');
+      }
     }
-    const chaves = comTextoAnot.filter((k) => !k.startsWith('verso:'));
+    const marcados = CC.versiculos && CC.versiculos.marcados ? CC.versiculos.marcados() : [];
+    if (marcados.length) {
+      const NOMES = ['', 'amarelo', 'verde', 'azul', 'rosa'];
+      L.push('## Versículos marcados', '');
+      for (const m of marcados) L.push('- ' + m.ref + ' (' + NOMES[m.cor] + ', ' + data(m.em) + ')');
+      L.push('');
+    }
+    const anot = E.anotacoes || {};
+    const chaves = Object.keys(anot).filter((k) => (anot[k] || '').trim() && !k.startsWith('verso:')).sort();
     if (chaves.length) {
       L.push('## Anotações', '');
       for (const k of chaves) {

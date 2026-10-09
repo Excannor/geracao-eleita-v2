@@ -62,7 +62,7 @@
     raiz.querySelectorAll('[data-tema]').forEach((b) => {
       b.onclick = () => { CC.guardarTema(JSON.parse(b.dataset.tema)); CC.redesenhar(); };
     });
-    raiz.querySelector('[data-exportar]').onclick = () => { CC.baixarExportacao(); CC.avisar('Arquivo gerado'); };
+    raiz.querySelector('[data-exportar]').onclick = () => CC.exportarComAviso();
     raiz.querySelector('[data-zerar]').onclick = async () => {
       const certo = await CC.confirmar({
         titulo: 'Recomeçar a trilha do zero?',
