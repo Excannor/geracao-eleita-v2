@@ -119,6 +119,14 @@
     }
 
     let el = document.querySelector('.licao:not(.saindo)');
+    // Redesenhar a MESMA tela (marcar uma passagem, a sincronização que chama CC.redesenhar)
+    // deixa o palco onde a pessoa estava; só uma tela nova da lição, ou outro dia, começa no
+    // topo. Antes o palco voltava sempre ao zero, e marcar a passagem de baixo jogava a lição
+    // para o alto (relato do dono, 09/10).
+    const qualTela = sessao.dia + ':' + sessao.tela;
+    const palcoAntes = el && el.dataset.tela === qualTela ? el.querySelector('.licao-palco') : null;
+    const rolagemAntes = palcoAntes ? palcoAntes.scrollTop : 0;
+    const focoAntes = el && el.contains(document.activeElement) ? document.activeElement.dataset.trilha : '';
     if (!el) {
       el = document.createElement('div');
       el.setAttribute('role', 'dialog');
@@ -140,10 +148,15 @@
     if (fechar) fechar.onclick = sair;
     if (tela.ligar) tela.ligar(el);
 
+    el.dataset.tela = qualTela;
     const palco = el.querySelector('.licao-palco');
-    if (palco) palco.scrollTop = 0;
+    if (palco) palco.scrollTop = rolagemAntes;
+    // O foco vai para o título numa tela nova; no redesenho, volta ao botão de marcar que foi
+    // tocado (o innerHTML trocou o elemento), sem rolar.
+    const tocado = palcoAntes && focoAntes ? el.querySelector('[data-trilha="' + focoAntes + '"]') : null;
     const titulo = el.querySelector('h1');
-    if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
+    if (tocado) tocado.focus({ preventScroll: true });
+    else if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
   }
 
   function sair() {
