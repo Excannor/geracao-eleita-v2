@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o grande banquete (Lc 14.15-24): a mesa comprida posta, com pão, taça e jarro, e três banquinhos vazios na frente; ao fundo, a porta da casa aberta, com o caminho saindo para a rua. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. O vão da porta é a única área sálvia. -->
+<path class="k p" d="M112 70V22C112 12 146 12 146 22V70Z"/>
+<path class="k s" d="M118 70V25C118 19 140 19 140 25V70Z"/>
+<path class="k p" d="M140 25L154 19V66L140 70Z"/>
+<path class="h" d="M146 26V64M150 24V64"/>
+<path class="h" d="M124 70C122 80 112 88 100 96M134 70C136 82 142 90 152 98"/>
+<path class="k" d="M30 74V100M96 74V100"/>
+<path class="k p" d="M18 66H104L114 76H8Z"/>
+<path class="k p" d="M8 76H114V83H8Z"/>
+<path class="k p" d="M12 83H18V108H12ZM104 83H110V108H104Z"/>
+<path class="h" d="M12 79H110"/>
+<path class="k p" d="M22 72C22 60 42 58 44 72C36 74 30 74 22 72Z"/>
+<path class="h" d="M28 65l3-3M34 66l3-3"/>
+<path class="k p" d="M52 54H66C66 62 63 65 59 65C55 65 52 62 52 54Z"/>
+<ellipse class="k s" cx="59" cy="54" rx="7" ry="2"/>
+<path class="k" d="M59 65V70M54 71.5C54 69.5 64 69.5 64 71.5"/>
+<path class="k p" d="M76 46H86V50C86 52 92 55 92 62C92 70 88 72 81 72C74 72 70 70 70 62C70 55 76 52 76 50Z"/>
+<path class="k" d="M74 46H88"/>
+<path class="k p" d="M24 112H40V116H24ZM54 112H70V116H54ZM84 112H100V116H84Z"/>
+<path class="k" d="M27 116V122M37 116V122M57 116V122M67 116V122M87 116V122M97 116V122"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as cinco juntas de bois (Lc 14.19): a canga de madeira que prende dois bois pelo pescoço, com as duas alças de cada lado e a argola no meio, onde se amarra o arado. A argola é a única área sálvia. -->
+<path class="k p" d="M12 46C30 40 90 40 108 46L106 54C88 48 32 48 14 54Z"/>
+<path class="k" d="M34 52C30 64 30 74 36 80M48 52C52 64 52 74 46 80M72 52C68 64 68 74 74 80M86 52C90 64 90 74 84 80"/>
+<path class="k" d="M60 44V30"/>
+<circle class="k s" cx="60" cy="26" r="5"/>
+<path class="h" d="M22 48l4 3M94 48l4 3M40 46l2 3M78 46l2 3"/>
+<path class="k" d="M10 98C40 96 80 96 110 98"/>
+</svg>
