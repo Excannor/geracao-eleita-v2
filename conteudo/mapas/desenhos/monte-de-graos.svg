@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o monte de grãos na eira, de noite (Rt 3.7-8): o chão da eira, o monte de cevada em sálvia com grãos riscados e a lua crescente. O monte fecha embaixo por uma curva rasa sobre a eira. -->
+<path class="k" d="M6 96C30 92 90 92 114 96"/>
+<path class="k s" d="M20 94.5C28 76 44 58 60 57C76 58 92 76 100 94.5C80 97 40 97 20 94.5Z"/>
+<path class="h" d="M44 76l3 -2M56 70l3 -2M68 74l3 -2M38 86l3 -2M52 82l3 -2M64 86l3 -2M78 82l3 -2M86 90l3 -2M30 91l3 -2M60 64l3 -2"/>
+<path class="k p" d="M82.9 14.3A16 16 0 1 0 101 35.5A14 14 0 0 1 82.9 14.3Z"/>
+<path class="h" d="M28 22v8M24 26h8M46 12v6M43 15h6M58 30v6M55 33h6"/>
+</svg>

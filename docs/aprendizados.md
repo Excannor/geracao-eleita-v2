@@ -587,6 +587,17 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
 - 2026-10-02 · captura · Juízes: o arquivo de cookie gravado a partir do `curl -i` do `api/entrar` saiu com
   duas linhas (`cc_sessao` e `cc_logado`), e o `foto-conta` capturou a página de entrada sem avisar → grave
   só a primeira linha (`head -1 | tr -d '\n'`) e confira a primeira captura antes de seguir.
+- 2026-10-09 · captura · Rute: para capturar o mapa não é preciso conta nem cookie. Um servidor próprio com
+  `CAMINHO_ESTADO=<pasta>/estado.json CAMINHO_ABERTO=1 node servidor.mjs <porta>` (como o `teste-mapas` faz)
+  abre o app sem entrada, e o `foto-conta` vai direto com `BASE=http://localhost:<porta>/`. E o
+  `teste-mapas` passou a aceitar `PORTA=` (padrão 8373), para dois agentes rodarem ao mesmo tempo.
+- 2026-10-09 · conteúdo · Rute: o nome não tem tradução segura (lembra a palavra hebraica para amiga) → o
+  `significado` diz "lembra" e que o livro não explica o nome, em vez de afirmar a etimologia. E o NT não liga
+  Boaz, o resgatador, a Jesus: a ligação ficou só onde o NT a faz (Mt 1.5-6, 16; Lc 3.31-32; 2Tm 2.8), sem
+  tipologia.
+- 2026-10-09 · revisão · Nesta rodada o agente escritor não tinha ferramenta para chamar um revisor → a
+  revisão em voz alta e a folha do `rever-mapa` ficaram com o próprio escritor, campo por campo; o mapa fica
+  marcado para a leitura do coordenador antes de ir ao ar.
 
 ## Entrada, sessão e página inicial
 

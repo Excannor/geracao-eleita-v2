@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a sandália que o parente tira e entrega a Boaz (Rt 4.7-8): sola com a borda em sálvia, tira larga na frente, tira no tornozelo . A sola de baixo é a mesma curva deslocada; as tiras começam e terminam na borda da sola. -->
+<g transform="rotate(-24 60 60)">
+<path class="k s" transform="translate(3 4)" d="M60 16C74 16 80 28 79 42C78 54 72 60 72 72C72 86 76 98 64 104C56 108 46 104 45 94C44 84 50 74 49 62C48 50 42 40 44 30C46 21 52 16 60 16Z"/>
+<path class="k p" d="M60 16C74 16 80 28 79 42C78 54 72 60 72 72C72 86 76 98 64 104C56 108 46 104 45 94C44 84 50 74 49 62C48 50 42 40 44 30C46 21 52 16 60 16Z"/>
+<path class="h" d="M52 92C52 98 56 100 60 100C66 100 68 96 68 90"/>
+<path class="k" d="M60 37L59.5 24"/>
+<path class="k p" d="M44.3 34C54 30 70 30 79.4 34L79.1 43C70 39 54 39 44.6 43Z"/>
+<path class="k" d="M60 42V66"/>
+<path class="k p" d="M48.7 66C56 62 66 62 72.1 66L72 74C66 70 56 70 48.5 74Z"/>
+</g>
+</svg>

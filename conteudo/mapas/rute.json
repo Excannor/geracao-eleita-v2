@@ -1,0 +1,192 @@
+{
+  "nome": "Rute",
+  "grupo": "Históricos",
+  "numero": 8,
+  "capitulos": 4,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "רוּת",
+    "transliteracao": "Rut",
+    "traducao": "amiga",
+    "texto": "O nome lembra a palavra hebraica para amiga, companheira. O livro não explica o nome dela. Rute é a moabita que não deixa a sogra voltar sozinha para Belém."
+  },
+  "autoria": {
+    "texto": "O autor interrompe a cena do mercado e explica um costume antigo. Naquela época, quem passava a outro o direito de compra tirava a sandália e entregava a ele.",
+    "apoio": "Nos últimos versículos, ele põe a lista dos antepassados de Davi, que começa em Perez. O nome dele não aparece no livro.",
+    "refs": [
+      "Rt 4.7",
+      "Rt 4.18"
+    ]
+  },
+  "raiz": {
+    "texto": "Rute é uma moabita que mora com a sogra, Noemi. Um dia ela sai para colher as espigas que sobram atrás dos trabalhadores e vai parar no campo de Boaz, um parente da família. Boaz casa com Rute, e o Senhor dá a ela um filho. Noemi pega o menino no colo e cuida dele.",
+    "refs": [
+      "Rt 2.2-3",
+      "Rt 2.23",
+      "Rt 4.13",
+      "Rt 4.16"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Volta a Belém",
+      "sub": "Rute não larga a sogra",
+      "desenho": "caminho-para-belem",
+      "galhos": [
+        {
+          "texto": "No tempo dos juízes, há fome em Judá. Elimeleque sai de Belém e vai morar em Moabe com a mulher, Noemi, e os dois filhos. Elimeleque morre ali. Os filhos casam com Orfa e Rute, duas moabitas, e uns dez anos depois morrem também. Noemi fica sozinha, sem o marido e sem os filhos.",
+          "ref": "Rt 1.1-5"
+        },
+        {
+          "texto": "Noemi ouve que o Senhor deu boas colheitas ao povo dela e decide voltar. No caminho, ela beija as noras e manda as duas de volta para a casa das mães. As três choram alto. Orfa se despede da sogra com um beijo e vai embora, e Rute fica.",
+          "ref": "Rt 1.6-9, 14"
+        },
+        {
+          "texto": "A cunhada já voltou ao povo dela e aos deuses dela, e Noemi manda Rute fazer o mesmo. Rute responde: “O seu povo será o meu povo e o seu Deus será o meu Deus!” Ela quer morrer onde a sogra morrer e ser enterrada ali.",
+          "ref": "Rt 1.15-17"
+        },
+        {
+          "texto": "Em Belém, as mulheres perguntam se aquela é Noemi. Noemi pede que chamem ela de Mara, porque Deus deixou a vida dela amarga. Ela diz: “Eu parti cheia de alegria, de mãos cheias, mas o Senhor me trouxe de volta de mãos vazias”.",
+          "ref": "Rt 1.19-21"
+        }
+      ],
+      "conexao": "Noemi e Rute chegam a Belém quando a colheita de cevada está começando (Rt 1.22)."
+    },
+    {
+      "titulo": "Campo de Boaz",
+      "sub": "Rute colhe o que sobra",
+      "desenho": "feixe-de-cevada",
+      "galhos": [
+        {
+          "texto": "Boaz chega de Belém e saúda os trabalhadores: “O Senhor esteja com vocês!” Eles respondem pedindo a bênção do Senhor para ele. Boaz quer saber de quem é aquela moça. O capataz conta que ela veio de Moabe com Noemi e trabalha desde cedo, quase sem parar.",
+          "ref": "Rt 2.4-7"
+        },
+        {
+          "texto": "No campo, Boaz diz a Rute que não vá colher em outra lavoura e que beba das vasilhas dos servos quando tiver sede. Rute se inclina com o rosto no chão e pergunta por que ele é tão bom com uma estrangeira. Boaz já sabe de tudo o que ela fez pela sogra. Ele quer que o Deus de Israel recompense Rute, porque ela veio se abrigar debaixo da proteção dele.",
+          "ref": "Rt 2.8-12"
+        },
+        {
+          "texto": "Na hora da refeição, Boaz chama Rute para molhar o pão no vinho junto com os trabalhadores. Ele manda os empregados deixarem cair espigas dos feixes para ela colher. À noite, Rute debulha a cevada do dia e tem mais de vinte quilos.",
+          "ref": "Rt 2.14-17"
+        },
+        {
+          "texto": "Rute leva a cevada para a sogra. Quando Rute diz o nome do dono do campo, Noemi abençoa Boaz e conta que ele é um parente chegado, um dos resgatadores da família.",
+          "ref": "Rt 2.18-20"
+        }
+      ],
+      "conexao": "Um dia, Noemi diz a Rute que está na hora de achar um marido para ela (Rt 3.1)."
+    },
+    {
+      "titulo": "Noite na eira",
+      "sub": "Rute pede a capa de Boaz",
+      "desenho": "monte-de-graos",
+      "galhos": [
+        {
+          "texto": "Noemi sabe que Boaz vai debulhar cevada na eira naquela noite. Ela manda Rute tomar banho, se perfumar e pôr a melhor roupa. Rute deve ver onde Boaz vai dormir, levantar a coberta dos pés dele e se deitar ali. Rute promete fazer tudo o que a sogra disse.",
+          "ref": "Rt 3.2-5"
+        },
+        {
+          "texto": "Depois de jantar, Boaz vai dormir perto de um monte de grãos. Rute chega sem fazer barulho, descobre os pés dele e se deita. No meio da noite, Boaz acorda de repente e encontra uma mulher deitada aos pés dele. Rute pede: “Estenda a sua capa sobre a sua serva, pois o senhor é o meu resgatador”.",
+          "ref": "Rt 3.7-9"
+        },
+        {
+          "texto": "Boaz abençoa Rute porque ela não foi atrás de um homem mais jovem. Só que existe outro resgatador, ainda mais chegado. De manhã, Boaz vai procurar esse parente. Se ele não quiser resgatar Rute, Boaz jura pelo Senhor que vai fazer isso.",
+          "ref": "Rt 3.10-13"
+        },
+        {
+          "texto": "Rute se levanta antes de clarear, para ninguém reconhecer a moça. Boaz enche a capa dela com uns vinte e cinco quilos de cevada e põe a carga nas costas de Rute. Em casa, Rute conta tudo à sogra e repete o que Boaz disse: “Você não vai voltar com as mãos vazias para a sua sogra!”",
+          "ref": "Rt 3.14-17"
+        }
+      ],
+      "conexao": "Noemi garante que Boaz não vai descansar e vai resolver o caso naquele mesmo dia (Rt 3.18)."
+    },
+    {
+      "titulo": "A sandália",
+      "sub": "Boaz resgata a terra e Rute",
+      "desenho": "sandalia",
+      "galhos": [
+        {
+          "texto": "De manhã, Boaz vai ao mercado, encontra o parente resgatador e chama o homem para sentar. Dez líderes da cidade servem de testemunhas. Boaz conta que Noemi pôs à venda a terra de Elimeleque. O parente responde: “Está certo. Eu comprarei a propriedade”.",
+          "ref": "Rt 4.1-4"
+        },
+        {
+          "texto": "Boaz avisa que quem comprar a terra também tem de casar com Rute, para que ela tenha filhos com o nome do marido que morreu. O parente desiste, porque assim o filho de Rute herdaria a terra dele também.",
+          "ref": "Rt 4.5-6"
+        },
+        {
+          "texto": "O parente diz a Boaz que ele pode comprar e tira a sandália. Boaz fala ao povo e às testemunhas que está comprando de Noemi tudo o que era de Elimeleque, de Quiliom e de Malom. Boaz também compra o direito de casar com Rute, a moabita.",
+          "ref": "Rt 4.8-10"
+        },
+        {
+          "texto": "Quando o filho de Rute nasce, as mulheres de Belém louvam o Senhor, que não deixou Noemi sem resgatador. Elas dizem que Rute ama Noemi e foi melhor para ela do que sete filhos.",
+          "ref": "Rt 4.14-15"
+        }
+      ],
+      "jesus": {
+        "texto": "Na lista de Mateus, Boaz é o pai de Obede, e a mãe de Obede é Rute. Dali, Mateus desce pelos nomes de Jessé e do rei Davi até chegar a José, o marido de Maria. Maria é a mãe de Jesus.",
+        "refs": [
+          "Mt 1.5-6",
+          "Mt 1.16"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "As vizinhas de Noemi chamam o menino de Obede. Obede vai ser o pai de Jessé e o avô de Davi. Paulo pede a Timóteo que nunca esqueça que Jesus Cristo ressuscitou dos mortos e é da família do rei Davi (2Tm 2.8).",
+    "ref": "Rt 4.17",
+    "desenho": "tronco-que-brota",
+    "pares": [
+      {
+        "at": "Rt 4.11",
+        "texto": "E que você seja um grande homem em Efrata, e muito famoso em Belém!",
+        "nt": "Lc 2.4-7",
+        "nota": "José é da linhagem de Davi e leva Maria a Belém. Ali nasce o primeiro filho dela"
+      },
+      {
+        "at": "Rt 4.22",
+        "texto": "Obede gerou Jessé; e Jessé gerou Davi.",
+        "nt": "Lc 3.23, 31-32",
+        "nota": "Na lista dos antepassados de Jesus, o pai de Davi é Jessé, o pai de Jessé é Obede, e o pai de Obede é Boaz"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Noemi volta de Moabe com Rute",
+      "de": 1,
+      "ate": 1
+    },
+    {
+      "titulo": "Rute colhe no campo de Boaz",
+      "de": 2,
+      "ate": 2
+    },
+    {
+      "titulo": "Noite na eira",
+      "de": 3,
+      "ate": 3
+    },
+    {
+      "titulo": "Boaz resgata a terra e casa com Rute",
+      "de": 4,
+      "ate": 4
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Noemi pergunta às noras se elas vão esperar que ela tenha outros filhos e que eles cresçam para casar com elas. Ela diz que já é velha demais para ter outro marido.",
+      "ref": "Rt 1.11-13"
+    },
+    {
+      "texto": "Rute conta que Boaz mandou ela colher com os empregados dele até o fim da colheita. Noemi acha ótimo, porque com as moças de Boaz a nora vai estar mais segura do que em outro campo.",
+      "ref": "Rt 2.21-22"
+    },
+    {
+      "texto": "O povo deseja que, com Rute, o Senhor dê a Boaz uma família tão grande quanto a de Perez. Perez é filho de Judá e Tamar.",
+      "ref": "Rt 4.12"
+    }
+  ],
+  "procure": {
+    "texto": "Noemi é a primeira a usar a palavra resgatador, quando ouve o nome de Boaz. Depois a palavra volta na boca de Rute, de Boaz e das mulheres de Belém."
+  }
+}
