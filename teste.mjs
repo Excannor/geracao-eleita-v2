@@ -461,6 +461,46 @@ checar(ordenado(CC.fundir(celular, computador)) === ordenado(CC.fundir(computado
 const zerado = { atualizadoEm: 200, zeradoEm: 200, dia: 1, lidos: [], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {} };
 checar(CC.fundir(celular, zerado).lidos.length === 0, 'um zeramento mais novo apaga o que veio antes');
 checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 'o que foi feito depois do zeramento sobrevive');
+// "Zerar progresso" recomeça só a trilha: foto, nome, o que foi escrito e marcado ficam
+{
+  CC.carregarLocal();
+  CC.guardarFoto('data:image/jpeg;base64,FOTO');
+  CC.guardarApelido('Ana');
+  CC.gravarAnotacao('verso:João 3.16', 'minha nota');
+  CC.gravarRegistro(1, { o: 'reflexão', i: '', a: '', oracao: 'oração' });
+  CC.gravarHistoria('antes', 'encontro', 'hoje');
+  CC.marcar(['João 3:16'], 2);
+  CC.marcarLido(1, true);
+  CC.marcarLicao('a', true);
+  CC.marcarConhecido(1);
+  CC.marcarOrei();
+  CC.gravar('bausAbertos', { 7: { em: '2026-03-01' } });
+  CC.gravar('conquistasGanhas', { 'nivel:x:1': '2026-03-01' });
+  CC.gravar('desafios', { semRedes: { inicio: '2026-03-01', dias: ['2026-03-01'], ativo: true, em: 1 } });
+  const antes = JSON.parse(JSON.stringify(CC.estado()));
+  CC.zerarProgresso();
+  const z = CC.estado();
+  checar(!z.lidos.length && !z.licoes.length && !Object.keys(z.conhecidos).length && !Object.keys(z.marcadoEm).length
+    && !Object.keys(z.bausAbertos).length && !Object.keys(z.conquistasGanhas).length && z.xpLegado === 0 && z.zeradoEm > 0,
+  'zerar apaga leituras, primeiros passos, Conhecer Jesus, ofensiva, baús, conquistas e XP');
+  checar(z.foto === antes.foto && z.apelido === 'Ana' && z.anotacoes['verso:João 3.16'] === 'minha nota' && z.oia[1].oracao === 'oração'
+    && z.historia.antes === 'antes' && z.marcas['João 3:16'].cor === 2 && Object.keys(z.oradoEm).length === 1 && z.desafios.semRedes.ativo,
+  'zerar mantém foto, nome, anotações, reflexões, Minha história, marca-texto, orações marcadas e desafios');
+  // outro aparelho, que ainda não sabia do zeramento, sincroniza depois: não traz a trilha de
+  // volta, mas o que ele tinha escrito continua
+  const outro = { ...antes, atualizadoEm: z.zeradoEm - 10, anotacoes: { ...antes.anotacoes, 'nota:y': 'escrita no outro' }, foto: antes.foto };
+  for (const [x, y] of [[z, outro], [outro, z]]) {
+    const f2 = CC.fundir(x, y);
+    checar(!f2.lidos.length && !Object.keys(f2.marcadoEm).length && f2.foto === antes.foto && f2.anotacoes['nota:y'] === 'escrita no outro'
+      && f2.anotacoes['verso:João 3.16'] === 'minha nota' && f2.oia[1].o === 'reflexão',
+    'na fusão com um aparelho atrasado, a trilha fica zerada e foto e anotações dos dois lados ficam');
+  }
+  // um zeramento da versão anterior (que mandava tudo vazio) não apaga mais o que foi escrito
+  const zeradoAntigo = { atualizadoEm: z.zeradoEm + 5, zeradoEm: z.zeradoEm + 5, dia: 1, lidos: [], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {}, foto: '' };
+  const f3 = CC.fundir(antes, zeradoAntigo);
+  checar(!f3.lidos.length && f3.foto === antes.foto && f3.anotacoes['verso:João 3.16'] === 'minha nota', 'zeramento vindo de aparelho antigo também só zera a trilha');
+  CC.carregarLocal();
+}
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
 
@@ -1030,6 +1070,21 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     await pedir('/api/estado', { ...outroAparelho, atualizadoEm: Date.now() + 2000, anotacoes: { 'nota:x': 'SEGREDO-EDITADA' } }, ana, 'PUT');
     checar(naLinha('ana.cofre').anotacoes['nota:x'].iv !== ivAntes, 'o texto editado é gravado com IV novo');
 
+    // "Zerar progresso" pelo servidor: a trilha recomeça, foto e anotações ficam
+    const FOTO = 'data:image/jpeg;base64,QUJD';
+    await pedir('/api/estado', { ...fundido, atualizadoEm: Date.now() + 3000, foto: FOTO, acertosTotal: 40 }, ana, 'PUT');
+    const cheio = await (await pedir('/api/estado', null, ana)).json();
+    const agoraZ = Date.now() + 4000;
+    const zeradoSrv = { ...cheio, atualizadoEm: agoraZ, zeradoEm: agoraZ };
+    for (const campo of CC.PROGRESSO_DA_TRILHA) zeradoSrv[campo] = { ...CC.normalizarEstado({}), xpLegado: 0 }[campo];
+    checar(cheio.lidos.length === 1 && cheio.acertosTotal === 40 && (await pedir('/api/estado', zeradoSrv, ana, 'PUT')).status === 200, 'o dono zera a trilha');
+    const depoisZ = await (await pedir('/api/estado', null, ana)).json();
+    checar(!depoisZ.lidos.length && !Object.keys(depoisZ.marcadoEm).length && depoisZ.acertosTotal === 0 && depoisZ.xpLegado === 0,
+      'no servidor, zerar recomeça leituras, ofensiva e contadores');
+    checar(depoisZ.foto === FOTO && depoisZ.anotacoes['nota:y'] === 'SEGREDO-NOVA' && depoisZ.oia[1].o === 'SEGREDO-OIA-ANA' && depoisZ.historia.antes === 'SEGREDO-HISTORIA-ANA',
+      'no servidor, zerar mantém a foto, as anotações, as reflexões e a Minha história');
+    checar(!/SEGREDO/.test(bancoBruto()), 'e o que ficou continua cifrado no banco');
+
     // migração: uma conta de antes do cofre, com texto em claro no banco
     naLinha('bia.cofre', () => ({ ...meu, oia: { 1: { o: 'SEGREDO-ANTIGO-BIA', i: '', a: '', oracao: '' } } }));
     checar(/SEGREDO-ANTIGO-BIA/.test(JSON.stringify(naLinha('bia.cofre'))), 'a conta antiga está em claro antes de reiniciar');
@@ -1038,6 +1093,7 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     srv = subir();
     checar(await no(), 'o servidor sobe de novo');
     checar(!/SEGREDO-ANTIGO-BIA/.test(JSON.stringify(naLinha('bia.cofre'))) && /anotações cifradas no banco: 1/.test(saida), 'na subida a conta antiga é cifrada');
+    checar(!/SEGREDO-ANTIGO-BIA/.test(bancoBruto()), 'e o texto em claro não sobra no arquivo do banco nem no WAL');
     checar((await (await pedir('/api/estado', null, bia)).json()).oia[1].o === 'SEGREDO-ANTIGO-BIA', 'e a dona continua lendo o que escreveu');
 
     // dado adulterado: nada é servido nem gravado por cima

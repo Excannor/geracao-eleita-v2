@@ -192,13 +192,15 @@ function conferirProgresso(atual, junto, hoje) {
     }
     junto[campo] = mapa;
   }
+  // "Zerar progresso" que acabou de chegar: os contadores recomeçam do zero com a trilha.
+  const zerouAgora = !!atual && (junto.zeradoEm || 0) > (atual.zeradoEm || 0);
   for (const [campo, maximo] of Object.entries(SUBIDA_MAXIMA)) {
-    const antes = Number((atual && atual[campo]) || 0);
+    const antes = zerouAgora ? 0 : Number((atual && atual[campo]) || 0);
     const agora = Number(junto[campo] || 0);
     junto[campo] = Number.isFinite(agora) ? Math.max(antes, Math.min(agora, antes + maximo)) : antes;
   }
   // O XP da versão antiga só entra na primeira vez que o progresso chega ao servidor.
-  if (atual) junto.xpLegado = atual.xpLegado === undefined ? null : atual.xpLegado;
+  if (atual) junto.xpLegado = zerouAgora ? 0 : (atual.xpLegado === undefined ? null : atual.xpLegado);
   return junto;
 }
 

@@ -56,14 +56,15 @@
     raiz.querySelector('[data-exportar]').onclick = () => { CC.baixarExportacao(); CC.avisar('Arquivo gerado'); };
     raiz.querySelector('[data-zerar]').onclick = async () => {
       const certo = await CC.confirmar({
-        titulo: 'Zerar todo o progresso?',
-        texto: 'Apaga leituras, ofensiva, registros e anotações em todos os aparelhos. O material de leitura não é tocado.',
-        acao: 'Apagar tudo',
+        titulo: 'Recomeçar a trilha do zero?',
+        texto: 'Apaga, em todos os aparelhos, as leituras marcadas do plano, os primeiros passos, os dias do Conhecer Jesus, a ofensiva, o XP, as conquistas, os baús, os desafios do dia e a prática. '
+          + 'Ficam sua foto e seu nome, as reflexões, anotações e notas, as marcações nos versículos, a Minha história com Deus, os desafios de vários dias, os amigos e a célula.',
+        acao: 'Zerar a trilha',
         perigo: true,
       });
       if (!certo) return;
       CC.zerarProgresso();
-      CC.avisar('Progresso zerado');
+      CC.avisar('Trilha recomeçada');
       CC.redesenhar();
     };
     const ligar = (sel, fn) => { const el = raiz.querySelector(sel); if (el) el.onclick = fn; };

@@ -146,5 +146,11 @@ export function migrarEstadosCifrados(db, chaves) {
       } catch { falhas++; }
     }
   });
+  // O SQLite não apaga de verdade a página antiga: o texto em claro ficaria nas páginas livres
+  // do arquivo (e no WAL) até serem reaproveitadas. O VACUUM reescreve o arquivo sem elas.
+  if (cifrados) {
+    db.exec('VACUUM');
+    db.exec('PRAGMA wal_checkpoint(TRUNCATE)');
+  }
   return { cifrados, falhas };
 }
