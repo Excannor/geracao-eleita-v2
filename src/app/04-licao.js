@@ -27,9 +27,12 @@
 
   CC.abrirLicao = function (dia) { location.hash = '#/dia/' + dia; };
 
+  // Só a lição do dia (.licao-dia): o dia do Conhecer Jesus e a prática também usam .licao, e
+  // o roteador fecha a lição em toda rota que não é #/dia. Com o seletor largo, qualquer
+  // redesenho (a sincronização) fechava o dia do Conhecer Jesus ou a prática no meio.
   CC.fecharLicao = function () {
     if (CC.fecharLeitor) CC.fecharLeitor();
-    CC.sair(document.querySelector('.licao:not(.saindo)'));
+    CC.sair(document.querySelector('.licao-dia:not(.saindo)'));
     sessao = null;
   };
 
@@ -118,7 +121,7 @@
       fracao = 0.5 + 0.5 * (ETAPAS.indexOf(sessao.etapaReflexao || 'guardar') + 1) / 4;
     }
 
-    let el = document.querySelector('.licao:not(.saindo)');
+    let el = document.querySelector('.licao-dia:not(.saindo)');
     // Redesenhar a MESMA tela (marcar uma passagem, a sincronização que chama CC.redesenhar)
     // deixa o palco onde a pessoa estava; só uma tela nova da lição, ou outro dia, começa no
     // topo. Antes o palco voltava sempre ao zero, e marcar a passagem de baixo jogava a lição
