@@ -50,5 +50,8 @@ tipografia), procurado (cartaz com a ovelha 100, sem frase), suficiente (bandeir
 multidão, ilustração própria a partir de uma foto), praticantes (livro aberto, Tiago 1.22 na
 NBV) e porta (porta entreaberta, Apocalipse 3.20 na NBV). Em todas: chama e dias no topo, a
 arte no meio (encolhe por igual para caber entre y 560 e 1480) e só a marca no pé.
+O arquivo não entra no index.html: o build o publica à parte (`story-artes.<resumo>.js`), o
+app o carrega só na hora de gerar um story desses e o service worker o guarda; sem ele, o
+story sai no modelo de sempre.
 Para gerar: `CHROME=... node design/compartilhar/gerar.mjs <pasta> artes`. O teste de
 navegador é `ferramentas/teste-story.mjs`.

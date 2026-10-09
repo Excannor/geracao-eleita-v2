@@ -58,7 +58,10 @@ console.log('primeiros dias:', Object.keys(conteudo.primeirosDias.dias).length, 
 
 // Os módulos do app são concatenados na ordem do nome do arquivo: 01 antes de 02.
 const pastaApp = src('app');
-const modulos = readdirSync(pastaApp).filter((f) => f.endsWith('.js')).sort();
+// Os modelos de story com arte própria (01e-story-artes.js) ficam fora: vão num arquivo
+// separado, pedido só na hora de gerar um story desses (veja "artes de story" mais abaixo).
+const SO_SOB_DEMANDA = (f) => /story-artes\.js$/.test(f);
+const modulos = readdirSync(pastaApp).filter((f) => f.endsWith('.js') && !SO_SOB_DEMANDA(f)).sort();
 // O que é só para quem lê o fonte sai do app entregue (o index.html tem teto de 1 MB):
 // - os comentários de linha inteira ("// ...", uns 80 KB) e os de bloco que começam numa
 //   linha e terminam no fim de outra ("/* ... */"), a documentação do código;
@@ -223,6 +226,22 @@ const mapas = (indiceMapas.publicados || []).map((slug) => {
 });
 console.log('mapas dos livros:', mapas.map((m) => m.nome).join(', ') || 'nenhum');
 
+// ---------- artes de story ----------
+// Os desenhos dos stories das frases com arte própria (src/app/01e-story-artes.js, umas
+// dezenas de KB) não cabem no index.html (teto de 1 MB) e só servem na hora de compartilhar:
+// saem num arquivo com resumo no nome (story-artes.<resumo>.js), que o app carrega sob
+// demanda (01d-story.js) e o service worker guarda no cache próprio na primeira vez. Sem
+// ele (sem rede na primeira vez), o story sai no modelo de sempre. Exige sessão, como o app.
+for (const velho of readdirSync(dist()).filter((f) => /^story-artes\..*\.js(\.gz)?$/.test(f))) rmSync(dist(velho));
+const artesStory = readdirSync(pastaApp).filter(SO_SOB_DEMANDA).sort()
+  .map((f) => enxugarJs(readFileSync(join(pastaApp, f), 'utf8'), f)).join('\n');
+const arquivoArtesStory = artesStory ? 'story-artes.' + createHash('sha256').update(artesStory).digest('hex').slice(0, 10) + '.js' : '';
+if (arquivoArtesStory) {
+  writeFileSync(dist(arquivoArtesStory), artesStory, 'utf8');
+  writeFileSync(dist(arquivoArtesStory + '.gz'), gzipSync(Buffer.from(artesStory, 'utf8'), { level: 9 }));
+  console.log('artes de story:', arquivoArtesStory, kb(artesStory));
+}
+
 // ---------- ícones ----------
 // Vêm prontos de src/icones/, gerados da arte em arte/icone-app.png por
 // ferramentas/icones.ps1. Reduzir um PNG exige decodificá-lo, e o build roda no Docker
@@ -312,6 +331,7 @@ const html = molde
   .replace(/\/\*CONTEUDO_ARQUIVO\*\//g, () => arquivoConteudo)
   // window.BIBLIAS fica por último: os testes leem a lista de traduções até o ";</script>".
   .replace(/\/\*DADOS\*\//g, () => 'window.CONTEUDO_ARQUIVO=' + JSON.stringify(arquivoConteudo) + ';'
+    + 'window.STORY_ARTES=' + JSON.stringify(arquivoArtesStory) + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
   // O cartão dos mapas no Explorar leva um desenho só (o rolo com a pena): ele entra no código
@@ -375,6 +395,9 @@ const CACHE_BIBLIAS = 'caminho-biblias';
 // Os mapas dos livros também têm cache próprio: um arquivo por livro, com resumo no nome,
 // guardado quando o mapa é aberto pela primeira vez.
 const CACHE_MAPAS = 'caminho-mapas';
+// As artes de story (story-artes.<resumo>.js): guardadas na primeira vez que alguém
+// compartilha um story desses, para o próximo sair sem rede.
+const CACHE_STORY = 'caminho-story';
 const ARQUIVOS = ${JSON.stringify(
   ['./', './index.html', './' + arquivoConteudo, './manifest.webmanifest', './apple-touch-icon.png', './icone-48.png']
     .concat(icones.map((i) => './' + i.arquivo), arquivosFontes.map((f) => './' + f.arquivo)))};
@@ -384,7 +407,8 @@ const AVULSAS = ['entrar.html', 'privacidade.html', 'termos.html'];
 const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
 // As fontes do nome original (fonte-original-*) vão no cache dos mapas: só a tela do mapa as usa.
 const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo).concat(fontesOriginais.map((f) => f.arquivo)))};
-const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS]];
+const STORY = ${JSON.stringify(arquivoArtesStory ? [arquivoArtesStory] : [])};
+const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_STORY, STORY]];
 
 self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE)
@@ -412,11 +436,11 @@ self.addEventListener('fetch', (ev) => {
   const guardado = GUARDADOS.find(([, lista]) => lista.includes(url.pathname.split('/').pop()));
   if (guardado) {
     // Guardada na primeira vez que é pedida: daí em diante a leitura abre sem rede.
-    // Só entra no cache o que é JSON (ou fonte), porque sem sessão o servidor responde com a
+    // Só entra no cache o que é JSON (ou fonte, ou o script das artes), porque sem sessão o servidor responde com a
     // tela de entrada, e ela não pode ficar guardada no lugar do texto.
     ev.respondWith(caches.open(guardado[0]).then((c) => c.match(ev.request, { ignoreSearch: true })
       .then((achado) => achado || fetch(ev.request).then((r) => {
-        if (r.ok && /json|font/.test(r.headers.get('content-type') || '')) c.put(ev.request, r.clone());
+        if (r.ok && /json|font|javascript/.test(r.headers.get('content-type') || '')) c.put(ev.request, r.clone());
         return r;
       }))));
     return;
