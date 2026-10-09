@@ -2,6 +2,9 @@
 // Chrome sem interface: para cada frase com arte, a folha da ofensiva abre com ela, o
 // Compartilhar manda um PNG de 1080x1920 desenhado (não vazio), com a chama e a contagem no
 // topo, e diferente do modelo de sempre; uma frase sem arte continua no modelo de sempre.
+// Os desenhos vêm de um arquivo à parte (story-artes.<resumo>.js), pedido só na hora: o teste
+// confere que ele não vem com o app, que sem ele o story sai no modelo de sempre e que, de
+// volta, ele carrega uma vez só.
 // As imagens e a folha da ofensiva com cada frase nova (390x844, claro e escuro) vão para
 // SAIDA=<pasta> (ou uma pasta temporária), para revisar.
 // Uso: CHROME=<chrome> [PORTAS=8821-8829] [SAIDA=<pasta>] node ferramentas/teste-story.mjs
@@ -139,6 +142,20 @@ try {
     await esperar('!!window.__compartilhado', 10000);
     return av('(async () => window.__compartilhado ? __medir(window.__compartilhado.files[0]) : null)()');
   };
+  // Os desenhos das artes vêm num arquivo à parte, só quando um story desses é gerado.
+  ok(await av('!CC.story.artes && !document.querySelector("script[src*=story-artes]") && /^story-artes\\.[0-9a-f]{10}\\.js$/.test(window.STORY_ARTES)'),
+    'ao abrir o app, os desenhos das artes não vêm junto (só o nome do arquivo: ' + await av('window.STORY_ARTES') + ')');
+  const sw = await av('fetch("./sw.js").then((r) => r.text()).then((t) => t.includes(window.STORY_ARTES) && /caminho-story/.test(t))');
+  ok(sw, 'o service worker conhece o arquivo das artes e o guarda no cache próprio');
+  const tipo = await av('fetch("./" + window.STORY_ARTES).then((r) => r.ok ? r.headers.get("content-type") : "erro " + r.status)');
+  ok(/javascript/.test(tipo || ''), 'o servidor entrega o arquivo das artes como script (' + tipo + ')');
+  // sem o arquivo (sem rede na primeira vez): o story sai no modelo de sempre, sem erro
+  await av('window.__artesReal = window.STORY_ARTES; window.STORY_ARTES = "story-artes.0000000000.js"; true');
+  const semArquivo = await abrirECompartilhar(artes[0]);
+  ok(!!semArquivo && semArquivo.w === 1080 && semArquivo.h === 1920 && Math.abs(semArquivo.canto[0] - 0x1b) < 6 && Math.abs(semArquivo.canto[2] - 0x1a) < 6,
+    'sem o arquivo das artes, o story sai no modelo de sempre (canto ' + (semArquivo && semArquivo.canto.join(',')) + ')');
+  ok(await av('!CC.story.artes'), 'e os desenhos continuam sem carregar');
+  await av('window.STORY_ARTES = window.__artesReal; true');
   for (const f of artes) {
     const m = await abrirECompartilhar(f);
     ok(!!m && m.tipo === 'image/png' && m.w === 1080 && m.h === 1920, f.arte + ': vai um PNG de 1080x1920' + (m ? ' (' + m.w + 'x' + m.h + ')' : ' (nada foi compartilhado)'));
@@ -152,6 +169,7 @@ try {
     const tela = await av('(() => ({ linhas: [...document.querySelectorAll(".folha-ofensiva .selo-linha")].map((l) => l.textContent), ref: (document.querySelector(".folha-ofensiva .selo-ref") || { textContent: "" }).textContent }))()');
     ok(tela.linhas.join(' ') === f.linhas.join(' ') && tela.ref === (f.ref || ''), f.arte + ': a folha mostra ' + (f.linhas.length ? 'a frase' : 'só a referência') + ' (' + (tela.linhas.join(' / ') || tela.ref) + ')');
   }
+  ok(await av('!!CC.story.artes && document.querySelectorAll("script[src*=story-artes]").length === 1'), 'com o arquivo de volta, os desenhos carregam uma vez só, na hora de gerar');
   ok(fundos.size >= 5, 'os modelos têm fundos diferentes entre si (' + fundos.size + ' fundos)');
   // frase sem arte: o modelo de sempre (o grafite #1b1c1a)
   const comum = await abrirECompartilhar({ linhas: ['Geração', 'inconformada'] });

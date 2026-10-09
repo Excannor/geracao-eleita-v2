@@ -325,11 +325,37 @@
   // A frase que tem arte própria (FRASES_OFENSIVA com "arte") usa o modelo dela; as outras,
   // e a frase do estágio, o modelo de sempre. A arte sai da lista pela frase, e não do pedido,
   // para o pedido continuar o mesmo (a folha e o fim da lição mandam linhas e referência).
-  function arteDaFrase(frase) {
+  // arteDesejada: o modelo que a frase pede; arteDaFrase: o mesmo, se os desenhos já chegaram.
+  function arteDesejada(frase) {
     if (!frase || !frase.linhas || !CC.FRASES_OFENSIVA) return null;
     const texto = frase.linhas.join(' ');
     const f = CC.FRASES_OFENSIVA.find((x) => x.arte && x.linhas.join(' ') === texto && (x.ref || '') === (frase.ref || ''));
-    return f && CC.story.artes && CC.story.artes[f.arte] ? f.arte : null;
+    return f ? f.arte : null;
+  }
+  function arteDaFrase(frase) {
+    const arte = arteDesejada(frase);
+    return arte && CC.story.artes && CC.story.artes[arte] ? arte : null;
+  }
+  // Os desenhos das artes moram num arquivo à parte (window.STORY_ARTES, gerado pelo build),
+  // pedido só quando um story desses vai ser gerado. Falhou (sem rede na primeira vez): a
+  // promessa resolve assim mesmo, e o story sai no modelo de sempre.
+  let artesPedidas = null;
+  function carregarArtes() {
+    if (CC.story.artes) return Promise.resolve(true);
+    if (!artesPedidas) {
+      artesPedidas = new Promise((resolver) => {
+        const arquivo = window.STORY_ARTES;
+        if (!arquivo) { resolver(false); return; }
+        const s = document.createElement('script');
+        const fim = (certo) => { clearTimeout(espera); resolver(certo && !!CC.story.artes); if (!CC.story.artes) artesPedidas = null; };
+        const espera = setTimeout(() => fim(false), 10000);
+        s.src = './' + arquivo;
+        s.onload = () => fim(true);
+        s.onerror = () => { s.remove(); fim(false); };
+        document.head.appendChild(s);
+      });
+    }
+    return artesPedidas;
   }
   function desenhar(ctx, tipo, dados) {
     const arte = tipo === 'ofensiva' ? arteDaFrase(dados.frase) : null;
@@ -357,9 +383,12 @@
   function preparar(pedido) {
     const chave = JSON.stringify(pedido);
     if (guardada.chave !== chave || !guardada.promessa) {
-      const promessa = prepararFontes().then(() => {
+      const querArte = pedido.tipo === 'ofensiva' && !!arteDesejada(pedido.frase);
+      const promessa = prepararFontes().then(() => (querArte ? carregarArtes() : true)).then(() => {
         const c = tela();
         desenhar(c.getContext('2d'), pedido.tipo, pedido);
+        // a arte não chegou: esta sai no modelo de sempre, e o próximo toque tenta de novo
+        if (querArte && !arteDaFrase(pedido.frase)) setTimeout(() => { if (guardada.promessa === promessa) guardada = { chave: '', promessa: null }; }, 0);
         return new Promise((resolver) => c.toBlob(resolver, 'image/png'));
       }).then((blob) => {
         if (!blob) throw new Error('sem imagem');
@@ -412,5 +441,5 @@
     return 'baixado';
   };
 
-  CC.story = { L, A, SEGURA, ENDERECO, desenhar, arteDaFrase, Mn, Lit, escrever, preparar, nomeDoArquivo, textoDe, prepararFontes, pincelada, medidasDoCarimbo, tamanhoDoCarimbo, carimbo, chama, logo, marca, textoEquilibrado, linhasDoCarimbo, tela };
+  CC.story = { L, A, SEGURA, ENDERECO, desenhar, arteDaFrase, arteDesejada, carregarArtes, Mn, Lit, escrever, preparar, nomeDoArquivo, textoDe, prepararFontes, pincelada, medidasDoCarimbo, tamanhoDoCarimbo, carimbo, chama, logo, marca, textoEquilibrado, linhasDoCarimbo, tela };
 })(window.CC);
