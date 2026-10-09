@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a funda dos homens de Benjamim, que atiram com as duas mãos (1Cr 12.2): a bolsa de couro em sálvia com a pedra dentro, as duas cordas subindo, uma com a laçada do dedo, e pedras de quina no chão. O chão vai antes das pedras. -->
+<path class="k" d="M10 100C40 98 80 98 110 100"/>
+<path class="k" d="M50 70C46 50 44 34 52 20M70 70C76 52 78 36 72 22"/>
+<circle class="k p" cx="52" cy="16" r="4"/>
+<path class="k" d="M72 22L74 16M72 22L68 17"/>
+<path class="k s" d="M46 68C52 64 68 64 74 68C74 78 68 84 60 84C52 84 46 78 46 68Z"/>
+<path class="k p" d="M54 70L58 66L66 67L67 72L60 75Z"/>
+<path class="k p" d="M22 99L24 92L32 91L35 98Z"/>
+<path class="k p" d="M82 99L85 93L92 93L94 99Z"/>
+<path class="k p" d="M96 99L98 95L103 95L104 99Z"/>
+</svg>

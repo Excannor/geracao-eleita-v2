@@ -616,6 +616,17 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   2 Reis, para não repetir o achado, a autoria ficou com o último fato datado (25.27) e o "até o dia de hoje"
   (17.23). E Joaquim (2Rs 24–25) não é ligado a "Jeconias" de Mt 1.11-12: o mapa só diz que a lista de Mateus
   atravessa o exílio, sem afirmar a identificação.
+- 2026-10-09 · conteúdo · 1 Crônicas conta de novo muita coisa de 2 Samuel (Uzá, a promessa de Natã, a
+  contagem do povo, a eira de Araúna). Antes de escrever, li o resumo de 2 Samuel (galhos, pares, curiosidades)
+  e escolhi o que só Crônicas tem: as listas com histórias (Jabez, Rúben), os levitas carregando a arca nos
+  ombros, os cantores e címbalos, o bronze de Hadadezer que vira o tanque, o fogo do céu no altar e o "aqui vai
+  ficar o templo", a planta "da mão do Senhor" e as ofertas. Livro paralelo pede essa leitura do mapa irmão
+  primeiro. O nome hebraico tem duas palavras: o checador barra o espaço no `original`, e o maqaf (־) junta as
+  duas dentro do bloco hebraico.
+- 2026-10-09 · desenho · 1 Crônicas: a planta do templo vista de cima, numa folha, virou ícone de bateria (o
+  retângulo com duas bolinhas na ponta) nas duas tentativas; a espada na bainha com a ponteira pontuda em
+  sálvia virou lápis → planta baixa não se lê em 96px, troca-se o objeto (ficou a harpa dos cantores); bainha
+  termina arredondada, com a cor no bocal.
 
 ## Entrada, sessão e página inicial
 

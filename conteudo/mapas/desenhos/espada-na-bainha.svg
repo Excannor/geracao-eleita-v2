@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a espada guardada na bainha quando o Senhor manda o anjo parar (1Cr 21.27): o cabo com o pomo e a guarda à mostra, a lâmina escondida na bainha comprida, com o bocal da bainha em sálvia e a ponta arredondada. -->
+<g transform="rotate(30 60 60)">
+<circle class="k p" cx="60" cy="10" r="4.5"/>
+<path class="k p" d="M57 14H63V28H57Z"/>
+<path class="h" d="M57 18L63 17M57 22L63 21M57 26L63 25"/>
+<path class="k p" d="M45 28H75C76.5 28 77.5 29 77.5 30.5C77.5 32 76.5 33 75 33H45C43.5 33 42.5 32 42.5 30.5C42.5 29 43.5 28 45 28Z"/>
+<path class="k p" d="M53 33H67V96C67 101 63 104 60 104C57 104 53 101 53 96Z"/>
+<path class="k s" d="M53 33H67V42H53Z"/>
+<path class="k" d="M53 88H67"/>
+<path class="h" d="M60 46V86"/>
+</g>
+</svg>
