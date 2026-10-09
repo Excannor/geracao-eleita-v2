@@ -94,6 +94,7 @@
     pessoas: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14c3 0 5 2.2 5 5"/>',
     estrada: '<path d="M8 3L4 21M16 3l4 18M12 5v3M12 11v3M12 17v3"/>',
     broto: '<path d="M12 21V11"/><path d="M12 11C12 6 8 4 4 4c0 4 3 7 8 7zM12 13c0-4 3-6 8-6 0 4-3 6-8 6z"/>',
+    lamparina: '<path d="M3 15c2 3 12 3 15-1H8c-3 0-5 0-5 1z"/><path d="M18 14l3-2"/><path d="M20 10c-2-2-1-4 0-6 1 2 2 4 0 6z"/>',
     moeda: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/>',
     ancora: '<circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 11h8M5 14c0 4 3 7 7 7s7-3 7-7"/>',
   };

@@ -1,0 +1,102 @@
+{
+  "titulo": "Os servos vigilantes",
+  "ref": "Lc 12.35-48",
+  "grupo": "lucas",
+  "linha": "Lamparina acesa para o patrão que volta sem avisar",
+  "desenho": "porta-com-lamparina",
+  "desenhoLista": "lamparina-acesa",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus continua conversando com os discípulos, depois da história do rico sem juízo. Ele diz que o Pai tem alegria em dar o Reino a eles.",
+          "ref": "Lc 12.22-32"
+        },
+        {
+          "texto": "Depois Jesus conta uma parábola sobre esperar."
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "lamparina",
+      "blocos": [
+        {
+          "texto": "Jesus manda os discípulos ficarem prontos para servir, com as lamparinas acesas.",
+          "ref": "Lc 12.35"
+        },
+        {
+          "texto": "Os discípulos devem ser como servos que esperam o patrão voltar de uma festa de casamento. Quando ele bater, os servos já estão ali para abrir a porta.",
+          "ref": "Lc 12.36"
+        },
+        {
+          "texto": "Jesus diz o que o patrão faz com os servos que encontra prontos.",
+          "ref": "Lc 12.37"
+        },
+        {
+          "fala": "ele colocará todos à mesa, e se vestirá para servi-los",
+          "ref": "Lc 12.37"
+        },
+        {
+          "texto": "O patrão pode chegar às nove horas ou só no meio da noite. O ladrão também não avisa a que horas vem arrombar a porta.",
+          "ref": "Lc 12.38-39"
+        },
+        {
+          "fala": "o Filho do Homem virá quando menos se esperar",
+          "ref": "Lc 12.40"
+        }
+      ]
+    },
+    {
+      "titulo": "A pergunta de Pedro",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Pedro quer saber se a parábola é só para os discípulos ou para todos. Jesus responde com outra comparação, a de um servo que o patrão põe para dar comida aos outros servos.",
+          "ref": "Lc 12.41-42"
+        },
+        {
+          "texto": "Esse servo pode fazer duas coisas enquanto espera."
+        },
+        {
+          "itens": [
+            {
+              "desenho": "chaves",
+              "titulo": "Se trabalha direito",
+              "fala": "seu patrão o encarregará de todos os seus bens",
+              "ref": "Lc 12.43-44"
+            },
+            {
+              "desenho": "taca-de-vinho",
+              "titulo": "Se acha que dá tempo",
+              "fala": "Meu senhor não voltará tão cedo",
+              "ref": "Lc 12.45"
+            }
+          ]
+        },
+        {
+          "texto": "Se o servo começa a bater nos outros e a passar o tempo em festas, o patrão volta sem aviso e tira o cargo dele.",
+          "ref": "Lc 12.45-46"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Jesus vai voltar, e ninguém sabe a hora. Quem espera do jeito certo faz o trabalho que ele deixou e cuida dos outros servos.",
+    "apoio": "No fim, Jesus deixa uma regra. “A quem muito é dado, muito será exigido”.",
+    "ref": "Lc 12.40-48"
+  },
+  "perguntas": [
+    "Se Jesus voltasse hoje, com o que ele encontraria você ocupado?",
+    "Que tarefa Deus deixou com você que está ficando para depois?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 24.42-51",
+      "titulo": "O servo fiel e o servo mau",
+      "linha": "o mesmo aviso, com o ladrão e os dois servos"
+    }
+  ]
+}
