@@ -651,6 +651,14 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   75 mil nas províncias, bens não tomados), sem adjetivo. "Ester e Cristo" não afirma tipologia: usa a tristeza
   que vira alegria (Et 9.22; Jo 16.20) e um par de memória celebrada (Et 9.28; 1Co 11.23-25).
 
+- 2026-10-09 · conteúdo · Romanos, a primeira carta: o nome de Paulo só está em Rm 1.1, e a regra de não pôr
+  "Paulo" em ref que não traz o nome vale dentro do mapa da própria carta. O "eu" da carta virou "o autor da carta"
+  ou "o autor" (1.1 do catálogo permite), e "Paulo" ficou só na autoria (Rm 1.1) e na raiz, que leva At 19.21. Carta
+  não é narrativa: os ramos seguem o argumento (pecado, fé de Abraão, Adão e Cristo, o Espírito, Israel, a vida da
+  igreja), e a situação de quem escreve e de quem recebe (Rm 1, 15 e 16) foi para a raiz e as curiosidades. Rm
+  1.26-27 ficou fora dos galhos e Rm 13.1-5 (autoridades) não virou galho: só os impostos e a dívida do amor (13.7-9).
+  O checador barra "declara" (verbo culto), o que pega o vocabulário da justificação: "aceita como justo", "considera".
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
