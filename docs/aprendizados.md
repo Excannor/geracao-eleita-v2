@@ -646,6 +646,10 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   pão do céu de Ne 9.15 com Jo 6 em Êxodo e Números; Jo 11.51-52 em João) → ficou um par só (Ne 9.20, o bom
   Espírito que instrui, com Jo 14.26) e "Neemias e Cristo" com a alegria (Ne 8.10; Jo 15.11). O sábado de Ne 13
   não foi posto ao lado de Mc 2.27-28: a dupla soaria como julgamento de Neemias, e o mapa não toma posição.
+- 2026-10-09 · conteúdo · Ester: o nome de Deus não aparece no texto da NBV (Et 1–10) → virou curiosidade, sem
+  explicar o porquê (as hipóteses são especulação). As mortes do cap. 9 ficam nos números do texto (500 em Susã,
+  75 mil nas províncias, bens não tomados), sem adjetivo. "Ester e Cristo" não afirma tipologia: usa a tristeza
+  que vira alegria (Et 9.22; Jo 16.20) e um par de memória celebrada (Et 9.28; 1Co 11.23-25).
 
 ## Entrada, sessão e página inicial
 

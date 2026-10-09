@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o cetro de ouro que o rei levanta para Ester (Et 4.11; 5.2): a vara comprida inclinada, o punho com anéis e a ponta redonda em sálvia, que Ester toca com a mão. -->
+<g transform="rotate(38 60 60)">
+<path class="k p" d="M56.5 34H63.5V108H56.5Z"/>
+<path class="h" d="M56.5 92H63.5M56.5 96H63.5M56.5 100H63.5"/>
+<path class="k p" d="M52 30H68V36H52Z"/>
+<circle class="k s" cx="60" cy="20" r="11"/>
+<path class="h" d="M53 15C56 12 64 12 67 15M52 22H68"/>
+<circle class="k p" cx="60" cy="6" r="3"/>
+</g>
+</svg>
