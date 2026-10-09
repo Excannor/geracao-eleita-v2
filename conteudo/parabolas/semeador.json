@@ -116,6 +116,13 @@
       "ref": "Mc 4.1-20",
       "titulo": "O semeador",
       "linha": "a terra boa dá trinta, sessenta e até cem por um"
+    },
+    {
+      "ref": "Lc 8.16-18",
+      "titulo": "A lâmpada",
+      "slug": "lampada",
+      "rotulo": "Da mesma conversa",
+      "linha": "ninguém acende a lamparina para esconder a luz"
     }
   ]
 }

@@ -1,0 +1,87 @@
+{
+  "titulo": "A figueira que brota",
+  "ref": "Lc 21.29-33",
+  "grupo": "lucas",
+  "linha": "Quando a figueira brota, o verão está perto",
+  "desenho": "figueira-brotando",
+  "desenhoLista": "ramo-brotando",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Os discípulos admiram as pedras bonitas do templo. Jesus avisa que não vai ficar pedra sobre pedra.",
+          "ref": "Lc 21.5-6"
+        },
+        {
+          "texto": "Eles perguntam quando isso vai acontecer. Jesus fala de guerras e de sinais no céu, e diz que o Filho do Homem vai voltar numa nuvem.",
+          "ref": "Lc 21.7-27"
+        },
+        {
+          "texto": "Ele diz aos discípulos o que fazer quando tudo isso começar.",
+          "ref": "Lc 21.28"
+        },
+        {
+          "fala": "levantem-se e ergam a cabeça com ânimo, pois a salvação de vocês estará próxima",
+          "ref": "Lc 21.28"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "broto",
+      "blocos": [
+        {
+          "texto": "Jesus manda os discípulos olharem a figueira e as outras árvores.",
+          "ref": "Lc 21.29"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "ramo-brotando",
+              "titulo": "As folhas novas",
+              "fala": "o verão está próximo",
+              "ref": "Lc 21.30"
+            },
+            {
+              "desenho": "rolo-aberto",
+              "titulo": "As palavras de Jesus",
+              "fala": "as minhas palavras permanecerão para sempre",
+              "ref": "Lc 21.33"
+            }
+          ]
+        },
+        {
+          "texto": "Ninguém precisa avisar. Quem vê as folhas novas sabe que o verão está chegando.",
+          "ref": "Lc 21.30"
+        },
+        {
+          "texto": "Do mesmo jeito, quando os discípulos virem essas coisas acontecendo, podem ter certeza de que o Reino de Deus está perto.",
+          "ref": "Lc 21.31"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Ninguém leva susto com o verão quando a figueira já está cheia de folhas. Jesus quer os discípulos atentos assim e de cabeça erguida, porque a volta dele está perto.",
+    "apoio": "Jesus fecha com um pedido. “Orem sempre para que possam escapar de tudo o que vai acontecer”.",
+    "ref": "Lc 21.28-36"
+  },
+  "perguntas": [
+    "O que muda no seu dia quando você lembra que Jesus vai voltar?",
+    "Você espera a volta de Jesus com medo ou de cabeça erguida?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 24.32-35",
+      "titulo": "A figueira",
+      "linha": "quando o ramo está novo e as folhas brotam, o verão está chegando"
+    },
+    {
+      "ref": "Mc 13.28-31",
+      "titulo": "A figueira",
+      "linha": "os brotos ficam macios e as folhas começam a crescer"
+    }
+  ]
+}

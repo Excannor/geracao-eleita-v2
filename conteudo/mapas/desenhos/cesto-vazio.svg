@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os servos mandados de volta de mãos vazias (Lc 20.10): um cesto de colheita trançado, com a alça em arco, vazio, a boca aberta mostrando o fundo sem nada. Sem área sálvia. -->
+<path class="k" d="M10 102H110"/>
+<path class="k" d="M34 60C34 26 86 26 86 60"/>
+<path class="k p" d="M24 60L32 100H88L96 60Z"/>
+<path class="h" d="M27 72H93M29 84H91M44 60L46 100M60 60V100M76 60L74 100"/>
+<path class="k p" d="M24 60a36 8 0 1 0 72 0a36 8 0 1 0 -72 0Z"/>
+<path class="h" d="M32 62C46 66 74 66 88 62"/>
+</svg>

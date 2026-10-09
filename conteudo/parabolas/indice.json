@@ -21,6 +21,7 @@
       "parabolas": [
         "dois-devedores",
         "semeador",
+        "lampada",
         "bom-samaritano",
         "amigo-meia-noite",
         "rico-sem-juizo",
@@ -39,7 +40,9 @@
         "servo-inutil",
         "viuva-e-juiz",
         "fariseu-e-publicano",
-        "dez-minas"
+        "dez-minas",
+        "lavradores-maus",
+        "figueira-que-brota"
       ]
     },
     {
@@ -52,6 +55,7 @@
   "publicadas": [
     "dois-devedores",
     "semeador",
+    "lampada",
     "bom-samaritano",
     "amigo-meia-noite",
     "rico-sem-juizo",
@@ -70,6 +74,8 @@
     "servo-inutil",
     "viuva-e-juiz",
     "fariseu-e-publicano",
-    "dez-minas"
+    "dez-minas",
+    "lavradores-maus",
+    "figueira-que-brota"
   ]
 }

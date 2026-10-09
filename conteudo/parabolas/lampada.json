@@ -1,0 +1,85 @@
+{
+  "titulo": "A lâmpada",
+  "ref": "Lc 8.16-18",
+  "grupo": "lucas",
+  "linha": "Ninguém acende a lamparina para esconder a luz",
+  "desenho": "lamparina-e-cama",
+  "desenhoLista": "lamparina-no-suporte",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus acaba de explicar aos discípulos a parábola do semeador. A semente é a palavra de Deus, e a terra boa é quem guarda a palavra e dá fruto.",
+          "ref": "Lc 8.11-15"
+        },
+        {
+          "texto": "Na mesma conversa, ele fala de uma lamparina.",
+          "ref": "Lc 8.16"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "lamparina",
+      "blocos": [
+        {
+          "texto": "Jesus pergunta quem já viu alguém acender uma lamparina para esconder a luz.",
+          "ref": "Lc 8.16"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "lamparina-debaixo-da-cama",
+              "titulo": "Debaixo da cama",
+              "fala": "debaixo de uma cama, para que não brilhe",
+              "ref": "Lc 8.16"
+            },
+            {
+              "desenho": "lamparina-no-suporte",
+              "titulo": "No lugar próprio",
+              "fala": "onde todos os que entram possam ver a luz",
+              "ref": "Lc 8.16"
+            }
+          ]
+        },
+        {
+          "texto": "Depois, Jesus dá um aviso aos discípulos.",
+          "ref": "Lc 8.18"
+        },
+        {
+          "fala": "Portanto, tomem cuidado na maneira como ouvem",
+          "ref": "Lc 8.18"
+        },
+        {
+          "texto": "Quem tem vai receber mais. Quem não tem perde até o que pensa que tem.",
+          "ref": "Lc 8.18"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Ninguém acende a luz para pôr debaixo da cama. A palavra que os discípulos recebem é para aparecer, e quem ouve com cuidado recebe ainda mais.",
+    "apoio": "Jesus diz que nada fica escondido para sempre. “não há nada oculto que não venha a ser revelado”.",
+    "ref": "Lc 8.16-18"
+  },
+  "perguntas": [
+    "O que Deus já mostrou a você e você está guardando só para si?",
+    "Como anda o seu jeito de ouvir a palavra de Deus?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 8.4-15",
+      "titulo": "O semeador",
+      "slug": "semeador",
+      "rotulo": "Da mesma conversa",
+      "linha": "a mesma semente em quatro tipos de chão"
+    },
+    {
+      "ref": "Mc 4.21-25",
+      "titulo": "A lamparina",
+      "linha": "a lamparina vai no pedestal, para brilhar e ser útil"
+    }
+  ]
+}
