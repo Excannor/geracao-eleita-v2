@@ -506,18 +506,103 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
 
   const E = CC.estado();
   E.marcas = { 'João 3:16': { cor: 2, em: 3 }, 'João 3:17': { cor: 2, em: 4 }, 'João 3:18': { cor: 1, em: 5 }, 'João 3:19': { cor: 0, em: 6 } };
-  E.anotacoes = { 'verso:João 3.16-18': 'Deus amou primeiro.', 'nota:x': 'outra', 'verso:Rute 1.16': '  ' };
+  E.anotacoes = { 'nota:x': 'outra' };
+  E.notas = CC.migrarNotas({ atualizadoEm: 1000, anotacoes: { 'verso:João 3.16-18': 'Deus amou primeiro.', 'verso:Rute 1.16': '  ' } }).notas;
   const marcados = CC.versiculos.marcados();
   checar(marcados.length === 2 && marcados.some((t) => t.ref === 'João 3.16-17' && t.cor === 2) && marcados.some((t) => t.ref === 'João 3.18' && t.cor === 1),
-    'Meus versículos junta versículos seguidos da mesma cor num trecho e ignora marca apagada');
-  checar(CC.versiculos.comNota().length === 1 && CC.versiculos.comNota()[0].ref === 'João 3.16-18', 'nota vazia não aparece em Meus versículos');
+    'os marcados juntam versículos seguidos da mesma cor num trecho e ignoram marca apagada');
+  checar(CC.notas().length === 1 && CC.notas()[0].versos[0] === 'João 3.16-18', 'nota vazia do formato antigo não vira nota');
   const an = CC.minhasAnotacoes();
-  checar(an.porVerso.length === 1 && an.porVerso[0].href === '#/biblia/Jo%C3%A3o/3' && !an.porNota.some((n) => n.titulo.includes('verso')),
-    'Minhas anotações separa as notas de versículo das do Explorar, com link para a Bíblia');
+  checar(!an.porNota.some((n) => /verso/.test(n.titulo + n.chave)) && an.porNota.some((n) => n.chave === 'nota:x'),
+    'as anotações do Explorar continuam à parte, sem as notas de versículo');
+  checar(CC.meusTextos().some((t) => t.texto === 'Deus amou primeiro.' && t.href === '#/perfil/anotacoes'), 'a busca do Explorar acha o texto das notas');
+  const id = CC.gravarNota(null, { versos: ['Salmos 23.1'], tipo: 'oracao', texto: 'Pela prova', tags: ['paz'], cor: 2 });
+  CC.responderOracao(id, true);
+  CC.fixarNota(id, true);
   const exp = CC.montarExportacao();
   checar(exp.includes('## Notas nos versículos') && exp.includes('### João 3.16-18') && !exp.includes('verso:'), 'o arquivo baixado leva as notas de versículo com a referência como título');
+  checar(exp.includes('## Orações') && /respondida em \d{4}-\d\d-\d\d/.test(exp) && exp.includes('#paz') && exp.includes('fixada')
+    && exp.includes('## Versículos marcados') && /João 3\.16-17 \(verde/.test(exp), 'o arquivo leva orações (respondida, tags, fixada) e os versículos marcados com a cor e a data');
   E.marcas = {};
   E.anotacoes = {};
+  E.notas = {};
+}
+
+// --- notas: modelo, migração, fusão por nota e lixeira (02-estado.js) ---
+{
+  const E = CC.estado();
+  E.notas = {};
+  const vazio = { atualizadoEm: 1, notas: {} };
+  // migração: as chaves "verso:" viram notas com id fixo, sem perder nada
+  const antigo = CC.normalizarEstado({ atualizadoEm: 5000, anotacoes: { 'verso:João 3.16': 'Deus amou', 'verso:Rute 1.16': 'Teu povo', 'nota:x': 'fica', 'verso:Jó 1.1': ' ' } });
+  const nj = antigo.notas['v:João 3.16'];
+  checar(nj && nj.texto === 'Deus amou' && nj.tipo === 'nota' && nj.versos[0] === 'João 3.16' && nj.criadaEm === 5000 && nj.editadaEm === 5000 && !nj.apagadaEm
+    && antigo.notas['v:Rute 1.16'].texto === 'Teu povo' && Object.keys(antigo.notas).length === 2, 'migração: cada nota antiga com texto vira uma nota, com a data do estado');
+  checar(antigo.anotacoes['nota:x'] === 'fica' && !Object.keys(antigo.anotacoes).some((k) => k.startsWith('verso:')), 'migração: as anotações do Explorar ficam e as chaves "verso:" saem');
+  const deNovo = CC.normalizarEstado(antigo);
+  checar(JSON.stringify(deNovo.notas) === JSON.stringify(antigo.notas), 'migração: migrar de novo não muda nada');
+  // um aparelho velho, que ainda manda o formato antigo, cai na mesma nota (mesmo id)
+  const velho = { atualizadoEm: 4000, anotacoes: { 'verso:João 3.16': 'Deus amou' } };
+  const f1 = CC.fundir(antigo, velho);
+  checar(Object.keys(f1.notas).length === 2 && f1.notas['v:João 3.16'].texto === 'Deus amou', 'migração: o aparelho velho e o novo dão a mesma nota, sem duplicar');
+  // fusão por nota: vence a editada por último, cada uma por si
+  const n = (texto, editadaEm, extra) => ({ versos: ['João 3.16'], tipo: 'nota', texto, tags: [], cor: 0, fixada: false, respondidaEm: 0, criadaEm: 1, editadaEm, apagadaEm: 0, ...extra });
+  const agora = Date.now();
+  const cel = { atualizadoEm: agora, notas: { a: n('a do celular, nova', agora - 10), b: n('b do celular, velha', agora - 900) } };
+  const pc = { atualizadoEm: agora - 5000, notas: { a: n('a do pc, velha', agora - 800), b: n('b do pc, nova', agora - 20), c: n('só no pc', agora - 30) } };
+  const f2 = CC.fundir(cel, pc);
+  checar(f2.notas.a.texto === 'a do celular, nova' && f2.notas.b.texto === 'b do pc, nova' && f2.notas.c.texto === 'só no pc',
+    'fusão por nota: cada nota fica com a edição mais recente, mesmo vindo do estado mais velho');
+  checar(JSON.stringify(f2.notas) === JSON.stringify(CC.fundir(pc, cel).notas), 'fusão por nota: dá o mesmo nos dois sentidos');
+  // apagar é marca, não texto vazio: o outro aparelho não traz de volta
+  const apagada = { atualizadoEm: agora - 9000, notas: { a: n('a do celular, nova', agora - 5, { apagadaEm: agora - 5 }) } };
+  const f3 = CC.fundir(cel, apagada);
+  checar(f3.notas.a.apagadaEm && f3.notas.a.texto === 'a do celular, nova', 'apagar: a marca de apagada vence a cópia viva e o texto fica para recuperar');
+  const velhaApagada = { notas: { a: n('x', agora - 31 * 864e5, { apagadaEm: agora - 31 * 864e5 }), z: n('y', agora - 91 * 864e5, { apagadaEm: agora - 91 * 864e5 }) } };
+  const f4 = CC.fundir(vazio, velhaApagada);
+  checar(f4.notas.a && f4.notas.a.texto === '' && f4.notas.a.versos.length === 0 && !f4.notas.z,
+    'lixeira: depois de 30 dias o texto some e fica só a lápide; depois de 90 a lápide também');
+  checar(CC.fundir(f4, { notas: { a: n('voltou?', agora - 40 * 864e5) } }).notas.a.texto === '', 'lixeira: a lápide impede um aparelho velho de trazer a nota de volta');
+  // as funções do app
+  const id = CC.gravarNota(null, { versos: ['João 3.16-17', 'Romanos 5.8'], tipo: 'estudo', texto: '  Deus amou primeiro  ', tags: ['graça', 'graça'.repeat(20)], cor: 1 });
+  const g = CC.nota(id);
+  checar(g.texto === 'Deus amou primeiro' && g.versos.length === 2 && g.tipo === 'estudo' && g.cor === 1 && g.tags[1].length === 30 && g.criadaEm > 0 && g.editadaEm >= g.criadaEm,
+    'gravar: nota nova com vários versículos, tipo, cor, tags (cortadas em 30) e datas');
+  const antes = g.editadaEm;
+  CC.gravarNota(id, { texto: 'editada' });
+  checar(CC.nota(id).texto === 'editada' && CC.nota(id).editadaEm > antes && CC.nota(id).criadaEm === g.criadaEm && CC.nota(id).versos.length === 2, 'editar: muda o texto, avança editadaEm e guarda o resto');
+  checar(CC.fixarNota(id, true) && CC.nota(id).fixada, 'fixar: a nota vai para o topo');
+  for (let i = 0; i < 5; i++) CC.fixarNota(CC.gravarNota(null, { texto: 'f' + i }), true);
+  checar(CC.notas().filter((x) => x.fixada).length === CC.MAX_FIXADAS && !CC.fixarNota(CC.gravarNota(null, { texto: 'mais uma' }), true), 'fixar: no máximo 5 fixadas');
+  const o = CC.gravarNota(null, { tipo: 'oracao', texto: 'pela prova' });
+  CC.responderOracao(o, true);
+  checar(CC.nota(o).respondidaEm > 0, 'oração: marcar como respondida guarda a data');
+  CC.responderOracao(o, false);
+  checar(!CC.nota(o).respondidaEm, 'oração: dá para desmarcar');
+  CC.apagarNota(id);
+  checar(!CC.notas().some((x) => x.id === id) && CC.notasApagadas().some((x) => x.id === id) && !CC.nota(id).fixada, 'apagar: sai da lista, vai para Apagadas e deixa de ser fixada');
+  CC.recuperarNota(id);
+  checar(CC.notas().some((x) => x.id === id) && !CC.notasApagadas().length, 'recuperar: volta para a lista');
+  CC.apagarNota(id);
+  CC.apagarNotaDeVez(id);
+  checar(!CC.notasApagadas().length && CC.nota(id).apagadaEm && CC.nota(id).texto === '', 'apagar de vez: fica só a lápide, sem texto');
+  // limpeza do que vem de fora
+  const sujo = CC.normalizarEstado({ atualizadoEm: 1, notas: { q: { versos: ['x'.repeat(80), 'João 1.1', 3], tipo: 'hack', texto: 5, tags: [1, 'ok'], cor: 9 }, r: null } });
+  checar(sujo.notas.q.tipo === 'nota' && sujo.notas.q.versos.length === 1 && sujo.notas.q.texto === '' && sujo.notas.q.tags.join() === 'ok' && sujo.notas.q.cor === 0 && !('r' in sujo.notas),
+    'o que chega de fora é limpo: tipo, versículos, texto, tags e cor');
+  checar(CC.normalizarEstado({ atualizadoEm: 1, notas: { q: { texto: 'enc:AAA', tags: 'enc:BBB' } } }).notas.q.tags === 'enc:BBB', 'tags cifradas no servidor (texto) passam sem ser estragadas');
+  // apagar todas, sem apagar a conta
+  CC.marcar(['João 3:16'], 2);
+  CC.gravarRegistro(3, { o: 'obs', i: '', a: '', oracao: '' });
+  CC.gravarAnotacao('nota:x', 'explorar');
+  CC.apagarTodasAnotacoes();
+  checar(!CC.notas().length && !CC.notasApagadas().length && !CC.marcas().length && !CC.temRegistro(3) && !CC.anotacao('nota:x') && CC.estado().lidos,
+    'apagar todas: notas, marcas, reflexões e anotações somem; o resto do progresso fica');
+  // a conquista conta notas em versículo, sem ler o texto
+  const conta = CC.CONQUISTAS.find((c) => c.id === 'notas').valor;
+  checar(conta({ notas: { a: n('x', 1), b: n('y', 1, { apagadaEm: 2 }), c: { ...n('z', 1), versos: [] } }, anotacoes: { 'verso:Jó 1.1': 'velha' } }) === 2,
+    'a conquista do caderno conta as notas vivas em versículo (e as do formato antigo)');
+  E.notas = {}; E.marcas = {}; E.oia = {}; E.anotacoes = {};
 }
 
 // --- frases do carimbo da ofensiva (01c-arte.js) ---
