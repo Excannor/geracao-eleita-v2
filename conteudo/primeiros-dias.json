@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "nota": "O que a pessoa vê ANTES de ler, nos 31 dias da Unidade 1: o mapa da história (as paradas), o contexto do dia em duas ou três frases, uma coisa para procurar enquanto lê, o gancho do dia seguinte e os guias dos trechos de lista. Fatos de autoria e data vêm das fichas dos livros (03 - Livros da Bíblia) em conteudo.json; toda citação é da NBV da leitura do dia. Regras: ferramentas/reflexoes/CLAUDE.md. Conferido por teste.mjs.",
+  "nota": "O que a pessoa vê ANTES de ler, dia a dia no plano anual (o arquivo nasceu com os 31 dias da Unidade 1 e cresce unidade por unidade): o mapa da história (as paradas), o contexto do dia em duas a cinco frases, uma coisa para procurar enquanto lê, o gancho do dia seguinte e os guias dos trechos de lista. Fatos de autoria e data vêm das fichas dos livros (03 - Livros da Bíblia) em conteudo.json; toda citação é da NBV da leitura do dia (o gancho, da leitura do dia seguinte). Regras: ferramentas/reflexoes/CLAUDE.md e .claude/skills/mapa-do-livro/voz.md. Conferido por ferramentas/checar-contexto.mjs, que o teste.mjs roda.",
   "paradas": [
     {
       "id": "criacao",
@@ -265,6 +265,202 @@
       "contexto": "Este é o último dia da Unidade 1. Em Êxodo 27 a 29, Deus continua a planta com o altar, o pátio e as roupas de Arão. Deus também ensina como consagrar os sacerdotes, num rito de sete dias. Em Mateus 22, os fariseus tentam pegar Jesus com perguntas, e um mestre da lei pergunta qual é o mandamento mais importante. A leitura tem uns 18 minutos, e vale ler em duas vezes.",
       "procure": "os dois lugares onde Arão leva os nomes das tribos de Israel (Êxodo 28.12 e 28.29). Em Mateus 22.40, veja do que dependem toda a Lei e os Profetas.",
       "amanha": "A Unidade 2 começa. Deus enche o artesão Bezalel do Espírito de Deus, e Jesus fala duro com os fariseus e os mestres da lei."
+    },
+    "32": {
+      "titulo": "O artesão cheio do Espírito",
+      "sub": "Deus escolhe Bezalel para fazer a tenda, e Jesus fala duro com os fariseus.",
+      "contexto": "Deus continua a planta da tenda com o altar do incenso, a bacia de bronze e o óleo da unção. No capítulo 31, Deus diz que escolheu Bezalel para fazer tudo isso e encheu Bezalel do Espírito de Deus. No fim, Deus dá a Moisés as duas tábuas de pedra, escritas pelo dedo dele. Em Mateus 23, Jesus fala ao povo dos mestres da lei e dos fariseus, que mandam fazer e não fazem.",
+      "procure": "o que Deus pôs em Bezalel junto com a habilidade (Êxodo 31.3). Em Mateus 23.37, veja com que ave Jesus compara o jeito dele de querer juntar o povo de Jerusalém.",
+      "amanha": "Moisés demora no monte, e o povo pede a Arão um deus de ouro. Depois Moisés pede ao Senhor para ver a glória dele."
+    },
+    "33": {
+      "titulo": "O bezerro de ouro",
+      "sub": "O povo faz um deus de ouro, e Moisés pede que o Senhor vá junto.",
+      "contexto": "Moisés demora no monte, e o povo pede a Arão deuses que sirvam de guia. Arão derrete as argolas de ouro e faz um bezerro. Moisés desce e quebra as tábuas. No dia seguinte, ele volta ao Senhor para pedir perdão pelo povo. No capítulo 34, Moisés sobe de novo com duas tábuas novas, e o Senhor passa diante dele. Em Mateus 24, Jesus fala do fim dos tempos e avisa que só o Pai sabe o dia. A leitura tem uns 17 minutos, e vale ler em duas vezes.",
+      "procure": "o que Arão diz a Moisés sobre o ouro que jogou no fogo (Êxodo 32.24). Em Êxodo 33.11, veja como o Senhor fala com Moisés.",
+      "amanha": "O povo traz tanta oferta para a tenda que Moisés manda avisar no acampamento que ninguém traga mais nada."
+    },
+    "34": {
+      "titulo": "Oferta de sobra",
+      "sub": "O povo traz ofertas para a tenda, e Bezalel começa a construir.",
+      "contexto": "Agora o povo faz tudo o que Deus mostrou a Moisés no monte. Por isso, nos capítulos 36 e 37, você vai reconhecer as medidas lidas nos dias 30 a 32. Moisés pede ofertas, e só traz quem sente o desejo no coração. Os artesãos começam o trabalho, e o povo continua trazendo mais todas as manhãs. A leitura de hoje é só de Êxodo.",
+      "procure": "o que os artesãos dizem a Moisés sobre as ofertas (Êxodo 36.5). No versículo 6, veja o aviso que Moisés manda espalhar no acampamento.",
+      "amanha": "A tenda fica pronta, e Moisés abençoa quem trabalhou. Jesus conta a história de dez moças que esperam o noivo."
+    },
+    "35": {
+      "titulo": "Tudo como o Senhor mandou",
+      "sub": "Os artesãos terminam a tenda, e Jesus conta histórias de quem espera.",
+      "contexto": "Os artesãos fazem o altar, o pátio e as roupas dos sacerdotes. No fim do capítulo 38 está a conta do ouro, da prata e do bronze que o povo deu. No capítulo 39, a frase “como o Senhor tinha ordenado a Moisés” se repete várias vezes. Em Mateus 25, Jesus conta histórias sobre esperar a volta dele. Na última, o Rei separa as pessoas como um pastor separa as ovelhas dos bodes.",
+      "procure": "a quem as pessoas estavam fazendo o bem sem saber, segundo o Rei (Mateus 25.40). Em Êxodo 39.43, veja o que Moisés faz depois de conferir o trabalho.",
+      "amanha": "Moisés arma a tenda, e a glória do Senhor enche tudo. Levítico começa, e em Mateus Jesus come a Páscoa com os discípulos."
+    },
+    "36": {
+      "titulo": "A glória enche a tenda",
+      "sub": "Êxodo termina com Deus morando no meio do povo, e Levítico começa.",
+      "contexto": "Moisés arma a tenda no primeiro dia do mês, e a nuvem cobre tudo. Assim termina Êxodo. Levítico começa quando o Senhor chama Moisés à tenda e fala com ele de lá. Pela tradição, Moisés também escreveu este livro. Levítico ensina como um povo pecador pode viver perto de um Deus santo. Em Mateus 26, Jesus come a Páscoa com os discípulos e depois ora no Getsêmani. Ali Judas chega com uma multidão armada.",
+      "procure": "por que Moisés não consegue entrar na tenda (Êxodo 40.35). Em Levítico 1.4, veja onde quem traz o animal põe a mão.",
+      "amanha": "É um dia curto, só de Levítico. Deus diz o que fazer quando alguém erra sem perceber."
+    },
+    "37": {
+      "titulo": "O erro sem querer",
+      "sub": "Deus ensina a oferta de gratidão e a oferta de quem erra sem saber.",
+      "contexto": "Levítico 3 e 4 são leis de ofertas, uma depois da outra. Leia com atenção o começo de cada parte, porque ali Deus diz para quem vale a regra. O capítulo 4 vale do sacerdote até qualquer pessoa do povo. Todos podem errar, e para todos Deus abre um caminho de perdão.",
+      "procure": "a frase que se repete no fim de cada parte do capítulo 4, depois que o sacerdote oferece o animal (Levítico 4.20, 26, 31 e 35).",
+      "amanha": "Quem não tem dinheiro para uma ovelha pode levar duas rolinhas. Em Mateus, Pilatos entrega Jesus para ser crucificado."
+    },
+    "38": {
+      "titulo": "A cortina rasgada",
+      "sub": "Deus aceita a oferta que o pobre pode dar, e Jesus morre na cruz.",
+      "contexto": "Em Levítico 5 a 7, Deus continua as leis das ofertas. Quem não pode pagar uma ovelha leva duas rolinhas, e quem não pode pagar as rolinhas leva farinha. Em Mateus 27, Pilatos entrega Jesus para ser crucificado. Na hora em que Jesus morre, a cortina do templo se rasga de cima até embaixo. É uma das leituras mais longas da unidade, uns 18 minutos, e vale ler em duas vezes.",
+      "procure": "o que Deus diz da pessoa pobre que só pode levar farinha (Levítico 5.13). Em Mateus 27.54, veja o que os soldados dizem quando a terra treme.",
+      "amanha": "Moisés veste Arão de sacerdote. Em Mateus, duas mulheres vão ao túmulo de Jesus, e um anjo diz que ele não está ali."
+    },
+    "39": {
+      "titulo": "Ele não está aqui",
+      "sub": "Arão começa a servir como sacerdote, e Mateus termina com Jesus vivo.",
+      "contexto": "Moisés lava Arão e os filhos dele com água e veste Arão com as roupas de sacerdote. Por sete dias, eles ficam na entrada da tenda. No oitavo dia, Arão oferece um sacrifício pelos pecados dele antes de oferecer pelos do povo. Em Mateus 28, duas mulheres vão ao túmulo no domingo bem cedo, e um anjo diz que Jesus ressuscitou. Hoje Mateus termina.",
+      "procure": "o que Jesus promete na última frase de Mateus (Mateus 28.20). Em Levítico 9.22, veja o que Arão faz com as mãos.",
+      "amanha": "Dois filhos de Arão levam fogo diante do Senhor contra as ordens dele. Depois Deus diz que animais o povo pode comer."
+    },
+    "40": {
+      "titulo": "Fogo diante do Senhor",
+      "sub": "Nadabe e Abiú morrem, e Deus separa o puro do impuro.",
+      "contexto": "Nadabe e Abiú são filhos de Arão. Eles levam fogo diante do Senhor contra as ordens que Deus tinha acabado de dar. Fogo sai da presença do Senhor, e os dois morrem. Nos capítulos 11 e 12, Deus diz que animais o povo pode comer e o que a mãe faz depois do parto. São regras daquele povo, naquela época, e Deus diz o motivo delas em Levítico 11.45.",
+      "procure": "o que Arão faz quando ouve o que Moisés diz (Levítico 10.3). Em Levítico 11.45, veja por que Deus quer um povo santo.",
+      "amanha": "A lei manda o leproso morar sozinho, fora do acampamento. Marcos começa, e Jesus toca num leproso."
+    },
+    "41": {
+      "titulo": "Jesus toca o leproso",
+      "sub": "A lei manda o leproso morar sozinho, e Marcos começa.",
+      "contexto": "Levítico 13 e 14 são leis sobre manchas na pele, na roupa e até na parede da casa. Quem tem lepra mora sozinho, fora do acampamento. Hoje começa Marcos. A tradição liga este evangelho à pregação de Pedro, e Marcos conta tudo depressa. Em Marcos 1, um leproso se ajoelha diante de Jesus. A leitura tem uns 19 minutos, e vale ler em duas vezes.",
+      "procure": "o que a lei manda o leproso gritar (Levítico 13.45). Em Marcos 1.41, veja o que Jesus faz antes de falar com o leproso.",
+      "amanha": "Uma vez por ano, um bode leva os pecados do povo para o deserto. Em Marcos, quatro homens abrem o teto de uma casa."
+    },
+    "42": {
+      "titulo": "Uma vez por ano",
+      "sub": "Arão entra atrás do véu, e Jesus perdoa um paralítico.",
+      "contexto": "Levítico 15 fala da impureza do corpo. No capítulo 16, Deus marca um dia por ano para tirar os pecados do povo. Nesse dia, Arão entra no Lugar Santíssimo, atrás do véu, e borrifa sangue sobre a tampa da arca. Depois põe as mãos sobre um bode vivo e confessa os pecados do povo. Em Marcos 2, Jesus diz a um paralítico que os pecados dele estão perdoados, e uns mestres da lei acham isso uma blasfêmia.",
+      "procure": "para onde o bode vivo leva os pecados do povo (Levítico 16.22). Em Marcos 2.5, veja o que Jesus vê nos homens que abrem o teto.",
+      "amanha": "Deus manda deixar os cantos da plantação para o pobre e amar o próximo. Jesus escolhe doze discípulos."
+    },
+    "43": {
+      "titulo": "Ame o seu próximo",
+      "sub": "Deus diz como vive um povo santo, e Jesus escolhe os doze.",
+      "contexto": "No capítulo 18, Deus diz que Israel não pode viver como os povos do Egito e de Canaã. No 19, Deus manda cuidar do pobre e do estrangeiro, e ali está a frase “Ame o seu próximo como a si mesmo”. São leis de um povo que Deus separou para ele, e muitas são sobre o jeito de tratar as pessoas. Em Marcos 3, Jesus escolhe doze discípulos e diz quem é a família dele.",
+      "procure": "quem Deus manda o povo amar como a si mesmo, além do próximo (Levítico 19.34). Em Marcos 3.35, veja quem Jesus chama de irmão, irmã e mãe.",
+      "amanha": "A leitura é só de Levítico, com leis duras. Deus diz que separou Israel dos outros povos para ser dele."
+    },
+    "44": {
+      "titulo": "Separados para Deus",
+      "sub": "Deus dá leis duras para o povo e regras para os sacerdotes.",
+      "contexto": "Em Levítico 20, Deus volta a muitas proibições do capítulo 18 e diz o castigo de cada uma. São leis daquele povo, naquela época, e algumas são duras de ler. Nos capítulos 21 e 22, Deus dá regras para os sacerdotes e para as ofertas. A leitura de hoje é só de Levítico.",
+      "procure": "por que Deus diz que separou Israel dos outros povos (Levítico 20.26). Em Levítico 22.33, veja o que Deus lembra de novo ao povo.",
+      "amanha": "Deus marca as festas do ano e manda devolver a terra no ano cinquenta. Em Marcos, Jesus dorme no barco durante a tempestade."
+    },
+    "45": {
+      "titulo": "O ano cinquenta",
+      "sub": "Deus marca as festas de Israel, e Jesus acalma o mar.",
+      "contexto": "Em Levítico 23, Deus marca as festas do ano, da Páscoa até a festa em que o povo mora em tendas. No capítulo 25, a lei manda deixar a terra descansar de sete em sete anos. No ano cinquenta, cada um volta para a terra da família. Em Marcos 4, Jesus conta parábolas de sementes. Quando cai a tarde, ele dorme no barco durante uma tempestade. A leitura tem uns 19 minutos, e vale ler em duas vezes.",
+      "procure": "de quem é a terra, segundo Levítico 25.23. Em Marcos 4.39, veja o que Jesus diz ao mar.",
+      "amanha": "Levítico termina com o que acontece se o povo obedecer ou desobedecer. Em Marcos, uma mulher toca no manto de Jesus."
+    },
+    "46": {
+      "titulo": "Doze anos",
+      "sub": "Levítico termina, e Jesus cura uma mulher e levanta uma menina.",
+      "contexto": "Em Levítico 26, Deus diz o que acontece se o povo obedecer e o que acontece se desobedecer. Mesmo para o povo espalhado entre os inimigos, Deus promete lembrar da aliança. No capítulo 27, Deus dá regras para as promessas feitas ao Senhor, e Levítico termina. Em Marcos 5, Jesus liberta um homem que vive entre os túmulos. Depois vai à casa de Jairo, e no caminho uma mulher toca no manto dele.",
+      "procure": "há quanto tempo a mulher estava doente e quantos anos tem a menina (Marcos 5.25 e 5.42). Em Levítico 26.13, veja como Deus diz que fez o povo andar.",
+      "amanha": "Números começa com uma contagem do povo, tribo por tribo. Os nomes e os números têm guia."
+    },
+    "47": {
+      "titulo": "Cada tribo no seu lugar",
+      "sub": "Números começa com a contagem do povo no deserto do Sinai.",
+      "contexto": "Hoje começa Números. Pela tradição, Moisés escreveu o livro, que conta a caminhada de Israel pelo deserto, do Sinai até a entrada de Canaã. O livro começa com uma contagem dos homens que podem ir à guerra, tribo por tribo. Depois Deus mostra onde cada tribo acampa, em volta da tenda. Moisés conta os levitas à parte. São muitos nomes e números, e o guia ajuda.",
+      "procure": "quantos homens dá a soma no fim da contagem (Números 1.46). Em Números 3.12, veja no lugar de quem Deus escolhe os levitas.",
+      "amanha": "Na cidade de Jesus, o povo não aceita que ele seja mais que um carpinteiro. Depois Jesus alimenta uma multidão e anda sobre a água."
+    },
+    "48": {
+      "titulo": "Pão para a multidão",
+      "sub": "Os levitas aprendem a carregar a tenda, e Jesus alimenta uma multidão.",
+      "contexto": "Em Números 4, Deus divide entre as famílias dos levitas o trabalho de desmontar e carregar a tenda. No capítulo 5, Deus dá leis para quem prejudica alguém e uma prova para o marido que desconfia da mulher. São regras daquele povo, naquela época. Em Marcos 6, o povo da cidade de Jesus fica escandalizado com ele. Depois Jesus manda os doze de dois em dois e, no fim do dia, alimenta uma multidão com cinco pães e dois peixes.",
+      "procure": "o que quem prejudicou alguém tem de fazer além de confessar (Números 5.7). Em Marcos 6.34, veja o que Jesus sente quando vê a multidão.",
+      "amanha": "Deus dá a Arão as palavras para abençoar o povo. Em Marcos, Jesus diz o que deixa uma pessoa impura."
+    },
+    "49": {
+      "titulo": "Que o Senhor os abençoe",
+      "sub": "Deus ensina a bênção dos sacerdotes, e Jesus fala do que sai do coração.",
+      "contexto": "No fim de Números 6 estão as palavras que Deus deu para Arão abençoar o povo. O capítulo 7 é longo e repetido. Os doze líderes das tribos trazem a mesma oferta, um por dia, e Números conta cada uma inteira. Em Marcos 7, os fariseus reclamam que os discípulos comem sem lavar as mãos, e Jesus diz o que deixa uma pessoa impura. Quem leu as leis de comida no dia 40 vai entender a discussão. A leitura tem uns 21 minutos, a mais longa da unidade, e vale ler em duas vezes.",
+      "procure": "o que Deus promete fazer quando os sacerdotes abençoarem o povo (Números 6.27). Em Marcos 7.15, veja de onde vem o que deixa uma pessoa impura.",
+      "amanha": "A nuvem se levanta, e o povo sai do deserto do Sinai. Em Marcos, Pedro diz quem Jesus é."
+    },
+    "50": {
+      "titulo": "Quando a nuvem se levanta",
+      "sub": "Israel sai do deserto do Sinai, e Pedro diz quem Jesus é.",
+      "contexto": "Em Números 9, o povo celebra a Páscoa no deserto, e Deus marca uma segunda data para quem estava impuro. Quando a nuvem se levanta da tenda, o povo parte. Quando a nuvem para, o povo acampa. No capítulo 10, Deus manda fazer duas trombetas de prata, e Israel sai do deserto do Sinai. Em Marcos 8, Jesus alimenta outra multidão e pergunta aos discípulos quem eles dizem que ele é.",
+      "procure": "quanto tempo o povo pode ficar acampado no mesmo lugar (Números 9.22). Em Marcos 8.29, veja o que Pedro responde.",
+      "amanha": "O povo cansa do maná e pede carne. Moisés manda um homem de cada tribo espionar a terra de Canaã."
+    },
+    "51": {
+      "titulo": "O cacho de uvas",
+      "sub": "O povo reclama do maná, e os espiões voltam de Canaã.",
+      "contexto": "Os israelitas querem carne e lembram dos peixes do Egito. Moisés diz ao Senhor que não consegue cuidar sozinho de todo esse povo, e Deus põe o Espírito sobre setenta líderes. No capítulo 12, Miriã e Arão criticam Moisés. No 13, os espiões voltam de Canaã com frutas da terra e dizem que o povo de lá é mais forte que Israel. A leitura de hoje é só de Números.",
+      "procure": "o que Moisés responde quando Josué pede que ele proíba dois homens de profetizar (Números 11.29). Em Números 13.30, veja o que Calebe diz ao povo.",
+      "amanha": "O povo chora naquela noite e fala em voltar para o Egito. Em Marcos, a roupa de Jesus fica branca e brilhante num monte."
+    },
+    "52": {
+      "titulo": "Quarenta anos no deserto",
+      "sub": "O povo não confia em Deus, e Jesus aparece com Moisés e Elias.",
+      "contexto": "O povo ouve os espiões e quer escolher um líder para voltar ao Egito. Josué e Calebe dizem que o Senhor está com eles. Moisés pede perdão pelo povo, e o Senhor perdoa. Mesmo assim, Deus diz que quem tem mais de vinte anos e reclamou vai morrer no deserto, menos Calebe e Josué. Os filhos vão entrar na terra. Em Marcos 9, a roupa de Jesus fica branca e brilhante num monte, e Moisés e Elias conversam com ele.",
+      "procure": "o que Deus diz de Calebe (Números 14.24). Em Marcos 9.24, veja o que o pai do menino pede a Jesus.",
+      "amanha": "Coré junta líderes contra Moisés e Arão, e a vara de Arão dá flores. Em Marcos, Jesus pega as crianças nos braços."
+    },
+    "53": {
+      "titulo": "A vara que floresce",
+      "sub": "Coré se revolta contra Moisés, e Jesus diz que veio para servir.",
+      "contexto": "Coré, Datã e Abirão juntam duzentos e cinquenta líderes contra Moisés e Arão. A terra se abre e engole os três, e o Senhor manda fogo sobre os outros. Depois Deus mostra quem escolheu para ser sacerdote com uma vara que dá flores de um dia para o outro. Em Marcos 10, um homem rico vai embora triste. Depois Tiago e João pedem os melhores lugares. A leitura tem uns 17 minutos, e vale ler em duas vezes.",
+      "procure": "o que a vara de Arão tem no dia seguinte (Números 17.8). Em Marcos 10.45, veja para que Jesus diz que veio.",
+      "amanha": "Miriã morre, e falta água em Cades. Deus manda Moisés falar com a rocha, e Moisés bate nela."
+    },
+    "54": {
+      "titulo": "A água da rocha",
+      "sub": "Moisés bate na rocha, e Arão morre no monte Hor.",
+      "contexto": "Números 19 é uma lei sobre a água que purifica quem tocou num morto. No capítulo 20, Miriã morre em Cades, e o povo fica sem água. Deus manda Moisés falar à rocha, e Moisés bate nela duas vezes. A água sai, mas Deus diz que Moisés e Arão não vão levar o povo até a terra. No fim, Arão morre no alto do monte Hor. É um dia curto, só de Números.",
+      "procure": "o que Deus manda Moisés fazer com a rocha e o que Moisés faz (Números 20.8 e 20.11). Em Números 20.29, veja quanto tempo o povo chora por Arão.",
+      "amanha": "Serpentes mordem o povo, e Deus manda fazer uma serpente de bronze. Uma jumenta fala com Balaão, e Jesus entra em Jerusalém."
+    },
+    "55": {
+      "titulo": "A jumenta que fala",
+      "sub": "O povo olha para a serpente de bronze, e Jesus entra em Jerusalém.",
+      "contexto": "No caminho, o povo reclama de Deus e de Moisés, e o Senhor manda serpentes venenosas. Moisés ora, e Deus manda pôr uma serpente de bronze num poste. Balaque é o rei de Moabe e chama Balaão para amaldiçoar Israel. Deus não deixa, e no caminho a jumenta de Balaão vê o Anjo do Senhor. Em Marcos 11, Jesus entra em Jerusalém montado num jumentinho e expulsa os negociantes do templo. A leitura tem uns 16 minutos, e vale ler em duas vezes.",
+      "procure": "o que acontece com quem olha para a serpente de bronze (Números 21.9). Em Marcos 11.25, veja o que Jesus manda fazer antes de orar.",
+      "amanha": "Balaão abençoa Israel em vez de amaldiçoar, e Moisés conta o povo de novo. Em Marcos, uma viúva pobre dá duas moedas."
+    },
+    "56": {
+      "titulo": "Outra contagem, outra geração",
+      "sub": "Balaão abençoa Israel, e Jesus diz quais são os maiores mandamentos.",
+      "contexto": "Balaão vê Israel acampado, tribo por tribo, e abençoa o povo de novo. No capítulo 25, os homens de Israel adoram o deus dos moabitas, e o Senhor fica muito irado com Israel. No 26, Moisés e Eleazar contam o povo outra vez, nas campinas de Moabe. Em Marcos 12, Jesus responde a perguntas difíceis e diz quais são os dois mandamentos mais importantes. A leitura tem uns 17 minutos, e vale ler em duas vezes.",
+      "procure": "quem ainda estava vivo da contagem feita no Sinai (Números 26.64-65). Em Marcos 12.43-44, veja por que Jesus diz que a viúva deu mais que os ricos.",
+      "amanha": "Cinco irmãs pedem a herança do pai, e Deus diz que elas estão certas. Moisés põe as mãos sobre Josué."
+    },
+    "57": {
+      "titulo": "As filhas de Zelofeade",
+      "sub": "Cinco irmãs pedem a herança do pai, e Josué vai liderar o povo.",
+      "contexto": "As filhas de Zelofeade vão até a entrada da tenda e pedem a herança do pai, que morreu sem filhos homens. Deus diz a Moisés que elas estão certas. Depois Moisés pede ao Senhor alguém para guiar o povo, e Deus escolhe Josué. No capítulo 28, Deus diz que ofertas o povo leva todo dia e em cada festa. Em Marcos 13, Jesus diz que o templo vai ser derrubado e fala do fim dos tempos.",
+      "procure": "com o que Moisés compara o povo sem um líder (Números 27.17). Em Marcos 13.32, veja quem sabe o dia e a hora.",
+      "amanha": "Deus manda cumprir as promessas feitas a ele, e Israel luta contra os midianitas. A leitura é só de Números."
+    },
+    "58": {
+      "titulo": "Palavra dada",
+      "sub": "Deus manda cumprir as promessas, e Israel luta contra os midianitas.",
+      "contexto": "Em Números 29, Deus marca as ofertas das festas do sétimo mês. No capítulo 30, Deus diz que quem promete algo a ele tem de cumprir. No 31, o Senhor manda Israel se vingar dos midianitas pelo que fizeram ao povo. São fatos de uma guerra daquele povo, naquela época, e não são ordem para hoje. A leitura de hoje é só de Números.",
+      "procure": "o que tem de fazer quem faz um voto ao Senhor (Números 30.2). Em Números 31.49, veja o que os comandantes contam a Moisés depois da guerra.",
+      "amanha": "Duas tribos pedem para ficar com a terra antes do rio Jordão. Moisés escreve cada parada do caminho, e Pedro nega Jesus."
+    },
+    "59": {
+      "titulo": "O caminho inteiro",
+      "sub": "Moisés escreve as paradas do deserto, e Judas entrega Jesus.",
+      "contexto": "As tribos de Rúben e Gade têm muito gado e pedem para ficar com a terra antes do rio Jordão. Moisés aceita, se os homens atravessarem armados e lutarem junto com os irmãos. Números 33 é a lista dos lugares onde o povo acampou, do Egito até as campinas de Moabe. Em Marcos 14, Judas entrega Jesus no Getsêmani, e Pedro nega três vezes que conhece Jesus. A leitura tem uns 16 minutos, e vale ler em duas vezes.",
+      "procure": "o que Pedro faz quando o galo canta pela segunda vez (Marcos 14.72). Em Números 33.2, veja quem escreve as etapas do caminho.",
+      "amanha": "Números termina com as fronteiras da terra e as cidades de refúgio. Em Marcos, Jesus morre na cruz, e um soldado romano diz quem ele era."
     }
   },
   "guias": {
@@ -339,6 +535,57 @@
       "de": 1,
       "ate": 46,
       "texto": "Neste capítulo, Deus ensina como consagrar os sacerdotes, num rito de sete dias (v. 35). Dá para ler sem parar em cada detalhe. Nos versículos 45 e 46, Deus diz que tirou o povo do Egito para morar no meio dele."
+    },
+    "Êxodo 36": {
+      "de": 8,
+      "ate": 38,
+      "texto": "Do versículo 8 em diante, os artesãos fazem as cortinas e as armações com as medidas que Deus deu no capítulo 26, lido no dia 30. Dá para passar os olhos. O que é novo está nos versículos 5 a 7."
+    },
+    "Êxodo 38": {
+      "de": 21,
+      "ate": 31,
+      "texto": "Do versículo 21 ao 31 está a conta do ouro, da prata e do bronze usados na tenda. A prata veio de quem foi contado na contagem do povo (v. 25). Pode ler rápido."
+    },
+    "Números 1": {
+      "de": 20,
+      "ate": 43,
+      "salto": "1:44",
+      "texto": "Do versículo 20 ao 43, a contagem vai tribo por tribo, sempre do mesmo jeito, com um número no fim. Pode ler rápido. A soma de todas está no versículo 46, e no 47 Números diz quem ficou de fora."
+    },
+    "Números 2": {
+      "de": 3,
+      "ate": 31,
+      "salto": "2:32",
+      "texto": "Números 2 mostra onde cada tribo acampa, nos quatro lados da tenda. Leia como quem olha um mapa. No versículo 17, os levitas levam a tenda no meio de todos."
+    },
+    "Números 3": {
+      "de": 14,
+      "ate": 39,
+      "salto": "3:40",
+      "texto": "Do versículo 14 ao 39 estão as famílias dos levitas e o serviço de cada uma. Pode ler rápido. No 40, Deus manda contar os filhos mais velhos de Israel e explica a troca pelos levitas."
+    },
+    "Números 7": {
+      "de": 12,
+      "ate": 83,
+      "salto": "7:89",
+      "texto": "Do versículo 12 ao 83, cada um dos doze líderes traz a mesma oferta, um por dia, e Números conta tudo de novo a cada vez. Leia a primeira oferta com calma e passe os olhos nas outras. No versículo 89, Moisés ouve a voz do Senhor de cima da arca."
+    },
+    "Números 26": {
+      "de": 5,
+      "ate": 62,
+      "salto": "26:63",
+      "texto": "Do versículo 5 ao 62 está a segunda contagem do povo, tribo por tribo. Pode ler rápido. Pare nos versículos 9 a 11, onde aparecem Datã e Abirão e os filhos de Coré. Os versículos 63 a 65 dizem quem sobrou da primeira contagem."
+    },
+    "Números 29": {
+      "de": 12,
+      "ate": 38,
+      "texto": "Do versículo 12 ao 38, as ofertas de cada dia da festa se repetem. No primeiro dia são treze novilhos, e a conta diminui um por dia até o sétimo. Pode ler rápido."
+    },
+    "Números 33": {
+      "de": 5,
+      "ate": 49,
+      "salto": "33:50",
+      "texto": "Do versículo 5 ao 49 estão os lugares onde o povo acampou, do Egito até as campinas de Moabe. De muitos, só se sabe o nome. Pare no versículo 9, em Elim, e no 14, em Refidim. No 50, Deus fala de novo com Moisés."
     }
   }
 }
