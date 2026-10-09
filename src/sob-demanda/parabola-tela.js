@@ -104,7 +104,7 @@
     if (b.fala !== undefined) return '<p class="fala-parabola">“' + tx(b.fala) + '”' + ref(b.ref) + '</p>';
     if (b.itens) {
       return '<div class="itens-parabola" style="--colunas:' + b.itens.length + '">' + b.itens.map((it) => '<div class="item-cena">' + desenho(p, it.desenho)
-        + '<b>' + CC.esc(it.titulo) + '</b>' + (it.fala ? '<span>“' + tx(it.fala) + '”</span>' : '') + '</div>').join('') + '</div>';
+        + '<b>' + CC.esc(it.titulo) + '</b>' + (it.fala ? '<span>“' + tx(it.fala).replace(/[^\s“]+-[^\s”]+/g, '<span class="sem-quebra">$&</span>') + '”</span>' : '') + '</div>').join('') + '</div>';
     }
     return '<p class="texto-parabola">' + tx(b.texto) + ref(b.ref) + '</p>';
   }

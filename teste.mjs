@@ -565,6 +565,8 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
     'a fusão une as parábolas lidas dos dois aparelhos, com a data mais antiga');
   const zerado = CC.fundir({ atualizadoEm: 2, parabolasLidas: { semeador: '2026-10-01' } }, { atualizadoEm: 9, zeradoEm: 9, parabolasLidas: {} });
   checar(zerado.parabolasLidas.semeador === '2026-10-01', 'zerar o progresso não apaga as parábolas lidas');
+  const comNota = CC.normalizarEstado({ atualizadoEm: 1, notas: { n1: { versos: [], tipo: 'nota', texto: 'na mesa', criadaEm: 1, editadaEm: 1, contexto: 'parabola:grande-banquete' } } });
+  checar(comNota.notas.n1.contexto === 'parabola:grande-banquete', 'a nota escrita numa parábola guarda o contexto "parabola:<slug>"');
 }
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
