@@ -664,6 +664,10 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   não pelo nome do arquivo; virou `massa-na-tigela`. Temas sensíveis da carta (1Co 7, 11.2-16, 14.34-35, a lista de
   6.9-10) ficaram só como título da estrutura ou fora dos galhos; 1Co 7 entra pelo "cada um tem o seu dom" (7.7, 17).
 
+- 2026-10-09 · conteúdo · 2 Coríntios: 2Co 9.6 ("quem dá pouco recebe pouco") não entrou em galho, pela regra de
+  dinheiro e bênção das reflexões; a oferta ficou na alegria de dar (9.7), na pobreza de Jesus (8.9) e no "não sobrava
+  nem faltava" (Êx 16.18). O véu de Moisés (2Co 3.14-16) já está em Êxodo: o ramo usa 3.7, 3.12-13 e 3.17-18.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
