@@ -69,5 +69,14 @@
   "perguntas": [
     "Quem perto de você anda esquecido num canto e precisa que alguém procure?",
     "Quando foi a última vez que você fez festa porque alguém voltou para Deus?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 15.1-7",
+      "titulo": "A ovelha perdida",
+      "slug": "ovelha-perdida",
+      "rotulo": "Da mesma conversa",
+      "linha": "o dono deixa as noventa e nove e vai atrás de uma"
+    }
   ]
 }
