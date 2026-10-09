@@ -12,7 +12,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { montarPainel } = await import(pathToFileURL(join(AQUI, 'painel.mjs')).href);
 const { montarMensagem, configDoEmail } = await import(pathToFileURL(join(AQUI, 'email.mjs')).href);
-const PORTA = 8207;
+const PORTA = Number(process.env.PORTA) || 8207;
 const PASTA = join(tmpdir(), 'cc-senha-painel');
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
