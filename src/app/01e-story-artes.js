@@ -1678,6 +1678,105 @@
     referencia(ctx, 'Gálatas 2.20', L / 2, y + 196, 32, 'rgba(244,241,234,.66)');
   }
 
+  // ---------- (r) Quando penso em desistir: o texto formando uma cruz ----------
+  function arteDesistir(ctx) {
+    const branco = '#f4f1ea';
+    const oswald = (t) => '700 ' + t + 'px Oswald, sans-serif';
+    const coluna = [['QUANDO', 44], ['PENSO', 44], ['EM', 104], ['DESISTIR', 0], ['LEMBRO', 44], ['QUE', 104],
+      ['VO', 136], ['CÊ', 136], ['INSISTIU', 44], ['EM', 104], ['MIM', 104]];
+    let y = 600;
+    for (const [palavra, t] of coluna) {
+      let tam = t;
+      if (!tam) { ctx.font = oswald(100); tam = 100 * 940 / ctx.measureText(palavra).width; }
+      // letra com acento em cima pede mais espaço acima
+      y += tam * (/[ÂÊÔÃÕÁÉÍÓÚ]/.test(palavra) ? 1.08 : 0.86);
+      S.escrever(ctx, palavra, L / 2, y, oswald(tam), branco, { espaco: t && t < 60 ? t * 0.1 : 0 });
+      y += tam * 0.12;
+    }
+  }
+
+  // ---------- (s) Confie no plano de Deus: o texto ondulando como bandeira ----------
+  // O texto é escrito numa camada e copiado em fatias verticais estreitas, cada uma subida ou
+  // descida por uma onda e um pouco esticada, como pano ao vento em perspectiva.
+  function arteConfie(ctx) {
+    const { c, ctx: t } = camada();
+    const linhas = ['CONFIE NO', 'PLANO DE DEUS.'];
+    t.font = S.Mn(800, 100);
+    const tam = 100 * 900 / Math.max(...linhas.map((l) => t.measureText(l).width));
+    linhas.forEach((l, i) => S.escrever(t, l, L / 2, 900 + i * tam * 1.02, S.Mn(800, tam), '#f6f3ec', { espaco: -tam * 0.02 }));
+    const topo = 900 - tam;
+    const alto = tam * 2.3;
+    const passo = 3;
+    for (let x = 60; x < L - 60; x += passo) {
+      const k = (x - 60) / (L - 120);
+      const dy = Math.sin(k * Math.PI * 2.2 + 0.6) * 46 - k * 40;
+      const esc = 1 + Math.cos(k * Math.PI * 2.2 + 0.6) * 0.09 + (1 - k) * 0.12;
+      ctx.drawImage(c, x, topo, passo, alto, x, topo + dy - alto * (esc - 1) / 2, passo + 0.6, alto * esc);
+    }
+  }
+
+  // ---------- (t) Inundados pelo amor de Deus: a pessoa ajoelhada dentro do AMOR ----------
+  // Ezequiel 47.1-9: o rio que sai do templo e enche tudo de vida. Sem citar o texto.
+  function arteInundados(ctx) {
+    const branco = '#f4f1ea';
+    const oswald = (t) => '700 ' + t + 'px Oswald, sans-serif';
+    S.escrever(ctx, 'INUNDADOS PELO', L / 2, 660, oswald(58), branco, { espaco: 58 * 0.14 });
+    ctx.font = oswald(100);
+    const tam = 100 * 940 / ctx.measureText('AMOR').width;
+    const base = 700 + tam * 0.86;
+    S.escrever(ctx, 'AMOR', L / 2, base, oswald(tam), branco);
+    // a pessoa ajoelhada, de perfil, vazada na palavra (a cor do fundo por cima)
+    const u = tam * 0.9 / 100;
+    ctx.save();
+    ctx.translate(L / 2 + 60, base);
+    ctx.scale(u, u);
+    const p = new Path2D('M-20 -24C-26 -46 -14 -64 2 -66C8 -68 12 -64 14 -60L21 -52L23 -40L13 -38L11 -30'
+      + 'C15 -22 23 -16 23 -8C23 -2 19 0 13 0L-31 0C-35 -2 -33 -8 -27 -10C-23 -14 -21 -18 -20 -24Z');
+    p.arc(11, -73, 9, 0, Math.PI * 2);
+    // contorno claro: fora das letras a pessoa continua visível, dentro delas é um vazado
+    ctx.strokeStyle = branco;
+    ctx.lineWidth = 10 / u;
+    ctx.lineJoin = 'round';
+    ctx.stroke(p);
+    ctx.fillStyle = '#0d0d0c';
+    ctx.fill(p);
+    ctx.restore();
+    S.escrever(ctx, 'DE DEUS', L / 2, base + 110, oswald(70), branco, { espaco: 70 * 0.14 });
+    referencia(ctx, 'Ezequiel 47.1-9', L / 2, base + 190, 32, 'rgba(244,241,234,.66)');
+  }
+
+  // ---------- (u) Estou em uma grande obra: letra grossa à esquerda ----------
+  // A NBV diz outra coisa em Neemias 6.3 ("Estou fazendo um trabalho muito importante!"):
+  // aqui é o lema, com a referência.
+  function arteGrandeObra(ctx) {
+    const branco = '#f4f1ea';
+    const linhas = ['ESTOU EM', 'UMA GRANDE', 'OBRA E NÃO', 'POSSO', 'PARAR.'];
+    ctx.font = S.Mn(800, 100);
+    const tam = 100 * 920 / Math.max(...linhas.map((l) => ctx.measureText(l).width));
+    let y = 600;
+    for (const l of linhas) {
+      y += tam * 1.02;
+      S.escrever(ctx, l, 80, y, S.Mn(800, tam), branco, { alinhar: 'left', espaco: -tam * 0.03 });
+    }
+    referencia(ctx, 'Neemias 6.3', 84, y + 90, 32, 'rgba(244,241,234,.66)', 'left');
+  }
+
+  // ---------- (v) Mateus 24.42: a citação em serifa clássica ----------
+  // O texto é o da NBV, palavra por palavra.
+  function arteVigiem(ctx) {
+    const branco = '#f4f1ea';
+    const serif = (t) => '500 ' + t + 'px Literata, Georgia, serif';
+    const texto = '“Portanto, estejam vigiando, porque vocês não sabem em que dia o seu Senhor virá.”';
+    const tx = S.textoEquilibrado(ctx, texto, { fonte: serif, larguraMax: 860, alturaMax: 620, fonteMax: 84, fonteMin: 44, entreLinhas: 1.3 });
+    const altura = tx.linhas.length * tx.tamanho * 1.3;
+    let y = 1020 - altura / 2;
+    ctx.fillStyle = branco;
+    ctx.fillRect(L / 2 - 40, y - 70, 80, 3);
+    for (const l of tx.linhas) { y += tx.tamanho * 1.3; S.escrever(ctx, l, L / 2, y - tx.tamanho * 0.3, serif(tx.tamanho), branco); }
+    ctx.fillRect(L / 2 - 40, y + 40, 80, 3);
+    referencia(ctx, 'Mateus 24.42', L / 2, y + 120, 34, 'rgba(244,241,234,.72)');
+  }
+
   // ---------- a ofensiva no topo, a arte no meio, a marca no pé ----------
   // A ofensiva continua em destaque em todo modelo: a chama do app e o número de dias no
   // alto, como no story de sempre. A arte vem abaixo, na faixa do meio (Z0 a Z1); a que foi
@@ -1730,6 +1829,11 @@
       tema: { ...ESCURO, numero: '#f0441e', rotulo: '#f1eee6', marca: '#f1eee6', marcaFraca: '#a3a29d' }, desenhar: arteCustaTudo, grao: [30, 13] },
     coracao: { fundo: ['#131110'], caixa: [580, 1540], tema: ESCURO, desenhar: arteCoracao, grao: [20, 15] },
     naovivo: { fundo: ['#0f0e0d', { x: L / 2, y: 1000, r: 800, cor: 'rgba(255,255,255,.05)' }], caixa: [560, 1510], tema: ESCURO, desenhar: arteNaoVivo, grao: [22, 220] },
+    desistir: { fundo: ['#0d0d0c'], caixa: [560, 1790], tema: ESCURO, desenhar: arteDesistir, grao: [18, 18] },
+    confie: { fundo: ['#0d0d0c', { x: L / 2, y: 1000, r: 800, cor: 'rgba(255,255,255,.05)' }], caixa: [700, 1300], tema: ESCURO, desenhar: arteConfie, grao: [18, 19] },
+    inundados: { fundo: ['#0d0d0c'], caixa: [600, 1460], tema: ESCURO, desenhar: arteInundados, grao: [18, 20] },
+    grandeobra: { fundo: ['#0d0d0c'], caixa: [580, 1540], tema: ESCURO, desenhar: arteGrandeObra, grao: [18, 63] },
+    vigiem: { fundo: ['#0d0d0c'], caixa: [600, 1440], tema: ESCURO, desenhar: arteVigiem, grao: [16, 2442] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
