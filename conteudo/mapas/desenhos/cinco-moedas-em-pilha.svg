@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o dinheiro que rendeu cinco vezes (Lc 19.18): uma pilha média de moedas deitadas, cada moeda marcada por uma linha fina, e a face de cima com a borda em relevo; ao lado, uma moeda sozinha no chão. A face de cima da pilha é a única área sálvia. -->
+<path class="k" d="M10 104H110"/>
+<path class="k p" d="M37 68v32a17 5.5 0 0 0 34 0v-32z"/>
+<path class="h" d="M37 93a17 5.5 0 0 0 34 0M37 86a17 5.5 0 0 0 34 0M37 79a17 5.5 0 0 0 34 0M37 72a17 5.5 0 0 0 34 0"/>
+<ellipse class="k s" cx="54" cy="68" rx="17" ry="5.5"/>
+<ellipse class="h" cx="54" cy="68" rx="12.2" ry="3.7"/>
+<path class="k p" d="M78 96v4a12 4 0 0 0 24 0v-4z"/>
+<ellipse class="k p" cx="90" cy="96" rx="12" ry="4"/>
+<ellipse class="h" cx="90" cy="96" rx="8.6" ry="2.7"/>
+</svg>

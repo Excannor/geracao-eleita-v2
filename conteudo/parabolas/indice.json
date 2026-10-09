@@ -34,7 +34,12 @@
         "ovelha-perdida",
         "moeda-perdida",
         "filho-prodigo",
-        "administrador-desonesto"
+        "administrador-desonesto",
+        "rico-e-lazaro",
+        "servo-inutil",
+        "viuva-e-juiz",
+        "fariseu-e-publicano",
+        "dez-minas"
       ]
     },
     {
@@ -60,6 +65,11 @@
     "ovelha-perdida",
     "moeda-perdida",
     "filho-prodigo",
-    "administrador-desonesto"
+    "administrador-desonesto",
+    "rico-e-lazaro",
+    "servo-inutil",
+    "viuva-e-juiz",
+    "fariseu-e-publicano",
+    "dez-minas"
   ]
 }

@@ -1,0 +1,88 @@
+{
+  "titulo": "As dez minas",
+  "ref": "Lc 19.11-27",
+  "grupo": "lucas",
+  "linha": "O rei volta e quer saber quanto o dinheiro rendeu",
+  "desenho": "moedas-e-bolsa",
+  "desenhoLista": "bolsa-amarrada",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Em Jericó, Jesus fica na casa de Zaqueu. Zaqueu cobra impostos para os romanos e promete dar metade do que tem aos pobres.",
+          "ref": "Lc 19.1-10"
+        },
+        {
+          "texto": "Jesus está chegando perto de Jerusalém, e o povo acha que o Reino de Deus vai começar logo. Jesus conta esta história para corrigir essa ideia.",
+          "ref": "Lc 19.11"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "moeda",
+      "blocos": [
+        {
+          "texto": "Um homem nobre viaja para longe para ser coroado rei. Antes de ir, ele chama dez servos e dá dinheiro a cada um.",
+          "ref": "Lc 19.12-13"
+        },
+        {
+          "fala": "Façam esse dinheiro render enquanto eu estiver ausente",
+          "ref": "Lc 19.13"
+        },
+        {
+          "texto": "O povo dele odeia o homem e manda avisar que não quer ele como rei. Ele volta como rei mesmo assim e chama os servos para saber quanto o dinheiro rendeu.",
+          "ref": "Lc 19.14-15"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "dez-moedas-em-pilha",
+              "titulo": "O primeiro",
+              "fala": "o seu dinheiro rendeu dez vezes mais a quantia recebida!",
+              "ref": "Lc 19.16"
+            },
+            {
+              "desenho": "cinco-moedas-em-pilha",
+              "titulo": "O segundo",
+              "fala": "o seu dinheiro rendeu cinco vezes a quantia recebida",
+              "ref": "Lc 19.18"
+            },
+            {
+              "desenho": "bolsa-amarrada",
+              "titulo": "O terceiro",
+              "fala": "Senhor, aqui está o seu dinheiro. Eu o guardei bem seguro",
+              "ref": "Lc 19.20"
+            }
+          ]
+        },
+        {
+          "texto": "O rei dá dez cidades para o primeiro governar e cinco para o segundo. O terceiro diz que teve medo, porque o rei é um homem severo.",
+          "ref": "Lc 19.17-21"
+        },
+        {
+          "texto": "O rei responde que o servo podia ao menos ter posto o dinheiro no banco para render juros. Ele manda tirar o dinheiro desse servo e dar ao que ganhou dez vezes mais. Depois, manda matar os inimigos que não queriam ele como rei.",
+          "ref": "Lc 19.22-27"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O povo espera o Reino para logo, e Jesus fala de um rei que vai embora e só depois volta. Até ele voltar, cada servo tem alguma coisa nas mãos para fazer render.",
+    "apoio": "O rei diz a regra. “aquele que tem muito receberá mais ainda, mas aquele que não tem, até o pouco que tem lhe será tirado”.",
+    "ref": "Lc 19.11-27"
+  },
+  "perguntas": [
+    "O que Deus pôs nas suas mãos que você está só guardando?",
+    "O que impede você de usar o que recebeu de Deus?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 25.14-30",
+      "titulo": "Os talentos",
+      "linha": "o homem deixa com os servos cinco talentos, dois e um"
+    }
+  ]
+}

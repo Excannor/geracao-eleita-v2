@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o grande abismo (Lc 16.26): dois paredões de pedra, um de cada lado, com o vão fundo no meio, que ninguém atravessa; as bordas de quinas descem até sumir embaixo, com riscos de sombra na fenda. O capim no alto do paredão da direita é a única área sálvia. -->
+<path class="p" d="M4 46H44L49 58L43 70L48 84L41 98L45 114H4Z"/>
+<path class="p" d="M116 46H76L71 60L77 72L70 86L77 100L73 114H116Z"/>
+<path class="k" d="M4 46H44L49 58L43 70L48 84L41 98L45 114M116 46H76L71 60L77 72L70 86L77 100L73 114"/>
+<path class="s" d="M77 46H115V42C104 40 88 40 77 42Z"/>
+<path class="k" d="M76 42C88 40 104 40 116 42"/>
+<path class="h" d="M10 58H34M8 74H30M14 90H36M86 60H110M90 76H112M84 92H106M58 104V112M62 96V104"/>
+</svg>

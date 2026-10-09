@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a porta do homem rico (Lc 16.19-21): à direita, a fachada da casa rica, com a porta alta de duas folhas fechada, a moldura e o degrau; à esquerda, no chão perto da porta, um cachorro magro e uma tigela vazia. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. As folhas da porta fechada são a única área sálvia. -->
+<path class="k" d="M2 108H158"/>
+<path class="p" d="M86 108V18H160V108Z"/>
+<path class="k" d="M86 108V18H158"/>
+<path class="h" d="M86 34H158M86 52H96M150 52H158M86 70H96M150 70H158M86 88H96M150 88H158"/>
+<path class="k p" d="M98 102V42C98 30 148 30 148 42V102Z"/>
+<path class="s" d="M104 102V44C104 36 122 36 122 40V102ZM124 102V40C124 36 142 36 142 44V102Z"/>
+<path class="k" d="M104 102V44C104 36 122 36 122 40V102M124 102V40C124 36 142 36 142 44V102M118 72V78M128 72V78"/>
+<path class="k p" d="M92 102H154V108H92Z"/>
+<path class="k" d="M30.8 94.4V108M35.8 95.6V108M50.6 95.6V108M55.6 94.4V108"/>
+<path class="k" d="M60.6 86.9C65.5 84.5 67.4 79.5 66.1 75.2"/>
+<path class="k p" d="M25.8 85.7C25.8 80.7 30.8 79.5 38.2 79.5H54.4C59.3 79.5 61.8 82.6 61.8 86.9C61.8 91.9 58.7 95 55 95C49.4 93.1 40.7 93.8 35.1 96.2C29.6 96.2 25.8 91.9 25.8 85.7Z"/>
+<path class="h" d="M37 83.8C40.7 82.6 44.4 82.6 48.2 83.8M40.7 88.2C44.4 86.9 48.2 86.9 51.9 88.2"/>
+<path class="k p" d="M30.8 82C30.8 75.2 27.1 70.8 22.7 70.8C19 70.8 16.5 73.3 15.9 75.8L11.6 77.6C9.7 79.5 10.3 83.2 13.4 83.8H21.5C26.5 85.7 30.8 85.7 30.8 82Z"/>
+<path class="k p" d="M24 72.1C27.7 70.8 30.8 73.9 29.6 80.7C26.5 79.5 24 76.4 24 72.1Z"/>
+<path class="e" d="M10.3 79.8a1.5 1.2 0 0.6 0 3 0a1.5 1.2 0 0.6 0-3 0Z"/>
+<path class="e" d="M18.5 75.8a1.1 1.1 0 0.6 0 2.2 0a1.1 1.1 0 0.6 0-2.2 0Z"/>
+<path class="k p" d="M64 102C64 108 82 108 82 102Z"/>
+<path class="k" d="M62 102H84"/>
+</svg>

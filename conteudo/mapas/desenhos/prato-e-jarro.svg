@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a refeição que o servo prepara e serve ao patrão (Lc 17.8): um prato fundo com um pão redondo em cima e, ao lado, o jarro de beber com a alça. O pão é a única área sálvia. -->
+<path class="h" d="M6 100H114"/>
+<path class="k p" d="M12 88C12 96 24 100 42 100C60 100 72 96 72 88Z"/>
+<path class="k p" d="M12 88a30 7 0 1 0 60 0a30 7 0 1 0-60 0Z"/>
+<path class="k s" d="M22 88C22 74 32 68 42 68C52 68 62 74 62 88C52 91 32 91 22 88Z"/>
+<path class="h" d="M32 76l4 6M42 74l4 7M52 76l3 6"/>
+<path class="k" d="M100 58C112 58 112 78 100 82"/>
+<path class="k p" d="M82 46H94V52C100 56 104 64 104 74C104 90 98 100 88 100C78 100 72 90 72 74C72 64 76 56 82 52Z"/>
+<path class="k" d="M80 46H96"/>
+<path class="h" d="M75 70C82 72 94 72 101 70"/>
+</svg>

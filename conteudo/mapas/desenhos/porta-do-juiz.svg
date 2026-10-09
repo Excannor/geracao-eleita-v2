@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a viúva e o juiz (Lc 18.2-5): à direita, a casa do juiz, de pedra, com a porta fechada e o degrau; no chão, vindo da frente do desenho, duas trilhas de pegadas de pé descalço que vão até a porta e voltam, de quem veio muitas vezes. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A porta fechada é a única área sálvia. -->
+<path class="k" d="M2 72H158"/>
+<path class="p" d="M98 72V10H160V72Z"/>
+<path class="k" d="M98 72V10H158"/>
+<path class="h" d="M98 24H158M98 40H104M152 40H158M98 56H104M152 56H158M118 10V24M138 10V24"/>
+<path class="k s" d="M110 68V36C110 26 142 26 142 36V68Z"/>
+<path class="k" d="M126 30V68"/>
+<path class="h" d="M118 38V68M134 38V68"/>
+<circle class="e" cx="122" cy="52" r="1.6"/>
+<path class="k p" d="M104 68H148V72H104Z"/>
+<g transform="translate(18.8 97.7) rotate(75.1)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(39.2 101.5) rotate(75.1)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(54.8 88.1) rotate(75.1)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(75.2 91.9) rotate(75.1)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(90.8 78.5) rotate(75.1)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(111.2 82.3) rotate(75.1)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(125.4 92.3) rotate(251.6)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(104.6 89.7) rotate(251.6)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(89.4 104.3) rotate(251.6)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(68.6 101.7) rotate(251.6)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(53.4 116.3) rotate(251.6)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+<g transform="translate(32.6 113.7) rotate(251.6)"><path class="k p" d="M0.4-6C3.8-6 4.4-2 3.4 1.5C2.6 4 2.6 6 1.6 7.6C0.8 8.8-1.6 8.8-2.4 7.6C-3.4 6-3 3-3.6 0C-4-3-3-6 0.4-6Z"/><circle class="e" cx="-3" cy="-9.4" r="1.2"/><circle class="e" cx="-0.4" cy="-10.6" r="1.4"/><circle class="e" cx="2.4" cy="-10" r="1.2"/></g>
+</svg>

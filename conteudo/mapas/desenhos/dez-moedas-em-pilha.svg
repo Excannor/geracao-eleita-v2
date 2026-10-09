@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o dinheiro que rendeu dez vezes (Lc 19.16): duas pilhas altas de moedas deitadas, uma ao lado da outra, cada moeda marcada por uma linha fina, e a face de cima com a borda em relevo. A moeda do alto da pilha mais alta é a única área sálvia. -->
+<path class="k" d="M10 104H110"/>
+<path class="k p" d="M29 42v58a15 5 0 0 0 30 0v-58z"/>
+<path class="h" d="M29 94a15 5 0 0 0 30 0M29 88a15 5 0 0 0 30 0M29 82a15 5 0 0 0 30 0M29 76a15 5 0 0 0 30 0M29 70a15 5 0 0 0 30 0M29 64a15 5 0 0 0 30 0M29 58a15 5 0 0 0 30 0M29 52a15 5 0 0 0 30 0M29 46a15 5 0 0 0 30 0"/>
+<ellipse class="k s" cx="44" cy="42" rx="15" ry="5"/>
+<ellipse class="h" cx="44" cy="42" rx="10.8" ry="3.4"/>
+<path class="k p" d="M63 66v34a15 5 0 0 0 30 0v-34z"/>
+<path class="h" d="M63 94a15 5 0 0 0 30 0M63 88a15 5 0 0 0 30 0M63 82a15 5 0 0 0 30 0M63 76a15 5 0 0 0 30 0M63 70a15 5 0 0 0 30 0"/>
+<ellipse class="k p" cx="78" cy="66" rx="15" ry="5"/>
+<ellipse class="h" cx="78" cy="66" rx="10.8" ry="3.4"/>
+</svg>
