@@ -681,6 +681,36 @@ checar(/e-mail/.test(erro), 'cadastro sem e-mail é recusado');
 await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03', consentimento: true });
 checar(!!(await contas.conferir('dora@x.com', '12345678')), 'entra com o e-mail, sem diferenciar maiúsculas');
 for (const u of ['ana', 'bia', 'caio']) await contas.completarPerfil(u, { email: u + '@x.com', nascimento: '2000-01-01' });
+
+// ---------- data de nascimento travada e e-mail só com a senha ----------
+{
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  checar(/não muda depois do cadastro.*suporte\|403/.test(await tentar(() => contas.completarPerfil('dora', { nascimento: '1990-05-05' }))),
+    'depois do cadastro, a data de nascimento não muda (403, "fale com o suporte")');
+  checar(await tentar(() => contas.completarPerfil('dora', { nascimento: '2001-02-03', email: 'dora@x.com' })) === ''
+    && contas.achar('dora').nascimento === '2001-02-03', 'mandar a mesma data e o mesmo e-mail de novo é aceito sem senha');
+  checar(/não muda depois do cadastro/.test(await tentar(() => contas.completarPerfil('dora', { nascimento: nasc12anos }, { senhaConferida: true }))),
+    'nem com a senha conferida a data muda (trocar para menor de idade também é recusado)');
+  checar(contas.achar('dora').nascimento === '2001-02-03', 'a data gravada continua a do cadastro');
+  checar(contas.trocaEmail('dora', 'outra@x.com') && !contas.trocaEmail('dora', 'DORA@x.com') && !contas.trocaEmail('dora', ''),
+    'trocaEmail só é verdadeiro quando o e-mail novo é outro');
+  checar(/senha atual\|403/.test(await tentar(() => contas.completarPerfil('dora', { email: 'outra@x.com' }))),
+    'trocar o e-mail sem a senha conferida é recusado');
+  checar(contas.achar('dora').email === 'dora@x.com', 'o e-mail continua o antigo');
+  await contas.completarPerfil('dora', { email: 'outra@x.com' }, { senhaConferida: true });
+  checar(contas.achar('dora').email === 'outra@x.com' && contas.achar('dora').nascimento === '2001-02-03',
+    'com a senha conferida, o e-mail troca e o nascimento fica');
+  await contas.completarPerfil('dora', { email: 'dora@x.com' }, { senhaConferida: true });
+  const semNasc = await contas.criar({ usuario: 'semnasc', senha: '12345678', email: 'semnasc@x.com' }, { exigirPerfil: false });
+  checar(!semNasc.nascimento, 'conta antiga pode não ter nascimento');
+  checar(/12 anos/.test(await tentar(() => contas.completarPerfil('semnasc', { nascimento: nasc11anos }))), 'completar com menos de 12 anos é recusado');
+  await contas.completarPerfil('semnasc', { nascimento: '1999-09-09' });
+  checar(contas.achar('semnasc').nascimento === '1999-09-09' && contas.achar('semnasc').email === 'semnasc@x.com',
+    'quem não tinha a data completa uma vez, sem senha, e o e-mail que já tinha fica');
+  checar(/não muda depois do cadastro/.test(await tentar(() => contas.completarPerfil('semnasc', { nascimento: '1998-08-08' }))),
+    'completada uma vez, a data também trava');
+  await contas.apagar('semnasc');
+}
 checar(contas.procurar('dora', 'an') === null && contas.procurar('dora', 'ana').usuario === 'ana', 'a busca só acha pelo @ exato');
 
 await contas.bloquear('dora', 'caio');

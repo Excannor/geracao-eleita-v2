@@ -1329,7 +1329,17 @@ const servidor = createServer(async (req, res) => {
     if (rota === '/api/perfil') {
       if (!exigir(post && conta, 405, 'método não suportado')) return;
       try {
-        await CONTAS.completarPerfil(eu, await lerJson(req));
+        const corpo = await lerJson(req);
+        // Trocar o e-mail que a conta já tem pede a senha atual, com o mesmo limite de
+        // tentativas do login (a data de nascimento nem com senha: contas.mjs recusa).
+        let senhaConferida = false;
+        if (CONTAS.trocaEmail(eu, corpo.email)) {
+          if (!podeTentar(ip, eu)) { json(res, 429, MUITAS); return; }
+          if (!corpo.senhaAtual) { json(res, 403, { erro: 'para trocar o e-mail, confirme com a sua senha atual' }); return; }
+          if (!await CONTAS.conferir(eu, corpo.senhaAtual)) { anotarErro(ip, eu); json(res, 401, { erro: 'a senha não confere' }); return; }
+          senhaConferida = true;
+        }
+        await CONTAS.completarPerfil(eu, corpo, { senhaConferida });
         json(res, 200, { ok: true });
       } catch (e) {
         json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não consegui salvar' });

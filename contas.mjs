@@ -62,6 +62,7 @@ export const FUSO_PADRAO = 'America/Sao_Paulo';
 // LGPD art. 14: menor de 12 anos precisaria de consentimento dos pais, que o app não tem
 // como conferir; por isso a idade mínima para ter conta é 12 anos completos.
 export const IDADE_MINIMA = 12;
+export const NASCIMENTO_TRAVADO = 'a data de nascimento não muda depois do cadastro; para corrigir, fale com o suporte';
 // Versão do texto de consentimento sobre dado de fé (LGPD art. 11). Mudar o texto de um
 // jeito que precise de um "sim" de novo exige subir este número.
 // v2: quem conduz a célula e a administração da igreja passam a ver o painel da célula com
@@ -487,21 +488,42 @@ export class Contas {
     return iguais(tentativa, conta.senha) ? conta : null;
   }
 
-  async completarPerfil(usuario, { email, nascimento, nome } = {}) {
+  // Completa o cadastro das contas antigas (e-mail e nascimento que faltavam) e troca o e-mail.
+  // A data de nascimento, uma vez gravada, não muda mais pelo app: é ela que decide a idade
+  // mínima e as regras para quem tem menos de 18 (liderar célula só com aprovação), e trocá-la
+  // abriria caminho para fugir dessas regras. Correção só pelo suporte. Mandar a mesma data (ou
+  // nenhuma) é aceito, para a tela de completar cadastro poder reenviar o que já tinha.
+  // Trocar um e-mail que já existe exige a senha atual, conferida pelo servidor antes
+  // (senhaConferida): com a sessão roubada, trocar o e-mail e pedir nova senha tomaria a conta.
+  async completarPerfil(usuario, { email, nascimento, nome } = {}, { senhaConferida = false } = {}) {
     const conta = this.achar(usuario);
     if (!conta) throw erro('conta não encontrada', 404);
-    const mail = limparEmail(email);
+    const mail = email === undefined || email === null || String(email).trim() === '' ? (conta.email || '') : limparEmail(email);
     if (!emailValido(mail)) throw erro('esse e-mail não parece certo');
     const dono = this.acharPorEmail(mail);
     if (dono && dono.usuario !== conta.usuario) throw erro('este e-mail já tem conta');
-    if (!nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
-    if (!idadeMinimaOk(nascimento)) throw erro('o Geração Eleita é para quem tem 12 anos ou mais');
+    if (conta.email && mail !== conta.email && !senhaConferida) throw erro('para trocar o e-mail, confirme com a sua senha atual', 403);
+    let nasc = conta.nascimento || '';
+    if (nasc) {
+      if (nascimento && nascimento !== nasc) throw erro(NASCIMENTO_TRAVADO, 403);
+    } else {
+      if (!nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
+      if (!idadeMinimaOk(nascimento)) throw erro('o Geração Eleita é para quem tem 12 anos ou mais');
+      nasc = nascimento;
+    }
     conta.email = mail;
-    conta.nascimento = nascimento;
+    conta.nascimento = nasc;
     const n = String(nome || '').trim().slice(0, 20);
     if (n) conta.nome = n;
     await this.salvar();
     return conta;
+  }
+
+  // Se este pedido troca o e-mail que a conta já tinha (o servidor então pede a senha atual).
+  trocaEmail(usuario, email) {
+    const conta = this.achar(usuario);
+    const mail = limparEmail(email);
+    return !!(conta && conta.email && mail && mail !== conta.email);
   }
 
   async atualizarFuso(usuario, fuso) {
