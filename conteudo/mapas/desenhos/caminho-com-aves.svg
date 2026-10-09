@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a semente na beira do caminho (Lc 8.5): a faixa de terra batida do caminho, com sementes soltas em cima, e uma ave bicando uma delas. O caminho é a única área sálvia. -->
+<path class="k s" d="M8 92C40 82 80 82 112 92V104C80 94 40 94 8 104Z"/>
+<path class="h" d="M20 96l6-2M58 90l6 0M90 94l6 1"/>
+<path class="k p" d="M44 58L30 50L34 64Z"/>
+<ellipse class="k p" cx="58" cy="62" rx="18" ry="12"/>
+<path class="h" d="M50 60C58 56 66 58 70 64"/>
+<circle class="k p" cx="80" cy="56" r="8"/>
+<path class="k" d="M87 58L96 66L85 63"/>
+<circle class="e" cx="82" cy="54" r="1.5"/>
+<path class="k" d="M56 74V84M64 74V84"/>
+<ellipse class="e" cx="98" cy="72" rx="2" ry="1.5"/>
+<ellipse class="e" cx="36" cy="90" rx="2" ry="1.5"/>
+<ellipse class="e" cx="80" cy="88" rx="2" ry="1.5"/>
+</svg>

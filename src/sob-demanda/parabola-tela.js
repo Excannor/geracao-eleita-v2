@@ -93,6 +93,7 @@
     pao: '<path d="M4 12a8 5 0 0 1 16 0v5H4z"/><path d="M9 9l1.5 2M13 8.5l1.5 2"/>',
     pessoas: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14c3 0 5 2.2 5 5"/>',
     estrada: '<path d="M8 3L4 21M16 3l4 18M12 5v3M12 11v3M12 17v3"/>',
+    broto: '<path d="M12 21V11"/><path d="M12 11C12 6 8 4 4 4c0 4 3 7 8 7zM12 13c0-4 3-6 8-6 0 4-3 6-8 6z"/>',
     moeda: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/>',
     ancora: '<circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 11h8M5 14c0 4 3 7 7 7s7-3 7-7"/>',
   };
@@ -104,10 +105,11 @@
       : '<path class="pontos" d="M80 2C70 20 40 18 32 36"/><path class="ponta" d="M26 32l6 6 5-7"/>') + '</svg>';
   const desenho = (p, id, classe) => (p.desenhos && p.desenhos[id] ? '<span class="desenho' + (classe ? ' ' + classe : '') + '" aria-hidden="true">' + p.desenhos[id] + '</span>' : '');
 
+  // quatro itens viram duas linhas de dois: a 390px, quatro colunas espremem os nomes
   function bloco(p, b) {
     if (b.fala !== undefined) return '<p class="fala-parabola">“' + falaTx(b.fala) + '”' + ref(b.ref) + '</p>';
     if (b.itens) {
-      return '<div class="itens-parabola" style="--colunas:' + b.itens.length + '">' + b.itens.map((it) => '<div class="item-cena">' + desenho(p, it.desenho)
+      return '<div class="itens-parabola" style="--colunas:' + (b.itens.length === 4 ? 2 : b.itens.length) + '">' + b.itens.map((it) => '<div class="item-cena">' + desenho(p, it.desenho)
         + '<b>' + CC.esc(it.titulo) + '</b>' + (it.fala ? '<span>“' + falaTx(it.fala) + '”</span>' : '') + '</div>').join('') + '</div>';
     }
     return '<p class="texto-parabola">' + tx(b.texto) + ref(b.ref) + '</p>';
@@ -126,7 +128,7 @@
     const parecidas = (p.parecidas || []).map((x) => {
       const destino = x.slug && porSlug.get(x.slug);
       const dentro = desenho(p, p.desenhoLista) + '<span><b>Parecida em ' + CC.esc((trechoDe(x.ref) || {}).livro || '') + ' · ' + CC.esc(x.titulo) + '</b>'
-        + '<small>' + nb(CC.esc(x.ref)) + (x.linha ? ' · ' + CC.esc(x.linha.charAt(0).toLowerCase() + x.linha.slice(1)) : '') + '</small></span>';
+        + '<small>' + nb(CC.esc(x.ref)) + (x.linha ? ' · ' + CC.esc(x.linha) : '') + '</small></span>';
       return destino ? '<a class="parecida-parabola" href="#/parabola/' + x.slug + '">' + dentro + CC.ico('avancar') + '</a>' : '<div class="parecida-parabola">' + dentro + '</div>';
     }).join('');
     return '<div class="parabola">'

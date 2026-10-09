@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o semeador (Lc 8.5-8): à esquerda, o saco de sementes amarrado na boca; dela sai um arco de sementes que voa por cima do campo arado; à direita, o trigo que cresceu na terra boa, e uma ave no alto. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. As espigas são a única área sálvia. -->
+<path class="k" d="M4 98C50 90 110 90 156 98"/>
+<path class="h" d="M14 106C50 100 110 100 150 106M30 114C60 110 100 110 136 114"/>
+<path class="k p" d="M10 84C2 66 14 54 28 52L22 44H46L40 52C56 54 64 70 56 84C48 94 18 94 10 84Z"/>
+<path class="k" d="M24 49H44"/>
+<path class="h" d="M22 66C20 72 22 78 26 82M46 64C50 70 50 78 46 84"/>
+<ellipse class="e" cx="54" cy="42" rx="2" ry="1.5"/><ellipse class="e" cx="64" cy="36" rx="2" ry="1.5"/>
+<ellipse class="e" cx="75" cy="33" rx="2" ry="1.5"/><ellipse class="e" cx="86" cy="34" rx="2" ry="1.5"/>
+<ellipse class="e" cx="96" cy="39" rx="2" ry="1.5"/><ellipse class="e" cx="104" cy="46" rx="2" ry="1.5"/>
+<ellipse class="e" cx="70" cy="44" rx="2" ry="1.5"/><ellipse class="e" cx="90" cy="46" rx="2" ry="1.5"/>
+<path class="k" d="M126 96V66M138 96V58M150 96V68"/>
+<path class="k" d="M126 82l-6-5M138 76l6-5M150 84l-5-5"/>
+<ellipse class="k s" cx="126" cy="60" rx="4" ry="8"/>
+<ellipse class="k s" cx="138" cy="52" rx="4" ry="8"/>
+<ellipse class="k s" cx="150" cy="62" rx="4" ry="8"/>
+<path class="k" d="M110 18c4-5 9-5 11 0c2-5 7-5 11 0"/>
+</svg>
