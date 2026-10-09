@@ -114,10 +114,12 @@ const FONTE_COM_RESUMO = /^\/fonte-[a-z-]+\.[0-9a-f]{10}\.woff2$/;
 // Os mapas dos livros (mapa-<slug>.<resumo>.json) também são públicos: são material de
 // estudo, não dado de ninguém, e o resumo no nome deixa o cache ser longo, como nas fontes.
 const MAPA_COM_RESUMO = /^\/mapa-[a-z0-9-]+\.[0-9a-f]{10}\.json$/;
+// As parábolas (parabola-<slug>.<resumo>.json e parabolas-desenhos.<resumo>.json), pelo mesmo motivo.
+const PARABOLA_COM_RESUMO = /^\/parabola(-[a-z0-9-]+|s-desenhos)\.[0-9a-f]{10}\.json$/;
 // As fotos da página de boas-vindas (landing-<nome>.<resumo>.webp|jpg): públicas, porque é
 // quem ainda não entrou que as vê.
 const FOTO_LANDING_COM_RESUMO = /^\/landing-[a-z0-9-]+\.[0-9a-f]{10}\.(webp|jpg)$/;
-const PUBLICO_COM_RESUMO = (rota) => FONTE_COM_RESUMO.test(rota) || MAPA_COM_RESUMO.test(rota) || FOTO_LANDING_COM_RESUMO.test(rota);
+const PUBLICO_COM_RESUMO = (rota) => FONTE_COM_RESUMO.test(rota) || MAPA_COM_RESUMO.test(rota) || PARABOLA_COM_RESUMO.test(rota) || FOTO_LANDING_COM_RESUMO.test(rota);
 const CSP = [
   "default-src 'self'",
   "script-src 'self' " + hashesDosScripts(),

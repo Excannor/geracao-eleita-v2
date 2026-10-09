@@ -268,6 +268,53 @@ secao('mapas dos livros');
 }
 
 // =========================================================================
+secao('parábolas');
+// =========================================================================
+// Como os mapas: o checador em cada parábola da pasta, o índice, um arquivo por publicada (com
+// os desenhos embutidos), a lista e a página sob demanda, tudo no cache próprio do service
+// worker. O texto das parábolas não entra no index.html.
+{
+  const { checarParabola, checarIndice, listarParabolas, lerIndiceParabolas, lerParabola } = await import('./ferramentas/checar-parabola.mjs');
+  const slugs = listarParabolas();
+  const indice = lerIndiceParabolas();
+  const errosIndice = checarIndice(indice);
+  checar(errosIndice.length === 0, 'o índice das parábolas está certo' + (errosIndice.length ? ': ' + errosIndice.slice(0, 3).join(' · ') : ''));
+  for (const slug of slugs) {
+    const { erros, avisos } = checarParabola(slug, lerParabola(slug));
+    checar(erros.length === 0, 'a parábola ' + slug + ' passa no checador' + (erros.length ? ': ' + erros.slice(0, 3).join(' · ') : ''));
+    for (const a of avisos) console.log('  aviso  ' + slug + ': ' + a);
+  }
+  const i0 = html.indexOf('window.PARABOLAS=');
+  const P = i0 > -1 ? JSON.parse(html.slice(i0 + 'window.PARABOLAS='.length, html.indexOf(';window.MAPAS=', i0))) : null;
+  checar(!!P && P.itens.length === indice.publicadas.length && P.itens.every((p) => indice.publicadas.includes(p.slug)),
+    'o aplicativo conhece exatamente as parábolas publicadas (' + ((P && P.itens) || []).map((p) => p.slug).join(', ') + ')');
+  checar(!!P && P.grupos.every((g) => P.itens.some((p) => p.grupo === g.id)), 'só os grupos com parábola publicada vão para a lista e os filtros');
+  checar(!!P && P.itens.every((p) => Object.keys(p).sort().join() === 'arquivo,desenho,grupo,linha,ref,slug,titulo'), 'no index.html vai só o mínimo da lista de cada parábola');
+  for (const p of (P && P.itens) || []) {
+    checar(/^parabola-[a-z0-9-]+\.[0-9a-f]{10}\.json$/.test(p.arquivo) && existsSync(dist(p.arquivo)) && existsSync(dist(p.arquivo + '.gz')) && sw.includes(p.arquivo),
+      'a parábola ' + p.slug + ' saiu para ' + p.arquivo + ', comprimida e no service worker');
+    if (!existsSync(dist(p.arquivo))) continue;
+    const publicada = JSON.parse(readFileSync(dist(p.arquivo), 'utf8'));
+    checar(Object.values(publicada.desenhos || {}).length >= 2 && Object.values(publicada.desenhos).every((d) => /^<svg/.test(d) && !/<style|xmlns|<!--/.test(d)),
+      'a parábola ' + p.slug + ' leva os desenhos embutidos, sem o estilo de visualização avulsa');
+    checar(!html.includes(publicada.dizendo.texto.slice(0, 40)), 'o texto da parábola ' + p.slug + ' não entra no index.html');
+  }
+  const extras = P ? [P.desenhos, P.tela] : [];
+  checar(extras.length === 2 && /^parabolas-desenhos\.[0-9a-f]{10}\.json$/.test(extras[0]) && /^parabola-tela\.[0-9a-f]{10}\.js$/.test(extras[1])
+    && extras.every((f) => existsSync(dist(f)) && sw.includes('"' + f + '"')) && sw.includes("'caminho-parabolas'"),
+  'os desenhos da lista e a tela das parábolas saem em arquivos próprios, no cache "caminho-parabolas"');
+  if (P && existsSync(dist(P.tela))) {
+    const tela = readFileSync(dist(P.tela), 'utf8');
+    checar(!tela.includes('ESTILO_PARABOLA') && tela.includes('.dizendo-parabola') && !html.includes('.dizendo-parabola'), 'o estilo da página da parábola vai junto com ela, fora do index.html');
+  }
+  const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
+  checar(/PARABOLA_COM_RESUMO\.test\(rota\)/.test(servidorTexto.match(/const PUBLICO_COM_RESUMO = .*/)[0]), 'o servidor entrega as parábolas sem sessão e com cache longo, como os mapas');
+  const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
+  checar(roteador.includes("rota === 'parabolas'") && roteador.includes("rota === 'parabola'") && roteador.includes("parabolas: '#/explorar'"), 'as rotas #/parabolas e #/parabola/<slug> existem e marcam o Explorar');
+  checar(readFileSync(join(AQUI, 'src', 'app', '06-explorar.js'), 'utf8').includes('CC.cartaoParabolas()'), 'o Explorar tem o cartão das parábolas');
+}
+
+// =========================================================================
 secao('regras de progresso');
 // =========================================================================
 const contexto = createContext({
@@ -507,6 +554,17 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
   const f3 = CC.fundir(antes, zeradoAntigo);
   checar(!f3.lidos.length && f3.foto === antes.foto && f3.notas['v:João 3.16'].texto === 'minha nota' && !f3.notas['v:João 3.16'].apagadaEm, 'zeramento vindo de aparelho antigo também só zera a trilha');
   CC.carregarLocal();
+}
+// As parábolas lidas são material de consulta: o "Zerar" não as apaga, e a fusão une os dois
+// aparelhos (vale a data mais antiga de cada uma).
+{
+  checar(!CC.PROGRESSO_DA_TRILHA.includes('parabolasLidas'), 'as parábolas lidas ficam fora do andamento da trilha');
+  const f = CC.fundir({ atualizadoEm: 2, parabolasLidas: { 'grande-banquete': '2026-10-09', 'semeador': '2026-10-01' } },
+    { atualizadoEm: 3, parabolasLidas: { 'grande-banquete': '2026-10-05', 'bom-samaritano': '2026-10-07' } });
+  checar(JSON.stringify(f.parabolasLidas) === JSON.stringify({ 'grande-banquete': '2026-10-05', semeador: '2026-10-01', 'bom-samaritano': '2026-10-07' }),
+    'a fusão une as parábolas lidas dos dois aparelhos, com a data mais antiga');
+  const zerado = CC.fundir({ atualizadoEm: 2, parabolasLidas: { semeador: '2026-10-01' } }, { atualizadoEm: 9, zeradoEm: 9, parabolasLidas: {} });
+  checar(zerado.parabolasLidas.semeador === '2026-10-01', 'zerar o progresso não apaga as parábolas lidas');
 }
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');

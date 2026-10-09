@@ -10,29 +10,75 @@
       "titulo": "Onde Jesus está",
       "icone": "alfinete",
       "blocos": [
-        { "texto": "Num sábado, Jesus vai comer na casa de um líder dos fariseus, e todo mundo fica de olho nele.", "ref": "Lc 14.1" },
-        { "texto": "Na mesa, Jesus diz ao dono da casa que, quando der um banquete, convide os pobres e os aleijados, gente que não tem como pagar o convite de volta. Um homem que está à mesa ouve isso e exclama:", "ref": "Lc 14.12-15" },
-        { "fala": "Que privilégio será comer no banquete do Reino de Deus!", "ref": "Lc 14.15" },
-        { "texto": "Jesus responde com esta história." }
+        {
+          "texto": "Num sábado, Jesus vai comer na casa de um líder dos fariseus, e todo mundo fica de olho nele.",
+          "ref": "Lc 14.1"
+        },
+        {
+          "texto": "Na mesa, Jesus diz ao dono da casa que, quando der um banquete, convide os pobres e os aleijados, gente que não tem como pagar o convite de volta.",
+          "ref": "Lc 14.12-14"
+        },
+        {
+          "texto": "Um homem que está à mesa ouve isso e exclama:"
+        },
+        {
+          "fala": "Que privilégio será comer no banquete do Reino de Deus!",
+          "ref": "Lc 14.15"
+        },
+        {
+          "texto": "Jesus responde com esta história."
+        }
       ]
     },
     {
       "titulo": "A história",
       "icone": "pao",
       "blocos": [
-        { "texto": "Um homem prepara um grande banquete e convida muita gente. Quando tudo fica pronto, ele manda o servo avisar os convidados.", "ref": "Lc 14.16-17" },
-        { "fala": "Venham, está na hora da festa. Tudo está pronto.", "ref": "Lc 14.17" },
-        { "texto": "Um por um, todos começam a dar desculpas." },
+        {
+          "texto": "Um homem prepara um grande banquete e convida muita gente. Quando tudo fica pronto, ele manda o servo avisar os convidados.",
+          "ref": "Lc 14.16-17"
+        },
+        {
+          "fala": "Venham, está na hora da festa. Tudo está pronto.",
+          "ref": "Lc 14.17"
+        },
+        {
+          "texto": "Um por um, todos começam a dar desculpas."
+        },
         {
           "itens": [
-            { "desenho": "campo-com-torre", "titulo": "Comprei um campo", "fala": "preciso ir vê-lo", "ref": "Lc 14.18" },
-            { "desenho": "canga-de-bois", "titulo": "Cinco juntas de bois", "fala": "quero experimentá-las", "ref": "Lc 14.19" },
-            { "desenho": "duas-aliancas", "titulo": "Acabei de casar", "fala": "não posso ir", "ref": "Lc 14.20" }
+            {
+              "desenho": "campo-com-torre",
+              "titulo": "Comprei um campo",
+              "fala": "preciso ir vê-lo",
+              "ref": "Lc 14.18"
+            },
+            {
+              "desenho": "canga-de-bois",
+              "titulo": "Cinco juntas de bois",
+              "fala": "quero experimentá-las",
+              "ref": "Lc 14.19"
+            },
+            {
+              "desenho": "duas-aliancas",
+              "titulo": "Acabei de casar",
+              "fala": "não posso ir",
+              "ref": "Lc 14.20"
+            }
           ]
         },
-        { "texto": "O dono da casa fica irado. Ele manda o servo ir depressa pelas ruas e becos da cidade e chamar os pobres e os aleijados, a gente que Jesus tinha acabado de mandar convidar. O servo volta com a notícia.", "ref": "Lc 14.21-22" },
-        { "fala": "mesmo assim, ainda há lugar!", "ref": "Lc 14.22" },
-        { "texto": "Então o dono da casa manda o servo sair da cidade, pelas entradas e caminhos, e trazer quem encontrar, para a casa ficar cheia.", "ref": "Lc 14.23" }
+        {
+          "texto": "O dono da casa fica irado. Ele manda o servo ir depressa pelas ruas e becos da cidade e chamar os pobres e os aleijados, a gente que Jesus tinha acabado de mandar convidar. O servo volta com a notícia.",
+          "ref": "Lc 14.21-22"
+        },
+        {
+          "fala": "mesmo assim, ainda há lugar!",
+          "ref": "Lc 14.22"
+        },
+        {
+          "texto": "Então o dono da casa manda o servo sair da cidade, pelas entradas e caminhos, e trazer quem encontrar, para a casa ficar cheia.",
+          "ref": "Lc 14.23"
+        }
       ]
     }
   ],
@@ -46,6 +92,10 @@
     "Quem você chamaria para a sua mesa que não tem como retribuir?"
   ],
   "parecidas": [
-    { "ref": "Mt 22.1-14", "titulo": "O banquete de casamento", "linha": "Um rei faz a festa do filho" }
+    {
+      "ref": "Mt 22.1-14",
+      "titulo": "O banquete de casamento",
+      "linha": "Um rei faz a festa do filho"
+    }
   ]
 }

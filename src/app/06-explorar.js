@@ -52,6 +52,7 @@
   CC.nomeDoContexto = (chave) => {
     const [tipo, alvo] = [chave.slice(0, chave.indexOf(':')), chave.slice(chave.indexOf(':') + 1)];
     if (tipo === 'conhecer') return 'Conhecer Jesus · dia ' + alvo;
+    if (tipo === 'parabola') return 'Parábola · ' + (CC.tituloDaParabola ? CC.tituloDaParabola(alvo) : alvo);
     return tipo === 'nota' ? (D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : alvo) : ((secaoDe(alvo) || {}).rotulo || alvo);
   };
   CC.hrefDoContexto = (chave) => '#/' + chave.slice(0, chave.indexOf(':')) + '/' + encodeURIComponent(chave.slice(chave.indexOf(':') + 1));
@@ -305,6 +306,8 @@
       // Os mapas dos livros: um cartão só, que abre e fecha no lugar, com o atalho para o mapa
       // do livro de hoje (06b-mapas.js).
       + CC.cartaoMapas()
+      // As parábolas, logo abaixo dos mapas, para todos os caminhos (06c-parabolas.js).
+      + (CC.cartaoParabolas ? CC.cartaoParabolas() : '')
       // A história em uma página é o passo 1 do caminho; o atalho próprio só volta depois dele.
       + (terminou && D.notas[HISTORIA] ? '<a class="cartao cartao-historia" href="#/nota/' + encodeURIComponent(HISTORIA) + '">'
         + CC.ico('livro') + '<span><b>A história da Bíblia em uma página</b>'

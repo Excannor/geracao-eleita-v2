@@ -1,0 +1,21 @@
+/* =========================================================================
+   REDESENHO V2 · 29-parabolas
+   Parábolas da Bíblia: só o cartão no Explorar. A lista e a página de cada parábola chegam
+   com o código delas (src/sob-demanda/parabola-tela.css, embutido em parabola-tela.<resumo>.js
+   pelo build), para não pesar no index.html (teto de 1 MB). Referência aprovada pelo dono: o
+   mock de 09/10. As classes de traço dos desenhos vêm do 27-mapas.css. Fichas de
+   00-tokens.css, nada de cor literal que valha só num tema.
+   ========================================================================= */
+
+/* ---------- o cartão no Explorar, logo abaixo de "Mapas dos livros" ---------- */
+.cartao-parabolas {
+  --mapa-tinta: var(--v2-tinta-forte); --mapa-papel: var(--v2-cartao); --mapa-cheio: var(--v2-tinta);
+  display: flex; align-items: center; gap: 14px; min-height: 88px; margin: 0 0 16px; padding: 12px 14px 12px 12px;
+  border-radius: var(--raio-cartao); background: var(--v2-cartao); color: var(--v2-tinta-forte); text-decoration: none;
+}
+.cartao-parabolas:hover { text-decoration: none; }
+.cartao-parabolas .desenho { width: 64px; height: 64px; }
+.parabolas-textos { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
+.parabolas-titulo { font-family: 'Permanent Marker', cursive; font-size: 23px; font-weight: 400; line-height: 1.15; }
+.parabolas-dica { color: var(--v2-tinta-fraca); font-size: .875rem; font-weight: 600; }
+.cartao-parabolas > svg { flex: none; width: 20px; height: 20px; color: var(--v2-tinta-fraca); }

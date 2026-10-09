@@ -226,6 +226,61 @@ const mapas = (indiceMapas.publicados || []).map((slug) => {
 });
 console.log('mapas dos livros:', mapas.map((m) => m.nome).join(', ') || 'nenhum');
 
+// ---------- parábolas ----------
+// Como os mapas: um arquivo por parábola publicada (parabola-<slug>.<resumo>.json), com os
+// desenhos embutidos, guardado pelo service worker quando é aberto. Os desenhos da lista
+// (um por parábola) vão juntos num arquivo só (parabolas-desenhos.<resumo>.json), pedido
+// quando a lista abre: dezenas de SVGs no index.html comeriam a folga do teto de 1 MB. No
+// index.html fica só o mínimo da lista (window.PARABOLAS). Publicada com erro no checador
+// (ferramentas/checar-parabola.mjs) para o build.
+const pastaParabolas = join(AQUI, 'conteudo', 'parabolas');
+for (const velho of readdirSync(dist()).filter((f) => /^parabola(-|s-desenhos\.).*\.(json|js)(\.gz)?$/.test(f))) rmSync(dist(velho));
+const parabolas = { desenhos: '', tela: '', grupos: [], itens: [] };
+if (existsSync(join(pastaParabolas, 'indice.json'))) {
+  const { checarParabola, checarIndice } = await import('./ferramentas/checar-parabola.mjs');
+  const indiceParabolas = JSON.parse(readFileSync(join(pastaParabolas, 'indice.json'), 'utf8'));
+  const errosIndice = checarIndice(indiceParabolas);
+  if (errosIndice.length) throw new Error('conteudo/parabolas/indice.json: ' + errosIndice.join(' · '));
+  const publicadas = new Set(indiceParabolas.publicadas || []);
+  const gravar = (arquivo, texto) => {
+    writeFileSync(dist(arquivo), texto, 'utf8');
+    writeFileSync(dist(arquivo + '.gz'), gzipSync(Buffer.from(texto, 'utf8'), { level: 9 }));
+  };
+  const resumo = (texto) => createHash('sha256').update(texto).digest('hex').slice(0, 10);
+  const desenhosDaLista = {};
+  for (const g of indiceParabolas.grupos) {
+    const slugs = (g.parabolas || []).filter((s) => publicadas.has(s));
+    if (!slugs.length) continue;
+    parabolas.grupos.push({ id: g.id, nome: g.nome, curto: g.curto, ...(g.sub ? { sub: g.sub } : {}) });
+    for (const slug of slugs) {
+      const p = JSON.parse(readFileSync(join(pastaParabolas, slug + '.json'), 'utf8'));
+      const { erros } = checarParabola(slug, p);
+      if (erros.length) throw new Error('a parábola publicada ' + slug + ' não passa no checador: ' + erros.slice(0, 3).join(' · '));
+      const ids = new Set([p.desenho, p.desenhoLista].concat(p.secoes.flatMap((s) => s.blocos.flatMap((b) => (b.itens || []).map((it) => it.desenho)))));
+      p.desenhos = Object.fromEntries([...ids].map((id) => [id, lerDesenho(id)]));
+      desenhosDaLista[p.desenhoLista] = p.desenhos[p.desenhoLista];
+      const texto = JSON.stringify(p);
+      const arquivo = 'parabola-' + slug + '.' + resumo(texto) + '.json';
+      gravar(arquivo, texto);
+      parabolas.itens.push({ slug, titulo: p.titulo, ref: p.ref, linha: p.linha, grupo: g.id, desenho: p.desenhoLista, arquivo });
+    }
+  }
+  if (parabolas.itens.length) {
+    const texto = JSON.stringify(desenhosDaLista);
+    parabolas.desenhos = 'parabolas-desenhos.' + resumo(texto) + '.json';
+    gravar(parabolas.desenhos, texto);    // A página da parábola (código e estilo) também fica fora do index.html: só quem abre uma
+    // parábola a baixa. O estilo entra no lugar da marca, já enxuto como o resto.
+    const css = enxugarCss(readFileSync(src('sob-demanda', 'parabola-tela.css'), 'utf8'));
+    if (/<\/style/i.test(css)) throw new Error('src/sob-demanda/parabola-tela.css tem "</style>" dentro');
+    const tela = enxugarJs(readFileSync(src('sob-demanda', 'parabola-tela.js'), 'utf8'), 'parabola-tela.js')
+      .replace("'/*ESTILO_PARABOLA*/'", () => JSON.stringify(css));
+    if (tela.includes('/*ESTILO_PARABOLA*/')) throw new Error('parabola-tela.js perdeu a marca do estilo');
+    parabolas.tela = 'parabola-tela.' + resumo(tela) + '.js';
+    gravar(parabolas.tela, tela);
+  }
+}
+console.log('parábolas:', parabolas.itens.map((p) => p.titulo).join(', ') || 'nenhuma');
+
 // ---------- artes de story ----------
 // Os desenhos dos stories das frases com arte própria (src/app/01e-story-artes.js, umas
 // dezenas de KB) não cabem no index.html (teto de 1 MB) e só servem na hora de compartilhar:
@@ -344,6 +399,7 @@ const html = molde
   // window.BIBLIAS fica por último: os testes leem a lista de traduções até o ";</script>".
   .replace(/\/\*DADOS\*\//g, () => 'window.CONTEUDO_ARQUIVO=' + JSON.stringify(arquivoConteudo) + ';'
     + 'window.STORY_ARTES=' + JSON.stringify(arquivoArtesStory) + ';'
+    + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
   // O cartão dos mapas no Explorar leva um desenho só (o rolo com a pena): ele entra no código
@@ -407,6 +463,9 @@ const CACHE_BIBLIAS = 'caminho-biblias';
 // Os mapas dos livros também têm cache próprio: um arquivo por livro, com resumo no nome,
 // guardado quando o mapa é aberto pela primeira vez.
 const CACHE_MAPAS = 'caminho-mapas';
+// As parábolas, como os mapas: um arquivo por parábola e o dos desenhos da lista, guardados
+// quando são pedidos pela primeira vez.
+const CACHE_PARABOLAS = 'caminho-parabolas';
 // As artes de story (story-artes.<resumo>.js): guardadas na primeira vez que alguém
 // compartilha um story desses, para o próximo sair sem rede.
 const CACHE_STORY = 'caminho-story';
@@ -420,7 +479,8 @@ const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
 // As fontes do nome original (fonte-original-*) vão no cache dos mapas: só a tela do mapa as usa.
 const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo).concat(fontesOriginais.map((f) => f.arquivo)))};
 const STORY = ${JSON.stringify((arquivoArtesStory ? [arquivoArtesStory] : []).concat(Object.values(fotosStory)))};
-const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_STORY, STORY]];
+const PARABOLAS = ${JSON.stringify(parabolas.itens.map((p) => p.arquivo).concat(parabolas.desenhos ? [parabolas.desenhos, parabolas.tela] : []))};
+const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_PARABOLAS, PARABOLAS], [CACHE_STORY, STORY]];
 
 self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE)
@@ -501,4 +561,4 @@ const mb = (Buffer.byteLength(html) / 1048576).toFixed(2);
 // O teste.mjs exige o index.html abaixo de 1 MB: quanto ainda cabe (as camadas de estilo contam).
 const folga = ((1024 * 1024 - Buffer.byteLength(paginaFinal)) / 1024).toFixed(1);
 console.log('gerado: dist/index.html (' + mb + ' MB, folga de ' + folga + ' KB até 1 MB) · manifest · sw ' + versao
-  + ' · ' + icones.length + ' ícones · ' + biblias.length + ' bíblias · ' + mapas.length + ' mapas');
+  + ' · ' + icones.length + ' ícones · ' + biblias.length + ' bíblias · ' + mapas.length + ' mapas · ' + parabolas.itens.length + ' parábolas');

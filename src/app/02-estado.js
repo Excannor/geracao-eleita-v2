@@ -52,6 +52,9 @@
     // cor, fixada, respondidaEm, criadaEm, editadaEm, apagadaEm } }. Privadas: só voltam pela
     // conta da própria pessoa. Os nomes "texto" e "tags" são os que o servidor cifra.
     notas: {},
+    // Parábolas lidas no Explorar: { [slug]: data ISO da primeira leitura }. É material de
+    // consulta, não andamento da trilha: fica fora do PROGRESSO_DA_TRILHA e o "Zerar" não apaga.
+    parabolasLidas: {},
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -268,6 +271,8 @@
       marcadoEm: { ...(a.marcadoEm || {}), ...(b.marcadoEm || {}) },
       licoesEm: { ...(a.licoesEm || {}), ...(b.licoesEm || {}) },
       conhecidos: fundirConhecidos(a.conhecidos, b.conhecidos),
+      // a mesma regra do Conhecer: união por slug, vale a data mais antiga
+      parabolasLidas: fundirConhecidos(a.parabolasLidas, b.parabolasLidas),
       pratica: fundirPratica(a.pratica, b.pratica),
       foto: maisNovo.foto || a.foto || b.foto || '',
       apelido: maisNovo.apelido || a.apelido || b.apelido || '',

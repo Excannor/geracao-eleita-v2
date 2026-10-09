@@ -52,6 +52,8 @@
     // O mapa de cada livro mora no Explorar (decisão do dono, 02/10); desde 04/10 a lista da
     // Bíblia e o fim da lição levam a ele, e ele continua marcando o Mais.
     mapa: '#/explorar',
+    // As parábolas também moram no Explorar (cartão logo abaixo dos mapas).
+    parabolas: '#/explorar', parabola: '#/explorar',
     // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
     // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
     conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
@@ -395,9 +397,10 @@
     'Configurações': (h) => h === '#/config',
     'Bíblia': (h) => h === '#/biblia',
     'Primeiros passos': (h) => h === '#/licoes',
+    'Parábolas': (h) => h === '#/parabolas',
   };
   const ENDERECO_DO_ROTULO = { 'Trilha': '#/', 'Perfil': '#/perfil', 'Juntos': '#/novidades', 'Explorar': '#/explorar',
-    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes' };
+    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes', 'Parábolas': '#/parabolas' };
   // Muitas telas (Discipulado, Painel, Notificações, Perfil...) só desenham o voltar DEPOIS
   // que os dados chegam, quando o roteador já tinha passado. Ligar o clique botão a botão
   // deixava esses mortos. Por isso: o nome é acertado por um observador assim que o botão
@@ -457,6 +460,8 @@
     else if (rota === 'nota') CC.vistaNota(conteudo, arg);
     else if (rota === 'busca') CC.vistaBusca(conteudo, arg);
     else if (rota === 'mapa') CC.vistaMapa(conteudo, arg);
+    else if (rota === 'parabolas') CC.vistaParabolas(conteudo);
+    else if (rota === 'parabola') CC.vistaParabola(conteudo, arg);
     else if (rota === 'conhecer') CC.vistaConhecer(conteudo);
     else if (rota === 'perguntas') (arg ? (r) => CC.vistaPergunta(r, arg) : CC.vistaPerguntas)(conteudo);
     else if (rota === 'seguir') CC.vistaSeguir(conteudo);
