@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o prêmio da corrida (Fp 3.14): uma coroa de folhas aberta em cima, dois ramos em arco com folhas dos dois lados do talo, presos embaixo por um nó com as fitas em sálvia -->
+<path class="k" d="M66.6 95.4L73.0 93.7L79.0 90.9L84.4 87.1L89.1 82.4L92.9 77.0L95.7 71.0L97.4 64.6L98.0 58.0L97.4 51.4L95.7 45.0L92.9 39.0L89.1 33.6L84.4 28.9L79.0 25.1L73.0 22.3"/>
+<path class="k p" d="M75.5 92.7Q82.7 90.3 83.9 82.8Q76.6 85.2 75.5 92.7Z"/>
+<path class="k p" d="M75.5 92.7Q73.4 100.1 79.0 105.2Q81.1 97.9 75.5 92.7Z"/>
+<path class="k p" d="M86.9 84.9Q94.3 83.1 96.1 75.7Q88.6 77.4 86.9 84.9Z"/>
+<path class="k p" d="M86.9 84.9Q79.4 86.6 77.7 94.1Q85.1 92.3 86.9 84.9Z"/>
+<path class="k p" d="M94.7 73.5Q102.3 72.3 104.6 65.0Q97.1 66.2 94.7 73.5Z"/>
+<path class="k p" d="M94.7 73.5Q89.6 67.8 82.2 69.9Q87.4 75.5 94.7 73.5Z"/>
+<path class="k p" d="M97.9 60.0Q105.6 59.7 108.7 52.7Q101.1 53.0 97.9 60.0Z"/>
+<path class="k p" d="M97.9 60.0Q94.5 53.2 86.9 53.2Q90.3 60.0 97.9 60.0Z"/>
+<path class="k p" d="M96.1 46.3Q103.7 47.5 108.2 41.3Q100.6 40.1 96.1 46.3Z"/>
+<path class="k p" d="M96.1 46.3Q93.6 39.1 86.0 38.1Q88.6 45.3 96.1 46.3Z"/>
+<path class="k p" d="M89.5 34.1Q94.4 40.0 101.8 38.3Q97.0 32.4 89.5 34.1Z"/>
+<path class="k p" d="M89.5 34.1Q87.6 26.7 80.1 25.1Q82.1 32.5 89.5 34.1Z"/>
+<path class="k p" d="M79.0 25.1Q74.3 31.1 77.6 38.0Q82.3 32.0 79.0 25.1Z"/>
+<path class="k p" d="M79.0 25.1Q77.7 17.6 70.3 15.4Q71.7 22.9 79.0 25.1Z"/>
+<path class="k" d="M53.4 95.4L47.0 93.7L41.0 90.9L35.6 87.1L30.9 82.4L27.1 77.0L24.3 71.0L22.6 64.6L22.0 58.0L22.6 51.4L24.3 45.0L27.1 39.0L30.9 33.6L35.6 28.9L41.0 25.1L47.0 22.3"/>
+<path class="k p" d="M44.5 92.7Q43.4 85.2 36.1 82.8Q37.3 90.3 44.5 92.7Z"/>
+<path class="k p" d="M44.5 92.7Q38.9 97.9 41.0 105.2Q46.6 100.1 44.5 92.7Z"/>
+<path class="k p" d="M33.1 84.9Q31.4 77.4 23.9 75.7Q25.7 83.1 33.1 84.9Z"/>
+<path class="k p" d="M33.1 84.9Q34.9 92.3 42.3 94.1Q40.6 86.6 33.1 84.9Z"/>
+<path class="k p" d="M25.3 73.5Q22.9 66.2 15.4 65.0Q17.7 72.3 25.3 73.5Z"/>
+<path class="k p" d="M25.3 73.5Q32.6 75.5 37.8 69.9Q30.4 67.8 25.3 73.5Z"/>
+<path class="k p" d="M22.1 60.0Q18.9 53.0 11.3 52.7Q14.4 59.7 22.1 60.0Z"/>
+<path class="k p" d="M22.1 60.0Q29.7 60.0 33.1 53.2Q25.5 53.2 22.1 60.0Z"/>
+<path class="k p" d="M23.9 46.3Q19.4 40.1 11.8 41.3Q16.3 47.5 23.9 46.3Z"/>
+<path class="k p" d="M23.9 46.3Q31.4 45.3 34.0 38.1Q26.4 39.1 23.9 46.3Z"/>
+<path class="k p" d="M30.5 34.1Q23.0 32.4 18.2 38.3Q25.6 40.0 30.5 34.1Z"/>
+<path class="k p" d="M30.5 34.1Q37.9 32.5 39.9 25.1Q32.4 26.7 30.5 34.1Z"/>
+<path class="k p" d="M41.0 25.1Q37.7 32.0 42.4 38.0Q45.7 31.1 41.0 25.1Z"/>
+<path class="k p" d="M41.0 25.1Q48.3 22.9 49.7 15.4Q42.3 17.6 41.0 25.1Z"/>
+<path class="k s" d="M52 92L44 108L52 104L56 110L60 96L64 110L68 104L76 108L68 92Z"/>
+<ellipse class="k p" cx="60" cy="94" rx="7" ry="5"/>
+</svg>
