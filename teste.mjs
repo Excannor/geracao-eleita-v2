@@ -1197,7 +1197,9 @@ secao('cofre das anotações (cofre.mjs e servidor)');
   // --- o servidor de verdade ---
   const livre = (p) => new Promise((r) => { const s = createServer().once('error', () => r(false)).listen(p, '127.0.0.1', () => s.close(() => r(true))); });
   let PORTA = 0;
-  for (let p = 8801; p <= 8809 && !PORTA; p++) if (await livre(p)) PORTA = p;
+  // PORTAS=8640-8649: a faixa desta máquina (padrão 8801-8809)
+  const faixaPortas = (/^(\d+)-(\d+)$/.exec(process.env.PORTAS || '') || [0, 8801, 8809]).slice(1, 3).map(Number);
+  for (let p = faixaPortas[0]; p <= faixaPortas[1] && !PORTA; p++) if (await livre(p)) PORTA = p;
   const pastaS = mkdtempSync(join(tmpdir(), 'cc-cofre-srv-'));
   const base = 'http://127.0.0.1:' + PORTA;
   const dormir = (ms) => new Promise((r) => setTimeout(r, ms));

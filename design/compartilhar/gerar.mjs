@@ -49,6 +49,7 @@ window.gerar = async (fn, dados) => {
   if (typeof d.frase === 'string') d.frase = FRASES[d.frase];
   const arte = d.frase && CC.story.arteDesejada && CC.story.arteDesejada(d.frase);
   if (arte && CC.story.prepararArte) await CC.story.prepararArte(arte);
+  if (fn.startsWith('arte:') && CC.story.prepararArte) await CC.story.prepararArte(fn.slice(5));
   if (fn === 'versiculo' && CC.story.prepararVersiculo) await CC.story.prepararVersiculo();
   const tela = CC.story.tela();
   // 'arte:<nome>': um modelo de story pelo nome (para comparar variantes de um modelo)
