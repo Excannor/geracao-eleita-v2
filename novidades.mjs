@@ -24,6 +24,10 @@ export class Novidades {
   constructor(arquivo) {
     this.arquivo = arquivo;
     this.dados = { versao: 1, eventos: [], ligados: [], perguntados: [] };
+    // Versículos apagados nas últimas 24 horas, por autor: contam no teto do dia, para que
+    // apagar e compartilhar de novo não vire um jeito de encher o mural dos amigos. Fica só
+    // na memória: depois de reiniciar o servidor, o teto volta a contar só os que estão lá.
+    this.apagadosHoje = new Map();
   }
 
   // O mural mora no banco (novidades_eventos, novidades_reacoes, novidades_pessoas); o
@@ -105,7 +109,8 @@ export class Novidades {
     if (this.dados.eventos.some((e) => e.autor === autor && e.chave === chave)) return null;
     if (tipo === 'versiculo') {
       const hoje = this.dados.eventos.filter((e) => e.autor === autor && e.tipo === 'versiculo' && agora - e.em < 86400000);
-      if (hoje.length >= VERSICULOS_POR_DIA) throw erro('você já compartilhou versículos demais hoje', 429);
+      const apagados = (this.apagadosHoje.get(autor) || []).filter((em) => agora - em < 86400000);
+      if (hoje.length + apagados.length >= VERSICULOS_POR_DIA) throw erro('você já compartilhou versículos demais hoje', 429);
     }
     const evento = { id: randomBytes(9).toString('base64url'), autor, tipo, dados, chave, em: agora, reacoes: [] };
     this.dados.eventos.push(evento);
@@ -138,6 +143,24 @@ export class Novidades {
     if (i === -1) evento.reacoes.push(eu); else evento.reacoes.splice(i, 1);
     await this.salvar();
     return { reagiu: i === -1, total: evento.reacoes.length };
+  }
+
+  // Quem compartilhou um versículo pode tirá-lo do mural: some para todos, com as reações
+  // junto (elas moram no próprio evento). Só o versículo: os marcos o servidor confere no
+  // progresso e não têm o que apagar. A nota e a marcação do versículo ficam na conta.
+  async apagarVersiculo(eu, id, agora = Date.now()) {
+    const evento = this.achar(id);
+    if (!evento) throw erro('esse versículo já não está no Juntos', 404);
+    if (evento.autor !== eu) throw erro('só quem compartilhou pode apagar', 403);
+    if (evento.tipo !== 'versiculo') throw erro('só dá para apagar um versículo compartilhado', 400);
+    this.dados.eventos = this.dados.eventos.filter((e) => e !== evento);
+    if (agora - evento.em < 86400000) {
+      const lista = (this.apagadosHoje.get(eu) || []).filter((em) => agora - em < 86400000);
+      lista.push(evento.em);
+      this.apagadosHoje.set(eu, lista);
+    }
+    await this.salvar();
+    return { apagado: true };
   }
 
   async apagarDe(usuario) {

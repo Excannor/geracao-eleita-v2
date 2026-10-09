@@ -1303,6 +1303,45 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     const r2 = await pedir('/api/estado', meu, ana, 'PUT');
     checar(r2.status === 500 && JSON.stringify(naLinha('ana.cofre')) === antesPut, 'e não grava nada por cima do que não abriu');
 
+    // Juntos: quem compartilhou um versículo pode apagá-lo; ninguém mais, e só versículo
+    {
+      const cris = await criar('cris.cofre');
+      checar((await pedir('/api/amizade', { acao: 'pedir', usuario: 'cris.cofre' }, ana)).status === 200
+        && (await pedir('/api/amizade', { acao: 'aceitar', usuario: 'ana.cofre' }, cris)).status === 200, 'Juntos: ana e cris viram amigas');
+      await pedir('/api/novidades/preferencia', { ligado: true }, ana);
+      await pedir('/api/novidades/preferencia', { ligado: true }, cris);
+      const comp = await pedir('/api/novidades', { tipo: 'versiculo', dados: { ref: 'João 3.16' } }, ana);
+      checar(comp.status === 200 && (await comp.json()).publicado, 'Juntos: ana compartilha um versículo');
+      const muralDe = async (c) => (await (await pedir('/api/novidades', null, c)).json()).eventos || [];
+      const verso = (await muralDe(cris)).find((e) => e.tipo === 'versiculo' && e.autor.usuario === 'ana.cofre');
+      const convite = (await muralDe(cris)).find((e) => e.tipo === 'novoProposito' && e.autor.usuario === 'cris.cofre');
+      checar(!!verso && !!convite, 'Juntos: a amiga vê o versículo compartilhado (e o convite aceito dela)');
+      await pedir('/api/novidades/reagir', { id: verso.id }, cris);
+      const alheio = await pedir('/api/novidades/apagar', { id: verso.id }, cris);
+      checar(alheio.status === 403 && (await muralDe(cris)).some((e) => e.id === verso.id), 'Juntos: outra pessoa recebe 403 e o versículo fica');
+      const marco = await pedir('/api/novidades/apagar', { id: convite.id }, cris);
+      checar(marco.status === 400 && (await muralDe(cris)).some((e) => e.id === convite.id), 'Juntos: outro tipo de novidade não se apaga por essa rota, nem pelo autor');
+      const semConta = await pedir('/api/novidades/apagar', { id: verso.id });
+      checar(semConta.status >= 400 && semConta.status < 500, 'Juntos: sem conta, a rota recusa (' + semConta.status + ')');
+      const notaAntes = (await (await pedir('/api/estado', null, ana)).json()).anotacoes;
+      const certo = await pedir('/api/novidades/apagar', { id: verso.id }, ana);
+      checar(certo.status === 200, 'Juntos: a autora apaga o próprio versículo');
+      checar(!(await muralDe(cris)).some((e) => e.id === verso.id) && !(await muralDe(ana)).some((e) => e.id === verso.id),
+        'Juntos: o versículo some do mural da amiga e do dela');
+      checar(JSON.stringify((await (await pedir('/api/estado', null, ana)).json()).anotacoes) === JSON.stringify(notaAntes),
+        'Juntos: apagar não mexe nas notas do versículo na conta');
+      const b = new DatabaseSync(arquivoDb);
+      const sobra = b.prepare('SELECT COUNT(*) AS n FROM novidades_reacoes WHERE evento = ?').get(verso.id).n
+        + b.prepare('SELECT COUNT(*) AS n FROM novidades_eventos WHERE id = ?').get(verso.id).n;
+      b.close();
+      checar(sobra === 0, 'Juntos: o evento e as reações dele saem do banco');
+      checar((await pedir('/api/novidades/apagar', { id: verso.id }, ana)).status === 404, 'Juntos: apagar de novo responde 404');
+      // o teto de 3 por dia conta os apagados: apagar e repostar não enche o mural
+      for (const ref of ['João 3.17', 'Salmos 23.1']) await pedir('/api/novidades', { tipo: 'versiculo', dados: { ref } }, ana);
+      checar((await pedir('/api/novidades', { tipo: 'versiculo', dados: { ref: 'Romanos 8.28' } }, ana)).status === 429,
+        'Juntos: o versículo apagado continua contando no teto do dia');
+    }
+
     // apagar a conta leva o progresso cifrado junto
     const apagou = await pedir('/api/apagar-conta', { senha: 'senha-bia.cofre' }, bia);
     checar(apagou.status === 200 && !naLinha('bia.cofre'), 'apagar a conta continua apagando o progresso');

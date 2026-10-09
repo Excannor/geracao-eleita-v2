@@ -1841,6 +1841,28 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .botao-reagir.pulando svg { animation: bater .4s var(--mola); }
 .botao-reagir:active { transform: translateY(2px); border-bottom-width: 2px; }
 .quem-celebrou { color: var(--tinta-fraca); font-size: 0.86rem; font-weight: 700; }
+/* Apagar o versículo que a própria pessoa compartilhou: discreto, no fim do pé, mas com
+   alvo de 44px para o dedo. */
+.botao-apagar-mural {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  margin-left: auto;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--tinta-fraca);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.botao-apagar-mural svg { width: 20px; height: 20px; }
+.botao-apagar-mural:hover, .botao-apagar-mural:focus-visible { color: var(--vermelho, #d33); background: var(--fundo-2); }
+.botao-apagar-mural:disabled { opacity: .5; cursor: default; }
 .rodape-privacidade { display: flex; align-items: flex-start; gap: 8px; margin: 22px 0 0; color: var(--tinta-fraca); font-size: 0.84rem; font-weight: 700; }
 .rodape-privacidade svg { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 2px; }
 

@@ -1460,7 +1460,7 @@ const servidor = createServer(async (req, res) => {
     // ---------- amigos ----------
     if (rota.startsWith('/api/') && ['/api/amigos', '/api/procurar', '/api/amizade', '/api/convites',
       '/api/convites/aceitar', '/api/convites/cancelar', '/api/toques', '/api/cutucar', '/api/denuncias',
-      '/api/novidades', '/api/novidades/reagir', '/api/novidades/preferencia', '/api/propositos',
+      '/api/novidades', '/api/novidades/reagir', '/api/novidades/apagar', '/api/novidades/preferencia', '/api/propositos',
       '/api/discipulado', '/api/cuidado'].includes(rota)) {
       if (!conta) { json(res, 403, { erro: 'entre com uma conta' }); return; }
     }
@@ -2112,6 +2112,12 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/novidades/reagir') {
       await acao(async ({ id }) => NOVIDADES.reagir(eu, String(id || ''), amigosDe(eu)));
+      return;
+    }
+
+    // Apagar o versículo que a própria pessoa compartilhou: o servidor confere que é dela.
+    if (rota === '/api/novidades/apagar') {
+      await acao(async ({ id }) => NOVIDADES.apagarVersiculo(eu, String(id || '')));
       return;
     }
 
