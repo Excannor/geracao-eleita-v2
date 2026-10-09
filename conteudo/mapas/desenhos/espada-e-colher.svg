@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a espada e a colher de pedreiro de quem levanta o muro com uma mão e segura a arma com a outra (Ne 4.17-18): as duas cruzadas em X, a lâmina da colher em sálvia. -->
+<g transform="rotate(35 60 60)">
+<path class="k p" d="M56.5 14L60 6L63.5 14V76H56.5Z"/>
+<path class="h" d="M60 14V72"/>
+<path class="k p" d="M46 76H74V81H46Z"/>
+<path class="k p" d="M57 81H63V98H57Z"/>
+<circle class="k p" cx="60" cy="102" r="4"/>
+</g>
+<g transform="rotate(-35 60 60)">
+<path class="k s" d="M60 8C66 18 74 32 76 42C70 48 64 52 60 54C56 52 50 48 44 42C46 32 54 18 60 8Z"/>
+<path class="h" d="M60 14V48"/>
+<path class="k" d="M60 54V58L66 62V66"/>
+<path class="k p" d="M62 66H70V98C70 100 68 102 66 102C64 102 62 100 62 98Z"/>
+</g>
+</svg>

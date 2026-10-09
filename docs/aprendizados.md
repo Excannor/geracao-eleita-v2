@@ -642,6 +642,10 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   Páscoa (Ed 6.21) e Ef 2.13, 19, e o destaque com a pedra de esquina sobre o alicerce (Ef 2.20-21). Os
   casamentos com estrangeiras (Ed 9–10) são contados só com o que o texto diz, sem julgar a decisão nem tirar
   lição dela.
+- 2026-10-09 · conteúdo · Neemias: o NT não cita o livro, e os versículos óbvios já estavam em outros mapas (o
+  pão do céu de Ne 9.15 com Jo 6 em Êxodo e Números; Jo 11.51-52 em João) → ficou um par só (Ne 9.20, o bom
+  Espírito que instrui, com Jo 14.26) e "Neemias e Cristo" com a alegria (Ne 8.10; Jo 15.11). O sábado de Ne 13
+  não foi posto ao lado de Mc 2.27-28: a dupla soaria como julgamento de Neemias, e o mapa não toma posição.
 
 ## Entrada, sessão e página inicial
 
