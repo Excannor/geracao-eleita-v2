@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o celeiro maior que o rico quer construir (Lc 12.18): um celeiro alto de telhado em ponta, com o portão de tábuas em X e a janela do sótão cheia de grãos até a boca. Os grãos na janela são a única área sálvia. -->
+<path class="k" d="M8 102H112"/>
+<path class="k p" d="M22 102V54L60 26L98 54V102Z"/>
+<path class="k" d="M16 58L60 24L104 58"/>
+<path class="k p" d="M46 102V70H74V102Z"/>
+<path class="h" d="M46 70L74 102M74 70L46 102M60 70V102"/>
+<path class="k p" d="M50 40H70V56H50Z"/>
+<path class="k s" d="M51 56V50C54 44 66 44 69 50V56Z"/>
+<path class="h" d="M22 64H46M74 64H98M22 80H46M74 80H98"/>
+</svg>

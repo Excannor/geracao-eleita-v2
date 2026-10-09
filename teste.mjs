@@ -724,7 +724,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
     const r = CC.lerRef(f.ref);
     return !r || biblias.some((b) => ((b.livros[r.livro] || [])[r.cap - 1] || []).slice(r.de - 1, r.ate).filter(Boolean).length !== r.ate - r.de + 1);
   })());
-  checar(frases.length === 43 && !longas.length, 'as 43 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
+  checar(frases.length === 46 && !longas.length, 'as 46 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
     + (longas.length ? ' (' + longas.map((f) => f.linhas[0]).join(', ') + ')' : ''));
   checar(!refsRuins.length, 'toda frase da ofensiva com referência aponta para versículos que existem nas duas Bíblias'
     + (refsRuins.length ? ' (' + refsRuins.map((f) => f.ref).join(', ') + ')' : ''));
@@ -767,7 +767,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01e-story-artes.js'), 'utf8'
   const S = CC.story;
   const comArte = CC.FRASES_OFENSIVA.filter((f) => f.arte);
   const sem = comArte.filter((f) => typeof S.artes[f.arte] !== 'function' || S.arteDaFrase({ linhas: f.linhas, ref: f.ref || '' }) !== f.arte);
-  checar(comArte.length === 22 && !sem.length, 'as 22 frases com arte têm modelo de story e o pedido da folha chega a ele'
+  checar(comArte.length === 25 && !sem.length, 'as 25 frases com arte têm modelo de story e o pedido da folha chega a ele'
     + (sem.length ? ' (' + sem.map((f) => f.arte).join(', ') + ')' : ''));
   checar(S.arteDaFrase({ linhas: ['Geração', 'inconformada'], ref: '' }) === null && S.arteDaFrase({ linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14' }) === 'luz',
     'frase sem arte usa o modelo de sempre; "Luz do mundo" usa o da lâmpada');
@@ -1257,7 +1257,9 @@ secao('cofre das anotações (cofre.mjs e servidor)');
   // --- o servidor de verdade ---
   const livre = (p) => new Promise((r) => { const s = createServer().once('error', () => r(false)).listen(p, '127.0.0.1', () => s.close(() => r(true))); });
   let PORTA = 0;
-  for (let p = 8801; p <= 8809 && !PORTA; p++) if (await livre(p)) PORTA = p;
+  // PORTAS=8720-8739 troca a faixa (máquina com portas reservadas), como em ferramentas/navegador.mjs.
+  const [de, ate] = (/^(\d+)-(\d+)$/.exec(process.env.PORTAS || '') || [0, 8801, 8809]).slice(1).map(Number);
+  for (let p = de; p <= ate && !PORTA; p++) if (await livre(p)) PORTA = p;
   const pastaS = mkdtempSync(join(tmpdir(), 'cc-cofre-srv-'));
   const base = 'http://127.0.0.1:' + PORTA;
   const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1295,7 +1297,7 @@ secao('cofre das anotações (cofre.mjs e servidor)');
 
   let srv = null;
   try {
-    checar(PORTA > 0, 'há uma porta livre entre 8801 e 8809 para o servidor do teste');
+    checar(PORTA > 0, 'há uma porta livre entre ' + de + ' e ' + ate + ' para o servidor do teste');
     // sem a chave em produção, o servidor recusa subir
     srv = subir({ NODE_ENV: 'production', CAMINHO_TESTE: '', CAMINHO_CHAVE_NOTAS: '' });
     const codigo = await new Promise((r) => { srv.once('exit', r); setTimeout(() => r('ainda vivo'), 8000); });

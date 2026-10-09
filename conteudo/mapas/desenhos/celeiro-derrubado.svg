@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o celeiro velho que o rico derruba (Lc 12.18): as paredes tortas caindo para o lado, dois pedaços do telhado soltos, tábuas largadas no chão e o grão que escorre do celeiro aberto. O grão é a única área sálvia. -->
+<path class="k" d="M8 102H112"/>
+<path class="k p" d="M18 102L24 64L58 56L70 102Z"/>
+<path class="h" d="M30 100L34 66M46 100L48 62M22 82L64 76"/>
+<path class="k p" d="M14 66L38 44L52 52L22 70Z"/>
+<path class="k p" d="M56 54L72 46L80 64L64 66Z"/>
+<path class="k s" d="M62 102C66 90 82 88 92 102Z"/>
+<path class="k p" d="M80 96L106 86L108 90L82 100Z"/>
+<path class="k p" d="M92 104L114 98L114 102L94 106Z"/>
+</svg>

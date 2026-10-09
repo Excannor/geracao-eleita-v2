@@ -1,0 +1,81 @@
+{
+  "titulo": "Os lugares à mesa",
+  "ref": "Lc 14.7-14",
+  "grupo": "lucas",
+  "linha": "Quem escolhe o melhor lugar pode ter de trocar",
+  "desenho": "mesa-dos-lugares",
+  "desenhoLista": "lugar-de-honra",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Num sábado, Jesus vai almoçar na casa de um líder dos fariseus. Ali ele cura um homem com o corpo inchado e pergunta quem não tira o filho ou o boi do poço no sábado. Ninguém consegue responder.",
+          "ref": "Lc 14.1-6"
+        },
+        {
+          "texto": "Jesus vê que os convidados estão escolhendo os melhores lugares da mesa e conta uma parábola.",
+          "ref": "Lc 14.7"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Alguém é convidado para uma festa de casamento e senta no melhor lugar. Aí um convidado mais importante chega, e o dono da casa pede a troca.",
+          "ref": "Lc 14.8-9"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "lugar-de-honra",
+              "titulo": "Quem senta no melhor lugar",
+              "fala": "Deixe este homem ficar aqui em seu lugar",
+              "ref": "Lc 14.9"
+            },
+            {
+              "desenho": "lugar-do-fim",
+              "titulo": "Quem senta no último lugar",
+              "fala": "Amigo, temos um lugar melhor do que este!",
+              "ref": "Lc 14.10"
+            }
+          ]
+        },
+        {
+          "texto": "O primeiro passa vergonha e vai para um lugar menos importante. O dono da casa chama o segundo para mais perto, e todos os convidados veem.",
+          "ref": "Lc 14.9-10"
+        }
+      ]
+    },
+    {
+      "titulo": "Para quem convida",
+      "icone": "pao",
+      "blocos": [
+        {
+          "texto": "Depois Jesus fala com o fariseu que convidou. Ele diz para não chamar só quem pode retribuir o convite depois.",
+          "ref": "Lc 14.12"
+        },
+        {
+          "fala": "convide os pobres, os aleijados, os coxos e os cegos",
+          "ref": "Lc 14.13"
+        },
+        {
+          "texto": "Jesus diz que essa gente não tem como pagar de volta, e que Deus recompensa quem convida na ressurreição dos justos.",
+          "ref": "Lc 14.14"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Na festa de Deus, o dono da casa escolhe os lugares. Quem se põe no alto desce. Quem convida gente que não tem como retribuir é recompensado por Deus.",
+    "apoio": "Jesus resume assim. “todo aquele que procura ser importante, será humilhado; e aquele que se humilha, será exaltado”.",
+    "ref": "Lc 14.11-14"
+  },
+  "perguntas": [
+    "Em que lugar você costuma se pôr quando chega num grupo novo?",
+    "Onde você tem procurado ser visto como importante?"
+  ]
+}

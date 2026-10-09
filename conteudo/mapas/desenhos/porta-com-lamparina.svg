@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os servos vigilantes (Lc 12.35-38): de noite, a porta da casa entreaberta, com a luz de dentro saindo pela fresta, e na frente dela, num banquinho, a lamparina acesa esperando o patrão; estrelas no alto. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A luz da porta é a única área sálvia. -->
+<path class="k" d="M4 110H156"/>
+<path class="k p" d="M40 110V40C40 24 96 24 96 40V110Z"/>
+<path class="k s" d="M50 110V44C50 32 86 32 86 44V110Z"/>
+<path class="k p" d="M50 44L72 38V114L50 110Z"/>
+<path class="h" d="M57 48V108M64 46V110"/>
+<circle class="k p" cx="68" cy="78" r="2"/>
+<path class="h" d="M86 60L100 58M86 74L104 76M86 90L100 94"/>
+<path class="k" d="M110 110V92M140 110V92"/>
+<path class="k p" d="M104 92H146V86H104Z"/>
+<path class="k p" d="M108 86C108 74 136 72 140 80C140 86 122 86 108 86Z"/>
+<path class="k p" d="M140 80L150 74L141 84Z"/>
+<path class="k p" d="M150 72C144 64 146 56 152 50C158 56 158 64 150 72Z"/>
+<path class="h" d="M152 44V40M159 50L156 52M145 50L142 48M114 80C120 78 128 78 134 80"/>
+<path class="k" d="M18 18v6M15 21h6M120 14v6M117 17h6M140 30v4M138 32h4"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a porta estreita (Lc 13.24): um muro de pedras largo e, no meio, uma porta alta e fina em arco, com a luz de dentro; a folha de tábuas aberta para dentro. O vão iluminado é a única área sálvia. -->
+<path class="k" d="M8 104H112"/>
+<path class="k p" d="M12 104V40H108V104Z"/>
+<path class="h" d="M12 54H48M72 54H108M12 70H48M72 70H108M12 86H48M72 86H108M28 40V54M92 40V54M36 54V70M84 54V70M24 70V86M96 70V86M40 86V104M80 86V104"/>
+<path class="k p" d="M46 104V36C46 24 74 24 74 36V104Z"/>
+<path class="k s" d="M51 104V38C51 30 69 30 69 38V104Z"/>
+<path class="k p" d="M51 38L60 42V104H51Z"/>
+<path class="h" d="M55 46V100"/>
+</svg>

@@ -269,7 +269,6 @@
     }
     itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
     itens.push(itemPainelMais(CC.ico('caderno'), true, 'Minhas anotações', 'Notas, orações e versículos marcados', '#/perfil/anotacoes'));
-    itens.push(itemPainelMais(CC.icoAba('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
     itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
     // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.
     if (CC.quem && CC.quem.admin) itens.push(itemPainelMais(CC.ico('grafico'), true, 'Painel do administrador', 'Números da igreja e do app', '#/config/painel'));
@@ -305,13 +304,13 @@
     if (rota === 'perfil' && arg === 'discipulado') ativa = '#/discipulado';
     const naBiblia = rota === 'biblia';
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
-    // Minhas anotações e Minha história abrem pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
+    // Minhas anotações abre pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
+    // Minha história com Deus mora dentro de Minhas anotações (cartão fixo no topo).
     const anteriorNav = pilha.length >= 2 ? pilha[pilha.length - 2] : '';
-    const doMais = rota === 'perfil' && (arg === 'anotacoes' || arg === 'historia') && !anteriorNav.startsWith('#/perfil');
+    const doMais = rota === 'perfil' && arg === 'anotacoes' && !anteriorNav.startsWith('#/perfil');
     // O painel do administrador também abre pelo Mais (só para o admin): com ele aberto, o Mais fica aceso.
     const noPainel = rota === 'config' && String(arg || '').startsWith('painel');
     const maisSelecionado = !naBiblia && (doMais || noPainel || ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
-    const pontoMais = !desafiosNaBarra && !!(CC.haDesafioPendenteHoje && CC.haDesafioPendenteHoje());
     const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
     const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
     // Uma vez que a pessoa chegou na aba, o pontinho de novidade não aparece nunca mais.
@@ -327,8 +326,10 @@
         + '<span class="rotulo-aba">' + rotulo + '</span></button>';
     };
 
+    // O Mais não leva ponto: os desafios do dia ficavam sempre "pendentes" e o ponto vermelho
+    // nunca sumia, sem dizer do que era. Ponto só para novidade de verdade (amigos, aba nova).
     const botaoMais = () => {
-      const ponto = pontoMais ? '<i class="ponto-aba"></i>' : '';
+      const ponto = '';
       return '<button type="button" class="aba' + (maisSelecionado ? ' selecionada' : '') + '" data-papel="mais" data-abrir-mais'
         + (maisSelecionado ? ' aria-current="page"' : '') + ' aria-label="Mais"><span class="icone-aba">' + CC.icoAba('mais') + ponto + '</span>'
         + '<span class="rotulo-aba">Mais</span></button>';
@@ -411,9 +412,11 @@
     'Bíblia': (h) => h === '#/biblia',
     'Primeiros passos': (h) => h === '#/licoes',
     'Parábolas': (h) => h === '#/parabolas',
+    'Minhas anotações': (h) => h === '#/perfil/anotacoes',
   };
   const ENDERECO_DO_ROTULO = { 'Trilha': '#/', 'Perfil': '#/perfil', 'Juntos': '#/novidades', 'Explorar': '#/explorar',
-    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes', 'Parábolas': '#/parabolas' };
+    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes', 'Parábolas': '#/parabolas',
+    'Minhas anotações': '#/perfil/anotacoes' };
   // Muitas telas (Discipulado, Painel, Notificações, Perfil...) só desenham o voltar DEPOIS
   // que os dados chegam, quando o roteador já tinha passado. Ligar o clique botão a botão
   // deixava esses mortos. Por isso: o nome é acertado por um observador assim que o botão

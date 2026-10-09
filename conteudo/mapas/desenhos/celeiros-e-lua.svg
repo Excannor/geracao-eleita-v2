@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o rico sem juízo (Lc 12.16-20): à esquerda, o monte de tábuas do celeiro velho derrubado; à direita, o celeiro novo e grande, com o portão em X e o sótão cheio; no alto, a lua da noite em que Deus fala com ele. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A lua é a única área sálvia. -->
+<path class="k" d="M4 108H156"/>
+<path class="k p" d="M70 108V56L108 28L146 56V108Z"/>
+<path class="k" d="M64 60L108 26L152 60"/>
+<path class="k p" d="M94 108V74H122V108Z"/>
+<path class="h" d="M94 74L122 108M122 74L94 108M108 74V108"/>
+<path class="k p" d="M98 42H118V58H98Z"/>
+<path class="h" d="M100 56C104 48 112 48 116 56M70 68H94M122 68H146M70 86H94M122 86H146"/>
+<path class="k p" d="M10 106L30 92L34 98L14 110Z"/>
+<path class="k p" d="M20 100L50 94L50 100L22 106Z"/>
+<path class="k p" d="M30 90L56 98L54 104L28 96Z"/>
+<path class="k p" d="M12 92L26 82L36 88L22 96Z"/>
+<path class="k s" d="M34 14C24 16 20 30 28 38C34 42 42 40 46 36C36 36 30 26 34 14Z"/>
+<path class="k" d="M62 16v6M59 19h6M144 12v6M141 15h6"/>
+</svg>

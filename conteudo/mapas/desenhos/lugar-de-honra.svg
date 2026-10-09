@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o melhor lugar da mesa (Lc 14.8): a cadeira de encosto alto da cabeceira, com a almofada no encosto, e a ponta da mesa ao lado. A almofada do encosto é a única área sálvia. -->
+<path class="k" d="M8 104H112"/>
+<g transform="translate(24 -2) scale(1.2 1.02)">
+<path class="k p" d="M10 78V30C10 22 30 22 30 30V78Z"/>
+<path class="k s" d="M14 74V32C14 28 26 28 26 32V74Z"/>
+<path class="k p" d="M6 78H38V86H6Z"/>
+<path class="k" d="M10 86V106M34 86V106"/>
+</g>
+<path class="k p" d="M82 64H112V72H82Z"/>
+<path class="k" d="M88 72V104"/>
+<ellipse class="k p" cx="98" cy="62" rx="8" ry="2.5"/>
+</svg>

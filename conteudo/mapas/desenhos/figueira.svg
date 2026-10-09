@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a figueira sem fruto (Lc 13.6): uma figueira nova, de tronco fino que se abre em galhos, com as folhas largas de três pontas e nenhum figo. As folhas são a única área sálvia. -->
+<path class="k" d="M10 104H110"/>
+<path class="k" d="M56 104C58 88 54 76 46 64M64 104C62 88 66 76 74 62M58 84C60 74 60 66 60 56"/>
+<path class="k" d="M56 104C58 90 62 90 64 104"/>
+<g transform="translate(42 66) rotate(-50) scale(1.3)"><path class="k s" d="M0 0C-6 -6 -16 -4 -18 -12C-12 -14 -10 -20 -6 -22C-4 -16 0 -18 0 -26C4 -18 8 -16 10 -22C14 -20 12 -14 18 -12C16 -4 6 -6 0 0Z"/><path class="h" d="M0 0V-20M0 -9L-10 -14M0 -9L10 -14"/></g>
+<g transform="translate(78 64) rotate(50) scale(1.3)"><path class="k s" d="M0 0C-6 -6 -16 -4 -18 -12C-12 -14 -10 -20 -6 -22C-4 -16 0 -18 0 -26C4 -18 8 -16 10 -22C14 -20 12 -14 18 -12C16 -4 6 -6 0 0Z"/><path class="h" d="M0 0V-20M0 -9L-10 -14M0 -9L10 -14"/></g>
+<g transform="translate(48 46) rotate(-18) scale(1.3)"><path class="k s" d="M0 0C-6 -6 -16 -4 -18 -12C-12 -14 -10 -20 -6 -22C-4 -16 0 -18 0 -26C4 -18 8 -16 10 -22C14 -20 12 -14 18 -12C16 -4 6 -6 0 0Z"/><path class="h" d="M0 0V-20M0 -9L-10 -14M0 -9L10 -14"/></g>
+<g transform="translate(72 44) rotate(18) scale(1.3)"><path class="k s" d="M0 0C-6 -6 -16 -4 -18 -12C-12 -14 -10 -20 -6 -22C-4 -16 0 -18 0 -26C4 -18 8 -16 10 -22C14 -20 12 -14 18 -12C16 -4 6 -6 0 0Z"/><path class="h" d="M0 0V-20M0 -9L-10 -14M0 -9L10 -14"/></g>
+<g transform="translate(60 56) scale(1.4)"><path class="k s" d="M0 0C-6 -6 -16 -4 -18 -12C-12 -14 -10 -20 -6 -22C-4 -16 0 -18 0 -26C4 -18 8 -16 10 -22C14 -20 12 -14 18 -12C16 -4 6 -6 0 0Z"/><path class="h" d="M0 0V-20M0 -9L-10 -14M0 -9L10 -14"/></g>
+</svg>

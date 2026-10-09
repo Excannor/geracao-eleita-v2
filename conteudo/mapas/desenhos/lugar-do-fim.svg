@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o último lugar da mesa (Lc 14.10): um banquinho baixo no fim da mesa e uma seta curva subindo para o lado da mesa, porque o dono da casa chama para mais perto. O assento do banquinho é a única área sálvia. -->
+<path class="k" d="M8 104H112"/>
+<path class="k p" d="M8 62H44V70H8Z"/>
+<path class="k" d="M38 70V104"/>
+<path class="k s" d="M70 88H104V95H70Z"/>
+<path class="k" d="M74 95V104M100 95V104"/>
+<path class="k" d="M88 80C84 60 70 50 54 50M60 44L54 50L61 55"/>
+</svg>

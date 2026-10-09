@@ -176,7 +176,6 @@
       + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
       + atalho('#/perfil/discipulado', 'cruz', 'Discipulado')
-      + atalho('#/perfil/historia', 'aperto', 'Minha história com Deus')
       // Só para quem ainda não está em nenhuma célula: quem já está numa (ou mais) usa a
       // aba Célula da barra, que abre direto (ou lista, se for mais de uma).
       + (CC.minhasCelulas && CC.minhasCelulas().length ? '' : '<button class="atalho" data-nova-celula>' + CC.ico('pessoas') + '<span>Criar uma célula</span>' + CC.ico('avancar') + '</button>')
@@ -272,7 +271,11 @@
   // ---------- Minha história com Deus ----------
   // Guia privado: nunca sai daqui, para amigo, célula, discipulado nem painel (só volta pela
   // própria conta da pessoa, em api/estado). Três campos livres, com autosalvamento, como o
-  // "Escrever sobre hoje" da lição (04-licao.js).
+  // "Escrever sobre hoje" da lição (04-licao.js). Entra pelo cartão fixo no topo de Minhas
+  // anotações (07g-anotacoes.js), e o voltar leva de volta para lá.
+  // 1 Pedro 3.15 na NBV, palavra por palavra (conteudo/biblias/nbv.json; teste-anotacoes confere).
+  const VERSO_HISTORIA = 'Entreguem-se aos cuidados de Cristo, seu Senhor, e se alguém perguntar acerca da esperança que vocês têm, '
+    + 'estejam preparados para contar-lhe, e façam-no de uma maneira amável e respeitosa.';
   const CAMPOS_HISTORIA = [
     ['antes', 'Antes: como era a sua vida? O que você buscava?'],
     ['encontro', 'O encontro: como você conheceu Jesus? Quem estava por perto?'],
@@ -289,10 +292,11 @@
 
   CC.vistaHistoria = function (raiz) {
     const h = CC.minhaHistoria() || {};
-    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Perfil')
+    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Minhas anotações')
       + '<h1>Minha história com Deus</h1>'
       + '<p class="passo-dica">Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus. Se você cresceu na igreja, conte quando a fé passou a ser sua. '
       + 'Escreva só para você.</p></div>'
+      + '<blockquote class="verso-historia"><p>“' + VERSO_HISTORIA + '”</p><cite>1 Pedro 3.15</cite></blockquote>'
       + '<span class="selo-status" id="salvo-historia" role="status"></span>'
       + CAMPOS_HISTORIA.map(([chave, pergunta]) => campoHistoria(chave, pergunta, h[chave])).join('')
       + '<p class="passo-dica pequena">Use palavras suas, sem termos de igreja. Três minutos de conversa bastam.</p>'

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a semente entre os espinhos (Lc 8.7): um broto fino no meio, e os galhos de espinho crescendo em volta e por cima dele, cruzando de um lado para o outro. As folhinhas do broto são a única área sálvia. -->
+<path class="k" d="M8 100H112"/>
+<path class="k" d="M60 100V62"/>
+<path class="k s" d="M60 64C53 58 53 50 60 46C66 52 66 58 60 64Z"/>
+<path class="k s" d="M60 76C54 74 48 76 46 82C52 84 58 82 60 76Z"/>
+<path class="k" d="M16 100C28 80 44 66 76 46M104 100C92 78 76 66 42 44M28 100C40 86 56 80 92 72"/>
+<path class="k" d="M30 82l-7-2M42 70l-4-7M56 60l-2-7M90 82l7-2M78 68l4-7M66 58l2-7M50 85l-2 7M74 77l2 7"/>
+</svg>

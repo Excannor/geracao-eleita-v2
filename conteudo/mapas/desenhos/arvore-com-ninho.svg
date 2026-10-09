@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o grão de mostarda que vira árvore (Lc 13.19): a árvore de copa larga, com um ninho no galho e um passarinho espiando dele, outra ave voando no alto e, no chão, a sementinha preta de onde tudo começou. A copa é a única área sálvia. -->
+<path class="k" d="M10 106H110"/>
+<path class="k" d="M54 106C56 92 54 82 46 72M66 106C64 92 66 82 74 70M60 92V70"/>
+<path class="k s" d="M24 64C14 60 16 44 28 44C28 30 44 24 54 32C60 20 80 22 82 34C96 32 104 46 96 56C104 64 96 76 84 72C78 80 62 80 56 72C46 80 30 76 24 64Z"/>
+<path class="h" d="M36 52C42 48 48 50 50 54M64 40C70 36 76 38 78 42M44 66C50 62 56 64 58 68"/>
+<path class="k p" d="M74 58C74 68 94 68 94 58Z"/>
+<path class="h" d="M76 62H92M78 65H90"/>
+<circle class="k p" cx="86" cy="52" r="4.5"/>
+<path class="k" d="M90 51L95 53L90 54"/>
+<path class="k" d="M24 16c3-4 7-4 9 0c2-4 6-4 9 0"/>
+<ellipse class="e" cx="22" cy="103" rx="2.5" ry="1.8"/>
+</svg>

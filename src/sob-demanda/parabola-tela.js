@@ -31,7 +31,8 @@
     CC.gravar('parabolasLidas', { ...atuais, [slug]: CC.hojeIso() });
   }
   const barra = (titulo, voltar, extra) => '<div class="mapa-barra">'
-    + '<button class="botao-redondo" data-voltar aria-label="Voltar">' + CC.ico('voltar') + '<span class="so-leitor">' + voltar + '</span></button>'
+    // o rótulo vai pronto no data-rotulo-voltar: o roteador não escreve "Voltar" visível no botão redondo
+    + '<button class="botao-redondo" data-voltar data-rotulo-voltar="' + voltar + '" aria-label="Voltar">' + CC.ico('voltar') + '</button>'
     + '<span class="mapa-barra-titulo">' + titulo + '</span>' + (extra || '<span class="parabola-vaga"></span>') + '</div>';
 
   // ---------- a lista ----------
@@ -78,6 +79,8 @@
   // citação que abre com palavra curta não deixa a aspa e a palavra sozinhas no fim da linha
   const tx = (t) => CC.esc(t).replace(/([“‘]\S{1,2}) /g, '$1 ');
   const ref = (r) => (r ? ' ' + marca(r) : '');
+  // "dizer-lhe", "vê-lo": dentro das falas, a palavra com hífen não quebra no hífen
+  const falaTx = (t) => tx(t).replace(/[^\s“]+-[^\s”]+/g, '<span class="sem-quebra">$&</span>');
   // "Lc 14.15-24" → { livro: "Lucas", cap: 14, de: 15, ate: 24 }
   const NOME_DA_SIGLA = new Map((CC.LIVROS_MAPA || []).map(([nome, , sigla]) => [sigla, nome]));
   const trechoDe = (r) => {
@@ -90,6 +93,9 @@
     pao: '<path d="M4 12a8 5 0 0 1 16 0v5H4z"/><path d="M9 9l1.5 2M13 8.5l1.5 2"/>',
     pessoas: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14c3 0 5 2.2 5 5"/>',
     estrada: '<path d="M8 3L4 21M16 3l4 18M12 5v3M12 11v3M12 17v3"/>',
+    broto: '<path d="M12 21V11"/><path d="M12 11C12 6 8 4 4 4c0 4 3 7 8 7zM12 13c0-4 3-6 8-6 0 4-3 6-8 6z"/>',
+    lamparina: '<path d="M3 15c2 3 12 3 15-1H8c-3 0-5 0-5 1z"/><path d="M18 14l3-2"/><path d="M20 10c-2-2-1-4 0-6 1 2 2 4 0 6z"/>',
+    moeda: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/>',
     ancora: '<circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 11h8M5 14c0 4 3 7 7 7s7-3 7-7"/>',
   };
   const rotulo = (icone, texto) => '<h2 class="mapa-rotulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -100,11 +106,12 @@
       : '<path class="pontos" d="M80 2C70 20 40 18 32 36"/><path class="ponta" d="M26 32l6 6 5-7"/>') + '</svg>';
   const desenho = (p, id, classe) => (p.desenhos && p.desenhos[id] ? '<span class="desenho' + (classe ? ' ' + classe : '') + '" aria-hidden="true">' + p.desenhos[id] + '</span>' : '');
 
+  // quatro itens viram duas linhas de dois: a 390px, quatro colunas espremem os nomes
   function bloco(p, b) {
-    if (b.fala !== undefined) return '<p class="fala-parabola">“' + tx(b.fala) + '”' + ref(b.ref) + '</p>';
+    if (b.fala !== undefined) return '<p class="fala-parabola">“' + falaTx(b.fala) + '”' + ref(b.ref) + '</p>';
     if (b.itens) {
-      return '<div class="itens-parabola" style="--colunas:' + b.itens.length + '">' + b.itens.map((it) => '<div class="item-cena">' + desenho(p, it.desenho)
-        + '<b>' + CC.esc(it.titulo) + '</b>' + (it.fala ? '<span>“' + tx(it.fala).replace(/[^\s“]+-[^\s”]+/g, '<span class="sem-quebra">$&</span>') + '”</span>' : '') + '</div>').join('') + '</div>';
+      return '<div class="itens-parabola" style="--colunas:' + (b.itens.length === 4 ? 2 : b.itens.length) + '">' + b.itens.map((it) => '<div class="item-cena">' + desenho(p, it.desenho)
+        + '<b>' + CC.esc(it.titulo) + '</b>' + (it.fala ? '<span>“' + falaTx(it.fala) + '”</span>' : '') + '</div>').join('') + '</div>';
     }
     return '<p class="texto-parabola">' + tx(b.texto) + ref(b.ref) + '</p>';
   }
@@ -122,7 +129,7 @@
     const parecidas = (p.parecidas || []).map((x) => {
       const destino = x.slug && porSlug.get(x.slug);
       const dentro = desenho(p, p.desenhoLista) + '<span><b>Parecida em ' + CC.esc((trechoDe(x.ref) || {}).livro || '') + ' · ' + CC.esc(x.titulo) + '</b>'
-        + '<small>' + nb(CC.esc(x.ref)) + (x.linha ? ' · ' + CC.esc(x.linha.charAt(0).toLowerCase() + x.linha.slice(1)) : '') + '</small></span>';
+        + '<small>' + nb(CC.esc(x.ref)) + (x.linha ? ' · ' + CC.esc(x.linha) : '') + '</small></span>';
       return destino ? '<a class="parecida-parabola" href="#/parabola/' + x.slug + '">' + dentro + CC.ico('avancar') + '</a>' : '<div class="parecida-parabola">' + dentro + '</div>';
     }).join('');
     return '<div class="parabola">'
@@ -136,13 +143,16 @@
       + '<div data-notas-contexto="parabola:' + CC.esc(slug) + '" data-tipo-nota="nota"></div></div>';
   }
 
-  // O nome no pincel encolhe até caber numa linha (como o nome do livro no mapa).
+  // O nome no pincel encolhe até caber numa linha (como o nome do livro no mapa). Nome que nem
+  // a 26px cabe ("O grão de mostarda e o fermento") volta ao tamanho cheio e quebra em duas linhas.
   function ajustarNome(raiz) {
     const nome = raiz.querySelector('.parabola-nome');
     if (!nome) return;
     nome.style.fontSize = '';
+    nome.style.whiteSpace = '';
     let tamanho = parseFloat(getComputedStyle(nome).fontSize);
-    for (let i = 0; i < 10 && tamanho > 24 && nome.scrollWidth > nome.clientWidth + 1; i++) { tamanho -= 2; nome.style.fontSize = tamanho + 'px'; }
+    for (let i = 0; i < 10 && tamanho > 26 && nome.scrollWidth > nome.clientWidth + 1; i++) { tamanho -= 2; nome.style.fontSize = tamanho + 'px'; }
+    if (nome.scrollWidth > nome.clientWidth + 1) { nome.style.fontSize = ''; nome.style.whiteSpace = 'normal'; }
   }
 
   let observador = null;

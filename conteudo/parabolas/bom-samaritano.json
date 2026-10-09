@@ -1,0 +1,109 @@
+{
+  "titulo": "O bom samaritano",
+  "ref": "Lc 10.25-37",
+  "grupo": "lucas",
+  "linha": "Um samaritano para onde dois passaram de longe",
+  "desenho": "estrada-de-jerico",
+  "desenhoLista": "vaso-de-azeite",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus está a caminho de Jerusalém. Pouco antes, o povo de uma aldeia samaritana não quis receber Jesus e os discípulos.",
+          "ref": "Lc 9.51-53"
+        },
+        {
+          "texto": "Um especialista da Lei vem pôr Jesus à prova. Ele quer saber o que precisa fazer para herdar a vida eterna.",
+          "ref": "Lc 10.25"
+        },
+        {
+          "texto": "Jesus pergunta o que a lei de Moisés diz. O especialista da Lei responde com os dois mandamentos, amar a Deus de todo o coração e amar o próximo como a si mesmo. Jesus diz que ele respondeu certo.",
+          "ref": "Lc 10.26-28"
+        },
+        {
+          "texto": "O especialista da Lei quer se justificar e faz outra pergunta.",
+          "ref": "Lc 10.29"
+        },
+        {
+          "fala": "Quem é o meu próximo?",
+          "ref": "Lc 10.29"
+        },
+        {
+          "texto": "Para responder, Jesus conta uma história."
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "estrada",
+      "blocos": [
+        {
+          "texto": "Um homem desce de Jerusalém para Jericó, e uns bandidos atacam ele no caminho. Eles levam até a roupa dele e largam o homem quase morto na beira da estrada.",
+          "ref": "Lc 10.30"
+        },
+        {
+          "texto": "Três pessoas passam por ali, uma depois da outra."
+        },
+        {
+          "itens": [
+            {
+              "desenho": "turbante-de-sacerdote",
+              "titulo": "Um sacerdote",
+              "fala": "passou de longe",
+              "ref": "Lc 10.31"
+            },
+            {
+              "desenho": "rolo-da-lei",
+              "titulo": "Um levita",
+              "fala": "também deixou o homem caído ali",
+              "ref": "Lc 10.32"
+            },
+            {
+              "desenho": "vaso-de-azeite",
+              "titulo": "Um samaritano",
+              "fala": "sentiu grande pena dele",
+              "ref": "Lc 10.33"
+            }
+          ]
+        },
+        {
+          "texto": "O samaritano se ajoelha ao lado do homem e derrama vinho e óleo nas feridas. Depois põe o homem em cima do jumento e leva até uma hospedaria, onde cuida dele.",
+          "ref": "Lc 10.34"
+        },
+        {
+          "texto": "No dia seguinte, o samaritano dá duas moedas ao dono da hospedaria e pede que cuide do homem.",
+          "ref": "Lc 10.35"
+        },
+        {
+          "fala": "Quando eu voltar, pagarei o que você gastar a mais com ele.",
+          "ref": "Lc 10.35"
+        }
+      ]
+    },
+    {
+      "titulo": "A pergunta de volta",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Jesus pergunta qual dos três foi o próximo do homem que caiu nas mãos dos bandidos. O especialista da Lei não fala a palavra samaritano. Ele responde assim.",
+          "ref": "Lc 10.36"
+        },
+        {
+          "fala": "Aquele que mostrou misericórdia por ele",
+          "ref": "Lc 10.37"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O especialista da Lei quer saber quem conta como próximo dele. Jesus troca a pergunta e fala de quem chega perto do homem caído. O samaritano para na estrada, e ninguém ali espera isso dele.",
+    "apoio": "Jesus termina a conversa com uma ordem. “Agora vá e faça o mesmo”.",
+    "ref": "Lc 10.37"
+  },
+  "perguntas": [
+    "O sacerdote e o levita viram o homem e seguiram viagem. O que costuma fazer você passar de longe de quem precisa de ajuda?",
+    "Quem está caído na beira da sua estrada esta semana?"
+  ]
+}

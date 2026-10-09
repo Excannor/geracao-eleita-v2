@@ -18,8 +18,8 @@ const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PASTA = join(AQUI, 'conteudo', 'parabolas');
 const DESENHOS = join(AQUI, 'conteudo', 'mapas', 'desenhos');
 export const GRUPOS_PARABOLA = ['mateus', 'marcos', 'lucas', 'at'];
-// Os ícones que a tela sabe desenhar no rótulo de cada seção (src/app/06c-parabolas.js).
-export const ICONES_SECAO = ['alfinete', 'pao', 'pessoas', 'estrada'];
+// Os ícones que a tela sabe desenhar no rótulo de cada seção (src/sob-demanda/parabola-tela.js).
+export const ICONES_SECAO = ['alfinete', 'pao', 'pessoas', 'estrada', 'moeda', 'broto', 'lamparina'];
 export const LINHA_MAX = 60;
 
 const normalizar = (s) => ' ' + String(s).normalize('NFC').toLowerCase()
@@ -128,6 +128,8 @@ export function checarParabola(slug, p) {
     if (!texto(x.titulo)) erro(onde + ': precisa de titulo');
     if (x.slug !== undefined && !/^[a-z0-9-]+$/.test(String(x.slug))) erro(onde + ': slug inválido');
     campos.push([onde + ' título', x.titulo, []]);
+    // a linha sai como está, depois da referência ("Mt 22.1-14 · um rei faz a festa do filho"):
+    // começa minúscula, a não ser nome próprio
     if (x.linha !== undefined) campos.push([onde + ' linha', x.linha, []]);
   });
 
@@ -156,7 +158,8 @@ export function checarParabola(slug, p) {
       if ((semAspas.match(/:/g) || []).length > 1) erro(onde + ': dois dois-pontos no mesmo campo (3.1)');
     }
     if (/–/.test(semAspas)) erro(onde + ': travessão (–) no texto');
-    const hifen = semAspas.match(/\p{L}+-\p{L}+/u);
+    // o título é o nome da parábola ("O amigo à meia-noite") e pode levar hífen
+    const hifen = onde === 'titulo' ? null : semAspas.match(/\p{L}+-\p{L}+/u);
     if (hifen) erro(onde + ': palavra com hífen fora de citação ("' + hifen[0] + '")');
     for (const m of String(t).matchAll(/“([^”]{8,300})”/g)) {
       const contra = refs.length ? refs : todasAsRefs;

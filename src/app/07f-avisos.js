@@ -79,7 +79,9 @@
       + (avisos.length
         ? '<div class="caixa-lista lista-avisos">' + avisos.map((a) => '<a class="item-aviso' + (ehNovo(a) ? ' novo' : '') + '" href="'
           + CC.esc(destino(a.url)) + '"><span class="ico-aviso">' + CC.ico(iconeDe(a.tipo)) + '</span>'
-          + '<span class="textos-aviso"><b>' + CC.esc(a.titulo) + '</b><span>' + CC.esc(a.corpo) + '</span>'
+          + '<span class="textos-aviso"><b>' + CC.esc(a.titulo) + '</b>' + (a.corpo ? '<span>' + CC.esc(a.corpo) + '</span>' : '')
+          // a foto do aviso do administrador (o id vem do servidor; ver /api/avisos/foto)
+          + (a.foto ? '<img class="foto-aviso" src="api/avisos/foto/' + encodeURIComponent(a.foto) + '" alt="" loading="lazy" decoding="async">' : '')
           + '<small>' + quando(a.em) + '</small></span>' + (ehNovo(a) ? '<i class="ponto-novo" aria-label="novo"></i>' : '') + '</a>').join('') + '</div>'
         : CC.estado({ icone: 'sino', titulo: 'Nenhum aviso ainda', texto: 'Lembretes da leitura, toques de amigos e convites aparecem aqui.' }))
       + ajustes;

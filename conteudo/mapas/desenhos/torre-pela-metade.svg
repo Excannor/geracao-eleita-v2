@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a torre que ficou pela metade (Lc 14.29-30): a base de pedras levantada só até o meio, com a beirada irregular, os paus do andaime subindo vazios dos dois lados e uma pilha de pedras parada no chão. A pilha de pedras é a única área sálvia. -->
+<path class="k" d="M8 104H112"/>
+<path class="k p" d="M30 104V62H70V104Z"/>
+<path class="h" d="M30 74H70M30 86H70M30 98H70M40 62V74M60 62V74M50 74V86M40 86V98M60 86V98"/>
+<path class="k p" d="M30 62V58H44V62ZM44 62V60H56V62Z"/>
+<path class="h" d="M24 36H76"/>
+<path class="k" d="M24 104V36M76 104V36M22 46H78M22 70H28M72 70H78"/>
+<path class="k s" d="M80 104H100V94H80Z"/>
+<path class="h" d="M80 99H100M90 94V104"/>
+</svg>

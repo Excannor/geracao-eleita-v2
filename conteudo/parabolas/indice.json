@@ -1,10 +1,57 @@
 {
   "nota": "As parábolas, na ordem da lista, agrupadas por onde estão (conteudo/parabolas/<slug>.json). O build só publica o que está em 'publicadas', depois de passar no ferramentas/checar-parabola.mjs; grupo sem nenhuma publicada não aparece na tela nem nos filtros. Uma parábola que aparece em mais de um evangelho fica no grupo de quem a conta com mais detalhe e aponta os outros em 'parecidas'.",
   "grupos": [
-    { "id": "mateus", "nome": "Evangelho de Mateus", "curto": "Mateus", "parabolas": [] },
-    { "id": "marcos", "nome": "Evangelho de Marcos", "curto": "Marcos", "parabolas": [] },
-    { "id": "lucas", "nome": "Evangelho de Lucas", "curto": "Lucas", "sub": "Muitas destas só Lucas conta", "parabolas": ["grande-banquete"] },
-    { "id": "at", "nome": "Antigo Testamento", "curto": "Antigo Testamento", "parabolas": [] }
+    {
+      "id": "mateus",
+      "nome": "Evangelho de Mateus",
+      "curto": "Mateus",
+      "parabolas": []
+    },
+    {
+      "id": "marcos",
+      "nome": "Evangelho de Marcos",
+      "curto": "Marcos",
+      "parabolas": []
+    },
+    {
+      "id": "lucas",
+      "nome": "Evangelho de Lucas",
+      "curto": "Lucas",
+      "sub": "Muitas destas só Lucas conta",
+      "parabolas": [
+        "dois-devedores",
+        "semeador",
+        "bom-samaritano",
+        "amigo-meia-noite",
+        "rico-sem-juizo",
+        "servos-vigilantes",
+        "figueira-sem-fruto",
+        "mostarda-e-fermento",
+        "porta-estreita",
+        "lugares-a-mesa",
+        "grande-banquete",
+        "torre-e-rei"
+      ]
+    },
+    {
+      "id": "at",
+      "nome": "Antigo Testamento",
+      "curto": "Antigo Testamento",
+      "parabolas": []
+    }
   ],
-  "publicadas": ["grande-banquete"]
+  "publicadas": [
+    "dois-devedores",
+    "semeador",
+    "bom-samaritano",
+    "amigo-meia-noite",
+    "rico-sem-juizo",
+    "servos-vigilantes",
+    "figueira-sem-fruto",
+    "mostarda-e-fermento",
+    "porta-estreita",
+    "lugares-a-mesa",
+    "grande-banquete",
+    "torre-e-rei"
+  ]
 }

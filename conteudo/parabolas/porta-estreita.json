@@ -1,0 +1,82 @@
+{
+  "titulo": "A porta estreita",
+  "ref": "Lc 13.22-30",
+  "grupo": "lucas",
+  "linha": "O dono tranca a porta, e gente de longe senta à mesa",
+  "desenho": "porta-estreita-no-muro",
+  "desenhoLista": "porta-estreita",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus está a caminho de Jerusalém e ensina nas cidades e aldeias por onde passa. Alguém faz uma pergunta.",
+          "ref": "Lc 13.22-23"
+        },
+        {
+          "fala": "Senhor, só poucos serão salvos?",
+          "ref": "Lc 13.23"
+        }
+      ]
+    },
+    {
+      "titulo": "A porta e o dono da casa",
+      "icone": "estrada",
+      "blocos": [
+        {
+          "texto": "Jesus não diz quantos. Ele manda fazer força para entrar pela porta estreita, porque muita gente vai tentar e não vai conseguir.",
+          "ref": "Lc 13.24"
+        },
+        {
+          "texto": "Um dia, o dono da casa se levanta e tranca a porta. Quem ficou do lado de fora bate e pede para entrar.",
+          "ref": "Lc 13.25"
+        },
+        {
+          "fala": "Eu não conheço vocês. Não sei de onde vocês são!",
+          "ref": "Lc 13.25"
+        },
+        {
+          "texto": "Os que estão do lado de fora lembram que comeram com ele e que ele ensinou nas ruas da cidade deles. O dono responde a mesma coisa.",
+          "ref": "Lc 13.26-27"
+        },
+        {
+          "texto": "Lá dentro, Abraão e os profetas estão à mesa do Reino de Deus, com gente que veio dos quatro cantos do mundo.",
+          "ref": "Lc 13.28-29"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "porta-trancada",
+              "titulo": "Do lado de fora",
+              "fala": "Senhor, abra-nos a porta",
+              "ref": "Lc 13.25"
+            },
+            {
+              "desenho": "mesa-posta",
+              "titulo": "À mesa do Reino",
+              "fala": "virá gente do oriente e do ocidente, do norte e do sul",
+              "ref": "Lc 13.29"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O homem pergunta quantos vão ser salvos, e Jesus fala de quem vai entrar. Ter comido perto dele e ouvido ele ensinar na rua não basta. À mesa vão sentar pessoas de todo lado.",
+    "apoio": "Jesus termina com uma virada. “os últimos serão os primeiros, e os primeiros serão os últimos”.",
+    "ref": "Lc 13.24-30"
+  },
+  "perguntas": [
+    "Você conhece Jesus de perto ou só de ouvir falar?",
+    "Quem você acha que não teria lugar nessa mesa? Por quê?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 7.13-14",
+      "titulo": "A porta estreita",
+      "linha": "Jesus põe lado a lado o caminho apertado e o caminho largo"
+    }
+  ]
+}

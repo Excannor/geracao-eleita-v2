@@ -5,7 +5,7 @@
 // Uso: node ferramentas/teste-anotacoes.mjs   (CHROME, PORTA e PORTAS como nos outros testes)
 import { spawn } from 'node:child_process';
 import { portaLivre, fecharArvore } from './navegador.mjs';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -229,6 +229,46 @@ await clicar('[data-abrir-mais]');
 ok(await esperar(existe('.painel-mais a[href="#/perfil/anotacoes"]')), 'o Mais leva a Minhas anotações');
 await clicar('.painel-mais a[href="#/perfil/anotacoes"]');
 await esperar('location.hash === "#/perfil/anotacoes"');
+
+// ---------- Minha história com Deus: cartão fixo em Minhas anotações, fora do Mais e do Perfil ----------
+await av('location.hash = "#/perfil"');
+await esperar(existe('.lista-atalhos a[href="#/perfil/anotacoes"]'));
+ok(await av('!' + existe('.lista-atalhos a[href="#/perfil/historia"]')), 'o Perfil não tem mais o atalho de Minha história com Deus');
+await clicar('[data-abrir-mais]');
+await esperar(existe('.painel-mais'));
+ok(await av('!' + existe('.painel-mais a[href="#/perfil/historia"]') + ' && !/Minha história/.test(' + q('.painel-mais') + '.innerText)'),
+  'o Mais não tem mais o item Minha história com Deus');
+await clicar('.painel-mais a[href="#/perfil/anotacoes"]');
+ok(await esperar('location.hash === "#/perfil/anotacoes" && ' + existe('.topo-historia a.cartao-historia.vazia[href="#/perfil/historia"]')),
+  'Minhas anotações mostra o cartão Minha história com Deus, vazio');
+ok(await av('(() => { const c = ' + q('.cartao-historia') + '; const f = ' + q('[data-controles]') + '; const l = ' + q('.lista-anot .cartao-anot') + ';'
+  + ' return !!(c.compareDocumentPosition(f) & 4) && !!(c.compareDocumentPosition(l) & 4) && /Escrever minha história/.test(c.innerText) && /quando alguém perguntar/i.test(c.innerText); })()'),
+  'o cartão fica acima dos filtros e das notas, diz para que serve e chama "Escrever minha história"');
+await clicar('.cartao-historia');
+ok(await esperar('location.hash === "#/perfil/historia" && ' + existe('textarea[data-campo="antes"]') + ' && ' + existe('textarea[data-campo="hoje"]')),
+  'tocar no cartão abre o editor de três campos');
+const nbv = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', 'nbv.json'), 'utf8'));
+ok(await av(q('.verso-historia p') + '.textContent === ' + JSON.stringify('“' + nbv.livros['1 Pedro'][2][14] + '”') + ' && /1 Pedro 3.15/.test(' + q('.verso-historia cite') + '.textContent)'),
+  'o editor mostra 1 Pedro 3.15 palavra por palavra da NBV');
+await preencher('textarea[data-campo="antes"]', 'Eu vivia com medo do futuro e longe de casa.');
+await preencher('textarea[data-campo="encontro"]', 'Um amigo me chamou para a célula.');
+ok(await av('(() => { const h = CC.minhaHistoria(); return !!h && h.antes === "Eu vivia com medo do futuro e longe de casa." && h.encontro === "Um amigo me chamou para a célula." && h.em > 0; })()'),
+  'escrever salva sozinho em E.historia');
+ok(await av('/Minhas anotações/.test(' + q('[data-voltar]') + '.innerText)'), 'o voltar do editor diz Minhas anotações');
+await clicar('[data-voltar]');
+ok(await esperar('location.hash === "#/perfil/anotacoes" && ' + existe('.cartao-historia:not(.vazia)')), 'o voltar do editor leva a Minhas anotações');
+ok(await av('(() => { const c = ' + q('.cartao-historia') + '; return /Eu vivia com medo do futuro/.test(c.innerText) && /Editada hoje/.test(c.innerText) && !/Escrever minha história/.test(c.innerText); })()'),
+  'o cartão preenchido mostra o começo do texto e a data da última edição');
+await preencher('#busca-anot', 'celula amigo');
+ok(await esperar(existe('.cartao-historia')), 'a busca acha a história pelo texto, sem acento');
+await preencher('#busca-anot', 'zzzpalavraquenaoexiste');
+ok(await esperar('!' + existe('.cartao-historia')), 'buscando outra coisa, o cartão da história sai da frente');
+await preencher('#busca-anot', '');
+await av('location.hash = "#/perfil"');
+await esperar(existe('.lista-atalhos'));
+await av('location.hash = "#/perfil/historia"');
+ok(await esperar(existe('textarea[data-campo="antes"]') + ' && ' + q('textarea[data-campo="antes"]') + '.value.startsWith("Eu vivia")'), 'a rota antiga #/perfil/historia continua abrindo o editor');
+
 await av('location.hash = "#/biblia"');
 ok(await esperar(existe('.folha-biblia a.atalho-anotacoes[href="#/perfil/anotacoes"][aria-label]'), 10000), 'o topo da Bíblia tem o caderno que leva a Minhas anotações');
 
