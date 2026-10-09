@@ -143,13 +143,16 @@
       + '<div data-notas-contexto="parabola:' + CC.esc(slug) + '" data-tipo-nota="nota"></div></div>';
   }
 
-  // O nome no pincel encolhe até caber numa linha (como o nome do livro no mapa).
+  // O nome no pincel encolhe até caber numa linha (como o nome do livro no mapa). Nome que nem
+  // a 26px cabe ("O grão de mostarda e o fermento") volta ao tamanho cheio e quebra em duas linhas.
   function ajustarNome(raiz) {
     const nome = raiz.querySelector('.parabola-nome');
     if (!nome) return;
     nome.style.fontSize = '';
+    nome.style.whiteSpace = '';
     let tamanho = parseFloat(getComputedStyle(nome).fontSize);
-    for (let i = 0; i < 10 && tamanho > 24 && nome.scrollWidth > nome.clientWidth + 1; i++) { tamanho -= 2; nome.style.fontSize = tamanho + 'px'; }
+    for (let i = 0; i < 10 && tamanho > 26 && nome.scrollWidth > nome.clientWidth + 1; i++) { tamanho -= 2; nome.style.fontSize = tamanho + 'px'; }
+    if (nome.scrollWidth > nome.clientWidth + 1) { nome.style.fontSize = ''; nome.style.whiteSpace = 'normal'; }
   }
 
   let observador = null;
