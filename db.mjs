@@ -235,6 +235,17 @@ const ESQUEMA = [
     PRIMARY KEY (proposito, usuario, papel));
   CREATE INDEX liderancas_estado ON liderancas (estado);
   `,
+  // v17: avisos pontuais do administrador (Painel > Enviar aviso). O item do sino pode levar
+  // uma foto (o id em avisos_fotos, servida em /api/avisos/foto/<id>); a foto mora aqui, no
+  // banco, para entrar nos backups junto com o resto. avisos_admin anota cada envio (quem,
+  // para quem, quando), o que segura o teto de um aviso para todos por dia.
+  `
+  ALTER TABLE push_caixa ADD COLUMN foto TEXT NOT NULL DEFAULT '';
+  CREATE TABLE avisos_fotos (id TEXT PRIMARY KEY, tipo TEXT NOT NULL, dados BLOB NOT NULL, em INTEGER NOT NULL);
+  CREATE TABLE avisos_admin (id TEXT PRIMARY KEY, de TEXT NOT NULL, publico TEXT NOT NULL, titulo TEXT NOT NULL,
+    corpo TEXT NOT NULL, url TEXT NOT NULL, foto TEXT NOT NULL DEFAULT '', pessoas INTEGER NOT NULL, dia TEXT NOT NULL, em INTEGER NOT NULL);
+  CREATE INDEX avisos_admin_dia ON avisos_admin (publico, dia);
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -424,6 +435,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     // a caixa do sino (v11) e o desafio de grupo que a pessoa abriu (v13) são dela, como no
     // apagar da conta ao vivo (Contas.apagar e Notificacoes.apagarDe)
     ['push_caixa', 'DELETE FROM push_caixa WHERE usuario = ?', [u]],
+    // o registro dos avisos que a pessoa mandou como administradora (v17)
+    ['avisos_admin', 'DELETE FROM avisos_admin WHERE de = ?', [u]],
     ['desafios_grupo', 'DELETE FROM desafios_grupo WHERE criado_por = ?', [u]],
     ['estados', 'DELETE FROM estados WHERE usuario = ?', [u]],
     // o check-in diário e a cópia achatada das datas de leitura (v14) são só da pessoa

@@ -155,7 +155,28 @@
     raiz.querySelectorAll('[data-voltar]').forEach((b) => { b.onclick = () => { location.hash = '#/config/painel'; }; });
   }
 
+  // Painel > Enviar aviso (#/config/painel/aviso): a tela vem de aviso-tela.<resumo>.js
+  // (src/sob-demanda/aviso-tela.js), pedida só quando o administrador a abre.
+  let pedidoTelaAviso = null;
+  function vistaAviso(raiz) {
+    if (CC.telaAviso) return CC.telaAviso(raiz);
+    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Voltar') + '<h1>Enviar aviso</h1></div>' + CC.esqueleto('cartoes');
+    CC.ligarVoltarDoTopo(raiz);
+    pedidoTelaAviso = pedidoTelaAviso || new Promise((resolver, falhar) => {
+      const s = document.createElement('script');
+      s.src = './' + window.AVISO_TELA;
+      s.onload = () => (CC.telaAviso ? resolver() : falhar(new Error('tela')));
+      s.onerror = () => { s.remove(); falhar(new Error('tela')); };
+      document.head.appendChild(s);
+    });
+    pedidoTelaAviso.then(() => { if (location.hash === '#/config/painel/aviso') CC.telaAviso(raiz); }, () => {
+      pedidoTelaAviso = null;
+      raiz.querySelector('.esqueleto').outerHTML = CC.estado({ erro: true, titulo: 'Não deu para abrir', texto: 'Pode ter sido a conexão. Tente de novo em instantes.' });
+    });
+  }
+
   CC.vistaPainel = async function (raiz, arg) {
+    if (arg === 'painel/aviso') return vistaAviso(raiz);
     if (arg && arg.startsWith('painel/celula/')) return vistaPainelCelula(raiz, arg.slice('painel/celula/'.length));
     // .folha-perfil: só apresentação, a folha do alto (25-perfil.css); o título longo desce
     // para baixo do voltar (.titulo-frase) e os quatro números viram os cartões de destaque.
@@ -185,6 +206,8 @@
         + (p.retorno[1] && p.retorno[1].pct !== null ? '<div class="painel-cartao"><strong>' + p.retorno[1].pct + '%' : '<div class="painel-cartao"><strong class="texto">ainda sem dado') + '</strong><span>voltaram depois de 7 dias</span>'
         + '<small><em>' + (p.retorno[1] ? p.retorno[1].voltaram + ' de ' + p.retorno[1].elegiveis + ' contas' : '') + '</em></small></div>'
         + '</div>' : ''))
+      + grupo('Avisos', '<a class="linha-config painel-ir" href="#/config/painel/aviso">' + CC.ico('sino') + '<span>Enviar aviso</span>' + CC.ico('avancar') + '</a>',
+        'Um aviso pontual, na hora: só para você (teste) ou para todos.')
       + blocoAprovacoes(liderancas)
       + blocosDaIgreja(igreja)
       + grupo('Senha esquecida',

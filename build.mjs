@@ -309,6 +309,22 @@ if (arquivoArtesStory) {
   console.log('artes de story:', arquivoArtesStory, kb(artesStory), Object.values(fotosStory).join(' '));
 }
 
+// ---------- a tela do aviso do administrador ----------
+// Painel > Enviar aviso: só o administrador abre, então código e estilo saem do index.html
+// (teto de 1 MB) num arquivo com resumo no nome (aviso-tela.<resumo>.js), pedido na hora
+// (07e-painel.js). O estilo entra no lugar da marca, já enxuto. Sem cache próprio no service
+// worker: é uma tela de quem administra, sempre com rede.
+for (const velho of readdirSync(dist()).filter((f) => /^aviso-tela\..*\.js(\.gz)?$/.test(f))) rmSync(dist(velho));
+const cssAviso = enxugarCss(readFileSync(src('sob-demanda', 'aviso-tela.css'), 'utf8'));
+if (/<\/style/i.test(cssAviso)) throw new Error('src/sob-demanda/aviso-tela.css tem "</style>" dentro');
+const telaAviso = enxugarJs(readFileSync(src('sob-demanda', 'aviso-tela.js'), 'utf8'), 'aviso-tela.js')
+  .replace("'/*ESTILO_AVISO*/'", () => JSON.stringify(cssAviso));
+if (telaAviso.includes('/*ESTILO_AVISO*/')) throw new Error('aviso-tela.js perdeu a marca do estilo');
+const arquivoAvisoTela = 'aviso-tela.' + createHash('sha256').update(telaAviso).digest('hex').slice(0, 10) + '.js';
+writeFileSync(dist(arquivoAvisoTela), telaAviso, 'utf8');
+writeFileSync(dist(arquivoAvisoTela + '.gz'), gzipSync(Buffer.from(telaAviso, 'utf8'), { level: 9 }));
+console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
+
 // ---------- ícones ----------
 // Vêm prontos de src/icones/, gerados da arte em arte/icone-app.png por
 // ferramentas/icones.ps1. Reduzir um PNG exige decodificá-lo, e o build roda no Docker
@@ -399,6 +415,7 @@ const html = molde
   // window.BIBLIAS fica por último: os testes leem a lista de traduções até o ";</script>".
   .replace(/\/\*DADOS\*\//g, () => 'window.CONTEUDO_ARQUIVO=' + JSON.stringify(arquivoConteudo) + ';'
     + 'window.STORY_ARTES=' + JSON.stringify(arquivoArtesStory) + ';'
+    + 'window.AVISO_TELA=' + JSON.stringify(arquivoAvisoTela) + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
@@ -541,6 +558,8 @@ self.addEventListener('push', (ev) => {
     tag: d.tag || 'caminho',
     renotify: Boolean(d.tag),
     data: { url: d.url || './' },
+    // A foto do aviso do administrador: o Android mostra grande; o iPhone ignora.
+    ...(d.image ? { image: new URL(d.image, self.registration.scope).href } : {}),
   }));
 });
 
