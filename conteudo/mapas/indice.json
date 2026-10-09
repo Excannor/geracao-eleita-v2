@@ -1,4 +1,4 @@
 {
   "nota": "Os mapas que vão ao ar, pelo slug do arquivo (conteudo/mapas/<slug>.json). Um mapa escrito mas ainda não revisado por alguém da igreja fica fora desta lista: o build só publica o que está aqui, e o Explorar mostra os outros 65 como 'em breve'.",
-  "publicados": ["genesis", "exodo", "levitico", "numeros", "deuteronomio", "josue", "juizes", "rute", "isaias", "mateus", "marcos", "lucas", "1-samuel", "joao", "2-samuel", "1-reis", "2-reis", "1-cronicas", "2-cronicas", "esdras", "neemias", "ester", "atos", "romanos", "1-corintios", "2-corintios", "galatas", "efesios", "filipenses", "colossenses", "1-tessalonicenses"]
+  "publicados": ["genesis", "exodo", "levitico", "numeros", "deuteronomio", "josue", "juizes", "rute", "isaias", "mateus", "marcos", "lucas", "1-samuel", "joao", "2-samuel", "1-reis", "2-reis", "1-cronicas", "2-cronicas", "esdras", "neemias", "ester", "atos", "romanos", "1-corintios", "2-corintios", "galatas", "efesios", "filipenses", "colossenses", "1-tessalonicenses", "2-tessalonicenses"]
 }

@@ -679,6 +679,12 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   continua valendo. Diminuir a fonte para 13px não bastava. Volta de Jesus (1Ts 4.13–5.11) contada só com as palavras
   do texto, sem ordem de acontecimentos nem nome de escola.
 
+- 2026-10-09 · conteúdo · 2 Tessalonicenses: o homem da rebelião (2Ts 2.3-10) ficou só com o que o texto diz, sem
+  nome de hoje, sem calendário e sem "anticristo"; os pares do AT (Is 66.15; Is 11.4) só onde o texto ecoa as palavras.
+  Lote de cartas (Romanos a 2 Tessalonicenses): cartas curtas (3 a 6 capítulos) aceitam 4 ou 5 ramos e 2 a 4 pares;
+  com poucos versículos, a regra "cada referência uma vez" aperta, e a raiz, a conexão, a curiosidade e o "procure"
+  disputam os mesmos versos: decidir a tabela antes de escrever, como em Levítico.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
