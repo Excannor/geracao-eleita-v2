@@ -60,7 +60,8 @@ const LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Es
   'Reino', 'Lei', 'Antigo', 'Novo', 'Testamento', 'Unidade', 'Israel', 'Egito', 'Enquanto', 'Hoje', 'Amanhã',
   ...LIVROS.flatMap((l) => l.split(' ')).filter((p) => /^\p{Lu}/u.test(p))]);
 
-const ANTES_DE_REF = new RegExp('(capítulos?|versículos?|Unidade|dia|\\d| a| e|' + LIVROS.join('|') + ') $', 'u');
+const LIVRO_NOME = new RegExp('(?<!\\p{L})(' + LIVROS.join('|') + ')(?!\\p{L})', 'gu');
+const ANTES_DE_REF = new RegExp('(capítulos?|versículos?|Unidade|dia|\\d| a| e|Livro) $', 'u');
 
 const so = process.argv[2] ? Number(process.argv[2]) : 0;
 const unidades = C.unidades.filter((u) => !so || u.numero === so);
@@ -91,12 +92,13 @@ for (const u of unidades) {
       for (const f of refsForaDaLeitura(t, alvo)) falhar(onde, k + ': ' + f);
       const crua = leituraCrua(alvo);
       const semAspas = String(t).replace(/“[^”]*”/g, '');
+      const semLivros = semAspas.replace(LIVRO_NOME, 'Livro');
       // Número por extenso, ou algarismo seguido de coisa contada ("175 anos", "setenta pessoas").
       // Capítulo, versículo e minutos não entram: são a referência e a régua do app.
-      for (const m of semAspas.matchAll(NUMERO)) {
-        const depois = semAspas.slice(m.index + m[0].length, m.index + m[0].length + 12);
+      for (const m of semLivros.matchAll(NUMERO)) {
+        const depois = semLivros.slice(m.index + m[0].length, m.index + m[0].length + 12);
         if (/^\d+$/.test(m[1]) && !/^ (?!minutos?\b|a\b|e\b|ao\b|até\b)\p{L}/u.test(depois)) continue;
-        if (/^\d+$/.test(m[1]) && ANTES_DE_REF.test(semAspas.slice(Math.max(0, m.index - 40), m.index))) continue;
+        if (/^\d+$/.test(m[1]) && ANTES_DE_REF.test(semLivros.slice(Math.max(0, m.index - 40), m.index))) continue;
         if (!new RegExp('(?<!\\p{L})' + m[1] + '(?!\\p{L})', 'iu').test(crua)) conferir.push(onde + ' ' + k + ': número "' + m[1] + depois.split(/[ ,.]/).slice(0, 2).join(' ') + '"');
       }
       for (const m of semAspas.matchAll(/(?<!\p{L})\p{Lu}[\p{L}]+/gu)) {

@@ -52,7 +52,12 @@
 
   // O cartão em si: o mapa com as paradas acesas, o texto e o "procure". A lição do dia e o
   // dia do Conhecer Jesus montam o mesmo cartão, cada um com as próprias paradas e textos.
+  // "2 Samuel 7.16" não quebra entre o número e o nome do livro: no celular, o "2" sozinho no
+  // fim da linha parecia sobra de outra frase.
+  const colarLivro = (t) => String(t || '').replace(/(^|[^\p{L}\p{N}])([123]) (?=\p{Lu})/gu, '$1$2\u00a0');
   function cartao(acesas, texto, procure) {
+    texto = colarLivro(texto);
+    procure = colarLivro(procure);
     const paradas = dados().paradas || [];
     if (!paradas.length) return '';
     const nomes = paradas.filter((p) => acesas.has(p.id)).map((p) => p.nome);
@@ -99,7 +104,7 @@
     const rotuloSalto = salto ? (Number(salto[0]) === Number(cap) ? 'Ir ao versículo ' + salto[1] : 'Ir ao capítulo ' + salto[0]) : '';
     return '<aside class="leitor-guia" role="note">'
       + '<span class="etiqueta">' + CC.ico('bussola') + 'Guia de leitura' + (g.inteiro ? '' : ' · v. ' + g.de + ' a ' + g.ate) + '</span>'
-      + '<p>' + CC.esc(g.texto) + '</p>'
+      + '<p>' + CC.esc(colarLivro(g.texto)) + '</p>'
       + (salto ? '<button type="button" class="botao contorno pequeno" data-saltar="' + CC.esc(g.salto) + '">' + CC.esc(rotuloSalto) + CC.ico('baixo') + '</button>' : '')
       + '</aside>';
   };
