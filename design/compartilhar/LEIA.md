@@ -51,7 +51,17 @@ multidão, ilustração própria a partir de uma foto), praticantes (livro abert
 NBV), porta (porta entreaberta, Apocalipse 3.20 na NBV) e, na segunda leva, mesa (99 não é
 100), quemdeusdiz (texto em arcos de digital e o carimbo "Somos Geração Eleita"), comprado
 (código de barras com as cruzes), momento (a poltrona vazia), tenda (a tenda do encontro),
-diferente (a ovelha branca entre as escuras), custatudo (quem anda sozinho, com os outros borrados) coracao (as brasas embaixo do texto) naovivo (só tipografia em pincel, Gálatas 2.20 como lema), desistir (o texto em cruz), confie (o texto ondulando em fatias), inundados (a pessoa ajoelhada no AMOR), grandeobra (Neemias 6.3 como lema) e vigiem (Mateus 24.42 na NBV, citado). Em todas: chama e dias no topo, a
+diferente (a ovelha branca entre as escuras), custatudo (quem anda sozinho, com os outros borrados) coracao (as brasas embaixo do texto) naovivo (só tipografia em pincel, Gálatas 2.20 como lema), desistir (o texto em cruz), confie (o texto ondulando em fatias), inundados (a pessoa ajoelhada no AMOR), grandeobra (Neemias 6.3 como lema) e vigiem (Mateus 24.42 na NBV, citado). Na terceira leva, avivados,
+naotemas e rei foram refeitos "no padrão da landing page", como o dono pediu: o preto da
+landing com grão, a foto da landing em P&B com contraste apagando nas bordas (a mesma de
+src/landing/, copiada para src/story-fotos/: o culto, a cruz no monte, o rapaz de costas),
+uma cor só na foto (o sol amarelo da cruz; a luz do palco do culto tingida de amarelo),
+título em Oswald maiúsculo creme com a palavra final em amarelo e o risco de marcador, o
+rótulo da referência em sálvia entre traços, a coroa à mão e a etiqueta "is my" em sálvia.
+As fotos vêm com as artes (MODELOS[nome].fotos); sem elas, sai só a tipografia. O
+quemdeusdiz ganhou uma digital de verdade atrás do texto (as linhas antigas pareciam ondas
+no celular): cristas ovais em volta de um núcleo em espiral, minúcias que bifurcam ou
+terminam as cristas, espessura irregular, em cinza fraco. Em todas: chama e dias no topo, a
 arte no meio (encolhe por igual para caber entre y 560 e 1480) e só a marca no pé.
 O arquivo não entra no index.html: o build o publica à parte (`story-artes.<resumo>.js`), o
 app o carrega só na hora de gerar um story desses e o service worker o guarda; sem ele, o

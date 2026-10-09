@@ -724,7 +724,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
     const r = CC.lerRef(f.ref);
     return !r || biblias.some((b) => ((b.livros[r.livro] || [])[r.cap - 1] || []).slice(r.de - 1, r.ate).filter(Boolean).length !== r.ate - r.de + 1);
   })());
-  checar(frases.length === 43 && !longas.length, 'as 43 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
+  checar(frases.length === 46 && !longas.length, 'as 46 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
     + (longas.length ? ' (' + longas.map((f) => f.linhas[0]).join(', ') + ')' : ''));
   checar(!refsRuins.length, 'toda frase da ofensiva com referência aponta para versículos que existem nas duas Bíblias'
     + (refsRuins.length ? ' (' + refsRuins.map((f) => f.ref).join(', ') + ')' : ''));
@@ -767,7 +767,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01e-story-artes.js'), 'utf8'
   const S = CC.story;
   const comArte = CC.FRASES_OFENSIVA.filter((f) => f.arte);
   const sem = comArte.filter((f) => typeof S.artes[f.arte] !== 'function' || S.arteDaFrase({ linhas: f.linhas, ref: f.ref || '' }) !== f.arte);
-  checar(comArte.length === 22 && !sem.length, 'as 22 frases com arte têm modelo de story e o pedido da folha chega a ele'
+  checar(comArte.length === 25 && !sem.length, 'as 25 frases com arte têm modelo de story e o pedido da folha chega a ele'
     + (sem.length ? ' (' + sem.map((f) => f.arte).join(', ') + ')' : ''));
   checar(S.arteDaFrase({ linhas: ['Geração', 'inconformada'], ref: '' }) === null && S.arteDaFrase({ linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14' }) === 'luz',
     'frase sem arte usa o modelo de sempre; "Luz do mundo" usa o da lâmpada');

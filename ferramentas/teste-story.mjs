@@ -147,7 +147,7 @@ try {
   await av('(() => { const E = CC.estado(); E.marcadoEm = {}; for (let i = 0; i < 16; i++) E.marcadoEm["t" + i] = CC.somaDias(CC.hojeIso(), -i); return true; })()');
   ok(await av('CC.sequencia().atual') === 16, 'a conta de teste está com 16 dias de ofensiva');
   const artes = await av('CC.FRASES_OFENSIVA.filter((f) => f.arte).map((f) => ({ ...f }))');
-  ok(Array.isArray(artes) && artes.length === 22, 'há 22 frases com arte própria (' + (artes || []).map((f) => f.arte).join(', ') + ')');
+  ok(Array.isArray(artes) && artes.length === 25, 'há 25 frases com arte própria (' + (artes || []).map((f) => f.arte).join(', ') + ')');
   const fundos = new Set();
   // abre a folha com esta frase (o sorteio é trocado só aqui) e toca em Compartilhar
   const abrirECompartilhar = async (frase) => {
@@ -210,6 +210,11 @@ try {
   ok(await av('fetch("./index.html").then((r) => r.text()).then((t) => !t.includes("story-foto-"))'), 'o index.html não menciona a foto');
   const comFoto = await av('!!performance.getEntriesByType("resource").find((e) => e.name.includes(' + JSON.stringify(fotoReal) + ')) && CC.story.arteCompleta("suficiente")');
   ok(comFoto, 'o story "Jesus é suficiente" baixou a foto e saiu com ela');
+  // os do padrão da landing usam as fotos dela no meio da arte (story-foto-culto, -cruz, -abertura)
+  const landing = ['avivados', 'naotemas', 'rei'];
+  ok(await av('Promise.all(' + JSON.stringify(landing) + '.map((n) => CC.story.prepararArte(n))).then((l) => l.every(Boolean) && '
+    + JSON.stringify(landing) + '.every((n) => CC.story.arteCompleta(n)) && ["culto", "cruz", "abertura"].every((f) => /^story-foto-' + '[a-z]+\\.[0-9a-f]{10}\\.webp$/.test((window.STORY_FOTOS || {})[f] || "")))'),
+    'Avivados, Não temas e Jesus is my King baixam as fotos da landing (culto, cruz, abertura)');
   const mFoto = await abrirECompartilhar(suf);
   await av('location.reload(); true');
   await dormir(500);
