@@ -25,7 +25,12 @@ window.CC = window.CC || {};
     return el && getComputedStyle(el).overflowY === 'auto' ? el : null;
   };
   CC.rolagemY = () => { const el = areaRolavel(); return el ? el.scrollTop : scrollY; };
-  CC.rolarPara = (y) => { const el = areaRolavel(); if (el) el.scrollTop = y; else scrollTo(0, y); };
+  CC.rolagemMax = () => { const el = areaRolavel(); return Math.max(0, el ? el.scrollHeight - el.clientHeight : document.documentElement.scrollHeight - innerHeight); };
+  CC.rolarPara = (y, suave) => {
+    const el = areaRolavel();
+    if (!suave) { if (el) el.scrollTop = y; else scrollTo(0, y); return; }
+    (el || window).scrollTo({ top: y, behavior: 'smooth' });
+  };
 
   // Referência de versículo, num lugar só: "João 3.16" ou "1 João 4.7-8". O trecho vai até
   // MAX_TRECHO versículos seguidos do mesmo capítulo. Roda também no servidor.

@@ -8,6 +8,14 @@
 // 2. Balões: com o balão de um nó aberto (dia lido, dia de hoje, dia adiante, baú fechado) não
 //    há outro balão visível (o cartão de hoje, o "Abrir" do baú ou outro balão); o balão não
 //    cobre o nó tocado nem sai da tela; fechado, o cartão de hoje volta.
+// 3. A trilha não se mexe: o balão flutua por cima dela. Abrir e fechar (dia lido, de hoje,
+//    adiante, baú) não muda o offsetTop de nenhuma linha nem o desenho da estrada (o d do
+//    path), nem no meio da animação de saída. O balão de outro dia não cobre o cartão de hoje
+//    e fica entre a faixa da unidade grudada no alto e a barra de abas. Antes (f90d675) a linha
+//    do nó aberto ganhava a altura do balão de margem: a trilha esticava e a estrada ficava
+//    44px fora dos nós enquanto o balão saía.
+// 4. Centros: o centro desenhado de cada nó (inclusive o de hoje, maior) fica a 2px ou menos
+//    do ponto da estrada que é dele, em toda unidade aberta.
 //
 // Uso: CHROME=<chrome> node ferramentas/teste-trilha-estrada.mjs   (PORTA=<n> troca a porta)
 import { spawn } from 'node:child_process';
@@ -74,6 +82,55 @@ const VISIVEIS = `[...document.querySelectorAll('.pop-no:not(.saindo), .cartao-n
   for (let p = e; p; p = p.parentElement) { const c = getComputedStyle(p); if (c.display === 'none' || c.visibility === 'hidden') return false; }
   return true; }).map((e) => e.className.split(' ')[0])`;
 
+// O que não pode mudar com o balão: o topo de cada linha da trilha e o traço da estrada.
+const RETRATO = `[...document.querySelectorAll('.trilha .nos')].map((nos) => [...nos.querySelectorAll(':scope > .no-linha')].map((l) => l.offsetTop).join(',')
+  + '|' + [...nos.querySelectorAll('.estrada path')].map((p) => p.getAttribute('d')).join('|')).join('#')`;
+// Nós cujo centro na tela está a mais de 2px do ponto da estrada que é dele.
+const FORA_DO_CENTRO = `[...document.querySelectorAll('.trilha .nos')].flatMap((nos) => {
+  const p = nos.querySelector('.estrada .faixa-estrada'); if (!p) return ['sem estrada'];
+  const n = p.getAttribute('d').match(/-?[\\d.]+/g).map(Number);
+  const pts = [[n[0], n[1]]]; for (let i = 2; i < n.length; i += 6) pts.push([n[i + 4], n[i + 5]]);
+  const r = nos.getBoundingClientRect();
+  return [...nos.querySelectorAll('.no, .no-bau, .no-marco')].map((el, i) => {
+    const b = el.getBoundingClientRect(); const pt = pts[i] || [1e9, 1e9];
+    const dist = Math.hypot(b.left + b.width / 2 - r.left - pt[0], b.top + b.height / 2 - r.top - pt[1]);
+    return dist > 2 ? (el.dataset.dia ? 'dia ' + el.dataset.dia : el.dataset.bau ? 'baú ' + el.dataset.bau : 'troféu') + (el.classList.contains('atual') ? ' (hoje)' : '') + ' a ' + Math.round(dist) + 'px' : '';
+  }).filter(Boolean);
+})`;
+// Onde o balão aberto está: se cobre o nó tocado ou o cartão de hoje (quando o nó é outro) e se
+// fica inteiro entre a faixa da unidade grudada no alto e a barra de abas.
+const GEOMETRIA = (sel) => `(() => { const pop = document.querySelector('.pop-no:not(.saindo)'); if (!pop) return null;
+  const p = pop.getBoundingClientRect(); const no = document.querySelector('${sel}'); const n = no.getBoundingClientRect();
+  const cruza = (a, b) => !(a.bottom <= b.top || a.top >= b.bottom || a.right <= b.left || a.left >= b.right);
+  const cartao = document.querySelector('.cartao-no-hoje'); const linha = no.closest('.no-linha');
+  const faixa = no.closest('.nos').previousElementSibling; const f = faixa.getBoundingClientRect();
+  const nav = document.getElementById('navegacao').getBoundingClientRect();
+  return { cobre: cruza(p, n), cobreHoje: !!cartao && !linha.contains(cartao) && cruza(p, cartao.getBoundingClientRect()),
+    dentro: p.left >= 0 && p.right <= innerWidth && p.top >= Math.max(0, f.bottom) - 1 && p.bottom <= Math.min(innerHeight, nav.top) + 1 }; })()`;
+
+// Abre o balão do nó, confere que a trilha não se mexeu (aberto, no meio da saída e fechado)
+// e devolve a geometria do balão aberto.
+async function balaoSemMexer(sel, rotulo) {
+  await av(`(() => { document.querySelector('${sel}').scrollIntoView({ block: 'center' }); return 1; })()`);
+  await dormir(150);
+  const antes = await av(RETRATO);
+  await av(`document.querySelector('${sel}').click(); 1`);
+  await dormir(700);
+  const aberto = await av(RETRATO);
+  const g = await av(GEOMETRIA(sel));
+  ok(!!g && aberto === antes, rotulo + ': abrir o balão não muda a posição de nenhum nó nem a estrada');
+  ok(g && !g.cobre && !g.cobreHoje && g.dentro, rotulo + ': o balão não cobre o nó tocado nem o cartão de hoje e cabe entre a faixa e a barra (' + JSON.stringify(g) + ')');
+  return { antes, g };
+}
+async function fecharSemMexer(antes, rotulo) {
+  await av('document.body.click(); 1');
+  await dormir(60);
+  const saindo = await av(RETRATO);
+  await dormir(400);
+  const fechado = await av(RETRATO);
+  ok(saindo === antes && fechado === antes, rotulo + ': fechar o balão não muda a posição de nenhum nó nem a estrada');
+}
+
 // Põe a conta com os dias 1..lidos feitos e o dia seguinte como o de hoje.
 async function preparar(lidos, todas) {
   await av(`(() => { const E = CC.estado(); E.lidos.splice(0, E.lidos.length, ...Array.from({ length: ${lidos} }, (_, i) => i + 1));
@@ -116,6 +173,9 @@ for (const [W, H] of [[360, 740], [390, 844]]) {
         ok(m && m.length >= (todas ? 12 : 1) && pior.dist <= 6,
           W + ' ' + tema + ', ' + caso.nome + (todas ? ', todas abertas' : '') + ': a estrada chega ao troféu ('
           + (m ? m.length : 0) + ' unidades, maior distância ' + pior.dist + 'px' + (pior.dist > 6 ? ' na unidade ' + pior.u : '') + ')');
+        const fora = await av(FORA_DO_CENTRO);
+        ok(Array.isArray(fora) && fora.length === 0 && await av("!!document.querySelector('.trilha .no.atual')") === true,
+          W + ' ' + tema + ', ' + caso.nome + (todas ? ', todas abertas' : '') + ': cada nó, o de hoje inclusive, centrado na estrada' + (fora && fora.length ? ' (' + fora.slice(0, 4).join('; ') + ')' : ''));
       }
     }
 
@@ -129,31 +189,27 @@ for (const [W, H] of [[360, 740], [390, 844]]) {
       ['[data-dia="5"]', 'dia lido longe de hoje'],
     ];
     for (const [sel, nome] of alvos) {
-      await av(`(() => { const b = document.querySelector('${sel}'); b.scrollIntoView({ block: 'center' }); return 1; })()`);
-      await dormir(150);
-      await av(`document.querySelector('${sel}').click(); 1`);
-      await dormir(700);
+      const { antes: retrato } = await balaoSemMexer(sel, W + ' ' + tema + ', balão do ' + nome);
       const vis = await av(VISIVEIS);
       ok(vis.length === 1 && vis[0] === 'pop-no', W + ' ' + tema + ', balão do ' + nome + ': só ele visível (' + vis.join(', ') + ')');
-      const g = await av(`(() => { const p = document.querySelector('.pop-no:not(.saindo)').getBoundingClientRect(); const n = document.querySelector('${sel}').getBoundingClientRect();
-        return { cobre: !(p.bottom <= n.top || p.top >= n.bottom || p.right <= n.left || p.left >= n.right), dentro: p.left >= 0 && p.right <= innerWidth && p.top >= 0 && p.bottom <= innerHeight }; })()`);
-      ok(g && !g.cobre && g.dentro, W + ' ' + tema + ', balão do ' + nome + ': não cobre o nó tocado e fica na tela (' + JSON.stringify(g) + ')');
-      await av('document.body.click(); 1');
-      await dormir(450);
+      await fecharSemMexer(retrato, W + ' ' + tema + ', balão do ' + nome);
       const depois = await av(VISIVEIS);
       ok(depois.includes('cartao-no-hoje') && !depois.includes('pop-no'), W + ' ' + tema + ', balão do ' + nome + ' fechado: o cartão de hoje volta (' + depois.join(', ') + ')');
     }
-    // dia adiante e baú fechado: hoje no dia 3, o dia 10 e o baú do dia 14 ainda vêm
+    // dia adiante e baú fechado: hoje no dia 3, o dia 10 e o baú do dia 14 ainda vêm; o dia 2
+    // (lido, logo acima do cartão de hoje) e o 4 (logo abaixo), colados ao cartão
     await preparar(2, false);
-    for (const [sel, nome] of [['[data-dia="10"]', 'dia adiante'], ['[data-bau="14"]', 'baú fechado']]) {
-      await av(`(() => { document.querySelector('${sel}').scrollIntoView({ block: 'center' }); return 1; })()`);
-      await dormir(150);
-      await av(`document.querySelector('${sel}').click(); 1`);
-      await dormir(700);
+    for (const [sel, nome] of [['[data-dia="10"]', 'dia adiante'], ['[data-bau="14"]', 'baú fechado'], ['[data-dia="2"]', 'dia lido colado ao de hoje'], ['[data-dia="4"]', 'dia seguinte ao de hoje']]) {
+      const { antes: retrato } = await balaoSemMexer(sel, W + ' ' + tema + ', balão do ' + nome);
       const vis = await av(VISIVEIS);
       ok(vis.length === 1 && vis[0] === 'pop-no', W + ' ' + tema + ', balão do ' + nome + ': só ele visível (' + vis.join(', ') + ')');
-      await av('document.body.click(); 1');
-      await dormir(450);
+      await fecharSemMexer(retrato, W + ' ' + tema + ', balão do ' + nome);
+    }
+    // outra unidade: hoje no dia 45 (unidade 2), com todas abertas; dias lidos, hoje e adiante
+    await preparar(44, true);
+    for (const [sel, nome] of [['[data-dia="44"]', 'dia lido (unidade 2)'], ['[data-dia="45"]', 'dia de hoje (unidade 2)'], ['[data-dia="50"]', 'dia adiante (unidade 2)'], ['[data-dia="100"]', 'dia adiante (unidade 4)']]) {
+      const { antes: retrato } = await balaoSemMexer(sel, W + ' ' + tema + ', balão do ' + nome);
+      await fecharSemMexer(retrato, W + ' ' + tema + ', balão do ' + nome);
     }
   }
 }

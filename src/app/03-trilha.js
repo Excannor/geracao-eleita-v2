@@ -146,9 +146,11 @@
     const legenda = 'Dia ' + numero + ', ' + passagemDe(dia) + (feito ? ', lido' : '')
       + (fechados.length ? '. Fecha ' + fechados.join(' e ') : '');
 
-    // O nó de hoje vai à borda da curva, para o cartão ao lado caber.
+    // O nó de hoje vai à borda da curva, para o cartão ao lado caber. No meio da curva (x0 = 0)
+    // ele ia de uma vez à borda oposta à do dia anterior (+49, -70, -49) e a estrada fazia um
+    // cotovelo; agora vai só até o lado do dia seguinte (+49, -49, -49), que já está a caminho.
     const x0 = deslocamento(passo);
-    const x = atual ? (x0 > 0 || (x0 === 0 && passo % 8 === 0) ? AMPLITUDE : -AMPLITUDE) : x0;
+    const x = !atual ? x0 : x0 === 0 ? deslocamento(passo + 1) : (x0 > 0 ? AMPLITUDE : -AMPLITUDE);
     const lado = ladoDoRotulo(x, passo);
     // Repete a legenda do botão: fora do leitor de tela. O de hoje é um cartão com o botão.
     const rotulo = atual ? cartaoDoNoDeHoje(numero, feito, lado)
@@ -500,6 +502,10 @@
     });
   }
 
+  // A estrada segue o layout final: refeita no próximo quadro, quando as fontes chegam e sempre
+  // que a largura da trilha ou o tamanho de uma unidade aberta muda (uma fonte que chega tarde,
+  // o rótulo do troféu que quebra em duas linhas). Antes só a largura era vigiada, e uma mudança
+  // de altura dentro de .nos deixava a estrada desenhada sobre posições antigas.
   let observador = null;
   function vigiarEstrada(raiz) {
     const trilha = raiz.querySelector('.trilha');
@@ -507,11 +513,18 @@
     requestAnimationFrame(desenhar);
     if (document.fonts) document.fonts.ready.then(desenhar);
     if (observador) observador.disconnect();
-    let largura = 0;
-    if (window.ResizeObserver) {
-      observador = new ResizeObserver(([r]) => { if (Math.round(r.contentRect.width) !== largura) { largura = Math.round(r.contentRect.width); desenhar(); } });
-      observador.observe(trilha);
-    }
+    if (!window.ResizeObserver) return;
+    const tamanhos = new WeakMap();
+    observador = new ResizeObserver((registros) => {
+      let mudou = false;
+      registros.forEach((r) => {
+        const t = Math.round(r.contentRect.width) + 'x' + Math.round(r.contentRect.height);
+        if (tamanhos.get(r.target) !== t) { tamanhos.set(r.target, t); mudou = true; }
+      });
+      if (mudou) desenhar();
+    });
+    observador.observe(trilha.querySelector('.trilha-caminho') || trilha);
+    trilha.querySelectorAll('.nos').forEach((nos) => observador.observe(nos));
   }
 
   // A seta que aparece quando o dia de hoje sai da tela, como no aplicativo de referência.
@@ -562,23 +575,76 @@
 
   // ---------- balão do nó ----------
   function fecharPop() {
-    const raizes = new Set();
-    document.querySelectorAll('.pop-no').forEach((p) => {
-      const linha = p.closest('.no-linha');
-      const raiz = p.closest('.conteudo') || document;
-      if (linha) linha.style.removeProperty('--altura-pop');
-      raizes.add(raiz);
-      CC.sair(p, 140);
-    });
+    document.querySelectorAll('.pop-no').forEach((p) => CC.sair(p, 140));
     document.querySelectorAll('.no.aberto').forEach((n) => n.classList.remove('aberto'));
-    // O pop sai com animação; redesenha depois de ele deixar o documento e de as margens
-    // voltarem ao tamanho normal.
-    if (raizes.size) setTimeout(() => raizes.forEach((raiz) => desenharEstradas(raiz)), 160);
   }
   CC.fecharPopNo = fecharPop;
   document.addEventListener('click', (ev) => {
     if (!ev.target.closest || !ev.target.closest('.pop-no')) fecharPop();
   });
+
+  // O balão flutua por cima da trilha: é absoluto na linha do nó e não ocupa lugar no fluxo,
+  // então abrir e fechar não mexe em nenhum nó nem na estrada (f90d675 reservava a altura dele
+  // na margem da linha: a trilha esticava ao abrir e a estrada ficava 44px fora dos nós durante
+  // o fechamento). Aqui só se escolhe onde ele fica: abaixo do nó, com a seta para cima; não
+  // cabendo, acima, com a seta para baixo; e, se o cartão de hoje estiver colado ao nó, do outro
+  // lado do cartão, sem seta. Ele nunca cobre o nó tocado nem o cartão de hoje, fica dentro da
+  // unidade (não entra na faixa grudada no alto) e a tela rola o mínimo para ele caber inteiro
+  // entre a faixa da unidade e a barra de abas.
+  function posicionarPop(pop, botao, linha) {
+    const nos = linha.closest('.nos');
+    if (!nos) return;
+    const topoEm = (el) => { let y = 0; for (let e = el; e && e !== nos; e = e.offsetParent) y += e.offsetTop; return y; };
+    const h = pop.offsetHeight;
+    const linhaY = topoEm(linha);
+    const noTopo = topoEm(botao);
+    const noBase = noTopo + botao.offsetHeight;
+    // o nó de hoje tem o halo de 14px em volta: a seta encosta no halo, não no nó
+    const vao = botao.classList.contains('atual') ? 26 : 14;
+    // o cartão de hoje (centrado na linha dele), quando o nó tocado é outro
+    let obst = null;
+    const hoje = nos.querySelector('.no-linha.hoje');
+    if (hoje && hoje !== linha) {
+      const y0 = topoEm(hoje);
+      const meio = y0 + hoje.offsetHeight / 2;
+      const cartao = hoje.querySelector('.cartao-no-hoje');
+      const meiaAltura = Math.max(hoje.offsetHeight, cartao ? cartao.offsetHeight : 0) / 2 + 18;
+      obst = [meio - meiaAltura, meio + meiaAltura];
+    }
+    const cruza = (y) => obst && y < obst[1] && y + h > obst[0];
+    const opcoes = [{ y: noBase + vao, lado: 'abaixo', peso: 0 }, { y: noTopo - vao - h, lado: 'acima', peso: 40 }];
+    const meioNo = (noTopo + noBase) / 2;
+    if (obst && obst[0] + obst[1] > 2 * meioNo) opcoes.push({ y: Math.max(obst[1], noBase + vao), lado: 'solto', peso: 400 });
+    else if (obst) opcoes.push({ y: Math.min(obst[0], noTopo - vao) - h, lado: 'solto', peso: 400 });
+    // a área visível: abaixo da faixa da unidade grudada no alto e acima da barra de abas
+    const faixa = nos.previousElementSibling;
+    const alto = faixa && faixa.classList.contains('faixa-unidade') && getComputedStyle(faixa).position === 'sticky'
+      ? (parseFloat(getComputedStyle(faixa).top) || 0) + faixa.offsetHeight + 8 : 8;
+    const barra = document.getElementById('navegacao');
+    const caixaBarra = barra && barra.offsetHeight ? barra.getBoundingClientRect() : null;
+    const baixo = (caixaBarra && caixaBarra.top < innerHeight ? caixaBarra.top : innerHeight) - 12;
+    const topoNos = nos.getBoundingClientRect().top;
+    const rolagem = CC.rolagemY();
+    const maxRolagem = CC.rolagemMax();
+    let melhor = null;
+    for (const o of opcoes) {
+      if (o.y < 4 || o.y + h > nos.offsetHeight + 8 || cruza(o.y)) continue;
+      const a = topoNos + Math.min(o.y, noTopo) - 4;
+      const b = topoNos + Math.max(o.y + h, noBase) + 4;
+      if (b - a > baixo - alto) continue;
+      let d = 0;
+      if (b > baixo) d = b - baixo;
+      if (a - d < alto) d = a - alto;
+      const destino = Math.min(maxRolagem, Math.max(0, rolagem + d));
+      if (a - (destino - rolagem) < alto - 1 || b - (destino - rolagem) > baixo + 1) continue;
+      const custo = Math.abs(d) + o.peso;
+      if (!melhor || custo < melhor.custo) melhor = { ...o, d: destino - rolagem, custo };
+    }
+    if (!melhor) melhor = { ...opcoes[0], d: 0 };
+    pop.classList.add(melhor.lado);
+    pop.style.top = Math.round(melhor.y - linhaY) + 'px';
+    if (Math.abs(melhor.d) >= 1) CC.rolarPara(rolagem + melhor.d, !CC.semMovimento());
+  }
 
   function montarPop(botao, classe, interno) {
     const ja = botao.classList.contains('aberto');
@@ -591,17 +657,7 @@
     pop.innerHTML = interno;
     linha.appendChild(pop);
     botao.classList.add('aberto');
-    // Reserva no fluxo exatamente a altura do balão. Assim o próximo nó/cartão desce e a
-    // estrada pode ser recalculada pelos novos offsetTop, sem estimativas por conteúdo.
-    linha.style.setProperty('--altura-pop', Math.ceil(pop.getBoundingClientRect().height) + 'px');
-    const raiz = linha.closest('.conteudo') || document;
-    desenharEstradas(raiz);
-    // Perto do fim da tela, a trilha rola o suficiente para o balão caber inteiro.
-    requestAnimationFrame(() => {
-      const caixa = pop.getBoundingClientRect();
-      const falta = caixa.bottom - (innerHeight - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alt-barra')) || 68) - 12);
-      if (falta > 0) scrollBy({ top: falta, behavior: CC.semMovimento() ? 'auto' : 'smooth' });
-    });
+    posicionarPop(pop, botao, linha);
     return pop;
   }
 

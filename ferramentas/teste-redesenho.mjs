@@ -13,7 +13,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Contas } from '../contas.mjs';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8212;
+const PORTA = Number(process.env.PORTA) || 8212;
 // Porta sorteada a cada rodada: com porta fixa, um Chrome que sobrou respondia no lugar.
 const DEPURACAO = await portaLivre();
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
@@ -273,21 +273,32 @@ await esperar('!' + existe('.licao'));
 ok(await esperar(existe('.cortina'), 4000), 'depois da primeira leitura, a conta nova vê o tutorial de instalar');
 await av('document.querySelectorAll(".cortina").forEach((c) => c.remove()), true');
 
-// Com o dia 1 lido, o dia 2 tem o cartão lateral. Abrir a revisão do dia 1 não pode pôr o
-// balão por cima desse cartão, e o troféu precisa continuar no mesmo centro usado pela estrada.
+// Com o dia 1 lido, o dia 2 tem o cartão lateral. O balão de revisão do dia 1 flutua por cima
+// da trilha: não cobre esse cartão nem o nó tocado, e a trilha não se mexe (o topo de cada linha
+// e o traço da estrada ficam idênticos antes e depois de abrir). Antes (f90d675) a linha do
+// balão ganhava a altura dele de margem e a trilha esticava a cada toque.
+const retratoTrilha = `[...document.querySelectorAll('.trilha .nos')].map((nos) => [...nos.querySelectorAll(':scope > .no-linha')].map((l) => l.offsetTop).join(',')
+  + '|' + [...nos.querySelectorAll('.estrada path')].map((p) => p.getAttribute('d')).join('|')).join('#')`;
+const trilhaAntes = await av(retratoTrilha);
 await clicar('.no[data-dia="1"]');
 ok(await esperar(existe('.no-linha:has(.no[data-dia="1"]) .pop-no')), 'o dia lido abre o balão de revisão');
+await dormir(700);
 ok(await av(`(() => {
+  const cruza = (a, b) => !(a.bottom <= b.top || a.top >= b.bottom || a.right <= b.left || a.left >= b.right);
   const pop = document.querySelector('.no-linha:has(.no[data-dia="1"]) .pop-no').getBoundingClientRect();
-  const hoje = document.querySelector('.no-linha.hoje').getBoundingClientRect();
-  return pop.bottom + 8 <= hoje.top;
-})()`), 'o balão de revisão reserva espaço e não cobre o cartão do dia atual');
+  const cartao = document.querySelector('.no-linha.hoje .cartao-no-hoje').getBoundingClientRect();
+  const no = document.querySelector('.no[data-dia="1"]').getBoundingClientRect();
+  return !cruza(pop, cartao) && !cruza(pop, no);
+})()`), 'o balão de revisão não cobre o cartão do dia atual nem o nó tocado');
+ok(await av(retratoTrilha) === trilhaAntes, 'abrir o balão de revisão não mexe na trilha: nós e estrada no mesmo lugar');
 ok(await av(`(() => {
   const linha = document.querySelector('.nos .linha-marco').getBoundingClientRect();
   const trofeu = document.querySelector('.nos .linha-marco .no-marco').getBoundingClientRect();
   return Math.abs((linha.left + linha.width / 2) - (trofeu.left + trofeu.width / 2)) <= 1;
 })()`), 'o troféu fica no centro usado pelo fim da estrada');
 await clicar('.no[data-dia="1"]');
+await dormir(400);
+ok(await av(retratoTrilha) === trilhaAntes, 'fechar o balão de revisão não mexe na trilha');
 
 // ---------- convite e propósito ----------
 const bruno = await criarConta('bruno', 'Bruno');

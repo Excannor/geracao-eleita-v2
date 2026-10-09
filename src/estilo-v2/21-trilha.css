@@ -188,6 +188,9 @@
 .no.travado, .no.travado:active, .no.travado.aberto { background: var(--cartao); color: var(--tinta-fraca); box-shadow: inset 0 0 0 1.5px var(--contorno); }
 .no.travado .face svg { width: 18px; height: 18px; stroke-width: 2; }
 .no.atual { width: 64px; height: 64px; box-shadow: 0 0 0 14px var(--salvia-palido); }
+/* maior só para os olhos: a margem negativa devolve os 6px, a caixa no fluxo fica com os 58px
+   dos outros nós e o centro dele não depende do tamanho (a estrada liga centros) */
+.no.atual { margin: -3px; }
 .no.atual:not(.feito) { --cor: var(--salvia); color: var(--salvia-tinta); }
 .no.atual .face svg { width: 26px; height: 26px; }
 .no .anel-atual {
@@ -240,24 +243,28 @@
 .rotulo-no { margin-top: 12px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
 .praticar-unidade { min-height: 44px; padding: 0 18px 0 14px; color: var(--salvia-texto); font-size: .875rem; text-decoration: none; }
 
-/* o balão do dia: cartão solto, abaixo do nó e do cartão de hoje (nunca por cima dele) */
+/* o balão do dia: cartão flutuante ancorado ao nó, com sombra e seta. Absoluto, fora do fluxo:
+   abrir e fechar não muda a altura de nada nem a estrada. O lugar (abaixo, acima ou do outro
+   lado do cartão de hoje) e a rolagem para ele caber vêm de 03-trilha.js (posicionarPop). */
 .pop-no, .pop-no.adiante { top: calc(100% + 12px); padding: 20px; border: 0; border-radius: 24px; background: var(--cartao); color: var(--tinta-fraca); box-shadow: var(--sombra-flutuante); }
 .no-linha.hoje .pop-no { top: calc(100% + 24px); }
 .pop-no::before, .pop-no.adiante::before { top: -7px; border: 0; background: var(--cartao); }
+.pop-no.acima::before { top: auto; bottom: -7px; }
+.pop-no.solto::before { display: none; }
+.pop-no.acima:not(.saindo) { animation-name: abrir-pop-acima; }
+@keyframes abrir-pop-acima {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px) scale(.94); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
 .pop-no .titulo-pop, .pop-no.adiante .titulo-pop { color: var(--tinta-forte); font-weight: 800; }
 .pop-no .sub-pop, .pop-no.adiante .sub-pop { color: inherit; font-weight: 500; opacity: 1; }
 .pop-no .fala-bento { border: 0; margin: 8px 0 4px; padding: 12px 14px; border-radius: 18px; color: var(--tinta-forte); font-weight: 600; }
 .pop-no .botao.contorno { background: var(--campo); }
 /* aberto, o balão fica acima dos outros nós, mas passa por baixo da faixa da unidade, que
    gruda no alto (antes o nó e o balão rolavam por cima dela); a folha do Início rola com a
-   trilha (5bb4ad1) */
-.no-linha:has(.pop-no) {
-  z-index: 15;
-  /* O balão é absoluto para continuar ancorado ao nó, mas a altura dele precisa participar
-     do ritmo da trilha. Sem esta reserva, abrir um dia lido põe o balão por cima do cartão
-     do dia atual e deixa a estrada desenhada sobre posições que já não correspondem aos nós. */
-  margin-bottom: calc(20px + var(--altura-pop, 180px) + 24px);
-}
+   trilha (5bb4ad1). Sem margem extra: reservar a altura do balão na linha (f90d675) esticava
+   a trilha a cada toque. */
+.no-linha:has(.pop-no) { z-index: 15; }
 /* um balão por vez: com o balão de qualquer nó aberto (de hoje, de um dia lido, de um dia
    adiante ou do baú), o cartão de hoje e o "Abrir" do baú saem de vista; ao fechar, voltam.
    Antes só o balão do próprio dia de hoje escondia o cartão, e o balão do dia anterior abria
