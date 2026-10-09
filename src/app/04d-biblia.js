@@ -111,7 +111,8 @@
       const antigo = livros.filter((l) => !CC.ehNovoTestamento(l));
       const novo = livros.filter((l) => CC.ehNovoTestamento(l));
       // O título abre a escolha da tradução: a sigla da atual fica à vista ao lado.
-      alvo.innerHTML = '<div class="folha-biblia"><h1 class="titulo-biblia"><button class="botao-versao" data-versao aria-haspopup="dialog" aria-label="Bíblia, tradução '
+      alvo.innerHTML = '<div class="folha-biblia"><a class="botao-redondo atalho-anotacoes" href="#/perfil/anotacoes" aria-label="Minhas anotações">' + CC.ico('caderno') + '</a>'
+        + '<h1 class="titulo-biblia"><button class="botao-versao" data-versao aria-haspopup="dialog" aria-label="Bíblia, tradução '
         + CC.esc(b.nome.replace(/Biblica® Open |™/g, '')) + '. Trocar a tradução">Bíblia<span class="sigla-versao">'
         + CC.esc(b.abreviatura || b.sigla.toUpperCase()) + CC.ico('baixo') + '</span></button></h1>'
         + '<p class="subtitulo-tela">Escolha um livro e leia à vontade, no seu ritmo.</p>'

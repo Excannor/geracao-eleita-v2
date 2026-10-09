@@ -118,14 +118,6 @@
 .trofeu .arte-trofeu { --cor: var(--salvia); --cor-3d: var(--salvia-texto); --trilho: color-mix(in srgb, var(--tinta-fraca) 30%, var(--cartao)); }
 .trofeu .detalhe { stroke: var(--cartao) !important; }
 
-/* minhas anotações: o dia e a contagem em cima, a passagem inteira embaixo */
-.cartao-caderno { border-radius: var(--raio-cartao); }
-.cartao-caderno summary { flex-wrap: wrap; gap: 6px 12px; min-height: 64px; padding: 16px 20px; }
-.cartao-caderno .rotulo-dia-caderno { padding: 4px 12px; background: var(--salvia-palido); color: var(--salvia-texto); font-size: .8125rem; font-weight: 700; }
-.cartao-caderno .conta-caderno { order: 1; margin-left: auto; font-size: .8125rem; }
-.cartao-caderno .passagem-caderno { order: 2; flex: 1 0 100%; white-space: normal; }
-.cartao-caderno .campos-caderno { padding: 16px 20px 12px; border-top: 1px solid var(--contorno); }
-.cartao-caderno .campos-caderno b { font-size: .8125rem; color: var(--tinta-fraca); }
 /* Minha história: as caixas de escrever são cartões sobre o fundo */
 [data-rota=perfil] textarea[id^=campo-historia] { min-height: 128px; padding: 14px 16px; border-color: var(--cartao); border-radius: 22px; background: var(--cartao); }
 #salvo-historia:empty { display: none; }

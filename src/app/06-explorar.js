@@ -514,13 +514,12 @@
         saida.push({ onde: 'Dia ' + dia + ' · ' + rotulo, texto: texto.trim(), href: '#/dia/' + dia });
       }
     }
+    const TIPO = { nota: 'Nota', oracao: 'Oração', estudo: 'Estudo' };
+    for (const n of CC.notas()) {
+      saida.push({ onde: TIPO[n.tipo] + (n.versos[0] ? ' · ' + n.versos[0] : ''), texto: n.texto.trim(), href: '#/perfil/anotacoes' });
+    }
     for (const [chave, texto] of Object.entries(E.anotacoes || {})) {
-      if (!texto || !texto.trim()) continue;
-      if (chave.startsWith('verso:')) {
-        const ref = chave.slice(6);
-        saida.push({ onde: 'Nota · ' + ref, texto: texto.trim(), href: CC.hrefDoVerso(ref) });
-        continue;
-      }
+      if (!texto || !texto.trim() || chave.startsWith('verso:')) continue;
       const alvo = chave.replace(/^(nota|secao):/, '');
       const nome = D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : ((secaoDe(alvo) || {}).rotulo || alvo);
       saida.push({
@@ -565,13 +564,8 @@
     });
 
     const porNota = [];
-    const porVerso = [];
     for (const [chave, texto] of Object.entries(E.anotacoes || {})) {
-      if (!texto || !texto.trim()) continue;
-      if (chave.startsWith('verso:')) {
-        porVerso.push({ ref: chave.slice(6), texto: texto.trim(), href: CC.hrefDoVerso(chave.slice(6)) });
-        continue;
-      }
+      if (!texto || !texto.trim() || chave.startsWith('verso:')) continue;
       const alvo = chave.replace(/^(nota|secao):/, '');
       const ehNota = chave.startsWith('nota:');
       const nome = ehNota ? (D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : alvo)
@@ -581,9 +575,10 @@
         texto: texto.trim(),
         href: ehNota ? '#/nota/' + encodeURIComponent(alvo) : '#/secao/' + encodeURIComponent(alvo),
         dias: ehNota ? (diasPorNota.get(alvo) || []) : [],
+        chave,
       });
     }
-    return { porDia, porNota, porVerso };
+    return { porDia, porNota };
   };
 
   CC.vazio = function (raiz, mensagem) {

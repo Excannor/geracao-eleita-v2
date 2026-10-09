@@ -1,0 +1,141 @@
+/* =========================================================================
+   REDESENHO V2 · 28 · anotações: a barra do versículo com "Escrever nota", o editor de nota
+   em folha alta, a etiqueta de nota no leitor e a tela Minhas anotações (07g-anotacoes.js).
+   Só fichas do guia; as cores de marca (--marca-1..4) já trocam de tema sozinhas.
+   ========================================================================= */
+
+/* ---------- a barra do versículo ---------- */
+.acoes-verso .ref-verso:has(small) { padding-top: 4px; line-height: 1.3; }
+.acoes-verso .ref-verso small { display: block; margin-top: 2px; color: var(--tinta-fraca); font-size: .875rem; font-weight: 500; }
+.previa-nota { display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 14px 16px; border: 0; border-radius: 20px; background: var(--salvia-palido); color: var(--tinta-forte); font: inherit; text-align: left; cursor: pointer; }
+.previa-nota svg { flex: none; width: 22px; height: 22px; margin-top: 1px; color: var(--salvia-texto); }
+.previa-nota b { display: block; font-size: .9375rem; }
+.previa-nota .resumo { display: -webkit-box; overflow: hidden; color: var(--tinta); font-size: .9375rem; line-height: 1.45; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.cor-marca.sem-cor { display: inline-grid; place-items: center; border: 2px dashed var(--contorno); background: transparent; color: var(--tinta-fraca); }
+.cor-marca.sem-cor svg { width: 22px; height: 22px; }
+.cor-marca.sem-cor[aria-pressed="true"] { border-style: solid; border-color: var(--tinta-forte); box-shadow: none; color: var(--tinta-forte); }
+.acoes-verso .botao.escrever-nota { width: 100%; min-height: 56px; background: var(--inverso); color: var(--inverso-tinta); font-size: 1.0625rem; }
+.acoes-verso.no-cartao .botao.escrever-nota { margin-top: 0; }
+
+/* ---------- a etiqueta de nota no leitor: caneta e número ---------- */
+.etiqueta-nota { position: relative; display: inline-flex; align-items: center; gap: 3px; height: 28px; margin-left: 6px; padding: 0 9px; border: 0; border-radius: 999px; background: var(--salvia-palido); color: var(--salvia-texto); font: 700 .8125rem/1 var(--fonte); vertical-align: middle; cursor: pointer; }
+.etiqueta-nota svg { width: 14px; height: 14px; }
+.etiqueta-nota::after { content: attr(data-n); }
+.etiqueta-nota::before { content: ''; position: absolute; inset: -8px -4px; }
+.leitor-verso[class*="marca-"] .etiqueta-nota { background: var(--cartao); }
+
+/* ---------- o editor (folha alta) ---------- */
+.folha.folha-editor { min-height: 80vh; padding-top: 24px; }
+.cabeca-editor { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin-bottom: 16px; }
+.cabeca-editor h2 { margin: 0; font-size: 1.125rem; text-align: center; }
+.cabeca-editor .botao { width: auto; }
+.cabeca-editor .botao.plano { justify-self: start; padding-left: 4px; }
+.cabeca-editor [data-guardar] { justify-self: end; }
+.chips-nota { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips-nota > span { display: contents; }
+.chip-nota { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--salvia-palido); color: var(--salvia-texto); font: 700 .9375rem var(--fonte); }
+.chip-nota svg { width: 18px; height: 18px; }
+.chip-nota.mais { box-shadow: inset 0 0 0 1.5px var(--contorno); background: none; color: var(--tinta-forte); }
+.chip-nota .tirar { display: inline-grid; place-items: center; width: 40px; height: 44px; margin-right: -14px; padding: 0; border: 0; background: none; color: inherit; }
+.por-nota { display: flex; gap: 8px; margin-top: 10px; }
+.por-nota input, .campo-nota { box-sizing: border-box; min-width: 0; border: 1.5px solid var(--contorno); border-radius: 18px; background: var(--campo); color: var(--tinta-forte); font: 600 1rem/1.5 var(--fonte); }
+.por-nota input { flex: 1; min-height: 48px; padding: 0 16px; }
+.por-nota .botao { width: auto; }
+.trecho-editor { margin: 14px 0 0; padding: 14px 16px; border-left: 4px solid var(--salvia-texto); border-radius: 20px; background: var(--campo); color: var(--tinta); font-family: var(--fonte-biblia); font-size: 1.0625rem; line-height: 1.5; }
+.trecho-editor span { display: -webkit-box; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.trecho-editor.aberto span { display: block; }
+.ver-trecho { min-height: 44px; padding: 0; border: 0; background: none; color: var(--salvia-texto); font: 700 .9375rem var(--fonte); cursor: pointer; }
+.tipo-nota { margin: 14px 0 12px; }
+.campo-nota { width: 100%; min-height: 168px; padding: 14px 16px; font-weight: 500; resize: vertical; }
+.campo-nota:focus, .por-nota input:focus { border-color: var(--salvia-texto); outline: none; }
+.ajuda-nota { margin: 8px 0 0; font-size: .875rem; font-weight: 600; }
+.folha p.rotulo-editor { margin: 18px 0 8px; color: var(--tinta-forte); font-size: .9375rem; font-weight: 700; }
+.folha-editor .cores-marca { gap: 12px; }
+.folha-editor [data-apagar] { width: 100%; margin-top: 8px; }
+
+/* a linha do cadeado: tocável, leva à folha "Como guardamos suas anotações" */
+.aviso-privado { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; margin-top: 18px; padding: 8px 0; border: 0; border-top: 1px solid var(--contorno); background: none; color: var(--tinta-fraca); font: 600 .875rem/1.4 var(--fonte); text-align: left; cursor: pointer; }
+.aviso-privado svg { flex: none; width: 20px; height: 20px; color: var(--salvia-texto); }
+.aviso-privado u { margin-left: auto; color: var(--salvia-texto); font-weight: 700; white-space: nowrap; }
+.lista-privada { display: grid; gap: 16px; margin: 16px 0 8px; padding: 0; list-style: none; }
+.lista-privada li { display: flex; gap: 12px; color: var(--tinta); line-height: 1.45; }
+.lista-privada svg { flex: none; width: 22px; height: 22px; color: var(--salvia-texto); }
+.lista-privada b { color: var(--tinta-forte); }
+.lista-privada a { display: inline-block; min-height: 44px; color: var(--salvia-texto); font-weight: 700; line-height: 44px; margin-top: -12px; }
+.dica-privada { position: fixed; z-index: 60; right: 16px; bottom: calc(96px + env(safe-area-inset-bottom)); left: 16px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 12px; max-width: 520px; margin: 0 auto; padding: 12px 12px 14px 16px; border-radius: 22px; background: var(--cartao); box-shadow: var(--v2-sombra-flutuante); animation: subir .2s var(--suave); }
+.dica-privada > svg { width: 22px; height: 22px; color: var(--salvia-texto); }
+.dica-privada p { margin: 0; color: var(--tinta-forte); font-size: .9375rem; font-weight: 600; }
+.dica-privada .botao { grid-column: 2 / 4; justify-self: start; width: auto; background: var(--campo); }
+
+/* ---------- prévia das notas e Apagadas ---------- */
+.previa-item { padding: 14px 0; border-top: 1px solid var(--contorno); }
+.previa-item .linha-tipo { margin: 0 0 4px; font-size: .875rem; }
+.previa-item .linha-tipo b { color: var(--salvia-texto); }
+.folha .texto-previa { margin: 0 0 10px; color: var(--tinta); white-space: pre-wrap; }
+.previa-item .botao, .pe-previa .botao { width: auto; }
+.pe-previa { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- Minhas anotações ---------- */
+.cabeca-anot, .folha-biblia { position: relative; }
+.nova-anot, .atalho-anotacoes { position: absolute; top: 40px; right: 30px; z-index: 1; }
+.atalho-anotacoes { background: var(--folha-campo); color: var(--folha-tinta); }
+.cabeca-anot > h1 { padding: 0 52px; }
+.pilulas-anot { display: flex; gap: 8px; margin: 0 -16px 10px; padding: 0 16px 2px; overflow-x: auto; scrollbar-width: none; }
+.pilulas-anot::-webkit-scrollbar { display: none; }
+.pilulas-anot .filtro { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 0 18px; border-radius: 999px; background: var(--cartao); font-size: .9375rem; white-space: nowrap; }
+.pilulas-anot .filtro svg { width: 16px; height: 16px; }
+.pilulas-anot .conta { color: var(--tinta-fraca); font-weight: 600; }
+.pilulas-anot .filtro.ligado { background: var(--inverso); color: var(--inverso-tinta); }
+.pilulas-anot .filtro.ligado .conta { color: inherit; opacity: .8; }
+.filtros-anot .filtro { background: var(--campo); }
+.filtros-anot .filtro.aplicado { background: var(--salvia-palido); color: var(--salvia-texto); font-weight: 700; }
+.lista-anot .titulo-secao { margin-top: 24px; }
+.cartao-anot { margin-bottom: 12px; padding: 16px 20px 18px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.cartao-anot.fixada { background: var(--realce); }
+.linha-tipo { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: .875rem; }
+.cartao-anot .linha-tipo > svg { flex: none; width: 18px; height: 18px; color: var(--salvia-texto); }
+.cartao-anot .linha-tipo b { flex: none; color: var(--salvia-texto); }
+.linha-tipo .sub { overflow: hidden; color: var(--tinta-fraca); font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
+.linha-tipo .quando { display: inline-flex; flex: none; align-items: center; gap: 4px; margin-left: auto; color: var(--tinta-fraca); font-weight: 600; white-space: nowrap; }
+.linha-tipo .quando svg { width: 16px; height: 16px; }
+.linha-tipo .quando.respondida { color: var(--salvia-texto); font-weight: 700; }
+.mais-anot { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; margin: -10px -14px -10px -6px; border: 0; border-radius: 50%; background: none; color: var(--tinta-fraca); cursor: pointer; }
+.mais-anot svg { width: 22px; height: 22px; }
+.corpo-anot { margin-top: 8px; cursor: pointer; }
+.citacao-anot { margin: 4px 0 10px; padding: 12px 16px; border-radius: 18px; background: var(--campo); color: var(--tinta); font: 400 1.0625rem/1.5 var(--fonte-biblia); }
+.citacao-anot span { display: -webkit-box; overflow: hidden; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.citacao-anot:last-child { margin-bottom: 0; }
+.cartao-anot h3 { margin: 4px 0 6px; color: var(--tinta-forte); font-size: 1.125rem; font-weight: 800; }
+.texto-anot { display: -webkit-box; overflow: hidden; margin: 0; color: var(--tinta); line-height: 1.5; white-space: pre-wrap; -webkit-line-clamp: 6; -webkit-box-orient: vertical; }
+.campo-anot { margin: 4px 0 0; color: var(--tinta); line-height: 1.45; }
+.campo-anot b { color: var(--tinta-forte); font-weight: 800; }
+.chips-anot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chips-anot .chip { min-height: 32px; padding: 4px 14px; background: var(--salvia-palido); color: var(--salvia-texto); font-weight: 700; }
+.cartao-anot [data-responder] { width: auto; margin-top: 12px; box-shadow: inset 0 0 0 1.5px var(--contorno); background: none; }
+.citacao-anot.marca-1, .trecho-editor.marca-1, .pilula.com-cor.marca-1 { background: var(--marca-1); }
+.citacao-anot.marca-2, .trecho-editor.marca-2, .pilula.com-cor.marca-2 { background: var(--marca-2); }
+.citacao-anot.marca-3, .trecho-editor.marca-3, .pilula.com-cor.marca-3 { background: var(--marca-3); }
+.citacao-anot.marca-4, .trecho-editor.marca-4, .pilula.com-cor.marca-4 { background: var(--marca-4); }
+.opcoes-filtro { margin-top: 12px; }
+.opcoes-filtro .pilula { border: 0; color: var(--tinta-forte); cursor: pointer; }
+.opcoes-filtro .pilula[aria-pressed="true"] { background: var(--inverso); color: var(--inverso-tinta); }
+.opcoes-filtro .pilula.com-cor[aria-pressed="true"] { box-shadow: inset 0 0 0 3px var(--tinta-forte); color: var(--tinta-forte); }
+.lista-acoes { margin-top: 12px; }
+.linha-acao { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 56px; padding: 0 4px; border: 0; border-top: 1px solid var(--contorno); background: none; color: var(--tinta-forte); font: 700 1rem var(--fonte); text-align: left; cursor: pointer; }
+.linha-acao svg { width: 22px; height: 22px; }
+.linha-acao.perigo { color: var(--alerta); }
+.dica-acoes { display: flex; gap: 10px; margin: 12px 0 0; font-size: .875rem; }
+.dica-acoes svg { flex: none; width: 20px; height: 20px; color: var(--salvia-texto); }
+.rodape-anot { display: grid; gap: 10px; margin: 32px 0 16px; }
+.rodape-anot .aviso-privado { margin-top: 4px; }
+.vazio-anot { text-align: center; }
+.icone-vazio { display: grid; place-items: center; width: 104px; height: 104px; margin: 8px auto 16px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.icone-vazio svg { width: 44px; height: 44px; }
+.vazio-anot h2 { margin: 0 auto 8px; max-width: 16ch; color: var(--tinta-forte); font-size: 1.5rem; font-weight: 800; text-wrap: balance; }
+.vazio-anot > p { max-width: 32ch; margin: 0 auto 20px; color: var(--tinta-fraca); font-weight: 500; }
+.passos-anot { margin: 0 0 20px; padding: 4px 20px; border-radius: var(--raio-cartao); background: var(--cartao); list-style: none; counter-reset: passo; text-align: left; }
+.passos-anot li { display: flex; align-items: center; gap: 16px; min-height: 68px; color: var(--tinta); counter-increment: passo; }
+.passos-anot li + li { border-top: 1px solid var(--contorno); }
+.passos-anot li::before { content: counter(passo); flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); font-weight: 800; }
+.passos-anot b { color: var(--tinta-forte); }
+.vazio-anot .botao { margin-top: 12px; }
