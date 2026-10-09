@@ -1,0 +1,75 @@
+{
+  "titulo": "A torre e o rei em guerra",
+  "ref": "Lc 14.25-35",
+  "grupo": "lucas",
+  "linha": "Antes da torre e da guerra, alguém senta e faz as contas",
+  "desenho": "torre-e-acampamento",
+  "desenhoLista": "torre-pela-metade",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Muita gente está seguindo Jesus. Ele se vira para o povo e fala do que custa ser discípulo dele.",
+          "ref": "Lc 14.25"
+        },
+        {
+          "texto": "Quem ama a família ou até a vida mais do que ama Jesus não pode ser discípulo dele.",
+          "ref": "Lc 14.26"
+        },
+        {
+          "fala": "ninguém pode ser meu discípulo se não carregar sua própria cruz e seguir-me",
+          "ref": "Lc 14.27"
+        }
+      ]
+    },
+    {
+      "titulo": "As contas antes de começar",
+      "icone": "moeda",
+      "blocos": [
+        {
+          "texto": "Jesus conta duas pequenas histórias de gente que senta e faz as contas antes de começar.",
+          "ref": "Lc 14.28-32"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "torre-pela-metade",
+              "titulo": "Quem constrói uma torre",
+              "fala": "Começou aquela construção e ficou sem dinheiro para terminá-la!",
+              "ref": "Lc 14.30"
+            },
+            {
+              "desenho": "coroa",
+              "titulo": "O rei que vai à guerra",
+              "fala": "enviará uma comissão para combinar as condições de paz",
+              "ref": "Lc 14.32"
+            }
+          ]
+        },
+        {
+          "texto": "Quem não calcula quanto custa a torre levanta só os alicerces, e todo mundo ri dele.",
+          "ref": "Lc 14.28-29"
+        },
+        {
+          "texto": "O rei com dez mil soldados senta com os conselheiros antes de enfrentar vinte mil. Se não der, ele manda pedir paz enquanto o outro exército ainda está longe.",
+          "ref": "Lc 14.31-32"
+        },
+        {
+          "texto": "Por último, Jesus fala do sal. O sal que perde o sabor não serve nem para adubo, e alguém joga fora.",
+          "ref": "Lc 14.34-35"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Seguir Jesus custa tudo, e ele não esconde isso de ninguém. Antes de começar, ele pede que a gente sente e faça as contas, como quem vai levantar uma torre.",
+    "apoio": "Jesus diz com todas as letras. “ninguém pode ser meu discípulo se não renunciar a tudo que possui”.",
+    "ref": "Lc 14.28-33"
+  },
+  "perguntas": [
+    "O que seguir Jesus já custou para você?",
+    "Tem alguma coisa que você ainda não pôs nessa conta?"
+  ]
+}
