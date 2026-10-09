@@ -79,6 +79,8 @@
   // citação que abre com palavra curta não deixa a aspa e a palavra sozinhas no fim da linha
   const tx = (t) => CC.esc(t).replace(/([“‘]\S{1,2}) /g, '$1 ');
   const ref = (r) => (r ? ' ' + marca(r) : '');
+  // "dizer-lhe", "vê-lo": dentro das falas, a palavra com hífen não quebra no hífen
+  const falaTx = (t) => tx(t).replace(/[^\s“]+-[^\s”]+/g, '<span class="sem-quebra">$&</span>');
   // "Lc 14.15-24" → { livro: "Lucas", cap: 14, de: 15, ate: 24 }
   const NOME_DA_SIGLA = new Map((CC.LIVROS_MAPA || []).map(([nome, , sigla]) => [sigla, nome]));
   const trechoDe = (r) => {
@@ -91,6 +93,7 @@
     pao: '<path d="M4 12a8 5 0 0 1 16 0v5H4z"/><path d="M9 9l1.5 2M13 8.5l1.5 2"/>',
     pessoas: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14c3 0 5 2.2 5 5"/>',
     estrada: '<path d="M8 3L4 21M16 3l4 18M12 5v3M12 11v3M12 17v3"/>',
+    moeda: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/>',
     ancora: '<circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 11h8M5 14c0 4 3 7 7 7s7-3 7-7"/>',
   };
   const rotulo = (icone, texto) => '<h2 class="mapa-rotulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -102,10 +105,10 @@
   const desenho = (p, id, classe) => (p.desenhos && p.desenhos[id] ? '<span class="desenho' + (classe ? ' ' + classe : '') + '" aria-hidden="true">' + p.desenhos[id] + '</span>' : '');
 
   function bloco(p, b) {
-    if (b.fala !== undefined) return '<p class="fala-parabola">“' + tx(b.fala) + '”' + ref(b.ref) + '</p>';
+    if (b.fala !== undefined) return '<p class="fala-parabola">“' + falaTx(b.fala) + '”' + ref(b.ref) + '</p>';
     if (b.itens) {
       return '<div class="itens-parabola" style="--colunas:' + b.itens.length + '">' + b.itens.map((it) => '<div class="item-cena">' + desenho(p, it.desenho)
-        + '<b>' + CC.esc(it.titulo) + '</b>' + (it.fala ? '<span>“' + tx(it.fala).replace(/[^\s“]+-[^\s”]+/g, '<span class="sem-quebra">$&</span>') + '”</span>' : '') + '</div>').join('') + '</div>';
+        + '<b>' + CC.esc(it.titulo) + '</b>' + (it.fala ? '<span>“' + falaTx(it.fala) + '”</span>' : '') + '</div>').join('') + '</div>';
     }
     return '<p class="texto-parabola">' + tx(b.texto) + ref(b.ref) + '</p>';
   }

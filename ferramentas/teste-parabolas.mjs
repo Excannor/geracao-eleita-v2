@@ -165,7 +165,7 @@ ok(await texto('.parabola-nome') === 'O grande banquete' && await av('document.q
   'o título sai numa linha só, no pincel');
 ok(await texto('.folha-parabola .mapa-grupo') === 'Evangelho de Lucas' && /^Lc 14\.15-24 · \d+ min de leitura$/.test(await texto('.parabola-sub')), 'o alto diz o evangelho, a referência e os minutos de leitura');
 ok(await av('!!document.querySelector(".parabola-heroi svg path") && document.querySelector(".parabola-heroi").getBoundingClientRect().width >= 200'), 'o desenho grande do banquete está no alto');
-const falas = JSON.parse(await av('JSON.stringify([...document.querySelectorAll(".fala-parabola")].map((f) => f.firstChild.textContent))'));
+const falas = JSON.parse(await av('JSON.stringify([...document.querySelectorAll(".fala-parabola")].map((f) => [...f.childNodes].filter((n) => n.nodeName !== "MARK").map((n) => n.textContent).join("")))'));
 const falasFonte = fonte.secoes.flatMap((s) => s.blocos.filter((b) => b.fala).map((b) => '“' + b.fala + '”'));
 ok(falas.length >= 3 && JSON.stringify(falas.map((f) => f.replace(/\u00a0/g, ' ').trim())) === JSON.stringify(falasFonte), 'as falas aparecem destacadas, com as aspas (' + falas.length + ')');
 ok(await av('document.querySelectorAll(".itens-parabola .item-cena").length === 3 && [...document.querySelectorAll(".item-cena")].every((c) => c.querySelector(".desenho svg path"))'), 'as três desculpas, cada uma com o seu desenho');
@@ -191,6 +191,7 @@ for (const outra of P.itens.filter((p) => p.slug !== 'grande-banquete')) {
   ok(await esperar('document.querySelectorAll(".fala-parabola").length === ' + nFalas + ' && !!document.querySelector(".parabola-heroi svg") && document.querySelectorAll(".secao-parabola").length === ' + f.secoes.length, 10000)
     && await texto('.parabola-nome') === outra.titulo, outra.titulo + ' abre com o desenho, as ' + f.secoes.length + ' seções e as ' + nFalas + ' falas');
   ok(await semEstouro() && await av('document.querySelector(".parabola-nome").scrollWidth <= document.querySelector(".parabola-nome").clientWidth + 1'), outra.titulo + ': nada estoura a 390px e o título cabe');
+  ok(await av('[...document.querySelectorAll(".sem-quebra")].every((el) => el.getClientRects().length === 1)'), outra.titulo + ': nenhuma palavra com hífen das falas quebra no hífen');
   await capturar(outra.slug + '-390-claro');
 }
 

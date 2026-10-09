@@ -18,8 +18,8 @@ const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PASTA = join(AQUI, 'conteudo', 'parabolas');
 const DESENHOS = join(AQUI, 'conteudo', 'mapas', 'desenhos');
 export const GRUPOS_PARABOLA = ['mateus', 'marcos', 'lucas', 'at'];
-// Os ícones que a tela sabe desenhar no rótulo de cada seção (src/app/06c-parabolas.js).
-export const ICONES_SECAO = ['alfinete', 'pao', 'pessoas', 'estrada'];
+// Os ícones que a tela sabe desenhar no rótulo de cada seção (src/sob-demanda/parabola-tela.js).
+export const ICONES_SECAO = ['alfinete', 'pao', 'pessoas', 'estrada', 'moeda'];
 export const LINHA_MAX = 60;
 
 const normalizar = (s) => ' ' + String(s).normalize('NFC').toLowerCase()
