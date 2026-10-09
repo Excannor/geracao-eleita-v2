@@ -139,14 +139,30 @@
   // ---------- fusão ----------
   const uniao = (a, b) => [...new Set([...(a || []), ...(b || [])])];
 
+  // "Zerar progresso" recomeça só a trilha: o que é andamento (plano, primeiros passos,
+  // Conhecer Jesus, ofensiva, XP, conquistas, baús, desafios do dia, prática). O que a pessoa
+  // escreveu, marcou ou é dela (reflexões, anotações, notas, marca-texto, Minha história, foto,
+  // nome, orações marcadas, desafios de vários dias, último capítulo) fica.
+  const PROGRESSO_DA_TRILHA = ['dia', 'lidos', 'licoes', 'marcadoEm', 'licoesEm', 'conhecidos', 'pratica', 'xpLegado',
+    'conquistasGanhas', 'maiorProposito', 'diario', 'bausAbertos', 'notasVistas', 'acertosTotal', 'missoesTotal', 'semanasJuntos'];
+  CC.PROGRESSO_DA_TRILHA = PROGRESSO_DA_TRILHA;
+
   // Nunca perde uma marcação: conjuntos são unidos, e só os campos únicos seguem
   // o carimbo de tempo mais recente.
   function fundir(a, b) {
     if (!a) return b || VAZIO();
     if (!b) return a;
-    // Zerar é a única operação que apaga.
-    if ((b.zeradoEm || 0) > (a.atualizadoEm || 0)) return b;
-    if ((a.zeradoEm || 0) > (b.atualizadoEm || 0)) return a;
+    // Zerar é a única operação que apaga, e só o andamento da trilha: o lado zerado vale
+    // inteiro nele; o resto se funde como sempre, para nada escrito se perder.
+    const zerado = (b.zeradoEm || 0) > (a.atualizadoEm || 0) ? b : (a.zeradoEm || 0) > (b.atualizadoEm || 0) ? a : null;
+    if (zerado) {
+      const junto = fundirTudo(a, b);
+      for (const campo of PROGRESSO_DA_TRILHA) junto[campo] = zerado[campo] === undefined ? VAZIO()[campo] : zerado[campo];
+      return junto;
+    }
+    return fundirTudo(a, b);
+  }
+  function fundirTudo(a, b) {
     const maisNovo = (b.atualizadoEm || 0) >= (a.atualizadoEm || 0) ? b : a;
 
     const vazio = (r) => !r || !((r.o || '') + (r.i || '') + (r.a || '') + (r.oracao || '')).trim();
@@ -627,7 +643,10 @@
 
   CC.zerarProgresso = function () {
     const agora = Date.now();
-    E = { ...VAZIO(), xpLegado: 0, atualizadoEm: agora, zeradoEm: agora };
+    const limpo = { ...VAZIO(), xpLegado: 0 };
+    const mantido = { ...E };
+    for (const campo of PROGRESSO_DA_TRILHA) mantido[campo] = limpo[campo];
+    E = { ...mantido, atualizadoEm: agora, zeradoEm: agora };
     localGravar();
     enviarAoServidor();
   };

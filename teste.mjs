@@ -461,6 +461,46 @@ checar(ordenado(CC.fundir(celular, computador)) === ordenado(CC.fundir(computado
 const zerado = { atualizadoEm: 200, zeradoEm: 200, dia: 1, lidos: [], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {} };
 checar(CC.fundir(celular, zerado).lidos.length === 0, 'um zeramento mais novo apaga o que veio antes');
 checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 'o que foi feito depois do zeramento sobrevive');
+// "Zerar progresso" recomeça só a trilha: foto, nome, o que foi escrito e marcado ficam
+{
+  CC.carregarLocal();
+  CC.guardarFoto('data:image/jpeg;base64,FOTO');
+  CC.guardarApelido('Ana');
+  CC.gravarAnotacao('verso:João 3.16', 'minha nota');
+  CC.gravarRegistro(1, { o: 'reflexão', i: '', a: '', oracao: 'oração' });
+  CC.gravarHistoria('antes', 'encontro', 'hoje');
+  CC.marcar(['João 3:16'], 2);
+  CC.marcarLido(1, true);
+  CC.marcarLicao('a', true);
+  CC.marcarConhecido(1);
+  CC.marcarOrei();
+  CC.gravar('bausAbertos', { 7: { em: '2026-03-01' } });
+  CC.gravar('conquistasGanhas', { 'nivel:x:1': '2026-03-01' });
+  CC.gravar('desafios', { semRedes: { inicio: '2026-03-01', dias: ['2026-03-01'], ativo: true, em: 1 } });
+  const antes = JSON.parse(JSON.stringify(CC.estado()));
+  CC.zerarProgresso();
+  const z = CC.estado();
+  checar(!z.lidos.length && !z.licoes.length && !Object.keys(z.conhecidos).length && !Object.keys(z.marcadoEm).length
+    && !Object.keys(z.bausAbertos).length && !Object.keys(z.conquistasGanhas).length && z.xpLegado === 0 && z.zeradoEm > 0,
+  'zerar apaga leituras, primeiros passos, Conhecer Jesus, ofensiva, baús, conquistas e XP');
+  checar(z.foto === antes.foto && z.apelido === 'Ana' && z.anotacoes['verso:João 3.16'] === 'minha nota' && z.oia[1].oracao === 'oração'
+    && z.historia.antes === 'antes' && z.marcas['João 3:16'].cor === 2 && Object.keys(z.oradoEm).length === 1 && z.desafios.semRedes.ativo,
+  'zerar mantém foto, nome, anotações, reflexões, Minha história, marca-texto, orações marcadas e desafios');
+  // outro aparelho, que ainda não sabia do zeramento, sincroniza depois: não traz a trilha de
+  // volta, mas o que ele tinha escrito continua
+  const outro = { ...antes, atualizadoEm: z.zeradoEm - 10, anotacoes: { ...antes.anotacoes, 'nota:y': 'escrita no outro' }, foto: antes.foto };
+  for (const [x, y] of [[z, outro], [outro, z]]) {
+    const f2 = CC.fundir(x, y);
+    checar(!f2.lidos.length && !Object.keys(f2.marcadoEm).length && f2.foto === antes.foto && f2.anotacoes['nota:y'] === 'escrita no outro'
+      && f2.anotacoes['verso:João 3.16'] === 'minha nota' && f2.oia[1].o === 'reflexão',
+    'na fusão com um aparelho atrasado, a trilha fica zerada e foto e anotações dos dois lados ficam');
+  }
+  // um zeramento da versão anterior (que mandava tudo vazio) não apaga mais o que foi escrito
+  const zeradoAntigo = { atualizadoEm: z.zeradoEm + 5, zeradoEm: z.zeradoEm + 5, dia: 1, lidos: [], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {}, foto: '' };
+  const f3 = CC.fundir(antes, zeradoAntigo);
+  checar(!f3.lidos.length && f3.foto === antes.foto && f3.anotacoes['verso:João 3.16'] === 'minha nota', 'zeramento vindo de aparelho antigo também só zera a trilha');
+  CC.carregarLocal();
+}
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
 
@@ -872,6 +912,204 @@ secao('painel pastoral agregado (Fase 5, seção 2)');
     checar(dia(7).base === 2 && dia(7).abriram === 0 && dia(7).leram === 0, 'dia 7: só as contas com 7 dias completos entram');
     checar(f.semana.base === 2 && f.semana.contas === 0, 'leram 3 ou mais dos 7 primeiros dias: nenhuma das duas com idade');
     checar(!/nova1|nova2|nova3|hoje1|@/.test(JSON.stringify(f)), 'o funil dos primeiros dias não leva nome nenhum');
+  }
+}
+
+// =========================================================================
+secao('cofre das anotações (cofre.mjs e servidor)');
+// =========================================================================
+{
+  const { chavesDasNotas, selarEstado, abrirEstado, migrarEstadosCifrados, ehCifrado, CAMPOS_CIFRADOS } = await import('./cofre.mjs');
+  const { DatabaseSync, abrirBanco } = await import('./db.mjs');
+  const { spawn } = await import('node:child_process');
+  const { createServer } = await import('node:net');
+  const { randomBytes } = await import('node:crypto');
+
+  // --- a chave ---
+  const lanca = (f) => { try { f(); return false; } catch { return true; } };
+  checar(lanca(() => chavesDasNotas({ NODE_ENV: 'production' })), 'produção sem CAMINHO_CHAVE_NOTAS não sobe');
+  checar(lanca(() => chavesDasNotas({ CAMINHO_CHAVE_NOTAS: 'curta' })), 'chave que não tem 64 hexadecimais é recusada');
+  const K = chavesDasNotas({ CAMINHO_TESTE: '1' });
+  checar(K.teste && K.atual.length === 32, 'em teste, sem a variável, vale a chave de teste');
+  const hex1 = randomBytes(32).toString('hex');
+  const hex2 = randomBytes(32).toString('hex');
+  const K1 = chavesDasNotas({ NODE_ENV: 'production', CAMINHO_CHAVE_NOTAS: hex1 });
+  checar(!K1.teste && K1.impressao !== K.impressao, 'produção com a chave sobe, com outra chave que a de teste');
+  checar(CAMPOS_CIFRADOS.includes('notas.*.texto') && CAMPOS_CIFRADOS.includes('notas.*.tags'), 'a lista dos campos já cobre o modelo novo de notas');
+
+  // --- selar e abrir ---
+  const claro = {
+    lidos: [1], marcadoEm: { 1: '2026-03-01' },
+    oia: { 1: { o: 'SEGREDO-OIA', i: '', a: '', oracao: 'SEGREDO-ORACAO' }, 2: { o: '', i: '', a: '', oracao: '' } },
+    anotacoes: { 'verso:João 3.16': 'SEGREDO-VERSO', 'nota:x': 'SEGREDO-NOTA', 'nota:vazia': '' },
+    historia: { antes: 'SEGREDO-ANTES', encontro: '', hoje: 'SEGREDO-HOJE', em: 5 },
+    notas: { n1: { tipo: 'oracao', texto: 'SEGREDO-NOTA-NOVA', tags: ['SEGREDO-TAG'], versos: ['João 3:16'] } },
+    marcas: { 'João 3:16': { cor: 2, em: 1 } }, foto: 'data:image/jpeg;base64,AAAA',
+  };
+  const selado = selarEstado(claro, 'ana', K);
+  const texto = JSON.stringify(selado);
+  checar(!/SEGREDO/.test(texto), 'selado, nenhum texto privado fica em claro');
+  checar(ehCifrado(selado.oia[1].o) && selado.oia[2].o === '' && selado.anotacoes['nota:vazia'] === '' && selado.historia.encontro === '',
+    'cada texto vira { v, k, iv, tag, dado } e o vazio continua vazio');
+  checar(selado.historia.em === 5 && selado.foto === claro.foto && selado.marcas['João 3:16'].cor === 2 && Object.keys(selado.anotacoes).length === 3,
+    'a forma do progresso não muda: chaves, datas, marcas e foto ficam como estavam');
+  checar(JSON.stringify(abrirEstado(selado, 'ana', K)) === JSON.stringify(claro), 'o dono abre e lê exatamente o que escreveu (também listas)');
+  checar(JSON.stringify(selarEstado(selado, 'ana', K)) === texto, 'selar o que já está selado com a chave atual não muda nada');
+  const outraVez = selarEstado(claro, 'ana', K);
+  checar(outraVez.oia[1].o.iv !== selado.oia[1].o.iv && outraVez.oia[1].o.dado !== selado.oia[1].o.dado, 'cada gravação usa um IV novo');
+  checar(lanca(() => abrirEstado(selado, 'bia', K)), 'o texto copiado para a linha de outra pessoa não abre');
+  checar(lanca(() => abrirEstado(selado, 'ana', K1)), 'com outra chave não abre');
+  const adulterado = JSON.parse(texto);
+  const bytes = Buffer.from(adulterado.anotacoes['nota:x'].dado, 'base64');
+  bytes[0] ^= 1;
+  adulterado.anotacoes['nota:x'].dado = bytes.toString('base64');
+  checar(lanca(() => abrirEstado(adulterado, 'ana', K)), 'dado adulterado é recusado');
+  const semTag = JSON.parse(texto);
+  semTag.historia.antes.tag = Buffer.alloc(16).toString('base64');
+  checar(lanca(() => abrirEstado(semTag, 'ana', K)), 'prova (tag) trocada é recusada');
+
+  // os sinais agregados não precisam decifrar
+  const contasP = [{ usuario: 'ana', criadaEm: '2026-01-01' }];
+  const p1 = montarPainel({ contas: contasP, estados: { ana: claro }, hoje: '2026-03-02' });
+  const p2 = montarPainel({ contas: contasP, estados: { ana: selado }, hoje: '2026-03-02' });
+  checar(JSON.stringify(p1) === JSON.stringify(p2), 'o painel agregado (escreveu, marcou, história) dá o mesmo com os textos cifrados');
+  const conquistaVerso = (e) => (CC.conquistasComNivel(e, '2026-03-02').find((c) => c.id === 'notas') || {}).valor;
+  checar(conquistaVerso(CC.normalizarEstado(selado)) === 1 && conquistaVerso(CC.normalizarEstado(claro)) === 1, 'a conquista das notas em versículos conta igual sem decifrar');
+
+  // --- migração e rotação, direto no banco ---
+  const pastaM = mkdtempSync(join(tmpdir(), 'cc-cofre-'));
+  const dbM = abrirBanco(join(pastaM, 'caminho.db'));
+  dbM.prepare('INSERT INTO estados (usuario, dados, atualizado_em) VALUES (?, ?, ?)').run('ana', JSON.stringify(claro), 'x');
+  dbM.prepare('INSERT INTO estados (usuario, dados, atualizado_em) VALUES (?, ?, ?)').run('leo', JSON.stringify({ lidos: [2] }), 'x');
+  const m1 = migrarEstadosCifrados(dbM, K1);
+  const linha = () => dbM.prepare("SELECT dados FROM estados WHERE usuario = 'ana'").get().dados;
+  checar(m1.cifrados === 1 && !/SEGREDO/.test(linha()), 'migração: a conta antiga tem os textos cifrados (e só ela é regravada)');
+  checar(migrarEstadosCifrados(dbM, K1).cifrados === 0, 'migração idempotente: a segunda vez não muda nada');
+  checar(JSON.stringify(abrirEstado(JSON.parse(linha()), 'ana', K1)) === JSON.stringify(claro), 'depois da migração o dono lê tudo de volta');
+  const K2 = chavesDasNotas({ CAMINHO_CHAVE_NOTAS: hex2, CAMINHO_CHAVE_NOTAS_ANTERIOR: hex1 });
+  const m2 = migrarEstadosCifrados(dbM, K2);
+  checar(m2.cifrados === 1 && JSON.parse(linha()).oia[1].o.k === K2.impressao, 'rotação: com a chave nova e a anterior, tudo é recifrado com a nova');
+  checar(JSON.stringify(abrirEstado(JSON.parse(linha()), 'ana', chavesDasNotas({ CAMINHO_CHAVE_NOTAS: hex2 }))) === JSON.stringify(claro),
+    'rotação: depois dela a chave antiga pode sair');
+  fecharBanco(join(pastaM, 'caminho.db'));
+  rmSync(pastaM, { recursive: true, force: true });
+
+  // --- o servidor de verdade ---
+  const livre = (p) => new Promise((r) => { const s = createServer().once('error', () => r(false)).listen(p, '127.0.0.1', () => s.close(() => r(true))); });
+  let PORTA = 0;
+  for (let p = 8801; p <= 8809 && !PORTA; p++) if (await livre(p)) PORTA = p;
+  const pastaS = mkdtempSync(join(tmpdir(), 'cc-cofre-srv-'));
+  const base = 'http://127.0.0.1:' + PORTA;
+  const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
+  let saida = '';
+  const subir = (amb = {}) => {
+    const s = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
+      env: { ...process.env, CAMINHO_ESTADO: join(pastaS, 'estado.json'), CAMINHO_TESTE: '1', CAMINHO_ADMIN: 'chefe', CAMINHO_CHAVE_NOTAS: hex1, ...amb },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    s.stdout.on('data', (d) => { saida += d; });
+    s.stderr.on('data', (d) => { saida += d; });
+    return s;
+  };
+  const no = async () => { for (let i = 0; i < 100; i++) { try { await fetch(base + '/api/existe-conta'); return true; } catch { await dormir(100); } } return false; };
+  const parar = async (s) => { s.kill(); for (let i = 0; i < 50; i++) { try { await fetch(base + '/api/existe-conta'); await dormir(100); } catch { return; } } };
+  const pedir = (rota, corpo, cookie, metodo) => fetch(base + rota, {
+    method: metodo || (corpo ? 'POST' : 'GET'),
+    headers: Object.assign({ 'content-type': 'application/json' }, cookie ? { cookie } : {}),
+    body: corpo ? JSON.stringify(corpo) : undefined,
+  });
+  const criar = async (usuario) => {
+    const r = await pedir('/api/criar-conta', { usuario, senha: 'senha-' + usuario, nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true });
+    return (r.headers.get('set-cookie') || '').split(';')[0];
+  };
+  const arquivoDb = join(pastaS, 'caminho.db');
+  const bancoBruto = () => ['', '-wal'].map((x) => (existsSync(arquivoDb + x) ? readFileSync(arquivoDb + x).toString('latin1') : '')).join('');
+  const naLinha = (u, mexer) => {
+    const b = new DatabaseSync(arquivoDb);
+    try {
+      const l = b.prepare('SELECT dados FROM estados WHERE usuario = ?').get(u);
+      if (mexer) b.prepare("INSERT OR REPLACE INTO estados (usuario, dados, atualizado_em) VALUES (?, ?, 'x')").run(u, JSON.stringify(mexer(l ? JSON.parse(l.dados) : null)));
+      return l && JSON.parse(l.dados);
+    } finally { b.close(); }
+  };
+
+  let srv = null;
+  try {
+    checar(PORTA > 0, 'há uma porta livre entre 8801 e 8809 para o servidor do teste');
+    // sem a chave em produção, o servidor recusa subir
+    srv = subir({ NODE_ENV: 'production', CAMINHO_TESTE: '', CAMINHO_CHAVE_NOTAS: '' });
+    const codigo = await new Promise((r) => { srv.once('exit', r); setTimeout(() => r('ainda vivo'), 8000); });
+    checar(codigo === 1 && /CAMINHO_CHAVE_NOTAS/.test(saida), 'servidor em produção sem a chave para na subida e diz o que falta');
+    if (codigo === 'ainda vivo') await parar(srv);
+
+    srv = subir();
+    checar(await no(), 'o servidor sobe com a chave');
+    const ana = await criar('ana.cofre');
+    const bia = await criar('bia.cofre');
+    const chefe = await criar('chefe');
+    const meu = { ...CC.normalizarEstado({}), atualizadoEm: Date.now(), lidos: [1], marcadoEm: { 1: hojeNoFuso(FUSO_PADRAO) },
+      oia: { 1: { o: 'SEGREDO-OIA-ANA', i: '', a: '', oracao: 'SEGREDO-ORACAO-ANA' } },
+      anotacoes: { 'verso:João 3.16': 'SEGREDO-VERSO-ANA', 'nota:x': 'SEGREDO-NOTA-ANA' },
+      historia: { antes: 'SEGREDO-HISTORIA-ANA', encontro: '', hoje: '', em: Date.now() } };
+    checar((await pedir('/api/estado', meu, ana, 'PUT')).status === 200, 'o dono grava as anotações');
+    checar(!/SEGREDO/.test(bancoBruto()), 'o arquivo do banco (com o WAL) não tem o texto em claro');
+    const lido = await (await pedir('/api/estado', null, ana)).json();
+    checar(lido.oia[1].oracao === 'SEGREDO-ORACAO-ANA' && lido.anotacoes['verso:João 3.16'] === 'SEGREDO-VERSO-ANA' && lido.historia.antes === 'SEGREDO-HISTORIA-ANA',
+      'o dono lê de volta, em claro, pelo /api/estado');
+    const outro = await (await pedir('/api/estado', null, bia)).text();
+    checar(!/SEGREDO/.test(outro), 'outra pessoa não obtém o texto');
+    const painel = await pedir('/api/painel', null, chefe);
+    checar(painel.status === 200 && !/SEGREDO/.test(await painel.text()), 'o admin vê o painel, sem texto nenhum');
+    // a fusão entre aparelhos continua: outro aparelho manda só uma anotação nova
+    const outroAparelho = { ...CC.normalizarEstado({}), atualizadoEm: Date.now() + 1000, anotacoes: { 'nota:y': 'SEGREDO-NOVA' } };
+    await pedir('/api/estado', outroAparelho, ana, 'PUT');
+    const fundido = await (await pedir('/api/estado', null, ana)).json();
+    checar(fundido.anotacoes['nota:x'] === 'SEGREDO-NOTA-ANA' && fundido.anotacoes['nota:y'] === 'SEGREDO-NOVA' && fundido.oia[1].o === 'SEGREDO-OIA-ANA',
+      'a fusão entre aparelhos junta o cifrado guardado com o que chega');
+    const ivAntes = naLinha('ana.cofre').anotacoes['nota:x'].iv;
+    await pedir('/api/estado', { ...outroAparelho, atualizadoEm: Date.now() + 2000, anotacoes: { 'nota:x': 'SEGREDO-EDITADA' } }, ana, 'PUT');
+    checar(naLinha('ana.cofre').anotacoes['nota:x'].iv !== ivAntes, 'o texto editado é gravado com IV novo');
+
+    // "Zerar progresso" pelo servidor: a trilha recomeça, foto e anotações ficam
+    const FOTO = 'data:image/jpeg;base64,QUJD';
+    await pedir('/api/estado', { ...fundido, atualizadoEm: Date.now() + 3000, foto: FOTO, acertosTotal: 40 }, ana, 'PUT');
+    const cheio = await (await pedir('/api/estado', null, ana)).json();
+    const agoraZ = Date.now() + 4000;
+    const zeradoSrv = { ...cheio, atualizadoEm: agoraZ, zeradoEm: agoraZ };
+    for (const campo of CC.PROGRESSO_DA_TRILHA) zeradoSrv[campo] = { ...CC.normalizarEstado({}), xpLegado: 0 }[campo];
+    checar(cheio.lidos.length === 1 && cheio.acertosTotal === 40 && (await pedir('/api/estado', zeradoSrv, ana, 'PUT')).status === 200, 'o dono zera a trilha');
+    const depoisZ = await (await pedir('/api/estado', null, ana)).json();
+    checar(!depoisZ.lidos.length && !Object.keys(depoisZ.marcadoEm).length && depoisZ.acertosTotal === 0 && depoisZ.xpLegado === 0,
+      'no servidor, zerar recomeça leituras, ofensiva e contadores');
+    checar(depoisZ.foto === FOTO && depoisZ.anotacoes['nota:y'] === 'SEGREDO-NOVA' && depoisZ.oia[1].o === 'SEGREDO-OIA-ANA' && depoisZ.historia.antes === 'SEGREDO-HISTORIA-ANA',
+      'no servidor, zerar mantém a foto, as anotações, as reflexões e a Minha história');
+    checar(!/SEGREDO/.test(bancoBruto()), 'e o que ficou continua cifrado no banco');
+
+    // migração: uma conta de antes do cofre, com texto em claro no banco
+    naLinha('bia.cofre', () => ({ ...meu, oia: { 1: { o: 'SEGREDO-ANTIGO-BIA', i: '', a: '', oracao: '' } } }));
+    checar(/SEGREDO-ANTIGO-BIA/.test(JSON.stringify(naLinha('bia.cofre'))), 'a conta antiga está em claro antes de reiniciar');
+    await parar(srv);
+    saida = '';
+    srv = subir();
+    checar(await no(), 'o servidor sobe de novo');
+    checar(!/SEGREDO-ANTIGO-BIA/.test(JSON.stringify(naLinha('bia.cofre'))) && /anotações cifradas no banco: 1/.test(saida), 'na subida a conta antiga é cifrada');
+    checar(!/SEGREDO-ANTIGO-BIA/.test(bancoBruto()), 'e o texto em claro não sobra no arquivo do banco nem no WAL');
+    checar((await (await pedir('/api/estado', null, bia)).json()).oia[1].o === 'SEGREDO-ANTIGO-BIA', 'e a dona continua lendo o que escreveu');
+
+    // dado adulterado: nada é servido nem gravado por cima
+    naLinha('ana.cofre', (e) => { const b = Buffer.from(e.oia[1].o.dado, 'base64'); b[0] ^= 1; e.oia[1].o.dado = b.toString('base64'); return e; });
+    const r1 = await pedir('/api/estado', null, ana);
+    checar(r1.status === 500 && !/SEGREDO/.test(await r1.text()), 'com o dado adulterado o servidor recusa servir');
+    const antesPut = JSON.stringify(naLinha('ana.cofre'));
+    const r2 = await pedir('/api/estado', meu, ana, 'PUT');
+    checar(r2.status === 500 && JSON.stringify(naLinha('ana.cofre')) === antesPut, 'e não grava nada por cima do que não abriu');
+
+    // apagar a conta leva o progresso cifrado junto
+    const apagou = await pedir('/api/apagar-conta', { senha: 'senha-bia.cofre' }, bia);
+    checar(apagou.status === 200 && !naLinha('bia.cofre'), 'apagar a conta continua apagando o progresso');
+  } finally {
+    if (srv) await parar(srv);
+    rmSync(pastaS, { recursive: true, force: true });
   }
 }
 

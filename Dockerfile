@@ -6,7 +6,7 @@ FROM node:24-alpine
 
 WORKDIR /app
 
-COPY package.json build.mjs servidor.mjs contas.mjs novidades.mjs notificacoes.mjs db.mjs propositos.mjs semeador.mjs painel.mjs email.mjs discipulado.mjs cuidado.mjs desafios-grupo.mjs inteligencia.mjs relatorio.mjs ./
+COPY package.json build.mjs servidor.mjs contas.mjs novidades.mjs notificacoes.mjs db.mjs propositos.mjs semeador.mjs painel.mjs email.mjs discipulado.mjs cuidado.mjs desafios-grupo.mjs inteligencia.mjs relatorio.mjs cofre.mjs ./
 # A pasta inteira: o build importa dela, e copiar arquivo a arquivo já fez a imagem
 # ficar para trás em silêncio quando um novo import apareceu.
 COPY ferramentas ./ferramentas
@@ -25,6 +25,8 @@ USER node
 # Onde o progresso é gravado; monte um volume aqui para ele sobreviver ao container
 ENV CAMINHO_ESTADO=/app/dados/estado.json
 ENV PORTA=8080
+# Produção: sem CAMINHO_CHAVE_NOTAS no .env o servidor não sobe (cofre.mjs)
+ENV NODE_ENV=production
 
 EXPOSE 8080
 

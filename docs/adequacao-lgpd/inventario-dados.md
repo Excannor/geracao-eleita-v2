@@ -35,12 +35,12 @@ do titular e de quem mantém o servidor, que lê tudo) · **Retenção real no c
 
 | Dado | Onde | Finalidade | Quem acessa | Retenção |
 |---|---|---|---|---|
-| Progresso inteiro (dias lidos, lições, prática, conquistas, XP, diário de uso, baús) | `estados.dados` (JSON, `db.mjs:70`; gravado em `servidor.mjs:1363-1386`) | sincronizar aparelhos, ofensiva, propósitos, painéis | partes derivadas: amigos (leu hoje), células, líder, admin | conta; também no `localStorage` do aparelho |
-| Reflexões (`oia`), anotações e notas de versículo, "Minha história com Deus" | `estados.dados.oia`, `.anotacoes`, `.historia` | guardar para a pessoa | **ninguém pela interface; em JSON aberto no banco** | conta |
+| Progresso inteiro (dias lidos, lições, prática, conquistas, XP, diário de uso, baús) | `estados.dados` (JSON, `db.mjs:70`; gravado em `servidor.mjs`, rota `/api/estado`) | sincronizar aparelhos, ofensiva, propósitos, painéis | partes derivadas: amigos (leu hoje), células, líder, admin | conta; também no `localStorage` do aparelho; "zerar progresso" apaga só o andamento da trilha (`CC.PROGRESSO_DA_TRILHA`: leituras, primeiros passos, Conhecer Jesus, ofensiva, XP, conquistas, baús, desafios do dia, prática) |
+| Reflexões (`oia`), anotações e notas de versículo, "Minha história com Deus" (e as notas novas, `notas.*.texto`/`.tags`, quando existirem) | `estados.dados.oia`, `.anotacoes`, `.historia` | guardar para a pessoa | ninguém pela interface; **cifrados no banco desde 2026-10-09** (AES-256-GCM campo a campo, `cofre.mjs`, chave `CAMINHO_CHAVE_NOTAS` do `.env`); em claro só no `/api/estado` do próprio dono; quem mantém o servidor e tem o `.env` ainda consegue abrir | conta; "zerar progresso" **não** apaga (só recomeça a trilha) |
 | Datas do "Orei" | `estados.dados.oradoEm` | propósito de oração | membros do propósito (fez hoje) | conta |
 | Marca-texto, último capítulo aberto | `estados.dados.marcas`, `.ultimaBiblia` | continuar a leitura | ninguém | conta |
 | Desafios pessoais (ex.: "21 dias sem redes sociais", "7 dias sem celular na cama") | `estados.dados.desafios` | o próprio desafio, painel do dono | admin (contagens), grupo do desafio coletivo | conta |
-| Foto de perfil (JPEG refeito no aparelho, sem EXIF) | `estados.dados.foto` (`src/app/02-estado.js:501`, `servidor.mjs:158-167`) | exibição | amigos, grupos, células | conta |
+| Foto de perfil (JPEG refeito no aparelho, sem EXIF) | `estados.dados.foto` (`src/app/02-estado.js:501`, `servidor.mjs:158-167`) | exibição | amigos, grupos, células | conta; "zerar progresso" não apaga |
 | Datas de leitura (cópia achatada) | `leitura_dias` (`db.mjs:214`) | painel da igreja | admin (agregado) | conta (apagado com a conta, `servidor.mjs:228`) |
 
 ## Relações e grupos
@@ -64,7 +64,7 @@ do titular e de quem mantém o servidor, que lê tudo) · **Retenção real no c
 | Dado | Onde | Finalidade | Quem acessa | Retenção |
 |---|---|---|---|---|
 | Check-in Corpo/Mente/Espírito (1 a 3) por dia | `checkins` (`db.mjs:190`, `contas.mjs:556-566`) | discipulador, agregado da célula e da igreja | **discipulador: o último da semana (padrão ligado)**; líder, auxiliar e admin: somado (célula 3+, igreja 5+) | **180 dias** (`contas.mjs:346`) |
-| Pedido de oração ou de ajuda (texto até 280/200, destino, vencimento, estado) | `pedidos` (`db.mjs:150-159`) | cuidado mútuo | célula ou só quem conduz | vence em 7 ou 30 dias; **apagado 30 dias depois de vencer** (`cuidado.mjs:46`); some ao sair da célula ou apagar a conta |
+| Pedido de oração ou de ajuda (texto até 280/200, destino, vencimento, estado) | `pedidos` (`db.mjs:150-159`; **em claro**: não é privado, a célula ou quem conduz lê; fora do cofre das anotações) | cuidado mútuo | célula ou só quem conduz | vence em 7 ou 30 dias; **apagado 30 dias depois de vencer** (`cuidado.mjs:46`); some ao sair da célula ou apagar a conta |
 | Gestos ("orei", "posso ajudar") | `pedido_gestos` | mostrar ao autor | autor | junto com o pedido |
 | Denúncias de pedido (quem, motivo, quando) | `pedido_denuncias` | esconder e decidir | líder e auxiliar (motivo e total, não quem) | junto com o pedido; **"manter" apaga as denúncias** |
 | Quem removeu um pedido | `pedidos.removido_por` | registro da decisão | ninguém pela interface | até o pedido ser apagado |
@@ -98,7 +98,7 @@ do titular e de quem mantém o servidor, que lê tudo) · **Retenção real no c
 | Passagem de sessão (token de 3 min) | memória (`servidor.mjs:1200-1207`) | levar a sessão do navegador do WhatsApp/Instagram para o Chrome | — | 3 minutos |
 | Pedidos de nova senha sem e-mail (@, quando) | `metadados.pedidos_senha` (`servidor.mjs:514-520`) | o dono mandar o link à mão | admin | **7 dias** ou até gerar o link |
 | Logs do servidor | saída do container (Docker) | diagnóstico | quem mantém o servidor | **sem rotação configurada**; contêm @ em falhas de push (`servidor.mjs:611-614`), na geração de link de senha pelo admin (`servidor.mjs:1241`) e método+caminho em erros (`servidor.mjs:2183`) |
-| Chaves (sessão, push, backup) | `dados/*.chave`, `.env` | assinar e cifrar | quem mantém o servidor | permanentes |
+| Chaves (sessão, push, backup, anotações) | `dados/*.chave`, `.env` (`CAMINHO_CHAVE_NOTAS` só no `.env`; sem ela, em produção, o servidor não sobe) | assinar e cifrar | quem mantém o servidor | permanentes; a das anotações troca com `CAMINHO_CHAVE_NOTAS_ANTERIOR` |
 | JSON legados da época dos arquivos | `dados/json-legado-*` | migração | quem mantém o servidor | indefinido; a pessoa é tirada deles ao apagar a conta (`servidor.mjs:236-301`) |
 
 ## Fora do app (cópias que o código não alcança)
