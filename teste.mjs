@@ -1257,7 +1257,9 @@ secao('cofre das anotações (cofre.mjs e servidor)');
   // --- o servidor de verdade ---
   const livre = (p) => new Promise((r) => { const s = createServer().once('error', () => r(false)).listen(p, '127.0.0.1', () => s.close(() => r(true))); });
   let PORTA = 0;
-  for (let p = 8801; p <= 8809 && !PORTA; p++) if (await livre(p)) PORTA = p;
+  // PORTAS=8720-8739 troca a faixa (máquina com portas reservadas), como em ferramentas/navegador.mjs.
+  const [de, ate] = (/^(\d+)-(\d+)$/.exec(process.env.PORTAS || '') || [0, 8801, 8809]).slice(1).map(Number);
+  for (let p = de; p <= ate && !PORTA; p++) if (await livre(p)) PORTA = p;
   const pastaS = mkdtempSync(join(tmpdir(), 'cc-cofre-srv-'));
   const base = 'http://127.0.0.1:' + PORTA;
   const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1295,7 +1297,7 @@ secao('cofre das anotações (cofre.mjs e servidor)');
 
   let srv = null;
   try {
-    checar(PORTA > 0, 'há uma porta livre entre 8801 e 8809 para o servidor do teste');
+    checar(PORTA > 0, 'há uma porta livre entre ' + de + ' e ' + ate + ' para o servidor do teste');
     // sem a chave em produção, o servidor recusa subir
     srv = subir({ NODE_ENV: 'production', CAMINHO_TESTE: '', CAMINHO_CHAVE_NOTAS: '' });
     const codigo = await new Promise((r) => { srv.once('exit', r); setTimeout(() => r('ainda vivo'), 8000); });

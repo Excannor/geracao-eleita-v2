@@ -25,7 +25,7 @@ import {
 } from './db.mjs';
 import {
   Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio,
-  MAX_TOQUES_RECEBIDOS_DIA,
+  MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, avisosDesligados,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
 import {
@@ -942,6 +942,13 @@ async function rodadaDeLembretes(agora = new Date()) {
     const data = hojeNoFuso(conta.fuso, agora);
     const minutos = minutosNoFuso(conta.fuso, agora);
     if (emSilencio(minutos)) continue;
+    // O aviso do administrador que chegou na hora do silêncio sai agora, na primeira rodada
+    // depois das 7h. Não conta no teto das automáticas.
+    for (const m of await NOTIFICACOES.tirarPendentes(usuario, agora.getTime())) {
+      if (avisosDesligados(NOTIFICACOES.preferencias(usuario))) break;
+      await enviarPara(usuario, m, { semCaixa: true, ttl: 12 * 3600 });
+      saiu.push({ usuario, tipo: 'aviso', titulo: m.titulo });
+    }
     const { feitas, protegidos } = await diaDe(usuario, data);
     const ontem = somaDias(data, -1);
     let ofensiva = 0;
@@ -1011,6 +1018,75 @@ async function rodadaDeLembretes(agora = new Date()) {
   return saiu;
 }
 
+// ---------- aviso do administrador ----------
+// Painel > Enviar aviso: um aviso pontual, na hora, para o próprio administrador (teste) ou
+// para todas as contas. Cada uma ganha o item no sino na hora. O push respeita o silêncio da
+// noite de cada um (fica guardado e sai depois das 7h, na rodada de lembretes) e quem
+// desligou todos os avisos; não conta no teto de 3 automáticas por dia.
+const PUBLICOS_AVISO = ['mim', 'todos'];
+const destinatariosDoAviso = (eu, publico) => (publico === 'todos' ? CONTAS.lista().map((c) => c.usuario) : [eu]);
+// Quem recebe no celular: tem aparelho inscrito e não desligou tudo.
+const recebePush = (usuario) => NOTIFICACOES.inscricoesDe(usuario).length > 0 && !avisosDesligados(NOTIFICACOES.preferencias(usuario));
+
+async function enviarAvisoAdmin(eu, pedido) {
+  const erro = (msg, codigo = 400, extra = {}) => Object.assign(new Error(msg), { publico: true, codigo, ...extra });
+  const titulo = String(pedido.titulo || '').replace(/\s+/g, ' ').trim();
+  const corpo = String(pedido.texto || '').replace(/\s+/g, ' ').trim();
+  if (!titulo) throw erro('escreva um título');
+  if ([...titulo].length > AVISO_TITULO_MAX) throw erro('o título passa de ' + AVISO_TITULO_MAX + ' caracteres');
+  if ([...corpo].length > AVISO_TEXTO_MAX) throw erro('o texto passa de ' + AVISO_TEXTO_MAX + ' caracteres');
+  const destino = String(pedido.destino || 'nenhum');
+  if (!Object.hasOwn(DESTINOS_AVISO, destino)) throw erro('destino desconhecido');
+  const publico = String(pedido.publico || '');
+  if (!PUBLICOS_AVISO.includes(publico)) throw erro('escolha para quem vai');
+  let foto = null;
+  if (pedido.foto) {
+    const bruto = Buffer.from(String(pedido.foto).replace(/^data:image\/[a-z]+;base64,/, ''), 'base64');
+    if (bruto.length > AVISO_FOTO_MAX) throw erro('a foto passou de ' + Math.round(AVISO_FOTO_MAX / 1024) + ' KB', 413);
+    const tipo = tipoDaImagem(bruto);
+    if (!tipo) throw erro('a foto precisa ser JPEG ou WebP');
+    foto = { bruto, tipo };
+  }
+  const agora = agoraDoServidor();
+  const dia = hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agora);
+  // Um aviso para todos por dia; o segundo exige confirmar de novo. "Só para mim" é livre.
+  if (publico === 'todos' && NOTIFICACOES.avisosParaTodosNoDia(dia) >= 1 && pedido.denovo !== true) {
+    throw erro('já saiu um aviso para todos hoje', 409, { precisaConfirmar: true });
+  }
+  const id = randomBytes(9).toString('base64url');
+  const idFoto = foto ? NOTIFICACOES.guardarFoto(foto.bruto, foto.tipo, agora.getTime()) : '';
+  const url = DESTINOS_AVISO[destino];
+  const usuarios = destinatariosDoAviso(eu, publico);
+  await NOTIFICACOES.guardarNaCaixaDeVarios(usuarios, 'aviso', { titulo, corpo, url, foto: idFoto }, agora.getTime());
+  // O push leva a foto num endereço relativo ao app (o service worker resolve): o Android a
+  // mostra grande; o iPhone ignora.
+  const mensagem = { titulo, corpo, tag: 'aviso:' + id, url, ...(idFoto ? { image: './api/avisos/foto/' + idFoto } : {}) };
+  const agoraVai = [];
+  const depois = [];
+  for (const u of usuarios.filter(recebePush)) {
+    (emSilencio(minutosNoFuso((CONTAS.achar(u) || {}).fuso, agora)) ? depois : agoraVai).push(u);
+  }
+  if (depois.length) await NOTIFICACOES.adiarPush(depois, mensagem, agora.getTime());
+  NOTIFICACOES.anotarAvisoAdmin({ id, de: eu, publico, titulo, corpo, url, foto: idFoto, pessoas: usuarios.length, dia, em: agora.getTime() });
+  console.log('  painel: @' + eu + ' mandou um aviso para ' + (publico === 'todos' ? usuarios.length + ' contas' : 'si') + ' em ' + new Date().toISOString());
+  const mandar = async () => { let n = 0; for (const u of agoraVai) n += (await enviarPara(u, mensagem, { semCaixa: true, ttl: 12 * 3600 })) ? 1 : 0; return n; };
+  // Para todos, o envio segue depois da resposta; só para mim, a resposta diz se chegou.
+  const enviados = publico === 'mim' ? await mandar() : (semEsperar(mandar()), null);
+  return { id, pessoas: usuarios.length, push: agoraVai.length, adiados: depois.length, enviados, foto: idFoto };
+}
+
+function resumoDoAviso(eu) {
+  const todos = CONTAS.lista().map((c) => c.usuario);
+  return {
+    pessoas: todos.length,
+    comPush: todos.filter(recebePush).length,
+    eu: { aparelhos: NOTIFICACOES.inscricoesDe(eu).length, push: recebePush(eu) },
+    paraTodosHoje: NOTIFICACOES.avisosParaTodosNoDia(hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agoraDoServidor())),
+    ultimos: NOTIFICACOES.ultimosAvisosAdmin(5),
+    limites: { titulo: AVISO_TITULO_MAX, texto: AVISO_TEXTO_MAX, foto: AVISO_FOTO_MAX },
+  };
+}
+
 // ---------- rotas ----------
 const servidor = createServer(async (req, res) => {
   try {
@@ -1041,6 +1117,17 @@ const servidor = createServer(async (req, res) => {
     // ---------- públicas ----------
     if (rota === '/api/existe-conta') { json(res, 200, { existe: !CONTAS.vazio }); return; }
     if (rota === '/api/versao') { json(res, 200, { versao: await versaoPublicada() }); return; }
+
+    // A foto de um aviso do administrador: pública, porque o Android busca a imagem do push
+    // sem cookie. O id é sorteado (16 bytes) e não se adivinha; a foto nunca muda (cache longo).
+    if (rota.startsWith('/api/avisos/foto/') && !mudaAlgo) {
+      const f = NOTIFICACOES.foto(rota.slice('/api/avisos/foto/'.length));
+      if (!f) { json(res, 404, { erro: 'foto não encontrada' }); return; }
+      const dados = Buffer.from(f.dados);
+      res.writeHead(200, { 'content-type': f.tipo, 'content-length': dados.length, 'cache-control': 'public, max-age=31536000, immutable' });
+      res.end(req.method === 'HEAD' ? undefined : dados);
+      return;
+    }
 
     // Só nas ferramentas de teste: um backup agora, para conferir que apagar a conta limpa os backups.
     if ((PUSH_TESTE || process.env.CAMINHO_TESTE === '1') && rota === '/api/teste/backup' && post) {
@@ -1304,6 +1391,21 @@ const servidor = createServer(async (req, res) => {
         backup: estadoDosBackups(),
       };
       json(res, 200, painel);
+      return;
+    }
+
+    // ---------- aviso pontual do administrador (Painel > Enviar aviso) ----------
+    // GET: quantas pessoas recebem e quantos avisos para todos já saíram hoje. POST: envia.
+    if (rota === '/api/painel/aviso') {
+      if (!exigir(conta && ehAdmin(eu), 403, 'só o administrador manda avisos')) return;
+      if (!post) { json(res, 200, resumoDoAviso(eu)); return; }
+      let pedido;
+      try { pedido = JSON.parse((await corpoDaRequisicao(req, 512 * 1024)) || '{}') || {}; } catch { json(res, 413, { erro: 'a foto é grande demais' }); return; }
+      try {
+        json(res, 200, { ok: true, ...(await enviarAvisoAdmin(eu, pedido)), resumo: resumoDoAviso(eu) });
+      } catch (e) {
+        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora', ...(e.precisaConfirmar ? { precisaConfirmar: true } : {}) });
+      }
       return;
     }
 
