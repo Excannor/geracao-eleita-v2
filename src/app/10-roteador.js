@@ -298,7 +298,6 @@
     // O painel do administrador também abre pelo Mais (só para o admin): com ele aberto, o Mais fica aceso.
     const noPainel = rota === 'config' && String(arg || '').startsWith('painel');
     const maisSelecionado = !naBiblia && (doMais || noPainel || ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
-    const pontoMais = !desafiosNaBarra && !!(CC.haDesafioPendenteHoje && CC.haDesafioPendenteHoje());
     const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
     const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
     // Uma vez que a pessoa chegou na aba, o pontinho de novidade não aparece nunca mais.
@@ -314,8 +313,10 @@
         + '<span class="rotulo-aba">' + rotulo + '</span></button>';
     };
 
+    // O Mais não leva ponto: os desafios do dia ficavam sempre "pendentes" e o ponto vermelho
+    // nunca sumia, sem dizer do que era. Ponto só para novidade de verdade (amigos, aba nova).
     const botaoMais = () => {
-      const ponto = pontoMais ? '<i class="ponto-aba"></i>' : '';
+      const ponto = '';
       return '<button type="button" class="aba' + (maisSelecionado ? ' selecionada' : '') + '" data-papel="mais" data-abrir-mais'
         + (maisSelecionado ? ' aria-current="page"' : '') + ' aria-label="Mais"><span class="icone-aba">' + CC.icoAba('mais') + ponto + '</span>'
         + '<span class="rotulo-aba">Mais</span></button>';
