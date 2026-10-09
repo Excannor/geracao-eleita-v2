@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os cachorros que lambem as feridas de Lázaro (Lc 16.21): um cachorro magro de lado, virado para a esquerda, de focinho comprido, a orelha caída, o rabo levantado e as quatro patas finas no chão. Sem área sálvia. As patas e o rabo vão antes do corpo, para o papel dele cobrir as pontas. -->
+<path class="h" d="M6 96H114"/>
+<path class="k" d="M46 74V96M54 76V96M78 76V96M86 74V96"/>
+<path class="k" d="M94 62C102 58 105 50 103 43"/>
+<path class="k p" d="M38 60C38 52 46 50 58 50H84C92 50 96 55 96 62C96 70 91 75 85 75C76 72 62 73 53 77C44 77 38 70 38 60Z"/>
+<path class="h" d="M56 57C62 55 68 55 74 57M62 64C68 62 74 62 80 64"/>
+<path class="k p" d="M46 54C46 43 40 36 33 36C27 36 23 40 22 44L15 47C12 50 13 56 18 57H31C39 60 46 60 46 54Z"/>
+<path class="k p" d="M35 38C41 36 46 41 44 52C39 50 35 45 35 38Z"/>
+<path class="e" d="M13 50.5a2.4 2 0 1 0 4.8 0a2.4 2 0 1 0-4.8 0Z"/>
+<path class="e" d="M26.2 44a1.8 1.8 0 1 0 3.6 0a1.8 1.8 0 1 0-3.6 0Z"/>
+</svg>

@@ -89,5 +89,14 @@
   "perguntas": [
     "Se você usasse o seu dinheiro pensando na vida que não acaba, o que mudaria esta semana?",
     "Em que coisa pequena Deus está vendo se você é fiel?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 16.19-31",
+      "titulo": "O rico e Lázaro",
+      "slug": "rico-e-lazaro",
+      "rotulo": "Da mesma conversa",
+      "linha": "um rico de púrpura e um mendigo na porta dele"
+    }
   ]
 }

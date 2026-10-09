@@ -1,0 +1,94 @@
+{
+  "titulo": "O rico e Lázaro",
+  "ref": "Lc 16.19-31",
+  "grupo": "lucas",
+  "linha": "Um rico de púrpura e um mendigo na porta dele",
+  "desenho": "porta-do-rico",
+  "desenhoLista": "grande-abismo",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus acaba de dizer que ninguém pode servir a Deus e ao dinheiro. Os fariseus amam o dinheiro e zombam de Jesus.",
+          "ref": "Lc 16.13-14"
+        },
+        {
+          "texto": "Jesus responde que Deus conhece o coração deles. Deus detesta muita coisa que as pessoas acham que vale muito. Depois, Jesus conta esta história.",
+          "ref": "Lc 16.15-19"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Um homem rico se veste de púrpura e linho fino e vive no luxo todos os dias. Um mendigo coberto de feridas fica sempre na porta dele. Jesus diz o nome do mendigo, Lázaro, mas não diz o nome do rico.",
+          "ref": "Lc 16.19-20"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "cachorro",
+              "titulo": "Na porta do rico",
+              "fala": "desejava comer o que caía da mesa do homem rico",
+              "ref": "Lc 16.21"
+            },
+            {
+              "desenho": "grande-abismo",
+              "titulo": "Depois da morte",
+              "fala": "há um grande abismo separando-nos",
+              "ref": "Lc 16.26"
+            },
+            {
+              "desenho": "rolo-aberto",
+              "titulo": "Os cinco irmãos",
+              "fala": "Os seus irmãos têm Moisés e os profetas",
+              "ref": "Lc 16.29"
+            }
+          ]
+        },
+        {
+          "texto": "Os cachorros vêm lamber as feridas de Lázaro. Um dia, Lázaro morre, e os anjos levam ele para junto de Abraão. O rico também morre e é sepultado.",
+          "ref": "Lc 16.21-22"
+        },
+        {
+          "texto": "No inferno, o rico sofre e vê Lázaro de longe, ao lado de Abraão. Ele grita por socorro.",
+          "ref": "Lc 16.23-24"
+        },
+        {
+          "fala": "Pai Abraão, tenha compaixão de mim",
+          "ref": "Lc 16.24"
+        },
+        {
+          "texto": "Abraão lembra que o rico teve tudo o que queria na vida, e Lázaro não teve nada. Agora Lázaro é consolado. Entre os dois existe um abismo que ninguém atravessa.",
+          "ref": "Lc 16.25-26"
+        },
+        {
+          "texto": "O rico pede que Lázaro vá avisar os cinco irmãos dele. Abraão diz que eles já têm Moisés e os profetas. O rico insiste que, se um morto for falar com eles, os irmãos vão largar os pecados.",
+          "ref": "Lc 16.27-30"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O rico sabe até o nome de Lázaro, e mesmo assim deixa o mendigo com fome na porta. Jesus conta isso para fariseus que amam o dinheiro.",
+    "apoio": "Abraão responde ao último pedido do rico. “também não ouvirão, mesmo que alguém ressuscite dos mortos”.",
+    "ref": "Lc 16.14-31"
+  },
+  "perguntas": [
+    "Quem fica na sua porta todo dia e você nem enxerga mais?",
+    "Que parte da Bíblia você já conhece, mas ainda não leva a sério?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 16.1-13",
+      "titulo": "O administrador desonesto",
+      "slug": "administrador-desonesto",
+      "rotulo": "Da mesma conversa",
+      "linha": "o administrador corta as dívidas e pensa no futuro"
+    }
+  ]
+}
