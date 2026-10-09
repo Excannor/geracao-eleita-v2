@@ -103,6 +103,10 @@ await cmd('Page.enable');
 await cmd('Runtime.enable');
 await cmd('Network.enable');
 await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+// O navegador no fuso das contas (o padrão do servidor é São Paulo). Com a máquina em UTC, das
+// 21h às 24h de Brasília o app já estava no dia seguinte e o servidor ainda no de hoje: o
+// "Orei" e o check-in iam para dias diferentes e o teste falhava só à noite.
+await cmd('Emulation.setTimezoneOverride', { timezoneId: 'America/Sao_Paulo' });
 // sem a abertura, sem o convite de notificações e sem o tutorial de instalar por cima da tela;
 // o .ics de "Pôr na agenda" fica guardado em window.__ics em vez de baixar
 await cmd('Page.addScriptToEvaluateOnNewDocument', { source: "try{localStorage.setItem('cc.aviso.push','nunca');localStorage.removeItem('cc.instalar');sessionStorage.setItem('cc.abertura','1')}catch(e){}"
@@ -144,7 +148,8 @@ ok(await av('decodeURIComponent(' + q('[data-mensagem-oracao="ana"]') + '.href).
 await clicar('[data-orei="ana"]');
 ok(await esperar('!document.querySelector("[data-ore-hoje=\\"ana\\"]") && !!CC.diaDoDiario()["orei_ana"]'), 'C1: "Orei" anota orei_ana no diário de hoje e a linha some');
 await av('CC.redesenhar(); true');
-ok(await esperar('!!document.querySelector("[data-ore-hoje=\\"bia\\"]") && !document.querySelector("[data-ore-hoje=\\"ana\\"]")'), 'C1: redesenhada, a linha de quem já recebeu oração continua fora até amanhã');
+// redesenhar busca a célula de novo no servidor: com a máquina carregada passa de 8 s
+ok(await esperar('!!document.querySelector("[data-ore-hoje=\\"bia\\"]") && !document.querySelector("[data-ore-hoje=\\"ana\\"]")', 20000), 'C1: redesenhada, a linha de quem já recebeu oração continua fora até amanhã');
 ok(await av('!!' + q('.cabeca-celula .cartao-encontro') + ' && /Próximo encontro/.test(' + q('.cartao-encontro') + '.textContent) && /^(Hoje|Quarta, \\d+\\/\\d+)$/.test(' + q('.cartao-encontro .textos > span') + '.textContent)'),
   'C8: o cartão "Próximo encontro" no alto, com o dia marcado (quarta)');
 ok(await av('!/Encontro às|encontro às/.test(' + q('#conteudo') + '.textContent)'), 'C8: a linha repetida "Encontro às quartas-feiras" saiu');
