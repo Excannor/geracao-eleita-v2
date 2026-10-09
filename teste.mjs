@@ -410,6 +410,12 @@ const CC = contexto.window.CC;
   }).map(([chave]) => chave);
   checar(Object.keys(P.guias).length >= 5 && !guiasRuins.length, 'cada guia de leitura aponta para um capítulo, versículos e salto que existem na NBV' + (guiasRuins.length ? ' (' + guiasRuins.join(', ') + ')' : ''));
   checar(html.includes('"primeirosDias"') || readFileSync(dist(arquivoConteudo), 'utf8').includes('"primeirosDias"'), 'o conteúdo publicado leva os primeiros dias');
+  // O checador inteiro do "Onde estamos" (ferramentas/checar-contexto.mjs, menos de um segundo): os
+  // cinco campos de cada dia escrito, o gancho de amanhã contra a NBV do dia seguinte, as
+  // referências dentro da leitura, o tamanho de cada campo e os guias.
+  const { spawnSync } = await import('node:child_process');
+  const cc = spawnSync(process.execPath, [join(AQUI, 'ferramentas', 'checar-contexto.mjs')], { encoding: 'utf8' });
+  checar(cc.status === 0, 'o "Onde estamos" de cada dia passa no checar-contexto' + (cc.status ? ' (' + (cc.stdout.match(/FALHA.*$/gm) || []).slice(0, 3).join(' · ') + ')' : ''));
 }
 
 const dias = (ini, n) => Array.from({ length: n }, (_, i) => somaDias(ini, i));
