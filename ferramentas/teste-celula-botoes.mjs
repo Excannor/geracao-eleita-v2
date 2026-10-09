@@ -169,7 +169,7 @@ ok(await av('/o encontro desta semana|Hoje|Ontem/.test(' + q('[data-realce-data]
 await clicar('[data-outra-data]');
 ok(await av('!' + q('[data-outras-datas]') + '.hidden && document.querySelectorAll("[data-outras-datas] [data-data]").length === 8 && ' + q('[data-outra-data]') + '.getAttribute("aria-expanded") === "true"'), 'C12: "Outra data" mostra as 8 datas');
 await av('document.querySelectorAll("[data-outras-datas] [data-data]")[2].click(); true');
-ok(await av('!/encontro desta semana/.test(' + q('[data-realce-data]') + '.textContent) || document.querySelectorAll("[data-outras-datas] [data-data]")[2].dataset.data === CC.hojeIso()'), 'C12: escolher outra data troca o destaque');
+ok(await esperar('!/encontro desta semana/.test(' + q('[data-realce-data]') + '.textContent) || document.querySelectorAll("[data-outras-datas] [data-data]")[2].dataset.data === CC.hojeIso()'), 'C12: escolher outra data troca o destaque');
 await clicar('.folha [data-fechar]');
 await esperar('!document.querySelector(".folha")');
 ok(await av('!!' + q('[data-pedir-caminhada]')) && await alto('[data-pedir-caminhada]'), 'C4: o Painel tem "Pedir para a célula marcar"');
