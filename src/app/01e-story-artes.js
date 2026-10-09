@@ -1714,7 +1714,7 @@
     oleiro: { fundo: ['#0f0e0d', { x: L / 2, y: 1000, r: 800, cor: 'rgba(224,112,48,.12)' }], caixa: [600, 1230],
       tema: { ...ESCURO, numero: '#e0743a', rotulo: '#efe4cf', marca: '#efe4cf', marcaFraca: '#a69c8c' }, desenhar: arteOleiro, grao: [22, 186] },
     procurado: { fundo: ['#efe7d8', { x: L / 2, y: 900, r: 1100, cor: 'rgba(255,255,255,.4)' }], caixa: [290, 1320], tema: CLARO, desenhar: arteProcurado, grao: [16, 157] },
-    suficiente: { fundo: ['#0b0c0e'], tema: { ...ESCURO, rotulo: '#f4f1ea', marcaFraca: '#9aa0a8' }, desenhar: arteSuficiente, grao: [18, 22] },
+    suficiente: { fundo: ['#0b0c0e'], foto: 'suficiente', tema: { ...ESCURO, rotulo: '#f4f1ea', marcaFraca: '#9aa0a8' }, desenhar: arteSuficiente, grao: [18, 22] },
     praticantes: { fundo: ['#46502f', { x: L / 2, y: 900, r: 1000, cor: 'rgba(150,165,100,.22)' }], caixa: [350, 1420],
       tema: { ...ESCURO, numero: '#ffb08a', rotulo: '#efe7cf', marca: '#efe7cf', marcaFraca: '#c2c7a4', brilho: false }, desenhar: artePraticantes, grao: [18, 122] },
     mesa: { fundo: ['#0e0f0d', { x: L / 2, y: 1050, r: 700, cor: 'rgba(143,209,79,.10)' }], caixa: [590, 1500],
@@ -1732,8 +1732,43 @@
     naovivo: { fundo: ['#0f0e0d', { x: L / 2, y: 1000, r: 800, cor: 'rgba(255,255,255,.05)' }], caixa: [560, 1510], tema: ESCURO, desenhar: arteNaoVivo, grao: [22, 220] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
   };
+  // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
+  // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
+  const fotos = {};
+  function prepararArte(nome) {
+    const m = MODELOS[nome];
+    const arquivo = m && m.foto && (window.STORY_FOTOS || {})[m.foto];
+    if (!arquivo || fotos[m.foto]) return Promise.resolve(true);
+    return new Promise((resolver) => {
+      const img = new Image();
+      const espera = setTimeout(() => resolver(false), 10000);
+      img.onload = () => { clearTimeout(espera); fotos[m.foto] = img; resolver(true); };
+      img.onerror = () => { clearTimeout(espera); resolver(false); };
+      img.src = /^(https?|file|data|blob):/.test(arquivo) ? arquivo : './' + arquivo;
+    });
+  }
+  const arteCompleta = (nome) => !(MODELOS[nome] && MODELOS[nome].foto && (window.STORY_FOTOS || {})[MODELOS[nome].foto]) || !!fotos[MODELOS[nome].foto];
+  // A foto é o fundo inteiro: só um degradê escuro em cima e embaixo, para a chama, os dias e
+  // a marca se lerem sobre o céu e a cidade; a frase já está na foto.
+  function comFoto(ctx, img, dias, m) {
+    ctx.drawImage(img, 0, 0, L, A);
+    const cima = ctx.createLinearGradient(0, 0, 0, 720);
+    cima.addColorStop(0, 'rgba(0,0,0,.72)');
+    cima.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = cima;
+    ctx.fillRect(0, 0, L, 720);
+    const baixo = ctx.createLinearGradient(0, A - 560, 0, A);
+    baixo.addColorStop(0, 'rgba(0,0,0,0)');
+    baixo.addColorStop(1, 'rgba(0,0,0,.8)');
+    ctx.fillStyle = baixo;
+    ctx.fillRect(0, A - 560, L, 560);
+    cabecalho(ctx, dias, m.tema);
+    grao(ctx, 14, 941);
+    S.marca(ctx, PE, { cor: m.tema.marca, corFraca: m.tema.marcaFraca });
+  }
   function montar(m) {
     return (ctx, { dias }) => {
+      if (m.foto && fotos[m.foto]) { comFoto(ctx, fotos[m.foto], dias, m); return; }
       fundo(ctx, m.fundo[0], m.fundo[1]);
       ctx.save();
       if (m.caixa) {
@@ -1752,5 +1787,7 @@
   }
   S.artes = {};
   for (const nome of Object.keys(MODELOS)) S.artes[nome] = montar(MODELOS[nome]);
+  S.prepararArte = prepararArte;
+  S.arteCompleta = arteCompleta;
   S.texturas = { sorteio, grao, gastar };
 })(window.CC);

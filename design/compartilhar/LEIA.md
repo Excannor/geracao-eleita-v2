@@ -56,5 +56,8 @@ arte no meio (encolhe por igual para caber entre y 560 e 1480) e só a marca no 
 O arquivo não entra no index.html: o build o publica à parte (`story-artes.<resumo>.js`), o
 app o carrega só na hora de gerar um story desses e o service worker o guarda; sem ele, o
 story sai no modelo de sempre.
+O "suficiente" usa a foto do dono (src/story-fotos/suficiente.webp: P&B, contraste, um pouco
+mais escura, 1080x1920, 113 KB) como fundo inteiro, publicada como
+`story-foto-suficiente.<resumo>.webp` e pedida junto com as artes; sem ela, sai a ilustração.
 Para gerar: `CHROME=... node design/compartilhar/gerar.mjs <pasta> artes`. O teste de
 navegador é `ferramentas/teste-story.mjs`.
