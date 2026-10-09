@@ -225,9 +225,9 @@
       + (membro ? blocoCaminhadaHoje() : '')
       + '<div class="acoes">'
       + (eu.papel === 'visitante' ? '<button class="botao" data-tornar-membro>' + CC.ico('mais-sinal') + 'Fazer parte da célula</button>' : '')
-      + (eu.papel !== 'visitante' && eu.estado === 'ativo' && p.encontro >= 0
+      + (eu.papel !== 'visitante' && eu.estado === 'ativo' && p.encontro >= 0 && !p.celulaAguardando
         ? '<button class="botao contorno" data-convidar-encontro>' + CC.ico('compartilhar') + 'Convidar para o encontro</button>' : '')
-      + (podeChamar && eu.estado === 'ativo' ? '<button class="botao contorno pequeno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
+      + (podeChamar && eu.estado === 'ativo' && !p.celulaAguardando ? '<button class="botao contorno pequeno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
       + (conduzo ? '<div class="pe-duplo-plano"><button class="botao plano pequeno" data-recado>' + (p.recado ? 'Mudar o recado' : 'Escrever um recado') + '</button>'
         + '<button class="botao plano pequeno" data-encontro>Dia do encontro</button></div>' : '')
       + '</div>';
@@ -327,6 +327,9 @@
       || (b.fezHoje - a.fezHoje) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
     const leram = gente.filter((m) => m.estado === 'ativo' && m.fezHoje).length;
     const ativosSemVisitante = gente.filter((m) => m.estado === 'ativo').length;
+    // Líder menor de 18 à espera da aprovação da liderança: ainda não tira gente, não marca
+    // auxiliar e não multiplica (pode encerrar a própria célula).
+    const gere = souLider && p.aguardandoAprovacao !== 'lider';
     return '<p class="passo-dica">' + leram + ' de ' + CC.plural(ativosSemVisitante, 'pessoa leu', 'pessoas leram') + ' hoje.</p>'
       + '<div class="lista-pedidos">' + ordem.map((m) => {
         const situacao = m.estado === 'convidado' ? 'Ainda não aceitou'
@@ -339,7 +342,7 @@
           + '<span class="arroba">' + situacao + '</span></div>'
           + (m.fezHoje ? '<span class="selo-status leu">' + CC.ico('certo') + '</span>' : '')
           // Tirar da célula é sério: fica separado, em vermelho, e ainda pede confirmação.
-          + (souLider && m.usuario !== p.criadoPor ? '<div class="acoes-pessoa">'
+          + (gere && m.usuario !== p.criadoPor ? '<div class="acoes-pessoa">'
             + (m.estado === 'ativo'
               ? '<button class="botao contorno pequeno" data-auxiliar="' + CC.esc(m.usuario) + '" data-sim="' + (m.papel === 'auxiliar' ? '0' : '1') + '">'
                 + (m.papel === 'auxiliar' ? 'Tirar de auxiliar' : 'Tornar auxiliar') + '</button>' : '')
@@ -348,13 +351,13 @@
       }).join('') + '</div>'
       + (visitantes.length ? CC.tituloSecao('Visitantes') + '<div class="lista-pedidos">' + visitantes.map((m) => '<div class="linha-amigo">' + retrato(m)
         + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + '</b></div>'
-        + (souLider ? '<div class="acoes-pessoa">' + botaoTirar(m) + '</div>' : '')
+        + (gere ? '<div class="acoes-pessoa">' + botaoTirar(m) + '</div>' : '')
         + '</div>').join('') + '</div>' : '')
       + '<div class="acoes">'
       + (eu.fezHoje && faltam.length ? '<button class="botao" data-notificar>' + CC.ico('sino')
         + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
-      + (gente.length < limite ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar um amigo</button>' : '')
-      + (souLider && p.membros.some((m) => m.estado === 'ativo' && m.papel === 'auxiliar')
+      + (gente.length < limite && !p.celulaAguardando ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar um amigo</button>' : '')
+      + (gere && p.membros.some((m) => m.estado === 'ativo' && m.papel === 'auxiliar')
         ? '<button class="botao contorno" data-multiplicar>' + CC.ico('mais-sinal') + 'Multiplicar a célula</button>' : '')
       + (souLider ? '<button class="botao plano perigo" data-encerrar>Encerrar a célula</button>' : '<button class="botao plano perigo" data-sair>Sair da célula</button>')
       + '</div>';
@@ -730,7 +733,8 @@
             const { proposito } = await CC.api('api/celula', { acao: 'criar', titulo: folha.querySelector('[data-titulo]').value });
             fechar();
             irParaCelula(proposito.id);
-            folhaLinkCelula(proposito);
+            if (proposito.aguardandoAprovacao) folhaAguardandoAprovacao();
+            else folhaLinkCelula(proposito);
           } catch (e) {
             erro.textContent = e.message;
             erro.hidden = false;
@@ -740,6 +744,21 @@
       },
     });
   };
+
+  // Menor de 18 que cria a célula: ela espera a aprovação da liderança antes do link e do painel.
+  const TEXTO_AGUARDANDO = {
+    lider: ['Sua célula está aguardando aprovação da liderança.',
+      'Quem tem menos de 18 anos lidera uma célula depois que a liderança da igreja aprova. Assim que aprovarem, você manda o link e vê o painel da célula.'],
+    auxiliar: ['Sua função de auxiliar está aguardando aprovação da liderança.',
+      'Quem tem menos de 18 anos ajuda a conduzir a célula depois que a liderança da igreja aprova. Até lá, você participa como membro.'],
+  };
+  function folhaAguardandoAprovacao() {
+    CC.folha('<h2>Célula criada</h2>'
+      + '<p>' + TEXTO_AGUARDANDO.lider[0] + '</p>'
+      + '<p class="passo-dica">' + TEXTO_AGUARDANDO.lider[1] + '</p>'
+      + '<div class="acoes"><button class="botao" data-fechar>Entendi</button></div>',
+    { rotulo: 'Célula aguardando aprovação', ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
+  }
 
   async function folhaLinkCelula(p) {
     let link = '';
@@ -787,7 +806,10 @@
 
   function topoDaCelula(p) {
     const conduzo = p.euConduzo;
-    return (p.nasceuDe ? '<div class="recado-lider"><p>Esta célula nasceu da ' + CC.esc(comoCelula(p.nasceuDe.titulo)) + '.</p></div>' : '')
+    const espera = TEXTO_AGUARDANDO[p.aguardandoAprovacao];
+    return (espera ? '<div class="recado-lider aviso-aprovacao" role="status"><span class="etiqueta">Aguardando aprovação</span><p><b>' + espera[0] + '</b></p>'
+      + '<p class="passo-dica">' + espera[1] + '</p></div>' : '')
+      + (p.nasceuDe ? '<div class="recado-lider"><p>Esta célula nasceu da ' + CC.esc(comoCelula(p.nasceuDe.titulo)) + '.</p></div>' : '')
       + (p.multiplicouPara ? '<div class="recado-lider"><p>Nasceu a ' + CC.esc(comoCelula(p.multiplicouPara.titulo)) + ' a partir desta célula.</p></div>' : '')
       + (p.recado
       ? '<div class="recado-lider"><span class="etiqueta">Recado de ' + CC.esc(nomeDoLider(p)) + '</span><p>' + CC.esc(p.recado) + '</p>'

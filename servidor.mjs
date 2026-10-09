@@ -11,7 +11,7 @@ import { createHmac, createHash, randomBytes } from 'node:crypto';
 import { createContext, runInContext } from 'node:vm';
 import {
   Contas, arquivoDoEstado, seloDaConta, limparNome, iguais, hojeNoFuso, fusoValido, somaDias,
-  datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA, podeConduzir,
+  datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA, podeConduzir, aguardandoAprovacao, aprovacaoQueFalta,
 } from './contas.mjs';
 import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs';
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
@@ -769,6 +769,10 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
     estudo: p.estudo || null,
     estudoAcolhida: p.estudoAcolhida || '', estudoAdoracao: p.estudoAdoracao || '', estudoTestemunho: p.estudoTestemunho || '',
     euConduzo: conduzo,
+    // Menor de 18 à espera da aprovação da liderança: o papel que espera ('lider'/'auxiliar'),
+    // para a tela avisar; e se a célula inteira espera (o líder dela), para não oferecer o link.
+    aguardandoAprovacao: aguardandoAprovacao(p, eu),
+    celulaAguardando: !!aprovacaoQueFalta(p, p.criadoPor, 'lider'),
     ...bannerMultiplicacao(p, referencia),
   };
   if (!conduzo && !verTudo) return extra;
@@ -1271,6 +1275,27 @@ const servidor = createServer(async (req, res) => {
       return;
     }
 
+    // ---------- liderança de menor de 18: o administrador aprova ou recusa ----------
+    // GET lista os pedidos pendentes; POST decide um ({ proposito, usuario, papel, aprovar }).
+    // Quem decidiu e quando ficam gravados no pedido (tabela liderancas) e no registro do servidor.
+    if (rota === '/api/painel/liderancas') {
+      if (!exigir(conta && ehAdmin(eu), 403, 'só a liderança aprova')) return;
+      if (post) {
+        try {
+          const { proposito, usuario, papel, aprovar } = await lerJson(req);
+          if (!['lider', 'auxiliar'].includes(papel)) throw Object.assign(new Error('papel inválido'), { publico: true });
+          await CONTAS.decidirLideranca(eu, { proposito, usuario, papel, aprovar: aprovar === true }, hojeDe(eu));
+          console.log('  painel: @' + eu + (aprovar === true ? ' aprovou ' : ' recusou ') + papel + ' de célula em ' + new Date().toISOString());
+          json(res, 200, { ok: true, pendentes: CONTAS.liderancasPendentes(hojeDe(eu)) });
+        } catch (e) {
+          json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora' });
+        }
+        return;
+      }
+      json(res, 200, { pendentes: CONTAS.liderancasPendentes(hojeDe(eu)) });
+      return;
+    }
+
     // ---------- inteligência: o painel da igreja (admin) e o da célula (quem conduz) ----------
     if (rota === '/api/painel/igreja') {
       if (!exigir(conta && ehAdmin(eu), 403, 'só o dono do app vê o painel')) return;
@@ -1751,8 +1776,8 @@ const servidor = createServer(async (req, res) => {
             const p = CONTAS.proposito(celula);
             if (p) {
               const nome = await nomeDeExibicao(eu);
-              const alvos = new Set([p.criadoPor]);
-              for (const m of p.membros) if (m.estado === 'ativo' && m.papel === 'auxiliar') alvos.add(m.usuario);
+              // Quem conduz de fato (menor à espera da aprovação da liderança ainda não recebe).
+              const alvos = new Set([p.criadoPor, ...p.membros.map((m) => m.usuario)].filter((u) => podeConduzir(p, u)));
               alvos.delete(eu);
               // "celula" vai junto para o toque na notificação abrir direto na aba Oração.
               for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'pedidoConduz', { amigo: nome, celula: p.id }));
@@ -1780,8 +1805,7 @@ const servidor = createServer(async (req, res) => {
           if (motivo === MOTIVO_PERIGO && !jaTinhaDenunciado) {
             const p = CONTAS.proposito(r.celula);
             if (p) {
-              const alvos = new Set([p.criadoPor]);
-              for (const m of p.membros) if (m.estado === 'ativo' && m.papel === 'auxiliar') alvos.add(m.usuario);
+              const alvos = new Set([p.criadoPor, ...p.membros.map((m) => m.usuario)].filter((u) => podeConduzir(p, u)));
               for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'denunciaPerigo', { celula: p.id }));
             }
           }
@@ -1829,7 +1853,7 @@ const servidor = createServer(async (req, res) => {
         if (r.ja) return { ja: true };
         const nome = await nomeDeExibicao(eu);
         const destinos = new Set([r.de]);
-        for (const p of CONTAS.propositosDe(eu)) if (p.celula && p.criadoPor) destinos.add(p.criadoPor);
+        for (const p of CONTAS.propositosDe(eu)) if (p.celula && p.criadoPor && podeConduzir(p, p.criadoPor)) destinos.add(p.criadoPor);
         await CONTAS.registrarPedidoConversa(eu, 'conhecer', [...destinos], hojeDe(eu));
         for (const destino of destinos) semEsperar(avisoSocial(destino, 'querConversar', { nome, deUsuario: eu }));
         return {};
@@ -1855,7 +1879,7 @@ const servidor = createServer(async (req, res) => {
         const conta = CONTAS.achar(eu);
         const destinos = new Set([conta.acompanhadoPor, conta.convidadoPor].filter(Boolean));
         for (const p of CONTAS.propositosDe(eu)) {
-          if (p.celula && p.criadoPor && p.membros.some((m) => m.usuario === eu && m.estado === 'ativo')) destinos.add(p.criadoPor);
+          if (p.celula && p.criadoPor && podeConduzir(p, p.criadoPor) && p.membros.some((m) => m.usuario === eu && m.estado === 'ativo')) destinos.add(p.criadoPor);
         }
         for (const x of Object.values(CONTAS.dados.discipulados || {})) if (x.estado === 'ativo' && x.discipulo === eu) destinos.add(x.discipulador);
         destinos.delete(eu);

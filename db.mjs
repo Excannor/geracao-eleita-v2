@@ -226,6 +226,15 @@ const ESQUEMA = [
   `
   ALTER TABLE propositos ADD COLUMN recado_quando TEXT NOT NULL DEFAULT '';
   `,
+  // v16: quem tem menos de 18 anos só lidera ou auxilia uma célula depois que a liderança (o
+  // administrador) aprova. Uma linha por pessoa, célula e papel ('lider' ou 'auxiliar'): o
+  // pedido, o estado ('pendente', 'aprovada', 'recusada') e quem decidiu, e quando.
+  `
+  CREATE TABLE liderancas (proposito TEXT NOT NULL, usuario TEXT NOT NULL, papel TEXT NOT NULL, estado TEXT NOT NULL,
+    pedido_em TEXT NOT NULL, decidido_por TEXT NOT NULL DEFAULT '', decidido_em TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY (proposito, usuario, papel));
+  CREATE INDEX liderancas_estado ON liderancas (estado);
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -393,6 +402,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['proposito_dias', 'DELETE FROM proposito_dias WHERE proposito IN (SELECT p.id FROM propositos p JOIN proposito_membros m ON m.proposito = p.id WHERE p.grupo = 0 AND m.usuario = ?)', [u]],
     ['propositos', 'DELETE FROM propositos WHERE grupo = 0 AND id IN (SELECT proposito FROM proposito_membros WHERE usuario = ?)', [u]],
     ['proposito_membros', 'DELETE FROM proposito_membros WHERE usuario = ?', [u]],
+    // o pedido de aprovação para liderar (v16) é da pessoa; quem decidiu fica no dela
+    ['liderancas', 'DELETE FROM liderancas WHERE usuario = ?', [u]],
     // o histórico do encontro fica (quem registrou, quantas pessoas), só a presença da pessoa some
     ['celula_presencas', 'DELETE FROM celula_presencas WHERE usuario = ?', [u]],
     // discipulado dos dois lados, e os encontros dele, saem inteiros: não é um grupo que
