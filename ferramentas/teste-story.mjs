@@ -206,6 +206,8 @@ try {
   const verso = await av('CC.story.preparar({ tipo: "versiculo", ref: "Êxodo 31.3", texto: "e o enchi do Espírito de Deus. Dei a ele habilidade, inteligência e conhecimento artístico", traducao: "Nova Bíblia Viva" }).then(__medir)');
   ok(!!verso && verso.w === 1080 && verso.h === 1920 && verso.desvio > 12 && verso.canto.every((v) => v < 30),
     'o story de versículo sai em 1080x1920, na página escura (canto ' + (verso && verso.canto.join(',')) + ')');
+  ok(await av('!!CC.story.fundoCartaz && CC.story.versiculoCompleto() && /^story-foto-montanhas\\.[0-9a-f]{10}\\.webp$/.test((window.STORY_FOTOS || {}).montanhas || "")'),
+    'o versículo sai no fundo de cartaz, com as montanhas (arquivo à parte, vindo com as artes)');
   const urlV = await textoGrande('CC.story.preparar({ tipo: "versiculo", ref: "Êxodo 31.3", texto: "e o enchi do Espírito de Deus. Dei a ele habilidade, inteligência e conhecimento artístico", traducao: "Nova Bíblia Viva" }).then((f) => new Promise((r) => { const l = new FileReader(); l.onload = () => r(l.result); l.readAsDataURL(f); }))');
   writeFileSync(join(SAIDA, 'story-versiculo-exodo-31-3.png'), Buffer.from(urlV.split(',')[1], 'base64'));
 

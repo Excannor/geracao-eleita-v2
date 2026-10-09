@@ -1839,19 +1839,20 @@
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
   const fotos = {};
-  function prepararArte(nome) {
-    const m = MODELOS[nome];
-    const arquivo = m && m.foto && (window.STORY_FOTOS || {})[m.foto];
-    if (!arquivo || fotos[m.foto]) return Promise.resolve(true);
+  function carregarFoto(chave) {
+    const arquivo = chave && (window.STORY_FOTOS || {})[chave];
+    if (!arquivo || fotos[chave]) return Promise.resolve(true);
     return new Promise((resolver) => {
       const img = new Image();
       const espera = setTimeout(() => resolver(false), 10000);
-      img.onload = () => { clearTimeout(espera); fotos[m.foto] = img; resolver(true); };
+      img.onload = () => { clearTimeout(espera); fotos[chave] = img; resolver(true); };
       img.onerror = () => { clearTimeout(espera); resolver(false); };
       img.src = /^(https?|file|data|blob):/.test(arquivo) ? arquivo : './' + arquivo;
     });
   }
-  const arteCompleta = (nome) => !(MODELOS[nome] && MODELOS[nome].foto && (window.STORY_FOTOS || {})[MODELOS[nome].foto]) || !!fotos[MODELOS[nome].foto];
+  const prepararArte = (nome) => carregarFoto(MODELOS[nome] && MODELOS[nome].foto);
+  const fotoPronta = (chave) => !(window.STORY_FOTOS || {})[chave] || !!fotos[chave];
+  const arteCompleta = (nome) => !(MODELOS[nome] && MODELOS[nome].foto) || fotoPronta(MODELOS[nome].foto);
   // A foto é o fundo inteiro: só um degradê escuro em cima e embaixo, para a chama, os dias e
   // a marca se lerem sobre o céu e a cidade; a frase já está na foto.
   function comFoto(ctx, img, dias, m) {
@@ -1891,7 +1892,136 @@
   }
   S.artes = {};
   for (const nome of Object.keys(MODELOS)) S.artes[nome] = montar(MODELOS[nome]);
+  // ---------- o fundo de cartaz do story de versículo ----------
+  // O fundo da arte da marca (2026-10-09): preto texturizado, papel cinza rasgado no canto,
+  // fitas translúcidas, pinceladas sálvia nas bordas, a logo no alto e as montanhas em P&B no
+  // pé (story-foto-montanhas, tirada da própria arte). As decorações ficam nas margens e no
+  // pé: o versículo (01d-story.js) é desenhado por cima, no meio, sem nada atrás.
+  function papelRasgado(ctx, de, ate, fecho, r) {
+    const p = new Path2D();
+    p.moveTo(de[0], de[1]);
+    const passos = Math.ceil(Math.hypot(ate[0] - de[0], ate[1] - de[1]) / 16);
+    const nx = -(ate[1] - de[1]);
+    const ny = ate[0] - de[0];
+    const n = Math.hypot(nx, ny);
+    for (let i = 1; i < passos; i++) {
+      const t = i / passos;
+      const j = (r() - 0.5) * 22;
+      p.lineTo(de[0] + (ate[0] - de[0]) * t + nx / n * j, de[1] + (ate[1] - de[1]) * t + ny / n * j);
+    }
+    p.lineTo(ate[0], ate[1]);
+    const borda = new Path2D(p);
+    for (const [x, y] of fecho) p.lineTo(x, y);
+    p.closePath();
+    ctx.fillStyle = '#3b3b39';
+    ctx.fill(p);
+    ctx.save();
+    ctx.clip(p);
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 40; i++) {
+      ctx.strokeStyle = r() < 0.5 ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.25)';
+      ctx.beginPath();
+      let x = r() * L;
+      let y = r() * A;
+      ctx.moveTo(x, y);
+      for (let k = 0; k < 4; k++) { x += (r() - 0.5) * 160; y += (r() - 0.5) * 160; ctx.lineTo(x, y); }
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(235,235,228,.45)';
+    ctx.lineWidth = 3;
+    ctx.stroke(borda);
+  }
+  function fita(ctx, x, y, w, h, ang) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    ctx.fillStyle = 'rgba(232,232,225,.14)';
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    ctx.strokeStyle = 'rgba(255,255,255,.12)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+  function pinceladaSalvia(ctx, x, y, w, h, ang, alfa) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    ctx.globalAlpha = alfa;
+    S.pincelada(ctx, -w / 2, -h / 2, w, h, false, '#9fb266');
+    ctx.restore();
+  }
+  function fundoCartaz(ctx) {
+    const r = sorteio(2131);
+    ctx.fillStyle = '#0e0e0d';
+    ctx.fillRect(0, 0, L, A);
+    const luz = ctx.createRadialGradient(L / 2, 900, 0, L / 2, 900, 1000);
+    luz.addColorStop(0, 'rgba(255,255,255,.05)');
+    luz.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = luz;
+    ctx.fillRect(0, 0, L, A);
+    // poeira clara
+    for (let i = 0; i < 900; i++) {
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.04 + r() * 0.18).toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(r() * L, r() * A, 0.5 + r() * 1.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    papelRasgado(ctx, [660, 0], [1080, 330], [[1080, 0]], r);
+    papelRasgado(ctx, [0, 1380], [300, 1920], [[0, 1920]], r);
+    // fitas e pinceladas só nas margens de cima e no pé, longe do texto
+    fita(ctx, 990, 300, 260, 70, 0.7);
+    fita(ctx, 1010, 1690, 230, 66, -0.5);
+    pinceladaSalvia(ctx, 880, 430, 280, 40, -0.32, 0.85);
+    pinceladaSalvia(ctx, 150, 1650, 260, 38, -0.22, 0.75);
+    // as montanhas no pé (o céu preto da foto some no preto do fundo)
+    const m = fotos.montanhas;
+    if (m) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighten';
+      ctx.drawImage(m, 0, A - 273, L, 273);
+      ctx.restore();
+    }
+    // a logo no alto, à esquerda
+    const w = S.logo(ctx, 96, 262, 78, '#f2efdc');
+    S.escrever(ctx, 'Geração Eleita', 96 + w + 20, 262 + 54, S.Mn(800, 46), '#f2efdc', { alinhar: 'left' });
+  }
+  // O pé do cartaz: o convite em carimbo sálvia, o endereço, a cruz e a coroa à mão, o grão.
+  function rodapeCartaz(ctx) {
+    const branco = '#f2efdc';
+    const convite = ['Leia a Bíblia comigo'];
+    const tc = S.tamanhoDoCarimbo(ctx, convite, 640, 90, 46);
+    const mc = S.carimbo(ctx, convite, L / 2, 1446, tc, { chapa: '#c8da8c', letra: '#12130f' });
+    S.escrever(ctx, S.ENDERECO, L / 2, 1590, S.Mn(700, 34), branco, { espaco: 1 });
+    const meio = mc.largura / 2;
+    ctx.save();
+    ctx.strokeStyle = branco;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 9;
+    // a cruz, à esquerda do convite
+    const cx = L / 2 - meio - 70;
+    ctx.beginPath();
+    ctx.moveTo(cx + 2, 1418); ctx.lineTo(cx - 2, 1522);
+    ctx.moveTo(cx - 32, 1452); ctx.lineTo(cx + 34, 1448);
+    ctx.stroke();
+    // a coroa, à direita
+    const kx = L / 2 + meio + 30;
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.moveTo(kx, 1500); ctx.lineTo(kx - 4, 1438); ctx.lineTo(kx + 26, 1474); ctx.lineTo(kx + 46, 1426);
+    ctx.lineTo(kx + 66, 1472); ctx.lineTo(kx + 96, 1436); ctx.lineTo(kx + 92, 1500); ctx.closePath();
+    ctx.moveTo(kx - 4, 1520); ctx.lineTo(kx + 98, 1518);
+    ctx.stroke();
+    ctx.restore();
+    grao(ctx, 20, 2131);
+  }
+
   S.prepararArte = prepararArte;
+  S.fundoCartaz = fundoCartaz;
+  S.rodapeCartaz = rodapeCartaz;
+  S.prepararVersiculo = () => carregarFoto('montanhas');
+  S.versiculoCompleto = () => fotoPronta('montanhas');
   S.arteCompleta = arteCompleta;
   S.texturas = { sorteio, grao, gastar };
 })(window.CC);

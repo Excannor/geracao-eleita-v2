@@ -77,3 +77,13 @@ herói (B perde impacto; em C a referência compete com o texto e o papel aperta
 Regras: o texto vai intacto; se começa no meio da frase (minúscula), reticências na frente,
 só na imagem; letra de 128 a 42px conforme o tamanho, e o que não couber para na última
 palavra com reticências (a referência diz o trecho inteiro).
+
+### Fundo de cartaz (pedido do dono, mesmo dia; `versiculo2/`)
+
+A composição A ficou sobre o fundo da arte da marca: preto texturizado com poeira, papel
+cinza rasgado no canto de cima e no pé, fitas translúcidas e pinceladas sálvia só nas margens
+(nada atrás do texto), a logo com "Geração Eleita" no alto à esquerda e, no pé, o convite em
+carimbo sálvia entre a cruz e a coroa à mão, o endereço e as montanhas em P&B. As montanhas
+foram tiradas da própria arte (src/story-fotos/montanhas.webp, 45 KB, sem o ícone de som do
+print) e vêm com as artes sob demanda; o fundo todo mora em 01e-story-artes.js. Sem as artes,
+o versículo sai na página lisa (a A original). `gerar.mjs <pasta> versiculo2` gera os casos.

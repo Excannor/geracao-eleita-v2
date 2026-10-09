@@ -282,20 +282,25 @@
   };
   function desenharVersiculo(ctx, { ref, texto, traducao, paleta }) {
     const P = PALETAS_VERSICULO[paleta] || PALETAS_VERSICULO.escura;
-    ctx.fillStyle = P.fundo;
-    ctx.fillRect(0, 0, L, A);
-    const brilho = ctx.createRadialGradient(160, 420, 0, 160, 420, 900);
-    brilho.addColorStop(0, P.brilho);
-    brilho.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = brilho;
-    ctx.fillRect(0, 0, L, A);
+    // o fundo de cartaz da marca vem com as artes (01e-story-artes.js); sem ele, a página lisa
+    const cartaz = !paleta && CC.story.fundoCartaz;
+    if (cartaz) CC.story.fundoCartaz(ctx);
+    else {
+      ctx.fillStyle = P.fundo;
+      ctx.fillRect(0, 0, L, A);
+      const brilho = ctx.createRadialGradient(160, 420, 0, 160, 420, 900);
+      brilho.addColorStop(0, P.brilho);
+      brilho.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = brilho;
+      ctx.fillRect(0, 0, L, A);
+    }
     const margem = 96;
     const largura = L - 2 * margem;
     const bruto = String(texto || '').trim();
     // começa no meio da frase: reticências na frente (o texto em si não muda)
     const corpo = bruto ? (/^\p{Ll}/u.test(bruto) ? '…' + bruto : bruto) : ref;
-    const z0 = SEGURA + 60;
-    const z1 = A - SEGURA - 250;
+    const z0 = SEGURA + (cartaz ? 150 : 60);
+    const z1 = A - SEGURA - (cartaz ? 300 : 250);
     const altAspas = 190;
     const altRef = 46 + 70 + (traducao ? 46 : 0);
     // Letra de 42px para cima (abaixo disso o story vira um paredão). Um trecho longo demais
@@ -330,7 +335,8 @@
     y += 70;
     escrever(ctx, ref.toUpperCase(), margem, y, '700 52px Oswald, sans-serif', P.ref, { alinhar: 'left', espaco: 52 * 0.06 });
     if (traducao) escrever(ctx, traducao.toUpperCase(), margem, y + 46, Mn(700, 26), P.versao, { alinhar: 'left', espaco: 26 * 0.16 });
-    // o convite e a marca
+    // o convite e a marca (no cartaz, o pé dele: convite, endereço, cruz e coroa)
+    if (cartaz) { CC.story.rodapeCartaz(ctx); return; }
     const convite = ['Leia a Bíblia comigo'];
     const tc = tamanhoDoCarimbo(ctx, convite, 760, 90, 46);
     carimbo(ctx, convite, L / 2, A - SEGURA - 210, tc, { chapa: P.chapa, letra: P.letra });
@@ -400,15 +406,19 @@
     if (guardada.chave !== chave || !guardada.promessa) {
       const querArte = pedido.tipo === 'ofensiva' && !!arteDesejada(pedido.frase);
       const arte = querArte ? arteDesejada(pedido.frase) : null;
+      // o versículo usa o fundo de cartaz, que vem com as artes (e as montanhas)
+      const ehVerso = pedido.tipo === 'versiculo' && !pedido.paleta;
       const promessa = prepararFontes()
-        .then(() => (querArte ? carregarArtes() : true))
+        .then(() => (querArte || ehVerso ? carregarArtes() : true))
         .then(() => (querArte && CC.story.prepararArte && arteDaFrase(pedido.frase) ? CC.story.prepararArte(arte) : true))
+        .then(() => (ehVerso && CC.story.prepararVersiculo ? CC.story.prepararVersiculo() : true))
         .then(() => {
           const c = tela();
           desenhar(c.getContext('2d'), pedido.tipo, pedido);
           // a arte (ou a foto dela) não chegou: esta sai no modelo de sempre (ou na
           // ilustração), e o próximo toque tenta de novo
-          const faltou = querArte && (!arteDaFrase(pedido.frase) || (CC.story.arteCompleta && !CC.story.arteCompleta(arte)));
+          const faltou = (querArte && (!arteDaFrase(pedido.frase) || (CC.story.arteCompleta && !CC.story.arteCompleta(arte))))
+            || (ehVerso && (!CC.story.fundoCartaz || !CC.story.versiculoCompleto()));
           if (faltou) setTimeout(() => { if (guardada.promessa === promessa) guardada = { chave: '', promessa: null }; }, 0);
           return new Promise((resolver) => c.toBlob(resolver, 'image/png'));
         }).then((blob) => {

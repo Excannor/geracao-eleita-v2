@@ -13,7 +13,7 @@ import { portaLivre, fecharArvore } from '../../ferramentas/navegador.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const [saidaArg, conjunto = 'variantes'] = process.argv.slice(2);
-if (!saidaArg) { console.log('Uso: CHROME=<chrome> node design/compartilhar/gerar.mjs <saida> [artes|versiculo|variantes|final]'); process.exit(2); }
+if (!saidaArg) { console.log('Uso: CHROME=<chrome> node design/compartilhar/gerar.mjs <saida> [artes|versiculo2|versiculo|variantes|final]'); process.exit(2); }
 const saida = resolve(saidaArg);
 mkdirSync(saida, { recursive: true });
 const CHROME = process.env.CHROME || 'chromium';
@@ -49,6 +49,7 @@ window.gerar = async (fn, dados) => {
   if (typeof d.frase === 'string') d.frase = FRASES[d.frase];
   const arte = d.frase && CC.story.arteDesejada && CC.story.arteDesejada(d.frase);
   if (arte && CC.story.prepararArte) await CC.story.prepararArte(arte);
+  if (fn === 'versiculo' && CC.story.prepararVersiculo) await CC.story.prepararVersiculo();
   const tela = CC.story.tela();
   const desenhar = (window.VARIANTES && VARIANTES[fn]) || (CC.story.desenhar && ((ctx, x) => CC.story.desenhar(ctx, fn, x)));
   desenhar(tela.getContext('2d'), d);
@@ -76,7 +77,13 @@ window.folha = async (urls, escala) => {
 
 const casos = [];
 const folhas = [];
-if (conjunto === 'versiculo') {
+if (conjunto === 'versiculo2') {
+  // o versículo sobre o fundo de cartaz da marca (o do app)
+  const exodo = { ref: 'Êxodo 31.3', texto: trecho('Êxodo', 31, 3, 3) };
+  const casosV = { curto: VERSOS.curto, exodo, medio: VERSOS.medio, longo: VERSOS.longo, dez: VERSOS.dez };
+  for (const [k, v] of Object.entries(casosV)) casos.push({ nome: 'versiculo-' + k, fn: 'versiculo', dados: { ...v, traducao: 'Nova Bíblia Viva' } });
+  folhas.push({ nome: 'folha-versiculo', casos: Object.keys(casosV).map((k) => 'versiculo-' + k) });
+} else if (conjunto === 'versiculo') {
   // o redesenho do versículo: A (escura, a do app), B (a mesma, clara) e C (cartaz), com o
   // curto, o que começa no meio da frase (Êxodo 31.3), o longo e o de dez versículos
   const exodo = { ref: 'Êxodo 31.3', texto: trecho('Êxodo', 31, 3, 3) };
