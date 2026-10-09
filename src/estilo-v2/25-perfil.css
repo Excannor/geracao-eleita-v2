@@ -143,6 +143,19 @@
 [data-rota=config] .linha-config[data-caminho] .valor { grid-row: 2; max-width: none; font-size: .875rem; text-align: left; }
 [data-rota=config] .linha-config[data-caminho] svg { grid-area: 1 / 2 / 3; }
 [data-rota=config] .dica-config { text-wrap: balance; }
+/* painel: pedido de aprovação de liderança (nome e célula em cima, os dois botões embaixo) */
+.linha-config.painel-aprovacao { display: grid; gap: 10px; padding-block: 14px; }
+.linha-config.painel-aprovacao > span { display: grid; gap: 2px; }
+.linha-config.painel-aprovacao small { color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; text-wrap: pretty; }
+.linha-config.painel-aprovacao .pe-duplo-plano { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+/* Nascimento: só leitura, com o caminho para corrigir (o servidor não aceita troca) */
+[data-rota=config] .linha-config.so-leitura { display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
+[data-rota=config] .linha-config.so-leitura .valor { white-space: nowrap; }
+.dica-linha { grid-column: 1 / -1; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; }
+.dica-linha a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.campo-senha.so-leitura { display: grid; gap: 4px; }
+.campo-senha.so-leitura b { color: var(--tinta-forte); font-weight: 700; }
+.campo-senha.so-leitura .dica-linha { text-transform: none; letter-spacing: 0; }
 
 /* notificações: o estado deste aparelho é o cartão de destaque da folha */
 .cartao-push { margin: 4px 0 0; padding: 20px; border-radius: 26px; }

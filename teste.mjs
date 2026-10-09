@@ -11,6 +11,7 @@ import { fecharBanco, arquivoDoBanco } from './db.mjs';
 import {
   Contas, diasDeProposito, resumoDeAmigo, somaDias, nascimentoValido,
   somaAnos, idadeMinimaOk, hojeNoFuso, FUSO_PADRAO, IDADE_MINIMA,
+  menorDeIdade, podeConduzir, aguardandoAprovacao,
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import { montarPainel } from './painel.mjs';
@@ -721,6 +722,36 @@ checar(/e-mail/.test(erro), 'cadastro sem e-mail é recusado');
 await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03', consentimento: true });
 checar(!!(await contas.conferir('dora@x.com', '12345678')), 'entra com o e-mail, sem diferenciar maiúsculas');
 for (const u of ['ana', 'bia', 'caio']) await contas.completarPerfil(u, { email: u + '@x.com', nascimento: '2000-01-01' });
+
+// ---------- data de nascimento travada e e-mail só com a senha ----------
+{
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  checar(/não muda depois do cadastro.*suporte\|403/.test(await tentar(() => contas.completarPerfil('dora', { nascimento: '1990-05-05' }))),
+    'depois do cadastro, a data de nascimento não muda (403, "fale com o suporte")');
+  checar(await tentar(() => contas.completarPerfil('dora', { nascimento: '2001-02-03', email: 'dora@x.com' })) === ''
+    && contas.achar('dora').nascimento === '2001-02-03', 'mandar a mesma data e o mesmo e-mail de novo é aceito sem senha');
+  checar(/não muda depois do cadastro/.test(await tentar(() => contas.completarPerfil('dora', { nascimento: nasc12anos }, { senhaConferida: true }))),
+    'nem com a senha conferida a data muda (trocar para menor de idade também é recusado)');
+  checar(contas.achar('dora').nascimento === '2001-02-03', 'a data gravada continua a do cadastro');
+  checar(contas.trocaEmail('dora', 'outra@x.com') && !contas.trocaEmail('dora', 'DORA@x.com') && !contas.trocaEmail('dora', ''),
+    'trocaEmail só é verdadeiro quando o e-mail novo é outro');
+  checar(/senha atual\|403/.test(await tentar(() => contas.completarPerfil('dora', { email: 'outra@x.com' }))),
+    'trocar o e-mail sem a senha conferida é recusado');
+  checar(contas.achar('dora').email === 'dora@x.com', 'o e-mail continua o antigo');
+  await contas.completarPerfil('dora', { email: 'outra@x.com' }, { senhaConferida: true });
+  checar(contas.achar('dora').email === 'outra@x.com' && contas.achar('dora').nascimento === '2001-02-03',
+    'com a senha conferida, o e-mail troca e o nascimento fica');
+  await contas.completarPerfil('dora', { email: 'dora@x.com' }, { senhaConferida: true });
+  const semNasc = await contas.criar({ usuario: 'semnasc', senha: '12345678', email: 'semnasc@x.com' }, { exigirPerfil: false });
+  checar(!semNasc.nascimento, 'conta antiga pode não ter nascimento');
+  checar(/12 anos/.test(await tentar(() => contas.completarPerfil('semnasc', { nascimento: nasc11anos }))), 'completar com menos de 12 anos é recusado');
+  await contas.completarPerfil('semnasc', { nascimento: '1999-09-09' });
+  checar(contas.achar('semnasc').nascimento === '1999-09-09' && contas.achar('semnasc').email === 'semnasc@x.com',
+    'quem não tinha a data completa uma vez, sem senha, e o e-mail que já tinha fica');
+  checar(/não muda depois do cadastro/.test(await tentar(() => contas.completarPerfil('semnasc', { nascimento: '1998-08-08' }))),
+    'completada uma vez, a data também trava');
+  await contas.apagar('semnasc');
+}
 checar(contas.procurar('dora', 'an') === null && contas.procurar('dora', 'ana').usuario === 'ana', 'a busca só acha pelo @ exato');
 
 await contas.bloquear('dora', 'caio');
@@ -778,6 +809,62 @@ await contas.silenciar('dora', 'bia', true);
 checar(!contas.toquesRecebidos('dora', '2026-03-02').includes('bia'), 'silenciar esconde os toques');
 await contas.apagar('bia');
 checar(!Object.keys(contas.dados.amizades).some((k) => k.includes('bia')), 'apagar a conta leva as amizades junto');
+
+// ---------- menor de 18 só lidera ou auxilia célula com aprovação da liderança ----------
+{
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  checar(menorDeIdade(somaAnos(hojeTeste, -17), hojeTeste) && !menorDeIdade(somaAnos(hojeTeste, -18), hojeTeste) && !menorDeIdade('', hojeTeste),
+    'menorDeIdade: 17 anos é menor; 18 completados hoje, não; sem data, não decide');
+  await contas.criar({ usuario: 'adulto', senha: '12345678', nome: 'Adulto', email: 'adulto@x.com', nascimento: '1990-01-01', consentimento: true });
+  await contas.criar({ usuario: 'teen', senha: '12345678', nome: 'Teen', email: 'teen@x.com', nascimento: somaAnos(hojeTeste, -15), consentimento: true });
+  const deAdulto = await contas.criarCelula('adulto', { titulo: 'Adultos' }, hojeTeste);
+  checar(!deAdulto.aprovacoes.length && podeConduzir(deAdulto, 'adulto') && contas.gerarLinkCelula('adulto', deAdulto.id, assinar).token,
+    'quem tem 18 ou mais cria a célula normal: conduz e manda o link');
+  const deTeen = await contas.criarCelula('teen', { titulo: 'Jovens' }, hojeTeste);
+  checar(deTeen.aprovacoes.length === 1 && deTeen.aprovacoes[0].estado === 'pendente' && deTeen.aprovacoes[0].papel === 'lider',
+    'menor de 18 cria a célula aguardando aprovação');
+  checar(!podeConduzir(deTeen, 'teen') && aguardandoAprovacao(deTeen, 'teen') === 'lider', 'enquanto espera, o menor não conduz (sem painel com nomes)');
+  checar(/aguardando aprovação da liderança\|403/.test(await tentar(() => contas.gerarLinkCelula('teen', deTeen.id, assinar))), 'célula aguardando não gera link');
+  checar(/aguardando aprovação da liderança\|403/.test(await tentar(() => contas.registrarEncontro('teen', deTeen.id, { data: hojeTeste, presentes: [] }, hojeTeste))),
+    'nem registra presença');
+  checar(contas.liderancasPendentes(hojeTeste).some((x) => x.proposito === deTeen.id && x.usuario === 'teen' && x.idade === 15),
+    'o pedido aparece para o administrador, com a idade');
+  await contas.decidirLideranca('dono', { proposito: deTeen.id, usuario: 'teen', papel: 'lider', aprovar: true }, hojeTeste);
+  const aprov = contas.proposito(deTeen.id).aprovacoes[0];
+  checar(aprov.estado === 'aprovada' && aprov.decididoPor === 'dono' && /^\d{4}-\d{2}-\d{2}T/.test(aprov.decididoEm),
+    'aprovar registra quem aprovou e quando');
+  checar(podeConduzir(contas.proposito(deTeen.id), 'teen') && contas.gerarLinkCelula('teen', deTeen.id, assinar).token, 'aprovado, o menor conduz e manda o link');
+  checar(/não está mais pendente\|404/.test(await tentar(() => contas.decidirLideranca('dono', { proposito: deTeen.id, usuario: 'teen', papel: 'lider', aprovar: false }))),
+    'um pedido decidido não se decide de novo');
+  // auxiliar menor
+  await contas.criar({ usuario: 'teen2', senha: '12345678', nome: 'Teen2', email: 'teen2@x.com', nascimento: somaAnos(hojeTeste, -16), consentimento: true });
+  await contas.entrarNaCelula('teen2', contas.gerarLinkCelula('adulto', deAdulto.id, assinar).token, assinar, hojeTeste);
+  await contas.definirAuxiliar('adulto', deAdulto.id, 'teen2', true);
+  checar(aguardandoAprovacao(contas.proposito(deAdulto.id), 'teen2') === 'auxiliar' && !podeConduzir(contas.proposito(deAdulto.id), 'teen2'),
+    'menor marcado como auxiliar espera a aprovação');
+  await contas.decidirLideranca('dono', { proposito: deAdulto.id, usuario: 'teen2', papel: 'auxiliar', aprovar: false }, hojeTeste);
+  const m2 = contas.proposito(deAdulto.id).membros.find((m) => m.usuario === 'teen2');
+  checar(m2.estado === 'ativo' && m2.papel === '' && !contas.proposito(deAdulto.id).encerradoEm, 'recusar o auxiliar só tira o papel; a célula segue');
+  await contas.definirAuxiliar('adulto', deAdulto.id, 'teen2', true);
+  await contas.decidirLideranca('dono', { proposito: deAdulto.id, usuario: 'teen2', papel: 'auxiliar', aprovar: true }, hojeTeste);
+  checar(podeConduzir(contas.proposito(deAdulto.id), 'teen2'), 'marcado de novo e aprovado, o auxiliar menor conduz');
+  // recusar o líder encerra
+  const outra = await contas.criarCelula('teen2', { titulo: 'Outra' }, hojeTeste);
+  await contas.decidirLideranca('dono', { proposito: outra.id, usuario: 'teen2', papel: 'lider', aprovar: false }, hojeTeste);
+  checar(!!contas.proposito(outra.id).encerradoEm && contas.proposito(outra.id).aprovacoes[0].estado === 'recusada', 'recusar o líder encerra a célula');
+  // sobrevive ao banco
+  await contas.salvar();
+  const rec = await new Contas(arquivoContas).carregar();
+  checar(rec.proposito(deTeen.id).aprovacoes[0].decididoPor === 'dono' && podeConduzir(rec.proposito(deAdulto.id), 'teen2'),
+    'as aprovações sobrevivem a salvar e recarregar do banco');
+  // célula antiga de menor, sem registro: passa a esperar ao abrir o banco
+  delete rec.proposito(deTeen.id).aprovacoes;
+  rec.proposito(deTeen.id).aprovacoes = [];
+  await rec.salvar();
+  const rec2 = await new Contas(arquivoContas).carregar();
+  checar(aguardandoAprovacao(rec2.proposito(deTeen.id), 'teen') === 'lider', 'célula de menor criada antes da regra passa a aguardar aprovação');
+  for (const u of ['adulto', 'teen', 'teen2']) await contas.apagar(u);
+}
 
 const resumo = resumoDeAmigo({ usuario: 'x', nome: 'X', email: 'x@x.com', nascimento: '2000-01-01' },
   { marcadoEm: { 1: '2026-03-02' }, oia: { 1: { oracao: 'segredo' } }, lidos: [1] }, '2026-03-02');

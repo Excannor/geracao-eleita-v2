@@ -358,3 +358,6 @@ button.cartao-proposito:hover { background: var(--campo); }
 .caixa-marcar { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; box-shadow: inset 0 0 0 2px var(--tinta-fraca); color: var(--salvia-tinta); }
 .linha-config.linha-marco[aria-checked="true"] .caixa-marcar { background: var(--salvia); box-shadow: none; }
 .caixa-marcar svg { width: 16px; height: 16px; stroke-width: 3; }
+/* célula de menor de 18 aguardando a aprovação da liderança */
+.recado-lider.aviso-aprovacao { background: var(--amarelo-fraco); }
+.recado-lider.aviso-aprovacao p + p { margin-top: 6px; font-size: .9375rem; }

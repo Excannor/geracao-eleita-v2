@@ -62,11 +62,18 @@ export const FUSO_PADRAO = 'America/Sao_Paulo';
 // LGPD art. 14: menor de 12 anos precisaria de consentimento dos pais, que o app não tem
 // como conferir; por isso a idade mínima para ter conta é 12 anos completos.
 export const IDADE_MINIMA = 12;
+// Quem tem menos que isto só lidera ou auxilia uma célula depois que a liderança (o
+// administrador) aprova; enquanto isso, não vê o painel com nomes dos membros.
+export const MAIORIDADE = 18;
+export const AGUARDANDO_APROVACAO = 'sua célula está aguardando aprovação da liderança';
+export const NASCIMENTO_TRAVADO = 'a data de nascimento não muda depois do cadastro; para corrigir, fale com o suporte';
 // Versão do texto de consentimento sobre dado de fé (LGPD art. 11). Mudar o texto de um
 // jeito que precise de um "sim" de novo exige subir este número.
 // v2: quem conduz a célula e a administração da igreja passam a ver o painel da célula com
 // nomes (Módulo 5, docs/inteligencia.md §5); quem já tinha conta concorda de novo.
-export const CONSENTIMENTO_VERSAO = 2;
+// v3 (política versão 3, 09/10/2026): o texto passa a citar o check-in, o que quem acompanha no
+// Discipulado vê e o check-in só somado para a célula; quem já tinha conta concorda de novo.
+export const CONSENTIMENTO_VERSAO = 3;
 export const MOTIVOS_DENUNCIA = [
   'Insiste ou incomoda',
   'Nome ou foto impróprios',
@@ -201,6 +208,10 @@ function paraLinhas(d) {
       proposito: p.id, usuario: m.usuario, estado: m.estado, entrou_em: m.entrouEm || '', saiu_em: m.saiuEm || '', convidado_por: m.convidadoPor || '',
       papel: m.papel || '', tornou_membro_em: m.tornouMembroEm || '',
     }))) },
+    { tabela: 'liderancas', chaves: ['proposito', 'usuario', 'papel'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.aprovacoes || []).map((x) => ({
+      proposito: p.id, usuario: x.usuario, papel: x.papel, estado: x.estado, pedido_em: x.pedidoEm || '',
+      decidido_por: x.decididoPor || '', decidido_em: x.decididoEm || '',
+    }))) },
     { tabela: 'proposito_dias', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.diasBatidos || []).map((data) => ({ proposito: p.id, data }))) },
     { tabela: 'celula_encontros', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || []).map((e) => ({
       proposito: p.id, data: e.data, visitantes: Number(e.visitantes) || 0, registrado_por: e.registradoPor || '', em: e.em || '',
@@ -238,6 +249,7 @@ function lerTabelas(db) {
     aceites: lerTabela(db, 'convites_aceites', ['de', 'para'], 'em'),
     propositos: lerTabela(db, 'propositos', ['id'], 'criado_em'),
     membros: lerTabela(db, 'proposito_membros', ['proposito', 'usuario']),
+    liderancas: lerTabela(db, 'liderancas', ['proposito', 'usuario', 'papel'], 'pedido_em'),
     diasBatidos: lerTabela(db, 'proposito_dias', ['proposito', 'data'], 'data'),
     encontros: lerTabela(db, 'celula_encontros', ['proposito', 'data'], 'data'),
     presencas: lerTabela(db, 'celula_presencas', ['proposito', 'data', 'usuario']),
@@ -279,8 +291,12 @@ function deLinhas(t, versao) {
       estudo: l.estudo_tipo ? { tipo: l.estudo_tipo, ref: l.estudo_ref || '', texto: l.estudo_texto || '', em: l.estudo_em || '' } : null,
       estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
       mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '',
-      membros: [], diasBatidos: [], encontros: [],
+      membros: [], diasBatidos: [], encontros: [], aprovacoes: [],
     };
+  }
+  for (const l of t.liderancas || []) {
+    const p = d.propositos[l.proposito];
+    if (p) p.aprovacoes.push({ usuario: l.usuario, papel: l.papel, estado: l.estado, pedidoEm: l.pedido_em || '', decididoPor: l.decidido_por || '', decididoEm: l.decidido_em || '' });
   }
   for (const l of t.membros || []) {
     const p = d.propositos[l.proposito];
@@ -333,13 +349,40 @@ function deLinhas(t, versao) {
   return d;
 }
 
+// Se, na data "hoje", a pessoa ainda não fez 18 anos. Sem data (conta antiga incompleta), não
+// dá para dizer: quem não completou o cadastro também não cria célula (exigirCompleto).
+export function menorDeIdade(nascimento, hoje = hojeNoFuso(FUSO_PADRAO)) {
+  const t = String(nascimento || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return false;
+  return t > somaAnos(hoje, -MAIORIDADE);
+}
+
+// A aprovação que ainda falta para alguém conduzir a célula num papel ('lider' ou 'auxiliar'):
+// o registro pendente (ou recusado), ou null quando não há nada esperando.
+export function aprovacaoQueFalta(p, usuario, papel) {
+  return ((p && p.aprovacoes) || []).find((x) => x.usuario === usuario && x.papel === papel && x.estado !== 'aprovada') || null;
+}
+// O papel em que a pessoa espera aprovação nesta célula ('lider', 'auxiliar' ou '').
+export function aguardandoAprovacao(p, usuario) {
+  if (!p || !usuario) return '';
+  if (p.criadoPor === usuario) return aprovacaoQueFalta(p, usuario, 'lider') ? 'lider' : '';
+  const m = p.membros.find((x) => x.usuario === usuario && x.estado === 'ativo' && x.papel === 'auxiliar');
+  return m && aprovacaoQueFalta(p, usuario, 'auxiliar') ? 'auxiliar' : '';
+}
+
+function pedidoDeAprovacao(usuario, papel) {
+  return { usuario, papel, estado: 'pendente', pedidoEm: new Date().toISOString(), decididoPor: '', decididoEm: '' };
+}
+
 // Quem conduz a célula: o líder sempre, e o auxiliar enquanto for membro ativo (perde o papel
 // se sair ou virar visitante). É a mesma regra para o servidor decidir o que mostrar e para
-// contas.mjs decidir o que aceitar.
+// contas.mjs decidir o que aceitar. Menor de 18 à espera da aprovação da liderança não conduz
+// ainda: não vê o painel com nomes, a lista de atenção, a presença nem os pedidos reservados.
 export function podeConduzir(p, usuario) {
   if (!p || !usuario) return false;
-  if (p.criadoPor === usuario) return true;
-  return p.membros.some((m) => m.usuario === usuario && m.estado === 'ativo' && m.papel === 'auxiliar');
+  if (p.criadoPor === usuario) return !aprovacaoQueFalta(p, usuario, 'lider');
+  return p.membros.some((m) => m.usuario === usuario && m.estado === 'ativo' && m.papel === 'auxiliar')
+    && !aprovacaoQueFalta(p, usuario, 'auxiliar');
 }
 
 // Quantos dias de check-in do discípulo ficam guardados (o histórico para gráficos futuros).
@@ -370,11 +413,13 @@ export class Contas {
       await this.salvar();
       concluirImportacao(db, 'contas', this.arquivo);
       await this.migrarPropositos();
+      await this.pedirAprovacoesQueFaltam();
       return this;
     }
     this.dados = deLinhas(lerTabelas(db), lerMeta(db, 'contas_versao'));
     if (this.precisaMigrar()) { this.migrar(); await this.salvar(); }
     await this.migrarPropositos();
+    await this.pedirAprovacoesQueFaltam();
     return this;
   }
 
@@ -487,21 +532,42 @@ export class Contas {
     return iguais(tentativa, conta.senha) ? conta : null;
   }
 
-  async completarPerfil(usuario, { email, nascimento, nome } = {}) {
+  // Completa o cadastro das contas antigas (e-mail e nascimento que faltavam) e troca o e-mail.
+  // A data de nascimento, uma vez gravada, não muda mais pelo app: é ela que decide a idade
+  // mínima e as regras para quem tem menos de 18 (liderar célula só com aprovação), e trocá-la
+  // abriria caminho para fugir dessas regras. Correção só pelo suporte. Mandar a mesma data (ou
+  // nenhuma) é aceito, para a tela de completar cadastro poder reenviar o que já tinha.
+  // Trocar um e-mail que já existe exige a senha atual, conferida pelo servidor antes
+  // (senhaConferida): com a sessão roubada, trocar o e-mail e pedir nova senha tomaria a conta.
+  async completarPerfil(usuario, { email, nascimento, nome } = {}, { senhaConferida = false } = {}) {
     const conta = this.achar(usuario);
     if (!conta) throw erro('conta não encontrada', 404);
-    const mail = limparEmail(email);
+    const mail = email === undefined || email === null || String(email).trim() === '' ? (conta.email || '') : limparEmail(email);
     if (!emailValido(mail)) throw erro('esse e-mail não parece certo');
     const dono = this.acharPorEmail(mail);
     if (dono && dono.usuario !== conta.usuario) throw erro('este e-mail já tem conta');
-    if (!nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
-    if (!idadeMinimaOk(nascimento)) throw erro('o Geração Eleita é para quem tem 12 anos ou mais');
+    if (conta.email && mail !== conta.email && !senhaConferida) throw erro('para trocar o e-mail, confirme com a sua senha atual', 403);
+    let nasc = conta.nascimento || '';
+    if (nasc) {
+      if (nascimento && nascimento !== nasc) throw erro(NASCIMENTO_TRAVADO, 403);
+    } else {
+      if (!nascimentoValido(nascimento)) throw erro('confira a data de nascimento');
+      if (!idadeMinimaOk(nascimento)) throw erro('o Geração Eleita é para quem tem 12 anos ou mais');
+      nasc = nascimento;
+    }
     conta.email = mail;
-    conta.nascimento = nascimento;
+    conta.nascimento = nasc;
     const n = String(nome || '').trim().slice(0, 20);
     if (n) conta.nome = n;
     await this.salvar();
     return conta;
+  }
+
+  // Se este pedido troca o e-mail que a conta já tinha (o servidor então pede a senha atual).
+  trocaEmail(usuario, email) {
+    const conta = this.achar(usuario);
+    const mail = limparEmail(email);
+    return !!(conta && conta.email && mail && mail !== conta.email);
   }
 
   async atualizarFuso(usuario, fuso) {
@@ -618,6 +684,7 @@ export class Contas {
       if (!p.membros.some((m) => m.usuario === chave)) continue;
       if (!p.grupo) { delete this.dados.propositos[id]; continue; }
       p.membros = p.membros.filter((m) => m.usuario !== chave);
+      p.aprovacoes = (p.aprovacoes || []).filter((x) => x.usuario !== chave);
       if (!p.encerradoEm && this.presentes(p).length < 2) p.encerradoEm = hojeNoFuso(FUSO_PADRAO);
     }
     // sai da lista de presentes de qualquer encontro já registrado; o encontro em si (quem
@@ -1068,6 +1135,7 @@ export class Contas {
     const p = this.proposito(id);
     if (!p || p.encerradoEm || !p.membros.some((m) => m.usuario === a.usuario && m.estado === 'ativo')) throw erro('propósito não encontrado', 404);
     if (!p.grupo) throw erro('só dá para chamar mais gente para um grupo');
+    if (p.celula && aprovacaoQueFalta(p, p.criadoPor, 'lider')) throw erro('a célula está aguardando aprovação da liderança', 403);
     const u = limparNome(outro);
     if (!this.achar(u) || this.relacao(a.usuario, u) !== 'amigos') throw erro('só dá para chamar amigos', 403);
     if (this.presentes(p).some((m) => m.usuario === u)) throw erro('essa pessoa já está no grupo');
@@ -1090,7 +1158,10 @@ export class Contas {
       id, tipo: 'plano', alvo: '', titulo: String(titulo || '').trim().slice(0, 30) || 'Célula',
       criadoPor: a.usuario, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
       membros: [{ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: '' }],
+      aprovacoes: [],
     };
+    // Menor de 18: a célula nasce aguardando a aprovação da liderança.
+    if (menorDeIdade(a.nascimento, hoje)) p.aprovacoes.push(pedidoDeAprovacao(a.usuario, 'lider'));
     this.dados.propositos[id] = p;
     await this.salvar();
     return p;
@@ -1102,6 +1173,8 @@ export class Contas {
     const a = this.exigirCompleto(eu);
     const p = this.proposito(id);
     if (!p || p.encerradoEm || !p.celula || !this.ativosDe(p).some((m) => m.usuario === a.usuario)) throw erro('célula não encontrada', 404);
+    // Enquanto a liderança não aprova quem lidera, a célula não chama ninguém.
+    if (aprovacaoQueFalta(p, p.criadoPor, 'lider')) throw erro(p.criadoPor === a.usuario ? AGUARDANDO_APROVACAO : 'a célula está aguardando aprovação da liderança', 403);
     const carga = Buffer.from(JSON.stringify({ p: p.id, d: a.usuario, v: agora + VALIDADE_CONVITE })).toString('base64url');
     return { token: carga + '.' + assinar('celula.' + carga + '.' + a.seloConvite), venceEm: new Date(agora + VALIDADE_CONVITE).toISOString() };
   }
@@ -1180,6 +1253,7 @@ export class Contas {
     const p = this.proposito(id);
     if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
     if (p.criadoPor !== a.usuario) throw erro('só o líder da célula pode fazer isso', 403);
+    if (aprovacaoQueFalta(p, a.usuario, 'lider')) throw erro(AGUARDANDO_APROVACAO, 403);
     return p;
   }
 
@@ -1190,6 +1264,7 @@ export class Contas {
     const a = this.exigirCompleto(eu);
     const p = this.proposito(id);
     if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
+    if (aguardandoAprovacao(p, a.usuario)) throw erro(AGUARDANDO_APROVACAO, 403);
     if (!podeConduzir(p, a.usuario)) throw erro('só quem conduz a célula pode fazer isso', 403);
     return p;
   }
@@ -1230,8 +1305,17 @@ export class Contas {
       const atuais = p.membros.filter((x) => x.estado === 'ativo' && x.papel === 'auxiliar' && x.usuario !== u).length;
       if (atuais >= LIMITE_AUXILIARES) throw erro('a célula já tem ' + LIMITE_AUXILIARES + ' auxiliares', 400);
       m.papel = 'auxiliar';
+      // Menor de 18 só auxilia depois da aprovação da liderança (uma aprovação já dada nesta
+      // célula continua valendo se o líder tirar e marcar de novo).
+      const conta = this.achar(u);
+      const jaAprovada = (p.aprovacoes || []).some((x) => x.usuario === u && x.papel === 'auxiliar' && x.estado === 'aprovada');
+      if (conta && menorDeIdade(conta.nascimento, hojeNoFuso(conta.fuso)) && !jaAprovada) {
+        p.aprovacoes = (p.aprovacoes || []).filter((x) => !(x.usuario === u && x.papel === 'auxiliar'));
+        p.aprovacoes.push(pedidoDeAprovacao(u, 'auxiliar'));
+      }
     } else if (m.papel === 'auxiliar') {
       m.papel = '';
+      p.aprovacoes = (p.aprovacoes || []).filter((x) => !(x.usuario === u && x.papel === 'auxiliar' && x.estado === 'pendente'));
     }
     await this.salvar();
     return p;
@@ -1348,8 +1432,11 @@ export class Contas {
     const filha = {
       id: filhaId, tipo: 'plano', alvo: '', titulo: String(titulo || '').trim().slice(0, 30) || 'Célula',
       criadoPor: novoLider, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
-      mae: mae.id, multiplicadaEm: hoje, membros: [],
+      mae: mae.id, multiplicadaEm: hoje, membros: [], aprovacoes: [],
     };
+    // Liderar a célula nova é função nova: menor de 18 espera a aprovação da liderança de novo.
+    const contaNovoLider = this.achar(novoLider);
+    if (contaNovoLider && menorDeIdade(contaNovoLider.nascimento, hoje)) filha.aprovacoes.push(pedidoDeAprovacao(novoLider, 'lider'));
     for (const u of movidos) {
       const m = mae.membros.find((x) => x.usuario === u);
       m.estado = 'saiu';
@@ -1363,6 +1450,61 @@ export class Contas {
     this.dados.propositos[filhaId] = filha;
     await this.salvar();
     return { filha, mae, movidos };
+  }
+
+  // ---------- liderança de menor de 18 (aprovação do administrador) ----------
+  // Célula criada antes da regra: quem a lidera ou auxilia com menos de 18 anos, sem
+  // nenhum registro, passa a esperar a aprovação também (roda ao abrir o banco).
+  async pedirAprovacoesQueFaltam(hoje = hojeNoFuso(FUSO_PADRAO)) {
+    let mudou = false;
+    for (const p of this.propositosAtivos().filter((x) => x.celula)) {
+      p.aprovacoes = p.aprovacoes || [];
+      const pessoas = [[p.criadoPor, 'lider'], ...p.membros.filter((m) => m.estado === 'ativo' && m.papel === 'auxiliar').map((m) => [m.usuario, 'auxiliar'])];
+      for (const [u, papel] of pessoas) {
+        const c = this.achar(u);
+        if (!c || !menorDeIdade(c.nascimento, hoje) || p.aprovacoes.some((x) => x.usuario === u && x.papel === papel)) continue;
+        p.aprovacoes.push(pedidoDeAprovacao(u, papel));
+        mudou = true;
+      }
+    }
+    if (mudou) await this.salvar();
+  }
+
+  // O que o administrador vê para decidir: a célula, quem, o papel, a idade em anos e desde
+  // quando espera. Só pedidos pendentes de células abertas.
+  liderancasPendentes(hoje = hojeNoFuso(FUSO_PADRAO)) {
+    const lista = [];
+    for (const p of this.propositosAtivos().filter((x) => x.celula)) {
+      for (const x of p.aprovacoes || []) {
+        if (x.estado !== 'pendente') continue;
+        const c = this.achar(x.usuario);
+        if (!c) continue;
+        let idade = 0;
+        while (c.nascimento && somaAnos(c.nascimento, idade + 1) <= hoje) idade++;
+        lista.push({ proposito: p.id, titulo: p.titulo, usuario: c.usuario, nome: c.nome, papel: x.papel, idade, pedidoEm: x.pedidoEm,
+          membros: this.ativosDe(p).length });
+      }
+    }
+    return lista.sort((a, b) => String(a.pedidoEm).localeCompare(String(b.pedidoEm)));
+  }
+
+  // Aprovar libera a função; recusar o líder encerra a célula (ela não teria quem a conduza),
+  // recusar o auxiliar só tira o papel. Fica registrado quem decidiu e quando.
+  async decidirLideranca(admin, { proposito, usuario, papel, aprovar } = {}, hoje = hojeNoFuso(FUSO_PADRAO)) {
+    const p = this.proposito(proposito);
+    const u = limparNome(usuario);
+    const x = p && (p.aprovacoes || []).find((a) => a.usuario === u && a.papel === papel && a.estado === 'pendente');
+    if (!p || p.encerradoEm || !x) throw erro('esse pedido de aprovação não está mais pendente', 404);
+    x.estado = aprovar ? 'aprovada' : 'recusada';
+    x.decididoPor = limparNome(admin);
+    x.decididoEm = new Date().toISOString();
+    if (!aprovar && papel === 'lider') p.encerradoEm = hoje;
+    if (!aprovar && papel === 'auxiliar') {
+      const m = p.membros.find((y) => y.usuario === u);
+      if (m && m.papel === 'auxiliar') m.papel = '';
+    }
+    await this.salvar();
+    return { proposito: p, aprovacao: x };
   }
 
   async sairDoProposito(eu, id, hoje) {
