@@ -1,7 +1,7 @@
 // Gera as imagens de story fora do app, com as fontes e as peças de verdade
 // (src/fontes.css, src/app/01c-arte.js e 01d-story.js), para olhar e comparar composições.
 // Uso: CHROME=<chrome> node design/compartilhar/gerar.mjs <pasta-de-saida> <conjunto>
-//   conjuntos: artes (os modelos das frases com arte própria), rodada4 (os da terceira leva), variantes (as três de cada, lado a lado), final (a escolhida nos casos de
+//   conjuntos: artes (os modelos das frases com arte própria), rodada4 (os da terceira leva), modelos (MODELOS=nome,nome: modelos pelo nome), variantes (as três de cada, lado a lado), final (a escolhida nos casos de
 //   teste: frase mais curta e mais longa, 1, 16, 100 e 365 dias, versículos curto, médio e
 //   longo). Cada caso sai em PNG 1080x1920; as folhas de comparação saem reduzidas.
 import { spawn } from 'node:child_process';
@@ -13,7 +13,7 @@ import { portaLivre, fecharArvore } from '../../ferramentas/navegador.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const [saidaArg, conjunto = 'variantes'] = process.argv.slice(2);
-if (!saidaArg) { console.log('Uso: CHROME=<chrome> node design/compartilhar/gerar.mjs <saida> [artes|rodada4|versiculo2|versiculo|variantes|final]'); process.exit(2); }
+if (!saidaArg) { console.log('Uso: CHROME=<chrome> node design/compartilhar/gerar.mjs <saida> [artes|rodada4|modelos|versiculo2|versiculo|variantes|final]'); process.exit(2); }
 const saida = resolve(saidaArg);
 mkdirSync(saida, { recursive: true });
 const CHROME = process.env.CHROME || 'chromium';
@@ -51,7 +51,9 @@ window.gerar = async (fn, dados) => {
   if (arte && CC.story.prepararArte) await CC.story.prepararArte(arte);
   if (fn === 'versiculo' && CC.story.prepararVersiculo) await CC.story.prepararVersiculo();
   const tela = CC.story.tela();
-  const desenhar = (window.VARIANTES && VARIANTES[fn]) || (CC.story.desenhar && ((ctx, x) => CC.story.desenhar(ctx, fn, x)));
+  // 'arte:<nome>': um modelo de story pelo nome (para comparar variantes de um modelo)
+  const modelo = fn.startsWith('arte:') && CC.story.artes && CC.story.artes[fn.slice(5)];
+  const desenhar = modelo || (window.VARIANTES && VARIANTES[fn]) || (CC.story.desenhar && ((ctx, x) => CC.story.desenhar(ctx, fn, x)));
   desenhar(tela.getContext('2d'), d);
   const u = tela.toDataURL('image/png');
   (window.__imgs = window.__imgs || {})[window.__nome] = u;
@@ -103,6 +105,11 @@ if (conjunto === 'versiculo2') {
   const novos = (process.env.ARTES || 'avivados,naotemas,rei').split(',');
   for (const arte of novos) for (const dias of [7, 120]) casos.push({ nome: 'story-' + arte + '-' + dias, fn: 'ofensiva', dados: { dias, frase: arte } });
   folhas.push({ nome: 'resumo', casos: novos.map((a) => 'story-' + a + '-7') });
+} else if (conjunto === 'modelos') {
+  // modelos pelo nome (MODELOS=a,b,c), com 7 e 120 dias, e a folha lado a lado com os de 7
+  const nomes = (process.env.MODELOS || '').split(',').filter(Boolean);
+  for (const m of nomes) for (const dias of [7, 120]) casos.push({ nome: 'story-' + m + '-' + dias, fn: 'arte:' + m, dados: { dias } });
+  folhas.push({ nome: process.env.FOLHA || 'resumo', casos: nomes.map((m) => 'story-' + m + '-7') });
 } else if (conjunto === 'variantes') {
   const of = { dias: 16, frase: 'atos' };
   for (const v of ['A', 'B', 'C']) casos.push({ nome: 'ofensiva-' + v, fn: 'ofensiva' + v, dados: of });
