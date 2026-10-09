@@ -93,6 +93,13 @@
     { linhas: ['Estou em uma', 'grande obra e', 'não posso parar'], ref: 'Neemias 6.3', arte: 'grandeobra' },
     // Começo de Mateus 24.42 na NBV, palavra por palavra (o story cita o versículo inteiro).
     { linhas: ['Portanto,', 'estejam vigiando'], ref: 'Mateus 24.42', arte: 'vigiem' },
+    // Terceira leva de artes do dono (2026-10-09), redesenhadas como ilustração própria.
+    // 1 Coríntios 11.26 na NBV termina em "Façam isso até que ele venha".
+    { linhas: ['Avivados', 'até que Ele venha'], ref: '1 Coríntios 11.26', arte: 'avivados' },
+    // Lema com a referência: a NBV diz "você não precisa ter medo porque eu sou o seu Deus".
+    { linhas: ['Não temas', 'eu sou teu Deus'], ref: 'Isaías 41.10', arte: 'naotemas' },
+    // O dono quis o texto da arte em inglês, como no adesivo original.
+    { linhas: ['Jesus is', 'my King'], arte: 'rei' },
     // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
     { linhas: ['É tudo', 'sobre Ele'] },
     { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },
