@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os cem tonéis de trigo (Lc 16.7): um tonel de tábuas em pé, com dois aros, cheio de trigo até em cima, o monte de grãos passando da boca. O trigo é a única área sálvia. -->
+<path class="h" d="M14 104H106"/>
+<path class="k p" d="M34 36C30 56 30 80 34 100C50 105 70 105 86 100C90 80 90 56 86 36Z"/>
+<path class="h" d="M47 41C45 60 45 82 47 103M60 42V104M73 41C75 60 75 82 73 103"/>
+<path class="k" d="M32 52C50 57 70 57 88 52M32 86C50 91 70 91 88 86"/>
+<path class="k s" d="M34 36C40 24 80 24 86 36C80 42 40 42 34 36Z"/>
+<path class="h" d="M48 32l2 1M58 29l2 1M68 31l2 1M54 36l2 1M74 35l2 1"/>
+</svg>

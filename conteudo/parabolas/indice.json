@@ -33,7 +33,8 @@
         "torre-e-rei",
         "ovelha-perdida",
         "moeda-perdida",
-        "filho-prodigo"
+        "filho-prodigo",
+        "administrador-desonesto"
       ]
     },
     {
@@ -58,6 +59,7 @@
     "torre-e-rei",
     "ovelha-perdida",
     "moeda-perdida",
-    "filho-prodigo"
+    "filho-prodigo",
+    "administrador-desonesto"
   ]
 }

@@ -1,0 +1,93 @@
+{
+  "titulo": "O administrador desonesto",
+  "ref": "Lc 16.1-13",
+  "grupo": "lucas",
+  "linha": "Ele vai ser despedido e corta as dívidas dos outros",
+  "desenho": "contas-do-administrador",
+  "desenhoLista": "contrato-rasgado",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Depois das histórias da ovelha, da moeda e do filho que volta para casa, Jesus fala com os discípulos.",
+          "ref": "Lc 16.1"
+        },
+        {
+          "texto": "Os fariseus também estão ouvindo. Eles amam o dinheiro, e quando Jesus termina, zombam dele.",
+          "ref": "Lc 16.14"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "moeda",
+      "blocos": [
+        {
+          "texto": "Um homem rico tem um administrador para cuidar dos negócios dele. O homem ouve dizer que o administrador está desperdiçando os bens.",
+          "ref": "Lc 16.1"
+        },
+        {
+          "texto": "O patrão chama o administrador e avisa que ele vai ser despedido. O administrador não tem força para a lavoura e é orgulhoso demais para pedir esmola. Ele pensa no que fazer até ter uma ideia.",
+          "ref": "Lc 16.2-4"
+        },
+        {
+          "fala": "Já sei o que vou fazer!",
+          "ref": "Lc 16.4"
+        },
+        {
+          "texto": "Ele quer ter amigos para cuidar dele quando perder o emprego. Então chama quem deve ao patrão, um por um, e corta as dívidas.",
+          "ref": "Lc 16.4-5"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "jarro-e-botija",
+              "titulo": "Cem potes de azeite",
+              "fala": "Rasgue-o e escreva cinquenta!",
+              "ref": "Lc 16.6"
+            },
+            {
+              "desenho": "tonel-de-trigo",
+              "titulo": "Cem tonéis de trigo",
+              "fala": "Tome a sua nota e escreva oitenta tonéis!",
+              "ref": "Lc 16.7"
+            }
+          ]
+        },
+        {
+          "texto": "Depois, o homem rico elogia o administrador desonesto por ser tão prudente.",
+          "ref": "Lc 16.8"
+        }
+      ]
+    },
+    {
+      "titulo": "O dinheiro deste mundo",
+      "icone": "lamparina",
+      "blocos": [
+        {
+          "texto": "Jesus diz que a gente deste mundo sabe se virar melhor entre si do que quem ama a Deus.",
+          "ref": "Lc 16.8"
+        },
+        {
+          "fala": "usem as riquezas deste mundo para conseguir amigos",
+          "ref": "Lc 16.9"
+        },
+        {
+          "texto": "Quem é fiel no pouco é fiel no muito. Quem não é de confiança com o dinheiro deste mundo não vai receber os tesouros de verdade.",
+          "ref": "Lc 16.10-11"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Jesus não elogia a desonestidade. Ele chama o administrador de desonesto. O patrão elogia outra coisa, a esperteza de quem pensa no futuro antes de ficar sem nada. Jesus quer os discípulos espertos assim com o dinheiro, só que servindo a Deus.",
+    "apoio": "Jesus fecha com uma escolha. “Vocês não podem servir a Deus e ao dinheiro”.",
+    "ref": "Lc 16.8-13"
+  },
+  "perguntas": [
+    "Se você usasse o seu dinheiro pensando na vida que não acaba, o que mudaria esta semana?",
+    "Em que coisa pequena Deus está vendo se você é fiel?"
+  ]
+}
