@@ -721,7 +721,9 @@
             + (campos.length === 1 ? ' class="alto"' : '') + '>' + CC.esc(valor(chave)) + '</textarea></div>';
         }).join('')
         + (temNotaVerso ? '<p class="nota-do-verso">' + CC.ico('caneta') + '<span>Você tem uma nota em ' + nb(CC.esc(refDoDia)) + '. '
-          + '<button class="link-inline" data-nota-do-verso>Ver a nota</button></span></p>' : ''),
+          + '<button class="link-inline" data-nota-do-verso>Ver a nota</button></span></p>' : '')
+        // o mesmo aviso de privacidade das notas (o que se escreve aqui aparece em Minhas anotações)
+        + CC.avisoPrivado(),
       pe: botao('Pronto', 'data-pronto'),
       ligar(el) {
         const salvo = el.querySelector('#salvo');
@@ -745,6 +747,7 @@
             campoOracao.scrollTop = campoOracao.scrollHeight;
           }, 0);
         }
+        CC.ligarAvisoPrivado(el);
         const notaVerso = el.querySelector('[data-nota-do-verso]');
         if (notaVerso) notaVerso.onclick = () => CC.versiculos.abrirPrevia(notasVerso, () => desenhar());
         el.querySelectorAll('[data-modo]').forEach((b) => {

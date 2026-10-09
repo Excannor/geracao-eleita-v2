@@ -221,7 +221,7 @@
       + '<section class="etapa-reflexao">' + perguntasFixas + '</section>'
       + '<section class="etapa-reflexao"><h2>Se quiser, fale com Deus:</h2>'
       + '<ul class="oracao-guia"><li>' + CC.esc(dia.conversa) + '</li></ul></section>'
-      + CC.painelAnotacao('conhecer:' + dia.numero, 'Escrever sobre isso')
+      + '<div data-notas-contexto="conhecer:' + dia.numero + '" data-tipo-nota="nota"></div>'
       + (terminado ? '<p class="conquista-linha">' + CC.ico('certo') + 'Dia concluído</p>' : '');
 
     el.innerHTML = '<div class="licao-topo">'
@@ -273,7 +273,7 @@
     }
     const continuarPlano = el.querySelector('[data-continuar-plano]');
     if (continuarPlano) ligarContinuarPlano(continuarPlano);
-    CC.ligarAnotacao(el);
+    CC.notasDoContexto(el);
   }
 
   // O rodapé muda com o estado do dia: primeiro só "Ler"; depois de ler, "Terminei o dia";
@@ -387,7 +387,7 @@
   CC.conversarSobreBatismo = function () {
     CC.folha('<h3>Conversar sobre o batismo</h3>'
       + '<p>Vamos avisar quem te acompanha no app: quem te convidou, o líder da sua célula e quem faz discipulado com você, se houver. A pessoa vai te procurar para conversar, do jeito que vocês costumam falar.</p>'
-      + '<p class="passo-dica">Só vai o aviso. Ninguém vê o que você escreveu no app.</p>'
+      + '<p class="passo-dica">Só vai o aviso, nunca o que você escreveu no app.</p>'
       + '<div class="acoes"><button class="botao" data-avisar>Avisar</button><button class="botao plano" data-fechar>Agora não</button></div>', {
       rotulo: 'Conversar sobre o batismo',
       ligar: (folha, fechar) => {

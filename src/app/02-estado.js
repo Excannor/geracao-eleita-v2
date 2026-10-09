@@ -141,6 +141,7 @@
   // O que vem de fora (o servidor também passa por aqui). Lido do banco sem abrir (amigos,
   // célula, painel), texto e tags chegam cifrados ({ v, k, iv, tag, dado }, cofre.mjs): o
   // envelope passa inteiro, sem ser cortado nem trocado por vazio.
+  const CONTEXTO = /^(nota|secao|conhecer):/;
   const cifra = (x) => !!x && typeof x === 'object' && !Array.isArray(x);
   function limparNota(n) {
     if (!n || typeof n !== 'object') return null;
@@ -151,6 +152,10 @@
       tags: Array.isArray(n.tags) ? n.tags.filter((t) => typeof t === 'string').map((t) => t.slice(0, 30)).slice(0, 12)
         : (typeof n.tags === 'string' || cifra(n.tags) ? n.tags : []),
       cor: [1, 2, 3, 4].includes(n.cor) ? n.cor : 0,
+      // onde a nota foi escrita, além dos versículos: uma página do Explorar ("nota:<id>",
+      // "secao:<pasta>") ou um dia do Conhecer Jesus ("conhecer:<n>"); só o endereço, como os
+      // versículos: o texto da pessoa fica em "texto", que é cifrado
+      contexto: typeof n.contexto === 'string' && CONTEXTO.test(n.contexto) ? n.contexto.slice(0, 200) : '',
       fixada: !!n.fixada,
       respondidaEm: numero(n.respondidaEm),
       criadaEm: numero(n.criadaEm),
@@ -158,11 +163,14 @@
       apagadaEm: numero(n.apagadaEm),
     };
   }
-  // As notas do formato antigo (E.anotacoes["verso:João 3.16"], só o texto) viram notas com id
-  // fixo, "v:" + a referência: os dois aparelhos e o servidor migram para a mesma nota.
+  // As notas do formato antigo viram notas com id fixo, para os dois aparelhos e o servidor
+  // migrarem para a mesma nota: E.anotacoes["verso:João 3.16"] vira a nota "v:João 3.16", e a
+  // caixa de texto antiga de uma página do Explorar (E.anotacoes["nota:<id>"], ["secao:<pasta>"])
+  // ou de um dia do Conhecer Jesus (["conhecer:<n>"]) vira a nota "e:" + a chave, ligada a esse
+  // lugar (Estudo no Explorar, Nota no Conhecer).
   function migrarNotas(e) {
     const anot = e.anotacoes || {};
-    const chaves = Object.keys(anot).filter((k) => k.startsWith('verso:'));
+    const chaves = Object.keys(anot).filter((k) => k.startsWith('verso:') || CONTEXTO.test(k));
     const notas = {};
     for (const [id, n] of Object.entries(e.notas || {})) { const x = limparNota(n); if (x) notas[id] = x; }
     const anotacoes = { ...anot };
@@ -172,10 +180,11 @@
       // a cifra só depende da conta, e o dono a abre no lugar novo (notas.*.texto)
       const texto = cifra(anotacoes[k]) ? anotacoes[k] : String(anotacoes[k] || '').trim();
       delete anotacoes[k];
-      const id = 'v:' + k.slice(6);
+      const verso = k.startsWith('verso:');
+      const id = (verso ? 'v:' : 'e:') + (verso ? k.slice(6) : k);
       if (!texto || (notas[id] && notas[id].editadaEm >= em)) continue;
-      notas[id] = { versos: [k.slice(6)], tipo: 'nota', texto, tags: [], cor: 0, fixada: false,
-        respondidaEm: 0, criadaEm: (notas[id] || {}).criadaEm || em, editadaEm: em, apagadaEm: 0 };
+      notas[id] = limparNota({ versos: verso ? [k.slice(6)] : [], tipo: verso || k.startsWith('conhecer:') ? 'nota' : 'estudo', texto,
+        criadaEm: (notas[id] || {}).criadaEm || em, editadaEm: em, contexto: verso ? '' : k });
     }
     return { ...e, notas, anotacoes };
   }
@@ -738,7 +747,7 @@
       if (!lista.length) continue;
       L.push('## ' + titulo, '');
       for (const n of lista) {
-        L.push('### ' + (n.versos.join('; ') || 'Nota livre'), '');
+        L.push('### ' + ([n.contexto && CC.nomeDoContexto ? CC.nomeDoContexto(n.contexto) : ''].concat(n.versos).filter(Boolean).join('; ') || 'Nota livre'), '');
         L.push('Escrita em ' + data(n.criadaEm) + (n.editadaEm - n.criadaEm > 6e4 ? ' · editada em ' + data(n.editadaEm) : '')
           + (n.respondidaEm ? ' · respondida em ' + data(n.respondidaEm) : '') + (n.fixada ? ' · fixada' : '') + '.', '');
         L.push(n.texto.trim(), '');
@@ -751,16 +760,6 @@
       L.push('## Versículos marcados', '');
       for (const m of marcados) L.push('- ' + m.ref + ' (' + NOMES[m.cor] + ', ' + data(m.em) + ')');
       L.push('');
-    }
-    const anot = E.anotacoes || {};
-    const chaves = Object.keys(anot).filter((k) => (anot[k] || '').trim() && !k.startsWith('verso:')).sort();
-    if (chaves.length) {
-      L.push('## Anotações', '');
-      for (const k of chaves) {
-        const alvo = k.replace(/^(nota|secao):/, '');
-        const nome = D.notas[alvo] ? D.notas[alvo].nome : alvo;
-        L.push('### ' + CC.semPrefixo(nome), '', anot[k].trim(), '');
-      }
     }
     return L.join(nl);
   };

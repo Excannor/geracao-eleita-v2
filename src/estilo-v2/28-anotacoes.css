@@ -11,6 +11,7 @@
 .previa-nota svg { flex: none; width: 22px; height: 22px; margin-top: 1px; color: var(--salvia-texto); }
 .previa-nota b { display: block; font-size: .9375rem; }
 .previa-nota .resumo { display: -webkit-box; overflow: hidden; color: var(--tinta); font-size: .9375rem; line-height: 1.45; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.cores-marca .cor-marca { flex: none; }
 .cor-marca.sem-cor { display: inline-grid; place-items: center; border: 2px dashed var(--contorno); background: transparent; color: var(--tinta-fraca); }
 .cor-marca.sem-cor svg { width: 22px; height: 22px; }
 .cor-marca.sem-cor[aria-pressed="true"] { border-style: solid; border-color: var(--tinta-forte); box-shadow: none; color: var(--tinta-forte); }
@@ -139,3 +140,8 @@
 .passos-anot li::before { content: counter(passo); flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); font-weight: 800; }
 .passos-anot b { color: var(--tinta-forte); }
 .vazio-anot .botao { margin-top: 12px; }
+
+/* ---------- o bloco de notas de um lugar (Explorar, Conhecer Jesus) ---------- */
+.escrever-contexto { margin-top: 4px; }
+.chip-contexto { gap: 6px; text-decoration: none; }
+.chip-contexto svg, .chips-nota > .chip-nota svg { width: 16px; height: 16px; }

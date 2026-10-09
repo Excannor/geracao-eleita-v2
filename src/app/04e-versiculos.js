@@ -160,11 +160,11 @@
   const todasAsTags = () => [...new Set(CC.notas().flatMap((n) => n.tags))].sort();
 
   // { id } edita; { ref } abre nota nova no trecho; sem os dois, nota livre (Estudo).
-  function abrirEditor({ id, ref, texto, tipo, depois } = {}) {
+  function abrirEditor({ id, ref, texto, tipo, contexto, depois } = {}) {
     const existente = id ? CC.nota(id) : null;
-    const chave = id || 'novo:' + (ref || '');
+    const chave = id || 'novo:' + (ref || contexto || '');
     const r0 = ref && CC.lerRef(ref);
-    const inicio = existente || { texto: '', tipo: tipo || (ref ? 'nota' : 'estudo'), tags: [], versos: ref ? [ref] : [], cor: r0 ? corDoTrecho(r0) : 0 };
+    const inicio = existente || { texto: '', tipo: tipo || (ref ? 'nota' : 'estudo'), tags: [], versos: ref ? [ref] : [], cor: r0 ? corDoTrecho(r0) : 0, contexto: contexto || '' };
     const campos = (x) => JSON.stringify([x.texto, x.tipo, x.tags, x.versos, x.cor]);
     const rasc = lerRascunho();
     const recuperou = rasc && rasc.chave === chave && campos(rasc) !== campos(inicio);
@@ -184,6 +184,7 @@
       + '<button class="botao plano" data-cancelar>Cancelar</button>'
       + '<h2>' + (existente ? 'Editar nota' : 'Nova nota') + '</h2>'
       + '<button class="botao pequeno" data-guardar>Guardar</button></div>'
+      + (st.contexto && CC.nomeDoContexto ? '<p class="chips-nota"><span class="chip-nota">' + CC.ico('bussola') + CC.esc(CC.nomeDoContexto(st.contexto)) + '</span></p>' : '')
       + lista('versos', 'Ligar versículo', 'Versículo para ligar', 'Ex.: Romanos 5.8', '')
       + '<blockquote class="trecho-editor" hidden><span></span>'
       + '<button class="ver-trecho" data-ver-trecho aria-expanded="false">Ver o trecho todo</button></blockquote>'
@@ -281,7 +282,7 @@
         return;
       }
       const primeira = !CC.notas().length && !CC.notasApagadas().length;
-      CC.gravarNota(existente ? id : null, { versos: st.versos, tipo: st.tipo, texto: st.texto, tags: st.tags, cor: st.cor });
+      CC.gravarNota(existente ? id : null, { versos: st.versos, tipo: st.tipo, texto: st.texto, tags: st.tags, cor: st.cor, contexto: st.contexto || '' });
       // a cor escolhida aqui também marca o trecho principal
       const principal = CC.lerRef(st.versos[0]);
       if (principal && st.cor !== inicio.cor) CC.marcar(chavesDoTrecho(principal), st.cor);

@@ -12,11 +12,11 @@
   const nb = (t) => String(t).replace(/(\d) (?=\p{L})/gu, '$1 ').replace(/(\p{L}) (?=\d)/gu, '$1 ')
     .replace(/(\d)-(?=\d)/g, '$1-⁠');
   const TIPOS = [['tudo', 'Tudo'], ['nota', 'Notas'], ['marcado', 'Marcados'], ['reflexao', 'Reflexões'],
-    ['oracao', 'Orações'], ['estudo', 'Estudos'], ['explorar', 'Explorar'], ['bau', 'Dos baús']];
+    ['oracao', 'Orações'], ['estudo', 'Estudos'], ['bau', 'Dos baús']];
   // o nome no cartão e o ícone de cada tipo
   const CARA = {
     nota: ['Nota', 'caneta'], oracao: ['Oração', 'aperto'], estudo: ['Estudo', 'lupa'], marcado: ['Marcado', 'marca-texto'],
-    reflexao: ['Reflexão do dia', 'caderno'], explorar: ['Explorar', 'bussola'], bau: ['Do baú', 'bau'],
+    reflexao: ['Reflexão do dia', 'caderno'], bau: ['Do baú', 'bau'],
   };
   const PERIODOS = [['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['365', 'Último ano']];
   const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -27,6 +27,9 @@
   const deIso = (d) => (d ? new Date(d + 'T12:00:00').getTime() : 0);
 
   // ---------- os itens da tela, todos com o mesmo esqueleto ----------
+  const itemDeNota = (n, livroDe, posicao) => ({ chave: 'n:' + n.id, tipo: n.tipo, nota: n, refs: n.versos, livros: livroDe ? n.versos.map(livroDe).filter(Boolean) : [],
+    em: n.editadaEm, texto: n.texto, cor: n.cor, tags: n.tags, fixada: n.fixada, pos: posicao ? posicao(n.versos[0]) : 0,
+    titulo: n.contexto && CC.nomeDoContexto ? CC.nomeDoContexto(n.contexto) : '' });
   function itens() {
     const ordem = new Map(LIVROS().map((l, i) => [l, i]));
     const posicao = (ref) => {
@@ -35,14 +38,11 @@
     };
     const livroDe = (ref) => (CC.lerRef(ref) || {}).livro;
     const saida = [];
-    for (const n of CC.notas()) {
-      saida.push({ chave: 'n:' + n.id, tipo: n.tipo, nota: n, refs: n.versos, livros: n.versos.map(livroDe).filter(Boolean),
-        em: n.editadaEm, texto: n.texto, cor: n.cor, tags: n.tags, fixada: n.fixada, pos: posicao(n.versos[0]) });
-    }
+    for (const n of CC.notas()) saida.push(itemDeNota(n, livroDe, posicao));
     for (const m of CC.versiculos.marcados()) {
       saida.push({ chave: 'm:' + m.ref, tipo: 'marcado', refs: [m.ref], livros: [livroDe(m.ref)], em: m.em, texto: '', cor: m.cor, tags: [], pos: posicao(m.ref) });
     }
-    const { porDia, porNota } = CC.minhasAnotacoes();
+    const { porDia } = CC.minhasAnotacoes();
     const E = CC.estado();
     for (const d of porDia) {
       const p = D.plano[d.dia - 1];
@@ -50,9 +50,6 @@
       saida.push({ chave: 'd:' + d.dia, tipo: 'reflexao', dia: d.dia, passagem: d.passagem, campos: d.campos, refs: [], livros: p.livros || [],
         em: deIso((E.marcadoEm || {})[d.dia]), texto: d.campos.map((c) => c.texto).join(' '), cor: 0, tags: [],
         pos: t && ordem.has(t.livro) ? ordem.get(t.livro) * 1e6 + t.de * 1e3 : Infinity });
-    }
-    for (const n of porNota) {
-      saida.push({ chave: 'e:' + n.chave, tipo: 'explorar', titulo: n.titulo, href: n.href, refs: [], livros: [], em: 0, texto: n.texto, cor: 0, tags: [], pos: Infinity });
     }
     for (const v of (CC.versiculosGuardados ? CC.versiculosGuardados() : [])) {
       const bau = (E.bausAbertos || {})[CC.chaveBau ? CC.chaveBau(v.dia) : 'dia:' + v.dia] || {};
@@ -91,7 +88,7 @@
     const n = it.nota;
     const ref = it.refs[0] || '';
     const respondida = n && n.tipo === 'oracao' && n.respondidaEm;
-    const sub = it.tipo === 'reflexao' || it.tipo === 'bau' ? 'Dia ' + it.dia : it.tipo === 'explorar' ? it.titulo : ref;
+    const sub = it.tipo === 'reflexao' || it.tipo === 'bau' ? 'Dia ' + it.dia : ref || it.titulo;
     const q = respondida && CC.quando(n.respondidaEm);
     const quando = respondida ? CC.ico('certo') + 'Respondida ' + (/^\d/.test(q) ? 'em ' : '') + q : (it.em ? CC.quando(it.em) : '');
     const citacao = ref && it.tipo !== 'estudo' ? '<blockquote class="citacao-anot' + (it.cor ? ' marca-' + it.cor : '') + '"><span data-citar="' + CC.esc(ref) + '">'
@@ -105,7 +102,9 @@
     } else if (it.texto) {
       corpo = '<p class="texto-anot">' + CC.esc(it.texto) + '</p>';
     }
-    const chips = (it.tipo === 'estudo' ? it.refs : it.refs.slice(1)).map((r) => '<span class="chip">' + nb(CC.esc(r)) + '</span>')
+    // o lugar ligado à nota (página do Explorar, dia do Conhecer Jesus): o chip leva até ele
+    const chips = (n && n.contexto ? ['<a class="chip chip-contexto" href="' + CC.hrefDoContexto(n.contexto) + '">' + CC.ico('bussola') + CC.esc(it.titulo) + '</a>'] : [])
+      .concat((it.tipo === 'estudo' ? it.refs : it.refs.slice(1)).map((r) => '<span class="chip">' + nb(CC.esc(r)) + '</span>'))
       .concat(it.tags.map((t) => '<span class="chip">#' + CC.esc(t) + '</span>'));
     return '<article class="cartao-anot' + (it.fixada ? ' fixada' : '') + '" data-item="' + CC.esc(it.chave) + '">'
       + '<div class="linha-tipo">' + CC.ico(icone) + '<b>' + nome + '</b>' + (sub ? '<span class="sub">· ' + nb(CC.esc(sub)) + '</span>' : '')
@@ -254,6 +253,24 @@
     });
   }
 
+  // ---------- onde se escreve (Explorar, Conhecer Jesus): as notas do lugar e "Escrever nota" ----------
+  // O mesmo bloco em todo lugar: os cartões de Minhas anotações e o mesmo editor, com o lugar
+  // ligado à nota (Estudo por padrão; data-tipo-nota muda).
+  CC.notasDoContexto = function (raiz) {
+    const alvo = raiz.querySelector('[data-notas-contexto]');
+    if (!alvo) return;
+    const contexto = alvo.dataset.notasContexto;
+    const desenhar = () => {
+      const lista = CC.notas().filter((n) => n.contexto === contexto).sort((a, b) => b.editadaEm - a.editadaEm).map((n) => itemDeNota(n));
+      alvo.innerHTML = CC.tituloSecao('Suas anotações', lista.length ? String(lista.length) : '') + lista.map(cartao).join('')
+        + '<button class="botao escrever-contexto" data-escrever-contexto>' + CC.ico('caneta') + 'Escrever nota</button>' + CC.avisoPrivado();
+      alvo.querySelector('[data-escrever-contexto]').onclick = () => CC.versiculos.abrirEditor({ contexto, tipo: alvo.dataset.tipoNota, depois: desenhar });
+      CC.ligarAvisoPrivado(alvo);
+      ligarCartoes(alvo, lista, desenhar);
+    };
+    desenhar();
+  };
+
   // ---------- tocar no cartão e as ações do "mais" ----------
   function ligarCartoes(alvo, todos, redesenhar) {
     const porChave = new Map(todos.map((it) => [it.chave, it]));
@@ -276,7 +293,6 @@
   function abrir(it, redesenhar) {
     if (it.nota) CC.versiculos.abrirEditor({ id: it.nota.id, depois: redesenhar });
     else if (it.tipo === 'reflexao') location.hash = '#/dia/' + it.dia;
-    else if (it.tipo === 'explorar') location.hash = it.href;
     else CC.versiculos.irPara(it.refs[0]);
   }
 
@@ -291,7 +307,6 @@
     if (n) linhas.push(linha('editar', 'caneta', 'Editar'), linha('fixar', 'pino', n.fixada ? 'Desafixar' : 'Fixar no topo'));
     if (n && n.tipo === 'oracao') linhas.push(linha('responder', 'certo', n.respondidaEm ? 'Ainda esperando resposta' : 'Marcar como respondida'));
     if (it.tipo === 'reflexao') linhas.push(linha('abrir', 'livro', 'Abrir o dia ' + it.dia));
-    if (it.tipo === 'explorar') linhas.push(linha('abrir', 'bussola', 'Abrir no Explorar'));
     if (ref) linhas.push(linha('biblia', 'livro', 'Abrir na Bíblia'));
     if (ref && !n) linhas.push(linha('escrever', 'caneta', 'Escrever nota'));
     if (ref && CC.imagemStory) linhas.push(linha('story', 'imagem', 'Story do versículo'));

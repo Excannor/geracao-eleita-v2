@@ -460,7 +460,7 @@ const computador = {
 let f = CC.fundir(celular, computador);
 checar(f.lidos.length === 4 && f.licoes.length === 2, 'a fusão não perde leitura nem lição');
 checar(f.oia[1].o === 'do celular' && f.oia[4].o === 'do computador', 'a fusão guarda os dois registros escritos');
-checar(f.anotacoes['nota:x'] === 'lembrete' && f.dia === 5, 'a fusão guarda anotação antiga e o dia do aparelho mais novo');
+checar(f.notas['e:nota:x'].texto === 'lembrete' && f.notas['e:nota:x'].contexto === 'nota:x' && f.dia === 5, 'a fusão guarda anotação antiga (agora nota ligada à página) e o dia do aparelho mais novo');
 checar(f.xpLegado === 15 && f.maiorProposito === 7 && f.conquistasGanhas['Escriba'] && f.conquistasGanhas['Pé na estrada'],
   'a fusão preserva XP antigo, maior propósito e conquistas dos dois lados');
 const ordenado = (e) => e.lidos.slice().sort((a, b) => a - b).join();
@@ -498,7 +498,7 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
   const outro = { ...antes, atualizadoEm: z.zeradoEm - 10, anotacoes: { ...antes.anotacoes, 'nota:y': 'escrita no outro' }, foto: antes.foto };
   for (const [x, y] of [[z, outro], [outro, z]]) {
     const f2 = CC.fundir(x, y);
-    checar(!f2.lidos.length && !Object.keys(f2.marcadoEm).length && f2.foto === antes.foto && f2.anotacoes['nota:y'] === 'escrita no outro'
+    checar(!f2.lidos.length && !Object.keys(f2.marcadoEm).length && f2.foto === antes.foto && f2.notas['e:nota:y'].texto === 'escrita no outro'
       && f2.notas['v:João 3.16'].texto === 'minha nota' && !f2.notas['v:João 3.16'].apagadaEm && f2.oia[1].o === 'reflexão',
     'na fusão com um aparelho atrasado, a trilha fica zerada e foto e anotações dos dois lados ficam');
   }
@@ -553,15 +553,12 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
 
   const E = CC.estado();
   E.marcas = { 'João 3:16': { cor: 2, em: 3 }, 'João 3:17': { cor: 2, em: 4 }, 'João 3:18': { cor: 1, em: 5 }, 'João 3:19': { cor: 0, em: 6 } };
-  E.anotacoes = { 'nota:x': 'outra' };
-  E.notas = CC.migrarNotas({ atualizadoEm: 1000, anotacoes: { 'verso:João 3.16-18': 'Deus amou primeiro.', 'verso:Rute 1.16': '  ' } }).notas;
+  E.anotacoes = {};
+  E.notas = CC.migrarNotas({ atualizadoEm: 1000, anotacoes: { 'verso:João 3.16-18': 'Deus amou primeiro.', 'verso:Rute 1.16': '  ', 'nota:x': 'outra' } }).notas;
   const marcados = CC.versiculos.marcados();
   checar(marcados.length === 2 && marcados.some((t) => t.ref === 'João 3.16-17' && t.cor === 2) && marcados.some((t) => t.ref === 'João 3.18' && t.cor === 1),
     'os marcados juntam versículos seguidos da mesma cor num trecho e ignoram marca apagada');
-  checar(CC.notas().length === 1 && CC.notas()[0].versos[0] === 'João 3.16-18', 'nota vazia do formato antigo não vira nota');
-  const an = CC.minhasAnotacoes();
-  checar(!an.porNota.some((n) => /verso/.test(n.titulo + n.chave)) && an.porNota.some((n) => n.chave === 'nota:x'),
-    'as anotações do Explorar continuam à parte, sem as notas de versículo');
+  checar(CC.notas().length === 2 && CC.nota('v:João 3.16-18').versos[0] === 'João 3.16-18' && CC.nota('e:nota:x').tipo === 'estudo', 'nota vazia do formato antigo não vira nota');
   checar(CC.meusTextos().some((t) => t.texto === 'Deus amou primeiro.' && t.href === '#/perfil/anotacoes'), 'a busca do Explorar acha o texto das notas');
   const id = CC.gravarNota(null, { versos: ['Salmos 23.1'], tipo: 'oracao', texto: 'Pela prova', tags: ['paz'], cor: 2 });
   CC.responderOracao(id, true);
@@ -581,17 +578,22 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   E.notas = {};
   const vazio = { atualizadoEm: 1, notas: {} };
   // migração: as chaves "verso:" viram notas com id fixo, sem perder nada
-  const antigo = CC.normalizarEstado({ atualizadoEm: 5000, anotacoes: { 'verso:João 3.16': 'Deus amou', 'verso:Rute 1.16': 'Teu povo', 'nota:x': 'fica', 'verso:Jó 1.1': ' ' } });
+  const antigo = CC.normalizarEstado({ atualizadoEm: 5000, anotacoes: { 'verso:João 3.16': 'Deus amou', 'verso:Rute 1.16': 'Teu povo', 'nota:x': 'fica', 'secao:01 - Temas': 'da seção', 'conhecer:3': 'do dia 3', 'nota:vazia': ' ', 'verso:Jó 1.1': ' ' } });
   const nj = antigo.notas['v:João 3.16'];
   checar(nj && nj.texto === 'Deus amou' && nj.tipo === 'nota' && nj.versos[0] === 'João 3.16' && nj.criadaEm === 5000 && nj.editadaEm === 5000 && !nj.apagadaEm
-    && antigo.notas['v:Rute 1.16'].texto === 'Teu povo' && Object.keys(antigo.notas).length === 2, 'migração: cada nota antiga com texto vira uma nota, com a data do estado');
-  checar(antigo.anotacoes['nota:x'] === 'fica' && !Object.keys(antigo.anotacoes).some((k) => k.startsWith('verso:')), 'migração: as anotações do Explorar ficam e as chaves "verso:" saem');
+    && antigo.notas['v:Rute 1.16'].texto === 'Teu povo' && Object.keys(antigo.notas).length === 5, 'migração: cada nota antiga com texto vira uma nota, com a data do estado');
+  const ex = antigo.notas['e:nota:x'];
+  checar(ex.texto === 'fica' && ex.tipo === 'estudo' && ex.contexto === 'nota:x' && !ex.versos.length && ex.criadaEm === 5000
+    && antigo.notas['e:secao:01 - Temas'].contexto === 'secao:01 - Temas' && antigo.notas['e:secao:01 - Temas'].tipo === 'estudo'
+    && antigo.notas['e:conhecer:3'].texto === 'do dia 3' && antigo.notas['e:conhecer:3'].tipo === 'nota' && antigo.notas['e:conhecer:3'].contexto === 'conhecer:3',
+  'migração: a caixa antiga do Explorar e do Conhecer Jesus vira nota ligada ao lugar (Estudo no Explorar), sem perder texto');
+  checar(!Object.keys(antigo.anotacoes).length, 'migração: as chaves antigas saem (a vazia não vira nota)');
   const deNovo = CC.normalizarEstado(antigo);
   checar(JSON.stringify(deNovo.notas) === JSON.stringify(antigo.notas), 'migração: migrar de novo não muda nada');
   // um aparelho velho, que ainda manda o formato antigo, cai na mesma nota (mesmo id)
   const velho = { atualizadoEm: 4000, anotacoes: { 'verso:João 3.16': 'Deus amou' } };
   const f1 = CC.fundir(antigo, velho);
-  checar(Object.keys(f1.notas).length === 2 && f1.notas['v:João 3.16'].texto === 'Deus amou', 'migração: o aparelho velho e o novo dão a mesma nota, sem duplicar');
+  checar(Object.keys(f1.notas).length === 5 && f1.notas['v:João 3.16'].texto === 'Deus amou', 'migração: o aparelho velho e o novo dão a mesma nota, sem duplicar');
   // fusão por nota: vence a editada por último, cada uma por si
   const n = (texto, editadaEm, extra) => ({ versos: ['João 3.16'], tipo: 'nota', texto, tags: [], cor: 0, fixada: false, respondidaEm: 0, criadaEm: 1, editadaEm, apagadaEm: 0, ...extra });
   const agora = Date.now();
@@ -1252,7 +1254,7 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     checar((await pedir('/api/estado', meu, ana, 'PUT')).status === 200, 'o dono grava as anotações');
     checar(!/SEGREDO/.test(bancoBruto()), 'o arquivo do banco (com o WAL) não tem o texto em claro');
     const lido = await (await pedir('/api/estado', null, ana)).json();
-    checar(lido.oia[1].oracao === 'SEGREDO-ORACAO-ANA' && lido.notas['v:João 3.16'].texto === 'SEGREDO-VERSO-ANA' && lido.anotacoes['nota:x'] === 'SEGREDO-NOTA-ANA'
+    checar(lido.oia[1].oracao === 'SEGREDO-ORACAO-ANA' && lido.notas['v:João 3.16'].texto === 'SEGREDO-VERSO-ANA' && lido.notas['e:nota:x'].texto === 'SEGREDO-NOTA-ANA' && lido.notas['e:nota:x'].contexto === 'nota:x'
       && !lido.anotacoes['verso:João 3.16'] && lido.historia.antes === 'SEGREDO-HISTORIA-ANA',
       'o dono lê de volta, em claro, pelo /api/estado');
     const outro = await (await pedir('/api/estado', null, bia)).text();
@@ -1263,11 +1265,11 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     const outroAparelho = { ...CC.normalizarEstado({}), atualizadoEm: Date.now() + 1000, anotacoes: { 'nota:y': 'SEGREDO-NOVA' } };
     await pedir('/api/estado', outroAparelho, ana, 'PUT');
     const fundido = await (await pedir('/api/estado', null, ana)).json();
-    checar(fundido.anotacoes['nota:x'] === 'SEGREDO-NOTA-ANA' && fundido.anotacoes['nota:y'] === 'SEGREDO-NOVA' && fundido.oia[1].o === 'SEGREDO-OIA-ANA',
+    checar(fundido.notas['e:nota:x'].texto === 'SEGREDO-NOTA-ANA' && fundido.notas['e:nota:y'].texto === 'SEGREDO-NOVA' && fundido.oia[1].o === 'SEGREDO-OIA-ANA',
       'a fusão entre aparelhos junta o cifrado guardado com o que chega');
-    const ivAntes = naLinha('ana.cofre').anotacoes['nota:x'].iv;
+    const ivAntes = naLinha('ana.cofre').notas['e:nota:x'].texto.iv;
     await pedir('/api/estado', { ...outroAparelho, atualizadoEm: Date.now() + 2000, anotacoes: { 'nota:x': 'SEGREDO-EDITADA' } }, ana, 'PUT');
-    checar(naLinha('ana.cofre').anotacoes['nota:x'].iv !== ivAntes, 'o texto editado é gravado com IV novo');
+    checar(naLinha('ana.cofre').notas['e:nota:x'].texto.iv !== ivAntes && naLinha('ana.cofre').notas['e:nota:x'].contexto === 'nota:x', 'o texto editado é gravado com IV novo');
 
     // "Zerar progresso" pelo servidor: a trilha recomeça, foto e anotações ficam
     const FOTO = 'data:image/jpeg;base64,QUJD';
@@ -1280,7 +1282,7 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     const depoisZ = await (await pedir('/api/estado', null, ana)).json();
     checar(!depoisZ.lidos.length && !Object.keys(depoisZ.marcadoEm).length && depoisZ.acertosTotal === 0 && depoisZ.xpLegado === 0,
       'no servidor, zerar recomeça leituras, ofensiva e contadores');
-    checar(depoisZ.foto === FOTO && depoisZ.anotacoes['nota:y'] === 'SEGREDO-NOVA' && depoisZ.oia[1].o === 'SEGREDO-OIA-ANA' && depoisZ.historia.antes === 'SEGREDO-HISTORIA-ANA',
+    checar(depoisZ.foto === FOTO && depoisZ.notas['e:nota:y'].texto === 'SEGREDO-NOVA' && depoisZ.oia[1].o === 'SEGREDO-OIA-ANA' && depoisZ.historia.antes === 'SEGREDO-HISTORIA-ANA',
       'no servidor, zerar mantém a foto, as anotações, as reflexões e a Minha história');
     checar(!/SEGREDO/.test(bancoBruto()), 'e o que ficou continua cifrado no banco');
 

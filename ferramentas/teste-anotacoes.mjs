@@ -181,6 +181,34 @@ ok(await av('/30 dias/.test([...document.querySelectorAll(".folha")].pop().inner
 await clicar('[data-recuperar]');
 ok(await esperar(existe(cartao(idEstudo)) + ' && !' + existe('[data-apagadas]')), 'recuperar traz a nota de volta');
 
+// ---------- no Explorar e no Conhecer Jesus: o mesmo bloco de notas ----------
+await av('location.hash = "#/nota/" + encodeURIComponent("05 - Hermenêutica/Os quatro contextos")');
+ok(await esperar(existe('[data-notas-contexto] [data-escrever-contexto]'), 10000) + '' && await av('!' + existe('[data-anotacao]') + ' && !' + existe('[data-copiar-anotacao]')
+  + ' && ' + existe('[data-notas-contexto] [data-como-guardamos]')), 'a página do Explorar troca a caixa solta e o "Copiar" por "Escrever nota" e a linha do cadeado');
+await clicar('[data-escrever-contexto]');
+ok(await esperar(existe('.folha-editor #campo-nota') + ' && /Os quatro contextos/.test(' + q('.folha-editor') + '.innerText) && '
+  + q('.folha-editor [data-tipo="estudo"]') + '.getAttribute("aria-pressed") === "true"'), 'o mesmo editor abre, com a página ligada e o tipo Estudo');
+await preencher('#campo-nota', 'Contexto histórico primeiro');
+await clicar('.folha-editor [data-guardar]');
+ok(await esperar('/Contexto histórico primeiro/.test(' + q('[data-notas-contexto]') + '.innerText) && ' + existe('[data-notas-contexto] .cartao-anot')),
+  'a nota aparece na página, como cartão');
+ok(await av('CC.notas().some((n) => n.contexto === "nota:05 - Hermenêutica/Os quatro contextos" && n.tipo === "estudo")'), 'a nota fica ligada à página (contexto)');
+await av('location.hash = "#/perfil/anotacoes"');
+await esperar(existe('[data-tipo="estudo"]'));
+await clicar('[data-tipo="estudo"]');
+ok(await esperar('[...document.querySelectorAll(".cartao-anot")].some((c) => /Contexto histórico primeiro/.test(c.innerText) && c.querySelector(".chip-contexto[href*=\'Os%20quatro%20contextos\']"))'),
+  'em Minhas anotações, o filtro Estudo mostra a nota com o chip da página, que leva até ela');
+await clicar('[data-tipo="tudo"]');
+await av('location.hash = "#/conhecer/1"');
+await esperar(existe('[data-ler]'), 10000);
+await clicar('[data-ler]');
+await esperar('[...document.querySelectorAll("button")].some((b) => /Terminei a leitura/.test(b.textContent))', 10000);
+await av('[...document.querySelectorAll("button")].find((b) => /Terminei a leitura/.test(b.textContent)).click(); true');
+ok(await esperar(existe('[data-notas-contexto="conhecer:1"] [data-escrever-contexto]') + ' && !' + existe('[data-anotacao]'), 10000), 'o Conhecer Jesus usa o mesmo bloco de notas');
+await clicar('.tela-conhecer [data-fechar]');
+await av('location.hash = "#/perfil/anotacoes"');
+await esperar(existe('.cartao-anot'));
+
 // exportar avisa que o arquivo é uma cópia fora do app
 await clicar('[data-exportar]');
 ok(await esperar('[...document.querySelectorAll(".folha")].some((f) => /fora do app/.test(f.innerText))'), 'baixar avisa antes que o arquivo fica fora do app');

@@ -292,11 +292,12 @@
     raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Perfil')
       + '<h1>Minha história com Deus</h1>'
       + '<p class="passo-dica">Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus. Se você cresceu na igreja, conte quando a fé passou a ser sua. '
-      + 'Escreva só para você. Ninguém vê o que está aqui.</p></div>'
+      + 'Escreva só para você.</p></div>'
       + '<span class="selo-status" id="salvo-historia" role="status"></span>'
       + CAMPOS_HISTORIA.map(([chave, pergunta]) => campoHistoria(chave, pergunta, h[chave])).join('')
       + '<p class="passo-dica pequena">Use palavras suas, sem termos de igreja. Três minutos de conversa bastam.</p>'
-      + '<div class="acoes"><button class="botao contorno pequeno" data-copiar>' + CC.ico('compartilhar') + 'Copiar minha história</button></div>';
+      + '<div class="acoes"><button class="botao contorno pequeno" data-copiar>' + CC.ico('compartilhar') + 'Copiar minha história</button></div>'
+      + CC.avisoPrivado();
 
     const conta = (chave) => {
       const campo = raiz.querySelector('[data-campo="' + chave + '"]');
@@ -314,6 +315,7 @@
       const campo = raiz.querySelector('[data-campo="' + chave + '"]');
       campo.addEventListener('input', () => { conta(chave); salvar(); });
     });
+    CC.ligarAvisoPrivado(raiz);
     raiz.querySelector('[data-copiar]').onclick = async () => {
       const atual = CC.minhaHistoria() || {};
       const texto = ['antes', 'encontro', 'hoje'].map((c) => atual[c] || '').filter(Boolean).join('\n\n');

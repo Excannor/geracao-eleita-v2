@@ -48,6 +48,13 @@
     if (!s || !TEXTO_SECAO[pasta]) return s;
     return { ...s, rotulo: TEXTO_SECAO[pasta][0], descricao: TEXTO_SECAO[pasta][1] };
   };
+  // O lugar a que uma nota está ligada (02-estado.js, "contexto"): nome e endereço.
+  CC.nomeDoContexto = (chave) => {
+    const [tipo, alvo] = [chave.slice(0, chave.indexOf(':')), chave.slice(chave.indexOf(':') + 1)];
+    if (tipo === 'conhecer') return 'Conhecer Jesus · dia ' + alvo;
+    return tipo === 'nota' ? (D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : alvo) : ((secaoDe(alvo) || {}).rotulo || alvo);
+  };
+  CC.hrefDoContexto = (chave) => '#/' + chave.slice(0, chave.indexOf(':')) + '/' + encodeURIComponent(chave.slice(chave.indexOf(':') + 1));
 
   // O subtítulo que só repete o nome da seção some, e a data perde a nota acadêmica entre
   // parênteses: no cartão basta a época, o detalhe fica dentro do texto.
@@ -335,7 +342,7 @@
       + filtros
       + (ids.length ? '<div class="grade">' + ids.map(CC.itemNota).join('') + '</div>'
         : '<div class="vazio">Nada por aqui com esse filtro.</div>')
-      + CC.painelAnotacao('secao:' + pasta, 'Suas anotações sobre ' + s.rotulo);
+      + '<div data-notas-contexto="secao:' + CC.esc(pasta) + '"></div>';
 
     raiz.querySelectorAll('[data-filtro]').forEach((el) => {
       el.onclick = () => {
@@ -343,7 +350,7 @@
         location.hash = '#/secao/' + encodeURIComponent(pasta) + (f ? '?' + encodeURIComponent(f) : '');
       };
     });
-    CC.ligarAnotacao(raiz);
+    CC.notasDoContexto(raiz);
     CC.inseparavel(raiz);
   };
 
@@ -393,7 +400,7 @@
           + '</div>'
         : '')
       + fimDoComece(id)
-      + CC.painelAnotacao('nota:' + id, 'Suas anotações')
+      + '<div data-notas-contexto="nota:' + CC.esc(id) + '"></div>'
       + citada;
 
     // A lição só conta quando a pessoa chega ao fim do texto: o botão aparece ali.
@@ -420,32 +427,8 @@
         CC.redesenhar();
       };
     }
-    CC.ligarAnotacao(raiz);
+    CC.notasDoContexto(raiz);
     CC.inseparavel(raiz);
-  };
-
-  // ---------- anotações livres ----------
-  CC.painelAnotacao = function (chave, titulo) {
-    const texto = CC.anotacao(chave);
-    return CC.tituloSecao(titulo, texto ? 'escrito' : '')
-      + '<div class="cartao"><div class="campo" style="margin:0">'
-      + '<textarea data-anotacao="' + CC.esc(chave) + '" aria-label="' + CC.esc(titulo || 'Sua anotação') + '" placeholder="Escreva aqui o que você quer lembrar."'
-      + ' style="min-height:110px">' + CC.esc(texto) + '</textarea></div>'
-      + '<div class="acoes"><button class="botao contorno pequeno" data-copiar-anotacao '
-      + 'style="width:auto">Copiar</button></div></div>';
-  };
-
-  CC.ligarAnotacao = function (raiz) {
-    const ta = raiz.querySelector('[data-anotacao]');
-    if (!ta) return;
-    ta.addEventListener('input', () => CC.gravarAnotacao(ta.dataset.anotacao, ta.value));
-    const bt = raiz.querySelector('[data-copiar-anotacao]');
-    if (bt) {
-      bt.onclick = async () => {
-        const certo = await CC.copiar(ta.value);
-        CC.avisar(certo ? 'Anotação copiada' : 'Não consegui copiar');
-      };
-    }
   };
 
   // ---------- busca ----------
@@ -516,28 +499,15 @@
     }
     const TIPO = { nota: 'Nota', oracao: 'Oração', estudo: 'Estudo' };
     for (const n of CC.notas()) {
-      saida.push({ onde: TIPO[n.tipo] + (n.versos[0] ? ' · ' + n.versos[0] : ''), texto: n.texto.trim(), href: '#/perfil/anotacoes' });
-    }
-    for (const [chave, texto] of Object.entries(E.anotacoes || {})) {
-      if (!texto || !texto.trim() || chave.startsWith('verso:')) continue;
-      const alvo = chave.replace(/^(nota|secao):/, '');
-      const nome = D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : ((secaoDe(alvo) || {}).rotulo || alvo);
-      saida.push({
-        onde: 'Anotação · ' + nome,
-        texto: texto.trim(),
-        href: chave.startsWith('nota:') ? '#/nota/' + encodeURIComponent(alvo)
-          : '#/secao/' + encodeURIComponent(alvo),
-      });
+      const onde = n.versos[0] || (n.contexto ? CC.nomeDoContexto(n.contexto) : '');
+      saida.push({ onde: TIPO[n.tipo] + (onde ? ' · ' + onde : ''), texto: n.texto.trim(), href: n.contexto ? CC.hrefDoContexto(n.contexto) : '#/perfil/anotacoes' });
     }
     return saida;
   };
 
-  // O mesmo material de CC.meusTextos, mas organizado como uma pessoa lembraria dele: os
-  // registros de OIA nascem de um dia específico, então viram um caderno por dia, do mais
-  // recente para o mais antigo. As anotações soltas numa nota ou seção do Explorar não têm
-  // um único dia dono (a nota de uma pessoa bíblica pode valer para dezenas de dias), então
-  // ficam à parte, mas levam consigo em que dias aquele material apareceu na leitura, quando
-  // dá para saber, como uma ponte de volta ao dia que gerou a anotação.
+  // As reflexões dos dias (OIA), do dia mais recente para o mais antigo: Minhas anotações
+  // mostra cada uma como cartão. As anotações do Explorar e do Conhecer Jesus são notas
+  // ligadas ao lugar (02-estado.js, "contexto").
   CC.minhasAnotacoes = function () {
     const E = CC.estado();
     const ROTULOS = [['o', 'Observação'], ['i', 'Interpretação'],
@@ -552,33 +522,7 @@
     }
     porDia.sort((a, b) => b.dia - a.dia);
 
-    // de cada nota, os dias do plano em que ela aparece como material de apoio
-    const diasPorNota = new Map();
-    D.plano.forEach((p, i) => {
-      for (const lista of Object.values(p.rel || {})) {
-        for (const id of lista) {
-          if (!diasPorNota.has(id)) diasPorNota.set(id, []);
-          diasPorNota.get(id).push(i + 1);
-        }
-      }
-    });
-
-    const porNota = [];
-    for (const [chave, texto] of Object.entries(E.anotacoes || {})) {
-      if (!texto || !texto.trim() || chave.startsWith('verso:')) continue;
-      const alvo = chave.replace(/^(nota|secao):/, '');
-      const ehNota = chave.startsWith('nota:');
-      const nome = ehNota ? (D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : alvo)
-        : ((secaoDe(alvo) || {}).rotulo || alvo);
-      porNota.push({
-        titulo: nome,
-        texto: texto.trim(),
-        href: ehNota ? '#/nota/' + encodeURIComponent(alvo) : '#/secao/' + encodeURIComponent(alvo),
-        dias: ehNota ? (diasPorNota.get(alvo) || []) : [],
-        chave,
-      });
-    }
-    return { porDia, porNota };
+    return { porDia };
   };
 
   CC.vazio = function (raiz, mensagem) {
