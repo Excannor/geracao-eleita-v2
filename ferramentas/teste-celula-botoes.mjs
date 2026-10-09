@@ -168,8 +168,10 @@ ok(await esperar('!!document.querySelector(".folha h2") && document.querySelecto
 ok(await av('/o encontro desta semana|Hoje|Ontem/.test(' + q('[data-realce-data]') + '.textContent) && ' + q('[data-outras-datas]') + '.hidden'), 'C12: a data do encontro em destaque, as outras escondidas');
 await clicar('[data-outra-data]');
 ok(await av('!' + q('[data-outras-datas]') + '.hidden && document.querySelectorAll("[data-outras-datas] [data-data]").length === 8 && ' + q('[data-outra-data]') + '.getAttribute("aria-expanded") === "true"'), 'C12: "Outra data" mostra as 8 datas');
-await av('document.querySelectorAll("[data-outras-datas] [data-data]")[2].click(); true');
-ok(await esperar('!/encontro desta semana/.test(' + q('[data-realce-data]') + '.textContent) || document.querySelectorAll("[data-outras-datas] [data-data]")[2].dataset.data === CC.hojeIso()'), 'C12: escolher outra data troca o destaque');
+// uma data que não seja a do encontro já em destaque (a 3ª da lista coincidia com a quarta do
+// encontro às sextas, e o destaque, com razão, não mudava)
+const outraData = await av('(() => { const b = [...document.querySelectorAll("[data-outras-datas] [data-data]")].find((x) => x.getAttribute("aria-pressed") !== "true" && x.dataset.data !== CC.hojeIso()); if (!b) return ""; b.click(); return b.dataset.data; })()');
+ok(!!outraData && await esperar('!/encontro desta semana/.test(' + q('[data-realce-data]') + '.textContent)'), 'C12: escolher outra data troca o destaque (' + outraData + ')');
 await clicar('.folha [data-fechar]');
 await esperar('!document.querySelector(".folha")');
 ok(await av('!!' + q('[data-pedir-caminhada]')) && await alto('[data-pedir-caminhada]'), 'C4: o Painel tem "Pedir para a célula marcar"');
