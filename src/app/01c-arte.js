@@ -57,13 +57,39 @@
     { linhas: ['A sua oração', 'de hoje está', 'construindo', 'o milagre de amanhã.', 'Continue firme'] },
     { linhas: ['Onde o mundo', 'vê um fim, Deus', 'escreve um', 'novo começo cheio', 'de esperança'] },
     { linhas: ['Geração', 'inconformada'] },
+    // As das artes que o dono mandou (2026-10-09): cada uma tem um modelo de story
+    // próprio, redesenhado em canvas a partir da arte (arte: o nome do modelo, 01e-story-artes.js).
+    { linhas: ['Não me envergonho', 'do Evangelho'], ref: 'Romanos 1.16', arte: 'chama' },
+    { linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14', arte: 'luz' },
+    { linhas: ['Ninguém fica', 'para trás'], ref: 'Mateus 18.11-14', arte: 'ninguem' },
+    { linhas: ['Eu ainda estou', 'nas mãos', 'do Oleiro'], ref: 'Jeremias 18.6', arte: 'oleiro' },
+    // O cartaz de "procurado" com a ovelha número 100 (a perdida da parábola): ilustração
+    // própria a partir da ideia de uma arte que o dono mandou, sem copiar o desenho. O dono
+    // quer só a arte, sem frase: na folha da ofensiva aparece só a referência, e o fim da
+    // lição (que mostra a frase em texto) não sorteia esta.
+    { linhas: [], ref: 'Lucas 15.4-7', arte: 'procurado' },
+    // A bandeira erguida: versão ilustrada a partir da ideia de uma foto que o dono mandou.
+    // Sem referência: nenhum versículo diz isso com estas palavras.
+    { linhas: ['Jesus é', 'suficiente'], arte: 'suficiente' },
+    // Trecho de Tiago 1.22 na NBV, palavra por palavra (a arte do dono citava outra tradução).
+    { linhas: ['Coloquem em prática', 'a palavra'], ref: 'Tiago 1.22', arte: 'praticantes' },
+    // A porta entreaberta: arte própria a partir de uma tipográfica que o dono mandou. A frase é
+    // o lema conhecido; o trecho que o story cita é o da NBV.
+    { linhas: ['Eis que estou', 'à porta e bato'], ref: 'Apocalipse 3.20', arte: 'porta' },
+    // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
+    { linhas: ['É tudo', 'sobre Ele'] },
+    { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },
+    { linhas: ['Jovens que', 'influenciam', 'a sua geração'], ref: 'Mateus 5.13-15' },
+    { linhas: ['O maior fracasso', 'é ter sucesso', 'em coisas que', 'nos afastam', 'de Deus'] },
   ];
   // Nunca a mesma da última vez: abrir de novo e ver a mesma frase parece que não sorteou.
+  // comTexto: só as que têm frase (o fim da lição mostra a frase em texto corrido).
   let ultimaFrase = -1;
-  CC.fraseDaOfensiva = () => {
+  CC.fraseDaOfensiva = ({ comTexto = false } = {}) => {
     const total = CC.FRASES_OFENSIVA.length;
+    const vale = (k) => !comTexto || CC.FRASES_OFENSIVA[k].linhas.length > 0;
     let i = Math.floor(Math.random() * total);
-    if (i === ultimaFrase && total > 1) i = (i + 1 + Math.floor(Math.random() * (total - 1))) % total;
+    for (let n = 0; n < total && (i === ultimaFrase || !vale(i)); n++) i = (i + 1 + Math.floor(Math.random() * (total - 1))) % total;
     ultimaFrase = i;
     return CC.FRASES_OFENSIVA[i];
   };

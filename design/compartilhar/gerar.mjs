@@ -1,7 +1,7 @@
 // Gera as imagens de story fora do app, com as fontes e as peças de verdade
 // (src/fontes.css, src/app/01c-arte.js e 01d-story.js), para olhar e comparar composições.
 // Uso: CHROME=<chrome> node design/compartilhar/gerar.mjs <pasta-de-saida> <conjunto>
-//   conjuntos: variantes (as três de cada, lado a lado), final (a escolhida nos casos de
+//   conjuntos: artes (os modelos das frases com arte própria), variantes (as três de cada, lado a lado), final (a escolhida nos casos de
 //   teste: frase mais curta e mais longa, 1, 16, 100 e 365 dias, versículos curto, médio e
 //   longo). Cada caso sai em PNG 1080x1920; as folhas de comparação saem reduzidas.
 import { spawn } from 'node:child_process';
@@ -13,7 +13,7 @@ import { portaLivre, fecharArvore } from '../../ferramentas/navegador.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const [saidaArg, conjunto = 'variantes'] = process.argv.slice(2);
-if (!saidaArg) { console.log('Uso: CHROME=<chrome> node design/compartilhar/gerar.mjs <saida> [variantes|final]'); process.exit(2); }
+if (!saidaArg) { console.log('Uso: CHROME=<chrome> node design/compartilhar/gerar.mjs <saida> [artes|variantes|final]'); process.exit(2); }
 const saida = resolve(saidaArg);
 mkdirSync(saida, { recursive: true });
 const CHROME = process.env.CHROME || 'chromium';
@@ -35,11 +35,13 @@ const html = `<!doctype html><meta charset="utf-8"><style>${ler('src/fontes.css'
 <script>CC.CAMINHO_SIMBOLO = ${JSON.stringify(simbolo)};</script>
 <script>${ler('src/app/01c-arte.js')}</script>
 <script>${ler('src/app/01d-story.js')}</script>
+<script>${ler('src/app/01e-story-artes.js')}</script>
 <script>${ler('design/compartilhar/variantes.js')}</script>
 <script>
-const porTamanho = [...CC.FRASES_OFENSIVA].sort((a, b) => a.linhas.join(' ').length - b.linhas.join(' ').length);
+const porTamanho = CC.FRASES_OFENSIVA.filter((f) => !f.arte).sort((a, b) => a.linhas.join(' ').length - b.linhas.join(' ').length);
 const FRASES = { curta: porTamanho[0], longa: porTamanho[porTamanho.length - 1],
   atos: CC.FRASES_OFENSIVA.find((f) => f.ref === 'Atos 17.28'), lucas: CC.FRASES_OFENSIVA.find((f) => f.ref === 'Lucas 9.23') };
+for (const f of CC.FRASES_OFENSIVA) if (f.arte) FRASES[f.arte] = f;
 window.gerar = async (fn, dados) => {
   await CC.story.prepararFontes();
   const d = Object.assign({}, dados);
@@ -47,7 +49,9 @@ window.gerar = async (fn, dados) => {
   const tela = CC.story.tela();
   const desenhar = (window.VARIANTES && VARIANTES[fn]) || (CC.story.desenhar && ((ctx, x) => CC.story.desenhar(ctx, fn, x)));
   desenhar(tela.getContext('2d'), d);
-  return tela.toDataURL('image/png');
+  const u = tela.toDataURL('image/png');
+  (window.__imgs = window.__imgs || {})[window.__nome] = u;
+  return u;
 };
 window.folha = async (urls, escala) => {
   const imgs = await Promise.all(urls.map((u) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.src = u; })));
@@ -69,7 +73,11 @@ window.folha = async (urls, escala) => {
 
 const casos = [];
 const folhas = [];
-if (conjunto === 'variantes') {
+if (conjunto === 'artes') {
+  // os modelos das frases com arte própria (01e-story-artes.js), com 1 e 16 dias
+  for (const arte of ['chama', 'luz', 'ninguem', 'oleiro', 'procurado', 'suficiente', 'praticantes', 'porta']) for (const dias of [16, 1]) casos.push({ nome: 'arte-' + arte + '-' + dias, fn: 'ofensiva', dados: { dias, frase: arte } });
+  folhas.push({ nome: 'folha-artes', casos: ['arte-chama-16', 'arte-luz-16', 'arte-ninguem-16', 'arte-oleiro-16', 'arte-procurado-16', 'arte-suficiente-16', 'arte-praticantes-16', 'arte-porta-16'] });
+} else if (conjunto === 'variantes') {
   const of = { dias: 16, frase: 'atos' };
   for (const v of ['A', 'B', 'C']) casos.push({ nome: 'ofensiva-' + v, fn: 'ofensiva' + v, dados: of });
   for (const v of ['A', 'B', 'C']) casos.push({ nome: 'versiculo-' + v, fn: 'versiculo' + v, dados: { ...VERSOS.medio, traducao: 'Nova Bíblia Viva' } });
@@ -119,12 +127,20 @@ const urls = {};
 try {
   for (const c of casos) {
     const t0 = Date.now();
-    urls[c.nome] = await av('gerar(' + JSON.stringify(c.fn) + ',' + JSON.stringify(c.dados) + ')');
+    // a imagem volta em pedaços de 1 MB: uma resposta de vários MB (as artes com grão) trava o canal
+    await av('window.__nome = ' + JSON.stringify(c.nome));
+    const tam = await av('gerar(' + JSON.stringify(c.fn) + ',' + JSON.stringify(c.dados) + ').then((u) => (window.__u = u).length)');
+    let u = '';
+    for (let i = 0; i < tam; i += 1e6) u += await av('window.__u.slice(' + i + ',' + (i + 1e6) + ')');
+    urls[c.nome] = u;
     writeFileSync(join(saida, c.nome + '.png'), Buffer.from(urls[c.nome].split(',')[1], 'base64'));
     console.log(c.nome + '.png', (Date.now() - t0) + 'ms');
   }
   for (const f of folhas) {
-    const u = await av('folha(' + JSON.stringify(f.casos.map((n) => urls[n])) + ', ' + (f.casos.length > 3 ? 0.36 : 0.45) + ')');
+    const nomes = JSON.stringify(f.casos);
+    const tamF = await av('folha(' + nomes + '.map((n) => window.__imgs[n]), ' + (f.casos.length > 3 ? 0.36 : 0.45) + ').then((u) => (window.__u = u).length)');
+    let u = '';
+    for (let i = 0; i < tamF; i += 1e6) u += await av('window.__u.slice(' + i + ',' + (i + 1e6) + ')');
     writeFileSync(join(saida, f.nome + '.png'), Buffer.from(u.split(',')[1], 'base64'));
     console.log(f.nome + '.png');
   }

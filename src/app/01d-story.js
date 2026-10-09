@@ -127,13 +127,14 @@
     return 1357 * s;
   }
 
-  // A marca no pé: símbolo + "Geração Eleita" + endereço, centrada, com o pé em y.
-  function marca(ctx, cy, { cor, corFraca, tamanho = 34 }) {
+  // A marca no pé: símbolo + "Geração Eleita" + endereço, centrada, com o pé em y. Os
+  // modelos das artes (01e-story-artes.js) põem a contagem de dias nessa segunda linha (sub).
+  function marca(ctx, cy, { cor, corFraca, tamanho = 34, sub = ENDERECO }) {
     const alturaLogo = tamanho * 2.1;
     ctx.font = '800 ' + tamanho + 'px Manrope, sans-serif';
     const wNome = ctx.measureText('Geração Eleita').width;
     ctx.font = '600 ' + Math.round(tamanho * 0.78) + 'px Manrope, sans-serif';
-    const wEnd = ctx.measureText(ENDERECO).width;
+    const wEnd = ctx.measureText(sub).width;
     const wTexto = Math.max(wNome, wEnd);
     const wLogo = alturaLogo * 1357 / 1936;
     const vao = tamanho * 0.6;
@@ -146,7 +147,7 @@
     ctx.fillText('Geração Eleita', x0 + wLogo + vao, cy - tamanho * 0.08);
     ctx.fillStyle = corFraca;
     ctx.font = '600 ' + Math.round(tamanho * 0.78) + 'px Manrope, sans-serif';
-    ctx.fillText(ENDERECO, x0 + wLogo + vao, cy + tamanho * 0.86);
+    ctx.fillText(sub, x0 + wLogo + vao, cy + tamanho * 0.86);
   }
 
   // Texto corrido quebrado em linhas equilibradas (o text-wrap: balance da tela): primeiro
@@ -321,8 +322,19 @@
     marca(ctx, A - SEGURA - 80, { cor: '#151615', corFraca: '#4f5a36' });
   }
 
+  // A frase que tem arte própria (FRASES_OFENSIVA com "arte") usa o modelo dela; as outras,
+  // e a frase do estágio, o modelo de sempre. A arte sai da lista pela frase, e não do pedido,
+  // para o pedido continuar o mesmo (a folha e o fim da lição mandam linhas e referência).
+  function arteDaFrase(frase) {
+    if (!frase || !frase.linhas || !CC.FRASES_OFENSIVA) return null;
+    const texto = frase.linhas.join(' ');
+    const f = CC.FRASES_OFENSIVA.find((x) => x.arte && x.linhas.join(' ') === texto && (x.ref || '') === (frase.ref || ''));
+    return f && CC.story.artes && CC.story.artes[f.arte] ? f.arte : null;
+  }
   function desenhar(ctx, tipo, dados) {
-    if (tipo === 'ofensiva') desenharOfensiva(ctx, dados);
+    const arte = tipo === 'ofensiva' ? arteDaFrase(dados.frase) : null;
+    if (arte) CC.story.artes[arte](ctx, dados);
+    else if (tipo === 'ofensiva') desenharOfensiva(ctx, dados);
     else desenharVersiculo(ctx, dados);
   }
 
@@ -400,5 +412,5 @@
     return 'baixado';
   };
 
-  CC.story = { L, A, SEGURA, ENDERECO, desenhar, preparar, nomeDoArquivo, textoDe, prepararFontes, pincelada, medidasDoCarimbo, tamanhoDoCarimbo, carimbo, chama, logo, marca, textoEquilibrado, linhasDoCarimbo, tela };
+  CC.story = { L, A, SEGURA, ENDERECO, desenhar, arteDaFrase, Mn, Lit, escrever, preparar, nomeDoArquivo, textoDe, prepararFontes, pincelada, medidasDoCarimbo, tamanhoDoCarimbo, carimbo, chama, logo, marca, textoEquilibrado, linhasDoCarimbo, tela };
 })(window.CC);
