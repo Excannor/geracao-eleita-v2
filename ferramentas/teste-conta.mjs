@@ -256,7 +256,7 @@ try {
       const campos = await t.av(`[...document.querySelectorAll('#form-cadastro input')].map((i) => [i.id, i.type, i.getAttribute('autocomplete'), parseFloat(getComputedStyle(i).fontSize)])`);
       ok(campos.every(([, , , fonte]) => fonte >= 16), nome + ': todo campo tem letra de 16px ou mais (o Chrome/Safari não dá zoom ao focar)');
       const tipo = Object.fromEntries(campos.map(([id, tipo, auto]) => [id, tipo + '/' + auto]));
-      ok(tipo.nome === 'text/given-name' && tipo.nascimento === 'date/bday' && tipo.email === 'email/email' && tipo.usuario === 'text/username' && tipo['senha-nova'] === 'password/new-password',
+      ok(tipo.nome === 'text/given-name' && tipo.nascimento === 'text/bday' && tipo.email === 'email/email' && tipo.usuario === 'text/username' && tipo['senha-nova'] === 'password/new-password',
         nome + ': tipos e autocomplete certos (nome, data, e-mail, @, senha nova)');
       await t.tocar('#botao-comecar');
       ok(await t.ate('document.getElementById("passo-rotulo").textContent === "Passo 1 de 3" && document.activeElement.id === "nome"'), nome + ': "Começar agora" abre o passo 1 com o cursor no nome');
