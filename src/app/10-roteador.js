@@ -251,7 +251,7 @@
       itens.push(itemPainelMais(CC.icoAba('bau'), false, 'Desafios', sub, '#/missoes'));
     }
     itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
-    itens.push(itemPainelMais(CC.icoAba('marcador'), true, 'Meus versículos', '', '#/perfil/versiculos'));
+    itens.push(itemPainelMais(CC.ico('caderno'), true, 'Minhas anotações', 'Notas, orações e versículos marcados', '#/perfil/anotacoes'));
     itens.push(itemPainelMais(CC.icoAba('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
     itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
     // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.
@@ -288,9 +288,9 @@
     if (rota === 'perfil' && arg === 'discipulado') ativa = '#/discipulado';
     const naBiblia = rota === 'biblia';
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
-    // Meus versículos e Minha história abrem pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
+    // Minhas anotações e Minha história abrem pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
     const anteriorNav = pilha.length >= 2 ? pilha[pilha.length - 2] : '';
-    const doMais = rota === 'perfil' && (arg === 'versiculos' || arg === 'historia') && !anteriorNav.startsWith('#/perfil');
+    const doMais = rota === 'perfil' && (arg === 'anotacoes' || arg === 'historia') && !anteriorNav.startsWith('#/perfil');
     // O painel do administrador também abre pelo Mais (só para o admin): com ele aberto, o Mais fica aceso.
     const noPainel = rota === 'config' && String(arg || '').startsWith('painel');
     const maisSelecionado = !naBiblia && (doMais || noPainel || ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
@@ -360,8 +360,10 @@
 
   // ---------- roteamento ----------
   const PERFIL = () => ({
-    escritos: CC.vistaEscritos, livros: CC.vistaLivros, conquistas: CC.vistaConquistas,
-    trofeus: CC.vistaTrofeus, versiculos: CC.vistaVersiculos, discipulado: CC.vistaDiscipulado,
+    anotacoes: CC.vistaAnotacoes, livros: CC.vistaLivros, conquistas: CC.vistaConquistas,
+    trofeus: CC.vistaTrofeus, discipulado: CC.vistaDiscipulado,
+    // as duas telas antigas viraram Minhas anotações; os atalhos guardados continuam valendo
+    escritos: () => CC.substituirRota('#/perfil/anotacoes'), versiculos: () => CC.substituirRota('#/perfil/anotacoes'),
     historia: CC.vistaHistoria,
   });
 
