@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o jarro de farinha e a botija de azeite da viúva de Sarepta (1Rs 17.12-16): o jarro alto com a borda, a botija pequena e redonda ao lado, em sálvia, com a alça. -->
+<path class="k" d="M10 100C40 98 80 98 110 100"/>
+<path class="k p" d="M34 30H62V36C62 40 74 46 74 64C74 86 66 99 48 99C30 99 22 86 22 64C22 46 34 40 34 36Z"/>
+<path class="k" d="M31 30H65"/>
+<path class="h" d="M27 56C38 59 58 59 69 56M24 76C38 80 58 80 72 76"/>
+<path class="k" d="M88 62C96 60 100 68 96 74"/>
+<path class="k s" d="M80 54H88V61C94 64 98 70 98 78C98 90 92 99 84 99C76 99 70 90 70 78C70 70 74 64 80 61Z"/>
+<path class="k p" d="M78 50H90V54H78Z"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o anel do rei, que sela as cartas e passa de Hamã para Mordecai (Et 3.10; 8.2): o aro visto um pouco de lado, a placa do selo em cima, em sálvia, com o desenho riscado. -->
+<path class="k p" transform="translate(4 -6)" d="M44 56C30 60 24 72 26 84C28 98 42 106 58 106C74 106 88 98 90 84C92 72 86 60 72 56L68 62C78 66 82 74 80 84C78 94 68 98 58 98C48 98 38 94 36 84C34 74 38 66 48 62Z"/>
+<path class="k p" transform="translate(4 -6)" d="M40 46H76L72 62H44Z"/>
+<ellipse class="k s" transform="translate(4 -6)" cx="58" cy="44" rx="20" ry="9"/>
+<path class="h" transform="translate(4 -6)" d="M50 44C54 40 62 40 66 44M52 47H64M58 39V49"/>
+</svg>

@@ -1,0 +1,302 @@
+{
+  "nome": "Ester",
+  "grupo": "Históricos",
+  "numero": 17,
+  "capitulos": 10,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "אֶסְתֵּר",
+    "transliteracao": "Ester",
+    "traducao": "estrela",
+    "texto": "O nome parece vir de uma palavra persa para estrela. Antes de ir para o palácio, a moça se chama Hadassa, um nome hebraico que lembra a murta."
+  },
+  "autoria": {
+    "texto": "Mordecai escreve os acontecimentos e manda cartas aos judeus de perto e de longe. O autor acrescenta que a grandeza de Mordecai está escrita no livro da história dos reis da Média e da Pérsia.",
+    "apoio": "Quem escreveu Ester não aparece no livro.",
+    "refs": [
+      "Et 9.20",
+      "Et 10.2"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Ester é uma moça judia que vira rainha da Pérsia sem contar a ninguém de que povo é. Hamã consegue do rei um decreto para matar todos os judeus num só dia. No fim, Hamã morre na forca que fez para Mordecai, e os judeus criam a festa de Purim.",
+    "refs": [
+      "Et 2.17",
+      "Et 2.20",
+      "Et 3.13",
+      "Et 7.10",
+      "Et 9.26"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "A nova rainha",
+      "sub": "Vasti diz não ao rei",
+      "desenho": "taca-de-vinho",
+      "galhos": [
+        {
+          "texto": "O rei Xerxes passa seis meses mostrando a riqueza do reino e depois dá sete dias de festa no jardim do palácio. O vinho vem em copos de ouro, e cada um bebe quanto quer.",
+          "ref": "Et 1.4-5, 7-8"
+        },
+        {
+          "texto": "No sétimo dia, alegre com o vinho, o rei manda buscar a rainha Vasti com a coroa, para mostrar a beleza dela. Vasti não vai, e o rei fica furioso.",
+          "ref": "Et 1.10-12"
+        },
+        {
+          "texto": "Memucã diz que Vasti ofendeu o reino inteiro e que as mulheres vão desrespeitar os maridos. Ele propõe uma lei, das que não podem ser mudadas, para que Vasti nunca mais apareça diante do rei.",
+          "ref": "Et 1.16-17, 19"
+        },
+        {
+          "texto": "Em Susã mora um judeu chamado Mordecai, da tribo de Benjamim. Ele criou a prima Hadassa, também chamada Ester, como filha, porque ela perdeu o pai e a mãe.",
+          "ref": "Et 2.5-7"
+        },
+        {
+          "texto": "Ester vai para o palácio com muitas outras moças. Hegai gosta dela e dá a ela sete criadas e o melhor lugar da casa das mulheres. Cada moça passa doze meses em tratamento de beleza antes de ver o rei.",
+          "ref": "Et 2.8-9, 12"
+        },
+        {
+          "texto": "Mordecai descobre que dois guardas do portão querem matar o rei e conta para Ester, que avisa o rei em nome dele. Os dois são enforcados, e tudo fica escrito no livro da história do reino.",
+          "ref": "Et 2.21-23"
+        }
+      ],
+      "conexao": "O rei põe Hamã no lugar mais alto do reino, logo abaixo dele (Et 3.1)."
+    },
+    {
+      "titulo": "Hamã",
+      "sub": "Mordecai não se curva",
+      "desenho": "anel-de-selo",
+      "galhos": [
+        {
+          "texto": "Todos os oficiais se curvam diante de Hamã, como o rei mandou, mas Mordecai não se curva. Os outros perguntam por que ele desobedece, e Mordecai diz que é judeu.",
+          "ref": "Et 3.2-4"
+        },
+        {
+          "texto": "Hamã fica furioso. Prender só Mordecai é pouco para ele, e Hamã resolve destruir todos os judeus do reino.",
+          "ref": "Et 3.5-6"
+        },
+        {
+          "texto": "Eles tiram a sorte com dados para escolher o dia da destruição. O dado aponta o dia treze do décimo segundo mês, o mês de adar.",
+          "ref": "Et 3.7"
+        },
+        {
+          "texto": "Hamã diz ao rei que existe um povo espalhado pelo reino, com leis diferentes, que não obedece ao rei. Ele oferece trezentas e cinquenta toneladas de prata ao tesouro em troca de uma lei para destruir esse povo.",
+          "ref": "Et 3.8-9"
+        },
+        {
+          "texto": "O rei tira o anel do dedo e dá a Hamã. Ele diz: “Guarde a prata, mas continue com o seu plano e faça com esse povo o que bem quiser”.",
+          "ref": "Et 3.10-11"
+        },
+        {
+          "texto": "Os mensageiros saem com a ordem. O rei e Hamã sentam para beber, enquanto a cidade de Susã fica em confusão.",
+          "ref": "Et 3.15"
+        }
+      ],
+      "conexao": "Mordecai rasga a roupa, veste pano de saco e sai chorando alto pela cidade (Et 4.1)."
+    },
+    {
+      "titulo": "Ester decide",
+      "sub": "Três dias de jejum em Susã",
+      "desenho": "cetro",
+      "galhos": [
+        {
+          "texto": "Em todas as províncias, os judeus jejuam e choram. Ester fica muito triste e manda roupas para Mordecai, mas ele não aceita.",
+          "ref": "Et 4.3-4"
+        },
+        {
+          "texto": "Mordecai manda para Ester uma cópia do decreto e pede que ela vá ao rei pedir misericórdia pelo povo.",
+          "ref": "Et 4.7-8"
+        },
+        {
+          "texto": "Ester lembra que quem entra no pátio do rei sem ser chamado morre, a não ser que o rei levante o cetro de ouro para a pessoa. Faz um mês que o rei não chama Ester.",
+          "ref": "Et 4.11"
+        },
+        {
+          "texto": "Mordecai responde que Ester não vai escapar só porque mora no palácio. Ele pergunta: “Quem sabe se não foi para uma ocasião como esta que você foi escolhida como rainha?”",
+          "ref": "Et 4.13-14"
+        },
+        {
+          "texto": "Ester pede que os judeus de Susã jejuem três dias por ela, e ela e as criadas vão fazer o mesmo. Depois ela vai ao rei, mesmo contra a lei: “se eu tiver de morrer, morrerei!”",
+          "ref": "Et 4.16-17"
+        }
+      ],
+      "conexao": "Três dias depois, Ester veste as roupas de rainha e entra no pátio do palácio (Et 5.1)."
+    },
+    {
+      "titulo": "Os banquetes",
+      "sub": "O rei não consegue dormir",
+      "desenho": "mesa-posta",
+      "galhos": [
+        {
+          "texto": "O rei estende o cetro de ouro, e Ester toca a ponta dele. O rei promete dar o que ela pedir, até a metade do reino. Ester convida o rei e Hamã para um banquete.",
+          "ref": "Et 5.2-4"
+        },
+        {
+          "texto": "Hamã sai feliz do banquete, até ver Mordecai na porta sem se levantar. Zeres é a mulher de Hamã, e ela e os amigos sugerem uma forca de vinte metros para Mordecai. Hamã gosta da ideia e manda fazer a forca.",
+          "ref": "Et 5.9, 14"
+        },
+        {
+          "texto": "Naquela noite, o rei não consegue dormir e manda ler o livro da história do reino. Ele descobre que Mordecai salvou a vida dele e não recebeu nada em troca.",
+          "ref": "Et 6.1-3"
+        },
+        {
+          "texto": "O rei pergunta a Hamã o que fazer para honrar um homem. Hamã pensa que o rei quer honrar Hamã e pede um manto do rei, um cavalo do rei e um príncipe para levar o homem pelas ruas.",
+          "ref": "Et 6.6-9"
+        },
+        {
+          "texto": "Agora Hamã tem de fazer tudo aquilo para Mordecai. Ele leva Mordecai pelas ruas gritando que assim o rei honra quem ele quer honrar. Depois Hamã corre para casa, humilhado.",
+          "ref": "Et 6.10-12"
+        }
+      ],
+      "jesus": {
+        "texto": "Em Hebreus, Jesus, o Filho de Deus, é o grande sumo sacerdote. Por causa dele, quem crê pode ir com coragem até o trono de Deus para receber misericórdia e achar graça na hora da necessidade.",
+        "refs": [
+          "Hb 4.14",
+          "Hb 4.16"
+        ]
+      },
+      "conexao": "No segundo banquete, o rei pergunta de novo o que Ester deseja (Et 7.1-2)."
+    },
+    {
+      "titulo": "A virada",
+      "sub": "Hamã morre na forca que fez",
+      "desenho": "coroa",
+      "galhos": [
+        {
+          "texto": "Ester pede ao rei a vida dela e a do povo dela, porque foram vendidos para morrer. O rei quer saber quem fez isso, e Ester responde: “O inimigo e adversário é Hamã, este homem perverso”.",
+          "ref": "Et 7.3-6"
+        },
+        {
+          "texto": "O rei sai furioso para o jardim. Hamã se joga no sofá da rainha para implorar pela vida, e o rei volta bem nessa hora. Os oficiais cobrem o rosto de Hamã.",
+          "ref": "Et 7.7-8"
+        },
+        {
+          "texto": "Harbona conta ao rei que Hamã fez uma forca para Mordecai, o homem que salvou o rei. O rei manda enforcar Hamã nela.",
+          "ref": "Et 7.9"
+        },
+        {
+          "texto": "O rei dá a Mordecai o anel que tinha tirado de Hamã. Ester se ajoelha diante do rei e pede, chorando, que ele pare o plano de Hamã contra os judeus.",
+          "ref": "Et 8.2-3"
+        },
+        {
+          "texto": "Uma carta com o selo do rei não pode ser desfeita, e o rei manda escrever outra. O novo decreto deixa os judeus se reunirem para defender a vida contra quem vier com armas contra eles.",
+          "ref": "Et 8.8, 11"
+        },
+        {
+          "texto": "Mordecai sai pelas ruas com roupas reais e uma coroa de ouro. Em cada cidade, os judeus fazem festa, e muita gente de outros povos se torna judia, com medo dos judeus.",
+          "ref": "Et 8.15-17"
+        }
+      ],
+      "conexao": "No dia treze de adar, acontece o contrário do que os inimigos dos judeus esperavam (Et 9.1)."
+    },
+    {
+      "titulo": "Purim",
+      "sub": "O choro vira dia de festa",
+      "desenho": "dois-dados",
+      "galhos": [
+        {
+          "texto": "Os judeus se reúnem nas cidades para se defender, e ninguém consegue fazer mal a eles. As autoridades das províncias ajudam os judeus, com medo de Mordecai.",
+          "ref": "Et 9.2-3"
+        },
+        {
+          "texto": "Em Susã, os judeus matam quinhentos homens. Nas províncias, matam setenta e cinco mil dos que odiavam os judeus, mas não pegam os bens de ninguém.",
+          "ref": "Et 9.6, 16"
+        },
+        {
+          "texto": "No dia catorze de adar, os judeus das províncias descansam e fazem festa. Os de Susã lutam mais um dia e fazem a festa no dia quinze.",
+          "ref": "Et 9.17-19"
+        },
+        {
+          "texto": "Mordecai manda os judeus guardarem todo ano os dias catorze e quinze de adar como feriado. Os judeus aceitam, e o costume se repete todo ano.",
+          "ref": "Et 9.21, 23"
+        },
+        {
+          "texto": "A rainha Ester escreve uma carta junto com Mordecai para confirmar a festa de Purim todos os anos.",
+          "ref": "Et 9.29, 31"
+        },
+        {
+          "texto": "Mordecai fica no lugar mais alto do reino, logo abaixo do rei Xerxes. Os judeus respeitam Mordecai, porque ele trabalha pelo bem do povo.",
+          "ref": "Et 10.3"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Mordecai manda os judeus festejarem o dia em que se livraram dos inimigos, quando “sua tristeza se transformou em alegria”. Jesus avisa os discípulos que eles vão chorar, mas que a tristeza deles vai virar alegria (Jo 16.20).",
+    "ref": "Et 9.22",
+    "desenho": "calice",
+    "pares": [
+      {
+        "at": "Et 9.28",
+        "texto": "Desse modo, a lembrança do que havia acontecido jamais seria apagada pelos judeus.",
+        "nt": "1Co 11.23-25",
+        "nota": "Na noite em que é traído, o Senhor Jesus parte o pão e manda fazer isso para lembrar dele"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Vasti sai e Ester vira rainha",
+      "de": 1,
+      "ate": 2
+    },
+    {
+      "titulo": "O plano de Hamã",
+      "de": 3,
+      "ate": 3
+    },
+    {
+      "titulo": "Ester decide falar com o rei",
+      "de": 4,
+      "ate": 5
+    },
+    {
+      "titulo": "O rei honra Mordecai",
+      "de": 6,
+      "ate": 6
+    },
+    {
+      "titulo": "Hamã cai, e sai o novo decreto",
+      "de": 7,
+      "ate": 8
+    },
+    {
+      "titulo": "A festa de Purim",
+      "de": 9,
+      "ate": 10
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Na NBV, as palavras Deus e Senhor não aparecem nenhuma vez em Ester.",
+      "ref": "Et 1–10"
+    },
+    {
+      "texto": "O reino de Xerxes tem cento e vinte e sete províncias e vai da Índia até a Etiópia.",
+      "ref": "Et 1.1"
+    },
+    {
+      "texto": "Depois do caso de Vasti, o rei manda cartas a cada povo na língua dele, dizendo que cada homem deve mandar na própria casa.",
+      "ref": "Et 1.22"
+    },
+    {
+      "texto": "Todo dia, Mordecai passa em frente ao pátio da casa das mulheres para saber notícias de Ester.",
+      "ref": "Et 2.11"
+    },
+    {
+      "texto": "Mordecai fica do lado de fora do portão do palácio, porque ninguém pode entrar vestido de pano de saco.",
+      "ref": "Et 4.2"
+    },
+    {
+      "texto": "Quando Hamã volta para casa humilhado, a mulher e os amigos dizem que, se Mordecai é judeu, Hamã não vai conseguir nada contra ele.",
+      "ref": "Et 6.13"
+    },
+    {
+      "texto": "O rei Xerxes cobra impostos do império inteiro, até das ilhas distantes do mar.",
+      "ref": "Et 10.1"
+    }
+  ],
+  "procure": {
+    "texto": "Procure os banquetes. Xerxes dá banquetes no começo, a virada acontece nos dois banquetes que Ester prepara, e os judeus terminam a história com festas e banquetes."
+  }
+}

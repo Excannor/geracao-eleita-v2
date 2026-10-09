@@ -587,6 +587,69 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
 - 2026-10-02 · captura · Juízes: o arquivo de cookie gravado a partir do `curl -i` do `api/entrar` saiu com
   duas linhas (`cc_sessao` e `cc_logado`), e o `foto-conta` capturou a página de entrada sem avisar → grave
   só a primeira linha (`head -1 | tr -d '\n'`) e confira a primeira captura antes de seguir.
+- 2026-10-09 · captura · Rute: para capturar o mapa não é preciso conta nem cookie. Um servidor próprio com
+  `CAMINHO_ESTADO=<pasta>/estado.json CAMINHO_ABERTO=1 node servidor.mjs <porta>` (como o `teste-mapas` faz)
+  abre o app sem entrada, e o `foto-conta` vai direto com `BASE=http://localhost:<porta>/`. E o
+  `teste-mapas` passou a aceitar `PORTA=` (padrão 8373), para dois agentes rodarem ao mesmo tempo.
+- 2026-10-09 · conteúdo · Rute: o nome não tem tradução segura (lembra a palavra hebraica para amiga) → o
+  `significado` diz "lembra" e que o livro não explica o nome, em vez de afirmar a etimologia. E o NT não liga
+  Boaz, o resgatador, a Jesus: a ligação ficou só onde o NT a faz (Mt 1.5-6, 16; Lc 3.31-32; 2Tm 2.8), sem
+  tipologia.
+- 2026-10-09 · revisão · Nesta rodada o agente escritor não tinha ferramenta para chamar um revisor → a
+  revisão em voz alta e a folha do `rever-mapa` ficaram com o próprio escritor, campo por campo; o mapa fica
+  marcado para a leitura do coordenador antes de ir ao ar.
+- 2026-10-09 · captura · Depois de cada `node build.mjs`, o servidor que já estava no ar entrega a página
+  velha sem os arquivos novos, e o `foto-conta` captura uma tela vazia de 844px sem erro → reiniciar o
+  servidor (pelo PID) depois de todo build e conferir a altura da captura antes de olhar. E 1 Reis tem uns
+  11.400px a 390: a 2x a captura não sai; com `ESCALA=1.5` sai inteira.
+- 2026-10-09 · tela · 1 Reis: "Fogo no Carmelo" (15 caracteres) cabe a 390 e quebra a 375 e 360 → virou
+  "Fogo do céu"; título com palavra longa no fim (Carmelo) pesa mais que a contagem.
+- 2026-10-09 · conteúdo · 1 Reis: em livro com 22 capítulos e seis ramos, os capítulos 13 a 16 (reis que
+  passam rápido) foram para as curiosidades e para a conexão; a citação “Veja! Ele esta vivo!” (17.23) tem
+  um erro de acento na própria NBV e virou paráfrase, para não parecer erro nosso. E o NT dá duas frases
+  irmãs em Mt 12: "maior do que Salomão" (12.42, destaque) e "maior do que o templo" (12.6, "1 Reis e Cristo").
+- 2026-10-09 · desenho · 2 Reis: o manto caído de Elias, ao pé do redemoinho, saiu primeiro como concha (meia
+  elipse com dobras) e depois como moita (contorno ondulado) → pano amontoado no chão não se lê num desenho
+  pequeno; o manto saiu e ficou só o funil. O ferro do machado, em retângulo com o olho, parecia lata; com o
+  gume abrindo em leque, virou machado.
+- 2026-10-09 · conteúdo · 2 Reis: a autoria de 1 Reis já usava as fontes ("Livro da História dos Reis"); em
+  2 Reis, para não repetir o achado, a autoria ficou com o último fato datado (25.27) e o "até o dia de hoje"
+  (17.23). E Joaquim (2Rs 24–25) não é ligado a "Jeconias" de Mt 1.11-12: o mapa só diz que a lista de Mateus
+  atravessa o exílio, sem afirmar a identificação.
+- 2026-10-09 · conteúdo · 1 Crônicas conta de novo muita coisa de 2 Samuel (Uzá, a promessa de Natã, a
+  contagem do povo, a eira de Araúna). Antes de escrever, li o resumo de 2 Samuel (galhos, pares, curiosidades)
+  e escolhi o que só Crônicas tem: as listas com histórias (Jabez, Rúben), os levitas carregando a arca nos
+  ombros, os cantores e címbalos, o bronze de Hadadezer que vira o tanque, o fogo do céu no altar e o "aqui vai
+  ficar o templo", a planta "da mão do Senhor" e as ofertas. Livro paralelo pede essa leitura do mapa irmão
+  primeiro. O nome hebraico tem duas palavras: o checador barra o espaço no `original`, e o maqaf (־) junta as
+  duas dentro do bloco hebraico.
+- 2026-10-09 · desenho · 1 Crônicas: a planta do templo vista de cima, numa folha, virou ícone de bateria (o
+  retângulo com duas bolinhas na ponta) nas duas tentativas; a espada na bainha com a ponteira pontuda em
+  sálvia virou lápis → planta baixa não se lê em 96px, troca-se o objeto (ficou a harpa dos cantores); bainha
+  termina arredondada, com a cor no bocal.
+- 2026-10-09 · conteúdo · Ao escrever 2 Crônicas, achei "Paulo escreve" e "Paulo pede a Timóteo" em textos
+  de Rute, 1 Reis, 1 Crônicas e 2 Crônicas com refs (2Tm 2.8, Rm 11.2-4, Rm 1.3-4, Fp 2.8-9) que não trazem o
+  nome de Paulo, o mesmo erro que a revisão de Juízes pegou (At 13.16) → o nome do autor da carta só entra se
+  está no versículo citado; senão, a frase vai direto ao que o versículo diz. Vale `grep -n "Paulo"` no mapa
+  antes de entregar.
+- 2026-10-09 · conteúdo · 2 Crônicas: o fio do livro é "humilhar-se" (7.14, Roboão, Ezequias, Manassés,
+  Josias, e Amom que não se humilha), e ele ficou no "procure" e na raiz. A ligação com Cristo ficou onde o NT
+  diz com as próprias palavras: Jesus se humilhou (Fp 2.8-9), ninguém se faz sacerdote por conta própria, nem
+  Cristo (Hb 5.4-5, ao lado de Uzias no incenso), e Jesus sobre a cidade que mata os profetas (Mt 23.37, junto
+  de 2Cr 36.15-16). O Zacarias apedrejado (2Cr 24) não foi ligado ao de Lc 11.51: o NT não diz que é o mesmo.
+- 2026-10-09 · conteúdo · Esdras: o 1Co 5.7 ("Cristo... foi sacrificado") ao lado da Páscoa de Ed 6 seria o
+  mesmo achado do destaque de Êxodo → "Esdras e Cristo" ficou com os estrangeiros que se juntam ao povo na
+  Páscoa (Ed 6.21) e Ef 2.13, 19, e o destaque com a pedra de esquina sobre o alicerce (Ef 2.20-21). Os
+  casamentos com estrangeiras (Ed 9–10) são contados só com o que o texto diz, sem julgar a decisão nem tirar
+  lição dela.
+- 2026-10-09 · conteúdo · Neemias: o NT não cita o livro, e os versículos óbvios já estavam em outros mapas (o
+  pão do céu de Ne 9.15 com Jo 6 em Êxodo e Números; Jo 11.51-52 em João) → ficou um par só (Ne 9.20, o bom
+  Espírito que instrui, com Jo 14.26) e "Neemias e Cristo" com a alegria (Ne 8.10; Jo 15.11). O sábado de Ne 13
+  não foi posto ao lado de Mc 2.27-28: a dupla soaria como julgamento de Neemias, e o mapa não toma posição.
+- 2026-10-09 · conteúdo · Ester: o nome de Deus não aparece no texto da NBV (Et 1–10) → virou curiosidade, sem
+  explicar o porquê (as hipóteses são especulação). As mortes do cap. 9 ficam nos números do texto (500 em Susã,
+  75 mil nas províncias, bens não tomados), sem adjetivo. "Ester e Cristo" não afirma tipologia: usa a tristeza
+  que vira alegria (Et 9.22; Jo 16.20) e um par de memória celebrada (Et 9.28; 1Co 11.23-25).
 
 ## Entrada, sessão e página inicial
 

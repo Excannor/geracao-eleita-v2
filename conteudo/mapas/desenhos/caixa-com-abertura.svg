@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a caixa das ofertas que Joiada põe ao lado do altar (2Rs 12.9): a caixa grande vista de lado e de cima, com a abertura na tampa e uma moeda caindo nela. A frente da caixa tem uma faixa em sálvia. -->
+<path class="k" d="M10 100C40 98 80 98 110 100"/>
+<path class="k p" d="M24 54L44 42H98L78 54Z"/>
+<path class="k p" d="M24 54H78V98H24Z"/>
+<path class="k p" d="M78 54L98 42V86L78 98Z"/>
+<path class="e" d="M50 49L56 45.5H70L64 49Z"/>
+<path class="k s" d="M24 68H78V76H24Z"/>
+<path class="h" d="M78 70L98 58M78 78L98 66"/>
+<ellipse class="k p" cx="62" cy="30" rx="5" ry="6"/>
+<path class="h" d="M62 27V33M50 22L54 25M74 22L70 25"/>
+</svg>

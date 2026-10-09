@@ -1,0 +1,318 @@
+{
+  "nome": "Neemias",
+  "grupo": "Históricos",
+  "numero": 16,
+  "capitulos": 13,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "נְחֶמְיָה",
+    "transliteracao": "Nechemyah",
+    "traducao": "o Senhor consola",
+    "texto": "O nome junta o verbo consolar com um pedaço do nome do Senhor. Neemias é o copeiro do rei da Pérsia que chora pelos muros de Jerusalém."
+  },
+  "autoria": {
+    "texto": "O livro abre dizendo que é a história da vida de Neemias, “escrita por ele mesmo”. O pai dele se chama Hacalias. Quase tudo é contado com a voz de Neemias.",
+    "apoio": "Neemias governa Judá doze anos, do vigésimo ao trigésimo segundo ano do rei Artaxerxes. Depois ele volta à Babilônia por um tempo e recebe licença para voltar a Jerusalém.",
+    "refs": [
+      "Ne 1.1",
+      "Ne 5.14",
+      "Ne 13.6"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Neemias é copeiro do rei da Pérsia e pede a Deus que o rei seja bondoso com ele. Ele vai a Jerusalém, junta o povo, e o muro da cidade fica pronto em cinquenta e dois dias. Depois, Esdras lê a Lei de Moisés para homens e mulheres reunidos, e todos entendem o que ele lê.",
+    "refs": [
+      "Ne 1.11",
+      "Ne 6.15",
+      "Ne 8.2"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "A notícia",
+      "sub": "O copeiro chora pela cidade",
+      "desenho": "taca-de-vinho",
+      "galhos": [
+        {
+          "texto": "Hanani é irmão de Neemias e chega de Judá. Ele conta que os que voltaram passam aflição e que os muros de Jerusalém continuam derrubados, com as portas queimadas. Neemias senta e chora e passa dias sem comer, orando ao Deus dos céus.",
+          "ref": "Ne 1.2-4"
+        },
+        {
+          "texto": "Neemias ora dia e noite pelo povo de Israel. Ele confessa que ele e o povo pecaram contra o Senhor e não obedeceram às leis dadas por Moisés.",
+          "ref": "Ne 1.5-7"
+        },
+        {
+          "texto": "Um dia, Neemias serve vinho ao rei Artaxerxes, e o rei nunca tinha visto Neemias triste. O rei pergunta por que ele está com o rosto tão triste. Neemias fica com muito medo e responde que a cidade dos pais dele está em ruínas.",
+          "ref": "Ne 2.1-3"
+        },
+        {
+          "texto": "O rei pergunta o que pode ser feito. Neemias faz uma oração ao Deus dos céus e pede para ir reconstruir a cidade. O rei ainda dá madeira para as vigas, as portas e os muros, porque Deus está sendo bondoso com Neemias.",
+          "ref": "Ne 2.4-5, 8"
+        },
+        {
+          "texto": "Três dias depois de chegar, Neemias sai de noite com poucos homens para examinar o muro derrubado e as portas queimadas. Num trecho, o animal dele não tem espaço para passar.",
+          "ref": "Ne 2.11-15"
+        },
+        {
+          "texto": "Neemias chama os líderes para reconstruir os muros e conta o que Deus pôs no coração dele. Eles respondem: “Ótimo! Vamos reconstruir os muros!”",
+          "ref": "Ne 2.17-18"
+        }
+      ],
+      "conexao": "Sambalate, Tobias e Gesém zombam, e Neemias responde que o Deus dos céus vai ajudar (Ne 2.19-20)."
+    },
+    {
+      "titulo": "O muro",
+      "sub": "Uma mão na obra, outra na arma",
+      "desenho": "espada-e-colher",
+      "galhos": [
+        {
+          "texto": "O sumo sacerdote Eliasibe e os outros sacerdotes reconstroem a porta das Ovelhas. Os homens de Tecoa consertam o trecho deles, mas os chefes de Tecoa não querem ajudar.",
+          "ref": "Ne 3.1, 5"
+        },
+        {
+          "texto": "Salum conserta a parte seguinte do muro junto com as filhas dele. Ele é o prefeito de metade do distrito de Jerusalém.",
+          "ref": "Ne 3.12"
+        },
+        {
+          "texto": "Sambalate caçoa dos judeus pobres e fracos que arrastam pedras queimadas do entulho. Tobias está ao lado dele e diz: “Basta uma simples raposa andar em cima do muro deles, e o muro cairá!”",
+          "ref": "Ne 4.2-3"
+        },
+        {
+          "texto": "O muro chega à metade da altura, porque o povo trabalha com vontade. Alguns chefes reclamam que os trabalhadores estão cansados e que ainda há muito entulho.",
+          "ref": "Ne 4.6, 10"
+        },
+        {
+          "texto": "Os pedreiros trabalham com uma mão e seguram uma arma com a outra. O tocador de trombeta fica com Neemias. Quando a trombeta tocar, todos devem correr para lá, e Deus vai lutar por eles.",
+          "ref": "Ne 4.17-18, 20"
+        },
+        {
+          "texto": "Neemias e os homens dele não tiram a roupa do corpo e não largam as armas para nada.",
+          "ref": "Ne 4.23"
+        }
+      ],
+      "conexao": "Homens e mulheres gritam em protesto contra os irmãos judeus (Ne 5.1)."
+    },
+    {
+      "titulo": "Os juros",
+      "sub": "Neemias manda devolver tudo",
+      "desenho": "saco-de-prata",
+      "galhos": [
+        {
+          "texto": "Muitos penhoraram terras, vinhas e casas para comprar trigo. Outros pegaram dinheiro emprestado para pagar o imposto das terras. Alguns já tiveram de vender filhas como escravas e não têm como comprar de volta.",
+          "ref": "Ne 5.3-5"
+        },
+        {
+          "texto": "Neemias fica revoltado e pergunta aos nobres: “Como têm a coragem de cobrar juros dos seus irmãos?” Os nobres não têm nada para dizer.",
+          "ref": "Ne 5.6-8"
+        },
+        {
+          "texto": "No julgamento, Neemias diz que todos vão parar de cobrar juros e manda devolver naquele dia as terras, as vinhas, as oliveiras e as casas. Os nobres prometem devolver tudo e juram diante dos sacerdotes.",
+          "ref": "Ne 5.10-12"
+        },
+        {
+          "texto": "Depois do juramento, Neemias sacode a faixa do manto e diz que Deus vai sacudir assim quem não cumprir a promessa. O povo grita: “Amém”, e cumpre o que prometeu.",
+          "ref": "Ne 5.13"
+        },
+        {
+          "texto": "Os governadores de antes cobravam do povo comida, vinho e prata. Neemias tem temor a Deus e não cobra o imposto do governador, porque o povo já passa por tempos difíceis.",
+          "ref": "Ne 5.15, 18"
+        },
+        {
+          "texto": "Cento e cinquenta judeus e oficiais comem todo dia à mesa de Neemias, fora os visitantes das nações vizinhas.",
+          "ref": "Ne 5.17"
+        }
+      ],
+      "conexao": "Com o muro quase pronto, os inimigos chamam Neemias para um encontro em Ono, para fazer mal a ele (Ne 6.1-2)."
+    },
+    {
+      "titulo": "Muro pronto",
+      "sub": "Os inimigos tentam assustar",
+      "desenho": "portas-abertas",
+      "galhos": [
+        {
+          "texto": "Neemias manda dizer: “Estou fazendo um trabalho muito importante!” Os inimigos repetem o convite quatro vezes, e ele dá sempre a mesma resposta.",
+          "ref": "Ne 6.3-4"
+        },
+        {
+          "texto": "Na quinta vez, chega uma carta aberta. Ela diz que os judeus planejam uma revolta e que Neemias quer ser rei. Neemias responde que é tudo mentira e pede forças a Deus.",
+          "ref": "Ne 6.5-9"
+        },
+        {
+          "texto": "Semaías chama Neemias para se esconder no templo e trancar a porta, porque os inimigos vêm matar Neemias à noite. Neemias responde: “Eu, o governador, deveria fugir do perigo?” Tobias e Sambalate tinham pagado Semaías.",
+          "ref": "Ne 6.10-13"
+        },
+        {
+          "texto": "Quando os inimigos e as nações vizinhas sabem que o muro está pronto, eles ficam com medo. Eles reconhecem que Deus ajudou na obra.",
+          "ref": "Ne 6.16"
+        },
+        {
+          "texto": "Neemias manda que as portas de Jerusalém só abram bem depois de o sol nascer. A cidade é grande, mas tem pouca gente, e as casas ainda não foram reconstruídas.",
+          "ref": "Ne 7.3-4"
+        }
+      ],
+      "conexao": "No sétimo mês, o povo se reúne na praça da porta das Águas e pede a Esdras que leia a Lei (Ne 8.1)."
+    },
+    {
+      "titulo": "A Lei lida",
+      "sub": "O povo chora e depois festeja",
+      "desenho": "rolo-aberto",
+      "galhos": [
+        {
+          "texto": "Esdras sobe num estrado de madeira e lê do raiar da manhã até o meio do dia. Quando ele abre o livro, o povo todo se levanta.",
+          "ref": "Ne 8.3-5"
+        },
+        {
+          "texto": "Lá em cima, Esdras louva o Senhor, e o povo levanta as mãos e responde: “Amém! Amém!” Depois todos se inclinam com o rosto no chão.",
+          "ref": "Ne 8.6"
+        },
+        {
+          "texto": "Os levitas explicam o que cada passagem quer dizer. O povo chora ao ouvir a Lei, e Neemias, Esdras e os levitas dizem: “Não chorem num dia como este!”",
+          "ref": "Ne 8.8-9"
+        },
+        {
+          "texto": "O povo corta ramos e faz tendas nos terraços, nos pátios e nas praças, e mora nelas durante a festa. Desde o tempo de Josué ninguém tinha feito a festa assim.",
+          "ref": "Ne 8.16-17"
+        },
+        {
+          "texto": "No vigésimo quarto dia, o povo jejua, veste pano de saco e põe terra na cabeça. Eles ouvem a Lei três horas e passam mais três horas confessando os pecados.",
+          "ref": "Ne 9.1-3"
+        },
+        {
+          "texto": "Na oração, os levitas lembram que os pais foram orgulhosos e teimosos. Mesmo assim, o Senhor é um Deus de perdão, bondoso e amoroso, que demora para ficar irado.",
+          "ref": "Ne 9.16-17"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus explica as Escrituras e abre a mente de quem está com ele para entender o que está escrito.",
+        "refs": [
+          "Lc 24.45"
+        ]
+      },
+      "conexao": "O povo jura de todo o coração obedecer à Lei de Deus dada por Moisés (Ne 10.29)."
+    },
+    {
+      "titulo": "Neemias volta",
+      "sub": "As portas fecham no sábado",
+      "desenho": "porta-trancada",
+      "galhos": [
+        {
+          "texto": "Os líderes vão morar em Jerusalém, e um sorteio escolhe a décima parte do povo das outras cidades para morar lá também. O povo abençoa quem se muda por vontade própria.",
+          "ref": "Ne 11.1-2"
+        },
+        {
+          "texto": "Na festa dos muros, Neemias divide os cantores em dois coros que andam por cima do muro, cada um para um lado, até o templo. O povo faz tanta festa que dá para ouvir de longe.",
+          "ref": "Ne 12.27, 31, 38, 40, 43"
+        },
+        {
+          "texto": "O sacerdote Eliasibe, parente de Tobias, transformou uma sala de ofertas do templo num quarto para ele. Quando Neemias chega de novo a Jerusalém, ele joga fora todos os móveis de Tobias.",
+          "ref": "Ne 13.4-5, 7-8"
+        },
+        {
+          "texto": "Os levitas não receberam o sustento e voltaram para as terras deles. Neemias pergunta aos oficiais: “Por que o templo foi abandonado?” Ele chama os levitas de volta.",
+          "ref": "Ne 13.10-11"
+        },
+        {
+          "texto": "Neemias vê gente pisando uvas e carregando jumentos no sábado. Ele manda fechar as portas da cidade quando começa a escurecer na sexta e só abrir quando o sábado terminar.",
+          "ref": "Ne 13.15, 19"
+        },
+        {
+          "texto": "Alguns judeus casaram com mulheres de Asdode, de Amom e de Moabe, e metade dos filhos não fala a língua de Judá. Neemias repreende esses homens, bate em alguns, arranca os cabelos deles e faz todos jurarem diante de Deus.",
+          "ref": "Ne 13.23-25"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Neemias manda o povo parar de chorar e fazer festa, porque “a alegria do Senhor é a força de vocês”. Jesus diz aos discípulos que fala com eles para que a alegria dele esteja neles e transborde (Jo 15.11).",
+    "ref": "Ne 8.10",
+    "desenho": "folhas-de-palmeira",
+    "pares": [
+      {
+        "at": "Ne 9.20",
+        "texto": "O Senhor mandou o seu bom Espírito para dar instrução a eles",
+        "nt": "Jo 14.26",
+        "nota": "Jesus promete que o Pai vai mandar o Espírito Santo, e o Espírito vai ensinar todas as coisas"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Neemias ouve a notícia e vai a Jerusalém",
+      "de": 1,
+      "ate": 2
+    },
+    {
+      "titulo": "O povo levanta o muro",
+      "de": 3,
+      "ate": 4
+    },
+    {
+      "titulo": "Neemias acaba com os juros",
+      "de": 5,
+      "ate": 5
+    },
+    {
+      "titulo": "O muro fica pronto",
+      "de": 6,
+      "ate": 7
+    },
+    {
+      "titulo": "A Lei lida e a confissão do povo",
+      "de": 8,
+      "ate": 10
+    },
+    {
+      "titulo": "Jerusalém ganha moradores e festa",
+      "de": 11,
+      "ate": 12
+    },
+    {
+      "titulo": "Neemias volta e corrige o povo",
+      "de": 13,
+      "ate": 13
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Quando Neemias pede para ir a Judá, a rainha está sentada ao lado do rei.",
+      "ref": "Ne 2.6"
+    },
+    {
+      "texto": "O rei manda com Neemias uma escolta de oficiais do exército para proteger a viagem.",
+      "ref": "Ne 2.9"
+    },
+    {
+      "texto": "Na porta dos Cavalos, cada sacerdote conserta o pedaço do muro que fica em frente à casa dele.",
+      "ref": "Ne 3.28"
+    },
+    {
+      "texto": "Os judeus que moram perto dos inimigos vêm avisar dez vezes que eles vão atacar de todos os lados.",
+      "ref": "Ne 4.12"
+    },
+    {
+      "texto": "Enquanto o muro sobe, Tobias troca muitas cartas com os ricos de Judá e manda cartas para ameaçar Neemias.",
+      "ref": "Ne 6.17, 19"
+    },
+    {
+      "texto": "Na oração dos levitas, eles lembram que, nos quarenta anos de deserto, as roupas do povo não se gastaram, e os pés não incharam.",
+      "ref": "Ne 9.21"
+    },
+    {
+      "texto": "Neemias é o primeiro a assinar o acordo de obedecer à Lei.",
+      "ref": "Ne 10.1"
+    },
+    {
+      "texto": "A Lei de Moisés lembra que Moabe e Amom pagaram Balaão para amaldiçoar Israel, e que Deus transformou a maldição em bênção.",
+      "ref": "Ne 13.1-2"
+    },
+    {
+      "texto": "Com as portas fechadas no sábado, os vendedores acampam do lado de fora do muro. Neemias ameaça prender todos, e eles não voltam mais no sábado.",
+      "ref": "Ne 13.20-21"
+    }
+  ],
+  "procure": {
+    "texto": "Procure as orações curtas de Neemias. No meio do trabalho, ele para e pede que Deus se lembre dele ou que não esqueça o mal dos inimigos. O livro termina com um pedido assim.",
+    "ref": "Ne 13.31"
+  }
+}

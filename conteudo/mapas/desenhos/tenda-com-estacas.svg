@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a tenda em que o Senhor mora desde o Egito, de tenda em tenda (1Cr 17.5): a tenda vista de frente, com a porta aberta em sálvia, as cordas esticadas até as estacas cravadas no chão. -->
+<path class="k" d="M6 98C40 96 80 96 114 98"/>
+<path class="k" d="M60 26L14 84M60 26L106 84"/>
+<path class="e" d="M12 84L16 84L15 97L13 97Z M104 84L108 84L107 97L105 97Z"/>
+<path class="k p" d="M60 26L28 96H92Z"/>
+<path class="k s" d="M60 50L48 96H72Z"/>
+<path class="h" d="M60 26V50M44 62L38 76M76 62L82 76"/>
+<path class="k" d="M58 20L60 26L62 20"/>
+</svg>

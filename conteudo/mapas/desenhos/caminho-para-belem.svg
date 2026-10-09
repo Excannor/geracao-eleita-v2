@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o caminho de volta para Belém (Rt 1.19): a estrada sobe do primeiro plano até as casas no alto do morro; as beiras da estrada se abrem para baixo; a porta da casa do meio em sálvia. -->
+<path class="k" d="M4 80C20 72 38 58 52 48C56 46 60 46 64 46H100C106 50 112 56 116 60"/>
+<path class="k p" d="M58 46V32H72V46"/>
+<path class="k" d="M57 32H72"/>
+<path class="k p" d="M70 46V24H88V46"/>
+<path class="k" d="M69 24H89"/>
+<path class="k p" d="M86 46V34H100V46"/>
+<path class="k" d="M86 34H101"/>
+<path class="e" d="M62 46V40A2.5 2.5 0 0 1 67 40V46ZM90 46V41A2.5 2.5 0 0 1 95 41V46Z"/>
+<path class="s" d="M76 46V38A3 3 0 0 1 82 38V46Z"/>
+<path class="k" d="M40 114C46 98 66 86 62 72C60 62 68 54 74 47M80 114C78 98 84 84 78 72C74 62 79 54 79 47"/>
+</svg>

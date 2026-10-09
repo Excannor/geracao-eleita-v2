@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os utensílios de ouro e de prata que Ciro devolve para o templo (Ed 1.7-11): um vaso alto atrás e uma tigela larga na frente, com o fundo da tigela em sálvia. O chão vai antes das peças. -->
+<path class="k" d="M10 100C40 98 80 98 110 100"/>
+<path class="k p" d="M58 24H80V30C80 34 92 40 92 56C92 72 84 80 69 80C54 80 46 72 46 56C46 40 58 34 58 30Z"/>
+<path class="k" d="M55 24H83"/>
+<path class="h" d="M50 50C60 54 78 54 88 50M48 64C60 68 78 68 90 64"/>
+<path class="k p" d="M18 74H74C74 90 62 99 46 99C30 99 18 90 18 74Z"/>
+<ellipse class="k s" cx="46" cy="74" rx="28" ry="6"/>
+<path class="h" d="M26 84C36 88 56 88 66 84"/>
+</svg>

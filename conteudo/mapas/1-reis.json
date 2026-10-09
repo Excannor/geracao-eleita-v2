@@ -1,0 +1,375 @@
+{
+  "nome": "1 Reis",
+  "grupo": "Históricos",
+  "numero": 11,
+  "capitulos": 22,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "מְלָכִים",
+    "transliteracao": "Melakhim",
+    "traducao": "reis",
+    "texto": "Melakhim quer dizer reis. No começo, 1 Reis e 2 Reis formam um livro só, que conta a história dos reis de Israel e de Judá, de Salomão em diante."
+  },
+  "autoria": {
+    "texto": "Para quem quer saber mais de cada rei, o autor indica outros livros, como os registros históricos de Salomão e os livros da história dos reis de Israel e de Judá.",
+    "apoio": "Ele conta que os varais da arca estão no templo “até o dia de hoje”, mas não diz quem ele é.",
+    "refs": [
+      "1Rs 8.8",
+      "1Rs 11.41",
+      "1Rs 14.19",
+      "1Rs 14.29"
+    ]
+  },
+  "raiz": {
+    "texto": "1 Reis vai de Davi, velho e com frio debaixo dos cobertores, até Acabe sangrando no fundo do carro de guerra. No meio, Deus dá sabedoria a Salomão, e Salomão constrói o templo. Na velhice, ele vai atrás dos deuses das mulheres estrangeiras. Depois dele, o reino se parte em dois, e só Judá fica com a família de Davi.",
+    "refs": [
+      "1Rs 1.1",
+      "1Rs 4.29",
+      "1Rs 6.14",
+      "1Rs 11.4",
+      "1Rs 12.20",
+      "1Rs 22.35"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "O novo rei",
+      "sub": "Salomão vai montado na mula",
+      "desenho": "altar-com-pontas",
+      "galhos": [
+        {
+          "texto": "Adonias é filho de Davi e diz: “Eu serei o rei”. Ele arruma carruagens e cinquenta homens para correr na frente dele. Davi nunca chamou a atenção dele. Adonias faz sacrifícios e uma festa com os irmãos, mas deixa de fora Natã, Benaia e o irmão Salomão.",
+          "ref": "1Rs 1.5-6, 9-10"
+        },
+        {
+          "texto": "O profeta Natã procura a mãe de Salomão e combina um plano. Ela vai lembrar Davi da promessa de que Salomão seria o rei. Enquanto ela ainda fala com o rei, Natã entra no quarto.",
+          "ref": "1Rs 1.11-14, 22"
+        },
+        {
+          "texto": "Davi jura que Salomão vai sentar no trono dele. Ele manda levar Salomão a Giom montado na mula do rei. Ali, o sacerdote Zadoque e Natã devem derramar óleo na cabeça de Salomão.",
+          "ref": "1Rs 1.29-30, 33-34"
+        },
+        {
+          "texto": "Em Giom, Zadoque pega o óleo sagrado do Tabernáculo e unge Salomão. As trombetas tocam, e o povo grita: “Viva o rei Salomão!” Na volta para Jerusalém, eles tocam flauta e fazem tanto barulho que o chão treme.",
+          "ref": "1Rs 1.39-40"
+        },
+        {
+          "texto": "Adonias e os convidados escutam a gritaria no fim do banquete e fogem com medo. Adonias corre para o Tabernáculo e se agarra às pontas do altar. Salomão promete que não cai um fio de cabelo de Adonias se ele se comportar bem, e manda: “Vá para a sua casa”.",
+          "ref": "1Rs 1.41, 49-53"
+        },
+        {
+          "texto": "Antes de morrer, Davi pede a Salomão que obedeça ao Senhor e guarde a Lei de Moisés. Davi morre e é sepultado na Cidade de Davi, depois de reinar quarenta anos.",
+          "ref": "1Rs 2.1-3, 10-11"
+        }
+      ],
+      "conexao": "Salomão ama o Senhor, mas ainda oferece sacrifícios nos altares dos montes (1Rs 3.3)."
+    },
+    {
+      "titulo": "Sabedoria",
+      "sub": "Salomão pede um coração sábio",
+      "desenho": "espada",
+      "galhos": [
+        {
+          "texto": "Em Gibeom, Salomão oferece mil ofertas queimadas. Naquela noite, o Senhor aparece num sonho e manda Salomão pedir o que quiser. Salomão pede um coração compreensivo, para governar o povo e saber o que é certo e o que é errado.",
+          "ref": "1Rs 3.4-5, 9"
+        },
+        {
+          "texto": "Salomão diz que se sente como um menino pequeno que não sabe andar sozinho. O Senhor gosta do pedido. Ele promete a sabedoria que Salomão pediu e ainda riqueza e honra, que ele não pediu.",
+          "ref": "1Rs 3.7, 10-13"
+        },
+        {
+          "texto": "Duas prostitutas que moram na mesma casa chegam ao rei. O bebê de uma delas morreu de noite, quando a mãe se deitou em cima dele. Cada uma diz que o bebê vivo é dela.",
+          "ref": "1Rs 3.16-22"
+        },
+        {
+          "texto": "Diante das duas, Salomão pede uma espada e manda cortar a criança ao meio. A mãe verdadeira grita que deem o menino à outra. A outra diz que dividam. Salomão decide: “Deem a criança à mulher que deseja que ele viva, pois ela é a mãe!”",
+          "ref": "1Rs 3.24-27"
+        },
+        {
+          "texto": "Salomão escreve três mil provérbios e mil e cinco canções. Ele se interessa pelas árvores, desde os cedros do Líbano até o hissopo que cresce nas fendas dos muros. Reis de todas as nações mandam gente para ouvir a sabedoria dele.",
+          "ref": "1Rs 4.32-34"
+        },
+        {
+          "texto": "A rainha de Sabá chega a Jerusalém com camelos carregados de perfumes, ouro e pedras preciosas. Ela testa Salomão com perguntas difíceis, e ele responde a todas. Quando vê o palácio e a mesa do rei, ela fica quase sem fala e diz: “Na verdade, não me contaram nem a metade!”",
+          "ref": "1Rs 10.1-7"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus lembra que a rainha de Sabá veio de uma terra distante para ouvir a sabedoria de Salomão. Depois ele diz: “agora aqui está quem é maior do que Salomão”. O maior do que Salomão é Jesus.",
+        "refs": [
+          "Mt 12.42"
+        ]
+      },
+      "conexao": "Salomão manda dizer a Hirão, rei de Tiro, que agora há paz para construir a casa do Senhor (1Rs 5.4-5)."
+    },
+    {
+      "titulo": "O templo",
+      "sub": "A nuvem enche a casa do Senhor",
+      "desenho": "jangada-de-cedro",
+      "galhos": [
+        {
+          "texto": "Hirão promete descer os cedros do Líbano até o mar e amarrar as toras em jangadas, que vão flutuar pela costa até onde Salomão indicar. Todo ano, Salomão paga com trigo e azeite.",
+          "ref": "1Rs 5.9-11"
+        },
+        {
+          "texto": "Salomão começa o templo no quarto ano do reinado, quatrocentos e oitenta anos depois que Israel saiu do Egito. Os trabalhadores preparam as pedras na pedreira. No lugar da obra, ninguém ouve martelo nem machado.",
+          "ref": "1Rs 6.1, 7"
+        },
+        {
+          "texto": "No Lugar Santíssimo, Salomão faz dois querubins de madeira de oliveira, cada um com quatro metros e meio de altura. As asas abertas vão de uma parede à outra e se encostam no meio da sala. Ele cobre os dois com ouro.",
+          "ref": "1Rs 6.23, 27-28"
+        },
+        {
+          "texto": "Um artesão de Tiro, também chamado Hirão, faz duas colunas de bronze para a entrada do templo. Ele põe o nome de Jaquim numa e o de Boaz na outra.",
+          "ref": "1Rs 7.13-15, 21"
+        },
+        {
+          "texto": "Os sacerdotes põem a arca debaixo das asas dos querubins. Dentro dela estão só as duas tábuas de pedra de Moisés. Quando os sacerdotes saem, uma nuvem brilhante enche o templo, e eles não conseguem continuar o serviço.",
+          "ref": "1Rs 8.6, 9-11"
+        },
+        {
+          "texto": "Salomão ora de joelhos, com as mãos erguidas para o céu. Depois ele se levanta e abençoa o povo. Ele diz que, de todas as promessas que Moisés anunciou, nem uma só palavra falhou.",
+          "ref": "1Rs 8.54-56"
+        }
+      ],
+      "conexao": "O Senhor aparece de novo a Salomão. Se ele adorar outros deuses, o templo vai virar ruínas (1Rs 9.6-8)."
+    },
+    {
+      "titulo": "Reino partido",
+      "sub": "Dez tribos vão com Jeroboão",
+      "desenho": "bezerro-de-ouro",
+      "galhos": [
+        {
+          "texto": "Salomão tem setecentas esposas e trezentas concubinas. Ele chega a construir no monte das Oliveiras um templo para Camos, o deus de Moabe.",
+          "ref": "1Rs 11.3, 7"
+        },
+        {
+          "texto": "O Senhor diz a Salomão que vai tirar o reino da família dele. Por amor a Davi, ele não vai fazer isso enquanto Salomão viver, e vai deixar uma tribo para o filho dele. Salomão reina quarenta anos e morre.",
+          "ref": "1Rs 11.11-13, 42-43"
+        },
+        {
+          "texto": "Jeroboão está saindo de Jerusalém quando o profeta Aías encontra com ele no caminho. Aías está com uma capa nova e rasga a capa em doze pedaços. Ele diz a Jeroboão: “Pegue dez desses pedaços”.",
+          "ref": "1Rs 11.29-31"
+        },
+        {
+          "texto": "Roboão é filho de Salomão e vai a Siquém para ser feito rei. O povo pede que ele alivie o trabalho pesado. Roboão deixa o conselho dos mais velhos, segue o dos jovens e responde: “Meu pai os castigou com chicotes; eu os castigarei com escorpiões”.",
+          "ref": "1Rs 12.1, 4, 14"
+        },
+        {
+          "texto": "As tribos de Israel gritam: “Vamos para casa, ó Israel!” Só Judá fica com Roboão. Quando o rei manda o chefe dos trabalhos forçados, o povo mata o homem a pedradas, e Roboão foge de carro para Jerusalém.",
+          "ref": "1Rs 12.16-18"
+        },
+        {
+          "texto": "Jeroboão tem medo de que o povo volte para Roboão quando for adorar em Jerusalém. Ele faz dois bezerros de ouro e diz ao povo: “Dá muito trabalho ir a Jerusalém para adorar”. Um bezerro fica em Betel, e o outro, em Dã.",
+          "ref": "1Rs 12.26-29"
+        }
+      ],
+      "conexao": "O rei Acabe casa com Jezabel, filha do rei de Sidom, e começa a adorar Baal (1Rs 16.31)."
+    },
+    {
+      "titulo": "Fogo do céu",
+      "sub": "Elias enfrenta Baal e foge",
+      "desenho": "jarro-e-botija",
+      "galhos": [
+        {
+          "texto": "Elias diz ao rei Acabe que não vai haver orvalho nem chuva enquanto ele não mandar. O Senhor manda Elias se esconder perto do córrego de Querite. Os corvos levam pão e carne para ele de manhã e de tarde.",
+          "ref": "1Rs 17.1, 3-6"
+        },
+        {
+          "texto": "Em Sarepta, uma viúva tem só um punhado de farinha e um pouco de azeite. Ela ia fazer a última refeição para ela e o filho. Elias pede que ela faça primeiro um pão para ele. Depois disso, a farinha do jarro não acaba e o azeite da botija não falta.",
+          "ref": "1Rs 17.10-16"
+        },
+        {
+          "texto": "No monte Carmelo, os profetas de Baal gritam desde a manhã para Baal responder. Ninguém responde. Elias começa a caçoar e diz que talvez Baal esteja dormindo. Eles gritam mais alto e se cortam com facas até o sangue escorrer.",
+          "ref": "1Rs 18.26-28"
+        },
+        {
+          "texto": "Elias manda despejar água três vezes sobre o novilho e a lenha, até a valeta encher. Ele ora, e o fogo do Senhor desce do céu. O fogo queima o novilho, a lenha, as pedras e até a água. O povo cai com o rosto no chão e grita: “O Senhor é Deus!”",
+          "ref": "1Rs 18.33-39"
+        },
+        {
+          "texto": "Jezabel jura matar Elias, e ele foge para o deserto. Debaixo de um zimbro, Elias pede para morrer e dorme. Um anjo toca nele e manda que ele se levante e coma. Ao lado dele há um pão assando sobre pedras quentes e um jarro de água.",
+          "ref": "1Rs 19.2-6"
+        },
+        {
+          "texto": "No monte Horebe, o Senhor passa diante de Elias. Um vento tão forte passa que as pedras saem do lugar. Depois há um terremoto e um fogo, e o Senhor não está em nenhum deles. Por fim, Elias ouve o som de uma brisa suave, cobre o rosto com o manto e vai até a entrada da caverna.",
+          "ref": "1Rs 19.8, 11-13"
+        }
+      ],
+      "conexao": "Nabote, de Jezreel, tem uma plantação de uvas ao lado do palácio do rei Acabe (1Rs 21.1)."
+    },
+    {
+      "titulo": "A vinha",
+      "sub": "Os cães lambem o sangue do rei",
+      "desenho": "vinha",
+      "galhos": [
+        {
+          "texto": "Acabe quer a vinha de Nabote para fazer uma horta e oferece outra vinha ou dinheiro. Nabote não aceita, porque a terra é herança dos pais dele. Acabe volta para casa com raiva, deita, vira o rosto para a parede e não come.",
+          "ref": "1Rs 21.2-4"
+        },
+        {
+          "texto": "Jezabel escreve cartas em nome de Acabe e sela com o selo do rei. Ela manda arranjar dois homens para acusar Nabote de amaldiçoar Deus e o rei. Os líderes da cidade obedecem, e Nabote morre apedrejado.",
+          "ref": "1Rs 21.8-11, 13"
+        },
+        {
+          "texto": "Acabe desce para pegar a vinha, e o Senhor manda Elias até lá. Quando vê Elias, Acabe diz: “Então o meu inimigo me encontrou!” Elias avisa que os cães vão lamber o sangue de Acabe, como lamberam o de Nabote.",
+          "ref": "1Rs 21.16-20"
+        },
+        {
+          "texto": "Quando ouve isso, Acabe rasga as roupas, veste pano de saco e jejua. O Senhor diz a Elias que, como Acabe se humilhou, o castigo vai cair sobre o filho dele, e não enquanto Acabe viver.",
+          "ref": "1Rs 21.27-29"
+        },
+        {
+          "texto": "Antes de uma batalha, quatrocentos profetas prometem vitória a Acabe. O profeta Micaías diz que vai falar só o que o Senhor mandar. Ele conta que viu Israel espalhado pelos montes, como ovelhas sem pastor.",
+          "ref": "1Rs 22.6, 14-17"
+        },
+        {
+          "texto": "Acabe vai à guerra disfarçado de soldado. Alguém atira uma flecha por acaso, e ela acerta o rei entre as juntas da armadura. Depois, enquanto lavam o carro de guerra perto do açude de Samaria, os cães lambem o sangue de Acabe.",
+          "ref": "1Rs 22.30, 34, 38"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "No dia da dedicação do templo, Salomão pergunta se é possível que Deus more na terra. Ele diz: “os céus e os mais altos céus são pequenos para o Senhor caber neles”. Jesus diz que ali está alguém maior do que o templo, e esse alguém é ele (Mt 12.6).",
+    "ref": "1Rs 8.27",
+    "desenho": "templo-com-colunas",
+    "pares": [
+      {
+        "at": "1Rs 17.9",
+        "texto": "Vá morar na aldeia de Sarepta, perto da cidade de Sidom. Ali mora uma viúva que dará alimento a você.",
+        "nt": "Lc 4.25-26",
+        "nota": "Jesus lembra que havia muitas viúvas em Israel no tempo de Elias. Elias foi mandado só à viúva de Sarepta"
+      },
+      {
+        "at": "1Rs 18.45",
+        "texto": "O céu logo ficou escuro com nuvens, e um forte vento trouxe uma grande tempestade.",
+        "nt": "Tg 5.17-18",
+        "nota": "Elias era humano como nós. Ele orou, e não choveu por três anos e meio. Orou de novo, e a chuva desceu"
+      },
+      {
+        "at": "1Rs 19.18",
+        "texto": "E fique sabendo que conservei sete mil homens em Israel que nunca se curvaram diante de Baal nem beijaram esse deus!",
+        "nt": "Rm 11.2-4",
+        "nota": "Deus não rejeitou o seu povo. Elias se queixou de estar sozinho, e Deus tinha sete mil que não se curvaram aos ídolos"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Salomão sobe ao trono",
+      "de": 1,
+      "ate": 2
+    },
+    {
+      "titulo": "Salomão pede sabedoria",
+      "de": 3,
+      "ate": 4
+    },
+    {
+      "titulo": "O templo e o palácio",
+      "de": 5,
+      "ate": 8
+    },
+    {
+      "titulo": "A fama de Salomão",
+      "de": 9,
+      "ate": 10
+    },
+    {
+      "titulo": "Salomão se desvia do Senhor",
+      "de": 11,
+      "ate": 11
+    },
+    {
+      "titulo": "O reino se divide",
+      "de": 12,
+      "ate": 14
+    },
+    {
+      "titulo": "Reis de Judá e de Israel",
+      "de": 15,
+      "ate": 16
+    },
+    {
+      "titulo": "Elias e a seca",
+      "de": 17,
+      "ate": 19
+    },
+    {
+      "titulo": "As guerras e a morte de Acabe",
+      "de": 20,
+      "ate": 22
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Os servos de Davi procuram pelo país inteiro uma moça bonita para aquecer o rei. Eles encontram Abisague, de Suném.",
+      "ref": "1Rs 1.2-4"
+    },
+    {
+      "texto": "Adonias pede à mãe de Salomão para casar com Abisague. Salomão entende que, com Abisague, Adonias está pedindo o reino, e manda Benaia matar o irmão.",
+      "ref": "1Rs 2.17, 22-25"
+    },
+    {
+      "texto": "Salomão proíbe Simei de sair de Jerusalém. Três anos depois, dois escravos de Simei fogem para Gate. Simei vai buscar os dois, e Salomão manda Benaia matar Simei.",
+      "ref": "1Rs 2.36-37, 39-40, 46"
+    },
+    {
+      "texto": "Na dedicação do templo, Salomão oferece vinte e dois mil bois e cento e vinte mil ovelhas.",
+      "ref": "1Rs 8.63"
+    },
+    {
+      "texto": "Salomão dá vinte cidades da Galileia a Hirão. Hirão vai ver as cidades e reclama: “estas cidades não valem nada!”",
+      "ref": "1Rs 9.11-13"
+    },
+    {
+      "texto": "No tempo de Salomão, ninguém liga para a prata. Em Jerusalém, ela é tão comum quanto as pedras.",
+      "ref": "1Rs 10.21, 27"
+    },
+    {
+      "texto": "Um profeta de Judá desobedece à ordem de não comer em Betel. Na volta, um leão mata o profeta. O leão fica parado ao lado do corpo e do jumento, sem comer nenhum dos dois.",
+      "ref": "1Rs 13.19, 24, 28"
+    },
+    {
+      "texto": "A mulher de Jeroboão vai disfarçada perguntar ao profeta Aías pelo filho doente. Aías está cego, mas ouve os passos dela e grita lá de dentro: “Entre, esposa de Jeroboão!”",
+      "ref": "1Rs 14.2, 4-6"
+    },
+    {
+      "texto": "Sisaque, rei do Egito, leva os escudos de ouro de Salomão. Roboão faz escudos de bronze para pôr no lugar.",
+      "ref": "1Rs 14.25-27"
+    },
+    {
+      "texto": "Asa tira a avó, Maaca, do lugar de rainha porque ela fez um poste sagrado. Ele derruba o poste e queima no vale de Cedrom.",
+      "ref": "1Rs 15.13"
+    },
+    {
+      "texto": "Zinri reina sete dias em Tirza. Quando vê a cidade tomada, ele vai para o palácio, põe fogo em tudo e morre.",
+      "ref": "1Rs 16.15, 18"
+    },
+    {
+      "texto": "Onri compra de Sêmer um monte por setenta quilos de prata. Ali ele constrói uma cidade e dá a ela o nome de Samaria.",
+      "ref": "1Rs 16.24"
+    },
+    {
+      "texto": "O filho da viúva de Sarepta morre. Elias leva o menino para o quarto de cima, se deita sobre ele três vezes e ora, e o menino volta a viver.",
+      "ref": "1Rs 17.19-22"
+    },
+    {
+      "texto": "Depois do fogo no Carmelo, Elias manda o servo olhar para o mar sete vezes. Na sétima, o servo vê subir uma nuvem pequena, do tamanho da mão de um homem.",
+      "ref": "1Rs 18.43-44"
+    },
+    {
+      "texto": "Eliseu está arando com doze parelhas de bois quando Elias joga a capa sobre os ombros dele. Eliseu mata os bois, assa a carne com a madeira do arado e vai com Elias.",
+      "ref": "1Rs 19.19-21"
+    },
+    {
+      "texto": "O rei da Síria ameaça transformar Samaria em pó. Acabe manda responder que o soldado que se arma para a guerra não deve se gabar como quem já venceu.",
+      "ref": "1Rs 20.10-11"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a frase “fez o que era mau aos olhos do Senhor”. A frase volta, com pouca diferença, em quase todo rei de Israel, de Nadabe até Acazias, o filho de Acabe.",
+    "ref": "1Rs 15.34"
+  }
+}

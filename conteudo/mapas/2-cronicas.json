@@ -1,0 +1,333 @@
+{
+  "nome": "2 Crônicas",
+  "grupo": "Históricos",
+  "numero": 14,
+  "capitulos": 36,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "דִּבְרֵי־הַיָּמִים",
+    "transliteracao": "Divrei hayamim",
+    "traducao": "os fatos dos dias",
+    "texto": "O nome é o de 1 Crônicas, porque os dois eram um livro só. A história começa com Salomão firme no trono, quando Davi já morreu."
+  },
+  "autoria": {
+    "texto": "Quem escreve vive depois da ordem de Ciro. Ele conta que os levados para a Babilônia ficaram lá até a Pérsia tomar o reino, e que a terra teve setenta anos de descanso, como Jeremias tinha dito.",
+    "apoio": "Para contar a vida dos reis, ele cita o que vários profetas escreveram, como Semaías, Ido, Jeú e Isaías.",
+    "refs": [
+      "2Cr 12.15",
+      "2Cr 20.34",
+      "2Cr 26.22",
+      "2Cr 36.20-21"
+    ]
+  },
+  "raiz": {
+    "texto": "2 Crônicas começa com Salomão firme no trono e termina com Ciro, rei da Pérsia, mandando o povo do Senhor voltar para Jerusalém. No meio, o exército da Babilônia queima o templo e derruba os muros da cidade. Logo que o templo fica pronto, o Senhor promete que, se o povo se humilhar, orar e procurar o Senhor, ele vai ouvir do céu, perdoar e sarar a terra.",
+    "refs": [
+      "2Cr 1.1",
+      "2Cr 7.14",
+      "2Cr 36.19",
+      "2Cr 36.23"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Fogo e glória",
+      "sub": "O fogo desce sobre o altar",
+      "desenho": "templo-com-colunas",
+      "galhos": [
+        {
+          "texto": "Os levitas cantores, vestidos de linho, ficam ao leste do altar, com cento e vinte sacerdotes tocando trombetas. Eles cantam juntos, como se fossem um só, que o Senhor é bom e que o amor dele dura para sempre. Nessa hora, uma nuvem enche o templo.",
+          "ref": "2Cr 5.12-14"
+        },
+        {
+          "texto": "Salomão manda fazer um palco de bronze no meio do pátio. Ele sobe no palco, se ajoelha na frente do povo e levanta os braços para o céu.",
+          "ref": "2Cr 6.13"
+        },
+        {
+          "texto": "Quando Salomão termina a oração, desce fogo do céu e queima os sacrifícios. A glória do Senhor enche o templo, e os sacerdotes não conseguem entrar. O povo se curva com o rosto no chão e adora o Senhor.",
+          "ref": "2Cr 7.1-3"
+        },
+        {
+          "texto": "O Senhor também avisa Salomão. Se o povo abandonar o Senhor e servir outros deuses, Israel vai ser arrancado da terra, e o templo vai ser destruído.",
+          "ref": "2Cr 7.19-20"
+        }
+      ],
+      "conexao": "Quando fica forte, Roboão abandona a lei do Senhor, e o povo vai junto (2Cr 12.1)."
+    },
+    {
+      "titulo": "Buscar o Senhor",
+      "sub": "Quem procura o Senhor acha",
+      "desenho": "duas-trombetas",
+      "galhos": [
+        {
+          "texto": "Sisaque chega a Jerusalém com o exército do Egito. O profeta Semaías diz em nome do Senhor: “Vocês me abandonaram; por isso eu abandonei vocês”. Roboão e os líderes se humilham e dizem que o Senhor foi justo, e o Senhor não deixa Sisaque destruir a cidade.",
+          "ref": "2Cr 12.4-7"
+        },
+        {
+          "texto": "Abias sobe no monte Zemaraim e grita para Jeroboão e o exército de Israel. Ele lembra a aliança de sal que o Senhor fez com Davi. Abias diz que eles têm um exército duas vezes maior e bezerros de ouro como deuses.",
+          "ref": "2Cr 13.4-5, 8"
+        },
+        {
+          "texto": "Jeroboão manda parte do exército dar a volta, e Judá fica cercado pela frente e por trás. Os homens de Judá pedem socorro ao Senhor, e os sacerdotes tocam as trombetas. Quando eles dão o grito de guerra, Deus derrota Jeroboão.",
+          "ref": "2Cr 13.13-15"
+        },
+        {
+          "texto": "Um exército da Etiópia, com um milhão de soldados, ataca Asa. Asa ora e diz ao Senhor que ninguém mais pode ajudar o povo. O Senhor derrota os etíopes.",
+          "ref": "2Cr 14.9, 11-12"
+        },
+        {
+          "texto": "O Espírito de Deus vem sobre Azarias, e ele diz a Asa: “Sempre que vocês procurarem o Senhor, vão encontrá-lo”. O povo faz um acordo de buscar o Senhor de todo o coração, e o Senhor deixa que eles encontrem.",
+          "ref": "2Cr 15.1-2, 12, 15"
+        },
+        {
+          "texto": "Anos depois, Asa paga o rei da Síria em vez de confiar no Senhor. O profeta Hanani avisa que os olhos do Senhor passam por toda a terra, procurando quem tem o coração íntegro. Asa fica irado e manda o profeta para a prisão.",
+          "ref": "2Cr 16.2, 7, 9-10"
+        }
+      ],
+      "conexao": "O Senhor está com Josafá, que segue o Deus do pai e não adora Baal (2Cr 17.3-4)."
+    },
+    {
+      "titulo": "Josafá",
+      "sub": "A batalha é de Deus",
+      "desenho": "lira",
+      "galhos": [
+        {
+          "texto": "No terceiro ano do reinado, Josafá manda oficiais, levitas e sacerdotes pelas cidades de Judá. Eles levam o Livro da Lei e ensinam o povo.",
+          "ref": "2Cr 17.7, 9"
+        },
+        {
+          "texto": "Quando Josafá volta para casa, o vidente Jeú pergunta: “Devia você ajudar os maus e amar aqueles que odeiam o Senhor?” Ele também diz que há coisas boas em Josafá.",
+          "ref": "2Cr 19.1-3"
+        },
+        {
+          "texto": "Josafá põe juízes nas cidades fortificadas e diz que eles julgam em nome de Deus. Eles não podem torcer a justiça nem aceitar presentes.",
+          "ref": "2Cr 19.5-7"
+        },
+        {
+          "texto": "Moabe e Amom vêm contra Judá com um exército muito grande. Josafá anuncia um jejum, e o povo vem de todas as cidades. Ele ora: “Não sabemos o que fazer, mas estamos olhando para o Senhor”.",
+          "ref": "2Cr 20.1-4, 12"
+        },
+        {
+          "texto": "O Espírito do Senhor vem sobre Jaaziel, um levita, no meio da assembleia. Ele diz: “Pois a batalha não é de vocês, mas de Deus!” O povo só vai ter de ficar firme e ver o Senhor salvar.",
+          "ref": "2Cr 20.14-15, 17"
+        },
+        {
+          "texto": "Josafá põe um coro na frente do exército. Eles cantam: “Louvem o Senhor, pois o seu amor dura para sempre”. Quando eles começam a cantar, o Senhor faz os inimigos lutarem entre si.",
+          "ref": "2Cr 20.21-22"
+        }
+      ],
+      "conexao": "Quando se firma no trono, Jeorão mata todos os irmãos (2Cr 21.4)."
+    },
+    {
+      "titulo": "O orgulho",
+      "sub": "Uzias queima incenso no templo",
+      "desenho": "incensario",
+      "galhos": [
+        {
+          "texto": "O profeta Elias manda uma carta ao rei Jeorão. Ele avisa que o rei vai ter uma doença grave nos intestinos. Dois anos depois, Jeorão morre com muita dor.",
+          "ref": "2Cr 21.12, 15, 18-19"
+        },
+        {
+          "texto": "Joás faz o que é bom enquanto o sacerdote Joiada vive. Joiada morre com cento e trinta anos e é sepultado entre os reis, por todo o bem que fez a Israel.",
+          "ref": "2Cr 24.2, 15-16"
+        },
+        {
+          "texto": "Depois que Joiada morre, Joás e os líderes deixam o templo e adoram imagens. Zacarias é filho de Joiada e avisa o povo, e Joás manda apedrejar Zacarias no pátio do templo. Antes de morrer, Zacarias diz: “Senhor, veja o que eles estão fazendo. Faça justiça!”",
+          "ref": "2Cr 24.17-18, 20-22"
+        },
+        {
+          "texto": "Amazias paga três toneladas e meia de prata por cem mil soldados de Israel. Um profeta manda dispensar esses soldados. Amazias reclama do dinheiro, e o profeta responde: “O Senhor pode dar a você muito mais do que isto!”",
+          "ref": "2Cr 25.6-9"
+        },
+        {
+          "texto": "Uzias busca a Deus enquanto tem por perto um homem de visões que ensina o temor de Deus. Ele fica forte e famoso. Depois disso, Uzias se enche de orgulho e entra no templo para queimar incenso no altar.",
+          "ref": "2Cr 26.5, 15-16"
+        },
+        {
+          "texto": "Diante dos sacerdotes, Uzias fica furioso e não larga o incensário. Ali, diante do altar, aparece lepra na testa dele, e ele sai depressa do templo.",
+          "ref": "2Cr 26.19-20"
+        }
+      ],
+      "conexao": "Acaz despedaça os utensílios de ouro e tranca as portas do templo (2Cr 28.24)."
+    },
+    {
+      "titulo": "Portas abertas",
+      "sub": "Ezequias reabre o templo",
+      "desenho": "portas-abertas",
+      "galhos": [
+        {
+          "texto": "No primeiro mês do reinado, Ezequias abre as portas do templo e conserta tudo. Ele chama os sacerdotes e os levitas e manda tirar do Lugar Santo tudo o que é impuro.",
+          "ref": "2Cr 29.3, 5"
+        },
+        {
+          "texto": "Os sacerdotes levam para o pátio as coisas impuras, e os levitas jogam tudo no córrego de Cedrom. Em dezesseis dias, o templo fica limpo.",
+          "ref": "2Cr 29.16-17"
+        },
+        {
+          "texto": "Na hora do sacrifício, os cantores começam a louvar ao som das trombetas e dos instrumentos de Davi. Ezequias e o povo ficam felizes com o que Deus fez em tão pouco tempo.",
+          "ref": "2Cr 29.27-28, 36"
+        },
+        {
+          "texto": "Ezequias manda cartas por Israel e Judá chamando o povo para a Páscoa em Jerusalém. As cartas dizem que o Senhor é cheio de graça e misericórdia. Em muitas cidades, o povo zomba dos mensageiros, mas alguns de Aser, Manassés e Zebulom se humilham e vêm.",
+          "ref": "2Cr 30.1, 6, 9-11"
+        },
+        {
+          "texto": "Muita gente de Efraim e de outras tribos chega sem se purificar. Ezequias ora para o Senhor perdoar todos os que buscam o Senhor de coração. O Senhor atende e sara o povo.",
+          "ref": "2Cr 30.18-20"
+        },
+        {
+          "texto": "Senaqueribe vem contra Jerusalém, e Ezequias reúne os oficiais na praça. Ele diz: “conosco está o Senhor, o nosso Deus, para lutar as nossas batalhas!” O povo se anima.",
+          "ref": "2Cr 32.2, 6-8"
+        }
+      ],
+      "conexao": "Ezequias fica orgulhoso, mas depois se humilha junto com Jerusalém (2Cr 32.25-26)."
+    },
+    {
+      "titulo": "Volta para casa",
+      "sub": "Ciro manda o povo voltar",
+      "desenho": "correntes",
+      "galhos": [
+        {
+          "texto": "Manassés queima os filhos em sacrifício e consulta médiuns. O Senhor manda os exércitos da Assíria, e eles prendem Manassés com ganchos e correntes de bronze e levam o rei para a Babilônia.",
+          "ref": "2Cr 33.6, 11"
+        },
+        {
+          "texto": "Lá, Manassés ora, e o Senhor ouve e leva o rei de volta a Jerusalém. Então Manassés reconhece que o Senhor é Deus e tira do templo a imagem e os deuses estranhos.",
+          "ref": "2Cr 33.13, 15"
+        },
+        {
+          "texto": "Josias ainda é jovem quando começa a buscar o Deus de Davi. Quatro anos depois, ele começa a limpar Judá e Jerusalém dos ídolos.",
+          "ref": "2Cr 34.3"
+        },
+        {
+          "texto": "O rei Neco manda dizer a Josias que não quer briga e que Deus está com ele. Josias não acredita e vai para a batalha disfarçado. As flechas acertam Josias, e ele morre em Jerusalém.",
+          "ref": "2Cr 35.21-24"
+        },
+        {
+          "texto": "Muitas vezes, o Senhor avisa o povo por meio dos profetas, porque tem pena do povo e do templo. O povo zomba dos mensageiros e caçoa dos profetas, até não haver mais remédio.",
+          "ref": "2Cr 36.15-16"
+        },
+        {
+          "texto": "No primeiro ano de Ciro, rei da Pérsia, o Senhor desperta o coração dele. Ciro faz uma proclamação em todo o reino, também por escrito.",
+          "ref": "2Cr 36.22"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus chama Jerusalém de cidade que mata os profetas e apedreja os que Deus manda. Ele diz que muitas vezes quis juntar os filhos dela como uma galinha junta os pintinhos debaixo das asas, mas eles não quiseram.",
+        "refs": [
+          "Mt 23.37"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "Manassés fica cheio de pavor. Ele se humilha diante do Deus dos antepassados e pede socorro. Jesus se humilhou e obedeceu até a morte, e morte de cruz. Por isso Deus deu a ele um nome acima de qualquer outro nome (Fp 2.8-9).",
+    "ref": "2Cr 33.12",
+    "desenho": "cruz",
+    "pares": [
+      {
+        "at": "2Cr 21.7",
+        "texto": "Contudo, o Senhor não quis acabar com os reis da família de Davi, pois ele havia feito uma aliança com Davi, de sempre haver um dos seus descendentes no trono.",
+        "nt": "At 13.34",
+        "nota": "Deus ressuscitou Jesus e assim deu as bênçãos sagradas e fiéis que tinha prometido a Davi"
+      },
+      {
+        "at": "2Cr 26.18",
+        "texto": "Não cabe a você, Uzias, queimar incenso ao Senhor. Isso é trabalho dos sacerdotes, dos descendentes de Arão que são consagrados para esse fim.",
+        "nt": "Hb 5.4-5",
+        "nota": "Ninguém vira sumo sacerdote só porque quer. Cristo também não tomou essa honra para si, foi Deus que escolheu"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Salomão constrói o templo",
+      "de": 1,
+      "ate": 9
+    },
+    {
+      "titulo": "O reino se divide",
+      "de": 10,
+      "ate": 12
+    },
+    {
+      "titulo": "Abias e Asa",
+      "de": 13,
+      "ate": 16
+    },
+    {
+      "titulo": "Josafá",
+      "de": 17,
+      "ate": 20
+    },
+    {
+      "titulo": "De Jeorão a Acaz",
+      "de": 21,
+      "ate": 28
+    },
+    {
+      "titulo": "Ezequias reabre o templo",
+      "de": 29,
+      "ate": 32
+    },
+    {
+      "titulo": "Manassés e Josias",
+      "de": 33,
+      "ate": 35
+    },
+    {
+      "titulo": "Jerusalém cai, e Ciro manda voltar",
+      "de": 36,
+      "ate": 36
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Abias tem catorze esposas, vinte e dois filhos e dezesseis filhas.",
+      "ref": "2Cr 13.21"
+    },
+    {
+      "texto": "Asa é enterrado num leito cheio de especiarias e perfumes, e queimam muito incenso em honra dele.",
+      "ref": "2Cr 16.14"
+    },
+    {
+      "texto": "Os árabes dão a Josafá sete mil e setecentos carneiros e sete mil e setecentos bodes.",
+      "ref": "2Cr 17.11"
+    },
+    {
+      "texto": "Depois da vitória, o povo se reúne num vale para louvar o Senhor. Por isso o lugar se chama vale de Beraca até hoje.",
+      "ref": "2Cr 20.26"
+    },
+    {
+      "texto": "Josafá faz sociedade com o rei Acazias para fabricar navios. Um profeta avisa que o Senhor vai destruir o que eles fizeram, e os navios naufragam.",
+      "ref": "2Cr 20.35-37"
+    },
+    {
+      "texto": "Jeorão morre, e ninguém lamenta. Ele é enterrado na Cidade de Davi, mas fora do cemitério dos reis.",
+      "ref": "2Cr 21.20"
+    },
+    {
+      "texto": "Uzias ama a terra. Ele cava muitos reservatórios de água e tem fazendas e plantações de uvas nos montes e nos vales.",
+      "ref": "2Cr 26.10"
+    },
+    {
+      "texto": "Em Samaria, o profeta Obede manda soltar os prisioneiros de Judá. Os chefes de Efraim dão roupa, sandálias e comida aos presos e levam os doentes em jumentos até Jericó, a cidade das palmeiras.",
+      "ref": "2Cr 28.9, 15"
+    },
+    {
+      "texto": "Na limpeza do templo, faltam sacerdotes santificados, e os levitas ajudam a tirar a pele dos animais. Os levitas estão bem mais dispostos a se santificar do que os sacerdotes.",
+      "ref": "2Cr 29.34"
+    },
+    {
+      "texto": "Desde o tempo de Salomão, ninguém tinha visto em Jerusalém uma festa como a Páscoa de Ezequias.",
+      "ref": "2Cr 30.26"
+    },
+    {
+      "texto": "O profeta Jeremias faz um lamento por Josias, e os cantores ainda cantam canções tristes por ele.",
+      "ref": "2Cr 35.25"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a palavra humilhar. Roboão, Ezequias, Manassés e Josias se humilham diante do Senhor. Amom é filho de Manassés e não se humilha como o pai."
+  }
+}

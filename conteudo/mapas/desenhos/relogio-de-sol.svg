@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o relógio de sol de Acaz, onde a sombra volta dez pontos (2Rs 20.11): o mostrador em meia elipse sobre a base, as marcas dos pontos, o ponteiro em triângulo, a sombra cheia e o sol com os raios curtos. O sol é a área em sálvia. -->
+<path class="k p" d="M22 88H98V100H22Z"/>
+<path class="k p" d="M26 88C26 72 94 72 94 88Z"/>
+<path class="h" d="M50.6 84.6L31.8 81.9M52.3 83.4L37.0 78.3M55.0 82.5L45.0 75.6M58.3 82.1L54.8 74.2M61.7 82.1L65.2 74.2M65.0 82.5L75.0 75.6M67.7 83.4L83.0 78.3M69.4 84.6L88.2 81.9"/>
+<path class="e" d="M60 87L36 80.5L37.5 84Z"/>
+<path class="k p" d="M60 88V58L78 88Z"/>
+<circle class="k s" cx="92" cy="26" r="8"/>
+<path class="h" d="M104.0 26.0L109.0 26.0M100.5 34.5L104.0 38.0M92.0 38.0L92.0 43.0M83.5 34.5L80.0 38.0M80.0 26.0L75.0 26.0M83.5 17.5L80.0 14.0M92.0 14.0L92.0 9.0M100.5 17.5L104.0 14.0"/>
+</svg>

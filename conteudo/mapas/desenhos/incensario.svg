@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o incensário que Uzias segura no templo (2Cr 26.19): a panela rasa com as brasas em sálvia, o cabo comprido e a fumaça do incenso subindo em voltas. -->
+<path class="k s" d="M30 74C36 66 64 66 70 74Z"/>
+<path class="k p" d="M26 74H74C74 86 64 94 50 94C36 94 26 86 26 74Z"/>
+<path class="k" d="M74 78L106 66"/>
+<path class="k p" d="M104 63L110 61L112 66L106 68Z"/>
+<path class="h" d="M38 64C34 56 42 52 38 44C34 36 42 32 40 24M50 62C46 54 54 50 50 42C46 34 54 30 52 20M62 64C58 56 66 52 62 44C58 36 66 32 64 26"/>
+</svg>
