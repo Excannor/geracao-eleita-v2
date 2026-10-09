@@ -200,9 +200,10 @@ ok(await esperar('!!document.querySelector(\'.leitor-verso[data-v="3:16"]\')', 1
 // com amigos, para o Juntos aparecer; o envio ao Juntos é simulado
 await av('CC.podeCompartilharComAmigos = () => true; window.__juntos = null; CC.compartilharVersiculo = async (ref) => { window.__juntos = ref; return true; }; true');
 await av('document.querySelector(\'.leitor-verso[data-v="3:16"]\').click()');
-ok(await esperar('!!document.querySelector(".acoes-verso [data-compartilhar-verso]")'), 'escolher João 3.16 mostra a barra com Compartilhar');
+ok(await esperar('!!document.querySelector(".acoes-verso [data-compartilhar-verso]")'), 'escolher João 3.16 mostra a barra com o Story');
 const rotulos = await av('[...document.querySelectorAll(".acoes-verso .botoes-verso .botao")].map((b) => b.textContent.trim())');
-ok(JSON.stringify(rotulos) === JSON.stringify(['Nota', 'Juntos', 'Copiar', 'Compartilhar']), 'a barra tem Nota, Juntos, Copiar e Compartilhar, sem "Imagem" (' + rotulos.join(', ') + ')');
+ok(JSON.stringify(rotulos) === JSON.stringify(['Juntos', 'Copiar', 'Story']) && await av('!!document.querySelector(".acoes-verso [data-nota-verso].escrever-nota")'),
+  'a barra tem "Escrever nota" como ação principal e, embaixo, Juntos, Copiar e Story, sem "Imagem" (' + rotulos.join(', ') + ')');
 ok(await av('!document.querySelector("[data-imagem-verso]")'), 'não sobra o botão Imagem');
 for (const largura of [390, 360]) {
   await cmd('Emulation.setDeviceMetricsOverride', { width: largura, height: 844, deviceScaleFactor: 2, mobile: true });
