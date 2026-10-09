@@ -158,7 +158,8 @@ export function checarParabola(slug, p) {
       if ((semAspas.match(/:/g) || []).length > 1) erro(onde + ': dois dois-pontos no mesmo campo (3.1)');
     }
     if (/–/.test(semAspas)) erro(onde + ': travessão (–) no texto');
-    const hifen = semAspas.match(/\p{L}+-\p{L}+/u);
+    // o título é o nome da parábola ("O amigo à meia-noite") e pode levar hífen
+    const hifen = onde === 'titulo' ? null : semAspas.match(/\p{L}+-\p{L}+/u);
     if (hifen) erro(onde + ': palavra com hífen fora de citação ("' + hifen[0] + '")');
     for (const m of String(t).matchAll(/“([^”]{8,300})”/g)) {
       const contra = refs.length ? refs : todasAsRefs;

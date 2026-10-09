@@ -1,0 +1,106 @@
+{
+  "titulo": "O amigo à meia-noite",
+  "ref": "Lc 11.5-13",
+  "grupo": "lucas",
+  "linha": "Um homem bate na porta do amigo e não desiste",
+  "desenho": "casa-de-noite",
+  "desenhoLista": "porta-trancada",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus termina de orar, e um dos discípulos chega com um pedido.",
+          "ref": "Lc 11.1"
+        },
+        {
+          "fala": "Senhor, ensine-nos a orar",
+          "ref": "Lc 11.1"
+        },
+        {
+          "texto": "Jesus ensina os discípulos a chamar Deus de Pai na oração. Depois ele conta uma história, ainda sobre oração.",
+          "ref": "Lc 11.2-5"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "pao",
+      "blocos": [
+        {
+          "texto": "No meio da noite, um homem vai até a casa de um amigo e pede três pães emprestados. Outro amigo acabou de chegar para visitar esse homem.",
+          "ref": "Lc 11.5-6"
+        },
+        {
+          "fala": "eu não tenho nada para lhe oferecer",
+          "ref": "Lc 11.6"
+        },
+        {
+          "texto": "Lá de dentro, o dono da casa responde que a porta já está trancada e que ele e os filhos estão deitados.",
+          "ref": "Lc 11.7"
+        },
+        {
+          "fala": "não posso me levantar e dar a você o que me pede",
+          "ref": "Lc 11.7"
+        },
+        {
+          "texto": "Jesus diz que o dono da casa vai se levantar e dar tudo o que o outro precisar. A amizade não basta para tirar ele da cama, mas a insistência basta.",
+          "ref": "Lc 11.8"
+        }
+      ]
+    },
+    {
+      "titulo": "O que Jesus ensina com ela",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Jesus tira da história um conselho para quem ora.",
+          "ref": "Lc 11.9"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "cesto-de-paes",
+              "titulo": "Peçam",
+              "fala": "Peçam e vocês receberão",
+              "ref": "Lc 11.9"
+            },
+            {
+              "desenho": "lamparina-acesa",
+              "titulo": "Procurem",
+              "fala": "procurem e vocês acharão",
+              "ref": "Lc 11.9"
+            },
+            {
+              "desenho": "portas-abertas",
+              "titulo": "Batam",
+              "fala": "batam, e a porta se abrirá",
+              "ref": "Lc 11.9"
+            }
+          ]
+        },
+        {
+          "texto": "Depois Jesus fala com os pais que estão ouvindo. Nenhum deles dá uma cobra ao filho que pede peixe.",
+          "ref": "Lc 11.11"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Se até um amigo já deitado se levanta da cama por causa da insistência, Deus ouve muito mais quem pede. Deus é Pai e sabe dar o que os filhos precisam.",
+    "apoio": "Jesus termina com uma promessa. “o Pai que está nos céus dará o Espírito Santo àqueles que o pedirem”.",
+    "ref": "Lc 11.11-13"
+  },
+  "perguntas": [
+    "Tem alguma coisa que você parou de pedir a Deus porque cansou de esperar?",
+    "Se Deus é Pai, o que muda no seu jeito de orar hoje?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 7.7-11",
+      "titulo": "Peçam, procurem, batam",
+      "linha": "o mesmo ensino, sem a história do amigo"
+    }
+  ]
+}
