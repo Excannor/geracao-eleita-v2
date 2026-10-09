@@ -1,0 +1,295 @@
+{
+  "nome": "Gálatas",
+  "grupo": "Cartas de Paulo",
+  "numero": 48,
+  "capitulos": 6,
+  "significado": {
+    "lingua": "grego",
+    "original": "Γαλάτας",
+    "transliteracao": "Galatas",
+    "traducao": "aos gálatas",
+    "texto": "Galatas quer dizer aos gálatas, os moradores da Galácia. A carta vai para várias igrejas dessa terra, e não para uma cidade só."
+  },
+  "autoria": {
+    "texto": "Paulo se apresenta como apóstolo chamado por Jesus Cristo e por Deus Pai, e não por homens. Ele escreve às igrejas da Galácia.",
+    "apoio": "No fim, ele pega a pena e escreve as últimas palavras com a mão dele, em letras grandes.",
+    "refs": [
+      "Gl 1.1-2",
+      "Gl 6.11"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O autor passou pela Galácia animando os irmãos. Agora ele fica espantado, porque as igrejas estão deixando tão depressa quem chamou elas pela graça. Uns mestres querem obrigar os irmãos a se circuncidar, para fugir da perseguição. O autor responde que só a cruz de Cristo salva.",
+    "refs": [
+      "At 18.23",
+      "Gl 1.6",
+      "Gl 6.12"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Outro evangelho",
+      "sub": "As igrejas se desviam depressa",
+      "desenho": "rolo-aberto",
+      "galhos": [
+        {
+          "texto": "Alguém está torcendo a verdade do evangelho de Cristo. Se alguém pregar outro evangelho, mesmo o autor ou um anjo do céu, que seja maldito. O autor repete o aviso.",
+          "ref": "Gl 1.7-9"
+        },
+        {
+          "texto": "O evangelho que o autor anuncia não veio de gente. Ele recebeu a mensagem de Jesus Cristo.",
+          "ref": "Gl 1.11-12"
+        },
+        {
+          "texto": "Antes, o autor perseguia a igreja de Deus sem dó e era um dos judeus mais apegados às tradições. Deus já tinha escolhido o autor antes de ele nascer e chama ele pela graça.",
+          "ref": "Gl 1.13-15"
+        },
+        {
+          "texto": "Deus revela o Filho no autor, para ele anunciar Jesus aos gentios. Ele não vai consultar ninguém e vai para os desertos da Arábia. Três anos depois, passa quinze dias com Pedro em Jerusalém.",
+          "ref": "Gl 1.16-18"
+        },
+        {
+          "texto": "As igrejas da Judeia não conhecem o autor de rosto. Elas só ouvem dizer que o antigo perseguidor agora anuncia a fé que tentava destruir, e louvam a Deus por causa dele.",
+          "ref": "Gl 1.22-24"
+        }
+      ],
+      "conexao": "Catorze anos depois, o autor vai de novo a Jerusalém com Barnabé e Tito (Gl 2.1)."
+    },
+    {
+      "titulo": "Mesa dividida",
+      "sub": "Pedro se afasta dos gentios",
+      "desenho": "mesa-posta",
+      "galhos": [
+        {
+          "texto": "Lá, o autor conta aos líderes da igreja o evangelho que prega aos gentios. Ninguém obriga Tito, que é grego, a se circuncidar.",
+          "ref": "Gl 2.2-3"
+        },
+        {
+          "texto": "Uns falsos irmãos entram escondidos para espiar a liberdade que eles têm em Cristo Jesus. O autor não cede a eles nem por um momento.",
+          "ref": "Gl 2.4-5"
+        },
+        {
+          "texto": "Pedro, Tiago e João, as colunas da igreja, estendem a mão direita ao autor e a Barnabé. Os dois vão aos gentios, e os outros, aos judeus. Eles pedem só que os dois se lembrem dos pobres.",
+          "ref": "Gl 2.9-10"
+        },
+        {
+          "texto": "Em Antioquia, Pedro come com os gentios. Quando chegam uns amigos de Tiago, ele se afasta, com medo dos que são da circuncisão. Os outros judeus fazem igual, e até Barnabé.",
+          "ref": "Gl 2.11-13"
+        },
+        {
+          "texto": "Na frente de todos, o autor pergunta a Pedro por que ele obriga os gentios a viver como judeus, se Pedro vive como gentio.",
+          "ref": "Gl 2.14"
+        },
+        {
+          "texto": "Ninguém fica justo diante de Deus por obedecer às leis judaicas. A pessoa fica justa só pela fé em Cristo Jesus.",
+          "ref": "Gl 2.16"
+        }
+      ],
+      "jesus": {
+        "texto": "Quem vive no autor agora é Cristo. Ele vive pela fé no Filho de Deus, que amou o autor e se entregou por ele. Esse Filho de Deus é Jesus Cristo.",
+        "refs": [
+          "Gl 2.20"
+        ]
+      },
+      "conexao": "Os gálatas viram Jesus Cristo crucificado como num quadro, e agora parecem enfeitiçados (Gl 3.1)."
+    },
+    {
+      "titulo": "Pela fé",
+      "sub": "Os filhos de Abraão creem",
+      "desenho": "tenda-e-estrelas",
+      "galhos": [
+        {
+          "texto": "O autor pergunta se os irmãos receberam o Espírito Santo por guardar as leis judaicas ou por crer no que ouviram.",
+          "ref": "Gl 3.2"
+        },
+        {
+          "texto": "Os filhos de verdade de Abraão são os que têm fé. Todos os que creem recebem a mesma bênção que Abraão recebeu.",
+          "ref": "Gl 3.7, 9"
+        },
+        {
+          "texto": "Em Cristo, a bênção prometida a Abraão chega também aos gentios, e todos recebem pela fé o Espírito prometido.",
+          "ref": "Gl 3.14"
+        },
+        {
+          "texto": "Ninguém muda um acordo escrito e assinado. A promessa que Deus faz a Abraão também não se cancela com a Lei, que vem quatrocentos e trinta anos depois.",
+          "ref": "Gl 3.15, 17"
+        },
+        {
+          "texto": "A Lei foi como um guia que cuida da criança até Cristo chegar. Agora que a fé chegou, ninguém precisa mais desse guia.",
+          "ref": "Gl 3.24-25"
+        },
+        {
+          "texto": "Em Cristo não há mais judeu nem grego, escravo nem livre, homem nem mulher. Todos são um em Cristo Jesus.",
+          "ref": "Gl 3.28"
+        }
+      ],
+      "conexao": "Quem é de Cristo é descendente de Abraão, e as promessas de Deus são dele também (Gl 3.29)."
+    },
+    {
+      "titulo": "Filhos de Deus",
+      "sub": "Escravos viram herdeiros",
+      "desenho": "correntes",
+      "galhos": [
+        {
+          "texto": "Um herdeiro pequeno não manda em nada até crescer. Antes de Cristo, eles eram assim, escravos das regras deste mundo.",
+          "ref": "Gl 4.1-3"
+        },
+        {
+          "texto": "Deus manda aos corações o Espírito do Filho, que chama: “Abba, Pai”. Quem crê deixa de ser escravo e vira filho e herdeiro.",
+          "ref": "Gl 4.6-7"
+        },
+        {
+          "texto": "Agora os irmãos guardam dias, meses e anos especiais. O autor tem medo de que todo o trabalho dele com eles tenha sido à toa.",
+          "ref": "Gl 4.10-11"
+        },
+        {
+          "texto": "Quando o autor chegou fraco do corpo, eles não desprezaram ele. Receberam o autor como um anjo de Deus, como se fosse Jesus Cristo, e dariam até os olhos para ele.",
+          "ref": "Gl 4.13-15"
+        },
+        {
+          "texto": "O autor chama os irmãos de filhos e diz que sente de novo dores de parto por eles, até Cristo se formar neles.",
+          "ref": "Gl 4.19"
+        },
+        {
+          "texto": "Abraão tem dois filhos, um da escrava Hagar e outro da mulher livre. O filho da livre nasce pela promessa. Os irmãos são filhos da promessa, como Isaque.",
+          "ref": "Gl 4.22-24, 28"
+        }
+      ],
+      "jesus": {
+        "texto": "Deus manda o Filho na hora certa. Jesus nasce de mãe humana, vive debaixo da Lei e compra a liberdade de quem era escravo da Lei, para Deus adotar essas pessoas como filhos.",
+        "refs": [
+          "Gl 4.4-5"
+        ]
+      },
+      "conexao": "Cristo libertou os irmãos, e eles não devem voltar a ficar presos às cadeias da escravidão (Gl 5.1)."
+    },
+    {
+      "titulo": "Livres",
+      "sub": "A liberdade é para amar",
+      "desenho": "massa-na-tigela",
+      "galhos": [
+        {
+          "texto": "Paulo avisa que quem conta com a circuncisão para ficar justo diante de Deus fica sem Cristo. Em Cristo Jesus, o que vale é a fé que age pelo amor.",
+          "ref": "Gl 5.2, 6"
+        },
+        {
+          "texto": "Os irmãos estavam indo bem, e alguém atrapalhou. Basta um pouco de fermento para levedar a massa toda.",
+          "ref": "Gl 5.7-9"
+        },
+        {
+          "texto": "Se o autor pregasse a circuncisão, ninguém mais perseguiria ele. Ele é perseguido porque prega a cruz.",
+          "ref": "Gl 5.11"
+        },
+        {
+          "texto": "Os irmãos foram chamados para a liberdade, e não para fazer a vontade da carne. Eles são livres para amar e servir uns aos outros.",
+          "ref": "Gl 5.13"
+        },
+        {
+          "texto": "Se eles vivem se mordendo e se devorando, precisam tomar cuidado para não acabarem uns com os outros.",
+          "ref": "Gl 5.15"
+        }
+      ],
+      "conexao": "Quem obedece ao Espírito Santo não vive fazendo a vontade da natureza pecaminosa (Gl 5.16)."
+    },
+    {
+      "titulo": "O fruto",
+      "sub": "O Espírito dá o seu fruto",
+      "desenho": "cacho-de-uvas",
+      "galhos": [
+        {
+          "texto": "A natureza humana e o Espírito brigam dentro de quem crê. As obras da carne são coisas como ódio, inveja e bebedeira.",
+          "ref": "Gl 5.17, 19-21"
+        },
+        {
+          "texto": "O fruto do Espírito começa no amor, na alegria e na paz e vai até o domínio próprio. Nada disso briga com a Lei.",
+          "ref": "Gl 5.22-23"
+        },
+        {
+          "texto": "Se alguém cai num pecado, os irmãos ajudam essa pessoa a voltar, com mansidão. Cada um carrega as dificuldades do outro e assim cumpre a lei de Cristo.",
+          "ref": "Gl 6.1-2"
+        },
+        {
+          "texto": "Ninguém engana a Deus. Cada um colhe o que planta, e quem planta as coisas boas do Espírito colhe a vida eterna.",
+          "ref": "Gl 6.7-8"
+        },
+        {
+          "texto": "Quem faz o bem não deve se cansar, porque no tempo certo vai colher. Sempre que pode, quem crê faz o bem a todos, e mais ainda aos irmãos.",
+          "ref": "Gl 6.9-10"
+        },
+        {
+          "texto": "O autor só se orgulha da cruz do Senhor Jesus Cristo. Ele carrega no corpo as cicatrizes de Jesus.",
+          "ref": "Gl 6.14, 17"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "As Escrituras já anunciavam o tempo em que Deus ia aceitar também os gentios pela fé. Muito tempo antes, Deus falou disso a Abraão.",
+    "ref": "Gl 3.8",
+    "desenho": "cruz",
+    "pares": [
+      {
+        "at": "Dt 27.26",
+        "texto": "Maldito aquele que não obedecer às palavras desta lei",
+        "nt": "Gl 3.10",
+        "nota": "Quem conta com as leis para ser salvo fica debaixo dessa maldição"
+      },
+      {
+        "at": "Lv 18.5",
+        "texto": "Obedeçam fielmente às minhas leis e aos meus mandamentos e vocês viverão.",
+        "nt": "Gl 3.11-12",
+        "nota": "O caminho da Lei é diferente do caminho da fé, e o justo vive pela fé"
+      },
+      {
+        "at": "Is 54.1",
+        "texto": "A abandonada terá mais filhos que a que mora com o marido",
+        "nt": "Gl 4.26-27",
+        "nota": "A mãe dos que creem é a Jerusalém do céu, que é livre"
+      },
+      {
+        "at": "Gn 21.10",
+        "texto": "Mande embora de casa essa escrava e o filho dela, porque o filho dessa escrava não será herdeiro junto com meu filho Isaque!",
+        "nt": "Gl 4.30-31",
+        "nota": "Os irmãos são filhos da mulher livre, e não da escrava"
+      },
+      {
+        "at": "Lv 19.18",
+        "texto": "Ame o seu próximo como a si mesmo.",
+        "nt": "Gl 5.14",
+        "nota": "A Lei inteira cabe nesse único mandamento"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O evangelho que o autor recebeu", "de": 1, "ate": 2 },
+    { "titulo": "Filhos de Abraão pela fé", "de": 3, "ate": 4 },
+    { "titulo": "Livres para viver no Espírito", "de": 5, "ate": 6 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O autor diz que, se ainda quisesse agradar às pessoas, não podia ser servo de Cristo.",
+      "ref": "Gl 1.10"
+    },
+    {
+      "texto": "Além de Pedro, o autor só vê um apóstolo, Tiago, o irmão do Senhor.",
+      "ref": "Gl 1.19"
+    },
+    {
+      "texto": "De longe, o autor não sabe o que fazer com os irmãos. Ele gostaria de estar lá naquela hora, para não ter de discutir com eles desse jeito.",
+      "ref": "Gl 4.20"
+    },
+    {
+      "texto": "Quem aprende a Palavra de Deus reparte as coisas boas que tem com quem ensina.",
+      "ref": "Gl 6.6"
+    },
+    {
+      "texto": "Os mestres que pregam a circuncisão nem guardam as outras leis. Eles querem só se gabar da marca no corpo dos irmãos.",
+      "ref": "Gl 6.13"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a palavra promessa. Deus promete a Abraão, a Lei não cancela a promessa, e os irmãos são filhos da promessa, como Isaque.",
+    "ref": "Gl 3.18"
+  }
+}
