@@ -59,6 +59,24 @@ ws.addEventListener('message', (e) => {
   const m = JSON.parse(e.data);
   if (m.id && pend.has(m.id)) { pend.get(m.id)(m.result || {}); pend.delete(m.id); }
 });
+// Rede que não responde, simulada na página (o service worker busca os arquivos por conta
+// própria, então não dá para segurar o pedido no navegador): o script das artes ou a imagem
+// das montanhas são pedidos e nunca chegam, nem com erro.
+const SEGURAR = `window.__segurar = (alvo) => {
+  if (alvo === 'artes') {
+    const original = document.head.appendChild;
+    document.head.appendChild = function (n) { return n && n.tagName === 'SCRIPT' && /story-artes/.test(n.src) ? n : original.call(this, n); };
+    return () => { document.head.appendChild = original; };
+  }
+  const d = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+  Object.defineProperty(HTMLImageElement.prototype, 'src', { configurable: true, get() { return d.get.call(this); },
+    set(v) { if (!/montanhas/.test(v)) d.set.call(this, v); } });
+  return () => Object.defineProperty(HTMLImageElement.prototype, 'src', d);
+};`;
+async function semResposta(alvo, expr) {
+  await av(SEGURAR + ' window.__soltar = __segurar(' + JSON.stringify(alvo) + '); true');
+  try { return await av(expr); } finally { await av('window.__soltar(); true'); }
+}
 await new Promise((r) => ws.addEventListener('open', r));
 const cmd = (m, p = {}) => new Promise((res) => { const id = ++seq; pend.set(id, res); ws.send(JSON.stringify({ id, method: m, params: p })); });
 const av = async (e) => (await cmd('Runtime.evaluate', { expression: e, returnByValue: true, awaitPromise: true })).result?.value;
@@ -149,6 +167,19 @@ try {
   ok(sw, 'o service worker conhece o arquivo das artes e o guarda no cache próprio');
   const tipo = await av('fetch("./" + window.STORY_ARTES).then((r) => r.ok ? r.headers.get("content-type") : "erro " + r.status)');
   ok(/javascript/.test(tipo || ''), 'o servidor entrega o arquivo das artes como script (' + tipo + ')');
+  // rede que não responde: o arquivo das artes nunca chega, e o story não pode ficar preso
+  const lento = await semResposta('artes', '(async () => { const t0 = performance.now();'
+    + ' const f = await CC.story.preparar({ tipo: "ofensiva", dias: 16, frase: ' + JSON.stringify({ linhas: artes[1].linhas, ref: artes[1].ref || '' }) + ' });'
+    + ' const m = await __medir(f); return { ms: performance.now() - t0, m }; })()');
+  ok(!!lento && lento.ms < 9000 && lento.m.w === 1080 && Math.abs(lento.m.canto[0] - 0x1b) < 6,
+    'com a rede parada no arquivo das artes, o story sai no modelo de sempre em ' + (lento && Math.round(lento.ms)) + ' ms (limite de 6 s)');
+  // o mesmo para o versículo: sai na página lisa
+  const lentoV = await semResposta('artes', '(async () => { const t0 = performance.now();'
+    + ' const f = await CC.story.preparar({ tipo: "versiculo", ref: "João 11.35", texto: "Jesus chorou.", traducao: "Nova Bíblia Viva" });'
+    + ' const m = await __medir(f); return { ms: performance.now() - t0, m, artes: !!CC.story.artes }; })()');
+  ok(!!lentoV && lentoV.ms < 9000 && lentoV.m.w === 1080 && !lentoV.artes, 'o versículo também não fica preso: sai em ' + (lentoV && Math.round(lentoV.ms)) + ' ms, na página lisa');
+  // o pedido segurado desiste sozinho (o mesmo limite) antes do próximo teste
+  await dormir(6500);
   // sem o arquivo (sem rede na primeira vez): o story sai no modelo de sempre, sem erro
   await av('window.__artesReal = window.STORY_ARTES; window.STORY_ARTES = "story-artes.0000000000.js"; true');
   const semArquivo = await abrirECompartilhar(artes[0]);
@@ -201,6 +232,13 @@ try {
   ok(!!comum && comum.w === 1080 && Math.abs(comum.canto[0] - 0x1b) < 6 && Math.abs(comum.canto[2] - 0x1a) < 6,
     'frase sem arte continua no modelo de sempre (canto ' + (comum && comum.canto.join(',')) + ')');
 
+  // as montanhas do versículo não chegam (rede parada): sai o fundo de cartaz sem elas, a tempo
+  const semMontanha = await semResposta('montanhas', '(async () => { const t0 = performance.now();'
+    + ' const f = await CC.story.preparar({ tipo: "versiculo", ref: "Salmos 119.1-10", texto: "Felizes são aqueles que andam por caminhos retos.", traducao: "Nova Bíblia Viva" });'
+    + ' const m = await __medir(f); return { ms: performance.now() - t0, m, completo: CC.story.versiculoCompleto() }; })()');
+  await dormir(6500);
+  ok(!!semMontanha && semMontanha.ms < 9000 && semMontanha.m.w === 1080 && !semMontanha.completo,
+    'sem as montanhas, o versículo sai em ' + (semMontanha && Math.round(semMontanha.ms)) + ' ms, no cartaz sem elas');
   // o story de versículo (redesenho): página escura, 1080x1920, com desenho; o trecho que
   // começa no meio da frase (Êxodo 31.3, minúscula) também sai
   const verso = await av('CC.story.preparar({ tipo: "versiculo", ref: "Êxodo 31.3", texto: "e o enchi do Espírito de Deus. Dei a ele habilidade, inteligência e conhecimento artístico", traducao: "Nova Bíblia Viva" }).then(__medir)');

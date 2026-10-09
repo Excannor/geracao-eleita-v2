@@ -1844,7 +1844,7 @@
     if (!arquivo || fotos[chave]) return Promise.resolve(true);
     return new Promise((resolver) => {
       const img = new Image();
-      const espera = setTimeout(() => resolver(false), 10000);
+      const espera = setTimeout(() => resolver(false), 6000);
       img.onload = () => { clearTimeout(espera); fotos[chave] = img; resolver(true); };
       img.onerror = () => { clearTimeout(espera); resolver(false); };
       img.src = /^(https?|file|data|blob):/.test(arquivo) ? arquivo : './' + arquivo;
