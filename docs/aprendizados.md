@@ -637,6 +637,11 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   diz com as próprias palavras: Jesus se humilhou (Fp 2.8-9), ninguém se faz sacerdote por conta própria, nem
   Cristo (Hb 5.4-5, ao lado de Uzias no incenso), e Jesus sobre a cidade que mata os profetas (Mt 23.37, junto
   de 2Cr 36.15-16). O Zacarias apedrejado (2Cr 24) não foi ligado ao de Lc 11.51: o NT não diz que é o mesmo.
+- 2026-10-09 · conteúdo · Esdras: o 1Co 5.7 ("Cristo... foi sacrificado") ao lado da Páscoa de Ed 6 seria o
+  mesmo achado do destaque de Êxodo → "Esdras e Cristo" ficou com os estrangeiros que se juntam ao povo na
+  Páscoa (Ed 6.21) e Ef 2.13, 19, e o destaque com a pedra de esquina sobre o alicerce (Ef 2.20-21). Os
+  casamentos com estrangeiras (Ed 9–10) são contados só com o que o texto diz, sem julgar a decisão nem tirar
+  lição dela.
 
 ## Entrada, sessão e página inicial
 
