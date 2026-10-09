@@ -673,6 +673,12 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   Levítico, e o muro (2.14-16) ficou com o ângulo da paz entre judeus e gentios. Par com hífen na NBV ("Sente-se", Sl
   110.1) saiu do mapa: no cartão escuro o texto do AT não se parafraseia.
 
+- 2026-10-09 · tela · 1 Tessalonicenses no índice: o nome (17 letras, 14px) cabia na célula "em breve" e não na
+  pronta a 360px, porque a pronta reserva 36px para a seta → a célula pronta de nome com mais de 15 letras ganha a
+  classe `nome-longo` (seta pequena no canto de baixo, nome com a largura toda); o teste dos tamanhos 20/17/15/14
+  continua valendo. Diminuir a fonte para 13px não bastava. Volta de Jesus (1Ts 4.13–5.11) contada só com as palavras
+  do texto, sem ordem de acontecimentos nem nome de escola.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
