@@ -31,7 +31,8 @@
         "lugares-a-mesa",
         "grande-banquete",
         "torre-e-rei",
-        "ovelha-perdida"
+        "ovelha-perdida",
+        "moeda-perdida"
       ]
     },
     {
@@ -54,6 +55,7 @@
     "lugares-a-mesa",
     "grande-banquete",
     "torre-e-rei",
-    "ovelha-perdida"
+    "ovelha-perdida",
+    "moeda-perdida"
   ]
 }

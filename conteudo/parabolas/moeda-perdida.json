@@ -1,0 +1,73 @@
+{
+  "titulo": "A moeda perdida",
+  "ref": "Lc 15.8-10",
+  "grupo": "lucas",
+  "linha": "A mulher procura em cada canto até achar a moeda",
+  "desenho": "lamparina-e-moeda",
+  "desenhoLista": "moeda-no-canto",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Os fariseus e os mestres da lei reclamam porque Jesus come com cobradores de impostos e outras pessoas de má fama.",
+          "ref": "Lc 15.1-2"
+        },
+        {
+          "texto": "Jesus responde com a história de um dono de cem ovelhas que perde uma e vai atrás dela até achar. Sem mudar de assunto, ele conta esta outra.",
+          "ref": "Lc 15.3-8"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "lamparina",
+      "blocos": [
+        {
+          "texto": "Desta vez, uma mulher perde uma coisa dentro de casa.",
+          "ref": "Lc 15.8"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "moedas-de-prata",
+              "titulo": "Dez moedas de prata",
+              "fala": "tem 10 valiosas moedas de prata e perde uma delas",
+              "ref": "Lc 15.8"
+            },
+            {
+              "desenho": "lamparina-acesa",
+              "titulo": "A lamparina",
+              "fala": "acender uma lamparina",
+              "ref": "Lc 15.8"
+            },
+            {
+              "desenho": "moeda-no-canto",
+              "titulo": "Cada canto da casa",
+              "fala": "olhar em cada canto da casa para achá-la",
+              "ref": "Lc 15.8"
+            }
+          ]
+        },
+        {
+          "texto": "Quando acha a moeda, a mulher chama as amigas e as vizinhas.",
+          "ref": "Lc 15.9"
+        },
+        {
+          "fala": "Alegrem-se comigo, pois encontrei minha moeda perdida",
+          "ref": "Lc 15.9"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Uma moeda entre dez parece pouca coisa, e a mulher procura em cada canto até achar. Para Deus, nenhuma pessoa perdida é pouca coisa.",
+    "apoio": "Jesus termina igual à história da ovelha. “há alegria entre os anjos de Deus quando um pecador se arrepende”.",
+    "ref": "Lc 15.8-10"
+  },
+  "perguntas": [
+    "Quem perto de você anda esquecido num canto e precisa que alguém procure?",
+    "Quando foi a última vez que você fez festa porque alguém voltou para Deus?"
+  ]
+}

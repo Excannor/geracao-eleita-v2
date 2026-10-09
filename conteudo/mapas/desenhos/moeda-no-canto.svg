@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a moeda perdida (Lc 15.8): o canto de um cômodo da casa, a quina das duas paredes de pedra e o chão, e a moeda deitada no chão, encostada no canto, com uns riscos de brilho em volta. A moeda é a única área sálvia. -->
+<path class="k" d="M70 16V78M70 78L8 102M70 78L114 98"/>
+<path class="h" d="M8 40L70 30M8 66L70 54M70 38L114 46M70 60L114 72M36 34V58M52 32V56M92 42V66"/>
+<path class="k p" d="M60 88v3a12 4 0 0 0 24 0v-3z"/>
+<ellipse class="k s" cx="72" cy="88" rx="12" ry="4"/>
+<ellipse class="h" cx="72" cy="88" rx="8.6" ry="2.7"/>
+<path class="h" d="M54 82L49 80M90 82L95 80M72 77V72M58 94L53 97M86 94L91 97"/>
+</svg>
