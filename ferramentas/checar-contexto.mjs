@@ -57,11 +57,11 @@ const NUMERO = /(?<!\p{L})(\d+|três|quatro|cinco|seis|sete|oito|nove|dez|doze|c
 const MINUSCULAS = new Set();
 for (const caps of Object.values(nbv)) for (const cap of caps) for (const v of cap) for (const p of String(v).match(/\p{Ll}[\p{L}]*/gu) || []) MINUSCULAS.add(p);
 const LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia', 'Escrituras',
-  'Reino', 'Lei', 'Antigo', 'Novo', 'Testamento', 'Unidade', 'Paulo', 'Israel', 'Egito', 'Enquanto', 'Hoje', 'Amanhã',
+  'Reino', 'Lei', 'Antigo', 'Novo', 'Testamento', 'Unidade', 'Paulo', 'Salmo', 'Israel', 'Egito', 'Enquanto', 'Hoje', 'Amanhã',
   ...LIVROS.flatMap((l) => l.split(' ')).filter((p) => /^\p{Lu}/u.test(p))]);
 
 const LIVRO_NOME = new RegExp('(?<!\\p{L})(' + LIVROS.join('|') + ')(?!\\p{L})', 'gu');
-const ANTES_DE_REF = new RegExp('(capítulos?|versículos?|Unidade|dia|\\d| a| e|Livro) $', 'u');
+const ANTES_DE_REF = new RegExp('(capítulos?|versículos?|Salmos?|Unidade|dia|\\d| a| e|Livro) $', 'u');
 
 const so = process.argv[2] ? Number(process.argv[2]) : 0;
 const unidades = C.unidades.filter((u) => !so || u.numero === so);
