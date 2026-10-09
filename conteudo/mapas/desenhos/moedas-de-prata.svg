@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as moedas de prata da mulher (Lc 15.8): nove moedas deitadas em três pilhas no chão, de quatro, de três e de duas, cada uma com a espessura à vista e a borda em relevo; a décima falta. Sem área sálvia. -->
+<path class="k" d="M8 106H112"/>
+<path class="k p" d="M19 81v20a13 4.5 0 0 0 26 0v-20z"/>
+<path class="h" d="M19 96a13 4.5 0 0 0 26 0M19 91a13 4.5 0 0 0 26 0M19 86a13 4.5 0 0 0 26 0"/>
+<ellipse class="k p" cx="32" cy="81" rx="13" ry="4.5"/>
+<ellipse class="h" cx="32" cy="81" rx="9.4" ry="3.1"/>
+<path class="k p" d="M47 86v15a13 4.5 0 0 0 26 0v-15z"/>
+<path class="h" d="M47 96a13 4.5 0 0 0 26 0M47 91a13 4.5 0 0 0 26 0"/>
+<ellipse class="k p" cx="60" cy="86" rx="13" ry="4.5"/>
+<ellipse class="h" cx="60" cy="86" rx="9.4" ry="3.1"/>
+<path class="k p" d="M75 91v10a13 4.5 0 0 0 26 0v-10z"/>
+<path class="h" d="M75 96a13 4.5 0 0 0 26 0"/>
+<ellipse class="k p" cx="88" cy="91" rx="13" ry="4.5"/>
+<ellipse class="h" cx="88" cy="91" rx="9.4" ry="3.1"/>
+</svg>

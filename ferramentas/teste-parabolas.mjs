@@ -192,6 +192,12 @@ for (const outra of P.itens.filter((p) => p.slug !== 'grande-banquete')) {
     && await texto('.parabola-nome') === outra.titulo, outra.titulo + ' abre com o desenho, as ' + f.secoes.length + ' seções e as ' + nFalas + ' falas');
   ok(await semEstouro() && await av('document.querySelector(".parabola-nome").scrollWidth <= document.querySelector(".parabola-nome").clientWidth + 1'), outra.titulo + ': nada estoura a 390px e o título cabe');
   ok(await av('[...document.querySelectorAll(".sem-quebra")].every((el) => el.getClientRects().length === 1)'), outra.titulo + ': nenhuma palavra com hífen das falas quebra no hífen');
+  if ((f.parecidas || []).some((x) => x.slug)) {
+    const cartoes = JSON.parse(await av('JSON.stringify([...document.querySelectorAll("a.parecida-parabola")].map((a) => { const s = a.querySelector(":scope > svg").getBoundingClientRect(); const t = a.querySelector(":scope > span:not(.desenho)").getBoundingClientRect(); return { seta: Math.max(s.width, s.height), texto: t.width, cartao: a.getBoundingClientRect().width, href: a.getAttribute("href") }; }))'));
+    const comLink = f.parecidas.filter((x) => x.slug);
+    ok(cartoes.length === comLink.length && cartoes.every((c, i) => c.href === '#/parabola/' + comLink[i].slug && c.seta <= 24 && c.texto >= c.cartao * .6),
+      outra.titulo + ': o cartão da parecida leva à outra parábola, com a seta de até 24px e o texto sem espremer (' + cartoes.map((c) => Math.round(c.seta) + '/' + Math.round(c.texto) + 'px').join(', ') + ')');
+  }
   await capturar(outra.slug + '-390-claro');
 }
 

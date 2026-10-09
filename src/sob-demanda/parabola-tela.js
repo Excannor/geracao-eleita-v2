@@ -128,7 +128,7 @@
     const d = p.dizendo;
     const parecidas = (p.parecidas || []).map((x) => {
       const destino = x.slug && porSlug.get(x.slug);
-      const dentro = desenho(p, p.desenhoLista) + '<span><b>Parecida em ' + CC.esc((trechoDe(x.ref) || {}).livro || '') + ' · ' + CC.esc(x.titulo) + '</b>'
+      const dentro = desenho(p, destino ? destino.desenho : p.desenhoLista) + '<span><b>' + CC.esc(x.rotulo || 'Parecida em ' + ((trechoDe(x.ref) || {}).livro || '')) + ' · ' + CC.esc(x.titulo) + '</b>'
         + '<small>' + nb(CC.esc(x.ref)) + (x.linha ? ' · ' + CC.esc(x.linha) : '') + '</small></span>';
       return destino ? '<a class="parecida-parabola" href="#/parabola/' + x.slug + '">' + dentro + CC.ico('avancar') + '</a>' : '<div class="parecida-parabola">' + dentro + '</div>';
     }).join('');

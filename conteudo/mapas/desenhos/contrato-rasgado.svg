@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o contrato rasgado (Lc 16.6): a nota da dívida partida em duas, a borda rasgada em zigue-zague, as duas metades um pouco separadas, com as linhas escritas; na metade da direita, o selo redondo. O selo é a única área sálvia. -->
+<path class="k p" d="M14 30L56 26L52 38L58 50L50 62L57 74L51 86L56 98L18 102Z"/>
+<path class="h" d="M22 42H46M22 52H48M22 62H42M22 72H46M22 82H40"/>
+<path class="k p" d="M68 24L104 22L106 94L68 96L63 84L69 72L62 60L70 48L64 36Z"/>
+<path class="h" d="M76 38H98M74 48H98M74 58H96M76 68H98"/>
+<circle class="k s" cx="90" cy="82" r="6"/>
+</svg>

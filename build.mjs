@@ -257,6 +257,8 @@ if (existsSync(join(pastaParabolas, 'indice.json'))) {
       const { erros } = checarParabola(slug, p);
       if (erros.length) throw new Error('a parábola publicada ' + slug + ' não passa no checador: ' + erros.slice(0, 3).join(' · '));
       const ids = new Set([p.desenho, p.desenhoLista].concat(p.secoes.flatMap((s) => s.blocos.flatMap((b) => (b.itens || []).map((it) => it.desenho)))));
+      // o cartão de uma parecida que leva a outra parábola mostra o desenho da lista dela
+      for (const x of p.parecidas || []) if (x.slug) ids.add(JSON.parse(readFileSync(join(pastaParabolas, x.slug + '.json'), 'utf8')).desenhoLista);
       p.desenhos = Object.fromEntries([...ids].map((id) => [id, lerDesenho(id)]));
       desenhosDaLista[p.desenhoLista] = p.desenhos[p.desenhoLista];
       const texto = JSON.stringify(p);

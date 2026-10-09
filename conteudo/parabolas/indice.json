@@ -31,7 +31,10 @@
         "lugares-a-mesa",
         "grande-banquete",
         "torre-e-rei",
-        "ovelha-perdida"
+        "ovelha-perdida",
+        "moeda-perdida",
+        "filho-prodigo",
+        "administrador-desonesto"
       ]
     },
     {
@@ -54,6 +57,9 @@
     "lugares-a-mesa",
     "grande-banquete",
     "torre-e-rei",
-    "ovelha-perdida"
+    "ovelha-perdida",
+    "moeda-perdida",
+    "filho-prodigo",
+    "administrador-desonesto"
   ]
 }

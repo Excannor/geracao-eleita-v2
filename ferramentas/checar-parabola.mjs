@@ -1,6 +1,6 @@
 // Confere uma parábola (conteudo/parabolas/<slug>.json) antes de ela ir ao ar:
 //   1. os campos do formato (titulo, ref, grupo, linha, desenho, desenhoLista, secoes com blocos,
-//      dizendo, duas perguntas, parecidas) e o índice (conteudo/parabolas/indice.json);
+//      dizendo, duas perguntas, parecidas com rótulo e slug opcionais) e o índice (conteudo/parabolas/indice.json);
 //   2. toda referência ("Lc 14.15-24") no formato dos mapas e existindo na NBV;
 //   3. toda fala e toda citação entre aspas batendo, palavra por palavra, com a NBV da referência
 //      do bloco (e sempre dentro das referências da própria parábola);
@@ -131,6 +131,9 @@ export function checarParabola(slug, p) {
     // a linha sai como está, depois da referência ("Mt 22.1-14 · um rei faz a festa do filho"):
     // começa minúscula, a não ser nome próprio
     if (x.linha !== undefined) campos.push([onde + ' linha', x.linha, []]);
+    // o rótulo troca o "Parecida em <Livro>" do cartão ("Da mesma conversa", para as de Lc 15)
+    if (x.rotulo !== undefined) { if (!texto(x.rotulo)) erro(onde + ': rótulo vazio'); else campos.push([onde + ' rótulo', x.rotulo, []]); }
+    if (x.slug !== undefined && !listarParabolas().includes(String(x.slug))) erro(onde + ': o slug ' + x.slug + ' não tem arquivo em conteudo/parabolas');
   });
 
   // Toda referência de bloco cai no mesmo livro da ref principal (a parábola e a cena em volta).
