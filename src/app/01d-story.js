@@ -369,7 +369,7 @@
         if (!arquivo) { resolver(false); return; }
         const s = document.createElement('script');
         const fim = (certo) => { clearTimeout(espera); resolver(certo && !!CC.story.artes); if (!CC.story.artes) artesPedidas = null; };
-        const espera = setTimeout(() => fim(false), 10000);
+        const espera = setTimeout(() => fim(false), LIMITE_EXTRAS);
         s.src = './' + arquivo;
         s.onload = () => fim(true);
         s.onerror = () => { s.remove(); fim(false); };
@@ -401,6 +401,8 @@
   // deixa abrir o compartilhamento logo depois de um toque; com a imagem já pronta, nada de
   // espera entre o toque e o navigator.share.
   let guardada = { chave: '', promessa: null };
+  const LIMITE_EXTRAS = 6000;
+  const comLimite = (p, ms) => Promise.race([Promise.resolve(p).catch(() => false), new Promise((r) => setTimeout(() => r(false), ms))]);
   function preparar(pedido) {
     const chave = JSON.stringify(pedido);
     if (guardada.chave !== chave || !guardada.promessa) {
@@ -408,10 +410,14 @@
       const arte = querArte ? arteDesejada(pedido.frase) : null;
       // o versículo usa o fundo de cartaz, que vem com as artes (e as montanhas)
       const ehVerso = pedido.tipo === 'versiculo' && !pedido.paleta;
-      const promessa = prepararFontes()
-        .then(() => (querArte || ehVerso ? carregarArtes() : true))
+      // Os arquivos à parte (artes, fotos) têm um tempo-limite só para eles: rede lenta ou
+      // pedido que nunca volta não pode segurar o compartilhar. Passou do limite, desenha com
+      // o que já chegou (o modelo de sempre, ou o fundo sem a foto).
+      const extras = () => carregarArtes()
         .then(() => (querArte && CC.story.prepararArte && arteDaFrase(pedido.frase) ? CC.story.prepararArte(arte) : true))
-        .then(() => (ehVerso && CC.story.prepararVersiculo ? CC.story.prepararVersiculo() : true))
+        .then(() => (ehVerso && CC.story.prepararVersiculo ? CC.story.prepararVersiculo() : true));
+      const promessa = prepararFontes()
+        .then(() => (querArte || ehVerso ? comLimite(extras(), LIMITE_EXTRAS) : true))
         .then(() => {
           const c = tela();
           desenhar(c.getContext('2d'), pedido.tipo, pedido);

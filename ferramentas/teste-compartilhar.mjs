@@ -102,6 +102,19 @@ window.__png = async (arquivo) => {
   return { url: b, w: img.width, h: img.height, nome: arquivo.name, tipo: arquivo.type };
 };`;
 const guardarPng = (nome, url) => writeFileSync(join(SAIDA, nome), Buffer.from(url.split(',')[1], 'base64'));
+// Imagens de alguns MB voltam do navegador em pedaços de 1 MB: várias numa resposta só (as
+// de versículo, com o fundo de cartaz, passam de 2 MB cada) travavam o canal de depuração.
+async function imagensGrandes(expr) {
+  const nomes = await av('(async () => { window.__imgs = await (' + expr + '); return Object.keys(window.__imgs); })()');
+  const saida = {};
+  for (const nome of nomes || []) {
+    const n = await av('window.__imgs[' + JSON.stringify(nome) + '].length');
+    let s = '';
+    for (let i = 0; i < n; i += 1e6) s += await av('window.__imgs[' + JSON.stringify(nome) + '].slice(' + i + ',' + (i + 1e6) + ')');
+    saida[nome] = s;
+  }
+  return saida;
+}
 
 console.log('\n  Compartilhar em imagem de story\n');
 try {
@@ -246,7 +259,7 @@ ok(await esperar('/Toque de novo/.test((document.getElementById("aviso-flutuante
   && await av('!!document.querySelector(".acoes-verso:not([hidden]) [data-compartilhar-verso]")'), 'se o navegador recusa, a barra fica e o aviso pede outro toque');
 await av('document.querySelector(".acoes-verso [data-compartilhar-verso]").click()');
 ok(await esperar('!!window.__compartilhado'), 'o segundo toque no versículo compartilha');
-const versos = await av(`(async () => {
+const versos = await imagensGrandes(`(async () => {
   const saida = {};
   for (const [nome, ref] of [["versiculo-curto", "João 11.35"], ["versiculo-longo", "1 Coríntios 13.4-7"], ["versiculo-dez", "Salmos 119.1-10"]]) {
     const texto = await CC.textoDoVersiculo(ref);
@@ -259,7 +272,7 @@ ok(Object.keys(versos || {}).length === 3, 'as imagens de versículo curto, long
 
 // as imagens de referência, para a revisão a olho: 1, 100 e 365 dias com a frase mais curta e
 // a mais longa da lista, e a frase do estágio (sem carimbo à vista)
-const casos = await av(`(async () => {
+const casos = await imagensGrandes(`(async () => {
   const por = CC.FRASES_OFENSIVA.filter((f) => !f.arte).sort((a, b) => a.linhas.join(" ").length - b.linhas.join(" ").length);
   const curta = por[0], longa = por[por.length - 1];
   const saida = {};
