@@ -57,7 +57,7 @@ const NUMERO = /(?<!\p{L})(\d+|três|quatro|cinco|seis|sete|oito|nove|dez|doze|c
 const MINUSCULAS = new Set();
 for (const caps of Object.values(nbv)) for (const cap of caps) for (const v of cap) for (const p of String(v).match(/\p{Ll}[\p{L}]*/gu) || []) MINUSCULAS.add(p);
 const LIVRES = new Set(['Deus', 'Senhor', 'Jesus', 'Cristo', 'Pai', 'Filho', 'Espírito', 'Santo', 'Bíblia', 'Escrituras',
-  'Reino', 'Lei', 'Antigo', 'Novo', 'Testamento', 'Unidade', 'Israel', 'Egito', 'Enquanto', 'Hoje', 'Amanhã',
+  'Reino', 'Lei', 'Antigo', 'Novo', 'Testamento', 'Unidade', 'Paulo', 'Israel', 'Egito', 'Enquanto', 'Hoje', 'Amanhã',
   ...LIVROS.flatMap((l) => l.split(' ')).filter((p) => /^\p{Lu}/u.test(p))]);
 
 const LIVRO_NOME = new RegExp('(?<!\\p{L})(' + LIVROS.join('|') + ')(?!\\p{L})', 'gu');
