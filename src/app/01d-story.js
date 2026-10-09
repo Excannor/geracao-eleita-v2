@@ -267,23 +267,42 @@
     marca(ctx, A - SEGURA - 80, { cor: '#c9d98f', corFraca: '#a4a99d' });
   }
 
-  // Versículo (variante A, escolhida): a folha do alto do app (sálvia pálida) com o versículo
-  // num cartão branco em Literata, as aspas no botão redondo preto e a referência embaixo.
-  function desenharVersiculo(ctx, { ref, texto, traducao }) {
-    ctx.fillStyle = '#dfe8c1';
+  // Versículo (redesenho de 2026-10-09, design/compartilhar/LEIA.md): a página escura da
+  // landing, as aspas grandes em sálvia como o elemento gráfico (sem a bolinha de antes), o
+  // versículo em Literata alinhado à esquerda, a referência em Oswald amarela com a versão
+  // embaixo, e no pé o carimbo "Leia a Bíblia comigo" com a marca: o story também apresenta o
+  // app a quem vê. O texto vai como está; se o trecho começa no meio da frase (minúscula),
+  // ganha reticências na frente, só na imagem. A paleta clara existe para comparar
+  // (design/compartilhar/gerar.mjs versiculo); o app usa a escura.
+  const PALETAS_VERSICULO = {
+    escura: { fundo: '#0d0e0c', brilho: 'rgba(200,218,140,.10)', aspas: '#c8da8c', texto: '#f2efdc', barra: '#c8da8c',
+      ref: '#ffc44d', versao: '#a3a69a', chapa: '#c8da8c', letra: '#12130f', marca: '#f2efdc', marcaFraca: '#a3a69a' },
+    clara: { fundo: '#dfe8c1', brilho: 'rgba(255,255,255,.35)', aspas: '#12130f', texto: '#12130f', barra: '#12130f',
+      ref: '#12130f', versao: '#4f5a36', chapa: '#12130f', letra: '#dfe8c1', marca: '#12130f', marcaFraca: '#4f5a36' },
+  };
+  function desenharVersiculo(ctx, { ref, texto, traducao, paleta }) {
+    const P = PALETAS_VERSICULO[paleta] || PALETAS_VERSICULO.escura;
+    ctx.fillStyle = P.fundo;
     ctx.fillRect(0, 0, L, A);
-    const margem = 64;
-    const dentro = 76;
-    const raio = 70;
-    const corpo = String(texto || '').trim() || ref;
-    const z0 = SEGURA + 40 + raio;
-    const z1 = A - SEGURA - 190;
-    const pe = 64 + 46 + (traducao ? 50 : 0) + 76;
-    // Letra de 34px para cima (abaixo disso não se lê no story). Um trecho longo demais (até
-    // dez versículos) para no fim da última palavra que cabe, com reticências: a referência
-    // embaixo diz o trecho inteiro.
-    const caixa = { fonte: (x) => Lit(500, x), larguraMax: L - 2 * (margem + dentro),
-      alturaMax: z1 - z0 - raio - 60 - pe, fonteMax: 92, fonteMin: 34, entreLinhas: 1.42 };
+    const brilho = ctx.createRadialGradient(160, 420, 0, 160, 420, 900);
+    brilho.addColorStop(0, P.brilho);
+    brilho.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = brilho;
+    ctx.fillRect(0, 0, L, A);
+    const margem = 96;
+    const largura = L - 2 * margem;
+    const bruto = String(texto || '').trim();
+    // começa no meio da frase: reticências na frente (o texto em si não muda)
+    const corpo = bruto ? (/^\p{Ll}/u.test(bruto) ? '…' + bruto : bruto) : ref;
+    const z0 = SEGURA + 60;
+    const z1 = A - SEGURA - 250;
+    const altAspas = 190;
+    const altRef = 46 + 70 + (traducao ? 46 : 0);
+    // Letra de 42px para cima (abaixo disso o story vira um paredão). Um trecho longo demais
+    // (até dez versículos) para no fim da última palavra que cabe, com reticências: a referência
+    // diz o trecho inteiro.
+    const caixa = { fonte: (x) => Lit(500, x), larguraMax: largura, alturaMax: z1 - z0 - altAspas - altRef,
+      fonteMax: 128, fonteMin: 42, entreLinhas: 1.3 };
     let t = textoEquilibrado(ctx, corpo, caixa);
     if (t.altura > caixa.alturaMax) {
       const palavras = corpo.split(/\s+/);
@@ -296,30 +315,26 @@
       }
       t = textoEquilibrado(ctx, palavras.slice(0, de).join(' ').replace(/[,;:.!?]+$/, '') + '…', caixa);
     }
-    const altura = raio + 60 + t.altura + pe;
-    const topo = z0 + Math.max(0, (z1 - z0 - altura) / 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(margem, topo, L - 2 * margem, altura, 64); else ctx.rect(margem, topo, L - 2 * margem, altura);
-    ctx.fill();
-    ctx.fillStyle = '#151615';
-    ctx.beginPath();
-    ctx.arc(L / 2, topo, raio, 0, Math.PI * 2);
-    ctx.fill();
-    // as aspas ficam no meio do círculo pelo desenho delas, não pela caixa da letra
-    ctx.font = Lit(600, 168);
-    const m = ctx.measureText('“');
-    const altAspas = (m.actualBoundingBoxAscent || 0) + (m.actualBoundingBoxDescent || 0);
-    escrever(ctx, '“', L / 2, topo + (m.actualBoundingBoxAscent ? m.actualBoundingBoxAscent - altAspas / 2 : 52), Lit(600, 168), '#c8da8c');
-    let y = topo + raio + 60;
+    const altura = altAspas + t.altura + altRef;
+    let y = z0 + Math.max(0, (z1 - z0 - altura) / 2);
+    // as aspas grandes, o elemento gráfico
+    escrever(ctx, '“', margem - 14, y + 300, Lit(600, 420), P.aspas, { alinhar: 'left' });
+    y += altAspas;
     for (const linha of t.linhas) {
-      escrever(ctx, linha, L / 2, y + t.tamanho * 1.05, Lit(500, t.tamanho), '#2c2d2b');
-      y += t.tamanho * 1.42;
+      escrever(ctx, linha, margem, y + t.tamanho * 1.0, Lit(500, t.tamanho), P.texto, { alinhar: 'left' });
+      y += t.tamanho * 1.3;
     }
-    y += 64 + 30;
-    escrever(ctx, ref, L / 2, y, Mn(800, 46), '#151615');
-    if (traducao) escrever(ctx, traducao, L / 2, y + 52, Mn(600, 30), '#686b66');
-    marca(ctx, A - SEGURA - 80, { cor: '#151615', corFraca: '#4f5a36' });
+    y += 46;
+    ctx.fillStyle = P.barra;
+    ctx.fillRect(margem, y, 90, 8);
+    y += 70;
+    escrever(ctx, ref.toUpperCase(), margem, y, '700 52px Oswald, sans-serif', P.ref, { alinhar: 'left', espaco: 52 * 0.06 });
+    if (traducao) escrever(ctx, traducao.toUpperCase(), margem, y + 46, Mn(700, 26), P.versao, { alinhar: 'left', espaco: 26 * 0.16 });
+    // o convite e a marca
+    const convite = ['Leia a Bíblia comigo'];
+    const tc = tamanhoDoCarimbo(ctx, convite, 760, 90, 46);
+    carimbo(ctx, convite, L / 2, A - SEGURA - 210, tc, { chapa: P.chapa, letra: P.letra });
+    marca(ctx, A - SEGURA - 60, { cor: P.marca, corFraca: P.marcaFraca });
   }
 
   // A frase que tem arte própria (FRASES_OFENSIVA com "arte") usa o modelo dela; as outras,

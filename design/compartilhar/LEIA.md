@@ -61,3 +61,19 @@ mais escura, 1080x1920, 113 KB) como fundo inteiro, publicada como
 `story-foto-suficiente.<resumo>.webp` e pedida junto com as artes; sem ela, sai a ilustração.
 Para gerar: `CHROME=... node design/compartilhar/gerar.mjs <pasta> artes`. O teste de
 navegador é `ferramentas/teste-story.mjs`.
+
+## Redesenho do versículo (2026-10-09, `versiculo/` na pasta de capturas)
+
+O dono achou o cartão branco com a bolinha de aspas fraco. Três propostas
+(`CHROME=... node design/compartilhar/gerar.mjs <pasta> versiculo`): A, página escura da
+landing com as aspas grandes em sálvia, o versículo em Literata à esquerda, a referência em
+Oswald amarela e o convite "Leia a Bíblia comigo" em carimbo sálvia; B, a mesma em sálvia
+clara; C, cartaz com a referência gigante e o versículo num papel creme.
+**Escolhida: A.** O story de versículo também apresenta o app: no feed, o fundo escuro com as
+aspas sálvia e a referência amarela chama mais atenção que um fundo claro (a maioria dos
+stories de versículo é clara), repete a identidade da landing (preto, sálvia, amarelo,
+Oswald, pincel) e o convite com a marca diz o que é e onde achar. O versículo continua o
+herói (B perde impacto; em C a referência compete com o texto e o papel aperta os longos).
+Regras: o texto vai intacto; se começa no meio da frase (minúscula), reticências na frente,
+só na imagem; letra de 128 a 42px conforme o tamanho, e o que não couber para na última
+palavra com reticências (a referência diz o trecho inteiro).

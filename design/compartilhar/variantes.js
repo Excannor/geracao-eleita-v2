@@ -181,5 +181,31 @@
     S.marca(ctx, A - 250 - 70, { cor: '#151615', corFraca: '#686b66' });
   }
 
-  window.VARIANTES = { ofensivaA, ofensivaB, ofensivaC, versiculoA, versiculoB, versiculoC };
+  // Redesenho do versículo (2026-10-09), proposta C: cartaz. A referência gigante em Oswald
+  // amarela sobre a faixa escura, o versículo num papel creme embaixo, o convite e a marca.
+  // As propostas A (escura, a escolhida) e B (clara) são a do app com paleta 'escura'/'clara'.
+  function versiculoNovoC(ctx, { ref, texto, traducao }) {
+    ctx.fillStyle = '#0d0e0c';
+    ctx.fillRect(0, 0, L, A);
+    const bruto = String(texto || '').trim();
+    const corpo = /^\p{Ll}/u.test(bruto) ? '…' + bruto : bruto;
+    ctx.font = '700 100px Oswald, sans-serif';
+    const tamRef = Math.min(190, 100 * 900 / ctx.measureText(ref.toUpperCase()).width);
+    textoCentro(ctx, ref.toUpperCase(), 300 + tamRef * 0.9, '700 ' + tamRef + 'px Oswald, sans-serif', '#ffc44d', 2);
+    if (traducao) textoCentro(ctx, traducao.toUpperCase(), 300 + tamRef * 0.9 + 56, Mn(700, 26), '#a3a69a', 4);
+    const topo = 300 + tamRef + 120;
+    const fim = A - 250 - 260;
+    const t = S.textoEquilibrado(ctx, corpo, { fonte: (x) => Lit(500, x), larguraMax: 800, alturaMax: fim - topo - 140, fonteMax: 80, fonteMin: 34, entreLinhas: 1.3 });
+    const alto = t.altura + 140;
+    const y0 = topo + Math.max(0, (fim - topo - alto) / 2);
+    ctx.fillStyle = '#f2efdc';
+    ctx.fillRect(70, y0, L - 140, alto);
+    let y = y0 + 70;
+    for (const linha of t.linhas) { textoCentro(ctx, linha, y + t.tamanho, Lit(500, t.tamanho), '#12130f'); y += t.tamanho * 1.3; }
+    const tc = S.tamanhoDoCarimbo(ctx, ['Leia a Bíblia comigo'], 760, 90, 46);
+    S.carimbo(ctx, ['Leia a Bíblia comigo'], meio, A - 250 - 210, tc, { chapa: '#c8da8c', letra: '#12130f' });
+    S.marca(ctx, A - 250 - 60, { cor: '#f2efdc', corFraca: '#a3a69a' });
+  }
+
+  window.VARIANTES = { ofensivaA, ofensivaB, ofensivaC, versiculoA, versiculoB, versiculoC, versiculoNovoC };
 })();

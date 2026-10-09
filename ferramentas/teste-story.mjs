@@ -201,6 +201,14 @@ try {
   ok(!!comum && comum.w === 1080 && Math.abs(comum.canto[0] - 0x1b) < 6 && Math.abs(comum.canto[2] - 0x1a) < 6,
     'frase sem arte continua no modelo de sempre (canto ' + (comum && comum.canto.join(',')) + ')');
 
+  // o story de versículo (redesenho): página escura, 1080x1920, com desenho; o trecho que
+  // começa no meio da frase (Êxodo 31.3, minúscula) também sai
+  const verso = await av('CC.story.preparar({ tipo: "versiculo", ref: "Êxodo 31.3", texto: "e o enchi do Espírito de Deus. Dei a ele habilidade, inteligência e conhecimento artístico", traducao: "Nova Bíblia Viva" }).then(__medir)');
+  ok(!!verso && verso.w === 1080 && verso.h === 1920 && verso.desvio > 12 && verso.canto.every((v) => v < 30),
+    'o story de versículo sai em 1080x1920, na página escura (canto ' + (verso && verso.canto.join(',')) + ')');
+  const urlV = await textoGrande('CC.story.preparar({ tipo: "versiculo", ref: "Êxodo 31.3", texto: "e o enchi do Espírito de Deus. Dei a ele habilidade, inteligência e conhecimento artístico", traducao: "Nova Bíblia Viva" }).then((f) => new Promise((r) => { const l = new FileReader(); l.onload = () => r(l.result); l.readAsDataURL(f); }))');
+  writeFileSync(join(SAIDA, 'story-versiculo-exodo-31-3.png'), Buffer.from(urlV.split(',')[1], 'base64'));
+
   // a folha da ofensiva com cada frase nova, nos dois temas
   const novas = await av('CC.FRASES_OFENSIVA.slice(18).map((f) => ({ ...f }))');
   for (const tema of ['claro', 'escuro']) {
