@@ -493,13 +493,13 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
   for (const [x, y] of [[z, outro], [outro, z]]) {
     const f2 = CC.fundir(x, y);
     checar(!f2.lidos.length && !Object.keys(f2.marcadoEm).length && f2.foto === antes.foto && f2.anotacoes['nota:y'] === 'escrita no outro'
-      && f2.anotacoes['verso:João 3.16'] === 'minha nota' && f2.oia[1].o === 'reflexão',
+      && f2.notas['v:João 3.16'].texto === 'minha nota' && !f2.notas['v:João 3.16'].apagadaEm && f2.oia[1].o === 'reflexão',
     'na fusão com um aparelho atrasado, a trilha fica zerada e foto e anotações dos dois lados ficam');
   }
   // um zeramento da versão anterior (que mandava tudo vazio) não apaga mais o que foi escrito
   const zeradoAntigo = { atualizadoEm: z.zeradoEm + 5, zeradoEm: z.zeradoEm + 5, dia: 1, lidos: [], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {}, foto: '' };
   const f3 = CC.fundir(antes, zeradoAntigo);
-  checar(!f3.lidos.length && f3.foto === antes.foto && f3.anotacoes['verso:João 3.16'] === 'minha nota', 'zeramento vindo de aparelho antigo também só zera a trilha');
+  checar(!f3.lidos.length && f3.foto === antes.foto && f3.notas['v:João 3.16'].texto === 'minha nota' && !f3.notas['v:João 3.16'].apagadaEm, 'zeramento vindo de aparelho antigo também só zera a trilha');
   CC.carregarLocal();
 }
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
@@ -1146,7 +1146,12 @@ secao('cofre das anotações (cofre.mjs e servidor)');
   const p2 = montarPainel({ contas: contasP, estados: { ana: selado }, hoje: '2026-03-02' });
   checar(JSON.stringify(p1) === JSON.stringify(p2), 'o painel agregado (escreveu, marcou, história) dá o mesmo com os textos cifrados');
   const conquistaVerso = (e) => (CC.conquistasComNivel(e, '2026-03-02').find((c) => c.id === 'notas') || {}).valor;
-  checar(conquistaVerso(CC.normalizarEstado(selado)) === 1 && conquistaVerso(CC.normalizarEstado(claro)) === 1, 'a conquista das notas em versículos conta igual sem decifrar');
+  // a nota antiga ("verso:") migra para o modelo novo: conta junto com a nota nova (n1), cifrada ou não
+  checar(conquistaVerso(CC.normalizarEstado(selado)) === 2 && conquistaVerso(CC.normalizarEstado(claro)) === 2, 'a conquista das notas em versículos conta igual sem decifrar');
+  const migradoSelado = CC.normalizarEstado(selado);
+  checar(ehCifrado(migradoSelado.notas['v:João 3.16'].texto) && ehCifrado(migradoSelado.notas.n1.texto) && ehCifrado(migradoSelado.notas.n1.tags)
+    && JSON.stringify(abrirEstado(migradoSelado, 'ana', K).notas['v:João 3.16'].texto) === '"SEGREDO-VERSO"',
+  'migrar o estado cifrado (sem abrir) não estraga o envelope: a nota antiga muda de lugar e o dono a abre');
 
   // --- migração e rotação, direto no banco ---
   const pastaM = mkdtempSync(join(tmpdir(), 'cc-cofre-'));
@@ -1226,7 +1231,8 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     checar((await pedir('/api/estado', meu, ana, 'PUT')).status === 200, 'o dono grava as anotações');
     checar(!/SEGREDO/.test(bancoBruto()), 'o arquivo do banco (com o WAL) não tem o texto em claro');
     const lido = await (await pedir('/api/estado', null, ana)).json();
-    checar(lido.oia[1].oracao === 'SEGREDO-ORACAO-ANA' && lido.anotacoes['verso:João 3.16'] === 'SEGREDO-VERSO-ANA' && lido.historia.antes === 'SEGREDO-HISTORIA-ANA',
+    checar(lido.oia[1].oracao === 'SEGREDO-ORACAO-ANA' && lido.notas['v:João 3.16'].texto === 'SEGREDO-VERSO-ANA' && lido.anotacoes['nota:x'] === 'SEGREDO-NOTA-ANA'
+      && !lido.anotacoes['verso:João 3.16'] && lido.historia.antes === 'SEGREDO-HISTORIA-ANA',
       'o dono lê de volta, em claro, pelo /api/estado');
     const outro = await (await pedir('/api/estado', null, bia)).text();
     checar(!/SEGREDO/.test(outro), 'outra pessoa não obtém o texto');

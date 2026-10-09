@@ -138,16 +138,18 @@
   const APAGADA_MS = 30 * 864e5;
   CC.DIAS_APAGADAS = 30;
   const numero = (x) => (Number(x) > 0 ? Number(x) : 0);
-  // O que vem de fora (o servidor também passa por aqui). Texto e tags podem chegar cifrados
-  // no servidor: string fora do formato fica como veio, sem ser cortada.
+  // O que vem de fora (o servidor também passa por aqui). Lido do banco sem abrir (amigos,
+  // célula, painel), texto e tags chegam cifrados ({ v, k, iv, tag, dado }, cofre.mjs): o
+  // envelope passa inteiro, sem ser cortado nem trocado por vazio.
+  const cifra = (x) => !!x && typeof x === 'object' && !Array.isArray(x);
   function limparNota(n) {
     if (!n || typeof n !== 'object') return null;
     return {
       versos: (Array.isArray(n.versos) ? n.versos : []).filter((r) => typeof r === 'string' && r.length <= 60).slice(0, 12),
       tipo: TIPOS_NOTA.includes(n.tipo) ? n.tipo : 'nota',
-      texto: typeof n.texto === 'string' ? n.texto : '',
+      texto: typeof n.texto === 'string' || cifra(n.texto) ? n.texto : '',
       tags: Array.isArray(n.tags) ? n.tags.filter((t) => typeof t === 'string').map((t) => t.slice(0, 30)).slice(0, 12)
-        : (typeof n.tags === 'string' ? n.tags : []),
+        : (typeof n.tags === 'string' || cifra(n.tags) ? n.tags : []),
       cor: [1, 2, 3, 4].includes(n.cor) ? n.cor : 0,
       fixada: !!n.fixada,
       respondidaEm: numero(n.respondidaEm),
@@ -166,7 +168,9 @@
     const anotacoes = { ...anot };
     const em = numero(e.atualizadoEm);
     for (const k of chaves) {
-      const texto = String(anotacoes[k] || '').trim();
+      // cifrada (lida do banco sem abrir), a nota antiga muda de lugar com o envelope inteiro:
+      // a cifra só depende da conta, e o dono a abre no lugar novo (notas.*.texto)
+      const texto = cifra(anotacoes[k]) ? anotacoes[k] : String(anotacoes[k] || '').trim();
       delete anotacoes[k];
       const id = 'v:' + k.slice(6);
       if (!texto || (notas[id] && notas[id].editadaEm >= em)) continue;
