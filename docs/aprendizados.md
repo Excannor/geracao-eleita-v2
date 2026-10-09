@@ -608,6 +608,14 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   passam rápido) foram para as curiosidades e para a conexão; a citação “Veja! Ele esta vivo!” (17.23) tem
   um erro de acento na própria NBV e virou paráfrase, para não parecer erro nosso. E o NT dá duas frases
   irmãs em Mt 12: "maior do que Salomão" (12.42, destaque) e "maior do que o templo" (12.6, "1 Reis e Cristo").
+- 2026-10-09 · desenho · 2 Reis: o manto caído de Elias, ao pé do redemoinho, saiu primeiro como concha (meia
+  elipse com dobras) e depois como moita (contorno ondulado) → pano amontoado no chão não se lê num desenho
+  pequeno; o manto saiu e ficou só o funil. O ferro do machado, em retângulo com o olho, parecia lata; com o
+  gume abrindo em leque, virou machado.
+- 2026-10-09 · conteúdo · 2 Reis: a autoria de 1 Reis já usava as fontes ("Livro da História dos Reis"); em
+  2 Reis, para não repetir o achado, a autoria ficou com o último fato datado (25.27) e o "até o dia de hoje"
+  (17.23). E Joaquim (2Rs 24–25) não é ligado a "Jeconias" de Mt 1.11-12: o mapa só diz que a lista de Mateus
+  atravessa o exílio, sem afirmar a identificação.
 
 ## Entrada, sessão e página inicial
 

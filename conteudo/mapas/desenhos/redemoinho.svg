@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o redemoinho que leva Elias ao céu (2Rs 2.11): o funil de vento em sálvia, largo em cima e fino embaixo, com as voltas riscadas por dentro, tocando o chão com uns rodopios de poeira. -->
+<path class="k" d="M10 102C40 99 80 99 110 102"/>
+<path class="k s" d="M22 18C22 12 98 12 98 18C96 30 78 40 70 52C64 62 58 76 54 92C50 86 52 72 50 60C46 46 26 34 22 18Z"/>
+<path class="h" d="M24 19C40 25 80 25 96 19M32 31C46 36 72 36 86 30M42 43C54 47 70 46 76 41M50 55C56 58 64 57 68 53M52 67C56 69 60 68 62 66M52 79C54 80 56 80 58 78"/>
+<path class="h" d="M40 96C44 92 48 92 50 95M60 95C62 92 66 92 70 96M34 99C36 97 38 97 40 98M72 98C74 96 76 96 78 98"/>
+</svg>
