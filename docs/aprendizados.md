@@ -598,6 +598,16 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
 - 2026-10-09 · revisão · Nesta rodada o agente escritor não tinha ferramenta para chamar um revisor → a
   revisão em voz alta e a folha do `rever-mapa` ficaram com o próprio escritor, campo por campo; o mapa fica
   marcado para a leitura do coordenador antes de ir ao ar.
+- 2026-10-09 · captura · Depois de cada `node build.mjs`, o servidor que já estava no ar entrega a página
+  velha sem os arquivos novos, e o `foto-conta` captura uma tela vazia de 844px sem erro → reiniciar o
+  servidor (pelo PID) depois de todo build e conferir a altura da captura antes de olhar. E 1 Reis tem uns
+  11.400px a 390: a 2x a captura não sai; com `ESCALA=1.5` sai inteira.
+- 2026-10-09 · tela · 1 Reis: "Fogo no Carmelo" (15 caracteres) cabe a 390 e quebra a 375 e 360 → virou
+  "Fogo do céu"; título com palavra longa no fim (Carmelo) pesa mais que a contagem.
+- 2026-10-09 · conteúdo · 1 Reis: em livro com 22 capítulos e seis ramos, os capítulos 13 a 16 (reis que
+  passam rápido) foram para as curiosidades e para a conexão; a citação “Veja! Ele esta vivo!” (17.23) tem
+  um erro de acento na própria NBV e virou paráfrase, para não parecer erro nosso. E o NT dá duas frases
+  irmãs em Mt 12: "maior do que Salomão" (12.42, destaque) e "maior do que o templo" (12.6, "1 Reis e Cristo").
 
 ## Entrada, sessão e página inicial
 
