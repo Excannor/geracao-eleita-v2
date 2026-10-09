@@ -175,10 +175,18 @@
 .linha-feita { stroke: var(--no-lido); }
 .linha-adiante { stroke: var(--tinta-fraca); stroke-dasharray: 1 8; }
 .no-linha { z-index: 1; margin-bottom: 20px; }
-.no-linha.hoje { margin: 44px 0 52px; z-index: 3; }
-/* hoje no último dia da unidade: o cartão de hoje, mais alto que o nó, passa do meio da tela;
-   o troféu, que vem logo depois no meio, desce um pouco para não encostar nele */
-.no-linha.hoje + .linha-marco { margin-top: 28px; }
+/* Passo vertical igual em toda a trilha: cada dia e cada baú ocupam 58px + 20px, o de hoje
+   também. O cartão de hoje (absoluto, ao lado) e a bolinha maior não ocupam fluxo; antes a linha
+   de hoje tinha 44px acima e 52px abaixo, o baú pronto 44px acima, e a estrada fazia um trecho
+   reto e esticado ali. O troféu tem o passo dele, sempre o mesmo. */
+.no-linha.hoje { z-index: 3; }
+.no-linha.com-balao { margin-top: 0; }
+.linha-bau > .deslocado { height: 58px; justify-content: center; }
+/* Tocar não mexe em nada além de abrir o balão: sem encolher o nó (o scale(.93) de :active e
+   .aberto em estilo.css, o scale(.96) do baú e do troféu em 01-base.css) e sem o quadrado azul
+   de toque do Android por cima dele. */
+.no, .no-bau, .no-marco { -webkit-tap-highlight-color: transparent; }
+.no:active, .no.aberto, .no-bau:active, .no-marco:active { transform: none; }
 
 /* nós: lido claro com ícone escuro, hoje sálvia com anel, adiante escuro com cadeado */
 .no { width: 58px; height: 58px; }
@@ -213,17 +221,22 @@
 /* o cartão de hoje, ao lado do nó de hoje */
 .cartao-no-hoje {
   position: absolute; top: 50%; z-index: 2; transform: translateY(-50%);
-  display: flex; flex-direction: column; gap: 2px;
-  width: min(200px, calc(50% + var(--xa, 0px) - 50px));
-  padding: 12px 12px 12px 16px; border-radius: 24px; background: var(--cartao); color: var(--tinta-forte);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 10px; row-gap: 1px;
+  width: min(220px, calc(50% + var(--xa, 0px) - 50px));
+  padding: 10px 10px 10px 14px; border-radius: 22px; background: var(--cartao); color: var(--tinta-forte);
+  /* baixo (cerca de 80px), para caber no passo da trilha sem encostar nos dias vizinhos */
 }
+.cartao-no-hoje > :not(.botao-pilula) { grid-column: 1; min-width: 0; }
+.cartao-no-hoje > .botao-pilula { grid-column: 2; grid-row: 1 / span 3; width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 0; border-radius: 50%; }
+.cartao-no-hoje > .botao-pilula svg { width: 20px; height: 20px; }
+
 .cartao-no-hoje.lado-esq { right: calc(50% - var(--x, 0px) + 50px); }
 .cartao-no-hoje.lado-dir { left: calc(50% + var(--x, 0px) + 50px); }
 .cartao-no-hoje::after { content: ''; position: absolute; top: 50%; width: 12px; height: 12px; margin-top: -6px; background: var(--cartao); transform: rotate(45deg); }
 .cartao-no-hoje.lado-esq::after { right: -5px; }
 .cartao-no-hoje.lado-dir::after { left: -5px; }
 .rot-hoje { color: var(--salvia-texto); font-size: .75rem; font-weight: 700; }
-.cartao-no-hoje b { color: var(--tinta-forte); font-size: 1.0625rem; font-weight: 700; line-height: 1.25; }
+.cartao-no-hoje b { color: var(--tinta-forte); font-size: 1rem; font-weight: 700; line-height: 1.25; }
 .sub-hoje { color: var(--tinta-fraca); font-size: .75rem; font-weight: 500; line-height: 1.35; }
 .botao-pilula {
   display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; margin-top: 8px; padding: 0 12px;
@@ -237,6 +250,12 @@
    de seletor devolve a tinta escura, como no claro) */
 .balao, .balao.balao-bau, :root[data-tema="escuro"] .balao.balao-bau { bottom: calc(100% + 18px); padding: 6px 14px; border: 0; border-radius: 999px; background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
 .balao::after { border: 0; background: var(--salvia); }
+/* o "Abrir" do baú fica ao lado dele, do lado com espaço, com a ponta voltada para o baú */
+.balao.balao-bau, :root[data-tema="escuro"] .balao.balao-bau { top: 50%; bottom: auto; left: calc(100% + 12px); transform: translateY(-50%); animation: cutucar-bau 1.8s ease-in-out infinite; }
+.balao.balao-bau.lado-esq, :root[data-tema="escuro"] .balao.balao-bau.lado-esq { left: auto; right: calc(100% + 12px); --cutuca: 4px; }
+.balao.balao-bau::after { top: 50%; left: 0; margin: -6px 0 0 -5px; }
+.balao.balao-bau.lado-esq::after { left: auto; right: 0; margin: -6px -5px 0 0; }
+@keyframes cutucar-bau { 50% { transform: translate(var(--cutuca, -4px), -50%); } }
 .no-bau svg, .no-marco .arte-trofeu { width: 64px; }
 .no-marco { padding: 8px; background: var(--cartao); box-shadow: inset 0 0 0 1.5px var(--contorno); }
 .no-marco.ganho { box-shadow: inset 0 0 0 2px var(--salvia); }
@@ -274,8 +293,9 @@
 /* a seta que volta ao dia de hoje */
 .trilha ~ .ir-atual { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--inverso); color: var(--inverso-tinta); box-shadow: var(--sombra-flutuante); }
 .trilha ~ .ir-atual svg { width: 22px; height: 22px; }
-/* com um balão aberto, a seta sai da frente dele (ela cobria o botão do balão no canto) */
-.trilha:has(.pop-no) ~ .ir-atual { visibility: hidden; }
+/* com um balão aberto, a seta passa para baixo dele (ela cobria o botão do balão no canto).
+   Antes ela sumia: era mais uma coisa mudando na tela a cada toque, longe do balão. */
+.trilha:has(.pop-no) ~ .ir-atual { z-index: 14; }
 
 /* folha da unidade: o nome quebra equilibrado; "Ir para o dia" é o botão principal, escuro */
 .cabeca-folha-unidade { gap: 16px; margin-bottom: 16px; }
