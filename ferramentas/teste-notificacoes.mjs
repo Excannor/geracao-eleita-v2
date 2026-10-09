@@ -16,6 +16,7 @@ const PORTA = 8213;
 const PORTA_PUSH = 8214;
 const PASTA = join(tmpdir(), 'cc-notificacoes');
 const FUSO = 'America/Sao_Paulo';
+const { TEXTOS } = await import(pathToFileURL(join(AQUI, 'notificacoes.mjs')).href);
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let falhas = 0;
@@ -117,13 +118,13 @@ const [teste] = await esperarPush(celBento, 1);
 const cab = (recebidos.find((r) => r.caminho === '/bento') || {}).cabecalhos || {};
 ok(cab['content-encoding'] === 'aes128gcm' && /^vapid t=[\w-]+\.[\w-]+\.[\w-]+, k=[\w-]+$/.test(cab.authorization || '') && Number(cab.ttl) > 0,
   'o push sai criptografado (aes128gcm), assinado (VAPID) e com validade');
-ok(teste && /Tudo certo/.test(teste.titulo) && teste.url, 'o celular decifra a notificação de teste: "' + (teste && teste.titulo) + '"');
+ok(teste && TEXTOS.teste.some(([t]) => t === teste.titulo) && teste.url, 'o celular decifra a notificação de teste: "' + (teste && teste.titulo) + '"');
 
 // ---------- amizade: convite aceito ----------
 const convite = await pedirJson('/api/convites', {}, ana);
 await pedirJson('/api/convites/aceitar', { token: new URL(convite.link).searchParams.get('convite') }, bento);
 const daAna = await esperarPush(celAna, 1);
-ok(daAna.some((m) => /Bento topou ler junto/.test(m.titulo) && /amigos/.test(m.url)), 'quem convidou é avisado quando o convite é aceito');
+ok(daAna.some((m) => /Bento/.test(m.titulo + m.corpo) && TEXTOS.aceito.some(([t]) => t.replace('{amigo}', 'Bento') === m.titulo) && /amigos/.test(m.url)), 'quem convidou é avisado quando o convite é aceito');
 
 // ---------- Notificar: um por amigo por dia ----------
 await ler(ana);
@@ -133,7 +134,7 @@ const toque = await pedirJson('/api/toques', { para: 'bento' }, ana);
 ok(toque.resultado === 'enviado', 'a Ana leu e notifica o Bento, que ainda não leu');
 const aposToque = await esperarPush(celBento, antesDoToque + 1);
 const msgToque = aposToque[aposToque.length - 1];
-ok(msgToque && /Ana/.test(msgToque.titulo) && !/Clara/.test(msgToque.titulo) && msgToque.tag === 'toque', 'o Bento recebe o toque com o primeiro nome da Ana');
+ok(msgToque && /Ana/.test(msgToque.titulo + msgToque.corpo) && !/Clara/.test(msgToque.titulo + msgToque.corpo) && msgToque.tag === 'toque', 'o Bento recebe o toque com o primeiro nome da Ana');
 // Decisão do dono (01/10): todo toque vira notificação no celular de quem recebe. O segundo
 // toque do mesmo amigo no dia não conta de novo (resultado "ja"), mas chega no celular.
 const denovo = await pedirJson('/api/toques', { para: 'bento' }, ana);
@@ -154,7 +155,7 @@ await dormir(300);
 let n = doAparelho(celBento).length;
 await pedirJson('/api/toques', { para: 'bento' }, outros[0]);
 const segundo = await esperarPush(celBento, n + 1);
-ok(segundo.length === n + 1 && /Carla e mais \d/.test(segundo[segundo.length - 1].titulo), 'o toque seguinte do dia vem agrupado: "Carla e mais N"');
+ok(segundo.length === n + 1 && /Carla e mais \d/.test(segundo[segundo.length - 1].titulo + segundo[segundo.length - 1].corpo), 'o toque seguinte do dia vem agrupado: "Carla e mais N"');
 
 await pedirJson('/api/notificacoes/preferencias', { amigos: false }, bento);
 n = doAparelho(celBento).length;

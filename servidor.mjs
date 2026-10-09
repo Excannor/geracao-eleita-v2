@@ -24,7 +24,7 @@ import {
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
 } from './db.mjs';
 import {
-  Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio,
+  Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio, leituraDoDia,
   MAX_TOQUES_RECEBIDOS_DIA,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
@@ -73,9 +73,12 @@ const TIPOS = {
 // O servidor carrega o mesmo arquivo, para os dois lados nunca discordarem.
 // O plano do conteúdo: os propósitos de livro precisam saber por onde cada dia passa.
 let PLANO_DO_CONTEUDO = [];
+// As reflexões dão o "tema" do dia aos lembretes ("a reflexão de hoje se chama ...").
+let REFLEXOES_DO_CONTEUDO = {};
 function carregarRegras() {
   const D = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conteudo.json'), 'utf8'));
   PLANO_DO_CONTEUDO = D.plano;
+  REFLEXOES_DO_CONTEUDO = D.reflexoes || {};
   const contexto = createContext({
     window: { DADOS: D }, console, Date, Math, JSON, Object, Set, Map, Number, String, Array, Boolean, Intl,
     localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
@@ -906,7 +909,7 @@ async function rodadaDeLembretes(agora = new Date()) {
     const data = hojeNoFuso(conta.fuso, agora);
     const minutos = minutosNoFuso(conta.fuso, agora);
     if (emSilencio(minutos)) continue;
-    const { feitas, protegidos } = await diaDe(usuario, data);
+    const { estado, feitas, protegidos } = await diaDe(usuario, data);
     const ontem = somaDias(data, -1);
     let ofensiva = 0;
     for (let d = ontem; (feitas.has(d) || protegidos.has(d)) && ofensiva < 5000; d = somaDias(d, -1)) ofensiva++;
@@ -925,7 +928,9 @@ async function rodadaDeLembretes(agora = new Date()) {
     if (!decisao) continue;
     // Anota antes de mandar: se o serviço demorar, a rodada seguinte não repete o aviso.
     await NOTIFICACOES.anotar(usuario, decisao.tipo, data, minutos);
-    const mensagem = montarMensagem(decisao.tipo, decisao.dados, { usuario, data, nome: await nomeDeExibicao(usuario) });
+    // A leitura em que a pessoa está entra nos dados: o aviso pode dizer o que tem hoje.
+    const doDia = leituraDoDia(PLANO_DO_CONTEUDO, REFLEXOES_DO_CONTEUDO, estado);
+    const mensagem = montarMensagem(decisao.tipo, { ...decisao.dados, ...doDia }, { usuario, data, nome: await nomeDeExibicao(usuario) });
     await enviarPara(usuario, mensagem, { ttl: 3 * 3600 });
     saiu.push({ usuario, tipo: decisao.tipo, titulo: mensagem.titulo });
   }

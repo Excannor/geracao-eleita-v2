@@ -875,5 +875,153 @@ secao('painel pastoral agregado (Fase 5, seção 2)');
   }
 }
 
+// =========================================================================
+secao('notificações: as frases');
+// =========================================================================
+// O que chega no celular: variado (para não cansar), curto (o push corta), leve (sem culpa,
+// sem ameaça, sem pressão pela sequência) e, quando cita a Bíblia, palavra por palavra da NBV.
+{
+  const N = await import('./notificacoes.mjs');
+  const T = N.TEXTOS;
+  const nbv = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', 'nbv.json'), 'utf8')).livros;
+  const FREQUENTES = ['lembreteComOfensiva', 'lembreteSemOfensiva', 'lembreteManha', 'lembreteMeio', 'ofensiva',
+    'voltaDiario', 'voltaValor', 'voltaSaudade', 'toque', 'metaDoGrupo'];
+  const SERIOS = ['querConversar', 'querBatismo', 'discipuladoConvite', 'discipuladoAceito', 'pedidoConduz', 'possoAjudar',
+    'denunciaPerigo', 'celulaMultiplicada'];
+  const poucas = Object.entries(T).filter(([k, v]) => v.length < (FREQUENTES.includes(k) ? 12 : 4)).map(([k, v]) => k + ' ' + v.length);
+  checar(!poucas.length, 'os avisos frequentes têm 12 frases ou mais, e os raros, 4 ou mais' + (poucas.length ? ' (' + poucas.join(', ') + ')' : ''));
+  checar(FREQUENTES.every((k) => T[k]), 'as listas frequentes existem');
+
+  // Os marcadores que cada lista pode usar (o que montarMensagem preenche para aquele tipo).
+  const LEITURA = ['nome', 'leitura', 'tema'];
+  const PERMITIDOS = {
+    lembreteComOfensiva: [...LEITURA, 'nDias'], lembreteSemOfensiva: LEITURA, lembreteMarco: [...LEITURA, 'marco'],
+    lembreteDomingo: LEITURA, lembreteManha: LEITURA, lembreteMeio: LEITURA, ofensiva: [...LEITURA, 'nDias'],
+    escudo: [...LEITURA, 'nDias'], volta3: LEITURA, volta7: LEITURA, volta14: LEITURA, voltaDiario: LEITURA,
+    voltaValor: LEITURA, voltaSaudade: LEITURA, toque: ['nome', 'amigo'], toques: ['nome', 'amigo', 'outros'],
+    metaDoGrupo: ['nome', 'titulo', 'faltamTexto'], metaBatida: ['nome', 'titulo'], celulaMultiplicada: ['filha', 'novoLider'],
+    desafioGrupo: ['amigo', 'quem', 'titulo'], querConversar: ['nome'], querBatismo: ['nome'], teste: [],
+    propositoConvite: ['amigo', 'titulo'], propositoAceito: ['amigo', 'titulo'], denunciaPerigo: [],
+  };
+  const permitidos = (k) => PERMITIDOS[k] || ['nome', 'amigo'];
+  const marcadoresRuins = Object.entries(T).flatMap(([k, v]) => v.flatMap((par) =>
+    [...par.join(' ').matchAll(/\{(\w+)\}/g)].map((m) => m[1]).filter((m) => !permitidos(k).includes(m)).map((m) => k + ': {' + m + '}')));
+  checar(!marcadoresRuins.length, 'toda frase usa só marcadores que o tipo dela preenche' + (marcadoresRuins.length ? ' (' + marcadoresRuins.slice(0, 5).join(', ') + ')' : ''));
+  const chavesSoltas = Object.entries(T).flatMap(([k, v]) => v.filter((par) => par.some((s) => /[{}]/.test(s.replace(/\{\w+\}/g, '')))).map(() => k));
+  checar(!chavesSoltas.length, 'nenhuma chave solta ou marcador malformado' + (chavesSoltas.length ? ' (' + chavesSoltas.join(', ') + ')' : ''));
+  // Cada lista com marcador opcional ({nome}, {leitura}, {tema}) tem frases que não dependem dele.
+  const dependentes = Object.entries(T).filter(([k]) => !['querConversar', 'querBatismo'].includes(k)).filter(([, v]) => v.every((par) => /\{(nome|leitura|tema)\}/.test(par.join(' '))));
+  checar(!dependentes.length, 'toda lista tem frase que sai mesmo sem nome e sem a leitura do dia' + (dependentes.length ? ' (' + dependentes.map(([k]) => k).join(', ') + ')' : ''));
+
+  // Tamanho, com os valores mais compridos que podem chegar.
+  const leituras = D.plano.map((d) => [d.antigo, d.novo].filter(Boolean).join(' · '));
+  const temas = Object.values(D.reflexoes).flat().map((r) => r.titulo);
+  const maior = (xs) => xs.reduce((a, b) => (b.length > a.length ? b : a), '');
+  const EXEMPLO = {
+    nome: 'Maximiliano', amigo: 'Maximiliano', outros: 12, titulo: 'Novo Testamento com a família', quem: 'a célula Esperança',
+    nDias: '365 dias', marco: 365, faltamTexto: 'duas leituras', filha: 'Célula Esperança Norte', novoLider: 'Maximiliano',
+    leitura: maior(leituras), tema: maior(temas),
+  };
+  const encher = (s) => s.replace(/\{(\w+)\}/g, (_, k) => String(EXEMPLO[k]));
+  const longos = Object.entries(T).flatMap(([k, v]) => v.filter(([t, c]) => encher(t).length > 40 || encher(c).length > 110)
+    .map(([t, c]) => k + ': ' + encher(t).length + '/' + encher(c).length + ' ' + t));
+  checar(!longos.length, 'título até 40 e corpo até 110 caracteres, com nome, leitura e tema dos mais compridos' + (longos.length ? ' (' + longos.join('; ') + ')' : ''));
+
+  // Tom: nada de culpa, ameaça, chantagem emocional ou pressão pela sequência.
+  const PROIBIDAS = /perd[ae]|perdeu|perdid|vai acabar|acab(a|ou) hoje|decepcion|[úu]ltima chance|trist|abandon|falhou|falha\b|culpa|vergonha|deveria|obriga[çc]|esqueceu|n[ãa]o deixe|n[ãa]o quebr|quebr(a|ar)|meia-noite|ainda d[áa] tempo|urgente|em risco|apag|mant(er|[ée]m|enha)|sentimos sua falta|saudade|sumiu|sumid|chateado|desist|zer(a|ou|ar)\b|jornada|mergulh|desvend/i;
+  const todas = Object.entries(T).flatMap(([k, v]) => v.map((par) => [k, par]));
+  const comProibida = todas.filter(([, par]) => PROIBIDAS.test(par.join(' ').replace(/"[^"]*"|“[^”]*”/g, ' ')));
+  checar(!comProibida.length, 'nenhuma frase cobra, culpa, ameaça ou pressiona pela sequência' + (comProibida.length ? ' (' + comProibida.map(([k, p]) => k + ': ' + p.join(' | ')).slice(0, 4).join('; ') + ')' : ''));
+  checar(!todas.some(([, par]) => /[—–;]/.test(par.join(' '))), 'nenhuma frase usa travessão ou ponto e vírgula');
+  const emojis = (s) => (s.match(/\p{Extended_Pictographic}/gu) || []).length;
+  const muitosEmojis = todas.filter(([, par]) => emojis(par.join(' ')) > 1);
+  checar(!muitosEmojis.length, 'no máximo um emoji por aviso' + (muitosEmojis.length ? ' (' + muitosEmojis.map(([k, p]) => k + ': ' + p[0]).join('; ') + ')' : ''));
+  const comEmoji = todas.filter(([, par]) => emojis(par.join(' '))).length;
+  checar(comEmoji < todas.length * 0.75, 'nem todo aviso tem emoji (' + comEmoji + ' de ' + todas.length + ')');
+  checar(SERIOS.every((k) => T[k].every((par) => !emojis(par.join(' ')))), 'os avisos sérios (conversa, discipulado, cuidado, célula) não têm emoji');
+  // Concordância neutra: quem recebe pode ser homem ou mulher.
+  const generoMarcado = todas.filter(([, par]) => /\b(bem-vind[oa]|sozinh[oa]|cansad[oa]|querid[oa]|deitad[oa]|sumid[oa]|lindo|linda|amigão|amigona|vocês dois|vocês duas|o líder|a líder)\b/i
+    .test(par.join(' ').replace(/"[^"]*"|“[^”]*”/g, ' ')));
+  checar(!generoMarcado.length, 'nenhuma frase presume o gênero de quem recebe' + (generoMarcado.length ? ' (' + generoMarcado.map(([k, p]) => k + ': ' + p.join(' | ')).join('; ') + ')' : ''));
+
+  // Sem frase repetida entre listas: trocar de lista de um dia para o outro também não repete.
+  const titulos = todas.map(([, [t]]) => t);
+  const corpos = todas.map(([, [, c]]) => c);
+  const repetidos = [...titulos.filter((t, i) => titulos.indexOf(t) !== i), ...corpos.filter((c, i) => corpos.indexOf(c) !== i)];
+  checar(!repetidos.length, 'nenhum título nem corpo se repete em toda a tabela' + (repetidos.length ? ' (' + repetidos.join('; ') + ')' : ''));
+
+  // Citações: toda frase entre aspas com referência está, palavra por palavra, na NBV.
+  const LIVROS = { Lm: 'Lamentações', Sl: 'Salmos', Mt: 'Mateus', Mc: 'Marcos', Lc: 'Lucas', Ne: 'Neemias', Is: 'Isaías',
+    Ec: 'Eclesiastes', '1Ts': '1 Tessalonicenses', Rm: 'Romanos', Jo: 'João', Pv: 'Provérbios' };
+  const normalizar = (t) => String(t).normalize('NFC').toLowerCase().replace(/[“”"'‘’«».,;:!?()[\]…—–-]/g, ' ').replace(/\s+/g, ' ').trim();
+  const foraDaNbv = [];
+  let citacoes = 0;
+  for (const [k, par] of todas) {
+    const texto = par.join(' ');
+    const refs = [...texto.matchAll(/\((1Ts|[A-Z][a-z]) (\d+)\.(\d+)\)/g)];
+    const aspas = [...texto.matchAll(/"([^"]+)"|“([^”]+)”/g)].map((m) => m[1] || m[2]).filter((q) => !/\{\w+\}/.test(q));
+    if (aspas.length && !refs.length) foraDaNbv.push(k + ': citação sem referência (' + aspas[0] + ')');
+    for (const r of refs) {
+      const livro = LIVROS[r[1]];
+      const verso = livro && ((nbv[livro] || [])[Number(r[2]) - 1] || [])[Number(r[3]) - 1];
+      if (!verso) { foraDaNbv.push(k + ': referência que não existe (' + r[0] + ')'); continue; }
+      for (const q of aspas) { citacoes++; if (!normalizar(verso).includes(normalizar(q))) foraDaNbv.push(k + ': ' + q + ' ' + r[0]); }
+    }
+  }
+  checar(citacoes >= 20, 'os avisos citam a Bíblia com frequência (' + citacoes + ' citações)');
+  checar(!foraDaNbv.length, 'toda citação dos avisos está, palavra por palavra, na NBV, com a referência certa' + (foraDaNbv.length ? ' (' + foraDaNbv.join('; ') + ')' : ''));
+
+  // Sem repetir em dias seguidos: para cada lista, 40 pessoas, 400 dias seguidos.
+  const CHEIO = { nome: 'Ana', amigo: 'Bento', outros: 2, titulo: 'Grupo', quem: 'você', nDias: '5 dias', marco: 7, faltamTexto: 'uma leitura',
+    filha: 'Célula Nova', novoLider: 'Caio', leitura: 'Gênesis 1-3 · Mateus 1', tema: 'Muito bom' };
+  const datas = Array.from({ length: 400 }, (_, i) => somaDias('2026-01-01', i));
+  let repetiu = [];
+  let cicloIncompleto = [];
+  for (const [k, lista] of Object.entries(T)) {
+    for (let u = 0; u < 40; u++) {
+      const escolhas = datas.map((dt) => N.escolherFrase(k, lista, CHEIO, 'pessoa' + u, dt));
+      for (let i = 1; i < escolhas.length; i++) if (lista.length > 1 && escolhas[i] === escolhas[i - 1]) repetiu.push(k + ' pessoa' + u + ' ' + datas[i]);
+      if (new Set(escolhas.slice(0, lista.length)).size !== lista.length) cicloIncompleto.push(k + ' pessoa' + u);
+    }
+  }
+  checar(!repetiu.length, 'a mesma pessoa nunca recebe a mesma frase em dois dias seguidos, em lista nenhuma' + (repetiu.length ? ' (' + repetiu.slice(0, 3).join(', ') + ')' : ''));
+  checar(!cicloIncompleto.length, 'a lista inteira passa antes de uma frase voltar' + (cicloIncompleto.length ? ' (' + cicloIncompleto.slice(0, 3).join(', ') + ')' : ''));
+  // A virada do ano não quebra a regra (a conta é por dia corrido, não por dia do ano).
+  const virada = ['2026-12-31', '2027-01-01'].map((dt) => N.escolherFrase('toque', T.toque, CHEIO, 'ana', dt));
+  checar(virada[0] !== virada[1], 'na virada do ano também não repete');
+  // Pessoas diferentes no mesmo dia recebem frases diferentes (não é todo mundo igual).
+  const noMesmoDia = new Set(Array.from({ length: 30 }, (_, u) => N.escolherFrase('lembreteComOfensiva', T.lembreteComOfensiva, CHEIO, 'p' + u, '2026-10-09')));
+  checar(noMesmoDia.size >= 6, 'no mesmo dia, pessoas diferentes recebem frases diferentes (' + noMesmoDia.size + ' de 30)');
+  checar(N.escolherFrase('ofensiva', T.ofensiva, CHEIO, 'ana', '2026-10-09') === N.escolherFrase('ofensiva', T.ofensiva, CHEIO, 'ana', '2026-10-09'),
+    'a escolha é determinística: mesma pessoa, lista e dia dão a mesma frase');
+
+  // Pelo caminho de verdade (montarMensagem), com o lembrete da noite de quem lê há dias.
+  const monta = (tipo, dados, data, nome = 'Ana Souza') => N.montarMensagem(tipo, dados, { usuario: 'ana', data, nome });
+  const noite = datas.slice(0, 60).map((dt) => monta('lembrete', { ofensiva: 12, slot: 19 * 60, ...CHEIO }, dt));
+  checar(noite.every((m, i) => !i || m.titulo !== noite[i - 1].titulo), 'o lembrete da noite não repete o título em dias seguidos');
+  checar(noite.every((m) => !/[{}]/.test(m.titulo + m.corpo) && m.titulo.length <= 40 && m.corpo.length <= 110), 'o lembrete sai preenchido e dentro do tamanho');
+  const semDados = datas.slice(0, 30).map((dt) => monta('volta', { dias: 5 }, dt, ''));
+  checar(semDados.every((m) => !/[{}]/.test(m.titulo + m.corpo) && !/\bOi,?\s*[.!]|, \./.test(m.titulo + m.corpo)), 'sem nome e sem a leitura do dia, a frase escolhida não fica com buraco');
+  checar(semDados.every((m, i) => !i || m.titulo !== semDados[i - 1].titulo), 'e também não repete em dias seguidos');
+  const umDia = datas.slice(0, 40).map((dt) => monta('escudo', { ofensiva: 1 }, dt));
+  checar(umDia.every((m) => !/\b1 dias\b/.test(m.titulo + m.corpo)), 'com 1 dia, o aviso diz "1 dia", não "1 dias"');
+  const meta = datas.slice(0, 40).map((dt) => monta('metaDoGrupo', { faltam: 1, titulo: 'Grupo', id: 'g' }, dt));
+  checar(meta.every((m) => !/Faltam 1\b|\b1 leituras/.test(m.titulo + m.corpo)) && meta.some((m) => /uma leitura/.test(m.titulo + m.corpo)),
+    'a meta do grupo concorda com o número ("uma leitura", nunca "faltam 1")');
+  const conversa = monta('querConversar', { nome: 'Bia Lima', deUsuario: 'bia' }, '2026-10-09', 'Ana Souza');
+  checar(/Bia/.test(conversa.titulo + conversa.corpo) && !/Ana/.test(conversa.titulo + conversa.corpo),
+    'no "quer conversar", o nome é de quem pediu a conversa, não de quem recebe');
+
+  // A leitura do dia que o servidor manda junto: o mesmo dia que o app abre.
+  const lido = (lidos, dia) => N.leituraDoDia(D.plano, D.reflexoes, { lidos, dia });
+  const passagem = (n) => [D.plano[n - 1].antigo, D.plano[n - 1].novo].filter(Boolean).join(' · ');
+  checar(lido([1, 2], 1).leitura === passagem(3), 'a leitura do dia é a primeira não lida (dia 3 para quem leu 1 e 2)');
+  checar(lido([1, 2], 40).leitura === passagem(40), 'ou o dia escolhido, se ainda não foi lido');
+  checar(lido([], undefined).tema === D.reflexoes[1][0].titulo, 'o tema é o título da reflexão daquele dia');
+  checar(!lido(D.plano.map((d) => d.numero), 365).leitura, 'quem leu tudo não recebe leitura inventada');
+  const comLeitura = datas.slice(0, 60).map((dt) => monta('lembrete', { ofensiva: 0, slot: 19 * 60, ...lido([1, 2], 1) }, dt));
+  checar(comLeitura.some((m) => m.corpo.includes(passagem(3))), 'o lembrete às vezes fala da leitura de hoje pelo nome');
+}
+
 console.log('\n  ' + contagem + ' checagens' + (falhas ? ' · ' + falhas + ' FALHA(S)\n' : ' · todas passaram\n'));
 process.exit(falhas ? 1 : 0);
