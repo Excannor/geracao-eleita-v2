@@ -1,0 +1,80 @@
+{
+  "titulo": "O fariseu e o publicano",
+  "ref": "Lc 18.9-14",
+  "grupo": "lucas",
+  "linha": "Dois homens oram no templo, e só um volta perdoado",
+  "desenho": "templo-perto-e-longe",
+  "desenhoLista": "longe-do-templo",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus acaba de contar a história da viúva que não desiste de pedir justiça ao juiz. Ele quer que os discípulos orem sempre.",
+          "ref": "Lc 18.1-8"
+        },
+        {
+          "texto": "Agora ele conta outra história sobre oração. Desta vez, ele fala para gente que se acha boa e despreza os outros.",
+          "ref": "Lc 18.9"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Dois homens vão ao templo orar. Um é fariseu, e o outro é cobrador de impostos.",
+          "ref": "Lc 18.10"
+        },
+        {
+          "texto": "O fariseu fica em pé e agradece a Deus por não ser como os outros, ainda mais como aquele cobrador de impostos ali.",
+          "ref": "Lc 18.11"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "moedas-de-prata",
+              "titulo": "O fariseu",
+              "fala": "dou a Deus o dízimo de tudo quanto ganho",
+              "ref": "Lc 18.12"
+            },
+            {
+              "desenho": "longe-do-templo",
+              "titulo": "O cobrador de impostos",
+              "fala": "Ó Deus, tenha misericórdia de mim, um pecador!",
+              "ref": "Lc 18.13"
+            }
+          ]
+        },
+        {
+          "texto": "O cobrador de impostos fica de longe. Ele não tem coragem nem de levantar os olhos para o céu e bate no peito enquanto ora.",
+          "ref": "Lc 18.13"
+        },
+        {
+          "texto": "Jesus diz que o cobrador de impostos volta para casa perdoado, e o fariseu não.",
+          "ref": "Lc 18.14"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O fariseu ora contando as qualidades dele e os pecados dos outros. O cobrador de impostos não tem nada para mostrar e só pede misericórdia. Deus perdoa quem chega assim.",
+    "apoio": "Jesus fecha com uma regra. “quem se exalta será humilhado, e quem se humilha será exaltado”.",
+    "ref": "Lc 18.9-14"
+  },
+  "perguntas": [
+    "Com quem você costuma se comparar quando ora?",
+    "O que você diria a Deus hoje se só pudesse pedir misericórdia?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 18.1-8",
+      "titulo": "A viúva e o juiz",
+      "slug": "viuva-e-juiz",
+      "rotulo": "Da mesma conversa",
+      "linha": "a viúva volta tantas vezes que o juiz cede"
+    }
+  ]
+}

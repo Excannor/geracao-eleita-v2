@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o fariseu e o cobrador de impostos no templo (Lc 18.10-13): à direita, o templo com as duas colunas e a porta; no chão, dois pares de pegadas de pés parados, virados para o templo, um bem na frente da porta e o outro lá atrás, longe, no canto esquerdo. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A porta do templo é a única área sálvia. -->
+<path class="k" d="M2 94H158"/>
+<path class="k p" d="M92 94V41H132V94Z"/>
+<path class="k p" d="M88 41H136V35H88Z"/>
+<path class="h" d="M92 53H132M92 65H104M120 65H132M92 77H104M120 77H132"/>
+<path class="k s" d="M105 94V71C105 62 119 62 119 71V94Z"/>
+<path class="k p" d="M78 94V49H85V94Z"/>
+<path class="k p" d="M139 94V49H146V94Z"/>
+<path class="k p" d="M76 49C74 43 76 39 81.5 39C87 39 89 43 87 49Z"/>
+<path class="k p" d="M137 49C135 43 137 39 142.5 39C148 39 150 43 148 49Z"/>
+<path class="h" d="M78.5 40L81.5 44L84.5 40M139.5 40L142.5 44L145.5 40M78 56H85M139 56H146M78 87H85M139 87H146"/>
+<g transform="translate(105.5 110) rotate(-6) scale(-1 1)"><path class="k p" d="M0.5-7.8C4.9-7.8 5.7-2.6 4.4 2C3.4 5.2 3.4 7.8 2.1 9.9C1 11.4-2.1 11.4-3.1 9.9C-4.4 7.8-3.9 3.9-4.7 0C-5.2-3.9-3.9-7.8 0.5-7.8Z"/><circle class="e" cx="-3.9" cy="-12.2" r="1.4"/><circle class="e" cx="-0.5" cy="-13.8" r="1.6"/><circle class="e" cx="3.1" cy="-13" r="1.4"/></g>
+<g transform="translate(118.5 110) rotate(6)"><path class="k p" d="M0.5-7.8C4.9-7.8 5.7-2.6 4.4 2C3.4 5.2 3.4 7.8 2.1 9.9C1 11.4-2.1 11.4-3.1 9.9C-4.4 7.8-3.9 3.9-4.7 0C-5.2-3.9-3.9-7.8 0.5-7.8Z"/><circle class="e" cx="-3.9" cy="-12.2" r="1.4"/><circle class="e" cx="-0.5" cy="-13.8" r="1.6"/><circle class="e" cx="3.1" cy="-13" r="1.4"/></g>
+<g transform="translate(13.5 110) rotate(-6) scale(-1 1)"><path class="k p" d="M0.5-7.8C4.9-7.8 5.7-2.6 4.4 2C3.4 5.2 3.4 7.8 2.1 9.9C1 11.4-2.1 11.4-3.1 9.9C-4.4 7.8-3.9 3.9-4.7 0C-5.2-3.9-3.9-7.8 0.5-7.8Z"/><circle class="e" cx="-3.9" cy="-12.2" r="1.4"/><circle class="e" cx="-0.5" cy="-13.8" r="1.6"/><circle class="e" cx="3.1" cy="-13" r="1.4"/></g>
+<g transform="translate(26.5 110) rotate(6)"><path class="k p" d="M0.5-7.8C4.9-7.8 5.7-2.6 4.4 2C3.4 5.2 3.4 7.8 2.1 9.9C1 11.4-2.1 11.4-3.1 9.9C-4.4 7.8-3.9 3.9-4.7 0C-5.2-3.9-3.9-7.8 0.5-7.8Z"/><circle class="e" cx="-3.9" cy="-12.2" r="1.4"/><circle class="e" cx="-0.5" cy="-13.8" r="1.6"/><circle class="e" cx="3.1" cy="-13" r="1.4"/></g>
+</svg>

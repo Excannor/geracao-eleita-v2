@@ -71,5 +71,14 @@
   "perguntas": [
     "Por qual coisa você já parou de orar porque cansou de esperar?",
     "Que pedido você precisa voltar a fazer a Deus esta semana?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 18.9-14",
+      "titulo": "O fariseu e o publicano",
+      "slug": "fariseu-e-publicano",
+      "rotulo": "Da mesma conversa",
+      "linha": "dois homens oram no templo, e só um volta perdoado"
+    }
   ]
 }
