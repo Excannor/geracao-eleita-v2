@@ -49,6 +49,8 @@
   td.sim { color: var(--verde); font-weight: 700; }
   td.nao { color: var(--fraca); }
   .ajuda { margin-top: 30px; padding: 14px 16px; border-radius: 16px; background: var(--ajuda); font-weight: 600; }
+  h3 { margin: 22px 0 8px; color: var(--forte); font-size: 1rem; }
+  .historico li { margin-bottom: 10px; }
   .voltar { display: inline-flex; align-items: center; min-height: 44px; margin-top: 18px; }
 </style>
 <style>/*ESTILO_V2*/</style>
@@ -56,135 +58,219 @@
 <body>
 <main>
   <div class="cabeca">/*SIMBOLO*/<div><div class="marca">Geração <em>Eleita</em></div><h1>Política de Privacidade</h1></div></div>
-  <p class="atualizada">Última atualização: 1 de outubro de 2026</p>
+  <p class="atualizada">Versão 3 · atualizada em 9 de outubro de 2026</p>
 
   <div class="resumo">
     <p><b>Em poucas palavras</b></p>
     <ul>
-      <li>Usamos seus dados só para o app funcionar: guardar seu progresso, deixar você entrar em qualquer aparelho e ler junto com amigos.</li>
-      <li>Não vendemos nem alugamos seus dados, e não há anúncios nem ferramentas de rastreamento. Eles só passam pelos serviços técnicos que o app precisa para funcionar: conexão, notificações e e-mail de nova senha.</li>
-      <li>O que você escreve (registros, orações e anotações) é só seu. Nem seus amigos veem. A exceção é o pedido de oração ou de ajuda que você mesmo manda para a sua célula.</li>
-      <li>Quem conduz a sua célula e a administração da igreja veem como você está caminhando (se leu, se foi ao encontro, em que etapa de Minha caminhada você se marcou), para cuidar de você. Nunca o que você escreve, e o seu check-in de Corpo, Mente e Espírito só somado com o dos outros, sem o seu nome.</li>
-      <li>Você pode baixar tudo o que escreveu e apagar sua conta quando quiser, com todas as cópias.</li>
+      <li>Usamos seus dados para o app funcionar (guardar seu progresso, entrar em qualquer aparelho, ler junto com amigos) e para quem conduz a sua célula e a administração acompanharem como as pessoas estão caminhando.</li>
+      <li>Não vendemos seus dados, não há anúncios e não há rastreamento publicitário nem ferramentas de análise de terceiros.</li>
+      <li>O que você escreve (reflexões, orações, anotações) não aparece para ninguém no app e fica guardado criptografado no servidor. A exceção é o pedido de oração ou de ajuda que você mesmo manda para a sua célula.</li>
+      <li>Quem conduz a sua célula e a administração veem, com o seu nome, se você está lendo, se foi aos encontros e a sua etapa em Minha caminhada. O seu check-in de Corpo, Mente e Espírito só aparece para quem te acompanha no Discipulado, e só se você deixar ligado.</li>
+      <li>Quem tem 12 a 17 anos usa o app com regras a mais: a data de nascimento não muda depois do cadastro, e liderar uma célula só com aprovação da liderança.</li>
+      <li>Você pode baixar o que escreveu e apagar a sua conta quando quiser. A seção 11 diz o que é apagado na hora, o que sai das cópias de segurança e o pouco que fica.</li>
+      <li>O Geração Eleita ainda está em desenvolvimento. Dúvidas e pedidos: <!--email_off--><a href="mailto:suporte@geracaoeleita.app">suporte@geracaoeleita.app</a><!--/email_off-->.</li>
     </ul>
   </div>
 
   <nav class="indice" aria-label="Nesta página">
     <ol>
       <li><a href="#quem-somos">Quem somos</a></li>
-      <li><a href="#idade-minima">Idade mínima</a></li>
+      <li><a href="#idade">Idade mínima e adolescentes</a></li>
       <li><a href="#coleta">Dados que coletamos</a></li>
-      <li><a href="#dado-fe">Dados sobre a sua fé</a></li>
-      <li><a href="#uso">Como usamos</a></li>
+      <li><a href="#sensiveis">Dados pessoais sensíveis</a></li>
+      <li><a href="#uso">Para que usamos cada dado</a></li>
       <li><a href="#quem-ve">Quem vê o quê</a></li>
-      <li><a href="#outras-pessoas">O que outras pessoas veem</a></li>
-      <li><a href="#compartilhamento">Compartilhamento</a></li>
+      <li><a href="#papeis">Quem são essas pessoas</a></li>
+      <li><a href="#compartilhamento">Serviços que recebem dados</a></li>
       <li><a href="#seguranca">Segurança</a></li>
-      <li><a href="#guarda">Guarda e exclusão</a></li>
-      <li><a href="#direitos">Seus controles</a></li>
-      <li><a href="#retirar-consentimento">Como retirar o consentimento</a></li>
-      <li><a href="#convivencia">Amizades, toques e denúncias</a></li>
-      <li><a href="#mudancas">Mudanças nesta política</a></li>
+      <li><a href="#incidentes">Incidentes de segurança</a></li>
+      <li><a href="#guarda">Guarda, cópias e exclusão</a></li>
+      <li><a href="#direitos">Seus direitos</a></li>
+      <li><a href="#consentimento">Consentimento</a></li>
+      <li><a href="#convivencia">Amizades, avisos e denúncias</a></li>
+      <li><a href="#mudancas">Mudanças e histórico</a></li>
     </ol>
   </nav>
 
   <h2 id="quem-somos">1. Quem somos</h2>
-  <p>O Geração Eleita é um aplicativo de leitura bíblica criado para ajudar jovens a ler a Bíblia inteira em um ano, uma lição por dia. É um projeto sem fins lucrativos, desenvolvido e mantido por membros da igreja, sem patrocínio e sem publicidade.</p>
+  <p>O Geração Eleita é um aplicativo de leitura bíblica para jovens: a Bíblia inteira em um ano, uma lição por dia, com leitura em grupo, células e discipulado. É um projeto sem fins lucrativos, sem anúncios e sem patrocínio, mantido por voluntários.</p>
+  <p>O app <b>ainda está em desenvolvimento</b>. A identificação formal de quem responde pelos dados (o controlador) e da igreja parceira será publicada aqui antes do lançamento. Até lá, quem cuida dos seus pedidos sobre dados, dúvidas e incidentes é a equipe do app, pelo e-mail <!--email_off--><a href="mailto:suporte@geracaoeleita.app">suporte@geracaoeleita.app</a><!--/email_off-->, que é lido pela equipe.</p>
 
-  <h2 id="idade-minima">2. Idade mínima</h2>
-  <p>O app é para quem tem 12 anos ou mais. Se você é adolescente, converse com seus pais ou responsáveis sobre o uso do app. Pais e responsáveis: o app não tem chat, só dá para achar alguém pelo nome de usuário exato, e ninguém além dos amigos aceitos e da célula vê o seu filho ou a sua filha.</p>
+  <h2 id="idade">2. Idade mínima e adolescentes</h2>
+  <p>O app é para quem tem <b>12 anos ou mais</b>. No cadastro você informa a sua data de nascimento; quem tem menos de 12 anos não consegue criar a conta, e nada fica guardado dessa tentativa. Não pedimos documento nem foto do rosto.</p>
+  <p>Para quem tem de 12 a 17 anos, o app tem estas regras a mais:</p>
+  <ul>
+    <li><b>A data de nascimento não muda depois do cadastro.</b> O app não deixa trocar; se houve erro de digitação, fale com o suporte.</li>
+    <li><b>Liderar ou auxiliar uma célula só com aprovação da liderança.</b> A célula criada por quem tem menos de 18 anos (ou a função de auxiliar) fica "aguardando aprovação" até a administração aprovar. Enquanto isso, a pessoa não vê o painel com os nomes dos membros, e a célula não manda link de entrada. Fica registrado quem aprovou e quando.</li>
+    <li>Só dá para achar alguém pelo @usuário exato, amizade só existe com convite aceito e o app não tem chat.</li>
+  </ul>
+  <p>Se você é adolescente, converse com seus pais ou responsáveis sobre o uso do app. O app ainda não tem uma conta de responsável ligada à do adolescente. Pais e responsáveis podem escrever ao suporte para pedir informações, correção ou exclusão dos dados do filho ou da filha. Se você souber de uma conta de criança com menos de 12 anos, avise o suporte para que ela seja apagada.</p>
 
   <h2 id="coleta">3. Dados que coletamos</h2>
-  <p><b>No cadastro:</b> nome ou apelido, @usuário, e-mail, data de nascimento e senha.</p>
-  <p><b>Enquanto você usa o app:</b> seu progresso de leitura (dias lidos, ofensiva, lições, prática e conquistas), o que você escreve nas reflexões, orações e anotações, a foto de perfil se você escolher uma, suas preferências de tema e tradução bíblica, suas amizades e propósitos, os marcos que você marca em Minha caminhada (decisão, batismo, célula, acompanhar alguém) e o check-in diário de Corpo, Mente e Espírito, se você fizer. Também anotamos em quais dias você abriu o app (só a data, sem hora nem tela), guardados por 90 dias, para saber quantas pessoas usam o app.</p>
-  <p><b>Se você ativar notificações:</b> o endereço técnico que o seu celular fornece para receber avisos e os horários que você escolheu.</p>
-  <p>Não coletamos localização, contatos, dados de outros aplicativos nem informações de pagamento.</p>
+  <p><b>No cadastro:</b> nome ou apelido, @usuário, e-mail, data de nascimento e senha. A senha não é guardada: guardamos só um resumo criptográfico dela. Também guardamos o fuso horário do aparelho (para saber qual é o seu "hoje"), de onde a conta veio (convite, link de célula ou cadastro direto) e a data e a versão do texto de consentimento que você aceitou.</p>
+  <p><b>Enquanto você usa o app:</b> progresso de leitura (dias lidos, ofensiva, lições, prática, conquistas e pontos), o que você escreve (reflexões, orações, anotações, notas de versículo e "Minha história com Deus"), marca-texto, as datas em que marcou "Orei", a foto de perfil se escolher uma, seus desafios pessoais, amizades, propósitos, células e discipulado, os marcos de Minha caminhada (decisão, batismo, célula, acompanhar alguém), o check-in de Corpo, Mente e Espírito se você fizer, pedidos de oração ou de ajuda, pedidos de conversa e os avisos que chegam no sino. Anotamos também os dias em que você abriu o app (só a data, sem hora nem tela).</p>
+  <p><b>O que outras pessoas registram sobre você:</b> a sua presença nos encontros da célula (quem conduz marca), quem te convidou ou te acompanha, o papel que você tem na célula, a aprovação da liderança quando você tem menos de 18 anos e denúncias que alguém faça.</p>
+  <p><b>Dados técnicos:</b> um cookie de sessão (para você continuar dentro) e outro que só diz que há sessão, válidos por 90 dias; o progresso e as preferências guardados no próprio aparelho, para o app funcionar sem internet; e, se você ativar notificações, o endereço técnico que o seu navegador fornece para receber avisos e os horários que você escolheu. O seu endereço IP <b>não é gravado</b> no banco: o servidor o usa só na memória, por alguns minutos, para limitar tentativas de senha e de cadastro. Registros técnicos de erro do servidor podem conter o seu @.</p>
+  <p>Não coletamos localização, contatos, dados de outros aplicativos nem informações de pagamento. A foto é refeita no próprio aparelho antes de ser enviada, o que tira dados escondidos dela, como o local onde foi tirada.</p>
 
-  <h2 id="dado-fe">4. Dados sobre a sua fé</h2>
-  <p>O app guarda suas leituras, marcações, anotações e reflexões, as datas em que você marcou "Orei", suas amizades e sua participação em propósitos e células. Pela Lei Geral de Proteção de Dados (art. 11), isso é dado sensível, e só é tratado com o seu consentimento específico, dado ao criar a conta, para estas finalidades: guardar o seu progresso, sincronizar os seus aparelhos, mostrar aos amigos e à sua célula apenas o que está descrito em <a href="#outras-pessoas">O que outras pessoas veem</a>, e ajudar quem conduz a sua célula e a administração da igreja a cuidar das pessoas e a acompanhar a igreja, do jeito descrito na seção 7: a chama (se você leu hoje ou manteve a sequência), a presença nos encontros, a etapa de Minha caminhada e os alertas de cuidado saem com o seu nome para essas pessoas; o que você escreve nunca sai, e o check-in de Corpo, Mente e Espírito só sai somado, sem nome.</p>
-
-  <h2 id="uso">5. Como usamos</h2>
+  <h2 id="sensiveis">4. Dados pessoais sensíveis</h2>
+  <p>Pela Lei Geral de Proteção de Dados (LGPD), alguns dados recebem proteção maior. No Geração Eleita, são estes:</p>
   <ul>
-    <li>Manter sua conta e permitir que você entre em outros aparelhos, pelo @usuário ou pelo e-mail.</li>
-    <li>Guardar e sincronizar seu progresso entre os seus aparelhos.</li>
-    <li>Mostrar aos amigos que você aceitou somente o que está descrito em <a href="#quem-ve">Quem vê o quê</a>.</li>
-    <li>Mostrar a quem conduz a sua célula, e à administração da igreja, o painel da célula (quem está com a chama acesa, quem foi aos encontros, quem está em cada etapa de Minha caminhada, quem precisa de atenção) e, à administração, os números da igreja inteira: quantas pessoas abrem o app e leem, a chama de cada célula, os marcos do mês e o check-in somado. A administração pode exportar esses mesmos dados num relatório (planilha ou PDF), com o mesmo conteúdo que vê no app, para a liderança da igreja.</li>
-    <li>Enviar os lembretes e avisos que você ativou.</li>
-    <li>Mandar para o seu e-mail o link de nova senha, só quando você pede em "Esqueci a senha".</li>
-    <li>Proteger o app contra acesso indevido e tratar denúncias.</li>
+    <li><b>Sobre a sua fé:</b> leituras, anotações, reflexões, "Orei", participação em células, propósitos e discipulado, e os marcos de Minha caminhada (como decisão e batismo). Juntos, eles mostram a sua religião.</li>
+    <li><b>Que podem revelar saúde:</b> o check-in de Corpo, Mente e Espírito.</li>
+    <li><b>O que você escreve livremente:</b> reflexões, orações, anotações e pedidos de oração ou de ajuda podem conter saúde, vida íntima ou dados de outras pessoas. Nos pedidos que vão para a célula, evite escrever o nome ou detalhes de outras pessoas.</li>
   </ul>
-  <p>Seu e-mail e sua data de nascimento não aparecem para ninguém no app e não são usados para enviar propaganda.</p>
+  <p>Esses dados só são tratados com o seu <b>consentimento específico e destacado</b>, dado na marcação do cadastro (seção 13), para as finalidades da seção 5. Aceitar usar um app de fé não autoriza ninguém a vigiar a sua vida: o que cada pessoa vê está na seção 6, e nada além disso.</p>
 
-  <h2 id="quem-ve">6. Quem vê o quê</h2>
+  <h2 id="uso">5. Para que usamos cada dado</h2>
   <div style="overflow-x:auto">
-  <table>
-    <thead><tr><th>Informação</th><th>Amigos que você aceitou</th><th>Quem conduz a sua célula e a administração da igreja</th><th>Demais pessoas no app</th></tr></thead>
+  <table class="duas">
+    <thead><tr><th>Dados</th><th>Para quê</th></tr></thead>
     <tbody>
-      <tr><td>Nome e foto</td><td class="sim">sim</td><td class="sim">sim</td><td class="nao">não</td></tr>
-      <tr><td>Se leu hoje e os dias dos propósitos em comum</td><td class="sim">sim</td><td class="sim">sim</td><td class="nao">não</td></tr>
-      <tr><td>Chama acesa ou apagada, dias seguidos de leitura, dias sem ler e sequência perdida há pouco</td><td class="nao">não</td><td class="sim">sim</td><td class="nao">não</td></tr>
-      <tr><td>Presença nos encontros da célula</td><td class="nao">não</td><td class="sim">sim</td><td class="nao">não</td></tr>
-      <tr><td>Etapa de Minha caminhada (decisão, batismo, acompanhar alguém)</td><td class="nao">não</td><td class="sim">sim</td><td class="nao">não</td></tr>
-      <tr><td>Check-in de Corpo, Mente e Espírito</td><td class="nao">não</td><td class="sim">só somado, sem nome</td><td class="nao">não</td></tr>
-      <tr><td>Orações, registros e anotações</td><td class="nao">não</td><td class="nao">não</td><td class="nao">não</td></tr>
-      <tr><td>E-mail e data de nascimento</td><td class="nao">não</td><td class="nao">não</td><td class="nao">não</td></tr>
-      <tr><td>Marcos no Juntos: ofensiva, livros terminados, conquistas e versículos guardados</td><td class="sim">só se você ativar</td><td class="nao">não</td><td class="nao">não</td></tr>
-      <tr><td>Pontos (XP)</td><td class="nao">não</td><td class="nao">não</td><td class="nao">não</td></tr>
+      <tr><td>@usuário, e-mail, senha, fuso, cookies</td><td>Manter a conta, deixar você entrar em qualquer aparelho e mandar o link de nova senha quando você pede.</td></tr>
+      <tr><td>Data de nascimento</td><td>Conferir a idade mínima e aplicar as regras de 12 a 17 anos. Não aparece para ninguém no app.</td></tr>
+      <tr><td>Progresso, o que você escreve, foto, preferências</td><td>Guardar para você e sincronizar entre os seus aparelhos. O que você escreve não é usado para mais nada.</td></tr>
+      <tr><td>Amizades, propósitos, células, discipulado</td><td>Ler junto: mostrar a quem você escolheu o que está na seção 6.</td></tr>
+      <tr><td>Leitura, presença, chama, Minha caminhada</td><td>Ajudar quem conduz a sua célula e a administração a cuidar das pessoas (o painel da célula) e a acompanhar a igreja em números.</td></tr>
+      <tr><td>Check-in de Corpo, Mente e Espírito</td><td>Mostrar a quem te acompanha no Discipulado, se você deixar ligado, e somar com o dos outros, sem nomes, no painel da célula e da administração. Não entra nos alertas de cuidado.</td></tr>
+      <tr><td>Dias em que abriu o app, criação e origem da conta</td><td>Números do app para a administração, sem nomes (quantas pessoas usam, quantas voltam).</td></tr>
+      <tr><td>Endereço de notificação e horários</td><td>Mandar os lembretes e avisos que você ativou.</td></tr>
+      <tr><td>IP (só na memória), denúncias, bloqueios</td><td>Proteger as contas contra acesso indevido e tratar denúncias.</td></tr>
     </tbody>
   </table>
   </div>
+  <p><b>Os alertas de cuidado</b> ("precisa de atenção") aparecem para quem conduz a célula quando a pessoa: faltou ao último encontro ou aos dois últimos; está há 5 dias ou mais sem ler; ou perdeu há pouco uma sequência de leitura de 7 dias ou mais. Eles podem errar (por exemplo, se a presença não foi marcada ou se você leu fora do app). Servem para uma pessoa procurar você, nunca para punir, e nenhuma decisão sobre você é tomada automaticamente.</p>
+  <p>Seu e-mail e sua data de nascimento nunca são usados para propaganda.</p>
 
-  <h2 id="outras-pessoas">7. O que outras pessoas veem</h2>
-  <p>Amigos veem seu nome, sua foto e se você leu hoje. Se você ligar "Mostrar meus marcos no Juntos", eles veem também os seus marcos, como a ofensiva e os livros terminados. Quem está na mesma célula ou no mesmo propósito vê se você leu no dia. Quem conduz a célula (o líder e o auxiliar) vê também o painel da célula, com o seu nome: se a sua chama está acesa ou apagada e há quantos dias você lê seguido, se você foi aos encontros das últimas semanas, em que etapa de Minha caminhada você se marcou (dando os primeiros passos, decidiu seguir Jesus, batizado, acompanha alguém) e os alertas de cuidado (há quantos dias você não lê, se faltou aos últimos encontros, se perdeu há pouco uma sequência longa de leitura), para poder procurar você. Vê ainda o check-in de Corpo, Mente e Espírito da célula somado (quantas pessoas estão em baixa), nunca o seu. A administração da igreja (quem responde pelo app na igreja) vê os números da igreja inteira sem nomes e pode abrir qualquer célula com o mesmo painel que o líder dela vê; pode também exportar esses dados num relatório (planilha ou PDF) para a liderança da igreja, com o mesmo conteúdo, nunca o que você escreve nem o seu check-in sozinho. Membros comuns, visitantes e líderes de outras células não veem nada disso. Ninguém vê suas anotações, reflexões, notas de versículo, orações nem a sua "Minha história com Deus". Um pedido de oração ou de ajuda que você manda na célula é lido pela célula inteira ou só por quem conduz, como você escolher, até vencer ou ser apagado. Quem te acompanha no Discipulado vê só o que você deixar ligado. No Conhecer Jesus, quem te convidou vê em que dia você está, e "Quero conversar" avisa essa pessoa e o líder da sua célula, sem mandar nada do que você escreveu. Na lição do batismo, "Quero conversar sobre o batismo" avisa quem te convidou, quem conduz a sua célula e quem te acompanha no Discipulado. Esses pedidos de conversa mostram só o seu nome e a data, e ficam visíveis para quem foi avisado por até 30 dias ou até a pessoa marcar que vocês já conversaram.</p>
+  <h2 id="quem-ve">6. Quem vê o quê</h2>
+  <p>"Ver" quer dizer aparecer na tela dessa pessoa ou num arquivo que ela gera pelo app. Quem são essas pessoas está na seção 7.</p>
+  <div style="overflow-x:auto">
+  <table class="duas">
+    <thead><tr><th>Informação</th><th>Quem vê</th></tr></thead>
+    <tbody>
+      <tr><td>Nome, foto e @usuário</td><td>Amigos; quem está nos mesmos propósitos e células (inclusive visitantes); quem conduz a sua célula; a administração. Quem te acompanha no Discipulado e quem te convidou veem o nome.</td></tr>
+      <tr><td>Se leu hoje</td><td>Amigos e quem está nos mesmos propósitos e células.</td></tr>
+      <tr><td>Chama acesa ou apagada e dias seguidos de leitura</td><td>Quem conduz a sua célula e a administração.</td></tr>
+      <tr><td>Alertas de cuidado (com o motivo)</td><td>Quem conduz a sua célula e a administração.</td></tr>
+      <tr><td>Presença nos encontros</td><td>Quem conduz a sua célula e a administração.</td></tr>
+      <tr><td>Etapa de Minha caminhada</td><td>Quem conduz a sua célula e a administração. Quem te acompanha no Discipulado, só se você ligar (vem desligado).</td></tr>
+      <tr><td>Primeiros passos e dias lidos na semana</td><td>Quem te acompanha no Discipulado, se você deixar ligado (vem ligado).</td></tr>
+      <tr><td>Seu check-in de Corpo, Mente e Espírito</td><td>Só quem te acompanha no Discipulado, o último da semana, se você deixar ligado (vem ligado; você desliga quando quiser).</td></tr>
+      <tr><td>Check-in somado, sem nomes</td><td>Quem conduz a célula (a partir de 3 respostas nos últimos 7 dias, com quantas pessoas em cada faixa) e a administração (por célula, da igreja toda e no relatório que ela exporta).</td></tr>
+      <tr><td>Pedido de oração ou de ajuda</td><td>A célula (membros, não visitantes) ou só quem conduz, como você escolher. Quem orou e quem pode ajudar, só você vê.</td></tr>
+      <tr><td>Pedido seu que foi denunciado</td><td>Quem conduz a célula vê o texto, o seu nome e os motivos (não quem denunciou). A administração vê só quantos pedidos têm denúncia.</td></tr>
+      <tr><td>Dia em que você está no Conhecer Jesus</td><td>Quem te convidou.</td></tr>
+      <tr><td>"Quero conversar" (Conhecer Jesus e batismo)</td><td>As pessoas avisadas veem o seu nome e a data, por até 30 dias ou até marcarem "já conversamos".</td></tr>
+      <tr><td>Progresso num desafio de grupo</td><td>Os membros da célula ou a dupla de discipulado do desafio.</td></tr>
+      <tr><td>Marcos no Juntos (ofensiva, livros, conquistas, versículos)</td><td>Amigos, só se você ligar.</td></tr>
+      <tr><td>Que você tem menos de 18 anos e pediu para liderar</td><td>A administração (nome, @, idade em anos e a célula).</td></tr>
+      <tr><td>Reflexões, orações, anotações, notas de versículo e "Minha história com Deus"</td><td>Ninguém pelo app. Ficam criptografados no servidor (seção 9).</td></tr>
+      <tr><td>E-mail, data de nascimento e pontos (XP)</td><td>Ninguém pelo app, só você.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Quem conduz uma célula só vê o painel da própria célula. Membros comuns, visitantes e líderes de outras células não veem chama, presença, caminhada nem alertas de ninguém.</p>
 
-  <h2 id="compartilhamento">8. Compartilhamento</h2>
-  <p>Não vendemos nem alugamos seus dados, e não os passamos a anunciantes nem a outras organizações. O app não usa ferramentas de análise, anúncios ou rastreadores, e as fontes e os textos bíblicos já vêm dentro do próprio app.</p>
-  <p>Para funcionar pela internet, o app conta com três serviços técnicos:</p>
+  <h2 id="papeis">7. Quem são essas pessoas</h2>
   <ul>
-    <li><b>Conexão segura:</b> o acesso passa por um serviço de rede que entrega a conexão protegida (HTTPS) até o nosso servidor.</li>
-    <li><b>Notificações:</b> quando você ativa lembretes, o aviso é entregue pelo serviço de notificações do seu próprio celular ou navegador (como Google ou Apple). O conteúdo do aviso segue criptografado até o seu aparelho.</li>
-    <li><b>E-mail de nova senha:</b> quando você pede uma nova senha, a mensagem sai por um serviço de entrega de e-mails (Resend). Ele recebe só o seu endereço de e-mail e o texto da mensagem, para entregá-la, e pode fazer isso em servidores fora do Brasil.</li>
+    <li><b>Amigos:</b> quem aceitou o seu convite de amizade, ou com quem você ficou amigo ao usar o link de convite dessa pessoa (ou ela o seu).</li>
+    <li><b>Membros de propósitos e células:</b> quem aceitou o convite para o propósito ou entrou pelo link da célula. Visitante é quem entrou na célula marcando "só conhecendo".</li>
+    <li><b>Quem conduz a célula:</b> o líder (quem criou a célula) e até 2 auxiliares escolhidos por ele. Quem tem menos de 18 anos só conduz depois da aprovação da administração. O auxiliar perde o papel quando sai da célula ou é desmarcado.</li>
+    <li><b>Quem te acompanha no Discipulado:</b> um amigo, só depois que você aceita. Você escolhe o que ele vê e pode encerrar quando quiser.</li>
+    <li><b>Quem te convidou:</b> quem mandou o link de convite ou de célula que você usou para entrar.</li>
+    <li><b>Administração:</b> quem a equipe do app define na configuração do servidor. Hoje é exercida por quem mantém o app. Ela vê os números do app sem nomes, pode abrir o painel de qualquer célula com o mesmo detalhe que o líder vê, aprova a liderança de quem tem menos de 18 anos e pode exportar um relatório (planilha ou PDF) com o painel da igreja e de cada célula, com nomes. Hoje esse relatório não é enviado a ninguém (o app está em desenvolvimento); se passar a ser, esta política dirá quem recebe e por quanto tempo. Quando o e-mail de nova senha não chega, a administração pode gerar um link de nova senha para a pessoa que pediu; isso fica no registro do servidor.</li>
+    <li><b>Equipe técnica:</b> quem mantém o servidor tem acesso técnico ao banco de dados e às cópias de segurança. Esse acesso é usado só para manutenção, segurança, tratamento de denúncias e pedidos de autoridade (seção 9).</li>
+    <li><b>Quem não tem conta:</b> quem abre um link de convite vê o nome e o @ de quem convidou; o link de célula mostra também o nome da célula e quantas vagas ela tem. Ninguém de fora vê os membros.</li>
   </ul>
-  <p>Só divulgaríamos dados diante de obrigação legal ou ordem de autoridade competente.</p>
+
+  <h2 id="compartilhamento">8. Serviços que recebem dados</h2>
+  <p>Não vendemos nem alugamos seus dados e não os passamos a anunciantes. O app não usa ferramentas de análise, anúncios ou rastreadores, e as fontes e os textos bíblicos vêm dentro do próprio app. Para funcionar pela internet, alguns serviços recebem dados:</p>
+  <ul>
+    <li><b>Cloudflare (rede):</b> o endereço do app e a conexão passam pela Cloudflare, empresa dos Estados Unidos. A conexão protegida (HTTPS) do seu aparelho termina nela, que a leva, de novo protegida, por um túnel até o nosso servidor. Por isso, a Cloudflare processa o que passa pela conexão (inclusive a senha que você digita e o que você escreve, a caminho do servidor) e vê o seu IP, guardando registros conforme as regras dela.</li>
+    <li><b>E-mail (Hostinger):</b> o e-mail do domínio do app, inclusive o do suporte e o link de nova senha, é do provedor de e-mail do nosso domínio, a Hostinger, empresa estrangeira. Ela recebe o seu endereço e o texto das mensagens para entregá-las, e pode processá-las fora do Brasil. Quando o e-mail automático não está ligado, o link de nova senha é mandado à mão pela administração, pela conversa que você indicar.</li>
+    <li><b>Notificações:</b> se você ativa avisos, eles são entregues pelo serviço de notificações do seu navegador (Google, Apple, Mozilla ou Microsoft). O texto do aviso vai criptografado do nosso servidor até o seu aparelho, e esses serviços não leem o conteúdo, mas veem dados técnicos da entrega, como o endereço do aparelho, a hora e o tamanho do aviso.</li>
+    <li><b>Hospedagem:</b> o banco de dados e as cópias de segurança ficam num servidor próprio do projeto, mantido pelos voluntários, e não num serviço de nuvem.</li>
+  </ul>
+  <p>Como Cloudflare e Hostinger ficam fora do Brasil, há transferência internacional de dados, feita para o app funcionar. Só divulgaríamos dados a autoridades diante de obrigação legal ou ordem de autoridade competente.</p>
 
   <h2 id="seguranca">9. Segurança</h2>
   <ul>
-    <li>Toda a comunicação entre o seu aparelho e o servidor usa conexão criptografada (HTTPS).</li>
-    <li>Sua senha nunca é guardada: armazenamos apenas um resumo criptográfico dela (scrypt, com um valor aleatório próprio de cada conta), do qual não é possível recuperar a senha original.</li>
-    <li>A sessão fica num cookie protegido, fora do alcance de scripts da página. Trocar a senha desconecta todos os seus outros aparelhos.</li>
-    <li>Tentativas seguidas de senha errada são bloqueadas por um tempo que aumenta a cada erro.</li>
-    <li>O acesso ao servidor é restrito a quem mantém o app e é usado apenas para manutenção, segurança e tratamento de denúncias.</li>
+    <li>A comunicação entre o seu aparelho e o app usa conexão criptografada (HTTPS), como explica a seção 8.</li>
+    <li>A senha nunca é guardada: guardamos um resumo criptográfico (scrypt, com um valor aleatório de cada conta). Não dá para recuperar a senha a partir dele, mas uma senha fraca pode ser adivinhada por tentativa; por isso pedimos 8 caracteres ou mais e bloqueamos tentativas seguidas de senha errada.</li>
+    <li><b>O que você escreve fica criptografado no servidor</b> (reflexões, orações, anotações, notas de versículo e "Minha história com Deus"). É uma proteção "em repouso": quem levar o arquivo do banco não consegue ler esses textos sem a chave. A chave fica no servidor, e não é criptografia de ponta a ponta: a equipe técnica teria, tecnicamente, como abrir os textos. Ela se compromete a não fazer isso, salvo para cumprir ordem de autoridade.</li>
+    <li>As cópias de segurança diárias são guardadas cifradas (AES-256).</li>
+    <li>A sessão fica num cookie protegido, fora do alcance dos scripts da página. Trocar a senha ou usar "Sair dos outros aparelhos" desconecta os outros aparelhos. Trocar o e-mail pede a senha atual.</li>
+    <li>O acesso ao servidor é restrito a quem mantém o app.</li>
   </ul>
+  <p>Nenhum sistema é totalmente imune a falhas. Fazemos o possível e revemos as proteções quando o app muda.</p>
 
-  <h2 id="guarda">10. Guarda e exclusão</h2>
+  <h2 id="incidentes">10. Incidentes de segurança</h2>
+  <p>Se acontecer um incidente de segurança que possa trazer risco ou dano relevante a você (como vazamento ou acesso indevido aos dados), nós vamos conter o problema, ver quais dados e quais pessoas foram atingidos, <b>avisar as pessoas afetadas</b> por e-mail e no app, em linguagem clara (o que aconteceu, quais dados, o que já fizemos e o que você pode fazer), e comunicar a Autoridade Nacional de Proteção de Dados (ANPD) quando a lei pedir. Todo incidente fica registrado, mesmo os que não precisarem de aviso. Se você notar algo estranho na sua conta, troque a senha e escreva ao suporte.</p>
+
+  <h2 id="guarda">11. Guarda, cópias e exclusão</h2>
+  <div style="overflow-x:auto">
+  <table class="duas">
+    <thead><tr><th>Dado</th><th>Por quanto tempo</th></tr></thead>
+    <tbody>
+      <tr><td>Conta, progresso, o que você escreve, foto, amizades</td><td>Enquanto a conta existir.</td></tr>
+      <tr><td>Dias em que você abriu o app</td><td>90 dias.</td></tr>
+      <tr><td>Check-in de Corpo, Mente e Espírito</td><td>180 dias.</td></tr>
+      <tr><td>Pedido de oração ou de ajuda</td><td>Fica visível até vencer (7 ou 30 dias, você escolhe) e é apagado 30 dias depois de vencer. Sai antes se você apagar o pedido ou sair da célula.</td></tr>
+      <tr><td>Marcos no Juntos</td><td>Apagados depois de 30 dias.</td></tr>
+      <tr><td>Avisos do sino</td><td>Os 60 mais recentes de cada pessoa.</td></tr>
+      <tr><td>"Quero conversar"</td><td>Visível para quem foi avisado por até 30 dias; o registro fica na sua conta.</td></tr>
+      <tr><td>Presença nos encontros e papel na célula</td><td>Enquanto a célula existir.</td></tr>
+      <tr><td>Pedido de nova senha feito sem e-mail</td><td>7 dias, ou até o link ser gerado.</td></tr>
+      <tr><td>Cookie de sessão</td><td>90 dias.</td></tr>
+      <tr><td>IP</td><td>Só na memória do servidor, por alguns minutos; não vai para o banco.</td></tr>
+      <tr><td>Denúncias de pessoas</td><td>Ainda sem prazo definido (ficam as 500 mais recentes).</td></tr>
+      <tr><td>Cópias de segurança</td><td>Uma por dia; ficam as dos últimos 14 dias.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><b>Apagar a conta</b> (Configurações, "Apagar a conta", com a sua senha) remove na hora a conta, o progresso, o que você escreveu, a foto, as amizades, as duplas, o discipulado, os seus pedidos, os check-ins, as notificações, os marcos e a sua presença nas células. Na mesma hora, você também é <b>tirado de cada uma das 14 cópias de segurança</b>, que são reescritas sem os seus dados; por isso, restaurar uma cópia não traz a sua conta de volta.</p>
+  <p><b>O que fica depois da exclusão:</b> as denúncias feitas por você ou contra você (com o @); o seu @ como quem registrou um encontro ou criou um grupo ou célula que continua com outras pessoas; o seu nome em avisos que já chegaram no sino de outras pessoas, até saírem dos 60 mais recentes delas; e o seu @ em registros técnicos de erro do servidor e nos registros da Cloudflare. Arquivos que alguém já baixou do app (como um relatório exportado) não são alcançados pela exclusão.</p>
+  <p><b>"Zerar progresso"</b> recomeça só a trilha e o plano de leitura. A sua foto e as suas anotações continuam guardadas.</p>
+
+  <h2 id="direitos">12. Seus direitos</h2>
+  <p>A LGPD garante a você, de graça:</p>
   <ul>
-    <li>Seus dados ficam guardados enquanto sua conta existir.</li>
-    <li>Fazemos uma cópia de segurança por dia e mantemos somente as dos últimos 14 dias.</li>
-    <li>Os marcos mostrados no Juntos deixam de aparecer depois de 30 dias.</li>
-    <li>Ao apagar sua conta, removemos a conta, o progresso, o que você escreveu, as amizades e os propósitos, inclusive das cópias de segurança já guardadas.</li>
+    <li>saber se tratamos os seus dados e ter acesso a eles;</li>
+    <li>corrigir dados incompletos ou errados;</li>
+    <li>pedir que dados desnecessários ou tratados fora desta política sejam anonimizados, bloqueados ou apagados;</li>
+    <li>receber os seus dados num formato para levar a outro serviço (portabilidade, nos limites que a ANPD definir);</li>
+    <li>saber com quem os dados são compartilhados (seção 8);</li>
+    <li>retirar o consentimento e saber o que acontece se não der ou retirar (seção 13);</li>
+    <li>pedir a exclusão dos dados tratados com o seu consentimento;</li>
+    <li>reclamar à ANPD.</li>
   </ul>
+  <p><b>No próprio app:</b> "Baixar o que escrevi" gera um arquivo com o seu progresso, os seus registros e as suas anotações; nome e foto você muda no Perfil; e-mail em Configurações, com a senha; marcos no Juntos, o que o Discipulado vê e as notificações você liga e desliga quando quiser; "Apagar a conta" apaga tudo como diz a seção 11.</p>
+  <p><b>Pelo suporte:</b> para qualquer outro pedido (uma cópia completa dos seus dados, corrigir a data de nascimento, saber quem viu o quê, apagar algo específico), escreva para <!--email_off--><a href="mailto:suporte@geracaoeleita.app">suporte@geracaoeleita.app</a><!--/email_off--> a partir do e-mail cadastrado na conta, para sabermos que é você. Respondemos em até 15 dias. Pais e responsáveis de quem tem menos de 18 anos também podem pedir. Você não precisa passar pela liderança da célula para exercer esses direitos.</p>
+  <p>O suporte não é atendimento de emergência nem atendimento de saúde. Se precisar de ajuda agora, veja os contatos no fim desta página.</p>
 
-  <h2 id="direitos">11. Seus controles</h2>
-  <p>Você controla seus dados direto no app, em Perfil e Configurações:</p>
-  <ul>
-    <li><b>Levar com você:</b> baixe tudo o que escreveu em "Baixar o que escrevi".</li>
-    <li><b>Corrigir:</b> altere seu nome e sua foto quando quiser.</li>
-    <li><b>Escolher o que aparece:</b> ative ou desative seus marcos no Juntos e as notificações.</li>
-    <li><b>Apagar:</b> use "Apagar a conta". A exclusão é definitiva.</li>
+  <h2 id="consentimento">13. Consentimento</h2>
+  <p>No cadastro você marca: <i>"Concordo que o Geração Eleita guarde minhas leituras, anotações, check-ins e a minha participação em grupos de leitura e oração. São informações sobre a minha fé. Só eu decido o que meus amigos e quem me acompanha no Discipulado veem; quem conduz a minha célula e a administração da igreja veem como estou caminhando (leitura, presença, etapa de Minha caminhada) e o check-in só somado com o dos outros, nunca o que eu escrevo."</i> Guardamos a data e a versão desse texto (a data aparece em Configurações, "Privacidade"). Quando o texto muda de um jeito que pede um novo "sim", o app mostra o texto novo e só segue depois da sua resposta.</p>
+  <p><b>Retirar partes, sem apagar a conta:</b> desligar os marcos no Juntos; desligar o que quem te acompanha no Discipulado vê (inclusive o check-in) ou encerrar o discipulado; não fazer o check-in; apagar um pedido; sair de um propósito ou de uma célula.</p>
+  <p><b>Retirar o consentimento inteiro:</b> como o app não consegue guardar leitura e participação de fé sem ele, hoje isso é feito apagando a conta (Configurações, "Privacidade" ou "Apagar a conta"), com o que a seção 11 explica.</p>
+
+  <h2 id="convivencia">14. Amizades, avisos e denúncias</h2>
+  <p><b>Amizade</b> só existe com convite aceito, ou quando alguém usa o seu link de convite. Ninguém encontra você por parte do nome, só pelo @usuário exato. Não há ranking entre pessoas nem pontos por orar.</p>
+  <p><b>Toques e cutucadas:</b> um amigo pode mandar um toque com texto pronto (no máximo um por dia para cada amigo e cinco por dia no total, e só quando ele já leu e você não) e cutucadas de café, oração ou treino (uma de cada tipo por dia para cada amigo). Hoje eles chegam como notificação também à noite. "Silenciar" alguém tira os toques dessa pessoa da sua lista, mas ainda não impede a notificação: para não receber mais, você pode desfazer a amizade, bloquear a pessoa ou desligar as notificações do app no celular. Os lembretes automáticos do app respeitam o silêncio da noite (das 22h30 às 7h) e têm um limite por dia, e você pode desligá-los em Configurações.</p>
+  <p><b>Bloquear</b> alguém desfaz a amizade e os grupos em comum, e a outra pessoa não é avisada.</p>
+  <p><b>Denunciar uma pessoa:</b> você escolhe um motivo, e fica registrado o seu @, o @ denunciado, o motivo e a data. Quem é denunciado não fica sabendo quem denunciou. Hoje as denúncias são analisadas pela equipe do app direto no servidor, ainda sem uma tela própria; conforme a gravidade, o conteúdo pode ser removido e a conta suspensa ou apagada, como dizem os <a href="termos.html#denuncias">Termos de Uso</a>.</p>
+  <p><b>Denunciar um pedido na célula:</b> com duas denúncias, o pedido fica escondido até quem conduz a célula decidir manter ou tirar. Se a denúncia diz que alguém pode estar em perigo, quem conduz é avisado na hora. Quem conduz vê o texto, o autor e os motivos, mas não quem denunciou. Hoje o autor não é avisado quando o pedido é tirado; se isso acontecer com você e quiser entender, escreva ao suporte.</p>
+  <p>O app não acompanha o que as pessoas fazem o tempo todo. Em caso de risco a uma criança ou adolescente, avise o suporte e procure também o Disque 100 ou a polícia.</p>
+  <p>As regras de convivência completas estão nos <a href="termos.html">Termos de Uso</a>.</p>
+
+  <h2 id="mudancas">15. Mudanças nesta política</h2>
+  <p>A política muda quando o app muda. A versão e a data ficam no topo desta página, e cada versão fica no histórico abaixo. Quando a mudança amplia o que alguém vê, muda a finalidade ou inclui um novo serviço que recebe dados, avisamos no app antes e, se for preciso, pedimos o seu "sim" de novo antes de começar o novo uso.</p>
+  <h3 class="historico-titulo">Histórico</h3>
+  <ul class="historico">
+    <li><b>Versão 3, 9 de outubro de 2026.</b> Política reescrita a partir do funcionamento real do app e de um diagnóstico jurídico: dados sensíveis, finalidade de cada dado, quem vê o quê para cada pessoa (inclusive quem te acompanha no Discipulado, quem te convidou e a administração), os serviços que recebem dados (Cloudflare, Hostinger e notificações), textos criptografados no servidor, IP não gravado, prazos reais, o que fica depois da exclusão, direitos, incidentes, denúncias e as regras para 12 a 17 anos (data de nascimento travada e liderança com aprovação). O texto de consentimento passou a citar o check-in e o Discipulado, e quem já tinha conta concorda de novo.</li>
+    <li><b>Versão 2, 1 de outubro de 2026.</b> Quem conduz a célula e a administração passam a ver o painel da célula com nomes, e a administração pode exportar um relatório. Quem já tinha conta concordou de novo.</li>
+    <li><b>Versão 1, 26 de setembro de 2026.</b> Primeira política com o consentimento para dados de fé e a idade mínima de 12 anos. Ajustes de texto em 27 e 29 de setembro.</li>
   </ul>
-  <p>Para corrigir e-mail ou data de nascimento, ou para qualquer outra dúvida sobre seus dados, escreva para <!--email_off--><a href="mailto:suporte@geracaoeleita.app">suporte@geracaoeleita.app</a><!--/email_off--> ou fale com a liderança responsável pelo app na sua igreja.</p>
-
-  <h2 id="retirar-consentimento">12. Como retirar o consentimento</h2>
-  <p>Vá em Configurações, "Privacidade". Como o app só guarda leitura, anotação e participação em grupo de fé com o seu consentimento, retirar o consentimento é apagar a conta, com todas as cópias.</p>
-
-  <h2 id="convivencia">13. Amizades, toques e denúncias</h2>
-  <p><b>Amizade</b> só existe com convite aceito. Ninguém encontra você por parte do nome, apenas pelo @usuário exato. Não existe ranking entre pessoas nem pontos por orar.</p>
-  <p><b>Toques:</b> um amigo pode enviar um lembrete com texto pronto, no máximo um por dia e só quando ele já leu e você ainda não. Você pode silenciar os toques de qualquer pessoa.</p>
-  <p><b>Proteção:</b> você pode encerrar um propósito, bloquear ou denunciar alguém a qualquer momento, e a outra pessoa não é avisada. As denúncias ficam registradas para quem cuida do app, com o @ de quem denunciou, o @ denunciado, o motivo e a data.</p>
-  <p>As regras de convivência completas, com o que pode e o que não pode no app, estão nos <a href="termos.html">Termos de Uso</a>.</p>
-
-  <h2 id="mudancas">14. Mudanças nesta política</h2>
-  <p>Esta política pode ser atualizada quando o app ganhar funções novas. A data da última atualização fica sempre no topo desta página.</p>
 
   <p class="ajuda">Precisa conversar com alguém? Fale com alguém de confiança ou ligue 188 (CVV), a qualquer hora. Se for abuso ou violência, ligue 100. Em emergência, 192 (SAMU) ou 190 (Polícia).</p>
   <a class="voltar" href="./">Voltar ao aplicativo</a>

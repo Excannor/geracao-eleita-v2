@@ -117,13 +117,13 @@
   // ---------- liderança de menor de 18 (api/painel/liderancas) ----------
   // Quem tem menos de 18 anos só lidera ou auxilia uma célula depois desta aprovação; até lá,
   // não vê o painel com nomes dos membros. Fica gravado quem decidiu e quando.
-  const PAPEL = { lider: 'Quer liderar', auxiliar: 'Foi marcado como auxiliar de' };
+  const PAPEL = { lider: 'Quer liderar a célula', auxiliar: 'Marcado como auxiliar da célula' };
   function blocoAprovacoes(l) {
     if (!l) return '';
     const lista = l.pendentes || [];
     return grupo('Liderança aguardando aprovação', lista.length
       ? lista.map((x, i) => '<div class="linha-config sem-toque painel-aprovacao" data-aprovacao="' + i + '"><span>' + CC.esc(x.nome) + ' (@' + CC.esc(x.usuario) + '), ' + x.idade + ' anos'
-        + '<small>' + PAPEL[x.papel] + ' a célula "' + CC.esc(x.titulo) + '" · ' + CC.plural(x.membros, 'pessoa', 'pessoas') + ' · desde ' + CC.esc(quando(x.pedidoEm)) + '</small></span>'
+        + '<small>' + PAPEL[x.papel] + ' "' + CC.esc(x.titulo) + '" · ' + CC.plural(x.membros, 'pessoa', 'pessoas') + ' · desde ' + CC.esc(quando(x.pedidoEm)) + '</small></span>'
         + '<div class="pe-duplo-plano"><button class="botao pequeno" data-decidir="' + i + '" data-aprovar="sim">Aprovar</button>'
         + '<button class="botao plano pequeno" data-decidir="' + i + '" data-aprovar="nao">Recusar</button></div></div>').join('')
       : '<div class="linha-config sem-toque"><span>Nenhum pedido agora</span></div>',

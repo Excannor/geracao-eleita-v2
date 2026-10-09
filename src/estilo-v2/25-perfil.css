@@ -150,6 +150,7 @@
 .linha-config.painel-aprovacao .pe-duplo-plano { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
 /* Nascimento: só leitura, com o caminho para corrigir (o servidor não aceita troca) */
 [data-rota=config] .linha-config.so-leitura { display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
+[data-rota=config] .linha-config.so-leitura .valor { white-space: nowrap; }
 .dica-linha { grid-column: 1 / -1; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; }
 .dica-linha a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .campo-senha.so-leitura { display: grid; gap: 4px; }

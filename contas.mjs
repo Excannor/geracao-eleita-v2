@@ -71,7 +71,9 @@ export const NASCIMENTO_TRAVADO = 'a data de nascimento não muda depois do cada
 // jeito que precise de um "sim" de novo exige subir este número.
 // v2: quem conduz a célula e a administração da igreja passam a ver o painel da célula com
 // nomes (Módulo 5, docs/inteligencia.md §5); quem já tinha conta concorda de novo.
-export const CONSENTIMENTO_VERSAO = 2;
+// v3 (política versão 3, 09/10/2026): o texto passa a citar o check-in, o que quem acompanha no
+// Discipulado vê e o check-in só somado para a célula; quem já tinha conta concorda de novo.
+export const CONSENTIMENTO_VERSAO = 3;
 export const MOTIVOS_DENUNCIA = [
   'Insiste ou incomoda',
   'Nome ou foto impróprios',

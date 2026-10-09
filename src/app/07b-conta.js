@@ -269,11 +269,11 @@
   // O mesmo texto do portal de entrada (src/entrar.html): leitura, anotação e participação
   // em grupo de leitura e oração são dado sensível, e pedem um "sim" claro, não escondido
   // em letra miúda.
-  // Versão 2 do texto (CONSENTIMENTO_VERSAO em contas.mjs): quem já tinha conta vê a folha de novo.
-  const TEXTO_CONSENTIMENTO = 'Concordo que o Geração Eleita guarde minhas leituras, anotações e a minha '
+  // Versão 3 do texto (CONSENTIMENTO_VERSAO em contas.mjs): quem já tinha conta vê a folha de novo.
+  const TEXTO_CONSENTIMENTO = 'Concordo que o Geração Eleita guarde minhas leituras, anotações, check-ins e a minha '
     + 'participação em grupos de leitura e oração. São informações sobre a minha fé. Só eu decido o que '
-    + 'meus amigos veem; quem conduz a minha célula e a administração da igreja veem como estou caminhando '
-    + '(leitura, presença, etapa de Minha caminhada), nunca o que eu escrevo.';
+    + 'meus amigos e quem me acompanha no Discipulado veem; quem conduz a minha célula e a administração da igreja veem como estou caminhando '
+    + '(leitura, presença, etapa de Minha caminhada) e o check-in só somado com o dos outros, nunca o que eu escrevo.';
   const LINK_PRIVACIDADE = '<a href="privacidade.html" target="_blank" rel="noopener">Ler a política de privacidade</a>';
 
   // Folha presa (sem fechar tocando fora) que a abertura do app mostra antes de tudo para
@@ -336,7 +336,8 @@
       + (quem && quem.comSenha
         ? '<h3>Retirar o consentimento</h3>'
           + '<p class="passo-dica">O app só guarda leitura, anotação e participação em grupo com o seu consentimento. '
-          + 'Retirar o consentimento é apagar a conta, com todas as cópias.</p>'
+          + 'Dá para retirar partes sem apagar a conta (marcos no Juntos, o que o Discipulado vê, sair de uma célula). '
+          + 'Retirar o consentimento inteiro é apagar a conta, como explica a política.</p>'
           + '<div class="acoes"><button class="botao plano perigo" data-apagar>Apagar a conta</button></div>'
         : ''),
     {

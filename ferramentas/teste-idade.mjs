@@ -1,12 +1,14 @@
 // Regras de idade no servidor, de ponta a ponta pela API: a data de nascimento não muda depois
 // do cadastro (nem com senha), trocar o e-mail pede a senha atual, e quem tem menos de 18 anos
-// só lidera ou auxilia uma célula depois que a liderança (o administrador) aprova.
+// só lidera ou auxilia uma célula depois que a liderança (o administrador) aprova. E o
+// consentimento: quem aceitou uma versão anterior do texto é chamado a concordar de novo.
 // Uso: node ferramentas/teste-idade.mjs   (PORTA=<porta> para trocar a 8791)
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DatabaseSync } from 'node:sqlite';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORTA = Number(process.env.PORTA) || 8791;
@@ -19,12 +21,20 @@ const ok = (cond, msg) => {
   if (!cond) falhas++;
 };
 
-const servidor = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
-  env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_TESTE: '1', CAMINHO_ADMIN: 'dono', CAMINHO_SMTP_HOST: '' },
-  stdio: 'ignore',
-});
 const base = 'http://127.0.0.1:' + PORTA;
-for (let i = 0; i < 80; i++) { try { await fetch(base + '/api/existe-conta'); break; } catch { await dormir(150); } }
+async function subir() {
+  const proc = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
+    env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_TESTE: '1', CAMINHO_ADMIN: 'dono', CAMINHO_SMTP_HOST: '' },
+    stdio: 'ignore',
+  });
+  for (let i = 0; i < 80; i++) { try { await fetch(base + '/api/existe-conta'); break; } catch { await dormir(150); } }
+  return proc;
+}
+async function descer(proc) {
+  proc.kill();
+  for (let i = 0; i < 40; i++) { try { await fetch(base + '/api/existe-conta'); await dormir(150); } catch { break; } }
+}
+let servidor = await subir();
 
 const pedir = (rota, corpo, cookie) => fetch(base + rota, {
   method: corpo ? 'POST' : 'GET',
@@ -117,17 +127,32 @@ try {
     'um pedido já decidido não se decide de novo');
 
   // quem aprovou e quando ficam no banco
-  const { DatabaseSync } = await import('node:sqlite');
   const banco = new DatabaseSync(join(PASTA, 'caminho.db'), { readOnly: true });
   const linhas = banco.prepare('SELECT * FROM liderancas ORDER BY papel').all();
   banco.close();
   ok(linhas.length === 2 && linhas.every((l) => l.estado === 'aprovada' && l.decidido_por === 'dono' && /^\d{4}-\d{2}-\d{2}T/.test(l.decidido_em)),
     'no banco: quem aprovou (@dono) e quando, para cada pedido');
+
+  console.log('\n  Consentimento: texto novo pede um novo "sim"\n');
+  const { CONSENTIMENTO_VERSAO } = await import('../contas.mjs');
+  ok((await dados(await pedir('/api/quem', null, ana))).consentimento === true, 'conta criada agora já está no texto atual (versão ' + CONSENTIMENTO_VERSAO + ')');
+  // Volta a conta da Ana para a versão anterior, como quem concordou antes da mudança.
+  await descer(servidor);
+  const gravar = new DatabaseSync(join(PASTA, 'caminho.db'));
+  const extra = JSON.parse(gravar.prepare("SELECT extra FROM contas WHERE usuario = 'ana'").get().extra || '{}');
+  extra.consentimento = { versao: CONSENTIMENTO_VERSAO - 1, em: '2026-10-01T12:00:00.000Z' };
+  gravar.prepare("UPDATE contas SET extra = ? WHERE usuario = 'ana'").run(JSON.stringify(extra));
+  gravar.close();
+  servidor = await subir();
+  d = await dados(await pedir('/api/quem', null, ana));
+  ok(d.consentimento === false && d.comSenha === true, 'quem concordou com a versão anterior volta a ver o pedido de consentimento (/api/quem diz que falta)');
+  ok((await pedir('/api/consentimento', {}, ana)).status === 200, 'o "Concordo" da folha grava o aceite');
+  d = await dados(await pedir('/api/quem', null, ana));
+  ok(d.consentimento === true && d.consentimentoEm > '2026-10-02', 'depois do "Concordo", a conta fica na versão atual, com a data nova');
 } catch (e) {
   ok(false, 'o teste quebrou: ' + (e && e.stack || e));
 } finally {
-  servidor.kill();
-  await dormir(300);
+  await descer(servidor);
   try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
 }
 
