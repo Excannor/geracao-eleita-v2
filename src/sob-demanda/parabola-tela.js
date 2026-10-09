@@ -31,7 +31,8 @@
     CC.gravar('parabolasLidas', { ...atuais, [slug]: CC.hojeIso() });
   }
   const barra = (titulo, voltar, extra) => '<div class="mapa-barra">'
-    + '<button class="botao-redondo" data-voltar aria-label="Voltar">' + CC.ico('voltar') + '<span class="so-leitor">' + voltar + '</span></button>'
+    // o rótulo vai pronto no data-rotulo-voltar: o roteador não escreve "Voltar" visível no botão redondo
+    + '<button class="botao-redondo" data-voltar data-rotulo-voltar="' + voltar + '" aria-label="Voltar">' + CC.ico('voltar') + '</button>'
     + '<span class="mapa-barra-titulo">' + titulo + '</span>' + (extra || '<span class="parabola-vaga"></span>') + '</div>';
 
   // ---------- a lista ----------

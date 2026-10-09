@@ -173,6 +173,7 @@ ok(await av('[...document.querySelectorAll(".item-cena b, .item-cena span")].eve
 ok(await av('(() => { const p = document.querySelector(".parecida-parabola"); const d = p.querySelector(".desenho"); return d.getBoundingClientRect().width <= 48; })()'), 'o desenho da parecida fica pequeno, ao lado do texto');
 ok(await av('document.querySelectorAll(".perguntas-parabola li").length === 2 && !!document.querySelector(".parecida-parabola")'), 'Pra pensar com duas perguntas e a parecida em Mateus');
 ok(await texto('.parabola-ler') === 'Ler Lucas 14 na Bíblia', 'o botão diz "Ler Lucas 14 na Bíblia"');
+ok(await av('(() => { const b = document.querySelector(".folha-parabola [data-voltar]"); return b.textContent.trim() === "" && b.dataset.rotuloVoltar === "Parábolas"; })()'), 'o voltar redondo não ganha texto visível');
 ok(await av('!!document.querySelector(\'[data-notas-contexto="parabola:grande-banquete"] [data-escrever-contexto]\')'), 'a parábola tem "Escrever nota", com as notas dela');
 ok(await semEstouro(), 'nada estoura a largura da parábola a 390px');
 ok(await av('[...document.querySelectorAll(".desenho .k")].slice(0, 3).every((k) => getComputedStyle(k).stroke !== "none")'), 'os traços dos desenhos seguem as fichas do tema');
@@ -182,7 +183,20 @@ await dormir(300);
 ok(await semEstouro() && await av('document.querySelector(".parabola-nome").scrollWidth <= document.querySelector(".parabola-nome").clientWidth + 1'), 'nada estoura a 360px, e o título ainda cabe');
 await tela(390, 844);
 
+// ---------- cada uma das outras publicadas abre inteira ----------
+for (const outra of P.itens.filter((p) => p.slug !== 'grande-banquete')) {
+  const f = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'parabolas', outra.slug + '.json'), 'utf8'));
+  const nFalas = f.secoes.flatMap((s) => s.blocos.filter((b) => b.fala)).length;
+  await av('location.hash = "#/parabola/' + outra.slug + '"');
+  ok(await esperar('document.querySelectorAll(".fala-parabola").length === ' + nFalas + ' && !!document.querySelector(".parabola-heroi svg") && document.querySelectorAll(".secao-parabola").length === ' + f.secoes.length, 10000)
+    && await texto('.parabola-nome') === outra.titulo, outra.titulo + ' abre com o desenho, as ' + f.secoes.length + ' seções e as ' + nFalas + ' falas');
+  ok(await semEstouro() && await av('document.querySelector(".parabola-nome").scrollWidth <= document.querySelector(".parabola-nome").clientWidth + 1'), outra.titulo + ': nada estoura a 390px e o título cabe');
+  await capturar(outra.slug + '-390-claro');
+}
+
 // rolar até o fim marca como lida (as capturas, com a tela do tamanho da página, já a viram inteira)
+await av('location.hash = "#/parabola/grande-banquete"');
+await esperar('!!document.querySelector(".parabola .dizendo-parabola")', 10000);
 await av('CC.gravar("parabolasLidas", {}); CC.redesenhar()');
 await esperar('!!document.querySelector("[data-fim-parabola]")');
 await av('CC.rolarPara(0)');

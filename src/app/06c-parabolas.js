@@ -56,8 +56,8 @@
     if (slug !== null && !item) return CC.vazio(raiz, 'Não encontrei essa parábola.');
     const pintar = (p) => pronto(P.tela)(raiz, item, p);
     if (pronto(P.tela) && (!item || pronto(item.arquivo))) { pintar(item && pronto(item.arquivo)); return; }
-    raiz.innerHTML = '<div class="folha-mapa"><div class="mapa-barra"><button class="botao-redondo" data-voltar aria-label="Voltar">'
-      + CC.ico('voltar') + '<span class="so-leitor">' + (item ? 'Parábolas' : 'Explorar') + '</span></button></div></div>' + CC.esqueleto('texto');
+    raiz.innerHTML = '<div class="folha-mapa"><div class="mapa-barra"><button class="botao-redondo" data-voltar data-rotulo-voltar="'
+      + (item ? 'Parábolas' : 'Explorar') + '" aria-label="Voltar">' + CC.ico('voltar') + '</button></div></div>' + CC.esqueleto('texto');
     CC.ligarVoltarDoTopo(raiz);
     if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Aberto como arquivo solto, o aplicativo não tem de onde trazer as parábolas.</div>'; return; }
     const geracao = (raiz.dataset.parabolaGeracao = String(Date.now()));

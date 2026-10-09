@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a estrada que desce de Jerusalém para Jericó (Lc 10.30): no alto, à esquerda, a muralha da cidade com a porta; dela sai a estrada, que desce serpenteando entre os morros até a ponta de baixo, à direita, com pedras na beira. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A estrada é a única área sálvia. -->
+<path class="k" d="M4 66C20 50 38 46 56 58C74 40 98 36 118 52C132 42 148 44 158 54"/>
+<path class="h" d="M70 50l6 3M92 44l5 4M128 52l6 2M20 60l5 2"/>
+<path class="k p" d="M12 50V32H18V27H24V32H30V27H36V32H42V27H48V32H54V50Z"/>
+<path class="h" d="M12 38H54"/>
+<path class="k p" d="M28 50V43C28 38 38 38 38 43V50Z"/>
+<path class="k s" d="M28 50C40 66 18 80 48 92C78 104 108 100 136 122L154 122C122 96 92 100 64 88C36 76 56 64 38 50Z"/>
+<path class="h" d="M33 56C40 66 30 76 50 86M58 94C82 102 104 102 122 114"/>
+<path class="k p" d="M96 80C96 74 106 72 110 78C112 82 104 84 96 80Z"/>
+<path class="k p" d="M10 104C10 98 22 96 24 104C20 106 14 106 10 104Z"/>
+<path class="k p" d="M124 92C124 88 132 87 134 92C131 94 127 94 124 92Z"/>
+<path class="k" d="M84 74V60M84 66L78 60M84 64L90 58"/>
+</svg>
