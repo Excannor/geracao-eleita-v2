@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a lamparina no lugar próprio (Lc 8.16): a lamparina de barro acesa em cima de um suporte alto, de pé largo, haste fina e prato no alto, com a luz saindo da chama para os lados. O miolo da chama é a única área sálvia. -->
+<path class="h" d="M10 106H110"/>
+<path class="k p" d="M42 106L48 98H68L74 106Z"/>
+<path class="k p" d="M55 98V62H61V98Z"/>
+<path class="k p" d="M40 58H76L72 62H44Z"/>
+<path class="k" d="M37.9 43.7C29.2 43.1 27.3 34.4 32.9 33.8C36.6 33.2 38.5 36.9 38.5 40"/>
+<path class="k p" d="M45.9 53L47.2 58H60.8L62.1 53Z"/>
+<path class="k p" d="M34.2 46.8C34.2 40.6 42.8 37.5 52.8 38.2C60.2 38.8 67.6 40 75.1 40.6L80.7 40C82.5 40 83.1 41.9 81.9 43.1L76.9 45.6C71.4 49.9 62.7 54.3 52.8 54.3C41.6 54.3 34.2 52.4 34.2 46.8Z"/>
+<ellipse class="k e" cx="51.5" cy="40" rx="4.3" ry="1.4"/>
+<path class="h" d="M38.5 49.9C45.3 53 57.7 53 67.6 48.7M41.6 45.6C46.6 46.8 54 46.8 60.2 45.6"/>
+<path class="k p" d="M80.7 39.4C75.7 35.1 76.3 30.1 80.7 22.7C85 30.1 85.6 35.1 80.7 39.4Z"/>
+<path class="s" d="M80.7 36.9C78.2 34.4 78.8 31.3 80.7 28.2C82.5 31.3 83.1 34.4 80.7 36.9Z"/>
+<path class="h" d="M72 24.5L68.9 22M89.3 24.5L92.4 22M80.7 17.7V14M73.8 31.3H70.1M87.5 31.3H91.2"/>
+</svg>
