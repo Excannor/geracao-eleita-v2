@@ -1518,47 +1518,79 @@
     }
   }
 
-  // ---------- (o) O chamado não custa caro, custa tudo: o cartaz no alambrado ----------
+  // ---------- (o) O chamado não é caro. Ele custa tudo: quem anda sozinho ----------
+  // Vista de cima, chão cinza granulado: uma pessoa andando sozinha, nítida, com a sombra
+  // longa, e outras passando borradas em volta. O borrão é a sombra do canvas (shadowBlur,
+  // que todo navegador tem), desenhada com a forma fora da tela.
+  function pessoa(x, y, h) {
+    const p = new Path2D();
+    p.arc(x, y - h * 0.9, h * 0.07, 0, Math.PI * 2);
+    p.moveTo(x - h * 0.11, y - h * 0.78);
+    p.quadraticCurveTo(x, y - h * 0.86, x + h * 0.11, y - h * 0.78);
+    p.lineTo(x + h * 0.1, y - h * 0.36);
+    p.lineTo(x + h * 0.06, y);
+    p.lineTo(x + h * 0.012, y);
+    p.lineTo(x, y - h * 0.3);
+    p.lineTo(x - h * 0.012, y);
+    p.lineTo(x - h * 0.06, y);
+    p.lineTo(x - h * 0.1, y - h * 0.36);
+    p.closePath();
+    return p;
+  }
+  function borrado(ctx, forma, cor, raio) {
+    ctx.save();
+    ctx.shadowColor = cor;
+    ctx.shadowBlur = raio;
+    // o deslocamento da sombra não passa pela escala do desenho; a forma, sim
+    const esc = ctx.getTransform ? ctx.getTransform().a : 1;
+    ctx.shadowOffsetX = 4000;
+    ctx.translate(-4000 / esc, 0);
+    ctx.fillStyle = '#000';
+    ctx.fill(forma);
+    ctx.restore();
+  }
   function arteCustaTudo(ctx) {
-    // o cartaz laranja, um pouco torto
-    ctx.save();
-    ctx.translate(L / 2, 1020);
-    ctx.rotate(-0.045);
-    const pw = 660;
-    const ph = 840;
-    ctx.fillStyle = 'rgba(0,0,0,.18)';
-    ctx.fillRect(-pw / 2 + 14, -ph / 2 + 18, pw, ph);
-    ctx.fillStyle = '#f2561d';
-    ctx.fillRect(-pw / 2, -ph / 2, pw, ph);
-    const oswald = (t) => '700 ' + t + 'px Oswald, sans-serif';
-    const linhas = ['O CHAMADO', 'NÃO CUSTA', 'CARO,', 'CUSTA', 'TUDO.'];
-    ctx.font = oswald(100);
-    const tam = Math.min(150, 100 * (pw - 110) / Math.max(...linhas.map((l) => ctx.measureText(l).width)));
-    let y = -(linhas.length * tam * 1.02) / 2 - tam * 0.2;
-    for (const linha of linhas) {
-      y += tam * 1.02;
-      S.escrever(ctx, linha, -pw / 2 + 55, y, oswald(tam), '#141210', { alinhar: 'left' });
+    // os que passam, borrados (e um pouco esticados, como em movimento)
+    for (const [x, y, h, raio, a] of [[240, 860, 420, 22, 0.95], [970, 720, 330, 26, 0.8], [330, 1330, 380, 34, 0.75], [880, 1400, 360, 40, 0.7]]) {
+      borrado(ctx, pessoa(x, y, h), 'rgba(8,8,8,' + a + ')', raio);
+      ctx.save();
+      ctx.translate(0, -h * 0.12);
+      borrado(ctx, pessoa(x, y, h), 'rgba(8,8,8,' + (a * 0.4) + ')', raio * 1.4);
+      ctx.restore();
     }
-    ctx.restore();
-    // a tela do alambrado, na frente de tudo: losangos de arame com sombra
-    const passo = 104;
-    const fio = (cor, larg, dx, dy) => {
-      ctx.strokeStyle = cor;
-      ctx.lineWidth = larg;
+    // a sombra longa e quem anda sozinho, nítido
+    const x = 560;
+    const y = 1000;
+    const h = 300;
+    const sombra = new Path2D();
+    sombra.ellipse(x + h * 0.62, y - 6, h * 0.62, h * 0.07, -0.04, 0, Math.PI * 2);
+    borrado(ctx, sombra, 'rgba(0,0,0,.55)', 10);
+    ctx.fillStyle = '#0b0b0b';
+    ctx.fill(pessoa(x, y, h));
+    // o texto: branco condensado, e o TUDO à mão em laranja, circulado
+    const branco = '#f1eee6';
+    const laranja = '#f0441e';
+    const linhas = ['O CHAMADO NÃO É', 'CARO. ELE CUSTA'];
+    ctx.font = S.Mn(800, 100);
+    const tam = Math.min(130, 100 * 900 / (0.84 * Math.max(...linhas.map((l) => ctx.measureText(l).width))));
+    linhas.forEach((l, i) => {
+      ctx.save();
+      ctx.translate(L / 2, 1300 + i * tam * 1.02);
+      ctx.scale(0.84, 1);
+      S.escrever(ctx, l, 0, 0, S.Mn(800, tam), branco, { espaco: -tam * 0.03 });
+      ctx.restore();
+    });
+    const yTudo = 1300 + tam * 1.02 + 150;
+    ctx.fillStyle = laranja;
+    aMao(ctx, 'TUDO', L / 2, yTudo, 104, sorteio(14), { alinhar: 'center', espaco: 6 });
+    ctx.strokeStyle = laranja;
+    ctx.lineCap = 'round';
+    for (const [d, w] of [[0, 6], [5, 3]]) {
+      ctx.lineWidth = w;
       ctx.beginPath();
-      for (let x = -A; x < L + A; x += passo) {
-        ctx.moveTo(x + dx, -400 + dy);
-        for (let t = 0; t <= 2800; t += 52) ctx.lineTo(x + t + dx + Math.sin(t / 52 * Math.PI) * 6, -400 + t + dy);
-        ctx.moveTo(x + dx, -400 + dy);
-        for (let t = 0; t <= 2800; t += 52) ctx.lineTo(x - t + dx + Math.sin(t / 52 * Math.PI) * 6, -400 + t + dy);
-      }
+      ctx.ellipse(L / 2 + d, yTudo - 36 + d, 210, 72, -0.06, Math.PI * 0.12, Math.PI * 2.05);
       ctx.stroke();
-    };
-    ctx.save();
-    ctx.lineJoin = 'round';
-    fio('rgba(20,30,45,.22)', 5, 4, 6);
-    fio('rgba(214,220,227,.85)', 3, 0, 0);
-    ctx.restore();
+    }
   }
 
   // ---------- a ofensiva no topo, a arte no meio, a marca no pé ----------
@@ -1609,20 +1641,13 @@
     tenda: { fundo: ['#d9cba9', { x: L / 2, y: 1000, r: 1000, cor: 'rgba(255,250,235,.35)' }], caixa: [600, 1520], tema: CLARO, desenhar: arteTenda, grao: [14, 3311] },
     diferente: { fundo: ['#121110', { x: L / 2, y: 820, r: 700, cor: 'rgba(255,255,255,.07)' }], caixa: [560, 1490],
       tema: { ...ESCURO, numero: '#f2552c' }, desenhar: arteDiferente, grao: [18, 1212] },
-    custatudo: { fundo: ['#5b97d6'], caixa: [560, 1480], ceu: true,
-      tema: { ...ESCURO, numero: '#ffffff', rotulo: '#ffffff', marca: '#ffffff', marcaFraca: '#e3eefa', brilho: false }, desenhar: arteCustaTudo, grao: [12, 13] },
+    custatudo: { fundo: ['#2b2b2a', { x: L / 2, y: 820, r: 900, cor: 'rgba(120,120,116,.35)' }], caixa: [560, 1560],
+      tema: { ...ESCURO, numero: '#f0441e', rotulo: '#f1eee6', marca: '#f1eee6', marcaFraca: '#a3a29d' }, desenhar: arteCustaTudo, grao: [30, 13] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
   };
   function montar(m) {
     return (ctx, { dias }) => {
       fundo(ctx, m.fundo[0], m.fundo[1]);
-      if (m.ceu) {
-        const g = ctx.createLinearGradient(0, 0, 0, A);
-        g.addColorStop(0, '#2f6fb8');
-        g.addColorStop(1, '#9cc8ee');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, L, A);
-      }
       ctx.save();
       if (m.caixa) {
         const [y0, y1] = m.caixa;
