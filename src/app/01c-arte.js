@@ -84,6 +84,15 @@
     { linhas: ['Seu chamado é', 'ser diferente'], arte: 'diferente' },
     { linhas: ['O chamado não', 'é caro. Ele', 'custa tudo'], arte: 'custatudo' },
     { linhas: ['Um coração disposto', 'não cumpre chamado', 'se a boca não fala'], arte: 'coracao' },
+    // Lema com a referência: a NBV diz "eu próprio não vivo mais, e sim é Cristo quem vive em mim".
+    { linhas: ['Não vivo mais eu,', 'mas Cristo', 'vive em mim'], ref: 'Gálatas 2.20', arte: 'naovivo' },
+    { linhas: ['Quando penso', 'em desistir, lembro', 'que você', 'insistiu em mim'], arte: 'desistir' },
+    { linhas: ['Confie no plano', 'de Deus'], arte: 'confie' },
+    { linhas: ['Inundados pelo', 'amor de Deus'], ref: 'Ezequiel 47.1-9', arte: 'inundados' },
+    // Lema com a referência: a NBV diz "Estou fazendo um trabalho muito importante!".
+    { linhas: ['Estou em uma', 'grande obra e', 'não posso parar'], ref: 'Neemias 6.3', arte: 'grandeobra' },
+    // Começo de Mateus 24.42 na NBV, palavra por palavra (o story cita o versículo inteiro).
+    { linhas: ['Portanto,', 'estejam vigiando'], ref: 'Mateus 24.42', arte: 'vigiem' },
     // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
     { linhas: ['É tudo', 'sobre Ele'] },
     { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },

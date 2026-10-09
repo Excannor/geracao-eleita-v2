@@ -129,7 +129,7 @@ try {
   await av('(() => { const E = CC.estado(); E.marcadoEm = {}; for (let i = 0; i < 16; i++) E.marcadoEm["t" + i] = CC.somaDias(CC.hojeIso(), -i); return true; })()');
   ok(await av('CC.sequencia().atual') === 16, 'a conta de teste está com 16 dias de ofensiva');
   const artes = await av('CC.FRASES_OFENSIVA.filter((f) => f.arte).map((f) => ({ ...f }))');
-  ok(Array.isArray(artes) && artes.length === 16, 'há 16 frases com arte própria (' + (artes || []).map((f) => f.arte).join(', ') + ')');
+  ok(Array.isArray(artes) && artes.length === 22, 'há 22 frases com arte própria (' + (artes || []).map((f) => f.arte).join(', ') + ')');
   const fundos = new Set();
   // abre a folha com esta frase (o sorteio é trocado só aqui) e toca em Compartilhar
   const abrirECompartilhar = async (frase) => {
@@ -170,6 +170,31 @@ try {
     ok(tela.linhas.join(' ') === f.linhas.join(' ') && tela.ref === (f.ref || ''), f.arte + ': a folha mostra ' + (f.linhas.length ? 'a frase' : 'só a referência') + ' (' + (tela.linhas.join(' / ') || tela.ref) + ')');
   }
   ok(await av('!!CC.story.artes && document.querySelectorAll("script[src*=story-artes]").length === 1'), 'com o arquivo de volta, os desenhos carregam uma vez só, na hora de gerar');
+  // a foto do "Jesus é suficiente" (story-foto-suficiente.<resumo>.webp): vem com as artes,
+  // só na hora; sem ela, o modelo sai com a ilustração, e o próximo toque tenta de novo
+  const suf = artes.find((f) => f.arte === 'suficiente');
+  const fotoReal = await av('(window.STORY_FOTOS || {}).suficiente || ""');
+  ok(/^story-foto-suficiente\.[0-9a-f]{10}\.webp$/.test(fotoReal), 'o nome da foto vem no arquivo das artes, não no index.html (' + fotoReal + ')');
+  ok(await av('fetch("./sw.js").then((r) => r.text()).then((t) => t.includes(' + JSON.stringify(fotoReal) + '))'), 'o service worker guarda a foto no cache das artes');
+  ok(await av('fetch("./index.html").then((r) => r.text()).then((t) => !t.includes("story-foto-"))'), 'o index.html não menciona a foto');
+  const comFoto = await av('!!performance.getEntriesByType("resource").find((e) => e.name.includes(' + JSON.stringify(fotoReal) + ')) && CC.story.arteCompleta("suficiente")');
+  ok(comFoto, 'o story "Jesus é suficiente" baixou a foto e saiu com ela');
+  const mFoto = await abrirECompartilhar(suf);
+  await av('location.reload(); true');
+  await dormir(500);
+  await esperar('!!(window.CC && CC.folhaOfensiva && CC.story && document.querySelector(".folha-topo, .trilha"))', 15000);
+  await dormir(1500);
+  await av(SIMULAR);
+  await av('(() => { const E = CC.estado(); E.marcadoEm = {}; for (let i = 0; i < 16; i++) E.marcadoEm["t" + i] = CC.somaDias(CC.hojeIso(), -i); return true; })()');
+  // a foto falha: as artes carregam e, antes de desenhar, o nome da foto é trocado por um que não existe
+  await av('CC.story.carregarArtes().then(() => { window.STORY_FOTOS.suficiente = "story-foto-suficiente.0000000000.webp"; return true; })');
+  const mSem = await abrirECompartilhar(suf);
+  ok(!!mSem && mSem.w === 1080 && mSem.h === 1920 && mSem.chama && !(await av('CC.story.arteCompleta("suficiente")')),
+    'sem a foto, "Jesus é suficiente" sai com a ilustração, sem erro');
+  ok(!!mFoto && !!mSem && Math.abs(mFoto.desvio - mSem.desvio) > 1, 'a versão com foto não é a ilustração (desvio ' + (mFoto && mFoto.desvio.toFixed(1)) + ' contra ' + (mSem && mSem.desvio.toFixed(1)) + ')');
+  await av('window.STORY_FOTOS.suficiente = ' + JSON.stringify(fotoReal) + '; true');
+  const mDeNovo = await abrirECompartilhar(suf);
+  ok(!!mDeNovo && await av('CC.story.arteCompleta("suficiente")') && Math.abs(mDeNovo.desvio - mFoto.desvio) < 0.5, 'com a foto de volta, o toque seguinte já sai com a foto');
   ok(fundos.size >= 5, 'os modelos têm fundos diferentes entre si (' + fundos.size + ' fundos)');
   // frase sem arte: o modelo de sempre (o grafite #1b1c1a)
   const comum = await abrirECompartilhar({ linhas: ['Geração', 'inconformada'] });

@@ -5,7 +5,7 @@
 //   teste: frase mais curta e mais longa, 1, 16, 100 e 365 dias, versículos curto, médio e
 //   longo). Cada caso sai em PNG 1080x1920; as folhas de comparação saem reduzidas.
 import { spawn } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,6 +35,7 @@ const html = `<!doctype html><meta charset="utf-8"><style>${ler('src/fontes.css'
 <script>CC.CAMINHO_SIMBOLO = ${JSON.stringify(simbolo)};</script>
 <script>${ler('src/app/01c-arte.js')}</script>
 <script>${ler('src/app/01d-story.js')}</script>
+<script>window.STORY_FOTOS = ${JSON.stringify(Object.fromEntries((existsSync(join(RAIZ, 'src', 'story-fotos')) ? readdirSync(join(RAIZ, 'src', 'story-fotos')) : []).filter((f) => f.endsWith('.webp')).map((f) => [f.replace(/\.webp$/, ''), 'file://' + join(RAIZ, 'src', 'story-fotos', f)])))};</script>
 <script>${ler('src/app/01e-story-artes.js')}</script>
 <script>${ler('design/compartilhar/variantes.js')}</script>
 <script>
@@ -46,6 +47,8 @@ window.gerar = async (fn, dados) => {
   await CC.story.prepararFontes();
   const d = Object.assign({}, dados);
   if (typeof d.frase === 'string') d.frase = FRASES[d.frase];
+  const arte = d.frase && CC.story.arteDesejada && CC.story.arteDesejada(d.frase);
+  if (arte && CC.story.prepararArte) await CC.story.prepararArte(arte);
   const tela = CC.story.tela();
   const desenhar = (window.VARIANTES && VARIANTES[fn]) || (CC.story.desenhar && ((ctx, x) => CC.story.desenhar(ctx, fn, x)));
   desenhar(tela.getContext('2d'), d);
@@ -75,8 +78,8 @@ const casos = [];
 const folhas = [];
 if (conjunto === 'artes') {
   // os modelos das frases com arte própria (01e-story-artes.js), com 1 e 16 dias
-  for (const arte of ['chama', 'luz', 'ninguem', 'oleiro', 'procurado', 'suficiente', 'praticantes', 'porta', 'mesa', 'quemdeusdiz', 'comprado', 'momento', 'tenda', 'diferente', 'custatudo', 'coracao']) for (const dias of [16, 1]) casos.push({ nome: 'arte-' + arte + '-' + dias, fn: 'ofensiva', dados: { dias, frase: arte } });
-  folhas.push({ nome: 'folha-artes', casos: ['arte-chama-16', 'arte-luz-16', 'arte-ninguem-16', 'arte-oleiro-16', 'arte-procurado-16', 'arte-suficiente-16', 'arte-praticantes-16', 'arte-porta-16', 'arte-mesa-16', 'arte-quemdeusdiz-16', 'arte-comprado-16', 'arte-momento-16', 'arte-tenda-16', 'arte-diferente-16', 'arte-custatudo-16', 'arte-coracao-16'] });
+  for (const arte of ['chama', 'luz', 'ninguem', 'oleiro', 'procurado', 'suficiente', 'praticantes', 'porta', 'mesa', 'quemdeusdiz', 'comprado', 'momento', 'tenda', 'diferente', 'custatudo', 'coracao', 'naovivo', 'desistir', 'confie', 'inundados', 'grandeobra', 'vigiem']) for (const dias of [16, 1]) casos.push({ nome: 'arte-' + arte + '-' + dias, fn: 'ofensiva', dados: { dias, frase: arte } });
+  folhas.push({ nome: 'folha-artes', casos: ['arte-chama-16', 'arte-luz-16', 'arte-ninguem-16', 'arte-oleiro-16', 'arte-procurado-16', 'arte-suficiente-16', 'arte-praticantes-16', 'arte-porta-16', 'arte-mesa-16', 'arte-quemdeusdiz-16', 'arte-comprado-16', 'arte-momento-16', 'arte-tenda-16', 'arte-diferente-16', 'arte-custatudo-16', 'arte-coracao-16', 'arte-naovivo-16', 'arte-desistir-16', 'arte-confie-16', 'arte-inundados-16', 'arte-grandeobra-16', 'arte-vigiem-16'] });
 } else if (conjunto === 'variantes') {
   const of = { dias: 16, frase: 'atos' };
   for (const v of ['A', 'B', 'C']) casos.push({ nome: 'ofensiva-' + v, fn: 'ofensiva' + v, dados: of });
@@ -102,7 +105,8 @@ if (conjunto === 'artes') {
 const pasta = mkdtempSync(join(tmpdir(), 'story-'));
 writeFileSync(join(pasta, 'p.html'), html);
 const porta = await portaLivre();
-const nav = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--remote-debugging-port=' + porta,
+// --allow-file-access-from-files: as fotos dos modelos vêm do disco e não podem sujar o canvas
+const nav = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--allow-file-access-from-files', '--remote-debugging-port=' + porta,
   '--user-data-dir=' + join(pasta, 'perfil'), 'about:blank'], { stdio: 'ignore' });
 let wsUrl;
 for (let i = 0; i < 80 && !wsUrl; i++) {

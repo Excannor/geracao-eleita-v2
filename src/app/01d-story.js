@@ -384,13 +384,19 @@
     const chave = JSON.stringify(pedido);
     if (guardada.chave !== chave || !guardada.promessa) {
       const querArte = pedido.tipo === 'ofensiva' && !!arteDesejada(pedido.frase);
-      const promessa = prepararFontes().then(() => (querArte ? carregarArtes() : true)).then(() => {
-        const c = tela();
-        desenhar(c.getContext('2d'), pedido.tipo, pedido);
-        // a arte não chegou: esta sai no modelo de sempre, e o próximo toque tenta de novo
-        if (querArte && !arteDaFrase(pedido.frase)) setTimeout(() => { if (guardada.promessa === promessa) guardada = { chave: '', promessa: null }; }, 0);
-        return new Promise((resolver) => c.toBlob(resolver, 'image/png'));
-      }).then((blob) => {
+      const arte = querArte ? arteDesejada(pedido.frase) : null;
+      const promessa = prepararFontes()
+        .then(() => (querArte ? carregarArtes() : true))
+        .then(() => (querArte && CC.story.prepararArte && arteDaFrase(pedido.frase) ? CC.story.prepararArte(arte) : true))
+        .then(() => {
+          const c = tela();
+          desenhar(c.getContext('2d'), pedido.tipo, pedido);
+          // a arte (ou a foto dela) não chegou: esta sai no modelo de sempre (ou na
+          // ilustração), e o próximo toque tenta de novo
+          const faltou = querArte && (!arteDaFrase(pedido.frase) || (CC.story.arteCompleta && !CC.story.arteCompleta(arte)));
+          if (faltou) setTimeout(() => { if (guardada.promessa === promessa) guardada = { chave: '', promessa: null }; }, 0);
+          return new Promise((resolver) => c.toBlob(resolver, 'image/png'));
+        }).then((blob) => {
         if (!blob) throw new Error('sem imagem');
         return new File([blob], nomeDoArquivo(pedido), { type: 'image/png' });
       });
