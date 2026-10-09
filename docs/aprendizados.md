@@ -668,6 +668,11 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   dinheiro e bênção das reflexões; a oferta ficou na alegria de dar (9.7), na pobreza de Jesus (8.9) e no "não sobrava
   nem faltava" (Êx 16.18). O véu de Moisés (2Co 3.14-16) já está em Êxodo: o ramo usa 3.7, 3.12-13 e 3.17-18.
 
+- 2026-10-09 · conteúdo · Efésios: o código da casa (Ef 5.21–6.9) ficou fora dos galhos e aparece só nos títulos da
+  estrutura ("Filhos da luz e o casamento", "A casa e a armadura de Deus"); Ef 2.13, 19-21 e 5.2 já estavam em Esdras e
+  Levítico, e o muro (2.14-16) ficou com o ângulo da paz entre judeus e gentios. Par com hífen na NBV ("Sente-se", Sl
+  110.1) saiu do mapa: no cartão escuro o texto do AT não se parafraseia.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
