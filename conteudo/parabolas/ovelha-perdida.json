@@ -1,0 +1,80 @@
+{
+  "titulo": "A ovelha perdida",
+  "ref": "Lc 15.1-7",
+  "grupo": "lucas",
+  "linha": "Noventa e nove ficam, e o dono vai atrás de uma",
+  "desenho": "ovelha-longe-do-rebanho",
+  "desenhoLista": "ovelha-sozinha",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Os cobradores de impostos e outras pessoas de má fama se juntam para ouvir Jesus. Os fariseus e os mestres da lei começam a reclamar.",
+          "ref": "Lc 15.1-2"
+        },
+        {
+          "fala": "Este homem está fazendo amizade com aquelas pessoas de má fama e até está comendo com elas!",
+          "ref": "Lc 15.2"
+        },
+        {
+          "texto": "Jesus responde com esta história. Na mesma conversa, ele ainda conta a da moeda perdida e a de um homem que tinha dois filhos.",
+          "ref": "Lc 15.3-11"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Jesus pede para quem está ouvindo se imaginar dono de cem ovelhas, e uma delas se perde.",
+          "ref": "Lc 15.4"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "rebanho-junto",
+              "titulo": "As noventa e nove",
+              "fala": "não deixaria as outras 99",
+              "ref": "Lc 15.4"
+            },
+            {
+              "desenho": "ovelha-sozinha",
+              "titulo": "A que se perdeu",
+              "fala": "ir à procura da perdida até conseguir encontrá-la",
+              "ref": "Lc 15.4"
+            },
+            {
+              "desenho": "ovelha-em-casa",
+              "titulo": "De volta para casa",
+              "fala": "Alegrem-se comigo, pois encontrei a minha ovelha perdida",
+              "ref": "Lc 15.6"
+            }
+          ]
+        },
+        {
+          "texto": "Quando acha, o dono põe a ovelha nos ombros e volta para casa todo alegre. Lá, ele chama os amigos e os vizinhos para se alegrarem com ele.",
+          "ref": "Lc 15.5-6"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Os fariseus reclamam de quem come com Jesus. Para Deus, cada uma dessas pessoas é a ovelha que se perdeu, e ele vai atrás dela até achar.",
+    "apoio": "Jesus diz o que acontece lá em cima. “há muito mais alegria no céu por causa de um pecador que volta para Deus”.",
+    "ref": "Lc 15.2-7"
+  },
+  "perguntas": [
+    "Quem você conhece que anda longe de Deus e precisa que alguém vá atrás?",
+    "Tem alguém que você estranharia ver sentado à mesa com Jesus?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 18.12-14",
+      "titulo": "A ovelha que se desgarra",
+      "linha": "o Pai não quer que nenhum pequenino se perca"
+    }
+  ]
+}

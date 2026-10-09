@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- de volta para casa (Lc 15.6): a casa de teto reto, com a porta de tábuas e a janela; na frente, encostada na parede, a ovelha que foi achada, de lã em nuvem, virada para a direita. A lã da ovelha é a única área sálvia. -->
+<path class="k" d="M6 100H114"/>
+<path class="k p" d="M8 100V50H64V100Z"/>
+<path class="k p" d="M4 50H68V43H4Z"/>
+<path class="h" d="M8 62H64M8 76H16M56 86H64"/>
+<path class="k p" d="M20 100V74C20 67 36 67 36 74V100Z"/>
+<path class="h" d="M25.5 69.5V100M30.5 69.5V100"/>
+<path class="k p" d="M44 68H56V80H44Z"/>
+<path class="h" d="M50 68V80M44 74H56"/>
+<path class="k s" d="M71.3 84.4c-4.2-1-4.2-6.2 0-7.3 0-4.2 5.2-6.2 8.3-3.1 2.1-3.1 7.3-3.1 9.4 0 3.1-2.1 7.3-1 8.3 2.1 4.2 0 6.2 4.2 3.1 7.3 2.1 3.1-1 6.2-4.2 5.2-2.1 2.1-6.2 2.1-8.3 0-3.1 2.1-7.3 2.1-9.4 0-4.2 1-7.3-1-7.3-4.2z"/>
+<path class="h" d="M76.5 80.2c1-1 2.1-1 3.1 0M82.7 78.2c1-1 2.1-1 3.1 0M89 80.2c1-1 2.1-1 3.1 0M79.6 84.4c1-1 2.1-1 3.1 0M86.9 84.4c1-1 2.1-1 3.1 0M94.2 83.4c1-1 2.1-1 3.1 0"/>
+<path class="k p" d="M101.4 76.1c2.1-4.2 9.4-4.2 11.4 1 1.6 4.2-1 8.3-5.2 8.3-4.2 0-7.3-4.2-6.2-9.4z"/>
+<path class="k p" d="M104.6 75c-1-4.2-4.2-5.2-6.2-3.1 1 2.1 3.1 3.1 6.2 3.1z"/>
+<circle class="e" cx="108.7" cy="79.2" r="1.4"/>
+<path class="k" d="M76.5 89.6v10.4M81.7 90.6v9.4M91 90.6v9.4M96.2 89.6v10.4"/>
+</svg>
