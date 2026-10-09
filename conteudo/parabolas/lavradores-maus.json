@@ -1,0 +1,101 @@
+{
+  "titulo": "Os lavradores maus",
+  "ref": "Lc 20.9-19",
+  "grupo": "lucas",
+  "linha": "O dono manda três servos e depois o filho",
+  "desenho": "vinha-arrendada",
+  "desenhoLista": "cesto-vazio",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus está ensinando no templo. Os sacerdotes principais, os mestres da lei e outros líderes perguntam com que autoridade ele faz essas coisas.",
+          "ref": "Lc 20.1-2"
+        },
+        {
+          "texto": "Jesus responde com outra pergunta, sobre o batismo de João. Eles dizem que não sabem, e Jesus também não responde.",
+          "ref": "Lc 20.3-8"
+        },
+        {
+          "texto": "Depois, Jesus se vira para o povo e conta esta história.",
+          "ref": "Lc 20.9"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "broto",
+      "blocos": [
+        {
+          "texto": "Um homem planta uma vinha, aluga a vinha para uns lavradores e viaja para longe por muito tempo.",
+          "ref": "Lc 20.9"
+        },
+        {
+          "texto": "Na época da colheita, ele manda um servo buscar a parte dele das uvas. Os lavradores batem no servo e mandam ele embora sem nada. O dono manda mais dois servos, e acontece a mesma coisa.",
+          "ref": "Lc 20.10-12"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "cesto-vazio",
+              "titulo": "Os servos",
+              "fala": "o mandaram de volta de mãos vazias",
+              "ref": "Lc 20.10"
+            },
+            {
+              "desenho": "anel-de-selo",
+              "titulo": "O filho",
+              "fala": "Este é o herdeiro",
+              "ref": "Lc 20.14"
+            },
+            {
+              "desenho": "pedra-principal",
+              "titulo": "A pedra",
+              "fala": "Qualquer que tropeçar nessa pedra será despedaçado",
+              "ref": "Lc 20.18"
+            }
+          ]
+        },
+        {
+          "texto": "Então o dono resolve mandar o filho amado. Ele acha que os lavradores vão respeitar o filho.",
+          "ref": "Lc 20.13"
+        },
+        {
+          "texto": "Os lavradores veem o filho e querem ficar com a herança. Eles arrastam o filho para fora da vinha e matam ele.",
+          "ref": "Lc 20.14-15"
+        },
+        {
+          "texto": "Jesus diz que o dono vai matar aqueles lavradores e dar a vinha para outros. O povo ouve e pede que Deus não permita isso.",
+          "ref": "Lc 20.15-16"
+        },
+        {
+          "texto": "Os mestres da lei e os sacerdotes principais entendem que a história é sobre eles e querem prender Jesus na hora. Só não prendem porque têm medo do povo.",
+          "ref": "Lc 20.19"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Os líderes entendem que a história é sobre eles. Deus mandou servo atrás de servo, e agora manda o filho amado. Jesus sabe o que eles vão fazer com ele e conta isso na frente deles.",
+    "apoio": "Jesus olha para eles e lembra a Escritura. “A pedra que os construtores rejeitaram acabou se tornando a pedra mais importante de toda a construção”.",
+    "ref": "Lc 20.13-19"
+  },
+  "perguntas": [
+    "Que parte da sua vida você trata como se fosse sua, e não de Deus?",
+    "O que você faz quando a Bíblia fala de você?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 21.33-46",
+      "titulo": "Os lavradores maus",
+      "linha": "o Reino de Deus vai ser tirado deles e dado a um povo que dê frutos"
+    },
+    {
+      "ref": "Mc 12.1-12",
+      "titulo": "Os lavradores maus",
+      "linha": "o dono faz cerca, tanque de uvas e torre antes de alugar a vinha"
+    }
+  ]
+}
