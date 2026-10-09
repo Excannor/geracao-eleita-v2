@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o servo inútil (Lc 17.7-8): à esquerda, no campo, o arado parado na terra arada, com os sulcos; à direita, dentro de casa, a mesa baixa com o prato de pão e o jarro que o servo ainda vai servir. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. O pão é a única área sálvia. -->
+<path class="k" d="M2 108H158"/>
+<path class="h" d="M6 114H36M44 115H70M8 120H30M48 120H66"/>
+<path class="k p" d="M22.8 93.6L75.6 68L78 72.8L25.2 98.4Z"/>
+<path class="k p" d="M6.8 58.4L11.6 56.8L27.6 101.6L22.8 103.2Z"/>
+<path class="k" d="M2 58.4H14.8"/>
+<path class="k e" d="M21.2 100L43.6 106.4L22.8 108Z"/>
+<path class="k p" d="M84 78H156V84H84Z"/>
+<path class="k" d="M90 84V108M150 84V108"/>
+<path class="k p" d="M88 69.6C88 75.2 96.4 78 109 78C121.6 78 130 75.2 130 69.6Z"/>
+<path class="k p" d="M88 69.6a21 4.9 0 0.7 0 42 0a21 4.9 0 0.7 0-42 0Z"/>
+<path class="k s" d="M95 69.6C95 59.8 102 55.6 109 55.6C116 55.6 123 59.8 123 69.6C116 71.7 102 71.7 95 69.6Z"/>
+<path class="h" d="M102 61.2l2.8 4.2M109 59.8l2.8 4.9M116 61.2l2.1 4.2"/>
+<path class="k" d="M149.6 48.6C158 48.6 158 62.6 149.6 65.4"/>
+<path class="k p" d="M137 40.2H145.4V44.4C149.6 47.2 152.4 52.8 152.4 59.8C152.4 71 148.2 78 141.2 78C134.2 78 130 71 130 59.8C130 52.8 132.8 47.2 137 44.4Z"/>
+<path class="k" d="M135.6 40.2H146.8"/>
+<path class="h" d="M132.1 57C137 58.4 145.4 58.4 150.3 57"/>
+</svg>

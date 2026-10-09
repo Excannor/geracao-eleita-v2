@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o servo que ara o campo (Lc 17.7): o arado de madeira no chão, o cabo inclinado com a travessa de pegar no alto, a relha de ferro escura com a ponta enterrada na terra (a terra vai depois do arado, para cobrir a ponta) e o timão comprido subindo para a direita; embaixo, a terra arada, com os sulcos. A terra arada é a única área sálvia. -->
+<path class="k p" d="M44 74L110 42L113 48L47 80Z"/>
+<path class="k p" d="M24 30L30 28L50 84L44 86Z"/>
+<path class="k" d="M18 30H34"/>
+<path class="k e" d="M42 82L70 90L44 92Z"/>
+<path class="s" d="M6 88H114V102C80 100 40 100 6 102Z"/>
+<path class="k" d="M6 88H114"/>
+<path class="h" d="M14 95H40M54 96H84M94 95H110"/>
+</svg>
