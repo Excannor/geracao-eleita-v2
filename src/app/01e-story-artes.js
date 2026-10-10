@@ -1790,32 +1790,63 @@
     }
   }
 
-  // ---------- (t) Inundados pelo amor de Deus: a pessoa ajoelhada dentro do AMOR ----------
-  // Ezequiel 47.1-9: o rio que sai do templo e enche tudo de vida. Sem citar o texto.
+  // ---------- (t) Inundados pelo amor de Deus: a água subindo dentro do AMOR ----------
+  // Ezequiel 47.1-9: o rio que sai do templo e vai enchendo, primeiro até o tornozelo,
+  // depois até o joelho, a cintura, e por fim dá para nadar. Cada letra de AMOR é um desses
+  // passos: a água (azul-esverdeado) sobe de letra em letra, com a onda na linha d'água, e a
+  // parte de cima continua creme. Sem citar o texto.
+  const AGUA = { funda: '#3f8f86', clara: '#7cc8bb' };
   function arteInundados(ctx) {
     const branco = '#f4f1ea';
     const oswald = (t) => '700 ' + t + 'px Oswald, sans-serif';
     S.escrever(ctx, 'INUNDADOS PELO', L / 2, 660, oswald(58), branco, { espaco: 58 * 0.14 });
     ctx.font = oswald(100);
-    const tam = 100 * 940 / ctx.measureText('AMOR').width;
+    const palavra = 'AMOR';
+    const tam = 100 * 940 / ctx.measureText(palavra).width;
     const base = 700 + tam * 0.86;
-    S.escrever(ctx, 'AMOR', L / 2, base, oswald(tam), branco);
-    // a pessoa ajoelhada, de perfil, vazada na palavra (a cor do fundo por cima)
-    const u = tam * 0.9 / 100;
-    ctx.save();
-    ctx.translate(L / 2 + 60, base);
-    ctx.scale(u, u);
-    const p = new Path2D('M-20 -24C-26 -46 -14 -64 2 -66C8 -68 12 -64 14 -60L21 -52L23 -40L13 -38L11 -30'
-      + 'C15 -22 23 -16 23 -8C23 -2 19 0 13 0L-31 0C-35 -2 -33 -8 -27 -10C-23 -14 -21 -18 -20 -24Z');
-    p.arc(11, -73, 9, 0, Math.PI * 2);
-    // contorno claro: fora das letras a pessoa continua visível, dentro delas é um vazado
-    ctx.strokeStyle = branco;
-    ctx.lineWidth = 10 / u;
-    ctx.lineJoin = 'round';
-    ctx.stroke(p);
-    ctx.fillStyle = '#0d0d0c';
-    ctx.fill(p);
-    ctx.restore();
+    // a palavra numa camada: o creme, e a água pintada só por cima das letras
+    const { c, ctx: k } = camada();
+    k.font = oswald(tam);
+    const larg = k.measureText(palavra).width;
+    const alto = k.measureText(palavra).actualBoundingBoxAscent;
+    S.escrever(k, palavra, L / 2, base, oswald(tam), branco);
+    // as divisas entre as letras: no meio do vão entre uma e a outra
+    const x0 = L / 2 - larg / 2;
+    const fim = [];
+    for (let i = 1; i <= palavra.length; i++) fim.push(x0 + k.measureText(palavra.slice(0, i)).width);
+    const divisa = [x0 - 20, ...fim.slice(0, -1), x0 + larg + 20];
+    // tornozelo, joelho, cintura e nado: a fração da altura da letra coberta de água
+    const niveis = [0.2, 0.4, 0.6, 0.82];
+    const onda = (x, i) => Math.sin(x / tam * 9.5 + i * 1.7) * tam * 0.022 + Math.sin(x / tam * 23 + i) * tam * 0.008;
+    k.globalCompositeOperation = 'source-atop';
+    palavra.split('').forEach((_, i) => {
+      const nivel = base - alto * niveis[i];
+      const a = divisa[i];
+      const b = divisa[i + 1];
+      const corpo = new Path2D();
+      corpo.moveTo(a, base + 40);
+      for (let x = a; x <= b; x += 4) corpo.lineTo(x, nivel + onda(x, i));
+      corpo.lineTo(b, base + 40);
+      corpo.closePath();
+      const g = k.createLinearGradient(0, nivel, 0, base);
+      g.addColorStop(0, AGUA.clara);
+      g.addColorStop(1, AGUA.funda);
+      k.fillStyle = g;
+      k.fill(corpo);
+      // a crista: uma linha mais clara na linha d'água e outra, fina, logo abaixo
+      k.strokeStyle = '#c9ece4';
+      k.lineWidth = tam * 0.014;
+      k.lineCap = 'round';
+      for (const [dy, alfa, fator] of [[0, 1, 1], [tam * 0.07, 0.4, 0.6]]) {
+        k.globalAlpha = alfa;
+        k.lineWidth = tam * 0.014 * fator;
+        k.beginPath();
+        for (let x = a; x <= b; x += 4) k[x === a ? 'moveTo' : 'lineTo'](x, nivel + dy + onda(x + tam * 0.3, i));
+        k.stroke();
+      }
+      k.globalAlpha = 1;
+    });
+    ctx.drawImage(c, 0, 0);
     S.escrever(ctx, 'DE DEUS', L / 2, base + 110, oswald(70), branco, { espaco: 70 * 0.14 });
     referencia(ctx, 'Ezequiel 47.1-9', L / 2, base + 190, 32, 'rgba(244,241,234,.66)');
   }
@@ -2081,24 +2112,25 @@
   }
 
   // (y) Jesus is my King: a abertura da landing. O rapaz de costas em P&B à direita, apagando
-  // para a esquerda e para baixo, com a coroa sálvia à mão sobre a cabeça (a mesma da
-  // landing); à esquerda, JESUS enorme em creme, "is my" na etiqueta sálvia e KING em
-  // amarelo com o risco. O texto fica em inglês, como o dono quis.
+  // para a esquerda e para baixo, mais para a borda e mais apagado, para não disputar com o
+  // texto; à esquerda, JESUS enorme em creme coroado pela coroa sálvia à mão (a mesma da
+  // landing), inclinada no canto de cima do J: a coroa é de Jesus, não do rapaz. Depois,
+  // "is my" na etiqueta sálvia e KING em amarelo com o risco. O texto fica em inglês.
   function arteRei(ctx, fotos) {
     fundoLanding(ctx);
-    const fx = 330;
+    const fx = 400;
     const fy = 600;
     const fw = 780;
     if (fotos.abertura) {
-      fotoLanding(ctx, fotos.abertura, { x: fx, y: fy, w: fw, alfa: 0.7,
-        apaga: { esq: [fx, fx + fw * 0.5], cima: [fy, fy + 60], baixo: [1560, 1200] } });
+      fotoLanding(ctx, fotos.abertura, { x: fx, y: fy, w: fw, alfa: 0.58,
+        apaga: { esq: [fx, fx + fw * 0.55], cima: [fy, fy + 120], baixo: [1560, 1200] } });
     }
-    // a coroa sobre a cabeça do rapaz (na foto, a cabeça fica a ~70% da largura, no alto)
-    coroaLanding(ctx, fx + fw * 0.74, fy + 90, 190, -0.1);
     const x = 72;
     const t1 = tamanhoPara(ctx, 'JESUS', 700, 300);
     const y1 = 1000;
     tituloLanding(ctx, 'JESUS', x, y1, t1, LP.creme, { alinhar: 'left' });
+    // a coroa no canto de cima do J, inclinada para a esquerda, como posta sobre o nome
+    coroaLanding(ctx, x + 76, y1 - t1 * 0.86 - 4, 150, -0.2);
     etiquetaLanding(ctx, ['is my'], x + 40, y1 + 34, 66, -0.06);
     const t3 = tamanhoPara(ctx, 'KING.', 640, 300);
     const y3 = y1 + 150 + t3 * 0.86;

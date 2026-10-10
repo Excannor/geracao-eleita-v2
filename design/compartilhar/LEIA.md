@@ -51,7 +51,7 @@ multidão, ilustração própria a partir de uma foto), praticantes (livro abert
 NBV), porta (porta entreaberta, Apocalipse 3.20 na NBV) e, na segunda leva, mesa (99 não é
 100), quemdeusdiz (texto em arcos de digital e o carimbo "Somos Geração Eleita"), comprado
 (código de barras com as cruzes), momento (a poltrona vazia), tenda (a tenda do encontro),
-diferente (a ovelha branca entre as escuras), custatudo (quem anda sozinho, com os outros borrados) coracao (as brasas embaixo do texto) naovivo (só tipografia em pincel, Gálatas 2.20 como lema), desistir (o texto em cruz), confie (o texto ondulando em fatias), inundados (a pessoa ajoelhada no AMOR), grandeobra (Neemias 6.3 como lema) e vigiem (Mateus 24.42 na NBV, citado). Na terceira leva, avivados,
+diferente (a ovelha branca entre as escuras), custatudo (quem anda sozinho, com os outros borrados) coracao (as brasas embaixo do texto) naovivo (só tipografia em pincel, Gálatas 2.20 como lema), desistir (o texto em cruz), confie (o texto ondulando em fatias), inundados (a água de Ezequiel 47 subindo de letra em letra no AMOR), grandeobra (Neemias 6.3 como lema) e vigiem (Mateus 24.42 na NBV, citado). Na terceira leva, avivados,
 naotemas e rei foram refeitos "no padrão da landing page", como o dono pediu: o preto da
 landing com grão, a foto da landing em P&B com contraste apagando nas bordas (a mesma de
 src/landing/, copiada para src/story-fotos/: o culto, a cruz no monte, o rapaz de costas),
@@ -97,3 +97,13 @@ carimbo sálvia entre a cruz e a coroa à mão, o endereço e as montanhas em P&
 foram tiradas da própria arte (src/story-fotos/montanhas.webp, 45 KB, sem o ícone de som do
 print) e vêm com as artes sob demanda; o fundo todo mora em 01e-story-artes.js. Sem as artes,
 o versículo sai na página lisa (a A original). `gerar.mjs <pasta> versiculo2` gera os casos.
+
+## Rodada 7 (`rodada7/`)
+
+Dois ajustes pedidos pelo dono, a partir das capturas do celular dele (o antes em `resumo.png`):
+- **rei:** a coroa saiu da cabeça do rapaz (parecia que ele era o rei) e foi para o canto de
+  cima do J, inclinada, coroando o nome JESUS. A foto deslizou para a direita e ficou mais
+  apagada, para não disputar com o texto.
+- **inundados:** a figura ajoelhada no O parecia uma mancha. Agora a água do rio de
+  Ezequiel 47 sobe dentro das letras, de letra em letra: tornozelo no A, joelho no M,
+  cintura no O e nado no R, em azul-esverdeado com a onda clara na linha d'água.
