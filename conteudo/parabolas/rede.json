@@ -1,0 +1,109 @@
+{
+  "titulo": "A rede",
+  "ref": "Mt 13.47-50",
+  "grupo": "mateus",
+  "linha": "Os pescadores separam os peixes na praia",
+  "desenho": "rede-na-praia",
+  "desenhoLista": "rede-com-peixes",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus está em casa com os discípulos. Ele acaba de contar a do tesouro no campo e a da pérola.",
+          "ref": "Mt 13.36-46"
+        },
+        {
+          "texto": "Quando Jesus chamou Pedro, André, Tiago e João, os quatro estavam no mar da Galileia, com as redes. Agora Jesus conta uma história de rede.",
+          "ref": "Mt 4.18-22"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Uns pescadores jogam a rede na água e pegam peixes de todo tipo.",
+          "ref": "Mt 13.47"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "rede-com-peixes",
+              "titulo": "A rede cheia",
+              "fala": "juntam peixes de todas as qualidades, bons e ruins",
+              "ref": "Mt 13.47"
+            },
+            {
+              "desenho": "cesto-de-peixes",
+              "titulo": "Os bons",
+              "fala": "separam nos cestos os que servem para comer",
+              "ref": "Mt 13.48"
+            },
+            {
+              "desenho": "peixe",
+              "titulo": "Os ruins",
+              "fala": "jogam fora os ruins",
+              "ref": "Mt 13.48"
+            }
+          ]
+        },
+        {
+          "texto": "Quando a rede fica cheia, os pescadores arrastam tudo para a praia. Ali eles se sentam para separar os peixes.",
+          "ref": "Mt 13.48"
+        }
+      ]
+    },
+    {
+      "titulo": "No fim da conversa",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Jesus diz que, no fim dos tempos, os anjos vão tirar os maus do meio dos justos e jogar todos eles na fornalha ardente.",
+          "ref": "Mt 13.49-50"
+        },
+        {
+          "texto": "Jesus pergunta aos discípulos se eles estão entendendo. Eles dizem que sim, e Jesus fala de um pai de família.",
+          "ref": "Mt 13.51-52"
+        },
+        {
+          "fala": "um pai de família que tira do seu tesouro coisas novas e coisas velhas!",
+          "ref": "Mt 13.52"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "A rede pega peixe de todo tipo, e os pescadores só separam na praia, quando a pesca termina. No fim dos tempos, os anjos vão separar as pessoas do mesmo jeito. Por enquanto, a rede ainda está na água.",
+    "apoio": "Jesus explica a história. “É assim que será no fim dos tempos”.",
+    "ref": "Mt 13.49"
+  },
+  "perguntas": [
+    "Se a rede fosse puxada para a praia hoje, você estaria tranquilo?",
+    "Quem você conhece que ainda precisa ouvir falar de Jesus enquanto a rede está na água?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 13.24-30, 36-43",
+      "titulo": "O joio e o trigo",
+      "slug": "joio-e-trigo",
+      "rotulo": "Da mesma conversa",
+      "linha": "um inimigo semeia joio no meio do trigo"
+    },
+    {
+      "ref": "Mt 13.44-46",
+      "titulo": "O tesouro e a pérola",
+      "slug": "tesouro-e-perola",
+      "rotulo": "Da mesma conversa",
+      "linha": "um tesouro no campo e uma pérola de grande valor"
+    },
+    {
+      "ref": "Lc 8.4-15",
+      "titulo": "O semeador",
+      "slug": "semeador",
+      "linha": "a mesma semente em quatro tipos de chão"
+    }
+  ]
+}

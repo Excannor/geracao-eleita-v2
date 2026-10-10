@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os peixes bons no cesto (Mt 13.48): um cesto trançado, de boca larga, com a borda grossa, e três peixes metidos de cabeça para baixo, com o rabo e o fim do corpo para fora da boca. Sem área sálvia. -->
+<path class="k" d="M18 104H102"/>
+<g transform="rotate(110 43 39.4)"><path class="k p" d="M63.4 39.4C53.2 25.5 32.8 28.3 28.7 39.4C32.8 50.5 53.2 53.3 63.4 39.4Z"/><path class="k p" d="M29.5 39.4L21.6 30.1V48.7Z"/></g>
+<g transform="rotate(70 77 39.4)"><path class="k p" d="M97.4 39.4C87.2 25.5 66.8 28.3 62.7 39.4C66.8 50.5 87.2 53.3 97.4 39.4Z"/><path class="k p" d="M63.5 39.4L55.6 30.1V48.7Z"/></g>
+<g transform="rotate(90 60 32.6)"><path class="k p" d="M80.4 32.6C70.2 18.7 49.8 21.5 45.7 32.6C49.8 43.7 70.2 46.5 80.4 32.6Z"/><path class="k p" d="M46.5 32.6L38.6 23.3V41.9Z"/></g>
+<path class="k p" d="M22.6 53L32.8 104H87.2L97.4 53Z"/>
+<path class="h" d="M25.3 66.6H94.7M28 80.2H92M30.8 93.8H89.2M46.4 53L49.8 104M73.6 53L70.2 104"/>
+<path class="k p" d="M19.2 53H100.8V59.8H19.2Z"/>
+</svg>

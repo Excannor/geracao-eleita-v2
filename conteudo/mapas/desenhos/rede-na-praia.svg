@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a rede (Mt 13.47-48): à esquerda, o mar com as ondas; os pescadores arrastaram a rede para a praia, e ela está deitada na areia, com a corda ainda saindo para a água, cheia de peixes de todo tipo, com a corda de cima e as boias; à direita, o cesto com os peixes que servem para comer, e na areia, longe do cesto, um peixe jogado fora. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. As boias da rede são a única área sálvia. -->
+<path class="k" d="M2 52C8 48 14 48 20 52C26 56 32 56 38 52"/>
+<path class="h" d="M4 62C10 58 16 58 22 62C28 66 32 66 34 64M6 76C10 73 14 73 18 76"/>
+<path class="k" d="M2 86C24 88 40 98 62 98H158"/>
+<path class="h" d="M50 108C80 104 110 104 146 108M74 116C94 113 116 113 132 116"/>
+<path class="k" d="M37 72C28 66 20 66 10 70"/>
+<path class="k p" d="M36 63.7C55 56.1 93 56.1 112 63.7C117.7 77 110.1 92.2 93 96C79.7 98.9 68.3 98.9 55 96C37.9 92.2 30.3 77 36 63.7Z"/>
+<g transform="rotate(-10 51.2 75.1)"><path class="k p" d="M59.8 75.1C55.5 69.3 46.9 70.4 45.2 75.1C46.9 79.8 55.5 80.9 59.8 75.1Z"/><path class="k p" d="M45.6 75.1L42.2 71.2V79Z"/><circle class="e" cx="55.9" cy="74.1" r="1"/></g>
+<g transform="rotate(8 68.3 82.7)"><path class="k p" d="M59.8 82.7C64 76.9 72.6 78 74.3 82.7C72.6 87.4 64 88.5 59.8 82.7Z"/><path class="k p" d="M73.9 82.7L77.3 78.8V86.6Z"/><circle class="e" cx="63.6" cy="81.7" r="1"/></g>
+<g transform="rotate(14 87.3 73.2)"><path class="k p" d="M95.9 73.2C91.6 67.4 83 68.5 81.3 73.2C83 77.9 91.6 79 95.9 73.2Z"/><path class="k p" d="M81.7 73.2L78.3 69.3V77.1Z"/><circle class="e" cx="92" cy="72.2" r="1"/></g>
+<g transform="rotate(-6 100.6 84.6)"><path class="k p" d="M92.1 84.6C96.3 78.8 104.9 79.9 106.6 84.6C104.9 89.3 96.3 90.4 92.1 84.6Z"/><path class="k p" d="M106.2 84.6L109.6 80.7V88.5Z"/><circle class="e" cx="95.9" cy="83.6" r="1"/></g>
+<g transform="rotate(4 51.2 88.4)"><path class="k p" d="M59.8 88.4C55.5 82.6 46.9 83.7 45.2 88.4C46.9 93.1 55.5 94.2 59.8 88.4Z"/><path class="k p" d="M45.6 88.4L42.2 84.5V92.3Z"/><circle class="e" cx="55.9" cy="87.4" r="1"/></g>
+<g transform="rotate(-4 77.8 67.5)"><path class="k p" d="M69.3 67.5C73.5 61.7 82.1 62.8 83.8 67.5C82.1 72.2 73.5 73.3 69.3 67.5Z"/><path class="k p" d="M83.4 67.5L86.8 63.6V71.4Z"/><circle class="e" cx="73.1" cy="66.5" r="1"/></g>
+<path class="h" d="M39.8 63.1C38.1 77 44.9 90.3 56.9 95.2M47.4 62.1C46.1 77 51.4 90.3 60.7 95.6M55 61.2C54.1 77 57.9 90.3 64.5 96M62.6 60.3C62 77 64.3 90.3 68.3 96.4M70.2 59.4C70 77 70.8 90.3 72.1 96.8M77.8 59.4C78 77 77.2 90.3 75.9 96.8M85.4 60.3C86 77 83.7 90.3 79.7 96.4M93 61.2C94 77 90.2 90.3 83.5 96M100.6 62.1C101.9 77 96.6 90.3 87.3 95.6M108.2 63.1C109.9 77 103.1 90.3 91.1 95.2M37.5 65.6C55 68.5 93 68.5 110.5 65.6M35.5 72.3C55 75.1 93 75.1 112.5 72.3M34.7 78.9C55 81.8 93 81.8 113.3 78.9M36.7 85.6C55 88.4 93 88.4 111.3 85.6M38.7 92.2C55 95.1 93 95.1 109.3 92.2"/>
+<path class="k" d="M36 63.7C55 56.1 93 56.1 112 63.7C117.7 77 110.1 92.2 93 96C79.7 98.9 68.3 98.9 55 96C37.9 92.2 30.3 77 36 63.7Z"/>
+<path class="k" d="M36 63.7C55 56.1 93 56.1 112 63.7"/>
+<ellipse class="k s" cx="47.4" cy="62.6" rx="3.8" ry="2.5"/>
+<ellipse class="k s" cx="74" cy="59.4" rx="3.8" ry="2.5"/>
+<ellipse class="k s" cx="100.6" cy="62.6" rx="3.8" ry="2.5"/>
+<g transform="rotate(110 128 63.8)"><path class="k p" d="M138.8 63.8C133.4 56.4 122.6 57.9 120.4 63.8C122.6 69.7 133.4 71.2 138.8 63.8Z"/><path class="k p" d="M120.9 63.8L116.7 58.9V68.7Z"/></g>
+<g transform="rotate(70 146 63.8)"><path class="k p" d="M156.8 63.8C151.4 56.4 140.6 57.9 138.4 63.8C140.6 69.7 151.4 71.2 156.8 63.8Z"/><path class="k p" d="M138.9 63.8L134.7 58.9V68.7Z"/></g>
+<g transform="rotate(90 137 60.2)"><path class="k p" d="M147.8 60.2C142.4 52.8 131.6 54.3 129.4 60.2C131.6 66.1 142.4 67.6 147.8 60.2Z"/><path class="k p" d="M129.9 60.2L125.7 55.3V65.1Z"/></g>
+<path class="k p" d="M117.2 71L122.6 98H151.4L156.8 71Z"/>
+<path class="h" d="M118.6 78.2H155.4M120.1 85.4H153.9M121.5 92.6H152.5M129.8 71L131.6 98M144.2 71L142.4 98"/>
+<path class="k p" d="M115.4 71H158.6V74.6H115.4Z"/>
+<g transform="rotate(15 106 110)"><path class="k p" d="M98.5 110C102.3 104.9 109.8 105.9 111.3 110C109.8 114.1 102.3 115.1 98.5 110Z"/><path class="k p" d="M111 110L113.9 106.6V113.4Z"/><circle class="e" cx="101.9" cy="109.1" r="1"/></g>
+</svg>
