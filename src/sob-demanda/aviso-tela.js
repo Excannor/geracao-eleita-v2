@@ -260,7 +260,10 @@
             if (e.status !== 409) throw e;
             const denovo = await CC.confirmar(quando
               ? { titulo: 'Já tem um aviso para todos nesse dia', texto: 'Agendar outro para o mesmo dia? Avisos demais cansam quem recebe.', acao: 'Agendar outro' }
-              : { titulo: 'Já saiu um aviso para todos hoje', texto: 'Mandar outro hoje mesmo? Avisos demais cansam quem recebe.', acao: 'Mandar outro' });
+              // o servidor diz se o de hoje já saiu ou se está agendado (e aí os dois saem)
+              : /agendado/.test(e.message || '')
+                ? { titulo: 'Já tem um aviso para todos agendado hoje', texto: 'Mandar este agora? O agendado também sai na hora dele. Avisos demais cansam quem recebe.', acao: 'Mandar agora' }
+                : { titulo: 'Já saiu um aviso para todos hoje', texto: 'Mandar outro hoje mesmo? Avisos demais cansam quem recebe.', acao: 'Mandar outro' });
             if (!denovo) return;
             resposta = await CC.api('api/painel/aviso', { ...corpo, denovo: true });
           }
