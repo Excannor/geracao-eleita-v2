@@ -1314,6 +1314,13 @@ secao('notificações: as frases');
   checar(lido([1, 2], 40).leitura === passagem(40), 'ou o dia escolhido, se ainda não foi lido');
   checar(lido([], undefined).tema === D.reflexoes[1][0].titulo, 'o tema é o título da reflexão daquele dia');
   checar(!lido(D.plano.map((d) => d.numero), 365).leitura, 'quem leu tudo não recebe leitura inventada');
+  // Quem está no Conhecer Jesus: o dia de lá (o primeiro não feito), sem o tema do plano.
+  {
+    const C = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
+    checar(N.leituraDoConhecer(C, {}).leitura === 'Gênesis 1.1-31 · Gênesis 2.1-3' && N.leituraDoConhecer(C, {}).tema === '', 'Conhecer Jesus: sem nada feito, a leitura é a do dia 1, sem tema');
+    checar(N.leituraDoConhecer(C, { conhecidos: { 1: '2026-01-01', 2: '2026-01-02' } }).leitura === 'Isaías 53.1-12', 'Conhecer Jesus: o primeiro dia não feito (dia 3)');
+    checar(!N.leituraDoConhecer(C, { conhecidos: Object.fromEntries(C.dias.map((x) => [x.numero, '2026-01-01'])) }).leitura, 'Conhecer Jesus: quem terminou os 14 dias não recebe leitura');
+  }
   const comLeitura = datas.slice(0, 60).map((dt) => monta('lembrete', { ofensiva: 0, slot: 19 * 60, ...lido([1, 2], 1) }, dt));
   checar(comLeitura.some((m) => m.corpo.includes(passagem(3))), 'o lembrete às vezes fala da leitura de hoje pelo nome');
 }

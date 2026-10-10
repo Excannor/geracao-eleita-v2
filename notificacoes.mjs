@@ -597,6 +597,18 @@ export function leituraDoDia(plano, reflexoes, estado = {}) {
   const reflexao = ((reflexoes || {})[n] || [])[0];
   return { leitura: [dia.antigo, dia.novo].filter(Boolean).join(' · '), tema: (reflexao && reflexao.titulo) || '' };
 }
+// Para quem está no caminho Conhecer Jesus: o plano anual não é a leitura dessa pessoa. O dia
+// é o mesmo que o app mostra como "Próximo" (05b-conhecer.js): o primeiro dos 14 ainda não
+// feito; os trechos são escritos como no app (CC.escreverRef). {tema} fica vazio: as frases
+// com ele falam da "reflexão" do plano, que o Conhecer Jesus não tem. Quem terminou os 14
+// dias não recebe {leitura}.
+export function leituraDoConhecer(conhecer, estado = {}) {
+  const feitos = (estado && estado.conhecidos) || {};
+  const dia = ((conhecer && conhecer.dias) || []).find((d) => !feitos[d.numero]);
+  if (!dia) return {};
+  const ref = (t) => t.livro + ' ' + t.cap + '.' + t.de + (t.ate && t.ate !== t.de ? '-' + t.ate : '');
+  return { leitura: (dia.trechos || []).map(ref).join(' · '), tema: '' };
+}
 const POR_EXTENSO = ['zero', 'uma', 'duas'];
 const preencher = (s, d) => s.replace(/\{(\w+)\}/g, (_, k) => (d[k] === undefined || d[k] === '' ? '' : String(d[k])))
   .replace(/\s+([!?.,])/g, '$1').replace(/,\s*!/g, '!').replace(/\s{2,}/g, ' ').trim();

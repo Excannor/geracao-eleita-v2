@@ -24,7 +24,7 @@ import {
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
 } from './db.mjs';
 import {
-  Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio, leituraDoDia,
+  Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio, leituraDoDia, leituraDoConhecer,
   MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, limparMetadados, avisosDesligados, umaDeCadaVez,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
@@ -76,6 +76,8 @@ const TIPOS = {
 let PLANO_DO_CONTEUDO = [];
 // As reflexões dão o "tema" do dia aos lembretes ("a reflexão de hoje se chama ...").
 let REFLEXOES_DO_CONTEUDO = {};
+// Os 14 dias do Conhecer Jesus: a leitura do dia de quem está nesse caminho.
+const CONHECER_DO_CONTEUDO = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
 function carregarRegras() {
   const D = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conteudo.json'), 'utf8'));
   PLANO_DO_CONTEUDO = D.plano;
@@ -975,7 +977,8 @@ async function rodadaDeLembretes(agora = new Date()) {
     // Anota antes de mandar: se o serviço demorar, a rodada seguinte não repete o aviso.
     await NOTIFICACOES.anotar(usuario, decisao.tipo, data, minutos);
     // A leitura em que a pessoa está entra nos dados: o aviso pode dizer o que tem hoje.
-    const doDia = leituraDoDia(PLANO_DO_CONTEUDO, REFLEXOES_DO_CONTEUDO, estado);
+    // Quem está no Conhecer Jesus recebe o dia de lá, nunca a leitura do plano anual.
+    const doDia = conta.caminho === 'conhecer' ? leituraDoConhecer(CONHECER_DO_CONTEUDO, estado) : leituraDoDia(PLANO_DO_CONTEUDO, REFLEXOES_DO_CONTEUDO, estado);
     const mensagem = montarMensagem(decisao.tipo, { ...decisao.dados, ...doDia }, { usuario, data, nome: await nomeDeExibicao(usuario) });
     await enviarPara(usuario, mensagem, { ttl: 3 * 3600 });
     saiu.push({ usuario, tipo: decisao.tipo, titulo: mensagem.titulo });

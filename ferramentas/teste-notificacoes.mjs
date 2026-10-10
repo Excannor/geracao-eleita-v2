@@ -193,6 +193,26 @@ ok(lembrete.length === n + 1 && lembrete[lembrete.length - 1].tag === 'lembrete'
 ok((await rodada('20:45')).length === 0, 'a rodada seguinte não repete o lembrete');
 ok((await rodada('23:00')).length === 0, 'às 23h, silêncio');
 
+// ---------- quem está no Conhecer Jesus ----------
+// O lembrete fala do dia do Conhecer Jesus (o primeiro não feito), nunca da leitura do plano anual.
+{
+  const gil = await criar('gil', 'Gil');
+  ok((await pedirJson('/api/caminho', { caminho: 'conhecer' }, gil)).status === 200, 'o Gil troca para o caminho Conhecer Jesus');
+  await pedir('/api/estado', { atualizadoEm: Date.now(), lidos: [], licoes: [], anotacoes: {}, oia: {}, conhecidos: { 1: hojeSP, 2: hojeSP } }, gil, 'PUT');
+  const celGil = aparelho('gil');
+  await pedirJson('/api/notificacoes/inscrever', { inscricao: celGil.inscricao }, gil);
+  const diaSP = (n, hora) => new Date(Date.parse(hojeSP + 'T' + hora + ':00-03:00') + n * 864e5).toISOString();
+  for (let n = 1; n <= 16; n++) {
+    for (const hora of ['09:00', '12:00', '20:30']) await pedirJson('/api/notificacoes/rodada', { agora: diaSP(n, hora) });
+  }
+  await dormir(500);
+  const doGil = doAparelho(celGil).filter((m) => m.tag === 'lembrete');
+  const textos = doGil.map((m) => m.titulo + ' ' + m.corpo);
+  ok(doGil.length >= 5, 'o Gil recebe lembretes (' + doGil.length + ')');
+  ok(!textos.some((t) => /Gênesis 1-3|Mateus 1\b/.test(t)), 'nenhum fala da leitura do plano anual (Gênesis 1-3 · Mateus 1)');
+  ok(textos.some((t) => t.includes('Isaías 53.1-12')), 'algum fala do dia 3 do Conhecer Jesus (Isaías 53.1-12), o primeiro não feito');
+}
+
 // ---------- aparelho que sumiu ----------
 const velho = aparelho('sumiu');
 await pedirJson('/api/notificacoes/inscrever', { inscricao: velho.inscricao }, bento);
