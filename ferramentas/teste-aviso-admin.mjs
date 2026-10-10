@@ -50,11 +50,25 @@ const push = createServer((req, res) => {
 });
 await new Promise((r) => push.listen(PORTA_PUSH, '127.0.0.1', r));
 
-const servidor = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
-  env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_PUSH_TESTE: '1', CAMINHO_RELOGIO: emSP('12:00'), CAMINHO_ABERTO: '', CAMINHO_ADMIN: 'chefe' },
-  stdio: ['ignore', 'ignore', 'inherit'],
-});
+// Sobe o servidor (e sobe de novo, no teste do reinício, com a mesma pasta de dados).
 const base = 'http://127.0.0.1:' + PORTA;
+let servidor = null;
+async function subir() {
+  servidor = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
+    env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_PUSH_TESTE: '1', CAMINHO_RELOGIO: emSP('12:00'), CAMINHO_ABERTO: '', CAMINHO_ADMIN: 'chefe' },
+    stdio: ['ignore', 'ignore', 'inherit'],
+  });
+  for (let i = 0; i < 80; i++) { try { await fetch(base + '/api/existe-conta'); break; } catch { await dormir(150); } }
+}
+async function derrubar() {
+  const saiu = new Promise((r) => servidor.once('exit', r));
+  servidor.kill();
+  await saiu;
+}
+await subir();
+// Dias a partir de hoje em São Paulo: AAAA-MM-DD e dd/mm/aaaa.
+const diaMais = (n) => new Date(Date.parse(hojeSP + 'T12:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+const br = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4);
 let nav = null;
 let perfil = '';
 const encerrar = () => {
@@ -63,7 +77,6 @@ const encerrar = () => {
   if (nav) fecharArvore(nav, perfil);
 };
 process.on('exit', encerrar);
-for (let i = 0; i < 80; i++) { try { await fetch(base + '/api/existe-conta'); break; } catch { await dormir(150); } }
 
 const pedir = (rota, corpo, cookie) => fetch(base + rota, {
   method: corpo ? 'POST' : 'GET',
@@ -167,6 +180,8 @@ if (CHROME && existsSync(CHROME)) {
   await cmd('Runtime.enable');
   await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
+  // o app grava o fuso do aparelho na conta: o do administrador fica o de São Paulo
+  await cmd('Emulation.setTimezoneOverride', { timezoneId: FUSO });
   const [nome, valor] = chefe.split('=');
   await cmd('Network.setCookie', { name: nome, value: valor, url: base + '/' });
   await cmd('Page.navigate', { url: base + '/#/config/painel/aviso' });
@@ -251,6 +266,45 @@ if (CHROME && existsSync(CHROME)) {
     const { data } = await cmd('Page.captureScreenshot', { format: 'png' });
     writeFileSync(join(CAPTURAS, 'painel-entrada-claro.png'), Buffer.from(data, 'base64'));
   }
+  // ---------- agendar pela tela ----------
+  // Só para mim, daqui a 3 dias às 10h; o teste de cancelar (abaixo) o tira da fila.
+  await av('CC.aplicarTema(false); location.hash = "#/config/painel/aviso"');
+  await esperar('!!document.querySelector("[data-titulo]") && !!document.querySelector("input[name=modo]")', 8000);
+  await dormir(400);
+  await preencher('[data-titulo]', 'Ensaio do louvor');
+  await av('document.querySelector("input[name=modo][value=agendar]").click()');
+  ok(await esperar('!!document.querySelector("[data-dia]") && document.querySelector("[data-dia]").value === ' + JSON.stringify(br(hojeSP))),
+    '"Agendar" mostra dia (já com hoje) e hora');
+  await preencher('[data-dia]', diaMais(3).slice(8, 10) + diaMais(3).slice(5, 7) + diaMais(3).slice(0, 4));
+  await preencher('[data-hora]', '1000');
+  ok(await av('document.querySelector("[data-dia]").value === ' + JSON.stringify(br(diaMais(3))) + ' && document.querySelector("[data-hora]").value === "10:00"'),
+    'a máscara põe as barras e os dois pontos sozinha');
+  ok(await av('/Agendar só para mim/.test(document.querySelector("[data-enviar]").textContent)'), 'o botão vira "Agendar só para mim"');
+  await av('document.querySelector("[data-enviar]").click()');
+  ok(await esperar('!!document.querySelector("[data-cancelar]") && /Ensaio do louvor/.test(document.querySelector(".aviso-agendado").textContent)', 8000),
+    'o aviso agendado aparece na lista "Agendados", com o botão Cancelar');
+  if (CAPTURAS) {
+    // um segundo rascunho, já em "Agendar", para a captura mostrar o formulário e a lista
+    await preencher('[data-titulo]', 'Vigília de sexta');
+    await preencher('[data-texto]', 'Das 22h à meia-noite, no templo. Venha orar com a gente.');
+    await av('document.querySelector("input[name=publico][value=todos]").click()');
+    await av('document.querySelector("input[name=modo][value=agendar]").click()');
+    await esperar('!!document.querySelector("[data-hora]")', 4000);
+    await preencher('[data-dia]', diaMais(1).slice(8, 10) + diaMais(1).slice(5, 7) + diaMais(1).slice(0, 4));
+    await preencher('[data-hora]', '1800');
+    await av('document.getElementById("aviso-flutuante")?.remove(); document.activeElement && document.activeElement.blur()');
+    for (const tema of ['claro', 'escuro']) {
+      await av('CC.aplicarTema(' + (tema === 'escuro') + ')');
+      await dormir(300);
+      const altura = await av('Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)');
+      await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: altura, deviceScaleFactor: 2, mobile: true });
+      await dormir(400);
+      const { data } = await cmd('Page.captureScreenshot', { format: 'png' });
+      await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+      writeFileSync(join(CAPTURAS, 'agendar-' + tema + '.png'), Buffer.from(data, 'base64'));
+    }
+    await av('CC.aplicarTema(false)');
+  }
   ws.close();
 } else {
   console.log('  (sem CHROME: a parte do navegador fica de fora)');
@@ -322,6 +376,109 @@ ok(confirmado.status === 200 && confirmado.pessoas === 5, 'confirmado de novo, e
 const soParaMim = await pedirJson('/api/painel/aviso', { titulo: 'Teste livre', publico: 'mim' }, chefe);
 ok(soParaMim.status === 200, '"Só para mim" continua livre');
 ok((await pedirJson('/api/painel/aviso', null, chefe)).paraTodosHoje === 2, 'a tela mostra que já saíram 2 para todos hoje');
+
+// ---------- agendar ----------
+console.log('\n  Aviso agendado\n');
+const agendar = (corpo, ck = chefe) => pedirJson('/api/painel/aviso', { publico: 'mim', ...corpo }, ck);
+const agendadosDe = async () => (await pedirJson('/api/painel/aviso', null, chefe));
+const pushDoChefe = (titulo) => avisosDe(cel.chefe).filter((m) => m.titulo === titulo);
+// sem navegador, o "Ensaio do louvor" nasce aqui
+if (!(await agendadosDe()).agendados.some((a) => a.titulo === 'Ensaio do louvor')) await agendar({ titulo: 'Ensaio do louvor', quando: diaMais(3) + 'T10:00' });
+
+ok((await agendar({ titulo: 'Oi', quando: diaMais(1) + 'T10:00' }, ana)).status === 403, 'quem não é administrador recebe 403 ao agendar');
+ok((await pedirJson('/api/painel/aviso/cancelar', { id: 'x' }, ana)).status === 403, 'e ao cancelar');
+ok((await agendar({ titulo: 'Atrasado', quando: hojeSP + 'T11:00' })).status === 400, 'data no passado (11h, com o relógio ao meio-dia) é recusada');
+ok((await agendar({ titulo: 'Longe', quando: diaMais(31) + 'T10:00' })).status === 400, 'mais de 30 dias à frente é recusado');
+ok((await agendar({ titulo: 'Torto', quando: '2026-02-31T10:00' })).status === 400, 'dia que não existe é recusado');
+
+const fotoA = (CHROME && existsSync(CHROME) ? bytes : jpegMinimo).toString('base64');
+const a = await agendar({ titulo: 'Aviso das 15h', texto: 'Agendado.', destino: 'biblia', quando: hojeSP + 'T15:00', foto: fotoA });
+ok(a.status === 200 && a.agendado && a.agendado.quando === hojeSP + 'T15:00' && a.foto, 'agendar "só para mim" para hoje às 15h, com foto');
+ok((await fetch(base + '/api/avisos/foto/' + a.foto)).status === 200, 'a foto do agendado já fica guardada');
+const lista = await agendadosDe();
+ok(lista.agendados.some((x) => x.titulo === 'Aviso das 15h' && x.quando === hojeSP + 'T15:00' && x.publico === 'mim' && x.foto),
+  'a lista "Agendados" mostra título, para quem e a hora');
+ok(!(await pedirJson('/api/avisos', null, chefe)).avisos.some((x) => x.titulo === 'Aviso das 15h'), 'antes da hora, nada no sino');
+await pedirJson('/api/notificacoes/rodada', { agora: emSP('14:59') });
+await dormir(300);
+ok(pushDoChefe('Aviso das 15h').length === 0, 'a rodada das 14h59 não manda');
+await pedirJson('/api/notificacoes/rodada', { agora: emSP('15:00') });
+for (let t = 0; t < 3000 && !pushDoChefe('Aviso das 15h').length; t += 100) await dormir(100);
+const [m15] = pushDoChefe('Aviso das 15h');
+ok(m15 && /#\/biblia$/.test(m15.url) && /\/api\/avisos\/foto\//.test(m15.image || ''), 'a rodada das 15h manda, com image e url');
+ok((await pedirJson('/api/avisos', null, chefe)).avisos.some((x) => x.titulo === 'Aviso das 15h' && x.foto === a.foto), 'e o item entra no sino, com a foto');
+await pedirJson('/api/notificacoes/rodada', { agora: emSP('15:01') });
+await pedirJson('/api/notificacoes/rodada', { agora: emSP('15:30') });
+await dormir(300);
+ok(pushDoChefe('Aviso das 15h').length === 1 && (await pedirJson('/api/avisos', null, chefe)).avisos.filter((x) => x.titulo === 'Aviso das 15h').length === 1,
+  'as rodadas seguintes não repetem');
+const depois15 = await agendadosDe();
+ok(!depois15.agendados.some((x) => x.titulo === 'Aviso das 15h') && depois15.agendadosAntes.some((x) => x.titulo === 'Aviso das 15h' && x.estado === 'enviado'),
+  'sai da fila e aparece como enviado');
+
+// Para todos amanhã às 10h30 (22h30 em Tóquio: silêncio para o Kenji); um segundo no mesmo dia pede confirmar de novo.
+const D1 = diaMais(1);
+const D2 = diaMais(2);
+const b = await agendar({ titulo: 'Bom dia, igreja', destino: 'inicio', publico: 'todos', quando: D1 + 'T10:30', foto: fotoA });
+ok(b.status === 200, 'agendar para todos amanhã às 10h30');
+const c1 = await agendar({ titulo: 'Segundo do dia', publico: 'todos', quando: D1 + 'T10:35' });
+ok(c1.status === 409 && c1.precisaConfirmar, 'um segundo para todos no mesmo dia pede confirmar de novo (409)');
+ok((await agendar({ titulo: 'Segundo do dia', publico: 'todos', quando: D1 + 'T10:35', denovo: true })).status === 200, 'confirmado, ele entra na fila');
+ok((await agendar({ titulo: 'Perdido', quando: D2 + 'T01:00' })).status === 200, 'agendar um para depois de amanhã à 1h');
+
+// ---------- reinício ----------
+await derrubar();
+await subir();
+const aposReinicio = await agendadosDe();
+ok(['Bom dia, igreja', 'Segundo do dia', 'Perdido', 'Ensaio do louvor'].every((t) => aposReinicio.agendados.some((x) => x.titulo === t)),
+  'depois de reiniciar o servidor, os agendados continuam na fila');
+
+// ---------- cancelar ----------
+const ensaio = aposReinicio.agendados.find((x) => x.titulo === 'Ensaio do louvor');
+ok((await pedirJson('/api/painel/aviso/cancelar', { id: ensaio.id }, chefe)).status === 200, 'cancelar um agendado');
+ok((await pedirJson('/api/painel/aviso/cancelar', { id: ensaio.id }, chefe)).status === 404, 'cancelar de novo: 404, já não está na fila');
+const aposCancelar = await agendadosDe();
+ok(!aposCancelar.agendados.some((x) => x.id === ensaio.id) && aposCancelar.agendadosAntes.some((x) => x.id === ensaio.id && x.estado === 'cancelado'),
+  'ele sai da fila e aparece como cancelado');
+const emDia = (dia, hora) => new Date(dia + 'T' + hora + ':00-03:00').toISOString();
+const rodada = (dia, hora) => pedirJson('/api/notificacoes/rodada', { agora: emDia(dia, hora) });
+const esperarTitulo = async (ap, titulo, n = 1) => {
+  for (let t = 0; t < 3000 && avisosDe(ap).filter((m) => m.titulo === titulo).length < n; t += 100) await dormir(100);
+  return avisosDe(ap).filter((m) => m.titulo === titulo);
+};
+
+// ---------- amanhã: a hora dos agendados para todos ----------
+await rodada(D1, '10:29');
+await dormir(300);
+ok((await esperarTitulo(cel.ana, 'Bom dia, igreja', 1)).length === 0, 'amanhã às 10h29, o "para todos" ainda não saiu');
+await rodada(D1, '10:30');
+const [bomAna] = await esperarTitulo(cel.ana, 'Bom dia, igreja');
+ok(bomAna && /\/api\/avisos\/foto\//.test(bomAna.image || '') && /#\/$/.test(bomAna.url), 'às 10h30 chega aos inscritos (Ana), com image e url');
+ok((await esperarTitulo(cel.chefe, 'Bom dia, igreja')).length === 1, 'e ao administrador');
+await dormir(300);
+ok((await esperarTitulo(cel.kenji, 'Bom dia, igreja', 1)).length === 0, 'Kenji (22h30 em Tóquio, silêncio) fica com o push pendente');
+ok(avisosDe(cel.bento).every((m) => m.titulo !== 'Bom dia, igreja'), 'Bento (tudo desligado) não recebe push');
+const sinoTem = async (ck, titulo) => ((await pedirJson('/api/avisos', null, ck)).avisos || []).some((x) => x.titulo === titulo && x.foto);
+ok((await sinoTem(bento, 'Bom dia, igreja')) && (await sinoTem(kenji, 'Bom dia, igreja')), 'mas todos têm o item no sino, com a foto');
+await rodada(D1, '10:35');
+ok((await esperarTitulo(cel.ana, 'Segundo do dia')).length === 1, 'o segundo do dia, confirmado de novo, sai às 10h35');
+await rodada(D1, '19:05');
+ok((await esperarTitulo(cel.kenji, 'Bom dia, igreja')).length === 1, 'às 7h05 em Tóquio o Kenji recebe o push pendente');
+await rodada(D1, '19:10');
+await dormir(300);
+ok(avisosDe(cel.kenji).filter((m) => m.titulo === 'Bom dia, igreja').length === 1 && avisosDe(cel.ana).filter((m) => m.titulo === 'Bom dia, igreja').length === 1,
+  'ninguém recebe duas vezes');
+
+// ---------- servidor fora por mais de 12h ----------
+await rodada(D2, '14:00');
+await dormir(300);
+ok(pushDoChefe('Perdido').length === 0, 'servidor de volta 13h depois da hora: o agendado não sai');
+ok((await agendadosDe()).agendadosAntes.some((x) => x.titulo === 'Perdido' && x.estado === 'perdido'), 'e aparece como "perdido" na lista');
+
+// ---------- o cancelado ----------
+await rodada(diaMais(3), '10:00');
+await dormir(300);
+ok(pushDoChefe('Ensaio do louvor').length === 0, 'o cancelado não sai na hora dele');
 
 encerrar();
 try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }

@@ -874,7 +874,9 @@ export class Notificacoes {
   guardarFoto(dados, tipo, em = Date.now()) {
     const id = randomBytes(16).toString('base64url');
     this.db.prepare('INSERT INTO avisos_fotos (id, tipo, dados, em) VALUES (?, ?, ?, ?)').run(id, tipo, dados, em);
-    this.db.prepare("DELETE FROM avisos_fotos WHERE em < ? AND id NOT IN (SELECT foto FROM push_caixa WHERE foto <> '')").run(em - 90 * 864e5);
+    // a foto de um aviso agendado que ainda não saiu fica, por mais antiga que seja
+    this.db.prepare("DELETE FROM avisos_fotos WHERE em < ? AND id NOT IN (SELECT foto FROM push_caixa WHERE foto <> '')"
+      + " AND id NOT IN (SELECT foto FROM avisos_agendados WHERE estado = 'agendado' AND foto <> '')").run(em - 90 * 864e5);
     return id;
   }
 
@@ -890,6 +892,50 @@ export class Notificacoes {
 
   avisosParaTodosNoDia(dia) {
     return Number(this.db.prepare("SELECT COUNT(*) AS n FROM avisos_admin WHERE publico = 'todos' AND dia = ?").get(dia).n);
+  }
+
+  // ---------- avisos agendados (tabela avisos_agendados) ----------
+  agendarAviso(a) {
+    this.db.prepare('INSERT INTO avisos_agendados (id, de, publico, titulo, corpo, destino, foto, quando, quando_local, dia, denovo, estado, criado_em)'
+      + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'agendado', ?)")
+      .run(a.id, a.de, a.publico, a.titulo, a.corpo, a.destino, a.foto || '', a.quando, a.quandoLocal, a.dia, a.denovo ? 1 : 0, a.criadoEm);
+  }
+
+  agendadosVencidos(agora) {
+    return this.db.prepare("SELECT * FROM avisos_agendados WHERE estado = 'agendado' AND quando <= ? ORDER BY quando").all(agora).map((l) => ({ ...l }));
+  }
+
+  // agendado → enviando numa gravação só: quem não conseguiu trocar o estado não manda.
+  tomarAgendado(id) {
+    return this.db.prepare("UPDATE avisos_agendados SET estado = 'enviando' WHERE id = ? AND estado = 'agendado'").run(id).changes === 1;
+  }
+
+  fecharAgendado(id, estado, { enviadoEm = 0, pessoas = 0, motivo = '' } = {}) {
+    this.db.prepare('UPDATE avisos_agendados SET estado = ?, enviado_em = ?, pessoas = ?, motivo = ? WHERE id = ?').run(estado, enviadoEm, pessoas, motivo, id);
+  }
+
+  cancelarAgendado(id) {
+    return this.db.prepare("UPDATE avisos_agendados SET estado = 'cancelado' WHERE id = ? AND estado = 'agendado'").run(id).changes === 1;
+  }
+
+  // O servidor caiu no meio de um envio: não manda de novo (parte pode ter saído).
+  interromperEnviando() {
+    this.db.prepare("UPDATE avisos_agendados SET estado = 'interrompido', motivo = 'o servidor reiniciou durante o envio' WHERE estado = 'enviando'").run();
+  }
+
+  agendadosParaTodosNoDia(dia) {
+    return Number(this.db.prepare("SELECT COUNT(*) AS n FROM avisos_agendados WHERE publico = 'todos' AND estado = 'agendado' AND dia = ?").get(dia).n);
+  }
+
+  // 'fila': os que ainda vão sair, do mais próximo ao mais distante; 'antes': os que já saíram
+  // da fila (enviados, cancelados, perdidos...), dos mais recentes.
+  listaAgendados(qual, n = 50) {
+    const sql = qual === 'fila'
+      ? "SELECT * FROM avisos_agendados WHERE estado = 'agendado' ORDER BY quando LIMIT ?"
+      : "SELECT * FROM avisos_agendados WHERE estado <> 'agendado' ORDER BY quando DESC LIMIT ?";
+    return this.db.prepare(sql).all(n).map((l) => ({
+      id: l.id, publico: l.publico, titulo: l.titulo, quando: l.quando_local, estado: l.estado, pessoas: l.pessoas, motivo: l.motivo, foto: !!l.foto,
+    }));
   }
 
   ultimosAvisosAdmin(n = 5) {
@@ -917,6 +963,7 @@ export class Notificacoes {
     // o registro dos avisos que a pessoa mandou como administradora (o item no sino de quem
     // recebeu fica, como os outros avisos, até sair dos 60 mais recentes)
     this.db.prepare('DELETE FROM avisos_admin WHERE de = ?').run(usuario);
+    this.db.prepare('DELETE FROM avisos_agendados WHERE de = ?').run(usuario);
   }
 }
 

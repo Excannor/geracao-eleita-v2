@@ -246,6 +246,19 @@ const ESQUEMA = [
     corpo TEXT NOT NULL, url TEXT NOT NULL, foto TEXT NOT NULL DEFAULT '', pessoas INTEGER NOT NULL, dia TEXT NOT NULL, em INTEGER NOT NULL);
   CREATE INDEX avisos_admin_dia ON avisos_admin (publico, dia);
   `,
+  // v18: aviso do administrador agendado. Fica aqui até a hora (sobrevive a reinício) e sai
+  // uma vez só, pela rodada de lembretes. quando é o instante (ms); quando_local e dia, a
+  // hora de parede no fuso de quem agendou. estado: agendado, enviando (tomado pela rodada),
+  // enviado, cancelado, perdido (servidor fora por mais de 12h), recusado, falhou ou
+  // interrompido (o servidor caiu no meio do envio; não sai de novo).
+  `
+  CREATE TABLE avisos_agendados (id TEXT PRIMARY KEY, de TEXT NOT NULL, publico TEXT NOT NULL, titulo TEXT NOT NULL,
+    corpo TEXT NOT NULL, destino TEXT NOT NULL, foto TEXT NOT NULL DEFAULT '', quando INTEGER NOT NULL,
+    quando_local TEXT NOT NULL, dia TEXT NOT NULL, denovo INTEGER NOT NULL DEFAULT 0, estado TEXT NOT NULL,
+    criado_em INTEGER NOT NULL, enviado_em INTEGER NOT NULL DEFAULT 0, pessoas INTEGER NOT NULL DEFAULT 0,
+    motivo TEXT NOT NULL DEFAULT '');
+  CREATE INDEX avisos_agendados_estado ON avisos_agendados (estado, quando);
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -437,6 +450,7 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['push_caixa', 'DELETE FROM push_caixa WHERE usuario = ?', [u]],
     // o registro dos avisos que a pessoa mandou como administradora (v17)
     ['avisos_admin', 'DELETE FROM avisos_admin WHERE de = ?', [u]],
+    ['avisos_agendados', 'DELETE FROM avisos_agendados WHERE de = ?', [u]],
     ['desafios_grupo', 'DELETE FROM desafios_grupo WHERE criado_por = ?', [u]],
     ['estados', 'DELETE FROM estados WHERE usuario = ?', [u]],
     // o check-in diário e a cópia achatada das datas de leitura (v14) são só da pessoa

@@ -45,11 +45,19 @@
 .aviso-previa .lista-avisos { padding: 0; border-radius: var(--raio-cartao); background: var(--v2-cartao); }
 .aviso-previa-destino { margin: 2px 2px 0; color: var(--v2-tinta-fraca); font-size: .8125rem; font-weight: 600; }
 
+/* agendar: dia e hora lado a lado; a lista dos agendados com o "Cancelar" no fim da linha */
+.aviso-tela .grupo-config > .aviso-quando { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; margin: 8px 20px 0; }
+.aviso-quando .campo-senha { margin: 0; }
+.aviso-agendado { gap: 12px; }
+.aviso-agendado > span { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.aviso-agendado b { color: var(--v2-tinta-forte); font-weight: 700; overflow-wrap: anywhere; }
+.aviso-agendado small { color: var(--v2-tinta-fraca); font-size: .8125rem; font-weight: 600; }
+.aviso-agendado .botao { flex: none; }
 .aviso-tela .erro-proposito { margin: 4px 20px 0; color: var(--alerta); }
 .aviso-acoes { margin: 12px 20px 8px; }
 .aviso-acoes .botao { width: 100%; }
 @media (max-width: 374px) {
   .aviso-tela .grupo-config > .campo-senha, .aviso-tela .grupo-config > .aviso-foto,
   .aviso-tela .grupo-config > .aviso-chips, .aviso-tela .grupo-config > .aviso-publico,
-  .aviso-tela .grupo-config > [data-previa] { margin-inline: 16px; }
+  .aviso-tela .grupo-config > [data-previa], .aviso-tela .grupo-config > .aviso-quando { margin-inline: 16px; }
 }

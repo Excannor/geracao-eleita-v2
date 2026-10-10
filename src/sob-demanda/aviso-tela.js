@@ -25,7 +25,26 @@
   const ALVO = 250 * 1024;
 
   // Um rascunho por visita: sobrevive aos redesenhos do app enquanto a tela está aberta.
-  const r = { titulo: '', texto: '', destino: 'nenhum', publico: 'mim', foto: null, fotoUrl: '' };
+  // modo: 'agora' ou 'agendar' (dia em dd/mm/aaaa e hora em hh:mm, digitados com máscara: o
+  // calendário do aparelho no Android é ruim de usar, como no cadastro).
+  const RASCUNHO = { titulo: '', texto: '', destino: 'nenhum', publico: 'mim', foto: null, fotoUrl: '', modo: 'agora', dia: '', hora: '' };
+  const r = { ...RASCUNHO };
+  const mascaraDia = (v) => { const n = v.replace(/\D/g, '').slice(0, 8); return n.slice(0, 2) + (n.length > 2 ? '/' + n.slice(2, 4) : '') + (n.length > 4 ? '/' + n.slice(4) : ''); };
+  const mascaraHora = (v) => { const n = v.replace(/\D/g, '').slice(0, 4); return n.slice(0, 2) + (n.length > 2 ? ':' + n.slice(2) : ''); };
+  const diaBr = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4);
+  // "dd/mm/aaaa" + "hh:mm" → "AAAA-MM-DDTHH:MM", ou '' se não existe. O servidor confere o
+  // resto (no fuso de quem agenda: não no passado, até 30 dias).
+  function quandoIso() {
+    const d = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(r.dia);
+    const h = /^(\d{2}):(\d{2})$/.exec(r.hora);
+    if (!d || !h || +h[1] > 23 || +h[2] > 59) return '';
+    const iso = d[3] + '-' + d[2] + '-' + d[1];
+    const t = new Date(iso + 'T12:00:00Z');
+    return !isNaN(t) && t.toISOString().slice(0, 10) === iso ? iso + 'T' + h[1] + ':' + h[2] : '';
+  }
+  // "11/10 às 10:00" (ou "11/10/2027 às 10:00" em outro ano)
+  const quandoBr = (q) => q.slice(8, 10) + '/' + q.slice(5, 7) + (q.slice(0, 4) !== String(new Date().getFullYear()) ? '/' + q.slice(0, 4) : '') + ' às ' + q.slice(11, 16);
+  const ESTADOS = { enviado: 'enviado', cancelado: 'cancelado', perdido: 'perdido', recusado: 'não saiu', falhou: 'não saiu', interrompido: 'interrompido', enviando: 'saindo' };
   let resumo = null;
 
   const carregarImagem = (arquivo) => new Promise((resolver, falhar) => {
@@ -96,6 +115,7 @@
       + (resumo.paraTodosHoje ? ' Já saiu um aviso para todos hoje.' : '');
   }
 
+  const rotuloEnviar = () => (r.modo === 'agendar' ? 'Agendar' : 'Enviar') + (r.publico === 'todos' ? ' para todos' : ' só para mim');
   const opcao = (nome, valor, rotulo, marcado) => '<label class="aviso-opcao"><input type="radio" name="' + nome + '" value="' + valor + '"'
     + (marcado ? ' checked' : '') + '><span>' + rotulo + '</span></label>';
 
@@ -119,9 +139,23 @@
       + opcao('publico', 'mim', 'Só para mim (teste)', r.publico === 'mim')
       + opcao('publico', 'todos', 'Todos' + (resumo ? ' (' + resumo.pessoas + ')' : ''), r.publico === 'todos') + '</div>'
       + '<p class="passo-dica pequena" data-alcance>' + CC.esc(alcance()) + '</p></section>'
+      + '<section class="grupo-config"><h2 class="etiqueta">Quando</h2><div class="aviso-publico" role="radiogroup" aria-label="Quando">'
+      + opcao('modo', 'agora', 'Enviar agora', r.modo === 'agora') + opcao('modo', 'agendar', 'Agendar', r.modo === 'agendar') + '</div>'
+      + (r.modo === 'agendar' ? '<div class="aviso-quando"><label class="campo-senha"><span>Dia</span><input data-dia type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" autocomplete="off" value="' + CC.esc(r.dia) + '"></label>'
+        + '<label class="campo-senha"><span>Hora</span><input data-hora type="text" inputmode="numeric" maxlength="5" placeholder="hh:mm" autocomplete="off" value="' + CC.esc(r.hora) + '"></label></div>'
+        + '<p class="passo-dica pequena">No seu fuso, até ' + ((resumo && resumo.limites && resumo.limites.dias) || 30) + ' dias à frente. Sai na hora marcada pelo mesmo caminho: sino, celular e o silêncio das 22h30 às 7h de cada um.</p>' : '')
+      + '</section>'
       + '<section class="grupo-config"><h2 class="etiqueta">Como aparece</h2><div data-previa>' + previa() + '</div></section>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes aviso-acoes"><button class="botao" data-enviar>' + (r.publico === 'todos' ? 'Enviar para todos' : 'Enviar só para mim') + '</button></div>'
+      + '<div class="acoes aviso-acoes"><button class="botao" data-enviar>' + rotuloEnviar() + '</button></div>'
+      + (resumo && resumo.agendados && resumo.agendados.length ? '<section class="grupo-config"><h2 class="etiqueta">Agendados</h2><div class="caixa-config">'
+        + resumo.agendados.map((a, i) => '<div class="linha-config sem-toque aviso-agendado"><span><b>' + CC.esc(a.titulo) + '</b><small>'
+          + CC.esc(quandoBr(a.quando) + ' · ' + (a.publico === 'todos' ? 'para todos' : 'só para mim') + (a.foto ? ' · com foto' : '')) + '</small></span>'
+          + '<button type="button" class="botao plano pequeno" data-cancelar="' + i + '">Cancelar</button></div>').join('') + '</div></section>' : '')
+      + (resumo && resumo.agendadosAntes && resumo.agendadosAntes.length ? '<section class="grupo-config"><h2 class="etiqueta">Agendamentos anteriores</h2><div class="caixa-config">'
+        + resumo.agendadosAntes.map((a) => '<div class="linha-config sem-toque painel-linha2"><span>' + CC.esc(a.titulo) + '</span><small>'
+          + CC.esc(quandoBr(a.quando) + ' · ' + (a.publico === 'todos' ? 'para todos' : 'só para mim') + ' · ' + (ESTADOS[a.estado] || a.estado)
+            + (a.estado === 'enviado' ? ' (' + CC.plural(a.pessoas, 'pessoa', 'pessoas') + ')' : '') + (a.motivo ? ': ' + a.motivo : '')) + '</small></div>').join('') + '</div></section>' : '')
       + (resumo && resumo.ultimos && resumo.ultimos.length ? '<section class="grupo-config"><h2 class="etiqueta">Últimos enviados</h2><div class="caixa-config">'
         + resumo.ultimos.map((u) => '<div class="linha-config sem-toque painel-linha2"><span>' + CC.esc(u.titulo) + '</span><small>'
           + CC.esc(new Date(u.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -138,7 +172,7 @@
     raiz.querySelector('[data-conta-titulo]').textContent = conta(r.titulo, lim.titulo);
     raiz.querySelector('[data-conta-texto]').textContent = conta(r.texto, lim.texto);
     raiz.querySelector('[data-alcance]').textContent = alcance();
-    raiz.querySelector('[data-enviar]').textContent = r.publico === 'todos' ? 'Enviar para todos' : 'Enviar só para mim';
+    raiz.querySelector('[data-enviar]').textContent = rotuloEnviar();
   }
 
   function ligar(raiz) {
@@ -148,6 +182,32 @@
     raiz.querySelector('[data-texto]').oninput = (ev) => { r.texto = ev.target.value; atualizarPrevia(raiz); };
     raiz.querySelectorAll('input[name=destino]').forEach((i) => { i.onchange = () => { r.destino = i.value; atualizarPrevia(raiz); }; });
     raiz.querySelectorAll('input[name=publico]').forEach((i) => { i.onchange = () => { r.publico = i.value; atualizarPrevia(raiz); }; });
+    raiz.querySelectorAll('input[name=modo]').forEach((i) => {
+      i.onchange = () => {
+        r.modo = i.value;
+        if (r.modo === 'agendar' && !r.dia && resumo && resumo.hoje) r.dia = diaBr(resumo.hoje);
+        desenhar(raiz);
+        if (r.modo === 'agendar') raiz.querySelector('[data-hora]').focus({ preventScroll: true });
+      };
+    });
+    const campoDia = raiz.querySelector('[data-dia]');
+    if (campoDia) campoDia.oninput = () => { const v = mascaraDia(campoDia.value); if (v !== campoDia.value) campoDia.value = v; r.dia = v; };
+    const campoHora = raiz.querySelector('[data-hora]');
+    if (campoHora) campoHora.oninput = () => { const v = mascaraHora(campoHora.value); if (v !== campoHora.value) campoHora.value = v; r.hora = v; };
+    raiz.querySelectorAll('[data-cancelar]').forEach((b) => {
+      b.onclick = async () => {
+        const a = resumo.agendados[Number(b.dataset.cancelar)];
+        if (!a) return;
+        const certo = await CC.confirmar({ titulo: 'Cancelar o aviso agendado?', texto: '"' + a.titulo + '", ' + quandoBr(a.quando) + ', ' + (a.publico === 'todos' ? 'para todos' : 'só para você') + '. Ele não sai mais.', acao: 'Cancelar o aviso', perigo: true });
+        if (!certo) return;
+        try {
+          const resp = await CC.api('api/painel/aviso/cancelar', { id: a.id });
+          resumo = resp.resumo || resumo;
+          CC.avisar('Pronto: aviso cancelado');
+        } catch (e) { CC.avisar(e.message); }
+        if (raiz.isConnected) desenhar(raiz);
+      };
+    });
     const arquivo = raiz.querySelector('[data-foto]');
     if (arquivo) {
       arquivo.onchange = async () => {
@@ -170,7 +230,16 @@
     raiz.querySelector('[data-enviar]').onclick = async () => {
       mostrarErro('');
       if (!r.titulo.trim()) { mostrarErro('Escreva um título.'); return; }
-      if (r.publico === 'todos') {
+      const quando = r.modo === 'agendar' ? quandoIso() : '';
+      if (r.modo === 'agendar' && !quando) { mostrarErro('Confira o dia (dd/mm/aaaa) e a hora (hh:mm).'); return; }
+      if (quando && r.publico === 'todos') {
+        const certo = await CC.confirmar({
+          titulo: 'Agendar para todos?',
+          texto: 'Sai em ' + quandoBr(quando) + ' para todas as contas (hoje são ' + (resumo ? resumo.pessoas : 0) + '). Dá para cancelar até lá, na lista de agendados.',
+          acao: 'Agendar para todos',
+        });
+        if (!certo) return;
+      } else if (r.publico === 'todos') {
         const certo = await CC.confirmar({
           titulo: 'Mandar para todos?',
           texto: CC.plural(resumo ? resumo.pessoas : 0, 'pessoa recebe', 'pessoas recebem') + ' agora no sino'
@@ -179,7 +248,7 @@
         });
         if (!certo) return;
       }
-      const corpo = { titulo: r.titulo.trim(), texto: r.texto.trim(), destino: r.destino, publico: r.publico };
+      const corpo = { titulo: r.titulo.trim(), texto: r.texto.trim(), destino: r.destino, publico: r.publico, ...(quando ? { quando } : {}) };
       const botao = raiz.querySelector('[data-enviar]');
       let resposta;
       await CC.ocupado(botao, async () => {
@@ -189,7 +258,9 @@
             resposta = await CC.api('api/painel/aviso', corpo);
           } catch (e) {
             if (e.status !== 409) throw e;
-            const denovo = await CC.confirmar({ titulo: 'Já saiu um aviso para todos hoje', texto: 'Mandar outro hoje mesmo? Avisos demais cansam quem recebe.', acao: 'Mandar outro' });
+            const denovo = await CC.confirmar(quando
+              ? { titulo: 'Já tem um aviso para todos nesse dia', texto: 'Agendar outro para o mesmo dia? Avisos demais cansam quem recebe.', acao: 'Agendar outro' }
+              : { titulo: 'Já saiu um aviso para todos hoje', texto: 'Mandar outro hoje mesmo? Avisos demais cansam quem recebe.', acao: 'Mandar outro' });
             if (!denovo) return;
             resposta = await CC.api('api/painel/aviso', { ...corpo, denovo: true });
           }
@@ -197,12 +268,12 @@
       });
       if (!resposta) return;
       resumo = resposta.resumo || resumo;
-      CC.avisar(r.publico === 'todos'
+      CC.avisar(resposta.agendado ? 'Agendado para ' + quandoBr(resposta.agendado.quando) : r.publico === 'todos'
         ? 'Enviado para ' + CC.plural(resposta.pessoas, 'pessoa', 'pessoas')
         : (resposta.enviados ? 'Enviado. Confira o celular e o sino' : resposta.adiados ? 'Enviado. No silêncio da noite: o push sai depois das 7h' : 'Enviado. Está no seu sino'));
       if (CC.atualizarPontoDoSino) CC.atualizarPontoDoSino();
       if (r.fotoUrl) URL.revokeObjectURL(r.fotoUrl);
-      Object.assign(r, { titulo: '', texto: '', destino: 'nenhum', publico: 'mim', foto: null, fotoUrl: '' });
+      Object.assign(r, RASCUNHO);
       if (raiz.isConnected) desenhar(raiz);
     };
   }

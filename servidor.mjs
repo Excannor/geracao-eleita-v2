@@ -347,6 +347,7 @@ const CONTAS = await new Contas(join(dirname(ESTADO), 'contas.json')).carregar()
 const NOVIDADES = await new Novidades(join(dirname(ESTADO), 'novidades.json')).carregar();
 // Notificações: aparelhos inscritos, preferências e o que já saiu hoje.
 const NOTIFICACOES = await new Notificacoes(join(dirname(ESTADO), 'notificacoes.json')).carregar();
+NOTIFICACOES.interromperEnviando();
 const CHAVES_PUSH = await chavesDoServidor(join(dirname(ESTADO), 'push.chave'));
 
 // O progresso que morava em estado*.json entra na tabela uma vez, e os arquivos vão para
@@ -938,7 +939,9 @@ async function montarPainelDaIgreja(hoje) {
 }
 
 async function rodadaDeLembretes(agora = new Date()) {
-  const saiu = [];
+  // Primeiro os avisos agendados do administrador que venceram: o push de quem está no
+  // silêncio fica pendente e sai no laço abaixo, na primeira rodada depois das 7h.
+  const saiu = await dispararAgendados(agora);
   for (const usuario of NOTIFICACOES.comInscricao()) {
     const conta = CONTAS.achar(usuario);
     if (!conta) continue;
@@ -1033,8 +1036,11 @@ const destinatariosDoAviso = (eu, publico) => (publico === 'todos' ? CONTAS.list
 // Quem recebe no celular: tem aparelho inscrito e não desligou tudo.
 const recebePush = (usuario) => NOTIFICACOES.inscricoesDe(usuario).length > 0 && !avisosDesligados(NOTIFICACOES.preferencias(usuario));
 
-async function enviarAvisoAdmin(eu, pedido) {
-  const erro = (msg, codigo = 400, extra = {}) => Object.assign(new Error(msg), { publico: true, codigo, ...extra });
+const erroAviso = (msg, codigo = 400, extra = {}) => Object.assign(new Error(msg), { publico: true, codigo, ...extra });
+
+// Confere o pedido da tela (o mesmo para enviar agora e para agendar).
+function validarAviso(pedido) {
+  const erro = erroAviso;
   const titulo = String(pedido.titulo || '').replace(/\s+/g, ' ').trim();
   const corpo = String(pedido.texto || '').replace(/\s+/g, ' ').trim();
   if (!titulo) throw erro('escreva um título');
@@ -1052,15 +1058,16 @@ async function enviarAvisoAdmin(eu, pedido) {
     if (!tipo) throw erro('a foto precisa ser JPEG ou WebP');
     foto = { bruto, tipo };
   }
-  const agora = agoraDoServidor();
-  const dia = hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agora);
-  // Um aviso para todos por dia; o segundo exige confirmar de novo. "Só para mim" é livre.
-  if (publico === 'todos' && NOTIFICACOES.avisosParaTodosNoDia(dia) >= 1 && pedido.denovo !== true) {
-    throw erro('já saiu um aviso para todos hoje', 409, { precisaConfirmar: true });
-  }
+  return { titulo, corpo, destino, publico, foto };
+}
+
+// Manda de fato: o item no sino de cada um, o push na hora ou guardado para depois das 7h
+// (silêncio no fuso de cada um) e o registro em avisos_admin. "agora" é o instante do envio
+// real: o da requisição, ou o da rodada que dispara um agendado.
+async function despacharAviso(eu, { titulo, corpo, destino, publico, idFoto }, agora) {
   const id = randomBytes(9).toString('base64url');
-  const idFoto = foto ? NOTIFICACOES.guardarFoto(foto.bruto, foto.tipo, agora.getTime()) : '';
   const url = DESTINOS_AVISO[destino];
+  const dia = hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agora);
   const usuarios = destinatariosDoAviso(eu, publico);
   await NOTIFICACOES.guardarNaCaixaDeVarios(usuarios, 'aviso', { titulo, corpo, url, foto: idFoto }, agora.getTime());
   // O push leva a foto num endereço relativo ao app (o service worker resolve): o Android a
@@ -1075,9 +1082,98 @@ async function enviarAvisoAdmin(eu, pedido) {
   NOTIFICACOES.anotarAvisoAdmin({ id, de: eu, publico, titulo, corpo, url, foto: idFoto, pessoas: usuarios.length, dia, em: agora.getTime() });
   console.log('  painel: @' + eu + ' mandou um aviso para ' + (publico === 'todos' ? usuarios.length + ' contas' : 'si') + ' em ' + new Date().toISOString());
   const mandar = async () => { let n = 0; for (const u of agoraVai) n += (await enviarPara(u, mensagem, { semCaixa: true, ttl: 12 * 3600 })) ? 1 : 0; return n; };
+  return { id, pessoas: usuarios.length, push: agoraVai.length, adiados: depois.length, foto: idFoto, mandar };
+}
+
+// "AAAA-MM-DDTHH:MM" na hora de parede de um fuso → instante (ms). null se a hora não existe
+// nesse fuso (data inválida, ou o buraco de uma mudança de horário de verão).
+const paredeEm = (t, fuso) => {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+    timeZone: fusoValido(fuso) ? fuso : 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date(t)).map((x) => [x.type, x.value]));
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+};
+function instanteNoFuso(local, fuso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(String(local || ''));
+  if (!m) return null;
+  const alvo = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+  let t = alvo;
+  for (let i = 0; i < 3; i++) t = alvo - (paredeEm(t, fuso) - t);
+  return paredeEm(t, fuso) === alvo ? t : null;
+}
+
+// Agendado: até 30 dias à frente; sai uma vez, na rodada de lembretes (a cada minuto). Se o
+// servidor esteve fora na hora, sai na volta com até 12h de atraso; passando disso, "perdido".
+const AGENDA_MAX_DIAS = 30;
+const AGENDA_ATRASO_MAX = 12 * 3600 * 1000;
+
+async function enviarAvisoAdmin(eu, pedido) {
+  const v = validarAviso(pedido);
+  const agora = agoraDoServidor();
+  const fuso = (CONTAS.achar(eu) || {}).fuso;
+  // Um aviso para todos por dia; o segundo exige confirmar de novo. "Só para mim" é livre.
+  // O dia é o do envio real: hoje, ou o dia marcado no agendamento (no fuso de quem agenda),
+  // contando também os agendados para todos que ainda estão na fila desse dia.
+  if (pedido.quando) {
+    const quando = instanteNoFuso(pedido.quando, fuso);
+    if (quando === null) throw erroAviso('confira o dia e a hora');
+    if (quando <= agora.getTime()) throw erroAviso('esse horário já passou');
+    if (quando > agora.getTime() + AGENDA_MAX_DIAS * 864e5) throw erroAviso('dá para agendar até ' + AGENDA_MAX_DIAS + ' dias à frente');
+    const dia = String(pedido.quando).slice(0, 10);
+    if (v.publico === 'todos' && pedido.denovo !== true
+      && NOTIFICACOES.avisosParaTodosNoDia(dia) + NOTIFICACOES.agendadosParaTodosNoDia(dia) >= 1) {
+      throw erroAviso('já tem um aviso para todos nesse dia', 409, { precisaConfirmar: true });
+    }
+    const idFoto = v.foto ? NOTIFICACOES.guardarFoto(v.foto.bruto, v.foto.tipo, agora.getTime()) : '';
+    const id = randomBytes(9).toString('base64url');
+    NOTIFICACOES.agendarAviso({ id, de: eu, publico: v.publico, titulo: v.titulo, corpo: v.corpo, destino: v.destino, foto: idFoto,
+      quando, quandoLocal: String(pedido.quando), dia, denovo: pedido.denovo === true ? 1 : 0, criadoEm: agora.getTime() });
+    console.log('  painel: @' + eu + ' agendou um aviso para ' + pedido.quando + ' em ' + new Date().toISOString());
+    return { agendado: { id, quando: String(pedido.quando) }, foto: idFoto };
+  }
+  const dia = hojeNoFuso(fuso, agora);
+  if (v.publico === 'todos' && NOTIFICACOES.avisosParaTodosNoDia(dia) >= 1 && pedido.denovo !== true) {
+    throw erroAviso('já saiu um aviso para todos hoje', 409, { precisaConfirmar: true });
+  }
+  const idFoto = v.foto ? NOTIFICACOES.guardarFoto(v.foto.bruto, v.foto.tipo, agora.getTime()) : '';
+  const r = await despacharAviso(eu, { ...v, idFoto }, agora);
   // Para todos, o envio segue depois da resposta; só para mim, a resposta diz se chegou.
-  const enviados = publico === 'mim' ? await mandar() : (semEsperar(mandar()), null);
-  return { id, pessoas: usuarios.length, push: agoraVai.length, adiados: depois.length, enviados, foto: idFoto };
+  const enviados = v.publico === 'mim' ? await r.mandar() : (semEsperar(r.mandar()), null);
+  const { mandar, ...resto } = r;
+  return { ...resto, enviados };
+}
+
+// Na rodada de lembretes: os agendados que venceram. Cada um é "tomado" (agendado → enviando)
+// numa só gravação antes de sair: duas rodadas nunca mandam o mesmo.
+async function dispararAgendados(agora) {
+  const saiu = [];
+  for (const a of NOTIFICACOES.agendadosVencidos(agora.getTime())) {
+    if (!NOTIFICACOES.tomarAgendado(a.id)) continue;
+    try {
+      if (agora.getTime() - a.quando > AGENDA_ATRASO_MAX) {
+        NOTIFICACOES.fecharAgendado(a.id, 'perdido', { motivo: 'o servidor esteve fora na hora marcada' });
+        continue;
+      }
+      if (!CONTAS.achar(a.de) || !ehAdmin(a.de)) {
+        NOTIFICACOES.fecharAgendado(a.id, 'recusado', { motivo: 'quem agendou não é mais administrador' });
+        continue;
+      }
+      const dia = hojeNoFuso((CONTAS.achar(a.de) || {}).fuso, agora);
+      if (a.publico === 'todos' && !a.denovo && NOTIFICACOES.avisosParaTodosNoDia(dia) >= 1) {
+        NOTIFICACOES.fecharAgendado(a.id, 'recusado', { motivo: 'já tinha saído um aviso para todos nesse dia' });
+        continue;
+      }
+      const r = await despacharAviso(a.de, { titulo: a.titulo, corpo: a.corpo, destino: a.destino, publico: a.publico, idFoto: a.foto }, agora);
+      NOTIFICACOES.fecharAgendado(a.id, 'enviado', { enviadoEm: agora.getTime(), pessoas: r.pessoas });
+      await r.mandar();
+      saiu.push({ usuario: a.de, tipo: 'avisoAgendado', titulo: a.titulo });
+    } catch (e) {
+      console.log('  aviso agendado não saiu: ' + e.message);
+      NOTIFICACOES.fecharAgendado(a.id, 'falhou', { motivo: 'erro no servidor' });
+    }
+  }
+  return saiu;
 }
 
 function resumoDoAviso(eu) {
@@ -1086,9 +1182,12 @@ function resumoDoAviso(eu) {
     pessoas: todos.length,
     comPush: todos.filter(recebePush).length,
     eu: { aparelhos: NOTIFICACOES.inscricoesDe(eu).length, push: recebePush(eu) },
+    hoje: hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agoraDoServidor()),
     paraTodosHoje: NOTIFICACOES.avisosParaTodosNoDia(hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agoraDoServidor())),
     ultimos: NOTIFICACOES.ultimosAvisosAdmin(5),
-    limites: { titulo: AVISO_TITULO_MAX, texto: AVISO_TEXTO_MAX, foto: AVISO_FOTO_MAX },
+    agendados: NOTIFICACOES.listaAgendados('fila'),
+    agendadosAntes: NOTIFICACOES.listaAgendados('antes', 5),
+    limites: { titulo: AVISO_TITULO_MAX, texto: AVISO_TEXTO_MAX, foto: AVISO_FOTO_MAX, dias: AGENDA_MAX_DIAS },
   };
 }
 
@@ -1411,6 +1510,16 @@ const servidor = createServer(async (req, res) => {
       } catch (e) {
         json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora', ...(e.precisaConfirmar ? { precisaConfirmar: true } : {}) });
       }
+      return;
+    }
+    // Cancelar um aviso agendado que ainda não saiu.
+    if (rota === '/api/painel/aviso/cancelar') {
+      if (!exigir(conta && ehAdmin(eu), 403, 'só o administrador manda avisos')) return;
+      if (!exigir(post, 405, 'método não suportado')) return;
+      const { id } = await lerJson(req);
+      if (!exigir(NOTIFICACOES.cancelarAgendado(String(id || '')), 404, 'esse aviso não está mais na fila')) return;
+      console.log('  painel: @' + eu + ' cancelou um aviso agendado em ' + new Date().toISOString());
+      json(res, 200, { ok: true, resumo: resumoDoAviso(eu) });
       return;
     }
 
