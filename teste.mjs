@@ -1319,6 +1319,42 @@ secao('notificações: as frases');
 }
 
 // =========================================================================
+secao('aviso do administrador: a foto sem metadados');
+// =========================================================================
+{
+  const N = await import('./notificacoes.mjs');
+  const jpeg = Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=', 'base64');
+  const seg = (marca, dados) => { const c = Buffer.alloc(4); c[0] = 0xff; c[1] = marca; c.writeUInt16BE(dados.length + 2, 2); return Buffer.concat([c, dados]); };
+  // EXIF com o IFD do GPS (latitude S), um ICC (APP2), um de fabricante (APP13) e lixo depois do fim
+  const tiff = Buffer.from('4d4d002a000000080001882500040000000100000020000000000000000000000001000100020000000253000000' + '00000000', 'hex');
+  const exif = seg(0xe1, Buffer.concat([Buffer.from('Exif\0\0', 'latin1'), tiff]));
+  const sujo = Buffer.concat([jpeg.subarray(0, 20), exif, seg(0xe2, Buffer.from('ICC_PROFILE\0xx')), seg(0xed, Buffer.from('Photoshop 3.0\0')),
+    seg(0xfe, Buffer.from('comentario')), jpeg.subarray(20), Buffer.from('trailer com GPS')]);
+  const limpo = N.limparMetadados(sujo, 'image/jpeg');
+  const marcas = (b) => { const m = []; for (let i = 2; i < b.length - 3 && b[i] === 0xff && b[i + 1] !== 0xda;) { m.push(b[i + 1]); i += 2 + b.readUInt16BE(i + 2); } return m; };
+  checar(limpo && !limpo.includes(tiff) && !limpo.includes('Exif') && !limpo.includes('ICC_PROFILE') && !limpo.includes('Photoshop') && !limpo.includes('trailer'),
+    'JPEG: saem o EXIF com o GPS, os outros APPn e o que vem depois do fim da imagem');
+  checar(limpo && marcas(limpo)[0] === 0xe0 && marcas(limpo).includes(0xfe) && marcas(limpo).every((m) => m < 0xe1 || m > 0xef), 'JPEG: o APP0 (JFIF) e os demais segmentos ficam');
+  checar(N.limparMetadados(jpeg, 'image/jpeg').equals(jpeg), 'JPEG sem metadados sai igual');
+  checar(N.limparMetadados(jpeg.subarray(0, 40), 'image/jpeg') === null, 'JPEG cortado: null (o servidor recusa)');
+  checar(N.limparMetadados(Buffer.concat([jpeg.subarray(0, 20), Buffer.from([0xff, 0xe1, 0xff, 0xff, 0])]), 'image/jpeg') === null, 'JPEG com segmento maior que o arquivo: null');
+  const chunk = (nome, d) => { const c = Buffer.alloc(8); c.write(nome, 0, 'latin1'); c.writeUInt32LE(d.length, 4); return Buffer.concat([c, d, d.length % 2 ? Buffer.alloc(1) : Buffer.alloc(0)]); };
+  const riff = (corpo) => { const b = Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4), Buffer.from('WEBP'), corpo]); b.writeUInt32LE(b.length - 8, 4); return b; };
+  const webp1 = Buffer.from('UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==', 'base64');
+  const vp8x = chunk('VP8X', Buffer.from('2c0000000000000000000000'.slice(0, 20), 'hex'));
+  const webpSujo = riff(Buffer.concat([vp8x, chunk('ICCP', Buffer.from('cor')), webp1.subarray(12), chunk('EXIF', tiff), chunk('XMP ', Buffer.from('<x:xmpmeta>GPS</x:xmpmeta>'))]));
+  const webpLimpo = N.limparMetadados(webpSujo, 'image/webp');
+  checar(webpLimpo && !webpLimpo.includes(tiff) && !webpLimpo.includes('EXIF') && !webpLimpo.includes('xmpmeta') && webpLimpo.includes('ICCP') && webpLimpo.includes('VP8L'),
+    'WebP: saem os chunks EXIF e XMP; ficam o ICC e a imagem');
+  checar(webpLimpo && webpLimpo.readUInt32LE(4) === webpLimpo.length - 8, 'WebP: o tamanho do RIFF é refeito');
+  checar(webpLimpo && webpLimpo[20] === 0x20, 'WebP: no VP8X, as marcas de EXIF e XMP caem e a do ICC fica');
+  checar(N.limparMetadados(webp1, 'image/webp').equals(webp1), 'WebP sem metadados sai igual');
+  const torto = Buffer.from(webpSujo); torto.writeUInt32LE(9999, 4);
+  checar(N.limparMetadados(torto, 'image/webp') === null, 'WebP com tamanho do RIFF maior que o arquivo: null');
+  checar(N.limparMetadados(riff(chunk('EXIF', tiff)), 'image/webp') === null, 'WebP sem imagem nenhuma: null');
+}
+
+// =========================================================================
 secao('rodada de lembretes sem sobreposição');
 // =========================================================================
 {

@@ -692,6 +692,88 @@ export function tipoDaImagem(b) {
   return null;
 }
 
+// Tira os metadados da foto antes de guardar: o navegador já manda a foto redesenhada num
+// canvas (sem EXIF), mas quem chama a API direto pode mandar a foto como saiu da câmera, com
+// o lugar (GPS), o aparelho e a hora. Devolve a foto limpa, ou null quando ela não pode ser
+// lida com segurança (estrutura quebrada): aí o servidor recusa, em vez de guardar às cegas.
+//   JPEG: sai todo segmento APP1 a APP15 (EXIF, XMP, ICC, fabricante...) e o que vier depois
+//   do fim da imagem (EOI); ficam o APP0 (JFIF) e os demais segmentos.
+//   WebP: saem os chunks EXIF e "XMP ", o tamanho do RIFF é refeito e as marcas de EXIF e XMP
+//   do VP8X são apagadas.
+export function limparMetadados(b, tipo) {
+  if (!Buffer.isBuffer(b)) return null;
+  if (tipo === 'image/jpeg') return limparJpeg(b);
+  if (tipo === 'image/webp') return limparWebp(b);
+  return null;
+}
+
+function limparJpeg(b) {
+  if (b.length < 4 || b[0] !== 0xff || b[1] !== 0xd8) return null;
+  const partes = [b.subarray(0, 2)];
+  let i = 2;
+  let imagem = false;
+  while (i < b.length) {
+    if (b[i] !== 0xff) return null;
+    let j = i;
+    while (j < b.length && b[j] === 0xff) j++; // bytes de preenchimento antes da marca
+    if (j >= b.length) return null;
+    const marca = b[j];
+    if (marca === 0xd9) { partes.push(b.subarray(j - 1, j + 1)); return imagem ? Buffer.concat(partes) : null; }
+    // marcas sem tamanho (TEM e RST) fora da imagem não fazem sentido aqui
+    if (marca === 0x00 || marca === 0x01 || (marca >= 0xd0 && marca <= 0xd8)) return null;
+    if (j + 3 > b.length) return null;
+    const tam = b.readUInt16BE(j + 1);
+    if (tam < 2 || j + 1 + tam > b.length) return null;
+    const fim = j + 1 + tam;
+    if (!(marca >= 0xe1 && marca <= 0xef)) partes.push(b.subarray(j - 1, fim));
+    i = fim;
+    if (marca === 0xda) {
+      // Depois do SOS vêm os dados da imagem, até a próxima marca de verdade (FF seguido de
+      // algo que não é 00, preenchimento nem RST).
+      imagem = true;
+      let k = i;
+      for (;;) {
+        if (k + 1 >= b.length) return null;
+        if (b[k] === 0xff && b[k + 1] !== 0x00 && b[k + 1] !== 0xff && !(b[k + 1] >= 0xd0 && b[k + 1] <= 0xd7)) break;
+        k++;
+      }
+      partes.push(b.subarray(i, k));
+      i = k;
+    }
+  }
+  return null;
+}
+
+function limparWebp(b) {
+  if (b.length < 12 || b.toString('latin1', 0, 4) !== 'RIFF' || b.toString('latin1', 8, 12) !== 'WEBP') return null;
+  const total = b.readUInt32LE(4) + 8;
+  if (total > b.length || total < 12) return null;
+  const partes = [];
+  let i = 12;
+  let vp8x = null;
+  let temImagem = false;
+  while (i < total) {
+    if (i + 8 > total) return null;
+    const nome = b.toString('latin1', i, i + 4);
+    const tam = b.readUInt32LE(i + 4);
+    const fim = i + 8 + tam + (tam % 2);
+    if (fim > total && !(i + 8 + tam === total)) return null;
+    const pedaco = Buffer.from(b.subarray(i, Math.min(fim, total)));
+    if (nome === 'VP8 ' || nome === 'VP8L' || nome === 'ANIM') temImagem = true;
+    if (nome === 'VP8X') { if (tam < 10 || vp8x) return null; vp8x = pedaco; }
+    if (nome !== 'EXIF' && nome !== 'XMP ') partes.push(pedaco);
+    i = fim;
+  }
+  if (!temImagem) return null;
+  if (vp8x) vp8x[8] &= ~(0x08 | 0x04); // marcas de EXIF (bit 3) e XMP (bit 2)
+  const corpo = Buffer.concat(partes);
+  const cabeca = Buffer.alloc(12);
+  cabeca.write('RIFF', 0, 'latin1');
+  cabeca.writeUInt32LE(corpo.length + 4, 4);
+  cabeca.write('WEBP', 8, 'latin1');
+  return Buffer.concat([cabeca, corpo]);
+}
+
 // Uma tarefa que não roda por cima de si mesma: chamada enquanto a anterior não terminou,
 // não faz nada e devolve false (a rodada de lembretes, a cada minuto).
 export function umaDeCadaVez(tarefa) {

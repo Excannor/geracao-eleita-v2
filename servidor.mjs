@@ -25,7 +25,7 @@ import {
 } from './db.mjs';
 import {
   Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio, leituraDoDia,
-  MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, avisosDesligados, umaDeCadaVez,
+  MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, limparMetadados, avisosDesligados, umaDeCadaVez,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
 import {
@@ -1056,7 +1056,10 @@ function validarAviso(pedido) {
     if (bruto.length > AVISO_FOTO_MAX) throw erro('a foto passou de ' + Math.round(AVISO_FOTO_MAX / 1024) + ' KB', 413);
     const tipo = tipoDaImagem(bruto);
     if (!tipo) throw erro('a foto precisa ser JPEG ou WebP');
-    foto = { bruto, tipo };
+    // Sem EXIF nem XMP (lugar, aparelho, hora): a foto vai para todas as contas.
+    const limpa = limparMetadados(bruto, tipo);
+    if (!limpa) throw erro('não deu para ler essa foto; tente outra');
+    foto = { bruto: limpa, tipo };
   }
   return { titulo, corpo, destino, publico, foto };
 }

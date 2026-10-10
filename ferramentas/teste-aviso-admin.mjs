@@ -346,6 +346,36 @@ ok((await pedirJson('/api/painel/aviso', { titulo: 'Oi', publico: 'mim', foto: B
 ok((await pedirJson('/api/painel/aviso', { titulo: 'Oi', publico: 'mim', foto: Buffer.concat([jpegMinimo, Buffer.alloc(320 * 1024)]).toString('base64') }, chefe)).status === 413,
   'recusa foto acima de 300 KB');
 ok((await pedirJson('/api/painel/aviso', { titulo: 'Oi', publico: 'mim', destino: 'https://golpe.example' }, chefe)).status === 400, 'recusa destino fora da lista');
+// Quem chama a API direto pode mandar a foto como saiu da câmera: o servidor tira o EXIF
+// (com o GPS) e o XMP antes de guardar, e recusa a foto que não consegue ler.
+{
+  const seg = (marca, dados) => { const c = Buffer.alloc(4); c[0] = 0xff; c[1] = marca; c.writeUInt16BE(dados.length + 2, 2); return Buffer.concat([c, dados]); };
+  // TIFF com IFD0 apontando para o IFD do GPS (latitude S)
+  const tiff = Buffer.from('4d4d002a00000008' + '0001' + '882500040000000100000020' + '00000000' + '000000000000' + '0001' + '000100020000000253000000' + '00000000', 'hex');
+  const exif = seg(0xe1, Buffer.concat([Buffer.from('Exif\0\0', 'latin1'), tiff]));
+  const xmp = seg(0xe1, Buffer.from('http://ns.adobe.com/xap/1.0/\0<x:xmpmeta>GPSLatitude 23,33S</x:xmpmeta>', 'latin1'));
+  const comExif = Buffer.concat([jpegMinimo.subarray(0, 20), exif, xmp, jpegMinimo.subarray(20)]);
+  ok(medirJpeg(comExif).exif, '(a foto do teste tem EXIF com GPS)');
+  const r = await pedirJson('/api/painel/aviso', { titulo: 'Foto com EXIF', publico: 'mim', foto: comExif.toString('base64') }, chefe);
+  const guardada = Buffer.from(await (await fetch(base + '/api/avisos/foto/' + r.foto)).arrayBuffer());
+  ok(r.status === 200 && guardada.length && !medirJpeg(guardada).exif && !guardada.includes('xmpmeta') && !guardada.includes(tiff),
+    'JPEG com EXIF e GPS: a foto guardada sai sem EXIF, sem GPS e sem XMP');
+  ok(guardada.equals(jpegMinimo), 'e o resto da foto fica igual, byte a byte');
+  // WebP com VP8X, EXIF e XMP
+  const chunk = (nome, d) => { const c = Buffer.alloc(8); c.write(nome, 0, 'latin1'); c.writeUInt32LE(d.length, 4); return Buffer.concat([c, d, d.length % 2 ? Buffer.alloc(1) : Buffer.alloc(0)]); };
+  const vp8l = Buffer.from('UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==', 'base64').subarray(12);
+  const vp8x = Buffer.from('0c000000000000', 'hex'); // marcas EXIF (0x08) e XMP (0x04); 1 × 1
+  const corpoWebp = Buffer.concat([chunk('VP8X', Buffer.concat([vp8x.subarray(0, 4), Buffer.alloc(6)])), vp8l, chunk('EXIF', tiff), chunk('XMP ', Buffer.from('<x:xmpmeta/>'))]);
+  const webp = Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4), Buffer.from('WEBP'), corpoWebp]);
+  webp.writeUInt32LE(webp.length - 8, 4);
+  const rw = await pedirJson('/api/painel/aviso', { titulo: 'WebP com EXIF', publico: 'mim', foto: webp.toString('base64') }, chefe);
+  const gw = Buffer.from(await (await fetch(base + '/api/avisos/foto/' + rw.foto)).arrayBuffer());
+  ok(rw.status === 200 && !gw.includes('EXIF') && !gw.includes('XMP ') && !gw.includes(tiff) && gw.readUInt32LE(4) === gw.length - 8 && (gw[20] & 0x0c) === 0,
+    'WebP com EXIF: a foto guardada sai sem os chunks EXIF e XMP, com o tamanho do RIFF e as marcas do VP8X certos');
+  const quebrado = Buffer.concat([jpegMinimo.subarray(0, 20), Buffer.from([0xff, 0xe1, 0xff, 0xff, 1, 2, 3])]);
+  ok((await pedirJson('/api/painel/aviso', { titulo: 'Quebrada', publico: 'mim', foto: quebrado.toString('base64') }, chefe)).status === 400,
+    'a foto que não dá para ler com segurança (segmento maior que o arquivo) é recusada');
+}
 ok((await pedirJson('/api/painel/aviso', { titulo: 'x'.repeat(51), publico: 'mim' }, chefe)).status === 400, 'recusa título com mais de 50 caracteres');
 ok((await pedirJson('/api/painel/aviso', { titulo: '', publico: 'mim' }, chefe)).status === 400, 'recusa aviso sem título');
 
