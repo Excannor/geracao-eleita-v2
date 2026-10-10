@@ -5,7 +5,9 @@
       "id": "mateus",
       "nome": "Evangelho de Mateus",
       "curto": "Mateus",
-      "parabolas": []
+      "parabolas": [
+        "joio-e-trigo"
+      ]
     },
     {
       "id": "marcos",
@@ -76,6 +78,7 @@
     "fariseu-e-publicano",
     "dez-minas",
     "lavradores-maus",
-    "figueira-que-brota"
+    "figueira-que-brota",
+    "joio-e-trigo"
   ]
 }

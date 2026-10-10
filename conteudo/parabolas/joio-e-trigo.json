@@ -1,0 +1,115 @@
+{
+  "titulo": "O joio e o trigo",
+  "ref": "Mt 13.24-30, 36-43",
+  "grupo": "mateus",
+  "linha": "Um inimigo semeia joio no meio do trigo",
+  "desenho": "joio-e-trigo",
+  "desenhoLista": "joio-no-trigo",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus sai de casa e desce para a beira da praia. Tanta gente se junta ali que ele entra num barco e ensina de dentro dele.",
+          "ref": "Mt 13.1-2"
+        },
+        {
+          "texto": "Jesus já contou a do lavrador que sai a semear. Agora ele conta outra história de semente e de campo.",
+          "ref": "Mt 13.3-24"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "broto",
+      "blocos": [
+        {
+          "texto": "Um agricultor semeia boa semente no campo dele. Uma noite, enquanto todos dormem, um inimigo semeia joio no meio do trigo e vai embora.",
+          "ref": "Mt 13.24-25"
+        },
+        {
+          "texto": "Quando a plantação começa a crescer, o joio cresce junto. Os servos vão contar ao patrão.",
+          "ref": "Mt 13.26-27"
+        },
+        {
+          "fala": "Patrão, o campo onde o senhor semeou aquela semente escolhida está cheia de joio!",
+          "ref": "Mt 13.27"
+        },
+        {
+          "texto": "O patrão responde que um inimigo fez isso. Os servos perguntam se devem arrancar o joio, e ele diz que não, porque eles podem levar o trigo junto.",
+          "ref": "Mt 13.28-29"
+        },
+        {
+          "texto": "Na colheita, o patrão vai mandar os ceifeiros separarem os dois.",
+          "ref": "Mt 13.30"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "joio-no-trigo",
+              "titulo": "Até a colheita",
+              "fala": "Deixem os dois crescerem juntos até a colheita",
+              "ref": "Mt 13.30"
+            },
+            {
+              "desenho": "feixe-no-fogo",
+              "titulo": "O joio",
+              "fala": "o amarrem em feixes para ser queimado",
+              "ref": "Mt 13.30"
+            },
+            {
+              "desenho": "celeiro-novo",
+              "titulo": "O trigo",
+              "fala": "juntem o trigo e o guardem no depósito",
+              "ref": "Mt 13.30"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Os discípulos perguntam",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Jesus deixa o povo do lado de fora e entra em casa. Os discípulos pedem que ele explique a parábola do joio e do trigo. Jesus responde.",
+          "ref": "Mt 13.36-37"
+        },
+        {
+          "fala": "O Filho do Homem é o agricultor que lançou a semente escolhida.",
+          "ref": "Mt 13.37"
+        },
+        {
+          "texto": "O campo é o mundo. A boa semente são os filhos do Reino, e o joio são os filhos do Maligno. O inimigo que semeou o joio é o Diabo.",
+          "ref": "Mt 13.38-39"
+        },
+        {
+          "texto": "A colheita é o fim dos tempos, e os ceifeiros são os anjos. Eles vão tirar do Reino todos os que praticam o mal.",
+          "ref": "Mt 13.39-42"
+        },
+        {
+          "fala": "Então os piedosos brilharão como o sol no Reino de seu Pai.",
+          "ref": "Mt 13.43"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O joio cresce no meio do trigo, no mesmo campo. Os servos querem arrancar logo, e o patrão manda esperar para não perder nenhum pé de trigo. Separar o joio fica para os anjos, no fim dos tempos.",
+    "apoio": "Jesus diz como vai ser no fim. “Como o joio é separado e queimado no fogo, assim será no fim dos tempos”.",
+    "ref": "Mt 13.36-43"
+  },
+  "perguntas": [
+    "Quem você já tratou como joio, sem esperar a colheita?",
+    "Como você vive diferente sabendo que Deus vai separar o joio do trigo no fim?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 8.4-15",
+      "titulo": "O semeador",
+      "slug": "semeador",
+      "linha": "a mesma semente em quatro tipos de chão"
+    }
+  ]
+}

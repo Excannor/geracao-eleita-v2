@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o joio no meio do trigo (Mt 13.26): dois pés que nasceram juntos no mesmo chão; à esquerda, o trigo de espiga cheia, em pares, com as barbas; à direita, o joio, mais fino e comprido, com as espiguetas pequenas e soltas. Embaixo da terra, as raízes dos dois se cruzam. A espiga do trigo é a única área sálvia. -->
+<path class="k" d="M10 94C40 90 80 90 110 94"/>
+<path class="h" d="M50 93C54 99 60 103 68 110M70 93C66 99 60 103 52 110M50 93C46 99 42 102 36 106M70 93C74 99 78 102 84 106"/>
+<path class="h" d="M43.3 49.5l-4.5 -7.5M56.8 49.5l4.5 -7.5M43.3 39.8l-4.5 -7.5M56.8 39.8l4.5 -7.5M43.3 30l-4.5 -7.5M56.8 30l4.5 -7.5M43.3 20.3l-4.5 -7.5M56.8 20.3l4.5 -7.5M50 25.5v-10.5"/>
+<path class="k" d="M50 94V57"/>
+<ellipse class="k s" cx="46.1" cy="54" rx="3.5999999999999996" ry="6.300000000000001" transform="rotate(-24 46.1 54)"/>
+<ellipse class="k s" cx="53.9" cy="54" rx="3.5999999999999996" ry="6.300000000000001" transform="rotate(24 53.9 54)"/>
+<ellipse class="k s" cx="46.1" cy="44.3" rx="3.5999999999999996" ry="6.300000000000001" transform="rotate(-24 46.1 44.3)"/>
+<ellipse class="k s" cx="53.9" cy="44.3" rx="3.5999999999999996" ry="6.300000000000001" transform="rotate(24 53.9 44.3)"/>
+<ellipse class="k s" cx="46.1" cy="34.5" rx="3.5999999999999996" ry="6.300000000000001" transform="rotate(-24 46.1 34.5)"/>
+<ellipse class="k s" cx="53.9" cy="34.5" rx="3.5999999999999996" ry="6.300000000000001" transform="rotate(24 53.9 34.5)"/>
+<ellipse class="k s" cx="46.1" cy="24.8" rx="3.5999999999999996" ry="6.300000000000001" transform="rotate(-24 46.1 24.8)"/>
+<ellipse class="k s" cx="53.9" cy="24.8" rx="3.5999999999999996" ry="6.300000000000001" transform="rotate(24 53.9 24.8)"/>
+<ellipse class="k s" cx="50" cy="30" rx="3.3000000000000003" ry="6"/>
+<path class="k p" d="M50 74C42 68 36 62 34 54C42 58 48 64 50 70Z"/>
+<path class="k" d="M70 94Q73 56 70 18"/>
+<ellipse class="k p" cx="66.4" cy="26.4" rx="2.2399999999999998" ry="5.6" transform="rotate(-22 66.4 26.4)"/>
+<ellipse class="k p" cx="73.6" cy="37.6" rx="2.2399999999999998" ry="5.6" transform="rotate(22 73.6 37.6)"/>
+<ellipse class="k p" cx="66.4" cy="48.8" rx="2.2399999999999998" ry="5.6" transform="rotate(-22 66.4 48.8)"/>
+<ellipse class="k p" cx="73.6" cy="60" rx="2.2399999999999998" ry="5.6" transform="rotate(22 73.6 60)"/>
+<ellipse class="k p" cx="66.4" cy="71.2" rx="2.2399999999999998" ry="5.6" transform="rotate(-22 66.4 71.2)"/>
+<ellipse class="k p" cx="70" cy="16.6" rx="1.9599999999999997" ry="4.76"/>
+<path class="k p" d="M70 80C76 76 82 70 86 62C80 64 74 70 71 74Z"/>
+</svg>

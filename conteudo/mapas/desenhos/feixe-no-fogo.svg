@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o joio amarrado em feixes para ser queimado (Mt 13.30): um feixe de pé, de hastes finas de joio abertas em leque no alto, cada uma com as espiguetas pequenas e soltas, amarrado no meio por uma corda; embaixo, na frente das hastes, as chamas da fogueira. As chamas são a única área sálvia. -->
+<path class="k" d="M14 108H106"/>
+<path class="k" d="M45 104L57.6 66L30 34M50 104L58.4 66L40 26M55 104L59.2 66L50 21M60 104L60 66L60 19M65 104L60.8 66L70 21M70 104L61.6 66L80 26M75 104L62.4 66L90 34"/>
+<ellipse class="k p" cx="30.8" cy="38.6" rx="1.5" ry="3.6" transform="rotate(-62.8 30.8 38.6)"/>
+<ellipse class="k p" cx="39" cy="40.8" rx="1.5" ry="3.6" transform="rotate(-18.8 39 40.8)"/>
+<ellipse class="k p" cx="39.9" cy="49.2" rx="1.5" ry="3.6" transform="rotate(-62.8 39.9 49.2)"/>
+<ellipse class="k p" cx="39.5" cy="30.6" rx="1.5" ry="3.6" transform="rotate(-46.7 39.5 30.6)"/>
+<ellipse class="k p" cx="46.8" cy="35" rx="1.5" ry="3.6" transform="rotate(-2.7 46.8 35)"/>
+<ellipse class="k p" cx="45.3" cy="43.4" rx="1.5" ry="3.6" transform="rotate(-46.7 45.3 43.4)"/>
+<ellipse class="k p" cx="48.4" cy="25.4" rx="1.5" ry="3.6" transform="rotate(-33.6 48.4 25.4)"/>
+<ellipse class="k p" cx="54.6" cy="31.3" rx="1.5" ry="3.6" transform="rotate(10.4 54.6 31.3)"/>
+<ellipse class="k p" cx="51.3" cy="39.1" rx="1.5" ry="3.6" transform="rotate(-33.6 51.3 39.1)"/>
+<ellipse class="k p" cx="57.6" cy="23" rx="1.5" ry="3.6" transform="rotate(-22 57.6 23)"/>
+<ellipse class="k p" cx="62.4" cy="30" rx="1.5" ry="3.6" transform="rotate(22 62.4 30)"/>
+<ellipse class="k p" cx="57.6" cy="37" rx="1.5" ry="3.6" transform="rotate(-22 57.6 37)"/>
+<ellipse class="k p" cx="66.8" cy="24.4" rx="1.5" ry="3.6" transform="rotate(-10.4 66.8 24.4)"/>
+<ellipse class="k p" cx="70.1" cy="32.3" rx="1.5" ry="3.6" transform="rotate(33.6 70.1 32.3)"/>
+<ellipse class="k p" cx="64" cy="38.2" rx="1.5" ry="3.6" transform="rotate(-10.4 64 38.2)"/>
+<ellipse class="k p" cx="76.1" cy="28.6" rx="1.5" ry="3.6" transform="rotate(2.7 76.1 28.6)"/>
+<ellipse class="k p" cx="77.6" cy="37" rx="1.5" ry="3.6" transform="rotate(46.7 77.6 37)"/>
+<ellipse class="k p" cx="70.3" cy="41.3" rx="1.5" ry="3.6" transform="rotate(2.7 70.3 41.3)"/>
+<ellipse class="k p" cx="85.6" cy="35.5" rx="1.5" ry="3.6" transform="rotate(18.8 85.6 35.5)"/>
+<ellipse class="k p" cx="84.6" cy="43.9" rx="1.5" ry="3.6" transform="rotate(62.8 84.6 43.9)"/>
+<ellipse class="k p" cx="76.4" cy="46.1" rx="1.5" ry="3.6" transform="rotate(18.8 76.4 46.1)"/>
+<path class="k p" d="M52 62C56 64.5 64 64.5 68 62L68.5 70C64 72.5 56 72.5 51.5 70Z"/>
+<path class="k" d="M68 66C72 68 74 72 72 76"/>
+<path class="k s" d="M32 108C28 100 34 96 36 90C40 94 42 98 45 94C47 90 49 86 52 82C55 88 58 92 60 96C62 92 65 88 68 84C70 90 72 94 75 98C77 95 80 92 84 90C86 96 92 100 88 108Z"/>
+<path class="h" d="M46 106C45 103 46 101 48 99M60 106C60 104 60 102 61 100M74 106C75 103 74 101 76 99"/>
+</svg>
