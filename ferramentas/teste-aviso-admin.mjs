@@ -42,11 +42,19 @@ const hojeSP = new Intl.DateTimeFormat('en-CA', { timeZone: FUSO, year: 'numeric
 const emSP = (hora, dia = hojeSP) => new Date(dia + 'T' + hora + ':00-03:00').toISOString();
 
 // ---------- serviço de push falso ----------
+// atrasoPush: quanto o serviço falso demora para responder a um aviso do administrador (o
+// teste do push lento); os lembretes da rodada respondem na hora.
 const recebidos = [];
+let atrasoPush = 0;
 const push = createServer((req, res) => {
   const partes = [];
   req.on('data', (p) => partes.push(p));
-  req.on('end', () => { recebidos.push({ caminho: req.url, corpo: Buffer.concat(partes) }); res.writeHead(201).end(); });
+  req.on('end', () => {
+    recebidos.push({ caminho: req.url, corpo: Buffer.concat(partes) });
+    let ehAviso = false;
+    try { const ap = Object.values(cel).find((x) => x.caminho === req.url); ehAviso = !!ap && /^aviso:/.test(decifrar(Buffer.concat(partes), ap).tag || ''); } catch { /* outro */ }
+    setTimeout(() => { try { res.writeHead(201).end(); } catch { /* o servidor caiu */ } }, ehAviso ? atrasoPush : 0);
+  });
 });
 await new Promise((r) => push.listen(PORTA_PUSH, '127.0.0.1', r));
 
@@ -533,6 +541,31 @@ ok(agoraSemConfirmar.status === 409 && agoraSemConfirmar.precisaConfirmar && /ag
 ok((await pedirJson('/api/painel/aviso', { titulo: 'Agora do dia', publico: 'todos', denovo: true }, chefe)).status === 200, 'confirmado, sai agora');
 await rodada(D7, '18:00');
 ok((await esperarTitulo(cel.ana, 'Agendado do dia')).length === 1, 'e o agendado também sai na hora dele');
+
+// ---------- o agendado para todos não segura a rodada ----------
+console.log('\n  Agendado com o push lento\n');
+ok((await agendar({ titulo: 'Lento', publico: 'todos', quando: D8 + 'T10:00' })).status === 200, 'um para todos amanhã às 10h');
+// uma rodada antes, para o push pendente do Kenji (silêncio da noite) sair e não entrar na conta
+await rodada(D8, '09:59');
+await dormir(300);
+atrasoPush = 1500;
+const antes = Date.now();
+await rodada(D8, '10:00');
+const levou = Date.now() - antes;
+ok(levou < 1000, 'com o serviço de push levando 1,5 s por aparelho, a rodada volta sem esperar o envio (' + levou + ' ms)');
+ok((await estadoDe('Lento')) === 'enviando', 'enquanto o push sai, ele fica "enviando"');
+ok((await esperarTitulo(cel.ana, 'Lento')).length === 1, 'o push chega');
+for (let t = 0; t < 6000 && (await estadoDe('Lento')) !== 'enviado'; t += 100) await dormir(100);
+ok((await estadoDe('Lento')) === 'enviado', 'e, no fim, vira "enviado"');
+// O servidor cai no meio do envio: na volta, "interrompido" (não "enviado", não sai de novo).
+ok((await agendar({ titulo: 'Caiu no meio', publico: 'todos', quando: D8 + 'T11:00', denovo: true })).status === 200, 'outro para as 11h (confirmado)');
+atrasoPush = 8000;
+await rodada(D8, '11:00');
+await dormir(300);
+await derrubar();
+atrasoPush = 0;
+await subir();
+ok((await estadoDe('Caiu no meio')) === 'interrompido', 'o servidor caiu durante o push: na volta, ele aparece como interrompido (' + (await estadoDe('Caiu no meio')) + ')');
 
 encerrar();
 try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }

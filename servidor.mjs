@@ -25,7 +25,7 @@ import {
 } from './db.mjs';
 import {
   Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio, leituraDoDia,
-  MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, avisosDesligados,
+  MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, avisosDesligados, umaDeCadaVez,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
 import {
@@ -1191,8 +1191,13 @@ async function dispararAgendados(agora) {
       // sabendo deste. Conferir de novo na hora recusava justo o que ele tinha confirmado
       // (B agendado para as 18h, A agendado para as 10h com o 409 confirmado: B era recusado).
       const r = await despacharAviso(a.de, { titulo: a.titulo, corpo: a.corpo, destino: a.destino, publico: a.publico, idFoto: a.foto }, agora);
-      NOTIFICACOES.fecharAgendado(a.id, 'enviado', { enviadoEm: agora.getTime(), pessoas: r.pessoas });
-      await r.mandar();
+      // O push segue sem segurar a rodada (para todos, passa por todas as contas), como no
+      // envio na hora. O estado fica "enviando" até o último push: se o servidor cair no
+      // meio, a subida o marca "interrompido" e ele não sai de novo.
+      semEsperar(r.mandar().then(
+        () => NOTIFICACOES.fecharAgendado(a.id, 'enviado', { enviadoEm: agora.getTime(), pessoas: r.pessoas }),
+        (e) => { console.log('  aviso agendado não saiu inteiro: ' + e.message); NOTIFICACOES.fecharAgendado(a.id, 'falhou', { motivo: 'erro no envio' }); },
+      ));
       saiu.push({ usuario: a.de, tipo: 'avisoAgendado', titulo: a.titulo });
     } catch (e) {
       console.log('  aviso agendado não saiu: ' + e.message);
@@ -2528,8 +2533,11 @@ servidor.listen(PORTA, '0.0.0.0', () => {
 });
 
 // Uma rodada de lembretes por minuto. unref: o relógio não segura o processo aberto sozinho.
+// umaDeCadaVez: se a rodada anterior ainda roda (muitos lembretes, serviço de push lento),
+// esta é pulada, em vez de duas rodadas mandarem lado a lado.
 if (!PUSH_TESTE) {
-  setInterval(() => rodadaDeLembretes().catch((e) => console.log('  rodada de lembretes: ' + e.message)), 60 * 1000).unref();
+  const rodada = umaDeCadaVez(() => rodadaDeLembretes().catch((e) => console.log('  rodada de lembretes: ' + e.message)));
+  setInterval(rodada, 60 * 1000).unref();
 }
 
 // Backup do dia (dados/backup/caminho-AAAA-MM-DD.db, ficam os 14 mais novos): na subida e a

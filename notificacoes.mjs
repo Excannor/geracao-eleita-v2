@@ -692,6 +692,19 @@ export function tipoDaImagem(b) {
   return null;
 }
 
+// Uma tarefa que não roda por cima de si mesma: chamada enquanto a anterior não terminou,
+// não faz nada e devolve false (a rodada de lembretes, a cada minuto).
+export function umaDeCadaVez(tarefa) {
+  let rodando = false;
+  return () => {
+    if (rodando) return false;
+    rodando = true;
+    let p;
+    try { p = Promise.resolve(tarefa()); } catch (e) { p = Promise.reject(e); }
+    return p.finally(() => { rodando = false; });
+  };
+}
+
 // Quem desligou os três avisos (lembrete, ofensiva e amigos) não recebe o aviso no celular,
 // só no sino.
 export const avisosDesligados = (pref) => !pref.lembrete && !pref.ofensiva && !pref.amigos;
@@ -910,8 +923,11 @@ export class Notificacoes {
     return this.db.prepare("UPDATE avisos_agendados SET estado = 'enviando' WHERE id = ? AND estado = 'agendado'").run(id).changes === 1;
   }
 
+  // Só fecha o que está "enviando" (tomado por esta rodada): o que a subida já marcou como
+  // interrompido, ou outro fechamento que chegou antes, não é sobrescrito.
   fecharAgendado(id, estado, { enviadoEm = 0, pessoas = 0, motivo = '' } = {}) {
-    this.db.prepare('UPDATE avisos_agendados SET estado = ?, enviado_em = ?, pessoas = ?, motivo = ? WHERE id = ?').run(estado, enviadoEm, pessoas, motivo, id);
+    return this.db.prepare("UPDATE avisos_agendados SET estado = ?, enviado_em = ?, pessoas = ?, motivo = ? WHERE id = ? AND estado = 'enviando'")
+      .run(estado, enviadoEm, pessoas, motivo, id).changes === 1;
   }
 
   cancelarAgendado(id) {

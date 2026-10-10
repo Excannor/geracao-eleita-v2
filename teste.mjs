@@ -1319,6 +1319,23 @@ secao('notificações: as frases');
 }
 
 // =========================================================================
+secao('rodada de lembretes sem sobreposição');
+// =========================================================================
+{
+  const N = await import('./notificacoes.mjs');
+  let soltar;
+  let vezes = 0;
+  const rodada = N.umaDeCadaVez(() => { vezes++; return new Promise((r) => { soltar = r; }); });
+  const primeira = rodada();
+  checar(rodada() === false && vezes === 1, 'com a rodada anterior ainda rodando, a seguinte é pulada');
+  soltar();
+  await primeira;
+  rodada();
+  checar(vezes === 2, 'terminada a anterior, a próxima roda');
+  soltar();
+}
+
+// =========================================================================
 secao('cofre das anotações (cofre.mjs e servidor)');
 // =========================================================================
 {
