@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as dez minas (Lc 19.13-20): três coisas no chão, da esquerda para a direita, o que cada servo devolve ao rei; uma pilha alta de moedas, uma pilha média e a bolsa de pano ainda amarrada, do servo que só guardou o dinheiro. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A moeda do alto da pilha mais alta é a única área sálvia. -->
+<path class="k" d="M2 108H158"/>
+<path class="k p" d="M14 34v70a16 5 0 0 0 32 0v-70z"/>
+<path class="h" d="M14 98a16 5 0 0 0 32 0M14 92a16 5 0 0 0 32 0M14 86a16 5 0 0 0 32 0M14 80a16 5 0 0 0 32 0M14 74a16 5 0 0 0 32 0M14 68a16 5 0 0 0 32 0M14 62a16 5 0 0 0 32 0M14 56a16 5 0 0 0 32 0M14 50a16 5 0 0 0 32 0M14 44a16 5 0 0 0 32 0M14 38a16 5 0 0 0 32 0"/>
+<ellipse class="k s" cx="30" cy="34" rx="16" ry="5"/>
+<ellipse class="h" cx="30" cy="34" rx="11.5" ry="3.4"/>
+<path class="k p" d="M56 70v34a16 5 0 0 0 32 0v-34z"/>
+<path class="h" d="M56 98a16 5 0 0 0 32 0M56 92a16 5 0 0 0 32 0M56 86a16 5 0 0 0 32 0M56 80a16 5 0 0 0 32 0M56 74a16 5 0 0 0 32 0"/>
+<ellipse class="k p" cx="72" cy="70" rx="16" ry="5"/>
+<ellipse class="h" cx="72" cy="70" rx="11.5" ry="3.4"/>
+<path class="k p" d="M109.4 77.2C98.2 81.4 95.4 96.8 101 103.8C103.8 106.6 109.4 108 122 108C134.6 108 140.2 106.6 143 103.8C148.6 96.8 145.8 81.4 134.6 77.2Z"/>
+<path class="h" d="M105.2 88.4C103.8 94 105.2 99.6 108 103.8M138.8 87C140.2 92.6 140.2 98.2 137.4 102.4"/>
+<path class="k p" d="M111.5 77.2C108 71.6 108.7 66 112.9 63.9C115.7 66.7 118.5 66.7 122 63.9C125.5 66.7 128.3 66.7 131.1 63.9C135.3 66 136 71.6 132.5 77.2Z"/>
+<path class="k" d="M109.4 77.2C117.8 80 126.2 80 134.6 77.2"/>
+<path class="k" d="M122 78.6C119.2 82.8 116.4 85.6 113.6 87M122 78.6C124.8 82.8 127.6 85.6 130.4 87"/>
+</svg>

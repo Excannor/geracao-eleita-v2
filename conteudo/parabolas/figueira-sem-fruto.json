@@ -1,0 +1,78 @@
+{
+  "titulo": "A figueira sem fruto",
+  "ref": "Lc 13.6-9",
+  "grupo": "lucas",
+  "linha": "Três anos sem figos e mais um ano de chance",
+  "desenho": "figueira-sem-fruto",
+  "desenhoLista": "figueira",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Algumas pessoas contam a Jesus que Pilatos matou uns galileus enquanto eles ofereciam sacrifícios no templo.",
+          "ref": "Lc 13.1"
+        },
+        {
+          "texto": "Jesus pergunta se aqueles galileus eram piores do que os outros. Ele lembra também os dezoito homens que morreram quando a torre de Siloé caiu em cima deles.",
+          "ref": "Lc 13.2-4"
+        },
+        {
+          "fala": "Mas vocês também morrerão, se não se arrependerem",
+          "ref": "Lc 13.5"
+        },
+        {
+          "texto": "Aí Jesus conta esta parábola.",
+          "ref": "Lc 13.6"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "broto",
+      "blocos": [
+        {
+          "texto": "Um homem planta uma figueira na vinha dele e vai muitas vezes procurar fruto nela. Ele nunca acha nada.",
+          "ref": "Lc 13.6"
+        },
+        {
+          "texto": "Depois de três anos, o dono fala com quem cuida da vinha. Os dois querem coisas diferentes para a figueira.",
+          "ref": "Lc 13.7-8"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "machado",
+              "titulo": "O dono",
+              "fala": "Corte-a, pois está ocupando lugar",
+              "ref": "Lc 13.7"
+            },
+            {
+              "desenho": "pa-e-adubo",
+              "titulo": "Quem cuida da vinha",
+              "fala": "Dê a ela mais uma oportunidade",
+              "ref": "Lc 13.8"
+            }
+          ]
+        },
+        {
+          "texto": "Quem cuida da vinha promete cavar em volta da figueira e pôr bastante adubo. Se ela não der figos no ano que vem, ele corta.",
+          "ref": "Lc 13.8-9"
+        },
+        {
+          "texto": "Jesus para a história aí. Ninguém descobre se a figueira deu fruto.",
+          "ref": "Lc 13.9"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Deus é paciente e ainda dá mais um ano de cuidado, com terra cavada e adubo. O prazo tem fim, e Jesus deixa a história sem final para quem ouve decidir o resto.",
+    "ref": "Lc 13.6-9"
+  },
+  "perguntas": [
+    "Que fruto Deus está procurando na sua vida há algum tempo?",
+    "O que seria terra cavada e adubo para você neste ano?"
+  ]
+}

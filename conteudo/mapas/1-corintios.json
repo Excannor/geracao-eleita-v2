@@ -1,0 +1,336 @@
+{
+  "nome": "1 Coríntios",
+  "grupo": "Cartas de Paulo",
+  "numero": 46,
+  "capitulos": 16,
+  "significado": {
+    "lingua": "grego",
+    "original": "Κορινθίους",
+    "transliteracao": "Korinthious",
+    "traducao": "aos coríntios",
+    "texto": "O nome vem de Corinto, uma cidade grega. Os primeiros a ler a carta são os irmãos da igreja que se reúne ali."
+  },
+  "autoria": {
+    "texto": "Paulo escreve junto com o irmão Sóstenes para a igreja de Deus que está em Corinto.",
+    "apoio": "As últimas palavras da carta, ele escreve com a mão dele.",
+    "refs": [
+      "1Co 1.1-2",
+      "1Co 16.21"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Paulo sai de Atenas e vai para Corinto, onde nasce a igreja. Ele se sente pai desses irmãos, porque levou o evangelho até eles. Agora ele está em Éfeso, e a igreja anda em brigas, com pecado no meio e cheia de dúvidas. Ele responde a tudo isso, uma coisa de cada vez.",
+    "apoio": "No meio das respostas, ele escreve sobre o amor e sobre Cristo, que venceu a morte.",
+    "refs": [
+      "At 18.1",
+      "1Co 4.15",
+      "1Co 16.8"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Divisões",
+      "sub": "Cada grupo tem o seu líder",
+      "desenho": "broto",
+      "galhos": [
+        {
+          "texto": "Gente da casa de Cloe conta que a igreja vive em brigas. Uns dizem: “Eu sou seguidor de Paulo”. Outros dizem que estão do lado de Apolo ou de Pedro. Paulo pergunta se ele morreu crucificado por eles.",
+          "ref": "1Co 1.11-13"
+        },
+        {
+          "texto": "Os judeus pedem sinais, e os gregos procuram sabedoria. A pregação fala de Cristo crucificado, que ofende os judeus e parece bobagem aos gentios. Para quem Deus chama, Cristo é o poder de Deus.",
+          "ref": "1Co 1.22-24"
+        },
+        {
+          "texto": "Entre os irmãos, poucos eram sábios ou importantes aos olhos do mundo. Deus escolhe o que o mundo acha fraco para envergonhar o que é forte.",
+          "ref": "1Co 1.26-27"
+        },
+        {
+          "texto": "Na primeira visita aos irmãos, o autor estava fraco, com medo e muito trêmulo. Ele tinha decidido não saber nada além de Jesus Cristo e da morte dele na cruz.",
+          "ref": "1Co 2.1-3"
+        },
+        {
+          "texto": "Paulo planta, Apolo rega, e Deus faz crescer. Quem planta e quem rega não são o mais importante, porque o crescimento vem de Deus.",
+          "ref": "1Co 3.5-7"
+        },
+        {
+          "texto": "Cada um constrói sobre o alicerce com o material que escolhe, uns com ouro e prata, outros com feno e palha. No Dia de Cristo, o fogo vai provar o trabalho de cada um.",
+          "ref": "1Co 3.10, 12-13"
+        }
+      ],
+      "jesus": {
+        "texto": "A igreja é o edifício de Deus. Ninguém pode pôr outro alicerce além do que já está posto, e esse alicerce é Jesus Cristo.",
+        "refs": [
+          "1Co 3.9",
+          "1Co 3.11"
+        ]
+      },
+      "conexao": "Alguns ficam arrogantes, como se o autor nunca mais fosse visitar a igreja (1Co 4.18)."
+    },
+    {
+      "titulo": "O fermento",
+      "sub": "A igreja deixa o pecado ficar",
+      "desenho": "massa-na-tigela",
+      "galhos": [
+        {
+          "texto": "Todo mundo comenta que um homem da igreja vive com a mulher do pai dele. Os irmãos, em vez de chorar, continuam cheios de si. O autor manda tirar esse homem do meio deles.",
+          "ref": "1Co 5.1-2, 13"
+        },
+        {
+          "texto": "Um pouco de fermento leveda a massa inteira. O autor pede que a igreja celebre a festa com os pães sem fermento, o pão da sinceridade e da verdade.",
+          "ref": "1Co 5.6, 8"
+        },
+        {
+          "texto": "Numa carta anterior, o autor pediu que eles não se misturassem com gente imoral. Ele não falava dos de fora, senão eles teriam de sair do mundo. O cuidado é com quem se diz irmão e vive assim, e com esse ninguém deve nem comer junto.",
+          "ref": "1Co 5.9-11"
+        },
+        {
+          "texto": "Um irmão processa o outro diante de juízes que não creem. O autor pergunta se não existe ninguém sábio na igreja para resolver a briga. Seria melhor sofrer a injustiça.",
+          "ref": "1Co 6.1, 5-7"
+        },
+        {
+          "texto": "Alguns deles viviam no pecado. Agora estão lavados, separados para Deus e justos no nome do Senhor Jesus Cristo.",
+          "ref": "1Co 6.11"
+        },
+        {
+          "texto": "O corpo de quem crê é a morada do Espírito Santo. Deus comprou cada um por um preço alto, e o autor pede que eles honrem a Deus com o corpo.",
+          "ref": "1Co 6.19-20"
+        }
+      ],
+      "conexao": "Os coríntios tinham mandado perguntas numa carta, e o autor começa a responder (1Co 7.1)."
+    },
+    {
+      "titulo": "Perguntas",
+      "sub": "Casamento e carne de ídolos",
+      "desenho": "mesa-posta",
+      "galhos": [
+        {
+          "texto": "Sobre o casamento, o autor gostaria que todos ficassem sem casar como ele, e lembra que Deus dá a cada um o seu dom. Cada um vive como Deus planejou, na situação em que foi chamado.",
+          "ref": "1Co 7.7, 17"
+        },
+        {
+          "texto": "Na questão da carne oferecida aos ídolos, cada um acha que tem a resposta certa. O autor lembra que esse conhecimento enche de orgulho, e o amor faz crescer. Um ídolo não é nada, e existe um só Deus.",
+          "ref": "1Co 8.1, 4"
+        },
+        {
+          "texto": "Um irmão de consciência fraca vê outro comendo à mesa de um templo de ídolo e come também, mas no fundo acha que está errado. O autor prefere nunca mais comer carne a fazer o irmão tropeçar.",
+          "ref": "1Co 8.10-13"
+        },
+        {
+          "texto": "O autor tem direito de ser sustentado pela igreja e não usa esse direito. Ele é livre de todos e se faz escravo de todos. Com os judeus, vive como judeu para ganhar o maior número de pessoas.",
+          "ref": "1Co 9.12, 19-20"
+        },
+        {
+          "texto": "Numa corrida todos correm, e só um ganha o prêmio. O atleta se sacrifica por uma coroa que não dura muito, e quem crê corre por uma coroa que dura para sempre.",
+          "ref": "1Co 9.24-25"
+        },
+        {
+          "texto": "As tentações de cada um são as mesmas que os outros enfrentam. Deus não deixa a tentação ficar mais forte do que a pessoa aguenta e dá força para suportar.",
+          "ref": "1Co 10.13"
+        }
+      ],
+      "jesus": {
+        "texto": "Muita gente fala de deuses no céu e na terra. Para quem crê, existe um só Deus, o Pai, e um só Senhor, Jesus Cristo, que fez todas as coisas.",
+        "refs": [
+          "1Co 8.5-6"
+        ]
+      },
+      "conexao": "Quem come, bebe ou faz qualquer outra coisa deve fazer tudo para a glória de Deus (1Co 10.31)."
+    },
+    {
+      "titulo": "Um só corpo",
+      "sub": "A ceia e os dons do Espírito",
+      "desenho": "calice",
+      "galhos": [
+        {
+          "texto": "Quando a igreja se reúne para comer, cada um come a ceia dele sem esperar os outros. Um sai com fome, e outro fica bêbado. O autor pergunta se eles querem humilhar os pobres.",
+          "ref": "1Co 11.20-22"
+        },
+        {
+          "texto": "Cada vez que a igreja come esse pão e bebe esse cálice, anuncia a morte do Senhor até ele voltar. Por isso, quando se reúnem para a ceia, os irmãos esperam uns pelos outros.",
+          "ref": "1Co 11.26, 33"
+        },
+        {
+          "texto": "Os dons são diferentes, e o Espírito é o mesmo. Um recebe a palavra de sabedoria, e outro recebe o dom de curar. O Espírito distribui a cada um como quer.",
+          "ref": "1Co 12.4, 8-11"
+        },
+        {
+          "texto": "Judeus e gentios, escravos e livres, todos foram batizados pelo mesmo Espírito num só corpo, o corpo de Cristo.",
+          "ref": "1Co 12.13"
+        },
+        {
+          "texto": "O pé não deixa de ser do corpo porque não é mão. Se o corpo inteiro fosse olho, ninguém ia conseguir ouvir.",
+          "ref": "1Co 12.15-17"
+        },
+        {
+          "texto": "Nenhum olho pode dizer à mão que não precisa dela. Os membros que parecem mais fracos são os mais necessários. Se um membro sofre, todos sofrem com ele.",
+          "ref": "1Co 12.21-22, 26"
+        }
+      ],
+      "conexao": "Depois de falar dos dons, o autor quer mostrar o caminho que é o melhor de todos (1Co 12.31)."
+    },
+    {
+      "titulo": "O amor",
+      "sub": "Sem amor, nada vale",
+      "desenho": "cimbalos",
+      "galhos": [
+        {
+          "texto": "Quem fala as línguas dos homens e dos anjos e não tem amor é como um sino que ressoa. Quem tem fé para tirar uma montanha do lugar e não tem amor não é nada.",
+          "ref": "1Co 13.1-2"
+        },
+        {
+          "texto": "Para o autor, o amor é paciente e bondoso. Ele não tem inveja, não é grosseiro e não guarda rancor.",
+          "ref": "1Co 13.4-5"
+        },
+        {
+          "texto": "Quando o autor era criança, falava e pensava como criança. Hoje a gente vê as coisas de Deus como num espelho embaçado, e um dia vai ver face a face.",
+          "ref": "1Co 13.11-12"
+        },
+        {
+          "texto": "Três coisas permanecem, a fé, a esperança e o amor. A maior delas é o amor.",
+          "ref": "1Co 13.13"
+        },
+        {
+          "texto": "Na reunião da igreja, o autor prefere falar cinco palavras que o povo entende a falar dez mil numa língua que ninguém conhece.",
+          "ref": "1Co 14.19"
+        },
+        {
+          "texto": "Um descrente entra na reunião, e todos estão profetizando. Os segredos do coração dele ficam à vista. Ele cai de joelhos, adora a Deus e diz: “Deus realmente está no meio de vocês!”",
+          "ref": "1Co 14.24-25"
+        }
+      ],
+      "conexao": "Alguns na igreja andam dizendo que não existe ressurreição dos mortos (1Co 15.12)."
+    },
+    {
+      "titulo": "Ressurreição",
+      "sub": "Cristo ressuscitou primeiro",
+      "desenho": "espigas-de-trigo",
+      "galhos": [
+        {
+          "texto": "Cristo aparece a Pedro e depois aos Doze. Depois, aparece a mais de quinhentos irmãos de uma vez, e muitos deles ainda estão vivos.",
+          "ref": "1Co 15.5-6"
+        },
+        {
+          "texto": "Por último, Cristo aparece também ao autor, como a alguém nascido fora de tempo. O autor se acha o menor dos apóstolos, porque perseguiu a igreja de Deus.",
+          "ref": "1Co 15.8-9"
+        },
+        {
+          "texto": "Se os mortos não ressuscitam, Cristo também não ressuscitou. Nesse caso a pregação não vale nada, a fé não vale nada, e os irmãos continuam debaixo da culpa dos pecados.",
+          "ref": "1Co 15.13-14, 17"
+        },
+        {
+          "texto": "Cristo ressuscitou de verdade e é o primeiro dos que morreram. Todos morrem em Adão, e em Cristo todos vão voltar à vida.",
+          "ref": "1Co 15.20, 22"
+        },
+        {
+          "texto": "A semente enterrada não vira planta se não morrer primeiro. O corpo também é semeado mortal e ressuscita imortal.",
+          "ref": "1Co 15.36-37, 42"
+        },
+        {
+          "texto": "Nem todos vão morrer, mas todos vão ser transformados num piscar de olhos, quando tocar a última trombeta. Os mortos vão ressuscitar com corpos que nunca mais morrem.",
+          "ref": "1Co 15.51-52"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Cristo morreu pelos nossos pecados, de acordo com as Escrituras. Ele foi sepultado e ressuscitou três dias depois, segundo as Escrituras. O autor recebeu essa notícia e passou para os irmãos desde o começo.",
+    "ref": "1Co 15.3-4",
+    "desenho": "tumulo-aberto",
+    "pares": [
+      {
+        "at": "Is 29.14",
+        "texto": "a sabedoria dos seus sábios se desvanecerá",
+        "nt": "1Co 1.19-20",
+        "nota": "Com a mensagem da cruz, Deus faz os sábios deste mundo parecerem ridículos"
+      },
+      {
+        "at": "Jr 9.24",
+        "texto": "O único motivo de se gloriar diante de todo esse povo deve ser me conhecer de fato",
+        "nt": "1Co 1.31",
+        "nota": "Quem quiser se gloriar se gloria só no Senhor"
+      },
+      {
+        "at": "Is 64.4",
+        "texto": "ninguém ouviu, nenhum ouvido percebeu e olho nenhum viu um Deus como o nosso",
+        "nt": "1Co 2.9-10",
+        "nota": "O que Deus preparou para quem ama o Senhor, o Espírito mostra aos que creem"
+      },
+      {
+        "at": "Dt 25.4",
+        "texto": "Não amordacem a boca do boi quando este estiver debulhando o cereal.",
+        "nt": "1Co 9.9-10",
+        "nota": "Deus pensa também em quem ara e debulha, que tem direito à parte da colheita"
+      },
+      {
+        "at": "Is 25.8",
+        "texto": "Ele acabará para sempre com a morte.",
+        "nt": "1Co 15.54",
+        "nota": "Quando o corpo mortal se vestir do que é imortal, a morte vai ser tragada na vitória"
+      },
+      {
+        "at": "Os 13.14",
+        "texto": "Ó morte, onde estão as suas pragas? Onde está, ó morte, a sua destruição?",
+        "nt": "1Co 15.55-57",
+        "nota": "Deus dá a vitória sobre a morte, e quem vence é Jesus Cristo, nosso Senhor"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Grupos que dividem a igreja", "de": 1, "ate": 4 },
+    { "titulo": "O pecado dentro da igreja", "de": 5, "ate": 6 },
+    { "titulo": "Perguntas sobre casamento", "de": 7, "ate": 7 },
+    { "titulo": "A carne oferecida aos ídolos", "de": 8, "ate": 10 },
+    { "titulo": "Cabeça coberta e ceia do Senhor", "de": 11, "ate": 11 },
+    { "titulo": "Os dons do Espírito", "de": 12, "ate": 14 },
+    { "titulo": "A ressurreição dos mortos", "de": 15, "ate": 15 },
+    { "titulo": "A coleta e as saudações", "de": 16, "ate": 16 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O autor agradece a Deus por ter batizado só Crispo e Gaio. Na frase seguinte, ele lembra que batizou também a família de Estéfanas, e não se recorda de mais ninguém.",
+      "ref": "1Co 1.14-16"
+    },
+    {
+      "texto": "Até agora, os apóstolos passam fome e sede, trabalham com as mãos para ganhar a vida e são tratados como o lixo do mundo.",
+      "ref": "1Co 4.11-13"
+    },
+    {
+      "texto": "O autor pergunta se a igreja quer que ele chegue com uma vara ou com amor e mansidão.",
+      "ref": "1Co 4.21"
+    },
+    {
+      "texto": "Para avisar a igreja, o autor lembra que no deserto 23.000 caíram mortos num só dia por causa da imoralidade.",
+      "ref": "1Co 10.8"
+    },
+    {
+      "texto": "Se o corneteiro do exército não toca as notas certas, os soldados não sabem que é hora da batalha. Palavra que ninguém entende é como falar ao vento.",
+      "ref": "1Co 14.8-9"
+    },
+    {
+      "texto": "O autor fala de gente que se batiza pelos mortos e pergunta por que fazem isso, se os mortos não ressuscitam.",
+      "ref": "1Co 15.29"
+    },
+    {
+      "texto": "O autor fala da luta contra animais selvagens em Éfeso. Depois avisa: “As más companhias corrompem os bons costumes”.",
+      "ref": "1Co 15.32-33"
+    },
+    {
+      "texto": "No primeiro dia da semana, cada irmão separa uma quantia, conforme o que ganhou, para a coleta dos santos de Jerusalém.",
+      "ref": "1Co 16.1-2"
+    },
+    {
+      "texto": "Estéfanas, Fortunato e Acaico chegam para uma visita e trazem ao autor a ajuda que a igreja não pôde dar de longe.",
+      "ref": "1Co 16.17"
+    },
+    {
+      "texto": "Quase no fim, o autor ora em poucas palavras: “Vem, Senhor Jesus!”",
+      "ref": "1Co 16.22"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a palavra corpo. O autor fala do corpo de quem crê, do pão da ceia, da igreja e do corpo que vai ressuscitar. Todos juntos são o corpo de Cristo, e cada um é parte dele.",
+    "ref": "1Co 12.27"
+  }
+}

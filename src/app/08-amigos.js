@@ -555,11 +555,17 @@
         ? CC.esc(nomes.slice(0, 2).join(' e ')) + (ev.total > nomes.slice(0, 2).length ? ' e outras pessoas' : '')
         : (ev.total === 1 ? '1 pessoa' : ev.total + ' pessoas')) + '</span>'
       : '';
+    // O versículo que a própria pessoa compartilhou pode sair do Juntos (o servidor confere
+    // que é dela). Os marcos não: o servidor os confere no progresso.
+    const apagar = meu && ev.tipo === 'versiculo'
+      ? '<button class="botao-apagar-mural" data-apagar-novidade="' + CC.esc(ev.id) + '" aria-label="Apagar este versículo do Juntos">'
+        + CC.ico('lixeira') + '<span>Apagar</span></button>'
+      : '';
     return '<article class="item-mural">'
       + '<div class="cabeca-mural">' + retrato(ev.autor, 'medio') + '<div><b>' + CC.esc(meu ? 'Você' : ev.autor.nome) + '</b><span>' + quando(ev.em) + '</span></div></div>'
       + '<div class="corpo-mural"><p>' + frase + '</p>' + (arte ? '<span class="arte-mural">' + arte + '</span>' : '') + '</div>'
       + extra
-      + '<div class="pe-mural">' + reacao + celebrado + '</div>'
+      + '<div class="pe-mural">' + reacao + celebrado + apagar + '</div>'
       + '</article>';
   }
 
@@ -718,6 +724,26 @@
           el.classList.toggle('ligado');
           CC.avisar(e.message);
         }
+      });
+      ligar('[data-apagar-novidade]', async (el) => {
+        const id = el.dataset.apagarNovidade;
+        const certo = await CC.confirmar({
+          titulo: 'Apagar este versículo do Juntos?',
+          texto: 'Seus amigos deixam de ver. A sua nota e a marcação do versículo continuam com você.',
+          acao: 'Apagar',
+          perigo: true,
+        });
+        if (!certo) return;
+        el.disabled = true;
+        try {
+          await CC.api('api/novidades/apagar', { id });
+        } catch (e) {
+          // Já apagado (em outro aparelho): o resultado é o mesmo, segue tirando da tela.
+          if (e.status !== 404) { el.disabled = false; CC.avisar(e.message); return; }
+        }
+        if (mural && mural.eventos) mural.eventos = mural.eventos.filter((x) => x.id !== id);
+        CC.avisar('Versículo apagado do Juntos.');
+        CC.redesenhar();
       });
       raiz.querySelectorAll('.versiculo-mural').forEach((v) => {
         if (!CC.textoDoVersiculo) return;

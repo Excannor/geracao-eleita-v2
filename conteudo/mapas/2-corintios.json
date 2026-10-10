@@ -1,0 +1,312 @@
+{
+  "nome": "2 Coríntios",
+  "grupo": "Cartas de Paulo",
+  "numero": 47,
+  "capitulos": 13,
+  "significado": {
+    "lingua": "grego",
+    "original": "Κορινθίους",
+    "transliteracao": "Korinthious",
+    "traducao": "aos coríntios",
+    "texto": "Korinthious quer dizer aos coríntios, os irmãos de Corinto. Desta vez a carta vai também para os santos de toda a Acaia, a região em volta da cidade."
+  },
+  "autoria": {
+    "texto": "Paulo escreve junto com o irmão Timóteo aos santos de Corinto e de toda a Acaia.",
+    "refs": [
+      "2Co 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Paulo tinha planejado passar por Corinto na ida e na volta da Macedônia. Ele muda de plano e não vai, para não fazer outra visita dolorosa. Depois parte para a Macedônia, e lá Tito chega com boas notícias da igreja. Paulo escreve aliviado e, ao mesmo tempo, enfrenta uns pregadores que se acham superiores a ele.",
+    "refs": [
+      "2Co 1.15-16",
+      "2Co 2.1",
+      "At 20.1",
+      "2Co 7.7",
+      "2Co 11.5"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Consolo",
+      "sub": "Deus consola na aflição",
+      "desenho": "frasco-de-alabastro",
+      "galhos": [
+        {
+          "texto": "Deus é o Pai da misericórdia e consola quem sofre. Ele consola os seus nas dificuldades, para eles consolarem os outros com o mesmo consolo.",
+          "ref": "2Co 1.3-4"
+        },
+        {
+          "texto": "Na província da Ásia, o autor e os companheiros passam por tanto aperto que perdem a esperança de sair vivos. Eles acham que vão morrer e põem tudo nas mãos de Deus, que ressuscita os mortos. Deus livra o grupo da morte.",
+          "ref": "2Co 1.8-10"
+        },
+        {
+          "texto": "Os irmãos podem estar perguntando por que o autor mudou de plano. Ele garante que o sim dele quer dizer sim. Ele não foi a Corinto para não entristecer a igreja com uma repreensão dura.",
+          "ref": "2Co 1.17-18, 23"
+        },
+        {
+          "texto": "O autor escreveu a última carta com aflição e chorando. Ele não queria entristecer a igreja e queria mostrar o quanto ama os irmãos.",
+          "ref": "2Co 2.3-4"
+        },
+        {
+          "texto": "Em Trôade, o Senhor abre portas para o evangelho, mas o autor fica sem sossego, porque Tito não está lá. Ele se despede e vai para a Macedônia.",
+          "ref": "2Co 2.12-13"
+        },
+        {
+          "texto": "Aonde quer que o autor vá, Deus espalha por ele a notícia de Cristo como um perfume suave. Para uns, é cheiro de morte, e para outros, perfume de vida.",
+          "ref": "2Co 2.14-16"
+        }
+      ],
+      "conexao": "O autor não precisa de carta de recomendação para falar com a igreja (2Co 3.1)."
+    },
+    {
+      "titulo": "Cartas vivas",
+      "sub": "Escritas pelo Espírito",
+      "desenho": "tabuas-da-lei",
+      "galhos": [
+        {
+          "texto": "Os irmãos são a carta do autor, escrita no coração dele e lida por todo mundo. É uma carta de Cristo, escrita pelo Espírito do Deus vivo, e não com tinta em tábuas de pedra.",
+          "ref": "2Co 3.2-3"
+        },
+        {
+          "texto": "O poder do autor vem de Deus, que o ajuda a anunciar a nova aliança. A letra mata, e o Espírito dá vida.",
+          "ref": "2Co 3.5-6"
+        },
+        {
+          "texto": "Quando a Lei é gravada em pedras, o rosto de Moisés brilha tanto que o povo não consegue olhar para ele. Mesmo assim, aquele brilho já está sumindo.",
+          "ref": "2Co 3.7"
+        },
+        {
+          "texto": "Quem tem essa esperança fala com toda a confiança. Moisés fazia diferente e punha um véu no rosto para os israelitas não verem o brilho acabar.",
+          "ref": "2Co 3.12-13"
+        },
+        {
+          "texto": "Onde está o Espírito do Senhor, há liberdade. Sem véu no rosto, quem crê reflete a glória do Senhor como um espelho e fica cada vez mais parecido com ele.",
+          "ref": "2Co 3.17-18"
+        }
+      ],
+      "conexao": "Deus, por misericórdia, deu esse trabalho a eles, e por isso eles nunca desanimam (2Co 4.1)."
+    },
+    {
+      "titulo": "Vaso de barro",
+      "sub": "O tesouro em gente fraca",
+      "desenho": "vaso-de-barro",
+      "galhos": [
+        {
+          "texto": "Satanás, o deus deste mundo, cega quem está se perdendo. Essa pessoa não vê a luz do evangelho da glória de Cristo.",
+          "ref": "2Co 4.3-4"
+        },
+        {
+          "texto": "Deus guarda esse tesouro num vaso de barro, o corpo fraco de quem prega. Assim todo mundo vê que o poder vem de Deus, e não deles.",
+          "ref": "2Co 4.7"
+        },
+        {
+          "texto": "Eles são apertados de todos os lados e não ficam esmagados. São derrubados e não são destruídos.",
+          "ref": "2Co 4.8-9"
+        },
+        {
+          "texto": "O corpo vai se gastando, e por dentro a força se renova dia a dia. O sofrimento de agora é leve e passa, e a glória que vem dura para sempre.",
+          "ref": "2Co 4.16-17"
+        },
+        {
+          "texto": "Quando este corpo morrer, Deus tem para eles um corpo novo, uma casa eterna no céu, que não foi feita por mãos humanas.",
+          "ref": "2Co 5.1"
+        },
+        {
+          "texto": "Quem está em Cristo vira uma pessoa nova. O que era antigo passou, e começa uma vida nova. Em Cristo, Deus faz as pazes com o mundo e apaga os pecados dos homens.",
+          "ref": "2Co 5.17, 19"
+        }
+      ],
+      "jesus": {
+        "texto": "Os mensageiros de Cristo pedem a todos que façam as pazes com Deus. Cristo nunca conheceu pecado, e Deus faz dele pecado por nós. Assim, em Jesus, a gente fica justo diante de Deus.",
+        "refs": [
+          "2Co 5.20-21"
+        ]
+      },
+      "conexao": "Como cooperadores de Deus, eles pedem que a igreja não despreze a graça de Deus (2Co 6.1)."
+    },
+    {
+      "titulo": "Coração aberto",
+      "sub": "A tristeza que leva a Deus",
+      "desenho": "portas-abertas",
+      "galhos": [
+        {
+          "texto": "Os servos de Deus apanham, vão para a prisão e passam noites sem dormir. São chamados de mentirosos e continuam sinceros.",
+          "ref": "2Co 6.4-5, 8"
+        },
+        {
+          "texto": "Eles vivem à beira da morte e continuam vivos. São pobres e enriquecem muita gente. Não têm nada e possuem tudo.",
+          "ref": "2Co 6.9-10"
+        },
+        {
+          "texto": "O autor chama os irmãos de Corinto de queridos amigos. Ele fala com eles como se fossem filhos e pede que abram o coração.",
+          "ref": "2Co 6.11-13"
+        },
+        {
+          "texto": "Na Macedônia, o autor não tem descanso, com problemas por fora e medo por dentro. Deus, que anima os abatidos, anima o grupo com a chegada de Tito.",
+          "ref": "2Co 7.5-6"
+        },
+        {
+          "texto": "O autor não se arrepende da carta dura. Com ela, a igreja ficou triste por pouco tempo e voltou para Deus. A tristeza que vem de Deus leva ao arrependimento e à salvação.",
+          "ref": "2Co 7.8-10"
+        },
+        {
+          "texto": "Tito volta alegre, porque a igreja recebeu Tito muito bem. O autor tinha falado bem dos irmãos para Tito, e eles não decepcionaram.",
+          "ref": "2Co 7.13-14"
+        }
+      ],
+      "conexao": "As igrejas da Macedônia passam por apertos e, mesmo pobres, dão com alegria (2Co 8.2)."
+    },
+    {
+      "titulo": "A oferta",
+      "sub": "Dar com alegria",
+      "desenho": "saco-de-prata",
+      "galhos": [
+        {
+          "texto": "Os irmãos da Macedônia dão além do que podem, por vontade deles. Eles até pedem para participar da ajuda aos santos.",
+          "ref": "2Co 8.3-4"
+        },
+        {
+          "texto": "A igreja começou a coleta um ano antes. O autor pede que os irmãos terminem, cada um dando do que tem, e não do que não tem.",
+          "ref": "2Co 8.10-12"
+        },
+        {
+          "texto": "Tito vai com outro irmão, escolhido pelas igrejas para levar a oferta a Jerusalém. Eles viajam juntos para ninguém achar falta no cuidado com o dinheiro.",
+          "ref": "2Co 8.16-20"
+        },
+        {
+          "texto": "Cada um decide quanto vai dar, sem ninguém forçar, porque Deus ama quem dá com alegria.",
+          "ref": "2Co 9.7"
+        },
+        {
+          "texto": "Quem recebe a oferta vai agradecer a Deus e orar pelos coríntios com carinho.",
+          "ref": "2Co 9.12-14"
+        }
+      ],
+      "jesus": {
+        "texto": "O Senhor Jesus era rico e se fez pobre por causa dos irmãos. Pela pobreza dele, eles ficam ricos.",
+        "refs": [
+          "2Co 8.9"
+        ]
+      },
+      "conexao": "O autor agradece a Deus por uma dádiva que não cabe em palavras (2Co 9.15)."
+    },
+    {
+      "titulo": "Na fraqueza",
+      "sub": "Quando estou fraco, sou forte",
+      "desenho": "cesto-no-muro",
+      "galhos": [
+        {
+          "texto": "Paulo fala com mansidão e bondade. Alguns dizem que as cartas dele são duras e que, de perto, ele é tímido e a palavra dele não vale nada.",
+          "ref": "2Co 10.1, 10"
+        },
+        {
+          "texto": "O autor quer a igreja inteira para Cristo, como uma noiva que guarda o amor para um homem só. Ele tem medo de que os irmãos se desviem, como Eva foi enganada pela serpente.",
+          "ref": "2Co 11.2-3"
+        },
+        {
+          "texto": "Cinco vezes os judeus dão trinta e nove chibatadas no autor. Ele apanha de vara três vezes, é apedrejado uma vez e passa por três naufrágios.",
+          "ref": "2Co 11.24-25"
+        },
+        {
+          "texto": "Em Damasco, o governador do rei Aretas põe guardas nos portões para prender o autor. Ele desce numa cesta presa a uma corda, por uma janela do muro, e escapa.",
+          "ref": "2Co 11.32-33"
+        },
+        {
+          "texto": "O autor conhece um homem que, catorze anos antes, foi levado ao paraíso. Lá ele ouviu coisas que ninguém consegue contar.",
+          "ref": "2Co 12.2-4"
+        },
+        {
+          "texto": "Para o autor não se encher de orgulho, ele recebe um espinho na carne. Três vezes ele pede que o Senhor tire o espinho. O Senhor responde: “A minha graça é tudo de que você precisa”.",
+          "ref": "2Co 12.7-9"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Jesus Cristo, o Filho de Deus, nunca diz sim querendo dizer não. Ele cumpre todas as promessas de Deus, não importa quantas sejam.",
+    "ref": "2Co 1.19-20",
+    "desenho": "rolo-amarrado",
+    "pares": [
+      {
+        "at": "Gn 1.3",
+        "texto": "Deus disse: “Haja luz”, e houve luz.",
+        "nt": "2Co 4.6",
+        "nota": "O Deus da luz faz a sua glória brilhar no rosto de Jesus Cristo"
+      },
+      {
+        "at": "Is 49.8",
+        "texto": "eu o ajudarei no dia da salvação",
+        "nt": "2Co 6.2",
+        "nota": "Agora Deus está pronto a acolher, e hoje é o dia da salvação"
+      },
+      {
+        "at": "Lv 26.12",
+        "texto": "Andarei entre vocês e serei o seu Deus, e vocês serão o meu povo.",
+        "nt": "2Co 6.16",
+        "nota": "A igreja é o templo do Deus vivo, e Deus mora no meio dela"
+      },
+      {
+        "at": "Êx 16.18",
+        "texto": "não sobrava nem faltava para ninguém",
+        "nt": "2Co 8.13-15",
+        "nota": "Quem tem mais reparte agora, para cada um ter o que precisa"
+      },
+      {
+        "at": "Sl 112.9",
+        "texto": "Ele reparte seus bens generosamente com os pobres e necessitados.",
+        "nt": "2Co 9.9",
+        "nota": "As boas obras de quem dá aos pobres ficam para sempre"
+      },
+      {
+        "at": "Dt 19.15",
+        "texto": "Qualquer acusação precisa ser confirmada pelo depoimento de duas ou três testemunhas.",
+        "nt": "2Co 13.1-2",
+        "nota": "O autor avisa que vai pela terceira vez e não vai poupar quem continua pecando"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Planos mudados e uma carta chorada", "de": 1, "ate": 2 },
+    { "titulo": "A nova aliança", "de": 3, "ate": 3 },
+    { "titulo": "O tesouro em vasos de barro", "de": 4, "ate": 5 },
+    { "titulo": "Tito traz boas notícias", "de": 6, "ate": 7 },
+    { "titulo": "A oferta para Jerusalém", "de": 8, "ate": 9 },
+    { "titulo": "Contra os falsos apóstolos", "de": 10, "ate": 13 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O homem que causou o problema na igreja já foi castigado pela maioria. O autor pede que agora os irmãos perdoem esse homem e mostrem que ainda amam ele.",
+      "ref": "2Co 2.6-8"
+    },
+    {
+      "texto": "Alguns pregadores negociam a palavra de Deus para ter lucro. O autor diz que não faz isso.",
+      "ref": "2Co 2.17"
+    },
+    {
+      "texto": "Enquanto trabalhava com os coríntios, o autor recebia sustento de outras igrejas. Quando o dinheiro acabou, os irmãos da Macedônia mandaram outra oferta.",
+      "ref": "2Co 11.8-9"
+    },
+    {
+      "texto": "Os falsos apóstolos fingem ser apóstolos de Cristo. Até Satanás pode se transformar num anjo de luz.",
+      "ref": "2Co 11.13-14"
+    },
+    {
+      "texto": "Muitas vezes o autor enfrenta perigos nos rios, nas cidades, no deserto e no mar. Ele passa fome, sede e frio, sem roupa para se agasalhar.",
+      "ref": "2Co 11.26-27"
+    },
+    {
+      "texto": "O autor vai visitar a igreja pela terceira vez e avisa que não quer o dinheiro dos irmãos. Ele quer os irmãos, porque quem junta para os filhos são os pais.",
+      "ref": "2Co 12.14"
+    },
+    {
+      "texto": "A carta termina desejando aos irmãos a graça do Senhor Jesus Cristo, o amor de Deus e a comunhão do Espírito Santo.",
+      "ref": "2Co 13.14"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a palavra fraqueza. O autor prefere se gloriar nas fraquezas dele. No fim, ele lembra que Cristo morreu na cruz num corpo fraco e agora vive pelo poder de Deus.",
+    "ref": "2Co 13.4"
+  }
+}

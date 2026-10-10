@@ -1,0 +1,301 @@
+{
+  "nome": "Esdras",
+  "grupo": "Históricos",
+  "numero": 15,
+  "capitulos": 10,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "עֶזְרָא",
+    "transliteracao": "Ezra",
+    "traducao": "ajuda",
+    "texto": "Ezra lembra a palavra hebraica para ajuda. É o nome do sacerdote e escriba que chega a Jerusalém no tempo do rei Artaxerxes."
+  },
+  "autoria": {
+    "texto": "Na viagem para Jerusalém, Esdras conta a história com a voz dele: “Eu, Esdras, reuni todos perto do canal de Aava”. O livro também copia cartas inteiras, como a que os vizinhos escrevem em aramaico ao rei Artaxerxes.",
+    "refs": [
+      "Ed 4.7",
+      "Ed 8.15"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Esdras começa com Ciro mandando o povo do Senhor voltar e reconstruir o templo em Jerusalém. Os que voltam levantam o altar e o templo, e os vizinhos conseguem parar a obra por anos. Depois chega Esdras, sacerdote e escriba da Lei de Deus. No fim, o povo chora com ele diante do templo por causa dos casamentos com mulheres estrangeiras.",
+    "refs": [
+      "Ed 1.2-3",
+      "Ed 4.24",
+      "Ed 7.11",
+      "Ed 10.1"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "A volta",
+      "sub": "Os vizinhos ajudam na viagem",
+      "desenho": "tigelas-de-ouro",
+      "galhos": [
+        {
+          "texto": "Deus desperta nos líderes de Judá e Benjamim, nos sacerdotes e nos levitas a vontade de voltar e reconstruir o templo. Os vizinhos ajudam com prata, ouro, mantimentos e animais.",
+          "ref": "Ed 1.5-6"
+        },
+        {
+          "texto": "Ciro manda tirar do templo dos deuses dele os utensílios que Nabucodonosor tinha levado de Jerusalém. O tesoureiro faz a lista e entrega a Sesbazar cinco mil e quatrocentos objetos de ouro e de prata.",
+          "ref": "Ed 1.7-8, 11"
+        },
+        {
+          "texto": "Alguns sacerdotes perderam o registro da família. O governador proíbe que eles comam alimentos sagrados até aparecer um sacerdote que consulte o Urim e Tumim.",
+          "ref": "Ed 2.62-63"
+        },
+        {
+          "texto": "Ao todo, voltam quarenta e dois mil, trezentos e sessenta homens, sem contar os escravos e duzentos cantores e cantoras. Eles levam até seis mil, setecentos e vinte jumentos.",
+          "ref": "Ed 2.64-65, 67"
+        },
+        {
+          "texto": "Quando chegam ao templo, os chefes das famílias dão para a obra ouro, prata e cem vestes de sacerdote, cada um como pode.",
+          "ref": "Ed 2.68-69"
+        }
+      ],
+      "conexao": "No sétimo mês, o povo sai das cidades e se junta em Jerusalém (Ed 3.1)."
+    },
+    {
+      "titulo": "O alicerce",
+      "sub": "Uns choram e outros gritam",
+      "desenho": "cimbalos",
+      "galhos": [
+        {
+          "texto": "Jesua e Zorobabel reconstroem o altar no mesmo lugar de antes. O povo tem medo dos vizinhos, mas oferece os sacrifícios de manhã e de tarde.",
+          "ref": "Ed 3.2-3"
+        },
+        {
+          "texto": "Eles pagam pedreiros e carpinteiros e compram cedros de Tiro e Sidom. As toras descem flutuando pela costa até Jope, com a permissão de Ciro.",
+          "ref": "Ed 3.7"
+        },
+        {
+          "texto": "Quando o alicerce fica pronto, os sacerdotes tocam as trombetas, e os filhos de Asafe tocam os címbalos para louvar o Senhor, como Davi tinha ordenado.",
+          "ref": "Ed 3.10"
+        },
+        {
+          "texto": "Os mais velhos, que se lembram do templo de Salomão, choram alto ao ver o alicerce. Outros gritam de alegria. O choro e a alegria se misturam, e o barulho se ouve de longe.",
+          "ref": "Ed 3.12-13"
+        }
+      ],
+      "jesus": {
+        "texto": "Em Efésios, os que creem estão sobre o alicerce dos apóstolos e dos profetas. A pedra de esquina do edifício é Jesus Cristo, e quem crê vira parte de um templo dedicado a Deus.",
+        "refs": [
+          "Ef 2.20-21"
+        ]
+      },
+      "conexao": "Os inimigos de Judá e de Benjamim pedem para trabalhar junto na obra (Ed 4.1-2)."
+    },
+    {
+      "titulo": "Obra parada",
+      "sub": "Os vizinhos escrevem ao rei",
+      "desenho": "rolo-amarrado",
+      "galhos": [
+        {
+          "texto": "Zorobabel e Jesua dizem que não, porque Ciro mandou o povo de Israel construir. Os moradores dali tentam assustar o povo e pagam funcionários do governo para atrapalhar a obra.",
+          "ref": "Ed 4.3-5"
+        },
+        {
+          "texto": "Eles escrevem ao rei Artaxerxes que os judeus estão reconstruindo uma cidade rebelde e má. Eles avisam que, com os muros prontos, ninguém vai pagar os impostos do rei.",
+          "ref": "Ed 4.12-13"
+        },
+        {
+          "texto": "O rei manda procurar nos registros antigos e acha revoltas contra muitos reis em Jerusalém. Ele ordena que a construção pare.",
+          "ref": "Ed 4.19, 21"
+        },
+        {
+          "texto": "Quando leem a carta do rei, os inimigos vão depressa a Jerusalém e obrigam os judeus a parar a obra.",
+          "ref": "Ed 4.23"
+        }
+      ],
+      "conexao": "Os profetas Ageu e Zacarias falam ao povo, e Zorobabel e Jesua recomeçam a obra (Ed 5.1-2)."
+    },
+    {
+      "titulo": "Templo pronto",
+      "sub": "Dario acha a ordem de Ciro",
+      "desenho": "muro-com-viga",
+      "galhos": [
+        {
+          "texto": "O governador Tatenai vem perguntar quem deu permissão para a obra. Os olhos de Deus estão sobre os líderes judeus, e ninguém obriga o povo a parar enquanto o rei não decide.",
+          "ref": "Ed 5.3, 5"
+        },
+        {
+          "texto": "Os judeus respondem: “Somos servos do Deus do céu e da terra”. Eles contam que os antepassados irritaram Deus e que Nabucodonosor destruiu o templo e levou o povo.",
+          "ref": "Ed 5.11-12"
+        },
+        {
+          "texto": "Dario manda procurar nos arquivos, e eles acham o documento no palácio de Ecbatana. Ciro tinha mandado reconstruir a casa de Deus em Jerusalém.",
+          "ref": "Ed 6.1-3"
+        },
+        {
+          "texto": "Com os impostos do rei, Dario manda pagar a obra. Os sacerdotes devem receber todo dia, sem falta, animais, trigo, sal, vinho e azeite.",
+          "ref": "Ed 6.8-9"
+        },
+        {
+          "texto": "O templo fica pronto no terceiro dia do mês de adar, no sexto ano do rei Dario.",
+          "ref": "Ed 6.15"
+        },
+        {
+          "texto": "A festa dos pães sem fermento dura sete dias. Há alegria em toda a terra, porque o Senhor fez o rei ser generoso e ajudar na obra do templo.",
+          "ref": "Ed 6.22"
+        }
+      ],
+      "conexao": "No tempo de Artaxerxes, Esdras pede para voltar a Jerusalém, e o rei dá tudo o que ele pede (Ed 7.6)."
+    },
+    {
+      "titulo": "Esdras chega",
+      "sub": "A mão de Deus na viagem",
+      "desenho": "balanca",
+      "galhos": [
+        {
+          "texto": "A família de Esdras vai até Arão, o sumo sacerdote. Ele sai da Babilônia no primeiro dia do primeiro mês e chega a Jerusalém no primeiro dia do quinto mês, porque a boa mão do seu Deus está sobre ele.",
+          "ref": "Ed 7.1, 5, 8-9"
+        },
+        {
+          "texto": "O rei Artaxerxes manda Esdras levar uma cópia da Lei de Deus para Judá. Esdras deve nomear juízes e ensinar as leis de Deus a quem não conhece.",
+          "ref": "Ed 7.14, 25"
+        },
+        {
+          "texto": "Esdras manda pedir levitas a Ido, em Casifia. Deus é bom e manda Serebias, com dezoito filhos e irmãos.",
+          "ref": "Ed 8.17-18"
+        },
+        {
+          "texto": "Para proteger o grupo, Esdras tem vergonha de pedir soldados ao rei, porque tinha dito que a mão de Deus protege quem adora o Senhor. Eles jejuam e pedem proteção, e Deus atende.",
+          "ref": "Ed 8.21-23"
+        },
+        {
+          "texto": "O grupo parte do canal de Aava. A mão de Deus livra todos dos inimigos e dos bandidos no caminho, e eles chegam a salvo em Jerusalém.",
+          "ref": "Ed 8.31-32"
+        },
+        {
+          "texto": "No quarto dia, pesam a prata e o ouro no templo. Os que voltaram oferecem sacrifícios, com doze bois por todo o Israel.",
+          "ref": "Ed 8.33, 35"
+        }
+      ],
+      "conexao": "Os líderes contam que muitos, até sacerdotes e levitas, casaram com mulheres dos povos vizinhos (Ed 9.1-2)."
+    },
+    {
+      "titulo": "A confissão",
+      "sub": "O povo chora com Esdras",
+      "desenho": "manto-rasgado",
+      "galhos": [
+        {
+          "texto": "Esdras rasga a túnica e o manto, arranca os cabelos da cabeça e da barba e senta sem saber o que fazer. Os que tremem diante da palavra de Deus ficam sentados com ele até o sacrifício da tarde.",
+          "ref": "Ed 9.3-4"
+        },
+        {
+          "texto": "Na hora do sacrifício da tarde, Esdras se ajoelha e levanta as mãos. Ele diz que tem vergonha de levantar o rosto para Deus, porque a culpa do povo é grande como os céus.",
+          "ref": "Ed 9.5-6"
+        },
+        {
+          "texto": "Esdras lembra que Deus não abandonou o povo na escravidão. Deus fez os reis da Pérsia ajudarem a reconstruir o templo.",
+          "ref": "Ed 9.9"
+        },
+        {
+          "texto": "Secanias diz a Esdras que o povo pecou, mas que ainda há esperança para Israel. Ele propõe que os homens mandem de volta as mulheres estrangeiras com os filhos delas.",
+          "ref": "Ed 10.2-3"
+        },
+        {
+          "texto": "Os homens de Judá e de Benjamim se reúnem diante do templo, tremendo, debaixo de uma chuva pesada. Esdras manda que se separem das mulheres estrangeiras, e o povo responde: “Faremos o que você disse”.",
+          "ref": "Ed 10.9-12"
+        },
+        {
+          "texto": "Chove muito, e os casos são muitos. O povo pede que os líderes julguem cada um num dia marcado. Os juízes começam no primeiro dia do décimo mês e terminam no primeiro dia do primeiro mês.",
+          "ref": "Ed 10.13-14, 16-17"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Na Páscoa, alguns estrangeiros que moram em Judá deixam os costumes deles e se juntam aos israelitas para adorar o Senhor. Em Efésios, quem estava longe chega perto de Deus pelo sangue de Jesus Cristo e deixa de ser estranho na família de Deus (Ef 2.13, 19).",
+    "ref": "Ed 6.21",
+    "desenho": "cordeiro",
+    "pares": [
+      {
+        "at": "Ed 6.16",
+        "texto": "Então o templo de Deus foi dedicado com grande alegria pelos sacerdotes, levitas e todo o povo.",
+        "nt": "Jo 10.22-23",
+        "nota": "No inverno, na festa da Dedicação, Jesus anda pelo templo, no Alpendre de Salomão"
+      },
+      {
+        "at": "Ed 7.10",
+        "texto": "Esdras tinha decidido estudar a lei do Senhor, e a obedecer a essas leis e ensinar os seus mandamentos aos israelitas.",
+        "nt": "Tg 1.22",
+        "nota": "A palavra é para ser posta em prática, não só ouvida"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Ciro manda voltar, e o povo volta",
+      "de": 1,
+      "ate": 2
+    },
+    {
+      "titulo": "O altar e o alicerce do templo",
+      "de": 3,
+      "ate": 3
+    },
+    {
+      "titulo": "Os vizinhos param a obra",
+      "de": 4,
+      "ate": 4
+    },
+    {
+      "titulo": "O templo fica pronto",
+      "de": 5,
+      "ate": 6
+    },
+    {
+      "titulo": "Esdras viaja para Jerusalém",
+      "de": 7,
+      "ate": 8
+    },
+    {
+      "titulo": "A confissão e os casamentos com estrangeiras",
+      "de": 9,
+      "ate": 10
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Os que voltam levam setecentos e trinta e seis cavalos, duzentos e quarenta e cinco mulos e quatrocentos e trinta e cinco camelos.",
+      "ref": "Ed 2.66-67"
+    },
+    {
+      "texto": "Na conversa com Zorobabel, os vizinhos dizem que oferecem sacrifícios ao Deus de Israel desde que o rei da Assíria trouxe eles para lá.",
+      "ref": "Ed 4.2"
+    },
+    {
+      "texto": "O rei Artaxerxes conta na carta que Jerusalém já teve reis muito poderosos, que cobravam impostos de toda a terra além do Eufrates.",
+      "ref": "Ed 4.20"
+    },
+    {
+      "texto": "Os oficiais de Dario escrevem ao rei que o templo está sendo construído com pedras enormes e que a obra vai rápido e bem.",
+      "ref": "Ed 5.8"
+    },
+    {
+      "texto": "Na dedicação do templo, o povo oferece doze bodes pelo pecado, um por tribo de Israel.",
+      "ref": "Ed 6.17"
+    },
+    {
+      "texto": "Artaxerxes livra de impostos os sacerdotes, os levitas, os cantores, os porteiros e todos os que trabalham no templo.",
+      "ref": "Ed 7.24"
+    },
+    {
+      "texto": "Esdras pesa e entrega aos sacerdotes vinte vasos de ouro e duas peças de bronze tão valiosas quanto o ouro.",
+      "ref": "Ed 8.27"
+    },
+    {
+      "texto": "Numa sala do templo, Esdras passa a noite sem comer nem beber, chorando pela infidelidade dos que voltaram.",
+      "ref": "Ed 10.6"
+    },
+    {
+      "texto": "Só quatro homens se opõem ao plano dos julgamentos, entre eles Sabetai, o levita.",
+      "ref": "Ed 10.15"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a mão de Deus. Esdras fala dela quando chega a Jerusalém, quando tem vergonha de pedir soldados ao rei e quando o grupo escapa dos bandidos no caminho."
+  }
+}

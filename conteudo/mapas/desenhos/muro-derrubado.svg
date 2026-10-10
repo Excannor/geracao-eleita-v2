@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o muro de Jerusalém derrubado pelos babilônios (2Rs 25.10): o muro com o alto quebrado em degraus, as fileiras de pedra e os blocos caídos no chão, em polígonos de quina. Um bloco caído em sálvia. O chão vai antes das pedras. -->
+<path class="k" d="M6 100C40 97 80 97 114 100"/>
+<path class="k p" d="M14 98V40H30V48H38V58H46V70H54V80H62V98Z"/>
+<path class="h" d="M14 52H38M14 64H46M14 76H54M14 88H62M24 40V52M32 52V64M22 64V76M40 64V76M30 76V88M48 76V88M38 88V98M54 88V98"/>
+<path class="k p" d="M70 98L72 86L84 84L88 96Z"/>
+<path class="k s" d="M86 98L90 88L102 87L104 98Z"/>
+<path class="k p" d="M76 84L80 76L90 76L92 83L84 84Z"/>
+<path class="k p" d="M100 98L102 92L108 92L110 98Z"/>
+</svg>

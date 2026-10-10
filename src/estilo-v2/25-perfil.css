@@ -118,14 +118,6 @@
 .trofeu .arte-trofeu { --cor: var(--salvia); --cor-3d: var(--salvia-texto); --trilho: color-mix(in srgb, var(--tinta-fraca) 30%, var(--cartao)); }
 .trofeu .detalhe { stroke: var(--cartao) !important; }
 
-/* minhas anotações: o dia e a contagem em cima, a passagem inteira embaixo */
-.cartao-caderno { border-radius: var(--raio-cartao); }
-.cartao-caderno summary { flex-wrap: wrap; gap: 6px 12px; min-height: 64px; padding: 16px 20px; }
-.cartao-caderno .rotulo-dia-caderno { padding: 4px 12px; background: var(--salvia-palido); color: var(--salvia-texto); font-size: .8125rem; font-weight: 700; }
-.cartao-caderno .conta-caderno { order: 1; margin-left: auto; font-size: .8125rem; }
-.cartao-caderno .passagem-caderno { order: 2; flex: 1 0 100%; white-space: normal; }
-.cartao-caderno .campos-caderno { padding: 16px 20px 12px; border-top: 1px solid var(--contorno); }
-.cartao-caderno .campos-caderno b { font-size: .8125rem; color: var(--tinta-fraca); }
 /* Minha história: as caixas de escrever são cartões sobre o fundo */
 [data-rota=perfil] textarea[id^=campo-historia] { min-height: 128px; padding: 14px 16px; border-color: var(--cartao); border-radius: 22px; background: var(--cartao); }
 #salvo-historia:empty { display: none; }
@@ -143,6 +135,19 @@
 [data-rota=config] .linha-config[data-caminho] .valor { grid-row: 2; max-width: none; font-size: .875rem; text-align: left; }
 [data-rota=config] .linha-config[data-caminho] svg { grid-area: 1 / 2 / 3; }
 [data-rota=config] .dica-config { text-wrap: balance; }
+/* painel: pedido de aprovação de liderança (nome e célula em cima, os dois botões embaixo) */
+.linha-config.painel-aprovacao { display: grid; gap: 10px; padding-block: 14px; }
+.linha-config.painel-aprovacao > span { display: grid; gap: 2px; }
+.linha-config.painel-aprovacao small { color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; text-wrap: pretty; }
+.linha-config.painel-aprovacao .pe-duplo-plano { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+/* Nascimento: só leitura, com o caminho para corrigir (o servidor não aceita troca) */
+[data-rota=config] .linha-config.so-leitura { display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
+[data-rota=config] .linha-config.so-leitura .valor { white-space: nowrap; }
+.dica-linha { grid-column: 1 / -1; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; }
+.dica-linha a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.campo-senha.so-leitura { display: grid; gap: 4px; }
+.campo-senha.so-leitura b { color: var(--tinta-forte); font-weight: 700; }
+.campo-senha.so-leitura .dica-linha { text-transform: none; letter-spacing: 0; }
 
 /* notificações: o estado deste aparelho é o cartão de destaque da folha */
 .cartao-push { margin: 4px 0 0; padding: 20px; border-radius: 26px; }
@@ -293,6 +298,7 @@
 .textos-aviso { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; text-wrap: pretty; }
 .textos-aviso b { color: var(--tinta-forte); font-size: 1rem; font-weight: 700; line-height: 1.3; }
 .textos-aviso span { color: var(--tinta); font-size: .9375rem; font-weight: 500; line-height: 1.4; }
+.textos-aviso .foto-aviso { display: block; width: 100%; max-width: 360px; aspect-ratio: 16 / 10; margin: 8px 0 2px; border-radius: 14px; background: var(--campo); object-fit: cover; }
 .textos-aviso small { margin-top: 2px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
 .item-aviso .ponto-novo { display: block; position: absolute; top: 22px; right: 18px; width: 10px; height: 10px; border-radius: 50%; background: var(--salvia-texto); }
 .linha-ajustes-avisos { display: flex; align-items: center; gap: 12px; min-height: 56px; margin-top: 16px; padding: 0 16px; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta-forte); font-weight: 600; text-decoration: none; }
@@ -303,6 +309,9 @@
    A linha de cada célula na "Chama das células": o nome em cima e a contagem embaixo, ao lado
    do trilho; o trilho e as barras de porcentagem na mesma peça das outras barras do painel. */
 .painel-celula-linha > span:first-child { display: grid; gap: 2px; }
+/* Painel > Enviar aviso: a linha que abre a tela, com a seta no fim */
+.painel-ir > span { flex: 1; }
+.painel-ir > svg:last-child { color: var(--tinta-fraca); }
 .painel-celula-linha small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; text-wrap: pretty; }
 [data-rota=config] .painel-trilho { background: var(--campo); }
 [data-rota=config] .painel-trilho i { background: var(--inverso); }

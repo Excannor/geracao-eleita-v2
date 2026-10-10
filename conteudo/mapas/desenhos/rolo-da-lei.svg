@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o levita que também passa (Lc 10.32): o rolo da Lei aberto de pé, com a folha esticada entre os dois cilindros, as linhas do texto em hachura e os puxadores em cima e embaixo. A folha vai antes dos cilindros, para eles cobrirem as bordas dela. Os cilindros são a única área sálvia. -->
+<path class="k p" d="M34 30H86V90H34Z"/>
+<path class="h" d="M44 40H76M44 48H76M44 56H70M44 64H76M44 72H66M44 80H74"/>
+<path class="k" d="M30 22V14M90 22V14M30 98V106M90 98V106"/>
+<circle class="k p" cx="30" cy="12" r="3"/><circle class="k p" cx="90" cy="12" r="3"/>
+<circle class="k p" cx="30" cy="108" r="3"/><circle class="k p" cx="90" cy="108" r="3"/>
+<path class="k s" d="M24 26C24 20 36 20 36 26V94C36 100 24 100 24 94Z"/>
+<path class="k s" d="M84 26C84 20 96 20 96 26V94C96 100 84 100 84 94Z"/>
+</svg>

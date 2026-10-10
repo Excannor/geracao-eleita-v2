@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o ramo de oliveira (Rm 11.17-24): um galho que afina para a ponta, folhas compridas dos dois lados, com a nervura, e três azeitonas penduradas embaixo, a primeira em sálvia -->
+<path class="k" d="M38.2 81.9Q38.8 90.9 41.2 91.4"/>
+<ellipse class="k s" cx="41.2" cy="97.9" rx="5.4" ry="7.2" transform="rotate(-20 41.2 97.9)"/>
+<path class="h" d="M39.4 95.4q1 -1.5 2.6 -1.4"/>
+<path class="k" d="M49.7 70.7Q50.3 79.7 52.7 80.2"/>
+<ellipse class="k p" cx="52.7" cy="86.7" rx="5.4" ry="7.2" transform="rotate(-20 52.7 86.7)"/>
+<path class="h" d="M50.9 84.2q1 -1.5 2.6 -1.4"/>
+<path class="k" d="M61.4 59.5Q62.0 67.5 64.4 68.0"/>
+<ellipse class="k p" cx="64.4" cy="74.5" rx="5.4" ry="7.2" transform="rotate(-20 64.4 74.5)"/>
+<path class="h" d="M62.6 72.0q1 -1.5 2.6 -1.4"/>
+<path class="k p" d="M21.0 105.0L23.6 102.1L26.3 99.3L29.0 96.5L31.7 93.6L34.4 90.7L37.2 87.8L40.0 84.9L42.8 82.0L45.7 79.0L48.6 76.0L51.6 72.9L54.7 69.8L57.8 66.6L61.0 63.4L64.3 60.1L67.7 56.7L71.2 53.3L74.8 49.8L78.5 46.2L82.4 42.6L86.3 38.8L90.4 35.0L94.6 31.1L98.9 27.0L97.1 25.0L92.6 28.8L88.2 32.6L84.0 36.3L79.8 39.8L75.9 43.3L72.0 46.7L68.2 50.1L64.6 53.3L61.0 56.5L57.5 59.7L54.1 62.7L50.8 65.7L47.6 68.7L44.4 71.6L41.3 74.5L38.2 77.3L35.2 80.1L32.3 82.9L29.3 85.6L26.4 88.3L23.6 91.0L20.7 93.7L17.9 96.4L15.0 99.0Z"/>
+<path class="k p" d="M32.7 87.4Q41.2 74.2 33.7 60.4Q25.2 73.6 32.7 87.4Z"/>
+<path class="h" d="M32.8 84.4L33.5 65.8"/>
+<path class="k p" d="M45.3 75.0Q54.5 61.4 46.7 47.0Q37.5 60.6 45.3 75.0Z"/>
+<path class="h" d="M45.4 72.0L46.4 52.6"/>
+<path class="k p" d="M59.0 61.8Q67.8 48.8 60.7 34.8Q51.9 47.8 59.0 61.8Z"/>
+<path class="h" d="M59.2 58.8L60.3 40.2"/>
+<path class="k p" d="M72.5 49.1Q85.0 56.6 97.5 49.2Q85.0 41.6 72.5 49.1Z"/>
+<path class="h" d="M75.5 49.1L92.5 49.2"/>
+<path class="k p" d="M74.3 47.5Q82.7 36.0 76.1 23.5Q67.7 34.9 74.3 47.5Z"/>
+<path class="h" d="M74.5 44.5L75.8 28.3"/>
+<path class="k p" d="M85.6 37.1Q96.0 44.3 106.6 37.4Q96.2 30.3 85.6 37.1Z"/>
+<path class="h" d="M88.6 37.1L102.4 37.3"/>
+<path class="k p" d="M98.0 26.0Q109.8 24.2 112.9 12.7Q101.2 14.5 98.0 26.0Z"/>
+</svg>

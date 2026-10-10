@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o ferro do machado que sobe e boia no Jordão (2Rs 6.5-7): a lâmina com o olho do cabo vazio, pousada na linha da água, as ondinhas em volta e a vara que Eliseu jogou. O ferro é a área em sálvia. -->
+<path class="k" d="M22 24L44 70"/>
+<path class="k s" d="M48 58L68 56C72 48 80 44 86 46C89 54 89 66 86 74C80 76 72 72 68 68L48 68C46 68 45 67 45 65V61C45 59 46 58 48 58Z"/>
+<path class="k p" d="M51 60H57V66H51Z"/>
+<path class="k" d="M8 74C16 70 24 70 32 74C40 78 48 78 56 74C64 70 72 70 80 74C88 78 96 78 104 74C108 72 110 72 112 72"/>
+<path class="h" d="M30 84C40 88 80 88 90 84M42 94C52 97 70 97 80 94M18 66C22 64 26 64 30 66M88 64C92 62 96 62 100 64"/>
+</svg>

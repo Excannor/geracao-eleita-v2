@@ -40,3 +40,60 @@ Versículo:
    versículo vai de 92px (curto) a 34px (o mínimo legível no celular) e, se um trecho de dez
    versículos não couber, para na última palavra que cabe, com reticências (a referência diz o
    trecho inteiro).
+
+## Frases com arte própria (`src/app/01e-story-artes.js`)
+
+Algumas frases da ofensiva (as que têm `arte` em `CC.FRASES_OFENSIVA`) vieram de artes que o
+dono mandou e ganharam um modelo próprio, redesenhado em canvas (nada de imagem embutida):
+envergonho (só tipografia), luz (lâmpada), ninguem (globo com ovelhas), oleiro (só
+tipografia), procurado (cartaz com a ovelha 100, sem frase), suficiente (bandeira e
+multidão, ilustração própria a partir de uma foto), praticantes (livro aberto, Tiago 1.22 na
+NBV), porta (porta entreaberta, Apocalipse 3.20 na NBV) e, na segunda leva, mesa (99 não é
+100), quemdeusdiz (texto em arcos de digital e o carimbo "Somos Geração Eleita"), comprado
+(código de barras com as cruzes), momento (a poltrona vazia), tenda (a tenda do encontro),
+diferente (a ovelha branca entre as escuras), custatudo (quem anda sozinho, com os outros borrados) coracao (as brasas embaixo do texto) naovivo (só tipografia em pincel, Gálatas 2.20 como lema), desistir (o texto em cruz), confie (o texto ondulando em fatias), inundados (a pessoa ajoelhada no AMOR), grandeobra (Neemias 6.3 como lema) e vigiem (Mateus 24.42 na NBV, citado). Na terceira leva, avivados,
+naotemas e rei foram refeitos "no padrão da landing page", como o dono pediu: o preto da
+landing com grão, a foto da landing em P&B com contraste apagando nas bordas (a mesma de
+src/landing/, copiada para src/story-fotos/: o culto, a cruz no monte, o rapaz de costas),
+uma cor só na foto (o sol amarelo da cruz; a luz do palco do culto tingida de amarelo),
+título em Oswald maiúsculo creme com a palavra final em amarelo e o risco de marcador, o
+rótulo da referência em sálvia entre traços, a coroa à mão e a etiqueta "is my" em sálvia.
+As fotos vêm com as artes (MODELOS[nome].fotos); sem elas, sai só a tipografia. O
+quemdeusdiz ganhou uma digital de verdade atrás do texto (as linhas antigas pareciam ondas
+no celular): cristas ovais em volta de um núcleo em espiral, minúcias que bifurcam ou
+terminam as cristas, espessura irregular, em cinza fraco. Em todas: chama e dias no topo, a
+arte no meio (encolhe por igual para caber entre y 560 e 1480) e só a marca no pé.
+O arquivo não entra no index.html: o build o publica à parte (`story-artes.<resumo>.js`), o
+app o carrega só na hora de gerar um story desses e o service worker o guarda; sem ele, o
+story sai no modelo de sempre.
+O "suficiente" usa a foto do dono (src/story-fotos/suficiente.webp: P&B, contraste, um pouco
+mais escura, 1080x1920, 113 KB) como fundo inteiro, publicada como
+`story-foto-suficiente.<resumo>.webp` e pedida junto com as artes; sem ela, sai a ilustração.
+Para gerar: `CHROME=... node design/compartilhar/gerar.mjs <pasta> artes`. O teste de
+navegador é `ferramentas/teste-story.mjs`.
+
+## Redesenho do versículo (2026-10-09, `versiculo/` na pasta de capturas)
+
+O dono achou o cartão branco com a bolinha de aspas fraco. Três propostas
+(`CHROME=... node design/compartilhar/gerar.mjs <pasta> versiculo`): A, página escura da
+landing com as aspas grandes em sálvia, o versículo em Literata à esquerda, a referência em
+Oswald amarela e o convite "Leia a Bíblia comigo" em carimbo sálvia; B, a mesma em sálvia
+clara; C, cartaz com a referência gigante e o versículo num papel creme.
+**Escolhida: A.** O story de versículo também apresenta o app: no feed, o fundo escuro com as
+aspas sálvia e a referência amarela chama mais atenção que um fundo claro (a maioria dos
+stories de versículo é clara), repete a identidade da landing (preto, sálvia, amarelo,
+Oswald, pincel) e o convite com a marca diz o que é e onde achar. O versículo continua o
+herói (B perde impacto; em C a referência compete com o texto e o papel aperta os longos).
+Regras: o texto vai intacto; se começa no meio da frase (minúscula), reticências na frente,
+só na imagem; letra de 128 a 42px conforme o tamanho, e o que não couber para na última
+palavra com reticências (a referência diz o trecho inteiro).
+
+### Fundo de cartaz (pedido do dono, mesmo dia; `versiculo2/`)
+
+A composição A ficou sobre o fundo da arte da marca: preto texturizado com poeira, papel
+cinza rasgado no canto de cima e no pé, fitas translúcidas e pinceladas sálvia só nas margens
+(nada atrás do texto), a logo com "Geração Eleita" no alto à esquerda e, no pé, o convite em
+carimbo sálvia entre a cruz e a coroa à mão, o endereço e as montanhas em P&B. As montanhas
+foram tiradas da própria arte (src/story-fotos/montanhas.webp, 45 KB, sem o ícone de som do
+print) e vêm com as artes sob demanda; o fundo todo mora em 01e-story-artes.js. Sem as artes,
+o versículo sai na página lisa (a A original). `gerar.mjs <pasta> versiculo2` gera os casos.

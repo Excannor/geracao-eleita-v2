@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- uma coroa de rei, para o rei da família de Davi que continua vivo na Babilônia (2Rs 25.28-29): a faixa em sálvia com as pedras e as cinco pontas com bolinhas. Tudo cabe no disco. -->
+<path class="k p" d="M30 78L26 44L44 62L60 36L76 62L94 44L90 78Z"/>
+<circle class="k p" cx="26" cy="41" r="3.5"/>
+<circle class="k p" cx="60" cy="33" r="3.5"/>
+<circle class="k p" cx="94" cy="41" r="3.5"/>
+<path class="k s" d="M29 78H91V90H29Z"/>
+<path class="h" d="M44 82V86M60 82V86M76 82V86M36 72L40 66M84 72L80 66"/>
+</svg>

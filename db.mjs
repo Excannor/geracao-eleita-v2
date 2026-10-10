@@ -226,6 +226,26 @@ const ESQUEMA = [
   `
   ALTER TABLE propositos ADD COLUMN recado_quando TEXT NOT NULL DEFAULT '';
   `,
+  // v16: quem tem menos de 18 anos só lidera ou auxilia uma célula depois que a liderança (o
+  // administrador) aprova. Uma linha por pessoa, célula e papel ('lider' ou 'auxiliar'): o
+  // pedido, o estado ('pendente', 'aprovada', 'recusada') e quem decidiu, e quando.
+  `
+  CREATE TABLE liderancas (proposito TEXT NOT NULL, usuario TEXT NOT NULL, papel TEXT NOT NULL, estado TEXT NOT NULL,
+    pedido_em TEXT NOT NULL, decidido_por TEXT NOT NULL DEFAULT '', decidido_em TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY (proposito, usuario, papel));
+  CREATE INDEX liderancas_estado ON liderancas (estado);
+  `,
+  // v17: avisos pontuais do administrador (Painel > Enviar aviso). O item do sino pode levar
+  // uma foto (o id em avisos_fotos, servida em /api/avisos/foto/<id>); a foto mora aqui, no
+  // banco, para entrar nos backups junto com o resto. avisos_admin anota cada envio (quem,
+  // para quem, quando), o que segura o teto de um aviso para todos por dia.
+  `
+  ALTER TABLE push_caixa ADD COLUMN foto TEXT NOT NULL DEFAULT '';
+  CREATE TABLE avisos_fotos (id TEXT PRIMARY KEY, tipo TEXT NOT NULL, dados BLOB NOT NULL, em INTEGER NOT NULL);
+  CREATE TABLE avisos_admin (id TEXT PRIMARY KEY, de TEXT NOT NULL, publico TEXT NOT NULL, titulo TEXT NOT NULL,
+    corpo TEXT NOT NULL, url TEXT NOT NULL, foto TEXT NOT NULL DEFAULT '', pessoas INTEGER NOT NULL, dia TEXT NOT NULL, em INTEGER NOT NULL);
+  CREATE INDEX avisos_admin_dia ON avisos_admin (publico, dia);
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -393,6 +413,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['proposito_dias', 'DELETE FROM proposito_dias WHERE proposito IN (SELECT p.id FROM propositos p JOIN proposito_membros m ON m.proposito = p.id WHERE p.grupo = 0 AND m.usuario = ?)', [u]],
     ['propositos', 'DELETE FROM propositos WHERE grupo = 0 AND id IN (SELECT proposito FROM proposito_membros WHERE usuario = ?)', [u]],
     ['proposito_membros', 'DELETE FROM proposito_membros WHERE usuario = ?', [u]],
+    // o pedido de aprovação para liderar (v16) é da pessoa; quem decidiu fica no dela
+    ['liderancas', 'DELETE FROM liderancas WHERE usuario = ?', [u]],
     // o histórico do encontro fica (quem registrou, quantas pessoas), só a presença da pessoa some
     ['celula_presencas', 'DELETE FROM celula_presencas WHERE usuario = ?', [u]],
     // discipulado dos dois lados, e os encontros dele, saem inteiros: não é um grupo que
@@ -413,6 +435,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     // a caixa do sino (v11) e o desafio de grupo que a pessoa abriu (v13) são dela, como no
     // apagar da conta ao vivo (Contas.apagar e Notificacoes.apagarDe)
     ['push_caixa', 'DELETE FROM push_caixa WHERE usuario = ?', [u]],
+    // o registro dos avisos que a pessoa mandou como administradora (v17)
+    ['avisos_admin', 'DELETE FROM avisos_admin WHERE de = ?', [u]],
     ['desafios_grupo', 'DELETE FROM desafios_grupo WHERE criado_por = ?', [u]],
     ['estados', 'DELETE FROM estados WHERE usuario = ?', [u]],
     // o check-in diário e a cópia achatada das datas de leitura (v14) são só da pessoa

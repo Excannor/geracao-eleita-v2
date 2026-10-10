@@ -84,7 +84,7 @@
     const lido = livroLido(nome);
     const nomeHtml = '<span class="nome-mapa" style="font-size:' + tamanhoDoNome(nome) + 'px">' + nb(CC.esc(nome)) + '</span>';
     if (!m) return '<span class="celula-mapa breve">' + nomeHtml + '<span class="so-leitor">, mapa em breve</span></span>';
-    return '<a class="celula-mapa pronto' + (lido ? ' lido' : '') + '" href="#/mapa/' + m.slug + '">' + nomeHtml
+    return '<a class="celula-mapa pronto' + (lido ? ' lido' : '') + (nome.length > 15 ? ' nome-longo' : '') + '" href="#/mapa/' + m.slug + '">' + nomeHtml
       + (lido ? '<span class="so-leitor">, lido inteiro no plano</span>' : '')
       + '<i class="marca-mapa" aria-hidden="true">' + CC.ico(lido ? 'certo' : 'avancar') + '</i></a>';
   }

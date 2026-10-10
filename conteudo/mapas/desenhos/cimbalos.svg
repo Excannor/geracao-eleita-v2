@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os címbalos de bronze que Hemã, Asafe e Etã tocam diante da arca (1Cr 15.19): dois pratos inclinados quase se tocando, cada um com o bojo do meio e a alça de couro, e traços curtos de som. A face de um prato em sálvia. -->
+<g transform="rotate(-24 40 60)">
+<ellipse class="k s" cx="40" cy="60" rx="26" ry="9"/>
+<ellipse class="k p" cx="40" cy="58" rx="7" ry="3.5"/>
+<path class="k" d="M36 57C36 50 44 50 44 57"/>
+</g>
+<g transform="rotate(24 80 60)">
+<ellipse class="k p" cx="80" cy="60" rx="26" ry="9"/>
+<ellipse class="k p" cx="80" cy="58" rx="7" ry="3.5"/>
+<path class="k" d="M76 57C76 50 84 50 84 57"/>
+</g>
+<path class="h" d="M60 30V40M50 34L54 42M70 34L66 42M60 88V98M50 86L54 80M70 86L66 80"/>
+</svg>

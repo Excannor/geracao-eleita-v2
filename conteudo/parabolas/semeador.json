@@ -1,0 +1,128 @@
+{
+  "titulo": "O semeador",
+  "ref": "Lc 8.4-15",
+  "grupo": "lucas",
+  "linha": "A mesma semente em quatro tipos de chão",
+  "desenho": "semente-ao-vento",
+  "desenhoLista": "espigas-de-trigo",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus passa pelas cidades e aldeias da Galileia e fala do Reino de Deus por onde vai. Os doze discípulos e algumas mulheres que ele tinha curado vão junto.",
+          "ref": "Lc 8.1-3"
+        },
+        {
+          "texto": "Um dia, uma multidão se junta para ouvir Jesus, e mais gente ainda está chegando de outras cidades. Jesus conta para eles uma parábola.",
+          "ref": "Lc 8.4"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "broto",
+      "blocos": [
+        {
+          "texto": "Um lavrador sai para o campo e joga as sementes no chão. Elas caem em quatro lugares diferentes.",
+          "ref": "Lc 8.5-8"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "caminho-com-aves",
+              "titulo": "Na beira do caminho",
+              "fala": "as aves vieram e as comeram",
+              "ref": "Lc 8.5"
+            },
+            {
+              "desenho": "broto-na-pedra",
+              "titulo": "Na pedra",
+              "fala": "logo murcharam e morreram",
+              "ref": "Lc 8.6"
+            },
+            {
+              "desenho": "broto-nos-espinhos",
+              "titulo": "Entre os espinhos",
+              "fala": "sufocaram todas elas",
+              "ref": "Lc 8.7"
+            },
+            {
+              "desenho": "espigas-de-trigo",
+              "titulo": "Na terra boa",
+              "fala": "deram boa colheita, de 100 por um",
+              "ref": "Lc 8.8"
+            }
+          ]
+        },
+        {
+          "texto": "Jesus termina a história com um aviso.",
+          "ref": "Lc 8.8"
+        },
+        {
+          "fala": "Aquele que tem ouvidos para ouvir, que ouça!",
+          "ref": "Lc 8.8"
+        }
+      ]
+    },
+    {
+      "titulo": "Os discípulos perguntam",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Depois, os discípulos querem saber o que a parábola significa. Jesus responde.",
+          "ref": "Lc 8.9-10"
+        },
+        {
+          "fala": "A semente é a palavra de Deus.",
+          "ref": "Lc 8.11"
+        },
+        {
+          "texto": "A beira do caminho é gente que ouve, mas o diabo tira a palavra do coração antes que a pessoa creia.",
+          "ref": "Lc 8.12"
+        },
+        {
+          "texto": "A pedra é gente que ouve com prazer e crê por um tempo. Sem raiz, essa gente desiste na hora da provação.",
+          "ref": "Lc 8.13"
+        },
+        {
+          "texto": "Os espinhos são gente que ouve, mas fica sufocada pela preocupação e pelo dinheiro e nunca amadurece.",
+          "ref": "Lc 8.14"
+        },
+        {
+          "texto": "A terra boa é gente de coração bom, que guarda a palavra e dá fruto sem desistir.",
+          "ref": "Lc 8.15"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O lavrador joga a semente em todo canto, sem escolher o chão. A semente é sempre a mesma, e o que muda é o chão onde ela cai.",
+    "apoio": "Na mesma conversa, Jesus avisa os discípulos. “Portanto, tomem cuidado na maneira como ouvem”.",
+    "ref": "Lc 8.15-18"
+  },
+  "perguntas": [
+    "Qual dos quatro chãos parece mais com você nesta semana?",
+    "O que costuma sufocar a palavra de Deus na sua vida?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 13.1-23",
+      "titulo": "O semeador",
+      "linha": "Jesus conta de dentro de um barco, perto da praia"
+    },
+    {
+      "ref": "Mc 4.1-20",
+      "titulo": "O semeador",
+      "linha": "a terra boa dá trinta, sessenta e até cem por um"
+    },
+    {
+      "ref": "Lc 8.16-18",
+      "titulo": "A lâmpada",
+      "slug": "lampada",
+      "rotulo": "Da mesma conversa",
+      "linha": "ninguém acende a lamparina para esconder a luz"
+    }
+  ]
+}

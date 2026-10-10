@@ -1,0 +1,336 @@
+{
+  "nome": "1 Crônicas",
+  "grupo": "Históricos",
+  "numero": 13,
+  "capitulos": 29,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "דִּבְרֵי־הַיָּמִים",
+    "transliteracao": "Divrei hayamim",
+    "traducao": "os fatos dos dias",
+    "texto": "O nome hebraico é como o de um diário do reino. Crônicas vem do grego chronos, que quer dizer tempo. 1 e 2 Crônicas formam, no começo, um livro só."
+  },
+  "autoria": {
+    "texto": "Para a história de Davi, o autor aponta três profetas que escreveram antes dele: Samuel, Natã e Gade.",
+    "apoio": "A lista da família de Davi passa por Jeconias, que teve filhos enquanto estava preso, e segue com os netos dele. Quem escreve vive depois do exílio.",
+    "refs": [
+      "1Cr 3.17-19",
+      "1Cr 29.29"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "1 Crônicas começa com uma lista de nomes que sai de Adão e chega às famílias que voltam para as suas cidades depois da Babilônia. Na história de Davi, todo o Israel leva a arca para Jerusalém entre gritos de alegria e trombetas. Davi junta material para um templo que só o filho vai construir. Ele morre bem velho, rico e cheio de honras, e Salomão reina no lugar dele.",
+    "refs": [
+      "1Cr 1.1",
+      "1Cr 9.1-2",
+      "1Cr 15.28",
+      "1Cr 22.5-6",
+      "1Cr 29.28"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "De Adão a Davi",
+      "sub": "Uma lista com histórias dentro",
+      "desenho": "lista-em-rolo",
+      "galhos": [
+        {
+          "texto": "Terá tem um filho chamado Abrão, que depois é conhecido como Abraão. Abraão é pai de Isaque, e Isaque tem dois filhos, Esaú e Israel.",
+          "ref": "1Cr 1.27-28, 34"
+        },
+        {
+          "texto": "Na família de Jessé, Eliabe é o primeiro filho. Depois vêm mais cinco irmãos, e o sétimo é Davi.",
+          "ref": "1Cr 2.13-15"
+        },
+        {
+          "texto": "Jabez é mais respeitado que os irmãos. A mãe deu esse nome porque sofreu muito no parto. Jabez pede que Deus abençoe ele, fique com ele em tudo e livre ele do mal e do sofrimento. Deus dá o que ele pediu.",
+          "ref": "1Cr 4.9-10"
+        },
+        {
+          "texto": "Rúben é o filho mais velho de Israel, mas desonrou a cama do pai. Os direitos de filho mais velho passam para os filhos de José. Judá é o mais forte dos irmãos, e dele vem um líder.",
+          "ref": "1Cr 5.1-2"
+        },
+        {
+          "texto": "Na guerra contra os hagarenos, Rúben, Gade e a meia tribo de Manassés pedem ajuda a Deus. Deus ajuda porque eles confiaram nele.",
+          "ref": "1Cr 5.18-20"
+        },
+        {
+          "texto": "Quando a arca vai para o Tabernáculo, Davi nomeia grupos de cantores. Eles cantam diante da tenda até Salomão construir a casa do Senhor em Jerusalém.",
+          "ref": "1Cr 6.31-32"
+        }
+      ],
+      "conexao": "Saul e três filhos dele morrem no monte Gilboa, todos no mesmo dia (1Cr 10.6, 8)."
+    },
+    {
+      "titulo": "Davi é rei",
+      "sub": "Os valentes se juntam a Davi",
+      "desenho": "funda-e-pedras",
+      "galhos": [
+        {
+          "texto": "Saul morre porque desobedeceu ao Senhor e consultou uma médium em vez de pedir orientação ao Senhor. O Senhor dá o reino a Davi, filho de Jessé.",
+          "ref": "1Cr 10.13-14"
+        },
+        {
+          "texto": "Os líderes de Israel vão a Hebrom e dizem a Davi: “Somos do mesmo povo”. Eles lembram que o Senhor chamou Davi para ser o pastor de Israel. Ali eles derramam óleo na cabeça de Davi.",
+          "ref": "1Cr 11.1-3"
+        },
+        {
+          "texto": "Em Jerusalém, os jebuseus dizem que Davi não vai entrar em Jerusalém. Davi promete que o primeiro a atacar vai ser o comandante do exército. Joabe vai na frente e fica com o posto.",
+          "ref": "1Cr 11.4-6"
+        },
+        {
+          "texto": "Benaia mata um leão numa cova, num dia de neve. Ele enfrenta um egípcio de dois metros e vinte e cinco só com um cajado, arranca a lança da mão dele e mata o homem com ela.",
+          "ref": "1Cr 11.22-23"
+        },
+        {
+          "texto": "Em Ziclague, homens de Benjamim, a tribo de Saul, se juntam a Davi. Eles atiram com arco e com funda e usam tanto a mão esquerda quanto a direita.",
+          "ref": "1Cr 12.1-2"
+        },
+        {
+          "texto": "Davi desconfia de um grupo que chega ao esconderijo. O Espírito desce sobre Amasai, e ele diz: “Nós somos seus, ó Davi; Estamos a seu lado, ó filho de Jessé”.",
+          "ref": "1Cr 12.17-18"
+        }
+      ],
+      "conexao": "Davi quer trazer a arca de volta. Desde que Saul virou rei, ninguém se lembra dela (1Cr 13.3)."
+    },
+    {
+      "titulo": "Nos ombros",
+      "sub": "Os levitas levam a arca",
+      "desenho": "cimbalos",
+      "galhos": [
+        {
+          "texto": "A arca vai num carro novo. Quando os bois tropeçam, Uzá estende a mão para segurar a arca, e o Senhor mata Uzá. Davi fica com medo e pergunta: “Como posso levar para casa a arca de Deus?”",
+          "ref": "1Cr 13.7, 9-10, 12"
+        },
+        {
+          "texto": "Davi manda que só os levitas carreguem a arca. Ele diz que o Senhor feriu o povo da outra vez porque eles não cuidaram da arca conforme as ordens dele.",
+          "ref": "1Cr 15.2, 13"
+        },
+        {
+          "texto": "Desta vez, os levitas levam a arca nos ombros, pelas varas, como o Senhor tinha mandado a Moisés. Deus ajuda os levitas, e eles oferecem sete novilhos e sete carneiros.",
+          "ref": "1Cr 15.15, 26"
+        },
+        {
+          "texto": "Davi manda os chefes dos levitas organizarem cantores para tocar bem alto e com alegria. Hemã, Asafe e Etã tocam os címbalos de bronze, e Quenanias dirige o canto porque entende muito de música.",
+          "ref": "1Cr 15.16, 19, 22"
+        },
+        {
+          "texto": "Depois dos sacrifícios, Davi abençoa o povo. Ele dá a cada homem e a cada mulher um pão, um bolo de tâmara e um bolo de uvas.",
+          "ref": "1Cr 16.2-3"
+        },
+        {
+          "texto": "Davi encarrega Asafe e os parentes dele de cantar ao Senhor. No hino, eles cantam: “Deem graças ao Senhor, porque ele é bom; o seu amor nunca acaba”.",
+          "ref": "1Cr 16.7, 34"
+        }
+      ],
+      "conexao": "Davi mora numa casa de cedro, e a arca do Senhor fica numa tenda (1Cr 17.1)."
+    },
+    {
+      "titulo": "A promessa",
+      "sub": "Um filho no trono de Davi",
+      "desenho": "tenda-com-estacas",
+      "galhos": [
+        {
+          "texto": "Naquela noite, Deus manda Natã dizer a Davi que não vai ser ele quem vai construir a casa. Desde o Egito, o Senhor mora de tenda em tenda e nunca pediu a ninguém um templo de cedro.",
+          "ref": "1Cr 17.3-6"
+        },
+        {
+          "texto": "O Senhor promete pôr um filho de Davi no trono quando Davi morrer, e esse filho vai construir o templo. Deus diz: “Serei o pai dele, e ele será o meu filho”.",
+          "ref": "1Cr 17.11-13"
+        },
+        {
+          "texto": "Davi traz muito bronze das cidades do rei Hadadezer. Esse é o bronze que Salomão vai derreter para fazer o tanque, as colunas e os objetos de bronze do templo.",
+          "ref": "1Cr 18.8"
+        },
+        {
+          "texto": "Tudo o que Davi tira das nações, prata e ouro, ele oferece ao Senhor. Por onde Davi vai, o Senhor dá vitória a ele.",
+          "ref": "1Cr 18.11, 13"
+        },
+        {
+          "texto": "Joabe e o irmão Abisai lutam contra Amom e a Síria, cada um de um lado, e combinam que um ajuda o outro. Joabe diz: “E que o Senhor faça o que achar melhor”.",
+          "ref": "1Cr 19.10-13"
+        }
+      ],
+      "jesus": {
+        "texto": "O Filho de Deus nasceu da família de Davi. Quando ressuscitou dos mortos, Deus mostrou com poder que ele é o Filho de Deus. Esse Filho é Jesus Cristo, nosso Senhor.",
+        "refs": [
+          "Rm 1.3-4"
+        ]
+      },
+      "conexao": "Satanás quer a desgraça de Israel e leva Davi a contar o povo (1Cr 21.1)."
+    },
+    {
+      "titulo": "Lugar do templo",
+      "sub": "O anjo guarda a espada",
+      "desenho": "espada-na-bainha",
+      "galhos": [
+        {
+          "texto": "Joabe pergunta a Davi por que ele quer trazer culpa sobre Israel. Davi insiste, e Joabe tem de obedecer. Ele não conta as tribos de Levi e de Benjamim, porque não concorda com a ordem.",
+          "ref": "1Cr 21.3-4, 6"
+        },
+        {
+          "texto": "Davi diz a Deus que pecou. O profeta Gade dá a Davi três escolhas, três anos de fome, três meses fugindo ou três dias de peste. Davi prefere cair nas mãos do Senhor, porque a misericórdia do Senhor é grande.",
+          "ref": "1Cr 21.8, 11-13"
+        },
+        {
+          "texto": "Deus manda um anjo destruir Jerusalém e depois manda parar. Davi vê o anjo entre a terra e o céu, com a espada na mão estendida sobre Jerusalém. Davi e os líderes vestem pano de saco e se ajoelham.",
+          "ref": "1Cr 21.15-16"
+        },
+        {
+          "texto": "Davi paga a Araúna em ouro, constrói um altar no terreiro e ora. O Senhor responde com fogo do céu sobre a oferta e manda o anjo guardar a espada na bainha.",
+          "ref": "1Cr 21.25-27"
+        },
+        {
+          "texto": "Para Davi, o templo de Deus vai ficar ali, no terreiro de debulhar trigo de Araúna. Ele manda os estrangeiros que moram em Israel prepararem pedras quadradas para a obra.",
+          "ref": "1Cr 22.1-2"
+        },
+        {
+          "texto": "O Senhor não deixou Davi construir o templo, porque ele derramou muito sangue nas guerras. Davi conta isso a Salomão e diz que o templo vai ser obra dele, um homem de paz.",
+          "ref": "1Cr 22.7-10"
+        }
+      ],
+      "conexao": "Davi está bem velho e faz de Salomão o novo rei de Israel (1Cr 23.1)."
+    },
+    {
+      "titulo": "As ofertas",
+      "sub": "Davi dá a planta do templo",
+      "desenho": "harpa",
+      "galhos": [
+        {
+          "texto": "Davi conta os levitas de trinta anos para cima, e eles são trinta e oito mil. Quatro mil vão louvar o Senhor com os instrumentos que Davi fez.",
+          "ref": "1Cr 23.3-5"
+        },
+        {
+          "texto": "Os cantores são duzentos e oitenta e oito mestres de música. O turno de cada grupo sai por sorteio, sem olhar idade nem importância.",
+          "ref": "1Cr 25.7-8"
+        },
+        {
+          "texto": "Davi entrega a Salomão a planta do templo, dos pátios e das salas, tudo o que o Espírito pôs no coração dele. Davi diz que cada parte daquela planta veio por escrito da mão do Senhor.",
+          "ref": "1Cr 28.11-12, 19"
+        },
+        {
+          "texto": "O pai pede a Salomão que seja forte e corajoso e não tenha medo do tamanho da obra. Davi promete que o Senhor vai estar com o filho: “Ele não o deixará nem o abandonará”.",
+          "ref": "1Cr 28.20"
+        },
+        {
+          "texto": "Das riquezas dele, Davi dá ouro e prata para o templo e pergunta quem mais quer dar. Os chefes dão de boa vontade. O povo fica alegre, porque eles deram de coração ao Senhor.",
+          "ref": "1Cr 29.3, 5-6, 9"
+        },
+        {
+          "texto": "Na frente de todos, Davi ora: “Tudo o que temos vem do Senhor, e nós apenas demos ao Senhor o que já é seu!” Ele diz que os dias deles na terra passam como sombra.",
+          "ref": "1Cr 29.14-15"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Davi conta que o Senhor escolheu Salomão para ficar no trono de Israel e chama esse reino de “o reino do Senhor”. Em Hebreus, Deus fala ao Filho que o Reino dele vai durar para todo o sempre (Hb 1.8).",
+    "ref": "1Cr 28.5",
+    "desenho": "trono",
+    "pares": [
+      {
+        "at": "1Cr 28.9",
+        "texto": "Se você procurar Deus, você o encontrará",
+        "nt": "Mt 7.7-8",
+        "nota": "Jesus ensina a pedir, procurar e bater. Quem procura, acha"
+      },
+      {
+        "at": "1Cr 29.11",
+        "texto": "Seus, ó Senhor, são o poder, a glória, e a vitória e a majestade.",
+        "nt": "Ap 5.12",
+        "nota": "No céu, todos cantam que o Cordeiro que foi morto é digno de receber o poder e a glória"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "De Adão às famílias que voltam",
+      "de": 1,
+      "ate": 9
+    },
+    {
+      "titulo": "Saul morre e Davi é feito rei",
+      "de": 10,
+      "ate": 12
+    },
+    {
+      "titulo": "A arca chega a Jerusalém",
+      "de": 13,
+      "ate": 16
+    },
+    {
+      "titulo": "A promessa e as vitórias de Davi",
+      "de": 17,
+      "ate": 20
+    },
+    {
+      "titulo": "A contagem do povo e o lugar do templo",
+      "de": 21,
+      "ate": 22
+    },
+    {
+      "titulo": "Levitas, cantores, porteiros e soldados",
+      "de": 23,
+      "ate": 27
+    },
+    {
+      "titulo": "Davi entrega o reino a Salomão",
+      "de": 28,
+      "ate": 29
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Uma família de Judá faz vasos de barro e cuida de jardins e plantações. Todos trabalham para o rei.",
+      "ref": "1Cr 4.23"
+    },
+    {
+      "texto": "Os cantores levitas moram nas salas do templo. Eles trabalham dia e noite e por isso ficam livres de outras tarefas.",
+      "ref": "1Cr 9.33"
+    },
+    {
+      "texto": "Num campo de cevada, o exército de Israel começa a fugir dos filisteus. Eleazar fica firme no meio da plantação, e o Senhor dá a ele uma grande vitória.",
+      "ref": "1Cr 11.13-14"
+    },
+    {
+      "texto": "Os soldados de Gade são tão bons que o mais fraco vale por cem, e o mais forte vale por mil.",
+      "ref": "1Cr 12.8, 14"
+    },
+    {
+      "texto": "Em Issacar, duzentos chefes conhecem bem os fatos daquele tempo e sabem qual o melhor caminho para Israel seguir.",
+      "ref": "1Cr 12.32"
+    },
+    {
+      "texto": "Quando Davi vira rei em Hebrom, a festa dura três dias. Gente de longe traz comida em jumentos, camelos, mulos e bois.",
+      "ref": "1Cr 12.39-40"
+    },
+    {
+      "texto": "Araúna está debulhando trigo quando vê o anjo. Ele e os quatro filhos fogem e se escondem.",
+      "ref": "1Cr 21.20"
+    },
+    {
+      "texto": "Os levitas não precisam mais carregar o Tabernáculo de um lugar para outro. Davi diz que o Senhor vai morar em Jerusalém para sempre.",
+      "ref": "1Cr 23.25-26"
+    },
+    {
+      "texto": "Hemã é vidente do rei, e Deus dá a ele catorze filhos e três filhas.",
+      "ref": "1Cr 25.5"
+    },
+    {
+      "texto": "Davi não conta quem tem menos de vinte anos, porque o Senhor prometeu um povo tão grande como as estrelas do céu. Joabe começa a contagem e nunca termina.",
+      "ref": "1Cr 27.23-24"
+    },
+    {
+      "texto": "O conselheiro de Davi é o tio dele, Jônatas, um homem prudente e educado. Jeiel ensina os filhos do rei.",
+      "ref": "1Cr 27.32"
+    },
+    {
+      "texto": "Na festa do dia seguinte às ofertas, o povo põe a coroa na cabeça de Salomão pela segunda vez e unge Zadoque como sacerdote.",
+      "ref": "1Cr 29.21-22"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a palavra alegria. A palavra volta quando as tribos fazem Davi rei, quando a arca chega a Jerusalém e quando o povo dá ofertas para o templo. No hino de Davi, até as árvores da floresta cantam de alegria."
+  }
+}

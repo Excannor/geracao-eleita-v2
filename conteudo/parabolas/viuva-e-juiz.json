@@ -1,0 +1,84 @@
+{
+  "titulo": "A viúva e o juiz",
+  "ref": "Lc 18.1-8",
+  "grupo": "lucas",
+  "linha": "A viúva volta tantas vezes que o juiz cede",
+  "desenho": "porta-do-juiz",
+  "desenhoLista": "pegadas",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus fala com os discípulos sobre o dia em que ele vai voltar. Vai ser como no tempo de Noé, quando o povo vivia como de costume até o dia do dilúvio.",
+          "ref": "Lc 17.22-27"
+        },
+        {
+          "texto": "Depois, Jesus conta esta história. Ele quer que os discípulos orem sempre, sem desanimar.",
+          "ref": "Lc 18.1"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Jesus fala de duas pessoas da mesma cidade.",
+          "ref": "Lc 18.2-3"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "balanca",
+              "titulo": "O juiz",
+              "fala": "não temia a Deus e que fazia pouco caso de todos",
+              "ref": "Lc 18.2"
+            },
+            {
+              "desenho": "pegadas",
+              "titulo": "A viúva",
+              "fala": "vinha frequentemente suplicar justiça",
+              "ref": "Lc 18.3"
+            }
+          ]
+        },
+        {
+          "texto": "A viúva pede justiça contra um homem que deu prejuízo a ela. Por um tempo, o juiz não dá atenção. Depois, ele pensa consigo mesmo.",
+          "ref": "Lc 18.3-4"
+        },
+        {
+          "fala": "esta mulher está me incomodando",
+          "ref": "Lc 18.5"
+        },
+        {
+          "texto": "O juiz resolve fazer justiça para a viúva, só para se livrar das queixas dela.",
+          "ref": "Lc 18.5"
+        },
+        {
+          "texto": "Jesus manda os discípulos prestarem atenção no que esse juiz desonesto disse. Deus vai fazer justiça ao povo dele, que pede dia e noite, e vai responder depressa.",
+          "ref": "Lc 18.6-8"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O juiz atende a viúva de má vontade, só para se livrar dela. Deus é o oposto desse juiz. Ele ouve o povo que pede dia e noite, e quem ora não precisa desistir.",
+    "apoio": "Jesus termina com uma pergunta. “Quando o Filho do Homem voltar, será que encontrará fé na terra?”",
+    "ref": "Lc 18.1-8"
+  },
+  "perguntas": [
+    "Por qual coisa você já parou de orar porque cansou de esperar?",
+    "Que pedido você precisa voltar a fazer a Deus esta semana?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Lc 18.9-14",
+      "titulo": "O fariseu e o publicano",
+      "slug": "fariseu-e-publicano",
+      "rotulo": "Da mesma conversa",
+      "linha": "dois homens oram no templo, e só um volta perdoado"
+    }
+  ]
+}

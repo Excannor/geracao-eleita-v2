@@ -136,6 +136,16 @@
   // O fim do dia, logo depois de "Terminei o dia": a chama, o que a pessoa conheceu e o que
   // amanhã traz, como o resumo do plano (04-licao.js). O tutorial de instalar e o convite dos
   // lembretes só vêm depois de "Até amanhã"; antes eles subiam por cima da festa.
+  // Redesenhar a mesma tela do dia (a sincronização chama CC.redesenhar) deixa o palco onde
+  // estava; o dia ou o resumo que acabam de abrir começam no topo. Devolve quem repõe a
+  // rolagem depois do innerHTML novo.
+  function rolagemDoPalco(el, qual) {
+    const palco = el.dataset.tela === qual ? el.querySelector('.licao-palco') : null;
+    const y = palco ? palco.scrollTop : 0;
+    el.dataset.tela = qual;
+    return () => { const novo = el.querySelector('.licao-palco'); if (novo) novo.scrollTop = y; };
+  }
+
   function desenharResumoConhecer(el, dia) {
     const C = conteudoDe();
     const seq = CC.sequencia();
@@ -148,6 +158,7 @@
     const pe = amanha
       ? '<button class="botao cor" data-ate-amanha>' + CC.esc(nome ? 'Até amanhã, ' + nome + '!' : 'Até amanhã!') + '</button>'
       : (peDoConhecer(dia, true, true) || '<button class="botao cor" data-ate-amanha>Fechar</button>');
+    const manter = rolagemDoPalco(el, dia.numero + ':resumo');
     el.className = 'licao c-azul tela-conhecer cj tela-resumo';
     el.innerHTML = '<div class="licao-palco"><div class="interno"><div class="resumo-dia resumo-conhecer"><div class="cabeca-licao">'
       + '<div class="chama-palco">' + CC.arte.faiscas() + CC.icoChama(seq.atual) + '</div>'
@@ -174,6 +185,7 @@
     }
     const continuarPlano = el.querySelector('[data-continuar-plano]');
     if (continuarPlano) ligarContinuarPlano(continuarPlano);
+    manter();
   }
 
   function ligarContinuarPlano(botao) {
@@ -208,6 +220,7 @@
     }
     // um redesenho no meio do resumo (a volta do segundo plano) não o apaga
     if (sessaoDia.resumo) { desenharResumoConhecer(el, dia); return; }
+    const manter = rolagemDoPalco(el, dia.numero + ':dia');
     el.className = 'licao c-azul tela-conhecer cj';
     el.setAttribute('aria-label', 'Dia ' + dia.numero + ' do Conhecer Jesus');
 
@@ -221,7 +234,7 @@
       + '<section class="etapa-reflexao">' + perguntasFixas + '</section>'
       + '<section class="etapa-reflexao"><h2>Se quiser, fale com Deus:</h2>'
       + '<ul class="oracao-guia"><li>' + CC.esc(dia.conversa) + '</li></ul></section>'
-      + CC.painelAnotacao('conhecer:' + dia.numero, 'Escrever sobre isso')
+      + '<div data-notas-contexto="conhecer:' + dia.numero + '" data-tipo-nota="nota"></div>'
       + (terminado ? '<p class="conquista-linha">' + CC.ico('certo') + 'Dia concluído</p>' : '');
 
     el.innerHTML = '<div class="licao-topo">'
@@ -273,7 +286,8 @@
     }
     const continuarPlano = el.querySelector('[data-continuar-plano]');
     if (continuarPlano) ligarContinuarPlano(continuarPlano);
-    CC.ligarAnotacao(el);
+    CC.notasDoContexto(el);
+    manter();
   }
 
   // O rodapé muda com o estado do dia: primeiro só "Ler"; depois de ler, "Terminei o dia";
@@ -387,7 +401,7 @@
   CC.conversarSobreBatismo = function () {
     CC.folha('<h3>Conversar sobre o batismo</h3>'
       + '<p>Vamos avisar quem te acompanha no app: quem te convidou, o líder da sua célula e quem faz discipulado com você, se houver. A pessoa vai te procurar para conversar, do jeito que vocês costumam falar.</p>'
-      + '<p class="passo-dica">Só vai o aviso. Ninguém vê o que você escreveu no app.</p>'
+      + '<p class="passo-dica">Só vai o aviso, nunca o que você escreveu no app.</p>'
       + '<div class="acoes"><button class="botao" data-avisar>Avisar</button><button class="botao plano" data-fechar>Agora não</button></div>', {
       rotulo: 'Conversar sobre o batismo',
       ligar: (folha, fechar) => {

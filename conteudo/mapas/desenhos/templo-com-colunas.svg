@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o templo de Salomão com as duas colunas de bronze da entrada, Jaquim e Boaz (1Rs 7.21), com os capitéis em forma de lírio. A porta em sálvia. Tudo cabe no disco de raio 50. -->
+<path class="k" d="M22 94C40 92 80 92 98 94"/>
+<path class="k p" d="M40 93V40H80V93Z"/>
+<path class="k p" d="M36 40H84V34H36Z"/>
+<path class="h" d="M40 52H80M40 64H52M68 64H80M40 76H52M68 76H80"/>
+<path class="k s" d="M53 93V70A7 7 0 0 1 67 70V93Z"/>
+<path class="k p" d="M26 93V48H33V93Z"/>
+<path class="k p" d="M87 93V48H94V93Z"/>
+<path class="k p" d="M24 48C22 42 24 38 29.5 38C35 38 37 42 35 48Z"/>
+<path class="k p" d="M85 48C83 42 85 38 90.5 38C96 38 98 42 96 48Z"/>
+<path class="h" d="M26.5 39L29.5 43L32.5 39M87.5 39L90.5 43L93.5 39M26 55H33M87 55H94M26 86H33M87 86H94"/>
+</svg>

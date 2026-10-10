@@ -672,6 +672,30 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   return { titulo: preencher(titulo, d), corpo: preencher(corpo, d), tag, url };
 }
 
+// ---------------------------------------------------------------- aviso do administrador
+// Os destinos que o toque pode abrir: uma lista curta e fechada, nunca um endereço livre.
+export const DESTINOS_AVISO = {
+  nenhum: './#/', inicio: './#/', explorar: './#/explorar', parabolas: './#/parabolas',
+  biblia: './#/biblia', celula: './#/celula', desafios: './#/missoes',
+};
+export const AVISO_TITULO_MAX = 50;
+export const AVISO_TEXTO_MAX = 150;
+// O navegador reduz a foto (até 1024 px, qualidade 0,8, alvo de 250 KB); o servidor aceita
+// até 300 KB, uma margem para a foto que não desceu tanto.
+export const AVISO_FOTO_MAX = 300 * 1024;
+
+// JPEG ou WebP, pelos primeiros bytes (o que o canvas do navegador gera). Nada de SVG ou HTML.
+export function tipoDaImagem(b) {
+  if (!Buffer.isBuffer(b) || b.length < 12) return null;
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return 'image/jpeg';
+  if (b.toString('latin1', 0, 4) === 'RIFF' && b.toString('latin1', 8, 12) === 'WEBP') return 'image/webp';
+  return null;
+}
+
+// Quem desligou os três avisos (lembrete, ofensiva e amigos) não recebe o aviso no celular,
+// só no sino.
+export const avisosDesligados = (pref) => !pref.lembrete && !pref.ofensiva && !pref.amigos;
+
 export const primeiroNome = (nome) => String(nome || '').trim().split(/\s+/)[0] || '';
 
 // ---------------------------------------------------------------- guarda
@@ -704,7 +728,7 @@ export class Notificacoes {
     for (const l of t.preferencias) d.preferencias[l.usuario] = JSON.parse(l.dados);
     for (const l of t.historico) d.historico[l.usuario] = JSON.parse(l.dados);
     for (const l of t.caixa) {
-      (d.caixa[l.usuario] || (d.caixa[l.usuario] = [])).push({ id: l.id, em: l.em, tipo: l.tipo, titulo: l.titulo, corpo: l.corpo, url: l.url, lido: !!l.lido });
+      (d.caixa[l.usuario] || (d.caixa[l.usuario] = [])).push({ id: l.id, em: l.em, tipo: l.tipo, titulo: l.titulo, corpo: l.corpo, url: l.url, lido: !!l.lido, ...(l.foto ? { foto: l.foto } : {}) });
     }
     this.dados = d;
     return this;
@@ -729,7 +753,7 @@ export class Notificacoes {
       { tabela: 'push_preferencias', chaves: ['usuario'], linhas: Object.entries(d.preferencias).map(([usuario, p]) => ({ usuario, dados: JSON.stringify(p) })) },
       { tabela: 'push_historico', chaves: ['usuario'], linhas: Object.entries(d.historico).map(([usuario, h]) => ({ usuario, dados: JSON.stringify(h) })) },
       { tabela: 'push_caixa', chaves: ['id'], linhas: Object.entries(d.caixa || {}).flatMap(([usuario, lista]) => (lista || []).map((a) => ({
-        id: a.id, usuario, em: a.em, tipo: a.tipo, titulo: a.titulo, corpo: a.corpo, url: a.url, lido: a.lido ? 1 : 0,
+        id: a.id, usuario, em: a.em, tipo: a.tipo, titulo: a.titulo, corpo: a.corpo, url: a.url, lido: a.lido ? 1 : 0, foto: a.foto || '',
       }))) },
     ]);
   }
@@ -797,13 +821,79 @@ export class Notificacoes {
   naoLidos(usuario) { return this.caixaDe(usuario).filter((a) => !a.lido).length; }
 
   async guardarNaCaixa(usuario, tipo, mensagem, em = Date.now()) {
-    if (!this.dados.caixa) this.dados.caixa = {};
-    const lista = this.dados.caixa[usuario] || [];
-    const id = em.toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-    lista.push({ id, em, tipo: String(tipo || ''), titulo: String(mensagem.titulo || ''), corpo: String(mensagem.corpo || ''), url: String(mensagem.url || './#/'), lido: false });
-    this.dados.caixa[usuario] = lista.sort((a, b) => a.em - b.em).slice(-CAIXA_MAX);
+    const [id] = this.porNaCaixa([usuario], tipo, mensagem, em);
     await this.salvar();
     return id;
+  }
+
+  // O mesmo item para várias pessoas de uma vez (o aviso do administrador para todos), com
+  // uma gravação só no fim, em vez de uma por pessoa.
+  async guardarNaCaixaDeVarios(usuarios, tipo, mensagem, em = Date.now()) {
+    const ids = this.porNaCaixa(usuarios, tipo, mensagem, em);
+    await this.salvar();
+    return ids;
+  }
+
+  porNaCaixa(usuarios, tipo, mensagem, em) {
+    if (!this.dados.caixa) this.dados.caixa = {};
+    return usuarios.map((usuario) => {
+      const lista = this.dados.caixa[usuario] || [];
+      const id = em.toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      lista.push({ id, em, tipo: String(tipo || ''), titulo: String(mensagem.titulo || ''), corpo: String(mensagem.corpo || ''), url: String(mensagem.url || './#/'), lido: false,
+        ...(mensagem.foto ? { foto: String(mensagem.foto) } : {}) });
+      this.dados.caixa[usuario] = lista.sort((a, b) => a.em - b.em).slice(-CAIXA_MAX);
+      return id;
+    });
+  }
+
+  // ---------- push adiado pelo silêncio da noite ----------
+  // O aviso do administrador que chega entre 22h30 e 7h no fuso da pessoa fica guardado no
+  // histórico dela e sai na primeira rodada de lembretes depois das 7h. Guarda no máximo 5,
+  // e o que passou de um dia na fila já não sai.
+  async adiarPush(usuarios, mensagem, em = Date.now()) {
+    for (const u of usuarios) {
+      const h = { ...this.historico(u) };
+      h.pendentes = (h.pendentes || []).concat([{ ...mensagem, em }]).slice(-5);
+      this.dados.historico[u] = h;
+    }
+    await this.salvar();
+  }
+
+  async tirarPendentes(usuario, agora = Date.now()) {
+    const h = this.historico(usuario);
+    if (!h.pendentes || !h.pendentes.length) return [];
+    const { pendentes, ...resto } = h;
+    this.dados.historico[usuario] = resto;
+    await this.salvar();
+    return pendentes.filter((m) => agora - (m.em || 0) < 24 * 3600 * 1000).map(({ em, ...m }) => m);
+  }
+
+  // ---------- fotos e registro dos avisos do administrador (tabelas avisos_fotos e avisos_admin) ----------
+  // O id da foto é sorteado (16 bytes): quem não recebeu o aviso não tem como adivinhar o
+  // endereço. Foto com mais de 90 dias que nenhum sino mostra mais sai na próxima gravação.
+  guardarFoto(dados, tipo, em = Date.now()) {
+    const id = randomBytes(16).toString('base64url');
+    this.db.prepare('INSERT INTO avisos_fotos (id, tipo, dados, em) VALUES (?, ?, ?, ?)').run(id, tipo, dados, em);
+    this.db.prepare("DELETE FROM avisos_fotos WHERE em < ? AND id NOT IN (SELECT foto FROM push_caixa WHERE foto <> '')").run(em - 90 * 864e5);
+    return id;
+  }
+
+  foto(id) {
+    if (!/^[\w-]{22}$/.test(String(id || ''))) return null;
+    return this.db.prepare('SELECT tipo, dados FROM avisos_fotos WHERE id = ?').get(id) || null;
+  }
+
+  anotarAvisoAdmin(r) {
+    this.db.prepare('INSERT INTO avisos_admin (id, de, publico, titulo, corpo, url, foto, pessoas, dia, em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(r.id, r.de, r.publico, r.titulo, r.corpo, r.url, r.foto || '', r.pessoas, r.dia, r.em);
+  }
+
+  avisosParaTodosNoDia(dia) {
+    return Number(this.db.prepare("SELECT COUNT(*) AS n FROM avisos_admin WHERE publico = 'todos' AND dia = ?").get(dia).n);
+  }
+
+  ultimosAvisosAdmin(n = 5) {
+    return this.db.prepare('SELECT id, publico, titulo, pessoas, em FROM avisos_admin ORDER BY em DESC LIMIT ?').all(n).map((l) => ({ ...l }));
   }
 
   async marcarLidos(usuario) {
@@ -824,6 +914,9 @@ export class Notificacoes {
     delete this.dados.historico[usuario];
     if (this.dados.caixa) delete this.dados.caixa[usuario];
     await this.salvar();
+    // o registro dos avisos que a pessoa mandou como administradora (o item no sino de quem
+    // recebeu fica, como os outros avisos, até sair dos 60 mais recentes)
+    this.db.prepare('DELETE FROM avisos_admin WHERE de = ?').run(usuario);
   }
 }
 

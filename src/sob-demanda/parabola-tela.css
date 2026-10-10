@@ -1,0 +1,98 @@
+/* Estilo da lista (#/parabolas) e da página de cada parábola (#/parabola/<slug>), que só chega
+   com o código delas: o build o embute em parabola-tela.<resumo>.js
+   (src/sob-demanda/parabola-tela.js); o cartão do Explorar fica em src/estilo-v2/29-parabolas.css.
+   A folha do alto, a barra, o rótulo das seções e as setas vêm do 27-mapas.css. Fichas de 00-tokens.css. */
+/* ---------- a folha do alto (lista e parábola) ---------- */
+.parabola-vaga { width: 44px; }
+.parabolas-cabeca, .parabola-cabeca { display: flex; flex-direction: column; gap: 4px; }
+.parabolas-cabeca p { margin: 6px 0 0; color: var(--folha-tinta-fraca); font-size: .9375rem; line-height: 1.45; }
+.parabolas-nome { margin: 0; color: var(--folha-tinta); font-family: 'Permanent Marker', cursive; font-size: 40px; font-weight: 400; line-height: 1.05; }
+.chips-parabolas { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-parabola {
+  min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--folha-campo);
+  color: var(--folha-tinta); font: inherit; font-size: .875rem; font-weight: 700; cursor: pointer;
+}
+.chip-parabola[aria-pressed="true"] { background: var(--folha-tinta); color: var(--folha); }
+.chip-parabola:focus-visible { outline: 3px solid var(--folha-tinta); outline-offset: 2px; }
+.folha-parabolas mark, .folha-parabola mark, .lista-parabolas mark, .parabola mark {
+  padding: 1px 6px; border-radius: 6px; background: var(--folha); color: var(--folha-tinta); font-size: .8125rem; font-weight: 800; white-space: nowrap;
+}
+.folha-parabola mark { background: var(--folha-campo); }
+
+/* ---------- a lista ---------- */
+.lista-parabolas { --mapa-tinta: var(--v2-tinta-forte); --mapa-papel: var(--v2-cartao); --mapa-cheio: var(--v2-tinta); display: flex; flex-direction: column; }
+.grupo-parabolas { display: flex; flex-direction: column; gap: 10px; }
+.grupo-parabolas h2 { margin: 22px 4px 2px; color: var(--v2-tinta-forte); font-size: 1.1875rem; font-weight: 800; }
+.grupo-parabolas h2 small { display: block; margin-top: 2px; color: var(--v2-tinta-fraca); font-size: .8125rem; font-weight: 500; }
+.item-parabola {
+  display: flex; align-items: center; gap: 14px; padding: 12px 14px 12px 12px; border-radius: 24px;
+  background: var(--v2-cartao); color: var(--v2-tinta); text-decoration: none;
+}
+.item-parabola:hover { text-decoration: none; }
+.item-parabola .desenho { width: 58px; height: 58px; padding: 5px; border-radius: 18px; background: var(--v2-fundo); --mapa-papel: var(--v2-cartao); }
+.item-parabola-textos { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
+.item-parabola b { color: var(--v2-tinta-forte); font-size: 1rem; }
+.item-parabola-linha { color: var(--v2-tinta-fraca); font-size: .84375rem; line-height: 1.35; }
+.item-parabola-pe { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+.item-parabola > svg { flex: none; width: 18px; height: 18px; color: var(--v2-tinta-fraca); }
+.parabola-lida { display: inline-flex; align-items: center; gap: 3px; color: var(--salvia-texto); font-size: .75rem; font-weight: 800; }
+.parabola-lida svg { width: 12px; height: 12px; stroke-width: 3; }
+
+/* ---------- a folha da parábola (sai antes do resto da página) ---------- */
+.folha-parabola { --mapa-tinta: var(--folha-tinta); --mapa-papel: var(--folha-campo); --mapa-cheio: var(--folha-tinta); }
+.parabola-nome { font-size: 34px; white-space: nowrap; }
+.parabola-sub { display: flex; align-items: center; gap: 4px; margin-top: 6px; color: var(--folha-tinta-fraca); font-size: .875rem; font-weight: 700; }
+
+/* ---------- a parábola ---------- */
+.parabola-heroi.desenho { align-self: center; width: 230px; height: 178px; margin: 4px 0 2px; }
+.parabola { --mapa-tinta: var(--v2-tinta-forte); --mapa-papel: var(--v2-cartao); --mapa-cheio: var(--v2-tinta); display: flex; flex-direction: column; }
+.parabola-seta { width: 120px; height: 44px; margin: 4px auto 2px; }
+.secao-parabola { display: flex; flex-direction: column; gap: 10px; padding: 0 4px; }
+.secao-parabola .mapa-rotulo { margin: 0 0 -2px; }
+.texto-parabola { margin: 0; color: var(--v2-tinta); font-size: 1rem; line-height: 1.55; text-wrap: pretty; }
+.fala-parabola {
+  margin: 4px 0; padding: 14px 16px; border-left: 4px solid var(--salvia); border-radius: 6px 22px 22px 6px;
+  background: var(--v2-cartao); color: var(--v2-tinta-forte); font-family: var(--fonte-biblia); font-size: 1.0625rem; line-height: 1.5;
+}
+.fala-parabola mark { font-family: var(--fonte-ui); }
+.itens-parabola { display: grid; grid-template-columns: repeat(var(--colunas, 3), minmax(0, 1fr)); gap: 8px; margin: 2px -4px; }
+.item-cena { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 6px; border-radius: 22px; background: var(--v2-cartao); text-align: center; }
+.item-cena .desenho { width: 62px; height: 62px; }
+.item-cena b { color: var(--v2-tinta-forte); font-size: .84375rem; line-height: 1.25; }
+.item-cena > span:not(.desenho) { color: var(--v2-tinta-fraca); font-family: var(--fonte-biblia); font-size: .75rem; line-height: 1.35; hyphens: none; overflow-wrap: normal; }
+/* "vê-lo", "experimentá-las": a palavra com hífen não quebra no hífen */
+.sem-quebra { white-space: nowrap; }
+.dizendo-parabola {
+  display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; border: 2px dashed var(--v2-tinta-forte);
+  border-radius: var(--raio-cartao); background: var(--v2-cartao);
+}
+.dizendo-texto { margin: 0; color: var(--v2-tinta-forte); font-family: var(--fonte-biblia); font-size: 1.25rem; font-weight: 700; line-height: 1.42; text-wrap: pretty; }
+.dizendo-apoio { margin: 0; color: var(--v2-tinta-fraca); font-size: .90625rem; line-height: 1.5; }
+.pensar-parabola { margin: 24px 4px 4px; color: var(--v2-tinta-forte); font-size: 1.0625rem; font-weight: 800; }
+.perguntas-parabola { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: pergunta; }
+.perguntas-parabola li {
+  display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; border-radius: 20px; background: var(--v2-cartao);
+  color: var(--v2-tinta-forte); font-size: .96875rem; font-weight: 600; line-height: 1.45; counter-increment: pergunta;
+}
+.perguntas-parabola li::before {
+  content: counter(pergunta); display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; font-weight: 800;
+}
+.parecida-parabola {
+  display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 12px 16px 12px 12px; border-radius: 22px;
+  background: var(--salvia-palido); color: var(--v2-tinta); text-decoration: none; --mapa-papel: var(--v2-cartao);
+}
+.parecida-parabola .desenho { width: 44px; height: 44px; }
+.parecida-parabola > span:not(.desenho) { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.parecida-parabola b { color: var(--v2-tinta-forte); font-size: .9375rem; line-height: 1.3; }
+.parecida-parabola small { color: var(--v2-tinta-fraca); font-size: .8125rem; }
+/* a seta do cartão que leva a outra parábola: tamanho fixo, e o texto fica com o resto */
+.parecida-parabola > svg { flex: none; width: 20px; height: 20px; color: var(--v2-tinta-fraca); }
+.parabola-ler { margin-top: 20px; }
+.parabola-fim { display: block; height: 1px; }
+
+
+@media (max-width: 374px) {
+  .parabolas-nome { font-size: 34px; }
+  .item-cena b { font-size: .78125rem; }
+}

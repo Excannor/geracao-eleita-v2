@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- um feixe de cevada (Rt 2.15-17): as hastes amarradas no meio por uma faixa em sálvia, as espigas abertas em leque com as barbas compridas da cevada. A faixa vai por cima das hastes e esconde o cruzamento. -->
+<path class="k" d="M30 104.5H90"/>
+<path class="k" d="M42 104L55.5 68L33 48M48 104L57 68L42 42M54 104L58.5 68L51 38M60 104L60 68L60 36M66 104L61.5 68L69 38M72 104L63 68L78 42M78 104L64.5 68L87 48"/>
+<ellipse class="k p" cx="26.3" cy="42" rx="3.6" ry="10" transform="rotate(-48.4 26.3 42)"/>
+<ellipse class="k p" cx="37.5" cy="34.2" rx="3.6" ry="10" transform="rotate(-30 37.5 34.2)"/>
+<ellipse class="k p" cx="48.8" cy="29.3" rx="3.6" ry="10" transform="rotate(-14 48.8 29.3)"/>
+<ellipse class="k p" cx="60" cy="27" rx="3.6" ry="10" transform="rotate(0 60 27)"/>
+<ellipse class="k p" cx="71.2" cy="29.3" rx="3.6" ry="10" transform="rotate(14 71.2 29.3)"/>
+<ellipse class="k p" cx="82.5" cy="34.2" rx="3.6" ry="10" transform="rotate(30 82.5 34.2)"/>
+<ellipse class="k p" cx="93.7" cy="42" rx="3.6" ry="10" transform="rotate(48.4 93.7 42)"/>
+<path class="h" d="M32 43.1L28.5 44L28 47.6M28.3 39.8L24.8 40.7L24.3 44.3M24.5 36.5L21 37.4L20.5 40.9M18.8 35.4L7.7 28.6M18.8 35.4L9.1 26.7M18.8 35.4L10.8 25.1M42.6 37L39 36.8L37.4 40M40.1 32.7L36.5 32.5L34.9 35.7M37.6 28.4L34 28.1L32.4 31.4M32.5 25.5L24.1 15.6M32.5 25.5L26 14.3M32.5 25.5L28.1 13.3M52.9 33.4L49.5 32.2L47.1 34.8M51.7 28.5L48.3 27.3L45.9 30M50.5 23.7L47.1 22.5L44.7 25.1M46.4 19.6L41 7.7M46.4 19.6L43.2 7M46.4 19.6L45.5 6.6M63 32L60 30L57 32M63 27L60 25L57 27M63 22L60 20L57 22M60 17L57.7 4.2M60 17L60 4M60 17L62.3 4.2M72.9 34.8L70.5 32.2L67.1 33.4M74.1 30L71.7 27.3L68.3 28.5M75.3 25.1L72.9 22.5L69.5 23.7M73.6 19.6L74.5 6.6M73.6 19.6L76.8 7M73.6 19.6L79 7.7M82.6 40L81 36.8L77.4 37M85.1 35.7L83.5 32.5L79.9 32.7M87.6 31.4L86 28.1L82.4 28.4M87.5 25.5L91.9 13.3M87.5 25.5L94 14.3M87.5 25.5L95.9 15.6M92 47.6L91.5 44L88 43.1M95.7 44.3L95.2 40.7L91.7 39.8M99.5 40.9L99 37.4L95.5 36.5M101.2 35.4L109.2 25.1M101.2 35.4L110.9 26.7M101.2 35.4L112.3 28.6"/>
+<path class="k s" d="M51.5 63C56 65.5 64 65.5 68.5 63L69 72C64 75 56 75 51 72Z"/>
+</svg>

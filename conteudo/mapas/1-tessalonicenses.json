@@ -1,0 +1,244 @@
+{
+  "nome": "1 Tessalonicenses",
+  "grupo": "Cartas de Paulo",
+  "numero": 52,
+  "capitulos": 5,
+  "significado": {
+    "lingua": "grego",
+    "original": "Θεσσαλονικεῖς",
+    "transliteracao": "Thessalonikeis",
+    "traducao": "os tessalonicenses",
+    "texto": "Thessalonikeis quer dizer os tessalonicenses, os moradores de Tessalônica, uma cidade da Macedônia. A carta vai para a igreja dessa cidade."
+  },
+  "autoria": {
+    "texto": "Paulo, Silas e Timóteo escrevem juntos à igreja de Tessalônica.",
+    "apoio": "No fim, Paulo pede em nome do Senhor que a carta seja lida para todos os irmãos.",
+    "refs": [
+      "1Ts 1.1",
+      "1Ts 5.27"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Paulo fala de Jesus por três semanas na sinagoga de Tessalônica, e muita gente crê. Logo os irmãos fazem Paulo e Silas sair de noite para Bereia. Paulo fica com saudade e preocupado com a igreja nova. Quando Timóteo volta com boas notícias da fé e do amor dos irmãos, ele escreve esta carta.",
+    "refs": [
+      "At 17.2-4",
+      "At 17.10",
+      "1Ts 3.6"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Exemplo",
+      "sub": "Dos ídolos para o Deus vivo",
+      "desenho": "rolo-aberto",
+      "galhos": [
+        {
+          "texto": "O autor e os companheiros agradecem a Deus pelos irmãos e lembram do trabalho que vem da fé, do esforço que vem do amor e da paciência que vem da esperança em Jesus.",
+          "ref": "1Ts 1.2-3"
+        },
+        {
+          "texto": "Quando o evangelho chega até eles, os irmãos escutam com interesse, e o Espírito Santo dá a eles a certeza de que é verdade. Eles recebem a mensagem com alegria, mesmo sofrendo.",
+          "ref": "1Ts 1.5-6"
+        },
+        {
+          "texto": "Os irmãos viram exemplo para os cristãos da Macedônia e da Acaia. Por toda parte, gente conta da fé deles em Deus.",
+          "ref": "1Ts 1.7-8"
+        },
+        {
+          "texto": "As pessoas contam como os irmãos deixaram os ídolos e agora servem só ao Deus vivo e verdadeiro.",
+          "ref": "1Ts 1.9"
+        }
+      ],
+      "conexao": "Os irmãos sabem como foi valiosa aquela primeira visita (1Ts 2.1)."
+    },
+    {
+      "titulo": "Como mãe e pai",
+      "sub": "O jeito da primeira visita",
+      "desenho": "lamparina-acesa",
+      "galhos": [
+        {
+          "texto": "Pouco antes, em Filipos, o grupo apanhou e foi insultado. Mesmo assim, Deus dá coragem a eles para anunciar o evangelho lá, no meio de muita luta.",
+          "ref": "1Ts 2.2"
+        },
+        {
+          "texto": "Eles não usam bajulação nem fingem amizade por dinheiro. Falam para agradar a Deus, que conhece o coração.",
+          "ref": "1Ts 2.4-5"
+        },
+        {
+          "texto": "No meio dos irmãos, eles são amáveis como uma mãe que alimenta e cuida dos filhos. Eles dão a mensagem de Deus e também a vida deles.",
+          "ref": "1Ts 2.7-8"
+        },
+        {
+          "texto": "O grupo trabalha noite e dia para ganhar o sustento e não pesar para ninguém enquanto prega o evangelho.",
+          "ref": "1Ts 2.9"
+        },
+        {
+          "texto": "Eles tratam cada irmão como um pai trata os filhos e animam todos a viver de um jeito digno de Deus.",
+          "ref": "1Ts 2.11-12"
+        },
+        {
+          "texto": "Os irmãos recebem a mensagem como palavra de Deus, e não de homens. Depois sofrem perseguição do próprio povo deles, como as igrejas da Judeia sofreram.",
+          "ref": "1Ts 2.13-14"
+        }
+      ],
+      "conexao": "Longe dos irmãos, o grupo quer de todo jeito voltar para ver todos de novo (1Ts 2.17)."
+    },
+    {
+      "titulo": "Saudade",
+      "sub": "Timóteo traz boas notícias",
+      "desenho": "sandalia",
+      "galhos": [
+        {
+          "texto": "Paulo tenta ir mais de uma vez, e Satanás impede. Os irmãos são a alegria e a coroa dele quando Jesus voltar.",
+          "ref": "1Ts 2.18-19"
+        },
+        {
+          "texto": "Quando não aguentam mais de saudade, o autor e os companheiros ficam sozinhos em Atenas e mandam Timóteo animar a fé dos irmãos.",
+          "ref": "1Ts 3.1-2"
+        },
+        {
+          "texto": "Ainda com os irmãos, eles avisaram que o sofrimento ia chegar, e chegou.",
+          "ref": "1Ts 3.4"
+        },
+        {
+          "texto": "As boas notícias consolam o grupo no meio do sofrimento. Eles aguentam qualquer coisa enquanto souberem que os irmãos estão firmes no Senhor.",
+          "ref": "1Ts 3.7-8"
+        },
+        {
+          "texto": "Noite e dia eles oram para ver os irmãos de novo e completar o que ainda falta na fé deles.",
+          "ref": "1Ts 3.10"
+        },
+        {
+          "texto": "O autor pede que o Senhor faça o amor dos irmãos crescer e transbordar, uns pelos outros e por todo mundo.",
+          "ref": "1Ts 3.12"
+        }
+      ],
+      "conexao": "Os irmãos já sabem como agradar a Deus no dia a dia, e o autor pede que vivam assim cada vez mais (1Ts 4.1)."
+    },
+    {
+      "titulo": "Vida santa",
+      "sub": "Amar e trabalhar em paz",
+      "desenho": "cesto-de-colheita",
+      "galhos": [
+        {
+          "texto": "Deus quer que os irmãos sejam santos e fiquem longe do pecado sexual. Cada um aprende a cuidar do corpo com honra.",
+          "ref": "1Ts 4.3-4"
+        },
+        {
+          "texto": "Ninguém precisa ensinar os irmãos a amar, porque Deus está ensinando. O amor deles já chega a toda a Macedônia, e o autor pede que amem mais ainda.",
+          "ref": "1Ts 4.9-10"
+        },
+        {
+          "texto": "Cada um procura levar uma vida tranquila e cuidar do trabalho dele. Assim, quem é de fora confia neles, e ninguém precisa viver à custa dos outros.",
+          "ref": "1Ts 4.11-12"
+        }
+      ],
+      "conexao": "O autor quer que os irmãos saibam o que acontece com quem crê e morre (1Ts 4.13)."
+    },
+    {
+      "titulo": "A esperança",
+      "sub": "Os que morreram vão viver",
+      "desenho": "corneta-de-chifre",
+      "galhos": [
+        {
+          "texto": "Os irmãos não precisam ficar tristes como quem não tem esperança. Jesus morreu e voltou à vida, e quando ele voltar, Deus vai trazer com ele os irmãos que já morreram.",
+          "ref": "1Ts 4.13-14"
+        },
+        {
+          "texto": "O Senhor vai descer do céu com o toque da trombeta de Deus, e os mortos em Cristo vão ressuscitar primeiro. Os que estiverem vivos vão encontrar o Senhor nos ares e ficar com ele para sempre.",
+          "ref": "1Ts 4.16-17"
+        },
+        {
+          "texto": "Com essas palavras, os irmãos podem consolar uns aos outros.",
+          "ref": "1Ts 4.18"
+        },
+        {
+          "texto": "Ninguém precisa perguntar quando vai ser. O dia do Senhor chega sem aviso, como um ladrão de noite.",
+          "ref": "1Ts 5.1-2"
+        },
+        {
+          "texto": "Os irmãos são filhos da luz e do dia. Eles ficam acordados e atentos, e não dormem como os outros.",
+          "ref": "1Ts 5.5-6"
+        },
+        {
+          "texto": "Quem é do dia veste a fé e o amor como couraça e põe a esperança da salvação como capacete.",
+          "ref": "1Ts 5.8"
+        }
+      ],
+      "jesus": {
+        "texto": "Deus não escolheu os irmãos para a ira, mas para a salvação, por nosso Senhor Jesus Cristo. Jesus morreu por eles, para que vivam com ele para sempre, vivos ou mortos.",
+        "refs": [
+          "1Ts 5.9-10"
+        ]
+      },
+      "conexao": "Por isso os irmãos animam uns aos outros, como já estão fazendo (1Ts 5.11)."
+    },
+    {
+      "titulo": "Sempre",
+      "sub": "Alegria, oração e gratidão",
+      "desenho": "lira",
+      "galhos": [
+        {
+          "texto": "O autor pede que os irmãos respeitem e amem quem trabalha guiando a igreja, e que vivam em paz uns com os outros.",
+          "ref": "1Ts 5.12-13"
+        },
+        {
+          "texto": "Os irmãos chamam a atenção de quem anda sem fazer nada, consolam quem tem medo e cuidam dos fracos. Ninguém paga o mal com o mal.",
+          "ref": "1Ts 5.14-15"
+        },
+        {
+          "texto": "O pedido cabe em três frases curtas: “Estejam sempre alegres. Permaneçam sempre em oração. Estejam sempre agradecidos”.",
+          "ref": "1Ts 5.16-18"
+        },
+        {
+          "texto": "Ninguém abafa o Espírito Santo nem zomba de quem profetiza. Os irmãos põem tudo à prova e ficam com o que é bom.",
+          "ref": "1Ts 5.19-21"
+        },
+        {
+          "texto": "O Deus da paz guarda o espírito, a alma e o corpo dos irmãos até Jesus Cristo voltar. Quem chama os irmãos é fiel e vai cumprir o que prometeu.",
+          "ref": "1Ts 5.23-24"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Os irmãos esperam o Filho de Deus voltar do céu. É Jesus, que Deus ressuscitou dos mortos e que livra da ira que vai chegar.",
+    "ref": "1Ts 1.10",
+    "desenho": "tumulo-aberto",
+    "pares": [
+      {
+        "at": "Is 54.13",
+        "texto": "Todos os seus filhos serão ensinados pelo Senhor",
+        "nt": "1Ts 4.9",
+        "nota": "Os irmãos não precisam de aula sobre o amor, porque Deus mesmo ensina cada um a amar"
+      },
+      {
+        "at": "Jr 6.14",
+        "texto": "dizendo: ‘Paz, paz’, quando a guerra se aproxima rapidamente.",
+        "nt": "1Ts 5.3",
+        "nota": "Quando o povo estiver dizendo que tudo está em paz, o desastre chega de repente, como as dores de parto"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Uma igreja que virou exemplo", "de": 1, "ate": 1 },
+    { "titulo": "Saudade dos irmãos", "de": 2, "ate": 3 },
+    { "titulo": "Vida santa e a volta de Jesus", "de": 4, "ate": 4 },
+    { "titulo": "Filhos do dia", "de": 5, "ate": 5 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O autor mandou Timóteo também por medo de que o tentador tivesse afastado os irmãos da fé.",
+      "ref": "1Ts 3.5"
+    },
+    {
+      "texto": "A carta termina pedindo que os irmãos se cumprimentem com um beijo santo.",
+      "ref": "1Ts 5.26"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a volta do Senhor Jesus. Ela aparece no fim de cada capítulo, cada vez de um jeito.",
+    "ref": "1Ts 3.13"
+  }
+}

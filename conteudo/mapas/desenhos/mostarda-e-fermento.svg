@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o grão de mostarda e o fermento (Lc 13.18-21): à esquerda, a árvore que nasceu da semente pequena, com o ninho no galho e a sementinha no chão; à direita, a tigela com a massa que cresceu com o fermento (o mesmo desenho de massa-na-tigela, menor). Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A copa e a tigela são as áreas sálvia. -->
+<path class="k" d="M4 112H156"/>
+<g transform="translate(-4 6)">
+<path class="k" d="M54 106C56 92 54 82 46 72M66 106C64 92 66 82 74 70M60 92V70"/>
+<path class="k s" d="M24 64C14 60 16 44 28 44C28 30 44 24 54 32C60 20 80 22 82 34C96 32 104 46 96 56C104 64 96 76 84 72C78 80 62 80 56 72C46 80 30 76 24 64Z"/>
+<path class="h" d="M36 52C42 48 48 50 50 54M64 40C70 36 76 38 78 42M44 66C50 62 56 64 58 68"/>
+<path class="k p" d="M74 58C74 68 94 68 94 58Z"/>
+<path class="h" d="M76 62H92M78 65H90"/>
+<circle class="k p" cx="86" cy="52" r="4.5"/>
+<path class="k" d="M90 51L95 53L90 54"/>
+<path class="k" d="M24 16c3-4 7-4 9 0c2-4 6-4 9 0"/>
+</g>
+<ellipse class="e" cx="20" cy="109" rx="2.5" ry="1.8"/>
+<g transform="translate(96 40) scale(.58)">
+<path class="k p" d="M18 60C14 48 24 42 32 44C34 32 48 28 58 33C66 25 84 28 86 40C96 38 106 48 102 60Z"/>
+<path class="h" d="M44 44a3 3 0 1 0 0.1 0M66 40a2.5 2.5 0 1 0 0.1 0M80 48a3 3 0 1 0 0.1 0M56 48a2 2 0 1 0 0.1 0M30 51a2 2 0 1 0 0.1 0"/>
+<path class="k s" d="M14 58H106C106 80 88 96 60 96S14 80 14 58Z"/>
+<path class="k p" d="M14 58C14 54 106 54 106 58C106 62 14 62 14 58Z"/>
+<path class="k" d="M44 96L42 102H78L76 96"/>
+</g>
+</svg>

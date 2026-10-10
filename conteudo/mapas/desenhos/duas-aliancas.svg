@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o casamento (Lc 14.20): duas alianças entrelaçadas, uma em papel e outra em sálvia, com três risquinhos de brilho. Um pedaço da primeira volta por cima da segunda, para as duas parecerem presas uma na outra. -->
+<path class="k p" fill-rule="evenodd" d="M26 64a22 22 0 1 0 44 0a22 22 0 1 0-44 0ZM33 64a15 15 0 1 0 30 0a15 15 0 1 0-30 0Z"/>
+<path class="k s" fill-rule="evenodd" d="M52 60a22 22 0 1 0 44 0a22 22 0 1 0-44 0ZM59 60a15 15 0 1 0 30 0a15 15 0 1 0-30 0Z"/>
+<path class="k p" d="M59 45A22 22 0 0 1 70 64H63A15 15 0 0 0 55.5 51Z"/>
+<path class="h" d="M30 30l-5-5M92 32l5-5M61 22V15"/>
+</svg>

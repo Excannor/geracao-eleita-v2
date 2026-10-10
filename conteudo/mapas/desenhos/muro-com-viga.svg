@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a parede do templo reconstruído, com três fileiras de pedras enormes e uma carreira de madeira por cima (Ed 6.4): pedras de quina em fileiras desencontradas e a viga em sálvia com os veios. O chão vai antes. -->
+<path class="k" d="M4 99C40 97 80 97 116 99"/>
+<path class="k p" d="M14 80H44L46 82V96L44 98H14L12 96V82Z"/>
+<path class="k p" d="M48 80H78L80 82V96L78 98H48L46 96V82Z"/>
+<path class="k p" d="M82 80H106L108 82V96L106 98H82L80 96V82Z"/>
+<path class="k p" d="M14 62H30L32 64V78L30 80H14L12 78V64Z"/>
+<path class="k p" d="M34 62H68L70 64V78L68 80H34L32 78V64Z"/>
+<path class="k p" d="M72 62H106L108 64V78L106 80H72L70 78V64Z"/>
+<path class="k p" d="M14 44H50L52 46V60L50 62H14L12 60V46Z"/>
+<path class="k p" d="M54 44H84L86 46V60L84 62H54L52 60V46Z"/>
+<path class="k p" d="M88 44H106L108 46V60L106 62H88L86 60V46Z"/>
+<path class="k s" d="M8 34H112V44H8Z"/>
+<path class="h" d="M16 38H40M48 40H76M84 38H104M24 41H32M88 41H98"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a taça de vinho que Neemias, o copeiro, serve ao rei (Ne 2.1): o bojo largo com o vinho em sálvia, a haste com um nó e o pé redondo. O chão vai antes. -->
+<path class="k" d="M20 100C44 98 76 98 100 100"/>
+<path class="k p" d="M32 26H88C88 50 76 64 60 64C44 64 32 50 32 26Z"/>
+<path class="k s" d="M35 38H85C82 52 72 60 60 60C48 60 38 52 35 38Z"/>
+<ellipse class="k p" cx="60" cy="26" rx="28" ry="4"/>
+<path class="k p" d="M56 64H64V86H56Z"/>
+<ellipse class="k p" cx="60" cy="74" rx="6" ry="3"/>
+<path class="k p" d="M42 98C42 90 50 86 60 86C70 86 78 90 78 98Z"/>
+</svg>

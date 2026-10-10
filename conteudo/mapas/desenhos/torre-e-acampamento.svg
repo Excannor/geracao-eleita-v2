@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a torre e o rei em guerra (Lc 14.28-32): à esquerda, a torre parada pela metade, com o andaime vazio e a pilha de pedras; à direita, longe, o acampamento de um exército, com as tendas e as bandeiras. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A pilha de pedras é a única área sálvia. -->
+<path class="k" d="M2 108H158"/>
+<g transform="translate(-14 4)">
+<path class="k p" d="M30 104V62H70V104Z"/>
+<path class="h" d="M30 74H70M30 86H70M30 98H70M40 62V74M60 62V74M50 74V86M40 86V98M60 86V98"/>
+<path class="k p" d="M30 62V58H44V62ZM44 62V60H56V62Z"/>
+<path class="h" d="M24 36H76"/>
+<path class="k" d="M24 104V36M76 104V36M22 46H78M22 70H28M72 70H78"/>
+<path class="k s" d="M80 104H100V94H80Z"/>
+<path class="h" d="M80 99H100M90 94V104"/>
+</g>
+<path class="k p" d="M100 108L114 80L128 108Z"/>
+<path class="k p" d="M124 108L136 86L148 108Z"/>
+<path class="k p" d="M140 108L150 90L158 108Z"/>
+<path class="h" d="M114 108V94M136 108V96"/>
+<path class="k" d="M114 80V64M136 86V72"/>
+<path class="k p" d="M114 64H126L122 68L126 72H114Z"/>
+<path class="k p" d="M136 72H146L143 75L146 78H136Z"/>
+</svg>

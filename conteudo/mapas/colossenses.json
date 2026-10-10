@@ -1,0 +1,233 @@
+{
+  "nome": "Colossenses",
+  "grupo": "Cartas de Paulo",
+  "numero": 51,
+  "capitulos": 4,
+  "significado": {
+    "lingua": "grego",
+    "original": "Κολοσσαεῖς",
+    "transliteracao": "Kolossaeis",
+    "traducao": "os colossenses",
+    "texto": "Kolossaeis quer dizer os colossenses, os moradores de Colossos. A carta vai para os irmãos dessa cidade, vizinha de Laodiceia."
+  },
+  "autoria": {
+    "texto": "Paulo, apóstolo de Cristo Jesus, escreve junto com o irmão Timóteo aos santos e fiéis irmãos em Cristo da cidade de Colossos.",
+    "apoio": "No fim, ele escreve a saudação com a mão dele e pede que os irmãos se lembrem dele na prisão.",
+    "refs": [
+      "Cl 1.1-2",
+      "Cl 4.18"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Epafras leva o evangelho a Colossos e depois conta a Paulo do amor daquela igreja. Paulo nunca esteve com esses irmãos. Ele escreve porque alguém pode enganar a igreja com palavras bonitas. Na carta, ele mostra que tudo o que os irmãos precisam eles já têm em Cristo.",
+    "refs": [
+      "Cl 1.7-8",
+      "Cl 1.23",
+      "Cl 2.1",
+      "Cl 2.4",
+      "Cl 2.10"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Fruto",
+      "sub": "O evangelho cresce no mundo",
+      "desenho": "vinha",
+      "galhos": [
+        {
+          "texto": "O autor ouviu falar da fé dos irmãos em Cristo Jesus e do amor deles pelo povo de Deus. O mesmo evangelho que mudou a vida deles está dando fruto no mundo todo.",
+          "ref": "Cl 1.4-6"
+        },
+        {
+          "texto": "Desde que soube dos irmãos, o autor não para de orar por eles. Ele pede que Deus mostre a eles o que ele quer e que a vida deles agrade ao Senhor.",
+          "ref": "Cl 1.9-10"
+        },
+        {
+          "texto": "Ele ora para que os irmãos sejam cheios da força de Deus e continuem com paciência e alegria, sempre agradecidos ao Pai.",
+          "ref": "Cl 1.11-12"
+        },
+        {
+          "texto": "Deus tira os irmãos das trevas e leva todos para o reino do seu Filho amado, que comprou a liberdade deles com o sangue e perdoou os pecados.",
+          "ref": "Cl 1.13-14"
+        }
+      ],
+      "conexao": "O Filho amado é a imagem perfeita do Deus que ninguém vê (Cl 1.15)."
+    },
+    {
+      "titulo": "O primeiro",
+      "sub": "Cristo está acima de todos",
+      "desenho": "sol-e-lua",
+      "galhos": [
+        {
+          "texto": "Deus quis que a plenitude morasse no Filho. Pela morte de Cristo na cruz, Deus faz as pazes com todas as coisas, no céu e na terra.",
+          "ref": "Cl 1.19-20"
+        },
+        {
+          "texto": "Antes, os irmãos eram inimigos de Deus, pelo que pensavam e faziam. Agora Cristo, pela morte dele, faz deles amigos de Deus, sem nenhuma acusação.",
+          "ref": "Cl 1.21-22"
+        },
+        {
+          "texto": "O autor sofre pela igreja e fica alegre com isso. Ele completa no corpo dele o que falta dos sofrimentos de Cristo pelo corpo, que é a igreja.",
+          "ref": "Cl 1.24"
+        },
+        {
+          "texto": "Deus guardou um mistério por séculos e agora revela aos que amam a ele. Cristo no coração de quem crê é a esperança da glória, também para os gentios.",
+          "ref": "Cl 1.26-27"
+        },
+        {
+          "texto": "Aonde vai, o autor fala de Cristo a todo mundo e ensina com sabedoria. Ele trabalha com a força que Cristo põe nele.",
+          "ref": "Cl 1.28-29"
+        }
+      ],
+      "jesus": {
+        "texto": "Tudo foi criado pelo Filho e para ele, no céu e na terra. Ele existia antes de tudo e sustenta todas as coisas. Jesus é a cabeça da igreja e o primeiro a ressuscitar dos mortos.",
+        "refs": [
+          "Cl 1.16-18"
+        ]
+      },
+      "conexao": "Em Cristo estão escondidos todos os tesouros da sabedoria e do conhecimento (Cl 2.3)."
+    },
+    {
+      "titulo": "Raízes",
+      "sub": "Firmes em Cristo, e não em regras",
+      "desenho": "arvore-com-raizes",
+      "galhos": [
+        {
+          "texto": "O autor pede que os irmãos continuem vivendo em Cristo Jesus como receberam. As raízes deles vão fundo nele, e a vida transborda de gratidão.",
+          "ref": "Cl 2.6-7"
+        },
+        {
+          "texto": "Ninguém deve estragar a fé dos irmãos com filosofias vazias, feitas de tradições humanas e das regras deste mundo.",
+          "ref": "Cl 2.8"
+        },
+        {
+          "texto": "No batismo, a velha natureza é sepultada com Cristo. Os irmãos ressuscitam com ele para uma vida nova, porque confiam no Deus que levantou Cristo dos mortos.",
+          "ref": "Cl 2.12"
+        },
+        {
+          "texto": "Deus perdoa todos os pecados. Ele pega a lista de acusações contra os irmãos e prega essa lista na cruz de Cristo.",
+          "ref": "Cl 2.13-14"
+        },
+        {
+          "texto": "Ninguém deve se achar melhor que os irmãos por ter visões, adorar anjos e fingir humildade. Quem faz isso não está ligado a Cristo, que é a cabeça.",
+          "ref": "Cl 2.18-19"
+        },
+        {
+          "texto": "As regras de não comer, não provar e não tocar parecem sábias. Elas são ensino de gente e não seguram os maus desejos de ninguém.",
+          "ref": "Cl 2.21-23"
+        }
+      ],
+      "conexao": "Os irmãos ressuscitaram com Cristo e agora põem os olhos no céu, onde Cristo está (Cl 3.1)."
+    },
+    {
+      "titulo": "Olhos no céu",
+      "sub": "Uma vida nova em Cristo",
+      "desenho": "harpa",
+      "galhos": [
+        {
+          "texto": "A vida dos irmãos está escondida com Cristo em Deus. Quando Cristo voltar, eles vão brilhar com ele.",
+          "ref": "Cl 3.3-4"
+        },
+        {
+          "texto": "Os irmãos jogam fora a raiva, o ódio e as palavras sujas. Ninguém mente para o outro, porque a vida velha morreu.",
+          "ref": "Cl 3.8-9"
+        },
+        {
+          "texto": "Na vida nova não há diferença entre grego e judeu, bárbaro e cita, escravo e livre. O que importa é Cristo, que está em todos.",
+          "ref": "Cl 3.11"
+        },
+        {
+          "texto": "Deus escolheu os irmãos e ama cada um. Por isso eles têm compaixão, bondade e paciência, e perdoam como o Senhor perdoou.",
+          "ref": "Cl 3.12-13"
+        },
+        {
+          "texto": "Acima de tudo, o amor dirige a vida da igreja, e a paz de Cristo mora no coração de cada um.",
+          "ref": "Cl 3.14-15"
+        },
+        {
+          "texto": "As palavras de Cristo enchem a vida dos irmãos. Eles ensinam uns aos outros e cantam salmos, hinos e cânticos a Deus com o coração agradecido.",
+          "ref": "Cl 3.16"
+        }
+      ],
+      "conexao": "Tudo o que os irmãos fazem ou dizem é em nome do Senhor Jesus, dando graças ao Pai (Cl 3.17)."
+    },
+    {
+      "titulo": "Os amigos",
+      "sub": "Saudações de dentro da prisão",
+      "desenho": "correntes",
+      "galhos": [
+        {
+          "texto": "O autor está preso por anunciar o mistério de Cristo. Ele pede que os irmãos orem para Deus abrir portas para o evangelho.",
+          "ref": "Cl 4.2-3"
+        },
+        {
+          "texto": "Com os de fora, os irmãos aproveitam cada chance. A conversa deles é agradável e temperada com sal.",
+          "ref": "Cl 4.5-6"
+        },
+        {
+          "texto": "Tíquico leva a carta e as notícias do autor. Com ele vai Onésimo, um irmão fiel e muito amado, que é da cidade dos colossenses.",
+          "ref": "Cl 4.7-9"
+        },
+        {
+          "texto": "Aristarco está preso com o autor e manda saudações. Marcos, primo de Barnabé, também manda, e o autor pede que a igreja receba Marcos bem se ele passar por lá.",
+          "ref": "Cl 4.10"
+        },
+        {
+          "texto": "Epafras, que é da cidade deles, ora sem parar pelos irmãos. Lucas, o médico amado, e Demas também mandam lembranças.",
+          "ref": "Cl 4.12, 14"
+        },
+        {
+          "texto": "Depois de ler a carta, os irmãos passam a carta para a igreja de Laodiceia e leem a carta que vem de lá.",
+          "ref": "Cl 4.16"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Ninguém deve julgar os irmãos pelo que comem ou bebem, nem por festas, luas novas e sábados. Essas coisas eram só sombras, e a realidade é Cristo.",
+    "ref": "Cl 2.16-17",
+    "desenho": "trono",
+    "pares": [
+      {
+        "at": "Gn 1.27",
+        "texto": "Assim Deus criou o ser humano semelhante à sua imagem",
+        "nt": "Cl 1.15",
+        "nota": "O Filho é a imagem perfeita do Deus que ninguém vê e existia antes de tudo ser criado"
+      },
+      {
+        "at": "Gn 17.11",
+        "texto": "Esta circuncisão será o sinal da aliança entre mim e você.",
+        "nt": "Cl 2.11",
+        "nota": "Em Cristo, quem crê recebe uma circuncisão que não é feita no corpo e fica livre da natureza pecadora"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Cristo primeiro em tudo", "de": 1, "ate": 1 },
+    { "titulo": "Firmes em Cristo, e não em regras", "de": 2, "ate": 2 },
+    { "titulo": "A vida nova, em casa e no trabalho", "de": 3, "ate": 3 },
+    { "titulo": "Oração e saudações", "de": 4, "ate": 4 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O autor diz que, mesmo longe, o coração dele está com os irmãos, feliz por ver a fé firme que eles têm em Cristo.",
+      "ref": "Cl 2.5"
+    },
+    {
+      "texto": "Um dos amigos do autor se chama Jesus, e o apelido dele é Justo.",
+      "ref": "Cl 4.11"
+    },
+    {
+      "texto": "Uma igreja se reúne na casa de Ninfa, e o autor manda saudações para ela e para os irmãos de Laodiceia.",
+      "ref": "Cl 4.15"
+    },
+    {
+      "texto": "O autor manda um recado para Arquipo: “Não deixe de fazer tudo quanto o Senhor lhe mandou fazer”.",
+      "ref": "Cl 4.17"
+    }
+  ],
+  "procure": {
+    "texto": "Procure as palavras tudo e todas. Cristo criou todas as coisas, sustenta tudo e é o primeiro em tudo."
+  }
+}

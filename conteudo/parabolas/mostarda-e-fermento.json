@@ -1,0 +1,86 @@
+{
+  "titulo": "O grão de mostarda e o fermento",
+  "ref": "Lc 13.18-21",
+  "grupo": "lucas",
+  "linha": "Uma semente pequena e um pouco de fermento",
+  "desenho": "mostarda-e-fermento",
+  "desenhoLista": "arvore-com-ninho",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Num sábado, Jesus está ensinando numa sinagoga e cura uma mulher que andava encurvada havia dezoito anos. Ela se endireita e começa a louvar a Deus.",
+          "ref": "Lc 13.10-13"
+        },
+        {
+          "texto": "O chefe da sinagoga fica indignado porque Jesus curou no sábado. Jesus responde, e o povo se alegra com o que ele faz.",
+          "ref": "Lc 13.14-17"
+        },
+        {
+          "texto": "Jesus ensina de novo sobre o Reino de Deus e faz uma pergunta.",
+          "ref": "Lc 13.18"
+        },
+        {
+          "fala": "Com que se parece o Reino?",
+          "ref": "Lc 13.18"
+        }
+      ]
+    },
+    {
+      "titulo": "As duas comparações",
+      "icone": "broto",
+      "blocos": [
+        {
+          "texto": "Jesus responde com duas coisas pequenas, uma da horta e outra da cozinha.",
+          "ref": "Lc 13.19-21"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "arvore-com-ninho",
+              "titulo": "O grão de mostarda",
+              "fala": "as aves fazem seus ninhos em seus ramos",
+              "ref": "Lc 13.19"
+            },
+            {
+              "desenho": "massa-na-tigela",
+              "titulo": "O fermento",
+              "fala": "até que o fermento se espalhe por toda a massa",
+              "ref": "Lc 13.21"
+            }
+          ]
+        },
+        {
+          "texto": "Alguém planta uma semente pequena de mostarda na horta, e ela vira uma árvore onde as aves fazem ninho.",
+          "ref": "Lc 13.19"
+        },
+        {
+          "texto": "Uma mulher mistura o fermento em três medidas de farinha até ele passar pela massa inteira.",
+          "ref": "Lc 13.20-21"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O Reino de Deus começa pequeno e quase escondido, como a semente na terra e o fermento na massa. Depois ele cresce até chegar em tudo. Naquele sábado, Jesus mostra isso numa mulher encurvada que volta a ficar de pé.",
+    "ref": "Lc 13.18-21"
+  },
+  "perguntas": [
+    "Que coisa pequena Deus está fazendo crescer em você agora?",
+    "Onde você pode ser fermento nesta semana, sem precisar aparecer?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 13.31-33",
+      "titulo": "O grão de mostarda e o fermento",
+      "linha": "a menor semente vira a maior planta"
+    },
+    {
+      "ref": "Mc 4.30-32",
+      "titulo": "O grão de mostarda",
+      "linha": "só a semente, sem o fermento"
+    }
+  ]
+}

@@ -114,6 +114,22 @@
         'A igreja de longe e cada célula de perto, como nesta tela. O PDF abre numa página nova com o "Salvar como PDF" do navegador.');
   }
 
+  // ---------- liderança de menor de 18 (api/painel/liderancas) ----------
+  // Quem tem menos de 18 anos só lidera ou auxilia uma célula depois desta aprovação; até lá,
+  // não vê o painel com nomes dos membros. Fica gravado quem decidiu e quando.
+  const PAPEL = { lider: 'Quer liderar a célula', auxiliar: 'Marcado como auxiliar da célula' };
+  function blocoAprovacoes(l) {
+    if (!l) return '';
+    const lista = l.pendentes || [];
+    return grupo('Liderança aguardando aprovação', lista.length
+      ? lista.map((x, i) => '<div class="linha-config sem-toque painel-aprovacao" data-aprovacao="' + i + '"><span>' + CC.esc(x.nome) + ' (@' + CC.esc(x.usuario) + '), ' + x.idade + ' anos'
+        + '<small>' + PAPEL[x.papel] + ' "' + CC.esc(x.titulo) + '" · ' + CC.plural(x.membros, 'pessoa', 'pessoas') + ' · desde ' + CC.esc(quando(x.pedidoEm)) + '</small></span>'
+        + '<div class="pe-duplo-plano"><button class="botao pequeno" data-decidir="' + i + '" data-aprovar="sim">Aprovar</button>'
+        + '<button class="botao plano pequeno" data-decidir="' + i + '" data-aprovar="nao">Recusar</button></div></div>').join('')
+      : '<div class="linha-config sem-toque"><span>Nenhum pedido agora</span></div>',
+    'Quem tem menos de 18 anos só lidera ou auxilia uma célula com a aprovação da liderança. Até lá, não vê o painel com os nomes dos membros. Recusar a liderança encerra a célula; recusar o auxiliar só tira o papel. Fica registrado quem decidiu e quando.');
+  }
+
   // ---------- uma célula de perto (api/painel/celula) ----------
   // O administrador abre qualquer célula e vê o que o líder dela vê (08b-propositos.js desenha
   // os mesmos blocos): a chama de cada um, a presença, o check-in somado, a caminhada e quem
@@ -139,7 +155,28 @@
     raiz.querySelectorAll('[data-voltar]').forEach((b) => { b.onclick = () => { location.hash = '#/config/painel'; }; });
   }
 
+  // Painel > Enviar aviso (#/config/painel/aviso): a tela vem de aviso-tela.<resumo>.js
+  // (src/sob-demanda/aviso-tela.js), pedida só quando o administrador a abre.
+  let pedidoTelaAviso = null;
+  function vistaAviso(raiz) {
+    if (CC.telaAviso) return CC.telaAviso(raiz);
+    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Voltar') + '<h1>Enviar aviso</h1></div>' + CC.esqueleto('cartoes');
+    CC.ligarVoltarDoTopo(raiz);
+    pedidoTelaAviso = pedidoTelaAviso || new Promise((resolver, falhar) => {
+      const s = document.createElement('script');
+      s.src = './' + window.AVISO_TELA;
+      s.onload = () => (CC.telaAviso ? resolver() : falhar(new Error('tela')));
+      s.onerror = () => { s.remove(); falhar(new Error('tela')); };
+      document.head.appendChild(s);
+    });
+    pedidoTelaAviso.then(() => { if (location.hash === '#/config/painel/aviso') CC.telaAviso(raiz); }, () => {
+      pedidoTelaAviso = null;
+      raiz.querySelector('.esqueleto').outerHTML = CC.estado({ erro: true, titulo: 'Não deu para abrir', texto: 'Pode ter sido a conexão. Tente de novo em instantes.' });
+    });
+  }
+
   CC.vistaPainel = async function (raiz, arg) {
+    if (arg === 'painel/aviso') return vistaAviso(raiz);
     if (arg && arg.startsWith('painel/celula/')) return vistaPainelCelula(raiz, arg.slice('painel/celula/'.length));
     // .folha-perfil: só apresentação, a folha do alto (25-perfil.css); o título longo desce
     // para baixo do voltar (.titulo-frase) e os quatro números viram os cartões de destaque.
@@ -147,9 +184,11 @@
     raiz.innerHTML = cabeca() + CC.esqueleto('cartoes');
     let p;
     let igreja = null;
+    let liderancas = null;
     try {
       // O painel da igreja vem junto; se falhar, o resto do painel aparece mesmo assim.
-      [p, igreja] = await Promise.all([CC.api('api/painel'), CC.api('api/painel/igreja').catch(() => null)]);
+      [p, igreja, liderancas] = await Promise.all([CC.api('api/painel'), CC.api('api/painel/igreja').catch(() => null),
+        CC.api('api/painel/liderancas').catch(() => null)]);
     } catch (e) {
       raiz.innerHTML = cabeca()
         + CC.estado({ erro: true, titulo: 'Não deu para carregar o painel', texto: e.message, acao: 'Tentar de novo' });
@@ -167,6 +206,9 @@
         + (p.retorno[1] && p.retorno[1].pct !== null ? '<div class="painel-cartao"><strong>' + p.retorno[1].pct + '%' : '<div class="painel-cartao"><strong class="texto">ainda sem dado') + '</strong><span>voltaram depois de 7 dias</span>'
         + '<small><em>' + (p.retorno[1] ? p.retorno[1].voltaram + ' de ' + p.retorno[1].elegiveis + ' contas' : '') + '</em></small></div>'
         + '</div>' : ''))
+      + grupo('Avisos', '<a class="linha-config painel-ir" href="#/config/painel/aviso">' + CC.ico('sino') + '<span>Enviar aviso</span>' + CC.ico('avancar') + '</a>',
+        'Um aviso pontual, na hora: só para você (teste) ou para todos.')
+      + blocoAprovacoes(liderancas)
       + blocosDaIgreja(igreja)
       + grupo('Senha esquecida',
         (pedidos.length
@@ -252,6 +294,31 @@
       CC.vistaPainel(raiz);
     }
     raiz.querySelectorAll('[data-link]').forEach((b) => { b.onclick = () => gerar(b.dataset.link); });
+    const pendentes = (liderancas && liderancas.pendentes) || [];
+    raiz.querySelectorAll('[data-decidir]').forEach((b) => {
+      b.onclick = async () => {
+        const x = pendentes[Number(b.dataset.decidir)];
+        const aprovar = b.dataset.aprovar === 'sim';
+        if (!x) return;
+        if (!aprovar) {
+          const certo = await CC.confirmar({
+            titulo: 'Recusar?',
+            texto: x.papel === 'lider'
+              ? 'A célula "' + x.titulo + '" é encerrada, porque ficaria sem quem a conduza. ' + x.nome + ' pode conversar com a liderança e criar outra depois.'
+              : x.nome + ' continua na célula "' + x.titulo + '", mas deixa de ser auxiliar.',
+            acao: 'Recusar',
+            perigo: true,
+          });
+          if (!certo) return;
+        }
+        b.disabled = true;
+        try {
+          await CC.api('api/painel/liderancas', { proposito: x.proposito, usuario: x.usuario, papel: x.papel, aprovar });
+          CC.avisar(aprovar ? 'Aprovado' : 'Recusado');
+        } catch (e) { CC.avisar(e.message); }
+        CC.vistaPainel(raiz);
+      };
+    });
     raiz.querySelector('[data-link-outro]').onclick = () => gerar(raiz.querySelector('#painel-usuario').value.trim().replace(/^@/, '').toLowerCase());
   };
 })(window.CC);

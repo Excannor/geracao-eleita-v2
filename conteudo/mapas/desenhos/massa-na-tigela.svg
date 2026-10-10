@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a massa que cresce (1Co 5.6): uma tigela larga com a massa estufada em calombos por cima da borda, a massa desce até abaixo da borda da frente, que a cobre; bolhas de fermento na massa e um pano dobrado ao lado; a tigela em sálvia -->
+<path class="k p" d="M18 60C14 48 24 42 32 44C34 32 48 28 58 33C66 25 84 28 86 40C96 38 106 48 102 60Z"/>
+<path class="h" d="M44 44a3 3 0 1 0 0.1 0M66 40a2.5 2.5 0 1 0 0.1 0M80 48a3 3 0 1 0 0.1 0M56 48a2 2 0 1 0 0.1 0M30 51a2 2 0 1 0 0.1 0"/>
+<path class="k s" d="M14 58H106C106 80 88 96 60 96S14 80 14 58Z"/>
+<path class="k p" d="M14 58C14 54 106 54 106 58C106 62 14 62 14 58Z"/>
+<path class="k" d="M44 96L42 102H78L76 96"/>
+</svg>

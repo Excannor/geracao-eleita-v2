@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os lugares à mesa (Lc 14.7-10): a mesa comprida da festa, com os pratos postos; na cabeceira, à esquerda, a cadeira de encosto alto do lugar de honra; na outra ponta, à direita, um banquinho baixo, o último lugar. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. O encosto da cadeira de honra é a única área sálvia. -->
+<path class="k" d="M2 106H158"/>
+<path class="k p" d="M10 78V30C10 22 30 22 30 30V78Z"/>
+<path class="k s" d="M14 74V32C14 28 26 28 26 32V74Z"/>
+<path class="k p" d="M6 78H38V86H6Z"/>
+<path class="k" d="M10 86V106M34 86V106"/>
+<path class="k p" d="M42 66H132V74H42Z"/>
+<path class="k" d="M48 74V106M126 74V106"/>
+<path class="h" d="M42 70H132"/>
+<ellipse class="k p" cx="58" cy="64" rx="8" ry="2.5"/>
+<ellipse class="k p" cx="80" cy="64" rx="8" ry="2.5"/>
+<ellipse class="k p" cx="102" cy="64" rx="8" ry="2.5"/>
+<path class="k p" d="M116 64V56H124V64Z"/>
+<path class="k p" d="M136 94H156V99H136Z"/>
+<path class="k" d="M139 99V106M153 99V106"/>
+</svg>

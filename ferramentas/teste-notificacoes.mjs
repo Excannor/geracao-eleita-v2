@@ -12,8 +12,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createECDH, createHmac, createDecipheriv, randomBytes } from 'node:crypto';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8213;
-const PORTA_PUSH = 8214;
+const PORTA = Number(process.env.PORTA) || 8213;
+const PORTA_PUSH = PORTA + 1;
 const PASTA = join(tmpdir(), 'cc-notificacoes');
 const FUSO = 'America/Sao_Paulo';
 const { TEXTOS } = await import(pathToFileURL(join(AQUI, 'notificacoes.mjs')).href);

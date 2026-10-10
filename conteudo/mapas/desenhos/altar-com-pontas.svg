@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o altar com as pontas em forma de chifre (1Rs 1.50): Adonias corre para o Tabernáculo e se agarra a elas. Quatro pontas, as de trás menores; a faixa do meio em sálvia. O chão vai primeiro. -->
+<path class="k" d="M14 100C40 98 80 98 106 100"/>
+<path class="k p" d="M50 44C50 38 44 33.2 38 32C39.5 35.6 40 40.4 40 44Z"/>
+<path class="k p" d="M70 44C70 38 76 33.2 82 32C80.5 35.6 80 40.4 80 44Z"/>
+<path class="k p" d="M34 99V50H86V99Z"/>
+<path class="k p" d="M28 44H92V50H28Z"/>
+<path class="k p" d="M38 44C38 35 32 27.8 26 26C27.5 31.4 28 38.6 28 44Z"/>
+<path class="k p" d="M82 44C82 35 88 27.8 94 26C92.5 31.4 92 38.6 92 44Z"/>
+<path class="k s" d="M34 68H86V76H34Z"/>
+<path class="h" d="M34 59H86M34 87H86M48 50V59M68 50V59M58 59V68M42 76V87M62 76V87M78 76V87M52 87V99M72 87V99"/>
+</svg>

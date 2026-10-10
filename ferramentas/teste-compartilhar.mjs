@@ -102,6 +102,19 @@ window.__png = async (arquivo) => {
   return { url: b, w: img.width, h: img.height, nome: arquivo.name, tipo: arquivo.type };
 };`;
 const guardarPng = (nome, url) => writeFileSync(join(SAIDA, nome), Buffer.from(url.split(',')[1], 'base64'));
+// Imagens de alguns MB voltam do navegador em pedaços de 1 MB: várias numa resposta só (as
+// de versículo, com o fundo de cartaz, passam de 2 MB cada) travavam o canal de depuração.
+async function imagensGrandes(expr) {
+  const nomes = await av('(async () => { window.__imgs = await (' + expr + '); return Object.keys(window.__imgs); })()');
+  const saida = {};
+  for (const nome of nomes || []) {
+    const n = await av('window.__imgs[' + JSON.stringify(nome) + '].length');
+    let s = '';
+    for (let i = 0; i < n; i += 1e6) s += await av('window.__imgs[' + JSON.stringify(nome) + '].slice(' + i + ',' + (i + 1e6) + ')');
+    saida[nome] = s;
+  }
+  return saida;
+}
 
 console.log('\n  Compartilhar em imagem de story\n');
 try {
@@ -200,9 +213,10 @@ ok(await esperar('!!document.querySelector(\'.leitor-verso[data-v="3:16"]\')', 1
 // com amigos, para o Juntos aparecer; o envio ao Juntos é simulado
 await av('CC.podeCompartilharComAmigos = () => true; window.__juntos = null; CC.compartilharVersiculo = async (ref) => { window.__juntos = ref; return true; }; true');
 await av('document.querySelector(\'.leitor-verso[data-v="3:16"]\').click()');
-ok(await esperar('!!document.querySelector(".acoes-verso [data-compartilhar-verso]")'), 'escolher João 3.16 mostra a barra com Compartilhar');
+ok(await esperar('!!document.querySelector(".acoes-verso [data-compartilhar-verso]")'), 'escolher João 3.16 mostra a barra com o Story');
 const rotulos = await av('[...document.querySelectorAll(".acoes-verso .botoes-verso .botao")].map((b) => b.textContent.trim())');
-ok(JSON.stringify(rotulos) === JSON.stringify(['Nota', 'Juntos', 'Copiar', 'Compartilhar']), 'a barra tem Nota, Juntos, Copiar e Compartilhar, sem "Imagem" (' + rotulos.join(', ') + ')');
+ok(JSON.stringify(rotulos) === JSON.stringify(['Juntos', 'Copiar', 'Story']) && await av('!!document.querySelector(".acoes-verso [data-nota-verso].escrever-nota")'),
+  'a barra tem "Escrever nota" como ação principal e, embaixo, Juntos, Copiar e Story, sem "Imagem" (' + rotulos.join(', ') + ')');
 ok(await av('!document.querySelector("[data-imagem-verso]")'), 'não sobra o botão Imagem');
 for (const largura of [390, 360]) {
   await cmd('Emulation.setDeviceMetricsOverride', { width: largura, height: 844, deviceScaleFactor: 2, mobile: true });
@@ -245,7 +259,7 @@ ok(await esperar('/Toque de novo/.test((document.getElementById("aviso-flutuante
   && await av('!!document.querySelector(".acoes-verso:not([hidden]) [data-compartilhar-verso]")'), 'se o navegador recusa, a barra fica e o aviso pede outro toque');
 await av('document.querySelector(".acoes-verso [data-compartilhar-verso]").click()');
 ok(await esperar('!!window.__compartilhado'), 'o segundo toque no versículo compartilha');
-const versos = await av(`(async () => {
+const versos = await imagensGrandes(`(async () => {
   const saida = {};
   for (const [nome, ref] of [["versiculo-curto", "João 11.35"], ["versiculo-longo", "1 Coríntios 13.4-7"], ["versiculo-dez", "Salmos 119.1-10"]]) {
     const texto = await CC.textoDoVersiculo(ref);
@@ -258,8 +272,8 @@ ok(Object.keys(versos || {}).length === 3, 'as imagens de versículo curto, long
 
 // as imagens de referência, para a revisão a olho: 1, 100 e 365 dias com a frase mais curta e
 // a mais longa da lista, e a frase do estágio (sem carimbo à vista)
-const casos = await av(`(async () => {
-  const por = [...CC.FRASES_OFENSIVA].sort((a, b) => a.linhas.join(" ").length - b.linhas.join(" ").length);
+const casos = await imagensGrandes(`(async () => {
+  const por = CC.FRASES_OFENSIVA.filter((f) => !f.arte).sort((a, b) => a.linhas.join(" ").length - b.linhas.join(" ").length);
   const curta = por[0], longa = por[por.length - 1];
   const saida = {};
   for (const [nome, p] of [["ofensiva-1-curta", { dias: 1, frase: curta }], ["ofensiva-100-longa", { dias: 100, frase: longa }],

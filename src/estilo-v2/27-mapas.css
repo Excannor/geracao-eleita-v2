@@ -75,6 +75,10 @@
 .nome-mapa { font-family: 'Permanent Marker', cursive; font-weight: 400; line-height: 1.15; white-space: nowrap; overflow-wrap: normal; word-break: keep-all; hyphens: none; }
 .marca-mapa { position: absolute; top: 50%; right: 10px; display: grid; place-items: center; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; color: var(--v2-tinta-fraca); }
 .marca-mapa svg { width: 16px; height: 16px; }
+/* "1 Tessalonicenses" e "2 Tessalonicenses", prontos, não cabiam a 360px ao lado da seta: a seta desce para o canto de baixo e o nome usa a largura toda */
+.celula-mapa.pronto.nome-longo { padding: 8px 12px 22px 10px; }
+.celula-mapa.pronto.nome-longo .marca-mapa { top: auto; bottom: 4px; right: 6px; width: 18px; height: 18px; margin-top: 0; }
+.celula-mapa.pronto.nome-longo .marca-mapa svg { width: 13px; height: 13px; }
 .celula-mapa.lido .marca-mapa { background: var(--salvia); color: var(--salvia-tinta); }
 .celula-mapa.lido .marca-mapa svg { width: 13px; height: 13px; stroke-width: 3; }
 .mapas-fechar { margin-top: 14px; }

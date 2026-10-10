@@ -13,7 +13,7 @@ import { LIVROS, slugDoLivro } from './checar-mapa.mjs';
 
 const PORTA_NAV = await portaLivre();
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8373;
+const PORTA = Number(process.env.PORTA) || 8373;
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 

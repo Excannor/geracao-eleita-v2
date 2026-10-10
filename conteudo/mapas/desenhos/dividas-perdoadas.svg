@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os dois devedores (Lc 7.41-42): um saco grande de moedas à esquerda e um pequeno à direita, as duas dívidas; entre eles, no alto, a nota da dívida rasgada em dois, porque o credor perdoa as duas; no chão, uma pilha de moedas. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A nota rasgada é a única área sálvia. -->
+<path class="k p" d="M14 110C4 82 24 60 42 56L36 44H62L56 56C74 60 94 82 84 110Z"/>
+<path class="k" d="M36 52H62"/>
+<path class="h" d="M26 78C30 72 36 68 42 66M22 92C24 86 28 82 32 80M70 84C72 90 72 96 70 102"/>
+<path class="k p" d="M110 110C104 94 114 82 124 80L120 72H138L134 80C144 82 154 94 148 110Z"/>
+<path class="k" d="M120 77H138"/>
+<path class="h" d="M116 98C118 94 120 92 124 90"/>
+<path class="k s" d="M64 14H80L77 22L81 28L78 36H64Z"/>
+<path class="k s" d="M86 12H102V34H86L89 27L85 20Z"/>
+<path class="h" d="M68 20H74M68 26H75M68 31H73M91 18H98M90 24H98M91 29H97"/>
+<ellipse class="k p" cx="96" cy="112" rx="8" ry="3"/>
+<path class="k p" d="M88 108V112C88 114 104 114 104 112V108"/>
+<ellipse class="k p" cx="96" cy="107" rx="8" ry="3"/>
+<path class="k p" d="M89 103V107M103 103V107"/>
+<ellipse class="k p" cx="96" cy="102" rx="8" ry="3"/>
+</svg>

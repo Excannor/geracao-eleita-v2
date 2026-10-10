@@ -1,0 +1,181 @@
+{
+  "nome": "2 Tessalonicenses",
+  "grupo": "Cartas de Paulo",
+  "numero": 53,
+  "capitulos": 3,
+  "significado": {
+    "lingua": "grego",
+    "original": "Θεσσαλονικεῖς",
+    "transliteracao": "Thessalonikeis",
+    "traducao": "os tessalonicenses",
+    "texto": "Thessalonikeis quer dizer os tessalonicenses. É a segunda carta do mesmo grupo para a mesma igreja de Tessalônica."
+  },
+  "autoria": {
+    "texto": "Paulo, Silas e Timóteo escrevem de novo à igreja de Tessalônica.",
+    "apoio": "No fim, o autor escreve a saudação com a mão dele, como faz em todas as cartas, para mostrar que a carta é mesmo dele.",
+    "refs": [
+      "2Ts 1.1",
+      "2Ts 3.17"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "A igreja de Tessalônica continua firme no meio da perseguição. Agora corre um boato de que o dia do Senhor já começou, até com uma carta que dizem ser do grupo. Os autores acalmam os irmãos e explicam que aquele dia ainda não chegou. Eles também chamam a atenção de quem largou o trabalho.",
+    "refs": [
+      "2Ts 1.4",
+      "2Ts 2.2",
+      "2Ts 3.11"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Firmes",
+      "sub": "A fé cresce no sofrimento",
+      "desenho": "balanca",
+      "galhos": [
+        {
+          "texto": "A fé dos irmãos cresce, e o amor de uns pelos outros também. O grupo agradece a Deus por eles.",
+          "ref": "2Ts 1.3"
+        },
+        {
+          "texto": "Deus é justo. Ele usa o sofrimento dos irmãos para preparar todos para o Reino dele e vai julgar quem faz os irmãos sofrerem.",
+          "ref": "2Ts 1.5-6"
+        },
+        {
+          "texto": "O grupo ora para Deus fazer os irmãos dignos do chamado e completar neles toda boa obra. Assim o nome do Senhor Jesus Cristo vai ser honrado neles.",
+          "ref": "2Ts 1.11-12"
+        }
+      ],
+      "jesus": {
+        "texto": "O Senhor Jesus vai aparecer do céu com os anjos dele, e os irmãos que sofrem vão ter alívio. Quando ele vier, vai receber louvor de todos os que creram.",
+        "refs": [
+          "2Ts 1.7",
+          "2Ts 1.10"
+        ]
+      },
+      "conexao": "Agora o grupo fala da volta do Senhor Jesus Cristo e do encontro com ele (2Ts 2.1)."
+    },
+    {
+      "titulo": "Ainda não",
+      "sub": "O dia do Senhor tem a hora dele",
+      "desenho": "relogio-de-sol",
+      "galhos": [
+        {
+          "texto": "Ninguém deve enganar os irmãos. Antes daquele dia vem uma grande rebelião contra Deus e aparece o homem da rebelião, que se senta no templo de Deus dizendo que é Deus.",
+          "ref": "2Ts 2.3-4"
+        },
+        {
+          "texto": "O autor lembra que já tinha falado disso quando estava com os irmãos.",
+          "ref": "2Ts 2.5"
+        },
+        {
+          "texto": "Alguma coisa ainda segura esse homem, e ele só pode vir quando chegar a hora dele.",
+          "ref": "2Ts 2.6-7"
+        },
+        {
+          "texto": "Ele vem com falsos milagres e engana quem rejeitou a verdade e não quis amar a verdade para ser salvo.",
+          "ref": "2Ts 2.9-10"
+        }
+      ],
+      "conexao": "Quem rejeita a verdade e gosta da injustiça vai ser julgado com justiça (2Ts 2.12)."
+    },
+    {
+      "titulo": "O Senhor é fiel",
+      "sub": "Os irmãos ficam firmes",
+      "desenho": "rolo-amarrado",
+      "galhos": [
+        {
+          "texto": "Deus chamou os irmãos pelo evangelho que o grupo anunciou, para eles terem parte na glória do Senhor Jesus Cristo.",
+          "ref": "2Ts 2.14"
+        },
+        {
+          "texto": "A ordem é ficar firme no que os irmãos aprenderam com o grupo, de boca e por carta.",
+          "ref": "2Ts 2.15"
+        },
+        {
+          "texto": "Os autores pedem oração para a mensagem do Senhor correr depressa e para serem livres dos homens maus.",
+          "ref": "2Ts 3.1-2"
+        },
+        {
+          "texto": "O Senhor é fiel, deixa os irmãos fortes e guarda todos contra o Maligno.",
+          "ref": "2Ts 3.3"
+        },
+        {
+          "texto": "Eles pedem que o Senhor leve os irmãos a entender cada vez mais o amor de Deus e a perseverança de Cristo.",
+          "ref": "2Ts 3.5"
+        }
+      ],
+      "jesus": {
+        "texto": "O Senhor Jesus Cristo e Deus Pai amaram os irmãos e deram consolo e esperança a eles. O autor pede que Jesus anime o coração deles para fazerem sempre o bem.",
+        "refs": [
+          "2Ts 2.16-17"
+        ]
+      },
+      "conexao": "Em nome do Senhor Jesus Cristo, o grupo manda os irmãos se afastarem de quem vive na preguiça (2Ts 3.6)."
+    },
+    {
+      "titulo": "Trabalhar",
+      "sub": "Ganhar o pão com as mãos",
+      "desenho": "pilao",
+      "galhos": [
+        {
+          "texto": "Quando esteve com os irmãos, o grupo nunca ficou à toa e não comeu de graça na casa de ninguém. Eles trabalharam dia e noite para não pesar para ninguém.",
+          "ref": "2Ts 3.7-8"
+        },
+        {
+          "texto": "Eles tinham direito ao sustento e não usaram esse direito, para servir de exemplo.",
+          "ref": "2Ts 3.9"
+        },
+        {
+          "texto": "O grupo já tinha dado esta ordem: “Aquele que não trabalha, não deve comer”.",
+          "ref": "2Ts 3.10"
+        },
+        {
+          "texto": "Quem vive à toa recebe um pedido em nome do Senhor Jesus Cristo, que sossegue, arranje trabalho e ganhe o sustento.",
+          "ref": "2Ts 3.12"
+        },
+        {
+          "texto": "Os outros irmãos não se cansam de fazer o bem.",
+          "ref": "2Ts 3.13"
+        },
+        {
+          "texto": "Quem não obedece à carta fica de lado para sentir vergonha. Mesmo assim, ninguém trata essa pessoa como inimiga, e os irmãos aconselham essa pessoa como irmão.",
+          "ref": "2Ts 3.14-15"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Deus escolheu os irmãos desde o princípio para a salvação, pela obra do Espírito Santo e pela fé na verdade.",
+    "ref": "2Ts 2.13",
+    "desenho": "tumulo-aberto",
+    "pares": [
+      {
+        "at": "Is 66.15",
+        "texto": "O Senhor virá com fogo",
+        "nt": "2Ts 1.8",
+        "nota": "O Senhor Jesus vem em fogo e julga quem não quer conhecer a Deus"
+      },
+      {
+        "at": "Is 11.4",
+        "texto": "matará o perverso com um sopro de sua boca",
+        "nt": "2Ts 2.8",
+        "nota": "Quando voltar, o Senhor Jesus vai destruir o perverso com o sopro da boca"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Firmes na perseguição", "de": 1, "ate": 1 },
+    { "titulo": "Aquele dia ainda não chegou", "de": 2, "ate": 2 },
+    { "titulo": "Oração e trabalho", "de": 3, "ate": 3 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "A carta termina desejando a paz do Senhor aos irmãos, aconteça o que acontecer.",
+      "ref": "2Ts 3.16"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a palavra firmes e as parecidas. Os irmãos estão firmes na perseguição, ficam firmes no que aprenderam, e o Senhor deixa todos fortes."
+  }
+}

@@ -1,0 +1,335 @@
+{
+  "nome": "Romanos",
+  "grupo": "Cartas de Paulo",
+  "numero": 45,
+  "capitulos": 16,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ῥωμαίους",
+    "transliteracao": "Rhomaious",
+    "traducao": "aos romanos",
+    "texto": "O nome vem de Roma. Os primeiros a ler a carta são os cristãos que vivem nessa cidade."
+  },
+  "autoria": {
+    "texto": "Na primeira linha, Paulo se apresenta como servo de Jesus Cristo, escolhido para ser apóstolo e enviado a pregar o evangelho de Deus.",
+    "apoio": "Quem põe as palavras no papel é Tércio. No fim da carta, ele manda as saudações dele aos irmãos no Senhor.",
+    "refs": [
+      "Rm 1.1",
+      "Rm 16.22"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Paulo escreve para a igreja de Roma antes de conhecer a cidade. Ele planejou ir muitas vezes, mas foi impedido. Enquanto não pode ir, ele manda por carta a boa notícia que prega. Deus salva todo aquele que crê, primeiro os judeus e agora também os gregos.",
+    "apoio": "Paulo já tinha dito que, depois de Jerusalém, precisava seguir para Roma. Na carta, o plano é passar por Roma numa viagem até a Espanha.",
+    "refs": [
+      "Rm 1.7, 13, 16",
+      "At 19.21",
+      "Rm 15.24"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Sem desculpa",
+      "sub": "Judeus e gentios pecaram",
+      "desenho": "balanca",
+      "galhos": [
+        {
+          "texto": "Deus mostra do céu a ira contra quem rejeita a verdade. As pessoas conhecem o poder de Deus pelas coisas que ele criou. Mesmo assim, trocam o Deus vivo por ídolos de madeira e pedra, com forma de aves, animais e homens.",
+          "ref": "Rm 1.18-23"
+        },
+        {
+          "texto": "Quando as pessoas abandonam Deus, ele deixa que elas façam tudo o que a mente delas inventa. A vida dessas pessoas se enche de inveja e fofoca. Elas sabem que isso merece a morte e continuam assim, e ainda animam os outros a fazer igual.",
+          "ref": "Rm 1.28-32"
+        },
+        {
+          "texto": "Quem julga os outros não tem desculpa, porque faz as mesmas coisas que condena. Deus é paciente com essa pessoa e espera. A bondade dele quer levar ela a largar o pecado.",
+          "ref": "Rm 2.1-4"
+        },
+        {
+          "texto": "Os judeus conhecem a Lei e se acham luz para quem está perdido na escuridão. Quem ensina os outros a não roubar e a não adulterar precisa ensinar a si mesmo primeiro. Por causa deles, os gentios falam mal de Deus.",
+          "ref": "Rm 2.17-24"
+        },
+        {
+          "texto": "Todos são pecadores do mesmo jeito, judeus e gentios. As Escrituras já dizem: “Ninguém é justo, nenhum sequer”. Ninguém procura de verdade os caminhos de Deus, e todos se desviam.",
+          "ref": "Rm 3.9-12"
+        },
+        {
+          "texto": "Ninguém fica justo diante de Deus por cumprir a Lei. Quanto mais a pessoa conhece a Lei, mais ela percebe que não obedece. Diante da Lei, todo mundo fica calado e culpado.",
+          "ref": "Rm 3.19-20"
+        }
+      ],
+      "conexao": "Todos pecaram e estão longe da glória de Deus, e Deus aceita de graça como justo quem crê (Rm 3.23-24)."
+    },
+    {
+      "titulo": "Abraão creu",
+      "sub": "Deus aceita quem crê",
+      "desenho": "tenda-e-estrelas",
+      "galhos": [
+        {
+          "texto": "Deus envia Cristo Jesus para levar o castigo dos nossos pecados. Com o sangue de Jesus, Deus salva quem tem fé. Assim ele continua justo e recebe o pecador que confia em Jesus.",
+          "ref": "Rm 3.25-26"
+        },
+        {
+          "texto": "Ninguém pode se gabar diante de Deus. A pessoa é salva pela fé em Cristo, e não pelas coisas boas que faz. Deus é Deus dos judeus e também dos gentios.",
+          "ref": "Rm 3.27-30"
+        },
+        {
+          "texto": "Abraão não tem do que se orgulhar diante de Deus. O trabalhador recebe o salário como direito, e não como favor. Com quem crê, Deus faz diferente e aceita até o pecador que confia nele.",
+          "ref": "Rm 4.1-2, 4-5"
+        },
+        {
+          "texto": "Deus aceita Abraão antes da circuncisão. O rito vem depois, como sinal da fé que ele já tinha. Por isso Abraão é pai de todos os que creem, circuncidados ou não.",
+          "ref": "Rm 4.10-12"
+        },
+        {
+          "texto": "Abraão tem cerca de cem anos, e Sara já está idosa demais para ter um filho. Mesmo assim, ele não duvida da promessa. A fé dele fica mais forte, e ele louva a Deus antes de ver a promessa cumprida.",
+          "ref": "Rm 4.18-21"
+        },
+        {
+          "texto": "Essas palavras sobre Abraão não foram escritas só para ele. Deus aceita do mesmo jeito quem crê naquele que ressuscitou Jesus. Jesus morre pelos nossos pecados e ressuscita para tornar a gente justo diante de Deus.",
+          "ref": "Rm 4.23-25"
+        }
+      ],
+      "conexao": "Quem Deus aceita como justo pela fé agora tem paz com ele, graças a Jesus Cristo (Rm 5.1)."
+    },
+    {
+      "titulo": "Adão e Cristo",
+      "sub": "A graça é maior que o pecado",
+      "desenho": "fruto-da-arvore",
+      "galhos": [
+        {
+          "texto": "Quem crê consegue se alegrar até quando sofre, porque o sofrimento produz paciência e, no fim, esperança. Essa esperança não decepciona. Deus derrama o amor dele no coração de quem crê, com o Espírito Santo.",
+          "ref": "Rm 5.3-5"
+        },
+        {
+          "texto": "Talvez alguém tenha coragem de morrer por uma pessoa boa. Cristo morre pelos pecadores, na hora certa. Deus mostra o amor dele assim, mandando Cristo morrer por nós quando ainda somos pecadores.",
+          "ref": "Rm 5.6-8"
+        },
+        {
+          "texto": "Um homem só desobedece, e muitos se tornam pecadores. Jesus Cristo obedece, e muitos vão ser feitos justos. Onde o pecado cresce em excesso, a graça de Deus fica ainda maior.",
+          "ref": "Rm 5.17-20"
+        },
+        {
+          "texto": "Ninguém deve continuar pecando para a graça aumentar. No batismo, quem crê é sepultado com Cristo na morte. O Pai ressuscita Cristo com poder, e quem foi batizado começa uma vida nova.",
+          "ref": "Rm 6.1-4"
+        },
+        {
+          "texto": "Cada um escolhe a quem servir. Quem se entrega ao pecado vira escravo dele. Quem obedece de coração ao ensino de Deus fica livre do velho senhor e serve a justiça.",
+          "ref": "Rm 6.16-18"
+        },
+        {
+          "texto": "Quem serve o pecado recebe como salário a morte. A vida eterna em Jesus Cristo, nosso Senhor, é um presente de graça de Deus.",
+          "ref": "Rm 6.23"
+        }
+      ],
+      "jesus": {
+        "texto": "Adão é uma figura daquele que ia vir. O pecado de Adão traz a morte para muitos, e a graça de outro homem traz o perdão para muitos. Esse outro homem é Jesus Cristo.",
+        "refs": [
+          "Rm 5.14-15"
+        ]
+      },
+      "conexao": "Quando o marido morre, a mulher fica livre para casar de novo. Quem crê também morreu para a Lei (Rm 7.2-4)."
+    },
+    {
+      "titulo": "Sem condenação",
+      "sub": "O Espírito dá vida e esperança",
+      "desenho": "correntes",
+      "galhos": [
+        {
+          "texto": "O autor da carta conta uma briga dentro dele. Ele quer fazer o bem e não consegue. O mal que ele não quer fazer, esse ele faz.",
+          "ref": "Rm 7.15, 18-19"
+        },
+        {
+          "texto": "No meio dessa luta, ele pergunta: “Quem é que me livrará deste corpo que me leva à morte?” Na frase seguinte, ele agradece a Deus por Jesus Cristo, nosso Senhor.",
+          "ref": "Rm 7.24-25"
+        },
+        {
+          "texto": "Agora não há nenhuma condenação para quem é de Cristo Jesus. Deus manda o Filho num corpo humano como o nosso, como sacrifício pelos nossos pecados.",
+          "ref": "Rm 8.1-3"
+        },
+        {
+          "texto": "Quem crê não recebe um espírito de escravo medroso. O Espírito de Deus adota cada um como filho, e por isso quem crê chama Deus de “Aba, Pai”. O Espírito confirma no coração que somos filhos de Deus.",
+          "ref": "Rm 8.14-16"
+        },
+        {
+          "texto": "Os que creem gemem por dentro e esperam o dia em que Deus vai libertar o corpo deles. Quando eles não sabem como orar, o Espírito ora por eles com gemidos que não cabem em palavras.",
+          "ref": "Rm 8.23, 26"
+        },
+        {
+          "texto": "Se Deus está do nosso lado, ninguém pode ficar contra nós. Nada vai separar quem crê do amor de Deus em Cristo Jesus, nem a morte, nem as profundezas do mar.",
+          "ref": "Rm 8.31, 38-39"
+        }
+      ],
+      "conexao": "O autor fica com o coração abatido por causa dos israelitas, o povo dele (Rm 9.2-3)."
+    },
+    {
+      "titulo": "A oliveira",
+      "sub": "Deus não rejeita o seu povo",
+      "desenho": "ramo-de-oliveira",
+      "galhos": [
+        {
+          "texto": "Rebeca espera gêmeos. Antes de os meninos nascerem e de fazerem qualquer coisa boa ou má, Deus avisa que o mais velho vai servir o irmão. Deus escolhe Jacó.",
+          "ref": "Rm 9.10-13"
+        },
+        {
+          "texto": "O vaso de barro não pergunta a quem o fez por que saiu daquele jeito. O oleiro pode fazer, do mesmo barro, um vaso para uso especial e outro para uso comum.",
+          "ref": "Rm 9.20-21"
+        },
+        {
+          "texto": "Os gentios nem procuravam ser justos e encontram a justiça que vem da fé. Os israelitas buscam a justiça com as boas ações deles e tropeçam na pedra de tropeço.",
+          "ref": "Rm 9.30-32"
+        },
+        {
+          "texto": "Entre judeus e gentios não há diferença. Os dois têm o mesmo Senhor, que dá com generosidade a todos os que pedem. Todo aquele que chamar pelo nome do Senhor vai ser salvo.",
+          "ref": "Rm 10.12-13"
+        },
+        {
+          "texto": "Deus não rejeita o povo dele. O autor da carta é israelita, descendente de Abraão, da família de Benjamim. Hoje também há um grupo que Deus escolhe pela graça.",
+          "ref": "Rm 11.1, 5"
+        },
+        {
+          "texto": "Alguns ramos da oliveira são cortados. Os gentios eram ramos de uma oliveira brava e agora são enxertados no lugar. O ramo enxertado não tem do que se gabar, porque é só ramo, e não raiz. Se os ramos cortados deixarem a incredulidade, Deus enxerta eles de novo.",
+          "ref": "Rm 11.17-18, 23"
+        }
+      ],
+      "jesus": {
+        "texto": "Israel recebe de Deus a aliança, a Lei e as promessas. Da família dos patriarcas vem Cristo como homem, e ele é Deus que reina sobre todas as coisas. Esse Cristo é Jesus.",
+        "refs": [
+          "Rm 9.4-5"
+        ]
+      },
+      "conexao": "Pelas misericórdias de Deus (Rm 11.32), o autor pede que cada um ofereça o corpo a Deus (Rm 12.1)."
+    },
+    {
+      "titulo": "Sacrifício vivo",
+      "sub": "A igreja põe a fé em prática",
+      "desenho": "altar-com-brasas",
+      "galhos": [
+        {
+          "texto": "Quem crê não imita a conduta e os costumes deste mundo. Cada um vira uma pessoa nova, que pensa de outro jeito, e aprende na prática a vontade boa e perfeita de Deus.",
+          "ref": "Rm 12.2"
+        },
+        {
+          "texto": "Na igreja acontece como no corpo, onde cada membro tem um trabalho diferente e todos pertencem uns aos outros. Quem tem o dom de ensinar ensina, e quem tem o dom de contribuir ajuda com generosidade.",
+          "ref": "Rm 12.4-8"
+        },
+        {
+          "texto": "A ordem é abençoar quem persegue e nunca pagar o mal com o mal. Ninguém se vinga, porque a ira fica com Deus. Se o inimigo tem fome, quem crê dá comida a ele e vence o mal com o bem.",
+          "ref": "Rm 12.14, 17-21"
+        },
+        {
+          "texto": "Quem crê paga os impostos e dá a cada um o que é devido. Só uma dívida fica sempre em aberto, a do amor. Quem ama o próximo como a si mesmo cumpre toda a Lei.",
+          "ref": "Rm 13.7-9"
+        },
+        {
+          "texto": "Na igreja, uns comem de tudo e outros só comem verduras. Quem come não despreza quem não come, e quem não come não acusa o outro, porque Deus aceitou os dois. O Reino de Deus é justiça, paz e alegria no Espírito Santo, e não comida e bebida.",
+          "ref": "Rm 14.2-3, 17"
+        },
+        {
+          "texto": "Cristo não procurou agradar a si mesmo. Os irmãos de Roma devem se acolher uns aos outros do jeito que Cristo acolheu cada um deles.",
+          "ref": "Rm 15.3, 7"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Deus mostra uma justiça que não depende da Lei, e a Lei de Moisés e os Profetas dão testemunho dela. Essa justiça vem pela fé em Jesus Cristo, para todos os que creem, sem diferença. A boa notícia já tinha sido prometida pelos profetas nas Escrituras (Rm 1.2).",
+    "ref": "Rm 3.21-22",
+    "desenho": "rolo-aberto",
+    "pares": [
+      {
+        "at": "Hc 2.4",
+        "texto": "O justo, porém, confia em mim e viverá!",
+        "nt": "Rm 1.17",
+        "nota": "A boa notícia diz que a pessoa só fica justa diante de Deus pela fé, do começo ao fim"
+      },
+      {
+        "at": "Gn 15.6",
+        "texto": "Abrão creu no Senhor. E Deus considerou Abrão justo, por causa da sua fé.",
+        "nt": "Rm 4.3",
+        "nota": "Por essa fé, Deus risca os pecados de Abraão e diz que ele está sem culpa"
+      },
+      {
+        "at": "Sl 32.1-2",
+        "texto": "Como é feliz o homem que tem suas transgressões perdoadas e os seus pecados apagados!",
+        "nt": "Rm 4.6-8",
+        "nota": "Davi fala da felicidade de quem Deus considera sem culpa, sem olhar para as obras"
+      },
+      {
+        "at": "Sl 44.22",
+        "texto": "somos como ovelhas destinadas ao matadouro.",
+        "nt": "Rm 8.35-37",
+        "nota": "Nem perseguição nem fome separam quem crê do amor de Cristo, e a vitória vem daquele que nos amou"
+      },
+      {
+        "at": "Is 28.16",
+        "texto": "Eu coloquei em Sião uma pedra para ser a pedra principal do alicerce firme e precioso",
+        "nt": "Rm 9.33",
+        "nota": "Para quem busca a justiça pelas obras, essa pedra faz tropeçar, e quem confia nela não é abalado"
+      },
+      {
+        "at": "Is 52.7",
+        "texto": "Como são bonitos, andando sobre as montanhas, os pés daqueles que trazem boas notícias",
+        "nt": "Rm 10.14-15",
+        "nota": "Ninguém crê sem ouvir, e ninguém ouve se alguém não for enviado para falar"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Judeus e gentios pecaram", "de": 1, "ate": 2 },
+    { "titulo": "Deus aceita como justo quem crê", "de": 3, "ate": 4 },
+    { "titulo": "Morrer e viver com Cristo", "de": 5, "ate": 6 },
+    { "titulo": "A vida no Espírito", "de": 7, "ate": 8 },
+    { "titulo": "Deus e o povo de Israel", "de": 9, "ate": 11 },
+    { "titulo": "O corpo oferecido a Deus", "de": 12, "ate": 13 },
+    { "titulo": "Quem come e quem não come", "de": 14, "ate": 15 },
+    { "titulo": "Saudações aos irmãos de Roma", "de": 16, "ate": 16 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O autor quer ir a Roma para fortalecer os irmãos com algum dom espiritual. Na mesma frase, ele corrige e diz que quer animar os irmãos e ser animado por eles, pela fé.",
+      "ref": "Rm 1.11-12"
+    },
+    {
+      "texto": "Judeu de verdade é quem tem o coração reto diante de Deus, mudado pelo Espírito, e não só quem passou pela circuncisão. Esse recebe o louvor de Deus, e não o dos homens.",
+      "ref": "Rm 2.28-29"
+    },
+    {
+      "texto": "O autor diz que não saberia o que é cobiça se a Lei não mandasse: “Não cobice!”",
+      "ref": "Rm 7.7"
+    },
+    {
+      "texto": "Oseias já tinha anunciado que Deus ia chamar de “meu povo” quem não era o povo dele. No lugar onde ouviram que não eram povo de Deus, eles vão ser chamados filhos do Deus vivo.",
+      "ref": "Rm 9.25-26"
+    },
+    {
+      "texto": "A noite está quase terminando e o dia logo vem. A ordem é deixar as obras das trevas e vestir a armadura da luz.",
+      "ref": "Rm 13.12"
+    },
+    {
+      "texto": "O autor pregou o evangelho de Cristo desde Jerusalém até o Ilírico. O plano dele é pregar onde o nome de Cristo nunca foi ouvido, em vez de construir sobre o alicerce de outro.",
+      "ref": "Rm 15.19-20"
+    },
+    {
+      "texto": "Na Macedônia e na Acaia, os irmãos fizeram uma coleta para os santos de Jerusalém, que passam dificuldades. O autor vai levar o dinheiro e pede oração para que os santos de lá aceitem a ajuda.",
+      "ref": "Rm 15.25-26, 31"
+    },
+    {
+      "texto": "Febe serve a igreja de Cencreia e vai visitar os irmãos. O autor pede que eles recebam Febe bem, porque ela ajudou muita gente, e o autor também.",
+      "ref": "Rm 16.1-2"
+    },
+    {
+      "texto": "Priscila e Áquila arriscaram a vida pelo autor, e uma igreja se reúne na casa deles. Em Atos, os dois tinham saído de Roma porque Cláudio César mandou (At 18.2).",
+      "ref": "Rm 16.3-5"
+    },
+    {
+      "texto": "Erasto administra a cidade e manda saudações aos irmãos de Roma. Quarto também manda.",
+      "ref": "Rm 16.23"
+    }
+  ],
+  "procure": {
+    "texto": "Procure as vezes em que aparece “está escrito”. O autor apoia quase cada passo da carta numa frase das Escrituras. Uma delas diz que todo joelho vai se curvar diante de Deus.",
+    "ref": "Rm 14.11"
+  }
+}

@@ -153,14 +153,6 @@
     return { lista, novas };
   };
 
-  // Só para o pontinho do Mais, quando Desafios está lá dentro (sem mexer no diário, sem
-  // contar conquista): há algum dos três desafios de hoje ainda não feito?
-  CC.haDesafioPendenteHoje = () => {
-    const E = CC.estado();
-    const ctx = { amigos: !!((CC.amigosEmCache && CC.amigosEmCache()) || {}).amigos?.length };
-    return CC.missoesDoDia(CC.hojeIso(), E, ctx).some((m) => !m.feita);
-  };
-
   // Horas até a meia-noite, para o "faltam 5 horas" das missões.
   CC.horasAteAmanha = () => {
     const agora = new Date();
@@ -255,7 +247,8 @@
     // Conta só quantas notas existem; o texto nunca é lido aqui.
     { id: 'notas', titulo: 'Caderno de notas', icone: 'caderno', cor: 'azul', niveis: [5, 25, 100],
       texto: (n) => 'Escreva nota em ' + n + ' versículos',
-      valor: (e) => Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
+      valor: (e) => Object.values(e.notas || {}).filter((n) => n && !n.apagadaEm && (n.versos || []).length).length
+        + Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
   ];
 
   // Semana de segunda a domingo, pela data da segunda-feira.

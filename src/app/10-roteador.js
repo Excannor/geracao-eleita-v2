@@ -52,6 +52,8 @@
     // O mapa de cada livro mora no Explorar (decisão do dono, 02/10); desde 04/10 a lista da
     // Bíblia e o fim da lição levam a ele, e ele continua marcando o Mais.
     mapa: '#/explorar',
+    // As parábolas também moram no Explorar (cartão logo abaixo dos mapas).
+    parabolas: '#/explorar', parabola: '#/explorar',
     // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
     // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
     conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
@@ -71,6 +73,19 @@
   const gravarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* segue */ } };
 
   let ultimaRota = null;
+  // A tela que está aberta, para saber quando a rolagem volta ao topo: só quando a pessoa vai
+  // para OUTRA tela. Antes contava só o primeiro pedaço do endereço, e do Perfil rolado para
+  // Minhas anotações (#/perfil → #/perfil/anotacoes), ou de uma nota para a seguinte, a tela
+  // nova abria no meio. Ficam de fora o que abre POR CIMA da tela de baixo (a lição, o dia do
+  // Conhecer Jesus, o capítulo da Bíblia sobre a grade: fechar devolve a tela como estava), a
+  // busca (o endereço muda a cada letra) e as abas da célula (trocar de aba não é sair dela).
+  let ultimaTela = null;
+  const SOBRE_A_TELA = new Set(['dia', 'conhecer', 'biblia', 'busca']);
+  function telaDe(rota, arg) {
+    if (SOBRE_A_TELA.has(rota)) return rota;
+    if (arg.startsWith('celula/')) return rota + '/' + arg.split('/').slice(0, 2).join('/');
+    return rota + '/' + arg;
+  }
 
   function partesDaRota() {
     const bruto = (location.hash || '#/').slice(2);
@@ -161,9 +176,10 @@
       // (CC.FRASES_OFENSIVA), com a referência em cima quando é versículo, como no portal.
       // Só o carimbo, sem texto corrido embaixo: o dono quer a frase sozinha, motivando.
       + (lema.ref ? '<span class="selo-ref">' + CC.esc(lema.ref) + '</span>' : '')
-      + '<div class="selo-lema selo-ofensiva" data-linhas="' + lema.linhas.length + '">'
-      + lema.linhas.map((l) => '<span class="selo-linha">' + CC.esc(l) + '</span>').join('')
-      + '</div>'
+      // A frase que é só arte (o cartaz de procurado) não tem carimbo: fica a referência.
+      + (lema.linhas.length ? '<div class="selo-lema selo-ofensiva" data-linhas="' + lema.linhas.length + '">'
+        + lema.linhas.map((l) => '<span class="selo-linha">' + CC.esc(l) + '</span>').join('')
+        + '</div>' : '')
       + (seq.atual === 0 ? '<p class="passo-dica">Leia hoje para acender o seu fogo.</p>'
         : (seq.feitoHoje ? '' : '<p class="passo-dica">A lenha de hoje ainda não entrou. Leia para manter o fogo aceso!</p>'))
       + '<div class="semana-bolinhas">' + semana + '</div>'
@@ -203,6 +219,7 @@
         // Se a linha mais larga ainda não couber, o carimbo TODO encolhe junto, na mesma
         // medida: linhas de tamanhos diferentes davam aparência de carimbo remendado.
         const selo = folha.querySelector('.selo-ofensiva');
+        if (!selo) return;
         const linhas = [...selo.querySelectorAll('.selo-linha')];
         let tamanho = parseFloat(getComputedStyle(linhas[0]).fontSize);
         const minimo = tamanho * 0.7;
@@ -251,8 +268,7 @@
       itens.push(itemPainelMais(CC.icoAba('bau'), false, 'Desafios', sub, '#/missoes'));
     }
     itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
-    itens.push(itemPainelMais(CC.icoAba('marcador'), true, 'Meus versículos', '', '#/perfil/versiculos'));
-    itens.push(itemPainelMais(CC.icoAba('caneta'), true, 'Minha história com Deus', '', '#/perfil/historia'));
+    itens.push(itemPainelMais(CC.ico('caderno'), true, 'Minhas anotações', 'Notas, orações e versículos marcados', '#/perfil/anotacoes'));
     itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
     // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.
     if (CC.quem && CC.quem.admin) itens.push(itemPainelMais(CC.ico('grafico'), true, 'Painel do administrador', 'Números da igreja e do app', '#/config/painel'));
@@ -288,13 +304,13 @@
     if (rota === 'perfil' && arg === 'discipulado') ativa = '#/discipulado';
     const naBiblia = rota === 'biblia';
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
-    // Meus versículos e Minha história abrem pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
+    // Minhas anotações abre pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
+    // Minha história com Deus mora dentro de Minhas anotações (cartão fixo no topo).
     const anteriorNav = pilha.length >= 2 ? pilha[pilha.length - 2] : '';
-    const doMais = rota === 'perfil' && (arg === 'versiculos' || arg === 'historia') && !anteriorNav.startsWith('#/perfil');
+    const doMais = rota === 'perfil' && arg === 'anotacoes' && !anteriorNav.startsWith('#/perfil');
     // O painel do administrador também abre pelo Mais (só para o admin): com ele aberto, o Mais fica aceso.
     const noPainel = rota === 'config' && String(arg || '').startsWith('painel');
     const maisSelecionado = !naBiblia && (doMais || noPainel || ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
-    const pontoMais = !desafiosNaBarra && !!(CC.haDesafioPendenteHoje && CC.haDesafioPendenteHoje());
     const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
     const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
     // Uma vez que a pessoa chegou na aba, o pontinho de novidade não aparece nunca mais.
@@ -310,8 +326,10 @@
         + '<span class="rotulo-aba">' + rotulo + '</span></button>';
     };
 
+    // O Mais não leva ponto: os desafios do dia ficavam sempre "pendentes" e o ponto vermelho
+    // nunca sumia, sem dizer do que era. Ponto só para novidade de verdade (amigos, aba nova).
     const botaoMais = () => {
-      const ponto = pontoMais ? '<i class="ponto-aba"></i>' : '';
+      const ponto = '';
       return '<button type="button" class="aba' + (maisSelecionado ? ' selecionada' : '') + '" data-papel="mais" data-abrir-mais'
         + (maisSelecionado ? ' aria-current="page"' : '') + ' aria-label="Mais"><span class="icone-aba">' + CC.icoAba('mais') + ponto + '</span>'
         + '<span class="rotulo-aba">Mais</span></button>';
@@ -360,8 +378,10 @@
 
   // ---------- roteamento ----------
   const PERFIL = () => ({
-    escritos: CC.vistaEscritos, livros: CC.vistaLivros, conquistas: CC.vistaConquistas,
-    trofeus: CC.vistaTrofeus, versiculos: CC.vistaVersiculos, discipulado: CC.vistaDiscipulado,
+    anotacoes: CC.vistaAnotacoes, livros: CC.vistaLivros, conquistas: CC.vistaConquistas,
+    trofeus: CC.vistaTrofeus, discipulado: CC.vistaDiscipulado,
+    // as duas telas antigas viraram Minhas anotações; os atalhos guardados continuam valendo
+    escritos: () => CC.substituirRota('#/perfil/anotacoes'), versiculos: () => CC.substituirRota('#/perfil/anotacoes'),
     historia: CC.vistaHistoria,
   });
 
@@ -391,9 +411,12 @@
     'Configurações': (h) => h === '#/config',
     'Bíblia': (h) => h === '#/biblia',
     'Primeiros passos': (h) => h === '#/licoes',
+    'Parábolas': (h) => h === '#/parabolas',
+    'Minhas anotações': (h) => h === '#/perfil/anotacoes',
   };
   const ENDERECO_DO_ROTULO = { 'Trilha': '#/', 'Perfil': '#/perfil', 'Juntos': '#/novidades', 'Explorar': '#/explorar',
-    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes' };
+    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes', 'Parábolas': '#/parabolas',
+    'Minhas anotações': '#/perfil/anotacoes' };
   // Muitas telas (Discipulado, Painel, Notificações, Perfil...) só desenham o voltar DEPOIS
   // que os dados chegam, quando o roteador já tinha passado. Ligar o clique botão a botão
   // deixava esses mortos. Por isso: o nome é acertado por um observador assim que o botão
@@ -453,6 +476,8 @@
     else if (rota === 'nota') CC.vistaNota(conteudo, arg);
     else if (rota === 'busca') CC.vistaBusca(conteudo, arg);
     else if (rota === 'mapa') CC.vistaMapa(conteudo, arg);
+    else if (rota === 'parabolas') CC.vistaParabolas(conteudo);
+    else if (rota === 'parabola') CC.vistaParabola(conteudo, arg);
     else if (rota === 'conhecer') CC.vistaConhecer(conteudo);
     else if (rota === 'perguntas') (arg ? (r) => CC.vistaPergunta(r, arg) : CC.vistaPerguntas)(conteudo);
     else if (rota === 'seguir') CC.vistaSeguir(conteudo);
@@ -475,9 +500,11 @@
     if ((rota === '' || rota === 'dia') && ultimaRota !== rota) {
       requestAnimationFrame(() => CC.rolarAteAtual(false));
     }
-    if (rota !== ultimaRota && rota !== 'busca') CC.rolarPara(0);
+    const tela = telaDe(rota, arg);
+    if (tela !== ultimaTela && rota !== 'busca') CC.rolarPara(0);
     entradaDaTela(rota);
     ultimaRota = rota;
+    ultimaTela = tela;
   }
 
   // A tela entra pelo lado de onde a pessoa veio: da direita quando anda para frente na barra
@@ -505,7 +532,36 @@
     try { rotear(); } finally { redesenhando = false; }
     ultimaRota = guardar;
     CC.rolarPara(y);
+    segurarRolagem(y);
   };
+
+  // Telas que desenham um esqueleto e só depois o conteúdo (a lista de livros da Bíblia, que
+  // espera a tradução carregar) encolhiam no redesenho: o navegador cortava a rolagem para
+  // caber no esqueleto e ela não voltava mais, e a página ia para o topo. Aqui a posição de
+  // antes é reposta conforme a tela cresce, até chegar nela, até 3 s, ou até a própria
+  // pessoa mexer (tocar, rolar, teclar) ou ir para outra tela.
+  let soltarRolagem = null;
+  function segurarRolagem(y) {
+    if (soltarRolagem) soltarRolagem();
+    if (y <= 0 || CC.rolagemY() >= y - 1 || typeof ResizeObserver === 'undefined') return;
+    const endereco = location.hash;
+    const gestos = ['touchstart', 'wheel', 'keydown', 'pointerdown'];
+    const olho = new ResizeObserver(() => {
+      if (location.hash !== endereco) { soltar(); return; }
+      CC.rolarPara(y);
+      if (CC.rolagemY() >= y - 1) soltar();
+    });
+    const prazo = setTimeout(() => soltar(), 3000);
+    function soltar() {
+      olho.disconnect();
+      clearTimeout(prazo);
+      gestos.forEach((g) => removeEventListener(g, soltar, true));
+      if (soltarRolagem === soltar) soltarRolagem = null;
+    }
+    gestos.forEach((g) => addEventListener(g, soltar, { capture: true, passive: true }));
+    olho.observe(conteudo);
+    soltarRolagem = soltar;
+  }
 
   // ---------- avisos da abertura ----------
   // Cada aviso aparece uma vez: o escudo que cobriu ontem, a ofensiva que zerou e o

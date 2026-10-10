@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- um dos dois bezerros de ouro de Jeroboão (1Rs 12.28-29), de pé sobre a base. O bezerro inteiro é a área em sálvia; os cascos são trapézios cheios assentados na base. -->
+<path class="k p" d="M18 98H102V108H18Z"/>
+<path class="h" d="M30 98V108M50 98V108M70 98V108M90 98V108"/>
+<path class="k s" d="M47 72V94H53V72M80 72V94H86V72"/>
+<path class="k s" d="M42 70V94H48V72M73 72V94H79V70"/>
+<path class="k s" d="M44 48C56 44 78 44 88 48C94 51 95 60 92 68C90 72 86 74 80 73C68 74 56 74 46 73C40 72 38 68 38 62L36 60C32 61 27 59 25 55C23 51 25 48 29 46L34 40C36 38 40 38 42 41Z"/>
+<path class="k" d="M36 40C34 35 34 32 37 29M41 40C42 35 45 33 48 33"/>
+<path class="k" d="M92 55C97 60 98 68 96 76"/>
+<path class="k s" d="M96 76C94 78 94 82 96 84C98 82 99 79 96 76Z"/>
+<circle class="e" cx="33" cy="46" r="1.5"/>
+<path class="h" d="M27 53h2M56 52C64 50 74 50 82 52M58 66C66 68 74 68 82 66"/>
+<path class="e" d="M42 94H48L48.6 98H41.4Z M47 94H53L53.6 98H46.4Z M73 94H79L79.6 98H72.4Z M80 94H86L86.6 98H79.4Z"/>
+</svg>

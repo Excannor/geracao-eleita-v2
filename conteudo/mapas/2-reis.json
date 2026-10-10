@@ -1,0 +1,356 @@
+{
+  "nome": "2 Reis",
+  "grupo": "Históricos",
+  "numero": 12,
+  "capitulos": 25,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "מְלָכִים",
+    "transliteracao": "Melakhim",
+    "traducao": "reis",
+    "texto": "É a segunda parte do livro dos Reis. A história começa quando Acabe já morreu e Moabe se revolta contra Israel."
+  },
+  "autoria": {
+    "texto": "O último fato do livro acontece no trigésimo sétimo ano em que o rei Joaquim está preso na Babilônia. Quem escreve vive depois disso. Ele conta que o povo de Israel continua na Assíria “até o dia de hoje”.",
+    "apoio": "O nome do autor fica de fora do livro.",
+    "refs": [
+      "2Rs 17.23",
+      "2Rs 25.27"
+    ]
+  },
+  "raiz": {
+    "texto": "2 Reis vai de Elias subindo ao céu num redemoinho até um rei de Judá preso na Babilônia, comendo à mesa do rei de lá. No meio, Samaria cai, e o povo de Israel vai para a Assíria. Depois os babilônios põem fogo no templo e derrubam os muros de Jerusalém. O Senhor manda profeta atrás de profeta para avisar Israel e Judá, e o povo não quer ouvir.",
+    "refs": [
+      "2Rs 2.1",
+      "2Rs 17.13-14",
+      "2Rs 18.10-11",
+      "2Rs 25.9-10",
+      "2Rs 25.29"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Carro de fogo",
+      "sub": "Elias sobe num redemoinho",
+      "desenho": "redemoinho",
+      "galhos": [
+        {
+          "texto": "O rei Acazias cai do terraço do palácio e manda perguntar a um deus de Ecrom se vai sarar. Elias encontra os mensageiros no caminho e pergunta: “Por acaso não existe Deus em Israel?” Ele avisa que o rei não vai mais levantar da cama.",
+          "ref": "2Rs 1.2-4"
+        },
+        {
+          "texto": "Acazias manda um oficial com cinquenta soldados buscar Elias. Duas vezes Elias pede, e desce fogo do céu sobre eles. O terceiro oficial se ajoelha e pede pela vida dele e dos soldados. Então o anjo do Senhor manda Elias descer com ele.",
+          "ref": "2Rs 1.9-15"
+        },
+        {
+          "texto": "Elias pede três vezes que Eliseu fique para trás, em Gilgal, em Betel e em Jericó. Todas as vezes, Eliseu jura que não vai deixar Elias ir sozinho.",
+          "ref": "2Rs 2.2-6"
+        },
+        {
+          "texto": "No Jordão, Elias enrola o manto e bate na água. A água se abre, e os dois atravessam em terra seca. Elias pergunta o que pode fazer por Eliseu, e Eliseu pede porção dobrada do espírito dele.",
+          "ref": "2Rs 2.8-10"
+        },
+        {
+          "texto": "Os dois andam e conversam. De repente, um carro de fogo com cavalos de fogo passa entre os dois e separa um do outro. Elias sobe ao céu num redemoinho. Eliseu grita: “Meu pai! Meu pai!”",
+          "ref": "2Rs 2.11-12"
+        },
+        {
+          "texto": "Eliseu pega o manto que caiu de Elias, bate na água do Jordão e pergunta: “Onde está o Senhor, o Deus de Elias?” A água se abre de novo. Os discípulos dos profetas veem e dizem que o espírito de Elias ficou com Eliseu.",
+          "ref": "2Rs 2.13-15"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus diz que Elias já veio, que ninguém reconheceu e que muita gente maltratou ele. Ele avisa que o Filho do Homem também vai sofrer nas mãos deles. Os discípulos entendem que o Elias de quem Jesus fala é João Batista.",
+        "refs": [
+          "Mt 17.12-13"
+        ]
+      },
+      "conexao": "Em Jericó, Eliseu joga sal na fonte, e a água ruim fica boa (2Rs 2.21-22)."
+    },
+    {
+      "titulo": "Eliseu",
+      "sub": "O ferro do machado flutua",
+      "desenho": "machado-na-agua",
+      "galhos": [
+        {
+          "texto": "Uma viúva deve dinheiro, e os credores querem levar os dois filhos dela como escravos. Ela só tem uma vasilha de azeite. Eliseu manda pedir vasilhas vazias aos vizinhos. Ela enche uma por uma, e o azeite só para quando não há mais vasilha.",
+          "ref": "2Rs 4.1-7"
+        },
+        {
+          "texto": "Em Suném, uma mulher rica faz um quarto em cima da casa para Eliseu, com cama e lamparina. Ela não tem filhos, e o marido já é velho. Eliseu promete que, dali a um ano, ela vai ter um filho nos braços, e o menino nasce.",
+          "ref": "2Rs 4.8-10, 14-17"
+        },
+        {
+          "texto": "O menino cresce e um dia morre no colo da mãe. Eliseu entra no quarto, ora e se deita sobre o menino. O corpo esquenta, e o menino espirra sete vezes e abre os olhos.",
+          "ref": "2Rs 4.18-20, 32-35"
+        },
+        {
+          "texto": "Naamã é comandante do exército da Síria e tem lepra. Uma menina israelita que trabalha na casa dele fala do profeta de Samaria. Eliseu manda dizer a Naamã que se lave sete vezes no Jordão. Naamã fica indignado e diz que os rios de Damasco são melhores. Os oficiais convencem Naamã a ir.",
+          "ref": "2Rs 5.1-3, 10-13"
+        },
+        {
+          "texto": "Geazi é o servo de Eliseu. Ele corre atrás de Naamã, pede prata em nome do profeta e esconde tudo em casa. Eliseu pergunta onde ele esteve, e Geazi mente. Geazi sai dali coberto de lepra, branco como a neve.",
+          "ref": "2Rs 5.20-27"
+        },
+        {
+          "texto": "Os discípulos dos profetas cortam árvores perto do Jordão, e o ferro de um machado cai na água. O machado era emprestado. Eliseu corta uma vara, joga onde o ferro afundou, e o ferro sobe e boia.",
+          "ref": "2Rs 6.4-7"
+        }
+      ],
+      "conexao": "Eliseu manda um discípulo com um vaso de óleo ungir Jeú como rei de Israel (2Rs 9.1-3)."
+    },
+    {
+      "titulo": "Jeú",
+      "sub": "Jeú guia o carro com fúria",
+      "desenho": "vaso-de-azeite",
+      "galhos": [
+        {
+          "texto": "O discípulo derrama o óleo na cabeça de Jeú e sai correndo. Os outros comandantes perguntam o que aquele louco queria. Quando Jeú conta, eles forram os degraus com as capas, tocam trombeta e gritam: “Jeú é rei!”",
+          "ref": "2Rs 9.6, 10-13"
+        },
+        {
+          "texto": "Em Jezreel, o vigia vê o carro chegando e diz ao rei: “Ele dirige furiosamente”. O rei Jorão sai para encontrar Jeú no campo de Nabote. Jorão tenta fugir, e Jeú acerta uma flecha nas costas dele.",
+          "ref": "2Rs 9.20-21, 23-24"
+        },
+        {
+          "texto": "Jezabel pinta os olhos e arruma o cabelo na janela do palácio. Jeú manda jogar Jezabel lá de cima. Quando vão enterrar o corpo, só encontram a caveira, os pés e as mãos.",
+          "ref": "2Rs 9.30, 33, 35"
+        },
+        {
+          "texto": "Jeú diz que vai adorar Baal mais do que Acabe e chama todos os adoradores de Baal para um sacrifício. O templo enche de ponta a ponta. Jeú manda os soldados matarem todos, e eles derrubam o templo e transformam o lugar num sanitário.",
+          "ref": "2Rs 10.18-21, 25-27"
+        },
+        {
+          "texto": "Em Israel, Jeú acaba com Baal, mas deixa os bezerros de ouro de Betel e Dã. O Senhor promete que os filhos dele vão reinar até a quarta geração.",
+          "ref": "2Rs 10.28-30"
+        }
+      ],
+      "conexao": "Em Judá, Atalia mata a família do rei, mas a tia esconde o menino Joás (2Rs 11.1-2)."
+    },
+    {
+      "titulo": "Samaria cai",
+      "sub": "Israel vai para a Assíria",
+      "desenho": "caixa-com-abertura",
+      "galhos": [
+        {
+          "texto": "Joás fica escondido no templo seis anos. Depois, o sacerdote Joiada mostra o menino aos guardas, põe a coroa na cabeça dele e derrama o óleo. O povo grita: “Viva o rei!” Joás tem sete anos.",
+          "ref": "2Rs 11.3-4, 12, 21"
+        },
+        {
+          "texto": "Joiada faz uma abertura na tampa de uma caixa grande e põe a caixa ao lado do altar. Quando a caixa enche, contam a prata e pagam os carpinteiros e os pedreiros que consertam o templo.",
+          "ref": "2Rs 12.9-11"
+        },
+        {
+          "texto": "Eliseu está doente, perto da morte, e o rei Jeoás chora ao lado dele. Eliseu manda o rei bater com as flechas no chão. O rei bate três vezes, e Eliseu fica irado. Com cinco ou seis, a Síria acabaria destruída.",
+          "ref": "2Rs 13.14, 18-19"
+        },
+        {
+          "texto": "Depois, Eliseu morre e é sepultado. Certa vez, uns homens enterram um amigo e veem um bando de moabitas. Eles jogam o morto no túmulo de Eliseu e fogem. Quando o corpo toca os ossos de Eliseu, o homem volta a viver e se levanta.",
+          "ref": "2Rs 13.20-21"
+        },
+        {
+          "texto": "O rei da Assíria cerca Samaria por três anos. A cidade cai no nono ano do rei Oseias, e o povo de Israel vai como escravo para a Assíria.",
+          "ref": "2Rs 17.5-6"
+        },
+        {
+          "texto": "No lugar dos israelitas, o rei da Assíria põe gente de outras terras para morar em Samaria. Eles não adoram o Senhor, e o Senhor manda leões para o meio deles.",
+          "ref": "2Rs 17.24-25"
+        }
+      ],
+      "conexao": "Em Judá, Ezequias confia no Senhor como nenhum rei antes ou depois dele (2Rs 18.5)."
+    },
+    {
+      "titulo": "Ezequias",
+      "sub": "A sombra volta dez pontos",
+      "desenho": "relogio-de-sol",
+      "galhos": [
+        {
+          "texto": "Ezequias derruba os altares das colinas e quebra a serpente de bronze que Moisés tinha feito. O povo queimava incenso para ela e chamava a serpente de Neustã.",
+          "ref": "2Rs 18.4"
+        },
+        {
+          "texto": "Os assírios acampam perto de Jerusalém. Os oficiais de Judá pedem que eles falem em aramaico, para o povo nos muros não entender. O chefe assírio grita em hebraico que Ezequias não pode salvar ninguém. O povo fica calado, como o rei mandou.",
+          "ref": "2Rs 18.26-29, 36"
+        },
+        {
+          "texto": "Ezequias recebe uma carta do rei da Assíria, leva ao templo e abre diante do Senhor. Ele pede que o Senhor salve o povo, para todos os reinos saberem que só o Senhor é Deus.",
+          "ref": "2Rs 19.14-16, 19"
+        },
+        {
+          "texto": "Naquela noite, o anjo do Senhor mata cento e oitenta e cinco mil soldados no acampamento assírio. O rei Senaqueribe volta para Nínive e fica por lá.",
+          "ref": "2Rs 19.35-36"
+        },
+        {
+          "texto": "Ezequias fica doente, e Isaías avisa que ele vai morrer. Ezequias vira o rosto para a parede, ora e chora. Antes de Isaías sair do pátio, o Senhor manda dizer que ouviu a oração e vai dar ao rei mais quinze anos.",
+          "ref": "2Rs 20.1-6"
+        },
+        {
+          "texto": "Para ter certeza, Ezequias pede um sinal. Isaías ora, e o Senhor faz a sombra voltar dez pontos no relógio de sol de Acaz.",
+          "ref": "2Rs 20.8-11"
+        }
+      ],
+      "conexao": "Ezequias mostra os tesouros aos mensageiros da Babilônia. Isaías avisa que tudo vai para lá (2Rs 20.13, 17)."
+    },
+    {
+      "titulo": "O livro achado",
+      "sub": "Os babilônios queimam o templo",
+      "desenho": "muro-derrubado",
+      "galhos": [
+        {
+          "texto": "Manassés reconstrói os altares que o pai derrubou e chega a queimar um filho em sacrifício. O Senhor avisa que vai limpar Jerusalém como se limpa um prato e se vira de boca para baixo.",
+          "ref": "2Rs 21.3, 6, 13"
+        },
+        {
+          "texto": "O sumo sacerdote Hilquias acha o Livro da Lei no templo. O secretário Safã lê o livro para o rei Josias, e Josias rasga as roupas.",
+          "ref": "2Rs 22.8, 10-11"
+        },
+        {
+          "texto": "Os homens do rei procuram a profetisa Hulda. Ela diz que o Senhor viu Josias chorar e que só vai castigar Jerusalém depois que o rei morrer.",
+          "ref": "2Rs 22.14-15, 19-20"
+        },
+        {
+          "texto": "Josias lê em voz alta, no templo, todo o Livro da Aliança. De pé ao lado da coluna, ele e o povo prometem obedecer ao Senhor de todo o coração.",
+          "ref": "2Rs 23.2-3"
+        },
+        {
+          "texto": "Nenhum rei se volta para o Senhor como Josias. Mesmo assim, o faraó Neco mata Josias em Megido.",
+          "ref": "2Rs 23.25, 29"
+        },
+        {
+          "texto": "Os babilônios cercam Jerusalém até acabar a comida. O rei Zedequias foge de noite por um buraco no muro, mas os soldados prendem o rei perto de Jericó. Eles matam os filhos de Zedequias na frente dele, vazam os olhos dele e levam o rei acorrentado para a Babilônia.",
+          "ref": "2Rs 25.3-7"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Na Babilônia, o novo rei trata com bondade Joaquim, que era rei de Judá. Joaquim recebe tratamento melhor do que os outros reis presos lá. Na lista dos antepassados de Jesus, Mateus conta os nomes antes e depois do exílio na Babilônia (Mt 1.1, 11-12).",
+    "ref": "2Rs 25.28",
+    "desenho": "coroa",
+    "pares": [
+      {
+        "at": "2Rs 4.44",
+        "texto": "Então ele serviu, e todos comeram e se fartaram e ainda sobrou, conforme a palavra do Senhor.",
+        "nt": "Mt 14.19-20",
+        "nota": "Jesus parte cinco pães, todo mundo come até ficar satisfeito, e sobram doze cestos"
+      },
+      {
+        "at": "2Rs 5.14",
+        "texto": "Foi até o rio Jordão e mergulhou nas águas sete vezes conforme as palavras do homem de Deus e foi purificado",
+        "nt": "Lc 4.27",
+        "nota": "Jesus lembra que, no tempo de Eliseu, nenhum leproso de Israel foi purificado, só Naamã, o sírio"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Elias sobe ao céu",
+      "de": 1,
+      "ate": 2
+    },
+    {
+      "titulo": "Os milagres de Eliseu",
+      "de": 3,
+      "ate": 8
+    },
+    {
+      "titulo": "Jeú acaba com a família de Acabe",
+      "de": 9,
+      "ate": 10
+    },
+    {
+      "titulo": "Reis de Judá e de Israel",
+      "de": 11,
+      "ate": 16
+    },
+    {
+      "titulo": "Samaria cai nas mãos da Assíria",
+      "de": 17,
+      "ate": 17
+    },
+    {
+      "titulo": "Ezequias confia no Senhor",
+      "de": 18,
+      "ate": 20
+    },
+    {
+      "titulo": "Manassés e Josias",
+      "de": 21,
+      "ate": 23
+    },
+    {
+      "titulo": "Jerusalém cai nas mãos da Babilônia",
+      "de": 24,
+      "ate": 25
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "No caminho de Betel, uns jovens zombam de Eliseu e gritam: “Olha o careca! Olha o careca!” Duas ursas saem do bosque e despedaçam quarenta e dois deles.",
+      "ref": "2Rs 2.23-24"
+    },
+    {
+      "texto": "De manhã, o sol bate na água que encheu o vale, e ela parece vermelha. Os moabitas pensam que é sangue dos três reis e correm para saquear o acampamento.",
+      "ref": "2Rs 3.22-23"
+    },
+    {
+      "texto": "Um discípulo põe no ensopado uns frutos do mato que ninguém conhece. Os homens provam e gritam: “Homem de Deus, há morte na panela!” Eliseu joga farinha na panela, e todos comem sem perigo.",
+      "ref": "2Rs 4.39-41"
+    },
+    {
+      "texto": "O exército da Síria cerca Dotã, e o servo de Eliseu se desespera. Eliseu ora, o Senhor abre os olhos do moço, e ele vê os montes cheios de cavalos e carros de fogo em volta de Eliseu.",
+      "ref": "2Rs 6.15-17"
+    },
+    {
+      "texto": "Na fome de Samaria, quatro leprosos acham vazio o acampamento dos sírios. Eles comem e escondem prata, até que um diz: “Este é um dia de boas notícias, e nós não podemos ficar calados!”",
+      "ref": "2Rs 7.3, 5, 8-9"
+    },
+    {
+      "texto": "Geazi está contando ao rei como Eliseu fez um menino voltar a viver. Bem nessa hora, a mãe do menino entra para pedir a casa e a terra de volta.",
+      "ref": "2Rs 8.4-5"
+    },
+    {
+      "texto": "Amazias desafia o rei de Israel para a guerra. Jeoás responde contando que um espinheiro do Líbano pede a filha do cedro para o filho dele, e um animal selvagem passa e pisa no espinheiro.",
+      "ref": "2Rs 14.8-9"
+    },
+    {
+      "texto": "O rei Uzias fica com lepra até morrer. Ele mora sozinho numa casa, e o filho, Jotão, governa no lugar dele.",
+      "ref": "2Rs 15.5"
+    },
+    {
+      "texto": "Em Damasco, o rei Acaz vê um altar e manda a planta para o sacerdote Urias. Urias faz um altar igual em Jerusalém antes de o rei voltar.",
+      "ref": "2Rs 16.10-11"
+    },
+    {
+      "texto": "Senaqueribe está adorando no templo do deus dele quando dois filhos dele matam o pai à espada.",
+      "ref": "2Rs 19.37"
+    },
+    {
+      "texto": "Ezequias faz um açude e um túnel para levar água para dentro de Jerusalém.",
+      "ref": "2Rs 20.20"
+    },
+    {
+      "texto": "Josias queima ossos sobre o altar de Betel, mas deixa em paz o túmulo do homem de Deus que veio de Judá. Aquele homem tinha anunciado o que Josias acaba de fazer.",
+      "ref": "2Rs 23.16-18"
+    },
+    {
+      "texto": "Desde o tempo dos juízes não havia uma Páscoa como a que Josias manda celebrar, seguindo o Livro da Aliança.",
+      "ref": "2Rs 23.21-22"
+    },
+    {
+      "texto": "O faraó Neco põe no trono Eliaquim, que é filho de Josias, e troca o nome dele para Jeoaquim.",
+      "ref": "2Rs 23.34"
+    },
+    {
+      "texto": "Nabucodonosor leva os tesouros do templo e dez mil prisioneiros de Jerusalém. Ele põe no trono Matanias, tio do rei Joaquim, e muda o nome dele para Zedequias.",
+      "ref": "2Rs 24.13-14, 17"
+    },
+    {
+      "texto": "Os babilônios cortam em pedaços as duas colunas de bronze do templo e levam o bronze para a Babilônia.",
+      "ref": "2Rs 25.13"
+    }
+  ],
+  "procure": {
+    "texto": "Procure os altares das colinas. Joás, Amazias, Uzias e Jotão agradam ao Senhor, mas deixam esses altares de pé. Em 2 Reis, o primeiro rei que tira os altares das colinas é Ezequias."
+  }
+}

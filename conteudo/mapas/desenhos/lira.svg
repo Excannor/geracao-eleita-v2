@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a lira dos levitas que cantam na frente do exército de Josafá (2Cr 20.21, 28): os dois braços curvos, a trave no alto, as cordas descendo até a caixa de som em sálvia. -->
+<path class="k p" d="M34 80C26 62 26 40 34 26C38 20 44 20 44 26C44 32 38 36 40 46C42 56 46 66 48 80Z"/>
+<path class="k p" d="M86 80C94 62 94 40 86 26C82 20 76 20 76 26C76 32 82 36 80 46C78 56 74 66 72 80Z"/>
+<path class="k p" d="M34 32H86V38H34Z"/>
+<path class="h" d="M50 38V80M56 38V80M62 38V80M68 38V80"/>
+<path class="k s" d="M30 80H90V96C90 100 86 102 82 102H38C34 102 30 100 30 96Z"/>
+<circle class="k p" cx="60" cy="90" r="4"/>
+</svg>

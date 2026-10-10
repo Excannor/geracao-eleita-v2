@@ -103,6 +103,10 @@ await cmd('Page.enable');
 await cmd('Runtime.enable');
 await cmd('Network.enable');
 await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+// O navegador no fuso das contas (o padrão do servidor é São Paulo). Com a máquina em UTC, das
+// 21h às 24h de Brasília o app já estava no dia seguinte e o servidor ainda no de hoje: o
+// "Orei" e o check-in iam para dias diferentes e o teste falhava só à noite.
+await cmd('Emulation.setTimezoneOverride', { timezoneId: 'America/Sao_Paulo' });
 // sem a abertura, sem o convite de notificações e sem o tutorial de instalar por cima da tela;
 // o .ics de "Pôr na agenda" fica guardado em window.__ics em vez de baixar
 await cmd('Page.addScriptToEvaluateOnNewDocument', { source: "try{localStorage.setItem('cc.aviso.push','nunca');localStorage.removeItem('cc.instalar');sessionStorage.setItem('cc.abertura','1')}catch(e){}"
@@ -144,7 +148,8 @@ ok(await av('decodeURIComponent(' + q('[data-mensagem-oracao="ana"]') + '.href).
 await clicar('[data-orei="ana"]');
 ok(await esperar('!document.querySelector("[data-ore-hoje=\\"ana\\"]") && !!CC.diaDoDiario()["orei_ana"]'), 'C1: "Orei" anota orei_ana no diário de hoje e a linha some');
 await av('CC.redesenhar(); true');
-ok(await esperar('!!document.querySelector("[data-ore-hoje=\\"bia\\"]") && !document.querySelector("[data-ore-hoje=\\"ana\\"]")'), 'C1: redesenhada, a linha de quem já recebeu oração continua fora até amanhã');
+// redesenhar busca a célula de novo no servidor: com a máquina carregada passa de 8 s
+ok(await esperar('!!document.querySelector("[data-ore-hoje=\\"bia\\"]") && !document.querySelector("[data-ore-hoje=\\"ana\\"]")', 20000), 'C1: redesenhada, a linha de quem já recebeu oração continua fora até amanhã');
 ok(await av('!!' + q('.cabeca-celula .cartao-encontro') + ' && /Próximo encontro/.test(' + q('.cartao-encontro') + '.textContent) && /^(Hoje|Quarta, \\d+\\/\\d+)$/.test(' + q('.cartao-encontro .textos > span') + '.textContent)'),
   'C8: o cartão "Próximo encontro" no alto, com o dia marcado (quarta)');
 ok(await av('!/Encontro às|encontro às/.test(' + q('#conteudo') + '.textContent)'), 'C8: a linha repetida "Encontro às quartas-feiras" saiu');
@@ -163,8 +168,10 @@ ok(await esperar('!!document.querySelector(".folha h2") && document.querySelecto
 ok(await av('/o encontro desta semana|Hoje|Ontem/.test(' + q('[data-realce-data]') + '.textContent) && ' + q('[data-outras-datas]') + '.hidden'), 'C12: a data do encontro em destaque, as outras escondidas');
 await clicar('[data-outra-data]');
 ok(await av('!' + q('[data-outras-datas]') + '.hidden && document.querySelectorAll("[data-outras-datas] [data-data]").length === 8 && ' + q('[data-outra-data]') + '.getAttribute("aria-expanded") === "true"'), 'C12: "Outra data" mostra as 8 datas');
-await av('document.querySelectorAll("[data-outras-datas] [data-data]")[2].click(); true');
-ok(await av('!/encontro desta semana/.test(' + q('[data-realce-data]') + '.textContent) || document.querySelectorAll("[data-outras-datas] [data-data]")[2].dataset.data === CC.hojeIso()'), 'C12: escolher outra data troca o destaque');
+// uma data que não seja a do encontro já em destaque (a 3ª da lista coincidia com a quarta do
+// encontro às sextas, e o destaque, com razão, não mudava)
+const outraData = await av('(() => { const b = [...document.querySelectorAll("[data-outras-datas] [data-data]")].find((x) => x.getAttribute("aria-pressed") !== "true" && x.dataset.data !== CC.hojeIso()); if (!b) return ""; b.click(); return b.dataset.data; })()');
+ok(!!outraData && await esperar('!/encontro desta semana/.test(' + q('[data-realce-data]') + '.textContent)'), 'C12: escolher outra data troca o destaque (' + outraData + ')');
 await clicar('.folha [data-fechar]');
 await esperar('!document.querySelector(".folha")');
 ok(await av('!!' + q('[data-pedir-caminhada]')) && await alto('[data-pedir-caminhada]'), 'C4: o Painel tem "Pedir para a célula marcar"');

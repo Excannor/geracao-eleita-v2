@@ -5,12 +5,34 @@
 
   const D = CC.D;
   const dataBr = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
+  // Data digitada (dd/mm/aaaa) no lugar do calendário do aparelho, que no Android obriga a
+  // voltar ano por ano. As barras entram sozinhas; dataIso devolve '' se a data não existe.
+  const mascaraData = (v) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+    const n = v.replace(/\D/g, '').slice(0, 8);
+    return n.slice(0, 2) + (n.length > 2 ? '/' + n.slice(2, 4) : '') + (n.length > 4 ? '/' + n.slice(4) : '');
+  };
+  const dataIso = (v) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v) || /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
+    if (!m) return '';
+    const iso = m[1].length === 4 ? m[1] + '-' + m[2] + '-' + m[3] : m[3] + '-' + m[2] + '-' + m[1];
+    const d = new Date(iso + 'T12:00:00Z');
+    return !isNaN(d) && d.toISOString().slice(0, 10) === iso && iso >= '1900-01-01' ? iso : '';
+  };
 
   const linha = (rotulo, valor, atributos, classe) => '<button class="linha-config' + (classe ? ' ' + classe : '') + '" ' + (atributos || '') + '>'
     + '<span>' + CC.esc(rotulo) + '</span>' + (valor ? '<span class="valor">' + CC.esc(valor) + '</span>' : '')
     + CC.ico('avancar') + '</button>';
   const grupo = (titulo, dentro) => '<section class="grupo-config"><h2 class="etiqueta">' + CC.esc(titulo) + '</h2>'
     + '<div class="caixa-config">' + dentro + '</div></section>';
+
+  // A data de nascimento não muda depois do cadastro (o servidor recusa): aparece só para
+  // leitura, com o caminho para corrigir um erro de digitação.
+  const SUPORTE = 'suporte@geracaoeleita.app';
+  const dicaNascimento = '<span class="dica-linha">Para corrigir, fale com o <a href="mailto:' + SUPORTE + '">suporte</a></span>';
+  const linhaNascimento = (nascimento) => (nascimento
+    ? '<div class="linha-config sem-toque so-leitura" data-nascimento><span>Nascimento</span><span class="valor">' + CC.esc(dataBr(nascimento)) + '</span>' + dicaNascimento + '</div>'
+    : '<div class="linha-config sem-toque"><span>Nascimento</span><span class="valor">falta completar</span></div>');
 
   CC.vistaConfig = function (raiz) {
     const quem = CC.quem || {};
@@ -40,8 +62,9 @@
         + linha('Zerar progresso', '', 'data-zerar', 'perigo'))
       + (quem.comSenha
         ? grupo('Conta', '<div class="linha-config sem-toque"><span>@usuário</span><span class="valor">@' + CC.esc(quem.usuario) + '</span></div>'
-          + '<div class="linha-config sem-toque"><span>E-mail</span><span class="valor">' + CC.esc(quem.email || 'falta completar') + '</span></div>'
-          + '<div class="linha-config sem-toque"><span>Nascimento</span><span class="valor">' + CC.esc(dataBr(quem.nascimento) || 'falta completar') + '</span></div>'
+          + (quem.email ? linha('E-mail', quem.email, 'data-email')
+            : '<div class="linha-config sem-toque"><span>E-mail</span><span class="valor">falta completar</span></div>')
+          + linhaNascimento(quem.nascimento)
           + (quem.perfilCompleto ? '' : linha('Completar cadastro', '', 'data-completar'))
           + linha('Trocar a senha', '', 'data-senha')
           + linha('Sair dos outros aparelhos', '', 'data-sair-outros')
@@ -53,17 +76,18 @@
     raiz.querySelectorAll('[data-tema]').forEach((b) => {
       b.onclick = () => { CC.guardarTema(JSON.parse(b.dataset.tema)); CC.redesenhar(); };
     });
-    raiz.querySelector('[data-exportar]').onclick = () => { CC.baixarExportacao(); CC.avisar('Arquivo gerado'); };
+    raiz.querySelector('[data-exportar]').onclick = () => CC.exportarComAviso();
     raiz.querySelector('[data-zerar]').onclick = async () => {
       const certo = await CC.confirmar({
-        titulo: 'Zerar todo o progresso?',
-        texto: 'Apaga leituras, ofensiva, registros e anotações em todos os aparelhos. O material de leitura não é tocado.',
-        acao: 'Apagar tudo',
+        titulo: 'Recomeçar a trilha do zero?',
+        texto: 'Apaga, em todos os aparelhos, as leituras marcadas do plano, os primeiros passos, os dias do Conhecer Jesus, a ofensiva, o XP, as conquistas, os baús, os desafios do dia e a prática. '
+          + 'Ficam sua foto e seu nome, as reflexões, anotações e notas, as marcações nos versículos, a Minha história com Deus, os desafios de vários dias, os amigos e a célula.',
+        acao: 'Zerar a trilha',
         perigo: true,
       });
       if (!certo) return;
       CC.zerarProgresso();
-      CC.avisar('Progresso zerado');
+      CC.avisar('Trilha recomeçada');
       CC.redesenhar();
     };
     const ligar = (sel, fn) => { const el = raiz.querySelector(sel); if (el) el.onclick = fn; };
@@ -81,6 +105,7 @@
     ligar('[data-caminho]', () => folhaSeuCaminho(quem));
     ligar('[data-completar]', () => CC.completarCadastro(quem));
     ligar('[data-senha]', () => CC.trocarSenha());
+    ligar('[data-email]', () => trocarEmail(quem));
     ligar('[data-apagar]', () => CC.apagarConta(quem.usuario));
     ligar('[data-sair-outros]', async () => {
       const certo = await CC.confirmar({
@@ -171,8 +196,12 @@
       CC.folha('<p class="fala-bento pequena">Oi' + (quem.nome ? ', ' + CC.esc(quem.nome) : '')
         + '! Faltam só dois detalhes.</p>'
         + '<p class="passo-dica">Seu progresso está guardado.</p>'
-        + '<label class="campo-senha"><span>E-mail</span><input type="email" id="cad-email" autocomplete="email" value="' + CC.esc(quem.email || '') + '"></label>'
-        + '<label class="campo-senha"><span>Data de nascimento</span><input type="date" id="cad-nasc" value="' + CC.esc(quem.nascimento || '') + '"></label>'
+        + (quem.email
+          ? '<div class="campo-senha so-leitura"><span>E-mail</span><b id="cad-email-fixo">' + CC.esc(quem.email) + '</b></div>'
+          : '<label class="campo-senha"><span>E-mail</span><input type="email" id="cad-email" autocomplete="email"></label>')
+        + (quem.nascimento
+          ? '<div class="campo-senha so-leitura" data-nascimento><span>Data de nascimento</span><b>' + CC.esc(dataBr(quem.nascimento)) + '</b>' + dicaNascimento + '</div>'
+          : '<label class="campo-senha"><span>Data de nascimento</span><input type="text" id="cad-nasc" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" autocomplete="bday"></label>')
         + '<p class="recado-senha" id="recado" role="alert"></p>'
         + '<div class="acoes"><button class="botao" data-salvar>Salvar e continuar</button>'
         + '<button class="botao plano" data-depois>Agora não</button></div>',
@@ -182,19 +211,23 @@
         ligar: (folha, fechar) => {
           const recado = folha.querySelector('#recado');
           const botao = folha.querySelector('[data-salvar]');
+          const nasc = folha.querySelector('#cad-nasc');
+          if (nasc) nasc.oninput = () => { const v = mascaraData(nasc.value); if (v !== nasc.value) nasc.value = v; };
           folha.querySelector('[data-depois]').onclick = () => { fechar(); resolver(false); };
           botao.onclick = async () => {
             recado.textContent = '';
             botao.disabled = true;
             try {
-              await CC.api('api/perfil', {
-                email: folha.querySelector('#cad-email').value,
-                nascimento: folha.querySelector('#cad-nasc').value,
-              });
+              const campoEmail = folha.querySelector('#cad-email');
+              const campoNasc = folha.querySelector('#cad-nasc');
+              const email = campoEmail ? campoEmail.value.trim().toLowerCase() : quem.email;
+              const nascimento = campoNasc ? dataIso(campoNasc.value) : quem.nascimento;
+              if (campoNasc && !nascimento) throw new Error('Confira a data de nascimento (dd/mm/aaaa).');
+              await CC.api('api/perfil', { email, nascimento });
               if (CC.quem) {
                 CC.quem.perfilCompleto = true;
-                CC.quem.email = folha.querySelector('#cad-email').value.trim().toLowerCase();
-                CC.quem.nascimento = folha.querySelector('#cad-nasc').value;
+                CC.quem.email = email;
+                CC.quem.nascimento = nascimento;
               }
               fechar();
               CC.avisar('Cadastro completo!');
@@ -211,15 +244,54 @@
     });
   };
 
+  // ---------- trocar o e-mail ----------
+  // Pede a senha atual: com a sessão de outra pessoa nas mãos, trocar o e-mail e depois pedir
+  // nova senha tomaria a conta.
+  function trocarEmail(quem) {
+    CC.folha('<h3>Trocar o e-mail</h3>'
+      + '<p class="passo-dica">Hoje: ' + CC.esc(quem.email || '') + '</p>'
+      + '<label class="campo-senha"><span>Novo e-mail</span><input type="email" id="novo-email" autocomplete="email"></label>'
+      + campo('email-senha', 'Sua senha atual', 'current-password')
+      + '<p class="recado-senha" id="recado" role="alert"></p>'
+      + '<div class="acoes"><button class="botao" data-salvar>Trocar o e-mail</button>'
+      + '<button class="botao plano" data-fechar>Cancelar</button></div>',
+    {
+      rotulo: 'Trocar o e-mail', classe: 'folha-conta',
+      ligar: (folha, fechar) => {
+        const recado = folha.querySelector('#recado');
+        const botao = folha.querySelector('[data-salvar]');
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        botao.onclick = async () => {
+          recado.textContent = '';
+          const email = folha.querySelector('#novo-email').value.trim().toLowerCase();
+          const senhaAtual = folha.querySelector('#email-senha').value;
+          if (!email) { recado.textContent = 'Escreva o novo e-mail.'; return; }
+          if (!senhaAtual) { recado.textContent = 'Digite a sua senha atual.'; return; }
+          botao.disabled = true;
+          try {
+            await CC.api('api/perfil', { email, senhaAtual });
+            if (CC.quem) CC.quem.email = email;
+            fechar();
+            CC.avisar('E-mail trocado');
+            CC.redesenhar();
+          } catch (e) {
+            botao.disabled = false;
+            recado.textContent = e.message;
+          }
+        };
+      },
+    });
+  }
+
   // ---------- consentimento sobre dado de fé (LGPD art. 11) ----------
   // O mesmo texto do portal de entrada (src/entrar.html): leitura, anotação e participação
   // em grupo de leitura e oração são dado sensível, e pedem um "sim" claro, não escondido
   // em letra miúda.
-  // Versão 2 do texto (CONSENTIMENTO_VERSAO em contas.mjs): quem já tinha conta vê a folha de novo.
-  const TEXTO_CONSENTIMENTO = 'Concordo que o Geração Eleita guarde minhas leituras, anotações e a minha '
+  // Versão 3 do texto (CONSENTIMENTO_VERSAO em contas.mjs): quem já tinha conta vê a folha de novo.
+  const TEXTO_CONSENTIMENTO = 'Concordo que o Geração Eleita guarde minhas leituras, anotações, check-ins e a minha '
     + 'participação em grupos de leitura e oração. São informações sobre a minha fé. Só eu decido o que '
-    + 'meus amigos veem; quem conduz a minha célula e a administração da igreja veem como estou caminhando '
-    + '(leitura, presença, etapa de Minha caminhada), nunca o que eu escrevo.';
+    + 'meus amigos e quem me acompanha no Discipulado veem; quem conduz a minha célula e a administração da igreja veem como estou caminhando '
+    + '(leitura, presença, etapa de Minha caminhada) e o check-in só somado com o dos outros, nunca o que eu escrevo.';
   const LINK_PRIVACIDADE = '<a href="privacidade.html" target="_blank" rel="noopener">Ler a política de privacidade</a>';
 
   // Folha presa (sem fechar tocando fora) que a abertura do app mostra antes de tudo para
@@ -282,7 +354,8 @@
       + (quem && quem.comSenha
         ? '<h3>Retirar o consentimento</h3>'
           + '<p class="passo-dica">O app só guarda leitura, anotação e participação em grupo com o seu consentimento. '
-          + 'Retirar o consentimento é apagar a conta, com todas as cópias.</p>'
+          + 'Dá para retirar partes sem apagar a conta (marcos no Juntos, o que o Discipulado vê, sair de uma célula). '
+          + 'Retirar o consentimento inteiro é apagar a conta, como explica a política.</p>'
           + '<div class="acoes"><button class="botao plano perigo" data-apagar>Apagar a conta</button></div>'
         : ''),
     {

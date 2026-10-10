@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o sacerdote que passa de longe (Lc 10.31): o turbante de linho, largo e baixo, visto de frente, com as voltas do pano cruzando em diagonal, a faixa de baixo e a placa na testa. A placa é a única área sálvia. -->
+<path class="k p" d="M20 78C16 54 36 38 60 38C84 38 104 54 100 78Z"/>
+<path class="k" d="M24 64C40 50 66 44 98 58M22 74C44 60 72 56 100 70M30 50C52 54 74 64 96 78"/>
+<path class="k p" d="M22 80C22 72 98 72 98 80V90C98 97 22 97 22 90Z"/>
+<path class="k s" d="M49 78H71V90H49Z"/>
+</svg>

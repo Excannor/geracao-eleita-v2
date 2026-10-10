@@ -44,7 +44,7 @@
     { linhas: ['Nele vivemos,', 'nos movemos', 'e existimos'], ref: 'Atos 17.28' },
     { linhas: ['Prepara-te,', 'Ele vem'] },
     { linhas: ['Até que', 'Ele venha'] },
-    { linhas: ['Quem já foi', 'comprado', 'não se vende'] },
+    { linhas: ['Quem já foi', 'comprado', 'não se vende'], ref: '1 Coríntios 6.20', arte: 'comprado' },
     { linhas: ['Atraídos pela', 'Sua presença'] },
     { linhas: ['Marcados pela', 'diferença'] },
     { linhas: ['Perseverando', 'até o fim'] },
@@ -57,13 +57,63 @@
     { linhas: ['A sua oração', 'de hoje está', 'construindo', 'o milagre de amanhã.', 'Continue firme'] },
     { linhas: ['Onde o mundo', 'vê um fim, Deus', 'escreve um', 'novo começo cheio', 'de esperança'] },
     { linhas: ['Geração', 'inconformada'] },
+    // As das artes que o dono mandou (2026-10-09): cada uma tem um modelo de story
+    // próprio, redesenhado em canvas a partir da arte (arte: o nome do modelo, 01e-story-artes.js).
+    { linhas: ['Não me envergonho', 'do Evangelho'], ref: 'Romanos 1.16', arte: 'chama' },
+    { linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14', arte: 'luz' },
+    { linhas: ['Ninguém fica', 'para trás'], ref: 'Mateus 18.11-14', arte: 'ninguem' },
+    { linhas: ['Eu ainda estou', 'nas mãos', 'do Oleiro'], ref: 'Jeremias 18.6', arte: 'oleiro' },
+    // O cartaz de "procurado" com a ovelha número 100 (a perdida da parábola): ilustração
+    // própria a partir da ideia de uma arte que o dono mandou, sem copiar o desenho. O dono
+    // quer só a arte, sem frase: na folha da ofensiva aparece só a referência, e o fim da
+    // lição (que mostra a frase em texto) não sorteia esta.
+    { linhas: [], ref: 'Lucas 15.4-7', arte: 'procurado' },
+    // A bandeira erguida: versão ilustrada a partir da ideia de uma foto que o dono mandou.
+    // Sem referência: nenhum versículo diz isso com estas palavras.
+    { linhas: ['Jesus é', 'suficiente'], arte: 'suficiente' },
+    // Trecho de Tiago 1.22 na NBV, palavra por palavra (a arte do dono citava outra tradução).
+    { linhas: ['Coloquem em prática', 'a palavra'], ref: 'Tiago 1.22', arte: 'praticantes' },
+    // A porta entreaberta: arte própria a partir de uma tipográfica que o dono mandou. A frase é
+    // o lema conhecido; o trecho que o story cita é o da NBV.
+    { linhas: ['Eis que estou', 'à porta e bato'], ref: 'Apocalipse 3.20', arte: 'porta' },
+    // Segunda leva de artes (o dono, 2026-10-09), também redesenhadas como arte própria.
+    { linhas: ['Até que a mesa', 'esteja cheia'], ref: 'Lucas 15.4-7', arte: 'mesa' },
+    { linhas: ['Eu não sou o que', 'dizem sobre mim,', 'sou quem Deus', 'diz que eu sou'], ref: '1 Pedro 2.9-10', arte: 'quemdeusdiz' },
+    { linhas: ['Jesus não nos chamou', 'para um momento,', 'mas para uma vida', 'inteira Nele'], arte: 'momento' },
+    { linhas: ['É você que', 'me encontra'], ref: 'Êxodo 33.7-11', arte: 'tenda' },
+    { linhas: ['Seu chamado é', 'ser diferente'], arte: 'diferente' },
+    { linhas: ['O chamado não', 'é caro. Ele', 'custa tudo'], arte: 'custatudo' },
+    { linhas: ['Um coração disposto', 'não cumpre chamado', 'se a boca não fala'], arte: 'coracao' },
+    // Lema com a referência: a NBV diz "eu próprio não vivo mais, e sim é Cristo quem vive em mim".
+    { linhas: ['Não vivo mais eu,', 'mas Cristo', 'vive em mim'], ref: 'Gálatas 2.20', arte: 'naovivo' },
+    { linhas: ['Quando penso', 'em desistir, lembro', 'que você', 'insistiu em mim'], arte: 'desistir' },
+    { linhas: ['Confie no plano', 'de Deus'], arte: 'confie' },
+    { linhas: ['Inundados pelo', 'amor de Deus'], ref: 'Ezequiel 47.1-9', arte: 'inundados' },
+    // Lema com a referência: a NBV diz "Estou fazendo um trabalho muito importante!".
+    { linhas: ['Estou em uma', 'grande obra e', 'não posso parar'], ref: 'Neemias 6.3', arte: 'grandeobra' },
+    // Começo de Mateus 24.42 na NBV, palavra por palavra (o story cita o versículo inteiro).
+    { linhas: ['Portanto,', 'estejam vigiando'], ref: 'Mateus 24.42', arte: 'vigiem' },
+    // Terceira leva de artes do dono (2026-10-09), redesenhadas como ilustração própria.
+    // 1 Coríntios 11.26 na NBV termina em "Façam isso até que ele venha".
+    { linhas: ['Avivados', 'até que Ele venha'], ref: '1 Coríntios 11.26', arte: 'avivados' },
+    // Lema com a referência: a NBV diz "você não precisa ter medo porque eu sou o seu Deus".
+    { linhas: ['Não temas', 'eu sou teu Deus'], ref: 'Isaías 41.10', arte: 'naotemas' },
+    // O dono quis o texto da arte em inglês, como no adesivo original.
+    { linhas: ['Jesus is', 'my King'], arte: 'rei' },
+    // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
+    { linhas: ['É tudo', 'sobre Ele'] },
+    { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },
+    { linhas: ['Jovens que', 'influenciam', 'a sua geração'], ref: 'Mateus 5.13-15' },
+    { linhas: ['O maior fracasso', 'é ter sucesso', 'em coisas que', 'nos afastam', 'de Deus'] },
   ];
   // Nunca a mesma da última vez: abrir de novo e ver a mesma frase parece que não sorteou.
+  // comTexto: só as que têm frase (o fim da lição mostra a frase em texto corrido).
   let ultimaFrase = -1;
-  CC.fraseDaOfensiva = () => {
+  CC.fraseDaOfensiva = ({ comTexto = false } = {}) => {
     const total = CC.FRASES_OFENSIVA.length;
+    const vale = (k) => !comTexto || CC.FRASES_OFENSIVA[k].linhas.length > 0;
     let i = Math.floor(Math.random() * total);
-    if (i === ultimaFrase && total > 1) i = (i + 1 + Math.floor(Math.random() * (total - 1))) % total;
+    for (let n = 0; n < total && (i === ultimaFrase || !vale(i)); n++) i = (i + 1 + Math.floor(Math.random() * (total - 1))) % total;
     ultimaFrase = i;
     return CC.FRASES_OFENSIVA[i];
   };

@@ -58,7 +58,10 @@ console.log('primeiros dias:', Object.keys(conteudo.primeirosDias.dias).length, 
 
 // Os módulos do app são concatenados na ordem do nome do arquivo: 01 antes de 02.
 const pastaApp = src('app');
-const modulos = readdirSync(pastaApp).filter((f) => f.endsWith('.js')).sort();
+// Os modelos de story com arte própria (01e-story-artes.js) ficam fora: vão num arquivo
+// separado, pedido só na hora de gerar um story desses (veja "artes de story" mais abaixo).
+const SO_SOB_DEMANDA = (f) => /story-artes\.js$/.test(f);
+const modulos = readdirSync(pastaApp).filter((f) => f.endsWith('.js') && !SO_SOB_DEMANDA(f)).sort();
 // O que é só para quem lê o fonte sai do app entregue (o index.html tem teto de 1 MB):
 // - os comentários de linha inteira ("// ...", uns 80 KB) e os de bloco que começam numa
 //   linha e terminam no fim de outra ("/* ... */"), a documentação do código;
@@ -223,6 +226,107 @@ const mapas = (indiceMapas.publicados || []).map((slug) => {
 });
 console.log('mapas dos livros:', mapas.map((m) => m.nome).join(', ') || 'nenhum');
 
+// ---------- parábolas ----------
+// Como os mapas: um arquivo por parábola publicada (parabola-<slug>.<resumo>.json), com os
+// desenhos embutidos, guardado pelo service worker quando é aberto. Os desenhos da lista
+// (um por parábola) vão juntos num arquivo só (parabolas-desenhos.<resumo>.json), pedido
+// quando a lista abre: dezenas de SVGs no index.html comeriam a folga do teto de 1 MB. No
+// index.html fica só o mínimo da lista (window.PARABOLAS). Publicada com erro no checador
+// (ferramentas/checar-parabola.mjs) para o build.
+const pastaParabolas = join(AQUI, 'conteudo', 'parabolas');
+for (const velho of readdirSync(dist()).filter((f) => /^parabola(-|s-desenhos\.).*\.(json|js)(\.gz)?$/.test(f))) rmSync(dist(velho));
+const parabolas = { desenhos: '', tela: '', grupos: [], itens: [] };
+if (existsSync(join(pastaParabolas, 'indice.json'))) {
+  const { checarParabola, checarIndice } = await import('./ferramentas/checar-parabola.mjs');
+  const indiceParabolas = JSON.parse(readFileSync(join(pastaParabolas, 'indice.json'), 'utf8'));
+  const errosIndice = checarIndice(indiceParabolas);
+  if (errosIndice.length) throw new Error('conteudo/parabolas/indice.json: ' + errosIndice.join(' · '));
+  const publicadas = new Set(indiceParabolas.publicadas || []);
+  const gravar = (arquivo, texto) => {
+    writeFileSync(dist(arquivo), texto, 'utf8');
+    writeFileSync(dist(arquivo + '.gz'), gzipSync(Buffer.from(texto, 'utf8'), { level: 9 }));
+  };
+  const resumo = (texto) => createHash('sha256').update(texto).digest('hex').slice(0, 10);
+  const desenhosDaLista = {};
+  for (const g of indiceParabolas.grupos) {
+    const slugs = (g.parabolas || []).filter((s) => publicadas.has(s));
+    if (!slugs.length) continue;
+    parabolas.grupos.push({ id: g.id, nome: g.nome, curto: g.curto, ...(g.sub ? { sub: g.sub } : {}) });
+    for (const slug of slugs) {
+      const p = JSON.parse(readFileSync(join(pastaParabolas, slug + '.json'), 'utf8'));
+      const { erros } = checarParabola(slug, p);
+      if (erros.length) throw new Error('a parábola publicada ' + slug + ' não passa no checador: ' + erros.slice(0, 3).join(' · '));
+      const ids = new Set([p.desenho, p.desenhoLista].concat(p.secoes.flatMap((s) => s.blocos.flatMap((b) => (b.itens || []).map((it) => it.desenho)))));
+      // o cartão de uma parecida que leva a outra parábola mostra o desenho da lista dela
+      for (const x of p.parecidas || []) if (x.slug) ids.add(JSON.parse(readFileSync(join(pastaParabolas, x.slug + '.json'), 'utf8')).desenhoLista);
+      p.desenhos = Object.fromEntries([...ids].map((id) => [id, lerDesenho(id)]));
+      desenhosDaLista[p.desenhoLista] = p.desenhos[p.desenhoLista];
+      const texto = JSON.stringify(p);
+      const arquivo = 'parabola-' + slug + '.' + resumo(texto) + '.json';
+      gravar(arquivo, texto);
+      parabolas.itens.push({ slug, titulo: p.titulo, ref: p.ref, linha: p.linha, grupo: g.id, desenho: p.desenhoLista, arquivo });
+    }
+  }
+  if (parabolas.itens.length) {
+    const texto = JSON.stringify(desenhosDaLista);
+    parabolas.desenhos = 'parabolas-desenhos.' + resumo(texto) + '.json';
+    gravar(parabolas.desenhos, texto);    // A página da parábola (código e estilo) também fica fora do index.html: só quem abre uma
+    // parábola a baixa. O estilo entra no lugar da marca, já enxuto como o resto.
+    const css = enxugarCss(readFileSync(src('sob-demanda', 'parabola-tela.css'), 'utf8'));
+    if (/<\/style/i.test(css)) throw new Error('src/sob-demanda/parabola-tela.css tem "</style>" dentro');
+    const tela = enxugarJs(readFileSync(src('sob-demanda', 'parabola-tela.js'), 'utf8'), 'parabola-tela.js')
+      .replace("'/*ESTILO_PARABOLA*/'", () => JSON.stringify(css));
+    if (tela.includes('/*ESTILO_PARABOLA*/')) throw new Error('parabola-tela.js perdeu a marca do estilo');
+    parabolas.tela = 'parabola-tela.' + resumo(tela) + '.js';
+    gravar(parabolas.tela, tela);
+  }
+}
+console.log('parábolas:', parabolas.itens.map((p) => p.titulo).join(', ') || 'nenhuma');
+
+// ---------- artes de story ----------
+// Os desenhos dos stories das frases com arte própria (src/app/01e-story-artes.js, umas
+// dezenas de KB) não cabem no index.html (teto de 1 MB) e só servem na hora de compartilhar:
+// saem num arquivo com resumo no nome (story-artes.<resumo>.js), que o app carrega sob
+// demanda (01d-story.js) e o service worker guarda no cache próprio na primeira vez. Sem
+// ele (sem rede na primeira vez), o story sai no modelo de sempre. Exige sessão, como o app.
+// As fotos de alguns modelos (src/story-fotos/<nome>.webp, já tratadas: P&B, contraste, até
+// 150 KB) saem como story-foto-<nome>.<resumo>.webp; os nomes entram no começo do arquivo das
+// artes (window.STORY_FOTOS), nunca no index.html, e vão no mesmo cache do service worker.
+for (const velho of readdirSync(dist()).filter((f) => /^story-(artes\..*\.js(\.gz)?|foto-.*\.webp)$/.test(f))) rmSync(dist(velho));
+const pastaFotosStory = src('story-fotos');
+const fotosStory = {};
+for (const f of existsSync(pastaFotosStory) ? readdirSync(pastaFotosStory).filter((x) => /^[a-z0-9-]+\.webp$/.test(x)) : []) {
+  const bin = readFileSync(join(pastaFotosStory, f));
+  const arquivo = 'story-foto-' + f.replace(/\.webp$/, '') + '.' + createHash('sha256').update(bin).digest('hex').slice(0, 10) + '.webp';
+  writeFileSync(dist(arquivo), bin);
+  fotosStory[f.replace(/\.webp$/, '')] = arquivo;
+}
+const artesStory = (Object.keys(fotosStory).length ? 'window.STORY_FOTOS=' + JSON.stringify(fotosStory) + ';\n' : '')
+  + readdirSync(pastaApp).filter(SO_SOB_DEMANDA).sort()
+    .map((f) => enxugarJs(readFileSync(join(pastaApp, f), 'utf8'), f)).join('\n');
+const arquivoArtesStory = artesStory ? 'story-artes.' + createHash('sha256').update(artesStory).digest('hex').slice(0, 10) + '.js' : '';
+if (arquivoArtesStory) {
+  writeFileSync(dist(arquivoArtesStory), artesStory, 'utf8');
+  writeFileSync(dist(arquivoArtesStory + '.gz'), gzipSync(Buffer.from(artesStory, 'utf8'), { level: 9 }));
+  console.log('artes de story:', arquivoArtesStory, kb(artesStory), Object.values(fotosStory).join(' '));
+}
+
+// ---------- a tela do aviso do administrador ----------
+// Painel > Enviar aviso: só o administrador abre, então código e estilo saem do index.html
+// (teto de 1 MB) num arquivo com resumo no nome (aviso-tela.<resumo>.js), pedido na hora
+// (07e-painel.js). O estilo entra no lugar da marca, já enxuto. Sem cache próprio no service
+// worker: é uma tela de quem administra, sempre com rede.
+for (const velho of readdirSync(dist()).filter((f) => /^aviso-tela\..*\.js(\.gz)?$/.test(f))) rmSync(dist(velho));
+const cssAviso = enxugarCss(readFileSync(src('sob-demanda', 'aviso-tela.css'), 'utf8'));
+if (/<\/style/i.test(cssAviso)) throw new Error('src/sob-demanda/aviso-tela.css tem "</style>" dentro');
+const telaAviso = enxugarJs(readFileSync(src('sob-demanda', 'aviso-tela.js'), 'utf8'), 'aviso-tela.js')
+  .replace("'/*ESTILO_AVISO*/'", () => JSON.stringify(cssAviso));
+if (telaAviso.includes('/*ESTILO_AVISO*/')) throw new Error('aviso-tela.js perdeu a marca do estilo');
+const arquivoAvisoTela = 'aviso-tela.' + createHash('sha256').update(telaAviso).digest('hex').slice(0, 10) + '.js';
+writeFileSync(dist(arquivoAvisoTela), telaAviso, 'utf8');
+writeFileSync(dist(arquivoAvisoTela + '.gz'), gzipSync(Buffer.from(telaAviso, 'utf8'), { level: 9 }));
+console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
+
 // ---------- ícones ----------
 // Vêm prontos de src/icones/, gerados da arte em arte/icone-app.png por
 // ferramentas/icones.ps1. Reduzir um PNG exige decodificá-lo, e o build roda no Docker
@@ -312,6 +416,9 @@ const html = molde
   .replace(/\/\*CONTEUDO_ARQUIVO\*\//g, () => arquivoConteudo)
   // window.BIBLIAS fica por último: os testes leem a lista de traduções até o ";</script>".
   .replace(/\/\*DADOS\*\//g, () => 'window.CONTEUDO_ARQUIVO=' + JSON.stringify(arquivoConteudo) + ';'
+    + 'window.STORY_ARTES=' + JSON.stringify(arquivoArtesStory) + ';'
+    + 'window.AVISO_TELA=' + JSON.stringify(arquivoAvisoTela) + ';'
+    + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
   // O cartão dos mapas no Explorar leva um desenho só (o rolo com a pena): ele entra no código
@@ -375,6 +482,12 @@ const CACHE_BIBLIAS = 'caminho-biblias';
 // Os mapas dos livros também têm cache próprio: um arquivo por livro, com resumo no nome,
 // guardado quando o mapa é aberto pela primeira vez.
 const CACHE_MAPAS = 'caminho-mapas';
+// As parábolas, como os mapas: um arquivo por parábola e o dos desenhos da lista, guardados
+// quando são pedidos pela primeira vez.
+const CACHE_PARABOLAS = 'caminho-parabolas';
+// As artes de story (story-artes.<resumo>.js): guardadas na primeira vez que alguém
+// compartilha um story desses, para o próximo sair sem rede.
+const CACHE_STORY = 'caminho-story';
 const ARQUIVOS = ${JSON.stringify(
   ['./', './index.html', './' + arquivoConteudo, './manifest.webmanifest', './apple-touch-icon.png', './icone-48.png']
     .concat(icones.map((i) => './' + i.arquivo), arquivosFontes.map((f) => './' + f.arquivo)))};
@@ -384,7 +497,9 @@ const AVULSAS = ['entrar.html', 'privacidade.html', 'termos.html'];
 const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
 // As fontes do nome original (fonte-original-*) vão no cache dos mapas: só a tela do mapa as usa.
 const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo).concat(fontesOriginais.map((f) => f.arquivo)))};
-const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS]];
+const STORY = ${JSON.stringify((arquivoArtesStory ? [arquivoArtesStory] : []).concat(Object.values(fotosStory)))};
+const PARABOLAS = ${JSON.stringify(parabolas.itens.map((p) => p.arquivo).concat(parabolas.desenhos ? [parabolas.desenhos, parabolas.tela] : []))};
+const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_PARABOLAS, PARABOLAS], [CACHE_STORY, STORY]];
 
 self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE)
@@ -412,11 +527,11 @@ self.addEventListener('fetch', (ev) => {
   const guardado = GUARDADOS.find(([, lista]) => lista.includes(url.pathname.split('/').pop()));
   if (guardado) {
     // Guardada na primeira vez que é pedida: daí em diante a leitura abre sem rede.
-    // Só entra no cache o que é JSON (ou fonte), porque sem sessão o servidor responde com a
+    // Só entra no cache o que é JSON (ou fonte, ou o script e as fotos das artes), porque sem sessão o servidor responde com a
     // tela de entrada, e ela não pode ficar guardada no lugar do texto.
     ev.respondWith(caches.open(guardado[0]).then((c) => c.match(ev.request, { ignoreSearch: true })
       .then((achado) => achado || fetch(ev.request).then((r) => {
-        if (r.ok && /json|font/.test(r.headers.get('content-type') || '')) c.put(ev.request, r.clone());
+        if (r.ok && /json|font|javascript|webp/.test(r.headers.get('content-type') || '')) c.put(ev.request, r.clone());
         return r;
       }))));
     return;
@@ -445,6 +560,8 @@ self.addEventListener('push', (ev) => {
     tag: d.tag || 'caminho',
     renotify: Boolean(d.tag),
     data: { url: d.url || './' },
+    // A foto do aviso do administrador: o Android mostra grande; o iPhone ignora.
+    ...(d.image ? { image: new URL(d.image, self.registration.scope).href } : {}),
   }));
 });
 
@@ -465,4 +582,4 @@ const mb = (Buffer.byteLength(html) / 1048576).toFixed(2);
 // O teste.mjs exige o index.html abaixo de 1 MB: quanto ainda cabe (as camadas de estilo contam).
 const folga = ((1024 * 1024 - Buffer.byteLength(paginaFinal)) / 1024).toFixed(1);
 console.log('gerado: dist/index.html (' + mb + ' MB, folga de ' + folga + ' KB até 1 MB) · manifest · sw ' + versao
-  + ' · ' + icones.length + ' ícones · ' + biblias.length + ' bíblias · ' + mapas.length + ' mapas');
+  + ' · ' + icones.length + ' ícones · ' + biblias.length + ' bíblias · ' + mapas.length + ' mapas · ' + parabolas.itens.length + ' parábolas');

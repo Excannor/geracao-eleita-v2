@@ -1,0 +1,131 @@
+{
+  "titulo": "Os dois devedores",
+  "ref": "Lc 7.41-43",
+  "grupo": "lucas",
+  "linha": "Uma dívida grande, uma pequena, e as duas perdoadas",
+  "desenho": "dividas-perdoadas",
+  "desenhoLista": "saco-de-prata",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Um fariseu convida Jesus para almoçar na casa dele.",
+          "ref": "Lc 7.36"
+        },
+        {
+          "texto": "Uma prostituta descobre que Jesus está lá e chega com um frasco de alabastro de perfume caro.",
+          "ref": "Lc 7.37"
+        },
+        {
+          "texto": "Ela se ajoelha atrás de Jesus e chora até molhar os pés dele. Depois enxuga os pés com os cabelos e derrama o perfume sobre eles.",
+          "ref": "Lc 7.38"
+        },
+        {
+          "texto": "O dono da casa pensa consigo que Jesus não é profeta. Se fosse, saberia que tipo de mulher está tocando nele. Jesus chama o fariseu pelo nome.",
+          "ref": "Lc 7.39-40"
+        },
+        {
+          "fala": "Simão, tenho algo para dizer-lhe",
+          "ref": "Lc 7.40"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "moeda",
+      "blocos": [
+        {
+          "texto": "Um homem empresta dinheiro a duas pessoas. Uma deve quinhentas moedas de prata, e a outra deve cinquenta.",
+          "ref": "Lc 7.41"
+        },
+        {
+          "texto": "Nenhuma consegue pagar, e o homem perdoa a dívida das duas. Jesus pergunta a Simão qual delas vai amar mais esse homem.",
+          "ref": "Lc 7.42"
+        },
+        {
+          "texto": "Simão responde.",
+          "ref": "Lc 7.43"
+        },
+        {
+          "fala": "Suponho que aquela pessoa a quem foi perdoada a dívida maior",
+          "ref": "Lc 7.43"
+        },
+        {
+          "texto": "Jesus diz que ele está certo.",
+          "ref": "Lc 7.43"
+        }
+      ]
+    },
+    {
+      "titulo": "O que Simão não fez",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Jesus se vira para a mulher e fala com Simão.",
+          "ref": "Lc 7.44"
+        },
+        {
+          "fala": "Veja esta mulher ajoelhada aqui!",
+          "ref": "Lc 7.44"
+        },
+        {
+          "texto": "Jesus lembra três gentilezas de quem recebe visita, e Simão não fez nenhuma. A mulher fez as três do jeito dela.",
+          "ref": "Lc 7.44-46"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "bacia-e-toalha",
+              "titulo": "Água para os pés",
+              "fala": "ela os lavou com suas lágrimas",
+              "ref": "Lc 7.44"
+            },
+            {
+              "desenho": "sandalia",
+              "titulo": "O beijo de chegada",
+              "fala": "ela beijou meus pés diversas vezes",
+              "ref": "Lc 7.45"
+            },
+            {
+              "desenho": "frasco-de-alabastro",
+              "titulo": "Óleo na cabeça",
+              "fala": "ela me cobriu os pés com um perfume raro",
+              "ref": "Lc 7.46"
+            }
+          ]
+        },
+        {
+          "texto": "Jesus diz que os muitos pecados da mulher estão perdoados, porque ela amou muito.",
+          "ref": "Lc 7.47"
+        },
+        {
+          "fala": "mas aquele a quem pouco foi perdoado, pouco ama",
+          "ref": "Lc 7.47"
+        },
+        {
+          "texto": "Depois Jesus fala com a mulher.",
+          "ref": "Lc 7.48"
+        },
+        {
+          "fala": "Os seus pecados estão perdoados",
+          "ref": "Lc 7.48"
+        },
+        {
+          "texto": "Os outros que estão à mesa estranham que Jesus perdoe pecados.",
+          "ref": "Lc 7.49"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Quem deve quinhentas e quem deve cinquenta estão na mesma situação, porque nenhum tem como pagar. A mulher sabe que deve muito, e o amor dela aparece nos pés de Jesus. Simão acha que deve pouco e nem oferece água.",
+    "apoio": "Jesus manda a mulher embora com esta frase. “A sua fé salvou você; vá em paz”.",
+    "ref": "Lc 7.47-50"
+  },
+  "perguntas": [
+    "Nesta história, você se parece mais com Simão ou com a mulher?",
+    "O que, na sua semana, mostra que você sabe quanto Deus perdoou você?"
+  ]
+}

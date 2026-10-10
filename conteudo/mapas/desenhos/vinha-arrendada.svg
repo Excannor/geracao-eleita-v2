@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os lavradores maus (Lc 20.9-15): a vinha, com as estacas em fila, a corda das videiras entre elas, uma folha e os cachos pendurados; à direita, o muro baixo de pedra, com a passagem aberta por onde os servos saem de mãos vazias. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. O cacho do meio é a única área sálvia. -->
+<path class="k" d="M2 108H158"/>
+<path class="k" d="M8 108V32.4M55.6 108V32.4M103.2 108V32.4M5.2 32.4H10.8M52.8 32.4H58.4M100.4 32.4H106"/>
+<path class="k" d="M8 38C22 52 41.6 52 55.6 38C69.6 52 89.2 52 103.2 38"/>
+<path class="h" d="M8 74.4C22 85.6 41.6 85.6 55.6 74.4C69.6 85.6 89.2 85.6 103.2 74.4"/>
+<path class="k p" d="M55.6 40.8C64 29.6 78 29.6 80.8 38C72.4 46.4 61.2 46.4 55.6 40.8Z"/>
+<path class="k" d="M31.8 54.8V59"/>
+<g class="k p"><circle cx="27.3" cy="63.2" r="4.5"/><circle cx="36.3" cy="63.2" r="4.5"/><circle cx="22.8" cy="70.8" r="4.5"/><circle cx="31.8" cy="70.8" r="4.5"/><circle cx="40.8" cy="70.8" r="4.5"/><circle cx="27.3" cy="78.4" r="4.5"/><circle cx="36.3" cy="78.4" r="4.5"/><circle cx="31.8" cy="86" r="4.5"/></g>
+<path class="k" d="M79.4 54.8V59"/>
+<g class="k s"><circle cx="74.9" cy="63.2" r="4.5"/><circle cx="83.9" cy="63.2" r="4.5"/><circle cx="70.4" cy="70.8" r="4.5"/><circle cx="79.4" cy="70.8" r="4.5"/><circle cx="88.4" cy="70.8" r="4.5"/><circle cx="74.9" cy="78.4" r="4.5"/><circle cx="83.9" cy="78.4" r="4.5"/><circle cx="79.4" cy="86" r="4.5"/></g>
+<path class="k p" d="M124 108V84L130 80L136 82L142 79V108ZM150 108V82L154 79L158 81V108"/>
+<path class="h" d="M124 94H142M124 102H142M150 94H158M150 102H158M132 82V94M137 94V102M129 94V102M154 94V102"/>
+<path class="h" d="M144 105l3-3"/>
+</svg>

@@ -11,7 +11,7 @@ import { createHmac, createHash, randomBytes } from 'node:crypto';
 import { createContext, runInContext } from 'node:vm';
 import {
   Contas, arquivoDoEstado, seloDaConta, limparNome, iguais, hojeNoFuso, fusoValido, somaDias,
-  datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA, podeConduzir,
+  datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA, podeConduzir, aguardandoAprovacao, aprovacaoQueFalta,
 } from './contas.mjs';
 import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs';
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
@@ -25,7 +25,7 @@ import {
 } from './db.mjs';
 import {
   Notificacoes, chavesDoServidor, inscricaoValida, enviarPush, decidir, montarMensagem, primeiroNome, emSilencio, leituraDoDia,
-  MAX_TOQUES_RECEBIDOS_DIA,
+  MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, avisosDesligados,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
 import {
@@ -35,6 +35,7 @@ import {
   MINIMO_CHECKIN_CELULA,
 } from './inteligencia.mjs';
 import { configDoEmail, enviarEmail } from './email.mjs';
+import { chavesDasNotas, selarEstado, abrirEstado, migrarEstadosCifrados } from './cofre.mjs';
 import { csvDoRelatorio, htmlDoRelatorio, nomeDoArquivo, SCRIPT_RELATORIO } from './relatorio.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -116,10 +117,12 @@ const FONTE_COM_RESUMO = /^\/fonte-[a-z-]+\.[0-9a-f]{10}\.woff2$/;
 // Os mapas dos livros (mapa-<slug>.<resumo>.json) também são públicos: são material de
 // estudo, não dado de ninguém, e o resumo no nome deixa o cache ser longo, como nas fontes.
 const MAPA_COM_RESUMO = /^\/mapa-[a-z0-9-]+\.[0-9a-f]{10}\.json$/;
+// As parábolas (parabola-<slug>.<resumo>.json e parabolas-desenhos.<resumo>.json), pelo mesmo motivo.
+const PARABOLA_COM_RESUMO = /^\/parabola(-[a-z0-9-]+|s-desenhos)\.[0-9a-f]{10}\.json$/;
 // As fotos da página de boas-vindas (landing-<nome>.<resumo>.webp|jpg): públicas, porque é
 // quem ainda não entrou que as vê.
 const FOTO_LANDING_COM_RESUMO = /^\/landing-[a-z0-9-]+\.[0-9a-f]{10}\.(webp|jpg)$/;
-const PUBLICO_COM_RESUMO = (rota) => FONTE_COM_RESUMO.test(rota) || MAPA_COM_RESUMO.test(rota) || FOTO_LANDING_COM_RESUMO.test(rota);
+const PUBLICO_COM_RESUMO = (rota) => FONTE_COM_RESUMO.test(rota) || MAPA_COM_RESUMO.test(rota) || PARABOLA_COM_RESUMO.test(rota) || FOTO_LANDING_COM_RESUMO.test(rota);
 const CSP = [
   "default-src 'self'",
   "script-src 'self' " + hashesDosScripts(),
@@ -194,13 +197,15 @@ function conferirProgresso(atual, junto, hoje) {
     }
     junto[campo] = mapa;
   }
+  // "Zerar progresso" que acabou de chegar: os contadores recomeçam do zero com a trilha.
+  const zerouAgora = !!atual && (junto.zeradoEm || 0) > (atual.zeradoEm || 0);
   for (const [campo, maximo] of Object.entries(SUBIDA_MAXIMA)) {
-    const antes = Number((atual && atual[campo]) || 0);
+    const antes = zerouAgora ? 0 : Number((atual && atual[campo]) || 0);
     const agora = Number(junto[campo] || 0);
     junto[campo] = Number.isFinite(agora) ? Math.max(antes, Math.min(agora, antes + maximo)) : antes;
   }
   // O XP da versão antiga só entra na primeira vez que o progresso chega ao servidor.
-  if (atual) junto.xpLegado = atual.xpLegado === undefined ? null : atual.xpLegado;
+  if (atual) junto.xpLegado = zerouAgora ? 0 : (atual.xpLegado === undefined ? null : atual.xpLegado);
   return junto;
 }
 
@@ -220,8 +225,16 @@ async function lerEstado(chave) {
   try { return lerEstadoDoBanco(DB, chave); } catch { return null; }
 }
 
+// lerEstado devolve os textos privados ainda cifrados (cofre.mjs): é o que amigos, célula,
+// discipulado e painel leem, e lá só contam datas, chaves e "tem texto". Em claro, só pelo
+// lerEstadoAberto, na rota do próprio dono. Erro ao abrir (dado adulterado, chave errada)
+// sobe para quem chamou: nada é servido nem gravado por cima.
+async function lerEstadoAberto(chave) {
+  return abrirEstado(await lerEstado(chave), chave, CHAVES_NOTAS);
+}
+
 async function gravarEstado(dados, chave) {
-  gravarEstadoNoBanco(DB, chave, dados);
+  gravarEstadoNoBanco(DB, chave, selarEstado(dados, chave, CHAVES_NOTAS));
 }
 
 // Apaga o progresso de uma conta e as cópias dele: a linha no banco, a pessoa em cada
@@ -313,6 +326,18 @@ const lerJson = async (req) => {
   try { return JSON.parse((await corpoDaRequisicao(req)) || '{}') || {}; } catch { return {}; }
 };
 
+// ---------- a chave das anotações ----------
+// Sem CAMINHO_CHAVE_NOTAS em produção o servidor não sobe: subir gravaria os textos de todo
+// mundo sem cifra (cofre.mjs).
+let CHAVES_NOTAS;
+try {
+  CHAVES_NOTAS = chavesDasNotas();
+} catch (e) {
+  console.error('\n  ' + e.message + '\n');
+  process.exit(1);
+}
+if (CHAVES_NOTAS.teste && process.env.CAMINHO_TESTE !== '1') console.log('  aviso: sem CAMINHO_CHAVE_NOTAS, as anotações usam a chave de teste (só fora de produção)');
+
 // ---------- contas e sessão ----------
 // Um banco só para tudo: dados/caminho.db. Na primeira subida, cada módulo importa o seu
 // JSON antigo e o guarda em json-legado-AAAA-MM-DD/.
@@ -343,6 +368,13 @@ function importarEstadosLegados() {
   if (achados.length) console.log('  progresso importado para o banco: ' + achados.length + ' arquivo(s)');
 }
 importarEstadosLegados();
+// Contas de antes do cofre (e o que acabou de ser importado) ficam com os textos cifrados;
+// com chave nova, o que estava na anterior é recifrado. Rodar de novo não muda nada.
+{
+  const { cifrados, falhas } = migrarEstadosCifrados(DB, CHAVES_NOTAS);
+  if (cifrados) console.log('  anotações cifradas no banco: ' + cifrados + ' conta(s)');
+  if (falhas) console.log('  anotações que não abriram com as chaves atuais: ' + falhas + ' conta(s), deixadas como estavam');
+}
 // A cópia achatada das datas de leitura (inteligencia.mjs, esquema v14): na primeira subida com
 // ela, as datas de quem já tinha progresso entram na tabela; depois, cada sincronização mantém.
 {
@@ -772,6 +804,10 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
     estudo: p.estudo || null,
     estudoAcolhida: p.estudoAcolhida || '', estudoAdoracao: p.estudoAdoracao || '', estudoTestemunho: p.estudoTestemunho || '',
     euConduzo: conduzo,
+    // Menor de 18 à espera da aprovação da liderança: o papel que espera ('lider'/'auxiliar'),
+    // para a tela avisar; e se a célula inteira espera (o líder dela), para não oferecer o link.
+    aguardandoAprovacao: aguardandoAprovacao(p, eu),
+    celulaAguardando: !!aprovacaoQueFalta(p, p.criadoPor, 'lider'),
     ...bannerMultiplicacao(p, referencia),
   };
   if (!conduzo && !verTudo) return extra;
@@ -909,6 +945,13 @@ async function rodadaDeLembretes(agora = new Date()) {
     const data = hojeNoFuso(conta.fuso, agora);
     const minutos = minutosNoFuso(conta.fuso, agora);
     if (emSilencio(minutos)) continue;
+    // O aviso do administrador que chegou na hora do silêncio sai agora, na primeira rodada
+    // depois das 7h. Não conta no teto das automáticas.
+    for (const m of await NOTIFICACOES.tirarPendentes(usuario, agora.getTime())) {
+      if (avisosDesligados(NOTIFICACOES.preferencias(usuario))) break;
+      await enviarPara(usuario, m, { semCaixa: true, ttl: 12 * 3600 });
+      saiu.push({ usuario, tipo: 'aviso', titulo: m.titulo });
+    }
     const { estado, feitas, protegidos } = await diaDe(usuario, data);
     const ontem = somaDias(data, -1);
     let ofensiva = 0;
@@ -980,6 +1023,75 @@ async function rodadaDeLembretes(agora = new Date()) {
   return saiu;
 }
 
+// ---------- aviso do administrador ----------
+// Painel > Enviar aviso: um aviso pontual, na hora, para o próprio administrador (teste) ou
+// para todas as contas. Cada uma ganha o item no sino na hora. O push respeita o silêncio da
+// noite de cada um (fica guardado e sai depois das 7h, na rodada de lembretes) e quem
+// desligou todos os avisos; não conta no teto de 3 automáticas por dia.
+const PUBLICOS_AVISO = ['mim', 'todos'];
+const destinatariosDoAviso = (eu, publico) => (publico === 'todos' ? CONTAS.lista().map((c) => c.usuario) : [eu]);
+// Quem recebe no celular: tem aparelho inscrito e não desligou tudo.
+const recebePush = (usuario) => NOTIFICACOES.inscricoesDe(usuario).length > 0 && !avisosDesligados(NOTIFICACOES.preferencias(usuario));
+
+async function enviarAvisoAdmin(eu, pedido) {
+  const erro = (msg, codigo = 400, extra = {}) => Object.assign(new Error(msg), { publico: true, codigo, ...extra });
+  const titulo = String(pedido.titulo || '').replace(/\s+/g, ' ').trim();
+  const corpo = String(pedido.texto || '').replace(/\s+/g, ' ').trim();
+  if (!titulo) throw erro('escreva um título');
+  if ([...titulo].length > AVISO_TITULO_MAX) throw erro('o título passa de ' + AVISO_TITULO_MAX + ' caracteres');
+  if ([...corpo].length > AVISO_TEXTO_MAX) throw erro('o texto passa de ' + AVISO_TEXTO_MAX + ' caracteres');
+  const destino = String(pedido.destino || 'nenhum');
+  if (!Object.hasOwn(DESTINOS_AVISO, destino)) throw erro('destino desconhecido');
+  const publico = String(pedido.publico || '');
+  if (!PUBLICOS_AVISO.includes(publico)) throw erro('escolha para quem vai');
+  let foto = null;
+  if (pedido.foto) {
+    const bruto = Buffer.from(String(pedido.foto).replace(/^data:image\/[a-z]+;base64,/, ''), 'base64');
+    if (bruto.length > AVISO_FOTO_MAX) throw erro('a foto passou de ' + Math.round(AVISO_FOTO_MAX / 1024) + ' KB', 413);
+    const tipo = tipoDaImagem(bruto);
+    if (!tipo) throw erro('a foto precisa ser JPEG ou WebP');
+    foto = { bruto, tipo };
+  }
+  const agora = agoraDoServidor();
+  const dia = hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agora);
+  // Um aviso para todos por dia; o segundo exige confirmar de novo. "Só para mim" é livre.
+  if (publico === 'todos' && NOTIFICACOES.avisosParaTodosNoDia(dia) >= 1 && pedido.denovo !== true) {
+    throw erro('já saiu um aviso para todos hoje', 409, { precisaConfirmar: true });
+  }
+  const id = randomBytes(9).toString('base64url');
+  const idFoto = foto ? NOTIFICACOES.guardarFoto(foto.bruto, foto.tipo, agora.getTime()) : '';
+  const url = DESTINOS_AVISO[destino];
+  const usuarios = destinatariosDoAviso(eu, publico);
+  await NOTIFICACOES.guardarNaCaixaDeVarios(usuarios, 'aviso', { titulo, corpo, url, foto: idFoto }, agora.getTime());
+  // O push leva a foto num endereço relativo ao app (o service worker resolve): o Android a
+  // mostra grande; o iPhone ignora.
+  const mensagem = { titulo, corpo, tag: 'aviso:' + id, url, ...(idFoto ? { image: './api/avisos/foto/' + idFoto } : {}) };
+  const agoraVai = [];
+  const depois = [];
+  for (const u of usuarios.filter(recebePush)) {
+    (emSilencio(minutosNoFuso((CONTAS.achar(u) || {}).fuso, agora)) ? depois : agoraVai).push(u);
+  }
+  if (depois.length) await NOTIFICACOES.adiarPush(depois, mensagem, agora.getTime());
+  NOTIFICACOES.anotarAvisoAdmin({ id, de: eu, publico, titulo, corpo, url, foto: idFoto, pessoas: usuarios.length, dia, em: agora.getTime() });
+  console.log('  painel: @' + eu + ' mandou um aviso para ' + (publico === 'todos' ? usuarios.length + ' contas' : 'si') + ' em ' + new Date().toISOString());
+  const mandar = async () => { let n = 0; for (const u of agoraVai) n += (await enviarPara(u, mensagem, { semCaixa: true, ttl: 12 * 3600 })) ? 1 : 0; return n; };
+  // Para todos, o envio segue depois da resposta; só para mim, a resposta diz se chegou.
+  const enviados = publico === 'mim' ? await mandar() : (semEsperar(mandar()), null);
+  return { id, pessoas: usuarios.length, push: agoraVai.length, adiados: depois.length, enviados, foto: idFoto };
+}
+
+function resumoDoAviso(eu) {
+  const todos = CONTAS.lista().map((c) => c.usuario);
+  return {
+    pessoas: todos.length,
+    comPush: todos.filter(recebePush).length,
+    eu: { aparelhos: NOTIFICACOES.inscricoesDe(eu).length, push: recebePush(eu) },
+    paraTodosHoje: NOTIFICACOES.avisosParaTodosNoDia(hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agoraDoServidor())),
+    ultimos: NOTIFICACOES.ultimosAvisosAdmin(5),
+    limites: { titulo: AVISO_TITULO_MAX, texto: AVISO_TEXTO_MAX, foto: AVISO_FOTO_MAX },
+  };
+}
+
 // ---------- rotas ----------
 const servidor = createServer(async (req, res) => {
   try {
@@ -1010,6 +1122,17 @@ const servidor = createServer(async (req, res) => {
     // ---------- públicas ----------
     if (rota === '/api/existe-conta') { json(res, 200, { existe: !CONTAS.vazio }); return; }
     if (rota === '/api/versao') { json(res, 200, { versao: await versaoPublicada() }); return; }
+
+    // A foto de um aviso do administrador: pública, porque o Android busca a imagem do push
+    // sem cookie. O id é sorteado (16 bytes) e não se adivinha; a foto nunca muda (cache longo).
+    if (rota.startsWith('/api/avisos/foto/') && !mudaAlgo) {
+      const f = NOTIFICACOES.foto(rota.slice('/api/avisos/foto/'.length));
+      if (!f) { json(res, 404, { erro: 'foto não encontrada' }); return; }
+      const dados = Buffer.from(f.dados);
+      res.writeHead(200, { 'content-type': f.tipo, 'content-length': dados.length, 'cache-control': 'public, max-age=31536000, immutable' });
+      res.end(req.method === 'HEAD' ? undefined : dados);
+      return;
+    }
 
     // Só nas ferramentas de teste: um backup agora, para conferir que apagar a conta limpa os backups.
     if ((PUSH_TESTE || process.env.CAMINHO_TESTE === '1') && rota === '/api/teste/backup' && post) {
@@ -1276,6 +1399,42 @@ const servidor = createServer(async (req, res) => {
       return;
     }
 
+    // ---------- aviso pontual do administrador (Painel > Enviar aviso) ----------
+    // GET: quantas pessoas recebem e quantos avisos para todos já saíram hoje. POST: envia.
+    if (rota === '/api/painel/aviso') {
+      if (!exigir(conta && ehAdmin(eu), 403, 'só o administrador manda avisos')) return;
+      if (!post) { json(res, 200, resumoDoAviso(eu)); return; }
+      let pedido;
+      try { pedido = JSON.parse((await corpoDaRequisicao(req, 512 * 1024)) || '{}') || {}; } catch { json(res, 413, { erro: 'a foto é grande demais' }); return; }
+      try {
+        json(res, 200, { ok: true, ...(await enviarAvisoAdmin(eu, pedido)), resumo: resumoDoAviso(eu) });
+      } catch (e) {
+        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora', ...(e.precisaConfirmar ? { precisaConfirmar: true } : {}) });
+      }
+      return;
+    }
+
+    // ---------- liderança de menor de 18: o administrador aprova ou recusa ----------
+    // GET lista os pedidos pendentes; POST decide um ({ proposito, usuario, papel, aprovar }).
+    // Quem decidiu e quando ficam gravados no pedido (tabela liderancas) e no registro do servidor.
+    if (rota === '/api/painel/liderancas') {
+      if (!exigir(conta && ehAdmin(eu), 403, 'só a liderança aprova')) return;
+      if (post) {
+        try {
+          const { proposito, usuario, papel, aprovar } = await lerJson(req);
+          if (!['lider', 'auxiliar'].includes(papel)) throw Object.assign(new Error('papel inválido'), { publico: true });
+          await CONTAS.decidirLideranca(eu, { proposito, usuario, papel, aprovar: aprovar === true }, hojeDe(eu));
+          console.log('  painel: @' + eu + (aprovar === true ? ' aprovou ' : ' recusou ') + papel + ' de célula em ' + new Date().toISOString());
+          json(res, 200, { ok: true, pendentes: CONTAS.liderancasPendentes(hojeDe(eu)) });
+        } catch (e) {
+          json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora' });
+        }
+        return;
+      }
+      json(res, 200, { pendentes: CONTAS.liderancasPendentes(hojeDe(eu)) });
+      return;
+    }
+
     // ---------- inteligência: o painel da igreja (admin) e o da célula (quem conduz) ----------
     if (rota === '/api/painel/igreja') {
       if (!exigir(conta && ehAdmin(eu), 403, 'só o dono do app vê o painel')) return;
@@ -1334,7 +1493,17 @@ const servidor = createServer(async (req, res) => {
     if (rota === '/api/perfil') {
       if (!exigir(post && conta, 405, 'método não suportado')) return;
       try {
-        await CONTAS.completarPerfil(eu, await lerJson(req));
+        const corpo = await lerJson(req);
+        // Trocar o e-mail que a conta já tem pede a senha atual, com o mesmo limite de
+        // tentativas do login (a data de nascimento nem com senha: contas.mjs recusa).
+        let senhaConferida = false;
+        if (CONTAS.trocaEmail(eu, corpo.email)) {
+          if (!podeTentar(ip, eu)) { json(res, 429, MUITAS); return; }
+          if (!corpo.senhaAtual) { json(res, 403, { erro: 'para trocar o e-mail, confirme com a sua senha atual' }); return; }
+          if (!await CONTAS.conferir(eu, corpo.senhaAtual)) { anotarErro(ip, eu); json(res, 401, { erro: 'a senha não confere' }); return; }
+          senhaConferida = true;
+        }
+        await CONTAS.completarPerfil(eu, corpo, { senhaConferida });
         json(res, 200, { ok: true });
       } catch (e) {
         json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não consegui salvar' });
@@ -1367,12 +1536,19 @@ const servidor = createServer(async (req, res) => {
     // o que outro marcou. A ofensiva dos amigos depende dessas datas.
     if (rota === '/api/estado') {
       const arquivo = arquivoDe(eu);
-      if (req.method === 'GET') { json(res, 200, (await lerEstado(arquivo)) || { vazio: true }); return; }
+      if (req.method === 'GET') {
+        let aberto;
+        try { aberto = await lerEstadoAberto(arquivo); } catch { json(res, 500, { erro: 'não consegui abrir suas anotações' }); return; }
+        json(res, 200, aberto || { vazio: true });
+        return;
+      }
       if (req.method === 'PUT' || post) {
+        let atualAberto;
+        try { atualAberto = await lerEstadoAberto(arquivo); } catch { json(res, 500, { erro: 'não consegui abrir suas anotações' }); return; }
         try {
           const novo = REGRAS.normalizarEstado(JSON.parse(await corpoDaRequisicao(req, LIMITE_ESTADO)));
           if (!novo) throw new Error('formato inválido');
-          const atual = REGRAS.normalizarEstado(await lerEstado(arquivo));
+          const atual = REGRAS.normalizarEstado(atualAberto);
           const junto = atual ? REGRAS.fundir(atual, novo) : novo;
           if (novo.dono) junto.dono = novo.dono;
           await gravarEstado(limparPerfilDoEstado(conferirProgresso(atual, junto, hojeDe(eu))), arquivo);
@@ -1393,7 +1569,7 @@ const servidor = createServer(async (req, res) => {
     // ---------- amigos ----------
     if (rota.startsWith('/api/') && ['/api/amigos', '/api/procurar', '/api/amizade', '/api/convites',
       '/api/convites/aceitar', '/api/convites/cancelar', '/api/toques', '/api/cutucar', '/api/denuncias',
-      '/api/novidades', '/api/novidades/reagir', '/api/novidades/preferencia', '/api/propositos',
+      '/api/novidades', '/api/novidades/reagir', '/api/novidades/apagar', '/api/novidades/preferencia', '/api/propositos',
       '/api/discipulado', '/api/cuidado'].includes(rota)) {
       if (!conta) { json(res, 403, { erro: 'entre com uma conta' }); return; }
     }
@@ -1746,8 +1922,8 @@ const servidor = createServer(async (req, res) => {
             const p = CONTAS.proposito(celula);
             if (p) {
               const nome = await nomeDeExibicao(eu);
-              const alvos = new Set([p.criadoPor]);
-              for (const m of p.membros) if (m.estado === 'ativo' && m.papel === 'auxiliar') alvos.add(m.usuario);
+              // Quem conduz de fato (menor à espera da aprovação da liderança ainda não recebe).
+              const alvos = new Set([p.criadoPor, ...p.membros.map((m) => m.usuario)].filter((u) => podeConduzir(p, u)));
               alvos.delete(eu);
               // "celula" vai junto para o toque na notificação abrir direto na aba Oração.
               for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'pedidoConduz', { amigo: nome, celula: p.id }));
@@ -1775,8 +1951,7 @@ const servidor = createServer(async (req, res) => {
           if (motivo === MOTIVO_PERIGO && !jaTinhaDenunciado) {
             const p = CONTAS.proposito(r.celula);
             if (p) {
-              const alvos = new Set([p.criadoPor]);
-              for (const m of p.membros) if (m.estado === 'ativo' && m.papel === 'auxiliar') alvos.add(m.usuario);
+              const alvos = new Set([p.criadoPor, ...p.membros.map((m) => m.usuario)].filter((u) => podeConduzir(p, u)));
               for (const alvo of alvos) semEsperar(avisoSocial(alvo, 'denunciaPerigo', { celula: p.id }));
             }
           }
@@ -1824,7 +1999,7 @@ const servidor = createServer(async (req, res) => {
         if (r.ja) return { ja: true };
         const nome = await nomeDeExibicao(eu);
         const destinos = new Set([r.de]);
-        for (const p of CONTAS.propositosDe(eu)) if (p.celula && p.criadoPor) destinos.add(p.criadoPor);
+        for (const p of CONTAS.propositosDe(eu)) if (p.celula && p.criadoPor && podeConduzir(p, p.criadoPor)) destinos.add(p.criadoPor);
         await CONTAS.registrarPedidoConversa(eu, 'conhecer', [...destinos], hojeDe(eu));
         for (const destino of destinos) semEsperar(avisoSocial(destino, 'querConversar', { nome, deUsuario: eu }));
         return {};
@@ -1850,7 +2025,7 @@ const servidor = createServer(async (req, res) => {
         const conta = CONTAS.achar(eu);
         const destinos = new Set([conta.acompanhadoPor, conta.convidadoPor].filter(Boolean));
         for (const p of CONTAS.propositosDe(eu)) {
-          if (p.celula && p.criadoPor && p.membros.some((m) => m.usuario === eu && m.estado === 'ativo')) destinos.add(p.criadoPor);
+          if (p.celula && p.criadoPor && podeConduzir(p, p.criadoPor) && p.membros.some((m) => m.usuario === eu && m.estado === 'ativo')) destinos.add(p.criadoPor);
         }
         for (const x of Object.values(CONTAS.dados.discipulados || {})) if (x.estado === 'ativo' && x.discipulo === eu) destinos.add(x.discipulador);
         destinos.delete(eu);
@@ -2046,6 +2221,12 @@ const servidor = createServer(async (req, res) => {
 
     if (rota === '/api/novidades/reagir') {
       await acao(async ({ id }) => NOVIDADES.reagir(eu, String(id || ''), amigosDe(eu)));
+      return;
+    }
+
+    // Apagar o versículo que a própria pessoa compartilhou: o servidor confere que é dela.
+    if (rota === '/api/novidades/apagar') {
+      await acao(async ({ id }) => NOVIDADES.apagarVersiculo(eu, String(id || '')));
       return;
     }
 

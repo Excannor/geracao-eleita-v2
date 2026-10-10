@@ -1,0 +1,106 @@
+{
+  "titulo": "O rico sem juízo",
+  "ref": "Lc 12.13-21",
+  "grupo": "lucas",
+  "linha": "Celeiros maiores para um homem que morre naquela noite",
+  "desenho": "celeiros-e-lua",
+  "desenhoLista": "monte-de-graos",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Tem tanta gente em volta de Jesus que o povo pisa uns nos outros.",
+          "ref": "Lc 12.1"
+        },
+        {
+          "texto": "Um homem grita do meio da multidão. Ele quer que Jesus mande o irmão dele dividir a herança do pai.",
+          "ref": "Lc 12.13"
+        },
+        {
+          "texto": "Jesus não aceita ser juiz dessa briga de família e faz um alerta para todo mundo.",
+          "ref": "Lc 12.14-15"
+        },
+        {
+          "fala": "Cuidado! Não andem sempre querendo o que vocês não têm.",
+          "ref": "Lc 12.15"
+        },
+        {
+          "texto": "Depois disso, Jesus conta uma parábola."
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "broto",
+      "blocos": [
+        {
+          "texto": "Um homem rico tem uma fazenda que dá colheitas tão boas que os depósitos ficam cheios. Ele não tem mais onde guardar o que colhe.",
+          "ref": "Lc 12.16-17"
+        },
+        {
+          "texto": "O homem pensa no problema e faz planos.",
+          "ref": "Lc 12.17"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "celeiro-derrubado",
+              "titulo": "Derrubar",
+              "fala": "Derrubarei os meus celeiros",
+              "ref": "Lc 12.18"
+            },
+            {
+              "desenho": "celeiro-novo",
+              "titulo": "Construir",
+              "fala": "construirei outros maiores!",
+              "ref": "Lc 12.18"
+            },
+            {
+              "desenho": "mesa-posta",
+              "titulo": "Descansar",
+              "fala": "Descanse, coma, beba e alegre-se",
+              "ref": "Lc 12.19"
+            }
+          ]
+        },
+        {
+          "texto": "O homem acha que guardou o bastante para muitos anos. Deus fala com ele.",
+          "ref": "Lc 12.19-20"
+        },
+        {
+          "fala": "Louco! Você morrerá esta noite. E então, quem ficará com tudo que você preparou?",
+          "ref": "Lc 12.20"
+        }
+      ]
+    },
+    {
+      "titulo": "Depois, com os discípulos",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "Jesus manda os discípulos olharem para os corvos. Eles não plantam nem guardam comida em depósito, e Deus cuida deles.",
+          "ref": "Lc 12.22-24"
+        },
+        {
+          "texto": "Jesus pede que vendam o que têm e ajudem quem precisa, para ter um tesouro no céu.",
+          "ref": "Lc 12.33"
+        },
+        {
+          "fala": "onde estiver o seu tesouro, ali estará também o seu coração",
+          "ref": "Lc 12.34"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "O homem faz planos para muitos anos e não põe Deus em nenhum deles. Ele fala só consigo, até Deus falar com ele naquela noite.",
+    "apoio": "Jesus diz que isso vale para muita gente. “assim acontece com todo aquele que junta riquezas para si mesmo, mas não é rico para com Deus”.",
+    "ref": "Lc 12.20-21"
+  },
+  "perguntas": [
+    "O que você está guardando para depois que podia estar usando agora com Deus e com os outros?",
+    "Como seria ser rico para com Deus na sua semana?"
+  ]
+}

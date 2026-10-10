@@ -696,7 +696,7 @@
           <input id="nome" name="name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="20" required>
           <span class="ajuda">Até 20 letras. É assim que seus amigos veem você.</span></div>
         <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
-          <input id="nascimento" name="bday" type="date" lang="pt-BR" placeholder="dd/mm/aaaa" autocomplete="bday" aria-describedby="ajuda-nascimento" required>
+          <input id="nascimento" name="bday" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" autocomplete="bday" aria-describedby="ajuda-nascimento" required>
           <span class="ajuda" id="ajuda-nascimento">Dia, mês e ano (dd/mm/aaaa). Não aparece para ninguém.</span></div>
         <div class="campo" style="margin-top:16px" id="campo-caminho">
           <label id="rotulo-caminho">Você já segue Jesus?</label>
@@ -723,7 +723,7 @@
           <span class="ajuda">Oito caracteres ou mais.</span></div>
         <label class="consentimento" style="margin-top:16px" for="consentimento-cadastro">
           <input type="checkbox" id="consentimento-cadastro">
-          <span>Concordo que o Geração Eleita guarde minhas leituras, anotações e a minha participação em grupos de leitura e oração. São informações sobre a minha fé. Só eu decido o que meus amigos veem; quem conduz a minha célula e a administração da igreja veem como estou caminhando (leitura, presença, etapa de Minha caminhada), nunca o que eu escrevo.
+          <span>Concordo que o Geração Eleita guarde minhas leituras, anotações, check-ins e a minha participação em grupos de leitura e oração. São informações sobre a minha fé. Só eu decido o que meus amigos e quem me acompanha no Discipulado veem; quem conduz a minha célula e a administração da igreja veem como estou caminhando (leitura, presença, etapa de Minha caminhada) e o check-in só somado com o dos outros, nunca o que eu escrevo.
             <a href="privacidade.html" target="_blank" rel="noopener">Ler a política de privacidade</a></span>
         </label>
       </div>
@@ -912,11 +912,30 @@
     var dia = String(Math.min(Number(p[2]), diasNoMes)).padStart(2, '0');
     return novoAno + '-' + String(mes).padStart(2, '0') + '-' + dia;
   }
+  // Data de nascimento digitada (dd/mm/aaaa) em vez do calendário do aparelho: no Android ele
+  // obriga a voltar ano por ano. As barras entram sozinhas; datas já no formato aaaa-mm-dd
+  // (preenchimento automático) ficam como vieram.
+  function mascaraData(v) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+    var n = v.replace(/\D/g, '').slice(0, 8);
+    return n.slice(0, 2) + (n.length > 2 ? '/' + n.slice(2, 4) : '') + (n.length > 4 ? '/' + n.slice(4) : '');
+  }
+  function dataIso(v) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v) || /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
+    if (!m) return '';
+    var iso = m[1].length === 4 ? m[1] + '-' + m[2] + '-' + m[3] : m[3] + '-' + m[2] + '-' + m[1];
+    var d = new Date(iso + 'T12:00:00Z');
+    return !isNaN(d) && d.toISOString().slice(0, 10) === iso && iso >= '1900-01-01' ? iso : '';
+  }
+  $('nascimento').addEventListener('input', function () {
+    var campo = $('nascimento'), novo = mascaraData(campo.value);
+    if (novo !== campo.value) campo.value = novo;
+  });
   function validar(n) {
     document.querySelectorAll('#form-cadastro input').forEach(function (i) { i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); });
     if (n === 1) {
       if (!$('nome').value.trim()) return erro($('nome'), 'Diga como quer que a gente te chame.');
-      var d = $('nascimento').value;
+      var d = dataIso($('nascimento').value);
       var hoje = new Date().toISOString().slice(0, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= hoje) return erro($('nascimento'), 'Confira a data de nascimento.');
       if (d > somaAnos(hoje, -12)) return erro($('nascimento'), 'O Geração Eleita é para quem tem 12 anos ou mais.');
@@ -956,7 +975,7 @@
     try { fuso = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) {}
     fetch('api/criar-conta', {
       method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: $('nascimento').value, email: $('email').value.trim(),
+      body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: dataIso($('nascimento').value), email: $('email').value.trim(),
         usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '', celula: celula || '',
         celulaVisitante: celula ? celulaVisitante : false,
         consentimento: $('consentimento-cadastro').checked, caminho: caminhoEscolhido }),

@@ -1841,6 +1841,28 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .botao-reagir.pulando svg { animation: bater .4s var(--mola); }
 .botao-reagir:active { transform: translateY(2px); border-bottom-width: 2px; }
 .quem-celebrou { color: var(--tinta-fraca); font-size: 0.86rem; font-weight: 700; }
+/* Apagar o versículo que a própria pessoa compartilhou: discreto, no fim do pé, mas com
+   alvo de 44px para o dedo. */
+.botao-apagar-mural {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  margin-left: auto;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--tinta-fraca);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.botao-apagar-mural svg { width: 20px; height: 20px; }
+.botao-apagar-mural:hover, .botao-apagar-mural:focus-visible { color: var(--vermelho, #d33); background: var(--fundo-2); }
+.botao-apagar-mural:disabled { opacity: .5; cursor: default; }
 .rodape-privacidade { display: flex; align-items: flex-start; gap: 8px; margin: 22px 0 0; color: var(--tinta-fraca); font-size: 0.84rem; font-weight: 700; }
 .rodape-privacidade svg { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 2px; }
 
@@ -2301,27 +2323,6 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .grade { display: grid; gap: 10px; }
 .item { display: block; padding: 14px; border: 2px solid var(--borda); border-radius: var(--raio); background: var(--cartao); color: inherit; text-decoration: none; }
 
-/* ---------- versículos guardados: um por baú ----------
-   O cartão de dentro é o mesmo .cartao-versiculo da lição; aqui só o espaçamento da lista
-   e a etiqueta do dia de onde ele veio. */
-.lista-versiculos { display: grid; gap: 18px; margin: 4px 0 22px; }
-.item-versiculo .etiqueta { display: block; margin-bottom: 2px; }
-.item-versiculo .cartao-versiculo { margin: 0; }
-.item-versiculo .ref-carregando { margin: 0; padding: 18px 0; color: var(--tinta-fraca); font-weight: 700; }
-
-/* ---------- minhas anotações: um caderno por dia ---------- */
-.cadernos-dias { display: grid; gap: 10px; margin: 4px 0 22px; }
-.cartao-caderno { border: 2px solid var(--borda); border-radius: var(--raio-g); background: var(--cartao); overflow: hidden; }
-.cartao-caderno summary { display: flex; align-items: center; gap: 10px; padding: 12px 14px; list-style: none; cursor: pointer; min-height: 44px; }
-.cartao-caderno summary::-webkit-details-marker { display: none; }
-.cartao-caderno .rotulo-dia-caderno { flex: 0 0 auto; padding: 3px 9px; border-radius: 999px; background: var(--cor-fraca); color: var(--cor); font-weight: 900; font-size: 0.8rem; }
-.cartao-caderno .passagem-caderno { flex: 1; min-width: 0; color: var(--tinta-forte); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cartao-caderno .conta-caderno { flex: 0 0 auto; color: var(--tinta-fraca); font-size: 0.78rem; font-weight: 700; }
-.cartao-caderno .campos-caderno { display: grid; gap: 12px; padding: 0 14px 14px; border-top: 2px solid var(--borda); padding-top: 12px; }
-.cartao-caderno .campos-caderno p { margin: 0; color: var(--tinta); line-height: 1.5; white-space: pre-wrap; }
-.cartao-caderno .campos-caderno b { display: block; margin-bottom: 3px; color: var(--tinta-forte); font-size: 0.82rem; }
-.titulo-anotacoes-nota { margin: 8px 0 10px; }
-.dias-da-nota { color: var(--tinta-fraca); font-weight: 700; font-size: 0.82rem; }
 .item:hover { text-decoration: none; background: var(--fundo-2); }
 .item b { display: block; color: var(--tinta-forte); }
 .item .sub { font-size: 0.74rem; font-weight: 800; color: var(--tinta-fraca); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -2508,13 +2509,12 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .leitor-verso.escolhido { background: color-mix(in srgb, var(--amarelo) 22%, transparent); box-shadow: inset 4px 0 0 var(--amarelo); }
 /* Marca-texto (04e-versiculos.js). Vem depois do .escolhido: o fundo é o da marca e a escolha
    continua visível pelo filete à esquerda. */
-.leitor-verso.marca-1, .cartao-versiculo.marca-1, .item-versiculo.marca-1 .cartao-versiculo { background: var(--marca-1); }
-.leitor-verso.marca-2, .cartao-versiculo.marca-2, .item-versiculo.marca-2 .cartao-versiculo { background: var(--marca-2); }
-.leitor-verso.marca-3, .cartao-versiculo.marca-3, .item-versiculo.marca-3 .cartao-versiculo { background: var(--marca-3); }
-.leitor-verso.marca-4, .cartao-versiculo.marca-4, .item-versiculo.marca-4 .cartao-versiculo { background: var(--marca-4); }
+.leitor-verso.marca-1, .cartao-versiculo.marca-1 { background: var(--marca-1); }
+.leitor-verso.marca-2, .cartao-versiculo.marca-2 { background: var(--marca-2); }
+.leitor-verso.marca-3, .cartao-versiculo.marca-3 { background: var(--marca-3); }
+.leitor-verso.marca-4, .cartao-versiculo.marca-4 { background: var(--marca-4); }
 .leitor-verso.escolhido { box-shadow: inset 4px 0 0 var(--acento); }
 /* versículo com nota: um pontinho no fim, discreto */
-.leitor-verso.com-nota::after { content: ''; display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--acento); vertical-align: middle; }
 .leitor.corrido .versos { display: block; }
 .leitor.corrido .leitor-verso { display: inline; margin: 0; padding: 2px 0; border-radius: 4px; }
 .leitor.corrido .leitor-verso sup { margin: 0 4px 0 2px; }
@@ -2533,7 +2533,6 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .cor-marca.marca-4 { background: var(--marca-4); }
 .cor-marca[aria-pressed="true"] { border-color: var(--tinta-forte); box-shadow: 0 0 0 3px var(--acento); }
 .cor-marca:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
-.cores-marca .tirar-marca { margin-left: auto; }
 .botoes-verso { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 1 100%; }
 .botoes-verso .botao { flex: 1 1 auto; }
 .botoes-verso .botao-icone { flex: 0 0 auto; }
@@ -2543,14 +2542,6 @@ a.item-licao:hover { text-decoration: none; background: var(--fundo-2); }
 .acoes-verso.no-cartao .ref-verso { display: none; }
 /* na Bíblia, com versículo escolhido, a barra toma o lugar dos botões de capítulo */
 .leitor-biblia.escolhendo [data-anterior], .leitor-biblia.escolhendo [data-proximo] { display: none; }
-.trecho-da-nota { margin: 0 0 14px; padding: 12px 14px; border-left: 4px solid var(--acento); border-radius: var(--raio-p); background: var(--fundo-2); color: var(--tinta); font-weight: 600; }
-.lista-notas-verso { display: grid; gap: 12px; margin: 4px 0 22px; }
-.nota-verso { padding: 14px 16px; border-radius: var(--raio); background: var(--cartao); border: 2px solid var(--borda); }
-.abrir-nota-verso { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
-.abrir-nota-verso b { display: block; color: var(--tinta-forte); }
-.abrir-nota-verso .resumo { display: block; margin-top: 4px; color: var(--tinta); }
-.nota-verso .botao { margin-top: 8px; }
-a.item-versiculo { display: block; color: inherit; text-decoration: none; }
 .acoes-verso .botao-icone { flex: 0 0 auto; }
 @media (min-width: 420px) { .acoes-verso b { flex: 1 1 auto; } .acoes-verso .botao { flex: 0 0 auto; } }
 
@@ -3075,7 +3066,7 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 /* ---------- S1 · três níveis de moldura ---------- */
 .cartao, .caixa-lista, .lista-atalhos, .caixa-config, .lista-missoes, .bloco-secao, .trofeu,
 .painel-cartao, .colecao-atalhos a, .item-livro, .item, .linha-amigo, .cartao-proposito,
-.cartao-semeador, .cartao-caderno, .nivel-semeador, .dsf-item, .entrada-propositos { border-width: var(--moldura); }
+.cartao-semeador, .nivel-semeador, .dsf-item, .entrada-propositos { border-width: var(--moldura); }
 .leitura-hoje, .passagem, .cartao-push, .apoiar-pix, .dsf-card { border-width: var(--moldura-forte); }
 
 /* ---------- 1.1 · relevo só no que se aperta; estático é chapado; flutuante tem sombra ---------- */

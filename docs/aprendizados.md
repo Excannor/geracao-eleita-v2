@@ -587,6 +587,103 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
 - 2026-10-02 · captura · Juízes: o arquivo de cookie gravado a partir do `curl -i` do `api/entrar` saiu com
   duas linhas (`cc_sessao` e `cc_logado`), e o `foto-conta` capturou a página de entrada sem avisar → grave
   só a primeira linha (`head -1 | tr -d '\n'`) e confira a primeira captura antes de seguir.
+- 2026-10-09 · captura · Rute: para capturar o mapa não é preciso conta nem cookie. Um servidor próprio com
+  `CAMINHO_ESTADO=<pasta>/estado.json CAMINHO_ABERTO=1 node servidor.mjs <porta>` (como o `teste-mapas` faz)
+  abre o app sem entrada, e o `foto-conta` vai direto com `BASE=http://localhost:<porta>/`. E o
+  `teste-mapas` passou a aceitar `PORTA=` (padrão 8373), para dois agentes rodarem ao mesmo tempo.
+- 2026-10-09 · conteúdo · Rute: o nome não tem tradução segura (lembra a palavra hebraica para amiga) → o
+  `significado` diz "lembra" e que o livro não explica o nome, em vez de afirmar a etimologia. E o NT não liga
+  Boaz, o resgatador, a Jesus: a ligação ficou só onde o NT a faz (Mt 1.5-6, 16; Lc 3.31-32; 2Tm 2.8), sem
+  tipologia.
+- 2026-10-09 · revisão · Nesta rodada o agente escritor não tinha ferramenta para chamar um revisor → a
+  revisão em voz alta e a folha do `rever-mapa` ficaram com o próprio escritor, campo por campo; o mapa fica
+  marcado para a leitura do coordenador antes de ir ao ar.
+- 2026-10-09 · captura · Depois de cada `node build.mjs`, o servidor que já estava no ar entrega a página
+  velha sem os arquivos novos, e o `foto-conta` captura uma tela vazia de 844px sem erro → reiniciar o
+  servidor (pelo PID) depois de todo build e conferir a altura da captura antes de olhar. E 1 Reis tem uns
+  11.400px a 390: a 2x a captura não sai; com `ESCALA=1.5` sai inteira.
+- 2026-10-09 · tela · 1 Reis: "Fogo no Carmelo" (15 caracteres) cabe a 390 e quebra a 375 e 360 → virou
+  "Fogo do céu"; título com palavra longa no fim (Carmelo) pesa mais que a contagem.
+- 2026-10-09 · conteúdo · 1 Reis: em livro com 22 capítulos e seis ramos, os capítulos 13 a 16 (reis que
+  passam rápido) foram para as curiosidades e para a conexão; a citação “Veja! Ele esta vivo!” (17.23) tem
+  um erro de acento na própria NBV e virou paráfrase, para não parecer erro nosso. E o NT dá duas frases
+  irmãs em Mt 12: "maior do que Salomão" (12.42, destaque) e "maior do que o templo" (12.6, "1 Reis e Cristo").
+- 2026-10-09 · desenho · 2 Reis: o manto caído de Elias, ao pé do redemoinho, saiu primeiro como concha (meia
+  elipse com dobras) e depois como moita (contorno ondulado) → pano amontoado no chão não se lê num desenho
+  pequeno; o manto saiu e ficou só o funil. O ferro do machado, em retângulo com o olho, parecia lata; com o
+  gume abrindo em leque, virou machado.
+- 2026-10-09 · conteúdo · 2 Reis: a autoria de 1 Reis já usava as fontes ("Livro da História dos Reis"); em
+  2 Reis, para não repetir o achado, a autoria ficou com o último fato datado (25.27) e o "até o dia de hoje"
+  (17.23). E Joaquim (2Rs 24–25) não é ligado a "Jeconias" de Mt 1.11-12: o mapa só diz que a lista de Mateus
+  atravessa o exílio, sem afirmar a identificação.
+- 2026-10-09 · conteúdo · 1 Crônicas conta de novo muita coisa de 2 Samuel (Uzá, a promessa de Natã, a
+  contagem do povo, a eira de Araúna). Antes de escrever, li o resumo de 2 Samuel (galhos, pares, curiosidades)
+  e escolhi o que só Crônicas tem: as listas com histórias (Jabez, Rúben), os levitas carregando a arca nos
+  ombros, os cantores e címbalos, o bronze de Hadadezer que vira o tanque, o fogo do céu no altar e o "aqui vai
+  ficar o templo", a planta "da mão do Senhor" e as ofertas. Livro paralelo pede essa leitura do mapa irmão
+  primeiro. O nome hebraico tem duas palavras: o checador barra o espaço no `original`, e o maqaf (־) junta as
+  duas dentro do bloco hebraico.
+- 2026-10-09 · desenho · 1 Crônicas: a planta do templo vista de cima, numa folha, virou ícone de bateria (o
+  retângulo com duas bolinhas na ponta) nas duas tentativas; a espada na bainha com a ponteira pontuda em
+  sálvia virou lápis → planta baixa não se lê em 96px, troca-se o objeto (ficou a harpa dos cantores); bainha
+  termina arredondada, com a cor no bocal.
+- 2026-10-09 · conteúdo · Ao escrever 2 Crônicas, achei "Paulo escreve" e "Paulo pede a Timóteo" em textos
+  de Rute, 1 Reis, 1 Crônicas e 2 Crônicas com refs (2Tm 2.8, Rm 11.2-4, Rm 1.3-4, Fp 2.8-9) que não trazem o
+  nome de Paulo, o mesmo erro que a revisão de Juízes pegou (At 13.16) → o nome do autor da carta só entra se
+  está no versículo citado; senão, a frase vai direto ao que o versículo diz. Vale `grep -n "Paulo"` no mapa
+  antes de entregar.
+- 2026-10-09 · conteúdo · 2 Crônicas: o fio do livro é "humilhar-se" (7.14, Roboão, Ezequias, Manassés,
+  Josias, e Amom que não se humilha), e ele ficou no "procure" e na raiz. A ligação com Cristo ficou onde o NT
+  diz com as próprias palavras: Jesus se humilhou (Fp 2.8-9), ninguém se faz sacerdote por conta própria, nem
+  Cristo (Hb 5.4-5, ao lado de Uzias no incenso), e Jesus sobre a cidade que mata os profetas (Mt 23.37, junto
+  de 2Cr 36.15-16). O Zacarias apedrejado (2Cr 24) não foi ligado ao de Lc 11.51: o NT não diz que é o mesmo.
+- 2026-10-09 · conteúdo · Esdras: o 1Co 5.7 ("Cristo... foi sacrificado") ao lado da Páscoa de Ed 6 seria o
+  mesmo achado do destaque de Êxodo → "Esdras e Cristo" ficou com os estrangeiros que se juntam ao povo na
+  Páscoa (Ed 6.21) e Ef 2.13, 19, e o destaque com a pedra de esquina sobre o alicerce (Ef 2.20-21). Os
+  casamentos com estrangeiras (Ed 9–10) são contados só com o que o texto diz, sem julgar a decisão nem tirar
+  lição dela.
+- 2026-10-09 · conteúdo · Neemias: o NT não cita o livro, e os versículos óbvios já estavam em outros mapas (o
+  pão do céu de Ne 9.15 com Jo 6 em Êxodo e Números; Jo 11.51-52 em João) → ficou um par só (Ne 9.20, o bom
+  Espírito que instrui, com Jo 14.26) e "Neemias e Cristo" com a alegria (Ne 8.10; Jo 15.11). O sábado de Ne 13
+  não foi posto ao lado de Mc 2.27-28: a dupla soaria como julgamento de Neemias, e o mapa não toma posição.
+- 2026-10-09 · conteúdo · Ester: o nome de Deus não aparece no texto da NBV (Et 1–10) → virou curiosidade, sem
+  explicar o porquê (as hipóteses são especulação). As mortes do cap. 9 ficam nos números do texto (500 em Susã,
+  75 mil nas províncias, bens não tomados), sem adjetivo. "Ester e Cristo" não afirma tipologia: usa a tristeza
+  que vira alegria (Et 9.22; Jo 16.20) e um par de memória celebrada (Et 9.28; 1Co 11.23-25).
+
+- 2026-10-09 · conteúdo · Romanos, a primeira carta: o nome de Paulo só está em Rm 1.1, e a regra de não pôr
+  "Paulo" em ref que não traz o nome vale dentro do mapa da própria carta. O "eu" da carta virou "o autor da carta"
+  ou "o autor" (1.1 do catálogo permite), e "Paulo" ficou só na autoria (Rm 1.1) e na raiz, que leva At 19.21. Carta
+  não é narrativa: os ramos seguem o argumento (pecado, fé de Abraão, Adão e Cristo, o Espírito, Israel, a vida da
+  igreja), e a situação de quem escreve e de quem recebe (Rm 1, 15 e 16) foi para a raiz e as curiosidades. Rm
+  1.26-27 ficou fora dos galhos e Rm 13.1-5 (autoridades) não virou galho: só os impostos e a dívida do amor (13.7-9).
+  O checador barra "declara" (verbo culto), o que pega o vocabulário da justificação: "aceita como justo", "considera".
+
+- 2026-10-09 · desenho · 1 Coríntios: o `cesto-de-paes` reaproveitado para o fermento de 1Co 5 traz o peixe da
+  multiplicação e só na captura deu para ver que não servia → desenho reaproveitado se confere pelo que tem dentro,
+  não pelo nome do arquivo; virou `massa-na-tigela`. Temas sensíveis da carta (1Co 7, 11.2-16, 14.34-35, a lista de
+  6.9-10) ficaram só como título da estrutura ou fora dos galhos; 1Co 7 entra pelo "cada um tem o seu dom" (7.7, 17).
+
+- 2026-10-09 · conteúdo · 2 Coríntios: 2Co 9.6 ("quem dá pouco recebe pouco") não entrou em galho, pela regra de
+  dinheiro e bênção das reflexões; a oferta ficou na alegria de dar (9.7), na pobreza de Jesus (8.9) e no "não sobrava
+  nem faltava" (Êx 16.18). O véu de Moisés (2Co 3.14-16) já está em Êxodo: o ramo usa 3.7, 3.12-13 e 3.17-18.
+
+- 2026-10-09 · conteúdo · Efésios: o código da casa (Ef 5.21–6.9) ficou fora dos galhos e aparece só nos títulos da
+  estrutura ("Filhos da luz e o casamento", "A casa e a armadura de Deus"); Ef 2.13, 19-21 e 5.2 já estavam em Esdras e
+  Levítico, e o muro (2.14-16) ficou com o ângulo da paz entre judeus e gentios. Par com hífen na NBV ("Sente-se", Sl
+  110.1) saiu do mapa: no cartão escuro o texto do AT não se parafraseia.
+
+- 2026-10-09 · tela · 1 Tessalonicenses no índice: o nome (17 letras, 14px) cabia na célula "em breve" e não na
+  pronta a 360px, porque a pronta reserva 36px para a seta → a célula pronta de nome com mais de 15 letras ganha a
+  classe `nome-longo` (seta pequena no canto de baixo, nome com a largura toda); o teste dos tamanhos 20/17/15/14
+  continua valendo. Diminuir a fonte para 13px não bastava. Volta de Jesus (1Ts 4.13–5.11) contada só com as palavras
+  do texto, sem ordem de acontecimentos nem nome de escola.
+
+- 2026-10-09 · conteúdo · 2 Tessalonicenses: o homem da rebelião (2Ts 2.3-10) ficou só com o que o texto diz, sem
+  nome de hoje, sem calendário e sem "anticristo"; os pares do AT (Is 66.15; Is 11.4) só onde o texto ecoa as palavras.
+  Lote de cartas (Romanos a 2 Tessalonicenses): cartas curtas (3 a 6 capítulos) aceitam 4 ou 5 ramos e 2 a 4 pares;
+  com poucos versículos, a regra "cada referência uma vez" aperta, e a raiz, a conexão, a curiosidade e o "procure"
+  disputam os mesmos versos: decidir a tabela antes de escrever, como em Levítico.
 
 ## Entrada, sessão e página inicial
 
@@ -984,3 +1081,16 @@ O link de convite (`/?convite=`) quase sempre abre no navegador de dentro do Wha
 - Tamanho de enfeite não pode ocupar lugar: o nó de hoje (64px) tem `margin: -3px`, então a caixa no fluxo tem os 58px dos outros e o centro não depende do tamanho. A estrada é refeita por um ResizeObserver em cada `.nos` (largura e altura), não só na largura da trilha.
 - O nó de hoje no meio da curva (x = 0) ia à borda oposta à do dia anterior (+49, -70, -49) e a estrada fazia um cotovelo; agora vai ao lado do dia seguinte (+49, -49, -49).
 - Prova: `teste-trilha-estrada.mjs` compara o topo de cada linha e o `d` da estrada antes, com o balão aberto, no meio da saída e depois (dia lido, hoje, adiante, baú; unidades 1, 2 e 4; 360/390; claro/escuro) e mede cada nó a ≤ 2px do seu ponto na estrada.
+
+## Anotações cifradas no banco e "zerar" que só recomeça a trilha (2026-10-09)
+- Pedido do dono: "criptografe as notas também". Os textos privados viviam em JSON aberto na tabela `estados`, protegidos só por permissão. Agora `cofre.mjs` cifra campo a campo (AES-256-GCM, IV novo a cada gravação, o @ como dado associado, formato `{ v: 1, k, iv, tag, dado }`). Cifrar a folha e não o estado inteiro foi o que deixou painel, amigos, discipulado e conquistas funcionando sem decifrar: eles só olham chaves, datas e "tem texto" (o vazio fica vazio; o cifrado conta como escrito). Em claro, só no `/api/estado` do próprio dono (`lerEstadoAberto`); qualquer outra rota lê com `lerEstado`, que devolve cifrado.
+- **Para cifrar um campo novo**: acrescente o caminho em `CAMPOS_CIFRADOS` (cofre.mjs), com `*` para qualquer chave de um mapa (ex.: `notas.*.texto`, `notas.*.tags`; o valor pode ser texto, lista ou objeto). Nada mais muda: a gravação cifra, o `/api/estado` abre, e a próxima subida cifra o que já estava gravado em claro. Confira se algum sinal agregado lê o conteúdo do campo (não só a existência): esse sinal passa a ver o objeto cifrado. Acrescente o campo ao teste "selado, nenhum texto privado fica em claro" do `teste.mjs`.
+- Chave: `CAMINHO_CHAVE_NOTAS` (64 hexadecimais, `openssl rand -hex 32`) no `.env`, derivada por HKDF com rótulo próprio; em produção (`NODE_ENV=production`, no Dockerfile) sem ela o servidor não sobe e o `publicar.ps1` para antes de derrubar o container. Não reaproveitei a do backup porque ela pode morar em `dados/backup.chave`, ao lado do banco, onde não protege nada. Rotação: a antiga em `CAMINHO_CHAVE_NOTAS_ANTERIOR`, a nova em `CAMINHO_CHAVE_NOTAS`; a subida recifra.
+- Texto que não abre (adulterado, de outra conta, chave que sumiu) nunca vira "vazio": o GET responde 500 e o PUT não grava por cima. Tratar falha de decifrar como vazio faria a fusão apagar o texto de verdade.
+- O SQLite não apaga a página antiga: depois de cifrar contas em claro, o texto ficava nas páginas livres e no WAL. A migração roda `VACUUM` e `wal_checkpoint(TRUNCATE)` quando cifrou alguém. Os backups de antes da migração (até 14 dias) ainda têm o texto em claro, dentro do arquivo cifrado do backup; saem sozinhos pela rotação.
+- Pedido do dono: "zero progresso apaga a foto e as anotações também, sendo que seria só o reset da trilha". `zerarProgresso` trocava o estado inteiro por `VAZIO()` e a fusão devolvia o lado zerado inteiro, então até o aparelho atrasado perdia o que tinha escrito. Agora a lista `CC.PROGRESSO_DA_TRILHA` (02-estado.js) é o que zera; na fusão, o lado zerado vale só nesses campos e o resto se funde como sempre. O servidor deixava os contadores (`acertosTotal`, `missoesTotal`, `maiorProposito`) e o XP antigo só subirem: com zeramento novo, recomeçam do zero. Regra: operação destrutiva tem lista explícita do que apaga, e o texto de confirmação diz o que sai e o que fica.
+
+- "Muda ao tocar" se prova quadro a quadro, não pelo estado final: com toque emulado (`Emulation.setTouchEmulationEnabled` + `Input.dispatchTouchEvent`) e `Page.startScreencast`, comparando cada quadro com o de antes do toque fora da área do balão. Apareceram o quadrado azul de toque do Android sobre o nó (~100ms), o `scale(.93)` de `.no:active`/`.no.aberto` (o nó encolhia e ficava menor enquanto o balão estava aberto), o `scale(.96)` de `.no-bau:active` (01-base.css) e a seta de voltar a hoje sumindo. Nada disso aparecia nos testes que olhavam só offsetTop e o traço da estrada.
+- Passo vertical igual em toda a trilha (78px; troféu sempre 93px): a linha de hoje tinha 44px acima e 52px abaixo, e o baú pronto 44px acima por causa do "Abrir" em cima dele. Agora o cartão de hoje é baixo (passagem abreviada e botão redondo; ~80px cabe no passo) e o "Abrir" vai ao lado do baú. A estrada fica sem os trechos retos e esticados.
+- Para o cartão de hoje caber, o nó de hoje precisa estar numa crista da senoide (±70). Empurrar só esse nó fazia cotovelo (+49, -70, -49); agora é a fase da senoide que se ajusta aos poucos nos 16 passos em volta de hoje (`deslocamento` em 03-trilha.js): o maior deslocamento lateral entre nós seguidos vai de 98 para 59 (a senoide pura dá 49).
+- Prova: `teste-trilha-estrada.mjs` compara o topo de cada linha e o `d` da estrada antes, com o balão aberto, no meio da saída e depois (dia lido, hoje, adiante, baú; unidades 1, 2 e 4; 360/390; claro/escuro), mede cada nó a ≤ 2px do seu ponto na estrada, confere o passo vertical (desvio ≤ 1px), a curva e o toque emulado (o nó não encolhe, sem realce, sem rolar). Rodado contra a versão anterior, dá 92 falhas.

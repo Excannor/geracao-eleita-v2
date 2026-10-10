@@ -1,0 +1,75 @@
+{
+  "titulo": "O servo inútil",
+  "ref": "Lc 17.7-10",
+  "grupo": "lucas",
+  "linha": "O servo volta do campo e ainda serve a mesa",
+  "desenho": "campo-e-mesa",
+  "desenhoLista": "arado",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus fala com os discípulos sobre perdão. Se o irmão pecar sete vezes no mesmo dia e voltar arrependido, é para perdoar as sete vezes.",
+          "ref": "Lc 17.1-4"
+        },
+        {
+          "texto": "Os apóstolos ouvem isso e fazem um pedido.",
+          "ref": "Lc 17.5"
+        },
+        {
+          "fala": "Aumente a nossa fé!",
+          "ref": "Lc 17.5"
+        },
+        {
+          "texto": "Jesus responde que uma fé do tamanho de um grão de mostarda já mandaria uma amoreira se arrancar e se plantar no mar. Depois, ele conta esta história.",
+          "ref": "Lc 17.6-7"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "pao",
+      "blocos": [
+        {
+          "texto": "Jesus pede para os apóstolos se imaginarem donos de um servo. O servo trabalha fora, e na volta ainda tem serviço em casa.",
+          "ref": "Lc 17.7"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "arado",
+              "titulo": "No campo",
+              "fala": "esteja arando no campo ou cuidando das ovelhas",
+              "ref": "Lc 17.7"
+            },
+            {
+              "desenho": "prato-e-jarro",
+              "titulo": "Na mesa",
+              "fala": "Prepare primeiro a minha refeição",
+              "ref": "Lc 17.8"
+            }
+          ]
+        },
+        {
+          "texto": "Quando o servo volta do campo, ninguém manda ele sentar para comer. O patrão manda o servo preparar a comida e servir primeiro. Só depois o servo come e bebe.",
+          "ref": "Lc 17.7-8"
+        },
+        {
+          "texto": "O patrão nem agradece, porque o servo só fez o que devia fazer.",
+          "ref": "Lc 17.9"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Os apóstolos pedem mais fé, e Jesus fala de serviço. Obedecer a Deus em tudo não deixa Deus devendo nada para a gente. Quem serve faz o que deve e não espera elogio.",
+    "apoio": "Jesus ensina os apóstolos a dizer assim. “Somos servos inúteis, porque apenas cumprimos o nosso dever!”",
+    "ref": "Lc 17.5-10"
+  },
+  "perguntas": [
+    "Em que parte do seu serviço a Deus você ainda espera que alguém agradeça?",
+    "Você já fez alguma coisa para Deus e achou que ele ficou devendo?"
+  ]
+}

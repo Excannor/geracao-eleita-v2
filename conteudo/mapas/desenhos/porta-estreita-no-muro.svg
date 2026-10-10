@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a porta estreita (Lc 13.24-29): um muro comprido de pedras, com uma porta só, alta e fina, aberta e com a luz de dentro; um caminho estreito chega até ela, e do lado de fora, longe da porta, o chão continua largo. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. O vão iluminado é a única área sálvia. -->
+<path class="k" d="M4 96H156"/>
+<path class="k p" d="M6 96V40H154V96Z"/>
+<path class="h" d="M6 54H68M92 54H154M6 68H68M92 68H154M6 82H68M92 82H154M22 40V54M46 40V54M114 40V54M138 40V54M34 54V68M58 54V68M104 54V68M128 54V68M18 68V82M48 68V82M118 68V82M146 68V82M30 82V96M60 82V96M100 82V96M130 82V96"/>
+<path class="k p" d="M66 96V30C66 18 94 18 94 30V96Z"/>
+<path class="k s" d="M71 96V32C71 24 89 24 89 32V96Z"/>
+<path class="k p" d="M71 32L80 36V96H71Z"/>
+<path class="k" d="M72 96C70 104 60 112 44 120M88 96C90 104 100 112 116 120"/>
+<path class="h" d="M80 100V104M80 108V112"/>
+</svg>

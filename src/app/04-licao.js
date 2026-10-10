@@ -27,9 +27,12 @@
 
   CC.abrirLicao = function (dia) { location.hash = '#/dia/' + dia; };
 
+  // Só a lição do dia (.licao-dia): o dia do Conhecer Jesus e a prática também usam .licao, e
+  // o roteador fecha a lição em toda rota que não é #/dia. Com o seletor largo, qualquer
+  // redesenho (a sincronização) fechava o dia do Conhecer Jesus ou a prática no meio.
   CC.fecharLicao = function () {
     if (CC.fecharLeitor) CC.fecharLeitor();
-    CC.sair(document.querySelector('.licao:not(.saindo)'));
+    CC.sair(document.querySelector('.licao-dia:not(.saindo)'));
     sessao = null;
   };
 
@@ -118,7 +121,15 @@
       fracao = 0.5 + 0.5 * (ETAPAS.indexOf(sessao.etapaReflexao || 'guardar') + 1) / 4;
     }
 
-    let el = document.querySelector('.licao:not(.saindo)');
+    let el = document.querySelector('.licao-dia:not(.saindo)');
+    // Redesenhar a MESMA tela (marcar uma passagem, a sincronização que chama CC.redesenhar)
+    // deixa o palco onde a pessoa estava; só uma tela nova da lição, ou outro dia, começa no
+    // topo. Antes o palco voltava sempre ao zero, e marcar a passagem de baixo jogava a lição
+    // para o alto (relato do dono, 09/10).
+    const qualTela = sessao.dia + ':' + sessao.tela;
+    const palcoAntes = el && el.dataset.tela === qualTela ? el.querySelector('.licao-palco') : null;
+    const rolagemAntes = palcoAntes ? palcoAntes.scrollTop : 0;
+    const focoAntes = el && el.contains(document.activeElement) ? document.activeElement.dataset.trilha : '';
     if (!el) {
       el = document.createElement('div');
       el.setAttribute('role', 'dialog');
@@ -140,10 +151,15 @@
     if (fechar) fechar.onclick = sair;
     if (tela.ligar) tela.ligar(el);
 
+    el.dataset.tela = qualTela;
     const palco = el.querySelector('.licao-palco');
-    if (palco) palco.scrollTop = 0;
+    if (palco) palco.scrollTop = rolagemAntes;
+    // O foco vai para o título numa tela nova; no redesenho, volta ao botão de marcar que foi
+    // tocado (o innerHTML trocou o elemento), sem rolar.
+    const tocado = palcoAntes && focoAntes ? el.querySelector('[data-trilha="' + focoAntes + '"]') : null;
     const titulo = el.querySelector('h1');
-    if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
+    if (tocado) tocado.focus({ preventScroll: true });
+    else if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
   }
 
   function sair() {
@@ -534,7 +550,7 @@
 
     // A frase do fim do dia é uma das frases da ofensiva (as mesmas do carimbo), sorteada,
     // com a referência quando a frase tem uma.
-    const f = CC.fraseDaOfensiva();
+    const f = CC.fraseDaOfensiva({ comTexto: true });
     const frase = CC.esc(f.linhas.join(' ')) + (f.ref ? ' <span class="ref-frase">' + CC.esc(f.ref) + '</span>' : '');
 
     return {
@@ -702,7 +718,8 @@
       : r[chave] || '');
     // A nota do versículo do dia (feita nos leitores) continua à mão aqui, onde se escreve.
     const refDoDia = CC.reflexaoDoDia(sessao.dia).ref;
-    const temNotaVerso = !!(refDoDia && CC.anotacao(CC.versiculos.chaveNota(refDoDia)).trim());
+    const notasVerso = refDoDia && CC.lerRef(refDoDia) ? CC.versiculos.notasDoTrecho(CC.lerRef(refDoDia)) : [];
+    const temNotaVerso = notasVerso.length > 0;
 
     return {
       topo: '<span class="salvo" id="salvo" role="status"></span>',
@@ -720,7 +737,9 @@
             + (campos.length === 1 ? ' class="alto"' : '') + '>' + CC.esc(valor(chave)) + '</textarea></div>';
         }).join('')
         + (temNotaVerso ? '<p class="nota-do-verso">' + CC.ico('caneta') + '<span>Você tem uma nota em ' + nb(CC.esc(refDoDia)) + '. '
-          + '<button class="link-inline" data-nota-do-verso>Ver a nota</button></span></p>' : ''),
+          + '<button class="link-inline" data-nota-do-verso>Ver a nota</button></span></p>' : '')
+        // o mesmo aviso de privacidade das notas (o que se escreve aqui aparece em Minhas anotações)
+        + CC.avisoPrivado(),
       pe: botao('Pronto', 'data-pronto'),
       ligar(el) {
         const salvo = el.querySelector('#salvo');
@@ -744,8 +763,9 @@
             campoOracao.scrollTop = campoOracao.scrollHeight;
           }, 0);
         }
+        CC.ligarAvisoPrivado(el);
         const notaVerso = el.querySelector('[data-nota-do-verso]');
-        if (notaVerso) notaVerso.onclick = () => CC.versiculos.abrirNota(refDoDia, null, () => desenhar());
+        if (notaVerso) notaVerso.onclick = () => CC.versiculos.abrirPrevia(notasVerso, () => desenhar());
         el.querySelectorAll('[data-modo]').forEach((b) => {
           b.onclick = () => { sessao.modo = b.dataset.modo; sessao.escolheu = true; desenhar(); };
         });

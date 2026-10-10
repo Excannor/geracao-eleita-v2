@@ -127,13 +127,14 @@
     return 1357 * s;
   }
 
-  // A marca no pé: símbolo + "Geração Eleita" + endereço, centrada, com o pé em y.
-  function marca(ctx, cy, { cor, corFraca, tamanho = 34 }) {
+  // A marca no pé: símbolo + "Geração Eleita" + endereço, centrada, com o pé em y. Os
+  // modelos das artes (01e-story-artes.js) põem a contagem de dias nessa segunda linha (sub).
+  function marca(ctx, cy, { cor, corFraca, tamanho = 34, sub = ENDERECO }) {
     const alturaLogo = tamanho * 2.1;
     ctx.font = '800 ' + tamanho + 'px Manrope, sans-serif';
     const wNome = ctx.measureText('Geração Eleita').width;
     ctx.font = '600 ' + Math.round(tamanho * 0.78) + 'px Manrope, sans-serif';
-    const wEnd = ctx.measureText(ENDERECO).width;
+    const wEnd = ctx.measureText(sub).width;
     const wTexto = Math.max(wNome, wEnd);
     const wLogo = alturaLogo * 1357 / 1936;
     const vao = tamanho * 0.6;
@@ -146,7 +147,7 @@
     ctx.fillText('Geração Eleita', x0 + wLogo + vao, cy - tamanho * 0.08);
     ctx.fillStyle = corFraca;
     ctx.font = '600 ' + Math.round(tamanho * 0.78) + 'px Manrope, sans-serif';
-    ctx.fillText(ENDERECO, x0 + wLogo + vao, cy + tamanho * 0.86);
+    ctx.fillText(sub, x0 + wLogo + vao, cy + tamanho * 0.86);
   }
 
   // Texto corrido quebrado em linhas equilibradas (o text-wrap: balance da tela): primeiro
@@ -266,23 +267,47 @@
     marca(ctx, A - SEGURA - 80, { cor: '#c9d98f', corFraca: '#a4a99d' });
   }
 
-  // Versículo (variante A, escolhida): a folha do alto do app (sálvia pálida) com o versículo
-  // num cartão branco em Literata, as aspas no botão redondo preto e a referência embaixo.
-  function desenharVersiculo(ctx, { ref, texto, traducao }) {
-    ctx.fillStyle = '#dfe8c1';
-    ctx.fillRect(0, 0, L, A);
-    const margem = 64;
-    const dentro = 76;
-    const raio = 70;
-    const corpo = String(texto || '').trim() || ref;
-    const z0 = SEGURA + 40 + raio;
-    const z1 = A - SEGURA - 190;
-    const pe = 64 + 46 + (traducao ? 50 : 0) + 76;
-    // Letra de 34px para cima (abaixo disso não se lê no story). Um trecho longo demais (até
-    // dez versículos) para no fim da última palavra que cabe, com reticências: a referência
-    // embaixo diz o trecho inteiro.
-    const caixa = { fonte: (x) => Lit(500, x), larguraMax: L - 2 * (margem + dentro),
-      alturaMax: z1 - z0 - raio - 60 - pe, fonteMax: 92, fonteMin: 34, entreLinhas: 1.42 };
+  // Versículo (redesenho de 2026-10-09, design/compartilhar/LEIA.md): a página escura da
+  // landing, as aspas grandes em sálvia como o elemento gráfico (sem a bolinha de antes), o
+  // versículo em Literata alinhado à esquerda, a referência em Oswald amarela com a versão
+  // embaixo, e no pé o carimbo "Leia a Bíblia comigo" com a marca: o story também apresenta o
+  // app a quem vê. O texto vai como está; se o trecho começa no meio da frase (minúscula),
+  // ganha reticências na frente, só na imagem. A paleta clara existe para comparar
+  // (design/compartilhar/gerar.mjs versiculo); o app usa a escura.
+  const PALETAS_VERSICULO = {
+    escura: { fundo: '#0d0e0c', brilho: 'rgba(200,218,140,.10)', aspas: '#c8da8c', texto: '#f2efdc', barra: '#c8da8c',
+      ref: '#ffc44d', versao: '#a3a69a', chapa: '#c8da8c', letra: '#12130f', marca: '#f2efdc', marcaFraca: '#a3a69a' },
+    clara: { fundo: '#dfe8c1', brilho: 'rgba(255,255,255,.35)', aspas: '#12130f', texto: '#12130f', barra: '#12130f',
+      ref: '#12130f', versao: '#4f5a36', chapa: '#12130f', letra: '#dfe8c1', marca: '#12130f', marcaFraca: '#4f5a36' },
+  };
+  function desenharVersiculo(ctx, { ref, texto, traducao, paleta }) {
+    const P = PALETAS_VERSICULO[paleta] || PALETAS_VERSICULO.escura;
+    // o fundo de cartaz da marca vem com as artes (01e-story-artes.js); sem ele, a página lisa
+    const cartaz = !paleta && CC.story.fundoCartaz;
+    if (cartaz) CC.story.fundoCartaz(ctx);
+    else {
+      ctx.fillStyle = P.fundo;
+      ctx.fillRect(0, 0, L, A);
+      const brilho = ctx.createRadialGradient(160, 420, 0, 160, 420, 900);
+      brilho.addColorStop(0, P.brilho);
+      brilho.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = brilho;
+      ctx.fillRect(0, 0, L, A);
+    }
+    const margem = 96;
+    const largura = L - 2 * margem;
+    const bruto = String(texto || '').trim();
+    // começa no meio da frase: reticências na frente (o texto em si não muda)
+    const corpo = bruto ? (/^\p{Ll}/u.test(bruto) ? '…' + bruto : bruto) : ref;
+    const z0 = SEGURA + (cartaz ? 150 : 60);
+    const z1 = A - SEGURA - (cartaz ? 300 : 250);
+    const altAspas = 190;
+    const altRef = 46 + 70 + (traducao ? 46 : 0);
+    // Letra de 42px para cima (abaixo disso o story vira um paredão). Um trecho longo demais
+    // (até dez versículos) para no fim da última palavra que cabe, com reticências: a referência
+    // diz o trecho inteiro.
+    const caixa = { fonte: (x) => Lit(500, x), larguraMax: largura, alturaMax: z1 - z0 - altAspas - altRef,
+      fonteMax: 128, fonteMin: 42, entreLinhas: 1.3 };
     let t = textoEquilibrado(ctx, corpo, caixa);
     if (t.altura > caixa.alturaMax) {
       const palavras = corpo.split(/\s+/);
@@ -295,34 +320,68 @@
       }
       t = textoEquilibrado(ctx, palavras.slice(0, de).join(' ').replace(/[,;:.!?]+$/, '') + '…', caixa);
     }
-    const altura = raio + 60 + t.altura + pe;
-    const topo = z0 + Math.max(0, (z1 - z0 - altura) / 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(margem, topo, L - 2 * margem, altura, 64); else ctx.rect(margem, topo, L - 2 * margem, altura);
-    ctx.fill();
-    ctx.fillStyle = '#151615';
-    ctx.beginPath();
-    ctx.arc(L / 2, topo, raio, 0, Math.PI * 2);
-    ctx.fill();
-    // as aspas ficam no meio do círculo pelo desenho delas, não pela caixa da letra
-    ctx.font = Lit(600, 168);
-    const m = ctx.measureText('“');
-    const altAspas = (m.actualBoundingBoxAscent || 0) + (m.actualBoundingBoxDescent || 0);
-    escrever(ctx, '“', L / 2, topo + (m.actualBoundingBoxAscent ? m.actualBoundingBoxAscent - altAspas / 2 : 52), Lit(600, 168), '#c8da8c');
-    let y = topo + raio + 60;
+    const altura = altAspas + t.altura + altRef;
+    let y = z0 + Math.max(0, (z1 - z0 - altura) / 2);
+    // as aspas grandes, o elemento gráfico
+    escrever(ctx, '“', margem - 14, y + 300, Lit(600, 420), P.aspas, { alinhar: 'left' });
+    y += altAspas;
     for (const linha of t.linhas) {
-      escrever(ctx, linha, L / 2, y + t.tamanho * 1.05, Lit(500, t.tamanho), '#2c2d2b');
-      y += t.tamanho * 1.42;
+      escrever(ctx, linha, margem, y + t.tamanho * 1.0, Lit(500, t.tamanho), P.texto, { alinhar: 'left' });
+      y += t.tamanho * 1.3;
     }
-    y += 64 + 30;
-    escrever(ctx, ref, L / 2, y, Mn(800, 46), '#151615');
-    if (traducao) escrever(ctx, traducao, L / 2, y + 52, Mn(600, 30), '#686b66');
-    marca(ctx, A - SEGURA - 80, { cor: '#151615', corFraca: '#4f5a36' });
+    y += 46;
+    ctx.fillStyle = P.barra;
+    ctx.fillRect(margem, y, 90, 8);
+    y += 70;
+    escrever(ctx, ref.toUpperCase(), margem, y, '700 52px Oswald, sans-serif', P.ref, { alinhar: 'left', espaco: 52 * 0.06 });
+    if (traducao) escrever(ctx, traducao.toUpperCase(), margem, y + 46, Mn(700, 26), P.versao, { alinhar: 'left', espaco: 26 * 0.16 });
+    // o convite e a marca (no cartaz, o pé dele: convite, endereço, cruz e coroa)
+    if (cartaz) { CC.story.rodapeCartaz(ctx); return; }
+    const convite = ['Leia a Bíblia comigo'];
+    const tc = tamanhoDoCarimbo(ctx, convite, 760, 90, 46);
+    carimbo(ctx, convite, L / 2, A - SEGURA - 210, tc, { chapa: P.chapa, letra: P.letra });
+    marca(ctx, A - SEGURA - 60, { cor: P.marca, corFraca: P.marcaFraca });
   }
 
+  // A frase que tem arte própria (FRASES_OFENSIVA com "arte") usa o modelo dela; as outras,
+  // e a frase do estágio, o modelo de sempre. A arte sai da lista pela frase, e não do pedido,
+  // para o pedido continuar o mesmo (a folha e o fim da lição mandam linhas e referência).
+  // arteDesejada: o modelo que a frase pede; arteDaFrase: o mesmo, se os desenhos já chegaram.
+  function arteDesejada(frase) {
+    if (!frase || !frase.linhas || !CC.FRASES_OFENSIVA) return null;
+    const texto = frase.linhas.join(' ');
+    const f = CC.FRASES_OFENSIVA.find((x) => x.arte && x.linhas.join(' ') === texto && (x.ref || '') === (frase.ref || ''));
+    return f ? f.arte : null;
+  }
+  function arteDaFrase(frase) {
+    const arte = arteDesejada(frase);
+    return arte && CC.story.artes && CC.story.artes[arte] ? arte : null;
+  }
+  // Os desenhos das artes moram num arquivo à parte (window.STORY_ARTES, gerado pelo build),
+  // pedido só quando um story desses vai ser gerado. Falhou (sem rede na primeira vez): a
+  // promessa resolve assim mesmo, e o story sai no modelo de sempre.
+  let artesPedidas = null;
+  function carregarArtes() {
+    if (CC.story.artes) return Promise.resolve(true);
+    if (!artesPedidas) {
+      artesPedidas = new Promise((resolver) => {
+        const arquivo = window.STORY_ARTES;
+        if (!arquivo) { resolver(false); return; }
+        const s = document.createElement('script');
+        const fim = (certo) => { clearTimeout(espera); resolver(certo && !!CC.story.artes); if (!CC.story.artes) artesPedidas = null; };
+        const espera = setTimeout(() => fim(false), LIMITE_EXTRAS);
+        s.src = './' + arquivo;
+        s.onload = () => fim(true);
+        s.onerror = () => { s.remove(); fim(false); };
+        document.head.appendChild(s);
+      });
+    }
+    return artesPedidas;
+  }
   function desenhar(ctx, tipo, dados) {
-    if (tipo === 'ofensiva') desenharOfensiva(ctx, dados);
+    const arte = tipo === 'ofensiva' ? arteDaFrase(dados.frase) : null;
+    if (arte) CC.story.artes[arte](ctx, dados);
+    else if (tipo === 'ofensiva') desenharOfensiva(ctx, dados);
     else desenharVersiculo(ctx, dados);
   }
 
@@ -342,14 +401,33 @@
   // deixa abrir o compartilhamento logo depois de um toque; com a imagem já pronta, nada de
   // espera entre o toque e o navigator.share.
   let guardada = { chave: '', promessa: null };
+  const LIMITE_EXTRAS = 6000;
+  const comLimite = (p, ms) => Promise.race([Promise.resolve(p).catch(() => false), new Promise((r) => setTimeout(() => r(false), ms))]);
   function preparar(pedido) {
     const chave = JSON.stringify(pedido);
     if (guardada.chave !== chave || !guardada.promessa) {
-      const promessa = prepararFontes().then(() => {
-        const c = tela();
-        desenhar(c.getContext('2d'), pedido.tipo, pedido);
-        return new Promise((resolver) => c.toBlob(resolver, 'image/png'));
-      }).then((blob) => {
+      const querArte = pedido.tipo === 'ofensiva' && !!arteDesejada(pedido.frase);
+      const arte = querArte ? arteDesejada(pedido.frase) : null;
+      // o versículo usa o fundo de cartaz, que vem com as artes (e as montanhas)
+      const ehVerso = pedido.tipo === 'versiculo' && !pedido.paleta;
+      // Os arquivos à parte (artes, fotos) têm um tempo-limite só para eles: rede lenta ou
+      // pedido que nunca volta não pode segurar o compartilhar. Passou do limite, desenha com
+      // o que já chegou (o modelo de sempre, ou o fundo sem a foto).
+      const extras = () => carregarArtes()
+        .then(() => (querArte && CC.story.prepararArte && arteDaFrase(pedido.frase) ? CC.story.prepararArte(arte) : true))
+        .then(() => (ehVerso && CC.story.prepararVersiculo ? CC.story.prepararVersiculo() : true));
+      const promessa = prepararFontes()
+        .then(() => (querArte || ehVerso ? comLimite(extras(), LIMITE_EXTRAS) : true))
+        .then(() => {
+          const c = tela();
+          desenhar(c.getContext('2d'), pedido.tipo, pedido);
+          // a arte (ou a foto dela) não chegou: esta sai no modelo de sempre (ou na
+          // ilustração), e o próximo toque tenta de novo
+          const faltou = (querArte && (!arteDaFrase(pedido.frase) || (CC.story.arteCompleta && !CC.story.arteCompleta(arte))))
+            || (ehVerso && (!CC.story.fundoCartaz || !CC.story.versiculoCompleto()));
+          if (faltou) setTimeout(() => { if (guardada.promessa === promessa) guardada = { chave: '', promessa: null }; }, 0);
+          return new Promise((resolver) => c.toBlob(resolver, 'image/png'));
+        }).then((blob) => {
         if (!blob) throw new Error('sem imagem');
         return new File([blob], nomeDoArquivo(pedido), { type: 'image/png' });
       });
@@ -400,5 +478,5 @@
     return 'baixado';
   };
 
-  CC.story = { L, A, SEGURA, ENDERECO, desenhar, preparar, nomeDoArquivo, textoDe, prepararFontes, pincelada, medidasDoCarimbo, tamanhoDoCarimbo, carimbo, chama, logo, marca, textoEquilibrado, linhasDoCarimbo, tela };
+  CC.story = { L, A, SEGURA, ENDERECO, desenhar, arteDaFrase, arteDesejada, carregarArtes, Mn, Lit, escrever, preparar, nomeDoArquivo, textoDe, prepararFontes, pincelada, medidasDoCarimbo, tamanhoDoCarimbo, carimbo, chama, logo, marca, textoEquilibrado, linhasDoCarimbo, tela };
 })(window.CC);

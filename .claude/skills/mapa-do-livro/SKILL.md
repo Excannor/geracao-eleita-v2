@@ -344,7 +344,7 @@ para olhar peça por peça, porque a página inteira reduzida esconde defeito.
   pulo nem a página poluída. Aberto: Antigo/Novo Testamento (começa no do livro de hoje), a grade
   de duas colunas só daquele testamento, os prontos primeiro e os "em breve" depois, mais
   apagados (só contorno), e um "Fechar" no fim, que fecha sem o resto da página pular. O nome
-  nunca quebra no meio da palavra (fonte de 20, 17, 15 ou 14px conforme o tamanho do nome; "Deuteronômio", com 12 letras, passou da célula pronta a 17px).
+  nunca quebra no meio da palavra (fonte de 20, 17, 15 ou 14px conforme o tamanho do nome; "Deuteronômio", com 12 letras, passou da célula pronta a 17px). Nome pronto com mais de 15 letras ("1 Tessalonicenses") ganha `nome-longo`: a seta desce para o canto de baixo e o nome usa a largura toda.
 - **A ficha e o mapa ligados:** a ficha do livro (Explorar > Livros) ganha "Ver o mapa" logo
   abaixo do nome quando o mapa existe, e o mapa termina com "Ver a ficha do livro". Um nome só
   para cada coisa (ficha, mapa), sem outra lista dos 66.

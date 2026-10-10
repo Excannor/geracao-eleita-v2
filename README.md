@@ -343,6 +343,15 @@ vem no Node (`node:sqlite`, nenhuma dependência nova). Roda em modo WAL.
   `node ferramentas/backup.mjs abrir dados/backup/caminho-AAAA-MM-DD.db.cifrado restaurado.db`.
   `node ferramentas/exportar-sqlite-para-json.mjs dados saida` regenera os JSON a partir de
   uma cópia do banco, o caminho de volta.
+- **Anotações cifradas:** o que a pessoa escreve só para si (reflexões do dia, anotações no
+  material, notas nos versículos e a Minha história com Deus) fica cifrado campo a campo no
+  banco (AES-256-GCM, `cofre.mjs`), com a chave `CAMINHO_CHAVE_NOTAS` do `.env` (64
+  hexadecimais: `openssl rand -hex 32`). **Obrigatória em produção: sem ela o container não
+  sobe.** Guarde uma cópia fora do servidor, junto da chave dos backups: perdida, os textos não
+  abrem mais. Na primeira subida com a chave, o que estava em claro é cifrado sozinho. Para
+  trocar a chave: a antiga vai para `CAMINHO_CHAVE_NOTAS_ANTERIOR`, a nova para
+  `CAMINHO_CHAVE_NOTAS`, e a subida recifra tudo; depois a antiga pode sair. Fora de produção
+  (sem `NODE_ENV=production`), sem a variável, o servidor usa uma chave de teste.
 - **Chaves:** `dados/sessao.chave` e `dados/push.chave` continuam como arquivos.
 
 ## Notificações
@@ -396,6 +405,10 @@ respeitam `prefers-reduced-motion`. O app não usa o nome, o logotipo nem a marc
 denominação.
 
 ## Rodar com Docker
+
+Antes do primeiro deploy com o cofre das anotações, ponha no `.env` desta pasta
+`CAMINHO_CHAVE_NOTAS=` seguido de 64 hexadecimais (`openssl rand -hex 32`) e guarde uma cópia
+fora do servidor. Sem ela o container para na subida com a mensagem "falta CAMINHO_CHAVE_NOTAS".
 
 ```
 docker compose up -d --build caminho && docker compose up -d --force-recreate tunel-fixo
@@ -483,6 +496,7 @@ falhou e o container continua servindo o build de antes.
 | `build.mjs` | junta conteúdo, estilo e código em `dist/`; gera ícones, manifesto, service worker e os arquivos das bíblias |
 | `servidor.mjs` | serve `dist/`, as rotas da API, os backups e a rodada das notificações |
 | `db.mjs` | o banco: esquema com versão, gravação só do que mudou, importação, backups |
+| `cofre.mjs` | a cifra dos textos privados no banco: a lista dos campos, a chave e a migração |
 | `src/estilo.css` | a base do estilo: peças, telas e nós da trilha |
 | `src/estilo-v2/` | as fichas de cor e de letra (`00-tokens.css`) e o desenho de cada tela, por cima da base |
 | `src/app/02-estado.js` | progresso, fusão entre aparelhos, ofensiva, XP, conquistas |

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o tesouro num vaso de barro (2Co 4.6-7): um pote de barro bojudo, com uma rachadura fina no corpo, a boca aberta em sálvia e raios curtos de luz saindo dela -->
+<path class="k p" d="M50 33C50 38 48 41 44 44C30 54 28 80 40 94C44 99 48 101 52 101H68C72 101 76 99 80 94C92 80 90 54 76 44C72 41 70 38 70 33Z"/>
+<path class="h" d="M45 50C54 53 66 53 75 50M36 78C50 82 70 82 84 78"/>
+<path class="h" d="M70 60L66 67L70 72L67 80"/>
+<ellipse class="k p" cx="60" cy="32" rx="13" ry="4"/>
+<ellipse class="s" cx="60" cy="32" rx="9.5" ry="2.2"/>
+<path class="h" d="M60 24V12M51 25L45 17M69 25L75 17M45 28L36 25M75 28L84 25"/>
+</svg>

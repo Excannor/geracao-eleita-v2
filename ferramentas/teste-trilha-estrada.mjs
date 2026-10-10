@@ -16,6 +16,13 @@
 //    44px fora dos nós enquanto o balão saía.
 // 4. Centros: o centro desenhado de cada nó (inclusive o de hoje, maior) fica a 2px ou menos
 //    do ponto da estrada que é dele, em toda unidade aberta.
+// 5. Ritmo: o passo vertical entre centros de nós seguidos (dias e baús) é o mesmo em toda a
+//    trilha (diferença ≤ 1px, o de hoje inclusive: o cartão ao lado e a bolinha maior não ocupam
+//    fluxo), o passo até o troféu é sempre o mesmo, a curva não tem cotovelo nem reta longa
+//    (deslocamento lateral entre nós seguidos ≤ 60px e mudança dele ≤ 54px; a senoide pura dá
+//    49 e 42) e o cartão de hoje não encosta em nenhum outro nó, rótulo ou balão.
+// 6. Toque: com toque emulado, o nó tocado não encolhe nem muda de lugar (nem pressionado,
+//    nem com o balão aberto), não há destaque de toque e, cabendo, a tela não rola.
 //
 // Uso: CHROME=<chrome> node ferramentas/teste-trilha-estrada.mjs   (PORTA=<n> troca a porta)
 import { spawn } from 'node:child_process';
@@ -131,6 +138,24 @@ async function fecharSemMexer(antes, rotulo) {
   ok(saindo === antes && fechado === antes, rotulo + ': fechar o balão não muda a posição de nenhum nó nem a estrada');
 }
 
+// O passo vertical e a curva de cada unidade aberta (ver 5 no alto).
+const RITMO = `[...document.querySelectorAll('.trilha .nos')].map((nos) => {
+  const els = [...nos.querySelectorAll('.no, .no-bau, .no-marco')];
+  const c = els.map((el) => { const b = el.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, m: !!el.dataset.marco }; });
+  const passos = [], dxs = [];
+  for (let i = 1; i < c.length; i++) if (!c[i].m) { passos.push(c[i].y - c[i - 1].y); dxs.push(c[i].x - c[i - 1].x); }
+  let quina = 0; for (let i = 1; i < dxs.length; i++) quina = Math.max(quina, Math.abs(dxs[i] - dxs[i - 1]));
+  const cartao = nos.querySelector('.cartao-no-hoje');
+  const cruza = (a, b) => !(a.bottom <= b.top || a.top >= b.bottom || a.right <= b.left || a.left >= b.right);
+  const encosta = cartao ? [...nos.querySelectorAll('.no, .no-bau, .no-marco, .rotulo-dia, .balao, .rotulo-no')]
+    .filter((e) => !e.closest('.no-linha.hoje') && cruza(e.getBoundingClientRect(), cartao.getBoundingClientRect())).map((e) => e.className.split(' ')[0]) : [];
+  const vaza = !!cartao && [...cartao.children].some((f) => f.scrollWidth > f.clientWidth + 1 || f.getBoundingClientRect().right > innerWidth || f.getBoundingClientRect().left < 0);
+  return { u: els[els.length - 1].dataset.marco, desvio: Math.round(Math.max(...passos) - Math.min(...passos)), passo: Math.round(passos[0]),
+    trofeu: Math.round(c[c.length - 1].y - c[c.length - 2].y), dx: Math.round(Math.max(...dxs.map(Math.abs))), quina: Math.round(quina), encosta, vaza };
+})`;
+const passosDoTrofeu = new Set();
+const passosDaTrilha = new Set();
+
 // Põe a conta com os dias 1..lidos feitos e o dia seguinte como o de hoje.
 async function preparar(lidos, todas) {
   await av(`(() => { const E = CC.estado(); E.lidos.splice(0, E.lidos.length, ...Array.from({ length: ${lidos} }, (_, i) => i + 1));
@@ -149,6 +174,9 @@ async function preparar(lidos, todas) {
 // Unidades: 1 (1-31, 31 dias), 2 (32-59, 28 dias), 4 (91-120, 30 dias).
 const CASOS = [
   { lidos: 0, nome: 'dia 1 (início da unidade de 31 dias)' },
+  { lidos: 4, nome: 'dia 5 (hoje no meio da curva)' },
+  { lidos: 5, nome: 'dia 6 (o cenário do print do dono)' },
+  { lidos: 7, nome: 'dia 8 (hoje logo depois de um baú)' },
   { lidos: 15, nome: 'dia 16 (meio da unidade 1)' },
   { lidos: 30, nome: 'dia 31 (último dia da unidade 1, hoje logo acima do troféu)' },
   { lidos: 31, nome: 'dia 32 (unidade 1 concluída, hoje na unidade 2)' },
@@ -176,8 +204,42 @@ for (const [W, H] of [[360, 740], [390, 844]]) {
         const fora = await av(FORA_DO_CENTRO);
         ok(Array.isArray(fora) && fora.length === 0 && await av("!!document.querySelector('.trilha .no.atual')") === true,
           W + ' ' + tema + ', ' + caso.nome + (todas ? ', todas abertas' : '') + ': cada nó, o de hoje inclusive, centrado na estrada' + (fora && fora.length ? ' (' + fora.slice(0, 4).join('; ') + ')' : ''));
+        const ritmo = await av(RITMO);
+        const ruins = (ritmo || []).filter((r) => r.desvio > 1 || r.dx > 60 || r.quina > 54 || r.encosta.length || r.vaza);
+        (ritmo || []).forEach((r) => { passosDoTrofeu.add(r.trofeu); passosDaTrilha.add(r.passo); });
+        ok(ritmo && ritmo.length && ruins.length === 0, W + ' ' + tema + ', ' + caso.nome + (todas ? ', todas abertas' : '')
+          + ': passo vertical igual, curva sem cotovelo e cartão de hoje sem encostar em nada'
+          + (ruins.length ? ' (' + JSON.stringify(ruins.slice(0, 2)) + ')' : ' (maior desvio ' + Math.max(...ritmo.map((r) => r.desvio)) + 'px, maior deslocamento ' + Math.max(...ritmo.map((r) => r.dx)) + 'px)'));
       }
     }
+
+    ok(passosDaTrilha.size === 1 && passosDoTrofeu.size === 1, W + ' ' + tema + ': o mesmo passo em todas as unidades e casos ('
+      + [...passosDaTrilha].join('/') + 'px entre nós, ' + [...passosDoTrofeu].join('/') + 'px até o troféu)');
+    passosDaTrilha.clear(); passosDoTrofeu.clear();
+
+    // Toque emulado (ver 6 no alto): hoje no dia 6, como no print do dono.
+    await cmd('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+    await preparar(5, false);
+    for (const [sel, nome] of [['[data-dia="3"]', 'dia lido'], ['[data-dia="6"]', 'dia de hoje'], ['[data-dia="14"]', 'dia adiante'], ['[data-bau="7"]', 'baú fechado']]) {
+      await av(`(() => { const b = document.querySelector('${sel}'); scrollTo(0, 0); scrollTo(0, b.getBoundingClientRect().top + scrollY - innerHeight * .35); return 1; })()`);
+      await dormir(300);
+      const caixa = `(() => { const b = document.querySelector('${sel}').getBoundingClientRect(); return [b.left, b.top, b.width, b.height].map((v) => Math.round(v * 10) / 10).join(',') + '@' + scrollY; })()`;
+      const antes = await av(caixa);
+      const [x, y] = antes.split('@')[0].split(',').map(Number);
+      const retrato = await av(RETRATO);
+      await cmd('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x + 20, y: y + 20 }] });
+      await dormir(60);
+      const apertado = await av(caixa);
+      const realce = await av(`getComputedStyle(document.querySelector('${sel}')).webkitTapHighlightColor`);
+      await cmd('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await dormir(600);
+      const aberto = await av(caixa);
+      ok(!!(await av("!!document.querySelector('.pop-no:not(.saindo)')")) && apertado === antes && aberto === antes && await av(RETRATO) === retrato && /rgba\(0, 0, 0, 0\)|transparent/.test(realce),
+        W + ' ' + tema + ', toque no ' + nome + ': o nó não encolhe nem sai do lugar, sem realce de toque, a tela não rola (' + [antes, apertado, aberto, realce].join(' | ') + ')');
+      await av('document.body.click(); 1');
+      await dormir(450);
+    }
+    await cmd('Emulation.setTouchEmulationEnabled', { enabled: false });
 
     // Balões: hoje no dia 31 (unidade 1), com o baú do dia 28 pronto ("Abrir" à vista).
     await preparar(30, false);

@@ -1,0 +1,295 @@
+{
+  "nome": "Efésios",
+  "grupo": "Cartas de Paulo",
+  "numero": 49,
+  "capitulos": 6,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἐφεσίους",
+    "transliteracao": "Ephesious",
+    "traducao": "aos efésios",
+    "texto": "Ephesious quer dizer aos efésios, os moradores de Éfeso. Os primeiros a ler a carta são os santos da igreja dessa cidade."
+  },
+  "autoria": {
+    "texto": "Paulo, apóstolo de Cristo Jesus, escreve aos santos e fiéis em Cristo Jesus que estão em Éfeso.",
+    "apoio": "Quem leva a carta é Tíquico, um irmão muito amado. Ele vai contar aos irmãos como o autor está passando.",
+    "refs": [
+      "Ef 1.1",
+      "Ef 6.21-22"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Paulo chega a Éfeso e fica na província da Ásia por dois anos, até todos ali ouvirem a palavra do Senhor. Agora ele está preso e escreve para os irmãos da cidade. Primeiro ele conta tudo o que Deus fez por eles em Cristo. Depois pede que eles vivam de um jeito digno desse chamado.",
+    "refs": [
+      "At 19.1, 10",
+      "Ef 4.1"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Escolhidos",
+      "sub": "Deus abençoa em Cristo",
+      "desenho": "anel-de-selo",
+      "galhos": [
+        {
+          "texto": "Muito antes de criar o mundo, Deus escolhe os seus para serem dele. O plano dele sempre foi adotar essas pessoas na família dele, por Jesus Cristo.",
+          "ref": "Ef 1.4-5"
+        },
+        {
+          "texto": "Cristo compra a liberdade dos seus com o sangue dele e perdoa os pecados. A graça de Deus vem com fartura.",
+          "ref": "Ef 1.7-8"
+        },
+        {
+          "texto": "Deus conta o plano que guardava em segredo. No tempo certo, ele vai juntar tudo o que existe, no céu e na terra, debaixo da autoridade de Cristo.",
+          "ref": "Ef 1.9-10"
+        },
+        {
+          "texto": "Os irmãos ouviram o evangelho e creram. Deus marca cada um com o Espírito Santo, como garantia de que vai dar tudo o que prometeu.",
+          "ref": "Ef 1.13-14"
+        },
+        {
+          "texto": "O autor ora sem parar pelos irmãos. Ele pede que o coração deles se encha de luz, para conhecerem a esperança a que Deus chama.",
+          "ref": "Ef 1.16-18"
+        },
+        {
+          "texto": "Em quem crê age o poder de Deus, o mesmo que ressuscitou Cristo. O autor quer que os irmãos entendam como esse poder é grande.",
+          "ref": "Ef 1.19"
+        }
+      ],
+      "jesus": {
+        "texto": "Deus põe todas as coisas debaixo dos pés de Cristo. Ele faz de Jesus a cabeça de tudo para a igreja, e a igreja é o corpo dele.",
+        "refs": [
+          "Ef 1.22-23"
+        ]
+      },
+      "conexao": "Antes, os irmãos estavam mortos por causa dos pecados (Ef 2.1)."
+    },
+    {
+      "titulo": "Muro derrubado",
+      "sub": "Judeus e gentios num só povo",
+      "desenho": "muro-derrubado",
+      "galhos": [
+        {
+          "texto": "Os irmãos seguiam o mundo e o príncipe do poder do ar, como todo mundo. Viviam fazendo o que as paixões mandavam.",
+          "ref": "Ef 2.2-3"
+        },
+        {
+          "texto": "Deus é rico em misericórdia e ama tanto que dá vida aos mortos junto com Cristo. Eles são salvos só pela graça.",
+          "ref": "Ef 2.4-5"
+        },
+        {
+          "texto": "A salvação vem pela graça, por meio da fé, e não é mérito de ninguém. É um presente de Deus, e ninguém pode se gabar.",
+          "ref": "Ef 2.8-9"
+        },
+        {
+          "texto": "Deus faz de quem crê uma obra dele, com vida nova em Cristo Jesus. As boas obras que eles vão fazer, Deus planejou há muito tempo.",
+          "ref": "Ef 2.10"
+        },
+        {
+          "texto": "Antes, os gentios estavam longe de Cristo e de fora das alianças de Israel. Viviam no mundo sem Deus e sem esperança.",
+          "ref": "Ef 2.12"
+        },
+        {
+          "texto": "Cristo é a paz entre judeus e gentios. Ele derruba o muro que separava os dois e faz dos dois um só povo. Na cruz, a inimizade acaba.",
+          "ref": "Ef 2.14-16"
+        }
+      ],
+      "conexao": "Agora judeus e gentios chegam ao Pai pelo mesmo Espírito (Ef 2.18)."
+    },
+    {
+      "titulo": "O mistério",
+      "sub": "Raízes no amor de Deus",
+      "desenho": "arvore-com-raizes",
+      "galhos": [
+        {
+          "texto": "Paulo está na prisão por pregar que os gentios fazem parte da casa de Deus. Deus mostrou esse mistério a ele por revelação.",
+          "ref": "Ef 3.1-3"
+        },
+        {
+          "texto": "O autor se acha o menor de todos os que são de Deus. Mesmo assim, Deus dá a ele a graça de anunciar aos gentios as riquezas sem fim que há em Cristo.",
+          "ref": "Ef 3.8"
+        },
+        {
+          "texto": "Pela fé em Jesus Cristo, quem crê chega perto de Deus com toda a confiança.",
+          "ref": "Ef 3.12"
+        },
+        {
+          "texto": "O autor cai de joelhos e ora ao Pai. Ele pede que Cristo more no coração dos irmãos e que eles finquem as raízes no amor de Deus.",
+          "ref": "Ef 3.14, 17"
+        },
+        {
+          "texto": "Ele quer que os irmãos entendam a largura, o comprimento, a altura e a profundidade do amor de Cristo, um amor tão grande que ninguém chega ao fim dele.",
+          "ref": "Ef 3.18-19"
+        },
+        {
+          "texto": "Deus pode fazer muito mais do que alguém tem coragem de pedir ou de imaginar. A ele seja a glória na igreja para sempre.",
+          "ref": "Ef 3.20-21"
+        }
+      ],
+      "conexao": "Os irmãos são humildes, amáveis e pacientes uns com os outros, e cuidam da unidade que o Espírito dá (Ef 4.2-3)."
+    },
+    {
+      "titulo": "Um só corpo",
+      "sub": "Cada um com o seu dom",
+      "desenho": "templo-com-colunas",
+      "galhos": [
+        {
+          "texto": "Existe um só corpo e um só Espírito. Há um só Senhor, uma só fé, um só batismo e um só Deus e Pai de todos.",
+          "ref": "Ef 4.4-6"
+        },
+        {
+          "texto": "Cristo dá um dom a cada um. Ele escolhe uns para apóstolos e outros para pastores e mestres, para o povo de Deus construir a igreja.",
+          "ref": "Ef 4.7, 11-12"
+        },
+        {
+          "texto": "Quem amadurece não muda de ideia a cada coisa que alguém diz, como criança. Fala a verdade com amor e fica cada vez mais parecido com Cristo.",
+          "ref": "Ef 4.14-15"
+        },
+        {
+          "texto": "Sob a direção de Cristo, o corpo inteiro se encaixa. Cada membro ajuda os outros, e o corpo cresce no amor.",
+          "ref": "Ef 4.16"
+        }
+      ],
+      "conexao": "Os irmãos não devem mais viver como quem tem o coração fechado e longe de Deus (Ef 4.17-18)."
+    },
+    {
+      "titulo": "Roupa nova",
+      "sub": "Os irmãos são filhos da luz",
+      "desenho": "tunica",
+      "galhos": [
+        {
+          "texto": "Quem crê tira a velha maneira de viver como quem tira uma roupa. Ele veste o novo ser que Deus cria, santo e justo.",
+          "ref": "Ef 4.22-24"
+        },
+        {
+          "texto": "Ladrão para de roubar e trabalha com as mãos, para ter o que repartir com quem precisa.",
+          "ref": "Ef 4.28"
+        },
+        {
+          "texto": "Nenhuma palavra suja sai da boca dos irmãos, só o que ajuda quem ouve. Eles não entristecem o Espírito Santo com o jeito de viver.",
+          "ref": "Ef 4.29-30"
+        },
+        {
+          "texto": "Os irmãos são bondosos uns com os outros e perdoam, do jeito que Deus perdoou cada um deles em Cristo.",
+          "ref": "Ef 4.32"
+        },
+        {
+          "texto": "Antes, o coração deles estava cheio de escuridão, e agora está cheio da luz do Senhor. O fruto da luz é bondade, justiça e verdade.",
+          "ref": "Ef 5.8-9"
+        },
+        {
+          "texto": "Em vez de beber muito vinho, eles se enchem do Espírito Santo. Conversam com salmos e hinos, cantam ao Senhor de coração e dão graças por tudo.",
+          "ref": "Ef 5.18-20"
+        }
+      ],
+      "conexao": "No fim, o autor pede que a força dos irmãos venha do poder do Senhor (Ef 6.10)."
+    },
+    {
+      "titulo": "A armadura",
+      "sub": "A luta é contra o mal",
+      "desenho": "espada",
+      "galhos": [
+        {
+          "texto": "Os irmãos vestem a armadura inteira de Deus para ficar firmes contra as artimanhas de Satanás.",
+          "ref": "Ef 6.11"
+        },
+        {
+          "texto": "A luta não é contra gente de carne e sangue. A briga é com os poderes e as forças espirituais do mal.",
+          "ref": "Ef 6.12"
+        },
+        {
+          "texto": "Na cintura vai o cinturão da verdade, e no peito vai a couraça da aprovação de Deus. Os pés calçam sapatos para levar depressa o evangelho da paz.",
+          "ref": "Ef 6.14-15"
+        },
+        {
+          "texto": "Em cada batalha, a fé serve de escudo e apaga as setas de fogo do Maligno.",
+          "ref": "Ef 6.16"
+        },
+        {
+          "texto": "Os irmãos oram no Espírito em todas as ocasiões e ficam alertas. Eles oram por todos os cristãos de toda parte.",
+          "ref": "Ef 6.18"
+        },
+        {
+          "texto": "O autor está preso em correntes e se chama de embaixador do evangelho. Ele pede oração para continuar falando do evangelho com coragem.",
+          "ref": "Ef 6.19-20"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Nos tempos antigos, Deus não mostrou esse mistério ao seu povo. Agora o Espírito revela aos apóstolos e profetas que os gentios herdam junto com os judeus, em Cristo Jesus.",
+    "ref": "Ef 3.5-6",
+    "desenho": "lamparina-acesa",
+    "pares": [
+      {
+        "at": "Is 57.19",
+        "texto": "paz para os que estão perto e para os que estão longe",
+        "nt": "Ef 2.17",
+        "nota": "Cristo leva a boa notícia da paz aos gentios, que estavam longe, e aos judeus, que estavam perto"
+      },
+      {
+        "at": "Sl 68.18",
+        "texto": "Ele subiu às alturas, levando cativos muitos prisioneiros",
+        "nt": "Ef 4.8-10",
+        "nota": "Quem sobe ao céu é o mesmo que tinha descido, e ele dá dons às pessoas"
+      },
+      {
+        "at": "Zc 8.16",
+        "texto": "Falem sempre a verdade.",
+        "nt": "Ef 4.25",
+        "nota": "Os irmãos param de mentir uns aos outros, porque são membros do mesmo corpo"
+      },
+      {
+        "at": "Sl 4.4",
+        "texto": "Quando vocês ficarem irados, não pequem contra o Senhor.",
+        "nt": "Ef 4.26-27",
+        "nota": "Que o sol não se ponha antes de a briga ser resolvida, para não dar chance ao diabo"
+      },
+      {
+        "at": "Is 59.17",
+        "texto": "colocou na cabeça o capacete da salvação",
+        "nt": "Ef 6.17",
+        "nota": "Os irmãos põem o capacete da salvação e pegam a espada do Espírito, que é a palavra de Deus"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "As bênçãos em Cristo", "de": 1, "ate": 1 },
+    { "titulo": "Perto de Deus e uns dos outros", "de": 2, "ate": 2 },
+    { "titulo": "O mistério revelado aos gentios", "de": 3, "ate": 3 },
+    { "titulo": "Um corpo e uma vida nova", "de": 4, "ate": 4 },
+    { "titulo": "Filhos da luz e o casamento", "de": 5, "ate": 5 },
+    { "titulo": "A casa e a armadura de Deus", "de": 6, "ate": 6 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O autor ouviu falar da fé dos irmãos no Senhor Jesus e do amor deles por todos os santos. Desde então ele não para de agradecer a Deus por eles.",
+      "ref": "Ef 1.15-16"
+    },
+    {
+      "texto": "Antes, os gentios eram chamados de incircuncisos pelos judeus, que tinham a circuncisão feita por mãos humanas.",
+      "ref": "Ef 2.11"
+    },
+    {
+      "texto": "Pela igreja, Deus mostra até às autoridades e poderes do céu como ele é sábio.",
+      "ref": "Ef 3.10"
+    },
+    {
+      "texto": "O autor cita uma frase que chama quem está dormindo a acordar e sair do meio dos mortos, e promete que Cristo vai iluminar essa pessoa.",
+      "ref": "Ef 5.14"
+    },
+    {
+      "texto": "Os dias são maus, e por isso os irmãos aproveitam cada chance de fazer o bem.",
+      "ref": "Ef 5.16"
+    },
+    {
+      "texto": "O autor lembra que honrar pai e mãe é o primeiro mandamento que vem com uma promessa.",
+      "ref": "Ef 6.2"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a expressão “em Cristo” e as parecidas, como “nele” e “com Cristo”. Logo no começo, o autor diz que Deus abençoa os seus com todas as bênçãos do céu por eles serem de Cristo.",
+    "ref": "Ef 1.3"
+  }
+}

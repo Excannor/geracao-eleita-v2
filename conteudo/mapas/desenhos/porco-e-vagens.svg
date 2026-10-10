@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os porcos do fazendeiro (Lc 15.15-16): um porco de lado, virado para a direita, com o focinho redondo, a orelha caída para a frente, o rabo enrolado e as quatro patas curtas; na frente do focinho, no chão, um montinho de vagens. As vagens são a única área sálvia. As patas vão antes do corpo, para o papel dele cobrir as pontas. -->
+<path class="h" d="M6 96H114"/>
+<path class="k p" d="M28 78V95H36V80M40 82V95H48V82M64 82V95H72V82M76 80V95H84V78"/>
+<path class="k p" d="M18 64C18 50 32 42 52 42C66 42 78 46 86 52C92 56 96 60 97 64V74C92 80 84 82 76 82C68 86 58 87 50 87C32 87 18 80 18 64Z"/>
+<path class="k" d="M19 60C13 58 10 63 13 66C16 69 20 66 17 62"/>
+<ellipse class="k p" cx="99" cy="69" rx="4" ry="6.5"/>
+<path class="e" d="M98 66.5a1 1.4 0 1 0 .1 0ZM100.6 70.5a1 1.4 0 1 0 .1 0Z"/>
+<path class="k p" d="M74 47L86 38L84 54C80 54 76 51 74 47Z"/>
+<circle class="e" cx="88" cy="59" r="1.8"/>
+<path class="h" d="M30 56C34 52 40 50 46 50M86 77C89 78 92 78 94 76"/>
+<path class="k s" d="M100 95C102 89 108 86 114 87C112 92 106 95 100 95ZM96 95C97 90 100 87 104 86C103 91 101 94 96 95Z"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o rolo com a lista das famílias (1Cr 1–9): a folha aberta para baixo entre dois rolos, com as linhas dos nomes riscadas. O rolo de baixo em sálvia. -->
+<path class="k p" d="M38 26H82V94H38Z"/>
+<path class="h" d="M44 34H74M44 41H66M44 48H72M44 55H60M44 62H70M44 69H64M44 76H74M44 83H58"/>
+<path class="k p" d="M32 20H88C91 20 91 28 88 28H32C29 28 29 20 32 20Z"/>
+<ellipse class="k p" cx="32" cy="24" rx="2.5" ry="4"/>
+<path class="k s" d="M32 92H88C91 92 91 100 88 100H32C29 100 29 92 32 92Z"/>
+<ellipse class="k p" cx="32" cy="96" rx="2.5" ry="4"/>
+</svg>

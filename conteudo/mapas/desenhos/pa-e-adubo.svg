@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a terra cavada e o adubo de quem cuida da vinha (Lc 13.8): a pá de pé, fincada num monte de adubo, com a terra solta em volta. O monte de adubo é a única área sálvia. -->
+<path class="k" d="M8 104H112"/>
+<path class="k s" d="M22 104C30 78 82 78 94 104Z"/>
+<path class="h" d="M38 94l4-3M56 90l4 2M72 96l3-3M48 100l3-2"/>
+<path class="k" d="M60 84V22M50 22H70"/>
+<path class="k p" d="M50 66H70V86C70 92 50 92 50 86Z"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o amigo à meia-noite (Lc 11.5-8): a casa de teto reto, com a porta trancada pela trave e a janela fechada, riscada de sombra, a lua e as estrelas no alto; na frente da porta, o cesto vazio de quem veio pedir pão. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. A lua é a única área sálvia. -->
+<path class="k" d="M6 108H154"/>
+<path class="k p" d="M30 108V52H118V108Z"/>
+<path class="k p" d="M24 52H124V44H24Z"/>
+<path class="h" d="M30 66H118M30 80H54M94 80H118M30 94H54M94 94H118"/>
+<path class="k p" d="M60 108V70C60 62 88 62 88 70V108Z"/>
+<path class="h" d="M67 66V108M74 64V108M81 66V108"/>
+<path class="k p" d="M56 84H92V90H56Z"/>
+<path class="k p" d="M98 58H112V72H98Z"/>
+<path class="h" d="M98 64L104 58M98 70L110 58M103 72L112 63"/>
+<path class="k p" d="M126 96H146L142 108H130Z"/>
+<path class="h" d="M128 100H144"/>
+<path class="k s" d="M140 14C130 16 126 30 134 38C140 42 148 40 152 36C142 36 136 26 140 14Z"/>
+<path class="k" d="M20 18v6M17 21h6M72 12v6M69 15h6M104 26v4M102 28h4"/>
+</svg>

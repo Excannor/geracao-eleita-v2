@@ -238,9 +238,10 @@ Curto e visual, sem muro de texto:
    nota "A história bíblica em uma página" do Explorar.
 2. **Duas ou três frases do dia**, escritas primeiro para os dias 1 a 7 e para a primeira vez de
    cada livro da Unidade 1, e depois para os dias 8 a 31 (seção 4.1b): quem escreveu (como a ficha
-   do livro diz: "pela tradição, Moisés", "Mateus, um dos doze"), para quem, e o que ligar. Fora
-   da Unidade 1, o cartão fica só com o mapa e, no primeiro dia de cada livro com ficha, a
-   apresentação do livro.
+   do livro diz: "pela tradição, Moisés", "Mateus, um dos doze"), para quem, e o que ligar. Depois o
+   texto foi estendido unidade por unidade às Unidades 2 a 12, e hoje os 365 dias têm título,
+   subtítulo, contexto, "procure" e gancho de amanhã (o dia 365 não tem gancho). Cada unidade
+   foi escrita com a NBV da leitura aberta e passa no `ferramentas/checar-contexto.mjs`.
 3. **"Enquanto lê, procure"**: uma coisa só para achar no texto (a frase que se repete, o único que
    não morre, as quatro mulheres). Vira a pergunta de um toque que o dia já tem na etapa Pensar.
 4. **Guia de leitura dentro do leitor**, só nos trechos de lista e de planta (Mt 1.1-17, Gn 5, Gn

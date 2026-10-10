@@ -11,6 +11,7 @@ import { fecharBanco, arquivoDoBanco } from './db.mjs';
 import {
   Contas, diasDeProposito, resumoDeAmigo, somaDias, nascimentoValido,
   somaAnos, idadeMinimaOk, hojeNoFuso, FUSO_PADRAO, IDADE_MINIMA,
+  menorDeIdade, podeConduzir, aguardandoAprovacao,
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import { montarPainel } from './painel.mjs';
@@ -171,7 +172,7 @@ for (const f of ['manifest.webmanifest', 'sw.js', 'icone-192.png', 'icone-512.pn
 }
 const entrar = readFileSync(dist('entrar.html'), 'utf8');
 const semMarcador = (texto) => !/\/\*(FONTES|SIMBOLO|USUARIO)\*\//.test(texto);
-checar(semMarcador(entrar) && entrar.includes('type="date"') && entrar.includes('api/criar-conta'), 'a entrada tem o cadastro com data de nascimento');
+checar(semMarcador(entrar) && /id="nascimento"[^>]*inputmode="numeric"/.test(entrar) && !/id="nascimento"[^>]*type="date"/.test(entrar) && entrar.includes('api/criar-conta'), 'a entrada tem o cadastro com data de nascimento');
 checar(semMarcador(readFileSync(dist('privacidade.html'), 'utf8')), 'a página de privacidade foi montada');
 checar(semMarcador(readFileSync(dist('termos.html'), 'utf8')) && readFileSync(dist('termos.html'), 'utf8').includes('Regras de convivência'), 'a página de termos de uso foi montada');
 checar(/rel="apple-touch-icon" href="apple-touch-icon\.png\?v=\w+"/.test(entrar) && entrar.includes('rel="manifest"')
@@ -264,6 +265,53 @@ secao('mapas dos livros');
   checar(soLink.length === 0, 'a Bíblia e o fim da lição só levam ao mapa publicado, com um link' + (soLink.length ? ' (' + soLink.join(', ') + ')' : ''));
   const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
   checar(roteador.includes("mapa: '#/explorar'") && roteador.includes("rota === 'mapa'"), 'a rota #/mapa/<slug> existe e marca o Explorar');
+}
+
+// =========================================================================
+secao('parábolas');
+// =========================================================================
+// Como os mapas: o checador em cada parábola da pasta, o índice, um arquivo por publicada (com
+// os desenhos embutidos), a lista e a página sob demanda, tudo no cache próprio do service
+// worker. O texto das parábolas não entra no index.html.
+{
+  const { checarParabola, checarIndice, listarParabolas, lerIndiceParabolas, lerParabola } = await import('./ferramentas/checar-parabola.mjs');
+  const slugs = listarParabolas();
+  const indice = lerIndiceParabolas();
+  const errosIndice = checarIndice(indice);
+  checar(errosIndice.length === 0, 'o índice das parábolas está certo' + (errosIndice.length ? ': ' + errosIndice.slice(0, 3).join(' · ') : ''));
+  for (const slug of slugs) {
+    const { erros, avisos } = checarParabola(slug, lerParabola(slug));
+    checar(erros.length === 0, 'a parábola ' + slug + ' passa no checador' + (erros.length ? ': ' + erros.slice(0, 3).join(' · ') : ''));
+    for (const a of avisos) console.log('  aviso  ' + slug + ': ' + a);
+  }
+  const i0 = html.indexOf('window.PARABOLAS=');
+  const P = i0 > -1 ? JSON.parse(html.slice(i0 + 'window.PARABOLAS='.length, html.indexOf(';window.MAPAS=', i0))) : null;
+  checar(!!P && P.itens.length === indice.publicadas.length && P.itens.every((p) => indice.publicadas.includes(p.slug)),
+    'o aplicativo conhece exatamente as parábolas publicadas (' + ((P && P.itens) || []).map((p) => p.slug).join(', ') + ')');
+  checar(!!P && P.grupos.every((g) => P.itens.some((p) => p.grupo === g.id)), 'só os grupos com parábola publicada vão para a lista e os filtros');
+  checar(!!P && P.itens.every((p) => Object.keys(p).sort().join() === 'arquivo,desenho,grupo,linha,ref,slug,titulo'), 'no index.html vai só o mínimo da lista de cada parábola');
+  for (const p of (P && P.itens) || []) {
+    checar(/^parabola-[a-z0-9-]+\.[0-9a-f]{10}\.json$/.test(p.arquivo) && existsSync(dist(p.arquivo)) && existsSync(dist(p.arquivo + '.gz')) && sw.includes(p.arquivo),
+      'a parábola ' + p.slug + ' saiu para ' + p.arquivo + ', comprimida e no service worker');
+    if (!existsSync(dist(p.arquivo))) continue;
+    const publicada = JSON.parse(readFileSync(dist(p.arquivo), 'utf8'));
+    checar(Object.values(publicada.desenhos || {}).length >= 2 && Object.values(publicada.desenhos).every((d) => /^<svg/.test(d) && !/<style|xmlns|<!--/.test(d)),
+      'a parábola ' + p.slug + ' leva os desenhos embutidos, sem o estilo de visualização avulsa');
+    checar(!html.includes(publicada.dizendo.texto.slice(0, 40)), 'o texto da parábola ' + p.slug + ' não entra no index.html');
+  }
+  const extras = P ? [P.desenhos, P.tela] : [];
+  checar(extras.length === 2 && /^parabolas-desenhos\.[0-9a-f]{10}\.json$/.test(extras[0]) && /^parabola-tela\.[0-9a-f]{10}\.js$/.test(extras[1])
+    && extras.every((f) => existsSync(dist(f)) && sw.includes('"' + f + '"')) && sw.includes("'caminho-parabolas'"),
+  'os desenhos da lista e a tela das parábolas saem em arquivos próprios, no cache "caminho-parabolas"');
+  if (P && existsSync(dist(P.tela))) {
+    const tela = readFileSync(dist(P.tela), 'utf8');
+    checar(!tela.includes('ESTILO_PARABOLA') && tela.includes('.dizendo-parabola') && !html.includes('.dizendo-parabola'), 'o estilo da página da parábola vai junto com ela, fora do index.html');
+  }
+  const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
+  checar(/PARABOLA_COM_RESUMO\.test\(rota\)/.test(servidorTexto.match(/const PUBLICO_COM_RESUMO = .*/)[0]), 'o servidor entrega as parábolas sem sessão e com cache longo, como os mapas');
+  const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
+  checar(roteador.includes("rota === 'parabolas'") && roteador.includes("rota === 'parabola'") && roteador.includes("parabolas: '#/explorar'"), 'as rotas #/parabolas e #/parabola/<slug> existem e marcam o Explorar');
+  checar(readFileSync(join(AQUI, 'src', 'app', '06-explorar.js'), 'utf8').includes('CC.cartaoParabolas()'), 'o Explorar tem o cartão das parábolas');
 }
 
 // =========================================================================
@@ -409,6 +457,12 @@ const CC = contexto.window.CC;
   }).map(([chave]) => chave);
   checar(Object.keys(P.guias).length >= 5 && !guiasRuins.length, 'cada guia de leitura aponta para um capítulo, versículos e salto que existem na NBV' + (guiasRuins.length ? ' (' + guiasRuins.join(', ') + ')' : ''));
   checar(html.includes('"primeirosDias"') || readFileSync(dist(arquivoConteudo), 'utf8').includes('"primeirosDias"'), 'o conteúdo publicado leva os primeiros dias');
+  // O checador inteiro do "Onde estamos" (ferramentas/checar-contexto.mjs, menos de um segundo): os
+  // cinco campos de cada dia escrito, o gancho de amanhã contra a NBV do dia seguinte, as
+  // referências dentro da leitura, o tamanho de cada campo e os guias.
+  const { spawnSync } = await import('node:child_process');
+  const cc = spawnSync(process.execPath, [join(AQUI, 'ferramentas', 'checar-contexto.mjs')], { encoding: 'utf8' });
+  checar(cc.status === 0, 'o "Onde estamos" de cada dia passa no checar-contexto' + (cc.status ? ' (' + (cc.stdout.match(/FALHA.*$/gm) || []).slice(0, 3).join(' · ') + ')' : ''));
 }
 
 const dias = (ini, n) => Array.from({ length: n }, (_, i) => somaDias(ini, i));
@@ -453,7 +507,7 @@ const computador = {
 let f = CC.fundir(celular, computador);
 checar(f.lidos.length === 4 && f.licoes.length === 2, 'a fusão não perde leitura nem lição');
 checar(f.oia[1].o === 'do celular' && f.oia[4].o === 'do computador', 'a fusão guarda os dois registros escritos');
-checar(f.anotacoes['nota:x'] === 'lembrete' && f.dia === 5, 'a fusão guarda anotação antiga e o dia do aparelho mais novo');
+checar(f.notas['e:nota:x'].texto === 'lembrete' && f.notas['e:nota:x'].contexto === 'nota:x' && f.dia === 5, 'a fusão guarda anotação antiga (agora nota ligada à página) e o dia do aparelho mais novo');
 checar(f.xpLegado === 15 && f.maiorProposito === 7 && f.conquistasGanhas['Escriba'] && f.conquistasGanhas['Pé na estrada'],
   'a fusão preserva XP antigo, maior propósito e conquistas dos dois lados');
 const ordenado = (e) => e.lidos.slice().sort((a, b) => a - b).join();
@@ -461,6 +515,59 @@ checar(ordenado(CC.fundir(celular, computador)) === ordenado(CC.fundir(computado
 const zerado = { atualizadoEm: 200, zeradoEm: 200, dia: 1, lidos: [], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {} };
 checar(CC.fundir(celular, zerado).lidos.length === 0, 'um zeramento mais novo apaga o que veio antes');
 checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 'o que foi feito depois do zeramento sobrevive');
+// "Zerar progresso" recomeça só a trilha: foto, nome, o que foi escrito e marcado ficam
+{
+  CC.carregarLocal();
+  CC.guardarFoto('data:image/jpeg;base64,FOTO');
+  CC.guardarApelido('Ana');
+  CC.gravarAnotacao('verso:João 3.16', 'minha nota');
+  CC.gravarRegistro(1, { o: 'reflexão', i: '', a: '', oracao: 'oração' });
+  CC.gravarHistoria('antes', 'encontro', 'hoje');
+  CC.marcar(['João 3:16'], 2);
+  CC.marcarLido(1, true);
+  CC.marcarLicao('a', true);
+  CC.marcarConhecido(1);
+  CC.marcarOrei();
+  CC.gravar('bausAbertos', { 7: { em: '2026-03-01' } });
+  CC.gravar('conquistasGanhas', { 'nivel:x:1': '2026-03-01' });
+  CC.gravar('desafios', { semRedes: { inicio: '2026-03-01', dias: ['2026-03-01'], ativo: true, em: 1 } });
+  const antes = JSON.parse(JSON.stringify(CC.estado()));
+  CC.zerarProgresso();
+  const z = CC.estado();
+  checar(!z.lidos.length && !z.licoes.length && !Object.keys(z.conhecidos).length && !Object.keys(z.marcadoEm).length
+    && !Object.keys(z.bausAbertos).length && !Object.keys(z.conquistasGanhas).length && z.xpLegado === 0 && z.zeradoEm > 0,
+  'zerar apaga leituras, primeiros passos, Conhecer Jesus, ofensiva, baús, conquistas e XP');
+  checar(z.foto === antes.foto && z.apelido === 'Ana' && z.anotacoes['verso:João 3.16'] === 'minha nota' && z.oia[1].oracao === 'oração'
+    && z.historia.antes === 'antes' && z.marcas['João 3:16'].cor === 2 && Object.keys(z.oradoEm).length === 1 && z.desafios.semRedes.ativo,
+  'zerar mantém foto, nome, anotações, reflexões, Minha história, marca-texto, orações marcadas e desafios');
+  // outro aparelho, que ainda não sabia do zeramento, sincroniza depois: não traz a trilha de
+  // volta, mas o que ele tinha escrito continua
+  const outro = { ...antes, atualizadoEm: z.zeradoEm - 10, anotacoes: { ...antes.anotacoes, 'nota:y': 'escrita no outro' }, foto: antes.foto };
+  for (const [x, y] of [[z, outro], [outro, z]]) {
+    const f2 = CC.fundir(x, y);
+    checar(!f2.lidos.length && !Object.keys(f2.marcadoEm).length && f2.foto === antes.foto && f2.notas['e:nota:y'].texto === 'escrita no outro'
+      && f2.notas['v:João 3.16'].texto === 'minha nota' && !f2.notas['v:João 3.16'].apagadaEm && f2.oia[1].o === 'reflexão',
+    'na fusão com um aparelho atrasado, a trilha fica zerada e foto e anotações dos dois lados ficam');
+  }
+  // um zeramento da versão anterior (que mandava tudo vazio) não apaga mais o que foi escrito
+  const zeradoAntigo = { atualizadoEm: z.zeradoEm + 5, zeradoEm: z.zeradoEm + 5, dia: 1, lidos: [], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {}, foto: '' };
+  const f3 = CC.fundir(antes, zeradoAntigo);
+  checar(!f3.lidos.length && f3.foto === antes.foto && f3.notas['v:João 3.16'].texto === 'minha nota' && !f3.notas['v:João 3.16'].apagadaEm, 'zeramento vindo de aparelho antigo também só zera a trilha');
+  CC.carregarLocal();
+}
+// As parábolas lidas são material de consulta: o "Zerar" não as apaga, e a fusão une os dois
+// aparelhos (vale a data mais antiga de cada uma).
+{
+  checar(!CC.PROGRESSO_DA_TRILHA.includes('parabolasLidas'), 'as parábolas lidas ficam fora do andamento da trilha');
+  const f = CC.fundir({ atualizadoEm: 2, parabolasLidas: { 'grande-banquete': '2026-10-09', 'semeador': '2026-10-01' } },
+    { atualizadoEm: 3, parabolasLidas: { 'grande-banquete': '2026-10-05', 'bom-samaritano': '2026-10-07' } });
+  checar(JSON.stringify(f.parabolasLidas) === JSON.stringify({ 'grande-banquete': '2026-10-05', semeador: '2026-10-01', 'bom-samaritano': '2026-10-07' }),
+    'a fusão une as parábolas lidas dos dois aparelhos, com a data mais antiga');
+  const zerado = CC.fundir({ atualizadoEm: 2, parabolasLidas: { semeador: '2026-10-01' } }, { atualizadoEm: 9, zeradoEm: 9, parabolasLidas: {} });
+  checar(zerado.parabolasLidas.semeador === '2026-10-01', 'zerar o progresso não apaga as parábolas lidas');
+  const comNota = CC.normalizarEstado({ atualizadoEm: 1, notas: { n1: { versos: [], tipo: 'nota', texto: 'na mesa', criadaEm: 1, editadaEm: 1, contexto: 'parabola:grande-banquete' } } });
+  checar(comNota.notas.n1.contexto === 'parabola:grande-banquete', 'a nota escrita numa parábola guarda o contexto "parabola:<slug>"');
+}
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
 
@@ -506,18 +613,105 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
 
   const E = CC.estado();
   E.marcas = { 'João 3:16': { cor: 2, em: 3 }, 'João 3:17': { cor: 2, em: 4 }, 'João 3:18': { cor: 1, em: 5 }, 'João 3:19': { cor: 0, em: 6 } };
-  E.anotacoes = { 'verso:João 3.16-18': 'Deus amou primeiro.', 'nota:x': 'outra', 'verso:Rute 1.16': '  ' };
+  E.anotacoes = {};
+  E.notas = CC.migrarNotas({ atualizadoEm: 1000, anotacoes: { 'verso:João 3.16-18': 'Deus amou primeiro.', 'verso:Rute 1.16': '  ', 'nota:x': 'outra' } }).notas;
   const marcados = CC.versiculos.marcados();
   checar(marcados.length === 2 && marcados.some((t) => t.ref === 'João 3.16-17' && t.cor === 2) && marcados.some((t) => t.ref === 'João 3.18' && t.cor === 1),
-    'Meus versículos junta versículos seguidos da mesma cor num trecho e ignora marca apagada');
-  checar(CC.versiculos.comNota().length === 1 && CC.versiculos.comNota()[0].ref === 'João 3.16-18', 'nota vazia não aparece em Meus versículos');
-  const an = CC.minhasAnotacoes();
-  checar(an.porVerso.length === 1 && an.porVerso[0].href === '#/biblia/Jo%C3%A3o/3' && !an.porNota.some((n) => n.titulo.includes('verso')),
-    'Minhas anotações separa as notas de versículo das do Explorar, com link para a Bíblia');
+    'os marcados juntam versículos seguidos da mesma cor num trecho e ignoram marca apagada');
+  checar(CC.notas().length === 2 && CC.nota('v:João 3.16-18').versos[0] === 'João 3.16-18' && CC.nota('e:nota:x').tipo === 'estudo', 'nota vazia do formato antigo não vira nota');
+  checar(CC.meusTextos().some((t) => t.texto === 'Deus amou primeiro.' && t.href === '#/perfil/anotacoes'), 'a busca do Explorar acha o texto das notas');
+  const id = CC.gravarNota(null, { versos: ['Salmos 23.1'], tipo: 'oracao', texto: 'Pela prova', tags: ['paz'], cor: 2 });
+  CC.responderOracao(id, true);
+  CC.fixarNota(id, true);
   const exp = CC.montarExportacao();
   checar(exp.includes('## Notas nos versículos') && exp.includes('### João 3.16-18') && !exp.includes('verso:'), 'o arquivo baixado leva as notas de versículo com a referência como título');
+  checar(exp.includes('## Orações') && /respondida em \d{4}-\d\d-\d\d/.test(exp) && exp.includes('#paz') && exp.includes('fixada')
+    && exp.includes('## Versículos marcados') && /João 3\.16-17 \(verde/.test(exp), 'o arquivo leva orações (respondida, tags, fixada) e os versículos marcados com a cor e a data');
   E.marcas = {};
   E.anotacoes = {};
+  E.notas = {};
+}
+
+// --- notas: modelo, migração, fusão por nota e lixeira (02-estado.js) ---
+{
+  const E = CC.estado();
+  E.notas = {};
+  const vazio = { atualizadoEm: 1, notas: {} };
+  // migração: as chaves "verso:" viram notas com id fixo, sem perder nada
+  const antigo = CC.normalizarEstado({ atualizadoEm: 5000, anotacoes: { 'verso:João 3.16': 'Deus amou', 'verso:Rute 1.16': 'Teu povo', 'nota:x': 'fica', 'secao:01 - Temas': 'da seção', 'conhecer:3': 'do dia 3', 'nota:vazia': ' ', 'verso:Jó 1.1': ' ' } });
+  const nj = antigo.notas['v:João 3.16'];
+  checar(nj && nj.texto === 'Deus amou' && nj.tipo === 'nota' && nj.versos[0] === 'João 3.16' && nj.criadaEm === 5000 && nj.editadaEm === 5000 && !nj.apagadaEm
+    && antigo.notas['v:Rute 1.16'].texto === 'Teu povo' && Object.keys(antigo.notas).length === 5, 'migração: cada nota antiga com texto vira uma nota, com a data do estado');
+  const ex = antigo.notas['e:nota:x'];
+  checar(ex.texto === 'fica' && ex.tipo === 'estudo' && ex.contexto === 'nota:x' && !ex.versos.length && ex.criadaEm === 5000
+    && antigo.notas['e:secao:01 - Temas'].contexto === 'secao:01 - Temas' && antigo.notas['e:secao:01 - Temas'].tipo === 'estudo'
+    && antigo.notas['e:conhecer:3'].texto === 'do dia 3' && antigo.notas['e:conhecer:3'].tipo === 'nota' && antigo.notas['e:conhecer:3'].contexto === 'conhecer:3',
+  'migração: a caixa antiga do Explorar e do Conhecer Jesus vira nota ligada ao lugar (Estudo no Explorar), sem perder texto');
+  checar(!Object.keys(antigo.anotacoes).length, 'migração: as chaves antigas saem (a vazia não vira nota)');
+  const deNovo = CC.normalizarEstado(antigo);
+  checar(JSON.stringify(deNovo.notas) === JSON.stringify(antigo.notas), 'migração: migrar de novo não muda nada');
+  // um aparelho velho, que ainda manda o formato antigo, cai na mesma nota (mesmo id)
+  const velho = { atualizadoEm: 4000, anotacoes: { 'verso:João 3.16': 'Deus amou' } };
+  const f1 = CC.fundir(antigo, velho);
+  checar(Object.keys(f1.notas).length === 5 && f1.notas['v:João 3.16'].texto === 'Deus amou', 'migração: o aparelho velho e o novo dão a mesma nota, sem duplicar');
+  // fusão por nota: vence a editada por último, cada uma por si
+  const n = (texto, editadaEm, extra) => ({ versos: ['João 3.16'], tipo: 'nota', texto, tags: [], cor: 0, fixada: false, respondidaEm: 0, criadaEm: 1, editadaEm, apagadaEm: 0, ...extra });
+  const agora = Date.now();
+  const cel = { atualizadoEm: agora, notas: { a: n('a do celular, nova', agora - 10), b: n('b do celular, velha', agora - 900) } };
+  const pc = { atualizadoEm: agora - 5000, notas: { a: n('a do pc, velha', agora - 800), b: n('b do pc, nova', agora - 20), c: n('só no pc', agora - 30) } };
+  const f2 = CC.fundir(cel, pc);
+  checar(f2.notas.a.texto === 'a do celular, nova' && f2.notas.b.texto === 'b do pc, nova' && f2.notas.c.texto === 'só no pc',
+    'fusão por nota: cada nota fica com a edição mais recente, mesmo vindo do estado mais velho');
+  checar(JSON.stringify(f2.notas) === JSON.stringify(CC.fundir(pc, cel).notas), 'fusão por nota: dá o mesmo nos dois sentidos');
+  // apagar é marca, não texto vazio: o outro aparelho não traz de volta
+  const apagada = { atualizadoEm: agora - 9000, notas: { a: n('a do celular, nova', agora - 5, { apagadaEm: agora - 5 }) } };
+  const f3 = CC.fundir(cel, apagada);
+  checar(f3.notas.a.apagadaEm && f3.notas.a.texto === 'a do celular, nova', 'apagar: a marca de apagada vence a cópia viva e o texto fica para recuperar');
+  const velhaApagada = { notas: { a: n('x', agora - 31 * 864e5, { apagadaEm: agora - 31 * 864e5 }), z: n('y', agora - 91 * 864e5, { apagadaEm: agora - 91 * 864e5 }) } };
+  const f4 = CC.fundir(vazio, velhaApagada);
+  checar(f4.notas.a && f4.notas.a.texto === '' && f4.notas.a.versos.length === 0 && !f4.notas.z,
+    'lixeira: depois de 30 dias o texto some e fica só a lápide; depois de 90 a lápide também');
+  checar(CC.fundir(f4, { notas: { a: n('voltou?', agora - 40 * 864e5) } }).notas.a.texto === '', 'lixeira: a lápide impede um aparelho velho de trazer a nota de volta');
+  // as funções do app
+  const id = CC.gravarNota(null, { versos: ['João 3.16-17', 'Romanos 5.8'], tipo: 'estudo', texto: '  Deus amou primeiro  ', tags: ['graça', 'graça'.repeat(20)], cor: 1 });
+  const g = CC.nota(id);
+  checar(g.texto === 'Deus amou primeiro' && g.versos.length === 2 && g.tipo === 'estudo' && g.cor === 1 && g.tags[1].length === 30 && g.criadaEm > 0 && g.editadaEm >= g.criadaEm,
+    'gravar: nota nova com vários versículos, tipo, cor, tags (cortadas em 30) e datas');
+  const antes = g.editadaEm;
+  CC.gravarNota(id, { texto: 'editada' });
+  checar(CC.nota(id).texto === 'editada' && CC.nota(id).editadaEm > antes && CC.nota(id).criadaEm === g.criadaEm && CC.nota(id).versos.length === 2, 'editar: muda o texto, avança editadaEm e guarda o resto');
+  checar(CC.fixarNota(id, true) && CC.nota(id).fixada, 'fixar: a nota vai para o topo');
+  for (let i = 0; i < 5; i++) CC.fixarNota(CC.gravarNota(null, { texto: 'f' + i }), true);
+  checar(CC.notas().filter((x) => x.fixada).length === CC.MAX_FIXADAS && !CC.fixarNota(CC.gravarNota(null, { texto: 'mais uma' }), true), 'fixar: no máximo 5 fixadas');
+  const o = CC.gravarNota(null, { tipo: 'oracao', texto: 'pela prova' });
+  CC.responderOracao(o, true);
+  checar(CC.nota(o).respondidaEm > 0, 'oração: marcar como respondida guarda a data');
+  CC.responderOracao(o, false);
+  checar(!CC.nota(o).respondidaEm, 'oração: dá para desmarcar');
+  CC.apagarNota(id);
+  checar(!CC.notas().some((x) => x.id === id) && CC.notasApagadas().some((x) => x.id === id) && !CC.nota(id).fixada, 'apagar: sai da lista, vai para Apagadas e deixa de ser fixada');
+  CC.recuperarNota(id);
+  checar(CC.notas().some((x) => x.id === id) && !CC.notasApagadas().length, 'recuperar: volta para a lista');
+  CC.apagarNota(id);
+  CC.apagarNotaDeVez(id);
+  checar(!CC.notasApagadas().length && CC.nota(id).apagadaEm && CC.nota(id).texto === '', 'apagar de vez: fica só a lápide, sem texto');
+  // limpeza do que vem de fora
+  const sujo = CC.normalizarEstado({ atualizadoEm: 1, notas: { q: { versos: ['x'.repeat(80), 'João 1.1', 3], tipo: 'hack', texto: 5, tags: [1, 'ok'], cor: 9 }, r: null } });
+  checar(sujo.notas.q.tipo === 'nota' && sujo.notas.q.versos.length === 1 && sujo.notas.q.texto === '' && sujo.notas.q.tags.join() === 'ok' && sujo.notas.q.cor === 0 && !('r' in sujo.notas),
+    'o que chega de fora é limpo: tipo, versículos, texto, tags e cor');
+  checar(CC.normalizarEstado({ atualizadoEm: 1, notas: { q: { texto: 'enc:AAA', tags: 'enc:BBB' } } }).notas.q.tags === 'enc:BBB', 'tags cifradas no servidor (texto) passam sem ser estragadas');
+  // apagar todas, sem apagar a conta
+  CC.marcar(['João 3:16'], 2);
+  CC.gravarRegistro(3, { o: 'obs', i: '', a: '', oracao: '' });
+  CC.gravarAnotacao('nota:x', 'explorar');
+  CC.apagarTodasAnotacoes();
+  checar(!CC.notas().length && !CC.notasApagadas().length && !CC.marcas().length && !CC.temRegistro(3) && !CC.anotacao('nota:x') && CC.estado().lidos,
+    'apagar todas: notas, marcas, reflexões e anotações somem; o resto do progresso fica');
+  // a conquista conta notas em versículo, sem ler o texto
+  const conta = CC.CONQUISTAS.find((c) => c.id === 'notas').valor;
+  checar(conta({ notas: { a: n('x', 1), b: n('y', 1, { apagadaEm: 2 }), c: { ...n('z', 1), versos: [] } }, anotacoes: { 'verso:Jó 1.1': 'velha' } }) === 2,
+    'a conquista do caderno conta as notas vivas em versículo (e as do formato antigo)');
+  E.notas = {}; E.marcas = {}; E.oia = {}; E.anotacoes = {};
 }
 
 // --- frases do carimbo da ofensiva (01c-arte.js) ---
@@ -525,12 +719,12 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
 {
   const frases = CC.FRASES_OFENSIVA;
   const biblias = ['nbv', 'blivre'].map((s) => JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', s + '.json'), 'utf8')));
-  const longas = frases.filter((f) => !f.linhas.length || f.linhas.length > 6 || f.linhas.some((l) => l.length > 20));
+  const longas = frases.filter((f) => (!f.linhas.length && !f.arte) || f.linhas.length > 6 || f.linhas.some((l) => l.length > 20));
   const refsRuins = frases.filter((f) => f.ref && (() => {
     const r = CC.lerRef(f.ref);
     return !r || biblias.some((b) => ((b.livros[r.livro] || [])[r.cap - 1] || []).slice(r.de - 1, r.ate).filter(Boolean).length !== r.ate - r.de + 1);
   })());
-  checar(frases.length === 18 && !longas.length, 'as 18 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
+  checar(frases.length === 46 && !longas.length, 'as 46 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
     + (longas.length ? ' (' + longas.map((f) => f.linhas[0]).join(', ') + ')' : ''));
   checar(!refsRuins.length, 'toda frase da ofensiva com referência aponta para versículos que existem nas duas Bíblias'
     + (refsRuins.length ? ' (' + refsRuins.map((f) => f.ref).join(', ') + ')' : ''));
@@ -538,6 +732,9 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
   let antes = null;
   for (let i = 0; i < 400; i++) { const f = CC.fraseDaOfensiva(); if (f === antes) repetiu = true; antes = f; }
   checar(!repetiu, 'o sorteio da ofensiva nunca repete a frase da vez anterior');
+  let semTexto = false;
+  for (let i = 0; i < 400; i++) if (!CC.fraseDaOfensiva({ comTexto: true }).linhas.length) semTexto = true;
+  checar(!semTexto, 'o fim da lição (comTexto) nunca sorteia a frase que é só arte');
 }
 
 // --- imagem de story (01d-story.js): nomes, texto junto e a frase do estágio no carimbo ---
@@ -562,6 +759,18 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01d-story.js'), 'utf8'), con
   });
   checar(!ruins.length, 'a frase de cada estágio da chama quebra em linhas de carimbo equilibradas, sem palavra sozinha'
     + (ruins.length ? ' (' + ruins.map((e) => S.linhasDoCarimbo(e.frase).join(' / ')).join('; ') + ')' : ''));
+}
+
+// --- modelos de story das frases com arte própria (01e-story-artes.js) ---
+runInContext(readFileSync(join(AQUI, 'src', 'app', '01e-story-artes.js'), 'utf8'), contexto, { filename: '01e-story-artes.js' });
+{
+  const S = CC.story;
+  const comArte = CC.FRASES_OFENSIVA.filter((f) => f.arte);
+  const sem = comArte.filter((f) => typeof S.artes[f.arte] !== 'function' || S.arteDaFrase({ linhas: f.linhas, ref: f.ref || '' }) !== f.arte);
+  checar(comArte.length === 25 && !sem.length, 'as 25 frases com arte têm modelo de story e o pedido da folha chega a ele'
+    + (sem.length ? ' (' + sem.map((f) => f.arte).join(', ') + ')' : ''));
+  checar(S.arteDaFrase({ linhas: ['Geração', 'inconformada'], ref: '' }) === null && S.arteDaFrase({ linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14' }) === 'luz',
+    'frase sem arte usa o modelo de sempre; "Luz do mundo" usa o da lâmpada');
 }
 
 // --- quebra de linhas e tamanho de letra do cartão de versículo (01c-arte.js) ---
@@ -681,6 +890,36 @@ checar(/e-mail/.test(erro), 'cadastro sem e-mail é recusado');
 await contas.criar({ usuario: 'dora', senha: '12345678', nome: 'Dora', email: 'Dora@X.com', nascimento: '2001-02-03', consentimento: true });
 checar(!!(await contas.conferir('dora@x.com', '12345678')), 'entra com o e-mail, sem diferenciar maiúsculas');
 for (const u of ['ana', 'bia', 'caio']) await contas.completarPerfil(u, { email: u + '@x.com', nascimento: '2000-01-01' });
+
+// ---------- data de nascimento travada e e-mail só com a senha ----------
+{
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  checar(/não muda depois do cadastro.*suporte\|403/.test(await tentar(() => contas.completarPerfil('dora', { nascimento: '1990-05-05' }))),
+    'depois do cadastro, a data de nascimento não muda (403, "fale com o suporte")');
+  checar(await tentar(() => contas.completarPerfil('dora', { nascimento: '2001-02-03', email: 'dora@x.com' })) === ''
+    && contas.achar('dora').nascimento === '2001-02-03', 'mandar a mesma data e o mesmo e-mail de novo é aceito sem senha');
+  checar(/não muda depois do cadastro/.test(await tentar(() => contas.completarPerfil('dora', { nascimento: nasc12anos }, { senhaConferida: true }))),
+    'nem com a senha conferida a data muda (trocar para menor de idade também é recusado)');
+  checar(contas.achar('dora').nascimento === '2001-02-03', 'a data gravada continua a do cadastro');
+  checar(contas.trocaEmail('dora', 'outra@x.com') && !contas.trocaEmail('dora', 'DORA@x.com') && !contas.trocaEmail('dora', ''),
+    'trocaEmail só é verdadeiro quando o e-mail novo é outro');
+  checar(/senha atual\|403/.test(await tentar(() => contas.completarPerfil('dora', { email: 'outra@x.com' }))),
+    'trocar o e-mail sem a senha conferida é recusado');
+  checar(contas.achar('dora').email === 'dora@x.com', 'o e-mail continua o antigo');
+  await contas.completarPerfil('dora', { email: 'outra@x.com' }, { senhaConferida: true });
+  checar(contas.achar('dora').email === 'outra@x.com' && contas.achar('dora').nascimento === '2001-02-03',
+    'com a senha conferida, o e-mail troca e o nascimento fica');
+  await contas.completarPerfil('dora', { email: 'dora@x.com' }, { senhaConferida: true });
+  const semNasc = await contas.criar({ usuario: 'semnasc', senha: '12345678', email: 'semnasc@x.com' }, { exigirPerfil: false });
+  checar(!semNasc.nascimento, 'conta antiga pode não ter nascimento');
+  checar(/12 anos/.test(await tentar(() => contas.completarPerfil('semnasc', { nascimento: nasc11anos }))), 'completar com menos de 12 anos é recusado');
+  await contas.completarPerfil('semnasc', { nascimento: '1999-09-09' });
+  checar(contas.achar('semnasc').nascimento === '1999-09-09' && contas.achar('semnasc').email === 'semnasc@x.com',
+    'quem não tinha a data completa uma vez, sem senha, e o e-mail que já tinha fica');
+  checar(/não muda depois do cadastro/.test(await tentar(() => contas.completarPerfil('semnasc', { nascimento: '1998-08-08' }))),
+    'completada uma vez, a data também trava');
+  await contas.apagar('semnasc');
+}
 checar(contas.procurar('dora', 'an') === null && contas.procurar('dora', 'ana').usuario === 'ana', 'a busca só acha pelo @ exato');
 
 await contas.bloquear('dora', 'caio');
@@ -738,6 +977,62 @@ await contas.silenciar('dora', 'bia', true);
 checar(!contas.toquesRecebidos('dora', '2026-03-02').includes('bia'), 'silenciar esconde os toques');
 await contas.apagar('bia');
 checar(!Object.keys(contas.dados.amizades).some((k) => k.includes('bia')), 'apagar a conta leva as amizades junto');
+
+// ---------- menor de 18 só lidera ou auxilia célula com aprovação da liderança ----------
+{
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  checar(menorDeIdade(somaAnos(hojeTeste, -17), hojeTeste) && !menorDeIdade(somaAnos(hojeTeste, -18), hojeTeste) && !menorDeIdade('', hojeTeste),
+    'menorDeIdade: 17 anos é menor; 18 completados hoje, não; sem data, não decide');
+  await contas.criar({ usuario: 'adulto', senha: '12345678', nome: 'Adulto', email: 'adulto@x.com', nascimento: '1990-01-01', consentimento: true });
+  await contas.criar({ usuario: 'teen', senha: '12345678', nome: 'Teen', email: 'teen@x.com', nascimento: somaAnos(hojeTeste, -15), consentimento: true });
+  const deAdulto = await contas.criarCelula('adulto', { titulo: 'Adultos' }, hojeTeste);
+  checar(!deAdulto.aprovacoes.length && podeConduzir(deAdulto, 'adulto') && contas.gerarLinkCelula('adulto', deAdulto.id, assinar).token,
+    'quem tem 18 ou mais cria a célula normal: conduz e manda o link');
+  const deTeen = await contas.criarCelula('teen', { titulo: 'Jovens' }, hojeTeste);
+  checar(deTeen.aprovacoes.length === 1 && deTeen.aprovacoes[0].estado === 'pendente' && deTeen.aprovacoes[0].papel === 'lider',
+    'menor de 18 cria a célula aguardando aprovação');
+  checar(!podeConduzir(deTeen, 'teen') && aguardandoAprovacao(deTeen, 'teen') === 'lider', 'enquanto espera, o menor não conduz (sem painel com nomes)');
+  checar(/aguardando aprovação da liderança\|403/.test(await tentar(() => contas.gerarLinkCelula('teen', deTeen.id, assinar))), 'célula aguardando não gera link');
+  checar(/aguardando aprovação da liderança\|403/.test(await tentar(() => contas.registrarEncontro('teen', deTeen.id, { data: hojeTeste, presentes: [] }, hojeTeste))),
+    'nem registra presença');
+  checar(contas.liderancasPendentes(hojeTeste).some((x) => x.proposito === deTeen.id && x.usuario === 'teen' && x.idade === 15),
+    'o pedido aparece para o administrador, com a idade');
+  await contas.decidirLideranca('dono', { proposito: deTeen.id, usuario: 'teen', papel: 'lider', aprovar: true }, hojeTeste);
+  const aprov = contas.proposito(deTeen.id).aprovacoes[0];
+  checar(aprov.estado === 'aprovada' && aprov.decididoPor === 'dono' && /^\d{4}-\d{2}-\d{2}T/.test(aprov.decididoEm),
+    'aprovar registra quem aprovou e quando');
+  checar(podeConduzir(contas.proposito(deTeen.id), 'teen') && contas.gerarLinkCelula('teen', deTeen.id, assinar).token, 'aprovado, o menor conduz e manda o link');
+  checar(/não está mais pendente\|404/.test(await tentar(() => contas.decidirLideranca('dono', { proposito: deTeen.id, usuario: 'teen', papel: 'lider', aprovar: false }))),
+    'um pedido decidido não se decide de novo');
+  // auxiliar menor
+  await contas.criar({ usuario: 'teen2', senha: '12345678', nome: 'Teen2', email: 'teen2@x.com', nascimento: somaAnos(hojeTeste, -16), consentimento: true });
+  await contas.entrarNaCelula('teen2', contas.gerarLinkCelula('adulto', deAdulto.id, assinar).token, assinar, hojeTeste);
+  await contas.definirAuxiliar('adulto', deAdulto.id, 'teen2', true);
+  checar(aguardandoAprovacao(contas.proposito(deAdulto.id), 'teen2') === 'auxiliar' && !podeConduzir(contas.proposito(deAdulto.id), 'teen2'),
+    'menor marcado como auxiliar espera a aprovação');
+  await contas.decidirLideranca('dono', { proposito: deAdulto.id, usuario: 'teen2', papel: 'auxiliar', aprovar: false }, hojeTeste);
+  const m2 = contas.proposito(deAdulto.id).membros.find((m) => m.usuario === 'teen2');
+  checar(m2.estado === 'ativo' && m2.papel === '' && !contas.proposito(deAdulto.id).encerradoEm, 'recusar o auxiliar só tira o papel; a célula segue');
+  await contas.definirAuxiliar('adulto', deAdulto.id, 'teen2', true);
+  await contas.decidirLideranca('dono', { proposito: deAdulto.id, usuario: 'teen2', papel: 'auxiliar', aprovar: true }, hojeTeste);
+  checar(podeConduzir(contas.proposito(deAdulto.id), 'teen2'), 'marcado de novo e aprovado, o auxiliar menor conduz');
+  // recusar o líder encerra
+  const outra = await contas.criarCelula('teen2', { titulo: 'Outra' }, hojeTeste);
+  await contas.decidirLideranca('dono', { proposito: outra.id, usuario: 'teen2', papel: 'lider', aprovar: false }, hojeTeste);
+  checar(!!contas.proposito(outra.id).encerradoEm && contas.proposito(outra.id).aprovacoes[0].estado === 'recusada', 'recusar o líder encerra a célula');
+  // sobrevive ao banco
+  await contas.salvar();
+  const rec = await new Contas(arquivoContas).carregar();
+  checar(rec.proposito(deTeen.id).aprovacoes[0].decididoPor === 'dono' && podeConduzir(rec.proposito(deAdulto.id), 'teen2'),
+    'as aprovações sobrevivem a salvar e recarregar do banco');
+  // célula antiga de menor, sem registro: passa a esperar ao abrir o banco
+  delete rec.proposito(deTeen.id).aprovacoes;
+  rec.proposito(deTeen.id).aprovacoes = [];
+  await rec.salvar();
+  const rec2 = await new Contas(arquivoContas).carregar();
+  checar(aguardandoAprovacao(rec2.proposito(deTeen.id), 'teen') === 'lider', 'célula de menor criada antes da regra passa a aguardar aprovação');
+  for (const u of ['adulto', 'teen', 'teen2']) await contas.apagar(u);
+}
 
 const resumo = resumoDeAmigo({ usuario: 'x', nome: 'X', email: 'x@x.com', nascimento: '2000-01-01' },
   { marcadoEm: { 1: '2026-03-02' }, oia: { 1: { oracao: 'segredo' } }, lidos: [1] }, '2026-03-02');
@@ -1021,6 +1316,251 @@ secao('notificações: as frases');
   checar(!lido(D.plano.map((d) => d.numero), 365).leitura, 'quem leu tudo não recebe leitura inventada');
   const comLeitura = datas.slice(0, 60).map((dt) => monta('lembrete', { ofensiva: 0, slot: 19 * 60, ...lido([1, 2], 1) }, dt));
   checar(comLeitura.some((m) => m.corpo.includes(passagem(3))), 'o lembrete às vezes fala da leitura de hoje pelo nome');
+}
+
+// =========================================================================
+secao('cofre das anotações (cofre.mjs e servidor)');
+// =========================================================================
+{
+  const { chavesDasNotas, selarEstado, abrirEstado, migrarEstadosCifrados, ehCifrado, CAMPOS_CIFRADOS } = await import('./cofre.mjs');
+  const { DatabaseSync, abrirBanco } = await import('./db.mjs');
+  const { spawn } = await import('node:child_process');
+  const { createServer } = await import('node:net');
+  const { randomBytes } = await import('node:crypto');
+
+  // --- a chave ---
+  const lanca = (f) => { try { f(); return false; } catch { return true; } };
+  checar(lanca(() => chavesDasNotas({ NODE_ENV: 'production' })), 'produção sem CAMINHO_CHAVE_NOTAS não sobe');
+  checar(lanca(() => chavesDasNotas({ CAMINHO_CHAVE_NOTAS: 'curta' })), 'chave que não tem 64 hexadecimais é recusada');
+  const K = chavesDasNotas({ CAMINHO_TESTE: '1' });
+  checar(K.teste && K.atual.length === 32, 'em teste, sem a variável, vale a chave de teste');
+  const hex1 = randomBytes(32).toString('hex');
+  const hex2 = randomBytes(32).toString('hex');
+  const K1 = chavesDasNotas({ NODE_ENV: 'production', CAMINHO_CHAVE_NOTAS: hex1 });
+  checar(!K1.teste && K1.impressao !== K.impressao, 'produção com a chave sobe, com outra chave que a de teste');
+  checar(CAMPOS_CIFRADOS.includes('notas.*.texto') && CAMPOS_CIFRADOS.includes('notas.*.tags'), 'a lista dos campos já cobre o modelo novo de notas');
+
+  // --- selar e abrir ---
+  const claro = {
+    lidos: [1], marcadoEm: { 1: '2026-03-01' },
+    oia: { 1: { o: 'SEGREDO-OIA', i: '', a: '', oracao: 'SEGREDO-ORACAO' }, 2: { o: '', i: '', a: '', oracao: '' } },
+    anotacoes: { 'verso:João 3.16': 'SEGREDO-VERSO', 'nota:x': 'SEGREDO-NOTA', 'nota:vazia': '' },
+    historia: { antes: 'SEGREDO-ANTES', encontro: '', hoje: 'SEGREDO-HOJE', em: 5 },
+    notas: { n1: { tipo: 'oracao', texto: 'SEGREDO-NOTA-NOVA', tags: ['SEGREDO-TAG'], versos: ['João 3:16'] } },
+    marcas: { 'João 3:16': { cor: 2, em: 1 } }, foto: 'data:image/jpeg;base64,AAAA',
+  };
+  const selado = selarEstado(claro, 'ana', K);
+  const texto = JSON.stringify(selado);
+  checar(!/SEGREDO/.test(texto), 'selado, nenhum texto privado fica em claro');
+  checar(ehCifrado(selado.oia[1].o) && selado.oia[2].o === '' && selado.anotacoes['nota:vazia'] === '' && selado.historia.encontro === '',
+    'cada texto vira { v, k, iv, tag, dado } e o vazio continua vazio');
+  checar(selado.historia.em === 5 && selado.foto === claro.foto && selado.marcas['João 3:16'].cor === 2 && Object.keys(selado.anotacoes).length === 3,
+    'a forma do progresso não muda: chaves, datas, marcas e foto ficam como estavam');
+  checar(JSON.stringify(abrirEstado(selado, 'ana', K)) === JSON.stringify(claro), 'o dono abre e lê exatamente o que escreveu (também listas)');
+  checar(JSON.stringify(selarEstado(selado, 'ana', K)) === texto, 'selar o que já está selado com a chave atual não muda nada');
+  const outraVez = selarEstado(claro, 'ana', K);
+  checar(outraVez.oia[1].o.iv !== selado.oia[1].o.iv && outraVez.oia[1].o.dado !== selado.oia[1].o.dado, 'cada gravação usa um IV novo');
+  checar(lanca(() => abrirEstado(selado, 'bia', K)), 'o texto copiado para a linha de outra pessoa não abre');
+  checar(lanca(() => abrirEstado(selado, 'ana', K1)), 'com outra chave não abre');
+  const adulterado = JSON.parse(texto);
+  const bytes = Buffer.from(adulterado.anotacoes['nota:x'].dado, 'base64');
+  bytes[0] ^= 1;
+  adulterado.anotacoes['nota:x'].dado = bytes.toString('base64');
+  checar(lanca(() => abrirEstado(adulterado, 'ana', K)), 'dado adulterado é recusado');
+  const semTag = JSON.parse(texto);
+  semTag.historia.antes.tag = Buffer.alloc(16).toString('base64');
+  checar(lanca(() => abrirEstado(semTag, 'ana', K)), 'prova (tag) trocada é recusada');
+
+  // os sinais agregados não precisam decifrar
+  const contasP = [{ usuario: 'ana', criadaEm: '2026-01-01' }];
+  const p1 = montarPainel({ contas: contasP, estados: { ana: claro }, hoje: '2026-03-02' });
+  const p2 = montarPainel({ contas: contasP, estados: { ana: selado }, hoje: '2026-03-02' });
+  checar(JSON.stringify(p1) === JSON.stringify(p2), 'o painel agregado (escreveu, marcou, história) dá o mesmo com os textos cifrados');
+  const conquistaVerso = (e) => (CC.conquistasComNivel(e, '2026-03-02').find((c) => c.id === 'notas') || {}).valor;
+  // a nota antiga ("verso:") migra para o modelo novo: conta junto com a nota nova (n1), cifrada ou não
+  checar(conquistaVerso(CC.normalizarEstado(selado)) === 2 && conquistaVerso(CC.normalizarEstado(claro)) === 2, 'a conquista das notas em versículos conta igual sem decifrar');
+  const migradoSelado = CC.normalizarEstado(selado);
+  checar(ehCifrado(migradoSelado.notas['v:João 3.16'].texto) && ehCifrado(migradoSelado.notas.n1.texto) && ehCifrado(migradoSelado.notas.n1.tags)
+    && JSON.stringify(abrirEstado(migradoSelado, 'ana', K).notas['v:João 3.16'].texto) === '"SEGREDO-VERSO"',
+  'migrar o estado cifrado (sem abrir) não estraga o envelope: a nota antiga muda de lugar e o dono a abre');
+
+  // --- migração e rotação, direto no banco ---
+  const pastaM = mkdtempSync(join(tmpdir(), 'cc-cofre-'));
+  const dbM = abrirBanco(join(pastaM, 'caminho.db'));
+  dbM.prepare('INSERT INTO estados (usuario, dados, atualizado_em) VALUES (?, ?, ?)').run('ana', JSON.stringify(claro), 'x');
+  dbM.prepare('INSERT INTO estados (usuario, dados, atualizado_em) VALUES (?, ?, ?)').run('leo', JSON.stringify({ lidos: [2] }), 'x');
+  const m1 = migrarEstadosCifrados(dbM, K1);
+  const linha = () => dbM.prepare("SELECT dados FROM estados WHERE usuario = 'ana'").get().dados;
+  checar(m1.cifrados === 1 && !/SEGREDO/.test(linha()), 'migração: a conta antiga tem os textos cifrados (e só ela é regravada)');
+  checar(migrarEstadosCifrados(dbM, K1).cifrados === 0, 'migração idempotente: a segunda vez não muda nada');
+  checar(JSON.stringify(abrirEstado(JSON.parse(linha()), 'ana', K1)) === JSON.stringify(claro), 'depois da migração o dono lê tudo de volta');
+  const K2 = chavesDasNotas({ CAMINHO_CHAVE_NOTAS: hex2, CAMINHO_CHAVE_NOTAS_ANTERIOR: hex1 });
+  const m2 = migrarEstadosCifrados(dbM, K2);
+  checar(m2.cifrados === 1 && JSON.parse(linha()).oia[1].o.k === K2.impressao, 'rotação: com a chave nova e a anterior, tudo é recifrado com a nova');
+  checar(JSON.stringify(abrirEstado(JSON.parse(linha()), 'ana', chavesDasNotas({ CAMINHO_CHAVE_NOTAS: hex2 }))) === JSON.stringify(claro),
+    'rotação: depois dela a chave antiga pode sair');
+  fecharBanco(join(pastaM, 'caminho.db'));
+  rmSync(pastaM, { recursive: true, force: true });
+
+  // --- o servidor de verdade ---
+  const livre = (p) => new Promise((r) => { const s = createServer().once('error', () => r(false)).listen(p, '127.0.0.1', () => s.close(() => r(true))); });
+  let PORTA = 0;
+  // PORTAS=8720-8739 troca a faixa (máquina com portas reservadas), como em ferramentas/navegador.mjs.
+  const [de, ate] = (/^(\d+)-(\d+)$/.exec(process.env.PORTAS || '') || [0, 8801, 8809]).slice(1).map(Number);
+  for (let p = de; p <= ate && !PORTA; p++) if (await livre(p)) PORTA = p;
+  const pastaS = mkdtempSync(join(tmpdir(), 'cc-cofre-srv-'));
+  const base = 'http://127.0.0.1:' + PORTA;
+  const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
+  let saida = '';
+  const subir = (amb = {}) => {
+    const s = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
+      env: { ...process.env, CAMINHO_ESTADO: join(pastaS, 'estado.json'), CAMINHO_TESTE: '1', CAMINHO_ADMIN: 'chefe', CAMINHO_CHAVE_NOTAS: hex1, ...amb },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    s.stdout.on('data', (d) => { saida += d; });
+    s.stderr.on('data', (d) => { saida += d; });
+    return s;
+  };
+  const no = async () => { for (let i = 0; i < 100; i++) { try { await fetch(base + '/api/existe-conta'); return true; } catch { await dormir(100); } } return false; };
+  const parar = async (s) => { s.kill(); for (let i = 0; i < 50; i++) { try { await fetch(base + '/api/existe-conta'); await dormir(100); } catch { return; } } };
+  const pedir = (rota, corpo, cookie, metodo) => fetch(base + rota, {
+    method: metodo || (corpo ? 'POST' : 'GET'),
+    headers: Object.assign({ 'content-type': 'application/json' }, cookie ? { cookie } : {}),
+    body: corpo ? JSON.stringify(corpo) : undefined,
+  });
+  const criar = async (usuario) => {
+    const r = await pedir('/api/criar-conta', { usuario, senha: 'senha-' + usuario, nome: usuario, email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true });
+    return (r.headers.get('set-cookie') || '').split(';')[0];
+  };
+  const arquivoDb = join(pastaS, 'caminho.db');
+  const bancoBruto = () => ['', '-wal'].map((x) => (existsSync(arquivoDb + x) ? readFileSync(arquivoDb + x).toString('latin1') : '')).join('');
+  const naLinha = (u, mexer) => {
+    const b = new DatabaseSync(arquivoDb);
+    try {
+      const l = b.prepare('SELECT dados FROM estados WHERE usuario = ?').get(u);
+      if (mexer) b.prepare("INSERT OR REPLACE INTO estados (usuario, dados, atualizado_em) VALUES (?, ?, 'x')").run(u, JSON.stringify(mexer(l ? JSON.parse(l.dados) : null)));
+      return l && JSON.parse(l.dados);
+    } finally { b.close(); }
+  };
+
+  let srv = null;
+  try {
+    checar(PORTA > 0, 'há uma porta livre entre ' + de + ' e ' + ate + ' para o servidor do teste');
+    // sem a chave em produção, o servidor recusa subir
+    srv = subir({ NODE_ENV: 'production', CAMINHO_TESTE: '', CAMINHO_CHAVE_NOTAS: '' });
+    const codigo = await new Promise((r) => { srv.once('exit', r); setTimeout(() => r('ainda vivo'), 8000); });
+    checar(codigo === 1 && /CAMINHO_CHAVE_NOTAS/.test(saida), 'servidor em produção sem a chave para na subida e diz o que falta');
+    if (codigo === 'ainda vivo') await parar(srv);
+
+    srv = subir();
+    checar(await no(), 'o servidor sobe com a chave');
+    const ana = await criar('ana.cofre');
+    const bia = await criar('bia.cofre');
+    const chefe = await criar('chefe');
+    const meu = { ...CC.normalizarEstado({}), atualizadoEm: Date.now(), lidos: [1], marcadoEm: { 1: hojeNoFuso(FUSO_PADRAO) },
+      oia: { 1: { o: 'SEGREDO-OIA-ANA', i: '', a: '', oracao: 'SEGREDO-ORACAO-ANA' } },
+      anotacoes: { 'verso:João 3.16': 'SEGREDO-VERSO-ANA', 'nota:x': 'SEGREDO-NOTA-ANA' },
+      historia: { antes: 'SEGREDO-HISTORIA-ANA', encontro: '', hoje: '', em: Date.now() } };
+    checar((await pedir('/api/estado', meu, ana, 'PUT')).status === 200, 'o dono grava as anotações');
+    checar(!/SEGREDO/.test(bancoBruto()), 'o arquivo do banco (com o WAL) não tem o texto em claro');
+    const lido = await (await pedir('/api/estado', null, ana)).json();
+    checar(lido.oia[1].oracao === 'SEGREDO-ORACAO-ANA' && lido.notas['v:João 3.16'].texto === 'SEGREDO-VERSO-ANA' && lido.notas['e:nota:x'].texto === 'SEGREDO-NOTA-ANA' && lido.notas['e:nota:x'].contexto === 'nota:x'
+      && !lido.anotacoes['verso:João 3.16'] && lido.historia.antes === 'SEGREDO-HISTORIA-ANA',
+      'o dono lê de volta, em claro, pelo /api/estado');
+    const outro = await (await pedir('/api/estado', null, bia)).text();
+    checar(!/SEGREDO/.test(outro), 'outra pessoa não obtém o texto');
+    const painel = await pedir('/api/painel', null, chefe);
+    checar(painel.status === 200 && !/SEGREDO/.test(await painel.text()), 'o admin vê o painel, sem texto nenhum');
+    // a fusão entre aparelhos continua: outro aparelho manda só uma anotação nova
+    const outroAparelho = { ...CC.normalizarEstado({}), atualizadoEm: Date.now() + 1000, anotacoes: { 'nota:y': 'SEGREDO-NOVA' } };
+    await pedir('/api/estado', outroAparelho, ana, 'PUT');
+    const fundido = await (await pedir('/api/estado', null, ana)).json();
+    checar(fundido.notas['e:nota:x'].texto === 'SEGREDO-NOTA-ANA' && fundido.notas['e:nota:y'].texto === 'SEGREDO-NOVA' && fundido.oia[1].o === 'SEGREDO-OIA-ANA',
+      'a fusão entre aparelhos junta o cifrado guardado com o que chega');
+    const ivAntes = naLinha('ana.cofre').notas['e:nota:x'].texto.iv;
+    await pedir('/api/estado', { ...outroAparelho, atualizadoEm: Date.now() + 2000, anotacoes: { 'nota:x': 'SEGREDO-EDITADA' } }, ana, 'PUT');
+    checar(naLinha('ana.cofre').notas['e:nota:x'].texto.iv !== ivAntes && naLinha('ana.cofre').notas['e:nota:x'].contexto === 'nota:x', 'o texto editado é gravado com IV novo');
+
+    // "Zerar progresso" pelo servidor: a trilha recomeça, foto e anotações ficam
+    const FOTO = 'data:image/jpeg;base64,QUJD';
+    await pedir('/api/estado', { ...fundido, atualizadoEm: Date.now() + 3000, foto: FOTO, acertosTotal: 40 }, ana, 'PUT');
+    const cheio = await (await pedir('/api/estado', null, ana)).json();
+    const agoraZ = Date.now() + 4000;
+    const zeradoSrv = { ...cheio, atualizadoEm: agoraZ, zeradoEm: agoraZ };
+    for (const campo of CC.PROGRESSO_DA_TRILHA) zeradoSrv[campo] = { ...CC.normalizarEstado({}), xpLegado: 0 }[campo];
+    checar(cheio.lidos.length === 1 && cheio.acertosTotal === 40 && (await pedir('/api/estado', zeradoSrv, ana, 'PUT')).status === 200, 'o dono zera a trilha');
+    const depoisZ = await (await pedir('/api/estado', null, ana)).json();
+    checar(!depoisZ.lidos.length && !Object.keys(depoisZ.marcadoEm).length && depoisZ.acertosTotal === 0 && depoisZ.xpLegado === 0,
+      'no servidor, zerar recomeça leituras, ofensiva e contadores');
+    checar(depoisZ.foto === FOTO && depoisZ.notas['e:nota:y'].texto === 'SEGREDO-NOVA' && depoisZ.oia[1].o === 'SEGREDO-OIA-ANA' && depoisZ.historia.antes === 'SEGREDO-HISTORIA-ANA',
+      'no servidor, zerar mantém a foto, as anotações, as reflexões e a Minha história');
+    checar(!/SEGREDO/.test(bancoBruto()), 'e o que ficou continua cifrado no banco');
+
+    // migração: uma conta de antes do cofre, com texto em claro no banco
+    naLinha('bia.cofre', () => ({ ...meu, oia: { 1: { o: 'SEGREDO-ANTIGO-BIA', i: '', a: '', oracao: '' } } }));
+    checar(/SEGREDO-ANTIGO-BIA/.test(JSON.stringify(naLinha('bia.cofre'))), 'a conta antiga está em claro antes de reiniciar');
+    await parar(srv);
+    saida = '';
+    srv = subir();
+    checar(await no(), 'o servidor sobe de novo');
+    checar(!/SEGREDO-ANTIGO-BIA/.test(JSON.stringify(naLinha('bia.cofre'))) && /anotações cifradas no banco: 1/.test(saida), 'na subida a conta antiga é cifrada');
+    checar(!/SEGREDO-ANTIGO-BIA/.test(bancoBruto()), 'e o texto em claro não sobra no arquivo do banco nem no WAL');
+    checar((await (await pedir('/api/estado', null, bia)).json()).oia[1].o === 'SEGREDO-ANTIGO-BIA', 'e a dona continua lendo o que escreveu');
+
+    // dado adulterado: nada é servido nem gravado por cima
+    naLinha('ana.cofre', (e) => { const b = Buffer.from(e.oia[1].o.dado, 'base64'); b[0] ^= 1; e.oia[1].o.dado = b.toString('base64'); return e; });
+    const r1 = await pedir('/api/estado', null, ana);
+    checar(r1.status === 500 && !/SEGREDO/.test(await r1.text()), 'com o dado adulterado o servidor recusa servir');
+    const antesPut = JSON.stringify(naLinha('ana.cofre'));
+    const r2 = await pedir('/api/estado', meu, ana, 'PUT');
+    checar(r2.status === 500 && JSON.stringify(naLinha('ana.cofre')) === antesPut, 'e não grava nada por cima do que não abriu');
+
+    // Juntos: quem compartilhou um versículo pode apagá-lo; ninguém mais, e só versículo
+    {
+      const cris = await criar('cris.cofre');
+      checar((await pedir('/api/amizade', { acao: 'pedir', usuario: 'cris.cofre' }, ana)).status === 200
+        && (await pedir('/api/amizade', { acao: 'aceitar', usuario: 'ana.cofre' }, cris)).status === 200, 'Juntos: ana e cris viram amigas');
+      await pedir('/api/novidades/preferencia', { ligado: true }, ana);
+      await pedir('/api/novidades/preferencia', { ligado: true }, cris);
+      const comp = await pedir('/api/novidades', { tipo: 'versiculo', dados: { ref: 'João 3.16' } }, ana);
+      checar(comp.status === 200 && (await comp.json()).publicado, 'Juntos: ana compartilha um versículo');
+      const muralDe = async (c) => (await (await pedir('/api/novidades', null, c)).json()).eventos || [];
+      const verso = (await muralDe(cris)).find((e) => e.tipo === 'versiculo' && e.autor.usuario === 'ana.cofre');
+      const convite = (await muralDe(cris)).find((e) => e.tipo === 'novoProposito' && e.autor.usuario === 'cris.cofre');
+      checar(!!verso && !!convite, 'Juntos: a amiga vê o versículo compartilhado (e o convite aceito dela)');
+      await pedir('/api/novidades/reagir', { id: verso.id }, cris);
+      const alheio = await pedir('/api/novidades/apagar', { id: verso.id }, cris);
+      checar(alheio.status === 403 && (await muralDe(cris)).some((e) => e.id === verso.id), 'Juntos: outra pessoa recebe 403 e o versículo fica');
+      const marco = await pedir('/api/novidades/apagar', { id: convite.id }, cris);
+      checar(marco.status === 400 && (await muralDe(cris)).some((e) => e.id === convite.id), 'Juntos: outro tipo de novidade não se apaga por essa rota, nem pelo autor');
+      const semConta = await pedir('/api/novidades/apagar', { id: verso.id });
+      checar(semConta.status >= 400 && semConta.status < 500, 'Juntos: sem conta, a rota recusa (' + semConta.status + ')');
+      const notaAntes = (await (await pedir('/api/estado', null, ana)).json()).anotacoes;
+      const certo = await pedir('/api/novidades/apagar', { id: verso.id }, ana);
+      checar(certo.status === 200, 'Juntos: a autora apaga o próprio versículo');
+      checar(!(await muralDe(cris)).some((e) => e.id === verso.id) && !(await muralDe(ana)).some((e) => e.id === verso.id),
+        'Juntos: o versículo some do mural da amiga e do dela');
+      checar(JSON.stringify((await (await pedir('/api/estado', null, ana)).json()).anotacoes) === JSON.stringify(notaAntes),
+        'Juntos: apagar não mexe nas notas do versículo na conta');
+      const b = new DatabaseSync(arquivoDb);
+      const sobra = b.prepare('SELECT COUNT(*) AS n FROM novidades_reacoes WHERE evento = ?').get(verso.id).n
+        + b.prepare('SELECT COUNT(*) AS n FROM novidades_eventos WHERE id = ?').get(verso.id).n;
+      b.close();
+      checar(sobra === 0, 'Juntos: o evento e as reações dele saem do banco');
+      checar((await pedir('/api/novidades/apagar', { id: verso.id }, ana)).status === 404, 'Juntos: apagar de novo responde 404');
+      // o teto de 3 por dia conta os apagados: apagar e repostar não enche o mural
+      for (const ref of ['João 3.17', 'Salmos 23.1']) await pedir('/api/novidades', { tipo: 'versiculo', dados: { ref } }, ana);
+      checar((await pedir('/api/novidades', { tipo: 'versiculo', dados: { ref: 'Romanos 8.28' } }, ana)).status === 429,
+        'Juntos: o versículo apagado continua contando no teto do dia');
+    }
+
+    // apagar a conta leva o progresso cifrado junto
+    const apagou = await pedir('/api/apagar-conta', { senha: 'senha-bia.cofre' }, bia);
+    checar(apagou.status === 200 && !naLinha('bia.cofre'), 'apagar a conta continua apagando o progresso');
+  } finally {
+    if (srv) await parar(srv);
+    rmSync(pastaS, { recursive: true, force: true });
+  }
 }
 
 console.log('\n  ' + contagem + ' checagens' + (falhas ? ' · ' + falhas + ' FALHA(S)\n' : ' · todas passaram\n'));
