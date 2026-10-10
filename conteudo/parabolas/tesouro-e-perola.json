@@ -1,0 +1,82 @@
+{
+  "titulo": "O tesouro e a pérola",
+  "ref": "Mt 13.44-46",
+  "grupo": "mateus",
+  "linha": "Um tesouro no campo e uma pérola de grande valor",
+  "desenho": "tesouro-e-perola",
+  "desenhoLista": "perola-na-concha",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus deixa o povo do lado de fora e entra em casa. Lá, ele explica aos discípulos a parábola do joio e do trigo.",
+          "ref": "Mt 13.36-43"
+        },
+        {
+          "texto": "Ainda em casa, só com os discípulos, Jesus conta duas histórias bem curtas sobre o Reino dos céus.",
+          "ref": "Mt 13.44"
+        }
+      ]
+    },
+    {
+      "titulo": "As duas histórias",
+      "icone": "moeda",
+      "blocos": [
+        {
+          "texto": "Jesus compara o Reino dos céus com duas coisas de muito valor.",
+          "ref": "Mt 13.44-46"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "bau-no-campo",
+              "titulo": "O tesouro",
+              "fala": "um tesouro que um homem descobriu num campo",
+              "ref": "Mt 13.44"
+            },
+            {
+              "desenho": "perola-na-concha",
+              "titulo": "A pérola",
+              "fala": "uma pérola de grande valor",
+              "ref": "Mt 13.46"
+            }
+          ]
+        },
+        {
+          "texto": "Um homem acha um tesouro num campo. Ele vende tudo o que tem e compra aquele campo.",
+          "ref": "Mt 13.44"
+        },
+        {
+          "texto": "Um negociante procura pérolas escolhidas. Quando acha uma de grande valor, ele vende tudo o que tem e compra a pérola.",
+          "ref": "Mt 13.45-46"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "Um homem acha o tesouro num campo, e o negociante encontra a pérola depois de procurar. Os dois vendem tudo o que têm, e o homem do campo faz isso cheio de alegria. O Reino dos céus vale mais do que tudo o que a gente deixa para trás.",
+    "apoio": "Jesus conta o que o homem sente quando acha o tesouro. “Na sua alegria, ele vendeu tudo quanto possuía para poder comprar aquele campo!”",
+    "ref": "Mt 13.44"
+  },
+  "perguntas": [
+    "Que coisa você segura com tanta força que seria difícil largar por Jesus?",
+    "Quando foi a última vez que seguir Jesus deu a você uma alegria como a do homem do campo?"
+  ],
+  "parecidas": [
+    {
+      "ref": "Mt 13.24-30, 36-43",
+      "titulo": "O joio e o trigo",
+      "slug": "joio-e-trigo",
+      "rotulo": "Da mesma conversa",
+      "linha": "um inimigo semeia joio no meio do trigo"
+    },
+    {
+      "ref": "Lc 8.4-15",
+      "titulo": "O semeador",
+      "slug": "semeador",
+      "linha": "a mesma semente em quatro tipos de chão"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a pérola de grande valor (Mt 13.46): a concha aberta, a de cima levantada para trás com as linhas de crescimento, a de baixo com o miolo, e no meio a pérola grande e redonda, com um brilho. O miolo da concha é a única área sálvia. -->
+<path class="k" d="M12 100H108"/>
+<path class="k p" d="M22.3 86.2C16.5 48.5 51.3 25.3 80.3 34C103.5 42.7 106.4 68.8 97.7 86.2"/>
+<path class="h" d="M33.9 74.6C33.9 51.4 57.1 36.9 77.4 42.7M48.4 80.4C51.3 60.1 65.8 51.4 83.2 54.3"/>
+<path class="k p" d="M16.5 86.2C22.3 106.5 97.7 106.5 103.5 86.2C80.3 77.5 39.7 77.5 16.5 86.2Z"/>
+<path class="k s" d="M28.1 87.7C45.5 81.9 74.5 81.9 91.9 87.7C80.3 94.9 39.7 94.9 28.1 87.7Z"/>
+<circle class="k p" cx="60" cy="76.1" r="13.1"/>
+<path class="h" d="M53.5 71.7a5 5 0 0 1 4 -3.5"/>
+</svg>
