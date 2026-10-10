@@ -101,6 +101,7 @@
   input:focus { outline: none; border-color: var(--azul); }
   input[aria-invalid="true"] { border-color: var(--erro); }
   .ajuda { font-size: .8rem; font-weight: 600; color: var(--fraca); }
+  .contagem { font-size: .75rem; font-weight: 600; color: var(--fraca); font-variant-numeric: tabular-nums; }
   .erro { min-height: 20px; font-size: .88rem; font-weight: 700; color: var(--erro); }
   .senha { position: relative; }
   .senha input { padding-right: 96px; }
@@ -692,7 +693,7 @@
     <form id="form-cadastro" autocomplete="on" novalidate>
       <div data-passo="1">
         <h1>Quem é você?</h1>
-        <div class="campo" style="margin-top:16px"><label for="nome">Como você quer que a gente te chame?</label>
+        <div class="campo" style="margin-top:16px"><label for="nome">Como você quer que a gente te chame? <small class="contagem" id="conta-nome" aria-hidden="true">0/20</small></label>
           <input id="nome" name="name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="20" required>
           <span class="ajuda">Até 20 letras. É assim que seus amigos veem você.</span></div>
         <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
@@ -954,11 +955,16 @@
     return !isNaN(d) && d.toISOString().slice(0, 10) === iso && iso >= '1900-01-01' ? iso : '';
   }
   $('nascimento').addEventListener('input', function () { mascararCampo($('nascimento'), false); });
+  // O nome tem até 20 caracteres (o servidor recusa acima disso): o contador acompanha.
+  function contarNome() { $('conta-nome').textContent = Array.from($('nome').value).length + '/20'; }
+  $('nome').addEventListener('input', contarNome);
+  contarNome();
   $('nascimento').addEventListener('change', function () { mascararCampo($('nascimento'), true); });
   function validar(n) {
     document.querySelectorAll('#form-cadastro input').forEach(function (i) { i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); });
     if (n === 1) {
       if (!$('nome').value.trim()) return erro($('nome'), 'Diga como quer que a gente te chame.');
+      if (Array.from($('nome').value.trim()).length > 20) return erro($('nome'), 'O nome pode ter até 20 caracteres.');
       var d = dataIso($('nascimento').value);
       var hoje = new Date().toISOString().slice(0, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= hoje) return erro($('nascimento'), 'Confira a data de nascimento.');

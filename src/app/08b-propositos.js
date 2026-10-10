@@ -4,6 +4,9 @@
 (function (CC) {
   'use strict';
 
+  // O teto do nome da célula, do grupo e do propósito (o mesmo de contas.mjs, TITULO_GRUPO_MAX):
+  // ele aparece nas notificações.
+  const TITULO_GRUPO_MAX = 24;
   let cache = null;
   const retrato = (p, tamanho) => CC.retratoAmigo(p, tamanho);
   const euUsuario = () => (CC.quem || {}).usuario;
@@ -437,7 +440,7 @@
       + '<p class="passo-dica">Quando a célula cresce, ela pode virar duas. Um auxiliar passa a liderar a nova, e vocês escolhem juntos quem vai para lá.</p>'
       + '<label class="campo-senha"><span>Quem vai liderar a nova célula</span><select data-auxiliar>'
       + auxiliares.map((m) => '<option value="' + CC.esc(m.usuario) + '">' + CC.esc(m.nome) + '</option>').join('') + '</select></label>'
-      + '<label class="campo-senha"><span>Nome da nova célula</span><input data-titulo maxlength="30" placeholder="Ex.: Célula de quinta" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
+      + '<label class="campo-senha"><span>Nome da nova célula ' + CC.contagem('', TITULO_GRUPO_MAX) + '</span><input data-titulo maxlength="' + TITULO_GRUPO_MAX + '" placeholder="Ex.: Célula de quinta" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
       + '<p class="etiqueta">Quem mais vai para a nova célula</p>'
       + '<div class="escolha-amigos" data-lista-pessoas>' + gente.filter((m) => m.papel !== 'auxiliar' || auxiliares.length > 1).map((m) => '<label class="linha-amigo escolha-amigo">'
         + '<input type="checkbox" value="' + CC.esc(m.usuario) + '" data-pessoa-multiplicar' + (m.papel === 'auxiliar' ? ' data-outro-auxiliar' : '') + '>' + retrato(m)
@@ -716,7 +719,7 @@
     const limite = (cache && cache.limiteCelula) || 20;
     CC.folha('<h2>Criar uma célula</h2>'
       + '<p class="passo-dica">Vocês leem o plano juntos, até ' + limite + ' pessoas. Depois de criar, você manda o link no grupo do WhatsApp e quem abrir já entra.</p>'
-      + '<label class="campo-senha"><span>Nome da célula</span><input data-titulo name="nome-da-celula" maxlength="30" placeholder="Ex.: Célula de quinta" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
+      + '<label class="campo-senha"><span>Nome da célula ' + CC.contagem('', TITULO_GRUPO_MAX) + '</span><input data-titulo name="nome-da-celula" maxlength="' + TITULO_GRUPO_MAX + '" placeholder="Ex.: Célula de quinta" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao" data-criar>Criar e pegar o link</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
@@ -1690,7 +1693,7 @@
         + '<input type="checkbox" value="' + CC.esc(a.usuario) + '"' + (preEscolhido === a.usuario ? ' checked' : '') + '>' + retrato(a)
         + '<span class="quem-amigo"><b>' + CC.esc(a.nome) + '</b><span class="arroba">@' + CC.esc(a.usuario) + '</span></span></label>').join('') + '</div>'
       + '<p class="passo-dica pequena" data-dica-grupo hidden>Com 3 ou mais pessoas, vira um grupo.</p>'
-      + '<label class="campo-senha" data-bloco-nome hidden><span>Nome do grupo</span><input data-titulo name="nome-do-grupo" maxlength="30" placeholder="Ex.: Amigos da escola" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
+      + '<label class="campo-senha" data-bloco-nome hidden><span>Nome do grupo ' + CC.contagem('', TITULO_GRUPO_MAX) + '</span><input data-titulo name="nome-do-grupo" maxlength="' + TITULO_GRUPO_MAX + '" placeholder="Ex.: Amigos da escola" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao" data-criar disabled>Chamar para o propósito</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',

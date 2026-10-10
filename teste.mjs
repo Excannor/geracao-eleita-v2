@@ -920,6 +920,30 @@ for (const u of ['ana', 'bia', 'caio']) await contas.completarPerfil(u, { email:
     'completada uma vez, a data também trava');
   await contas.apagar('semnasc');
 }
+
+// ---------- teto do nome (20) e do nome de célula ou propósito (24) ----------
+// O que se digita agora precisa caber; o que já estava salvo com mais continua valendo.
+{
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  const vinte = 'A'.repeat(20);
+  checar(/até 20 caracteres\|400/.test(await tentar(() => contas.criar({ usuario: 'longa', senha: '12345678', nome: vinte + 'x', email: 'longa@x.com', nascimento: '2000-01-01', consentimento: true }))) && !contas.achar('longa'),
+    'criar conta com nome de 21 caracteres é recusado com o motivo (e nada é criado)');
+  await contas.criar({ usuario: 'cabe', senha: '12345678', nome: 'A'.repeat(20), email: 'cabe@x.com', nascimento: '2000-01-01', consentimento: true });
+  checar(contas.achar('cabe').nome === 'A'.repeat(20), 'com 20, cabe');
+  const velha = await contas.criar({ usuario: 'velhalonga', senha: '12345678', nome: 'Nome Antigo Bem Comprido Mesmo' }, { exigirPerfil: false });
+  checar(velha.nome === 'Nome Antigo Bem Comprido Mesmo', 'conta antiga importada guarda o nome inteiro, sem cortar');
+  await contas.completarPerfil('velhalonga', { email: 'velhalonga@x.com', nascimento: '2000-01-01' });
+  checar(contas.achar('velhalonga').nome === 'Nome Antigo Bem Comprido Mesmo' && contas.perfilCompleto(contas.achar('velhalonga')),
+    'completar o cadastro sem mexer no nome deixa o nome antigo como está');
+  checar(/até 20 caracteres\|400/.test(await tentar(() => contas.completarPerfil('velhalonga', { nome: 'Outro Nome Comprido Demais' }))), 'mas trocar por outro nome maior que 20 é recusado');
+  await contas.completarPerfil('velhalonga', { nome: 'Nome Novo' });
+  checar(contas.achar('velhalonga').nome === 'Nome Novo', 'e trocar por um que cabe funciona');
+  checar(/célula pode ter até 24 caracteres\|400/.test(await tentar(() => contas.criarCelula('cabe', { titulo: 'C'.repeat(25) }, '2026-03-01'))), 'nome de célula com 25 é recusado com o motivo');
+  const cel24 = await contas.criarCelula('cabe', { titulo: 'C'.repeat(24) }, '2026-03-01');
+  checar(cel24.titulo === 'C'.repeat(24), 'com 24, cabe');
+  await contas.apagar('cabe');
+  await contas.apagar('velhalonga');
+}
 checar(contas.procurar('dora', 'an') === null && contas.procurar('dora', 'ana').usuario === 'ana', 'a busca só acha pelo @ exato');
 
 await contas.bloquear('dora', 'caio');
@@ -1238,6 +1262,20 @@ secao('notificações: as frases');
     const pior = (k, c) => c.replace(/\{(\w+)\}/g, (_, m) => String(k === 'desafioGrupo' && m === 'titulo' ? tituloDesafio : PIOR[m]));
     const estouram = Object.entries(T).flatMap(([k, v]) => v.filter(([, c]) => pior(k, c).length > N.CORPO_MAX).map(([, c]) => k + ': ' + pior(k, c).length + ' ' + c));
     checar(n30.length === 30 && !estouram.length, 'no pior caso de cada tipo (nomes de 30, títulos no máximo, leitura e tema longos), o corpo cabe em 110' + (estouram.length ? ' (' + estouram.join('; ') + ')' : ''));
+    // Os títulos, pelo preenchimento de verdade (preencherTitulo), com os mesmos marcadores no
+    // máximo (30: o que contas antigas ainda têm salvo; o teto novo é 20 e 24): cabem em 40,
+    // e o texto fixo da frase fica inteiro (só o valor do marcador é encurtado).
+    const dadosDe = (k) => ({ ...PIOR, ...(k === 'desafioGrupo' ? { titulo: tituloDesafio } : {}), outros: '99' });
+    const titulosRuins = Object.entries(T).flatMap(([k, v]) => v.map(([t]) => {
+      const pronto = N.preencherTitulo(t, dadosDe(k));
+      const fixos = t.split(/\{\w+\}/).map((x) => x.trim()).filter((x) => x.length > 1);
+      return pronto.length > N.TITULO_MAX || !fixos.every((x) => pronto.includes(x.replace(/^[,!]\s*/, '').replace(/\s*[,!]$/, ''))) ? k + ': ' + pronto + ' (' + pronto.length + ')' : '';
+    })).filter(Boolean);
+    checar(!titulosRuins.length, 'no pior caso de cada tipo, o título cabe em 40, sem cortar o texto fixo da frase' + (titulosRuins.length ? ' (' + titulosRuins.slice(0, 5).join('; ') + ')' : ''));
+    checar(N.preencherTitulo('{amigo} quer caminhar com você na fé', { amigo: n30 }).endsWith('… quer caminhar com você na fé'), 'o nome longo é encurtado com reticências, no fim do nome');
+    checar(N.preencherTitulo('Toc, toc, é {amigo}', { amigo: 'Ana' }) === 'Toc, toc, é Ana', 'o título que já cabe fica igual');
+    const comNomeInteiro = N.montarMensagem('pedido', { amigo: 'Maximiliano Albuquerque', amigoUsuario: 'max' }, { usuario: 'ana', data: '2026-03-01' });
+    checar(!/Albuquerque/.test(comNomeInteiro.titulo + comNomeInteiro.corpo) && comNomeInteiro.titulo.length <= N.TITULO_MAX, 'no aviso, {amigo} é só o primeiro nome');
     // Pelo caminho de verdade: célula de nome longo, quem chamou com nome longo, o desafio mais longo.
     const oitoDias = Array.from({ length: 8 }, (_, i) => somaDias('2026-03-01', i));
     const desafios = oitoDias.map((dt) => N.montarMensagem('desafioGrupo', { amigo: n30, amigoUsuario: 'x', titulo: tituloDesafio, grupo: 'C'.repeat(30) }, { usuario: 'ana', data: dt }));

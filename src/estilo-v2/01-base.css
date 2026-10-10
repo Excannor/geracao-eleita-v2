@@ -754,3 +754,7 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 .cartao-proposito:active, .dsf-item:active, .opcao-traducao:active, .amigo-roda:active, .corpo-faixa:active, .item-aviso:active { background: var(--campo); }
 .botao-pilula:active, .botao-redondo:active, .botao-icone:active, .guia:active, .no-bau:active, .no-marco:active { transform: scale(.96); }
 
+
+/* Contador "n/máx" dos campos com limite (CC.contagem). */
+.contagem { color: var(--tinta-fraca, inherit); font-size: .75rem; font-weight: 600; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+.contagem.passou { color: var(--erro); font-weight: 700; }

@@ -74,6 +74,24 @@ export const NASCIMENTO_TRAVADO = 'a data de nascimento não muda depois do cada
 // v3 (política versão 3, 09/10/2026): o texto passa a citar o check-in, o que quem acompanha no
 // Discipulado vê e o check-in só somado para a célula; quem já tinha conta concorda de novo.
 export const CONSENTIMENTO_VERSAO = 3;
+// O nome de exibição e o nome da célula ou do propósito aparecem nas notificações: com estes
+// tetos, o título cabe em 40 caracteres e o corpo em 110 (teste.mjs confere o pior caso).
+// Só o que é digitado agora precisa caber: o que já está salvo com mais fica como está.
+export const NOME_MAX = 20;
+export const TITULO_GRUPO_MAX = 24;
+const tamanho = (s) => [...s].length;
+// O nome digitado, sem espaço sobrando; acima do teto, erro com o motivo (nada de cortar
+// sem avisar, que guardava um nome que a pessoa não escreveu).
+function nomeDigitado(nome) {
+  const n = String(nome || '').replace(/\s+/g, ' ').trim();
+  if (tamanho(n) > NOME_MAX) throw erro('o nome pode ter até ' + NOME_MAX + ' caracteres');
+  return n;
+}
+function tituloDigitado(titulo, oQue) {
+  const t = String(titulo || '').replace(/\s+/g, ' ').trim();
+  if (tamanho(t) > TITULO_GRUPO_MAX) throw erro('o nome ' + oQue + ' pode ter até ' + TITULO_GRUPO_MAX + ' caracteres');
+  return t;
+}
 export const MOTIVOS_DENUNCIA = [
   'Insiste ou incomoda',
   'Nome ou foto impróprios',
@@ -485,7 +503,8 @@ export class Contas {
       throw erro('o @ aceita letras minúsculas, números, ponto, hífen e sublinhado, de 2 a 30 caracteres');
     }
     if (this.achar(chave)) throw erro('esse @ já existe');
-    const nomeLimpo = String(nome || '').trim().slice(0, 20);
+    // Na importação de conta antiga (sem exigirPerfil) o nome que veio fica inteiro.
+    const nomeLimpo = exigirPerfil ? nomeDigitado(nome) : String(nome || '').trim();
     if (exigirPerfil && !nomeLimpo) throw erro('diga como quer ser chamado');
     const mail = limparEmail(email);
     if (exigirPerfil || mail) {
@@ -557,7 +576,8 @@ export class Contas {
     }
     conta.email = mail;
     conta.nascimento = nasc;
-    const n = String(nome || '').trim().slice(0, 20);
+    // Só troca o nome se ele veio; o que já estava salvo, mesmo maior, fica.
+    const n = nome === undefined || nome === null ? '' : nomeDigitado(nome);
     if (n) conta.nome = n;
     await this.salvar();
     return conta;
@@ -1090,6 +1110,7 @@ export class Contas {
 
   async criarProposito(eu, { tipo, alvo, titulo, com }, hoje, todosLivros) {
     const a = this.exigirCompleto(eu);
+    const tituloLimpo = tituloDigitado(titulo, 'do propósito');
     const outros = [...new Set((Array.isArray(com) ? com : [com]).map(limparNome).filter((u) => u && u !== a.usuario))];
     if (!outros.length) throw erro('escolha com quem');
     if (outros.length + 1 > LIMITE_GRUPO) throw erro('um grupo tem no máximo ' + LIMITE_GRUPO + ' pessoas');
@@ -1104,7 +1125,7 @@ export class Contas {
     if (repetido) throw erro('vocês já têm esse propósito');
     const id = 'p' + randomBytes(6).toString('hex');
     const p = {
-      id, tipo, alvo: alvoLimpo, titulo: String(titulo || '').trim().slice(0, 30) || rotuloDoProposito(tipo, alvoLimpo),
+      id, tipo, alvo: alvoLimpo, titulo: tituloLimpo || rotuloDoProposito(tipo, alvoLimpo),
       criadoPor: a.usuario, criadoEm: hoje, encerradoEm: '', grupo: outros.length >= 2,
       membros: [{ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: '' }]
         .concat(outros.map((u) => ({ usuario: u, estado: 'convidado', entrouEm: '', saiuEm: '', convidadoPor: a.usuario }))),
@@ -1153,9 +1174,10 @@ export class Contas {
   // amigo antes (a amizade com quem mandou o link nasce junto, como num convite).
   async criarCelula(eu, { titulo } = {}, hoje) {
     const a = this.exigirCompleto(eu);
+    const tituloLimpo = tituloDigitado(titulo, 'da célula');
     const id = 'p' + randomBytes(6).toString('hex');
     const p = {
-      id, tipo: 'plano', alvo: '', titulo: String(titulo || '').trim().slice(0, 30) || 'Célula',
+      id, tipo: 'plano', alvo: '', titulo: tituloLimpo || 'Célula',
       criadoPor: a.usuario, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
       membros: [{ usuario: a.usuario, estado: 'ativo', entrouEm: hoje, saiuEm: '', convidadoPor: '' }],
       aprovacoes: [],
@@ -1416,6 +1438,7 @@ export class Contas {
   // auxiliar da mãe só porque saiu dela, não por um passo à parte.
   async multiplicarCelula(eu, id, { auxiliar, titulo, pessoas } = {}, hoje) {
     const mae = this.celulaDoLider(eu, id);
+    const tituloLimpo = tituloDigitado(titulo, 'da célula');
     const novoLider = limparNome(auxiliar);
     const souAuxiliar = (u) => mae.membros.find((m) => m.usuario === u && m.estado === 'ativo' && m.papel === 'auxiliar');
     if (!souAuxiliar(novoLider)) throw erro('escolha um auxiliar ativo da célula para liderar a nova célula', 400);
@@ -1430,7 +1453,7 @@ export class Contas {
     if (movidos.length > LIMITE_CELULA) throw erro('a nova célula tem no máximo ' + LIMITE_CELULA + ' pessoas', 400);
     const filhaId = 'p' + randomBytes(6).toString('hex');
     const filha = {
-      id: filhaId, tipo: 'plano', alvo: '', titulo: String(titulo || '').trim().slice(0, 30) || 'Célula',
+      id: filhaId, tipo: 'plano', alvo: '', titulo: tituloLimpo || 'Célula',
       criadoPor: novoLider, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
       mae: mae.id, multiplicadaEm: hoje, membros: [], aprovacoes: [],
     };

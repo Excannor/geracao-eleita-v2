@@ -7,6 +7,32 @@ window.CC = window.CC || {};
 
   // ---------- texto ----------
   const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  // Contador "n/máx" de um campo com limite (o padrão da tela de aviso): o <small> fica no
+  // rótulo, e passa a vermelho quando um valor antigo, já salvo, passa do teto.
+  CC.contagem = (valor, max) => '<small class="contagem' + ([...String(valor || '')].length > max ? ' passou' : '') + '">'
+    + [...String(valor || '')].length + '/' + max + '</small>';
+  CC.ligarContagem = (campo, saida, max) => {
+    const atualizar = () => {
+      const n = [...campo.value].length;
+      saida.textContent = n + '/' + max;
+      saida.classList.toggle('passou', n > max);
+    };
+    saida.dataset.ligado = '1';
+    campo.addEventListener('input', atualizar);
+    atualizar();
+  };
+  // Campo dentro de um <label> com o contador: ele acompanha sozinho, sem ligar um por um.
+  if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('input', (ev) => {
+      const campo = ev.target;
+      const rotulo = campo && campo.closest && campo.closest('label');
+      const saida = rotulo && rotulo.querySelector('.contagem');
+      if (!saida || !(campo.maxLength > 0) || saida.dataset.ligado) return;
+      const n = [...campo.value].length;
+      saida.textContent = n + '/' + campo.maxLength;
+      saida.classList.toggle('passou', n > campo.maxLength);
+    });
+  }
   CC.esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ESCAPES[c]);
   CC.semAcento = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   CC.plural = (n, um, muitos) => n + ' ' + (n === 1 ? um : muitos);

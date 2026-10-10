@@ -4,6 +4,9 @@
 (function (CC) {
   'use strict';
 
+  // O teto do nome de exibição (o mesmo de contas.mjs, NOME_MAX).
+  const NOME_MAX = 20;
+
   const D = CC.D;
 
   // Uma conquista em linha: medalha com o nível, título, barra até o próximo nível.
@@ -128,6 +131,7 @@
     // Primeiro as conquistas mais perto do próximo nível: é o que dá vontade de seguir.
     const vitrine = conquistas.slice().sort((a, b) => (a.maximo - b.maximo) || (b.fracao - a.fracao)).slice(0, 3);
 
+    const nomeNoCampo = CC.apelido() || (quem.nome && quem.nome !== quem.usuario ? quem.nome : '');
     // .folha-perfil: só apresentação, a folha do alto das telas deste grupo (25-perfil.css):
     // o título e quem você é; os números e o resto vêm embaixo, no fundo.
     raiz.innerHTML = '<div class="folha-perfil"><div class="cabeca-tela cabeca-centro"><span class="vao"></span><h1>Perfil</h1>'
@@ -139,10 +143,10 @@
       + '<div class="quem">'
       // O nome aparece na saudação do Início e para os amigos. Conta antiga sem nome (o nome
       // é o próprio @) abre com o campo vazio, pedindo o nome, em vez de repetir o usuário.
-      + '<label class="rotulo-apelido" for="apelido">Seu nome no app</label>'
+      + '<label class="rotulo-apelido" for="apelido">Seu nome no app ' + CC.contagem(nomeNoCampo, NOME_MAX) + '</label>'
       + '<input id="apelido" class="campo-apelido" value="'
-      + CC.esc(CC.apelido() || (quem.nome && quem.nome !== quem.usuario ? quem.nome : '')) + '" '
-      + 'placeholder="Como quer ser chamado?" maxlength="20" autocomplete="given-name">'
+      + CC.esc(nomeNoCampo) + '" '
+      + 'placeholder="Como quer ser chamado?" maxlength="' + NOME_MAX + '" autocomplete="given-name">'
       + (quem.usuario && quem.comSenha ? '<span class="conta">@' + CC.esc(quem.usuario) + '</span>' : '')
       + '</div>'
       + '<input type="file" id="arquivo-foto" accept="image/*" hidden>'
@@ -207,7 +211,14 @@
       arquivo.value = '';
     };
     const campoNome = raiz.querySelector('#apelido');
-    campoNome.addEventListener('input', () => CC.guardarApelido(campoNome.value));
+    // Nome antigo maior que o teto: aparece inteiro e continua valendo; só é trocado quando o
+    // que está no campo cabe em 20 (nada de cortar sem a pessoa ver).
+    CC.ligarContagem(campoNome, raiz.querySelector('.rotulo-apelido .contagem'), NOME_MAX);
+    campoNome.addEventListener('input', () => {
+      const cabe = [...campoNome.value].length <= NOME_MAX;
+      campoNome.setAttribute('aria-invalid', cabe ? 'false' : 'true');
+      if (cabe) CC.guardarApelido(campoNome.value);
+    });
     raiz.querySelector('[data-instalar]').onclick = () => CC.tutorialInstalar();
     const ofensiva = raiz.querySelector('[data-ofensiva-perfil]');
     if (ofensiva) ofensiva.onclick = CC.folhaOfensiva;

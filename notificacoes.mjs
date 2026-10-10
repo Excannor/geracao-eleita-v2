@@ -611,8 +611,32 @@ export function leituraDoConhecer(conhecer, estado = {}) {
   const ref = (t) => t.livro + ' ' + t.cap + '.' + t.de + (t.ate && t.ate !== t.de ? '-' + t.ate : '');
   return { leitura: (dia.trechos || []).map(ref).join(' · '), tema: '' };
 }
-// O corpo que o celular mostra sem cortar (teste.mjs confere o pior caso de cada tipo).
+// O título e o corpo que o celular mostra sem cortar (teste.mjs confere o pior caso de cada tipo).
+export const TITULO_MAX = 40;
 export const CORPO_MAX = 110;
+
+// O título com os marcadores preenchidos, sem passar de 40. Se passar (nome antigo maior que
+// o teto, título de grupo longo), o marcador mais longo é encurtado com "…"; se nem assim
+// couber, vira uma forma genérica. Só os valores dos marcadores mudam: o texto fixo da frase
+// nunca é cortado.
+const GENERICO = { amigo: 'Alguém', nome: '', titulo: 'o grupo', filha: 'a célula nova', novoLider: 'alguém' };
+export function preencherTitulo(modelo, d) {
+  const v = { ...d };
+  let pronto = preencher(modelo, v);
+  if (pronto.length <= TITULO_MAX) return pronto;
+  const chaves = [...new Set(marcadores(modelo))].filter((k) => typeof v[k] === 'string' && v[k])
+    .sort((a, b) => v[b].length - v[a].length);
+  for (const k of chaves) {
+    const letras = Array.from(v[k]);
+    for (let n = letras.length - 1; n >= 3 && pronto.length > TITULO_MAX; n--) {
+      const tentativa = { ...v, [k]: letras.slice(0, n).join('').trimEnd() + '…' };
+      if (preencher(modelo, tentativa).length <= TITULO_MAX) { v[k] = tentativa[k]; pronto = preencher(modelo, v); }
+    }
+    if (pronto.length > TITULO_MAX && k in GENERICO) { v[k] = GENERICO[k]; pronto = preencher(modelo, v); }
+    if (pronto.length <= TITULO_MAX) break;
+  }
+  return pronto;
+}
 const POR_EXTENSO = ['zero', 'uma', 'duas'];
 const preencher = (s, d) => s.replace(/\{(\w+)\}/g, (_, k) => (d[k] === undefined || d[k] === '' ? '' : String(d[k])))
   .replace(/\s+([!?.,])/g, '$1').replace(/,\s*!/g, '!').replace(/\s{2,}/g, ' ').trim();
@@ -623,7 +647,8 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   // {nome} é quem recebe, menos no querConversar e no querBatismo, em que é quem pediu a
   // conversa: ali o nome que veio nos dados vale. Antes o nome de quem recebia passava por
   // cima, e a pessoa lia o próprio nome no aviso ("Ana quer conversar com você").
-  const d = { ...dados, nome: dados.nome ? primeiroNome(dados.nome) : primeiroNome(nome) };
+  // {amigo} também é só o primeiro nome, venha de onde vier.
+  const d = { ...dados, nome: dados.nome ? primeiroNome(dados.nome) : primeiroNome(nome), ...(dados.amigo ? { amigo: primeiroNome(dados.amigo) } : {}) };
   let chave = tipo;
   let url = './#/';
   let tag = tipo;
@@ -687,7 +712,7 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   const [titulo, corpo] = escolherFrase(chave, lista, d, usuario, data);
   let pronto = preencher(corpo, d);
   if (tipo === 'desafioGrupo' && dados.grupo && [...pronto].length > CORPO_MAX) pronto = preencher(corpo, { ...d, quem: 'a sua célula' });
-  return { titulo: preencher(titulo, d), corpo: pronto, tag, url };
+  return { titulo: preencherTitulo(titulo, d), corpo: pronto, tag, url };
 }
 
 // ---------------------------------------------------------------- aviso do administrador
