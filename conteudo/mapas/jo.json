@@ -1,0 +1,294 @@
+{
+  "nome": "Jó",
+  "grupo": "Poéticos",
+  "numero": 18,
+  "capitulos": 42,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "אִיּוֹב",
+    "transliteracao": "Iyov",
+    "traducao": "perseguido",
+    "texto": "O nome lembra a palavra hebraica para inimigo, e o livro não explica o nome. No meio da dor, Jó pergunta por que o Senhor se esconde e trata Jó como inimigo."
+  },
+  "autoria": {
+    "texto": "Jó mora na terra de Uz. Quem escreveu a história dele não deixou o nome no livro.",
+    "apoio": "A história vai até o fim da vida de Jó. Depois do sofrimento, ele ainda vive cento e quarenta anos e conhece os netos e os bisnetos.",
+    "refs": [
+      "Jó 1.1",
+      "Jó 42.16-17"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "No céu, o Senhor deixa Satanás tirar de Jó os bens, os filhos e a saúde, mas não a vida. Três amigos vêm consolar Jó. Na conversa, eles dizem que Jó sofre porque pecou. Jó jura que é inocente e pede que Deus responda. O Senhor responde do meio da tempestade.",
+    "refs": [
+      "Jó 1.12",
+      "Jó 2.6",
+      "Jó 22.5",
+      "Jó 31.35",
+      "Jó 40.6"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "O desafio no céu",
+      "sub": "Jó perde tudo e não peca",
+      "desenho": "manto-rasgado",
+      "galhos": [
+        {
+          "texto": "Jó tem sete filhos e três filhas e é o homem mais rico do Oriente. Quando os filhos terminam os dias de banquete, Jó levanta cedo e oferece um sacrifício por cada um. Ele pensa que algum deles pode ter amaldiçoado Deus no coração.",
+          "ref": "Jó 1.2-5"
+        },
+        {
+          "texto": "Satanás pergunta ao Senhor: “Será que Jó não tem razões para temer a Deus?” Para Satanás, Jó só obedece porque Deus pôs uma cerca em volta dele e de tudo o que ele tem. Se perder os bens, Jó vai se revoltar e amaldiçoar o Senhor.",
+          "ref": "Jó 1.9-11"
+        },
+        {
+          "texto": "Num dia de banquete, os empregados chegam correndo à casa de Jó, um atrás do outro. Cada um ainda está falando quando o seguinte chega. O último conta que uma ventania derrubou a casa do irmão mais velho, e todos os filhos de Jó morreram.",
+          "ref": "Jó 1.13-19"
+        },
+        {
+          "texto": "Jó rasga o manto e rapa a cabeça. Depois se ajoelha com o rosto no chão e diz: “O Senhor me deu, o Senhor tomou de volta; louvado seja o nome do Senhor”. Jó não peca nem culpa Deus de nada.",
+          "ref": "Jó 1.20-22"
+        },
+        {
+          "texto": "Satanás cobre o corpo de Jó de feridas, dos pés à cabeça. Jó se senta num monte de cinzas e coça as feridas com um caco de vidro. A mulher dele diz que o melhor é amaldiçoar Deus e morrer. Jó pergunta por que receber de Deus as coisas boas e não receber também o mal.",
+          "ref": "Jó 2.7-10"
+        },
+        {
+          "texto": "Elifaz, Bildade e Zofar vêm visitar o amigo. De longe, quase não reconhecem Jó. Os três rasgam as roupas e choram alto. Depois ficam sete dias e sete noites sentados com ele na cinza, sem dizer uma palavra.",
+          "ref": "Jó 2.11-13"
+        }
+      ],
+      "conexao": "Depois de sete dias de silêncio, Jó abre a boca e amaldiçoa o dia em que nasceu (Jó 3.1)."
+    },
+    {
+      "titulo": "Primeira rodada",
+      "sub": "Os amigos procuram um pecado",
+      "desenho": "tronco-que-brota",
+      "galhos": [
+        {
+          "texto": "Jó queria ter morrido ao nascer. Ele pergunta por que a mãe pegou ele no colo e deu de mamar. Se tivesse morrido naquele dia, estaria agora descansando em paz.",
+          "ref": "Jó 3.11-13"
+        },
+        {
+          "texto": "Elifaz fala primeiro. Ele pergunta se alguma vez Deus destruiu um inocente. Para Elifaz, quem planta maldade colhe a maldade que fez.",
+          "ref": "Jó 4.1, 7-8"
+        },
+        {
+          "texto": "Bildade pergunta se Deus torce a justiça. Ele diz que os filhos de Jó pecaram contra Deus e sofreram as consequências.",
+          "ref": "Jó 8.3-4"
+        },
+        {
+          "texto": "Zofar diz que Deus ainda está deixando de lado uma parte dos pecados de Jó. Se Jó largar o pecado, vai dormir em paz, e todo mundo vai querer ser amigo dele.",
+          "ref": "Jó 11.6, 14-19"
+        },
+        {
+          "texto": "Jó manda os amigos ficarem quietos, porque agora ele vai falar. Ele diz: “Deus pode me matar, mas mesmo assim esperarei nele”.",
+          "ref": "Jó 13.13, 15"
+        },
+        {
+          "texto": "Até uma árvore cortada tem esperança, porque brota de novo com a chuva. O homem dá o último suspiro e deixa de existir.",
+          "ref": "Jó 14.7-10"
+        }
+      ],
+      "conexao": "Jó pergunta se quem morre vai viver de novo (Jó 14.14). Elifaz chama a conversa dele de vento (Jó 15.2)."
+    },
+    {
+      "titulo": "Segunda rodada",
+      "sub": "Jó fala do Redentor que vive",
+      "desenho": "pedra-gravada",
+      "galhos": [
+        {
+          "texto": "Elifaz pergunta se Jó é o primeiro homem que nasceu na terra. Do lado dos amigos estão homens de cabelo branco, mais velhos que o pai de Jó.",
+          "ref": "Jó 15.7-10"
+        },
+        {
+          "texto": "Bildade avisa que a luz do perverso vai se apagar. Na tenda dele, tudo vai ficar escuro.",
+          "ref": "Jó 18.5-6"
+        },
+        {
+          "texto": "A mulher de Jó não chega perto dele por causa do hálito. Os irmãos e os amigos se afastaram, e até as crianças riem quando ele tenta se levantar. Jó diz que escapou só com a pele dos dentes.",
+          "ref": "Jó 19.13-20"
+        },
+        {
+          "texto": "Jó queria ver as palavras dele gravadas para sempre numa rocha. Ele diz: “Eu sei que o meu Redentor vive”. Jó tem certeza de que vai ver Deus face a face.",
+          "ref": "Jó 19.23-27"
+        },
+        {
+          "texto": "Zofar garante que a alegria dos maus dura só um momento. O perverso passa como um sonho e some como uma visão da noite.",
+          "ref": "Jó 20.5-8"
+        },
+        {
+          "texto": "Jó pergunta por que os perversos continuam vivos. Eles ficam velhos e ricos, veem os filhos formarem família e morrem tranquilos.",
+          "ref": "Jó 21.7-13"
+        }
+      ],
+      "conexao": "Jó chama o consolo dos amigos de pura falsidade (Jó 21.34). Elifaz responde pela terceira vez (Jó 22.1)."
+    },
+    {
+      "titulo": "Última rodada",
+      "sub": "Jó jura que é inocente",
+      "desenho": "balanca",
+      "galhos": [
+        {
+          "texto": "Elifaz chega a supor o que Jó fez de errado. Talvez tenha pegado a roupa do pobre como garantia, negado água ao viajante cansado e pão a quem tinha fome.",
+          "ref": "Jó 22.6-9"
+        },
+        {
+          "texto": "Jó queria saber onde encontrar Deus. Ele vai para o oriente e para o ocidente, procura no norte e no sul, e não acha. Mesmo assim, Jó diz que, quando Deus examinar a vida dele, vai ver que ele é puro como o ouro.",
+          "ref": "Jó 23.3, 8-10"
+        },
+        {
+          "texto": "Bildade pergunta como o homem pode ser justo diante de Deus. Para Deus, nem a lua tem brilho, e o homem não passa de um verme.",
+          "ref": "Jó 25.4-6"
+        },
+        {
+          "texto": "Jó fala dos homens que cavam minas no fundo da terra e acham prata, ouro e safiras. Só que ninguém descobre a sabedoria cavando. Deus sabe onde ela mora e diz: “O temor do Senhor é a sabedoria”.",
+          "ref": "Jó 28.1-6, 21, 23, 28"
+        },
+        {
+          "texto": "Com saudade, Jó lembra o tempo em que Deus era amigo dele. Naquele tempo, ele servia de vista para os cegos e de pés para os aleijados. Agora uns rapazes zombam dele com canções. Os pais deles não mereciam ficar nem ao lado dos cachorros que Jó punha para cuidar das ovelhas.",
+          "ref": "Jó 29–30"
+        },
+        {
+          "texto": "Jó pede que Deus pese a vida dele numa balança justa. Se ele mentiu ou enganou alguém, que outros comam o que ele plantou.",
+          "ref": "Jó 31.5-8"
+        }
+      ],
+      "conexao": "Jó termina a defesa (Jó 31.40), e os três amigos param de responder (Jó 32.1)."
+    },
+    {
+      "titulo": "O jovem Eliú",
+      "sub": "Um quarto homem pede a vez",
+      "desenho": "nuvem-e-raio",
+      "galhos": [
+        {
+          "texto": "Eliú fica irado com os três amigos, porque eles acusam Jó sem conseguir provar. Ele esperou calado a conversa inteira, porque era mais novo que todos.",
+          "ref": "Jó 32.3-5"
+        },
+        {
+          "texto": "Agora Eliú diz que as palavras dele são como vinho guardado numa bolsa de couro nova, quase estourando. Ele precisa falar para ter alívio.",
+          "ref": "Jó 32.18-20"
+        },
+        {
+          "texto": "Para Eliú, Deus fala com o homem em sonhos, de noite, enquanto ele dorme. Assim Deus tira o orgulho do homem e livra a vida dele da cova.",
+          "ref": "Jó 33.14-18"
+        },
+        {
+          "texto": "Eliú pergunta se Deus faria alguma coisa errada. Para ele, Deus dá a cada um o que os atos merecem.",
+          "ref": "Jó 34.10-12"
+        },
+        {
+          "texto": "Muita gente explorada grita por socorro, e ninguém procura o Criador, que dá canções durante a noite.",
+          "ref": "Jó 35.9-10"
+        },
+        {
+          "texto": "Eliú manda Jó escutar o trovão, que é a voz de Deus. O relâmpago ilumina a terra de uma ponta a outra, e Deus manda a neve cair.",
+          "ref": "Jó 37.2-6"
+        }
+      ],
+      "conexao": "Eliú acaba de falar, e o Senhor responde a Jó do meio da tempestade (Jó 38.1)."
+    },
+    {
+      "titulo": "Deus responde",
+      "sub": "O Senhor faz as perguntas",
+      "desenho": "redemoinho",
+      "galhos": [
+        {
+          "texto": "Deus pergunta onde Jó estava quando ele lançou os alicerces do mundo. Naquele dia, as primeiras estrelas cantavam, e os anjos vibravam de alegria.",
+          "ref": "Jó 38.4-7"
+        },
+        {
+          "texto": "O mar tem limite. Deus lembra que disse às ondas: “Até aqui você pode vir”.",
+          "ref": "Jó 38.8-11"
+        },
+        {
+          "texto": "A avestruz deixa os ovos na areia para o sol chocar e não cuida dos filhotes, porque Deus não deu sabedoria a ela. Na corrida, ela ri do cavalo e do cavaleiro.",
+          "ref": "Jó 39.13-18"
+        },
+        {
+          "texto": "Deus pergunta se Jó consegue prender o Leviatã com linha e anzol. O Leviatã solta chamas pela boca e fumaça pelas narinas, como uma panela fervendo.",
+          "ref": "Jó 41.1-2, 19-21"
+        },
+        {
+          "texto": "Jó diz ao Senhor: “Antes eu só o conhecia de ouvir falar, mas agora eu vejo o Senhor com meus próprios olhos”. Ele se arrepende de tudo o que disse.",
+          "ref": "Jó 42.5-6"
+        },
+        {
+          "texto": "O Senhor diz a Elifaz que ele e os dois amigos não falaram o que é certo sobre Deus, como Jó falou. Jó ora pelos amigos, e Deus dá a Jó o dobro do que ele tinha.",
+          "ref": "Jó 42.7-10"
+        }
+      ],
+      "jesus": {
+        "texto": "No barco, Jesus repreende o vento e manda o mar se calar. Tudo fica calmo, e os discípulos perguntam uns aos outros: “Quem é este, que até os ventos e as ondas lhe obedecem?”",
+        "refs": [
+          "Mc 4.38-41"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "Jó queria alguém que ficasse entre ele e Deus: “Mas não há um juiz capaz de decidir nossas questões com Deus e nos deixar em paz com ele.” No Novo Testamento, existe um só mediador entre Deus e os homens, o homem Cristo Jesus, que deu a vida em resgate por toda a humanidade (1Tm 2.5-6).",
+    "ref": "Jó 9.33",
+    "desenho": "cruz",
+    "pares": [
+      {
+        "at": "Jó 16.19",
+        "texto": "O meu advogado está nas alturas.",
+        "nt": "1Jo 2.1",
+        "nota": "Quem peca tem alguém que intercede por ele diante do Pai, e o nome dele é Jesus Cristo"
+      },
+      {
+        "at": "Jó 28.12",
+        "texto": "onde o homem poderá encontrar a sabedoria?",
+        "nt": "Cl 2.2-3",
+        "nota": "Todos os tesouros da sabedoria e do conhecimento estão escondidos em Cristo"
+      },
+      {
+        "at": "Jó 42.12",
+        "texto": "Assim, o Senhor abençoou Jó muito mais do que antes.",
+        "nt": "Tg 5.11",
+        "nota": "Quem ouviu falar da perseverança de Jó vê que o plano do Senhor terminou em bem, porque ele é cheio de ternura e de misericórdia"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Satanás põe Jó à prova", "de": 1, "ate": 2 },
+    { "titulo": "Primeira rodada da conversa", "de": 3, "ate": 14 },
+    { "titulo": "Segunda rodada da conversa", "de": 15, "ate": 21 },
+    { "titulo": "Última rodada e a defesa de Jó", "de": 22, "ate": 31 },
+    { "titulo": "Eliú pede a vez", "de": 32, "ate": 37 },
+    { "titulo": "O Senhor fala da tempestade", "de": 38, "ate": 42 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Elifaz conta que, certa noite, um espírito passou diante dele, e os pelos do corpo dele se arrepiaram. Ele não via a forma, só um vulto. No silêncio, ouviu uma voz abafada.",
+      "ref": "Jó 4.12-16"
+    },
+    {
+      "texto": "Jó compara os amigos aos riachos que descem a montanha. No inverno, eles correm cheios. No calor, secam, e as caravanas que vinham atrás de água ficam sem nada para beber.",
+      "ref": "Jó 6.15-20"
+    },
+    {
+      "texto": "Para Jó, Deus estende o céu do norte sobre o espaço vazio e faz a terra flutuar sobre o nada.",
+      "ref": "Jó 26.7"
+    },
+    {
+      "texto": "Quando o Senhor para de perguntar pela primeira vez, Jó só diz que é indigno e que já falou demais. Ele promete ficar calado.",
+      "ref": "Jó 40.4-5"
+    },
+    {
+      "texto": "Deus manda Jó olhar o Beemote, que come capim como o boi. Os ossos dele são duros como bronze, e a cauda balança como um cedro.",
+      "ref": "Jó 40.15-18"
+    },
+    {
+      "texto": "A primeira das novas filhas de Jó se chama Jemima. Elas são as mulheres mais bonitas daquela terra e ficam com uma parte da herança, como os irmãos.",
+      "ref": "Jó 42.14-15"
+    }
+  ],
+  "procure": {
+    "texto": "No céu, o Senhor chama Jó de “meu servo”. No fim, quando fala com Elifaz, o Senhor chama Jó assim mais quatro vezes.",
+    "ref": "Jó 1.8"
+  }
+}

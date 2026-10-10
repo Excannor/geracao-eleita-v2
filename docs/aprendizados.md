@@ -685,6 +685,13 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   com poucos versículos, a regra "cada referência uma vez" aperta, e a raiz, a conexão, a curiosidade e o "procure"
   disputam os mesmos versos: decidir a tabela antes de escrever, como em Levítico.
 
+- 2026-10-10 · conteúdo · Jó, o primeiro poético: sem enredo, os ramos seguem o diálogo (prólogo, as três rodadas
+  de conversa, Eliú, o Senhor na tempestade com o epílogo). Com 42 capítulos e seis galhos por ramo, cada rodada ficou
+  com um galho por fala e os capítulos que sobram (6, 26, 40) foram para as curiosidades. "Todo-poderoso" aparece a
+  toda hora e tem hífen: o mapa diz "Deus". O NT não cita as falas de Jó sobre o juiz, o advogado e a sabedoria; os pares
+  são ecos (1Tm 2.5-6, 1Jo 2.1, Cl 2.3), sem dizer que Jó profetizou, e o significado do nome fica no "lembra".
+  Na captura, um galho terminou com "Jó." sozinho na linha: nome de duas letras no fim do item também conta.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de

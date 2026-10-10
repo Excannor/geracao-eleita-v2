@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o trovão e o relâmpago de Eliú (Jó 37.2-4, 11): a nuvem carregada, o raio em sálvia saindo de baixo dela e os riscos de chuva dos dois lados. O raio vem antes no SVG, para a nuvem cobrir a ponta de cima. -->
+<path class="k s" d="M57 52L48 78H59L51 104L75 72H63L71 52Z"/>
+<path class="k p" d="M28 58C14 58 12 42 24 39C24 26 40 21 48 30C53 16 75 16 80 30C88 22 102 28 100 41C112 43 110 58 98 58Z"/>
+<path class="h" d="M40 33c4-3 9-3 12 0M70 30c3-2 7-2 9 1"/>
+<path class="h" d="M32 66l-4 10M42 68l-4 10M86 66l-4 10M96 66l-4 10M37 82l-3 8M91 82l-3 8"/>
+</svg>
