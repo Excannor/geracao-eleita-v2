@@ -1222,6 +1222,30 @@ secao('notificações: as frases');
     .map(([t, c]) => k + ': ' + encher(t).length + '/' + encher(c).length + ' ' + t));
   checar(!longos.length, 'título até 40 e corpo até 110 caracteres, com nome, leitura e tema dos mais compridos' + (longos.length ? ' (' + longos.join('; ') + ')' : ''));
 
+  // O pior caso de cada tipo: nomes de 30 caracteres (o usuário, quando a conta não tem nome),
+  // títulos no máximo (30 no propósito e na célula; o desafio em grupo mais longo), a leitura
+  // e o tema mais longos (do plano e do Conhecer Jesus). O corpo cabe nos 110 em toda frase.
+  {
+    const { DESAFIOS_GRUPO } = await import('./desafios-grupo.mjs');
+    const C = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
+    const leiturasConhecer = C.dias.map((_, i) => N.leituraDoConhecer(C, { conhecidos: Object.fromEntries(C.dias.slice(0, i).map((x) => [x.numero, '2026-01-01'])) }).leitura);
+    const n30 = 'Maximilianoooooooooooooooooooo';
+    const tituloDesafio = maior(Object.values(DESAFIOS_GRUPO).map((x) => x.titulo));
+    const PIOR = {
+      nome: n30, amigo: n30, outros: 99, titulo: 'T'.repeat(30), quem: 'a sua célula', nDias: '365 dias', marco: 365,
+      faltamTexto: 'duas leituras', filha: n30, novoLider: n30, leitura: maior([...leituras, ...leiturasConhecer]), tema: maior(temas),
+    };
+    const pior = (k, c) => c.replace(/\{(\w+)\}/g, (_, m) => String(k === 'desafioGrupo' && m === 'titulo' ? tituloDesafio : PIOR[m]));
+    const estouram = Object.entries(T).flatMap(([k, v]) => v.filter(([, c]) => pior(k, c).length > N.CORPO_MAX).map(([, c]) => k + ': ' + pior(k, c).length + ' ' + c));
+    checar(n30.length === 30 && !estouram.length, 'no pior caso de cada tipo (nomes de 30, títulos no máximo, leitura e tema longos), o corpo cabe em 110' + (estouram.length ? ' (' + estouram.join('; ') + ')' : ''));
+    // Pelo caminho de verdade: célula de nome longo, quem chamou com nome longo, o desafio mais longo.
+    const oitoDias = Array.from({ length: 8 }, (_, i) => somaDias('2026-03-01', i));
+    const desafios = oitoDias.map((dt) => N.montarMensagem('desafioGrupo', { amigo: n30, amigoUsuario: 'x', titulo: tituloDesafio, grupo: 'C'.repeat(30) }, { usuario: 'ana', data: dt }));
+    checar(desafios.every((m) => m.corpo.length <= N.CORPO_MAX), 'o convite de desafio da célula de nome longo cabe em 110 (' + Math.max(...desafios.map((m) => m.corpo.length)) + ')');
+    const curto = oitoDias.map((dt) => N.montarMensagem('desafioGrupo', { amigo: 'Ana', titulo: tituloDesafio, grupo: 'Célula de quinta' }, { usuario: 'ana', data: dt }));
+    checar(curto.every((m) => /Célula de quinta/.test(m.corpo)), 'com o nome da célula curto, o convite diz qual célula');
+  }
+
   // Tom: nada de culpa, ameaça, chantagem emocional ou pressão pela sequência.
   const PROIBIDAS = /perd[ae]|perdeu|perdid|vai acabar|acab(a|ou) hoje|decepcion|[úu]ltima chance|trist|abandon|falhou|falha\b|culpa|vergonha|deveria|obriga[çc]|esqueceu|n[ãa]o deixe|n[ãa]o quebr|quebr(a|ar)|meia-noite|ainda d[áa] tempo|urgente|em risco|apag|mant(er|[ée]m|enha)|sentimos sua falta|saudade|sumiu|sumid|chateado|desist|zer(a|ou|ar)\b|jornada|mergulh|desvend/i;
   const todas = Object.entries(T).flatMap(([k, v]) => v.map((par) => [k, par]));

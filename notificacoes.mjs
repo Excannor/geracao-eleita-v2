@@ -453,7 +453,7 @@ const T = {
     ['{amigo} te chamou pra um propósito', '{titulo}. Abre o app pra ver e aceitar.'],
     ['Convite de {amigo} 📬', 'Um propósito novo, “{titulo}”. Dá uma olhada no app.'],
     ['Bora nessa?', '{amigo} te convidou para “{titulo}”. Abre o app pra ver.'],
-    ['Propósito novo te esperando', '{amigo} quer você em “{titulo}”. Aceita se fizer sentido pra você.'],
+    ['Propósito novo te esperando', '{amigo} quer você em “{titulo}”. Aceita se fizer sentido.'],
   ],
   // Meta do grupo: depois das 18h, para quem ainda não leu, quando falta pouco. É convite,
   // nunca "o grupo depende de você".
@@ -543,12 +543,14 @@ const T = {
     ['Novo começo na célula', 'Você está em {filha}. {novoLider} vai liderar o grupo.'],
   ],
   // Desafio de consagração em grupo: um convite, sem cobrança. {quem} é "você" na dupla do
-  // discipulado ou "a célula X".
+  // discipulado ou "a célula X"; quando o nome da célula não cabe (corpo acima de 110
+  // caracteres), vira "a sua célula" (montarMensagem). As frases cabem com o nome de 30 de
+  // quem chamou, o título mais longo e "a sua célula".
   desafioGrupo: [
-    ['Desafio novo de {amigo}', '{amigo} chamou {quem} para “{titulo}”. Entre também na aba Desafios.'],
+    ['Desafio novo de {amigo}', '{amigo} chamou {quem} para “{titulo}”. Veja na aba Desafios.'],
     ['{amigo} lançou um desafio 🏁', '“{titulo}”, para {quem}. Topa? Está na aba Desafios.'],
-    ['Bora encarar um desafio?', 'É “{titulo}”, um convite de {amigo} para {quem}. Veja em Desafios.'],
-    ['Desafio em grupo chegando 💪', '{amigo} convidou {quem} para “{titulo}”. Entre se fizer sentido.'],
+    ['Bora encarar um desafio?', 'É “{titulo}”, convite de {amigo} para {quem}. Veja em Desafios.'],
+    ['Desafio em grupo chegando 💪', '{amigo} convidou {quem} para “{titulo}”. Veja se topa.'],
   ],
 };
 export const TEXTOS = T;
@@ -609,6 +611,8 @@ export function leituraDoConhecer(conhecer, estado = {}) {
   const ref = (t) => t.livro + ' ' + t.cap + '.' + t.de + (t.ate && t.ate !== t.de ? '-' + t.ate : '');
   return { leitura: (dia.trechos || []).map(ref).join(' · '), tema: '' };
 }
+// O corpo que o celular mostra sem cortar (teste.mjs confere o pior caso de cada tipo).
+export const CORPO_MAX = 110;
 const POR_EXTENSO = ['zero', 'uma', 'duas'];
 const preencher = (s, d) => s.replace(/\{(\w+)\}/g, (_, k) => (d[k] === undefined || d[k] === '' ? '' : String(d[k])))
   .replace(/\s+([!?.,])/g, '$1').replace(/,\s*!/g, '!').replace(/\s{2,}/g, ' ').trim();
@@ -681,7 +685,9 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   const lista = T[chave];
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = escolherFrase(chave, lista, d, usuario, data);
-  return { titulo: preencher(titulo, d), corpo: preencher(corpo, d), tag, url };
+  let pronto = preencher(corpo, d);
+  if (tipo === 'desafioGrupo' && dados.grupo && [...pronto].length > CORPO_MAX) pronto = preencher(corpo, { ...d, quem: 'a sua célula' });
+  return { titulo: preencher(titulo, d), corpo: pronto, tag, url };
 }
 
 // ---------------------------------------------------------------- aviso do administrador

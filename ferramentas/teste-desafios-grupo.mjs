@@ -101,7 +101,7 @@ try {
 
   await dormir(300);
   const caixaAna = await dados(await pedir('/api/avisos', null, ana.cookie));
-  ok((caixaAna.avisos || []).some((a) => a.tipo === 'desafioGrupo' && /7 dias sem celular na cama/.test(a.corpo) && /célula de quinta/i.test(a.titulo)), 'o convite chega na caixa do sino de quem é da célula');
+  ok((caixaAna.avisos || []).some((a) => a.tipo === 'desafioGrupo' && /7 dias sem celular na cama/.test(a.corpo) && /célula de quinta/i.test(a.corpo)), 'o convite chega na caixa do sino de quem é da célula');
 
   // Ana entra e vence hoje; Bia tinha dias antigos, de antes do grupo, que não contam
   await pedir('/api/estado', { atualizadoEm: Date.now(), desafios: { 'celular-cama-7': { inicio: HOJE, dias: [HOJE], ativo: true, concluidoEm: '', em: Date.now() } } }, ana.cookie);
