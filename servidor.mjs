@@ -1069,6 +1069,10 @@ async function despacharAviso(eu, { titulo, corpo, destino, publico, idFoto }, a
   const url = DESTINOS_AVISO[destino];
   const dia = hojeNoFuso((CONTAS.achar(eu) || {}).fuso, agora);
   const usuarios = destinatariosDoAviso(eu, publico);
+  // O registro (que segura o teto de um aviso para todos por dia) vem antes do primeiro
+  // await: entre o teste do teto em enviarAvisoAdmin e esta linha nada espera, então um
+  // segundo envio simultâneo já encontra este anotado.
+  NOTIFICACOES.anotarAvisoAdmin({ id, de: eu, publico, titulo, corpo, url, foto: idFoto, pessoas: usuarios.length, dia, em: agora.getTime() });
   await NOTIFICACOES.guardarNaCaixaDeVarios(usuarios, 'aviso', { titulo, corpo, url, foto: idFoto }, agora.getTime());
   // O push leva a foto num endereço relativo ao app (o service worker resolve): o Android a
   // mostra grande; o iPhone ignora.
@@ -1079,7 +1083,6 @@ async function despacharAviso(eu, { titulo, corpo, destino, publico, idFoto }, a
     (emSilencio(minutosNoFuso((CONTAS.achar(u) || {}).fuso, agora)) ? depois : agoraVai).push(u);
   }
   if (depois.length) await NOTIFICACOES.adiarPush(depois, mensagem, agora.getTime());
-  NOTIFICACOES.anotarAvisoAdmin({ id, de: eu, publico, titulo, corpo, url, foto: idFoto, pessoas: usuarios.length, dia, em: agora.getTime() });
   console.log('  painel: @' + eu + ' mandou um aviso para ' + (publico === 'todos' ? usuarios.length + ' contas' : 'si') + ' em ' + new Date().toISOString());
   const mandar = async () => { let n = 0; for (const u of agoraVai) n += (await enviarPara(u, mensagem, { semCaixa: true, ttl: 12 * 3600 })) ? 1 : 0; return n; };
   return { id, pessoas: usuarios.length, push: agoraVai.length, adiados: depois.length, foto: idFoto, mandar };
@@ -1148,10 +1151,15 @@ async function enviarAvisoAdmin(eu, pedido) {
     console.log('  painel: @' + eu + ' agendou um aviso para ' + pedido.quando + ' em ' + new Date().toISOString());
     return { agendado: { id, quando: String(pedido.quando) }, foto: idFoto };
   }
+  // Enviar agora conta também o agendado para todos que ainda vai sair hoje: sem isso, o
+  // de hoje saía e o agendado saía depois, dois no dia sem ninguém confirmar.
   const dia = hojeNoFuso(fuso, agora);
-  if (v.publico === 'todos' && NOTIFICACOES.avisosParaTodosNoDia(dia) >= 1 && pedido.denovo !== true) {
-    throw erroAviso('já saiu um aviso para todos hoje', 409, { precisaConfirmar: true });
+  if (v.publico === 'todos' && pedido.denovo !== true) {
+    if (NOTIFICACOES.avisosParaTodosNoDia(dia) >= 1) throw erroAviso('já saiu um aviso para todos hoje', 409, { precisaConfirmar: true });
+    if (NOTIFICACOES.agendadosParaTodosNoDia(dia) >= 1) throw erroAviso('já tem um aviso para todos agendado hoje', 409, { precisaConfirmar: true });
   }
+  // Daqui até o registro em avisos_admin (em despacharAviso, antes do primeiro await) nada
+  // espera: dois envios para todos ao mesmo tempo não passam juntos pelo teste acima.
   const idFoto = v.foto ? NOTIFICACOES.guardarFoto(v.foto.bruto, v.foto.tipo, agora.getTime()) : '';
   const r = await despacharAviso(eu, { ...v, idFoto }, agora);
   // Para todos, o envio segue depois da resposta; só para mim, a resposta diz se chegou.
@@ -1175,11 +1183,13 @@ async function dispararAgendados(agora) {
         NOTIFICACOES.fecharAgendado(a.id, 'recusado', { motivo: 'quem agendou não é mais administrador' });
         continue;
       }
-      const dia = hojeNoFuso((CONTAS.achar(a.de) || {}).fuso, agora);
-      if (a.publico === 'todos' && !a.denovo && NOTIFICACOES.avisosParaTodosNoDia(dia) >= 1) {
-        NOTIFICACOES.fecharAgendado(a.id, 'recusado', { motivo: 'já tinha saído um aviso para todos nesse dia' });
-        continue;
-      }
+      // O teto de um aviso para todos por dia não é conferido de novo aqui. Ele já foi
+      // conferido quando este foi agendado (contando os enviados e os agendados do dia) e é
+      // conferido em todo envio "agora" e todo agendamento feito depois (que contam este, que
+      // está na fila). Qualquer outro aviso para todos do mesmo dia, então, ou nasceu antes
+      // deste (e este é que pediu confirmação) ou depois, com o administrador confirmando
+      // sabendo deste. Conferir de novo na hora recusava justo o que ele tinha confirmado
+      // (B agendado para as 18h, A agendado para as 10h com o 409 confirmado: B era recusado).
       const r = await despacharAviso(a.de, { titulo: a.titulo, corpo: a.corpo, destino: a.destino, publico: a.publico, idFoto: a.foto }, agora);
       NOTIFICACOES.fecharAgendado(a.id, 'enviado', { enviadoEm: agora.getTime(), pessoas: r.pessoas });
       await r.mandar();

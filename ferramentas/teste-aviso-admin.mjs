@@ -53,9 +53,10 @@ await new Promise((r) => push.listen(PORTA_PUSH, '127.0.0.1', r));
 // Sobe o servidor (e sobe de novo, no teste do reinício, com a mesma pasta de dados).
 const base = 'http://127.0.0.1:' + PORTA;
 let servidor = null;
+let relogio = emSP('12:00');
 async function subir() {
   servidor = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
-    env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_PUSH_TESTE: '1', CAMINHO_RELOGIO: emSP('12:00'), CAMINHO_ABERTO: '', CAMINHO_ADMIN: 'chefe' },
+    env: { ...process.env, CAMINHO_ESTADO: join(PASTA, 'estado.json'), CAMINHO_PUSH_TESTE: '1', CAMINHO_RELOGIO: relogio, CAMINHO_ABERTO: '', CAMINHO_ADMIN: 'chefe' },
     stdio: ['ignore', 'ignore', 'inherit'],
   });
   for (let i = 0; i < 80; i++) { try { await fetch(base + '/api/existe-conta'); break; } catch { await dormir(150); } }
@@ -493,6 +494,45 @@ ok((await agendadosDe()).agendadosAntes.some((x) => x.titulo === 'Perdido' && x.
 await rodada(diaMais(3), '10:00');
 await dormir(300);
 ok(pushDoChefe('Ensaio do louvor').length === 0, 'o cancelado não sai na hora dele');
+
+// ---------- o teto de um aviso para todos por dia, sem furos ----------
+console.log('\n  Um aviso para todos por dia\n');
+const D5 = diaMais(5);
+const D6 = diaMais(6);
+const D7 = diaMais(7);
+const D8 = diaMais(8);
+const estadoDe = async (titulo) => ((await agendadosDe()).agendadosAntes.find((x) => x.titulo === titulo) || {}).estado;
+relogio = emDia(D5, '09:00');
+await derrubar();
+await subir();
+// Dois "Todos" ao mesmo tempo num dia sem nenhum: só um passa sem confirmar.
+const juntos = await Promise.all(['Junto 1', 'Junto 2'].map((titulo) => pedirJson('/api/painel/aviso', { titulo, publico: 'todos' }, chefe)));
+ok(juntos.filter((r) => r.status === 200).length === 1 && juntos.filter((r) => r.status === 409).length === 1,
+  'dois envios para todos ao mesmo tempo: um sai, o outro pede confirmar (' + juntos.map((r) => r.status).join(', ') + ')');
+
+// B agendado para as 18h; depois A para as 10h do mesmo dia, com o 409 confirmado: os dois saem.
+ok((await agendar({ titulo: 'B das 18h', publico: 'todos', quando: D6 + 'T18:00' })).status === 200, 'B, para todos, agendado para as 18h');
+const aSemConfirmar = await agendar({ titulo: 'A das 10h', publico: 'todos', quando: D6 + 'T10:00' });
+ok(aSemConfirmar.status === 409, 'A, para as 10h do mesmo dia, pede confirmar');
+ok((await agendar({ titulo: 'A das 10h', publico: 'todos', quando: D6 + 'T10:00', denovo: true })).status === 200, 'A confirmado');
+await rodada(D6, '10:00');
+ok((await esperarTitulo(cel.ana, 'A das 10h')).length === 1, 'A sai às 10h');
+await rodada(D6, '18:00');
+ok((await esperarTitulo(cel.ana, 'B das 18h')).length === 1, 'e B também sai às 18h (o teto não é refeito contra o que o administrador confirmou)');
+for (let t = 0; t < 3000 && (await estadoDe('B das 18h')) !== 'enviado'; t += 100) await dormir(100);
+ok((await estadoDe('B das 18h')) === 'enviado', 'B aparece como enviado');
+
+// "Enviar agora" num dia que já tem um agendado para todos: pede confirmar; confirmado, os dois saem.
+relogio = emDia(D7, '09:00');
+await derrubar();
+await subir();
+ok((await agendar({ titulo: 'Agendado do dia', publico: 'todos', quando: D7 + 'T18:00' })).status === 200, 'um para todos agendado para hoje às 18h');
+const agoraSemConfirmar = await pedirJson('/api/painel/aviso', { titulo: 'Agora do dia', publico: 'todos' }, chefe);
+ok(agoraSemConfirmar.status === 409 && agoraSemConfirmar.precisaConfirmar && /agendado hoje/.test(agoraSemConfirmar.erro || ''),
+  '"enviar agora" para todos conta o agendado de hoje e pede confirmar (' + agoraSemConfirmar.status + ', ' + agoraSemConfirmar.erro + ')');
+ok((await pedirJson('/api/painel/aviso', { titulo: 'Agora do dia', publico: 'todos', denovo: true }, chefe)).status === 200, 'confirmado, sai agora');
+await rodada(D7, '18:00');
+ok((await esperarTitulo(cel.ana, 'Agendado do dia')).length === 1, 'e o agendado também sai na hora dele');
 
 encerrar();
 try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
