@@ -7,12 +7,40 @@
   const dataBr = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
   // Data digitada (dd/mm/aaaa) no lugar do calendário do aparelho, que no Android obriga a
   // voltar ano por ano. As barras entram sozinhas; dataIso devolve '' se a data não existe.
+  // A data vai em campos (dia, mês, ano): a barra, o traço ou o ponto digitado fecha o campo,
+  // e dia ou mês de um dígito ganham o zero ("1/3/2000" vira 01/03/2000). Sem separador, o
+  // campo fecha ao completar. (O mesmo em src/entrar.html.)
   const mascaraData = (v) => {
     if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
-    const n = v.replace(/\D/g, '').slice(0, 8);
-    return n.slice(0, 2) + (n.length > 2 ? '/' + n.slice(2, 4) : '') + (n.length > 4 ? '/' + n.slice(4) : '');
+    const campos = [];
+    const limites = [2, 2, 4];
+    let atual = '';
+    let barraNoFim = false;
+    for (const c of v) {
+      if (campos.length >= 3) break;
+      if (c >= '0' && c <= '9') {
+        atual += c;
+        barraNoFim = false;
+        if (atual.length === limites[campos.length]) { campos.push(atual); atual = ''; }
+      } else if (/[/.\-\s]/.test(c)) {
+        if (atual) { campos.push(campos.length < 2 ? atual.padStart(2, '0') : atual); atual = ''; }
+        barraNoFim = true;
+      }
+    }
+    if (atual && campos.length < 3) campos.push(atual);
+    return campos.join('/') + (barraNoFim && campos.length && campos.length < 3 ? '/' : '');
   };
-  const dataIso = (v) => {
+  // Remascara só com o cursor no fim; editando no meio, o texto e o cursor ficam como estão e
+  // a máscara volta ao sair do campo (antes, apagar o 5 de 15/03/2000 dava 10/32/000).
+  const mascararCampo = (campo, sempre) => {
+    const v = campo.value;
+    const fim = campo.selectionStart === null || (campo.selectionStart === v.length && campo.selectionEnd === v.length);
+    if (!sempre && !fim) return;
+    const novo = mascaraData(v);
+    if (novo !== v) campo.value = novo;
+  };
+  const dataIso = (bruto) => {
+    const v = mascaraData(String(bruto || '').trim());
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v) || /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
     if (!m) return '';
     const iso = m[1].length === 4 ? m[1] + '-' + m[2] + '-' + m[3] : m[3] + '-' + m[2] + '-' + m[1];
@@ -212,7 +240,10 @@
           const recado = folha.querySelector('#recado');
           const botao = folha.querySelector('[data-salvar]');
           const nasc = folha.querySelector('#cad-nasc');
-          if (nasc) nasc.oninput = () => { const v = mascaraData(nasc.value); if (v !== nasc.value) nasc.value = v; };
+          if (nasc) {
+            nasc.oninput = () => mascararCampo(nasc, false);
+            nasc.onchange = () => mascararCampo(nasc, true);
+          }
           folha.querySelector('[data-depois]').onclick = () => { fechar(); resolver(false); };
           botao.onclick = async () => {
             recado.textContent = '';

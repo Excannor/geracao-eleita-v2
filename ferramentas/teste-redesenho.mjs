@@ -93,6 +93,46 @@ const existe = (sel) => '!!' + q(sel);
 const clicar = (sel) => av('(() => { const el = ' + q(sel) + '; if (el) el.click(); return !!el; })()');
 const preencher = (sel, valor) => av('(() => { const el = ' + q(sel) + '; el.value = '
   + JSON.stringify(valor) + '; el.dispatchEvent(new Event("input", { bubbles: true })); return true; })()');
+// Digita de verdade, como no teclado: o cursor em pos (-1 é o fim), Backspace n vezes e o
+// texto, uma tecla por vez. Devolve o valor e a posição do cursor.
+const teclar = async (sel, { pos = -1, apagar = 0, texto = '' } = {}) => {
+  await av('(() => { const el = ' + q(sel) + '; el.focus(); const p = ' + pos + ' < 0 ? el.value.length : ' + pos + '; el.setSelectionRange(p, p); return 1; })()');
+  for (let i = 0; i < apagar; i++) {
+    await cmd('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'Backspace', code: 'Backspace', windowsVirtualKeyCode: 8 });
+    await cmd('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Backspace', code: 'Backspace', windowsVirtualKeyCode: 8 });
+  }
+  for (const ch of texto) await cmd('Input.insertText', { text: ch });
+  return av('(() => { const el = ' + q(sel) + '; return el.value + "|" + el.selectionStart; })()');
+};
+const sair = (sel) => av('(() => { const el = ' + q(sel) + '; el.blur(); el.dispatchEvent(new Event("change", { bubbles: true })); return el.value; })()');
+// A máscara da data de nascimento, tecla a tecla (entrar.html e a folha de completar cadastro).
+async function conferirMascara(sel, onde) {
+  const valor = () => av(q(sel) + '.value');
+  await preencher(sel, '15/03/2000');
+  let r = await teclar(sel, { pos: 2, apagar: 1 });
+  ok(r === '1/03/2000|1', onde + ': apagar o 5 de 15/03/2000 deixa 1/03/2000, com o cursor no lugar (' + r + ')');
+  r = await teclar(sel, { pos: 1, texto: '0' });
+  ok(r === '10/03/2000|2', onde + ': e digitar 0 ali dá 10/03/2000, não 10/32/000 (' + r + ')');
+  await preencher(sel, '15/03/2000');
+  r = await teclar(sel, { pos: 2, apagar: 1 });
+  const saiu = await sair(sel);
+  ok(r === '1/03/2000|1' && saiu === '01/03/2000', onde + ': editado no meio, a máscara volta ao sair do campo (' + saiu + ')');
+  await preencher(sel, '');
+  r = await teclar(sel, { texto: '1/3/2000' });
+  ok(r === '01/03/2000|10', onde + ': "1/3/2000" digitado vira 01/03/2000 (' + r + ')');
+  await preencher(sel, '');
+  r = await teclar(sel, { texto: '29022000' });
+  ok(r === '29/02/2000|10', onde + ': só números, as barras entram sozinhas (' + r + ')');
+  const r4 = await teclar(sel, { apagar: 4 });
+  const r5 = await teclar(sel, { apagar: 1 });
+  ok(r4 === '29/02/|6' && r5 === '29/02|5', onde + ': o backspace no fim apaga normalmente (' + r4 + ', ' + r5 + ')');
+  await preencher(sel, '15-03-2000');
+  ok(await valor() === '15/03/2000', onde + ': colar com traço vira 15/03/2000');
+  await preencher(sel, '15.03.2000');
+  ok(await valor() === '15/03/2000', onde + ': colar com ponto também');
+  await preencher(sel, '2000-03-15');
+  ok(await valor() === '2000-03-15', onde + ': o aaaa-mm-dd do preenchimento automático fica como veio');
+}
 const irPara = (hash) => av('location.hash = ' + JSON.stringify(hash));
 
 mkdirSync(join(AQUI, 'capturas'), { recursive: true });
@@ -132,6 +172,9 @@ await preencher('#nome', 'Ana');
 await preencher('#nascimento', '06052004');
 ok(await av(q('#nascimento') + '.type') === 'text' && await av(q('#nascimento') + '.value') === '06/05/2004',
   'a data de nascimento é digitada (sem o calendário do Android) e as barras entram sozinhas');
+await conferirMascara('#nascimento', 'cadastro');
+await preencher('#nascimento', '');
+await teclar('#nascimento', { texto: '6/5/2004' });
 await clicar('#botao-cadastro');
 ok(await esperar('!' + q('[data-passo="2"]') + '.hidden'), 'nome e data de nascimento levam ao e-mail');
 await preencher('#email', 'ana@teste.com');
@@ -428,7 +471,9 @@ await clicar('.cortina [data-concordar]');
 ok(await esperar(existe('.cortina #cad-email'), 12000), 'depois de concordar, a conta antiga é convidada a completar o cadastro');
 await foto('9-completar-cadastro');
 await preencher('#cad-email', 'velho@teste.com');
-await preencher('#cad-nasc', '09091999');
+await conferirMascara('#cad-nasc', 'completar cadastro');
+await preencher('#cad-nasc', '');
+await teclar('#cad-nasc', { texto: '9/9/1999' });
 await clicar('.cortina [data-salvar]');
 ok(await esperar('CC.quem && CC.quem.perfilCompleto === true'), 'completar o cadastro libera os amigos');
 const { DatabaseSync } = await import(pathToFileURL(join(AQUI, 'db.mjs')).href);

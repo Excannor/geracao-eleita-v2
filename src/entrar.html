@@ -914,23 +914,47 @@
   }
   // Data de nascimento digitada (dd/mm/aaaa) em vez do calendário do aparelho: no Android ele
   // obriga a voltar ano por ano. As barras entram sozinhas; datas já no formato aaaa-mm-dd
-  // (preenchimento automático) ficam como vieram.
+  // (preenchimento automático) ficam como vieram. A data vai em campos (dia, mês, ano): a
+  // barra, o traço ou o ponto que a pessoa digita fecha o campo, e dia ou mês de um dígito
+  // ganham o zero ("1/3/2000" vira 01/03/2000). Sem separador, o campo fecha ao completar.
+  // (O mesmo em src/app/07b-conta.js.)
   function mascaraData(v) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
-    var n = v.replace(/\D/g, '').slice(0, 8);
-    return n.slice(0, 2) + (n.length > 2 ? '/' + n.slice(2, 4) : '') + (n.length > 4 ? '/' + n.slice(4) : '');
+    var campos = [], atual = '', limites = [2, 2, 4], barraNoFim = false;
+    for (var i = 0; i < v.length && campos.length < 3; i++) {
+      var c = v.charAt(i);
+      if (c >= '0' && c <= '9') {
+        atual += c;
+        barraNoFim = false;
+        if (atual.length === limites[campos.length]) { campos.push(atual); atual = ''; }
+      } else if (/[\/.\-\s]/.test(c)) {
+        if (atual) { campos.push(campos.length < 2 ? ('0' + atual).slice(-2) : atual); atual = ''; }
+        barraNoFim = true;
+      }
+    }
+    if (atual && campos.length < 3) campos.push(atual);
+    return campos.join('/') + (barraNoFim && campos.length && campos.length < 3 ? '/' : '');
+  }
+  // Remascara só com o cursor no fim (digitando, colando, apagando do fim). Editando no meio
+  // ("15/03/2000", apagar o 5 e digitar 0), o texto fica como está, o cursor não sai do
+  // lugar e a máscara volta ao sair do campo; antes, as barras eram refeitas e a data andava
+  // ("10/32/000").
+  function mascararCampo(campo, sempre) {
+    var v = campo.value, fim = campo.selectionStart === null || (campo.selectionStart === v.length && campo.selectionEnd === v.length);
+    if (!sempre && !fim) return;
+    var novo = mascaraData(v);
+    if (novo !== v) campo.value = novo;
   }
   function dataIso(v) {
+    v = mascaraData(String(v || '').trim());
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v) || /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
     if (!m) return '';
     var iso = m[1].length === 4 ? m[1] + '-' + m[2] + '-' + m[3] : m[3] + '-' + m[2] + '-' + m[1];
     var d = new Date(iso + 'T12:00:00Z');
     return !isNaN(d) && d.toISOString().slice(0, 10) === iso && iso >= '1900-01-01' ? iso : '';
   }
-  $('nascimento').addEventListener('input', function () {
-    var campo = $('nascimento'), novo = mascaraData(campo.value);
-    if (novo !== campo.value) campo.value = novo;
-  });
+  $('nascimento').addEventListener('input', function () { mascararCampo($('nascimento'), false); });
+  $('nascimento').addEventListener('change', function () { mascararCampo($('nascimento'), true); });
   function validar(n) {
     document.querySelectorAll('#form-cadastro input').forEach(function (i) { i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); });
     if (n === 1) {
