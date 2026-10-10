@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a prisão (Mt 18.30): uma parede de pedras em fiadas desencontradas, com uma janela pequena e escura no meio, fechada por grades de ferro, três barras em pé e uma deitada, e o peitoril de pedra embaixo. Sem área sálvia. -->
+<path class="k" d="M10 104H110"/>
+<path class="k p" d="M22 104V20H98V104Z"/>
+<path class="h" d="M22 36.8H98M22 53.6H98M22 70.4H98M22 87.2H98M47.3 20V36.8M72.7 20V36.8M34.7 36.8V53.6M60 36.8V53.6M85.3 36.8V53.6M47.3 53.6V70.4M72.7 53.6V70.4M34.7 70.4V87.2M60 70.4V87.2M85.3 70.4V87.2M47.3 87.2V104M72.7 87.2V104"/>
+<path class="k e" d="M44 42h32v30h-32Z"/>
+<path class="k p" d="M41 72h38v4h-38Z"/>
+<path class="p" d="M44 55h32v4h-32ZM50 42h4v30h-4ZM58 42h4v30h-4ZM66 42h4v30h-4Z"/>
+</svg>

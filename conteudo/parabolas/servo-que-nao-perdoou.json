@@ -1,0 +1,107 @@
+{
+  "titulo": "O servo que não perdoou",
+  "ref": "Mt 18.21-35",
+  "grupo": "mateus",
+  "linha": "O rei perdoa muita prata, e o servo cobra cem denários",
+  "desenho": "saco-e-prisao",
+  "desenhoLista": "janela-da-prisao",
+  "secoes": [
+    {
+      "titulo": "Onde Jesus está",
+      "icone": "alfinete",
+      "blocos": [
+        {
+          "texto": "Jesus está ensinando os discípulos sobre o irmão que peca contra a gente. Primeiro, a gente vai e conversa com ele a sós, para ganhar o irmão de volta.",
+          "ref": "Mt 18.15-17"
+        },
+        {
+          "texto": "Pedro chega perto de Jesus com uma pergunta.",
+          "ref": "Mt 18.21"
+        },
+        {
+          "fala": "Senhor, quantas vezes eu devo perdoar um irmão que peca contra mim? Sete vezes?",
+          "ref": "Mt 18.21"
+        },
+        {
+          "texto": "Jesus responde que Pedro deve perdoar até setenta vezes sete. Depois, ele conta esta história.",
+          "ref": "Mt 18.22-23"
+        }
+      ]
+    },
+    {
+      "titulo": "A história",
+      "icone": "moeda",
+      "blocos": [
+        {
+          "texto": "Um rei resolve acertar as contas com os servos. Um deles deve muita prata ao rei e não tem como pagar. O rei manda vender o servo com a família e tudo o que ele tem.",
+          "ref": "Mt 18.23-25"
+        },
+        {
+          "texto": "O servo se joga com o rosto no chão e pede paciência. O rei tem pena dele, solta o servo e perdoa a dívida.",
+          "ref": "Mt 18.26-27"
+        },
+        {
+          "texto": "Na saída, esse servo encontra um companheiro que deve a ele cem denários. Ele agarra o companheiro pela garganta e cobra o dinheiro na hora.",
+          "ref": "Mt 18.28"
+        },
+        {
+          "texto": "O companheiro se joga no chão e pede um pouco mais de tempo. O servo não quer esperar.",
+          "ref": "Mt 18.29-30"
+        },
+        {
+          "itens": [
+            {
+              "desenho": "saco-de-prata",
+              "titulo": "Muita prata",
+              "fala": "Ó senhor, tenha paciência comigo, e eu pagarei tudo",
+              "ref": "Mt 18.26"
+            },
+            {
+              "desenho": "duas-moedinhas",
+              "titulo": "Cem denários",
+              "fala": "Tenha paciência que eu lhe pagarei",
+              "ref": "Mt 18.29"
+            },
+            {
+              "desenho": "janela-da-prisao",
+              "titulo": "A prisão",
+              "fala": "Mandou prender e encarcerar o homem",
+              "ref": "Mt 18.30"
+            }
+          ]
+        },
+        {
+          "texto": "Os amigos do companheiro ficam tristes e vão contar tudo ao rei.",
+          "ref": "Mt 18.31"
+        }
+      ]
+    },
+    {
+      "titulo": "O rei chama o servo",
+      "icone": "pessoas",
+      "blocos": [
+        {
+          "texto": "O rei chama o servo e diz que perdoou aquela dívida toda só porque ele pediu.",
+          "ref": "Mt 18.32"
+        },
+        {
+          "fala": "Você não devia ter misericórdia do seu companheiro, do mesmo modo como eu tive de você?",
+          "ref": "Mt 18.33"
+        },
+        {
+          "texto": "O rei fica irado e manda castigar o servo até ele pagar o último centavo.",
+          "ref": "Mt 18.34"
+        }
+      ]
+    }
+  ],
+  "dizendo": {
+    "texto": "A dívida do servo com o rei é tão grande que ele não tem como pagar, e o rei perdoa tudo. Os cem denários do companheiro são pouca coisa perto disso. Quem foi perdoado de tanto por Deus perdoa o irmão.",
+    "apoio": "Jesus termina a história assim. “Assim meu Pai celeste fará com vocês, se cada um de vocês se recusar a perdoar verdadeiramente a seu irmão”.",
+    "ref": "Mt 18.32-35"
+  },
+  "perguntas": [
+    "Quem você ainda está cobrando, mesmo depois de tudo o que Deus já perdoou a você?",
+    "Que dívida de alguém com você está na hora de perdoar?"
+  ]
+}

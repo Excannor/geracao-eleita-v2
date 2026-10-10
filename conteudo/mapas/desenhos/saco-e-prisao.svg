@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 124">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o servo que não perdoou (Mt 18.23-30): à esquerda, o saco enorme de prata, a dívida que o rei perdoa, com a nota da dívida rasgada em dois no alto; à direita, a parede de pedra da prisão, com a janela escura e as grades, e no chão, na frente dela, uma pilha pequena de moedas, os cem denários do companheiro. Mais largo que os outros desenhos (160 por 124): é o desenho do alto da página da parábola. O saco é a única área sálvia. -->
+<path class="k" d="M4 106H156"/>
+<path class="k s" d="M10 106C2 80 22 58 40 54L34 42H62L56 54C74 58 94 80 86 106Z"/>
+<path class="k" d="M34 50H62"/>
+<path class="h" d="M22 76C26 70 32 66 38 64M18 90C20 84 24 80 28 78M70 82C72 88 72 94 70 100"/>
+<path class="k p" d="M30 10H46L43 18L47 24L44 32H30Z"/>
+<path class="k p" d="M52 8H68V30H52L55 23L51 16Z"/>
+<path class="h" d="M34 16H40M34 22H41M34 27H39M57 14H64M56 20H64M57 25H63"/>
+<path class="k p" d="M108 106V34H154V106Z"/>
+<path class="h" d="M108 48.4H154M108 62.8H154M108 77.2H154M108 91.6H154M123.3 34V48.4M138.7 34V48.4M115.7 48.4V62.8M131 48.4V62.8M146.3 48.4V62.8M123.3 62.8V77.2M138.7 62.8V77.2M115.7 77.2V91.6M131 77.2V91.6M146.3 77.2V91.6M123.3 91.6V106M138.7 91.6V106"/>
+<path class="k e" d="M120 50h22v22h-22Z"/>
+<path class="k p" d="M117 72h28v4h-28Z"/>
+<path class="p" d="M120 59.5h22v3h-22ZM124 50h3v22h-3ZM129.5 50h3v22h-3ZM135 50h3v22h-3Z"/>
+<ellipse class="k p" cx="96" cy="104" rx="6" ry="2.4"/>
+<path class="k p" d="M90 100V104C90 105.6 102 105.6 102 104V100"/>
+<ellipse class="k p" cx="96" cy="100" rx="6" ry="2.4"/>
+</svg>
