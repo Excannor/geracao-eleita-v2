@@ -390,6 +390,20 @@ ok((await pedirJson('/api/painel/aviso/cancelar', { id: 'x' }, ana)).status === 
 ok((await agendar({ titulo: 'Atrasado', quando: hojeSP + 'T11:00' })).status === 400, 'data no passado (11h, com o relógio ao meio-dia) é recusada');
 ok((await agendar({ titulo: 'Longe', quando: diaMais(31) + 'T10:00' })).status === 400, 'mais de 30 dias à frente é recusado');
 ok((await agendar({ titulo: 'Torto', quando: '2026-02-31T10:00' })).status === 400, 'dia que não existe é recusado');
+// O Date.UTC aceitava o excesso em silêncio ("dia 32" virava o dia 1 do mês seguinte, "34h"
+// virava 10h do dia seguinte) e o teto do dia era conferido no dia errado.
+{
+  const [ano, mes] = hojeSP.split('-').map(Number);
+  const ultimo = new Date(Date.UTC(ano, mes, 0)).getUTCDate();
+  const diaDemais = await agendar({ titulo: 'Torto', quando: hojeSP.slice(0, 8) + String(ultimo + 1) + 'T10:00' });
+  ok(diaDemais.status === 400 && /não existe/.test(diaDemais.erro || ''), 'dia além do último do mês é recusado com o motivo (' + diaDemais.status + ', ' + diaDemais.erro + ')');
+  const horaDemais = await agendar({ titulo: 'Torto', quando: diaMais(1) + 'T34:00' });
+  ok(horaDemais.status === 400 && /hora/.test(horaDemais.erro || ''), 'hora 34 é recusada (' + horaDemais.status + ', ' + horaDemais.erro + ')');
+  const minutoDemais = await agendar({ titulo: 'Torto', quando: diaMais(1) + 'T10:75' });
+  ok(minutoDemais.status === 400 && /minutos/.test(minutoDemais.erro || ''), 'minuto 75 é recusado (' + minutoDemais.status + ')');
+  const mesDemais = await agendar({ titulo: 'Torto', quando: ano + '-13-01T10:00' });
+  ok(mesDemais.status === 400 && /mês/.test(mesDemais.erro || ''), 'mês 13 é recusado (' + mesDemais.status + ')');
+}
 
 const fotoA = (CHROME && existsSync(CHROME) ? bytes : jpegMinimo).toString('base64');
 const a = await agendar({ titulo: 'Aviso das 15h', texto: 'Agendado.', destino: 'biblia', quando: hojeSP + 'T15:00', foto: fotoA });

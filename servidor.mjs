@@ -1094,9 +1094,23 @@ const paredeEm = (t, fuso) => {
   }).formatToParts(new Date(t)).map((x) => [x.type, x.value]));
   return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
 };
-function instanteNoFuso(local, fuso) {
+// O que não existe no calendário ("2026-10-40", "34:00") é recusado aqui, com o motivo: o
+// Date.UTC empurraria o excesso para o dia seguinte sem avisar, e o teto de um aviso para
+// todos por dia seria conferido no dia errado. Devolve '' quando está tudo certo.
+const DIAS_NO_MES = (ano, mes) => new Date(Date.UTC(ano, mes, 0)).getUTCDate();
+function erroNaParede(local) {
   const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(String(local || ''));
-  if (!m) return null;
+  if (!m) return 'confira o dia e a hora';
+  const [ano, mes, dia, hora, minuto] = m.slice(1).map(Number);
+  if (mes < 1 || mes > 12) return 'o mês vai de 1 a 12';
+  if (dia < 1 || dia > DIAS_NO_MES(ano, mes)) return 'esse dia não existe: o mês ' + String(mes).padStart(2, '0') + ' tem ' + DIAS_NO_MES(ano, mes) + ' dias';
+  if (hora > 23) return 'a hora vai de 00 a 23';
+  if (minuto > 59) return 'os minutos vão de 00 a 59';
+  return '';
+}
+function instanteNoFuso(local, fuso) {
+  if (erroNaParede(local)) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(String(local));
   const alvo = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
   let t = alvo;
   for (let i = 0; i < 3; i++) t = alvo - (paredeEm(t, fuso) - t);
@@ -1116,6 +1130,8 @@ async function enviarAvisoAdmin(eu, pedido) {
   // O dia é o do envio real: hoje, ou o dia marcado no agendamento (no fuso de quem agenda),
   // contando também os agendados para todos que ainda estão na fila desse dia.
   if (pedido.quando) {
+    const torto = erroNaParede(pedido.quando);
+    if (torto) throw erroAviso(torto);
     const quando = instanteNoFuso(pedido.quando, fuso);
     if (quando === null) throw erroAviso('confira o dia e a hora');
     if (quando <= agora.getTime()) throw erroAviso('esse horário já passou');
