@@ -315,6 +315,33 @@ secao('parábolas');
 }
 
 // =========================================================================
+secao('peças sob demanda');
+// =========================================================================
+// O index.html tem teto de 1 MB. O que pesa e pouca gente usa mora em src/sob-demanda/ e sai
+// em <nome>.<resumo>.js, pedido na primeira vez (CC.pedirPeca) e guardado pelo service worker.
+// Cada peça tem uma marca: um trecho que só existe nela. Se a marca voltar ao index.html (ou o
+// arquivo voltar para src/app/), alguém pôs a peça grande de novo no index: o teste falha.
+{
+  const PECAS = [
+    // [nome, variável no index.html, marca que só a peça tem, arquivo antigo em src/app, rótulo]
+    ['qrcode', 'QR_GERADOR', 'getBCHTypeInfo', '00-qrcode.js', 'o gerador de QR'],
+  ];
+  const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
+  for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
+    const arquivo = (html.match(new RegExp('window\\.' + variavel + '="([^"]*)"')) || [])[1] || '';
+    checar(new RegExp('^' + nome + '\\.[0-9a-f]{10}\\.js$').test(arquivo) && existsSync(dist(arquivo)) && existsSync(dist(arquivo + '.gz')),
+      rotulo + ' sai em arquivo próprio, com versão comprimida (window.' + variavel + ': ' + (arquivo || 'nenhum') + ')');
+    checar(!!arquivo && sw.includes('"' + arquivo + '"') && sw.includes("'caminho-telas'"), rotulo + ' fica no cache "caminho-telas" do service worker, para abrir sem rede');
+    checar(!html.includes(marca), rotulo + ' não está embutido no index.html (achei "' + marca + '")');
+    checar(!existsSync(join(AQUI, 'src', 'app', antigo)) && existsSync(join(AQUI, 'src', 'sob-demanda', nome + '.js')), rotulo + ' mora em src/sob-demanda/, fora dos módulos do index.html');
+    checar(!!arquivo && existsSync(dist(arquivo)) && readFileSync(dist(arquivo), 'utf8').includes(marca) && !readFileSync(dist(arquivo), 'utf8').includes('/*ESTILO_PECA*/'),
+      rotulo + ' leva o próprio código (e o estilo, quando tem)');
+    // como todo .js do app: só com sessão (não é público como os mapas e as fontes)
+    checar(!servidorTexto.match(/const PUBLICO_COM_RESUMO = .*/)[0].includes(nome.toUpperCase()), rotulo + ' só sai do servidor com sessão');
+  }
+}
+
+// =========================================================================
 secao('regras de progresso');
 // =========================================================================
 const contexto = createContext({

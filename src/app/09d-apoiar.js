@@ -33,16 +33,8 @@
 
   const reais = (v) => 'R$ ' + (Number.isInteger(v) ? v : v.toFixed(2).replace('.', ','));
 
-  function qrPix(codigo) {
-    try {
-      const q = qrcode(0, 'M');
-      q.addData(codigo);
-      q.make();
-      return '<div class="qr-convite" role="img" aria-label="QR Code do Pix">' + q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }) + '</div>';
-    } catch (e) {
-      return '';
-    }
-  }
+  // o gerador de QR vem sob demanda (CC.qr, 08-amigos.js)
+  const qrPix = (codigo) => CC.qr(codigo, 'QR Code do Pix');
 
   CC.vistaApoiar = function (raiz) {
     let valor = 10;

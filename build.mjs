@@ -327,6 +327,31 @@ writeFileSync(dist(arquivoAvisoTela), telaAviso, 'utf8');
 writeFileSync(dist(arquivoAvisoTela + '.gz'), gzipSync(Buffer.from(telaAviso, 'utf8'), { level: 9 }));
 console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 
+// ---------- peças sob demanda ----------
+// O que pesa e pouca gente usa (o gerador de QR, a tela do mapa, o painel do administrador)
+// sai do index.html (teto de 1 MB) para src/sob-demanda/<nome>.js e vira <nome>.<resumo>.js,
+// pedido pelo app na primeira vez que a tela abre (CC.pedirPeca, 01-nucleo.js). O estilo da
+// peça, quando há (<nome>.css), entra já enxuto no lugar da marca '/*ESTILO_PECA*/'. O service
+// worker guarda cada uma no cache "caminho-telas" quando é pedida: depois, abre sem rede. Como
+// todo .js do app, o servidor só as entrega com sessão.
+// Função nova e pesada já nasce aqui, e não em src/app/.
+const NOMES_PECAS = ['qrcode'];
+for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
+const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
+  let codigo = enxugarJs(readFileSync(src('sob-demanda', nome + '.js'), 'utf8'), nome + '.js');
+  if (existsSync(src('sob-demanda', nome + '.css'))) {
+    const css = enxugarCss(readFileSync(src('sob-demanda', nome + '.css'), 'utf8'));
+    if (/<\/style/i.test(css)) throw new Error('src/sob-demanda/' + nome + '.css tem "</style>" dentro');
+    if (!codigo.includes("'/*ESTILO_PECA*/'")) throw new Error('src/sob-demanda/' + nome + '.js não tem a marca do estilo');
+    codigo = codigo.replace("'/*ESTILO_PECA*/'", () => JSON.stringify(css));
+  }
+  const arquivo = nome + '.' + createHash('sha256').update(codigo).digest('hex').slice(0, 10) + '.js';
+  writeFileSync(dist(arquivo), codigo, 'utf8');
+  writeFileSync(dist(arquivo + '.gz'), gzipSync(Buffer.from(codigo, 'utf8'), { level: 9 }));
+  console.log('peça sob demanda:', arquivo, kb(codigo));
+  return [nome, arquivo];
+}));
+
 // ---------- ícones ----------
 // Vêm prontos de src/icones/, gerados da arte em arte/icone-app.png por
 // ferramentas/icones.ps1. Reduzir um PNG exige decodificá-lo, e o build roda no Docker
@@ -418,6 +443,7 @@ const html = molde
   .replace(/\/\*DADOS\*\//g, () => 'window.CONTEUDO_ARQUIVO=' + JSON.stringify(arquivoConteudo) + ';'
     + 'window.STORY_ARTES=' + JSON.stringify(arquivoArtesStory) + ';'
     + 'window.AVISO_TELA=' + JSON.stringify(arquivoAvisoTela) + ';'
+    + 'window.QR_GERADOR=' + JSON.stringify(pecas.qrcode) + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
@@ -497,9 +523,13 @@ const AVULSAS = ['entrar.html', 'privacidade.html', 'termos.html'];
 const BIBLIAS = ${JSON.stringify(biblias.map((b) => b.arquivo))};
 // As fontes do nome original (fonte-original-*) vão no cache dos mapas: só a tela do mapa as usa.
 const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo).concat(fontesOriginais.map((f) => f.arquivo)))};
+// As peças sob demanda (src/sob-demanda/: o gerador de QR, a tela do mapa, o painel), guardadas
+// na primeira vez que o app as pede: a tela abre sem rede daí em diante.
+const CACHE_TELAS = 'caminho-telas';
+const TELAS = ${JSON.stringify(Object.values(pecas))};
 const STORY = ${JSON.stringify((arquivoArtesStory ? [arquivoArtesStory] : []).concat(Object.values(fotosStory)))};
 const PARABOLAS = ${JSON.stringify(parabolas.itens.map((p) => p.arquivo).concat(parabolas.desenhos ? [parabolas.desenhos, parabolas.tela] : []))};
-const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_PARABOLAS, PARABOLAS], [CACHE_STORY, STORY]];
+const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_PARABOLAS, PARABOLAS], [CACHE_STORY, STORY], [CACHE_TELAS, TELAS]];
 
 self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE)

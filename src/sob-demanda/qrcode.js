@@ -1,6 +1,9 @@
-/* 00-qrcode.js: gerador de QR Code (qrcode-generator 1.4.4, de Kazuhiko Arase, licença MIT,
+/* qrcode.js: gerador de QR Code (qrcode-generator 1.4.4, de Kazuhiko Arase, licença MIT,
    copiado sem mudanças; só saiu o trecho final de módulo AMD/CommonJS, que o navegador não usa).
-   Usado no convite para o amigo apontar a câmera: o código é gerado no próprio aparelho. */
+   Usado no convite, no link da célula e no Pix: o código é gerado no próprio aparelho.
+   Fica fora do index.html (teto de 1 MB): o build o publica como qrcode.<resumo>.js, que o app
+   pede na primeira vez que precisa desenhar um código (CC.qr, 08-amigos.js). Carregado como
+   <script>, o "var qrcode" abaixo vira window.qrcode. */
 //---------------------------------------------------------------------
 //
 // QR Code Generator for JavaScript

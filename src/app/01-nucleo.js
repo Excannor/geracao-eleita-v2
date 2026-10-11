@@ -408,6 +408,41 @@ window.CC = window.CC || {};
   CC.esqueleto = (forma = 'texto') => '<div class="esqueleto' + (forma === 'texto' ? ' leitor-esqueleto' : '') + '" role="status" aria-busy="true" aria-label="Carregando">'
     + '<div class="esqueleto-corpo" aria-hidden="true">' + (FORMAS_ESQUELETO[forma] || FORMAS_ESQUELETO.texto) + '</div></div>';
 
+  // ---------- peças sob demanda ----------
+  // O index.html tem teto de 1 MB: o que pesa e pouca gente usa (o gerador de QR, a tela do
+  // mapa, o painel do administrador) mora em <nome>.<resumo>.js, publicado pelo build a partir
+  // de src/sob-demanda/. CC.pedirPeca pede o arquivo uma vez, como <script> do próprio app, e
+  // resolve quando pronta() diz que ele registrou o que traz. Se falhar (sem rede na primeira
+  // vez), o pedido é esquecido e a próxima tentativa pede de novo. O service worker guarda a
+  // peça no cache "caminho-telas" na primeira vez: daí em diante ela abre sem rede.
+  const pecas = new Map();
+  CC.pedirPeca = (arquivo, pronta) => {
+    if (pronta()) return Promise.resolve();
+    if (!pecas.has(arquivo)) {
+      const pedido = new Promise((resolver, falhar) => {
+        if (!arquivo) { falhar(new Error('peça')); return; }
+        const s = document.createElement('script');
+        s.src = './' + arquivo;
+        s.onload = () => (pronta() ? resolver() : falhar(new Error('peça')));
+        s.onerror = () => { s.remove(); falhar(new Error('peça')); };
+        document.head.appendChild(s);
+      });
+      pedido.catch(() => pecas.delete(arquivo));
+      pecas.set(arquivo, pedido);
+    }
+    return pecas.get(arquivo);
+  };
+  // A falha de uma peça, no azulejo das parábolas: o que houve e o "Tentar de novo".
+  CC.estadoSemPeca = (titulo) => {
+    const semRede = navigator.onLine === false;
+    return CC.estado({
+      erro: true, icone: 'info',
+      titulo: semRede ? 'Sem conexão. Tente de novo.' : titulo,
+      texto: semRede ? 'Isto ainda não está guardado neste celular. Com internet, fica guardado para abrir sem rede.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
+      acao: 'Tentar de novo',
+    });
+  };
+
   // Botão ocupado: enquanto a tarefa roda, ele mantém a cor e mostra um anel girando
   // (esperar a rede não é o mesmo que estar desligado).
   CC.ocupado = async (botao, tarefa) => {

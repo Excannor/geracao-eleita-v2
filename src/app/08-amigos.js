@@ -168,19 +168,56 @@
   }
 
   // QR Code do convite, para o amigo que está do lado apontar a câmera em vez de receber
-  // mensagem. Gerado aqui mesmo (00-qrcode.js): o link não passa por nenhum serviço de fora.
+  // mensagem. Gerado aqui mesmo: o link não passa por nenhum serviço de fora.
   // Fundo sempre branco, também no tema escuro: leitor de QR precisa de contraste claro.
-  CC.qrDoLink = function (link) {
-    try {
-      const q = qrcode(0, 'M');
-      q.addData(link);
-      q.make();
-      return '<div class="qr-convite" role="img" aria-label="QR Code do convite">' + q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }) + '</div>'
-        + '<p class="passo-dica pequena qr-legenda">Quem está do seu lado pode apontar a câmera do celular para o código.</p>';
-    } catch (e) {
-      return '';
-    }
+  // O gerador (src/sob-demanda/qrcode.js, uns 55 KB) não mora no index.html, que tem teto de
+  // 1 MB: CC.qr devolve o lugar do código (um quadrado pulsando) e, logo que a folha entra na
+  // tela, o gerador é pedido (na primeira vez) e desenha. Sem rede na primeira vez, o lugar
+  // vira "Sem conexão. Tente de novo." com o botão; depois de uma vez, sai do cache sem rede.
+  const ESPERA_QR = '<span class="qr-espera" aria-hidden="true"></span>';
+  let qrAgendado = false;
+  function desenharQrs() {
+    qrAgendado = false;
+    const pendentes = () => [...document.querySelectorAll('[data-qr]:not([data-qr-feito])')].filter((el) => el.classList.contains('carregando'));
+    if (!pendentes().length) return;
+    CC.pedirPeca(window.QR_GERADOR, () => typeof window.qrcode === 'function').then(() => {
+      for (const el of pendentes()) {
+        try {
+          const q = window.qrcode(0, 'M');
+          q.addData(el.dataset.qr);
+          q.make();
+          el.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+          el.classList.remove('carregando');
+          el.dataset.qrFeito = '1';
+        } catch (e) {
+          // texto que não cabe num QR: como antes, a folha segue sem o código
+          const legenda = el.nextElementSibling;
+          if (legenda && legenda.classList.contains('qr-legenda')) legenda.remove();
+          el.remove();
+        }
+      }
+    }, () => {
+      for (const el of pendentes()) {
+        el.classList.remove('carregando');
+        el.classList.add('falhou');
+        el.removeAttribute('role');
+        el.innerHTML = '<span class="qr-erro">Sem conexão. Tente de novo.</span><button type="button" class="botao contorno pequeno" data-qr-tentar>Tentar de novo</button>';
+        el.querySelector('[data-qr-tentar]').onclick = () => {
+          el.classList.remove('falhou');
+          el.classList.add('carregando');
+          el.setAttribute('role', 'img');
+          el.innerHTML = ESPERA_QR;
+          desenharQrs();
+        };
+      }
+    });
+  }
+  CC.qr = function (texto, rotulo) {
+    if (!qrAgendado) { qrAgendado = true; setTimeout(desenharQrs, 0); }
+    return '<div class="qr-convite carregando" role="img" aria-label="' + CC.esc(rotulo) + '" data-qr="' + CC.esc(texto) + '">' + ESPERA_QR + '</div>';
   };
+  CC.qrDoLink = (link) => CC.qr(link, 'QR Code do convite')
+    + '<p class="passo-dica pequena qr-legenda">Quem está do seu lado pode apontar a câmera do celular para o código.</p>';
 
   // ---------- convidar ----------
   // Primeiro pergunta para quem é o convite: o link e o texto mudam, porque um vai para
