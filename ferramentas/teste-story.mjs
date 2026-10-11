@@ -147,7 +147,7 @@ try {
   await av('(() => { const E = CC.estado(); E.marcadoEm = {}; for (let i = 0; i < 16; i++) E.marcadoEm["t" + i] = CC.somaDias(CC.hojeIso(), -i); return true; })()');
   ok(await av('CC.sequencia().atual') === 16, 'a conta de teste está com 16 dias de ofensiva');
   const artes = await av('CC.FRASES_OFENSIVA.filter((f) => f.arte).map((f) => ({ ...f }))');
-  ok(Array.isArray(artes) && artes.length === 27, 'há 27 frases com arte própria (' + (artes || []).map((f) => f.arte).join(', ') + ')');
+  ok(Array.isArray(artes) && artes.length === 28, 'há 28 frases com arte própria (' + (artes || []).map((f) => f.arte).join(', ') + ')');
   const fundos = new Set();
   // abre a folha com esta frase (o sorteio é trocado só aqui) e toca em Compartilhar
   const abrirECompartilhar = async (frase) => {

@@ -103,7 +103,7 @@
     // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
     { linhas: ['É tudo', 'sobre Ele'] },
     { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },
-    { linhas: ['Jovens que', 'influenciam', 'a sua geração'], ref: 'Mateus 5.13-15' },
+    { linhas: ['Jovens que', 'influenciam', 'a sua geração'], ref: 'Mateus 5.13-15', arte: 'influenciam' },
     { linhas: ['O maior fracasso', 'é ter sucesso', 'em coisas que', 'nos afastam', 'de Deus'] },
   ];
   // Nunca a mesma da última vez: abrir de novo e ver a mesma frase parece que não sorteou.

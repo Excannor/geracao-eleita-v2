@@ -2478,6 +2478,8 @@
     relogio: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteRelogio, grao: [18, 1617] },
     toco: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteToco, grao: [18, 1479] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
+    // quarta leva no padrão da landing (o bloco perto do fim do arquivo)
+    influenciam: { fundo: [LP.preto], fotos: ['influenciam'], tema: TEMA_LP, desenhar: arteInfluenciam, grao: [18, 5131] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -2660,6 +2662,93 @@
     ctx.stroke();
     ctx.restore();
     grao(ctx, 20, 2131);
+  }
+
+  // ---------- quarta leva no padrão da landing (2026-10-11) ----------
+  // Mais frases da ofensiva no padrão aprovado: o preto com grão, Oswald creme com a última
+  // linha em amarelo e o risco, os desenhos à mão em sálvia. As funções moram aqui, num bloco
+  // só delas (as declarações sobem, então a lista de modelos lá em cima já as conhece).
+
+  // Jovens que influenciam a sua geração (Mateus 5.13-15): a foto do dono, a multidão vista
+  // de cima com o facho de luz caindo sobre uma pessoa (src/story-fotos/influenciam.webp, em
+  // P&B). A luz do facho ganha o amarelo, a única cor da foto, como o sol na cruz da landing.
+  // A pessoa iluminada fica no alto do meio; o alto e o pé escurecem e o texto vai no escuro
+  // de baixo: JOVENS QUE INFLUENCIAM em creme e A SUA GERAÇÃO em amarelo com o risco.
+  function arteInfluenciam(ctx, fotos) {
+    fundoLanding(ctx);
+    const cx = L / 2;
+    const img = fotos.influenciam;
+    if (img) {
+      const w = 1240;
+      const h = w * img.height / img.width;
+      // a pessoa na luz está a 47% da largura e 58% da altura da foto
+      const x = cx - w * 0.47;
+      const y = 760 - h * 0.58;
+      fotoLanding(ctx, img, { x, y, w, alfa: 0.9,
+        apaga: { cima: [y + 120, y + 420], baixo: [1250, 940] },
+        depois: (k, c) => {
+          // o facho e quem ele toca: só o que é bem claro, na faixa do facho, vira amarelo
+          let dados;
+          try { dados = k.getImageData(0, 0, L, Math.min(A, Math.round(c.y + c.h))); } catch (e) { return; }
+          const d = dados.data;
+          const W = dados.width;
+          const H = dados.height;
+          // a linha do facho: da pessoa (0.47, 0.56) para o canto de cima à direita (1.0, 0.12)
+          const ax = c.x + c.w * 0.47;
+          const ay = c.y + c.h * 0.56;
+          const bx = c.x + c.w * 1.02;
+          const by = c.y + c.h * 0.1;
+          const vx = bx - ax;
+          const vy = by - ay;
+          const comp = Math.hypot(vx, vy);
+          for (let yy = 0; yy < H; yy++) {
+            for (let xx = 0; xx < W; xx++) {
+              const t = ((xx - ax) * vx + (yy - ay) * vy) / (comp * comp);
+              const dist = Math.abs((xx - ax) * vy - (yy - ay) * vx) / comp;
+              const largura = 150 + Math.max(0, t) * 60;
+              const borda = t < -0.15 ? 0 : (t < 0 ? 1 + t / 0.15 : 1);
+              const lado = Math.max(0, 1 - dist / largura);
+              const perto = borda * lado * lado * (3 - 2 * lado);
+              if (!perto) continue;
+              const i = (yy * W + xx) * 4;
+              const l = (d[i] + d[i + 1] + d[i + 2]) / 765;
+              const u = Math.min(1, Math.max(0, (l - 0.28) / 0.45));
+              const q = u * u * (3 - 2 * u) * perto;
+              if (!q) continue;
+              const v = Math.min(1, l * 1.25);
+              d[i] += (255 * v - d[i]) * q;
+              d[i + 1] += (206 * v - d[i + 1]) * q;
+              d[i + 2] += (104 * v - d[i + 2]) * q;
+            }
+          }
+          k.putImageData(dados, 0, 0);
+        } });
+      // um brilho leve no facho e em volta de quem ele toca (em tela, só clareia)
+      const px = x + w * 0.47;
+      const py = y + h * 0.58;
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      const halo = ctx.createRadialGradient(px, py - 40, 0, px, py - 40, 260);
+      halo.addColorStop(0, 'rgba(255,196,77,.22)');
+      halo.addColorStop(1, 'rgba(255,196,77,0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(px - 260, py - 300, 520, 520);
+      ctx.restore();
+      // o alto escurece de novo, para a chama e os dias se lerem sobre a multidão
+      const g = ctx.createLinearGradient(0, 0, 0, 640);
+      g.addColorStop(0, 'rgba(13,14,12,.9)');
+      g.addColorStop(0.55, 'rgba(13,14,12,.55)');
+      g.addColorStop(1, 'rgba(13,14,12,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, L, 640);
+    }
+    const y0 = 1040;
+    rotuloLanding(ctx, 'Mateus 5.13-15', cx, y0, 30);
+    return blocoLanding(ctx, [
+      { t: 'JOVENS QUE', larg: 520, max: 104, peso: 600, espaco: 4, vao: 22 },
+      { t: 'INFLUENCIAM', larg: 900, max: 170, vao: 6 },
+      { t: 'A SUA GERAÇÃO.', larg: 880, max: 140, cor: LP.amarelo, risco: true, vao: 36 },
+    ], y0);
   }
 
   S.prepararArte = prepararArte;
