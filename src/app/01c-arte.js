@@ -46,7 +46,7 @@
     { linhas: ['Até que', 'Ele venha'] },
     { linhas: ['Quem já foi', 'comprado', 'não se vende'], ref: '1 Coríntios 6.20', arte: 'comprado' },
     { linhas: ['Atraídos pela', 'Sua presença'] },
-    { linhas: ['Marcados pela', 'diferença'] },
+    { linhas: ['Marcados pela', 'diferença'], arte: 'diferenca' },
     { linhas: ['Perseverando', 'até o fim'] },
     { linhas: ['Há esperança', 'para a árvore que,', 'se for cortada,', 'ainda se renovará'], ref: 'Jó 14.7-9', arte: 'toco' },
     { linhas: ['Jesus para', 'as nações'], arte: 'nacoes' },
@@ -103,8 +103,11 @@
     // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
     { linhas: ['É tudo', 'sobre Ele'] },
     { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },
-    { linhas: ['Jovens que', 'influenciam', 'a sua geração'], ref: 'Mateus 5.13-15' },
+    { linhas: ['Jovens que', 'influenciam', 'a sua geração'], ref: 'Mateus 5.13-15', arte: 'influenciam' },
     { linhas: ['O maior fracasso', 'é ter sucesso', 'em coisas que', 'nos afastam', 'de Deus'] },
+    // Frases novas do dono (2026-10-11), sem referência: nenhum versículo diz isso com estas palavras.
+    { linhas: ['Jesus morreu', 'por mim,', 'agora eu vivo', 'por Ele'], arte: 'vivoporele' },
+    { linhas: ['Jesus', 'vive'], arte: 'jesusvive' },
   ];
   // Nunca a mesma da última vez: abrir de novo e ver a mesma frase parece que não sorteou.
   // comTexto: só as que têm frase (o fim da lição mostra a frase em texto corrido).
