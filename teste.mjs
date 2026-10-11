@@ -325,6 +325,8 @@ secao('peças sob demanda');
   const PECAS = [
     // [nome, variável no index.html, marca que só a peça tem, arquivo antigo em src/app, rótulo]
     ['qrcode', 'QR_GERADOR', 'getBCHTypeInfo', '00-qrcode.js', 'o gerador de QR'],
+    // a casca da tela do mapa (06b-mapas.js) fica no index: só o desenho do mapa sai
+    ['mapa-tela', 'MAPA_TELA', 'mapa-conexao', '', 'a tela do mapa'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -333,7 +335,7 @@ secao('peças sob demanda');
       rotulo + ' sai em arquivo próprio, com versão comprimida (window.' + variavel + ': ' + (arquivo || 'nenhum') + ')');
     checar(!!arquivo && sw.includes('"' + arquivo + '"') && sw.includes("'caminho-telas'"), rotulo + ' fica no cache "caminho-telas" do service worker, para abrir sem rede');
     checar(!html.includes(marca), rotulo + ' não está embutido no index.html (achei "' + marca + '")');
-    checar(!existsSync(join(AQUI, 'src', 'app', antigo)) && existsSync(join(AQUI, 'src', 'sob-demanda', nome + '.js')), rotulo + ' mora em src/sob-demanda/, fora dos módulos do index.html');
+    checar((!antigo || !existsSync(join(AQUI, 'src', 'app', antigo))) && existsSync(join(AQUI, 'src', 'sob-demanda', nome + '.js')), rotulo + ' mora em src/sob-demanda/, fora dos módulos do index.html');
     checar(!!arquivo && existsSync(dist(arquivo)) && readFileSync(dist(arquivo), 'utf8').includes(marca) && !readFileSync(dist(arquivo), 'utf8').includes('/*ESTILO_PECA*/'),
       rotulo + ' leva o próprio código (e o estilo, quando tem)');
     // como todo .js do app: só com sessão (não é público como os mapas e as fontes)

@@ -3,6 +3,8 @@
 //   - o gerador de QR: o Pix e o convite desenham o código depois que o gerador chega; sem rede
 //     na primeira vez, o lugar do código diz "Sem conexão. Tente de novo." e o botão tenta de
 //     novo; depois de uma vez, o código sai sem rede;
+//   - a tela do mapa: a barra e o nome aparecem na hora; sem rede na primeira vez, o recado
+//     com o "Tentar de novo"; com rede, o mapa inteiro; depois, sem rede, também;
 //   - nenhuma peça vem junto com a abertura do app: cada uma é pedida só quando a tela abre.
 // Uso: CHROME=<chrome> node ferramentas/teste-sob-demanda.mjs   (PORTA=<porta> para trocar a 8378)
 import { spawn } from 'node:child_process';
@@ -145,7 +147,22 @@ ok(await av('(() => { document.body.insertAdjacentHTML("beforeend", "<div id=qr-
   && await esperar('!!document.querySelector("#qr-teste .qr-convite[data-qr-feito] svg") && !!document.querySelector("#qr-teste .qr-legenda")'), 'o QR do convite desenha com a legenda');
 await av('document.getElementById("qr-teste").remove()');
 
-// Depois de uma vez, o código sai sem rede, mesmo com a página recarregada.
+// ---------- a tela do mapa ----------
+// A casca (a barra, a cabeça com o nome) aparece na hora; o desenho do mapa vem da peça.
+await semRede(true);
+await av('location.hash = "#/mapa/isaias"');
+ok(await esperar('!!' + q('.folha-mapa .mapa-nome') + ' && ' + q('.folha-mapa .mapa-nome') + '.textContent === "Isaías"', 4000), 'o mapa abre na hora com a barra e o nome do livro');
+ok(await esperar('!!' + q('.estado.erro [data-acao-estado]'), 8000), 'sem rede na primeira vez, o mapa não fica carregando para sempre');
+ok(await av(q('.estado.erro b') + '?.textContent === "Sem conexão. Tente de novo."'), 'o recado diz "Sem conexão. Tente de novo."');
+await semRede(false);
+await clicar('[data-acao-estado]');
+ok(await esperar('document.querySelectorAll(".mapa .mapa-ramo").length >= 3 && !!' + q('.mapa .mapa-conexao .seta'), 10000), 'com rede, "Tentar de novo" desenha o mapa inteiro');
+ok(await av('!!document.querySelector("style[data-mapa-tela]") && getComputedStyle(' + q('.mapa-raiz') + ').borderTopStyle === "dashed"'), 'o estilo da tela do mapa chega junto com ela');
+ok((await pedidas()).includes('mapa-tela'), 'a tela do mapa foi pedida só agora');
+await av('location.hash = "#/explorar"');
+ok(await esperar('!!' + q('.cartao-mapas .mapas-titulo') + ' && getComputedStyle(' + q('.cartao-mapas') + ').borderTopLeftRadius !== "0px"'), 'o cartão dos mapas segue no Explorar, com o estilo dele');
+
+// Depois de uma vez, tudo sai sem rede, mesmo com a página recarregada.
 await semRede(true);
 await cmd('Page.reload');
 ok(await esperar('!!window.CC && !!document.querySelector("#conteudo")', 15000), 'sem rede, o app abre');
@@ -154,6 +171,8 @@ await esperar('!!' + q('[data-qr-pix]'));
 await clicar('[data-qr-pix]');
 ok(await esperar('!!' + q('.folha .qr-convite svg'), 8000), 'sem rede, o QR do Pix sai do gerador guardado');
 await fecharFolha();
+await av('location.hash = "#/mapa/isaias"');
+ok(await esperar('document.querySelectorAll(".mapa .mapa-ramo").length >= 3', 10000), 'sem rede, o mapa já aberto uma vez sai da tela guardada');
 await semRede(false);
 
 const erros = evs.filter((e) => e.method === 'Runtime.exceptionThrown').map((e) => e.params.exceptionDetails?.exception?.description || 'exceção');

@@ -335,7 +335,7 @@ console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 // worker guarda cada uma no cache "caminho-telas" quando é pedida: depois, abre sem rede. Como
 // todo .js do app, o servidor só as entrega com sessão.
 // Função nova e pesada já nasce aqui, e não em src/app/.
-const NOMES_PECAS = ['qrcode'];
+const NOMES_PECAS = ['qrcode', 'mapa-tela'];
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
   let codigo = enxugarJs(readFileSync(src('sob-demanda', nome + '.js'), 'utf8'), nome + '.js');
@@ -444,6 +444,7 @@ const html = molde
     + 'window.STORY_ARTES=' + JSON.stringify(arquivoArtesStory) + ';'
     + 'window.AVISO_TELA=' + JSON.stringify(arquivoAvisoTela) + ';'
     + 'window.QR_GERADOR=' + JSON.stringify(pecas.qrcode) + ';'
+    + 'window.MAPA_TELA=' + JSON.stringify(pecas['mapa-tela']) + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
