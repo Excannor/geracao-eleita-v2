@@ -3744,60 +3744,13 @@
     return ys + 400;
   }
 
-  // O propósito de Deus para a sua vida é maior do que qualquer obstáculo no seu caminho: a
-  // ilustração ocupa a tela toda. O horizonte alto, o campo em sulcos e tufos à mão em sálvia
-  // até a borda, e o caminho, visto de quem está nele, entra pela borda de baixo, contorna
-  // uma pedra grande e estreita até a meta, a bandeirinha amarela (a única cor quente). A
-  // frase vai pequena no alto, à esquerda, como legenda, com NO SEU CAMINHO. em sálvia e uma
-  // seta à mão até a meta; a chama fica à direita e a marca à esquerda. Sem referência.
-  // A pedra: o contorno de uma rocha larga assentada no chão (yg), as arestas das faces e a
-  // hachura do lado da sombra, com o miolo pintado de preto (tapa o caminho que passa atrás).
-  function pedraGrande(ctx, x0, yg, w, h, r) {
-    // o contorno em calombos, de um pé ao outro (a base fica no chão, sem risco)
-    // (os lados retos, com pontos no meio, para o traço quebrar nas quinas como pedra)
-    const quinas = [[0, 0.02], [0.03, -0.42], [0.14, -0.7], [0.3, -0.78], [0.44, -0.95], [0.62, -1], [0.78, -0.82], [0.92, -0.6], [0.99, -0.3], [1, 0.02]]
-      .map(([u, v]) => [x0 + u * w + (r() - 0.5) * w * 0.012, yg + v * h + (r() - 0.5) * h * 0.02]);
-    const pts = [quinas[0]];
-    for (let i = 1; i < quinas.length; i++) {
-      const [ax, ay] = quinas[i - 1];
-      const [bx, by] = quinas[i];
-      for (const t of [0.2, 0.8, 1]) pts.push([ax + (bx - ax) * t, ay + (by - ay) * t]);
-    }
-    ctx.fillStyle = LP.preto;
-    ctx.beginPath();
-    pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
-    ctx.closePath();
-    ctx.fill();
-    tracoAMao(ctx, pts, { r, largura: 7, tremor: 2.5 });
-    // as arestas, deitadas, acompanhando os calombos
-    const meio = { r, largura: 3.5, tremor: 1.5, segunda: false, cor: 'rgba(200,218,140,.7)' };
-    const reta = (a, b, op) => tracoAMao(ctx, [a, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], b], op);
-    const P = (u, v) => [x0 + w * u, yg - h * v];
-    reta(P(0.44, 0.95), P(0.52, 0.64), meio);
-    reta(P(0.52, 0.64), P(0.78, 0.56), meio);
-    reta(P(0.78, 0.56), P(0.92, 0.6), meio);
-    reta(P(0.52, 0.64), P(0.48, 0.3), { ...meio, cor: 'rgba(200,218,140,.5)' });
-    reta(P(0.14, 0.7), P(0.26, 0.5), { ...meio, cor: 'rgba(200,218,140,.5)' });
-    reta(P(0.26, 0.5), P(0.52, 0.64), { ...meio, cor: 'rgba(200,218,140,.45)' });
-    reta(P(0.66, 0.9), P(0.7, 0.76), { ...meio, largura: 2.5, cor: 'rgba(200,218,140,.5)' });
-    reta(P(0.3, 0.3), P(0.36, 0.16), { ...meio, largura: 2.5, cor: 'rgba(200,218,140,.4)' });
-    // o pontilhado da sombra, embaixo e à direita, mais denso perto do chão
-    for (let i = 0; i < 110; i++) {
-      const u = 0.45 + Math.sqrt(r()) * 0.52;
-      const v = -Math.pow(r(), 1.6) * 0.5 * (1 - (u - 0.45) * 0.6);
-      ctx.fillStyle = 'rgba(200,218,140,' + (0.25 + r() * 0.35).toFixed(2) + ')';
-      ctx.beginPath();
-      ctx.arc(x0 + u * w, yg + v * h - 4, 1.1 + r() * 1.3, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // o chão: o risco da base passando dos pés, uma pedrinha ao lado e a sombra deitada
-    tracoAMao(ctx, [[x0 - w * 0.1, yg + 3], [x0 + w * 0.5, yg + 6], [x0 + w * 1.12, yg + 2]], { r, largura: 4, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.6)' });
-    tracoAMao(ctx, pontosElipse(x0 - w * 0.06, yg - 6, 14, 8, { r, n: 10, mexe: 0.2 }), { r, largura: 3, tremor: 1, fechar: true, segunda: false, cor: 'rgba(200,218,140,.6)' });
-    for (let i = 0; i < 3; i++) {
-      const y = yg + 14 + i * 9;
-      tracoAMao(ctx, [[x0 + w * (0.55 + i * 0.06), y], [x0 + w * (1.2 - i * 0.07), y + 1]], { r, largura: 2.5, tremor: 1, segunda: false, cor: 'rgba(200,218,140,' + (0.34 - i * 0.08).toFixed(2) + ')' });
-    }
-  }
+  // O propósito de Deus para a sua vida é maior do que qualquer obstáculo no seu caminho:
+  // cartaz de paisagem que sangra a tela. A frase grande à esquerda, ocupando o céu (O
+  // PROPÓSITO / DE DEUS enormes, o meio menor, NO SEU CAMINHO. em sálvia), a chama à direita.
+  // Embaixo, as camadas de morros à mão em sálvia com um vale atrás da meta, o clarão amarelo
+  // fraco subindo do horizonte, e o caminho com textura entrando pela borda de baixo: no
+  // meio dele, a rocha partida em duas, as metades afastadas e as lascas no chão, e o caminho
+  // passa pela quebra até a bandeirinha amarela (a única cor quente). Sem referência.
   // A bandeirinha da meta: o mastro e o pano ondulado, em amarelo, com o pé em (x, y).
   function bandeirinha(ctx, x, y, alt, r) {
     const cor = LP.amarelo;
@@ -3823,103 +3776,256 @@
     // o chão da meta: um risquinho amarelo
     tracoAMao(ctx, [[x - alt * 0.3, y + 2], [x + alt * 0.35, y + 1]], { r, largura: 3, tremor: 1, segunda: false, cor });
   }
-  function arteCaminho(ctx) {
-    const r = sorteio(1414);
-    const cx = L / 2;
-    const H = 760; // o horizonte, alto
-    const B = 2150; // o pé do caminho, abaixo do quadro: o caminho sai da borda de baixo
-    const xh = cx + 150; // a meta, no horizonte
-    // o chão em perspectiva: s vai de 0 (perto) a 1 (o horizonte); o desvio é dado no
-    // tamanho de perto e encolhe com a distância
-    const yDe = (s) => H + (B - H) * Math.pow(1 - s, 1.5);
-    const pDe = (s) => (yDe(s) - H) / (B - H);
-    const sp = 0.4; // onde fica a pedra
-    const desvio = (s) => -60 + 790 * Math.exp(-(((s - sp) / 0.17) ** 2));
-    const meio = (s) => xh + (cx - 120 + desvio(s) - xh) * pDe(s);
-    const meia = 330;
-    // o céu: só um clarão fraco atrás da meta; o chão: os sulcos de lado a lado, cada vez
-    // mais juntos e fracos para trás, e os tufos espalhados pelo campo inteiro
-    const g = ctx.createRadialGradient(xh, H, 0, xh, H, 700);
-    g.addColorStop(0, 'rgba(200,218,140,.10)');
+  // Uma metade da rocha partida: o contorno arredondado por fora e a face da quebra, em
+  // dentes, virada para o caminho (lado: -1 é a metade da esquerda). (xq, yg) é o pé da
+  // quebra no chão; w e h, o tamanho da metade.
+  function metadeDaRocha(ctx, xq, yg, w, h, lado, r) {
+    const P = (u, v) => [xq + lado * u * w, yg - v * h];
+    // por fora: do pé da quebra, pelo chão, sobe pelas costas arredondadas até o topo
+    // (as quinas ligadas por trechos retos, para o traço quebrar como pedra, não como pão)
+    const quinas = [[0, 0], [0.6, 0], [0.97, 0], [1, -0.14], [0.93, -0.34], [0.97, -0.5], [0.84, -0.7], [0.64, -0.85], [0.44, -0.97], [0.22, -1], [0.1, -0.95]]
+      .map(([u, v]) => P(u + (r() - 0.5) * 0.03, -v + (r() - 0.5) * 0.03));
+    const fora = [quinas[0]];
+    for (let i = 1; i < quinas.length; i++) {
+      const [ax, ay] = quinas[i - 1];
+      const [bx, by] = quinas[i];
+      for (const t of [0.15, 0.85, 1]) fora.push([ax + (bx - ax) * t, ay + (by - ay) * t]);
+    }
+    // a sombra deitada no chão, para trás e para fora (a luz vem da meta)
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.beginPath();
+    ctx.ellipse(xq + lado * w * 0.55, yg + 4, w * 0.75, h * 0.06, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    // a face da quebra: desce do topo em dentes até o pé, inclinada para fora em cima
+    const quebra = [];
+    for (let i = 0; i <= 13; i++) {
+      const t = i / 13;
+      const dente = (i % 2 ? 1 : -1) * (0.02 + r() * 0.05) * (i && i < 13 ? 1 : 0);
+      quebra.push(P(0.1 * (1 - t) + dente - 0.03 * t, 0.95 * (1 - t) + (r() - 0.5) * 0.03));
+    }
+    const pts = fora.concat(quebra);
+    ctx.fillStyle = '#121310';
+    ctx.beginPath();
+    pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.closePath();
+    ctx.fill();
+    // a hachura de sombra nas costas e a face da quebra mais clara (a luz da meta bate nela)
+    ctx.save();
+    ctx.clip();
+    for (let i = 0; i < 26; i++) {
+      const u = 0.45 + r() * 0.6;
+      const [x0, y0] = P(u, r() * 0.9);
+      tracoAMao(ctx, [[x0, y0], [x0 + lado * 26, y0 + 30]], { r, largura: 2.2, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.28)' });
+    }
+    const [qx, qy] = P(0.1, 0.5);
+    const g = ctx.createRadialGradient(qx, qy, 0, qx, qy, w * 0.5);
+    g.addColorStop(0, 'rgba(200,218,140,.16)');
     g.addColorStop(1, 'rgba(200,218,140,0)');
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, L, A);
-    horizonte(ctx, H, 30, L - 30, r);
-    for (let i = 1; i < 30; i++) {
-      const s = i / 30;
+    ctx.fillRect(qx - w, qy - h, w * 2, h * 2);
+    for (let i = 1; i < 6; i++) {
+      const a = P(0.1 + (r() - 0.5) * 0.06, 0.96 * i / 6);
+      const b = P(0.26 + r() * 0.12, 0.96 * i / 6 + (r() - 0.5) * 0.08);
+      tracoAMao(ctx, [a, b], { r, largura: 2.5, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.45)' });
+    }
+    ctx.restore();
+    // as arestas por cima e o contorno
+    tracoAMao(ctx, [P(0.3, 1), P(0.4, 0.62), P(0.7, 0.5), P(0.9, 0.62)], { r, largura: 3.5, tremor: 1.5, segunda: false, cor: 'rgba(200,218,140,.55)' });
+    tracoAMao(ctx, [P(0.4, 0.62), P(0.46, 0.2)], { r, largura: 3, tremor: 1.5, segunda: false, cor: 'rgba(200,218,140,.4)' });
+    tracoAMao(ctx, fora, { r, largura: 8, tremor: 2.5 });
+    // a face da quebra em linha quebrada de verdade (sem alisar), mais clara
+    ctx.save();
+    ctx.strokeStyle = 'rgba(225,236,190,.95)';
+    ctx.lineWidth = 6;
+    ctx.lineJoin = 'miter';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    quebra.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+    ctx.stroke();
+    ctx.restore();
+  }
+  // As camadas de morros no horizonte, do fundo para a frente: cada uma tapa a de trás (o
+  // miolo escuro), tem a crista à mão em sálvia e abre um vale atrás da meta.
+  function morros(ctx, H, xh, r) {
+    for (const [alto, alfa, tom, f] of [[230, 0.22, '#121410', 0.006], [160, 0.36, '#10120e', 0.009], [92, 0.55, '#0e0f0c', 0.013]]) {
+      const pts = [];
+      const fase = r() * 10;
+      for (let x = -40; x <= L + 40; x += 30) {
+        const vale = 1 - 0.92 * Math.exp(-(((x - xh) / 200) ** 2));
+        const rampa = 0.35 + 0.65 * Math.min(1, x / L + 0.2);
+        const y = H - alto * vale * rampa * (0.55 + 0.22 * Math.sin(x * f + fase) + 0.14 * Math.sin(x * f * 2.3 + fase * 2) + 0.09 * Math.sin(x * f * 5.1 + fase * 3)) + (r() - 0.5) * 5;
+        pts.push([x, y]);
+      }
+      ctx.fillStyle = tom;
+      ctx.beginPath();
+      ctx.moveTo(-40, H + 2);
+      pts.forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.lineTo(L + 40, H + 2);
+      ctx.closePath();
+      ctx.fill();
+      // a hachura deitada dentro do morro, rala
+      ctx.save();
+      ctx.clip();
+      for (let y = H - alto; y < H; y += 14) {
+        tracoAMao(ctx, [[-20, y], [L / 2, y + (r() - 0.5) * 4], [L + 20, y]], { r, largura: 1.2, tremor: 1, segunda: false, cor: 'rgba(200,218,140,' + (alfa * 0.22).toFixed(3) + ')' });
+      }
+      ctx.restore();
+      tracoAMao(ctx, pts, { r, largura: 3 + alfa * 3, tremor: 1.5, segunda: false, cor: 'rgba(200,218,140,' + alfa + ')' });
+    }
+  }
+  function arteCaminho(ctx) {
+    const r = sorteio(1414);
+    const x = 90;
+    const H = 1170; // o horizonte
+    const B = 2300; // o pé do caminho, abaixo do quadro
+    const xh = 780; // a meta, no horizonte
+    // a frase grande, à esquerda, ocupando o céu
+    const linhas = [
+      { t: 'O PROPÓSITO', larg: 860, max: 190, cor: LP.creme, vao: 0 },
+      { t: 'DE DEUS', larg: 860, max: 190, cor: LP.creme, vao: 18, igual: 0 },
+      { t: 'PARA A SUA VIDA É MAIOR DO QUE', larg: 860, max: 60, cor: LP.texto, peso: 500, espaco: 2, vao: 34 },
+      { t: 'QUALQUER OBSTÁCULO', larg: 900, max: 140, cor: LP.creme, vao: 30 },
+      { t: 'NO SEU CAMINHO.', larg: 900, max: 140, cor: LP.salvia, vao: 18, igual: 3 },
+    ];
+    for (const l of linhas) l.tam = tamanhoPara(ctx, l.t, l.larg, l.max, l.peso || 700);
+    for (const l of linhas) if (l.igual !== undefined) l.tam = Math.min(l.tam, linhas[l.igual].tam);
+    // o céu: o clarão amarelo fraco atrás da meta, subindo do horizonte, e os riscos deitados
+    const g = ctx.createRadialGradient(xh, H, 0, xh, H, 820);
+    g.addColorStop(0, 'rgba(255,196,77,.30)');
+    g.addColorStop(0.25, 'rgba(255,196,77,.10)');
+    g.addColorStop(0.6, 'rgba(200,218,140,.04)');
+    g.addColorStop(1, 'rgba(200,218,140,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, H + 10);
+    for (let i = 0; i < 9; i++) {
+      const y = H - 260 + i * 26;
+      const x0 = xh - 420 + r() * 120;
+      tracoAMao(ctx, [[x0, y], [xh + (r() - 0.5) * 60, y + (r() - 0.5) * 3], [xh + 440 - r() * 120, y]], { r, largura: 1.6, tremor: 1, segunda: false, cor: 'rgba(255,214,130,' + (0.05 + i * 0.012).toFixed(3) + ')' });
+    }
+    morros(ctx, H, xh, r);
+    // o chão: o campo em sulcos e tufos
+    const yDe = (s) => H + (B - H) * Math.pow(1 - s, 1.6);
+    const pDe = (s) => (yDe(s) - H) / (B - H);
+    for (let i = 1; i < 34; i++) {
+      const s = i / 34;
       const y = yDe(s);
       if (y > A + 10) continue;
       const p = pDe(s);
       const pts = [];
-      for (let x = -20; x <= L + 20; x += 90) pts.push([x, y + Math.sin(x / 140 + i) * 6 * p]);
-      tracoAMao(ctx, pts, { r, largura: 1 + 2.5 * p, tremor: 1 + p, segunda: false, cor: 'rgba(200,218,140,' + (0.06 + 0.14 * p).toFixed(2) + ')' });
+      for (let xx = -20; xx <= L + 20; xx += 90) pts.push([xx, y + Math.sin(xx / 140 + i) * 6 * p]);
+      tracoAMao(ctx, pts, { r, largura: 1 + 2.5 * p, tremor: 1 + p, segunda: false, cor: 'rgba(200,218,140,' + (0.07 + 0.16 * p).toFixed(2) + ')' });
     }
-    for (let i = 0; i < 90; i++) {
-      const s = Math.pow(r(), 0.9) * 0.92;
-      const p = pDe(s);
-      const x = r() * L;
-      if (Math.abs(x - meio(s)) < meia * p + 30 * p) continue; // fora do caminho
-      const y = yDe(s);
-      for (const d of [-1, 0, 1]) {
-        tracoAMao(ctx, [[x + d * 9 * p, y], [x + d * 16 * p, y - (16 + 10 * r()) * (0.4 + p)]], { r, largura: 1 + 2 * p, tremor: 1, segunda: false, cor: 'rgba(200,218,140,' + (0.25 + 0.3 * p).toFixed(2) + ')' });
+    // o caminho: largo no pé, num S suave até a meta, pintado um pouco mais claro que o campo
+    const meia = 600;
+    const meio = (s) => xh + (L / 2 - 40 + 300 * Math.sin(s * 4.6 + 0.2) * (1 - s * 0.6) - xh) * pDe(s);
+    const borda = (lado) => {
+      const pts = [];
+      for (let i = 0; i <= 60; i++) {
+        const s = i / 60 * 0.995;
+        pts.push([meio(s) + lado * meia * pDe(s), yDe(s)]);
       }
-    }
-    // as beiradas do caminho, em trechos que afinam com a distância
-    const N = 40;
-    for (const lado of [-1, 1]) {
-      for (let i = 0; i < N; i += 4) {
-        const pts = [];
-        for (let j = i; j <= Math.min(N, i + 4); j++) {
-          const s = j / N * 0.985;
-          pts.push([meio(s) + lado * meia * pDe(s), yDe(s)]);
-        }
-        const s0 = i / N;
-        const a = Math.min(1, 1.25 - s0 * 0.4) * Math.min(1, (1 - s0) * 6 + 0.1);
-        tracoAMao(ctx, pts, { r, largura: 9 - s0 * 6.5, tremor: 1.4 - s0, segunda: i < N / 2, cor: 'rgba(200,218,140,' + a.toFixed(2) + ')' });
-      }
-    }
-    // a trilha no meio do caminho, em tracinhos que encolhem para trás, e o cascalho
-    for (let i = 0; i < 30; i++) {
-      const s0 = i / 30 * 0.94;
-      const s1 = s0 + 0.014;
-      const p = pDe(s0);
-      tracoAMao(ctx, [[meio(s0), yDe(s0)], [meio(s1), yDe(s1)]], { r, largura: 1.5 + 4 * p, tremor: 0.6, segunda: false, cor: 'rgba(200,218,140,' + (0.25 + 0.3 * p).toFixed(2) + ')' });
-    }
-    for (let i = 0; i < 110; i++) {
-      const s = Math.pow(r(), 1.3) * 0.85;
+      return pts;
+    };
+    const esq = borda(-1);
+    const dir = borda(1);
+    const chao = new Path2D();
+    esq.forEach(([px, py], i) => (i ? chao.lineTo(px, py) : chao.moveTo(px, py)));
+    for (let i = dir.length - 1; i >= 0; i--) chao.lineTo(dir[i][0], dir[i][1]);
+    chao.closePath();
+    ctx.save();
+    const gc = ctx.createLinearGradient(0, H, 0, A);
+    gc.addColorStop(0, 'rgba(255,214,130,.16)');
+    gc.addColorStop(0.3, 'rgba(200,218,140,.07)');
+    gc.addColorStop(1, 'rgba(200,218,140,.05)');
+    ctx.fillStyle = '#0d0e0c';
+    ctx.fill(chao);
+    ctx.fillStyle = gc;
+    ctx.fill(chao);
+    ctx.clip(chao);
+    // a textura do caminho: riscos de través, que se juntam para trás, e o cascalho
+    for (let i = 0; i < 70; i++) {
+      const s = Math.pow(i / 70, 0.9) * 0.97;
       const p = pDe(s);
-      const x = meio(s) + (r() - 0.5) * 1.6 * meia * p;
-      ctx.fillStyle = 'rgba(200,218,140,' + (0.18 + r() * 0.25).toFixed(2) + ')';
+      const y = yDe(s) + (r() - 0.5) * 8 * p;
+      const xm = meio(s) + (r() - 0.5) * meia * p * 1.4;
+      const comp = (30 + r() * 80) * p;
+      tracoAMao(ctx, [[xm - comp, y], [xm + comp, y + (r() - 0.5) * 4 * p]], { r, largura: 1 + 2.5 * p, tremor: 1, segunda: false, cor: 'rgba(200,218,140,' + (0.12 + 0.2 * p).toFixed(2) + ')' });
+    }
+    for (let i = 0; i < 260; i++) {
+      const s = Math.pow(r(), 1.2) * 0.95;
+      const p = pDe(s);
+      ctx.fillStyle = 'rgba(200,218,140,' + (0.15 + r() * 0.3).toFixed(2) + ')';
       ctx.beginPath();
-      ctx.ellipse(x, yDe(s), 1.5 + p * 5 * r(), 1 + p * 2.6 * r(), 0, 0, Math.PI * 2);
+      ctx.ellipse(meio(s) + (r() - 0.5) * 2 * meia * p, yDe(s), 1.2 + p * 5 * r(), 0.8 + p * 2.6 * r(), 0, 0, Math.PI * 2);
       ctx.fill();
     }
-    // a pedra, no lugar onde o caminho iria reto; desenhada depois, tapa a volta de trás
-    const pp = pDe(sp);
-    const xc = xh + (cx - 120 - 60 - xh) * pp;
-    const wp = 620 * pp;
-    pedraGrande(ctx, xc - wp / 2, yDe(sp) + 14, wp, wp * 0.6, r);
-    bandeirinha(ctx, xh, H + 2, 64, r);
-    // em cima à esquerda, a frase pequena, como legenda da paisagem; o fecho em sálvia, com
-    // a seta à mão descendo até a meta
-    const x = 90;
-    linhaSeca(ctx, 'O PROPÓSITO DE DEUS', x, 356, 60, LP.creme);
-    linhaSeca(ctx, 'PARA A SUA VIDA É MAIOR DO QUE', x, 408, 33, LP.texto, { peso: 500, espaco: 2 });
-    linhaSeca(ctx, 'QUALQUER OBSTÁCULO', x, 478, 60, LP.creme);
-    const w4 = linhaSeca(ctx, 'NO SEU CAMINHO.', x, 550, 60, LP.salvia);
-    const ax = xh - 26;
-    const ay = H - 96;
-    const seta = [];
-    const [s0x, s0y] = [x + w4 + 28, 532];
-    for (let i = 0; i <= 12; i++) {
-      const t = i / 12;
-      seta.push([s0x + (ax - s0x) * Math.sin(t * Math.PI / 2), s0y + (ay - s0y) * (1 - Math.cos(t * Math.PI / 2))]);
+    // as marcas de roda: duas linhas que acompanham o caminho
+    for (const k of [-0.42, 0.42]) {
+      const pts = [];
+      for (let i = 0; i <= 30; i++) {
+        const s = i / 30 * 0.97;
+        pts.push([meio(s) + k * meia * pDe(s), yDe(s)]);
+      }
+      tracoAMao(ctx, pts, { r, largura: 3, tremor: 1.5, segunda: false, cor: 'rgba(200,218,140,.22)' });
     }
-    tracoAMao(ctx, seta, { r, largura: 4, tremor: 0.5, segunda: false });
-    tracoAMao(ctx, [[ax - 16, ay - 20], [ax, ay], [ax + 16, ay - 20]], { r, largura: 4, tremor: 0.5, segunda: false });
+    ctx.restore();
+    // as beiradas, grossas na frente e finas no fundo
+    for (const pts of [esq, dir]) {
+      for (let i = 0; i < pts.length - 1; i += 6) {
+        const t = i / pts.length;
+        tracoAMao(ctx, pts.slice(i, i + 7), { r, largura: 10 - t * 8, tremor: 1.6 - t, segunda: t < 0.5, cor: 'rgba(200,218,140,' + Math.min(1, 1.15 - t * 0.5).toFixed(2) + ')' });
+      }
+    }
+    // os tufos do campo, fora do caminho
+    for (let i = 0; i < 120; i++) {
+      const s = Math.pow(r(), 0.9) * 0.92;
+      const p = pDe(s);
+      const xx = r() * L;
+      if (Math.abs(xx - meio(s)) < meia * p + 40 * p) continue;
+      const y = yDe(s);
+      for (const d of [-1, 0, 1]) {
+        tracoAMao(ctx, [[xx + d * 10 * p, y], [xx + d * 18 * p, y - (18 + 12 * r()) * (0.4 + p)]], { r, largura: 1 + 2.2 * p, tremor: 1, segunda: false, cor: 'rgba(200,218,140,' + (0.25 + 0.35 * p).toFixed(2) + ')' });
+      }
+    }
+    // a rocha partida no meio do caminho: as duas metades afastadas e o caminho passando
+    // pela quebra; lascas no chão
+    const sb = 0.55;
+    const pb = pDe(sb);
+    const yb = yDe(sb);
+    const xm = meio(sb);
+    const vao = meia * pb * 0.62;
+    metadeDaRocha(ctx, xm - vao, yb, 780 * pb, 900 * pb, -1, r);
+    metadeDaRocha(ctx, xm + vao, yb + 6, 720 * pb, 800 * pb, 1, r);
+    for (const [dx, dy, w] of [[-0.3, 26, 22], [0.12, 46, 16], [0.36, 18, 26], [-0.05, 70, 12], [0.55, 60, 18]]) {
+      const lx = xm + dx * vao * 2;
+      const ly = yb + dy;
+      const pts = [[lx - w, ly], [lx - w * 0.5, ly - w * 0.75], [lx + w * 0.3, ly - w * 0.85], [lx + w, ly - w * 0.2], [lx + w * 0.7, ly + w * 0.15]];
+      ctx.fillStyle = '#1a1c17';
+      ctx.strokeStyle = 'rgba(200,218,140,.75)';
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'miter';
+      ctx.beginPath();
+      pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+    bandeirinha(ctx, xh, H + 2, 70, r);
+    // a frase por cima de tudo, com a sombra escura para ler sobre o clarão e os morros
+    let y = 520;
+    for (const l of linhas) {
+      y += l.vao + l.tam * 0.8;
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,.75)';
+      ctx.shadowBlur = 24;
+      linhaSeca(ctx, l.t, x - 4, y, l.tam, l.cor, { peso: l.peso || 700, espaco: l.espaco || 0 });
+      ctx.restore();
+    }
     // a marca fica sobre o campo: um escuro suave atrás dela
     const gm = ctx.createRadialGradient(250, PE, 0, 250, PE, 300);
-    gm.addColorStop(0, 'rgba(13,14,12,.85)');
+    gm.addColorStop(0, 'rgba(13,14,12,.9)');
     gm.addColorStop(1, 'rgba(13,14,12,0)');
     ctx.save();
     ctx.translate(0, PE);
@@ -3931,11 +4037,13 @@
     return A;
   }
 
-  // Somos remanescentes: editorial e bruto. A palavra enorme em creme, à esquerda, em três
-  // linhas que enchem a largura (SOMOS / REMANES- / CENTES.); os miolos dos dois O guardam
-  // uma brasa acesa cada e o ponto final é uma brasa acesa. Embaixo, um campo de brasas
-  // apagadas em cinza com umas poucas ainda acesas. Nada de chama: o que sobrou e continua
-  // aceso. A chama e a marca vão na margem esquerda. Sem referência.
+  // Somos remanescentes: editorial e bruto. A palavra enorme, à esquerda, em três linhas que
+  // enchem a largura (SOMOS / REMANES- / CENTES.), feita de carvão que esfria: a cinza clara
+  // por cima, manchada, a beira queimada e as rachaduras escuras, e só umas poucas
+  // rachaduras ainda acesas por dentro, mais na última linha. O ponto final é a brasa que
+  // não apaga, o ponto mais claro da arte. Embaixo, o chão de cinza e carvão já apagado.
+  // Nada de chama: o pouco que restou e continua aceso. A chama e a marca vão na margem
+  // esquerda. Sem referência.
   // Uma brasa: um carvão de borda irregular centrado em (x, y), largura w; apagada, em cinza
   // com a beira de cima mais clara e as rachaduras escuras; acesa, o miolo amarelo, a borda
   // laranja e as rachaduras brilhando.
@@ -4073,21 +4181,119 @@
     k.fillRect(0, 0, L, A);
     ctx.drawImage(c, 0, 0);
   }
-  // Uma brasa acesa sozinha, com o brilho em volta (o ponto final, os miolos do O).
-  function brasaAcesa(ctx, x, y, w, r) {
-    brilhoDeBrasa(ctx, x, y, w * 1.1);
-    brasa(ctx, x, y, w, r, true);
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    brilhoDeBrasa(ctx, x, y, w * 0.8);
-    ctx.restore();
+  // Uma rachadura: um traço quebrado que anda a partir de (x, y), muda de rumo aos poucos e
+  // às vezes solta um galho. Devolve a lista de trechos [[x, y], ...].
+  function rachadura(x, y, ang, passos, r, galhos = 1) {
+    const trechos = [];
+    const pts = [[x, y]];
+    for (let i = 0; i < passos; i++) {
+      ang += (r() - 0.5) * 1.1;
+      const d = 12 + r() * 20;
+      x += Math.cos(ang) * d;
+      y += Math.sin(ang) * d;
+      pts.push([x, y]);
+      if (galhos > 0 && i > 1 && r() < 0.18) trechos.push(...rachadura(x, y, ang + (r() < 0.5 ? 1 : -1) * (0.6 + r() * 0.6), 2 + Math.floor(r() * 4), r, galhos - 1));
+    }
+    trechos.unshift(pts);
+    return trechos;
+  }
+  // A palavra como carvão que esfria: as letras em cinza de cinza (a cinza clara por cima do
+  // carvão), manchadas, com a beira queimada e rachaduras escuras; só algumas rachaduras
+  // ainda brilham por dentro, em amarelo. linhas: [{ t, x, y, tam }]; acesas: quantas
+  // rachaduras continuam acesas em cada linha.
+  function palavraDeCarvao(ctx, linhas, r) {
+    const { c, ctx: k } = camada();
+    for (const l of linhas) S.escrever(k, l.t, l.x, l.y, oswaldLP(l.tam, 700), '#c9c5b8', { alinhar: 'left' });
+    k.globalCompositeOperation = 'source-atop';
+    // as manchas da cinza: mais escuras e mais claras, largas e suaves
+    for (const l of linhas) {
+      ctx.font = oswaldLP(l.tam, 700);
+      const w = ctx.measureText(l.t).width;
+      for (let i = 0; i < 26; i++) {
+        const mx = l.x + r() * w;
+        const my = l.y - r() * l.tam * 0.8;
+        const raio = l.tam * (0.15 + r() * 0.4);
+        const g = k.createRadialGradient(mx, my, 0, mx, my, raio);
+        const escuro = r() < 0.55;
+        g.addColorStop(0, escuro ? 'rgba(70,66,60,.30)' : 'rgba(236,232,220,.35)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        k.fillStyle = g;
+        k.fillRect(mx - raio, my - raio, raio * 2, raio * 2);
+      }
+      // o pó: pontinhos escuros e claros
+      for (let i = 0; i < 1600; i++) {
+        k.fillStyle = r() < 0.6 ? 'rgba(40,38,34,' + (0.2 + r() * 0.4).toFixed(2) + ')' : 'rgba(245,242,232,' + (0.2 + r() * 0.4).toFixed(2) + ')';
+        k.fillRect(l.x + r() * w, l.y - r() * l.tam * 0.82, 1 + r() * 2, 1 + r() * 2);
+      }
+    }
+    // a beira queimada: o contorno da letra escurecido por dentro
+    for (const l of linhas) {
+      k.font = oswaldLP(l.tam, 700);
+      k.textAlign = 'left';
+      k.textBaseline = 'alphabetic';
+      k.lineJoin = 'round';
+      k.save();
+      k.filter = 'blur(' + Math.round(l.tam * 0.03) + 'px)';
+      k.strokeStyle = 'rgba(30,28,25,.7)';
+      k.lineWidth = l.tam * 0.07;
+      k.strokeText(l.t, l.x, l.y);
+      k.restore();
+    }
+    // as rachaduras: as escuras em todas as linhas; as acesas, poucas
+    const acesas = [];
+    k.lineCap = 'round';
+    k.lineJoin = 'round';
+    for (const l of linhas) {
+      ctx.font = oswaldLP(l.tam, 700);
+      const w = ctx.measureText(l.t).width;
+      const n = Math.round(w / 70);
+      const passo = Math.max(1, Math.floor(n / (l.acesas || 1)));
+      let nAcesas = 0;
+      for (let i = 0; i < n; i++) {
+        const x0 = l.x + (i + r()) * w / n;
+        const y0 = l.y - l.tam * (0.15 + r() * 0.55);
+        const tr = rachadura(x0, y0, r() * Math.PI * 2, 3 + Math.floor(r() * 5), r);
+        const acesa = !!l.acesas && i % passo === passo >> 1 && nAcesas < l.acesas;
+        if (acesa) nAcesas++;
+        for (const pts of tr) {
+          if (acesa) { acesas.push({ l, pts }); continue; }
+          k.strokeStyle = 'rgba(22,20,18,' + (0.55 + r() * 0.35).toFixed(2) + ')';
+          k.lineWidth = 2 + r() * 3.5;
+          k.beginPath();
+          pts.forEach(([px, py], j) => (j ? k.lineTo(px, py) : k.moveTo(px, py)));
+          k.stroke();
+        }
+      }
+    }
+    // as acesas: o calor espalhado em volta, o risco laranja-amarelo e o miolo claro
+    for (const { pts } of acesas) {
+      const [mx, my] = pts[Math.floor(pts.length / 2)];
+      const g = k.createRadialGradient(mx, my, 0, mx, my, 90);
+      g.addColorStop(0, 'rgba(255,170,60,.35)');
+      g.addColorStop(1, 'rgba(255,170,60,0)');
+      k.fillStyle = g;
+      k.fillRect(mx - 90, my - 90, 180, 180);
+    }
+    for (const [cor, lw, sombra] of [['rgba(110,40,12,.9)', 11, 0], ['#f6a24f', 6, 22], ['#ffd772', 2.6, 8]]) {
+      k.save();
+      k.strokeStyle = cor;
+      k.lineWidth = lw;
+      k.shadowColor = 'rgba(255,170,60,.9)';
+      k.shadowBlur = sombra;
+      for (const { pts } of acesas) {
+        k.beginPath();
+        pts.forEach(([px, py], j) => (j ? k.lineTo(px, py) : k.moveTo(px, py)));
+        k.stroke();
+      }
+      k.restore();
+    }
+    ctx.drawImage(c, 0, 0);
   }
   function arteBrasas(ctx) {
     const r = sorteio(1990);
     const x = 84;
     const larg = L - 2 * x;
     // a palavra enorme, à esquerda, quebrada em três linhas que enchem a largura
-    ctx.font = oswaldLP(100, 700);
     const alt = (t) => { ctx.font = oswaldLP(t, 700); return ctx.measureText('H').actualBoundingBoxAscent; };
     const t1 = tamanhoPara(ctx, 'SOMOS', larg, 300);
     const b1 = 560 + alt(t1);
@@ -4095,22 +4301,35 @@
     const b2 = b1 + 44 + alt(t2);
     const t3 = tamanhoPara(ctx, 'CENTES.', larg, 400);
     const b3 = b2 + 44 + alt(t3);
-    // o campo de brasas embaixo, logo abaixo da última linha
-    campoDeBrasas(ctx, b3 + 4, 1500, r, [[0.08, 0.7], [0.36, 0.9], [0.62, 0.55], [0.84, 0.82], [0.5, 0.3], [0.22, 0.4], [0.96, 0.45]], 520);
-    linhaSeca(ctx, 'SOMOS', x - 6, b1, t1, LP.creme);
-    linhaSeca(ctx, 'REMANES-', x - 6, b2, t2, LP.creme);
-    // CENTES. com o ponto final virado brasa acesa
-    const wC = linhaSeca(ctx, 'CENTES', x - 6, b3, t3, LP.creme);
-    const wp = t3 * 0.2;
-    brasaAcesa(ctx, x - 6 + wC + wp * 0.7, b3 - wp * 0.42, wp * 1.5, r);
-    // os miolos dos dois O de SOMOS guardam uma brasa acesa cada
-    ctx.font = oswaldLP(t1, 700);
-    const wO = ctx.measureText('O').width;
-    const a1 = alt(t1);
-    for (const antes of ['S', 'SOM']) {
-      const xo = x - 6 + ctx.measureText(antes).width + wO / 2;
-      brasaAcesa(ctx, xo, b1 - a1 * 0.5, wO * 0.3, r);
-    }
+    // o chão de cinza e carvão embaixo, quase apagado: o que restou
+    campoDeBrasas(ctx, b3 + 30, 1500, r, [], 420);
+    // a palavra de carvão: as rachaduras ainda acesas vão crescendo até a última linha
+    palavraDeCarvao(ctx, [
+      { t: 'SOMOS', x: x - 6, y: b1, tam: t1, acesas: 2 },
+      { t: 'REMANES-', x: x - 6, y: b2, tam: t2, acesas: 3 },
+      { t: 'CENTES.', x: x - 6, y: b3, tam: t3, acesas: 4 },
+    ], r);
+    // o ponto final é a brasa que não apaga: o mais claro da arte, com o brilho em volta
+    ctx.font = oswaldLP(t3, 700);
+    const xp = x - 6 + ctx.measureText('CENTES').width;
+    const wp = ctx.measureText('.').width;
+    const cxp = xp + wp / 2;
+    const cyp = b3 - wp * 0.32;
+    const g = ctx.createRadialGradient(cxp, cyp, 0, cxp, cyp, wp * 2.6);
+    g.addColorStop(0, 'rgba(255,196,77,.55)');
+    g.addColorStop(0.35, 'rgba(255,160,60,.18)');
+    g.addColorStop(1, 'rgba(255,160,60,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(cxp - wp * 3, cyp - wp * 3, wp * 6, wp * 6);
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,190,80,.95)';
+    ctx.shadowBlur = 40;
+    const gp = ctx.createRadialGradient(cxp, cyp - wp * 0.1, 0, cxp, cyp, wp * 0.7);
+    gp.addColorStop(0, '#fff1b8');
+    gp.addColorStop(0.5, '#ffd772');
+    gp.addColorStop(1, '#f6a24f');
+    S.escrever(ctx, '.', xp, b3, oswaldLP(t3, 700), gp, { alinhar: 'left' });
+    ctx.restore();
     return 1500;
   }
 
