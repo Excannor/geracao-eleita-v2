@@ -363,7 +363,8 @@ writeFileSync(dist(arquivoAvisoTela + '.gz'), gzipSync(Buffer.from(telaAviso, 'u
 console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 
 // ---------- peças sob demanda ----------
-// O que pesa e pouca gente usa (o gerador de QR, a tela do mapa, o painel do administrador)
+// O que pesa e pouca gente usa (o gerador de QR, a tela do mapa, o painel do administrador,
+// as cartas do baú)
 // sai do index.html (teto de 1 MB) para src/sob-demanda/<nome>.js e vira <nome>.<resumo>.js,
 // pedido pelo app na primeira vez que a tela abre (CC.pedirPeca, 01-nucleo.js). O estilo da
 // peça, quando há (<nome>.css), entra já enxuto no lugar da marca '/*ESTILO_PECA*/'. O service
@@ -373,7 +374,7 @@ console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 // Uma peça pode juntar vários arquivos (PARTES_PECA), na ordem: o estudo da célula leva as regras
 // puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela, e o preparo leva o leitor
 // de marcas (estudo-marcas.js, que o servidor também carrega) antes do editor. O padrão é <nome>.js.
-const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo'];
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas'];
 const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
@@ -489,6 +490,7 @@ const html = molde
     + 'window.ESTUDO_CELULA=' + JSON.stringify(pecas['estudo-celula']) + ';'
     + 'window.ESTUDO_PREPARO=' + JSON.stringify(pecas['estudo-preparo']) + ';'
     + 'window.ATLAS=' + JSON.stringify(atlas).replace(/</g, '\\u003c') + ';'
+    + 'window.CARTAS=' + JSON.stringify(pecas.cartas) + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')

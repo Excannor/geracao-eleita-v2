@@ -1,0 +1,20 @@
+/* A carta que vira no baú (src/sob-demanda/cartas.js). Entra de costas, gira em 3D e para de
+   frente; a especial ganha um brilho de metal que passa uma vez. Com menos movimento, só aparece. */
+.cena-carta .revelar-carta { width: min(80vw, 340px, calc((100dvh - 360px) * 5 / 7)); min-width: 200px; aspect-ratio: 5 / 7; margin: 4px auto 0; perspective: 1400px; }
+.revelar-carta .carta-giro { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transform: rotateY(180deg) scale(.82); animation: carta-virar 1.15s cubic-bezier(.2, .75, .25, 1) .2s forwards; }
+.revelar-carta .carta-face { position: absolute; inset: 0; border-radius: 4.6% / 3.3%; overflow: hidden; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.revelar-carta .carta-face canvas { display: block; width: 100%; height: 100%; }
+.revelar-carta .carta-verso { transform: rotateY(180deg); }
+.revelar-carta .carta-brilho { position: absolute; inset: -20% -60%; background: linear-gradient(105deg, transparent 38%, rgba(255, 250, 225, .55) 48%, rgba(255, 250, 225, 0) 58%); transform: translateX(-70%); animation: carta-brilho 1.6s ease-in-out 1.35s 1 forwards; mix-blend-mode: soft-light; pointer-events: none; }
+@keyframes carta-virar {
+  0% { transform: translateY(18px) rotateY(180deg) scale(.82); }
+  65% { transform: translateY(-4px) rotateY(-10deg) scale(1.03); }
+  100% { transform: none; }
+}
+@keyframes carta-brilho { to { transform: translateX(70%); } }
+.cena-carta .dica-carta { margin: 2px 0 0; }
+@media (prefers-reduced-motion: reduce) {
+  .revelar-carta .carta-giro { transform: none; animation: carta-surgir .25s ease both; }
+  .revelar-carta .carta-verso, .revelar-carta .carta-brilho { display: none; }
+}
+@keyframes carta-surgir { from { opacity: 0; } to { opacity: 1; } }

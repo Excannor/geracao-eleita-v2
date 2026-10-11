@@ -1282,3 +1282,9 @@ O link de convite (`/?convite=`) quase sempre abre no navegador de dentro do Wha
 
 ## Avisos de privacidade fora da interface (2026-10-19)
 - 2026-10-19 · texto · O dono pediu para tirar os avisos que repetiam quem vê o quê ("só você vê", "só a soma aparece para quem conduz", "o app não avisa ninguém", a linha do cadeado com "Saiba mais"): "nenhum app profissional fica colocando esses avisos". A regra de privacidade continua a mesma e mora na política; a tela não repete. Ficam o consentimento, os erros, as escolhas de quem vê ("Só quem conduz") e o efeito de uma ação. Regra em `docs/voz.md`.
+
+## Cartas do baú: amostra para o dono (2026-10-11)
+- 2026-10-11 · cartas · As primeiras versões saíram com cara de banco de imagens: o poço de lado (tijolo regular, morro chapado, oliveira em bolinha), as pedras da funda como ovos e o mar como corredor de paredes verdes. O que resolveu foi trocar a ideia, não o acabamento: o poço visto de cima, com o sol do meio-dia no fundo; a funda como prancha de gravura com a pedra que falta na fileira; o mar do alto, como mapa gravado, com pegadas na areia → quando o desenho não chega na régua, mude o ponto de vista ou a técnica antes de polir.
+- 2026-10-11 · cartas · Gravura em canvas que funciona: linhas paralelas dentro da forma, com a grossura vinda de uma função de sombra (luz de cima à esquerda sobre um oval) e um leve abaulado (`gravar` em `src/sob-demanda/cartas.js`).
+- 2026-10-11 · cartas · Canvas de 1000 px reduzido pelo navegador para uns 300 px deixava o texto pequeno da carta serrilhado ("JOÃO" virava "IOÃO") → a carta da tela é desenhada no tamanho de uso (largura CSS x densidade); a de 1000 px fica para o story.
+- 2026-10-11 · captura · No `foto-conta.mjs`, `ESPERA` é antes da `ACAO`; a espera depois dela é `ESPERA_ACAO` (padrão 1200 ms). Para fotografar a carta parada, `ESPERA_ACAO=5500`; para pegar no meio da virada, uns 900.

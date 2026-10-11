@@ -343,6 +343,8 @@ secao('peças sob demanda');
     // o estudo da célula (À Mesa): a casca, o vazio e o selo ficam em 08b-propositos.js
     ['estudo-celula', 'ESTUDO_CELULA', 'textoParaGrupo', '', 'o estudo da célula'],
     ['estudo-preparo', 'ESTUDO_PREPARO', 'mesa-barra-marcas', '', 'o preparo do estudo'],
+    // a tela do baú (03-trilha.js) fica no index: os desenhos das cartas e o papel de parede saem
+    ['cartas', 'CARTAS', 'desenhoAzeite', '', 'as cartas do baú'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {

@@ -458,8 +458,13 @@
       CC.avisar('Não consegui gerar a imagem agora.');
       return 'falhou';
     }
+    return CC.compartilharImagem(arquivo, textoDe(pedido));
+  };
+  // O mesmo caminho para qualquer imagem pronta (a carta do baú, o papel de parede): a folha
+  // do sistema com o arquivo e, sem ela, o download com o aviso (o aviso pode vir de fora).
+  CC.compartilharImagem = async function (arquivo, texto, avisoBaixado) {
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
-      const comTexto = { files: [arquivo], text: textoDe(pedido) };
+      const comTexto = { files: [arquivo], text: texto };
       try {
         await navigator.share(navigator.canShare(comTexto) ? comTexto : { files: [arquivo] });
         return 'compartilhado';
@@ -475,7 +480,7 @@
       CC.avisar('Não consegui salvar a imagem agora.');
       return 'falhou';
     }
-    CC.avisar('Imagem salva. Poste pela galeria no story do Instagram ou no status do WhatsApp.');
+    CC.avisar(avisoBaixado || 'Imagem salva. Poste pela galeria no story do Instagram ou no status do WhatsApp.');
     return 'baixado';
   };
 
