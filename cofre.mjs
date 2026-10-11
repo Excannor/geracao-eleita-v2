@@ -26,7 +26,7 @@ export const CAMPOS_CIFRADOS = [
   'oia.*.*', // reflexões do dia: observação, interpretação, aplicação e oração
   'anotacoes.*', // anotações no material e notas nos versículos ("verso:...")
   'historia.antes', 'historia.encontro', 'historia.hoje', // Minha história com Deus
-  'notas.*.texto', 'notas.*.tags', // o modelo novo de notas (quando existir)
+  'notas.*.texto', 'notas.*.tags', 'notas.*.titulo', // as notas: texto, tags e o título opcional
 ];
 
 const ROTULO = 'geracao-eleita/notas/v1';

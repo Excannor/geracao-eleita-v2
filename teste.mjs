@@ -734,6 +734,22 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   checar(sujo.notas.q.tipo === 'nota' && sujo.notas.q.versos.length === 1 && sujo.notas.q.texto === '' && sujo.notas.q.tags.join() === 'ok' && sujo.notas.q.cor === 0 && !('r' in sujo.notas),
     'o que chega de fora é limpo: tipo, versículos, texto, tags e cor');
   checar(CC.normalizarEstado({ atualizadoEm: 1, notas: { q: { texto: 'enc:AAA', tags: 'enc:BBB' } } }).notas.q.tags === 'enc:BBB', 'tags cifradas no servidor (texto) passam sem ser estragadas');
+  // título opcional: uma linha, sem espaço sobrando, até 60 letras; nota antiga fica sem título
+  const comTitulo = CC.normalizarEstado({ atualizadoEm: 1, notas: {
+    a: { texto: 'x', titulo: '  Amor   que\nvem primeiro  ' }, b: { texto: 'y', titulo: 'T'.repeat(90) }, c: { texto: 'z', titulo: 7 }, d: { texto: 'velha' },
+    e: { texto: 'w', titulo: { v: 1, k: 'k', iv: 'i', tag: 't', dado: 'd' } } } }).notas;
+  checar(comTitulo.a.titulo === 'Amor que vem primeiro' && comTitulo.b.titulo.length === 60 && comTitulo.c.titulo === '' && comTitulo.d.titulo === '' && comTitulo.e.titulo.dado === 'd',
+    'título da nota: limpo, cortado em 60, vazio quando falta ou não é texto, e o cifrado passa inteiro');
+  const idT = CC.gravarNota(null, { versos: ['João 3.16'], tipo: 'nota', titulo: ' Primeiro estudo ', texto: 'a' });
+  const idT2 = CC.gravarNota(null, { versos: ['João 3.16'], tipo: 'nota', titulo: '', texto: 'b' });
+  checar(CC.nota(idT).titulo === 'Primeiro estudo' && CC.nota(idT2).titulo === '', 'gravar nota com título e com título vazio');
+  CC.gravarNota(idT, { ...CC.nota(idT), titulo: 'Segundo olhar' });
+  checar(CC.nota(idT).titulo === 'Segundo olhar' && CC.nota(idT).texto === 'a', 'editar o título guarda o novo e não mexe no texto');
+  checar(CC.montarExportacao().includes('### Segundo olhar') && CC.montarExportacao().includes('### João 3.16'), 'a cópia baixada abre a nota pelo título (e sem título, pelo versículo)');
+  CC.apagarNota(idT);
+  CC.apagarNotaDeVez(idT);
+  checar(CC.nota(idT).titulo === '' && CC.nota(idT).texto === '', 'apagar de vez também tira o título da lápide');
+  CC.apagarNotaDeVez((CC.apagarNota(idT2), idT2));
   // apagar todas, sem apagar a conta
   CC.marcar(['João 3:16'], 2);
   CC.gravarRegistro(3, { o: 'obs', i: '', a: '', oracao: '' });
@@ -1501,7 +1517,7 @@ secao('cofre das anotações (cofre.mjs e servidor)');
   const hex2 = randomBytes(32).toString('hex');
   const K1 = chavesDasNotas({ NODE_ENV: 'production', CAMINHO_CHAVE_NOTAS: hex1 });
   checar(!K1.teste && K1.impressao !== K.impressao, 'produção com a chave sobe, com outra chave que a de teste');
-  checar(CAMPOS_CIFRADOS.includes('notas.*.texto') && CAMPOS_CIFRADOS.includes('notas.*.tags'), 'a lista dos campos já cobre o modelo novo de notas');
+  checar(CAMPOS_CIFRADOS.includes('notas.*.texto') && CAMPOS_CIFRADOS.includes('notas.*.tags') && CAMPOS_CIFRADOS.includes('notas.*.titulo'), 'a lista dos campos cobre o modelo novo de notas (com o título)');
 
   // --- selar e abrir ---
   const claro = {
@@ -1509,7 +1525,7 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     oia: { 1: { o: 'SEGREDO-OIA', i: '', a: '', oracao: 'SEGREDO-ORACAO' }, 2: { o: '', i: '', a: '', oracao: '' } },
     anotacoes: { 'verso:João 3.16': 'SEGREDO-VERSO', 'nota:x': 'SEGREDO-NOTA', 'nota:vazia': '' },
     historia: { antes: 'SEGREDO-ANTES', encontro: '', hoje: 'SEGREDO-HOJE', em: 5 },
-    notas: { n1: { tipo: 'oracao', texto: 'SEGREDO-NOTA-NOVA', tags: ['SEGREDO-TAG'], versos: ['João 3:16'] } },
+    notas: { n1: { tipo: 'oracao', titulo: 'SEGREDO-TITULO', texto: 'SEGREDO-NOTA-NOVA', tags: ['SEGREDO-TAG'], versos: ['João 3:16'] } },
     marcas: { 'João 3:16': { cor: 2, em: 1 } }, foto: 'data:image/jpeg;base64,AAAA',
   };
   const selado = selarEstado(claro, 'ana', K);
