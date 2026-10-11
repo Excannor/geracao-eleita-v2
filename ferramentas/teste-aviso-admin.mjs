@@ -253,6 +253,27 @@ if (CHROME && existsSync(CHROME)) {
   ok(noCel && noCel.titulo === 'Culto especial no domingo' && /\/api\/avisos\/foto\/[\w-]{22}$/.test(noCel.image || '') && /#\/parabolas$/.test(noCel.url || ''),
     'o push leva image (' + (noCel && noCel.image) + ') e url (' + (noCel && noCel.url) + ')');
   ok(avisosDe(cel.ana).length === 0, '"só para mim" não chega a mais ninguém');
+  // tocar no aviso com foto abre a foto inteira, com o botão para o destino
+  await av('location.hash = "#/avisos"');
+  await esperar('!!document.querySelector("button.item-aviso.com-foto")', 8000);
+  await av('document.querySelector("button.item-aviso.com-foto").click()');
+  await esperar('!!document.querySelector(".folha-foto-aviso .foto-aviso-inteira")', 5000);
+  const vista = await av('(() => { const f = document.querySelector(".folha-foto-aviso"); const img = f.querySelector(".foto-aviso-inteira"); const ir = f.querySelector("[data-ir-aviso]"); return { src: img.getAttribute("src"), ir: ir && ir.getAttribute("href"), titulo: f.querySelector("h2").textContent, hash: location.hash }; })()');
+  ok(vista && /^api\/avisos\/foto\/[\w-]{22}$/.test(vista.src) && vista.ir === '#/parabolas' && vista.titulo === 'Culto especial no domingo' && vista.hash === '#/avisos',
+    'tocar no aviso com foto abre a imagem inteira, com o título e o botão Abrir (' + JSON.stringify(vista) + ')');
+  if (CAPTURAS) {
+    await dormir(700);
+    for (const tema of ['claro', 'escuro']) {
+      await av('CC.aplicarTema(' + (tema === 'escuro') + ')');
+      await dormir(300);
+      const { data } = await cmd('Page.captureScreenshot', { format: 'png' });
+      writeFileSync(join(CAPTURAS, 'foto-aviso-' + tema + '.png'), Buffer.from(data, 'base64'));
+    }
+    await av('CC.aplicarTema(false)');
+  }
+  await av('document.querySelector("[data-fechar-foto]").click()');
+  await esperar('!document.querySelector(".folha-foto-aviso")', 5000);
+  ok(await av('location.hash === "#/avisos"'), 'Fechar volta para a lista de avisos');
   if (CAPTURAS) {
     await av('location.hash = "#/avisos"');
     await esperar('!!document.querySelector(".item-aviso .foto-aviso") && document.querySelector(".item-aviso .foto-aviso").complete', 8000);

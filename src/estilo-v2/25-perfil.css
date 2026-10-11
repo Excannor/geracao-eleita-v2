@@ -290,6 +290,13 @@
 .lista-avisos { padding: 4px 0; }
 .item-aviso { position: relative; display: flex; align-items: flex-start; gap: 14px; min-height: 64px; padding: 14px 40px 14px 16px; color: var(--tinta); font-weight: 500; text-decoration: none; }
 .item-aviso + .item-aviso { border-top: 1px solid var(--contorno); }
+button.item-aviso { width: 100%; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; }
+.item-aviso.novo:is(button) { background: var(--realce); }
+.folha-foto-aviso .foto-aviso-inteira { display: block; width: 100%; max-height: 62vh; object-fit: contain; border-radius: 14px; background: var(--campo); }
+.folha-foto-aviso h2 { margin: 14px 0 4px; }
+.folha-foto-aviso .texto-foto-aviso { margin: 0 0 4px; color: var(--tinta); white-space: pre-line; }
+.folha-foto-aviso .acoes-foto-aviso { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.folha-foto-aviso .acoes-foto-aviso > * { flex: 1 1 140px; }
 .item-aviso .ico-aviso { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--campo); color: var(--tinta-forte); }
 .item-aviso.novo { background: var(--realce); }
 .item-aviso.novo .ico-aviso { background: var(--salvia); color: var(--salvia-tinta); }

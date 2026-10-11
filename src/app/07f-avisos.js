@@ -51,6 +51,19 @@
     return iso.slice(8, 10) + '/' + iso.slice(5, 7);
   }
 
+  // A foto do aviso, inteira, numa folha: a imagem sem corte, o texto e, se o aviso levar a
+  // algum lugar do app, o botão para ir até lá.
+  const verFoto = (a) => {
+    const alvo = destino(a.url);
+    const { fechar, folha } = CC.folha('<img class="foto-aviso-inteira" src="api/avisos/foto/' + encodeURIComponent(a.foto) + '" alt="' + CC.esc(a.titulo) + '">'
+      + '<h2>' + CC.esc(a.titulo) + '</h2>' + (a.corpo ? '<p class="texto-foto-aviso">' + CC.esc(a.corpo) + '</p>' : '')
+      + '<div class="acoes-foto-aviso">' + (alvo !== '#/' ? '<a class="botao" href="' + CC.esc(alvo) + '" data-ir-aviso>Abrir</a>' : '')
+      + '<button type="button" class="botao contorno" data-fechar-foto>Fechar</button></div>',
+    { rotulo: a.titulo, rolavel: true, classe: 'folha-foto-aviso' });
+    folha.querySelector('[data-fechar-foto]').onclick = () => fechar();
+    const ir = folha.querySelector('[data-ir-aviso]');
+    if (ir) ir.addEventListener('click', () => fechar());
+  };
   const destino = (url) => {
     const i = String(url || '').indexOf('#');
     return i >= 0 ? url.slice(i) : '#/';
@@ -77,15 +90,21 @@
       + '<span>Escolher quais avisos chegam no celular</span>' + CC.ico('avancar') + '</a>';
     raiz.innerHTML = cabeca
       + (avisos.length
-        ? '<div class="caixa-lista lista-avisos">' + avisos.map((a) => '<a class="item-aviso' + (ehNovo(a) ? ' novo' : '') + '" href="'
-          + CC.esc(destino(a.url)) + '"><span class="ico-aviso">' + CC.ico(iconeDe(a.tipo)) + '</span>'
+        ? '<div class="caixa-lista lista-avisos">' + avisos.map((a, i) => (a.foto
+          // o aviso com foto abre a foto inteira ao tocar (e o link dele, se tiver, fica na folha)
+          ? '<button type="button" class="item-aviso com-foto' + (ehNovo(a) ? ' novo' : '') + '" data-ver-foto="' + i + '" aria-label="' + CC.esc(a.titulo) + ': ver a imagem">'
+          : '<a class="item-aviso' + (ehNovo(a) ? ' novo' : '') + '" href="' + CC.esc(destino(a.url)) + '">')
+          + '<span class="ico-aviso">' + CC.ico(iconeDe(a.tipo)) + '</span>'
           + '<span class="textos-aviso"><b>' + CC.esc(a.titulo) + '</b>' + (a.corpo ? '<span>' + CC.esc(a.corpo) + '</span>' : '')
           // a foto do aviso do administrador (o id vem do servidor; ver /api/avisos/foto)
           + (a.foto ? '<img class="foto-aviso" src="api/avisos/foto/' + encodeURIComponent(a.foto) + '" alt="" loading="lazy" decoding="async">' : '')
-          + '<small>' + quando(a.em) + '</small></span>' + (ehNovo(a) ? '<i class="ponto-novo" aria-label="novo"></i>' : '') + '</a>').join('') + '</div>'
+          + '<small>' + quando(a.em) + '</small></span>' + (ehNovo(a) ? '<i class="ponto-novo" aria-label="novo"></i>' : '') + (a.foto ? '</button>' : '</a>')).join('') + '</div>'
         : CC.estado({ icone: 'sino', titulo: 'Nenhum aviso ainda', texto: 'Lembretes da leitura, toques de amigos e convites aparecem aqui.' }))
       + ajustes;
     CC.ligarVoltarDoTopo(raiz);
+    raiz.querySelectorAll('[data-ver-foto]').forEach((b) => {
+      b.onclick = () => verFoto(avisos[Number(b.dataset.verFoto)]);
+    });
     if (r.naoLidos) {
       naoLidos = 0;
       // o sino do topo (o mesmo em todas as abas) perde o ponto na hora
