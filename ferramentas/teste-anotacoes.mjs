@@ -2,7 +2,8 @@
 // nota no editor (rascunho, versículo ligado, tag), ver a etiqueta no leitor e o cartão em Minhas
 // anotações; oração respondida; busca e filtro; fixar; apagar e recuperar; as rotas antigas; a
 // folha "Como guardamos suas anotações"; o título opcional (vazio, escrito, editado, duas notas
-// no mesmo versículo, depois de recarregar e sincronizar); e que a nota chega ao servidor.
+// no mesmo versículo, depois de recarregar e sincronizar); o voltar de um versículo aberto das
+// anotações, de uma parábola e de um mapa; e que a nota chega ao servidor.
 // Uso: node ferramentas/teste-anotacoes.mjs   (CHROME, PORTA e PORTAS como nos outros testes)
 import { spawn } from 'node:child_process';
 import { portaLivre, fecharArvore } from './navegador.mjs';
@@ -363,6 +364,73 @@ await dormir(300);
 await av('location.hash = "#/perfil/anotacoes"');
 ok(await esperar('(() => { const t = [...document.querySelectorAll(".cartao-anot h3.titulo-nota")].map((h) => h.textContent); return t.includes("O amor que vem antes") && t.includes("Estudo da célula: crer"); })()', 10000),
   'e Minhas anotações mostra os títulos depois de recarregar');
+
+// ---------- o voltar de um versículo aberto daqui ----------
+console.log('\n  Voltar de um versículo\n');
+const abrirVersoDasAnotacoes = async () => {
+  await av('[...document.querySelectorAll(".cartao-anot")].find((x) => /O amor que vem antes/.test(x.innerText)).querySelector("[data-acoes]").click(); true');
+  await esperar(existe('[data-acao="biblia"]'));
+  ok(await av('/O amor que vem antes/.test([...document.querySelectorAll(".folha")].pop().innerText)'), 'a folha de ações diz o título da nota');
+  await clicar('[data-acao="biblia"]');
+  return esperar(existe('.leitor-biblia:not(.saindo) .leitor-verso[data-v="3:16"]') + ' && /^#\\/biblia\\/Jo/.test(location.hash)', 15000);
+};
+const conferirVolta = async (como, yAntes) => {
+  ok(await esperar('location.hash === "#/perfil/anotacoes" && !' + existe('.leitor-biblia:not(.saindo)') + ' && ' + existe('.cartao-anot'), 8000), como + ': volta a Minhas anotações, não à Bíblia');
+  await dormir(500);
+  ok(await av(q('[data-tipo="nota"]') + '.getAttribute("aria-pressed") === "true" && ' + q('#busca-anot') + '.value === "joao"'
+    + ' && [...document.querySelectorAll(".cartao-anot")].every((c) => /Nota/.test(c.querySelector(".linha-tipo b").textContent))'), como + ': com o filtro (Notas) e a busca de antes');
+  const y = await av('CC.rolagemY()');
+  ok(Math.abs(y - yAntes) <= 4, como + ': na mesma altura da lista (' + Math.round(yAntes) + ' → ' + Math.round(y) + ')');
+};
+await clicar('[data-tipo="nota"]');
+await preencher('#busca-anot', 'joao');
+await esperar('document.querySelectorAll(".cartao-anot").length >= 3');
+await av('(() => { const c = [...document.querySelectorAll(".cartao-anot")].find((x) => /O amor que vem antes/.test(x.innerText)); CC.rolarPara(c.getBoundingClientRect().top + CC.rolagemY() - 120); return true; })()');
+await dormir(400);
+let yLista = await av('CC.rolagemY()');
+ok(yLista > 100, 'a lista está rolada antes de abrir o versículo (' + Math.round(yLista) + ')');
+ok(await abrirVersoDasAnotacoes(), '"Abrir na Bíblia" abre o leitor no versículo');
+ok(await av(q('[data-fechar-biblia]') + '.getAttribute("aria-label") === "Voltar"'), 'o X do leitor diz "Voltar" (não "Voltar aos capítulos")');
+await clicar('[data-proximo]');
+await esperar('/\\/4$/.test(location.hash)', 10000);
+await dormir(400);
+await clicar('[data-fechar-biblia]');
+await conferirVolta('o X do leitor, depois de virar o capítulo', yLista);
+yLista = await av('CC.rolagemY()');
+ok(await abrirVersoDasAnotacoes(), 'abrir de novo o versículo');
+await av('history.back()');
+await conferirVolta('o voltar do celular/navegador', yLista);
+await av('history.forward()');
+ok(await esperar(existe('.leitor-biblia:not(.saindo)'), 10000), 'avançar reabre o capítulo');
+await av('history.back()');
+await esperar('location.hash === "#/perfil/anotacoes"');
+await clicar('[data-tipo="tudo"]');
+await preencher('#busca-anot', '');
+// o mesmo voltar em outros lugares que abrem um capítulo: uma parábola e um mapa
+const voltarDoLeitor = async (rotulo, rota, botao) => {
+  await av('location.hash = ' + JSON.stringify(rota));
+  const achou = await esperar(existe(botao), 15000);
+  ok(achou, rotulo + ': o botão que abre a Bíblia aparece');
+  if (!achou) return;
+  await clicar(botao);
+  ok(await esperar(existe('.leitor-biblia:not(.saindo)'), 15000), rotulo + ': abre o capítulo');
+  await dormir(300);
+  await clicar('[data-fechar-biblia]');
+  ok(await esperar('location.hash === ' + JSON.stringify(rota) + ' && !' + existe('.leitor-biblia:not(.saindo)'), 8000), rotulo + ': o X do leitor volta para ' + rota);
+};
+const slugParabola = await av('((window.PARABOLAS || {}).itens || [])[0]?.slug || ""');
+if (slugParabola) await voltarDoLeitor('parábola', '#/parabola/' + slugParabola, '[data-ler-parabola]');
+else ok(false, 'não achei uma parábola');
+const slugMapa = await av('(CC.mapaDoLivro("Gênesis") || {}).slug || ""');
+await voltarDoLeitor('mapa', '#/mapa/' + slugMapa, 'a.mapa-ler');
+// sem tela anterior do app (link direto no capítulo), o X continua levando à grade do livro
+await av('location.hash = "#/biblia/" + encodeURIComponent("Rute") + "/2"');
+await esperar('location.hash.endsWith("/2")');
+await cmd('Page.reload');
+ok(await esperar('!!(window.CC && CC.quem) && ' + existe('.leitor-biblia:not(.saindo) [data-fechar-biblia]'), 20000), 'aberto direto num capítulo (sem tela anterior), o leitor abre');
+ok(await av(q('[data-fechar-biblia]') + '.getAttribute("aria-label") === "Voltar aos capítulos"'), 'aí o X diz "Voltar aos capítulos"');
+await clicar('[data-fechar-biblia]');
+ok(await esperar('location.hash === "#/biblia/Rute" && ' + existe('.grade-capitulos a'), 10000), 'e leva à grade do livro, como antes');
 
 // ---------- o servidor recebe as notas ----------
 await av('CC.salvarNoServidor()');

@@ -211,7 +211,10 @@
 
   // ---------- a tela ----------
   CC.vistaAnotacoes = function (raiz, opcoes) {
-    if (!opcoes || !opcoes.manter) F = { ...novoFiltro(), ordem: F.ordem };
+    // De volta pelo histórico (o voltar de um versículo aberto daqui, do app ou do celular), os
+    // filtros e a busca ficam como estavam; o roteador devolve a altura da lista.
+    const manter = (opcoes && opcoes.manter) || (CC.voltandoNoHistorico && CC.voltandoNoHistorico());
+    if (!manter) F = { ...novoFiltro(), ordem: F.ordem };
     const todos = itens();
     const apagadas = CC.notasApagadas().length;
     raiz.innerHTML = '<div class="folha-perfil cabeca-anot">' + CC.botaoVoltar('Perfil') + '<h1>Minhas anotações</h1>'

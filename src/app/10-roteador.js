@@ -423,6 +423,7 @@
   // aparece, e o toque é tratado por um único ouvinte na área de conteúdo, que vale para
   // qualquer voltar, desenhado a qualquer momento.
   const anteriorNaPilha = () => (pilha.length >= 2 ? pilha[pilha.length - 2] : null);
+  CC.anteriorNaPilha = anteriorNaPilha;
   function rotularVoltar(el) {
     if (el.dataset.rotuloVoltar) return;
     const rotulo = el.textContent.trim();
@@ -449,8 +450,33 @@
     else location.hash = ENDERECO_DO_ROTULO[el.dataset.rotuloVoltar || el.textContent.trim()] || '#/';
   });
 
+  // ---------- voltar devolve a tela como estava ----------
+  // Cada entrada do histórico ganha uma marca (history.state.cc) na primeira vez que abre.
+  // Chegar a uma entrada que já tem marca é andar no histórico (o voltar do app, do celular
+  // ou do navegador), não abrir de novo: a tela volta na altura em que estava, e quem guarda
+  // filtros (Minhas anotações) os mantém. A altura de cada entrada é anotada enquanto se rola.
+  const SESSAO_HIST = Math.random().toString(36).slice(2, 8) + ':';
+  const alturas = new Map();
+  let marcas = 0;
+  let marcaAtual = '';
+  let voltando = false;
+  CC.voltandoNoHistorico = () => voltando;
+  let anotandoAltura = false;
+  addEventListener('scroll', () => {
+    if (anotandoAltura) return;
+    anotandoAltura = true;
+    requestAnimationFrame(() => { anotandoAltura = false; if (marcaAtual) alturas.set(marcaAtual, CC.rolagemY()); });
+  }, { capture: true, passive: true });
+  function marcarEntrada() {
+    const estado = history.state && typeof history.state === 'object' ? history.state : {};
+    voltando = !!estado.cc;
+    if (!estado.cc) { try { history.replaceState({ ...estado, cc: SESSAO_HIST + (++marcas) }, ''); } catch (e) { /* segue */ } }
+    marcaAtual = (history.state && history.state.cc) || '';
+  }
+
   function rotear() {
     anotarCaminho();
+    if (!redesenhando) marcarEntrada();
     const { rota, arg, consulta } = partesDaRota();
 
     conteudo.classList.toggle('sem-entrada', redesenhando);
@@ -501,7 +527,12 @@
       requestAnimationFrame(() => CC.rolarAteAtual(false));
     }
     const tela = telaDe(rota, arg);
-    if (tela !== ultimaTela && rota !== 'busca') CC.rolarPara(0);
+    if (tela !== ultimaTela && rota !== 'busca') {
+      // de volta a uma entrada, a altura de quando se saiu dela (a tela pode crescer depois)
+      const y = voltando ? alturas.get(marcaAtual) || 0 : 0;
+      CC.rolarPara(y);
+      if (y) segurarRolagem(y);
+    }
     entradaDaTela(rota);
     ultimaRota = rota;
     ultimaTela = tela;
