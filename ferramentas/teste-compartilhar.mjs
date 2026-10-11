@@ -147,16 +147,16 @@ ok(/16 dias/.test(doc.texto) && /geracaoeleita\.app/.test(doc.texto), 'o texto c
 ok(await av('CC.story.preparar({ tipo: "ofensiva", dias: 16, frase: ' + JSON.stringify(lema) + ' }).then((f) => f === window.__compartilhado.files[0])'),
   'a imagem leva a mesma frase do carimbo da tela (' + lema.linhas.join(' / ') + ')');
 guardarPng('ofensiva-16-folha.png', doc.url);
-// abrir de novo sorteia outra frase, e a imagem acompanha
+// abrir de novo no mesmo dia mostra a mesma frase (uma por dia), e a imagem acompanha
 await av('document.querySelectorAll(".folha, .veu").forEach((e) => e.remove())');
 await av('__simular("aceita"); CC.folhaOfensiva()');
 await esperar('!!document.querySelector("[data-compartilhar-ofensiva]")');
 const lema2 = await av('(() => ({ linhas: [...document.querySelectorAll(".folha-ofensiva .selo-linha")].map((l) => l.textContent), ref: (document.querySelector(".folha-ofensiva .selo-ref") || { textContent: "" }).textContent }))()');
 await av('document.querySelector("[data-compartilhar-ofensiva]").click()');
 await esperar('!!window.__compartilhado');
-ok(lema2.linhas.join(' ') !== lema.linhas.join(' ')
+ok(lema2.linhas.join(' ') === lema.linhas.join(' ')
   && await av('CC.story.preparar({ tipo: "ofensiva", dias: 16, frase: ' + JSON.stringify(lema2) + ' }).then((f) => f === window.__compartilhado.files[0])'),
-'abrindo de novo, a frase nova do carimbo é a que vai na imagem');
+'abrindo de novo no mesmo dia, a frase do carimbo é a mesma e é a que vai na imagem');
 
 // o Safari recusa quando passou tempo demais desde o toque: o app avisa e o segundo toque vai
 await av('__simular("nega")');
