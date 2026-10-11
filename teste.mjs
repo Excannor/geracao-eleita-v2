@@ -762,12 +762,19 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
     + (longas.length ? ' (' + longas.map((f) => f.linhas[0]).join(', ') + ')' : ''));
   checar(!refsRuins.length, 'toda frase da ofensiva com referência aponta para versículos que existem nas duas Bíblias'
     + (refsRuins.length ? ' (' + refsRuins.map((f) => f.ref).join(', ') + ')' : ''));
-  let repetiu = false;
-  let antes = null;
-  for (let i = 0; i < 400; i++) { const f = CC.fraseDaOfensiva(); if (f === antes) repetiu = true; antes = f; }
-  checar(!repetiu, 'o sorteio da ofensiva nunca repete a frase da vez anterior');
+  // Uma por dia, sem repetir até passarem todas (o baralho fica em memória: o localStorage do teste é mudo).
+  const diaN = (n) => new Date(Date.UTC(2026, 0, 1 + n)).toISOString().slice(0, 10);
+  let mudouNoDia = false;
+  for (let i = 0; i < 20; i++) if (CC.fraseDaOfensiva({ dia: diaN(0) }) !== CC.fraseDaOfensiva({ dia: diaN(0) })) mudouNoDia = true;
+  checar(!mudouNoDia, 'a frase da ofensiva é a mesma o dia inteiro');
+  const ciclo = new Set();
+  for (let n = 0; n < frases.length; n++) ciclo.add(CC.fraseDaOfensiva({ dia: diaN(n) }));
+  let colou = false;
+  let antes = CC.fraseDaOfensiva({ dia: diaN(frases.length - 1) });
+  for (let n = frases.length; n < frases.length * 4; n++) { const f = CC.fraseDaOfensiva({ dia: diaN(n) }); if (f === antes) colou = true; antes = f; }
+  checar(ciclo.size === frases.length && !colou, 'as frases da ofensiva saem uma por dia, aleatórias, sem repetir até passarem todas (e nunca a de ontem)');
   let semTexto = false;
-  for (let i = 0; i < 400; i++) if (!CC.fraseDaOfensiva({ comTexto: true }).linhas.length) semTexto = true;
+  for (let n = 0; n < 400; n++) if (!CC.fraseDaOfensiva({ comTexto: true, dia: diaN(500 + n) }).linhas.length) semTexto = true;
   checar(!semTexto, 'o fim da lição (comTexto) nunca sorteia a frase que é só arte');
 }
 

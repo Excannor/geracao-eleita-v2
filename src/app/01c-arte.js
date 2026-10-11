@@ -110,16 +110,45 @@
     { linhas: ['Jesus', 'vive'], arte: 'jesusvive' },
     { linhas: ['Quem não', 'desiste tem', 'testemunho', 'pra contar.'], arte: 'testemunho' },
   ];
-  // Nunca a mesma da última vez: abrir de novo e ver a mesma frase parece que não sorteou.
-  // comTexto: só as que têm frase (o fim da lição mostra a frase em texto corrido).
-  let ultimaFrase = -1;
-  CC.fraseDaOfensiva = ({ comTexto = false } = {}) => {
-    const total = CC.FRASES_OFENSIVA.length;
-    const vale = (k) => !comTexto || CC.FRASES_OFENSIVA[k].linhas.length > 0;
-    let i = Math.floor(Math.random() * total);
-    for (let n = 0; n < total && (i === ultimaFrase || !vale(i)); n++) i = (i + 1 + Math.floor(Math.random() * (total - 1))) % total;
-    ultimaFrase = i;
-    return CC.FRASES_OFENSIVA[i];
+  // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
+  // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir
+  // com a de ontem. comTexto: o fim da lição mostra a frase em texto corrido, então quando a
+  // do dia é só arte ele tem um sorteio próprio, só entre as que têm frase.
+  // A chave é o texto + referência (a lista cresce e muda de ordem sem bagunçar o que já saiu).
+  const chaveFrase = (f) => f.linhas.join(' ') + '|' + (f.ref || '') + '|' + (f.arte || '');
+  const GUARDA_FRASES = 'cc.frasesOfensiva';
+  let baralhoMem = null;
+  function lerBaralho() {
+    try { const b = JSON.parse(localStorage.getItem(GUARDA_FRASES)); if (b && typeof b === 'object') return b; } catch (e) { /* segue */ }
+    return baralhoMem || {};
+  }
+  function guardarBaralho(b) {
+    baralhoMem = b;
+    try { localStorage.setItem(GUARDA_FRASES, JSON.stringify(b)); } catch (e) { /* segue */ }
+  }
+  function sortearDoDia(b, modo, dia, vale) {
+    const m = b[modo] || (b[modo] = { vistas: [] });
+    const todas = CC.FRASES_OFENSIVA.filter(vale);
+    const achar = (k) => todas.find((f) => chaveFrase(f) === k);
+    if (m.dia === dia && achar(m.chave)) return achar(m.chave);
+    const ontem = m.chave;
+    let restam = todas.filter((f) => !m.vistas.includes(chaveFrase(f)));
+    if (!restam.length) {
+      m.vistas = [];
+      restam = todas.length > 1 ? todas.filter((f) => chaveFrase(f) !== ontem) : todas;
+    }
+    const f = restam[Math.floor(Math.random() * restam.length)];
+    m.dia = dia;
+    m.chave = chaveFrase(f);
+    m.vistas.push(m.chave);
+    return f;
+  }
+  CC.fraseDaOfensiva = ({ comTexto = false, dia = CC.hojeIso() } = {}) => {
+    const b = lerBaralho();
+    let f = sortearDoDia(b, 'geral', dia, () => true);
+    if (comTexto && !f.linhas.length) f = sortearDoDia(b, 'texto', dia, (x) => x.linhas.length > 0);
+    guardarBaralho(b);
+    return f;
   };
   // Quebra um texto em linhas que cabem numa largura, encolhendo a letra até o bloco caber
   // também na altura: a mesma lógica do carimbo da ofensiva (começa grande, diminui aos
