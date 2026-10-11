@@ -5,10 +5,10 @@
    redesenhada em canvas, sem imagem embutida (o index.html tem teto de 1 MB): desenhos em
    caminhos e traços, e a textura de impressão gasta é ruído com semente fixa (a mesma frase
    sai sempre igual). As de terceiros (procurado, a foto da bandeira) viraram ilustração
-   própria, só com a ideia. Duas o dono preferiu só tipográficas (envergonho, oleiro). Na
-   terceira leva, "Avivados", "Não temas" e "Jesus is my King" seguem o padrão da landing
-   (entrar.html): as fotos em P&B dela, o preto com grão, Oswald creme e amarelo, o risco de
-   marcador, a coroa e a etiqueta em sálvia.
+   própria, só com a ideia. Duas o dono preferiu só tipográficas (envergonho, oleiro). As
+   feitas depois "no padrão da landing" ficaram repetidas e foram revistas (o último bloco do
+   arquivo): cada uma com fundo, composição, letra e fechamento próprios, usando as fotos da
+   landing e do dono.
    Quando a frase sorteada é uma destas, 01d-story.js desenha com o modelo dela
    (CC.story.artes[arte]); as outras continuam no modelo de sempre.
    Em todos: a chama e a contagem de dias no topo (a ofensiva continua em destaque), a arte no
@@ -1883,14 +1883,10 @@
     referencia(ctx, 'Mateus 24.42', L / 2, y + 120, 34, 'rgba(244,241,234,.72)');
   }
 
-  // ---------- (w, x, y) Avivados, Não temas e Jesus is my King: no padrão da landing ----------
-  // O dono pediu os três "no padrão da landing page" (entrar.html): página quase preta com
-  // grão, foto em preto e branco com contraste (a mesma da landing, que já vem tratada),
-  // apagando nas bordas, uma cor só na foto quando há (o sol amarelo atrás da cruz), título
-  // em Oswald maiúsculo creme com a palavra-chave em amarelo e o risco de marcador embaixo,
-  // o rótulo espaçado em sálvia entre dois traços, a coroa à mão em sálvia e a etiqueta em
-  // Permanent Marker sobre papel sálvia. As fotos (story-foto-<nome>) vêm com as artes; sem
-  // elas, o modelo sai só com a tipografia, que se lê sozinha.
+  // ---------- as cores e peças da landing (entrar.html) ----------
+  // A paleta, o Oswald, o preto com grão, o título com sombra e a coroa à mão da landing, que
+  // as artes do fim do arquivo usam. As fotos (story-foto-<nome>) vêm com as artes; sem elas,
+  // o modelo sai só com a tipografia, que se lê sozinha.
   const LP = { preto: '#0d0e0c', faixa: '#171815', creme: '#f2efdc', texto: '#c9cabd', fraco: '#a3a69a',
     salvia: '#c8da8c', salviaEscura: '#9fb266', amarelo: '#ffc44d', tinta: '#12130f' };
   const oswaldLP = (t, peso = 700) => peso + ' ' + t + 'px Oswald, "Arial Narrow", sans-serif';
@@ -1910,43 +1906,6 @@
       ctx.restore();
     }
   }
-  // A foto em (x, y) com largura w, numa camada: as bordas apagam como as máscaras da landing
-  // (apaga: { cima: [de, ate], baixo, esq, dir }, cada uma uma rampa de 0 a 1), a opacidade
-  // é a da landing (a foto nunca vai cheia sobre o preto) e o grão vem depois, por cima de tudo.
-  function fotoLanding(ctx, img, { x, y, w, alfa = 0.8, apaga = {}, depois }) {
-    const h = w * img.height / img.width;
-    const { c, ctx: k } = camada();
-    k.imageSmoothingEnabled = true;
-    k.imageSmoothingQuality = 'high';
-    k.drawImage(img, x, y, w, h);
-    if (depois) depois(k, { x, y, w, h });
-    k.globalCompositeOperation = 'destination-in';
-    for (const [lado, [de, ate]] of Object.entries(apaga)) {
-      const vert = lado === 'cima' || lado === 'baixo';
-      const g = vert ? k.createLinearGradient(0, de, 0, ate) : k.createLinearGradient(de, 0, ate, 0);
-      g.addColorStop(0, 'rgba(0,0,0,0)');
-      g.addColorStop(1, 'rgba(0,0,0,1)');
-      k.fillStyle = g;
-      k.fillRect(0, 0, L, A);
-    }
-    ctx.save();
-    ctx.globalAlpha = alfa;
-    ctx.drawImage(c, 0, 0);
-    ctx.restore();
-  }
-  // O risco de marcador embaixo da palavra (--lp-risco-* da landing), com a base em y.
-  function riscoLanding(ctx, x, y, w, h, cor) {
-    ctx.save();
-    ctx.translate(x, y - h);
-    ctx.scale(w / 300, h / 16);
-    ctx.fillStyle = cor;
-    ctx.fill(new Path2D('M3 10C70 4 160 3 297 5l-2 5C190 10 96 11 6 15z'));
-    ctx.globalAlpha = 0.6;
-    ctx.strokeStyle = cor;
-    ctx.lineWidth = 1.4;
-    ctx.stroke(new Path2D('M30 13c80-3 160-4 240-3'));
-    ctx.restore();
-  }
   // Uma linha do título: Oswald 700 maiúscula, com a sombra escura da landing por baixo
   // (text-shadow 0 2px 18px). Devolve a largura.
   function tituloLanding(ctx, texto, x, y, tam, cor, { alinhar = 'center', peso = 700, espaco = 0 } = {}) {
@@ -1958,27 +1917,6 @@
     ctx.restore();
     ctx.font = oswaldLP(tam, peso);
     return ctx.measureText(texto).width + espaco * Math.max(0, texto.length - 1);
-  }
-  // O tamanho em que a linha ocupa a largura dada (no máximo tamMax).
-  function tamanhoPara(ctx, texto, largura, tamMax, peso = 700) {
-    ctx.font = oswaldLP(100, peso);
-    return Math.min(tamMax, 100 * largura / ctx.measureText(texto).width);
-  }
-  // O rótulo da seção (.lp-joao-ref): Manrope 800 espaçada em sálvia, entre dois traços.
-  function rotuloLanding(ctx, texto, cx, y, tam = 34) {
-    const t = texto.toUpperCase();
-    const espaco = tam * 0.22;
-    ctx.font = S.Mn(800, tam);
-    const w = ctx.measureText(t).width + espaco * (t.length - 1);
-    S.escrever(ctx, t, cx - espaco / 2, y, S.Mn(800, tam), LP.salvia, { espaco });
-    ctx.save();
-    ctx.globalAlpha = 0.7;
-    ctx.fillStyle = LP.salvia;
-    const traco = tam * 2.6;
-    const vao = tam * 0.8;
-    ctx.fillRect(cx - w / 2 - vao - traco, y - tam * 0.4, traco, 5);
-    ctx.fillRect(cx + w / 2 + vao, y - tam * 0.4, traco, 5);
-    ctx.restore();
   }
   // A coroa à mão da landing (.lp-coroa: o zigue-zague com a base), com o meio da base em
   // (x, y), largura w e o giro dela.
@@ -1998,147 +1936,8 @@
     ctx.stroke(new Path2D('M12 70c30-4 60-5 92-1M17 60l-4-30M101 61l4-30'));
     ctx.restore();
   }
-  // A etiqueta do lema (.lp-etiqueta): cada linha numa tira de papel sálvia, desencontradas,
-  // em Permanent Marker escuro, girada e com sombra. (x, y) é o canto de cima à esquerda.
-  function etiquetaLanding(ctx, linhas, x, y, tam, giro) {
-    const recuo = [0, 8, 2, 12, 4].map((v) => v * tam / 16);
-    const alt = tam * 1.15 + tam * 0.4;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(giro);
-    ctx.font = '400 ' + tam + 'px "Permanent Marker", cursive';
-    ctx.shadowColor = 'rgba(0,0,0,.45)';
-    ctx.shadowBlur = 24;
-    ctx.shadowOffsetY = 12;
-    linhas.forEach((l, i) => {
-      const w = ctx.measureText(l.toUpperCase()).width + tam * 1.1;
-      ctx.fillStyle = LP.salvia;
-      ctx.fillRect(recuo[i % recuo.length], i * (alt - tam * 0.12), w, alt);
-    });
-    ctx.shadowColor = 'rgba(0,0,0,0)';
-    linhas.forEach((l, i) => {
-      S.escrever(ctx, l.toUpperCase(), recuo[i % recuo.length] + tam * 0.55, i * (alt - tam * 0.12) + tam * 1.12, '400 ' + tam + 'px "Permanent Marker", cursive', LP.tinta, { alinhar: 'left', espaco: tam * 0.02 });
-    });
-    ctx.restore();
-  }
-  // A borda rasgada da faixa (.lp-faixa): o papel um pouco mais claro que o fundo, com os
-  // dentes da clip-path da landing, entre y0 e y1.
-  function faixaLanding(ctx, y0, y1, semente) {
-    const r = sorteio(semente);
-    const p = new Path2D();
-    const n = 28;
-    p.moveTo(0, y0 + r() * 22);
-    for (let i = 1; i <= n; i++) p.lineTo(L * i / n, y0 + r() * 22);
-    for (let i = n; i >= 0; i--) p.lineTo(L * i / n, y1 - r() * 22);
-    p.closePath();
-    ctx.fillStyle = LP.faixa;
-    ctx.fill(p);
-  }
 
-  // (w) Avivados até que Ele venha: a foto do culto (as mãos levantadas) com a luz do palco
-  // acesa em amarelo, como o sol atrás da cruz na landing; embaixo, como no chamado final da
-  // landing: AVIVADOS creme, "até que" pequeno em amarelo e ELE VENHA grande em amarelo com
-  // o risco; a coroa sálvia à mão em cima de AVIVADOS.
-  function arteAvivados(ctx, fotos) {
-    fundoLanding(ctx);
-    if (fotos.culto) {
-      fotoLanding(ctx, fotos.culto, { x: -40, y: 440, w: L + 80, alfa: 0.82,
-        apaga: { cima: [440, 620], baixo: [1080, 820] },
-        depois: (k, c) => {
-          // a luz do palco em amarelo: só o que é claro, perto dos refletores, ganha a cor
-          // (o resto da foto continua cinza, como a landing faz com o sol)
-          const x0 = Math.max(0, Math.round(c.x));
-          const y0 = Math.round(c.y);
-          const w = Math.min(L, Math.round(c.w)) - x0;
-          const h = Math.round(c.h * 0.55);
-          let img;
-          try { img = k.getImageData(x0, y0, w, h); } catch (e) { return; }
-          const d = img.data;
-          const fx = c.x + c.w * 0.42 - x0;
-          const fy = c.h * 0.1;
-          const raio = c.w * 0.36;
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const i = (y * w + x) * 4;
-              const perto = Math.max(0, 1 - Math.hypot(x - fx, (y - fy) * 1.3) / raio);
-              if (!perto) continue;
-              const l = (d[i] + d[i + 1] + d[i + 2]) / 765;
-              const t = Math.min(1, Math.max(0, (l - 0.25) / 0.55)) * Math.min(1, perto * 1.6);
-              d[i] += (Math.min(255, 255 * l * 1.15) - d[i]) * t;
-              d[i + 1] += (Math.min(255, 196 * l * 1.15) - d[i + 1]) * t;
-              d[i + 2] += (Math.min(255, 77 * l * 1.15) - d[i + 2]) * t;
-            }
-          }
-          k.putImageData(img, x0, y0);
-        } });
-    }
-    const cx = L / 2;
-    rotuloLanding(ctx, '1 Coríntios 11.26', cx, 975);
-    const t1 = tamanhoPara(ctx, 'AVIVADOS', 900, 260);
-    const y1 = 975 + 70 + t1 * 0.86;
-    const w1 = tituloLanding(ctx, 'AVIVADOS', cx, y1, t1, LP.creme);
-    coroaLanding(ctx, cx + w1 / 2 - 50, y1 - t1 * 0.86 - 4, 140, 0.16);
-    const y2 = y1 + 96;
-    tituloLanding(ctx, 'ATÉ QUE', cx, y2, 78, LP.amarelo, { peso: 600, espaco: 3 });
-    const t3 = tamanhoPara(ctx, 'ELE VENHA.', 860, 200);
-    const y3 = y2 + t3 * 0.9;
-    const w3 = tituloLanding(ctx, 'ELE VENHA.', cx, y3, t3, LP.amarelo);
-    riscoLanding(ctx, cx - w3 / 2 - 6, y3 + 30, w3 + 14, 22, LP.amarelo);
-  }
-
-  // (x) Não temas, eu sou teu Deus: a seção de João 14.6 da landing. A foto da cruz no monte
-  // com o sol amarelo no alto, apagando embaixo; por cima dela, o rótulo com a referência,
-  // NÃO TEMAS enorme em creme, "eu sou" menor e TEU DEUS em amarelo com o risco.
-  function arteNaoTemas(ctx, fotos) {
-    fundoLanding(ctx);
-    if (fotos.cruz) {
-      // a cruz fica um pouco à esquerda do meio, com o sol inteiro
-      const w = 1700;
-      const x = 500 - w * 0.215;
-      fotoLanding(ctx, fotos.cruz, { x, y: 470, w, alfa: 0.92,
-        apaga: { cima: [490, 650], baixo: [1180, 930], esq: [x, x + 240] } });
-    }
-    const cx = L / 2;
-    rotuloLanding(ctx, 'Isaías 41.10', cx, 1000);
-    const t1 = tamanhoPara(ctx, 'NÃO TEMAS', 900, 250);
-    const y1 = 1000 + 40 + t1 * 0.86;
-    tituloLanding(ctx, 'NÃO TEMAS', cx, y1, t1, LP.creme);
-    const y2 = y1 + 104;
-    tituloLanding(ctx, 'EU SOU', cx, y2, 92, LP.creme, { peso: 600, espaco: 2 });
-    const t3 = tamanhoPara(ctx, 'TEU DEUS.', 760, 190);
-    const y3 = y2 + t3 * 0.92;
-    const w3 = tituloLanding(ctx, 'TEU DEUS.', cx, y3, t3, LP.amarelo);
-    riscoLanding(ctx, cx - w3 / 2 - 6, y3 + 30, w3 + 14, 22, LP.amarelo);
-  }
-
-  // (y) Jesus is my King: a abertura da landing. O rapaz de costas em P&B à direita, apagando
-  // para a esquerda e para baixo, mais para a borda e mais apagado, para não disputar com o
-  // texto; à esquerda, JESUS enorme em creme coroado pela coroa sálvia à mão (a mesma da
-  // landing), inclinada no canto de cima do J: a coroa é de Jesus, não do rapaz. Depois,
-  // "is my" na etiqueta sálvia e KING em amarelo com o risco. O texto fica em inglês.
-  function arteRei(ctx, fotos) {
-    fundoLanding(ctx);
-    const fx = 400;
-    const fy = 600;
-    const fw = 780;
-    if (fotos.abertura) {
-      fotoLanding(ctx, fotos.abertura, { x: fx, y: fy, w: fw, alfa: 0.58,
-        apaga: { esq: [fx, fx + fw * 0.55], cima: [fy, fy + 120], baixo: [1560, 1200] } });
-    }
-    const x = 72;
-    const t1 = tamanhoPara(ctx, 'JESUS', 700, 300);
-    const y1 = 1000;
-    tituloLanding(ctx, 'JESUS', x, y1, t1, LP.creme, { alinhar: 'left' });
-    // a coroa no canto de cima do J, inclinada para a esquerda, como posta sobre o nome
-    coroaLanding(ctx, x + 76, y1 - t1 * 0.86 - 4, 150, -0.2);
-    etiquetaLanding(ctx, ['is my'], x + 40, y1 + 34, 66, -0.06);
-    const t3 = tamanhoPara(ctx, 'KING.', 640, 300);
-    const y3 = y1 + 150 + t3 * 0.86;
-    const w3 = tituloLanding(ctx, 'KING.', x, y3, t3, LP.amarelo, { alinhar: 'left' });
-    riscoLanding(ctx, x - 4, y3 + 34, w3 + 14, 26, LP.amarelo);
-  }
-  // ---------- (z) Prepara-te e Há esperança no padrão da landing; Jesus para as nações no dos posts da marca ----------
-  // Nos dois sem foto, o desenho à mão em sálvia é o herói; o título vem embaixo, como nos outros.
+  // ---------- o traço à mão; Jesus para as nações no padrão dos posts da marca ----------
   // O traço à mão: os pontos ligados por curvas, cada um mexido um pouco pelo sorteio, em
   // duas passadas (a grossa e uma fina e mais fraca, um pouco ao lado), como a coroa da
   // landing. fechar: liga o último ao primeiro.
@@ -2173,17 +1972,6 @@
       pts.push([cx + Math.cos(t) * rx * k, cy + Math.sin(t) * ry * k]);
     }
     return pts;
-  }
-  // O título no pé da arte, do jeito dos outros da landing: as linhas creme, a última em
-  // amarelo com o risco. linhas: [{ t, larg, max, peso, cor, espaco, vao }]; devolve o y final.
-  function blocoLanding(ctx, linhas, y, cx = L / 2) {
-    for (const l of linhas) {
-      const tam = tamanhoPara(ctx, l.t, l.larg, l.max, l.peso || 700);
-      y += (l.vao || 0) + tam * 0.9;
-      const w = tituloLanding(ctx, l.t, cx, y, tam, l.cor || LP.creme, { peso: l.peso || 700, espaco: l.espaco || 0 });
-      if (l.risco) riscoLanding(ctx, cx - w / 2 - 6, y + tam * 0.15, w + 14, 22, LP.amarelo);
-    }
-    return y;
   }
 
   // (z0) Jesus para as nações: no padrão dos posts da marca Geração Eleita (o dono pediu
@@ -2421,166 +2209,6 @@
     coroaBranca(ctx, 905, 1410, 140, 0.14, r);
   }
 
-  // (z1) Prepara-te, Ele vem (1 Tessalonicenses 4.16-17): a partir da arte que o dono mandou,
-  // o relógio antigo de algarismos romanos com os ponteiros quase na meia-noite, inteiro,
-  // centrado e à mão em sálvia (sem a chama: o dono preferiu só o relógio). Embaixo,
-  // PREPARA-TE menor em creme e ELE VEM em amarelo com o risco.
-  function arteRelogio(ctx) {
-    fundoLanding(ctx);
-    const r = sorteio(1617);
-    const cx = L / 2;
-    // ---- o relógio ----
-    const ox = 150;
-    const oy = 808;
-    // sem a chama, o relógio vem inteiro e centrado (desenhado em ox, oy e trazido para o meio)
-    const [px, py, k] = [L / 2, 806, 0.97];
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.scale(k, k);
-    ctx.translate(-ox, -oy);
-    const R = 300;
-    // o aro: duas voltas grossas, e entre elas os riscos dos minutos
-    tracoAMao(ctx, pontosElipse(ox, oy, R, R, { r, n: 60, mexe: 0.008 }), { r, largura: 8, fechar: true });
-    tracoAMao(ctx, pontosElipse(ox, oy, R - 40, R - 40, { r, n: 56, mexe: 0.01 }), { r, largura: 4, fechar: true, segunda: false });
-    for (let i = 0; i < 60; i++) {
-      const a = i / 60 * Math.PI * 2 - Math.PI / 2;
-      const hora = i % 5 === 0;
-      const de = R - (hora ? 38 : 26);
-      const ate = R - 10;
-      tracoAMao(ctx, [[ox + Math.cos(a) * de, oy + Math.sin(a) * de], [ox + Math.cos(a) * ate, oy + Math.sin(a) * ate]],
-        { r, tremor: 1.5, largura: hora ? 5 : 2.5, segunda: false, cor: hora ? LP.salvia : 'rgba(200,218,140,.7)' });
-    }
-    // os algarismos romanos, todos de pé (os de baixo, virados como nos relógios antigos,
-    // liam errado no celular: o VI parecia IΛ)
-    const romanos = ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
-    romanos.forEach((n, i) => {
-      const a = i / 12 * Math.PI * 2 - Math.PI / 2;
-      const rr = R - 92;
-      ctx.save();
-      ctx.translate(ox + Math.cos(a) * rr, oy + Math.sin(a) * rr);
-      S.escrever(ctx, n, 0, 18, '600 46px Literata, Georgia, serif', LP.salvia, { espaco: -2 });
-      ctx.restore();
-    });
-    // o anel de dentro, fino, e o miolo
-    tracoAMao(ctx, pontosElipse(ox, oy, R - 150, R - 150, { r, n: 48, mexe: 0.012 }), { r, largura: 2.5, fechar: true, segunda: false, cor: 'rgba(200,218,140,.6)' });
-    tracoAMao(ctx, pontosElipse(ox, oy, 46, 46, { r, n: 20, mexe: 0.05 }), { r, largura: 3, fechar: true, segunda: false, cor: 'rgba(200,218,140,.55)' });
-    // os ponteiros: onze e cinquenta e sete, a três minutos da meia-noite
-    const ponteiro = (ang, comp, largura, ponta) => {
-      const a = ang - Math.PI / 2;
-      const ux = Math.cos(a);
-      const uy = Math.sin(a);
-      tracoAMao(ctx, [[ox - ux * 40, oy - uy * 40], [ox + ux * comp * 0.5, oy + uy * comp * 0.5], [ox + ux * comp, oy + uy * comp]], { r, tremor: 1.5, largura });
-      // a ponta em losango vazado
-      const px = ox + ux * comp;
-      const py = oy + uy * comp;
-      const nx = -uy;
-      const ny = ux;
-      tracoAMao(ctx, [[px - ux * ponta, py - uy * ponta], [px + nx * ponta * 0.45, py + ny * ponta * 0.45], [px + ux * ponta * 0.9, py + uy * ponta * 0.9],
-        [px - nx * ponta * 0.45, py - ny * ponta * 0.45]], { r, tremor: 1, largura: largura * 0.7, fechar: true, segunda: false });
-    };
-    ponteiro((57 / 60) * Math.PI * 2, R - 70, 6, 30);
-    ponteiro(((11 + 57 / 60) / 12) * Math.PI * 2, R - 140, 9, 34);
-    ctx.fillStyle = LP.salvia;
-    ctx.beginPath();
-    ctx.arc(ox, oy, 13, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-    // ---- embaixo, o título ----
-    const y0 = 1150;
-    rotuloLanding(ctx, '1 Tessalonicenses 4.16-17', cx, y0, 30);
-    return blocoLanding(ctx, [
-      { t: 'PREPARA-TE,', larg: 560, max: 100, peso: 600, espaco: 4, vao: 30 },
-      { t: 'ELE VEM.', larg: 820, max: 200, cor: LP.amarelo, risco: true, vao: 8 },
-    ], y0);
-  }
-
-  // (z2) Há esperança para a árvore (Jó 14.7-9): o toco cortado, com os anéis no corte, as
-  // cascas e as raízes à mão em sálvia, e o broto novo saindo da beira do corte, com as
-  // folhas cheias (é a única parte viva, por isso a mais forte). A frase é longa: HÁ
-  // ESPERANÇA grande, o meio menor e AINDA SE RENOVARÁ em amarelo com o risco.
-  function arteToco(ctx) {
-    fundoLanding(ctx);
-    const r = sorteio(1479);
-    const cx = L / 2;
-    // o desenho é feito em tamanho grande e encolhe por igual, com o chão em y 962
-    ctx.save();
-    ctx.translate(cx, 962);
-    ctx.scale(0.8, 0.8);
-    ctx.translate(-cx, -1066);
-    const topo = 870; // o meio da elipse do corte
-    const rx = 196;
-    const ry = 50;
-    const pe = 1060;
-    // o chão: um risco longo e fraco, com dois tufos
-    tracoAMao(ctx, [[cx - 380, pe + 6], [cx - 200, pe + 2], [cx, pe + 6], [cx + 200, pe + 3], [cx + 380, pe + 8]], { r, largura: 4, segunda: false, cor: 'rgba(200,218,140,.4)' });
-    // as laterais do tronco, abrindo nas raízes
-    tracoAMao(ctx, [[cx - rx, topo + 2], [cx - rx - 4, topo + 80], [cx - rx - 2, topo + 140], [cx - rx - 26, pe - 20], [cx - rx - 90, pe + 4]], { r });
-    tracoAMao(ctx, [[cx + rx, topo + 2], [cx + rx + 3, topo + 80], [cx + rx + 6, topo + 140], [cx + rx + 30, pe - 22], [cx + rx + 96, pe + 4]], { r });
-    // as duas raízes da frente, saindo do tronco e entrando no chão
-    tracoAMao(ctx, [[cx - 96, pe - 56], [cx - 104, pe - 20], [cx - 150, pe + 4]], { r, largura: 6 });
-    tracoAMao(ctx, [[cx + 70, pe - 50], [cx + 82, pe - 16], [cx + 132, pe + 5]], { r, largura: 6 });
-    // a casca: riscos verticais ondulados
-    for (const [dx, de, ate] of [[-150, 40, 150], [-96, 70, 176], [-40, 54, 160], [20, 76, 182], [80, 50, 150], [138, 66, 170], [-176, 120, 170], [168, 110, 166]]) {
-      const x = cx + dx;
-      const curva = ry * Math.sqrt(Math.max(0, 1 - (dx / rx) ** 2));
-      tracoAMao(ctx, [[x, topo + curva + de * 0.3], [x + 4, topo + curva + (de + ate) / 2 * 0.6], [x - 2, topo + curva + ate * 0.9]], { r, largura: 3.5, segunda: false, cor: 'rgba(200,218,140,.6)' });
-    }
-    // o corte: a borda da casca, grossa, e os anéis dentro, com o miolo fora do centro
-    tracoAMao(ctx, pontosElipse(cx, topo, rx, ry, { r, n: 44, mexe: 0.025 }), { r, largura: 8, fechar: true });
-    tracoAMao(ctx, pontosElipse(cx, topo + 2, rx - 18, ry - 6, { r, n: 40, mexe: 0.03 }), { r, largura: 3, fechar: true, segunda: false, cor: 'rgba(200,218,140,.8)' });
-    const mx = cx - 22;
-    const my = topo + 4;
-    for (let i = 1; i <= 6; i++) {
-      const k = i / 7;
-      tracoAMao(ctx, pontosElipse(mx + (cx - mx) * k, my + (topo - my) * k, (rx - 26) * k, (ry - 10) * k, { r, n: 30, mexe: 0.07 }),
-        { r, largura: i % 2 ? 3 : 2.2, fechar: true, segunda: false, cor: 'rgba(200,218,140,' + (0.85 - i * 0.05) + ')' });
-    }
-    ctx.fillStyle = LP.salvia;
-    ctx.beginPath();
-    ctx.ellipse(mx, my, 6, 2.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // a rachadura do corte, do miolo para a borda
-    tracoAMao(ctx, [[mx + 4, my], [mx + 60, my - 10], [mx + 120, my - 20], [mx + 170, my - 32]], { r, largura: 2.5, segunda: false, cor: 'rgba(200,218,140,.75)' });
-    // o broto: sai da beira de trás do corte, sobe em curva e abre as folhas
-    const bx = cx + 92;
-    const by = topo - ry * 0.86;
-    const haste = [[bx, by + 4], [bx + 6, by - 50], [bx - 6, by - 110], [bx + 10, by - 170], [bx + 24, by - 214]];
-    tracoAMao(ctx, haste, { r, largura: 9, segunda: false });
-    const folha = (x, y, comp, larg, ang) => {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(ang);
-      const p = new Path2D();
-      p.moveTo(0, 0);
-      p.bezierCurveTo(comp * 0.3, -larg, comp * 0.75, -larg * 0.9, comp, 0);
-      p.bezierCurveTo(comp * 0.7, larg * 0.75, comp * 0.3, larg * 0.8, 0, 0);
-      ctx.fillStyle = LP.salvia;
-      ctx.fill(p);
-      // a nervura, em escuro
-      ctx.strokeStyle = 'rgba(13,14,12,.55)';
-      ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(comp * 0.08, 0);
-      ctx.quadraticCurveTo(comp * 0.5, -larg * 0.12, comp * 0.86, 0);
-      ctx.stroke();
-      ctx.restore();
-    };
-    folha(bx - 2, by - 108, 110, 34, -2.6);
-    folha(bx + 2, by - 86, 92, 28, -0.42);
-    folha(bx + 22, by - 210, 96, 30, -1.05);
-    folha(bx + 20, by - 206, 76, 24, -2.3);
-    ctx.restore();
-    // embaixo, o título
-    const y0 = 1036;
-    rotuloLanding(ctx, 'Jó 14.7-9', cx, y0);
-    return blocoLanding(ctx, [
-      { t: 'HÁ ESPERANÇA', larg: 900, max: 170, vao: 28 },
-      { t: 'PARA A ÁRVORE QUE,', larg: 900, max: 64, peso: 600, espaco: 3, vao: 20 },
-      { t: 'SE FOR CORTADA,', larg: 900, max: 64, peso: 600, espaco: 3, vao: 10 },
-      { t: 'AINDA SE RENOVARÁ.', larg: 900, max: 130, cor: LP.amarelo, risco: true, vao: 14 },
-    ], y0);
-  }
   // ---------- a ofensiva no topo, a arte no meio, a marca no pé ----------
   // A ofensiva continua em destaque em todo modelo: a chama do app e o número de dias no
   // alto, como no story de sempre. A arte vem abaixo, na faixa do meio (Z0 a Z1); a que foi
@@ -2611,6 +2239,10 @@
   // os do padrão da landing: o número em amarelo, o resto em creme
   const TEMA_LP = { ...ESCURO, numero: LP.amarelo, rotulo: LP.creme, marca: LP.creme, marcaFraca: LP.fraco };
   const CLARO = { numero: '#d2401c', rotulo: '#1d1b19', apagada: '#8a8f84', marca: '#161514', marcaFraca: '#6d5446' };
+  // os revistos (o bloco do fim do arquivo): o papel claro, o amarelo cheio e a sálvia cheia
+  const TEMA_PAPEL = { ...CLARO, numero: '#b8341a', marcaFraca: '#5c5a52' };
+  const TEMA_AMARELO = { numero: '#151512', rotulo: '#151512', apagada: '#6b5a2c', marca: '#151512', marcaFraca: '#4a3d1a' };
+  const TEMA_SALVIA = { numero: '#151512', rotulo: '#151512', apagada: '#5d6b3c', marca: '#151512', marcaFraca: '#3d4526' };
   const MODELOS = {
     chama: { fundo: ['#121110', { x: L / 2, y: 1000, r: 900, cor: 'rgba(70,60,50,.35)' }], tema: ESCURO, desenhar: arteChama, grao: [26, 116], caixa: [560, 1450] },
     luz: { fundo: ['#4a2f1e', { x: L / 2 + 30, y: 900, r: 760, cor: 'rgba(214,120,48,.20)' }], caixa: [360, 1440],
@@ -2640,19 +2272,19 @@
     inundados: { fundo: ['#0d0d0c'], caixa: [600, 1460], tema: ESCURO, desenhar: arteInundados, grao: [18, 20] },
     grandeobra: { fundo: ['#0d0d0c'], caixa: [580, 1540], tema: ESCURO, desenhar: arteGrandeObra, grao: [18, 63] },
     vigiem: { fundo: ['#0d0d0c'], caixa: [600, 1440], tema: ESCURO, desenhar: arteVigiem, grao: [16, 2442] },
-    avivados: { fundo: [LP.preto], fotos: ['culto'], tema: TEMA_LP, desenhar: arteAvivados, grao: [18, 1126] },
-    naotemas: { fundo: [LP.preto], fotos: ['cruz'], tema: TEMA_LP, desenhar: arteNaoTemas, grao: [18, 4110] },
-    rei: { fundo: [LP.preto], fotos: ['abertura'], tema: TEMA_LP, desenhar: arteRei, grao: [18, 777] },
+    avivados: { fundo: [LP.amarelo], fotos: ['culto'], tema: TEMA_AMARELO, desenhar: arteAvivados, grao: [14, 1126] },
+    naotemas: { fundo: ['#ebe7dc'], fotos: ['cruz'], tema: TEMA_PAPEL, desenhar: arteNaoTemas, grao: [12, 4110] },
+    rei: { fundo: [LP.salvia], fotos: ['abertura'], tema: TEMA_SALVIA, desenhar: arteRei, grao: [14, 777] },
     nacoes: { fundo: [LP.preto], fotos: ['nacoes'], tema: TEMA_LP, desenhar: arteNacoes, grao: [26, 2819] },
-    relogio: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteRelogio, grao: [18, 1617] },
-    toco: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteToco, grao: [18, 1479] },
+    relogio: { fundo: ['#0f110e'], tema: { ...TEMA_LP, brilho: false }, desenhar: arteRelogio, grao: [18, 1617] },
+    toco: { fundo: ['#f0e9d8'], tema: TEMA_PAPEL, desenhar: arteToco, grao: [18, 1479] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
-    // quarta leva no padrão da landing (o bloco perto do fim do arquivo)
-    influenciam: { fundo: [LP.preto], fotos: ['influenciam'], tema: TEMA_LP, desenhar: arteInfluenciam, grao: [18, 5131] },
-    diferenca: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteDiferenca, grao: [18, 1308] },
-    vivoporele: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVivoPorEle, grao: [18, 2203] },
+    // quarta leva (o bloco perto do fim do arquivo; as revistas no último bloco)
+    influenciam: { fundo: [LP.preto], fotos: ['influenciam'], tema: { ...TEMA_LP, brilho: false }, desenhar: arteInfluenciam, grao: [18, 5131] },
+    diferenca: { fundo: ['#efece3'], tema: TEMA_PAPEL, desenhar: arteDiferenca, grao: [12, 1308] },
+    vivoporele: { fundo: [LP.preto], tema: { ...TEMA_LP, marca: '#151512', marcaFraca: '#4a3d1a', brilho: false }, desenhar: arteVivoPorEle, grao: [18, 2203] },
     jesusvive: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteJesusVive, grao: [18, 3111] },
-    testemunho: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteTestemunho, grao: [18, 4747] },
+    testemunho: { fundo: ['#0d0f0c'], tema: { ...TEMA_LP, brilho: false }, desenhar: arteTestemunho, grao: [18, 4747] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -2837,223 +2469,9 @@
     grao(ctx, 20, 2131);
   }
 
-  // ---------- quarta leva no padrão da landing (2026-10-11) ----------
-  // Mais frases da ofensiva no padrão aprovado: o preto com grão, Oswald creme com a última
-  // linha em amarelo e o risco, os desenhos à mão em sálvia. As funções moram aqui, num bloco
-  // só delas (as declarações sobem, então a lista de modelos lá em cima já as conhece).
-
-  // Jovens que influenciam a sua geração (Mateus 5.13-15): a foto do dono, a multidão vista
-  // de cima com o facho de luz caindo sobre uma pessoa (src/story-fotos/influenciam.webp, em
-  // P&B). A luz do facho ganha o amarelo, a única cor da foto, como o sol na cruz da landing.
-  // A pessoa iluminada fica no alto do meio; o alto e o pé escurecem e o texto vai no escuro
-  // de baixo: JOVENS QUE INFLUENCIAM em creme e A SUA GERAÇÃO em amarelo com o risco.
-  function arteInfluenciam(ctx, fotos) {
-    fundoLanding(ctx);
-    const cx = L / 2;
-    const img = fotos.influenciam;
-    if (img) {
-      const w = 1240;
-      const h = w * img.height / img.width;
-      // a pessoa na luz está a 47% da largura e 58% da altura da foto
-      const x = cx - w * 0.47;
-      const y = 760 - h * 0.58;
-      fotoLanding(ctx, img, { x, y, w, alfa: 0.9,
-        apaga: { cima: [y + 120, y + 420], baixo: [1250, 940] },
-        depois: (k, c) => {
-          // o facho e quem ele toca: só o que é bem claro, na faixa do facho, vira amarelo
-          let dados;
-          try { dados = k.getImageData(0, 0, L, Math.min(A, Math.round(c.y + c.h))); } catch (e) { return; }
-          const d = dados.data;
-          const W = dados.width;
-          const H = dados.height;
-          // a linha do facho: da pessoa (0.47, 0.56) para o canto de cima à direita (1.0, 0.12)
-          const ax = c.x + c.w * 0.47;
-          const ay = c.y + c.h * 0.56;
-          const bx = c.x + c.w * 1.02;
-          const by = c.y + c.h * 0.1;
-          const vx = bx - ax;
-          const vy = by - ay;
-          const comp = Math.hypot(vx, vy);
-          for (let yy = 0; yy < H; yy++) {
-            for (let xx = 0; xx < W; xx++) {
-              const t = ((xx - ax) * vx + (yy - ay) * vy) / (comp * comp);
-              const dist = Math.abs((xx - ax) * vy - (yy - ay) * vx) / comp;
-              const largura = 150 + Math.max(0, t) * 60;
-              const borda = t < -0.15 ? 0 : (t < 0 ? 1 + t / 0.15 : 1);
-              const lado = Math.max(0, 1 - dist / largura);
-              const perto = borda * lado * lado * (3 - 2 * lado);
-              if (!perto) continue;
-              const i = (yy * W + xx) * 4;
-              const l = (d[i] + d[i + 1] + d[i + 2]) / 765;
-              const u = Math.min(1, Math.max(0, (l - 0.28) / 0.45));
-              const q = u * u * (3 - 2 * u) * perto;
-              if (!q) continue;
-              const v = Math.min(1, l * 1.25);
-              d[i] += (255 * v - d[i]) * q;
-              d[i + 1] += (206 * v - d[i + 1]) * q;
-              d[i + 2] += (104 * v - d[i + 2]) * q;
-            }
-          }
-          k.putImageData(dados, 0, 0);
-        } });
-      // um brilho leve no facho e em volta de quem ele toca (em tela, só clareia)
-      const px = x + w * 0.47;
-      const py = y + h * 0.58;
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      const halo = ctx.createRadialGradient(px, py - 40, 0, px, py - 40, 260);
-      halo.addColorStop(0, 'rgba(255,196,77,.22)');
-      halo.addColorStop(1, 'rgba(255,196,77,0)');
-      ctx.fillStyle = halo;
-      ctx.fillRect(px - 260, py - 300, 520, 520);
-      ctx.restore();
-      // o alto escurece de novo, para a chama e os dias se lerem sobre a multidão
-      const g = ctx.createLinearGradient(0, 0, 0, 640);
-      g.addColorStop(0, 'rgba(13,14,12,.9)');
-      g.addColorStop(0.55, 'rgba(13,14,12,.55)');
-      g.addColorStop(1, 'rgba(13,14,12,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, L, 640);
-    }
-    const y0 = 1040;
-    rotuloLanding(ctx, 'Mateus 5.13-15', cx, y0, 30);
-    return blocoLanding(ctx, [
-      { t: 'JOVENS QUE', larg: 520, max: 104, peso: 600, espaco: 4, vao: 22 },
-      { t: 'INFLUENCIAM', larg: 900, max: 170, vao: 6 },
-      { t: 'A SUA GERAÇÃO.', larg: 880, max: 140, cor: LP.amarelo, risco: true, vao: 36 },
-    ], y0);
-  }
-
-  // Marcados pela diferença: a ideia do dono a partir de uma ilustração. Uma multidão de
-  // silhuetas mínimas, como pictogramas a tinta (cabeça, tronco, braços e pernas num passo),
-  // todas iguais e andando para a direita, em sálvia apagada e sumindo na borda esquerda; à
-  // frente, separada por um vão, uma só no mesmo passo, em amarelo. Embaixo, MARCADOS PELA
-  // em creme e DIFERENÇA em amarelo com o risco. Sem referência.
-  // O pictograma andando, com os pés em (x, y) e altura h, virado para a direita.
-  function andando(ctx, x, y, h, cor, passo = 0) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(h, h);
-    ctx.strokeStyle = cor;
-    ctx.fillStyle = cor;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    const a = 1 + passo; // a abertura do passo muda um pouco de um para outro
-    ctx.beginPath();
-    ctx.arc(0.06, -0.9, 0.088, 0, Math.PI * 2);
-    ctx.fill();
-    // o tronco, levemente inclinado para a frente
-    ctx.lineWidth = 0.15;
-    ctx.beginPath();
-    ctx.moveTo(0.035, -0.73);
-    ctx.lineTo(-0.005, -0.46);
-    ctx.stroke();
-    // as pernas: a da frente esticada, a de trás com o joelho dobrado
-    ctx.lineWidth = 0.105;
-    ctx.beginPath();
-    ctx.moveTo(-0.005, -0.45);
-    ctx.lineTo(0.1 * a, -0.23);
-    ctx.lineTo(0.21 * a, -0.04);
-    ctx.moveTo(-0.005, -0.45);
-    ctx.lineTo(-0.09 * a, -0.25);
-    ctx.lineTo(-0.24 * a, -0.07);
-    ctx.stroke();
-    // os braços, balançando ao contrário das pernas e soltos do corpo
-    ctx.lineWidth = 0.075;
-    ctx.beginPath();
-    ctx.moveTo(0.035, -0.69);
-    ctx.lineTo(-0.1 * a, -0.57);
-    ctx.lineTo(-0.2 * a, -0.48);
-    ctx.moveTo(0.035, -0.69);
-    ctx.lineTo(0.14 * a, -0.58);
-    ctx.lineTo(0.24 * a, -0.52);
-    ctx.stroke();
-    ctx.restore();
-  }
-  function arteDiferenca(ctx) {
-    fundoLanding(ctx);
-    const r = sorteio(1308);
-    const cx = L / 2;
-    // a multidão: fileiras desencontradas, as de trás menores e mais apagadas, apagando para a
-    // borda esquerda (continua para fora da imagem)
-    const fileiras = 6;
-    let y = 650;
-    for (let f = 0; f < fileiras; f++) {
-      const k = f / (fileiras - 1); // 0 = a de trás
-      const h = 58 + k * 30;
-      y += f ? h * 0.98 : 0;
-      const vao = h * 0.92;
-      const fim = 640 - (1 - k) * 50 + (r() - 0.5) * 24; // a frente da multidão
-      const desloca = (f % 2) * vao * 0.5;
-      for (let x = fim - desloca; x > -vao; x -= vao * (0.94 + r() * 0.14)) {
-        // a cor já misturada com o fundo (com transparência, os traços que se cruzam clareavam)
-        const t = (0.36 + k * 0.52) * Math.min(1, Math.max(0.1, x / 400));
-        const cor = 'rgb(' + [200, 218, 140].map((v, j) => Math.round([13, 14, 12][j] + (v - [13, 14, 12][j]) * t)).join(',') + ')';
-        andando(ctx, x + (r() - 0.5) * 8, y + (r() - 0.5) * 5, h * (0.97 + r() * 0.06), cor, (r() - 0.5) * 0.12);
-      }
-    }
-    // a da frente, sozinha, no mesmo passo, maior e em amarelo, na linha da primeira fileira
-    const fx = 880;
-    const fy = y;
-    andando(ctx, fx, fy, 132, LP.amarelo);
-    // o chão dela: um risco curto à mão, em sálvia
-    tracoAMao(ctx, [[fx - 80, fy + 16], [fx, fy + 12], [fx + 90, fy + 17]], { r, largura: 4, segunda: false, cor: 'rgba(200,218,140,.55)' });
-    const y0 = fy + 90;
-    return blocoLanding(ctx, [
-      { t: 'MARCADOS PELA', larg: 820, max: 130, peso: 600, espaco: 4, vao: 0 },
-      { t: 'DIFERENÇA.', larg: 860, max: 230, cor: LP.amarelo, risco: true, vao: 18 },
-    ], y0);
-  }
-
-  // Jesus morreu por mim, agora eu vivo por Ele: no espírito de uma estampa que o dono mandou,
-  // letras serifadas grandes e claras sobre o escuro. Literata 600 maiúscula, uma linha
-  // empilhada sobre a outra, cada uma no tamanho que lhe cabe; as duas metades da frase
-  // separadas por um risco fino à mão em sálvia com a cruz pequena no meio, e POR ELE em
-  // amarelo com o risco. Sem referência.
-  const literataLP = (t) => '600 ' + t + 'px Literata, Georgia, serif';
-  function arteVivoPorEle(ctx) {
-    fundoLanding(ctx);
-    const r = sorteio(2203);
-    const cx = L / 2;
-    const larg = 880;
-    // uma linha serifada, no maior tamanho até max que cabe na largura; devolve a largura
-    const linha = (texto, y, max, cor, espaco) => {
-      ctx.font = literataLP(100);
-      const t = Math.min(max, 100 * (larg - espaco * (texto.length - 1)) / ctx.measureText(texto).width);
-      ctx.save();
-      ctx.shadowColor = 'rgba(0,0,0,.6)';
-      ctx.shadowBlur = t * 0.12;
-      ctx.shadowOffsetY = 4;
-      S.escrever(ctx, texto, cx + espaco / 2, y, literataLP(t), cor, { espaco });
-      ctx.restore();
-      ctx.font = literataLP(t);
-      return { t, w: ctx.measureText(texto).width + espaco * (texto.length - 1) };
-    };
-    let y = 566;
-    const primeira = [['JESUS', 168, 10], ['MORREU', 150, 6], ['POR MIM,', 110, 4]];
-    for (const [texto, max, espaco] of primeira) {
-      ctx.font = literataLP(max);
-      y += max * 0.74;
-      const { t } = linha(texto, y, max, LP.creme, espaco);
-      y += t * 0.16;
-    }
-    // o risco fino com a cruz no meio, entre as duas metades
-    const ym = y + 40;
-    tracoAMao(ctx, [[cx - 330, ym + 2], [cx - 180, ym], [cx - 52, ym + 1]], { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.7)' });
-    tracoAMao(ctx, [[cx + 52, ym + 1], [cx + 180, ym - 1], [cx + 330, ym + 2]], { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.7)' });
-    tracoAMao(ctx, [[cx + 1, ym - 34], [cx, ym + 2], [cx - 1, ym + 34]], { r, largura: 5, tremor: 1.5 });
-    tracoAMao(ctx, [[cx - 20, ym - 12], [cx + 21, ym - 13]], { r, largura: 5, tremor: 1.5 });
-    y = ym + 50;
-    const segunda = [['AGORA EU', 110, 4, LP.creme], ['VIVO', 196, 14, LP.creme], ['POR ELE.', 150, 6, LP.amarelo]];
-    let ultima;
-    for (const [texto, max, espaco, cor] of segunda) {
-      y += max * 0.74;
-      ultima = linha(texto, y, max, cor, espaco);
-      y += ultima.t * 0.16;
-    }
-    riscoLanding(ctx, cx - ultima.w / 2 - 6, y + 8, ultima.w + 14, 24, LP.amarelo);
-    return y;
-  }
+  // ---------- quarta leva (2026-10-11) ----------
+  // Jesus vive (os recortes de revista) e as peças dele. As funções moram aqui, num bloco só
+  // delas (as declarações sobem, então a lista de modelos lá em cima já as conhece).
 
   // Jesus vive: letras de recorte de revista, cada uma num papel de cor e letra diferentes,
   // tortas e coladas com sombra, em tons quentes e sálvia sobre o preto com grão; entre as
@@ -3217,156 +2635,694 @@
     return 1460;
   }
 
-  // Quem não desiste tem testemunho pra contar: a partir de uma arte que o dono mandou (a letra
-  // de pincel com QUEM num retângulo à mão e alguém sentado num banco olhando o horizonte). A
-  // foto é de terceiros e figura humana desenhada não entra: fica só o lugar de quem esperou,
-  // o banco de madeira vazio visto de trás, à mão em sálvia, diante de uma linha de horizonte
-  // baixa, com o sol nascendo em amarelo (a única cor quente do desenho). A frase em Permanent
-  // Marker creme, QUEM no retângulo sálvia e PRA CONTAR. em amarelo com o risco. Sem referência.
-  // Uma linha de palavras à mão, centrada em cx, no maior tamanho até max que cabe na largura;
-  // devolve o tamanho e onde ficou cada palavra ([x, largura]).
-  const marcador = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
-  function linhaPincel(ctx, palavras, cx, y, larg, max, cor, r) {
-    ctx.font = marcador(100);
-    const vao100 = ctx.measureText(' ').width * 1.1;
-    const w100 = palavras.reduce((s, p) => s + ctx.measureText(p).width, 0) + vao100 * (palavras.length - 1);
-    const tam = Math.min(max, 100 * larg / w100);
-    ctx.font = marcador(tam);
-    const vao = vao100 * tam / 100;
-    const ws = palavras.map((p) => ctx.measureText(p).width);
-    let x = cx - (ws.reduce((a, b) => a + b, 0) + vao * (palavras.length - 1)) / 2;
-    const onde = [];
-    ctx.save();
+  // ---------- revisão das artes no padrão da landing (2026-10-11) ----------
+  // O dono achou repetidas as artes feitas "no padrão da landing": todas no quase preto, com
+  // o Oswald creme centrado, a última linha em amarelo com o risco de marcador e o desenho no
+  // meio. Cada uma ganhou um fundo, uma composição, uma letra e um fechamento próprios
+  // (.claude/skills/artes-story): o pôster amarelo (avivados), o papel impresso com a fita
+  // sálvia (naotemas), a sálvia cheia com a letra vazada (rei), o texto dentro do relógio com o
+  // brilho na meia-noite (relogio), o toco em tinta no papel com a nota à mão (toco), a foto cheia com o
+  // texto à direita (influenciam), o cartão de respostas (diferenca), o corte preto e amarelo
+  // (vivoporele) e o céu do amanhecer com a fita creme (testemunho). A ideia, as fotos do dono
+  // e o texto de cada frase continuam os mesmos.
+  const TINTA = '#151512';
+  // O tamanho em que o texto ocupa a largura (no máximo max), com o espaço entre letras em
+  // fração do tamanho; devolve o tamanho.
+  function caber(ctx, texto, fonte, largura, max, espaco = 0) {
+    ctx.font = fonte(100);
+    const w100 = ctx.measureText(texto).width;
+    return Math.min(max, largura / (w100 / 100 + espaco * Math.max(0, texto.length - 1)));
+  }
+  function larguraDe(ctx, texto, fonte, espaco = 0) {
+    ctx.font = fonte;
+    return ctx.measureText(texto).width + espaco * Math.max(0, texto.length - 1);
+  }
+  // Papel claro: a cor lisa com manchas fracas e fibras curtas (o grão vem depois, na arte toda).
+  function fundoPapel(ctx, cor, semente) {
+    const r = sorteio(semente);
     ctx.fillStyle = cor;
-    ctx.shadowColor = 'rgba(0,0,0,.55)';
-    ctx.shadowBlur = tam * 0.1;
-    ctx.shadowOffsetY = 4;
-    palavras.forEach((p, i) => {
-      const w = aMao(ctx, p, x, y, tam, r);
-      onde.push([x, w]);
-      x += ws[i] + vao;
-    });
-    ctx.restore();
-    return { tam, onde };
+    ctx.fillRect(0, 0, L, A);
+    for (let i = 0; i < 26; i++) {
+      const x = r() * L;
+      const y = r() * A;
+      const rr = 80 + r() * 260;
+      const a = 0.02 + r() * 0.035;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+      g.addColorStop(0, r() < 0.55 ? 'rgba(120,105,80,' + a.toFixed(3) + ')' : 'rgba(255,255,255,' + (a * 2).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+    }
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 260; i++) {
+      ctx.strokeStyle = 'rgba(60,50,35,' + (0.04 + r() * 0.07).toFixed(3) + ')';
+      ctx.lineWidth = 0.6 + r() * 0.8;
+      const x = r() * L;
+      const y = r() * A;
+      const a = r() * Math.PI;
+      const c = 6 + r() * 18;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + Math.cos(a) * c * 0.5 + r() * 4, y + Math.sin(a) * c * 0.5 + r() * 4, x + Math.cos(a) * c, y + Math.sin(a) * c);
+      ctx.stroke();
+    }
   }
-  // O retângulo à mão em volta de uma palavra: quatro traços que passam um pouco dos cantos.
-  function caixaAMao(ctx, x0, y0, x1, y1, r) {
-    const o = 12;
-    const op = { r, largura: 5, tremor: 2.5, segunda: false };
-    tracoAMao(ctx, [[x0 - o, y0 + 1], [(x0 + x1) / 2, y0 - 2], [x1 + o * 0.6, y0 + 2]], op);
-    tracoAMao(ctx, [[x1 + 1, y0 - o * 0.7], [x1 + 3, (y0 + y1) / 2], [x1, y1 + o]], op);
-    tracoAMao(ctx, [[x1 + o, y1 + 2], [(x0 + x1) / 2, y1 + 4], [x0 - o * 0.5, y1]], op);
-    tracoAMao(ctx, [[x0 - 1, y1 + o * 0.6], [x0 + 1, (y0 + y1) / 2], [x0 - 2, y0 - o]], op);
+  // A foto numa camada, com filtro; apaga: { cima: [de, ate], baixo, esq, dir }, cada uma
+  // uma rampa de 0 a 1 na borda (como as máscaras da landing).
+  function camadaFoto(img, x, y, w, filtro, apaga = {}, depois) {
+    const h = w * img.height / img.width;
+    const { c, ctx: k } = camada();
+    k.imageSmoothingEnabled = true;
+    k.imageSmoothingQuality = 'high';
+    k.filter = filtro;
+    k.drawImage(img, x, y, w, h);
+    k.filter = 'none';
+    if (depois) depois(k);
+    k.globalCompositeOperation = 'destination-in';
+    for (const [lado, [de, ate]] of Object.entries(apaga)) {
+      const vert = lado === 'cima' || lado === 'baixo';
+      const g = vert ? k.createLinearGradient(0, de, 0, ate) : k.createLinearGradient(de, 0, ate, 0);
+      g.addColorStop(0, 'rgba(0,0,0,0)');
+      g.addColorStop(1, 'rgba(0,0,0,1)');
+      k.fillStyle = g;
+      k.fillRect(0, 0, L, A);
+    }
+    k.globalCompositeOperation = 'source-over';
+    return { c, k, h };
   }
-  // O sol nascendo: meio disco riscado à mão sobre o horizonte (yh), com o brilho fraco e os
-  // raios curtos, em amarelo.
-  function solNascendo(ctx, cx, yh, raio, r) {
+  // A letra vazada: só o contorno.
+  function vazado(ctx, texto, x, y, fonte, cor, largura, { alinhar = 'left', espaco = 0 } = {}) {
     ctx.save();
-    const g = ctx.createRadialGradient(cx, yh, raio * 0.4, cx, yh, raio * 3.4);
-    g.addColorStop(0, 'rgba(255,196,77,.22)');
+    ctx.font = fonte;
+    ctx.textAlign = alinhar;
+    ctx.textBaseline = 'alphabetic';
+    try { ctx.letterSpacing = espaco + 'px'; } catch (e) { /* sem letterSpacing */ }
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = cor;
+    ctx.lineWidth = largura;
+    ctx.strokeText(texto, x, y);
+    try { ctx.letterSpacing = '0px'; } catch (e) { /* idem */ }
+    ctx.restore();
+  }
+  // O círculo à mão: uma volta e um pouco mais, que não fecha no mesmo lugar (como caneta).
+  function lacoAMao(ctx, cx, cy, rx, ry, r, { cor = TINTA, largura = 7, giro = -0.1, inicio = -2.2 } = {}) {
+    const pts = [];
+    const n = 44;
+    for (let i = 0; i <= n; i++) {
+      const t = inicio + (Math.PI * 2 + 0.55) * i / n;
+      const k = 1.06 - 0.12 * i / n + (r() - 0.5) * 0.02;
+      const x = Math.cos(t) * rx * k;
+      const y = Math.sin(t) * ry * k;
+      pts.push([cx + x * Math.cos(giro) - y * Math.sin(giro), cy + x * Math.sin(giro) + y * Math.cos(giro)]);
+    }
+    tracoAMao(ctx, pts, { r, largura, tremor: 2, cor, segunda: false });
+  }
+  // A fita de papel: retângulo girado com as pontas rasgadas e uma sombra curta.
+  function fitaRasgada(ctx, x, y, w, h, ang, cor, r, { sombra = 'rgba(0,0,0,.22)' } = {}) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    const p = bordaRasgada([[[-w / 2, -h / 2], [w / 2, -h / 2], 3], [[w / 2, -h / 2], [w / 2, h / 2], 26],
+      [[w / 2, h / 2], [-w / 2, h / 2], 3], [[-w / 2, h / 2], [-w / 2, -h / 2], 26]], r, 6);
+    ctx.shadowColor = sombra;
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 6;
+    ctx.fillStyle = cor;
+    ctx.fill(p);
+    ctx.restore();
+  }
+
+  // (w) Avivados até que Ele venha: o pôster de uma cor só. O amarelo cheio é a luz do palco;
+  // a foto do culto entra em P&B multiplicada sobre ele (o claro some no amarelo, o escuro
+  // vira tinta), com as mãos levantadas subindo do pé. No alto, à esquerda, AVIVADOS enorme
+  // em tinta e "até que Ele venha" à mão. Fechamento: a inversão (tudo em tinta no amarelo).
+  function arteAvivados(ctx, fotos) {
+    const r = sorteio(1126);
+    ctx.fillStyle = LP.amarelo;
+    ctx.fillRect(0, 0, L, A);
+    const img = fotos.culto;
+    if (img) {
+      const w = 1320;
+      const y = 820;
+      const { c } = camadaFoto(img, (L - w) / 2 + 40, y, w, 'grayscale(1) contrast(1.5) brightness(1.12)',
+        { cima: [y + 20, y + 230], baixo: [1560, 1420] });
+      ctx.save();
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.drawImage(c, 0, 0);
+      ctx.restore();
+    }
+    const x = 70;
+    const f1 = (t) => oswaldLP(t);
+    referencia(ctx, '1 Coríntios 11.26', x, 572, 28, TINTA, 'left');
+    const t1 = caber(ctx, 'AVIVADOS', f1, L - 2 * x, 300, 0.005);
+    const y1 = 600 + t1 * 0.86;
+    S.escrever(ctx, 'AVIVADOS', x - 6, y1, f1(t1), TINTA, { alinhar: 'left', espaco: t1 * 0.005 });
+    ctx.save();
+    ctx.translate(x + 4, y1 + 112);
+    ctx.rotate(-0.04);
+    ctx.fillStyle = TINTA;
+    aMao(ctx, 'até que Ele venha', 0, 0, 92, r);
+    ctx.restore();
+  }
+
+  // (x) Não temas, eu sou teu Deus: papel claro de jornal com a foto da cruz impressa nele
+  // (multiplicada, com o sol amarelo da landing), sangrando nas laterais e rasgada embaixo;
+  // no papel, NÃO TEMAS em Literata grande e preta, e "eu sou teu Deus" numa fita sálvia.
+  function arteNaoTemas(ctx, fotos) {
+    const r = sorteio(4110);
+    fundoPapel(ctx, '#ebe7dc', 4110);
+    const cx = L / 2;
+    const img = fotos.cruz;
+    let pe = 560;
+    if (img) {
+      const w = 1640;
+      const x = -90;
+      const y = 540;
+      const h = w * img.height / img.width;
+      pe = y + h - 80;
+      const { c, k } = camadaFoto(img, x, y, w, 'contrast(1.12) brightness(1.04)');
+      // a borda da impressão: rasgada embaixo, quase reta em cima
+      k.globalCompositeOperation = 'destination-in';
+      k.fill(bordaRasgada([[[-40, y + 4], [L + 40, y], 6], [[L + 40, y], [L + 40, pe], 0], [[L + 40, pe], [-40, pe + 10], 34], [[-40, pe + 10], [-40, y + 4], 0]], r, 8));
+      ctx.save();
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.drawImage(c, 0, 0);
+      ctx.restore();
+    }
+    const y0 = pe + 64;
+    referencia(ctx, 'Isaías 41.10', cx, y0, 28, '#4b4a44');
+    const f1 = (t) => Lit(600, t);
+    const t1 = caber(ctx, 'NÃO TEMAS', f1, 900, 190);
+    const y1 = y0 + 26 + t1 * 0.76;
+    S.escrever(ctx, 'NÃO TEMAS', cx, y1, f1(t1), TINTA);
+    const f2 = (t) => 'italic 600 ' + t + 'px Literata, Georgia, serif';
+    const t2 = 68;
+    const w2 = larguraDe(ctx, 'eu sou teu Deus', f2(t2));
+    const y2 = y1 + 100;
+    fitaRasgada(ctx, cx, y2 - t2 * 0.32, w2 + 90, t2 * 1.45, -0.025, LP.salvia, r);
+    ctx.save();
+    ctx.translate(cx, y2);
+    ctx.rotate(-0.025);
+    S.escrever(ctx, 'eu sou teu Deus', 0, 0, f2(t2), TINTA);
+    ctx.restore();
+  }
+  const Lit = S.Lit;
+
+  // (y) Jesus is my King: a sálvia cheia, como um cartaz de uma cor. O rapaz de costas da
+  // landing entra em estêncil (só o quase preto vira tinta) à direita, apagando para dentro
+  // (a coroa fica longe dele, no J); JESUS gigante em tinta na largura, coroado pela coroa à
+  // mão, "is my" à mão e KING vazado, com a sombra em sálvia escura. Fechamento: a letra vazada. O texto fica em inglês.
+  function arteRei(ctx, fotos) {
+    const r = sorteio(777);
+    ctx.fillStyle = LP.salvia;
+    ctx.fillRect(0, 0, L, A);
+    const img = fotos.abertura;
+    if (img) {
+      const fx = 600;
+      const fw = 560;
+      const fy = 610;
+      // em estêncil: só o quase preto (o rapaz, o muro) vira tinta; o céu e as luzes somem
+      const { c } = camadaFoto(img, fx, fy, fw, 'grayscale(1)',
+        { esq: [fx + 80, fx + 300], cima: [fy + 40, fy + 200], baixo: [1530, 1380] }, (k) => {
+          let dados;
+          try { dados = k.getImageData(0, 0, L, A); } catch (e) { return; }
+          const d = dados.data;
+          for (let i = 0; i < d.length; i += 4) {
+            const u = Math.min(1, Math.max(0, (d[i] - 16) / 18));
+            d[i] = d[i + 1] = d[i + 2] = 255 * u * u * (3 - 2 * u);
+          }
+          k.putImageData(dados, 0, 0);
+        });
+      ctx.save();
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(c, 0, 0);
+      ctx.restore();
+    }
+    // a frase gigante na largura, à esquerda; o rapaz à direita, longe da coroa
+    const x = 64;
+    const f = (t) => oswaldLP(t);
+    const t1 = caber(ctx, 'JESUS', f, 930, 330);
+    const y1 = 640 + t1 * 0.86;
+    S.escrever(ctx, 'JESUS', x - 4, y1, f(t1), TINTA, { alinhar: 'left' });
+    coroaLanding(ctx, x + 70, y1 - t1 * 0.86 - 8, 150, -0.2, TINTA);
+    ctx.save();
+    ctx.translate(x + 10, y1 + 120);
+    ctx.rotate(-0.05);
+    ctx.fillStyle = TINTA;
+    aMao(ctx, 'is my', 0, 0, 104, r);
+    ctx.restore();
+    const t3 = caber(ctx, 'KING.', f, 760, 340);
+    const y3 = y1 + 150 + t3 * 0.86;
+    vazado(ctx, 'KING.', x + 12, y3 + 12, f(t3), LP.salviaEscura, 8, { alinhar: 'left' });
+    vazado(ctx, 'KING.', x, y3, f(t3), TINTA, 8, { alinhar: 'left' });
+  }
+
+  // (z1) Prepara-te, Ele vem (1 Tessalonicenses 4.16-17): o relógio antigo à mão ocupa a arte,
+  // inteiro, com os ponteiros a três minutos da meia-noite; a frase mora dentro do mostrador,
+  // na metade de baixo, e a única luz é o brilho amarelo no XII. Fechamento: o brilho.
+  // O relógio: centro (ox, oy), raio R; sem: os algarismos que não entram.
+  function relogioAMao(ctx, ox, oy, R, r, { sem = [], cor = LP.salvia, fraca = (a) => 'rgba(200,218,140,' + a + ')', destaque } = {}) {
+    tracoAMao(ctx, pontosElipse(ox, oy, R, R, { r, n: 72, mexe: 0.004 }), { r, largura: 8, fechar: true, cor });
+    tracoAMao(ctx, pontosElipse(ox, oy, R - 40, R - 40, { r, n: 68, mexe: 0.005 }), { r, largura: 4, fechar: true, segunda: false, cor });
+    for (let i = 0; i < 60; i++) {
+      const a = i / 60 * Math.PI * 2 - Math.PI / 2;
+      const hora = i % 5 === 0;
+      const de = R - (hora ? 38 : 26);
+      const ate = R - 10;
+      tracoAMao(ctx, [[ox + Math.cos(a) * de, oy + Math.sin(a) * de], [ox + Math.cos(a) * ate, oy + Math.sin(a) * ate]],
+        { r, tremor: 1.5, largura: hora ? 5 : 2.5, segunda: false, cor: i === 0 && destaque ? destaque : (hora ? cor : fraca(0.7)) });
+    }
+    const romanos = ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+    romanos.forEach((n, i) => {
+      if (sem.includes(n)) return;
+      const a = i / 12 * Math.PI * 2 - Math.PI / 2;
+      const rr = R - 92;
+      S.escrever(ctx, n, ox + Math.cos(a) * rr, oy + Math.sin(a) * rr + 18, '600 48px Literata, Georgia, serif', i === 0 && destaque ? destaque : cor, { espaco: -2 });
+    });
+    tracoAMao(ctx, pontosElipse(ox, oy, 46, 46, { r, n: 20, mexe: 0.05 }), { r, largura: 3, fechar: true, segunda: false, cor: fraca(0.55) });
+    const ponteiro = (ang, comp, largura, ponta) => {
+      const a = ang - Math.PI / 2;
+      const ux = Math.cos(a);
+      const uy = Math.sin(a);
+      tracoAMao(ctx, [[ox - ux * 40, oy - uy * 40], [ox + ux * comp * 0.5, oy + uy * comp * 0.5], [ox + ux * comp, oy + uy * comp]], { r, tremor: 1.5, largura, cor });
+      const px = ox + ux * comp;
+      const py = oy + uy * comp;
+      const nx = -uy;
+      const ny = ux;
+      tracoAMao(ctx, [[px - ux * ponta, py - uy * ponta], [px + nx * ponta * 0.45, py + ny * ponta * 0.45], [px + ux * ponta * 0.9, py + uy * ponta * 0.9],
+        [px - nx * ponta * 0.45, py - ny * ponta * 0.45]], { r, tremor: 1, largura: largura * 0.7, fechar: true, segunda: false, cor });
+    };
+    ponteiro((57 / 60) * Math.PI * 2, R - 70, 6, 30);
+    ponteiro(((11 + 57 / 60) / 12) * Math.PI * 2, R - 150, 9, 34);
+    ctx.fillStyle = cor;
+    ctx.beginPath();
+    ctx.arc(ox, oy, 13, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  function arteRelogio(ctx) {
+    const r = sorteio(1617);
+    const ox = L / 2;
+    const oy = 1000;
+    const R = 462;
+    ctx.fillStyle = '#0f110e';
+    ctx.fillRect(0, 0, L, A);
+    // o brilho da meia-noite: em volta do XII, amarelo, apagando devagar
+    const gy = oy - R + 92;
+    const g = ctx.createRadialGradient(ox, gy, 0, ox, gy, 420);
+    g.addColorStop(0, 'rgba(255,196,77,.6)');
+    g.addColorStop(0.3, 'rgba(255,196,77,.2)');
     g.addColorStop(1, 'rgba(255,196,77,0)');
     ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.rect(cx - raio * 3.6, yh - raio * 3.6, raio * 7.2, raio * 3.6);
-    ctx.fill();
+    ctx.fillRect(0, gy - 420, L, 840);
+    relogioAMao(ctx, ox, oy, R, r, { sem: ['V', 'VI', 'VII'], destaque: LP.amarelo });
+    // a frase dentro do mostrador, na metade de baixo
+    referencia(ctx, '1 Tessalonicenses 4.16-17', ox, oy + 112, 24, LP.salvia);
+    ctx.save();
+    ctx.fillStyle = LP.creme;
+    aMao(ctx, 'Prepara-te,', ox, oy + 196, 66, r, { alinhar: 'center' });
     ctx.restore();
-    const cor = LP.amarelo;
-    tracoAMao(ctx, pontosElipse(cx, yh, raio, raio, { de: Math.PI, ate: Math.PI * 2, n: 14, r, mexe: 0.03 }), { r, largura: 6, tremor: 2, cor });
-    // os raios, mais curtos perto do horizonte
-    for (let i = 0; i < 9; i++) {
-      const a = Math.PI + Math.PI * (i + 0.5) / 9;
-      const lado = Math.abs(Math.cos(a));
-      const d0 = raio * 1.28;
-      const d1 = raio * (1.28 + 0.42 - lado * 0.18 + (i % 2 ? -0.08 : 0.04));
-      tracoAMao(ctx, [[cx + Math.cos(a) * d0, yh + Math.sin(a) * d0], [cx + Math.cos(a) * d1, yh + Math.sin(a) * d1]], { r, largura: 5, tremor: 1.5, cor, segunda: false });
-    }
+    const f = (t) => oswaldLP(t);
+    const t = caber(ctx, 'ELE VEM.', f, 470, 150, 0.02);
+    tituloLanding(ctx, 'ELE VEM.', ox, oy + 210 + t * 0.86, t, LP.creme, { espaco: t * 0.02 });
   }
-  // O horizonte: um risco à mão baixo, que some nas pontas, com um morro distante bem fraco.
-  function horizonte(ctx, yh, x0, x1, r) {
-    const n = 8;
-    for (let i = 0; i < n; i++) {
-      const a = x0 + (x1 - x0) * i / n;
-      const b = x0 + (x1 - x0) * (i + 1) / n + 6;
-      const m = 1 - Math.abs((i + 0.5) / n - 0.5) * 2; // 1 no meio, 0 nas pontas
-      tracoAMao(ctx, [[a, yh + (r() - 0.5) * 2], [(a + b) / 2, yh + (r() - 0.5) * 3], [b, yh + (r() - 0.5) * 2]],
-        { r, largura: 4, tremor: 1.5, segunda: false, cor: 'rgba(200,218,140,' + (0.12 + m * 0.7).toFixed(2) + ')' });
+
+  // (z2) Há esperança para a árvore (Jó 14.7-9): papel claro, a frase alinhada à esquerda no
+  // alto, em Literata (Há esperança na largura toda, o meio em itálico) e o toco enorme à mão
+  // em tinta, sangrando pelas laterais, com o broto de folhas amarelas, a única coisa viva e
+  // quente. Fechamento: "ainda se renovará." escrito à mão, como uma nota no livro.
+  function tocoAMao(ctx, cx, r, { cor, fraca, folhaCor, nervura, contorno }) {
+    const topo = 870;
+    const rx = 196;
+    const ry = 50;
+    const pe = 1060;
+    tracoAMao(ctx, [[cx - 900, pe + 8], [cx - 420, pe + 4], [cx - 200, pe + 2], [cx, pe + 6], [cx + 200, pe + 3], [cx + 420, pe + 6], [cx + 900, pe + 10]], { r, largura: 4, segunda: false, cor: fraca(0.45) });
+    for (const dx of [-560, -470, -330, 300, 420, 540]) {
+      tracoAMao(ctx, [[cx + dx, pe + 6], [cx + dx + 6, pe - 22]], { r, largura: 3, tremor: 1, segunda: false, cor: fraca(0.5) });
+      tracoAMao(ctx, [[cx + dx + 12, pe + 6], [cx + dx + 22, pe - 14]], { r, largura: 3, tremor: 1, segunda: false, cor: fraca(0.4) });
     }
-    tracoAMao(ctx, [[x0 + 60, yh - 2], [x0 + 200, yh - 34], [x0 + 330, yh - 18], [x0 + 420, yh - 3]],
-      { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.22)' });
-    tracoAMao(ctx, [[x1 - 380, yh - 2], [x1 - 260, yh - 24], [x1 - 120, yh - 14], [x1 - 40, yh - 1]],
-      { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.18)' });
+    tracoAMao(ctx, [[cx - rx, topo + 2], [cx - rx - 4, topo + 80], [cx - rx - 2, topo + 140], [cx - rx - 26, pe - 20], [cx - rx - 90, pe + 4], [cx - rx - 200, pe + 8]], { r, cor });
+    tracoAMao(ctx, [[cx + rx, topo + 2], [cx + rx + 3, topo + 80], [cx + rx + 6, topo + 140], [cx + rx + 30, pe - 22], [cx + rx + 96, pe + 4], [cx + rx + 220, pe + 9]], { r, cor });
+    tracoAMao(ctx, [[cx - 96, pe - 56], [cx - 104, pe - 20], [cx - 150, pe + 4]], { r, largura: 6, cor });
+    tracoAMao(ctx, [[cx + 70, pe - 50], [cx + 82, pe - 16], [cx + 132, pe + 5]], { r, largura: 6, cor });
+    for (const [dx, de, ate] of [[-150, 40, 150], [-96, 70, 176], [-40, 54, 160], [20, 76, 182], [80, 50, 150], [138, 66, 170], [-176, 120, 170], [168, 110, 166]]) {
+      const x = cx + dx;
+      const curva = ry * Math.sqrt(Math.max(0, 1 - (dx / rx) ** 2));
+      tracoAMao(ctx, [[x, topo + curva + de * 0.3], [x + 4, topo + curva + (de + ate) / 2 * 0.6], [x - 2, topo + curva + ate * 0.9]], { r, largura: 3.5, segunda: false, cor: fraca(0.6) });
+    }
+    tracoAMao(ctx, pontosElipse(cx, topo, rx, ry, { r, n: 44, mexe: 0.025 }), { r, largura: 8, fechar: true, cor });
+    tracoAMao(ctx, pontosElipse(cx, topo + 2, rx - 18, ry - 6, { r, n: 40, mexe: 0.03 }), { r, largura: 3, fechar: true, segunda: false, cor: fraca(0.8) });
+    const mx = cx - 22;
+    const my = topo + 4;
+    for (let i = 1; i <= 6; i++) {
+      const k = i / 7;
+      tracoAMao(ctx, pontosElipse(mx + (cx - mx) * k, my + (topo - my) * k, (rx - 26) * k, (ry - 10) * k, { r, n: 30, mexe: 0.07 }),
+        { r, largura: i % 2 ? 3 : 2.2, fechar: true, segunda: false, cor: fraca(0.85 - i * 0.05) });
+    }
+    ctx.fillStyle = cor;
+    ctx.beginPath();
+    ctx.ellipse(mx, my, 6, 2.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    tracoAMao(ctx, [[mx + 4, my], [mx + 60, my - 10], [mx + 120, my - 20], [mx + 170, my - 32]], { r, largura: 2.5, segunda: false, cor: fraca(0.75) });
+    const bx = cx + 92;
+    const by = topo - ry * 0.86;
+    tracoAMao(ctx, [[bx, by + 4], [bx + 6, by - 50], [bx - 6, by - 110], [bx + 10, by - 170], [bx + 24, by - 214]], { r, largura: 9, segunda: false, cor: folhaCor });
+    const folha = (x, y, comp, larg, ang) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(ang);
+      const p = new Path2D();
+      p.moveTo(0, 0);
+      p.bezierCurveTo(comp * 0.3, -larg, comp * 0.75, -larg * 0.9, comp, 0);
+      p.bezierCurveTo(comp * 0.7, larg * 0.75, comp * 0.3, larg * 0.8, 0, 0);
+      ctx.fillStyle = folhaCor;
+      ctx.fill(p);
+      if (contorno) {
+        ctx.strokeStyle = contorno;
+        ctx.lineWidth = 4;
+        ctx.lineJoin = 'round';
+        ctx.stroke(p);
+      }
+      ctx.strokeStyle = nervura;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(comp * 0.08, 0);
+      ctx.quadraticCurveTo(comp * 0.5, -larg * 0.12, comp * 0.86, 0);
+      ctx.stroke();
+      ctx.restore();
+    };
+    folha(bx - 2, by - 108, 110, 34, -2.6);
+    folha(bx + 2, by - 86, 92, 28, -0.42);
+    folha(bx + 22, by - 210, 96, 30, -1.05);
+    folha(bx + 20, by - 206, 76, 24, -2.3);
   }
-  // O banco de madeira visto de trás: a tábua do assento com a beirada de cima, os veios e um
-  // nó, nas duas pernas de tábua; o miolo pintado de preto para tapar o que fica atrás. (cx, y)
-  // é o meio da beirada de cima do assento; w a largura; o chão fica em y + alt.
-  function bancoDeTras(ctx, cx, y, w, alt, r) {
-    const e = w * 0.052; // a espessura da tábua
-    const fundoTab = (x0, y0, x1, y1) => { ctx.fillStyle = LP.preto; ctx.fillRect(x0, y0, x1 - x0, y1 - y0); };
-    const x0 = cx - w / 2;
-    const x1 = cx + w / 2;
-    const op = { r, largura: 6, tremor: 2.5 };
-    // as pernas, um pouco para dentro das pontas e levemente abertas
-    for (const [px, abre] of [[x0 + w * 0.11, -1], [x1 - w * 0.11, 1]]) {
-      const lw = w * 0.052;
-      fundoTab(px - lw / 2, y + e, px + lw / 2, y + alt);
-      tracoAMao(ctx, [[px - lw / 2, y + e], [px - lw / 2 + abre * 2, y + alt * 0.6], [px - lw / 2 + abre * 4, y + alt]], op);
-      tracoAMao(ctx, [[px + lw / 2, y + e], [px + lw / 2 + abre * 2, y + alt * 0.6], [px + lw / 2 + abre * 4, y + alt]], op);
-      // um veio na perna
-      tracoAMao(ctx, [[px + abre * 3, y + e + alt * 0.18], [px + abre * 4, y + alt * 0.5]], { r, largura: 2.5, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.5)' });
-    }
-    // a travessa entre as pernas, por trás
-    tracoAMao(ctx, [[x0 + w * 0.136, y + alt * 0.66], [cx, y + alt * 0.645], [x1 - w * 0.136, y + alt * 0.66]], { r, largura: 4, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.6)' });
-    // o assento: a beirada de cima (a tábua vista um pouco de cima) e a face de trás
-    const topo = e * 0.42;
-    fundoTab(x0, y - topo, x1, y + e);
-    tracoAMao(ctx, [[x0 + 8, y - topo], [cx, y - topo - 2], [x1 - 6, y - topo + 1]], op);
-    tracoAMao(ctx, [[x1 - 6, y - topo + 1], [x1 + 1, y], [x1, y + e * 0.5], [x1 - 1, y + e]], op);
-    tracoAMao(ctx, [[x1 - 1, y + e], [cx, y + e + 2], [x0 + 1, y + e]], op);
-    tracoAMao(ctx, [[x0 + 1, y + e], [x0 - 1, y + e * 0.5], [x0, y], [x0 + 8, y - topo]], op);
-    tracoAMao(ctx, [[x0 + 2, y + 1], [cx * 0.6 + x0 * 0.4, y + 2], [x1 - 2, y]], { r, largura: 3.5, tremor: 1.5, segunda: false });
-    // os veios da madeira e o nó
-    const veio = { r, largura: 2.5, tremor: 1.2, segunda: false, cor: 'rgba(200,218,140,.55)' };
-    tracoAMao(ctx, [[x0 + w * 0.05, y + e * 0.42], [x0 + w * 0.3, y + e * 0.38], [x0 + w * 0.46, y + e * 0.48]], veio);
-    tracoAMao(ctx, [[x0 + w * 0.56, y + e * 0.66], [x0 + w * 0.78, y + e * 0.6], [x1 - w * 0.04, y + e * 0.68]], veio);
-    tracoAMao(ctx, [[x0 + w * 0.2, y + e * 0.74], [x0 + w * 0.38, y + e * 0.72]], veio);
-    tracoAMao(ctx, pontosElipse(x0 + w * 0.52, y + e * 0.5, w * 0.022, e * 0.16, { n: 10, r, mexe: 0.15 }), { ...veio, fechar: true });
-    // o chão: riscos curtos de capim nos pés e a sombra do banco
-    tracoAMao(ctx, [[x0 + w * 0.02, y + alt + 4], [cx, y + alt + 8], [x1 - w * 0.02, y + alt + 3]], { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.3)' });
-    for (const px of [x0 + w * 0.11, x1 - w * 0.11]) {
-      for (const d of [-0.07, -0.045, 0.05, 0.075]) {
-        const bx = px + w * d;
-        tracoAMao(ctx, [[bx, y + alt + 4], [bx + d * 60, y + alt - 14 - r() * 8]], { r, largura: 3, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.55)' });
+  function arteToco(ctx) {
+    const r = sorteio(1479);
+    const cx = L / 2;
+    fundoPapel(ctx, '#f0e9d8', 1479);
+    // o toco grande, à direita do meio, com o chão em y 1530 saindo pelas laterais
+    const k = 1.2;
+    ctx.save();
+    ctx.translate(cx + 130, 1530);
+    ctx.scale(k, k);
+    ctx.translate(-cx, -1066);
+    tocoAMao(ctx, cx, r, { cor: TINTA, fraca: (a) => 'rgba(21,21,18,' + a + ')', folhaCor: LP.amarelo, nervura: 'rgba(21,21,18,.75)', contorno: TINTA });
+    ctx.restore();
+    // a frase no alto, à esquerda: Literata, e o fim escrito à mão
+    const x = 66;
+    referencia(ctx, 'Jó 14.7-9', x, 566, 26, '#55524a', 'left');
+    const f = (t) => Lit(600, t);
+    const t1 = caber(ctx, 'Há esperança', f, L - 2 * x, 170);
+    let y = 588 + t1 * 0.74;
+    S.escrever(ctx, 'Há esperança', x - 4, y, f(t1), TINTA, { alinhar: 'left' });
+    const fi = (t) => 'italic 500 ' + t + 'px Literata, Georgia, serif';
+    y += 72;
+    S.escrever(ctx, 'para a árvore que,', x, y, fi(52), TINTA, { alinhar: 'left' });
+    y += 64;
+    S.escrever(ctx, 'se for cortada,', x, y, fi(52), TINTA, { alinhar: 'left' });
+    y += 100;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(-0.035);
+    ctx.fillStyle = TINTA;
+    aMao(ctx, 'ainda se renovará.', 0, 0, 76, r);
+    ctx.restore();
+  }
+
+  // Jovens que influenciam a sua geração (Mateus 5.13-15): a foto do dono (a multidão vista de
+  // cima com o facho de luz caindo numa pessoa) cobre o story inteiro; o facho e quem ele toca
+  // ganham o amarelo, a única cor. A frase vai no escuro do pé, alinhada à direita, como uma
+  // legenda grande, com INFLUENCIAM no maior tamanho. Sem ênfase além do facho.
+  function facho(k, c, { de, para, base = 150 }) {
+    let dados;
+    try { dados = k.getImageData(0, 0, L, A); } catch (e) { return; }
+    const d = dados.data;
+    const ax = c.x + c.w * de[0];
+    const ay = c.y + c.h * de[1];
+    const vx = c.x + c.w * para[0] - ax;
+    const vy = c.y + c.h * para[1] - ay;
+    const comp = Math.hypot(vx, vy);
+    for (let yy = 0; yy < A; yy++) {
+      for (let xx = 0; xx < L; xx++) {
+        const t = ((xx - ax) * vx + (yy - ay) * vy) / (comp * comp);
+        if (t < -0.15) continue;
+        const dist = Math.abs((xx - ax) * vy - (yy - ay) * vx) / comp;
+        const largura = base + Math.max(0, t) * 60 * c.w / 1240;
+        const lado = Math.max(0, 1 - dist / largura);
+        if (!lado) continue;
+        const borda = t < 0 ? 1 + t / 0.15 : 1;
+        const perto = borda * lado * lado * (3 - 2 * lado);
+        const i = (yy * L + xx) * 4;
+        const l = (d[i] + d[i + 1] + d[i + 2]) / 765;
+        const u = Math.min(1, Math.max(0, (l - 0.28) / 0.45));
+        const q = u * u * (3 - 2 * u) * perto;
+        if (!q) continue;
+        const v = Math.min(1, l * 1.25);
+        d[i] += (255 * v - d[i]) * q;
+        d[i + 1] += (206 * v - d[i + 1]) * q;
+        d[i + 2] += (104 * v - d[i + 2]) * q;
       }
     }
+    k.putImageData(dados, 0, 0);
   }
-  function frasePincel(ctx, cx, y, larg, maxes, r) {
-    const linhas = [[['QUEM', 'NÃO'], maxes[0]], [['DESISTE', 'TEM'], maxes[1]], [['TESTEMUNHO'], maxes[2]]];
-    linhas.forEach(([palavras, max], i) => {
-      ctx.font = marcador(max);
-      y += (i ? max * 0.08 : 0) + max * 0.84;
-      const { tam, onde } = linhaPincel(ctx, palavras, cx, y, larg, max, LP.creme, r);
-      y += tam * 0.12 - max * 0.12;
-      if (i === 0) caixaAMao(ctx, onde[0][0] - 16, y - tam * 0.86, onde[0][0] + onde[0][1] + 12, y + tam * 0.1, r);
-    });
-    y += maxes[3] * 0.24 + maxes[3] * 0.84;
-    const { tam, onde } = linhaPincel(ctx, ['PRA', 'CONTAR.'], cx, y, larg * 0.84, maxes[3], LP.amarelo, r);
-    const xa = onde[0][0];
-    const xb = onde[1][0] + onde[1][1];
-    riscoLanding(ctx, xa - 8, y + tam * 0.2, xb - xa + 18, 22, LP.amarelo);
-    return y + tam * 0.2;
+  function arteInfluenciam(ctx, fotos) {
+    ctx.fillStyle = LP.preto;
+    ctx.fillRect(0, 0, L, A);
+    const img = fotos.influenciam;
+    if (img) {
+      const w = 1560;
+      const h = w * img.height / img.width;
+      const x = 470 - w * 0.47;
+      const y = 820 - h * 0.58;
+      const { c, k } = camadaFoto(img, x, y, w, 'grayscale(1) contrast(1.1)');
+      facho(k, { x, y, w, h }, { de: [0.47, 0.56], para: [1.02, 0.1], base: 190 });
+      ctx.drawImage(c, 0, 0);
+      const px = x + w * 0.47;
+      const py = y + h * 0.58;
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      const halo = ctx.createRadialGradient(px, py - 40, 0, px, py - 40, 300);
+      halo.addColorStop(0, 'rgba(255,196,77,.24)');
+      halo.addColorStop(1, 'rgba(255,196,77,0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(px - 300, py - 340, 600, 600);
+      ctx.restore();
+    }
+    // o escuro no alto (a chama e os dias) e no pé (a frase e a marca)
+    const cima = ctx.createLinearGradient(0, 200, 0, 640);
+    cima.addColorStop(0, 'rgba(13,14,12,.86)');
+    cima.addColorStop(1, 'rgba(13,14,12,0)');
+    ctx.fillStyle = cima;
+    ctx.fillRect(0, 0, L, 640);
+    const baixo = ctx.createLinearGradient(0, 1000, 0, 1330);
+    baixo.addColorStop(0, 'rgba(13,14,12,0)');
+    baixo.addColorStop(1, 'rgba(13,14,12,.9)');
+    ctx.fillStyle = baixo;
+    ctx.fillRect(0, 1000, L, A - 1000);
+    const xd = L - 64;
+    const f = (t) => oswaldLP(t);
+    referencia(ctx, 'Mateus 5.13-15', xd, 1150, 28, LP.salvia, 'right');
+    tituloLanding(ctx, 'JOVENS QUE', xd, 1240, 78, LP.creme, { alinhar: 'right', peso: 500, espaco: 3 });
+    const t2 = caber(ctx, 'INFLUENCIAM', f, 952, 200);
+    const y2 = 1252 + t2 * 0.86;
+    tituloLanding(ctx, 'INFLUENCIAM', xd + 4, y2, t2, LP.creme, { alinhar: 'right' });
+    tituloLanding(ctx, 'A SUA GERAÇÃO.', xd, y2 + 84, 78, LP.creme, { alinhar: 'right', peso: 500, espaco: 3 });
+  }
+
+  // Marcados pela diferença: o cartão de respostas. O papel claro coberto de bolinhas
+  // impressas, todas iguais (as questões numeradas, de A a E), sangrando pelas bordas; uma só
+  // foi pintada, em amarelo, e circulada à caneta. A frase escrita à mão, em tinta, no alto
+  // do cartão. Fechamento: o círculo à mão. Sem referência.
+  function arteDiferenca(ctx) {
+    const r = sorteio(1308);
+    const cx = L / 2;
+    fundoPapel(ctx, '#efece3', 1308);
+    // a régua e o cabeçalho impresso do cartão
+    const tinta = 'rgba(31,34,27,';
+    const y0 = 968;
+    ctx.fillStyle = tinta + '.75)';
+    ctx.fillRect(0, y0 - 52, L, 3);
+    S.escrever(ctx, 'FOLHA DE RESPOSTAS', L - 70, y0 - 70, S.Mn(800, 22), tinta + '.7)', { alinhar: 'right', espaco: 5 });
+    // as bolinhas: três colunas de questões, cinco letras cada, cortadas pelas duas bordas
+    const raio = 24;
+    const passoX = 64;
+    const passoY = 74;
+    let marcada = null;
+    for (let col = 0; col < 3; col++) {
+      const xq = -190 + col * 480;
+      for (let q = 0; q < 7; q++) {
+        const y = y0 + 22 + q * passoY;
+        const num = String(col * 7 + q + 1).padStart(2, '0');
+        S.escrever(ctx, num, xq + 36, y + 9, S.Mn(800, 24), tinta + '.75)', { alinhar: 'right' });
+        for (let op = 0; op < 5; op++) {
+          const x = xq + 86 + op * passoX;
+          ctx.strokeStyle = tinta + '.6)';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(x, y, raio, 0, Math.PI * 2);
+          ctx.stroke();
+          S.escrever(ctx, 'ABCDE'[op], x, y + 8, S.Mn(700, 22), tinta + '.55)');
+          if (col === 1 && q === 3 && op === 2) marcada = [x, y];
+        }
+      }
+    }
+    if (marcada) {
+      // a bolinha pintada: amarela cheia, passando um pouco da borda, com o contorno em tinta
+      const [mx, my] = marcada;
+      ctx.fillStyle = LP.amarelo;
+      ctx.beginPath();
+      ctx.ellipse(mx + 3, my + 2, raio + 12, raio + 9, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = TINTA;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(mx, my, raio, 0, Math.PI * 2);
+      ctx.stroke();
+      lacoAMao(ctx, mx, my, 74, 64, r, { cor: TINTA, largura: 7 });
+    }
+    // a frase à mão no alto do cartão
+    ctx.save();
+    ctx.fillStyle = TINTA;
+    const f = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
+    const t1 = caber(ctx, 'MARCADOS PELA', f, 860, 104);
+    aMao(ctx, 'MARCADOS PELA', cx, 580 + t1 * 0.8, t1, r, { alinhar: 'center' });
+    const t2 = caber(ctx, 'DIFERENÇA.', f, 900, 150);
+    aMao(ctx, 'DIFERENÇA.', cx, 600 + t1 * 0.9 + t2 * 0.86, t2, r, { alinhar: 'center' });
+    ctx.restore();
+  }
+
+  // Jesus morreu por mim, agora eu vivo por Ele: o story partido ao meio. Em cima, no preto,
+  // JESUS MORREU POR MIM, em Literata creme; o amarelo rasgado sobe de baixo, com a cruz à mão
+  // em tinta na emenda, e AGORA EU VIVO POR ELE. vem em tinta sobre ele. Fechamento: a
+  // inversão (a segunda metade inteira em tinta no amarelo). Sem referência.
+  const literataLP = (t) => '600 ' + t + 'px Literata, Georgia, serif';
+  function arteVivoPorEle(ctx) {
+    const r = sorteio(2203);
+    const cx = L / 2;
+    const larg = 880;
+    ctx.fillStyle = LP.preto;
+    ctx.fillRect(0, 0, L, A);
+    const linha = (texto, y, max, cor, espaco) => {
+      ctx.font = literataLP(100);
+      const t = Math.min(max, 100 * (larg - espaco * (texto.length - 1)) / ctx.measureText(texto).width);
+      S.escrever(ctx, texto, cx + espaco / 2, y, literataLP(t), cor, { espaco });
+      return t;
+    };
+    let y = 560;
+    for (const [texto, max, espaco] of [['JESUS', 150, 10], ['MORREU', 136, 6], ['POR MIM,', 100, 4]]) {
+      y += max * 0.74;
+      y += linha(texto, y, max, LP.creme, espaco) * 0.16;
+    }
+    // o amarelo rasgado, da emenda até o pé
+    const emenda = y + 92;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.5)';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetY = -6;
+    ctx.fillStyle = LP.amarelo;
+    ctx.fill(bordaRasgada([[[-20, emenda + 10], [L + 20, emenda - 6], 30], [[L + 20, emenda - 6], [L + 20, A + 20], 0], [[L + 20, A + 20], [-20, A + 20], 0], [[-20, A + 20], [-20, emenda + 10], 0]], r, 8));
+    ctx.restore();
+    // a cruz à mão sobre a emenda: creme no preto, tinta no amarelo (o mesmo traço, cortado)
+    for (const [cor, acima] of [[LP.creme, true], [TINTA, false]]) {
+      const rc = sorteio(2204);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, acima ? 0 : emenda + 2, L, acima ? emenda + 2 : A);
+      ctx.clip();
+      tracoAMao(ctx, [[cx + 1, emenda - 56], [cx, emenda], [cx - 1, emenda + 80]], { r: rc, largura: 10, tremor: 1.5, cor, segunda: false });
+      tracoAMao(ctx, [[cx - 38, emenda - 18], [cx + 39, emenda - 20]], { r: rc, largura: 10, tremor: 1.5, cor, segunda: false });
+      ctx.restore();
+    }
+    y = emenda + 90;
+    for (const [texto, max, espaco] of [['AGORA EU', 100, 4], ['VIVO', 190, 14], ['POR ELE.', 136, 6]]) {
+      y += max * 0.74;
+      y += linha(texto, y, max, TINTA, espaco) * 0.16;
+    }
+    return y;
+  }
+
+  // Quem não desiste tem testemunho pra contar: o céu do amanhecer. O escuro de cima clareia
+  // até a linha do horizonte, onde o sol amarelo nasce atrás do banco vazio (o lugar de quem
+  // esperou, em silhueta: figura humana não entra). A frase à mão em creme no escuro do alto,
+  // e PRA CONTAR. em tinta numa fita de papel creme. Fechamento: a fita. Sem referência.
+  function bancoSilhueta(ctx, cx, chao, w, cor) {
+    const alt = w * 0.4;
+    const assento = chao - alt * 0.45;
+    ctx.fillStyle = cor;
+    const tabua = (x0, y0, x1, y1) => ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+    // as pernas abertas, o assento, os pés do encosto, as tábuas e os braços
+    for (const [px, abre] of [[cx - w * 0.42, -1], [cx + w * 0.42, 1]]) {
+      ctx.beginPath();
+      ctx.moveTo(px - w * 0.022, assento);
+      ctx.lineTo(px + w * 0.022, assento);
+      ctx.lineTo(px + w * 0.022 + abre * 10, chao);
+      ctx.lineTo(px - w * 0.022 + abre * 10, chao);
+      ctx.fill();
+      tabua(px - w * 0.018, chao - alt, px + w * 0.018, assento);
+      // o braço: sobe do assento e se curva para fora
+      ctx.beginPath();
+      ctx.moveTo(px - abre * w * 0.02, assento);
+      ctx.quadraticCurveTo(px + abre * w * 0.05, assento - alt * 0.3, px + abre * w * 0.07, assento - alt * 0.26);
+      ctx.lineTo(px + abre * w * 0.07, assento - alt * 0.2);
+      ctx.quadraticCurveTo(px + abre * w * 0.03, assento - alt * 0.2, px + abre * w * 0.03, assento);
+      ctx.fill();
+    }
+    tabua(cx - w / 2, assento - w * 0.025, cx + w / 2, assento + w * 0.03);
+    for (const [y, e] of [[chao - alt, 0.04], [chao - alt * 0.84, 0.036], [chao - alt * 0.7, 0.032]]) tabua(cx - w * 0.46, y, cx + w * 0.46, y + w * e);
   }
   function arteTestemunho(ctx) {
-    fundoLanding(ctx);
     const r = sorteio(4747);
     const cx = L / 2;
-    // como na arte: a frase no céu e o banco embaixo, de frente para o sol que nasce (a outra
-    // variante, o banco em cima e a frase embaixo, apertava a frase e perdia a força dela)
-    const fim = frasePincel(ctx, cx, 586, 840, [138, 138, 148, 110], r);
-    const yh = fim + 118;
-    solNascendo(ctx, cx + 20, yh, 54, r);
-    horizonte(ctx, yh, 70, L - 70, r);
-    bancoDeTras(ctx, cx, yh + 78, 620, 150, r);
-    return yh + 232;
+    const yh = 1400;
+    const ceu = ctx.createLinearGradient(0, 0, 0, yh);
+    ceu.addColorStop(0, '#0d0f0c');
+    ceu.addColorStop(0.55, '#151913');
+    ceu.addColorStop(0.78, '#4a5540');
+    ceu.addColorStop(0.92, '#b9c39d');
+    ceu.addColorStop(1, '#f1ecca');
+    ctx.fillStyle = ceu;
+    ctx.fillRect(0, 0, L, yh);
+    // o sol nascendo, cheio, com o brilho
+    const sx = cx + 270;
+    const g = ctx.createRadialGradient(sx, yh, 60, sx, yh, 560);
+    g.addColorStop(0, 'rgba(255,196,77,.85)');
+    g.addColorStop(0.3, 'rgba(255,196,77,.3)');
+    g.addColorStop(1, 'rgba(255,196,77,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, yh - 520, L, 520);
+    ctx.fillStyle = LP.amarelo;
+    ctx.beginPath();
+    ctx.arc(sx, yh, 110, Math.PI, 0);
+    ctx.fill();
+    // o chão escuro
+    const chao = '#12140f';
+    ctx.fillStyle = chao;
+    ctx.fill(bordaRasgada([[[-20, yh + 2], [L + 20, yh], 8], [[L + 20, yh], [L + 20, A], 0], [[L + 20, A], [-20, A], 0], [[-20, A], [-20, yh + 2], 0]], r, 10));
+    bancoSilhueta(ctx, cx - 110, yh + 14, 500, chao);
+    // a frase à mão no alto
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.5)';
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = LP.creme;
+    const f = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
+    let y = 560;
+    for (const [texto, max] of [['QUEM NÃO', 130], ['DESISTE TEM', 130], ['TESTEMUNHO', 150]]) {
+      const t = caber(ctx, texto, f, 900, max);
+      y += t * 0.92;
+      aMao(ctx, texto, cx, y, t, r, { alinhar: 'center' });
+    }
+    ctx.restore();
+    const t4 = 96;
+    const w4 = larguraDe(ctx, 'PRA CONTAR.', f(t4));
+    const y4 = y + 140;
+    fitaRasgada(ctx, cx, y4 - t4 * 0.34, w4 + 100, t4 * 1.4, 0.03, '#f2efdc', r, { sombra: 'rgba(0,0,0,.45)' });
+    ctx.save();
+    ctx.translate(cx, y4);
+    ctx.rotate(0.03);
+    ctx.fillStyle = TINTA;
+    aMao(ctx, 'PRA CONTAR.', 0, 0, t4, r, { alinhar: 'center' });
+    ctx.restore();
   }
 
   S.prepararArte = prepararArte;
