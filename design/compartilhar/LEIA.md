@@ -160,3 +160,9 @@ amarelo como a única cor quente), sem figura humana, prédio, coroa ou foto:
   tipografia. O FIM enorme e quase apagado, com a borracha passando por cima, e o ponto final
   dele em pincel amarelo, que ganhou a cauda e virou vírgula: a frase continua em DEUS
   ESCREVE UM, NOVO COMEÇO grande e CHEIO DE ESPERANÇA. em amarelo com o risco.
+- **semente** (A sua oração de hoje está construindo o milagre de amanhã. Continue firme): o
+  corte da terra visto de lado, à mão em sálvia (a superfície, o pontilhado, as camadas e as
+  pedrinhas, apagando para os lados e para baixo). A semente, um feijão deitado, solta as
+  raízes para baixo e o broto sobe em S até furar a superfície com as duas primeiras folhas;
+  acima dele, o ponto de luz amarelo. A frase em cima, O MILAGRE DE AMANHÃ. em amarelo com o
+  risco, e CONTINUE FIRME no rótulo sálvia embaixo da terra.

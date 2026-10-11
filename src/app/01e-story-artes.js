@@ -2654,6 +2654,7 @@
     jesusvive: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteJesusVive, grao: [18, 3111] },
     testemunho: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteTestemunho, grao: [18, 4747] },
     virgula: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVirgula, grao: [18, 1712] },
+    semente: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteSemente, grao: [18, 1606] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -3503,6 +3504,201 @@
       { t: 'NOVO COMEÇO', larg: 880, max: 200, vao: 22 },
       { t: 'CHEIO DE ESPERANÇA.', larg: 820, max: 110, cor: LP.amarelo, risco: true, vao: 22 },
     ], y);
+  }
+
+  // A sua oração de hoje está construindo o milagre de amanhã. Continue firme: o corte da
+  // terra visto de lado, à mão em sálvia. Embaixo, a semente já aberta soltando as raízes;
+  // dela sobe o broto, que acaba de furar a superfície com as duas primeiras folhas, e acima
+  // dele um ponto de luz em amarelo (a única cor quente). O que ainda não se vê já está
+  // crescendo. Em cima, a frase, O MILAGRE DE AMANHÃ. em amarelo com o risco; embaixo da
+  // terra, "continue firme" no rótulo sálvia. Sem referência.
+  // Uma folha cheia em sálvia com a nervura escura, saindo de (x, y) no ângulo dado.
+  function folhaCheia(ctx, x, y, comp, larg, ang) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    const p = new Path2D();
+    p.moveTo(0, 0);
+    p.bezierCurveTo(comp * 0.3, -larg, comp * 0.75, -larg * 0.9, comp, 0);
+    p.bezierCurveTo(comp * 0.7, larg * 0.75, comp * 0.3, larg * 0.8, 0, 0);
+    ctx.fillStyle = LP.salvia;
+    ctx.fill(p);
+    ctx.strokeStyle = 'rgba(13,14,12,.55)';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(comp * 0.08, 0);
+    ctx.quadraticCurveTo(comp * 0.5, -larg * 0.12, comp * 0.86, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+  // O ponto de luz: o miolo amarelo, o brilho largo e fraco em volta e quatro raios curtos.
+  function pontoDeLuz(ctx, x, y, raio, r) {
+    ctx.save();
+    const g = ctx.createRadialGradient(x, y, 0, x, y, raio * 9);
+    g.addColorStop(0, 'rgba(255,196,77,.30)');
+    g.addColorStop(0.35, 'rgba(255,196,77,.09)');
+    g.addColorStop(1, 'rgba(255,196,77,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x - raio * 9, y - raio * 9, raio * 18, raio * 18);
+    ctx.fillStyle = LP.amarelo;
+    ctx.beginPath();
+    ctx.arc(x, y, raio, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    for (let i = 0; i < 8; i++) {
+      const a = i / 8 * Math.PI * 2;
+      const longo = i % 2 === 0;
+      const d0 = raio * (longo ? 1.9 : 2.1);
+      const d1 = raio * (longo ? 3.4 : 2.4);
+      tracoAMao(ctx, [[x + Math.cos(a) * d0, y + Math.sin(a) * d0], [x + Math.cos(a) * d1, y + Math.sin(a) * d1]],
+        { r, largura: longo ? 4.5 : 3.5, tremor: 1, segunda: false, cor: LP.amarelo });
+    }
+  }
+  // O corte da terra: a superfície à mão com o vão por onde o broto sai, os torrões e as
+  // pedrinhas, as camadas onduladas e o pontilhado da terra, apagando para os lados e para
+  // baixo. (cx, ys) é onde o broto fura a superfície; fundo, até onde vai o corte.
+  function corteDeTerra(ctx, cx, ys, fundo, r) {
+    const { c, ctx: k } = camada();
+    // o pontilhado e os riscos curtos da terra, mais densos para baixo
+    for (let i = 0; i < 900; i++) {
+      const x = 40 + r() * (L - 80);
+      const y = ys + 18 + Math.pow(r(), 0.8) * (fundo - ys);
+      const prof = (y - ys) / (fundo - ys);
+      k.globalAlpha = 0.12 + r() * 0.2 + prof * 0.08;
+      k.fillStyle = LP.salvia;
+      if (r() < 0.7) {
+        k.beginPath();
+        k.arc(x, y, 1.2 + r() * 2.2, 0, Math.PI * 2);
+        k.fill();
+      } else {
+        k.strokeStyle = LP.salvia;
+        k.lineWidth = 2;
+        k.lineCap = 'round';
+        const a = (r() - 0.5) * 0.8;
+        k.beginPath();
+        k.moveTo(x, y);
+        k.lineTo(x + Math.cos(a) * 9, y + Math.sin(a) * 9);
+        k.stroke();
+      }
+    }
+    k.globalAlpha = 1;
+    // as camadas: duas linhas onduladas fracas
+    for (const [dy, a] of [[150, 0.28], [300, 0.2]]) {
+      const pts = [];
+      for (let x = 30; x <= L - 30; x += 70) pts.push([x, ys + dy + Math.sin(x / 130 + dy) * 12]);
+      tracoAMao(k, pts, { r, largura: 3, tremor: 4, segunda: false, cor: 'rgba(200,218,140,' + a + ')' });
+    }
+    // as pedrinhas, em contorno
+    for (const [px, py, rx, ry] of [[200, 110, 26, 16], [860, 90, 20, 13], [300, 360, 34, 20], [790, 280, 30, 18], [120, 230, 16, 11], [960, 380, 22, 14], [560, 420, 18, 11]]) {
+      k.fillStyle = LP.preto;
+      k.beginPath();
+      k.ellipse(px, ys + py, rx, ry, 0, 0, Math.PI * 2);
+      k.fill();
+      tracoAMao(k, pontosElipse(px, ys + py, rx, ry, { r, n: 12, mexe: 0.18 }), { r, largura: 3, tremor: 1.5, fechar: true, segunda: false, cor: 'rgba(200,218,140,.55)' });
+    }
+    // apaga para os lados e para baixo
+    k.globalCompositeOperation = 'destination-in';
+    const gv = k.createLinearGradient(0, fundo - 150, 0, fundo);
+    gv.addColorStop(0, 'rgba(0,0,0,1)');
+    gv.addColorStop(1, 'rgba(0,0,0,0)');
+    k.fillStyle = gv;
+    k.fillRect(0, 0, L, A);
+    for (const [de, ate] of [[0, 220], [L, L - 220]]) {
+      const gh = k.createLinearGradient(de, 0, ate, 0);
+      gh.addColorStop(0, 'rgba(0,0,0,0)');
+      gh.addColorStop(1, 'rgba(0,0,0,1)');
+      k.fillStyle = gh;
+      k.fillRect(0, 0, L, A);
+    }
+    ctx.drawImage(c, 0, 0);
+    // a superfície: dois riscos, com o vão do broto, e os torrões levantados ao lado dele
+    const lado = (x0, x1) => {
+      const pts = [];
+      const n = Math.max(2, Math.round(Math.abs(x1 - x0) / 60));
+      for (let i = 0; i <= n; i++) pts.push([x0 + (x1 - x0) * i / n, ys + (r() - 0.5) * 6]);
+      return pts;
+    };
+    const fraco = (pts) => tracoAMao(ctx, pts, { r, largura: 6, tremor: 2.5 });
+    fraco(lado(cx - 30, 150));
+    fraco(lado(cx + 30, L - 150));
+    for (const [de, ate, a] of [[60, 150, 0.4], [L - 150, L - 60, 0.4]]) {
+      tracoAMao(ctx, lado(de, ate), { r, largura: 5, tremor: 2, segunda: false, cor: 'rgba(200,218,140,' + a + ')' });
+    }
+    // os torrões: dois montinhos de terra levantados pelo broto
+    tracoAMao(ctx, [[cx - 30, ys + 1], [cx - 26, ys - 12], [cx - 16, ys - 14], [cx - 10, ys - 4]], { r, largura: 4, tremor: 1.5, segunda: false });
+    tracoAMao(ctx, [[cx + 30, ys + 1], [cx + 26, ys - 10], [cx + 15, ys - 12], [cx + 10, ys - 3]], { r, largura: 4, tremor: 1.5, segunda: false });
+    // tufos de capim na superfície, longe do broto
+    for (const tx of [210, 330, 760, 880]) {
+      for (const d of [-8, 0, 9]) {
+        tracoAMao(ctx, [[tx + d, ys - 1], [tx + d * 1.8, ys - 16 - r() * 10]], { r, largura: 3, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.6)' });
+      }
+    }
+  }
+  // A semente aberta: a casca em amêndoa, deitada, com a fenda por onde saem o broto (em
+  // cima) e a raiz (embaixo); as raízes descem afinando e se dividem.
+  function sementeComRaiz(ctx, x, y, r) {
+    // as raízes: a principal desce em curva, as laterais saem dela; cada uma afina em trechos
+    const raiz = (pts, larg) => {
+      for (let i = 0; i < pts.length - 1; i++) {
+        const w = larg * (1 - i / (pts.length - 1)) + 1.4;
+        tracoAMao(ctx, [pts[i], [(pts[i][0] + pts[i + 1][0]) / 2 + (r() - 0.5) * 4, (pts[i][1] + pts[i + 1][1]) / 2], pts[i + 1]], { r, largura: w, tremor: 1.2, segunda: false });
+      }
+    };
+    raiz([[x + 4, y + 30], [x + 10, y + 70], [x - 4, y + 112], [x + 6, y + 156], [x - 2, y + 196]], 6);
+    raiz([[x + 9, y + 62], [x + 40, y + 88], [x + 56, y + 126], [x + 80, y + 146]], 3.5);
+    raiz([[x - 2, y + 104], [x - 38, y + 124], [x - 52, y + 160]], 3);
+    raiz([[x + 4, y + 148], [x + 30, y + 170], [x + 36, y + 194]], 2.4);
+    raiz([[x + 2, y + 40], [x - 30, y + 58], [x - 56, y + 64]], 2.6);
+    // a casca: um feijão deitado, com a covinha em cima (de onde sai o broto), pintado de preto
+    // por dentro para tapar a terra
+    const rx = 62;
+    const ry = 31;
+    const casca = [];
+    for (let i = 0; i <= 30; i++) {
+      const t = i / 30 * Math.PI * 2;
+      let py = Math.sin(t) * ry;
+      if (py < 0) py += ry * 0.22 * Math.exp(-(Math.cos(t) ** 2) / 0.12);
+      casca.push([x + Math.cos(t) * rx * (1 + (r() - 0.5) * 0.03), y + py]);
+    }
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(-0.12);
+    ctx.translate(-x, -y);
+    ctx.fillStyle = LP.preto;
+    ctx.beginPath();
+    casca.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+    ctx.fill();
+    tracoAMao(ctx, casca, { r, largura: 6, tremor: 2, fechar: true });
+    // as linhas da casca, acompanhando a barriga do feijão, e a fenda aberta na covinha
+    tracoAMao(ctx, [[x - rx * 0.72, y + ry * 0.05], [x - rx * 0.2, y + ry * 0.32], [x + rx * 0.35, y + ry * 0.28], [x + rx * 0.74, y - ry * 0.02]],
+      { r, largura: 2.5, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.45)' });
+    tracoAMao(ctx, [[x - 4, y - ry * 0.7], [x - 6, y - ry * 0.25]], { r, largura: 3, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.8)' });
+    ctx.restore();
+  }
+  function arteSemente(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(1606);
+    const cx = L / 2;
+    const fim = blocoLanding(ctx, [
+      { t: 'A SUA ORAÇÃO DE HOJE', larg: 700, max: 84, peso: 600, espaco: 3, vao: 40 },
+      { t: 'ESTÁ CONSTRUINDO', larg: 700, max: 84, peso: 600, espaco: 3, vao: 22 },
+      { t: 'O MILAGRE DE AMANHÃ.', larg: 900, max: 140, cor: LP.amarelo, risco: true, vao: 14 },
+    ], 560);
+    const ys = fim + 200; // a superfície
+    const bx = cx + 8;
+    const sx = cx - 36;
+    const sy = ys + 150; // a semente
+    corteDeTerra(ctx, bx, ys, ys + 400, r);
+    // o broto: sai de cima da semente, sobe em S até a superfície e abre as duas folhas
+    const haste = [[sx - 4, sy - 20], [sx - 6, sy - 70], [sx + 30, sy - 120], [bx - 4, sy - 160], [bx, ys + 2], [bx + 2, ys - 40], [bx - 2, ys - 66]];
+    tracoAMao(ctx, haste, { r, largura: 7, tremor: 2, segunda: false });
+    folhaCheia(ctx, bx - 2, ys - 64, 74, 26, -2.55);
+    folhaCheia(ctx, bx, ys - 66, 70, 24, -0.55);
+    sementeComRaiz(ctx, sx, sy, r);
+    pontoDeLuz(ctx, bx + 110, ys - 130, 12, r);
+    rotuloLanding(ctx, 'Continue firme', cx, ys + 410, 32);
+    return ys + 410;
   }
 
   S.prepararArte = prepararArte;
