@@ -145,6 +145,15 @@
 .dsf-estudo p { color: var(--tinta); }
 .dsf-sobre { margin: 16px 0 0; border-top: 1px solid var(--contorno); }
 .dsf-sobre summary { padding: 14px 0; color: var(--tinta-forte); }
+/* a arte do alto (campo `arte` do desafio): a tela de "sem internet" em pixels, à esquerda como
+   no navegador; 72 x 25 pixels a 4px cada (escala inteira: o pixel não borra) */
+.dsf-arte { margin: 0 0 20px; padding: 20px; border-radius: 24px; background: var(--campo); color: var(--tinta); }
+.dsf-arte svg { display: block; width: 288px; max-width: 100%; height: auto; margin: 0 0 16px; color: var(--tinta-fraca); }
+.dsf-arte p { margin: 0; }
+.dsf-arte .dsf-arte-titulo { color: var(--tinta-forte); font: 800 1.25rem/1.25 var(--fonte); letter-spacing: .02em; }
+.dsf-arte .dsf-arte-tente { margin-top: 8px; }
+.dsf-arte ul { margin: 2px 0 0; padding-left: 22px; list-style: disc; }
+.dsf-arte li { margin-top: 2px; }
 
 /* ---------- Praticar: a lista das unidades; a da vez com o realce do "hoje" ---------- */
 .lista-pratica.caixa-lista { overflow: hidden; }

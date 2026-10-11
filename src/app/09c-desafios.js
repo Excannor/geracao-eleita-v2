@@ -11,6 +11,7 @@
       id: 'sem-redes-21',
       titulo: '21 dias sem redes sociais',
       dias: 21,
+      arte: 'offline',
       resumo: 'Trocar o tempo de rolar a tela por um tempo com Deus.',
       desafio: 'Ficar longe de Instagram, TikTok e parecidos. Mensagem com amigos e família pode.',
       base: { texto: '“Posso fazer qualquer coisa que eu quiser”, mas algumas dessas coisas não são boas para mim.', ref: '1 Coríntios 6.12' },
@@ -44,6 +45,7 @@
       id: 'celular-cama-7',
       titulo: '7 dias sem celular na cama',
       dias: 7,
+      arte: 'dormir',
       resumo: 'A primeira coisa do dia é a Palavra, e não a tela.',
       desafio: 'O celular dorme longe da cama. Nada de tela ao deitar nem ao acordar.',
       base: { texto: 'Quando vou dormir, meu coração está em perfeita paz e tenho um sono tranquilo porque o Senhor me dá a mais perfeita segurança.', ref: 'Salmos 4.8' },
@@ -158,6 +160,57 @@
     todos[id] = { ...mudar({ ...atual, dias: [...(atual.dias || [])] }), em: Date.now() };
     CC.gravar('desafios', todos);
   }
+
+  // ---------- a arte do alto da folha (campo `arte` do desafio) ----------
+  // Uma brincadeira com a tela de "sem internet" do navegador: um desenho em pixels num chão
+  // pontilhado e, embaixo, o título e o "Tente:" com três sugestões (texto de verdade, não
+  // imagem). O desenho é nosso (ovelha, celular dormindo). Cada figura é uma grade de
+  // linhas ('#' acende o pixel); o SVG junta tudo num caminho só, na cor da letra fraca.
+  const PIXELS = {
+    cacto: '...##|..####|..####|#.####|#.####.#|#.####.#|#.####.#|######.#|..######|..####|..####|..####|..####',
+    cactinho: '..##|.####|.####|#####|#.##|..##|..##',
+    ovelha: '.....##..##..##|...##..##..##..##|..#..............#|.#................#|.#................#|#..................#|#..................#'
+      + '|.#.................#|.#................#|..#..............#|...##..##..##..##|....##........##|....##........##|....##........##|....##........##',
+    cabeca: '##|.###|.#######|..###.###|..#######|...######|....#####|.....###',
+    wifi: '...#######|.##.......##|#...#####...#|..##.....##|....#####|.....#.#|......#',
+    xis: '#...#|.#.#|..#|.#.#|#...#',
+    celular: '.###########|#...........#|#....###....#|#...........#|#.#########.#|#.#########.#|#.#########.#|#.#########.#|#.#...#...#.#'
+      + '|#.#########.#|#.#########.#|#.####.####.#|#.#########.#|#.#########.#|#.#########.#|#.#########.#|#...........#|#.....#.....#|#...........#|.###########',
+    z5: '#####|...#|..#|.#|#####', z4: '####|..#|.#|####', z3: '###|.#|#|###',
+    lua: '..####|.###|###|###|###|.###|..####', estrela: '.#|###|.#',
+  };
+  const ARTES = {
+    offline: {
+      rotulo: 'Desenho em pixels: uma ovelha entre dois cactos e o sinal de internet cortado',
+      cena: [['cacto', 6, 8], ['ovelha', 24, 6], ['cabeca', 40, 6], ['cactinho', 62, 14], ['wifi', 52, 1], ['xis', 62, 6]],
+      titulo: 'SEM INTERNET',
+      tente: ['Largar seu celular', 'Se conectar com Deus', 'Desfrutar'],
+    },
+    dormir: {
+      rotulo: 'Desenho em pixels: um celular de tela apagada dormindo, com a lua e as estrelas',
+      cena: [['lua', 6, 2], ['estrela', 18, 7], ['estrela', 8, 13], ['estrela', 62, 4], ['celular', 29, 1], ['z3', 45, 11], ['z4', 49, 7], ['z5', 54, 1]],
+      titulo: 'CELULAR DORMINDO',
+      tente: ['Deixar o celular longe da cama', 'Conversar com Deus antes de dormir', 'Descansar'],
+    },
+  };
+  function desenhoPixels(cena) {
+    // o chão (72 x 1, na linha 21) e as pedrinhas embaixo dele
+    let d = 'M0 21h72v1H0z';
+    for (let x = 1; x < 72; x += 7) d += 'M' + x + ' 23h1v1h-1z';
+    for (let x = 4; x < 72; x += 11) d += 'M' + x + ' 24h1v1h-1z';
+    cena.forEach(([nome, x0, y0]) => PIXELS[nome].split('|').forEach((linha, y) => {
+      linha.replace(/#+/g, (run, x) => { d += 'M' + (x0 + x) + ' ' + (y0 + y) + 'h' + run.length + 'v1h-' + run.length + 'z'; return run; });
+    }));
+    return d;
+  }
+  CC.arteDesafio = function (d) {
+    const a = d && ARTES[d.arte];
+    if (!a) return '';
+    return '<div class="dsf-arte" data-arte="' + d.arte + '">'
+      + '<svg viewBox="0 0 72 25" shape-rendering="crispEdges" role="img" aria-label="' + CC.esc(a.rotulo) + '"><path fill="currentColor" d="' + desenhoPixels(a.cena) + '"/></svg>'
+      + '<p class="dsf-arte-titulo">' + a.titulo + '</p><p class="dsf-arte-tente">Tente:</p>'
+      + '<ul>' + a.tente.map((t) => '<li>' + CC.esc(t) + '</li>').join('') + '</ul></div>';
+  };
 
   // ---------- telas ----------
   const selo = (t) => '<span class="dsf-selo">' + CC.esc(t) + '</span>';
@@ -344,7 +397,7 @@
         + '<div class="acoes"><button class="botao azul" data-comecar>' + (s.vencidos ? 'Continuar' : 'Começar hoje') + '</button>'
         + '<button class="botao plano" data-fechar>Agora não</button></div>';
     }
-    CC.folha('<span class="etiqueta">' + d.dias + '&nbsp;dias</span><h2>' + nb(d.titulo) + '</h2>' + corpo, {
+    CC.folha(CC.arteDesafio(d) + '<span class="etiqueta">' + d.dias + '&nbsp;dias</span><h2>' + nb(d.titulo) + '</h2>' + corpo, {
       rotulo: d.titulo,
       classe: 'folha-desafio',
       rolavel: true,
