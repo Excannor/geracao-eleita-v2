@@ -125,3 +125,14 @@ com grão, Oswald creme com a última linha em amarelo e o risco, rótulo sálvi
   sálvia, e o broto de folhas cheias saindo da beira. A frase longa vira hierarquia: HÁ
   ESPERANÇA grande, o meio menor e AINDA SE RENOVARÁ em amarelo com o risco.
 `MODELOS=nacoes,relogio,toco node design/compartilhar/gerar.mjs <pasta> modelos` gera os três.
+
+## Rodada 9 (`rodada9/`): nações no padrão dos posts da marca
+
+- **nacoes**: o dono pediu "mais a cara dele", no padrão dos posts da Geração Eleita (o de
+  tiras sálvia): preto de papel amassado com vincos, papel cinza rasgado nos cantos com a
+  fibra branca na borda, pinceladas secas sálvia e branca, a foto do dono como recorte de
+  papel rasgado colado com fita (a 1,3 vez, a foto é pequena), JESUS PARA / AS NAÇÕES em
+  Permanent Marker preto em duas tiras sálvia desencontradas, a cruz e a coroa brancas à
+  mão e o risco de pincel branco embaixo. Duas variantes: a foto centrada com as tiras
+  embaixo (a foto encostava no "dias de ofensiva" e a cruz ficava espremida) e a foto à
+  direita com a cruz ao lado e as tiras saindo da esquerda sobre o pé dela (escolhida).

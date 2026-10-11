@@ -2137,7 +2137,7 @@
     const w3 = tituloLanding(ctx, 'KING.', x, y3, t3, LP.amarelo, { alinhar: 'left' });
     riscoLanding(ctx, x - 4, y3 + 34, w3 + 14, 26, LP.amarelo);
   }
-  // ---------- (z) Jesus para as nações, Prepara-te e Há esperança: no padrão da landing ----------
+  // ---------- (z) Prepara-te e Há esperança no padrão da landing; Jesus para as nações no dos posts da marca ----------
   // Nos dois sem foto, o desenho à mão em sálvia é o herói; o título vem embaixo, como nos outros.
   // O traço à mão: os pontos ligados por curvas, cada um mexido um pouco pelo sorteio, em
   // duas passadas (a grossa e uma fina e mais fraca, um pouco ao lado), como a coroa da
@@ -2186,32 +2186,283 @@
     return y;
   }
 
-  // (z0) Jesus para as nações: a foto do dono (as mãos sobre a bandeira do Brasil, orando),
-  // em P&B com contraste, apagando nas bordas como as da landing. A foto é pequena (486 px):
-  // vai no máximo a uns 1,8 vez, centrada, para não borrar. Embaixo, JESUS PARA AS em creme
-  // e NAÇÕES em amarelo com o risco. Sem referência: nenhum versículo diz isso com estas
-  // palavras (Mateus 28.19 e Salmos 96.3, na NBV, dizem outra coisa).
-  function arteNacoes(ctx, fotos) {
-    fundoLanding(ctx);
-    const cx = L / 2;
-    if (fotos.nacoes) {
-      // a bandeira (perto de 60% da altura da foto) fica acima do título, livre do texto
-      const w = 880;
-      const x = cx - w / 2;
-      const y = 300;
-      const h = w * fotos.nacoes.height / fotos.nacoes.width;
-      fotoLanding(ctx, fotos.nacoes, { x, y, w, alfa: 0.94,
-        apaga: { cima: [y + 150, y + 380], baixo: [1190, 1000], esq: [x + 20, x + 280], dir: [x + w - 20, x + w - 280] } });
+  // (z0) Jesus para as nações: no padrão dos posts da marca Geração Eleita (o dono pediu
+  // "mais a cara dele"): o preto de papel amassado, os pedaços de papel rasgado nos cantos com
+  // a borda branca, as pinceladas sálvia e branca, a frase em Permanent Marker preto com cada
+  // linha numa tira de papel sálvia colada, desencontradas, a cruz e a coroa brancas à mão e
+  // o risco de pincel branco embaixo. A foto do dono (as mãos sobre a bandeira, em P&B) vai
+  // como um recorte de papel rasgado colado com fita; ela é pequena (486 px), então vai a
+  // no máximo 1,5 vez. Sem referência: nenhum versículo diz isso com estas palavras na NBV.
+  // O preto amassado: manchas claras bem fracas e os vincos (uma linha clara e, colada nela,
+  // uma escura), como o papel do fundo dos posts.
+  function fundoAmassado(ctx, r) {
+    ctx.fillStyle = '#0e0e0d';
+    ctx.fillRect(0, 0, L, A);
+    for (let i = 0; i < 14; i++) {
+      const x = r() * L;
+      const y = r() * A;
+      const raio = 160 + r() * 340;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, raio);
+      g.addColorStop(0, 'rgba(255,255,255,' + (0.015 + r() * 0.03).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - raio, y - raio, raio * 2, raio * 2);
     }
-    const t1 = tamanhoPara(ctx, 'JESUS PARA AS', 860, 130);
-    const y1 = 1150;
-    tituloLanding(ctx, 'JESUS PARA AS', cx, y1, t1, LP.creme);
-    const t2 = tamanhoPara(ctx, 'NAÇÕES.', 780, 220);
-    const y2 = y1 + 44 + t2 * 0.9;
-    const w2 = tituloLanding(ctx, 'NAÇÕES.', cx, y2, t2, LP.amarelo);
-    // o risco abaixo da cedilha do Ç
-    riscoLanding(ctx, cx - w2 / 2 - 6, y2 + t2 * 0.3, w2 + 14, 24, LP.amarelo);
-    return y2;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 70; i++) {
+      let x = r() * L;
+      let y = r() * A;
+      const pts = [[x, y]];
+      let ang = r() * Math.PI * 2;
+      for (let k = 0; k < 3 + Math.floor(r() * 4); k++) {
+        ang += (r() - 0.5) * 1.4;
+        const passo = 40 + r() * 140;
+        x += Math.cos(ang) * passo;
+        y += Math.sin(ang) * passo;
+        pts.push([x, y]);
+      }
+      const forca = 0.035 + r() * 0.06;
+      for (const [dx, cor] of [[0, 'rgba(255,255,255,' + forca.toFixed(3) + ')'], [2, 'rgba(0,0,0,' + (forca * 4).toFixed(3) + ')']]) {
+        ctx.strokeStyle = cor;
+        ctx.lineWidth = 1.2 + r() * 1.2;
+        ctx.beginPath();
+        pts.forEach(([px, py], j) => (j ? ctx.lineTo(px + dx, py + dx) : ctx.moveTo(px + dx, py + dx)));
+        ctx.stroke();
+      }
+    }
+  }
+  // Um polígono de borda rasgada: os pontos de cada lado (de canto a canto) mexidos para
+  // fora e para dentro, numa onda larga e irregular (a soma de três senos de fase sorteada)
+  // com a fibra miúda por cima. lados: [[de, ate, tremor]]; devolve o Path2D.
+  function bordaRasgada(lados, r, passo = 14) {
+    const p = new Path2D();
+    let primeiro = true;
+    for (const [de, ate, tremor] of lados) {
+      const comp = Math.hypot(ate[0] - de[0], ate[1] - de[1]);
+      const n = Math.max(1, Math.ceil(comp / passo));
+      const nx = -(ate[1] - de[1]) / comp;
+      const ny = (ate[0] - de[0]) / comp;
+      const fase = [r(), r(), r()].map((v) => v * Math.PI * 2);
+      for (let i = 0; i < n; i++) {
+        const t = i / n;
+        const s = comp * t / 100;
+        const onda = Math.sin(s * 0.9 + fase[0]) * 0.5 + Math.sin(s * 2.3 + fase[1]) * 0.3 + Math.sin(s * 5.1 + fase[2]) * 0.2;
+        const j = i ? tremor * (onda * 0.42 + (r() - 0.5) * 0.14) : 0;
+        const x = de[0] + (ate[0] - de[0]) * t + nx * j;
+        const y = de[1] + (ate[1] - de[1]) * t + ny * j;
+        if (primeiro) { p.moveTo(x, y); primeiro = false; } else p.lineTo(x, y);
+      }
+    }
+    p.closePath();
+    return p;
+  }
+  // Os pedaços de papel cinza rasgado dos cantos: a fibra branca aparece na borda rasgada
+  // (o papel branco por baixo, com outro rasgo), e o cinza tem vincos claros e escuros.
+  function papelDoCanto(ctx, de, ate, fecho, r) {
+    const lados = (tremor, desloca) => {
+      const l = [[[de[0] + desloca[0], de[1] + desloca[1]], [ate[0] + desloca[0], ate[1] + desloca[1]], tremor]];
+      let ant = [ate[0] + desloca[0], ate[1] + desloca[1]];
+      for (const q of fecho) { l.push([ant, q, 0]); ant = q; }
+      l.push([ant, [de[0] + desloca[0], de[1] + desloca[1]], 0]);
+      return l;
+    };
+    const nx = -(ate[1] - de[1]);
+    const ny = ate[0] - de[0];
+    const n = Math.hypot(nx, ny);
+    const fora = [nx / n * 12, ny / n * 12];
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.6)';
+    ctx.shadowBlur = 22;
+    ctx.fillStyle = '#e9e8e1';
+    ctx.fill(bordaRasgada(lados(44, fora), r, 4));
+    ctx.restore();
+    const cinza = bordaRasgada(lados(22, [0, 0]), r, 12);
+    ctx.fillStyle = '#353533';
+    ctx.fill(cinza);
+    ctx.save();
+    ctx.clip(cinza);
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 46; i++) {
+      ctx.strokeStyle = r() < 0.5 ? 'rgba(255,255,255,.09)' : 'rgba(0,0,0,.3)';
+      ctx.lineWidth = 1 + r() * 1.5;
+      ctx.beginPath();
+      let x = Math.min(de[0], ate[0]) + r() * Math.abs(ate[0] - de[0] || L);
+      let y = Math.min(de[1], ate[1]) + r() * Math.abs(ate[1] - de[1] || A);
+      ctx.moveTo(x, y);
+      for (let k = 0; k < 4; k++) { x += (r() - 0.5) * 150; y += (r() - 0.5) * 150; ctx.lineTo(x, y); }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // A pincelada seca: muitos fios de tinta encavalados, os da beira mais curtos, e depois
+  // as falhas (riscos finos tirados da tinta), como o pincel quase sem tinta dos posts.
+  // (x, y) é o meio da pincelada, w o comprimento, h a grossura.
+  function pincelSeco(ctx, x, y, w, h, ang, cor, r, fios = 18) {
+    const { c, ctx: k } = camada();
+    k.translate(x, y);
+    k.rotate(ang);
+    k.strokeStyle = cor;
+    k.lineCap = 'round';
+    const n = fios * 2;
+    for (let i = 0; i < n; i++) {
+      const fy = -h / 2 + h * (i + r()) / n;
+      const borda = Math.abs(fy) / (h / 2);
+      const x0 = -w / 2 + r() * w * (0.02 + borda * borda * 0.35);
+      const x1 = w / 2 - r() * w * (0.02 + borda * borda * 0.4);
+      k.globalAlpha = 0.7 + r() * 0.3;
+      k.lineWidth = h / n * (1.6 + r() * 1.4);
+      k.beginPath();
+      k.moveTo(x0, fy);
+      k.quadraticCurveTo((x0 + x1) / 2, fy + (r() - 0.5) * h * 0.12, x1, fy + (r() - 0.5) * h * 0.18);
+      k.stroke();
+    }
+    k.globalCompositeOperation = 'destination-out';
+    for (let i = 0; i < fios; i++) {
+      const fy = -h / 2 + r() * h;
+      const x0 = -w / 2 + r() * w * 0.7;
+      k.globalAlpha = 0.5 + r() * 0.5;
+      k.lineWidth = 0.8 + r() * 1.6;
+      k.beginPath();
+      k.moveTo(x0, fy);
+      k.lineTo(x0 + w * (0.1 + r() * 0.4), fy + (r() - 0.5) * 3);
+      k.stroke();
+    }
+    ctx.drawImage(c, 0, 0);
+  }
+  // Uma linha da frase na tira de papel sálvia colada: a borda de cima e de baixo um pouco
+  // irregular, as pontas rasgadas, a sombra curta de papel colado, manchas e vincos fracos no
+  // papel, e a letra de pincel preta (Permanent Marker, engrossada como no carimbo do app).
+  // (x, y) é o canto de cima à esquerda; devolve a largura da tira.
+  function tiraSalvia(ctx, texto, x, y, tam, giro, r) {
+    const fonte = '600 ' + tam + 'px "Permanent Marker", cursive';
+    ctx.font = fonte;
+    const wt = ctx.measureText(texto).width;
+    const w = wt + tam * 0.9;
+    const h = tam * 1.3;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(giro);
+    const p = bordaRasgada([[[0, 0], [w, 0], 4], [[w, 0], [w, h], 12], [[w, h], [0, h], 4], [[0, h], [0, 0], 12]], r, 12);
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.55)';
+    ctx.shadowBlur = 16;
+    ctx.shadowOffsetY = 6;
+    ctx.fillStyle = LP.salvia;
+    ctx.fill(p);
+    ctx.restore();
+    ctx.save();
+    ctx.clip(p);
+    for (let i = 0; i < 10; i++) {
+      const mx = r() * w;
+      const my = r() * h;
+      const raio = 30 + r() * 90;
+      const g = ctx.createRadialGradient(mx, my, 0, mx, my, raio);
+      const escuro = r() < 0.6;
+      g.addColorStop(0, escuro ? 'rgba(70,90,30,.12)' : 'rgba(255,255,240,.18)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(mx - raio, my - raio, raio * 2, raio * 2);
+    }
+    ctx.lineWidth = 1.2;
+    for (let i = 0; i < 8; i++) {
+      ctx.strokeStyle = r() < 0.5 ? 'rgba(60,75,25,.18)' : 'rgba(255,255,245,.3)';
+      ctx.beginPath();
+      const vx = r() * w;
+      ctx.moveTo(vx, 0);
+      ctx.lineTo(vx + (r() - 0.5) * 120, h);
+      ctx.stroke();
+    }
+    ctx.restore();
+    // a borda do papel: uma linha clara fina, de papel cortado
+    ctx.strokeStyle = 'rgba(240,248,215,.55)';
+    ctx.lineWidth = 2;
+    ctx.stroke(p);
+    S.escrever(ctx, texto, tam * 0.45, h * 0.5 + tam * 0.36, fonte, LP.tinta, { alinhar: 'left', espaco: tam * 0.02 });
+    ctx.restore();
+    return w;
+  }
+  // A foto como um recorte de papel colado: o papel branco rasgado em volta (a borda
+  // irregular), a foto recortada dentro, a sombra e dois pedaços de fita nos cantos.
+  // corte: [sx, sy, sw, sh] da foto; (cx, cy) é o meio; w a largura do recorte.
+  function recorteFoto(ctx, img, corte, cx, cy, w, giro, r) {
+    const [sx, sy, sw, sh] = corte;
+    const h = w * sh / sw;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(giro);
+    const m = 14;
+    const fora = bordaRasgada([[[-w / 2 - m, -h / 2 - m], [w / 2 + m, -h / 2 - m], 12], [[w / 2 + m, -h / 2 - m], [w / 2 + m, h / 2 + m], 12],
+      [[w / 2 + m, h / 2 + m], [-w / 2 - m, h / 2 + m], 16], [[-w / 2 - m, h / 2 + m], [-w / 2 - m, -h / 2 - m], 12]], r, 10);
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.7)';
+    ctx.shadowBlur = 34;
+    ctx.shadowOffsetY = 14;
+    ctx.fillStyle = '#ecebe4';
+    ctx.fill(fora);
+    ctx.restore();
+    const dentro = bordaRasgada([[[-w / 2, -h / 2], [w / 2, -h / 2], 5], [[w / 2, -h / 2], [w / 2, h / 2], 5],
+      [[w / 2, h / 2], [-w / 2, h / 2], 7], [[-w / 2, h / 2], [-w / 2, -h / 2], 5]], r, 14);
+    ctx.save();
+    ctx.clip(dentro);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.filter = 'grayscale(1) contrast(1.12)';
+    ctx.drawImage(img, sx, sy, sw, sh, -w / 2, -h / 2, w, h);
+    ctx.filter = 'none';
+    ctx.restore();
+    ctx.restore();
+    // as fitas, meio de lado, nos dois cantos de cima
+    const canto = (dx, dy) => [cx + dx * Math.cos(giro) - dy * Math.sin(giro), cy + dx * Math.sin(giro) + dy * Math.cos(giro)];
+    const [ax, ay] = canto(-w / 2 + 30, -h / 2 + 4);
+    const [bx, by] = canto(w / 2 - 30, -h / 2 + 4);
+    fita(ctx, ax, ay, 190, 54, giro - 0.62);
+    fita(ctx, bx, by, 190, 54, giro + 0.6);
+    return h;
+  }
+  // A cruz e a coroa brancas, à mão, como os rabiscos dos posts.
+  function cruzBranca(ctx, x, y, s, r) {
+    tracoAMao(ctx, [[x + s * 0.02, y - s * 0.55], [x, y], [x - s * 0.03, y + s * 0.62]], { r, largura: s * 0.11, cor: LP.creme, segunda: false });
+    tracoAMao(ctx, [[x - s * 0.34, y - s * 0.22], [x, y - s * 0.24], [x + s * 0.36, y - s * 0.27]], { r, largura: s * 0.11, cor: LP.creme, segunda: false });
+  }
+  function coroaBranca(ctx, x, y, w, giro, r) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(giro);
+    const k = w / 120;
+    const pt = (a, b) => [a * k, b * k];
+    // as três pontas, com a do meio mais alta, e a base em dois riscos
+    const traco = { r, largura: 7 * k, cor: LP.creme, segunda: false, tremor: 2.5 };
+    tracoAMao(ctx, [pt(10, 84), pt(2, 26)], traco);
+    tracoAMao(ctx, [pt(2, 26), pt(34, 58)], traco);
+    tracoAMao(ctx, [pt(34, 58), pt(60, 4)], traco);
+    tracoAMao(ctx, [pt(60, 4), pt(86, 56)], traco);
+    tracoAMao(ctx, [pt(86, 56), pt(118, 22)], traco);
+    tracoAMao(ctx, [pt(118, 22), pt(108, 84)], traco);
+    tracoAMao(ctx, [pt(4, 98), pt(60, 94), pt(116, 97)], { ...traco, largura: 6 * k });
+    tracoAMao(ctx, [pt(12, 112), pt(62, 109), pt(108, 111)], { ...traco, largura: 5 * k });
+    ctx.restore();
+  }
+  // O corte da foto: as mãos em volta da bandeira, sem a gente da borda de baixo.
+  const CORTE_NACOES = [8, 70, 470, 440];
+  function arteNacoes(ctx, fotos) {
+    const r = sorteio(2819);
+    fundoAmassado(ctx, r);
+    // os papéis dos cantos e as pinceladas, nas margens (longe da frase)
+    papelDoCanto(ctx, [790, 0], [1080, 430], [[1080, 0]], r);
+    papelDoCanto(ctx, [270, 1920], [0, 1430], [[0, 1920]], r);
+    // a foto à direita, um pouco girada, e a cruz ao lado dela; as tiras saem da esquerda
+    // e cobrem o pé da foto, e a coroa fecha o canto de baixo
+    pincelSeco(ctx, 1040, 960, 330, 64, -1.2, LP.salvia, r, 20);
+    pincelSeco(ctx, 1000, 1290, 230, 40, -0.4, LP.creme, r, 14);
+    const img = fotos.nacoes;
+    if (img) recorteFoto(ctx, img, CORTE_NACOES, 610, 862, 600, 0.045, r);
+    cruzBranca(ctx, 170, 800, 130, r);
+    const tam = 118;
+    const y1 = 1132;
+    const w1 = tiraSalvia(ctx, 'JESUS PARA', 74, y1, tam, -0.025, r);
+    const w2 = tiraSalvia(ctx, 'AS NAÇÕES', 136, y1 + tam * 1.3 - 6, tam, 0.015, r);
+    pincelSeco(ctx, 96 + Math.max(w1, w2) / 2, y1 + tam * 2.6 + 44, Math.max(w1, w2) * 0.86, 34, -0.015, LP.creme, r, 14);
+    coroaBranca(ctx, 900, 1408, 140, 0.14, r);
   }
 
   // (z1) Prepara-te, Ele vem (1 Tessalonicenses 4.16-17): a partir da arte que o dono mandou,
