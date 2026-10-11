@@ -230,3 +230,34 @@ Nenhuma fecha com a palavra amarela sublinhada; sem figura humana, prédio, coro
   escura perto do meio, toda apontando para a frase, que fica num vazio com uma luz amarela
   fraca (a presença não aparece, só o que ela atrai). Manrope extra-negrito. Fecha no brilho.
 `MODELOS=chegada,ancora,bussola,ima DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos` gera os quatro.
+
+## Rodada 14 (`rodada14/`)
+
+As últimas quatro frases da ofensiva que não tinham arte ganharam modelo próprio, cada uma num
+fundo, composição, letra e fecho diferentes entre si e das 41 publicadas (`folha-todas.png`,
+com as 45). Nenhuma fecha com a palavra amarela sublinhada; sem figura humana, prédio, coroa ou foto:
+- **ondas** (Conhecer a Deus e fazê-Lo conhecido): a gota amarela cai na água e os anéis abrem
+  dela, fortes perto do ponto e cada vez mais largos e fracos, até sair pelas bordas: receber e
+  passar adiante. Sálvia cheia, tudo centrado: CONHECER A DEUS em Literata no alto, a gota no
+  meio, E FAZÊ-LO espaçado e CONHECIDO em Oswald na largura toda. Sem ênfase na letra: os anéis
+  são o fecho. (O eco em contorno de CONHECIDO, na primeira versão, embolava; saiu.)
+- **envelope** (Como pregarão, se não forem enviados?, Romanos 10.15): o story é um envelope de
+  correio aéreo. Papel claro com a borda listrada de sálvia e tinta, o selo picotado com os
+  montes, o caminho que sobe e o sol ("como são belos os pés dos que anunciam boas novas") e o
+  valor 10.15, o carimbo redondo do correio com a referência e as ondas de cancelamento, e a
+  pergunta à mão em Permanent Marker no lugar do endereço. Fecha no carimbo de borracha
+  ENVIADOS?, verde-escuro, torto e falhado. A chama vai à esquerda, o selo à direita.
+- **molde** (Geração inconformada): o amarelo cheio com a grade de tinta de borda a borda.
+  GERAÇÃO em Oswald, uma letra em cada quadro, certinha; INCON / FORMADA à mão, cada letra maior
+  e mais torta que a anterior, e a grade some em volta de cada letra, com um quadro solto caído.
+  Fecha na grade quebrada. Diferente da bolinha do cartão de respostas (diferenca) e da ovelha
+  branca (diferente): aqui ninguém se destaca no meio dos outros, é a forma que não segura. As
+  rachaduras em fio da primeira versão pareciam fios de cabelo e saíram.
+- **rasura** (É tudo sobre Ele): a correção à mão. No preto da landing, É TUDO / SOBRE em Oswald
+  creme enorme, encostado à esquerda, e na linha de baixo MIM apagado e riscado com força em
+  sálvia, com ELE escrito à mão em amarelo ao lado. A frase que se lê é É TUDO SOBRE ELE; o
+  MIM riscado é o gancho (sair do centro). Fecha na rasura.
+`MODELOS=ondas,envelope,molde,rasura DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos`
+gera os quatro. Para a folha de contato, os 45 saem com `MODELOS=<todos> DIAS=7` e são montados
+em dez colunas. Os testes trocaram "Geração inconformada" por "Até que Ele venha" como frase
+sem arte.

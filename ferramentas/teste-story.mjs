@@ -148,7 +148,7 @@ try {
   await av('(() => { const E = CC.estado(); E.marcadoEm = {}; for (let i = 0; i < 16; i++) E.marcadoEm["t" + i] = CC.somaDias(CC.hojeIso(), -i); return true; })()');
   ok(await av('CC.sequencia().atual') === 16, 'a conta de teste está com 16 dias de ofensiva');
   const artes = await av('CC.FRASES_OFENSIVA.filter((f) => f.arte).map((f) => ({ ...f }))');
-  ok(Array.isArray(artes) && artes.length === 41, 'há 41 frases com arte própria (' + (artes || []).map((f) => f.arte).join(', ') + ')');
+  ok(Array.isArray(artes) && artes.length === 45, 'há 45 frases com arte própria (' + (artes || []).map((f) => f.arte).join(', ') + ')');
   const fundos = new Set();
   // abre a folha com esta frase (o sorteio é trocado só aqui) e toca em Compartilhar
   const abrirECompartilhar = async (frase) => {
@@ -234,7 +234,7 @@ try {
   ok(!!mDeNovo && await av('CC.story.arteCompleta("suficiente")') && Math.abs(mDeNovo.desvio - mFoto.desvio) < 0.5, 'com a foto de volta, o toque seguinte já sai com a foto');
   ok(fundos.size >= 5, 'os modelos têm fundos diferentes entre si (' + fundos.size + ' fundos)');
   // frase sem arte: o modelo de sempre (o grafite #1b1c1a)
-  const comum = await abrirECompartilhar({ linhas: ['Geração', 'inconformada'] });
+  const comum = await abrirECompartilhar({ linhas: ['Até que', 'Ele venha'] });
   ok(!!comum && comum.w === 1080 && Math.abs(comum.canto[0] - 0x1b) < 6 && Math.abs(comum.canto[2] - 0x1a) < 6,
     'frase sem arte continua no modelo de sempre (canto ' + (comum && comum.canto.join(',')) + ')');
 

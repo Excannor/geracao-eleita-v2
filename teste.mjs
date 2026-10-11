@@ -808,9 +808,9 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01e-story-artes.js'), 'utf8'
   const S = CC.story;
   const comArte = CC.FRASES_OFENSIVA.filter((f) => f.arte);
   const sem = comArte.filter((f) => typeof S.artes[f.arte] !== 'function' || S.arteDaFrase({ linhas: f.linhas, ref: f.ref || '' }) !== f.arte);
-  checar(comArte.length === 41 && !sem.length, 'as 41 frases com arte têm modelo de story e o pedido da folha chega a ele'
+  checar(comArte.length === 45 && !sem.length, 'as 45 frases com arte têm modelo de story e o pedido da folha chega a ele'
     + (sem.length ? ' (' + sem.map((f) => f.arte).join(', ') + ')' : ''));
-  checar(S.arteDaFrase({ linhas: ['Geração', 'inconformada'], ref: '' }) === null && S.arteDaFrase({ linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14' }) === 'luz',
+  checar(S.arteDaFrase({ linhas: ['Até que', 'Ele venha'], ref: '' }) === null && S.arteDaFrase({ linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14' }) === 'luz',
     'frase sem arte usa o modelo de sempre; "Luz do mundo" usa o da lâmpada');
 }
 

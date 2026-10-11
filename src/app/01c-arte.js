@@ -50,13 +50,13 @@
     { linhas: ['Perseverando', 'até o fim'], arte: 'chegada' },
     { linhas: ['Há esperança', 'para a árvore que,', 'se for cortada,', 'ainda se renovará'], ref: 'Jó 14.7-9', arte: 'toco' },
     { linhas: ['Jesus para', 'as nações'], arte: 'nacoes' },
-    { linhas: ['Conhecer a Deus', 'e fazê-Lo', 'conhecido'] },
+    { linhas: ['Conhecer a Deus', 'e fazê-Lo', 'conhecido'], arte: 'ondas' },
     { linhas: ['Se alguém quiser', 'vir após mim,', 'negue a si mesmo,', 'tome diariamente', 'a sua cruz', 'e siga-me'], ref: 'Lucas 9.23' },
     { linhas: ['Firmes no propósito,', 'constantes', 'na oração', 'e inabaláveis na fé'], arte: 'ancora' },
     { linhas: ['O propósito de Deus', 'para a sua vida', 'é maior do que', 'qualquer obstáculo', 'no seu caminho'], arte: 'caminho' },
     { linhas: ['A sua oração', 'de hoje está', 'construindo', 'o milagre de amanhã.', 'Continue firme'], arte: 'semente' },
     { linhas: ['Onde o mundo', 'vê um fim, Deus', 'escreve um', 'novo começo cheio', 'de esperança'], arte: 'virgula' },
-    { linhas: ['Geração', 'inconformada'] },
+    { linhas: ['Geração', 'inconformada'], arte: 'molde' },
     // As das artes que o dono mandou (2026-10-09): cada uma tem um modelo de story
     // próprio, redesenhado em canvas a partir da arte (arte: o nome do modelo, 01e-story-artes.js).
     { linhas: ['Não me envergonho', 'do Evangelho'], ref: 'Romanos 1.16', arte: 'chama' },
@@ -101,8 +101,8 @@
     // O dono quis o texto da arte em inglês, como no adesivo original.
     { linhas: ['Jesus is', 'my King'], arte: 'rei' },
     // Mais quatro do dono no mesmo dia, só a frase (o story é o modelo de sempre).
-    { linhas: ['É tudo', 'sobre Ele'] },
-    { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },
+    { linhas: ['É tudo', 'sobre Ele'], arte: 'rasura' },
+    { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15', arte: 'envelope' },
     { linhas: ['Jovens que', 'influenciam', 'a sua geração'], ref: 'Mateus 5.13-15', arte: 'influenciam' },
     { linhas: ['O maior fracasso', 'é ter sucesso', 'em coisas que', 'nos afastam', 'de Deus'] },
     // Frases novas do dono (2026-10-11), sem referência: nenhum versículo diz isso com estas palavras.

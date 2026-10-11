@@ -2310,6 +2310,11 @@
     ancora: { fundo: ['#0f1916'], tema: { ...TEMA_LP, escala: 0.8 }, desenhar: arteAncora, grao: [16, 1310] },
     bussola: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteBussola, grao: [12, 1320] },
     ima: { fundo: ['#ecebe4'], tema: { ...TEMA_PAPEL, alinhar: 'esquerda', escala: 0.8, marcaX: 90 }, desenhar: arteIma, grao: [12, 1330] },
+    // sétima leva (rodada 14): as ondas na água, o envelope aéreo, a grade quebrada e a rasura
+    ondas: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteConhecer, grao: [14, 1400] },
+    envelope: { fundo: ['#f1ece0'], tema: { ...TEMA_PAPEL, alinhar: 'esquerda', escala: 0.8 }, desenhar: artePregarao, grao: [12, 1410] },
+    molde: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, alinhar: 'direita', escala: 0.8 }, desenhar: arteInconformada, grao: [12, 1420] },
+    rasura: { fundo: [LP.preto], tema: { ...TEMA_LP, alinhar: 'esquerda', escala: 0.8, marcaX: 86 }, desenhar: arteTudo, grao: [18, 1430] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -4799,6 +4804,463 @@
     const t2 = caber(ctx, 'SUA PRESENÇA', mn, 860, 130, -0.02);
     S.escrever(ctx, 'ATRAÍDOS PELA', cx, cy - t2 * 0.55, S.Mn(700, 50), LP.tinta, { espaco: 12 });
     S.escrever(ctx, 'SUA PRESENÇA', cx, cy + t2 * 0.62, mn(t2), LP.tinta, { espaco: -t2 * 0.02 });
+  }
+
+  // ---------- sétima leva (rodada 14) ----------
+  // Quatro frases da ofensiva que ainda não tinham arte, cada uma num fundo (a sálvia, o papel
+  // de envelope, o amarelo e o preto), com composição, letra e fecho próprios. Nenhuma fecha
+  // com a palavra amarela sublinhada; nada de figura humana, prédio, coroa ou foto.
+
+  // Conhecer a Deus e fazê-Lo conhecido: a gota que cai na água e as ondas que saem dela. A
+  // superfície em sálvia vista de lado (os anéis achatados), a gota amarela caindo no meio e
+  // os anéis abrindo, fortes perto do ponto e cada vez mais largos e fracos, até sair pelas
+  // bordas: receber e passar adiante. CONHECER A DEUS em Literata no alto, a gota, e embaixo
+  // E FAZÊ-LO pequeno e CONHECIDO na largura toda. Fechamento: o eco, dois contornos de
+  // CONHECIDO abrindo como os anéis. Sem referência.
+  function ondasNaAgua(ctx, cx, cy, achata, r) {
+    const { c, ctx: k } = camada();
+    k.lineCap = 'round';
+    k.lineJoin = 'round';
+    let rx = 40;
+    let n = 0;
+    while (rx < 1500) {
+      const t = Math.min(1, (rx - 40) / 1000);
+      const alfa = 0.88 * (1 - t) ** 1.3 + 0.16;
+      const lw = 8 * (1 - t) + 2.2;
+      const f1 = r() * 6.3;
+      const f2 = r() * 6.3;
+      const anel = (dy, cor, largura) => {
+        k.strokeStyle = cor;
+        k.lineWidth = largura;
+        k.beginPath();
+        for (let i = 0; i <= 200; i++) {
+          const a = i / 200 * Math.PI * 2;
+          const rr = 1 + Math.sin(a * 5 + f1) * 0.01 + Math.sin(a * 11 + f2) * 0.006;
+          const x = cx + Math.cos(a) * rx * rr;
+          const y = cy + dy + Math.sin(a) * rx * achata * rr;
+          if (i) k.lineTo(x, y); else k.moveTo(x, y);
+        }
+        k.stroke();
+      };
+      // a crista clara um pouco acima, o vale escuro embaixo (a luz vem de cima)
+      anel(-lw * 1.3, 'rgba(250,253,235,' + (alfa * 0.75).toFixed(3) + ')', lw * 0.8);
+      anel(0, 'rgba(30,38,18,' + alfa.toFixed(3) + ')', lw);
+      n++;
+      rx += 30 + n * 11;
+    }
+    // os anéis somem atrás da marca, para ela se ler limpa
+    k.globalCompositeOperation = 'destination-out';
+    k.save();
+    k.translate(L / 2, PE);
+    k.scale(1, 0.4);
+    const g = k.createRadialGradient(0, 0, 0, 0, 0, 300);
+    g.addColorStop(0, 'rgba(0,0,0,1)');
+    g.addColorStop(0.6, 'rgba(0,0,0,1)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    k.fillStyle = g;
+    k.fillRect(-300, -300, 600, 600);
+    k.restore();
+    ctx.drawImage(c, 0, 0);
+  }
+  // A gota: a lágrima de ponta para cima, amarela com o contorno em tinta e o brilho claro.
+  function gotaAmarela(ctx, x, y, h) {
+    const w = h * 0.62;
+    const p = new Path2D();
+    p.moveTo(x, y - h / 2);
+    p.bezierCurveTo(x + w * 0.2, y - h * 0.2, x + w / 2, y + h * 0.02, x + w / 2, y + h * 0.18);
+    p.arc(x, y + h * 0.18, w / 2, 0, Math.PI, false);
+    p.bezierCurveTo(x - w / 2, y + h * 0.02, x - w * 0.2, y - h * 0.2, x, y - h / 2);
+    ctx.save();
+    ctx.fillStyle = LP.amarelo;
+    ctx.fill(p);
+    ctx.strokeStyle = LP.tinta;
+    ctx.lineWidth = 5;
+    ctx.lineJoin = 'round';
+    ctx.stroke(p);
+    ctx.strokeStyle = 'rgba(255,250,225,.9)';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(x, y + h * 0.18, w * 0.3, Math.PI * 0.95, Math.PI * 1.35);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function arteConhecer(ctx) {
+    const r = sorteio(1400);
+    ctx.fillStyle = LP.salvia;
+    ctx.fillRect(0, 0, L, A);
+    const luz = ctx.createRadialGradient(L / 2, 1000, 0, L / 2, 1000, 900);
+    luz.addColorStop(0, 'rgba(244,250,220,.45)');
+    luz.addColorStop(1, 'rgba(244,250,220,0)');
+    ctx.fillStyle = luz;
+    ctx.fillRect(0, 0, L, A);
+    const tinta = LP.tinta;
+    const cx = L / 2;
+    const cy = 1010;
+    ondasNaAgua(ctx, cx, cy, 0.3, r);
+    // o respingo no meio: a coroinha de água e a gota caindo
+    ctx.fillStyle = LP.amarelo;
+    ctx.strokeStyle = tinta;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 22, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    gotaAmarela(ctx, cx, cy - 170, 120);
+    // CONHECER A DEUS no alto
+    const lit = (t) => Lit(600, t);
+    const t1 = caber(ctx, 'CONHECER A DEUS', lit, 920, 104, 0.01);
+    S.escrever(ctx, 'CONHECER A DEUS', cx, 680, lit(t1), tinta, { espaco: t1 * 0.01 });
+    // E FAZÊ-LO e CONHECIDO embaixo, com o eco
+    S.escrever(ctx, 'E FAZÊ-LO', cx, 1318, oswaldLP(54, 500), tinta, { espaco: 16 });
+    const os = (t) => oswaldLP(t, 700);
+    const t3 = caber(ctx, 'CONHECIDO', os, 900, 220, 0.02);
+    const y3 = 1500;
+    ctx.font = os(t3);
+    S.escrever(ctx, 'CONHECIDO', cx, y3, os(t3), tinta, { espaco: t3 * 0.02 });
+  }
+
+  // Como pregarão, se não forem enviados? (Romanos 10.15): o story é um envelope de correio
+  // aéreo. O papel claro com a borda listrada de sálvia e tinta, o selo no canto (os montes,
+  // o caminho que sobe e o sol, por "como são belos os pés dos que anunciam boas novas", e o
+  // valor 10.15), o carimbo redondo do correio com a referência e as ondas de cancelamento, e
+  // a pergunta escrita à mão no lugar do endereço. Fechamento: ENVIADOS? batido com carimbo
+  // de borracha, torto e falhado.
+  function bordaAerea(ctx, larg) {
+    ctx.save();
+    const p = new Path2D();
+    p.rect(0, 0, L, A);
+    p.rect(larg, larg, L - 2 * larg, A - 2 * larg);
+    ctx.clip(p, 'evenodd');
+    const faixa = 46;
+    const vao = 26;
+    let i = 0;
+    for (let s = -A; s < L + A; s += faixa + vao) {
+      ctx.fillStyle = i++ % 2 ? LP.tinta : LP.salviaEscura;
+      ctx.beginPath();
+      ctx.moveTo(s, 0);
+      ctx.lineTo(s + faixa, 0);
+      ctx.lineTo(s + faixa - A * 0.7, A);
+      ctx.lineTo(s - A * 0.7, A);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  function seloPostal(ctx, x, y, w, h, giro, r) {
+    const { c, ctx: k } = camada();
+    k.translate(x, y);
+    k.rotate(giro);
+    // o papel do selo com o picote (meias-luas tiradas da borda)
+    k.fillStyle = '#fbf9f1';
+    k.fillRect(-w / 2, -h / 2, w, h);
+    k.globalCompositeOperation = 'destination-out';
+    const furo = 9;
+    const passo = 26;
+    for (let px = -w / 2; px <= w / 2 + 1; px += passo) {
+      k.beginPath(); k.arc(px, -h / 2, furo, 0, Math.PI * 2); k.fill();
+      k.beginPath(); k.arc(px, h / 2, furo, 0, Math.PI * 2); k.fill();
+    }
+    for (let py = -h / 2; py <= h / 2 + 1; py += passo) {
+      k.beginPath(); k.arc(-w / 2, py, furo, 0, Math.PI * 2); k.fill();
+      k.beginPath(); k.arc(w / 2, py, furo, 0, Math.PI * 2); k.fill();
+    }
+    k.globalCompositeOperation = 'source-over';
+    // a gravura: sálvia, o sol, os montes e o caminho pontilhado que sobe
+    const m = 22;
+    const ix = -w / 2 + m;
+    const iy = -h / 2 + m;
+    const iw = w - 2 * m;
+    const ih = h - 2 * m;
+    k.save();
+    k.beginPath();
+    k.rect(ix, iy, iw, ih);
+    k.clip();
+    k.fillStyle = LP.salvia;
+    k.fillRect(ix, iy, iw, ih);
+    k.fillStyle = LP.amarelo;
+    k.beginPath(); k.arc(ix + iw * 0.7, iy + ih * 0.42, iw * 0.15, 0, Math.PI * 2); k.fill();
+    k.strokeStyle = LP.tinta;
+    k.lineWidth = 3;
+    k.stroke();
+    const monte = (pts, cor) => {
+      k.beginPath();
+      k.moveTo(ix, iy + ih);
+      for (const [a, b] of pts) k.lineTo(ix + iw * a, iy + ih * b);
+      k.lineTo(ix + iw, iy + ih);
+      k.closePath();
+      k.fillStyle = cor;
+      k.fill();
+      k.lineWidth = 3.5;
+      k.lineJoin = 'round';
+      k.stroke();
+    };
+    monte([[0, 0.66], [0.3, 0.4], [0.5, 0.58], [0.78, 0.5], [1, 0.62]], LP.salviaEscura);
+    monte([[0, 0.86], [0.42, 0.66], [0.62, 0.78], [1, 0.72]], '#7f9150');
+    // o caminho, do pé ao alto do monte
+    k.setLineDash([2, 12]);
+    k.lineCap = 'round';
+    k.lineWidth = 6;
+    k.strokeStyle = '#fbf9f1';
+    k.beginPath();
+    k.moveTo(ix + iw * 0.18, iy + ih);
+    k.bezierCurveTo(ix + iw * 0.5, iy + ih * 0.9, ix + iw * 0.1, iy + ih * 0.7, ix + iw * 0.3, iy + ih * 0.44);
+    k.stroke();
+    k.setLineDash([]);
+    k.restore();
+    k.strokeStyle = LP.tinta;
+    k.lineWidth = 3;
+    k.strokeRect(ix, iy, iw, ih);
+    // o valor
+    S.escrever(k, '10.15', ix + 12, iy + 58, oswaldLP(52, 700), LP.tinta, { alinhar: 'left' });
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    gastar(c, { x: x - w, y: y - h, w: 2 * w, h: 2 * h }, { pontos: 400, manchas: 6, riscos: 20, semente: 1411, forca: 0.5 });
+    ctx.save();
+    ctx.shadowColor = 'rgba(40,35,20,.28)';
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 5;
+    ctx.drawImage(c, 0, 0);
+    ctx.restore();
+  }
+  // O carimbo redondo do correio: dois anéis, a referência pela borda, a cruz no meio e as
+  // ondas de cancelamento saindo para a esquerda. Em tinta falhada, por cima do selo.
+  function carimboPostal(ctx, cx, cy, R, ondasAte, r) {
+    const { c, ctx: k } = camada();
+    const cor = 'rgba(18,19,15,.82)';
+    k.strokeStyle = cor;
+    k.lineWidth = 5;
+    k.beginPath(); k.arc(cx, cy, R, 0, Math.PI * 2); k.stroke();
+    k.lineWidth = 3;
+    k.beginPath(); k.arc(cx, cy, R * 0.6, 0, Math.PI * 2); k.stroke();
+    letrasNoArco(k, 'ROMANOS', cx, cy, R * 0.8 - 2, -Math.PI / 2, oswaldLP(30, 700), cor, { espaco: 5 });
+    letrasNoArco(k, '10.15', cx, cy, R * 0.8 + 10, Math.PI / 2, oswaldLP(30, 700), cor, { espaco: 6, embaixo: true });
+    k.fillStyle = cor;
+    k.fillRect(cx - 4, cy - 26, 8, 52);
+    k.fillRect(cx - 17, cy - 12, 34, 8);
+    // as ondas
+    k.lineWidth = 5;
+    k.lineCap = 'round';
+    for (let i = 0; i < 5; i++) {
+      const y = cy - R * 0.62 + i * R * 0.31;
+      k.beginPath();
+      for (let x = cx - R - 14; x >= ondasAte; x -= 6) {
+        const yy = y + Math.sin((x - cx) / 22) * 10;
+        if (x > cx - R - 14 - 1) k.moveTo(x, yy); else k.lineTo(x, yy);
+      }
+      k.stroke();
+    }
+    gastar(c, { x: ondasAte - 10, y: cy - R - 10, w: cx + R - ondasAte + 20, h: 2 * R + 20 }, { pontos: 1400, manchas: 24, riscos: 60, semente: 1412, forca: 0.9 });
+    ctx.drawImage(c, 0, 0);
+  }
+  // O carimbo de borracha: a palavra em Oswald dentro de dois quadros, torta, com a tinta
+  // falhando (mais nas bordas, como a borracha que não assentou por igual).
+  function carimboDeBorracha(ctx, texto, cx, cy, tam, giro, cor, r) {
+    const { c, ctx: k } = camada();
+    k.translate(cx, cy);
+    k.rotate(giro);
+    k.font = oswaldLP(tam, 700);
+    try { k.letterSpacing = tam * 0.04 + 'px'; } catch (e) { /* sem letterSpacing */ }
+    const w = k.measureText(texto).width;
+    const cap = k.measureText(texto).actualBoundingBoxAscent;
+    const pad = tam * 0.22;
+    const bw = w + pad * 2;
+    const bh = cap + pad * 2;
+    k.strokeStyle = cor;
+    k.lineWidth = 12;
+    k.strokeRect(-bw / 2, -bh / 2, bw, bh);
+    k.lineWidth = 4;
+    k.strokeRect(-bw / 2 + 20, -bh / 2 + 20, bw - 40, bh - 40);
+    k.fillStyle = cor;
+    k.textAlign = 'center';
+    k.textBaseline = 'alphabetic';
+    k.fillText(texto, tam * 0.02, cap / 2);
+    try { k.letterSpacing = '0px'; } catch (e) { /* idem */ }
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    const caixa = { x: cx - bw / 2 - 30, y: cy - bh / 2 - 60, w: bw + 60, h: bh + 120 };
+    gastar(c, caixa, { pontos: 2600, manchas: 40, riscos: 140, semente: 1413, forca: 0.95 });
+    // a borracha que não assentou: a ponta direita mais fraca
+    k.globalCompositeOperation = 'destination-out';
+    const g = k.createLinearGradient(cx - bw / 2, 0, cx + bw / 2, 0);
+    g.addColorStop(0, 'rgba(0,0,0,.05)');
+    g.addColorStop(0.7, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,.28)');
+    k.fillStyle = g;
+    k.fillRect(caixa.x, caixa.y, caixa.w, caixa.h);
+    ctx.drawImage(c, 0, 0);
+  }
+  function artePregarao(ctx) {
+    const r = sorteio(1410);
+    fundoPapel(ctx, '#f1ece0', 1410);
+    bordaAerea(ctx, 34);
+    // o selo e o carimbo no canto de cima
+    seloPostal(ctx, 870, 440, 210, 250, 0.05, r);
+    carimboPostal(ctx, 700, 590, 96, 430, r);
+    // a pergunta à mão, no lugar do endereço, com as linhas do endereço
+    const x = 112;
+    const tam = 112;
+    const linhas = ['Como pregarão', 'se não forem'];
+    ctx.font = '400 ' + tam + 'px "Permanent Marker", cursive';
+    const tamOk = Math.min(tam, 840 / ctx.measureText('Como pregarão').width * tam);
+    let y = 930;
+    for (const linha of linhas) {
+      ctx.fillStyle = LP.tinta;
+      aMao(ctx, linha, x, y, tamOk, r);
+      tracoAMao(ctx, [[x - 10, y + 30], [L / 2, y + 32], [L - 110, y + 29]], { r, largura: 2.5, tremor: 1, segunda: false, cor: 'rgba(18,19,15,.32)' });
+      y += tamOk * 1.42;
+    }
+    carimboDeBorracha(ctx, 'ENVIADOS?', L / 2 + 10, 1330, 150, -0.08, '#3d4a20', r);
+  }
+
+  // Geração inconformada: a forma que não segura. O amarelo cheio com a grade de tinta, os
+  // quadros todos iguais, de borda a borda; GERAÇÃO em Oswald, uma letra em cada quadro,
+  // certinha. INCONFORMADA vem à mão e enorme, cada letra maior e mais torta que a anterior,
+  // e onde ela passa a grade arrebenta: as linhas somem em volta de cada letra e um quadro
+  // solto cai torto. Fechamento: a grade quebrada. Sem referência.
+  const QUADRO = 120;
+  function gradeDoMolde(ctx, buracos, r) {
+    const { c, ctx: k } = camada();
+    k.strokeStyle = LP.tinta;
+    k.lineWidth = 3;
+    for (let x = 0; x <= L; x += QUADRO) { k.beginPath(); k.moveTo(x, 0); k.lineTo(x, A); k.stroke(); }
+    for (let y = 0; y <= A; y += QUADRO) { k.beginPath(); k.moveTo(0, y); k.lineTo(L, y); k.stroke(); }
+    k.globalCompositeOperation = 'destination-out';
+    // a grade some atrás da chama, dos dias e da marca
+    for (const [x, y, w, h] of [[L - 300, 390, 360, 170], [L / 2, PE, 340, 110]]) {
+      k.save();
+      k.translate(x, y);
+      k.scale(1, h / w);
+      const g = k.createRadialGradient(0, 0, 0, 0, 0, w);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(0.6, 'rgba(0,0,0,.92)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      k.fillStyle = g;
+      k.fillRect(-w, -w, 2 * w, 2 * w);
+      k.restore();
+    }
+    // e arrebenta onde as letras passaram
+    k.fillStyle = '#000';
+    for (const b of buracos) k.fill(b);
+    k.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 0.62;
+    ctx.drawImage(c, 0, 0);
+    ctx.globalAlpha = 1;
+  }
+  function arteInconformada(ctx) {
+    const r = sorteio(1420);
+    ctx.fillStyle = LP.amarelo;
+    ctx.fillRect(0, 0, L, A);
+    const tinta = LP.tinta;
+    const pm = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
+    // as letras de INCONFORMADA: cada uma maior e mais torta que a anterior
+    const letras = [];
+    const linha = (texto, y, largura, cresce0, cresce1, i0) => {
+      const base = caber(ctx, texto, pm, largura, 400);
+      const n = texto.length;
+      const tams = [...texto].map((_, i) => base * (cresce0 + (cresce1 - cresce0) * i / (n - 1)));
+      const largs = [...texto].map((l, i) => { ctx.font = pm(tams[i]); return ctx.measureText(l).width * 0.94; });
+      const total = largs.reduce((a, b) => a + b, 0);
+      let x = L / 2 - total / 2;
+      [...texto].forEach((l, i) => {
+        const solto = (i0 + i) / 11;
+        letras.push({ l, x: x + largs[i] / 2, y: y + (r() - 0.5) * 50 * solto, tam: tams[i], giro: (i % 2 ? -1 : 1) * (0.03 + solto * 0.2) * (0.75 + r() * 0.25) });
+        x += largs[i];
+      });
+    };
+    linha('INCON', 1040, 660, 0.8, 1.12, 0);
+    linha('FORMADA', 1340, 930, 0.85, 1.3, 5);
+    // os buracos na grade: a caixa de cada letra, girada, com folga e a borda irregular
+    const buracos = letras.map((t) => {
+      ctx.font = pm(t.tam);
+      const m = ctx.measureText(t.l);
+      const w = m.width * 0.5 + 18;
+      const cima = m.actualBoundingBoxAscent + 16;
+      const baixo = m.actualBoundingBoxDescent + 16;
+      const p = new Path2D();
+      const pts = [[-w, -cima], [w, -cima], [w, baixo], [-w, baixo]].map(([a, b]) => [a + (r() - 0.5) * 18, b + (r() - 0.5) * 18]);
+      pts.forEach(([a, b], i) => {
+        const px = t.x + a * Math.cos(t.giro) - b * Math.sin(t.giro);
+        const py = t.y + a * Math.sin(t.giro) + b * Math.cos(t.giro);
+        if (i) p.lineTo(px, py); else p.moveTo(px, py);
+      });
+      p.closePath();
+      return p;
+    });
+    gradeDoMolde(ctx, buracos, r);
+    // o quadro que saiu da grade e caiu torto, no canto de baixo
+    ctx.save();
+    ctx.translate(905, 1488);
+    ctx.rotate(0.38);
+    ctx.strokeStyle = 'rgba(18,19,15,.62)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(-QUADRO / 2, -QUADRO / 2, QUADRO, QUADRO);
+    ctx.restore();
+    // GERAÇÃO certinha, uma letra por quadro (colunas 1 a 7, a fileira de 600 a 720)
+    const yF = 600;
+    ctx.font = oswaldLP(88, 700);
+    [...'GERAÇÃO'].forEach((l, i) => {
+      ctx.font = oswaldLP(88, 700);
+      const m = ctx.measureText('G');
+      S.escrever(ctx, l, QUADRO * (i + 1) + QUADRO / 2, yF + QUADRO / 2 + m.actualBoundingBoxAscent / 2, oswaldLP(88, 700), tinta);
+    });
+    // INCONFORMADA à mão, por cima
+    for (const t of letras) {
+      ctx.save();
+      ctx.translate(t.x, t.y);
+      ctx.rotate(t.giro);
+      S.escrever(ctx, t.l, 0, 0, pm(t.tam), tinta);
+      ctx.restore();
+    }
+  }
+
+  // É tudo sobre Ele: a correção à mão. No preto da landing, É TUDO / SOBRE / MIM em Oswald
+  // creme enorme, encostado à esquerda; o MIM, apagado, é riscado com força em sálvia e, ao
+  // lado, ELE vem escrito à mão em amarelo, a única cor quente, como quem corrige o
+  // texto. A frase que fica é É TUDO SOBRE ELE. Fechamento: a rasura.
+  function rasura(ctx, x0, y0, x1, y1, r) {
+    const pts = [];
+    const n = 9;
+    for (let i = 0; i <= n; i++) {
+      const t = i / n;
+      pts.push([x0 + (x1 - x0) * t + (r() - 0.5) * 20, (i % 2 ? y1 : y0) + (r() - 0.5) * 24]);
+    }
+    tracoAMao(ctx, pts, { r, largura: 22, tremor: 6, cor: LP.salvia, segunda: true });
+    tracoAMao(ctx, [[x0 - 20, (y0 + y1) / 2 + 10], [(x0 + x1) / 2, (y0 + y1) / 2 - 14], [x1 + 24, (y0 + y1) / 2 + 4]], { r, largura: 26, tremor: 6, cor: LP.salvia, segunda: false });
+  }
+  function arteTudo(ctx) {
+    const r = sorteio(1430);
+    fundoLanding(ctx);
+    const x = 86;
+    const os = (t) => oswaldLP(t, 700);
+    const pm = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
+    // MIM riscado e ELE ao lado têm de caber na mesma linha
+    const wLinha3 = (larguraDe(ctx, 'MIM', os(100)) + 0.95 * larguraDe(ctx, 'ELE', pm(100))) / 100;
+    const tam = Math.min(caber(ctx, 'É TUDO', os, 900, 330), caber(ctx, 'SOBRE', os, 900, 330), (L - x - 70 - 40) / wLinha3);
+    ctx.font = os(tam);
+    const cap = ctx.measureText('É TUDO').actualBoundingBoxAscent;
+    const capS = ctx.measureText('SOBRE').actualBoundingBoxAscent;
+    const vao = tam * 0.1;
+    const y1 = (Z0 + Z1) / 2 - (cap + 2 * (vao + capS)) / 2 + cap;
+    const y2 = y1 + vao + capS;
+    const y3 = y2 + vao + capS;
+    S.escrever(ctx, 'É TUDO', x, y1, os(tam), LP.creme, { alinhar: 'left' });
+    S.escrever(ctx, 'SOBRE', x, y2, os(tam), LP.creme, { alinhar: 'left' });
+    // o MIM apagado e riscado
+    const wM = larguraDe(ctx, 'MIM', os(tam));
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    S.escrever(ctx, 'MIM', x, y3, os(tam), LP.creme, { alinhar: 'left' });
+    ctx.restore();
+    rasura(ctx, x - 6, y3 - capS * 0.9, x + wM + 6, y3 - capS * 0.1, r);
+    // ELE à mão, ao lado, um pouco acima, e a setinha de inserção embaixo
+    const tE = tam * 0.95;
+    ctx.fillStyle = LP.amarelo;
+    const xE = x + wM + 50;
+    const yE = y3 - capS * 0.12;
+    ctx.save();
+    ctx.translate(xE, yE);
+    ctx.rotate(-0.07);
+    aMao(ctx, 'ELE', 0, 0, tE, r);
+    ctx.restore();
   }
 
   S.prepararArte = prepararArte;
