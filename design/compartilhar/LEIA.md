@@ -150,3 +150,33 @@ Retorno do dono:
   duas variantes, a foto cobrindo a altura toda (3,5 vezes) cortava a bandeira e borrava
   demais; a foto na largura deixava a bandeira clara no alto, mas apagava no preto embaixo.
   Ficou a foto na largura com o pé continuado em espelho, mais borrado, sob o escuro.
+
+## Revisão das artes no padrão da landing (`revisao-landing/`)
+
+O dono achou repetidas as artes feitas "no padrão da landing": quase preto, Oswald creme
+centrado, a última linha em amarelo com o risco de marcador, o desenho no meio e a mesma
+moldura. Na folha de contato (`folha-todas.png`, com as quatro da rodada 12 da outra frente)
+nove delas empatavam em quatro ou cinco eixos da skill artes-story. Cada uma ganhou fundo,
+composição, letra e fechamento próprios; a ideia, as fotos e o texto continuam os mesmos
+(`antes-depois.png`):
+- **avivados:** pôster amarelo cheio, a foto do culto multiplicada (o claro some no amarelo),
+  AVIVADOS gigante em tinta à esquerda e "até que Ele venha" à mão. Fecha na inversão.
+- **naotemas:** papel de jornal com a foto da cruz impressa e rasgada embaixo, NÃO TEMAS em
+  Literata preta e "eu sou teu Deus" numa fita sálvia.
+- **rei:** sálvia cheia, o rapaz da landing em estêncil à direita, JESUS gigante na largura
+  com a coroa à mão no J, "is my" à mão e KING vazado com sombra.
+- **relogio:** o relógio ocupa a arte e a frase mora dentro do mostrador (sem o V, VI e
+  VII); a única luz é o brilho amarelo no XII, a meia-noite.
+- **toco:** papel claro, a frase à esquerda em Literata (o meio em itálico) e "ainda se
+  renovará." escrito à mão; o toco em tinta sangrando pelas laterais, o broto amarelo.
+- **influenciam:** a foto do dono cobre o story todo, com o facho amarelo; a frase à direita,
+  no escuro do pé, INFLUENCIAM no maior tamanho.
+- **diferenca:** o cartão de respostas: as bolinhas impressas sangrando pelas bordas, uma só
+  pintada de amarelo e circulada à caneta, e a frase à mão. O pictograma de gente saiu
+  (figura humana desenhada é proibida).
+- **vivoporele:** o story partido: JESUS MORREU POR MIM em Literata creme no preto e AGORA EU
+  VIVO POR ELE em tinta no amarelo rasgado, com a cruz na emenda.
+- **testemunho:** o céu do amanhecer clareando até o horizonte, o banco vazio em silhueta
+  diante do sol amarelo, a frase à mão e PRA CONTAR. numa fita creme.
+O fechamento amarelo com risco não aparece mais em nenhuma arte. Para gerar:
+`DIAS=7 MODELOS=avivados,naotemas,rei,relogio,toco,influenciam,diferenca,vivoporele,testemunho node design/compartilhar/gerar.mjs <pasta> modelos`.
