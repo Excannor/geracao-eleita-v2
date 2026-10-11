@@ -117,6 +117,9 @@
     // Lembra o filho que volta (Lucas 15), mas não é citação: sem referência.
     { linhas: ['Não importa o que', 'você fez, apenas', 'volte para casa!', 'O Pai te espera', 'de braços abertos'], arte: 'casa' },
     { linhas: ['Jesus', 'salva'], arte: 'salva' },
+    { linhas: ['Jesus', 'está no', 'controle'], arte: 'controle' },
+    // Lema com a referência: Mateus 5.13-14 chama de "sal da terra" e "luz do mundo".
+    { linhas: ['Sal e luz', 'do mundo'], ref: 'Mateus 5.13-14', arte: 'salluz' },
     { linhas: ['Que haja Deus', 'em tudo o que', 'for meu.'], arte: 'meu' },
     { linhas: ['Deus', 'tem um plano', 'para você.'], arte: 'plano' },
     { linhas: ['Peça a Deus.', 'Confie em Deus.', 'Agradeça a Deus.'], arte: 'cubo' },

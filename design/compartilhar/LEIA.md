@@ -331,17 +331,22 @@ sublinhada; sem figura humana, prédio, coroa ou foto:
   (o mapa elíptico do quadrado no círculo), impressa em tinta no papel amarelo, com a marca leve
   da prensa. Em volta, anéis finos à mão, cada vez mais largos e mais fracos, que somem antes da
   chama e da marca. Diferente dos recortes de Jesus vive. Fecha nas ondas.
-- **salluz** (Sal e luz do mundo, Mateus 5.13-14): a lâmpada acesa que é saleiro: o vidro
-  amarelo brilhando no escuro, com a borda acesa e o reflexo em vez de contorno, a frase à mão
-  dentro dele, e a rosca virou a tampa de metal furada, de onde cai o sal, cada grão pegando a
-  luz. **Sobreposição com luz** (Luz do mundo, a lâmpada em traço laranja no marrom): aqui o
-  vidro é cheio e aceso, a letra fica dentro e o sal é o gancho. A referência é de lema (Mateus
-  5.13-14 fala do sal da terra e da luz do mundo) e aparece pequena no canto. Fecha no sal caindo.
-- **controle** (Jesus está no controle): a estampa de camiseta no tecido sálvia, com a trama e
-  as dobras passando por cima: o controle em serigrafia, o traço de pincel mais grosso no lado da
-  sombra, o amarelo fora de registro, a sombra em retícula, botões só de bolinha (nenhum símbolo
-  de console) e a tinta rachada de lavar. JESUS e CONTROLE em Manrope, "está no" à mão. Fecha no
-  próprio controle.
+- **salluz** (Sal e luz do mundo, Mateus 5.13-14): a lâmpada que é saleiro, deitada de lado no
+  gesto de quem salga, no papel creme, com a luz dela no papel e a sombra macia. A frase é o
+  próprio desenho do vidro: SAL, E LUZ DO e MUNDO em Oswald, de pé, inchando com a curva até
+  encher a bola (o mesmo mapa do quadrado no círculo de Jesus salva, com a linha do meio mais
+  estreita para não espremer nas bordas), com a curva e os reflexos do vidro por cima. A rosca
+  virou a tampa de metal furada, e o sal cai dela grão por grão. **Sobreposição com luz** (Luz
+  do mundo, a lâmpada em traço laranja no marrom): aqui o fundo é claro, a letra é o vidro e o
+  sal é o gancho. A referência é de lema e aparece pequena no canto. Na primeira versão a lâmpada
+  ficava em pé no escuro com a frase colada dentro; o dono pediu a lâmpada de lado e a letra
+  integrada, como na referência. Fecha no sal caindo.
+- **controle** (Jesus está no controle): a estampa de camiseta na malha grafite mesclada (o dono
+  pediu cinza, menos sálvia e amarelo), com a trama e as dobras passando por cima: o controle em
+  serigrafia amarela com o traço de pincel creme, mais grosso no lado da sombra, a sombra em
+  retícula vazada (o pano aparece nos pontos), botões só de bolinha (nenhum símbolo de console)
+  e a tinta rachada de lavar. JESUS e CONTROLE em Manrope creme, "está no" à mão em amarelo.
+  Fecha no próprio controle.
 - **plano** (Deus tem um plano para você): DEUS gigante, deitado, impresso em tipografia no
   papel de algodão (a borda clara de onde o papel afundou), com as linhas de construção finas
   do desenho das letras em volta, como projeto; "tem um plano para você." escondido na barriga

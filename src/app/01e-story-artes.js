@@ -2328,8 +2328,8 @@
     planos: { fundo: ['#d6dbd1'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: artePlanos, grao: [12, 1610] },
     casa: { fundo: ['#0a0c0a'], tema: { ...TEMA_LP, brilho: false, escala: 0.8, marca: LP.tinta, marcaFraca: '#4a3d1a' }, desenhar: arteCasa, grao: [16, 1620] },
     salva: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteSalva, grao: [12, 1625] },
-    salluz: { fundo: ['#0a0b09'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteSalLuz, grao: [18, 1640] },
-    controle: { fundo: ['#c3d488'], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteControle, grao: [14, 1630] },
+    salluz: { fundo: ['#f2ead7'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteSalLuz, grao: [12, 1640] },
+    controle: { fundo: ['#3a3c39'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteControle, grao: [14, 1630] },
     plano: { fundo: ['#e8e3d9'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: artePlano, grao: [12, 1650] },
     meu: { fundo: ['#c4d589'], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteMeu, grao: [12, 1645] },
     cubo: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteCubo, grao: [12, 1655] },
@@ -6229,7 +6229,9 @@
     aMao(ctx, 'O Pai te espera', L / 2, dBase + 150, 50, r, { alinhar: 'center' });
     aMao(ctx, 'de braços abertos', L / 2, dBase + 218, 50, r, { alinhar: 'center' });
   }
-  function letrasNoCirculo(palavras, R, cor) {
+  // fonte: a letra (Manrope engordada, ou outra); pesos: a altura de cada linha, em proporção;
+  // larguras: a fração da largura que cada linha ocupa (a mais curta não espreme nas bordas).
+  function letrasNoCirculo(palavras, R, cor, { fonte: letra = '800 200px Manrope, sans-serif', pesos, larguras } = {}) {
     const Q = 1400;
     const fonte = document.createElement('canvas');
     fonte.width = Q;
@@ -6239,19 +6241,24 @@
     k.strokeStyle = '#000';
     k.lineJoin = 'round';
     const vao = Q * 0.035;
-    const altura = (Q - vao * (palavras.length - 1)) / palavras.length;
+    const ps = pesos || palavras.map(() => 1);
+    const somaPesos = ps.reduce((a, b) => a + b, 0);
+    const alturas = ps.map((x) => (Q - vao * (palavras.length - 1)) * x / somaPesos);
     palavras.forEach((p, i) => {
+      const altura = alturas[i];
+      const topo = alturas.slice(0, i).reduce((a, b) => a + b, 0) + i * vao;
       k.save();
-      k.font = '800 200px Manrope, sans-serif';
+      k.font = letra;
       k.textAlign = 'left';
       k.textBaseline = 'alphabetic';
       const m = k.measureText(p);
       const w = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
       const h = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
       const gordo = 16;
-      k.translate(0, i * (altura + vao));
-      k.scale((Q - gordo * 3) / w, (altura - gordo * 3) / h);
-      k.translate(m.actualBoundingBoxLeft + gordo * 1.5 * w / Q, m.actualBoundingBoxAscent + gordo * 1.5 * h / altura);
+      const fr = larguras ? larguras[i] : 1;
+      k.translate(Q * (1 - fr) / 2, topo);
+      k.scale((Q * fr - gordo * 3) / w, (altura - gordo * 3) / h);
+      k.translate(m.actualBoundingBoxLeft + gordo * 1.5 * w / (Q * fr), m.actualBoundingBoxAscent + gordo * 1.5 * h / altura);
       k.fillText(p, 0, 0);
       k.lineWidth = gordo;
       k.strokeText(p, 0, 0);
@@ -6392,17 +6399,34 @@
     p.closePath();
     return p;
   }
-  // Jesus está no controle: a estampa de camiseta. O tecido sálvia com a trama e as dobras,
-  // e por cima a estampa em serigrafia: o controle desenhado com traço de pincel (mais grosso
-  // no lado da sombra), o amarelo fora de registro por baixo do preto, a sombra em retícula,
+  // Jesus está no controle: a estampa de camiseta. O tecido grafite mesclado (o dono pediu
+  // cinza, menos sálvia e amarelo) com a trama e as dobras, e por cima a estampa em
+  // serigrafia: o controle com traço de pincel creme (mais grosso no lado da sombra), o
+  // amarelo fora de registro, a sombra em retícula vazada (o pano aparece nos pontos),
   // a cruz direcional, quatro botões só de bolinha, os analógicos e a luz do jogador 1. A
   // tinta é gasta, rachada de lavar, e as dobras do pano passam por cima de tudo. JESUS em
   // cima, "está no" à mão e CONTROLE embaixo. Fechamento: o próprio controle.
   function arteControle(ctx) {
     const r = sorteio(1630);
-    const tinta = LP.tinta;
-    ctx.fillStyle = '#c3d488';
+    // a tinta clara da estampa e o "furo": onde a tinta não vai, aparece o pano
+    const tinta = '#eee8d3';
+    const furo = '#363835';
+    // a camiseta grafite mesclada: o cinza com as fibras claras e escuras
+    ctx.fillStyle = '#3a3c39';
     ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 40, { aClaro: 0.05, aEscuro: 0.08, claro: '220,222,215', escuro: '0,0,0' });
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 26000; i++) {
+      const claro = r() < 0.5;
+      ctx.strokeStyle = claro ? 'rgba(210,212,205,' + (0.05 + r() * 0.1).toFixed(3) + ')' : 'rgba(10,10,10,' + (0.08 + r() * 0.14).toFixed(3) + ')';
+      ctx.lineWidth = 0.8 + r() * 1.2;
+      const x = r() * L;
+      const y = r() * A;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + (r() - 0.5) * 3, y + 3 + r() * 6);
+      ctx.stroke();
+    }
     // a estampa numa camada (para gastar a tinta sem gastar o pano)
     const { c, ctx: k } = camada();
     const cx = L / 2;
@@ -6427,7 +6451,7 @@
     // a sombra em retícula, dentro do corpo, mais cheia embaixo e à direita
     k.save();
     k.clip(corpo);
-    reticula(k, -520, -220, 520, 380, 13, (x, y) => Math.max(0, (y + 40) / 380 + (x - 100) / 1400) * 0.95, 'rgba(18,19,15,.85)');
+    reticula(k, -520, -220, 520, 380, 13, (x, y) => Math.max(0, (y + 40) / 380 + (x - 100) / 1400) * 0.95, furo);
     k.restore();
     // o traço de pincel: fino no lado da luz, grosso no lado da sombra
     k.strokeStyle = tinta;
@@ -6448,7 +6472,7 @@
     k.stroke(corpo);
     k.restore();
     // a cruz direcional
-    k.fillStyle = tinta;
+    k.fillStyle = furo;
     k.save();
     k.translate(-268, -14);
     retRedondo(k, -76, -26, 152, 52, 10);
@@ -6462,7 +6486,7 @@
       k.beginPath();
       k.arc(x + 6, y + 5, 30, 0, Math.PI * 2);
       k.fill();
-      k.strokeStyle = tinta;
+      k.strokeStyle = furo;
       k.lineWidth = 7;
       k.beginPath();
       k.arc(x, y, 31, 0, Math.PI * 2);
@@ -6472,7 +6496,7 @@
     for (const lado of [-1, 1]) {
       const x = lado * 124;
       const y = 92;
-      k.fillStyle = tinta;
+      k.fillStyle = furo;
       k.beginPath();
       k.arc(x, y, 64, 0, Math.PI * 2);
       k.fill();
@@ -6483,12 +6507,12 @@
       k.stroke();
     }
     for (const lado of [-1, 1]) {
-      k.fillStyle = tinta;
+      k.fillStyle = furo;
       retRedondo(k, lado * 70 - 28, -64, 56, 18, 9);
       k.fill();
     }
     for (let i = 0; i < 4; i++) {
-      k.fillStyle = i === 0 ? LP.creme : tinta;
+      k.fillStyle = i === 0 ? tinta : furo;
       k.beginPath();
       k.arc(-42 + i * 28, -8, 8, 0, Math.PI * 2);
       k.fill();
@@ -6505,7 +6529,7 @@
     const mn = (t) => '800 ' + t + 'px Manrope, sans-serif';
     const tJ = caber(k, 'JESUS', mn, 700, 250, -0.02);
     S.escrever(k, 'JESUS', L / 2, 740, mn(tJ), tinta, { espaco: -tJ * 0.02 });
-    k.fillStyle = tinta;
+    k.fillStyle = LP.amarelo;
     aMao(k, 'está no', L / 2, 1316, 74, r, { alinhar: 'center' });
     const tC = caber(k, 'CONTROLE', mn, 840, 210, -0.02);
     S.escrever(k, 'CONTROLE', L / 2, 1340 + tC * 0.74, mn(tC), tinta, { espaco: -tC * 0.02 });
@@ -6514,11 +6538,11 @@
     ctx.drawImage(c, 0, 0);
     // a trama do pano, por cima de tudo
     for (let y = 0; y < A; y += 4) {
-      ctx.fillStyle = 'rgba(40,50,20,.05)';
+      ctx.fillStyle = 'rgba(0,0,0,.06)';
       ctx.fillRect(0, y, L, 1.5);
     }
     for (let x = 0; x < L; x += 4) {
-      ctx.fillStyle = 'rgba(255,255,240,.04)';
+      ctx.fillStyle = 'rgba(255,255,255,.025)';
       ctx.fillRect(x, 0, 1.5, A);
     }
     // as dobras: faixas largas de luz e de sombra, macias
@@ -6527,9 +6551,9 @@
     d.filter = 'blur(38px)';
     d.lineCap = 'round';
     for (const [x0, y0, x1, y1, w, cor] of [
-      [-100, 380, 1180, 760, 90, 'rgba(250,255,230,.32)'], [-100, 470, 1180, 860, 70, 'rgba(50,62,22,.22)'],
-      [-80, 1580, 1160, 1180, 110, 'rgba(250,255,230,.26)'], [-80, 1690, 1160, 1290, 80, 'rgba(50,62,22,.20)'],
-      [760, -40, 1180, 620, 60, 'rgba(50,62,22,.16)']]) {
+      [-100, 380, 1180, 760, 90, 'rgba(230,232,225,.13)'], [-100, 470, 1180, 860, 70, 'rgba(0,0,0,.30)'],
+      [-80, 1580, 1160, 1180, 110, 'rgba(230,232,225,.11)'], [-80, 1690, 1160, 1290, 80, 'rgba(0,0,0,.28)'],
+      [760, -40, 1180, 620, 60, 'rgba(0,0,0,.22)']]) {
       d.strokeStyle = cor;
       d.lineWidth = w;
       d.beginPath();
@@ -6554,167 +6578,166 @@
     p.closePath();
     return p;
   }
-  // Sal e luz do mundo: a lâmpada acesa que é saleiro. O vidro amarelo brilha no escuro, com
-  // a borda acesa em vez de contorno, o reflexo e a frase à mão em tinta dentro dele; a rosca
-  // virou a tampa de metal furada do saleiro, de onde cai o sal, grão por grão, cada um
-  // pegando a luz. Diferente de Luz do mundo (a lâmpada em traço laranja no marrom): aqui o
-  // vidro é cheio e aceso, a letra fica dentro e o sal é o gancho. Lema com a referência
-  // (Mateus 5.13-14 fala do sal da terra e da luz do mundo). Fechamento: o sal caindo.
+  // Sal e luz do mundo: a lâmpada que é saleiro, deitada de lado no gesto de quem salga, no
+  // papel creme, como na arte que o dono mandou. A frase é o próprio desenho do vidro: SAL,
+  // E LUZ DO e MUNDO em Oswald, inchando com a curva do vidro até encher a bola (o mesmo mapa
+  // do quadrado no círculo de Jesus salva), e não um rótulo colado por cima. O vidro tem a luz
+  // acesa no miolo, a sombra da curva por cima das letras e os reflexos; a rosca virou a tampa
+  // de metal furada, e o sal cai dela em leque e depois reto, grão por grão. Diferente de Luz
+  // do mundo (a lâmpada em traço laranja no marrom): o fundo claro, a letra que é o vidro e o
+  // sal. Lema com a referência (Mateus 5.13-14 fala do sal da terra e da luz do mundo).
+  // Fechamento: o sal caindo.
   function arteSalLuz(ctx) {
     const r = sorteio(1640);
-    ctx.fillStyle = '#0a0b09';
+    fundoPapel(ctx, '#f2ead7', 1640);
+    const cx = 470;
+    const cy = 880;
+    const r0 = 280;
+    const giro = -0.78;
+    // a luz da lâmpada no papel
+    const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, 720);
+    halo.addColorStop(0, 'rgba(255,200,90,.42)');
+    halo.addColorStop(0.45, 'rgba(255,200,90,.14)');
+    halo.addColorStop(1, 'rgba(255,200,90,0)');
+    ctx.fillStyle = halo;
     ctx.fillRect(0, 0, L, A);
-    const cx = 540;
-    const cy = 790;
-    const r0 = 250;
-    const giro = -0.2;
-    for (const [rr, a] of [[900, 0.16], [520, 0.22], [330, 0.25]]) {
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
-      g.addColorStop(0, 'rgba(255,196,77,' + a + ')');
-      g.addColorStop(1, 'rgba(255,196,77,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, L, A);
-    }
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(giro);
     const vidro = vidroDaLampada(r0);
-    // o vidro aceso: o miolo quase branco, o amarelo e a borda mais funda
-    const gv = ctx.createRadialGradient(-r0 * 0.15, -r0 * 0.15, 0, 0, r0 * 0.2, r0 * 1.45);
-    gv.addColorStop(0, '#fff8e2');
-    gv.addColorStop(0.35, '#ffe08f');
-    gv.addColorStop(0.75, '#ffc44d');
-    gv.addColorStop(1, '#e79a24');
+    // o vidro aceso, com a sombra macia no papel
+    const gv = ctx.createRadialGradient(-r0 * 0.18, -r0 * 0.22, 0, 0, r0 * 0.15, r0 * 1.45);
+    gv.addColorStop(0, '#fff7df');
+    gv.addColorStop(0.4, '#ffdc84');
+    gv.addColorStop(0.8, '#ffc44d');
+    gv.addColorStop(1, '#eca337');
     ctx.save();
-    ctx.shadowColor = 'rgba(255,200,90,.85)';
-    ctx.shadowBlur = 120;
+    ctx.shadowColor = 'rgba(110,80,20,.28)';
+    ctx.shadowBlur = 46;
+    ctx.shadowOffsetX = 26;
+    ctx.shadowOffsetY = 34;
     ctx.fillStyle = gv;
     ctx.fill(vidro);
     ctx.restore();
+    // a frase, inchada até encher a bola do vidro
+    const R = r0 * 0.83;
+    const letras = letrasNoCirculo(['SAL', 'E LUZ DO', 'MUNDO'], R, LP.tinta, { fonte: '700 200px Oswald, sans-serif', pesos: [1.1, 0.62, 1.05], larguras: [1, 0.86, 1] });
     ctx.save();
     ctx.clip(vidro);
-    // a borda funda por dentro (o vidro é curvo) e a borda acesa por fora
-    ctx.lineWidth = 46;
-    ctx.strokeStyle = 'rgba(205,120,15,.32)';
-    ctx.filter = 'blur(10px)';
-    ctx.stroke(vidro);
-    ctx.filter = 'none';
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = 'rgba(255,250,230,.5)';
-    ctx.stroke(vidro);
-    // o reflexo da janela, macio
-    ctx.filter = 'blur(6px)';
-    ctx.strokeStyle = 'rgba(255,255,255,.8)';
-    ctx.lineWidth = 22;
+    // as letras ficam de pé (só levemente tortas), mesmo com a lâmpada deitada
+    ctx.save();
+    ctx.rotate(-giro - 0.1);
+    ctx.translate(-r0 * 0.04, -r0 * 0.04);
+    const pincel = camada();
+    pincel.ctx.drawImage(letras, L / 2 - R, A / 2 - R);
+    gastar(pincel.c, { x: L / 2 - R, y: A / 2 - R, w: 2 * R, h: 2 * R }, { pontos: 1400, manchas: 0, riscos: 0, semente: 1641, forca: 0.35 });
+    ctx.drawImage(pincel.c, -L / 2, -A / 2);
+    ctx.restore();
+    // a curva do vidro por cima das letras: a borda mais funda e o miolo aceso
+    const curva = ctx.createRadialGradient(-r0 * 0.15, -r0 * 0.2, r0 * 0.3, 0, 0, r0 * 1.15);
+    curva.addColorStop(0, 'rgba(255,250,230,.18)');
+    curva.addColorStop(0.6, 'rgba(255,250,230,0)');
+    curva.addColorStop(1, 'rgba(170,100,10,.35)');
+    ctx.fillStyle = curva;
+    ctx.fillRect(-r0 * 1.5, -r0 * 1.5, r0 * 3, r0 * 3.2);
+    // os reflexos da janela no vidro, por cima de tudo
+    ctx.filter = 'blur(5px)';
+    ctx.strokeStyle = 'rgba(255,255,255,.85)';
     ctx.lineCap = 'round';
+    ctx.lineWidth = 20;
     ctx.beginPath();
-    ctx.arc(0, 0, r0 * 0.78, Math.PI * 1.1, Math.PI * 1.32);
+    ctx.arc(0, 0, r0 * 0.84, Math.PI * 1.12, Math.PI * 1.36);
+    ctx.stroke();
+    ctx.lineWidth = 9;
+    ctx.beginPath();
+    ctx.arc(0, 0, r0 * 0.84, Math.PI * 1.43, Math.PI * 1.5);
     ctx.stroke();
     ctx.filter = 'none';
-    ctx.fillStyle = 'rgba(255,255,255,.9)';
-    ctx.beginPath();
-    ctx.ellipse(r0 * 0.52, -r0 * 0.5, 9, 14, 0.7, 0, Math.PI * 2);
-    ctx.fill();
     ctx.restore();
-    // a frase à mão dentro do vidro
-    ctx.fillStyle = LP.tinta;
-    const linha = (partes, y) => {
-      const larg = partes.map(([t, tam]) => { ctx.font = '400 ' + tam + 'px "Permanent Marker", cursive'; return ctx.measureText(t).width; });
-      const vao = 16;
-      let x = -(larg.reduce((a, b) => a + b, 0) + vao * (partes.length - 1)) / 2;
-      partes.forEach(([t, tam], i) => {
-        aMao(ctx, t, x, y, tam, r);
-        x += larg[i] + vao;
-      });
-    };
-    linha([['SAL', 104], ['e', 56], ['LUZ', 104]], -34);
-    linha([['do', 56], ['MUNDO', 94]], 84);
+    // o contorno à mão, de pincel: cheio e uma segunda passada fina
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = LP.tinta;
+    ctx.lineWidth = 7;
+    ctx.stroke(vidro);
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.lineWidth = 2.5;
+    ctx.translate(4, 3);
+    ctx.stroke(vidro);
+    ctx.restore();
     // a tampa de metal do saleiro, no lugar da rosca
     const gy = r0 * 1.32;
     const tw = r0 * 0.5;
     const th = r0 * 0.5;
     const metal = ctx.createLinearGradient(-tw, 0, tw, 0);
-    metal.addColorStop(0, '#3f423d');
-    metal.addColorStop(0.18, '#8e928a');
-    metal.addColorStop(0.34, '#eef0e8');
-    metal.addColorStop(0.46, '#b9bcb3');
-    metal.addColorStop(0.75, '#6e7269');
-    metal.addColorStop(1, '#30332e');
+    metal.addColorStop(0, '#5b5f58');
+    metal.addColorStop(0.2, '#9fa39a');
+    metal.addColorStop(0.36, '#f2f3ec');
+    metal.addColorStop(0.5, '#c2c5bc');
+    metal.addColorStop(0.78, '#7b7f76');
+    metal.addColorStop(1, '#4a4d47');
     ctx.fillStyle = metal;
     retRedondo(ctx, -tw, gy - 6, tw * 2, th, 12);
     ctx.fill();
-    // as voltas da rosca: uma linha de luz e uma de sombra em cada
+    ctx.lineWidth = 5;
+    ctx.stroke();
     for (let i = 1; i < 4; i++) {
       const y = gy - 6 + i * th / 4;
-      ctx.strokeStyle = 'rgba(0,0,0,.35)';
+      ctx.strokeStyle = 'rgba(18,19,15,.45)';
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(-tw + 2, y);
-      ctx.quadraticCurveTo(0, y + 10, tw - 2, y);
+      ctx.moveTo(-tw + 3, y);
+      ctx.quadraticCurveTo(0, y + 10, tw - 3, y);
       ctx.stroke();
-      ctx.strokeStyle = 'rgba(255,255,255,.35)';
+      ctx.strokeStyle = 'rgba(255,255,255,.45)';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(-tw + 2, y + 3);
-      ctx.quadraticCurveTo(0, y + 13, tw - 2, y + 3);
+      ctx.moveTo(-tw + 3, y + 3);
+      ctx.quadraticCurveTo(0, y + 13, tw - 3, y + 3);
       ctx.stroke();
     }
-    // o amarelo da lâmpada batendo no alto da tampa
-    const reflexo = ctx.createLinearGradient(0, gy - 6, 0, gy + 30);
-    reflexo.addColorStop(0, 'rgba(255,196,77,.55)');
-    reflexo.addColorStop(1, 'rgba(255,196,77,0)');
-    ctx.fillStyle = reflexo;
-    ctx.fillRect(-tw, gy - 6, tw * 2, 36);
-    // o fundo da tampa com os furos
     const fy = gy - 6 + th;
     const fundoTampa = ctx.createLinearGradient(-tw, 0, tw, 0);
-    fundoTampa.addColorStop(0, '#5a5e57');
-    fundoTampa.addColorStop(0.4, '#c9ccc3');
-    fundoTampa.addColorStop(1, '#4a4d47');
+    fundoTampa.addColorStop(0, '#6a6e66');
+    fundoTampa.addColorStop(0.4, '#d6d9d0');
+    fundoTampa.addColorStop(1, '#575a54');
     ctx.fillStyle = fundoTampa;
     ctx.beginPath();
     ctx.ellipse(0, fy, tw, 24, 0, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = LP.tinta;
+    ctx.lineWidth = 4;
+    ctx.stroke();
     for (const [hx, hy] of [[-60, -6], [-20, -10], [20, -10], [60, -6], [-40, 8], [0, 6], [40, 8], [-80, 2], [80, 2]]) {
       ctx.fillStyle = '#121310';
       ctx.beginPath();
       ctx.ellipse(hx, fy + hy, 6, 4, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,.35)';
-      ctx.beginPath();
-      ctx.ellipse(hx + 1, fy + hy + 3, 5, 1.6, 0, 0, Math.PI);
-      ctx.fill();
     }
-    const saida = [-Math.sin(giro) * (fy + 16), Math.cos(giro) * (fy + 16)];
+    const saida = [-Math.sin(giro) * (fy + 14), Math.cos(giro) * (fy + 14)];
+    const dir = [-Math.sin(giro), Math.cos(giro)];
     ctx.restore();
-    // o sal caindo: cristais com um lado aceso pela lâmpada, alguns em rastro
+    // o sal: sai da tampa em leque, na direção dela, e cai reto, abrindo e sumindo
     const sx = cx + saida[0];
     const sy = cy + saida[1];
-    for (let i = 0; i < 1100; i++) {
-      const t = Math.pow(r(), 1.2);
-      const y = sy + t * (1530 - sy);
-      const abre = 30 + t * 240;
-      const x = sx + (r() + r() + r() - 1.5) / 1.5 * abre;
-      const a = (1 - t * 0.65) * (0.45 + r() * 0.55);
-      const s = 2.2 + r() * 5 * (1 - t * 0.3);
+    for (let i = 0; i < 1300; i++) {
+      const t = Math.pow(r(), 1.1);
+      const lado = (r() + r() + r() - 1.5) / 1.5;
+      const x = sx + dir[0] * 90 * Math.sqrt(t) + lado * (14 + t * 150);
+      const y = sy + dir[1] * 40 * Math.sqrt(t) + t * (1520 - sy) + lado * 12;
+      if (y > 1530) continue;
+      const a = (1 - t * 0.55) * (0.5 + r() * 0.5);
+      const s = 2 + r() * 4.6 * (1 - t * 0.3);
       ctx.save();
       ctx.translate(x, y);
-      if (r() < 0.06) {
-        const rastro = 8 + r() * 16;
-        const g = ctx.createLinearGradient(0, -rastro, 0, 0);
-        g.addColorStop(0, 'rgba(246,244,232,0)');
-        g.addColorStop(1, 'rgba(246,244,232,' + (a * 0.6).toFixed(3) + ')');
-        ctx.fillStyle = g;
-        ctx.fillRect(-s * 0.3, -rastro, s * 0.6, rastro);
-      }
       ctx.rotate(r() * Math.PI);
-      ctx.fillStyle = 'rgba(150,148,138,' + a.toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(70,68,60,' + (a * 0.85).toFixed(3) + ')';
       ctx.fillRect(-s / 2, -s / 2, s, s);
-      ctx.fillStyle = 'rgba(255,246,220,' + a.toFixed(3) + ')';
-      ctx.fillRect(-s / 2, -s / 2, s * 0.6, s * 0.6);
+      ctx.fillStyle = 'rgba(255,255,250,' + (a * 0.9).toFixed(3) + ')';
+      ctx.fillRect(-s / 2, -s / 2, s * 0.55, s * 0.55);
       ctx.restore();
     }
-    referencia(ctx, 'Mateus 5.13-14', 90, 1490, 30, 'rgba(242,239,220,.72)', 'left');
+    referencia(ctx, 'Mateus 5.13-14', 90, 1490, 30, '#5c5a52', 'left');
   }
   // Que haja Deus em tudo o que for meu: o papel de cartão sálvia, quase vazio, com uma
   // etiqueta de papel creme amarrada no barbante que desce do alto, a sombra da etiqueta e
