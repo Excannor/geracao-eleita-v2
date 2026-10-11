@@ -208,3 +208,25 @@ amarelo como a única cor quente), sem figura humana, prédio, coroa ou foto:
   brasa. Em cima, SOMOS em creme e REMANESCENTES. em amarelo com o risco. Na primeira versão
   as brasas, claras e com a beira riscada, pareciam pedrinhas; escurecidas, leem como carvão.
 `MODELOS=virgula,semente,caminho,brasas node design/compartilhar/gerar.mjs <pasta> modelos` gera os quatro.
+
+## Rodada 13 (`rodada13/`)
+
+Quatro frases da ofensiva que não tinham arte ganharam modelo próprio, cada uma num fundo,
+composição, letra e fecho diferentes entre si e das 37 publicadas (`folha-todas.png`, com as 41).
+Nenhuma fecha com a palavra amarela sublinhada; sem figura humana, prédio, coroa ou foto:
+- **chegada** (Perseverando até o fim): a pista de atletismo vista de cima, em sálvia cheia.
+  PERSEVERANDO gigante e de pé dentro da primeira raia, lido de baixo para cima até a faixa
+  quadriculada da chegada; ATÉ O FIM pintado no chão das outras raias, os números 2, 3 e 4 e a
+  largada escalonada embaixo. Oswald em tinta de pista gasta. Fecha na chegada quadriculada.
+- **ancora** (Firmes no propósito, constantes na oração e inabaláveis na fé): o fundo do mar,
+  verde quase preto com fachos de luz. A âncora cheia em sálvia, assentada na areia à direita,
+  com o cabo torcido subindo; a frase à esquerda em degraus, FIRMES, CONSTANTES e INABALÁVEIS
+  em pincel creme e o resto em Oswald sálvia. Fecha na inversão: NA FÉ em tinta num bloco amarelo.
+- **bussola** (Direcionados à santidade, 2 Timóteo 2.22): o amarelo cheio como latão.
+  DIRECIONADOS em Literata e o mostrador gravado em tinta, com a cruz no lugar do norte, À
+  SANTIDADE pela borda de cima e a agulha parada nela, com dois rastros fracos de quando
+  balançava; a referência gravada embaixo. Fecha na própria agulha, sem ênfase na letra.
+- **ima** (Atraídos pela Sua presença): limalha de ferro no papel claro, enfileirada e mais
+  escura perto do meio, toda apontando para a frase, que fica num vazio com uma luz amarela
+  fraca (a presença não aparece, só o que ela atrai). Manrope extra-negrito. Fecha no brilho.
+`MODELOS=chegada,ancora,bussola,ima DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos` gera os quatro.

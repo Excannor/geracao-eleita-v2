@@ -2305,6 +2305,11 @@
       tema: { ...CLARO, numero: LP.tinta, rotulo: LP.tinta, apagada: '#6b7550', marca: LP.tinta, marcaFraca: '#3d4625', escala: 0.8 } },
     caminho: { fundo: [LP.preto], tema: { ...TEMA_LP, alinhar: 'direita', escala: 0.75, marcaX: 90 }, desenhar: arteCaminho, grao: [18, 1414] },
     brasas: { fundo: ['#0b0b0a'], tema: { ...TEMA_LP, alinhar: 'esquerda', escala: 0.75, marcaX: 84 }, desenhar: arteBrasas, grao: [20, 1990] },
+    // sexta leva (rodada 13): a pista, o fundo do mar, a bússola e a limalha
+    chegada: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, alinhar: 'direita', escala: 0.78, marcaX: 380 }, desenhar: arteChegada, grao: [14, 1300] },
+    ancora: { fundo: ['#0f1916'], tema: { ...TEMA_LP, escala: 0.8 }, desenhar: arteAncora, grao: [16, 1310] },
+    bussola: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteBussola, grao: [12, 1320] },
+    ima: { fundo: ['#ecebe4'], tema: { ...TEMA_PAPEL, alinhar: 'esquerda', escala: 0.8, marcaX: 90 }, desenhar: arteIma, grao: [12, 1330] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -4292,6 +4297,508 @@
     S.escrever(ctx, '.', xp, b3, oswaldLP(t3, 700), gp, { alinhar: 'left' });
     ctx.restore();
     return 1500;
+  }
+
+  // ---------- sexta leva (rodada 13) ----------
+  // Quatro frases da ofensiva que ainda não tinham arte, cada uma num fundo diferente (sálvia,
+  // o fundo do mar, o amarelo e o papel), com composição, letra e fecho próprios. Nenhuma fecha
+  // com a palavra amarela sublinhada; nada de figura humana, prédio, coroa ou foto.
+
+  // Perseverando até o fim: a pista de atletismo vista de cima, em sálvia, as raias de cima a
+  // baixo. PERSEVERANDO, gigante e de pé, corre dentro da primeira raia, de baixo para cima,
+  // e chega na faixa quadriculada da chegada; ATÉ O FIM está pintado no chão logo antes dela,
+  // e os números das raias e a largada escalonada ficam embaixo. Fechamento: a chegada
+  // quadriculada (a ofensiva é a corrida). Sem referência.
+  const RAIA = { x0: 46, w: 247 }; // a primeira raia; as outras seguem com a mesma largura
+  function pistaDeCima(ctx, r) {
+    ctx.fillStyle = LP.salvia;
+    ctx.fillRect(0, 0, L, A);
+    // a borracha da pista: pintinhas claras e escuras bem miúdas, e manchas de uso
+    for (let i = 0; i < 26; i++) {
+      const x = r() * L;
+      const y = r() * A;
+      const rr = 120 + r() * 320;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+      g.addColorStop(0, r() < 0.5 ? 'rgba(90,110,40,.08)' : 'rgba(250,255,230,.12)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+    }
+    for (let i = 0; i < 9000; i++) {
+      ctx.fillStyle = r() < 0.55 ? 'rgba(70,88,30,.16)' : 'rgba(255,255,240,.2)';
+      ctx.fillRect(r() * L, r() * A, 1.5 + r() * 2, 1.5 + r() * 2);
+    }
+    // as linhas das raias, em tinta branca de pista, um pouco gastas
+    const { c, ctx: k } = camada();
+    k.fillStyle = '#fbfaf0';
+    for (let i = 0; i <= 4; i++) {
+      const x = RAIA.x0 + i * RAIA.w;
+      k.fillRect(x - 6, 0, 12, A);
+    }
+    gastar(c, { x: 0, y: 0, w: L, h: A }, { pontos: 2200, manchas: 40, riscos: 160, semente: 1301, forca: 0.8 });
+    // a tinta das linhas some atrás da marca (no pé, à direita), para ela se ler limpa
+    k.globalCompositeOperation = 'destination-out';
+    const gm = k.createRadialGradient(560, PE, 0, 560, PE, 260);
+    gm.addColorStop(0, 'rgba(0,0,0,1)');
+    gm.addColorStop(0.7, 'rgba(0,0,0,1)');
+    gm.addColorStop(1, 'rgba(0,0,0,0)');
+    k.save();
+    k.translate(560, PE);
+    k.scale(1, 0.42);
+    k.translate(-560, -PE);
+    k.fillStyle = gm;
+    k.fillRect(260, PE - 300, 600, 600);
+    k.restore();
+    k.globalCompositeOperation = 'source-over';
+    ctx.drawImage(c, 0, 0);
+  }
+  // A faixa quadriculada da chegada, de lado a lado, em (y) com a altura h.
+  function chegadaQuadriculada(ctx, y, h, r) {
+    const { c, ctx: k } = camada();
+    const lado = h / 2;
+    for (let col = 0; col * lado < L; col++) {
+      for (let lin = 0; lin < 2; lin++) {
+        k.fillStyle = (col + lin) % 2 ? '#fbfaf0' : LP.tinta;
+        k.fillRect(col * lado, y + lin * lado, lado + 0.5, lado + 0.5);
+      }
+    }
+    gastar(c, { x: 0, y, w: L, h }, { pontos: 900, manchas: 14, riscos: 70, semente: 1302, forca: 0.7 });
+    ctx.drawImage(c, 0, 0);
+  }
+  // Tinta de chão pintada (o texto da pista), gasta pelo uso.
+  function tintaDeChao(ctx, desenho, caixa, semente) {
+    const { c, ctx: k } = camada();
+    desenho(k);
+    gastar(c, caixa, { pontos: 900, manchas: 0, riscos: 50, semente, forca: 0.6 });
+    ctx.drawImage(c, 0, 0);
+  }
+  function arteChegada(ctx) {
+    const r = sorteio(1300);
+    pistaDeCima(ctx, r);
+    const yLinha = 560; // a chegada
+    chegadaQuadriculada(ctx, yLinha, 64, r);
+    // PERSEVERANDO, de pé na primeira raia: lido de baixo para cima, até a chegada
+    const xRaia = RAIA.x0 + RAIA.w / 2;
+    const comp = 1640 - (yLinha + 64 + 28);
+    const tam = Math.min(caber(ctx, 'PERSEVERANDO', (t) => oswaldLP(t, 700), comp, 400), 300);
+    ctx.font = oswaldLP(tam, 700);
+    const m = ctx.measureText('PERSEVERANDO');
+    const cap = m.actualBoundingBoxAscent;
+    tintaDeChao(ctx, (k) => {
+      k.save();
+      k.translate(xRaia + cap / 2, yLinha + 64 + 28 + m.width);
+      k.rotate(-Math.PI / 2);
+      k.font = oswaldLP(tam, 700);
+      k.fillStyle = LP.tinta;
+      k.textAlign = 'left';
+      k.textBaseline = 'alphabetic';
+      k.fillText('PERSEVERANDO', 0, 0);
+      k.restore();
+    }, { x: RAIA.x0, y: yLinha, w: RAIA.w, h: A - yLinha }, 1303);
+    // ATÉ O FIM no chão das outras três raias, logo antes da chegada
+    const x2 = RAIA.x0 + RAIA.w + 34;
+    const larg2 = L - x2 - 40;
+    const t2 = caber(ctx, 'ATÉ O FIM', (t) => oswaldLP(t, 700), larg2, 260);
+    ctx.font = oswaldLP(t2, 700);
+    const a2 = ctx.measureText('ATÉ O FIM').actualBoundingBoxAscent;
+    const y2 = yLinha + 64 + 40 + a2;
+    tintaDeChao(ctx, (k) => {
+      k.font = oswaldLP(t2, 700);
+      k.fillStyle = LP.tinta;
+      k.textAlign = 'left';
+      k.textBaseline = 'alphabetic';
+      k.fillText('ATÉ O FIM', x2, y2);
+    }, { x: x2, y: y2 - a2, w: larg2, h: a2 + 20 }, 1304);
+    // a largada escalonada e os números das raias, em branco de pista, embaixo
+    tintaDeChao(ctx, (k) => {
+      k.fillStyle = '#fbfaf0';
+      k.textAlign = 'center';
+      k.textBaseline = 'alphabetic';
+      for (let i = 1; i < 4; i++) {
+        const x = RAIA.x0 + i * RAIA.w;
+        const y = 1320 - i * 70;
+        k.fillRect(x + 6, y, RAIA.w - 12, 12);
+        k.font = oswaldLP(150, 700);
+        k.fillText(String(i + 1), x + RAIA.w / 2, y + 190);
+      }
+    }, { x: RAIA.x0 + RAIA.w, y: 1000, w: L, h: 500 }, 1305);
+  }
+
+  // Firmes no propósito, constantes na oração e inabaláveis na fé: o fundo do mar, verde
+  // quase preto, com a luz da superfície entrando em fachos fracos. A âncora, à mão em sálvia
+  // e cheia, assentada no fundo de areia à direita, com o cabo subindo reto para a superfície;
+  // a frase à esquerda em três degraus, cada palavra forte em pincel creme (FIRMES,
+  // CONSTANTES, INABALÁVEIS) e o resto pequeno em Oswald sálvia. Fechamento: a inversão, NA FÉ
+  // em tinta num bloco amarelo, a única cor quente. Sem referência.
+  function fundoDoMar(ctx, r) {
+    const g = ctx.createLinearGradient(0, 0, 0, A);
+    g.addColorStop(0, '#1a2a25');
+    g.addColorStop(0.45, '#0f1916');
+    g.addColorStop(1, '#070a09');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, A);
+    // os fachos de luz da superfície, inclinados, bem fracos
+    for (let i = 0; i < 6; i++) {
+      const x = 120 + i * 190 + r() * 60;
+      const w = 50 + r() * 110;
+      const gr = ctx.createLinearGradient(0, 0, 0, 1500);
+      gr.addColorStop(0, 'rgba(200,218,140,' + (0.05 + r() * 0.05).toFixed(3) + ')');
+      gr.addColorStop(1, 'rgba(200,218,140,0)');
+      ctx.fillStyle = gr;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + w, 0);
+      ctx.lineTo(x + w + 260, 1500);
+      ctx.lineTo(x + 180, 1500);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // partículas em suspensão
+    for (let i = 0; i < 260; i++) {
+      ctx.fillStyle = 'rgba(220,232,190,' + (0.05 + r() * 0.16).toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(r() * L, r() * A, 0.8 + r() * 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  // A âncora: o anel, a haste, o cepo atravessado e os dois braços em arco com as unhas,
+  // cheia em sálvia com a borda à mão. (x, y) é o meio do anel; h, a altura toda; giro, a
+  // inclinação. Devolve o ponto de cima do anel, onde o cabo amarra.
+  function ancoraCheia(ctx, x, y, h, giro, r) {
+    const k = h / 1000;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(giro);
+    ctx.scale(k, k);
+    // cada peça num caminho próprio (cheias uma a uma: peças sobrepostas em sentidos opostos
+    // não abrem buraco)
+    const anel = new Path2D();
+    anel.arc(0, 0, 70, 0, Math.PI * 2);
+    anel.moveTo(42, 0);
+    anel.arc(0, 0, 42, 0, Math.PI * 2, true);
+    const pecas = [];
+    const peca = (f) => { const q = new Path2D(); f(q); pecas.push(q); };
+    // a haste e o cepo atravessado no alto, com as pontas redondas
+    peca((q) => q.rect(-26, 60, 52, 860));
+    peca((q) => q.rect(-250, 150, 500, 50));
+    peca((q) => q.arc(-262, 175, 35, 0, Math.PI * 2));
+    peca((q) => q.arc(262, 175, 35, 0, Math.PI * 2));
+    // os braços: um arco grosso que sai do pé da haste
+    peca((q) => {
+      q.moveTo(-380, 640);
+      q.quadraticCurveTo(-340, 960, 0, 1000);
+      q.quadraticCurveTo(340, 960, 380, 640);
+      q.lineTo(330, 660);
+      q.quadraticCurveTo(300, 900, 0, 920);
+      q.quadraticCurveTo(-300, 900, -330, 660);
+      q.closePath();
+    });
+    // as unhas, em ponta de seta, na ponta de cada braço
+    peca((q) => { q.moveTo(-400, 540); q.lineTo(-460, 730); q.lineTo(-300, 700); q.closePath(); });
+    peca((q) => { q.moveTo(400, 540); q.lineTo(460, 730); q.lineTo(300, 700); q.closePath(); });
+    const { c, ctx: q } = camada();
+    q.setTransform(ctx.getTransform());
+    // a borda: o contorno grosso em verde escuro por baixo de todas e o cheio por cima (só
+    // sobra a borda de fora, sem as costuras das peças)
+    q.strokeStyle = '#26352c';
+    q.lineJoin = 'round';
+    q.lineWidth = 16;
+    q.stroke(anel);
+    for (const pc of pecas) q.stroke(pc);
+    q.fillStyle = LP.salvia;
+    q.fill(anel, 'evenodd');
+    for (const pc of pecas) q.fill(pc);
+    q.setTransform(1, 0, 0, 1, 0, 0);
+    gastar(c, { x: x - h * 0.5, y: y - 80, w: h, h: h * 1.1 }, { pontos: 1400, manchas: 26, riscos: 90, semente: 1311, forca: 0.8 });
+    ctx.restore();
+    ctx.drawImage(c, 0, 0);
+    return [x + Math.sin(giro) * 70 * k, y - Math.cos(giro) * 70 * k];
+  }
+  // O cabo: duas pernas torcidas, de (x0, y0) até (x1, y1).
+  function caboTorcido(ctx, x0, y0, x1, y1, r) {
+    const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 6);
+    for (const fase of [0, Math.PI]) {
+      ctx.beginPath();
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        const x = x0 + (x1 - x0) * t + Math.sin(t * n / 3.2 + fase) * 6;
+        const y = y0 + (y1 - y0) * t;
+        if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+      }
+      ctx.strokeStyle = fase ? 'rgba(200,190,160,.85)' : 'rgba(242,239,220,.95)';
+      ctx.lineWidth = 7;
+      ctx.stroke();
+    }
+  }
+  function arteAncora(ctx) {
+    const r = sorteio(1310);
+    fundoDoMar(ctx, r);
+    // o fundo de areia, uma faixa ondulada embaixo com o pontilhado
+    const yAreia = 1500;
+    ctx.fillStyle = '#1c2420';
+    ctx.beginPath();
+    ctx.moveTo(0, yAreia + 40);
+    for (let x = 0; x <= L; x += 40) ctx.lineTo(x, yAreia + Math.sin(x / 170) * 16 + (x > 600 ? -20 : 0));
+    ctx.lineTo(L, A);
+    ctx.lineTo(0, A);
+    ctx.closePath();
+    ctx.fill();
+    for (let i = 0; i < 420; i++) {
+      ctx.fillStyle = 'rgba(200,218,140,' + (0.08 + r() * 0.18).toFixed(3) + ')';
+      ctx.fillRect(r() * L, yAreia + 20 + r() * (A - yAreia), 2, 2);
+    }
+    // a âncora, à direita, com a unha enterrada na areia, e o cabo subindo reto
+    const ax = 790;
+    const ay = 800;
+    const h = 720;
+    const topo = ancoraCheia(ctx, ax, ay, h, 0.09, r);
+    caboTorcido(ctx, topo[0], topo[1] + 6, topo[0] - 28, -10, r);
+    // a areia por cima da ponta enterrada
+    ctx.fillStyle = '#1c2420';
+    ctx.beginPath();
+    ctx.ellipse(ax + 60, yAreia + 30, 240, 26, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // a frase em três degraus, à esquerda
+    const x = 80;
+    const pm = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
+    const os = (t) => oswaldLP(t, 500);
+    const larg = 620;
+    const tGrande = Math.min(caber(ctx, 'INABALÁVEIS', pm, larg, 140), 140);
+    let y = 600;
+    const degrau = (forte, fraco, recuo) => {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,.55)';
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = LP.creme;
+      y += tGrande * 0.92;
+      aMao(ctx, forte, x + recuo, y, tGrande, r);
+      ctx.restore();
+      if (fraco) {
+        y += 70;
+        S.escrever(ctx, fraco, x + recuo + 6, y, os(52), LP.salvia, { alinhar: 'left', espaco: 3 });
+      }
+      y += 40;
+    };
+    degrau('FIRMES', 'NO PROPÓSITO,', 0);
+    degrau('CONSTANTES', 'NA ORAÇÃO E', 0);
+    degrau('INABALÁVEIS', '', 0);
+    // NA FÉ: tinta num bloco amarelo, como uma etiqueta presa no cabo
+    const tF = 92;
+    ctx.font = oswaldLP(tF, 700);
+    const wF = ctx.measureText('NA FÉ').width + 6 * 4;
+    const yF = y + 16;
+    ctx.save();
+    ctx.translate(x + 4, yF);
+    ctx.rotate(-0.02);
+    const p = bordaRasgada([[[0, 0], [wF + 60, 0], 3], [[wF + 60, 0], [wF + 60, tF * 1.2], 5], [[wF + 60, tF * 1.2], [0, tF * 1.2], 3], [[0, tF * 1.2], [0, 0], 5]], r, 10);
+    ctx.fillStyle = LP.amarelo;
+    ctx.fill(p);
+    S.escrever(ctx, 'NA FÉ', 30, tF * 1.2 * 0.5 + tF * 0.38, oswaldLP(tF, 700), LP.tinta, { alinhar: 'left', espaco: 6 });
+    ctx.restore();
+  }
+
+  // Direcionados à santidade (2 Timóteo 2.22): o amarelo cheio como o latão de uma bússola.
+  // DIRECIONADOS em Literata no alto e, embaixo, o mostrador gravado em tinta: os anéis, os
+  // traços dos graus, a rosa dos ventos apagada e, no lugar do norte, uma cruz pequena; À
+  // SANTIDADE corre pela borda de cima do mostrador, e a agulha aponta para ela, com dois
+  // rastros fracos de quando ainda balançava. Fechamento: a própria agulha, sem ênfase na
+  // letra. A referência vai gravada na parte de baixo do mostrador.
+  function letrasNoArco(ctx, texto, cx, cy, raio, meio, fonte, cor, { espaco = 0, embaixo = false } = {}) {
+    ctx.save();
+    ctx.font = fonte;
+    ctx.fillStyle = cor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    const larg = [...texto].map((l) => ctx.measureText(l).width + espaco);
+    const total = larg.reduce((a, b) => a + b, 0) - espaco;
+    let a = meio + (embaixo ? 1 : -1) * total / 2 / raio;
+    [...texto].forEach((l, i) => {
+      const da = (larg[i] / 2) / raio * (embaixo ? -1 : 1);
+      a += da;
+      ctx.save();
+      ctx.translate(cx + Math.cos(a) * raio, cy + Math.sin(a) * raio);
+      ctx.rotate(a + (embaixo ? -Math.PI / 2 : Math.PI / 2));
+      ctx.fillText(l, 0, 0);
+      ctx.restore();
+      a += da;
+    });
+    ctx.restore();
+  }
+  function agulhaDaBussola(ctx, cx, cy, comp, giro, alfa) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(giro);
+    ctx.globalAlpha = alfa;
+    const lw = comp * 0.11;
+    // a metade do norte, cheia; a do sul, só o contorno
+    ctx.fillStyle = LP.tinta;
+    ctx.beginPath();
+    ctx.moveTo(0, -comp);
+    ctx.lineTo(lw, 0);
+    ctx.lineTo(-lw, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = LP.tinta;
+    ctx.lineWidth = 5;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(lw, 0);
+    ctx.lineTo(0, comp * 0.8);
+    ctx.lineTo(-lw, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function arteBussola(ctx) {
+    const r = sorteio(1320);
+    ctx.fillStyle = LP.amarelo;
+    ctx.fillRect(0, 0, L, A);
+    const brilho = ctx.createRadialGradient(L * 0.35, 900, 0, L * 0.35, 900, 1100);
+    brilho.addColorStop(0, 'rgba(255,236,170,.45)');
+    brilho.addColorStop(1, 'rgba(255,236,170,0)');
+    ctx.fillStyle = brilho;
+    ctx.fillRect(0, 0, L, A);
+    const tinta = LP.tinta;
+    // DIRECIONADOS no alto
+    const lit = (t) => Lit(600, t);
+    const t1 = caber(ctx, 'DIRECIONADOS', lit, 920, 140, 0.02);
+    S.escrever(ctx, 'DIRECIONADOS', L / 2, 640, lit(t1), tinta, { espaco: t1 * 0.02 });
+    // o mostrador
+    const cx = L / 2;
+    const cy = 1150;
+    const R = 350;
+    const { c, ctx: k } = camada();
+    k.strokeStyle = tinta;
+    k.lineWidth = 6;
+    k.beginPath(); k.arc(cx, cy, R, 0, Math.PI * 2); k.stroke();
+    k.lineWidth = 2.5;
+    k.beginPath(); k.arc(cx, cy, R - 16, 0, Math.PI * 2); k.stroke();
+    k.beginPath(); k.arc(cx, cy, R - 74, 0, Math.PI * 2); k.stroke();
+    // os traços dos graus: de 2 em 2, maiores de 10 em 10
+    for (let g = 0; g < 360; g += 2) {
+      const a = g * Math.PI / 180 - Math.PI / 2;
+      const ext = R - 16;
+      const comp = g % 30 === 0 ? 40 : g % 10 === 0 ? 28 : 14;
+      k.lineWidth = g % 10 === 0 ? 3 : 1.6;
+      k.beginPath();
+      k.moveTo(cx + Math.cos(a) * ext, cy + Math.sin(a) * ext);
+      k.lineTo(cx + Math.cos(a) * (ext - comp), cy + Math.sin(a) * (ext - comp));
+      k.stroke();
+    }
+    // a rosa dos ventos, só o contorno e apagada
+    k.globalAlpha = 0.35;
+    k.lineWidth = 2;
+    for (let i = 0; i < 8; i++) {
+      const a = i * Math.PI / 4 - Math.PI / 2;
+      const comp = i % 2 ? R * 0.42 : R * 0.7;
+      const lado = R * 0.09;
+      k.beginPath();
+      k.moveTo(cx + Math.cos(a) * comp, cy + Math.sin(a) * comp);
+      k.lineTo(cx + Math.cos(a + Math.PI / 2) * lado, cy + Math.sin(a + Math.PI / 2) * lado);
+      k.lineTo(cx + Math.cos(a - Math.PI / 2) * lado, cy + Math.sin(a - Math.PI / 2) * lado);
+      k.closePath();
+      k.stroke();
+    }
+    k.globalAlpha = 1;
+    // os pontos cardeais: L, S e O em Oswald; no norte, uma cruz pequena
+    for (const [letra, a] of [['L', 0], ['O', Math.PI]]) {
+      S.escrever(k, letra, cx + Math.cos(a) * (R - 104), cy + Math.sin(a) * (R - 104) + 16, oswaldLP(44, 700), tinta);
+    }
+    k.fillStyle = tinta;
+    const yc = cy - (R - 112);
+    k.fillRect(cx - 4, yc - 28, 8, 56);
+    k.fillRect(cx - 18, yc - 14, 36, 8);
+    gastar(c, { x: cx - R - 20, y: cy - R - 20, w: 2 * R + 40, h: 2 * R + 40 }, { pontos: 700, manchas: 10, riscos: 40, semente: 1321, forca: 0.6 });
+    ctx.drawImage(c, 0, 0);
+    // À SANTIDADE pela borda de cima, por fora; a referência gravada embaixo, por dentro
+    letrasNoArco(ctx, 'À SANTIDADE', cx, cy, R + 34, -Math.PI / 2, Lit(600, 86), tinta, { espaco: 6 });
+    letrasNoArco(ctx, '2 TIMÓTEO 2.22', cx, cy, R - 118, Math.PI / 2, oswaldLP(34, 700), tinta, { espaco: 6, embaixo: true });
+    // os rastros da agulha balançando, e a agulha parada no norte
+    agulhaDaBussola(ctx, cx, cy, R * 0.58, -0.32, 0.1);
+    agulhaDaBussola(ctx, cx, cy, R * 0.58, 0.16, 0.18);
+    agulhaDaBussola(ctx, cx, cy, R * 0.58, 0, 1);
+    ctx.fillStyle = LP.amarelo;
+    ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = tinta;
+    ctx.lineWidth = 6;
+    ctx.stroke();
+  }
+
+  // Atraídos pela Sua presença: limalha de ferro no papel claro, como na aula de física. Os
+  // fiapos de ferro cobrem o story inteiro, soltos e claros nas bordas, enfileirados e mais
+  // escuros perto do meio, e todos apontam para a frase, que fica no centro de um vazio com
+  // uma luz amarela bem fraca: a presença não aparece, só o que ela atrai. A letra em Manrope
+  // extra-negrito, sem ênfase: o desenho inteiro é a ênfase. Sem referência.
+  function limalha(ctx, cx, cy, rx, ry, r) {
+    const { c, ctx: k } = camada();
+    k.lineCap = 'round';
+    // a distância "elíptica" ao meio: 1 na borda do vazio
+    const dist = (x, y) => Math.hypot((x - cx) / rx, (y - cy) / ry);
+    const fiapo = (x, y, comp, alfa) => {
+      // aponta para o meio, com um leve redemoinho
+      const a = Math.atan2(cy - y, cx - x) + 0.22;
+      k.strokeStyle = 'rgba(28,29,26,' + alfa.toFixed(3) + ')';
+      k.lineWidth = 1.6 + r() * 1.6;
+      k.beginPath();
+      k.moveTo(x - Math.cos(a) * comp / 2, y - Math.sin(a) * comp / 2);
+      k.lineTo(x + Math.cos(a) * comp / 2, y + Math.sin(a) * comp / 2);
+      k.stroke();
+    };
+    // as fileiras: linhas de campo que espiralam para o vazio, com os fiapos enfileirados
+    for (let i = 0; i < 150; i++) {
+      let a = i / 150 * Math.PI * 2 + r() * 0.03;
+      let d = 1.04 + r() * 0.06;
+      while (d < 4.2) {
+        const x = cx + Math.cos(a) * rx * d;
+        const y = cy + Math.sin(a) * ry * d;
+        const perto = Math.max(0, 1 - (d - 1) / 3);
+        if (r() < 0.55 + perto * 0.4) fiapo(x + (r() - 0.5) * 6, y + (r() - 0.5) * 6, 8 + perto * 22 + r() * 8, 0.12 + perto * 0.7);
+        d += 0.025 + (d - 1) * 0.03 + r() * 0.03;
+        a -= 0.012; // o redemoinho
+      }
+    }
+    // os soltos, espalhados pelo papel todo
+    for (let i = 0; i < 2600; i++) {
+      const x = r() * L;
+      const y = r() * A;
+      const d = dist(x, y);
+      if (d < 1.05) continue;
+      const perto = Math.max(0, 1 - (d - 1) / 3.5);
+      fiapo(x, y, 6 + perto * 14 + r() * 6, 0.1 + perto * 0.4);
+    }
+    // a limalha some atrás da chama, dos dias e da marca, para eles se lerem limpos
+    k.globalCompositeOperation = 'destination-out';
+    for (const [x, y, w, h] of [[230, 375, 300, 150], [250, PE, 300, 110]]) {
+      k.save();
+      k.translate(x, y);
+      k.scale(1, h / w);
+      const g = k.createRadialGradient(0, 0, 0, 0, 0, w);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(0.65, 'rgba(0,0,0,.95)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      k.fillStyle = g;
+      k.fillRect(-w, -w, 2 * w, 2 * w);
+      k.restore();
+    }
+    ctx.drawImage(c, 0, 0);
+  }
+  function arteIma(ctx) {
+    const r = sorteio(1330);
+    fundoPapel(ctx, '#ecebe4', 1330);
+    const cx = L / 2;
+    const cy = 1040;
+    // a luz no meio, quase nada de amarelo
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 520);
+    g.addColorStop(0, 'rgba(255,196,77,.58)');
+    g.addColorStop(0.5, 'rgba(255,196,77,.2)');
+    g.addColorStop(1, 'rgba(255,196,77,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, A);
+    limalha(ctx, cx, cy, 470, 190, r);
+    // a frase no meio do vazio
+    const mn = (t) => S.Mn(800, t);
+    const t2 = caber(ctx, 'SUA PRESENÇA', mn, 860, 130, -0.02);
+    S.escrever(ctx, 'ATRAÍDOS PELA', cx, cy - t2 * 0.55, S.Mn(700, 50), LP.tinta, { espaco: 12 });
+    S.escrever(ctx, 'SUA PRESENÇA', cx, cy + t2 * 0.62, mn(t2), LP.tinta, { espaco: -t2 * 0.02 });
   }
 
   S.prepararArte = prepararArte;
