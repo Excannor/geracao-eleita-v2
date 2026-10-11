@@ -146,11 +146,16 @@
   // envelope passa inteiro, sem ser cortado nem trocado por vazio.
   const CONTEXTO = /^(nota|secao|conhecer|parabola):/;
   const cifra = (x) => !!x && typeof x === 'object' && !Array.isArray(x);
+  // Título opcional (o mesmo versículo pode ter várias notas, cada uma com um estudo): uma
+  // linha só, sem espaço sobrando, até 60 letras; nota antiga, sem título, fica com ''.
+  CC.MAX_TITULO_NOTA = 60;
+  const limparTitulo = (t) => (typeof t === 'string' ? t.replace(/\s+/g, ' ').trim().slice(0, CC.MAX_TITULO_NOTA) : (cifra(t) ? t : ''));
   function limparNota(n) {
     if (!n || typeof n !== 'object') return null;
     return {
       versos: (Array.isArray(n.versos) ? n.versos : []).filter((r) => typeof r === 'string' && r.length <= 60).slice(0, 12),
       tipo: TIPOS_NOTA.includes(n.tipo) ? n.tipo : 'nota',
+      titulo: limparTitulo(n.titulo),
       texto: typeof n.texto === 'string' || cifra(n.texto) ? n.texto : '',
       tags: Array.isArray(n.tags) ? n.tags.filter((t) => typeof t === 'string').map((t) => t.slice(0, 30)).slice(0, 12)
         : (typeof n.tags === 'string' || cifra(n.tags) ? n.tags : []),
@@ -202,7 +207,7 @@
     for (const [id, n] of Object.entries(saida)) {
       if (!n.apagadaEm) continue;
       if (n.apagadaEm < agora - LAPIDE_MS) delete saida[id];
-      else if (n.apagadaEm < agora - APAGADA_MS && (n.texto || n.versos.length)) saida[id] = { ...n, texto: '', tags: [], versos: [] };
+      else if (n.apagadaEm < agora - APAGADA_MS && (n.texto || n.titulo || n.versos.length)) saida[id] = { ...n, titulo: '', texto: '', tags: [], versos: [] };
     }
     return saida;
   }
@@ -427,7 +432,7 @@
   CC.apagarNota = (id) => mudarNota(id, { apagadaEm: Date.now(), fixada: false });
   CC.recuperarNota = (id) => mudarNota(id, { apagadaEm: 0 });
   // Apagar de vez: fica só a lápide (sem texto), para o outro aparelho não trazer de volta.
-  CC.apagarNotaDeVez = (id) => mudarNota(id, { texto: '', tags: [], versos: [], apagadaEm: (E.notas[id] || {}).apagadaEm || Date.now() });
+  CC.apagarNotaDeVez = (id) => mudarNota(id, { titulo: '', texto: '', tags: [], versos: [], apagadaEm: (E.notas[id] || {}).apagadaEm || Date.now() });
   CC.MAX_FIXADAS = 5;
   CC.fixarNota = (id, fixar) => {
     if (fixar && CC.notas().filter((n) => n.fixada).length >= CC.MAX_FIXADAS) return false;
@@ -440,7 +445,7 @@
   CC.apagarTodasAnotacoes = () => {
     const agora = Date.now();
     for (const [id, n] of Object.entries(E.notas || {})) {
-      E.notas[id] = { ...n, texto: '', tags: [], versos: [], fixada: false, apagadaEm: n.apagadaEm || agora, editadaEm: agora };
+      E.notas[id] = { ...n, titulo: '', texto: '', tags: [], versos: [], fixada: false, apagadaEm: n.apagadaEm || agora, editadaEm: agora };
     }
     for (const k of Object.keys(E.marcas || {})) E.marcas[k] = { cor: 0, em: agora };
     for (const k of Object.keys(E.oia || {})) E.oia[k] = { o: '', i: '', a: '', oracao: '' };
@@ -753,7 +758,10 @@
       if (!lista.length) continue;
       L.push('## ' + titulo, '');
       for (const n of lista) {
-        L.push('### ' + ([n.contexto && CC.nomeDoContexto ? CC.nomeDoContexto(n.contexto) : ''].concat(n.versos).filter(Boolean).join('; ') || 'Nota livre'), '');
+        // com título, ele abre a nota e o lugar (página, versículos) vem logo abaixo
+        const onde = [n.contexto && CC.nomeDoContexto ? CC.nomeDoContexto(n.contexto) : ''].concat(n.versos).filter(Boolean).join('; ');
+        L.push('### ' + (n.titulo || onde || 'Nota livre'), '');
+        if (n.titulo && onde) L.push(onde, '');
         L.push('Escrita em ' + data(n.criadaEm) + (n.editadaEm - n.criadaEm > 6e4 ? ' · editada em ' + data(n.editadaEm) : '')
           + (n.respondidaEm ? ' · respondida em ' + data(n.respondidaEm) : '') + (n.fixada ? ' · fixada' : '') + '.', '');
         L.push(n.texto.trim(), '');

@@ -231,12 +231,19 @@
 
   // Fechar o leitor tem de devolver o histórico ao estado de antes dele. Se o capítulo foi
   // aberto por um toque na grade, a entrada anterior É a grade: volta de verdade (virar
-  // capítulo usa replace, então ela continua ali). Se ninguém passou pela grade (link direto),
-  // troca a entrada do capítulo pela da grade. Empurrar uma entrada nova, como antes, fazia o
+  // capítulo usa replace, então ela continua ali). Se veio de outra tela do app (Minhas
+  // anotações, uma parábola, um mapa, o Conhecer Jesus, a célula), volta para ela: antes o X
+  // trocava o capítulo pela grade do livro, e quem abriu um versículo das anotações caía na
+  // Bíblia. Só sem tela anterior (link direto, app aberto no capítulo) troca a entrada do
+  // capítulo pela da grade. Empurrar uma entrada nova, como antes de tudo isso, fazia o
   // "Voltar" da grade cair no capítulo recém-fechado e reabrir o leitor.
   let leitorSobreGrade = false;
+  const veioDeFora = () => {
+    const anterior = CC.anteriorNaPilha ? CC.anteriorNaPilha() : null;
+    return !!anterior && !/^#\/biblia(\/|$)/.test(anterior);
+  };
   function voltarParaGrade(livro) {
-    if (leitorSobreGrade) history.back();
+    if (leitorSobreGrade || veioDeFora()) history.back();
     else CC.substituirRota('#/biblia/' + encodeURIComponent(livro));
   }
 
@@ -278,7 +285,7 @@
 
     el.innerHTML = '<div class="leitor-cabeca">'
       + '<div class="licao-topo">'
-      + '<button class="fechar" data-fechar-biblia aria-label="Voltar aos capítulos">' + CC.ico('fechar') + '</button>'
+      + '<button class="fechar" data-fechar-biblia aria-label="' + (!leitorSobreGrade && veioDeFora() ? 'Voltar' : 'Voltar aos capítulos') + '">' + CC.ico('fechar') + '</button>'
       + '<div class="leitor-titulo"><span class="rot">' + CC.esc(b.abreviatura) + '</span>'
       + '<b>' + nb(CC.esc(livro) + ' ' + n) + '</b></div>'
       + '<button class="botao-icone letra" data-aa-biblia aria-label="Tradução, letra e tema">Aa</button>'

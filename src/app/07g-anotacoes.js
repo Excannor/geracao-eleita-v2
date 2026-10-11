@@ -29,7 +29,7 @@
 
   // ---------- os itens da tela, todos com o mesmo esqueleto ----------
   const itemDeNota = (n, livroDe, posicao) => ({ chave: 'n:' + n.id, tipo: n.tipo, nota: n, refs: n.versos, livros: livroDe ? n.versos.map(livroDe).filter(Boolean) : [],
-    em: n.editadaEm, texto: n.texto, cor: n.cor, tags: n.tags, fixada: n.fixada, pos: posicao ? posicao(n.versos[0]) : 0,
+    em: n.editadaEm, texto: n.texto, tituloNota: typeof n.titulo === 'string' ? n.titulo : '', cor: n.cor, tags: n.tags, fixada: n.fixada, pos: posicao ? posicao(n.versos[0]) : 0,
     titulo: n.contexto && CC.nomeDoContexto ? CC.nomeDoContexto(n.contexto) : '' });
   function itens() {
     const ordem = new Map(LIVROS().map((l, i) => [l, i]));
@@ -63,7 +63,8 @@
   const passa = (it, semTipo) => {
     if (!semTipo && F.tipo !== 'tudo' && it.tipo !== F.tipo) return false;
     if (F.q) {
-      const alvo = CC.semAcento([it.texto, it.refs.join(' '), it.tags.join(' '), it.passagem || '', it.titulo || ''].join(' '));
+      // o título da nota (tituloNota) e o nome do lugar ligado a ela (titulo) entram na busca
+      const alvo = CC.semAcento([it.tituloNota || '', it.texto, it.refs.join(' '), it.tags.join(' '), it.passagem || '', it.titulo || ''].join(' '));
       if (!CC.semAcento(F.q).trim().split(/\s+/).every((p) => alvo.includes(p))) return false;
     }
     if (F.livro === 'AT' && !it.livros.some((l) => !CC.ehNovoTestamento(l))) return false;
@@ -95,9 +96,13 @@
     const citacao = ref && it.tipo !== 'estudo' ? '<blockquote class="citacao-anot' + (it.cor ? ' marca-' + it.cor : '') + '"><span data-citar="' + CC.esc(ref) + '">'
       + nb(CC.esc(ref)) + '</span></blockquote>' : '';
     let corpo = '';
+    // Com título, ele abre o cartão (várias notas no mesmo versículo se distinguem por ele) e
+    // o texto vem inteiro; sem título, o cartão fica como sempre foi (no Estudo, a primeira
+    // linha do texto faz as vezes de título).
+    const tituloNota = it.tituloNota ? '<h3 class="titulo-nota">' + CC.esc(it.tituloNota) + '</h3>' : '';
     if (it.tipo === 'reflexao') {
       corpo = '<h3>' + nb(CC.esc(it.passagem)) + '</h3>' + it.campos.map((c) => '<p class="campo-anot"><b>' + CC.esc(c.rotulo[0]) + '</b> ' + CC.esc(c.texto) + '</p>').join('');
-    } else if (it.tipo === 'estudo') {
+    } else if (it.tipo === 'estudo' && !tituloNota) {
       const [titulo, ...resto] = n.texto.split('\n');
       corpo = '<h3>' + CC.esc(titulo) + '</h3>' + (resto.join('\n').trim() ? '<p class="texto-anot">' + CC.esc(resto.join('\n').trim()) + '</p>' : '');
     } else if (it.texto) {
@@ -110,8 +115,8 @@
     return '<article class="cartao-anot' + (it.fixada ? ' fixada' : '') + '" data-item="' + CC.esc(it.chave) + '">'
       + '<div class="linha-tipo">' + CC.ico(icone) + '<b>' + nome + '</b>' + (sub ? '<span class="sub">· ' + nb(CC.esc(sub)) + '</span>' : '')
       + '<span class="quando' + (respondida ? ' respondida' : '') + '">' + (it.fixada ? CC.ico('pino') + '<span class="so-leitor">Fixada. </span>' : '') + quando + '</span>'
-      + '<button class="mais-anot" data-acoes aria-label="Ações: ' + CC.esc(nome + (sub ? ', ' + sub : '')) + '">' + CC.ico('mais') + '</button></div>'
-      + '<div class="corpo-anot" data-abrir>' + citacao + corpo + '</div>'
+      + '<button class="mais-anot" data-acoes aria-label="Ações: ' + CC.esc(nome + (sub ? ', ' + sub : '') + (it.tituloNota ? ', ' + it.tituloNota : '')) + '">' + CC.ico('mais') + '</button></div>'
+      + '<div class="corpo-anot" data-abrir>' + tituloNota + citacao + corpo + '</div>'
       + (chips.length ? '<div class="chips-anot">' + chips.join('') + '</div>' : '')
       + (n && n.tipo === 'oracao' && !respondida ? '<button class="botao pequeno contorno" data-responder>' + CC.ico('certo') + 'Marcar como respondida</button>' : '')
       + '</article>';
@@ -206,7 +211,10 @@
 
   // ---------- a tela ----------
   CC.vistaAnotacoes = function (raiz, opcoes) {
-    if (!opcoes || !opcoes.manter) F = { ...novoFiltro(), ordem: F.ordem };
+    // De volta pelo histórico (o voltar de um versículo aberto daqui, do app ou do celular), os
+    // filtros e a busca ficam como estavam; o roteador devolve a altura da lista.
+    const manter = (opcoes && opcoes.manter) || (CC.voltandoNoHistorico && CC.voltandoNoHistorico());
+    if (!manter) F = { ...novoFiltro(), ordem: F.ordem };
     const todos = itens();
     const apagadas = CC.notasApagadas().length;
     raiz.innerHTML = '<div class="folha-perfil cabeca-anot">' + CC.botaoVoltar('Perfil') + '<h1>Minhas anotações</h1>'
@@ -324,7 +332,7 @@
   }
 
   const textoParaCopiar = (it) => (it.tipo === 'reflexao' ? it.passagem + '\n' + it.campos.map((c) => c.rotulo + ': ' + c.texto).join('\n')
-    : [it.refs.join('; '), it.texto].filter(Boolean).join('\n'));
+    : [it.tituloNota, it.refs.join('; '), it.texto].filter(Boolean).join('\n'));
 
   function acoes(it, redesenhar) {
     const n = it.nota;
@@ -341,7 +349,7 @@
     if (n) linhas.push(linha('apagar', 'lixeira', 'Apagar ' + CARA[n.tipo][0].toLowerCase(), ' perigo'));
     if (it.tipo === 'marcado') linhas.push(linha('tirar', 'bloquear', 'Tirar a marca', ' perigo'));
     const titulo = (ref || it.titulo || (it.dia ? 'Dia ' + it.dia : '')) + ' · ' + CARA[it.tipo][0].toLowerCase();
-    CC.folha('<h2>' + nb(CC.esc(titulo)) + '</h2><div class="lista-acoes">' + linhas.join('') + '</div>'
+    CC.folha('<h2>' + nb(CC.esc(titulo)) + '</h2>' + (it.tituloNota ? '<p class="sub-acoes">' + CC.esc(it.tituloNota) + '</p>' : '') + '<div class="lista-acoes">' + linhas.join('') + '</div>'
       + (n ? '<p class="dica-acoes">' + CC.ico('info') + '<span>Apagou sem querer? Fica em “Apagadas” por ' + CC.DIAS_APAGADAS + ' dias.</span></p>' : ''),
     {
       rotulo: 'Ações',
@@ -377,7 +385,7 @@
     const lista = CC.notasApagadas().sort((a, b) => b.apagadaEm - a.apagadaEm);
     CC.folha('<h2>Apagadas</h2><p>Ficam aqui por ' + CC.DIAS_APAGADAS + ' dias e depois somem de vez, deste aparelho e da sua conta.</p>'
       + lista.map((n) => '<div class="previa-item"><p class="linha-tipo"><b>' + CARA[n.tipo][0] + '</b>' + (n.versos[0] ? ' · ' + nb(CC.esc(n.versos[0])) : '')
-        + ' · some em ' + CC.plural(dias(n), 'dia', 'dias') + '</p><p class="texto-previa">' + CC.esc(n.texto.slice(0, 240)) + '</p>'
+        + ' · some em ' + CC.plural(dias(n), 'dia', 'dias') + '</p>' + (n.titulo ? '<h3 class="titulo-previa">' + CC.esc(n.titulo) + '</h3>' : '') + '<p class="texto-previa">' + CC.esc(n.texto.slice(0, 240)) + '</p>'
         + '<div class="pe-previa"><button class="botao pequeno contorno" data-recuperar="' + CC.esc(n.id) + '">Recuperar</button>'
         + '<button class="botao plano perigo" data-de-vez="' + CC.esc(n.id) + '">Apagar agora</button></div></div>').join(''),
     {
