@@ -265,7 +265,12 @@
         const entrada = form.firstChild;
         const v = k === 'tags' ? entrada.value.replace(/^#+/, '').replace(/\s+/g, ' ').trim().slice(0, 30) : lerRefDigitada(entrada.value);
         if (!v) { if (k === 'versos') CC.avisar('Escreva assim: Romanos 5.8', { tipo: 'erro' }); return; }
-        if (!st[k].some((x) => CC.semAcento(x) === CC.semAcento(v)) && st[k].length < 12) st[k].push(v);
+        const limite = k === 'versos' ? CC.MAX_VERSOS_NOTA : 12;
+        if (st[k].length >= limite && !st[k].some((x) => CC.semAcento(x) === CC.semAcento(v))) {
+          CC.avisar(k === 'versos' ? 'Uma nota liga até ' + limite + ' versículos' : 'Uma nota leva até ' + limite + ' tags', { tipo: 'erro' });
+          return;
+        }
+        if (!st[k].some((x) => CC.semAcento(x) === CC.semAcento(v))) st[k].push(v);
         entrada.value = '';
         if (k === 'versos') form.hidden = true;
         mudou();

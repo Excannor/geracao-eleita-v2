@@ -149,11 +149,13 @@
   // Título opcional (o mesmo versículo pode ter várias notas, cada uma com um estudo): uma
   // linha só, sem espaço sobrando, até 60 letras; nota antiga, sem título, fica com ''.
   CC.MAX_TITULO_NOTA = 60;
+  // Até 15 versículos ligados numa nota (o estudo que passa por vários textos).
+  CC.MAX_VERSOS_NOTA = 15;
   const limparTitulo = (t) => (typeof t === 'string' ? t.replace(/\s+/g, ' ').trim().slice(0, CC.MAX_TITULO_NOTA) : (cifra(t) ? t : ''));
   function limparNota(n) {
     if (!n || typeof n !== 'object') return null;
     return {
-      versos: (Array.isArray(n.versos) ? n.versos : []).filter((r) => typeof r === 'string' && r.length <= 60).slice(0, 12),
+      versos: (Array.isArray(n.versos) ? n.versos : []).filter((r) => typeof r === 'string' && r.length <= 60).slice(0, CC.MAX_VERSOS_NOTA),
       tipo: TIPOS_NOTA.includes(n.tipo) ? n.tipo : 'nota',
       titulo: limparTitulo(n.titulo),
       texto: typeof n.texto === 'string' || cifra(n.texto) ? n.texto : '',

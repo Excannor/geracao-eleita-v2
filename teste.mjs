@@ -743,6 +743,11 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   const idT = CC.gravarNota(null, { versos: ['João 3.16'], tipo: 'nota', titulo: ' Primeiro estudo ', texto: 'a' });
   const idT2 = CC.gravarNota(null, { versos: ['João 3.16'], tipo: 'nota', titulo: '', texto: 'b' });
   checar(CC.nota(idT).titulo === 'Primeiro estudo' && CC.nota(idT2).titulo === '', 'gravar nota com título e com título vazio');
+  const muitos = Array.from({ length: 16 }, (_, i) => 'Salmos 119.' + (i + 1));
+  const idV = CC.gravarNota(null, { versos: muitos, tipo: 'estudo', texto: 'Salmo 119' });
+  checar(CC.MAX_VERSOS_NOTA === 15 && CC.nota(idV).versos.length === 15 && CC.nota(idV).versos[14] === 'Salmos 119.15', 'uma nota guarda até 15 versículos ligados (o 16º fica de fora)');
+  CC.apagarNota(idV);
+  CC.apagarNotaDeVez(idV);
   CC.gravarNota(idT, { ...CC.nota(idT), titulo: 'Segundo olhar' });
   checar(CC.nota(idT).titulo === 'Segundo olhar' && CC.nota(idT).texto === 'a', 'editar o título guarda o novo e não mexe no texto');
   checar(CC.montarExportacao().includes('### Segundo olhar') && CC.montarExportacao().includes('### João 3.16'), 'a cópia baixada abre a nota pelo título (e sem título, pelo versículo)');
