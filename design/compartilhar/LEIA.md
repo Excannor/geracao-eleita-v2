@@ -253,10 +253,9 @@ com as 45). Nenhuma fecha com a palavra amarela sublinhada; sem figura humana, p
   Fecha na grade quebrada. Diferente da bolinha do cartão de respostas (diferenca) e da ovelha
   branca (diferente): aqui ninguém se destaca no meio dos outros, é a forma que não segura. As
   rachaduras em fio da primeira versão pareciam fios de cabelo e saíram.
-- **rasura** (É tudo sobre Ele): a correção à mão. No preto da landing, É TUDO / SOBRE em Oswald
-  creme enorme, encostado à esquerda, e na linha de baixo MIM apagado e riscado com força em
-  sálvia, com ELE escrito à mão em amarelo ao lado. A frase que se lê é É TUDO SOBRE ELE; o
-  MIM riscado é o gancho (sair do centro). Fecha na rasura.
+- **rasura** (É tudo sobre Ele): no preto da landing, É TUDO / SOBRE em Oswald creme enorme,
+  encostado à esquerda, e ELE escrito à mão em amarelo, maior que o resto. A primeira versão
+  tinha MIM riscado antes do ELE; o dono pediu para tirar (nenhuma palavra fora da frase).
 `MODELOS=ondas,envelope,molde,rasura DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos`
 gera os quatro. Para a folha de contato, os 45 saem com `MODELOS=<todos> DIAS=7` e são montados
 em dez colunas. Os testes trocaram "Geração inconformada" por "Até que Ele venha" como frase

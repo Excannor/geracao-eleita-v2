@@ -5212,53 +5212,30 @@
     }
   }
 
-  // É tudo sobre Ele: a correção à mão. No preto da landing, É TUDO / SOBRE / MIM em Oswald
-  // creme enorme, encostado à esquerda; o MIM, apagado, é riscado com força em sálvia e, ao
-  // lado, ELE vem escrito à mão em amarelo, a única cor quente, como quem corrige o
-  // texto. A frase que fica é É TUDO SOBRE ELE. Fechamento: a rasura.
-  function rasura(ctx, x0, y0, x1, y1, r) {
-    const pts = [];
-    const n = 9;
-    for (let i = 0; i <= n; i++) {
-      const t = i / n;
-      pts.push([x0 + (x1 - x0) * t + (r() - 0.5) * 20, (i % 2 ? y1 : y0) + (r() - 0.5) * 24]);
-    }
-    tracoAMao(ctx, pts, { r, largura: 22, tremor: 6, cor: LP.salvia, segunda: true });
-    tracoAMao(ctx, [[x0 - 20, (y0 + y1) / 2 + 10], [(x0 + x1) / 2, (y0 + y1) / 2 - 14], [x1 + 24, (y0 + y1) / 2 + 4]], { r, largura: 26, tremor: 6, cor: LP.salvia, segunda: false });
-  }
+  // É tudo sobre Ele: no preto da landing, É TUDO / SOBRE em Oswald creme enorme, encostado
+  // à esquerda, e ELE escrito à mão em amarelo, a única cor quente, maior que o resto: a
+  // frase termina nEle. Sem outra palavra (o dono tirou o MIM riscado). Fechamento: o ELE à mão.
   function arteTudo(ctx) {
     const r = sorteio(1430);
     fundoLanding(ctx);
     const x = 86;
     const os = (t) => oswaldLP(t, 700);
-    const pm = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
-    // MIM riscado e ELE ao lado têm de caber na mesma linha
-    const wLinha3 = (larguraDe(ctx, 'MIM', os(100)) + 0.95 * larguraDe(ctx, 'ELE', pm(100))) / 100;
-    const tam = Math.min(caber(ctx, 'É TUDO', os, 900, 330), caber(ctx, 'SOBRE', os, 900, 330), (L - x - 70 - 40) / wLinha3);
+    const tam = Math.min(caber(ctx, 'É TUDO', os, 900, 330), caber(ctx, 'SOBRE', os, 900, 330));
     ctx.font = os(tam);
     const cap = ctx.measureText('É TUDO').actualBoundingBoxAscent;
     const capS = ctx.measureText('SOBRE').actualBoundingBoxAscent;
     const vao = tam * 0.1;
-    const y1 = (Z0 + Z1) / 2 - (cap + 2 * (vao + capS)) / 2 + cap;
+    const tE = tam * 1.25;
+    const capE = capS * 1.25;
+    const y1 = (Z0 + Z1) / 2 - (cap + vao + capS + vao * 1.6 + capE) / 2 + cap;
     const y2 = y1 + vao + capS;
-    const y3 = y2 + vao + capS;
+    const y3 = y2 + vao * 1.6 + capE;
     S.escrever(ctx, 'É TUDO', x, y1, os(tam), LP.creme, { alinhar: 'left' });
     S.escrever(ctx, 'SOBRE', x, y2, os(tam), LP.creme, { alinhar: 'left' });
-    // o MIM apagado e riscado
-    const wM = larguraDe(ctx, 'MIM', os(tam));
-    ctx.save();
-    ctx.globalAlpha = 0.5;
-    S.escrever(ctx, 'MIM', x, y3, os(tam), LP.creme, { alinhar: 'left' });
-    ctx.restore();
-    rasura(ctx, x - 6, y3 - capS * 0.9, x + wM + 6, y3 - capS * 0.1, r);
-    // ELE à mão, ao lado, um pouco acima, e a setinha de inserção embaixo
-    const tE = tam * 0.95;
     ctx.fillStyle = LP.amarelo;
-    const xE = x + wM + 50;
-    const yE = y3 - capS * 0.12;
     ctx.save();
-    ctx.translate(xE, yE);
-    ctx.rotate(-0.07);
+    ctx.translate(x + 4, y3);
+    ctx.rotate(-0.05);
     aMao(ctx, 'ELE', 0, 0, tE, r);
     ctx.restore();
   }
