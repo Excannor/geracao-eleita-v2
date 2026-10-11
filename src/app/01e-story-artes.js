@@ -2333,6 +2333,17 @@
     plano: { fundo: ['#e8e3d9'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: artePlano, grao: [12, 1650] },
     meu: { fundo: ['#c4d589'], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteMeu, grao: [12, 1645] },
     cubo: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteCubo, grao: [12, 1655] },
+    // décima leva (rodada 17): a capa vazia no gancho, as letras ondulando de João 14.6, o
+    // coração gravado em chamas, a graça repetida, o IM levado embora, os olhos de fogo, o
+    // selo em relevo do reino e a chama gravada sobre o altar
+    heroi: { fundo: ['#151614'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteHeroi, grao: [16, 1700] },
+    vida: { fundo: ['#efe8d6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteVida, grao: [12, 1710] },
+    queimar: { fundo: ['#ece3cf'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteQueimar, grao: [12, 1720] },
+    graca: { fundo: ['#111310'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteGraca, grao: [16, 1730] },
+    impossivel: { fundo: ['#efeae0'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteImpossivel, grao: [12, 1740] },
+    olhos: { fundo: ['#0b0b0a'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteOlhos, grao: [18, 1750] },
+    reino: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteReino, grao: [12, 1760] },
+    altar: { fundo: ['#10110f'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteAltar, grao: [16, 1770] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -7132,6 +7143,1297 @@
     ctx.fill();
     ctx.restore();
     ctx.restore();
+  }
+
+  // ---------- décima leva (rodada 17): oito frases novas do dono (2026-10-11) ----------
+  // RODADA17
+  // Jesus, meu super-herói: nenhuma figura, só a capa. A parede escura de reboco com um
+  // foco de luz de cima, um gancho de ferro e, pendurada nele pelo cordão, a capa amarela
+  // vazia, com as pregas que se juntam no colarinho e abrem até a barra, a sombra macia na
+  // parede e a trama do pano. "Jesus," em Literata itálica e MEU SUPER-HERÓI em Oswald,
+  // embaixo, no escuro. Fechamento: a capa no foco de luz.
+  // Mistura duas cores [r, g, b] (t de 0 a 1).
+  function misturaCor(a, b, t) {
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  }
+  // A cor de um degradê de várias paradas [[t, [r, g, b]], ...] no ponto t.
+  function corNaRampa(rampa, t) {
+    if (t <= rampa[0][0]) return rampa[0][1];
+    for (let i = 1; i < rampa.length; i++) {
+      if (t <= rampa[i][0]) return misturaCor(rampa[i - 1][1], rampa[i][1], (t - rampa[i - 1][0]) / (rampa[i][0] - rampa[i - 1][0]));
+    }
+    return rampa[rampa.length - 1][1];
+  }
+  function reboco(ctx, base, semente) {
+    const r = sorteio(semente);
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 70, { aClaro: 0.05, aEscuro: 0.10, claro: '210,205,190', escuro: '0,0,0', rMin: 40, rMax: 260 });
+    for (let i = 0; i < 16000; i++) {
+      const claro = r() < 0.45;
+      ctx.fillStyle = claro ? 'rgba(225,220,205,' + (0.03 + r() * 0.07).toFixed(3) + ')' : 'rgba(0,0,0,' + (0.10 + r() * 0.2).toFixed(3) + ')';
+      const s = 0.8 + r() * r() * 3;
+      ctx.fillRect(r() * L, r() * A, s, s);
+    }
+  }
+  // A capa como imagem: cada pixel com a cor da prega em que cai. Devolve a camada e a
+  // máscara (para a sombra).
+  function capaPendurada(topo, base, cx, larguraTopo, larguraBase, semente) {
+    const r = sorteio(semente);
+    const { c, ctx: k } = camada();
+    const x0 = Math.floor(cx - larguraBase / 2 - 60);
+    const x1 = Math.ceil(cx + larguraBase / 2 + 60);
+    const y0 = Math.floor(topo);
+    const y1 = Math.ceil(base + 40);
+    const W = x1 - x0;
+    const H = y1 - y0;
+    const img = k.createImageData(W, H);
+    const d = img.data;
+    const N = 5.2;
+    const rampa = [[0, [70, 44, 8]], [0.3, [160, 104, 22]], [0.58, [226, 158, 48]], [0.82, [248, 190, 78]], [1, [255, 214, 130]]];
+    const rampaForro = [[0, [14, 14, 12]], [0.45, [40, 40, 36]], [0.8, [76, 75, 68]], [1, [112, 110, 100]]];
+    const fases = Array.from({ length: 5 }, () => r() * Math.PI * 2);
+    for (let py = 0; py < H; py++) {
+      const y = y0 + py;
+      const s = (y - topo) / (base - topo);
+      if (s < 0 || s > 1.08) continue;
+      const ss = Math.min(1, s);
+      // a largura abre rápido logo abaixo do colarinho e depois devagar
+      const abre = Math.pow(ss, 0.72);
+      const meia = (larguraTopo + (larguraBase - larguraTopo) * abre) / 2;
+      const balanco = Math.sin(ss * 2.4 + fases[0]) * 8 * ss + 26 * ss * ss;
+      for (let px = 0; px < W; px++) {
+        const x = x0 + px;
+        const u = (x - cx - balanco) / meia; // -1 a 1
+        // as pregas: a fase anda pela largura; as bordas viram para trás
+        const t = (u + 1) / 2;
+        const fi = t * N * Math.PI * 2 + Math.sin(ss * 3.1 + fases[1]) * 0.8 + Math.sin(t * 3.1 + fases[2]) * 2.2 + Math.sin(t * 7.7 + fases[3]) * 0.9;
+        const dobra = Math.cos(fi);
+        // a borda da capa ondula com as pregas, e a barra também
+        const borda = 1 + 0.035 * Math.sin(ss * 9 + fases[3]) * ss;
+        if (Math.abs(u) > borda + 0.02) continue;
+        const barra = 1 + 0.02 * dobra - 0.05 * (0.5 - t) + 0.015 * Math.sin(t * 7 + fases[4]) - (Math.abs(u) > 0.8 ? 0.05 * (Math.abs(u) - 0.8) / 0.2 : 0);
+        if (s > barra) continue;
+        let a = Math.min(1, (borda + 0.02 - Math.abs(u)) * meia * 0.5) * Math.min(1, (barra - s) * (base - topo) * 0.6);
+        if (a <= 0) continue;
+        // a luz: a prega (mais funda embaixo), o foco de cima e à esquerda, as bordas na sombra
+        const fundo = 0.25 + 0.75 * Math.min(1, ss * 2.2);
+        let luz = 0.6 + 0.3 * dobra * fundo + 0.07 * Math.sin(fi * 2 + 1) * fundo;
+        luz -= 0.38 * Math.pow(Math.abs(u), 3);
+        luz -= 0.20 * ss;
+        luz += 0.10 * (1 - t);
+        if (ss < 0.1) luz -= (0.1 - ss) * 2.4 * (0.5 + 0.5 * Math.cos(t * 30));
+        // a barra virada: o avesso, mais escuro, numa faixa fina
+        if (barra - s < 0.012) luz -= 0.22;
+        luz += (r() - 0.5) * 0.04;
+        // o forro grafite: as duas beiradas da frente caem abertas e mostram o avesso,
+        // mais largo embaixo, com a dobra escura na emenda
+        const forro = (u < 0 ? 0.015 + 0.07 * ss : 0.02 + 0.2 * Math.pow(ss, 1.1));
+        const dentro = 1 - Math.abs(u);
+        let cor;
+        if (dentro < forro) {
+          const q = dentro / forro;
+          let lz = 0.35 + 0.5 * q - 0.25 * ss + (u < 0 ? 0.08 : -0.04) + (r() - 0.5) * 0.04;
+          if (barra - s < 0.012) lz -= 0.2;
+          cor = corNaRampa(rampaForro, Math.max(0, Math.min(1, lz)));
+        } else {
+          if (dentro < forro + 0.025) luz -= 0.35 * (1 - (dentro - forro) / 0.025);
+          cor = corNaRampa(rampa, Math.max(0, Math.min(1, luz)));
+        }
+        const j = (py * W + px) * 4;
+        d[j] = cor[0];
+        d[j + 1] = cor[1];
+        d[j + 2] = cor[2];
+        d[j + 3] = a * 255;
+      }
+    }
+    k.putImageData(img, x0, y0);
+    // a trama do pano: linhas finas cruzadas, só onde há capa
+    k.save();
+    k.globalCompositeOperation = 'source-atop';
+    for (let y = y0; y < y1; y += 3) {
+      k.fillStyle = 'rgba(80,50,0,.07)';
+      k.fillRect(x0, y, W, 1);
+    }
+    for (let x = x0; x < x1; x += 3) {
+      k.fillStyle = 'rgba(255,240,200,.05)';
+      k.fillRect(x, y0, 1, H);
+    }
+    k.restore();
+    return c;
+  }
+  function arteHeroi(ctx) {
+    const r = sorteio(1700);
+    reboco(ctx, '#1b1c19', 1700);
+    const cx = L / 2;
+    const yGancho = 570;
+    // o foco de luz de cima, uma elipse comprida e macia
+    ctx.save();
+    ctx.translate(cx, 860);
+    ctx.scale(1, 1.5);
+    const foco = ctx.createRadialGradient(0, 0, 0, 0, 0, 520);
+    foco.addColorStop(0, 'rgba(236,228,200,.20)');
+    foco.addColorStop(0.55, 'rgba(236,228,200,.08)');
+    foco.addColorStop(1, 'rgba(236,228,200,0)');
+    ctx.fillStyle = foco;
+    ctx.fillRect(-600, -600, 1200, 1200);
+    ctx.restore();
+    const topo = yGancho + 118;
+    const base = 1286;
+    const capa = capaPendurada(topo, base, cx, 150, 600, 1701);
+    // a sombra da capa na parede, macia e para a direita e para baixo
+    const sombra = camada();
+    sombra.ctx.filter = 'blur(26px)';
+    sombra.ctx.drawImage(capa, 34, 30);
+    sombra.ctx.filter = 'none';
+    sombra.ctx.globalCompositeOperation = 'source-in';
+    sombra.ctx.fillStyle = '#000';
+    sombra.ctx.fillRect(0, 0, L, A);
+    ctx.save();
+    ctx.globalAlpha = 0.75;
+    ctx.drawImage(sombra.c, 0, 0);
+    ctx.restore();
+    ctx.drawImage(capa, 0, 0);
+    // a abertura do pescoço: entre os dois broches, a beirada cai para a frente e mostra o
+    // forro grafite por dentro; a corrente dos broches passa pelo gancho
+    const bx = 74;
+    const by = topo + 2;
+    ctx.save();
+    const boca = new Path2D();
+    boca.moveTo(cx - bx, by);
+    boca.bezierCurveTo(cx - bx * 0.5, by + 62, cx + bx * 0.5, by + 62, cx + bx, by);
+    boca.bezierCurveTo(cx + bx * 0.5, by + 6, cx - bx * 0.5, by + 6, cx - bx, by);
+    boca.closePath();
+    const gb = ctx.createLinearGradient(0, by, 0, by + 50);
+    gb.addColorStop(0, '#0f0f0d');
+    gb.addColorStop(1, '#3d3c37');
+    ctx.fillStyle = gb;
+    ctx.fill(boca);
+    // a beirada dobrada, com a costura
+    ctx.strokeStyle = '#b07a1c';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(cx - bx, by);
+    ctx.bezierCurveTo(cx - bx * 0.5, by + 62, cx + bx * 0.5, by + 62, cx + bx, by);
+    ctx.stroke();
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = 'rgba(70,40,0,.6)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(cx - bx + 6, by + 10);
+    ctx.bezierCurveTo(cx - bx * 0.5, by + 60, cx + bx * 0.5, by + 60, cx + bx - 6, by + 10);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // a corrente: elos pequenos dos broches até o gancho
+    for (const lado of [-1, 1]) {
+      const x0 = cx + lado * (bx - 6);
+      const y0 = by - 4;
+      const x1 = cx + lado * 4;
+      const y1 = yGancho + 30;
+      const n = 7;
+      for (let i = 0; i < n; i++) {
+        const t = (i + 0.5) / n;
+        const x = x0 + (x1 - x0) * t;
+        const y = y0 + (y1 - y0) * t - Math.sin(t * Math.PI) * 6;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(Math.atan2(y1 - y0, x1 - x0) + (i % 2 ? Math.PI / 2 : 0) * 0);
+        ctx.strokeStyle = i % 2 ? '#8d8a80' : '#5d5b54';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 8, i % 2 ? 2.5 : 4.5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    // os broches redondos de metal escuro, com o brilho do foco
+    for (const lado of [-1, 1]) {
+      const x = cx + lado * bx;
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,.55)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 7;
+      const g = ctx.createRadialGradient(x - 8, by - 8, 2, x, by, 25);
+      g.addColorStop(0, '#e6e1d1');
+      g.addColorStop(0.3, '#8a867b');
+      g.addColorStop(1, '#22221e');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, by, 23, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(15,15,13,.7)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(x, by, 14, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+    // o gancho de ferro: a roseta na parede e o braço que sai e sobe
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.6)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 8;
+    ctx.shadowOffsetY = 10;
+    const roseta = ctx.createRadialGradient(cx - 8, yGancho - 30, 2, cx, yGancho - 22, 30);
+    roseta.addColorStop(0, '#6e6c64');
+    roseta.addColorStop(1, '#22221f');
+    ctx.fillStyle = roseta;
+    ctx.beginPath();
+    ctx.ellipse(cx, yGancho - 22, 30, 30, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#2b2a26';
+    ctx.lineWidth = 15;
+    ctx.beginPath();
+    ctx.moveTo(cx, yGancho - 22);
+    ctx.lineTo(cx, yGancho + 22);
+    ctx.quadraticCurveTo(cx, yGancho + 48, cx + 22, yGancho + 40);
+    ctx.quadraticCurveTo(cx + 34, yGancho + 34, cx + 32, yGancho + 18);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(220,214,195,.45)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(cx - 4, yGancho - 16);
+    ctx.lineTo(cx - 4, yGancho + 22);
+    ctx.stroke();
+    ctx.restore();
+    // a frase, embaixo, no escuro
+    S.escrever(ctx, 'Jesus,', cx, 1382, 'italic 500 88px Literata, Georgia, serif', LP.creme);
+    const os = (t) => oswaldLP(t, 700);
+    const tH = caber(ctx, 'MEU SUPER-HERÓI', os, 820, 124, 0.02);
+    S.escrever(ctx, 'MEU SUPER-HERÓI', cx, 1384 + tH * 0.98, os(tH), LP.creme, { espaco: tH * 0.02 });
+  }
+  // As linhas empilhadas, cada uma esticada na largura do bloco, numa máscara W x H; depois
+  // cada pixel de saída busca o ponto da máscara que o mapa manda (o texto ondula e incha).
+  // mapa(X, Y) recebe X de -1 a 1 e Y de 0 a 1 e devolve [X, Y] na máscara. A cor é a do
+  // pincel; devolve a camada W x H.
+  function textoOndulado(linhas, pesos, W, H, mapa, cor, { fonte = (t) => oswaldLP(t, 700), gordo = 10, vao = 0.03, margem = 0 } = {}) {
+    const M = document.createElement('canvas');
+    M.width = W;
+    M.height = H;
+    const k = M.getContext('2d');
+    k.fillStyle = '#000';
+    k.strokeStyle = '#000';
+    k.lineJoin = 'round';
+    const soma = pesos.reduce((a, b) => a + b, 0);
+    const Wi = W - margem * 2;
+    const Hi = H - margem * 2;
+    const livre = Hi * (1 - vao * (linhas.length - 1));
+    let topo = margem;
+    linhas.forEach((l, i) => {
+      const alt = livre * pesos[i] / soma;
+      k.save();
+      k.font = fonte(200);
+      k.textBaseline = 'alphabetic';
+      const m = k.measureText(l);
+      const w = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+      const h = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+      k.translate(margem + gordo, topo + gordo);
+      k.scale((Wi - gordo * 2) / w, (alt - gordo * 2) / h);
+      k.fillText(l, m.actualBoundingBoxLeft, m.actualBoundingBoxAscent);
+      k.lineWidth = gordo * 2 * w / Wi;
+      k.strokeText(l, m.actualBoundingBoxLeft, m.actualBoundingBoxAscent);
+      k.restore();
+      topo += alt + Hi * vao;
+    });
+    const src = k.getImageData(0, 0, W, H).data;
+    const sai = document.createElement('canvas');
+    sai.width = W;
+    sai.height = H;
+    const ks = sai.getContext('2d');
+    const img = ks.createImageData(W, H);
+    const o = img.data;
+    const cr = parseInt(cor.slice(1, 3), 16);
+    const cg = parseInt(cor.slice(3, 5), 16);
+    const cb = parseInt(cor.slice(5, 7), 16);
+    const alfa = (x, y) => {
+      const xi = Math.floor(x);
+      const yi = Math.floor(y);
+      if (xi < 0 || yi < 0 || xi >= W - 1 || yi >= H - 1) return 0;
+      const fx = x - xi;
+      const fy = y - yi;
+      const i = (yi * W + xi) * 4 + 3;
+      return (src[i] * (1 - fx) + src[i + 4] * fx) * (1 - fy) + (src[i + W * 4] * (1 - fx) + src[i + W * 4 + 4] * fx) * fy;
+    };
+    for (let py = 0; py < H; py++) {
+      for (let px = 0; px < W; px++) {
+        const [X, Y] = mapa((px + 0.5) / W * 2 - 1, (py + 0.5) / H);
+        const a = alfa((X + 1) / 2 * W, Y * H);
+        if (a <= 0) continue;
+        const j = (py * W + px) * 4;
+        o[j] = cr;
+        o[j + 1] = cg;
+        o[j + 2] = cb;
+        o[j + 3] = a;
+      }
+    }
+    ks.putImageData(img, 0, 0);
+    return sai;
+  }
+  // Jesus, caminho, verdade e vida: como o cartaz que o dono mandou, as quatro palavras
+  // empilhadas em letra psicodélica dos anos 70, que ondula e incha como vista através da
+  // água quente, com a sombra deslocada por baixo. Aqui em tinta no papel creme, com a
+  // sombra amarela (a da referência é azul e laranja). JESUS, menor no alto. Lema com a
+  // referência (João 14.6: "Eu sou o Caminho, a Verdade e a Vida"). Fechamento: a sombra.
+  function arteVida(ctx) {
+    fundoPapel(ctx, '#efe8d6', 1710);
+    const W = 980;
+    const H = 1000;
+    const x0 = (L - W) / 2 - 10;
+    const y0 = 500;
+    const mapa = (X, Y) => {
+      // a largura de cada faixa incha e encolhe, o bloco serpenteia e as linhas de base ondulam
+      const incha = 1 + 0.13 * Math.sin(2 * Math.PI * (Y * 1.35) + 0.4);
+      const anda = 0.07 * Math.sin(2 * Math.PI * (Y * 1.1) + 1.9);
+      const xs = X / incha - anda;
+      const ys = Y + 0.03 * Math.sin(Math.PI * (X * 1.6) + Y * 6) + 0.012 * Math.sin(X * 9 + Y * 4);
+      return [xs, ys];
+    };
+    const linhas = ['JESUS,', 'CAMINHO,', 'VERDADE', 'E VIDA'];
+    const pesos = [0.62, 1.12, 1.12, 1];
+    const letra = textoOndulado(linhas, pesos, W, H, mapa, LP.tinta, { gordo: 9, margem: 92 });
+    const sombra = textoOndulado(linhas, pesos, W, H, mapa, '#eea62a', { gordo: 9, margem: 92 });
+    // a tinta assentada no papel, com falhas leves
+    const juntas = camada();
+    juntas.ctx.drawImage(sombra, x0 + 16, y0 + 14);
+    juntas.ctx.drawImage(letra, x0, y0);
+    gastar(juntas.c, { x: x0, y: y0, w: W + 20, h: H + 20 }, { pontos: 2600, manchas: 6, riscos: 0, semente: 1711, forca: 0.3 });
+    ctx.drawImage(juntas.c, 0, 0);
+    referencia(ctx, 'João 14.6', L / 2, 1530, 30, '#5c5a52');
+  }
+  // ---------- gravura: o traço que engrossa na sombra ----------
+  // Uma linha de buril: os pontos ligados em pedaços curtos, cada pedaço da largura que
+  // largura(x, y) manda (zero some). Como a gravura dos livros antigos: o tom vem só da
+  // espessura das linhas.
+  function linhaDeBuril(ctx, pts, largura, cor) {
+    ctx.save();
+    ctx.strokeStyle = cor;
+    ctx.lineCap = 'round';
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1];
+      const [x1, y1] = pts[i];
+      const w = largura((x0 + x1) / 2, (y0 + y1) / 2, i / (pts.length - 1));
+      if (w < 0.35) continue;
+      ctx.lineWidth = w;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // Os pontos de uma cúbica (n pedaços).
+  function pontosCubica(p0, p1, p2, p3, n) {
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const t = i / n;
+      const a = (1 - t) ** 3;
+      const b = 3 * (1 - t) ** 2 * t;
+      const c = 3 * (1 - t) * t * t;
+      const d = t ** 3;
+      pts.push([a * p0[0] + b * p1[0] + c * p2[0] + d * p3[0], a * p0[1] + b * p1[1] + c * p2[1] + d * p3[1]]);
+    }
+    return pts;
+  }
+  // Um vaso (tubo) em gravura: a linha do meio é uma cúbica, o raio vai de r0 a r1. As
+  // linhas correm ao longo do tubo, mais grossas no lado da sombra (o lado +), com o
+  // contorno e a boca cortada em elipse no fim, escura por dentro.
+  function vasoGravado(ctx, p0, p1, p2, p3, r0, r1, { tinta, papel, fundo = true, boca = true, n = 9 }) {
+    const meio = pontosCubica(p0, p1, p2, p3, 60);
+    const normal = meio.map((p, i) => {
+      const a = meio[Math.max(0, i - 1)];
+      const b = meio[Math.min(meio.length - 1, i + 1)];
+      const dx = b[0] - a[0];
+      const dy = b[1] - a[1];
+      const m = Math.hypot(dx, dy) || 1;
+      return [-dy / m, dx / m];
+    });
+    const raio = (i) => r0 + (r1 - r0) * i / (meio.length - 1);
+    const borda = (o) => meio.map((p, i) => [p[0] + normal[i][0] * o * raio(i), p[1] + normal[i][1] * o * raio(i)]);
+    const esq = borda(-1);
+    const dir = borda(1);
+    const forma = new Path2D();
+    forma.moveTo(esq[0][0], esq[0][1]);
+    esq.forEach((p) => forma.lineTo(p[0], p[1]));
+    for (let i = dir.length - 1; i >= 0; i--) forma.lineTo(dir[i][0], dir[i][1]);
+    forma.closePath();
+    if (fundo) {
+      ctx.fillStyle = papel;
+      ctx.fill(forma);
+    }
+    for (let j = 0; j < n; j++) {
+      const o = -0.85 + 1.7 * j / (n - 1);
+      linhaDeBuril(ctx, borda(o), () => Math.max(0, 0.4 + 3.2 * (o + 0.15)), tinta);
+    }
+    ctx.save();
+    ctx.strokeStyle = tinta;
+    ctx.lineWidth = 3.2;
+    ctx.lineJoin = 'round';
+    for (const lado of [esq, dir]) {
+      ctx.beginPath();
+      lado.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+      ctx.stroke();
+    }
+    if (boca) {
+      const f = meio[meio.length - 1];
+      const nf = normal[normal.length - 1];
+      const ang = Math.atan2(nf[1], nf[0]);
+      ctx.translate(f[0], f[1]);
+      ctx.rotate(ang);
+      ctx.fillStyle = papel;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, r1, r1 * 0.38, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = tinta;
+      ctx.beginPath();
+      ctx.ellipse(0, r1 * 0.06, r1 * 0.62, r1 * 0.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    return forma;
+  }
+  // O corpo do coração (sem os vasos), com o meio em (0, 0): ombro largo e a ponta embaixo.
+  function corpoDoCoracao() {
+    const p = new Path2D();
+    p.moveTo(-60, -230);
+    p.bezierCurveTo(40, -258, 170, -246, 218, -150);
+    p.bezierCurveTo(262, -60, 236, 92, 152, 192);
+    p.bezierCurveTo(92, 256, 20, 286, -26, 300);
+    p.bezierCurveTo(-110, 254, -214, 150, -232, 24);
+    p.bezierCurveTo(-246, -92, -184, -206, -60, -230);
+    p.closePath();
+    return p;
+  }
+  // O coração em gravura no lugar (cx, cy), girado e na escala: as linhas de contorno
+  // curvas como paralelos de uma bola, a luz do alto à esquerda, o sulco do meio, as
+  // artérias claras por cima e os vasos no alto.
+  function coracaoGravado(ctx, cx, cy, esc, giro, { tinta, papel, semente, vasos = true }) {
+    const r = sorteio(semente);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(giro);
+    ctx.scale(esc, esc);
+    const corpo = corpoDoCoracao();
+    // os vasos de trás: a veia cava à direita e a aorta, que sobe e faz o arco
+    if (vasos) {
+      vasoGravado(ctx, [150, -170], [160, -260], [150, -330], [140, -400], 44, 40, { tinta, papel });
+      vasoGravado(ctx, [-10, -200], [-10, -330], [70, -420], [180, -400], 62, 54, { tinta, papel, boca: false });
+      // os três ramos que saem do arco
+      for (const [x, y, dx] of [[30, -380], [80, -410, 6], [130, -416, 14]]) {
+        vasoGravado(ctx, [x, y], [x + (dx || 0) * 0.3, y - 40], [x + (dx || 0), y - 70], [x + (dx || 0) * 1.4, y - 104], 18, 15, { tinta, papel, n: 5 });
+      }
+      vasoGravado(ctx, [180, -400], [230, -390], [250, -360], [262, -320], 54, 50, { tinta, papel });
+    }
+    ctx.fillStyle = papel;
+    ctx.fill(corpo);
+    // as linhas do corpo: curvas como paralelos, girando em volta do eixo do coração
+    ctx.save();
+    ctx.clip(corpo);
+    const luz = [-0.55, -0.62, 0.56];
+    const tom = (x, y) => {
+      const nx = (x - 0) / 250;
+      const ny = (y - 20) / 290;
+      const nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
+      const dif = Math.max(0, nx * luz[0] + ny * luz[1] + nz * luz[2]);
+      const borda = Math.max(0, Math.hypot(nx, ny) - 0.72) * 2.2;
+      return Math.min(1, (1 - dif) * 0.95 + borda);
+    };
+    for (let i = -34; i <= 40; i++) {
+      const y0 = i * 9;
+      const pts = [];
+      for (let x = -260; x <= 270; x += 4) {
+        const nx = x / 250;
+        const curva = 26 * (1 - Math.min(1, nx * nx)) + 0.18 * x;
+        pts.push([x, y0 + curva + Math.sin(x * 0.03 + i) * 1.2]);
+      }
+      linhaDeBuril(ctx, pts, (x, y) => tom(x, y) * 4.6 - 0.6, tinta);
+    }
+    ctx.restore();
+    // o sulco do meio, do alto até a ponta, com a sombra ao lado
+    const sulco = pontosCubica([-20, -220], [30, -100], [10, 120], [-26, 296], 50);
+    linhaDeBuril(ctx, sulco, (x, y, t) => 2 + 4 * Math.sin(t * Math.PI), tinta);
+    // as artérias da superfície: tubinhos claros com a beira em tinta, ramificando
+    const arteria = (pts, w) => {
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = tinta;
+      ctx.lineWidth = w + 5;
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+      ctx.stroke();
+      ctx.strokeStyle = papel;
+      ctx.lineWidth = w;
+      ctx.stroke();
+      ctx.restore();
+    };
+    arteria(pontosCubica([-14, -214], [44, -110], [24, 110], [-20, 280], 40), 9);
+    arteria(pontosCubica([20, -40], [70, -10], [110, 40], [150, 120], 20), 6);
+    arteria(pontosCubica([0, 60], [-50, 90], [-90, 140], [-110, 210], 20), 5);
+    arteria(pontosCubica([-60, -200], [-130, -160], [-190, -80], [-210, 30], 30), 7);
+    arteria(pontosCubica([-150, -120], [-120, -60], [-120, 10], [-140, 80], 20), 5);
+    arteria(pontosCubica([120, -200], [170, -130], [200, -40], [196, 60], 24), 6);
+    // o contorno
+    ctx.strokeStyle = tinta;
+    ctx.lineWidth = 4.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke(corpo);
+    // o tronco pulmonar, na frente, saindo do alto à esquerda
+    if (vasos) {
+      vasoGravado(ctx, [-80, -190], [-110, -280], [-170, -320], [-240, -330], 52, 44, { tinta, papel });
+      vasoGravado(ctx, [-150, -315], [-170, -360], [-200, -390], [-230, -420], 24, 20, { tinta, papel, n: 6 });
+    }
+    void r;
+    ctx.restore();
+  }
+  // Uma língua de fogo em gravura: o contorno em tinta e as linhas de dentro, que correm da
+  // base até a ponta, mais grossas no meio. base e ponta em pixels; curva entorta o meio.
+  function linguaDeFogo(ctx, base, ponta, largura, curva, { tinta, cor, linhas = 6, contorno = 2.6, fase = 0 }) {
+    const dx = ponta[0] - base[0];
+    const dy = ponta[1] - base[1];
+    const comp = Math.hypot(dx, dy);
+    const ux = dx / comp;
+    const uy = dy / comp;
+    const nx = -uy;
+    const ny = ux;
+    const meio = (t) => {
+      const s = curva * comp * (Math.sin(t * Math.PI * 1.7 + fase) - Math.sin(fase)) * (0.35 + t * 0.8);
+      return [base[0] + dx * t + nx * s, base[1] + dy * t + ny * s];
+    };
+    const perfil = (t) => largura * Math.pow(Math.sin(Math.PI * Math.min(1, 0.22 + t * 0.78)), 0.7) * Math.pow(1 - t, 0.8);
+    const borda = (o, n = 40) => {
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        const m = meio(t);
+        const w = perfil(t) * o;
+        pts.push([m[0] + nx * w, m[1] + ny * w]);
+      }
+      return pts;
+    };
+    for (let j = 0; j < linhas; j++) {
+      const o = -0.75 + 1.5 * j / Math.max(1, linhas - 1);
+      linhaDeBuril(ctx, borda(o), (x, y, t) => (1.6 + 1.8 * (1 - Math.abs(o))) * Math.pow(Math.sin(Math.PI * Math.min(1, 0.1 + t)), 0.6), cor);
+    }
+    const esq = borda(-1);
+    const dir = borda(1);
+    ctx.save();
+    ctx.strokeStyle = tinta;
+    ctx.lineWidth = contorno;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    esq.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+    for (let i = dir.length - 1; i >= 0; i--) ctx.lineTo(dir[i][0], dir[i][1]);
+    ctx.stroke();
+    ctx.restore();
+  }
+  // Deixa queimar: o coração anatômico em gravura de tinta no papel creme, como página de
+  // livro antigo de anatomia, e as chamas subindo dele também em gravura: línguas com o
+  // contorno em tinta e as linhas de dentro em amarelo, sem nada preenchido. Embaixo,
+  // "deixa queimar" à mão. Diferente das brasas (carvão no escuro) e do coração disposto
+  // (as brasas embaixo do texto). Fechamento: as chamas.
+  function arteQueimar(ctx) {
+    const r = sorteio(1720);
+    fundoPapel(ctx, '#ece3cf', 1720);
+    const tinta = '#1e1a14';
+    const amarelo = '#e9a21f';
+    const papel = '#efe6d2';
+    const cx = L / 2;
+    const cy = 1060;
+    // o calor atrás de tudo: uma luz amarela fraca no papel
+    const calor = ctx.createRadialGradient(cx, 900, 0, cx, 900, 560);
+    calor.addColorStop(0, 'rgba(255,196,77,.30)');
+    calor.addColorStop(1, 'rgba(255,196,77,0)');
+    ctx.fillStyle = calor;
+    ctx.fillRect(0, 0, L, A);
+    // as chamas de trás: sobem do alto e dos lados do coração
+    const fogo = (bx, by, px, py, w, c, n) => linguaDeFogo(ctx, [bx, by], [px, py], w, c, { tinta, cor: amarelo, linhas: n + 3, fase: r() * 2 - 1, contorno: 2.2 });
+    const atras = [
+      [cx - 150, 970, cx - 250, 610, 62, 0.16, 6], [cx - 60, 930, cx - 70, 530, 70, -0.14, 7], [cx + 40, 910, cx + 90, 550, 66, 0.15, 7],
+      [cx + 150, 950, cx + 260, 620, 60, -0.18, 6], [cx - 220, 1070, cx - 300, 720, 50, 0.12, 5], [cx + 230, 1050, cx + 300, 700, 52, -0.12, 5],
+      [cx + 10, 930, cx - 10, 630, 40, 0.24, 5], [cx - 240, 1190, cx - 330, 900, 40, 0.14, 4], [cx + 250, 1170, cx + 340, 880, 40, -0.14, 4],
+      [cx - 110, 950, cx - 170, 700, 34, -0.18, 3], [cx + 110, 930, cx + 170, 690, 34, 0.18, 3],
+    ];
+    for (const f of atras) fogo(...f);
+    coracaoGravado(ctx, cx + 6, cy, 0.78, -0.22, { tinta, papel, semente: 1721 });
+    // as da frente: menores, lambendo a borda do coração
+    const frente = [
+      [cx - 180, 1120, cx - 250, 930, 34, -0.2, 4], [cx + 170, 1080, cx + 230, 900, 32, 0.22, 4], [cx - 40, 1030, cx - 80, 870, 26, 0.2, 3],
+      [cx + 90, 980, cx + 120, 830, 24, -0.25, 3],
+    ];
+    for (const f of frente) fogo(...f);
+    // as fagulhas: pontinhos e risquinhos subindo
+    for (let i = 0; i < 26; i++) {
+      const x = cx + (r() - 0.5) * 640;
+      const y = 560 + r() * 360;
+      ctx.strokeStyle = r() < 0.5 ? amarelo : tinta;
+      ctx.lineWidth = 2 + r() * 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + (r() - 0.5) * 10, y - 8 - r() * 14);
+      ctx.stroke();
+    }
+    ctx.fillStyle = tinta;
+    aMao(ctx, 'deixa', cx, 1392, 84, r, { alinhar: 'center' });
+    aMao(ctx, 'queimar', cx, 1484, 84, r, { alinhar: 'center' });
+  }
+  // A coroa de espinhos em volta de (cx, cy): três ramos torcidos numa elipse inclinada, com
+  // os espinhos para fora. metade: 'tras' desenha só a metade de trás (antes do coração),
+  // 'frente' só a da frente.
+  function coroaDeEspinhos(ctx, cx, cy, rx, ry, giro, metade, { tinta, claro, semente }) {
+    const r = sorteio(semente);
+    const ponto = (t, k, fase) => {
+      const ox = Math.cos(t) * rx;
+      const oy = Math.sin(t) * ry + Math.sin(t * 3 + fase) * 9 * k + Math.cos(t * 5 + fase * 2) * 4;
+      return [cx + ox * Math.cos(giro) - oy * Math.sin(giro), cy + ox * Math.sin(giro) + oy * Math.cos(giro)];
+    };
+    const frente = (t) => Math.sin(t) > 0;
+    const quer = (t) => (metade === 'frente' ? frente(t) : !frente(t));
+    for (let ramo = 0; ramo < 3; ramo++) {
+      const fase = ramo * 2.1;
+      const k = 1 + ramo * 0.25;
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      // cada pedaço desenhado só se cai na metade pedida
+      const n = 160;
+      for (let i = 0; i < n; i++) {
+        const t0 = (i / n) * Math.PI * 2;
+        const t1 = ((i + 1) / n) * Math.PI * 2;
+        if (!quer((t0 + t1) / 2)) continue;
+        const a = ponto(t0, k, fase);
+        const b = ponto(t1, k, fase);
+        const fundo = metade === 'tras' ? 0.55 : 1;
+        ctx.strokeStyle = tinta;
+        ctx.lineWidth = 11;
+        ctx.beginPath();
+        ctx.moveTo(a[0], a[1]);
+        ctx.lineTo(b[0], b[1]);
+        ctx.stroke();
+        ctx.globalAlpha = fundo;
+        ctx.strokeStyle = claro;
+        ctx.lineWidth = 3.4;
+        ctx.beginPath();
+        ctx.moveTo(a[0], a[1] - 2);
+        ctx.lineTo(b[0], b[1] - 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      // os espinhos
+      for (let i = 0; i < 26; i++) {
+        const t = r() * Math.PI * 2;
+        if (!quer(t)) continue;
+        const p = ponto(t, k, fase);
+        const ang = r() * Math.PI * 2;
+        const comp = 14 + r() * 16;
+        const ponta = [p[0] + Math.cos(ang) * comp, p[1] + Math.sin(ang) * comp];
+        const lado = [-Math.sin(ang) * 4, Math.cos(ang) * 4];
+        ctx.fillStyle = claro;
+        ctx.strokeStyle = tinta;
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = metade === 'tras' ? 0.6 : 1;
+        ctx.beginPath();
+        ctx.moveTo(p[0] + lado[0], p[1] + lado[1]);
+        ctx.lineTo(ponta[0], ponta[1]);
+        ctx.lineTo(p[0] - lado[0], p[1] - lado[1]);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      ctx.restore();
+    }
+  }
+  // Foi Tua graça que me salvou: GRAÇA repetida quatro vezes em serifa grande sálvia no
+  // escuro, uma embaixo da outra, e no meio delas, por cima, o coração em gravura clara com
+  // a coroa de espinhos passando em volta (atrás e na frente). "Foi Tua" em cima e "que me
+  // salvou" embaixo, em Literata itálica. Lema com a referência (Efésios 2.8: "é pela graça
+  // que vocês são salvos"). A repetição de GRAÇA é a da referência. Fechamento: o coração.
+  function arteGraca(ctx) {
+    const r = sorteio(1730);
+    ctx.fillStyle = '#111310';
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 30, { aClaro: 0.035, aEscuro: 0.08, claro: '200,218,140', escuro: '0,0,0' });
+    const lit = (t) => '600 ' + t + 'px Literata, Georgia, serif';
+    let tG = caber(ctx, 'GRAÇA', lit, 900, 330, 0.01);
+    ctx.font = lit(tG);
+    tG *= Math.min(1, 146 / ctx.measureText('G').actualBoundingBoxAscent);
+    ctx.font = lit(tG);
+    const capG = ctx.measureText('G').actualBoundingBoxAscent;
+    const passo = capG * 1.13;
+    const yPrimeira = 690 + capG;
+    const { c, ctx: k } = camada();
+    for (let i = 0; i < 4; i++) {
+      const y = yPrimeira + i * passo;
+      k.save();
+      k.font = lit(tG);
+      k.textAlign = 'center';
+      k.textBaseline = 'alphabetic';
+      try { k.letterSpacing = tG * 0.01 + 'px'; } catch (e) { /* sem letterSpacing */ }
+      k.fillStyle = LP.salvia;
+      k.strokeStyle = LP.salvia;
+      k.lineJoin = 'round';
+      k.lineWidth = tG * 0.035;
+      k.fillText('GRAÇA', L / 2, y);
+      k.strokeText('GRAÇA', L / 2, y);
+      k.restore();
+    }
+    gastar(c, { x: 60, y: 640, w: L - 120, h: 760 }, { pontos: 3500, manchas: 10, riscos: 0, semente: 1731, forca: 0.35 });
+    ctx.drawImage(c, 0, 0);
+    S.escrever(ctx, 'Foi Tua', L / 2, 648, 'italic 500 66px Literata, Georgia, serif', LP.creme);
+    // o coração no meio das quatro, com a coroa
+    const hx = L / 2 + 10;
+    const hy = yPrimeira + passo * 1.5 - capG * 0.5 + 30;
+    const tinta = '#151512';
+    const claro = '#efe9d8';
+    // a sombra do coração nas letras
+    ctx.save();
+    ctx.filter = 'blur(18px)';
+    ctx.fillStyle = 'rgba(0,0,0,.6)';
+    ctx.beginPath();
+    ctx.ellipse(hx + 16, hy + 30, 175, 220, 0.15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    const coroa = { tinta, claro: '#d9d2bc', semente: 1732 };
+    coroaDeEspinhos(ctx, hx, hy + 18, 200, 56, -0.16, 'tras', coroa);
+    coracaoGravado(ctx, hx, hy, 0.54, 0.16, { tinta, papel: claro, semente: 1733 });
+    coroaDeEspinhos(ctx, hx, hy + 18, 200, 56, -0.16, 'frente', coroa);
+    const yFim = yPrimeira + passo * 3 + 98;
+    S.escrever(ctx, 'que me salvou', L / 2, yFim, 'italic 500 66px Literata, Georgia, serif', LP.creme);
+    referencia(ctx, 'Efésios 2.8', L / 2, yFim + 58, 28, LP.salvia);
+  }
+  // Uma aguada de aquarela: o caminho pintado numa camada com a cor rala, a beirada mais
+  // escura (onde o pigmento se junta ao secar) e a borda macia; o papel aparece nos furos.
+  function aguada(ctx, caminho, cor, { alfa = 0.6, beira = 0.5, macio = 1.4, semente = 1, furos = 120, transformar, variar } = {}) {
+    const { c, ctx: k } = camada();
+    if (transformar) transformar(k);
+    k.filter = 'blur(' + macio + 'px)';
+    k.globalAlpha = alfa;
+    k.fillStyle = cor;
+    k.fill(caminho);
+    k.globalAlpha = alfa * beira;
+    k.strokeStyle = cor;
+    k.lineWidth = 3;
+    k.lineJoin = 'round';
+    k.stroke(caminho);
+    k.filter = 'none';
+    // o pigmento que não assenta por igual: mais ralo no meio, mais denso numa ponta
+    if (variar) {
+      k.globalCompositeOperation = 'source-atop';
+      const g = k.createLinearGradient(variar[0], variar[1], variar[2], variar[3]);
+      g.addColorStop(0, 'rgba(255,255,250,.28)');
+      g.addColorStop(1, 'rgba(0,0,0,.10)');
+      k.globalAlpha = 1;
+      k.fillStyle = g;
+      k.fill(caminho);
+      k.globalCompositeOperation = 'source-over';
+    }
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    // a granulação do pigmento: furinhos claros
+    const r = sorteio(semente);
+    k.globalCompositeOperation = 'destination-out';
+    for (let i = 0; i < furos; i++) {
+      k.globalAlpha = 0.15 + r() * 0.3;
+      k.beginPath();
+      k.arc(r() * L, r() * A, 0.8 + r() * 2.4, 0, Math.PI * 2);
+      k.fill();
+    }
+    k.globalCompositeOperation = 'source-over';
+    ctx.drawImage(c, 0, 0);
+  }
+  // A figura pequena de Jesus, de costas, andando, em aquarela de poucas cores: a túnica
+  // numa aguada cinza quente, o manto num cinza mais fundo cruzando as costas, o cabelo
+  // comprido escuro e o braço erguido segurando a carga no ombro. Sem rosto e sem contorno:
+  // só manchas de tinta com a beirada mais escura, como as figuras pequenas das aquarelas.
+  // Os pés em (x, y); h é a altura. carga() desenha o que ele leva, atrás do braço.
+  function figuraEmAquarela(ctx, x, y, h, carga, semente) {
+    const s = h / 300;
+    const T = (k) => { k.translate(x, y); k.scale(s, s); k.transform(1, 0, -0.07, 1, 0, 0); };
+    const P = (d) => new Path2D(d);
+    const pinta = (d, cor, alfa, macio, n, beira = 0.7, variar) => aguada(ctx, P(d), cor, { alfa, macio, beira, transformar: T, semente: semente + n, variar });
+    // a sombra no chão
+    pinta('M-70 -2 C-40 -12 60 -12 90 -2 C60 8 -40 8 -70 -2 Z', '#8f8a7c', 0.3, 7, 1);
+    // os pés: um no chão, o outro saindo (só o calcanhar e a sola)
+    pinta('M-26 -4 C-26 -12 -12 -14 -6 -10 L-6 -2 Z M10 -14 C12 -22 26 -22 28 -14 L26 -8 C20 -10 14 -10 10 -10 Z', '#4f493f', 0.8, 0.8, 2);
+    // a túnica, de costas, abrindo para a barra, com o passo marcando um lado
+    const tunica = 'M-9 -250 C-20 -246 -32 -240 -36 -226 C-40 -180 -46 -104 -52 -12 C-30 -4 20 -2 48 -12 C44 -100 42 -176 38 -226 C34 -240 22 -246 9 -250 C4 -252 -4 -252 -9 -250 Z';
+    pinta(tunica, '#cfc6b1', 0.95, 0.6, 3, 1.5, [-30, -200, 40, -60]);
+    pinta('M18 -236 C30 -200 34 -120 38 -14 L48 -12 C44 -100 42 -176 38 -226 C34 -238 26 -244 18 -236 Z', '#978d78', 0.55, 2.2, 15);
+    // as dobras: a perna que avança, o meio das costas e a sombra da barra
+    pinta('M-14 -130 C-16 -90 -20 -50 -26 -8 L-16 -6 C-12 -50 -12 -90 -14 -130 Z', '#8f8878', 0.5, 1.6, 4, 1.2);
+    pinta('M8 -150 C12 -100 18 -50 26 -10 L34 -10 C26 -52 18 -100 8 -150 Z', '#8f8878', 0.45, 1.6, 5, 1.2);
+    pinta('M-50 -12 C-30 -4 20 -2 48 -12 L46 -22 C20 -12 -30 -14 -48 -22 Z', '#8a8373', 0.45, 2.5, 6);
+    // o manto: desce do ombro direito, cruza as costas até o quadril esquerdo e cai
+    const manto = 'M12 -250 C30 -244 40 -230 42 -200 C44 -150 46 -100 48 -60 C38 -56 30 -58 26 -64 C24 -86 22 -104 20 -122 C2 -116 -20 -122 -36 -138 C-24 -170 -10 -222 12 -250 Z';
+    pinta(manto, '#a59a82', 0.78, 0.6, 7, 1.6, [30, -240, -30, -100]);
+    pinta('M-34 -140 C-16 -126 4 -122 20 -126 L20 -118 C2 -112 -20 -118 -38 -134 Z', '#6b6150', 0.45, 1.5, 8);
+    pinta('M34 -200 C38 -150 42 -110 46 -64 L48 -60 C46 -100 44 -150 40 -200 Z', '#6b6150', 0.4, 1.5, 9);
+    pinta('M2 -220 C-6 -190 -14 -160 -22 -136 L-16 -134 C-8 -160 0 -190 6 -218 Z', '#7c725f', 0.35, 1.5, 16);
+    // a carga no ombro, atrás do braço e da cabeça
+    if (carga) carga();
+    // o braço direito erguido, a manga larga caindo, a mão na carga
+    pinta('M24 -236 C36 -240 44 -252 46 -268 C48 -276 40 -280 36 -274 C34 -262 28 -254 18 -248 Z', '#aea791', 0.95, 1.2, 10, 0.8);
+    pinta('M42 -270 C42 -280 50 -286 56 -280 C58 -274 52 -268 46 -268 Z', '#b3a48c', 0.9, 1, 11);
+    // a cabeça de costas: só o cabelo, comprido, caindo entre os ombros
+    pinta('M-13 -268 C-14 -284 -6 -292 1 -292 C10 -292 15 -284 14 -268 C14 -256 12 -242 8 -232 C3 -229 -4 -229 -8 -232 C-12 -242 -13 -256 -13 -268 Z', '#463f35', 0.9, 1.1, 12, 0.8, [-10, -290, 10, -230]);
+  }
+  // Deus do impossível: como a referência do dono, IMPOSSÍVEL escrito no papel claro e o IM
+  // tirado da palavra, levado no ombro por uma figura pequena de Jesus em aquarela, andando
+  // para fora: sem o IM, fica POSSÍVEL. A exceção à proibição de figura humana é do dono,
+  // só nesta arte. "Deus do" em Literata itálica, a referência à mão. Fechamento: o IM indo
+  // embora (e a marca fraca de onde ele estava).
+  function arteImpossivel(ctx) {
+    const r = sorteio(1740);
+    fundoPapel(ctx, '#efeae0', 1740);
+    manchas(ctx, r, 18, { aClaro: 0.10, aEscuro: 0.03, claro: '255,253,245', escuro: '120,105,80' });
+    const tinta = '#2d2a22';
+    const fonte = (t) => '500 ' + t + 'px Literata, Georgia, serif';
+    const esp = 0.06;
+    const tP = caber(ctx, 'IMPOSSÍVEL', fonte, 940, 220, esp);
+    const base = 1170;
+    const wTudo = larguraDe(ctx, 'IMPOSSÍVEL', fonte(tP), tP * esp);
+    const wIM = larguraDe(ctx, 'IM', fonte(tP), tP * esp) + tP * esp;
+    const x0 = (L - wTudo) / 2;
+    S.escrever(ctx, 'Deus do', x0 + wTudo - 6, base - tP * 0.98, 'italic 500 84px Literata, Georgia, serif', tinta, { alinhar: 'right' });
+    // a marca fraca de onde o IM estava
+    ctx.save();
+    ctx.globalAlpha = 0.07;
+    S.escrever(ctx, 'IM', x0, base, fonte(tP), tinta, { alinhar: 'left', espaco: tP * esp });
+    ctx.restore();
+    // POSSÍVEL, em tinta, com a tinta falhando de leve
+    const { c, ctx: k } = camada();
+    S.escrever(k, 'POSSÍVEL', x0 + wIM, base, fonte(tP), tinta, { alinhar: 'left', espaco: tP * esp });
+    gastar(c, { x: 0, y: base - tP, w: L, h: tP * 1.2 }, { pontos: 900, manchas: 0, riscos: 0, semente: 1741, forca: 0.3 });
+    ctx.drawImage(c, 0, 0);
+    // a figura anda na linha de base da palavra, saindo pela esquerda com o IM no ombro
+    const fx = 160;
+    const fy = base + 2;
+    const h = 290;
+    figuraEmAquarela(ctx, fx, fy, h, () => {
+      ctx.save();
+      ctx.translate(fx + h * 0.03, fy - h * 0.80);
+      ctx.rotate(-0.26);
+      ctx.shadowColor = 'rgba(60,50,30,.22)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 8;
+      S.escrever(ctx, 'IM', 0, 0, fonte(tP * 0.86), tinta, { alinhar: 'left', espaco: tP * esp });
+      ctx.restore();
+    }, 1742);
+    ctx.fillStyle = '#5c5a52';
+    aMao(ctx, 'Lucas 1.37', x0 + wTudo - 4, base + 96, 46, r, { alinhar: 'right' });
+  }
+  // Um ponto de fogo: o miolo branco, quase uma chama de vela pequena (a gota de luz), o
+  // halo amarelo que vaza em volta e o risco de brilho na horizontal, tudo somando luz.
+  function pontoDeFogo(ctx, x, y, R) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const halo = ctx.createRadialGradient(x, y, 0, x, y, R * 2.4);
+    halo.addColorStop(0, 'rgba(255,196,77,.55)');
+    halo.addColorStop(0.35, 'rgba(255,170,50,.22)');
+    halo.addColorStop(1, 'rgba(255,150,40,0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(x - R * 2.4, y - R * 2.4, R * 4.8, R * 4.8);
+    // o risco de brilho
+    const risco = ctx.createLinearGradient(x - R * 2.6, 0, x + R * 2.6, 0);
+    risco.addColorStop(0, 'rgba(255,220,150,0)');
+    risco.addColorStop(0.5, 'rgba(255,236,190,.55)');
+    risco.addColorStop(1, 'rgba(255,220,150,0)');
+    ctx.fillStyle = risco;
+    ctx.fillRect(x - R * 2.6, y - 2.5, R * 5.2, 5);
+    // a gota de luz: a chama pequena, de ponta para cima, com o miolo branco
+    ctx.filter = 'blur(' + (R * 0.08).toFixed(1) + 'px)';
+    const gota = new Path2D();
+    gota.moveTo(x, y - R * 0.95);
+    gota.bezierCurveTo(x + R * 0.18, y - R * 0.5, x + R * 0.42, y - R * 0.05, x + R * 0.36, y + R * 0.28);
+    gota.bezierCurveTo(x + R * 0.3, y + R * 0.55, x - R * 0.3, y + R * 0.55, x - R * 0.36, y + R * 0.28);
+    gota.bezierCurveTo(x - R * 0.42, y - R * 0.05, x - R * 0.18, y - R * 0.5, x, y - R * 0.95);
+    const g = ctx.createRadialGradient(x, y + R * 0.15, 0, x, y, R * 0.8);
+    g.addColorStop(0, 'rgba(255,255,245,1)');
+    g.addColorStop(0.45, 'rgba(255,226,150,.95)');
+    g.addColorStop(1, 'rgba(255,170,40,.4)');
+    ctx.fillStyle = g;
+    ctx.fill(gota);
+    ctx.filter = 'none';
+    ctx.restore();
+  }
+  // Fogo em seus olhos: no preto, FOGO enorme e OLHOS enorme em Oswald creme, e no lugar
+  // dos dois O de OLHOS, os olhos de fogo: dentro de cada O, um ponto de luz que queima,
+  // com o halo vazando na letra e o calor fraco no escuro. "EM SEUS" numa etiqueta creme
+  // entre as duas e o versículo citado embaixo (Apocalipse 2.18, NBV, palavra por palavra).
+  // Os rabiscos da referência saíram (no teste, pareciam fios). Nada de olho desenhado. Fechamento: os
+  // dois pontos de fogo.
+  function arteOlhos(ctx) {
+    const r = sorteio(1750);
+    ctx.fillStyle = '#0b0b0a';
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 24, { aClaro: 0.03, aEscuro: 0.06, claro: '230,225,210', escuro: '0,0,0' });
+    const os = (t) => oswaldLP(t, 700);
+    const x0 = 84;
+    const larg = L - 2 * x0;
+    let tF = caber(ctx, 'FOGO', os, larg, 460, -0.01);
+    ctx.font = os(tF);
+    tF *= Math.min(1, 300 / ctx.measureText('F').actualBoundingBoxAscent);
+    ctx.font = os(tF);
+    const capF = ctx.measureText('F').actualBoundingBoxAscent;
+    const yF = 586 + capF;
+    S.escrever(ctx, 'FOGO', x0 - 6, yF, os(tF), LP.creme, { alinhar: 'left', espaco: -tF * 0.01 });
+    // OLHOS, com o mesmo corpo
+    let tO = caber(ctx, 'OLHOS', os, larg, 460, -0.01);
+    ctx.font = os(tO);
+    tO *= Math.min(1, 262 / ctx.measureText('O').actualBoundingBoxAscent);
+    ctx.font = os(tO);
+    const capO = ctx.measureText('O').actualBoundingBoxAscent;
+    const yO = yF + 112 + capO;
+    // o calor dos olhos no escuro em volta da palavra
+    const quente = ctx.createRadialGradient(L / 2, yO - capO / 2, 0, L / 2, yO - capO / 2, 620);
+    quente.addColorStop(0, 'rgba(255,170,50,.13)');
+    quente.addColorStop(1, 'rgba(255,170,50,0)');
+    ctx.fillStyle = quente;
+    ctx.fillRect(0, 0, L, A);
+    S.escrever(ctx, 'OLHOS', x0 - 6, yO, os(tO), LP.creme, { alinhar: 'left', espaco: -tO * 0.01 });
+    // a etiqueta EM SEUS, torta, entre as duas palavras, à direita
+    ctx.save();
+    ctx.translate(L - x0 - 150, yF + 62);
+    ctx.rotate(-0.06);
+    ctx.fillStyle = LP.creme;
+    ctx.fillRect(-150, -42, 300, 84);
+    S.escrever(ctx, 'EM SEUS', 0, 24, os(66), '#0b0b0a', { espaco: 3 });
+    ctx.restore();
+    // os olhos: o meio de cada O de OLHOS
+    ctx.font = os(tO);
+    const esp = -tO * 0.01;
+    const meioDe = (antes, letra) => x0 - 6 + ctx.measureText(antes).width + esp * antes.length + ctx.measureText(letra).width / 2;
+    const wO = ctx.measureText('O').width;
+    for (const antes of ['', 'OLH']) pontoDeFogo(ctx, meioDe(antes, 'O'), yO - capO / 2, wO * 0.24);
+    // o versículo
+    const citacao = '“Esta é uma mensagem que vem do Filho de Deus, cujos olhos penetram como labaredas de fogo, cujos pés brilham como o bronze reluzente.”';
+    const fonteC = 'italic 400 31px Literata, Georgia, serif';
+    ctx.font = fonteC;
+    const linhas = [];
+    let atual = '';
+    for (const p of citacao.split(' ')) {
+      const t = atual ? atual + ' ' + p : p;
+      if (atual && ctx.measureText(t).width > larg) { linhas.push(atual); atual = p; } else atual = t;
+    }
+    linhas.push(atual);
+    linhas.forEach((l, i) => S.escrever(ctx, l, x0, yO + 72 + i * 42, fonteC, '#c9c6b8', { alinhar: 'left' }));
+    referencia(ctx, 'Apocalipse 2.18', x0, yO + 72 + linhas.length * 42 + 8, 26, LP.amarelo, 'left');
+  }
+  // Um texto que dá a volta inteira no círculo, começando no alto e indo no sentido do
+  // relógio, com o espaço entre as letras ajustado para fechar a volta.
+  function anelDeTexto(ctx, texto, cx, cy, raio, fonte, cor) {
+    ctx.save();
+    ctx.font = fonte;
+    ctx.fillStyle = cor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    const letras = [...texto];
+    const larg = letras.map((l) => ctx.measureText(l).width);
+    const soma = larg.reduce((a, b) => a + b, 0);
+    const extra = (Math.PI * 2 * raio - soma) / letras.length;
+    let a = -Math.PI / 2;
+    letras.forEach((l, i) => {
+      const passo = (larg[i] + extra) / raio;
+      const meio = a + passo / 2;
+      ctx.save();
+      ctx.translate(cx + Math.cos(meio) * raio, cy + Math.sin(meio) * raio);
+      ctx.rotate(meio + Math.PI / 2);
+      ctx.fillText(l, 0, 0);
+      ctx.restore();
+      a += passo;
+    });
+    ctx.restore();
+  }
+  // O relevo seco: o desenho (na camada m, em qualquer cor) vira papel levantado, com a luz
+  // de cima à esquerda (a beirada clara) e a sombra de baixo à direita. fundo: rebaixado
+  // (o contrário, como um carimbo prensado).
+  function relevoSeco(ctx, m, cor, { altura = 3, fundo = false, sombra = 'rgba(40,52,18,.55)', luz = 'rgba(250,255,232,.85)' } = {}) {
+    const d = fundo ? -1 : 1;
+    const pinta = (dx, dy, c, borra) => {
+      const { c: t, ctx: k } = camada();
+      k.filter = 'blur(' + borra + 'px)';
+      k.drawImage(m, dx, dy);
+      k.filter = 'none';
+      k.globalCompositeOperation = 'source-in';
+      k.fillStyle = c;
+      k.fillRect(0, 0, L, A);
+      ctx.drawImage(t, 0, 0);
+    };
+    pinta(altura * d, altura * d, sombra, altura * 0.9);
+    pinta(-altura * 0.8 * d, -altura * 0.8 * d, luz, altura * 0.6);
+    pinta(0, 0, cor, 0.6);
+  }
+  // Venha o seu reino.: o selo em relevo seco no cartão sálvia grosso, como o selo de um
+  // documento: o disco levantado, a volta de contas, o anel com a continuação do versículo
+  // (Mateus 6.10, NBV: "Que a sua vontade seja feita aqui na terra, como é feita no céu.")
+  // entre pontos, e no meio VENHA O / SEU REINO. em Literata, prensado e com tinta. Tudo no
+  // mesmo papel: só a luz rasante mostra o desenho. Diferente do círculo de Jesus salva (a
+  // letra inchada em tinta no amarelo). Fechamento: as contas e os pontos do anel.
+  function arteReino(ctx) {
+    const r = sorteio(1760);
+    const papel = '#c6d68a';
+    ctx.fillStyle = papel;
+    ctx.fillRect(0, 0, L, A);
+    const luzJanela = ctx.createLinearGradient(0, 0, L, A);
+    luzJanela.addColorStop(0, 'rgba(250,255,230,.30)');
+    luzJanela.addColorStop(0.6, 'rgba(250,255,230,0)');
+    luzJanela.addColorStop(1, 'rgba(50,62,20,.20)');
+    ctx.fillStyle = luzJanela;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 30, { aClaro: 0.06, aEscuro: 0.04, claro: '250,255,235', escuro: '60,72,25' });
+    for (let i = 0; i < 900; i++) {
+      ctx.strokeStyle = r() < 0.6 ? 'rgba(60,72,25,' + (0.05 + r() * 0.08).toFixed(3) + ')' : 'rgba(250,255,235,' + (0.1 + r() * 0.15).toFixed(3) + ')';
+      ctx.lineWidth = 0.7 + r() * 0.8;
+      const x = r() * L;
+      const y = r() * A;
+      const a = r() * Math.PI;
+      const c = 5 + r() * 16;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + Math.cos(a) * c * 0.5 + r() * 3, y + Math.sin(a) * c * 0.5 + r() * 3, x + Math.cos(a) * c, y + Math.sin(a) * c);
+      ctx.stroke();
+    }
+    const cx = L / 2;
+    const cy = 1020;
+    const R = 400;
+    // 1) o disco inteiro, levantado de leve, com a borda em ondas miúdas (a prensa)
+    const disco = camada();
+    disco.ctx.fillStyle = '#000';
+    disco.ctx.beginPath();
+    for (let i = 0; i <= 240; i++) {
+      const t = i / 240 * Math.PI * 2;
+      const rr = R + Math.cos(t * 60) * 5;
+      const x = cx + Math.cos(t) * rr;
+      const y = cy + Math.sin(t) * rr;
+      if (i) disco.ctx.lineTo(x, y); else disco.ctx.moveTo(x, y);
+    }
+    disco.ctx.closePath();
+    disco.ctx.fill();
+    relevoSeco(ctx, disco.c, '#cad991', { altura: 6 });
+    // 2) os filetes, as contas e o anel de texto, mais altos
+    const anel = camada();
+    const k = anel.ctx;
+    k.strokeStyle = '#000';
+    k.fillStyle = '#000';
+    for (const [rr, w] of [[R - 26, 5], [R - 112, 3], [R - 124, 7]]) {
+      k.lineWidth = w;
+      k.beginPath();
+      k.arc(cx, cy, rr, 0, Math.PI * 2);
+      k.stroke();
+    }
+    for (let i = 0; i < 96; i++) {
+      const t = i / 96 * Math.PI * 2;
+      k.beginPath();
+      k.arc(cx + Math.cos(t) * (R - 44), cy + Math.sin(t) * (R - 44), 4.2, 0, Math.PI * 2);
+      k.fill();
+    }
+    anelDeTexto(k, 'QUE A SUA VONTADE SEJA FEITA AQUI NA TERRA, COMO É FEITA NO CÉU.  •  MATEUS 6.10  •  ', cx, cy, R - 96, '500 30px Oswald, sans-serif', '#000');
+    relevoSeco(ctx, anel.c, '#d0de98', { altura: 3 });
+    // 3) o meio prensado (rebaixado) e com tinta: VENHA O / SEU REINO.
+    const meio = camada();
+    const lit = (t) => '600 ' + t + 'px Literata, Georgia, serif';
+    const tV = caber(meio.ctx, 'SEU REINO.', lit, R * 1.25, 110, 0.02);
+    S.escrever(meio.ctx, 'VENHA O', cx, cy - 14, lit(tV), '#000', { espaco: tV * 0.04 });
+    S.escrever(meio.ctx, 'SEU REINO.', cx, cy + tV * 0.98, lit(tV), '#000', { espaco: tV * 0.02 });
+    // os ramos de pontos acima e abaixo do texto
+    for (const [y, n] of [[cy - tV * 1.25, 5], [cy + tV * 1.48, 5]]) {
+      for (let i = 0; i < n; i++) {
+        meio.ctx.beginPath();
+        meio.ctx.arc(cx + (i - (n - 1) / 2) * 26, y, i === (n - 1) / 2 ? 6 : 3.5, 0, Math.PI * 2);
+        meio.ctx.fill();
+      }
+    }
+    relevoSeco(ctx, meio.c, '#25301a', { altura: 2.2, fundo: true, sombra: 'rgba(30,40,12,.6)', luz: 'rgba(245,252,225,.9)' });
+  }
+  // O contorno de uma chama de três pontas, com a base em (cx, yb), largura w e altura h,
+  // encolhido por k em volta de um ponto perto da base (para os contornos de dentro), e a
+  // ondulação que muda com k (os contornos não ficam paralelos demais).
+  function contornoDeChama(cx, yb, w, h, k, onda) {
+    const ax = cx;
+    const ay = yb - h * 0.04;
+    const ky = Math.pow(k, 0.62);
+    const q = (x, y) => [ax + (x - ax) * k + Math.sin(y * 0.025 + onda) * 7 * k * (1 - (yb - y) / h * 0.3), ay + (y - ay) * ky];
+    const p = new Path2D();
+    const pts = [
+      [cx - w * 0.5, yb - h * 0.1], [cx - w * 0.62, yb - h * 0.42], [cx - w * 0.34, yb - h * 0.58], [cx - w * 0.36, yb - h * 0.74],
+      [cx - w * 0.2, yb - h * 0.62], [cx - w * 0.14, yb - h * 0.86], [cx + w * 0.02, yb - h], [cx + w * 0.04, yb - h * 0.8],
+      [cx + w * 0.16, yb - h * 0.62], [cx + w * 0.34, yb - h * 0.8], [cx + w * 0.3, yb - h * 0.6], [cx + w * 0.58, yb - h * 0.44],
+      [cx + w * 0.5, yb - h * 0.1], [cx + w * 0.3, yb + h * 0.02], [cx - w * 0.3, yb + h * 0.02],
+    ].map(([x, y]) => q(x, y));
+    p.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i];
+      const b = pts[(i + 1) % pts.length];
+      p.quadraticCurveTo(a[0], a[1], (a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+    }
+    p.closePath();
+    return p;
+  }
+  // O altar de pedra em gravura de raspagem (linhas claras no escuro): a frente de blocos
+  // assentados, cada bloco com as linhas horizontais mais grossas onde a luz do fogo bate
+  // (em cima), o lado na sombra com linhas verticais finas, o tampo e os quatro chifres.
+  function altarGravado(ctx, x0, x1, yTopo, yBase, fundoLado, r, cor) {
+    const alturaTampo = 46;
+    const yF = yTopo + alturaTampo;
+    // o lado direito, recuando, na sombra
+    ctx.save();
+    const lado = new Path2D();
+    lado.moveTo(x1, yF);
+    lado.lineTo(x1 + fundoLado, yF - alturaTampo * 0.7);
+    lado.lineTo(x1 + fundoLado, yBase - alturaTampo * 0.7);
+    lado.lineTo(x1, yBase);
+    lado.closePath();
+    ctx.clip(lado);
+    for (let x = x1 + 3; x < x1 + fundoLado; x += 7) {
+      const pts = [];
+      for (let y = yF - 40; y < yBase + 4; y += 6) pts.push([x + Math.sin(y * 0.05) * 0.8, y]);
+      linhaDeBuril(ctx, pts, (px, py) => 0.4 + 1.6 * (1 - (py - yF) / (yBase - yF)) * (1 - (px - x1) / fundoLado), cor);
+    }
+    ctx.restore();
+    // o tampo, visto de cima, iluminado pelo fogo
+    ctx.save();
+    const tampo = new Path2D();
+    tampo.moveTo(x0, yF);
+    tampo.lineTo(x0 + fundoLado, yTopo - alturaTampo * 0.3);
+    tampo.lineTo(x1 + fundoLado, yTopo - alturaTampo * 0.3);
+    tampo.lineTo(x1, yF);
+    tampo.closePath();
+    ctx.clip(tampo);
+    for (let y = yTopo - 40; y < yF + 2; y += 5) {
+      const pts = [];
+      for (let x = x0; x <= x1 + fundoLado; x += 6) pts.push([x, y + (x - x0) * -0.0 + Math.sin(x * 0.04) * 0.6]);
+      linhaDeBuril(ctx, pts, (px) => 1.6 + 1.6 * (1 - Math.abs(px - (x0 + x1 + fundoLado) / 2) / ((x1 - x0) * 0.7)), cor);
+    }
+    ctx.restore();
+    // a frente: fiadas de blocos, cada bloco com as próprias linhas
+    const fiadas = 4;
+    const hF = (yBase - yF) / fiadas;
+    for (let f = 0; f < fiadas; f++) {
+      const ya = yF + f * hF;
+      let x = x0 - (f % 2 ? 40 : 0);
+      while (x < x1) {
+        const w = 90 + r() * 70;
+        const bx0 = Math.max(x0, x) + 4;
+        const bx1 = Math.min(x1, x + w) - 4;
+        const by0 = ya + 4;
+        const by1 = ya + hF - 4;
+        if (bx1 - bx0 > 20) {
+          ctx.save();
+          const bloco = new Path2D();
+          const m = () => (r() - 0.5) * 5;
+          bloco.moveTo(bx0 + m(), by0 + m());
+          bloco.lineTo(bx1 + m(), by0 + m());
+          bloco.lineTo(bx1 + m(), by1 + m());
+          bloco.lineTo(bx0 + m(), by1 + m());
+          bloco.closePath();
+          ctx.clip(bloco);
+          const luzF = 1 - f / fiadas * 0.75;
+          for (let y = by0 + 2; y < by1; y += 5.5) {
+            const pts = [];
+            for (let xx = bx0; xx <= bx1; xx += 6) pts.push([xx, y + Math.sin(xx * 0.07 + y) * 0.7]);
+            // mais claro no alto de cada bloco (a quina pega luz) e perto do meio
+            const t = (y - by0) / (by1 - by0);
+            linhaDeBuril(ctx, pts, (px) => Math.max(0, (2.3 - t * 1.7) * luzF * (1.15 - Math.abs(px - (x0 + x1) / 2) / (x1 - x0)) + (r() - 0.5) * 0.4), cor);
+          }
+          ctx.restore();
+        }
+        x += w;
+      }
+    }
+    // os quatro chifres nos cantos do tampo (os de trás menores)
+    const chifre = (x, y, s) => {
+      ctx.save();
+      const p = new Path2D();
+      p.moveTo(x - 22 * s, y);
+      p.quadraticCurveTo(x - 20 * s, y - 40 * s, x - 4 * s, y - 58 * s);
+      p.quadraticCurveTo(x + 6 * s, y - 40 * s, x + 22 * s, y);
+      p.closePath();
+      ctx.save();
+      ctx.strokeStyle = cor;
+      ctx.lineWidth = 2.4;
+      ctx.stroke(p);
+      ctx.restore();
+      ctx.clip(p);
+      for (let xx = x - 24 * s; xx < x + 24 * s; xx += 5) {
+        linhaDeBuril(ctx, [[xx, y + 2], [xx + 2 * s, y - 30 * s], [xx + 4 * s, y - 60 * s]], () => 0.6 + 1.8 * Math.max(0, 1 - Math.abs(xx - x + 6 * s) / (22 * s)), cor);
+      }
+      ctx.restore();
+    };
+    chifre(x0 + fundoLado + 26, yTopo - alturaTampo * 0.3 + 4, 0.75);
+    chifre(x1 + fundoLado - 26, yTopo - alturaTampo * 0.3 + 4, 0.75);
+    chifre(x0 + 28, yF + 2, 1);
+    chifre(x1 - 28, yF + 2, 1);
+  }
+  // O fogo do altar deverá ser mantido continuamente aceso; não deve ser apagado.
+  // (Levítico 6.13, NBV, o versículo inteiro): gravura de raspagem no escuro, como a
+  // referência em gravura. O altar de pedra com os chifres em linhas creme e, em cima, a
+  // chama alta em contornos amarelos um dentro do outro, cada vez mais grossos e claros
+  // até o miolo: o fogo é só linha. A frase embaixo em Oswald condensada, em degraus de
+  // tamanho, CONTINUAMENTE ACESO; maior e em amarelo. Diferente do coração em gravura de
+  // Deixa queimar (tinta no papel) e dos pontos de luz de Fogo em seus olhos. Fechamento: a
+  // chama.
+  function arteAltar(ctx) {
+    const r = sorteio(1770);
+    ctx.fillStyle = '#10110f';
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 26, { aClaro: 0.025, aEscuro: 0.06, claro: '230,225,210', escuro: '0,0,0' });
+    const cx = L / 2;
+    const yAltar = 900;
+    // a luz do fogo no escuro
+    const brilho = ctx.createRadialGradient(cx, 760, 0, cx, 760, 520);
+    brilho.addColorStop(0, 'rgba(255,170,50,.20)');
+    brilho.addColorStop(1, 'rgba(255,170,50,0)');
+    ctx.fillStyle = brilho;
+    ctx.fillRect(0, 0, L, A);
+    altarGravado(ctx, 330, 700, yAltar, 1130, 64, r, '#e9e2cc');
+    // a chama: contornos de fora (finos, amarelo escuro) para dentro (grossos, quase brancos)
+    const n = 16;
+    for (let i = 0; i < n; i++) {
+      const k = 1 - i / n * 0.92;
+      const t = i / (n - 1);
+      const p = contornoDeChama(cx + 30, yAltar + 8, 300, 400, k, i * 0.45);
+      ctx.save();
+      ctx.strokeStyle = 'rgb(' + Math.round(232 + 23 * t) + ',' + Math.round(150 + 90 * t) + ',' + Math.round(40 + 170 * t) + ')';
+      ctx.lineWidth = 1.6 + t * 3.2;
+      ctx.lineJoin = 'round';
+      ctx.stroke(p);
+      ctx.restore();
+    }
+    // as fagulhas subindo
+    for (let i = 0; i < 18; i++) {
+      const x = cx + 30 + (r() - 0.5) * 360;
+      const y = 560 + r() * 140;
+      ctx.strokeStyle = 'rgba(255,196,77,' + (0.5 + r() * 0.5).toFixed(2) + ')';
+      ctx.lineWidth = 2 + r() * 1.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + (r() - 0.5) * 8, y - 8 - r() * 12);
+      ctx.stroke();
+    }
+    // a frase, em degraus
+    const os = (t) => oswaldLP(t, 700);
+    const x0 = 120;
+    const larg = L - 2 * x0;
+    const linhas = [['O FOGO DO ALTAR', LP.creme, 1], ['DEVERÁ SER MANTIDO', LP.creme, 0.5], ['CONTINUAMENTE ACESO;', LP.amarelo, 1], ['NÃO DEVE SER APAGADO.', LP.creme, 0.5]];
+    let y = 1186;
+    for (const [t, cor, peso] of linhas) {
+      const tam = caber(ctx, t, os, larg * (peso === 1 ? 0.94 : 0.6), 160, 0.03);
+      ctx.font = os(tam);
+      const cap = ctx.measureText('H').actualBoundingBoxAscent;
+      y += cap;
+      S.escrever(ctx, t, L / 2, y, os(tam), cor, { espaco: tam * 0.03 });
+      y += peso === 1 ? 16 : 14;
+    }
+    referencia(ctx, 'Levítico 6.13', L / 2, y + 30, 25, '#9a9b8e');
   }
 
   S.prepararArte = prepararArte;

@@ -123,6 +123,17 @@
     { linhas: ['Que haja Deus', 'em tudo o que', 'for meu.'], arte: 'meu' },
     { linhas: ['Deus', 'tem um plano', 'para você.'], arte: 'plano' },
     { linhas: ['Peça a Deus.', 'Confie em Deus.', 'Agradeça a Deus.'], arte: 'cubo' },
+    // Mais oito do dono (2026-10-11, rodada 17), com arte própria a partir das referências que ele
+    // mandou (só a ideia: tudo redesenhado). João 14.6, Efésios 2.8 e Lucas 1.37 são lema com a
+    // referência; Mateus 6.10 e Levítico 6.13 são o começo e o versículo inteiro, palavra por palavra (NBV).
+    { linhas: ['Jesus,', 'meu super-herói'], arte: 'heroi' },
+    { linhas: ['Jesus,', 'caminho,', 'verdade', 'e vida'], ref: 'João 14.6', arte: 'vida' },
+    { linhas: ['Deixa', 'queimar'], arte: 'queimar' },
+    { linhas: ['Foi Tua graça', 'que me salvou'], ref: 'Efésios 2.8', arte: 'graca' },
+    { linhas: ['Deus do', 'impossível'], ref: 'Lucas 1.37', arte: 'impossivel' },
+    { linhas: ['Fogo em', 'seus olhos'], ref: 'Apocalipse 2.18', arte: 'olhos' },
+    { linhas: ['Venha o', 'seu reino.'], ref: 'Mateus 6.10', arte: 'reino' },
+    { linhas: ['O fogo do altar', 'deverá ser mantido', 'continuamente aceso;', 'não deve ser', 'apagado.'], ref: 'Levítico 6.13', arte: 'altar' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir
