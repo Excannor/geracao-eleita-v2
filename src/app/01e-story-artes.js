@@ -2652,6 +2652,7 @@
     diferenca: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteDiferenca, grao: [18, 1308] },
     vivoporele: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVivoPorEle, grao: [18, 2203] },
     jesusvive: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteJesusVive, grao: [18, 3111] },
+    testemunho: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteTestemunho, grao: [18, 4747] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -3214,6 +3215,158 @@
     bibliaAberta(ctx, cx, 992, 460, r);
     palavraRecortada(ctx, [['V', 2, 1], ['I', 6, 0], ['V', 7, 2], ['E', 0, 4]], cx, 1310, 210, { r, larguraMax: 780 });
     return 1460;
+  }
+
+  // Quem não desiste tem testemunho pra contar: a partir de uma arte que o dono mandou (a letra
+  // de pincel com QUEM num retângulo à mão e alguém sentado num banco olhando o horizonte). A
+  // foto é de terceiros e figura humana desenhada não entra: fica só o lugar de quem esperou,
+  // o banco de madeira vazio visto de trás, à mão em sálvia, diante de uma linha de horizonte
+  // baixa, com o sol nascendo em amarelo (a única cor quente do desenho). A frase em Permanent
+  // Marker creme, QUEM no retângulo sálvia e PRA CONTAR. em amarelo com o risco. Sem referência.
+  // Uma linha de palavras à mão, centrada em cx, no maior tamanho até max que cabe na largura;
+  // devolve o tamanho e onde ficou cada palavra ([x, largura]).
+  const marcador = (t) => '400 ' + t + 'px "Permanent Marker", cursive';
+  function linhaPincel(ctx, palavras, cx, y, larg, max, cor, r) {
+    ctx.font = marcador(100);
+    const vao100 = ctx.measureText(' ').width * 1.1;
+    const w100 = palavras.reduce((s, p) => s + ctx.measureText(p).width, 0) + vao100 * (palavras.length - 1);
+    const tam = Math.min(max, 100 * larg / w100);
+    ctx.font = marcador(tam);
+    const vao = vao100 * tam / 100;
+    const ws = palavras.map((p) => ctx.measureText(p).width);
+    let x = cx - (ws.reduce((a, b) => a + b, 0) + vao * (palavras.length - 1)) / 2;
+    const onde = [];
+    ctx.save();
+    ctx.fillStyle = cor;
+    ctx.shadowColor = 'rgba(0,0,0,.55)';
+    ctx.shadowBlur = tam * 0.1;
+    ctx.shadowOffsetY = 4;
+    palavras.forEach((p, i) => {
+      const w = aMao(ctx, p, x, y, tam, r);
+      onde.push([x, w]);
+      x += ws[i] + vao;
+    });
+    ctx.restore();
+    return { tam, onde };
+  }
+  // O retângulo à mão em volta de uma palavra: quatro traços que passam um pouco dos cantos.
+  function caixaAMao(ctx, x0, y0, x1, y1, r) {
+    const o = 12;
+    const op = { r, largura: 5, tremor: 2.5, segunda: false };
+    tracoAMao(ctx, [[x0 - o, y0 + 1], [(x0 + x1) / 2, y0 - 2], [x1 + o * 0.6, y0 + 2]], op);
+    tracoAMao(ctx, [[x1 + 1, y0 - o * 0.7], [x1 + 3, (y0 + y1) / 2], [x1, y1 + o]], op);
+    tracoAMao(ctx, [[x1 + o, y1 + 2], [(x0 + x1) / 2, y1 + 4], [x0 - o * 0.5, y1]], op);
+    tracoAMao(ctx, [[x0 - 1, y1 + o * 0.6], [x0 + 1, (y0 + y1) / 2], [x0 - 2, y0 - o]], op);
+  }
+  // O sol nascendo: meio disco riscado à mão sobre o horizonte (yh), com o brilho fraco e os
+  // raios curtos, em amarelo.
+  function solNascendo(ctx, cx, yh, raio, r) {
+    ctx.save();
+    const g = ctx.createRadialGradient(cx, yh, raio * 0.4, cx, yh, raio * 3.4);
+    g.addColorStop(0, 'rgba(255,196,77,.22)');
+    g.addColorStop(1, 'rgba(255,196,77,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.rect(cx - raio * 3.6, yh - raio * 3.6, raio * 7.2, raio * 3.6);
+    ctx.fill();
+    ctx.restore();
+    const cor = LP.amarelo;
+    tracoAMao(ctx, pontosElipse(cx, yh, raio, raio, { de: Math.PI, ate: Math.PI * 2, n: 14, r, mexe: 0.03 }), { r, largura: 6, tremor: 2, cor });
+    // os raios, mais curtos perto do horizonte
+    for (let i = 0; i < 9; i++) {
+      const a = Math.PI + Math.PI * (i + 0.5) / 9;
+      const lado = Math.abs(Math.cos(a));
+      const d0 = raio * 1.28;
+      const d1 = raio * (1.28 + 0.42 - lado * 0.18 + (i % 2 ? -0.08 : 0.04));
+      tracoAMao(ctx, [[cx + Math.cos(a) * d0, yh + Math.sin(a) * d0], [cx + Math.cos(a) * d1, yh + Math.sin(a) * d1]], { r, largura: 5, tremor: 1.5, cor, segunda: false });
+    }
+  }
+  // O horizonte: um risco à mão baixo, que some nas pontas, com um morro distante bem fraco.
+  function horizonte(ctx, yh, x0, x1, r) {
+    const n = 8;
+    for (let i = 0; i < n; i++) {
+      const a = x0 + (x1 - x0) * i / n;
+      const b = x0 + (x1 - x0) * (i + 1) / n + 6;
+      const m = 1 - Math.abs((i + 0.5) / n - 0.5) * 2; // 1 no meio, 0 nas pontas
+      tracoAMao(ctx, [[a, yh + (r() - 0.5) * 2], [(a + b) / 2, yh + (r() - 0.5) * 3], [b, yh + (r() - 0.5) * 2]],
+        { r, largura: 4, tremor: 1.5, segunda: false, cor: 'rgba(200,218,140,' + (0.12 + m * 0.7).toFixed(2) + ')' });
+    }
+    tracoAMao(ctx, [[x0 + 60, yh - 2], [x0 + 200, yh - 34], [x0 + 330, yh - 18], [x0 + 420, yh - 3]],
+      { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.22)' });
+    tracoAMao(ctx, [[x1 - 380, yh - 2], [x1 - 260, yh - 24], [x1 - 120, yh - 14], [x1 - 40, yh - 1]],
+      { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.18)' });
+  }
+  // O banco de madeira visto de trás: a tábua do assento com a beirada de cima, os veios e um
+  // nó, nas duas pernas de tábua; o miolo pintado de preto para tapar o que fica atrás. (cx, y)
+  // é o meio da beirada de cima do assento; w a largura; o chão fica em y + alt.
+  function bancoDeTras(ctx, cx, y, w, alt, r) {
+    const e = w * 0.052; // a espessura da tábua
+    const fundoTab = (x0, y0, x1, y1) => { ctx.fillStyle = LP.preto; ctx.fillRect(x0, y0, x1 - x0, y1 - y0); };
+    const x0 = cx - w / 2;
+    const x1 = cx + w / 2;
+    const op = { r, largura: 6, tremor: 2.5 };
+    // as pernas, um pouco para dentro das pontas e levemente abertas
+    for (const [px, abre] of [[x0 + w * 0.11, -1], [x1 - w * 0.11, 1]]) {
+      const lw = w * 0.052;
+      fundoTab(px - lw / 2, y + e, px + lw / 2, y + alt);
+      tracoAMao(ctx, [[px - lw / 2, y + e], [px - lw / 2 + abre * 2, y + alt * 0.6], [px - lw / 2 + abre * 4, y + alt]], op);
+      tracoAMao(ctx, [[px + lw / 2, y + e], [px + lw / 2 + abre * 2, y + alt * 0.6], [px + lw / 2 + abre * 4, y + alt]], op);
+      // um veio na perna
+      tracoAMao(ctx, [[px + abre * 3, y + e + alt * 0.18], [px + abre * 4, y + alt * 0.5]], { r, largura: 2.5, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.5)' });
+    }
+    // a travessa entre as pernas, por trás
+    tracoAMao(ctx, [[x0 + w * 0.136, y + alt * 0.66], [cx, y + alt * 0.645], [x1 - w * 0.136, y + alt * 0.66]], { r, largura: 4, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.6)' });
+    // o assento: a beirada de cima (a tábua vista um pouco de cima) e a face de trás
+    const topo = e * 0.42;
+    fundoTab(x0, y - topo, x1, y + e);
+    tracoAMao(ctx, [[x0 + 8, y - topo], [cx, y - topo - 2], [x1 - 6, y - topo + 1]], op);
+    tracoAMao(ctx, [[x1 - 6, y - topo + 1], [x1 + 1, y], [x1, y + e * 0.5], [x1 - 1, y + e]], op);
+    tracoAMao(ctx, [[x1 - 1, y + e], [cx, y + e + 2], [x0 + 1, y + e]], op);
+    tracoAMao(ctx, [[x0 + 1, y + e], [x0 - 1, y + e * 0.5], [x0, y], [x0 + 8, y - topo]], op);
+    tracoAMao(ctx, [[x0 + 2, y + 1], [cx * 0.6 + x0 * 0.4, y + 2], [x1 - 2, y]], { r, largura: 3.5, tremor: 1.5, segunda: false });
+    // os veios da madeira e o nó
+    const veio = { r, largura: 2.5, tremor: 1.2, segunda: false, cor: 'rgba(200,218,140,.55)' };
+    tracoAMao(ctx, [[x0 + w * 0.05, y + e * 0.42], [x0 + w * 0.3, y + e * 0.38], [x0 + w * 0.46, y + e * 0.48]], veio);
+    tracoAMao(ctx, [[x0 + w * 0.56, y + e * 0.66], [x0 + w * 0.78, y + e * 0.6], [x1 - w * 0.04, y + e * 0.68]], veio);
+    tracoAMao(ctx, [[x0 + w * 0.2, y + e * 0.74], [x0 + w * 0.38, y + e * 0.72]], veio);
+    tracoAMao(ctx, pontosElipse(x0 + w * 0.52, y + e * 0.5, w * 0.022, e * 0.16, { n: 10, r, mexe: 0.15 }), { ...veio, fechar: true });
+    // o chão: riscos curtos de capim nos pés e a sombra do banco
+    tracoAMao(ctx, [[x0 + w * 0.02, y + alt + 4], [cx, y + alt + 8], [x1 - w * 0.02, y + alt + 3]], { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.3)' });
+    for (const px of [x0 + w * 0.11, x1 - w * 0.11]) {
+      for (const d of [-0.07, -0.045, 0.05, 0.075]) {
+        const bx = px + w * d;
+        tracoAMao(ctx, [[bx, y + alt + 4], [bx + d * 60, y + alt - 14 - r() * 8]], { r, largura: 3, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.55)' });
+      }
+    }
+  }
+  function frasePincel(ctx, cx, y, larg, maxes, r) {
+    const linhas = [[['QUEM', 'NÃO'], maxes[0]], [['DESISTE', 'TEM'], maxes[1]], [['TESTEMUNHO'], maxes[2]]];
+    linhas.forEach(([palavras, max], i) => {
+      ctx.font = marcador(max);
+      y += (i ? max * 0.08 : 0) + max * 0.84;
+      const { tam, onde } = linhaPincel(ctx, palavras, cx, y, larg, max, LP.creme, r);
+      y += tam * 0.12 - max * 0.12;
+      if (i === 0) caixaAMao(ctx, onde[0][0] - 16, y - tam * 0.86, onde[0][0] + onde[0][1] + 12, y + tam * 0.1, r);
+    });
+    y += maxes[3] * 0.24 + maxes[3] * 0.84;
+    const { tam, onde } = linhaPincel(ctx, ['PRA', 'CONTAR.'], cx, y, larg * 0.84, maxes[3], LP.amarelo, r);
+    const xa = onde[0][0];
+    const xb = onde[1][0] + onde[1][1];
+    riscoLanding(ctx, xa - 8, y + tam * 0.2, xb - xa + 18, 22, LP.amarelo);
+    return y + tam * 0.2;
+  }
+  function arteTestemunho(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(4747);
+    const cx = L / 2;
+    // como na arte: a frase no céu e o banco embaixo, de frente para o sol que nasce (a outra
+    // variante, o banco em cima e a frase embaixo, apertava a frase e perdia a força dela)
+    const fim = frasePincel(ctx, cx, 586, 840, [138, 138, 148, 110], r);
+    const yh = fim + 118;
+    solNascendo(ctx, cx + 20, yh, 54, r);
+    horizonte(ctx, yh, 70, L - 70, r);
+    bancoDeTras(ctx, cx, yh + 78, 620, 150, r);
+    return yh + 232;
   }
 
   S.prepararArte = prepararArte;
