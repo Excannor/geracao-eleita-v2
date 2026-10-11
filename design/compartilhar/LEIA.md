@@ -171,3 +171,10 @@ amarelo como a única cor quente), sem figura humana, prédio, coroa ou foto:
   uma pedra grande (quinas, arestas e o pontilhado da sombra) e estreita até o horizonte,
   onde a meta é a bandeirinha amarela. A frase embaixo, NO SEU CAMINHO. em amarelo com o
   risco. A primeira pedra, lisa e em cúpula, parecia um túnel; a de quinas lê como pedra.
+- **brasas** (Somos remanescentes): um campo de brasas apagadas, carvões cinza-escuros com a
+  cinza clara salpicada e a sombra que os assenta no chão, em perspectiva (as de trás menores
+  e mais juntas), e no meio delas oito ainda acesas, em amarelo com a borda laranja suave, a
+  crosta de cinza por cima e o brilho baixo pegando nas vizinhas. Nada de chama: são pontos de
+  brasa. Em cima, SOMOS em creme e REMANESCENTES. em amarelo com o risco. Na primeira versão
+  as brasas, claras e com a beira riscada, pareciam pedrinhas; escurecidas, leem como carvão.
+`MODELOS=virgula,semente,caminho,brasas node design/compartilhar/gerar.mjs <pasta> modelos` gera os quatro.

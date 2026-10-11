@@ -40,7 +40,7 @@
   // linha com até ~20 letras cabe numa tela de 320px (a que passar encolhe na hora).
   CC.FRASES_OFENSIVA = [
     { linhas: ['Direcionados', 'à santidade'], ref: '2 Timóteo 2.22' },
-    { linhas: ['Somos', 'remanescentes'] },
+    { linhas: ['Somos', 'remanescentes'], arte: 'brasas' },
     { linhas: ['Nele vivemos,', 'nos movemos', 'e existimos'], ref: 'Atos 17.28' },
     { linhas: ['Prepara-te,', 'Ele vem'], ref: '1 Tessalonicenses 4.16-17', arte: 'relogio' },
     { linhas: ['Até que', 'Ele venha'] },

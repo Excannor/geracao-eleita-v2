@@ -2656,6 +2656,7 @@
     virgula: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVirgula, grao: [18, 1712] },
     semente: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteSemente, grao: [18, 1606] },
     caminho: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteCaminho, grao: [18, 1414] },
+    brasas: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteBrasas, grao: [18, 1990] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -3847,6 +3848,181 @@
       { t: 'QUALQUER OBSTÁCULO', larg: 840, max: 106, vao: 26 },
       { t: 'NO SEU CAMINHO.', larg: 760, max: 126, cor: LP.amarelo, risco: true, vao: 14 },
     ], B);
+  }
+
+  // Somos remanescentes: um campo de brasas apagadas em cinza, em perspectiva (as de trás
+  // menores e mais juntas), e no meio delas umas poucas ainda acesas, em amarelo com a borda
+  // laranja suave e um brilho baixo em volta. Nada de chama: são pontos de brasa, o que
+  // sobrou e continua aceso. Em cima, SOMOS em creme e REMANESCENTES. em amarelo com o risco.
+  // Sem referência.
+  // Uma brasa: um carvão de borda irregular centrado em (x, y), largura w; apagada, em cinza
+  // com a beira de cima mais clara e as rachaduras escuras; acesa, o miolo amarelo, a borda
+  // laranja e as rachaduras brilhando.
+  function brasa(ctx, x, y, w, r, acesa) {
+    const n = 9 + Math.floor(r() * 4);
+    const h = w * (0.48 + r() * 0.16);
+    const giro = (r() - 0.5) * 0.5;
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i + r() * 0.5) / n * Math.PI * 2;
+      const k = 0.74 + r() * 0.32;
+      const px = Math.cos(a) * w / 2 * k;
+      const py = Math.sin(a) * h / 2 * k;
+      pts.push([x + px * Math.cos(giro) - py * Math.sin(giro), y + px * Math.sin(giro) + py * Math.cos(giro)]);
+    }
+    const forma = new Path2D();
+    pts.forEach(([px, py], i) => (i ? forma.lineTo(px, py) : forma.moveTo(px, py)));
+    forma.closePath();
+    ctx.save();
+    // a sombra embaixo, que assenta a brasa no chão
+    ctx.save();
+    ctx.translate(0, h * 0.2);
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.fill(forma);
+    ctx.restore();
+    if (acesa) {
+      const g = ctx.createRadialGradient(x, y - h * 0.12, 0, x, y, w * 0.6);
+      g.addColorStop(0, '#ffd772');
+      g.addColorStop(0.5, '#f6a24f');
+      g.addColorStop(1, '#c9663b');
+      ctx.fillStyle = g;
+    } else {
+      const t = Math.round(26 + r() * 20);
+      const g = ctx.createLinearGradient(0, y - h / 2, 0, y + h / 2);
+      g.addColorStop(0, 'rgb(' + (t + 22) + ',' + (t + 23) + ',' + (t + 20) + ')');
+      g.addColorStop(0.45, 'rgb(' + t + ',' + (t + 1) + ',' + (t - 2) + ')');
+      g.addColorStop(1, 'rgb(' + (t - 14) + ',' + (t - 13) + ',' + (t - 15) + ')');
+      ctx.fillStyle = g;
+    }
+    ctx.fill(forma);
+    ctx.clip(forma);
+    if (acesa) {
+      // a crosta de cinza por cima: a luz aparece nas frestas entre as placas
+      for (let i = 0; i < 4; i++) {
+        const px = x + (r() - 0.5) * w * 0.8;
+        const py = y + (r() - 0.35) * h * 0.7;
+        ctx.fillStyle = 'rgba(64,60,56,' + (0.6 + r() * 0.3).toFixed(2) + ')';
+        ctx.beginPath();
+        const m = 6;
+        for (let j = 0; j < m; j++) {
+          const a = j / m * Math.PI * 2;
+          const rr = w * (0.1 + r() * 0.1);
+          const X = px + Math.cos(a) * rr;
+          const Y = py + Math.sin(a) * rr * 0.6;
+          if (j) ctx.lineTo(X, Y); else ctx.moveTo(X, Y);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else {
+      // a cinza clara salpicada e as rachaduras escuras
+      for (let i = 0; i < 4; i++) {
+        ctx.fillStyle = 'rgba(170,172,162,' + (0.1 + r() * 0.16).toFixed(2) + ')';
+        ctx.beginPath();
+        ctx.arc(x + (r() - 0.5) * w * 0.7, y - r() * h * 0.35, Math.max(0.8, w * 0.03), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(14,14,12,.6)';
+      ctx.lineWidth = Math.max(1, w * 0.03);
+      ctx.lineCap = 'round';
+      const ax = x + (r() - 0.5) * w * 0.5;
+      const ay = y + (r() - 0.5) * h * 0.4;
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(ax + (r() - 0.5) * w * 0.4, ay + (r() - 0.5) * h * 0.5);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // O brilho baixo de uma brasa acesa, no chão em volta dela (antes das brasas, por baixo).
+  function brilhoDeBrasa(ctx, x, y, w) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(1, 0.55);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, w * 2.6);
+    g.addColorStop(0, 'rgba(255,170,80,.42)');
+    g.addColorStop(0.4, 'rgba(240,140,70,.14)');
+    g.addColorStop(1, 'rgba(240,140,70,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(-w * 2.6, -w * 2.6, w * 5.2, w * 5.2);
+    ctx.restore();
+  }
+  function arteBrasas(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(1990);
+    const cx = L / 2;
+    const fim = blocoLanding(ctx, [
+      { t: 'SOMOS', larg: 440, max: 150, peso: 600, espaco: 14, vao: 70 },
+      { t: 'REMANESCENTES.', larg: 900, max: 180, cor: LP.amarelo, risco: true, vao: 18 },
+    ], 560);
+    // o campo: d vai de 0 (o fundo) a 1 (a frente); y e o tamanho crescem com d
+    const y0 = fim + 40;
+    const y1 = 1475;
+    const yDe = (d) => y0 + (y1 - y0) * d;
+    const tamDe = (d) => 12 + Math.pow(d, 1.4) * 74;
+    // as acesas: poucas, espalhadas, nenhuma na borda
+    const acesas = [[0.32, 0.66], [0.64, 0.86], [0.76, 0.42], [0.4, 0.3], [0.14, 0.88], [0.9, 0.7], [0.56, 0.5], [0.2, 0.46]];
+    const brasas = [];
+    for (let i = 0; i < 900; i++) {
+      const d = Math.pow(r(), 0.85);
+      brasas.push({ x: -20 + r() * (L + 40), d, w: tamDe(d) * (0.7 + r() * 0.6), acesa: false });
+    }
+    for (const [u, d] of acesas) brasas.push({ x: 120 + u * (L - 240), d, w: tamDe(d) * 1.2, acesa: true });
+    brasas.sort((a, b) => a.d - b.d);
+    // a cinza fina do chão, numa camada que apaga para cima e para os lados
+    const { c, ctx: k } = camada();
+    for (let i = 0; i < 1400; i++) {
+      const d = Math.pow(r(), 0.8);
+      k.fillStyle = 'rgba(160,162,152,' + (0.08 + r() * 0.18).toFixed(2) + ')';
+      k.beginPath();
+      k.arc(r() * L, yDe(d) + (r() - 0.5) * 20, 0.8 + d * 1.6 * r(), 0, Math.PI * 2);
+      k.fill();
+    }
+    for (const b of brasas) if (b.acesa) brilhoDeBrasa(k, b.x, yDe(b.d), b.w);
+    // as apagadas primeiro e as acesas por cima (atrás de uma apagada, a acesa virava um risco)
+    for (const b of brasas) if (!b.acesa) brasa(k, b.x + (r() - 0.5) * 6, yDe(b.d) + (r() - 0.5) * (4 + b.d * 18), b.w, r, false);
+    for (const b of brasas) if (b.acesa) brasa(k, b.x, yDe(b.d), b.w, r, true);
+    for (const b of brasas) {
+      if (!b.acesa) continue;
+      for (const dx of [-0.42, 0.1, 0.5]) {
+        const d = Math.min(1, b.d + 0.035);
+        brasa(k, b.x + dx * b.w + (r() - 0.5) * 8, yDe(d) + tamDe(d) * 0.12, tamDe(d) * (0.7 + r() * 0.35), r, false);
+      }
+    }
+    // a luz das acesas pega nas vizinhas: o mesmo brilho por cima, somando
+    k.globalCompositeOperation = 'lighter';
+    for (const b of brasas) if (b.acesa) brilhoDeBrasa(k, b.x, yDe(b.d), b.w * 0.9);
+    k.globalCompositeOperation = 'source-over';
+    // umas faíscas pequenas subindo das acesas
+    for (const b of brasas) {
+      if (!b.acesa) continue;
+      for (let i = 0; i < 2; i++) {
+        k.fillStyle = 'rgba(255,196,77,' + (0.5 + r() * 0.4).toFixed(2) + ')';
+        k.beginPath();
+        k.arc(b.x + (r() - 0.5) * b.w * 1.2, yDe(b.d) - b.w * (0.8 + r() * 1.6), 1.2 + b.d * 1.8, 0, Math.PI * 2);
+        k.fill();
+      }
+    }
+    k.globalCompositeOperation = 'destination-in';
+    const gv = k.createLinearGradient(0, y0 - 20, 0, y0 + 130);
+    gv.addColorStop(0, 'rgba(0,0,0,0)');
+    gv.addColorStop(1, 'rgba(0,0,0,1)');
+    k.fillStyle = gv;
+    k.fillRect(0, 0, L, A);
+    const gb = k.createLinearGradient(0, y1 - 40, 0, y1 + 30);
+    gb.addColorStop(0, 'rgba(0,0,0,1)');
+    gb.addColorStop(1, 'rgba(0,0,0,0)');
+    k.fillStyle = gb;
+    k.fillRect(0, 0, L, A);
+    for (const [de, ate] of [[0, 160], [L, L - 160]]) {
+      const gh = k.createLinearGradient(de, 0, ate, 0);
+      gh.addColorStop(0, 'rgba(0,0,0,0)');
+      gh.addColorStop(1, 'rgba(0,0,0,1)');
+      k.fillStyle = gh;
+      k.fillRect(0, 0, L, A);
+    }
+    ctx.drawImage(c, 0, 0);
+    return y1;
   }
 
   S.prepararArte = prepararArte;
