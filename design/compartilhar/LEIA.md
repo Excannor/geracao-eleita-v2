@@ -295,3 +295,63 @@ gera os quatro. Como nenhuma frase da lista ficou sem arte, os testes simulam a 
 tirando a arte de "Até que Ele venha" por um instante (e conferem uma frase fora da lista), e as
 imagens do modelo de sempre (`gerar.mjs` no conjunto final, `teste-compartilhar.mjs`) tiram a
 arte das frases só enquanto desenham.
+
+## Rodada 16 (`rodada16/`)
+
+Dez frases novas do dono (2026-10-11), cada uma com modelo próprio; agora são 59 frases, todas
+com arte. As referências que ele mandou são de terceiros: só a ideia ficou, tudo redesenhado,
+sem foto nem logo de ninguém. A primeira versão saiu com cara de ícone chapado (contorno grosso
+igual, cor lisa) e o dono só aprovou o avião; as outras nove foram refeitas no nível dele: luz,
+sombra, profundidade, textura de impressão e poucos elementos, bem desenhados. Cada uma num
+fundo, composição, letra e fecho diferentes das vizinhas e das 49 de antes (`folha-todas.png`,
+com as 59, e `resumo.png`, as dez em duas fileiras). Nenhuma fecha com a palavra amarela
+sublinhada; sem figura humana, prédio, coroa ou foto:
+- **noticia** (O Evangelho não é segredo para ser guardado, é notícia para ser espalhada):
+  exemplares do jornal espalhados no concreto, com a sombra de cada folha. O de cima é a
+  primeira página: o começo em Literata itálica, É NOTÍCIA de manchete em Oswald, "para ser
+  espalhada." embaixo, e a foto em retícula de um amanhecer impressa em duas cores (a luz no
+  amarelo). As colunas são cinza, sem palavra. Fecha nos jornais espalhados.
+- **chamada** (Jesus está chamando você): o celular deitado na mesa escura, tocando; a tela é
+  a única luz e clareia a mesa, e o contorno repetido dos lados é a vibração. Na tela, Jesus
+  grande e os dois botões, recusar em cinza e aceitar em sálvia (nada de vermelho e verde).
+  **Palavras fora da frase: "recusar" e "aceitar"**, pequenas, parte da tela. Fecha na luz.
+- **planos** (Meus planos. Os planos de Deus.): o aviãozinho de papel amarelo, pequeno, no céu
+  nublado, e a sombra borrada de um avião de linha enorme na mesma direção. "Meus planos." em
+  Permanent Marker junto do aviãozinho, "Os planos de Deus." em Literata junto da sombra.
+  Fecha na sombra. (Aprovado pelo dono como está.)
+- **casa** (Não importa o que você fez, apenas volte para casa! O Pai te espera de braços
+  abertos): a noite e, lá na frente, uma porta aberta com a luz acesa; o facho deita no chão de
+  tábuas até quem vê, com a poeira brilhando. NÃO IMPORTA O QUE VOCÊ FEZ, em Manrope espaçada,
+  "Apenas volte para casa!" em Literata creme, e o bilhete à mão dentro da luz. A casa não
+  aparece, só a luz (diferente da porta entreaberta no papel claro). O cartaz da primeira versão
+  (com os carimbos VOCÊ É FILHO AMADO e VOCÊ É HERDEIRO) saiu: nenhuma palavra fora da frase.
+  Sem referência (lembra Lucas 15, mas não é citação). Fecha na luz.
+- **salva** (Jesus salva): as duas palavras incham até encher um círculo, como as letras dos
+  adesivos dos anos 70: Manrope engordada, esticada num quadrado e levada ao disco ponto a ponto
+  (o mapa elíptico do quadrado no círculo), impressa em tinta no papel amarelo, com a marca leve
+  da prensa. Em volta, anéis finos à mão, cada vez mais largos e mais fracos, que somem antes da
+  chama e da marca. Diferente dos recortes de Jesus vive. Fecha nas ondas.
+- **salluz** (Sal e luz do mundo, Mateus 5.13-14): a lâmpada acesa que é saleiro: o vidro
+  amarelo brilhando no escuro, com a borda acesa e o reflexo em vez de contorno, a frase à mão
+  dentro dele, e a rosca virou a tampa de metal furada, de onde cai o sal, cada grão pegando a
+  luz. **Sobreposição com luz** (Luz do mundo, a lâmpada em traço laranja no marrom): aqui o
+  vidro é cheio e aceso, a letra fica dentro e o sal é o gancho. A referência é de lema (Mateus
+  5.13-14 fala do sal da terra e da luz do mundo) e aparece pequena no canto. Fecha no sal caindo.
+- **controle** (Jesus está no controle): a estampa de camiseta no tecido sálvia, com a trama e
+  as dobras passando por cima: o controle em serigrafia, o traço de pincel mais grosso no lado da
+  sombra, o amarelo fora de registro, a sombra em retícula, botões só de bolinha (nenhum símbolo
+  de console) e a tinta rachada de lavar. JESUS e CONTROLE em Manrope, "está no" à mão. Fecha no
+  próprio controle.
+- **plano** (Deus tem um plano para você): DEUS gigante, deitado, impresso em tipografia no
+  papel de algodão (a borda clara de onde o papel afundou), com as linhas de construção finas
+  do desenho das letras em volta, como projeto; "tem um plano para você." escondido na barriga
+  do D. Diferente de confie (a faixa ondulando) e das só tipográficas. Fecha no texto escondido.
+- **meu** (Que haja Deus em tudo o que for meu): o cartão sálvia quase vazio, a frase pequena em
+  Oswald no alto, e uma etiqueta de papel creme amarrada no barbante que desce do alto, com a
+  sombra no papel e só uma cruz carimbada: a etiqueta diz de quem é. Fecha na etiqueta.
+- **cubo** (Peça a Deus. Confie em Deus. Agradeça a Deus.): o adesivo de vinil de um cubo
+  isométrico na capa amarela de um caderno, uma frase em cada face (em Oswald creme, deitada na
+  face por uma transformação do canvas), com a borda de corte, a espessura, a sombra, o brilho
+  do vinil e uma ponta descolando. Fecha na ponta descolada.
+`MODELOS=noticia,chamada,planos,casa,salva,salluz,controle,plano,meu,cubo DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos`
+gera as dez. A folha de contato junta as 59 em dez colunas. Os testes passaram a contar 59.

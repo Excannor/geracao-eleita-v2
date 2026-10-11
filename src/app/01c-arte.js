@@ -109,6 +109,17 @@
     { linhas: ['Jesus morreu', 'por mim,', 'agora eu vivo', 'por Ele'], arte: 'vivoporele' },
     { linhas: ['Jesus', 'vive'], arte: 'jesusvive' },
     { linhas: ['Quem não', 'desiste tem', 'testemunho', 'pra contar.'], arte: 'testemunho' },
+    // Mais dez do dono (2026-10-11), com arte própria a partir das referências que ele mandou
+    // (só a ideia: tudo redesenhado). Sem referência: nenhum versículo diz isso com estas palavras.
+    { linhas: ['O Evangelho não é', 'segredo para ser', 'guardado, é notícia', 'para ser espalhada.'], arte: 'noticia' },
+    { linhas: ['Meus planos.', 'Os planos de Deus.'], arte: 'planos' },
+    { linhas: ['Jesus', 'está chamando você'], arte: 'chamada' },
+    // Lembra o filho que volta (Lucas 15), mas não é citação: sem referência.
+    { linhas: ['Não importa o que', 'você fez, apenas', 'volte para casa!', 'O Pai te espera', 'de braços abertos'], arte: 'casa' },
+    { linhas: ['Jesus', 'salva'], arte: 'salva' },
+    { linhas: ['Que haja Deus', 'em tudo o que', 'for meu.'], arte: 'meu' },
+    { linhas: ['Deus', 'tem um plano', 'para você.'], arte: 'plano' },
+    { linhas: ['Peça a Deus.', 'Confie em Deus.', 'Agradeça a Deus.'], arte: 'cubo' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir

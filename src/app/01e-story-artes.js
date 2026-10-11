@@ -2320,6 +2320,19 @@
     rotina: { fundo: ['#f2eee3'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteRotina, grao: [12, 1510] },
     grafico: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, alinhar: 'direita', escala: 0.8 }, desenhar: arteFracasso, grao: [12, 1520] },
     alvorada: { fundo: ['#080a09'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteVenha, grao: [18, 1530] },
+    // nona leva (rodada 16): os jornais espalhados, o celular tocando na mesa, o aviãozinho e a
+    // sombra, a porta acesa, o círculo de Jesus salva, a lâmpada saleiro, a estampa do
+    // controle, o DEUS impresso, a etiqueta e o adesivo do cubo
+    noticia: { fundo: ['#d6d3cb'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteNoticia, grao: [12, 1600] },
+    chamada: { fundo: ['#0e0f0e'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteChamada, grao: [16, 1615] },
+    planos: { fundo: ['#d6dbd1'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: artePlanos, grao: [12, 1610] },
+    casa: { fundo: ['#0a0c0a'], tema: { ...TEMA_LP, brilho: false, escala: 0.8, marca: LP.tinta, marcaFraca: '#4a3d1a' }, desenhar: arteCasa, grao: [16, 1620] },
+    salva: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteSalva, grao: [12, 1625] },
+    salluz: { fundo: ['#0a0b09'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteSalLuz, grao: [18, 1640] },
+    controle: { fundo: ['#c3d488'], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteControle, grao: [14, 1630] },
+    plano: { fundo: ['#e8e3d9'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: artePlano, grao: [12, 1650] },
+    meu: { fundo: ['#c4d589'], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteMeu, grao: [12, 1645] },
+    cubo: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteCubo, grao: [12, 1655] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -5585,6 +5598,1517 @@
     // a estrela da manhã e o até que no céu escuro, acima
     estrelaDaManha(ctx, L / 2, HORIZONTE - capV - 200, 300);
     S.escrever(ctx, 'Até que', L / 2, HORIZONTE - capV - 400, 'italic 500 104px Literata, Georgia, serif', LP.creme);
+  }
+
+  // ---------- nona leva (rodada 16): dez frases novas do dono (2026-10-11) ----------
+  // Cada uma num fundo, composição, letra e fecho diferentes das vizinhas e das 49 de antes.
+  // As referências que o dono mandou são de terceiros: daqui só saiu a ideia, redesenhada.
+  // O dono recusou a primeira versão (com cara de ícone chapado) e pediu o nível do avião:
+  // luz, sombra, profundidade, textura de impressão e poucos elementos, bem desenhados.
+  // O retângulo de cantos redondos como caminho (sem depender do roundRect do navegador).
+  function retRedondo(ctx, x, y, w, h, raio) {
+    const q = Math.min(raio, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + q, y);
+    ctx.arcTo(x + w, y, x + w, y + h, q);
+    ctx.arcTo(x + w, y + h, x, y + h, q);
+    ctx.arcTo(x, y + h, x, y, q);
+    ctx.arcTo(x, y, x + w, y, q);
+    ctx.closePath();
+  }
+  // Retícula de impressão: pontos numa grade a 45°, do tamanho que a função pede (0 a 1)
+  // em cada lugar. Desenha onde o contexto já estiver recortado.
+  function reticula(ctx, x0, y0, x1, y1, passo, densidade, cor) {
+    ctx.save();
+    ctx.fillStyle = cor;
+    const c = Math.SQRT1_2;
+    const diag = Math.hypot(x1 - x0, y1 - y0);
+    const mx = (x0 + x1) / 2;
+    const my = (y0 + y1) / 2;
+    for (let u = -diag / 2; u <= diag / 2; u += passo) {
+      for (let v = -diag / 2; v <= diag / 2; v += passo) {
+        const x = mx + (u - v) * c;
+        const y = my + (u + v) * c;
+        if (x < x0 - passo || x > x1 + passo || y < y0 - passo || y > y1 + passo) continue;
+        const d = densidade(x, y);
+        if (d <= 0.02) continue;
+        ctx.beginPath();
+        ctx.arc(x, y, passo * 0.56 * Math.sqrt(Math.min(1, d)), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+  // Manchas suaves (luz ou sombra) espalhadas: dão volume a um fundo liso.
+  function manchas(ctx, r, n, { x0 = 0, y0 = 0, x1 = L, y1 = A, rMin = 80, rMax = 360, claro = '255,255,255', escuro = '0,0,0', aClaro = 0.05, aEscuro = 0.05 } = {}) {
+    for (let i = 0; i < n; i++) {
+      const x = x0 + r() * (x1 - x0);
+      const y = y0 + r() * (y1 - y0);
+      const rr = rMin + r() * (rMax - rMin);
+      const ehClaro = r() < 0.5;
+      const a = (ehClaro ? aClaro : aEscuro) * (0.4 + r() * 0.6);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+      g.addColorStop(0, 'rgba(' + (ehClaro ? claro : escuro) + ',' + a.toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(' + (ehClaro ? claro : escuro) + ',0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+    }
+  }
+
+  // O Evangelho não é segredo para ser guardado, é notícia para ser espalhada: vários
+  // exemplares do jornal espalhados no chão de concreto, à luz do dia, com a sombra macia
+  // de cada folha. O de cima é a primeira página da frase: o começo em Literata itálica
+  // (a linha fina), É NOTÍCIA de manchete em Oswald e "para ser espalhada." embaixo, com a
+  // foto em retícula de uma luz que se abre e as colunas de texto em cinza (nenhuma palavra).
+  // Os outros, por baixo, saem do quadro para todos os lados. Fechamento: os jornais
+  // espalhados. (Antes era a caixa de jornal amarela, que ficou com cara de ícone.)
+  function concreto(ctx, semente) {
+    const r = sorteio(semente);
+    const g = ctx.createLinearGradient(0, 0, L * 0.6, A);
+    g.addColorStop(0, '#dcd9d1');
+    g.addColorStop(1, '#c6c2b8');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 60, { aClaro: 0.10, aEscuro: 0.07, claro: '250,248,240', escuro: '70,66,58' });
+    for (let i = 0; i < 14000; i++) {
+      const escuro = r() < 0.7;
+      ctx.fillStyle = escuro ? 'rgba(60,56,48,' + (0.06 + r() * 0.2).toFixed(3) + ')' : 'rgba(255,255,250,' + (0.2 + r() * 0.3).toFixed(3) + ')';
+      const s = 0.6 + r() * r() * 2.6;
+      ctx.fillRect(r() * L, r() * A, s, s);
+    }
+  }
+  // Uma folha de jornal com o meio em (0, 0) já girado; desenho(ctx, w, h) faz o conteúdo.
+  function folhaDeJornal(ctx, w, h, r, desenho) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(45,40,30,.34)';
+    ctx.shadowBlur = 34;
+    ctx.shadowOffsetX = 10;
+    ctx.shadowOffsetY = 18;
+    ctx.fillStyle = '#efece3';
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(-w / 2, -h / 2, w, h);
+    ctx.clip();
+    desenho(ctx, w, h);
+    // o papel não fica plano: a dobra do meio, a luz de um lado e a sombra do outro
+    const g = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
+    g.addColorStop(0, 'rgba(255,255,255,.10)');
+    g.addColorStop(0.47, 'rgba(0,0,0,.02)');
+    g.addColorStop(0.5, 'rgba(0,0,0,.10)');
+    g.addColorStop(0.53, 'rgba(255,255,255,.12)');
+    g.addColorStop(1, 'rgba(0,0,0,.07)');
+    ctx.fillStyle = g;
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    const v = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+    v.addColorStop(0, 'rgba(0,0,0,.05)');
+    v.addColorStop(0.2, 'rgba(0,0,0,0)');
+    v.addColorStop(0.85, 'rgba(0,0,0,0)');
+    v.addColorStop(1, 'rgba(0,0,0,.08)');
+    ctx.fillStyle = v;
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    // fibras do papel-jornal
+    for (let i = 0; i < 500; i++) {
+      ctx.fillStyle = 'rgba(80,70,55,' + (0.04 + r() * 0.06).toFixed(3) + ')';
+      ctx.fillRect(-w / 2 + r() * w, -h / 2 + r() * h, 1 + r() * 3, 1);
+    }
+    ctx.restore();
+  }
+  // As linhas de texto de uma coluna, em cinza (o texto miúdo do jornal, de longe).
+  function colunaDeTexto(ctx, x, y, w, ate, r, entre = 15) {
+    ctx.fillStyle = 'rgba(18,19,15,.32)';
+    let n = 0;
+    for (let yy = y; yy < ate; yy += entre) {
+      const fim = (++n % 9 === 0) ? w * (0.3 + r() * 0.4) : w;
+      ctx.fillRect(x, yy, fim, 5.5);
+    }
+  }
+  function jornalGenerico(r) {
+    return (ctx, w, h) => {
+      const m = 34;
+      ctx.fillStyle = 'rgba(18,19,15,.7)';
+      ctx.fillRect(-w / 2 + m, -h / 2 + m, w - 2 * m, 5);
+      ctx.fillRect(-w / 2 + m, -h / 2 + m + 11, w - 2 * m, 2);
+      // a manchete: duas linhas de letras grandes vistas de longe, em cinza
+      const yM = -h / 2 + m + 40;
+      for (let lin = 0; lin < 2; lin++) {
+        let x = -w / 2 + m;
+        const fimLinha = lin ? w * 0.1 : w / 2 - m;
+        while (x < fimLinha - 30) {
+          const lw = 14 + r() * 26;
+          ctx.fillStyle = 'rgba(18,19,15,.5)';
+          ctx.fillRect(x, yM + lin * 40 + (r() < 0.3 ? -6 : 0), Math.min(lw, fimLinha - x), r() < 0.3 ? 32 : 26);
+          x += lw + (r() < 0.25 ? 16 : 4);
+        }
+      }
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(-w / 2 + m, yM + 76, w * 0.5, h * 0.3);
+      ctx.clip();
+      reticula(ctx, -w / 2 + m, yM + 76, -w / 2 + m + w * 0.5, yM + 76 + h * 0.3, 9, (px, py) => 0.2 + 0.45 * Math.sin(px * 0.01 + py * 0.013) ** 2, 'rgba(18,19,15,.45)');
+      ctx.restore();
+      const cw = (w - 2 * m - 40) / 3;
+      colunaDeTexto(ctx, -w / 2 + m + w * 0.5 + 20, yM + 76, w - 2 * m - w * 0.5 - 20, yM + 76 + h * 0.3, r);
+      for (let i = 0; i < 3; i++) colunaDeTexto(ctx, -w / 2 + m + i * (cw + 20), yM + 100 + h * 0.3, cw, h / 2 - m, r);
+    };
+  }
+  function arteNoticia(ctx) {
+    const r = sorteio(1600);
+    concreto(ctx, 1600);
+    const tinta = LP.tinta;
+    // os de baixo, saindo do quadro
+    for (const [x, y, giro] of [[60, 760, -0.42], [1010, 700, 0.36], [40, 1520, 0.3], [1060, 1560, -0.24]]) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(giro);
+      folhaDeJornal(ctx, 640, 880, r, jornalGenerico(r));
+      ctx.restore();
+    }
+    // o de cima: a primeira página da frase
+    ctx.save();
+    ctx.translate(540, 1030);
+    ctx.rotate(-0.035);
+    folhaDeJornal(ctx, 720, 960, r, (k, w, h) => {
+      const m = 44;
+      const x0 = -w / 2 + m;
+      const larg = w - 2 * m;
+      let y = -h / 2 + m;
+      k.fillStyle = tinta;
+      k.fillRect(x0, y, larg, 7);
+      k.fillRect(x0, y + 13, larg, 2);
+      y += 72;
+      const lit = (t) => 'italic 500 ' + t + 'px Literata, Georgia, serif';
+      const tD = Math.min(caber(k, 'O Evangelho não é segredo', lit, larg, 54), caber(k, 'para ser guardado,', lit, larg, 54));
+      S.escrever(k, 'O Evangelho não é segredo', x0, y, lit(tD), tinta, { alinhar: 'left' });
+      S.escrever(k, 'para ser guardado,', x0, y + tD * 1.2, lit(tD), tinta, { alinhar: 'left' });
+      y += tD * 1.2 + 30;
+      k.fillRect(x0, y, larg, 2);
+      const os = (t) => oswaldLP(t, 700);
+      const tN = caber(k, 'É NOTÍCIA', os, larg, 260);
+      k.font = os(tN);
+      const capN = k.measureText('É NOTÍCIA').actualBoundingBoxAscent;
+      y += 22 + capN;
+      S.escrever(k, 'É NOTÍCIA', x0 - 4, y, os(tN), tinta, { alinhar: 'left' });
+      y += 70;
+      const tE = caber(k, 'para ser espalhada.', (t) => '600 ' + t + 'px Literata, Georgia, serif', larg, 66);
+      S.escrever(k, 'para ser espalhada.', x0, y, '600 ' + tE + 'px Literata, Georgia, serif', tinta, { alinhar: 'left' });
+      y += 34;
+      k.fillRect(x0, y, larg, 2);
+      y += 26;
+      // a foto em retícula: a luz que se abre do meio, e as colunas ao lado
+      const fw = larg * 0.56;
+      const fh = h / 2 - m - y;
+      const fx = x0;
+      k.save();
+      k.beginPath();
+      k.rect(fx, y, fw, fh);
+      k.clip();
+      const cxF = fx + fw * 0.5;
+      const cyF = y + fh * 0.62;
+      // a foto: um amanhecer, o céu escuro em cima, a luz rompendo no horizonte e os raios,
+      // impressa em duas cores (a luz no amarelo, por baixo da retícula preta)
+      const sol = k.createRadialGradient(cxF, cyF, 0, cxF, cyF, fw * 0.75);
+      sol.addColorStop(0, '#ffe7a6');
+      sol.addColorStop(0.35, LP.amarelo);
+      sol.addColorStop(1, '#f0b84a');
+      k.fillStyle = sol;
+      k.fillRect(fx, y, fw, fh);
+      reticula(k, fx, y, fx + fw, y + fh, 7, (px, py) => {
+        const dx = px - cxF;
+        const dy = py - cyF;
+        const d = Math.hypot(dx, dy * 1.4) / fw;
+        const ang = Math.atan2(dy, dx);
+        const raios = Math.max(0, Math.cos(ang * 11)) ** 3 * Math.exp(-d * 1.6) * (dy < 0 ? 1 : 0);
+        const luz = Math.exp(-d * 4.2) + raios * 0.7;
+        const chao = py > cyF ? 0.55 + (py - cyF) / fh * 0.8 : 0;
+        return Math.min(1, Math.max(chao, 0.95 - luz * 1.25));
+      }, 'rgba(18,19,15,.85)');
+      k.restore();
+      colunaDeTexto(k, fx + fw + 22, y + 4, larg - fw - 22, h / 2 - m, r, 16);
+    });
+    ctx.restore();
+  }
+  // Meus planos. Os planos de Deus.: o aviãozinho de papel, pequeno, no céu nublado, faz no
+  // chão... no céu, a sombra de um avião enorme. Meus planos à mão, ao lado do aviãozinho;
+  // Os planos de Deus em Literata, junto da sombra. Fechamento: a sombra.
+  function nuvens(ctx, r) {
+    for (let i = 0; i < 70; i++) {
+      const x = r() * L;
+      const y = r() * A;
+      const rx = 120 + r() * 320;
+      const ry = rx * (0.35 + r() * 0.25);
+      const claro = r() < 0.6;
+      const a = claro ? 0.12 + r() * 0.2 : 0.05 + r() * 0.08;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(1, ry / rx);
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+      const cor = claro ? '252,252,246' : '120,130,122';
+      g.addColorStop(0, 'rgba(' + cor + ',' + a.toFixed(3) + ')');
+      g.addColorStop(0.6, 'rgba(' + cor + ',' + (a * 0.6).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(' + cor + ',0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(-rx, -rx, rx * 2, rx * 2);
+      ctx.restore();
+    }
+  }
+  // A planta de um avião de linha vista de baixo, com o nariz para +x e o meio em (0, 0):
+  // o corpo, as asas enflechadas com os motores e o leme de profundidade.
+  function silhuetaDeAviao(ctx, comp) {
+    const k = comp / 1000;
+    ctx.save();
+    ctx.scale(k, k);
+    ctx.beginPath();
+    // o corpo
+    ctx.moveTo(500, 0);
+    ctx.bezierCurveTo(500, -40, 450, -56, 390, -56);
+    ctx.lineTo(-380, -50);
+    ctx.bezierCurveTo(-440, -44, -480, -20, -500, 0);
+    ctx.bezierCurveTo(-480, 20, -440, 44, -380, 50);
+    ctx.lineTo(390, 56);
+    ctx.bezierCurveTo(450, 56, 500, 40, 500, 0);
+    ctx.closePath();
+    ctx.fill();
+    for (const lado of [-1, 1]) {
+      // a asa
+      ctx.beginPath();
+      ctx.moveTo(150, lado * 40);
+      ctx.lineTo(-150, lado * 520);
+      ctx.lineTo(-225, lado * 520);
+      ctx.lineTo(-110, lado * 40);
+      ctx.closePath();
+      ctx.fill();
+      // os motores, à frente da asa
+      for (const [mx, my] of [[90, 190], [-10, 360]]) {
+        ctx.beginPath();
+        ctx.ellipse(mx, lado * my, 82, 30, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // o leme de profundidade
+      ctx.beginPath();
+      ctx.moveTo(-345, lado * 40);
+      ctx.lineTo(-470, lado * 210);
+      ctx.lineTo(-515, lado * 210);
+      ctx.lineTo(-455, lado * 30);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  function aviaoDePapel(ctx, x, y, comp, giro, r) {
+    const k = comp / 200;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(giro);
+    ctx.scale(k, k);
+    ctx.lineJoin = 'round';
+    // a asa de cima (clara), a de baixo (na sombra) e a quilha
+    const cima = new Path2D('M100 0 L-100 -62 L-70 0 Z');
+    const baixo = new Path2D('M100 0 L-70 0 L-96 46 Z');
+    const quilha = new Path2D('M100 0 L-70 0 L-82 16 Z');
+    ctx.fillStyle = LP.amarelo;
+    ctx.fill(cima);
+    ctx.fillStyle = '#d9a034';
+    ctx.fill(baixo);
+    ctx.fillStyle = '#b57f1c';
+    ctx.fill(quilha);
+    ctx.strokeStyle = LP.tinta;
+    ctx.lineWidth = 3.2 / k;
+    for (const p of [cima, baixo, quilha]) ctx.stroke(p);
+    ctx.restore();
+    // o risco do vento atrás dele
+    const pts = [];
+    for (let i = 0; i <= 10; i++) {
+      const t = i / 10;
+      pts.push([x - Math.cos(giro) * comp * (0.75 + t * 1.4) + Math.sin(t * 6) * 6, y - Math.sin(giro) * comp * (0.75 + t * 1.4) + Math.cos(t * 5) * 8]);
+    }
+    tracoAMao(ctx, pts, { r, largura: 3, tremor: 1.5, cor: 'rgba(18,19,15,.35)', segunda: false });
+  }
+  function artePlanos(ctx) {
+    const r = sorteio(1610);
+    const g = ctx.createLinearGradient(0, 0, L * 0.3, A);
+    g.addColorStop(0, '#c3ccc3');
+    g.addColorStop(0.5, '#d6dbd1');
+    g.addColorStop(1, '#e7e8de');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, A);
+    nuvens(ctx, r);
+    // a sombra do avião grande, na mesma direção do aviãozinho, borrada como sombra de verdade
+    const giro = -0.62;
+    const { c, ctx: k } = camada();
+    k.filter = 'blur(7px)';
+    k.translate(600, 1180);
+    k.rotate(giro);
+    k.fillStyle = '#1c231e';
+    silhuetaDeAviao(k, 1180);
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    k.filter = 'none';
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.drawImage(c, 0, 0);
+    ctx.restore();
+    nuvens(ctx, sorteio(1611));
+    // o aviãozinho, pequeno, no alto à esquerda
+    aviaoDePapel(ctx, 300, 690, 150, giro, r);
+    const tinta = LP.tinta;
+    ctx.fillStyle = tinta;
+    aMao(ctx, '— Meus planos.', 420, 640, 62, r);
+    // junto da sombra, embaixo da asa
+    S.escrever(ctx, '— Os planos', L - 80, 1420, '600 84px Literata, Georgia, serif', tinta, { alinhar: 'right' });
+    S.escrever(ctx, 'de Deus.', L - 80, 1520, '600 84px Literata, Georgia, serif', tinta, { alinhar: 'right' });
+  }
+  // Jesus está chamando você: o celular deitado na mesa escura, tocando. A tela acesa é a
+  // única luz: ela clareia a mesa em volta, e o aparelho vibra (o rastro fraco dos lados).
+  // Na tela, Jesus grande e "está chamando você", e os dois botões: recusar em cinza e
+  // aceitar em sálvia. Recusar e aceitar são palavras fora da frase (parte da tela),
+  // avisadas ao dono. Fechamento: a luz da tela na mesa.
+  function fone(ctx, cx, cy, s, giro, cor) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(giro);
+    ctx.fillStyle = cor;
+    // o fone de gancho deitado: as duas conchas e o cabo curvo entre elas
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.62, -s * 0.06);
+    ctx.bezierCurveTo(-s * 0.62, -s * 0.5, s * 0.62, -s * 0.5, s * 0.62, -s * 0.06);
+    ctx.lineTo(s * 0.62, s * 0.08);
+    ctx.bezierCurveTo(s * 0.62, s * 0.2, s * 0.56, s * 0.24, s * 0.46, s * 0.24);
+    ctx.lineTo(s * 0.3, s * 0.24);
+    ctx.bezierCurveTo(s * 0.22, s * 0.24, s * 0.18, s * 0.18, s * 0.2, s * 0.1);
+    ctx.lineTo(s * 0.22, -s * 0.02);
+    ctx.bezierCurveTo(s * 0.08, -s * 0.08, -s * 0.08, -s * 0.08, -s * 0.22, -s * 0.02);
+    ctx.lineTo(-s * 0.2, s * 0.1);
+    ctx.bezierCurveTo(-s * 0.18, s * 0.18, -s * 0.22, s * 0.24, -s * 0.3, s * 0.24);
+    ctx.lineTo(-s * 0.46, s * 0.24);
+    ctx.bezierCurveTo(-s * 0.56, s * 0.24, -s * 0.62, s * 0.2, -s * 0.62, s * 0.08);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  function arteChamada(ctx) {
+    const r = sorteio(1615);
+    // a mesa: grafite fosco com veio fino
+    ctx.fillStyle = '#0e0f0e';
+    ctx.fillRect(0, 0, L, A);
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 1600; i++) {
+      const y = r() * A;
+      const x = r() * L;
+      ctx.strokeStyle = 'rgba(' + (r() < 0.5 ? '255,255,255' : '0,0,0') + ',' + (0.015 + r() * 0.03).toFixed(3) + ')';
+      ctx.lineWidth = 1 + r() * 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 60 + r() * 220, y + (r() - 0.5) * 6);
+      ctx.stroke();
+    }
+    const cx = 548;
+    const cy = 1020;
+    const w = 470;
+    const h = 930;
+    const giro = -0.08;
+    // a luz da tela na mesa: larga e macia, mais forte junto do aparelho
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(giro);
+    for (const [rx, ry, a] of [[820, 980, 0.16], [500, 700, 0.20], [340, 600, 0.16]]) {
+      ctx.save();
+      ctx.scale(rx / ry, 1);
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, ry);
+      g.addColorStop(0, 'rgba(214,226,170,' + a + ')');
+      g.addColorStop(1, 'rgba(214,226,170,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(-ry, -ry, ry * 2, ry * 2);
+      ctx.restore();
+    }
+    // a vibração: o contorno repetido, bem fraco, dos dois lados
+    for (const d of [-16, 16, -30, 30]) {
+      ctx.strokeStyle = 'rgba(220,230,190,' + (Math.abs(d) < 20 ? 0.10 : 0.05) + ')';
+      ctx.lineWidth = 3;
+      retRedondo(ctx, -w / 2 + d, -h / 2, w, h, 72);
+      ctx.stroke();
+    }
+    // o aparelho: a sombra, o corpo e o brilho da borda
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.8)';
+    ctx.shadowBlur = 50;
+    ctx.shadowOffsetX = 14;
+    ctx.shadowOffsetY = 26;
+    retRedondo(ctx, -w / 2, -h / 2, w, h, 72);
+    ctx.fillStyle = '#1b1c1b';
+    ctx.fill();
+    ctx.restore();
+    const borda = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+    borda.addColorStop(0, 'rgba(255,255,255,.42)');
+    borda.addColorStop(0.35, 'rgba(255,255,255,.06)');
+    borda.addColorStop(0.7, 'rgba(255,255,255,.03)');
+    borda.addColorStop(1, 'rgba(255,255,255,.22)');
+    ctx.strokeStyle = borda;
+    ctx.lineWidth = 3;
+    retRedondo(ctx, -w / 2 + 1.5, -h / 2 + 1.5, w - 3, h - 3, 71);
+    ctx.stroke();
+    ctx.fillStyle = '#2a2b29';
+    ctx.fillRect(w / 2 - 1, -h / 2 + 200, 5, 110);
+    ctx.fillRect(-w / 2 - 4, -h / 2 + 170, 5, 60);
+    ctx.fillRect(-w / 2 - 4, -h / 2 + 250, 5, 90);
+    // a tela
+    const m = 14;
+    retRedondo(ctx, -w / 2 + m, -h / 2 + m, w - 2 * m, h - 2 * m, 60);
+    ctx.save();
+    ctx.clip();
+    const fundoTela = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+    fundoTela.addColorStop(0, '#26301f');
+    fundoTela.addColorStop(0.45, '#151a13');
+    fundoTela.addColorStop(1, '#0b0d0a');
+    ctx.fillStyle = fundoTela;
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    // o papel de parede desfocado: duas luzes, sálvia e amarela
+    for (const [x, y, rr, cor, a] of [[-90, -330, 300, '200,218,140', 0.45], [130, -250, 240, '255,196,77', 0.22], [0, 260, 360, '200,218,140', 0.10]]) {
+      const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+      g.addColorStop(0, 'rgba(' + cor + ',' + a + ')');
+      g.addColorStop(1, 'rgba(' + cor + ',0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+    }
+    // a ilha da câmera
+    ctx.fillStyle = '#050505';
+    retRedondo(ctx, -64, -h / 2 + 32, 128, 38, 19);
+    ctx.fill();
+    // quem chama
+    S.escrever(ctx, 'Jesus', 0, -186, '500 128px Manrope, sans-serif', LP.creme, { espaco: -3 });
+    S.escrever(ctx, 'está chamando você', 0, -120, '500 38px Manrope, sans-serif', '#d5d8c8');
+    // os botões
+    const by = 300;
+    const xb = 118;
+    ctx.fillStyle = 'rgba(70,74,66,.85)';
+    ctx.beginPath();
+    ctx.arc(-xb, by, 56, 0, Math.PI * 2);
+    ctx.fill();
+    fone(ctx, -xb, by + 6, 62, 0, LP.creme);
+    for (const [rr, a] of [[96, 0.10], [80, 0.2]]) {
+      ctx.strokeStyle = 'rgba(200,218,140,' + a + ')';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(xb, by, rr, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.fillStyle = LP.salvia;
+    ctx.beginPath();
+    ctx.arc(xb, by, 56, 0, Math.PI * 2);
+    ctx.fill();
+    fone(ctx, xb + 3, by + 3, 62, Math.PI * 1.75, LP.tinta);
+    S.escrever(ctx, 'recusar', -xb, by + 104, '500 26px Manrope, sans-serif', '#c9cabd');
+    S.escrever(ctx, 'aceitar', xb, by + 104, '500 26px Manrope, sans-serif', '#c9cabd');
+    ctx.fillStyle = 'rgba(242,239,220,.7)';
+    retRedondo(ctx, -70, h / 2 - 34, 140, 8, 4);
+    ctx.fill();
+    // o reflexo do vidro, uma faixa larga e muito fraca
+    const refl = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+    refl.addColorStop(0, 'rgba(255,255,255,0)');
+    refl.addColorStop(0.32, 'rgba(255,255,255,0)');
+    refl.addColorStop(0.36, 'rgba(255,255,255,.06)');
+    refl.addColorStop(0.5, 'rgba(255,255,255,.02)');
+    refl.addColorStop(0.52, 'rgba(255,255,255,0)');
+    ctx.fillStyle = refl;
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    ctx.restore();
+    ctx.restore();
+  }
+  // Não importa o que você fez, apenas volte para casa! O Pai te espera de braços abertos:
+  // a noite, e lá na frente uma porta aberta com a luz acesa. Só a luz: o retângulo claro no
+  // escuro e o facho que ela deita no chão, vindo até quem vê, com a poeira brilhando. Em
+  // cima, "Não importa o que você fez," pequeno em Manrope espaçada e "Apenas volte para
+  // casa!" grande em Literata, creme; dentro da luz, à mão, "O Pai te espera de braços
+  // abertos", como bilhete. Diferente da porta entreaberta (porta: o desenho da porta no
+  // papel claro): aqui a casa não aparece, só a luz que ela deixou acesa. Sem carimbo nem
+  // palavra fora da frase (o cartaz da primeira versão ficou carregado). Fechamento: a luz.
+  function arteCasa(ctx) {
+    const r = sorteio(1620);
+    const ceu = ctx.createLinearGradient(0, 0, 0, A);
+    ceu.addColorStop(0, '#080a09');
+    ceu.addColorStop(0.55, '#0c0e0c');
+    ceu.addColorStop(1, '#121410');
+    ctx.fillStyle = ceu;
+    ctx.fillRect(0, 0, L, A);
+    // o texto de cima
+    const tinta = LP.tinta;
+    S.escrever(ctx, 'NÃO IMPORTA O QUE VOCÊ FEZ,', L / 2, 580, '600 34px Manrope, sans-serif', LP.texto, { espaco: 7 });
+    const lit = (t) => '600 ' + t + 'px Literata, Georgia, serif';
+    const tG = Math.min(caber(ctx, 'Apenas volte', lit, 900, 140), caber(ctx, 'para casa!', lit, 900, 140));
+    S.escrever(ctx, 'Apenas volte', L / 2, 580 + 40 + tG * 0.86, lit(tG), LP.creme, { espaco: -1 });
+    S.escrever(ctx, 'para casa!', L / 2, 580 + 40 + tG * 0.86 + tG * 1.1, lit(tG), LP.creme, { espaco: -1 });
+    // a porta, lá na frente
+    const dw = 128;
+    const dTopo = 580 + 40 + tG * 2.1 + 80;
+    const dh = 236;
+    const dBase = dTopo + dh;
+    const dx = L / 2;
+    // o facho no chão: do pé da porta até a borda de baixo, abrindo
+    const facho = camada();
+    const k = facho.ctx;
+    k.filter = 'blur(5px)';
+    const g = k.createLinearGradient(0, dBase, 0, A);
+    g.addColorStop(0, 'rgba(255,222,140,.97)');
+    g.addColorStop(0.45, 'rgba(255,204,100,.78)');
+    g.addColorStop(1, 'rgba(255,196,77,.5)');
+    k.fillStyle = g;
+    k.beginPath();
+    k.moveTo(dx - dw / 2, dBase);
+    k.lineTo(dx + dw / 2, dBase);
+    k.lineTo(dx + dw / 2 + 760, A + 40);
+    k.lineTo(dx - dw / 2 - 760, A + 40);
+    k.closePath();
+    k.fill();
+    k.filter = 'none';
+    // as tábuas do chão, só onde a luz bate
+    k.globalCompositeOperation = 'source-atop';
+    k.strokeStyle = 'rgba(90,60,10,.20)';
+    k.lineWidth = 3;
+    for (let i = -8; i <= 8; i++) {
+      k.beginPath();
+      k.moveTo(dx + i * dw / 16, dBase);
+      k.lineTo(dx + i * 120, A + 40);
+      k.stroke();
+    }
+    for (let i = 0; i < 9; i++) {
+      const t = (i + 1) / 10;
+      const y = dBase + Math.pow(t, 1.8) * (A - dBase);
+      k.strokeStyle = 'rgba(90,60,10,.10)';
+      k.lineWidth = 2;
+      k.beginPath();
+      k.moveTo(0, y);
+      k.lineTo(L, y);
+      k.stroke();
+    }
+    // as bordas do facho somem para os lados
+    k.globalCompositeOperation = 'destination-in';
+    const lados = k.createLinearGradient(0, 0, L, 0);
+    lados.addColorStop(0, 'rgba(0,0,0,.2)');
+    lados.addColorStop(0.3, 'rgba(0,0,0,1)');
+    lados.addColorStop(0.7, 'rgba(0,0,0,1)');
+    lados.addColorStop(1, 'rgba(0,0,0,.2)');
+    k.fillStyle = lados;
+    k.fillRect(0, 0, L, A);
+    ctx.drawImage(facho.c, 0, 0);
+    // o brilho em volta da porta
+    const halo = ctx.createRadialGradient(dx, dTopo + dh * 0.6, 0, dx, dTopo + dh * 0.6, 520);
+    halo.addColorStop(0, 'rgba(255,214,130,.38)');
+    halo.addColorStop(0.3, 'rgba(255,200,100,.12)');
+    halo.addColorStop(1, 'rgba(255,200,100,0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, dTopo - 520, L, 1100);
+    // a porta: a luz de dentro, mais clara no meio, e a folha aberta, escura, de lado
+    const gp = ctx.createLinearGradient(dx - dw / 2, 0, dx + dw / 2, 0);
+    gp.addColorStop(0, '#ffe4a3');
+    gp.addColorStop(0.5, '#fff7e0');
+    gp.addColorStop(1, '#ffd98a');
+    ctx.fillStyle = gp;
+    ctx.fillRect(dx - dw / 2, dTopo, dw, dh);
+    ctx.fillStyle = 'rgba(40,30,10,.55)';
+    ctx.beginPath();
+    ctx.moveTo(dx - dw / 2, dTopo);
+    ctx.lineTo(dx - dw / 2 + 26, dTopo + 10);
+    ctx.lineTo(dx - dw / 2 + 26, dBase - 8);
+    ctx.lineTo(dx - dw / 2, dBase);
+    ctx.closePath();
+    ctx.fill();
+    // a poeira na luz
+    for (let i = 0; i < 240; i++) {
+      const t = r();
+      const y = dBase - 60 + t * 700;
+      const meia = dw / 2 + t * 420;
+      const x = dx + (r() - 0.5) * 2 * meia * 0.8;
+      const a = (1 - t) * (0.25 + r() * 0.5);
+      ctx.fillStyle = 'rgba(255,248,225,' + a.toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(x, y, 0.8 + r() * 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // o bilhete à mão, dentro da luz
+    ctx.fillStyle = tinta;
+    aMao(ctx, 'O Pai te espera', L / 2, dBase + 150, 50, r, { alinhar: 'center' });
+    aMao(ctx, 'de braços abertos', L / 2, dBase + 218, 50, r, { alinhar: 'center' });
+  }
+  function letrasNoCirculo(palavras, R, cor) {
+    const Q = 1400;
+    const fonte = document.createElement('canvas');
+    fonte.width = Q;
+    fonte.height = Q;
+    const k = fonte.getContext('2d');
+    k.fillStyle = '#000';
+    k.strokeStyle = '#000';
+    k.lineJoin = 'round';
+    const vao = Q * 0.035;
+    const altura = (Q - vao * (palavras.length - 1)) / palavras.length;
+    palavras.forEach((p, i) => {
+      k.save();
+      k.font = '800 200px Manrope, sans-serif';
+      k.textAlign = 'left';
+      k.textBaseline = 'alphabetic';
+      const m = k.measureText(p);
+      const w = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+      const h = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+      const gordo = 16;
+      k.translate(0, i * (altura + vao));
+      k.scale((Q - gordo * 3) / w, (altura - gordo * 3) / h);
+      k.translate(m.actualBoundingBoxLeft + gordo * 1.5 * w / Q, m.actualBoundingBoxAscent + gordo * 1.5 * h / altura);
+      k.fillText(p, 0, 0);
+      k.lineWidth = gordo;
+      k.strokeText(p, 0, 0);
+      k.restore();
+    });
+    const src = k.getImageData(0, 0, Q, Q).data;
+    const D = Math.ceil(R * 2);
+    const sai = document.createElement('canvas');
+    sai.width = D;
+    sai.height = D;
+    const ks = sai.getContext('2d');
+    const img = ks.createImageData(D, D);
+    const o = img.data;
+    const cr = parseInt(cor.slice(1, 3), 16);
+    const cg = parseInt(cor.slice(3, 5), 16);
+    const cb = parseInt(cor.slice(5, 7), 16);
+    const s2 = Math.SQRT2;
+    const alfa = (x, y) => {
+      const xi = Math.floor(x);
+      const yi = Math.floor(y);
+      if (xi < 0 || yi < 0 || xi >= Q - 1 || yi >= Q - 1) return 0;
+      const fx = x - xi;
+      const fy = y - yi;
+      const i = (yi * Q + xi) * 4 + 3;
+      return (src[i] * (1 - fx) + src[i + 4] * fx) * (1 - fy) + (src[i + Q * 4] * (1 - fx) + src[i + Q * 4 + 4] * fx) * fy;
+    };
+    for (let py = 0; py < D; py++) {
+      for (let px = 0; px < D; px++) {
+        const u = (px + 0.5 - R) / R;
+        const v = (py + 0.5 - R) / R;
+        const d2 = u * u + v * v;
+        if (d2 >= 1) continue;
+        const a2 = 2 + u * u - v * v;
+        const b2 = 2 - u * u + v * v;
+        const x = 0.5 * Math.sqrt(Math.max(0, a2 + 2 * s2 * u)) - 0.5 * Math.sqrt(Math.max(0, a2 - 2 * s2 * u));
+        const y = 0.5 * Math.sqrt(Math.max(0, b2 + 2 * s2 * v)) - 0.5 * Math.sqrt(Math.max(0, b2 - 2 * s2 * v));
+        let a = alfa((x + 1) / 2 * (Q - 1), (y + 1) / 2 * (Q - 1));
+        const borda = (1 - Math.sqrt(d2)) * R;
+        if (borda < 1) a *= borda;
+        if (a <= 0) continue;
+        const j = (py * D + px) * 4;
+        o[j] = cr;
+        o[j + 1] = cg;
+        o[j + 2] = cb;
+        o[j + 3] = a;
+      }
+    }
+    ks.putImageData(img, 0, 0);
+    return sai;
+  }
+  // Jesus salva: as duas palavras incham até encher um círculo, como as letras redondas dos
+  // adesivos dos anos 70, impressas em tinta no papel amarelo grosso (a tinta assentada, com
+  // a marca leve da prensa), e as ondas finas em volta, cada vez mais largas e mais fracas,
+  // como o som que se espalha. As letras são Manrope engordada, esticada num quadrado e
+  // levada para o círculo ponto a ponto (o mapa elíptico do quadrado no disco). Diferente
+  // dos recortes de revista de Jesus vive. Fechamento: as ondas.
+  function arteSalva(tela) {
+    let ctx = tela;
+    const r = sorteio(1625);
+    const g = ctx.createLinearGradient(0, 0, L, A);
+    g.addColorStop(0, '#ffcf63');
+    g.addColorStop(0.55, LP.amarelo);
+    g.addColorStop(1, '#f2b23a');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 40, { aClaro: 0.10, aEscuro: 0.05, claro: '255,244,214', escuro: '150,90,0' });
+    for (let i = 0; i < 400; i++) {
+      ctx.fillStyle = 'rgba(120,70,0,' + (0.04 + r() * 0.06).toFixed(3) + ')';
+      ctx.fillRect(r() * L, r() * A, 1 + r() * 4, 1);
+    }
+    const cx = L / 2;
+    const cy = 1030;
+    const R = 372;
+    // as ondas: anéis à mão, tremendo, cada vez mais abertos e mais fracos (numa camada que
+    // some antes da chama e da marca)
+    const aneis = camada();
+    ctx = aneis.ctx;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (let i = 0; i < 9; i++) {
+      const raio = R + 36 + i * (28 + i * 3);
+      const amp = 3 + i * 2.2;
+      const ondas = 9 + (i % 3);
+      const fase = r() * Math.PI * 2;
+      ctx.strokeStyle = 'rgba(18,19,15,' + Math.max(0.06, 0.78 - i * 0.07).toFixed(3) + ')';
+      ctx.lineWidth = Math.max(1.6, 5 - i * 0.32);
+      ctx.beginPath();
+      for (let j = 0; j <= 240; j++) {
+        const t = j / 240 * Math.PI * 2;
+        const rr = raio + Math.sin(t * ondas + fase) * amp + Math.sin(t * 3 + fase * 2) * amp * 0.5;
+        const x = cx + Math.cos(t) * rr;
+        const y = cy + Math.sin(t) * rr;
+        if (j) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.globalCompositeOperation = 'destination-in';
+    const mascara = ctx.createLinearGradient(0, 470, 0, 1560);
+    mascara.addColorStop(0, 'rgba(0,0,0,0)');
+    mascara.addColorStop(0.1, 'rgba(0,0,0,1)');
+    mascara.addColorStop(0.88, 'rgba(0,0,0,1)');
+    mascara.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = mascara;
+    ctx.fillRect(0, 0, L, A);
+    ctx = tela;
+    ctx.drawImage(aneis.c, 0, 0);
+    // as letras: a marca da prensa (luz embaixo, sombra em cima) e a tinta gasta
+    const letras = letrasNoCirculo(['JESUS', 'SALVA'], R, LP.tinta);
+    const { c, ctx: k } = camada();
+    k.drawImage(letras, cx - R, cy - R);
+    gastar(c, { x: cx - R, y: cy - R, w: 2 * R, h: 2 * R }, { pontos: 2000, manchas: 0, riscos: 0, semente: 1625, forca: 0.3 });
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,240,200,.55)';
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 4;
+    ctx.shadowBlur = 2;
+    ctx.globalAlpha = 0.95;
+    ctx.drawImage(c, 0, 0);
+    ctx.restore();
+  }
+  function corpoDoControle() {
+    const p = new Path2D();
+    const metade = [[0, -135], [120, -140, 230, -165, 330, -150], [420, -138, 462, -60, 472, 40], [486, 170, 472, 312, 402, 336],
+      [342, 356, 300, 322, 270, 262], [240, 202, 210, 150, 150, 150], [80, 150, 40, 156, 0, 156]];
+    p.moveTo(metade[0][0], metade[0][1]);
+    for (let i = 1; i < metade.length; i++) p.bezierCurveTo(...metade[i]);
+    // a metade esquerda, espelhada, de volta ao começo
+    for (let i = metade.length - 1; i >= 1; i--) {
+      const [a, b, c, d] = metade[i];
+      const ant = metade[i - 1];
+      const ex = ant.length === 2 ? ant[0] : ant[4];
+      const ey = ant.length === 2 ? ant[1] : ant[5];
+      p.bezierCurveTo(-c, d, -a, b, -ex, ey);
+    }
+    p.closePath();
+    return p;
+  }
+  // Jesus está no controle: a estampa de camiseta. O tecido sálvia com a trama e as dobras,
+  // e por cima a estampa em serigrafia: o controle desenhado com traço de pincel (mais grosso
+  // no lado da sombra), o amarelo fora de registro por baixo do preto, a sombra em retícula,
+  // a cruz direcional, quatro botões só de bolinha, os analógicos e a luz do jogador 1. A
+  // tinta é gasta, rachada de lavar, e as dobras do pano passam por cima de tudo. JESUS em
+  // cima, "está no" à mão e CONTROLE embaixo. Fechamento: o próprio controle.
+  function arteControle(ctx) {
+    const r = sorteio(1630);
+    const tinta = LP.tinta;
+    ctx.fillStyle = '#c3d488';
+    ctx.fillRect(0, 0, L, A);
+    // a estampa numa camada (para gastar a tinta sem gastar o pano)
+    const { c, ctx: k } = camada();
+    const cx = L / 2;
+    const cy = 985;
+    const esc = 0.8;
+    k.save();
+    k.translate(cx, cy);
+    k.rotate(-0.05);
+    k.scale(esc, esc);
+    const corpo = corpoDoControle();
+    // o amarelo, deslocado do preto como serigrafia que mexeu
+    k.save();
+    k.translate(9, 7);
+    for (const lado of [-1, 1]) {
+      k.fillStyle = '#eab544';
+      retRedondo(k, lado * 250 - 85, -196, 170, 66, 26);
+      k.fill();
+    }
+    k.fillStyle = LP.amarelo;
+    k.fill(corpo);
+    k.restore();
+    // a sombra em retícula, dentro do corpo, mais cheia embaixo e à direita
+    k.save();
+    k.clip(corpo);
+    reticula(k, -520, -220, 520, 380, 13, (x, y) => Math.max(0, (y + 40) / 380 + (x - 100) / 1400) * 0.95, 'rgba(18,19,15,.85)');
+    k.restore();
+    // o traço de pincel: fino no lado da luz, grosso no lado da sombra
+    k.strokeStyle = tinta;
+    k.lineJoin = 'round';
+    k.lineCap = 'round';
+    for (const lado of [-1, 1]) {
+      k.lineWidth = 7;
+      retRedondo(k, lado * 250 - 85, -196, 170, 66, 26);
+      k.stroke();
+    }
+    k.lineWidth = 7;
+    k.stroke(corpo);
+    k.save();
+    k.beginPath();
+    k.rect(-600, 40, 1200, 500);
+    k.clip();
+    k.lineWidth = 17;
+    k.stroke(corpo);
+    k.restore();
+    // a cruz direcional
+    k.fillStyle = tinta;
+    k.save();
+    k.translate(-268, -14);
+    retRedondo(k, -76, -26, 152, 52, 10);
+    k.fill();
+    retRedondo(k, -26, -76, 52, 152, 10);
+    k.fill();
+    k.restore();
+    // os botões: anéis de tinta com o miolo creme, um pouco fora do lugar
+    [[268, -82], [336, -14], [268, 54], [200, -14]].forEach(([x, y], i) => {
+      k.fillStyle = i % 2 ? LP.creme : '#fffaf0';
+      k.beginPath();
+      k.arc(x + 6, y + 5, 30, 0, Math.PI * 2);
+      k.fill();
+      k.strokeStyle = tinta;
+      k.lineWidth = 7;
+      k.beginPath();
+      k.arc(x, y, 31, 0, Math.PI * 2);
+      k.stroke();
+    });
+    // os analógicos
+    for (const lado of [-1, 1]) {
+      const x = lado * 124;
+      const y = 92;
+      k.fillStyle = tinta;
+      k.beginPath();
+      k.arc(x, y, 64, 0, Math.PI * 2);
+      k.fill();
+      k.strokeStyle = LP.amarelo;
+      k.lineWidth = 6;
+      k.beginPath();
+      k.arc(x + 4, y + 3, 40, Math.PI * 1.05, Math.PI * 1.55);
+      k.stroke();
+    }
+    for (const lado of [-1, 1]) {
+      k.fillStyle = tinta;
+      retRedondo(k, lado * 70 - 28, -64, 56, 18, 9);
+      k.fill();
+    }
+    for (let i = 0; i < 4; i++) {
+      k.fillStyle = i === 0 ? LP.creme : tinta;
+      k.beginPath();
+      k.arc(-42 + i * 28, -8, 8, 0, Math.PI * 2);
+      k.fill();
+    }
+    // o brilho da tinta clara no alto
+    k.strokeStyle = '#fffaf0';
+    k.lineWidth = 10;
+    k.beginPath();
+    k.moveTo(-390, -88);
+    k.quadraticCurveTo(-330, -130, -220, -136);
+    k.stroke();
+    k.restore();
+    // a frase, na mesma tinta
+    const mn = (t) => '800 ' + t + 'px Manrope, sans-serif';
+    const tJ = caber(k, 'JESUS', mn, 700, 250, -0.02);
+    S.escrever(k, 'JESUS', L / 2, 740, mn(tJ), tinta, { espaco: -tJ * 0.02 });
+    k.fillStyle = tinta;
+    aMao(k, 'está no', L / 2, 1316, 74, r, { alinhar: 'center' });
+    const tC = caber(k, 'CONTROLE', mn, 840, 210, -0.02);
+    S.escrever(k, 'CONTROLE', L / 2, 1340 + tC * 0.74, mn(tC), tinta, { espaco: -tC * 0.02 });
+    // a tinta rachada de lavar
+    gastar(c, { x: 60, y: 520, w: L - 120, h: 1020 }, { pontos: 11000, manchas: 40, riscos: 260, semente: 1631, forca: 0.7 });
+    ctx.drawImage(c, 0, 0);
+    // a trama do pano, por cima de tudo
+    for (let y = 0; y < A; y += 4) {
+      ctx.fillStyle = 'rgba(40,50,20,.05)';
+      ctx.fillRect(0, y, L, 1.5);
+    }
+    for (let x = 0; x < L; x += 4) {
+      ctx.fillStyle = 'rgba(255,255,240,.04)';
+      ctx.fillRect(x, 0, 1.5, A);
+    }
+    // as dobras: faixas largas de luz e de sombra, macias
+    const dobra = camada();
+    const d = dobra.ctx;
+    d.filter = 'blur(38px)';
+    d.lineCap = 'round';
+    for (const [x0, y0, x1, y1, w, cor] of [
+      [-100, 380, 1180, 760, 90, 'rgba(250,255,230,.32)'], [-100, 470, 1180, 860, 70, 'rgba(50,62,22,.22)'],
+      [-80, 1580, 1160, 1180, 110, 'rgba(250,255,230,.26)'], [-80, 1690, 1160, 1290, 80, 'rgba(50,62,22,.20)'],
+      [760, -40, 1180, 620, 60, 'rgba(50,62,22,.16)']]) {
+      d.strokeStyle = cor;
+      d.lineWidth = w;
+      d.beginPath();
+      d.moveTo(x0, y0);
+      d.quadraticCurveTo((x0 + x1) / 2, (y0 + y1) / 2 - 80, x1, y1);
+      d.stroke();
+    }
+    d.filter = 'none';
+    ctx.drawImage(dobra.c, 0, 0);
+  }
+  function vidroDaLampada(r0) {
+    const p = new Path2D();
+    const a1 = Math.PI * 0.80;
+    const a2 = Math.PI * 0.20;
+    const gx = r0 * 0.44;
+    const gy = r0 * 1.32;
+    p.moveTo(Math.cos(a1) * r0, Math.sin(a1) * r0);
+    p.arc(0, 0, r0, a1, a2, false);
+    p.bezierCurveTo(r0 * 0.66, r0 * 0.98, gx, r0 * 1.06, gx, gy);
+    p.lineTo(-gx, gy);
+    p.bezierCurveTo(-gx, r0 * 1.06, -r0 * 0.66, r0 * 0.98, Math.cos(a1) * r0, Math.sin(a1) * r0);
+    p.closePath();
+    return p;
+  }
+  // Sal e luz do mundo: a lâmpada acesa que é saleiro. O vidro amarelo brilha no escuro, com
+  // a borda acesa em vez de contorno, o reflexo e a frase à mão em tinta dentro dele; a rosca
+  // virou a tampa de metal furada do saleiro, de onde cai o sal, grão por grão, cada um
+  // pegando a luz. Diferente de Luz do mundo (a lâmpada em traço laranja no marrom): aqui o
+  // vidro é cheio e aceso, a letra fica dentro e o sal é o gancho. Lema com a referência
+  // (Mateus 5.13-14 fala do sal da terra e da luz do mundo). Fechamento: o sal caindo.
+  function arteSalLuz(ctx) {
+    const r = sorteio(1640);
+    ctx.fillStyle = '#0a0b09';
+    ctx.fillRect(0, 0, L, A);
+    const cx = 540;
+    const cy = 790;
+    const r0 = 250;
+    const giro = -0.2;
+    for (const [rr, a] of [[900, 0.16], [520, 0.22], [330, 0.25]]) {
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+      g.addColorStop(0, 'rgba(255,196,77,' + a + ')');
+      g.addColorStop(1, 'rgba(255,196,77,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, L, A);
+    }
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(giro);
+    const vidro = vidroDaLampada(r0);
+    // o vidro aceso: o miolo quase branco, o amarelo e a borda mais funda
+    const gv = ctx.createRadialGradient(-r0 * 0.15, -r0 * 0.15, 0, 0, r0 * 0.2, r0 * 1.45);
+    gv.addColorStop(0, '#fff8e2');
+    gv.addColorStop(0.35, '#ffe08f');
+    gv.addColorStop(0.75, '#ffc44d');
+    gv.addColorStop(1, '#e79a24');
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,200,90,.85)';
+    ctx.shadowBlur = 120;
+    ctx.fillStyle = gv;
+    ctx.fill(vidro);
+    ctx.restore();
+    ctx.save();
+    ctx.clip(vidro);
+    // a borda funda por dentro (o vidro é curvo) e a borda acesa por fora
+    ctx.lineWidth = 46;
+    ctx.strokeStyle = 'rgba(205,120,15,.32)';
+    ctx.filter = 'blur(10px)';
+    ctx.stroke(vidro);
+    ctx.filter = 'none';
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(255,250,230,.5)';
+    ctx.stroke(vidro);
+    // o reflexo da janela, macio
+    ctx.filter = 'blur(6px)';
+    ctx.strokeStyle = 'rgba(255,255,255,.8)';
+    ctx.lineWidth = 22;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(0, 0, r0 * 0.78, Math.PI * 1.1, Math.PI * 1.32);
+    ctx.stroke();
+    ctx.filter = 'none';
+    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.beginPath();
+    ctx.ellipse(r0 * 0.52, -r0 * 0.5, 9, 14, 0.7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    // a frase à mão dentro do vidro
+    ctx.fillStyle = LP.tinta;
+    const linha = (partes, y) => {
+      const larg = partes.map(([t, tam]) => { ctx.font = '400 ' + tam + 'px "Permanent Marker", cursive'; return ctx.measureText(t).width; });
+      const vao = 16;
+      let x = -(larg.reduce((a, b) => a + b, 0) + vao * (partes.length - 1)) / 2;
+      partes.forEach(([t, tam], i) => {
+        aMao(ctx, t, x, y, tam, r);
+        x += larg[i] + vao;
+      });
+    };
+    linha([['SAL', 104], ['e', 56], ['LUZ', 104]], -34);
+    linha([['do', 56], ['MUNDO', 94]], 84);
+    // a tampa de metal do saleiro, no lugar da rosca
+    const gy = r0 * 1.32;
+    const tw = r0 * 0.5;
+    const th = r0 * 0.5;
+    const metal = ctx.createLinearGradient(-tw, 0, tw, 0);
+    metal.addColorStop(0, '#3f423d');
+    metal.addColorStop(0.18, '#8e928a');
+    metal.addColorStop(0.34, '#eef0e8');
+    metal.addColorStop(0.46, '#b9bcb3');
+    metal.addColorStop(0.75, '#6e7269');
+    metal.addColorStop(1, '#30332e');
+    ctx.fillStyle = metal;
+    retRedondo(ctx, -tw, gy - 6, tw * 2, th, 12);
+    ctx.fill();
+    // as voltas da rosca: uma linha de luz e uma de sombra em cada
+    for (let i = 1; i < 4; i++) {
+      const y = gy - 6 + i * th / 4;
+      ctx.strokeStyle = 'rgba(0,0,0,.35)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-tw + 2, y);
+      ctx.quadraticCurveTo(0, y + 10, tw - 2, y);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-tw + 2, y + 3);
+      ctx.quadraticCurveTo(0, y + 13, tw - 2, y + 3);
+      ctx.stroke();
+    }
+    // o amarelo da lâmpada batendo no alto da tampa
+    const reflexo = ctx.createLinearGradient(0, gy - 6, 0, gy + 30);
+    reflexo.addColorStop(0, 'rgba(255,196,77,.55)');
+    reflexo.addColorStop(1, 'rgba(255,196,77,0)');
+    ctx.fillStyle = reflexo;
+    ctx.fillRect(-tw, gy - 6, tw * 2, 36);
+    // o fundo da tampa com os furos
+    const fy = gy - 6 + th;
+    const fundoTampa = ctx.createLinearGradient(-tw, 0, tw, 0);
+    fundoTampa.addColorStop(0, '#5a5e57');
+    fundoTampa.addColorStop(0.4, '#c9ccc3');
+    fundoTampa.addColorStop(1, '#4a4d47');
+    ctx.fillStyle = fundoTampa;
+    ctx.beginPath();
+    ctx.ellipse(0, fy, tw, 24, 0, 0, Math.PI * 2);
+    ctx.fill();
+    for (const [hx, hy] of [[-60, -6], [-20, -10], [20, -10], [60, -6], [-40, 8], [0, 6], [40, 8], [-80, 2], [80, 2]]) {
+      ctx.fillStyle = '#121310';
+      ctx.beginPath();
+      ctx.ellipse(hx, fy + hy, 6, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.35)';
+      ctx.beginPath();
+      ctx.ellipse(hx + 1, fy + hy + 3, 5, 1.6, 0, 0, Math.PI);
+      ctx.fill();
+    }
+    const saida = [-Math.sin(giro) * (fy + 16), Math.cos(giro) * (fy + 16)];
+    ctx.restore();
+    // o sal caindo: cristais com um lado aceso pela lâmpada, alguns em rastro
+    const sx = cx + saida[0];
+    const sy = cy + saida[1];
+    for (let i = 0; i < 1100; i++) {
+      const t = Math.pow(r(), 1.2);
+      const y = sy + t * (1530 - sy);
+      const abre = 30 + t * 240;
+      const x = sx + (r() + r() + r() - 1.5) / 1.5 * abre;
+      const a = (1 - t * 0.65) * (0.45 + r() * 0.55);
+      const s = 2.2 + r() * 5 * (1 - t * 0.3);
+      ctx.save();
+      ctx.translate(x, y);
+      if (r() < 0.06) {
+        const rastro = 8 + r() * 16;
+        const g = ctx.createLinearGradient(0, -rastro, 0, 0);
+        g.addColorStop(0, 'rgba(246,244,232,0)');
+        g.addColorStop(1, 'rgba(246,244,232,' + (a * 0.6).toFixed(3) + ')');
+        ctx.fillStyle = g;
+        ctx.fillRect(-s * 0.3, -rastro, s * 0.6, rastro);
+      }
+      ctx.rotate(r() * Math.PI);
+      ctx.fillStyle = 'rgba(150,148,138,' + a.toFixed(3) + ')';
+      ctx.fillRect(-s / 2, -s / 2, s, s);
+      ctx.fillStyle = 'rgba(255,246,220,' + a.toFixed(3) + ')';
+      ctx.fillRect(-s / 2, -s / 2, s * 0.6, s * 0.6);
+      ctx.restore();
+    }
+    referencia(ctx, 'Mateus 5.13-14', 90, 1490, 30, 'rgba(242,239,220,.72)', 'left');
+  }
+  // Que haja Deus em tudo o que for meu: o papel de cartão sálvia, quase vazio, com uma
+  // etiqueta de papel creme amarrada no barbante que desce do alto, a sombra da etiqueta e
+  // do barbante no papel, e na etiqueta só uma cruz carimbada. A frase pequena, em Oswald
+  // condensada, no alto à esquerda: a etiqueta diz de quem é. Fechamento: a etiqueta.
+  function barbante(ctx, pts, r, cor = '#e7dcc0') {
+    // a linha torcida: o traço claro e os gomos escuros em diagonal por cima
+    const caminho = new Path2D();
+    caminho.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length - 1; i++) caminho.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+    caminho.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = cor;
+    ctx.lineWidth = 6;
+    ctx.stroke(caminho);
+    ctx.setLineDash([3, 5]);
+    ctx.strokeStyle = 'rgba(120,100,60,.55)';
+    ctx.lineWidth = 6;
+    ctx.stroke(caminho);
+    ctx.setLineDash([]);
+    ctx.restore();
+    return caminho;
+  }
+  function arteMeu(ctx) {
+    const r = sorteio(1645);
+    // o cartão sálvia com fibras e a luz da janela no alto à direita
+    ctx.fillStyle = '#c4d589';
+    ctx.fillRect(0, 0, L, A);
+    const luz = ctx.createRadialGradient(L * 0.85, 260, 0, L * 0.85, 260, 1500);
+    luz.addColorStop(0, 'rgba(245,252,220,.38)');
+    luz.addColorStop(1, 'rgba(245,252,220,0)');
+    ctx.fillStyle = luz;
+    ctx.fillRect(0, 0, L, A);
+    const canto = ctx.createLinearGradient(0, A, L * 0.4, A * 0.6);
+    canto.addColorStop(0, 'rgba(60,72,25,.18)');
+    canto.addColorStop(1, 'rgba(60,72,25,0)');
+    ctx.fillStyle = canto;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 30, { aClaro: 0.07, aEscuro: 0.04, claro: '250,255,235', escuro: '60,72,25' });
+    for (let i = 0; i < 700; i++) {
+      ctx.strokeStyle = 'rgba(60,72,25,' + (0.05 + r() * 0.08).toFixed(3) + ')';
+      ctx.lineWidth = 0.7 + r() * 0.8;
+      const x = r() * L;
+      const y = r() * A;
+      const a = r() * Math.PI;
+      const c = 5 + r() * 16;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + Math.cos(a) * c * 0.5 + r() * 3, y + Math.sin(a) * c * 0.5 + r() * 3, x + Math.cos(a) * c, y + Math.sin(a) * c);
+      ctx.stroke();
+    }
+    // a frase, pequena, no alto à esquerda
+    const tinta = LP.tinta;
+    ['QUE HAJA DEUS', 'EM TUDO O QUE', 'FOR MEU.'].forEach((l, i) => S.escrever(ctx, l, 104, 640 + i * 62, oswaldLP(52, 600), tinta, { alinhar: 'left', espaco: 5 }));
+    // a etiqueta: girada, com o furo reforçado no alto
+    const tx = 676;
+    const ty = 1150;
+    const tg = 0.2;
+    const tw = 270;
+    const th = 470;
+    const local = (x, y) => [tx + x * Math.cos(tg) - y * Math.sin(tg), ty + x * Math.sin(tg) + y * Math.cos(tg)];
+    const furo = local(0, -th / 2 + 52);
+    // o barbante desce do alto, faz a laçada no furo e sobra uma ponta
+    const fioPts = [[1000, -20], [930, 340], [840, 640], furo];
+    const pontaPts = [furo, [furo[0] - 46, furo[1] - 34], [furo[0] - 104, furo[1] - 50], [furo[0] - 156, furo[1] - 22]];
+    // as sombras no papel, macias e deslocadas para baixo e à esquerda
+    ctx.save();
+    ctx.filter = 'blur(9px)';
+    ctx.translate(-16, 26);
+    ctx.strokeStyle = 'rgba(40,50,15,.35)';
+    ctx.lineWidth = 6;
+    for (const pts of [fioPts, pontaPts]) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      ctx.stroke();
+    }
+    ctx.restore();
+    const forma = new Path2D();
+    forma.moveTo(-tw / 2 + 60, -th / 2);
+    forma.lineTo(tw / 2 - 60, -th / 2);
+    forma.lineTo(tw / 2, -th / 2 + 70);
+    forma.lineTo(tw / 2, th / 2);
+    forma.lineTo(-tw / 2, th / 2);
+    forma.lineTo(-tw / 2, -th / 2 + 70);
+    forma.closePath();
+    ctx.save();
+    ctx.translate(tx, ty);
+    ctx.rotate(tg);
+    ctx.save();
+    ctx.shadowColor = 'rgba(40,50,15,.42)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetX = -14;
+    ctx.shadowOffsetY = 24;
+    ctx.fillStyle = '#f3eedb';
+    ctx.fill(forma);
+    ctx.restore();
+    ctx.save();
+    ctx.clip(forma);
+    // o papel da etiqueta: uma dobrinha de luz e as fibras
+    const gt = ctx.createLinearGradient(-tw / 2, 0, tw / 2, 0);
+    gt.addColorStop(0, 'rgba(0,0,0,.06)');
+    gt.addColorStop(0.6, 'rgba(255,255,255,.08)');
+    gt.addColorStop(1, 'rgba(0,0,0,.08)');
+    ctx.fillStyle = gt;
+    ctx.fillRect(-tw / 2, -th / 2, tw, th);
+    for (let i = 0; i < 220; i++) {
+      ctx.fillStyle = 'rgba(120,100,60,' + (0.05 + r() * 0.08).toFixed(3) + ')';
+      ctx.fillRect(-tw / 2 + r() * tw, -th / 2 + r() * th, 1 + r() * 4, 1);
+    }
+    ctx.restore();
+    // o reforço do furo
+    ctx.fillStyle = '#e2d39d';
+    ctx.beginPath();
+    ctx.arc(0, -th / 2 + 52, 30, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#c4d589';
+    ctx.beginPath();
+    ctx.arc(0, -th / 2 + 52, 13, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(80,60,20,.25)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // a cruz carimbada, com a tinta falhando
+    const carimbo = camada();
+    const k = carimbo.ctx;
+    k.translate(tx, ty);
+    k.rotate(tg + 0.03);
+    k.fillStyle = tinta;
+    k.fillRect(-11, -40, 22, 200);
+    k.fillRect(-62, 12, 124, 22);
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    gastar(carimbo.c, { x: tx - 150, y: ty - 100, w: 300, h: 330 }, { pontos: 700, manchas: 8, riscos: 0, semente: 1646, forca: 0.7 });
+    ctx.restore();
+    ctx.save();
+    ctx.globalAlpha = 0.88;
+    ctx.drawImage(carimbo.c, 0, 0);
+    ctx.restore();
+    // o barbante por cima de tudo
+    barbante(ctx, fioPts, r);
+    barbante(ctx, pontaPts, r);
+  }
+  // Deus tem um plano para você: DEUS gigante, deitado de lado, ocupando a altura do story,
+  // impresso em tipografia no papel de algodão: a tinta grafite assentada no papel, que
+  // afunda um pouco (a luz rasante mostra a borda), com o grão da tinta. "tem um plano para
+  // você." pequeno, escondido na barriga do D. Quem passa vê a palavra; quem para acha o
+  // resto. Fechamento: nenhum, só o texto escondido.
+  function artePlano(ctx) {
+    const r = sorteio(1650);
+    fundoPapel(ctx, '#e8e3d9', 1650);
+    // a luz rasante da janela, da esquerda
+    const raso = ctx.createLinearGradient(0, 0, L, A * 0.3);
+    raso.addColorStop(0, 'rgba(255,253,245,.35)');
+    raso.addColorStop(0.6, 'rgba(255,253,245,0)');
+    raso.addColorStop(1, 'rgba(60,50,35,.10)');
+    ctx.fillStyle = raso;
+    ctx.fillRect(0, 0, L, A);
+    const mn = (t) => '800 ' + t + 'px Manrope, sans-serif';
+    ctx.font = mn(100);
+    const m = ctx.measureText('DEUS');
+    const w100 = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+    const h100 = m.actualBoundingBoxAscent;
+    const y0 = 556;
+    const y1 = 1500;
+    const largura = 720;
+    const sx = (y1 - y0) / w100;
+    const sy = largura / h100;
+    const palavra = (k, cor) => {
+      k.save();
+      k.translate(L / 2 + largura / 2, y0);
+      k.rotate(Math.PI / 2);
+      k.scale(sx, sy);
+      k.fillStyle = cor;
+      k.textAlign = 'left';
+      k.textBaseline = 'alphabetic';
+      k.fillText('DEUS', m.actualBoundingBoxLeft, h100);
+      k.restore();
+    };
+    // a impressão: a borda clara embaixo (o papel que subiu) e a sombra em cima
+    const { c, ctx: k } = camada();
+    k.font = mn(100);
+    palavra(k, '#34352f');
+    gastar(c, { x: 150, y: 520, w: 780, h: 1020 }, { pontos: 5000, manchas: 0, riscos: 0, semente: 1651, forca: 0.2 });
+    // a tinta mais carregada nas bordas (o que a prensa faz)
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,255,250,.75)';
+    ctx.shadowOffsetX = -3;
+    ctx.shadowOffsetY = 3;
+    ctx.shadowBlur = 3;
+    ctx.drawImage(c, 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.shadowColor = 'rgba(40,35,25,.35)';
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = -2;
+    ctx.shadowBlur = 4;
+    ctx.globalAlpha = 0.25;
+    ctx.drawImage(c, 0, 0);
+    ctx.restore();
+    // as linhas de construção do desenho das letras, finas, como quem planejou cada uma:
+    // a base e o alto das letras, os limites de cada letra e os círculos das curvas
+    ctx.save();
+    ctx.strokeStyle = 'rgba(52,53,47,.26)';
+    ctx.lineWidth = 1.6;
+    const xBase = L / 2 + largura / 2;
+    const xAlto = L / 2 - largura / 2;
+    for (const x of [xBase, xAlto]) {
+      ctx.beginPath();
+      ctx.moveTo(x, 500);
+      ctx.lineTo(x, 1556);
+      ctx.stroke();
+    }
+    ctx.font = mn(100);
+    const limites = ['', 'D', 'DE', 'DEU', 'DEUS'].map((t) => y0 + (t ? ctx.measureText(t).width : 0) * sx);
+    for (const y of limites) {
+      ctx.beginPath();
+      ctx.moveTo(110, y);
+      ctx.lineTo(L - 110, y);
+      ctx.stroke();
+    }
+    ctx.setLineDash([6, 8]);
+    ctx.beginPath();
+    ctx.ellipse(L / 2, limites[1] - (limites[1] - limites[0]) * 0.5, largura * 0.5, (limites[1] - limites[0]) * 0.52, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(L / 2, (limites[3] + limites[4]) / 2, largura * 0.5, (limites[4] - limites[3]) * 0.52, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // as marcas de medida no pé, como num projeto
+    for (const y of limites) {
+      ctx.beginPath();
+      ctx.moveTo(L - 140, y - 10);
+      ctx.lineTo(L - 120, y + 10);
+      ctx.stroke();
+    }
+    ctx.restore();
+    // a barriga do D: o meio da primeira letra
+    ctx.font = mn(100);
+    const mD = ctx.measureText('D');
+    const wD = (mD.actualBoundingBoxLeft + mD.actualBoundingBoxRight) * sx;
+    const yD = y0 + wD * 0.47 + 12;
+    S.escrever(ctx, 'tem um plano para você.', L / 2 - 4, yD, '700 33px Manrope, sans-serif', LP.tinta);
+    void r;
+  }
+  // Peça a Deus. Confie em Deus. Agradeça a Deus.: o adesivo de vinil de um cubo em
+  // perspectiva isométrica, colado na capa amarela de um caderno, com a borda de corte creme,
+  // a espessura e a sombra do adesivo, o brilho do vinil e uma ponta descolando. Uma frase
+  // em cada face, em Oswald creme, deitada na face dela; as faces com a luz de cima.
+  // Fechamento: a ponta que descola.
+  function arteCubo(ctx) {
+    const r = sorteio(1655);
+    // a capa do caderno: amarelo com textura de cartão e a luz vindo de cima
+    const g = ctx.createLinearGradient(0, 0, 0, A);
+    g.addColorStop(0, '#ffcd5c');
+    g.addColorStop(1, '#efad35');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 40, { aClaro: 0.09, aEscuro: 0.05, claro: '255,245,215', escuro: '140,80,0' });
+    for (let i = 0; i < 9000; i++) {
+      ctx.fillStyle = r() < 0.6 ? 'rgba(130,80,0,' + (0.05 + r() * 0.1).toFixed(3) + ')' : 'rgba(255,248,225,' + (0.12 + r() * 0.2).toFixed(3) + ')';
+      ctx.fillRect(r() * L, r() * A, 1 + r() * 1.5, 1 + r() * 1.5);
+    }
+    const a = 380;
+    const c = Math.cos(Math.PI / 6);
+    const s = 0.5;
+    const soma = (...v) => v.reduce((t, x) => [t[0] + x[0], t[1] + x[1]], [0, 0]);
+    const P0 = [0, 0];
+    const Lv = [-c * a, -s * a];
+    const Rv = [c * a, -s * a];
+    const D = [0, a];
+    // o contorno do adesivo: o hexágono com a margem de corte e os cantos redondos
+    const hexa = [soma(Lv, Rv), soma(Rv), soma(Rv, D), soma(D), soma(Lv, D), soma(Lv)];
+    const margem = 46;
+    const contorno = [];
+    hexa.forEach(([x, y]) => {
+      const n = Math.hypot(x, y);
+      contorno.push([x + x / n * margem * 1.12, y + y / n * margem * 1.12]);
+    });
+    const raio = 40;
+    const forma = new Path2D();
+    contorno.forEach((p, i) => {
+      const ant = contorno[(i + 5) % 6];
+      const prox = contorno[(i + 1) % 6];
+      const de = [p[0] + (ant[0] - p[0]) * raio / Math.hypot(ant[0] - p[0], ant[1] - p[1]), p[1] + (ant[1] - p[1]) * raio / Math.hypot(ant[0] - p[0], ant[1] - p[1])];
+      const ate = [p[0] + (prox[0] - p[0]) * raio / Math.hypot(prox[0] - p[0], prox[1] - p[1]), p[1] + (prox[1] - p[1]) * raio / Math.hypot(prox[0] - p[0], prox[1] - p[1])];
+      if (i) forma.lineTo(de[0], de[1]); else forma.moveTo(de[0], de[1]);
+      forma.quadraticCurveTo(p[0], p[1], ate[0], ate[1]);
+    });
+    forma.closePath();
+    // a ponta que descola: o canto de baixo à direita (o vértice 2 do contorno)
+    const C = contorno[2];
+    const A1 = [C[0] + (contorno[1][0] - C[0]) * 0.17, C[1] + (contorno[1][1] - C[1]) * 0.17];
+    const B1 = [C[0] + (contorno[3][0] - C[0]) * 0.17, C[1] + (contorno[3][1] - C[1]) * 0.17];
+    // o canto refletido na linha da dobra (A1-B1): o verso do adesivo virado
+    const ux = B1[0] - A1[0];
+    const uy = B1[1] - A1[1];
+    const un = Math.hypot(ux, uy);
+    const tx = ux / un;
+    const ty = uy / un;
+    const vx = C[0] - A1[0];
+    const vy = C[1] - A1[1];
+    const proj = vx * tx + vy * ty;
+    const Cr = [A1[0] + 2 * proj * tx - vx, A1[1] + 2 * proj * ty - vy];
+    const semCanto = new Path2D();
+    semCanto.rect(-2000, -2000, 4000, 4000);
+    semCanto.moveTo(A1[0], A1[1]);
+    semCanto.lineTo(C[0] + (C[0] - A1[0]) * 0.2 + (C[0] - B1[0]) * 0.2, C[1] + (C[1] - A1[1]) * 0.2 + (C[1] - B1[1]) * 0.2);
+    semCanto.lineTo(B1[0], B1[1]);
+    semCanto.closePath();
+    ctx.save();
+    ctx.translate(L / 2, 1030);
+    ctx.rotate(-0.1);
+    ctx.save();
+    ctx.clip(semCanto, 'evenodd');
+    // a sombra e a espessura do adesivo
+    ctx.save();
+    ctx.shadowColor = 'rgba(110,60,0,.45)';
+    ctx.shadowBlur = 22;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 12;
+    ctx.fillStyle = '#d9d2bc';
+    ctx.fill(forma);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(0, -3);
+    ctx.fillStyle = '#fbf8ec';
+    ctx.fill(forma);
+    // as faces: [origem, eixo x, eixo y, cor de cima, cor de baixo, linhas]
+    const faces = [
+      [Lv, [c, s], [0, 1], '#1a1b17', '#0d0e0b', ['PEÇA A', 'DEUS']],
+      [Lv, [c, -s], [c, s], '#34352f', '#24251f', ['CONFIE', 'EM DEUS']],
+      [P0, [c, -s], [0, 1], '#26271f', '#15160f', ['AGRADEÇA', 'A DEUS']],
+    ];
+    const vao = 6;
+    for (const [o, ex, ey, c1, c2, linhas] of faces) {
+      ctx.save();
+      ctx.transform(ex[0], ex[1], ey[0], ey[1], o[0], o[1]);
+      const gf = ctx.createLinearGradient(0, 0, a * 0.3, a);
+      gf.addColorStop(0, c1);
+      gf.addColorStop(1, c2);
+      ctx.fillStyle = gf;
+      retRedondo(ctx, vao, vao, a - 2 * vao, a - 2 * vao, 26);
+      ctx.fill();
+      const largura = a * 0.8;
+      const tams = linhas.map((l) => caber(ctx, l, (t) => oswaldLP(t, 700), largura, 400));
+      const caps = tams.map((t) => { ctx.font = oswaldLP(t, 700); return ctx.measureText('H').actualBoundingBoxAscent; });
+      const entre = a * 0.06;
+      const total = caps.reduce((x, y) => x + y, 0) + entre * (linhas.length - 1);
+      const k = Math.min(1, (a * 0.78) / total);
+      ctx.translate(a / 2, a / 2 - total * k / 2);
+      ctx.scale(1, k);
+      let y = 0;
+      linhas.forEach((l, i) => {
+        y += caps[i];
+        S.escrever(ctx, l, 0, y, oswaldLP(tams[i], 700), '#f6f2e2');
+        y += entre;
+      });
+      ctx.restore();
+    }
+    // o brilho do vinil: uma faixa larga e fraca na diagonal
+    ctx.save();
+    ctx.clip(forma);
+    const brilho = ctx.createLinearGradient(-500, -500, 500, 500);
+    brilho.addColorStop(0, 'rgba(255,255,255,0)');
+    brilho.addColorStop(0.36, 'rgba(255,255,255,0)');
+    brilho.addColorStop(0.42, 'rgba(255,255,255,.16)');
+    brilho.addColorStop(0.5, 'rgba(255,255,255,.04)');
+    brilho.addColorStop(0.56, 'rgba(255,255,255,0)');
+    ctx.fillStyle = brilho;
+    ctx.fillRect(-600, -600, 1200, 1200);
+    ctx.restore();
+    ctx.restore();
+    ctx.restore();
+    // a ponta virada: o verso do adesivo, com a sombra que ela faz por baixo
+    ctx.save();
+    ctx.shadowColor = 'rgba(110,60,0,.4)';
+    ctx.shadowBlur = 16;
+    ctx.shadowOffsetX = -4;
+    ctx.shadowOffsetY = 10;
+    const verso = ctx.createLinearGradient(A1[0], A1[1], Cr[0], Cr[1]);
+    verso.addColorStop(0, '#d7d1c0');
+    verso.addColorStop(0.5, '#f4f1e7');
+    verso.addColorStop(1, '#e6e1d2');
+    ctx.fillStyle = verso;
+    ctx.beginPath();
+    ctx.moveTo(A1[0], A1[1] - 3);
+    ctx.quadraticCurveTo((A1[0] + B1[0]) / 2 + (Cr[0] - C[0]) * 0.1, (A1[1] + B1[1]) / 2 - 3, B1[0], B1[1] - 3);
+    ctx.lineTo(Cr[0], Cr[1] - 3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    ctx.restore();
   }
 
   S.prepararArte = prepararArte;
