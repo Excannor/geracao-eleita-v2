@@ -5,6 +5,14 @@ description: Como criar e avaliar as artes de story das frases da ofensiva (src/
 
 # Artes de story
 
+## Para que a arte existe
+Ela tem três trabalhos, nesta ordem de avaliação:
+1. **Motivar quem postou.** A ofensiva aparece como conquista, sem virar o assunto da arte.
+2. **Despertar interesse em quem vê.** A frase precisa funcionar sozinha para quem nunca abriu o app, como mensagem de fé que fala com a pessoa. Mostre uma cena ou ideia que gere curiosidade, não só decoração.
+3. **Fazer outros compartilharem.** A arte precisa ser bonita a ponto de alguém querer repostar ou mandar para um amigo, mesmo sem ofensiva. Ela não pode ter cara de print de app nem de selo de conquista. A marca fica presente e discreta, para quem vê saber de onde veio e encontrar o Geração Eleita.
+
+Pergunta de marketing para cada arte: "Uma pessoa de 16 a 25 anos que segue quem postou pararia, leria e repostaria isso?" Se a resposta for não, refaça.
+
 Toda arte nova passa pela aprovação do dono antes de publicar. Mande uma imagem única com todas as artes da rodada lado a lado.
 
 ## O que não muda (identidade)
