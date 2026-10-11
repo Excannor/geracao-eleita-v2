@@ -2465,10 +2465,44 @@
     coroaBranca(ctx, 900, 1408, 140, 0.14, r);
   }
 
+  // A chama do relógio, em contorno amarelo no traço à mão do relógio (duas passadas, a
+  // segunda fina e mais fraca, um pouco ao lado): as línguas de fogo e uma linha por dentro,
+  // sem preenchimento nem brilho. (fx, fb) é o meio da base; fh, a altura.
+  // as três línguas (a da esquerda, a do meio, mais alta e virada para a direita, e a
+  // pequena da direita) e, por dentro, um risco só subindo da base, como na arte de referência.
+  // Cada trecho são três pontos de uma curva de Bézier.
+  const CHAMA_FORA = [[0, 0], [-0.36, 0], [-0.5, -0.26], [-0.4, -0.5], [-0.36, -0.6], [-0.36, -0.68], [-0.4, -0.78],
+    [-0.24, -0.7], [-0.14, -0.62], [-0.12, -0.52], [-0.14, -0.72], [-0.02, -0.88], [0.1, -1],
+    [0.08, -0.86], [0.16, -0.74], [0.24, -0.64], [0.28, -0.68], [0.33, -0.72], [0.36, -0.8],
+    [0.52, -0.52], [0.4, -0.02], [0, 0]];
+  const CHAMA_DENTRO = [[0.06, -0.12], [-0.14, -0.16], [-0.12, -0.38], [0.02, -0.54]];
+  function chamaAMao(ctx, fx, fb, fh, r) {
+    const fw = fh * 0.72;
+    const passada = (pts, dx, dy, lw, alfa) => {
+      const q = pts.map(([x, y]) => [fx + x * fw + dx + (r() - 0.5) * 3, fb + y * fh + dy + (r() - 0.5) * 3]);
+      ctx.save();
+      ctx.globalAlpha = alfa;
+      ctx.strokeStyle = LP.amarelo;
+      ctx.lineWidth = lw;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(q[0][0], q[0][1]);
+      for (let i = 1; i + 2 < q.length; i += 3) ctx.bezierCurveTo(q[i][0], q[i][1], q[i + 1][0], q[i + 1][1], q[i + 2][0], q[i + 2][1]);
+      ctx.stroke();
+      ctx.restore();
+    };
+    for (const [pts, lw] of [[CHAMA_FORA, 8], [CHAMA_DENTRO, 6]]) {
+      passada(pts, 0, 0, lw, 1);
+      passada(pts, lw * 0.45, lw * 0.35, lw * 0.4, 0.5);
+    }
+  }
+
   // (z1) Prepara-te, Ele vem (1 Tessalonicenses 4.16-17): a partir da arte que o dono mandou,
   // o relógio antigo de algarismos romanos com os ponteiros quase na meia-noite, grande e
-  // cortado pela borda esquerda, à mão em sálvia; ao lado, a chama em amarelo (a única cor
-  // quente), com o halo. Embaixo, PREPARA-TE menor em creme e ELE VEM em amarelo com o risco.
+  // cortado pela borda esquerda, à mão em sálvia; ao lado, perto dele, a chama em contorno
+  // amarelo no mesmo traço (a única cor quente; a chama cheia com halo parecia emoji).
+  // Embaixo, PREPARA-TE menor em creme e ELE VEM em amarelo com o risco.
   function arteRelogio(ctx) {
     fundoLanding(ctx);
     const r = sorteio(1617);
@@ -2522,51 +2556,8 @@
     ctx.beginPath();
     ctx.arc(ox, oy, 13, 0, Math.PI * 2);
     ctx.fill();
-    // ---- a chama, à direita, com o halo ----
-    const fx = 770;
-    const fb = 1040; // a base
-    const fh = 380;
-    const fw = 250;
-    for (const [raio, a] of [[560, 0.14], [300, 0.2]]) {
-      const g = ctx.createRadialGradient(fx, fb - fh * 0.42, 0, fx, fb - fh * 0.42, raio);
-      g.addColorStop(0, 'rgba(255,196,77,' + a + ')');
-      g.addColorStop(1, 'rgba(255,196,77,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(fx - raio, fb - fh * 0.42 - raio, raio * 2, raio * 2);
-    }
-    ctx.save();
-    ctx.translate(fx, fb);
-    ctx.scale(fw, fh);
-    // o fogo: a gota com duas línguas dos lados e a ponta principal virada para a direita
-    const fogo = new Path2D();
-    fogo.moveTo(0, 0);
-    fogo.bezierCurveTo(-0.46, 0, -0.6, -0.36, -0.44, -0.64);
-    fogo.bezierCurveTo(-0.36, -0.74, -0.38, -0.84, -0.34, -0.92);
-    fogo.bezierCurveTo(-0.2, -0.78, -0.12, -0.7, -0.06, -0.62);
-    fogo.bezierCurveTo(-0.12, -0.82, 0.0, -0.94, 0.14, -1.0);
-    fogo.bezierCurveTo(0.12, -0.86, 0.22, -0.76, 0.34, -0.66);
-    fogo.bezierCurveTo(0.38, -0.72, 0.36, -0.8, 0.32, -0.86);
-    fogo.bezierCurveTo(0.6, -0.56, 0.5, -0.04, 0, 0);
-    fogo.closePath();
-    ctx.shadowColor = 'rgba(255,196,77,.75)';
-    ctx.shadowBlur = 50;
-    ctx.fillStyle = LP.amarelo;
-    ctx.fill(fogo);
-    ctx.shadowBlur = 0;
-    // o miolo, mais claro, baixo e com a ponta para a direita
-    const miolo = new Path2D();
-    miolo.moveTo(0.02, -0.06);
-    miolo.bezierCurveTo(-0.26, -0.08, -0.26, -0.34, -0.12, -0.48);
-    miolo.bezierCurveTo(-0.08, -0.4, -0.02, -0.38, 0.02, -0.36);
-    miolo.bezierCurveTo(0.0, -0.46, 0.06, -0.54, 0.12, -0.6);
-    miolo.bezierCurveTo(0.14, -0.48, 0.26, -0.36, 0.24, -0.22);
-    miolo.bezierCurveTo(0.22, -0.1, 0.14, -0.06, 0.02, -0.06);
-    miolo.closePath();
-    ctx.translate(0.0, -0.03);
-    ctx.scale(0.9, 0.9);
-    ctx.fillStyle = '#ffe7a6';
-    ctx.fill(miolo);
-    ctx.restore();
+    // ---- a chama, à direita, no mesmo traço à mão ----
+    chamaAMao(ctx, 625, 1000, 280, r);
     // ---- embaixo, o título ----
     const y0 = 1150;
     rotuloLanding(ctx, '1 Tessalonicenses 4.16-17', cx, y0, 30);

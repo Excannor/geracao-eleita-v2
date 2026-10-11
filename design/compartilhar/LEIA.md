@@ -126,7 +126,7 @@ com grão, Oswald creme com a última linha em amarelo e o risco, rótulo sálvi
   ESPERANÇA grande, o meio menor e AINDA SE RENOVARÁ em amarelo com o risco.
 `MODELOS=nacoes,relogio,toco node design/compartilhar/gerar.mjs <pasta> modelos` gera os três.
 
-## Rodada 9 (`rodada9/`): nações no padrão dos posts da marca
+## Rodada 9 (`rodada9/`): nações no padrão dos posts da marca e a chama do relógio
 
 - **nacoes**: o dono pediu "mais a cara dele", no padrão dos posts da Geração Eleita (o de
   tiras sálvia): preto de papel amassado com vincos, papel cinza rasgado nos cantos com a
@@ -136,3 +136,7 @@ com grão, Oswald creme com a última linha em amarelo e o risco, rótulo sálvi
   mão e o risco de pincel branco embaixo. Duas variantes: a foto centrada com as tiras
   embaixo (a foto encostava no "dias de ofensiva" e a cruz ficava espremida) e a foto à
   direita com a cruz ao lado e as tiras saindo da esquerda sobre o pé dela (escolhida).
+- **relogio**: a chama cheia com halo parecia emoji. Três variantes de chama em contorno
+  amarelo no traço do relógio: três línguas com uma gota por dentro (a gota ainda lembrava
+  emoji), duas línguas com um risco por dentro, e três línguas com o risco (escolhida),
+  menor e mais perto do relógio. A frase voltou a ter `arte: 'relogio'`.
