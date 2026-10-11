@@ -42,7 +42,7 @@
     { linhas: ['Direcionados', 'à santidade'], ref: '2 Timóteo 2.22' },
     { linhas: ['Somos', 'remanescentes'] },
     { linhas: ['Nele vivemos,', 'nos movemos', 'e existimos'], ref: 'Atos 17.28' },
-    { linhas: ['Prepara-te,', 'Ele vem'], ref: '1 Tessalonicenses 4.16-17', arte: 'relogio' },
+    { linhas: ['Prepara-te,', 'Ele vem'], ref: '1 Tessalonicenses 4.16-17' },
     { linhas: ['Até que', 'Ele venha'] },
     { linhas: ['Quem já foi', 'comprado', 'não se vende'], ref: '1 Coríntios 6.20', arte: 'comprado' },
     { linhas: ['Atraídos pela', 'Sua presença'] },
