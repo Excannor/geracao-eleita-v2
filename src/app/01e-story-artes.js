@@ -2481,6 +2481,7 @@
     // quarta leva no padrão da landing (o bloco perto do fim do arquivo)
     influenciam: { fundo: [LP.preto], fotos: ['influenciam'], tema: TEMA_LP, desenhar: arteInfluenciam, grao: [18, 5131] },
     diferenca: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteDiferenca, grao: [18, 1308] },
+    vivoporele: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVivoPorEle, grao: [18, 2203] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -2831,6 +2832,56 @@
       { t: 'MARCADOS PELA', larg: 820, max: 130, peso: 600, espaco: 4, vao: 0 },
       { t: 'DIFERENÇA.', larg: 860, max: 230, cor: LP.amarelo, risco: true, vao: 18 },
     ], y0);
+  }
+
+  // Jesus morreu por mim, agora eu vivo por Ele: no espírito de uma estampa que o dono mandou,
+  // letras serifadas grandes e claras sobre o escuro. Literata 600 maiúscula, uma linha
+  // empilhada sobre a outra, cada uma no tamanho que lhe cabe; as duas metades da frase
+  // separadas por um risco fino à mão em sálvia com a cruz pequena no meio, e POR ELE em
+  // amarelo com o risco. Sem referência.
+  const literataLP = (t) => '600 ' + t + 'px Literata, Georgia, serif';
+  function arteVivoPorEle(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(2203);
+    const cx = L / 2;
+    const larg = 880;
+    // uma linha serifada, no maior tamanho até max que cabe na largura; devolve a largura
+    const linha = (texto, y, max, cor, espaco) => {
+      ctx.font = literataLP(100);
+      const t = Math.min(max, 100 * (larg - espaco * (texto.length - 1)) / ctx.measureText(texto).width);
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,.6)';
+      ctx.shadowBlur = t * 0.12;
+      ctx.shadowOffsetY = 4;
+      S.escrever(ctx, texto, cx + espaco / 2, y, literataLP(t), cor, { espaco });
+      ctx.restore();
+      ctx.font = literataLP(t);
+      return { t, w: ctx.measureText(texto).width + espaco * (texto.length - 1) };
+    };
+    let y = 566;
+    const primeira = [['JESUS', 168, 10], ['MORREU', 150, 6], ['POR MIM,', 110, 4]];
+    for (const [texto, max, espaco] of primeira) {
+      ctx.font = literataLP(max);
+      y += max * 0.74;
+      const { t } = linha(texto, y, max, LP.creme, espaco);
+      y += t * 0.16;
+    }
+    // o risco fino com a cruz no meio, entre as duas metades
+    const ym = y + 40;
+    tracoAMao(ctx, [[cx - 330, ym + 2], [cx - 180, ym], [cx - 52, ym + 1]], { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.7)' });
+    tracoAMao(ctx, [[cx + 52, ym + 1], [cx + 180, ym - 1], [cx + 330, ym + 2]], { r, largura: 3, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.7)' });
+    tracoAMao(ctx, [[cx + 1, ym - 34], [cx, ym + 2], [cx - 1, ym + 34]], { r, largura: 5, tremor: 1.5 });
+    tracoAMao(ctx, [[cx - 20, ym - 12], [cx + 21, ym - 13]], { r, largura: 5, tremor: 1.5 });
+    y = ym + 50;
+    const segunda = [['AGORA EU', 110, 4, LP.creme], ['VIVO', 196, 14, LP.creme], ['POR ELE.', 150, 6, LP.amarelo]];
+    let ultima;
+    for (const [texto, max, espaco, cor] of segunda) {
+      y += max * 0.74;
+      ultima = linha(texto, y, max, cor, espaco);
+      y += ultima.t * 0.16;
+    }
+    riscoLanding(ctx, cx - ultima.w / 2 - 6, y + 8, ultima.w + 14, 24, LP.amarelo);
+    return y;
   }
 
   S.prepararArte = prepararArte;

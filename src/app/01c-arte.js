@@ -105,6 +105,8 @@
     { linhas: ['Como pregarão', 'se não forem', 'enviados?'], ref: 'Romanos 10.15' },
     { linhas: ['Jovens que', 'influenciam', 'a sua geração'], ref: 'Mateus 5.13-15', arte: 'influenciam' },
     { linhas: ['O maior fracasso', 'é ter sucesso', 'em coisas que', 'nos afastam', 'de Deus'] },
+    // Frases novas do dono (2026-10-11), sem referência: nenhum versículo diz isso com estas palavras.
+    { linhas: ['Jesus morreu', 'por mim,', 'agora eu vivo', 'por Ele'], arte: 'vivoporele' },
   ];
   // Nunca a mesma da última vez: abrir de novo e ver a mesma frase parece que não sorteou.
   // comTexto: só as que têm frase (o fim da lição mostra a frase em texto corrido).
