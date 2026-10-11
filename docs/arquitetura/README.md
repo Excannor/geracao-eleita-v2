@@ -56,7 +56,6 @@ A versão publicada (`/api/versao`) é o hash do `index.html`. O app compara a v
 
 | Módulo | Responsabilidade |
 |---|---|
-| `00-qrcode.js` | o QR Code do convite (qrcode-generator, MIT) |
 | `01-nucleo.js` | utilidades (`CC.esc`, datas, ícones, folhas e confirmações) |
 | `01c-arte.js` | ilustrações em SVG: medalha, troféu, baú, chama, confete |
 | `01d-story.js` | a imagem de story com a ofensiva e o versículo, feita no aparelho |
@@ -68,12 +67,25 @@ A versão publicada (`/api/versao`) é o hash do `index.html`. O app compara a v
 | `04c-reflexao.js` | as reflexões por dia e as perguntas por gênero |
 | `04e-versiculos.js` | o que se faz com um versículo (marcar, guardar, anotar), igual nos dois leitores |
 | `05-licoes.js` · `05b-conhecer.js` | os Primeiros passos e o Conhecer Jesus (14 dias e perguntas honestas) |
-| `06-explorar.js` · `06b-mapas.js` | Explorar: seções, busca, notas, "Comece por aqui" e o mapa de cada livro |
+| `06-explorar.js` · `06b-mapas.js` | Explorar: seções, busca, notas, "Comece por aqui", o cartão dos mapas e a casca da tela de cada mapa |
 | `07-perfil.js` · `07b-conta.js` · `07c-instalar.js` · `07d-notificacoes.js` · `07e-painel.js` · `07f-avisos.js` | perfil, configurações e conta, tutorial de instalar, notificações, painel do administrador, caixa do sino |
 | `08-amigos.js` · `08b-propositos.js` · `08c-discipulado.js` | Juntos: amigos, feed, convites, célula, propósitos; discipulado |
 | `09-praticar.js` · `09b-missoes.js` · `09c-desafios.js` | Praticar, a tela de Desafios e os desafios de vários dias |
 | `09d-apoiar.js` | Apoiar o app (doação opcional pelo Pix) |
 | `10-roteador.js` | rotas por `#`, barra de abas, topo, avisos do dia |
+
+### Peças sob demanda (src/sob-demanda)
+
+O `index.html` tem teto de 1 MB. O que pesa e pouca gente usa sai dele em `<nome>.<resumo>.js`, pedido pelo app na primeira vez que a tela abre (`CC.pedirPeca`, `01-nucleo.js`) e guardado pelo service worker (cache `caminho-telas`, ou o das parábolas) para abrir sem rede. No index fica uma casca que desenha na hora o título e o esqueleto e mostra "Sem conexão. Tente de novo." se a peça não chegar.
+
+| Peça | O que traz | Quem pede |
+|---|---|---|
+| `qrcode.js` | o gerador de QR (qrcode-generator, MIT) | `CC.qr` em `08-amigos.js` (convite, link da célula, Pix) |
+| `mapa-tela.js` + `.css` | o desenho de cada mapa do livro | `CC.vistaMapa` em `06b-mapas.js` |
+| `painel-tela.js` | o painel do administrador | `CC.vistaPainel` em `07e-painel.js` |
+| `parabola-tela.js` + `.css` | a lista e a página das parábolas | `06c-parabolas.js` |
+| `aviso-tela.js` + `.css` | Painel > Enviar aviso | `painel-tela.js` |
+| `01e-story-artes.js` (em `src/app`) | as artes dos stories | `01d-story.js` |
 
 ### Rotas
 
