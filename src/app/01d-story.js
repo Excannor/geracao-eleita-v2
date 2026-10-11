@@ -128,8 +128,9 @@
   }
 
   // A marca no pé: símbolo + "Geração Eleita" + endereço, centrada, com o pé em y. Os
-  // modelos das artes (01e-story-artes.js) põem a contagem de dias nessa segunda linha (sub).
-  function marca(ctx, cy, { cor, corFraca, tamanho = 34, sub = ENDERECO }) {
+  // modelos das artes (01e-story-artes.js) põem a contagem de dias nessa segunda linha (sub)
+  // e podem encostá-la na margem esquerda (x, o começo do símbolo).
+  function marca(ctx, cy, { cor, corFraca, tamanho = 34, sub = ENDERECO, x }) {
     const alturaLogo = tamanho * 2.1;
     ctx.font = '800 ' + tamanho + 'px Manrope, sans-serif';
     const wNome = ctx.measureText('Geração Eleita').width;
@@ -138,7 +139,7 @@
     const wTexto = Math.max(wNome, wEnd);
     const wLogo = alturaLogo * 1357 / 1936;
     const vao = tamanho * 0.6;
-    const x0 = L / 2 - (wLogo + vao + wTexto) / 2;
+    const x0 = x === undefined ? L / 2 - (wLogo + vao + wTexto) / 2 : x;
     logo(ctx, x0, cy - alturaLogo / 2, alturaLogo, cor);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';

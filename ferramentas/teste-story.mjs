@@ -130,9 +130,10 @@ window.__medir = async (arquivo) => {
   }
   const n = d.length / 4;
   const px = (X, Y) => { const p = x.getImageData(X, Y, 1, 1).data; return [p[0], p[1], p[2]]; };
-  // a chama no topo: algum pixel alaranjado entre y 30 e 45 (de 192), no meio
+  // a chama no topo: algum pixel alaranjado entre y 30 e 45 (de 192), em qualquer ponto da
+  // largura (alguns modelos encostam a chama e os dias numa margem)
   let chama = false;
-  const topo = x.getImageData(30, 30, 48, 15).data;
+  const topo = x.getImageData(4, 30, 100, 15).data;
   for (let i = 0; i < topo.length; i += 4) if (topo[i] > 190 && topo[i + 1] < 150 && topo[i + 2] < 90) chama = true;
   return { w: img.width, h: img.height, tipo: arquivo.type, nome: arquivo.name, cores: cores.size,
     desvio: Math.sqrt(soma2 / n - (soma / n) ** 2), canto: px(2, 2), chama };
