@@ -180,3 +180,31 @@ composição, letra e fechamento próprios; a ideia, as fotos e o texto continua
   diante do sol amarelo, a frase à mão e PRA CONTAR. numa fita creme.
 O fechamento amarelo com risco não aparece mais em nenhuma arte. Para gerar:
 `DIAS=7 MODELOS=avivados,naotemas,rei,relogio,toco,influenciam,diferenca,vivoporele,testemunho node design/compartilhar/gerar.mjs <pasta> modelos`.
+
+## Rodada 12 (`rodada12/`)
+
+Mais quatro frases que já existiam ganharam modelo próprio, no padrão da landing (o preto com
+grão, Oswald creme com a última linha em amarelo e o risco, os desenhos à mão em sálvia, o
+amarelo como a única cor quente), sem figura humana, prédio, coroa ou foto:
+- **virgula** (Onde o mundo vê um fim, Deus escreve um novo começo cheio de esperança): só
+  tipografia. O FIM enorme e quase apagado, com a borracha passando por cima, e o ponto final
+  dele em pincel amarelo, que ganhou a cauda e virou vírgula: a frase continua em DEUS
+  ESCREVE UM, NOVO COMEÇO grande e CHEIO DE ESPERANÇA. em amarelo com o risco.
+- **semente** (A sua oração de hoje está construindo o milagre de amanhã. Continue firme): o
+  corte da terra visto de lado, à mão em sálvia (a superfície, o pontilhado, as camadas e as
+  pedrinhas, apagando para os lados e para baixo). A semente, um feijão deitado, solta as
+  raízes para baixo e o broto sobe em S até furar a superfície com as duas primeiras folhas;
+  acima dele, o ponto de luz amarelo. A frase em cima, O MILAGRE DE AMANHÃ. em amarelo com o
+  risco, e CONTINUE FIRME no rótulo sálvia embaixo da terra.
+- **caminho** (O propósito de Deus para a sua vida é maior do que qualquer obstáculo no seu
+  caminho): o caminho à mão em sálvia, em perspectiva, sai largo do pé do desenho, desvia de
+  uma pedra grande (quinas, arestas e o pontilhado da sombra) e estreita até o horizonte,
+  onde a meta é a bandeirinha amarela. A frase embaixo, NO SEU CAMINHO. em amarelo com o
+  risco. A primeira pedra, lisa e em cúpula, parecia um túnel; a de quinas lê como pedra.
+- **brasas** (Somos remanescentes): um campo de brasas apagadas, carvões cinza-escuros com a
+  cinza clara salpicada e a sombra que os assenta no chão, em perspectiva (as de trás menores
+  e mais juntas), e no meio delas oito ainda acesas, em amarelo com a borda laranja suave, a
+  crosta de cinza por cima e o brilho baixo pegando nas vizinhas. Nada de chama: são pontos de
+  brasa. Em cima, SOMOS em creme e REMANESCENTES. em amarelo com o risco. Na primeira versão
+  as brasas, claras e com a beira riscada, pareciam pedrinhas; escurecidas, leem como carvão.
+`MODELOS=virgula,semente,caminho,brasas node design/compartilhar/gerar.mjs <pasta> modelos` gera os quatro.
