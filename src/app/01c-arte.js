@@ -55,7 +55,7 @@
     { linhas: ['Firmes no propósito,', 'constantes', 'na oração', 'e inabaláveis na fé'] },
     { linhas: ['O propósito de Deus', 'para a sua vida', 'é maior do que', 'qualquer obstáculo', 'no seu caminho'] },
     { linhas: ['A sua oração', 'de hoje está', 'construindo', 'o milagre de amanhã.', 'Continue firme'] },
-    { linhas: ['Onde o mundo', 'vê um fim, Deus', 'escreve um', 'novo começo cheio', 'de esperança'] },
+    { linhas: ['Onde o mundo', 'vê um fim, Deus', 'escreve um', 'novo começo cheio', 'de esperança'], arte: 'virgula' },
     { linhas: ['Geração', 'inconformada'] },
     // As das artes que o dono mandou (2026-10-09): cada uma tem um modelo de story
     // próprio, redesenhado em canvas a partir da arte (arte: o nome do modelo, 01e-story-artes.js).

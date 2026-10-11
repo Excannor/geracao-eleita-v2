@@ -2653,6 +2653,7 @@
     vivoporele: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVivoPorEle, grao: [18, 2203] },
     jesusvive: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteJesusVive, grao: [18, 3111] },
     testemunho: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteTestemunho, grao: [18, 4747] },
+    virgula: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVirgula, grao: [18, 1712] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -3367,6 +3368,141 @@
     horizonte(ctx, yh, 70, L - 70, r);
     bancoDeTras(ctx, cx, yh + 78, 620, 150, r);
     return yh + 232;
+  }
+
+  // ---------- quinta leva no padrão da landing (2026-10-11) ----------
+  // Onde o mundo vê um fim, Deus escreve um novo começo cheio de esperança: só tipografia. O
+  // FIM enorme, quase apagado (a borracha passou por cima), e o ponto final dele, em amarelo
+  // e de pincel, ganhou a cauda e virou vírgula: a frase continua. Depois, DEUS ESCREVE UM
+  // menor, NOVO COMEÇO grande em creme e CHEIO DE ESPERANÇA. em amarelo com o risco. Sem
+  // referência.
+  // A vírgula de pincel: o ponto (um borrão redondo de tinta) e a cauda que sai dele e desce
+  // afinando, feita de fios (os da beira acabam antes, como o pincel que seca), com as falhas
+  // tiradas da tinta. (x, y) é o meio do ponto; R, o raio.
+  function virgulaPincel(ctx, x, y, R, cor, r) {
+    const { c, ctx: k } = camada();
+    k.fillStyle = cor;
+    k.strokeStyle = cor;
+    k.lineCap = 'round';
+    // o ponto: a borda um pouco irregular
+    k.beginPath();
+    const n = 28;
+    for (let i = 0; i <= n; i++) {
+      const a = i / n * Math.PI * 2;
+      const rr = R * (1 + Math.sin(a * 3 + 1.3) * 0.035 + (r() - 0.5) * 0.05);
+      const px = x + Math.cos(a) * rr;
+      const py = y + Math.sin(a) * rr;
+      if (i) k.lineTo(px, py); else k.moveTo(px, py);
+    }
+    k.fill();
+    // a cauda: sai da metade de baixo do ponto, desce em curva para a esquerda e afina
+    const p0 = [x + R * 0.18, y + R * 0.2];
+    const p1 = [x + R * 1.15, y + R * 1.1];
+    const p2 = [x + R * 0.55, y + R * 2.5];
+    const p3 = [x - R * 0.85, y + R * 3.35];
+    const em = (t) => {
+      const u = 1 - t;
+      return [u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0],
+        u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1]];
+    };
+    const largura = (t) => R * 1.55 * Math.pow(1 - t, 0.85) + R * 0.04;
+    const fios = 56;
+    for (let f = 0; f < fios; f++) {
+      const o = (f + 0.5) / fios - 0.5; // -0.5 a 0.5
+      const fim = 1 - Math.abs(o) * 0.35 - r() * 0.08;
+      k.globalAlpha = 0.85 + r() * 0.15;
+      k.lineWidth = R * (0.06 + r() * 0.04);
+      k.beginPath();
+      for (let i = 0; i <= 40; i++) {
+        const t = fim * i / 40;
+        const [px, py] = em(t);
+        const [qx, qy] = em(Math.min(1, t + 0.01));
+        const dx = qx - px;
+        const dy = qy - py;
+        const d = Math.hypot(dx, dy) || 1;
+        const nx = -dy / d;
+        const ny = dx / d;
+        const w = largura(t) * o;
+        if (i) k.lineTo(px + nx * w, py + ny * w); else k.moveTo(px + nx * w, py + ny * w);
+      }
+      k.stroke();
+    }
+    // as falhas: riscos finos tirados da tinta, mais na cauda, e uns furinhos no ponto
+    k.globalCompositeOperation = 'destination-out';
+    for (let i = 0; i < 9; i++) {
+      const t0 = 0.45 + r() * 0.45;
+      const o = (r() - 0.5) * 0.7;
+      k.globalAlpha = 0.4 + r() * 0.5;
+      k.lineWidth = 0.8 + r() * 1.4;
+      k.beginPath();
+      for (let j = 0; j <= 8; j++) {
+        const t = Math.min(1, t0 + j * 0.02);
+        const [px, py] = em(t);
+        const [qx, qy] = em(Math.min(1, t + 0.01));
+        const d = Math.hypot(qx - px, qy - py) || 1;
+        const w = largura(t) * o;
+        const X = px - (qy - py) / d * w;
+        const Y = py + (qx - px) / d * w;
+        if (j) k.lineTo(X, Y); else k.moveTo(X, Y);
+      }
+      k.stroke();
+    }
+    gastar(c, { x: x - R, y: y - R, w: R * 2.4, h: R * 4.4 }, { pontos: 34, manchas: 0, riscos: 0, semente: 1713, forca: 0.5 });
+    ctx.drawImage(c, 0, 0);
+  }
+  // O FIM quase apagado: a palavra em creme numa camada, a borracha passando por cima em
+  // riscos largos e ralos, a tinta gasta, e a camada fraca sobre o preto. Devolve a largura.
+  function fimApagado(ctx, texto, cx, y, tam, r) {
+    const { c, ctx: k } = camada();
+    k.font = oswaldLP(tam, 700);
+    k.textAlign = 'center';
+    k.textBaseline = 'alphabetic';
+    k.fillStyle = LP.creme;
+    k.fillText(texto, cx, y);
+    const w = k.measureText(texto).width;
+    k.globalCompositeOperation = 'destination-out';
+    k.lineCap = 'round';
+    for (let i = 0; i < 34; i++) {
+      const yy = y - tam * 0.75 + r() * tam * 0.8;
+      const x0 = cx - w / 2 - 20 + r() * w * 0.5;
+      const comp = w * (0.3 + r() * 0.6);
+      k.globalAlpha = 0.18 + r() * 0.35;
+      k.lineWidth = 10 + r() * 34;
+      k.beginPath();
+      k.moveTo(x0, yy);
+      k.quadraticCurveTo(x0 + comp / 2, yy + (r() - 0.5) * 30, x0 + comp, yy + (r() - 0.5) * 40);
+      k.stroke();
+    }
+    gastar(c, { x: cx - w / 2, y: y - tam, w, h: tam }, { pontos: 900, manchas: 30, riscos: 120, semente: 1717, forca: 1 });
+    ctx.save();
+    ctx.globalAlpha = 0.26;
+    ctx.drawImage(c, 0, 0);
+    ctx.restore();
+    return w;
+  }
+  function arteVirgula(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(1712);
+    const cx = L / 2;
+    let y = blocoLanding(ctx, [
+      { t: 'ONDE O MUNDO VÊ UM', larg: 640, max: 80, peso: 600, espaco: 4, vao: 36 },
+    ], 560);
+    // o FIM e a vírgula, juntos no meio
+    const tam = 330;
+    ctx.font = oswaldLP(tam, 700);
+    const wFim = ctx.measureText('FIM').width;
+    const R = 56;
+    const grupo = wFim + 26 + R * 2;
+    const xFim = cx - grupo / 2 + wFim / 2;
+    const base = y + 30 + tam * 0.8;
+    fimApagado(ctx, 'FIM', xFim, base, tam, r);
+    virgulaPincel(ctx, xFim + wFim / 2 + 26 + R, base - R, R, LP.amarelo, r);
+    y = base + R * 2.9;
+    return blocoLanding(ctx, [
+      { t: 'DEUS ESCREVE UM', larg: 600, max: 80, peso: 600, espaco: 4, vao: 0 },
+      { t: 'NOVO COMEÇO', larg: 880, max: 200, vao: 22 },
+      { t: 'CHEIO DE ESPERANÇA.', larg: 820, max: 110, cor: LP.amarelo, risco: true, vao: 22 },
+    ], y);
   }
 
   S.prepararArte = prepararArte;

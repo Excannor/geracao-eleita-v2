@@ -150,3 +150,13 @@ Retorno do dono:
   duas variantes, a foto cobrindo a altura toda (3,5 vezes) cortava a bandeira e borrava
   demais; a foto na largura deixava a bandeira clara no alto, mas apagava no preto embaixo.
   Ficou a foto na largura com o pé continuado em espelho, mais borrado, sob o escuro.
+
+## Rodada 12 (`rodada12/`)
+
+Mais quatro frases que já existiam ganharam modelo próprio, no padrão da landing (o preto com
+grão, Oswald creme com a última linha em amarelo e o risco, os desenhos à mão em sálvia, o
+amarelo como a única cor quente), sem figura humana, prédio, coroa ou foto:
+- **virgula** (Onde o mundo vê um fim, Deus escreve um novo começo cheio de esperança): só
+  tipografia. O FIM enorme e quase apagado, com a borracha passando por cima, e o ponto final
+  dele em pincel amarelo, que ganhou a cauda e virou vírgula: a frase continua em DEUS
+  ESCREVE UM, NOVO COMEÇO grande e CHEIO DE ESPERANÇA. em amarelo com o risco.
