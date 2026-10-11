@@ -13,6 +13,12 @@ Ela tem três trabalhos, nesta ordem de avaliação:
 
 Pergunta de marketing para cada arte: "Uma pessoa de 16 a 25 anos que segue quem postou pararia, leria e repostaria isso?" Se a resposta for não, refaça.
 
+## Qualidade acima de tudo
+A prioridade é sempre a qualidade, nunca a velocidade nem a quantidade. Quando há muitas frases, faça menos de cada vez e faça bem.
+- O dono recusou desenhos chapados com cara de ícone de banco de imagens: contorno grosso e uniforme, objetos genéricos, maquete de tela, adesivo simples.
+- A régua é a que funcionou: atmosfera e profundidade (luz, sombra, textura, grão, papel ou impressão), poucos elementos bem desenhados, uma ideia clara e letras escolhidas com cuidado. Exemplos aprovados: 'planos' (o aviãozinho e a sombra do avião), 'alvorada', 'avivados', 'rasura', 'bussola'.
+- Compare cada arte lado a lado com essas, em tamanho grande, antes de seguir. Se a ideia não chegar nesse nível, troque a ideia e mantenha a frase.
+
 Toda arte nova passa pela aprovação do dono antes de publicar. Mande uma imagem única com todas as artes da rodada lado a lado.
 
 ## O que não muda (identidade)
