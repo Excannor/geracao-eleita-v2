@@ -260,3 +260,37 @@ com as 45). Nenhuma fecha com a palavra amarela sublinhada; sem figura humana, p
 gera os quatro. Para a folha de contato, os 45 saem com `MODELOS=<todos> DIAS=7` e são montados
 em dez colunas. Os testes trocaram "Geração inconformada" por "Até que Ele venha" como frase
 sem arte.
+
+## Rodada 15 (`rodada15/`)
+
+As quatro últimas frases da ofensiva sem arte ganharam modelo próprio; agora as 49 frases têm
+arte. Cada uma num fundo, composição, letra e fecho diferentes entre si e das 45 publicadas
+(`folha-todas.png`, com as 49). Nenhuma fecha com a palavra amarela sublinhada; sem figura
+humana, prédio, coroa ou foto, e nenhuma palavra fora da frase (só a referência):
+- **aura** (Nele vivemos, nos movemos e existimos, Atos 17.28): no preto da landing, uma luz
+  grande e macia de sálvia e amarelo, como as auras com grão dos pôsteres, toma o story e
+  envolve a frase inteira: nada fica de fora dela. NELE em Manrope extra-negrito enorme, o resto
+  em Manrope, centrado, em tinta. Sem ênfase na letra: a aura é o fecho. (Os riscos de poeira
+  dentro da luz, na primeira versão, pareciam fios de cabelo e saíram.)
+- **rotina** (Se alguém quiser vir após mim..., Lucas 9.23): a página de caderno pontilhado de
+  quem anota a rotina. O começo é o título em Literata itálica; os pedidos viram a lista do dia
+  em Manrope, cada quadradinho marcado com uma cruzinha à mão, e "tome diariamente a sua cruz"
+  ganha a fileira de sete quadradinhos da semana, todos com a cruz. Fecha com "e siga-me" em
+  Permanent Marker e a seta à mão que sai da página. (Os quadradinhos feitos com o traço
+  curvo pareciam escudos; viraram quatro riscos retos.)
+- **grafico** (O maior fracasso é ter sucesso em coisas que nos afastam de Deus): o gráfico de
+  "crescimento" à mão no amarelo cheio. A linha sai de junto de uma cruz pequena, no pé, e sobe
+  em degraus até a seta no alto; EM COISAS QUE / NOS AFASTAM corre inclinado em cima dela e DE
+  DEUS fica embaixo, ao lado da cruz que ficou para trás. O MAIOR pequeno e FRACASSO gigante, tudo
+  em Oswald. Fecha na cruz deixada no começo do gráfico.
+- **alvorada** (Até que Ele venha): o mar antes do sol, sem sol. O céu vai do quase preto à
+  faixa clara do horizonte, a estrela da manhã brilha sozinha acima e o caminho de luz dela na
+  água vem na direção de quem vê. Até que em Literata itálica creme no céu, e ELE VENHA em
+  Oswald enorme, em tinta, de pé no horizonte contra a faixa clara. Diferente do relógio
+  (ponteiros no preto) e de Avivados (cartaz amarelo com foto). Fecha na estrela. (O reflexo
+  das letras na água, na primeira versão, saía em faixas quebradas e saiu.)
+`MODELOS=aura,rotina,grafico,alvorada DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos`
+gera os quatro. Como nenhuma frase da lista ficou sem arte, os testes simulam a frase sem arte
+tirando a arte de "Até que Ele venha" por um instante (e conferem uma frase fora da lista), e as
+imagens do modelo de sempre (`gerar.mjs` no conjunto final, `teste-compartilhar.mjs`) tiram a
+arte das frases só enquanto desenham.

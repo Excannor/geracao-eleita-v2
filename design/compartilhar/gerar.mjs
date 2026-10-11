@@ -39,7 +39,11 @@ const html = `<!doctype html><meta charset="utf-8"><style>${ler('src/fontes.css'
 <script>${ler('src/app/01e-story-artes.js')}</script>
 <script>${ler('design/compartilhar/variantes.js')}</script>
 <script>
-const porTamanho = CC.FRASES_OFENSIVA.filter((f) => !f.arte).sort((a, b) => a.linhas.join(' ').length - b.linhas.join(' ').length);
+// Desde a rodada 15 toda frase da lista tem arte: sem nenhuma sem arte, a mais curta e a mais
+// longa saem da lista inteira, e os casos do modelo de sempre (sempre: true) tiram a arte delas
+// só enquanto desenham.
+const semArte = CC.FRASES_OFENSIVA.filter((f) => !f.arte);
+const porTamanho = (semArte.length ? semArte : CC.FRASES_OFENSIVA.slice()).sort((a, b) => a.linhas.join(' ').length - b.linhas.join(' ').length);
 const FRASES = { curta: porTamanho[0], longa: porTamanho[porTamanho.length - 1],
   atos: CC.FRASES_OFENSIVA.find((f) => f.ref === 'Atos 17.28'), lucas: CC.FRASES_OFENSIVA.find((f) => f.ref === 'Lucas 9.23') };
 for (const f of CC.FRASES_OFENSIVA) if (f.arte) FRASES[f.arte] = f;
@@ -55,7 +59,11 @@ window.gerar = async (fn, dados) => {
   // 'arte:<nome>': um modelo de story pelo nome (para comparar variantes de um modelo)
   const modelo = fn.startsWith('arte:') && CC.story.artes && CC.story.artes[fn.slice(5)];
   const desenhar = modelo || (window.VARIANTES && VARIANTES[fn]) || (CC.story.desenhar && ((ctx, x) => CC.story.desenhar(ctx, fn, x)));
-  desenhar(tela.getContext('2d'), d);
+  const tiradas = d.sempre ? CC.FRASES_OFENSIVA.map((f) => f.arte) : null;
+  if (tiradas) CC.FRASES_OFENSIVA.forEach((f) => { delete f.arte; });
+  try { desenhar(tela.getContext('2d'), d); } finally {
+    if (tiradas) CC.FRASES_OFENSIVA.forEach((f, i) => { if (tiradas[i]) f.arte = tiradas[i]; });
+  }
   const u = tela.toDataURL('image/png');
   (window.__imgs = window.__imgs || {})[window.__nome] = u;
   return u;
@@ -121,10 +129,10 @@ if (conjunto === 'versiculo2') {
   const fn = process.env.FN_OFENSIVA || 'ofensiva';
   const fv = process.env.FN_VERSICULO || 'versiculo';
   for (const dias of [1, 16, 100, 365]) for (const frase of ['curta', 'longa']) {
-    casos.push({ nome: 'ofensiva-' + dias + '-' + frase, fn, dados: { dias, frase } });
+    casos.push({ nome: 'ofensiva-' + dias + '-' + frase, fn, dados: { dias, frase, sempre: true } });
   }
-  casos.push({ nome: 'ofensiva-16-atos', fn, dados: { dias: 16, frase: 'atos' } });
-  casos.push({ nome: 'ofensiva-7-lucas', fn, dados: { dias: 7, frase: 'lucas' } });
+  casos.push({ nome: 'ofensiva-16-atos', fn, dados: { dias: 16, frase: 'atos', sempre: true } });
+  casos.push({ nome: 'ofensiva-7-lucas', fn, dados: { dias: 7, frase: 'lucas', sempre: true } });
   // sem carimbo à vista (fim da lição antigo): a frase do estágio, quebrada como o carimbo
   casos.push({ nome: 'ofensiva-7-estagio', fn, dados: { dias: 7 } });
   for (const k of Object.keys(VERSOS)) casos.push({ nome: 'versiculo-' + k, fn: fv, dados: { ...VERSOS[k], traducao: 'Nova Bíblia Viva' } });
