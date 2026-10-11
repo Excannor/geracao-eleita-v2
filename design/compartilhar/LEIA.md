@@ -370,53 +370,79 @@ perto). No nível de planos e alvorada: luz, sombra, textura e poucos elementos.
 fundo, composição, letra e fecho diferentes das vizinhas e das 59 de antes (`folha-todas.png`,
 com as 67, e `resumo.png`, as oito em duas fileiras). Nenhuma fecha com a palavra amarela
 sublinhada:
-- **heroi** (Jesus, meu super-herói): nenhuma figura, só a capa vazia. Na parede escura de
-  reboco, com um foco de luz de cima, a capa amarela pendurada num gancho de ferro pela corrente
-  dos dois broches, com as pregas pixel a pixel (juntas no pescoço, abrindo até a barra), o
-  forro grafite nas beiradas que caem abertas e a sombra macia na parede. "Jesus," em Literata
-  itálica e MEU SUPER-HERÓI em Oswald creme embaixo. Fecha na capa no foco. (A primeira capa,
-  franzida numa faixa, parecia saia; a de gola alta parecia vestido; os broches com a corrente
-  e o forro fizeram ela ler como capa.)
+- **heroi** (Jesus, meu super-herói): refeita como a referência, a pedido do dono. Jesus de
+  costas, em pé, no papel claro com grão, com a capa vermelha comprida até o chão: por cima dela
+  só o cabelo comprido e os ombros, sem rosto. A capa é pintada pixel a pixel (o perfil desce do
+  pescoço, arredonda no ombro e cai abrindo até arrastar no chão; as pregas nascem embaixo das
+  omoplatas e abrem até a barra, com a crista estreita e o vale largo; a luz vem da esquerda e o
+  rastro do pincel corre com a prega). O cabelo sai do redemoinho, contorna o crânio e cai em
+  mechas. Embaixo, o chão é uma pincelada de tinta de pincel seco, com as cerdas falhando nas
+  pontas e os respingos. JESUS enorme em Oswald pesada gasta e MEU SUPER-HERÓI pequeno e
+  espaçado. **Duas exceções pedidas pelo dono, só nesta arte: a figura humana de costas (como em
+  impossivel) e o vermelho da capa** (a identidade da referência; o amarelo continua sendo a
+  única cor quente nas outras). A primeira versão (a capa amarela vazia no gancho) saiu.
+  Fecha na capa no chão de tinta.
 - **vida** (Jesus, caminho, verdade e vida, João 14.6): como a referência, as quatro palavras
   empilhadas em letra psicodélica dos anos 70, ondulando e inchando (Oswald engordada, esticada
   em faixas e deformada ponto a ponto), em tinta no papel creme, com a sombra deslocada em
   amarelo. Da mesma família de deformação de Jesus salva (o dono aceitou), mas empilhada,
   ondulada e com sombra. Lema com a referência. Fecha na sombra.
-- **queimar** (Deixa queimar): o coração anatômico em gravura de tinta no papel creme (as linhas
-  curvas como paralelos, mais grossas na sombra, os vasos com a boca cortada, as artérias claras)
-  e as chamas também em gravura: línguas com o contorno em tinta e as linhas de dentro em
-  amarelo, nada preenchido. "deixa queimar" à mão embaixo. Fecha nas chamas.
+- **queimar** (Deixa queimar): o coração foi redesenhado do zero (o dono achou o primeiro
+  "muito ruim"). Agora é anatômico de verdade: o átrio direito com a aurícula dobrando por cima,
+  os dois ventrículos separados pelo sulco (o direito na frente, o esquerdo até a ponta), a
+  aurícula esquerda, a veia cava superior, a aorta com o arco e os três ramos, o tronco pulmonar
+  na frente dela abrindo para o ramo esquerdo embaixo do arco, as veias pulmonares atrás e as
+  coronárias tortuosas na superfície. Cada parte tem o próprio volume (a normal sai de máscaras
+  borradas da forma) e é gravada com linhas que contornam o volume (paralelos de elipsoide
+  recortados na forma), que engrossam na sombra, com o cruzado só no escuro, o pontilhado na
+  passagem, as sombras que os vasos e as aurículas jogam no músculo e o contorno mais grosso do
+  lado da sombra. Os vasos têm anéis de corte e a boca cortada. As chamas viraram flash de
+  tatuagem: uma silhueta só de fogo atrás do coração, com as línguas em S e a ponta em gancho,
+  o contorno grosso de tinta, a camada amarela mais clara e o miolo quase branco dentro, os
+  traços finos que sobem por dentro e um fogo baixo na frente lambendo a ponta. "deixa queimar"
+  à mão embaixo. Fecha nas chamas.
 - **graca** (Foi Tua graça que me salvou, Efésios 2.8): GRAÇA quatro vezes em Literata sálvia
-  no escuro e, por cima do meio, o coração em gravura clara com a coroa de espinhos passando por
-  trás e pela frente. "Foi Tua" e "que me salvou" em Literata itálica. **A repetição de GRAÇA é
-  a da referência** (a palavra está na frase). Lema com a referência. Fecha no coração.
+  no escuro e, por cima do meio, o mesmo coração novo, mas claro no escuro, mais deitado (girado
+  para o outro lado) e sem chamas, apertado pela coroa de espinhos: três ramos grossos torcidos
+  uns nos outros, cada pedaço com o tom que muda conforme o ramo rola, desenhados em ordem de
+  profundidade; a volta de trás passa atrás do coração e a da frente na frente, jogando sombra
+  nele, com os espinhos compridos e curvos para todo lado. "Foi Tua" e "que me salvou" em
+  Literata itálica. **A repetição de GRAÇA é a da referência** (a palavra está na frase). Lema
+  com a referência. Fecha no coração.
 - **impossivel** (Deus do impossível, Lucas 1.37): IMPOSSÍVEL em Literata no papel claro, o IM
   tirado da palavra (fica só a marca fraca) e levado no ombro por uma figura pequena de Jesus de
   costas, em aquarela de cinzas quentes, sem rosto e sem contorno, andando na linha de base.
-  "Deus do" em itálica e a referência à mão. **A figura é exceção do dono, só nesta arte.** As
+  "Deus do" em itálica e a referência à mão. **A figura é exceção do dono, aqui e em heroi.** As
   primeiras figuras (de lado, com o manto sálvia) saíram com cara de boneco de papel; a de
   costas, num tom só, ficou mais limpa, mas ainda é simples: o dono decide. Fecha no IM indo
   embora.
-- **olhos** (Fogo em seus olhos, Apocalipse 2.18): FOGO e OLHOS enormes em Oswald creme no
-  preto, "EM SEUS" numa etiqueta, e dentro dos dois O de OLHOS um ponto de fogo (a gota de luz
-  branca, o halo amarelo e o risco de brilho), sem olho desenhado. Embaixo, o versículo da NBV
-  citado palavra por palavra ("Esta é uma mensagem que vem do Filho de Deus, cujos olhos
-  penetram como labaredas de fogo, cujos pés brilham como o bronze reluzente."). Os rabiscos
-  da referência saíram (pareciam fios). Fecha nos pontos de fogo.
+- **olhos** (Fogo em teus olhos fez eu me apaixonar): a frase mudou a pedido do dono (em
+  01c-arte.js: 'Fogo em', 'teus olhos', 'fez eu me', 'apaixonar.', sem referência) e o
+  versículo citado embaixo saiu. FOGO e OLHOS enormes em Oswald creme no preto, "EM TEUS" na
+  etiqueta, e dentro dos dois O de OLHOS um ponto de fogo (a gota de luz branca, o halo amarelo
+  e o risco de brilho), sem olho desenhado. O fecho em Literata itálica: "fez eu me" pequeno e
+  "apaixonar." grande, alinhados à esquerda. Fecha nos pontos de fogo.
 - **reino** (Venha o seu reino., Mateus 6.10): o selo em relevo seco no cartão sálvia, com a
   borda serrilhada da prensa, a volta de contas e o anel com a continuação da NBV ("Que a sua
   vontade seja feita aqui na terra, como é feita no céu.") e MATEUS 6.10 entre pontos; no meio,
   VENHA O / SEU REINO. em Literata, rebaixado e com tinta. Diferente de Jesus salva no
   material (papel em relevo, não tinta no amarelo) e na letra (serifa, não a inchada). Fecha nas
   contas.
-- **altar** (Levítico 6.13, o versículo inteiro na NBV): gravura de raspagem no escuro, o altar
-  de blocos de pedra com os quatro chifres em linhas creme e a chama alta em contornos amarelos
-  um dentro do outro, mais grossos e claros até o miolo. A frase em Oswald, em degraus de
-  tamanho, com CONTINUAMENTE ACESO; em amarelo. Fecha na chama.
-Os três de fogo não se repetem: o coração em gravura de tinta no papel com línguas de linha
-(queimar), os pontos de luz dentro da letra no preto (olhos) e os contornos concêntricos sobre
-a pedra (altar). **Sobreposição:** queimar e graca usam o mesmo coração em gravura (um no papel
-com chamas, o outro claro no escuro com a coroa); ambos lembram coracao (as brasas embaixo do
-texto) só no tema.
+- **altar** (Levítico 6.13, o versículo inteiro na NBV): refeita (o dono achou a caixa de
+  tijolos e a chama de contornos fracas). Um altar antigo de pedras lavradas à mão, de três
+  quartos: a frente em fiadas de blocos desencontrados, cada um com a sua altura e o seu tom, o
+  lado recuando na sombra, o tampo de laje e os quatro chifres de pedra. A textura é um ruído
+  suave multiplicado na pedra, com as rachaduras e as marcas do cinzel; a luz amarela do fogo
+  bate nas quinas de cima e some para baixo. Em cima, a lenha em brasa e o fogo vivo: quatro
+  camadas de línguas diferentes (nenhuma é cópia encolhida da outra), da âmbar macia ao miolo
+  quase branco, com as linhas de gravura por dentro, o brilho no escuro, as línguas soltas e as
+  fagulhas. A frase em hierarquia: "O fogo do altar / deverá ser mantido" em Literata itálica,
+  CONTINUAMENTE ACESO; grande em Oswald amarela e "não deve ser apagado." pequena embaixo.
+  Fecha na chama.
+Os três de fogo não se repetem: o coração em gravura de tinta no papel com as chamas de
+tatuagem (queimar), os pontos de luz dentro da letra no preto (olhos) e o fogo vivo pintado
+sobre a pedra (altar). **Sobreposição:** queimar e graca usam o mesmo coração anatômico, mas em
+pose, tratamento e companhia diferentes (em pé, tinta no papel, nas chamas; deitado, claro no
+escuro, apertado pela coroa); ambos lembram coracao (as brasas embaixo do texto) só no tema.
 `MODELOS=heroi,vida,queimar,graca,impossivel,olhos,reino,altar DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos`
 gera as oito. A folha de contato junta as 67 em dez colunas. Os testes passaram a contar 67.

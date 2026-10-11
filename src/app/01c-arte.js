@@ -131,7 +131,7 @@
     { linhas: ['Deixa', 'queimar'], arte: 'queimar' },
     { linhas: ['Foi Tua graça', 'que me salvou'], ref: 'Efésios 2.8', arte: 'graca' },
     { linhas: ['Deus do', 'impossível'], ref: 'Lucas 1.37', arte: 'impossivel' },
-    { linhas: ['Fogo em', 'seus olhos'], ref: 'Apocalipse 2.18', arte: 'olhos' },
+    { linhas: ['Fogo em', 'teus olhos', 'fez eu me', 'apaixonar.'], arte: 'olhos' },
     { linhas: ['Venha o', 'seu reino.'], ref: 'Mateus 6.10', arte: 'reino' },
     { linhas: ['O fogo do altar', 'deverá ser mantido', 'continuamente aceso;', 'não deve ser', 'apagado.'], ref: 'Levítico 6.13', arte: 'altar' },
   ];
