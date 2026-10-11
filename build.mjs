@@ -314,7 +314,7 @@ if (arquivoArtesStory) {
 // ---------- a tela do aviso do administrador ----------
 // Painel > Enviar aviso: só o administrador abre, então código e estilo saem do index.html
 // (teto de 1 MB) num arquivo com resumo no nome (aviso-tela.<resumo>.js), pedido na hora
-// (07e-painel.js). O estilo entra no lugar da marca, já enxuto. Sem cache próprio no service
+// (src/sob-demanda/painel-tela.js). O estilo entra no lugar da marca, já enxuto. Sem cache próprio no service
 // worker: é uma tela de quem administra, sempre com rede.
 for (const velho of readdirSync(dist()).filter((f) => /^aviso-tela\..*\.js(\.gz)?$/.test(f))) rmSync(dist(velho));
 const cssAviso = enxugarCss(readFileSync(src('sob-demanda', 'aviso-tela.css'), 'utf8'));
@@ -335,7 +335,7 @@ console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 // worker guarda cada uma no cache "caminho-telas" quando é pedida: depois, abre sem rede. Como
 // todo .js do app, o servidor só as entrega com sessão.
 // Função nova e pesada já nasce aqui, e não em src/app/.
-const NOMES_PECAS = ['qrcode', 'mapa-tela'];
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela'];
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
   let codigo = enxugarJs(readFileSync(src('sob-demanda', nome + '.js'), 'utf8'), nome + '.js');
@@ -445,6 +445,7 @@ const html = molde
     + 'window.AVISO_TELA=' + JSON.stringify(arquivoAvisoTela) + ';'
     + 'window.QR_GERADOR=' + JSON.stringify(pecas.qrcode) + ';'
     + 'window.MAPA_TELA=' + JSON.stringify(pecas['mapa-tela']) + ';'
+    + 'window.PAINEL_TELA=' + JSON.stringify(pecas['painel-tela']) + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')

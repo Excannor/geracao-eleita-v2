@@ -327,6 +327,8 @@ secao('peças sob demanda');
     ['qrcode', 'QR_GERADOR', 'getBCHTypeInfo', '00-qrcode.js', 'o gerador de QR'],
     // a casca da tela do mapa (06b-mapas.js) fica no index: só o desenho do mapa sai
     ['mapa-tela', 'MAPA_TELA', 'mapa-conexao', '', 'a tela do mapa'],
+    // a casca (07e-painel.js) e o item do Mais (10-roteador.js) ficam no index: o painel sai
+    ['painel-tela', 'PAINEL_TELA', 'api/painel/liderancas', '', 'o painel do administrador'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -341,6 +343,9 @@ secao('peças sob demanda');
     // como todo .js do app: só com sessão (não é público como os mapas e as fontes)
     checar(!servidorTexto.match(/const PUBLICO_COM_RESUMO = .*/)[0].includes(nome.toUpperCase()), rotulo + ' só sai do servidor com sessão');
   }
+  // o que continua no index: o cartão dos mapas, a casca da rota do mapa e o item do Mais do painel
+  checar(html.includes('.cartao-mapas{') && html.includes('CC.cartaoMapas') && html.includes('window.MAPAS='), 'o cartão e a lista dos mapas continuam no index.html');
+  checar(html.includes('Painel do administrador') && html.includes('CC.vistaPainel') && /window\.AVISO_TELA="aviso-tela\.[0-9a-f]{10}\.js"/.test(html), 'o item do painel, a casca dele e o nome da tela do aviso continuam no index.html');
 }
 
 // =========================================================================

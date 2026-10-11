@@ -847,7 +847,7 @@
   const botaoZap = (texto, rotulo, attr) => '<a class="botao-whatsapp" ' + attr + ' href="' + linkZap(texto) + '" target="_blank" rel="noopener">'
     + CC.ico('balao') + rotulo + '</a>';
 
-  // O painel inteiro da célula, para o administrador que abre qualquer célula (07e-painel.js):
+  // O painel inteiro da célula, para o administrador que abre qualquer célula (src/sob-demanda/painel-tela.js):
   // o mesmo que o líder dela vê, com a caminhada junto (lá ela mora na aba Pessoas).
   CC.painelDaCelulaHtml = (p) => cartaoSaude(p) + blocoCheckin(p) + blocoFunil(p) + blocoAtencao(p);
 

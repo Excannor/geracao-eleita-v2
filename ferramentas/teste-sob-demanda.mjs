@@ -5,6 +5,8 @@
 //     novo; depois de uma vez, o código sai sem rede;
 //   - a tela do mapa: a barra e o nome aparecem na hora; sem rede na primeira vez, o recado
 //     com o "Tentar de novo"; com rede, o mapa inteiro; depois, sem rede, também;
+//   - o painel do administrador: o título e o esqueleto na hora; sem rede na primeira vez, o
+//     recado com o "Tentar de novo"; com rede, os números e o "Enviar aviso" (outra peça);
 //   - nenhuma peça vem junto com a abertura do app: cada uma é pedida só quando a tela abre.
 // Uso: CHROME=<chrome> node ferramentas/teste-sob-demanda.mjs   (PORTA=<porta> para trocar a 8378)
 import { spawn } from 'node:child_process';
@@ -162,6 +164,32 @@ ok((await pedidas()).includes('mapa-tela'), 'a tela do mapa foi pedida só agora
 await av('location.hash = "#/explorar"');
 ok(await esperar('!!' + q('.cartao-mapas .mapas-titulo') + ' && getComputedStyle(' + q('.cartao-mapas') + ').borderTopLeftRadius !== "0px"'), 'o cartão dos mapas segue no Explorar, com o estilo dele');
 
+// ---------- o painel do administrador ----------
+// O item do Mais vem no index (só para o administrador); o painel em si, da peça.
+ok(!!(await av('CC.quem && CC.quem.admin')), 'a conta de teste é a do administrador');
+await semRede(true);
+await av('location.hash = "#/config/painel"');
+// (sem servidor, o erro chega quase junto: vale o esqueleto ou o recado, com o título em cima)
+ok(await esperar(q('.folha-perfil h1') + '?.textContent === "Painel do administrador" && !!(' + q('.esqueleto') + ' || ' + q('.estado.erro') + ')', 4000), 'o painel abre na hora com o título');
+ok(await esperar('!!' + q('.estado.erro [data-acao-estado]'), 8000), 'sem rede na primeira vez, o painel não fica carregando para sempre');
+ok(await av(q('.estado.erro b') + '?.textContent === "Sem conexão. Tente de novo."'), 'o recado diz "Sem conexão. Tente de novo."');
+await semRede(false);
+await clicar('[data-acao-estado]');
+ok(await esperar('!!' + q('.painel-resumo .painel-cartao') + ' && !!' + q('a.painel-ir[href="#/config/painel/aviso"]'), 10000), 'com rede, "Tentar de novo" abre o painel com os números');
+ok((await pedidas()).includes('painel-tela'), 'o painel foi pedido só agora');
+// a tela do aviso (outra peça, aviso-tela) continua abrindo a partir do painel
+await clicar('a.painel-ir[href="#/config/painel/aviso"]');
+ok(await esperar('!!' + q('.aviso-tela') + ' && !!document.querySelector("style[data-aviso-tela]")', 10000), 'Enviar aviso abre a partir do painel, com o estilo dele');
+await av('location.hash = "#/config/painel"');
+ok(await esperar('!!' + q('.painel-resumo .painel-cartao'), 8000), 'voltar ao painel desenha de novo, sem pedir a peça outra vez');
+// o Mais mostra o item do painel ao administrador, e ele leva ao painel
+await av('location.hash = "#/explorar"');
+await esperar('!!' + q('.cartao-mapas'));
+await clicar('[data-abrir-mais]');
+ok(await esperar('!!' + q('.painel-mais a[href="#/config/painel"]')), 'o Mais mostra "Painel do administrador" ao administrador');
+await clicar('.painel-mais a[href="#/config/painel"]');
+ok(await esperar('location.hash === "#/config/painel" && !!' + q('.painel-resumo .painel-cartao'), 8000), 'o item do Mais abre o painel');
+
 // Depois de uma vez, tudo sai sem rede, mesmo com a página recarregada.
 await semRede(true);
 await cmd('Page.reload');
@@ -173,6 +201,10 @@ ok(await esperar('!!' + q('.folha .qr-convite svg'), 8000), 'sem rede, o QR do P
 await fecharFolha();
 await av('location.hash = "#/mapa/isaias"');
 ok(await esperar('document.querySelectorAll(".mapa .mapa-ramo").length >= 3', 10000), 'sem rede, o mapa já aberto uma vez sai da tela guardada');
+await av('location.hash = "#/config/painel"');
+ok(await esperar('!!' + q('.estado.erro') + ' && ' + q('.folha-perfil h1') + '?.textContent === "Painel do administrador"', 10000)
+  && await av('!document.querySelector(".estado.erro b") || document.querySelector(".estado.erro b").textContent === "Não deu para carregar o painel"'),
+'sem rede, o painel guardado abre e diz que não deu para buscar os números (como antes)');
 await semRede(false);
 
 const erros = evs.filter((e) => e.method === 'Runtime.exceptionThrown').map((e) => e.params.exceptionDetails?.exception?.description || 'exceção');

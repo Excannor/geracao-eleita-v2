@@ -1,7 +1,7 @@
 /* Painel > Enviar aviso (#/config/painel/aviso): um aviso pontual do administrador, na hora,
    para ele mesmo (teste) ou para todas as contas. Pedida só quando o administrador abre a
    tela: o build a publica como aviso-tela.<resumo>.js, com o estilo (aviso-tela.css) no lugar
-   da marca abaixo; a casca que a carrega mora em src/app/07e-painel.js.
+   da marca abaixo; quem a carrega é o painel (src/sob-demanda/painel-tela.js).
    O servidor confere de novo tudo o que esta tela limita (servidor.mjs, enviarAvisoAdmin):
    só o administrador, título e texto curtos, foto JPEG até 300 KB, destino da lista fechada,
    e um aviso para todos por dia (o segundo pede confirmar de novo).
