@@ -2137,6 +2137,281 @@
     const w3 = tituloLanding(ctx, 'KING.', x, y3, t3, LP.amarelo, { alinhar: 'left' });
     riscoLanding(ctx, x - 4, y3 + 34, w3 + 14, 26, LP.amarelo);
   }
+  // ---------- (z) Jesus para as nações, Prepara-te e Há esperança: no padrão da landing ----------
+  // Nos dois sem foto, o desenho à mão em sálvia é o herói; o título vem embaixo, como nos outros.
+  // O traço à mão: os pontos ligados por curvas, cada um mexido um pouco pelo sorteio, em
+  // duas passadas (a grossa e uma fina e mais fraca, um pouco ao lado), como a coroa da
+  // landing. fechar: liga o último ao primeiro.
+  function tracoAMao(ctx, pts, { r, tremor = 3, largura = 7, cor = LP.salvia, fechar = false, segunda = true }) {
+    const passada = (dx, dy, lw, alfa) => {
+      const q = pts.map(([x, y]) => [x + dx + (r() - 0.5) * tremor, y + dy + (r() - 0.5) * tremor]);
+      if (fechar) q.push(q[0], q[1]);
+      ctx.save();
+      ctx.globalAlpha = alfa;
+      ctx.strokeStyle = cor;
+      ctx.lineWidth = lw;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(q[0][0], q[0][1]);
+      for (let i = 1; i < q.length - 1; i++) {
+        ctx.quadraticCurveTo(q[i][0], q[i][1], (q[i][0] + q[i + 1][0]) / 2, (q[i][1] + q[i + 1][1]) / 2);
+      }
+      if (!fechar) ctx.lineTo(q[q.length - 1][0], q[q.length - 1][1]);
+      ctx.stroke();
+      ctx.restore();
+    };
+    passada(0, 0, largura, 1);
+    if (segunda) passada(largura * 0.45, largura * 0.35, largura * 0.4, 0.5);
+  }
+  // Os pontos de uma elipse (de a até b, em radianos), com a borda um pouco irregular.
+  function pontosElipse(cx, cy, rx, ry, { de = 0, ate = Math.PI * 2, n = 36, r, mexe = 0 } = {}) {
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const t = de + (ate - de) * i / n;
+      const k = 1 + (r ? (r() - 0.5) * mexe : 0);
+      pts.push([cx + Math.cos(t) * rx * k, cy + Math.sin(t) * ry * k]);
+    }
+    return pts;
+  }
+  // O título no pé da arte, do jeito dos outros da landing: as linhas creme, a última em
+  // amarelo com o risco. linhas: [{ t, larg, max, peso, cor, espaco, vao }]; devolve o y final.
+  function blocoLanding(ctx, linhas, y, cx = L / 2) {
+    for (const l of linhas) {
+      const tam = tamanhoPara(ctx, l.t, l.larg, l.max, l.peso || 700);
+      y += (l.vao || 0) + tam * 0.9;
+      const w = tituloLanding(ctx, l.t, cx, y, tam, l.cor || LP.creme, { peso: l.peso || 700, espaco: l.espaco || 0 });
+      if (l.risco) riscoLanding(ctx, cx - w / 2 - 6, y + tam * 0.15, w + 14, 22, LP.amarelo);
+    }
+    return y;
+  }
+
+  // (z0) Jesus para as nações: a foto do dono (as mãos sobre a bandeira do Brasil, orando),
+  // em P&B com contraste, apagando nas bordas como as da landing. A foto é pequena (486 px):
+  // vai no máximo a uns 1,8 vez, centrada, para não borrar. Embaixo, JESUS PARA AS em creme
+  // e NAÇÕES em amarelo com o risco. Sem referência: nenhum versículo diz isso com estas
+  // palavras (Mateus 28.19 e Salmos 96.3, na NBV, dizem outra coisa).
+  function arteNacoes(ctx, fotos) {
+    fundoLanding(ctx);
+    const cx = L / 2;
+    if (fotos.nacoes) {
+      // a bandeira (perto de 60% da altura da foto) fica acima do título, livre do texto
+      const w = 880;
+      const x = cx - w / 2;
+      const y = 300;
+      const h = w * fotos.nacoes.height / fotos.nacoes.width;
+      fotoLanding(ctx, fotos.nacoes, { x, y, w, alfa: 0.94,
+        apaga: { cima: [y + 150, y + 380], baixo: [1190, 1000], esq: [x + 20, x + 280], dir: [x + w - 20, x + w - 280] } });
+    }
+    const t1 = tamanhoPara(ctx, 'JESUS PARA AS', 860, 130);
+    const y1 = 1150;
+    tituloLanding(ctx, 'JESUS PARA AS', cx, y1, t1, LP.creme);
+    const t2 = tamanhoPara(ctx, 'NAÇÕES.', 780, 220);
+    const y2 = y1 + 44 + t2 * 0.9;
+    const w2 = tituloLanding(ctx, 'NAÇÕES.', cx, y2, t2, LP.amarelo);
+    // o risco abaixo da cedilha do Ç
+    riscoLanding(ctx, cx - w2 / 2 - 6, y2 + t2 * 0.3, w2 + 14, 24, LP.amarelo);
+    return y2;
+  }
+
+  // (z1) Prepara-te, Ele vem (1 Tessalonicenses 4.16-17): a partir da arte que o dono mandou,
+  // o relógio antigo de algarismos romanos com os ponteiros quase na meia-noite, grande e
+  // cortado pela borda esquerda, à mão em sálvia; ao lado, a chama em amarelo (a única cor
+  // quente), com o halo. Embaixo, PREPARA-TE menor em creme e ELE VEM em amarelo com o risco.
+  function arteRelogio(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(1617);
+    const cx = L / 2;
+    // ---- o relógio ----
+    const ox = 150;
+    const oy = 808;
+    const R = 300;
+    // o aro: duas voltas grossas, e entre elas os riscos dos minutos
+    tracoAMao(ctx, pontosElipse(ox, oy, R, R, { r, n: 60, mexe: 0.008 }), { r, largura: 8, fechar: true });
+    tracoAMao(ctx, pontosElipse(ox, oy, R - 40, R - 40, { r, n: 56, mexe: 0.01 }), { r, largura: 4, fechar: true, segunda: false });
+    for (let i = 0; i < 60; i++) {
+      const a = i / 60 * Math.PI * 2 - Math.PI / 2;
+      const hora = i % 5 === 0;
+      const de = R - (hora ? 38 : 26);
+      const ate = R - 10;
+      tracoAMao(ctx, [[ox + Math.cos(a) * de, oy + Math.sin(a) * de], [ox + Math.cos(a) * ate, oy + Math.sin(a) * ate]],
+        { r, tremor: 1.5, largura: hora ? 5 : 2.5, segunda: false, cor: hora ? LP.salvia : 'rgba(200,218,140,.7)' });
+    }
+    // os algarismos romanos, todos de pé (os de baixo, virados como nos relógios antigos,
+    // liam errado no celular: o VI parecia IΛ)
+    const romanos = ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+    romanos.forEach((n, i) => {
+      const a = i / 12 * Math.PI * 2 - Math.PI / 2;
+      const rr = R - 92;
+      ctx.save();
+      ctx.translate(ox + Math.cos(a) * rr, oy + Math.sin(a) * rr);
+      S.escrever(ctx, n, 0, 18, '600 46px Literata, Georgia, serif', LP.salvia, { espaco: -2 });
+      ctx.restore();
+    });
+    // o anel de dentro, fino, e o miolo
+    tracoAMao(ctx, pontosElipse(ox, oy, R - 150, R - 150, { r, n: 48, mexe: 0.012 }), { r, largura: 2.5, fechar: true, segunda: false, cor: 'rgba(200,218,140,.6)' });
+    tracoAMao(ctx, pontosElipse(ox, oy, 46, 46, { r, n: 20, mexe: 0.05 }), { r, largura: 3, fechar: true, segunda: false, cor: 'rgba(200,218,140,.55)' });
+    // os ponteiros: onze e cinquenta e sete, a três minutos da meia-noite
+    const ponteiro = (ang, comp, largura, ponta) => {
+      const a = ang - Math.PI / 2;
+      const ux = Math.cos(a);
+      const uy = Math.sin(a);
+      tracoAMao(ctx, [[ox - ux * 40, oy - uy * 40], [ox + ux * comp * 0.5, oy + uy * comp * 0.5], [ox + ux * comp, oy + uy * comp]], { r, tremor: 1.5, largura });
+      // a ponta em losango vazado
+      const px = ox + ux * comp;
+      const py = oy + uy * comp;
+      const nx = -uy;
+      const ny = ux;
+      tracoAMao(ctx, [[px - ux * ponta, py - uy * ponta], [px + nx * ponta * 0.45, py + ny * ponta * 0.45], [px + ux * ponta * 0.9, py + uy * ponta * 0.9],
+        [px - nx * ponta * 0.45, py - ny * ponta * 0.45]], { r, tremor: 1, largura: largura * 0.7, fechar: true, segunda: false });
+    };
+    ponteiro((57 / 60) * Math.PI * 2, R - 70, 6, 30);
+    ponteiro(((11 + 57 / 60) / 12) * Math.PI * 2, R - 140, 9, 34);
+    ctx.fillStyle = LP.salvia;
+    ctx.beginPath();
+    ctx.arc(ox, oy, 13, 0, Math.PI * 2);
+    ctx.fill();
+    // ---- a chama, à direita, com o halo ----
+    const fx = 770;
+    const fb = 1040; // a base
+    const fh = 380;
+    const fw = 250;
+    for (const [raio, a] of [[560, 0.14], [300, 0.2]]) {
+      const g = ctx.createRadialGradient(fx, fb - fh * 0.42, 0, fx, fb - fh * 0.42, raio);
+      g.addColorStop(0, 'rgba(255,196,77,' + a + ')');
+      g.addColorStop(1, 'rgba(255,196,77,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(fx - raio, fb - fh * 0.42 - raio, raio * 2, raio * 2);
+    }
+    ctx.save();
+    ctx.translate(fx, fb);
+    ctx.scale(fw, fh);
+    // o fogo: a gota com duas línguas dos lados e a ponta principal virada para a direita
+    const fogo = new Path2D();
+    fogo.moveTo(0, 0);
+    fogo.bezierCurveTo(-0.46, 0, -0.6, -0.36, -0.44, -0.64);
+    fogo.bezierCurveTo(-0.36, -0.74, -0.38, -0.84, -0.34, -0.92);
+    fogo.bezierCurveTo(-0.2, -0.78, -0.12, -0.7, -0.06, -0.62);
+    fogo.bezierCurveTo(-0.12, -0.82, 0.0, -0.94, 0.14, -1.0);
+    fogo.bezierCurveTo(0.12, -0.86, 0.22, -0.76, 0.34, -0.66);
+    fogo.bezierCurveTo(0.38, -0.72, 0.36, -0.8, 0.32, -0.86);
+    fogo.bezierCurveTo(0.6, -0.56, 0.5, -0.04, 0, 0);
+    fogo.closePath();
+    ctx.shadowColor = 'rgba(255,196,77,.75)';
+    ctx.shadowBlur = 50;
+    ctx.fillStyle = LP.amarelo;
+    ctx.fill(fogo);
+    ctx.shadowBlur = 0;
+    // o miolo, mais claro, baixo e com a ponta para a direita
+    const miolo = new Path2D();
+    miolo.moveTo(0.02, -0.06);
+    miolo.bezierCurveTo(-0.26, -0.08, -0.26, -0.34, -0.12, -0.48);
+    miolo.bezierCurveTo(-0.08, -0.4, -0.02, -0.38, 0.02, -0.36);
+    miolo.bezierCurveTo(0.0, -0.46, 0.06, -0.54, 0.12, -0.6);
+    miolo.bezierCurveTo(0.14, -0.48, 0.26, -0.36, 0.24, -0.22);
+    miolo.bezierCurveTo(0.22, -0.1, 0.14, -0.06, 0.02, -0.06);
+    miolo.closePath();
+    ctx.translate(0.0, -0.03);
+    ctx.scale(0.9, 0.9);
+    ctx.fillStyle = '#ffe7a6';
+    ctx.fill(miolo);
+    ctx.restore();
+    // ---- embaixo, o título ----
+    const y0 = 1150;
+    rotuloLanding(ctx, '1 Tessalonicenses 4.16-17', cx, y0, 30);
+    return blocoLanding(ctx, [
+      { t: 'PREPARA-TE,', larg: 560, max: 100, peso: 600, espaco: 4, vao: 30 },
+      { t: 'ELE VEM.', larg: 820, max: 200, cor: LP.amarelo, risco: true, vao: 8 },
+    ], y0);
+  }
+
+  // (z2) Há esperança para a árvore (Jó 14.7-9): o toco cortado, com os anéis no corte, as
+  // cascas e as raízes à mão em sálvia, e o broto novo saindo da beira do corte, com as
+  // folhas cheias (é a única parte viva, por isso a mais forte). A frase é longa: HÁ
+  // ESPERANÇA grande, o meio menor e AINDA SE RENOVARÁ em amarelo com o risco.
+  function arteToco(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(1479);
+    const cx = L / 2;
+    // o desenho é feito em tamanho grande e encolhe por igual, com o chão em y 962
+    ctx.save();
+    ctx.translate(cx, 962);
+    ctx.scale(0.8, 0.8);
+    ctx.translate(-cx, -1066);
+    const topo = 870; // o meio da elipse do corte
+    const rx = 196;
+    const ry = 50;
+    const pe = 1060;
+    // o chão: um risco longo e fraco, com dois tufos
+    tracoAMao(ctx, [[cx - 380, pe + 6], [cx - 200, pe + 2], [cx, pe + 6], [cx + 200, pe + 3], [cx + 380, pe + 8]], { r, largura: 4, segunda: false, cor: 'rgba(200,218,140,.4)' });
+    // as laterais do tronco, abrindo nas raízes
+    tracoAMao(ctx, [[cx - rx, topo + 2], [cx - rx - 4, topo + 80], [cx - rx - 2, topo + 140], [cx - rx - 26, pe - 20], [cx - rx - 90, pe + 4]], { r });
+    tracoAMao(ctx, [[cx + rx, topo + 2], [cx + rx + 3, topo + 80], [cx + rx + 6, topo + 140], [cx + rx + 30, pe - 22], [cx + rx + 96, pe + 4]], { r });
+    // as duas raízes da frente, saindo do tronco e entrando no chão
+    tracoAMao(ctx, [[cx - 96, pe - 56], [cx - 104, pe - 20], [cx - 150, pe + 4]], { r, largura: 6 });
+    tracoAMao(ctx, [[cx + 70, pe - 50], [cx + 82, pe - 16], [cx + 132, pe + 5]], { r, largura: 6 });
+    // a casca: riscos verticais ondulados
+    for (const [dx, de, ate] of [[-150, 40, 150], [-96, 70, 176], [-40, 54, 160], [20, 76, 182], [80, 50, 150], [138, 66, 170], [-176, 120, 170], [168, 110, 166]]) {
+      const x = cx + dx;
+      const curva = ry * Math.sqrt(Math.max(0, 1 - (dx / rx) ** 2));
+      tracoAMao(ctx, [[x, topo + curva + de * 0.3], [x + 4, topo + curva + (de + ate) / 2 * 0.6], [x - 2, topo + curva + ate * 0.9]], { r, largura: 3.5, segunda: false, cor: 'rgba(200,218,140,.6)' });
+    }
+    // o corte: a borda da casca, grossa, e os anéis dentro, com o miolo fora do centro
+    tracoAMao(ctx, pontosElipse(cx, topo, rx, ry, { r, n: 44, mexe: 0.025 }), { r, largura: 8, fechar: true });
+    tracoAMao(ctx, pontosElipse(cx, topo + 2, rx - 18, ry - 6, { r, n: 40, mexe: 0.03 }), { r, largura: 3, fechar: true, segunda: false, cor: 'rgba(200,218,140,.8)' });
+    const mx = cx - 22;
+    const my = topo + 4;
+    for (let i = 1; i <= 6; i++) {
+      const k = i / 7;
+      tracoAMao(ctx, pontosElipse(mx + (cx - mx) * k, my + (topo - my) * k, (rx - 26) * k, (ry - 10) * k, { r, n: 30, mexe: 0.07 }),
+        { r, largura: i % 2 ? 3 : 2.2, fechar: true, segunda: false, cor: 'rgba(200,218,140,' + (0.85 - i * 0.05) + ')' });
+    }
+    ctx.fillStyle = LP.salvia;
+    ctx.beginPath();
+    ctx.ellipse(mx, my, 6, 2.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // a rachadura do corte, do miolo para a borda
+    tracoAMao(ctx, [[mx + 4, my], [mx + 60, my - 10], [mx + 120, my - 20], [mx + 170, my - 32]], { r, largura: 2.5, segunda: false, cor: 'rgba(200,218,140,.75)' });
+    // o broto: sai da beira de trás do corte, sobe em curva e abre as folhas
+    const bx = cx + 92;
+    const by = topo - ry * 0.86;
+    const haste = [[bx, by + 4], [bx + 6, by - 50], [bx - 6, by - 110], [bx + 10, by - 170], [bx + 24, by - 214]];
+    tracoAMao(ctx, haste, { r, largura: 9, segunda: false });
+    const folha = (x, y, comp, larg, ang) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(ang);
+      const p = new Path2D();
+      p.moveTo(0, 0);
+      p.bezierCurveTo(comp * 0.3, -larg, comp * 0.75, -larg * 0.9, comp, 0);
+      p.bezierCurveTo(comp * 0.7, larg * 0.75, comp * 0.3, larg * 0.8, 0, 0);
+      ctx.fillStyle = LP.salvia;
+      ctx.fill(p);
+      // a nervura, em escuro
+      ctx.strokeStyle = 'rgba(13,14,12,.55)';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(comp * 0.08, 0);
+      ctx.quadraticCurveTo(comp * 0.5, -larg * 0.12, comp * 0.86, 0);
+      ctx.stroke();
+      ctx.restore();
+    };
+    folha(bx - 2, by - 108, 110, 34, -2.6);
+    folha(bx + 2, by - 86, 92, 28, -0.42);
+    folha(bx + 22, by - 210, 96, 30, -1.05);
+    folha(bx + 20, by - 206, 76, 24, -2.3);
+    ctx.restore();
+    // embaixo, o título
+    const y0 = 1036;
+    rotuloLanding(ctx, 'Jó 14.7-9', cx, y0);
+    return blocoLanding(ctx, [
+      { t: 'HÁ ESPERANÇA', larg: 900, max: 170, vao: 28 },
+      { t: 'PARA A ÁRVORE QUE,', larg: 900, max: 64, peso: 600, espaco: 3, vao: 20 },
+      { t: 'SE FOR CORTADA,', larg: 900, max: 64, peso: 600, espaco: 3, vao: 10 },
+      { t: 'AINDA SE RENOVARÁ.', larg: 900, max: 130, cor: LP.amarelo, risco: true, vao: 14 },
+    ], y0);
+  }
   // ---------- a ofensiva no topo, a arte no meio, a marca no pé ----------
   // A ofensiva continua em destaque em todo modelo: a chama do app e o número de dias no
   // alto, como no story de sempre. A arte vem abaixo, na faixa do meio (Z0 a Z1); a que foi
@@ -2199,6 +2474,9 @@
     avivados: { fundo: [LP.preto], fotos: ['culto'], tema: TEMA_LP, desenhar: arteAvivados, grao: [18, 1126] },
     naotemas: { fundo: [LP.preto], fotos: ['cruz'], tema: TEMA_LP, desenhar: arteNaoTemas, grao: [18, 4110] },
     rei: { fundo: [LP.preto], fotos: ['abertura'], tema: TEMA_LP, desenhar: arteRei, grao: [18, 777] },
+    nacoes: { fundo: [LP.preto], fotos: ['nacoes'], tema: TEMA_LP, desenhar: arteNacoes, grao: [18, 2819] },
+    relogio: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteRelogio, grao: [18, 1617] },
+    toco: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteToco, grao: [18, 1479] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas

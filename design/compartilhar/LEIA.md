@@ -107,3 +107,21 @@ Dois ajustes pedidos pelo dono, a partir das capturas do celular dele (o antes e
 - **inundados:** a figura ajoelhada no O parecia uma mancha. Agora a água do rio de
   Ezequiel 47 sobe dentro das letras, de letra em letra: tornozelo no A, joelho no M,
   cintura no O e nado no R, em azul-esverdeado com a onda clara na linha d'água.
+
+## Rodada 8 (`rodada8/`)
+
+Três frases que já existiam ganharam modelo próprio, no padrão da landing (fundo quase preto
+com grão, Oswald creme com a última linha em amarelo e o risco, rótulo sálvia entre traços):
+- **nacoes** (Jesus para as nações): a foto do dono, as mãos sobre a bandeira do Brasil
+  (src/story-fotos/nacoes.webp: P&B, contraste, 486x547, 25 KB, sob demanda como as outras).
+  A foto é pequena, então vai a uns 1,8 vez, com a bandeira acima do título e as bordas
+  apagando. Sem referência: Mateus 28.19 e Salmos 96.3 na NBV não dizem isso palavra por palavra.
+- **relogio** (Prepara-te, Ele vem; a frase ganhou a referência 1 Tessalonicenses 4.16-17): a
+  partir da arte que o dono mandou, o relógio antigo de algarismos romanos à mão em sálvia,
+  cortado pela borda esquerda, com os ponteiros a três minutos da meia-noite, e a chama
+  amarela com o halo ao lado, a única cor quente. Os algarismos ficam todos de pé (o VI
+  virado parecia IΛ no celular).
+- **toco** (Jó 14.7-9): o toco cortado com os anéis no corte, a casca e as raízes à mão em
+  sálvia, e o broto de folhas cheias saindo da beira. A frase longa vira hierarquia: HÁ
+  ESPERANÇA grande, o meio menor e AINDA SE RENOVARÁ em amarelo com o risco.
+`MODELOS=nacoes,relogio,toco node design/compartilhar/gerar.mjs <pasta> modelos` gera os três.
