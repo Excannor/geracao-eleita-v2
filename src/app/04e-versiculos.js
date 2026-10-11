@@ -147,7 +147,7 @@
   const AJUDA = {
     nota: 'Para começar: O que diz? · O que significa? · Como vivo isso?',
     oracao: 'Fale com Deus do seu jeito. De outras pessoas, use só o primeiro nome.',
-    estudo: 'A primeira linha vira o título. Ligue os versículos que se explicam.',
+    estudo: 'Ligue os versículos que se explicam. Sem título, a primeira linha vira o título.',
   };
   // "romanos 5:8" vira "Romanos 5.8", com o nome do livro como está na Bíblia.
   const LIVROS = () => (CC.COLECOES || []).flatMap(([, l]) => l);
@@ -164,11 +164,12 @@
     const existente = id ? CC.nota(id) : null;
     const chave = id || 'novo:' + (ref || contexto || '');
     const r0 = ref && CC.lerRef(ref);
-    const inicio = existente || { texto: '', tipo: tipo || (ref ? 'nota' : 'estudo'), tags: [], versos: ref ? [ref] : [], cor: r0 ? corDoTrecho(r0) : 0, contexto: contexto || '' };
-    const campos = (x) => JSON.stringify([x.texto, x.tipo, x.tags, x.versos, x.cor]);
+    const inicio = existente || { titulo: '', texto: '', tipo: tipo || (ref ? 'nota' : 'estudo'), tags: [], versos: ref ? [ref] : [], cor: r0 ? corDoTrecho(r0) : 0, contexto: contexto || '' };
+    const campos = (x) => JSON.stringify([x.titulo || '', x.texto, x.tipo, x.tags, x.versos, x.cor]);
     const rasc = lerRascunho();
     const recuperou = rasc && rasc.chave === chave && campos(rasc) !== campos(inicio);
     const st = JSON.parse(JSON.stringify(recuperou ? rasc : inicio));
+    if (typeof st.titulo !== 'string') st.titulo = '';
 
     // os versículos ligados e as tags: a mesma lista de chips, com um formulário para pôr mais
     const chips = (k) => st[k].map((v, i) => '<span class="chip-nota">' + (k === 'versos' && !i ? CC.ico('livro') : '') + (k === 'tags' ? '#' : '') + nb(CC.esc(v))
@@ -190,6 +191,10 @@
       + '<button class="ver-trecho" data-ver-trecho aria-expanded="false">Ver o trecho todo</button></blockquote>'
       + '<div class="segmentado tipo-nota" role="group" aria-label="Tipo">'
       + TIPOS.map(([t, nome]) => '<button data-tipo="' + t + '" aria-pressed="' + (st.tipo === t) + '">' + nome + '</button>').join('') + '</div>'
+      // o título é opcional: separa as notas de um mesmo versículo (cada uma, um estudo)
+      + '<label class="so-leitor" for="campo-titulo-nota">Título</label>'
+      + '<input id="campo-titulo-nota" class="campo-titulo-nota" type="text" maxlength="' + CC.MAX_TITULO_NOTA + '" placeholder="Título (opcional)"'
+      + ' autocomplete="off" autocapitalize="sentences" enterkeyhint="next" value="' + CC.esc(st.titulo) + '">'
       + '<label class="so-leitor" for="campo-nota">Sua nota</label>'
       + '<textarea id="campo-nota" class="campo-nota" rows="6" maxlength="5000" autocapitalize="sentences">' + CC.esc(st.texto) + '</textarea>'
       + '<p class="ajuda-nota" data-ajuda>' + AJUDA[st.tipo] + '</p>'
@@ -204,11 +209,16 @@
     CC.ligarAvisoPrivado(folha);
     const $ = (sel) => folha.querySelector(sel);
     const campo = $('#campo-nota');
+    const campoTitulo = $('#campo-titulo-nota');
     const guardarRascunho = () => {
       st.texto = campo.value;
+      st.titulo = campoTitulo.value;
       gravarRascunho(campos(st) !== campos(inicio) ? { chave, ...st } : null);
     };
     campo.addEventListener('input', guardarRascunho);
+    campoTitulo.addEventListener('input', guardarRascunho);
+    // Enter no título leva ao texto, em vez de não fazer nada
+    campoTitulo.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); campo.focus({ preventScroll: true }); } });
     if (recuperou) CC.avisar('Rascunho recuperado');
 
     // o trecho do versículo principal, recolhido em duas linhas, na cor da nota
@@ -277,12 +287,13 @@
     };
     $('[data-guardar]').onclick = () => {
       st.texto = campo.value.trim();
+      st.titulo = campoTitulo.value;
       if (!st.texto) {
         if (existente) apagar(); else { campo.focus(); $('[data-vivo]').textContent = 'Escreva alguma coisa antes de guardar'; }
         return;
       }
       const primeira = !CC.notas().length && !CC.notasApagadas().length;
-      CC.gravarNota(existente ? id : null, { versos: st.versos, tipo: st.tipo, texto: st.texto, tags: st.tags, cor: st.cor, contexto: st.contexto || '' });
+      CC.gravarNota(existente ? id : null, { versos: st.versos, tipo: st.tipo, titulo: st.titulo, texto: st.texto, tags: st.tags, cor: st.cor, contexto: st.contexto || '' });
       // a cor escolhida aqui também marca o trecho principal
       const principal = CC.lerRef(st.versos[0]);
       if (principal && st.cor !== inicio.cor) CC.marcar(chavesDoTrecho(principal), st.cor);
@@ -327,8 +338,9 @@
     if (!notas.length) return;
     CC.folha('<h2>' + nb(CC.esc(notas[0].versos[0] || '')) + '</h2>'
       + notas.map((n) => '<div class="previa-item"><p class="linha-tipo"><b>' + ROTULO_TIPO[n.tipo] + '</b> · ' + CC.quando(n.editadaEm) + '</p>'
+        + (n.titulo ? '<h3 class="titulo-previa">' + CC.esc(n.titulo) + '</h3>' : '')
         + '<p class="texto-previa">' + CC.esc(n.texto) + '</p>'
-        + '<button class="botao pequeno contorno" data-editar="' + CC.esc(n.id) + '">' + CC.ico('caneta') + 'Editar</button></div>').join('')
+        + '<button class="botao pequeno contorno" data-editar="' + CC.esc(n.id) + '"' + (n.titulo ? ' aria-label="Editar: ' + CC.esc(n.titulo) + '"' : '') + '>' + CC.ico('caneta') + 'Editar</button></div>').join('')
       + '<div class="acoes"><a class="botao plano" href="#/perfil/anotacoes" data-ir-anotacoes>' + CC.ico('caderno') + 'Minhas anotações</a></div>',
     {
       rotulo: CC.plural(notas.length, 'nota', 'notas') + ' neste trecho',

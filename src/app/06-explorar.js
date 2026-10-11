@@ -503,7 +503,8 @@
     const TIPO = { nota: 'Nota', oracao: 'Oração', estudo: 'Estudo' };
     for (const n of CC.notas()) {
       const onde = n.versos[0] || (n.contexto ? CC.nomeDoContexto(n.contexto) : '');
-      saida.push({ onde: TIPO[n.tipo] + (onde ? ' · ' + onde : ''), texto: n.texto.trim(), href: n.contexto ? CC.hrefDoContexto(n.contexto) : '#/perfil/anotacoes' });
+      // o título (opcional) vem antes do texto: a busca alcança os dois
+      saida.push({ onde: TIPO[n.tipo] + (onde ? ' · ' + onde : ''), texto: (n.titulo && typeof n.titulo === 'string' ? n.titulo + ' · ' : '') + n.texto.trim(), href: n.contexto ? CC.hrefDoContexto(n.contexto) : '#/perfil/anotacoes' });
     }
     return saida;
   };

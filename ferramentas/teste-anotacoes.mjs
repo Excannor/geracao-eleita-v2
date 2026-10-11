@@ -1,11 +1,12 @@
 // Minhas anotações num Chrome sem interface, de ponta a ponta: escolher um versículo, escrever a
 // nota no editor (rascunho, versículo ligado, tag), ver a etiqueta no leitor e o cartão em Minhas
 // anotações; oração respondida; busca e filtro; fixar; apagar e recuperar; as rotas antigas; a
-// folha "Como guardamos suas anotações"; e que a nota chega ao servidor.
+// folha "Como guardamos suas anotações"; o título opcional (vazio, escrito, editado, duas notas
+// no mesmo versículo, depois de recarregar e sincronizar); e que a nota chega ao servidor.
 // Uso: node ferramentas/teste-anotacoes.mjs   (CHROME, PORTA e PORTAS como nos outros testes)
 import { spawn } from 'node:child_process';
 import { portaLivre, fecharArvore } from './navegador.mjs';
-import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -108,6 +109,7 @@ ok(await esperar('!' + existe('.folha-editor') + ' && CC.notas().length === 1'),
 const nota = await av('CC.notas()[0]');
 ok(nota.versos.join() === 'João 3.16,Romanos 5.8' && nota.tags.join() === 'graça' && nota.tipo === 'nota' && !(await av('localStorage.getItem("cc.rascunho.nota")')),
   'a nota guarda os versículos, a tag e o tipo, e o rascunho sai');
+ok(nota.titulo === '', 'sem título escrito, a nota guarda o título vazio (o título é opcional)');
 ok(await esperar(existe('.dica-privada [data-ver]')), 'na primeira nota, uma dica leve (não bloqueia) leva à folha de privacidade');
 await clicar('.dica-privada [data-dispensar]');
 ok(await esperar('!' + existe('.dica-privada')), 'a dica se dispensa com um toque');
@@ -271,6 +273,96 @@ ok(await esperar(existe('textarea[data-campo="antes"]') + ' && ' + q('textarea[d
 
 await av('location.hash = "#/biblia"');
 ok(await esperar(existe('.folha-biblia a.atalho-anotacoes[href="#/perfil/anotacoes"][aria-label]'), 10000), 'o topo da Bíblia tem o caderno que leva a Minhas anotações');
+
+// ---------- o título da nota ----------
+console.log('\n  Título da nota\n');
+await av('location.hash = "#/biblia/" + encodeURIComponent("João") + "/3"');
+await esperar(existe('.leitor-biblia .leitor-verso[data-v="3:16"]'), 15000);
+const escreverNoVerso = async (titulo, textoNota) => {
+  if (await av('!' + existe('.acoes-verso:not([hidden]) [data-nota-verso]'))) await clicar('.leitor-verso[data-v="3:16"]');
+  await esperar(existe('.acoes-verso:not([hidden]) [data-nota-verso]'));
+  await clicar('.acoes-verso [data-nota-verso]');
+  await esperar(existe('.folha-editor #campo-titulo-nota'));
+  await preencher('#campo-titulo-nota', titulo);
+  await preencher('#campo-nota', textoNota);
+  await clicar('.folha-editor [data-guardar]');
+  return esperar('!' + existe('.folha-editor') + ' && CC.notas().some((n) => n.texto === ' + JSON.stringify(textoNota) + ')');
+};
+await clicar('.leitor-verso[data-v="3:16"]');
+await esperar(existe('.acoes-verso:not([hidden]) [data-nota-verso]'));
+await clicar('.acoes-verso [data-nota-verso]');
+ok(await esperar(existe('.folha-editor #campo-titulo-nota')), 'o editor tem o campo de título');
+ok(await av(`(() => { const t = document.querySelector('#campo-titulo-nota'); const c = document.querySelector('#campo-nota');
+  return t.placeholder === 'Título (opcional)' && t.maxLength === 60 && !!(t.compareDocumentPosition(c) & 4) && t.getBoundingClientRect().height >= 44
+    && !!document.querySelector('label[for="campo-titulo-nota"]') && getComputedStyle(t).borderRadius === getComputedStyle(c).borderRadius; })()`),
+'o título vem acima do texto, com "Título (opcional)", até 60 letras, rótulo, 44px e o mesmo contorno do campo do texto');
+await fecharFolhas();
+ok(await escreverNoVerso('  O amor   que vem primeiro ', 'Segunda nota no mesmo versículo'), 'guardar a nota com título');
+ok(await av('CC.notas().find((n) => n.texto === "Segunda nota no mesmo versículo").titulo === "O amor que vem primeiro"'), 'o título fica no campo próprio, sem espaço sobrando');
+ok(await escreverNoVerso('Estudo da célula: crer', 'Crer é confiar.\nVer Romanos 10.9.'), 'outra nota no mesmo versículo, com outro título');
+ok(await escreverNoVerso('', 'Terceira, sem título'), 'e uma nota com o título vazio também se guarda');
+ok(await av('CC.notas().find((n) => n.texto === "Terceira, sem título").titulo === ""'), 'título vazio fica vazio');
+await fecharFolhas();
+if (await av('!' + existe('.leitor-verso[data-v="3:16"] .etiqueta-nota'))) await dormir(500);
+await clicar('.leitor-verso[data-v="3:16"] .etiqueta-nota');
+ok(await esperar('(() => { const f = [...document.querySelectorAll(".folha")].pop(); const t = [...f.querySelectorAll(".titulo-previa")].map((h) => h.textContent);'
+  + ' return t.includes("O amor que vem primeiro") && t.includes("Estudo da célula: crer"); })()'), 'a prévia do versículo mostra o título de cada nota');
+await fecharFolhas();
+await clicar('[data-fechar-biblia]');
+await av('location.hash = "#/perfil/anotacoes"');
+await esperar(existe('.cartao-anot'));
+const titulosNaLista = () => av('[...document.querySelectorAll(".cartao-anot h3.titulo-nota")].map((h) => h.textContent)');
+let vistos = await titulosNaLista();
+ok(vistos.includes('O amor que vem primeiro') && vistos.includes('Estudo da célula: crer'), 'em Minhas anotações, as duas notas do mesmo versículo aparecem, cada uma com o seu título');
+ok(await av('(() => { const c = [...document.querySelectorAll(".cartao-anot")].find((x) => /Terceira, sem título/.test(x.innerText)); return !!c && !c.querySelector(".titulo-nota") && /João\\s3\\.16/.test(c.querySelector(".linha-tipo").innerText); })()'),
+  'a nota sem título fica como sempre (o versículo no alto, sem título)');
+ok(await av('(() => { const c = [...document.querySelectorAll(".cartao-anot")].find((x) => /Quem foi Abraão/.test(x.innerText)); return !!c && c.querySelector("h3").textContent === "Quem foi Abraão?"; })()'),
+  'o estudo antigo, sem título, continua com a primeira linha como título');
+ok(await av('(() => { const c = [...document.querySelectorAll(".cartao-anot")].find((x) => /Estudo da célula: crer/.test(x.innerText)); return /Crer é confiar/.test(c.querySelector(".texto-anot").textContent) && c.querySelector("[data-acoes]").getAttribute("aria-label").includes("Estudo da célula: crer"); })()'),
+  'com título, o texto vem inteiro embaixo, e o botão de ações diz o título');
+await preencher('#busca-anot', 'celula crer');
+ok(await esperar('document.querySelectorAll(".cartao-anot").length === 1 && /Estudo da célula/.test(' + q('.cartao-anot') + '.innerText)'), 'a busca acha a nota pelo título, sem acento');
+await preencher('#busca-anot', 'quatro contextos');
+ok(await esperar('document.querySelectorAll(".cartao-anot").length === 1'), 'a busca continua achando pelo nome da página ligada à nota');
+await preencher('#busca-anot', '');
+await esperar('document.querySelectorAll(".cartao-anot").length > 3');
+// editar o título
+await av('[...document.querySelectorAll(".cartao-anot")].find((x) => /O amor que vem primeiro/.test(x.innerText)).querySelector("[data-abrir]").click(); true');
+ok(await esperar(existe('.folha-editor #campo-titulo-nota') + ' && ' + q('#campo-titulo-nota') + '.value === "O amor que vem primeiro"'), 'editar abre o editor com o título');
+await preencher('#campo-titulo-nota', 'O amor que vem antes');
+await clicar('.folha-editor [data-guardar]');
+ok(await esperar('!' + existe('.folha-editor') + ' && CC.notas().some((n) => n.titulo === "O amor que vem antes" && n.texto === "Segunda nota no mesmo versículo")'), 'editar o título guarda o novo, com o mesmo texto');
+vistos = await titulosNaLista();
+ok(vistos.includes('O amor que vem antes') && !vistos.includes('O amor que vem primeiro'), 'o cartão mostra o título novo');
+// apagar o título de uma nota volta o cartão ao jeito de sempre
+await av('[...document.querySelectorAll(".cartao-anot")].find((x) => /Terceira, sem título/.test(x.innerText)).querySelector("[data-abrir]").click(); true');
+await esperar(existe('.folha-editor #campo-titulo-nota'));
+await preencher('#campo-titulo-nota', 'Por um tempo');
+await clicar('.folha-editor [data-guardar]');
+await esperar('CC.notas().some((n) => n.titulo === "Por um tempo")');
+await av('[...document.querySelectorAll(".cartao-anot")].find((x) => /Terceira, sem título/.test(x.innerText)).querySelector("[data-abrir]").click(); true');
+await esperar(existe('.folha-editor #campo-titulo-nota') + ' && ' + q('#campo-titulo-nota') + '.value === "Por um tempo"');
+await preencher('#campo-titulo-nota', '');
+await clicar('.folha-editor [data-guardar]');
+ok(await esperar('CC.notas().find((n) => n.texto === "Terceira, sem título").titulo === ""'), 'tirar o título deixa a nota sem título');
+// recarregar e sincronizar: o título vai ao servidor e volta dele
+await av('CC.salvarNoServidor()');
+await dormir(400);
+const estadoSrv = await (await fetch(base + '/api/estado', { headers: { cookie: cookie.join('; ') } })).json();
+ok(Object.values(estadoSrv.notas || {}).some((n) => n.titulo === 'O amor que vem antes' && n.texto === 'Segunda nota no mesmo versículo')
+  && Object.values(estadoSrv.notas || {}).some((n) => n.titulo === '' && n.texto === 'Terceira, sem título'), 'o título chega ao servidor (e o vazio continua vazio)');
+// o banco (e o WAL) em bytes: nem o título nem o texto aparecem em claro
+const bruto = Buffer.concat(readdirSync(pasta).filter((f) => f.startsWith('caminho.db')).map((f) => readFileSync(join(pasta, f))));
+ok(bruto.length > 0 && !bruto.includes('O amor que vem antes') && !bruto.includes('Estudo da célula') && !bruto.includes('Segunda nota no mesmo'), 'no banco do servidor, o título fica cifrado como o texto');
+await av('localStorage.removeItem("cc.app.estado"); true');
+await cmd('Page.reload');
+ok(await esperar('!!(window.CC && CC.notas && CC.notas().some((n) => n.titulo === "O amor que vem antes") && CC.notas().some((n) => n.titulo === "Estudo da célula: crer"))', 20000),
+  'sem nada guardado no aparelho, recarregar traz os títulos do servidor');
+await av('location.hash = "#/perfil"');
+await dormir(300);
+await av('location.hash = "#/perfil/anotacoes"');
+ok(await esperar('(() => { const t = [...document.querySelectorAll(".cartao-anot h3.titulo-nota")].map((h) => h.textContent); return t.includes("O amor que vem antes") && t.includes("Estudo da célula: crer"); })()', 10000),
+  'e Minhas anotações mostra os títulos depois de recarregar');
 
 // ---------- o servidor recebe as notas ----------
 await av('CC.salvarNoServidor()');
