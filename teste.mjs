@@ -808,10 +808,18 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01e-story-artes.js'), 'utf8'
   const S = CC.story;
   const comArte = CC.FRASES_OFENSIVA.filter((f) => f.arte);
   const sem = comArte.filter((f) => typeof S.artes[f.arte] !== 'function' || S.arteDaFrase({ linhas: f.linhas, ref: f.ref || '' }) !== f.arte);
-  checar(comArte.length === 45 && !sem.length, 'as 45 frases com arte têm modelo de story e o pedido da folha chega a ele'
+  checar(comArte.length === 49 && comArte.length === CC.FRASES_OFENSIVA.length && !sem.length, 'as 49 frases (todas) têm arte, com modelo de story, e o pedido da folha chega a ele'
     + (sem.length ? ' (' + sem.map((f) => f.arte).join(', ') + ')' : ''));
-  checar(S.arteDaFrase({ linhas: ['Até que', 'Ele venha'], ref: '' }) === null && S.arteDaFrase({ linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14' }) === 'luz',
-    'frase sem arte usa o modelo de sempre; "Luz do mundo" usa o da lâmpada');
+  // Toda frase da lista já tem arte: a frase sem arte é simulada tirando a arte de uma delas
+  // por um instante (e a frase do estágio da chama, que não está na lista, também fica sem).
+  const venha = CC.FRASES_OFENSIVA.find((f) => f.linhas.join(' ') === 'Até que Ele venha');
+  const arteVenha = venha.arte;
+  delete venha.arte;
+  const semArte = S.arteDaFrase({ linhas: ['Até que', 'Ele venha'], ref: '' });
+  venha.arte = arteVenha;
+  checar(semArte === null && S.arteDaFrase({ linhas: ['Até que', 'Ele venha'], ref: '' }) === 'alvorada'
+    && S.arteDaFrase({ linhas: ['Uma frase', 'fora da lista'], ref: '' }) === null && S.arteDaFrase({ linhas: ['Luz do', 'mundo'], ref: 'Mateus 5.14' }) === 'luz',
+    'frase sem arte (simulada, ou fora da lista) usa o modelo de sempre; "Até que Ele venha" usa a alvorada e "Luz do mundo" a lâmpada');
 }
 
 // --- quebra de linhas e tamanho de letra do cartão de versículo (01c-arte.js) ---

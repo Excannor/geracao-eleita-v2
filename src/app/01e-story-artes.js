@@ -2315,6 +2315,11 @@
     envelope: { fundo: ['#f1ece0'], tema: { ...TEMA_PAPEL, alinhar: 'esquerda', escala: 0.8 }, desenhar: artePregarao, grao: [12, 1410] },
     molde: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, alinhar: 'direita', escala: 0.8 }, desenhar: arteInconformada, grao: [12, 1420] },
     rasura: { fundo: [LP.preto], tema: { ...TEMA_LP, alinhar: 'esquerda', escala: 0.8, marcaX: 86 }, desenhar: arteTudo, grao: [18, 1430] },
+    // oitava leva (rodada 15): a aura, o caderno pontilhado, o gráfico e a alvorada sobre o mar
+    aura: { fundo: [LP.preto], tema: { ...TEMA_LP, escala: 0.8 }, desenhar: arteNele, grao: [24, 1500] },
+    rotina: { fundo: ['#f2eee3'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteRotina, grao: [12, 1510] },
+    grafico: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, alinhar: 'direita', escala: 0.8 }, desenhar: arteFracasso, grao: [12, 1520] },
+    alvorada: { fundo: ['#080a09'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteVenha, grao: [18, 1530] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -5261,6 +5266,325 @@
     ctx.rotate(-0.07);
     aMao(ctx, 'ELE', 0, 0, tE, r);
     ctx.restore();
+  }
+
+  // ---------- oitava leva (rodada 15) ----------
+  // As últimas quatro frases da ofensiva sem arte, cada uma num fundo (o preto com a aura, o
+  // papel pontilhado, o amarelo e o céu da alvorada sobre o mar), com composição, letra e fecho
+  // próprios. Nenhuma fecha com a palavra amarela sublinhada; nada de figura humana, prédio,
+  // coroa ou foto, e nenhuma palavra que não esteja na frase.
+
+  // Nele vivemos, nos movemos e existimos (Atos 17.28): a frase inteira mergulhada numa aura
+  // só, a luz grande e macia de sálvia e amarelo que ocupa o story e envolve tudo, no preto da
+  // landing.
+  // NELE em Manrope extra-negrito enorme, o resto em Manrope, tudo centrado e em tinta.
+  // Fechamento: nenhuma ênfase na letra; a aura que não deixa nada de fora é o fecho.
+  function fundoAura(ctx) {
+    ctx.fillStyle = LP.preto;
+    ctx.fillRect(0, 0, L, A);
+    const mancha = (x, y, rx, ry, rgb, a, borda) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(1, ry / rx);
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+      g.addColorStop(0, 'rgba(' + rgb + ',' + a + ')');
+      g.addColorStop(borda, 'rgba(' + rgb + ',' + (a * 0.9).toFixed(3) + ')');
+      g.addColorStop(0.88, 'rgba(' + rgb + ',' + (a * 0.3).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(' + rgb + ',0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(-rx, -rx, rx * 2, rx * 2);
+      ctx.restore();
+    };
+    mancha(540, 1000, 800, 640, '200,218,140', 1, 0.62);
+    mancha(310, 1250, 400, 340, '172,196,110', 0.6, 0.4);
+    mancha(720, 840, 470, 420, '255,196,77', 0.85, 0.4);
+    mancha(500, 1080, 420, 380, '246,244,222', 0.6, 0.3);
+  }
+  function arteNele(ctx) {
+    fundoAura(ctx);
+    const tinta = LP.tinta;
+    const mn = (peso) => (t) => peso + ' ' + t + 'px Manrope, sans-serif';
+    const tN = caber(ctx, 'Nele', mn(800), 640, 330);
+    const tR = Math.min(caber(ctx, 'nos movemos', mn(600), 700, 104), caber(ctx, 'e existimos', mn(600), 700, 104));
+    const yN = 960;
+    S.escrever(ctx, 'Nele', L / 2, yN, mn(800)(tN), tinta, { espaco: -tN * 0.04 });
+    const linhas = ['vivemos,', 'nos movemos', 'e existimos'];
+    linhas.forEach((l, i) => S.escrever(ctx, l, L / 2, yN + 150 + i * tR * 1.18, mn(600)(tR), tinta));
+    referencia(ctx, 'Atos 17.28', L / 2, yN + 150 + 2 * tR * 1.18 + 96, 34, 'rgba(18,19,15,.78)');
+  }
+
+  // Se alguém quiser vir após mim... (Lucas 9.23): a página de um caderno pontilhado, como o
+  // planner de quem anota a rotina. O começo vem como título, em Literata itálica; os três
+  // pedidos viram a lista do dia, cada um com o quadradinho marcado por uma cruzinha à mão
+  // (não um visto), e "tome diariamente a sua cruz" ganha a fileira de sete quadrinhos da
+  // semana, todos com a cruz: é todo dia. "e siga-me" sai à mão, maior, com a seta que segue
+  // para fora da página. Fechamento: a seta à mão.
+  // O quadradinho à mão: quatro riscos retos, cada canto passando um pouco do outro.
+  function caixinhaAMao(ctx, x, y, lado, r, largura = 5) {
+    const j = () => (r() - 0.5) * lado * 0.06;
+    const c = [[x + j(), y + j()], [x + lado + j(), y + j()], [x + lado + j(), y + lado + j()], [x + j(), y + lado + j()]];
+    ctx.save();
+    ctx.strokeStyle = 'rgba(18,19,15,.7)';
+    ctx.lineWidth = largura;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 4; i++) {
+      const [ax, ay] = c[i];
+      const [bx, by] = c[(i + 1) % 4];
+      const sx = (bx - ax) * 0.05;
+      const sy = (by - ay) * 0.05;
+      ctx.beginPath();
+      ctx.moveTo(ax - sx * (i === 0 ? 0.4 : 0), ay - sy * (i === 0 ? 0.4 : 0));
+      ctx.lineTo(bx + sx, by + sy);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function cruzinhaAMao(ctx, cx, cy, h, r, largura) {
+    tracoAMao(ctx, [[cx + h * 0.06, cy - h * 0.5], [cx - h * 0.05, cy + h * 0.5]], { r, largura, tremor: h * 0.04, cor: LP.tinta, segunda: false });
+    tracoAMao(ctx, [[cx - h * 0.32, cy - h * 0.2], [cx + h * 0.33, cy - h * 0.23]], { r, largura, tremor: h * 0.04, cor: LP.tinta, segunda: false });
+  }
+  function setaAMao(ctx, x0, y0, x1, y1, r, largura) {
+    const pts = [];
+    for (let i = 0; i <= 8; i++) {
+      const t = i / 8;
+      pts.push([x0 + (x1 - x0) * t, y0 + (y1 - y0) * t + Math.sin(t * Math.PI) * -10]);
+    }
+    tracoAMao(ctx, pts, { r, largura, tremor: 3, cor: LP.tinta, segunda: false });
+    const a = Math.atan2(y1 - pts[7][1], x1 - pts[7][0]);
+    const p = 34;
+    tracoAMao(ctx, [[x1 - Math.cos(a - 0.5) * p, y1 - Math.sin(a - 0.5) * p], [x1, y1], [x1 - Math.cos(a + 0.5) * p, y1 - Math.sin(a + 0.5) * p]], { r, largura, tremor: 2, cor: LP.tinta, segunda: false });
+  }
+  function arteRotina(ctx) {
+    const r = sorteio(1510);
+    fundoPapel(ctx, '#f2eee3', 1510);
+    // o pontilhado do caderno
+    ctx.fillStyle = 'rgba(18,19,15,.2)';
+    for (let y = 40; y < A; y += 56) for (let x = 36; x < L; x += 56) {
+      ctx.beginPath();
+      ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    const tinta = LP.tinta;
+    const x0 = 104;
+    const lit = (t) => 'italic 500 ' + t + 'px Literata, Georgia, serif';
+    const mn = (t) => '800 ' + t + 'px Manrope, sans-serif';
+    referencia(ctx, 'Lucas 9.23', x0, 596, 32, '#5c5a52', 'left');
+    const tT = Math.min(caber(ctx, 'Se alguém quiser', lit, 860, 92), caber(ctx, 'vir após mim,', lit, 860, 92));
+    S.escrever(ctx, 'Se alguém quiser', x0, 700, lit(tT), tinta, { alinhar: 'left' });
+    S.escrever(ctx, 'vir após mim,', x0, 700 + tT * 1.15, lit(tT), tinta, { alinhar: 'left' });
+    // a lista do dia
+    const xt = x0 + 104;
+    const tI = Math.min(...['negue a si mesmo,', 'tome diariamente', 'a sua cruz'].map((l) => caber(ctx, l, mn, L - xt - 70, 82)));
+    const capI = tI * 0.72;
+    const lado = 62;
+    const item = (y) => {
+      const topo = y - capI / 2 - lado / 2;
+      caixinhaAMao(ctx, x0, topo, lado, r, 3.5);
+      cruzinhaAMao(ctx, x0 + lado / 2, topo + lado / 2 + 2, lado * 0.74, r, 7.5);
+    };
+    let y = 960;
+    item(y);
+    S.escrever(ctx, 'negue a si mesmo,', xt, y, mn(tI), tinta, { alinhar: 'left' });
+    y += 156;
+    item(y);
+    S.escrever(ctx, 'tome diariamente', xt, y, mn(tI), tinta, { alinhar: 'left' });
+    S.escrever(ctx, 'a sua cruz', xt, y + tI * 1.12, mn(tI), tinta, { alinhar: 'left' });
+    // os sete dias da semana, todos com a cruz
+    const q = 52;
+    const vao = (L - xt - 80 - 7 * q) / 6;
+    const yq = y + tI * 1.12 + 58;
+    for (let i = 0; i < 7; i++) {
+      const xq = xt + i * (q + vao);
+      caixinhaAMao(ctx, xq, yq, q, r, 2.8);
+      cruzinhaAMao(ctx, xq + q / 2, yq + q / 2 + 2, q * 0.74, r, 5.5);
+    }
+    // e siga-me: à mão, maior, com a seta para fora da página
+    const yS = yq + q + 170;
+    const tS = 132;
+    ctx.fillStyle = tinta;
+    aMao(ctx, 'e siga-me', x0 - 4, yS, tS, r);
+    ctx.font = '400 ' + tS + 'px "Permanent Marker", cursive';
+    const wS = ctx.measureText('e siga-me').width;
+    setaAMao(ctx, x0 + wS + 34, yS - tS * 0.34, L - 34, yS - tS * 0.42, r, 7);
+  }
+
+  // O maior fracasso é ter sucesso em coisas que nos afastam de Deus: o gráfico de "sucesso"
+  // à mão no amarelo cheio. A linha sai de junto de uma cruz pequena, no canto de baixo, e
+  // sobe em degraus até a ponta da seta, no alto à direita: quanto mais sobe, mais longe da
+  // cruz. EM COISAS QUE / NOS AFASTAM corre em cima da linha, inclinado com ela, e DE DEUS
+  // fica lá embaixo, ao lado da cruz que ficou para trás. O MAIOR pequeno e FRACASSO gigante
+  // no alto. Tudo em Oswald e tinta. Fechamento: a cruz deixada no começo do gráfico.
+  function arteFracasso(ctx) {
+    const r = sorteio(1520);
+    ctx.fillStyle = LP.amarelo;
+    ctx.fillRect(0, 0, L, A);
+    const tinta = LP.tinta;
+    const os = (peso) => (t) => oswaldLP(t, peso);
+    const x0 = 92;
+    S.escrever(ctx, 'O MAIOR', x0, 640, os(600)(74), tinta, { alinhar: 'left', espaco: 10 });
+    const tF = caber(ctx, 'FRACASSO', os(700), L - 2 * x0, 300);
+    ctx.font = os(700)(tF);
+    const capF = ctx.measureText('FRACASSO').actualBoundingBoxAscent;
+    const yF = 640 + 26 + capF;
+    S.escrever(ctx, 'FRACASSO', x0 - 4, yF, os(700)(tF), tinta, { alinhar: 'left' });
+    S.escrever(ctx, 'É TER SUCESSO', x0, yF + 104, os(600)(74), tinta, { alinhar: 'left', espaco: 10 });
+    // os eixos à mão
+    const ox = 120;
+    const oy = 1500;
+    tracoAMao(ctx, [[ox, 1060], [ox - 2, 1280], [ox, oy]], { r, largura: 5, tremor: 2, cor: tinta, segunda: false });
+    tracoAMao(ctx, [[ox, oy], [560, oy + 2], [L - 70, oy - 1]], { r, largura: 5, tremor: 2, cor: tinta, segunda: false });
+    for (let i = 1; i <= 4; i++) {
+      const yy = oy - i * 100;
+      tracoAMao(ctx, [[ox - 14, yy], [ox + 14, yy]], { r, largura: 4, tremor: 1, cor: tinta, segunda: false });
+    }
+    // a cruz pequena, no começo, e a linha que sobe para longe dela
+    const cx = 196;
+    const cy = 1440;
+    cruzinhaAMao(ctx, cx, cy, 92, r, 9);
+    const pts = [[240, 1440], [318, 1404], [384, 1418], [470, 1336], [540, 1350], [632, 1250], [700, 1266], [800, 1150], [868, 1166], [985, 1035]];
+    const linha = pts.map(([x, y]) => [x, y]);
+    ctx.save();
+    ctx.strokeStyle = tinta;
+    ctx.lineWidth = 11;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    linha.forEach(([x, y], i) => (i ? ctx.lineTo(x + (r() - 0.5) * 3, y + (r() - 0.5) * 3) : ctx.moveTo(x, y)));
+    ctx.stroke();
+    ctx.restore();
+    const [ax, ay] = pts[pts.length - 1];
+    const ang = Math.atan2(ay - pts[pts.length - 2][1], ax - pts[pts.length - 2][0]);
+    const ponta = 46;
+    ctx.save();
+    ctx.fillStyle = tinta;
+    ctx.beginPath();
+    ctx.moveTo(ax + Math.cos(ang) * ponta * 0.6, ay + Math.sin(ang) * ponta * 0.6);
+    ctx.lineTo(ax + Math.cos(ang + 2.5) * ponta, ay + Math.sin(ang + 2.5) * ponta);
+    ctx.lineTo(ax + Math.cos(ang - 2.5) * ponta, ay + Math.sin(ang - 2.5) * ponta);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    // o texto em cima da linha, inclinado com ela
+    const inc = Math.atan2(pts[pts.length - 1][1] - pts[0][1], pts[pts.length - 1][0] - pts[0][0]);
+    const tL = 64;
+    ctx.save();
+    ctx.translate(560, 1210);
+    ctx.rotate(inc);
+    S.escrever(ctx, 'EM COISAS QUE', -10, -tL * 1.2, os(600)(tL), tinta, { espaco: 4 });
+    S.escrever(ctx, 'NOS AFASTAM', -10, 0, os(600)(tL), tinta, { espaco: 4 });
+    ctx.restore();
+    // de Deus, embaixo, ao lado da cruz que ficou para trás
+    S.escrever(ctx, 'DE DEUS', cx + 70, oy - 22, os(700)(46), tinta, { alinhar: 'left', espaco: 6 });
+  }
+
+  // Até que Ele venha: a alvorada sobre o mar, antes do sol. O céu vem do quase preto, no alto,
+  // até a faixa clara no horizonte, e uma estrela só, a estrela da manhã, brilha logo acima
+  // dela; no mar escuro, o caminho de luz que a estrela faz na água vem na direção de quem vê.
+  // até que em Literata itálica creme no céu escuro, e ELE VENHA em Oswald enorme, em tinta,
+  // de pé no horizonte, contra a faixa clara. Diferente do
+  // relógio (Prepara-te, Ele vem) e do cartaz amarelo de Avivados: nenhum ponteiro, nenhuma
+  // foto, só a espera e a luz que vem. Fechamento: a estrela.
+  const HORIZONTE = 1250;
+  function ceuDaAlvorada(ctx) {
+    const g = ctx.createLinearGradient(0, 0, 0, HORIZONTE);
+    g.addColorStop(0, '#080a09');
+    g.addColorStop(0.42, '#0d1210');
+    g.addColorStop(0.66, '#26302a');
+    g.addColorStop(0.76, '#5e6b52');
+    g.addColorStop(0.83, '#c3cd9f');
+    g.addColorStop(1, '#f5f2dc');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, HORIZONTE);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, L, HORIZONTE);
+    ctx.clip();
+    ctx.translate(L / 2, HORIZONTE);
+    ctx.scale(1, 0.42);
+    const q = ctx.createRadialGradient(0, 0, 0, 0, 0, 760);
+    q.addColorStop(0, 'rgba(255,214,130,.55)');
+    q.addColorStop(0.5, 'rgba(255,214,130,.16)');
+    q.addColorStop(1, 'rgba(255,214,130,0)');
+    ctx.fillStyle = q;
+    ctx.fillRect(-760, -760, 1520, 1520);
+    ctx.restore();
+    // o mar
+    const m = ctx.createLinearGradient(0, HORIZONTE, 0, A);
+    m.addColorStop(0, '#2a312b');
+    m.addColorStop(0.08, '#121714');
+    m.addColorStop(1, '#070908');
+    ctx.fillStyle = m;
+    ctx.fillRect(0, HORIZONTE, L, A - HORIZONTE);
+  }
+  function brilhoNoMar(ctx, r) {
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 900; i++) {
+      const t = Math.pow(r(), 1.25);
+      const y = HORIZONTE + 8 + t * (A - HORIZONTE);
+      const meia = 26 + t * 300;
+      const desvio = (r() + r() + r() - 1.5) / 1.5;
+      const x = L / 2 + desvio * meia;
+      const perto = 1 - Math.abs(desvio);
+      const fade = y < 1400 ? 1 : Math.max(0, 1 - (y - 1400) / 130);
+      const a = (0.2 + perto * 0.6) * (1 - t * 0.55) * fade * (0.5 + r() * 0.5);
+      if (a < 0.03) continue;
+      const w = 6 + r() * (14 + t * 40);
+      ctx.strokeStyle = 'rgba(250,240,205,' + a.toFixed(3) + ')';
+      ctx.lineWidth = 1.5 + t * 2.4;
+      ctx.beginPath();
+      ctx.moveTo(x - w / 2, y);
+      ctx.lineTo(x + w / 2, y);
+      ctx.stroke();
+    }
+    // a linha do horizonte, fina e clara
+    ctx.fillStyle = 'rgba(250,245,222,.9)';
+    ctx.fillRect(0, HORIZONTE - 1, L, 2.5);
+    ctx.restore();
+  }
+  function estrelaDaManha(ctx, x, y, h) {
+    ctx.save();
+    const g = ctx.createRadialGradient(x, y, 0, x, y, h * 0.9);
+    g.addColorStop(0, 'rgba(255,240,200,.55)');
+    g.addColorStop(0.3, 'rgba(255,230,170,.16)');
+    g.addColorStop(1, 'rgba(255,230,170,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x - h, y - h, 2 * h, 2 * h);
+    // os raios: finos e afinando, o de cima e o de baixo mais longos
+    const raio = (ang, comp, base) => {
+      ctx.beginPath();
+      ctx.moveTo(x + Math.cos(ang) * comp, y + Math.sin(ang) * comp);
+      ctx.lineTo(x + Math.cos(ang + Math.PI / 2) * base, y + Math.sin(ang + Math.PI / 2) * base);
+      ctx.lineTo(x + Math.cos(ang + Math.PI) * comp, y + Math.sin(ang + Math.PI) * comp);
+      ctx.lineTo(x + Math.cos(ang - Math.PI / 2) * base, y + Math.sin(ang - Math.PI / 2) * base);
+      ctx.closePath();
+      ctx.fill();
+    };
+    ctx.fillStyle = '#fff6da';
+    raio(Math.PI / 2, h * 0.5, h * 0.035);
+    raio(0, h * 0.4, h * 0.035);
+    ctx.globalAlpha = 0.55;
+    raio(Math.PI / 4, h * 0.13, h * 0.02);
+    raio(-Math.PI / 4, h * 0.13, h * 0.02);
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, h * 0.045, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function arteVenha(ctx) {
+    const r = sorteio(1530);
+    ceuDaAlvorada(ctx);
+    brilhoNoMar(ctx, r);
+    const os = (t) => oswaldLP(t, 700);
+    const tV = caber(ctx, 'ELE VENHA', os, L - 130, 320);
+    ctx.font = os(tV);
+    // ELE VENHA de pé no horizonte, em tinta contra a faixa clara
+    S.escrever(ctx, 'ELE VENHA', L / 2, HORIZONTE - 4, os(tV), LP.tinta, { espaco: 2 });
+    const capV = ctx.measureText('ELE VENHA').actualBoundingBoxAscent;
+    // a estrela da manhã e o até que no céu escuro, acima
+    estrelaDaManha(ctx, L / 2, HORIZONTE - capV - 200, 300);
+    S.escrever(ctx, 'Até que', L / 2, HORIZONTE - capV - 400, 'italic 500 104px Literata, Georgia, serif', LP.creme);
   }
 
   S.prepararArte = prepararArte;

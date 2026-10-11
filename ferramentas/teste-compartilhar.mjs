@@ -273,13 +273,21 @@ ok(Object.keys(versos || {}).length === 3, 'as imagens de versículo curto, long
 // as imagens de referência, para a revisão a olho: 1, 100 e 365 dias com a frase mais curta e
 // a mais longa da lista, e a frase do estágio (sem carimbo à vista)
 const casos = await imagensGrandes(`(async () => {
-  const por = CC.FRASES_OFENSIVA.filter((f) => !f.arte).sort((a, b) => a.linhas.join(" ").length - b.linhas.join(" ").length);
-  const curta = por[0], longa = por[por.length - 1];
+  // toda frase da lista tem arte (rodada 15): para o modelo de sempre, a arte sai de todas só
+  // enquanto estas imagens são feitas, e volta no fim
+  const tiradas = CC.FRASES_OFENSIVA.map((f) => f.arte);
+  CC.FRASES_OFENSIVA.forEach((f) => { delete f.arte; });
   const saida = {};
-  for (const [nome, p] of [["ofensiva-1-curta", { dias: 1, frase: curta }], ["ofensiva-100-longa", { dias: 100, frase: longa }],
-    ["ofensiva-365-curta", { dias: 365, frase: curta }], ["ofensiva-7-estagio", { dias: 7 }]]) {
-    const f = await CC.story.preparar({ tipo: "ofensiva", ...p });
-    saida[nome] = (await __png(f)).url;
+  try {
+    const por = CC.FRASES_OFENSIVA.slice().sort((a, b) => a.linhas.join(" ").length - b.linhas.join(" ").length);
+    const curta = por[0], longa = por[por.length - 1];
+    for (const [nome, p] of [["ofensiva-1-curta", { dias: 1, frase: curta }], ["ofensiva-100-longa", { dias: 100, frase: longa }],
+      ["ofensiva-365-curta", { dias: 365, frase: curta }], ["ofensiva-7-estagio", { dias: 7 }]]) {
+      const f = await CC.story.preparar({ tipo: "ofensiva", ...p });
+      saida[nome] = (await __png(f)).url;
+    }
+  } finally {
+    CC.FRASES_OFENSIVA.forEach((f, i) => { if (tiradas[i]) f.arte = tiradas[i]; });
   }
   return saida;
 })()`);
