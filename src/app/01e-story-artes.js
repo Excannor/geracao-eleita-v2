@@ -2655,6 +2655,7 @@
     testemunho: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteTestemunho, grao: [18, 4747] },
     virgula: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVirgula, grao: [18, 1712] },
     semente: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteSemente, grao: [18, 1606] },
+    caminho: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteCaminho, grao: [18, 1414] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -3699,6 +3700,153 @@
     pontoDeLuz(ctx, bx + 110, ys - 130, 12, r);
     rotuloLanding(ctx, 'Continue firme', cx, ys + 410, 32);
     return ys + 410;
+  }
+
+  // O propósito de Deus para a sua vida é maior do que qualquer obstáculo no seu caminho: o
+  // caminho à mão em sálvia, visto de quem está nele, sai largo do pé do desenho, desvia de
+  // uma pedra grande e segue estreitando até o horizonte, onde a meta é a bandeirinha
+  // amarela (a única cor quente). Embaixo, a frase: O PROPÓSITO DE DEUS grande, o meio menor,
+  // QUALQUER OBSTÁCULO e NO SEU CAMINHO. em amarelo com o risco. Sem referência.
+  // A pedra: o contorno de uma rocha larga assentada no chão (yg), as arestas das faces e a
+  // hachura do lado da sombra, com o miolo pintado de preto (tapa o caminho que passa atrás).
+  function pedraGrande(ctx, x0, yg, w, h, r) {
+    // o contorno em calombos, de um pé ao outro (a base fica no chão, sem risco)
+    // (os lados retos, com pontos no meio, para o traço quebrar nas quinas como pedra)
+    const quinas = [[0, 0.02], [0.03, -0.42], [0.14, -0.7], [0.3, -0.78], [0.44, -0.95], [0.62, -1], [0.78, -0.82], [0.92, -0.6], [0.99, -0.3], [1, 0.02]]
+      .map(([u, v]) => [x0 + u * w + (r() - 0.5) * w * 0.012, yg + v * h + (r() - 0.5) * h * 0.02]);
+    const pts = [quinas[0]];
+    for (let i = 1; i < quinas.length; i++) {
+      const [ax, ay] = quinas[i - 1];
+      const [bx, by] = quinas[i];
+      for (const t of [0.2, 0.8, 1]) pts.push([ax + (bx - ax) * t, ay + (by - ay) * t]);
+    }
+    ctx.fillStyle = LP.preto;
+    ctx.beginPath();
+    pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.closePath();
+    ctx.fill();
+    tracoAMao(ctx, pts, { r, largura: 7, tremor: 2.5 });
+    // as arestas, deitadas, acompanhando os calombos
+    const meio = { r, largura: 3.5, tremor: 1.5, segunda: false, cor: 'rgba(200,218,140,.7)' };
+    const reta = (a, b, op) => tracoAMao(ctx, [a, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], b], op);
+    const P = (u, v) => [x0 + w * u, yg - h * v];
+    reta(P(0.44, 0.95), P(0.52, 0.64), meio);
+    reta(P(0.52, 0.64), P(0.78, 0.56), meio);
+    reta(P(0.78, 0.56), P(0.92, 0.6), meio);
+    reta(P(0.52, 0.64), P(0.48, 0.3), { ...meio, cor: 'rgba(200,218,140,.5)' });
+    reta(P(0.14, 0.7), P(0.26, 0.5), { ...meio, cor: 'rgba(200,218,140,.5)' });
+    reta(P(0.26, 0.5), P(0.52, 0.64), { ...meio, cor: 'rgba(200,218,140,.45)' });
+    reta(P(0.66, 0.9), P(0.7, 0.76), { ...meio, largura: 2.5, cor: 'rgba(200,218,140,.5)' });
+    reta(P(0.3, 0.3), P(0.36, 0.16), { ...meio, largura: 2.5, cor: 'rgba(200,218,140,.4)' });
+    // o pontilhado da sombra, embaixo e à direita, mais denso perto do chão
+    for (let i = 0; i < 110; i++) {
+      const u = 0.45 + Math.sqrt(r()) * 0.52;
+      const v = -Math.pow(r(), 1.6) * 0.5 * (1 - (u - 0.45) * 0.6);
+      ctx.fillStyle = 'rgba(200,218,140,' + (0.25 + r() * 0.35).toFixed(2) + ')';
+      ctx.beginPath();
+      ctx.arc(x0 + u * w, yg + v * h - 4, 1.1 + r() * 1.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // o chão: o risco da base passando dos pés, uma pedrinha ao lado e a sombra deitada
+    tracoAMao(ctx, [[x0 - w * 0.1, yg + 3], [x0 + w * 0.5, yg + 6], [x0 + w * 1.12, yg + 2]], { r, largura: 4, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.6)' });
+    tracoAMao(ctx, pontosElipse(x0 - w * 0.06, yg - 6, 14, 8, { r, n: 10, mexe: 0.2 }), { r, largura: 3, tremor: 1, fechar: true, segunda: false, cor: 'rgba(200,218,140,.6)' });
+    for (let i = 0; i < 3; i++) {
+      const y = yg + 14 + i * 9;
+      tracoAMao(ctx, [[x0 + w * (0.55 + i * 0.06), y], [x0 + w * (1.2 - i * 0.07), y + 1]], { r, largura: 2.5, tremor: 1, segunda: false, cor: 'rgba(200,218,140,' + (0.34 - i * 0.08).toFixed(2) + ')' });
+    }
+  }
+  // A bandeirinha da meta: o mastro e o pano ondulado, em amarelo, com o pé em (x, y).
+  function bandeirinha(ctx, x, y, alt, r) {
+    const cor = LP.amarelo;
+    ctx.save();
+    const g = ctx.createRadialGradient(x, y - alt * 0.6, 0, x, y - alt * 0.6, alt * 1.8);
+    g.addColorStop(0, 'rgba(255,196,77,.16)');
+    g.addColorStop(1, 'rgba(255,196,77,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x - alt * 2, y - alt * 2.4, alt * 4, alt * 3.6);
+    ctx.restore();
+    tracoAMao(ctx, [[x, y], [x + 1, y - alt * 0.5], [x, y - alt]], { r, largura: 4.5, tremor: 1, segunda: false, cor });
+    const p = new Path2D();
+    const w = alt * 0.62;
+    const h = alt * 0.36;
+    p.moveTo(x + 2, y - alt);
+    p.bezierCurveTo(x + w * 0.35, y - alt - h * 0.18, x + w * 0.6, y - alt + h * 0.16, x + w, y - alt + h * 0.02);
+    p.lineTo(x + w * 0.86, y - alt + h * 0.52);
+    p.lineTo(x + w, y - alt + h);
+    p.bezierCurveTo(x + w * 0.6, y - alt + h * 1.1, x + w * 0.35, y - alt + h * 0.8, x + 2, y - alt + h * 0.92);
+    p.closePath();
+    ctx.fillStyle = cor;
+    ctx.fill(p);
+    // o chão da meta: um risquinho amarelo
+    tracoAMao(ctx, [[x - alt * 0.3, y + 2], [x + alt * 0.35, y + 1]], { r, largura: 3, tremor: 1, segunda: false, cor });
+  }
+  function arteCaminho(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(1414);
+    const cx = L / 2;
+    const H = 620; // o horizonte
+    const B = 1064; // o pé do caminho
+    const xh = cx + 70; // a meta, no horizonte
+    // o caminho num chão em perspectiva: s vai de 0 (perto) a 1 (o horizonte); o desvio é
+    // dado no tamanho de perto e encolhe com a distância
+    const yDe = (s) => H + (B - H) * Math.pow(1 - s, 1.5);
+    const pDe = (s) => (yDe(s) - H) / (B - H);
+    const desvio = (s) => -10 + 400 * Math.exp(-(((s - 0.3) / 0.16) ** 2));
+    const meio = (s) => xh + (cx + desvio(s) - xh) * pDe(s);
+    const meia = 210;
+    horizonte(ctx, H, 60, L - 60, r);
+    // as beiradas, em trechos que afinam com a distância
+    const N = 36;
+    for (const lado of [-1, 1]) {
+      for (let i = 0; i < N; i += 4) {
+        const pts = [];
+        for (let j = i; j <= Math.min(N, i + 4); j++) {
+          const s = j / N * 0.985;
+          pts.push([meio(s) + lado * meia * pDe(s), yDe(s)]);
+        }
+        const s0 = i / N;
+        const a = Math.min(1, 1.25 - s0 * 0.4) * Math.min(1, (1 - s0) * 6 + 0.1);
+        tracoAMao(ctx, pts, { r, largura: 7 - s0 * 4.5, tremor: 1.2 - s0, segunda: i < N / 2, cor: 'rgba(200,218,140,' + a.toFixed(2) + ')' });
+      }
+    }
+    // a trilha no meio do caminho, em tracinhos que encolhem para trás
+    for (let i = 0; i < 26; i++) {
+      const s0 = i / 26 * 0.94;
+      const s1 = s0 + 0.016;
+      const p = pDe(s0);
+      tracoAMao(ctx, [[meio(s0), yDe(s0)], [meio(s1), yDe(s1)]], { r, largura: 1.5 + 3 * p, tremor: 0.6, segunda: false, cor: 'rgba(200,218,140,' + (0.25 + 0.3 * p).toFixed(2) + ')' });
+    }
+    // o cascalho do caminho e os tufos nas beiradas, menores para trás
+    for (let i = 0; i < 70; i++) {
+      const s = Math.pow(r(), 1.3) * 0.85;
+      const p = pDe(s);
+      const x = meio(s) + (r() - 0.5) * 1.6 * meia * p;
+      ctx.fillStyle = 'rgba(200,218,140,' + (0.18 + r() * 0.25).toFixed(2) + ')';
+      ctx.beginPath();
+      ctx.ellipse(x, yDe(s), 1.5 + p * 4 * r(), 1 + p * 2.2 * r(), 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    for (const [s, lado] of [[0.06, -1], [0.1, 1], [0.24, 1], [0.5, 1], [0.62, -1], [0.18, -1]]) {
+      const p = pDe(s);
+      const x = meio(s) + lado * (meia * p + 26 * p + 10);
+      const y = yDe(s);
+      for (const d of [-1, 0, 1]) {
+        tracoAMao(ctx, [[x + d * 9 * p, y], [x + d * 16 * p, y - (16 + 10 * r()) * (0.4 + p)]], { r, largura: 1.5 + 2 * p, tremor: 1, segunda: false, cor: 'rgba(200,218,140,.55)' });
+      }
+    }
+    // a pedra, no lugar onde o caminho iria reto; desenhada depois, tapa a volta de trás
+    const sp = 0.3;
+    const pp = pDe(sp);
+    const xc = xh + (cx - 120 - xh) * pp;
+    pedraGrande(ctx, xc - 160, yDe(sp) + 10, 320, 190, r);
+    bandeirinha(ctx, xh, H + 2, 74, r);
+    // embaixo, a frase
+    return blocoLanding(ctx, [
+      { t: 'O PROPÓSITO DE DEUS', larg: 840, max: 106, vao: 34 },
+      { t: 'PARA A SUA VIDA É MAIOR DO QUE', larg: 840, max: 56, peso: 600, espaco: 3, vao: 20 },
+      { t: 'QUALQUER OBSTÁCULO', larg: 840, max: 106, vao: 26 },
+      { t: 'NO SEU CAMINHO.', larg: 760, max: 126, cor: LP.amarelo, risco: true, vao: 14 },
+    ], B);
   }
 
   S.prepararArte = prepararArte;

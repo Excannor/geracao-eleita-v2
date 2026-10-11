@@ -53,7 +53,7 @@
     { linhas: ['Conhecer a Deus', 'e fazê-Lo', 'conhecido'] },
     { linhas: ['Se alguém quiser', 'vir após mim,', 'negue a si mesmo,', 'tome diariamente', 'a sua cruz', 'e siga-me'], ref: 'Lucas 9.23' },
     { linhas: ['Firmes no propósito,', 'constantes', 'na oração', 'e inabaláveis na fé'] },
-    { linhas: ['O propósito de Deus', 'para a sua vida', 'é maior do que', 'qualquer obstáculo', 'no seu caminho'] },
+    { linhas: ['O propósito de Deus', 'para a sua vida', 'é maior do que', 'qualquer obstáculo', 'no seu caminho'], arte: 'caminho' },
     { linhas: ['A sua oração', 'de hoje está', 'construindo', 'o milagre de amanhã.', 'Continue firme'], arte: 'semente' },
     { linhas: ['Onde o mundo', 'vê um fim, Deus', 'escreve um', 'novo começo cheio', 'de esperança'], arte: 'virgula' },
     { linhas: ['Geração', 'inconformada'] },

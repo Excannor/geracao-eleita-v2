@@ -166,3 +166,8 @@ amarelo como a única cor quente), sem figura humana, prédio, coroa ou foto:
   raízes para baixo e o broto sobe em S até furar a superfície com as duas primeiras folhas;
   acima dele, o ponto de luz amarelo. A frase em cima, O MILAGRE DE AMANHÃ. em amarelo com o
   risco, e CONTINUE FIRME no rótulo sálvia embaixo da terra.
+- **caminho** (O propósito de Deus para a sua vida é maior do que qualquer obstáculo no seu
+  caminho): o caminho à mão em sálvia, em perspectiva, sai largo do pé do desenho, desvia de
+  uma pedra grande (quinas, arestas e o pontilhado da sombra) e estreita até o horizonte,
+  onde a meta é a bandeirinha amarela. A frase embaixo, NO SEU CAMINHO. em amarelo com o
+  risco. A primeira pedra, lisa e em cúpula, parecia um túnel; a de quinas lê como pedra.
