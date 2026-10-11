@@ -2482,6 +2482,7 @@
     influenciam: { fundo: [LP.preto], fotos: ['influenciam'], tema: TEMA_LP, desenhar: arteInfluenciam, grao: [18, 5131] },
     diferenca: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteDiferenca, grao: [18, 1308] },
     vivoporele: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteVivoPorEle, grao: [18, 2203] },
+    jesusvive: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteJesusVive, grao: [18, 3111] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -2882,6 +2883,168 @@
     }
     riscoLanding(ctx, cx - ultima.w / 2 - 6, y + 8, ultima.w + 14, 24, LP.amarelo);
     return y;
+  }
+
+  // Jesus vive: letras de recorte de revista, cada uma num papel de cor e letra diferentes,
+  // tortas e coladas com sombra, em tons quentes e sálvia sobre o preto com grão; entre as
+  // duas palavras, a Bíblia aberta à mão em sálvia (no lugar da foto da referência, que é de
+  // terceiros). Sem referência.
+  const PAPEIS = [
+    { papel: LP.amarelo, tinta: LP.tinta },
+    { papel: '#f2efdc', tinta: '#7a2e22' },
+    { papel: '#c8553d', tinta: '#f6ead2' },
+    { papel: LP.salvia, tinta: LP.tinta },
+    { papel: '#e8a25a', tinta: '#2a1a10' },
+    { papel: '#5a2a24', tinta: '#ffd58a' },
+    { papel: '#d9c3a0', tinta: '#3b2a1c' },
+    { papel: '#9fb266', tinta: '#f7f2df' },
+    { papel: '#efe2c4', tinta: '#c8553d' },
+  ];
+  const LETRAS_RECORTE = [
+    (t) => '700 ' + t + 'px Oswald, "Arial Narrow", sans-serif',
+    (t) => '600 ' + t + 'px Literata, Georgia, serif',
+    (t) => '400 ' + t + 'px "Permanent Marker", cursive',
+    (t) => '800 ' + t + 'px Manrope, sans-serif',
+    (t) => 'italic 600 ' + t + 'px Literata, Georgia, serif',
+    (t) => '500 ' + t + 'px Oswald, "Arial Narrow", sans-serif',
+  ];
+  // Uma letra recortada: o papel (um quadrilátero meio torto, às vezes com um lado picotado)
+  // centrado em (x, y), girado, com a sombra de papel colado, e a letra por cima.
+  function recorte(ctx, letra, x, y, { alt, papel, tinta, fonte, giro, r, largura = 1, minuscula = false }) {
+    const txt = minuscula ? letra.toLowerCase() : letra;
+    const tam = alt * (minuscula ? 0.95 : 0.8);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(giro);
+    ctx.font = fonte(tam);
+    ctx.textAlign = 'center';
+    const m = ctx.measureText(txt);
+    const w = Math.max(alt * 0.62, m.width + alt * 0.26) * largura;
+    const h = alt;
+    const j = () => (r() - 0.5) * alt * 0.07;
+    const cantos = [[-w / 2 + j(), -h / 2 + j()], [w / 2 + j(), -h / 2 + j()], [w / 2 + j(), h / 2 + j()], [-w / 2 + j(), h / 2 + j()]];
+    const p = new Path2D();
+    p.moveTo(cantos[0][0], cantos[0][1]);
+    const picotado = Math.floor(r() * 6); // 0 a 3: esse lado sai picotado; 4 e 5: nenhum
+    for (let i = 0; i < 4; i++) {
+      const [ax, ay] = cantos[i];
+      const [bx, by] = cantos[(i + 1) % 4];
+      if (i === picotado) {
+        const n = 9;
+        for (let k = 1; k < n; k++) {
+          const t = k / n;
+          const dente = (k % 2 ? 1 : -1) * alt * 0.025;
+          const nx = -(by - ay) / Math.hypot(bx - ax, by - ay);
+          const ny = (bx - ax) / Math.hypot(bx - ax, by - ay);
+          p.lineTo(ax + (bx - ax) * t + nx * dente, ay + (by - ay) * t + ny * dente);
+        }
+      }
+      p.lineTo(bx, by);
+    }
+    p.closePath();
+    ctx.shadowColor = 'rgba(0,0,0,.55)';
+    ctx.shadowBlur = alt * 0.1;
+    ctx.shadowOffsetX = alt * 0.025;
+    ctx.shadowOffsetY = alt * 0.05;
+    ctx.fillStyle = papel;
+    ctx.fill(p);
+    ctx.shadowColor = 'rgba(0,0,0,0)';
+    // um pouco de textura de papel: uma faixa mais clara de um lado
+    ctx.save();
+    ctx.clip(p);
+    const g = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+    g.addColorStop(0, 'rgba(255,255,255,.14)');
+    g.addColorStop(0.6, 'rgba(255,255,255,0)');
+    g.addColorStop(1, 'rgba(0,0,0,.12)');
+    ctx.fillStyle = g;
+    ctx.fillRect(-w, -h, w * 2, h * 2);
+    ctx.restore();
+    // a letra, centrada pela altura das maiúsculas
+    const asc = m.actualBoundingBoxAscent || tam * 0.7;
+    const desc = m.actualBoundingBoxDescent || 0;
+    ctx.fillStyle = tinta;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(txt, (m.actualBoundingBoxLeft - m.actualBoundingBoxRight) / 2, (asc - desc) / 2);
+    ctx.restore();
+    return w;
+  }
+  // Uma palavra de recortes, centrada em cx: cada letra com o seu papel (índice em PAPEIS),
+  // a sua letra (índice em LETRAS_RECORTE) e, às vezes, minúscula; o tamanho, o giro e a
+  // altura variam pelo sorteio. Encolhe por igual se passar da largura.
+  function palavraRecortada(ctx, letras, cx, cy, alt, { r, larguraMax }) {
+    const planos = letras.map(([l, papel, fonte, minuscula]) => ({ l, ...PAPEIS[papel], fonte: LETRAS_RECORTE[fonte], minuscula: !!minuscula,
+      giro: (r() - 0.5) * 0.36, dy: (r() - 0.5) * alt * 0.22, a: alt * (0.86 + r() * 0.28) }));
+    ctx.save();
+    const larg = planos.map((p) => {
+      ctx.font = p.fonte(p.a * (p.minuscula ? 0.95 : 0.8));
+      return Math.max(p.a * 0.62, ctx.measureText(p.minuscula ? p.l.toLowerCase() : p.l).width + p.a * 0.26);
+    });
+    ctx.restore();
+    const vao = alt * 0.02;
+    let total = larg.reduce((s2, w) => s2 + w, 0) + vao * (larg.length - 1);
+    const k = Math.min(1, larguraMax / total);
+    total *= k;
+    let x = cx - total / 2;
+    planos.forEach((p, i) => {
+      const w = larg[i] * k;
+      recorte(ctx, p.l, x + w / 2, cy + p.dy * k, { alt: p.a * k, papel: p.papel, tinta: p.tinta, fonte: p.fonte, giro: p.giro, r, minuscula: p.minuscula });
+      x += w + vao * k;
+    });
+  }
+  // A Bíblia aberta à mão: as duas páginas curvas saindo da lombada, a espessura das folhas
+  // embaixo, as linhas do texto em duas colunas e a fita marcadora caindo do meio.
+  function bibliaAberta(ctx, cx, cy, w, r) {
+    const h = w * 0.52;
+    const topo = cy - h / 2;
+    const pe = cy + h / 2;
+    const meia = w / 2;
+    for (const lado of [-1, 1]) {
+      const X = (t) => cx + lado * meia * t;
+      // a página: a borda de cima sobe da lombada e se arredonda no canto, desce e volta
+      // embaixo, afundando de novo na lombada
+      tracoAMao(ctx, [[cx, topo + 34], [X(0.2), topo + 6], [X(0.55), topo - 6], [X(0.9), topo + 2], [X(1.0), topo + 22],
+        [X(1.01), cy], [X(0.99), pe - 22], [X(0.9), pe - 8], [X(0.55), pe - 18], [X(0.2), pe - 6], [cx, pe + 18]], { r, largura: 6, tremor: 4 });
+      // a espessura das folhas, por baixo
+      for (let k = 1; k <= 2; k++) {
+        tracoAMao(ctx, [[X(0.99) + lado * k * 2, pe - 18 + k * 9], [X(0.9), pe - 4 + k * 10], [X(0.55), pe - 14 + k * 10], [X(0.2), pe - 2 + k * 9], [cx, pe + 18 + k * 7]],
+          { r, largura: 3, tremor: 3, segunda: false, cor: 'rgba(200,218,140,' + (0.7 - k * 0.18) + ')' });
+      }
+      // as linhas do texto: duas colunas por página, seguindo a curva do papel
+      const curva = (x) => {
+        const t = Math.min(1, Math.abs(x - cx) / meia);
+        return t < 0.3 ? 9 * (1 - t / 0.3) : -Math.sin(Math.PI * (t - 0.3) / 0.7) * 5;
+      };
+      for (let c = 0; c < 2; c++) {
+        const x0 = X(0.14 + c * 0.42);
+        const x1 = X(0.48 + c * 0.42);
+        for (let i = 0; i < 6; i++) {
+          const yy = topo + 52 + i * (h - 110) / 5;
+          const curto = i === 5 || (i === 2 && c === 1) || (i === 3 && c === 0 && lado > 0) ? 0.5 : 1;
+          const xb = x0 + (x1 - x0) * curto;
+          tracoAMao(ctx, [[x0, yy + curva(x0)], [(x0 + xb) / 2, yy + curva((x0 + xb) / 2)], [xb, yy + curva(xb)]],
+            { r, largura: 2.5, tremor: 2, segunda: false, cor: 'rgba(200,218,140,.5)' });
+        }
+      }
+    }
+    // a lombada
+    tracoAMao(ctx, [[cx, topo + 34], [cx + 1, cy], [cx, pe + 18]], { r, largura: 4, segunda: false });
+    // a fita marcadora, saindo da lombada embaixo, curta, com o corte em V
+    const fx = cx + 10;
+    const fp = pe + 20;
+    tracoAMao(ctx, [[fx, fp - 4], [fx + 6, fp + 28], [fx + 4, fp + 58]], { r, largura: 4, tremor: 1.5, segunda: false });
+    tracoAMao(ctx, [[fx + 20, fp - 2], [fx + 25, fp + 30], [fx + 25, fp + 62]], { r, largura: 4, tremor: 1.5, segunda: false });
+    tracoAMao(ctx, [[fx + 4, fp + 58], [fx + 15, fp + 48], [fx + 25, fp + 62]], { r, largura: 4, tremor: 1.5, segunda: false });
+  }
+  function arteJesusVive(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(3111);
+    const cx = L / 2;
+    // [letra, papel, fonte, minúscula]
+    palavraRecortada(ctx, [['J', 0, 0], ['E', 5, 4, true], ['S', 3, 1], ['U', 1, 3], ['S', 4, 2]], cx, 712, 180, { r, larguraMax: 860 });
+    bibliaAberta(ctx, cx, 992, 460, r);
+    palavraRecortada(ctx, [['V', 2, 1], ['I', 6, 0], ['V', 7, 2], ['E', 0, 4]], cx, 1310, 210, { r, larguraMax: 780 });
+    return 1460;
   }
 
   S.prepararArte = prepararArte;
