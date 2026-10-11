@@ -290,7 +290,7 @@ console.log('parábolas:', parabolas.itens.map((p) => p.titulo).join(', ') || 'n
 // demanda (01d-story.js) e o service worker guarda no cache próprio na primeira vez. Sem
 // ele (sem rede na primeira vez), o story sai no modelo de sempre. Exige sessão, como o app.
 // As fotos de alguns modelos (src/story-fotos/<nome>.webp, já tratadas: P&B, contraste, até
-// 150 KB) saem como story-foto-<nome>.<resumo>.webp; os nomes entram no começo do arquivo das
+// 150 KB; a estampa do dono em impossivel é a exceção, colorida e com transparência) saem como story-foto-<nome>.<resumo>.webp; os nomes entram no começo do arquivo das
 // artes (window.STORY_FOTOS), nunca no index.html, e vão no mesmo cache do service worker.
 for (const velho of readdirSync(dist()).filter((f) => /^story-(artes\..*\.js(\.gz)?|foto-.*\.webp)$/.test(f))) rmSync(dist(velho));
 const pastaFotosStory = src('story-fotos');

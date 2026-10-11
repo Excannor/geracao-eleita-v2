@@ -2341,7 +2341,7 @@
     vida: { fundo: ['#efe8d6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteVida, grao: [12, 1710] },
     queimar: { fundo: ['#ece3cf'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteQueimar, grao: [12, 1720] },
     graca: { fundo: ['#111310'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteGraca, grao: [16, 1730] },
-    impossivel: { fundo: ['#efeae0'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteImpossivel, grao: [12, 1740] },
+    impossivel: { fundo: ['#e9dcc4'], fotos: ['impossivel'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteImpossivel, grao: [12, 1740] },
     olhos: { fundo: ['#0b0b0a'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteOlhos, grao: [18, 1750] },
     reino: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteReino, grao: [12, 1760] },
     altar: { fundo: ['#10110f'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteAltar, grao: [16, 1770] },
@@ -8448,12 +8448,45 @@
     // a cabeça de costas: só o cabelo, comprido, caindo entre os ombros
     pinta('M-13 -268 C-14 -284 -6 -292 1 -292 C10 -292 15 -284 14 -268 C14 -256 12 -242 8 -232 C3 -229 -4 -229 -8 -232 C-12 -242 -13 -256 -13 -268 Z', '#463f35', 0.9, 1.1, 12, 0.8, [-10, -290, 10, -230]);
   }
-  // Deus do impossível: como a referência do dono, IMPOSSÍVEL escrito no papel claro e o IM
-  // tirado da palavra, levado no ombro por uma figura pequena de Jesus em aquarela, andando
-  // para fora: sem o IM, fica POSSÍVEL. A exceção à proibição de figura humana é do dono,
-  // aqui e em heroi. "Deus do" em Literata itálica, a referência à mão. Fechamento: o IM indo
-  // embora (e a marca fraca de onde ele estava).
-  function arteImpossivel(ctx) {
+  // Deus do impossível: a arte é do próprio dono (a estampa da camiseta dele, que ele fez e
+  // liberou): Jesus de costas, de túnica branca e manto vermelho, com a coroa em traço acima da
+  // cabeça, andando nas pedras e levando na mão o IM que se esfarela; embaixo, POSSÍVEL gasto.
+  // A foto (story-foto-impossivel) é a estampa recortada do tecido, com fundo transparente,
+  // grande no meio do papel bege quente, perto da cor da camiseta. "Deus do" em Literata
+  // itálica no vão à esquerda, acima do IM, para ler "Deus do IMPOSSÍVEL", e Lucas 1.37 limpo
+  // embaixo (a linha da referência da estampa, ilegível, ficou fora do recorte). O vermelho do
+  // manto e a figura são exceções do dono. Sem a foto, sai a ilustração de antes.
+  function arteImpossivel(ctx, fotos) {
+    const img = fotos && fotos.impossivel;
+    if (!img) { arteImpossivelDesenho(ctx); return; }
+    const r = sorteio(1740);
+    fundoPapel(ctx, '#e9dcc4', 1740);
+    manchas(ctx, r, 16, { aClaro: 0.08, aEscuro: 0.035, claro: '255,250,238', escuro: '120,98,66' });
+    const tinta = '#25221c';
+    // entre os dias (até ~465) e a marca (de ~1550): a estampa até ~1435 e a referência embaixo
+    const w = 790;
+    const h = w * img.height / img.width;
+    const x = (L - w) / 2;
+    const y = 486;
+    ctx.drawImage(img, x, y, w, h);
+    // a medida da estampa (920 de largura no arquivo): o IM começa a ~17% da largura e a ~43%
+    // da altura; o vão acima dele, à esquerda do braço, recebe o "Deus do"
+    S.escrever(ctx, 'Deus do', x + w * 0.27, y + h * 0.385, 'italic 600 72px Literata, Georgia, serif', tinta, { alinhar: 'right' });
+    // Lucas 1.37 embaixo de POSSÍVEL (o meio da palavra fica a ~58% da largura), entre fios
+    const cx = x + w * 0.575;
+    const yr = y + h + 44;
+    referencia(ctx, 'Lucas 1.37', cx, yr, 30, '#4b463c');
+    ctx.font = '700 30px Oswald, sans-serif';
+    const wr = ctx.measureText('LUCAS 1.37').width + 30 * 0.16 * 9;
+    ctx.fillStyle = 'rgba(75,70,60,.75)';
+    ctx.fillRect(cx - wr / 2 - 26 - 90, yr - 12, 90, 2);
+    ctx.fillRect(cx + wr / 2 + 26, yr - 12, 90, 2);
+  }
+  // A ilustração de antes, para quando a foto da estampa não chega: IMPOSSÍVEL escrito no
+  // papel claro e o IM tirado da palavra, levado no ombro por uma figura pequena de Jesus em
+  // aquarela, andando para fora: sem o IM, fica POSSÍVEL. "Deus do" em Literata itálica, a
+  // referência à mão. Fechamento: o IM indo embora (e a marca fraca de onde ele estava).
+  function arteImpossivelDesenho(ctx) {
     const r = sorteio(1740);
     fundoPapel(ctx, '#efeae0', 1740);
     manchas(ctx, r, 18, { aClaro: 0.10, aEscuro: 0.03, claro: '255,253,245', escuro: '120,105,80' });

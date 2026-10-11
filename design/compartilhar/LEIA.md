@@ -363,12 +363,16 @@ gera as dez. A folha de contato junta as 59 em dez colunas. Os testes passaram a
 
 ## Rodada 17 (`rodada17/`)
 
-Oito frases novas do dono (2026-10-11), cada uma com modelo próprio; agora são 67 frases,
-todas com arte. As referências são de terceiros: só a ideia ficou, tudo redesenhado, sem foto
-nem logo de ninguém (em "caminho, verdade e vida" o dono pediu para seguir a referência de
+Oito frases novas do dono (2026-10-11), cada uma com modelo próprio. **Três estão paradas
+por ora, a pedido do dono: heroi (Jesus, meu super-herói), queimar (Deixa queimar) e altar
+(Levítico 6.13).** Saíram de `CC.FRASES_OFENSIVA`, mas os modelos continuam em
+`01e-story-artes.js`, sem uso, para poderem voltar (os PNGs delas ficam nesta pasta). Agora são
+64 frases, todas com arte; `folha-todas.png` tem as 64 e `resumo.png` as cinco que ficaram.
+As referências são de terceiros: só a ideia ficou, tudo redesenhado, sem foto nem logo de
+ninguém (a exceção é impossivel, que usa a estampa do próprio dono; em "caminho, verdade e vida" o dono pediu para seguir a referência de
 perto). No nível de planos e alvorada: luz, sombra, textura e poucos elementos. Cada uma num
-fundo, composição, letra e fecho diferentes das vizinhas e das 59 de antes (`folha-todas.png`,
-com as 67, e `resumo.png`, as oito em duas fileiras). Nenhuma fecha com a palavra amarela
+fundo, composição, letra e fecho diferentes das vizinhas e das 59 de antes (`folha-todas.png`
+e `resumo.png`). Nenhuma fecha com a palavra amarela
 sublinhada:
 - **heroi** (Jesus, meu super-herói): refeita como a referência, a pedido do dono. Jesus de
   costas, em pé, no papel claro com grão, com a capa vermelha comprida até o chão: por cima dela
@@ -409,13 +413,19 @@ sublinhada:
   nele, com os espinhos compridos e curvos para todo lado. "Foi Tua" e "que me salvou" em
   Literata itálica. **A repetição de GRAÇA é a da referência** (a palavra está na frase). Lema
   com a referência. Fecha no coração.
-- **impossivel** (Deus do impossível, Lucas 1.37): IMPOSSÍVEL em Literata no papel claro, o IM
-  tirado da palavra (fica só a marca fraca) e levado no ombro por uma figura pequena de Jesus de
-  costas, em aquarela de cinzas quentes, sem rosto e sem contorno, andando na linha de base.
-  "Deus do" em itálica e a referência à mão. **A figura é exceção do dono, aqui e em heroi.** As
-  primeiras figuras (de lado, com o manto sálvia) saíram com cara de boneco de papel; a de
-  costas, num tom só, ficou mais limpa, mas ainda é simples: o dono decide. Fecha no IM indo
-  embora.
+- **impossivel** (Deus do impossível, Lucas 1.37): **a arte é a estampa do próprio dono** (a
+  camiseta que ele desenhou e liberou para o app): Jesus de costas, de túnica branca e manto
+  vermelho, a coroa em traço acima da cabeça, andando nas pedras com o IM se esfarelando na mão,
+  e POSSÍVEL gasto embaixo. A estampa foi recortada da foto da camiseta
+  (`src/story-fotos/impossivel.webp`, 920 px de largura, fundo transparente): o bege do tecido
+  saiu por uma curva de cor do tecido ajustada pelo claro e escuro das dobras, o que está preso
+  dentro dos contornos (a túnica, as pedras) ficou, e os miolos de tecido das letras (o O, o P,
+  o IM) saíram. A linha de referência da estampa, ilegível, ficou fora do recorte. No story, a
+  estampa vai grande no papel bege quente (perto da cor da camiseta), com "Deus do" em Literata
+  itálica no vão à esquerda, acima do IM (lê-se "Deus do IMPOSSÍVEL"), e LUCAS 1.37 limpo entre
+  fios embaixo. As cores da estampa ficam, inclusive o vermelho do manto (exceção do dono). Sem
+  a foto, sai a ilustração de antes (a figura em aquarela levando o IM). Fecha no IM se
+  esfarelando.
 - **olhos** (Fogo em teus olhos fez eu me apaixonar): a frase mudou a pedido do dono (em
   01c-arte.js: 'Fogo em', 'teus olhos', 'fez eu me', 'apaixonar.', sem referência) e o
   versículo citado embaixo saiu. FOGO e OLHOS enormes em Oswald creme no preto, "EM TEUS" na
