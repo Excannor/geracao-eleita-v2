@@ -46,7 +46,7 @@
     { linhas: ['Até que', 'Ele venha'] },
     { linhas: ['Quem já foi', 'comprado', 'não se vende'], ref: '1 Coríntios 6.20', arte: 'comprado' },
     { linhas: ['Atraídos pela', 'Sua presença'] },
-    { linhas: ['Marcados pela', 'diferença'] },
+    { linhas: ['Marcados pela', 'diferença'], arte: 'diferenca' },
     { linhas: ['Perseverando', 'até o fim'] },
     { linhas: ['Há esperança', 'para a árvore que,', 'se for cortada,', 'ainda se renovará'], ref: 'Jó 14.7-9', arte: 'toco' },
     { linhas: ['Jesus para', 'as nações'], arte: 'nacoes' },

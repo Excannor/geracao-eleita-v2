@@ -2480,6 +2480,7 @@
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
     // quarta leva no padrão da landing (o bloco perto do fim do arquivo)
     influenciam: { fundo: [LP.preto], fotos: ['influenciam'], tema: TEMA_LP, desenhar: arteInfluenciam, grao: [18, 5131] },
+    diferenca: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteDiferenca, grao: [18, 1308] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -2748,6 +2749,87 @@
       { t: 'JOVENS QUE', larg: 520, max: 104, peso: 600, espaco: 4, vao: 22 },
       { t: 'INFLUENCIAM', larg: 900, max: 170, vao: 6 },
       { t: 'A SUA GERAÇÃO.', larg: 880, max: 140, cor: LP.amarelo, risco: true, vao: 36 },
+    ], y0);
+  }
+
+  // Marcados pela diferença: a ideia do dono a partir de uma ilustração. Uma multidão de
+  // silhuetas mínimas, como pictogramas a tinta (cabeça, tronco, braços e pernas num passo),
+  // todas iguais e andando para a direita, em sálvia apagada e sumindo na borda esquerda; à
+  // frente, separada por um vão, uma só no mesmo passo, em amarelo. Embaixo, MARCADOS PELA
+  // em creme e DIFERENÇA em amarelo com o risco. Sem referência.
+  // O pictograma andando, com os pés em (x, y) e altura h, virado para a direita.
+  function andando(ctx, x, y, h, cor, passo = 0) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(h, h);
+    ctx.strokeStyle = cor;
+    ctx.fillStyle = cor;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const a = 1 + passo; // a abertura do passo muda um pouco de um para outro
+    ctx.beginPath();
+    ctx.arc(0.06, -0.9, 0.088, 0, Math.PI * 2);
+    ctx.fill();
+    // o tronco, levemente inclinado para a frente
+    ctx.lineWidth = 0.15;
+    ctx.beginPath();
+    ctx.moveTo(0.035, -0.73);
+    ctx.lineTo(-0.005, -0.46);
+    ctx.stroke();
+    // as pernas: a da frente esticada, a de trás com o joelho dobrado
+    ctx.lineWidth = 0.105;
+    ctx.beginPath();
+    ctx.moveTo(-0.005, -0.45);
+    ctx.lineTo(0.1 * a, -0.23);
+    ctx.lineTo(0.21 * a, -0.04);
+    ctx.moveTo(-0.005, -0.45);
+    ctx.lineTo(-0.09 * a, -0.25);
+    ctx.lineTo(-0.24 * a, -0.07);
+    ctx.stroke();
+    // os braços, balançando ao contrário das pernas e soltos do corpo
+    ctx.lineWidth = 0.075;
+    ctx.beginPath();
+    ctx.moveTo(0.035, -0.69);
+    ctx.lineTo(-0.1 * a, -0.57);
+    ctx.lineTo(-0.2 * a, -0.48);
+    ctx.moveTo(0.035, -0.69);
+    ctx.lineTo(0.14 * a, -0.58);
+    ctx.lineTo(0.24 * a, -0.52);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function arteDiferenca(ctx) {
+    fundoLanding(ctx);
+    const r = sorteio(1308);
+    const cx = L / 2;
+    // a multidão: fileiras desencontradas, as de trás menores e mais apagadas, apagando para a
+    // borda esquerda (continua para fora da imagem)
+    const fileiras = 6;
+    let y = 650;
+    for (let f = 0; f < fileiras; f++) {
+      const k = f / (fileiras - 1); // 0 = a de trás
+      const h = 58 + k * 30;
+      y += f ? h * 0.98 : 0;
+      const vao = h * 0.92;
+      const fim = 640 - (1 - k) * 50 + (r() - 0.5) * 24; // a frente da multidão
+      const desloca = (f % 2) * vao * 0.5;
+      for (let x = fim - desloca; x > -vao; x -= vao * (0.94 + r() * 0.14)) {
+        // a cor já misturada com o fundo (com transparência, os traços que se cruzam clareavam)
+        const t = (0.36 + k * 0.52) * Math.min(1, Math.max(0.1, x / 400));
+        const cor = 'rgb(' + [200, 218, 140].map((v, j) => Math.round([13, 14, 12][j] + (v - [13, 14, 12][j]) * t)).join(',') + ')';
+        andando(ctx, x + (r() - 0.5) * 8, y + (r() - 0.5) * 5, h * (0.97 + r() * 0.06), cor, (r() - 0.5) * 0.12);
+      }
+    }
+    // a da frente, sozinha, no mesmo passo, maior e em amarelo, na linha da primeira fileira
+    const fx = 880;
+    const fy = y;
+    andando(ctx, fx, fy, 132, LP.amarelo);
+    // o chão dela: um risco curto à mão, em sálvia
+    tracoAMao(ctx, [[fx - 80, fy + 16], [fx, fy + 12], [fx + 90, fy + 17]], { r, largura: 4, segunda: false, cor: 'rgba(200,218,140,.55)' });
+    const y0 = fy + 90;
+    return blocoLanding(ctx, [
+      { t: 'MARCADOS PELA', larg: 820, max: 130, peso: 600, espaco: 4, vao: 0 },
+      { t: 'DIFERENÇA.', larg: 860, max: 230, cor: LP.amarelo, risco: true, vao: 18 },
     ], y0);
   }
 
