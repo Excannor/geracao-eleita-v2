@@ -140,3 +140,13 @@ com grão, Oswald creme com a última linha em amarelo e o risco, rótulo sálvi
   amarelo no traço do relógio: três línguas com uma gota por dentro (a gota ainda lembrava
   emoji), duas línguas com um risco por dentro, e três línguas com o risco (escolhida),
   menor e mais perto do relógio. A frase voltou a ter `arte: 'relogio'`.
+
+Retorno do dono:
+- **relogio**: a chama sai de vez. Das duas posições (o relógio maior cortado pela esquerda,
+  que encostava no "dias de ofensiva", e o relógio inteiro no meio), ficou o do meio.
+- **nacoes**: a foto dos jovens com a bandeira deixa de ser recorte colado e vira o fundo de
+  toda a área do meio, do topo ao pé, atrás dos papéis rasgados dos cantos: P&B, escurecida
+  pela metade, com vinheta e grão e um desfoque leve de propósito (ampliada 2,4 vezes). Das
+  duas variantes, a foto cobrindo a altura toda (3,5 vezes) cortava a bandeira e borrava
+  demais; a foto na largura deixava a bandeira clara no alto, mas apagava no preto embaixo.
+  Ficou a foto na largura com o pé continuado em espelho, mais borrado, sob o escuro.

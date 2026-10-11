@@ -2187,49 +2187,48 @@
   }
 
   // (z0) Jesus para as nações: no padrão dos posts da marca Geração Eleita (o dono pediu
-  // "mais a cara dele"): o preto de papel amassado, os pedaços de papel rasgado nos cantos com
-  // a borda branca, as pinceladas sálvia e branca, a frase em Permanent Marker preto com cada
-  // linha numa tira de papel sálvia colada, desencontradas, a cruz e a coroa brancas à mão e
-  // o risco de pincel branco embaixo. A foto do dono (as mãos sobre a bandeira, em P&B) vai
-  // como um recorte de papel rasgado colado com fita; ela é pequena (486 px), então vai a
-  // no máximo 1,5 vez. Sem referência: nenhum versículo diz isso com estas palavras na NBV.
-  // O preto amassado: manchas claras bem fracas e os vincos (uma linha clara e, colada nela,
-  // uma escura), como o papel do fundo dos posts.
-  function fundoAmassado(ctx, r) {
+  // "mais a cara dele"), com a foto do dono (as mãos dos jovens sobre a bandeira) de fundo
+  // do story inteiro: em P&B, escurecida, com vinheta e grão. Ela é pequena (486 px) e borra
+  // ampliada; o desfoque leve, de propósito, com o grão por cima, faz dela um fundo e deixa
+  // a frase na frente. Por cima: os pedaços de papel rasgado nos cantos com a borda branca,
+  // as pinceladas sálvia e branca, a frase em Permanent Marker preto com cada linha numa tira
+  // de papel sálvia colada, desencontradas, a cruz e a coroa brancas à mão e o risco de pincel
+  // branco embaixo. Sem referência: nenhum versículo diz isso com estas palavras na NBV.
+  // A foto de fundo de toda a área do meio, do topo ao pé, atrás dos papéis dos cantos:
+  // na largura do story (2,4 vezes), com a bandeira na metade de cima, logo abaixo dos dias;
+  // como a foto ampliada não chega ao pé, o pé dela continua espelhado e mais borrado (some
+  // sob o escuro, atrás das tiras e da marca). Depois, o escuro por cima, mais forte no pé,
+  // e a vinheta.
+  function fotoDeFundo(ctx, img) {
+    const w = L + 90;
+    const h = w * img.height / img.width;
+    const x = (L - w) / 2;
+    const y = -20;
+    const borra = (w / img.width * 1.1).toFixed(1);
     ctx.fillStyle = '#0e0e0d';
     ctx.fillRect(0, 0, L, A);
-    for (let i = 0; i < 14; i++) {
-      const x = r() * L;
-      const y = r() * A;
-      const raio = 160 + r() * 340;
-      const g = ctx.createRadialGradient(x, y, 0, x, y, raio);
-      g.addColorStop(0, 'rgba(255,255,255,' + (0.015 + r() * 0.03).toFixed(3) + ')');
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(x - raio, y - raio, raio * 2, raio * 2);
-    }
-    ctx.lineCap = 'round';
-    for (let i = 0; i < 70; i++) {
-      let x = r() * L;
-      let y = r() * A;
-      const pts = [[x, y]];
-      let ang = r() * Math.PI * 2;
-      for (let k = 0; k < 3 + Math.floor(r() * 4); k++) {
-        ang += (r() - 0.5) * 1.4;
-        const passo = 40 + r() * 140;
-        x += Math.cos(ang) * passo;
-        y += Math.sin(ang) * passo;
-        pts.push([x, y]);
-      }
-      const forca = 0.035 + r() * 0.06;
-      for (const [dx, cor] of [[0, 'rgba(255,255,255,' + forca.toFixed(3) + ')'], [2, 'rgba(0,0,0,' + (forca * 4).toFixed(3) + ')']]) {
-        ctx.strokeStyle = cor;
-        ctx.lineWidth = 1.2 + r() * 1.2;
-        ctx.beginPath();
-        pts.forEach(([px, py], j) => (j ? ctx.lineTo(px + dx, py + dx) : ctx.moveTo(px + dx, py + dx)));
-        ctx.stroke();
-      }
-    }
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.filter = 'grayscale(1) contrast(1.08) blur(' + borra + 'px)';
+    ctx.drawImage(img, x, y, w, h);
+    ctx.filter = 'grayscale(1) contrast(1.08) blur(' + (borra * 3).toFixed(1) + 'px)';
+    ctx.translate(0, 2 * (y + h));
+    ctx.scale(1, -1);
+    ctx.drawImage(img, x, y, w, h);
+    ctx.restore();
+    ctx.fillStyle = 'rgba(8,8,7,.5)';
+    ctx.fillRect(0, 0, L, A);
+    const pe = ctx.createLinearGradient(0, h - 260, 0, A);
+    pe.addColorStop(0, 'rgba(8,8,7,0)');
+    pe.addColorStop(1, 'rgba(8,8,7,.6)');
+    ctx.fillStyle = pe;
+    ctx.fillRect(0, h - 260, L, A);
+    const g = ctx.createRadialGradient(L / 2, A * 0.42, A * 0.24, L / 2, A * 0.46, A * 0.7);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,.7)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, L, A);
   }
   // Um polígono de borda rasgada: os pontos de cada lado (de canto a canto) mexidos para
   // fora e para dentro, numa onda larga e irregular (a soma de três senos de fase sorteada)
@@ -2381,44 +2380,6 @@
     ctx.restore();
     return w;
   }
-  // A foto como um recorte de papel colado: o papel branco rasgado em volta (a borda
-  // irregular), a foto recortada dentro, a sombra e dois pedaços de fita nos cantos.
-  // corte: [sx, sy, sw, sh] da foto; (cx, cy) é o meio; w a largura do recorte.
-  function recorteFoto(ctx, img, corte, cx, cy, w, giro, r) {
-    const [sx, sy, sw, sh] = corte;
-    const h = w * sh / sw;
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(giro);
-    const m = 14;
-    const fora = bordaRasgada([[[-w / 2 - m, -h / 2 - m], [w / 2 + m, -h / 2 - m], 12], [[w / 2 + m, -h / 2 - m], [w / 2 + m, h / 2 + m], 12],
-      [[w / 2 + m, h / 2 + m], [-w / 2 - m, h / 2 + m], 16], [[-w / 2 - m, h / 2 + m], [-w / 2 - m, -h / 2 - m], 12]], r, 10);
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,.7)';
-    ctx.shadowBlur = 34;
-    ctx.shadowOffsetY = 14;
-    ctx.fillStyle = '#ecebe4';
-    ctx.fill(fora);
-    ctx.restore();
-    const dentro = bordaRasgada([[[-w / 2, -h / 2], [w / 2, -h / 2], 5], [[w / 2, -h / 2], [w / 2, h / 2], 5],
-      [[w / 2, h / 2], [-w / 2, h / 2], 7], [[-w / 2, h / 2], [-w / 2, -h / 2], 5]], r, 14);
-    ctx.save();
-    ctx.clip(dentro);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.filter = 'grayscale(1) contrast(1.12)';
-    ctx.drawImage(img, sx, sy, sw, sh, -w / 2, -h / 2, w, h);
-    ctx.filter = 'none';
-    ctx.restore();
-    ctx.restore();
-    // as fitas, meio de lado, nos dois cantos de cima
-    const canto = (dx, dy) => [cx + dx * Math.cos(giro) - dy * Math.sin(giro), cy + dx * Math.sin(giro) + dy * Math.cos(giro)];
-    const [ax, ay] = canto(-w / 2 + 30, -h / 2 + 4);
-    const [bx, by] = canto(w / 2 - 30, -h / 2 + 4);
-    fita(ctx, ax, ay, 190, 54, giro - 0.62);
-    fita(ctx, bx, by, 190, 54, giro + 0.6);
-    return h;
-  }
   // A cruz e a coroa brancas, à mão, como os rabiscos dos posts.
   function cruzBranca(ctx, x, y, s, r) {
     tracoAMao(ctx, [[x + s * 0.02, y - s * 0.55], [x, y], [x - s * 0.03, y + s * 0.62]], { r, largura: s * 0.11, cor: LP.creme, segunda: false });
@@ -2442,67 +2403,28 @@
     tracoAMao(ctx, [pt(12, 112), pt(62, 109), pt(108, 111)], { ...traco, largura: 5 * k });
     ctx.restore();
   }
-  // O corte da foto: as mãos em volta da bandeira, sem a gente da borda de baixo.
-  const CORTE_NACOES = [8, 70, 470, 440];
   function arteNacoes(ctx, fotos) {
     const r = sorteio(2819);
-    fundoAmassado(ctx, r);
-    // os papéis dos cantos e as pinceladas, nas margens (longe da frase)
+    if (fotos.nacoes) fotoDeFundo(ctx, fotos.nacoes);
+    else { ctx.fillStyle = '#0e0e0d'; ctx.fillRect(0, 0, L, A); }
+    // os papéis rasgados por cima, nos cantos, como moldura; depois a frase e os rabiscos
     papelDoCanto(ctx, [790, 0], [1080, 430], [[1080, 0]], r);
     papelDoCanto(ctx, [270, 1920], [0, 1430], [[0, 1920]], r);
-    // a foto à direita, um pouco girada, e a cruz ao lado dela; as tiras saem da esquerda
-    // e cobrem o pé da foto, e a coroa fecha o canto de baixo
     pincelSeco(ctx, 1040, 960, 330, 64, -1.2, LP.salvia, r, 20);
     pincelSeco(ctx, 1000, 1290, 230, 40, -0.4, LP.creme, r, 14);
-    const img = fotos.nacoes;
-    if (img) recorteFoto(ctx, img, CORTE_NACOES, 610, 862, 600, 0.045, r);
-    cruzBranca(ctx, 170, 800, 130, r);
-    const tam = 118;
-    const y1 = 1132;
-    const w1 = tiraSalvia(ctx, 'JESUS PARA', 74, y1, tam, -0.025, r);
-    const w2 = tiraSalvia(ctx, 'AS NAÇÕES', 136, y1 + tam * 1.3 - 6, tam, 0.015, r);
-    pincelSeco(ctx, 96 + Math.max(w1, w2) / 2, y1 + tam * 2.6 + 44, Math.max(w1, w2) * 0.86, 34, -0.015, LP.creme, r, 14);
-    coroaBranca(ctx, 900, 1408, 140, 0.14, r);
-  }
-
-  // A chama do relógio, em contorno amarelo no traço à mão do relógio (duas passadas, a
-  // segunda fina e mais fraca, um pouco ao lado): as línguas de fogo e uma linha por dentro,
-  // sem preenchimento nem brilho. (fx, fb) é o meio da base; fh, a altura.
-  // as três línguas (a da esquerda, a do meio, mais alta e virada para a direita, e a
-  // pequena da direita) e, por dentro, um risco só subindo da base, como na arte de referência.
-  // Cada trecho são três pontos de uma curva de Bézier.
-  const CHAMA_FORA = [[0, 0], [-0.36, 0], [-0.5, -0.26], [-0.4, -0.5], [-0.36, -0.6], [-0.36, -0.68], [-0.4, -0.78],
-    [-0.24, -0.7], [-0.14, -0.62], [-0.12, -0.52], [-0.14, -0.72], [-0.02, -0.88], [0.1, -1],
-    [0.08, -0.86], [0.16, -0.74], [0.24, -0.64], [0.28, -0.68], [0.33, -0.72], [0.36, -0.8],
-    [0.52, -0.52], [0.4, -0.02], [0, 0]];
-  const CHAMA_DENTRO = [[0.06, -0.12], [-0.14, -0.16], [-0.12, -0.38], [0.02, -0.54]];
-  function chamaAMao(ctx, fx, fb, fh, r) {
-    const fw = fh * 0.72;
-    const passada = (pts, dx, dy, lw, alfa) => {
-      const q = pts.map(([x, y]) => [fx + x * fw + dx + (r() - 0.5) * 3, fb + y * fh + dy + (r() - 0.5) * 3]);
-      ctx.save();
-      ctx.globalAlpha = alfa;
-      ctx.strokeStyle = LP.amarelo;
-      ctx.lineWidth = lw;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      ctx.moveTo(q[0][0], q[0][1]);
-      for (let i = 1; i + 2 < q.length; i += 3) ctx.bezierCurveTo(q[i][0], q[i][1], q[i + 1][0], q[i + 1][1], q[i + 2][0], q[i + 2][1]);
-      ctx.stroke();
-      ctx.restore();
-    };
-    for (const [pts, lw] of [[CHAMA_FORA, 8], [CHAMA_DENTRO, 6]]) {
-      passada(pts, 0, 0, lw, 1);
-      passada(pts, lw * 0.45, lw * 0.35, lw * 0.4, 0.5);
-    }
+    cruzBranca(ctx, 150, 1000, 130, r);
+    const tam = 124;
+    const y1 = 1110;
+    const w1 = tiraSalvia(ctx, 'JESUS PARA', 84, y1, tam, -0.025, r);
+    const w2 = tiraSalvia(ctx, 'AS NAÇÕES', 150, y1 + tam * 1.3 - 6, tam, 0.015, r);
+    pincelSeco(ctx, 106 + Math.max(w1, w2) / 2, y1 + tam * 2.6 + 44, Math.max(w1, w2) * 0.86, 34, -0.015, LP.creme, r, 14);
+    coroaBranca(ctx, 905, 1410, 140, 0.14, r);
   }
 
   // (z1) Prepara-te, Ele vem (1 Tessalonicenses 4.16-17): a partir da arte que o dono mandou,
-  // o relógio antigo de algarismos romanos com os ponteiros quase na meia-noite, grande e
-  // cortado pela borda esquerda, à mão em sálvia; ao lado, perto dele, a chama em contorno
-  // amarelo no mesmo traço (a única cor quente; a chama cheia com halo parecia emoji).
-  // Embaixo, PREPARA-TE menor em creme e ELE VEM em amarelo com o risco.
+  // o relógio antigo de algarismos romanos com os ponteiros quase na meia-noite, inteiro,
+  // centrado e à mão em sálvia (sem a chama: o dono preferiu só o relógio). Embaixo,
+  // PREPARA-TE menor em creme e ELE VEM em amarelo com o risco.
   function arteRelogio(ctx) {
     fundoLanding(ctx);
     const r = sorteio(1617);
@@ -2510,6 +2432,12 @@
     // ---- o relógio ----
     const ox = 150;
     const oy = 808;
+    // sem a chama, o relógio vem inteiro e centrado (desenhado em ox, oy e trazido para o meio)
+    const [px, py, k] = [L / 2, 806, 0.97];
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.scale(k, k);
+    ctx.translate(-ox, -oy);
     const R = 300;
     // o aro: duas voltas grossas, e entre elas os riscos dos minutos
     tracoAMao(ctx, pontosElipse(ox, oy, R, R, { r, n: 60, mexe: 0.008 }), { r, largura: 8, fechar: true });
@@ -2556,8 +2484,7 @@
     ctx.beginPath();
     ctx.arc(ox, oy, 13, 0, Math.PI * 2);
     ctx.fill();
-    // ---- a chama, à direita, no mesmo traço à mão ----
-    chamaAMao(ctx, 625, 1000, 280, r);
+    ctx.restore();
     // ---- embaixo, o título ----
     const y0 = 1150;
     rotuloLanding(ctx, '1 Tessalonicenses 4.16-17', cx, y0, 30);
@@ -2716,7 +2643,7 @@
     avivados: { fundo: [LP.preto], fotos: ['culto'], tema: TEMA_LP, desenhar: arteAvivados, grao: [18, 1126] },
     naotemas: { fundo: [LP.preto], fotos: ['cruz'], tema: TEMA_LP, desenhar: arteNaoTemas, grao: [18, 4110] },
     rei: { fundo: [LP.preto], fotos: ['abertura'], tema: TEMA_LP, desenhar: arteRei, grao: [18, 777] },
-    nacoes: { fundo: [LP.preto], fotos: ['nacoes'], tema: TEMA_LP, desenhar: arteNacoes, grao: [18, 2819] },
+    nacoes: { fundo: [LP.preto], fotos: ['nacoes'], tema: TEMA_LP, desenhar: arteNacoes, grao: [26, 2819] },
     relogio: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteRelogio, grao: [18, 1617] },
     toco: { fundo: [LP.preto], tema: TEMA_LP, desenhar: arteToco, grao: [18, 1479] },
     porta: { fundo: ['#ebe0cb', { x: L / 2, y: 1100, r: 1000, cor: 'rgba(255,248,230,.5)' }], caixa: [600, 1640], tema: CLARO, desenhar: artePorta, grao: [16, 320] },
