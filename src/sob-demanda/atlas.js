@@ -177,8 +177,8 @@
       + '<button type="button" class="atlas-botao" data-zoom="menos" aria-label="Afastar" disabled>' + ICO.menos + '</button>'
       + '<button type="button" class="atlas-botao" data-zoom="inteiro" aria-label="Ver o mapa inteiro" hidden>' + ICO.inteiro + '</button></span></figcaption></figure>'
       + '<h2 class="mapa-rotulo atlas-rotulo">' + CC.ico('alfinete') + '<span>Paradas</span></h2>'
-      + '<h3 class="atlas-trecho">' + linhaAmostra('ida') + 'Ida</h3><ol class="atlas-paradas">' + ida.map(parada).join('') + '</ol>'
-      + (volta.length ? '<h3 class="atlas-trecho">' + linhaAmostra('volta') + 'Volta</h3><ol class="atlas-paradas">' + volta.map(parada).join('') + '</ol>' : '')
+      + '<h3 class="atlas-trecho">' + (m.pernas.length ? linhaAmostra('ida') : '') + esc((m.trechos || {}).ida || 'Ida') + '</h3><ol class="atlas-paradas">' + ida.map(parada).join('') + '</ol>'
+      + (volta.length ? '<h3 class="atlas-trecho">' + linhaAmostra('volta') + esc((m.trechos || {}).volta || 'Volta') + '</h3><ol class="atlas-paradas">' + volta.map(parada).join('') + '</ol>' : '')
       + (ler ? '<a class="botao atlas-ler" href="#/biblia/' + encodeURIComponent(ler.livro) + '/' + ler.cap + '">' + CC.ico('livro') + 'Ler a passagem · ' + esc(trechoDeLeitura(m.leitura)) + '</a>' : '')
       + '<p class="atlas-fonte">Posições e caminhos aproximados. Relevo e profundidade: SRTM, GMTED2010 e ETOPO1 (dados públicos); costa: Natural Earth.</p>';
     CC.ligarVoltarDoTopo(raiz);

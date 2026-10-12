@@ -1,0 +1,506 @@
+{
+  "titulo": "Viagem a Roma",
+  "tituloMapa": "Viagem de Paulo a Roma",
+  "grupo": "paulo",
+  "sub": "Paulo, preso, com Lucas e Aristarco",
+  "ref": "At 27.1–28.16",
+  "linha": "De Cesareia a Roma, com tempestade e naufrágio",
+  "quando": "por volta de 59 a 60 d.C.",
+  "texto": "Paulo apelou para César e segue preso para Roma. No caminho vêm a tempestade, o naufrágio em Malta e, por fim, os irmãos que saem para encontrá-lo.",
+  "vista": {
+    "oeste": 9.6,
+    "leste": 37.8,
+    "sul": 30.6,
+    "norte": 43.0
+  },
+  "relevoExagero": 7,
+  "trechos": {
+    "ida": "A viagem"
+  },
+  "lugares": {
+    "cesareia": {
+      "nome": "Cesareia",
+      "lon": 34.89,
+      "lat": 32.5,
+      "lado": "o"
+    },
+    "jerusalem": {
+      "nome": "Jerusalém",
+      "lon": 35.23,
+      "lat": 31.78,
+      "lado": "o",
+      "contexto": true
+    },
+    "sidom": {
+      "nome": "Sidom",
+      "lon": 35.37,
+      "lat": 33.56,
+      "lado": "l",
+      "marca": [
+        -9,
+        0
+      ]
+    },
+    "mirra": {
+      "nome": "Mirra",
+      "lon": 29.98,
+      "lat": 36.26,
+      "lado": "s",
+      "marca": [
+        -8,
+        -6
+      ]
+    },
+    "cnido": {
+      "nome": "Cnido",
+      "lon": 27.37,
+      "lat": 36.69,
+      "lado": "n",
+      "marca": [
+        -9,
+        2
+      ]
+    },
+    "salmona": {
+      "nome": "Salmona",
+      "lon": 26.31,
+      "lat": 35.31,
+      "lado": "l"
+    },
+    "bons-portos": {
+      "nome": "Bons Portos",
+      "lon": 24.83,
+      "lat": 34.93,
+      "lado": "s"
+    },
+    "tempestade": {
+      "nome": "",
+      "lon": 19.6,
+      "lat": 35.4,
+      "oculto": true,
+      "marca": [
+        0,
+        0
+      ]
+    },
+    "malta": {
+      "nome": "Malta",
+      "lon": 14.42,
+      "lat": 35.95,
+      "lado": "s"
+    },
+    "siracusa": {
+      "nome": "Siracusa",
+      "lon": 15.29,
+      "lat": 37.07,
+      "lado": "l"
+    },
+    "regio": {
+      "nome": "Régio",
+      "lon": 15.65,
+      "lat": 38.11,
+      "lado": "l"
+    },
+    "poteoli": {
+      "nome": "Potéoli",
+      "lon": 14.12,
+      "lat": 40.82,
+      "lado": "o",
+      "marca": [
+        9,
+        2
+      ]
+    },
+    "forum": {
+      "nome": "Fórum de Ápio",
+      "lon": 13.07,
+      "lat": 41.45,
+      "lado": "l",
+      "marca": [
+        6,
+        -9
+      ]
+    },
+    "roma": {
+      "nome": "Roma",
+      "lon": 12.48,
+      "lat": 41.9,
+      "lado": "o",
+      "marca": [
+        -1,
+        -9
+      ]
+    }
+  },
+  "regioes": [
+    {
+      "nome": "ITÁLIA",
+      "lon": 16.7,
+      "lat": 40.2
+    },
+    {
+      "nome": "SICÍLIA",
+      "lon": 13.9,
+      "lat": 37.65
+    },
+    {
+      "nome": "MACEDÔNIA",
+      "lon": 22.3,
+      "lat": 41.4
+    },
+    {
+      "nome": "ACAIA",
+      "lon": 21.9,
+      "lat": 37.6
+    },
+    {
+      "nome": "CRETA",
+      "lon": 24.9,
+      "lat": 35.55
+    },
+    {
+      "nome": "ÁSIA",
+      "lon": 28.6,
+      "lat": 38.6
+    },
+    {
+      "nome": "LÍCIA",
+      "lon": 29.35,
+      "lat": 37.2
+    },
+    {
+      "nome": "PANFÍLIA",
+      "lon": 32.1,
+      "lat": 37.45
+    },
+    {
+      "nome": "CILÍCIA",
+      "lon": 35.15,
+      "lat": 37.15
+    },
+    {
+      "nome": "CHIPRE",
+      "lon": 33.1,
+      "lat": 35.15
+    },
+    {
+      "nome": "SÍRIA",
+      "lon": 36.9,
+      "lat": 35.3
+    },
+    {
+      "nome": "FENÍCIA",
+      "lon": 36.75,
+      "lat": 34.25
+    },
+    {
+      "nome": "JUDEIA",
+      "lon": 36.55,
+      "lat": 31.15
+    },
+    {
+      "nome": "EGITO",
+      "lon": 29.5,
+      "lat": 31.0
+    },
+    {
+      "nome": "CIRENAICA",
+      "lon": 22.0,
+      "lat": 31.6
+    }
+  ],
+  "aguas": [
+    {
+      "nome": "MAR MEDITERRÂNEO",
+      "lon": 22.0,
+      "lat": 33.85
+    },
+    {
+      "nome": "MAR ADRIÁTICO",
+      "lon": 17.3,
+      "lat": 42.25,
+      "giro": -35
+    }
+  ],
+  "caminho": [
+    {
+      "tipo": "ida",
+      "mar": true,
+      "pontos": [
+        "cesareia",
+        [
+          34.75,
+          33.0
+        ],
+        "sidom"
+      ],
+      "chega": "sidom"
+    },
+    {
+      "tipo": "ida",
+      "mar": true,
+      "pontos": [
+        "sidom",
+        [
+          35.1,
+          34.4
+        ],
+        [
+          34.75,
+          35.85
+        ],
+        [
+          33.3,
+          36.0
+        ],
+        [
+          31.6,
+          36.35
+        ],
+        [
+          30.5,
+          36.15
+        ],
+        "mirra"
+      ],
+      "chega": "mirra"
+    },
+    {
+      "tipo": "ida",
+      "mar": true,
+      "pontos": [
+        "mirra",
+        [
+          29.1,
+          36.1
+        ],
+        [
+          28.2,
+          36.4
+        ],
+        "cnido"
+      ],
+      "chega": "cnido"
+    },
+    {
+      "tipo": "ida",
+      "mar": true,
+      "pontos": [
+        "cnido",
+        [
+          26.9,
+          35.95
+        ],
+        [
+          26.45,
+          35.45
+        ],
+        "salmona",
+        [
+          25.8,
+          34.95
+        ],
+        "bons-portos"
+      ],
+      "chega": "bons-portos"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "bons-portos",
+        [
+          24.0,
+          34.8
+        ],
+        [
+          22.0,
+          35.2
+        ],
+        "tempestade",
+        [
+          17.0,
+          35.7
+        ],
+        [
+          15.2,
+          35.9
+        ],
+        "malta"
+      ],
+      "chega": "tempestade"
+    },
+    {
+      "tipo": "ida",
+      "mar": true,
+      "pontos": [
+        "malta",
+        [
+          14.95,
+          36.5
+        ],
+        "siracusa",
+        [
+          15.55,
+          37.6
+        ],
+        "regio"
+      ],
+      "chega": "siracusa"
+    },
+    {
+      "tipo": "ida",
+      "mar": true,
+      "pontos": [
+        "regio",
+        [
+          15.6,
+          38.6
+        ],
+        [
+          15.6,
+          39.4
+        ],
+        [
+          15.0,
+          40.1
+        ],
+        [
+          14.3,
+          40.55
+        ],
+        "poteoli"
+      ],
+      "chega": "regio"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "poteoli",
+        [
+          14.25,
+          41.08
+        ],
+        [
+          13.6,
+          41.3
+        ],
+        "forum",
+        [
+          12.8,
+          41.65
+        ],
+        "roma"
+      ],
+      "chega": "poteoli"
+    }
+  ],
+  "paradas": [
+    {
+      "n": 1,
+      "lugar": "cesareia",
+      "nome": "Cesareia",
+      "texto": "Paulo e outros presos embarcam sob a guarda do centurião Júlio.",
+      "ref": "At 27.1-2"
+    },
+    {
+      "n": 2,
+      "lugar": "sidom",
+      "nome": "Sidom",
+      "texto": "Júlio deixa Paulo descer para visitar os amigos.",
+      "ref": "At 27.3"
+    },
+    {
+      "n": 3,
+      "lugar": "mirra",
+      "nome": "Mirra",
+      "texto": "Com vento contrário, passam ao norte de Chipre. Em Mirra, trocam para um navio que ia de Alexandria à Itália.",
+      "ref": "At 27.4-6"
+    },
+    {
+      "n": 4,
+      "lugar": "cnido",
+      "nome": "Cnido",
+      "texto": "Depois de dias de navegação difícil, o vento não os deixa seguir.",
+      "ref": "At 27.7"
+    },
+    {
+      "n": 5,
+      "lugar": "bons-portos",
+      "nome": "Salmona e Bons Portos",
+      "texto": "Eles descem pelo sul de Creta. Paulo avisa que seguir viagem é perigoso.",
+      "ref": "At 27.7-12"
+    },
+    {
+      "n": 6,
+      "lugar": "tempestade",
+      "nome": "A tempestade",
+      "texto": "Quatorze dias à deriva. O navio se parte, mas todos chegam vivos à praia.",
+      "ref": "At 27.13-44"
+    },
+    {
+      "n": 7,
+      "lugar": "malta",
+      "nome": "Malta",
+      "texto": "Uma cobra prende-se à mão de Paulo, e nada lhe acontece. O pai de Públio e outros doentes são curados.",
+      "ref": "At 28.1-10"
+    },
+    {
+      "n": 8,
+      "lugar": "siracusa",
+      "nome": "Siracusa",
+      "texto": "Três meses depois, num navio de Alexandria, ficam três dias em Siracusa.",
+      "ref": "At 28.11-12"
+    },
+    {
+      "n": 9,
+      "lugar": "regio",
+      "nome": "Régio",
+      "texto": "Contornam a ponta da Itália e esperam o vento sul.",
+      "ref": "At 28.13"
+    },
+    {
+      "n": 10,
+      "lugar": "poteoli",
+      "nome": "Potéoli",
+      "texto": "Encontram irmãos e ficam com eles uma semana.",
+      "ref": "At 28.13-14"
+    },
+    {
+      "n": 11,
+      "lugar": "forum",
+      "nome": "Fórum de Ápio e Três Vendas",
+      "texto": "Irmãos de Roma vêm ao encontro de Paulo, e ele dá graças a Deus.",
+      "ref": "At 28.15"
+    },
+    {
+      "n": 12,
+      "lugar": "roma",
+      "nome": "Roma",
+      "texto": "Paulo mora dois anos numa casa alugada, sob guarda, e anuncia o Reino de Deus a todos que vão visitá-lo.",
+      "ref": "At 28.16-31"
+    }
+  ],
+  "legenda": [
+    {
+      "tipo": "ida",
+      "nome": "Viagem"
+    },
+    {
+      "tipo": "volta",
+      "nome": "À deriva"
+    }
+  ],
+  "leitura": [
+    {
+      "rotulo": "Atos 27",
+      "livro": "Atos",
+      "cap": 27
+    },
+    {
+      "rotulo": "Atos 28",
+      "livro": "Atos",
+      "cap": 28
+    }
+  ]
+}
