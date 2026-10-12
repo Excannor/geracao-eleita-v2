@@ -5,12 +5,14 @@
       "nome": "Viagens de Paulo",
       "mapas": [
         "paulo-1",
-        "paulo-2"
+        "paulo-2",
+        "paulo-3"
       ]
     }
   ],
   "publicados": [
     "paulo-1",
-    "paulo-2"
+    "paulo-2",
+    "paulo-3"
   ]
 }

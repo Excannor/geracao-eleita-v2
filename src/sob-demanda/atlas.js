@@ -64,7 +64,8 @@
     // as cidades: ponto preto de anel branco e o nome; o número da parada vai pequeno ao lado
     const tempo = {};
     m.pernas.forEach((p, i) => { if (p.chega && tempo[p.chega] === undefined) tempo[p.chega] = i + 1; });
-    partes.push('<g class="at-lugares">' + m.lugares.map((l) => {
+    // lugar oculto: uma região sem cidade ("Galácia e Frígia"), só com o número no caminho
+    partes.push('<g class="at-lugares">' + m.lugares.filter((l) => !l.oculto).map((l) => {
       const [dx, dy, ancora] = ROTULO[l.lado] || ROTULO.l;
       return '<g class="at-lugar' + (l.contexto ? ' contexto' : '') + '" data-lugar="' + esc(l.id) + '">'
         + '<circle class="at-ponto" cx="' + l.x + '" cy="' + l.y + '" r="' + (l.contexto ? 2 : 2.4) + '"/>'

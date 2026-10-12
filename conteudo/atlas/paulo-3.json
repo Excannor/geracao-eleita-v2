@@ -1,0 +1,686 @@
+{
+  "titulo": "Terceira viagem missionária",
+  "tituloMapa": "Terceira viagem missionária de Paulo",
+  "grupo": "paulo",
+  "sub": "Paulo e os companheiros",
+  "ref": "At 18.23–21.17",
+  "linha": "Dois anos em Éfeso, a Grécia e a volta a Jerusalém",
+  "quando": "por volta de 53 a 57 d.C.",
+  "texto": "Paulo passa dois anos em Éfeso, visita a Macedônia e a Grécia e volta por mar até Jerusalém, despedindo-se das igrejas pelo caminho.",
+  "vista": {
+    "oeste": 19.9,
+    "leste": 37.15,
+    "sul": 31.15,
+    "norte": 42.0
+  },
+  "relevoExagero": 6,
+  "lugares": {
+    "antioquia": {
+      "nome": "Antioquia",
+      "lon": 36.161,
+      "lat": 36.202,
+      "lado": "s",
+      "marca": [
+        -8,
+        -4
+      ]
+    },
+    "tarso": {
+      "nome": "Tarso",
+      "lon": 34.895,
+      "lat": 36.917,
+      "lado": "n",
+      "contexto": true
+    },
+    "galacia": {
+      "nome": "",
+      "lon": 32.4,
+      "lat": 38.35,
+      "oculto": true,
+      "marca": [
+        0,
+        0
+      ]
+    },
+    "efeso": {
+      "nome": "Éfeso",
+      "lon": 27.34,
+      "lat": 37.94,
+      "lado": "l"
+    },
+    "tessalonica": {
+      "nome": "Tessalônica",
+      "lon": 22.94,
+      "lat": 40.64,
+      "lado": "n",
+      "dx": 8,
+      "marca": [
+        0,
+        10
+      ]
+    },
+    "bereia": {
+      "nome": "Bereia",
+      "lon": 22.2,
+      "lat": 40.52,
+      "lado": "o",
+      "contexto": true
+    },
+    "corinto": {
+      "nome": "Corinto",
+      "lon": 22.88,
+      "lat": 37.906,
+      "lado": "o"
+    },
+    "filipos": {
+      "nome": "Filipos",
+      "lon": 24.287,
+      "lat": 41.012,
+      "lado": "n",
+      "dx": -6,
+      "marca": [
+        10,
+        -2
+      ]
+    },
+    "troade": {
+      "nome": "Trôade",
+      "lon": 26.155,
+      "lat": 39.752,
+      "lado": "o",
+      "marca": [
+        -2,
+        -9
+      ]
+    },
+    "assos": {
+      "nome": "Assôs",
+      "lon": 26.34,
+      "lat": 39.49,
+      "lado": "ne",
+      "marca": [
+        10,
+        5
+      ]
+    },
+    "mitilene": {
+      "nome": "Mitilene",
+      "lon": 26.555,
+      "lat": 39.105,
+      "lado": "l",
+      "marca": [
+        -9,
+        2
+      ]
+    },
+    "quios": {
+      "nome": "Quios",
+      "lon": 26.14,
+      "lat": 38.37,
+      "lado": "o",
+      "contexto": true
+    },
+    "samos": {
+      "nome": "Samos",
+      "lon": 26.94,
+      "lat": 37.69,
+      "lado": "o",
+      "contexto": true,
+      "dy": -3
+    },
+    "mileto": {
+      "nome": "Mileto",
+      "lon": 27.28,
+      "lat": 37.53,
+      "lado": "l",
+      "marca": [
+        -3,
+        10
+      ]
+    },
+    "cos": {
+      "nome": "Cós",
+      "lon": 27.29,
+      "lat": 36.89,
+      "lado": "o",
+      "contexto": true
+    },
+    "rodes": {
+      "nome": "Rodes",
+      "lon": 28.225,
+      "lat": 36.44,
+      "lado": "s"
+    },
+    "patara": {
+      "nome": "Pátara",
+      "lon": 29.32,
+      "lat": 36.27,
+      "lado": "n",
+      "contexto": true
+    },
+    "tiro": {
+      "nome": "Tiro",
+      "lon": 35.195,
+      "lat": 33.27,
+      "lado": "o",
+      "marca": [
+        9,
+        -3
+      ]
+    },
+    "ptolemaida": {
+      "nome": "Ptolemaida",
+      "lon": 35.07,
+      "lat": 32.93,
+      "lado": "o",
+      "marca": [
+        9,
+        2
+      ]
+    },
+    "cesareia": {
+      "nome": "Cesareia",
+      "lon": 34.89,
+      "lat": 32.5,
+      "lado": "o",
+      "marca": [
+        9,
+        0
+      ]
+    },
+    "jerusalem": {
+      "nome": "Jerusalém",
+      "lon": 35.23,
+      "lat": 31.78,
+      "lado": "o",
+      "marca": [
+        9,
+        0
+      ]
+    }
+  },
+  "regioes": [
+    {
+      "nome": "MACEDÔNIA",
+      "lon": 21.8,
+      "lat": 41.6
+    },
+    {
+      "nome": "TRÁCIA",
+      "lon": 26.0,
+      "lat": 41.4
+    },
+    {
+      "nome": "ACAIA",
+      "lon": 22.2,
+      "lat": 37.05
+    },
+    {
+      "nome": "ÁSIA",
+      "lon": 28.5,
+      "lat": 38.6
+    },
+    {
+      "nome": "FRÍGIA",
+      "lon": 30.4,
+      "lat": 39.0
+    },
+    {
+      "nome": "GALÁCIA",
+      "lon": 33.0,
+      "lat": 39.4
+    },
+    {
+      "nome": "CILÍCIA",
+      "lon": 35.25,
+      "lat": 37.6
+    },
+    {
+      "nome": "SÍRIA",
+      "lon": 36.6,
+      "lat": 35.0
+    },
+    {
+      "nome": "CHIPRE",
+      "lon": 33.1,
+      "lat": 35.15
+    },
+    {
+      "nome": "FENÍCIA",
+      "lon": 36.2,
+      "lat": 33.75
+    },
+    {
+      "nome": "JUDEIA",
+      "lon": 36.35,
+      "lat": 32.15
+    },
+    {
+      "nome": "CRETA",
+      "lon": 24.8,
+      "lat": 35.0
+    },
+    {
+      "nome": "CAPADÓCIA",
+      "lon": 35.6,
+      "lat": 38.75
+    }
+  ],
+  "aguas": [
+    {
+      "nome": "MAR MEDITERRÂNEO",
+      "lon": 29.0,
+      "lat": 34.0
+    },
+    {
+      "nome": "MAR EGEU",
+      "lon": 24.4,
+      "lat": 38.45
+    }
+  ],
+  "caminho": [
+    {
+      "tipo": "ida",
+      "pontos": [
+        "antioquia",
+        [
+          36.25,
+          36.55
+        ],
+        [
+          36.1,
+          36.85
+        ],
+        [
+          35.6,
+          36.95
+        ],
+        "tarso"
+      ]
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "tarso",
+        [
+          34.75,
+          37.3
+        ],
+        [
+          33.9,
+          37.75
+        ],
+        "galacia"
+      ],
+      "chega": "galacia"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "galacia",
+        [
+          31.3,
+          38.45
+        ],
+        [
+          29.8,
+          38.35
+        ],
+        [
+          28.5,
+          38.05
+        ],
+        "efeso"
+      ],
+      "chega": "efeso"
+    },
+    {
+      "tipo": "ida",
+      "mar": true,
+      "pontos": [
+        "efeso",
+        [
+          26.6,
+          38.35
+        ],
+        [
+          25.8,
+          39.3
+        ],
+        [
+          24.6,
+          40.05
+        ],
+        [
+          23.4,
+          40.35
+        ],
+        "tessalonica"
+      ],
+      "chega": "tessalonica"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "tessalonica",
+        [
+          22.55,
+          40.55
+        ],
+        "bereia",
+        [
+          22.1,
+          39.6
+        ],
+        [
+          22.45,
+          38.8
+        ],
+        [
+          22.6,
+          38.2
+        ],
+        "corinto"
+      ],
+      "chega": "corinto"
+    },
+    {
+      "tipo": "volta",
+      "desvio": 6,
+      "pontos": [
+        "corinto",
+        [
+          22.6,
+          38.2
+        ],
+        [
+          22.45,
+          38.8
+        ],
+        [
+          22.1,
+          39.6
+        ],
+        "bereia",
+        [
+          22.55,
+          40.55
+        ],
+        "tessalonica",
+        [
+          23.44,
+          40.62
+        ],
+        [
+          23.845,
+          40.82
+        ],
+        "filipos"
+      ],
+      "chega": "filipos"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "filipos",
+        [
+          24.41,
+          40.93
+        ],
+        [
+          25.4,
+          40.35
+        ],
+        "troade"
+      ],
+      "chega": "troade"
+    },
+    {
+      "tipo": "volta",
+      "pontos": [
+        "troade",
+        "assos"
+      ],
+      "chega": "assos"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "assos",
+        [
+          26.3,
+          39.3
+        ],
+        "mitilene",
+        [
+          26.35,
+          38.75
+        ],
+        [
+          26.25,
+          38.35
+        ],
+        [
+          26.6,
+          37.85
+        ],
+        "samos",
+        "mileto"
+      ],
+      "chega": "mitilene"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "mileto",
+        "cos",
+        [
+          27.8,
+          36.6
+        ],
+        "rodes",
+        [
+          28.9,
+          36.15
+        ],
+        "patara"
+      ],
+      "chega": "rodes"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "patara",
+        [
+          30.5,
+          35.45
+        ],
+        [
+          32.3,
+          34.3
+        ],
+        [
+          33.9,
+          33.9
+        ],
+        [
+          34.9,
+          33.45
+        ],
+        "tiro"
+      ],
+      "chega": "tiro"
+    },
+    {
+      "tipo": "volta",
+      "pontos": [
+        "tiro",
+        "ptolemaida"
+      ],
+      "chega": "ptolemaida"
+    },
+    {
+      "tipo": "volta",
+      "pontos": [
+        "ptolemaida",
+        "cesareia"
+      ],
+      "chega": "cesareia"
+    },
+    {
+      "tipo": "volta",
+      "pontos": [
+        "cesareia",
+        [
+          34.98,
+          32.1
+        ],
+        "jerusalem"
+      ],
+      "chega": "jerusalem"
+    }
+  ],
+  "paradas": [
+    {
+      "n": 1,
+      "lugar": "antioquia",
+      "nome": "Antioquia da Síria",
+      "texto": "Depois de algum tempo em Antioquia, Paulo parte outra vez.",
+      "ref": "At 18.23"
+    },
+    {
+      "n": 2,
+      "lugar": "galacia",
+      "nome": "Galácia e Frígia",
+      "texto": "Ele passa de cidade em cidade animando os irmãos.",
+      "ref": "At 18.23"
+    },
+    {
+      "n": 3,
+      "lugar": "efeso",
+      "nome": "Éfeso",
+      "texto": "Paulo ensina dois anos na escola de Tirano, e toda a Ásia ouve a palavra. Depois vem o tumulto na cidade.",
+      "ref": "At 19.1-41"
+    },
+    {
+      "n": 4,
+      "lugar": "tessalonica",
+      "nome": "Macedônia",
+      "texto": "Paulo percorre a região e anima os irmãos de cidade em cidade.",
+      "ref": "At 20.1-2"
+    },
+    {
+      "n": 5,
+      "lugar": "corinto",
+      "nome": "Grécia",
+      "texto": "Ele fica três meses. Por causa de uma conspiração, decide voltar pela Macedônia.",
+      "ref": "At 20.2-3"
+    },
+    {
+      "n": 6,
+      "tipo": "volta",
+      "lugar": "filipos",
+      "nome": "Filipos",
+      "texto": "Depois da festa dos pães sem fermento, eles embarcam em Filipos.",
+      "ref": "At 20.3-6"
+    },
+    {
+      "n": 7,
+      "tipo": "volta",
+      "lugar": "troade",
+      "nome": "Trôade",
+      "texto": "Paulo fala até a meia-noite. Êutico cai da janela e volta vivo.",
+      "ref": "At 20.6-12"
+    },
+    {
+      "n": 8,
+      "tipo": "volta",
+      "lugar": "assos",
+      "nome": "Assôs",
+      "texto": "Paulo vai por terra e embarca com os outros em Assôs.",
+      "ref": "At 20.13-14"
+    },
+    {
+      "n": 9,
+      "tipo": "volta",
+      "lugar": "mitilene",
+      "nome": "Mitilene, Quios e Samos",
+      "texto": "Eles navegam até Mitilene e, nos dias seguintes, passam por Quios e Samos.",
+      "ref": "At 20.14-15"
+    },
+    {
+      "n": 10,
+      "tipo": "volta",
+      "lugar": "mileto",
+      "nome": "Mileto",
+      "texto": "Paulo se despede dos presbíteros de Éfeso. Eles oram juntos e choram.",
+      "ref": "At 20.15-38"
+    },
+    {
+      "n": 11,
+      "tipo": "volta",
+      "lugar": "rodes",
+      "nome": "Cós, Rodes e Pátara",
+      "texto": "Em Pátara, eles tomam um navio para a Fenícia.",
+      "ref": "At 21.1-2"
+    },
+    {
+      "n": 12,
+      "tipo": "volta",
+      "lugar": "tiro",
+      "nome": "Tiro",
+      "texto": "Deixando Chipre à esquerda, eles chegam a Tiro e ficam sete dias com os discípulos.",
+      "ref": "At 21.3-6"
+    },
+    {
+      "n": 13,
+      "tipo": "volta",
+      "lugar": "ptolemaida",
+      "nome": "Ptolemaida",
+      "texto": "Saúdam os irmãos e ficam só um dia.",
+      "ref": "At 21.7"
+    },
+    {
+      "n": 14,
+      "tipo": "volta",
+      "lugar": "cesareia",
+      "nome": "Cesareia",
+      "texto": "Ficam na casa do evangelista Filipe. O profeta Ágabo avisa o que espera Paulo em Jerusalém.",
+      "ref": "At 21.8-14"
+    },
+    {
+      "n": 15,
+      "tipo": "volta",
+      "lugar": "jerusalem",
+      "nome": "Jerusalém",
+      "texto": "Os irmãos os recebem com muita alegria.",
+      "ref": "At 21.15-17"
+    }
+  ],
+  "legenda": [
+    {
+      "tipo": "ida",
+      "nome": "Ida"
+    },
+    {
+      "tipo": "volta",
+      "nome": "Volta"
+    }
+  ],
+  "leitura": [
+    {
+      "rotulo": "Atos 18",
+      "livro": "Atos",
+      "cap": 18
+    },
+    {
+      "rotulo": "Atos 21",
+      "livro": "Atos",
+      "cap": 21
+    }
+  ]
+}

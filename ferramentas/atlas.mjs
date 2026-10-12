@@ -175,7 +175,7 @@ export function montarMapa(slug) {
     const ns = numeros[id] || [];
     return {
       id, nome: l.nome, x: n1(x), y: n1(y), lado: l.lado || 'l', ...(l.dx ? { dx: l.dx } : {}), ...(l.dy ? { dy: l.dy } : {}),
-      ...(ns.length ? { n: ns[0].n, tipoN: ns[0].tipo } : {}), ...(l.marca ? { marca: l.marca } : {}), ...(l.contexto ? { contexto: true } : {}), ...(l.linhas ? { linhas: l.linhas } : {}),
+      ...(ns.length ? { n: ns[0].n, tipoN: ns[0].tipo } : {}), ...(l.marca ? { marca: l.marca } : {}), ...(l.contexto ? { contexto: true } : {}), ...(l.oculto ? { oculto: true } : {}), ...(l.linhas ? { linhas: l.linhas } : {}),
     };
   });
   saida.pernas = (m.caminho || []).map((c) => ({
