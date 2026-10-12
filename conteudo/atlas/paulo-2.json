@@ -8,10 +8,10 @@
   "quando": "por volta de 49 a 52 d.C.",
   "texto": "Paulo volta para visitar as igrejas da primeira viagem. O Espírito o leva até Trôade, e ali uma visão o chama para a Macedônia.",
   "vista": {
-    "oeste": 20.7,
+    "oeste": 19.9,
     "leste": 37.15,
     "sul": 31.5,
-    "norte": 41.85
+    "norte": 42.15
   },
   "relevoExagero": 6,
   "lugares": {
@@ -110,11 +110,12 @@
       "nome": "Filipos",
       "lon": 24.287,
       "lat": 41.012,
-      "lado": "no",
+      "lado": "n",
       "marca": [
-        0,
-        -9
-      ]
+        11,
+        -3
+      ],
+      "dx": -6
     },
     "tessalonica": {
       "nome": "Tessalônica",
@@ -122,18 +123,18 @@
       "lat": 40.64,
       "lado": "n",
       "marca": [
-        -9,
-        -5
+        2,
+        9
       ]
     },
     "bereia": {
       "nome": "Bereia",
       "lon": 22.2,
       "lat": 40.52,
-      "lado": "so",
+      "lado": "s",
       "marca": [
-        -8,
-        -5
+        -9,
+        0
       ]
     },
     "atenas": {
@@ -142,8 +143,8 @@
       "lat": 37.97,
       "lado": "l",
       "marca": [
-        -2,
-        -8
+        0,
+        -9
       ]
     },
     "corinto": {
@@ -152,20 +153,19 @@
       "lat": 37.906,
       "lado": "o",
       "marca": [
-        -4,
-        -8
+        0,
+        -9
       ]
     },
     "cencreia": {
       "nome": "Cencreia",
       "lon": 22.99,
       "lat": 37.88,
-      "lado": "se",
+      "lado": "so",
       "marca": [
-        0,
+        1,
         9
-      ],
-      "dx": 4
+      ]
     },
     "efeso": {
       "nome": "Éfeso",
@@ -198,8 +198,8 @@
   "regioes": [
     {
       "nome": "MACEDÔNIA",
-      "lon": 22.25,
-      "lat": 41.62
+      "lon": 21.6,
+      "lat": 41.75
     },
     {
       "nome": "TRÁCIA",
@@ -208,8 +208,8 @@
     },
     {
       "nome": "ACAIA",
-      "lon": 22.15,
-      "lat": 37.42
+      "lon": 22.2,
+      "lat": 37.02
     },
     {
       "nome": "MÍSIA",
