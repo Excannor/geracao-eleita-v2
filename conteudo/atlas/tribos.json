@@ -1,0 +1,1059 @@
+{
+  "titulo": "Canaã: divisão das tribos",
+  "tituloMapa": "Canaã: divisão das tribos",
+  "grupo": "terra",
+  "sub": "Josué reparte a terra",
+  "ref": "Js 13.8–19.51",
+  "linha": "A herança de cada tribo de Israel",
+  "quando": "depois da conquista, nos dias de Josué",
+  "texto": "Rúben, Gade e metade de Manassés ficam a leste do Jordão. As outras tribos recebem a herança por sorteio, em Siló. Levi não recebe território: a herança dos levitas é servir ao Senhor.",
+  "vista": {
+    "oeste": 34.05,
+    "leste": 36.45,
+    "sul": 30.65,
+    "norte": 33.45
+  },
+  "miniatura": {
+    "oeste": 33.9,
+    "leste": 36.6,
+    "sul": 30.6,
+    "norte": 33.5
+  },
+  "relevoExagero": 3,
+  "trechos": {
+    "ida": "As tribos"
+  },
+  "lagos": [
+    [
+      [
+        35.59,
+        32.905
+      ],
+      [
+        35.625,
+        32.89
+      ],
+      [
+        35.645,
+        32.86
+      ],
+      [
+        35.652,
+        32.82
+      ],
+      [
+        35.645,
+        32.77
+      ],
+      [
+        35.63,
+        32.73
+      ],
+      [
+        35.6,
+        32.705
+      ],
+      [
+        35.57,
+        32.705
+      ],
+      [
+        35.553,
+        32.73
+      ],
+      [
+        35.54,
+        32.775
+      ],
+      [
+        35.535,
+        32.8
+      ],
+      [
+        35.52,
+        32.83
+      ],
+      [
+        35.53,
+        32.86
+      ],
+      [
+        35.555,
+        32.885
+      ]
+    ],
+    [
+      [
+        35.555,
+        31.78
+      ],
+      [
+        35.52,
+        31.75
+      ],
+      [
+        35.47,
+        31.72
+      ],
+      [
+        35.455,
+        31.66
+      ],
+      [
+        35.43,
+        31.58
+      ],
+      [
+        35.4,
+        31.5
+      ],
+      [
+        35.385,
+        31.43
+      ],
+      [
+        35.37,
+        31.35
+      ],
+      [
+        35.38,
+        31.27
+      ],
+      [
+        35.4,
+        31.18
+      ],
+      [
+        35.42,
+        31.1
+      ],
+      [
+        35.44,
+        31.04
+      ],
+      [
+        35.47,
+        31.04
+      ],
+      [
+        35.49,
+        31.1
+      ],
+      [
+        35.5,
+        31.2
+      ],
+      [
+        35.53,
+        31.27
+      ],
+      [
+        35.57,
+        31.32
+      ],
+      [
+        35.585,
+        31.42
+      ],
+      [
+        35.59,
+        31.52
+      ],
+      [
+        35.585,
+        31.62
+      ],
+      [
+        35.575,
+        31.71
+      ]
+    ]
+  ],
+  "semRiosGeo": true,
+  "rios": [
+    {
+      "nome": "Jordão",
+      "linha": [
+        [
+          35.62,
+          33.2
+        ],
+        [
+          35.61,
+          33.05
+        ],
+        [
+          35.62,
+          32.95
+        ],
+        [
+          35.6,
+          32.905
+        ]
+      ]
+    },
+    {
+      "nome": "Jordão",
+      "linha": [
+        [
+          35.572,
+          32.705
+        ],
+        [
+          35.565,
+          32.62
+        ],
+        [
+          35.585,
+          32.52
+        ],
+        [
+          35.57,
+          32.44
+        ],
+        [
+          35.545,
+          32.35
+        ],
+        [
+          35.55,
+          32.25
+        ],
+        [
+          35.53,
+          32.15
+        ],
+        [
+          35.535,
+          32.05
+        ],
+        [
+          35.52,
+          31.98
+        ],
+        [
+          35.545,
+          31.9
+        ],
+        [
+          35.55,
+          31.84
+        ],
+        [
+          35.555,
+          31.78
+        ]
+      ]
+    }
+  ],
+  "formas": [
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          34.85,
+          33.32
+        ],
+        [
+          35.33,
+          33.33
+        ],
+        [
+          35.48,
+          33.34
+        ],
+        [
+          35.64,
+          33.32
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.33,
+          33.33
+        ],
+        [
+          35.31,
+          33.15
+        ],
+        [
+          35.32,
+          33.0
+        ],
+        [
+          35.28,
+          32.9
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.28,
+          32.9
+        ],
+        [
+          35.2,
+          32.8
+        ],
+        [
+          35.12,
+          32.69
+        ],
+        [
+          35.05,
+          32.66
+        ],
+        [
+          35.0,
+          32.62
+        ],
+        [
+          34.85,
+          32.6
+        ],
+        [
+          34.75,
+          32.6
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.28,
+          32.9
+        ],
+        [
+          35.36,
+          32.84
+        ],
+        [
+          35.43,
+          32.79
+        ],
+        [
+          35.52,
+          32.79
+        ],
+        [
+          35.585,
+          32.77
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.43,
+          32.79
+        ],
+        [
+          35.4,
+          32.72
+        ],
+        [
+          35.36,
+          32.64
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.12,
+          32.69
+        ],
+        [
+          35.24,
+          32.66
+        ],
+        [
+          35.36,
+          32.64
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.36,
+          32.64
+        ],
+        [
+          35.32,
+          32.56
+        ],
+        [
+          35.3,
+          32.5
+        ],
+        [
+          35.45,
+          32.47
+        ],
+        [
+          35.56,
+          32.45
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          34.55,
+          32.16
+        ],
+        [
+          34.75,
+          32.18
+        ],
+        [
+          34.97,
+          32.16
+        ],
+        [
+          35.2,
+          32.12
+        ],
+        [
+          35.4,
+          32.17
+        ],
+        [
+          35.54,
+          32.16
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          34.97,
+          32.16
+        ],
+        [
+          34.99,
+          32.06
+        ],
+        [
+          35.02,
+          31.97
+        ],
+        [
+          35.0,
+          31.86
+        ],
+        [
+          35.03,
+          31.77
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.03,
+          31.77
+        ],
+        [
+          34.7,
+          31.75
+        ],
+        [
+          34.3,
+          31.77
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.02,
+          31.97
+        ],
+        [
+          35.25,
+          32.0
+        ],
+        [
+          35.53,
+          31.97
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.03,
+          31.77
+        ],
+        [
+          35.2,
+          31.8
+        ],
+        [
+          35.4,
+          31.77
+        ],
+        [
+          35.55,
+          31.79
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          34.05,
+          31.0
+        ],
+        [
+          34.6,
+          30.95
+        ],
+        [
+          35.1,
+          30.92
+        ],
+        [
+          35.3,
+          31.0
+        ],
+        [
+          35.42,
+          31.08
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.64,
+          33.32
+        ],
+        [
+          36.0,
+          33.25
+        ],
+        [
+          36.35,
+          33.15
+        ],
+        [
+          36.33,
+          32.8
+        ],
+        [
+          36.3,
+          32.45
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.56,
+          32.45
+        ],
+        [
+          35.9,
+          32.47
+        ],
+        [
+          36.3,
+          32.45
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          36.3,
+          32.45
+        ],
+        [
+          36.15,
+          32.15
+        ],
+        [
+          36.0,
+          31.84
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          35.55,
+          31.79
+        ],
+        [
+          35.8,
+          31.83
+        ],
+        [
+          36.0,
+          31.84
+        ]
+      ]
+    },
+    {
+      "classe": "divisa",
+      "suave": true,
+      "linha": [
+        [
+          36.0,
+          31.84
+        ],
+        [
+          35.98,
+          31.62
+        ],
+        [
+          35.96,
+          31.42
+        ],
+        [
+          35.75,
+          31.43
+        ],
+        [
+          35.575,
+          31.42
+        ]
+      ]
+    },
+    {
+      "classe": "divisa simeao",
+      "fechada": true,
+      "suave": true,
+      "linha": [
+        [
+          34.72,
+          31.36
+        ],
+        [
+          35.0,
+          31.37
+        ],
+        [
+          35.08,
+          31.2
+        ],
+        [
+          34.92,
+          31.07
+        ],
+        [
+          34.66,
+          31.12
+        ]
+      ]
+    }
+  ],
+  "lugares": {
+    "ruben": {
+      "nome": "",
+      "lon": 35.77,
+      "lat": 31.62,
+      "oculto": true,
+      "marca": [
+        -26.2,
+        -3.3
+      ]
+    },
+    "gade": {
+      "nome": "",
+      "lon": 35.78,
+      "lat": 32.15,
+      "oculto": true,
+      "marca": [
+        -23.0,
+        -3.3
+      ]
+    },
+    "manasses-l": {
+      "nome": "",
+      "lon": 36.0,
+      "lat": 32.6,
+      "oculto": true,
+      "marca": [
+        -36.0,
+        -3.3
+      ]
+    },
+    "juda": {
+      "nome": "",
+      "lon": 35.1,
+      "lat": 31.55,
+      "oculto": true,
+      "marca": [
+        -23.0,
+        -3.3
+      ]
+    },
+    "efraim": {
+      "nome": "",
+      "lon": 35.25,
+      "lat": 32.065,
+      "oculto": true,
+      "marca": [
+        -29.5,
+        -3.3
+      ]
+    },
+    "manasses-o": {
+      "nome": "",
+      "lon": 35.22,
+      "lat": 32.33,
+      "oculto": true,
+      "marca": [
+        -36.0,
+        -3.3
+      ]
+    },
+    "benjamim": {
+      "nome": "",
+      "lon": 35.29,
+      "lat": 31.87,
+      "oculto": true,
+      "marca": [
+        -36.0,
+        -3.3
+      ]
+    },
+    "simeao": {
+      "nome": "",
+      "lon": 34.88,
+      "lat": 31.22,
+      "oculto": true,
+      "marca": [
+        -29.5,
+        -3.3
+      ]
+    },
+    "zebulom": {
+      "nome": "",
+      "lon": 35.24,
+      "lat": 32.75,
+      "oculto": true,
+      "marca": [
+        -32.8,
+        -3.3
+      ]
+    },
+    "issacar": {
+      "nome": "",
+      "lon": 35.45,
+      "lat": 32.6,
+      "oculto": true,
+      "marca": [
+        -32.8,
+        -3.3
+      ]
+    },
+    "aser": {
+      "nome": "",
+      "lon": 35.1,
+      "lat": 33.05,
+      "oculto": true,
+      "marca": [
+        -23.0,
+        -3.3
+      ]
+    },
+    "naftali": {
+      "nome": "",
+      "lon": 35.47,
+      "lat": 33.05,
+      "oculto": true,
+      "marca": [
+        -32.8,
+        -3.3
+      ]
+    },
+    "da": {
+      "nome": "",
+      "lon": 34.75,
+      "lat": 31.95,
+      "oculto": true,
+      "marca": [
+        -16.5,
+        -3.3
+      ]
+    }
+  },
+  "regioes": [
+    {
+      "nome": "RÚBEN",
+      "lon": 35.77,
+      "lat": 31.62
+    },
+    {
+      "nome": "GADE",
+      "lon": 35.78,
+      "lat": 32.15
+    },
+    {
+      "nome": "MANASSÉS",
+      "lon": 36.0,
+      "lat": 32.6
+    },
+    {
+      "nome": "JUDÁ",
+      "lon": 35.1,
+      "lat": 31.55
+    },
+    {
+      "nome": "EFRAIM",
+      "lon": 35.25,
+      "lat": 32.065
+    },
+    {
+      "nome": "MANASSÉS",
+      "lon": 35.22,
+      "lat": 32.33
+    },
+    {
+      "nome": "BENJAMIM",
+      "lon": 35.29,
+      "lat": 31.87
+    },
+    {
+      "nome": "SIMEÃO",
+      "lon": 34.88,
+      "lat": 31.22
+    },
+    {
+      "nome": "ZEBULOM",
+      "lon": 35.24,
+      "lat": 32.75
+    },
+    {
+      "nome": "ISSACAR",
+      "lon": 35.45,
+      "lat": 32.6
+    },
+    {
+      "nome": "ASER",
+      "lon": 35.1,
+      "lat": 33.05
+    },
+    {
+      "nome": "NAFTALI",
+      "lon": 35.47,
+      "lat": 33.05
+    },
+    {
+      "nome": "DÃ",
+      "lon": 34.75,
+      "lat": 31.95
+    },
+    {
+      "nome": "SÍRIA",
+      "lon": 36.25,
+      "lat": 33.4,
+      "fraca": true
+    },
+    {
+      "nome": "AMOM",
+      "lon": 36.25,
+      "lat": 32.0,
+      "fraca": true
+    },
+    {
+      "nome": "MOABE",
+      "lon": 36.0,
+      "lat": 31.2,
+      "fraca": true
+    },
+    {
+      "nome": "EDOM",
+      "lon": 35.75,
+      "lat": 30.75,
+      "fraca": true
+    },
+    {
+      "nome": "FILÍSTIA",
+      "lon": 34.35,
+      "lat": 31.45,
+      "fraca": true
+    }
+  ],
+  "aguas": [
+    {
+      "nome": "MAR MEDITERRÂNEO",
+      "lon": 34.45,
+      "lat": 32.75,
+      "linhas": [
+        "MAR",
+        "MEDITERRÂNEO"
+      ]
+    },
+    {
+      "nome": "Mar Morto",
+      "lon": 35.48,
+      "lat": 31.2,
+      "giro": -82,
+      "rio": true
+    },
+    {
+      "nome": "Mar da Galileia",
+      "lon": 35.75,
+      "lat": 32.8,
+      "rio": true,
+      "linhas": [
+        "Mar da",
+        "Galileia"
+      ]
+    }
+  ],
+  "caminho": [],
+  "paradas": [
+    {
+      "n": 1,
+      "lugar": "ruben",
+      "nome": "Rúben",
+      "texto": "Recebe de Moisés as terras a leste do mar Morto. O Jordão é a fronteira do oeste.",
+      "ref": "Js 13.15-23"
+    },
+    {
+      "n": 2,
+      "lugar": "gade",
+      "nome": "Gade",
+      "texto": "Fica com parte de Gileade, a leste do Jordão.",
+      "ref": "Js 13.24-28"
+    },
+    {
+      "n": 3,
+      "lugar": "manasses-l",
+      "nome": "Manassés (a leste do Jordão)",
+      "texto": "Metade da tribo recebe Basã e metade de Gileade, ao norte.",
+      "ref": "Js 13.29-31"
+    },
+    {
+      "n": 4,
+      "lugar": "juda",
+      "nome": "Judá",
+      "texto": "A maior parte, do mar Morto ao Mediterrâneo. Os jebuseus continuam em Jerusalém.",
+      "ref": "Js 15.1-63"
+    },
+    {
+      "n": 5,
+      "lugar": "efraim",
+      "nome": "Efraim",
+      "texto": "O centro da terra. Os cananeus de Gezer continuam no meio do povo.",
+      "ref": "Js 16.5-10"
+    },
+    {
+      "n": 6,
+      "lugar": "manasses-o",
+      "nome": "Manassés (a oeste do Jordão)",
+      "texto": "A outra metade da tribo de Manassés, filho mais velho de José, fica a oeste do Jordão.",
+      "ref": "Js 17.1-13"
+    },
+    {
+      "n": 7,
+      "lugar": "benjamim",
+      "nome": "Benjamim",
+      "texto": "Uma faixa entre Judá e José, com Jebus, que é Jerusalém.",
+      "ref": "Js 18.11-28"
+    },
+    {
+      "n": 8,
+      "lugar": "simeao",
+      "nome": "Simeão",
+      "texto": "Recebe cidades dentro da herança de Judá, que era grande demais para uma tribo só.",
+      "ref": "Js 19.1-9"
+    },
+    {
+      "n": 9,
+      "lugar": "zebulom",
+      "nome": "Zebulom",
+      "texto": "O terceiro sorteio, na Galileia.",
+      "ref": "Js 19.10-16"
+    },
+    {
+      "n": 10,
+      "lugar": "issacar",
+      "nome": "Issacar",
+      "texto": "O quarto sorteio, ao sul do mar da Galileia.",
+      "ref": "Js 19.17-23"
+    },
+    {
+      "n": 11,
+      "lugar": "aser",
+      "nome": "Aser",
+      "texto": "O quinto sorteio, junto ao litoral do norte.",
+      "ref": "Js 19.24-31"
+    },
+    {
+      "n": 12,
+      "lugar": "naftali",
+      "nome": "Naftali",
+      "texto": "O sexto sorteio, a oeste do mar da Galileia e do Jordão.",
+      "ref": "Js 19.32-39"
+    },
+    {
+      "n": 13,
+      "lugar": "da",
+      "nome": "Dã",
+      "texto": "O sétimo sorteio, perto do litoral, entre Judá e Efraim.",
+      "ref": "Js 19.40-48"
+    }
+  ],
+  "legenda": [
+    {
+      "tipo": "divisa",
+      "nome": "Divisa entre tribos"
+    }
+  ],
+  "leitura": [
+    {
+      "rotulo": "Josué 13",
+      "livro": "Josué",
+      "cap": 13
+    },
+    {
+      "rotulo": "Josué 19",
+      "livro": "Josué",
+      "cap": 19
+    }
+  ]
+}

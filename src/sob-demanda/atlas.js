@@ -50,12 +50,17 @@
     partes.push('<g transform="translate(0 ' + topo + ')">');
     partes.push('<rect class="at-fundo" width="' + W + '" height="' + H + '"/>');
     if (m.imagem) partes.push('<image href="' + esc(m.imagem) + '" width="' + W + '" height="' + H + '" preserveAspectRatio="none"/>');
+    // áreas (as tribos) e plantas (muros, vales, construções), presas à terra quando há mar
+    if (m.formas && m.formas.length) {
+      if (m.terra) partes.push('<clipPath id="' + id + '-terra"><path d="' + m.terra + '"/></clipPath>');
+      partes.push('<g class="at-formas"' + (m.terra ? ' clip-path="url(#' + id + '-terra)"' : '') + '>' + m.formas.map((f) => '<path class="at-forma ' + esc(f.classe) + '" d="' + f.d + '"/>').join('') + '</g>');
+    }
     if (m.terra) {
       partes.push('<g class="at-rios">' + m.rios.map((d) => '<path d="' + d + '"/>').join('') + m.riosExtras.map((r) => '<path d="' + r.d + '"/>').join('') + '</g>');
-      if (m.lagos) partes.push('<path class="at-lago" d="' + m.lagos + '"/>');
+      if (m.lagos) partes.push('<path class="at-lago' + (m.formas && m.formas.length ? ' cheio' : '') + '" d="' + m.lagos + '"/>');
       partes.push('<path class="at-costa" d="' + m.terra + '"/>');
     }
-    partes.push('<g class="at-regioes">' + m.regioes.map((r) => texto(r.x, r.y, r.linhas || r.nome, 'at-regiao', 'middle', giro(r))).join('') + '</g>');
+    partes.push('<g class="at-regioes">' + m.regioes.map((r) => texto(r.x, r.y, r.linhas || r.nome, 'at-regiao' + (r.fraca ? ' fraca' : ''), 'middle', giro(r))).join('') + '</g>');
     partes.push('<g class="at-serras">' + (m.serras || []).map((r) => texto(r.x, r.y, r.linhas || r.nome, 'at-serra', 'middle', giro(r))).join('') + '</g>');
     partes.push('<g class="at-aguas">' + m.aguas.map((r) => texto(r.x, r.y, r.linhas || r.nome, 'at-agua' + (r.rio ? ' rio' : ''), 'middle', giro(r))).join('') + '</g>');
     // o caminho: um halo claro por baixo, para a linha ler sobre o marrom e o azul
@@ -82,7 +87,7 @@
     const lw = Math.max(76, e.comprimento + 40);
     const lh = 14 + leg.length * 11 + 16;
     partes.push('<g class="at-legenda" transform="translate(' + (/direita/.test(m.legendaLado || '') ? n(W - lw - 8) : 8) + ' ' + (/alto/.test(m.legendaLado || '') ? 8 : n(H - lh - 8)) + ')"><rect width="' + n(lw) + '" height="' + lh + '" rx="3"/>'
-      + leg.map((l, i) => '<g transform="translate(8 ' + (11 + i * 11) + ')"><path class="at-rota-halo ' + l.tipo + '" d="M0 0h20"/><path class="at-rota ' + l.tipo + '" d="M0 0h20"/>'
+      + leg.map((l, i) => '<g transform="translate(8 ' + (11 + i * 11) + ')">' + (/^(divisa|muro|vale|templo|area)$/.test(l.tipo) ? (l.tipo === 'divisa' ? '<path class="at-forma divisa" d="M0 1C6 -3 13 4 20 0"/>' : '<rect class="at-forma ' + l.tipo + '" x="2" y="-4" width="16" height="8" rx="1.5"/>') : '<path class="at-rota-halo ' + l.tipo + '" d="M0 0h20"/><path class="at-rota ' + l.tipo + '" d="M0 0h20"/>')
         + '<text x="26" y="3">' + esc(l.nome) + '</text></g>').join('')
       + '<g transform="translate(8 ' + (lh - 9) + ')"><path class="at-escala-fundo" d="M0 0h' + e.comprimento + '"/><path class="at-escala-meio" d="M0 0h' + n(e.comprimento / 2) + '"/>'
       + '<text x="' + n(e.comprimento + 4) + '" y="2.6">' + e.km + ' km</text></g></g>');

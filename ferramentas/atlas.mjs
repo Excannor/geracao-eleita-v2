@@ -97,6 +97,18 @@ function curva(pts, tensao = 0.5) {
   }
   return d;
 }
+// curva fechada e suave (Catmull-Rom com os vizinhos dando a volta)
+function curvaFechada(pts, tensao = 0.5) {
+  const n = pts.length;
+  let d = 'M' + n1(pts[0][0]) + ' ' + n1(pts[0][1]);
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    const c1 = [p1[0] + (p2[0] - p0[0]) * tensao / 3, p1[1] + (p2[1] - p0[1]) * tensao / 3];
+    const c2 = [p2[0] - (p3[0] - p1[0]) * tensao / 3, p2[1] - (p3[1] - p1[1]) * tensao / 3];
+    d += 'C' + [c1, c2, p2].map(([x, y]) => n1(x) + ' ' + n1(y)).join(' ');
+  }
+  return d + 'Z';
+}
 // desloca uma linha para o lado (a volta corre ao lado da ida, sem cobri-la)
 function deslocar(pts, d) {
   if (!d) return pts;
@@ -159,11 +171,11 @@ export function montarMapa(slug) {
   // planta: muros, vales, construções e áreas em lon/lat
   saida.formas = (m.formas || []).map((f) => ({
     classe: f.classe, nome: f.nome || '',
-    d: f.fechada ? dFechado(f.linha.map(P)) : (f.suave ? curva(f.linha.map(P), 0.6) : dAberto(f.linha.map(P))),
+    d: f.fechada ? (f.suave ? curvaFechada(f.linha.map(P), 0.6) : dFechado(f.linha.map(P))) : (f.suave ? curva(f.linha.map(P), 0.6) : dAberto(f.linha.map(P))),
   }));
   const rot = (r) => {
     const [x, y] = P([r.lon, r.lat]);
-    return { nome: r.nome, x: n1(x), y: n1(y), ...(r.giro ? { giro: r.giro } : {}), ...(r.linhas ? { linhas: r.linhas } : {}), ...(r.rio ? { rio: true } : {}) };
+    return { nome: r.nome, x: n1(x), y: n1(y), ...(r.giro ? { giro: r.giro } : {}), ...(r.linhas ? { linhas: r.linhas } : {}), ...(r.rio ? { rio: true } : {}), ...(r.fraca ? { fraca: true } : {}) };
   };
   saida.regioes = (m.regioes || []).map(rot);
   saida.aguas = (m.aguas || []).map(rot);
