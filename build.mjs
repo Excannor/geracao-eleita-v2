@@ -283,6 +283,41 @@ if (existsSync(join(pastaParabolas, 'indice.json'))) {
 }
 console.log('parábolas:', parabolas.itens.map((p) => p.titulo).join(', ') || 'nenhuma');
 
+// ---------- mapas bíblicos (o atlas) ----------
+// Mapas geográficos (#/atlas), não o mapa mental de cada livro. Como as parábolas: um arquivo
+// por mapa publicado (atlas-<slug>.<resumo>.json), com os caminhos SVG já projetados por
+// ferramentas/atlas.mjs, e o relevo pronto (conteudo/atlas/relevo/<slug>.webp, gerado fora do
+// build por ferramentas/atlas-relevo.py) em atlas-relevo-<slug>.<resumo>.webp. No index.html
+// fica só a lista mínima (window.ATLAS); a tela vem na peça sob demanda "atlas".
+const pastaAtlas = join(AQUI, 'conteudo', 'atlas');
+for (const velho of readdirSync(dist()).filter((f) => /^atlas-[a-z0-9-]+\.[0-9a-f]{10}\.(json|webp)(\.gz)?$/.test(f))) rmSync(dist(velho));
+const atlas = { grupos: [], itens: [] };
+if (existsSync(join(pastaAtlas, 'indice.json'))) {
+  const { montarMapa } = await import('./ferramentas/atlas.mjs');
+  const indiceAtlas = JSON.parse(readFileSync(join(pastaAtlas, 'indice.json'), 'utf8'));
+  const publicados = new Set(indiceAtlas.publicados || []);
+  const resumo = (dado) => createHash('sha256').update(dado).digest('hex').slice(0, 10);
+  for (const g of indiceAtlas.grupos) {
+    const slugs = (g.mapas || []).filter((s) => publicados.has(s));
+    if (!slugs.length) continue;
+    atlas.grupos.push({ id: g.id, nome: g.nome });
+    for (const slug of slugs) {
+      const m = montarMapa(slug);
+      const caminhoRelevo = join(pastaAtlas, 'relevo', slug + '.webp');
+      if (!existsSync(caminhoRelevo)) throw new Error('falta conteudo/atlas/relevo/' + slug + '.webp: rode ferramentas/atlas-relevo.py ' + slug);
+      const relevo = readFileSync(caminhoRelevo);
+      m.imagem = 'atlas-relevo-' + slug + '.' + resumo(relevo) + '.webp';
+      writeFileSync(dist(m.imagem), relevo);
+      const texto = JSON.stringify(m);
+      const arquivo = 'atlas-' + slug + '.' + resumo(texto) + '.json';
+      writeFileSync(dist(arquivo), texto, 'utf8');
+      writeFileSync(dist(arquivo + '.gz'), gzipSync(Buffer.from(texto, 'utf8'), { level: 9 }));
+      atlas.itens.push({ slug, titulo: m.titulo, linha: m.linha, ref: m.ref, grupo: g.id, arquivo, imagem: m.imagem });
+    }
+  }
+}
+console.log('mapas bíblicos:', atlas.itens.map((m) => m.titulo).join(', ') || 'nenhum');
+
 // ---------- artes de story ----------
 // Os desenhos dos stories das frases com arte própria (src/app/01e-story-artes.js, umas
 // dezenas de KB) não cabem no index.html (teto de 1 MB) e só servem na hora de compartilhar:
@@ -335,7 +370,7 @@ console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 // worker guarda cada uma no cache "caminho-telas" quando é pedida: depois, abre sem rede. Como
 // todo .js do app, o servidor só as entrega com sessão.
 // Função nova e pesada já nasce aqui, e não em src/app/.
-const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela'];
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas'];
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
   let codigo = enxugarJs(readFileSync(src('sob-demanda', nome + '.js'), 'utf8'), nome + '.js');
@@ -446,6 +481,8 @@ const html = molde
     + 'window.QR_GERADOR=' + JSON.stringify(pecas.qrcode) + ';'
     + 'window.MAPA_TELA=' + JSON.stringify(pecas['mapa-tela']) + ';'
     + 'window.PAINEL_TELA=' + JSON.stringify(pecas['painel-tela']) + ';'
+    + 'window.ATLAS_TELA=' + JSON.stringify(pecas.atlas) + ';'
+    + 'window.ATLAS=' + JSON.stringify(atlas).replace(/</g, '\\u003c') + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')
@@ -516,6 +553,8 @@ const CACHE_PARABOLAS = 'caminho-parabolas';
 // As artes de story (story-artes.<resumo>.js): guardadas na primeira vez que alguém
 // compartilha um story desses, para o próximo sair sem rede.
 const CACHE_STORY = 'caminho-story';
+// Os mapas bíblicos (o atlas): o desenho de cada mapa e o relevo dele, guardados na primeira vez.
+const CACHE_ATLAS = 'caminho-atlas';
 const ARQUIVOS = ${JSON.stringify(
   ['./', './index.html', './' + arquivoConteudo, './manifest.webmanifest', './apple-touch-icon.png', './icone-48.png']
     .concat(icones.map((i) => './' + i.arquivo), arquivosFontes.map((f) => './' + f.arquivo)))};
@@ -531,7 +570,8 @@ const CACHE_TELAS = 'caminho-telas';
 const TELAS = ${JSON.stringify(Object.values(pecas))};
 const STORY = ${JSON.stringify((arquivoArtesStory ? [arquivoArtesStory] : []).concat(Object.values(fotosStory)))};
 const PARABOLAS = ${JSON.stringify(parabolas.itens.map((p) => p.arquivo).concat(parabolas.desenhos ? [parabolas.desenhos, parabolas.tela] : []))};
-const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_PARABOLAS, PARABOLAS], [CACHE_STORY, STORY], [CACHE_TELAS, TELAS]];
+const ATLAS = ${JSON.stringify(atlas.itens.flatMap((m) => [m.arquivo, m.imagem]))};
+const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_PARABOLAS, PARABOLAS], [CACHE_STORY, STORY], [CACHE_TELAS, TELAS], [CACHE_ATLAS, ATLAS]];
 
 self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE)

@@ -54,6 +54,8 @@
     mapa: '#/explorar',
     // As parábolas também moram no Explorar (cartão logo abaixo dos mapas).
     parabolas: '#/explorar', parabola: '#/explorar',
+    // Os mapas bíblicos (o atlas geográfico) também: cartão logo abaixo das parábolas.
+    atlas: '#/explorar',
     // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
     // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
     conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
@@ -412,10 +414,11 @@
     'Bíblia': (h) => h === '#/biblia',
     'Primeiros passos': (h) => h === '#/licoes',
     'Parábolas': (h) => h === '#/parabolas',
+    'Mapas bíblicos': (h) => h === '#/atlas',
     'Minhas anotações': (h) => h === '#/perfil/anotacoes',
   };
   const ENDERECO_DO_ROTULO = { 'Trilha': '#/', 'Perfil': '#/perfil', 'Juntos': '#/novidades', 'Explorar': '#/explorar',
-    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes', 'Parábolas': '#/parabolas',
+    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes', 'Parábolas': '#/parabolas', 'Mapas bíblicos': '#/atlas',
     'Minhas anotações': '#/perfil/anotacoes' };
   // Muitas telas (Discipulado, Painel, Notificações, Perfil...) só desenham o voltar DEPOIS
   // que os dados chegam, quando o roteador já tinha passado. Ligar o clique botão a botão
@@ -504,6 +507,7 @@
     else if (rota === 'mapa') CC.vistaMapa(conteudo, arg);
     else if (rota === 'parabolas') CC.vistaParabolas(conteudo);
     else if (rota === 'parabola') CC.vistaParabola(conteudo, arg);
+    else if (rota === 'atlas') CC.vistaAtlas(conteudo, arg);
     else if (rota === 'conhecer') CC.vistaConhecer(conteudo);
     else if (rota === 'perguntas') (arg ? (r) => CC.vistaPergunta(r, arg) : CC.vistaPerguntas)(conteudo);
     else if (rota === 'seguir') CC.vistaSeguir(conteudo);

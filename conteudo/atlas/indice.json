@@ -1,0 +1,6 @@
+{
+  "grupos": [
+    { "id": "paulo", "nome": "Viagens de Paulo", "mapas": ["paulo-1"] }
+  ],
+  "publicados": ["paulo-1"]
+}

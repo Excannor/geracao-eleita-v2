@@ -124,7 +124,9 @@ const PARABOLA_COM_RESUMO = /^\/parabola(-[a-z0-9-]+|s-desenhos)\.[0-9a-f]{10}\.
 // As fotos da página de boas-vindas (landing-<nome>.<resumo>.webp|jpg): públicas, porque é
 // quem ainda não entrou que as vê.
 const FOTO_LANDING_COM_RESUMO = /^\/landing-[a-z0-9-]+\.[0-9a-f]{10}\.(webp|jpg)$/;
-const PUBLICO_COM_RESUMO = (rota) => FONTE_COM_RESUMO.test(rota) || MAPA_COM_RESUMO.test(rota) || PARABOLA_COM_RESUMO.test(rota) || FOTO_LANDING_COM_RESUMO.test(rota);
+// Os mapas bíblicos (atlas-<slug>.<resumo>.json e o relevo atlas-relevo-<slug>.<resumo>.webp), pelo mesmo motivo.
+const GEOGRAFICO_COM_RESUMO = /^\/atlas-[a-z0-9-]+\.[0-9a-f]{10}\.(json|webp)$/;
+const PUBLICO_COM_RESUMO = (rota) => FONTE_COM_RESUMO.test(rota) || MAPA_COM_RESUMO.test(rota) || PARABOLA_COM_RESUMO.test(rota) || FOTO_LANDING_COM_RESUMO.test(rota) || GEOGRAFICO_COM_RESUMO.test(rota);
 const CSP = [
   "default-src 'self'",
   "script-src 'self' " + hashesDosScripts(),

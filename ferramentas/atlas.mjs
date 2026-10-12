@@ -138,7 +138,7 @@ export function montarMapa(slug) {
   };
   const ponto = (x) => (typeof x === 'string' ? lugar(x) : P(x));
   const saida = {
-    slug, titulo: m.titulo, tituloMapa: m.tituloMapa || '', grupo: m.grupo, sub: m.sub, ref: m.ref, quando: m.quando || '', texto: m.texto || '',
+    slug, titulo: m.titulo, tituloMapa: m.tituloMapa || '', linha: m.linha || '', grupo: m.grupo, sub: m.sub, ref: m.ref, quando: m.quando || '', texto: m.texto || '',
     tipo: m.tipo || 'regiao', largura: prj.largura, altura: prj.altura, escala: escala(prj),
     legenda: m.legenda || [], leitura: m.leitura || [], notas: m.notas || [],
   };
@@ -182,7 +182,7 @@ export function montarMapa(slug) {
     d: curva(deslocar(c.pontos.map(ponto), c.desvio || 0), c.tensao ?? 0.5),
     ...(c.chega ? { chega: c.chega } : {}),
   }));
-  saida.paradas = (m.paradas || []).map((p) => ({ n: p.n, nome: p.nome, texto: p.texto, ref: p.ref, tipo: p.tipo || 'ida', lugar: [].concat(p.lugar)[0] }));
+  saida.paradas = (m.paradas || []).map((p) => ({ n: p.n, nome: p.nome, texto: p.texto, ref: p.ref, tipo: p.tipo || 'ida', lugar: [].concat(p.lugar)[0], lugares: [].concat(p.lugar) }));
   return saida;
 }
 

@@ -329,6 +329,8 @@ secao('peças sob demanda');
     ['mapa-tela', 'MAPA_TELA', 'mapa-conexao', '', 'a tela do mapa'],
     // a casca (07e-painel.js) e o item do Mais (10-roteador.js) ficam no index: o painel sai
     ['painel-tela', 'PAINEL_TELA', 'api/painel/liderancas', '', 'o painel do administrador'],
+    // a casca (06d-atlas.js) e o cartão do Explorar ficam no index: a lista e o mapa saem
+    ['atlas', 'ATLAS_TELA', 'atlas-quadro', '', 'os mapas bíblicos'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {

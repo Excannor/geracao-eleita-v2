@@ -308,6 +308,8 @@
       + CC.cartaoMapas()
       // As parábolas, logo abaixo dos mapas, para todos os caminhos (06c-parabolas.js).
       + (CC.cartaoParabolas ? CC.cartaoParabolas() : '')
+      // Os mapas bíblicos, logo abaixo das parábolas (06d-atlas.js).
+      + (CC.cartaoAtlas ? CC.cartaoAtlas() : '')
       // A história em uma página é o passo 1 do caminho; o atalho próprio só volta depois dele.
       + (terminou && D.notas[HISTORIA] ? '<a class="cartao cartao-historia" href="#/nota/' + encodeURIComponent(HISTORIA) + '">'
         + CC.ico('livro') + '<span><b>A história da Bíblia em uma página</b>'

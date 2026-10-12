@@ -71,3 +71,84 @@
 }
 @keyframes at-desenha { to { stroke-dashoffset: 0; } }
 @keyframes at-aparece { to { opacity: 1; } }
+.at-numero { cursor: pointer; }
+.at-pulso { fill: none; stroke: var(--at-rota); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: at-pulso 1.4s ease-out 2; }
+@keyframes at-pulso { from { opacity: 1; transform: scale(.6); } to { opacity: 0; transform: scale(2.4); } }
+@media (prefers-reduced-motion: reduce) { .at-pulso { animation: none; opacity: 1; } }
+
+/* ---------- as telas (fichas do app) ---------- */
+.atlas-vaga { width: 44px; }
+.atlas-cabeca { display: flex; flex-direction: column; gap: 4px; }
+.atlas-cabeca p { margin: 6px 0 0; color: var(--folha-tinta-fraca); font-size: .9375rem; line-height: 1.45; text-wrap: pretty; }
+.atlas-nome { margin: 0; color: var(--folha-tinta); font-family: 'Permanent Marker', cursive; font-size: 34px; font-weight: 400; line-height: 1.08; text-wrap: balance; }
+.atlas-cabeca .atlas-sub { margin-top: 8px; color: var(--folha-tinta); font-weight: 700; }
+.atlas-cabeca .atlas-quando { margin: 0; font-size: .8125rem; font-weight: 600; }
+.folha-atlas mark, .lista-atlas mark, .atlas-parada-ref mark {
+  padding: 1px 6px; border-radius: 6px; background: var(--folha); color: var(--folha-tinta); font-size: .8125rem; font-weight: 800; white-space: nowrap;
+}
+.folha-atlas mark { background: var(--folha-campo); }
+.atlas-texto { margin: 18px 4px 12px; color: var(--v2-tinta); font-size: 1rem; line-height: 1.55; text-wrap: pretty; }
+
+/* o mapa no cartão: proporção fixa, o miolo é que aproxima */
+.atlas-quadro { position: relative; margin: 14px 0 0; padding: 6px; border-radius: var(--raio-cartao); background: var(--v2-cartao); }
+.atlas-palco { position: relative; overflow: hidden; border-radius: 22px; touch-action: pan-y; background: #cfe6f3; }
+.atlas-palco.ampliado { touch-action: none; cursor: grab; }
+.atlas-zoom { transform-origin: 0 0; will-change: transform; }
+.atlas-zoom.suave { transition: transform .32s ease; }
+.atlas-pe { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 4px 2px 10px; }
+.atlas-dica { color: var(--v2-tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.35; }
+.atlas-controles { display: flex; flex: none; gap: 6px; }
+.atlas-botao {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--campo); color: var(--v2-tinta-forte); cursor: pointer;
+}
+.atlas-botao svg { width: 20px; height: 20px; }
+.atlas-botao:disabled { opacity: .4; cursor: default; }
+.atlas-botao:active:not(:disabled) { transform: scale(.94); }
+.atlas-botao[hidden] { display: none; }
+
+/* as paradas */
+.atlas-rotulo { margin: 26px 4px 4px; }
+.atlas-trecho { display: flex; align-items: center; gap: 10px; margin: 16px 4px 8px; color: var(--v2-tinta-forte); font-size: 1.0625rem; font-weight: 800; }
+.atlas-amostra { width: 28px; height: 8px; }
+.atlas-amostra path { fill: none; stroke: var(--v2-tinta-forte); stroke-width: 3; stroke-linecap: round; }
+.atlas-amostra.volta path { stroke-dasharray: 5 4; stroke-linecap: butt; }
+.atlas-paradas { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.atlas-parada { display: flex; flex-direction: column; border-radius: 22px; background: var(--v2-cartao); scroll-margin: 90px 0 140px; transition: background-color .3s; }
+.atlas-parada.ativa { background: var(--realce); }
+.atlas-parada-botao {
+  display: flex; align-items: flex-start; gap: 12px; width: 100%; min-height: 44px; padding: 14px 16px 6px; border: 0; border-radius: 22px 22px 0 0;
+  background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.atlas-parada-n {
+  display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; font-weight: 800;
+}
+.atlas-parada.volta .atlas-parada-n { background: transparent; border: 2px dashed var(--salvia-texto); color: var(--v2-tinta-forte); }
+.atlas-parada-textos { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.atlas-parada-textos b { color: var(--v2-tinta-forte); font-size: 1rem; }
+.atlas-parada-textos span { color: var(--v2-tinta); font-size: .9375rem; line-height: 1.45; text-wrap: pretty; }
+.atlas-parada-ref {
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; min-height: 44px; margin: 0 0 4px 52px; padding: 0 8px 0 0;
+  color: var(--v2-tinta-fraca); text-decoration: none;
+}
+.atlas-parada-ref svg { width: 16px; height: 16px; }
+.atlas-parada-ref:active mark { background: var(--salvia); }
+.atlas-ler { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 22px 0 0; }
+.atlas-ler svg { width: 20px; height: 20px; }
+.atlas-fonte { margin: 14px 8px 0; color: var(--v2-tinta-fraca); font-size: .75rem; line-height: 1.45; text-align: center; }
+
+/* a lista dos mapas */
+.lista-atlas { display: flex; flex-direction: column; }
+.grupo-atlas { display: flex; flex-direction: column; gap: 10px; }
+.grupo-atlas h2 { margin: 22px 4px 2px; color: var(--v2-tinta-forte); font-size: 1.1875rem; font-weight: 800; }
+.item-atlas { display: flex; flex-direction: column; gap: 12px; padding: 6px 6px 16px; border-radius: var(--raio-cartao); background: var(--v2-cartao); color: var(--v2-tinta); text-decoration: none; }
+.item-atlas:hover { text-decoration: none; }
+.item-atlas:active { transform: scale(.99); }
+.item-atlas-mapa { display: block; overflow: hidden; aspect-ratio: 400 / 336; border-radius: 22px; background: #cfe6f3; }
+.item-atlas-textos { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
+.item-atlas b { color: var(--v2-tinta-forte); font-size: 1.0625rem; }
+.item-atlas-linha { color: var(--v2-tinta-fraca); font-size: .90625rem; line-height: 1.4; }
+.item-atlas-pe { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.item-atlas-pe svg { width: 18px; height: 18px; color: var(--v2-tinta-fraca); }
+.atlas-em-breve { margin: 18px 8px 0; color: var(--v2-tinta-fraca); font-size: .875rem; font-weight: 600; text-align: center; }

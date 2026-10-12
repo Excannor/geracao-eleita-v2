@@ -94,5 +94,242 @@
     return '<svg class="atlas-svg' + (op.animar ? ' animar' : '') + '" viewBox="0 0 ' + W + ' ' + n(H + topo) + '" role="img" aria-label="' + esc('Mapa: ' + m.titulo) + '" style="--pernas:' + m.pernas.length + ';--dur:' + DUR + 's">' + partes.join('') + '</svg>';
   }
 
-  CC.atlas = Object.assign(CC.atlas || {}, { svg });
+  // ---------- as telas ----------
+  const reduzido = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // espaço inseparável entre sigla e capítulo e um juntor depois do traço, como nas parábolas
+  const nb = (t) => String(t).replace(/(\S) (?=\d)/g, '$1 ').replace(/(\d)([-–])(?=\d)/g, '$1$2⁠');
+  const NOME_DA_SIGLA = new Map((CC.LIVROS_MAPA || []).map(([nome, , sigla]) => [sigla, nome]));
+  // "At 13.51–14.5" → #/biblia/Atos/13 (o leitor abre no capítulo)
+  const linkDaRef = (r) => {
+    const x = /^(\S+) (\d+)/.exec(String(r || ''));
+    const livro = x && NOME_DA_SIGLA.get(x[1]);
+    return livro ? '#/biblia/' + encodeURIComponent(livro) + '/' + x[2] : '';
+  };
+  const ICO = {
+    menos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>',
+    mais: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12M12 6v12"/></svg>',
+    inteiro: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+  };
+  const linhaAmostra = (tipo) => '<svg class="atlas-amostra ' + tipo + '" viewBox="0 0 28 8" aria-hidden="true"><path d="M2 4h24"/></svg>';
+  const barra = (voltar) => '<div class="mapa-barra"><button class="botao-redondo" data-voltar data-rotulo-voltar="' + voltar + '" aria-label="Voltar">'
+    + CC.ico('voltar') + '</button><span class="mapa-barra-titulo">Mapas bíblicos</span><span class="atlas-vaga"></span></div>';
+
+  // ---------- a lista (#/atlas) ----------
+  function lista(raiz) {
+    const { A, buscar, pronto } = CC.atlasDados;
+    const cartao = (it) => {
+      const m = pronto(it.arquivo);
+      return '<a class="item-atlas" href="#/atlas/' + it.slug + '" data-item-atlas="' + it.slug + '">'
+        + '<span class="item-atlas-mapa" aria-hidden="true">' + (m ? svg(m, { faixa: false, mini: true }) : '') + '</span>'
+        + '<span class="item-atlas-textos"><b>' + esc(it.titulo) + '</b><span class="item-atlas-linha">' + esc(it.linha) + '</span>'
+        + '<span class="item-atlas-pe"><mark>' + nb(esc(it.ref)) + '</mark>' + CC.ico('avancar') + '</span></span></a>';
+    };
+    raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Explorar')
+      + '<div class="atlas-cabeca"><span class="mapa-grupo">Explorar</span><h1 class="atlas-nome">Mapas bíblicos</h1>'
+      + '<p>As cidades, os caminhos e o relevo de onde a história aconteceu. Toque num mapa para ver as paradas e ler na Bíblia.</p></div></div>'
+      + '<div class="lista-atlas">' + A.grupos.map((g) => '<section class="grupo-atlas"><h2>' + esc(g.nome) + '</h2>'
+        + A.itens.filter((it) => it.grupo === g.id).map(cartao).join('') + '</section>').join('')
+      + '<p class="atlas-em-breve">Mais mapas em breve.</p></div>';
+    CC.ligarVoltarDoTopo(raiz);
+    CC.inseparavel(raiz);
+    // a miniatura é o próprio mapa, desenhado quando os dados dele chegam
+    for (const it of A.itens) {
+      if (pronto(it.arquivo)) continue;
+      buscar(it.arquivo).then((m) => {
+        const alvo = raiz.querySelector('[data-item-atlas="' + it.slug + '"] .item-atlas-mapa');
+        if (alvo) alvo.innerHTML = svg(m, { faixa: false, mini: true });
+      }).catch(() => null);
+    }
+  }
+
+  // ---------- um mapa (#/atlas/<slug>) ----------
+  function parada(p) {
+    const link = linkDaRef(p.ref);
+    return '<li class="atlas-parada ' + p.tipo + '" id="atlas-parada-' + p.n + '">'
+      + '<button type="button" class="atlas-parada-botao" data-ir-parada="' + p.n + '" aria-label="' + esc('Ver no mapa: ' + p.n + ', ' + p.nome) + '">'
+      + '<span class="atlas-parada-n" aria-hidden="true">' + p.n + '</span><span class="atlas-parada-textos"><b>' + esc(p.nome) + '</b>'
+      + '<span>' + esc(p.texto) + '</span></span></button>'
+      + (link ? '<a class="atlas-parada-ref" href="' + link + '" aria-label="' + esc('Ler ' + p.ref.replace(/^At /, 'Atos ')) + '"><mark>' + nb(esc(p.ref)) + '</mark>' + CC.ico('livro') + '</a>' : '')
+      + '</li>';
+  }
+
+  function mapa(raiz, item, m) {
+    const ida = m.paradas.filter((p) => p.tipo !== 'volta'), volta = m.paradas.filter((p) => p.tipo === 'volta');
+    const ler = m.leitura[0];
+    // a linha se desenha quando a tela abre; um redesenho com o mesmo mapa na tela não repete
+    const animar = !raiz.querySelector('[data-atlas-mapa="' + m.slug + '"]');
+    const grupo = (CC.atlasDados.A.grupos.find((g) => g.id === item.grupo) || {}).nome || '';
+    raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Mapas bíblicos')
+      + '<div class="atlas-cabeca"><span class="mapa-grupo">' + esc(grupo) + '</span><h1 class="atlas-nome">' + esc(m.titulo) + '</h1>'
+      + '<p class="atlas-sub">' + esc(m.sub) + ' · <mark>' + nb(esc(m.ref)) + '</mark></p>'
+      + (m.quando ? '<p class="atlas-quando">' + esc(m.quando.charAt(0).toUpperCase() + m.quando.slice(1)) + '</p>' : '') + '</div></div>'
+      + (m.texto ? '<p class="atlas-texto">' + esc(m.texto) + '</p>' : '')
+      + '<figure class="atlas-quadro" data-atlas-mapa="' + esc(m.slug) + '"><div class="atlas-palco" data-atlas-palco><div class="atlas-zoom">' + svg(m, { animar }) + '</div></div>'
+      + '<figcaption class="atlas-pe"><span class="atlas-dica">Toque duas vezes ou use dois dedos para aproximar.</span>'
+      + '<span class="atlas-controles"><button type="button" class="atlas-botao" data-zoom="mais" aria-label="Aproximar">' + ICO.mais + '</button>'
+      + '<button type="button" class="atlas-botao" data-zoom="menos" aria-label="Afastar" disabled>' + ICO.menos + '</button>'
+      + '<button type="button" class="atlas-botao" data-zoom="inteiro" aria-label="Ver o mapa inteiro" hidden>' + ICO.inteiro + '</button></span></figcaption></figure>'
+      + '<h2 class="mapa-rotulo atlas-rotulo">' + CC.ico('alfinete') + '<span>Paradas</span></h2>'
+      + '<h3 class="atlas-trecho">' + linhaAmostra('ida') + 'Ida</h3><ol class="atlas-paradas">' + ida.map(parada).join('') + '</ol>'
+      + (volta.length ? '<h3 class="atlas-trecho">' + linhaAmostra('volta') + 'Volta</h3><ol class="atlas-paradas">' + volta.map(parada).join('') + '</ol>' : '')
+      + (ler ? '<a class="botao atlas-ler" href="#/biblia/' + encodeURIComponent(ler.livro) + '/' + ler.cap + '">' + CC.ico('livro') + 'Ler a passagem · ' + esc(m.leitura.map((l) => l.rotulo).join(' e ')) + '</a>' : '')
+      + '<p class="atlas-fonte">Posições e caminhos aproximados. Relevo e profundidade: SRTM, GMTED2010 e ETOPO1 (dados públicos); costa: Natural Earth.</p>';
+    CC.ligarVoltarDoTopo(raiz);
+    CC.inseparavel(raiz);
+    ligarZoom(raiz, m);
+  }
+
+  // ---------- aproximar e arrastar ----------
+  // O mapa fica num palco de proporção fixa; o zoom é um transform no miolo (o navegador só
+  // escala a imagem pronta). Sem zoom, um dedo rola a página (touch-action: pan-y); com zoom,
+  // um dedo arrasta o mapa. Dois dedos aproximam, toque duplo alterna, e os botões fazem o mesmo.
+  function ligarZoom(raiz, m) {
+    const palco = raiz.querySelector('[data-atlas-palco]');
+    const miolo = palco.querySelector('.atlas-zoom');
+    const svgEl = miolo.querySelector('svg');
+    const MAX = 5;
+    let s = 1, tx = 0, ty = 0;
+    const tam = () => [palco.clientWidth, palco.clientHeight];
+    function aplicar(suave) {
+      const [w, h] = tam();
+      s = Math.min(MAX, Math.max(1, s));
+      tx = Math.min(0, Math.max(w - w * s, tx));
+      ty = Math.min(0, Math.max(h - h * s, ty));
+      miolo.classList.toggle('suave', !!suave && !reduzido());
+      miolo.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + s + ')';
+      svgEl.style.setProperty('--zi', String(1 / Math.sqrt(s)));
+      palco.classList.toggle('ampliado', s > 1.01);
+      raiz.querySelector('[data-zoom="menos"]').disabled = s <= 1.01;
+      raiz.querySelector('[data-zoom="mais"]').disabled = s >= MAX - .01;
+      raiz.querySelector('[data-zoom="inteiro"]').hidden = s <= 1.01;
+    }
+    // aproxima em torno de um ponto do palco (px), mantendo esse ponto parado
+    function zoomEm(novo, px, py, suave) {
+      const cx = (px - tx) / s, cy = (py - ty) / s;
+      s = Math.min(MAX, Math.max(1, novo));
+      tx = px - cx * s; ty = py - cy * s;
+      aplicar(suave);
+    }
+    // centra um ponto do mapa (unidades do SVG) no palco, com pelo menos o zoom z
+    function centrar(ux, uy, z) {
+      const [w, h] = tam();
+      const vb = svgEl.viewBox.baseVal;
+      const k = w / vb.width;
+      s = Math.max(s, z);
+      tx = w / 2 - ux * k * s; ty = h / 2 - uy * k * s;
+      aplicar(true);
+    }
+    raiz.querySelectorAll('[data-zoom]').forEach((b) => {
+      b.onclick = () => {
+        const [w, h] = tam();
+        if (b.dataset.zoom === 'inteiro') { s = 1; tx = 0; ty = 0; aplicar(true); } else zoomEm(s * (b.dataset.zoom === 'mais' ? 1.6 : 1 / 1.6), w / 2, h / 2, true);
+      };
+    });
+
+    const dedos = new Map();
+    let inicio = null, moveu = false, ultimoToque = 0, ultimoPonto = null;
+    const ponto = (e) => { const r = palco.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    palco.addEventListener('pointerdown', (e) => {
+      dedos.set(e.pointerId, ponto(e));
+      moveu = false;
+      if (dedos.size === 2 || s > 1.01) { try { palco.setPointerCapture(e.pointerId); } catch (x) { /* ok */ } }
+      const pts = [...dedos.values()];
+      inicio = { s, tx, ty, pts: pts.map((p) => p.slice()) };
+    });
+    palco.addEventListener('pointermove', (e) => {
+      if (!dedos.has(e.pointerId) || !inicio) return;
+      dedos.set(e.pointerId, ponto(e));
+      const pts = [...dedos.values()];
+      if (pts.length >= 2 && inicio.pts.length >= 2) {
+        const d0 = Math.hypot(inicio.pts[0][0] - inicio.pts[1][0], inicio.pts[0][1] - inicio.pts[1][1]) || 1;
+        const d1 = Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]);
+        const m0 = [(inicio.pts[0][0] + inicio.pts[1][0]) / 2, (inicio.pts[0][1] + inicio.pts[1][1]) / 2];
+        const m1 = [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2];
+        const cx = (m0[0] - inicio.tx) / inicio.s, cy = (m0[1] - inicio.ty) / inicio.s;
+        s = Math.min(MAX, Math.max(1, inicio.s * d1 / d0));
+        tx = m1[0] - cx * s; ty = m1[1] - cy * s;
+        moveu = true;
+        aplicar(false);
+        e.preventDefault();
+      } else if (pts.length === 1 && inicio.s > 1.01) {
+        const dx = pts[0][0] - inicio.pts[0][0], dy = pts[0][1] - inicio.pts[0][1];
+        if (Math.hypot(dx, dy) > 4) moveu = true;
+        tx = inicio.tx + dx; ty = inicio.ty + dy;
+        aplicar(false);
+        e.preventDefault();
+      }
+    });
+    const soltar = (e) => {
+      if (!dedos.has(e.pointerId)) return;
+      const p = dedos.get(e.pointerId);
+      dedos.delete(e.pointerId);
+      const pts = [...dedos.values()];
+      inicio = pts.length ? { s, tx, ty, pts: pts.map((q) => q.slice()) } : null;
+      if (e.type !== 'pointerup' || moveu || pts.length) return;
+      // toque duplo: aproxima no ponto; se já está perto, volta ao inteiro
+      const agora = Date.now();
+      if (agora - ultimoToque < 320 && ultimoPonto && Math.hypot(p[0] - ultimoPonto[0], p[1] - ultimoPonto[1]) < 30) {
+        if (s > 1.5) { s = 1; tx = 0; ty = 0; aplicar(true); } else zoomEm(2.4, p[0], p[1], true);
+        ultimoToque = 0;
+        return;
+      }
+      ultimoToque = agora; ultimoPonto = p;
+    };
+    palco.addEventListener('pointerup', soltar);
+    palco.addEventListener('pointercancel', soltar);
+    palco.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey) return; // pinça do trackpad; a roda sozinha continua rolando a página
+      e.preventDefault();
+      const [px, py] = ponto(e);
+      zoomEm(s * Math.exp(-e.deltaY / 200), px, py, false);
+    }, { passive: false });
+
+    // da lista para o mapa: centra a parada (ou as cidades dela) e pulsa
+    const porN = new Map(m.paradas.map((p) => [String(p.n), p]));
+    const lugares = new Map(m.lugares.map((l) => [l.id, l]));
+    const pulsos = svgEl.querySelector('.at-pulsos') || svgEl.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
+    pulsos.setAttribute('class', 'at-pulsos');
+    pulsos.setAttribute('transform', 'translate(0 24)');
+    function destacar(n) {
+      const p = porN.get(String(n));
+      if (!p) return;
+      const ids = [].concat(p.lugares || p.lugar);
+      const ls = ids.map((id) => lugares.get(id)).filter(Boolean);
+      if (!ls.length) return;
+      const ux = ls.reduce((a, l) => a + l.x, 0) / ls.length, uy = ls.reduce((a, l) => a + l.y, 0) / ls.length + 24;
+      raiz.querySelectorAll('.atlas-parada.ativa').forEach((li) => li.classList.remove('ativa'));
+      const li = raiz.querySelector('#atlas-parada-' + n);
+      if (li) li.classList.add('ativa');
+      centrar(ux, uy, ls.length > 1 ? 1.6 : 2.2);
+      pulsos.innerHTML = ls.map((l) => '<circle class="at-pulso" cx="' + l.x + '" cy="' + l.y + '" r="9"/>').join('');
+      const cartao = raiz.querySelector('.atlas-quadro');
+      const r = cartao.getBoundingClientRect();
+      if (r.top < 60 || r.bottom > innerHeight - 100) cartao.scrollIntoView({ block: 'start', behavior: reduzido() ? 'auto' : 'smooth' });
+    }
+    raiz.querySelectorAll('[data-ir-parada]').forEach((b) => { b.onclick = () => destacar(b.dataset.irParada); });
+    // do mapa para a lista: tocar num número leva à parada e a acende
+    svgEl.addEventListener('click', (e) => {
+      const g = e.target.closest('[data-parada]');
+      if (!g || moveu) return;
+      const li = raiz.querySelector('#atlas-parada-' + g.dataset.parada);
+      if (!li) return;
+      raiz.querySelectorAll('.atlas-parada.ativa').forEach((x) => x.classList.remove('ativa'));
+      li.classList.add('ativa');
+      li.scrollIntoView({ block: 'center', behavior: reduzido() ? 'auto' : 'smooth' });
+    });
+    // ao girar o celular, o palco muda de tamanho; quando a tela sai, o ouvinte sai junto
+    const aoRedimensionar = () => {
+      if (!palco.isConnected) { removeEventListener('resize', aoRedimensionar); return; }
+      aplicar(false);
+    };
+    addEventListener('resize', aoRedimensionar, { passive: true });
+    aplicar(false);
+  }
+
+  function tela(raiz, item, m) {
+    if (!item) lista(raiz);
+    else mapa(raiz, item, m);
+  }
+
+  CC.atlas = Object.assign(CC.atlas || {}, { svg, tela });
 })(window.CC);
