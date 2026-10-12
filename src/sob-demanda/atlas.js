@@ -129,10 +129,12 @@
   // ---------- a lista (#/atlas) ----------
   function lista(raiz) {
     const { A, buscar, pronto } = CC.atlasDados;
+    // a caixa toma a proporção do próprio mapa: nada sobra embaixo nem fica cortado
+    const proporcao = (m) => m ? ' style="aspect-ratio:' + m.largura + ' / ' + m.altura + '"' : '';
     const cartao = (it) => {
       const m = pronto(it.arquivo);
       return '<a class="item-atlas" href="#/atlas/' + it.slug + '" data-item-atlas="' + it.slug + '">'
-        + '<span class="item-atlas-mapa" aria-hidden="true">' + (m ? svg(m, { faixa: false, mini: true }) : '') + '</span>'
+        + '<span class="item-atlas-mapa" aria-hidden="true"' + proporcao(m) + '>' + (m ? svg(m, { faixa: false, mini: true }) : '') + '</span>'
         + '<span class="item-atlas-textos"><b>' + esc(it.titulo) + '</b><span class="item-atlas-linha">' + esc(it.linha) + '</span>'
         + '<span class="item-atlas-pe"><mark>' + nb(esc(it.ref)) + '</mark>' + CC.ico('avancar') + '</span></span></a>';
     };
@@ -149,7 +151,9 @@
       if (pronto(it.arquivo)) continue;
       buscar(it.arquivo).then((m) => {
         const alvo = raiz.querySelector('[data-item-atlas="' + it.slug + '"] .item-atlas-mapa');
-        if (alvo) alvo.innerHTML = svg(m, { faixa: false, mini: true });
+        if (!alvo) return;
+        alvo.style.aspectRatio = m.largura + ' / ' + m.altura;
+        alvo.innerHTML = svg(m, { faixa: false, mini: true });
       }).catch(() => null);
     }
   }

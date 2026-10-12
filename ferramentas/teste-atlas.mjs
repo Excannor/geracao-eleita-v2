@@ -133,6 +133,7 @@ ok(await esperar('location.hash === "#/atlas" && document.querySelectorAll(".ite
 ok(await texto('.atlas-nome') === 'Mapas bíblicos' && await av('/Permanent Marker/.test(getComputedStyle(document.querySelector(".atlas-nome")).fontFamily)'), 'a lista se chama "Mapas bíblicos", no pincel');
 ok(await av('JSON.stringify([...document.querySelectorAll(".grupo-atlas h2")].map((h) => h.textContent))') === JSON.stringify(A.grupos.map((g) => g.nome)), 'a lista agrupa os mapas (' + A.grupos.map((g) => g.nome).join(', ') + ')');
 ok(await esperar('[...document.querySelectorAll(".item-atlas-mapa")].every((d) => d.querySelector("svg image"))'), 'cada mapa da lista mostra o próprio desenho');
+ok(await av('[...document.querySelectorAll(".item-atlas-mapa")].every((d) => Math.abs(d.querySelector("svg").getBoundingClientRect().height - d.getBoundingClientRect().height) < 2)'), 'cada miniatura cabe inteira na caixa, sem corte e sem sobra');
 ok(await texto('.atlas-em-breve') === 'Mais mapas em breve.', 'avisa, sem cartão falso, que há mais mapas a caminho');
 ok(await abaAcesa() === abaExplorar && !!abaExplorar, 'na lista, a barra continua acesa onde fica o Explorar (' + abaExplorar.trim() + ')');
 ok(await av('document.querySelector(".folha-atlas [data-voltar]").dataset.rotuloVoltar === "Explorar"'), 'o voltar da lista leva ao Explorar');
