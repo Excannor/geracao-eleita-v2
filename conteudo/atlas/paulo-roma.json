@@ -22,7 +22,11 @@
       "nome": "Cesareia",
       "lon": 34.89,
       "lat": 32.5,
-      "lado": "o"
+      "lado": "o",
+      "marca": [
+        7,
+        -4
+      ]
     },
     "jerusalem": {
       "nome": "Jerusalém",
@@ -35,10 +39,10 @@
       "nome": "Sidom",
       "lon": 35.37,
       "lat": 33.56,
-      "lado": "l",
+      "lado": "o",
       "marca": [
-        -9,
-        0
+        7,
+        -6
       ]
     },
     "mirra": {
@@ -55,23 +59,23 @@
       "nome": "Cnido",
       "lon": 27.37,
       "lat": 36.69,
-      "lado": "n",
+      "lado": "no",
       "marca": [
-        -9,
-        2
+        6,
+        -9
       ]
     },
     "salmona": {
       "nome": "Salmona",
       "lon": 26.31,
       "lat": 35.31,
-      "lado": "l"
+      "lado": "se"
     },
     "bons-portos": {
       "nome": "Bons Portos",
       "lon": 24.83,
       "lat": 34.93,
-      "lado": "s"
+      "lado": "so"
     },
     "tempestade": {
       "nome": "",
@@ -105,7 +109,7 @@
       "nome": "Potéoli",
       "lon": 14.12,
       "lat": 40.82,
-      "lado": "o",
+      "lado": "so",
       "marca": [
         9,
         2
@@ -117,8 +121,8 @@
       "lat": 41.45,
       "lado": "l",
       "marca": [
-        6,
-        -9
+        2,
+        -12
       ]
     },
     "roma": {
@@ -140,12 +144,12 @@
     },
     {
       "nome": "SICÍLIA",
-      "lon": 13.9,
-      "lat": 37.65
+      "lon": 12.9,
+      "lat": 37.55
     },
     {
       "nome": "MACEDÔNIA",
-      "lon": 22.3,
+      "lon": 22.7,
       "lat": 41.4
     },
     {
@@ -156,7 +160,7 @@
     {
       "nome": "CRETA",
       "lon": 24.9,
-      "lat": 35.55
+      "lat": 35.85
     },
     {
       "nome": "ÁSIA",
@@ -185,18 +189,13 @@
     },
     {
       "nome": "SÍRIA",
-      "lon": 36.9,
-      "lat": 35.3
+      "lon": 36.35,
+      "lat": 35.55
     },
     {
       "nome": "FENÍCIA",
-      "lon": 36.75,
-      "lat": 34.25
-    },
-    {
-      "nome": "JUDEIA",
-      "lon": 36.55,
-      "lat": 31.15
+      "lon": 33.6,
+      "lat": 34.35
     },
     {
       "nome": "EGITO",
@@ -212,14 +211,17 @@
   "aguas": [
     {
       "nome": "MAR MEDITERRÂNEO",
-      "lon": 22.0,
-      "lat": 33.85
+      "lon": 22.4,
+      "lat": 33.2
     },
     {
       "nome": "MAR ADRIÁTICO",
-      "lon": 17.3,
-      "lat": 42.25,
-      "giro": -35
+      "lon": 19.45,
+      "lat": 41.35,
+      "giro": -58,
+      "linhas": [
+        "ADRIÁTICO"
+      ]
     }
   ],
   "caminho": [

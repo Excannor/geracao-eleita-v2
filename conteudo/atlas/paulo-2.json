@@ -23,7 +23,8 @@
       "marca": [
         -8,
         -4
-      ]
+      ],
+      "dx": -10
     },
     "tarso": {
       "nome": "Tarso",
@@ -41,8 +42,8 @@
       "lat": 37.348,
       "lado": "s",
       "marca": [
-        0,
-        -8
+        8,
+        -6
       ]
     },
     "listra": {
@@ -51,18 +52,19 @@
       "lat": 37.578,
       "lado": "so",
       "marca": [
-        -8,
-        0
-      ]
+        -9,
+        -3
+      ],
+      "dy": 2
     },
     "iconio": {
       "nome": "Icônio",
       "lon": 32.493,
       "lat": 37.871,
-      "lado": "l",
+      "lado": "ne",
       "marca": [
-        -8,
-        -4
+        -9,
+        -6
       ]
     },
     "antioquia-pisidia": {
@@ -110,21 +112,20 @@
       "nome": "Filipos",
       "lon": 24.287,
       "lat": 41.012,
-      "lado": "n",
+      "lado": "no",
       "marca": [
         11,
         -3
-      ],
-      "dx": -6
+      ]
     },
     "tessalonica": {
       "nome": "Tessalônica",
       "lon": 22.94,
       "lat": 40.64,
-      "lado": "n",
+      "lado": "no",
       "marca": [
-        2,
-        9
+        5,
+        10
       ]
     },
     "bereia": {
@@ -151,7 +152,7 @@
       "nome": "Corinto",
       "lon": 22.88,
       "lat": 37.906,
-      "lado": "o",
+      "lado": "no",
       "marca": [
         0,
         -9
@@ -183,9 +184,10 @@
       "lat": 32.5,
       "lado": "o",
       "marca": [
-        -8,
-        -6
-      ]
+        -9,
+        -8
+      ],
+      "dy": 5
     },
     "jerusalem": {
       "nome": "Jerusalém",
@@ -223,8 +225,8 @@
     },
     {
       "nome": "ÁSIA",
-      "lon": 28.3,
-      "lat": 38.55
+      "lon": 28.0,
+      "lat": 38.4
     },
     {
       "nome": "FRÍGIA",
@@ -238,13 +240,13 @@
     },
     {
       "nome": "LICAÔNIA",
-      "lon": 33.6,
-      "lat": 38.3
+      "lon": 33.2,
+      "lat": 38.62
     },
     {
       "nome": "CILÍCIA",
-      "lon": 35.25,
-      "lat": 37.62
+      "lon": 35.75,
+      "lat": 37.95
     },
     {
       "nome": "CAPADÓCIA",
@@ -253,8 +255,8 @@
     },
     {
       "nome": "SÍRIA",
-      "lon": 36.55,
-      "lat": 35.0
+      "lon": 36.2,
+      "lat": 34.95
     },
     {
       "nome": "CHIPRE",

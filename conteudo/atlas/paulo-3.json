@@ -19,7 +19,7 @@
       "nome": "Antioquia",
       "lon": 36.161,
       "lat": 36.202,
-      "lado": "s",
+      "lado": "so",
       "marca": [
         -8,
         -4
@@ -46,14 +46,13 @@
       "nome": "Éfeso",
       "lon": 27.34,
       "lat": 37.94,
-      "lado": "l"
+      "lado": "ne"
     },
     "tessalonica": {
       "nome": "Tessalônica",
       "lon": 22.94,
       "lat": 40.64,
-      "lado": "n",
-      "dx": 8,
+      "lado": "no",
       "marca": [
         0,
         10
@@ -70,14 +69,13 @@
       "nome": "Corinto",
       "lon": 22.88,
       "lat": 37.906,
-      "lado": "o"
+      "lado": "so"
     },
     "filipos": {
       "nome": "Filipos",
       "lon": 24.287,
       "lat": 41.012,
-      "lado": "n",
-      "dx": -6,
+      "lado": "no",
       "marca": [
         10,
         -2
@@ -99,8 +97,8 @@
       "lat": 39.49,
       "lado": "ne",
       "marca": [
-        10,
-        5
+        12,
+        3
       ]
     },
     "mitilene": {
@@ -111,7 +109,8 @@
       "marca": [
         -9,
         2
-      ]
+      ],
+      "dy": 6
     },
     "quios": {
       "nome": "Quios",
@@ -143,7 +142,8 @@
       "lon": 27.29,
       "lat": 36.89,
       "lado": "o",
-      "contexto": true
+      "contexto": true,
+      "dy": 3
     },
     "rodes": {
       "nome": "Rodes",
@@ -166,7 +166,8 @@
       "marca": [
         9,
         -3
-      ]
+      ],
+      "dy": -3
     },
     "ptolemaida": {
       "nome": "Ptolemaida",
@@ -186,7 +187,8 @@
       "marca": [
         9,
         0
-      ]
+      ],
+      "dy": 2
     },
     "jerusalem": {
       "nome": "Jerusalém",
@@ -202,7 +204,7 @@
   "regioes": [
     {
       "nome": "MACEDÔNIA",
-      "lon": 21.8,
+      "lon": 21.4,
       "lat": 41.6
     },
     {
@@ -217,7 +219,7 @@
     },
     {
       "nome": "ÁSIA",
-      "lon": 28.5,
+      "lon": 29.1,
       "lat": 38.6
     },
     {
@@ -232,13 +234,13 @@
     },
     {
       "nome": "CILÍCIA",
-      "lon": 35.25,
-      "lat": 37.6
+      "lon": 34.6,
+      "lat": 37.95
     },
     {
       "nome": "SÍRIA",
-      "lon": 36.6,
-      "lat": 35.0
+      "lon": 36.0,
+      "lat": 35.3
     },
     {
       "nome": "CHIPRE",
@@ -249,11 +251,6 @@
       "nome": "FENÍCIA",
       "lon": 36.2,
       "lat": 33.75
-    },
-    {
-      "nome": "JUDEIA",
-      "lon": 36.35,
-      "lat": 32.15
     },
     {
       "nome": "CRETA",
@@ -274,8 +271,8 @@
     },
     {
       "nome": "MAR EGEU",
-      "lon": 24.4,
-      "lat": 38.45
+      "lon": 24.6,
+      "lat": 39.15
     }
   ],
   "caminho": [

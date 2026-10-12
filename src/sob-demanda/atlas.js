@@ -78,7 +78,7 @@
     }).join('') + '</g>');
     partes.push('<g class="at-numeros">' + m.lugares.filter((l) => l.n).map((l) => {
       const [mx, my] = l.marca || [-7, -7];
-      return '<g class="at-numero ' + l.tipoN + '" data-parada="' + l.n + '" style="--t:' + (tempo[l.id] || 0) + '" transform="translate(' + n(l.x + mx) + ' ' + n(l.y + my) + ')">'
+      return '<g class="at-numero ' + l.tipoN + '" data-parada="' + l.n + '" data-de="' + esc(l.id) + '" style="--t:' + (tempo[l.id] || 0) + '" transform="translate(' + n(l.x + mx) + ' ' + n(l.y + my) + ')">'
         + '<g class="at-numero-escala"><circle r="5.4"/><text y="2.3" text-anchor="middle">' + l.n + '</text></g></g>';
     }).join('') + '</g>');
     // legenda (ida e volta), escala e norte, num quadro claro no canto de baixo
@@ -91,7 +91,7 @@
         + '<text x="26" y="3">' + esc(l.nome) + '</text></g>').join('')
       + '<g transform="translate(8 ' + (lh - 9) + ')"><path class="at-escala-fundo" d="M0 0h' + e.comprimento + '"/><path class="at-escala-meio" d="M0 0h' + n(e.comprimento / 2) + '"/>'
       + '<text x="' + n(e.comprimento + 4) + '" y="2.6">' + e.km + ' km</text></g></g>');
-    partes.push('<g class="at-norte" transform="translate(' + n(W - 15) + ' 17)"><circle r="9"/><path class="at-norte-seta" d="M0 -6.5L3 3L0 1.2L-3 3Z"/><text y="-11.5" text-anchor="middle">N</text></g>');
+    partes.push('<g class="at-norte" transform="translate(' + n(W - 15) + ' 23)"><circle r="9"/><path class="at-norte-seta" d="M0 -6.5L3 3L0 1.2L-3 3Z"/><text y="-11.5" text-anchor="middle">N</text></g>');
     partes.push('</g>');
     if (comFaixa) {
       partes.push('<rect class="at-faixa" width="' + W + '" height="' + FAIXA + '"/>'

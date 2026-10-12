@@ -22,7 +22,11 @@
       "nome": "Ramessés",
       "lon": 31.83,
       "lat": 30.8,
-      "lado": "o"
+      "lado": "o",
+      "marca": [
+        0,
+        -10
+      ]
     },
     "sucote": {
       "nome": "Sucote",
@@ -66,7 +70,7 @@
       "nome": "Refidim",
       "lon": 33.65,
       "lat": 28.72,
-      "lado": "o"
+      "lado": "so"
     },
     "sinai": {
       "nome": "Monte Sinai",
@@ -76,7 +80,8 @@
       "linhas": [
         "Monte",
         "Sinai"
-      ]
+      ],
+      "dy": 2
     },
     "hazerote": {
       "nome": "Hazerote",
@@ -124,8 +129,8 @@
         "de Moabe"
       ],
       "marca": [
-        -9,
-        -4
+        -2,
+        -10
       ]
     },
     "jerico": {
@@ -149,12 +154,12 @@
     },
     {
       "nome": "DESERTO DE SUR",
-      "lon": 33.15,
-      "lat": 30.75
+      "lon": 32.95,
+      "lat": 30.95
     },
     {
       "nome": "DESERTO DE PARÃ",
-      "lon": 34.05,
+      "lon": 33.72,
       "lat": 29.75
     },
     {

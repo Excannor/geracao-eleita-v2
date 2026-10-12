@@ -25,15 +25,16 @@
       "lat": 31.84,
       "lado": "l",
       "marca": [
-        3,
-        -9
-      ]
+        2,
+        -10
+      ],
+      "dy": 3
     },
     "gilgal": {
       "nome": "Gilgal",
       "lon": 35.5,
       "lat": 31.9,
-      "lado": "n",
+      "lado": "ne",
       "marca": [
         -9,
         -4
@@ -47,7 +48,8 @@
       "marca": [
         -9,
         2
-      ]
+      ],
+      "dy": 2
     },
     "ai": {
       "nome": "Ai",
@@ -55,8 +57,8 @@
       "lat": 31.917,
       "lado": "n",
       "marca": [
-        -8,
-        -6
+        -11,
+        -2
       ]
     },
     "gibeom": {
@@ -73,7 +75,7 @@
       "nome": "Bete-Horom",
       "lon": 35.13,
       "lat": 31.885,
-      "lado": "n",
+      "lado": "no",
       "contexto": true
     },
     "azeca": {
@@ -107,7 +109,7 @@
       "nome": "Láquis",
       "lon": 34.849,
       "lat": 31.565,
-      "lado": "s",
+      "lado": "se",
       "marca": [
         -9,
         2
