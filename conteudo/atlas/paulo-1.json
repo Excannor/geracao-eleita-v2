@@ -1,0 +1,102 @@
+{
+  "titulo": "Primeira viagem missionária",
+  "grupo": "paulo",
+  "sub": "Paulo e Barnabé",
+  "ref": "At 13.1–14.28",
+  "quando": "por volta de 46 a 48 d.C.",
+  "texto": "A igreja de Antioquia envia Barnabé e Saulo. Eles atravessam Chipre, sobem as montanhas até o planalto e voltam pelas mesmas cidades para firmar os discípulos.",
+  "vista": { "oeste": 29.7, "leste": 36.75, "sul": 34.3, "norte": 39.05 },
+  "miniatura": { "oeste": 30.2, "leste": 36.4, "sul": 34.5, "norte": 38.6 },
+  "lugares": {
+    "antioquia": { "nome": "Antioquia", "lon": 36.161, "lat": 36.202, "lado": "n", "dx": -10, "marca": [7, -10] },
+    "seleucia": { "nome": "Selêucia", "lon": 35.93, "lat": 36.123, "lado": "no", "marca": [-8, 9] },
+    "salamina": { "nome": "Salamina", "lon": 33.9, "lat": 35.183, "lado": "l" },
+    "pafos": { "nome": "Pafos", "lon": 32.41, "lat": 34.757, "lado": "o" },
+    "perge": { "nome": "Perge", "lon": 30.853, "lat": 36.961, "lado": "l", "marca": [9, -7] },
+    "atalia": { "nome": "Atália", "lon": 30.705, "lat": 36.886, "lado": "o", "marca": [-9, 8] },
+    "antioquia-pisidia": { "nome": "Antioquia da Pisídia", "lon": 31.189, "lat": 38.306, "lado": "n", "linhas": ["Antioquia", "da Pisídia"] },
+    "iconio": { "nome": "Icônio", "lon": 32.493, "lat": 37.871, "lado": "l" },
+    "listra": { "nome": "Listra", "lon": 32.377, "lat": 37.578, "lado": "o" },
+    "derbe": { "nome": "Derbe", "lon": 33.36, "lat": 37.348, "lado": "l" },
+    "tarso": { "nome": "Tarso", "lon": 34.895, "lat": 36.917, "lado": "n", "contexto": true }
+  },
+  "regioes": [
+    { "nome": "GALÁCIA", "lon": 32.25, "lat": 38.72 },
+    { "nome": "PISÍDIA", "lon": 30.3, "lat": 37.74 },
+    { "nome": "LICAÔNIA", "lon": 33.6, "lat": 37.95 },
+    { "nome": "PANFÍLIA", "lon": 31.95, "lat": 36.83 },
+    { "nome": "CILÍCIA", "lon": 35.15, "lat": 37.35 },
+    { "nome": "SÍRIA", "lon": 36.45, "lat": 35.1 },
+    { "nome": "CHIPRE", "lon": 33.2, "lat": 35.12 }
+  ],
+  "serras": [
+    { "nome": "MONTES TAURO", "lon": 33.2, "lat": 37.06, "giro": 4 }
+  ],
+  "aguas": [
+    { "nome": "Mar Mediterrâneo", "lon": 30.8, "lat": 35.32 },
+    { "nome": "Orontes", "lon": 36.47, "lat": 35.83, "giro": 84, "rio": true }
+  ],
+  "rios": [
+    { "nome": "Orontes", "linha": [[36.36, 35.62], [36.33, 35.85], [36.37, 36.08], [36.36, 36.24], [36.25, 36.25], [36.16, 36.2], [36.05, 36.12], [35.965, 36.05]] }
+  ],
+  "relevo": [
+    { "linha": [[30.15, 36.3], [30.3, 36.62], [30.36, 36.95], [30.46, 37.25]], "largura": 22 },
+    { "linha": [[30.5, 37.38], [30.82, 37.55], [31.15, 37.47]], "largura": 18 },
+    { "linha": [[31.2, 37.36], [31.7, 37.17], [32.2, 37.02]], "largura": 26 },
+    { "linha": [[32.15, 36.72], [32.6, 36.6], [33.05, 36.55]], "largura": 14 },
+    { "linha": [[32.55, 37.03], [33.0, 36.95], [33.5, 37.0]], "largura": 20 },
+    { "linha": [[33.85, 37.2], [34.35, 37.38], [34.8, 37.45]], "largura": 24 },
+    { "linha": [[35.0, 37.55], [35.25, 37.82], [35.5, 38.05]], "largura": 18 },
+    { "linha": [[30.85, 38.62], [31.12, 38.42], [31.45, 38.18], [31.75, 38.0]], "largura": 16 },
+    { "linha": [[33.06, 37.39], [33.2, 37.43]], "largura": 9 },
+    { "linha": [[34.12, 38.12], [34.22, 38.14]], "largura": 9 },
+    { "linha": [[35.4, 38.52], [35.5, 38.54]], "largura": 11 },
+    { "linha": [[36.08, 36.38], [36.22, 36.7], [36.42, 37.05], [36.55, 37.3]], "largura": 16 },
+    { "linha": [[35.92, 35.9], [35.98, 35.95]], "largura": 7 },
+    { "linha": [[32.62, 34.95], [32.9, 34.93], [33.18, 34.9]], "largura": 20 },
+    { "linha": [[33.0, 35.33], [33.5, 35.3], [34.0, 35.4]], "largura": 6 },
+    { "linha": [[35.95, 34.3], [36.15, 34.55], [36.3, 34.85]], "largura": 20 }
+  ],
+  "caminho": [
+    { "tipo": "ida", "pontos": ["antioquia", [36.05, 36.17], "seleucia"] },
+    { "tipo": "ida", "mar": true, "pontos": ["seleucia", [35.2, 35.75], [34.4, 35.35], "salamina"], "chega": "salamina" },
+    { "tipo": "ida", "pontos": ["salamina", [33.62, 34.95], [33.15, 34.72], [32.8, 34.68], "pafos"], "chega": "pafos" },
+    { "tipo": "ida", "mar": true, "pontos": ["pafos", [31.95, 35.25], [31.3, 36.15], [30.95, 36.8], "perge"], "chega": "perge" },
+    { "tipo": "ida", "pontos": ["perge", [30.8, 37.3], [30.92, 37.7], [31.05, 38.05], "antioquia-pisidia"], "chega": "antioquia-pisidia" },
+    { "tipo": "ida", "pontos": ["antioquia-pisidia", [31.65, 38.12], [32.1, 37.97], "iconio"], "chega": "iconio" },
+    { "tipo": "ida", "pontos": ["iconio", [32.47, 37.72], "listra"], "chega": "listra" },
+    { "tipo": "ida", "pontos": ["listra", [32.85, 37.42], "derbe"], "chega": "derbe" },
+    { "tipo": "volta", "desvio": -5, "pontos": ["derbe", [32.85, 37.42], "listra", [32.47, 37.72], "iconio", [32.1, 37.97], [31.65, 38.12], "antioquia-pisidia"] },
+    { "tipo": "volta", "desvio": 5, "pontos": ["antioquia-pisidia", [31.05, 38.05], [30.92, 37.7], [30.8, 37.3], "perge"] },
+    { "tipo": "volta", "pontos": ["perge", "atalia"], "chega": "atalia" },
+    { "tipo": "volta", "mar": true, "pontos": ["atalia", [31.25, 36.55], [32.3, 36.0], [33.3, 35.82], [34.6, 35.95], [35.55, 36.0], "seleucia"] },
+    { "tipo": "volta", "desvio": 4, "pontos": ["seleucia", [36.05, 36.17], "antioquia"] }
+  ],
+  "paradas": [
+    { "n": 1, "lugar": "antioquia", "nome": "Antioquia da Síria", "texto": "Depois de jejuar e orar, a igreja impõe as mãos sobre Barnabé e Saulo e os envia.", "ref": "At 13.1-3" },
+    { "n": 2, "lugar": "seleucia", "nome": "Selêucia", "texto": "Eles descem até o porto e embarcam para Chipre.", "ref": "At 13.4" },
+    { "n": 3, "lugar": "salamina", "nome": "Salamina", "texto": "Pregam nas sinagogas, com João Marcos de ajudante.", "ref": "At 13.5" },
+    { "n": 4, "lugar": "pafos", "nome": "Pafos", "texto": "O feiticeiro Elimas fica cego, e o governador Sérgio Paulo crê.", "ref": "At 13.6-12" },
+    { "n": 5, "lugar": "perge", "nome": "Perge", "texto": "João Marcos deixa o grupo e volta para Jerusalém.", "ref": "At 13.13" },
+    { "n": 6, "lugar": "antioquia-pisidia", "nome": "Antioquia da Pisídia", "texto": "Paulo prega na sinagoga. Muitos gentios creem, e os líderes expulsam os dois da cidade.", "ref": "At 13.14-50" },
+    { "n": 7, "lugar": "iconio", "nome": "Icônio", "texto": "Muita gente crê. Quando planejam apedrejá-los, eles fogem.", "ref": "At 13.51–14.5" },
+    { "n": 8, "lugar": "listra", "nome": "Listra", "texto": "Um homem que nunca tinha andado fica de pé. Depois, Paulo é apedrejado e se levanta.", "ref": "At 14.6-20" },
+    { "n": 9, "lugar": "derbe", "nome": "Derbe", "texto": "Eles anunciam a boa-nova e fazem muitos discípulos.", "ref": "At 14.20-21" },
+    { "n": 10, "tipo": "volta", "lugar": ["listra", "iconio", "antioquia-pisidia"], "nome": "Listra, Icônio e Antioquia", "texto": "Voltam pelas mesmas cidades, animam os discípulos e nomeiam presbíteros em cada igreja.", "ref": "At 14.21-23" },
+    { "n": 11, "tipo": "volta", "lugar": "perge", "nome": "Perge", "texto": "Atravessam a Pisídia e pregam outra vez em Perge.", "ref": "At 14.24-25" },
+    { "n": 12, "tipo": "volta", "lugar": "atalia", "nome": "Atália", "texto": "No porto de Atália, embarcam de volta.", "ref": "At 14.25-26" },
+    { "n": 13, "tipo": "volta", "lugar": "antioquia", "nome": "Antioquia da Síria", "texto": "Reúnem a igreja e contam como Deus abriu a porta da fé aos gentios.", "ref": "At 14.26-28" }
+  ],
+  "legenda": [
+    { "tipo": "ida", "nome": "Ida" },
+    { "tipo": "volta", "nome": "Volta" }
+  ],
+  "leitura": [
+    { "rotulo": "Atos 13", "livro": "Atos", "cap": 13 },
+    { "rotulo": "Atos 14", "livro": "Atos", "cap": 14 }
+  ],
+  "notas": [
+    "Derbe: o lugar mais aceito é o morro de Kerti Hüyük, perto de Karaman; a cidade antiga ainda não foi escavada.",
+    "O caminho por terra segue as estradas romanas da época de modo aproximado; Atos não descreve as estradas."
+  ]
+}
