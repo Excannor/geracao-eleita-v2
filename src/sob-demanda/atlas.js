@@ -81,7 +81,7 @@
     const leg = m.legenda.length ? m.legenda : [{ tipo: 'ida', nome: 'Ida' }, { tipo: 'volta', nome: 'Volta' }];
     const lw = Math.max(76, e.comprimento + 40);
     const lh = 14 + leg.length * 11 + 16;
-    partes.push('<g class="at-legenda" transform="translate(8 ' + n(H - lh - 8) + ')"><rect width="' + n(lw) + '" height="' + lh + '" rx="3"/>'
+    partes.push('<g class="at-legenda" transform="translate(' + (/direita/.test(m.legendaLado || '') ? n(W - lw - 8) : 8) + ' ' + (/alto/.test(m.legendaLado || '') ? 8 : n(H - lh - 8)) + ')"><rect width="' + n(lw) + '" height="' + lh + '" rx="3"/>'
       + leg.map((l, i) => '<g transform="translate(8 ' + (11 + i * 11) + ')"><path class="at-rota-halo ' + l.tipo + '" d="M0 0h20"/><path class="at-rota ' + l.tipo + '" d="M0 0h20"/>'
         + '<text x="26" y="3">' + esc(l.nome) + '</text></g>').join('')
       + '<g transform="translate(8 ' + (lh - 9) + ')"><path class="at-escala-fundo" d="M0 0h' + e.comprimento + '"/><path class="at-escala-meio" d="M0 0h' + n(e.comprimento / 2) + '"/>'

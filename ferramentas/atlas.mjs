@@ -140,7 +140,7 @@ export function montarMapa(slug) {
   const saida = {
     slug, titulo: m.titulo, tituloMapa: m.tituloMapa || '', linha: m.linha || '', grupo: m.grupo, sub: m.sub, ref: m.ref, quando: m.quando || '', texto: m.texto || '',
     tipo: m.tipo || 'regiao', largura: prj.largura, altura: prj.altura, escala: escala(prj),
-    legenda: m.legenda || [], leitura: m.leitura || [], notas: m.notas || [], ...(m.trechos ? { trechos: m.trechos } : {}),
+    legenda: m.legenda || [], leitura: m.leitura || [], notas: m.notas || [], ...(m.trechos ? { trechos: m.trechos } : {}), ...(m.legendaLado ? { legendaLado: m.legendaLado } : {}),
   };
   if (saida.tipo === 'regiao') {
     Object.assign(saida, base(m.vista, prj, 0.3));

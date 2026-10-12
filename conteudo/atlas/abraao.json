@@ -1,0 +1,328 @@
+{
+  "titulo": "Abraão: de Ur a Hebrom",
+  "tituloMapa": "Abraão: de Ur a Hebrom",
+  "grupo": "patriarcas",
+  "sub": "Abrão, Sarai e Ló",
+  "ref": "Gn 11.31–13.18",
+  "linha": "De Ur dos caldeus a Canaã, passando por Harã",
+  "quando": "por volta de 2000 a.C.",
+  "texto": "Abrão sai com a família de Ur dos caldeus e para em Harã. Ali Deus o chama para uma terra que ainda não conhece, e ele vai, levantando altares pelo caminho.",
+  "vista": {
+    "oeste": 31.6,
+    "leste": 47.6,
+    "sul": 29.3,
+    "norte": 38.0
+  },
+  "relevoExagero": 6,
+  "trechos": {
+    "ida": "O caminho"
+  },
+  "lugares": {
+    "ur": {
+      "nome": "Ur",
+      "lon": 46.1,
+      "lat": 30.96,
+      "lado": "s"
+    },
+    "babilonia": {
+      "nome": "Babilônia",
+      "lon": 44.42,
+      "lat": 32.54,
+      "lado": "l",
+      "contexto": true
+    },
+    "mari": {
+      "nome": "Mari",
+      "lon": 40.89,
+      "lat": 34.55,
+      "lado": "s",
+      "contexto": true
+    },
+    "hara": {
+      "nome": "Harã",
+      "lon": 39.03,
+      "lat": 36.86,
+      "lado": "n",
+      "marca": [
+        -9,
+        -3
+      ]
+    },
+    "hamate": {
+      "nome": "Hamate",
+      "lon": 36.75,
+      "lat": 35.13,
+      "lado": "l",
+      "contexto": true
+    },
+    "cades": {
+      "nome": "Cades",
+      "lon": 36.51,
+      "lat": 34.56,
+      "lado": "l",
+      "contexto": true
+    },
+    "damasco": {
+      "nome": "Damasco",
+      "lon": 36.29,
+      "lat": 33.51,
+      "lado": "l",
+      "contexto": true
+    },
+    "siquem": {
+      "nome": "Siquém",
+      "lon": 35.28,
+      "lat": 32.21,
+      "lado": "o",
+      "marca": [
+        9,
+        -3
+      ]
+    },
+    "betel": {
+      "nome": "Betel",
+      "lon": 35.22,
+      "lat": 31.93,
+      "lado": "o",
+      "marca": [
+        9,
+        -1
+      ]
+    },
+    "hebrom": {
+      "nome": "Hebrom",
+      "lon": 35.1,
+      "lat": 31.53,
+      "lado": "o",
+      "marca": [
+        9,
+        2
+      ]
+    },
+    "neguebe": {
+      "nome": "",
+      "lon": 34.8,
+      "lat": 30.9,
+      "oculto": true,
+      "marca": [
+        0,
+        0
+      ]
+    }
+  },
+  "regioes": [
+    {
+      "nome": "CANAÃ",
+      "lon": 34.35,
+      "lat": 32.35
+    },
+    {
+      "nome": "ARÃ",
+      "lon": 38.5,
+      "lat": 34.0
+    },
+    {
+      "nome": "PADÃ-ARÃ",
+      "lon": 40.8,
+      "lat": 37.35
+    },
+    {
+      "nome": "ASSÍRIA",
+      "lon": 43.4,
+      "lat": 36.5
+    },
+    {
+      "nome": "SINEAR",
+      "lon": 43.6,
+      "lat": 31.95
+    },
+    {
+      "nome": "NEGUEBE",
+      "lon": 34.3,
+      "lat": 30.55
+    },
+    {
+      "nome": "DESERTO DA ARÁBIA",
+      "lon": 41.0,
+      "lat": 31.4
+    }
+  ],
+  "aguas": [
+    {
+      "nome": "MAR MEDITERRÂNEO",
+      "lon": 33.3,
+      "lat": 33.4,
+      "linhas": [
+        "MAR",
+        "MEDITERRÂNEO"
+      ]
+    },
+    {
+      "nome": "Eufrates",
+      "lon": 38.75,
+      "lat": 36.2,
+      "giro": -62,
+      "rio": true
+    },
+    {
+      "nome": "Tigre",
+      "lon": 44.3,
+      "lat": 34.6,
+      "giro": -52,
+      "rio": true
+    }
+  ],
+  "caminho": [
+    {
+      "tipo": "ida",
+      "pontos": [
+        "ur",
+        [
+          45.2,
+          31.55
+        ],
+        [
+          44.6,
+          32.3
+        ],
+        [
+          43.6,
+          33.3
+        ],
+        [
+          42.3,
+          34.3
+        ],
+        "mari",
+        [
+          40.2,
+          35.25
+        ],
+        [
+          39.2,
+          36.0
+        ],
+        "hara"
+      ],
+      "chega": "hara"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "hara",
+        [
+          38.1,
+          36.55
+        ],
+        [
+          37.2,
+          36.1
+        ],
+        "hamate",
+        "cades",
+        "damasco",
+        [
+          35.7,
+          32.85
+        ],
+        "siquem"
+      ],
+      "chega": "siquem"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "siquem",
+        "betel"
+      ],
+      "chega": "betel"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "betel",
+        [
+          35.05,
+          31.5
+        ],
+        "neguebe"
+      ],
+      "chega": "neguebe"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "neguebe",
+        [
+          35.25,
+          31.2
+        ],
+        "hebrom"
+      ],
+      "chega": "hebrom"
+    }
+  ],
+  "paradas": [
+    {
+      "n": 1,
+      "lugar": "ur",
+      "nome": "Ur dos caldeus",
+      "texto": "Terá sai de Ur com Abrão, Sarai e Ló, a caminho de Canaã.",
+      "ref": "Gn 11.31"
+    },
+    {
+      "n": 2,
+      "lugar": "hara",
+      "nome": "Harã",
+      "texto": "A família para em Harã. Ali Deus chama Abrão, que parte aos 75 anos.",
+      "ref": "Gn 11.31–12.5"
+    },
+    {
+      "n": 3,
+      "lugar": "siquem",
+      "nome": "Siquém",
+      "texto": "Junto ao carvalho de Moré, Deus promete a terra, e Abrão levanta um altar.",
+      "ref": "Gn 12.6-7"
+    },
+    {
+      "n": 4,
+      "lugar": "betel",
+      "nome": "Betel e Ai",
+      "texto": "Abrão acampa entre Betel e Ai, levanta outro altar e ora ao Senhor.",
+      "ref": "Gn 12.8"
+    },
+    {
+      "n": 5,
+      "lugar": "neguebe",
+      "nome": "Neguebe",
+      "texto": "Ele segue para o sul. Numa fome, desce ao Egito e depois volta até Betel.",
+      "ref": "Gn 12.9–13.4"
+    },
+    {
+      "n": 6,
+      "lugar": "hebrom",
+      "nome": "Hebrom",
+      "texto": "Abrão acampa junto aos carvalhos de Manre, perto de Hebrom, e levanta um altar.",
+      "ref": "Gn 13.18"
+    }
+  ],
+  "legenda": [
+    {
+      "tipo": "ida",
+      "nome": "Caminho de Abrão"
+    }
+  ],
+  "leitura": [
+    {
+      "rotulo": "Gênesis 11",
+      "livro": "Gênesis",
+      "cap": 11
+    },
+    {
+      "rotulo": "Gênesis 13",
+      "livro": "Gênesis",
+      "cap": 13
+    }
+  ],
+  "legendaLado": "alto-esquerda"
+}

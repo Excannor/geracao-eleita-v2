@@ -1,6 +1,38 @@
 {
   "grupos": [
     {
+      "id": "patriarcas",
+      "nome": "Patriarcas e Êxodo",
+      "mapas": [
+        "abraao",
+        "exodo"
+      ]
+    },
+    {
+      "id": "terra",
+      "nome": "Terra Prometida",
+      "mapas": [
+        "invasao",
+        "tribos"
+      ]
+    },
+    {
+      "id": "jerusalem",
+      "nome": "Jerusalém",
+      "mapas": [
+        "jerusalem-davi",
+        "jerusalem-ezequias",
+        "jerusalem-nt"
+      ]
+    },
+    {
+      "id": "imperios",
+      "nome": "Impérios",
+      "mapas": [
+        "mundo-antigo"
+      ]
+    },
+    {
       "id": "paulo",
       "nome": "Viagens de Paulo",
       "mapas": [
@@ -12,6 +44,7 @@
     }
   ],
   "publicados": [
+    "abraao",
     "paulo-1",
     "paulo-2",
     "paulo-3",
