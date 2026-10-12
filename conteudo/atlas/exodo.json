@@ -1,0 +1,441 @@
+{
+  "titulo": "O Êxodo: do Egito a Canaã",
+  "tituloMapa": "O Êxodo: do Egito a Canaã",
+  "grupo": "patriarcas",
+  "sub": "Moisés e o povo de Israel",
+  "ref": "Êx 12.37 a Nm 33.49",
+  "linha": "Do Egito ao monte Sinai e às campinas de Moabe",
+  "quando": "por volta de 1450 a.C. (ou 1250 a.C., conforme a data adotada)",
+  "texto": "Deus tira Israel do Egito, abre o mar e conduz o povo pelo deserto até o monte Sinai. Depois de quarenta anos, eles acampam diante de Canaã, do outro lado do Jordão.",
+  "vista": {
+    "oeste": 31.0,
+    "leste": 36.75,
+    "sul": 27.55,
+    "norte": 32.6
+  },
+  "relevoExagero": 5,
+  "trechos": {
+    "ida": "O caminho"
+  },
+  "lugares": {
+    "ramesses": {
+      "nome": "Ramessés",
+      "lon": 31.83,
+      "lat": 30.8,
+      "lado": "o"
+    },
+    "sucote": {
+      "nome": "Sucote",
+      "lon": 32.1,
+      "lat": 30.55,
+      "lado": "l"
+    },
+    "migdol": {
+      "nome": "Migdol",
+      "lon": 32.45,
+      "lat": 30.0,
+      "lado": "o",
+      "marca": [
+        0,
+        -9
+      ]
+    },
+    "mara": {
+      "nome": "Mara",
+      "lon": 32.85,
+      "lat": 29.62,
+      "lado": "l"
+    },
+    "elim": {
+      "nome": "Elim",
+      "lon": 33.05,
+      "lat": 29.27,
+      "lado": "l"
+    },
+    "sim": {
+      "nome": "",
+      "lon": 33.32,
+      "lat": 28.95,
+      "oculto": true,
+      "marca": [
+        0,
+        0
+      ]
+    },
+    "refidim": {
+      "nome": "Refidim",
+      "lon": 33.65,
+      "lat": 28.72,
+      "lado": "o"
+    },
+    "sinai": {
+      "nome": "Monte Sinai",
+      "lon": 33.975,
+      "lat": 28.54,
+      "lado": "s",
+      "linhas": [
+        "Monte",
+        "Sinai"
+      ]
+    },
+    "hazerote": {
+      "nome": "Hazerote",
+      "lon": 34.42,
+      "lat": 28.88,
+      "lado": "l",
+      "contexto": true
+    },
+    "cades": {
+      "nome": "Cades-Barneia",
+      "lon": 34.42,
+      "lat": 30.65,
+      "lado": "o",
+      "marca": [
+        0,
+        -9
+      ]
+    },
+    "jotbata": {
+      "nome": "Jotbatá",
+      "lon": 35.06,
+      "lat": 29.89,
+      "lado": "l",
+      "contexto": true
+    },
+    "eziom": {
+      "nome": "Eziom-Geber",
+      "lon": 34.98,
+      "lat": 29.53,
+      "lado": "l"
+    },
+    "punom": {
+      "nome": "Punom",
+      "lon": 35.43,
+      "lat": 30.62,
+      "lado": "l"
+    },
+    "moabe": {
+      "nome": "Campinas de Moabe",
+      "lon": 35.62,
+      "lat": 31.83,
+      "lado": "l",
+      "linhas": [
+        "Campinas",
+        "de Moabe"
+      ],
+      "marca": [
+        -9,
+        -4
+      ]
+    },
+    "jerico": {
+      "nome": "Jericó",
+      "lon": 35.44,
+      "lat": 31.87,
+      "lado": "o",
+      "contexto": true
+    }
+  },
+  "regioes": [
+    {
+      "nome": "EGITO",
+      "lon": 31.35,
+      "lat": 29.9
+    },
+    {
+      "nome": "GÓSEN",
+      "lon": 31.65,
+      "lat": 31.05
+    },
+    {
+      "nome": "DESERTO DE SUR",
+      "lon": 33.15,
+      "lat": 30.75
+    },
+    {
+      "nome": "DESERTO DE PARÃ",
+      "lon": 34.05,
+      "lat": 29.75
+    },
+    {
+      "nome": "SINAI",
+      "lon": 33.95,
+      "lat": 28.05
+    },
+    {
+      "nome": "FILÍSTIA",
+      "lon": 34.35,
+      "lat": 31.45
+    },
+    {
+      "nome": "EDOM",
+      "lon": 35.9,
+      "lat": 30.35
+    },
+    {
+      "nome": "MOABE",
+      "lon": 36.15,
+      "lat": 31.25
+    },
+    {
+      "nome": "MIDIÃ",
+      "lon": 35.5,
+      "lat": 28.25
+    },
+    {
+      "nome": "CANAÃ",
+      "lon": 35.0,
+      "lat": 32.35
+    }
+  ],
+  "aguas": [
+    {
+      "nome": "MAR MEDITERRÂNEO",
+      "lon": 32.6,
+      "lat": 31.95
+    },
+    {
+      "nome": "MAR VERMELHO",
+      "lon": 33.35,
+      "lat": 28.0,
+      "giro": -55
+    },
+    {
+      "nome": "MAR MORTO",
+      "lon": 35.2,
+      "lat": 31.35,
+      "linhas": [
+        "MAR",
+        "MORTO"
+      ]
+    }
+  ],
+  "caminho": [
+    {
+      "tipo": "ida",
+      "pontos": [
+        "ramesses",
+        "sucote"
+      ],
+      "chega": "sucote"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "sucote",
+        [
+          32.35,
+          30.35
+        ],
+        "migdol"
+      ],
+      "chega": "migdol"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "migdol",
+        [
+          32.62,
+          29.85
+        ],
+        "mara"
+      ],
+      "chega": "mara"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "mara",
+        "elim"
+      ],
+      "chega": "elim"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "elim",
+        "sim"
+      ],
+      "chega": "sim"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "sim",
+        "refidim"
+      ],
+      "chega": "refidim"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "refidim",
+        "sinai"
+      ],
+      "chega": "sinai"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "sinai",
+        "hazerote",
+        [
+          34.55,
+          29.5
+        ],
+        [
+          34.45,
+          30.1
+        ],
+        "cades"
+      ],
+      "chega": "cades"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "cades",
+        [
+          34.75,
+          30.2
+        ],
+        "jotbata",
+        "eziom"
+      ],
+      "chega": "eziom"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "eziom",
+        [
+          35.2,
+          29.95
+        ],
+        "punom"
+      ],
+      "chega": "punom"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "punom",
+        [
+          35.75,
+          30.95
+        ],
+        [
+          35.85,
+          31.45
+        ],
+        "moabe"
+      ],
+      "chega": "moabe"
+    }
+  ],
+  "paradas": [
+    {
+      "n": 1,
+      "lugar": "ramesses",
+      "nome": "Ramessés",
+      "texto": "Saem do Egito cerca de seiscentos mil homens a pé, além de mulheres e crianças.",
+      "ref": "Êx 12.37"
+    },
+    {
+      "n": 2,
+      "lugar": "sucote",
+      "nome": "Sucote e Etã",
+      "texto": "Eles acampam na entrada do deserto.",
+      "ref": "Êx 13.20"
+    },
+    {
+      "n": 3,
+      "lugar": "migdol",
+      "nome": "Pi-Hairote, entre Migdol e o mar",
+      "texto": "Deus abre o mar Vermelho, e o povo atravessa em terra seca.",
+      "ref": "Êx 14.1-31"
+    },
+    {
+      "n": 4,
+      "lugar": "mara",
+      "nome": "Mara",
+      "texto": "A água amarga fica boa para beber.",
+      "ref": "Êx 15.22-26"
+    },
+    {
+      "n": 5,
+      "lugar": "elim",
+      "nome": "Elim",
+      "texto": "Acampam junto a doze fontes e setenta palmeiras.",
+      "ref": "Êx 15.27"
+    },
+    {
+      "n": 6,
+      "lugar": "sim",
+      "nome": "Deserto de Sim",
+      "texto": "Deus manda o maná todas as manhãs.",
+      "ref": "Êx 16.1-36"
+    },
+    {
+      "n": 7,
+      "lugar": "refidim",
+      "nome": "Refidim",
+      "texto": "Sai água da rocha, e Israel vence Amaleque.",
+      "ref": "Êx 17.1-16"
+    },
+    {
+      "n": 8,
+      "lugar": "sinai",
+      "nome": "Monte Sinai",
+      "texto": "Deus faz aliança com o povo e dá os Dez Mandamentos.",
+      "ref": "Êx 19.1–20.17"
+    },
+    {
+      "n": 9,
+      "lugar": "cades",
+      "nome": "Cades-Barneia",
+      "texto": "Os espiões voltam de Canaã, o povo tem medo de entrar, e começam os quarenta anos no deserto.",
+      "ref": "Nm 13.26–14.35"
+    },
+    {
+      "n": 10,
+      "lugar": "eziom",
+      "nome": "Eziom-Geber",
+      "texto": "Passando por Jotbatá, acampam junto ao golfo.",
+      "ref": "Nm 33.33-35"
+    },
+    {
+      "n": 11,
+      "lugar": "punom",
+      "nome": "Punom",
+      "texto": "Contornando Edom, eles sobem para o norte.",
+      "ref": "Nm 33.42-43"
+    },
+    {
+      "n": 12,
+      "lugar": "moabe",
+      "nome": "Campinas de Moabe",
+      "texto": "Acampam junto ao Jordão, do outro lado de Jericó, diante da terra prometida.",
+      "ref": "Nm 33.48-49"
+    }
+  ],
+  "legenda": [
+    {
+      "tipo": "ida",
+      "nome": "Caminho do povo"
+    }
+  ],
+  "leitura": [
+    {
+      "rotulo": "Êxodo 12",
+      "livro": "Êxodo",
+      "cap": 12
+    },
+    {
+      "rotulo": "Números 33",
+      "livro": "Números",
+      "cap": 33
+    }
+  ]
+}
