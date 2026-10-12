@@ -204,6 +204,25 @@ await dormir(300);
 ok(await semEstouro(), 'nada estoura a 360px');
 await tela(390, 844);
 
+// ---------- cada um dos outros mapas publicados abre inteiro ----------
+await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+for (const outro of A.itens.filter((m) => m.slug !== 'paulo-1')) {
+  const f = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'atlas', outro.slug + '.json'), 'utf8'));
+  await av('location.hash = "#/atlas/' + outro.slug + '"');
+  ok(await esperar('!!document.querySelector(\'.atlas-quadro[data-atlas-mapa="' + outro.slug + '"] .atlas-svg image\') && document.querySelectorAll(".atlas-parada").length === ' + f.paradas.length, 10000)
+    && await texto('.atlas-nome') === outro.titulo, outro.titulo + ' abre com o relevo e as ' + f.paradas.length + ' paradas');
+  const ps = JSON.parse(await av('JSON.stringify([...document.querySelectorAll(".atlas-parada")].map((li) => [li.querySelector("b").textContent, li.querySelector(".atlas-parada-ref mark").textContent.replace(/\\u00a0/g, " ").replace(/\\u2060/g, ""), li.querySelector(".atlas-parada-ref").getAttribute("href")]))'));
+  ok(ps.every((x, i) => x[0] === f.paradas[i].nome && x[1] === f.paradas[i].ref && /^#\/biblia\/[^/]+\/\d+$/.test(x[2])), outro.titulo + ': nomes e referências na ordem, cada uma com o link do leitor');
+  ok(await av('document.querySelectorAll(".at-perna").length') === f.caminho.length && await av('document.querySelectorAll(".atlas-quadro [data-parada]").length') >= Math.min(9, new Set(f.paradas.map((x) => [].concat(x.lugar)[0])).size - 1),
+    outro.titulo + ': o caminho inteiro e os números no mapa');
+  const ler = f.leitura[0];
+  ok(await av('document.querySelector(".atlas-ler").getAttribute("href")') === '#/biblia/' + encodeURIComponent(ler.livro) + '/' + ler.cap, outro.titulo + ': "Ler a passagem" abre ' + ler.livro + ' ' + ler.cap);
+  ok(await semEstouro(), outro.titulo + ': nada estoura a 390px');
+  await foto('mapa-' + outro.slug + '-390-claro');
+  await foto('paradas-' + outro.slug + '-390-claro', '.atlas-rotulo');
+}
+await cmd('Emulation.setEmulatedMedia', { features: [] });
+
 // ---------- tema escuro ----------
 await av('localStorage.setItem("cc.tema", "true"); location.hash = "#/explorar"; location.reload()');
 ok(await esperar('document.documentElement.dataset.tema === "escuro" && !!document.querySelector(".cartao-atlas")', 12000), 'o cartão aparece no tema escuro');

@@ -110,6 +110,12 @@
     mais: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12M12 6v12"/></svg>',
     inteiro: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
   };
+  // [Atos 13, Atos 14] → "Atos 13–14"; livros diferentes → "Êxodo 12 a Números 33"
+  const trechoDeLeitura = (ls) => {
+    const a = ls[0], z = ls[ls.length - 1];
+    if (ls.length === 1) return a.livro + ' ' + a.cap;
+    return a.livro === z.livro ? a.livro + ' ' + a.cap + '–' + z.cap : a.livro + ' ' + a.cap + ' a ' + z.livro + ' ' + z.cap;
+  };
   const linhaAmostra = (tipo) => '<svg class="atlas-amostra ' + tipo + '" viewBox="0 0 28 8" aria-hidden="true"><path d="M2 4h24"/></svg>';
   const barra = (voltar) => '<div class="mapa-barra"><button class="botao-redondo" data-voltar data-rotulo-voltar="' + voltar + '" aria-label="Voltar">'
     + CC.ico('voltar') + '</button><span class="mapa-barra-titulo">Mapas bíblicos</span><span class="atlas-vaga"></span></div>';
@@ -172,7 +178,7 @@
       + '<h2 class="mapa-rotulo atlas-rotulo">' + CC.ico('alfinete') + '<span>Paradas</span></h2>'
       + '<h3 class="atlas-trecho">' + linhaAmostra('ida') + 'Ida</h3><ol class="atlas-paradas">' + ida.map(parada).join('') + '</ol>'
       + (volta.length ? '<h3 class="atlas-trecho">' + linhaAmostra('volta') + 'Volta</h3><ol class="atlas-paradas">' + volta.map(parada).join('') + '</ol>' : '')
-      + (ler ? '<a class="botao atlas-ler" href="#/biblia/' + encodeURIComponent(ler.livro) + '/' + ler.cap + '">' + CC.ico('livro') + 'Ler a passagem · ' + esc(m.leitura.map((l) => l.rotulo).join(' e ')) + '</a>' : '')
+      + (ler ? '<a class="botao atlas-ler" href="#/biblia/' + encodeURIComponent(ler.livro) + '/' + ler.cap + '">' + CC.ico('livro') + 'Ler a passagem · ' + esc(trechoDeLeitura(m.leitura)) + '</a>' : '')
       + '<p class="atlas-fonte">Posições e caminhos aproximados. Relevo e profundidade: SRTM, GMTED2010 e ETOPO1 (dados públicos); costa: Natural Earth.</p>';
     CC.ligarVoltarDoTopo(raiz);
     CC.inseparavel(raiz);

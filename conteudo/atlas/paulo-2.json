@@ -1,0 +1,744 @@
+{
+  "titulo": "Segunda viagem missionária",
+  "tituloMapa": "Segunda viagem missionária de Paulo",
+  "grupo": "paulo",
+  "sub": "Paulo, Silas e Timóteo",
+  "ref": "At 15.36–18.22",
+  "linha": "Da Síria à Macedônia e à Acaia, e de volta pelo mar",
+  "quando": "por volta de 49 a 52 d.C.",
+  "texto": "Paulo volta para visitar as igrejas da primeira viagem. O Espírito o leva até Trôade, e ali uma visão o chama para a Macedônia.",
+  "vista": {
+    "oeste": 20.7,
+    "leste": 37.15,
+    "sul": 31.5,
+    "norte": 41.85
+  },
+  "relevoExagero": 6,
+  "lugares": {
+    "antioquia": {
+      "nome": "Antioquia",
+      "lon": 36.161,
+      "lat": 36.202,
+      "lado": "s",
+      "marca": [
+        -8,
+        -4
+      ]
+    },
+    "tarso": {
+      "nome": "Tarso",
+      "lon": 34.895,
+      "lat": 36.917,
+      "lado": "n",
+      "marca": [
+        -8,
+        4
+      ]
+    },
+    "derbe": {
+      "nome": "Derbe",
+      "lon": 33.36,
+      "lat": 37.348,
+      "lado": "s",
+      "marca": [
+        0,
+        -8
+      ]
+    },
+    "listra": {
+      "nome": "Listra",
+      "lon": 32.377,
+      "lat": 37.578,
+      "lado": "so",
+      "marca": [
+        -8,
+        0
+      ]
+    },
+    "iconio": {
+      "nome": "Icônio",
+      "lon": 32.493,
+      "lat": 37.871,
+      "lado": "l",
+      "marca": [
+        -8,
+        -4
+      ]
+    },
+    "antioquia-pisidia": {
+      "nome": "Antioquia da Pisídia",
+      "lon": 31.189,
+      "lat": 38.306,
+      "lado": "o",
+      "linhas": [
+        "Antioquia",
+        "da Pisídia"
+      ],
+      "marca": [
+        -2,
+        -9
+      ]
+    },
+    "troade": {
+      "nome": "Trôade",
+      "lon": 26.155,
+      "lat": 39.752,
+      "lado": "o",
+      "marca": [
+        3,
+        -8
+      ]
+    },
+    "samotracia": {
+      "nome": "Samotrácia",
+      "lon": 25.53,
+      "lat": 40.48,
+      "lado": "l",
+      "marca": [
+        0,
+        -8
+      ]
+    },
+    "neapolis": {
+      "nome": "Neápolis",
+      "lon": 24.41,
+      "lat": 40.937,
+      "lado": "s",
+      "dy": 1
+    },
+    "filipos": {
+      "nome": "Filipos",
+      "lon": 24.287,
+      "lat": 41.012,
+      "lado": "no",
+      "marca": [
+        0,
+        -9
+      ]
+    },
+    "tessalonica": {
+      "nome": "Tessalônica",
+      "lon": 22.94,
+      "lat": 40.64,
+      "lado": "n",
+      "marca": [
+        -9,
+        -5
+      ]
+    },
+    "bereia": {
+      "nome": "Bereia",
+      "lon": 22.2,
+      "lat": 40.52,
+      "lado": "so",
+      "marca": [
+        -8,
+        -5
+      ]
+    },
+    "atenas": {
+      "nome": "Atenas",
+      "lon": 23.727,
+      "lat": 37.97,
+      "lado": "l",
+      "marca": [
+        -2,
+        -8
+      ]
+    },
+    "corinto": {
+      "nome": "Corinto",
+      "lon": 22.88,
+      "lat": 37.906,
+      "lado": "o",
+      "marca": [
+        -4,
+        -8
+      ]
+    },
+    "cencreia": {
+      "nome": "Cencreia",
+      "lon": 22.99,
+      "lat": 37.88,
+      "lado": "se",
+      "marca": [
+        0,
+        9
+      ],
+      "dx": 4
+    },
+    "efeso": {
+      "nome": "Éfeso",
+      "lon": 27.34,
+      "lat": 37.94,
+      "lado": "l",
+      "marca": [
+        -8,
+        -5
+      ]
+    },
+    "cesareia": {
+      "nome": "Cesareia",
+      "lon": 34.89,
+      "lat": 32.5,
+      "lado": "o",
+      "marca": [
+        -8,
+        -6
+      ]
+    },
+    "jerusalem": {
+      "nome": "Jerusalém",
+      "lon": 35.23,
+      "lat": 31.78,
+      "lado": "o",
+      "contexto": true
+    }
+  },
+  "regioes": [
+    {
+      "nome": "MACEDÔNIA",
+      "lon": 22.25,
+      "lat": 41.62
+    },
+    {
+      "nome": "TRÁCIA",
+      "lon": 26.0,
+      "lat": 41.3
+    },
+    {
+      "nome": "ACAIA",
+      "lon": 22.15,
+      "lat": 37.42
+    },
+    {
+      "nome": "MÍSIA",
+      "lon": 27.6,
+      "lat": 39.4
+    },
+    {
+      "nome": "BITÍNIA",
+      "lon": 30.4,
+      "lat": 40.45
+    },
+    {
+      "nome": "ÁSIA",
+      "lon": 28.3,
+      "lat": 38.55
+    },
+    {
+      "nome": "FRÍGIA",
+      "lon": 29.35,
+      "lat": 38.95
+    },
+    {
+      "nome": "GALÁCIA",
+      "lon": 32.9,
+      "lat": 39.4
+    },
+    {
+      "nome": "LICAÔNIA",
+      "lon": 33.6,
+      "lat": 38.3
+    },
+    {
+      "nome": "CILÍCIA",
+      "lon": 35.25,
+      "lat": 37.62
+    },
+    {
+      "nome": "CAPADÓCIA",
+      "lon": 35.6,
+      "lat": 38.7
+    },
+    {
+      "nome": "SÍRIA",
+      "lon": 36.55,
+      "lat": 35.0
+    },
+    {
+      "nome": "CHIPRE",
+      "lon": 33.1,
+      "lat": 35.15
+    },
+    {
+      "nome": "FENÍCIA",
+      "lon": 35.95,
+      "lat": 33.75
+    },
+    {
+      "nome": "JUDEIA",
+      "lon": 35.75,
+      "lat": 31.95
+    },
+    {
+      "nome": "CRETA",
+      "lon": 24.8,
+      "lat": 35.0
+    }
+  ],
+  "aguas": [
+    {
+      "nome": "MAR MEDITERRÂNEO",
+      "lon": 29.0,
+      "lat": 34.2
+    },
+    {
+      "nome": "MAR EGEU",
+      "lon": 25.75,
+      "lat": 38.85
+    }
+  ],
+  "caminho": [
+    {
+      "tipo": "ida",
+      "pontos": [
+        "antioquia",
+        [
+          36.25,
+          36.55
+        ],
+        [
+          36.1,
+          36.85
+        ],
+        [
+          35.6,
+          36.95
+        ],
+        "tarso"
+      ],
+      "chega": "tarso"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "tarso",
+        [
+          34.75,
+          37.3
+        ],
+        [
+          34.2,
+          37.4
+        ],
+        "derbe"
+      ],
+      "chega": "derbe"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "derbe",
+        [
+          32.85,
+          37.42
+        ],
+        "listra"
+      ],
+      "chega": "listra"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "listra",
+        [
+          32.47,
+          37.72
+        ],
+        "iconio"
+      ],
+      "chega": "iconio"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "iconio",
+        [
+          32.1,
+          37.97
+        ],
+        [
+          31.65,
+          38.12
+        ],
+        "antioquia-pisidia"
+      ],
+      "chega": "antioquia-pisidia"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "antioquia-pisidia",
+        [
+          30.7,
+          39.15
+        ],
+        [
+          29.8,
+          39.75
+        ],
+        [
+          28.4,
+          40.05
+        ],
+        [
+          27.1,
+          39.9
+        ],
+        "troade"
+      ],
+      "chega": "troade"
+    },
+    {
+      "tipo": "ida",
+      "mar": true,
+      "pontos": [
+        "troade",
+        [
+          25.9,
+          40.15
+        ],
+        "samotracia",
+        [
+          24.9,
+          40.8
+        ],
+        "neapolis"
+      ],
+      "chega": "samotracia"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "neapolis",
+        "filipos"
+      ],
+      "chega": "filipos"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "filipos",
+        [
+          23.845,
+          40.82
+        ],
+        [
+          23.44,
+          40.62
+        ],
+        "tessalonica"
+      ],
+      "chega": "tessalonica"
+    },
+    {
+      "tipo": "volta",
+      "pontos": [
+        "tessalonica",
+        [
+          22.55,
+          40.6
+        ],
+        "bereia"
+      ],
+      "chega": "bereia"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "bereia",
+        [
+          22.6,
+          40.35
+        ],
+        [
+          23.15,
+          39.95
+        ],
+        [
+          23.65,
+          39.3
+        ],
+        [
+          24.55,
+          38.95
+        ],
+        [
+          24.75,
+          38.4
+        ],
+        [
+          24.25,
+          37.62
+        ],
+        [
+          23.7,
+          37.8
+        ],
+        "atenas"
+      ],
+      "chega": "atenas"
+    },
+    {
+      "tipo": "volta",
+      "pontos": [
+        "atenas",
+        [
+          23.35,
+          38.0
+        ],
+        "corinto"
+      ],
+      "chega": "corinto"
+    },
+    {
+      "tipo": "volta",
+      "pontos": [
+        "corinto",
+        "cencreia"
+      ],
+      "chega": "cencreia"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "cencreia",
+        [
+          23.4,
+          37.7
+        ],
+        [
+          24.2,
+          37.5
+        ],
+        [
+          25.3,
+          37.55
+        ],
+        [
+          26.4,
+          37.95
+        ],
+        [
+          27.0,
+          37.98
+        ],
+        "efeso"
+      ],
+      "chega": "efeso"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "efeso",
+        [
+          27.05,
+          37.5
+        ],
+        [
+          27.6,
+          36.75
+        ],
+        [
+          28.6,
+          36.05
+        ],
+        [
+          30.5,
+          35.55
+        ],
+        [
+          32.4,
+          34.45
+        ],
+        [
+          33.9,
+          33.2
+        ],
+        "cesareia"
+      ],
+      "chega": "cesareia"
+    },
+    {
+      "tipo": "volta",
+      "mar": true,
+      "pontos": [
+        "cesareia",
+        [
+          34.7,
+          33.3
+        ],
+        [
+          35.3,
+          34.6
+        ],
+        [
+          35.65,
+          35.55
+        ],
+        [
+          35.93,
+          36.1
+        ],
+        "antioquia"
+      ]
+    }
+  ],
+  "paradas": [
+    {
+      "n": 1,
+      "lugar": "antioquia",
+      "nome": "Antioquia da Síria",
+      "texto": "Paulo e Barnabé se separam. Paulo escolhe Silas e parte, enquanto Barnabé leva Marcos para Chipre.",
+      "ref": "At 15.36-40"
+    },
+    {
+      "n": 2,
+      "lugar": "tarso",
+      "nome": "Síria e Cilícia",
+      "texto": "Eles passam pelas igrejas da Síria e da Cilícia, animando os irmãos.",
+      "ref": "At 15.41"
+    },
+    {
+      "n": 3,
+      "lugar": "derbe",
+      "nome": "Derbe",
+      "texto": "Paulo e Silas voltam primeiro a Derbe.",
+      "ref": "At 16.1"
+    },
+    {
+      "n": 4,
+      "lugar": "listra",
+      "nome": "Listra",
+      "texto": "Timóteo, respeitado pelos irmãos, entra no grupo.",
+      "ref": "At 16.1-3"
+    },
+    {
+      "n": 5,
+      "lugar": "iconio",
+      "nome": "Icônio",
+      "texto": "De cidade em cidade, as igrejas ficam mais firmes e crescem a cada dia.",
+      "ref": "At 16.2-5"
+    },
+    {
+      "n": 6,
+      "lugar": "antioquia-pisidia",
+      "nome": "Frígia e Galácia",
+      "texto": "O Espírito Santo não deixa que preguem na Ásia nem que entrem na Bitínia.",
+      "ref": "At 16.6-7"
+    },
+    {
+      "n": 7,
+      "lugar": "troade",
+      "nome": "Trôade",
+      "texto": "À noite, Paulo vê um homem da Macedônia pedindo ajuda.",
+      "ref": "At 16.8-10"
+    },
+    {
+      "n": 8,
+      "lugar": [
+        "samotracia",
+        "neapolis"
+      ],
+      "nome": "Samotrácia e Neápolis",
+      "texto": "De Trôade, eles navegam direto para a Samotrácia e, no dia seguinte, para Neápolis.",
+      "ref": "At 16.11"
+    },
+    {
+      "n": 9,
+      "lugar": "filipos",
+      "nome": "Filipos",
+      "texto": "Lídia crê. Na prisão, Paulo e Silas cantam, a terra treme, e o carcereiro é batizado com a família.",
+      "ref": "At 16.12-40"
+    },
+    {
+      "n": 10,
+      "lugar": "tessalonica",
+      "nome": "Tessalônica",
+      "texto": "Passando por Anfípolis e Apolônia, eles pregam três sábados na sinagoga. Muitos creem, e há tumulto na cidade.",
+      "ref": "At 17.1-9"
+    },
+    {
+      "n": 11,
+      "tipo": "volta",
+      "lugar": "bereia",
+      "nome": "Bereia",
+      "texto": "O povo examina as Escrituras todos os dias para ver se o que Paulo diz é verdade.",
+      "ref": "At 17.10-14"
+    },
+    {
+      "n": 12,
+      "tipo": "volta",
+      "lugar": "atenas",
+      "nome": "Atenas",
+      "texto": "Paulo fala do Deus desconhecido no Areópago. Dionísio e Dâmaris creem.",
+      "ref": "At 17.15-34"
+    },
+    {
+      "n": 13,
+      "tipo": "volta",
+      "lugar": "corinto",
+      "nome": "Corinto",
+      "texto": "Paulo mora e trabalha com Áqüila e Priscila e ensina ali um ano e meio.",
+      "ref": "At 18.1-17"
+    },
+    {
+      "n": 14,
+      "tipo": "volta",
+      "lugar": "cencreia",
+      "nome": "Cencreia",
+      "texto": "Antes de embarcar, Paulo rapa a cabeça por causa de um voto.",
+      "ref": "At 18.18"
+    },
+    {
+      "n": 15,
+      "tipo": "volta",
+      "lugar": "efeso",
+      "nome": "Éfeso",
+      "texto": "Priscila e Áqüila ficam. Paulo promete voltar, se Deus quiser.",
+      "ref": "At 18.19-21"
+    },
+    {
+      "n": 16,
+      "tipo": "volta",
+      "lugar": "cesareia",
+      "nome": "Cesareia",
+      "texto": "Do porto, Paulo sobe para saudar a igreja de Jerusalém.",
+      "ref": "At 18.22"
+    },
+    {
+      "n": 17,
+      "tipo": "volta",
+      "lugar": "antioquia",
+      "nome": "Antioquia da Síria",
+      "texto": "Paulo volta à igreja que o enviou.",
+      "ref": "At 18.22"
+    }
+  ],
+  "legenda": [
+    {
+      "tipo": "ida",
+      "nome": "Ida"
+    },
+    {
+      "tipo": "volta",
+      "nome": "Volta"
+    }
+  ],
+  "leitura": [
+    {
+      "rotulo": "Atos 15",
+      "livro": "Atos",
+      "cap": 15
+    },
+    {
+      "rotulo": "Atos 18",
+      "livro": "Atos",
+      "cap": 18
+    }
+  ]
+}

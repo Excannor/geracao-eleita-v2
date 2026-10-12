@@ -168,7 +168,8 @@ export function montarMapa(slug) {
   saida.serras = (m.serras || []).map(rot);
   // números das paradas em cada lugar (o primeiro número vai no mapa; a lista diz o resto)
   const numeros = {};
-  for (const p of m.paradas || []) for (const id of [].concat(p.lugar)) (numeros[id] ||= []).push({ n: p.n, tipo: p.tipo || 'ida' });
+  // só a primeira cidade de uma parada leva o número (Samotrácia e Neápolis são uma parada só)
+  for (const p of m.paradas || []) (numeros[[].concat(p.lugar)[0]] ||= []).push({ n: p.n, tipo: p.tipo || 'ida' });
   saida.lugares = Object.entries(m.lugares).map(([id, l]) => {
     const [x, y] = P([l.lon, l.lat]);
     const ns = numeros[id] || [];
