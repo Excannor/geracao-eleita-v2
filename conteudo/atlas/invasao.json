@@ -1,0 +1,666 @@
+{
+  "titulo": "A invasão de Canaã",
+  "tituloMapa": "A invasão de Canaã",
+  "grupo": "terra",
+  "sub": "Josué e o povo de Israel",
+  "ref": "Js 3.1–10.43",
+  "linha": "Do Jordão a Jericó e às cidades do sul",
+  "quando": "por volta de 1400 a.C. (ou 1200 a.C., conforme a data adotada)",
+  "texto": "O Jordão se abre e Israel entra na terra. Depois de Jericó e Ai, Josué defende Gibeom e avança pelas cidades do sul, sempre voltando ao acampamento de Gilgal.",
+  "vista": {
+    "oeste": 34.45,
+    "leste": 35.95,
+    "sul": 31.25,
+    "norte": 32.2
+  },
+  "relevoExagero": 3,
+  "trechos": {
+    "ida": "As campanhas",
+    "volta": "A volta"
+  },
+  "lugares": {
+    "sitim": {
+      "nome": "Sitim",
+      "lon": 35.68,
+      "lat": 31.84,
+      "lado": "l",
+      "marca": [
+        3,
+        -9
+      ]
+    },
+    "gilgal": {
+      "nome": "Gilgal",
+      "lon": 35.5,
+      "lat": 31.9,
+      "lado": "n",
+      "marca": [
+        -9,
+        -4
+      ]
+    },
+    "jerico": {
+      "nome": "Jericó",
+      "lon": 35.444,
+      "lat": 31.871,
+      "lado": "s",
+      "marca": [
+        -9,
+        2
+      ]
+    },
+    "ai": {
+      "nome": "Ai",
+      "lon": 35.26,
+      "lat": 31.917,
+      "lado": "n",
+      "marca": [
+        -8,
+        -6
+      ]
+    },
+    "gibeom": {
+      "nome": "Gibeom",
+      "lon": 35.183,
+      "lat": 31.847,
+      "lado": "s",
+      "marca": [
+        9,
+        -3
+      ]
+    },
+    "bete-horom": {
+      "nome": "Bete-Horom",
+      "lon": 35.13,
+      "lat": 31.885,
+      "lado": "n",
+      "contexto": true
+    },
+    "azeca": {
+      "nome": "Azeca",
+      "lon": 34.937,
+      "lat": 31.7,
+      "lado": "o",
+      "marca": [
+        0,
+        -9
+      ]
+    },
+    "maqueda": {
+      "nome": "Maquedá",
+      "lon": 34.96,
+      "lat": 31.62,
+      "lado": "l",
+      "contexto": true
+    },
+    "libna": {
+      "nome": "Libna",
+      "lon": 34.875,
+      "lat": 31.615,
+      "lado": "o",
+      "marca": [
+        -2,
+        -9
+      ]
+    },
+    "laquis": {
+      "nome": "Láquis",
+      "lon": 34.849,
+      "lat": 31.565,
+      "lado": "s",
+      "marca": [
+        -9,
+        2
+      ]
+    },
+    "eglom": {
+      "nome": "Eglom",
+      "lon": 34.73,
+      "lat": 31.5,
+      "lado": "o",
+      "marca": [
+        0,
+        -9
+      ]
+    },
+    "hebrom": {
+      "nome": "Hebrom",
+      "lon": 35.1,
+      "lat": 31.53,
+      "lado": "l",
+      "marca": [
+        0,
+        -9
+      ]
+    },
+    "debir": {
+      "nome": "Debir",
+      "lon": 35.03,
+      "lat": 31.42,
+      "lado": "s",
+      "marca": [
+        -9,
+        0
+      ]
+    },
+    "jerusalem": {
+      "nome": "Jerusalém",
+      "lon": 35.23,
+      "lat": 31.78,
+      "lado": "s",
+      "contexto": true
+    }
+  },
+  "regioes": [
+    {
+      "nome": "CANAÃ",
+      "lon": 35.2,
+      "lat": 32.08
+    },
+    {
+      "nome": "GILEADE",
+      "lon": 35.75,
+      "lat": 32.1
+    },
+    {
+      "nome": "MOABE",
+      "lon": 35.78,
+      "lat": 31.55
+    },
+    {
+      "nome": "NEGUEBE",
+      "lon": 35.2,
+      "lat": 31.3
+    },
+    {
+      "nome": "SEFELÁ",
+      "lon": 34.68,
+      "lat": 31.82
+    }
+  ],
+  "aguas": [
+    {
+      "nome": "MAR MEDITERRÂNEO",
+      "lon": 34.6,
+      "lat": 32.05,
+      "linhas": [
+        "MAR",
+        "MEDITERRÂNEO"
+      ]
+    },
+    {
+      "nome": "MAR MORTO",
+      "lon": 35.49,
+      "lat": 31.48,
+      "giro": -82
+    },
+    {
+      "nome": "Jordão",
+      "lon": 35.585,
+      "lat": 32.03,
+      "giro": -84,
+      "rio": true
+    }
+  ],
+  "caminho": [
+    {
+      "tipo": "ida",
+      "pontos": [
+        "sitim",
+        [
+          35.58,
+          31.88
+        ],
+        "gilgal"
+      ],
+      "chega": "gilgal"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "gilgal",
+        "jerico"
+      ],
+      "chega": "jerico"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "jerico",
+        [
+          35.36,
+          31.9
+        ],
+        "ai"
+      ],
+      "chega": "ai"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "ai",
+        [
+          35.22,
+          31.88
+        ],
+        "gibeom"
+      ],
+      "chega": "gibeom"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "gibeom",
+        "bete-horom",
+        [
+          35.02,
+          31.8
+        ],
+        "azeca"
+      ],
+      "chega": "azeca"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "azeca",
+        "maqueda",
+        "libna"
+      ],
+      "chega": "libna"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "libna",
+        "laquis"
+      ],
+      "chega": "laquis"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "laquis",
+        "eglom"
+      ],
+      "chega": "eglom"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "eglom",
+        [
+          34.92,
+          31.47
+        ],
+        "hebrom"
+      ],
+      "chega": "hebrom"
+    },
+    {
+      "tipo": "ida",
+      "pontos": [
+        "hebrom",
+        "debir"
+      ],
+      "chega": "debir"
+    },
+    {
+      "tipo": "volta",
+      "pontos": [
+        "debir",
+        [
+          35.15,
+          31.45
+        ],
+        [
+          35.3,
+          31.65
+        ],
+        [
+          35.42,
+          31.8
+        ],
+        "gilgal"
+      ]
+    }
+  ],
+  "paradas": [
+    {
+      "n": 1,
+      "lugar": "sitim",
+      "nome": "Sitim",
+      "texto": "Josué e o povo levantam o acampamento e vão até o Jordão.",
+      "ref": "Js 3.1"
+    },
+    {
+      "n": 2,
+      "lugar": "gilgal",
+      "nome": "Gilgal",
+      "texto": "As águas param, o povo atravessa sem molhar os pés, e Josué levanta as doze pedras.",
+      "ref": "Js 3.14–4.20"
+    },
+    {
+      "n": 3,
+      "lugar": "jerico",
+      "nome": "Jericó",
+      "texto": "Depois de sete dias de marcha, as cornetas tocam e os muros caem.",
+      "ref": "Js 6.1-27"
+    },
+    {
+      "n": 4,
+      "lugar": "ai",
+      "nome": "Ai",
+      "texto": "Israel perde a primeira batalha por causa do pecado de Acã. Depois, toma a cidade.",
+      "ref": "Js 7.1–8.29"
+    },
+    {
+      "n": 5,
+      "lugar": "gibeom",
+      "nome": "Gibeom",
+      "texto": "Josué defende os gibeonitas, e o sol para até a vitória.",
+      "ref": "Js 9.3–10.14"
+    },
+    {
+      "n": 6,
+      "lugar": "azeca",
+      "nome": "Azeca e Maquedá",
+      "texto": "Os inimigos fogem sob uma chuva de pedras. Os cinco reis se escondem numa caverna em Maquedá.",
+      "ref": "Js 10.10-28"
+    },
+    {
+      "n": 7,
+      "lugar": "libna",
+      "nome": "Libna",
+      "texto": "Josué ataca Libna.",
+      "ref": "Js 10.29-30"
+    },
+    {
+      "n": 8,
+      "lugar": "laquis",
+      "nome": "Láquis",
+      "texto": "A cidade é cercada e cai no segundo dia.",
+      "ref": "Js 10.31-33"
+    },
+    {
+      "n": 9,
+      "lugar": "eglom",
+      "nome": "Eglom",
+      "texto": "Josué sitia e toma Eglom.",
+      "ref": "Js 10.34-35"
+    },
+    {
+      "n": 10,
+      "lugar": "hebrom",
+      "nome": "Hebrom",
+      "texto": "Israel sobe de Eglom e ataca Hebrom.",
+      "ref": "Js 10.36-37"
+    },
+    {
+      "n": 11,
+      "lugar": "debir",
+      "nome": "Debir",
+      "texto": "Josué volta-se contra Debir e a toma.",
+      "ref": "Js 10.38-39"
+    },
+    {
+      "n": 12,
+      "tipo": "volta",
+      "lugar": "gilgal",
+      "nome": "Gilgal",
+      "texto": "Josué volta com todo o Israel para o acampamento.",
+      "ref": "Js 10.43"
+    }
+  ],
+  "legenda": [
+    {
+      "tipo": "ida",
+      "nome": "Campanhas"
+    },
+    {
+      "tipo": "volta",
+      "nome": "Volta a Gilgal"
+    }
+  ],
+  "leitura": [
+    {
+      "rotulo": "Josué 3",
+      "livro": "Josué",
+      "cap": 3
+    },
+    {
+      "rotulo": "Josué 10",
+      "livro": "Josué",
+      "cap": 10
+    }
+  ],
+  "lagos": [
+    [
+      [
+        35.59,
+        32.905
+      ],
+      [
+        35.625,
+        32.89
+      ],
+      [
+        35.645,
+        32.86
+      ],
+      [
+        35.652,
+        32.82
+      ],
+      [
+        35.645,
+        32.77
+      ],
+      [
+        35.63,
+        32.73
+      ],
+      [
+        35.6,
+        32.705
+      ],
+      [
+        35.57,
+        32.705
+      ],
+      [
+        35.553,
+        32.73
+      ],
+      [
+        35.54,
+        32.775
+      ],
+      [
+        35.535,
+        32.8
+      ],
+      [
+        35.52,
+        32.83
+      ],
+      [
+        35.53,
+        32.86
+      ],
+      [
+        35.555,
+        32.885
+      ]
+    ],
+    [
+      [
+        35.555,
+        31.78
+      ],
+      [
+        35.52,
+        31.75
+      ],
+      [
+        35.47,
+        31.72
+      ],
+      [
+        35.455,
+        31.66
+      ],
+      [
+        35.43,
+        31.58
+      ],
+      [
+        35.4,
+        31.5
+      ],
+      [
+        35.385,
+        31.43
+      ],
+      [
+        35.37,
+        31.35
+      ],
+      [
+        35.38,
+        31.27
+      ],
+      [
+        35.4,
+        31.18
+      ],
+      [
+        35.42,
+        31.1
+      ],
+      [
+        35.44,
+        31.04
+      ],
+      [
+        35.47,
+        31.04
+      ],
+      [
+        35.49,
+        31.1
+      ],
+      [
+        35.5,
+        31.2
+      ],
+      [
+        35.53,
+        31.27
+      ],
+      [
+        35.57,
+        31.32
+      ],
+      [
+        35.585,
+        31.42
+      ],
+      [
+        35.59,
+        31.52
+      ],
+      [
+        35.585,
+        31.62
+      ],
+      [
+        35.575,
+        31.71
+      ]
+    ]
+  ],
+  "semRiosGeo": true,
+  "rios": [
+    {
+      "nome": "Jordão",
+      "linha": [
+        [
+          35.62,
+          33.2
+        ],
+        [
+          35.61,
+          33.05
+        ],
+        [
+          35.62,
+          32.95
+        ],
+        [
+          35.6,
+          32.905
+        ]
+      ]
+    },
+    {
+      "nome": "Jordão",
+      "linha": [
+        [
+          35.572,
+          32.705
+        ],
+        [
+          35.565,
+          32.62
+        ],
+        [
+          35.585,
+          32.52
+        ],
+        [
+          35.57,
+          32.44
+        ],
+        [
+          35.545,
+          32.35
+        ],
+        [
+          35.55,
+          32.25
+        ],
+        [
+          35.53,
+          32.15
+        ],
+        [
+          35.535,
+          32.05
+        ],
+        [
+          35.52,
+          31.98
+        ],
+        [
+          35.545,
+          31.9
+        ],
+        [
+          35.55,
+          31.84
+        ],
+        [
+          35.555,
+          31.78
+        ]
+      ]
+    }
+  ],
+  "miniatura": {
+    "oeste": 34.3,
+    "leste": 36.1,
+    "sul": 30.9,
+    "norte": 32.5
+  }
+}

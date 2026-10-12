@@ -108,7 +108,9 @@ function deslocar(pts, d) {
 }
 
 // a terra e o resto da base, recortados e simplificados para uma vista
-function base(vista, prj, tol) {
+// lagosProprios / riosProprios: num mapa de perto (Canaã, Jerusalém), o 1:50m do Natural Earth
+// desenha o mar da Galileia e o mar Morto como losangos; ali valem os contornos do próprio mapa
+function base(vista, prj, tol, mapa = {}) {
   const m = 12;
   const [x0, y0, x1, y1] = [-m, -m, prj.largura + m, prj.altura + m];
   const terra = [];
@@ -116,8 +118,8 @@ function base(vista, prj, tol) {
     const r = recortar(dp(anel.map(prj.p), tol), x0, y0, x1, y1);
     if (r.length > 2) terra.push(dFechado(r));
   }
-  const lagos = geo().lagos.map((a) => recortar(dp(a.map(prj.p), tol), x0, y0, x1, y1)).filter((r) => r.length > 2).map(dFechado);
-  const rios = geo().rios.flatMap((l) => trechosDentro(dp(l.map(prj.p), tol), x0, y0, x1, y1)).map(dAberto);
+  const lagos = (mapa.lagos || geo().lagos).map((a) => recortar(dp(a.map(prj.p), tol), x0, y0, x1, y1)).filter((r) => r.length > 2).map(dFechado);
+  const rios = (mapa.semRiosGeo ? [] : geo().rios).flatMap((l) => trechosDentro(dp(l.map(prj.p), tol), x0, y0, x1, y1)).map(dAberto);
   return { terra: terra.join(''), lagos: lagos.join(''), rios };
 }
 
@@ -143,7 +145,7 @@ export function montarMapa(slug) {
     legenda: m.legenda || [], leitura: m.leitura || [], notas: m.notas || [], ...(m.trechos ? { trechos: m.trechos } : {}), ...(m.legendaLado ? { legendaLado: m.legendaLado } : {}),
   };
   if (saida.tipo === 'regiao') {
-    Object.assign(saida, base(m.vista, prj, 0.3));
+    Object.assign(saida, base(m.vista, prj, 0.3, m));
     // a grade de graus inteiros (só no mar), com o número na borda
     const passo = m.vista.leste - m.vista.oeste > 14 ? 5 : 1;
     saida.grade = {
@@ -201,7 +203,7 @@ export function montarMiniatura(m) {
   const prj = projecao(quadrada, 120);
   const out = { tipo: m.tipo || 'regiao' };
   if (out.tipo === 'regiao') {
-    const b = base(quadrada, prj, 0.6);
+    const b = base(quadrada, prj, 0.6, m);
     out.terra = b.terra;
     out.lagos = b.lagos;
   }

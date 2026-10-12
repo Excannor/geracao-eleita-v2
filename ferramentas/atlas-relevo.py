@@ -126,7 +126,7 @@ def main():
     d = ImageDraw.Draw(mascara)
     for anel in geo['terra']:
         d.polygon([P(p) for p in anel], fill=255)
-    for anel in geo['lagos']:
+    for anel in m.get('lagos') or geo['lagos']:
         d.polygon([P(p) for p in anel], fill=0)
     terra = np.asarray(mascara, dtype=float) / 255
     # borda suave de 1 px, para a cor não serrilhar sob a linha da costa
