@@ -138,7 +138,7 @@ export function montarMapa(slug) {
   };
   const ponto = (x) => (typeof x === 'string' ? lugar(x) : P(x));
   const saida = {
-    slug, titulo: m.titulo, grupo: m.grupo, sub: m.sub, ref: m.ref, quando: m.quando || '', texto: m.texto || '',
+    slug, titulo: m.titulo, tituloMapa: m.tituloMapa || '', grupo: m.grupo, sub: m.sub, ref: m.ref, quando: m.quando || '', texto: m.texto || '',
     tipo: m.tipo || 'regiao', largura: prj.largura, altura: prj.altura, escala: escala(prj),
     legenda: m.legenda || [], leitura: m.leitura || [], notas: m.notas || [],
   };

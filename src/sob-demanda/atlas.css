@@ -4,93 +4,65 @@
    seções vêm do 27-mapas.css. Cores só por fichas de 00-tokens.css: as do mapa são misturas
    delas (color-mix), redefinidas para o escuro, nunca cor literal que valha só num tema. */
 
-/* ---------- as cores do mapa ---------- */
+/* ---------- o desenho do mapa ----------
+   Decisão do dono (12/10): a arte do mapa segue a convenção dos atlas bíblicos impressos
+   (relevo hipsométrico, mar azul, caminho em vermelho escuro, faixa preta do título). Ela é a
+   mesma nos dois temas, como uma imagem: as cores abaixo são do desenho, não da interface, e
+   ficam presas a .atlas-svg; a tela em volta (cartão, textos, botões) segue as fichas do app. */
 .atlas-svg {
-  --at-mar: color-mix(in srgb, var(--salvia) 36%, var(--contorno));
-  --at-praia: color-mix(in srgb, var(--salvia-texto) 30%, var(--at-mar));
-  --at-terra: color-mix(in srgb, var(--v2-cartao) 45%, var(--v2-fundo));
-  --at-relevo: color-mix(in srgb, var(--v2-tinta-fraca) 80%, var(--salvia-texto));
-  --at-relevo-forca: .22;
-  --at-luz: var(--v2-cartao);
-  --at-costa: color-mix(in srgb, var(--salvia-texto) 60%, var(--v2-tinta-forte));
-  --at-rio: color-mix(in srgb, var(--salvia-texto) 50%, var(--at-mar));
-  --at-grade: color-mix(in srgb, var(--salvia-texto) 22%, transparent);
-  --at-regiao: color-mix(in srgb, var(--v2-tinta-fraca) 85%, var(--salvia-texto));
-  --at-agua: var(--salvia-texto);
-  --at-nome: var(--v2-tinta-forte);
-  --at-halo: var(--at-terra);
-  --at-rota: var(--salvia);
-  --at-rota-borda: var(--salvia-tinta);
-  --at-numero: var(--no-lido);
-  --at-numero-tinta: var(--no-lido-tinta);
-  --at-numero-anel: var(--salvia);
+  --at-tinta: #1d1d1b;
+  --at-halo: rgba(255, 255, 255, .78);
+  --at-rota: #8e1c1c;
+  --at-costa: #3f6a86;
+  --at-agua: #2f5f80;
   --zi: 1;
   display: block; width: 100%; height: auto; overflow: hidden;
   font-family: var(--fonte-ui); -webkit-user-select: none; user-select: none;
 }
-:root[data-tema="escuro"] .atlas-svg {
-  --at-mar: color-mix(in srgb, var(--salvia) 7%, var(--salvia-tinta));
-  --at-praia: color-mix(in srgb, var(--salvia) 16%, var(--salvia-tinta));
-  --at-terra: color-mix(in srgb, var(--contorno) 75%, var(--campo));
-  --at-relevo: var(--salvia-tinta);
-  --at-relevo-forca: .6;
-  --at-luz: color-mix(in srgb, var(--v2-tinta-fraca) 30%, var(--at-terra));
-  --at-costa: color-mix(in srgb, var(--salvia-texto) 55%, var(--at-terra));
-  --at-rio: color-mix(in srgb, var(--salvia-texto) 42%, var(--at-mar));
-  --at-grade: color-mix(in srgb, var(--salvia-texto) 12%, transparent);
-  --at-regiao: color-mix(in srgb, var(--v2-tinta-fraca) 80%, var(--salvia-texto));
-  --at-rota-borda: var(--v2-fundo);
-}
-.at-mar { fill: var(--at-mar); }
-.at-grade path { fill: none; stroke: var(--at-grade); stroke-width: .6; }
-.at-graus text { fill: var(--at-agua); font-size: 6.4px; font-weight: 700; letter-spacing: .04em; opacity: .75; }
-.at-praia { fill: none; stroke: var(--at-praia); stroke-width: 7; stroke-linejoin: round; opacity: .55; }
-.at-terra { fill: var(--at-terra); }
-.at-relevo path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.at-sombra path { stroke: var(--at-relevo); opacity: var(--at-relevo-forca); }
-.at-luz path { stroke: var(--at-luz); opacity: .9; }
-.at-lago { fill: var(--at-mar); stroke: var(--at-costa); stroke-width: .5; }
-.at-rios path { fill: none; stroke: var(--at-rio); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
-.at-costa { fill: none; stroke: var(--at-costa); stroke-width: .7; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.at-fundo { fill: #cfe6f3; }
+.at-rios path { fill: none; stroke: #4a88b8; stroke-width: .9; stroke-linecap: round; stroke-linejoin: round; }
+.at-lago { fill: none; stroke: var(--at-costa); stroke-width: .5; }
+.at-costa { fill: none; stroke: var(--at-costa); stroke-width: .55; stroke-linejoin: round; opacity: .7; }
 
-/* nomes: região em versalete espaçado, mar em Literata itálica, cidade em Manrope com halo da terra */
-.at-regiao { fill: var(--at-regiao); font-size: 8.4px; font-weight: 800; letter-spacing: .32em; }
-.at-agua { fill: var(--at-agua); font-family: var(--fonte-biblia); font-size: 10.5px; font-style: italic; letter-spacing: .06em; }
-.at-agua.rio { font-size: 7.4px; letter-spacing: .1em; paint-order: stroke; stroke: var(--at-halo); stroke-width: 2.4px; }
+/* nomes: regiões em caixa-alta escura, mar em azul espaçado, cidades em preto com halo branco */
+.at-regiao {
+  fill: var(--at-tinta); font-size: 9.4px; font-weight: 800; letter-spacing: .06em;
+  paint-order: stroke; stroke: rgba(255, 255, 255, .45); stroke-width: 2.4px; stroke-linejoin: round;
+}
+.at-serra { fill: #5a3a22; font-size: 6.2px; font-weight: 700; letter-spacing: .3em; opacity: .9; }
+.at-agua { fill: var(--at-agua); font-size: 7.4px; font-weight: 700; letter-spacing: .14em; }
+.at-agua.rio { font-size: 6.4px; letter-spacing: .06em; font-style: normal; paint-order: stroke; stroke: rgba(255, 255, 255, .6); stroke-width: 2px; }
 .at-nome {
-  fill: var(--at-nome); font-size: 10.6px; font-weight: 800; letter-spacing: -.005em;
-  paint-order: stroke; stroke: var(--at-halo); stroke-width: 3px; stroke-linejoin: round;
+  fill: var(--at-tinta); font-size: 9.6px; font-weight: 700;
+  paint-order: stroke; stroke: var(--at-halo); stroke-width: 2.6px; stroke-linejoin: round;
 }
-.at-lugar.contexto .at-nome { fill: var(--v2-tinta-fraca); font-weight: 600; font-size: 9.6px; }
-.at-ponto { fill: var(--at-terra); stroke: var(--at-nome); stroke-width: 1.3; }
-.at-lugar.contexto .at-ponto { stroke: var(--v2-tinta-fraca); }
-.at-ponto.pequeno { fill: var(--at-nome); stroke: none; }
-.at-fio { fill: none; stroke: var(--at-nome); stroke-width: 1; }
-.at-serra { fill: var(--at-regiao); font-size: 6.6px; font-weight: 700; letter-spacing: .42em; opacity: .85; }
+.at-lugar.contexto .at-nome { font-weight: 500; font-size: 8.6px; fill: #3a3a36; }
+.at-ponto { fill: var(--at-tinta); stroke: #fff; stroke-width: 1.1; }
 
-/* o caminho: borda escura e traço sálvia; a volta tracejada */
-.at-rota-borda, .at-rota { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.at-rota-borda { stroke: var(--at-rota-borda); stroke-width: 4.6; }
-.at-rota { stroke: var(--at-rota); stroke-width: 2.6; }
-.at-perna.volta .at-rota-borda { stroke-dasharray: 7.5 5.5; stroke-linecap: butt; }
-.at-perna.volta .at-rota { stroke-dasharray: 6.5 6.5; stroke-dashoffset: -.5; stroke-linecap: butt; }
+/* o caminho: vermelho escuro com halo claro; a volta tracejada */
+.at-rota-halo, .at-rota { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.at-rota-halo { stroke: rgba(255, 255, 255, .6); stroke-width: 4.2; }
+.at-rota { stroke: var(--at-rota); stroke-width: 2.1; }
+.at-perna.volta .at-rota, .at-rota.volta { stroke-width: 1.9; stroke-dasharray: 4.2 3; stroke-linecap: butt; }
+.at-perna.volta .at-rota-halo, .at-rota-halo.volta { stroke-width: 3.6; stroke: rgba(255, 255, 255, .5); }
 .at-revela { fill: none; stroke: #fff; stroke-width: 16; stroke-linecap: round; stroke-dasharray: 1 1; stroke-dashoffset: 0; }
 
-/* os números das paradas: o disco da trilha (dia lido), com anel sálvia; a volta só de contorno */
+/* os números das paradas: pequenos, discretos, ao lado da cidade */
 .at-numero-escala { transform: scale(var(--zi)); }
-.at-numero circle { fill: var(--at-numero); stroke: var(--at-numero-anel); stroke-width: 1.6; }
-.at-numero text { fill: var(--at-numero-tinta); font-size: 9.4px; font-weight: 800; }
-.at-numero.volta circle { fill: var(--at-terra); stroke: var(--at-numero); stroke-dasharray: 3 2; }
-.at-numero.volta text { fill: var(--at-nome); }
+.at-numero circle { fill: #fff; stroke: var(--at-rota); stroke-width: 1.1; }
+.at-numero text { fill: var(--at-rota); font-size: 6.6px; font-weight: 800; }
+.at-numero.volta circle { stroke-dasharray: 2 1.4; }
 
-/* escala e norte */
-.at-escala path { fill: none; stroke: var(--at-nome); stroke-width: 1; }
-.at-escala .at-escala-fundo { stroke-width: 3.4; stroke: var(--at-nome); }
-.at-escala .at-escala-meio { stroke-width: 2; stroke: var(--at-terra); }
-.at-escala text, .at-norte text { fill: var(--at-nome); font-size: 7.6px; font-weight: 800; letter-spacing: .06em; }
-.at-escala text { paint-order: stroke; stroke: var(--at-halo); stroke-width: 2.4px; }
-.at-norte circle { fill: var(--at-terra); stroke: var(--at-costa); stroke-width: .8; opacity: .92; }
-.at-norte-seta { fill: var(--at-nome); }
+/* a faixa do título, a legenda, a escala e o norte */
+.at-faixa { fill: #111; }
+.at-titulo { fill: #fff; font-size: 9.6px; font-weight: 800; letter-spacing: .05em; }
+.at-legenda rect { fill: rgba(255, 255, 255, .86); stroke: rgba(0, 0, 0, .25); stroke-width: .5; }
+.at-legenda text { fill: var(--at-tinta); font-size: 7.4px; font-weight: 700; }
+.at-legenda .at-escala-fundo { fill: none; stroke: var(--at-tinta); stroke-width: 2.6; }
+.at-legenda .at-escala-meio { fill: none; stroke: #fff; stroke-width: 1.4; }
+.at-norte circle { fill: rgba(255, 255, 255, .8); stroke: rgba(0, 0, 0, .35); stroke-width: .6; }
+.at-norte-seta { fill: var(--at-tinta); }
+.at-norte text { fill: var(--at-tinta); font-size: 7px; font-weight: 800; paint-order: stroke; stroke: var(--at-halo); stroke-width: 2px; }
 
 /* a abertura: cada perna se desenha atrás da outra, e o número aparece quando a linha chega */
 @media (prefers-reduced-motion: no-preference) {
