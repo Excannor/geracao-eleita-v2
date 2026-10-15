@@ -2348,6 +2348,7 @@
     // décima primeira leva (rodada 18): de dentro da água, a frase afundando
     raso: { fundo: ['#1b6c86'], tema: { ...TEMA_SALVIA, escala: 0.8, marca: LP.creme, marcaFraca: LP.fraco, marcaX: 90 }, desenhar: arteRaso, grao: [14, 1800] },
     acesa: { fundo: ['#dcdcda'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.62 }, desenhar: arteAcesa, grao: [10, 1820] },
+    ore: { fundo: ['#dedcd7'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.8 }, desenhar: arteOre, grao: [10, 1830] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -9519,6 +9520,143 @@
     toraXilo(ctx, 446, 864, 384, 790, 40, 32, r);
     toraXilo(ctx, 342, 878, 344, 786, 44, 34, r);
     ctx.restore();
+  }
+  // Ore. (sem referência). O dono pediu igual à referência (a bandeira preta pendurada na
+  // parede clara): a bandeira de cetim preto presa nos dois cantos de cima, com ORE. em branco
+  // grosso, as dobras que descem em leque do canto direito, a barriga entre os pregos, o brilho
+  // do tecido e a sombra macia na parede cinza-clara. Desenhada em duas etapas: a bandeira lisa
+  // numa camada (o pano e as letras), levada para o story em colunas que acompanham a curva do
+  // pano, e por cima o mapa de luz das dobras (feito pixel a pixel numa tela pequena), que
+  // clareia o preto e escurece o branco como num tecido de verdade.
+  function arteOre(ctx) {
+    const r = sorteio(1830);
+    // a parede: cinza-claro com luz vinda do alto
+    const parede = ctx.createLinearGradient(0, 0, 0, A);
+    parede.addColorStop(0, '#e6e4df');
+    parede.addColorStop(1, '#d3d0ca');
+    ctx.fillStyle = parede;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 30, { aClaro: 0.08, aEscuro: 0.03, claro: '255,255,255', escuro: '90,85,75' });
+    const W = 960;
+    const H = 640;
+    const x0 = (L - W) / 2;
+    const y0 = 720;
+    // a bandeira lisa
+    const pano = document.createElement('canvas');
+    pano.width = W;
+    pano.height = H;
+    const p = pano.getContext('2d');
+    p.fillStyle = '#141414';
+    p.fillRect(0, 0, W, H);
+    p.font = '800 300px Manrope, sans-serif';
+    p.textAlign = 'center';
+    p.textBaseline = 'alphabetic';
+    const m = p.measureText('ORE.');
+    const t = 300 * Math.min(1, (W * 0.8) / m.width);
+    p.font = '800 ' + t + 'px Manrope, sans-serif';
+    try { p.letterSpacing = (-t * 0.02) + 'px'; } catch (e) { /* idem */ }
+    const cap = p.measureText('O').actualBoundingBoxAscent;
+    p.fillStyle = '#f1f1ef';
+    p.fillText('ORE.', W / 2 + t * 0.01, H / 2 + cap / 2 + 6);
+    // o mapa de luz das dobras: leques que saem do canto de cima à direita e a barriga de cima
+    const k = 4;
+    const w = W / k;
+    const h = H / k;
+    const luz = document.createElement('canvas');
+    luz.width = w;
+    luz.height = h;
+    const lk = luz.getContext('2d');
+    const img = lk.createImageData(w, h);
+    const dobras = [];
+    for (let i = 0; i < 11; i++) dobras.push({ ang: Math.PI * (0.6 + i * 0.034 + r() * 0.015), larg: 0.02 + r() * 0.035, forca: 0.55 + r() * 0.7, alcance: 0.8 + r() * 1.1 });
+    const valor = new Float32Array(w * h);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const u = x / w;
+        const v = y / h;
+        // a distância à reta de cada dobra, que nasce no canto (1, 0)
+        const dx = (u - 0.98) * 1.5;
+        const dy = v;
+        const dist = Math.hypot(dx, dy);
+        let s = 0;
+        for (const d of dobras) {
+          const nx = Math.cos(d.ang);
+          const ny = Math.sin(d.ang);
+          const ao = dx * nx + dy * ny; // ao longo
+          if (ao < 0) continue;
+          const atr = dx * -ny + dy * nx; // atravessado
+          const larg = d.larg * (0.6 + ao * 1.6);
+          const some = Math.exp(-ao / d.alcance);
+          // a crista clara e o vale escuro logo ao lado
+          s += d.forca * some * (Math.exp(-(((atr - larg * 0.6) / larg) ** 2)) - 0.8 * Math.exp(-(((atr + larg * 0.9) / larg) ** 2)));
+        }
+        // a barriga entre os pregos, perto da beira de cima
+        const barriga = Math.exp(-v / 0.12) * (0.35 * Math.sin(u * Math.PI * 3.2 + 0.6) + 0.15);
+        // um brilho largo de cetim no meio e a queda de luz para baixo
+        const largo = 0.18 * Math.exp(-((((u - 0.55) - (v - 0.45) * 0.7) / 0.18) ** 2)) - v * 0.12;
+        valor[y * w + x] = s + barriga + largo + (dist < 0.08 ? 0.2 : 0);
+      }
+    }
+    for (let i = 0; i < w * h; i++) {
+      const s = valor[i];
+      img.data[i * 4] = s > 0 ? 255 : 0;
+      img.data[i * 4 + 1] = s > 0 ? 255 : 0;
+      img.data[i * 4 + 2] = s > 0 ? 255 : 0;
+      img.data[i * 4 + 3] = Math.round(255 * Math.min(0.75, Math.abs(s) * (s > 0 ? 0.42 : 0.6)));
+    }
+    lk.putImageData(img, 0, 0);
+    p.save();
+    p.globalCompositeOperation = 'source-atop';
+    p.filter = 'blur(10px)';
+    p.drawImage(luz, 0, 0, W, H);
+    p.restore();
+    // no branco das letras, os vales das dobras aparecem mais (o preto já esconde a sombra)
+    const vale = lk.createImageData(w, h);
+    for (let i = 0; i < w * h; i++) {
+      vale.data[i * 4 + 3] = valor[i] < 0 ? Math.round(255 * Math.min(0.6, -valor[i] * 0.9)) : Math.round(255 * Math.max(0, 0.12 - valor[i] * 0.1));
+    }
+    lk.putImageData(vale, 0, 0);
+    p.save();
+    p.globalCompositeOperation = 'source-atop';
+    p.filter = 'blur(9px)';
+    p.drawImage(luz, 0, 0, W, H);
+    p.restore();
+    // a curva do pano: as colunas descem na barriga entre os pregos e a beira de baixo ondula
+    const curva = (u) => 16 * Math.sin(Math.PI * u) + 6 * Math.sin(u * Math.PI * 3 + 0.5);
+    // a sombra na parede, deslocada para baixo e macia
+    ctx.save();
+    ctx.filter = 'blur(26px)';
+    ctx.fillStyle = 'rgba(40,36,30,.32)';
+    ctx.beginPath();
+    ctx.moveTo(x0 + 14, y0 + 30);
+    for (let u = 0; u <= 1.001; u += 0.05) ctx.lineTo(x0 + 14 + u * W, y0 + 30 + curva(u));
+    for (let u = 1; u >= -0.001; u -= 0.05) ctx.lineTo(x0 + 14 + u * W, y0 + H + 36 + curva(u) * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    const faixa = 2;
+    for (let x = 0; x < W; x += faixa) {
+      const u = x / W;
+      ctx.drawImage(pano, x, 0, faixa, H, x0 + x, y0 + curva(u), faixa + 0.6, H - curva(u) * 0.35);
+    }
+    // os ilhoses de metal na beira esquerda e os pregos nos cantos de cima
+    for (const [x, y] of [[x0 + 14, y0 + 18], [x0 + 14, y0 + H - 22]]) {
+      ctx.strokeStyle = 'rgba(200,200,196,.9)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    for (const [x, y] of [[x0 + 8, y0 + 4], [x0 + W - 8, y0 + 4]]) {
+      ctx.fillStyle = 'rgba(0,0,0,.25)';
+      ctx.beginPath();
+      ctx.arc(x + 3, y + 4, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#9a9893';
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
   S.prepararVersiculo = () => carregarFoto('montanhas');
   S.versiculoCompleto = () => fotoPronta('montanhas');

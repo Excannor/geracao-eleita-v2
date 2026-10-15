@@ -138,6 +138,8 @@
     // Lema com Mateus 25.4 (as prudentes levaram óleo junto com as lamparinas); a arte é a chama
     // de papel vermelho da referência do dono.
     { linhas: ['Mantenha sua', 'chama acesa'], ref: 'Mateus 25.4', arte: 'acesa' },
+    // A bandeira preta na parede, igual à referência que o dono mandou.
+    { linhas: ['Ore.'], arte: 'ore' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir
