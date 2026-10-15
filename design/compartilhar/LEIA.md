@@ -456,3 +456,18 @@ pose, tratamento e companhia diferentes (em pé, tinta no papel, nas chamas; dei
 escuro, apertado pela coroa); ambos lembram coracao (as brasas embaixo do texto) só no tema.
 `MODELOS=heroi,vida,queimar,graca,impossivel,olhos,reino,altar DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos`
 gera as oito. A folha de contato junta as 67 em dez colunas. Os testes passaram a contar 67.
+
+## Rodada 18 (`rodada18/`)
+
+Referências novas do dono (2026-10-15), agora entregues uma arte por vez. Só a ideia de cada
+referência; tudo redesenhado em canvas, sem foto nem logo de ninguém.
+- **raso** (O raso já não nos satisfaz, lema com Ezequiel 47.3-5): vista de dentro da água. A
+  superfície clara em cima com a rede de luz da onda (cáusticas feitas pixel a pixel numa tela
+  pequena e esticada), os fachos de sol descendo e sumindo, partículas em suspensão e bolhas. A
+  frase afunda e engorda com a profundidade: "O raso" pequeno em Literata itálica escura no
+  claro, JÁ NÃO NOS em Oswald média e SATISFAZ enorme no escuro. Na direita, a régua de
+  profundidade com as marcas do versículo (TORNOZELOS, JOELHOS, CINTURA, A NADO); A NADO em
+  amarelo, na altura do SATISFAZ. Fundo novo na coleção (a água em degradê do claro ao quase
+  preto), texto à esquerda, sem palavra sublinhada. Diferente de inundados (a água dentro das
+  letras de AMOR no preto). Fecha na marca amarela da régua.
+`MODELOS=raso DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos`. Os testes contam 64.

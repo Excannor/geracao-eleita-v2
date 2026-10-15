@@ -132,6 +132,9 @@
     { linhas: ['Deus do', 'impossível'], ref: 'Lucas 1.37', arte: 'impossivel' },
     { linhas: ['Fogo em', 'teus olhos', 'fez eu me', 'apaixonar.'], arte: 'olhos' },
     { linhas: ['Venha o', 'seu reino.'], ref: 'Mateus 6.10', arte: 'reino' },
+    // Rodada 18 (2026-10-15), uma de cada vez: lema com Ezequiel 47.3-5 (a água nos tornozelos,
+    // nos joelhos, na cintura e o rio que só se atravessa a nado).
+    { linhas: ['O raso', 'já não nos', 'satisfaz'], ref: 'Ezequiel 47.3-5', arte: 'raso' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir
