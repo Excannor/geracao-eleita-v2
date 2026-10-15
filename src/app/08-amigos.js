@@ -54,7 +54,9 @@
     return (cache ? (cache.recebidos || []).length + (cache.toques || []).length + (cache.convitesProposito || 0) + (cache.pedidosConversa || []).length : 0) + novas;
   };
 
-  const TEXTO_CONVITE = 'Bora ler a Bíblia inteira em um ano, junto? No Geração Eleita é uma leitura por dia, e dá pra gente ler junto. Aceita meu convite:';
+  // O convite fala de um pouco por dia e de ler junto, não de meta de um ano: "plano anual"
+  // assusta quem já tentou e parou. É conversa de amigo, sem cobrança.
+  const TEXTO_CONVITE = 'Tô lendo a Bíblia no Geração Eleita, um pouquinho por dia. Lê comigo? A gente vê onde o outro tá e troca ideia sobre o que leu, sem pressão. Topa?';
   // O convite do Conhecer Jesus não fala em "propósito" nem "ano": é para quem talvez nunca
   // tenha lido a Bíblia, então o convite abre pelo caminho de 14 dias, sem pressa.
   const TEXTO_CONVITE_CONHECER = 'Tô lendo a Bíblia num app e tem um caminho de 14 dias pra quem quer conhecer Jesus, sem pressão. Quer ver?';

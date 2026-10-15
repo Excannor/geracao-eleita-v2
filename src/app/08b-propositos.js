@@ -709,7 +709,7 @@
   // abre entra direto, sem precisar ser amigo antes. É o "junto com a sua célula" do app.
   // "Célula de quinta" já diz o que é; "Jovens Betel" ganha a palavra na frente.
   const comoCelula = (titulo) => (/^c[ée]lula(\s|$)/i.test(titulo) ? titulo : 'célula ' + titulo);
-  const textoCelula = (titulo) => 'Bora ler a Bíblia inteira em um ano, junto? Entra na ' + comoCelula(titulo) + ' no Geração Eleita:';
+  const textoCelula = (titulo) => 'A gente vai ler a Bíblia junto, um pouquinho por dia, e conversar sobre o que leu. Entra na ' + comoCelula(titulo) + ' no Geração Eleita:';
 
   CC.novaCelula = function () {
     if (CC.quem && CC.quem.comSenha && !CC.quem.perfilCompleto) {
