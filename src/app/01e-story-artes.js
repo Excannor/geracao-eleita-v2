@@ -2303,22 +2303,22 @@
       tema: { ...CLARO, numero: LP.tinta, rotulo: LP.tinta, apagada: '#8a877c', marca: LP.tinta, marcaFraca: '#57554c', escala: 0.72 } },
     semente: { fundo: [LP.salvia, { x: L * 0.7, y: 500, r: 1000, cor: 'rgba(240,248,215,.35)' }], desenhar: arteSemente, grao: [16, 1606],
       tema: { ...CLARO, numero: LP.tinta, rotulo: LP.tinta, apagada: '#6b7550', marca: LP.tinta, marcaFraca: '#3d4625', escala: 0.8 } },
-    caminho: { fundo: [LP.preto], tema: { ...TEMA_LP, alinhar: 'direita', escala: 0.75, marcaX: 90 }, desenhar: arteCaminho, grao: [18, 1414] },
-    brasas: { fundo: ['#0b0b0a'], tema: { ...TEMA_LP, alinhar: 'esquerda', escala: 0.75, marcaX: 84 }, desenhar: arteBrasas, grao: [20, 1990] },
+    caminho: { fundo: [LP.preto], tema: { ...TEMA_LP, escala: 0.75, marcaX: 90 }, desenhar: arteCaminho, grao: [18, 1414] },
+    brasas: { fundo: ['#0b0b0a'], tema: { ...TEMA_LP, escala: 0.75, marcaX: 84 }, desenhar: arteBrasas, grao: [20, 1990] },
     // sexta leva (rodada 13): a pista, o fundo do mar, a bússola e a limalha
-    chegada: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, alinhar: 'direita', escala: 0.78, marcaX: 380 }, desenhar: arteChegada, grao: [14, 1300] },
+    chegada: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, escala: 0.78, marcaX: 380 }, desenhar: arteChegada, grao: [14, 1300] },
     ancora: { fundo: ['#0f1916'], tema: { ...TEMA_LP, escala: 0.8 }, desenhar: arteAncora, grao: [16, 1310] },
     bussola: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteBussola, grao: [12, 1320] },
-    ima: { fundo: ['#ecebe4'], tema: { ...TEMA_PAPEL, alinhar: 'esquerda', escala: 0.8, marcaX: 90 }, desenhar: arteIma, grao: [12, 1330] },
+    ima: { fundo: ['#ecebe4'], tema: { ...TEMA_PAPEL, escala: 0.8, marcaX: 90 }, desenhar: arteIma, grao: [12, 1330] },
     // sétima leva (rodada 14): as ondas na água, o envelope aéreo, a grade quebrada e a rasura
     ondas: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteConhecer, grao: [14, 1400] },
-    envelope: { fundo: ['#f1ece0'], tema: { ...TEMA_PAPEL, alinhar: 'esquerda', escala: 0.8 }, desenhar: artePregarao, grao: [12, 1410] },
-    molde: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, alinhar: 'direita', escala: 0.8 }, desenhar: arteInconformada, grao: [12, 1420] },
-    rasura: { fundo: [LP.preto], tema: { ...TEMA_LP, alinhar: 'esquerda', escala: 0.8, marcaX: 86 }, desenhar: arteTudo, grao: [18, 1430] },
+    envelope: { fundo: ['#f1ece0'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: artePregarao, grao: [12, 1410] },
+    molde: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteInconformada, grao: [12, 1420] },
+    rasura: { fundo: [LP.preto], tema: { ...TEMA_LP, escala: 0.8, marcaX: 86 }, desenhar: arteTudo, grao: [18, 1430] },
     // oitava leva (rodada 15): a aura, o caderno pontilhado, o gráfico e a alvorada sobre o mar
     aura: { fundo: [LP.preto], tema: { ...TEMA_LP, escala: 0.8 }, desenhar: arteNele, grao: [24, 1500] },
     rotina: { fundo: ['#f2eee3'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteRotina, grao: [12, 1510] },
-    grafico: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, alinhar: 'direita', escala: 0.8 }, desenhar: arteFracasso, grao: [12, 1520] },
+    grafico: { fundo: [LP.amarelo], tema: { ...TEMA_AMARELO, escala: 0.8 }, desenhar: arteFracasso, grao: [12, 1520] },
     alvorada: { fundo: ['#080a09'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteVenha, grao: [18, 1530] },
     // nona leva (rodada 16): os jornais espalhados, o celular tocando na mesa, o aviãozinho e a
     // sombra, a porta acesa, o círculo de Jesus salva, a lâmpada saleiro, a estampa do
@@ -2346,7 +2346,7 @@
     reino: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteReino, grao: [12, 1760] },
     altar: { fundo: ['#10110f'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteAltar, grao: [16, 1770] },
     // décima primeira leva (rodada 18): de dentro da água, a frase afundando
-    raso: { fundo: ['#1b6c86'], tema: { ...TEMA_SALVIA, alinhar: 'esquerda', escala: 0.8, marca: LP.creme, marcaFraca: LP.fraco, marcaX: 90 }, desenhar: arteRaso, grao: [14, 1800] },
+    raso: { fundo: ['#1b6c86'], tema: { ...TEMA_SALVIA, escala: 0.8, marca: LP.creme, marcaFraca: LP.fraco, marcaX: 90 }, desenhar: arteRaso, grao: [14, 1800] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
