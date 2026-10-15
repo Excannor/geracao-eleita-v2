@@ -135,6 +135,9 @@
     // Rodada 18 (2026-10-15), uma de cada vez: lema com Ezequiel 47.3-5 (a água nos tornozelos,
     // nos joelhos, na cintura e o rio que só se atravessa a nado).
     { linhas: ['O raso', 'já não nos', 'satisfaz'], ref: 'Ezequiel 47.3-5', arte: 'raso' },
+    // Lema com Mateus 25.4 (as prudentes levaram óleo junto com as lamparinas); a arte é a chama
+    // de papel vermelho da referência do dono.
+    { linhas: ['Mantenha sua', 'chama acesa'], ref: 'Mateus 25.4', arte: 'acesa' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir

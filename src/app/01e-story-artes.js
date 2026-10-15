@@ -2347,6 +2347,7 @@
     altar: { fundo: ['#10110f'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteAltar, grao: [16, 1770] },
     // décima primeira leva (rodada 18): de dentro da água, a frase afundando
     raso: { fundo: ['#1b6c86'], tema: { ...TEMA_SALVIA, escala: 0.8, marca: LP.creme, marcaFraca: LP.fraco, marcaX: 90 }, desenhar: arteRaso, grao: [14, 1800] },
+    acesa: { fundo: ['#dcdcda'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.62 }, desenhar: arteAcesa, grao: [10, 1820] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -9324,6 +9325,201 @@
   S.prepararArte = prepararArte;
   S.fundoCartaz = fundoCartaz;
   S.rodapeCartaz = rodapeCartaz;
+  // Mantenha sua chama acesa (lema com Mateus 25.4). O dono pediu igual à referência que mandou
+  // (2026-10-15): no cinza-claro, uma chama grande de papel vermelho recortado à mão, com as
+  // línguas desencontradas, a beira serrilhada da tesoura e os rasgos claros por dentro; dentro
+  // dela, MANTENHA SUA pequeno e CHAMA / ACESA enorme, em letra preta condensada feita à mão; na
+  // base, as toras pretas de xilogravura com os veios e os anéis brancos. O vermelho é a exceção
+  // pedida pelo dono para esta arte. Tudo redesenhado em canvas.
+  // As medidas estão no espaço de 672 x 975 da referência, levado ao story por uma escala.
+  const VERMELHO_PAPEL = '#e11d25';
+  const CINZA_PAREDE = '#dcdcda';
+  // Um contorno de curvas (cada uma [x0,y0, c1x,c1y, c2x,c2y, x1,y1]) amostrado em pontos, com a
+  // beira tremida de papel cortado à tesoura.
+  function recorteDePapel(ctx, curvas, r, tremor = 1.6) {
+    ctx.beginPath();
+    curvas.forEach((c, i) => {
+      for (let k = 0; k <= 18; k++) {
+        const t = k / 18;
+        const u = 1 - t;
+        const x = u * u * u * c[0] + 3 * u * u * t * c[2] + 3 * u * t * t * c[4] + t * t * t * c[6];
+        const y = u * u * u * c[1] + 3 * u * u * t * c[3] + 3 * u * t * t * c[5] + t * t * t * c[7];
+        const j = k === 0 || k === 18 ? 0 : tremor;
+        const px = x + (r() - 0.5) * j * 2;
+        const py = y + (r() - 0.5) * j * 2;
+        if (i === 0 && k === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+    });
+    ctx.closePath();
+  }
+  // Uma linha de letras condensadas "à mão": Oswald estreitada, cada letra com uma inclinação,
+  // uma altura e um respiro um pouco diferentes.
+  function letreiroAMao(ctx, texto, cx, base, alturaCap, largura, r, cor) {
+    ctx.save();
+    const tam = 100;
+    ctx.font = '600 ' + tam + 'px Oswald, "Arial Narrow", sans-serif';
+    const cap = ctx.measureText('H').actualBoundingBoxAscent;
+    const sy = alturaCap / cap;
+    const letras = [...texto];
+    const larg = letras.map((l) => (l === ' ' ? tam * 0.22 : ctx.measureText(l).width));
+    const vao = tam * 0.04;
+    const total = larg.reduce((a, b) => a + b, 0) + vao * (letras.length - 1);
+    const sx = largura / total;
+    let x = cx - largura / 2;
+    ctx.fillStyle = cor;
+    ctx.strokeStyle = cor;
+    ctx.lineJoin = 'miter';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    letras.forEach((l, i) => {
+      const w = larg[i] * sx;
+      if (l !== ' ') {
+        ctx.save();
+        ctx.translate(x + w / 2, base + (r() - 0.5) * alturaCap * 0.03);
+        ctx.rotate((r() - 0.5) * 0.05);
+        ctx.scale(sx * (0.96 + r() * 0.08), sy * (0.97 + r() * 0.06));
+        ctx.fillText(l, 0, 0);
+        ctx.lineWidth = 2.2 / sx;
+        ctx.strokeText(l, 0, 0);
+        ctx.restore();
+      }
+      x += w + vao * sx;
+    });
+    ctx.restore();
+  }
+  // Uma tora de xilogravura: o corpo preto do topo de trás até a ponta da frente, os veios
+  // brancos ao comprido e a ponta cortada com os anéis em espiral.
+  function toraXilo(ctx, fx, fy, bx, by, rx, ry, r) {
+    const ang = Math.atan2(by - fy, bx - fx);
+    const nx = -Math.sin(ang);
+    const ny = Math.cos(ang);
+    const rb = 0.8;
+    ctx.save();
+    ctx.fillStyle = '#121212';
+    ctx.beginPath();
+    ctx.moveTo(fx + nx * rx, fy + ny * ry);
+    ctx.lineTo(bx + nx * rx * rb, by + ny * ry * rb);
+    ctx.lineTo(bx - nx * rx * rb, by - ny * ry * rb);
+    ctx.lineTo(fx - nx * rx, fy - ny * ry);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(bx, by, rx * rb, ry * rb, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // os veios ao comprido, brancos e falhados
+    ctx.strokeStyle = CINZA_PAREDE;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 7; i++) {
+      const o = -0.8 + (i / 6) * 1.6;
+      ctx.lineWidth = 1.2 + r() * 1.6;
+      const t0 = 0.15 + r() * 0.25;
+      const t1 = 0.7 + r() * 0.28;
+      const x0 = fx + (bx - fx) * t0 + nx * rx * o * 0.9;
+      const y0 = fy + (by - fy) * t0 + ny * ry * o * 0.9;
+      const x1 = fx + (bx - fx) * t1 + nx * rx * o * 0.85;
+      const y1 = fy + (by - fy) * t1 + ny * ry * o * 0.85;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.quadraticCurveTo((x0 + x1) / 2 + (r() - 0.5) * 6, (y0 + y1) / 2 + (r() - 0.5) * 6, x1, y1);
+      ctx.stroke();
+    }
+    // a ponta cortada: preta, com a casca e os anéis brancos
+    ctx.fillStyle = '#121212';
+    ctx.beginPath();
+    ctx.ellipse(fx, fy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = CINZA_PAREDE;
+    for (let k = 1; k <= 4; k++) {
+      const f = k / 5;
+      ctx.lineWidth = 1.6 + r();
+      ctx.beginPath();
+      ctx.ellipse(fx + (r() - 0.5) * 2, fy + (r() - 0.5) * 2, rx * f, ry * f, 0, r() * 1.5, Math.PI * 2 - r() * 0.8);
+      ctx.stroke();
+    }
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(fx, fy, rx - 3, ry - 3, 0, Math.PI * 0.9, Math.PI * 1.9);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function arteAcesa(ctx) {
+    const r = sorteio(1820);
+    ctx.fillStyle = CINZA_PAREDE;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 26, { aClaro: 0.08, aEscuro: 0.03, claro: '255,255,255', escuro: '90,90,85' });
+    const k = 1.35;
+    ctx.save();
+    ctx.translate(540 - 340 * k, 289);
+    ctx.scale(k, k);
+    // a chama de papel: a língua grande do meio, a da esquerda e a da direita, e o bojo embaixo
+    const chama = [
+      [176, 806, 120, 790, 66, 740, 50, 650],
+      [50, 650, 40, 590, 52, 540, 44, 470],
+      [44, 470, 70, 500, 86, 520, 100, 500],
+      [100, 500, 110, 420, 160, 330, 212, 246],
+      [212, 246, 222, 290, 230, 320, 244, 336],
+      [244, 336, 240, 280, 226, 190, 248, 96],
+      [248, 96, 300, 140, 350, 190, 372, 250],
+      [372, 250, 392, 290, 404, 300, 424, 320],
+      [424, 320, 456, 300, 494, 286, 522, 262],
+      [522, 262, 528, 340, 566, 420, 604, 470],
+      [604, 470, 646, 560, 640, 680, 596, 744],
+      [596, 744, 560, 790, 520, 806, 470, 808],
+      [470, 808, 380, 812, 260, 812, 176, 806],
+    ];
+    ctx.fillStyle = VERMELHO_PAPEL;
+    recorteDePapel(ctx, chama, r);
+    ctx.fill();
+    // a lasquinha solta acima da língua da direita e a da esquerda
+    for (const c of [[[318, 130, 340, 150, 352, 176, 350, 206], [350, 206, 336, 186, 322, 166, 318, 130]],
+      [[518, 222, 528, 236, 534, 252, 530, 270], [530, 270, 522, 256, 516, 240, 518, 222]]]) {
+      recorteDePapel(ctx, c, r, 0.8);
+      ctx.fill();
+    }
+    // os rasgos claros por dentro, perto das beiras
+    ctx.fillStyle = CINZA_PAREDE;
+    for (const c of [
+      [[120, 300, 150, 300, 180, 280, 196, 268], [196, 268, 170, 300, 140, 330, 108, 352], [108, 352, 112, 330, 116, 314, 120, 300]],
+      [[60, 560, 74, 580, 84, 610, 88, 650], [88, 650, 76, 630, 64, 600, 60, 560]],
+      [[64, 690, 80, 700, 96, 720, 104, 744], [104, 744, 88, 730, 74, 712, 64, 690]],
+      [[560, 430, 584, 470, 596, 510, 596, 552], [596, 552, 582, 520, 568, 480, 560, 430]],
+      [[330, 200, 350, 220, 364, 246, 366, 270], [366, 270, 350, 250, 336, 228, 330, 200]],
+      [[600, 600, 612, 620, 616, 650, 610, 680], [610, 680, 604, 650, 600, 630, 600, 600]],
+    ]) {
+      recorteDePapel(ctx, c, r, 0.7);
+      ctx.fill();
+    }
+    // a frase em letra preta condensada feita à mão
+    // (numa camada própria, gasta como tinta de carimbo)
+    const preto = '#141414';
+    const { c: cl, ctx: kl } = camada();
+    kl.setTransform(ctx.getTransform());
+    letreiroAMao(kl, 'MANTENHA SUA', 346, 400, 44, 316, r, preto);
+    letreiroAMao(kl, 'CHAMA', 344, 572, 150, 318, r, preto);
+    letreiroAMao(kl, 'ACESA', 344, 748, 150, 316, r, preto);
+    kl.setTransform(1, 0, 0, 1, 0, 0);
+    gastar(cl, { x: 300, y: 740, w: 520, h: 600 }, { pontos: 500, manchas: 0, riscos: 30, semente: 1821, forca: 0.7 });
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(cl, 0, 0);
+    ctx.restore();
+    // as brasas vermelhas soltas na base
+    ctx.strokeStyle = VERMELHO_PAPEL;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 6;
+    for (const [x0, y0, x1, y1] of [[150, 820, 186, 812], [158, 846, 196, 846], [496, 812, 530, 820], [494, 842, 534, 846]]) {
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+    }
+    // as toras: as duas de fora primeiro, a do meio por cima
+    toraXilo(ctx, 238, 866, 304, 790, 40, 32, r);
+    toraXilo(ctx, 446, 864, 384, 790, 40, 32, r);
+    toraXilo(ctx, 342, 878, 344, 786, 44, 34, r);
+    ctx.restore();
+  }
   S.prepararVersiculo = () => carregarFoto('montanhas');
   S.versiculoCompleto = () => fotoPronta('montanhas');
   S.arteCompleta = arteCompleta;
