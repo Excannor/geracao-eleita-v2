@@ -2346,7 +2346,7 @@
     reino: { fundo: [LP.salvia], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteReino, grao: [12, 1760] },
     altar: { fundo: ['#10110f'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteAltar, grao: [16, 1770] },
     // décima primeira leva (rodada 18): de dentro da água, a frase afundando
-    raso: { fundo: ['#34493c'], tema: { ...TEMA_SALVIA, alinhar: 'esquerda', escala: 0.8, marca: LP.creme, marcaFraca: LP.fraco, marcaX: 90 }, desenhar: arteRaso, grao: [14, 1800] },
+    raso: { fundo: ['#1b6c86'], tema: { ...TEMA_SALVIA, alinhar: 'esquerda', escala: 0.8, marca: LP.creme, marcaFraca: LP.fraco, marcaX: 90 }, desenhar: arteRaso, grao: [14, 1800] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -9161,7 +9161,7 @@
   // afunda e engorda com a profundidade: "O raso" pequeno, em Literata itálica escura, no claro
   // de cima; JÁ NÃO NOS em Oswald média no meio; SATISFAZ enorme no escuro. Na direita, a régua
   // de profundidade com as quatro marcas do versículo; a última, A NADO, em amarelo, na altura
-  // do SATISFAZ. Fundo novo na coleção (a água em degradê do claro ao escuro), texto alinhado à
+  // do SATISFAZ. Fundo novo na coleção (a água azul, a pedido do dono, em degradê do claro ao escuro), texto alinhado à
   // esquerda e sem palavra sublinhada. Fechamento: a marca amarela da régua.
   function superficieDaAgua(ctx, y0, y1, r) {
     // a rede de luz (cáusticas) feita pixel a pixel numa tela pequena e esticada
@@ -9182,9 +9182,9 @@
         for (const [ang, f, fase] of ondas) s += Math.sin((x * Math.cos(ang) + y * fy * Math.sin(ang)) * f + fase);
         const v = Math.pow(Math.max(0, 1 - Math.abs(s) * 0.42), 4);
         const i = (y * w + x) * 4;
-        img.data[i] = 248;
-        img.data[i + 1] = 250;
-        img.data[i + 2] = 226;
+        img.data[i] = 236;
+        img.data[i + 1] = 252;
+        img.data[i + 2] = 255;
         img.data[i + 3] = Math.round(255 * Math.min(1, v * 1.1) * (1 - y / h) ** 1.7);
       }
     }
@@ -9207,9 +9207,9 @@
       const abre = larg * 2.4;
       const xf = x + inc * comp;
       const g = k.createLinearGradient(0, 0, 0, comp);
-      g.addColorStop(0, 'rgba(255,240,180,' + (0.6 * forca).toFixed(3) + ')');
-      g.addColorStop(0.5, 'rgba(232,240,190,' + (0.26 * forca).toFixed(3) + ')');
-      g.addColorStop(1, 'rgba(200,218,140,0)');
+      g.addColorStop(0, 'rgba(214,250,255,' + (0.6 * forca).toFixed(3) + ')');
+      g.addColorStop(0.5, 'rgba(150,226,240,' + (0.26 * forca).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(110,200,225,0)');
       k.fillStyle = g;
       k.beginPath();
       k.moveTo(x - larg / 2, 0);
@@ -9233,12 +9233,12 @@
       const bx = x + Math.sin(t * 9 + r()) * 18 + (r() - 0.5) * 16;
       const raio = 3 + (1 - t) * 6 + r() * 5;
       const a = 0.25 + (1 - t) * 0.35;
-      ctx.strokeStyle = 'rgba(232,240,214,' + a.toFixed(2) + ')';
+      ctx.strokeStyle = 'rgba(214,244,250,' + a.toFixed(2) + ')';
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.arc(bx, y, raio, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.fillStyle = 'rgba(250,252,240,' + (a + 0.2).toFixed(2) + ')';
+      ctx.fillStyle = 'rgba(245,253,255,' + (a + 0.2).toFixed(2) + ')';
       ctx.beginPath();
       ctx.arc(bx - raio * 0.35, y - raio * 0.35, Math.max(1, raio * 0.25), 0, Math.PI * 2);
       ctx.fill();
@@ -9276,24 +9276,25 @@
   }
   function arteRaso(ctx) {
     const r = sorteio(1800);
-    // a água: clara na superfície, sálvia no meio e quase preta no fundo
+    // a água (azul, a pedido do dono): água-marinha na superfície, azul-petróleo no meio e
+    // quase preta no fundo
     const g = ctx.createLinearGradient(0, 0, 0, A);
-    g.addColorStop(0, '#e7eec9');
-    g.addColorStop(0.14, '#c9da98');
-    g.addColorStop(0.3, '#7f9a6a');
-    g.addColorStop(0.46, '#34493c');
-    g.addColorStop(0.64, '#142019');
-    g.addColorStop(1, '#070b09');
+    g.addColorStop(0, '#dcf6f4');
+    g.addColorStop(0.14, '#9fdde0');
+    g.addColorStop(0.3, '#5cb7c6');
+    g.addColorStop(0.46, '#1b6c86');
+    g.addColorStop(0.64, '#0b3550');
+    g.addColorStop(1, '#040d18');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, L, A);
-    manchas(ctx, r, 22, { y0: 400, aClaro: 0.035, aEscuro: 0.08, claro: '220,235,180', escuro: '0,10,5' });
+    manchas(ctx, r, 22, { y0: 400, aClaro: 0.035, aEscuro: 0.08, claro: '170,230,240', escuro: '0,12,24' });
     fachosDeSol(ctx, r);
     superficieDaAgua(ctx, 0, 520, r);
     // partículas em suspensão, mais visíveis onde a luz ainda chega
     for (let i = 0; i < 520; i++) {
       const y = 200 + r() * 1500;
       const a = (0.08 + r() * 0.3) * Math.max(0.25, 1 - Math.abs(y - 900) / 1100);
-      ctx.fillStyle = 'rgba(236,242,214,' + a.toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(214,244,250,' + a.toFixed(3) + ')';
       const s = 1 + r() * r() * 3;
       ctx.beginPath();
       ctx.arc(r() * L, y, s, 0, Math.PI * 2);
@@ -9308,15 +9309,15 @@
     S.escrever(ctx, 'JÁ NÃO NOS', x - 4, 1004, oswaldLP(tN, 600), LP.creme, { alinhar: 'left', espaco: 4 });
     const tS = caber(ctx, 'SATISFAZ', (t) => oswaldLP(t, 700), 790, 260, 0.01);
     ctx.save();
-    ctx.shadowColor = 'rgba(200,218,140,.25)';
+    ctx.shadowColor = 'rgba(120,210,235,.28)';
     ctx.shadowBlur = 40;
     S.escrever(ctx, 'SATISFAZ', x - 8, 1300, oswaldLP(tS, 700), LP.creme, { alinhar: 'left', espaco: tS * 0.01 });
     ctx.restore();
-    referencia(ctx, 'Ezequiel 47.3-5', x, 1370, 26, LP.salvia, 'left');
+    referencia(ctx, 'Ezequiel 47.3-5', x, 1370, 26, '#8fd9e4', 'left');
     reguaDeFundo(ctx, 1000, 580, 1420, [
-      { y: 660, texto: 'TORNOZELOS', cor: 'rgba(18,19,15,.7)' },
-      { y: 860, texto: 'JOELHOS', cor: 'rgba(242,239,220,.6)' },
-      { y: 1080, texto: 'CINTURA', cor: 'rgba(242,239,220,.6)' },
+      { y: 660, texto: 'TORNOZELOS', cor: 'rgba(18,19,15,.8)' },
+      { y: 860, texto: 'JOELHOS', cor: 'rgba(242,239,220,.8)' },
+      { y: 1080, texto: 'CINTURA', cor: 'rgba(242,239,220,.8)' },
       { y: 1340, texto: 'A NADO', cor: LP.amarelo, forte: true },
     ]);
   }
