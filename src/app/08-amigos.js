@@ -55,11 +55,11 @@
   };
 
   // O convite fala de um pouco por dia e de ler junto, não de meta de um ano: "plano anual"
-  // assusta quem já tentou e parou. É conversa de amigo, sem cobrança.
-  const TEXTO_CONVITE = 'Tô lendo a Bíblia no Geração Eleita, um pouquinho por dia. Lê comigo? A gente vê onde o outro tá e troca ideia sobre o que leu, sem pressão. Topa?';
+  // assusta quem já tentou e parou. Tom cordial, sem gíria: a igreja inteira usa o convite.
+  const TEXTO_CONVITE = 'Estou lendo a Bíblia no Geração Eleita, um pouco por dia. Quer ler comigo? Assim acompanhamos a leitura um do outro e conversamos sobre o que aprendemos. Aceita o convite?';
   // O convite do Conhecer Jesus não fala em "propósito" nem "ano": é para quem talvez nunca
   // tenha lido a Bíblia, então o convite abre pelo caminho de 14 dias, sem pressa.
-  const TEXTO_CONVITE_CONHECER = 'Tô lendo a Bíblia num app e tem um caminho de 14 dias pra quem quer conhecer Jesus, sem pressão. Quer ver?';
+  const TEXTO_CONVITE_CONHECER = 'Estou lendo a Bíblia no Geração Eleita, e lá tem um caminho de 14 dias para quem quer conhecer Jesus, no seu ritmo. Quer ver?';
   const FALA_TOQUE = 'Bora ler hoje?';
 
   // ---------- peças ----------
