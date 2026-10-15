@@ -378,11 +378,8 @@ await dormir(300);
 const carla = await criarConta('carla', 'Carla');
 const conviteCarla = (await api('/api/convites', {}, carla.cookie)).dado.link;
 await cmd('Page.navigate', { url: base + '/?convite=' + new URL(conviteCarla).searchParams.get('convite') + '#/' });
-ok(await esperar(existe('.cortina [data-aceitar]') + ' && /Carla te chamou/.test(' + q('.folha') + '.innerText)', 12000),
-  'abrir o link de convite mostra quem chamou e o que cada um vê');
-await foto('6-aceitar-convite');
-await clicar('.cortina [data-aceitar]');
-ok(await esperar('CC.amigosEmCache() && CC.amigosEmCache().amigos.length === 2'), 'aceitar pela tela cria o segundo propósito');
+ok(await esperar('CC.amigosEmCache() && CC.amigosEmCache().amigos.length === 2', 12000), 'quem já tem conta e abre o link vira amigo na hora, sem tocar em Aceitar');
+ok(!(await av(existe('.cortina [data-aceitar]'))), 'não aparece a pergunta de aceitar para quem já está dentro do app');
 ok(await esperar(existe('.tela-proposito')), 'um propósito novo abre a tela de comemoração');
 await dormir(900);
 await foto('6b-novo-proposito');

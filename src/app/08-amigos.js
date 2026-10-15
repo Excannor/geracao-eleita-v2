@@ -406,6 +406,24 @@
       CC.avisar('Esse convite é seu. Mande o link para alguém!');
       return;
     }
+    // Quem já tem conta e está dentro do app vira amigo na hora: abrir o link já é o "sim".
+    if (CC.quem && CC.quem.usuario) {
+      if (!CC.quem.perfilCompleto) {
+        if (await CC.completarCadastro(CC.quem)) CC.aceitarConvite(token);
+        return;
+      }
+      try {
+        const r = await CC.api('api/convites/aceitar', { token });
+        if (r.ja) CC.avisar('Você e ' + info.nome + ' já são amigos!');
+        else CC.telaNovoProposito(info);
+        recarregar();
+      } catch (e) {
+        CC.folha('<h2>Não deu para aceitar o convite</h2><p>' + CC.esc(e.message || 'Tente de novo em instantes.') + '</p>'
+          + '<div class="acoes"><button class="botao" data-fechar>Entendi</button></div>',
+        { ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
+      }
+      return;
+    }
     CC.folha('<div class="dupla-convite">' + retrato(info, 'grande') + '<span class="chama-convite">' + CC.icoChama() + '</span>'
       + retrato(eu(), 'grande') + '</div>'
       + '<h2>' + CC.esc(info.nome) + ' te chamou para um propósito!</h2>'
