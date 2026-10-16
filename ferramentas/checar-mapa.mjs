@@ -284,14 +284,19 @@ export function checarMapa(slug, mapa) {
   });
   if (a.desenho) desenhos.push(['autoria', a.desenho]);
 
+  // Livro de um capítulo só (Obadias, Filemom, 2 e 3 João, Judas): as partes da estrutura contam
+  // versículos do capítulo 1, e a última termina no último versículo da NBV.
   const partes = Array.isArray(mapa.estrutura) ? mapa.estrutura : [];
+  const umCapitulo = mapa.capitulos === 1;
+  const unidade = umCapitulo ? 'versículo' : 'capítulo';
+  const fim = umCapitulo ? ((nbv()[mapa.nome] || [])[0] || []).length : mapa.capitulos;
   if (partes.length < 2) erro('estrutura precisa de ao menos 2 partes');
   partes.forEach((p, i) => {
     if (!texto(p.titulo)) erro('estrutura ' + (i + 1) + ': precisa de titulo');
     if (!Number.isInteger(p.de) || !Number.isInteger(p.ate) || p.de > p.ate) erro('estrutura ' + (i + 1) + ': de/ate inválidos');
-    if (i === 0 && p.de !== 1) erro('a estrutura começa no capítulo 1');
+    if (i === 0 && p.de !== 1) erro('a estrutura começa no ' + unidade + ' 1');
     if (i && partes[i - 1].ate + 1 !== p.de) erro('estrutura ' + (i + 1) + ': começa em ' + p.de + ', mas a anterior termina em ' + partes[i - 1].ate);
-    if (i === partes.length - 1 && p.ate !== mapa.capitulos) erro('a estrutura termina no capítulo ' + p.ate + ', e o livro tem ' + mapa.capitulos);
+    if (i === partes.length - 1 && p.ate !== fim) erro('a estrutura termina no ' + unidade + ' ' + p.ate + ', e o livro tem ' + fim);
     campo('estrutura ' + (i + 1), p.titulo);
   });
 

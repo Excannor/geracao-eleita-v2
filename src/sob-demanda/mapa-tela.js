@@ -171,11 +171,13 @@
     // do livro começou; antes disso, só a lista.
     const partes = mapa.estrutura || [];
     const comecou = lidos.size > 0;
-    const lida = (p) => { for (let ch = p.de; ch <= p.ate; ch++) if (!lidos.has(ch)) return false; return true; };
+    // Num livro de um capítulo só, as partes contam versículos do capítulo 1.
+    const umCapitulo = mapa.capitulos === 1;
+    const lida = (p) => { if (umCapitulo) return lidos.has(1); for (let ch = p.de; ch <= p.ate; ch++) if (!lidos.has(ch)) return false; return true; };
     let aqui = -1;
     if (comecou) aqui = partes.findIndex((p) => !lida(p));
     const estrutura = rotulo('linhas', 'Estrutura do livro') + '<ol class="mapa-estrutura">' + partes.map((p, i) => {
-      const ref = mapa.sigla + ' ' + (p.de === p.ate ? p.de : p.de + '–' + p.ate);
+      const ref = mapa.sigla + ' ' + (umCapitulo ? '1.' + (p.de === p.ate ? p.de : p.de + '-' + p.ate) : (p.de === p.ate ? p.de : p.de + '–' + p.ate));
       const feita = comecou && lida(p);
       return '<li class="' + (feita ? 'lida' : '') + (i === aqui ? ' aqui' : '') + '">' + (feita ? CC.ico('certo') : '')
         + CC.esc(p.titulo) + ' ' + marca(ref) + (i === aqui ? ' <span class="mapa-aqui">você está aqui</span>' : '') + '</li>';
