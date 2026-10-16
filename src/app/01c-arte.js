@@ -143,6 +143,8 @@
     // Lema com 2 Coríntios 5.7, na forma popular (lema com referência não precisa seguir a letra
     // da NBV; citação literal, sim).
     { linhas: ['Caminhamos por fé,', 'e não pelo', 'que vemos'], ref: '2 Coríntios 5.7', arte: 'fe' },
+    // Como a referência do dono, em inglês: GOD IS ALWAYS IN e a tecla Ctrl verde-limão.
+    { linhas: ['God is', 'always in', 'Ctrl'], arte: 'ctrl' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir

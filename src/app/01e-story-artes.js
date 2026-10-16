@@ -2350,6 +2350,7 @@
     acesa: { fundo: ['#dcdcda'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.62 }, desenhar: arteAcesa, grao: [10, 1820] },
     ore: { fundo: ['#dedcd7'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.8 }, desenhar: arteOre, grao: [10, 1830] },
     fe: { fundo: ['#efe8d6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteFe, grao: [12, 1810] },
+    ctrl: { fundo: ['#e9e9e6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteCtrl, grao: [10, 1850] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -9790,6 +9791,133 @@
     // o fim do lema, depois da neblina
     S.escrever(ctx, 'e não pelo que vemos.', cx, 1468, 'italic 400 50px Literata, Georgia, serif', LP.tinta);
     referencia(ctx, '2 Coríntios 5.7', cx, 1522, 22, '#5c5a52');
+  }
+  // God is always in Ctrl (sem referência; em inglês, como a referência que o dono mandou).
+  // O papel cinza-claro, GOD enorme em Oswald preta esticada de pé, IS ALWAYS na mesma largura,
+  // IN pequeno à esquerda e, no lugar de "control", a tecla Ctrl de verdade em verde-limão: a base
+  // com os quatro chanfros (o de cima claro, o de baixo escuro), o tampo côncavo com a luz no
+  // meio, a etiqueta Ctrl no canto e a sombra macia no papel. Desenhada em canvas. Diferente de
+  // controle (o controle de videogame estampado na camiseta).
+  const LIMAO = { tampo: '#c4dc3c', luz: '#d6ea5e', claro: '#d0e44e', medio: '#adc42a', escuro: '#8ea21c', fundo: '#7c8f17' };
+  function teclaCtrl(ctx, x, y, s) {
+    const raio = s * 0.09;
+    // a sombra no papel, para baixo e para a direita
+    ctx.save();
+    ctx.filter = 'blur(' + Math.round(s * 0.06) + 'px)';
+    ctx.fillStyle = 'rgba(40,44,20,.38)';
+    ctx.beginPath();
+    ctx.roundRect(x + s * 0.04, y + s * 0.08, s, s, raio);
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.filter = 'blur(' + Math.round(s * 0.015) + 'px)';
+    ctx.fillStyle = 'rgba(30,34,14,.35)';
+    ctx.beginPath();
+    ctx.roundRect(x + s * 0.01, y + s * 0.03, s, s, raio);
+    ctx.fill();
+    ctx.restore();
+    // a base, com os quatro chanfros entre ela e o tampo
+    const fora = [x, y, x + s, y + s];
+    const ti = [x + s * 0.1, y + s * 0.05, x + s * 0.9, y + s * 0.8];
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x, y, s, s, raio);
+    ctx.clip();
+    ctx.fillStyle = LIMAO.medio;
+    ctx.fillRect(x, y, s, s);
+    const face = (pts, cor) => {
+      ctx.fillStyle = cor;
+      ctx.beginPath();
+      pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+      ctx.closePath();
+      ctx.fill();
+    };
+    face([[fora[0], fora[1]], [fora[2], fora[1]], [ti[2], ti[1]], [ti[0], ti[1]]], LIMAO.luz);
+    face([[fora[0], fora[1]], [ti[0], ti[1]], [ti[0], ti[3]], [fora[0], fora[3]]], LIMAO.claro);
+    face([[fora[2], fora[1]], [fora[2], fora[3]], [ti[2], ti[3]], [ti[2], ti[1]]], LIMAO.medio);
+    face([[fora[0], fora[3]], [ti[0], ti[3]], [ti[2], ti[3]], [fora[2], fora[3]]], LIMAO.escuro);
+    // o pé da base, mais escuro, onde ela encosta no papel
+    const pe = ctx.createLinearGradient(0, y + s * 0.9, 0, y + s);
+    pe.addColorStop(0, 'rgba(124,143,23,0)');
+    pe.addColorStop(1, 'rgba(100,116,16,.75)');
+    ctx.fillStyle = pe;
+    ctx.fillRect(x, y + s * 0.9, s, s * 0.1);
+    ctx.restore();
+    // o tampo côncavo: a luz no meio e a beira um pouco mais escura
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(ti[0], ti[1], ti[2] - ti[0], ti[3] - ti[1], raio * 0.8);
+    const tampo = ctx.createRadialGradient(x + s * 0.48, y + s * 0.36, s * 0.05, x + s * 0.5, y + s * 0.42, s * 0.5);
+    tampo.addColorStop(0, '#cfe64c');
+    tampo.addColorStop(0.7, LIMAO.tampo);
+    tampo.addColorStop(1, '#b6ce30');
+    ctx.fillStyle = tampo;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,230,.35)';
+    ctx.lineWidth = s * 0.006;
+    ctx.stroke();
+    ctx.restore();
+    // a etiqueta
+    S.escrever(ctx, 'Ctrl', ti[0] + s * 0.08, ti[1] + s * 0.16, '600 ' + Math.round(s * 0.11) + 'px Manrope, sans-serif', '#262a12', { alinhar: 'left' });
+  }
+  function arteCtrl(ctx) {
+    const r = sorteio(1850);
+    const tinta = '#141413';
+    // o papel cinza-claro, com a luz no meio
+    ctx.fillStyle = '#e9e9e6';
+    ctx.fillRect(0, 0, L, A);
+    const luz = ctx.createRadialGradient(L / 2, 900, 100, L / 2, 900, 1200);
+    luz.addColorStop(0, 'rgba(255,255,255,.5)');
+    luz.addColorStop(1, 'rgba(150,150,140,.18)');
+    ctx.fillStyle = luz;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 18, { aClaro: 0.05, aEscuro: 0.025, claro: '255,255,255', escuro: '90,90,80' });
+    // as linhas, condensadas na altura (a letra esticada de pé, como a referência); o bloco
+    // encolhe por igual para caber entre os dias (y 540) e a marca (y 1480, com a sombra)
+    const estica = 1.22;
+    const f = (t) => oswaldLP(t, 700);
+    const medir = (larg) => {
+      const linha = (txt) => {
+        ctx.font = f(100);
+        const t = 100 * larg / ctx.measureText(txt).width;
+        ctx.font = f(t);
+        return { t, cap: ctx.measureText(txt).actualBoundingBoxAscent * estica };
+      };
+      const l1 = linha('GOD');
+      const l2 = linha('IS ALWAYS');
+      ctx.font = f(l2.t);
+      const capNo = ctx.measureText('IN').actualBoundingBoxAscent * estica;
+      const vao = larg * 0.036;
+      const tecla = larg * 0.4;
+      return { l1, l2, capNo, vao, tecla, alto: l1.cap + vao + l2.cap + vao + tecla };
+    };
+    let larg = 820;
+    let b = medir(larg);
+    if (b.alto > 900) { larg *= 900 / b.alto; b = medir(larg); }
+    const { l1, l2, capNo, vao, tecla } = b;
+    const x0 = (L - larg) / 2;
+    const topo = 540 + (900 - b.alto) / 2;
+    const escrever = (txt, t, y) => {
+      ctx.save();
+      ctx.translate(x0, y);
+      ctx.scale(1, estica);
+      ctx.font = f(t);
+      ctx.fillStyle = tinta;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(txt, 0, 0);
+      ctx.restore();
+    };
+    const b1 = topo + l1.cap;
+    escrever('GOD', l1.t, b1);
+    const b2 = b1 + vao + l2.cap;
+    escrever('IS ALWAYS', l2.t, b2);
+    const b3 = b2 + vao + capNo;
+    escrever('IN', l2.t, b3);
+    ctx.font = f(l2.t);
+    const wNo = ctx.measureText('IN').width;
+    // a tecla no lugar de "controle": o topo na altura do NO, logo depois dele
+    teclaCtrl(ctx, x0 + wNo + larg * 0.02, b3 - capNo - larg * 0.01, tecla);
   }
   S.prepararVersiculo = () => carregarFoto('montanhas');
   S.versiculoCompleto = () => fotoPronta('montanhas');
