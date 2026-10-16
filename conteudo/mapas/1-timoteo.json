@@ -1,0 +1,238 @@
+{
+  "nome": "1 Timóteo",
+  "grupo": "Cartas de Paulo",
+  "numero": 54,
+  "capitulos": 6,
+  "significado": {
+    "lingua": "grego",
+    "original": "Τιμόθεον",
+    "transliteracao": "Timotheon",
+    "traducao": "a Timóteo",
+    "texto": "O nome Timóteo junta as palavras gregas para honra e para Deus. Esta é a primeira de duas cartas para ele."
+  },
+  "autoria": {
+    "texto": "Paulo, apóstolo de Jesus Cristo, escreve a Timóteo e chama Timóteo de verdadeiro filho na fé.",
+    "apoio": "No fim, o autor chama Timóteo pelo nome e pede que ele não deixe de fazer o que Deus confiou a ele.",
+    "refs": [
+      "1Tm 1.1-2",
+      "1Tm 6.20"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Em Listra, Paulo encontra um discípulo chamado Timóteo e pede que ele viaje junto. Quando Paulo vai para a Macedônia, Timóteo fica em Éfeso para impedir uns homens de ensinar doutrinas falsas. Paulo espera ver Timóteo logo, mas escreve para o caso de demorar. Na carta, ele diz como as pessoas devem viver na casa de Deus, que é a igreja do Deus vivo.",
+    "refs": [
+      "At 16.1-3",
+      "1Tm 1.3",
+      "1Tm 3.14-15"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Combatente",
+      "sub": "Deus perdoa o pior pecador",
+      "desenho": "espada",
+      "galhos": [
+        {
+          "texto": "Os mestres falsos gastam o tempo com mitos e listas de antepassados, que só dão discussão. O alvo do autor é outro, um amor que vem de coração puro e uma fé sincera.",
+          "ref": "1Tm 1.4-5"
+        },
+        {
+          "texto": "O autor agradece a Cristo Jesus por ter sido escolhido como mensageiro. Antes, ele zombava do nome de Cristo e perseguia o povo dele. Deus teve misericórdia, porque o autor ainda não conhecia Cristo.",
+          "ref": "1Tm 1.12-13"
+        },
+        {
+          "texto": "Cristo Jesus usa o autor como exemplo da paciência que tem até com o pior dos pecadores. Assim os outros entendem que também podem crer e ter a vida eterna.",
+          "ref": "1Tm 1.16"
+        },
+        {
+          "texto": "Timóteo tem de ser um bom combatente nas batalhas do Senhor e guardar a consciência limpa. Alguns desobedeceram à consciência e perderam a fé em Cristo.",
+          "ref": "1Tm 1.18-19"
+        }
+      ],
+      "jesus": {
+        "texto": "O autor quer que todo o mundo saiba de uma coisa: “Cristo Jesus veio ao mundo para salvar os pecadores”. Entre eles, o autor diz que é o maior de todos.",
+        "refs": [
+          "1Tm 1.15"
+        ]
+      },
+      "conexao": "O autor passa às instruções e começa pela oração por todos (1Tm 2.1)."
+    },
+    {
+      "titulo": "Casa de Deus",
+      "sub": "A igreja ora e escolhe líderes",
+      "desenho": "templo-com-colunas",
+      "galhos": [
+        {
+          "texto": "O autor pede oração pelos reis e por quem tem autoridade, para os irmãos viverem em paz e sossego.",
+          "ref": "1Tm 2.2"
+        },
+        {
+          "texto": "Orar assim agrada a Deus, nosso Salvador. Ele quer que todos sejam salvos e conheçam a verdade.",
+          "ref": "1Tm 2.3-4"
+        },
+        {
+          "texto": "Em todo lugar, os homens devem orar com mãos santas levantadas para Deus, sem raiva e sem briga.",
+          "ref": "1Tm 2.8"
+        },
+        {
+          "texto": "O bispo precisa ter uma vida que ninguém possa criticar. Ele tem de gostar de receber hóspedes em casa e não pode ser violento nem apegado ao dinheiro.",
+          "ref": "1Tm 3.2-3"
+        },
+        {
+          "texto": "Quem é novo na fé não pode ser bispo, porque podia ficar orgulhoso. O orgulho vem antes da queda, como aconteceu com o diabo.",
+          "ref": "1Tm 3.6"
+        },
+        {
+          "texto": "Os diáconos também têm de ser homens dignos e de palavra, que não bebem demais nem correm atrás de dinheiro. Primeiro eles fazem outras tarefas na igreja, e só são escolhidos se forem bem.",
+          "ref": "1Tm 3.8-10"
+        }
+      ],
+      "conexao": "O Espírito avisa que, nos últimos tempos, alguns da igreja vão se desviar de Cristo (1Tm 4.1)."
+    },
+    {
+      "titulo": "Exemplo",
+      "sub": "Timóteo é moço e mostra o caminho",
+      "desenho": "pegadas",
+      "galhos": [
+        {
+          "texto": "Uns vão dizer que é errado casar e comer certos alimentos. Deus criou esses alimentos para as pessoas receberem com gratidão.",
+          "ref": "1Tm 4.3"
+        },
+        {
+          "texto": "Timóteo não deve perder tempo com lendas tolas. O exercício físico é bom, e o espiritual vale muito mais, nesta vida e na vida futura.",
+          "ref": "1Tm 4.7-8"
+        },
+        {
+          "texto": "O autor e os companheiros trabalham e lutam muito para as pessoas crerem. A esperança deles está no Deus vivo, o Salvador de todos.",
+          "ref": "1Tm 4.10"
+        },
+        {
+          "texto": "Ninguém pode fazer pouco caso de Timóteo por ele ser moço. Ele tem de ser exemplo no amor, na fé e na pureza, para os irmãos seguirem o caminho que ele ensina e vive.",
+          "ref": "1Tm 4.12"
+        },
+        {
+          "texto": "Até o autor chegar, Timóteo deve se dedicar à leitura das Escrituras e ao ensino. Ele não pode deixar de usar o dom que recebeu quando os líderes da igreja puseram as mãos sobre a cabeça dele.",
+          "ref": "1Tm 4.13-14"
+        }
+      ],
+      "conexao": "Timóteo trata os mais velhos como pai e mãe e os mais moços como irmãos (1Tm 5.1-2)."
+    },
+    {
+      "titulo": "Viúvas",
+      "sub": "A igreja cuida como família",
+      "desenho": "bacia-e-toalha",
+      "galhos": [
+        {
+          "texto": "A igreja cuida das viúvas que não têm ninguém. Quando a viúva tem filhos ou netos, eles cuidam da mãe ou da avó, porque a bondade começa em casa.",
+          "ref": "1Tm 5.3-4"
+        },
+        {
+          "texto": "Quem ficou viúva e sozinha põe a esperança em Deus e ora dia e noite.",
+          "ref": "1Tm 5.5"
+        },
+        {
+          "texto": "Um cristão que deixa a família sem ajuda negou a fé e é pior do que os descrentes.",
+          "ref": "1Tm 5.8"
+        },
+        {
+          "texto": "Na lista das viúvas só pode entrar quem tem pelo menos sessenta anos e foi casada uma vez. Ela tem de ser conhecida pelo bem que fez, como tratar bem os estranhos e lavar os pés dos irmãos.",
+          "ref": "1Tm 5.9-10"
+        },
+        {
+          "texto": "Os líderes da igreja que trabalham bem merecem bom pagamento e respeito, mais ainda os que pregam e ensinam.",
+          "ref": "1Tm 5.17"
+        },
+        {
+          "texto": "Timóteo não pode ter pressa de pôr as mãos sobre alguém. Ele tem de se conservar puro e não entrar no pecado dos outros.",
+          "ref": "1Tm 5.22"
+        }
+      ],
+      "conexao": "Os mestres falsos acham que o evangelho é um jeito de ganhar dinheiro (1Tm 6.5)."
+    },
+    {
+      "titulo": "Contente",
+      "sub": "Rico em boas obras",
+      "desenho": "moedas-de-prata",
+      "galhos": [
+        {
+          "texto": "Quem vive para Deus e está contente com o que tem é rico de verdade.",
+          "ref": "1Tm 6.6"
+        },
+        {
+          "texto": "Com comida e roupa, os irmãos podem ficar satisfeitos. Quem quer ficar rico cai em tentações, armadilhas e desejos tolos, que acabam em ruína.",
+          "ref": "1Tm 6.8-9"
+        },
+        {
+          "texto": "O autor avisa: “o amor ao dinheiro é a raiz de todos os tipos de males”. Por causa dele, alguns voltaram as costas a Deus.",
+          "ref": "1Tm 6.10"
+        },
+        {
+          "texto": "Timóteo é homem de Deus. O autor pede que ele fuja dessas coisas e se agarre à vida eterna.",
+          "ref": "1Tm 6.11-12"
+        },
+        {
+          "texto": "Os ricos não podem pôr a confiança no dinheiro, que logo acaba. Eles devem confiar no Deus vivo e repartir com alegria o que Deus deu a eles.",
+          "ref": "1Tm 6.17-18"
+        }
+      ],
+      "jesus": {
+        "texto": "O autor fala a Timóteo na presença de Deus e de Cristo Jesus, que deu testemunho diante de Pôncio Pilatos. Timóteo tem de cumprir a ordem sem que ninguém ache falta nele, até a volta do Senhor Jesus Cristo.",
+        "refs": [
+          "1Tm 6.13-14"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "O autor diz que é grande o mistério da vida com Deus. Jesus se torna um ser humano, e gente de toda parte crê nele. No fim, ele é recebido de novo na glória.",
+    "ref": "1Tm 3.16",
+    "desenho": "coroa",
+    "pares": [
+      {
+        "at": "Êx 33.20",
+        "texto": "nenhum homem poderá continuar vivo depois de me ver",
+        "nt": "1Tm 1.17",
+        "nota": "O autor dá honra e glória ao Rei eterno, o Deus único, imortal e invisível"
+      },
+      {
+        "at": "Gn 1.31",
+        "texto": "E Deus viu tudo o que havia feito, e eis que havia ficado muito bom.",
+        "nt": "1Tm 4.4",
+        "nota": "Tudo o que Deus fez é bom, e quem agradece pode comer satisfeito"
+      },
+      {
+        "at": "Dt 10.17",
+        "texto": "o Deus dos deuses e o Senhor dos senhores",
+        "nt": "1Tm 6.15",
+        "nota": "No tempo certo, Cristo vai ser revelado como o Rei dos reis e Senhor dos senhores"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Mestres falsos e um pecador perdoado", "de": 1, "ate": 1 },
+    { "titulo": "Oração por todos", "de": 2, "ate": 2 },
+    { "titulo": "Bispos e diáconos", "de": 3, "ate": 3 },
+    { "titulo": "Um exemplo para os irmãos", "de": 4, "ate": 4 },
+    { "titulo": "Viúvas e líderes da igreja", "de": 5, "ate": 5 },
+    { "titulo": "O dinheiro e o bom combate", "de": 6, "ate": 6 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Himeneu e Alexandre perderam a fé. O autor entregou os dois a Satanás para aprenderem a não blasfemar mais.",
+      "ref": "1Tm 1.20"
+    },
+    {
+      "texto": "O autor diz que quem deseja ser bispo tem uma boa ambição.",
+      "ref": "1Tm 3.1"
+    },
+    {
+      "texto": "Timóteo não deve beber só água. O autor manda tomar também um pouco de vinho, por causa do estômago e das doenças frequentes.",
+      "ref": "1Tm 5.23"
+    }
+  ],
+  "procure": {
+    "texto": "Fique de olho na palavra consciência. Timóteo e os diáconos precisam de uma consciência limpa. Nos mentirosos dos últimos tempos, ela nem incomoda mais.",
+    "ref": "1Tm 4.2"
+  }
+}
