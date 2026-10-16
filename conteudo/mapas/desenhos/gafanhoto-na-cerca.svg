@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os gafanhotos nas cercas durante o frio (Na 3.17): um gafanhoto de lado, com a perna de salto e a asa em sálvia, sobre a travessa de uma cerca de madeira -->
+<path class="k p" d="M18 58h8v50h-8zM94 58h8v50h-8z"/>
+<path class="k p" d="M10 66h100v8h-100zM10 88h100v8h-100z"/>
+<path class="h" d="M22 100v6M98 100v6M30 70h14M70 70h20M40 92h22"/>
+<path class="k" d="M6 108h108"/>
+<path class="k" d="M76 52L80 60L78 66M66 54L64 60L60 66"/>
+<path class="k p" d="M86 46C80 42 60 44 46 48C38 50 34 54 38 57C46 60 70 58 86 56z"/>
+<path class="h" d="M46 49.2C45 52 45 55 46 58.4M52 47.9C51 51 51 54.5 52 58.2M58 46.8C57 50 57 54 58 57.9M64 46C63 49.5 63 53.5 64 57.6"/>
+<path class="k s" d="M78 45C66 40 50 40 38 46C50 47 66 48 78 49z"/>
+<path class="k p" d="M66 53C58 44 46 34 38 30C34 30 34 34 37 37C46 44 56 52 62 57z"/>
+<path class="h" d="M44 35L46 41M50 39L52 45M56 43L58 49"/>
+<path class="k" d="M37 33L28 66"/>
+<path class="k p" d="M84 44C90 40 98 42 100 48C102 54 98 60 92 60C88 60 86 58 84 56z"/>
+<circle class="e" cx="93" cy="47" r="2.6"/>
+<path class="h" d="M98 56l3 2"/>
+<path class="k" d="M92 42C94 32 100 26 108 24M89 42C88 32 90 24 96 18"/>
+</svg>
