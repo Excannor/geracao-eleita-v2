@@ -1,0 +1,239 @@
+{
+  "nome": "Miqueias",
+  "grupo": "Profetas menores",
+  "numero": 33,
+  "capitulos": 7,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "מִיכָה",
+    "transliteracao": "Mikhah",
+    "traducao": "quem é como o Senhor?",
+    "texto": "O nome inteiro é uma pergunta. Quem faz essa pergunta já sabe que ninguém é igual ao Senhor."
+  },
+  "autoria": {
+    "texto": "Miqueias mora na cidade de Moresete. O Senhor fala com ele em visões no tempo de Jotão, Acaz e Ezequias, reis de Judá, e as mensagens são para Samaria e para Jerusalém.",
+    "refs": [
+      "Mq 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Miqueias manda todos os povos da terra ouvirem as acusações do Senhor. O governador e o juiz exigem suborno, e quem é rico paga e diz a eles quem condenar. Mesmo assim, Miqueias anuncia que o Senhor vai ser rei no monte Sião para sempre. Perto do fim, ele diz que o Senhor vai jogar todos os pecados do povo no fundo do mar.",
+    "refs": [
+      "Mq 1.2",
+      "Mq 7.3",
+      "Mq 4.7",
+      "Mq 7.19"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Deus desce",
+      "sub": "Samaria vai virar entulho",
+      "desenho": "muro-derrubado",
+      "galhos": [
+        {
+          "texto": "O Senhor deixa o trono no céu e vem à terra, andando sobre os lugares mais altos. Os montes derretem debaixo dos pés dele como cera perto do fogo.",
+          "ref": "Mq 1.3-4"
+        },
+        {
+          "texto": "Miqueias pergunta qual é o pecado de Jacó e quem pôs um altar de ídolos em Judá. Para ele, a culpa é de Samaria e de Jerusalém.",
+          "ref": "Mq 1.5"
+        },
+        {
+          "texto": "Deus avisa que vai fazer de Samaria um monte de entulho, um lugar para plantar videiras. As pedras da cidade vão rolar morro abaixo, e as imagens dos ídolos vão ser esmigalhadas.",
+          "ref": "Mq 1.6-7"
+        },
+        {
+          "texto": "Miqueias diz que vai chorar e andar nu e descalço, uivando como um chacal. A ferida do povo é funda demais para ser curada, e o Senhor já está às portas de Jerusalém.",
+          "ref": "Mq 1.8-9"
+        },
+        {
+          "texto": "Laquis foi a primeira cidade a seguir Israel no pecado dos ídolos. Miqueias manda os moradores de lá fugirem nos carros mais rápidos.",
+          "ref": "Mq 1.13"
+        },
+        {
+          "texto": "Miqueias pede que as famílias rapem a cabeça e chorem pelos filhinhos, que vão ser levados para o exílio.",
+          "ref": "Mq 1.16"
+        }
+      ],
+      "conexao": "Depois, Miqueias fala dos que ficam acordados à noite, planejando a maldade (Mq 2.1)."
+    },
+    {
+      "titulo": "Terra roubada",
+      "sub": "Os ricos tomam as casas",
+      "desenho": "porta-do-curral",
+      "galhos": [
+        {
+          "texto": "Quando os poderosos querem um terreno ou uma casa, eles tomam tudo com roubo e ameaças, mesmo que seja a única coisa que a pessoa tem.",
+          "ref": "Mq 2.2"
+        },
+        {
+          "texto": "Deus avisa que os inimigos vão zombar deles. Eles vão imitar o lamento de quem perdeu a terra para os invasores.",
+          "ref": "Mq 2.4"
+        },
+        {
+          "texto": "O povo quer calar Miqueias: “Não fale desse jeito”. Para eles, essas coisas ruins nunca vão acontecer.",
+          "ref": "Mq 2.6"
+        },
+        {
+          "texto": "Esses poderosos esperam os homens que voltam da guerra para roubar a capa das costas deles. Eles expulsam as viúvas de casa.",
+          "ref": "Mq 2.8-9"
+        },
+        {
+          "texto": "Miqueias diz que o povo gosta de profeta mentiroso, que promete as alegrias do vinho e da bebida fermentada.",
+          "ref": "Mq 2.11"
+        },
+        {
+          "texto": "Deus promete reunir todos os que sobrarem do povo, como ovelhas no curral, numa multidão alegre e barulhenta.",
+          "ref": "Mq 2.12"
+        }
+      ],
+      "conexao": "Miqueias chama os líderes de Jacó, que deviam saber a diferença entre o certo e o errado (Mq 3.1)."
+    },
+    {
+      "titulo": "Líderes",
+      "sub": "Juízes e profetas comprados",
+      "desenho": "panela-de-ensopado",
+      "galhos": [
+        {
+          "texto": "Os líderes amam o mal e odeiam o bem. Miqueias diz que eles esfolam o povo e cortam as pessoas como carne para a panela.",
+          "ref": "Mq 3.2-3"
+        },
+        {
+          "texto": "Na hora da aflição, esses líderes ainda pedem socorro ao Senhor. Deus vai virar as costas para eles.",
+          "ref": "Mq 3.4"
+        },
+        {
+          "texto": "Os falsos profetas prometem paz a quem dá comida a eles e ameaçam com guerra quem não dá nada.",
+          "ref": "Mq 3.5"
+        },
+        {
+          "texto": "Deus avisa que a noite vai cair sobre esses profetas e acabar com as visões deles. Os videntes vão esconder o rosto de vergonha.",
+          "ref": "Mq 3.6-7"
+        },
+        {
+          "texto": "Miqueias diz que está cheio do poder do Espírito do Senhor. Ele tem coragem para anunciar, sem medo, o castigo que Deus vai dar a Israel.",
+          "ref": "Mq 3.8"
+        },
+        {
+          "texto": "Os juízes aceitam suborno, os sacerdotes cobram para ensinar a Lei, e todos dizem: “Está tudo bem, o Senhor está conosco”. Por causa deles, Jerusalém vai ser arada como um campo, e o monte do templo vai ficar coberto de mato.",
+          "ref": "Mq 3.11-12"
+        }
+      ],
+      "conexao": "Nos últimos dias, o monte do templo vai ser o mais conhecido de todos os montes (Mq 4.1)."
+    },
+    {
+      "titulo": "O rei de Belém",
+      "sub": "As espadas viram arados",
+      "desenho": "arado",
+      "galhos": [
+        {
+          "texto": "Povos de toda a terra vão dizer: “Venham, vamos visitar o monte do Senhor”. Eles querem que Deus ensine o que devem fazer.",
+          "ref": "Mq 4.2"
+        },
+        {
+          "texto": "Deus vai julgar as nações. Os homens vão derreter as espadas para fazer arados, e ninguém mais vai se preparar para a guerra.",
+          "ref": "Mq 4.3"
+        },
+        {
+          "texto": "Cada um vai viver tranquilo debaixo da sua videira e da sua figueira, sem nada a temer.",
+          "ref": "Mq 4.4"
+        },
+        {
+          "texto": "Miqueias manda o povo de Sião gemer como mulher em trabalho de parto, porque vai ser levado para o exílio na Babilônia. Lá, o Senhor vai socorrer o povo e libertar todos dos inimigos.",
+          "ref": "Mq 4.10"
+        },
+        {
+          "texto": "Belém Efrata é só uma pequena vila da Judeia. Miqueias anuncia que ali vai nascer o rei de Israel, de uma família que vem de tempos antigos.",
+          "ref": "Mq 5.2"
+        },
+        {
+          "texto": "Esse rei vai se levantar na força do Senhor e alimentar o rebanho dele. O povo vai viver em segurança, e ele vai trazer a paz.",
+          "ref": "Mq 5.4-5"
+        }
+      ],
+      "conexao": "O Senhor chama os montes para ouvirem a acusação dele contra o povo (Mq 6.2)."
+    },
+    {
+      "titulo": "Nem um cacho",
+      "sub": "Deus acusa e perdoa o povo",
+      "desenho": "cacho-de-uvas",
+      "galhos": [
+        {
+          "texto": "O Senhor pergunta: “Meu povo, o que foi que eu fiz para vocês me abandonarem assim?” Ele lembra que tirou o povo do Egito e deu Moisés, Arão e Miriam para guiar todos.",
+          "ref": "Mq 6.3-4"
+        },
+        {
+          "texto": "Alguém pergunta se Deus quer milhares de carneiros, dez mil rios de azeite ou até o filho mais velho. Deus já disse o que deseja. A pessoa deve ser honesta e justa, saber amar a fidelidade e ser humilde diante de Deus.",
+          "ref": "Mq 6.6-8"
+        },
+        {
+          "texto": "As casas dos maus estão cheias de riqueza roubada. Os comerciantes andam com balanças falsas e pesos adulterados na bolsa.",
+          "ref": "Mq 6.10-11"
+        },
+        {
+          "texto": "Para Miqueias, achar um homem honesto é tão difícil quanto achar uvas depois da colheita. Não sobrou nem um cacho para provar.",
+          "ref": "Mq 7.1"
+        },
+        {
+          "texto": "Miqueias manda não confiar nem no melhor amigo. O filho despreza o pai, a filha provoca a mãe, e a nora amaldiçoa a sogra.",
+          "ref": "Mq 7.5-6"
+        },
+        {
+          "texto": "Enquanto espera pelo Senhor, o Salvador dele, Miqueias diz ao inimigo: “Se tiver de viver na escuridão, o Senhor mesmo será a minha luz”.",
+          "ref": "Mq 7.7-8"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus avisa que não veio trazer paz à terra, mas a espada. Com palavras parecidas com as de Miqueias, ele diz que veio lançar o homem contra o pai e a filha contra a mãe. “Os piores inimigos de um homem estarão justamente dentro da sua própria casa!”",
+        "refs": [
+          "Mt 10.34-36"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "“Onde haverá outro Deus como o Senhor, que perdoa os pecados e esquece a transgressão do remanescente de seu povo?” Na casa de um fariseu, uma mulher derrama perfume nos pés de Jesus. Jesus diz a ela que os pecados dela estão perdoados, e os homens à mesa se perguntam quem ele pensa que é, para perdoar pecados (Lc 7.36-38, 48-49).",
+    "ref": "Mq 7.18",
+    "desenho": "frasco-de-alabastro",
+    "pares": [
+      {
+        "at": "Mq 2.13",
+        "texto": "O seu rei irá à frente de vocês. O Senhor os guiará",
+        "nt": "Jo 10.4",
+        "nota": "O pastor leva as ovelhas para fora e vai andando na frente delas, e elas seguem, porque conhecem a voz dele"
+      },
+      {
+        "at": "Mq 7.20",
+        "texto": "O Senhor estenderá o seu amor sobre nós, conforme prometeu aos descendentes de Abraão!",
+        "nt": "Lc 1.72-73",
+        "nota": "Deus mostra a misericórdia dele e se lembra da santa aliança, a promessa que fez a Abraão"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Deus desce contra Samaria", "de": 1, "ate": 1 },
+    { "titulo": "Os que roubam terras", "de": 2, "ate": 2 },
+    { "titulo": "Líderes e profetas comprados", "de": 3, "ate": 3 },
+    { "titulo": "O monte do Senhor e Belém", "de": 4, "ate": 5 },
+    { "titulo": "A acusação e o perdão", "de": 6, "ate": 7 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Miqueias compara o povo que sobrar ao orvalho que vem do Senhor, como chuva que cai sobre as plantas.",
+      "ref": "Mq 5.7"
+    },
+    {
+      "texto": "Deus lembra que Balaque, rei de Moabe, quis destruir o povo com a maldição de Balaão. Deus fez Balaão abençoar Israel.",
+      "ref": "Mq 6.5"
+    },
+    {
+      "texto": "O povo só obedece aos mandamentos de Onri e só segue o exemplo da família de Acabe.",
+      "ref": "Mq 6.16"
+    }
+  ],
+  "procure": {
+    "texto": "Procure quem Miqueias manda ouvir. Ele chama todos os povos, depois os líderes de Jacó e, por último, até os montes."
+  }
+}
