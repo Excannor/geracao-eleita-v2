@@ -1,0 +1,279 @@
+{
+  "nome": "Oseias",
+  "grupo": "Profetas menores",
+  "numero": 28,
+  "capitulos": 14,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "הוֹשֵׁעַ",
+    "transliteracao": "Hoshea",
+    "traducao": "salvação",
+    "texto": "Hoshea vem do verbo salvar. No livro, o Senhor diz a Israel que não existe outro Salvador além dele."
+  },
+  "autoria": {
+    "texto": "Oseias é filho de Beeri. O Senhor dá mensagens a ele nos dias de Uzias, Jotão, Acaz e Ezequias, reis de Judá, e de Jeroboão, rei de Israel.",
+    "apoio": "O livro termina com um recado. Quem for sábio deve entender essas coisas, porque os caminhos do Senhor são verdadeiros e justos.",
+    "refs": [
+      "Os 1.1",
+      "Os 14.9"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Deus manda Oseias casar com uma mulher adúltera. Com esse casamento, ele quer mostrar como o povo de Israel tem sido infiel ao Senhor. Mesmo assim, Deus não consegue abandonar Israel e diz que o coração dele grita. Quando o povo voltar, ele promete curar a infidelidade de Israel.",
+    "refs": [
+      "Os 1.2",
+      "Os 11.8",
+      "Os 14.4"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Três nomes",
+      "sub": "Oseias casa com Gômer",
+      "desenho": "duas-aliancas",
+      "galhos": [
+        {
+          "texto": "Oseias se casa com Gômer, e eles têm um filho. O Senhor manda chamar o menino de Jezreel. Deus avisa que vai castigar a família do rei Jeú no vale que tem esse nome.",
+          "ref": "Os 1.3-4"
+        },
+        {
+          "texto": "Algum tempo depois, Gômer tem uma menina. Ela vai se chamar Não Amada, porque Deus não vai mais perdoar Israel. O Senhor promete ter compaixão de Judá e livrar a tribo sem arco nem espada.",
+          "ref": "Os 1.6-7"
+        },
+        {
+          "texto": "Quando Não Amada para de mamar, Gômer tem outro menino. O Senhor manda chamar o menino de Não Meu Povo e diz: “eu não sou o Deus de Israel”.",
+          "ref": "Os 1.8-9"
+        },
+        {
+          "texto": "Mesmo assim, Deus avisa que vai chegar o tempo em que os israelitas vão ser como a areia da praia, tantos que ninguém consegue contar. Em vez de dizer que eles não são o povo dele, o Senhor vai chamar todos de filhos do Deus vivo.",
+          "ref": "Os 1.10"
+        },
+        {
+          "texto": "Judá e Israel vão se unir e ter um só líder. Os dois vão voltar juntos do exílio, no dia em que Deus plantar o povo de novo na terra.",
+          "ref": "Os 1.11"
+        }
+      ],
+      "conexao": "Jezreel deve chamar os irmãos de Meu Povo e Amada (Os 2.1). Só que a mãe deles está com outro homem (Os 2.2)."
+    },
+    {
+      "titulo": "Quinze moedas",
+      "sub": "O marido busca a esposa",
+      "desenho": "moedas-de-prata",
+      "galhos": [
+        {
+          "texto": "A mãe diz que vai atrás de outros homens em troca de comida e azeite. Deus diz que vai fechar o caminho dela com espinhos. Ela não vai achar os amantes e vai pensar em voltar para o marido, porque antes estava muito melhor.",
+          "ref": "Os 2.5-7"
+        },
+        {
+          "texto": "Deus deu a ela o trigo, o vinho e o azeite, e ela não percebe. Com a prata e o ouro que vieram dele, ela adora Baal. Na colheita, Deus não vai mais dar o trigo e o vinho a ela.",
+          "ref": "Os 2.8-9"
+        },
+        {
+          "texto": "Depois, Deus diz que vai levar a esposa ao deserto e falar do amor dele por ela. Lá, ele vai transformar o vale da desgraça numa porta de esperança. Ela vai cantar como na juventude, quando Deus tirou o povo do Egito.",
+          "ref": "Os 2.14-15"
+        },
+        {
+          "texto": "Naquele dia, ela vai chamar Deus de Meu Marido, e não mais de Meu Baal. Deus promete casar com ela para sempre, com fidelidade e amor.",
+          "ref": "Os 2.16, 19-20"
+        },
+        {
+          "texto": "Deus manda Oseias buscar a mulher e amar a esposa de novo, porque o Senhor ainda ama Israel. Oseias compra a mulher de volta por quinze moedas de prata e um barril e meio de cevada.",
+          "ref": "Os 3.1-2"
+        },
+        {
+          "texto": "Israel vai ficar muito tempo sem rei nem altar. Depois, os israelitas vão voltar ao Senhor e ao Messias, o rei deles. Isso vai acontecer nos últimos dias.",
+          "ref": "Os 3.4-5"
+        }
+      ],
+      "conexao": "A mulher vai esperar por Oseias em casa muitos dias (Os 3.3). O Senhor tem uma acusação contra Israel (Os 4.1)."
+    },
+    {
+      "titulo": "Tal sacerdote",
+      "sub": "O Senhor acusa o povo",
+      "desenho": "turbante-de-sacerdote",
+      "galhos": [
+        {
+          "texto": "Em Israel, o povo jura falso, mata e rouba. Por isso, a terra não produz nada, e até os peixes estão morrendo.",
+          "ref": "Os 4.2-3"
+        },
+        {
+          "texto": "O Senhor diz que o povo dele é destruído porque não conhece Deus. A culpa é dos sacerdotes, que esqueceram a lei.",
+          "ref": "Os 4.6"
+        },
+        {
+          "texto": "Os sacerdotes ficam contentes com os pecados do povo e vivem pedindo mais. Deus diz: “Tal sacerdote, tal povo”.",
+          "ref": "Os 4.8-9"
+        },
+        {
+          "texto": "O povo pergunta a um pedaço de pau o que fazer. Para saber o futuro, faz perguntas a uma coluna de madeira.",
+          "ref": "Os 4.12"
+        },
+        {
+          "texto": "Israel e Judá percebem que estão doentes. Israel manda pedir ajuda ao grande rei da Assíria, mas ele não consegue curar ninguém.",
+          "ref": "Os 5.13"
+        },
+        {
+          "texto": "Deus avisa que vai rasgar Israel e Judá em pedaços, como o leão rasga o animal que matou.",
+          "ref": "Os 5.14"
+        }
+      ],
+      "conexao": "Na aflição, o povo vai procurar Deus (Os 5.15). Uma voz chama: “Venham, vamos voltar ao Senhor” (Os 6.1)."
+    },
+    {
+      "titulo": "Forno aceso",
+      "sub": "Um amor que some cedo",
+      "desenho": "fornalha",
+      "galhos": [
+        {
+          "texto": "Quem chama o povo diz que, em dois ou três dias, Deus vai levantar todos de novo. Se o povo se esforçar para conhecer o Senhor, ele vai responder tão certo quanto a manhã vem depois da noite.",
+          "ref": "Os 6.2-3"
+        },
+        {
+          "texto": "Deus responde com uma pergunta: “O que será que vou fazer com vocês?” Para ele, o amor do povo é como a neblina da manhã, que some depressa como o orvalho.",
+          "ref": "Os 6.4"
+        },
+        {
+          "texto": "Como Adão, o povo quebrou a aliança com Deus. Na estrada de Siquém, até os sacerdotes formam bandos de assassinos.",
+          "ref": "Os 6.7, 9"
+        },
+        {
+          "texto": "Para Deus, o coração dos príncipes é um forno aceso, cheio de intriga. O povo mata os governantes, um atrás do outro. Os reis caem, e ninguém procura o Senhor para pedir socorro.",
+          "ref": "Os 7.6-7"
+        },
+        {
+          "texto": "Israel se mistura com os outros povos e fica inútil como um pão que não foi bem assado. Como uma pomba tola, Israel pede ajuda ao Egito e voa para a Assíria.",
+          "ref": "Os 7.8, 11"
+        },
+        {
+          "texto": "O povo perde o sono e geme de medo, mas não ora de coração. Deus compara Israel a um arco com defeito, que nunca acerta o alvo.",
+          "ref": "Os 7.14, 16"
+        }
+      ],
+      "conexao": "Deus manda tocar a trombeta. Os inimigos estão chegando como uma águia (Os 8.1)."
+    },
+    {
+      "titulo": "Semear vento",
+      "sub": "Israel colhe o que plantou",
+      "desenho": "bezerro-de-ouro",
+      "galhos": [
+        {
+          "texto": "Os israelitas escolhem reis sem a ordem de Deus e fazem ídolos de ouro e prata. O Senhor manda Samaria jogar fora aquele ídolo e diz: “Esse bezerro não é Deus!”",
+          "ref": "Os 8.4-6"
+        },
+        {
+          "texto": "Deus avisa: “Os israelitas semeiam vento e colhem tempestade!” As espigas vão murchar, e o pouco que nascer os estrangeiros vão comer.",
+          "ref": "Os 8.7"
+        },
+        {
+          "texto": "Israel constrói muitos altares, mas não para o Senhor. Mesmo que Deus desse milhares de leis, o povo ia dizer que as leis são para outras nações.",
+          "ref": "Os 8.11-12"
+        },
+        {
+          "texto": "Chega o tempo do castigo de Israel, e o povo zomba: “Os profetas estão loucos”.",
+          "ref": "Os 9.7"
+        },
+        {
+          "texto": "Deus lembra que achar Israel no deserto foi como encontrar uvas ali. O amor do povo era doce como os primeiros figos do verão, mas Israel logo abandonou Deus por causa de Baal.",
+          "ref": "Os 9.10"
+        },
+        {
+          "texto": "O Senhor pede que o povo plante justiça e passe o arado no chão duro do coração. Só que Israel plantou a maldade e colheu pecado.",
+          "ref": "Os 10.12-13"
+        }
+      ],
+      "conexao": "Numa só manhã, o rei de Israel vai ser destruído (Os 10.15). Deus lembra quando Israel era criança (Os 11.1)."
+    },
+    {
+      "titulo": "Meu filho",
+      "sub": "Deus não desiste de Israel",
+      "desenho": "lirio-do-campo",
+      "galhos": [
+        {
+          "texto": "Deus ensinou Israel a andar, como a mãe ensina o filhinho, e segurou o povo nos braços. Com laços de amor, ele puxou Israel para perto e se abaixou para dar comida.",
+          "ref": "Os 11.3-4"
+        },
+        {
+          "texto": "O Senhor decide não castigar Israel como a ira dele pede. Ele diz: “Eu sou Deus e não um simples homem”. Quando ele rugir como um leão, o povo vai voltar do Egito e da Assíria voando como pombas.",
+          "ref": "Os 11.9-11"
+        },
+        {
+          "texto": "Jacó lutou com o irmão quando nasceu. Quando já era homem feito, lutou com o Anjo, chorou e pediu uma bênção. Em Betel, Deus falou com ele.",
+          "ref": "Os 12.3-4"
+        },
+        {
+          "texto": "Na boa terra, o povo comeu, ficou satisfeito e esqueceu Deus. O Senhor avisa que vai atacar como um leopardo e como uma ursa que teve os filhotes roubados.",
+          "ref": "Os 13.6-8"
+        },
+        {
+          "texto": "Israel tem de voltar para o Senhor e pedir perdão. O povo deve dizer que a Assíria não pode salvar e que nunca mais vai chamar de deus o que fez com as mãos.",
+          "ref": "Os 14.1-3"
+        },
+        {
+          "texto": "Deus promete cair sobre Israel como o orvalho. O povo vai crescer como o lírio, com raízes fundas como as dos cedros do Líbano, e todos vão descansar à sombra de Deus.",
+          "ref": "Os 14.5-7"
+        }
+      ],
+      "jesus": {
+        "texto": "Naquela mesma noite, José parte para o Egito com Maria e o menino e fica lá até Herodes morrer. Assim se cumpre o que o Senhor tinha dito pelo profeta: “Eu chamei o meu filho do Egito”. O filho que Deus chama do Egito é Jesus.",
+        "refs": [
+          "Mt 2.13-15"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "“Não quero sacrifícios: quero o seu amor.” Os fariseus reclamam porque Jesus come com cobradores de impostos e pecadores. Jesus manda que eles aprendam o sentido desse versículo (Mt 9.11-13). Num sábado, ele diz que os fariseus não teriam condenado quem não tem culpa se entendessem essas palavras (Mt 12.2, 7).",
+    "ref": "Os 6.6",
+    "desenho": "mesa-posta",
+    "pares": [
+      {
+        "at": "Os 10.8",
+        "texto": "os homens vão gritar para as montanhas: ‘Caiam em cima de nós!’",
+        "nt": "Lc 23.29-30",
+        "nota": "Estão chegando dias em que todos vão pedir às montanhas que caiam em cima deles"
+      },
+      {
+        "at": "Os 14.2",
+        "texto": "por sua misericórdia receba nossos novos sacrifícios, o louvor dos nossos lábios!",
+        "nt": "Hb 13.15",
+        "nota": "Com a ajuda de Jesus, quem crê oferece sempre a Deus um sacrifício de louvor"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Gômer e os três filhos", "de": 1, "ate": 1 },
+    { "titulo": "A esposa comprada de volta", "de": 2, "ate": 3 },
+    { "titulo": "A acusação contra o povo", "de": 4, "ate": 5 },
+    { "titulo": "Um amor como a neblina", "de": 6, "ate": 7 },
+    { "titulo": "Quem semeia vento", "de": 8, "ate": 10 },
+    { "titulo": "O filho que Deus chamou", "de": 11, "ate": 13 },
+    { "titulo": "A volta e o orvalho", "de": 14, "ate": 14 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Deus diz que vai acabar com Israel como a traça acaba com um pedaço de pano.",
+      "ref": "Os 5.12"
+    },
+    {
+      "texto": "O cabelo de Israel fica branco, e ele nem percebe como está fraco e velho.",
+      "ref": "Os 7.9"
+    },
+    {
+      "texto": "Israel se gaba de ter ficado rico sem ajuda de ninguém: “Sou muito rico! E consegui tudo isso sozinho!”",
+      "ref": "Os 12.8"
+    },
+    {
+      "texto": "Quando fugiu para a Síria, Jacó cuidou de ovelhas para conseguir a esposa.",
+      "ref": "Os 12.12"
+    },
+    {
+      "texto": "Para Deus, Israel é como uma criança teimosa que se recusa a nascer.",
+      "ref": "Os 13.13"
+    }
+  ],
+  "procure": {
+    "texto": "Procure o verbo voltar. Ele aparece quando a esposa pensa no marido, quando uma voz chama o povo para o Senhor e quando alguém pede que Israel volte para Deus e pratique a lealdade e a justiça.",
+    "ref": "Os 12.6"
+  }
+}

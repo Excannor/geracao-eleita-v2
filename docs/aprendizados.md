@@ -742,6 +742,11 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   diz "os três amigos". Mt 24.15 é o único verso do NT que nomeia "o profeta Daniel"; entrou como par, só com o que Jesus
   diz, sem ligar a "coisa horrível" a fato nenhum. As setenta semanas (Dn 9.24-27) e os 1.290 e 1.335 dias (Dn 12.11-12)
   ficaram fora, porque o texto não interpreta e cada igreja lê de um jeito; o capítulo 9 entra pela oração e por Gabriel.
+- 2026-10-16 · conteúdo · Oseias: os nomes dos filhos vêm com hífen na NBV (Lo-Ruhamah, ‘Não-Amada’, Lo-Ami), mas Os 1.8
+  escreve “Não Amada” sem hífen e 1.9 dá ‘Não Meu Povo’ → o galho usa a forma sem hífen que a própria NBV traz, sem o nome
+  hebraico. O único texto que o NT liga a Jesus é Os 11.1 (Mt 2.15), e ficou no destaque; Os 6.6, que Jesus cita duas vezes
+  (Mt 9.13; 12.7), foi para "Oseias e Cristo". Os 13.14 já está em 1 Coríntios e Os 1.10 e 2.23 em Romanos: ficaram só nos galhos.
+  O teste-mapas reprovou duas conexões de 128 e 129 caracteres com duas referências (5 linhas a 390px): com duas refs, uns 100.
 
 ## Entrada, sessão e página inicial
 
