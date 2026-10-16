@@ -140,6 +140,9 @@
     { linhas: ['Mantenha sua', 'chama acesa'], ref: 'Mateus 25.4', arte: 'acesa' },
     // A bandeira preta na parede, igual à referência que o dono mandou.
     { linhas: ['Ore.'], arte: 'ore' },
+    // Lema com 2 Coríntios 5.7, na forma popular (lema com referência não precisa seguir a letra
+    // da NBV; citação literal, sim).
+    { linhas: ['Caminhamos por fé,', 'e não pelo', 'que vemos'], ref: '2 Coríntios 5.7', arte: 'fe' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir

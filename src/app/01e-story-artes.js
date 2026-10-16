@@ -2349,6 +2349,7 @@
     raso: { fundo: ['#1b6c86'], tema: { ...TEMA_SALVIA, escala: 0.8, marca: LP.creme, marcaFraca: LP.fraco, marcaX: 90 }, desenhar: arteRaso, grao: [14, 1800] },
     acesa: { fundo: ['#dcdcda'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.62 }, desenhar: arteAcesa, grao: [10, 1820] },
     ore: { fundo: ['#dedcd7'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.8 }, desenhar: arteOre, grao: [10, 1830] },
+    fe: { fundo: ['#efe8d6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteFe, grao: [12, 1810] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -9657,6 +9658,138 @@
       ctx.arc(x, y, 5, 0, Math.PI * 2);
       ctx.fill();
     }
+  }
+  // Caminhamos por fé, e não pelo que vemos (lema com 2 Coríntios 5.7, na forma popular: não é
+  // citação literal, então não segue a letra da NBV). Impressão retrô no papel creme: FÉ enorme em tinta gasta e, por cima da
+  // metade de baixo das letras, um banco de neblina (nuvens macias com a borda em retícula
+  // sálvia) que esconde o chão; da beira do papel sobem pegadas, uma depois da outra, e entram
+  // na neblina: o passo continua onde a vista não chega. Papel claro, texto centralizado em
+  // tamanho extremo, sem palavra sublinhada; "e não pelo que vemos." em Literata itálica
+  // embaixo, depois da neblina. Fechamento: as pegadas sumindo na neblina.
+  function pegada(ctx, x, y, s, giro, esquerda, cor) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(giro);
+    ctx.scale(esquerda ? -s : s, s);
+    ctx.fillStyle = cor;
+    // a sola: o calcanhar, o arco estreito e a planta larga
+    ctx.beginPath();
+    ctx.moveTo(0, 46);
+    ctx.bezierCurveTo(-15, 46, -17, 30, -14, 16);
+    ctx.bezierCurveTo(-11, 4, -9, -6, -15, -18);
+    ctx.bezierCurveTo(-21, -32, -14, -46, 2, -46);
+    ctx.bezierCurveTo(18, -46, 22, -32, 18, -16);
+    ctx.bezierCurveTo(14, -2, 8, 6, 10, 18);
+    ctx.bezierCurveTo(13, 32, 14, 46, 0, 46);
+    ctx.fill();
+    // os dedos
+    for (const [dx, dy, rr] of [[-11, -58, 7.5], [1, -62, 6], [10, -59, 5], [17, -53, 4.4], [22, -45, 3.8]]) {
+      ctx.beginPath();
+      ctx.ellipse(dx, dy, rr * 0.85, rr, -0.15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  // A neblina: uma faixa feita pixel a pixel numa tela pequena (o perfil liso no meio e as
+  // beiras desfiadas pelo ruído), que deixa ver um resto do que está atrás; nas beiras, a
+  // retícula sálvia da impressão.
+  function neblina(ctx, y0, y1, r) {
+    const esc = 4;
+    const w = L / esc;
+    const h = Math.round((y1 - y0) / esc);
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const k = c.getContext('2d');
+    const img = k.createImageData(w, h);
+    const ondas = [];
+    for (let i = 0; i < 6; i++) ondas.push([0.02 + r() * 0.05, 0.05 + r() * 0.08, r() * 6.3, r() * 6.3]);
+    const alfa = new Float32Array(w * h);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        let n = 0;
+        for (const [fx, fy, a, b] of ondas) n += Math.sin(x * fx + a + Math.sin(y * fy + b) * 1.6) * Math.cos(y * fy * 0.7 + b);
+        n /= ondas.length;
+        const t = y / (h - 1) + n * 0.35;
+        const perfil = Math.max(0, Math.sin(Math.PI * Math.min(1, Math.max(0, t))));
+        const v = Math.min(0.86, Math.pow(perfil, 0.8) * (0.8 + n * 0.9));
+        alfa[y * w + x] = v;
+        const i = (y * w + x) * 4;
+        img.data[i] = 240;
+        img.data[i + 1] = 234;
+        img.data[i + 2] = 217;
+        img.data[i + 3] = Math.round(255 * Math.max(0, v));
+      }
+    }
+    k.putImageData(img, 0, 0);
+    ctx.save();
+    ctx.filter = 'blur(6px)';
+    ctx.drawImage(c, 0, y0, L, y1 - y0);
+    ctx.restore();
+    // os fiapos que passam por cima: elipses compridas e macias, mais densas no meio da faixa
+    const f = S.tela();
+    const kf = f.getContext('2d');
+    for (let i = 0; i < 46; i++) {
+      const t = 0.08 + r() * 0.8;
+      const y = y0 + t * (y1 - y0);
+      const x = r() * L;
+      const rx = 110 + r() * 260;
+      const ry = 10 + r() * 30;
+      kf.save();
+      kf.translate(x, y);
+      kf.scale(1, ry / rx);
+      const g = kf.createRadialGradient(0, 0, 0, 0, 0, rx);
+      const a = (0.25 + r() * 0.45) * Math.sin(Math.PI * t);
+      g.addColorStop(0, 'rgba(246,242,230,' + a.toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(246,242,230,0)');
+      kf.fillStyle = g;
+      kf.fillRect(-rx, -rx, rx * 2, rx * 2);
+      kf.restore();
+    }
+    ctx.save();
+    ctx.filter = 'blur(5px)';
+    ctx.drawImage(f, 0, 0);
+    ctx.restore();
+    // a retícula nas beiras: pontos que crescem onde a neblina está pela metade
+    const passo = 12;
+    ctx.save();
+    ctx.fillStyle = 'rgba(128,150,76,.34)';
+    for (let y = y0 + passo / 2, lin = 0; y < y1; y += passo, lin++) {
+      for (let x = (lin % 2) * passo / 2; x < L; x += passo) {
+        const a = alfa[Math.min(h - 1, Math.floor((y - y0) / esc)) * w + Math.min(w - 1, Math.floor(x / esc))];
+        const borda = Math.max(0, 1 - Math.abs(a - 0.3) / 0.16) * (1 - (y - y0) / (y1 - y0));
+        if (borda <= 0.08) continue;
+        ctx.beginPath();
+        ctx.arc(x, y, passo * 0.34 * Math.sqrt(borda), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+  function arteFe(ctx) {
+    const r = sorteio(1810);
+    fundoPapel(ctx, '#efe8d6', 1811);
+    const cx = L / 2;
+    S.escrever(ctx, 'CAMINHAMOS POR', cx + 7, 616, oswaldLP(52, 600), LP.tinta, { espaco: 14 });
+    // FÉ em tinta gasta: o tamanho em que o É (com o acento) mede 570px de altura
+    const { c, ctx: k } = camada();
+    k.font = oswaldLP(100, 700);
+    const alto100 = k.measureText('É').actualBoundingBoxAscent;
+    const tF = 100 * 570 / alto100;
+    k.font = oswaldLP(tF, 700);
+    const capF = k.measureText('F').actualBoundingBoxAscent;
+    const base = 670 + 570;
+    S.escrever(k, 'FÉ', cx, base, oswaldLP(tF, 700), LP.tinta, { espaco: tF * 0.02 });
+    const wF = k.measureText('FÉ').width;
+    gastar(c, { x: cx - wF / 2, y: base - 600, w: wF, h: 620 }, { pontos: 700, manchas: 8, riscos: 40, semente: 1812, forca: 0.55 });
+    ctx.drawImage(c, 0, 0);
+    // as pegadas sobem da beira e entram na neblina, encolhendo com a distância
+    const passos = [[cx + 30, 1370, 0.74], [cx - 26, 1310, 0.67], [cx + 22, 1258, 0.6], [cx - 18, 1214, 0.54], [cx + 14, 1176, 0.49], [cx - 11, 1144, 0.44], [cx + 8, 1116, 0.39]];
+    passos.forEach(([x, y, s], i) => pegada(ctx, x, y, s, (i % 2 ? 0.08 : -0.08), i % 2 === 1, 'rgba(18,19,15,' + (0.86 - i * 0.04).toFixed(2) + ')'));
+    neblina(ctx, base - capF * 0.62, base + 110, r);
+    // o fim do lema, depois da neblina
+    S.escrever(ctx, 'e não pelo que vemos.', cx, 1468, 'italic 400 50px Literata, Georgia, serif', LP.tinta);
+    referencia(ctx, '2 Coríntios 5.7', cx, 1522, 22, '#5c5a52');
   }
   S.prepararVersiculo = () => carregarFoto('montanhas');
   S.versiculoCompleto = () => fotoPronta('montanhas');
