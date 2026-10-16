@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a corda trançada com três fios de Ec 4.12: a estaca fincada no chão, a corda grossa amarrada nela com uma volta, as voltas da trança em curvas inclinadas e, na ponta solta, os três fios abertos. A estaca é a área em sálvia. -->
+<path class="k" d="M8 98C30 95 90 95 112 98"/>
+<path class="k s" d="M14 97V32L19 26L24 32V97Z"/>
+<path class="h" d="M17 40V48M21 78V90"/>
+<path class="k p" d="M24 51H90C92 54 92 66 90 69H24Z"/>
+<path class="k" d="M30 69C31 62 36 58 38 51M38 69C39 62 44 58 46 51M46 69C47 62 52 58 54 51M54 69C55 62 60 58 62 51M62 69C63 62 68 58 70 51M70 69C71 62 76 58 78 51M78 69C79 62 84 58 86 51"/>
+<path class="k p" d="M11 53C11 49 27 49 27 53V67C27 71 11 71 11 67Z"/>
+<path class="h" d="M11 60C16 62 22 62 27 60"/>
+<path class="k" d="M91 54C97 50 101 45 104 39M92 60C98 60 104 59 110 57M91 66C97 69 101 74 103 81"/>
+</svg>

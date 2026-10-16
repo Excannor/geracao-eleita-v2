@@ -1,0 +1,286 @@
+{
+  "nome": "Eclesiastes",
+  "grupo": "Poéticos",
+  "numero": 21,
+  "capitulos": 12,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "קֹהֶלֶת",
+    "transliteracao": "Qohelet",
+    "traducao": "o que reúne o povo",
+    "texto": "Qohelet é quem reúne o povo para ensinar, e por isso a Bíblia em português chama esse homem de Pregador. Eclesiastes vem do grego e tem a raiz da palavra igreja."
+  },
+  "autoria": {
+    "texto": "O livro começa assim: “Palavra do Pregador Salomão, rei de Jerusalém, filho de Davi, rei de Jerusalém.” Ele conta que foi rei de Israel e morou em Jerusalém.",
+    "apoio": "Perto do fim, outra pessoa fala do Pregador. Ela conta que ele era sábio e não parou de ensinar o povo. Ele juntou muitos provérbios e ditados.",
+    "refs": [
+      "Ec 1.1",
+      "Ec 1.12",
+      "Ec 12.9"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O Pregador começa dizendo que tudo é ilusão, e perto do fim diz isso de novo. Ele é rei e consegue tudo o que os olhos dele desejam. Quando olha o que as mãos dele fizeram, vê que tudo é como correr atrás do vento. Mesmo assim, ele diz que não há nada melhor do que comer, beber e ter prazer no trabalho, e que esse prazer vem de Deus.",
+    "apoio": "No fim, ele dá um conselho só: “Tema a Deus e obedeça aos seus mandamentos.”",
+    "refs": [
+      "Ec 1.2",
+      "Ec 2.10-11",
+      "Ec 2.24",
+      "Ec 12.8",
+      "Ec 12.13"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Nada de novo",
+      "sub": "O sol nasce e volta ao lugar",
+      "desenho": "luz-sobre-as-aguas",
+      "galhos": [
+        {
+          "texto": "O sol nasce, se põe e volta ao lugar de onde saiu. Os rios correm para o mar, e o mar nunca fica cheio. A água volta para os rios e desce outra vez.",
+          "ref": "Ec 1.5, 7"
+        },
+        {
+          "texto": "Tudo já foi dito ou feito antes, diz o Pregador. Ele pergunta: “Você pode mostrar alguma coisa nova?” Daqui a algum tempo, ninguém vai lembrar o que a gente fez.",
+          "ref": "Ec 1.10-11"
+        },
+        {
+          "texto": "Ele se esforça para entender tudo o que existe e descobre que Deus deu ao homem trabalhos pesados. Ele diz que o que está torto não tem conserto.",
+          "ref": "Ec 1.13, 15"
+        },
+        {
+          "texto": "O Pregador se acha mais estudado que todos os reis que governaram Jerusalém. Depois ele diz: “quanto maior a sabedoria, maior o sofrimento”.",
+          "ref": "Ec 1.16, 18"
+        }
+      ],
+      "conexao": "O Pregador diz a si mesmo que vai experimentar a alegria e aproveitar a vida ao máximo (Ec 2.1)."
+    },
+    {
+      "titulo": "O rei tem tudo",
+      "sub": "O Pregador constrói e planta",
+      "desenho": "taca-de-vinho",
+      "galhos": [
+        {
+          "texto": "O Pregador resolve se entregar ao vinho e se divertir, sem largar a sabedoria. Ele quer descobrir o que vale a pena fazer durante a vida curta na terra.",
+          "ref": "Ec 2.3"
+        },
+        {
+          "texto": "Ele constrói casas e planta videiras. Nos jardins e pomares, põe todo tipo de árvore de fruta e manda fazer açudes para regar as plantações.",
+          "ref": "Ec 2.4-6"
+        },
+        {
+          "texto": "Os reis dos países vizinhos pagam impostos em ouro e prata. Ele monta corais e orquestras com bons cantores e cantoras e fica mais importante que todos os reis de Jerusalém antes dele.",
+          "ref": "Ec 2.8-9"
+        },
+        {
+          "texto": "O sábio tem olhos para ver, e o tolo é cego. Só que os dois têm o mesmo fim. O Pregador pensa: “Um dia o tolo vai morrer, e eu também.”",
+          "ref": "Ec 2.14-15"
+        },
+        {
+          "texto": "Ele fica aborrecido porque vai ter de deixar tudo para outra pessoa. Ninguém sabe se ela vai ser sábia ou tola, e ela recebe de mão beijada o que ele ajuntou.",
+          "ref": "Ec 2.18-19, 21"
+        }
+      ],
+      "conexao": "Sem Deus, ninguém come nem se alegra (Ec 2.25), e para cada coisa há um tempo certo (Ec 3.1)."
+    },
+    {
+      "titulo": "Tempo certo",
+      "sub": "Um tempo para nascer e morrer",
+      "desenho": "relogio-de-sol",
+      "galhos": [
+        {
+          "texto": "O Pregador fala de catorze pares de tempo. Tem hora de plantar e hora de colher, hora de chorar e hora de rir.",
+          "ref": "Ec 3.2-8"
+        },
+        {
+          "texto": "Ele diz: “Deus colocou o anseio pela eternidade no coração do homem”. Só que o homem não consegue entender por inteiro os planos de Deus.",
+          "ref": "Ec 3.11"
+        },
+        {
+          "texto": "Tudo o que Deus faz dura para sempre, e ninguém consegue tirar nem pôr nada. Deus quer que os homens tenham temor dele.",
+          "ref": "Ec 3.14"
+        },
+        {
+          "texto": "Debaixo do sol, o Pregador vê o crime no lugar da justiça. Ele pensa que Deus vai julgar o justo e o perverso na hora certa.",
+          "ref": "Ec 3.16-17"
+        },
+        {
+          "texto": "Os homens e os animais respiram o mesmo ar e morrem do mesmo jeito. Todos voltam ao pó de onde vieram.",
+          "ref": "Ec 3.19-20"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus levanta os olhos para o céu e ora ao Pai. Ele diz o que é a vida eterna: “conhecer o único Deus verdadeiro, e a Jesus Cristo, que o Senhor enviou!”",
+        "refs": [
+          "Jo 17.1, 3"
+        ]
+      },
+      "conexao": "O Pregador olha as lágrimas de quem sofre, e ninguém consola essa gente (Ec 4.1)."
+    },
+    {
+      "titulo": "Dois juntos",
+      "sub": "A corda de três fios aguenta",
+      "desenho": "corda-de-tres-fios",
+      "galhos": [
+        {
+          "texto": "O Pregador percebe que a inveja faz os homens correrem atrás do sucesso. O tolo cruza os braços e passa fome. Para o Pregador, vale mais viver apertado e tranquilo do que trabalhar até cansar.",
+          "ref": "Ec 4.4-6"
+        },
+        {
+          "texto": "Um homem vive sozinho, sem filhos e sem irmãos, e trabalha sem parar para juntar dinheiro. O Pregador pergunta para quem ele vai deixar tudo isso.",
+          "ref": "Ec 4.8"
+        },
+        {
+          "texto": "Duas pessoas juntas rendem mais que uma. Se uma cai, a outra ajuda a levantar. Na noite fria, as duas se esquentam debaixo do mesmo cobertor. O Pregador diz: “Uma corda trançada com três fios não arrebenta facilmente.”",
+          "ref": "Ec 4.9-12"
+        },
+        {
+          "texto": "Para o Pregador, um jovem pobre e sábio vale mais que um rei velho e tolo, que não aceita ser corrigido. Um rapaz assim pode sair da prisão e virar rei.",
+          "ref": "Ec 4.13-14"
+        },
+        {
+          "texto": "Quem entra no templo de Deus tem de tomar cuidado. Deus está no céu, e a pessoa está aqui na terra. Por isso, o Pregador manda falar pouco.",
+          "ref": "Ec 5.1-2"
+        },
+        {
+          "texto": "O trabalhador dorme bem, coma pouco ou muito, e o rico fica preocupado e não dorme direito. Quem ama o dinheiro nunca acha que tem o suficiente.",
+          "ref": "Ec 5.10, 12"
+        }
+      ],
+      "conexao": "O Pregador pergunta quem sabe o que é melhor nesta vida curta (Ec 6.12). Ele tenta responder com o que vale mais (Ec 7.1)."
+    },
+    {
+      "titulo": "Vale mais",
+      "sub": "Mosca morta estraga o perfume",
+      "desenho": "frasco-de-alabastro",
+      "galhos": [
+        {
+          "texto": "Para o Pregador, é melhor ir a um velório do que a uma festa, porque todo mundo vai morrer um dia. O sábio fica na casa onde há luto, e o tolo só quer se divertir.",
+          "ref": "Ec 7.2, 4"
+        },
+        {
+          "texto": "Ele avisa que não é sábio perguntar por que os dias do passado não voltam. Deus dá os dias bons e também os maus, e ninguém sabe o que vai acontecer amanhã.",
+          "ref": "Ec 7.10, 14"
+        },
+        {
+          "texto": "Os vivos ainda têm esperança. O Pregador diz: “É melhor ser um cachorro vivo do que um leão morto!”",
+          "ref": "Ec 9.4"
+        },
+        {
+          "texto": "Ele manda comer com prazer e beber o vinho com alegria, porque Deus se agrada do que a pessoa faz. Também manda viver feliz com a mulher amada todos os dias da vida.",
+          "ref": "Ec 9.7, 9"
+        },
+        {
+          "texto": "Um rei cerca uma cidade pequena com um grande exército. Ali mora um homem pobre e sábio, que salva todos com a sabedoria dele. Depois, todo mundo esquece esse homem.",
+          "ref": "Ec 9.14-15"
+        },
+        {
+          "texto": "Moscas mortas estragam um vidro de perfume. Do mesmo jeito, um pouco de tolice estraga muita sabedoria.",
+          "ref": "Ec 10.1"
+        }
+      ],
+      "conexao": "O Pregador manda dar o pão com generosidade, porque o que se dá aos outros volta (Ec 11.1)."
+    },
+    {
+      "titulo": "O fio de prata",
+      "sub": "Lembre do Criador cedo",
+      "desenho": "cantaro-quebrado",
+      "galhos": [
+        {
+          "texto": "Quem vive de olho no vento não planta, e quem olha para as nuvens não colhe. O Pregador manda plantar as sementes sem parar, porque ninguém sabe qual delas vai crescer.",
+          "ref": "Ec 11.4, 6"
+        },
+        {
+          "texto": "Ele diz ao jovem que aproveite a juventude e faça o que tiver vontade. Só que o jovem vai ter de prestar contas a Deus de tudo o que fizer.",
+          "ref": "Ec 11.9"
+        },
+        {
+          "texto": "O Pregador pede que o jovem se lembre do Criador antes de chegarem os dias difíceis. Nesses anos, a pessoa vai dizer: “Não tenho mais alegria de viver”.",
+          "ref": "Ec 12.1"
+        },
+        {
+          "texto": "Na velhice, os braços tremem e as pernas ficam fracas. A pessoa acorda com o barulho dos pássaros, mas não ouve direito o moinho moendo.",
+          "ref": "Ec 12.3-4"
+        },
+        {
+          "texto": "Um dia o fio de prata da vida se corta, e o cântaro se quebra na fonte. O pó volta para a terra, e o espírito volta para Deus, que deu a vida.",
+          "ref": "Ec 12.6-7"
+        },
+        {
+          "texto": "Deus vai julgar tudo o que foi feito, até as coisas que ninguém conhece, sejam boas ou más.",
+          "ref": "Ec 12.14"
+        }
+      ],
+      "jesus": {
+        "texto": "Vai chegar o dia em que Deus vai julgar a vida íntima de todos, até os pensamentos e os motivos mais secretos. Deus vai fazer isso pelas mãos de Jesus Cristo.",
+        "refs": [
+          "Rm 2.16"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "O Pregador pergunta: “Qual é a vantagem que o homem consegue com o seu trabalho em que se esforça tanto debaixo do sol?” No Novo Testamento, os irmãos ouvem que a vitória que vem é certa. Eles devem ficar firmes no trabalho do Senhor, porque nada do que fazem para ele é inútil (1Co 15.58).",
+    "ref": "Ec 1.3",
+    "desenho": "tumulo-aberto",
+    "pares": [
+      {
+        "at": "Ec 1.9",
+        "texto": "não há nada de novo debaixo do sol.",
+        "nt": "Ap 21.5",
+        "nota": "Aquele que está sentado no trono diz que está fazendo novas todas as coisas"
+      },
+      {
+        "at": "Ec 5.15",
+        "texto": "O homem sai nu do ventre de sua mãe e, como veio, assim vai.",
+        "nt": "1Tm 6.7",
+        "nota": "Ninguém trouxe dinheiro quando veio ao mundo, e ninguém leva nada quando morre"
+      },
+      {
+        "at": "Ec 7.20",
+        "texto": "não existe um único homem na terra que seja sempre justo e que pratique o bem e nunca peque.",
+        "nt": "Rm 3.23-24",
+        "nota": "Todos pecaram e estão longe da glória de Deus, e Jesus Cristo tira os nossos pecados sem cobrar nada"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Nada de novo debaixo do sol", "de": 1, "ate": 1 },
+    { "titulo": "O rei experimenta de tudo", "de": 2, "ate": 2 },
+    { "titulo": "Um tempo para cada coisa", "de": 3, "ate": 3 },
+    { "titulo": "O trabalho e o dinheiro", "de": 4, "ate": 6 },
+    { "titulo": "O que vale mais", "de": 7, "ate": 10 },
+    { "titulo": "Lembre do Criador", "de": 11, "ate": 12 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O sorriso do tolo some tão depressa quanto o estalo de espinhos debaixo da panela.",
+      "ref": "Ec 7.6"
+    },
+    {
+      "texto": "Nem sempre o mais rápido ganha a corrida, e nem sempre o mais forte vence a guerra. Ninguém sabe quando vai chegar a sua hora, como o peixe que cai na rede.",
+      "ref": "Ec 9.11-12"
+    },
+    {
+      "texto": "Quem cava um poço pode cair dentro dele, e quem derruba um muro pode ser mordido por uma cobra.",
+      "ref": "Ec 10.8"
+    },
+    {
+      "texto": "O Pregador avisa que não se deve amaldiçoar o rico nem dentro do quarto, porque uma ave do céu pode levar a conversa até ele.",
+      "ref": "Ec 10.20"
+    },
+    {
+      "texto": "Para o caso de precisar de ajuda no futuro, o Pregador manda dividir o que se tem com sete pessoas, ou até com oito.",
+      "ref": "Ec 11.2"
+    },
+    {
+      "texto": "As palavras dos sábios são como pregos bem fixados, diz o Pregador. Elas vêm do único Pastor.",
+      "ref": "Ec 12.11"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a expressão debaixo do sol. O Pregador usa essas palavras vinte e oito vezes, quando pensa no trabalho, na riqueza e na morte. Quando ele manda o jovem se lembrar do Criador, ela não aparece mais.",
+    "ref": "Ec 8.9"
+  }
+}

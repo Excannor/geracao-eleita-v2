@@ -1,0 +1,269 @@
+{
+  "nome": "Cânticos",
+  "grupo": "Poéticos",
+  "numero": 22,
+  "capitulos": 8,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "שִׁיר־הַשִּׁירִים",
+    "transliteracao": "Shir hashirim",
+    "traducao": "a canção das canções",
+    "texto": "Em hebraico, repetir a palavra é um jeito de dizer que aquela é a maior de todas. A canção começa dizendo que é mais bonita que qualquer outra."
+  },
+  "autoria": {
+    "texto": "O rei Salomão escreveu esta canção.",
+    "apoio": "No fim do poema, Salomão tem uma plantação de uvas e arrenda essa terra a alguns lavradores.",
+    "refs": [
+      "Ct 1.1",
+      "Ct 8.11"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Cânticos é uma canção de amor entre uma moça e o amado dela, que ela chama de rei. Ele diz que os olhos dela são como os das pombas, e ela acha o amado encantador. Ela canta: “O meu amado é meu, e eu sou dele.” No fim, ela pede que ele venha depressa, como a gazela que salta sobre os montes.",
+    "refs": [
+      "Ct 1.4",
+      "Ct 1.15-16",
+      "Ct 2.16",
+      "Ct 8.14"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Primeiro amor",
+      "sub": "Ela é um lírio entre espinhos",
+      "desenho": "lirio-do-campo",
+      "galhos": [
+        {
+          "texto": "A moça é morena e está queimada do sol. Ela pede que as moças de Jerusalém não façam pouco caso dela. Os irmãos se zangaram e mandaram ela cuidar das plantações de uvas, e ela não pôde cuidar da videira dela.",
+          "ref": "Ct 1.5-6"
+        },
+        {
+          "texto": "Ela pergunta ao amado onde ele leva o rebanho quando o sol esquenta. Ela não quer procurar por ele entre as ovelhas dos outros pastores. Ele responde que basta seguir a trilha do rebanho até as cabanas dos pastores.",
+          "ref": "Ct 1.7-8"
+        },
+        {
+          "texto": "A moça diz: “Eu sou a rosa de Sarom, o lírio dos vales.” O amado responde que ela é um lírio entre os espinhos.",
+          "ref": "Ct 2.1-2"
+        },
+        {
+          "texto": "Para ela, o amado é como uma macieira no meio das árvores do pomar. Ela gosta de sentar à sombra dele, e o fruto é gostoso.",
+          "ref": "Ct 2.3"
+        }
+      ],
+      "conexao": "A moça ouve o amado chegar, saltando pelos montes (Ct 2.8)."
+    },
+    {
+      "titulo": "Primavera",
+      "sub": "O inverno já acabou",
+      "desenho": "ramo-brotando",
+      "galhos": [
+        {
+          "texto": "O amado é como uma gazela. Ele fica atrás do muro e espia pela janela, por entre as grades.",
+          "ref": "Ct 2.9"
+        },
+        {
+          "texto": "Ele chama a moça para ir com ele. O inverno já acabou, e a chuva passou. A figueira começa a dar os primeiros frutos, e as videiras florescem.",
+          "ref": "Ct 2.10-13"
+        },
+        {
+          "texto": "O amado chama a moça de minha pomba. Ela está escondida entre as pedras, numa fenda da rocha, e ele quer ver o rosto e ouvir a voz dela.",
+          "ref": "Ct 2.14"
+        },
+        {
+          "texto": "Na canção, alguém manda apanhar as raposinhas que estão acabando com as plantações de uvas, porque as vinhas estão em flor.",
+          "ref": "Ct 2.15"
+        },
+        {
+          "texto": "Certa noite, a moça procura o amado e não acha. Ela sai pelas ruas e praças da cidade e pergunta aos guardas se viram o amado. Pouco depois, ela encontra o amado, abraça e não deixa que ele vá embora.",
+          "ref": "Ct 3.1-4"
+        }
+      ],
+      "conexao": "Alguma coisa vem pelo deserto como uma nuvem de fumaça, com cheiro de incenso e mirra (Ct 3.6)."
+    },
+    {
+      "titulo": "O casamento",
+      "sub": "Salomão chega com a coroa",
+      "desenho": "coroa",
+      "galhos": [
+        {
+          "texto": "A liteira de Salomão chega cercada por sessenta homens valentes, os melhores soldados de Israel. Cada um traz a espada e está pronto para defender o rei dos pavores da noite.",
+          "ref": "Ct 3.7-8"
+        },
+        {
+          "texto": "Salomão constrói a liteira com madeira do Líbano. As colunas são de prata, e o teto é de ouro. As mulheres de Jerusalém enfeitam o lado de dentro.",
+          "ref": "Ct 3.9-10"
+        },
+        {
+          "texto": "As moças de Sião saem à rua para ver o rei Salomão. Ele usa a coroa que a mãe pôs na cabeça dele no dia do casamento, o dia em que o coração dele se alegrou.",
+          "ref": "Ct 3.11"
+        },
+        {
+          "texto": "O amado diz que os cabelos dela são como um rebanho de cabras descendo os morros de Gileade. O sorriso dela é branco como ovelhas que acabaram de ser tosquiadas e lavadas.",
+          "ref": "Ct 4.1-2"
+        },
+        {
+          "texto": "Para o amado, o pescoço da moça é como a torre de Davi, com mil escudos de guerra pendurados.",
+          "ref": "Ct 4.4"
+        },
+        {
+          "texto": "Ele chama a noiva de jardim particular. Ela é como uma fonte só dele e de mais ninguém.",
+          "ref": "Ct 4.12"
+        }
+      ],
+      "jesus": {
+        "texto": "Perguntam a Jesus por que os discípulos dele não jejuam. Ele responde que os amigos do noivo não jejuam enquanto o noivo está com eles. O noivo de quem Jesus fala é ele, e um dia vai ser tirado dos amigos.",
+        "refs": [
+          "Mc 2.18-20"
+        ]
+      },
+      "conexao": "Certa noite, o amado bate à porta com os cabelos molhados de orvalho (Ct 5.2)."
+    },
+    {
+      "titulo": "Porta fechada",
+      "sub": "Ela demora a abrir",
+      "desenho": "porta-trancada",
+      "galhos": [
+        {
+          "texto": "A moça já trocou de roupa e lavou os pés. Ela pergunta se vai ter de se vestir de novo.",
+          "ref": "Ct 5.3"
+        },
+        {
+          "texto": "O amado tenta abrir a porta. Quando ela tira a tranca, com as mãos pingando mirra, ele já foi embora. Ela chama, e ele não responde.",
+          "ref": "Ct 5.4-6"
+        },
+        {
+          "texto": "Os guardas da cidade encontram a moça na rua e batem nela. Os vigias da muralha arrancam o manto dela.",
+          "ref": "Ct 5.7"
+        },
+        {
+          "texto": "Ela pede às moças de Jerusalém que digam ao amado, se encontrarem ele, que ela está morrendo de amor. Elas perguntam o que esse homem tem que nenhum outro tem.",
+          "ref": "Ct 5.8-9"
+        },
+        {
+          "texto": "A moça responde que o amado se destaca entre dez mil homens. A cabeça dele é como ouro puro, e o cabelo cheio de cachos é preto como as penas de um corvo.",
+          "ref": "Ct 5.10-11"
+        },
+        {
+          "texto": "Ela sabe para onde ele foi. O amado foi ao jardim dele dar de comer ao rebanho e colher lírios.",
+          "ref": "Ct 6.2"
+        }
+      ],
+      "conexao": "O amado diz que a moça é linda como Tirza e bela como Jerusalém (Ct 6.4)."
+    },
+    {
+      "titulo": "Única",
+      "sub": "A pombinha dele é única",
+      "desenho": "romas",
+      "galhos": [
+        {
+          "texto": "O amado diz que pode haver sessenta rainhas e muitas outras moças, mas a pombinha dele é perfeita. Até as rainhas elogiam a moça.",
+          "ref": "Ct 6.8-9"
+        },
+        {
+          "texto": "As rainhas perguntam quem é essa que aparece como o alvorecer, linda como a lua e brilhante como o sol.",
+          "ref": "Ct 6.10"
+        },
+        {
+          "texto": "Outras vozes chamam a moça de sulamita e pedem que ela volte para junto delas, para poderem ver a moça de novo.",
+          "ref": "Ct 6.13"
+        },
+        {
+          "texto": "A moça diz: “Eu sou do meu amado, e ele sente saudades de mim.” Ela chama o amado para sair pelo campo e ver se as videiras já brotaram e se os pés de romã já deram flor.",
+          "ref": "Ct 7.10-12"
+        },
+        {
+          "texto": "No campo, as mandrágoras deixam o ar perfumado. Ela guardou para ele todo tipo de fruta, fresca ou seca.",
+          "ref": "Ct 7.13"
+        }
+      ],
+      "conexao": "Alguém pergunta quem vem do deserto, apoiada no amado (Ct 8.5)."
+    },
+    {
+      "titulo": "Amor forte",
+      "sub": "Nenhuma água apaga o amor",
+      "desenho": "fogueira",
+      "galhos": [
+        {
+          "texto": "A moça pede um lugar para sempre no coração do amado. Ela diz: “o amor é forte como a morte”. Para ela, o amor é como um fogo, como as labaredas do Senhor.",
+          "ref": "Ct 8.6"
+        },
+        {
+          "texto": "Nenhuma água apaga a chama do amor, e nenhum rio leva o amor na correnteza. Quem oferece toda a fortuna da casa para comprar o amor só ganha desprezo.",
+          "ref": "Ct 8.7"
+        },
+        {
+          "texto": "Alguns irmãos perguntam o que vão fazer com a irmãzinha no dia em que alguém pedir a mão dela. Se ela for um muro, eles vão construir uma torre de prata em cima. A moça responde que ela é um muro, e por isso o amado se agradou dela.",
+          "ref": "Ct 8.8-10"
+        },
+        {
+          "texto": "A moça diz que a vinha dela está em poder dela. Ela deixa os doze quilos de prata para Salomão.",
+          "ref": "Ct 8.12"
+        },
+        {
+          "texto": "Uma voz chama a moça que mora nos jardins. Os amigos querem ouvir a voz dela, e quem chama também quer.",
+          "ref": "Ct 8.13"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus manda os discípulos amarem uns aos outros do jeito que ele ama. Ele diz que o maior amor é o de quem entrega a vida pelos amigos.",
+        "refs": [
+          "Jo 15.12-13"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "O amado diz à moça: “Você é linda demais, minha querida; em você não há o menor defeito.” No Novo Testamento, o marido deve amar a esposa do jeito que Cristo amou a igreja e se entregou por ela. Cristo quer apresentar a igreja a si mesmo sem mancha, sem ruga e sem nenhum defeito (Ef 5.25-27).",
+    "ref": "Ct 4.7",
+    "desenho": "duas-aliancas",
+    "pares": [
+      {
+        "at": "Ct 2.4",
+        "texto": "Ele me levou ao salão de festas e mostrou a todos o quanto me ama.",
+        "nt": "1Jo 4.19",
+        "nota": "O nosso amor por Deus nasce porque ele amou a gente primeiro"
+      },
+      {
+        "at": "Ct 6.3",
+        "texto": "Eu sou do meu amado, e o meu amado é meu. Ele leva o seu rebanho para pastar entre os lírios!",
+        "nt": "Jo 10.14",
+        "nota": "Jesus diz que é o bom Pastor, que conhece as ovelhas dele, e elas conhecem Jesus"
+      },
+      {
+        "at": "Ct 5.16",
+        "texto": "Esse é o meu amado, esse é o meu noivo.",
+        "nt": "Ap 19.7",
+        "nota": "Chegou a hora do casamento do Cordeiro, e a noiva dele já se preparou"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "A moça e o amado se encontram", "de": 1, "ate": 2 },
+    { "titulo": "A liteira e o dia do casamento", "de": 3, "ate": 4 },
+    { "titulo": "A porta fechada e a procura", "de": 5, "ate": 6 },
+    { "titulo": "O amor forte como a morte", "de": 7, "ate": 8 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Para a moça, a casa dos dois tem vigas de cedro e telhado de pinheiro.",
+      "ref": "Ct 1.17"
+    },
+    {
+      "texto": "O amado compara a moça a um pomar de romãs, com nardo, açafrão e canela.",
+      "ref": "Ct 4.13-14"
+    },
+    {
+      "texto": "No meio da canção, outra voz entra e convida os amigos para comer e beber à vontade.",
+      "ref": "Ct 5.1"
+    },
+    {
+      "texto": "Os olhos da moça são claros como os açudes de Hesbom, e o nariz é como a torre do Líbano, voltada para Damasco.",
+      "ref": "Ct 7.4"
+    }
+  ],
+  "procure": {
+    "texto": "Procure o pedido que a moça faz três vezes às moças de Jerusalém, com quase nada de diferença. Ela pede que ninguém acorde o amor enquanto ele não quiser. Ela faz o pedido depois de abraçar o amado ou de encontrar o amado.",
+    "ref": "Ct 2.7"
+  }
+}

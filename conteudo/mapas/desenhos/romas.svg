@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as romãs de Ct 4.3, 6.11 e 7.12: uma romã inteira em pé, com a coroa de pontas no alto e uma folha no cabinho, e outra cortada ao meio, deitada, com a parte de dentro cheia de sementes. O lado de dentro da romã cortada é a única área sálvia. -->
+<path class="k" d="M8 100H112"/>
+<path class="k p" d="M41 46L39 33L45 39L50 30L55 39L61 33L59 46Z"/>
+<path class="k p" d="M50 44C68 44 80 58 78 74C76 90 64 99 50 99C36 99 24 90 22 74C20 58 32 44 50 44Z"/>
+<path class="h" d="M30 66C28 76 32 86 40 92"/>
+<path class="k p" d="M59 40C66 30 78 28 86 30C80 38 70 42 59 40Z"/>
+<path class="h" d="M61 39C68 35 76 32 84 31"/>
+<path class="k p" d="M74 88C74 96 82 100 93 100C104 100 112 96 112 88Z"/>
+<ellipse class="k s" cx="93" cy="87" rx="19" ry="7"/>
+<path class="h" d="M82 86a1.7 1.7 0 1 0 0.1 0M88 83.5a1.7 1.7 0 1 0 0.1 0M95 83a1.7 1.7 0 1 0 0.1 0M102 84a1.7 1.7 0 1 0 0.1 0M107 87a1.7 1.7 0 1 0 0.1 0M85 90a1.7 1.7 0 1 0 0.1 0M92 88a1.7 1.7 0 1 0 0.1 0M99 89a1.7 1.7 0 1 0 0.1 0"/>
+</svg>
