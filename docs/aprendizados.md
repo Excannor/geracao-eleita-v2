@@ -697,6 +697,12 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   (`grep -L 'viewBox="0 0 120 120"' conteudo/mapas/desenhos/*.svg` lista os que não servem para ramo). Os versos de
   Ec 12.6 viraram `cantaro-quebrado`. No conteúdo, a NBV já põe o nome de Salomão em Ec 1.1 ("Palavra do Pregador
   Salomão"): a autoria cita o verso em vez de discutir quem escreveu.
+- 2026-10-16 · conteúdo · Cânticos, para todas as idades: Ct 1.13, 4.5, 4.16–5.1, 7.1-9 e 8.1-3 ficam fora dos galhos;
+  o que entra é olhar, procura, porta, casamento, o jardim "só meu" (4.12) e o "eu sou um muro" (8.10). Muitos versos
+  da NBV não dizem quem fala (2.15, 6.11, 6.13, 8.8, 8.13): o galho diz "alguém", "uma voz" ou "alguns irmãos" em vez de
+  pôr um nome. Sem alegoria nos galhos: Cristo e a igreja ficam em "Cânticos e Cristo" (Ef 5.25-27), e o noivo só
+  onde Jesus se chama assim (Mc 2.19-20). E dois desenhos de parábola (160 por 124, como `figueira-brotando`) quase
+  entraram em ramo: o `grep -L` do viewBox acima vale antes de escolher.
 
 ## Entrada, sessão e página inicial
 

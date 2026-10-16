@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o fogo do amor de Ct 8.6-7: a chama alta em três línguas sobre dois troncos cruzados, a chama de dentro e as fagulhas subindo. A chama de dentro é a única área sálvia. -->
+<path class="k" d="M10 100H110"/>
+<path class="k p" d="M60 20C66 32 80 40 80 62C80 76 72 86 60 86C48 86 40 76 40 62C40 52 46 46 48 38C52 46 54 50 56 50C56 40 56 30 60 20Z"/>
+<path class="k s" d="M60 46C64 54 70 60 70 70C70 78 66 82 60 82C54 82 50 78 50 70C50 64 54 60 55 56C57 60 58 60 59 58C59 54 59 50 60 46Z"/>
+<path class="k p" d="M26 98L30 88L92 80L90 90Z"/>
+<path class="k p" d="M28 80L32 90L94 98L90 88Z"/>
+<path class="h" d="M44 87L58 85M66 91L80 93"/>
+<path class="h" d="M82 34l3-4M88 44l4-2M36 32l-3-4M32 44l-4-2"/>
+</svg>
