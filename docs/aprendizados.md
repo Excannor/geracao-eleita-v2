@@ -691,6 +691,15 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   toda hora e tem hífen: o mapa diz "Deus". O NT não cita as falas de Jó sobre o juiz, o advogado e a sabedoria; os pares
   são ecos (1Tm 2.5-6, 1Jo 2.1, Cl 2.3), sem dizer que Jó profetizou, e o significado do nome fica no "lembra".
   Na captura, um galho terminou com "Jó." sozinho na linha: nome de duas letras no fim do item também conta.
+- 2026-10-16 · conteúdo · Jeremias e Lamentações: o "quase com as mesmas palavras" que a skill pede para o "procure"
+  reprova no `checar-mapa` (a regra do reforço vazio pega "mesmas palavras") → escrever "com palavras parecidas". A tela
+  já escreve "Em hebraico, <original>, <transliteração>:" antes do `significado.texto`: o texto não começa com "Em
+  hebraico" nem repete "hebraico". Livro que conta de novo o fim de outro (Jr 39 e 52 com 2Rs 25): a queda fica vista
+  por Jeremias (o poço, a ordem de Nabucodonosor de cuidar dele), e os olhos de Zedequias e as colunas não se repetem.
+  Lamentações: a NBV não mostra o acróstico; ele entrou no `apoio` da autoria pela contagem que se confere na NBV
+  (22, 22, 66, 22 e 22 versículos), com "quase sempre na ordem", porque em parte dos poemas duas letras trocam de lugar.
+- 2026-10-16 · tela · "Lamentações" (11 letras, com ç, ã e õ) a 17px passou da célula pronta do Explorar a 360px no
+  `teste-mapas` → a fonte de 17px ficou para nomes de até 10 letras; com 11 e 12, 15px (`tamanhoDoNome`, 06b-mapas.js).
 
 ## Entrada, sessão e página inicial
 

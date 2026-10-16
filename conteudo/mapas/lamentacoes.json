@@ -1,0 +1,257 @@
+{
+  "nome": "Lamentações",
+  "grupo": "Profetas maiores",
+  "numero": 25,
+  "capitulos": 5,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "אֵיכָה",
+    "transliteracao": "Eikhah",
+    "traducao": "como!",
+    "texto": "O primeiro poema começa com essa palavra, um grito de espanto diante da cidade vazia. O nome Lamentações vem do latim e quer dizer lamentos."
+  },
+  "autoria": {
+    "texto": "O autor chora tanto que fica sem lágrimas, vendo a desgraça que caiu sobre o povo dele. Em nenhum dos cinco poemas ele diz o nome dele.",
+    "apoio": "Os capítulos 1, 2 e 4 têm 22 versículos, um para cada letra do alfabeto hebraico, e no original cada estrofe começa com uma letra, quase sempre na ordem. O capítulo 3 dá três versículos a cada letra e chega a 66. A oração do capítulo 5 também tem 22 versículos, mas não segue o alfabeto.",
+    "refs": [
+      "Lm 2.11"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Jerusalém foi destruída, e alguém chora por ela em cinco poemas. Jerusalém pede socorro ao Senhor e não tem ninguém que console. No meio do livro, um homem ferido decide lembrar o que pode dar esperança. No último poema, o povo pede ao Senhor que faça todos voltarem para ele e renove os dias como eram antes.",
+    "refs": [
+      "Lm 1.7",
+      "Lm 1.9",
+      "Lm 3.21",
+      "Lm 5.21"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Cidade sozinha",
+      "sub": "Ninguém consola Jerusalém",
+      "desenho": "canga-de-bois",
+      "galhos": [
+        {
+          "texto": "A cidade que vivia cheia de gente está deserta. Ela chora como uma mulher que perdeu o marido. Antes era a rainha entre as províncias, e agora é uma escrava.",
+          "ref": "Lm 1.1"
+        },
+        {
+          "texto": "As estradas de Sião estão tristes e vazias, porque ninguém vai mais às festas no templo. Os portões estão desertos, e os sacerdotes gemem de tristeza.",
+          "ref": "Lm 1.4"
+        },
+        {
+          "texto": "Em Jerusalém, o povo pede chorando um pedaço de pão. Os moradores trocam os tesouros por comida para não morrer de fome.",
+          "ref": "Lm 1.11"
+        },
+        {
+          "texto": "O Senhor amarra com uma corda os pecados da cidade num jugo e põe tudo no pescoço dela. Ela fica sem força nas mãos dos inimigos.",
+          "ref": "Lm 1.14"
+        },
+        {
+          "texto": "Jerusalém chora e diz: “O meu Consolador está longe de mim”. Sião pede ajuda, e não há quem console.",
+          "ref": "Lm 1.16-17"
+        },
+        {
+          "texto": "A cidade admite que o Senhor tem toda a razão em castigar, porque ela teimou em desobedecer. Os filhos e as filhas dela foram levados como escravos.",
+          "ref": "Lm 1.18"
+        }
+      ],
+      "conexao": "A cidade geme até o coração ficar fraco (Lm 1.22). Depois, as nuvens da ira do Senhor cobrem Jerusalém (Lm 2.1)."
+    },
+    {
+      "titulo": "Dia da ira",
+      "sub": "O Senhor derruba os muros",
+      "desenho": "muro-derrubado",
+      "galhos": [
+        {
+          "texto": "O Senhor ataca Israel como se fosse inimigo. Ele destrói a morada dele com violência, como quem desmancha um canteiro de jardim.",
+          "ref": "Lm 2.5-6"
+        },
+        {
+          "texto": "Deus mede e marca o que vai derrubar nos muros de Sião. As trancas dos portões estão quebradas, e os profetas não têm mais visões do Senhor.",
+          "ref": "Lm 2.8-9"
+        },
+        {
+          "texto": "As crianças perguntam às mães: “Onde está o pão e o vinho?” Elas desmaiam nas ruas como os feridos, nos braços das mães.",
+          "ref": "Lm 2.12"
+        },
+        {
+          "texto": "Os profetas de Jerusalém tiveram visões falsas. Eles não mostraram à cidade os pecados dela, e por isso ela virou escrava.",
+          "ref": "Lm 2.14"
+        },
+        {
+          "texto": "Todos os inimigos assobiam e rangem os dentes. Eles dizem: “Finalmente destruímos Jerusalém!”",
+          "ref": "Lm 2.16"
+        },
+        {
+          "texto": "Quem chora pede aos muros de Sião que deixem as lágrimas correr como um rio, de dia e de noite. O povo deve levantar no meio da noite e derramar o coração como água diante do Senhor.",
+          "ref": "Lm 2.18-19"
+        }
+      ],
+      "conexao": "No dia da ira do Senhor, ninguém escapa (Lm 2.22). Então um homem fala: “Eu vi o terrível sofrimento” (Lm 3.1)."
+    },
+    {
+      "titulo": "O homem que viu",
+      "sub": "Um homem ferido espera em Deus",
+      "desenho": "sol-nascendo",
+      "galhos": [
+        {
+          "texto": "O homem anda no escuro, sem ver a luz. Deus cerca a vida dele com paredes altas e põe correntes pesadas nos pés dele.",
+          "ref": "Lm 3.2-7"
+        },
+        {
+          "texto": "Ele lembra que o grande amor de Deus nunca termina. A misericórdia do Senhor não acaba, e o homem diz: “Ela se renova a cada manhã; grande é a sua fidelidade”.",
+          "ref": "Lm 3.22-23"
+        },
+        {
+          "texto": "O que ele quer na vida é o Senhor, e por isso põe nele toda a esperança. Vale muito esperar com paciência a salvação do Senhor.",
+          "ref": "Lm 3.24-26"
+        },
+        {
+          "texto": "Para o homem, é bom aguentar a carga enquanto é jovem e aprender a ficar sentado em silêncio. Quando alguém bater nele, ele deve mostrar a outra face e aceitar os insultos.",
+          "ref": "Lm 3.27-30"
+        },
+        {
+          "texto": "Ele chama o povo para examinar a vida, voltar para o Senhor e confessar: “Pecamos e fomos rebeldes e o Senhor não nos perdoou”.",
+          "ref": "Lm 3.40-42"
+        },
+        {
+          "texto": "Os inimigos jogam o homem num poço e atiram pedras nele. A água chega à cabeça dele. Lá do fundo, ele chama pelo nome do Senhor, que ouve e responde: “Não tenha medo”.",
+          "ref": "Lm 3.53-57"
+        }
+      ],
+      "jesus": {
+        "texto": "Quando insultam Jesus, ele nunca retruca. Quando sofre, não faz ameaças e deixa o caso nas mãos de Deus, que sempre julga com justiça.",
+        "refs": [
+          "1Pe 2.21-23"
+        ]
+      },
+      "conexao": "O homem pede que o Senhor castigue os inimigos (Lm 3.64). Aí quem chora vê o ouro sem brilho (Lm 4.1)."
+    },
+    {
+      "titulo": "Ouro sem brilho",
+      "sub": "Os filhos de Sião passam fome",
+      "desenho": "cesto-vazio",
+      "galhos": [
+        {
+          "texto": "Os filhos de Sião valiam o peso deles em ouro. Agora valem menos que um vaso de barro feito por um oleiro.",
+          "ref": "Lm 4.2"
+        },
+        {
+          "texto": "Até os chacais amamentam os filhotes. No meio do povo, a língua dos bebês gruda no céu da boca de sede, e as crianças pedem um pedacinho de pão que não sobrou.",
+          "ref": "Lm 4.3-4"
+        },
+        {
+          "texto": "As pessoas que viviam em palácios agora reviram os montes de lixo.",
+          "ref": "Lm 4.5"
+        },
+        {
+          "texto": "Os príncipes eram mais brancos que a neve e o leite. Agora a pele deles está escura como carvão e enrugada sobre os ossos, e ninguém reconhece esses homens na rua.",
+          "ref": "Lm 4.7-8"
+        },
+        {
+          "texto": "Dentro de Jerusalém, os profetas e os sacerdotes mataram gente inocente. Agora andam pelas ruas como cegos, sujos de sangue, e o povo grita: “Vocês são imundos!”",
+          "ref": "Lm 4.13-15"
+        },
+        {
+          "texto": "Os inimigos alcançam quem foge para as montanhas e preparam uma armadilha no deserto. Até o rei escolhido pelo Senhor fica preso numa dessas armadilhas.",
+          "ref": "Lm 4.19-20"
+        }
+      ],
+      "conexao": "O castigo de Sião vai ter fim (Lm 4.22). O povo pede ao Senhor: “Veja a nossa desgraça e vergonha!” (Lm 5.1)"
+    },
+    {
+      "titulo": "Oração do povo",
+      "sub": "O povo pede para voltar",
+      "desenho": "coroa",
+      "galhos": [
+        {
+          "texto": "A terra e as casas do povo agora são de estrangeiros. Todos têm de pagar até a água que bebem.",
+          "ref": "Lm 5.2, 4"
+        },
+        {
+          "texto": "Para o povo, os pais pecaram e morreram antes de o castigo chegar. Agora os filhos pagam pelos pecados deles.",
+          "ref": "Lm 5.7"
+        },
+        {
+          "texto": "Os inimigos obrigam os jovens a moer cereal com pedras pesadas. Os meninos caem com o peso da lenha. Ninguém mais canta, e as danças viram lamentos.",
+          "ref": "Lm 5.13-15"
+        },
+        {
+          "texto": "Todos dizem: “Caiu a coroa das nossas cabeças! Ai de nós, porque temos pecado!” Os olhos do povo perderam o brilho.",
+          "ref": "Lm 5.16-17"
+        },
+        {
+          "texto": "O monte de Sião está deserto, e os chacais andam por ali. Mesmo assim, o povo diz: “Mas Senhor, o Senhor reina para sempre!”",
+          "ref": "Lm 5.18-19"
+        },
+        {
+          "texto": "Depois, o povo pergunta por que o Senhor se esqueceria deles para sempre. O livro termina com outra pergunta, se a ira do Senhor contra eles não tem limite.",
+          "ref": "Lm 5.20, 22"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "A cidade pergunta: “Será que o meu sofrimento não significa nada para vocês que passam por mim?” No caminho da cruz, muitas mulheres choram por Jesus, e ele pede que as filhas de Jerusalém chorem por elas e pelos filhos (Lc 23.27-28). Na cruz, o povo que passa ofende Jesus e sacode a cabeça para ele (Mt 27.39).",
+    "ref": "Lm 1.12",
+    "desenho": "cruz",
+    "pares": [
+      {
+        "at": "Lm 5.3",
+        "texto": "Somos órfãos! Nosso pai morreu, nossa mãe ficou viúva.",
+        "nt": "Jo 14.18",
+        "nota": "Os discípulos não vão ficar órfãos, porque Jesus promete voltar para eles"
+      },
+      {
+        "at": "Lm 3.31",
+        "texto": "porque o Senhor não o rejeitará para sempre.",
+        "nt": "Jo 6.37",
+        "nota": "Para Jesus, quem vem a ele nunca vai ser rejeitado"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Jerusalém sozinha e sem consolo", "de": 1, "ate": 1 },
+    { "titulo": "O dia da ira do Senhor", "de": 2, "ate": 2 },
+    { "titulo": "O homem que volta a esperar", "de": 3, "ate": 3 },
+    { "titulo": "A fome e a queda de Sião", "de": 4, "ate": 4 },
+    { "titulo": "A oração dos que sobraram", "de": 5, "ate": 5 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Jerusalém perde para os inimigos as coisas mais preciosas dela. O povo vê entrar no templo nações que Deus tinha proibido de participar das assembleias.",
+      "ref": "Lm 1.10"
+    },
+    {
+      "texto": "Os inimigos gritam de alegria dentro da casa do Senhor, como os judeus faziam nos dias de festa.",
+      "ref": "Lm 2.7"
+    },
+    {
+      "texto": "O homem ferido compara Deus a um urso e a um leão escondidos para atacar de surpresa.",
+      "ref": "Lm 3.10"
+    },
+    {
+      "texto": "No meio da dor, quem chora sabe que Deus não tem prazer em dar sofrimento e tristeza a ninguém.",
+      "ref": "Lm 3.33"
+    },
+    {
+      "texto": "Na confissão do povo, o Senhor se esconde atrás de um véu de nuvens, para as orações não chegarem aos ouvidos dele.",
+      "ref": "Lm 3.44"
+    },
+    {
+      "texto": "Para quem chora, o pecado do povo é maior que o de Sodoma, que foi destruída de repente, sem ajuda de ninguém.",
+      "ref": "Lm 4.6"
+    },
+    {
+      "texto": "Edom, que vive na terra de Uz, pode se alegrar por enquanto. Logo vai tomar o cálice e cair como bêbado.",
+      "ref": "Lm 4.21"
+    }
+  ],
+  "procure": {
+    "texto": "Logo no começo, nenhum dos antigos amantes vem consolar a cidade. Conte no primeiro poema quantas vezes ela fica sem consolo. A queixa volta mais quatro vezes, com palavras parecidas.",
+    "ref": "Lm 1.2"
+  }
+}
