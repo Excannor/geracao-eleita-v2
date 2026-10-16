@@ -2351,7 +2351,9 @@
     ore: { fundo: ['#dedcd7'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.8 }, desenhar: arteOre, grao: [10, 1830] },
     fe: { fundo: ['#efe8d6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteFe, grao: [12, 1810] },
     ctrl: { fundo: ['#e9e9e6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteCtrl, grao: [10, 1850] },
+    liberdade: { fundo: ['#d3d5a2'], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteLiberdade, grao: [12, 1860] },
     mana: { fundo: ['#1b1b1b'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteMana, grao: [14, 1870] },
+    offline: { fundo: ['#f0f0ef'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteOffline, grao: [10, 1880] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -9524,6 +9526,447 @@
     toraXilo(ctx, 342, 878, 344, 786, 44, 34, r);
     ctx.restore();
   }
+  // O mundo vende uma liberdade que aprisiona (sem referência). Como a referência do dono: o
+  // fundo verde-oliva claro, a frase em letra de marcador preta (Permanent Marker), VENDE
+  // circulado à mão e LIBERDADE sublinhado, os dois em vermelho de caneta. No alto, no lugar das
+  // grades da referência (pedido do dono), o que o mundo vende, a lápis, como produtos numa
+  // prateleira: a garrafa de cerveja com a etiqueta de preço, a taça de vinho, o celular cheio de
+  // notificações, o cartão de crédito, as cápsulas e o cigarro com a fumaça. Tudo à mão em
+  // canvas: cada traço repassado duas ou três vezes, tremido, com a hachura de lápis no lado da
+  // sombra. O vermelho é o da referência, só nesta arte.
+  const TINTA_LB = '#161613';
+  const VERMELHO_LB = '#e0402e';
+  // Uma linha em letra de marcador, letra por letra (como aMao); devolve onde cada palavra
+  // começa e termina, para o círculo e o sublinhado.
+  function linhaMarcador(ctx, texto, cx, y, tam, r, aperto = 1, alto = 1) {
+    ctx.font = '400 ' + tam + 'px "Permanent Marker", cursive';
+    const letras = [...texto];
+    const larg = letras.map((l) => ctx.measureText(l).width * aperto);
+    const total = larg.reduce((a, b) => a + b, 0);
+    let px = cx - total / 2;
+    const palavras = {};
+    let atual = null;
+    letras.forEach((l, i) => {
+      if (l === ' ') atual = null;
+      else {
+        if (!atual) { atual = { de: px, ate: px }; palavras[texto.slice(i).split(' ')[0]] = atual; }
+        atual.ate = px + larg[i];
+      }
+      ctx.save();
+      ctx.translate(px + larg[i] / 2, y + (r() - 0.5) * tam * 0.06);
+      ctx.rotate((r() - 0.5) * 0.1);
+      ctx.scale(aperto, alto);
+      ctx.fillStyle = TINTA_LB;
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'left';
+      ctx.fillText(l, -larg[i] / aperto / 2, 0);
+      ctx.restore();
+      px += larg[i];
+    });
+    return { total, palavras };
+  }
+  // ---------- a vitrine do mundo, a lápis ----------
+  // Uma forma a lápis: o papel por dentro (cobre o que está atrás), a hachura do lado da sombra
+  // (lado: 1 à direita, -1 à esquerda, 0 sem) e o contorno repassado duas ou três vezes, tremido.
+  function formaLapis(ctx, pts, r, { lado = 1, fechar = true, papel = true, largura = 2.4, vezes = 3, densa = 0.75 } = {}) {
+    const caminho = new Path2D();
+    pts.forEach(([x, y], i) => (i ? caminho.lineTo(x, y) : caminho.moveTo(x, y)));
+    if (fechar) caminho.closePath();
+    if (fechar && papel) {
+      ctx.fillStyle = '#d3d5a2';
+      ctx.fill(caminho);
+    }
+    if (fechar && lado) {
+      const xs = pts.map((p) => p[0]);
+      const ys = pts.map((p) => p[1]);
+      const x0 = Math.min(...xs);
+      const x1 = Math.max(...xs);
+      const y0 = Math.min(...ys);
+      const y1 = Math.max(...ys);
+      ctx.save();
+      ctx.clip(caminho);
+      ctx.strokeStyle = TINTA_LB;
+      ctx.lineWidth = 1.3;
+      for (let k = x0 - (y1 - y0); k < x1 + 10; k += 5 + r() * 1.5) {
+        const meio = k + (y1 - y0) / 2;
+        const u = (meio - x0) / Math.max(1, x1 - x0);
+        const forca = lado > 0 ? (u - 0.45) / 0.55 : (0.55 - u) / 0.55;
+        if (forca <= 0) continue;
+        ctx.globalAlpha = Math.min(1, forca) * densa;
+        ctx.beginPath();
+        ctx.moveTo(k, y1 + 2);
+        ctx.lineTo(k + (y1 - y0) + 4, y0 - 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.strokeStyle = TINTA_LB;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (let v = 0; v < vezes; v++) {
+      ctx.lineWidth = largura * (0.7 + r() * 0.6);
+      ctx.globalAlpha = 0.55 + r() * 0.4;
+      ctx.beginPath();
+      const lista = fechar ? pts.concat([pts[0]]) : pts;
+      lista.forEach(([x, y], i) => {
+        const jx = x + (r() - 0.5) * 2.2;
+        const jy = y + (r() - 0.5) * 2.2;
+        i ? ctx.lineTo(jx, jy) : ctx.moveTo(jx, jy);
+      });
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  const elipsePts = (cx, cy, rx, ry, a0 = 0, a1 = Math.PI * 2, n = 32) =>
+    Array.from({ length: n + 1 }, (_, i) => { const a = a0 + (a1 - a0) * i / n; return [cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]; });
+  // retângulo de cantos redondos, girado em volta do centro
+  function caixaPts(cx, cy, w, h, raio, giro = 0) {
+    const pts = [];
+    const cantos = [[w / 2 - raio, -h / 2 + raio, -Math.PI / 2], [w / 2 - raio, h / 2 - raio, 0], [-w / 2 + raio, h / 2 - raio, Math.PI / 2], [-w / 2 + raio, -h / 2 + raio, Math.PI]];
+    for (const [x, y, a] of cantos) for (let i = 0; i <= 6; i++) {
+      const t = a + (Math.PI / 2) * i / 6;
+      pts.push([x + Math.cos(t) * raio, y + Math.sin(t) * raio]);
+    }
+    const c = Math.cos(giro);
+    const s = Math.sin(giro);
+    return pts.map(([x, y]) => [cx + x * c - y * s, cy + x * s + y * c]);
+  }
+  // O que o mundo vende, como produtos na prateleira: a garrafa de cerveja com a etiqueta de
+  // preço pendurada no gargalo, a taça de vinho, o celular cheio de notificações, o cartão de
+  // crédito, as cápsulas e o cigarro com a fumaça. No espaço de 780 x 368 (o centro em x 0, a
+  // prateleira em y 350).
+  function vitrineLapis(ctx, r) {
+    // a prateleira e a sombra dela
+    formaLapis(ctx, [[-395, 350], [395, 350], [395, 362], [-395, 362]], r, { lado: 0 });
+    // o cartão de crédito, encostado atrás das cápsulas
+    const cartao = caixaPts(165, 286, 170, 108, 12, -0.12);
+    formaLapis(ctx, cartao, r, { lado: 1, densa: 0.45 });
+    formaLapis(ctx, caixaPts(118, 268, 34, 26, 5, -0.12), r, { lado: 0, vezes: 2, largura: 2 });
+    for (const [x0, x1, y] of [[100, 230, 312], [100, 190, 328]]) {
+      const c = Math.cos(-0.12);
+      const s = Math.sin(-0.12);
+      const p = (x, yy) => [165 + (x - 165) * c - (yy - 286) * s, 286 + (x - 165) * s + (yy - 286) * c];
+      formaLapis(ctx, [p(x0, y), p(x1, y)], r, { fechar: false, vezes: 2, largura: 2 });
+    }
+    // a garrafa de cerveja
+    const garrafa = [[-330, 350], [-334, 196], [-326, 168], [-306, 146], [-298, 120], [-298, 62], [-302, 56], [-302, 46],
+      [-258, 46], [-258, 56], [-262, 62], [-262, 120], [-254, 146], [-234, 168], [-226, 196], [-230, 350]];
+    formaLapis(ctx, garrafa, r, { lado: 1 });
+    formaLapis(ctx, caixaPts(-280, 262, 96, 66, 4), r, { lado: 0, vezes: 2, largura: 2 });
+    ctx.save();
+    ctx.font = '400 30px "Permanent Marker", cursive';
+    ctx.fillStyle = TINTA_LB;
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.85;
+    ctx.fillText('BEER', -280, 274);
+    ctx.restore();
+    // a taça de vinho: o bojo, o vinho no fundo dele, a haste e o pé
+    formaLapis(ctx, elipsePts(-165, 150, 46, 84, 0, Math.PI, 22), r, { lado: 0 });
+    formaLapis(ctx, elipsePts(-165, 150, 42, 80, 0.5, Math.PI - 0.5, 16), r, { lado: 1, densa: 0.95, vezes: 2, largura: 1.8 });
+    formaLapis(ctx, [[-169, 232], [-170, 336], [-160, 336], [-161, 232]], r, { lado: 1 });
+    formaLapis(ctx, elipsePts(-165, 340, 46, 10), r, { lado: 1 });
+    // o celular de pé, com as notificações e o número no canto
+    formaLapis(ctx, caixaPts(-20, 228, 128, 244, 18), r, { lado: 1, densa: 0.4 });
+    formaLapis(ctx, caixaPts(-20, 232, 108, 204, 6), r, { lado: 0, vezes: 2, largura: 2 });
+    for (const y of [166, 214, 262]) {
+      formaLapis(ctx, caixaPts(-20, y, 92, 38, 8), r, { lado: 0, vezes: 2, largura: 2 });
+      formaLapis(ctx, elipsePts(-52, y, 9, 9, 0, Math.PI * 2, 14), r, { lado: 0, vezes: 1, largura: 2 });
+      formaLapis(ctx, [[-36, y - 6], [14, y - 6]], r, { fechar: false, vezes: 1, largura: 2.4 });
+      formaLapis(ctx, [[-36, y + 6], [0, y + 6]], r, { fechar: false, vezes: 1, largura: 2 });
+    }
+    ctx.fillStyle = TINTA_LB;
+    ctx.beginPath();
+    ctx.arc(40, 108, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.font = '400 26px "Permanent Marker", cursive';
+    ctx.fillStyle = '#d3d5a2';
+    ctx.textAlign = 'center';
+    ctx.fillText('9+', 40, 118);
+    // as cápsulas na frente, metade escura
+    for (const [x, y, g] of [[84, 336, 0.25], [142, 340, -0.1], [200, 334, 0.4]]) {
+      const cap = caixaPts(x, y, 58, 24, 12, g);
+      formaLapis(ctx, cap, r, { lado: 0 });
+      const c = Math.cos(g);
+      const s = Math.sin(g);
+      const meia = caixaPts(x + 14.5 * c, y + 14.5 * s, 29, 24, 11, g);
+      ctx.save();
+      ctx.fillStyle = TINTA_LB;
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      meia.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+      ctx.fill();
+      ctx.restore();
+    }
+    // o cigarro deitado na ponta da prateleira, com a brasa e a fumaça subindo
+    const cigarro = caixaPts(326, 338, 120, 20, 4, -0.06);
+    formaLapis(ctx, cigarro, r, { lado: 0 });
+    formaLapis(ctx, caixaPts(286, 340, 40, 20, 4, -0.06), r, { lado: -1, densa: 1 });
+    ctx.save();
+    ctx.fillStyle = TINTA_LB;
+    ctx.globalAlpha = 0.8;
+    ctx.beginPath();
+    ctx.ellipse(384, 334, 4, 9, -0.06, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    const fumaca = [];
+    for (let i = 0; i <= 30; i++) {
+      const t = i / 30;
+      fumaca.push([388 - t * 20 + Math.sin(t * 8) * 14 * t, 324 - t * 130]);
+    }
+    formaLapis(ctx, fumaca, r, { fechar: false, vezes: 2, largura: 2 });
+    // a etiqueta de preço pendurada no gargalo, com o barbante
+    formaLapis(ctx, [[-290, 100], [-310, 116], [-326, 138], [-336, 158]], r, { fechar: false, vezes: 2, largura: 1.8 });
+    formaLapis(ctx, caixaPts(-346, 208, 74, 104, 9, 0.16), r, { lado: 1, densa: 0.35 });
+    formaLapis(ctx, elipsePts(-338, 166, 6, 6, 0, Math.PI * 2, 12), r, { lado: 0, vezes: 2, largura: 1.8 });
+    ctx.save();
+    ctx.translate(-347, 214);
+    ctx.rotate(0.16);
+    ctx.font = '400 30px "Permanent Marker", cursive';
+    ctx.fillStyle = TINTA_LB;
+    ctx.textAlign = 'center';
+    ctx.fillText('R$', 0, -6);
+    ctx.font = '400 26px "Permanent Marker", cursive';
+    ctx.fillText('0,99', 0, 28);
+    ctx.restore();
+  }
+
+  function arteLiberdade(ctx) {
+    const r = sorteio(1860);
+    ctx.fillStyle = '#d3d5a2';
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 24, { aClaro: 0.06, aEscuro: 0.04, claro: '250,250,225', escuro: '110,110,60' });
+    // a frase em letra de marcador, grande e de margem a margem (a Permanent Marker um pouco
+    // apertada na largura e esticada na altura, como o marcador estreito da referência), em três
+    // linhas de largura parecida
+    const linhas = ['O MUNDO VENDE', 'UMA LIBERDADE', 'QUE APRISIONA.'];
+    const aperto = 0.8;
+    const alto = 1.26;
+    ctx.font = '400 100px "Permanent Marker", cursive';
+    const largMax = Math.max(...linhas.map((l) => [...l].reduce((s, c) => s + ctx.measureText(c).width, 0) * aperto));
+    const tam = 100 * 960 / largMax;
+    ctx.font = '400 ' + tam + 'px "Permanent Marker", cursive';
+    const cap = ctx.measureText('M').actualBoundingBoxAscent * alto;
+    const passo = cap * 1.3;
+    const altoTexto = cap + passo * 2;
+    // a pilha toda entre os dias (y 500) e a marca (y 1490): as grades em cima, a frase embaixo
+    const topo = 505;
+    const fim = 1478;
+    const vaoMeio = 92;
+    const altoGrade = fim - topo - altoTexto - vaoMeio;
+    // a vitrine do mundo a lápis, no tamanho de sempre (368 de alto), ampliada para o espaço
+    // que sobra entre os dias e a frase
+    const s = Math.min(altoGrade / 368, 1000 / 800);
+    ctx.save();
+    ctx.translate(L / 2, topo + (altoGrade - 368 * s) / 2);
+    ctx.scale(s, s);
+    vitrineLapis(ctx, r);
+    ctx.restore();
+    const y1 = fim - altoTexto + cap;
+    const l1 = linhaMarcador(ctx, linhas[0], L / 2, y1, tam, r, aperto, alto);
+    const l2 = linhaMarcador(ctx, linhas[1], L / 2, y1 + passo, tam, r, aperto, alto);
+    linhaMarcador(ctx, linhas[2], L / 2, y1 + passo * 2, tam, r, aperto, alto);
+    // o círculo à mão em VENDE: duas voltas grossas que não fecham iguais, a caneta passando
+    const v = l1.palavras.VENDE;
+    const ccx = (v.de + v.ate) / 2 + 4;
+    const ccy = y1 - cap * 0.5;
+    const crx = (v.ate - v.de) / 2 + 14;
+    const cry = cap * 0.7;
+    ctx.save();
+    ctx.strokeStyle = VERMELHO_LB;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (let volta = 0; volta < 2; volta++) {
+      ctx.lineWidth = 11 - volta * 3;
+      ctx.beginPath();
+      const a0 = -2.3 + volta * 0.3;
+      const fimA = a0 + Math.PI * 2 + 0.5 - volta * 0.3;
+      for (let a = a0; a <= fimA; a += 0.04) {
+        const k = 1 + volta * 0.045 + 0.025 * Math.sin(a * 3 + volta);
+        const x = ccx + Math.cos(a) * crx * k;
+        const y = ccy + Math.sin(a) * cry * k - (a - a0) * 2.2;
+        a === a0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    // o sublinhado em LIBERDADE: um risco de caneta grosso, um pouco subindo
+    const lb = l2.palavras.LIBERDADE;
+    const yS = y1 + passo + cap * 0.14;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(lb.de - 4, yS + 6);
+    ctx.bezierCurveTo(lb.de + (lb.ate - lb.de) * 0.3, yS - 2, lb.de + (lb.ate - lb.de) * 0.7, yS + 4, lb.ate + 10, yS - 4);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // O maná pode até cair do céu, mas você ainda precisa sair da tenda para buscá-lo (lema, sem
+  // referência). Como a referência do dono: a foto em preto e branco granulada, com a faixa de
+  // luz atravessando na diagonal entre o escuro, e a frase em grotesca branca pesada (Manrope
+  // 800), alinhada à esquerda, entrelinha apertada, enchendo a largura. A foto é feita aqui: as
+  // manchas de luz desfocadas e o grão grosso de filme pixel a pixel. Por dentro da faixa de luz
+  // cai o maná, flocos brancos miúdos, alguns fora de foco: o gancho, sem disputar com a frase.
+  // A faixa nunca passa de um cinza médio atrás do texto (contraste AA do branco grande).
+  function fotoGranulada(ctx, r) {
+    // o escuro da foto e a faixa de luz na diagonal, do alto à direita para baixo à esquerda
+    ctx.fillStyle = '#1b1b1b';
+    ctx.fillRect(0, 0, L, A);
+    const luz = S.tela();
+    const k = luz.getContext('2d');
+    k.save();
+    k.translate(L / 2, A / 2);
+    k.rotate(-0.62);
+    const faixa = k.createLinearGradient(0, -520, 0, 520);
+    faixa.addColorStop(0, 'rgba(140,140,140,0)');
+    faixa.addColorStop(0.25, 'rgba(140,140,140,.9)');
+    faixa.addColorStop(0.45, 'rgba(150,150,150,1)');
+    faixa.addColorStop(0.58, 'rgba(70,70,70,.6)');
+    faixa.addColorStop(0.66, 'rgba(10,10,10,.9)');
+    faixa.addColorStop(1, 'rgba(10,10,10,.95)');
+    k.fillStyle = faixa;
+    k.fillRect(-1400, -520, 2800, 1600);
+    // um vinco mais claro e um mais escuro dentro da faixa, como dobra de tecido na foto
+    k.fillStyle = 'rgba(150,150,150,.35)';
+    k.fillRect(-1400, -120, 2800, 60);
+    k.fillStyle = 'rgba(20,20,20,.4)';
+    k.fillRect(-1400, 210, 2800, 90);
+    k.restore();
+    for (let i = 0; i < 30; i++) {
+      const x = r() * L;
+      const y = r() * A;
+      const rr = 60 + r() * 220;
+      const g = k.createRadialGradient(x, y, 0, x, y, rr);
+      const claro = r() < 0.5;
+      g.addColorStop(0, claro ? 'rgba(150,150,150,.18)' : 'rgba(0,0,0,.3)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      k.fillStyle = g;
+      k.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+    }
+    ctx.save();
+    ctx.filter = 'blur(40px)';
+    ctx.drawImage(luz, 0, 0);
+    ctx.restore();
+    // o grão grosso de filme: ruído em meia resolução, esticado e somado à luz
+    const esc = 2;
+    const w = L / esc;
+    const h = A / esc;
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const kc = c.getContext('2d');
+    const img = kc.createImageData(w, h);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = Math.round(128 + (r() + r() + r() - 1.5) * 120);
+      img.data[i] = v;
+      img.data[i + 1] = v;
+      img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+    kc.putImageData(img, 0, 0);
+    ctx.save();
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.globalAlpha = 0.42;
+    ctx.drawImage(c, 0, 0, L, A);
+    ctx.restore();
+  }
+  function arteMana(ctx) {
+    const r = sorteio(1870);
+    fotoGranulada(ctx, r);
+    // a frase em grotesca branca pesada, alinhada à esquerda, enchendo a largura
+    const linhas = ['O maná pode', 'até cair do céu,', 'mas você ainda', 'precisa sair da', 'tenda para', 'buscá-lo.'];
+    const fonte = (t) => S.Mn(800, t);
+    const espaco = (t) => -t * 0.045;
+    const larguraDe = (txt, t) => {
+      ctx.font = fonte(t);
+      return ctx.measureText(txt).width + espaco(t) * (txt.length - 1);
+    };
+    const maior = Math.max(...linhas.map((l) => larguraDe(l, 100)));
+    const tam = Math.min(150, 100 * 950 / maior);
+    const passo = tam * 1.02;
+    const altoBloco = passo * (linhas.length - 1) + tam * 0.74;
+    const y0 = 540 + (940 - altoBloco) / 2 + tam * 0.74;
+    // onde o maná não cai: os dias no alto, a marca no pé e cada linha da frase, com folga
+    const livre = [[300, 260, 780, 480], [340, 1520, 760, 1640]];
+    linhas.forEach((l, i) => {
+      const yb = y0 + i * passo;
+      livre.push([40, yb - tam * 0.86, 66 + larguraDe(l, tam) + 26, yb + tam * 0.3]);
+    });
+    // o maná caindo na faixa de luz: flocos brancos, os de perto maiores e fora de foco
+    const flocos = S.tela();
+    const kf = flocos.getContext('2d');
+    for (let i = 0; i < 220; i++) {
+      // ao longo da faixa (a diagonal) com um desvio para os lados
+      const t = r();
+      const d = (r() - 0.5) * 520;
+      const x = L * (1.05 - t * 1.1) + d * 0.58;
+      const y = A * (t * 0.95) + d * 0.81;
+      const s = 2 + r() * r() * 9;
+      if (livre.some(([a, b, c, d]) => x > a - s && x < c + s && y > b - s && y < d + s)) continue;
+      kf.fillStyle = 'rgba(245,245,240,' + (0.35 + r() * 0.5).toFixed(2) + ')';
+      kf.beginPath();
+      kf.ellipse(x, y, s, s * (0.7 + r() * 0.3), r() * 3, 0, Math.PI * 2);
+      kf.fill();
+    }
+    ctx.save();
+    ctx.filter = 'blur(1.5px)';
+    ctx.drawImage(flocos, 0, 0);
+    ctx.restore();
+    // uma sombra leve por trás das letras, para o branco nunca afundar na luz
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.35)';
+    ctx.shadowBlur = 24;
+    linhas.forEach((l, i) => S.escrever(ctx, l, 66, y0 + i * passo, fonte(tam), '#f6f6f2', { alinhar: 'left', espaco: espaco(tam) }));
+    ctx.restore();
+  }
+
+  // Permaneça offline para o pecado (sem referência). Como a referência do dono (o joguinho do
+  // navegador sem internet): fundo cinza bem claro, a cena em pixel art de uma cor só, cinza
+  // quase preto, sobre a linha do chão pontilhada, e a frase em letra condensada no mesmo cinza.
+  // A cena é a mesma da arte do desafio "Sem internet" (09c-desafios.js), de que o dono gostou:
+  // a ovelhinha entre os dois cactos e o sinal de internet cortado. As grades de pixels são
+  // copiadas de lá (este arquivo é carregado à parte) e ampliadas em blocos inteiros, nítidos.
+  const PIXELS_OFF = {
+    cacto: '...##|..####|..####|#.####|#.####.#|#.####.#|#.####.#|######.#|..######|..####|..####|..####|..####',
+    cactinho: '..##|.####|.####|#####|#.##|..##|..##',
+    ovelha: '.....##..##..##|...##..##..##..##|..#..............#|.#................#|.#................#|#..................#|#..................#'
+      + '|.#.................#|.#................#|..#..............#|...##..##..##..##|....##........##|....##........##|....##........##|....##........##',
+    cabeca: '##|.###|.#######|..###.###|..#######|...######|....#####|.....###',
+    wifi: '...#######|.##.......##|#...#####...#|..##.....##|....#####|.....#.#|......#',
+    xis: '#...#|.#.#|..#|.#.#|#...#',
+  };
+  const CENA_OFF = [['cacto', 6, 8], ['ovelha', 24, 6], ['cabeca', 40, 6], ['cactinho', 62, 14], ['wifi', 52, 1], ['xis', 62, 6]];
+  function arteOffline(ctx) {
+    const r = sorteio(1880);
+    const tinta = '#2b2b2b';
+    ctx.fillStyle = '#f0f0ef';
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 14, { aClaro: 0.05, aEscuro: 0.025, claro: '255,255,255', escuro: '120,120,120' });
+    const f = (t) => oswaldLP(t, 600);
+    // PERMANEÇA OFFLINE em cima, a cena no meio sobre o chão, PARA O PECADO embaixo
+    const tam = 106;
+    const passo = 132;
+    S.escrever(ctx, 'PERMANEÇA', L / 2, 616, f(tam), tinta, { espaco: 3 });
+    S.escrever(ctx, 'OFFLINE', L / 2, 616 + passo, f(tam), tinta, { espaco: 3 });
+    // a cena do desafio, pixel a pixel (72 x 25, o chão na linha 21), em blocos inteiros
+    const p = 14;
+    const x0 = Math.round(L / 2 - 72 * p / 2);
+    const chao = 1180;
+    const y0 = chao - 21 * p;
+    ctx.fillStyle = tinta;
+    const pixel = (x, y, w = 1) => ctx.fillRect(x0 + x * p, y0 + y * p, w * p, p);
+    for (const [nome, cx, cy] of CENA_OFF) {
+      PIXELS_OFF[nome].split('|').forEach((linha, y) => {
+        linha.replace(/#+/g, (run, x) => { pixel(cx + x, cy + y, run.length); return run; });
+      });
+    }
+    // o chão e as pedrinhas pontilhadas embaixo dele
+    pixel(0, 21, 72);
+    for (let x = 1; x < 72; x += 7) pixel(x, 23);
+    for (let x = 4; x < 72; x += 11) pixel(x, 24);
+    S.escrever(ctx, 'PARA O', L / 2, 1366, f(tam), tinta, { espaco: 3 });
+    S.escrever(ctx, 'PECADO', L / 2, 1366 + passo - 12, f(tam), tinta, { espaco: 3 });
+  }
+
   // Ore. (sem referência). O dono pediu igual à referência (a bandeira preta pendurada na
   // parede clara): a bandeira de cetim preto presa nos dois cantos de cima, com ORE. em branco
   // grosso, as dobras que descem em leque do canto direito, a barriga entre os pregos, o brilho
@@ -9920,125 +10363,6 @@
     // a tecla no lugar de "controle": o topo na altura do NO, logo depois dele
     teclaCtrl(ctx, x0 + wNo + larg * 0.02, b3 - capNo - larg * 0.01, tecla);
   }
-  // O maná pode até cair do céu, mas você ainda precisa sair da tenda para buscá-lo (lema, sem
-  // referência). Como a referência do dono: a foto em preto e branco granulada, com a faixa de
-  // luz atravessando na diagonal entre o escuro, e a frase em grotesca branca pesada (Manrope
-  // 800), alinhada à esquerda, entrelinha apertada, enchendo a largura. A foto é feita aqui: as
-  // manchas de luz desfocadas e o grão grosso de filme pixel a pixel. Por dentro da faixa de luz
-  // cai o maná, flocos brancos miúdos, alguns fora de foco: o gancho, sem disputar com a frase.
-  // A faixa nunca passa de um cinza médio atrás do texto (contraste AA do branco grande).
-  function fotoGranulada(ctx, r) {
-    // o escuro da foto e a faixa de luz na diagonal, do alto à direita para baixo à esquerda
-    ctx.fillStyle = '#1b1b1b';
-    ctx.fillRect(0, 0, L, A);
-    const luz = S.tela();
-    const k = luz.getContext('2d');
-    k.save();
-    k.translate(L / 2, A / 2);
-    k.rotate(-0.62);
-    const faixa = k.createLinearGradient(0, -520, 0, 520);
-    faixa.addColorStop(0, 'rgba(140,140,140,0)');
-    faixa.addColorStop(0.25, 'rgba(140,140,140,.9)');
-    faixa.addColorStop(0.45, 'rgba(150,150,150,1)');
-    faixa.addColorStop(0.58, 'rgba(70,70,70,.6)');
-    faixa.addColorStop(0.66, 'rgba(10,10,10,.9)');
-    faixa.addColorStop(1, 'rgba(10,10,10,.95)');
-    k.fillStyle = faixa;
-    k.fillRect(-1400, -520, 2800, 1600);
-    // um vinco mais claro e um mais escuro dentro da faixa, como dobra de tecido na foto
-    k.fillStyle = 'rgba(150,150,150,.35)';
-    k.fillRect(-1400, -120, 2800, 60);
-    k.fillStyle = 'rgba(20,20,20,.4)';
-    k.fillRect(-1400, 210, 2800, 90);
-    k.restore();
-    for (let i = 0; i < 30; i++) {
-      const x = r() * L;
-      const y = r() * A;
-      const rr = 60 + r() * 220;
-      const g = k.createRadialGradient(x, y, 0, x, y, rr);
-      const claro = r() < 0.5;
-      g.addColorStop(0, claro ? 'rgba(150,150,150,.18)' : 'rgba(0,0,0,.3)');
-      g.addColorStop(1, 'rgba(0,0,0,0)');
-      k.fillStyle = g;
-      k.fillRect(x - rr, y - rr, rr * 2, rr * 2);
-    }
-    ctx.save();
-    ctx.filter = 'blur(40px)';
-    ctx.drawImage(luz, 0, 0);
-    ctx.restore();
-    // o grão grosso de filme: ruído em meia resolução, esticado e somado à luz
-    const esc = 2;
-    const w = L / esc;
-    const h = A / esc;
-    const c = document.createElement('canvas');
-    c.width = w;
-    c.height = h;
-    const kc = c.getContext('2d');
-    const img = kc.createImageData(w, h);
-    for (let i = 0; i < img.data.length; i += 4) {
-      const v = Math.round(128 + (r() + r() + r() - 1.5) * 120);
-      img.data[i] = v;
-      img.data[i + 1] = v;
-      img.data[i + 2] = v;
-      img.data[i + 3] = 255;
-    }
-    kc.putImageData(img, 0, 0);
-    ctx.save();
-    ctx.globalCompositeOperation = 'overlay';
-    ctx.globalAlpha = 0.42;
-    ctx.drawImage(c, 0, 0, L, A);
-    ctx.restore();
-  }
-  function arteMana(ctx) {
-    const r = sorteio(1870);
-    fotoGranulada(ctx, r);
-    // a frase em grotesca branca pesada, alinhada à esquerda, enchendo a largura
-    const linhas = ['O maná pode', 'até cair do céu,', 'mas você ainda', 'precisa sair da', 'tenda para', 'buscá-lo.'];
-    const fonte = (t) => S.Mn(800, t);
-    const espaco = (t) => -t * 0.045;
-    const larguraDe = (txt, t) => {
-      ctx.font = fonte(t);
-      return ctx.measureText(txt).width + espaco(t) * (txt.length - 1);
-    };
-    const maior = Math.max(...linhas.map((l) => larguraDe(l, 100)));
-    const tam = Math.min(150, 100 * 950 / maior);
-    const passo = tam * 1.02;
-    const altoBloco = passo * (linhas.length - 1) + tam * 0.74;
-    const y0 = 540 + (940 - altoBloco) / 2 + tam * 0.74;
-    // onde o maná não cai: os dias no alto, a marca no pé e cada linha da frase, com folga
-    const livre = [[300, 260, 780, 480], [340, 1520, 760, 1640]];
-    linhas.forEach((l, i) => {
-      const yb = y0 + i * passo;
-      livre.push([40, yb - tam * 0.86, 66 + larguraDe(l, tam) + 26, yb + tam * 0.3]);
-    });
-    // o maná caindo na faixa de luz: flocos brancos, os de perto maiores e fora de foco
-    const flocos = S.tela();
-    const kf = flocos.getContext('2d');
-    for (let i = 0; i < 220; i++) {
-      // ao longo da faixa (a diagonal) com um desvio para os lados
-      const t = r();
-      const d = (r() - 0.5) * 520;
-      const x = L * (1.05 - t * 1.1) + d * 0.58;
-      const y = A * (t * 0.95) + d * 0.81;
-      const s = 2 + r() * r() * 9;
-      if (livre.some(([a, b, c, d]) => x > a - s && x < c + s && y > b - s && y < d + s)) continue;
-      kf.fillStyle = 'rgba(245,245,240,' + (0.35 + r() * 0.5).toFixed(2) + ')';
-      kf.beginPath();
-      kf.ellipse(x, y, s, s * (0.7 + r() * 0.3), r() * 3, 0, Math.PI * 2);
-      kf.fill();
-    }
-    ctx.save();
-    ctx.filter = 'blur(1.5px)';
-    ctx.drawImage(flocos, 0, 0);
-    ctx.restore();
-    // uma sombra leve por trás das letras, para o branco nunca afundar na luz
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,.35)';
-    ctx.shadowBlur = 24;
-    linhas.forEach((l, i) => S.escrever(ctx, l, 66, y0 + i * passo, fonte(tam), '#f6f6f2', { alinhar: 'left', espaco: espaco(tam) }));
-    ctx.restore();
-  }
-
   S.prepararVersiculo = () => carregarFoto('montanhas');
   S.versiculoCompleto = () => fotoPronta('montanhas');
   S.arteCompleta = arteCompleta;

@@ -145,8 +145,13 @@
     { linhas: ['Caminhamos por fé,', 'e não pelo', 'que vemos'], ref: '2 Coríntios 5.7', arte: 'fe' },
     // Como a referência do dono, em inglês: GOD IS ALWAYS IN e a tecla Ctrl verde-limão.
     { linhas: ['God is', 'always in', 'Ctrl'], arte: 'ctrl' },
-    // A foto em preto e branco granulada, com o maná caindo na faixa de luz (sem referência).
+    // A frase escrita a marcador, com VENDE circulado e LIBERDADE sublinhado, e a prateleira do
+    // que o mundo vende (bebida, cigarro, comprimidos, celular, cartão), como pediu o dono.
+    { linhas: ['O mundo vende uma', 'liberdade que', 'aprisiona'], arte: 'liberdade' },
+    // A frase branca na foto granulada em preto e branco, com o maná caindo, como a referência.
     { linhas: ['O maná pode até', 'cair do céu, mas', 'você ainda precisa', 'sair da tenda para', 'buscá-lo.'], arte: 'mana' },
+    // O joguinho sem internet, com a ovelhinha em pixel do desafio Sem internet.
+    { linhas: ['Permaneça offline', 'para o pecado'], arte: 'offline' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir

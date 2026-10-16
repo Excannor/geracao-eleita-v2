@@ -474,3 +474,28 @@ referência; tudo redesenhado em canvas, sem foto nem logo de ninguém.
   sálvia, saiu. Contraste AA medido no fundo de cada linha (JÁ NÃO NOS 5,1; o resto acima de 7), texto à esquerda, sem palavra sublinhada. Diferente de inundados (a água dentro das
   letras de AMOR no preto). Fecha na marca amarela da régua.
 `MODELOS=raso DIAS=7 node design/compartilhar/gerar.mjs <pasta> modelos`. Os testes contam 64.
+- **liberdade** (O mundo vende uma liberdade que aprisiona, sem referência): como a referência
+  do dono, o fundo verde-oliva claro, a frase grande, de margem a margem, em três linhas de letra
+  de marcador preta (a Permanent Marker um pouco apertada e esticada na altura, como o marcador
+  estreito da referência), VENDE circulado à mão com duas voltas grossas e LIBERDADE com um
+  sublinhado grosso, os dois em vermelho de caneta (a cor da referência, só nesta arte). No alto,
+  no lugar das grades (o dono pediu; a versão com as grades e o cadeado saiu), o que o mundo
+  vende, a lápis, como produtos numa prateleira: a garrafa de cerveja com a etiqueta de preço
+  pendurada no gargalo, a taça de vinho, o celular cheio de notificações, o cartão de crédito, as
+  cápsulas e o cigarro com a fumaça, com os traços tremidos e repassados e a hachura. Nada de
+  seringa nem nada pesado. Fecha na etiqueta de preço.
+- **mana** (O maná pode até cair do céu, mas você ainda precisa sair da tenda para buscá-lo,
+  lema sem referência): como a referência do dono, a foto em preto e branco granulada, feita
+  em canvas (a faixa de luz desfocada atravessando na diagonal entre o escuro e o grão grosso
+  de filme pixel a pixel), e a frase em grotesca branca pesada (Manrope 800), alinhada à
+  esquerda, entrelinha apertada, enchendo a largura em seis linhas. Na faixa de luz cai o maná,
+  flocos brancos miúdos, que desviam dos dias, da marca e de cada linha da frase. A faixa fica
+  em cinza médio atrás do texto (o branco grande passa no contraste AA). Fecha no maná caindo.
+- **offline** (Permaneça offline para o pecado, sem referência): como a referência do dono, o
+  joguinho do navegador sem internet: fundo cinza bem claro, a cena em pixel art de uma cor só,
+  cinza quase preto, sobre o chão pontilhado, e a frase em Oswald condensada no mesmo cinza,
+  PERMANEÇA OFFLINE em cima e PARA O PECADO embaixo (o story é de pé, então a frase vai acima e
+  abaixo em vez dos lados). A cena é a da arte do desafio "Sem internet" (09c-desafios.js), que
+  o dono pediu: a ovelhinha entre os dois cactos e o sinal de internet cortado, com as mesmas
+  grades de pixels, ampliadas em blocos inteiros de 14px. O leão em pixel das duas primeiras
+  versões saiu ("ficou ruim demais"). Fecha na ovelhinha.
