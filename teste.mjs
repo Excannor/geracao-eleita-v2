@@ -781,7 +781,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01c-arte.js'), 'utf8'), cont
     const r = CC.lerRef(f.ref);
     return !r || biblias.some((b) => ((b.livros[r.livro] || [])[r.cap - 1] || []).slice(r.de - 1, r.ate).filter(Boolean).length !== r.ate - r.de + 1);
   })());
-  checar(frases.length === 68 && !longas.length, 'as 68 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
+  checar(frases.length === 69 && !longas.length, 'as 69 frases da ofensiva cabem no carimbo (até 6 linhas de até 20 letras)'
     + (longas.length ? ' (' + longas.map((f) => f.linhas[0]).join(', ') + ')' : ''));
   checar(!refsRuins.length, 'toda frase da ofensiva com referência aponta para versículos que existem nas duas Bíblias'
     + (refsRuins.length ? ' (' + refsRuins.map((f) => f.ref).join(', ') + ')' : ''));
@@ -831,7 +831,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '01e-story-artes.js'), 'utf8'
   const S = CC.story;
   const comArte = CC.FRASES_OFENSIVA.filter((f) => f.arte);
   const sem = comArte.filter((f) => typeof S.artes[f.arte] !== 'function' || S.arteDaFrase({ linhas: f.linhas, ref: f.ref || '' }) !== f.arte);
-  checar(comArte.length === 68 && comArte.length === CC.FRASES_OFENSIVA.length && !sem.length, 'as 68 frases (todas) têm arte, com modelo de story, e o pedido da folha chega a ele'
+  checar(comArte.length === 69 && comArte.length === CC.FRASES_OFENSIVA.length && !sem.length, 'as 69 frases (todas) têm arte, com modelo de story, e o pedido da folha chega a ele'
     + (sem.length ? ' (' + sem.map((f) => f.arte).join(', ') + ')' : ''));
   // Toda frase da lista já tem arte: a frase sem arte é simulada tirando a arte de uma delas
   // por um instante (e a frase do estágio da chama, que não está na lista, também fica sem).

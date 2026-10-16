@@ -2351,6 +2351,7 @@
     ore: { fundo: ['#dedcd7'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.8 }, desenhar: arteOre, grao: [10, 1830] },
     fe: { fundo: ['#efe8d6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteFe, grao: [12, 1810] },
     ctrl: { fundo: ['#e9e9e6'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteCtrl, grao: [10, 1850] },
+    mana: { fundo: ['#1b1b1b'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteMana, grao: [14, 1870] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -9919,6 +9920,125 @@
     // a tecla no lugar de "controle": o topo na altura do NO, logo depois dele
     teclaCtrl(ctx, x0 + wNo + larg * 0.02, b3 - capNo - larg * 0.01, tecla);
   }
+  // O maná pode até cair do céu, mas você ainda precisa sair da tenda para buscá-lo (lema, sem
+  // referência). Como a referência do dono: a foto em preto e branco granulada, com a faixa de
+  // luz atravessando na diagonal entre o escuro, e a frase em grotesca branca pesada (Manrope
+  // 800), alinhada à esquerda, entrelinha apertada, enchendo a largura. A foto é feita aqui: as
+  // manchas de luz desfocadas e o grão grosso de filme pixel a pixel. Por dentro da faixa de luz
+  // cai o maná, flocos brancos miúdos, alguns fora de foco: o gancho, sem disputar com a frase.
+  // A faixa nunca passa de um cinza médio atrás do texto (contraste AA do branco grande).
+  function fotoGranulada(ctx, r) {
+    // o escuro da foto e a faixa de luz na diagonal, do alto à direita para baixo à esquerda
+    ctx.fillStyle = '#1b1b1b';
+    ctx.fillRect(0, 0, L, A);
+    const luz = S.tela();
+    const k = luz.getContext('2d');
+    k.save();
+    k.translate(L / 2, A / 2);
+    k.rotate(-0.62);
+    const faixa = k.createLinearGradient(0, -520, 0, 520);
+    faixa.addColorStop(0, 'rgba(140,140,140,0)');
+    faixa.addColorStop(0.25, 'rgba(140,140,140,.9)');
+    faixa.addColorStop(0.45, 'rgba(150,150,150,1)');
+    faixa.addColorStop(0.58, 'rgba(70,70,70,.6)');
+    faixa.addColorStop(0.66, 'rgba(10,10,10,.9)');
+    faixa.addColorStop(1, 'rgba(10,10,10,.95)');
+    k.fillStyle = faixa;
+    k.fillRect(-1400, -520, 2800, 1600);
+    // um vinco mais claro e um mais escuro dentro da faixa, como dobra de tecido na foto
+    k.fillStyle = 'rgba(150,150,150,.35)';
+    k.fillRect(-1400, -120, 2800, 60);
+    k.fillStyle = 'rgba(20,20,20,.4)';
+    k.fillRect(-1400, 210, 2800, 90);
+    k.restore();
+    for (let i = 0; i < 30; i++) {
+      const x = r() * L;
+      const y = r() * A;
+      const rr = 60 + r() * 220;
+      const g = k.createRadialGradient(x, y, 0, x, y, rr);
+      const claro = r() < 0.5;
+      g.addColorStop(0, claro ? 'rgba(150,150,150,.18)' : 'rgba(0,0,0,.3)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      k.fillStyle = g;
+      k.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+    }
+    ctx.save();
+    ctx.filter = 'blur(40px)';
+    ctx.drawImage(luz, 0, 0);
+    ctx.restore();
+    // o grão grosso de filme: ruído em meia resolução, esticado e somado à luz
+    const esc = 2;
+    const w = L / esc;
+    const h = A / esc;
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const kc = c.getContext('2d');
+    const img = kc.createImageData(w, h);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = Math.round(128 + (r() + r() + r() - 1.5) * 120);
+      img.data[i] = v;
+      img.data[i + 1] = v;
+      img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+    kc.putImageData(img, 0, 0);
+    ctx.save();
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.globalAlpha = 0.42;
+    ctx.drawImage(c, 0, 0, L, A);
+    ctx.restore();
+  }
+  function arteMana(ctx) {
+    const r = sorteio(1870);
+    fotoGranulada(ctx, r);
+    // a frase em grotesca branca pesada, alinhada à esquerda, enchendo a largura
+    const linhas = ['O maná pode', 'até cair do céu,', 'mas você ainda', 'precisa sair da', 'tenda para', 'buscá-lo.'];
+    const fonte = (t) => S.Mn(800, t);
+    const espaco = (t) => -t * 0.045;
+    const larguraDe = (txt, t) => {
+      ctx.font = fonte(t);
+      return ctx.measureText(txt).width + espaco(t) * (txt.length - 1);
+    };
+    const maior = Math.max(...linhas.map((l) => larguraDe(l, 100)));
+    const tam = Math.min(150, 100 * 950 / maior);
+    const passo = tam * 1.02;
+    const altoBloco = passo * (linhas.length - 1) + tam * 0.74;
+    const y0 = 540 + (940 - altoBloco) / 2 + tam * 0.74;
+    // onde o maná não cai: os dias no alto, a marca no pé e cada linha da frase, com folga
+    const livre = [[300, 260, 780, 480], [340, 1520, 760, 1640]];
+    linhas.forEach((l, i) => {
+      const yb = y0 + i * passo;
+      livre.push([40, yb - tam * 0.86, 66 + larguraDe(l, tam) + 26, yb + tam * 0.3]);
+    });
+    // o maná caindo na faixa de luz: flocos brancos, os de perto maiores e fora de foco
+    const flocos = S.tela();
+    const kf = flocos.getContext('2d');
+    for (let i = 0; i < 220; i++) {
+      // ao longo da faixa (a diagonal) com um desvio para os lados
+      const t = r();
+      const d = (r() - 0.5) * 520;
+      const x = L * (1.05 - t * 1.1) + d * 0.58;
+      const y = A * (t * 0.95) + d * 0.81;
+      const s = 2 + r() * r() * 9;
+      if (livre.some(([a, b, c, d]) => x > a - s && x < c + s && y > b - s && y < d + s)) continue;
+      kf.fillStyle = 'rgba(245,245,240,' + (0.35 + r() * 0.5).toFixed(2) + ')';
+      kf.beginPath();
+      kf.ellipse(x, y, s, s * (0.7 + r() * 0.3), r() * 3, 0, Math.PI * 2);
+      kf.fill();
+    }
+    ctx.save();
+    ctx.filter = 'blur(1.5px)';
+    ctx.drawImage(flocos, 0, 0);
+    ctx.restore();
+    // uma sombra leve por trás das letras, para o branco nunca afundar na luz
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.35)';
+    ctx.shadowBlur = 24;
+    linhas.forEach((l, i) => S.escrever(ctx, l, 66, y0 + i * passo, fonte(tam), '#f6f6f2', { alinhar: 'left', espaco: espaco(tam) }));
+    ctx.restore();
+  }
+
   S.prepararVersiculo = () => carregarFoto('montanhas');
   S.versiculoCompleto = () => fotoPronta('montanhas');
   S.arteCompleta = arteCompleta;

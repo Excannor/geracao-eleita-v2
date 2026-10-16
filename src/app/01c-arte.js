@@ -145,6 +145,8 @@
     { linhas: ['Caminhamos por fé,', 'e não pelo', 'que vemos'], ref: '2 Coríntios 5.7', arte: 'fe' },
     // Como a referência do dono, em inglês: GOD IS ALWAYS IN e a tecla Ctrl verde-limão.
     { linhas: ['God is', 'always in', 'Ctrl'], arte: 'ctrl' },
+    // A foto em preto e branco granulada, com o maná caindo na faixa de luz (sem referência).
+    { linhas: ['O maná pode até', 'cair do céu, mas', 'você ainda precisa', 'sair da tenda para', 'buscá-lo.'], arte: 'mana' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir
