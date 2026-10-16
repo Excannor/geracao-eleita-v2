@@ -1,0 +1,171 @@
+{
+  "nome": "Ageu",
+  "grupo": "Profetas menores",
+  "numero": 37,
+  "capitulos": 2,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "חַגַּי",
+    "transliteracao": "Chaggay",
+    "traducao": "festivo",
+    "texto": "Chag quer dizer festa, e o nome lembra um dia de festa. O Senhor chama Ageu de mensageiro dele."
+  },
+  "autoria": {
+    "texto": "No segundo ano do reinado de Dario, o Senhor manda o profeta Ageu falar com o governador de Judá e com o sumo sacerdote. O governador é Zorobabel, e o sumo sacerdote é Josué.",
+    "apoio": "Cada mensagem tem data. A primeira chega no começo do sexto mês. A pergunta aos sacerdotes é do dia vinte e quatro do nono mês, no mesmo ano.",
+    "refs": [
+      "Ag 1.1",
+      "Ag 2.10"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O templo do Senhor continua em ruínas, e o povo só se preocupa com as belas casas dele. Pela boca de Ageu, o Senhor dos Exércitos manda: “Pensem bem nisto!” Zorobabel, o sumo sacerdote Josué e o resto do povo obedecem à mensagem e começam a adorar a Deus de todo o coração.",
+    "refs": [
+      "Ag 1.9",
+      "Ag 1.7",
+      "Ag 1.12"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Casa em ruínas",
+      "sub": "Muito plantio e pouca colheita",
+      "desenho": "bolsa-furada",
+      "galhos": [
+        {
+          "texto": "O povo anda dizendo que ainda não chegou a hora de reconstruir a casa do Senhor. O Senhor pergunta se é hora de morar em casas confortáveis enquanto o templo dele está em ruínas.",
+          "ref": "Ag 1.2-4"
+        },
+        {
+          "texto": "Todo mundo planta muito e colhe pouco. Eles têm roupa e não se aquecem no frio. O salário desaparece como se fosse guardado num bolso furado.",
+          "ref": "Ag 1.6"
+        },
+        {
+          "texto": "O Senhor manda o povo subir os montes e trazer madeira para reconstruir o templo. Ele promete se alegrar ali e aparecer com toda a glória dele.",
+          "ref": "Ag 1.8"
+        },
+        {
+          "texto": "Deus não deixa o céu dar chuva, e as colheitas saem fracas. Ele manda uma seca sobre a terra e até sobre os montes. Os cereais, as uvas e as azeitonas murcham, e o gado sofre junto.",
+          "ref": "Ag 1.10-11"
+        },
+        {
+          "texto": "Ageu passa ao povo mais um recado do Senhor: “Eu estou do seu lado: Vou abençoar vocês”.",
+          "ref": "Ag 1.13"
+        },
+        {
+          "texto": "O Senhor anima Zorobabel, Josué e o resto do povo. No dia vinte e quatro do sexto mês, todos se reúnem e começam a trabalhar no templo por vontade própria.",
+          "ref": "Ag 1.14-15"
+        }
+      ],
+      "conexao": "Menos de um mês depois, Ageu leva outra mensagem do Senhor (Ag 2.1)."
+    },
+    {
+      "titulo": "Mais glória",
+      "sub": "O templo novo parece pequeno",
+      "desenho": "templo-com-colunas",
+      "galhos": [
+        {
+          "texto": "Ageu pergunta quem ainda se lembra do templo antigo. Era uma coisa fabulosa, e o templo novo parece insignificante perto dele.",
+          "ref": "Ag 2.3"
+        },
+        {
+          "texto": "O Senhor fala com Zorobabel, com Josué e com o povo: “Não desanime”. Ele pede coragem e trabalho, porque está do lado deles.",
+          "ref": "Ag 2.4"
+        },
+        {
+          "texto": "Deus vai sacudir as nações, e elas vão trazer os tesouros para o templo. Ele diz que toda a prata e todo o ouro são dele e promete encher aquele lugar com a sua glória.",
+          "ref": "Ag 2.7-8"
+        }
+      ],
+      "conexao": "Na mensagem seguinte, o Senhor manda Ageu fazer uma pergunta aos sacerdotes sobre a Lei (Ag 2.11)."
+    },
+    {
+      "titulo": "Hoje em diante",
+      "sub": "Deus abençoa desde o alicerce",
+      "desenho": "romas",
+      "galhos": [
+        {
+          "texto": "Ageu pergunta se a carne de um sacrifício santo, levada na roupa, deixa santo o pão em que a roupa encosta. Os sacerdotes respondem que não.",
+          "ref": "Ag 2.12"
+        },
+        {
+          "texto": "Depois, Ageu quer saber se quem tocou num morto e ficou impuro deixa impura a comida em que toca. Os sacerdotes dizem: “Sim, ficará contaminada”.",
+          "ref": "Ag 2.13"
+        },
+        {
+          "texto": "Ageu dá a resposta do Senhor. Com a vida cheia de egoísmo e maldade, o povo contamina os sacrifícios e tudo o que oferece a Deus.",
+          "ref": "Ag 2.14"
+        },
+        {
+          "texto": "No dia em que os alicerces do templo são colocados, o Senhor promete: “A partir de hoje eu os abençoarei”. Ele faz a promessa antes da colheita, quando os figos e as romãs nem apareceram.",
+          "ref": "Ag 2.18-19"
+        }
+      ],
+      "conexao": "No mesmo dia, Ageu recebe mais uma mensagem do Senhor (Ag 2.20)."
+    },
+    {
+      "titulo": "O anel",
+      "sub": "Deus escolhe Zorobabel",
+      "desenho": "anel-de-selo",
+      "galhos": [
+        {
+          "texto": "Ageu leva um recado só para Zorobabel, que governa Judá. O Senhor repete que vai sacudir os céus e a terra.",
+          "ref": "Ag 2.21"
+        },
+        {
+          "texto": "O Senhor vai derrubar reis e destruir a força dos reinos da terra. Ele vai arrasar os exércitos com os carros e os condutores, e os companheiros vão se matar uns aos outros.",
+          "ref": "Ag 2.22"
+        },
+        {
+          "texto": "Deus chama Zorobabel de “meu servo” e diz que escolheu esse homem. Zorobabel vai ser tão importante para o Senhor quanto o anel com que um rei confirma as ordens dele.",
+          "ref": "Ag 2.23"
+        }
+      ],
+      "jesus": {
+        "texto": "Zorobabel está na lista dos antepassados de Jesus. Ele é o pai de Abiúde, e de pai para filho a família chega até José, o marido de Maria, a mãe de Jesus.",
+        "refs": [
+          "Mt 1.13",
+          "Mt 1.16"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "“Mais um pouco de tempo e começarei a sacudir os céus e a terra, os mares e a terra seca.” Hebreus repete essa promessa. Deus vai fazer tremer a terra e também os céus, e só as coisas inabaláveis vão ficar (Hb 12.26-27). Quem chegou perto de Jesus, que trouxe uma nova aliança, tem um reino que nada pode destruir (Hb 12.24, 28).",
+    "ref": "Ag 2.6",
+    "desenho": "nuvem-e-raio",
+    "pares": [
+      {
+        "at": "Ag 2.5",
+        "texto": "Porque quando Israel saiu do Egito eu prometi que o meu Espírito habitaria entre vocês; por isso, não fiquem com medo",
+        "nt": "1Co 3.16",
+        "nota": "Todos juntos, os irmãos são a casa de Deus, e o Espírito de Deus vive neles"
+      },
+      {
+        "at": "Ag 2.9",
+        "texto": "A glória deste templo será maior que a glória do primeiro... E será neste lugar que estabelecerei a paz",
+        "nt": "Jo 14.27",
+        "nota": "Jesus deixa a paz dele, diferente da que o mundo dá"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O templo em ruínas e o povo que obedece", "de": 1, "ate": 1 },
+    { "titulo": "A glória maior, a bênção e o anel", "de": 2, "ate": 2 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Antes de o povo começar o templo, quem esperava vinte medidas de trigo achava só dez. No depósito de vinho, quem ia buscar cinquenta medidas achava vinte.",
+      "ref": "Ag 2.16"
+    },
+    {
+      "texto": "O Senhor castigou o trabalho do povo com ferrugem, bolor e granizo. Mesmo assim, ninguém voltou para ele.",
+      "ref": "Ag 2.17"
+    }
+  ],
+  "procure": {
+    "texto": "Procure as vezes em que o Senhor manda o povo parar e pensar. A primeira é “Veja o resultado disso”. A ordem volta, com palavras parecidas, até o dia em que os alicerces do templo são colocados.",
+    "ref": "Ag 1.5"
+  }
+}
