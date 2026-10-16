@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o monte das Oliveiras partido ao meio (Zc 14.4-5): duas metades de um monte largo e baixo, cada uma descendo até o chão numa curva, com a face partida em dentes virada para o meio. Entre elas, o vale largo: a linha do fundo e o caminho de fuga com as beiras se abrindo para baixo, em sálvia (o vale vai antes das metades, que cobrem as pontas). Uma oliveira pequena na encosta de cada metade, com o tronco entrando na copa. O chão vai antes de tudo. -->
+<path class="k" d="M4 100C40 98 80 98 116 100"/>
+<path class="s" d="M57 74H63L71 99H49Z"/>
+<path class="k" d="M38 74H82M57 74L49 99M63 74L71 99"/>
+<path class="k p" d="M4 99C10 82 22 64 40 58L46 60L43 66L48 73L44 80L49 87L45 99Z"/>
+<path class="k p" d="M116 99C110 82 98 64 80 58L74 60L77 66L72 73L76 80L71 87L75 99Z"/>
+<path class="h" d="M20 84l6-2M28 92l6-1M100 84l-6-2M92 92l-6-1M38 64l3 4M82 64l-3 4"/>
+<path class="k" d="M24 70V58M96 70V58"/>
+<path class="k p" d="M17 56c-2-5 2-9 6-8 1-4 7-4 8 0 4 0 6 5 3 8 1 4-3 6-6 5-2 2-6 2-8 0-3 0-5-3-3-5z"/>
+<path class="k p" d="M89 56c-2-5 2-9 6-8 1-4 7-4 8 0 4 0 6 5 3 8 1 4-3 6-6 5-2 2-6 2-8 0-3 0-5-3-3-5z"/>
+</svg>

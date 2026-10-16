@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- os ferreiros que quebram os chifres (Zc 1.18-21): uma bigorna de ferreiro, com o bico apontando para a esquerda, a cintura fina e o pé largo assentado no chão; em cima dela, um chifre de animal quebrado, com a ponta curva e a base partida em dentes; o martelo levantado no alto, à direita. O chifre é a única área sálvia. O chão vai antes da bigorna. -->
+<path class="k" d="M8 100C40 98 80 98 112 100"/>
+<path class="k p" d="M48 72H76L74 80C72 84 72 88 76 92L84 99H38L46 92C50 88 50 84 48 80Z"/>
+<path class="k p" d="M14 62C24 61 32 61 36 60H92V72H36C30 71 22 67 14 62Z"/>
+<path class="h" d="M40 66H88M52 76H72M48 94H74"/>
+<path class="k s" d="M70 60C56 60 42 52 34 32C44 44 56 48 68 45L71 49L67 52L71 55L68 58Z"/>
+<path class="h" d="M60 47.5C58 51 58 56 60 59.5M51 45.5C49 49 49 53 50 56.5M43 41C41 44 41.5 47 43 50"/>
+<path class="k p" d="M83.1 26.6L95.9 19.4L102.3 30.7L89.5 37.9Z"/>
+<path class="k p" d="M96.3 33.3L112.4 58.1L109.1 60.2L93 35.4Z"/>
+<path class="h" d="M80 44l-4 3M86 46l-2 4"/>
+</svg>

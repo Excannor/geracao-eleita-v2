@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as trinta moedas de prata (Zc 11.12-13; Mt 26.15): o pagamento atirado no chão. Uma pilha alta de moedas no meio, uma pilha baixa ao lado e moedas soltas, uma delas em pé, apoiada na face de cima de uma deitada. Tudo dentro do círculo do disco de "[Livro] e Cristo" (o chão vai de 22 a 98). A moeda do alto da pilha alta é a única área sálvia. -->
+<path class="k" d="M22 92C46 90 74 90 98 92"/>
+<path class="k p" d="M44 46v42a13 4.5 0 0 0 26 0v-42z"/>
+<path class="h" d="M44 82a13 4.5 0 0 0 26 0M44 76a13 4.5 0 0 0 26 0M44 70a13 4.5 0 0 0 26 0M44 64a13 4.5 0 0 0 26 0M44 58a13 4.5 0 0 0 26 0M44 52a13 4.5 0 0 0 26 0"/>
+<ellipse class="k s" cx="57" cy="46" rx="13" ry="4.5"/>
+<ellipse class="h" cx="57" cy="46" rx="9.4" ry="3.1"/>
+<path class="k p" d="M72 76v12a11 4 0 0 0 22 0v-12z"/>
+<path class="h" d="M72 84a11 4 0 0 0 22 0M72 80a11 4 0 0 0 22 0"/>
+<ellipse class="k p" cx="83" cy="76" rx="11" ry="4"/>
+<path class="k p" d="M27 86v2a9 3.2 0 0 0 18 0v-2z"/>
+<ellipse class="k p" cx="36" cy="86" rx="9" ry="3.2"/>
+<ellipse class="k p" cx="36" cy="76" rx="4" ry="9"/>
+<ellipse class="h" cx="36" cy="76" rx="2.4" ry="6"/>
+</svg>
