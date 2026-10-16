@@ -692,6 +692,17 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   são ecos (1Tm 2.5-6, 1Jo 2.1, Cl 2.3), sem dizer que Jó profetizou, e o significado do nome fica no "lembra".
   Na captura, um galho terminou com "Jó." sozinho na linha: nome de duas letras no fim do item também conta.
 
+- 2026-10-16 · conteúdo · Ezequiel tem 48 capítulos de oráculos parecidos: com seis ramos de seis galhos, a lista dos
+  capítulos ainda deixava 17 de fora. Entraram uma cena por bloco (o braço quebrado do faraó, Ez 30, no ramo das nações) e
+  curiosidades curtas (7, 13, 17, 46); ficaram só na estrutura os blocos repetidos ou de medidas (6, 15, 19, 21, 23, 31-32,
+  35, 38, 41-42, 45). Ezequiel repete o próprio achado (vigia em 3 e 33; coração novo em 11, 18 e 36): cada um mora num
+  item só, e a raiz e o significado foram reescritos quando disputavam o mesmo achado com um par.
+- 2026-10-16 · desenho · Ezequiel: os morros em sálvia fechados por baixo numa curva solta, sem tocar o chão, viraram nuvem
+  ou moita; o chão do vale em perspectiva virou um morro verde; a árvore com frutas em bolinhas escuras e dois traços de
+  folha virou rosto. Os ossos saíram de um gerador (duas bolinhas em cada ponta, contorno calculado), espaçados para nenhum
+  encostar no outro a 520px. O rio em trapézio sozinho parecia estrada: com a fachada do templo no alto e o rio saindo por
+  baixo da porta, leu como rio (Ez 47.1) → morro desce até o chão, fruta é bolinha clara solta, rio pede a fonte.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de

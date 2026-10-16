@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o rio que sai do templo e as árvores das margens (Ez 47.1, 12; Ap 22.1-2): a fachada pequena do templo no alto, o rio saindo por baixo da porta, estreito perto do templo e largo embaixo, com ondas de traço, e uma árvore frutífera de cada lado, de copa redonda com frutas em bolinhas espalhadas (em fileira, viravam olhos). O rio é a única área sálvia. Tudo cabe num círculo de raio 54 em volta de (60,60), porque em "Ezequiel e Cristo" o desenho fica sobre um disco. -->
+<path class="k s" d="M56 36C55 52 46 72 36 96H84C74 72 65 52 64 36Z"/>
+<path class="h" d="M57 48c2-1 4-1 6 0M53 62c3-1.5 7-1.5 10 0s5 1.5 6 0M48 76c4-2 8-2 12 0s8 2 12 0M43 89c5-2 10-2 15 0s10 2 15 0s6 2 8 0"/>
+<path class="k p" d="M49 36V24H71V36Z"/>
+<path class="k" d="M46 24L60 13L74 24"/>
+<path class="k" d="M56 36V29H64V36"/>
+<path class="k" d="M26 96H46M74 96H94"/>
+<path class="k" d="M30 94V64M28 74L22 68M32 70L38 64"/>
+<path class="k p" d="M30 26C19 26 14 35 16 43C10 49 14 60 23 60C27 66 35 66 39 61C46 60 48 51 44 45C47 36 41 27 30 26Z"/>
+<circle class="k p" cx="23" cy="37" r="2.4"/>
+<circle class="k p" cx="36" cy="34" r="2.4"/>
+<circle class="k p" cx="30" cy="46" r="2.4"/>
+<circle class="k p" cx="20" cy="52" r="2.4"/>
+<circle class="k p" cx="38" cy="54" r="2.4"/>
+<path class="k" d="M90 94V64M92 74L98 68M88 70L82 64"/>
+<path class="k p" d="M90 26C101 26 106 35 104 43C110 49 106 60 97 60C93 66 85 66 81 61C74 60 72 51 76 45C73 36 79 27 90 26Z"/>
+<circle class="k p" cx="97" cy="37" r="2.4"/>
+<circle class="k p" cx="84" cy="34" r="2.4"/>
+<circle class="k p" cx="90" cy="46" r="2.4"/>
+<circle class="k p" cx="100" cy="52" r="2.4"/>
+<circle class="k p" cx="82" cy="54" r="2.4"/>
+</svg>
