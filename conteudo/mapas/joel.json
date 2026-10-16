@@ -1,0 +1,236 @@
+{
+  "nome": "Joel",
+  "grupo": "Profetas menores",
+  "numero": 29,
+  "capitulos": 3,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "יוֹאֵל",
+    "transliteracao": "Yoel",
+    "traducao": "o Senhor é Deus",
+    "texto": "Yo é um pedaço do nome do Senhor, e El quer dizer Deus. No fim do livro, o Senhor promete que o povo vai saber que ele é o Senhor, o Deus deles, morando em Sião."
+  },
+  "autoria": {
+    "texto": "O Senhor manda uma mensagem a Joel, filho de Petuel. Joel começa chamando os anciãos e todo o povo para escutar.",
+    "apoio": "Ele pede que o povo conte tudo aos filhos e que os filhos contem aos netos.",
+    "refs": [
+      "Jl 1.1-3"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Os gafanhotos comem as plantações, e Joel avisa que o dia do Senhor está chegando. Mesmo assim, Deus promete devolver as colheitas que os gafanhotos comeram. O livro termina com o Senhor dizendo que Jerusalém é a casa dele, junto com o povo.",
+    "refs": [
+      "Jl 1.15",
+      "Jl 2.25",
+      "Jl 3.21"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Gafanhotos",
+      "sub": "Nada sobra nos campos",
+      "desenho": "gafanhoto",
+      "galhos": [
+        {
+          "texto": "O gafanhoto cortador come as plantações. O migrador come o que sobrou, depois vem o saltador e, por fim, o devorador.",
+          "ref": "Jl 1.4"
+        },
+        {
+          "texto": "Joel manda os bêbados acordarem e chorarem, porque as uvas acabaram. Um exército sem conta, com dentes de leão, invadiu a terra e arrancou a casca das figueiras até os galhos ficarem brancos.",
+          "ref": "Jl 1.5-7"
+        },
+        {
+          "texto": "Os sacerdotes devem vestir pano de saco e chorar a noite toda em frente do altar. Joel pede um jejum e uma reunião de todo o povo no templo para orar ao Senhor.",
+          "ref": "Jl 1.13-14"
+        },
+        {
+          "texto": "As sementes apodrecem na terra, e os celeiros estão em ruínas. O gado muge de fome, porque não há pasto.",
+          "ref": "Jl 1.17-18"
+        },
+        {
+          "texto": "Joel pede socorro ao Senhor, porque o fogo queimou os pastos e as árvores. Até os animais selvagens gritam pedindo ajuda, porque os córregos secaram.",
+          "ref": "Jl 1.19-20"
+        }
+      ],
+      "conexao": "Joel manda tocar a trombeta em Sião, porque o dia do Senhor está perto (Jl 2.1)."
+    },
+    {
+      "titulo": "Dia escuro",
+      "sub": "Um exército toma a terra",
+      "desenho": "corneta-de-chifre",
+      "galhos": [
+        {
+          "texto": "É um dia de escuridão e nuvens negras. Um exército tão grande que nunca se viu igual cobre as montanhas. Antes dele, a terra parece o jardim do Éden, e depois parece um deserto.",
+          "ref": "Jl 2.2-3"
+        },
+        {
+          "texto": "Os invasores se parecem com cavalos e saltam pelos picos das montanhas. O barulho deles lembra carros de guerra e fogo queimando um campo.",
+          "ref": "Jl 2.4-5"
+        },
+        {
+          "texto": "O exército sobe as muralhas como soldados treinados e marcha sempre em frente. Na cidade, entra nas casas pelas janelas, como um ladrão.",
+          "ref": "Jl 2.7, 9"
+        },
+        {
+          "texto": "A terra treme, e o sol e a lua escurecem. O Senhor comanda esse exército com um grito, e Joel pergunta quem vai aguentar o dia do Senhor.",
+          "ref": "Jl 2.10-11"
+        }
+      ],
+      "conexao": "O Senhor diz que ainda há tempo de voltar para ele (Jl 2.12)."
+    },
+    {
+      "titulo": "Coração rasgado",
+      "sub": "O Senhor chama o povo de volta",
+      "desenho": "manto-rasgado",
+      "galhos": [
+        {
+          "texto": "Joel diz: “Rasguem os seus corações e não apenas as suas roupas”. O Senhor é paciente, cheio de amor e sempre pronto a não castigar.",
+          "ref": "Jl 2.13"
+        },
+        {
+          "texto": "Quem sabe o Senhor ainda muda de ideia e dá boas colheitas. Aí o povo vai poder levar de novo ofertas de cereais e de vinho.",
+          "ref": "Jl 2.14"
+        },
+        {
+          "texto": "Joel manda tocar a trombeta em Sião e reunir todo o povo, até as crianças que ainda mamam no peito. O noivo e a noiva também têm de vir.",
+          "ref": "Jl 2.15-16"
+        },
+        {
+          "texto": "Os sacerdotes devem chorar entre o pórtico do templo e o altar e pedir ao Senhor que poupe o povo dele. Assim as nações não vão perguntar onde está o Deus deles.",
+          "ref": "Jl 2.17"
+        }
+      ],
+      "conexao": "Então o Senhor vai ter misericórdia do povo e mostrar o zelo pela terra dele (Jl 2.18)."
+    },
+    {
+      "titulo": "Eiras cheias",
+      "sub": "Deus devolve o que se perdeu",
+      "desenho": "monte-de-graos",
+      "galhos": [
+        {
+          "texto": "O Senhor promete trigo, vinho novo e azeite até acabar a necessidade do povo. O povo nunca mais vai ser motivo de zombaria entre as nações.",
+          "ref": "Jl 2.19"
+        },
+        {
+          "texto": "Deus diz ao povo e aos animais do campo que não tenham medo. Os pastos vão ficar verdes, e as figueiras e as videiras vão florescer de novo.",
+          "ref": "Jl 2.21-22"
+        },
+        {
+          "texto": "O povo de Sião pode se alegrar, porque as chuvas do outono e da primavera vão voltar. As eiras vão ficar cheias de trigo, e os tanques vão transbordar de vinho e azeite.",
+          "ref": "Jl 2.23-24"
+        },
+        {
+          "texto": "Todos vão comer até ficar satisfeitos e louvar o Senhor pelos milagres. O Senhor promete que o povo dele nunca mais vai passar uma vergonha assim.",
+          "ref": "Jl 2.26"
+        }
+      ],
+      "conexao": "O povo vai saber que o Senhor está no meio de Israel (Jl 2.27)."
+    },
+    {
+      "titulo": "O Espírito",
+      "sub": "Deus derrama o Espírito",
+      "desenho": "jarro-derramado",
+      "galhos": [
+        {
+          "texto": "Depois disso, Deus promete derramar o Espírito sobre todos os povos. Filhos e filhas vão profetizar, os velhos vão sonhar, e os jovens vão ter visões.",
+          "ref": "Jl 2.28"
+        },
+        {
+          "texto": "Naqueles dias, Deus vai derramar o Espírito até sobre os servos e as servas.",
+          "ref": "Jl 2.29"
+        },
+        {
+          "texto": "Deus vai pôr sinais estranhos na terra e no céu, com sangue, fogo e colunas de fumaça.",
+          "ref": "Jl 2.30"
+        },
+        {
+          "texto": "Todo aquele que pedir socorro ao nome do Senhor vai ser salvo. No monte Sião e em Jerusalém, alguns vão escapar, como o Senhor prometeu.",
+          "ref": "Jl 2.32"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus diz aos discípulos: “eu enviarei sobre vocês a promessa de meu Pai”. Ele manda que fiquem em Jerusalém até o Espírito Santo vir. Depois, Pedro diz ao povo que o que eles estão vendo é o que o profeta Joel anunciou. A promessa de Joel chega mandada por Jesus.",
+        "refs": [
+          "Lc 24.49",
+          "At 1.4-5",
+          "At 2.14, 16-17"
+        ]
+      },
+      "conexao": "Naquele tempo, Deus vai devolver a Judá e a Jerusalém o que tinham antes (Jl 3.1)."
+    },
+    {
+      "titulo": "A foice",
+      "sub": "Deus julga as nações",
+      "desenho": "foice-e-trigo",
+      "galhos": [
+        {
+          "texto": "Deus vai juntar os exércitos do mundo no vale onde o Senhor julga. As nações espalharam o povo dele e trocaram uma menina por vinho.",
+          "ref": "Jl 3.2-3"
+        },
+        {
+          "texto": "Tiro, Sidom e os filisteus levaram a prata e o ouro de Deus para os templos deles. Eles venderam o povo de Judá e de Jerusalém aos gregos.",
+          "ref": "Jl 3.4-6"
+        },
+        {
+          "texto": "As nações devem derreter os arados para fazer espadas e transformar as foices em lanças. Até o fraco deve dizer: “Eu sou forte!”",
+          "ref": "Jl 3.10"
+        },
+        {
+          "texto": "No vale de Josafá, o Senhor vai se sentar para julgar todos os povos vizinhos. Ele chama as nações para lá.",
+          "ref": "Jl 3.12"
+        },
+        {
+          "texto": "Quando o Senhor rugir de Sião, a terra e o céu vão tremer. Para o povo dele, o Senhor é um refúgio.",
+          "ref": "Jl 3.16"
+        },
+        {
+          "texto": "Egito e Edom vão virar deserto, por causa do sangue inocente que derramaram em Judá. Judá vai prosperar para sempre, e Jerusalém também.",
+          "ref": "Jl 3.19-20"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Uma fonte nascerá no templo do Senhor para regar o vale das Acácias.” Jesus diz que, segundo as Escrituras, rios de água viva vão correr do íntimo de quem crer nele (Jo 7.38). Ele está falando do Espírito, que ainda ia ser dado a quem cresse nele (Jo 7.39).",
+    "ref": "Jl 3.18",
+    "desenho": "rio-e-arvore",
+    "pares": [
+      {
+        "at": "Jl 2.31",
+        "texto": "O sol vai escurecer, e a lua vai ficar vermelha como sangue, antes de chegar o grande e terrível dia do Senhor.",
+        "nt": "Mt 24.29",
+        "nota": "Depois da perseguição daqueles dias, o sol vai escurecer, a lua vai ficar negra e as estrelas vão cair do céu"
+      },
+      {
+        "at": "Jl 3.13",
+        "texto": "A foice deve cumprir sua tarefa; a colheita está madura.",
+        "nt": "Ap 14.15",
+        "nota": "Um anjo grita para quem está sentado na nuvem que comece a usar a foice, porque a colheita da terra está madura"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Os gafanhotos e o choro", "de": 1, "ate": 1 },
+    { "titulo": "O dia do Senhor e a promessa", "de": 2, "ate": 2 },
+    { "titulo": "O vale onde o Senhor julga", "de": 3, "ate": 3 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Joel compara o choro do povo ao de uma jovem que perde o noivo antes do casamento.",
+      "ref": "Jl 1.8"
+    },
+    {
+      "texto": "Até as tamareiras e as romeiras murcham, e a alegria seca no coração das pessoas.",
+      "ref": "Jl 1.12"
+    },
+    {
+      "texto": "Deus promete jogar o exército que vem do norte numa terra seca. Metade das tropas vai para o mar Morto, e o resto vai para o Mediterrâneo.",
+      "ref": "Jl 2.20"
+    }
+  ],
+  "procure": {
+    "texto": "Procure o dia do Senhor. Joel fala dele quando os gafanhotos chegam, quando a trombeta toca em Sião, quando o sol escurece e quando as multidões esperam no vale.",
+    "ref": "Jl 3.14"
+  }
+}

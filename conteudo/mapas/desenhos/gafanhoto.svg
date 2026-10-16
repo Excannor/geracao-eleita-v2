@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o gafanhoto que come as plantações (Jl 1.4): de lado, sobre uma folha roída, com a perna de trás dobrada em cima, as antenas compridas e a asa em sálvia ao longo das costas. -->
+<path class="k p" d="M8 96C30 86 58 84 84 88C96 90 106 94 112 98C104 100 98 98 92 102C86 98 80 102 74 99C66 103 58 99 50 102C40 98 26 100 8 96Z"/>
+<path class="h" d="M18 95C42 91 70 90 104 96"/>
+<path class="k" d="M84 70L91 89M78 72L77 88M66 72L61 86"/>
+<path class="k" d="M34 43L24 91"/>
+<path class="k p" d="M18 64C18 56 30 52 46 52H78C86 52 92 56 92 64C92 70 86 74 78 74H44C28 74 18 70 18 64Z"/>
+<path class="h" d="M30 55C28 60 28 68 30 73M38 53C36 59 36 68 38 74M46 52C44 59 44 68 46 74"/>
+<path class="k s" d="M26 58C38 46 64 44 84 50C70 54 48 58 26 58Z"/>
+<path class="k p" d="M86 52C90 46 98 44 104 48C108 52 108 62 104 68C100 72 94 72 90 70"/>
+<ellipse class="e" cx="99" cy="54" rx="3" ry="3.6"/>
+<path class="k" d="M100 46C104 36 108 28 114 22M96 45C96 36 98 28 102 20"/>
+<path class="k p" d="M70 70C62 66 50 54 40 42C36 37 30 39 32 44C40 56 52 68 62 74Z"/>
+<path class="h" d="M44 48L58 64M40 44L54 62"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a foice e a colheita madura (Jl 3.13): duas espigas de trigo em pé, abertas em V, e ao lado uma foice com a lâmina em meia-lua e o cabo em sálvia. -->
+<path class="k" d="M14 104H106"/>
+<path class="k" d="M36 104C36 84 32 62 26 40M40 104C42 84 46 64 52 44"/>
+<path class="k p" d="M26 40c-4-2-5-7-3-11c3 1 5 5 3 11zM26 40c4-2 6-6 5-11c-3 1-6 5-5 11zM27 50c-4-2-6-6-4-11c3 1 6 5 4 11zM27 50c4-2 6-7 4-11c-3 1-5 6-4 11zM29 60c-4-2-6-6-4-11c3 1 6 5 4 11zM29 60c4-2 6-7 4-11c-3 1-5 6-4 11z"/>
+<path class="k p" d="M52 44c-4-2-5-7-2-11c3 2 4 6 2 11zM52 44c4-1 7-5 6-10c-3 1-6 5-6 10zM50 54c-4-2-5-7-3-11c3 1 5 6 3 11zM50 54c4-2 6-6 5-11c-3 1-5 6-5 11zM48 64c-4-2-5-7-3-11c3 1 5 6 3 11zM48 64c4-2 6-6 5-11c-3 1-5 6-5 11z"/>
+<path class="h" d="M24 29l-2-7M31 29l2-7M50 33l-1-7M58 34l3-6"/>
+<path class="k s" d="M86 104l-6-28l6-1l6 28z"/>
+<path class="h" d="M81 82l6-1M82 86l6-1"/>
+<path class="k p" d="M80 76C62 70 58 46 72 34C84 24 102 26 110 38C100 32 86 34 78 42C70 52 74 66 86 75Z"/>
+<path class="h" d="M74 40C70 48 70 58 76 66"/>
+</svg>
