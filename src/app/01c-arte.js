@@ -152,6 +152,8 @@
     { linhas: ['O maná pode até', 'cair do céu, mas', 'você ainda precisa', 'sair da tenda para', 'buscá-lo.'], arte: 'mana' },
     // O joguinho sem internet, com a ovelhinha em pixel do desafio Sem internet.
     { linhas: ['Permaneça offline', 'para o pecado'], arte: 'offline' },
+    // Lema sem referência: a frase dobrada na quina de um cubo, como a referência do dono.
+    { linhas: ['Até lá,', 'eu oro.'], arte: 'oro' },
   ];
   // Uma frase por dia: o sorteio do dia fica guardado e volta igual o dia inteiro. As frases
   // saem em ordem aleatória sem repetir até passarem todas; aí o baralho recomeça, sem abrir

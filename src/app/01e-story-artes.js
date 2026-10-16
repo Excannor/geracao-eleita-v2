@@ -2354,6 +2354,7 @@
     liberdade: { fundo: ['#d3d5a2'], tema: { ...TEMA_SALVIA, escala: 0.8 }, desenhar: arteLiberdade, grao: [12, 1860] },
     mana: { fundo: ['#1b1b1b'], tema: { ...TEMA_LP, brilho: false, escala: 0.8 }, desenhar: arteMana, grao: [14, 1870] },
     offline: { fundo: ['#f0f0ef'], tema: { ...TEMA_PAPEL, escala: 0.8 }, desenhar: arteOffline, grao: [10, 1880] },
+    oro: { fundo: ['#dad9d5'], tema: { ...TEMA_PAPEL, numero: '#151514', escala: 0.8 }, desenhar: arteOro, grao: [10, 1890] },
   };
   // Fotos de fundo (window.STORY_FOTOS, posto pelo build no começo deste arquivo): pedidas
   // antes de desenhar (prepararArte). Sem a foto, o modelo sai com a ilustração.
@@ -10362,6 +10363,169 @@
     const wNo = ctx.measureText('IN').width;
     // a tecla no lugar de "controle": o topo na altura do NO, logo depois dele
     teclaCtrl(ctx, x0 + wNo + larg * 0.02, b3 - capNo - larg * 0.01, tecla);
+  }
+  // Até lá, eu oro. (lema, sem referência). Igual à referência do dono: a frase em letra
+  // condensada preta, pintada na quina de um cubo que vem para a frente. ATÉ e EU ficam na face
+  // da esquerda, LÁ, e ORO. na da direita; cada face foge para o seu lado em perspectiva (as
+  // letras crescem perto da quina e encolhem para fora), e a dobra fica no meio, entre as
+  // palavras. As faces não aparecem: só as letras dobram. Embaixo, o papel cinza-claro com
+  // grão e um texto de livro bem apagado, espelhado como a impressão do outro lado da folha.
+  // Fechamento: a dobra (nenhuma ênfase de cor).
+  const LIVRO_ORO = 'Há dias em que a resposta demora, e a gente aprende a esperar sem largar a mão de quem '
+    + 'prometeu. A espera não é tempo perdido: é o lugar onde a confiança cria raiz. Enquanto a porta não '
+    + 'se abre, o joelho dobra; enquanto o caminho não aparece, a voz continua subindo. Ninguém sabe quando '
+    + 'vai chegar o dia, mas sabe para quem está falando até ele chegar. A oração não apressa o relógio, '
+    + 'muda quem olha para ele. Por isso a gente volta, de manhã e de noite, com as mesmas palavras e com '
+    + 'palavras novas, com lágrima e com riso, porque quem ouve não se cansa de ouvir. ';
+  function livroApagado(ctx, r) {
+    const t = 25;
+    const passo = 39;
+    ctx.save();
+    // espelhado: a impressão do outro lado da página, vista contra a luz
+    ctx.translate(L, 0);
+    ctx.scale(-1, 1);
+    ctx.filter = 'blur(1.2px)';
+    ctx.font = 'italic 500 ' + t + 'px Literata, Georgia, serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    const palavras = (LIVRO_ORO + LIVRO_ORO + LIVRO_ORO + LIVRO_ORO).split(' ');
+    const x0 = 150;
+    const larg = L - 300;
+    let i = 0;
+    for (let y = 130; y < A - 60; y += passo) {
+      // um respiro de parágrafo de vez em quando, e as linhas não começam todas iguais
+      if (r() < 0.07) continue;
+      let linha = '';
+      while (i < palavras.length) {
+        const prova = linha ? linha + ' ' + palavras[i] : palavras[i];
+        if (ctx.measureText(prova).width > larg) break;
+        linha = prova;
+        i++;
+      }
+      if (i >= palavras.length) i = 0;
+      ctx.fillStyle = 'rgba(70,68,62,' + (0.03 + r() * 0.02).toFixed(3) + ')';
+      ctx.fillText(linha, x0, y);
+    }
+    ctx.restore();
+  }
+  function arteOro(ctx) {
+    const r = sorteio(1890);
+    const tinta = '#121211';
+    // o papel cinza-claro, com a luz vindo de cima e os cantos um pouco mais escuros
+    ctx.fillStyle = '#dad9d5';
+    ctx.fillRect(0, 0, L, A);
+    const luz = ctx.createRadialGradient(L / 2, 820, 120, L / 2, 900, 1250);
+    luz.addColorStop(0, 'rgba(255,255,253,.42)');
+    luz.addColorStop(1, 'rgba(120,118,110,.16)');
+    ctx.fillStyle = luz;
+    ctx.fillRect(0, 0, L, A);
+    manchas(ctx, r, 40, { aClaro: 0.06, aEscuro: 0.03, claro: '255,255,255', escuro: '95,92,84', rMin: 40, rMax: 260 });
+    // as fibras do papel: risquinhos finos claros e escuros
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 2600; i++) {
+      const x = r() * L;
+      const y = r() * A;
+      const ang = r() * Math.PI;
+      const comp = 3 + r() * 14;
+      ctx.strokeStyle = r() < 0.5 ? 'rgba(255,255,255,.22)' : 'rgba(80,78,72,.10)';
+      ctx.lineWidth = 0.6 + r() * 0.9;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.cos(ang) * comp, y + Math.sin(ang) * comp);
+      ctx.stroke();
+    }
+    ctx.restore();
+    livroApagado(ctx, r);
+    // a frase, cada face numa tela própria (em dobro, para a dobra sair lisa), com a quina na
+    // beira de dentro: na da esquerda ATÉ e EU encostam à direita, na da direita LÁ, e ORO.
+    // encostam à esquerda
+    const Q = 2;
+    const t = 230 * Q;
+    const estica = 1.06; // a letra um pouco mais alta, como a da referência
+    const f = oswaldLP(t, 700);
+    const meioVao = t * 0.09; // metade do espaço entre as palavras, de cada lado da quina
+    const entre = t * 0.24; // entrelinha (a vírgula de LÁ, não encosta no ORO.)
+    const prova = S.tela();
+    const pc = prova.getContext('2d');
+    pc.font = f;
+    const cap = pc.measureText('H').actualBoundingBoxAscent * estica;
+    const acento = cap * 0.26; // o espaço dos acentos de ATÉ e LÁ
+    const desce = cap * 0.14; // a vírgula
+    const H = Math.ceil(acento + cap + entre + cap + desce + 20 * Q);
+    const b1 = acento + cap + 6 * Q;
+    const b2 = b1 + entre + cap;
+    const face = (palavras, direita) => {
+      const k = document.createElement('canvas');
+      const w = Math.ceil(Math.max(...palavras.map((p) => pc.measureText(p).width)) + meioVao + 20 * Q);
+      k.width = w;
+      k.height = H;
+      const c = k.getContext('2d');
+      c.font = f;
+      try { c.letterSpacing = (t * 0.01) + 'px'; } catch (e) { /* sem letterSpacing: segue */ }
+      c.fillStyle = tinta;
+      c.strokeStyle = tinta;
+      c.lineJoin = 'round';
+      c.lineWidth = t * 0.022; // engrossa um pouco: a da referência é bem cheia
+      c.textBaseline = 'alphabetic';
+      c.textAlign = direita ? 'left' : 'right';
+      const x = direita ? meioVao : w - meioVao;
+      palavras.forEach((p, i) => {
+        c.save();
+        c.translate(x, i ? b2 : b1);
+        c.scale(1, estica);
+        // o ponto final sai mais alto que largo: na face que foge, o quadradinho do Oswald
+        // achatava e virava traço
+        const corpo = p.endsWith('.') ? p.slice(0, -1) : p;
+        c.fillText(corpo, 0, 0);
+        c.strokeText(corpo, 0, 0);
+        if (corpo !== p) {
+          const xp = c.measureText(corpo).width + t * 0.03;
+          const lp = t * 0.1;
+          c.beginPath();
+          c.roundRect(xp, -lp * 1.45, lp, lp * 1.45, lp * 0.3);
+          c.fill();
+        }
+        c.restore();
+      });
+      return k;
+    };
+    const esq = face(['ATÉ', 'EU'], false);
+    const dir = face(['LÁ,', 'ORO.'], true);
+    // a quina vista de cima: cada face é uma tira oblíqua (as linhas sobem da quina para fora,
+    // em V, como as faces de um cubo visto do alto), as letras crescem um pouco perto da quina
+    // e os traços de pé se fecham para baixo (a fuga vertical). Cada coluna da tela da face vai
+    // para o story com a sua própria transformação afim.
+    const cx = 0.9; // o encurtamento na horizontal
+    const sobe = 0.22; // quanto a linha sobe por pixel andado para fora da quina
+    const fecha = 0.06; // a fuga vertical: o pé das letras chega mais perto da quina
+    const yh = acento * 0.5; // a escala parte do alto do bloco: o pé cresce mais que a cabeça
+    const dMax = Math.max(esq.width, dir.width);
+    const g = 0.4 / dMax; // na ponta, a letra fica com ~71% da altura da quina
+    const esc = (d) => 1 / (1 + g * d);
+    const largura = cx * (esq.width + dir.width);
+    const altura = H - yh + sobe * cx * dMax;
+    const k = Math.min(730 / largura, 800 / altura);
+    const xq = L / 2 + k * cx * (esq.width - dir.width) / 2;
+    const yc = 1010 - k * (H - yh - sobe * cx * dMax) / 2;
+    const { c: cam, ctx: tc } = camada();
+    tc.imageSmoothingQuality = 'high';
+    const passo = Q;
+    for (const [tela, lado] of [[esq, -1], [dir, 1]]) {
+      for (let sx = 0; sx < tela.width; sx += passo) {
+        // d: a distância da coluna até a quina, na tela da face
+        const d = lado < 0 ? tela.width - sx : sx;
+        tc.setTransform(k * cx, -lado * k * sobe * cx, -lado * k * cx * d * fecha / H, k * esc(d),
+          xq + lado * k * cx * d, yc - k * sobe * cx * d);
+        // a tira pega um pouco da vizinha: sem isso a emenda aparece em listras
+        const w = Math.min(passo + 3 * Q, tela.width - sx);
+        tc.drawImage(tela, sx, 0, w, H, 0, -yh, w, H);
+      }
+    }
+    tc.setTransform(1, 0, 0, 1, 0, 0);
+    // a tinta pintada: uns furinhos e riscos finos tirados
+    gastar(cam, { x: 0, y: 500, w: L, h: 1000 }, { pontos: 220, manchas: 0, riscos: 10, semente: 1891, forca: 0.5 });
+    ctx.drawImage(cam, 0, 0);
   }
   S.prepararVersiculo = () => carregarFoto('montanhas');
   S.versiculoCompleto = () => fotoPronta('montanhas');
