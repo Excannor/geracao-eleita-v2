@@ -692,6 +692,12 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   são ecos (1Tm 2.5-6, 1Jo 2.1, Cl 2.3), sem dizer que Jó profetizou, e o significado do nome fica no "lembra".
   Na captura, um galho terminou com "Jó." sozinho na linha: nome de duas letras no fim do item também conta.
 
+- 2026-10-16 · desenho · Eclesiastes: `semente-ao-vento` está na pasta dos mapas, mas é o desenho do alto da página da
+  parábola do semeador (viewBox 160 por 124), e o checador barrou → antes de reaproveitar um desenho, olhar o viewBox
+  (`grep -L 'viewBox="0 0 120 120"' conteudo/mapas/desenhos/*.svg` lista os que não servem para ramo). Os versos de
+  Ec 12.6 viraram `cantaro-quebrado`. No conteúdo, a NBV já põe o nome de Salomão em Ec 1.1 ("Palavra do Pregador
+  Salomão"): a autoria cita o verso em vez de discutir quem escreveu.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de

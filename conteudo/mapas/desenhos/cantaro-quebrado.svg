@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o cântaro que se quebra na fonte (Ec 12.6): o fundo largo do cântaro em pé, com a borda de cima em dentes de caco e a parte de dentro à mostra; o gargalo com a boca e a alça caído ao lado, deitado; um caco solto e a água da fonte numa poça larga atrás. A poça é a única área sálvia. -->
+<path class="k" d="M6 94H114"/>
+<path class="k s" d="M10 94C12 87 32 85 60 85C88 85 108 87 110 94Z"/>
+<path class="k p" d="M14 44L21 38L27 46L34 36L41 45L48 37L55 46L62 39L68 45C74 64 66 82 50 92H32C16 82 8 64 14 44Z"/>
+<path class="h" d="M16 50C28 55 54 56 67 50"/>
+<path class="h" d="M20 60C22 72 28 80 36 85"/>
+<path class="k p" d="M72 93L77 86L71 79L78 72L74 65C84 60 95 64 98 74H103V86H98C95 91 84 94 72 93Z"/>
+<path class="k p" d="M103 70H109V90H103Z"/>
+<path class="k" d="M84 63C83 50 101 50 100 74"/>
+<path class="h" d="M80 70C86 70 92 74 94 80"/>
+<path class="k p" d="M8 92L12 84L20 86L19 92Z"/>
+</svg>
