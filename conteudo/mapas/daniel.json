@@ -1,0 +1,283 @@
+{
+  "nome": "Daniel",
+  "grupo": "Profetas maiores",
+  "numero": 27,
+  "capitulos": 12,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "דָּנִיֵּאל",
+    "transliteracao": "Daniyyel",
+    "traducao": "Deus é o meu juiz",
+    "texto": "El é Deus, e Dan vem do verbo julgar. Na Babilônia, o chefe dos oficiais troca o nome de Daniel por Beltessazar. Nabucodonosor conta que deu esse nome em honra ao deus dele."
+  },
+  "autoria": {
+    "texto": "Numa noite, Daniel está deitado na cama e tem um sonho. Ele escreve o que viu. Nas visões, Daniel fala de si: “Eu, Daniel, fiquei muito confuso e perturbado com o que vi”.",
+    "apoio": "Daniel é da tribo de Judá. Ele fica no palácio da Babilônia até o primeiro ano do reinado de Ciro.",
+    "refs": [
+      "Dn 7.1",
+      "Dn 7.15",
+      "Dn 1.6",
+      "Dn 1.21"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Nabucodonosor cerca Jerusalém e leva para a Babilônia os vasos do templo e alguns rapazes de Judá. Longe de casa, Daniel serve no palácio de reis estrangeiros e continua orando ao Deus dele três vezes por dia. Os inimigos usam isso contra ele. Daniel louva a Deus, que derruba os reis dos tronos e põe outros no lugar.",
+    "refs": [
+      "Dn 1.1-3",
+      "Dn 6.13",
+      "Dn 2.20-21"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "O sonho do rei",
+      "sub": "Deus dá sabedoria a Daniel",
+      "desenho": "estatua",
+      "galhos": [
+        {
+          "texto": "Daniel decide que não vai comer a comida do rei nem beber o vinho dele. Ele pede ao mordomo dez dias só com legumes e água. Quando os dez dias terminam, Daniel e os três amigos estão mais fortes que os rapazes que comeram a comida fina do rei.",
+          "ref": "Dn 1.8-15"
+        },
+        {
+          "texto": "Nabucodonosor tem um sonho e acorda com medo. Ele exige que os sábios contem o sonho e o significado, ou vão ser cortados em pedaços. Os sábios dizem que ninguém em toda a terra consegue fazer isso.",
+          "ref": "Dn 2.1-10"
+        },
+        {
+          "texto": "O rei manda matar todos os sábios da Babilônia, e o comandante da guarda vem procurar Daniel e os amigos. Daniel pede um tempo ao rei. Em casa, ele ora com os três amigos. Naquela noite, Deus mostra o sonho a Daniel numa visão.",
+          "ref": "Dn 2.12-19"
+        },
+        {
+          "texto": "Daniel conta o sonho ao rei. No sonho, Nabucodonosor vê uma estátua de homem, com a cabeça de ouro e os pés de ferro e barro. Uma pedra é cortada da montanha, sem força humana, e despedaça os pés da estátua.",
+          "ref": "Dn 2.31-34"
+        },
+        {
+          "texto": "Na hora de dar o significado, Daniel diz ao rei: “O senhor, rei Nabucodonosor, é a cabeça de ouro”. Nabucodonosor se ajoelha diante de Daniel, com o rosto no chão, e diz que o Deus de Daniel é o Deus dos deuses.",
+          "ref": "Dn 2.38, 46-47"
+        }
+      ],
+      "conexao": "O rei põe os três amigos de Daniel na província (Dn 2.49). Depois, faz uma festa para uma estátua (Dn 3.2)."
+    },
+    {
+      "titulo": "A fornalha",
+      "sub": "Três amigos não se curvam",
+      "desenho": "fornalha",
+      "galhos": [
+        {
+          "texto": "Um homem grita a ordem do rei. Quando a música tocar, todos têm de se curvar até o chão e adorar a estátua de ouro. Quem não se curvar vai ser jogado na fornalha acesa.",
+          "ref": "Dn 3.4-6"
+        },
+        {
+          "texto": "Alguns astrólogos acusam os três judeus de não adorar a estátua. Nabucodonosor fica furioso. Ele dá mais uma chance aos três e pergunta: “E qual é o deus que vai poder livrar vocês de minhas mãos?”",
+          "ref": "Dn 3.8-15"
+        },
+        {
+          "texto": "Os três respondem que o Deus deles pode livrar os três da fornalha. Se ele não livrar, mesmo assim eles nunca vão servir aos deuses do rei.",
+          "ref": "Dn 3.16-18"
+        },
+        {
+          "texto": "O rei manda esquentar a fornalha sete vezes mais que de costume. Os soldados amarram os três e jogam todos lá dentro. O fogo está tão forte que mata os soldados.",
+          "ref": "Dn 3.19-23"
+        },
+        {
+          "texto": "Nabucodonosor se levanta espantado e grita: “Eu estou vendo quatro homens, desamarrados, andando pelo fogo”. Para o rei, o quarto homem parece um filho dos deuses.",
+          "ref": "Dn 3.24-25"
+        },
+        {
+          "texto": "Os três saem do meio do fogo. Nenhum fio de cabelo está queimado, e eles não têm nem cheiro de fumaça. Nabucodonosor diz que o Deus deles mandou o anjo para salvar os servos dele.",
+          "ref": "Dn 3.26-28"
+        }
+      ],
+      "conexao": "O rei promove os três (Dn 3.30). Numa noite, Nabucodonosor tem um sonho que deixa o rei com medo (Dn 4.5)."
+    },
+    {
+      "titulo": "O rei no capim",
+      "sub": "Deus humilha dois reis",
+      "desenho": "arvore-com-ninho",
+      "galhos": [
+        {
+          "texto": "No sonho, uma árvore cresce tanto que a copa encosta no céu, e as aves fazem ninho nos ramos dela. Um anjo desce do céu e grita que derrubem a árvore, mas deixem as raízes e o toco.",
+          "ref": "Dn 4.10-15"
+        },
+        {
+          "texto": "Daniel fica um tempo sentado em silêncio, com medo do sonho. Depois diz ao rei que a árvore é Nabucodonosor. Daniel ainda pede que o rei pare de pecar e seja bom para os pobres.",
+          "ref": "Dn 4.19-27"
+        },
+        {
+          "texto": "Doze meses depois, o rei passeia no terraço do palácio e se gaba da cidade que construiu. Ele ainda está falando quando uma voz do céu diz que ele não é mais rei. Nabucodonosor é expulso do palácio e come capim como os bois.",
+          "ref": "Dn 4.29-33"
+        },
+        {
+          "texto": "Sete anos depois, Nabucodonosor olha para o céu, e a mente dele volta ao normal. Ele louva o Deus Altíssimo. Os conselheiros vêm procurar Nabucodonosor, e ele é rei outra vez.",
+          "ref": "Dn 4.34-36"
+        },
+        {
+          "texto": "O rei Belsazar dá uma festa para mil convidados e bebe vinho nas taças de ouro do templo de Jerusalém. De repente, os dedos de uma mão escrevem na parede do palácio. Os joelhos do rei batem um contra o outro.",
+          "ref": "Dn 5.1-6"
+        },
+        {
+          "texto": "Daniel lê as palavras da parede. TEQUEL quer dizer pesado, porque Deus pesou o rei na balança, e o peso não deu. Naquela mesma noite, Belsazar é morto.",
+          "ref": "Dn 5.25-28, 30"
+        }
+      ],
+      "conexao": "Dario começa a reinar na Babilônia (Dn 5.31) e põe Daniel entre os três ministros do reino (Dn 6.2)."
+    },
+    {
+      "titulo": "Cova dos leões",
+      "sub": "Daniel ora com a janela aberta",
+      "desenho": "anel-de-selo",
+      "galhos": [
+        {
+          "texto": "Os outros ministros e governadores procuram um roubo ou uma desonestidade de Daniel e não acham nada. Eles percebem que só vão pegar Daniel por causa da lei do Deus dele.",
+          "ref": "Dn 6.4-5"
+        },
+        {
+          "texto": "Eles convencem o rei a assinar uma lei que não pode ser mudada. Durante trinta dias, quem fizer um pedido a qualquer deus ou homem, fora o rei, vai ser jogado na cova dos leões.",
+          "ref": "Dn 6.6-9"
+        },
+        {
+          "texto": "Daniel sabe que o rei assinou a lei e vai para casa. No quarto do segundo andar, com as janelas abertas na direção de Jerusalém, ele se ajoelha e ora, como faz três vezes por dia.",
+          "ref": "Dn 6.10"
+        },
+        {
+          "texto": "O rei passa o resto do dia tentando salvar Daniel, mas a lei não muda. Daniel vai para a cova, e o rei fala com ele: “Eu espero que o seu Deus... o salve dos leões”. Uma pedra fecha a entrada, e o rei marca a pedra com o anel dele.",
+          "ref": "Dn 6.14-17"
+        },
+        {
+          "texto": "Naquela noite, o rei vai deitar sem comer e não dorme. Bem cedinho, corre à cova e chama Daniel. Daniel responde: “O meu Deus mandou o seu anjo para fechar as bocas dos leões”.",
+          "ref": "Dn 6.18-22"
+        },
+        {
+          "texto": "Daniel sai da cova sem nenhum arranhão, porque confiou no Deus dele. Os homens que acusaram Daniel vão para a cova com as famílias, e os leões atacam todos antes de chegarem ao fundo.",
+          "ref": "Dn 6.23-24"
+        }
+      ],
+      "conexao": "Dario manda o reino respeitar o Deus de Daniel (Dn 6.26). Num sonho, Daniel vê quatro animais (Dn 7.2-3)."
+    },
+    {
+      "titulo": "Quatro animais",
+      "sub": "Daniel vê os animais e o trono",
+      "desenho": "trono",
+      "galhos": [
+        {
+          "texto": "Daniel vê um leão com asas de águia e um urso com três costelas na boca. Depois, um quarto animal sai do mar, com dentes de ferro e dez chifres. Um chifre pequeno nasce no meio deles, com olhos de homem e uma boca que fala com arrogância.",
+          "ref": "Dn 7.4-8"
+        },
+        {
+          "texto": "Um ancião se senta num trono de fogo, que se move sobre rodas. A roupa dele é branca como a neve. Um rio de fogo corre na frente dele, e os livros são abertos.",
+          "ref": "Dn 7.9-10"
+        },
+        {
+          "texto": "Numa visão à noite, Daniel vê alguém semelhante a um filho do homem chegando no meio das nuvens do céu. Esse filho do homem chega perto do ancião. Todos os povos devem obedecer a ele, e o reino dele jamais vai ser destruído.",
+          "ref": "Dn 7.13-14"
+        },
+        {
+          "texto": "Daniel chega perto de um dos que estão ao lado do trono e pergunta sobre tudo aquilo. Ele diz a Daniel que os quatro animais são quatro reis. Perto do fim dos tempos, os santos do Deus Altíssimo vão dominar todos os reinos para sempre.",
+          "ref": "Dn 7.16-18"
+        },
+        {
+          "texto": "Em outra visão, perto do rio Ulai, um bode corre tão depressa que nem toca no chão e quebra os dois chifres de um carneiro. Gabriel diz a Daniel que o carneiro são os reis da Média e da Pérsia, e o bode é o rei da Grécia.",
+          "ref": "Dn 8.2-7, 16-21"
+        }
+      ],
+      "jesus": {
+        "texto": "Nas encostas do monte das Oliveiras, os discípulos perguntam a Jesus o que vai marcar a volta dele. Jesus responde que um sinal da vinda dele vai aparecer no céu. As nações do mundo vão ver o Filho do Homem chegar nas nuvens do céu, com poder e grande glória. O filho do homem que Daniel vê chegando nas nuvens é Jesus.",
+        "refs": [
+          "Mt 24.3",
+          "Mt 24.30"
+        ]
+      },
+      "conexao": "Daniel fica doente vários dias (Dn 8.27). Depois, lê que Jerusalém ficaria setenta anos desolada (Dn 9.2)."
+    },
+    {
+      "titulo": "O tempo do fim",
+      "sub": "Um anjo fala do que vai vir",
+      "desenho": "rolo-amarrado",
+      "galhos": [
+        {
+          "texto": "Daniel jejua e põe cinza na cabeça para orar. Ele confessa os pecados do povo. Daniel diz a Deus que não pede porque eles merecem, mas por causa da misericórdia dele.",
+          "ref": "Dn 9.3-5, 18"
+        },
+        {
+          "texto": "Gabriel chega voando enquanto Daniel ainda está orando, na hora do sacrifício da tarde. Gabriel conta que a ordem foi dada no instante em que Daniel começou a orar, porque Deus tem um amor muito especial por ele.",
+          "ref": "Dn 9.20-23"
+        },
+        {
+          "texto": "Depois de três semanas sem carne e sem vinho, Daniel está na margem do rio Tigre. Ele vê um homem vestido de linho, com um cinto de ouro puro. Os companheiros de Daniel não veem nada, mas ficam apavorados e correm para se esconder.",
+          "ref": "Dn 10.2-5, 7"
+        },
+        {
+          "texto": "Um mensageiro conta a Daniel que os pedidos dele foram ouvidos no primeiro dia. Só que o príncipe do reino da Pérsia impediu o mensageiro durante vinte e um dias, até Miguel vir ajudar.",
+          "ref": "Dn 10.12-13"
+        },
+        {
+          "texto": "O mensageiro fala de um rei do norte e de um rei do sul. Os dois vão se reunir para tratar da paz e fazer planos para enganar um ao outro. Ele avisa que as pessoas que conhecem o seu Deus vão resistir com firmeza.",
+          "ref": "Dn 11.27, 32"
+        },
+        {
+          "texto": "Quem é sábio vai brilhar como o sol, e quem levou outras pessoas a obedecer a Deus vai brilhar para sempre, como as estrelas.",
+          "ref": "Dn 12.3"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Mas a pedra que tinha destruído a estátua cresceu e se tornou uma grande montanha e ocupou toda a terra.” Jesus fala de uma pedra que os construtores rejeitaram. Ele avisa que as pessoas sobre quem essa pedra cair vão virar pó (Lc 20.17-18).",
+    "ref": "Dn 2.35",
+    "desenho": "pedra-e-monte",
+    "pares": [
+      {
+        "at": "Dn 10.6",
+        "texto": "os seus olhos eram chamas de fogo. Os seus braços e pés pareciam feitos de bronze polido",
+        "nt": "Ap 1.13-15",
+        "nota": "João vê alguém semelhante a um filho de homem, com os olhos como labaredas de fogo e os pés brilhando como bronze polido"
+      },
+      {
+        "at": "Dn 11.31",
+        "texto": "Suas forças se levantarão para desrespeitar a fortaleza e o templo, acabando com os sacrifícios diários, e estabelecerão um sacrilégio terrível.",
+        "nt": "Mt 24.15",
+        "nota": "Jesus fala do dia em que vão ver no Lugar Santo a coisa horrível de que falou o profeta Daniel"
+      },
+      {
+        "at": "Dn 12.2",
+        "texto": "E muitas pessoas cujos corpos estão enterrados ressuscitarão.",
+        "nt": "Jo 5.28-29",
+        "nota": "Todos os mortos vão ouvir nos túmulos a voz do Filho de Deus e ressuscitar, uns para a vida, outros para a condenação"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Os rapazes de Judá e a estátua", "de": 1, "ate": 2 },
+    { "titulo": "A fornalha acesa", "de": 3, "ate": 3 },
+    { "titulo": "Dois reis humilhados", "de": 4, "ate": 5 },
+    { "titulo": "Daniel na cova dos leões", "de": 6, "ate": 6 },
+    { "titulo": "Os animais do mar e o bode", "de": 7, "ate": 8 },
+    { "titulo": "A oração e o tempo do fim", "de": 9, "ate": 12 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "A estátua dourada de Nabucodonosor tem vinte e sete metros de altura e só dois metros e setenta centímetros de largura.",
+      "ref": "Dn 3.1"
+    },
+    {
+      "texto": "Nabucodonosor conta a história da árvore numa mensagem a todos os povos do mundo. Ele começa assim: “Eu, Nabucodonosor, vivia tranquilo e feliz no meu palácio”.",
+      "ref": "Dn 4.1, 4"
+    },
+    {
+      "texto": "Belsazar promete a Daniel roupa de rei e uma corrente de ouro. Daniel manda o rei guardar os presentes. No fim, Daniel está com a roupa real, de tecido vermelho, e com a corrente no pescoço.",
+      "ref": "Dn 5.16-17, 29"
+    },
+    {
+      "texto": "Daniel tem de deixar a profecia selada até perto do fim dos tempos. Ele pergunta ao homem vestido de linho qual vai ser o resultado de tudo. O homem responde: “Deixe isso comigo, Daniel”.",
+      "ref": "Dn 12.4, 7-9"
+    },
+    {
+      "texto": "O livro termina com uma promessa a Daniel. O dia do descanso dele vai chegar e, depois de muito tempo, Daniel vai ressuscitar para receber o seu justo prêmio.",
+      "ref": "Dn 12.13"
+    }
+  ],
+  "procure": {
+    "texto": "Procure o reino que não acaba. Daniel fala dele ao explicar o sonho da estátua. Depois, Nabucodonosor e Dario escrevem quase a mesma coisa sobre o Deus de Daniel, e Daniel vê esse reino de novo nas visões.",
+    "ref": "Dn 2.44"
+  }
+}

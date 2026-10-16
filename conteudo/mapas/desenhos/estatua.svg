@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a estátua do sonho de Nabucodonosor (Dn 2.31-34): uma estátua de homem em pé, num contorno só, com a cabeça de ouro (a única área sálvia), o peito e os braços lisos, a barriga com hachura, as pernas riscadas e os pés de ferro e barro rachando, com a pedra cortada da montanha encostada no pé direito. O chão vai antes da estátua. -->
+<path class="k" d="M14 104H106"/>
+<path class="k p" d="M48 96L49 72H58V96ZM62 96V72H71L72 96Z"/>
+<path class="h" d="M51 77H56M51 83H56M51 89H56M64 77H69M64 83H69M64 89H69"/>
+<path class="k p" d="M46 104L47 96H58V104ZM62 104V96H73L74 104Z"/>
+<path class="h" d="M52 97L50 100L53 102M68 97L66 100L69 102"/>
+<path class="k p" d="M54 31L46 33L42 36L38 60L43 61L46 44L47 74H73L74 44L77 61L82 60L78 36L74 33L66 31Z"/>
+<path class="k" d="M46.6 56H73.4"/>
+<path class="h" d="M50 60L55 65M56 59L63 66M63 59L70 66M48 66L54 72M57 66L62 71M65 67L70 72"/>
+<path class="h" d="M51 39V52M69 39V52"/>
+<path class="k p" d="M57 32V25H63V32"/>
+<circle class="k s" cx="60" cy="18" r="8.5"/>
+<path class="k p" d="M77 104L76 96L81 91L88 92L91 98L89 104Z"/>
+<path class="h" d="M93 95L98 93M93 99L99 99"/>
+</svg>

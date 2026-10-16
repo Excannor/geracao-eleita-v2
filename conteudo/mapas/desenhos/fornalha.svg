@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a fornalha acesa da Babilônia (Dn 3.19-23): o forno de tijolos em cúpula, com a boca em arco cheia de chamas e o fogo saindo também pelo respiro do alto, porque o rei mandou esquentar sete vezes mais. As chamas da boca são a única área sálvia; o chão vai antes do forno. -->
+<path class="k" d="M10 104H110"/>
+<path class="k p" d="M22 104L24 78C26 50 42 32 60 32C78 32 94 50 96 78L98 104Z"/>
+<path class="h" d="M27 94H41M79 94H93M28 84H42M78 84H92M30 74H44M76 74H90M34 64H49M71 64H86M39 54H81M47 44H73"/>
+<path class="h" d="M35 94V84M85 94V84M37 74V64M83 74V64M44 64V54M76 64V54M60 54V44"/>
+<path class="k p" d="M53 32V24H67V32"/>
+<path class="k s" d="M46 104C43 97 47 93 49 87C51 90 53 92 55 89C56 84 58 80 60 75C62 80 64 84 65 89C67 92 69 90 71 87C73 93 77 97 74 104Z"/>
+<path class="k" d="M43 104V83C43 71 51 64 60 64C69 64 77 71 77 83V104"/>
+<path class="h" d="M53 100C52 97 53 95 55 93M60 101C59 98 60 95 61 92M67 100C68 97 67 95 65 93"/>
+<path class="k" d="M57 20C54 16 59 13 56 8M63 20C66 16 61 13 64 8M60 19C59 14 62 11 60 5"/>
+</svg>

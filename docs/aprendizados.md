@@ -702,6 +702,12 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   folha virou rosto. Os ossos saíram de um gerador (duas bolinhas em cada ponta, contorno calculado), espaçados para nenhum
   encostar no outro a 520px. O rio em trapézio sozinho parecia estrada: com a fachada do templo no alto e o rio saindo por
   baixo da porta, leu como rio (Ez 47.1) → morro desce até o chão, fruta é bolinha clara solta, rio pede a fonte.
+- 2026-10-16 · conteúdo · Daniel: o Filho do Homem nas nuvens (Dn 7.13-14) já tinha o julgamento de Mc 14.61-62 no
+  destaque de Marcos, e Mt 26.64 contaria a mesma cena. O destaque ficou com Mt 24.3, 30, onde o próprio Jesus fala da
+  "minha vinda" e do Filho do Homem chegando nas nuvens. A NBV escreve "Abede-Nego" com hífen em todo o capítulo 3: o mapa
+  diz "os três amigos". Mt 24.15 é o único verso do NT que nomeia "o profeta Daniel"; entrou como par, só com o que Jesus
+  diz, sem ligar a "coisa horrível" a fato nenhum. As setenta semanas (Dn 9.24-27) e os 1.290 e 1.335 dias (Dn 12.11-12)
+  ficaram fora, porque o texto não interpreta e cada igreja lê de um jeito; o capítulo 9 entra pela oração e por Gabriel.
 
 ## Entrada, sessão e página inicial
 
