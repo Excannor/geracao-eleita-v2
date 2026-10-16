@@ -1,0 +1,290 @@
+{
+  "nome": "Tiago",
+  "grupo": "Outras cartas",
+  "numero": 59,
+  "capitulos": 5,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἰάκωβος",
+    "transliteracao": "Iakobos",
+    "traducao": "Jacó",
+    "texto": "Iakobos é o nome Jacó, o mesmo do neto de Abraão. Em português, esse nome virou Tiago."
+  },
+  "autoria": {
+    "texto": "Tiago se apresenta como servo de Deus e do Senhor Jesus Cristo. Ele escreve ao povo de Deus espalhado entre as nações.",
+    "apoio": "Ele se conta entre os mestres da igreja e lembra que eles vão ser julgados com mais rigor do que os outros.",
+    "refs": [
+      "Tg 1.1",
+      "Tg 3.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Tiago quer uma fé que dá para ver. Ele escreve sobre a língua, o dinheiro, o pobre que entra na reunião da igreja e o doente que chama os líderes para orar. Para ele, não basta ter fé, e quem crê também faz o bem. A fé que não se mostra em boas obras está morta.",
+    "refs": [
+      "Tg 2.17"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Provações",
+      "sub": "Alegria na hora da prova",
+      "desenho": "coroa-de-louros",
+      "galhos": [
+        {
+          "texto": "Tiago pede que os irmãos vejam as provações como motivo de grande alegria. Quando a fé passa pela prova, a perseverança deles cresce.",
+          "ref": "Tg 1.2-3"
+        },
+        {
+          "texto": "Quem precisa saber o que fazer pede a Deus, e ele dá sabedoria com fartura. Quem pede duvidando fica como a onda do mar, que o vento empurra de um lado para outro.",
+          "ref": "Tg 1.5-6"
+        },
+        {
+          "texto": "O rico vai passar como a flor do campo. O sol nasce com o calor forte, e a planta murcha e seca.",
+          "ref": "Tg 1.10-11"
+        },
+        {
+          "texto": "Feliz é quem não cede e continua fiel na prova. Depois essa pessoa recebe a coroa da vida, que Deus prometeu a quem ama a ele.",
+          "ref": "Tg 1.12"
+        },
+        {
+          "texto": "Quem é tentado nunca deve dizer que a tentação vem de Deus. Deus não tenta ninguém. Os desejos maus da pessoa levam ao pecado, que termina em morte.",
+          "ref": "Tg 1.13-15"
+        },
+        {
+          "texto": "Tudo o que é bom e perfeito vem de Deus, o Criador de toda luz. Nele não existe mudança nem sombra.",
+          "ref": "Tg 1.17"
+        }
+      ],
+      "conexao": "Deus dá vida nova aos irmãos pela palavra da verdade, e eles são os primeiros frutos do que ele criou (Tg 1.18)."
+    },
+    {
+      "titulo": "O espelho",
+      "sub": "Ouvir e fazer o que ouviu",
+      "desenho": "espelho",
+      "galhos": [
+        {
+          "texto": "Tiago pede que cada um esteja pronto para ouvir e demore para falar e para ficar irado. A raiva humana não produz a justiça de Deus.",
+          "ref": "Tg 1.19-20"
+        },
+        {
+          "texto": "Quem ouve a palavra e não pratica é como alguém que olha o rosto no espelho, vai embora e logo esquece como é.",
+          "ref": "Tg 1.23-24"
+        },
+        {
+          "texto": "Aquele que olha com firmeza na lei que traz a liberdade e pratica o que ela diz tem a bênção de Deus em tudo o que faz.",
+          "ref": "Tg 1.25"
+        },
+        {
+          "texto": "Para Deus, religião pura é cuidar dos órfãos e das viúvas nas dificuldades e não se sujar com o mundo.",
+          "ref": "Tg 1.27"
+        },
+        {
+          "texto": "Um homem entra na igreja com roupa fina e anéis de ouro, e outro entra pobre, com roupa velha e suja. Se os irmãos dão ao rico o melhor lugar e mandam o pobre sentar no chão, julgam por motivos errados.",
+          "ref": "Tg 2.2-4"
+        },
+        {
+          "texto": "Deus escolheu gente pobre aos olhos do mundo para ser rica na fé. O Reino do céu é dessa gente.",
+          "ref": "Tg 2.5"
+        }
+      ],
+      "jesus": {
+        "texto": "Tiago chama Jesus Cristo de Senhor da glória. Quem é desse Senhor não trata uns melhor que os outros. Os poderosos do mundo crucificaram o Senhor da glória sem entender quem ele era.",
+        "refs": [
+          "Tg 2.1",
+          "1Co 2.8"
+        ]
+      },
+      "conexao": "Quem foi misericordioso vê a misericórdia de Deus vencer o juízo (Tg 2.13)."
+    },
+    {
+      "titulo": "Fé e obras",
+      "sub": "A fé que se vê",
+      "desenho": "altar-com-brasas",
+      "galhos": [
+        {
+          "texto": "Tiago pergunta de que adianta alguém dizer que tem fé se não tem obras. Esse tipo de fé não salva ninguém.",
+          "ref": "Tg 2.14"
+        },
+        {
+          "texto": "Um irmão está sem comida e sem roupa. Alguém deseja a ele que Deus abençoe, que se esquente e coma bem, e não dá nada. Isso não adianta.",
+          "ref": "Tg 2.15-16"
+        },
+        {
+          "texto": "Alguém pode dizer que um tem fé e outro tem obras. Tiago responde que vai mostrar a fé dele pelas obras.",
+          "ref": "Tg 2.18"
+        },
+        {
+          "texto": "Alguns creem que existe um único Deus. Tiago lembra que os demônios também creem nisso e tremem de terror.",
+          "ref": "Tg 2.19"
+        },
+        {
+          "texto": "Abraão está pronto para oferecer o filho Isaque no altar. A fé e as obras de Abraão agem juntas, e as obras deixam a fé dele completa.",
+          "ref": "Tg 2.21-22"
+        },
+        {
+          "texto": "O corpo sem espírito está morto, e a fé sem boas obras também está.",
+          "ref": "Tg 2.26"
+        }
+      ],
+      "conexao": "Todo mundo erra, e quem consegue dominar a língua tem domínio de si em todo o resto (Tg 3.2)."
+    },
+    {
+      "titulo": "A língua",
+      "sub": "Uma fagulha põe fogo na mata",
+      "desenho": "navio-a-vela",
+      "galhos": [
+        {
+          "texto": "Com um freio na boca, a gente faz um cavalo grande virar. Um leme minúsculo leva um navio grande para onde o piloto quer, mesmo com vento forte.",
+          "ref": "Tg 3.3-4"
+        },
+        {
+          "texto": "A língua é pequena e se gaba de grandes coisas. Uma fagulha pequenina põe fogo numa floresta inteira, e a língua é uma chama de fogo.",
+          "ref": "Tg 3.5-6"
+        },
+        {
+          "texto": "O ser humano consegue domar qualquer tipo de animal, mas ninguém consegue domar a língua.",
+          "ref": "Tg 3.7-8"
+        },
+        {
+          "texto": "Com a língua a gente louva o Senhor e amaldiçoa as pessoas feitas à semelhança de Deus. Tiago diz que isso não está certo.",
+          "ref": "Tg 3.9-10"
+        },
+        {
+          "texto": "Uma fonte não jorra água doce e água amarga. Ninguém colhe azeitona de figueira nem figo de videira.",
+          "ref": "Tg 3.11-12"
+        },
+        {
+          "texto": "A sabedoria que vem do céu é pura, calma e cheia de misericórdia. Os pacificadores plantam sementes de paz e colhem o fruto da justiça.",
+          "ref": "Tg 3.17-18"
+        }
+      ],
+      "conexao": "Tiago diz que as brigas entre os irmãos começam nos maus desejos dentro de cada um (Tg 4.1)."
+    },
+    {
+      "titulo": "Perto de Deus",
+      "sub": "A vida é como a neblina",
+      "desenho": "sol-nascendo",
+      "galhos": [
+        {
+          "texto": "Os irmãos não têm o que desejam porque não pedem a Deus. Quando pedem, não recebem, porque só querem prazer para si.",
+          "ref": "Tg 4.2-3"
+        },
+        {
+          "texto": "Tiago manda os irmãos se submeterem a Deus e resistirem ao diabo. Assim o diabo foge deles.",
+          "ref": "Tg 4.7"
+        },
+        {
+          "texto": "O Senhor levanta e anima quem se humilha diante dele.",
+          "ref": "Tg 4.10"
+        },
+        {
+          "texto": "Ninguém deve falar mal do irmão nem julgar o irmão. Só quem fez a lei pode julgar.",
+          "ref": "Tg 4.11-12"
+        },
+        {
+          "texto": "Alguns dizem que amanhã vão a tal cidade, ficam lá um ano e fazem negócio. Ninguém sabe como vai ser o dia seguinte, e a vida é como a neblina da manhã, que logo some. Tiago ensina a dizer: “Se o Senhor quiser, viveremos e faremos isto ou aquilo”.",
+          "ref": "Tg 4.13-15"
+        },
+        {
+          "texto": "A riqueza dos ricos apodrece, e as roupas finas viram trapos comidos pelas traças. Até o ouro e a prata enferrujam.",
+          "ref": "Tg 5.2-3"
+        }
+      ],
+      "conexao": "Os ricos condenaram e mataram homens justos, que não tinham força para se defender (Tg 5.6)."
+    },
+    {
+      "titulo": "Paciência",
+      "sub": "Esperar o Senhor e orar",
+      "desenho": "vaso-de-azeite",
+      "galhos": [
+        {
+          "texto": "Tiago pede que os irmãos não murmurem uns contra os outros. O grande Juiz já vem.",
+          "ref": "Tg 5.9"
+        },
+        {
+          "texto": "Para aprender a ter paciência no sofrimento, os irmãos olham para os profetas que falaram em nome do Senhor.",
+          "ref": "Tg 5.10"
+        },
+        {
+          "texto": "Ninguém precisa jurar pelo céu nem pela terra. Basta dizer sim ou não.",
+          "ref": "Tg 5.12"
+        },
+        {
+          "texto": "Quem está sofrendo continua orando. Os que têm motivo para agradecer cantam louvores ao Senhor.",
+          "ref": "Tg 5.13"
+        },
+        {
+          "texto": "O doente manda chamar os líderes da igreja. Eles oram pela pessoa e derramam azeite sobre ela em nome do Senhor, e o Senhor faz o doente ficar bom.",
+          "ref": "Tg 5.14-15"
+        },
+        {
+          "texto": "Quando alguém se desvia da verdade e um irmão traz essa pessoa de volta, ele salva a vida dela e faz muitos pecados serem perdoados.",
+          "ref": "Tg 5.19-20"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Os irmãos esperam a volta do Senhor com a paciência do lavrador, que espera as chuvas do outono e da primavera para a colheita amadurecer. “E tenham coragem, pois a vinda do Senhor está próxima.”",
+    "ref": "Tg 5.7-8",
+    "desenho": "espigas-de-trigo",
+    "pares": [
+      {
+        "at": "Êx 20.13",
+        "texto": "Não mate.",
+        "nt": "Tg 2.10-11",
+        "nota": "Quem guarda toda a Lei e falha num ponto só é culpado de quebrar a Lei inteira"
+      },
+      {
+        "at": "Is 41.8",
+        "texto": "você que é descendente de Abraão, meu amigo",
+        "nt": "Tg 2.23",
+        "nota": "Abraão creu em Deus, Deus aceitou Abraão como justo, e ele foi chamado amigo de Deus"
+      },
+      {
+        "at": "Zc 1.3",
+        "texto": "Voltem para mim, e eu me voltarei para vocês.",
+        "nt": "Tg 4.8",
+        "nota": "Quando os irmãos chegam perto de Deus, ele chega perto deles, e eles lavam as mãos e limpam o coração"
+      },
+      {
+        "at": "Dt 24.15",
+        "texto": "Pague o seu salário cada dia, antes do pôr do sol",
+        "nt": "Tg 5.4",
+        "nota": "Os gritos dos trabalhadores enganados no pagamento chegam aos ouvidos do Senhor dos Exércitos"
+      },
+      {
+        "at": "Pv 27.1",
+        "texto": "você não sabe o que vai acontecer amanhã.",
+        "nt": "Tg 4.16-17",
+        "nota": "Quem se gaba dos planos faz o que não agrada a Deus, e quem sabe fazer o bem e não faz peca"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "A prova e a palavra praticada", "de": 1, "ate": 1 },
+    { "titulo": "Sem favoritos, a fé com obras", "de": 2, "ate": 2 },
+    { "titulo": "A língua e a sabedoria do céu", "de": 3, "ate": 3 },
+    { "titulo": "Perto de Deus, longe do orgulho", "de": 4, "ate": 4 },
+    { "titulo": "Os ricos, a paciência e a oração", "de": 5, "ate": 5 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O Espírito que Deus pôs dentro de quem crê vigia com fortes ciúmes, e Tiago lembra isso aos irmãos.",
+      "ref": "Tg 4.5"
+    },
+    {
+      "texto": "Tiago compara os ricos que vivem só para se divertir com gado gordo, pronto para a matança.",
+      "ref": "Tg 5.5"
+    },
+    {
+      "texto": "Os irmãos confessam os pecados uns aos outros e oram uns pelos outros. A oração de um homem justo tem grande poder.",
+      "ref": "Tg 5.16"
+    }
+  ],
+  "procure": {
+    "texto": "Procure as vezes em que Tiago chama os leitores de irmãos, queridos irmãos ou meus irmãos. Ele faz isso até nas partes mais duras da carta, como quando avisa que ninguém deve se enganar.",
+    "ref": "Tg 1.16"
+  }
+}
