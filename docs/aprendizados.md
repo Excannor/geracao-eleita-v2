@@ -765,6 +765,16 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   a regra de cada versículo uma vez aperta como nas cartas: montar antes a tabela de raiz, conexões, pares e curiosidades.
   O checador barra "por meio de" também na paráfrase do NT (At 10.36, At 13.38).
 
+- 2026-10-16 · conteúdo · Hebreus, Tiago, 1 e 2 Pedro: as cartas gerais já estavam espalhadas pelos mapas do AT (Hebreus em
+  onze mapas, de Gênesis a Provérbios; Tg 5.17-18, 2.25, 5.11, 1.22 e 4.6; 1Pe 2.4-7, 2.21-23 e 4.8; 2Pe 3.9) → antes da tabela
+  dos versículos-chave, `grep -o -E '"(Hb|Tg|1Pe|2Pe) [0-9][^"]*"' conteudo/mapas/*.json` e o mesmo para os versos do AT que a
+  carta cita; o destaque e o par ficam com o que sobrou (Hb 1.3, 7.24-25, 13.20; Sl 22.22, Sl 95.7-8, Ag 2.6). A mesma ideia em
+  duas cartas também conta como achado repetido: Tg 4.10 e 1Pe 5.6 (Deus levanta quem se humilha) ficaram só em Tiago, e Noé
+  ficou com o batismo em 1 Pedro e fora de 2 Pedro.
+- 2026-10-16 · tela · Tiago: no cartão escuro, a referência de um par com intervalo ("Êx 20.13-14") passa da coluna da sigla e
+  encosta no texto do versículo a 390px, sem o `teste-mapas` acusar → no par, preferir a referência de um versículo só (ficou
+  "Êx 20.13") e olhar o cartão na captura. Fica para quem mexe na tela: a coluna da sigla não cabe 11 caracteres.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o espelho de mão de Tg 1.23-24, em que o homem olha o rosto e logo esquece como é: o espelho oval de moldura larga, com o vidro em sálvia e dois riscos de brilho em diagonal, um enfeite no alto e o cabo fino e torneado embaixo (redondo e de cabo curto, virava lupa). Cabe num círculo de raio uns 50 em volta de (60,60). -->
+<path class="k p" d="M56 78H64L63 86C66 87 66 90 63 91L62 104C65 105 66 108 63 110H57C54 108 55 105 58 104L57 91C54 90 54 87 57 86Z"/>
+<path class="h" d="M57 86H63M57 91H63M58 104H62"/>
+<path class="k p" d="M55 12C55 8 65 8 65 12C65 14 63 15 62 15H58C57 15 55 14 55 12Z"/>
+<ellipse class="k p" cx="60" cy="47" rx="27" ry="33"/>
+<ellipse class="s" cx="60" cy="47" rx="20" ry="26"/>
+<ellipse class="h" cx="60" cy="47" rx="23.5" ry="29.5"/>
+<path class="h" d="M47 46L58 30M49 56L64 35"/>
+</svg>

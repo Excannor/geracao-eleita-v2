@@ -1,0 +1,328 @@
+{
+  "nome": "Hebreus",
+  "grupo": "Outras cartas",
+  "numero": 58,
+  "capitulos": 13,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἑβραίους",
+    "transliteracao": "Hebraious",
+    "traducao": "aos hebreus",
+    "texto": "O nome vem dos hebreus, o povo de Abraão. O autor não escreve esse nome na carta, mas fala o tempo todo de Moisés e dos sacerdotes."
+  },
+  "autoria": {
+    "texto": "O autor não põe o nome na carta. O Senhor Jesus anunciou a salvação, e quem ouviu Jesus passou a mensagem para o autor e para os leitores.",
+    "apoio": "No fim, ele chama a carta de curta, conta que o irmão Timóteo saiu da prisão e manda saudações dos cristãos da Itália.",
+    "refs": [
+      "Hb 2.3",
+      "Hb 13.22-24"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Os irmãos que recebem esta carta creem em Cristo há muito tempo. No começo, eles perderam o que tinham e sofreram junto com quem foi jogado na prisão, e ainda assim ficaram alegres. Agora algumas pessoas deixam de ir às reuniões. O autor mostra que Jesus entrou no céu para ficar diante de Deus a favor deles e lembra que eles não são dos que dão as costas a Deus.",
+    "refs": [
+      "Hb 5.12",
+      "Hb 10.32-34",
+      "Hb 10.25",
+      "Hb 9.24",
+      "Hb 10.39"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "O Filho",
+      "sub": "Maior que os anjos",
+      "desenho": "trono",
+      "galhos": [
+        {
+          "texto": "Quando o Filho primogênito vem ao mundo, Deus manda todos os anjos adorarem Jesus.",
+          "ref": "Hb 1.6"
+        },
+        {
+          "texto": "Deus nunca convidou um anjo para sentar à direita dele, no lugar de honra. Os anjos são espíritos mensageiros, mandados para cuidar de quem vai herdar a salvação.",
+          "ref": "Hb 1.13-14"
+        },
+        {
+          "texto": "Por isso, quem ouviu a mensagem precisa prestar muita atenção nela, para não se desviar.",
+          "ref": "Hb 2.1"
+        },
+        {
+          "texto": "Deus deixa Jesus sofrer, porque está levando muitos filhos para a glória. Pelo sofrimento, Jesus fica perfeito como autor da salvação deles.",
+          "ref": "Hb 2.10"
+        },
+        {
+          "texto": "Jesus vira carne e sangue, como os filhos. Só sendo homem ele pode morrer e derrotar o diabo, que tinha o poder da morte. Assim ele liberta quem passou a vida inteira com medo de morrer.",
+          "ref": "Hb 2.14-15"
+        },
+        {
+          "texto": "Para ser um sumo sacerdote misericordioso e fiel, Jesus precisa ficar igual aos irmãos. Ele passou pelo sofrimento e pela tentação e sabe ajudar quem é tentado.",
+          "ref": "Hb 2.17-18"
+        }
+      ],
+      "jesus": {
+        "texto": "O Filho brilha com a glória de Deus e mantém o universo em ordem com a força da autoridade dele. Ele limpa os pecados e depois se senta à direita da Majestade nas alturas. Esse Filho é Jesus.",
+        "refs": [
+          "Hb 1.3",
+          "Hb 5.8"
+        ]
+      },
+      "conexao": "Por isso, o autor pede que os irmãos pensem em Jesus, o mensageiro de Deus e o supremo sacerdote da fé (Hb 3.1)."
+    },
+    {
+      "titulo": "Hoje",
+      "sub": "O descanso que Deus promete",
+      "desenho": "espada",
+      "galhos": [
+        {
+          "texto": "Jesus merece mais glória do que Moisés, como quem constrói uma casa tem mais honra do que a casa. Deus constrói todas as coisas.",
+          "ref": "Hb 3.3-4"
+        },
+        {
+          "texto": "No deserto, os antepassados desafiaram Deus e testaram a paciência dele por quarenta anos, mesmo vendo tudo o que ele fez.",
+          "ref": "Hb 3.9"
+        },
+        {
+          "texto": "O autor pede que os irmãos conversem uns com os outros todo dia, enquanto ainda é hoje, para ninguém ficar endurecido pelo engano do pecado.",
+          "ref": "Hb 3.13"
+        },
+        {
+          "texto": "Quem saiu do Egito com Moisés morreu no deserto. Esse povo não entrou no descanso porque não confiou em Deus.",
+          "ref": "Hb 3.16-19"
+        },
+        {
+          "texto": "O autor chama os irmãos a fazer o melhor que puderem para entrar nesse descanso, sem cair na desobediência daquele povo.",
+          "ref": "Hb 4.11"
+        },
+        {
+          "texto": "A palavra de Deus é viva e corta mais que uma espada afiada dos dois lados. Ela vai fundo nos pensamentos e nos desejos do coração, e nada fica escondido dos olhos de Deus.",
+          "ref": "Hb 4.12-13"
+        }
+      ],
+      "conexao": "Jesus entende as fraquezas dos irmãos, porque foi tentado como eles, mas nunca pecou (Hb 4.15)."
+    },
+    {
+      "titulo": "Melquisedeque",
+      "sub": "Sacerdote para sempre",
+      "desenho": "ancora",
+      "galhos": [
+        {
+          "texto": "Todo sumo sacerdote é um homem como os outros. Ele também é fraco e precisa oferecer sacrifícios pelos pecados do povo e pelos dele.",
+          "ref": "Hb 5.1-3"
+        },
+        {
+          "texto": "Enquanto vive na terra, Cristo ora a Deus com lágrimas e agonia, e Deus ouve a oração dele.",
+          "ref": "Hb 5.7"
+        },
+        {
+          "texto": "Quem ainda vive de leite não foi longe na vida cristã. A comida sólida é para os adultos, que aprendem com exercício a separar o certo do errado.",
+          "ref": "Hb 5.13-14"
+        },
+        {
+          "texto": "Deus jura pelo nome dele, porque não há ninguém maior. Abraão espera com paciência, e Deus dá a ele o filho Isaque.",
+          "ref": "Hb 6.13-15"
+        },
+        {
+          "texto": "A esperança de quem crê é uma âncora forte e segura para a alma. Essa âncora prende a pessoa a Deus, do outro lado do véu, no santuário do céu.",
+          "ref": "Hb 6.19"
+        },
+        {
+          "texto": "Melquisedeque é rei de Salém e sacerdote do Deus Altíssimo. Quando Abraão volta de uma batalha contra muitos reis, Melquisedeque vai até ele e dá uma bênção. Abraão entrega a ele a décima parte de tudo.",
+          "ref": "Hb 7.1-2"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus vive para sempre, e o sacerdócio dele não acaba. Ele salva por completo quem chega a Deus por meio dele e vive sempre para pedir a favor dessas pessoas.",
+        "refs": [
+          "Hb 7.24-25"
+        ]
+      },
+      "conexao": "Esse sumo sacerdote está no céu e serve no tabernáculo verdadeiro, que o Senhor construiu (Hb 8.1-2)."
+    },
+    {
+      "titulo": "Nova aliança",
+      "sub": "O sangue que limpa de vez",
+      "desenho": "arca-com-varas",
+      "galhos": [
+        {
+          "texto": "Deus fala de uma aliança nova, que toma o lugar da antiga. A primeira já está velha e fica de lado para sempre.",
+          "ref": "Hb 8.13"
+        },
+        {
+          "texto": "O tabernáculo tem duas salas, e uma cortina fica entre elas. O Santo dos Santos é a sala de trás, com a arca coberta de ouro. Dentro da arca estão as tábuas da aliança, um vaso com maná e a vara de Arão que floresceu.",
+          "ref": "Hb 9.2-4"
+        },
+        {
+          "texto": "Um testamento só vale depois que a pessoa que escreveu morre. Enquanto ela vive, ninguém recebe nada.",
+          "ref": "Hb 9.16-17"
+        },
+        {
+          "texto": "Na antiga aliança, quase tudo se limpa com sangue. Sem sangue derramado, ninguém tem perdão dos pecados.",
+          "ref": "Hb 9.22"
+        },
+        {
+          "texto": "Todo ano os sacrifícios fazem o povo lembrar da culpa, em vez de aliviar. O sangue de touros e de bodes não consegue tirar pecados.",
+          "ref": "Hb 10.3-4"
+        },
+        {
+          "texto": "Os sacerdotes ficam diante do altar dia após dia, com sacrifícios que nunca levam embora os pecados. Com um sacrifício só, Cristo torna perfeitos para sempre os que ele está santificando.",
+          "ref": "Hb 10.11, 14"
+        }
+      ],
+      "jesus": {
+        "texto": "Cada pessoa morre uma vez só e depois enfrenta o julgamento. Cristo também morre uma vez só, pelos pecados de muitos. Jesus vai voltar, não para tratar do pecado de novo, mas para trazer salvação a quem espera por ele.",
+        "refs": [
+          "Hb 9.27-28"
+        ]
+      },
+      "conexao": "Com o sangue de Cristo salpicado neles, os irmãos vão direto a Deus, com o coração sincero e uma fé firme (Hb 10.22)."
+    },
+    {
+      "titulo": "Gente de fé",
+      "sub": "A certeza do que não se vê",
+      "desenho": "tenda-e-estrelas",
+      "galhos": [
+        {
+          "texto": "A fé é a certeza de que o que a gente espera está guardado e a prova de que existem coisas que ninguém vê.",
+          "ref": "Hb 11.1"
+        },
+        {
+          "texto": "Pela fé, Abel oferece um sacrifício melhor que o de Caim. Abel morreu há muito tempo, mas ainda fala pela fé.",
+          "ref": "Hb 11.4"
+        },
+        {
+          "texto": "Noé ouve Deus falar de coisas que ninguém consegue ver ainda. Ele constrói a arca sem perder tempo e salva a família.",
+          "ref": "Hb 11.7"
+        },
+        {
+          "texto": "Abraão sai de casa sem saber para onde vai. Na terra prometida, ele mora em tendas, porque espera a cidade com alicerces que Deus projeta e constrói.",
+          "ref": "Hb 11.8-10"
+        },
+        {
+          "texto": "Deus põe Abraão à prova, e ele oferece Isaque, o único filho. Abraão crê que Deus pode trazer Isaque de volta da morte.",
+          "ref": "Hb 11.17-19"
+        },
+        {
+          "texto": "Moisés cresce e não aceita ser tratado como filho da filha do faraó. Ele prefere sofrer com o povo de Deus a aproveitar os prazeres do pecado por pouco tempo.",
+          "ref": "Hb 11.24-25"
+        }
+      ],
+      "jesus": {
+        "texto": "Moisés acha melhor sofrer pelo Cristo prometido do que ter todos os tesouros do Egito. O Cristo prometido é Jesus, que morre uma vez por todas.",
+        "refs": [
+          "Hb 11.26",
+          "Hb 10.10"
+        ]
+      },
+      "conexao": "Com essa multidão de testemunhas em volta, os irmãos correm a corrida que Deus propôs (Hb 12.1)."
+    },
+    {
+      "titulo": "Monte Sião",
+      "sub": "Correr firme até o fim",
+      "desenho": "corneta-de-chifre",
+      "galhos": [
+        {
+          "texto": "Para não desanimar, os irmãos pensam em Jesus, que aguentou tudo o que os pecadores fizeram com ele. Eles ainda não lutaram contra o pecado a ponto de derramar sangue.",
+          "ref": "Hb 12.3-4"
+        },
+        {
+          "texto": "O autor pede que os irmãos firmem as mãos cansadas e os joelhos que tremem, e que abram um caminho reto. Assim os fracos que vêm atrás não caem.",
+          "ref": "Hb 12.12-13"
+        },
+        {
+          "texto": "Esaú vende o direito de filho mais velho por uma refeição. Depois ele quer esse direito de volta e chora lágrimas amargas, mas já é tarde.",
+          "ref": "Hb 12.16-17"
+        },
+        {
+          "texto": "No monte, os israelitas ficam diante do fogo e de uma tempestade. O povo ouve uma trombeta e uma voz que dá tanto medo que todos pedem a Deus para parar de falar. Até Moisés treme de medo.",
+          "ref": "Hb 12.18-21"
+        },
+        {
+          "texto": "Os irmãos chegaram a outro monte, o monte Sião, a Jerusalém do céu, com milhares de anjos em festa. Ali está Jesus, com o sangue salpicado que perdoa, em vez de pedir vingança como o de Abel.",
+          "ref": "Hb 12.22-24"
+        },
+        {
+          "texto": "O autor pede que os irmãos sejam bondosos com os estranhos, porque alguns hospedaram anjos sem perceber. Ele pede também que ninguém esqueça os presos.",
+          "ref": "Hb 13.2-3"
+        }
+      ],
+      "jesus": {
+        "texto": "O Deus da paz traz Jesus de volta dos mortos. Jesus é o grande Pastor do rebanho, e o sangue dele marca uma aliança que dura para sempre.",
+        "refs": [
+          "Hb 13.20"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "“Há muito tempo Deus falou de muitas maneiras diferentes aos nossos pais por intermédio dos profetas.” Agora Deus fala por meio do Filho. Quando cita as Escrituras, o autor diz que o Espírito Santo fala aos irmãos (Hb 3.7).",
+    "ref": "Hb 1.1-2",
+    "desenho": "rolo-aberto",
+    "pares": [
+      {
+        "at": "Sl 22.22",
+        "texto": "Louvarei o seu nome diante de todos os meus irmãos.",
+        "nt": "Hb 2.11-12",
+        "nota": "Jesus e os que ele santifica têm o mesmo Pai, e ele não tem vergonha de chamar essa gente de irmãos"
+      },
+      {
+        "at": "Sl 95.7-8",
+        "texto": "Hoje, se ouvirem a sua voz, não endureçam os seus corações",
+        "nt": "Hb 4.7",
+        "nota": "Muitos anos depois do deserto, Deus fala por Davi e marca outra ocasião para entrar no descanso, e ela é hoje"
+      },
+      {
+        "at": "Êx 25.40",
+        "texto": "Tenha cuidado para fazer tudo de acordo com o modelo que lhe foi mostrado neste monte.",
+        "nt": "Hb 8.5",
+        "nota": "O tabernáculo que Moisés constrói é um modelo do tabernáculo verdadeiro, que está no céu"
+      },
+      {
+        "at": "Hc 2.3",
+        "texto": "O cumprimento dessa promessa certamente ocorrerá e não se atrasará!",
+        "nt": "Hb 10.37",
+        "nota": "Falta pouco tempo, e aquele que há de vir não vai demorar"
+      },
+      {
+        "at": "Ag 2.6",
+        "texto": "Mais um pouco de tempo e começarei a sacudir os céus e a terra",
+        "nt": "Hb 12.26-27",
+        "nota": "Deus vai fazer tremer a terra e o céu, e só ficam as coisas que nada pode abalar"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O Filho acima dos anjos", "de": 1, "ate": 2 },
+    { "titulo": "Maior que Moisés e o descanso", "de": 3, "ate": 4 },
+    { "titulo": "O sacerdote como Melquisedeque", "de": 5, "ate": 7 },
+    { "titulo": "A nova aliança e o sangue", "de": 8, "ate": 10 },
+    { "titulo": "Os que viveram pela fé", "de": 11, "ate": 11 },
+    { "titulo": "A corrida e a vida da igreja", "de": 12, "ate": 13 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Não existe nenhuma anotação sobre o pai, a mãe ou os antepassados de Melquisedeque. Ele é parecido com o Filho de Deus e continua sacerdote para sempre.",
+      "ref": "Hb 7.3"
+    },
+    {
+      "texto": "Jesus é da tribo de Judá. Moisés nunca deu o serviço de sacerdote a ninguém dessa tribo.",
+      "ref": "Hb 7.14"
+    },
+    {
+      "texto": "Em cima da arca ficam estátuas de querubins com as asas abertas sobre a tampa de ouro. O autor para ali e diz que chega de detalhes.",
+      "ref": "Hb 9.5"
+    },
+    {
+      "texto": "Quando está velho e perto de morrer, Jacó abençoa os dois filhos de José e ora apoiado na ponta do bordão.",
+      "ref": "Hb 11.21"
+    },
+    {
+      "texto": "Alguns que tinham fé andaram vestidos com peles de ovelha e de bode e moraram em cavernas. O autor diz que o mundo não era digno deles.",
+      "ref": "Hb 11.37-38"
+    }
+  ],
+  "procure": {
+    "texto": "Procure as palavras superior e melhor. Por causa do juramento de Deus, Jesus é a garantia de uma aliança superior. Os que viveram pela fé esperam uma pátria melhor (Hb 11.16).",
+    "ref": "Hb 7.22"
+  }
+}

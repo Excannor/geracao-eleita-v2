@@ -1,0 +1,259 @@
+{
+  "nome": "1 Pedro",
+  "grupo": "Outras cartas",
+  "numero": 60,
+  "capitulos": 5,
+  "significado": {
+    "lingua": "grego",
+    "original": "Πέτρου",
+    "transliteracao": "Petrou",
+    "traducao": "de Pedro",
+    "texto": "Petrou quer dizer de Pedro, e o nome Pedro lembra a palavra grega para pedra. É a primeira das duas cartas que levam o nome dele."
+  },
+  "autoria": {
+    "texto": "Pedro, apóstolo de Jesus Cristo, escreve aos irmãos que vivem como peregrinos em cinco regiões, do Ponto até a Bitínia.",
+    "apoio": "Pedro manda esta carta pequena com a ajuda de Silvano, um irmão muito fiel.",
+    "refs": [
+      "1Pe 1.1",
+      "1Pe 5.12"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Pedro viu Cristo morrer na cruz. Agora ele escreve a irmãos que são insultados por causa do nome de Cristo. Ele pede que os irmãos continuem fazendo o que é direito e se entreguem aos cuidados do Criador, que é fiel.",
+    "refs": [
+      "1Pe 5.1",
+      "1Pe 4.14",
+      "1Pe 4.19"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Nascer de novo",
+      "sub": "Uma herança guardada no céu",
+      "desenho": "broto",
+      "galhos": [
+        {
+          "texto": "Deus tem uma misericórdia sem limite e faz os irmãos nascerem de novo. Eles vivem na esperança da vida eterna, porque Cristo Jesus voltou dos mortos.",
+          "ref": "1Pe 1.3"
+        },
+        {
+          "texto": "No céu, Deus guarda uma herança para os filhos dele. Essa herança é pura e nunca estraga.",
+          "ref": "1Pe 1.4"
+        },
+        {
+          "texto": "As provações deixam os irmãos tristes por algum tempo. O fogo prova o ouro, e a provação mostra se a fé deles é forte e pura. Essa fé vale mais para Deus do que o ouro.",
+          "ref": "1Pe 1.6-7"
+        },
+        {
+          "texto": "Os irmãos nunca viram Jesus e mesmo assim amam e creem nele. Eles ficam felizes com uma alegria que vem do céu e que ninguém consegue descrever.",
+          "ref": "1Pe 1.8"
+        },
+        {
+          "texto": "Pedro conta que até os anjos do céu dariam tudo para saber mais dessa boa notícia.",
+          "ref": "1Pe 1.12"
+        }
+      ],
+      "conexao": "Por isso, os irmãos ficam alertas e põem toda a esperança na graça que Deus dá quando Jesus Cristo voltar (1Pe 1.13)."
+    },
+    {
+      "titulo": "Pedras vivas",
+      "sub": "Um povo que é de Deus",
+      "desenho": "doze-pedras",
+      "galhos": [
+        {
+          "texto": "O Pai a quem os irmãos oram não julga por preferência. Ele vai julgar cada um com justiça pelo que fez.",
+          "ref": "1Pe 1.17"
+        },
+        {
+          "texto": "Os irmãos nasceram de novo pela palavra de Deus, que vive e não acaba. Por isso eles se amam de todo o coração.",
+          "ref": "1Pe 1.22-23"
+        },
+        {
+          "texto": "Pedro pede que os irmãos larguem a maldade, o engano e a fofoca. Como bebês, eles devem desejar o leite puro para crescer, porque já provaram que o Senhor é bom.",
+          "ref": "1Pe 2.1-3"
+        },
+        {
+          "texto": "Deus usa os irmãos como pedras vivas para construir uma casa espiritual. Eles são sacerdotes santos. Por Jesus Cristo, oferecem sacrifícios espirituais que agradam a Deus.",
+          "ref": "1Pe 2.5"
+        },
+        {
+          "texto": "Os irmãos são sacerdotes do Rei e um povo que é de Deus. Eles contam a todos que Deus chamou cada um da escuridão para a luz maravilhosa dele.",
+          "ref": "1Pe 2.9"
+        }
+      ],
+      "jesus": {
+        "texto": "Deus paga o resgate dos irmãos com o sangue precioso de Cristo, como de um cordeiro sem defeito e sem mancha, e não com ouro ou prata. Muito antes de criar o mundo, Deus já tinha escolhido Jesus para isso.",
+        "refs": [
+          "1Pe 1.18-20"
+        ]
+      },
+      "conexao": "Pedro chama os irmãos de estrangeiros e peregrinos aqui na terra (1Pe 2.11)."
+    },
+    {
+      "titulo": "Estrangeiros",
+      "sub": "Fazer o bem no meio dos outros",
+      "desenho": "tenda-com-estacas",
+      "galhos": [
+        {
+          "texto": "Quem não crê fala mal dos irmãos. Se eles se comportam bem, essas pessoas vão acabar louvando a Deus pelas boas obras deles.",
+          "ref": "1Pe 2.12"
+        },
+        {
+          "texto": "Pelo amor ao Senhor, os irmãos obedecem às leis do governo, do rei aos oficiais que ele manda para castigar quem faz o mal.",
+          "ref": "1Pe 2.13-14"
+        },
+        {
+          "texto": "Os irmãos são livres, e a liberdade deles serve para fazer a vontade de Deus, não o mal. Pedro pede que mostrem respeito a todos e amem os irmãos.",
+          "ref": "1Pe 2.16-17"
+        },
+        {
+          "texto": "Quem sofre por ter feito o que é certo e aguenta firme agrada a Deus. Apanhar por ter feito o mal não tem mérito nenhum.",
+          "ref": "1Pe 2.19-20"
+        },
+        {
+          "texto": "Todos são cheios de compaixão e se amam com o coração terno e humilde. Ninguém paga o mal com mal nem ofensa com ofensa, e cada um ora por quem fez mal a ele.",
+          "ref": "1Pe 3.8-9"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus carrega no corpo os pecados dos irmãos quando morre na cruz, para eles morrerem para o pecado e viverem uma vida santa. Os ferimentos de Jesus curam os deles.",
+        "refs": [
+          "1Pe 2.24"
+        ]
+      },
+      "conexao": "Pedro pergunta quem vai prejudicar alguém que deseja de todo o coração fazer o bem (1Pe 3.13)."
+    },
+    {
+      "titulo": "Fazer o bem",
+      "sub": "Sofrer sem ter medo",
+      "desenho": "arca",
+      "galhos": [
+        {
+          "texto": "Quem sofre por fazer o bem é feliz e não precisa ter medo. Quando alguém pergunta sobre a esperança dos irmãos, eles estão prontos para contar, com amor e respeito.",
+          "ref": "1Pe 3.14-15"
+        },
+        {
+          "texto": "Deus espera com paciência enquanto Noé constrói a arca, e só oito pessoas se salvam pela água. Pedro compara o batismo com isso, e quem é batizado se volta para Deus e pede um coração limpo.",
+          "ref": "1Pe 3.20-21"
+        },
+        {
+          "texto": "Antes, os irmãos viviam em bebedeiras e na adoração de ídolos. Agora os velhos amigos estranham, porque eles não vão mais junto.",
+          "ref": "1Pe 4.3-4"
+        },
+        {
+          "texto": "Os irmãos abrem a casa com boa vontade para quem precisa de comida ou de um lugar para dormir. Cada um usa o dom que Deus deu para ajudar os outros.",
+          "ref": "1Pe 4.9-10"
+        },
+        {
+          "texto": "Pedro avisa que as provas de fogo vão chegar e que isso não é coisa estranha. Quem sofre com Cristo agora vai se alegrar quando ele mostrar a glória dele.",
+          "ref": "1Pe 4.12-13"
+        },
+        {
+          "texto": "Sofrer por seguir Cristo não é vergonha nenhuma. Os irmãos agradecem a Deus por serem chamados pelo nome de Cristo.",
+          "ref": "1Pe 4.16"
+        }
+      ],
+      "jesus": {
+        "texto": "Cristo nunca pecou e sofre pelos pecadores para levar todos de volta a Deus. Agora Jesus está no céu, à direita de Deus, e os anjos e os poderes do céu obedecem a ele.",
+        "refs": [
+          "1Pe 3.18",
+          "1Pe 3.22"
+        ]
+      },
+      "conexao": "Pedro diz que a hora do julgamento chegou e que ele começa pelos filhos de Deus (1Pe 4.17)."
+    },
+    {
+      "titulo": "O rebanho",
+      "sub": "Líderes que cuidam",
+      "desenho": "rebanho-junto",
+      "galhos": [
+        {
+          "texto": "Pedro pede que os líderes cuidem do rebanho de Deus com boa vontade, sem pensar no que vão ganhar. Eles guiam pelo exemplo, sem ser tiranos.",
+          "ref": "1Pe 5.2-3"
+        },
+        {
+          "texto": "Os mais jovens seguem os mais velhos, e todos servem uns aos outros com humildade. Deus é contra os orgulhosos e abençoa os humildes.",
+          "ref": "1Pe 5.5"
+        },
+        {
+          "texto": "O diabo anda em volta como um leão faminto que ruge atrás de alguém para devorar. Os irmãos ficam alertas e firmes e lembram que cristãos no mundo inteiro passam pelos mesmos sofrimentos.",
+          "ref": "1Pe 5.8-9"
+        },
+        {
+          "texto": "Depois de um pouco de sofrimento, o Deus de toda a graça vai dar aos irmãos, por Cristo, a glória eterna dele. Ele vai pôr os irmãos num lugar firme e deixar todos mais fortes.",
+          "ref": "1Pe 5.10"
+        },
+        {
+          "texto": "No fim, Pedro pede que os irmãos se cumprimentem com um beijo santo.",
+          "ref": "1Pe 5.14"
+        }
+      ],
+      "jesus": {
+        "texto": "Os irmãos andavam longe de Deus como ovelhas e agora voltaram para o pastor e guardião da alma deles. Quando o Supremo Pastor vier, os líderes ganham uma coroa que nunca perde o brilho. Esse Pastor é Jesus.",
+        "refs": [
+          "1Pe 2.25",
+          "1Pe 5.4"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "Os profetas escreveram sobre essa salvação e queriam entender o que ela significava. O Espírito de Cristo falava dentro deles e mandava escrever sobre o sofrimento de Cristo e a glória que vem depois. Eles queriam saber quando isso ia acontecer.",
+    "ref": "1Pe 1.10-11",
+    "desenho": "rolo-amarrado",
+    "pares": [
+      {
+        "at": "Lv 19.2",
+        "texto": "Sejam santos porque eu, o Senhor, o Deus de vocês, sou santo.",
+        "nt": "1Pe 1.15-16",
+        "nota": "O Senhor que chamou os irmãos é santo, e eles também vivem santos em tudo o que fazem"
+      },
+      {
+        "at": "Is 40.8",
+        "texto": "A erva seca e as flores caem, mas a palavra de nosso Deus dura para sempre!",
+        "nt": "1Pe 1.24-25",
+        "nota": "A palavra do Senhor que fica para sempre é o evangelho anunciado aos irmãos"
+      },
+      {
+        "at": "Os 2.23",
+        "texto": "Agora vocês são meu povo",
+        "nt": "1Pe 2.10",
+        "nota": "Antes os irmãos nem chegavam a ser povo, e agora são o povo de Deus"
+      },
+      {
+        "at": "Sl 34.14",
+        "texto": "Procure viver em paz com todos",
+        "nt": "1Pe 3.10-11",
+        "nota": "Quem quer uma vida feliz cuida da língua, faz o bem e corre atrás da paz"
+      },
+      {
+        "at": "Sl 55.22",
+        "texto": "Entregue todas as suas preocupações ao Senhor.",
+        "nt": "1Pe 5.7",
+        "nota": "Os irmãos deixam com Deus as preocupações, porque ele está sempre cuidando deles"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "A esperança viva e a vida santa", "de": 1, "ate": 1 },
+    { "titulo": "Pedras vivas e estrangeiros", "de": 2, "ate": 2 },
+    { "titulo": "A casa, a paz e o justo que sofre", "de": 3, "ate": 3 },
+    { "titulo": "Os dons e a prova de fogo", "de": 4, "ate": 4 },
+    { "titulo": "Os líderes e o rebanho", "de": 5, "ate": 5 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Pedro cita as Escrituras e pergunta o que vai ser do ímpio e do pecador, se até os justos se salvam com dificuldade.",
+      "ref": "1Pe 4.18"
+    },
+    {
+      "texto": "A igreja que está em Babilônia manda saudações. Marcos, que Pedro chama de filho, também manda.",
+      "ref": "1Pe 5.13"
+    }
+  ],
+  "procure": {
+    "texto": "Procure as palavras sofrer e sofrimento. Elas estão em todos os capítulos da carta. Pedro diz que é melhor sofrer por fazer o bem do que por fazer o mal.",
+    "ref": "1Pe 3.17"
+  }
+}
