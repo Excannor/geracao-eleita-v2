@@ -757,6 +757,13 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   Desenho: o prumo encostado num muro com a travessa no alto parecia forca; sem travessa, com o taco encostado na face do
   muro e o peso rente, leu como prumo. O ninho no alto de uma rocha simétrica parecia saco amarrado; com o penhasco de um lado
   só e a parede reta do outro, leu como rocha. Dois ovos lado a lado no ninho viram coração.
+- 2026-10-16 · conteúdo · Jonas, Miqueias, Naum e Habacuque: a ligação óbvia de cada um já estava em outro mapa (Mt 12.40
+  em Mateus, Mq 5.2 com Mt 2 em Mateus, Belém em 2 Samuel e Rute, Hc 2.4 em Romanos e Gálatas). Os destaques ficaram com o
+  versículo irmão que ninguém usou (Mt 12.41, Mt 10.34-36, Hb 10.36-37 com 9.28) e Belém ficou só no galho de Mq 5.2. Para
+  livro que o NT não cita (Naum), o destaque e os pares são ecos (Jo 8.36, Ap 6.16-17, Mt 9.35-36) escritos sem dizer que
+  é profecia. A NBV de Hc 2 só tem quatro "Ai", não os cinco de costume: o título virou "Ai de vocês". Em profeta curto,
+  a regra de cada versículo uma vez aperta como nas cartas: montar antes a tabela de raiz, conexões, pares e curiosidades.
+  O checador barra "por meio de" também na paráfrase do NT (At 10.36, At 13.38).
 
 ## Entrada, sessão e página inicial
 

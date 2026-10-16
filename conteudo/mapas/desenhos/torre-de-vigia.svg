@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a torre de vigia de Habacuque (Hc 2.1-2): a torre de pedra com ameias, onde ele sobe para esperar a resposta, e ao pé dela a tábua com a visão escrita em letras grandes -->
+<path class="k" d="M6 106h108"/>
+<path class="k p" d="M36 106L42 40H74L80 106z"/>
+<path class="h" d="M41 52H75M40 64H76M39 76H77M38 88H78M37 100H79M50 40V52M64 52V64M52 64V76M66 76V88M50 88V100M62 40V52M56 76V88M70 64V76"/>
+<path class="k p" d="M36 40H80V30H74V24H67V30H61V24H55V30H49V24H42V30H36z"/>
+<path class="k e" d="M52 106V96C52 91 64 91 64 96V106z"/>
+<path class="k e" d="M56 58h4v10h-4z"/>
+<path class="k s" d="M84 106L92 64L110 67L104 106z"/>
+<path class="k" d="M93 76L104 78M91.6 86L103 88M90.2 96L101.5 98"/>
+</svg>

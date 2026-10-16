@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o grande peixe que engole Jonas (Jn 1.17): debaixo da linha do mar, de boca aberta, com o rabo em sálvia -->
+<path class="k" d="M4 18c8-6 16-6 24 0s16 6 24 0s16-6 24 0s16 6 24 0s16-6 24 0"/>
+<path class="h" d="M14 28c6-3 12-3 18 0M70 28c6-3 12-3 18 0"/>
+<path class="k p" d="M57 38C60 29 66 23 75 24C72 30 71 35 72 41"/>
+<path class="h" d="M62 36L67 27M67 37L71 27"/>
+<path class="k s" d="M93 61L112 42C107 54 107 68 112 80z"/>
+<path class="h" d="M99 61L108 50M99 61L108 72M100 61h8"/>
+<path class="k p" d="M38 62L12 47C28 32 60 28 80 41C88 46 93 53 96 61C93 69 86 76 78 80C60 90 32 89 15 79z"/>
+<path class="k e" d="M12 47L38 62L15 79C10 70 9 56 12 47z"/>
+<path class="k" d="M50 49C46 57 46 68 50 76"/>
+<path class="h" d="M60 50c2 3 5 3 6 0M70 47c2 3 5 3 6 0M60 60c2 3 5 3 6 0M70 57c2 3 5 3 6 0M80 54c2 3 5 3 6 0M60 70c2 3 5 3 6 0M70 67c2 3 5 3 6 0M80 64c2 3 5 3 6 0"/>
+<path class="k p" d="M60 80C58 88 62 94 70 96C70 90 68 84 64 80z"/>
+<circle class="e" cx="36" cy="47" r="2.4"/>
+<circle class="h" cx="8" cy="38" r="2"/><circle class="h" cx="14" cy="33" r="1.4"/>
+<path class="h" d="M10 104c6-4 12-4 18 0s12 4 18 0M62 108c6-4 12-4 18 0s12 4 18 0"/>
+</svg>

@@ -1,0 +1,207 @@
+{
+  "nome": "Habacuque",
+  "grupo": "Profetas menores",
+  "numero": 35,
+  "capitulos": 3,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "חֲבַקּוּק",
+    "transliteracao": "Chavaqquq",
+    "traducao": "abraço",
+    "texto": "O nome lembra o verbo hebraico abraçar, e o livro não explica o nome."
+  },
+  "autoria": {
+    "texto": "A mensagem chega ao profeta Habacuque numa visão de Deus. Fora isso, Habacuque não conta nada sobre a família ou a cidade dele.",
+    "refs": [
+      "Hc 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Habacuque pergunta ao Senhor até quando vai pedir ajuda sem ser ouvido. Deus responde, e Habacuque pergunta de novo se os inimigos vão vencer para sempre. No fim, ele canta que o Senhor é a força dele e faz os pés dele como os da corça, para andar seguro pelas montanhas.",
+    "refs": [
+      "Hc 1.2",
+      "Hc 1.17",
+      "Hc 3.19"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "O grito",
+      "sub": "Deus responde com os caldeus",
+      "desenho": "balanca",
+      "galhos": [
+        {
+          "texto": "Para onde olha, Habacuque vê violência e destruição. Ele pergunta ao Senhor por que tem de ver tanta maldade.",
+          "ref": "Hc 1.3"
+        },
+        {
+          "texto": "Ninguém cumpre a lei, e nem nos tribunais há justiça. Os maus são muito mais numerosos que os justos, e a justiça é torcida.",
+          "ref": "Hc 1.4"
+        },
+        {
+          "texto": "Deus diz que está preparando os caldeus, uma nação violenta que marcha pela terra para tomar casas que não são deles. Eles fazem o que bem entendem.",
+          "ref": "Hc 1.6-7"
+        },
+        {
+          "texto": "Os cavalos dos caldeus correm mais que leopardos e são mais ferozes que lobos à noite. Os soldados caem sobre as vítimas como águias caçando e fazem prisioneiros sem conta.",
+          "ref": "Hc 1.8-9"
+        },
+        {
+          "texto": "Na guerra, os caldeus zombam dos reis e fazem rampas de terra para tomar as fortalezas. A culpa deles é grande, porque o deus deles é a força que eles têm.",
+          "ref": "Hc 1.10-11"
+        }
+      ],
+      "conexao": "Habacuque chama Deus de Rocha e diz que o plano dele não é destruir o povo (Hc 1.12)."
+    },
+    {
+      "titulo": "Peixes na rede",
+      "sub": "Habacuque pergunta de novo",
+      "desenho": "rede-com-peixes",
+      "galhos": [
+        {
+          "texto": "Para Habacuque, o povo é mau, mas os caldeus são piores. Ele pergunta como Deus, que não tolera o pecado, pode ficar assistindo enquanto eles devoram gente mais justa.",
+          "ref": "Hc 1.13"
+        },
+        {
+          "texto": "Habacuque pergunta se Deus fez as pessoas como peixes do mar. Ele tem medo de que os inimigos peguem todos com anzol e rede e façam festa.",
+          "ref": "Hc 1.14-15"
+        },
+        {
+          "texto": "Os inimigos vão adorar as armas de guerra e queimar incenso para elas. Eles vão dizer que esses são os deuses que deram toda aquela riqueza.",
+          "ref": "Hc 1.16"
+        }
+      ],
+      "conexao": "Habacuque sobe à torre de vigia para esperar a resposta do Senhor (Hc 2.1)."
+    },
+    {
+      "titulo": "A visão escrita",
+      "sub": "Deus manda escrever e esperar",
+      "desenho": "torre-de-vigia",
+      "galhos": [
+        {
+          "texto": "O Senhor manda Habacuque escrever a resposta em tábuas, com letras bem grandes. Quem ler deve sair correndo para contar a outros.",
+          "ref": "Hc 2.2"
+        },
+        {
+          "texto": "A visão não vai se cumprir de imediato. Deus diz: “Se aparentemente está demorando muito, não se desespere, porque tudo vai acontecer mesmo!”",
+          "ref": "Hc 2.3"
+        },
+        {
+          "texto": "Os maus confiam em si e acabam fracassando. Deus diz a Habacuque: “O justo, porém, confia em mim e viverá!”",
+          "ref": "Hc 2.4"
+        },
+        {
+          "texto": "O homem mau é arrogante e cheio de ambição. Ele é como a sepultura, nunca se satisfaz e junta todos os povos para ele.",
+          "ref": "Hc 2.5"
+        }
+      ],
+      "jesus": {
+        "texto": "O autor da carta aos Hebreus pede paciência e lembra estas palavras das Escrituras: “Um pouco mais de tempo, e virá aquele que há de vir; ele não vai demorar.” Cristo morreu uma vez pelos pecados de muitos e vai vir de novo para salvar quem espera por ele. Aquele que vem é Jesus.",
+        "refs": [
+          "Hb 10.36-37",
+          "Hb 9.28"
+        ]
+      },
+      "conexao": "Os escravos vão zombar dos que roubaram e gritar: “Ladrões!” (Hc 2.6)"
+    },
+    {
+      "titulo": "Ai de vocês",
+      "sub": "Deus avisa os violentos",
+      "desenho": "muro-com-viga",
+      "galhos": [
+        {
+          "texto": "Os credores vão chegar de repente e levar tudo. As nações que eles saquearam vão saquear os ladrões.",
+          "ref": "Hc 2.7-8"
+        },
+        {
+          "texto": "Deus fala contra quem enriquece com a maldade. As pedras das paredes dessas casas vão gritar contra eles, e as vigas do telhado vão fazer eco.",
+          "ref": "Hc 2.9-11"
+        },
+        {
+          "texto": "Quem constrói cidades com dinheiro de assassinatos e roubos vai ver as riquezas virarem cinza nas mãos.",
+          "ref": "Hc 2.12-13"
+        },
+        {
+          "texto": "Um dia, a terra inteira vai ficar cheia do conhecimento da glória do Senhor, como as águas enchem o mar.",
+          "ref": "Hc 2.14"
+        },
+        {
+          "texto": "Os violentos fizeram os vizinhos cambalear como bêbados e riram da vergonha deles. Agora, eles vão beber da taça da mão direita do Senhor.",
+          "ref": "Hc 2.15-16"
+        },
+        {
+          "texto": "Deus lembra que os ídolos de madeira são cobertos de ouro e prata, mas não falam e não têm vida. O Senhor está no santo templo, e toda a terra deve se calar diante dele.",
+          "ref": "Hc 2.18-20"
+        }
+      ],
+      "conexao": "Habacuque canta ao Senhor uma oração de triunfo (Hc 3.1)."
+    },
+    {
+      "titulo": "O canto",
+      "sub": "Habacuque se alegra em Deus",
+      "desenho": "figueira",
+      "galhos": [
+        {
+          "texto": "Habacuque pede ao Senhor que ajude o povo de novo, como no passado. Ele pede que Deus se lembre da misericórdia, mesmo na ira.",
+          "ref": "Hc 3.2"
+        },
+        {
+          "texto": "Deus vem de Temã, e o Santo vem do monte Parã. O brilho dele é como a luz do sol, e das mãos dele saem raios de luz.",
+          "ref": "Hc 3.3-4"
+        },
+        {
+          "texto": "O Senhor se detém um momento e olha a terra. Então sacode as nações, e os montes mais antigos desmoronam.",
+          "ref": "Hc 3.6"
+        },
+        {
+          "texto": "Os montes tremem ao ver Deus. O sol e a lua ficam parados, e as flechas e a lança de Deus brilham mais que eles.",
+          "ref": "Hc 3.10-11"
+        },
+        {
+          "texto": "Habacuque treme ao ouvir tudo isso, e as pernas dele vacilam. Ele resolve esperar em silêncio o dia da tragédia do povo que vai invadir.",
+          "ref": "Hc 3.16"
+        },
+        {
+          "texto": "No canto, Habacuque fala das figueiras e as videiras sem fruto, a colheita de azeitonas perdida e os currais vazios.",
+          "ref": "Hc 3.17"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Ainda enquanto estiverem vivos, eu farei uma coisa que vocês terão de ver para crer.” Numa sinagoga, Paulo anuncia que Jesus traz o perdão dos pecados. No fim, ele avisa os ouvintes com essas palavras dos profetas (At 13.14, 16, 38-41).",
+    "ref": "Hc 1.5",
+    "desenho": "rolo-aberto",
+    "pares": [
+      {
+        "at": "Hc 3.18",
+        "texto": "eu me alegrarei no Senhor! Ficarei muito feliz no Deus da minha salvação!",
+        "nt": "Lc 1.46-47",
+        "nota": "Maria diz que o espírito dela se alegra em Deus, o Salvador dela"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "A queixa e os caldeus", "de": 1, "ate": 1 },
+    { "titulo": "A torre e os avisos de Deus", "de": 2, "ate": 2 },
+    { "titulo": "A oração de Habacuque", "de": 3, "ate": 3 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Os violentos derrubaram as florestas do Líbano e caçaram os animais selvagens. Agora vão ser derrubados também.",
+      "ref": "Hc 2.17"
+    },
+    {
+      "texto": "Na oração, a peste vai na frente de Deus, e a praga vem logo atrás.",
+      "ref": "Hc 3.5"
+    },
+    {
+      "texto": "Habacuque canta que Deus saiu para salvar o povo e libertar o seu ungido.",
+      "ref": "Hc 3.13"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a palavra violência. Habacuque grita por causa dela logo no começo, e Deus fala dela de novo nos avisos contra os ladrões."
+  }
+}
