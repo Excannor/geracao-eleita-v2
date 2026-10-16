@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o rio que sai do templo e as árvores das margens (Ez 47.1, 12; Ap 22.1-2): a fachada do templo no alto, como nos outros templos do app (cornija reta, duas colunas com capitel, porta em arco e dois degraus), e a água saindo por baixo da porta, descendo os degraus e alargando até embaixo, com ondas de traço. Uma árvore frutífera em cada margem, mais baixa que o templo para não cobrir as colunas, de copa redonda com frutinhas escuras espalhadas sem ordem (em fileira ou com riscos de folha, viravam rosto). O rio é a única área sálvia. Tudo cabe num círculo de raio 54 em volta de (60,60), porque em "Ezequiel e Cristo" o desenho fica sobre um disco. -->
+<path class="k s" d="M56 44C55 60 46 78 36 98H84C74 78 65 60 64 44Z"/>
+<path class="h" d="M57 56c2-1 4-1 6 0M53 68c3-1.5 7-1.5 10 0s5 1.5 6 0M48 80c4-2 8-2 12 0s8 2 12 0M43 91c5-2 10-2 15 0s10 2 15 0s6 2 8 0"/>
+<path class="k p" d="M40 38V23H80V38Z"/>
+<path class="k p" d="M37 23V18H83V23Z"/>
+<path class="k p" d="M42 38V27H47V38ZM73 38V27H78V38Z"/>
+<path class="k p" d="M41 27C40 24 42 23 44.5 23C47 23 49 24 48 27ZM72 27C71 24 73 23 75.5 23C78 23 80 24 79 27Z"/>
+<path class="k" d="M55 38V33A5 5 0 0 1 65 33V38"/>
+<path class="k p" d="M38 41V38H82V41Z"/>
+<path class="k p" d="M35 44V41H85V44Z"/>
+<path class="k" d="M28 98H44M76 98H92"/>
+<path class="k" d="M27 96V74M25 84L20 79M29 81L34 76"/>
+<path class="k p" d="M27 46C18 46 14 53 15 59C10 64 13 72 20 72C23 77 31 77 34 73C41 73 43 66 39 61C42 54 36 46 27 46Z"/>
+<circle class="e" cx="21" cy="53" r="1.8"/>
+<circle class="e" cx="31" cy="51" r="1.8"/>
+<circle class="e" cx="18" cy="62" r="1.8"/>
+<circle class="e" cx="28" cy="60" r="1.8"/>
+<circle class="e" cx="36" cy="66" r="1.8"/>
+<circle class="e" cx="24" cy="69" r="1.8"/>
+<path class="k" d="M 93 96 V 74 M 95 84 L 100 79 M 91 81 L 86 76"/>
+<path class="k p" d="M 93 46 C 102 46 106 53 105 59 C 110 64 107 72 100 72 C 97 77 89 77 86 73 C 79 73 77 66 81 61 C 78 54 84 46 93 46 Z"/>
+<circle class="e" cx="99" cy="52" r="1.8"/>
+<circle class="e" cx="89" cy="54" r="1.8"/>
+<circle class="e" cx="102" cy="61" r="1.8"/>
+<circle class="e" cx="93" cy="63" r="1.8"/>
+<circle class="e" cx="84" cy="66" r="1.8"/>
+<circle class="e" cx="97" cy="69" r="1.8"/>
+</svg>

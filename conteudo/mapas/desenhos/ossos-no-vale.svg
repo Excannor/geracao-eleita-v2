@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o vale de ossos secos (Ez 37.1-10): os dois morros baixos do vale em sálvia (a única área sálvia), descendo até o fundo do vale, os ossos espalhados pelo chão na frente, cada um com duas bolinhas em cada ponta, e o sopro do espírito em volutas no alto, sobre o vale. Os ossos vêm depois dos morros, para o papel deles cobrir as linhas. -->
+<path class="k s" d="M6 80C12 60 22 50 34 54C46 58 52 66 60 74C68 66 74 58 86 54C98 50 108 60 114 80Z"/>
+<path class="h" d="M20 66l3 7M30 61l2 8M90 61l-2 8M100 66l-3 7"/>
+<path class="k" d="M4 112H116"/>
+<path class="k p" d="M19.7 89.1L31.8 87.4A3 3 0 1 1 36.7 88.5A3 3 0 1 1 32.3 90.9L20.2 92.6A3 3 0 1 1 15.3 91.5A3 3 0 1 1 19.7 89.1Z"/>
+<path class="k p" d="M59.4 85.2L69.3 87.3A3 3 0 1 1 73.6 90A3 3 0 1 1 68.6 90.8L58.7 88.7A3 3 0 1 1 54.4 86A3 3 0 1 1 59.4 85.2Z"/>
+<path class="k p" d="M90.6 94L100.1 90.6A3 3 0 1 1 105.2 90.6A3 3 0 1 1 101.4 94L91.9 97.4A3 3 0 1 1 86.8 97.4A3 3 0 1 1 90.6 94Z"/>
+<path class="k p" d="M33.1 101.7L47.2 102.7A3 3 0 1 1 51.8 104.8A3 3 0 1 1 46.9 106.3L32.8 105.3A3 3 0 1 1 28.2 103.2A3 3 0 1 1 33.1 101.7Z"/>
+<path class="k p" d="M67.8 104.7L77.8 103.7A3 3 0 1 1 82.7 105A3 3 0 1 1 78.2 107.3L68.2 108.3A3 3 0 1 1 63.3 107A3 3 0 1 1 67.8 104.7Z"/>
+<path class="k" d="M28 22C40 14 54 16 60 22C64 26 60 32 55 29"/>
+<path class="k" d="M58 40C66 34 78 34 84 40C87 44 83 48 79 45"/>
+<path class="h" d="M36 32C44 29 52 30 58 34"/>
+</svg>

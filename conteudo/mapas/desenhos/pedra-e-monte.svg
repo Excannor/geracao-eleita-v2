@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a pedra cortada da montanha sem força humana (Dn 2.34-35): o monte com o recorte de onde a pedra saiu, o rastro da pedra descendo pela encosta e a pedra em polígono de quinas no pé do monte, a única área sálvia. Tudo cabe num círculo de raio 54 em volta de (60,60), porque em "Daniel e Cristo" o desenho fica sobre um disco. -->
+<path class="k" d="M22 92H99"/>
+<path class="k p" d="M24 92L36 68L46 46L55 28L61 35L66 30L75 49L71 55L78 57L81 66L87 82L89 92Z"/>
+<path class="h" d="M53 40L49 52M59 42L54 58M43 66L38 78M65 46L61 58M55 66L51 80M71 64L67 76"/>
+<path class="h" d="M80 61C84 65 87 70 88 75M83 58C88 62 91 67 93 72"/>
+<path class="k s" d="M85 92L84 83L89 77L96 78L100 85L97 92Z"/>
+<path class="h" d="M89 82L93 84M92 88L95 87"/>
+</svg>

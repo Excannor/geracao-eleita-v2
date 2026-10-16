@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a estátua do sonho de Nabucodonosor (Dn 2.31-34): uma estátua de frente, rígida, de braços colados ao corpo, sobre um pedestal de pedra, com as faixas de material de cima para baixo: a cabeça de ouro (a única área sálvia, sem rosto), o peito e os braços de prata (lisos, com dois riscos de brilho), o ventre de bronze (hachura inclinada), as pernas de ferro (hachura cruzada) e os pés de ferro e barro (pedaços escuros no barro claro), com uma rachadura. A pedra cortada da montanha vem pelo ar na direção dos pés. O chão e o pedestal vêm antes da estátua. -->
+<path class="k" d="M12 110H108"/>
+<path class="k p" d="M34 110V98H86V110Z"/>
+<path class="k p" d="M30 98V93H90V98Z"/>
+<path class="h" d="M48 98V110M72 98V110M34 104H48M72 104H86M60 104V110"/>
+<path class="k p" d="M45 93L46 84H59V93ZM61 93V84H74L75 93Z"/>
+<path class="e" d="M47 86H51V89H47ZM62 88H66V91H62ZM69 86H72V89H69Z"/>
+<path class="h" d="M55 84L53 87L56 90L54 93"/>
+<path class="k p" d="M48 84V62H58V84ZM62 84V62H72V84Z"/>
+<path class="h" d="M48 66H58M48 70H58M48 74H58M48 78H58M48 82H58M62 66H72M62 70H72M62 74H72M62 78H72M62 82H72M51 62V84M55 62V84M65 62V84M69 62V84"/>
+<path class="k p" d="M46 62L47 50H73L74 62Z"/>
+<path class="h" d="M49 53L53 57M54 52L60 58M60 52L66 58M66 52L71 57M48 58L51 61M56 58L59 61M63 58L66 61M70 58L72 60"/>
+<path class="k p" d="M44 50V29L50 26H70L76 29V50Z"/>
+<path class="k p" d="M38 30L44 29V58H38Z"/>
+<path class="k p" d="M82 30L76 29V58H82Z"/>
+<path class="h" d="M50 32V44M70 32V44M41 34V50M79 34V50"/>
+<path class="k p" d="M56 26V21H64V26"/>
+<circle class="k s" cx="60" cy="14" r="7.5"/>
+<path class="k p" d="M100 78L96 74L99 69L105 70L107 76L104 79Z"/>
+<path class="h" d="M108 66L114 63M109 72L116 72M107 79L113 82"/>
+</svg>

@@ -1,0 +1,315 @@
+{
+  "nome": "Ezequiel",
+  "grupo": "Profetas maiores",
+  "numero": 26,
+  "capitulos": 48,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "יְחֶזְקֵאל",
+    "transliteracao": "Yechezqel",
+    "traducao": "Deus fortalece",
+    "texto": "Chazaq quer dizer ser forte, e El é Deus. O povo para quem Ezequiel fala é teimoso e tem o coração duro. Deus diz a Ezequiel: “Tornei a sua testa dura como o diamante, mais dura que a pedra”."
+  },
+  "autoria": {
+    "texto": "Ezequiel é sacerdote e filho de Buzi. Ele está com os exilados, perto do rio Quebar, quando o céu se abre e Deus mostra a ele muitas visões.",
+    "apoio": "Ezequiel põe data em muitas mensagens. Deus chega a mandar Ezequiel anotar o dia em que o rei da Babilônia começa o cerco de Jerusalém.",
+    "refs": [
+      "Ez 1.1",
+      "Ez 1.3",
+      "Ez 24.1-2"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Ezequiel vê a glória do Senhor e cai com o rosto no chão. Depois, ele vê essa glória sair do templo. Deus promete reunir o povo espalhado e devolver a terra de Israel a ele. No fim, a glória entra de novo no templo, e a cidade vai se chamar “O Senhor está aqui”.",
+    "refs": [
+      "Ez 1.28",
+      "Ez 10.18",
+      "Ez 11.17",
+      "Ez 43.4",
+      "Ez 48.35"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "O céu se abre",
+      "sub": "Deus chama Ezequiel no exílio",
+      "desenho": "rolo-aberto",
+      "galhos": [
+        {
+          "texto": "Ezequiel vê uma tempestade chegando do norte, com uma nuvem carregada de fogo. Quatro criaturas saem do meio da nuvem. Cada uma tem quatro rostos e quatro asas.",
+          "ref": "Ez 1.4-6"
+        },
+        {
+          "texto": "Ao lado de cada criatura há uma roda, e dentro de cada roda parece haver outra. Os aros são altos e cheios de olhos. As rodas vão para onde o Espírito quer, sem precisar fazer curva.",
+          "ref": "Ez 1.15-20"
+        },
+        {
+          "texto": "Acima das criaturas há um trono azul, de safira. Alguém parecido com um homem está sentado no trono. Da cintura para baixo, ele parece feito de fogo.",
+          "ref": "Ez 1.26-27"
+        },
+        {
+          "texto": "O Espírito entra em Ezequiel e faz ele ficar em pé. Deus manda Ezequiel ao povo de Israel e diz que ele não deve ter medo, mesmo que as palavras do povo firam como espinhos.",
+          "ref": "Ez 2.2-6"
+        },
+        {
+          "texto": "Deus manda Ezequiel abrir a boca e comer o que vai dar a ele. Uma mão estende um rolo escrito por dentro e por fora, cheio de ameaças, desgraças e condenações.",
+          "ref": "Ez 2.8-10"
+        },
+        {
+          "texto": "O Espírito leva Ezequiel embora. Ezequiel está irado e cheio de amargura. Ele chega aos exilados e fica sete dias sentado no meio deles, sem saber o que fazer.",
+          "ref": "Ez 3.14-15"
+        }
+      ],
+      "conexao": "Deus avisa que Ezequiel vai ficar mudo (Ez 3.26). Mesmo sem falar, ele vai fazer sinais para o povo ver (Ez 4.3)."
+    },
+    {
+      "titulo": "A glória sai",
+      "sub": "Deus deixa a cidade cercada",
+      "desenho": "templo-com-colunas",
+      "galhos": [
+        {
+          "texto": "Deus manda Ezequiel desenhar Jerusalém num tijolo de barro ainda mole. Em volta da cidade, ele tem de gravar rampas de terra, acampamentos e troncos para arrombar os portões.",
+          "ref": "Ez 4.1-2"
+        },
+        {
+          "texto": "Ezequiel tem de dormir deitado sobre o lado esquerdo durante trezentos e noventa dias. Cada dia vale um ano de castigo para Israel.",
+          "ref": "Ez 4.4-5"
+        },
+        {
+          "texto": "Deus manda Ezequiel raspar o cabelo e a barba com uma espada bem afiada e dividir os cabelos numa balança. Uma parte vai queimar no fogo, e outra vai ser jogada ao vento.",
+          "ref": "Ez 5.1-2"
+        },
+        {
+          "texto": "Numa visão, Deus leva Ezequiel até a porta do pátio e manda aumentar um buraco na parede. Atrás do buraco há uma porta secreta. Lá dentro, setenta líderes de Israel queimam incenso diante de desenhos de cobras e lagartos. Eles pensam que o Senhor não está vendo.",
+          "ref": "Ez 8.3, 7-12"
+        },
+        {
+          "texto": "Deus manda um homem vestido de linho, com material de escrever na cintura, passar pelas ruas de Jerusalém. Ele tem de fazer um sinal na testa de quem chora pelos pecados do povo. Os outros homens não podem tocar em quem tem a marca.",
+          "ref": "Ez 9.2-6"
+        },
+        {
+          "texto": "Os querubins levantam voo com as rodas, e a glória do Senhor sobe do meio da cidade. Ela vai parar no monte que fica a leste de Jerusalém.",
+          "ref": "Ez 11.22-23"
+        }
+      ],
+      "conexao": "O Espírito leva Ezequiel de volta à Babilônia (Ez 11.24). Lá, o povo tem olhos, mas não vê (Ez 12.2)."
+    },
+    {
+      "titulo": "Sinais do fim",
+      "sub": "Ezequiel encena a queda",
+      "desenho": "panela-de-ensopado",
+      "galhos": [
+        {
+          "texto": "Ezequiel prepara a bagagem de quem vai para o exílio, como Deus mandou. De dia, ele põe tudo para fora de casa. Ao pôr do sol, cava um buraco na parede com as mãos e sai no escuro com a bagagem nos ombros, enquanto o povo olha.",
+          "ref": "Ez 12.3-7"
+        },
+        {
+          "texto": "Jerusalém é como uma menina abandonada no campo assim que nasce, ainda coberta de sangue. Deus passa por ali e diz: “Viva!” Quando ela cresce, Deus cobre a moça com o manto dele e faz uma aliança com ela.",
+          "ref": "Ez 16.3-8"
+        },
+        {
+          "texto": "O povo repete que os filhos pagam pelos pecados dos pais. Deus manda parar com esse ditado: “A pessoa que pecar é que morrerá”.",
+          "ref": "Ez 18.2-4"
+        },
+        {
+          "texto": "Deus procura um homem que conserte o muro e fique na brecha, para a terra não ser destruída. Ele procura e não acha nenhum.",
+          "ref": "Ez 22.30"
+        },
+        {
+          "texto": "Ezequiel tem de pôr uma panela no fogo, com a melhor carne. A cidade assassina é como essa panela, que está enferrujada por dentro. Nem o fogo mais quente tira a ferrugem.",
+          "ref": "Ez 24.3-6, 11-12"
+        },
+        {
+          "texto": "Deus avisa que vai tirar de Ezequiel a mulher que é o prazer dos olhos dele, e manda não chorar em público. De manhã, Ezequiel fala ao povo. À tarde, a mulher dele morre.",
+          "ref": "Ez 24.16-18"
+        }
+      ],
+      "conexao": "Deus avisa que um homem vai escapar com a notícia (Ez 24.26). Os amonitas zombam do templo destruído (Ez 25.3)."
+    },
+    {
+      "titulo": "Tiro e o Egito",
+      "sub": "Deus fala aos povos vizinhos",
+      "desenho": "navio-a-vela",
+      "galhos": [
+        {
+          "texto": "Os amonitas pulam e batem palmas quando o povo de Deus é destruído. Deus avisa que já estendeu o braço contra eles.",
+          "ref": "Ez 25.6-7"
+        },
+        {
+          "texto": "Quando Jerusalém cai, Tiro diz: “Chegou a minha vez de enriquecer”. Deus avisa que muitas nações vão atacar a cidade como as ondas do mar, e ela vai virar uma rocha nua.",
+          "ref": "Ez 26.2-4"
+        },
+        {
+          "texto": "Deus compara Tiro a um navio bonito, com mastros de cedro do Líbano e velas de linho bordado do Egito. Um vento leste arrebenta o navio no meio do mar.",
+          "ref": "Ez 27.3-7, 26"
+        },
+        {
+          "texto": "O príncipe de Tiro diz: “Sou um deus”. Deus pergunta se ele vai continuar dizendo isso diante da espada de quem vai matar o príncipe.",
+          "ref": "Ez 28.2, 9"
+        },
+        {
+          "texto": "No Nilo, o faraó é como um crocodilo deitado, que pensa: “O rio Nilo é meu!” Deus avisa que vai amarrar a boca dele e jogar o crocodilo no deserto.",
+          "ref": "Ez 29.3-5"
+        },
+        {
+          "texto": "Deus diz que já quebrou o braço do faraó. Ninguém enfaixou o braço, e o faraó não consegue mais segurar uma espada.",
+          "ref": "Ez 30.21"
+        }
+      ],
+      "conexao": "Quem ouve o alarme do vigia e se protege salva a vida (Ez 33.5). Deus põe Ezequiel como vigia de Israel (Ez 33.7)."
+    },
+    {
+      "titulo": "Ossos que vivem",
+      "sub": "Deus promete vida nova ao povo",
+      "desenho": "ossos-no-vale",
+      "galhos": [
+        {
+          "texto": "Numa manhã, Deus cura Ezequiel da mudez. Pouco depois, um homem que escapou de Jerusalém chega e diz: “A cidade foi destruída!”",
+          "ref": "Ez 33.21-22"
+        },
+        {
+          "texto": "O povo comenta sobre Ezequiel nas portas das casas e vem ouvir o que ele diz. Para eles, Ezequiel é como um cantor de belas canções de amor. Eles ouvem tudo e não põem uma palavra em prática.",
+          "ref": "Ez 33.30-32"
+        },
+        {
+          "texto": "Os pastores de Israel comem a carne e se vestem com a lã, mas não cuidam do rebanho. Deus diz que vai procurar a ovelha perdida e curar a machucada. Ele promete que o pastor das ovelhas vai ser o seu servo Davi.",
+          "ref": "Ez 34.2-4, 16, 23"
+        },
+        {
+          "texto": "Deus promete que outros povos vão olhar para a terra arrasada e dizer: “essa terra parecia um deserto, mas agora parece o jardim do Éden”.",
+          "ref": "Ez 36.34-35"
+        },
+        {
+          "texto": "O Espírito leva Ezequiel a um vale cheio de ossos secos. Deus pergunta se aqueles ossos podem viver de novo. Ezequiel responde: “Ó Soberano Senhor, essa resposta só o Senhor pode dar”.",
+          "ref": "Ez 37.1-3"
+        },
+        {
+          "texto": "Ezequiel fala aos ossos, e eles começam a bater uns nos outros e se juntar. Os ossos se cobrem de tendões, carne e pele. O espírito entra nos corpos, e eles se levantam, tantos que formam um grande exército.",
+          "ref": "Ez 37.7-8, 10"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus diz: “Eu sou o bom Pastor, conheço minhas próprias ovelhas, e elas me conhecem”. Ele ainda tem outras ovelhas, que não são do mesmo curral, e vai haver um só rebanho e um só pastor. O pastor que Deus promete às ovelhas espalhadas é Jesus.",
+        "refs": [
+          "Jo 10.14-16"
+        ]
+      },
+      "conexao": "Deus promete pôr o santuário no meio do povo (Ez 37.26). Anos depois, ele leva Ezequiel a um monte alto (Ez 40.1-2)."
+    },
+    {
+      "titulo": "O templo novo",
+      "sub": "A glória volta para a casa",
+      "desenho": "porta-trancada",
+      "galhos": [
+        {
+          "texto": "No monte, um homem que brilha como metal polido segura um fio de linho e uma régua de medir. Ele manda Ezequiel prestar atenção em tudo e contar ao povo de Israel.",
+          "ref": "Ez 40.3-4"
+        },
+        {
+          "texto": "A glória do Deus de Israel vem do oriente, e a voz dele parece o barulho de uma grande queda d’água. O Espírito leva Ezequiel até o pátio interno, e a glória enche o templo inteiro.",
+          "ref": "Ez 43.2-3, 5"
+        },
+        {
+          "texto": "Do templo, o Senhor chama Ezequiel. Ele diz que ali é o lugar do trono dele: “Neste lugar eu viverei para sempre entre o meu povo”.",
+          "ref": "Ez 43.6-7"
+        },
+        {
+          "texto": "A porta leste do muro está fechada. O Senhor diz que essa porta nunca vai ser aberta, porque o Deus de Israel entrou por ela.",
+          "ref": "Ez 44.1-2"
+        },
+        {
+          "texto": "Uma corrente de água sai de debaixo do templo. O guia mede quinhentos metros e manda Ezequiel atravessar. A água chega aos tornozelos, sobe aos joelhos e à cintura. No fim, Ezequiel só consegue atravessar o rio a nado.",
+          "ref": "Ez 47.1-5"
+        },
+        {
+          "texto": "Por onde o rio passa, tudo vive. Até no mar Morto vai haver peixe, e os pescadores vão estender as redes na beira para secar.",
+          "ref": "Ez 47.8-10"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Os frutos dessas árvores servirão para alimentar os povos da terra; as folhas servirão como remédio para curar as pessoas.” No fim do Apocalipse, João vê o rio da água da vida saindo do trono de Deus e do Cordeiro. De cada lado do rio está a árvore da vida, e as folhas dela curam as nações (Ap 22.1-2).",
+    "ref": "Ez 47.12",
+    "desenho": "rio-e-arvore",
+    "pares": [
+      {
+        "at": "Ez 33.11",
+        "texto": "Minha maior alegria é ver o pecador se arrepender, deixar seu mau caminho e viver.",
+        "nt": "2Pe 3.9",
+        "nota": "O Senhor não está sendo vagaroso com a volta prometida. Ele espera com paciência, porque não quer que ninguém pereça"
+      },
+      {
+        "at": "Ez 36.26",
+        "texto": "Darei a vocês um coração novo. Darei a vocês um espírito novo.",
+        "nt": "Jo 3.5",
+        "nota": "Quem não nasce da água e do Espírito não pode entrar no Reino de Deus"
+      },
+      {
+        "at": "Ez 37.9",
+        "texto": "Ó espírito, venha dos quatro cantos da terra e sopre nestes corpos mortos para que eles vivam novamente!",
+        "nt": "Jo 20.22",
+        "nota": "Jesus sopra sobre os discípulos e diz que recebam o Espírito Santo"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O céu se abre perto do rio", "de": 1, "ate": 3 },
+    { "titulo": "O cerco em sinais e a glória que sai", "de": 4, "ate": 11 },
+    { "titulo": "A queda de Jerusalém anunciada", "de": 12, "ate": 24 },
+    { "titulo": "Mensagens aos povos vizinhos", "de": 25, "ate": 32 },
+    { "titulo": "O pastor e o vale de ossos", "de": 33, "ate": 39 },
+    { "titulo": "O templo novo e o rio", "de": 40, "ate": 48 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Para assar pão, Ezequiel tem de usar fezes humanas secas no fogo. Ele diz que nunca comeu nada impuro, e Deus deixa trocar por esterco de vaca.",
+      "ref": "Ez 4.12-15"
+    },
+    {
+      "texto": "No dia do castigo, o povo vai jogar fora a prata e o ouro, como coisa impura. O dinheiro não vai matar a fome de ninguém.",
+      "ref": "Ez 7.19"
+    },
+    {
+      "texto": "Deus promete aos exilados que vai ser o templo deles enquanto estiverem longe de Israel.",
+      "ref": "Ez 11.16"
+    },
+    {
+      "texto": "Os falsos profetas prometem paz quando não há paz. Deus compara a mentira deles a uma mão de cal num muro fino e avisa que a chuva e o vento vão derrubar o muro.",
+      "ref": "Ez 13.10-11"
+    },
+    {
+      "texto": "Nem Noé, Daniel e Jó salvariam uma terra que Deus vai castigar. Eles só salvariam a vida deles.",
+      "ref": "Ez 14.14"
+    },
+    {
+      "texto": "Deus promete plantar num monte de Israel um broto da ponta de um cedro alto. O broto vai virar um grande cedro, e as aves vão fazer ninho nos ramos dele.",
+      "ref": "Ez 17.22-23"
+    },
+    {
+      "texto": "Ezequiel reclama com Deus: “O povo de Israel aqui na Babilônia está dizendo que eu não passo de um contador de histórias!”",
+      "ref": "Ez 20.49"
+    },
+    {
+      "texto": "Deus pergunta ao príncipe de Tiro se ele pensa que sabe mais que Daniel.",
+      "ref": "Ez 28.3"
+    },
+    {
+      "texto": "Ezequiel tem de gravar o nome de Judá num pedaço de madeira e o de Efraim em outro. Depois, Deus manda juntar os dois até virarem um só.",
+      "ref": "Ez 37.16-17"
+    },
+    {
+      "texto": "Deus avisa que os moradores de Israel vão juntar as armas do exército que invadiu a terra e usar tudo como lenha. Durante sete anos, ninguém vai precisar cortar árvore para fazer fogo.",
+      "ref": "Ez 39.9-10"
+    },
+    {
+      "texto": "Nas festas, quem entra pelo portão norte tem de sair pelo portão sul. Ninguém sai pelo portão por onde entrou.",
+      "ref": "Ez 46.9"
+    }
+  ],
+  "procure": {
+    "texto": "Procure como Deus chama Ezequiel. Quase nunca é pelo nome. Mais de noventa vezes, Ezequiel é chamado de “filho do homem”.",
+    "ref": "Ez 2.1"
+  }
+}

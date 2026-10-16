@@ -726,6 +726,23 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   onde Jesus se chama assim (Mc 2.19-20). E dois desenhos de parábola (160 por 124, como `figueira-brotando`) quase
   entraram em ramo: o `grep -L` do viewBox acima vale antes de escolher.
 
+- 2026-10-16 · conteúdo · Ezequiel tem 48 capítulos de oráculos parecidos: com seis ramos de seis galhos, a lista dos
+  capítulos ainda deixava 17 de fora. Entraram uma cena por bloco (o braço quebrado do faraó, Ez 30, no ramo das nações) e
+  curiosidades curtas (7, 13, 17, 46); ficaram só na estrutura os blocos repetidos ou de medidas (6, 15, 19, 21, 23, 31-32,
+  35, 38, 41-42, 45). Ezequiel repete o próprio achado (vigia em 3 e 33; coração novo em 11, 18 e 36): cada um mora num
+  item só, e a raiz e o significado foram reescritos quando disputavam o mesmo achado com um par.
+- 2026-10-16 · desenho · Ezequiel: os morros em sálvia fechados por baixo numa curva solta, sem tocar o chão, viraram nuvem
+  ou moita; o chão do vale em perspectiva virou um morro verde; a árvore com frutas em bolinhas escuras e dois traços de
+  folha virou rosto. Os ossos saíram de um gerador (duas bolinhas em cada ponta, contorno calculado), espaçados para nenhum
+  encostar no outro a 520px. O rio em trapézio sozinho parecia estrada: com a fachada do templo no alto e o rio saindo por
+  baixo da porta, leu como rio (Ez 47.1) → morro desce até o chão, fruta é bolinha clara solta, rio pede a fonte.
+- 2026-10-16 · conteúdo · Daniel: o Filho do Homem nas nuvens (Dn 7.13-14) já tinha o julgamento de Mc 14.61-62 no
+  destaque de Marcos, e Mt 26.64 contaria a mesma cena. O destaque ficou com Mt 24.3, 30, onde o próprio Jesus fala da
+  "minha vinda" e do Filho do Homem chegando nas nuvens. A NBV escreve "Abede-Nego" com hífen em todo o capítulo 3: o mapa
+  diz "os três amigos". Mt 24.15 é o único verso do NT que nomeia "o profeta Daniel"; entrou como par, só com o que Jesus
+  diz, sem ligar a "coisa horrível" a fato nenhum. As setenta semanas (Dn 9.24-27) e os 1.290 e 1.335 dias (Dn 12.11-12)
+  ficaram fora, porque o texto não interpreta e cada igreja lê de um jeito; o capítulo 9 entra pela oração e por Gabriel.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
