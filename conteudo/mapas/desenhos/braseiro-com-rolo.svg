@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o rolo cortado e jogado no braseiro (Jr 36.22-23): um braseiro de bacia funda sobre três pés, com as brasas na boca e o fogo subindo; um pedaço do rolo, com as linhas escritas e a ponta ainda enrolada, cai de lado na chama. O fogo é a única área sálvia. -->
+<path class="k" d="M14 104H106"/>
+<path class="k" d="M40 84L32 104M80 84L88 104M60 88V104"/>
+<path class="k p" d="M28 66C30 80 44 88 60 88C76 88 90 80 92 66Z"/>
+<path class="h" d="M34 74C48 80 72 80 86 74"/>
+<ellipse class="k p" cx="60" cy="66" rx="32" ry="6"/>
+<path class="k e" d="M36 66c0-5 6-6 8-2 2-6 10-6 12-1 3-5 10-4 12 1 3-3 9-2 10 2-12 4-30 4-42 0z"/>
+<path class="k s" d="M44 62C38 52 44 42 50 38C50 44 54 46 56 44C54 36 58 28 64 24C64 32 70 34 72 40C76 48 74 56 70 62Z"/>
+<path class="h" d="M56 58C54 52 56 48 60 44M64 58C66 52 64 48 62 46"/>
+<g transform="rotate(32 88 40)">
+<path class="k p" d="M74 24H100V55L96 58L92 55L88 59L84 55L80 58L74 55Z"/>
+<rect class="k p" x="72" y="17" width="30" height="8" rx="4"/>
+<circle class="k" cx="76" cy="21" r="1.6"/>
+<path class="h" d="M79 31H95M79 37H93M79 43H95M79 49H90"/>
+</g>
+</svg>

@@ -61,7 +61,7 @@
   // cartão a célula é mais estreita que na grade antiga, e 15px já encostava na borda).
   // Doze letras pedem 15px: "Deuteronômio" a 17px passou da célula pronta (que tem a seta à
   // direita) a 360px quando o mapa foi ao ar, e a 14px ficava miúdo ao lado dos vizinhos.
-  const tamanhoDoNome = (nome) => (nome.length <= 8 ? 20 : nome.length <= 11 ? 17 : nome.length <= 12 ? 15 : 14);
+  const tamanhoDoNome = (nome) => (nome.length <= 8 ? 20 : nome.length <= 10 ? 17 : nome.length <= 12 ? 15 : 14);
 
   function celula([nome]) {
     const m = porSlug.get(CC.slugDoLivro(nome));

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o vaso de barro quebrado diante dos líderes (Jr 19.10-11): o vaso de gargalo e duas alças, em pé, com um buraco de bordas em dentes na barriga; o caco que saiu dali está no chão, à direita, e dois cacos menores à esquerda. A boca do vaso é a única área sálvia. -->
+<path class="k" d="M4 100H116"/>
+<path class="k" d="M46 33C36 32 32 40 38 47M62 33C72 32 76 40 70 47"/>
+<path class="k p" d="M45 27L46 37C34 42 27 52 27 64C27 78 36 88 44 94L42 100H66L64 94C72 88 81 78 81 64C81 52 74 42 62 37L63 27Z"/>
+<ellipse class="k p" cx="54" cy="26" rx="11" ry="3.5"/>
+<ellipse class="s" cx="54" cy="26" rx="7.5" ry="1.8"/>
+<path class="h" d="M30 72C44 78 64 78 78 72M38 86C48 90 60 90 70 86"/>
+<path class="k e" d="M60 53L66 50L70 55L75 53L74 60L78 65L72 69L74 76L67 75L62 79L60 72L54 69L57 62L53 57Z"/>
+<path class="h" d="M53 57L46 54M54 69L47 73M62 79L61 85"/>
+<path class="k p" d="M86 100L88 93L95 90L101 94L104 100Z"/>
+<path class="h" d="M90 96C94 94 98 95 100 97"/>
+<path class="k p" d="M8 100L11 94L17 95L18 100Z"/>
+<path class="k p" d="M22 100L24 97L29 97L30 100Z"/>
+</svg>

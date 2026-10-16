@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a misericórdia que se renova a cada manhã (Lm 3.22-23): o sol nascendo atrás de duas colinas baixas e largas, com raios curtos em leque. As colinas descem em curva até o chão e vêm depois no SVG, cobrindo a parte de baixo do sol. O sol é a única área sálvia. -->
+<circle class="k s" cx="58" cy="74" r="22"/>
+<path class="k" d="M30.7 64.1L22.3 61.0M36.4 54.6L29.8 48.6M45.3 47.9L41.3 39.8M56.0 45.1L55.3 36.1M67.0 46.4L69.7 37.9M76.6 51.8L82.4 44.9M83.6 60.4L91.6 56.2"/>
+<path class="k p" d="M4 102C10 90 20 80 34 78C44 77 50 80 56 84C66 74 84 70 98 75C108 79 114 90 116 102Z"/>
+<path class="k" d="M4 102H116"/>
+<path class="h" d="M22 88C28 86 34 86 38 88M76 82C84 80 92 81 98 84M30 96C42 94 54 95 62 97M68 94C80 92 92 92 102 94"/>
+</svg>

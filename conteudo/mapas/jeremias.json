@@ -1,0 +1,308 @@
+{
+  "nome": "Jeremias",
+  "grupo": "Profetas maiores",
+  "numero": 24,
+  "capitulos": 52,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "יִרְמְיָהוּ",
+    "transliteracao": "Yirmeyahu",
+    "traducao": "o Senhor levanta",
+    "texto": "Yirmeyahu tem um pedaço do nome do Senhor e um verbo que pode querer dizer levantar. No livro, além do profeta, há pelo menos outros dois homens chamados Jeremias."
+  },
+  "autoria": {
+    "texto": "Jeremias é filho de Hilquias e um dos sacerdotes de Anatote, na terra de Benjamim. Ele dita as mensagens do Senhor, e Baruque escreve tudo com tinta num rolo.",
+    "apoio": "Quando o primeiro rolo vai para o fogo, Jeremias dita tudo de novo a Baruque. O segundo rolo fica com muitas outras mensagens.",
+    "refs": [
+      "Jr 1.1",
+      "Jr 36.4, 18, 32"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Jeremias fala em nome do Senhor nos dias dos reis Josias, Jeoaquim e Zedequias, até o ano em que Jerusalém é destruída e os moradores vão para o exílio. Durante vinte e três anos, ele avisa Judá todos os dias, desde a madrugada, e o povo não ouve. Mesmo assim, o Senhor promete plantar o povo de novo na terra, de todo o coração.",
+    "refs": [
+      "Jr 1.2-3",
+      "Jr 25.3",
+      "Jr 32.41"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "O chamado",
+      "sub": "O menino avisa Jerusalém",
+      "desenho": "vara-que-floresce",
+      "galhos": [
+        {
+          "texto": "O Senhor diz que escolheu Jeremias para ser profeta antes de ele nascer. Jeremias responde que não passa de uma criança. O Senhor toca a boca dele com a mão e diz: “Veja, eu estou colocando as minhas palavras na sua boca!”",
+          "ref": "Jr 1.5-9"
+        },
+        {
+          "texto": "Jeremias vê um ramo de amendoeira quando o Senhor pergunta o que ele está vendo. O Senhor explica que está vigiando para que a palavra dele se cumpra.",
+          "ref": "Jr 1.11-12"
+        },
+        {
+          "texto": "Na segunda visão, Jeremias vê uma panela fervendo, com a boca inclinada do Norte para cá. O Senhor avisa que o castigo vai chegar do Norte.",
+          "ref": "Jr 1.13-14"
+        },
+        {
+          "texto": "Para o Senhor, o povo dele cometeu dois pecados. Eles abandonaram o Senhor, a fonte da água da vida, e construíram cisternas rachadas, que não seguram a água.",
+          "ref": "Jr 2.13"
+        },
+        {
+          "texto": "Deus manda procurar nas ruas e praças de Jerusalém pelo menos uma pessoa honesta, que busque a verdade. Se houver uma, ele promete perdoar a cidade.",
+          "ref": "Jr 5.1"
+        },
+        {
+          "texto": "O Senhor pede que o povo pare e pergunte pelo bom caminho, aquele de muito tempo atrás. Quem andar por ele vai encontrar paz e segurança. O povo responde que não é esse que quer seguir.",
+          "ref": "Jr 6.16"
+        }
+      ],
+      "conexao": "Na porta do templo, Jeremias deve falar a quem entra para adorar o Senhor (Jr 7.2)."
+    },
+    {
+      "titulo": "Templo e oleiro",
+      "sub": "O povo não quer ouvir",
+      "desenho": "jarro-quebrado",
+      "galhos": [
+        {
+          "texto": "O Senhor manda o povo não confiar em quem repete: “Este é o templo do Senhor”. Ele pergunta se eles acham que a casa dele é um esconderijo de ladrões.",
+          "ref": "Jr 7.4, 11"
+        },
+        {
+          "texto": "Jeremias compra um cinto de linho. O Senhor manda esconder o cinto num buraco entre as pedras, em Perate. Muito tempo depois, Jeremias cava o lugar e acha o cinto podre, sem servir para mais nada.",
+          "ref": "Jr 13.1-7"
+        },
+        {
+          "texto": "Quem confia no Senhor é como uma árvore plantada à beira de um rio. As raízes descem fundo atrás da água. As folhas ficam sempre verdes, e a árvore dá fruto até no tempo da seca.",
+          "ref": "Jr 17.7-8"
+        },
+        {
+          "texto": "Na casa do oleiro, Jeremias vê o homem trabalhando na roda. O vaso não sai como ele quer, e o oleiro amassa o barro de novo para fazer outro. Deus diz ao povo: “Como o barro está nas mãos do oleiro, assim vocês estão na minha mão”.",
+          "ref": "Jr 18.3-6"
+        },
+        {
+          "texto": "O Senhor manda Jeremias comprar um vaso de barro e levar líderes do povo e sacerdotes ao vale de Hinom. Lá, Jeremias deve quebrar o vaso na frente deles e avisar que a cidade vai ficar em pedaços do mesmo jeito, sem conserto.",
+          "ref": "Jr 19.1-2, 10-11"
+        },
+        {
+          "texto": "Pasur manda prender Jeremias. Jeremias apanha e passa a noite inteira amarrado ao tronco. Ele tenta ficar calado, mas as palavras do Senhor queimam como fogo no coração e nos ossos dele.",
+          "ref": "Jr 20.2-3, 9"
+        }
+      ],
+      "jesus": {
+        "texto": "No templo, Jesus expulsa os negociantes e derruba as mesas dos cambistas. Ele diz que as Escrituras chamam a casa de Deus de casa de oração, e eles fizeram dali um covil de ladrões.",
+        "refs": [
+          "Mt 21.12-13"
+        ]
+      },
+      "conexao": "O rei Zedequias manda pedir a Jeremias que fale com o Senhor, porque Nabucodonosor está atacando (Jr 21.1-2)."
+    },
+    {
+      "titulo": "Reis e profetas",
+      "sub": "Jeremias contra a mentira",
+      "desenho": "ramo-brotando",
+      "galhos": [
+        {
+          "texto": "O Senhor avisa o rei que constrói um palácio bonito, forrado de cedro, sem pagar os trabalhadores. O pai desse rei cuidou dos pobres e dos necessitados, e tudo correu bem para ele. Para o Senhor, quem age assim conhece Deus.",
+          "ref": "Jr 22.13-16"
+        },
+        {
+          "texto": "Deus promete fazer brotar um ramo justo da família de Davi. Quando ele reinar, Judá vai ser salvo. Todos vão chamar esse rei pelo nome: “O Senhor é a Nossa Justiça”.",
+          "ref": "Jr 23.5-6"
+        },
+        {
+          "texto": "Jeremias avisa no templo que o Senhor pode destruir aquela casa como destruiu Siló. Os sacerdotes, os profetas e o povo agarram Jeremias e gritam que ele vai morrer. Os líderes decidem que ele não deve morrer, e Aicam protege o profeta.",
+          "ref": "Jr 26.6-9, 16, 24"
+        },
+        {
+          "texto": "O profeta Hananias arranca a canga de madeira do pescoço de Jeremias e quebra na frente de toda a multidão. O Senhor responde que vai pôr no lugar uma canga de ferro. Hananias morre naquele mesmo ano.",
+          "ref": "Jr 28.10-17"
+        },
+        {
+          "texto": "Jeremias escreve uma carta aos que foram levados para a Babilônia. O Senhor manda que eles construam casas e plantem pomares lá. Também devem orar pela cidade, porque, se ela estiver em paz, eles vão viver em segurança.",
+          "ref": "Jr 29.1, 5-7"
+        },
+        {
+          "texto": "O Senhor promete trazer o povo de volta depois de setenta anos na Babilônia. Os planos dele são de bem, não de sofrimento. Ele diz: “Vocês me procurarão e me encontrarão quando me procurarem de todo o coração”.",
+          "ref": "Jr 29.10-13"
+        }
+      ],
+      "conexao": "Depois da carta, o Senhor manda Jeremias escrever num livro todas as palavras que ouviu (Jr 30.2)."
+    },
+    {
+      "titulo": "Plantar de novo",
+      "sub": "Deus promete trazer o povo",
+      "desenho": "tamborim",
+      "galhos": [
+        {
+          "texto": "O Senhor diz a Israel: “Eu amei você, meu povo, desde a eternidade!” Ele promete reconstruir a nação, e a virgem Israel vai dançar de alegria ao som dos pandeiros.",
+          "ref": "Jr 31.3-4"
+        },
+        {
+          "texto": "Ninguém mais vai repetir o ditado dos pais que comeram uvas verdes e deixaram ásperos os dentes dos filhos. Cada um vai morrer pelos pecados dele.",
+          "ref": "Jr 31.29-30"
+        },
+        {
+          "texto": "Com Jerusalém cercada e Jeremias preso, o primo Hanameel oferece a ele um campo em Anatote. Jeremias assina e sela o contrato diante de testemunhas e paga dezessete moedas de prata.",
+          "ref": "Jr 32.2, 8-10"
+        },
+        {
+          "texto": "Baruque deve guardar o contrato num vaso de barro, para durar bastante tempo. O Senhor promete que o povo ainda vai comprar e vender casas, campos e plantações de uvas em Judá.",
+          "ref": "Jr 32.13-15"
+        },
+        {
+          "texto": "Jeremias ora e diz que, para o Senhor, nada é impossível. O Senhor responde com uma pergunta: “Por acaso haverá algo que seja impossível para mim?”",
+          "ref": "Jr 32.17, 27"
+        },
+        {
+          "texto": "Na prisão do palácio, Jeremias ouve o Senhor de novo: “Fale comigo e eu responderei”.",
+          "ref": "Jr 33.1-3"
+        }
+      ],
+      "conexao": "Com o exército da Babilônia em volta de Jerusalém, Jeremias avisa Zedequias que a cidade vai queimar (Jr 34.1-2)."
+    },
+    {
+      "titulo": "Rolo e poço",
+      "sub": "Jerusalém cai",
+      "desenho": "braseiro-com-rolo",
+      "galhos": [
+        {
+          "texto": "Zedequias faz um acordo com o povo, e todos soltam os escravos israelitas. Pouco tempo depois, mudam de ideia e voltam a escravizar homens e mulheres.",
+          "ref": "Jr 34.8-11"
+        },
+        {
+          "texto": "Jeremias leva a família dos recabitas ao templo e põe vinho na frente deles. Eles não bebem, porque o antepassado Jonadabe proibiu a família de beber. Até hoje eles obedecem.",
+          "ref": "Jr 35.4-8"
+        },
+        {
+          "texto": "Jeudi lê o rolo para o rei Jeoaquim, sentado diante de um braseiro. A cada três ou quatro colunas, o rei corta o pedaço com uma faca e joga no fogo, até não sobrar nada do rolo.",
+          "ref": "Jr 36.21-23"
+        },
+        {
+          "texto": "Jeremias sai de Jerusalém para ir ao campo que comprou em Anatote. No portão de Benjamim, um guarda prende Jeremias como traidor. As autoridades mandam chicotear o profeta e prender ele numa cela debaixo da terra.",
+          "ref": "Jr 37.12-16"
+        },
+        {
+          "texto": "Os oficiais baixam Jeremias com cordas num poço sem água, e ele afunda na lama. Um etíope que cuida das mulheres e dos filhos do rei pede a Zedequias para salvar o profeta. O etíope desce trapos para Jeremias pôr debaixo dos braços, e os homens puxam o profeta lá de baixo.",
+          "ref": "Jr 38.6-13"
+        },
+        {
+          "texto": "No décimo primeiro ano de Zedequias, os babilônios abrem uma brecha no muro e põem fogo em Jerusalém. Nabucodonosor manda o chefe da guarda achar Jeremias e cuidar dele.",
+          "ref": "Jr 39.2, 8, 11-12"
+        }
+      ],
+      "conexao": "Em Ramá, no meio dos presos, o chefe da guarda acha Jeremias acorrentado e solta o profeta (Jr 40.1)."
+    },
+    {
+      "titulo": "Depois da queda",
+      "sub": "Do Egito ao rio Eufrates",
+      "desenho": "correntes",
+      "galhos": [
+        {
+          "texto": "O chefe da guarda deixa Jeremias escolher entre ir para a Babilônia e ficar. Jeremias vai para Mispá e fica com Gedalias, no meio do povo que sobrou em Judá.",
+          "ref": "Jr 40.4-6"
+        },
+        {
+          "texto": "Durante uma refeição em Mispá, Ismael e dez companheiros puxam as espadas e matam Gedalias, o governador que Nabucodonosor escolheu.",
+          "ref": "Jr 41.1-2"
+        },
+        {
+          "texto": "O povo que restou pede que Jeremias ore ao Senhor e pergunte para onde ir. Todos prometem obedecer, gostem ou não da resposta.",
+          "ref": "Jr 42.2-6"
+        },
+        {
+          "texto": "Jeremias avisa que o Senhor não quer o povo no Egito. Azarias e Joanã respondem que ele está mentindo. Eles levam todo mundo para Tafnes, no Egito, e obrigam Jeremias e Baruque a ir junto.",
+          "ref": "Jr 43.2-7"
+        },
+        {
+          "texto": "No Egito, homens e mulheres dizem a Jeremias que vão continuar queimando incenso para a Rainha do Céu. Eles contam que, naquela época, nunca passavam fome.",
+          "ref": "Jr 44.15-17"
+        },
+        {
+          "texto": "Jeremias escreve num rolo as desgraças contra a Babilônia e entrega a Seraías. Depois de ler, Seraías deve amarrar o rolo a uma pedra e jogar no rio Eufrates. Assim a Babilônia vai afundar e nunca mais vai se levantar.",
+          "ref": "Jr 51.59-64"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "O Senhor promete uma nova aliança, diferente da que fez quando tirou o povo do Egito: “Gravarei as minhas leis no coração e na mente deles.” Na ceia, Jesus pega o cálice de vinho e chama aquilo de nova aliança do sangue dele, derramado pelos discípulos (Lc 22.20). Hebreus traz essa promessa inteira e diz que o acordo que Jesus oferece tem promessas melhores (Hb 8.6-12).",
+    "ref": "Jr 31.31-34",
+    "desenho": "calice",
+    "pares": [
+      {
+        "at": "Jr 31.15",
+        "texto": "Raquel está chorando pelos seus filhos. Ela não quer ser consolada, porque todos os seus filhos já não existem",
+        "nt": "Mt 2.16-18",
+        "nota": "Herodes manda matar os meninos de Belém, e assim se cumpre a profecia de Jeremias"
+      },
+      {
+        "at": "Jr 17.10",
+        "texto": "Ele examina cuidadosamente o coração e os pensamentos do homem para dar a cada um a justa recompensa",
+        "nt": "Ap 2.18, 23",
+        "nota": "O Filho de Deus avisa que todas as igrejas vão saber que ele sonda o coração e a mente e dá a cada um o que merecer"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Deus chama Jeremias", "de": 1, "ate": 1 },
+    { "titulo": "Avisos a Judá e a Jerusalém", "de": 2, "ate": 20 },
+    { "titulo": "Os reis e os falsos profetas", "de": 21, "ate": 29 },
+    { "titulo": "A promessa da volta", "de": 30, "ate": 33 },
+    { "titulo": "O cerco e a queda de Jerusalém", "de": 34, "ate": 39 },
+    { "titulo": "O povo que sobra foge para o Egito", "de": 40, "ate": 45 },
+    { "titulo": "Mensagens sobre as nações", "de": 46, "ate": 51 },
+    { "titulo": "Jerusalém cai, e Joaquim sai da prisão", "de": 52, "ate": 52 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Jeremias queria que a cabeça dele virasse uma fonte de água e que os olhos dele não parassem de chorar. Assim ele choraria noite e dia pelos mortos do povo.",
+      "ref": "Jr 9.1"
+    },
+    {
+      "texto": "O Senhor proíbe Jeremias de casar e de ter filhos naquela cidade. Ele também não deve ir a banquetes e festas.",
+      "ref": "Jr 16.2, 8"
+    },
+    {
+      "texto": "Jeremias amaldiçoa o dia em que nasceu e o homem que deu ao pai dele a notícia: “Nasceu! É um menino!”",
+      "ref": "Jr 20.14-15"
+    },
+    {
+      "texto": "Numa visão, Jeremias vê dois cestos de figos diante do templo. Os figos de um cesto são bons, e os do outro estão estragados. Os bons são o povo levado para a Babilônia.",
+      "ref": "Jr 24.1-5"
+    },
+    {
+      "texto": "No julgamento de Jeremias, alguns líderes mais velhos lembram o profeta Miqueias. Ele anunciou a destruição de Jerusalém no tempo de Ezequias, e ninguém matou Miqueias por isso.",
+      "ref": "Jr 26.17-19"
+    },
+    {
+      "texto": "Urias, outro profeta, anuncia o mesmo que Jeremias e foge para o Egito. O rei Jeoaquim manda buscar Urias lá e mata o profeta com a espada.",
+      "ref": "Jr 26.20-23"
+    },
+    {
+      "texto": "Depois de uma das promessas de volta, Jeremias acorda e diz: “Que sonho maravilhoso o Senhor me deu!”",
+      "ref": "Jr 31.26"
+    },
+    {
+      "texto": "Zedequias não deixa Jeremias voltar para a prisão de antes. No pátio da guarda, o profeta recebe todo dia um pão fresco da rua dos padeiros, enquanto há pão na cidade.",
+      "ref": "Jr 37.21"
+    },
+    {
+      "texto": "Baruque reclama que não aguenta mais tanta tristeza. O Senhor manda dizer a ele que pare de pensar em grandezas, mas promete que Baruque vai escapar com vida, onde estiver.",
+      "ref": "Jr 45.3-5"
+    },
+    {
+      "texto": "Moabe nunca foi para o exílio. O Senhor compara essa nação a um vinho que ninguém passou de uma vasilha para outra e que guardou o mesmo gosto e o mesmo cheiro.",
+      "ref": "Jr 48.11"
+    },
+    {
+      "texto": "Em três vezes, os babilônios levam 4.600 judeus para o exílio.",
+      "ref": "Jr 52.28-30"
+    }
+  ],
+  "procure": {
+    "texto": "No chamado, o Senhor fala em arrancar e derrubar, construir e plantar. Procure esses verbos. Eles voltam, com palavras parecidas, quando o Senhor fala das nações, dos exilados e até com Baruque.",
+    "ref": "Jr 1.10"
+  }
+}
