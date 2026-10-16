@@ -700,6 +700,12 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   At 2.34-36, At 13.35-37). Os ramos seguem os cinco livros que o próprio texto marca com o "amém" (41.13, 72.20, 89.52, 106.48), e o
   intervalo de salmos fica só na estrutura: no `sub` de todos os ramos ("Do 1 ao 41, ...") virava molde repetido.
 
+- 2026-10-16 · conteúdo · Provérbios: ditado solto não tem cena, então os ramos seguem as seções que o próprio texto abre (1.1, 8–9,
+  10.1, 22.17 e 24.23, 25.1, 30.1, 31.1), e cada galho pega um ditado concreto (a formiga, o curral sem bois, as maçãs de ouro) em vez
+  de um tema. O livro repete ditados quase iguais (14.12 e 16.25, 19.24 e 26.15, 6.10-11 e 24.33-34): conferir com um `grep` na NBV
+  antes de usar, porque o segundo vira o mesmo achado em outro galho; a repetição boa vai para a curiosidade ou o "procure". O
+  conselho de Rm 12.20 tem hífen na NBV dos dois lados ("dê-lhe", Pv 25.21), e o par ficou com Pv 25.22.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de

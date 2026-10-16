@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- maçãs de ouro numa bandeja de prata (Pv 25.11): um bom conselho na hora certa. Bandeja larga e rasa com a borda em elipse e o pé baixo; três maçãs em cima, uma atrás e duas na frente, cada uma com o cabo e uma folha. A maçã do meio, na frente, é a única área sálvia. As maçãs de trás vão antes no SVG, e a base de cada uma fica dentro da face de cima da bandeja. -->
+<path class="k p" d="M44 98H76L72 90H48Z"/>
+<ellipse class="k p" cx="60" cy="84" rx="48" ry="10"/>
+<ellipse class="h" cx="60" cy="83" rx="40" ry="6"/>
+<path class="k p" d="M60 52C55 48 46 48 42 54C37 62 40 74 48 78C52 80 56 80 60 78C64 80 68 80 72 78C80 74 83 62 78 54C74 48 65 48 60 52Z"/>
+<path class="k" d="M60 52C60 47 61 43 63 40"/>
+<path class="k p" d="M63 42C67 37 74 36 78 39C74 44 68 45 63 42Z"/>
+<path class="k p" d="M36 66C32 63 25 63 22 68C18 74 20 83 26 86C29 88 33 88 36 86C39 88 43 88 46 86C52 83 54 74 50 68C47 63 40 63 36 66Z"/>
+<path class="k" d="M36 66C36 62 35 59 33 57"/>
+<path class="k p" d="M84 66C80 63 73 63 70 68C66 74 68 83 74 86C77 88 81 88 84 86C87 88 91 88 94 86C100 83 102 74 98 68C95 63 88 63 84 66Z"/>
+<path class="k" d="M84 66C84 62 85 59 87 57"/>
+<path class="k s" d="M60 70C56 67 49 67 46 72C42 78 44 87 50 90C53 92 57 92 60 90C63 92 67 92 70 90C76 87 78 78 74 72C71 67 64 67 60 70Z"/>
+<path class="k" d="M60 70C60 66 61 63 63 61"/>
+<path class="h" d="M50 76c-2 3-2 7 0 10"/>
+</svg>

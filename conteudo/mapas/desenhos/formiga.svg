@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a formiga que junta comida no verão para o inverno (Pv 6.6-8): vista de lado, cabeça, tórax e abdômen em três peças, seis pernas dobradas que apoiam no chão, as antenas e um grão de trigo em sálvia preso nas mandíbulas. O chão e as pernas vão antes do corpo, para o papel do corpo cobrir a raiz das pernas. -->
+<path class="k" d="M10 88H110"/>
+<path class="k" d="M50 66L42 76L36 88M56 67L58 78L54 88M62 66L72 76L78 88"/>
+<path class="k p" d="M70 62C70 50 82 44 94 46C106 48 112 58 108 68C104 76 90 78 80 74C74 72 70 68 70 62Z"/>
+<path class="h" d="M86 50C83 56 83 66 87 72M96 48C93 55 93 66 97 74"/>
+<ellipse class="k p" cx="57" cy="64" rx="10" ry="6"/>
+<circle class="k p" cx="38" cy="58" r="9"/>
+<circle class="e" cx="34" cy="56" r="1.6"/>
+<path class="k" d="M40 49C38 40 32 34 24 32M43 51C46 42 46 36 42 30"/>
+<path class="k s" d="M14 66C14 60 20 56 26 58C30 60 30 66 26 69C21 72 14 71 14 66Z"/>
+<path class="h" d="M17 64c3-2 7-3 10-2"/>
+<path class="k" d="M30 63L26 65"/>
+</svg>

@@ -1,0 +1,304 @@
+{
+  "nome": "Provérbios",
+  "grupo": "Poéticos",
+  "numero": 20,
+  "capitulos": 31,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "מִשְׁלֵי",
+    "transliteracao": "Mishlei",
+    "traducao": "provérbios",
+    "texto": "Mishlei é a primeira palavra do livro em hebraico. A mesma palavra serve para ditado e para comparação, como a da formiga e a do preguiçoso."
+  },
+  "autoria": {
+    "texto": "Os ditados têm vários donos. A maioria é de Salomão, e uma parte é dos sábios. Agur e o rei Lemuel, que aprendeu com a mãe, fecham o livro.",
+    "apoio": "Os secretários do rei Ezequias, de Judá, copiaram outros provérbios de Salomão.",
+    "refs": [
+      "Pv 1.1",
+      "Pv 24.23",
+      "Pv 25.1",
+      "Pv 31.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Provérbios junta frases curtas que ensinam a viver com sabedoria. Quem escreve pergunta como alguém fica sábio e responde: “Em primeiro lugar, temendo o Senhor.” Os ditados servem para ajudar os jovens a enfrentar com bom senso os problemas da vida.",
+    "refs": [
+      "Pv 1.2-4",
+      "Pv 1.7"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Ouça, meu filho",
+      "sub": "O pai ensina o caminho",
+      "desenho": "formiga",
+      "galhos": [
+        {
+          "texto": "Se um bando convidar o filho para atacar de surpresa um inocente e dividir o que roubar, o pai manda o filho ficar longe deles. Esses homens montam armadilhas contra a vida deles.",
+          "ref": "Pv 1.8, 10-11, 14-15, 18"
+        },
+        {
+          "texto": "O filho deve confiar no Senhor de todo o coração, e não na capacidade dele. Se puser Deus em primeiro lugar, Deus vai guiar os passos dele.",
+          "ref": "Pv 3.5-6"
+        },
+        {
+          "texto": "Quem ensina conta que, quando pequeno, também aprendeu com o pai. Agora ele pede ao filho: “Acima de tudo, meu filho, cuide bem do seu coração”.",
+          "ref": "Pv 4.3-4, 23"
+        },
+        {
+          "texto": "O pai manda o preguiçoso olhar as formigas. Ninguém dá ordens a elas, e mesmo assim elas trabalham no verão e guardam comida para o inverno. O pai pergunta até quando o preguiçoso vai ficar deitado.",
+          "ref": "Pv 6.6-9"
+        },
+        {
+          "texto": "Há seis coisas que o Senhor odeia e uma última que ele detesta. Entre elas estão a língua mentirosa e as mãos que derramam sangue inocente. A última é quem espalha discórdia entre irmãos.",
+          "ref": "Pv 6.16-19"
+        },
+        {
+          "texto": "Da janela de casa, quem ensina vê um jovem sem juízo andar de lá para cá perto da casa de uma mulher, ao anoitecer. Ela sai, beija o jovem e seduz ele com conversa doce. Ele vai atrás dela como um boi que caminha para o matadouro.",
+          "ref": "Pv 7.6-10, 13, 21-22"
+        }
+      ],
+      "conexao": "O jovem cai na armadilha sem saber (Pv 7.23). Enquanto isso, a sabedoria chama nas ruas (Pv 8.1-3)."
+    },
+    {
+      "titulo": "Convite à mesa",
+      "sub": "A sabedoria chama na rua",
+      "desenho": "mesa-posta",
+      "galhos": [
+        {
+          "texto": "A sabedoria pede que as pessoas prefiram a instrução dela à prata e o conhecimento ao ouro mais puro. Ela vale mais que pedras preciosas.",
+          "ref": "Pv 8.4, 10-11"
+        },
+        {
+          "texto": "Por meio da sabedoria os reis governam. Ela diz: “Amo todos os que me amam; quem me procura sempre me encontra.”",
+          "ref": "Pv 8.15, 17"
+        },
+        {
+          "texto": "Antes de existirem os montes e as fontes de água, a sabedoria já estava com o Senhor. Quando ele marca o limite do mar e põe os alicerces da terra, ela está junto e diz: “fui o seu arquiteto!”",
+          "ref": "Pv 8.22-30"
+        },
+        {
+          "texto": "A sabedoria constrói uma casa sobre sete colunas e prepara uma festa com carne e vinho. As servas dela saem pela cidade e chamam quem não tem juízo para comer do banquete.",
+          "ref": "Pv 9.1-5"
+        },
+        {
+          "texto": "Quem tenta corrigir o zombador ganha o ódio dele. Quem repreende o sábio ganha um amigo.",
+          "ref": "Pv 9.8"
+        },
+        {
+          "texto": "A loucura também senta à porta de casa e chama quem passa. Ela diz: “A bebida roubada é mais doce!”",
+          "ref": "Pv 9.13-17"
+        }
+      ],
+      "conexao": "Quem vai atrás da loucura não sabe que caminha para a morte (Pv 9.18)."
+    },
+    {
+      "titulo": "Balança justa",
+      "sub": "O justo e o mau lado a lado",
+      "desenho": "balanca",
+      "galhos": [
+        {
+          "texto": "Salomão abre os provérbios dele com o filho sábio, que alegra o pai. Quem é preguiçoso no trabalho fica pobre depressa, e quem dorme na colheita causa vergonha.",
+          "ref": "Pv 10.1, 4-5"
+        },
+        {
+          "texto": "O Senhor detesta balança desonesta e tem prazer no peso justo. Quem reparte os bens com generosidade vê a riqueza aumentar. Quem segura mais do que precisa acaba pobre.",
+          "ref": "Pv 11.1, 24-25"
+        },
+        {
+          "texto": "Algumas palavras ferem como uma espada afiada, e as palavras do sábio trazem a cura. O Senhor odeia os lábios mentirosos e tem prazer em quem fala a verdade.",
+          "ref": "Pv 12.18, 22"
+        },
+        {
+          "texto": "Quem procura a companhia dos sábios fica sábio também. Quem anda com gente tola acaba mal.",
+          "ref": "Pv 13.20"
+        },
+        {
+          "texto": "Um curral sem bois não dá trabalho e fica sempre limpo. Só que a colheita farta vem da força do boi.",
+          "ref": "Pv 14.4"
+        },
+        {
+          "texto": "É melhor ser pobre e temer o Senhor do que ser rico e viver preocupado. Um prato de verduras com paz na família vale mais que um boi gordo num lar cheio de ódio.",
+          "ref": "Pv 15.16-17"
+        }
+      ],
+      "conexao": "O temor do Senhor ensina a sabedoria, e a humildade vem antes da honra (Pv 15.33)."
+    },
+    {
+      "titulo": "Planos e passos",
+      "sub": "O homem planeja, Deus guia",
+      "desenho": "pegadas",
+      "galhos": [
+        {
+          "texto": "As pessoas fazem planos para a vida, e o Senhor determina os passos. Até quando alguém tira a sorte, o Senhor controla o resultado.",
+          "ref": "Pv 16.9, 33"
+        },
+        {
+          "texto": "A desgraça está a um passo do orgulho, e a vaidade termina em queda. É melhor ser humilde junto dos oprimidos do que dividir as riquezas dos orgulhosos.",
+          "ref": "Pv 16.18-19"
+        },
+        {
+          "texto": "O amigo é sempre leal. Na hora da dificuldade, ele vira um irmão.",
+          "ref": "Pv 17.17"
+        },
+        {
+          "texto": "Quem ajuda os pobres empresta ao Senhor, e o Senhor vai recompensar.",
+          "ref": "Pv 19.17"
+        },
+        {
+          "texto": "Os sábios perguntam quem tem os olhos inchados e vive brigando. É o homem que passa horas bebendo vinho. O bêbado diz que levou uma surra e não sentiu dor, e só pensa em beber mais um pouco.",
+          "ref": "Pv 23.29-30, 34-35"
+        },
+        {
+          "texto": "Quem ensina passa pelo sítio do preguiçoso e vê tudo coberto de mato, com o muro de pedras em ruínas. Para quem só quer mais uma soneca, a pobreza chega de repente, como um ladrão.",
+          "ref": "Pv 24.30-31, 33-34"
+        }
+      ],
+      "conexao": "Quem viu o sítio do preguiçoso pensa um pouco e aprende uma lição (Pv 24.32)."
+    },
+    {
+      "titulo": "Maçãs de ouro",
+      "sub": "A palavra certa na hora certa",
+      "desenho": "macas-na-bandeja",
+      "galhos": [
+        {
+          "texto": "Um bom conselho, dado na hora certa, é como uma bandeja de prata cheia de maçãs de ouro.",
+          "ref": "Pv 25.11"
+        },
+        {
+          "texto": "Ninguém deve procurar um lugar de honra perto do rei. É melhor ser convidado pelo rei do que ter de sair dali e passar vergonha.",
+          "ref": "Pv 25.6-7"
+        },
+        {
+          "texto": "Quem não sabe controlar as emoções e as vontades é como uma cidade com os muros derrubados.",
+          "ref": "Pv 25.28"
+        },
+        {
+          "texto": "A fogueira apaga quando acaba a lenha. As brigas também acabam quando o encrenqueiro sai do grupo.",
+          "ref": "Pv 26.20-21"
+        },
+        {
+          "texto": "Duas lâminas de ferro ficam mais afiadas quando uma esfrega na outra. Dois amigos que conversam com sinceridade sobre os problemas ficam mais amigos.",
+          "ref": "Pv 27.17"
+        },
+        {
+          "texto": "Quem esconde os pecados não prospera. Quem confessa e abandona os pecados alcança misericórdia.",
+          "ref": "Pv 28.13"
+        }
+      ],
+      "jesus": {
+        "texto": "Num jantar, Jesus vê os convidados escolhendo os melhores lugares da mesa. Ele conta que o convidado deve ficar num lugar menos importante, até o dono da casa chamar para um lugar melhor. Jesus termina assim: “aquele que se humilha, será exaltado”.",
+        "refs": [
+          "Lc 14.3",
+          "Lc 14.7-11"
+        ]
+      },
+      "conexao": "Quem tem medo dos homens cai em armadilhas, e quem confia no Senhor vive tranquilo (Pv 29.25)."
+    },
+    {
+      "titulo": "Agur e Lemuel",
+      "sub": "Agur pergunta, Lemuel ouve",
+      "desenho": "coroa-e-pulseira",
+      "galhos": [
+        {
+          "texto": "Agur diz que não consegue entender a sabedoria. Ele pergunta quem subiu aos céus e desceu, e quem já pegou o vento com as mãos.",
+          "ref": "Pv 30.1-4"
+        },
+        {
+          "texto": "Num pedido a Deus, Agur quer duas coisas. A primeira é não ser mentiroso. A outra é não ficar nem muito rico nem muito pobre, para não esquecer o Senhor e para não virar ladrão.",
+          "ref": "Pv 30.7-9"
+        },
+        {
+          "texto": "Para Agur, até os bichos pequenos ensinam sabedoria. Os coelhos fazem a toca no meio das pedras, e os gafanhotos voam juntos sem nenhum líder. A lagartixa cabe na mão e mesmo assim vive nos palácios dos reis.",
+          "ref": "Pv 30.24, 26-28"
+        },
+        {
+          "texto": "A mãe do rei Lemuel ensina o filho. O rei que bebe muito esquece as obrigações e não julga com justiça os pobres. Ela pede que ele use as palavras para ajudar os fracos.",
+          "ref": "Pv 31.2-5, 8"
+        },
+        {
+          "texto": "Quem encontra uma esposa fiel e dedicada acha um tesouro mais valioso que ouro e pedras preciosas. Ela levanta antes do sol raiar para preparar a comida da família e trabalha com gosto a lã e o linho.",
+          "ref": "Pv 31.10, 13, 15"
+        },
+        {
+          "texto": "Os filhos e o marido elogiam a esposa. A beleza não dura para sempre, e a verdadeira honra de uma mulher está em temer o Senhor.",
+          "ref": "Pv 31.28-30"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus diz a um mestre de Israel: “Ninguém jamais subiu ao céu, a não ser aquele que veio do céu”. Quem veio do céu é o Filho do Homem, e esse Filho do Homem é Jesus.",
+        "refs": [
+          "Jo 3.10",
+          "Jo 3.13"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "A sabedoria diz: “todo aquele que me acha, acha a vida”. Para quem está em Cristo, Jesus se tornou sabedoria de Deus (1Co 1.30). Quem tem o Filho de Deus tem a vida (1Jo 5.12).",
+    "ref": "Pv 8.35",
+    "desenho": "cruz",
+    "pares": [
+      {
+        "at": "Pv 3.12",
+        "texto": "pois o Senhor disciplina quem ele ama, assim como um pai cheio de amor faz ao seu filho.",
+        "nt": "Hb 12.5-7",
+        "nota": "Deus lembra aos filhos que o Senhor corrige quem ama, como qualquer pai amoroso faz"
+      },
+      {
+        "at": "Pv 3.34",
+        "texto": "Deus zomba dos zombadores, mas mostra o seu amor aos humildes.",
+        "nt": "Tg 4.6",
+        "nota": "As Escrituras dizem que Deus dá graça ao humilde e se opõe aos orgulhosos"
+      },
+      {
+        "at": "Pv 10.12",
+        "texto": "o amor esquece e perdoa todas as ofensas.",
+        "nt": "1Pe 4.8",
+        "nota": "Os irmãos continuam se amando muito, porque o amor perdoa muitos pecados"
+      },
+      {
+        "at": "Pv 25.22",
+        "texto": "você amontoará brasas vivas sobre a cabeça dele",
+        "nt": "Rm 12.20-21",
+        "nota": "Quem dá comida ao inimigo com fome vence o mal fazendo o bem"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O pai ensina o filho", "de": 1, "ate": 7 },
+    { "titulo": "A sabedoria e a loucura chamam", "de": 8, "ate": 9 },
+    { "titulo": "Os provérbios de Salomão", "de": 10, "ate": 22 },
+    { "titulo": "As palavras dos sábios", "de": 23, "ate": 24 },
+    { "titulo": "Os provérbios copiados no tempo de Ezequias", "de": 25, "ate": 29 },
+    { "titulo": "Os ditados de Agur", "de": 30, "ate": 30 },
+    { "titulo": "A mãe de Lemuel e a esposa dedicada", "de": 31, "ate": 31 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Uma mulher bonita que não se porta com decência é como uma joia de ouro no focinho de um porco.",
+      "ref": "Pv 11.22"
+    },
+    {
+      "texto": "Há caminhos que parecem perfeitos, e quem segue por eles encontra a morte no fim. Esse ditado está duas vezes no livro, quase do mesmo jeito (Pv 14.12).",
+      "ref": "Pv 16.25"
+    },
+    {
+      "texto": "O comprador diz que está muito caro e pechincha o preço. Em casa, ele se gaba para todo mundo da boa compra que fez.",
+      "ref": "Pv 20.14"
+    },
+    {
+      "texto": "Dois ditados seguidos parecem brigar. Um manda não discutir com o tolo, para não ficar igual a ele. O outro manda responder ao tolo, para ele não pensar que está ficando sábio.",
+      "ref": "Pv 26.4-5"
+    },
+    {
+      "texto": "A sanguessuga tem duas filhas, e elas gritam: “Me dá! Me dá!”",
+      "ref": "Pv 30.15"
+    }
+  ],
+  "procure": {
+    "texto": "O preguiçoso aparece mais de quinze vezes no livro. Duas vezes ele põe a mão no prato e acha cansativo demais levar a comida à boca (Pv 19.24).",
+    "ref": "Pv 26.15"
+  }
+}
