@@ -1,0 +1,149 @@
+{
+  "nome": "3 João",
+  "grupo": "Outras cartas",
+  "numero": 64,
+  "capitulos": 1,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἰωάννου",
+    "transliteracao": "Ioannou",
+    "traducao": "de João",
+    "texto": "É a terceira carta com o nome de João. Ela cabe num capítulo só, de quinze versículos."
+  },
+  "autoria": {
+    "texto": "João se apresenta como o ancião e escreve ao querido Gaio.",
+    "apoio": "Logo na primeira linha, ele diz que ama Gaio de verdade.",
+    "refs": [
+      "3Jo 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Gaio recebe bem os irmãos que passam pela cidade dele em viagem. Na mesma igreja, Diótrefes gosta de aparecer como líder e não acolhe esses irmãos. Ele ainda expulsa da igreja quem quer acolher. João escreve para Gaio continuar fazendo o bem.",
+    "refs": [
+      "3Jo 1.5",
+      "3Jo 1.9-10"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Querido Gaio",
+      "sub": "Gaio anda na verdade",
+      "desenho": "pegadas",
+      "galhos": [
+        {
+          "texto": "João chama Gaio de querido e diz que ama esse amigo de verdade.",
+          "ref": "3Jo 1.1"
+        },
+        {
+          "texto": "Alguns irmãos chegam de viagem e contam a João que Gaio vive conforme a verdade. João fica muito satisfeito.",
+          "ref": "3Jo 1.3"
+        },
+        {
+          "texto": "João diz que não tem alegria maior do que ouvir que os filhos dele andam na verdade.",
+          "ref": "3Jo 1.4"
+        }
+      ],
+      "conexao": "Gaio mostra essa verdade no cuidado com os mestres que viajam."
+    },
+    {
+      "titulo": "Os viajantes",
+      "sub": "Gaio abre a casa",
+      "desenho": "sandalia",
+      "galhos": [
+        {
+          "texto": "João diz que Gaio faz uma boa obra para Deus quando cuida dos irmãos que estão de passagem.",
+          "ref": "3Jo 1.5"
+        },
+        {
+          "texto": "Os viajantes contam à igreja de João o amor e a generosidade de Gaio. João fica contente quando Gaio despede esses irmãos de um jeito que agrada a Deus.",
+          "ref": "3Jo 1.6"
+        },
+        {
+          "texto": "João e os irmãos devem receber bem esses viajantes, para trabalharem juntos na obra do Senhor.",
+          "ref": "3Jo 1.8"
+        }
+      ],
+      "jesus": {
+        "texto": "Na última ceia, Jesus diz que quem recebe alguém enviado por ele recebe Jesus. Quem recebe Jesus recebe o Pai, que o enviou.",
+        "refs": [
+          "Jo 13.20"
+        ]
+      },
+      "conexao": "João escreveu à igreja sobre esses irmãos, mas alguém não quer ouvir (3Jo 1.9)."
+    },
+    {
+      "titulo": "Diótrefes",
+      "sub": "Um homem que gosta de aparecer",
+      "desenho": "lugar-de-honra",
+      "galhos": [
+        {
+          "texto": "Diótrefes gosta de aparecer como líder dos irmãos. Ele se recusa a ouvir João e o grupo dele.",
+          "ref": "3Jo 1.9"
+        },
+        {
+          "texto": "Ele fala mal de João e usa palavras de insulto. Ele não acolhe os irmãos que viajam, proíbe os outros de acolher e tenta expulsar da igreja quem acolhe. João promete contar tudo quando chegar.",
+          "ref": "3Jo 1.10"
+        },
+        {
+          "texto": "João pede que Gaio não se deixe levar pelo mau exemplo. Quem faz o bem mostra que é filho de Deus, e quem continua no mal está longe de Deus.",
+          "ref": "3Jo 1.11"
+        }
+      ],
+      "conexao": "Do outro lado está Demétrio, e todos falam bem dele (3Jo 1.12)."
+    },
+    {
+      "titulo": "Demétrio",
+      "sub": "João se despede de Gaio",
+      "desenho": "ramo-de-oliveira",
+      "galhos": [
+        {
+          "texto": "Todos falam bem de Demétrio, e até a verdade fala a favor dele. João e o grupo dizem o mesmo, e Gaio sabe que eles falam a verdade.",
+          "ref": "3Jo 1.12"
+        },
+        {
+          "texto": "João ainda tem muito para contar, mas não quer escrever. Ele espera ver Gaio em breve, e os dois vão ter muito o que conversar.",
+          "ref": "3Jo 1.13-14"
+        },
+        {
+          "texto": "No fim, João deseja paz a Gaio. Os amigos de João mandam lembranças, e ele pede que Gaio leve a saudação dele a cada amigo de lá.",
+          "ref": "3Jo 1.15"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "João conta por que os irmãos saem de cidade em cidade: “eles estão viajando por causa do Nome, sem receber ajuda alguma dos gentios”. Em Atos, os apóstolos saem do Sinédrio alegres por serem humilhados por amor ao nome do Senhor Jesus Cristo (At 5.41).",
+    "ref": "3Jo 1.7",
+    "desenho": "cruz",
+    "pares": [
+      {
+        "at": "Jó 31.32",
+        "texto": "a minha porta sempre esteve aberta ao viajante",
+        "nt": "3Jo 1.5",
+        "nota": "João elogia Gaio por cuidar dos mestres e missionários que passam em viagem"
+      },
+      {
+        "at": "Sl 37.27",
+        "texto": "deixe a maldade e comece a praticar o bem.",
+        "nt": "3Jo 1.11",
+        "nota": "Gaio deve seguir só o que é bom, sem imitar o mau exemplo"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Gaio anda na verdade", "de": 1, "ate": 4 },
+    { "titulo": "Os irmãos que viajam", "de": 5, "ate": 8 },
+    { "titulo": "Diótrefes e Demétrio", "de": 9, "ate": 12 },
+    { "titulo": "Até breve", "de": 13, "ate": 15 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "João ora pela saúde de Gaio. Ele quer que o corpo do amigo esteja tão bem quanto a alma, que ele sabe que vai bem.",
+      "ref": "3Jo 1.2"
+    }
+  ],
+  "procure": {
+    "texto": "Marque os nomes de Gaio, Diótrefes e Demétrio. Gaio e Demétrio vivem do jeito que João pede, e Diótrefes faz o contrário."
+  }
+}
