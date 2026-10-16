@@ -1,0 +1,148 @@
+{
+  "nome": "2 João",
+  "grupo": "Outras cartas",
+  "numero": 63,
+  "capitulos": 1,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἰωάννου",
+    "transliteracao": "Ioannou",
+    "traducao": "de João",
+    "texto": "A carta inteira cabe num capítulo só, com treze versículos. O nome João está logo na primeira palavra."
+  },
+  "autoria": {
+    "texto": "João se apresenta como o ancião e escreve à senhora eleita e aos filhos dela.",
+    "apoio": "A carta não diz quem é essa senhora nem onde ela mora.",
+    "refs": [
+      "2Jo 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "João encontra alguns filhos da senhora eleita vivendo na verdade e fica feliz. Ele escreve para lembrar que amar a Deus é fazer o que ele manda. Ele também avisa que há enganadores pelo mundo, e o resto ele vai dizer quando visitar a família.",
+    "refs": [
+      "2Jo 1.4",
+      "2Jo 1.6-7",
+      "2Jo 1.12"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "A verdade",
+      "sub": "Uma carta à senhora eleita",
+      "desenho": "rolo-aberto",
+      "galhos": [
+        {
+          "texto": "João ama a senhora e os filhos dela na verdade. Todos os outros que conhecem a verdade também amam essa família.",
+          "ref": "2Jo 1.1"
+        },
+        {
+          "texto": "Esse amor tem um motivo. A verdade fica para sempre no coração deles.",
+          "ref": "2Jo 1.2"
+        },
+        {
+          "texto": "João deseja graça, misericórdia e paz de Deus Pai e de Jesus Cristo, o Filho, em verdade e amor.",
+          "ref": "2Jo 1.3"
+        }
+      ],
+      "conexao": "João conta o que viu nos filhos da senhora (2Jo 1.4)."
+    },
+    {
+      "titulo": "O mandamento",
+      "sub": "Amar uns aos outros",
+      "desenho": "tabuas-da-lei",
+      "galhos": [
+        {
+          "texto": "Os filhos da senhora obedecem aos mandamentos que vieram do Pai. Isso deixa João muito feliz.",
+          "ref": "2Jo 1.4"
+        },
+        {
+          "texto": "João pede à senhora que se lembre do mandamento velho que Deus deu bem no princípio, que uns amem os outros.",
+          "ref": "2Jo 1.5"
+        },
+        {
+          "texto": "Quem ama a Deus faz tudo o que ele manda.",
+          "ref": "2Jo 1.6"
+        }
+      ],
+      "conexao": "João avisa que falsos líderes saíram pelo mundo (2Jo 1.7)."
+    },
+    {
+      "titulo": "Cuidado",
+      "sub": "Jesus veio como ser humano",
+      "desenho": "coroa-de-louros",
+      "galhos": [
+        {
+          "texto": "Os falsos líderes não creem que Jesus Cristo veio à terra como ser humano, com um corpo como o nosso. João chama quem faz isso de enganador e anticristo.",
+          "ref": "2Jo 1.7"
+        },
+        {
+          "texto": "João e os irmãos trabalharam duro por um prêmio. Ninguém deve perder esse prêmio, e todos devem buscar do Senhor a recompensa completa.",
+          "ref": "2Jo 1.8"
+        },
+        {
+          "texto": "Se os irmãos forem além do ensino de Cristo, eles perdem Deus de vista.",
+          "ref": "2Jo 1.9"
+        }
+      ],
+      "conexao": "Os enganadores também podem chegar para ensinar os irmãos (2Jo 1.10)."
+    },
+    {
+      "titulo": "Em casa",
+      "sub": "Quem entra e quem vem visitar",
+      "desenho": "porta-trancada",
+      "galhos": [
+        {
+          "texto": "Se alguém ensina sem crer no que Cristo ensinou, os irmãos não devem convidar essa pessoa para entrar em casa nem cumprimentar.",
+          "ref": "2Jo 1.10"
+        },
+        {
+          "texto": "Quem convida ou cumprimenta essa pessoa vira companheiro dela e das obras más que ela faz.",
+          "ref": "2Jo 1.11"
+        },
+        {
+          "texto": "João ainda tem muito a dizer, mas não quer pôr isso na carta. Ele espera ir ver todos em breve e conversar face a face, para a alegria dele ficar completa.",
+          "ref": "2Jo 1.12"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "João avisa os irmãos: “se forem leais aos ensinos de Cristo, terão a Deus também. E então, terão tanto o Pai como o Filho”.",
+    "ref": "2Jo 1.9",
+    "desenho": "cruz-no-monte",
+    "pares": [
+      {
+        "at": "Dt 11.1",
+        "texto": "Amem o Senhor, o seu Deus, e obedeçam às suas leis",
+        "nt": "2Jo 1.6",
+        "nota": "Amar a Deus é fazer tudo o que ele manda, e ele manda que uns amem os outros"
+      },
+      {
+        "at": "Dt 13.3",
+        "texto": "não deem ouvidos às palavras daquele profeta ou sonhador.",
+        "nt": "2Jo 1.10",
+        "nota": "Os irmãos não devem convidar para casa quem chega ensinando e não crê no que Cristo ensinou"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "A saudação", "de": 1, "ate": 3 },
+    { "titulo": "O mandamento do amor", "de": 4, "ate": 6 },
+    { "titulo": "Os enganadores", "de": 7, "ate": 11 },
+    { "titulo": "João espera ver todos", "de": 12, "ate": 13 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Nos quatro primeiros versículos, a palavra verdade aparece cinco vezes.",
+      "ref": "2Jo 1.1-4"
+    },
+    {
+      "texto": "No fim, quem manda saudações são os filhos da irmã da senhora, que também foi escolhida por Deus.",
+      "ref": "2Jo 1.13"
+    }
+  ],
+  "procure": {
+    "texto": "Conte quantas vezes João fala de amor e de verdade. Na bênção do começo, as duas palavras aparecem juntas."
+  }
+}
