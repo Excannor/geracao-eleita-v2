@@ -1,0 +1,223 @@
+{
+  "nome": "Malaquias",
+  "grupo": "Profetas menores",
+  "numero": 39,
+  "capitulos": 4,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "מַלְאָכִי",
+    "transliteracao": "Malakhi",
+    "traducao": "meu mensageiro",
+    "texto": "Malakh é mensageiro. Malaquias também chama os sacerdotes de mensageiros do Senhor dos Exércitos."
+  },
+  "autoria": {
+    "texto": "O Senhor manda uma mensagem ao povo de Israel pelo profeta Malaquias. O livro não conta mais nada sobre ele.",
+    "refs": [
+      "Ml 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O povo diz que servir ao Senhor é difícil demais e traz para o altar animais roubados, aleijados e doentes. A cada acusação, o povo pergunta o que fez de errado, e o Senhor responde. Nos últimos versículos, o Senhor promete enviar o profeta Elias antes do grande dia do julgamento.",
+    "refs": [
+      "Ml 1.13",
+      "Ml 4.5"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Eu amei vocês",
+      "sub": "O amor que o povo não vê",
+      "desenho": "muro-derrubado",
+      "galhos": [
+        {
+          "texto": "O Senhor diz que sempre amou o povo, e o povo quer saber como. O Senhor responde que mostrou o amor dele quando amou Jacó.",
+          "ref": "Ml 1.2"
+        },
+        {
+          "texto": "Esaú é irmão de Jacó, e o Senhor rejeitou esse irmão. Ele destruiu as montanhas do reino de Esaú e deu aquelas terras aos chacais do deserto.",
+          "ref": "Ml 1.3"
+        },
+        {
+          "texto": "O Senhor manda o povo de Israel levantar os olhos e ver o que Deus está fazendo. Todos vão dizer que o poder do Senhor vai muito além das fronteiras do país.",
+          "ref": "Ml 1.5"
+        }
+      ],
+      "conexao": "O filho respeita o pai, e o Senhor pergunta aos sacerdotes por que eles não respeitam o Pai deles (Ml 1.6)."
+    },
+    {
+      "titulo": "Animais cegos",
+      "sub": "Os sacerdotes dão o pior",
+      "desenho": "altar-com-brasas",
+      "galhos": [
+        {
+          "texto": "Os sacerdotes dizem que não faz mal oferecer no altar um animal cego, aleijado ou doente. O Senhor manda experimentar dar um animal assim de presente ao governador.",
+          "ref": "Ml 1.8"
+        },
+        {
+          "texto": "O Senhor queria achar um sacerdote que fechasse as portas do templo para acabar com esses sacrifícios. Ele não tem prazer neles e não aceita as ofertas.",
+          "ref": "Ml 1.10"
+        },
+        {
+          "texto": "Quem promete ao Senhor um carneiro forte do rebanho e entrega um animal doente é maldito. O Senhor é o Grande Rei, e o nome dele deve ser respeitado entre as nações.",
+          "ref": "Ml 1.14"
+        },
+        {
+          "texto": "O Senhor deu leis a Levi para que ele tivesse vida e paz. Levi mostrou respeito por Deus e andou junto com o Senhor. Ele tirou muita gente dos caminhos do pecado.",
+          "ref": "Ml 2.5-6"
+        },
+        {
+          "texto": "Os lábios do sacerdote deviam guardar o conhecimento de Deus para o povo. Esses sacerdotes deixaram o caminho do Senhor, e muita gente caiu no pecado com o que eles ensinam.",
+          "ref": "Ml 2.7-8"
+        }
+      ],
+      "conexao": "O Senhor faz o povo desprezar esses sacerdotes (Ml 2.9). Malaquias pergunta: “Não somos filhos do mesmo pai?” (Ml 2.10)"
+    },
+    {
+      "titulo": "Infiéis",
+      "sub": "O povo quebra a aliança",
+      "desenho": "duas-aliancas",
+      "galhos": [
+        {
+          "texto": "Em Judá e em Jerusalém, os homens desrespeitam o templo e casam com mulheres que adoram deuses estrangeiros.",
+          "ref": "Ml 2.11"
+        },
+        {
+          "texto": "No altar do Senhor, o povo chora e cobre tudo de lágrimas, porque o Senhor não dá mais atenção às ofertas.",
+          "ref": "Ml 2.13"
+        },
+        {
+          "texto": "O povo pergunta chorando por que Deus abandonou todos. O Senhor viu a traição dos homens que deixaram a esposa, a companheira que foi fiel desde jovem.",
+          "ref": "Ml 2.14"
+        },
+        {
+          "texto": "“Eu odeio o divórcio e os homens violentos”, diz o Deus de Israel. Ele manda cada um ter cuidado e não ser infiel.",
+          "ref": "Ml 2.16"
+        }
+      ],
+      "conexao": "O povo cansa o Senhor e ainda pergunta: “Onde está o Deus da justiça?” (Ml 2.17)"
+    },
+    {
+      "titulo": "O mensageiro",
+      "sub": "O Senhor vem ao templo",
+      "desenho": "cadinho-no-fogo",
+      "galhos": [
+        {
+          "texto": "O Senhor promete mandar o mensageiro dele na frente, para preparar o caminho. Depois, de repente, o Senhor que eles procuram vai chegar ao templo.",
+          "ref": "Ml 3.1"
+        },
+        {
+          "texto": "“Quem pode suportar a sua presença?”, pergunta o Senhor dos Exércitos. Quem vem ao templo vai ser como o fogo que purifica o ouro e como o sabão que limpa as roupas mais sujas.",
+          "ref": "Ml 3.2"
+        },
+        {
+          "texto": "O Senhor vai sentar como quem purifica a prata e vigiar até queimar todo o refugo. Ele vai limpar os levitas, e eles vão servir ao Senhor com o coração puro.",
+          "ref": "Ml 3.3"
+        },
+        {
+          "texto": "Feiticeiros e mentirosos vão ter o Senhor como testemunha contra eles. Ele também vai acusar quem rouba o salário do empregado e explora as viúvas e os órfãos.",
+          "ref": "Ml 3.5"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus diz que João Batista é o homem de quem está escrito que Deus ia enviar um mensageiro na frente para preparar o caminho. Esse caminho é o de Jesus.",
+        "refs": [
+          "Mt 11.10"
+        ]
+      },
+      "conexao": "O Senhor não muda, e por isso o povo de Jacó ainda não foi destruído (Ml 3.6)."
+    },
+    {
+      "titulo": "Roubar a Deus",
+      "sub": "O Senhor quer o povo de volta",
+      "desenho": "celeiro-novo",
+      "galhos": [
+        {
+          "texto": "O Senhor chama o povo: “Ainda é tempo de voltar para mim”. Ele promete voltar também, e o povo pergunta quando foi que deixou o Senhor.",
+          "ref": "Ml 3.7"
+        },
+        {
+          "texto": "A nação inteira rouba o Senhor nos dízimos e nas ofertas. O povo ainda pergunta quando foi que roubou.",
+          "ref": "Ml 3.8-9"
+        },
+        {
+          "texto": "Deus manda o povo trazer todos os dízimos aos depósitos do templo, para haver comida na casa dele. Ele desafia o povo a pôr Deus à prova e promete abrir as janelas do céu.",
+          "ref": "Ml 3.10"
+        },
+        {
+          "texto": "O Senhor promete proteger as colheitas dos bichos e das pragas. As nações vão chamar o povo de abençoado, porque a terra vai vibrar de alegria.",
+          "ref": "Ml 3.11-12"
+        }
+      ],
+      "conexao": "O Senhor acusa o povo de ser arrogante com ele, e o povo pergunta o que falou de errado (Ml 3.13)."
+    },
+    {
+      "titulo": "Nomes no livro",
+      "sub": "Deus não esquece quem é dele",
+      "desenho": "lista-em-rolo",
+      "galhos": [
+        {
+          "texto": "O povo diz que é bobagem adorar e obedecer a Deus. Eles dizem que os arrogantes vivem felizes e que os maus prosperam.",
+          "ref": "Ml 3.14-15"
+        },
+        {
+          "texto": "Os que obedecem e amam o Senhor conversam uns com os outros. O Senhor tem na frente dele um livro com o registro de quem obedece e honra o nome dele.",
+          "ref": "Ml 3.16"
+        },
+        {
+          "texto": "O Senhor diz: “Eles serão meus”. Ele não vai deixar essa gente sofrer, como o pai não castiga o filho obediente. Todos vão ver a diferença entre o justo e o mau.",
+          "ref": "Ml 3.17-18"
+        },
+        {
+          "texto": "No fim, o povo tem de lembrar das leis que o Senhor deu a Israel por Moisés, no monte Horebe.",
+          "ref": "Ml 4.4"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Mas para vocês, os que me obedecem, nascerá o sol da justiça, trazendo cura em seus raios.” No Novo Testamento, o sol nascente vai raiar para dar luz a quem está na escuridão e na sombra da morte (Lc 1.78-79). Jesus diz que é a luz do mundo. Quem segue Jesus não tropeça na escuridão e tem a luz da vida (Jo 8.12).",
+    "ref": "Ml 4.2",
+    "desenho": "sol-nascendo",
+    "pares": [
+      {
+        "at": "Ml 1.11",
+        "texto": "Em todo o mundo os homens oferecerão incenso e sacrifícios puros para me honrar.",
+        "nt": "Jo 4.21, 23",
+        "nota": "Jesus diz a uma mulher que vem a hora em que os verdadeiros adoradores vão adorar o Pai em espírito e em verdade, nem naquele monte, nem em Jerusalém"
+      },
+      {
+        "at": "Ml 4.1",
+        "texto": "Os orgulhosos e os maus serão queimados como palha.",
+        "nt": "Mt 3.11-12",
+        "nota": "Alguém muito maior está vindo. Ele vai separar a palha do grão e queimar a palha com fogo que nunca se apaga"
+      },
+      {
+        "at": "Ml 4.6",
+        "texto": "A pregação desse profeta fará os pais e os filhos se unirem de coração novamente",
+        "nt": "Lc 1.13, 17",
+        "nota": "João vai na frente do Senhor, no espírito e poder de Elias, para fazer o coração dos pais voltar aos filhos"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O amor de Deus e as ofertas cegas", "de": 1, "ate": 1 },
+    { "titulo": "Os sacerdotes e a esposa deixada", "de": 2, "ate": 2 },
+    { "titulo": "O mensageiro e os dízimos", "de": 3, "ate": 3 },
+    { "titulo": "O sol da justiça e Elias", "de": 4, "ate": 4 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Se o povo de Esaú reconstruir as ruínas, o Senhor vai destruir tudo de novo. O país vai ser chamado “A Terra da Maldade”.",
+      "ref": "Ml 1.4"
+    },
+    {
+      "texto": "Quem obedece ao Senhor vai pisar os perversos como se eles fossem cinza debaixo dos pés.",
+      "ref": "Ml 4.3"
+    }
+  ],
+  "procure": {
+    "texto": "Procure as perguntas que o povo faz de volta ao Senhor. Quando o Senhor fala das ofertas impuras, os sacerdotes perguntam: “Sacrifícios impuros? Quando fizemos uma coisa dessas?” Essas perguntas voltam até perto do fim do livro.",
+    "ref": "Ml 1.7"
+  }
+}

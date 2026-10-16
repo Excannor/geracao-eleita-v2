@@ -742,6 +742,16 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   diz "os três amigos". Mt 24.15 é o único verso do NT que nomeia "o profeta Daniel"; entrou como par, só com o que Jesus
   diz, sem ligar a "coisa horrível" a fato nenhum. As setenta semanas (Dn 9.24-27) e os 1.290 e 1.335 dias (Dn 12.11-12)
   ficaram fora, porque o texto não interpreta e cada igreja lê de um jeito; o capítulo 9 entra pela oração e por Gabriel.
+- 2026-10-16 · conteúdo · Sofonias a Malaquias: nos profetas curtos, a raiz, as conexões, os pares, a curiosidade e o
+  "procure" disputam os mesmos 38 a 55 versículos → a tabela de versículos vem antes do texto, e os ramos seguem o corte que
+  o próprio livro faz (as mensagens com data em Ageu, as perguntas do povo em Malaquias). Os versículos que o NT cita
+  desses livros já estavam em Mateus, Marcos e João (Zc 9.9, 12.10, 13.7): o mapa novo usa outro versículo do NT para a
+  mesma passagem (Jo 12.14-16, Ap 1.7) ou deixa a passagem só no galho. Mt 27.9-10 atribui a Jeremias as trinta moedas
+  de Zc 11.12-13 → o mapa diz "a profecia", sem nome de profeta, e o caso vai marcado para o pastor.
+- 2026-10-16 · desenho · Zacarias: `moedas-de-prata` são as nove moedas da mulher de Lc 15.8, com o chão de 8 a 112, e no
+  disco de "[Livro] e Cristo" o chão saiu cortado → desenho de disco tem o chão curto (de uns 22 a 98) e se mede antes; virou
+  `trinta-moedas`. Chama com dois arquinhos dentro virou rosto de gato no `cadinho-no-fogo`: chama leva uma linha só de
+  chama interna, aberta embaixo.
 
 ## Entrada, sessão e página inicial
 

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o fogo que purifica a prata (Ml 3.2-3): o cadinho do ourives, uma tigela funda de bico curto, preso por uma tenaz comprida que sai para o alto, à direita, com o pino no cruzamento; embaixo, as chamas sobre as brasas, entre pedras. O metal derretido na boca do cadinho é a única área sálvia. O chão vai antes das pedras. -->
+<path class="k" d="M10 104H110"/>
+<path class="k p" d="M34 103L36 96L44 95L46 103Z"/>
+<path class="k p" d="M74 103L76 95L84 96L86 103Z"/>
+<path class="k p" d="M42 101C39 90 43 83 46 76C48 81 50 83 52 83C52 76 54 70 58 63C62 70 64 76 66 81C68 79 70 76 72 73C77 82 79 92 76 101Z"/>
+<path class="h" d="M52 99C50 93 54 88 58 83C61 89 64 93 63 99"/>
+<path class="k" d="M72 60L104 30M70 66L106 38"/>
+<circle class="k p" cx="94" cy="39" r="2.4"/>
+<path class="k p" d="M38 52C38 64 46 76 58 76C70 76 78 64 78 52Z"/>
+<ellipse class="k s" cx="58" cy="52" rx="20" ry="5"/>
+<path class="k p" d="M37 51L30 48L38 55"/>
+<path class="h" d="M44 62c2 5 6 8 10 9"/>
+</svg>
