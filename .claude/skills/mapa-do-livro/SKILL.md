@@ -399,6 +399,8 @@ desce quando o mapa abre e fica guardado pelo service worker para abrir sem rede
   375 e 360px (os nomes antigos que já quebravam ficam numa lista de exceções, como aviso). As capturas de referência ficam em
   `design/mapas/capturas/` (Explorar com o cartão fechado e aberto e cada mapa inteiro, claro e
   escuro, a 390px; o "antes" de um pacote de ajustes vai numa subpasta, como `antes-pacote/`).
+  Elas são só locais: o .gitignore deixa toda imagem de `design/` fora do repositório, porque
+  cada captura ficava para sempre no histórico e enchia o cartão do servidor. Não force o add.
 
 Para um mapa novo: escrever o JSON, desenhar os SVGs e revisá-los ampliados (seção 2), rodar o
 checador, subir o servidor e olhar a tela inteira nos dois temas (seção 2, revisão), pôr o slug

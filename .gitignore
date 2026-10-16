@@ -2,8 +2,14 @@
 node_modules/
 dist/
 capturas/
-# As capturas de referência dos mapas dos livros são versionadas (design/mapas/capturas)
-!design/mapas/capturas/
+# Imagens de design (capturas de tela, mocks, folhas de revisão) ficam fora do repositório:
+# o app não usa nenhuma, e cada uma ficava para sempre no histórico, inchando o .git do
+# servidor a cada atualização. Os scripts e textos de design/ continuam versionados.
+design/**/*.png
+design/**/*.jpg
+design/**/*.jpeg
+design/**/*.webp
+design/**/*.gif
 
 # Dados de quem usa o app: banco (contas, e-mails, progresso), backups, JSON legados
 # e as chaves de sessão e de push. Nunca vão para o repositório.
