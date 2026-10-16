@@ -748,6 +748,16 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   (Mt 9.13; 12.7), foi para "Oseias e Cristo". Os 13.14 já está em 1 Coríntios e Os 1.10 e 2.23 em Romanos: ficaram só nos galhos.
   O teste-mapas reprovou duas conexões de 128 e 129 caracteres com duas referências (5 linhas a 390px): com duas refs, uns 100.
 
+- 2026-10-16 · conteúdo · Obadias, 21 versículos e "cada referência uma vez": raiz, galhos, conexões, pares, cristo e curiosidades
+  disputam verso por verso → montar a tabela versículo a versículo antes de escrever (1 autoria, 2-4 ramo 1, 5 conexão, 6-8
+  ramo 2, 9 curiosidade, 10 e 15 raiz, 11-14 ramo 3 e par, 16 conexão, 17-19 ramo 4, 20 curiosidade, 21 cristo). Uma conexão
+  ficou sem referência ("Depois, Deus diz por que Edom vai cair"), e o cartão ficou com um par só. Nos profetas menores, os
+  versículos que o NT cita já estavam em outros mapas (Jl 2.28 e Am 9.11 em Atos, Os 13.14 em 1 Coríntios): o destaque
+  pegou um eco contado sem chamar de profecia (Am 8.9 com Lc 23.44-46) ou o lado de Jesus (Lc 24.49 para o Espírito de Joel).
+  Desenho: o prumo encostado num muro com a travessa no alto parecia forca; sem travessa, com o taco encostado na face do
+  muro e o peso rente, leu como prumo. O ninho no alto de uma rocha simétrica parecia saco amarrado; com o penhasco de um lado
+  só e a parede reta do outro, leu como rocha. Dois ovos lado a lado no ninho viram coração.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de

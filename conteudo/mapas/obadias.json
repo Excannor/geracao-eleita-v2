@@ -1,0 +1,147 @@
+{
+  "nome": "Obadias",
+  "grupo": "Profetas menores",
+  "numero": 31,
+  "capitulos": 1,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "עֹבַדְיָה",
+    "transliteracao": "Ovadyah",
+    "traducao": "servo do Senhor",
+    "texto": "Eved quer dizer servo, e Yah é um pedaço do nome do Senhor. O livro tem um capítulo só, com vinte e um versículos."
+  },
+  "autoria": {
+    "texto": "Obadias conta uma visão em que o Senhor mostra a ele o futuro da terra de Edom.",
+    "apoio": "Obadias não diz o nome do pai nem o tempo em que viveu.",
+    "refs": [
+      "Ob 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Edom vai ser destruído por causa do que fez contra o irmão Jacó. Deus avisa que o dia do Senhor está perto de todas as nações. O que Edom fez a Judá, outros vão fazer a Edom.",
+    "refs": [
+      "Ob 1.10",
+      "Ob 1.15"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Ninho de águia",
+      "sub": "Deus derruba o orgulho de Edom",
+      "desenho": "ninho-na-rocha",
+      "galhos": [
+        {
+          "texto": "Deus avisa Edom que as outras nações vão desprezar esse povo. Edom vai virar um povo sem importância.",
+          "ref": "Ob 1.2"
+        },
+        {
+          "texto": "O povo de Edom mora nas rochas altas, onde ninguém alcança. Ele pergunta com orgulho: “Quem poderá nos derrubar daqui?”",
+          "ref": "Ob 1.3"
+        },
+        {
+          "texto": "Deus responde que, mesmo se Edom subir como a águia e fizer o ninho entre as estrelas, ele vai derrubar esse povo lá do alto.",
+          "ref": "Ob 1.4"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus diz ao povo e aos discípulos que quem se acha grande vai ser humilhado, e quem se humilha vai ser engrandecido.",
+        "refs": [
+          "Mt 23.1, 12"
+        ]
+      },
+      "conexao": "Ladrões de noite não levariam tudo, e quem rouba uvas deixa alguns cachos (Ob 1.5)."
+    },
+    {
+      "titulo": "Falsos amigos",
+      "sub": "Edom perde tudo",
+      "desenho": "cacho-de-uvas",
+      "galhos": [
+        {
+          "texto": "Com Edom vai ser pior. Cada canto das casas vai ser revirado, e todos os tesouros vão ser roubados.",
+          "ref": "Ob 1.6"
+        },
+        {
+          "texto": "Os aliados de Edom vão virar inimigos e ajudar a expulsar o povo da terra. Os amigos em quem Edom confia vão preparar armadilhas.",
+          "ref": "Ob 1.7"
+        },
+        {
+          "texto": "Naquele dia, não vai sobrar um homem sábio em Edom. Deus vai transformar os sábios em tolos.",
+          "ref": "Ob 1.8"
+        }
+      ],
+      "conexao": "Depois, Deus diz por que Edom vai cair."
+    },
+    {
+      "titulo": "O irmão Jacó",
+      "sub": "Edom não ajuda o irmão",
+      "desenho": "dois-dados",
+      "galhos": [
+        {
+          "texto": "Quando os invasores levaram as riquezas e tiraram a sorte para dividir Jerusalém, Edom ficou de lado. O povo não levantou um dedo para ajudar os irmãos.",
+          "ref": "Ob 1.11"
+        },
+        {
+          "texto": "Edom chegou a invadir Judá no dia da desgraça para matar e roubar. O povo ficou rico à custa dos irmãos.",
+          "ref": "Ob 1.13"
+        },
+        {
+          "texto": "Nas encruzilhadas, Edom matou os fugitivos e entregou os refugiados judeus aos inimigos.",
+          "ref": "Ob 1.14"
+        }
+      ],
+      "conexao": "Edom bebeu o cálice do castigo, e as nações em volta também vão beber (Ob 1.16)."
+    },
+    {
+      "titulo": "Monte Sião",
+      "sub": "O Senhor vai reinar",
+      "desenho": "feixe-no-fogo",
+      "galhos": [
+        {
+          "texto": "O monte Sião vai ser um refúgio. A família de Jacó vai voltar a morar na terra prometida.",
+          "ref": "Ob 1.17"
+        },
+        {
+          "texto": "Deus compara a família de Jacó ao fogo e Edom à palha. Ninguém da família de Edom vai sobrar.",
+          "ref": "Ob 1.18"
+        },
+        {
+          "texto": "O povo do Neguebe vai ocupar as montanhas de Edom, e a tribo de Benjamim vai ficar com Gileade.",
+          "ref": "Ob 1.19"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Os vitoriosos subirão ao monte Sião e governarão a terra de Edom. E o Senhor será Rei!” No Apocalipse, o sétimo anjo toca a trombeta, e vozes no céu dizem que o reino deste mundo agora é do Senhor e do Cristo dele, que vai reinar para sempre (Ap 11.15).",
+    "ref": "Ob 1.21",
+    "desenho": "coroa",
+    "pares": [
+      {
+        "at": "Ob 1.12",
+        "texto": "Não deviam ter ficado satisfeitos no dia da desgraça de seu irmão.",
+        "nt": "1Jo 3.17",
+        "nota": "Quem tem o suficiente para viver bem, vê um irmão em necessidade e não ajuda não tem como ter o amor de Deus"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O orgulho de Edom", "de": 1, "ate": 4 },
+    { "titulo": "Edom saqueado pelos amigos", "de": 5, "ate": 9 },
+    { "titulo": "O que Edom fez ao irmão", "de": 10, "ate": 14 },
+    { "titulo": "O dia do Senhor e o monte Sião", "de": 15, "ate": 21 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Os soldados de Temã vão tremer, e os montes de Esaú vão ficar sem homens.",
+      "ref": "Ob 1.9"
+    },
+    {
+      "texto": "Quem voltar do exílio vai ocupar o litoral até Sarepta, ao norte. Os que foram levados de Jerusalém para Sefarade também vão voltar.",
+      "ref": "Ob 1.20"
+    }
+  ],
+  "procure": {
+    "texto": "Procure os montes. Os montes de Esaú ficam sem homens, e o monte Sião vira refúgio. No fim, os vitoriosos sobem a Sião para governar Edom."
+  }
+}

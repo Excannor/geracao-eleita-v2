@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o ninho no alto da rocha, entre as estrelas (Ob 3-4): um penhasco de um lado só, com a encosta em degraus à esquerda e a parede reta à direita, o ninho de gravetos na beira do alto, com as pontas dos gravetos para fora, e as estrelas no céu, uma delas em sálvia. -->
+<path class="k" d="M6 106H114"/>
+<path class="k p" d="M10 106L18 92L16 84L26 74L24 64L34 56L36 46L48 40H66L70 46L68 58L72 66L70 80L74 90L72 106Z"/>
+<path class="h" d="M22 96L32 94M30 80L44 78M36 66L50 64M44 52L56 50M58 70L66 68M52 90L64 88M56 58L64 56"/>
+<path class="k p" d="M42 34Q57 38 72 34Q69 44 57 44Q45 44 42 34Z"/>
+<path class="h" d="M37 31L46 37M77 31L68 37M44 30L50 36M70 30L64 36M57 29V35M46 38L58 43M52 36L68 42M62 36L70 39M47 42L56 37M61 43L69 37"/>
+<path class="k s" d="M94 18L96 23.2L101.6 23.5L97.2 27.1L98.7 32.5L94 29.4L89.3 32.5L90.8 27.1L86.4 23.5L92 23.2Z"/>
+<path class="h" d="M22 24V32M18 28H26M40 12V18M37 15H43M104 52V58M101 55H107M74 12V18M71 15H77M88 74V80M85 77H91"/>
+</svg>
