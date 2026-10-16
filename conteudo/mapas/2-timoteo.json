@@ -1,0 +1,233 @@
+{
+  "nome": "2 Timóteo",
+  "grupo": "Cartas de Paulo",
+  "numero": 55,
+  "capitulos": 4,
+  "significado": {
+    "lingua": "grego",
+    "original": "Τιμόθεον",
+    "transliteracao": "Timotheon",
+    "traducao": "a Timóteo",
+    "texto": "É a segunda carta para Timóteo. Dessa vez, o autor chama Timóteo de filho amado."
+  },
+  "autoria": {
+    "texto": "Paulo, apóstolo de Jesus Cristo, escreve de novo a Timóteo.",
+    "apoio": "O autor conta que Deus escolheu ele para pregar e ensinar como apóstolo.",
+    "refs": [
+      "2Tm 1.1-2",
+      "2Tm 1.11"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O autor está na prisão como um criminoso, por causa do evangelho. Mesmo assim, ele diz que a palavra de Deus não está em cadeias. Ele pede que Timóteo venha logo e que ensine o que ouviu a homens de confiança, que vão ensinar a outros.",
+    "refs": [
+      "2Tm 2.9",
+      "2Tm 4.9",
+      "2Tm 2.2"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "A chama",
+      "sub": "Sem medo e sem vergonha",
+      "desenho": "fogueira",
+      "galhos": [
+        {
+          "texto": "O autor lembra das lágrimas de Timóteo na despedida. Ele lembra também da fé sincera da avó Lóide e da mãe Eunice, a mesma fé que agora está em Timóteo.",
+          "ref": "2Tm 1.4-5"
+        },
+        {
+          "texto": "Timóteo recebeu um dom quando o autor pôs as mãos sobre a cabeça dele. Agora ele tem de manter viva a chama desse dom.",
+          "ref": "2Tm 1.6"
+        },
+        {
+          "texto": "O Espírito que Deus deu não é de covardia. Ele dá poder, amor e equilíbrio.",
+          "ref": "2Tm 1.7"
+        },
+        {
+          "texto": "Timóteo não pode ter medo de falar do Senhor nem de ser amigo de um preso por causa de Cristo. Deus vai dar forças para ele sofrer junto.",
+          "ref": "2Tm 1.8"
+        },
+        {
+          "texto": "O autor sofre na prisão e não tem vergonha disso. Ele diz: “conheço aquele em quem confio”.",
+          "ref": "2Tm 1.12"
+        },
+        {
+          "texto": "Quando chega a Roma, Onesíforo procura o autor por toda parte até encontrar. As visitas dele são como um sopro de ar fresco.",
+          "ref": "2Tm 1.16-17"
+        }
+      ],
+      "conexao": "O autor chama Timóteo de filho e pede que ele fique forte na graça de Cristo Jesus (2Tm 2.1)."
+    },
+    {
+      "titulo": "Bom soldado",
+      "sub": "Sofrer junto pelo evangelho",
+      "desenho": "arado",
+      "galhos": [
+        {
+          "texto": "Timóteo tem de sofrer junto como um bom soldado de Jesus Cristo. Soldado não se prende aos negócios deste mundo, para agradar quem alistou ele.",
+          "ref": "2Tm 2.3-4"
+        },
+        {
+          "texto": "O atleta segue as regras, senão é desclassificado e fica sem prêmio.",
+          "ref": "2Tm 2.5"
+        },
+        {
+          "texto": "Se trabalhar duro como um lavrador, Timóteo vai ser o primeiro a receber a parte dele na colheita.",
+          "ref": "2Tm 2.6"
+        },
+        {
+          "texto": "O autor aceita sofrer, se isso trouxer salvação e glória em Cristo Jesus para quem Deus escolheu.",
+          "ref": "2Tm 2.10"
+        },
+        {
+          "texto": "Para se consolar, o autor lembra um ensino verdadeiro. Quem morre por Cristo vai viver com ele, e quem suporta o sofrimento vai governar com ele.",
+          "ref": "2Tm 2.11-12"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus continua fiel mesmo quando os seus são infiéis. Ele não pode negar a si mesmo.",
+        "refs": [
+          "2Tm 2.13"
+        ]
+      },
+      "conexao": "Timóteo deve lembrar isso ao povo e mandar ninguém brigar por coisas sem importância (2Tm 2.14)."
+    },
+    {
+      "titulo": "Vasilha de ouro",
+      "sub": "Ensinar certo e fugir de briga",
+      "desenho": "tigelas-de-ouro",
+      "galhos": [
+        {
+          "texto": "Timóteo deve ser um bom obreiro, que não fica envergonhado quando Deus examina o trabalho dele. Ele ensina certo a palavra da verdade.",
+          "ref": "2Tm 2.15"
+        },
+        {
+          "texto": "Himeneu e Fileto espalham o ensino deles como gangrena. Eles dizem que a ressurreição dos mortos já aconteceu e enfraquecem a fé de alguns.",
+          "ref": "2Tm 2.17-18"
+        },
+        {
+          "texto": "Numa casa rica há vasilhas de ouro e de prata, e também de madeira e de barro. Quem fica longe do pecado é como a vasilha de ouro puro, que Cristo usa para toda boa obra.",
+          "ref": "2Tm 2.20-21"
+        },
+        {
+          "texto": "Timóteo deve fugir dos desejos impuros da juventude. Ele busca a fé, o amor e a paz junto com quem ama o Senhor de coração puro.",
+          "ref": "2Tm 2.22"
+        },
+        {
+          "texto": "O servo do Senhor não briga. Ele é amável com todos e corrige com mansidão quem é contra a verdade, na esperança de que essas pessoas creiam.",
+          "ref": "2Tm 2.24-25"
+        }
+      ],
+      "conexao": "Nos últimos dias, ser servo de Cristo vai ser muito difícil (2Tm 3.1)."
+    },
+    {
+      "titulo": "As Escrituras",
+      "sub": "Firme no que aprendeu",
+      "desenho": "rolo-aberto",
+      "galhos": [
+        {
+          "texto": "Nos últimos dias, as pessoas vão gostar mais do prazer do que de Deus. Elas vão parecer religiosas, mas não vão acreditar em nada do que ouvem.",
+          "ref": "2Tm 3.4-5"
+        },
+        {
+          "texto": "Timóteo viu de perto como o autor vive e sofre. Ele sabe o que aconteceu em Antioquia, Icônio e Listra, e que o Senhor livrou o autor de tudo.",
+          "ref": "2Tm 3.10-11"
+        },
+        {
+          "texto": "Quem decide viver para Deus em Cristo Jesus vai sofrer perseguição.",
+          "ref": "2Tm 3.12"
+        },
+        {
+          "texto": "Timóteo continua firme no que aprendeu. Desde bem pequeno ele conhece as Sagradas Escrituras, que dão sabedoria para a salvação pela fé em Cristo Jesus.",
+          "ref": "2Tm 3.14-15"
+        },
+        {
+          "texto": "Toda a Escritura foi dada por inspiração de Deus e serve para ensinar e corrigir. Com ela, a pessoa fica preparada para toda boa obra.",
+          "ref": "2Tm 3.16-17"
+        }
+      ],
+      "conexao": "O autor insiste que Timóteo pregue a palavra a tempo e fora de tempo (2Tm 4.2)."
+    },
+    {
+      "titulo": "A coroa",
+      "sub": "O autor terminou a luta",
+      "desenho": "coroa-de-louros",
+      "galhos": [
+        {
+          "texto": "Um dia, as pessoas não vão suportar a verdade. Elas vão procurar mestres que digam só o que querem ouvir.",
+          "ref": "2Tm 4.3-4"
+        },
+        {
+          "texto": "O autor sabe que o tempo dele está quase terminado. Ele lutou muito pelo Senhor e ficou fiel no meio de tudo, e agora chegou a hora de descansar.",
+          "ref": "2Tm 4.6-7"
+        },
+        {
+          "texto": "Naquele dia, o Senhor, o justo Juiz, vai dar ao autor uma coroa de justiça. Ele vai dar a coroa também a todos os que esperam a volta dele.",
+          "ref": "2Tm 4.8"
+        },
+        {
+          "texto": "Demas ama este mundo e abandona o autor. Só Lucas está com ele, e o autor pede que Timóteo traga Marcos.",
+          "ref": "2Tm 4.10-11"
+        },
+        {
+          "texto": "Na primeira vez diante do juiz, ninguém fica do lado do autor. O Senhor fica com ele e dá forças para ele anunciar a mensagem inteira aos gentios.",
+          "ref": "2Tm 4.16-17"
+        }
+      ],
+      "jesus": {
+        "texto": "Um dia, Cristo Jesus vai aparecer para estabelecer o Reino dele. Jesus vai julgar os vivos e os mortos.",
+        "refs": [
+          "2Tm 4.1"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "Deus salvou e escolheu os seus muito antes do princípio do mundo, sem ninguém merecer. Agora isso ficou claro com a vinda do Salvador Jesus Cristo, que quebrou o poder da morte.",
+    "ref": "2Tm 1.9-10",
+    "desenho": "tumulo-aberto",
+    "pares": [
+      {
+        "at": "Nm 16.5",
+        "texto": "o Senhor mostrará quem pertence a ele",
+        "nt": "2Tm 2.19",
+        "nota": "A verdade de Deus é um alicerce firme, e nele está escrito que o Senhor conhece os que são dele"
+      },
+      {
+        "at": "Sl 62.12",
+        "texto": "retribuirá a cada um o que merece, conforme as suas ações",
+        "nt": "2Tm 4.14",
+        "nota": "O ferreiro Alexandre fez muito mal ao autor, e o Senhor vai retribuir de acordo com o que ele fez"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Sem vergonha do evangelho", "de": 1, "ate": 1 },
+    { "titulo": "Soldado e obreiro", "de": 2, "ate": 2 },
+    { "titulo": "Os últimos dias e as Escrituras", "de": 3, "ate": 3 },
+    { "titulo": "A coroa e os amigos", "de": 4, "ate": 4 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Todos os irmãos que vieram da província da Ásia abandonaram o autor, até Fígelo e Hermógenes.",
+      "ref": "2Tm 1.15"
+    },
+    {
+      "texto": "Janes e Jambres se opuseram a Moisés, e o autor compara os mestres falsos aos dois.",
+      "ref": "2Tm 3.8"
+    },
+    {
+      "texto": "Timóteo deve trazer a capa que ficou em Trôade, com o irmão Carpo, e os livros, em especial os pergaminhos.",
+      "ref": "2Tm 4.13"
+    },
+    {
+      "texto": "O autor deixou Trófimo doente em Mileto. Ele pede que Timóteo chegue antes do inverno.",
+      "ref": "2Tm 4.20-21"
+    }
+  ],
+  "procure": {
+    "texto": "Preste atenção na vergonha. O autor não se envergonha da prisão, Onesíforo também não, e o bom obreiro não precisa ficar envergonhado diante de Deus."
+  }
+}

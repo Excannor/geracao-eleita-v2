@@ -1,0 +1,181 @@
+{
+  "nome": "Tito",
+  "grupo": "Cartas de Paulo",
+  "numero": 56,
+  "capitulos": 3,
+  "significado": {
+    "lingua": "grego",
+    "original": "Τίτῳ",
+    "transliteracao": "Tito",
+    "traducao": "a Tito",
+    "texto": "Como as cartas a Timóteo, esta tem o nome de quem recebe, e não de uma igreja ou de uma cidade."
+  },
+  "autoria": {
+    "texto": "Paulo, escravo de Deus e apóstolo de Jesus Cristo, escreve a Tito. Ele chama Tito de filho na fé que os dois têm em comum.",
+    "apoio": "No fim, todos os que estão com o autor mandam lembranças.",
+    "refs": [
+      "Tt 1.1",
+      "Tt 1.4",
+      "Tt 3.15"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O autor deixa Tito na ilha de Creta para pôr em ordem o que ainda falta e escolher líderes em cada cidade. Na ilha há muitos faladores e enganadores, atrás do dinheiro dos irmãos. O autor escreve para Tito ensinar com toda a autoridade, sem deixar ninguém desprezar o que ele diz.",
+    "refs": [
+      "Tt 1.5",
+      "Tt 1.10-11",
+      "Tt 2.15"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Em ordem",
+      "sub": "Líderes para cada cidade",
+      "desenho": "lista-em-rolo",
+      "galhos": [
+        {
+          "texto": "Os líderes precisam ter boa fama e ser maridos de uma só mulher. Os filhos deles têm de amar o Senhor.",
+          "ref": "Tt 1.6"
+        },
+        {
+          "texto": "O bispo é ministro de Deus. Ele não pode ser orgulhoso nem briguento.",
+          "ref": "Tt 1.7"
+        },
+        {
+          "texto": "Quem lidera se agarra à verdade que aprendeu. Assim ele pode ensinar os outros e mostrar onde erra quem discorda.",
+          "ref": "Tt 1.9"
+        },
+        {
+          "texto": "Para quem tem o coração puro, tudo é puro. Quem tem a mente impura acha maldade em tudo.",
+          "ref": "Tt 1.15"
+        },
+        {
+          "texto": "Essa gente diz que conhece a Deus, mas o jeito de viver nega isso.",
+          "ref": "Tt 1.16"
+        }
+      ],
+      "conexao": "Tito deve defender a vida decente que acompanha a fé verdadeira (Tt 2.1)."
+    },
+    {
+      "titulo": "Equilíbrio",
+      "sub": "Cada idade aprende a viver bem",
+      "desenho": "balanca",
+      "galhos": [
+        {
+          "texto": "Tito ensina os homens mais velhos a serem moderados e dignos de respeito, com amor e perseverança.",
+          "ref": "Tt 2.2"
+        },
+        {
+          "texto": "As mulheres mais velhas não devem falar mal dos outros nem beber demais. Elas ensinam o bem e ajudam as mais jovens a amar o marido e os filhos.",
+          "ref": "Tt 2.3-4"
+        },
+        {
+          "texto": "Tito tem de ser exemplo de boas obras para os jovens e animar todos a levar a vida a sério.",
+          "ref": "Tt 2.6-7"
+        },
+        {
+          "texto": "A fala de Tito tem de ser tão sensata que quem quiser discutir fique com vergonha, sem nada para criticar.",
+          "ref": "Tt 2.8"
+        },
+        {
+          "texto": "Os escravos crentes não podem responder mal nem roubar. Quem vê como eles são confiáveis tem vontade de crer no ensino de Deus.",
+          "ref": "Tt 2.9-10"
+        }
+      ],
+      "conexao": "Deus oferece agora a todos o presente da salvação (Tt 2.11)."
+    },
+    {
+      "titulo": "A bondade",
+      "sub": "Deus salva por compaixão",
+      "desenho": "jarro-derramado",
+      "galhos": [
+        {
+          "texto": "Deus quer que quem crê deixe a vida sem Deus e os prazeres errados, para viver direito no tempo de agora.",
+          "ref": "Tt 2.12"
+        },
+        {
+          "texto": "Tito lembra aos irmãos que obedeçam às autoridades e fiquem prontos para qualquer trabalho honesto. Eles não devem falar mal de ninguém e têm de ser bondosos com todos.",
+          "ref": "Tt 3.1-2"
+        },
+        {
+          "texto": "Antes, o autor e os irmãos também eram insensatos e desobedientes. Eles viviam escravos de desejos ruins, cheios de rancor e inveja.",
+          "ref": "Tt 3.3"
+        }
+      ],
+      "jesus": {
+        "texto": "Deus derrama o Espírito Santo com fartura, por causa do que Jesus Cristo fez. Pela graça, quem crê é aceito como justo e vira herdeiro da vida eterna.",
+        "refs": [
+          "Tt 3.6-7"
+        ]
+      },
+      "conexao": "O autor quer que Tito insista nesse ensino, para os irmãos fazerem boas obras o tempo todo (Tt 3.8)."
+    },
+    {
+      "titulo": "Boas obras",
+      "sub": "Vidas que dão fruto",
+      "desenho": "cesto-de-colheita",
+      "galhos": [
+        {
+          "texto": "Tito não deve se envolver em discussões tolas nem em brigas sobre as leis judaicas. Esse tipo de assunto não vale nada e só faz mal.",
+          "ref": "Tt 3.9"
+        },
+        {
+          "texto": "Os irmãos avisam duas vezes quem provoca divisões. Depois disso, eles cortam relações com essa pessoa.",
+          "ref": "Tt 3.10-11"
+        },
+        {
+          "texto": "O autor vai mandar Ártemas ou Tíquico até Tito. Quando um deles chegar, Tito deve ir depressa a Nicópolis, onde o autor vai passar o inverno.",
+          "ref": "Tt 3.12"
+        },
+        {
+          "texto": "Os irmãos aprendem a fazer o bem e a ajudar quem precisa, para a vida deles dar fruto.",
+          "ref": "Tt 3.14"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "Quando chega o tempo, Deus, nosso Salvador, mostra a bondade e o amor dele. Ele salva os seus por compaixão, e não porque eles sejam bons. O Espírito Santo lava os pecados e renova a vida de quem crê.",
+    "ref": "Tt 3.4-5",
+    "desenho": "sol-nascendo",
+    "pares": [
+      {
+        "at": "Nm 23.19",
+        "texto": "Deus não é homem, pois não mente",
+        "nt": "Tt 1.2",
+        "nota": "Deus prometeu a vida eterna antes do princípio do mundo, e ele não pode mentir"
+      },
+      {
+        "at": "Is 43.11",
+        "texto": "além de mim não há outro Salvador",
+        "nt": "Tt 2.13",
+        "nota": "Quem crê espera o dia em que vai ver a glória do grande Deus e Salvador, Jesus Cristo"
+      },
+      {
+        "at": "Ez 37.23",
+        "texto": "Eu mesmo purificarei o meu povo!",
+        "nt": "Tt 2.14",
+        "nota": "Jesus deu a vida para livrar os seus dos pecados e fazer deles um povo dedicado a boas obras"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Líderes para Creta", "de": 1, "ate": 1 },
+    { "titulo": "A vida que combina com a verdade", "de": 2, "ate": 2 },
+    { "titulo": "Salvos pela bondade de Deus", "de": 3, "ate": 3 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Um profeta nascido em Creta diz que os cretenses são todos mentirosos e só vivem para encher a barriga. O autor concorda e manda Tito falar duro com os irmãos, para ficarem fortes na fé.",
+      "ref": "Tt 1.12-13"
+    },
+    {
+      "texto": "Tito deve ajudar o advogado Zenas e Apolo na viagem, para não faltar nada a eles.",
+      "ref": "Tt 3.13"
+    }
+  ],
+  "procure": {
+    "texto": "Conte as vezes em que aparecem as boas obras. Tito é exemplo delas, e Jesus deu a vida para ter um povo dedicado a elas."
+  }
+}
