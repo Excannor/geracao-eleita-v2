@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- Nínive em ruínas (Sf 2.14): a cidade vira pasto, e as corujas moram nas ruínas dos palácios. Uma coruja de frente, pousada no alto partido de uma coluna larga (a quebra aparece dos dois lados da coruja), com os olhos grandes, as duas pontas de pena na cabeça e as garras sobre a quebra. À esquerda, o toco de outra coluna; à direita, um pedaço de coluna caído de lado, com a ponta redonda à mostra, em sálvia. O chão vai antes das pedras. -->
+<path class="k" d="M4 104C40 101 80 101 116 104"/>
+<path class="k p" d="M10 103V86L14 82L18 85L23 80L28 84V103Z"/>
+<path class="h" d="M15 88V101M22 87V101"/>
+<path class="k p" d="M36 103V74L40 69L44 72L50 70H70L76 72L80 68L84 73V103Z"/>
+<path class="h" d="M42 78V100M50 77V101M58 77V101M66 77V101M74 77V100M80 78V100"/>
+<path class="k s" d="M93 88H110L112 92L109 95L112 98L110 102H93"/>
+<ellipse class="k p" cx="93" cy="95" rx="4.5" ry="7"/>
+<path class="h" d="M98 91.5H107M98 95H108M98 98.5H107"/>
+<path class="k p" d="M60 70C46 70 40 60 40 48C40 38 44 30 47 26L52 31C55 30 65 30 68 31L73 26C76 30 80 38 80 48C80 60 74 70 60 70Z"/>
+<path class="k" d="M44 50C46 60 51 66 56 68M76 50C74 60 69 66 64 68"/>
+<path class="h" d="M54 56l2 3M60 58l0 3M66 56l-2 3M57 62l1 2M63 62l-1 2"/>
+<circle class="k p" cx="52" cy="41" r="6.5"/>
+<circle class="k p" cx="68" cy="41" r="6.5"/>
+<circle class="e" cx="52" cy="41" r="2.6"/>
+<circle class="e" cx="68" cy="41" r="2.6"/>
+<path class="k e" d="M57.5 47L62.5 47L60 52Z"/>
+<path class="k" d="M54 70v3M57 70v3M63 70v3M66 70v3"/>
+</svg>

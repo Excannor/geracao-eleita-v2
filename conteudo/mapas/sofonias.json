@@ -1,0 +1,195 @@
+{
+  "nome": "Sofonias",
+  "grupo": "Profetas menores",
+  "numero": 36,
+  "capitulos": 3,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "צְפַנְיָה",
+    "transliteracao": "Tsefanyah",
+    "traducao": "o Senhor esconde",
+    "texto": "Tsafan é esconder, guardar, e Yah é um pedaço do nome do Senhor. O livro não diz por que Sofonias tem esse nome."
+  },
+  "autoria": {
+    "texto": "Sofonias é filho de Cuchi e trineto de um homem chamado Ezequias. O Senhor entrega a mensagem a Sofonias no tempo de Josias, rei de Judá.",
+    "refs": [
+      "Sf 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Sofonias avisa que o grande dia do Senhor está muito perto e vai chegar depressa. Nesse dia, o Senhor vai esmagar Judá e Jerusalém com o punho dele. O livro termina com uma promessa. O Senhor vai trazer o povo de volta para casa e dar a ele um nome respeitado no mundo inteiro.",
+    "refs": [
+      "Sf 1.4",
+      "Sf 1.14",
+      "Sf 3.20"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Dia da ira",
+      "sub": "Deus procura com lanternas",
+      "desenho": "lamparina-acesa",
+      "galhos": [
+        {
+          "texto": "O Senhor avisa que vai arrasar tudo o que existe na terra. Ele vai destruir os homens e os animais. Até as aves e os peixes vão morrer.",
+          "ref": "Sf 1.2-3"
+        },
+        {
+          "texto": "No terraço de casa, tem gente que se curva diante do sol, da lua e das estrelas. Outros adoram o Senhor e juram pelo nome dele, mas fazem o mesmo com o deus Moloque.",
+          "ref": "Sf 1.5"
+        },
+        {
+          "texto": "Naquele dia, um grito de alarme vai sair da porta dos Peixes. O Senhor manda os moradores da cidade baixa de Jerusalém chorarem. Quem vive de negociar com prata vai ficar arruinado.",
+          "ref": "Sf 1.10-11"
+        },
+        {
+          "texto": "Deus vai procurar com lanternas nos becos mais escuros de Jerusalém. Ele quer achar quem vive acomodado no pecado. Essa gente pensa assim: “O Senhor não nos incomodará”.",
+          "ref": "Sf 1.12"
+        },
+        {
+          "texto": "Quem vive assim vai perder as propriedades para os ladrões. Eles constroem casas novas e não vão chegar a morar nelas. Plantam vinhas e nunca vão beber o vinho.",
+          "ref": "Sf 1.13"
+        },
+        {
+          "texto": "Sofonias pede que o povo se junte e ore enquanto ainda há tempo. Os humildes devem pedir ao Senhor que salve e fazer o que é certo. Talvez escapem do castigo no dia da ira.",
+          "ref": "Sf 2.1-3"
+        }
+      ],
+      "conexao": "Sofonias fala também dos vizinhos de Judá. A cidade de Gaza vai ficar deserta (Sf 2.4)."
+    },
+    {
+      "titulo": "As nações",
+      "sub": "Os vizinhos de Judá também caem",
+      "desenho": "coruja-nas-ruinas",
+      "galhos": [
+        {
+          "texto": "Os filisteus moram no litoral, e o julgamento também é para eles. O litoral vai virar pasto, com currais de ovelhas. Quem sobrar de Judá vai deitar para descansar nas casas vazias de Ascalom.",
+          "ref": "Sf 2.5-7"
+        },
+        {
+          "texto": "Moabe e Amom riem do povo do Senhor e ameaçam tomar a terra. O Senhor jura que os dois vão ser destruídos como Sodoma e Gomorra e virar um lugar de urtigas e poços de sal.",
+          "ref": "Sf 2.8-9"
+        },
+        {
+          "texto": "O Senhor vai acabar com os deuses das outras nações. Todos os homens vão adorar o Senhor, cada um na sua terra.",
+          "ref": "Sf 2.11"
+        },
+        {
+          "texto": "A capital da Assíria é Nínive, e o Senhor vai fazer dela um campo seco como um deserto. Ouriços e corujas vão morar nas ruínas dos palácios. Os corvos vão gritar nas portas.",
+          "ref": "Sf 2.13-14"
+        },
+        {
+          "texto": "Nínive se sente segura e diz para si mesma: “Em todo o mundo não há cidade tão poderosa!” Quem passar pelas ruínas vai zombar e sacudir a cabeça.",
+          "ref": "Sf 2.15"
+        }
+      ],
+      "conexao": "A próxima cidade é Jerusalém, e Sofonias diz que ela é violenta e opressora (Sf 3.1)."
+    },
+    {
+      "titulo": "Jerusalém",
+      "sub": "A cidade que não escuta",
+      "desenho": "muralha",
+      "galhos": [
+        {
+          "texto": "Ninguém em Jerusalém ouve a voz do Senhor nem aceita correção. O povo não confia no Senhor e não procura o Deus dele.",
+          "ref": "Sf 3.2"
+        },
+        {
+          "texto": "Os líderes da cidade são como leões que rugem atrás das vítimas. Os juízes são como lobos famintos ao cair da noite. Quando chega a madrugada, não sobrou nada das vítimas.",
+          "ref": "Sf 3.3"
+        },
+        {
+          "texto": "Em Jerusalém, os profetas mentem e enganam. Os sacerdotes não obedecem às leis de Deus e profanam o templo.",
+          "ref": "Sf 3.4"
+        },
+        {
+          "texto": "O Senhor continua na cidade e faz sempre o que é justo. A cada dia, a justiça dele fica mais clara, e ninguém dá importância. Os perversos nem sentem vergonha.",
+          "ref": "Sf 3.5"
+        },
+        {
+          "texto": "Deus destruiu muitas nações e deixou as cidades vazias. Ele pensou: “Com certeza, agora eles me ouvirão”. Por mais que castigue, o povo continua nos maus caminhos.",
+          "ref": "Sf 3.6-7"
+        }
+      ],
+      "conexao": "O Senhor pede paciência até o dia de julgar as nações (Sf 3.8). Nesse dia, o povo dele não vai mais ter vergonha (Sf 3.11)."
+    },
+    {
+      "titulo": "A canção",
+      "sub": "O Senhor se alegra com o povo",
+      "desenho": "tamborim",
+      "galhos": [
+        {
+          "texto": "O Senhor promete que só vão ficar os mansos e os humildes. Essa gente vai confiar no nome do Senhor.",
+          "ref": "Sf 3.12"
+        },
+        {
+          "texto": "Sofonias manda a filha de Sião cantar e gritar de alegria. O Senhor tirou as acusações contra o povo e espantou os inimigos.",
+          "ref": "Sf 3.14-15"
+        },
+        {
+          "texto": "Naquele dia, Jerusalém vai ouvir que não precisa ter medo. O Senhor está no meio do povo para salvar, e ele vai amar todos. Sofonias diz que o Senhor vai se alegrar com eles aos gritos.",
+          "ref": "Sf 3.16-17"
+        },
+        {
+          "texto": "O Senhor promete ajuntar os feridos e salvar os fracos. Quem foi levado preso e ouviu ofensas e zombarias vai receber glória.",
+          "ref": "Sf 3.18-19"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus pede que os cansados levem o jugo dele e aprendam com ele, porque ele é manso e humilde de coração. Com Jesus, eles vão achar descanso para a alma.",
+        "refs": [
+          "Mt 11.29"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "“A sua prata e o seu ouro não terão nenhum valor no dia da ira do Senhor para comprarem a sua liberdade.” Deus pagou um resgate para livrar os irmãos. Ele não pagou com ouro ou prata, mas com o sangue precioso de Cristo (1Pe 1.18-19).",
+    "ref": "Sf 1.18",
+    "desenho": "saco-de-prata",
+    "pares": [
+      {
+        "at": "Sf 1.15",
+        "texto": "Um dia de terrível angústia e sofrimento, um dia de ruína e desolação, de escuridão e de nuvens sombrias.",
+        "nt": "2Pe 3.10",
+        "nota": "O dia do Senhor vem de surpresa, como um ladrão"
+      },
+      {
+        "at": "Sf 3.9",
+        "texto": "Então eu mudarei a língua dos povos para que todos invoquem o nome do Senhor",
+        "nt": "Ap 7.9-10",
+        "nota": "Gente de todas as nações e línguas, mais do que dá para contar, fica em pé diante do trono e do Cordeiro"
+      },
+      {
+        "at": "Sf 3.13",
+        "texto": "O remanescente do povo de Israel não cometerá injustiças, nem estará cheio de mentira e engano.",
+        "nt": "Ap 14.4-5",
+        "nota": "Os que seguem o Cordeiro por todo lugar não podem ser acusados de nenhuma mentira"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O grande dia do Senhor", "de": 1, "ate": 1 },
+    { "titulo": "Os humildes e os povos em volta", "de": 2, "ate": 2 },
+    { "titulo": "Jerusalém e a canção da volta", "de": 3, "ate": 3 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "No dia do julgamento, o Senhor vai castigar os líderes de Judá e até quem anda com roupa estrangeira.",
+      "ref": "Sf 1.8"
+    },
+    {
+      "texto": "Deus manda um recado de uma frase só para o povo da Etiópia: “Vocês também, etíopes, serão mortos pela espada do Senhor”.",
+      "ref": "Sf 2.12"
+    },
+    {
+      "texto": "O povo de Deus que vive espalhado além dos rios da Etiópia vai trazer ofertas ao Senhor.",
+      "ref": "Sf 3.10"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a palavra dia. No começo, Sofonias manda todos ficarem calados diante do Senhor, porque o dia do julgamento chegou. Ele fala desse dia muitas vezes. Nos últimos versículos, “naquele dia” é hora de cantar.",
+    "ref": "Sf 1.7"
+  }
+}
