@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- o fio de prumo junto ao muro (Am 7.7-8): um muro de pedras em fiadas e, com o taco de madeira encostado no alto da face do muro, o fio esticado e o peso do prumo em sálvia, que desce rente ao muro e termina em ponta. -->
+<path class="k" d="M8 104H112"/>
+<path class="k p" d="M22 104V24H66V104"/>
+<path class="h" d="M22 38H66M22 52H66M22 66H66M22 80H66M22 94H66M44 24V38M33 38V52M55 38V52M44 52V66M33 66V80M55 66V80M44 80V94M33 94V104M55 94V104"/>
+<path class="k" d="M76 38V68"/>
+<path class="k p" d="M66 28H86V38H66Z"/>
+<path class="k s" d="M67 68H85V84L76 98L67 84Z"/>
+<path class="h" d="M67 75H85"/>
+</svg>

@@ -1,0 +1,265 @@
+{
+  "nome": "Amós",
+  "grupo": "Profetas menores",
+  "numero": 30,
+  "capitulos": 9,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "עָמוֹס",
+    "transliteracao": "Amos",
+    "traducao": "carregado",
+    "texto": "Amas é o verbo carregar um peso. No livro, Deus avisa que vai fazer Israel gemer como uma carroça carregada de feixes de trigo."
+  },
+  "autoria": {
+    "texto": "Amós é um pastor que cuida dos rebanhos em Tecoa. Ele tem as visões quando Uzias é rei de Judá e Jeroboão é rei de Israel, dois anos antes do terremoto.",
+    "apoio": "Amós diz ao sacerdote de Betel que não é profeta nem filho de profeta. Ele cuida de bois e de sicômoros, até o Senhor tirar Amós de junto dos rebanhos.",
+    "refs": [
+      "Am 1.1",
+      "Am 7.14-15"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O Senhor ruge de Sião, e Amós leva a voz dele até Israel. Em Samaria, quem vive no luxo se deita em camas de marfim. Deus diz que quer ver a justiça correndo como um rio. No fim, ele promete plantar Israel na terra, para nunca mais ser arrancado.",
+    "refs": [
+      "Am 1.2",
+      "Am 6.1, 4",
+      "Am 5.24",
+      "Am 9.15"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Peca sem parar",
+      "sub": "Deus julga os vizinhos",
+      "desenho": "fogueira",
+      "galhos": [
+        {
+          "texto": "O Senhor diz que o povo de Damasco peca sem parar. Eles feriram o povo de Deus em Gileade com trilhos de ferro, e Deus vai pôr fogo no palácio do rei Hazael.",
+          "ref": "Am 1.3-4"
+        },
+        {
+          "texto": "Gaza e Tiro venderam o povo de Deus como escravo para Edom. Tiro nem se lembrou do tratado de amizade.",
+          "ref": "Am 1.6, 9"
+        },
+        {
+          "texto": "Edom perseguiu o irmão com a espada na mão, sem misericórdia, e a raiva dele não passa nunca. Deus vai pôr fogo em Temã.",
+          "ref": "Am 1.11-12"
+        },
+        {
+          "texto": "Os moradores de Amom mataram mulheres grávidas para ganhar mais terra em Gileade.",
+          "ref": "Am 1.13"
+        },
+        {
+          "texto": "Moabe queimou os ossos do rei de Edom até virarem cinza. Deus vai mandar fogo contra as fortalezas de Queriote.",
+          "ref": "Am 2.1-2"
+        },
+        {
+          "texto": "Judá também peca sem parar. O povo rejeitou as leis de Deus e pecou como os antepassados.",
+          "ref": "Am 2.4"
+        }
+      ],
+      "conexao": "O fogo vai queimar até as fortalezas de Jerusalém (Am 2.5). Depois, chega a vez de Israel."
+    },
+    {
+      "titulo": "Sandálias",
+      "sub": "Israel vende o pobre",
+      "desenho": "sandalia",
+      "galhos": [
+        {
+          "texto": "Israel vende o justo por prata e o pobre por um par de sandálias. O povo pisa os pobres e nega justiça às pessoas simples.",
+          "ref": "Am 2.6-7"
+        },
+        {
+          "texto": "Nas festas religiosas, eles se deitam sobre roupas tomadas como penhor. No templo, oferecem vinho recebido como multa.",
+          "ref": "Am 2.8"
+        },
+        {
+          "texto": "Deus lembra que tirou Israel do Egito e expulsou os amorreus, altos como cedros. Por quarenta anos, ele guiou o povo pelo deserto.",
+          "ref": "Am 2.9-10"
+        },
+        {
+          "texto": "Entre os filhos de Israel, Deus escolheu nazireus e profetas. O povo fez os nazireus beber vinho e mandou os profetas pararem de falar.",
+          "ref": "Am 2.11-12"
+        },
+        {
+          "texto": "Naquele dia, o corredor mais rápido não vai conseguir fugir, e o arqueiro vai errar a mira. Até os guerreiros mais corajosos vão largar as armas e correr.",
+          "ref": "Am 2.14-16"
+        }
+      ],
+      "conexao": "Deus escolheu Israel entre todos os povos da terra. Por isso, vai castigar o povo pelos pecados (Am 3.2)."
+    },
+    {
+      "titulo": "O leão rugiu",
+      "sub": "Israel não volta para Deus",
+      "desenho": "altar-com-pontas",
+      "galhos": [
+        {
+          "texto": "O leão só ruge na floresta quando apanha a presa. Quando o leão ruge, todo mundo tem medo, e quando o Senhor anuncia o julgamento, alguém tem de profetizar.",
+          "ref": "Am 3.4, 8"
+        },
+        {
+          "texto": "Um pastor tenta tirar a ovelha da boca do leão e só salva duas pernas e um pedaço da orelha. Assim vai ser com Samaria. Vai sobrar só uma cadeira e uma cama quebrada.",
+          "ref": "Am 3.12"
+        },
+        {
+          "texto": "No dia do castigo, Deus vai arrancar as pontas do altar de Betel. As casas de inverno e de verão e os palácios cobertos de marfim vão desaparecer.",
+          "ref": "Am 3.14-15"
+        },
+        {
+          "texto": "Em Samaria, as “vacas gordas” de Basã maltratam os pobres e pedem mais vinho aos maridos. O Senhor jura que elas vão ser levadas para longe, presas por anzóis.",
+          "ref": "Am 4.1-2"
+        },
+        {
+          "texto": "Deus diz ao povo: “Andem, continuem sacrificando aos ídolos em Betel e em Gilgal”. O povo se orgulha das ofertas e conta tudo aos quatro ventos.",
+          "ref": "Am 4.4-5"
+        },
+        {
+          "texto": "Quando Deus mandou fome e segurou a chuva antes da colheita, gente de duas ou três cidades andou cansada atrás de água. Mesmo assim, o povo não voltou para ele.",
+          "ref": "Am 4.6-8"
+        }
+      ],
+      "conexao": "Israel deve se preparar para o julgamento (Am 4.12). Alguém canta uma canção triste para Israel (Am 5.1)."
+    },
+    {
+      "titulo": "Rio de justiça",
+      "sub": "Busquem o Senhor e vivam",
+      "desenho": "lira",
+      "galhos": [
+        {
+          "texto": "Na canção, a bela virgem Israel cai no chão para nunca mais levantar, e ninguém vem ajudar.",
+          "ref": "Am 5.2"
+        },
+        {
+          "texto": "O Senhor diz a Israel que busque a ele e viva. O povo não deve ir atrás de ídolos em Betel, senão Deus vai passar como fogo, e ninguém vai conseguir apagar.",
+          "ref": "Am 5.4-6"
+        },
+        {
+          "texto": "Quem pisa o pobre e aceita suborno nos tribunais não vai morar nas casas bonitas que constrói nem beber o vinho das videiras que planta.",
+          "ref": "Am 5.11-12"
+        },
+        {
+          "texto": "Israel pede que o dia do Senhor chegue. Só que esse dia vai ser de trevas, como fugir de um leão e cair nas garras de um urso.",
+          "ref": "Am 5.18-19"
+        },
+        {
+          "texto": "Deus diz que odeia as festas religiosas do povo e não aceita as ofertas. Ele manda parar o barulho das canções e não quer ouvir as liras.",
+          "ref": "Am 5.21-23"
+        },
+        {
+          "texto": "Quem vive no luxo bebe vinho à vontade e usa os perfumes mais caros. Ninguém se importa com os irmãos que precisam de ajuda.",
+          "ref": "Am 6.6"
+        }
+      ],
+      "conexao": "O Senhor vai trazer uma nação para apertar Israel de norte a sul (Am 6.14)."
+    },
+    {
+      "titulo": "O prumo",
+      "sub": "Amós vê o que vai acontecer",
+      "desenho": "prumo-no-muro",
+      "galhos": [
+        {
+          "texto": "Numa visão, Amós vê gafanhotos comendo todo o verde da terra e depois um fogo que seca até o mar. Nas duas vezes, ele pede por Israel, que é pequeno, e o Senhor desiste.",
+          "ref": "Am 7.1-6"
+        },
+        {
+          "texto": "O Senhor está ao lado de um muro com um fio de prumo e pergunta: “Amós, o que você está vendo?” Deus vai medir Israel com o prumo e não vai mais adiar o castigo.",
+          "ref": "Am 7.7-8"
+        },
+        {
+          "texto": "Em Betel, o sacerdote Amazias manda dizer ao rei Jeroboão que Amós é um traidor. Depois, manda Amós fugir para Judá e ganhar o pão naquela terra.",
+          "ref": "Am 7.10-12"
+        },
+        {
+          "texto": "Amós vê um cesto cheio de frutas maduras. O Senhor diz que Israel está maduro para o castigo.",
+          "ref": "Am 8.1-2"
+        },
+        {
+          "texto": "Os comerciantes não veem a hora de o sábado acabar para vender trigo com balança falsa. Eles vendem até a palha junto com o trigo.",
+          "ref": "Am 8.5-6"
+        },
+        {
+          "texto": "Naquele dia, Deus vai fazer o sol se pôr no meio do dia e escurecer a terra. As festas vão virar velório.",
+          "ref": "Am 8.9-10"
+        }
+      ],
+      "jesus": {
+        "texto": "Quando Jesus está na cruz, no meio do dia, a escuridão cobre toda a terra até as três da tarde, e a luz do sol desaparece. Então Jesus grita: “Pai, nas tuas mãos entrego o meu espírito”.",
+        "refs": [
+          "Lc 23.44-46"
+        ]
+      },
+      "conexao": "Vai chegar uma fome de ouvir a Palavra do Senhor (Am 8.11). Amós vê o Senhor perto do altar (Am 9.1)."
+    },
+    {
+      "titulo": "Tenda de Davi",
+      "sub": "Deus levanta o que caiu",
+      "desenho": "tenda-com-estacas",
+      "galhos": [
+        {
+          "texto": "Mesmo que o povo se esconda no alto do Carmelo ou no fundo do mar, o Senhor vai buscar todos.",
+          "ref": "Am 9.3"
+        },
+        {
+          "texto": "Deus pergunta se Israel se acha melhor que os etíopes. Ele tirou Israel do Egito, mas também tirou os filisteus de Caftor e os sírios de Quir.",
+          "ref": "Am 9.7"
+        },
+        {
+          "texto": "Como quem peneira trigo, Deus vai sacudir Israel entre as nações. Ele promete não destruir de todo a família de Jacó, e nem um grão vai se perder.",
+          "ref": "Am 9.8-9"
+        },
+        {
+          "texto": "Naquele dia, Deus vai levantar de novo a tenda caída de Davi. Ele vai consertar o que quebrou e devolver a glória de antes.",
+          "ref": "Am 9.11"
+        },
+        {
+          "texto": "As colheitas vão ser tantas que o lavrador vai plantar de novo assim que terminar de colher, e o vinho vai escorrer das colinas. O povo vai reconstruir as cidades e morar nelas.",
+          "ref": "Am 9.13-14"
+        }
+      ]
+    }
+  ],
+  "cristo": {
+    "texto": "“Eu, o Senhor, o Soberano, revelo os meus planos por meio dos meus servos, os profetas.” Hebreus começa lembrando que Deus falou de muitas maneiras aos antepassados pelos profetas. Agora, nestes dias, Deus fala por meio do Filho (Hb 1.1-2).",
+    "ref": "Am 3.7",
+    "desenho": "rolo-aberto",
+    "pares": [
+      {
+        "at": "Am 5.27",
+        "texto": "Por isso, vou mandar todos vocês e todos os seus ídolos para o exílio, para muito além de Damasco",
+        "nt": "At 7.42-43",
+        "nota": "O povo serviu às estrelas no deserto, e Deus vai mandar todos para além da Babilônia"
+      },
+      {
+        "at": "Am 4.11",
+        "texto": "Os sobreviventes pareciam pedaços de lenha, meio queimados, tirados da fogueira.",
+        "nt": "Jd 1.23",
+        "nota": "Quem crê deve salvar alguns, tirando essas pessoas do fogo"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "O fogo sobre os povos vizinhos", "de": 1, "ate": 2 },
+    { "titulo": "Mensagens para Israel", "de": 3, "ate": 6 },
+    { "titulo": "As visões de Amós", "de": 7, "ate": 8 },
+    { "titulo": "O Senhor no altar e a tenda de Davi", "de": 9, "ate": 9 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Amós lembra que o Senhor criou as Plêiades e a constelação de Órion.",
+      "ref": "Am 5.8"
+    },
+    {
+      "texto": "Deus pergunta se cavalos correm sobre as rochas e se bois aram o mar. O povo fez coisa pior e transformou o direito em veneno.",
+      "ref": "Am 6.12"
+    },
+    {
+      "texto": "Na hora do castigo, a terra sobe e desce como o rio Nilo na cheia. Amós usa essa imagem outra vez perto do fim (Am 9.5).",
+      "ref": "Am 8.8"
+    }
+  ],
+  "procure": {
+    "texto": "Procure a frase “vocês não se voltaram para mim”. Deus repete essas palavras cinco vezes, depois de cada castigo que mandou para o povo.",
+    "ref": "Am 4.9"
+  }
+}
