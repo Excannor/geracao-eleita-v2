@@ -78,7 +78,7 @@
     const prontos = livros.filter(([nome]) => porSlug.has(CC.slugDoLivro(nome)));
     const breve = livros.filter(([nome]) => !porSlug.has(CC.slugDoLivro(nome)));
     return (prontos.length
-      ? '<p class="grupo-mapas">Prontos</p><div class="grade-mapas">' + prontos.map(celula).join('') + '</div>'
+      ? (breve.length ? '<p class="grupo-mapas">Prontos</p>' : '') + '<div class="grade-mapas">' + prontos.map(celula).join('') + '</div>'
       : '<p class="passo-dica mapas-nenhum">Nenhum mapa deste testamento ainda.</p>')
       + (breve.length ? '<p class="grupo-mapas">Em breve</p><div class="grade-mapas">' + breve.map(celula).join('') + '</div>' : '');
   }
@@ -103,8 +103,10 @@
       + '<button type="button" class="mapas-cabeca" data-abrir-mapas aria-expanded="' + mapasAberto + '" aria-controls="corpo-mapas">'
       + '<span class="mapas-desenho desenho" aria-hidden="true">' + DESENHO_CARTAO + '</span>'
       + '<span class="mapas-textos"><span class="mapas-titulo" id="titulo-mapas">Mapas dos livros</span>'
-      + '<span class="mapas-linha"><span class="mapas-progresso">' + prontos + ' de ' + LIVROS.length + ' prontos</span>'
-      + '<span class="barra-mapas" aria-hidden="true"><i style="width:' + Math.max(2, Math.round((prontos / LIVROS.length) * 100)) + '%"></i></span></span></span>'
+      // Enquanto faltava livro, a linha contava "N de 66 prontos" com a barra; com os 66 prontos
+      // a contagem não diz mais nada, e fica só o que o cartão traz.
+      + '<span class="mapas-linha"><span class="mapas-progresso">' + (prontos < LIVROS.length ? prontos + ' de ' + LIVROS.length + ' prontos' : 'Os ' + LIVROS.length + ' livros da Bíblia') + '</span>'
+      + (prontos < LIVROS.length ? '<span class="barra-mapas" aria-hidden="true"><i style="width:' + Math.max(2, Math.round((prontos / LIVROS.length) * 100)) + '%"></i></span>' : '') + '</span></span>'
       + '<span class="mapas-seta" aria-hidden="true">' + CC.ico('baixo') + '</span></button>'
       + (deHoje ? '<a class="mapas-hoje" href="#/mapa/' + deHoje.slug + '"><span>Mapa de hoje: <b>' + CC.esc(deHoje.nome) + '</b></span>' + CC.ico('avancar') + '</a>' : '')
       + '<div class="mapas-corpo" id="corpo-mapas"' + (mapasAberto ? '' : ' hidden') + '>'

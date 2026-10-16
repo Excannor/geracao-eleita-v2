@@ -204,6 +204,8 @@
 /* Comece por aqui: a ação é a pílula escura; o nome do passo é longo, então ela é um cartão
    escuro com o texto à esquerda, e não um botão que quebra no meio */
 .comece { margin: 0 0 12px; }
+/* Feito o caminho, ele desce para o fim, logo depois da grade: o mesmo vão de 12px entre os cartões */
+.grade-secoes + .comece { margin-top: 12px; }
 .lista-comece :is(b, small) { text-wrap: pretty; }
 :is(.corpo-comece, .comece-proximo) > .botao.azul { --b: var(--inverso); justify-content: flex-start; min-height: 56px; padding: 14px 20px; border-radius: 26px; color: var(--inverso-tinta); text-align: left; text-wrap: balance; }
 /* A história da Bíblia e Perguntas honestas: ícone em círculo sálvia pálido e o botão redondo

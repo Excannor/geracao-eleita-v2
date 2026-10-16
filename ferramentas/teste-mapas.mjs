@@ -110,8 +110,11 @@ ok(await av('(() => { const b = document.querySelector("' + cab + '"); const cor
   'fechado de início: botão com aria-expanded="false" ligado ao corpo escondido (aria-controls)');
 ok(await av('/Permanent Marker/.test(getComputedStyle(document.querySelector(".mapas-titulo")).fontFamily) && document.querySelector(".mapas-titulo").getClientRects().length === 1'),
   'o título "Mapas dos livros" vem no pincel, numa linha só');
-ok(await av('!!document.querySelector(".mapas-desenho svg path") && /^' + mapas.length + ' de 66 prontos$/.test(document.querySelector(".mapas-progresso").textContent) && !!document.querySelector(".barra-mapas i")'),
-  'o cartão traz o rolo com a pena, "' + mapas.length + ' de 66 prontos" e a barra de progresso');
+// Com os 66 prontos, a contagem e a barra dão lugar a "Os 66 livros da Bíblia".
+const linhaMapas = mapas.length < 66 ? '/^' + mapas.length + ' de 66 prontos$/.test(document.querySelector(".mapas-progresso").textContent) && !!document.querySelector(".barra-mapas i")'
+  : 'document.querySelector(".mapas-progresso").textContent.replace(/[\\u00a0\\u2060]/g, (c) => c === "\\u00a0" ? " " : "") === "Os 66 livros da Bíblia" && !document.querySelector(".barra-mapas") && !document.querySelector(".grupo-mapas")';
+ok(await av('!!document.querySelector(".mapas-desenho svg path") && ' + linhaMapas),
+  mapas.length < 66 ? 'o cartão traz o rolo com a pena, "' + mapas.length + ' de 66 prontos" e a barra de progresso' : 'com os 66 prontos, o cartão traz o rolo com a pena e "Os 66 livros da Bíblia", sem contagem nem barra');
 ok(await av('getComputedStyle(document.querySelector(".cartao-mapas")).backgroundColor === getComputedStyle(document.querySelector(".folha-perfil")).backgroundColor'),
   'o fundo do cartão é o sálvia da folha do alto');
 // No dia 1 o plano lê Gênesis, que tem mapa: o atalho "Mapa de hoje" aparece.
