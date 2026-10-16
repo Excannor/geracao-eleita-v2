@@ -1,0 +1,159 @@
+{
+  "nome": "Filemom",
+  "grupo": "Cartas de Paulo",
+  "numero": 57,
+  "capitulos": 1,
+  "significado": {
+    "lingua": "grego",
+    "original": "Φιλήμονι",
+    "transliteracao": "Philemoni",
+    "traducao": "a Filemom",
+    "texto": "O nome lembra o verbo grego para amar. Na carta, o nome de Onésimo também conta. Ele quer dizer útil, e o autor brinca com isso quando diz que Onésimo não era útil e agora vai ser."
+  },
+  "autoria": {
+    "texto": "Paulo, preso por anunciar Jesus Cristo, escreve com o irmão Timóteo a Filemom e à igreja que se reúne na casa dele.",
+    "apoio": "A carta vai também para a irmã Áfia e para Arquipo, que o autor chama de soldado da cruz.",
+    "refs": [
+      "Fm 1.1-2"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Onésimo era escravo de Filemom e fugiu. Na prisão, ele conhece o autor e vira filho dele na fé. Agora o autor manda Onésimo de volta para Filemom, junto com esta carta.",
+    "refs": [
+      "Fm 1.10",
+      "Fm 1.12",
+      "Fm 1.15"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Gratidão",
+      "sub": "Filemom anima os irmãos",
+      "desenho": "mesa-posta",
+      "galhos": [
+        {
+          "texto": "Sempre que ora por Filemom, o autor agradece a Deus.",
+          "ref": "Fm 1.4"
+        },
+        {
+          "texto": "O autor ouve falar da fé de Filemom no Senhor Jesus e do amor dele por todo o povo de Deus.",
+          "ref": "Fm 1.5"
+        },
+        {
+          "texto": "Filemom enche o autor de alegria e consolo com o amor dele. A bondade de Filemom anima o coração dos irmãos.",
+          "ref": "Fm 1.7"
+        }
+      ],
+      "conexao": "O autor podia exigir um favor em nome de Cristo (Fm 1.8)."
+    },
+    {
+      "titulo": "O pedido",
+      "sub": "Paulo pede por amor",
+      "desenho": "janela-da-prisao",
+      "galhos": [
+        {
+          "texto": "Por amor, Paulo prefere só pedir. Ele já está velho e preso por causa de Jesus Cristo.",
+          "ref": "Fm 1.9"
+        },
+        {
+          "texto": "Antes, Onésimo não era de muita utilidade para Filemom. Agora ele vai ser útil para os dois.",
+          "ref": "Fm 1.11"
+        },
+        {
+          "texto": "O autor queria ficar com Onésimo, para ele ajudar na prisão no lugar de Filemom.",
+          "ref": "Fm 1.13"
+        }
+      ],
+      "conexao": "O autor não quer um favor forçado, quer que ele seja de boa vontade (Fm 1.14)."
+    },
+    {
+      "titulo": "Irmão",
+      "sub": "Mais do que um escravo",
+      "desenho": "portas-abertas",
+      "galhos": [
+        {
+          "texto": "Onésimo volta não mais só como escravo. Ele é um irmão amado, para o autor e para Filemom.",
+          "ref": "Fm 1.16"
+        },
+        {
+          "texto": "Se Filemom tem o autor como companheiro na fé, deve receber Onésimo como receberia o autor.",
+          "ref": "Fm 1.17"
+        },
+        {
+          "texto": "O autor está certo de que Filemom vai fazer até mais do que o pedido.",
+          "ref": "Fm 1.21"
+        }
+      ],
+      "conexao": "Se Onésimo deve alguma coisa, Filemom pode cobrar do autor (Fm 1.18)."
+    },
+    {
+      "titulo": "Eu pago",
+      "sub": "O autor assina a dívida",
+      "desenho": "saco-de-prata",
+      "galhos": [
+        {
+          "texto": "Paulo escreve de próprio punho que vai pagar. Ele lembra que Filemom deve a vida a ele.",
+          "ref": "Fm 1.19"
+        },
+        {
+          "texto": "O autor pede esse ato de amor, para o coração dele se alegrar em Cristo.",
+          "ref": "Fm 1.20"
+        },
+        {
+          "texto": "Filemom deve deixar um quarto de hóspedes pronto. O autor espera que Deus ouça as orações dos irmãos e deixe ele ir logo até lá.",
+          "ref": "Fm 1.22"
+        },
+        {
+          "texto": "Epafras está preso junto com o autor e manda lembranças. Marcos, Aristarco, Demas e Lucas também.",
+          "ref": "Fm 1.23-24"
+        }
+      ],
+      "jesus": {
+        "texto": "A carta termina pedindo que a graça do Senhor Jesus Cristo esteja com todos.",
+        "refs": [
+          "Fm 1.25"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "O autor ora para que Filemom reparta a fé com os outros. Ele quer que essa fé leve todos a conhecer as coisas boas que quem crê tem em Cristo.",
+    "ref": "Fm 1.6",
+    "desenho": "cruz",
+    "pares": [
+      {
+        "at": "Gn 43.9",
+        "texto": "Eu serei responsável por ele. O senhor me fará prestar contas.",
+        "nt": "Fm 1.18",
+        "nota": "Se Onésimo prejudicou ou roubou Filemom, o autor pede que a conta fique com ele"
+      }
+    ]
+  },
+  "estrutura": [
+    {
+      "titulo": "Saudação e gratidão",
+      "de": 1,
+      "ate": 7
+    },
+    {
+      "titulo": "O pedido por Onésimo",
+      "de": 8,
+      "ate": 21
+    },
+    {
+      "titulo": "Planos e saudações",
+      "de": 22,
+      "ate": 25
+    }
+  ],
+  "curiosidades": [
+    {
+      "texto": "A graça e a paz chegam para a casa inteira, da parte de Deus Pai e do Senhor Jesus Cristo.",
+      "ref": "Fm 1.3"
+    }
+  ],
+  "procure": {
+    "texto": "Siga a palavra coração. Filemom anima o coração dos irmãos. Onésimo volta levando o coração do autor, que pede para ter o dele animado também."
+  }
+}
