@@ -64,7 +64,7 @@
 .mapa-cristo .desenho { border-radius: 50%; background: var(--v2-fundo); }
 .mapa-rotulo-claro { color: var(--salvia); font-size: .875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; text-wrap: balance; }
 .mapa-cristo .mapa-textos > span:last-child { font-size: .9375rem; line-height: 1.5; }
-.mapa-pares { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 10px 12px; padding-top: 12px; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); font-size: .875rem; line-height: 1.45; }
+.mapa-pares { display: grid; grid-template-columns: minmax(70px, max-content) minmax(0, 1fr); gap: 10px 12px; padding-top: 12px; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); font-size: .875rem; line-height: 1.45; }
 .mapa-par-at { color: var(--salvia); font-weight: 800; }
 .mapa-par-texto { font-family: var(--fonte-biblia); }
 .mapa-par-nt { font-size: .75rem; font-weight: 700; opacity: .8; }

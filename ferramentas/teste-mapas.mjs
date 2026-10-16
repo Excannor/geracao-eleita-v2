@@ -132,7 +132,8 @@ ok(await av('document.querySelector("[data-testamento=at]").getAttribute("aria-p
 const ordemOk = (n) => av('(() => { const c = [...document.querySelectorAll(".cartao-mapas .celula-mapa")]; const i = c.findIndex((x) => x.classList.contains("breve")); return c.length === ' + n + ' && (i < 0 || c.slice(i).every((x) => x.classList.contains("breve") && x.tagName !== "A")) && c.slice(0, i < 0 ? c.length : i).every((x) => x.tagName === "A"); })()');
 ok(await ordemOk(39), 'a grade mostra só os 39 do Antigo Testamento, os prontos primeiro e os "em breve" depois, sem link');
 ok(await av('!!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/isaias"]\') && !!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/genesis"]\')'), 'Gênesis e Isaías viram link para o mapa');
-ok(await av('(() => { const b = document.querySelector(".celula-mapa.breve"); const p = document.querySelector(".celula-mapa.pronto"); return getComputedStyle(b).color !== getComputedStyle(p).color && getComputedStyle(b).backgroundColor !== getComputedStyle(p).backgroundColor; })()'),
+// Com todos os livros prontos não há "em breve" para comparar; aí a checagem passa sozinha.
+ok(await av('(() => { const b = document.querySelector(".celula-mapa.breve"); const p = document.querySelector(".celula-mapa.pronto"); if (!b) return true; return getComputedStyle(b).color !== getComputedStyle(p).color && getComputedStyle(b).backgroundColor !== getComputedStyle(p).backgroundColor; })()'),
   'os "em breve" vêm mais apagados que os prontos');
 ok(await av('/Permanent Marker/.test(getComputedStyle(document.querySelector(".nome-mapa")).fontFamily)'), 'os nomes da grade estão no pincel (Permanent Marker)');
 const estouro = () => av('JSON.stringify([...document.querySelectorAll(".cartao-mapas .nome-mapa")].filter((n) => n.scrollWidth > n.clientWidth + 1 || n.getClientRects().length > 1 || n.getBoundingClientRect().right > n.parentNode.getBoundingClientRect().right - 8).map((n) => n.textContent))');
@@ -178,12 +179,16 @@ ok(await av('document.querySelector("' + cab + '").getAttribute("aria-expanded")
   'aberto, ele continua aberto e no testamento escolhido');
 await av('document.querySelector("[data-testamento=at]").click()');
 // Num dia cujo livro ainda não tem mapa, o atalho "Mapa de hoje" some.
-const diaSemMapa = await av('(() => { const n = CC.D.plano.findIndex((d) => !(d.livros || []).some((l) => CC.mapaDoLivro(l))) + 1; CC.diaAtual = () => n; return n; })()');
-await av('location.hash = "#/"');
-await dormir(300);
-await av('location.hash = "#/explorar"');
-await esperar('!!document.querySelector(".cartao-mapas")');
-ok(await av('!document.querySelector(".mapas-hoje") && !!document.querySelector(".cartao-mapas")'), 'num dia sem mapa (dia ' + diaSemMapa + '), o cartão aparece sem o atalho "Mapa de hoje"');
+// Quando todo dia do plano já tem mapa (os 66 prontos), não há dia assim e a checagem é pulada.
+const diaSemMapa = await av('CC.D.plano.findIndex((d) => !(d.livros || []).some((l) => CC.mapaDoLivro(l))) + 1');
+if (diaSemMapa) {
+  await av('CC.diaAtual = () => ' + diaSemMapa);
+  await av('location.hash = "#/"');
+  await dormir(300);
+  await av('location.hash = "#/explorar"');
+  await esperar('!!document.querySelector(".cartao-mapas")');
+  ok(await av('!document.querySelector(".mapas-hoje") && !!document.querySelector(".cartao-mapas")'), 'num dia sem mapa (dia ' + diaSemMapa + '), o cartão aparece sem o atalho "Mapa de hoje"');
+} else console.log('  --    todo dia do plano tem mapa: sem dia para conferir o cartão sem atalho');
 // a ficha do livro (Explorar > Livros) e o mapa ficam ligados
 await av('location.hash = "#/nota/" + encodeURIComponent("03 - Livros da Bíblia/Isaías")');
 ok(await esperar('!!document.querySelector(".nota-corpo")'), 'a ficha de Isaías abre');
@@ -191,9 +196,11 @@ ok(await av('(() => { const l = [...document.querySelectorAll(".nota-corpo a.lin
   'a ficha de Isaías tem um link "Ver o mapa" (44px)');
 // o primeiro livro do cânon que ainda não tem mapa no índice (era Êxodo até Êxodo ganhar o seu)
 const livroSemMapa = LIVROS.map(([nome]) => nome).find((nome) => !indice.publicados.includes(slugDoLivro(nome)));
-await av('location.hash = "#/nota/" + encodeURIComponent("03 - Livros da Bíblia/' + livroSemMapa + '")');
-await esperar('!!document.querySelector(".nota-corpo")');
-ok(await av('!document.querySelector(".link-mapa")'), 'a ficha de um livro sem mapa (' + livroSemMapa + ') não tem o link');
+if (livroSemMapa) {
+  await av('location.hash = "#/nota/" + encodeURIComponent("03 - Livros da Bíblia/' + livroSemMapa + '")');
+  await esperar('!!document.querySelector(".nota-corpo")');
+  ok(await av('!document.querySelector(".link-mapa")'), 'a ficha de um livro sem mapa (' + livroSemMapa + ') não tem o link');
+} else console.log('  --    os 66 livros têm mapa: sem ficha sem link para conferir');
 // volta ao Explorar, com o cartão aberto no Antigo Testamento, e desce até Isaías
 await av('location.hash = "#/explorar"');
 await esperar('!!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/isaias"]\')');
