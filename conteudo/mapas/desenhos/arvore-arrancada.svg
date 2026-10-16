@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- as árvores sem fruto na colheita, arrancadas com raiz e tudo (Jd 1.12): uma árvore seca, sem folha nem fruto, tombando para a esquerda, com as raízes fora do chão e a terra revirada da cova em sálvia. O chão e a terra vão antes; as raízes saem da base do tronco (pontos calculados depois do giro) e o papel do tronco cobre o começo delas. -->
+<path class="k" d="M10 102H110"/>
+<path class="k s" d="M69 102C71 96 79 94 88 94C96 94 101 97 103 102Z"/>
+<path class="h" d="M18 108h10M40 109h14M66 108h10"/>
+<g transform="translate(-7 1)">
+<path class="k" d="M81 92C80 96 80 99 82 102M84 91C87 94 90 97 92 100M87 89C91 92 96 93 100 92M89 88C93 87 98 85 102 82M88 88C91 84 93 80 94 76"/>
+<path class="h" d="M92 100l2 2M100 92l3 1M102 82l2-3M94 76l-1-3"/>
+</g>
+<g transform="translate(-2 -6) rotate(-30 80 98) translate(80 98) scale(.92) translate(-80 -98)">
+<path class="k p" d="M73 98C75 86 76 74 76 64C76 56 74 48 71 38C75 46 79 52 81 58C84 52 88 46 94 41C89 50 86 56 85 64C85 74 86 86 88 98Z"/>
+<path class="h" d="M79 92C79 84 79 76 79 70M83 88C83 82 83 76 83 72"/>
+<path class="k" d="M71 38C68 32 66 26 66 18M68 30C62 28 58 24 56 18M66 18C64 14 64 10 66 6M66 18C70 14 72 12 76 12M94 41C100 38 104 34 106 28M100 36C104 36 108 38 110 42M106 28C106 24 108 20 110 18M56 18C52 16 50 12 50 8"/>
+</g>
+</svg>
