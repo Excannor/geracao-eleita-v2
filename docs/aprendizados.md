@@ -742,6 +742,13 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   diz "os três amigos". Mt 24.15 é o único verso do NT que nomeia "o profeta Daniel"; entrou como par, só com o que Jesus
   diz, sem ligar a "coisa horrível" a fato nenhum. As setenta semanas (Dn 9.24-27) e os 1.290 e 1.335 dias (Dn 12.11-12)
   ficaram fora, porque o texto não interpreta e cada igreja lê de um jeito; o capítulo 9 entra pela oração e por Gabriel.
+- 2026-10-16 · conteúdo · Jonas, Miqueias, Naum e Habacuque: a ligação óbvia de cada um já estava em outro mapa (Mt 12.40
+  em Mateus, Mq 5.2 com Mt 2 em Mateus, Belém em 2 Samuel e Rute, Hc 2.4 em Romanos e Gálatas). Os destaques ficaram com o
+  versículo irmão que ninguém usou (Mt 12.41, Mt 10.34-36, Hb 10.36-37 com 9.28) e Belém ficou só no galho de Mq 5.2. Para
+  livro que o NT não cita (Naum), o destaque e os pares são ecos (Jo 8.36, Ap 6.16-17, Mt 9.35-36) escritos sem dizer que
+  é profecia. A NBV de Hc 2 só tem quatro "Ai", não os cinco de costume: o título virou "Ai de vocês". Em profeta curto,
+  a regra de cada versículo uma vez aperta como nas cartas: montar antes a tabela de raiz, conexões, pares e curiosidades.
+  O checador barra "por meio de" também na paráfrase do NT (At 10.36, At 13.38).
 
 ## Entrada, sessão e página inicial
 
