@@ -784,6 +784,23 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   disco de "[Livro] e Cristo" o chão saiu cortado → desenho de disco tem o chão curto (de uns 22 a 98) e se mede antes; virou
   `trinta-moedas`. Chama com dois arquinhos dentro virou rosto de gato no `cadinho-no-fogo`: chama leva uma linha só de
   chama interna, aberta embaixo.
+- 2026-10-16 · conteúdo · 2 e 3 João têm 13 e 15 versículos, e o mínimo do formato (4 ramos de 3 galhos, raiz, autoria,
+  "Cristo", um par e uma curiosidade) pede uns 17 itens com referência → em livro de um capítulo, a regra "cada referência
+  uma vez" não fecha. Os galhos ficam com um versículo cada, e a raiz, a autoria, o cartão de Cristo e os pares repetem
+  versículos dos galhos, cada um pegando outra parte do versículo (2Jo 1.9: o galho fica com "ir além do ensino", o cartão
+  com "terão tanto o Pai como o Filho"). E as três cartas de João contam o mesmo achado (anticristo, o Filho e o Pai, o
+  mandamento antigo e novo): cada mapa fica com o ângulo da própria carta.
+- 2026-10-16 · conteúdo · Apocalipse: oito versículos já tinham ligação em outro mapa (Ap 1.13-15 em Daniel, 5.5 em Gênesis,
+  5.12 em 1 Crônicas, 19.7 em Cânticos, 21.5 em Eclesiastes, 22.1-2 em Ezequiel, 22.16 em 2 Samuel, 2.18, 23 em Jeremias) →
+  esses ficaram fora dos pares e destaques, e o galho que conta a mesma cena muda o foco (em 5.5-6, o Cordeiro que João vê
+  quando olha para o Leão). Os mil anos (20.1-6), o 144.000, o 666 e o Armagedom ficaram fora dos galhos: o texto não
+  interpreta e as igrejas leem de jeitos diferentes; entraram as interpretações que o próprio livro dá (as estrelas e os
+  castiçais, 1.20; o incenso e as orações, 5.8; a mulher e a grande cidade, 17.18). "Selos e trombetas" (17 letras)
+  quebrou a 375px → "Sete selos". Par com "Todo-poderoso" na NBV (Is 6.3) cabe cortando a citação antes do hífen.
+- 2026-10-16 · desenho · Apocalipse e Judas: sete selos em fila sob o rolo viraram rodas de esteira (ar-condicionado,
+  lagarta), nas duas tentativas → coisa repetida em fila embaixo de um cilindro lê como máquina; o ramo ficou com as
+  trombetas. A árvore arrancada deitada com o torrão redondo de raízes virou um besouro; em pé e tombando, com tronco
+  largo que afina nos galhos secos e as raízes saindo do chão, leu como árvore morta.
 
 ## Entrada, sessão e página inicial
 

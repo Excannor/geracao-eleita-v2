@@ -1,0 +1,188 @@
+{
+  "nome": "Judas",
+  "grupo": "Outras cartas",
+  "numero": 65,
+  "capitulos": 1,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἰούδα",
+    "transliteracao": "Iouda",
+    "traducao": "de Judas",
+    "texto": "Ioudas é a forma grega do nome hebraico Yehudah, o mesmo nome de Judá, um dos filhos de Jacó."
+  },
+  "autoria": {
+    "texto": "Judas se apresenta como servo de Jesus Cristo e irmão de Tiago.",
+    "apoio": "Ele escreve aos que Deus chamou, que o Pai ama e que Jesus Cristo guarda em segurança.",
+    "refs": [
+      "Jd 1.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Judas queria escrever sobre a salvação, mas precisa pedir outra coisa. Uns homens entram na igreja sem ninguém perceber e usam a graça de Deus como desculpa para viver como querem. Judas pede que os irmãos defendam a fé e continuem no amor de Deus.",
+    "refs": [
+      "Jd 1.3-4",
+      "Jd 1.21"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Defendam a fé",
+      "sub": "Gente infiltrada na igreja",
+      "desenho": "espada",
+      "galhos": [
+        {
+          "texto": "Na saudação, Judas deseja aos irmãos cada vez mais misericórdia, paz e amor de Deus.",
+          "ref": "Jd 1.2"
+        },
+        {
+          "texto": "Judas estava planejando escrever sobre a salvação. Agora ele vê que precisa insistir em outra coisa. Os irmãos devem defender com coragem a fé que Deus entregou ao povo dele, uma vez por todas.",
+          "ref": "Jd 1.3"
+        },
+        {
+          "texto": "Alguns homens ímpios entram no meio dos irmãos sem ninguém notar. Eles dizem que, depois de virar cristão, a pessoa pode viver como quiser. Esses homens se voltam contra Jesus Cristo, o único Mestre e Senhor.",
+          "ref": "Jd 1.4"
+        }
+      ],
+      "conexao": "Judas pede que os irmãos lembrem uma coisa que eles já sabem (Jd 1.5)."
+    },
+    {
+      "titulo": "Lembrem",
+      "sub": "Judas conta o que Deus já fez",
+      "desenho": "correntes",
+      "galhos": [
+        {
+          "texto": "O Senhor salva do Egito um povo inteiro. Depois, ele mata cada pessoa que não confia nele nem obedece.",
+          "ref": "Jd 1.5"
+        },
+        {
+          "texto": "Alguns anjos não ficam dentro da autoridade que Deus deu a eles e abandonam o lugar deles. Deus guarda esses anjos acorrentados em prisões de escuridão, até o julgamento do grande dia.",
+          "ref": "Jd 1.6"
+        },
+        {
+          "texto": "Judas lembra Sodoma, Gomorra e as cidades vizinhas. Elas estavam cheias de todo tipo de imoralidade.",
+          "ref": "Jd 1.7"
+        }
+      ],
+      "conexao": "Mesmo assim, esses homens sonhadores continuam vivendo na imoralidade (Jd 1.8)."
+    },
+    {
+      "titulo": "Sem fruto",
+      "sub": "Como são os infiltrados",
+      "desenho": "arvore-arrancada",
+      "galhos": [
+        {
+          "texto": "Esses sonhadores desonram o corpo com a imoralidade. Eles rejeitam quem tem autoridade sobre eles e zombam até dos seres gloriosos do céu.",
+          "ref": "Jd 1.8"
+        },
+        {
+          "texto": "Eles falam mal de tudo o que não entendem. Como animais sem razão, fazem tudo o que dá vontade e assim se corrompem.",
+          "ref": "Jd 1.10"
+        },
+        {
+          "texto": "Judas diz: “Ai deles!” Esses homens seguem o exemplo de Caim, fazem qualquer coisa por lucro, como Balaão, e acabam destruídos como os rebeldes de Coré.",
+          "ref": "Jd 1.11"
+        },
+        {
+          "texto": "Nas festas da igreja, eles comem demais e só cuidam de si. Judas diz que eles são nuvens sem chuva levadas pelo vento e árvores sem fruto na colheita, arrancadas com raiz e tudo.",
+          "ref": "Jd 1.12"
+        },
+        {
+          "texto": "Por onde passam, deixam vergonha, como a espuma suja das ondas bravas do mar. Eles vagam como estrelas sem rumo, e Deus já preparou para eles as trevas eternas.",
+          "ref": "Jd 1.13"
+        }
+      ],
+      "conexao": "Muito tempo atrás, Enoque já falava desses homens (Jd 1.14)."
+    },
+    {
+      "titulo": "Enoque avisou",
+      "sub": "Os apóstolos também avisam",
+      "desenho": "rolo-amarrado",
+      "galhos": [
+        {
+          "texto": "Enoque diz: “Eis que o Senhor virá, acompanhado de milhares e milhares de seus santos”. O Senhor vem julgar todas as pessoas do mundo e mostrar o mal que os perversos fizeram contra Deus.",
+          "ref": "Jd 1.14-15"
+        },
+        {
+          "texto": "Esses homens vivem explorando os outros e nunca estão satisfeitos. Eles se exibem, e quando parecem se interessar por alguém, é só para tirar alguma coisa dessa pessoa.",
+          "ref": "Jd 1.16"
+        },
+        {
+          "texto": "Os apóstolos de Jesus Cristo já tinham avisado. Nos últimos tempos vão aparecer zombadores que só querem saber de todo tipo de maldade.",
+          "ref": "Jd 1.17-18"
+        },
+        {
+          "texto": "Esses zombadores dividem os irmãos. Eles amam os maus desejos e não têm o Espírito de Deus morando neles.",
+          "ref": "Jd 1.19"
+        }
+      ],
+      "conexao": "Judas se vira para os amigos queridos com outro pedido (Jd 1.20)."
+    },
+    {
+      "titulo": "No amor de Deus",
+      "sub": "O pedido aos amigos queridos",
+      "desenho": "fogueira",
+      "galhos": [
+        {
+          "texto": "Judas pede que os irmãos construam a vida em cima da fé santíssima que eles têm e orem no poder do Espírito Santo.",
+          "ref": "Jd 1.20"
+        },
+        {
+          "texto": "Os irmãos devem ter compaixão de quem tem dúvidas.",
+          "ref": "Jd 1.22"
+        },
+        {
+          "texto": "Tem gente que os irmãos devem salvar como quem tira alguém do fogo. Com outros, eles devem ter misericórdia e cuidado, para não serem arrastados para os mesmos pecados.",
+          "ref": "Jd 1.23"
+        }
+      ],
+      "jesus": {
+        "texto": "Judas pede que os irmãos continuem vivendo no amor de Deus. Enquanto isso, eles esperam com paciência a misericórdia do Senhor Jesus Cristo, que vai dar a vida eterna.",
+        "refs": [
+          "Jd 1.21"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "No fim, Judas louva a Deus, que pode guardar os irmãos de escorregar e cair (Jd 1.24). Ele dá toda a glória “àquele que é o único Deus, que nos salva por meio de Jesus Cristo, nosso Senhor”.",
+    "ref": "Jd 1.25",
+    "desenho": "coroa",
+    "pares": [
+      {
+        "at": "Gn 19.24",
+        "texto": "o Senhor fez chover fogo e enxofre sobre Sodoma e Gomorra.",
+        "nt": "Jd 1.7",
+        "nota": "Sodoma e Gomorra foram destruídas pelo fogo e continuam sendo um aviso do castigo do fogo eterno"
+      },
+      {
+        "at": "Zc 3.2",
+        "texto": "O Senhor, que escolheu Jerusalém, o repreenda!",
+        "nt": "Jd 1.9",
+        "nota": "Na discussão pelo corpo de Moisés, o anjo Miguel não acusa o Diabo e pede que o Senhor repreenda o Diabo"
+      },
+      {
+        "at": "Pv 25.14",
+        "texto": "é como uma nuvem que passa sobre o deserto e não deixa cair uma gota de chuva.",
+        "nt": "Jd 1.12",
+        "nota": "Os homens infiltrados são como nuvens sem chuva que o vento leva"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Defendam a fé", "de": 1, "ate": 4 },
+    { "titulo": "O que Deus já fez", "de": 5, "ate": 7 },
+    { "titulo": "Como são os infiltrados", "de": 8, "ate": 13 },
+    { "titulo": "Enoque e os apóstolos avisaram", "de": 14, "ate": 19 },
+    { "titulo": "Firmes no amor de Deus", "de": 20, "ate": 25 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Judas conta as gerações. Enoque é o sétimo depois de Adão.",
+      "ref": "Jd 1.14"
+    }
+  ],
+  "procure": {
+    "texto": "Judas gosta de contar em três. Ele deseja misericórdia, paz e amor, lembra três castigos do passado e compara os infiltrados a Caim, Balaão e Coré. Procure outros trios na carta."
+  }
+}

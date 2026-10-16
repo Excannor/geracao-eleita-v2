@@ -1,0 +1,315 @@
+{
+  "nome": "Apocalipse",
+  "grupo": "Apocalipse",
+  "numero": 66,
+  "capitulos": 22,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἀποκάλυψις",
+    "transliteracao": "Apokalypsis",
+    "traducao": "revelação",
+    "texto": "É a primeira palavra do livro, que a NBV traduz por revelação. A palavra lembra tirar a cobertura de alguma coisa para todo mundo ver."
+  },
+  "autoria": {
+    "texto": "João escreve às sete igrejas da província da Ásia e deseja a elas graça e paz.",
+    "apoio": "Perto do fim, ele assina de novo o que viu: “Eu, João, vi e ouvi todas estas coisas”.",
+    "refs": [
+      "Ap 1.4",
+      "Ap 22.8"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "João está na ilha de Patmos por causa da palavra de Deus. No dia do Senhor, ele ouve atrás dele uma voz forte como trombeta. A voz manda pôr tudo por escrito e mandar às sete igrejas. No fim do livro, Jesus manda dizer às igrejas que vem em breve, com a recompensa de cada um.",
+    "refs": [
+      "Ap 1.9-11",
+      "Ap 22.12",
+      "Ap 22.16"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Sete igrejas",
+      "sub": "Cartas às igrejas da Ásia",
+      "desenho": "lamparina-no-suporte",
+      "galhos": [
+        {
+          "texto": "Deus deixa Jesus Cristo mostrar aos servos dele o que vai acontecer em breve. Um anjo explica a visão, e João põe tudo por escrito.",
+          "ref": "Ap 1.1-2"
+        },
+        {
+          "texto": "João se vira para ver quem fala e vê sete castiçais de ouro. No meio deles está alguém com sete estrelas na mão direita. Da boca dele sai uma espada afiada, e o rosto brilha como o sol do meio do dia.",
+          "ref": "Ap 1.12-13, 16"
+        },
+        {
+          "texto": "Quando vê quem está falando, João cai aos pés dele como morto. Ele põe a mão direita sobre João e diz que João não precisa ter medo. Quem fala morreu e agora está vivo para sempre, e tem as chaves da morte e do inferno.",
+          "ref": "Ap 1.17-18"
+        },
+        {
+          "texto": "Em Éfeso, a igreja sofre e não desiste, mas não ama como no princípio. Se não voltar ao que fazia no começo, vai perder o castiçal.",
+          "ref": "Ap 2.3-5"
+        },
+        {
+          "texto": "A igreja de Esmirna vai sofrer, e o diabo vai pôr alguns irmãos na prisão. Quem for fiel até diante da morte vai ganhar a coroa da vida.",
+          "ref": "Ap 2.10"
+        },
+        {
+          "texto": "Os irmãos de Laodiceia não são quentes nem frios. Eles são mornos e estão a ponto de ser cuspidos. Mesmo assim, a testemunha fiel e verdadeira diz: “Eu tenho permanecido à porta e estou batendo constantemente”.",
+          "ref": "Ap 3.14-16, 20"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus Cristo é o primeiro a se levantar da morte para nunca mais morrer. Ele ama os seus e derramou o sangue para livrar todos dos pecados. Jesus ainda reúne essa gente no reino dele e faz deles sacerdotes de Deus.",
+        "refs": [
+          "Ap 1.5-6"
+        ]
+      },
+      "conexao": "Depois das cartas, a voz de trombeta chama João por uma porta aberta no céu: “Suba para cá” (Ap 4.1)."
+    },
+    {
+      "titulo": "O Cordeiro",
+      "sub": "O trono e o rolo selado",
+      "desenho": "trono",
+      "galhos": [
+        {
+          "texto": "João vê um trono no céu e alguém sentado nele. O rosto de quem está sentado brilha como as pedras de jaspe e sardônio.",
+          "ref": "Ap 4.2-3"
+        },
+        {
+          "texto": "Em volta estão vinte e quatro tronos, com vinte e quatro anciãos vestidos de branco e com coroas de ouro. Eles caem diante do trono, põem as coroas na frente dele e dizem que o Senhor é digno da glória, porque criou todas as coisas.",
+          "ref": "Ap 4.4, 10-11"
+        },
+        {
+          "texto": "Diante do trono há um mar de cristal. Nos quatro lados estão quatro seres cheios de olhos. O primeiro parece um leão, e o último parece uma águia de asas abertas.",
+          "ref": "Ap 4.6-7"
+        },
+        {
+          "texto": "Quem está no trono tem na mão direita um rolo escrito dos dois lados e fechado com sete selos. Ninguém no céu nem na terra é digno de abrir o rolo, e João chora muito.",
+          "ref": "Ap 5.1-4"
+        },
+        {
+          "texto": "Um dos anciãos diz que João pode parar de chorar, porque o Leão da tribo de Judá venceu. João olha e vê um Cordeiro em pé, que parece ter sido sacrificado.",
+          "ref": "Ap 5.5-6"
+        },
+        {
+          "texto": "O Cordeiro pega o livro, e os anciãos caem de joelhos. Cada um tem uma harpa e taças de ouro cheias de incenso, que são as orações do povo de Deus.",
+          "ref": "Ap 5.8"
+        }
+      ],
+      "jesus": {
+        "texto": "Um dia, João Batista vê Jesus caminhando na direção dele e diz: “Vejam! Aí está o Cordeiro de Deus que tira o pecado do mundo!” O Cordeiro diante do trono é Jesus.",
+        "refs": [
+          "Jo 1.29"
+        ]
+      },
+      "conexao": "O Cordeiro quebra o primeiro selo, e um dos seres viventes diz com voz de trovão: “Venha!” (Ap 6.1)."
+    },
+    {
+      "titulo": "Sete selos",
+      "sub": "Selos quebrados e trombetas",
+      "desenho": "duas-trombetas",
+      "galhos": [
+        {
+          "texto": "A cada um dos quatro primeiros selos, sai um cavalo com um cavaleiro. O último cavalo é amarelo, e o cavaleiro dele se chama Morte.",
+          "ref": "Ap 6.2-8"
+        },
+        {
+          "texto": "Debaixo do altar, João vê as almas dos que morreram por pregar a palavra de Deus. Eles perguntam quanto tempo ainda falta. Alguém dá um manto branco a cada um e pede que descansem mais um pouco.",
+          "ref": "Ap 6.9-11"
+        },
+        {
+          "texto": "Depois, João vê uma multidão que ninguém consegue contar, de todas as nações, com roupas brancas e folhas de palmeira na mão. Um ancião conta que eles vêm da grande tribulação e lavaram as roupas no sangue do Cordeiro.",
+          "ref": "Ap 7.9, 13-14"
+        },
+        {
+          "texto": "Quando o Cordeiro quebra o sétimo selo, o céu inteiro fica em silêncio por cerca de meia hora. Depois, sete trombetas são entregues aos sete anjos que ficam diante de Deus.",
+          "ref": "Ap 8.1-2"
+        },
+        {
+          "texto": "Mesmo depois das pragas, quem fica vivo não se arrepende. Essas pessoas não largam os ídolos, que não veem, não ouvem e não andam.",
+          "ref": "Ap 9.20"
+        },
+        {
+          "texto": "O sétimo anjo toca a trombeta, e vozes fortes gritam no céu: “O reino deste mundo agora pertence ao nosso Senhor e ao seu Cristo”.",
+          "ref": "Ap 11.15"
+        }
+      ],
+      "conexao": "No céu, João vê um grande sinal. É uma mulher vestida de sol, com a lua debaixo dos pés (Ap 12.1)."
+    },
+    {
+      "titulo": "O dragão",
+      "sub": "Uma guerra no céu e na terra",
+      "desenho": "foice",
+      "galhos": [
+        {
+          "texto": "A mulher está grávida e grita com as dores do parto. Um dragão vermelho de sete cabeças fica na frente dela, pronto para devorar o filho assim que ele nascer. O menino nasce e é levado para junto de Deus e do trono dele.",
+          "ref": "Ap 12.2-5"
+        },
+        {
+          "texto": "Miguel e os anjos dele lutam contra o dragão no céu. O dragão perde e é jogado na terra. Ele é a antiga serpente, chamada diabo ou Satanás, que engana o mundo todo.",
+          "ref": "Ap 12.7-9"
+        },
+        {
+          "texto": "Uma voz forte no céu conta como os irmãos vencem o acusador. Eles vencem pelo sangue do Cordeiro e pelo testemunho deles, e não se apegam à vida nem diante da morte.",
+          "ref": "Ap 12.10-11"
+        },
+        {
+          "texto": "João vê uma besta subindo do mar, com sete cabeças e dez chifres. Ela parece um leopardo, com pés de urso e boca de leão, e o dragão dá a ela o poder dele.",
+          "ref": "Ap 13.1-2"
+        },
+        {
+          "texto": "Outra besta sobe da terra e exige que todos ponham um sinal na mão direita ou na testa. Sem esse sinal, ninguém pode comprar nem vender.",
+          "ref": "Ap 13.11, 16-17"
+        },
+        {
+          "texto": "João vê uma nuvem branca e, sentado nela, alguém parecido com um filho do homem, com coroa de ouro e uma foice afiada. Um anjo grita que a colheita da terra está madura, e ele passa a foice.",
+          "ref": "Ap 14.14-16"
+        }
+      ],
+      "conexao": "João vê sete anjos com as sete últimas pragas, e com elas se completa a ira de Deus (Ap 15.1)."
+    },
+    {
+      "titulo": "Babilônia cai",
+      "sub": "As taças e a grande cidade",
+      "desenho": "taca-de-vinho",
+      "galhos": [
+        {
+          "texto": "Os que venceram a besta estão em pé num mar de vidro e fogo, com harpas na mão. Eles cantam o cântico de Moisés e o cântico do Cordeiro.",
+          "ref": "Ap 15.2-3"
+        },
+        {
+          "texto": "Uma voz manda os sete anjos derramarem na terra as sete taças da ira de Deus. Quando o sétimo derrama a taça no ar, uma voz forte sai do trono: “Está terminado!”",
+          "ref": "Ap 16.1, 17"
+        },
+        {
+          "texto": "Um anjo leva João ao deserto. Lá ele vê uma mulher sentada numa besta vermelha, com roupa de púrpura e uma taça de ouro na mão. O anjo explica que ela é a grande cidade que governa os reis da terra.",
+          "ref": "Ap 17.3-4, 18"
+        },
+        {
+          "texto": "Uma voz do céu chama: “Saiam dela, meu povo; não tomem parte nos seus pecados”.",
+          "ref": "Ap 18.4"
+        },
+        {
+          "texto": "Um anjo forte joga no mar uma pedra que parece de moinho. Ele avisa que a grande cidade Babilônia vai ser atirada fora assim e vai desaparecer para sempre.",
+          "ref": "Ap 18.21"
+        },
+        {
+          "texto": "João vê o céu aberto e um cavalo branco. O cavaleiro se chama Fiel e Verdadeiro, e o título dele é Palavra de Deus. No manto dele está escrito: Rei dos Reis e Senhor dos Senhores.",
+          "ref": "Ap 19.11, 13, 16"
+        }
+      ],
+      "conexao": "João vê um grande trono branco e quem está sentado nele (Ap 20.11)."
+    },
+    {
+      "titulo": "Tudo novo",
+      "sub": "A cidade que desce do céu",
+      "desenho": "cidade-nas-nuvens",
+      "galhos": [
+        {
+          "texto": "João vê os mortos, grandes e pequenos, em pé diante do trono. Os livros são abertos, e cada um é julgado pelo que fez.",
+          "ref": "Ap 20.12"
+        },
+        {
+          "texto": "A cidade santa, a nova Jerusalém, desce do céu. Ela é linda como uma noiva que vai encontrar o noivo.",
+          "ref": "Ap 21.2"
+        },
+        {
+          "texto": "Uma voz forte sai do trono. Agora Deus vai morar com as pessoas. Ele vai enxugar todas as lágrimas dos olhos delas, e não vai haver mais morte nem dor.",
+          "ref": "Ap 21.3-4"
+        },
+        {
+          "texto": "Cada portão da cidade é uma pérola, e a rua principal é de ouro puro, como vidro. A cidade não precisa de sol nem de lua, porque a glória de Deus ilumina tudo e o Cordeiro é a candeia dela.",
+          "ref": "Ap 21.21, 23"
+        },
+        {
+          "texto": "Na cidade não há maldição nenhuma. Os servos de Deus vão ver o rosto dele e levar o nome dele escrito na testa.",
+          "ref": "Ap 22.3-4"
+        },
+        {
+          "texto": "O Espírito e a noiva chamam todo mundo para vir. Quem tem sede pode vir e beber de graça da água da vida.",
+          "ref": "Ap 22.17"
+        }
+      ],
+      "jesus": {
+        "texto": "Quem diz todas essas coisas promete que vem em breve. João responde: “Amém! Vem, Senhor Jesus!”",
+        "refs": [
+          "Ap 22.20"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "Os anciãos cantam um cântico novo ao Cordeiro: “porque foi morto, e com o seu sangue comprou para Deus pessoas de toda tribo, língua, povo e nação”. Na cidade nova, João não vê templo, porque o Senhor Deus e o Cordeiro são o templo dela (Ap 21.22).",
+    "ref": "Ap 5.9",
+    "desenho": "cordeiro",
+    "pares": [
+      {
+        "at": "Is 6.3",
+        "texto": "Santo, santo, santo é o Senhor",
+        "nt": "Ap 4.8",
+        "nota": "Os quatro seres viventes têm seis asas e repetem dia e noite que o Senhor Deus é santo"
+      },
+      {
+        "at": "Is 49.10",
+        "texto": "Nunca mais terão sede ou fome.",
+        "nt": "Ap 7.16-17",
+        "nota": "A multidão de roupas brancas não vai mais ter fome nem sede, e o Cordeiro vai levar todos às fontes da água da vida"
+      },
+      {
+        "at": "Is 65.17",
+        "texto": "Criarei novos céus e nova terra",
+        "nt": "Ap 21.1",
+        "nota": "João vê uma nova terra e um novo céu, e o mar já não existe mais"
+      },
+      {
+        "at": "Is 44.6",
+        "texto": "Eu sou o Primeiro e o Último, além de mim não há outro Deus.",
+        "nt": "Ap 22.13",
+        "nota": "No fim do livro, quem fala se chama o Alfa e o Ômega, o Primeiro e o Último"
+      },
+      {
+        "at": "Gn 3.22",
+        "texto": "é necessário que ele não coma da fruta da árvore da vida",
+        "nt": "Ap 22.14",
+        "nota": "Quem lava as roupas tem o direito de comer do fruto da árvore da vida e de entrar na cidade"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "A voz em Patmos e as sete cartas", "de": 1, "ate": 3 },
+    { "titulo": "O trono e o Cordeiro", "de": 4, "ate": 5 },
+    { "titulo": "Os sete selos", "de": 6, "ate": 7 },
+    { "titulo": "As sete trombetas", "de": 8, "ate": 11 },
+    { "titulo": "O dragão contra a mulher", "de": 12, "ate": 14 },
+    { "titulo": "As sete taças", "de": 15, "ate": 16 },
+    { "titulo": "A queda da grande cidade", "de": 17, "ate": 18 },
+    { "titulo": "O cavaleiro fiel e o trono branco", "de": 19, "ate": 20 },
+    { "titulo": "A nova Jerusalém", "de": 21, "ate": 22 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Para quem vencer em Pérgamo, a promessa é uma pedra branca com um nome novo gravado. Só o dono da pedra conhece esse nome.",
+      "ref": "Ap 2.17"
+    },
+    {
+      "texto": "O rei dos gafanhotos que saem do abismo tem dois nomes. Em hebraico ele se chama Abadom, e em grego, Apoliom.",
+      "ref": "Ap 9.11"
+    },
+    {
+      "texto": "João come um livrinho que um anjo dá a ele. Na boca é doce como mel, e no estômago fica amargo.",
+      "ref": "Ap 10.9-10"
+    },
+    {
+      "texto": "Um anjo mede a nova Jerusalém com uma vara de ouro. A cidade tem a largura, o comprimento e a altura iguais, de 2.200 quilômetros.",
+      "ref": "Ap 21.15-16"
+    },
+    {
+      "texto": "Perto do fim, Deus promete castigo para quem acrescentar ou tirar alguma coisa das palavras do livro.",
+      "ref": "Ap 22.18-19"
+    }
+  ],
+  "procure": {
+    "texto": "Sublinhe cada “feliz” e “felizes”. Eles aparecem em sete versículos, e a primeira vez é para quem lê esta profecia.",
+    "ref": "Ap 1.3"
+  }
+}

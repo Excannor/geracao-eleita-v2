@@ -1,0 +1,276 @@
+{
+  "nome": "1 João",
+  "grupo": "Outras cartas",
+  "numero": 62,
+  "capitulos": 5,
+  "significado": {
+    "lingua": "grego",
+    "original": "Ἰωάννου",
+    "transliteracao": "Ioannou",
+    "traducao": "de João",
+    "texto": "O título só diz de quem é a carta. Das três cartas com esse nome, esta é a mais comprida, com cinco capítulos."
+  },
+  "autoria": {
+    "texto": "O autor viu Cristo com os olhos dele, ouviu Cristo falar e tocou nele com as mãos. Em nenhum lugar da carta ele escreve o nome dele.",
+    "apoio": "Ele fala também no plural, em nome de quem viu e ouviu, e escreve para que os leitores fiquem cheios de alegria.",
+    "refs": [
+      "1Jo 1.1",
+      "1Jo 1.3-4"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "Algumas pessoas deixam a igreja, e o autor diz que elas nunca foram dos irmãos de verdade. Ele chama de mentiroso quem diz que Jesus não é o Cristo, e também quem diz que ama a Deus e odeia o irmão. O autor escreve aos que creem no nome do Filho de Deus, para que saibam que têm a vida eterna.",
+    "refs": [
+      "1Jo 2.19",
+      "1Jo 2.22",
+      "1Jo 4.20",
+      "1Jo 5.13"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Na luz",
+      "sub": "Deus é luz, sem escuridão",
+      "desenho": "lamparina-acesa",
+      "galhos": [
+        {
+          "texto": "O autor passa adiante a mensagem que recebeu de Deus: “Deus é luz e nele não há escuridão nenhuma”.",
+          "ref": "1Jo 1.5"
+        },
+        {
+          "texto": "Quem diz que anda com Deus e vive no escuro está mentindo. Quem vive na luz tem comunhão com os irmãos, e o sangue de Jesus purifica de todo pecado.",
+          "ref": "1Jo 1.6-7"
+        },
+        {
+          "texto": "Dizer que não tem pecado é enganar a si mesmo e recusar a verdade.",
+          "ref": "1Jo 1.8"
+        },
+        {
+          "texto": "Tem gente que diz que conhece Cristo e não faz o que ele manda. O autor chama essa pessoa de mentirosa. Quem diz que é servo de Cristo deve viver como Cristo viveu.",
+          "ref": "1Jo 2.4-6"
+        },
+        {
+          "texto": "Quem ama o irmão fica na luz e vê o caminho. Quem odeia o irmão anda no escuro, sem saber para onde vai, como um cego.",
+          "ref": "1Jo 2.9-11"
+        }
+      ],
+      "conexao": "O autor pede que os irmãos deixem de amar este mundo mau (1Jo 2.15)."
+    },
+    {
+      "titulo": "O mundo passa",
+      "sub": "Chegou a hora final",
+      "desenho": "relogio-de-sol",
+      "galhos": [
+        {
+          "texto": "Os maus desejos da natureza humana e dos olhos e a ambição pelas coisas desta vida não vêm de Deus. Eles são do mundo.",
+          "ref": "1Jo 2.16"
+        },
+        {
+          "texto": "Este mundo está perecendo, e as coisas más vão junto com ele. Quem faz a vontade de Deus vive para sempre.",
+          "ref": "1Jo 2.17"
+        },
+        {
+          "texto": "O autor avisa os filhinhos que chegou a hora final. Eles já ouviram que o anticristo vem, e muitas pessoas assim já apareceram.",
+          "ref": "1Jo 2.18"
+        },
+        {
+          "texto": "Uma pessoa que nega o Filho também não tem o Pai. Os irmãos devem continuar crendo no que aprenderam desde o começo.",
+          "ref": "1Jo 2.23-24"
+        },
+        {
+          "texto": "O Espírito Santo vive no coração dos irmãos. Eles não precisam de ninguém para ensinar a verdade, porque o Espírito ensina todas as coisas.",
+          "ref": "1Jo 2.27"
+        }
+      ],
+      "conexao": "O autor pede que os filhinhos fiquem em comunhão com Cristo, para não terem vergonha quando ele vier (1Jo 2.28)."
+    },
+    {
+      "titulo": "Filhos de Deus",
+      "sub": "Esperando a vinda de Cristo",
+      "desenho": "sol-nascendo",
+      "galhos": [
+        {
+          "texto": "O autor escreve: “Vejam como é grande o amor do nosso Pai”. Deus chama os irmãos de filhos, e eles são filhos mesmo. Quem não conhece a Deus não entende isso.",
+          "ref": "1Jo 3.1"
+        },
+        {
+          "texto": "Os irmãos já são filhos de Deus e nem imaginam como vai ser depois. Quando Cristo vier, os irmãos vão ficar parecidos com ele, porque vão ver Cristo como ele é de verdade.",
+          "ref": "1Jo 3.2"
+        },
+        {
+          "texto": "Todo aquele que crê nisso de verdade procura ficar puro, porque Cristo é puro.",
+          "ref": "1Jo 3.3"
+        },
+        {
+          "texto": "O autor pede que ninguém engane os filhinhos. Quem faz o que é justo é justo, como Cristo.",
+          "ref": "1Jo 3.7"
+        },
+        {
+          "texto": "Quem nasceu na família de Deus não faz do pecado um hábito, porque a vida de Deus está nele. Quem não faz o que é certo e não ama o irmão mostra que não é filho de Deus.",
+          "ref": "1Jo 3.9-10"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus se torna homem para tirar os pecados, e nele não há pecado. O diabo peca desde a criação do mundo, e o Filho de Deus vem para destruir as obras do diabo.",
+        "refs": [
+          "1Jo 3.5",
+          "1Jo 3.8"
+        ]
+      },
+      "conexao": "Desde o princípio, os irmãos ouvem a mesma mensagem, que devem amar uns aos outros (1Jo 3.11)."
+    },
+    {
+      "titulo": "Amar de verdade",
+      "sub": "O amor aparece nas ações",
+      "desenho": "prato-e-jarro",
+      "galhos": [
+        {
+          "texto": "Os irmãos não devem estranhar se o mundo odiar todos eles. Quem ama os irmãos já passou da morte para a vida.",
+          "ref": "1Jo 3.13-14"
+        },
+        {
+          "texto": "Odiar o irmão já é ser assassino, e nenhum assassino tem a vida eterna.",
+          "ref": "1Jo 3.15"
+        },
+        {
+          "texto": "Jesus Cristo dá a vida dele por nós, e assim a gente aprende o que é amor de verdade. Por isso, os irmãos também devem dar a vida uns pelos outros.",
+          "ref": "1Jo 3.16"
+        },
+        {
+          "texto": "Alguém tem o bastante para viver bem, vê um irmão passando necessidade e não ajuda. O autor pergunta como o amor de Deus pode estar nessa pessoa. Ele pede que os filhinhos amem com ações, e não só com palavras.",
+          "ref": "1Jo 3.17-18"
+        },
+        {
+          "texto": "Quando a consciência pesa, o Senhor é maior que ela e sabe tudo. Com a consciência limpa, os irmãos chegam ao Senhor com confiança.",
+          "ref": "1Jo 3.20-21"
+        },
+        {
+          "texto": "Deus manda que os irmãos creiam no nome de Jesus Cristo, o Filho dele, e que amem uns aos outros.",
+          "ref": "1Jo 3.23"
+        }
+      ],
+      "conexao": "O Espírito Santo que Deus deu confirma que Deus vive em quem obedece (1Jo 3.24)."
+    },
+    {
+      "titulo": "Deus é amor",
+      "sub": "Quem ama conhece a Deus",
+      "desenho": "balanca",
+      "galhos": [
+        {
+          "texto": "O autor pede que os irmãos não creiam em qualquer espírito. Eles devem examinar primeiro os espíritos para ver se são de Deus, porque há muitos falsos mestres pelo mundo.",
+          "ref": "1Jo 4.1"
+        },
+        {
+          "texto": "Quem confessa que Jesus Cristo se tornou homem de verdade, com um corpo humano, vem de Deus. Quem não confessa Jesus não vem de Deus.",
+          "ref": "1Jo 4.2-3"
+        },
+        {
+          "texto": "Os filhinhos já ganharam a luta. Aquele que está no coração deles é mais forte do que aquele que está no mundo.",
+          "ref": "1Jo 4.4"
+        },
+        {
+          "texto": "O autor escreve: “Deus é amor”. Quem ama mostra que é filho de Deus, e quem não ama não conhece a Deus.",
+          "ref": "1Jo 4.7-8"
+        },
+        {
+          "texto": "No amor não existe medo. Quem tem medo do castigo ainda não está convencido de que Deus ama de verdade.",
+          "ref": "1Jo 4.18"
+        }
+      ],
+      "jesus": {
+        "texto": "Deus mostra quanto ama quando manda o único Filho a este mundo, para a gente viver por meio dele. O amor verdadeiro não é o nosso amor por Deus. É o amor de Deus, que manda o Filho por causa dos nossos pecados. Quem confessa que Jesus é o Filho de Deus tem Deus vivendo nele.",
+        "refs": [
+          "1Jo 4.9-10",
+          "1Jo 4.15"
+        ]
+      },
+      "conexao": "Quem crê que Jesus é o Cristo é filho de Deus, e quem ama o Pai ama também os filhos dele (1Jo 5.1)."
+    },
+    {
+      "titulo": "A vida eterna",
+      "sub": "A fé vence o mundo",
+      "desenho": "jarro-derramado",
+      "galhos": [
+        {
+          "texto": "Os mandamentos de Deus não são difíceis. Com a fé, os filhos de Deus vencem o mundo.",
+          "ref": "1Jo 5.3-4"
+        },
+        {
+          "texto": "Jesus Cristo vem pela água e pelo sangue. O Espírito, a água e o sangue são três testemunhas, e as três dizem que Jesus Cristo é o Filho de Deus.",
+          "ref": "1Jo 5.6-8"
+        },
+        {
+          "texto": "As pessoas creem no testemunho dos homens, e o testemunho de Deus vale mais. Quem não crê no que Deus diz sobre o Filho chama Deus de mentiroso.",
+          "ref": "1Jo 5.9-10"
+        },
+        {
+          "texto": "Deus ouve os irmãos toda vez que eles pedem alguma coisa de acordo com a vontade dele. Se ele ouve, eles podem ter certeza da resposta.",
+          "ref": "1Jo 5.14-15"
+        },
+        {
+          "texto": "Um irmão comete um pecado que não leva à morte. Quem vê isso deve pedir a Deus que perdoe, e Deus vai dar vida a esse irmão.",
+          "ref": "1Jo 5.16"
+        },
+        {
+          "texto": "A carta termina com um pedido aos filhos queridos. Eles devem se afastar de tudo o que possa tomar o lugar de Deus no coração.",
+          "ref": "1Jo 5.21"
+        }
+      ],
+      "jesus": {
+        "texto": "O Filho de Deus vem para ajudar os irmãos a encontrar o Deus verdadeiro. Quem está em Jesus Cristo está em Deus. Jesus é o único Deus verdadeiro e a vida eterna.",
+        "refs": [
+          "1Jo 5.20"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "O autor fala por todos os que viram: “Deus enviou o seu Filho para ser o Salvador do mundo”. Jesus leva sobre ele a ira de Deus contra os pecados, e não só contra os nossos, mas contra os do mundo inteiro (1Jo 2.2).",
+    "ref": "1Jo 4.14",
+    "desenho": "cruz",
+    "pares": [
+      {
+        "at": "Pv 28.13",
+        "texto": "quem confessa e abandona seus pecados alcança misericórdia.",
+        "nt": "1Jo 1.9",
+        "nota": "Se os irmãos confessam os pecados, Deus é fiel e justo para perdoar e limpar toda maldade"
+      },
+      {
+        "at": "Gn 4.8",
+        "texto": "Caim atacou o seu irmão Abel e o matou.",
+        "nt": "1Jo 3.12",
+        "nota": "Caim era do Maligno e matou o irmão porque fazia o mal, enquanto o irmão fazia o bem"
+      },
+      {
+        "at": "Êx 33.20",
+        "texto": "nenhum homem poderá continuar vivo depois de me ver",
+        "nt": "1Jo 4.12",
+        "nota": "Ninguém nunca viu a Deus, mas, quando os irmãos se amam, Deus vive neles"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "A luz e o mundo que passa", "de": 1, "ate": 2 },
+    { "titulo": "Filhos de Deus que se amam", "de": 3, "ate": 3 },
+    { "titulo": "Os espíritos e o amor de Deus", "de": 4, "ate": 4 },
+    { "titulo": "A fé que vence o mundo", "de": 5, "ate": 5 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "O autor escreve como pai. Ele chama os leitores de filhinhos oito vezes na carta.",
+      "ref": "1Jo 2.1"
+    },
+    {
+      "texto": "Primeiro, o autor diz que o mandamento não é novo, porque os irmãos ouvem isso desde o princípio. Mesmo assim, ele diz que é um mandamento novo.",
+      "ref": "1Jo 2.7-8"
+    },
+    {
+      "texto": "O autor escreve aos filhinhos, aos pais e aos jovens, um de cada vez. Depois ele repete as três chamadas.",
+      "ref": "1Jo 2.12-14"
+    }
+  ],
+  "procure": {
+    "texto": "O autor quer que os irmãos tenham certeza do que creem, e por isso usa muito o verbo saber. Perto do fim da carta, ele escreve a palavra sabemos três vezes em poucos versículos. Sublinhe cada uma."
+  }
+}

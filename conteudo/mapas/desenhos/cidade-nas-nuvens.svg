@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a nova Jerusalém descendo do céu, vinda de Deus (Ap 21.2, 10-12): a muralha com três portões em arco e as torres nas pontas, apoiada numa faixa de nuvens, com a luz da glória de Deus em raios por cima. O portão do meio é a única área sálvia. A muralha vai antes das nuvens, para as nuvens cobrirem a base dela. -->
+<path class="h" d="M60 14V24M44 18L48 26M76 18L72 26"/>
+<path class="k p" d="M22 82V44h10v-6h6v6h8v-6h6v6h16v-6h6v6h8v-6h6v6h10v38z"/>
+<path class="k p" d="M14 82V36h12v46z"/>
+<path class="k p" d="M94 82V36h12v46z"/>
+<path class="k" d="M14 36l6-6 6 6M94 36l6-6 6 6"/>
+<path class="k s" d="M53 82V68a7 7 0 0 1 14 0v14z"/>
+<path class="k p" d="M33 82V71a5 5 0 0 1 10 0v11z"/>
+<path class="k p" d="M77 82V71a5 5 0 0 1 10 0v11z"/>
+<path class="h" d="M26 54h68M26 62h22M72 62h22M18 46h4M98 46h4M18 58h4M98 58h4"/>
+<path class="k p" d="M10 92C6 92 6 84 12 84C12 78 20 76 24 80C26 74 36 74 38 80C42 76 50 76 52 82C56 76 66 76 68 82C70 76 80 76 82 80C86 74 96 76 96 82C102 78 112 82 108 90C112 94 106 98 102 96H16C10 98 6 94 10 92Z"/>
+<path class="h" d="M24 90c4-2 8-2 12 0M58 92c4-2 8-2 12 0M88 90c4-2 8-2 10 0"/>
+</svg>
