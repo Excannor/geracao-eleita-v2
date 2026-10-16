@@ -1,0 +1,288 @@
+{
+  "nome": "Salmos",
+  "grupo": "Poéticos",
+  "numero": 19,
+  "capitulos": 150,
+  "significado": {
+    "lingua": "hebraico",
+    "original": "תְּהִלִּים",
+    "transliteracao": "Tehillim",
+    "traducao": "louvores",
+    "texto": "Em hebraico, o livro se chama Louvores. O nome Salmos vem do grego e quer dizer canções tocadas com instrumento de cordas."
+  },
+  "autoria": {
+    "texto": "Muitos salmos abrem com um título que diz de quem é a canção. Davi é o nome que mais aparece, mas há salmos dos coraítas, da família de Asafe e de Salomão.",
+    "apoio": "Alguns títulos dão até instruções para quem toca, como “Com instrumentos de cordas”.",
+    "refs": [
+      "Sl 4.1",
+      "Sl 47.1",
+      "Sl 50.1",
+      "Sl 127.1"
+    ],
+    "desenho": "pena-e-rolo"
+  },
+  "raiz": {
+    "texto": "O livro de Salmos junta cento e cinquenta canções e orações feitas para Deus. Num salmo, um aflito quase sem forças derrama o lamento diante do Senhor. Em outro, Davi canta no dia em que o Senhor livra ele dos inimigos e de Saul. No último versículo, quem canta chama todos os seres vivos para louvar o Senhor.",
+    "refs": [
+      "Sl 102.1",
+      "Sl 18.1",
+      "Sl 150.6"
+    ]
+  },
+  "ramos": [
+    {
+      "titulo": "Canções de Davi",
+      "sub": "Davi descansa no Senhor",
+      "desenho": "arvore-junto-ao-rio",
+      "galhos": [
+        {
+          "texto": "O livro começa com um homem feliz, que pensa na lei do Senhor de dia e de noite. Ele é como uma árvore plantada perto de um rio, que dá fruto no tempo certo. Os maus são como a palha que o vento leva.",
+          "ref": "Sl 1.1-4"
+        },
+        {
+          "texto": "Quando foge do filho Absalão, Davi vê os inimigos aumentarem. Mesmo assim, ele se deita e dorme em paz, porque o Senhor cuida dele.",
+          "ref": "Sl 3.1-5"
+        },
+        {
+          "texto": "Davi olha a lua e as estrelas e pergunta por que Deus dá tanta atenção ao homem. O Senhor fez o homem só um pouco menor do que Deus e deu a ele glória e honra.",
+          "ref": "Sl 8.1, 3-5"
+        },
+        {
+          "texto": "Para Davi, os céus anunciam a glória de Deus sem falar nada. Mesmo sem palavras, a voz deles chega até os confins do mundo. O sol corre de uma ponta à outra do céu, forte e alegre como um atleta.",
+          "ref": "Sl 19.1-6"
+        },
+        {
+          "texto": "Davi diz: “O Senhor é o meu pastor.” O Senhor leva Davi aos pastos verdes e aos riachos de águas mansas. Mesmo que ande pelo vale escuro, onde a morte está bem perto, Davi não vai ter medo.",
+          "ref": "Sl 23.1-4"
+        },
+        {
+          "texto": "Por um tempo, Davi esconde os pecados e fica fraco, gemendo o dia inteiro. Quando ele confessa a culpa, o Senhor perdoa.",
+          "ref": "Sl 32.1, 3-5"
+        }
+      ],
+      "jesus": {
+        "texto": "Hebreus repete as palavras sobre o homem que Deus coroou de glória. Ainda não dá para ver tudo isso acontecer. Já dá para ver Jesus, que ficou por pouco tempo menor do que os anjos. Agora ele está coroado de glória e de honra, porque sofreu a morte por todas as pessoas.",
+        "refs": [
+          "Hb 2.6-9"
+        ]
+      },
+      "conexao": "Davi termina o salmo 41 com “Amém! Amém!” (Sl 41.13). O salmo seguinte é um poema dos coraítas."
+    },
+    {
+      "titulo": "Sede de Deus",
+      "sub": "A alma procura o Senhor",
+      "desenho": "lira",
+      "galhos": [
+        {
+          "texto": "Quem canta tem sede de Deus como a corça procura um riacho. De dia e de noite, as lágrimas viram comida. Os inimigos zombam e perguntam: “Onde anda o seu Deus?”",
+          "ref": "Sl 42.1-3"
+        },
+        {
+          "texto": "Os coraítas fazem um cântico de casamento para o rei. A filha do rei entra no palácio com roupas bordadas, e um grupo alegre de moças vai junto.",
+          "ref": "Sl 45.1, 13-15"
+        },
+        {
+          "texto": "Para o povo, Deus é refúgio e fortaleza. Mesmo que a terra trema e os montes caiam no mar, o povo não fica perturbado. O Senhor diz: “Fiquem quietos e saibam, de uma vez por todas, que eu sou Deus!”",
+          "ref": "Sl 46.1-3, 10"
+        },
+        {
+          "texto": "Davi tinha cometido adultério, e o profeta Natã vai falar com ele. Davi pede que o Senhor apague a mancha dos pecados dele e diz: “Crie em mim, ó Deus, um coração puro”.",
+          "ref": "Sl 51.1, 10"
+        },
+        {
+          "texto": "Na caverna onde se esconde de Saul, Davi se abriga debaixo das asas de Deus até o perigo passar. Ali ele diz: “Acordem, harpas e liras! Vou acordar bem cedo!”",
+          "ref": "Sl 57.1, 7-8"
+        },
+        {
+          "texto": "Salomão pede que Deus ajude o rei a governar com justiça. Esse rei socorre os pobres que pedem ajuda e salva quem não tem mais esperança.",
+          "ref": "Sl 72.1, 12-13"
+        }
+      ],
+      "conexao": "No fim do salmo de Salomão está escrito: “Aqui terminam as orações de Davi, filho de Jessé” (Sl 72.20)."
+    },
+    {
+      "titulo": "Perguntas a Deus",
+      "sub": "O povo pergunta até quando",
+      "desenho": "vinha",
+      "galhos": [
+        {
+          "texto": "Num salmo da família de Asafe, quem canta quase tropeça e cai. Ele tem inveja dos maus, que vivem com saúde e sucesso. Um dia, no templo de Deus, ele entende o fim que espera por eles.",
+          "ref": "Sl 73.1-4, 16-17"
+        },
+        {
+          "texto": "Um cantor da família de Asafe não consegue dormir. Ele pergunta se Deus se esqueceu de mostrar misericórdia. Depois, começa a lembrar dos milagres que o Senhor fez no passado.",
+          "ref": "Sl 77.1, 4, 9, 11"
+        },
+        {
+          "texto": "Quem canta promete contar com ilustrações a história antiga do povo, que os pais e os avós contaram. Ele quer que os filhos e os netos também saibam dos milagres do Senhor.",
+          "ref": "Sl 78.1-4"
+        },
+        {
+          "texto": "Israel é uma videira que Deus trouxe do Egito e plantou na terra. Agora os muros caíram, e quem passa arranca as uvas. O povo pede que Deus olhe de novo do céu e venha cuidar da vinha.",
+          "ref": "Sl 80.8, 12, 14"
+        },
+        {
+          "texto": "Os coraítas têm saudade do templo, onde até os pardais fazem ninho perto do altar. Para eles, um dia no templo vale mais que mil dias em qualquer outro lugar.",
+          "ref": "Sl 84.1-3, 10"
+        },
+        {
+          "texto": "Etã canta a promessa de Deus a Davi. Alguém da família de Davi vai ocupar o trono por todas as gerações. Depois, Etã pergunta por que Deus deixou de lado a aliança, e a coroa do rei foi parar na lama.",
+          "ref": "Sl 89.1, 3-4, 38-39"
+        }
+      ],
+      "jesus": {
+        "texto": "Jesus fala com a multidão sempre por parábolas. Assim ele cumpre o que o profeta tinha dito: “Eu falarei por meio de parábolas”.",
+        "refs": [
+          "Mt 13.34-35"
+        ]
+      },
+      "conexao": "Etã reclama, mas termina com “Amém e amém!” (Sl 89.52). Depois, Moisés ora."
+    },
+    {
+      "titulo": "O Senhor reina",
+      "sub": "O Rei eterno cuida de tudo",
+      "desenho": "trono",
+      "galhos": [
+        {
+          "texto": "Numa oração, Moisés diz que o Senhor é o refúgio do povo de geração em geração. Para Deus, mil anos são como o dia de ontem. Moisés pede que Deus ensine o povo a contar os dias.",
+          "ref": "Sl 90.1, 4, 12"
+        },
+        {
+          "texto": "Quem canta começa assim: “O Senhor é rei!” As águas sobem, e o barulho das ondas aumenta. Mesmo assim, o Senhor é mais forte que as grandes ondas do mar.",
+          "ref": "Sl 93.1, 3-4"
+        },
+        {
+          "texto": "Num salmo para ação de graças, quem canta chama todos os moradores da terra para entrar pelas portas do templo com canções. O Senhor fez o povo, e eles são o rebanho dele.",
+          "ref": "Sl 100.1-4"
+        },
+        {
+          "texto": "Quem ora lembra que o Senhor criou a terra e os céus com as mãos. Eles vão ficar velhos como roupa usada, e o Senhor vai trocar os dois como se troca de roupa. O Senhor continua o mesmo, e a vida dele não tem fim.",
+          "ref": "Sl 102.25-27"
+        },
+        {
+          "texto": "Davi canta: “Dê louvores ao Senhor, ó minha alma!” Deus afasta a culpa para tão longe quanto o Oriente está do Ocidente. Ele é bondoso como um pai e sabe que somos pó.",
+          "ref": "Sl 103.1, 12-14"
+        },
+        {
+          "texto": "O Senhor faz crescer o pasto do gado e as plantas que o homem cultiva. A terra produz o vinho que alegra o coração, o azeite e o pão.",
+          "ref": "Sl 104.14-15"
+        }
+      ],
+      "jesus": {
+        "texto": "Deus fez o universo por meio do Filho. Em Hebreus, ele diz ao Filho que os céus vão ficar velhos como roupa, mas o Filho nunca muda. Esse Filho é Jesus Cristo, o mesmo ontem, hoje e para sempre.",
+        "refs": [
+          "Hb 1.2",
+          "Hb 1.8",
+          "Hb 1.10-12",
+          "Hb 13.8"
+        ]
+      },
+      "conexao": "Todo o povo deve dizer “Amém! Aleluia!” (Sl 106.48) e dar graças ao Senhor, porque ele é bom (Sl 107.1)."
+    },
+    {
+      "titulo": "Louvor sem fim",
+      "sub": "Todo ser vivo louva o Senhor",
+      "desenho": "cimbalos",
+      "galhos": [
+        {
+          "texto": "Davi escreve: “O Senhor disse ao meu Senhor”. Deus manda esse Senhor sentar no trono, à direita dele, e promete derrotar todos os inimigos.",
+          "ref": "Sl 110.1"
+        },
+        {
+          "texto": "No salmo mais longo do livro, quem canta ama a lei do Senhor. Ele diz: “A sua palavra é uma lâmpada que ilumina o caminho por onde eu ando”.",
+          "ref": "Sl 119.1, 105"
+        },
+        {
+          "texto": "Num cântico de peregrinação, alguém olha para os montes e pergunta: “De onde virá o meu socorro?” O Senhor, que fez os céus e a terra, vigia cada passo dele. O protetor de Israel não cochila nem dorme.",
+          "ref": "Sl 121.1-4"
+        },
+        {
+          "texto": "Perto dos rios da Babilônia, o povo senta e chora lembrando de Sião. As harpas ficam penduradas nos salgueiros. Os babilônios pedem canções, e o povo pergunta como cantar ao Senhor numa terra estranha.",
+          "ref": "Sl 137.1-4"
+        },
+        {
+          "texto": "Davi diz que o Senhor conhece tudo sobre ele e formou o corpo dele na barriga da mãe. Davi agradece ao Senhor por ter feito ele de um jeito tão maravilhoso.",
+          "ref": "Sl 139.1, 13-14"
+        },
+        {
+          "texto": "No último salmo, quem canta manda louvar o Senhor com trombetas, harpas e címbalos.",
+          "ref": "Sl 150.3-5"
+        }
+      ],
+      "jesus": {
+        "texto": "Davi nunca subiu aos céus, mas disse que o Senhor mandou o Senhor dele sentar à direita. Em Atos, todo o povo de Israel ouve que Deus fez de Jesus, que eles crucificaram, Senhor e Cristo.",
+        "refs": [
+          "At 2.34-36"
+        ]
+      }
+    }
+  ],
+  "cristo": {
+    "texto": "O rei conta o que o Senhor disse a ele: “Você é meu filho! Hoje o gerei.” Deus cumpre essa promessa feita aos antepassados quando ressuscita Jesus (At 13.32-33).",
+    "ref": "Sl 2.7",
+    "desenho": "coroa",
+    "pares": [
+      {
+        "at": "Sl 16.10",
+        "texto": "O Senhor não deixará o meu corpo abandonado no sepulcro",
+        "nt": "At 13.35-37",
+        "nota": "Davi morreu, foi sepultado, e o corpo dele se decompôs. O corpo de Jesus, que Deus ressuscitou, não sofreu decomposição"
+      },
+      {
+        "at": "Sl 22.8",
+        "texto": "Pois bem, vamos ver se o Senhor vem salvar a sua vida!",
+        "nt": "Mt 27.41-43",
+        "nota": "Os sacerdotes principais e os mestres da lei zombam de Jesus na cruz e dizem que Deus devia livrar quem confiou nele"
+      },
+      {
+        "at": "Sl 40.8",
+        "texto": "Minha maior alegria é fazer a sua vontade, ó meu Deus.",
+        "nt": "Hb 10.5-7",
+        "nota": "Quando vem ao mundo, Cristo diz que veio para fazer a vontade de Deus"
+      },
+      {
+        "at": "Sl 118.26",
+        "texto": "Bendito é aquele que vem em nome do Senhor!",
+        "nt": "Mt 21.9",
+        "nota": "O povo que vai na frente de Jesus grita louvores ao Filho de Davi, que vem em nome do Senhor"
+      }
+    ]
+  },
+  "estrutura": [
+    { "titulo": "Primeiro livro, quase todo de Davi", "de": 1, "ate": 41 },
+    { "titulo": "Segundo livro, dos coraítas a Salomão", "de": 42, "ate": 72 },
+    { "titulo": "Terceiro livro, de Asafe e dos coraítas", "de": 73, "ate": 89 },
+    { "titulo": "Quarto livro, da oração de Moisés ao amém", "de": 90, "ate": 106 },
+    { "titulo": "Quinto livro, até o último aleluia", "de": 107, "ate": 150 }
+  ],
+  "curiosidades": [
+    {
+      "texto": "Hemã termina o salmo dele assim: “Hoje, minha única companhia é a escuridão.”",
+      "ref": "Sl 88.1, 18"
+    },
+    {
+      "texto": "No título do salmo 92 está escrito: “Cântico para o dia de sábado”.",
+      "ref": "Sl 92.1"
+    },
+    {
+      "texto": "O menor salmo tem só dois versículos. Nele, quem canta chama todos os povos da terra para louvar o Senhor.",
+      "ref": "Sl 117.1-2"
+    },
+    {
+      "texto": "Com 176 versículos, o salmo 119 é o maior do livro. No fim, quem canta diz que andou sem rumo como uma ovelha e pede que Deus venha buscar o servo dele.",
+      "ref": "Sl 119.176"
+    },
+    {
+      "texto": "Davi compara os irmãos que vivem unidos ao óleo perfumado derramado na cabeça de Arão. O óleo escorre pela barba até a barra da roupa.",
+      "ref": "Sl 133.1-2"
+    },
+    {
+      "texto": "Os vinte e seis versículos do salmo 136 terminam quase do mesmo jeito: “porque o seu amor fiel dura para sempre”.",
+      "ref": "Sl 136"
+    }
+  ],
+  "procure": {
+    "texto": "Quem canta só diz “Aleluia!” pela primeira vez no fim do salmo 104. Até o último versículo do livro, a palavra volta mais de vinte vezes.",
+    "ref": "Sl 104.35"
+  }
+}

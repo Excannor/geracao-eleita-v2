@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<style>.k{fill:none;stroke:#151615;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.h{fill:none;stroke:#151615;stroke-width:1;stroke-linecap:round;opacity:.7}.p{fill:#fff}.s{fill:#c8da8c}.e{fill:#2c2d2b}</style>
+<!-- a árvore plantada junto à margem de um rio (Sl 1.3): copa redonda em sálvia com frutos, o tronco plantado na margem, que desce numa curva até a água, e o rio em ondas de traço embaixo, à direita. O chão vai antes do tronco, e o topo do tronco fica dentro da copa. -->
+<path class="k" d="M8 86C26 82 48 82 64 86C72 88 76 92 80 96"/>
+<path class="k p" d="M42 86V56H50V86Z"/>
+<path class="k s" d="M46 18C58 18 66 26 66 34C74 36 78 44 74 52C70 60 58 60 52 56C48 60 42 60 38 56C32 60 20 58 18 50C14 42 20 34 28 34C28 24 36 18 46 18Z"/>
+<circle class="k p" cx="34" cy="42" r="3.5"/>
+<circle class="k p" cx="52" cy="32" r="3.5"/>
+<circle class="k p" cx="62" cy="46" r="3.5"/>
+<circle class="k p" cx="44" cy="48" r="3.5"/>
+<path class="h" d="M16 92l3-4M24 91l2-4M34 91l3-4M56 90l2-4"/>
+<path class="k" d="M70 102c6-4 12-4 18 0s12 4 18 0"/>
+<path class="k" d="M56 110c5-3 10-3 15 0s10 3 15 0 10-3 15 0"/>
+<path class="h" d="M88 94c4-2 7-2 10 0M96 114c3-2 6-2 9 0"/>
+</svg>

@@ -692,6 +692,14 @@ sem esperar pedido. O coordenador é coautor: propõe, não só executa.
   são ecos (1Tm 2.5-6, 1Jo 2.1, Cl 2.3), sem dizer que Jó profetizou, e o significado do nome fica no "lembra".
   Na captura, um galho terminou com "Jó." sozinho na linha: nome de duas letras no fim do item também conta.
 
+- 2026-10-16 · conteúdo · Salmos: na NBV, o título do salmo faz parte do versículo 1 ("Salmo de Davi, quando fugia de seu filho
+  Absalão. Ó Senhor..."), então quem cita o autor ou a ocasião põe o versículo 1 na referência (Sl 32.1, 3-5). Os salmos que o NT
+  cita já estavam espalhados em outros mapas (Sl 22.1 em Marcos, 22.18, 41.9 e 69.9 em João, 31.5 em Lucas, 118.22 em Atos, Mateus e
+  Marcos, o Sl 110 e o At 2.29-32 em 2 Samuel) → antes de escolher pares e destaques de um livro muito citado, `grep -n "Sl "` em
+  todos os mapas; o rascunho repetia Mt 22.41-45 e At 2.29-31, e os versículos foram trocados por outros do NT (Hb 2.6-9, Hb 1.10-12,
+  At 2.34-36, At 13.35-37). Os ramos seguem os cinco livros que o próprio texto marca com o "amém" (41.13, 72.20, 89.52, 106.48), e o
+  intervalo de salmos fica só na estrutura: no `sub` de todos os ramos ("Do 1 ao 41, ...") virava molde repetido.
+
 ## Entrada, sessão e página inicial
 
 - 2026-10-02 · sessão · O dono viu a trilha piscar ao voltar da privacidade para a página de
