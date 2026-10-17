@@ -19,7 +19,7 @@ import {
   motivoDenunciaValido, venceEmDe, vencidoParaApagar, membroDeVerdade,
 } from './cuidado.mjs';
 import {
-  ESTUDO_MAX, TIPOS_ESTUDO, TRADUCOES, MENSAGENS as MSG_ESTUDO, semVersiculo,
+  ESTUDO_MAX, ESTUDO_BRUTO_MAX, TIPOS_ESTUDO, TRADUCOES, MENSAGENS as MSG_ESTUDO, semVersiculo,
   limparPerguntas, limparFonte, validarLeitura, estudoDaLinha,
 } from './estudos.mjs';
 
@@ -1434,6 +1434,9 @@ export class Contas {
       if (!TRADUCOES.includes(traducao)) throw erro(MSG_ESTUDO.traducao);
       const perguntas = e.perguntas === undefined || e.perguntas === null ? null : limparPerguntas(e.perguntas);
       const recebida = limparFonte(e.fonte !== undefined && e.fonte !== null ? e.fonte : e.texto);
+      // O teto vale para a fonte limpa (sem as citações trocadas), mas o texto bruto também tem o
+      // seu, conferido antes de o leitor de marcas rodar: ele nunca lê mais que o dobro do estudo.
+      if (recebida.length > ESTUDO_BRUTO_MAX) throw erro(MSG_ESTUDO.tamanho);
       const contar = typeof versiculos === 'function' ? versiculos(traducao) : null;
       novo = { tipo, titulo: '', ref: '', planoAte: 0, fonte: recebida, blocos: [], refs: [], perguntas: perguntas || [], traducao };
       if (tipo === 'blocos') {

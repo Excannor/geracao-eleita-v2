@@ -10,6 +10,9 @@
 // A fonte limpa (sem as citações de outra tradução) tem até 10.000 caracteres: o estudo do dono tem
 // uns 2.900. Uma parte de texto é um parágrafo, não um capítulo colado.
 export const ESTUDO_MAX = 10000;
+// O texto como chegou, com as citações de outra tradução ainda dentro: o leitor de marcas não lê
+// mais que isto (o dobro), e um pedido maior volta sem passar por ele.
+export const ESTUDO_BRUTO_MAX = 2 * ESTUDO_MAX;
 export const TITULO_MAX = 120;
 export const TEXTO_BLOCO_MAX = 1500;
 export const BLOCOS_MAX = 80;

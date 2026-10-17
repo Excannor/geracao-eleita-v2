@@ -14,12 +14,14 @@
 
   const TOPICO_MAX = 140;
   const RESTO_CURTO = 40;
+  // Uma linha maior que isto é texto, sem procurar marca nenhuma: uma parte tem até 1.500
+  // caracteres (estudos.mjs recusa a maior), e assim nenhuma expressão roda sobre uma linha enorme.
+  const LINHA_MAX = 3000;
   const PARES_MAX = 12;
   const PERGUNTAS_MAX = 6;
 
   // ---------- a linha, antes das regras ----------
   const INVISIVEIS = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u00ad\u200b-\u200f\u2060\ufeff]/g;
-  const ESPACOS = /[\t\u00a0\u2000-\u200a\u202f\u205f\u3000]/g;
   // a bolinha do Word (inclusive a da fonte Symbol, na área de uso privado) e o hífen de lista
   const MARCA_LISTA = /^(?:[\u2022\u2023\u2043\u2219\u25a0\u25a1\u25aa\u25ab\u25cf\u25e6\uf076\uf0a7\uf0b7\uf0d8\uf0fc]|[-\u2013](?= ))\s*/;
   // o "n " ou "nn " que a cópia do PDF deixa no lugar do marcador, antes de uma referência, de
@@ -28,7 +30,9 @@
   const DEPOIS_DO_PREFIXO = /^\**\s*(?:conclus[aã]o|para concluir|estudo\s*:|tema\s*:)/i;
 
   function limpar(bruta, capitulos) {
-    let l = String(bruta).replace(INVISIVEIS, '').replace(ESPACOS, ' ').replace(/ {2,}/g, ' ').trim();
+    // Todo espaço (o comum, o inseparável, o tab e os outros que o \s conhece, como o U+1680)
+    // vira um espaço só: nenhuma expressão daqui encontra uma fila de espaços para desmontar.
+    let l = String(bruta).replace(INVISIVEIS, '').replace(/\s+/g, ' ').trim();
     l = l.replace(MARCA_LISTA, '');
     if (PREFIXO_PDF.test(l)) {
       const resto = l.replace(PREFIXO_PDF, '');
@@ -55,8 +59,16 @@
   const SETAS = /\s*(?:\u2192|->|=>|\u00ae)\s*/;
   const MARCA_PERGUNTA = /^(?:\d{1,2}[.)]|[a-z][.)]|[-\u2013\u2022*])\s*/i;
   // a citação depois da referência: dois pontos, travessão ou meia-risca (ou nada) e o texto entre
-  // aspas, com ou sem a sigla da tradução no fim ("(NVI)")
-  const CITACAO = /^(?:[:\u2014\u2013-]\s*)?[\u201c"\u00ab]([\s\S]*)[\u201d"\u00bb]\s*[.,;]?\s*(?:\(\s*(\p{Lu}[\p{L}\d]{1,7})\s*\))?\s*\.?$/u;
+  // aspas até as últimas aspas da linha; o que sobra depois delas (CAUDA) é só pontuação e a sigla
+  // da tradução ("(NVI)"). Em duas expressões, sem espaços opcionais encadeados: a de cima anda a
+  // linha uma vez, e a cauda é curta.
+  const CITACAO = /^(?:[:\u2014\u2013-] ?)?[\u201c"\u00ab]([\s\S]*)[\u201d"\u00bb]([^\u201d"\u00bb]*)$/u;
+  const CAUDA = /^ ?[.,;]? ?(?:\( ?(\p{Lu}[\p{L}\d]{1,7}) ?\))? ?\.?$/u;
+  const citacao = (resto) => {
+    const c = CITACAO.exec(resto);
+    const cauda = c && c[2].length <= 40 ? CAUDA.exec(c[2]) : null;
+    return cauda ? { texto: c[1], de: cauda[1] || '' } : null;
+  };
   const SO_SIGLA = /^[.:;,]?\s*(?:\(\s*\p{Lu}[\p{L}\d]{1,7}\s*\))?\s*[.:;,]?$/u;
   // o texto entre aspas e, depois, a referência: entre parênteses, ou depois de um travessão
   const ASPAS_E_REF = /^[\u201c"\u00ab]([\s\S]+)[\u201d"\u00bb]\s*[.,;]?\s*(?:[\u2014\u2013-]\s*)?([\s\S]+)$/u;
@@ -91,8 +103,8 @@
       const resto = s.slice(a.fim).trim();
       if (!resto || SO_SIGLA.test(resto)) return { r: a, troca: false, de: '', antes: false };
       if (!a.maiuscula) return null;
-      const c = CITACAO.exec(resto);
-      if (c) return { r: a, troca: true, de: c[2] || '', antes: false };
+      const c = citacao(resto);
+      if (c) return { r: a, troca: true, de: c.de, antes: false };
       if (!a.inteiro && resto.length <= RESTO_CURTO && !/[\u201c\u201d"\u00ab\u00bb]/.test(resto)) return { r: a, troca: false, de: '', antes: true };
       return null;
     }
@@ -211,6 +223,7 @@
     for (let i = 0; i < fonte.length; i++) {
       const linha = limpar(fonte[i], capitulos);
       if (!linha) continue;
+      if (linha.length > LINHA_MAX) { fecharLista(); emPerguntas = false; primeira = false; textoDe(linha, i); continue; }
       const topico = TOPICO.exec(linha);
       const textoDoTopico = topico ? semAsteriscos(topico[2]) : '';
       const ehTopico = !!topico && textoDoTopico.length > 0 && textoDoTopico.length <= TOPICO_MAX;

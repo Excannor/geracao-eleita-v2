@@ -22,6 +22,7 @@
   const SETA = ' \u2192 ';
   // Os tetos de estudos.mjs (o servidor confere de novo): avisar aqui poupa a ida e volta.
   const ESTUDO_MAX = 10000;
+  const ESTUDO_BRUTO_MAX = 2 * ESTUDO_MAX;
   const AVISO_LIMITE = 9000;
   const TITULO_MAX = 120;
   const TEXTO_BLOCO_MAX = 1500;
@@ -278,8 +279,9 @@
         clearTimeout(medida);
         medida = setTimeout(() => {
           if (!campo.isConnected) return;
-          // o teto vale para o texto limpo, sem as citações de outra tradução (como no servidor)
-          const n = CC.lerEstudo(st.fonte, { capitulos: capitulos() }).fonte.length;
+          // o teto vale para o texto limpo, sem as citações de outra tradução (como no servidor);
+          // o texto bruto acima do dobro nem passa pelo leitor
+          const n = st.fonte.length > ESTUDO_BRUTO_MAX ? st.fonte.length : CC.lerEstudo(st.fonte, { capitulos: capitulos() }).fonte.length;
           limite.hidden = n < AVISO_LIMITE;
           limite.textContent = n > ESTUDO_MAX ? MSG.tamanho : 'Faltam ' + (ESTUDO_MAX - n).toLocaleString('pt-BR') + ' caracteres para o limite do estudo';
         }, 250);
@@ -507,7 +509,7 @@
       const erros = [];
       if (!r.blocos.length) erros.push(MSG.vazio);
       if (!r.titulo || r.titulo.length > TITULO_MAX) erros.push(MSG.titulo);
-      if (r.fonte.length > ESTUDO_MAX) erros.push(MSG.tamanho);
+      if (r.fonte.length > ESTUDO_MAX || st.fonte.length > ESTUDO_BRUTO_MAX) erros.push(MSG.tamanho);
       if (r.blocos.length > BLOCOS_MAX) erros.push(MSG.partes);
       if (r.blocos.some((b) => (b.t === 'seta' ? b.itens.map((x) => x.join(' ')) : [b.texto || '', b.autor || '']).some((t) => t.length > TEXTO_BLOCO_MAX))) erros.push(MSG.parte);
       if (r.blocos.filter((b) => b.t === 'versiculo').length > CARTOES_MAX) erros.push(MSG.cartoes);

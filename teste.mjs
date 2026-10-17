@@ -15,7 +15,7 @@ import {
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import {
-  ESTUDO_MAX, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
+  ESTUDO_MAX, ESTUDO_BRUTO_MAX, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
 
@@ -511,6 +511,17 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 
   checar(['', '   \n \n'].every((t) => { const x = ler(t); return x.titulo === '' && x.blocos.length === 0 && x.refs.length === 0; }), '29. texto vazio não tem título nem partes');
   checar(ler('1. Um tópico logo de cara\nTexto').titulo === '', 'a primeira linha que já é marca deixa o estudo sem título');
   checar(!/[—–“”→®]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 'utf8')), 'o leitor escreve as letras especiais como escape (a varredura de travessão não o acusa)');
+
+  // --- o tempo do leitor: o servidor o roda antes de qualquer teto, então nada pode travá-lo ---
+  {
+    let t0 = Date.now();
+    const espacos = ler('T\nEfésios 6:12 "a"' + '\u1680'.repeat(2400) + 'x');
+    checar(Date.now() - t0 < 100 && espacos.blocos.length >= 1, 'uma fila de 2.400 espaços U+1680 depois da citação é lida em menos de 100 ms (' + (Date.now() - t0) + ' ms)');
+    checar(ler('T\nA\u1680\u3000\u00a0\tB').blocos[0].texto === 'A B', 'todo tipo de espaço vira um espaço só');
+    t0 = Date.now();
+    const longa = ler('T\n> "' + '" - '.repeat(1500) + 'x');
+    checar(Date.now() - t0 < 100 && longa.blocos.length === 1 && longa.blocos[0].t === 'texto', 'uma linha de mais de 3.000 caracteres vira texto, sem procurar marca (' + (Date.now() - t0) + ' ms)');
+  }
 }
 
 // =========================================================================
@@ -1515,6 +1526,12 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
   checar(await recusa({ estudo: 'outro' }) === MSG_ESTUDO.tipo + '|400', 'tipo desconhecido: "' + MSG_ESTUDO.tipo + '"');
   checar(await recusa({ estudo: 'blocos', fonte: '   ' }) === MSG_ESTUDO.vazio + '|400', 'estudo escrito vazio: "' + MSG_ESTUDO.vazio + '"');
   checar(await recusa({ estudo: 'blocos', fonte: 'x'.repeat(10001) }) === MSG_ESTUDO.tamanho + '|400', 'texto puro de 10.001 caracteres: "' + MSG_ESTUDO.tamanho + '"');
+  {
+    const semLer = opcoes({ regras: Object.assign(Object.create(C), { lerEstudo: () => { throw new Error('o leitor rodou'); } }) });
+    checar(ESTUDO_BRUTO_MAX === 20000 && await tentar(() => ce.salvarEstudo('lider', ID, { estudo: 'blocos', fonte: 'T\n' + 'x '.repeat(10001) }, semLer)) === MSG_ESTUDO.tamanho + '|400'
+      && await tentar(() => ce.salvarEstudo('lider', ID, { estudo: 'semana', fonte: 'x'.repeat(20001) }, semLer)) === MSG_ESTUDO.tamanho + '|400',
+    'o texto bruto acima de 20.000 caracteres volta antes de o leitor de marcas rodar');
+  }
   checar(await recusa({ estudo: 'blocos', fonte: '1. Um tópico logo de cara\nTexto' }) === MSG_ESTUDO.titulo + '|400', 'estudo sem título: "' + MSG_ESTUDO.titulo + '"');
   checar(await recusa({ ...doDono, perguntas: ['1', '2', '3', '4', '5', '6', '7'] }) === MSG_ESTUDO.perguntas + '|400', '7 perguntas: "' + MSG_ESTUDO.perguntas + '"');
   checar(await recusa({ ...doDono, traducao: 'nvi' }) === MSG_ESTUDO.traducao + '|400', 'a tradução "nvi": "' + MSG_ESTUDO.traducao + '"');
