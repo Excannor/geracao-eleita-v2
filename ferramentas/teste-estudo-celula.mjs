@@ -500,9 +500,11 @@ for (const w of [390, 360]) {
     folha.scrollTop = 0;
     const f = folha.getBoundingClientRect();
     const b = folha.querySelector('[data-mandar]').getBoundingClientRect();
-    return { altura: folha.scrollHeight, visivel: Math.round(f.height), dentro: b.top >= f.top && b.bottom <= f.bottom && b.bottom <= innerHeight };
+    // e nada do texto rola por baixo da barra: o que está no pé da folha é a própria barra
+    const pe = document.elementFromPoint(f.left + f.width / 2, f.bottom - 3);
+    return { altura: folha.scrollHeight, visivel: Math.round(f.height), dentro: b.top >= f.top && b.bottom <= f.bottom && b.bottom <= innerHeight, rente: !!(pe && pe.closest('.acoes')) };
   });
-  ok(pe.dentro && pe.altura > pe.visivel, '11. a ' + w + ' px, "Mandar" fica à vista no pé da folha desde o começo (prévia de ' + pe.altura + ' px numa folha de ' + pe.visivel + ')');
+  ok(pe.dentro && pe.rente && pe.altura > pe.visivel, '11. a ' + w + ' px, "Mandar" fica à vista no pé da folha desde o começo, sem texto por baixo (prévia de ' + pe.altura + ' px numa folha de ' + pe.visivel + ')');
 }
 await tamanho(390);
 const dataDoEncontro = await na(() => {
@@ -512,6 +514,7 @@ const dataDoEncontro = await na(() => {
 });
 const esperado = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo-grupo.txt'), 'utf8')
   .replace('{{DATA}}', dataDoEncontro).replace('{{NBV Efésios 6.12}}', textoDe(NBV, 'Efésios 6.12')).replace('{{ENDERECO}}', base.replace(/\/$/, ''));
+await foto('05b-whatsapp-tela');
 await foto('05-whatsapp', true);
 await medidas('a folha "Mandar no grupo" a 390 px');
 await clicar('.cortina [data-mandar]');
@@ -544,7 +547,16 @@ async function percorrer(guardar) {
 await clicar('[data-modo-encontro]');
 ok(await esperar(existe('.tela-cheia .mesa-topo'), 15000), '12. o modo encontro abre');
 const vistos = await percorrer(async (n) => {
-  if (n === 3) await foto('06a-encontro-3', true);
+  if (n === 3) {
+    await foto('06a-encontro-3', true);
+    await tema(true);
+    await dormir(500);
+    // no escuro, "Abrir Efésios 6 na Bíblia" precisa parecer botão: fundo diferente do da folha do alto
+    const cores = await na(() => { const b = document.querySelector('.tela-cheia .mesa-abrir'); return { botao: getComputedStyle(b).backgroundColor, folha: getComputedStyle(b.closest('.mesa-topo')).backgroundColor, tinta: getComputedStyle(b).color }; });
+    ok(cores.botao !== cores.folha && cores.botao !== cores.tinta, '12. no escuro, "Abrir Efésios 6 na Bíblia" tem fundo próprio, diferente do da folha (' + cores.botao + ' sobre ' + cores.folha + ')');
+    await foto('escuro-06a-encontro-3');
+    await tema(false);
+  }
   if (n === 7) { await foto('06b-encontro-7'); await tema(true); await foto('escuro-06b-encontro-7', true); await tema(false); }
   if (n === 11) await foto('06c-encontro-11');
   if (n === 13) await foto('06d-encontro-13', true);

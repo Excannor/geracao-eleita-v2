@@ -77,8 +77,11 @@
 .mesa-zap .link { color: var(--salvia-texto); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 /* o estudo inteiro vai na prévia, que fica alta: "Mandar" e "Copiar" ficam presos no pé da folha,
    à mão desde a primeira tela */
+/* o sticky gruda no fim da área de conteúdo, acima do respiro de baixo da folha: o respiro passa
+   para dentro da barra, senão o texto aparece rolando por baixo dela */
+.folha.folha-zap { padding-bottom: 0; }
 .folha-zap .acoes { position: sticky; bottom: 0; z-index: 1; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin: 12px -20px 0;
-  padding: 12px 20px; background: var(--cartao); box-shadow: 0 -1px 0 var(--contorno); }
+  padding: 12px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--cartao); box-shadow: 0 -1px 0 var(--contorno); }
 .folha-zap .acoes .botao { min-width: 0; }
 .folha-zap .acoes [data-fechar] { grid-column: 1 / -1; }
 
@@ -86,9 +89,11 @@
 .tela-modo-encontro .cena.mesa-topo { padding-bottom: 28px; }
 .mesa-topo .mesa-titulo-cena { margin: 4px 0 0; color: var(--folha-tinta); font-size: 1.625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
 .mesa-topo .frase-cena.mesa-frase { font-size: 1.5rem; }
-/* a pílula de destaque da folha do alto, nos dois temas: no escuro, a sálvia com a tinta dela (o
-   fundo do campo some na folha escura, e o botão deixava de parecer botão) */
-.mesa-topo .mesa-abrir { margin-top: 8px; background: var(--folha-destaque); color: var(--salvia-tinta); }
+.mesa-topo .mesa-abrir { margin-top: 8px; background: var(--folha-destaque); color: var(--tinta-forte); }
+/* no escuro, o fundo do campo (o da tela cheia) é o mesmo da folha do alto e o botão deixava de
+   parecer botão: a pílula de destaque da folha, a sálvia com a tinta dela. O seletor precisa
+   passar o de .tela-cheia .botao.contorno. */
+:root[data-tema="escuro"] .mesa-topo .mesa-abrir { background: var(--folha-destaque); color: var(--salvia-tinta); }
 .mesa-abrir-cartao { margin: 10px 0 0; }
 .mesa-corpo-encontro { display: grid; gap: 16px; width: 100%; max-width: 560px; padding: 24px 20px 40px; text-align: left; }
 .mesa-corpo-encontro > * { margin: 0; }
