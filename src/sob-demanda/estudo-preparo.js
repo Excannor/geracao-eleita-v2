@@ -73,7 +73,7 @@
     const baseEm = e ? e.editadoEm || e.em || '' : '';
     const salvo = lerRascunho(p.id);
     if (salvo && (salvo.base || '') === base && (salvo.baseEm === undefined || salvo.baseEm === baseEm)) return salvo;
-    if (salvo) CC.avisar('O estudo mudou em outro aparelho. O preparo começa da versão salva.');
+    if (salvo && base && (salvo.base || '') === base) CC.avisar('O estudo mudou em outro aparelho. O preparo começa da versão salva.');
     const st = {
       v: 1, base, baseEm, tipo: 'blocos', passo: 1, fonte: '', palavra: '', trecho: { livro: 'Gênesis', cap: '1', vers: '' }, traducao: 'nbv',
       opcoes: true, modo: 'colar', colado: false, coladoWord: false, recusadas: [], perguntas: null, chavePerguntas: '', salvas: null, ws: null,
