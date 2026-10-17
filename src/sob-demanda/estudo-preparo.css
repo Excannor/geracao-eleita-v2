@@ -123,3 +123,4 @@
 .mesa-ws dd { margin: 2px 0 0; color: var(--tinta); font-size: .9375rem; font-weight: 500; line-height: 1.45; text-wrap: pretty; }
 .mesa-nota { display: flex; align-items: flex-start; gap: 10px; margin: 0 4px; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
 .mesa-nota svg { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--salvia-texto); }
+div.mesa-aviso { cursor: auto; padding-bottom: 18px; }

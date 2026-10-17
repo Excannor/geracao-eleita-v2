@@ -1445,7 +1445,10 @@ export class Contas {
         Object.assign(novo, { titulo: lido.titulo, fonte: lido.fonte, blocos: lido.blocos, refs: lido.refs });
         if (!perguntas) novo.perguntas = lido.perguntas;
       } else {
-        if (recebida.length > ESTUDO_MAX) throw erro(MSG_ESTUDO.tamanho);
+        // A palavra do líder (semana e trecho) passa pelo mesmo leitor, sem título: a citação de
+        // outra tradução que vier nela também fica só com a referência.
+        novo.fonte = recebida ? regras.lerEstudo(recebida, { capitulos, versiculos: contar, semTitulo: true }).fonte : '';
+        if (novo.fonte.length > ESTUDO_MAX) throw erro(MSG_ESTUDO.tamanho);
         if (tipo === 'semana') Object.assign(novo, { planoAte: Number(planoAte) || 0, refs: refSemana ? [String(refSemana)] : [] });
         if (tipo === 'trecho') {
           const r = regras.lerRefLivre(e.ref, capitulos);

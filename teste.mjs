@@ -512,6 +512,79 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 
   checar(ler('1. Um tópico logo de cara\nTexto').titulo === '', 'a primeira linha que já é marca deixa o estudo sem título');
   checar(!/[—–“”→®]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 'utf8')), 'o leitor escreve as letras especiais como escape (a varredura de travessão não o acusa)');
 
+  // --- as citações de outra tradução, em todas as formas que o líder cola (revisão de 17/10) ---
+  {
+    const Q = '\u201cA nossa luta não é contra seres humanos, mas contra os poderes\u201d';
+    const umCartao = (linha, de) => {
+      const x = ler('Título\n' + linha);
+      const relida = ler(x.fonte);
+      return x.blocos.length === 1 && x.blocos[0].t === 'versiculo' && x.blocos[0].ref === 'Efésios 6.12' && x.trocas.length === 1 && x.trocas[0].de === de
+        && !x.fonte.includes('nossa luta') && JSON.stringify(semL(relida.blocos)) === JSON.stringify(semL(x.blocos)) && !relida.trocas.length;
+    };
+    const formas = [
+      ['Efésios 6:12 ' + Q + ' NVI', 'NVI'], ['Efésios 6:12 (NVI) ' + Q, 'NVI'], ['Efésios 6:12 (NVI): ' + Q, 'NVI'], ['Efésios 6:12 NVI \u2014 ' + Q, 'NVI'],
+      ['Efésios 6:12 \u2013 ' + Q + ' \u2013 NVI', 'NVI'], ['Efésios 6.12 \u2014 ' + Q + ' (Nova Versão Internacional)', 'Nova Versão Internacional'],
+      ['Efésios 6:12 \u2018A nossa luta não é contra seres humanos\u2019', ''], ['Efésios 6:12 - A nossa luta não é contra seres humanos, mas contra os poderes (NVI)', 'NVI'],
+      [Q + ' (Ef 6.12 NVI)', 'NVI'], ['Efésios 6:12\n' + Q + ' (NVI)', 'NVI'], ['Efésios 6:12 (NVI)\n' + Q, 'NVI'], [Q + ' (ARA)\nEfésios 6:12', 'ARA'],
+      ['Efésios 6:12\n> ' + Q, ''], ['*Leiam juntos:* Efésios 6.12 (NBV)\n' + Q, 'NBV'],
+    ];
+    const falhou = formas.filter(([l, de]) => !umCartao(l, de)).map(([l]) => l.slice(0, 40));
+    checar(!falhou.length, 'cada forma de citação (sigla antes ou depois, por extenso, aspas simples, sem aspas com a sigla, a referência e o texto em duas linhas) vira o cartão com a troca' + (falhou.length ? ': ' + falhou.join(' | ') : ''));
+    const citou = (linha) => { const x = ler('Título\n' + linha); return { x, relida: ler(x.fonte) }; };
+    {
+      const { x, relida } = citou('Para guardar: Efésios 6:10 \u201cFortaleça-se no Senhor e na força do seu poder.\u201d (NVI)');
+      checar(JSON.stringify(semL(x.blocos)) === JSON.stringify([{ t: 'versiculo', ref: 'Efésios 6.10' }, { t: 'guardar', texto: 'Efésios 6.10' }]) && x.trocas[0].de === 'NVI'
+        && JSON.stringify(semL(relida.blocos)) === JSON.stringify(semL(x.blocos)), '"Para guardar:" com a citação: o cartão entra, e a frase para guardar fica com a referência');
+    }
+    {
+      const { x, relida } = citou('Conclusão: \u201cFortaleça-se no Senhor e na força do seu poder.\u201d (Efésios 6:10)');
+      checar(JSON.stringify(semL(x.blocos)) === JSON.stringify([{ t: 'conclusao' }, { t: 'versiculo', ref: 'Efésios 6.10' }]) && x.trocas.length === 1
+        && JSON.stringify(semL(relida.blocos)) === JSON.stringify(semL(x.blocos)), '"Conclusão:" com a citação: a conclusão e o cartão, sem o texto citado');
+    }
+    {
+      const { x, relida } = citou('1. Efésios 6:10 \u201c' + 'Fortaleça-se no Senhor e na força do seu poder. '.repeat(4) + '\u201d (NVI)');
+      checar(JSON.stringify(semL(x.blocos)) === JSON.stringify([{ t: 'topico', n: 1, texto: 'Efésios 6.10' }, { t: 'versiculo', ref: 'Efésios 6.10' }]) && !x.fonte.includes('Fortaleça-se')
+        && JSON.stringify(semL(relida.blocos)) === JSON.stringify(semL(x.blocos)), 'o tópico que cita o versículo (mesmo longo) fica com a referência, e o cartão vem logo abaixo');
+    }
+    {
+      const sem = ler('Título\nEfésios 6:12 - Pois a nossa luta não é contra seres humanos, mas contra os poderes');
+      checar(JSON.stringify(semL(sem.blocos).map((b) => b.t)) === '["versiculo","texto"]' && !sem.trocas.length && sem.avisos.some((a) => a.tipo === 'citacao' && a.bloco === 1 && a.ref === 'Efésios 6.12'),
+        'a referência, um travessão e um texto longo, sem aspas e sem sigla: o cartão entra antes, a linha fica e a prévia avisa');
+      const meio = ler('Título\nEfésios 6:12 diz que \u201ca nossa luta não é contra pessoas\u201d, e isso muda tudo.');
+      checar(meio.avisos.some((a) => a.tipo === 'citacao' && a.bloco === 1), 'a referência no começo e um trecho entre aspas no meio da frase: a prévia avisa');
+      const semRef = ler('Título\n> \u201cEstejam alertas e vigiem.\u201d (NVI)\nUm texto que termina na sigla (NVI)');
+      checar(semRef.avisos.filter((a) => a.tipo === 'citacao').length === 2 && semRef.blocos[0].t === 'citacao' && semRef.blocos[0].autor === '', 'a citação com a sigla e sem a referência fica, com o aviso (a sigla não vira autor)');
+      checar(!r.avisos.some((a) => a.tipo === 'citacao'), 'no estudo do dono, nenhum aviso de citação (a "casa varrida" de Lucas e o "tenha medo" da conclusão são do texto)');
+    }
+    {
+      const zap = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo-grupo.txt'), 'utf8').replace('{{DATA}}', 'quinta, 22/10')
+        .replace('{{NBV Efésios 6.12}}', 'Pois nós não estamos lutando contra seres humanos').replace('{{ENDERECO}}', 'https://exemplo.app');
+      const z = ler(zap);
+      checar(z.titulo === 'Batalha espiritual, vigilância e Armadura de Deus' && JSON.stringify(z.refs) === JSON.stringify(['Efésios 6.12', '1 Pedro 5.8', 'Efésios 6.13-17', 'Efésios 6.18', 'Efésios 6.10'])
+        && z.trocas.length === 1 && !z.fonte.includes('Pois nós não') && JSON.stringify(z.sugestoes.map((x) => x.ref)) === '["Lucas 11.24-26"]',
+      'o texto do grupo colado de volta: os 5 cartões ("Leiam juntos:" e "Leiam:"), a citação da NBV trocada e Lucas como sugestão');
+      checar(z.perguntas.length === 2 && !/Para o encontro de|Conheça o app|Para ler cada versículo/.test(z.fonte) && z.blocos[z.blocos.length - 1].t === 'guardar',
+        'e as linhas que o app escreve (a data, o rodapé) ficam fora; as perguntas numeradas param no rodapé');
+    }
+  }
+
+  // --- as outras bordas do leitor (revisão de 17/10) ---
+  checar(ler('João 3:16 \u2013 O amor de Deus\nTexto').titulo === 'João 3:16 \u2013 O amor de Deus' && ler('*Romanos 8:28-39: Mais que vencedores*\nTexto').titulo === 'Romanos 8:28-39: Mais que vencedores',
+    'o título que começa por uma referência com um resto curto continua sendo o título');
+  checar(JSON.stringify(semL(ler('Título\n\u2192 só sentido\nitem \u2192\n\u2192').blocos).map((b) => b.t)) === '["texto","texto","texto"]', 'a seta sem um dos lados fica como texto, e não como lista');
+  {
+    const x = ler('Título\nEfésios 7:1\nMarcos 20 anos de ministério.');
+    checar(x.avisos.length === 1 && x.avisos[0].tipo === 'sem-versiculo' && x.avisos[0].ref === 'Efésios 7.1' && x.avisos[0].bloco === 0,
+      'a linha que é a referência de um capítulo que não existe ganha o aviso; "Marcos 20 anos" no começo de uma frase não');
+  }
+  checar(JSON.stringify(semL(ler('Título\n> \u201cQuem tem Deus tem tudo.\u201d (Spurgeon)\n> \u201cQuem tem Deus tem tudo.\u201d Spurgeon').blocos))
+    === JSON.stringify([{ t: 'citacao', texto: 'Quem tem Deus tem tudo.', autor: 'Spurgeon' }, { t: 'citacao', texto: 'Quem tem Deus tem tudo.', autor: 'Spurgeon' }]),
+  'a frase de alguém com o autor entre parênteses, ou solto depois das aspas, separa o autor e tira as aspas');
+  {
+    const p = ler('Começo da palavra.\nEfésios 6:12 \u201cA nossa luta\u201d (NVI)', { semTitulo: true });
+    checar(p.titulo === '' && p.fonte === 'Começo da palavra.\nEfésios 6.12' && p.trocas.length === 1, 'sem título (a palavra do líder na semana e no trecho), a primeira linha é texto, e a citação vira a referência');
+  }
+
   // --- o tempo do leitor: o servidor o roda antes de qualquer teto, então nada pode travá-lo ---
   {
     let t0 = Date.now();
@@ -1450,6 +1523,9 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
     checar(val(leitura([{ t: 'texto', texto: 'x'.repeat(1501) }])) === MSG_ESTUDO.parte + '|400', 'uma parte de texto com mais de 1.500 caracteres é recusada');
     checar(val(leitura(Array.from({ length: 16 }, (_, i) => ({ t: 'versiculo', ref: 'Salmos ' + (i + 1) + '.1' })))) === MSG_ESTUDO.cartoes + '|400', 'mais de 15 versículos: "' + MSG_ESTUDO.cartoes + '"');
     checar(val(leitura([{ t: 'seta', itens: Array.from({ length: 13 }, () => ['Fé', 'confiança.']) }])) === MSG_ESTUDO.lista + '|400', 'lista com seta de 13 linhas é recusada');
+    checar(val(leitura([{ t: 'seta', itens: [['Fé', ''], ['**', 'x']] }])) === MSG_ESTUDO.seta + '|400', 'lista com seta sem um dos lados é recusada');
+    checar(val(leitura([texto], { avisos: [{ tipo: 'sem-versiculo', bloco: 0, ref: 'Efésios 7.1' }] })) === 'não achamos Efésios 7.1 na Bíblia do app. Confira a referência|400',
+      'a referência de um capítulo que não existe, que o leitor deixou como texto com o aviso, é recusada');
     checar(/^não achamos Efésios 99\.1 na Bíblia do app/.test(val(leitura([{ t: 'versiculo', ref: 'Efésios 99.1' }]))) && /^não achamos/.test(val(leitura([{ t: 'versiculo', ref: 'Livro 1.1' }]))),
       'um cartão que não existe na Bíblia do app é recusado');
     const limpa = validarLeitura(leitura([{ t: 'versiculo', ref: 'Efésios 6.12', l: [3, 3] }, { t: 'seta', itens: [['Fé', 'confiança.']], l: [4, 4], linhas: 1 }]), { lerRef: C.lerRef, livros: [...LIVROS], capitulos: capitulosDoPlano });
@@ -1553,6 +1629,10 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
   checar(r5.estudo.tipo === 'semana' && r5.estudo.planoAte === 30 && JSON.stringify(r5.estudo.refs) === '["Gênesis 50.20"]' && r5.estudo.fonte === 'Confiar sem ver.',
     'a leitura da semana congela até que dia do plano ela vai, com a referência-chave');
   checar(estudoNoRetrato(r5.estudo, {}).texto === 'Confiar sem ver.' && !('fonte' in estudoNoRetrato(r5.estudo, { souQuemPrepara: true })), 'em semana e trecho, a palavra do líder vai como "texto"');
+  {
+    const comCitacao = await ce.salvarEstudo('lider', ID, { estudo: 'semana', fonte: 'Confiar sem ver.\nEfésios 6:12 \u201cA nossa luta não é contra seres humanos\u201d (NVI)', base: r5.estudo.id }, opcoes({ planoAte: 30, refSemana: 'Gênesis 50.20' }), dia(15));
+    checar(comCitacao.estudo.fonte === 'Confiar sem ver.\nEfésios 6.12', 'a palavra do líder também perde a citação de outra tradução: fica a referência');
+  }
   // o aparelho que ainda tem o app antigo manda "livre" e "texto"
   const r6 = await ce.salvarEstudo('lider', ID, { estudo: 'livre', texto: 'Hoje vamos falar de perdão.\r\nLeiam Mateus 18.21-22.' }, opcoes(), dia(16));
   checar(r6.estudo.tipo === 'blocos' && r6.estudo.titulo === 'Hoje vamos falar de perdão.' && r6.estudo.fonte === 'Hoje vamos falar de perdão.\nLeiam Mateus 18.21-22.'

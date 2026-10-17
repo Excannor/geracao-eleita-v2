@@ -422,9 +422,15 @@
         + '<div class="mesa-sugestao-botoes" role="group" aria-label="Cartão de ' + esc(s.ref) + '">'
         + '<button type="button" class="botao pequeno contorno" data-mostrar="' + s.bloco + '" data-ref="' + esc(s.ref) + '">' + CC.ico('certo') + 'Mostrar o cartão</button>'
         + '<button type="button" class="botao pequeno contorno" data-nao-mostrar="' + esc(s.ref) + '">' + CC.ico('fechar') + 'Não mostrar</button></div></div>';
+      // O aviso de uma parte que não é cartão: a referência de um capítulo que não existe, ou o que
+      // parece ser o texto de um versículo de outra tradução, que ficou como veio.
+      const avisoDaParte = (a) => (a.tipo === 'sem-versiculo' ? semVersiculo(a.ref)
+        : a.ref ? 'Esta parte começa com ' + a.ref + ' e pode trazer o texto do versículo em outra tradução. Se trouxer, deixe só a referência: o cartão já mostra o texto da ' + nome + '.'
+          : 'Esta parte parece citar a Bíblia em outra tradução. Ponha a referência numa linha só, e o app mostra o texto da ' + nome + ' num cartão.');
       const parteHtml = (n) => {
         const b = r.blocos[n];
-        const html = b.t === 'versiculo' ? cartaoComOrigem(b, n) : R.blocoEmHtml(b, { semConclusao: true, semEtiqueta: true });
+        const html = b.t === 'versiculo' ? cartaoComOrigem(b, n) : R.blocoEmHtml(b, { semConclusao: true, semEtiqueta: true })
+          + r.avisos.filter((a) => a.bloco === n && (a.tipo === 'citacao' || a.tipo === 'sem-versiculo')).map((a) => '<p class="mesa-origem mesa-origem-aviso">' + CC.ico('info') + esc(avisoDaParte(a)) + '</p>').join('');
         return html + r.sugestoes.filter((s) => s.bloco === n).map(sugestao).join('');
       };
       // As partes: o título, a introdução, cada tópico, a conclusão e cada "Para guardar".
@@ -521,7 +527,10 @@
     async function previaDoRoteiro(painel, biblia) {
       const erros = [];
       let blocos = [];
-      if (st.tipo === 'semana') blocos = R.comoBlocos({ tipo: 'semana', texto: st.palavra }, sem());
+      // a palavra como o servidor vai gravar: a citação de outra tradução fica só com a referência
+      const palavra = st.palavra && st.palavra.length <= ESTUDO_BRUTO_MAX ? CC.lerEstudo(st.palavra, { capitulos: capitulos(), semTitulo: true }) : { fonte: st.palavra || '', trocas: [] };
+      if (palavra.fonte.length > ESTUDO_MAX || String(st.palavra || '').length > ESTUDO_BRUTO_MAX) erros.push(MSG.tamanho);
+      if (st.tipo === 'semana') blocos = R.comoBlocos({ tipo: 'semana', texto: palavra.fonte }, sem());
       else {
         const ref = refDoTrecho();
         const r = CC.lerRefLivre(ref, capitulos());
@@ -530,7 +539,7 @@
           const c = R.cartaoDe(ref, contar(biblia));
           const total = contar(biblia) ? contar(biblia)(r.livro, r.cap) : 0;
           if (total && (r.de || 1) > total) erros.push(semVersiculo(CC.escreverRef(r.livro, r.cap, r.de, r.ate)));
-          blocos = R.comoBlocos({ tipo: 'trecho', texto: st.palavra, ref: '' }).concat(c ? [c] : []);
+          blocos = R.comoBlocos({ tipo: 'trecho', texto: palavra.fonte, ref: '' }).concat(c ? [c] : []);
         }
       }
       const refs = blocos.filter((b) => b.t === 'versiculo').map((b) => b.ref);
@@ -540,7 +549,10 @@
         ? '<div class="mesa-com-origem">' + cartao(b.ref, textos.get(b.ref)) + (b.escrito ? '<p class="mesa-origem mesa-origem-aviso">' + CC.ico('info')
           + esc('Mostramos os 10 primeiros versículos de ' + b.escrito + '. Para o capítulo inteiro, use Abrir na Bíblia, ou divida em dois cartões.') + '</p>' : '') + '</div>'
         : R.blocoEmHtml(b))).join('');
-      painel.innerHTML = (st.tipo === 'trecho' ? blocoTraducao(refs.length) : '')
+      const n = palavra.trocas.length;
+      painel.innerHTML = (n ? '<div class="mesa-aviso">' + CC.ico('info') + '<b>Tiramos o texto citado da sua palavra</b><p>'
+        + (n === 1 ? 'Ela trazia 1 citação em outra tradução. No lugar dela fica só a referência.' : 'Ela trazia ' + n + ' citações em outra tradução. No lugar de cada uma fica só a referência.') + '</p></div>' : '')
+        + (st.tipo === 'trecho' ? blocoTraducao(refs.length) : '')
         + (html ? '<section class="mesa-parte"><header><span class="etiqueta">' + (st.tipo === 'semana' ? 'Leitura da semana' : 'Um trecho') + '</span></header><div class="mesa-estudo">' + html + '</div></section>' : '')
         + acoes2;
       mostrarErro(painel, erros);

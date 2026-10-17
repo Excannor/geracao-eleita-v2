@@ -36,6 +36,7 @@ export const MENSAGENS = {
   partes: 'o estudo passou de 80 partes. Divida em dois encontros',
   cartoes: 'o estudo tem no máximo 15 versículos',
   lista: 'uma lista com seta tem no máximo 12 linhas',
+  seta: 'cada linha com seta precisa de um item antes e de um sentido depois',
   perguntas: 'escolha até 6 perguntas',
   pergunta: 'cada pergunta tem no máximo 300 caracteres',
   traducao: 'escolha a NBV ou a Bíblia Livre',
@@ -100,6 +101,7 @@ export function validarLeitura(r, { lerRef, livros = [], capitulos = null, versi
     const textos = b.t === 'seta' ? (b.itens || []).map((par) => par.join(' ')) : [b.texto || '', b.autor || ''];
     if (textos.some((t) => tamanho(t) > TEXTO_BLOCO_MAX)) throw erro(MENSAGENS.parte);
     if (b.t === 'seta' && (!Array.isArray(b.itens) || !b.itens.length || b.itens.length > PARES_MAX)) throw erro(MENSAGENS.lista);
+    if (b.t === 'seta' && b.itens.some((par) => !Array.isArray(par) || par.length !== 2 || par.some((x) => !String(x || '').replace(/\*/g, '').trim()))) throw erro(MENSAGENS.seta);
     if (b.t === 'versiculo') {
       cartoes++;
       const x = lerRef ? lerRef(b.ref) : null;
@@ -109,6 +111,10 @@ export function validarLeitura(r, { lerRef, livros = [], capitulos = null, versi
     blocos.push(parteLimpa(b));
   }
   if (cartoes > CARTOES_MAX) throw erro(MENSAGENS.cartoes);
+  // uma linha que começa pela referência de um capítulo que não existe ("Efésios 7:1") fica como
+  // texto no leitor, com o aviso: o servidor recusa como a prévia
+  const falta = (r.avisos || []).find((a) => a && a.tipo === 'sem-versiculo');
+  if (falta) throw erro(semVersiculo(falta.ref));
   const refs = [...new Set(blocos.filter((b) => b.t === 'versiculo').map((b) => b.ref))];
   return { titulo, blocos, refs, fonte, perguntas: (r.perguntas || []).slice(0, PERGUNTAS_MAX) };
 }
