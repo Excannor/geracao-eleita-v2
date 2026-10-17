@@ -1207,6 +1207,26 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   checar(semRede[4] === '*Leiam juntos:* Efésios 6.12 (NBV)' && semRede[5] === '', 'textoParaGrupo(): sem o texto do versículo, sai só a referência');
   checar(R.textoParaGrupo({ ...dono, traducao: 'blivre' }, { principal: { abreviatura: 'BLIVRE' } }).includes('*Leiam juntos:* Efésios 6.12 (BLIVRE)'), 'textoParaGrupo(): com a Bíblia Livre, a abreviatura dela');
   checar(!zap.includes('DE TESTE') && !/Acolhida|Adoração|Testemunho/.test(zap), 'textoParaGrupo(): acolhida, adoração e testemunho não vão para o grupo');
+  {
+    // semana e trecho mandam o roteiro inteiro, como a aba: o começo e a oração
+    const sem = R.semana(30);
+    const zapSemana = R.textoParaGrupo({ tipo: 'semana', texto: 'Confiar sem ver.', perguntas: [], refs: [], blocos: [] }, { semana: sem, principal: { abreviatura: 'NBV' } });
+    checar(zapSemana.includes('\n*Para começar*\n' + R.COMECAR_SEMANA + '\n') && zapSemana.indexOf('*Para começar*') < zapSemana.indexOf('*Leiam juntos:*')
+      && (!sem.oracao.length || zapSemana.includes('*Para orar juntos*\n' + sem.oracao.join('\n'))), 'textoParaGrupo(): a leitura da semana leva "Para começar" e "Para orar juntos", como a aba');
+    const zapTrecho = R.textoParaGrupo({ tipo: 'trecho', ref: 'Romanos 8.28-30', texto: '', perguntas: [], refs: ['Romanos 8.28-30'], blocos: [] }, { principal: { abreviatura: 'NBV' } });
+    checar(zapTrecho.includes('*Para orar juntos*\n' + R.ORAR_TRECHO) && zapTrecho.includes('*Para conversar*\n1. ' + R.PERGUNTAS_OIA[0]), 'textoParaGrupo(): o trecho leva as perguntas do OIA e a oração');
+    const frases = (texto, autor) => R.textoParaGrupo({ tipo: 'blocos', titulo: 'T', blocos: [{ t: 'citacao', texto, autor }], perguntas: [] }, {}).split('\n')[2];
+    checar(frases('Quem tem Deus tem tudo.', 'Spurgeon') === '> \u201cQuem tem Deus tem tudo.\u201d (Spurgeon)' && frases('\u201cJá entre aspas\u201d', '') === '> \u201cJá entre aspas\u201d',
+      'textoParaGrupo(): a frase de alguém vai entre aspas, e a que já vem com aspas não ganha outras');
+  }
+  {
+    // o cartão cortado: o aviso dos 10 primeiros só quando o cartão mostra menos do que foi pedido
+    const contar = (l, c) => nbv.livros[l][c - 1].length;
+    checar(R.cortaTrecho({ ref: 'Efésios 6.1-10', escrito: 'Efésios 6' }, contar) && R.cortaTrecho({ ref: 'Efésios 6.10-19', escrito: 'Efésios 6.10-20' }, contar)
+      && !R.cortaTrecho({ ref: 'Salmos 117.1-2', escrito: 'Salmos 117' }, contar) && !R.cortaTrecho({ ref: 'Salmos 117.1-2', escrito: 'Salmos 117.1-5' }, contar)
+      && !R.cortaTrecho({ ref: 'Salmos 117.1-2', escrito: 'Salmos 117' }, null) && R.cortaTrecho({ ref: 'Efésios 6.1-10', escrito: 'Efésios 6' }, null) && !R.cortaTrecho({ ref: 'João 3.16' }, contar),
+    'cortaTrecho(): o capítulo e o trecho longo cortados contam; o Salmos 117 (inteiro no cartão) não, com a contagem ou sem ela');
+  }
 
   // 3. noPlano()
   const dias = (refs) => R.noPlano(refs, D.plano).map((x) => x.numero).join();

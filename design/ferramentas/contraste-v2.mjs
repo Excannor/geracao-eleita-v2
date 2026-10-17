@@ -59,6 +59,8 @@ const PARES = [
   ['--folha-tinta-fraca', '--salvia-palido', 4.5, 'etiqueta "Para guardar" do estudo no escuro'],
   ['--v2-tinta-forte', '--salvia-palido', 4.5, 'selo "Encontro hoje · preparar o estudo"'],
   ['--v2-tinta-forte', '--v2-cartao', 4.5, 'convite de Orar juntos no modo encontro'],
+  ['--salvia-tinta', '--folha-destaque', 4.5, 'botão "Abrir ... na Bíblia" no alto do passo do encontro'],
+  ['--v2-tinta-fraca', '--v2-cartao', 3, 'círculo vazio da escolha no passo 1 do preparo'],
 ];
 
 let falhas = 0;

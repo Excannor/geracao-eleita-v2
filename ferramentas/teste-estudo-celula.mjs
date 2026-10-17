@@ -492,6 +492,19 @@ await na(() => { window.__compartilhado = null; CC.compartilhar = async (t) => {
 await clicar('[data-compartilhar]');
 ok(await esperar(existe('.cortina .mesa-zap')), '11. "Mandar no grupo" abre a prévia');
 ok(await av('!/Versão curta|Estudo inteiro/.test(document.querySelector(".cortina .folha").textContent)'), '11. sem "Versão curta": vai sempre o estudo inteiro');
+for (const w of [390, 360]) {
+  await tamanho(w);
+  await dormir(300);
+  const pe = await na(() => {
+    const folha = document.querySelector('.cortina .folha');
+    folha.scrollTop = 0;
+    const f = folha.getBoundingClientRect();
+    const b = folha.querySelector('[data-mandar]').getBoundingClientRect();
+    return { altura: folha.scrollHeight, visivel: Math.round(f.height), dentro: b.top >= f.top && b.bottom <= f.bottom && b.bottom <= innerHeight };
+  });
+  ok(pe.dentro && pe.altura > pe.visivel, '11. a ' + w + ' px, "Mandar" fica à vista no pé da folha desde o começo (prévia de ' + pe.altura + ' px numa folha de ' + pe.visivel + ')');
+}
+await tamanho(390);
 const dataDoEncontro = await na(() => {
   const nomes = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
   for (let i = 0; i < 7; i++) { const d = CC.somaDias(CC.hojeIso(), i); if (new Date(d + 'T12:00:00').getDay() === 4) return 'quinta, ' + d.slice(8, 10) + '/' + d.slice(5, 7); }

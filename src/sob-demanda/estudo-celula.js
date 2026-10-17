@@ -115,13 +115,13 @@
     const leiam = cartao ? '<li><b>Leiam juntos</b>' + cartaoComMais(cartao.ref, textos.get(cartao.ref) || '', sigla) + abrir + '</li>' : '';
     const perguntas = R.perguntasDe(e, sem);
     return '<ol class="roteiro">'
-      + (e.tipo === 'semana' ? '<li><b>Para começar</b><p>Cada um conta, em uma frase, o que mais marcou na leitura da semana.</p></li>' : '')
+      + (e.tipo === 'semana' ? '<li><b>Para começar</b><p>' + esc(R.COMECAR_SEMANA) + '</p></li>' : '')
       + leiam
       + (e.tipo === 'semana' ? '<li><b>A leitura da semana</b><ul class="roteiro-dias">' + sem.dias.map((d) => '<li><span>Dia ' + d.n + '</span>' + esc(CC.passagemDe(d.dia))
         + (d.r.titulo ? '<small>' + esc(d.r.titulo) + '</small>' : '') + '</li>').join('') + '</ul></li>' : '')
       + (perguntas.length ? '<li><b>Para conversar</b><ul class="roteiro-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ul></li>' : '')
       + (e.tipo === 'semana' && sem.oracao.length ? '<li><b>Para orar juntos</b><ul class="roteiro-oracao">' + sem.oracao.map((o) => '<li>' + esc(o) + '</li>').join('') + '</ul></li>' : '')
-      + (e.tipo === 'trecho' ? '<li><b>Para orar juntos</b><p>Orem a partir do que o texto mostrou.</p></li>' : '')
+      + (e.tipo === 'trecho' ? '<li><b>Para orar juntos</b><p>' + esc(R.ORAR_TRECHO) + '</p></li>' : '')
       + '</ol>';
   }
 

@@ -75,14 +75,21 @@
 .mesa-zap .ast { color: var(--tinta-fraca); font-weight: 600; }
 .mesa-zap b { font-weight: 800; }
 .mesa-zap .link { color: var(--salvia-texto); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+/* o estudo inteiro vai na prévia, que fica alta: "Mandar" e "Copiar" ficam presos no pé da folha,
+   à mão desde a primeira tela */
+.folha-zap .acoes { position: sticky; bottom: 0; z-index: 1; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin: 12px -20px 0;
+  padding: 12px 20px; background: var(--cartao); box-shadow: 0 -1px 0 var(--contorno); }
+.folha-zap .acoes .botao { min-width: 0; }
+.folha-zap .acoes [data-fechar] { grid-column: 1 / -1; }
 
 /* ---------- modo encontro por partes ---------- */
 .tela-modo-encontro .cena.mesa-topo { padding-bottom: 28px; }
 .mesa-topo .mesa-titulo-cena { margin: 4px 0 0; color: var(--folha-tinta); font-size: 1.625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
 .mesa-topo .frase-cena.mesa-frase { font-size: 1.5rem; }
-.mesa-topo .mesa-abrir { margin-top: 8px; background: var(--folha-destaque); color: var(--tinta-forte); }
+/* a pílula de destaque da folha do alto, nos dois temas: no escuro, a sálvia com a tinta dela (o
+   fundo do campo some na folha escura, e o botão deixava de parecer botão) */
+.mesa-topo .mesa-abrir { margin-top: 8px; background: var(--folha-destaque); color: var(--salvia-tinta); }
 .mesa-abrir-cartao { margin: 10px 0 0; }
-:root[data-tema="escuro"] .mesa-topo .mesa-abrir { background: var(--campo); color: var(--tinta-forte); }
 .mesa-corpo-encontro { display: grid; gap: 16px; width: 100%; max-width: 560px; padding: 24px 20px 40px; text-align: left; }
 .mesa-corpo-encontro > * { margin: 0; }
 .mesa-corpo-encontro .mesa-fala { color: var(--tinta-forte); font-size: 1.25rem; font-weight: 600; line-height: 1.5; text-wrap: pretty; }
@@ -97,6 +104,10 @@
 .mesa-corpo-encontro .mesa-seta li:first-child { padding-top: 14px; }
 .mesa-corpo-encontro .mesa-seta li:last-child { padding-bottom: 14px; }
 .mesa-corpo-encontro .roteiro-dias { margin: 0; }
+/* os dias da leitura da semana fora do roteiro (no estudo, na prévia e no encontro): sem o
+   marcador e o recuo do navegador, como na aba */
+.mesa-estudo .roteiro-dias, .mesa-corpo-encontro .roteiro-dias { display: grid; gap: 8px; padding-left: 0; list-style: none; }
+.mesa-estudo .roteiro-dias { margin: 6px 0 0; }
 .mesa-convite { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 14px; padding: 16px 18px; border-radius: var(--raio-cartao); background: var(--cartao); }
 .mesa-convite > svg { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
 .mesa-convite p { margin: 0; color: var(--tinta-forte); font-size: 1.0625rem; font-weight: 600; line-height: 1.5; text-wrap: pretty; }

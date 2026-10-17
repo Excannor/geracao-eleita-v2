@@ -27,6 +27,9 @@
   const SUGESTAO_ADORACAO = 'Escolham juntos uma música de louvor para começar.';
   const SUGESTAO_TESTEMUNHO = 'Quem vocês querem convidar para o próximo encontro? Orem juntos por essas pessoas, pelo nome.';
   const ORAR = 'Orem uns pelos outros, a partir do que conversaram.';
+  // o começo e a oração do roteiro de semana e trecho (a aba e o texto do grupo dizem o mesmo)
+  const COMECAR_SEMANA = 'Cada um conta, em uma frase, o que mais marcou na leitura da semana.';
+  const ORAR_TRECHO = 'Orem a partir do que o texto mostrou.';
   const SETA = ' \u2192 ';
   const ABRE = '\u201c';
   const FECHA = '\u201d';
@@ -242,6 +245,8 @@
     };
     blocos.forEach((b, i) => {
       if (b.t === 'versiculo') {
+        // a leitura da semana começa como na aba: cada um conta o que mais marcou
+        if (i === iPrincipal && e.tipo === 'semana') { por(['*Para começar*', COMECAR_SEMANA], 'texto'); colar = ''; }
         if (i === iPrincipal) {
           const p = c.principal || {};
           por(['*Leiam juntos:* ' + b.ref + (p.abreviatura ? ' (' + p.abreviatura + ')' : '')].concat(p.texto ? [ABRE + p.texto + FECHA] : []), 'leiam', true);
@@ -254,13 +259,17 @@
       if (b.t === 'conclusao') { por(['*Conclusão*'], 'conclusao'); colar = 'sempre'; return; }
       if (b.t === 'texto') { por([b.texto], 'texto'); colar = /:\s*$/.test(b.texto) ? 'lista' : ''; return; }
       if (b.t === 'seta') por(b.itens.map(([item, sentido]) => (b.destaque ? '*' + item + SETA + sentido + '*' : item + SETA + sentido)), 'seta');
-      else if (b.t === 'citacao') por(['> ' + ABRE + b.texto + FECHA + (b.autor ? ' (' + b.autor + ')' : '')], 'citacao');
+      // a frase que já vem entre aspas não ganha outras
+      else if (b.t === 'citacao') por(['> ' + (/^[\u201c"\u00ab\u2018]/.test(b.texto) ? b.texto : ABRE + b.texto + FECHA) + (b.autor ? ' (' + b.autor + ')' : '')], 'citacao');
       else if (b.t === 'guardar') por(['*Para guardar:* ' + b.texto], 'guardar');
       else if (b.t === 'dias') por(b.dias.map((d) => 'Dia ' + d.n + ': ' + d.passagem), 'dias');
       colar = '';
     });
     const qs = perguntasDe(e, c.semana);
     if (qs.length) saida.push('', '*Para conversar*', ...qs.map((q, i) => (i + 1) + '. ' + q));
+    // semana e trecho fecham com a oração, como na aba (o estudo inteiro vai para o grupo)
+    const oracao = e.tipo === 'semana' && c.semana ? c.semana.oracao : e.tipo === 'trecho' ? [ORAR_TRECHO] : [];
+    if (oracao.length) saida.push('', '*Para orar juntos*', ...oracao);
     saida.push('', 'Para ler cada versículo, abram a Bíblia nas referências acima.');
     if (c.endereco) saida.push('Conheça o app: ' + c.endereco);
     return saida.join('\n');
@@ -355,7 +364,7 @@
   }
 
   CC.estudoRegras = {
-    PERGUNTAS_OIA, PERGUNTAS_ACOLHIDA, SUGESTAO_ADORACAO, SUGESTAO_TESTEMUNHO, sugestaoAcolhida,
+    PERGUNTAS_OIA, PERGUNTAS_ACOLHIDA, SUGESTAO_ADORACAO, SUGESTAO_TESTEMUNHO, COMECAR_SEMANA, ORAR_TRECHO, sugestaoAcolhida,
     cruza, cartaoDe, cortaTrecho, capituloDe, semana, titulo, comoBlocos, perguntasDe, dividir, passos, textoParaGrupo,
     noPlano, parabolaDoEstudo, gruposDePerguntas, blocoEmHtml, negrito,
   };
