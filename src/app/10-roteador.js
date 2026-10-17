@@ -483,6 +483,9 @@
     const { rota, arg, consulta } = partesDaRota();
 
     conteudo.classList.toggle('sem-entrada', redesenhando);
+    // O preparo do estudo da célula é uma tela sem a barra de abas: um toque sem querer nela
+    // não tira o líder do meio do texto (01-base.css, body.sem-barra).
+    document.body.classList.toggle('sem-barra', /^celula\/[^/]+\/preparar$/.test(arg || '') && (rota === 'novidades' || rota === 'amigos'));
     if (rota !== 'dia') CC.fecharLicao();
     // A tela do dia do Conhecer Jesus é uma folha cheia por cima da lista (igual à lição),
     // então só fica aberta enquanto a rota aponta para aquele dia específico.

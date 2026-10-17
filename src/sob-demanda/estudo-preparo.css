@@ -1,0 +1,125 @@
+/* =========================================================================
+   Preparar o estudo da célula (À Mesa): os 3 passos, do mock aprovado (mesa-mock/_fonte/mesa.css),
+   só com fichas de 00-tokens.css. O listrado sálvia (--realce) fica só para o que foi escolhido:
+   a opção do passo 1 e a pergunta marcada no passo 3.
+   ========================================================================= */
+
+/* ---------- a cabeça com os passos ---------- */
+.mesa-passos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: -6px 8px 10px; }
+.mesa-passos i { height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--folha-tinta) 16%, transparent); }
+.mesa-passos i.feito { background: var(--folha-tinta); }
+.folha-juntos .mesa-passo { margin: 0; text-align: center; color: var(--folha-tinta-fraca); font-size: .9375rem; font-weight: 600; }
+.folha-juntos .mesa-passo b { color: var(--folha-tinta); font-weight: 800; }
+.folha-juntos .mesa-cabeca > h1 { font-size: 1.25rem; white-space: nowrap; }
+
+/* ---------- passo 1: Colar ou Escrever ---------- */
+.mesa-escolha:empty, .segmentado[data-tipos][hidden] { display: none; }
+.mesa-opcoes { display: grid; gap: 10px; }
+.mesa-opcao { display: grid; grid-template-columns: 44px minmax(0, 1fr) 28px; align-items: center; gap: 14px; width: 100%; min-height: 76px; padding: 14px 16px; border: 0; border-radius: 24px; background: var(--cartao); color: var(--tinta-forte); font: inherit; text-align: left; cursor: pointer; }
+.mesa-opcao > svg:first-child { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--campo); color: var(--tinta-forte); }
+.mesa-opcao b { display: block; font-size: 1rem; font-weight: 800; line-height: 1.3; text-wrap: balance; }
+.mesa-opcao small { display: block; margin-top: 2px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.35; text-wrap: pretty; }
+.mesa-opcao .marca-opcao { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--contorno); }
+.mesa-opcao[aria-checked="true"] { background: var(--realce); }
+.mesa-opcao[aria-checked="true"] > svg:first-child { background: var(--salvia); color: var(--salvia-tinta); }
+.mesa-opcao[aria-checked="true"] .marca-opcao { background: var(--inverso); color: var(--inverso-tinta); box-shadow: none; }
+.mesa-opcao .marca-opcao svg { width: 16px; height: 16px; stroke-width: 3; }
+/* depois de colar, a escolha recolhe numa linha */
+.mesa-escolhido { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 10px 10px 14px; border-radius: 24px; background: var(--cartao); }
+.mesa-escolhido > svg { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); }
+.mesa-escolhido b { display: block; color: var(--tinta-forte); font-size: 1rem; font-weight: 800; line-height: 1.3; }
+.mesa-escolhido small { display: block; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.35; text-wrap: pretty; }
+.mesa-escolhido .botao { min-height: 44px; background: var(--campo); }
+
+/* ---------- o campo do estudo: uma caixa de texto comum ---------- */
+.mesa-rotulo { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 8px 4px -2px; }
+.mesa-rotulo b { color: var(--tinta-forte); font-size: 1.0625rem; font-weight: 800; }
+.mesa-campo { display: block; box-sizing: border-box; width: 100%; min-height: 120px; margin: 0; padding: 14px 16px 16px; border: 1.5px solid var(--contorno); border-radius: var(--raio-campo); background: var(--campo); color: var(--tinta-forte); font: inherit; font-size: 1rem; font-weight: 500; line-height: 1.55; overflow-wrap: anywhere; resize: none; overflow: hidden; }
+.mesa-campo::placeholder { color: var(--tinta-fraca); opacity: 1; }
+.mesa-campo:focus { border-color: var(--tinta-forte); background: var(--cartao); outline: none; }
+.mesa-legenda { display: grid; gap: 6px; margin: 0 4px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
+.mesa-limite { margin: 0 4px; color: var(--tinta-forte); font-size: .875rem; font-weight: 700; }
+
+/* ---------- as marcas, presas logo acima do teclado ---------- */
+.mesa-barra-marcas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; gap: 8px; max-width: 560px; margin: 0 auto; padding: 10px 12px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--contorno); background: var(--cartao); }
+.mesa-barra-marcas[hidden] { display: none; }
+.mesa-barra-marcas > p { margin: 0 4px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
+.mesa-barra-marcas .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mesa-marca { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 14px; background: var(--campo); color: var(--tinta-forte); font: inherit; font-size: .9375rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.mesa-marca .g { display: inline-grid; place-items: center; min-width: 18px; color: var(--salvia-texto); font-size: 1rem; font-weight: 800; line-height: 1; }
+.mesa-marca svg { width: 18px; height: 18px; color: var(--salvia-texto); }
+/* com a barra aberta, o fim do texto não fica escondido atrás dela */
+.conteudo:has(.mesa-barra-marcas:not([hidden])) { padding-bottom: 200px; }
+
+/* ---------- passo 2: avisos e escolhas da prévia ---------- */
+.mesa-aviso { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 4px 14px; align-items: start; width: 100%; padding: 18px 20px 12px; border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.mesa-aviso > svg { grid-row: span 3; box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.mesa-aviso b { color: var(--tinta-forte); font-size: 1rem; font-weight: 800; line-height: 1.35; text-wrap: balance; }
+.mesa-aviso p { margin: 0; color: var(--tinta); font-size: .9375rem; font-weight: 500; line-height: 1.5; text-wrap: pretty; }
+.mesa-aviso .ir { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; color: var(--salvia-texto); font-size: .9375rem; font-weight: 800; }
+.mesa-aviso .ir svg { width: 18px; height: 18px; }
+.mesa-bloco { display: grid; gap: 10px; padding: 18px 20px 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.mesa-bloco > .etiqueta, .mesa-parte > header .etiqueta { color: var(--salvia-texto); font-size: .8125rem; }
+.mesa-bloco > .segmentado { margin: 0; background: var(--campo); }
+.mesa-bloco > .segmentado button { min-height: 44px; }
+.mesa-bloco > .segmentado button[aria-pressed="true"] { background: var(--inverso); color: var(--inverso-tinta); box-shadow: none; }
+.mesa-bloco > p { margin: 0; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
+.mesa-resumo { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.mesa-resumo li { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--campo); color: var(--tinta-forte); font-size: .8125rem; font-weight: 700; }
+.mesa-parte { display: grid; gap: 12px; padding: 16px 20px 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.mesa-parte > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; margin: -4px -8px -6px 0; }
+.mesa-parte > header .botao { min-height: 44px; padding: 8px 14px 8px 12px; background: var(--campo); }
+.mesa-parte > header .botao svg { width: 18px; height: 18px; }
+.mesa-parte .erro-proposito { margin: 0; }
+/* embaixo do cartão, o que havia no texto do líder */
+.mesa-com-origem { display: grid; gap: 6px; margin: 4px 0; }
+.mesa-com-origem .cartao-versiculo { margin: 0; }
+.mesa-origem { display: flex; align-items: flex-start; gap: 6px; margin: 0 4px; color: var(--tinta-fraca); font-size: .8125rem !important; font-weight: 600 !important; line-height: 1.4 !important; }
+.mesa-origem svg { flex: none; width: 15px; height: 15px; margin-top: 1px; }
+.mesa-origem.mesa-origem-aviso { color: var(--tinta-forte); }
+/* a sugestão do app: contorno tracejado, nada escolhido ainda */
+.mesa-sugestao { display: grid; gap: 10px; padding: 14px; border: 2px dashed color-mix(in srgb, var(--salvia-texto) 70%, transparent); border-radius: 24px; background: var(--cartao); }
+.mesa-sugestao > .etiqueta { margin: 2px 4px 0; color: var(--salvia-texto); font-size: .8125rem; }
+.mesa-sugestao > p { margin: 0 4px; color: var(--tinta-forte); font-size: .9375rem !important; font-weight: 600 !important; line-height: 1.45 !important; text-wrap: pretty; }
+.mesa-sugestao .cartao-versiculo { margin: 0; background: var(--campo); }
+.mesa-sugestao-botoes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.mesa-sugestao-botoes .botao { width: 100%; min-height: 44px; padding-inline: 10px; background: var(--campo); }
+.mesa-sugestao-botoes .botao svg { width: 18px; height: 18px; }
+
+/* ---------- passo 3: Para conversar ---------- */
+.mesa-grupo { display: grid; gap: 0; border-radius: var(--raio-cartao); background: var(--cartao); overflow: hidden; }
+.mesa-grupo > header { display: grid; gap: 2px; padding: 16px 20px 6px; }
+.mesa-grupo > header b { color: var(--tinta-forte); font-size: 1rem; font-weight: 800; }
+.mesa-grupo > header span { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+.mesa-pergunta { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 8px; padding: 6px 12px 6px 8px; border-top: 1px solid var(--contorno); }
+.mesa-grupo > header + .mesa-pergunta { border-top: 0; }
+.mesa-pergunta label { display: grid; grid-template-columns: 26px minmax(0, 1fr); align-items: start; gap: 12px; min-height: 44px; padding: 8px 4px 8px 12px; border-radius: 16px; cursor: pointer; }
+.mesa-pergunta input { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; }
+.mesa-pergunta input:focus-visible + .caixa-marcar { outline: 2px solid var(--tinta-forte); outline-offset: 2px; }
+.mesa-pergunta .caixa-marcar { margin-top: 1px; }
+.mesa-pergunta.marcada { background: var(--realce); }
+.mesa-pergunta.marcada .caixa-marcar { background: var(--salvia); box-shadow: none; }
+.mesa-pergunta .texto { margin: 2px 0 0; color: var(--tinta-forte); font-size: .9375rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
+.mesa-pergunta > .botao { min-height: 44px; margin-top: 2px; padding: 8px 14px; background: var(--campo); }
+.mesa-pergunta.editando { grid-template-columns: 26px minmax(0, 1fr); gap: 12px; padding: 14px 20px; }
+.mesa-pergunta.editando .campo-editar { display: grid; gap: 8px; }
+.mesa-pergunta.editando .texto-editar { box-sizing: border-box; width: 100%; margin: 0; padding: 12px 14px; border: 0; border-radius: 18px; background: var(--cartao); box-shadow: inset 0 0 0 1.5px var(--tinta-forte); color: var(--tinta-forte); font: inherit; font-size: .9375rem; font-weight: 600; line-height: 1.45; resize: none; overflow: hidden; }
+.mesa-pergunta.editando .texto-editar:focus { outline: none; }
+.mesa-pergunta.editando .pe-editar { display: flex; flex-wrap: wrap; gap: 8px; }
+.mesa-pergunta.editando .pe-editar .botao { min-height: 44px; }
+.mesa-pergunta .botao.contorno, .mesa-escrever .botao.contorno, .mesa-ws .botao.contorno { background: var(--campo); }
+.mesa-escrever { display: grid; gap: 8px; padding: 14px 20px 18px; border-top: 1px solid var(--contorno); }
+.mesa-escrever .campo-falso { box-sizing: border-box; width: 100%; min-height: 52px; padding: 14px 16px; border: 1.5px solid var(--contorno); border-radius: 18px; background: var(--campo); color: var(--tinta-forte); font: inherit; font-size: 1rem; font-weight: 500; }
+.mesa-escrever .campo-falso::placeholder { color: var(--tinta-fraca); opacity: 1; }
+.mesa-escrever .campo-falso:focus { border-color: var(--tinta-forte); background: var(--cartao); outline: none; }
+.mesa-escrever .botao { justify-self: start; min-height: 44px; }
+.mesa-conta { margin: 0 4px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
+.mesa-ws { display: grid; gap: 0; border-radius: var(--raio-cartao); background: var(--cartao); overflow: hidden; }
+.mesa-ws > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 12px 6px 20px; }
+.mesa-ws > header b { color: var(--tinta-forte); font-size: 1rem; font-weight: 800; }
+.mesa-ws > header .botao { min-height: 44px; background: var(--campo); }
+.mesa-ws dl { margin: 0; padding: 0 20px 16px; }
+.mesa-ws dt { margin-top: 10px; color: var(--salvia-texto); font-size: .8125rem; font-weight: 800; }
+.mesa-ws dd { margin: 2px 0 0; color: var(--tinta); font-size: .9375rem; font-weight: 500; line-height: 1.45; text-wrap: pretty; }
+.mesa-nota { display: flex; align-items: flex-start; gap: 10px; margin: 0 4px; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
+.mesa-nota svg { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--salvia-texto); }

@@ -340,6 +340,7 @@ secao('peças sob demanda');
     ['atlas', 'ATLAS_TELA', 'atlas-quadro', '', 'os mapas bíblicos'],
     // o estudo da célula (À Mesa): a casca, o vazio e o selo ficam em 08b-propositos.js
     ['estudo-celula', 'ESTUDO_CELULA', 'textoParaGrupo', '', 'o estudo da célula'],
+    ['estudo-preparo', 'ESTUDO_PREPARO', 'mesa-barra-marcas', '', 'o preparo do estudo'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -354,13 +355,16 @@ secao('peças sob demanda');
     // como todo .js do app: só com sessão (não é público como os mapas e as fontes)
     checar(!servidorTexto.match(/const PUBLICO_COM_RESUMO = .*/)[0].includes(nome.toUpperCase()), rotulo + ' só sai do servidor com sessão');
   }
-  // A peça do estudo junta mais de um arquivo: as regras puras vão com a tela. O estudo antigo
-  // saiu do index.
+  // As peças do estudo juntam mais de um arquivo: as regras puras vão com a tela, e o leitor de
+  // marcas (o mesmo do servidor) vai com o preparo. O estudo antigo saiu do index.
   {
     const arquivo = (variavel) => (html.match(new RegExp('window\\.' + variavel + '="([^"]*)"')) || [])[1] || '';
     const celula = arquivo('ESTUDO_CELULA') ? readFileSync(dist(arquivo('ESTUDO_CELULA')), 'utf8') : '';
+    const preparo = arquivo('ESTUDO_PREPARO') ? readFileSync(dist(arquivo('ESTUDO_PREPARO')), 'utf8') : '';
     checar(celula.includes('CC.estudoRegras =') && celula.includes('CC.estudoCelula =') && celula.indexOf('CC.estudoRegras =') < celula.indexOf('CC.estudoCelula ='),
       'a peça estudo-celula leva as regras (estudo-regras.js) antes da tela');
+    checar(preparo.includes('CC.lerEstudo =') && preparo.includes('CC.estudoPreparo =') && preparo.indexOf('CC.lerEstudo =') < preparo.indexOf('CC.estudoPreparo ='),
+      'a peça estudo-preparo leva o leitor de marcas (estudo-marcas.js) antes do editor');
     checar(!/folhaPrepararEstudo|montarEstudo|estudoEmTexto|semanaDoEstudo|PERGUNTAS_ACOLHIDA/.test(html) && html.includes('CC.apoioCelula'),
       'o estudo antigo (preparar, montar, texto do grupo) saiu do index.html; fica a casca');
   }
@@ -1143,7 +1147,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   checar(!/<(?!\/?(p|b|ul|li|span|svg|path|h3|div|figure|blockquote|figcaption)\b)/.test(dono.blocos.map((b) => R.blocoEmHtml(b, { cartao: () => '' })).join('')), 'blocoEmHtml(): o estudo do dono vira só as marcas de sempre');
 
   // 6. nada de travessão nem meia-risca nos textos das peças do estudo (as letras especiais como escape)
-  for (const f of ['estudo-regras.js', 'estudo-celula.js']) {
+  for (const f of ['estudo-regras.js', 'estudo-celula.js', 'estudo-preparo.js']) {
     checar(!/[—–]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', f), 'utf8')), f + ': sem travessão nem meia-risca no texto');
   }
 }

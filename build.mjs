@@ -371,9 +371,10 @@ console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 // todo .js do app, o servidor só as entrega com sessão.
 // Função nova e pesada já nasce aqui, e não em src/app/.
 // Uma peça pode juntar vários arquivos (PARTES_PECA), na ordem: o estudo da célula leva as regras
-// puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela. O padrão é <nome>.js.
-const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula'];
-const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js'] };
+// puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela, e o preparo leva o leitor
+// de marcas (estudo-marcas.js, que o servidor também carrega) antes do editor. O padrão é <nome>.js.
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo'];
+const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
   let codigo = (PARTES_PECA[nome] || [nome + '.js']).map((f) => enxugarJs(readFileSync(src('sob-demanda', f), 'utf8'), f)).join('\n');
@@ -486,6 +487,7 @@ const html = molde
     + 'window.PAINEL_TELA=' + JSON.stringify(pecas['painel-tela']) + ';'
     + 'window.ATLAS_TELA=' + JSON.stringify(pecas.atlas) + ';'
     + 'window.ESTUDO_CELULA=' + JSON.stringify(pecas['estudo-celula']) + ';'
+    + 'window.ESTUDO_PREPARO=' + JSON.stringify(pecas['estudo-preparo']) + ';'
     + 'window.ATLAS=' + JSON.stringify(atlas).replace(/</g, '\\u003c') + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'

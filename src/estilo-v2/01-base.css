@@ -758,3 +758,10 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
 /* Contador "n/máx" dos campos com limite (CC.contagem). */
 .contagem { color: var(--tinta-fraca, inherit); font-size: .75rem; font-weight: 600; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
 .contagem.passou { color: var(--erro); font-weight: 700; }
+
+/* O preparo do estudo da célula (#/novidades/celula/<id>/preparar) é tela própria, sem a barra
+   de abas (o roteador põe body.sem-barra): o fim da página não precisa do vão dela. */
+@media (max-width: 859px) {
+  body.sem-barra .navegacao { display: none; }
+  body.sem-barra .conteudo { padding-bottom: 40px; }
+}
