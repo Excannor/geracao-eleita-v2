@@ -51,6 +51,14 @@ const PARES = [
   ['--alerta', '--v2-fundo', 4.5, 'erro no fundo'],
   ['--v2-tinta-fraca', '--campo', 3, 'bolinha do interruptor desligado'],
   ['--salvia-tinta', '--salvia', 3, 'bolinha do interruptor ligado'],
+  // À Mesa, o estudo da célula (docs/a-mesa-fase1.md, 6.5): os pares novos das peças estudo-celula
+  // e estudo-preparo. O "Para guardar" fica na folha no claro e na sálvia pálida no escuro.
+  ['--v2-tinta-fraca', '--v2-cartao', 4.5, 'linha de origem do cartão na prévia do estudo'],
+  ['--salvia-texto', '--v2-cartao', 4.5, 'etiqueta "Sugestão do app" na prévia'],
+  ['--folha-tinta', '--salvia-palido', 4.5, '"Para guardar" do estudo no escuro'],
+  ['--folha-tinta-fraca', '--salvia-palido', 4.5, 'etiqueta "Para guardar" do estudo no escuro'],
+  ['--v2-tinta-forte', '--salvia-palido', 4.5, 'selo "Encontro hoje · preparar o estudo"'],
+  ['--v2-tinta-forte', '--v2-cartao', 4.5, 'convite de Orar juntos no modo encontro'],
 ];
 
 let falhas = 0;

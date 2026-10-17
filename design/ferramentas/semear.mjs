@@ -3,7 +3,8 @@
 // Uso: BASE=http://localhost:8095/ SAIDA=<pasta para os cookies> node design/ferramentas/semear.mjs
 //
 // Contas (senha "senha123" em todas):
-//   marcos  dia 42, amigos, célula (líder), discipulado (conduz o davi), propósito com a ana
+//   marcos  dia 42, amigos, célula (líder, com o estudo do dono), discipulado (conduz o davi),
+//           propósito com a ana
 //           -> barra cheia (Trilha · Juntos · Célula | Bíblia | Discipulado · Mais); admin do
 //              painel se o servidor subir com CAMINHO_ADMIN=marcos
 //   ana     dia 43, membro da célula do marcos -> barra com Célula
@@ -11,8 +12,9 @@
 //   rute    dia 31, só amiga -> barra padrão (Trilha · Desafios | Bíblia | Juntos · Mais)
 //   lia     caminho Conhecer Jesus (dia 3), amiga do marcos
 // Cada cookie sai em <SAIDA>/cookie-<conta>.txt, no formato "cc_sessao=...".
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const B = (process.env.BASE || 'http://localhost:8095/').replace(/\/?$/, '/');
 const SAIDA = process.env.SAIDA || '.';
@@ -104,6 +106,11 @@ if (c.proposito) {
   if (token) await api('ana', 'api/celula', { acao: 'entrar', token });
   await api('marcos', 'api/celula', { acao: 'encontro', id, dia: 3 });
   await api('marcos', 'api/celula', { acao: 'recado', id, texto: 'Quinta às 20h na casa da Ana. Tragam a Bíblia!' });
+  // O estudo do dono (À Mesa), como o líder o colaria, com "Para guardar" na última linha: a aba
+  // Estudo, "Mandar no grupo" e o modo encontro aparecem cheios na revisão de telas.
+  const linhas = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'ferramentas', 'estudo-exemplo.txt'), 'utf8').replace(/\s+$/, '').split('\n');
+  linhas[linhas.length - 1] = 'Para guardar: ' + linhas[linhas.length - 1];
+  await api('marcos', 'api/celula', { acao: 'estudo', id, estudo: 'blocos', fonte: linhas.join('\n'), traducao: 'nbv' });
 }
 
 // Discipulado: marcos conduz o davi
