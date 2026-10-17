@@ -395,6 +395,103 @@ const capitulosDoPlano = ctxEstudo.window.CC.capitulosDoPlano(D.plano);
 }
 
 // =========================================================================
+secao('leitor de marcas do estudo da célula (À Mesa)');
+// =========================================================================
+// O leitor (src/sob-demanda/estudo-marcas.js) roda no mesmo contexto do servidor: o que a prévia
+// do líder mostra é o que o servidor relê e grava. Casos de docs/a-mesa-fase1.md, seção 2.5.
+runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 'utf8'), ctxEstudo, { filename: 'estudo-marcas.js' });
+{
+  const C = ctxEstudo.window.CC;
+  const capitulos = capitulosDoPlano;
+  const ler = (texto, opcoes = {}) => C.lerEstudo(texto, { capitulos, ...opcoes });
+  const semL = (blocos) => blocos.map(({ l, ...b }) => b);
+
+  // --- C. as referências dentro do estudo ---
+  checar(ler('T\nefésios 6,12').blocos[0].ref === 'Efésios 6.12', '16. a referência sozinha na linha vale até com o livro em minúscula');
+  {
+    const r = ler('T\nEfésios 6');
+    checar(JSON.stringify(semL(r.blocos)) === JSON.stringify([{ t: 'versiculo', ref: 'Efésios 6.1-10', escrito: 'Efésios 6' }])
+      && r.avisos.length === 1 && r.avisos[0].tipo === 'capitulo' && r.avisos[0].mostra === 'Efésios 6.1-10', '19. o capítulo inteiro vira o cartão dos 10 primeiros, com o aviso');
+    const l = ler('T\nEf 6.10-20');
+    checar(l.blocos[0].ref === 'Efésios 6.10-19' && l.blocos[0].escrito === 'Efésios 6.10-20' && l.avisos[0].tipo === 'longo', '20. o trecho longo mostra os 10 primeiros, com o aviso');
+    const curto = ler('T\nSalmos 117', { versiculos: (livro, cap) => (livro === 'Salmos' && cap === 117 ? 2 : 0) });
+    checar(curto.blocos[0].ref === 'Salmos 117.1-2' && !curto.avisos.length, 'com a contagem de versículos, o capítulo curto aparece inteiro, sem aviso');
+    const falta = ler('T\nEfésios 6.99', { versiculos: () => 24 });
+    checar(falta.avisos.some((a) => a.tipo === 'sem-versiculo' && a.ref === 'Efésios 6.99'), 'um versículo que a Bíblia do app não tem gera o aviso');
+  }
+  {
+    const meio = ler('T\nOs 3 primeiros dias, os números 3 e 4, Efésios 99.1 e João 3.18-16 ficam como texto.');
+    checar(meio.blocos.length === 1 && meio.blocos[0].t === 'texto' && !meio.sugestoes.length,
+      '22. sigla sem versículo, minúscula no meio do texto, capítulo que não existe e trecho de trás para frente não viram cartão nem sugestão');
+    const cruza = ler('T\nEfésios 5.21-6.9');
+    checar(JSON.stringify(semL(cruza.blocos)) === JSON.stringify([{ t: 'versiculo', ref: 'Efésios 5.21' }, { t: 'texto', texto: 'Efésios 5.21-6.9' }]), '23. o trecho que cruza capítulos vira o cartão da primeira parte, e a linha fica como texto');
+  }
+
+  // --- A. o estudo do dono (casos 1 a 12) ---
+  const linhasDono = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo.txt'), 'utf8').replace(/\s+$/, '').split('\n');
+  linhasDono[linhasDono.length - 1] = 'Para guardar: ' + linhasDono[linhasDono.length - 1];
+  const dono = linhasDono.join('\n');
+  const r = ler(dono);
+  checar(r.titulo === 'Batalha espiritual, vigilância e Armadura de Deus' && r.linhaTitulo === 0, '1. o título sai sem "Estudo:"');
+  const topicos = r.blocos.filter((b) => b.t === 'topico');
+  checar(topicos.map((b) => b.n).join() === '1,2,3,4,5' && topicos[0].texto === 'Principados, potestades e dominadores' && topicos[4].texto === 'Jejum e oração: vigilância espiritual'
+    && r.blocos.filter((b) => b.t === 'conclusao').length === 1, '2. cinco tópicos, de 1 a 5, e a conclusão');
+  const ordem = 'texto versiculo topico texto texto topico texto texto texto topico texto versiculo texto texto topico texto versiculo texto seta texto versiculo topico texto texto texto texto seta conclusao texto versiculo texto guardar';
+  checar(r.blocos.map((b) => b.t).join(' ') === ordem, '3. as 32 partes vêm na ordem do mock (' + r.blocos.length + ')');
+  checar(r.blocos[17].texto === 'Efésios 6:13–17 apresenta:' && r.blocos[16].ref === 'Efésios 6.13-17', '3. o cartão de Efésios 6.13-17 entra antes da linha "apresenta:"');
+  checar(JSON.stringify(r.refs) === JSON.stringify(['Efésios 6.12', '1 Pedro 5.8', 'Efésios 6.13-17', 'Efésios 6.18', 'Efésios 6.10']), '4. os cinco cartões, na ordem');
+  checar(r.trocas.length === 4 && r.trocas.filter((t) => t.de === 'NVI').map((t) => t.ref).join() === 'Efésios 6.12' && !r.trocas.some((t) => t.ref === 'Efésios 6.13-17'),
+    '5. quatro trocas, só a de Efésios 6.12 marcada NVI; Efésios 6.13-17 era só a referência');
+  checar(JSON.stringify(r.sugestoes) === JSON.stringify([{ bloco: 6, ref: 'Lucas 11.24-26' }]), '6. a única sugestão é Lucas 11.24-26, no Tópico 2');
+  const setas = r.blocos.filter((b) => b.t === 'seta');
+  checar(setas.length === 2 && setas.every((b) => b.itens.length === 6 && !b.destaque) && setas[0].itens[5][0] === 'Espada do Espírito' && setas[0].itens[5][1] === 'a Palavra de Deus.',
+    '7. as duas listas com seta, de 6 pares, sem destaque quando coladas sem negrito');
+  const comAsteriscos = dono.replace(/^(Jejum|Oração|Palavra|Fé|Vigilância|Obediência) → (.+)$/gm, '*$1 → $2*');
+  checar(ler(comAsteriscos).blocos.filter((b) => b.t === 'seta')[1].destaque === true, '7. o resumo do Tópico 5 com o negrito do Word vira lista em destaque');
+  checar(r.blocos[31].t === 'guardar' && r.blocos[31].texto === 'Não basta limpar a casa. É preciso permitir que Deus habite nela.', '8. "Para guardar" traz a última frase');
+  checar(!['A nossa luta', 'Estejam alertas e vigiem.”', 'Orem no Espírito', 'Fortaleça-se'].some((t) => r.fonte.includes(t)) && r.fonte.length < 3000,
+    '9. a fonte limpa não guarda as citações de outra tradução (' + r.fonte.length + ' caracteres)');
+  const relido = ler(r.fonte);
+  checar(JSON.stringify(semL(relido.blocos)) === JSON.stringify(semL(r.blocos)) && relido.trocas.length === 0 && relido.fonte === r.fonte, '10. ler a fonte limpa de novo dá as mesmas partes e nenhuma troca');
+  checar(ler(dono, { semCartao: ['Lucas 11.24-26'] }).sugestoes.length === 0, '11. a sugestão recusada some');
+  {
+    const ls = dono.split('\n');
+    ls.splice(8, 0, 'Lucas 11.24-26');
+    const comLucas = ler(ls.join('\n'));
+    checar(comLucas.refs.length === 6 && comLucas.refs[1] === 'Lucas 11.24-26' && !comLucas.sugestoes.length, '12. "Mostrar o cartão" põe Lucas como segundo cartão, e a sugestão some');
+  }
+  const esperado = JSON.parse(readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo-leitura.json'), 'utf8'));
+  checar(JSON.stringify({ titulo: r.titulo, blocos: semL(r.blocos), refs: r.refs, perguntas: r.perguntas, trocas: r.trocas, sugestoes: r.sugestoes, avisos: r.avisos, fonte: r.fonte }) === JSON.stringify(esperado),
+    'o estudo do dono dá exatamente ferramentas/estudo-exemplo-leitura.json (os dados de exemplo do cliente)');
+
+  // --- B. o texto copiado do PDF (casos 13 a 15) ---
+  const pdf = ler(readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo-pdf.txt'), 'utf8'));
+  checar(pdf.titulo.startsWith('Batalha espiritual') && pdf.blocos[1].t === 'versiculo' && pdf.trocas[0].ref === 'Efésios 6.12' && pdf.trocas[0].de === 'NVI'
+    && pdf.blocos.some((b) => b.t === 'conclusao'), '13. "nn Estudo:", "n Efésios 6:12" e "n Conclusão" da cópia do PDF são entendidos');
+  const setasPdf = pdf.blocos.filter((b) => b.t === 'seta');
+  checar(setasPdf.length === 2 && setasPdf[1].itens.length === 6 && setasPdf[1].itens[5].join(' ') === 'Obediência firmeza.', '14. a linha com seis "®" do resumo vira uma lista de 6 pares');
+  const iArmadura = pdf.blocos.indexOf(setasPdf[0]);
+  checar(setasPdf[0].itens.length === 6 && setasPdf[0].itens[0][0] === 'Cinturão da verdade' && setasPdf[0].itens[5][1] === 'a Palavra de Deus.'
+    && pdf.blocos[iArmadura + 1].t === 'texto' && pdf.blocos[iArmadura + 1].texto === 'E Paulo acrescenta algo fundamental:', '15. a armadura vira 6 pares, e "E Paulo acrescenta" vira um texto depois da lista');
+
+  // --- D. as outras marcas (casos 24 a 29) ---
+  checar(JSON.stringify(semL(ler('T\n> Quem não vigia, cai. — Spurgeon').blocos)) === JSON.stringify([{ t: 'citacao', texto: 'Quem não vigia, cai.', autor: 'Spurgeon' }]), '24. frase de alguém com o autor');
+  checar(JSON.stringify(semL(ler('T\nFé -> confiança.\nAmor => serviço.').blocos)) === JSON.stringify([{ t: 'seta', itens: [['Fé', 'confiança.'], ['Amor', 'serviço.']], destaque: false }]), '25. "->" e "=>" também fazem lista com seta');
+  {
+    const duas = ler('T\nPerguntas:\n1. O que mais marcou você?\n2. O que muda na sua semana?');
+    checar(JSON.stringify(duas.perguntas) === JSON.stringify(['O que mais marcou você?', 'O que muda na sua semana?']) && duas.blocos.length === 0, '26. a seção "Perguntas" vai para as perguntas, sem o número');
+    const oito = ler('T\nPara conversar\n' + [1, 2, 3, 4, 5, 6, 7, 8].map((n) => n + '. Pergunta ' + n + '?').join('\n'));
+    checar(oito.perguntas.length === 6 && oito.avisos.length === 1 && oito.avisos[0].tipo === 'perguntas-demais' && oito.avisos[0].perguntas.length === 2, '26. com 8 perguntas, ficam 6 e um aviso');
+  }
+  checar(JSON.stringify(semL(ler('T\nConclusão: Deus é fiel.').blocos)) === JSON.stringify([{ t: 'conclusao' }, { t: 'texto', texto: 'Deus é fiel.' }]), '27. "Conclusão: ..." vira a conclusão e um texto');
+  checar(JSON.stringify(semL(ler('T\n**Para guardar:** Fiquem firmes.\nTexto com **negrito**.').blocos)) === JSON.stringify([{ t: 'guardar', texto: 'Fiquem firmes.' }, { t: 'texto', texto: 'Texto com *negrito*.' }]),
+    '28. "**Para guardar:**" vira a frase para guardar, e **negrito** vira *negrito*');
+  checar(['', '   \n \n'].every((t) => { const x = ler(t); return x.titulo === '' && x.blocos.length === 0 && x.refs.length === 0; }), '29. texto vazio não tem título nem partes');
+  checar(ler('1. Um tópico logo de cara\nTexto').titulo === '', 'a primeira linha que já é marca deixa o estudo sem título');
+  checar(!/[—–“”→®]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 'utf8')), 'o leitor escreve as letras especiais como escape (a varredura de travessão não o acusa)');
+}
+
+// =========================================================================
 secao('regras de progresso');
 // =========================================================================
 const contexto = createContext({
