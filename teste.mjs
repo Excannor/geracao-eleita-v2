@@ -151,6 +151,9 @@ checar(readFileSync(dist('sw.js'), 'utf8').includes('./' + arquivoConteudo), 'o 
   checar(faltam.length === 0, 'todo módulo que o servidor carrega está no COPY do Dockerfile' + (faltam.length ? ' (faltam: ' + faltam.join(', ') + ')' : ''));
 }
 checar(Buffer.byteLength(html) < 1024 * 1024, 'o index.html ficou abaixo de 1 MB (' + Math.round(Buffer.byteLength(html) / 1024) + ' KB)');
+// O piso da folga (docs/aprendizados.md, "Folga do index.html"): abaixo de 60 KB, o que é grande e
+// pouca gente usa vai para uma peça sob demanda antes de entrar coisa nova no index.
+checar(Buffer.byteLength(html) <= 1024 * 1024 - 60 * 1024, 'o index.html deixa pelo menos 60 KB de folga até 1 MB (folga: ' + ((1024 * 1024 - Buffer.byteLength(html)) / 1024).toFixed(1) + ' KB)');
 // Três blocos: o tema (uma linha, para a abertura já nascer no tema escolhido), os dados e o app.
 checar(html.split('<script').length - 1 === 3, 'há exatamente três blocos de script: tema da abertura, dados e aplicativo');
 checar(!html.includes('coluna-lado'), 'a coluna de resumo das telas largas saiu');
