@@ -110,6 +110,18 @@ try {
   const amizadesAntes = Object.keys(antes.amizades || {}).length;
   ok(banco('SELECT count(*) n FROM amizades')[0].n === amizadesAntes, 'as ' + amizadesAntes + ' amizades e pedidos vieram junto');
   ok(banco('SELECT count(*) n FROM toques')[0].n === Object.keys(antes.toques || {}).length, 'os toques vieram junto');
+  // O estudo que a célula trazia no contas.json (p.estudo) vira a linha 'l' + id de celula_estudos,
+  // sem autor (na época o auxiliar também preparava), e a célula aponta para ela (v19).
+  const celulasComEstudo = Object.values(antes.propositos || {}).filter((p) => p.celula && p.estudo && p.estudo.tipo);
+  const estudosBanco = new Map(banco('SELECT * FROM celula_estudos').map((l) => [l.id, l]));
+  const ponteiros = new Map(banco('SELECT id, estudo_id FROM propositos').map((l) => [l.id, l.estudo_id]));
+  ok((!SINTETICO || celulasComEstudo.length >= 2) && celulasComEstudo.every((p) => {
+    const l = estudosBanco.get('l' + p.id);
+    return l && l.proposito === p.id && l.tipo === p.estudo.tipo && l.ref === (p.estudo.ref || '') && l.fonte === (p.estudo.texto || '')
+      && l.criado_por === '' && l.atual_ate === '' && ponteiros.get(p.id) === 'l' + p.id;
+  }), 'o estudo de cada célula (' + celulasComEstudo.length + ') vira uma linha de celula_estudos, sem autor, e a célula aponta para ela');
+  ok(estudosBanco.size === celulasComEstudo.length && !banco("SELECT count(*) n FROM propositos WHERE estudo_tipo != '' OR estudo_texto != ''")[0].n,
+    'nenhum estudo sobra nas colunas antigas de propositos, e nenhum é inventado');
 
   const estadosBanco = new Map(banco('SELECT usuario, dados FROM estados').map((l) => [l.usuario, l.dados]));
   // No banco, os textos privados ficam cifrados (cofre.mjs): abertos, são os mesmos do arquivo.

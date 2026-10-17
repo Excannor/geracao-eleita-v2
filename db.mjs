@@ -259,6 +259,39 @@ const ESQUEMA = [
     motivo TEXT NOT NULL DEFAULT '');
   CREATE INDEX avisos_agendados_estado ON avisos_agendados (estado, quando);
   `,
+  // v19: os estudos da célula (À Mesa, docs/a-mesa-fase1.md). Cada estudo preparado é uma linha;
+  // o atual é o que propositos.estudo_id aponta. Um estudo novo não apaga o anterior: ele fica
+  // aqui, com atual_ate, para o histórico. O texto bíblico nunca é guardado, só as referências:
+  // a fonte é o texto do líder com cada citação de outra tradução trocada pela referência, e
+  // blocos, refs e perguntas são JSON. criado_por é o @ de quem preparou ('' no estudo que veio
+  // de antes, quando o auxiliar também preparava e não dá para saber quem foi). As colunas
+  // estudo_* de propositos ficam no esquema (coluna não se apaga) e passam a ser gravadas vazias.
+  `
+  CREATE TABLE celula_estudos (
+    id TEXT PRIMARY KEY,
+    proposito TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    titulo TEXT NOT NULL DEFAULT '',
+    ref TEXT NOT NULL DEFAULT '',
+    plano_ate INTEGER NOT NULL DEFAULT 0,
+    fonte TEXT NOT NULL DEFAULT '',
+    blocos TEXT NOT NULL DEFAULT '[]',
+    refs TEXT NOT NULL DEFAULT '[]',
+    perguntas TEXT NOT NULL DEFAULT '[]',
+    traducao TEXT NOT NULL DEFAULT 'nbv',
+    criado_por TEXT NOT NULL DEFAULT '',
+    criado_em TEXT NOT NULL,
+    editado_em TEXT NOT NULL DEFAULT '',
+    atual_ate TEXT NOT NULL DEFAULT ''
+  );
+  CREATE INDEX celula_estudos_proposito ON celula_estudos (proposito, criado_em);
+  ALTER TABLE propositos ADD COLUMN estudo_id TEXT NOT NULL DEFAULT '';
+  INSERT INTO celula_estudos (id, proposito, tipo, ref, fonte, criado_por, criado_em)
+    SELECT 'l' || id, id, estudo_tipo, estudo_ref, estudo_texto, '',
+           CASE WHEN estudo_em != '' THEN estudo_em ELSE criado_em END
+    FROM propositos WHERE celula = 1 AND estudo_tipo != '';
+  UPDATE propositos SET estudo_id = 'l' || id WHERE celula = 1 AND estudo_tipo != '';
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -430,6 +463,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['liderancas', 'DELETE FROM liderancas WHERE usuario = ?', [u]],
     // o histórico do encontro fica (quem registrou, quantas pessoas), só a presença da pessoa some
     ['celula_presencas', 'DELETE FROM celula_presencas WHERE usuario = ?', [u]],
+    // celula_estudos (v19) não entra aqui, de propósito: os estudos que a pessoa preparou ficam na
+    // célula com o @ dela (decisão do dono, 17/10; a política de privacidade diz isso)
     // discipulado dos dois lados, e os encontros dele, saem inteiros: não é um grupo que
     // sobrevive sem a pessoa, é uma relação de duas pontas só
     ['discipulado_encontros', "DELETE FROM discipulado_encontros WHERE discipulado IN (SELECT id FROM discipulados WHERE discipulador = ? OR discipulo = ?)", [u, u]],

@@ -18,6 +18,10 @@ import {
   tipoValido, destinoValido, diasValido, textoValido, limparTexto, LIMITE_ATIVOS_POR_CELULA,
   motivoDenunciaValido, venceEmDe, vencidoParaApagar, membroDeVerdade,
 } from './cuidado.mjs';
+import {
+  ESTUDO_MAX, TIPOS_ESTUDO, TRADUCOES, MENSAGENS as MSG_ESTUDO, semVersiculo,
+  limparPerguntas, limparFonte, validarLeitura, estudoDaLinha,
+} from './estudos.mjs';
 
 const scrypt = promisify(scryptCb);
 const CUSTO = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
@@ -49,7 +53,8 @@ export function validarQuandoDoEncontro(quando, hoje) {
   if (dia < hoje || dia > limite) throw erro('escolha um dia de hoje até um ano para a frente');
   return q;
 }
-export const ESTUDO_MAX = 3000;
+// O teto do estudo (10.000 caracteres na fonte limpa) e os outros moram em estudos.mjs.
+export { ESTUDO_MAX };
 // Acolhida, adoração e testemunho são só um empurrão para a conversa: bem mais curtos que a
 // Palavra, que pode ser um estudo inteiro.
 export const CAMPO_4W_MAX = 300;
@@ -217,8 +222,11 @@ function paraLinhas(d) {
       id: p.id, tipo: p.tipo, alvo: p.alvo || '', titulo: p.titulo || '', criado_por: p.criadoPor, criado_em: p.criadoEm,
       encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0, celula: p.celula ? 1 : 0,
       encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recado_em: p.recadoEm || '', recado_quando: p.recadoQuando || '',
-      estudo_tipo: (p.estudo && p.estudo.tipo) || '', estudo_ref: (p.estudo && p.estudo.ref) || '',
-      estudo_texto: (p.estudo && p.estudo.texto) || '', estudo_em: (p.estudo && p.estudo.em) || '',
+      // O estudo mora em celula_estudos desde a v19; a célula guarda só o ponteiro. estudo_id tem
+      // de estar aqui: sincronizar regrava a linha inteira (INSERT OR REPLACE) só com estas
+      // colunas, e sem ele a primeira gravação zeraria o estudo de todas as células. As quatro
+      // colunas antigas vão vazias, para a linha relida do banco comparar igual à da memória.
+      estudo_id: p.estudoId || '', estudo_tipo: '', estudo_ref: '', estudo_texto: '', estudo_em: '',
       estudo_acolhida: p.estudoAcolhida || '', estudo_adoracao: p.estudoAdoracao || '', estudo_testemunho: p.estudoTestemunho || '',
       mae: p.mae || '', multiplicada_em: p.multiplicadaEm || '',
     })) },
@@ -306,7 +314,7 @@ function deLinhas(t, versao) {
       id: l.id, tipo: l.tipo, alvo: l.alvo || '', titulo: l.titulo || '', criadoPor: l.criado_por, criadoEm: l.criado_em,
       encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, celula: !!l.celula,
       encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '', recadoQuando: l.recado_quando || '',
-      estudo: l.estudo_tipo ? { tipo: l.estudo_tipo, ref: l.estudo_ref || '', texto: l.estudo_texto || '', em: l.estudo_em || '' } : null,
+      estudoId: l.estudo_id || '',
       estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
       mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '',
       membros: [], diasBatidos: [], encontros: [], aprovacoes: [],
@@ -428,6 +436,7 @@ export class Contas {
         this.migrar();
       }
       lerTabelas(db);
+      this.migrarEstudosLegados();
       await this.salvar();
       concluirImportacao(db, 'contas', this.arquivo);
       await this.migrarPropositos();
@@ -439,6 +448,22 @@ export class Contas {
     await this.migrarPropositos();
     await this.pedirAprovacoesQueFaltam();
     return this;
+  }
+
+  // O contas.json de antes do banco trazia o estudo dentro da célula (p.estudo). Ele vira a linha
+  // 'l' + id de celula_estudos, como a migração v19 faz com o que já estava no banco, sem autor: na
+  // época o auxiliar também preparava, e não dá para saber quem foi.
+  migrarEstudosLegados() {
+    const db = this.banco();
+    for (const p of Object.values(this.dados.propositos || {})) {
+      const e = p.estudo;
+      delete p.estudo;
+      if (p.estudoId === undefined) p.estudoId = '';
+      if (!p.celula || !e || !e.tipo) continue;
+      db.prepare("INSERT OR IGNORE INTO celula_estudos (id, proposito, tipo, ref, fonte, criado_por, criado_em) VALUES (?, ?, ?, ?, ?, '', ?)")
+        .run('l' + p.id, p.id, String(e.tipo), String(e.ref || ''), String(e.texto || ''), String(e.em || p.criadoEm || new Date().toISOString()));
+      p.estudoId = 'l' + p.id;
+    }
   }
 
   precisaMigrar() {
@@ -472,14 +497,20 @@ export class Contas {
     this.dados.versao = 2;
   }
 
-  // Grava só as linhas que mudaram, numa transação: ou a mudança entra inteira, ou nada.
-  // O banco é síncrono, então duas gravações nunca se atropelam.
-  async salvar() {
+  // A conexão do banco, para o que é lido e gravado direto, fora da foto em memória (os estudos
+  // da célula). Aberta aqui pela primeira vez, a foto das tabelas é lida junto, como em salvar.
+  banco() {
     if (!this.db) {
       this.db = abrirModulo(this.arquivo, 'contas').db;
       lerTabelas(this.db);
     }
-    const db = this.db;
+    return this.db;
+  }
+
+  // Grava só as linhas que mudaram, numa transação: ou a mudança entra inteira, ou nada.
+  // O banco é síncrono, então duas gravações nunca se atropelam.
+  async salvar() {
+    const db = this.banco();
     transacao(db, () => {
       gravarMeta(db, 'contas_versao', this.dados.versao || 2);
       sincronizar(db, paraLinhas(this.dados));
@@ -707,6 +738,8 @@ export class Contas {
       p.aprovacoes = (p.aprovacoes || []).filter((x) => x.usuario !== chave);
       if (!p.encerradoEm && this.presentes(p).length < 2) p.encerradoEm = hojeNoFuso(FUSO_PADRAO);
     }
+    // os estudos que a pessoa preparou (celula_estudos) ficam na célula com o @ dela, de propósito
+    // (decisão do dono, 17/10; a política de privacidade diz isso): a tela mostra o @ no lugar do nome.
     // sai da lista de presentes de qualquer encontro já registrado; o encontro em si (quem
     // registrou, quantas pessoas vieram) continua de pé
     for (const p of Object.values(this.dados.propositos || {})) {
@@ -1279,9 +1312,9 @@ export class Contas {
     return p;
   }
 
-  // O auxiliar conduz a célula junto com o líder (recado, encontro, estudo, registrar
-  // encontro, atenção e oração), mas não tira gente, não marca auxiliar e não encerra: isso
-  // continua só do líder.
+  // O auxiliar conduz a célula junto com o líder (recado, encontro, registrar encontro,
+  // atenção e oração), mas não tira gente, não marca auxiliar, não encerra e não prepara o
+  // estudo (celulaDeQuemPrepara): isso continua só do líder.
   celulaDeQuemConduz(eu, id) {
     const a = this.exigirCompleto(eu);
     const p = this.proposito(id);
@@ -1343,46 +1376,117 @@ export class Contas {
     return p;
   }
 
-  // O estudo do encontro é escolha de quem conduz, nunca imposto pelo app:
-  //   semana: o roteiro que o app monta da leitura da semana (sugestão pronta)
-  //   trecho: um livro e capítulo, ou versículos, escolhidos por ele ("Romanos 8", "João 3.16-18")
-  //   livre:  um estudo escrito por ele
-  // Nos três, "texto" é a palavra de quem conduz (no livre, é o estudo inteiro). Tipo vazio apaga.
-  // Acolhida, adoração e testemunho são os outros três W do roteiro: valem e são gravados
-  // mesmo quando a Palavra está vazia, porque a conversa da célula não depende dela.
-  async definirEstudo(eu, id, { tipo, ref, texto, acolhida, adoracao, testemunho } = {}, livros = [], agora = new Date()) {
-    const p = this.celulaDeQuemConduz(eu, id);
+  // ---------- o estudo da célula (À Mesa, docs/a-mesa-fase1.md) ----------
+  // Só o líder prepara, muda ou tira o estudo (decisão do dono, 17/10). O auxiliar continua
+  // conduzindo o resto (recado, encontro, presença, Painel), mas o estudo ele vê como membro: o
+  // auxiliar, o membro, o visitante, o líder de outra célula e o administrador recebem 403. O líder
+  // menor de 18 que espera a aprovação da liderança recebe o 403 dessa espera.
+  celulaDeQuemPrepara(eu, id) {
+    const a = this.exigirCompleto(eu);
+    const p = this.proposito(id);
+    if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
+    if (p.criadoPor !== a.usuario) throw erro(MSG_ESTUDO.soLider, 403);
+    if (aprovacaoQueFalta(p, a.usuario, 'lider')) throw erro(AGUARDANDO_APROVACAO, 403);
+    return p;
+  }
+
+  // Um estudo pela chave; o atual da célula é o que p.estudoId aponta. Como o check-in, os estudos
+  // ficam fora da foto em memória: lidos e gravados direto em celula_estudos.
+  estudo(id) {
+    if (!id) return null;
+    return estudoDaLinha(this.banco().prepare('SELECT * FROM celula_estudos WHERE id = ?').get(String(id)));
+  }
+
+  // entrada é o corpo de POST /api/celula, ação "estudo":
+  //   estudo: 'blocos' (o estudo escrito, com marcas), 'semana', 'trecho' ou '' (tira o estudo). Sem
+  //           o campo, grava só acolhida, adoração e testemunho, e o estudo fica como está. 'livre'
+  //           (o aparelho que ainda tem o app antigo) vale como 'blocos', e "texto" no lugar de "fonte".
+  //   fonte (o estudo escrito; em semana e trecho, a palavra do líder), ref (trecho), traducao,
+  //   perguntas (0 a 6), acolhida, adoracao, testemunho e base: o id do estudo que está sendo mudado.
+  //   Igual ao atual, a linha é atualizada; em qualquer outro caso nasce uma linha nova, e a anterior
+  //   ganha atual_ate, para o histórico.
+  // opcoes: regras (o CC das regras do app: lerEstudo, lerRefLivre, lerRef, escreverRef), livros,
+  //   capitulos, versiculos(traducao) => (livro, cap) => quantos versículos, planoAte (até que dia do
+  //   plano vai a semana do líder hoje) e refSemana (a referência-chave dessa semana).
+  // O estudo escrito é relido aqui pelo mesmo leitor do aparelho, e o que se grava é a fonte limpa
+  // que ele devolve, nunca a recebida. Tudo é validado antes de mudar qualquer coisa; a linha do
+  // estudo e o ponteiro da célula entram na mesma transação.
+  async salvarEstudo(eu, id, entrada = {}, opcoes = {}, agora = new Date()) {
+    const p = this.celulaDeQuemPrepara(eu, id);
+    const { regras = {}, livros = [], capitulos = null, versiculos = null, planoAte = 0, refSemana = '' } = opcoes;
+    const e = entrada || {};
     const campo4w = (valor, nome) => {
       const limpo = String(valor || '').replace(/\s+/g, ' ').trim();
       if (limpo.length > CAMPO_4W_MAX) throw erro('o campo "' + nome + '" tem no máximo ' + CAMPO_4W_MAX + ' caracteres');
       return limpo;
     };
-    // Tudo é validado antes de mudar o propósito: um campo recusado não pode deixar o outro
-    // pela metade gravado na memória.
-    const novaAcolhida = acolhida !== undefined ? campo4w(acolhida, 'acolhida') : undefined;
-    const novaAdoracao = adoracao !== undefined ? campo4w(adoracao, 'adoração') : undefined;
-    const novoTestemunho = testemunho !== undefined ? campo4w(testemunho, 'testemunho') : undefined;
-    const t = String(tipo || '');
-    let novoEstudo = null;
-    if (t) {
-      if (!['semana', 'trecho', 'livre'].includes(t)) throw erro('escolha como vai ser o estudo');
-      const limpo = String(texto || '').replace(/\r\n/g, '\n').trim();
-      if (limpo.length > ESTUDO_MAX) throw erro('o estudo tem no máximo ' + ESTUDO_MAX + ' caracteres');
-      if (t === 'livre' && !limpo) throw erro('escreva o estudo');
-      let referencia = '';
-      if (t === 'trecho') {
-        referencia = String(ref || '').replace(/\s+/g, ' ').trim();
-        const m = /^(.+?) (\d{1,3})(?:\.(\d{1,3})(?:-(\d{1,3}))?)?$/.exec(referencia);
-        if (!m || !livros.includes(m[1]) || (m[4] && Number(m[4]) < Number(m[3]))) throw erro('escolha um livro e um capítulo, como "Romanos 8" ou "João 3.16-18"');
+    const ws = {};
+    if (e.acolhida !== undefined) ws.estudoAcolhida = campo4w(e.acolhida, 'acolhida');
+    if (e.adoracao !== undefined) ws.estudoAdoracao = campo4w(e.adoracao, 'adoração');
+    if (e.testemunho !== undefined) ws.estudoTestemunho = campo4w(e.testemunho, 'testemunho');
+
+    let tipo = e.estudo === undefined || e.estudo === null ? null : String(e.estudo);
+    if (tipo === 'livre') tipo = 'blocos';
+    let novo = null;
+    if (tipo) {
+      if (!TIPOS_ESTUDO.includes(tipo)) throw erro(MSG_ESTUDO.tipo);
+      const traducao = e.traducao === undefined || e.traducao === null || e.traducao === '' ? 'nbv' : String(e.traducao);
+      if (!TRADUCOES.includes(traducao)) throw erro(MSG_ESTUDO.traducao);
+      const perguntas = e.perguntas === undefined || e.perguntas === null ? null : limparPerguntas(e.perguntas);
+      const recebida = limparFonte(e.fonte !== undefined && e.fonte !== null ? e.fonte : e.texto);
+      const contar = typeof versiculos === 'function' ? versiculos(traducao) : null;
+      novo = { tipo, titulo: '', ref: '', planoAte: 0, fonte: recebida, blocos: [], refs: [], perguntas: perguntas || [], traducao };
+      if (tipo === 'blocos') {
+        if (!recebida) throw erro(MSG_ESTUDO.vazio);
+        const lido = validarLeitura(regras.lerEstudo(recebida, { capitulos, versiculos: contar }), { lerRef: regras.lerRef, livros, capitulos, versiculos: contar });
+        Object.assign(novo, { titulo: lido.titulo, fonte: lido.fonte, blocos: lido.blocos, refs: lido.refs });
+        if (!perguntas) novo.perguntas = lido.perguntas;
+      } else {
+        if (recebida.length > ESTUDO_MAX) throw erro(MSG_ESTUDO.tamanho);
+        if (tipo === 'semana') Object.assign(novo, { planoAte: Number(planoAte) || 0, refs: refSemana ? [String(refSemana)] : [] });
+        if (tipo === 'trecho') {
+          const r = regras.lerRefLivre(e.ref, capitulos);
+          if (!r || !livros.includes(r.livro)) throw erro(MSG_ESTUDO.trecho);
+          const ref = regras.escreverRef(r.livro, r.cap, r.de, r.ate);
+          if (contar && r.de > (Number(contar(r.livro, r.cap)) || 0)) throw erro(semVersiculo(ref));
+          Object.assign(novo, { titulo: ref, ref, refs: [ref] });
+        }
       }
-      novoEstudo = { tipo: t, ref: referencia, texto: limpo, em: agora.toISOString() };
     }
-    if (novaAcolhida !== undefined) p.estudoAcolhida = novaAcolhida;
-    if (novaAdoracao !== undefined) p.estudoAdoracao = novaAdoracao;
-    if (novoTestemunho !== undefined) p.estudoTestemunho = novoTestemunho;
-    p.estudo = novoEstudo;
-    await this.salvar();
-    return p;
+
+    const db = this.banco();
+    const quando = agora.toISOString();
+    const antes = { estudoId: p.estudoId || '', estudoAcolhida: p.estudoAcolhida, estudoAdoracao: p.estudoAdoracao, estudoTestemunho: p.estudoTestemunho };
+    const encerrar = (estudoId) => db.prepare("UPDATE celula_estudos SET atual_ate = ? WHERE id = ? AND atual_ate = ''").run(quando, estudoId);
+    try {
+      transacao(db, () => {
+        const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+        if (tipo === '') {
+          if (atual) encerrar(atual.id);
+          p.estudoId = '';
+        } else if (novo) {
+          const valores = [novo.tipo, novo.titulo, novo.ref, novo.planoAte, novo.fonte, JSON.stringify(novo.blocos), JSON.stringify(novo.refs), JSON.stringify(novo.perguntas), novo.traducao];
+          if (atual && String(e.base || '') === atual.id) {
+            // o estudo de antes da v19 não tinha autor: quem o muda agora é o líder
+            db.prepare("UPDATE celula_estudos SET tipo = ?, titulo = ?, ref = ?, plano_ate = ?, fonte = ?, blocos = ?, refs = ?, perguntas = ?, traducao = ?, editado_em = ?, "
+              + "criado_por = CASE WHEN criado_por = '' THEN ? ELSE criado_por END WHERE id = ?").run(...valores, quando, p.criadoPor, atual.id);
+          } else {
+            const novoId = 'e' + randomBytes(6).toString('hex');
+            db.prepare('INSERT INTO celula_estudos (id, proposito, tipo, titulo, ref, plano_ate, fonte, blocos, refs, perguntas, traducao, criado_por, criado_em) '
+              + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(novoId, p.id, ...valores, p.criadoPor, quando);
+            if (atual) encerrar(atual.id);
+            p.estudoId = novoId;
+          }
+        }
+        Object.assign(p, ws);
+        gravarMeta(db, 'contas_versao', this.dados.versao || 2);
+        sincronizar(db, paraLinhas(this.dados));
+      });
+    } catch (falha) {
+      Object.assign(p, antes);
+      throw falha;
+    }
+    return { p, estudo: this.estudo(p.estudoId) };
   }
 
   // Quem conduz registra quem foi ao encontro: hoje ou um dos 7 dias anteriores, membros e
@@ -1455,7 +1559,7 @@ export class Contas {
     const filha = {
       id: filhaId, tipo: 'plano', alvo: '', titulo: tituloLimpo || 'Célula',
       criadoPor: novoLider, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
-      mae: mae.id, multiplicadaEm: hoje, membros: [], aprovacoes: [],
+      mae: mae.id, multiplicadaEm: hoje, membros: [], aprovacoes: [], estudoId: '',
     };
     // Liderar a célula nova é função nova: menor de 18 espera a aprovação da liderança de novo.
     const contaNovoLider = this.achar(novoLider);

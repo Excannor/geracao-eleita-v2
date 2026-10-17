@@ -14,6 +14,9 @@ import {
   menorDeIdade, podeConduzir, aguardandoAprovacao,
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
+import {
+  ESTUDO_MAX, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
+} from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -1286,6 +1289,189 @@ checar(diasDeProposito(p(dias('2026-03-01', 5)), p(dias('2026-03-01', 5)), '2026
 // No Windows, arquivo aberto não se apaga: o banco da pasta temporária fecha antes.
 fecharBanco(arquivoDoBanco(pasta));
 rmSync(pasta, { recursive: true, force: true });
+
+// =========================================================================
+secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
+// =========================================================================
+// O que o líder salva passa pelo mesmo leitor de marcas do aparelho (ctxEstudo é o contexto que o
+// servidor monta) e vai para celula_estudos; a célula guarda só o ponteiro. Só o líder prepara.
+// docs/a-mesa-fase1.md, seções 1, 5.3 e 6.2.
+{
+  const C = ctxEstudo.window.CC;
+  const erroDe = (f) => { try { f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  // como o servidor (servidor.mjs, versiculosDa): só a contagem de versículos de cada capítulo
+  const contagens = Object.fromEntries(TRADUCOES.map((s) => {
+    const b = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', s + '.json'), 'utf8'));
+    return [s, Object.fromEntries(Object.entries(b.livros).map(([l, caps]) => [l, caps.map((v) => (v || []).length)]))];
+  }));
+  const opcoes = (extra = {}) => ({
+    regras: C, livros: [...LIVROS], capitulos: capitulosDoPlano,
+    versiculos: (t) => (livro, cap) => ((contagens[t] || {})[livro] || [])[cap - 1] || 0, ...extra,
+  });
+  const linhasDono = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo.txt'), 'utf8').replace(/\s+$/, '').split('\n');
+  linhasDono[linhasDono.length - 1] = 'Para guardar: ' + linhasDono[linhasDono.length - 1];
+  const dono = linhasDono.join('\n');
+  const esperado = JSON.parse(readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo-leitura.json'), 'utf8'));
+
+  // --- os tetos e as mensagens (estudos.mjs) ---
+  checar(ESTUDO_MAX === 10000, 'o teto do estudo passa de 3.000 para 10.000 caracteres');
+  checar(JSON.stringify(TRADUCOES) === JSON.stringify(listaBiblias.map((b) => b.sigla)), 'as traduções do estudo são as siglas de window.BIBLIAS (' + TRADUCOES.join(', ') + ')');
+  checar(JSON.stringify(limparPerguntas([' O que   marcou? ', 'O que marcou?', '', null])) === JSON.stringify(['O que marcou?']) && limparPerguntas(undefined).length === 0,
+    'as perguntas saem numa linha só, sem repetir e sem vazias');
+  checar(erroDe(() => limparPerguntas(['1', '2', '3', '4', '5', '6', '7'])) === MSG_ESTUDO.perguntas + '|400'
+    && erroDe(() => limparPerguntas(['x'.repeat(301)])) === MSG_ESTUDO.pergunta + '|400' && erroDe(() => limparPerguntas('uma')) === MSG_ESTUDO.perguntas + '|400',
+    'sete perguntas, uma de 301 caracteres ou uma lista que não é lista são recusadas');
+  {
+    const leitura = (blocos, extra = {}) => ({ titulo: 'Título', fonte: 'Título\nTexto', blocos, perguntas: [], ...extra });
+    const val = (r) => erroDe(() => validarLeitura(r, { lerRef: C.lerRef, livros: [...LIVROS], capitulos: capitulosDoPlano }));
+    const texto = { t: 'texto', texto: 'Um parágrafo.' };
+    checar(val(leitura([texto], { fonte: 'x'.repeat(10001) })) === MSG_ESTUDO.tamanho + '|400', 'mais de 10.000 caracteres na fonte limpa: "' + MSG_ESTUDO.tamanho + '"');
+    checar(val(leitura([texto], { titulo: '' })) === MSG_ESTUDO.titulo + '|400' && val(leitura([texto], { titulo: 'x'.repeat(121) })) === MSG_ESTUDO.titulo + '|400',
+      'sem título, ou com mais de 120 caracteres: "' + MSG_ESTUDO.titulo + '"');
+    checar(val(leitura([])) === MSG_ESTUDO.vazio + '|400' && val(leitura([texto], { fonte: '  ' })) === MSG_ESTUDO.vazio + '|400', 'estudo sem partes: "' + MSG_ESTUDO.vazio + '"');
+    checar(val(leitura(Array.from({ length: 81 }, () => texto))) === MSG_ESTUDO.partes + '|400', 'mais de 80 partes: "' + MSG_ESTUDO.partes + '"');
+    checar(val(leitura([{ t: 'texto', texto: 'x'.repeat(1501) }])) === MSG_ESTUDO.parte + '|400', 'uma parte de texto com mais de 1.500 caracteres é recusada');
+    checar(val(leitura(Array.from({ length: 16 }, (_, i) => ({ t: 'versiculo', ref: 'Salmos ' + (i + 1) + '.1' })))) === MSG_ESTUDO.cartoes + '|400', 'mais de 15 versículos: "' + MSG_ESTUDO.cartoes + '"');
+    checar(val(leitura([{ t: 'seta', itens: Array.from({ length: 13 }, () => ['Fé', 'confiança.']) }])) === MSG_ESTUDO.lista + '|400', 'lista com seta de 13 linhas é recusada');
+    checar(/^não achamos Efésios 99\.1 na Bíblia do app/.test(val(leitura([{ t: 'versiculo', ref: 'Efésios 99.1' }]))) && /^não achamos/.test(val(leitura([{ t: 'versiculo', ref: 'Livro 1.1' }]))),
+      'um cartão que não existe na Bíblia do app é recusado');
+    const limpa = validarLeitura(leitura([{ t: 'versiculo', ref: 'Efésios 6.12', l: [3, 3] }, { t: 'seta', itens: [['Fé', 'confiança.']], l: [4, 4], linhas: 1 }]), { lerRef: C.lerRef, livros: [...LIVROS], capitulos: capitulosDoPlano });
+    checar(JSON.stringify(limpa.blocos) === JSON.stringify([{ t: 'versiculo', ref: 'Efésios 6.12' }, { t: 'seta', itens: [['Fé', 'confiança.']], destaque: false }])
+      && JSON.stringify(limpa.refs) === JSON.stringify(['Efésios 6.12']), 'o que se grava leva só as chaves de cada parte (sem a linha .l da fonte)');
+  }
+
+  // --- a célula de ensaio: líder, auxiliar, membro, visitante e o líder de outra célula ---
+  const pastaE = mkdtempSync(join(tmpdir(), 'cc-teste-estudos-'));
+  const arquivoE = join(pastaE, 'contas.json');
+  let ce = await new Contas(arquivoE).carregar();
+  const nova = (u, nascimento = '1990-01-01') => ce.criar({ usuario: u, senha: '12345678', nome: u[0].toUpperCase() + u.slice(1), email: u + '@x.com', nascimento, consentimento: true });
+  for (const u of ['lider', 'aux', 'ana', 'vera', 'outro']) await nova(u);
+  await nova('teen', somaAnos(hojeTeste, -15));
+  const cel = await ce.criarCelula('lider', { titulo: 'Quinta' }, hojeTeste);
+  const ID = cel.id;
+  const tok = ce.gerarLinkCelula('lider', ID, assinar).token;
+  for (const u of ['aux', 'ana']) await ce.entrarNaCelula(u, tok, assinar, hojeTeste);
+  await ce.entrarNaCelula('vera', tok, assinar, hojeTeste, Date.now(), { visitante: true });
+  await ce.definirAuxiliar('lider', ID, 'aux', true);
+  await ce.criarCelula('outro', { titulo: 'Outra' }, hojeTeste);
+  const deTeen = await ce.criarCelula('teen', { titulo: 'Jovens' }, hojeTeste);
+  const linhas = (sql, ...p) => ce.banco().prepare(sql).all(...p);
+  const dia = (n) => new Date(Date.UTC(2026, 9, n, 12));
+
+  // --- só o líder prepara ---
+  const doDono = { estudo: 'blocos', fonte: dono, traducao: 'nbv', perguntas: ['O que mais marcou você?', 'O que muda na sua semana?'] };
+  checar(podeConduzir(ce.proposito(ID), 'aux'), 'o auxiliar conduz a célula (recado, encontro, presença, Painel)');
+  for (const u of ['aux', 'ana', 'vera', 'outro']) {
+    checar(await tentar(() => ce.salvarEstudo(u, ID, doDono, opcoes())) === MSG_ESTUDO.soLider + '|403', u + ' recebe 403: "' + MSG_ESTUDO.soLider + '"');
+  }
+  checar(await tentar(() => ce.salvarEstudo('aux', ID, { acolhida: 'Oi' }, opcoes())) === MSG_ESTUDO.soLider + '|403' && !ce.proposito(ID).estudoAcolhida,
+    'o auxiliar também não grava acolhida, adoração e testemunho: são do estudo');
+  checar(/aguardando aprovação da liderança\|403/.test(await tentar(() => ce.salvarEstudo('teen', deTeen.id, doDono, opcoes()))), 'o líder menor que espera a aprovação recebe o 403 dessa espera');
+  checar(/célula não encontrada\|404/.test(await tentar(() => ce.salvarEstudo('lider', 'nenhuma', doDono, opcoes()))), 'célula que não existe: 404');
+  checar(linhas('SELECT * FROM celula_estudos').length === 0 && !ce.proposito(ID).estudoId, 'nada foi gravado pelas tentativas recusadas');
+
+  // --- o estudo do dono ---
+  const r1 = await ce.salvarEstudo('lider', ID, doDono, opcoes(), dia(10));
+  const e1 = r1.estudo;
+  checar(/^e[0-9a-f]{12}$/.test(e1.id) && ce.proposito(ID).estudoId === e1.id && e1.tipo === 'blocos' && e1.criadoPor === 'lider' && e1.traducao === 'nbv'
+    && e1.criadoEm === dia(10).toISOString() && e1.atualAte === '' && e1.editadoEm === '', 'o líder salva: nasce uma linha com o @ dele, e a célula aponta para ela');
+  checar(e1.titulo === 'Batalha espiritual, vigilância e Armadura de Deus' && JSON.stringify(e1.refs) === JSON.stringify(esperado.refs)
+    && JSON.stringify(e1.blocos) === JSON.stringify(esperado.blocos), 'as partes gravadas são as do leitor, iguais aos dados de exemplo do cliente (estudo-exemplo-leitura.json)');
+  checar(!['A nossa luta', 'Estejam alertas e vigiem.”', 'Orem no Espírito', 'Fortaleça-se'].some((t) => e1.fonte.includes(t)) && e1.fonte === esperado.fonte,
+    'a fonte gravada é a limpa, sem as citações da NVI');
+  checar(JSON.stringify(e1.perguntas) === JSON.stringify(doDono.perguntas), 'as perguntas escolhidas vão junto');
+  {
+    const bruta = linhas('SELECT * FROM celula_estudos WHERE id = ?', e1.id)[0];
+    checar(!/A nossa luta|Orem no Espírito/.test(JSON.stringify(bruta)) && !/"l":/.test(bruta.blocos), 'no banco não fica texto da NVI nem a linha .l das partes');
+  }
+  const doMembro = estudoNoRetrato(ce.estudo(ce.proposito(ID).estudoId), { souQuemPrepara: false, nomeDe: (u) => 'Nome de ' + u });
+  const doLider = estudoNoRetrato(ce.estudo(ce.proposito(ID).estudoId), { souQuemPrepara: true, nomeDe: (u) => 'Nome de ' + u });
+  checar(!('fonte' in doMembro) && !('texto' in doMembro) && doMembro.blocos.length === 32 && doMembro.criadoPorNome === 'Nome de lider' && doMembro.em === e1.criadoEm,
+    'quem só lê recebe as partes, sem a fonte');
+  checar(doLider.fonte === e1.fonte && Object.keys(doLider).sort().join() === 'blocos,criadoPor,criadoPorNome,editadoEm,em,fonte,id,perguntas,planoAte,ref,refs,tipo,titulo,traducao',
+    'quem prepara recebe a fonte, para "Mudar o estudo"');
+
+  // --- mudar o mesmo estudo (base igual) atualiza a linha ---
+  const r2 = await ce.salvarEstudo('lider', ID, { ...doDono, fonte: dono.replace(/^Estudo: .*/, 'A armadura de Deus'), base: e1.id, traducao: 'blivre' }, opcoes(), dia(11));
+  checar(r2.estudo.id === e1.id && r2.estudo.titulo === 'A armadura de Deus' && r2.estudo.traducao === 'blivre' && r2.estudo.editadoEm === dia(11).toISOString()
+    && r2.estudo.criadoEm === e1.criadoEm && linhas('SELECT * FROM celula_estudos').length === 1, '"Mudar o estudo" (base igual ao atual) atualiza a mesma linha');
+
+  // --- só os 4 Ws: o estudo fica ---
+  await ce.salvarEstudo('lider', ID, { acolhida: '  O que fez você rir   nos últimos dias? ', adoracao: 'Uma música', testemunho: 'Convidar o vizinho' }, opcoes(), dia(12));
+  checar(ce.proposito(ID).estudoAcolhida === 'O que fez você rir nos últimos dias?' && ce.proposito(ID).estudoId === e1.id && ce.estudo(e1.id).editadoEm === dia(11).toISOString(),
+    'sem o campo "estudo", só acolhida, adoração e testemunho mudam; o estudo fica como estava');
+  checar(await tentar(() => ce.salvarEstudo('lider', ID, { ...doDono, acolhida: 'x'.repeat(301) }, opcoes())) === 'o campo "acolhida" tem no máximo 300 caracteres|400'
+    && linhas('SELECT * FROM celula_estudos').length === 1 && ce.proposito(ID).estudoAcolhida === 'O que fez você rir nos últimos dias?',
+  'um campo recusado não deixa nada gravado pela metade');
+
+  // --- as recusas do estudo ---
+  const recusa = (entrada) => tentar(() => ce.salvarEstudo('lider', ID, entrada, opcoes()));
+  checar(await recusa({ estudo: 'outro' }) === MSG_ESTUDO.tipo + '|400', 'tipo desconhecido: "' + MSG_ESTUDO.tipo + '"');
+  checar(await recusa({ estudo: 'blocos', fonte: '   ' }) === MSG_ESTUDO.vazio + '|400', 'estudo escrito vazio: "' + MSG_ESTUDO.vazio + '"');
+  checar(await recusa({ estudo: 'blocos', fonte: 'x'.repeat(10001) }) === MSG_ESTUDO.tamanho + '|400', 'texto puro de 10.001 caracteres: "' + MSG_ESTUDO.tamanho + '"');
+  checar(await recusa({ estudo: 'blocos', fonte: '1. Um tópico logo de cara\nTexto' }) === MSG_ESTUDO.titulo + '|400', 'estudo sem título: "' + MSG_ESTUDO.titulo + '"');
+  checar(await recusa({ ...doDono, perguntas: ['1', '2', '3', '4', '5', '6', '7'] }) === MSG_ESTUDO.perguntas + '|400', '7 perguntas: "' + MSG_ESTUDO.perguntas + '"');
+  checar(await recusa({ ...doDono, traducao: 'nvi' }) === MSG_ESTUDO.traducao + '|400', 'a tradução "nvi": "' + MSG_ESTUDO.traducao + '"');
+  checar(await recusa({ estudo: 'blocos', fonte: 'Título\nEfésios 6.99' }) === 'não achamos Efésios 6.99 na Bíblia do app. Confira a referência|400', 'um versículo que a Bíblia do app não tem é recusado');
+  checar(await recusa({ estudo: 'trecho', ref: 'Livro Nenhum 3' }) === MSG_ESTUDO.trecho + '|400' && await recusa({ estudo: 'trecho', ref: 'João 3.18-16' }) === MSG_ESTUDO.trecho + '|400',
+    'trecho que não é referência: "' + MSG_ESTUDO.trecho + '"');
+  checar(await recusa({ estudo: 'trecho', ref: 'Romanos 8.40' }) === 'não achamos Romanos 8.40 na Bíblia do app. Confira a referência|400', 'trecho com versículo que não existe é recusado');
+  checar(linhas('SELECT * FROM celula_estudos').length === 1 && ce.proposito(ID).estudoId === e1.id, 'nenhuma recusa mexeu no estudo');
+
+  // --- um estudo novo não apaga o anterior ---
+  const r3 = await ce.salvarEstudo('lider', ID, { estudo: 'trecho', ref: 'Rm 8:28–30', fonte: 'Tudo coopera para o bem.', base: '' }, opcoes(), dia(13));
+  checar(r3.estudo.id !== e1.id && r3.estudo.ref === 'Romanos 8.28-30' && r3.estudo.titulo === 'Romanos 8.28-30' && JSON.stringify(r3.estudo.refs) === '["Romanos 8.28-30"]'
+    && r3.estudo.fonte === 'Tudo coopera para o bem.' && r3.estudo.perguntas.length === 0, 'o trecho aceita sigla, dois pontos e meia-risca, e grava a referência escrita do jeito do app');
+  checar(ce.estudo(e1.id).atualAte === dia(13).toISOString() && ce.proposito(ID).estudoId === r3.estudo.id && linhas('SELECT * FROM celula_estudos').length === 2,
+    'o estudo anterior fica na tabela, com atual_ate: pronto para o histórico');
+  const r4 = await ce.salvarEstudo('lider', ID, { estudo: 'trecho', ref: 'Romanos 8' }, opcoes(), dia(14));
+  checar(r4.estudo.ref === 'Romanos 8' && r4.estudo.titulo === 'Romanos 8', 'o trecho pode ser o capítulo inteiro');
+  const r5 = await ce.salvarEstudo('lider', ID, { estudo: 'semana', fonte: 'Confiar sem ver.' }, opcoes({ planoAte: 30, refSemana: 'Gênesis 50.20' }), dia(15));
+  checar(r5.estudo.tipo === 'semana' && r5.estudo.planoAte === 30 && JSON.stringify(r5.estudo.refs) === '["Gênesis 50.20"]' && r5.estudo.fonte === 'Confiar sem ver.',
+    'a leitura da semana congela até que dia do plano ela vai, com a referência-chave');
+  checar(estudoNoRetrato(r5.estudo, {}).texto === 'Confiar sem ver.' && !('fonte' in estudoNoRetrato(r5.estudo, { souQuemPrepara: true })), 'em semana e trecho, a palavra do líder vai como "texto"');
+  // o aparelho que ainda tem o app antigo manda "livre" e "texto"
+  const r6 = await ce.salvarEstudo('lider', ID, { estudo: 'livre', texto: 'Hoje vamos falar de perdão.\r\nLeiam Mateus 18.21-22.' }, opcoes(), dia(16));
+  checar(r6.estudo.tipo === 'blocos' && r6.estudo.titulo === 'Hoje vamos falar de perdão.' && r6.estudo.fonte === 'Hoje vamos falar de perdão.\nLeiam Mateus 18.21-22.'
+    && r6.estudo.refs.length === 0, 'o app antigo ("livre" com "texto") vira um estudo escrito');
+
+  // --- tirar o estudo: a linha fica ---
+  await ce.salvarEstudo('lider', ID, { estudo: '' }, opcoes(), dia(17));
+  checar(ce.proposito(ID).estudoId === '' && ce.estudo(r6.estudo.id).atualAte === dia(17).toISOString() && linhas('SELECT * FROM celula_estudos').length === 5,
+    '"Tirar o estudo" zera o ponteiro e deixa a linha, com atual_ate');
+  checar(linhas("SELECT count(*) n FROM celula_estudos WHERE atual_ate = ''")[0].n === 0, 'sem estudo atual, nenhuma linha fica marcada como atual');
+
+  // --- o ponteiro sobrevive ao banco (a armadilha do INSERT OR REPLACE de sincronizar) ---
+  const r7 = await ce.salvarEstudo('lider', ID, doDono, opcoes(), dia(18));
+  ce = await new Contas(arquivoE).carregar();
+  checar(ce.proposito(ID).estudoId === r7.estudo.id && ce.estudo(r7.estudo.id).blocos.length === 32, 'recarregado do banco, a célula continua apontando para o estudo');
+  ce.proposito(ID).recado = 'Tragam a Bíblia';
+  await ce.salvar();
+  ce = await new Contas(arquivoE).carregar();
+  checar(ce.proposito(ID).recado === 'Tragam a Bíblia' && ce.proposito(ID).estudoId === r7.estudo.id
+    && linhas("SELECT estudo_tipo, estudo_texto, estudo_id FROM propositos WHERE id = ?", ID)[0].estudo_id === r7.estudo.id,
+  'regravar a célula por outro motivo não zera o estudo_id (paraLinhas grava o ponteiro)');
+  checar(!('estudo' in ce.proposito(ID)), 'o objeto antigo p.estudo não mora mais na memória');
+
+  // --- a linha antiga e a multiplicação ---
+  ce.banco().prepare("INSERT INTO celula_estudos (id, proposito, tipo, ref, fonte, criado_por, criado_em) VALUES ('lx', ?, 'trecho', 'João 3.16-18', '', '', '2026-01-01')").run(ID);
+  const legado = ce.estudo('lx');
+  checar(legado.titulo === 'João 3.16-18' && JSON.stringify(legado.refs) === '["João 3.16-18"]' && estudoNoRetrato(legado, {}).criadoPorNome === '',
+    'o trecho de antes da v19 ganha título e referência da própria ref, e fica sem "preparado por"');
+  checar(estudoDaLinha({ id: 'z', tipo: 'livre', blocos: 'quebrado', traducao: 'nvi' }).blocos.length === 0 && estudoDaLinha({ id: 'z', tipo: 'livre', traducao: 'nvi' }).traducao === 'nbv',
+    'uma linha com JSON quebrado ou tradução desconhecida não derruba a leitura');
+  ce.banco().prepare("DELETE FROM celula_estudos WHERE id = 'lx'").run();
+
+  // --- apagar a conta de quem preparou: os estudos ficam, com o @ ---
+  await ce.apagar('lider');
+  checar(linhas("SELECT count(*) n FROM celula_estudos WHERE criado_por = 'lider'")[0].n === 6 && ce.proposito(ID).estudoId === r7.estudo.id,
+    'apagar a conta do líder deixa os estudos dele na célula');
+  checar(estudoNoRetrato(ce.estudo(r7.estudo.id), {}).criadoPorNome === '@lider', 'sem a conta, "preparado por" mostra o @');
+
+  fecharBanco(arquivoDoBanco(pastaE));
+  rmSync(pastaE, { recursive: true, force: true });
+}
 
 // =========================================================================
 secao('painel pastoral agregado (Fase 5, seção 2)');

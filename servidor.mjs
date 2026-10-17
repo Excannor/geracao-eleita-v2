@@ -28,6 +28,7 @@ import {
   MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, limparMetadados, avisosDesligados, umaDeCadaVez,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
+import { estudoNoRetrato } from './estudos.mjs';
 import {
   chamaAcesa, termometro, frequencia, funil, ofensivaPerdida, atencaoComGatilhos, rankingDaChama, evangelismoDoMes,
   saudeDosCheckins, adocao, sincronizarLeituraDias, preencherLeituraDias, apagarLeituraDias, leiturasPorDia, quemLeuEntre,
@@ -92,10 +93,39 @@ function carregarRegras() {
   for (const f of ['01-nucleo.js', '02-estado.js', '02b-jogo.js']) {
     runInContext(readFileSync(join(AQUI, 'src', 'app', f), 'utf8'), contexto, { filename: f });
   }
+  // O leitor de marcas do estudo da célula (CC.lerEstudo) é o mesmo da prévia do líder: o servidor
+  // relê o texto que chega e grava só o que ele mesmo leu (docs/a-mesa-fase1.md, seção 2).
+  runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 'utf8'), contexto, { filename: 'estudo-marcas.js' });
   return contexto.window.CC;
 }
 const REGRAS = carregarRegras();
 const TODOS_LIVROS = [...new Set(PLANO_DO_CONTEUDO.flatMap((d) => d.livros))];
+// Quantos capítulos cada livro tem (o plano passa pela Bíblia inteira): sem isso, "Efésios 99.1"
+// viraria cartão.
+const CAPITULOS = REGRAS.capitulosDoPlano(PLANO_DO_CONTEUDO);
+// Quantos versículos cada capítulo tem, por tradução: o cartão do estudo precisa existir na Bíblia
+// do app. Só a contagem fica na memória; o texto é lido uma vez, no primeiro estudo salvo naquela
+// tradução, e descartado. Sem o arquivo, a conferência fica só no capítulo.
+const VERSICULOS = new Map();
+function versiculosDa(sigla) {
+  if (!VERSICULOS.has(sigla)) {
+    let contagem = null;
+    try {
+      const b = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', sigla + '.json'), 'utf8'));
+      contagem = Object.fromEntries(Object.entries(b.livros || {}).map(([livro, caps]) => [livro, caps.map((v) => (Array.isArray(v) ? v.length : 0))]));
+    } catch { contagem = null; }
+    VERSICULOS.set(sigla, contagem);
+  }
+  const c = VERSICULOS.get(sigla);
+  return c ? (livro, cap) => (c[livro] || [])[cap - 1] || 0 : null;
+}
+// A semana que o roteiro "Leitura da semana" cobre: os 7 dias do plano até onde o líder já leu (é
+// ele quem conduz o encontro), e a referência-chave dela, a da reflexão do 4º dia.
+function semanaDoLider(estadoDoLider) {
+  const lidos = ((estadoDoLider && estadoDoLider.lidos) || []).map(Number).filter((n) => n >= 1 && n <= PLANO_DO_CONTEUDO.length);
+  return Math.min(PLANO_DO_CONTEUDO.length, Math.max(7, lidos.length ? Math.max(...lidos) : 0));
+}
+const refDaSemana = (ate) => (((REFLEXOES_DO_CONTEUDO[ate - 3] || [])[0] || {}).ref) || '';
 
 // ---------- cabeçalhos de segurança ----------
 // O app é uma página só, com os scripts dentro do HTML. A CSP libera exatamente esses
@@ -799,14 +829,28 @@ function bannerMultiplicacao(p, referencia) {
   return { nasceuDe, multiplicouPara };
 }
 
+// O nome de quem preparou o estudo, como a célula o vê: o apelido ou o primeiro nome; sem a conta
+// (apagada), o @, porque os estudos ficam na célula (decisão do dono, 17/10).
+function nomeNaCelula(info, usuario) {
+  const x = info.get(usuario);
+  if (x) return primeiroNome((x.estado && x.estado.apelido) || x.conta.nome || usuario);
+  const c = CONTAS.achar(usuario);
+  return c ? primeiroNome(c.nome || usuario) : '@' + usuario;
+}
+
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const lider = info.get(p.criadoPor);
-  const lidos = ((lider && lider.estado && lider.estado.lidos) || []).map(Number).filter((n) => n >= 1 && n <= PLANO_DO_CONTEUDO.length);
-  const semanaAte = Math.max(7, lidos.length ? Math.max(...lidos) : 0);
+  const semanaAte = semanaDoLider(lider && lider.estado);
   const conduzo = podeConduzir(p, eu);
+  // Só o líder prepara, muda ou tira o estudo; o auxiliar o vê como membro. A tela decide por
+  // isto, nunca por euConduzo.
+  const euPreparoEstudo = p.criadoPor === eu && !aprovacaoQueFalta(p, eu, 'lider');
   const extra = {
     encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
-    estudo: p.estudo || null,
+    // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
+    // para quem prepara (estudos.mjs, estudoNoRetrato).
+    estudo: estudoNoRetrato(CONTAS.estudo(p.estudoId), { souQuemPrepara: euPreparoEstudo, nomeDe: (u) => nomeNaCelula(info, u) }),
+    euPreparoEstudo,
     estudoAcolhida: p.estudoAcolhida || '', estudoAdoracao: p.estudoAdoracao || '', estudoTestemunho: p.estudoTestemunho || '',
     euConduzo: conduzo,
     // Menor de 18 à espera da aprovação da liderança: o papel que espera ('lider'/'auxiliar'),
@@ -1900,10 +1944,12 @@ const servidor = createServer(async (req, res) => {
     }
 
     if (rota === '/api/celula') {
-      await acao(async ({
-        acao: qual, id, titulo, token, dia, texto, usuario, estudo, ref, acolhida, adoracao, testemunho,
-        visitante, sim, data, presentes, visitantes, semEncontro, auxiliar, pessoas, quando,
-      }) => {
+      await acao(async (corpo) => {
+        // O corpo inteiro vai para o estudo (salvarEstudo lê só os campos dele); o resto, por nome.
+        const {
+          acao: qual, id, titulo, token, dia, texto, usuario,
+          visitante, sim, data, presentes, visitantes, semEncontro, auxiliar, pessoas, quando,
+        } = corpo || {};
         const hoje = hojeDe(eu);
         if (qual === 'criar') {
           const p = await CONTAS.criarCelula(eu, { titulo }, hoje);
@@ -1923,7 +1969,16 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'auxiliar') { await CONTAS.definirAuxiliar(eu, id, usuario, !!sim); return {}; }
         if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia); return {}; }
         if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto, new Date(), { quando, hoje }); return {}; }
-        if (qual === 'estudo') { await CONTAS.definirEstudo(eu, id, { tipo: estudo, ref, texto, acolhida, adoracao, testemunho }, TODOS_LIVROS); return {}; }
+        if (qual === 'estudo') {
+          // Só o líder prepara (contas.mjs, salvarEstudo, dá 403 aos outros). A leitura da semana
+          // congela até que dia do plano ela vai, contado pelo que o líder já leu.
+          const ate = semanaDoLider(await lerEstado(arquivoDe(eu)));
+          const r = await CONTAS.salvarEstudo(eu, id, corpo, {
+            regras: REGRAS, livros: TODOS_LIVROS, capitulos: CAPITULOS, versiculos: versiculosDa, planoAte: ate, refSemana: refDaSemana(ate),
+          });
+          const nomes = new Map([[eu, await nomeDeExibicao(eu)]]);
+          return { estudo: estudoNoRetrato(r.estudo, { souQuemPrepara: true, nomeDe: (u) => nomes.get(u) || '@' + u }) };
+        }
         if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro }, hoje); return {}; }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
         if (qual === 'multiplicar') {

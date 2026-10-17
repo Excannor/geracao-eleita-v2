@@ -181,6 +181,10 @@ try {
       VALUES ('p1', 'plano', '', 'Célula de quinta', 'lider', '2026-01-01', '', 1, 1, 4, 'Tragam a Bíblia', '2026-01-01T00:00:00Z', '', '', '', '');
     INSERT INTO proposito_membros (proposito, usuario, estado, entrou_em, saiu_em, convidado_por)
       VALUES ('p1', 'lider', 'ativo', '2026-01-01', '', '');
+    -- uma segunda célula com o estudo escrito pelo líder (ou pelo auxiliar: na época não se sabia)
+    INSERT INTO propositos (id, tipo, alvo, titulo, criado_por, criado_em, encerrado_em, grupo, celula, encontro, recado, recado_em, estudo_tipo, estudo_ref, estudo_texto, estudo_em)
+      VALUES ('p2', 'plano', '', 'Célula de sábado', 'lider', '2026-01-02', '', 1, 1, 6, '', '', 'livre', '', 'Hoje vamos falar de perdão.
+Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
   `);
   ok(Number(brutoV6.prepare('SELECT versao FROM schema_versao').get().versao) === 6, 'o banco de ensaio nasce na versão 6, como um HML de antes da Fase 2');
   brutoV6.close();
@@ -195,9 +199,21 @@ try {
     'os propósitos existentes ganham os três campos do roteiro 4 Ws vazios, sem perder o que já tinham');
   const tabelasV7 = dbV7.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name);
   ok(tabelasV7.includes('celula_encontros') && tabelasV7.includes('celula_presencas'), 'as tabelas de encontro e presença nascem na migração');
+  // v19: o estudo que cada célula tinha vira a primeira linha de celula_estudos, sem autor
+  const lp2 = dbV7.prepare("SELECT * FROM celula_estudos WHERE id = 'lp2'").get();
+  ok(lp2 && lp2.proposito === 'p2' && lp2.tipo === 'livre' && lp2.fonte === 'Hoje vamos falar de perdão.\nLeiam Mateus 18.21-22.'
+    && lp2.criado_por === '' && lp2.criado_em === '2026-01-05T12:00:00.000Z' && lp2.atual_ate === '' && lp2.traducao === 'nbv',
+    'a migração v19 copia o estudo antigo para celula_estudos (linha lp2), sem autor e com a data em que foi escolhido');
+  ok(dbV7.prepare("SELECT estudo_id FROM propositos WHERE id = 'p2'").get().estudo_id === 'lp2'
+    && dbV7.prepare("SELECT estudo_id FROM propositos WHERE id = 'p1'").get().estudo_id === ''
+    && dbV7.prepare('SELECT count(*) n FROM celula_estudos').get().n === 1, 'a célula aponta para o estudo dela; a que não tinha estudo fica sem');
+  ok(!!dbV7.prepare("SELECT 1 FROM sqlite_master WHERE type = 'index' AND name = 'celula_estudos_proposito'").get(), 'o índice dos estudos por célula existe');
   dbV7.prepare("INSERT INTO celula_encontros (proposito, data, visitantes, registrado_por, em) VALUES ('p1', '2026-01-08', 2, 'lider', '2026-01-08T20:00:00Z')").run();
   dbV7.prepare("INSERT INTO celula_presencas (proposito, data, usuario) VALUES ('p1', '2026-01-08', 'lider')").run();
   ok(dbV7.prepare("SELECT count(*) n FROM celula_presencas WHERE proposito = 'p1'").get().n === 1, 'as tabelas novas aceitam linhas de verdade');
+  B.apagarPessoaDoBanco(dbV7, 'lider');
+  ok(dbV7.prepare("SELECT count(*) n FROM celula_estudos WHERE id = 'lp2'").get().n === 1,
+    'apagar a pessoa do banco (e dos backups) não apaga os estudos da célula: eles ficam com o @ de quem preparou');
   B.fecharBanco(arquivoV6);
 
   // ---------- migração v7 -> v8 num banco v7 existente ----------
