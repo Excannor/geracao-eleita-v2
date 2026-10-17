@@ -15,7 +15,7 @@ import {
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import {
-  ESTUDO_MAX, ESTUDO_BRUTO_MAX, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
+  ESTUDO_MAX, ESTUDO_BRUTO_MAX, ESTUDOS_POR_CELULA, estudoUsado, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
 
@@ -1586,8 +1586,8 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
   const doLider = estudoNoRetrato(ce.estudo(ce.proposito(ID).estudoId), { souQuemPrepara: true, nomeDe: (u) => 'Nome de ' + u });
   checar(!('fonte' in doMembro) && !('texto' in doMembro) && doMembro.blocos.length === 32 && doMembro.criadoPorNome === 'Nome de lider' && doMembro.em === e1.criadoEm,
     'quem só lê recebe as partes, sem a fonte');
-  checar(doLider.fonte === e1.fonte && Object.keys(doLider).sort().join() === 'blocos,criadoPor,criadoPorNome,editadoEm,em,fonte,id,perguntas,planoAte,ref,refs,tipo,titulo,traducao',
-    'quem prepara recebe a fonte, para "Mudar o estudo"');
+  checar(doLider.fonte === e1.fonte && Object.keys(doLider).sort().join() === 'blocos,criadoPor,criadoPorNome,editadoEm,em,fonte,id,perguntas,planoAte,ref,refs,tipo,titulo,traducao,usado'
+    && doLider.usado === false && !('usado' in doMembro), 'quem prepara recebe a fonte, para "Mudar o estudo", e se o estudo já foi usado (só ele)');
 
   // --- mudar o mesmo estudo (base igual) atualiza a linha ---
   const r2 = await ce.salvarEstudo('lider', ID, { ...doDono, fonte: dono.replace(/^Estudo: .*/, 'A armadura de Deus'), base: e1.id, traducao: 'blivre' }, opcoes(), dia(11));
@@ -1615,6 +1615,8 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
   }
   checar(await recusa({ estudo: 'blocos', fonte: '1. Um tópico logo de cara\nTexto' }) === MSG_ESTUDO.titulo + '|400', 'estudo sem título: "' + MSG_ESTUDO.titulo + '"');
   checar(await recusa({ ...doDono, perguntas: ['1', '2', '3', '4', '5', '6', '7'] }) === MSG_ESTUDO.perguntas + '|400', '7 perguntas: "' + MSG_ESTUDO.perguntas + '"');
+  checar(await recusa({ estudo: 'blocos', fonte: 'Título\nTexto\nPerguntas:\n1. ' + 'x'.repeat(301) + '?' }) === MSG_ESTUDO.pergunta + '|400',
+    'sem as perguntas escolhidas (o app antigo), a pergunta do texto com mais de 300 caracteres também é recusada');
   checar(await recusa({ ...doDono, traducao: 'nvi' }) === MSG_ESTUDO.traducao + '|400', 'a tradução "nvi": "' + MSG_ESTUDO.traducao + '"');
   checar(await recusa({ estudo: 'blocos', fonte: 'Título\nEfésios 6.99' }) === 'não achamos Efésios 6.99 na Bíblia do app. Confira a referência|400', 'um versículo que a Bíblia do app não tem é recusado');
   checar(await recusa({ estudo: 'trecho', ref: 'Livro Nenhum 3' }) === MSG_ESTUDO.trecho + '|400' && await recusa({ estudo: 'trecho', ref: 'João 3.18-16' }) === MSG_ESTUDO.trecho + '|400',
@@ -1670,11 +1672,36 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
     'uma linha com JSON quebrado ou tradução desconhecida não derruba a leitura');
   ce.banco().prepare("DELETE FROM celula_estudos WHERE id = 'lx'").run();
 
+  // --- mudar um estudo que já foi usado num encontro é preparar o próximo: o usado fica ---
+  {
+    const usado = (x) => estudoUsado({ criadoEm: '2026-10-18T12:00:00.000Z', nasceu: '2026-10-18', hoje: '2026-10-20', encontro: -1, encontros: [], ...x });
+    checar(!usado({}) && !usado({ encontro: 2 }) && usado({ encontro: 1 }) && usado({ encontro: 0 }) && !usado({ encontro: 0, hoje: '2026-10-18' }),
+      'pelo dia da semana: usado quando já passou um dia de encontro desde que nasceu (o de hoje não conta)');
+    const reg = (data, em, semEncontro = false) => ({ encontros: [{ data, em, semEncontro }] });
+    checar(usado(reg('2026-10-19', '2026-10-19T23:00:00.000Z')) && !usado(reg('2026-10-18', '2026-10-18T08:00:00.000Z')) && !usado(reg('2026-10-19', '2026-10-19T23:00:00.000Z', true))
+      && !usado(reg('2026-10-17', '2026-10-19T23:00:00.000Z')) && usado({ nasceu: '' }),
+    'pelo registro: usado quando o encontro foi registrado depois que o estudo nasceu (não o "não houve encontro"); sem data, conta como usado');
+    ce.proposito(ID).encontros = [{ data: '2026-10-19', em: dia(19).toISOString(), visitantes: 0, presentes: [], registradoPor: 'lider', semEncontro: false }];
+    const proximo = await ce.salvarEstudo('lider', ID, { ...doDono, fonte: dono.replace(/^Estudo: .*/, 'O estudo da semana seguinte'), base: r7.estudo.id }, opcoes(), dia(20));
+    checar(proximo.estudo.id !== r7.estudo.id && ce.estudo(r7.estudo.id).titulo === 'Batalha espiritual, vigilância e Armadura de Deus' && ce.estudo(r7.estudo.id).atualAte === dia(20).toISOString(),
+      'com o estudo já usado, "Mudar" com a base atual cria o estudo novo, e o usado continua na tabela, inteiro');
+    ce.proposito(ID).encontros = [];
+  }
+  {
+    // o histórico de uma célula tem teto: além de 200, sai o mais antigo que não é o atual
+    const outra = Object.values(ce.dados.propositos).find((p) => p.celula && p.criadoPor === 'outro');
+    const inserir = ce.banco().prepare("INSERT INTO celula_estudos (id, proposito, tipo, fonte, criado_por, criado_em) VALUES (?, ?, 'blocos', '', 'outro', ?)");
+    for (let i = 0; i < ESTUDOS_POR_CELULA; i++) inserir.run('velho' + i, outra.id, new Date(Date.UTC(2020, 0, 1) + i * 86400000).toISOString());
+    await ce.salvarEstudo('outro', outra.id, doDono, opcoes(), dia(20));
+    const restam = linhas('SELECT id FROM celula_estudos WHERE proposito = ? ORDER BY criado_em', outra.id).map((x) => x.id);
+    checar(ESTUDOS_POR_CELULA === 200 && restam.length === 200 && restam[0] === 'velho1' && restam.includes(ce.proposito(outra.id).estudoId), 'com 200 estudos guardados, o novo entra e o mais antigo sai');
+  }
+
   // --- apagar a conta de quem preparou: os estudos ficam, com o @ ---
   await ce.apagar('lider');
-  checar(linhas("SELECT count(*) n FROM celula_estudos WHERE criado_por = 'lider'")[0].n === 6 && ce.proposito(ID).estudoId === r7.estudo.id,
+  checar(linhas("SELECT count(*) n FROM celula_estudos WHERE criado_por = 'lider'")[0].n === 7 && ce.proposito(ID).estudoId !== '',
     'apagar a conta do líder deixa os estudos dele na célula');
-  checar(estudoNoRetrato(ce.estudo(r7.estudo.id), {}).criadoPorNome === '@lider', 'sem a conta, "preparado por" mostra o @');
+  checar(estudoNoRetrato(ce.estudo(ce.proposito(ID).estudoId), {}).criadoPorNome === '@lider', 'sem a conta, "preparado por" mostra o @');
   checar(await tentar(() => nova('lider')) === 'esse @ já existe|400' && await tentar(() => nova('outro2')) === '',
     'o @ de quem apagou a conta e deixou estudos na célula fica guardado: uma conta nova não o pega');
   {

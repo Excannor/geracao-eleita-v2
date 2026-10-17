@@ -20,6 +20,9 @@ export const CARTOES_MAX = 15;
 export const PARES_MAX = 12;
 export const PERGUNTAS_MAX = 6;
 export const PERGUNTA_MAX = 300;
+// Os estudos guardados de uma célula, o atual incluído: uns quatro anos de um por semana. Além
+// disso, sai o mais antigo (o histórico da Fase 2 não cresce sem fim).
+export const ESTUDOS_POR_CELULA = 200;
 // As siglas de window.BIBLIAS (o teste.mjs confere que batem): o estudo inteiro numa tradução só.
 export const TRADUCOES = ['nbv', 'blivre'];
 // 'livre' é o estudo escrito de antes da v19: continua sendo lido, mas o que se grava agora é 'blocos'.
@@ -116,7 +119,28 @@ export function validarLeitura(r, { lerRef, livros = [], capitulos = null, versi
   const falta = (r.avisos || []).find((a) => a && a.tipo === 'sem-versiculo');
   if (falta) throw erro(semVersiculo(falta.ref));
   const refs = [...new Set(blocos.filter((b) => b.t === 'versiculo').map((b) => b.ref))];
-  return { titulo, blocos, refs, fonte, perguntas: (r.perguntas || []).slice(0, PERGUNTAS_MAX) };
+  // as perguntas da seção "Perguntas" do texto, quando o pedido não traz as escolhidas (o app
+  // antigo): os mesmos tetos das escolhidas
+  return { titulo, blocos, refs, fonte, perguntas: limparPerguntas((r.perguntas || []).slice(0, PERGUNTAS_MAX)) };
+}
+
+// O estudo atual já foi usado num encontro? Sim quando um encontro foi registrado depois que o
+// estudo nasceu (e não era "não houve encontro"), ou quando, desde o dia em que ele nasceu, já
+// passou um dia da semana do encontro (sem contar hoje: o estudo de hoje ainda é o do encontro de
+// hoje). Mudar um estudo usado é preparar o do próximo encontro: nasce uma linha nova, e o usado
+// fica para o histórico (Fase 2). Mudar um que ainda não foi usado corrige ele mesmo.
+//   criadoEm: o ISO de quando o estudo nasceu; nasceu e hoje: 'AAAA-MM-DD' no fuso do líder;
+//   encontro: o dia da semana (0 a 6, ou -1); encontros: os registrados ({ data, em, semEncontro }).
+// Sem data que se leia, conta como usado: na dúvida, o estudo antigo fica guardado.
+export function estudoUsado({ criadoEm, nasceu, hoje, encontro = -1, encontros = [] }) {
+  if (!nasceu || !hoje || !/^\d{4}-\d{2}-\d{2}$/.test(nasceu)) return true;
+  if ((encontros || []).some((x) => x && !x.semEncontro && x.em && x.em > criadoEm && x.data >= nasceu && x.data <= hoje)) return true;
+  if (!Number.isInteger(encontro) || encontro < 0) return false;
+  const dia = (iso) => Math.floor(Date.parse(iso + 'T12:00:00Z') / 86400000);
+  const de = dia(nasceu);
+  const ate = dia(hoje);
+  for (let d = de; d < ate && d < de + 7; d++) if (new Date(d * 86400000 + 43200000).getUTCDay() === encontro) return true;
+  return false;
 }
 
 // A linha do banco como o servidor trabalha com ela. O trecho de antes da v19 não tinha título nem
@@ -143,7 +167,7 @@ export function estudoDaLinha(l) {
 // e no escrito de antes da v19 (livre), a fonte é a palavra do líder e vai como "texto".
 // nomeDe(@, criadoEm) dá o nome de exibição de quem preparou (ou o @, se a conta não existe mais,
 // ou se a conta com esse @ nasceu depois do estudo).
-export function estudoNoRetrato(e, { souQuemPrepara = false, nomeDe = (u) => '@' + u } = {}) {
+export function estudoNoRetrato(e, { souQuemPrepara = false, nomeDe = (u) => '@' + u, usado = false } = {}) {
   if (!e) return null;
   const saida = {
     id: e.id, tipo: e.tipo, titulo: e.titulo, ref: e.ref, planoAte: e.planoAte,
@@ -153,5 +177,8 @@ export function estudoNoRetrato(e, { souQuemPrepara = false, nomeDe = (u) => '@'
   };
   if (e.tipo !== 'blocos') saida.texto = e.fonte;
   else if (souQuemPrepara) saida.fonte = e.fonte;
+  // só quem prepara precisa saber se o estudo já foi usado: a tela dele troca "Mudar o estudo"
+  // por "Preparar o próximo"
+  if (souQuemPrepara) saida.usado = !!usado;
   return saida;
 }

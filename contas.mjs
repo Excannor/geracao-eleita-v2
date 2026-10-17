@@ -20,7 +20,7 @@ import {
 } from './cuidado.mjs';
 import {
   ESTUDO_MAX, ESTUDO_BRUTO_MAX, TIPOS_ESTUDO, TRADUCOES, MENSAGENS as MSG_ESTUDO, semVersiculo,
-  limparPerguntas, limparFonte, validarLeitura, estudoDaLinha,
+  limparPerguntas, limparFonte, validarLeitura, estudoDaLinha, estudoUsado, ESTUDOS_POR_CELULA,
 } from './estudos.mjs';
 
 const scrypt = promisify(scryptCb);
@@ -1400,6 +1400,17 @@ export class Contas {
     return p;
   }
 
+  // O estudo já foi usado num encontro desta célula (estudos.mjs, estudoUsado), no fuso do líder.
+  estudoJaUsado(p, e, agora = new Date()) {
+    if (!p || !e) return false;
+    const fuso = (this.achar(p.criadoPor) || {}).fuso;
+    const nascido = new Date(e.criadoEm);
+    return estudoUsado({
+      criadoEm: e.criadoEm, nasceu: Number.isNaN(nascido.getTime()) ? '' : hojeNoFuso(fuso, nascido), hoje: hojeNoFuso(fuso, agora),
+      encontro: p.encontro, encontros: p.encontros,
+    });
+  }
+
   // Um estudo pela chave; o atual da célula é o que p.estudoId aponta. Como o check-in, os estudos
   // ficam fora da foto em memória: lidos e gravados direto em celula_estudos.
   estudo(id) {
@@ -1482,7 +1493,9 @@ export class Contas {
           p.estudoId = '';
         } else if (novo) {
           const valores = [novo.tipo, novo.titulo, novo.ref, novo.planoAte, novo.fonte, JSON.stringify(novo.blocos), JSON.stringify(novo.refs), JSON.stringify(novo.perguntas), novo.traducao];
-          if (atual && String(e.base || '') === atual.id) {
+          // mudar o estudo atual (base igual) atualiza a mesma linha, a não ser que ele já tenha
+          // sido usado num encontro: aí é o estudo do próximo, e o usado fica para o histórico
+          if (atual && String(e.base || '') === atual.id && !this.estudoJaUsado(p, atual, agora)) {
             // o estudo de antes da v19 não tinha autor: quem o muda agora é o líder
             db.prepare("UPDATE celula_estudos SET tipo = ?, titulo = ?, ref = ?, plano_ate = ?, fonte = ?, blocos = ?, refs = ?, perguntas = ?, traducao = ?, editado_em = ?, "
               + "criado_por = CASE WHEN criado_por = '' THEN ? ELSE criado_por END WHERE id = ?").run(...valores, quando, p.criadoPor, atual.id);
@@ -1492,6 +1505,9 @@ export class Contas {
               + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(novoId, p.id, ...valores, p.criadoPor, quando);
             if (atual) encerrar(atual.id);
             p.estudoId = novoId;
+            // o histórico de uma célula tem teto: além dele, sai o mais antigo que não é o atual
+            db.prepare('DELETE FROM celula_estudos WHERE proposito = ? AND id != ? AND id NOT IN '
+              + '(SELECT id FROM celula_estudos WHERE proposito = ? ORDER BY criado_em DESC, id DESC LIMIT ?)').run(p.id, novoId, p.id, ESTUDOS_POR_CELULA);
           }
         }
         Object.assign(p, ws);

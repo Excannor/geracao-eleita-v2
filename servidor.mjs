@@ -847,13 +847,14 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   // isto, nunca por euConduzo.
   const minha = p.membros.find((m) => m.usuario === eu) || {};
   const convidado = minha.estado === 'convidado';
+  const atual = CONTAS.estudo(p.estudoId);
   const euPreparoEstudo = p.criadoPor === eu && minha.estado === 'ativo' && !aprovacaoQueFalta(p, eu, 'lider');
   const extra = {
     encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
     // para quem prepara (estudos.mjs, estudoNoRetrato). Quem só foi convidado e ainda não aceitou
     // não é da célula (privacidade, seção 7): não recebe o estudo nem o roteiro dele.
-    estudo: convidado ? null : estudoNoRetrato(CONTAS.estudo(p.estudoId), { souQuemPrepara: euPreparoEstudo, nomeDe: (u, desde) => nomeNaCelula(info, u, desde) }),
+    estudo: convidado ? null : estudoNoRetrato(atual, { souQuemPrepara: euPreparoEstudo, nomeDe: (u, desde) => nomeNaCelula(info, u, desde), usado: euPreparoEstudo && CONTAS.estudoJaUsado(p, atual) }),
     euPreparoEstudo,
     estudoAcolhida: (!convidado && p.estudoAcolhida) || '', estudoAdoracao: (!convidado && p.estudoAdoracao) || '', estudoTestemunho: (!convidado && p.estudoTestemunho) || '',
     euConduzo: conduzo,
@@ -1975,13 +1976,15 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto, new Date(), { quando, hoje }); return {}; }
         if (qual === 'estudo') {
           // Só o líder prepara (contas.mjs, salvarEstudo, dá 403 aos outros). A leitura da semana
-          // congela até que dia do plano ela vai, contado pelo que o líder já leu.
+          // congela até que dia do plano ela vai, contado pelo que o líder já leu. Gravar o estudo
+          // tem limite por minuto: cada estudo novo é uma linha no histórico da célula.
+          if (!dentroDoLimite('estudo:' + eu, 20)) throw Object.assign(new Error('muitas tentativas, espere um pouco'), { publico: true, codigo: 429 });
           const ate = semanaDoLider(await lerEstado(arquivoDe(eu)));
           const r = await CONTAS.salvarEstudo(eu, id, corpo, {
             regras: REGRAS, livros: TODOS_LIVROS, capitulos: CAPITULOS, versiculos: versiculosDa, planoAte: ate, refSemana: refDaSemana(ate),
           });
           const nomes = new Map([[eu, await nomeDeExibicao(eu)]]);
-          return { estudo: estudoNoRetrato(r.estudo, { souQuemPrepara: true, nomeDe: (u) => nomes.get(u) || '@' + u }) };
+          return { estudo: estudoNoRetrato(r.estudo, { souQuemPrepara: true, nomeDe: (u) => nomes.get(u) || '@' + u, usado: CONTAS.estudoJaUsado(r.p, r.estudo) }) };
         }
         if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro }, hoje); return {}; }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }

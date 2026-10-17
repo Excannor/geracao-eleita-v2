@@ -139,9 +139,11 @@
         + blocos.map((b) => R.blocoEmHtml(b, { cartao: (c) => cartaoComMais(c.ref, textos.get(c.ref) || '', sigla) })).join('') + '</div>';
     const perguntas = legado ? [] : R.perguntasDe(e, sem);
     painel.innerHTML = (linha ? '<p class="passo-dica">' + esc(linha) + '</p>' : '')
+      // O estudo que já foi usado num encontro fica guardado: o caminho é preparar o próximo (o
+      // servidor faz o mesmo, estudos.mjs, estudoUsado)
       + (p.euPreparoEstudo ? '<div class="mesa-lider">' + CC.ico('caneta') + '<span><b>' + (e.criadoPor === (CC.quem || {}).usuario ? 'Você preparou este estudo' : 'O estudo desta célula') + '</b>'
-        + '<small>Só o líder pode mudar o estudo.</small></span>'
-        + '<button type="button" class="botao pequeno contorno" data-mudar>Mudar o estudo</button></div>' : '')
+        + '<small>' + (e.usado ? 'Ele já foi usado num encontro e fica guardado na célula.' : 'Só o líder pode mudar o estudo.') + '</small></span>'
+        + '<button type="button" class="botao pequeno contorno" data-mudar>' + (e.usado ? 'Preparar o próximo' : 'Mudar o estudo') + '</button></div>' : '')
       + (e.tipo === 'blocos' || e.tipo === 'trecho' ? noPlanoHtml(refs) : '')
       + secaoW('Acolhida', '<p>' + esc(ws.acolhida) + '</p>')
       + secaoW('Adoração', '<p>' + esc(ws.adoracao) + '</p>')

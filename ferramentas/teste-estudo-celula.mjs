@@ -605,6 +605,20 @@ await esperar(existe('.painel-celula'), 15000);
 await dormir(800);
 ok(await av('!/Encontro hoje/.test(document.querySelector(".painel-celula").textContent)'), '15. sem estudo, a Ana não vê selo nenhum');
 
+// ---------- 17. O estudo usado num encontro: preparar o próximo ----------
+{
+  const r = await pedir('api/celula', { acao: 'estudo', id: ID, estudo: 'blocos', fonte: 'Estudo: Vigiar e orar\nEfésios 6:18\nOrem em todo tempo.', base: '' }, lider);
+  ok(r.status === 200 && r.dado.estudo && r.dado.estudo.usado === false, '17. o líder salva outro estudo, ainda não usado');
+  const hojeIso = await av('CC.hojeIso()');
+  ok((await pedir('api/celula', { acao: 'registrarEncontro', id: ID, data: hojeIso, presentes: ['ana'], visitantes: 0 }, lider)).status === 200, '17. e registra o encontro de hoje');
+  await como(lider, rota('estudo'));
+  ok(await esperar('/Preparar o próximo/.test(document.querySelector(".mesa-lider [data-mudar]")?.textContent || "") && /já foi usado num encontro/.test(document.querySelector(".mesa-lider")?.textContent || "")', 15000),
+    '17. o cartão do líder diz que o estudo já foi usado e oferece "Preparar o próximo"');
+  await clicar('.mesa-lider [data-mudar]');
+  ok(await esperar('/\\/preparar$/.test(location.hash) && !!document.querySelector("[data-fonte]") && document.querySelector("[data-fonte]").value === ""', 15000),
+    '17. "Preparar o próximo" abre o preparo em branco (o usado fica guardado na célula)');
+}
+
 // ---------- 18. sem exceções ----------
 const erros = evs.filter((e) => e.method === 'Runtime.exceptionThrown').map((e) => e.params.exceptionDetails?.exception?.description || e.params.exceptionDetails?.text || 'exceção');
 ok(erros.length === 0, 'nenhuma exceção de JavaScript' + (erros[0] ? ': ' + erros[0].slice(0, 200) : ''));

@@ -62,9 +62,11 @@
   const gravarRascunho = (id, st) => { try { localStorage.setItem(chave(id), JSON.stringify(Object.assign({}, st, { em: new Date().toISOString() }))); } catch (e) { /* segue */ } };
   const apagarRascunho = (id) => { try { localStorage.removeItem(chave(id)); } catch (e) { /* segue */ } };
 
-  // Um rascunho de outro estudo (o estudo mudou em outro aparelho) não serve mais.
+  // Um rascunho de outro estudo (o estudo mudou em outro aparelho) não serve mais. O estudo que já
+  // foi usado num encontro não é a base de nada: o líder prepara o próximo, em branco, e o usado
+  // fica guardado na célula.
   function estadoInicial(p) {
-    const e = p.estudo;
+    const e = p.estudo && !p.estudo.usado ? p.estudo : null;
     const base = e ? e.id : '';
     const salvo = lerRascunho(p.id);
     if (salvo && (salvo.base || '') === base) return salvo;

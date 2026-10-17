@@ -359,6 +359,26 @@ try {
     const daAmiga = (await propositos(amiga.cookie)).find((p) => p.id === idS2);
     ok(daAmiga && daAmiga.euConvidado === true && daAmiga.estudo === null && daAmiga.estudoAcolhida === '', 'antes de aceitar, a convidada não recebe o estudo');
     ok((await propositos(mS1.cookie)).find((p) => p.id === idS2).estudo.blocos.length === 32, 'quem é da célula continua recebendo');
+
+    // o estudo usado num encontro: "Mudar" vira preparar o próximo, e o usado fica
+    const deS2 = async (cookie) => (await propositos(cookie)).find((p) => p.id === idS2).estudo;
+    const antes = await deS2(liderS2.cookie);
+    ok(antes.usado === false, 'antes do encontro, o estudo ainda não foi usado');
+    ok((await pedir('/api/celula', { acao: 'registrarEncontro', id: idS2, data: HOJE, presentes: ['membros1'], visitantes: 0 }, liderS2.cookie)).status === 200, 'o líder registra o encontro');
+    ok((await deS2(liderS2.cookie)).usado === true && !('usado' in (await deS2(mS1.cookie))), 'depois dele, o líder vê o estudo como usado (só ele recebe isso)');
+    const proximo = await dados(await pedir('/api/celula', { ...doDono, id: idS2, base: antes.id, fonte: doDono.fonte.replace(/^Estudo: .*/, 'O próximo estudo') }, liderS2.cookie));
+    ok(proximo.estudo && proximo.estudo.id !== antes.id && proximo.estudo.titulo === 'O próximo estudo' && proximo.estudo.usado === false, 'salvar com a base do estudo usado cria o estudo novo');
+    {
+      const db = new DatabaseSync(join(PASTA, 'caminho.db'), { readOnly: true });
+      try {
+        const velho = db.prepare('SELECT titulo, atual_ate FROM celula_estudos WHERE id = ?').get(antes.id);
+        ok(velho && velho.titulo === 'Batalha espiritual, vigilância e Armadura de Deus' && velho.atual_ate !== '', 'e o estudo usado fica na tabela, inteiro, para o histórico');
+      } finally { db.close(); }
+    }
+    // gravar o estudo tem limite por minuto
+    const status = [];
+    for (let i = 0; i < 21; i++) status.push((await pedir('/api/celula', { acao: 'estudo', id: idS2, estudo: 'semana' }, liderS2.cookie)).status);
+    ok(status.filter((x) => x === 429).length >= 1 && status.slice(0, 10).every((x) => x === 200), 'gravar o estudo mais de 20 vezes num minuto: 429');
   }
 
   // ---------- quem precisa de atenção ----------
