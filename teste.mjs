@@ -338,6 +338,8 @@ secao('peças sob demanda');
     ['painel-tela', 'PAINEL_TELA', 'api/painel/liderancas', '', 'o painel do administrador'],
     // a casca (06d-atlas.js) e o cartão do Explorar ficam no index: a lista e o mapa saem
     ['atlas', 'ATLAS_TELA', 'atlas-quadro', '', 'os mapas bíblicos'],
+    // o estudo da célula (À Mesa): a casca, o vazio e o selo ficam em 08b-propositos.js
+    ['estudo-celula', 'ESTUDO_CELULA', 'textoParaGrupo', '', 'o estudo da célula'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -351,6 +353,16 @@ secao('peças sob demanda');
       rotulo + ' leva o próprio código (e o estilo, quando tem)');
     // como todo .js do app: só com sessão (não é público como os mapas e as fontes)
     checar(!servidorTexto.match(/const PUBLICO_COM_RESUMO = .*/)[0].includes(nome.toUpperCase()), rotulo + ' só sai do servidor com sessão');
+  }
+  // A peça do estudo junta mais de um arquivo: as regras puras vão com a tela. O estudo antigo
+  // saiu do index.
+  {
+    const arquivo = (variavel) => (html.match(new RegExp('window\\.' + variavel + '="([^"]*)"')) || [])[1] || '';
+    const celula = arquivo('ESTUDO_CELULA') ? readFileSync(dist(arquivo('ESTUDO_CELULA')), 'utf8') : '';
+    checar(celula.includes('CC.estudoRegras =') && celula.includes('CC.estudoCelula =') && celula.indexOf('CC.estudoRegras =') < celula.indexOf('CC.estudoCelula ='),
+      'a peça estudo-celula leva as regras (estudo-regras.js) antes da tela');
+    checar(!/folhaPrepararEstudo|montarEstudo|estudoEmTexto|semanaDoEstudo|PERGUNTAS_ACOLHIDA/.test(html) && html.includes('CC.apoioCelula'),
+      'o estudo antigo (preparar, montar, texto do grupo) saiu do index.html; fica a casca');
   }
   // o que continua no index: o cartão dos mapas, a casca da rota do mapa e o item do Mais do painel
   checar(html.includes('.cartao-mapas{') && html.includes('CC.cartaoMapas') && html.includes('window.MAPAS='), 'o cartão e a lista dos mapas continuam no index.html');
@@ -1048,6 +1060,92 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '08b-propositos.js'), 'utf8')
   checar(JSON.stringify(mesmoDiaDeNovo) === JSON.stringify(r1), 'o mesmo dia sempre devolve a mesma sugestão (determinístico, nada gravado)');
   checar(CC.oreHojePor([], '2026-01-01', 0).length === 0, 'sem candidatos, não há o que sugerir');
   checar(CC.oreHojePor([{ usuario: 'so', nome: 'Só' }], '2026-01-01', 1).length === 1, 'com um candidato só, a sugestão é ele mesmo');
+}
+
+
+// --- o estudo da célula: as regras puras (src/sob-demanda/estudo-regras.js) ---
+// docs/a-mesa-fase1.md, seção 6.2. O estudo do dono como o servidor o guarda: o texto colado do
+// Word (o resumo em negrito), a marca "Para guardar" na última linha e o cartão de Lucas que a
+// prévia sugeriu. Os versículos esperados vêm de conteudo/biblias, nunca digitados aqui.
+runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 'utf8'), contexto, { filename: 'estudo-regras.js' });
+{
+  const R = CC.estudoRegras;
+  const nbv = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', 'nbv.json'), 'utf8'));
+  const versiculo = (livro, cap, v) => nbv.livros[livro][cap - 1][v - 1];
+  const linhas = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo.txt'), 'utf8').replace(/\s+$/, '').split('\n')
+    .map((t, i) => (i >= 31 && i <= 36 ? '*' + t + '*' : t));
+  linhas[41] = 'Para guardar: ' + linhas[41];
+  linhas.splice(8, 0, 'Lucas 11.24-26');
+  const lido = ctxEstudo.window.CC.lerEstudo(linhas.join('\n'), { capitulos: capitulosDoPlano });
+  const r244 = D.reflexoes['244'][0];
+  const perguntas = [r244.perguntas[0], R.PERGUNTAS_OIA[2]];
+  const dono = { tipo: 'blocos', titulo: lido.titulo, blocos: lido.blocos.map(({ l, ...b }) => b), refs: lido.refs, perguntas, traducao: 'nbv' };
+  checar(dono.refs.length === 6 && dono.refs[1] === 'Lucas 11.24-26', 'regras do estudo: o estudo do dono, com o cartão de Lucas, tem 6 cartões');
+
+  // 1. passos()
+  const ws = { acolhida: 'ACOLHIDA DE TESTE', adoracao: 'ADORACAO DE TESTE', testemunho: 'TESTEMUNHO DE TESTE' };
+  const ps = R.passos(dono, { conduzo: true, ...ws });
+  const ETIQUETAS = ['Acolhida', 'Adoração', 'Abertura', 'Tópico 1', 'Tópico 2', 'Tópico 3', 'Tópico 4, parte 1 de 2', 'Tópico 4, parte 2 de 2', 'Tópico 5', 'Conclusão',
+    'Para conversar, 1 de 2', 'Para conversar, 2 de 2', 'Orar juntos', 'Testemunho', 'Fechar o encontro'];
+  checar(JSON.stringify(ps.map((x) => x.etiqueta)) === JSON.stringify(ETIQUETAS), 'passos(): os 15 passos do estudo do dono, com as etiquetas do mock');
+  const palavra = ps.filter((x) => x.tipo === 'palavra');
+  checar(palavra.every((x) => !JSON.stringify(x).includes('DE TESTE')), 'passos(): nenhum passo da Palavra leva acolhida, adoração ou testemunho');
+  const orar = ps.find((x) => x.tipo === 'orar');
+  checar(!(orar.blocos || []).length && orar.convite === true && orar.frase === 'Orem uns pelos outros, a partir do que conversaram.', 'passos(): Orar juntos convida a orar, sem versículo');
+  checar(palavra.every((x) => !x.blocos.some((b) => b.t === 'guardar')) && ps[14].frase === 'Não basta limpar a casa. É preciso permitir que Deus habite nela.' && ps[14].registrar === true,
+    'passos(): "Para guardar" só no último passo, e quem conduz abre o registro');
+  checar(ps[7].blocos[0].t === 'texto' && ps[7].blocos[0].texto === 'E Paulo acrescenta algo fundamental:' && ps[7].blocos[1].ref === 'Efésios 6.18' && ps[6].blocos.filter((b) => b.t === 'versiculo').length === 1,
+    'passos(): "Tópico 4, parte 2 de 2" começa por "E Paulo acrescenta algo fundamental:"');
+  checar(JSON.stringify(ps[2].abrir) === JSON.stringify({ livro: 'Efésios', cap: 6 }) && ps[2].titulo === dono.titulo, 'passos(): a Abertura traz o título e "Abrir Efésios 6 na Bíblia"');
+  checar(R.passos(dono, { conduzo: false })[14].registrar === false, 'passos(): sem conduzir, o último passo não abre o registro');
+  checar(R.passos(dono, { visitante: true }).find((x) => x.tipo === 'orar').convite === false, 'passos(): o visitante não ouve falar da aba Oração');
+  const semTopicos = R.passos({ tipo: 'blocos', titulo: 'T', blocos: [{ t: 'texto', texto: 'a' }, { t: 'versiculo', ref: 'João 3.16' }, { t: 'texto', texto: 'b:' }, { t: 'versiculo', ref: 'João 3.17' }], perguntas: [] }, {});
+  checar(JSON.stringify(semTopicos.filter((x) => x.tipo === 'palavra').map((x) => x.etiqueta)) === JSON.stringify(['A Palavra, 1 de 2', 'A Palavra, 2 de 2']), 'passos(): sem tópicos, a Palavra se divide pelos cartões');
+
+  // 2. textoParaGrupo()
+  const molde = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo-grupo.txt'), 'utf8');
+  checar(!molde.includes(versiculo('Efésios', 6, 12)), 'o texto esperado do grupo não traz o versículo digitado: ele vem de nbv.json');
+  const principal = { texto: versiculo('Efésios', 6, 12), abreviatura: 'NBV' };
+  const zap = R.textoParaGrupo(dono, { data: 'quinta, 22/10', principal, endereco: 'https://exemplo.app' });
+  checar(zap === molde.replace('{{DATA}}', 'quinta, 22/10').replace('{{NBV Efésios 6.12}}', principal.texto).replace('{{ENDERECO}}', 'https://exemplo.app'),
+    'textoParaGrupo(): o estudo inteiro, formatado como no mock (ferramentas/estudo-exemplo-grupo.txt)');
+  checar(R.textoParaGrupo(dono, { principal }).split('\n')[1] === '', 'textoParaGrupo(): sem dia de encontro, a linha da data some');
+  const semRede = R.textoParaGrupo(dono, { principal: { abreviatura: 'NBV' } }).split('\n');
+  checar(semRede[4] === '*Leiam juntos:* Efésios 6.12 (NBV)' && semRede[5] === '', 'textoParaGrupo(): sem o texto do versículo, sai só a referência');
+  checar(R.textoParaGrupo({ ...dono, traducao: 'blivre' }, { principal: { abreviatura: 'BLIVRE' } }).includes('*Leiam juntos:* Efésios 6.12 (BLIVRE)'), 'textoParaGrupo(): com a Bíblia Livre, a abreviatura dela');
+  checar(!zap.includes('DE TESTE') && !/Acolhida|Adoração|Testemunho/.test(zap), 'textoParaGrupo(): acolhida, adoração e testemunho não vão para o grupo');
+
+  // 3. noPlano()
+  const dias = (refs) => R.noPlano(refs, D.plano).map((x) => x.numero).join();
+  const romanos8 = D.plano.find((d) => d.trechos.some((t) => t.livro === 'Romanos' && t.de <= 8 && t.ate >= 8)).numero;
+  checar(dias(dono.refs) === '244,77' && dias(dono.refs.filter((x) => !x.startsWith('Lucas'))) === '244,318' && dias(['Romanos 8']) === String(romanos8),
+    'noPlano(): com Lucas, os dias 244 e 77; sem Lucas, 244 e 318; Romanos 8, o dia que lê Romanos 8');
+
+  // 4. gruposDePerguntas()
+  const g1 = R.gruposDePerguntas(dono, { plano: D.plano, reflexaoEscrita: CC.reflexaoEscrita, refs: dono.refs, doTexto: [] });
+  checar(JSON.stringify(g1.map((g) => g.titulo)) === JSON.stringify(['Da reflexão do dia 244', 'Do método OIA']) && g1[0].perguntas.length === 2
+    && JSON.stringify(g1.flatMap((g) => g.marcadas)) === JSON.stringify(perguntas), 'gruposDePerguntas(): a reflexão do dia 244 e o OIA, com 2 marcadas');
+  const parabola = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'parabolas', 'amigo-meia-noite.json'), 'utf8'));
+  const item = R.parabolaDoEstudo(['Lucas 11'], [{ titulo: 'O bom samaritano', ref: 'Lc 10.25-37' }, { titulo: parabola.titulo, ref: parabola.ref }]);
+  const g2 = R.gruposDePerguntas({ tipo: 'trecho', ref: 'Lucas 11', perguntas: [] }, { plano: D.plano, reflexaoEscrita: CC.reflexaoEscrita, refs: ['Lucas 11'], parabola: { titulo: item.titulo, ref: item.ref, perguntas: parabola.perguntas } });
+  checar(JSON.stringify(g2.map((g) => g.titulo)) === JSON.stringify(['Da reflexão do dia 77', 'Da parábola', 'Do método OIA']) && g2[1].subtitulo.startsWith('O amigo à meia-noite')
+    && JSON.stringify(g2[1].perguntas) === JSON.stringify(parabola.perguntas), 'gruposDePerguntas(): num trecho "Lucas 11", a reflexão do dia 77, a parábola do amigo à meia-noite (do arquivo dela) e o OIA');
+
+  // o trecho de um capítulo inteiro: os 10 primeiros, ou o capítulo curto inteiro com a contagem da Bíblia
+  const cartaoTrecho = (ref, contar) => R.comoBlocos({ tipo: 'trecho', ref, texto: '' }, null, contar).find((b) => b.t === 'versiculo');
+  checar(JSON.stringify(cartaoTrecho('Romanos 8')) === JSON.stringify({ t: 'versiculo', ref: 'Romanos 8.1-10', escrito: 'Romanos 8' })
+    && JSON.stringify(cartaoTrecho('Salmos 117', (l, c) => nbv.livros[l][c - 1].length)) === JSON.stringify({ t: 'versiculo', ref: 'Salmos 117.1-2', escrito: 'Salmos 117' }),
+  'comoBlocos(): o trecho de um capítulo mostra os 10 primeiros, e o capítulo curto mostra o que ele tem');
+
+  // 5. blocoEmHtml()
+  checar(R.blocoEmHtml({ t: 'texto', texto: '<script>x</script> e *<b>* e *negrito* e _nada_' }) === '<p>&lt;script&gt;x&lt;/script&gt; e <b>&lt;b&gt;</b> e <b>negrito</b> e _nada_</p>',
+    'blocoEmHtml(): tudo escapado, e só *negrito* vira <b>');
+  checar(!/<(?!\/?(p|b|ul|li|span|svg|path|h3|div|figure|blockquote|figcaption)\b)/.test(dono.blocos.map((b) => R.blocoEmHtml(b, { cartao: () => '' })).join('')), 'blocoEmHtml(): o estudo do dono vira só as marcas de sempre');
+
+  // 6. nada de travessão nem meia-risca nos textos das peças do estudo (as letras especiais como escape)
+  for (const f of ['estudo-regras.js', 'estudo-celula.js']) {
+    checar(!/[—–]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', f), 'utf8')), f + ': sem travessão nem meia-risca no texto');
+  }
 }
 
 // =========================================================================

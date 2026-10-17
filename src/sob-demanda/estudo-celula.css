@@ -1,0 +1,110 @@
+/* =========================================================================
+   O estudo da célula pronto (À Mesa): a aba Estudo, o modo encontro e "Mandar no grupo".
+   Do mock aprovado (mesa-mock/_fonte/mesa.css), só com fichas de 00-tokens.css. O listrado
+   sálvia (--realce) fica só para o que foi escolhido, no preparo.
+   ========================================================================= */
+
+/* ---------- o estudo formatado (prévia, aba Estudo e modo encontro) ---------- */
+.mesa-estudo { display: grid; gap: 12px; color: var(--tinta); }
+.mesa-estudo > * { margin: 0; }
+.mesa-estudo p { font-size: 1rem; font-weight: 500; line-height: 1.6; text-wrap: pretty; }
+.mesa-estudo .mesa-t1 { color: var(--tinta-forte); font-size: 1.375rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
+.mesa-estudo .mesa-t2 { display: flex; align-items: baseline; gap: 10px; margin-top: 8px; color: var(--tinta-forte); font-size: 1.1875rem; font-weight: 800; line-height: 1.3; text-wrap: balance; }
+.mesa-parte .mesa-estudo .mesa-t2:first-child { margin-top: 0; }
+.mesa-t2 .n { flex: none; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); font-size: .9375rem; font-weight: 800; transform: translateY(2px); }
+.mesa-estudo .cartao-versiculo { margin: 4px 0; padding: 30px 18px 16px; background: var(--campo); }
+.mesa-estudo .cartao-versiculo .aspas { left: 18px; }
+.mesa-estudo .cartao-versiculo blockquote { font-size: 1.0625rem; line-height: 1.65; }
+.mesa-estudo .cartao-versiculo figcaption { margin-top: 8px; }
+/* os três pontos de cada cartão: a barra de ações abre logo abaixo dele */
+.cartao-versiculo.com-mais { padding-bottom: 8px; }
+.cartao-versiculo.com-mais > figcaption { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; margin-top: 4px; }
+.cartao-versiculo .mesa-mais { display: grid; place-items: center; flex: none; width: 44px; height: 44px; margin-right: -10px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--tinta-fraca); cursor: pointer; }
+.cartao-versiculo .mesa-mais[aria-expanded="true"] { background: var(--cartao); color: var(--tinta-forte); }
+.cartao-versiculo .mesa-mais svg { width: 20px; height: 20px; }
+.cartao-versiculo.com-mais > .acoes-verso.no-cartao { margin-top: 6px; }
+.mesa-seta { display: grid; margin: 0; padding: 0; list-style: none; }
+.mesa-seta li { display: grid; gap: 2px; padding: 10px 0; border-top: 1px solid var(--contorno); }
+.mesa-seta li:first-child { border-top: 0; padding-top: 2px; }
+.mesa-seta li:last-child { padding-bottom: 2px; }
+.mesa-seta b { color: var(--tinta-forte); font-size: 1rem; font-weight: 800; line-height: 1.35; }
+.mesa-seta span { display: flex; align-items: flex-start; gap: 6px; color: var(--tinta); font-size: 1rem; font-weight: 500; line-height: 1.45; }
+.mesa-seta span svg { flex: none; width: 18px; height: 18px; margin-top: 2px; color: var(--salvia-texto); stroke-width: 2.4; }
+/* o resumo em destaque: sálvia pálido liso, sem listra */
+.mesa-seta.destaque { padding: 8px 16px; border-radius: 22px; background: var(--salvia-palido); }
+.mesa-seta.destaque li { grid-template-columns: auto auto minmax(0, 1fr); align-items: center; gap: 8px; border-top-color: color-mix(in srgb, var(--salvia-texto) 25%, transparent); }
+.mesa-seta.destaque li:first-child { padding-top: 10px; }
+.mesa-seta.destaque li:last-child { padding-bottom: 10px; }
+.mesa-seta.destaque svg { width: 18px; height: 18px; color: var(--salvia-texto); stroke-width: 2.4; }
+.mesa-guardar { display: grid; gap: 6px; padding: 18px 20px 20px; border-radius: 24px; background: var(--folha); color: var(--folha-tinta); }
+/* no escuro, --folha é a mesma cor do cartão de versículo (--campo): o bloco usa a sálvia pálida */
+:root[data-tema="escuro"] .mesa-guardar { background: var(--salvia-palido); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--salvia-texto) 35%, transparent); }
+.mesa-guardar .etiqueta { color: var(--folha-tinta-fraca); font-size: .8125rem; }
+.mesa-guardar p, .mesa-estudo .mesa-guardar p { margin: 0; color: var(--folha-tinta); font-size: 1.25rem; font-weight: 800; line-height: 1.35; letter-spacing: -.01em; text-wrap: balance; }
+/* frase de alguém (> no texto) */
+.mesa-citacao { display: grid; gap: 6px; margin: 4px 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--salvia); }
+.mesa-citacao blockquote { margin: 0; color: var(--tinta-forte); font-size: 1.0625rem; font-weight: 600; font-style: italic; line-height: 1.5; text-wrap: pretty; }
+.mesa-citacao figcaption { color: var(--tinta-fraca); font-size: .875rem; font-weight: 700; }
+
+/* ---------- aba Estudo: o líder e No plano ---------- */
+.mesa-lider { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 10px 14px; padding: 16px 16px 16px 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.mesa-lider > svg { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); }
+.mesa-lider b { display: block; color: var(--tinta-forte); font-size: 1rem; font-weight: 800; line-height: 1.3; }
+.mesa-lider small { display: block; margin-top: 2px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+.mesa-lider .botao { grid-column: 1 / -1; width: 100%; min-height: 48px; background: var(--campo); }
+.mesa-plano { display: grid; border-radius: var(--raio-cartao); background: var(--cartao); overflow: hidden; }
+.mesa-plano > .etiqueta { padding: 16px 20px 2px; color: var(--salvia-texto); font-size: .8125rem; }
+.mesa-dia { display: grid; grid-template-columns: 44px minmax(0, 1fr) 24px; align-items: center; gap: 14px; min-height: 68px; padding: 10px 14px 10px 20px; color: var(--tinta-forte); text-decoration: none; }
+.mesa-dia + .mesa-dia { border-top: 1px solid var(--contorno); }
+.mesa-dia:active { background: var(--campo); }
+.mesa-dia > svg:first-child { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--campo); color: var(--tinta-forte); }
+.mesa-dia > svg:last-child { width: 20px; height: 20px; color: var(--tinta-fraca); }
+.mesa-dia b { display: block; font-size: 1rem; font-weight: 800; line-height: 1.3; }
+.mesa-dia small { display: flex; align-items: center; gap: 6px; margin-top: 2px; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+.mesa-dia small.leu { color: var(--salvia-texto); font-weight: 700; }
+.mesa-dia small.leu svg { flex: none; width: 14px; height: 14px; stroke-width: 3; }
+.painel-celula .secao-w > .mesa-estudo { margin-top: 2px; }
+.secao-w .roteiro-perguntas.mesa-perguntas { display: grid; gap: 8px; margin: 4px 0 0; padding: 0; list-style: none; counter-reset: q; }
+.mesa-perguntas li { position: relative; padding: 12px 14px 12px 48px; border-radius: 18px; background: var(--campo); color: var(--tinta-forte); font-size: 1rem; font-weight: 600; line-height: 1.45; counter-increment: q; }
+.mesa-perguntas li::before { content: counter(q); position: absolute; top: 11px; left: 12px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); font-size: .8125rem; font-weight: 800; }
+
+/* ---------- Mandar no grupo: a prévia do texto ---------- */
+.mesa-zap-moldura { display: grid; gap: 8px; margin: 14px 0 6px; padding: 14px 12px 16px; border-radius: 24px; background: var(--campo); }
+.mesa-zap-moldura > span { justify-self: center; padding: 4px 10px; border-radius: 999px; background: var(--cartao); color: var(--tinta-fraca); font-size: .75rem; font-weight: 700; }
+.mesa-zap { position: relative; margin: 0 0 0 auto; max-width: 96%; padding: 10px 12px; border-radius: 18px 4px 18px 18px; background: var(--cartao); color: var(--tinta-forte); font-size: .9375rem; font-weight: 500; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mesa-zap .ast { color: var(--tinta-fraca); font-weight: 600; }
+.mesa-zap b { font-weight: 800; }
+.mesa-zap .link { color: var(--salvia-texto); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- modo encontro por partes ---------- */
+.tela-modo-encontro .cena.mesa-topo { padding-bottom: 28px; }
+.mesa-topo .mesa-titulo-cena { margin: 4px 0 0; color: var(--folha-tinta); font-size: 1.625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
+.mesa-topo .frase-cena.mesa-frase { font-size: 1.5rem; }
+.mesa-topo .mesa-abrir { margin-top: 8px; background: var(--folha-destaque); color: var(--tinta-forte); }
+:root[data-tema="escuro"] .mesa-topo .mesa-abrir { background: var(--campo); color: var(--tinta-forte); }
+.mesa-corpo-encontro { display: grid; gap: 16px; width: 100%; max-width: 560px; padding: 24px 20px 40px; text-align: left; }
+.mesa-corpo-encontro > * { margin: 0; }
+.mesa-corpo-encontro .mesa-fala { color: var(--tinta-forte); font-size: 1.25rem; font-weight: 600; line-height: 1.5; text-wrap: pretty; }
+.mesa-corpo-encontro .cartao-versiculo { margin: 0; padding: 32px 20px 18px; }
+.mesa-corpo-encontro .cartao-versiculo.com-mais { padding-bottom: 8px; }
+.mesa-corpo-encontro .cartao-versiculo blockquote { font-size: 1.25rem; line-height: 1.6; }
+.mesa-corpo-encontro .cartao-versiculo figcaption { font-size: .9375rem; }
+.mesa-corpo-encontro .mesa-seta { padding: 4px 18px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.mesa-corpo-encontro .mesa-seta.destaque { background: var(--salvia-palido); }
+.mesa-corpo-encontro .mesa-seta li { padding: 12px 0; }
+.mesa-corpo-encontro .mesa-seta b, .mesa-corpo-encontro .mesa-seta span { font-size: 1.125rem; }
+.mesa-corpo-encontro .mesa-seta li:first-child { padding-top: 14px; }
+.mesa-corpo-encontro .mesa-seta li:last-child { padding-bottom: 14px; }
+.mesa-corpo-encontro .roteiro-dias { margin: 0; }
+.mesa-convite { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 14px; padding: 16px 18px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.mesa-convite > svg { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.mesa-convite p { margin: 0; color: var(--tinta-forte); font-size: 1.0625rem; font-weight: 600; line-height: 1.5; text-wrap: pretty; }
+.mesa-registrar { display: grid; gap: 10px; padding: 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.mesa-registrar h2 { margin: 0; color: var(--tinta-forte); font-size: 1.1875rem; font-weight: 800; text-wrap: balance; }
+.mesa-registrar p { margin: 0; color: var(--tinta); font-size: 1rem; font-weight: 500; line-height: 1.5; text-wrap: pretty; }
+.mesa-registrar .botao { width: 100%; min-height: 56px; font-size: 1.0625rem; }
+.modo-encontro-nav [data-indice] { font-variant-numeric: tabular-nums; }
+.modo-encontro-nav [data-concluir] svg { width: 18px; height: 18px; }
+/* o texto continua embaixo da barra: um degradê avisa */
+.tela-modo-encontro .tela-cheia-pe.mesa-pe { position: relative; }
+.tela-modo-encontro .tela-cheia-pe.mesa-pe::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 48px; background: linear-gradient(to bottom, color-mix(in srgb, var(--fundo) 0%, transparent), var(--fundo)); pointer-events: none; }

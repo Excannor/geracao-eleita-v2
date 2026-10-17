@@ -97,7 +97,7 @@
   function cartao(p) {
     return '<button class="cartao-proposito" data-proposito="' + CC.esc(p.id) + '">'
       + cabeca(p)
-      + (p.celula && encontroHoje(p) ? '<span class="selo-status leu">' + CC.ico('livro') + 'Encontro hoje · veja o estudo</span>' : '')
+      + (p.celula && encontroHoje(p) && p.estudo ? '<span class="selo-status leu">' + CC.ico('livro') + 'Encontro hoje · veja o estudo</span>' : '')
       + (p.celula && p.recado ? '<p class="recado-cartao">' + CC.esc(p.recado) + '</p>' : '')
       + (p.grupo && p.hoje && p.tipo !== 'oracao' ? barraDoGrupo(p.hoje) : situacaoDaDupla(p))
       + '</button>';
@@ -120,6 +120,9 @@
 
   CC.vistaCelula = function (raiz, arg) {
     const [id, pedida] = String(arg || '').split('/');
+    // O preparo do estudo já aberto não se redesenha (a sincronização chama CC.redesenhar): o
+    // líder perderia o foco do texto no meio de uma frase. O rascunho já está guardado.
+    if (pedida === 'preparar' && [...raiz.querySelectorAll('.mesa-preparo[data-passo]')].some((el) => el.dataset.celula === id)) return;
     const meu = ++desenhoCelula;
     const nestaTela = () => meu === desenhoCelula && location.hash.startsWith('#/novidades/celula/');
 
@@ -129,6 +132,12 @@
       if (!p) {
         raiz.innerHTML = voltarCelulas() + '<div class="vazio-amigos">' + CC.ico('pessoas') + '<p>Essa célula não está mais na sua lista.</p></div>';
         ligarVoltar(raiz);
+        return;
+      }
+      // O preparo do estudo é tela própria, sem as abas, e só de quem prepara (o líder).
+      if (pedida === 'preparar') {
+        if (!p.euPreparoEstudo) { CC.substituirRota(enderecoCelula(p.id, 'estudo')); return; }
+        abrirPreparo(raiz, p, () => meu === desenhoCelula);
         return;
       }
       const souLider = p.criadoPor === euUsuario();
@@ -218,7 +227,9 @@
     const membro = eu.estado === 'ativo' && eu.papel !== 'visitante';
     return topoDaCelula(p)
       + (conduzo ? oreHojePorHtml(p) : '')
-      + (encontroHoje(p) ? '<button class="selo-status leu botao-selo" data-ir-estudo>' + CC.ico('livro') + 'Encontro hoje · veja o estudo</button>' : '')
+      // No dia do encontro: com estudo, o caminho até ele; sem estudo, só quem prepara vê o selo.
+      + (encontroHoje(p) && p.estudo ? '<button class="selo-status leu botao-selo" data-ir-estudo>' + CC.ico('livro') + 'Encontro hoje · veja o estudo</button>' : '')
+      + (encontroHoje(p) && !p.estudo && p.euPreparoEstudo ? '<button class="selo-status botao-selo" data-ir-preparar>' + CC.ico('livro') + 'Encontro hoje · preparar o estudo</button>' : '')
       + (p.hoje ? barraDoGrupo(p.hoje) : '')
       // A meta ainda não foi batida e falta a minha leitura: o caminho até ela, sem rodeio.
       + (p.hoje && !p.hoje.batida && eu.estado === 'ativo' && !eu.fezHoje
@@ -239,6 +250,7 @@
   function ligarHoje(painel, p) {
     const ligar = (sel, fn) => { const el = painel.querySelector(sel); if (el) el.onclick = fn; };
     ligar('[data-ir-estudo]', () => CC.substituirRota(enderecoCelula(p.id, 'estudo')));
+    ligar('[data-ir-preparar]', () => { location.hash = enderecoCelula(p.id, 'preparar'); });
     ligar('[data-link-celula]', () => folhaLinkCelula(p));
     ligar('[data-recado]', () => folhaRecado(p));
     ligar('[data-encontro]', () => folhaEncontro(p));
@@ -289,32 +301,37 @@
     });
   }
 
-  async function preencherEstudo(painel, p, aindaAqui) {
-    const conduzo = p.euConduzo;
+  // ---------- o estudo (À Mesa): a casca ----------
+  // O estudo pronto, o modo encontro e "Mandar no grupo" moram na peça estudo-celula; o preparo,
+  // na estudo-preparo (src/sob-demanda/). Aqui fica o que abre na hora: o vazio, com o caminho de
+  // cada um, e o pedido das peças. Quem prepara é só o líder (euPreparoEstudo, do servidor),
+  // nunca decidido por euConduzo: o auxiliar vê o estudo como membro.
+  const pedirEstudo = (comPreparo) => CC.pedirPeca(window.ESTUDO_CELULA, () => !!CC.estudoCelula)
+    .then(() => (comPreparo ? CC.pedirPeca(window.ESTUDO_PREPARO, () => !!CC.estudoPreparo) : null));
+  function semPeca(painel, titulo) {
+    painel.innerHTML = CC.estadoSemPeca(titulo);
+    const b = painel.querySelector('[data-acao-estado]');
+    if (b) b.onclick = () => CC.redesenhar();
+  }
+  function preencherEstudo(painel, p, aindaAqui) {
     if (!p.estudo) {
       painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('livro')
-        + '<p>' + (conduzo ? 'O estudo do encontro ainda não foi preparado. Você escolhe: a leitura da semana, um trecho ou um estudo seu.'
+        + '<p>' + (p.euPreparoEstudo ? 'O estudo do encontro ainda não foi preparado. Você escolhe: a leitura da semana, um trecho ou um estudo seu.'
           : CC.esc(nomeDoLider(p)) + ' ainda não preparou o estudo deste encontro.') + '</p>'
-        + (conduzo ? '<button class="botao" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>'
+        + (p.euPreparoEstudo ? '<button class="botao" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>'
           : '<a class="botao" href="' + leituraDaSemana(p) + '" data-leitura-semana>Ler a leitura da semana' + CC.ico('avancar') + '</a>') + '</div>';
       const preparar = painel.querySelector('[data-preparar]');
-      if (preparar) preparar.onclick = () => folhaPrepararEstudo(p);
+      if (preparar) preparar.onclick = () => { location.hash = enderecoCelula(p.id, 'preparar'); };
       return;
     }
-    const { html, texto, ref } = await montarEstudo(p);
-    if (!aindaAqui()) return;
-    painel.innerHTML = html
-      + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
-      + '<button class="botao contorno" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button>'
-      + (conduzo ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '') + '</div>';
-    if (ref) CC.ligarCartaoVersiculo(painel, ref);
-    // "Mateus 26", "1 Samuel": a quebra de linha nunca separa o número do livro
-    if (CC.inseparavel) CC.inseparavel(painel);
-    painel.querySelector('[data-compartilhar]').onclick = () => compartilharEstudo(texto);
-    const modo = painel.querySelector('[data-modo-encontro]');
-    if (modo) modo.onclick = () => CC.modoEncontro(p);
-    const mudar = painel.querySelector('[data-mudar]');
-    if (mudar) mudar.onclick = () => folhaPrepararEstudo(p);
+    pedirEstudo(false).then(() => { if (aindaAqui()) CC.estudoCelula.aba(painel, p, apoio, aindaAqui); },
+      () => { if (aindaAqui()) semPeca(painel, 'Não deu para abrir o estudo'); });
+  }
+  function abrirPreparo(raiz, p, aindaAqui) {
+    raiz.innerHTML = '<div class="folha-juntos"><div class="cabeca-centro"><h1>Preparar o estudo</h1></div></div>'
+      + '<div class="painel-celula mesa-preparo">' + CC.esqueleto('texto') + '</div>';
+    pedirEstudo(true).then(() => { if (aindaAqui()) CC.estudoPreparo.tela(raiz, p, apoio); },
+      () => { if (aindaAqui()) semPeca(raiz.querySelector('.mesa-preparo'), 'Não deu para abrir o preparo'); });
   }
 
   function abaPessoas(p, souLider) {
@@ -631,7 +648,7 @@
         const linkCelula = folha.querySelector('[data-link-celula]');
         if (linkCelula) linkCelula.onclick = () => { fechar(); folhaLinkCelula(p); };
         const roteiro = folha.querySelector('[data-roteiro]');
-        if (roteiro) roteiro.onclick = () => { fechar(); CC.estudoDoEncontro(p); };
+        if (roteiro) roteiro.onclick = () => { fechar(); location.hash = enderecoCelula(p.id, 'estudo'); };
         const recado = folha.querySelector('[data-recado]');
         if (recado) recado.onclick = () => { fechar(); folhaRecado(p); };
         const encontro = folha.querySelector('[data-encontro]');
@@ -800,12 +817,10 @@
   const encontroHoje = (p) => p.encontro >= 0 && new Date(CC.hojeIso() + 'T12:00:00').getDay() === p.encontro;
   const nomeDoEncontro = (d) => (d === 0 || d === 6 ? 'aos ' + DIAS_ENCONTRO[d] + 's' : 'às ' + DIAS_ENCONTRO[d] + 's-feiras');
   const nomeDoLider = (p) => { const l = p.membros.find((m) => m.usuario === p.criadoPor); return l ? l.nome : 'o líder'; };
-  const paragrafos = (texto) => String(texto || '').split(/\n+/).filter(Boolean).map((l) => '<p>' + CC.esc(l) + '</p>').join('');
   const ddmm = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
-  // Dia do ano (1 a 366) e semana do ano de uma data ISO: base para o rodízio de oração e
-  // para a pergunta de acolhida padrão, sempre a mesma para toda a célula no mesmo dia.
+  // Dia do ano (1 a 366) de uma data ISO: base para o rodízio de oração, sempre o mesmo para
+  // toda a célula no mesmo dia (a pergunta de acolhida da semana mora em estudo-regras.js).
   const diaDoAno = (iso) => Math.floor((Date.parse(iso + 'T12:00:00Z') - Date.parse(iso.slice(0, 4) + '-01-01T12:00:00Z')) / 86400000) + 1;
-  const semanaDoAno = (iso) => Math.floor((diaDoAno(iso) - 1) / 7);
 
   function topoDaCelula(p) {
     const conduzo = p.euConduzo;
@@ -1068,26 +1083,31 @@
   }
   CC.rotuloAgenda = rotuloAgenda;
 
-  // O cartão do alto: o dia e a hora do recado quando houver; senão, o próximo dia da semana
-  // marcado. Sem nenhum dos dois, não aparece (o aviso de marcar o dia fica na aba Hoje).
-  function cartaoProximoEncontro(p) {
-    let texto = '';
+  // O próximo encontro: o dia e a hora do recado quando houver; senão, o próximo dia da semana
+  // marcado (hoje inclusive). { iso, hora } ou null.
+  function proximoEncontro(p) {
     if (quandoValendo(p)) {
       const [a, m, d, h, mi] = partesQuando(p.recadoQuando);
-      const iso = a + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-      texto = (iso === CC.hojeIso() ? 'Hoje' : DIA_LONGO[diaDaSemana(a, m, d)] + ', ' + d + '/' + m) + ', às ' + horaCurta(h, mi);
-    } else if (p.encontro >= 0) {
-      const hoje = CC.hojeIso();
-      for (let i = 0; i < 7; i++) {
-        const dia = CC.somaDias(hoje, i);
-        if (new Date(dia + 'T12:00:00').getDay() !== p.encontro) continue;
-        texto = i === 0 ? 'Hoje' : DIA_LONGO[p.encontro] + ', ' + Number(dia.slice(8, 10)) + '/' + Number(dia.slice(5, 7));
-        break;
-      }
+      return { iso: a + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0'), hora: horaCurta(h, mi) };
     }
-    if (!texto) return '';
+    if (!(p.encontro >= 0)) return null;
+    const hoje = CC.hojeIso();
+    for (let i = 0; i < 7; i++) {
+      const dia = CC.somaDias(hoje, i);
+      if (new Date(dia + 'T12:00:00').getDay() === p.encontro) return { iso: dia, hora: '' };
+    }
+    return null;
+  }
+  // O cartão do alto. Sem dia marcado, não aparece (o aviso de marcar o dia fica na aba Hoje).
+  function cartaoProximoEncontro(p) {
+    const x = proximoEncontro(p);
+    if (!x) return '';
+    const texto = (x.iso === CC.hojeIso() ? 'Hoje' : DIA_LONGO[new Date(x.iso + 'T12:00:00').getDay()] + ', ' + Number(x.iso.slice(8, 10)) + '/' + Number(x.iso.slice(5, 7)))
+      + (x.hora ? ', às ' + x.hora : '');
     return '<div class="cartao-encontro"><span class="textos"><b>Próximo encontro</b><span>' + CC.esc(texto) + '</span></span>' + CC.ico('calendario') + '</div>';
   }
+  // "quinta, 22/10": a linha do estudo ("Para o encontro de quinta, 22/10") e o texto do grupo.
+  const dataDoProximo = (p) => { const x = proximoEncontro(p); return x ? DIAS_ENCONTRO[new Date(x.iso + 'T12:00:00').getDay()] + ', ' + ddmm(x.iso) : ''; };
 
   // O evento para a agenda do celular (.ics): hora local, sem fuso (o encontro é na cidade de
   // quem lê), duas horas de duração e um lembrete 1 hora antes. Função pura, testada no navegador.
@@ -1335,294 +1355,20 @@
     });
   }
 
-  // ---------- o estudo do encontro ----------
-  // O líder escolhe; o app não impõe. Três jeitos:
-  //   semana: um roteiro pronto com a leitura dos 7 dias do plano até onde o líder leu, as
-  //           perguntas das reflexões escritas desses dias e um começo de oração
-  //   trecho: um livro e capítulo (ou versículos) que o líder escolheu, com as perguntas do OIA
-  //   livre:  o estudo que o próprio líder escreveu
-  // Nos dois primeiros o líder ainda pode deixar uma palavra dele por cima.
-  const PERGUNTAS_OIA = [
-    'O que o texto diz? Contem com as próprias palavras, sem interpretar ainda.',
-    'O que o autor quis dizer a quem leu primeiro? O que isso mostra sobre Deus e sobre nós?',
-    'O que muda na minha semana? Uma atitude concreta, com dia e hora.',
-  ];
-
-  // ---------- o roteiro 4 Ws: acolhida, adoração, a Palavra (o estudo de sempre) e testemunho ----------
-  const CAMPO_4W_MAX = 300;
-  const PERGUNTAS_ACOLHIDA = [
-    'Qual foi a melhor parte da sua semana?',
-    'O que te fez rir nos últimos dias?',
-    'Se você pudesse passar um dia em qualquer lugar, onde seria?',
-    'Qual música não sai da sua cabeça esta semana?',
-    'Conte uma coisa pequena pela qual você quer agradecer hoje.',
-    'Qual foi a parte mais difícil da sua semana?',
-    'Quem é uma pessoa que te ajudou recentemente?',
-    'Qual comida te lembra a sua casa?',
-  ];
-  const SUGESTAO_ADORACAO = 'Escolham juntos uma música de louvor para começar.';
-  const SUGESTAO_TESTEMUNHO = 'Quem você quer convidar para o próximo encontro? Orem juntos por essas pessoas, pelo nome.';
-  // A mesma pergunta para toda a célula na semana: escolhida pelo número da semana do ano.
-  const sugestaoAcolhida = (referencia) => PERGUNTAS_ACOLHIDA[semanaDoAno(referencia) % PERGUNTAS_ACOLHIDA.length];
-  const secaoW = (titulo, corpo) => '<div class="secao-w"><span class="etiqueta">' + CC.esc(titulo) + '</span>' + corpo + '</div>';
-
-  function semanaDoEstudo(p) {
-    const D = CC.D;
-    const ate = Math.min(D.plano.length, Math.max(7, p.semanaAte || 7));
-    const dias = [];
-    for (let n = ate - 6; n <= ate; n++) dias.push({ n, dia: D.plano[n - 1], r: CC.reflexaoDoDia(n) });
-    const chave = dias[3].r.ref ? dias[3] : dias.find((d) => d.r.ref) || dias[0];
-    // Uma pergunta de dias espalhados pela semana, para a conversa passar por ela inteira.
-    const perguntas = [0, 2, 4, 6].map((i) => ({ d: dias[i], q: (dias[i].r.perguntas || [])[0] })).filter((x) => x.q);
-    const oracao = (dias[6].r.oracao || []).slice(0, 3);
-    return { de: ate - 6, ate, dias, chave, perguntas, oracao };
-  }
-
-  // O mesmo estudo em texto corrido, para quem conduz mandar no grupo do WhatsApp. Ordem dos
-  // 4 Ws: Acolhida, Adoração, Palavra (o estudo de sempre) e Testemunho.
-  function estudoEmTexto(p, e, versiculo, ws) {
-    const est = p.estudo;
-    const l = ['Estudo do encontro · ' + p.titulo, '', 'Acolhida', ws.acolhida, '', 'Adoração', ws.adoracao, '', 'Palavra'];
-    if (est.tipo !== 'livre' && est.texto) l.push('Palavra de ' + nomeDoLider(p) + ':', est.texto, '');
-    if (est.tipo === 'livre') l.push(est.texto);
-    if (est.tipo === 'semana') {
-      l.push('Dias ' + e.de + ' a ' + e.ate + ' do plano', '', '1. Para começar: cada um conta, em uma frase, o que mais marcou na leitura da semana.', '',
-        '2. Leiam juntos: ' + e.chave.r.ref + (versiculo ? ': "' + versiculo + '"' : ''), '', '3. A leitura da semana:');
-      e.dias.forEach((d) => l.push('Dia ' + d.n + ': ' + CC.passagemDe(d.dia)));
-      l.push('', '4. Para conversar:');
-      e.perguntas.forEach((x, i) => l.push((i + 1) + ') ' + x.q));
-      if (e.oracao.length) { l.push('', '5. Para orar juntos:'); e.oracao.forEach((o) => l.push('• ' + o)); }
-    }
-    if (est.tipo === 'trecho') {
-      l.push('Leiam juntos: ' + est.ref + (versiculo ? ': "' + versiculo + '"' : ''), '', 'Para conversar:');
-      PERGUNTAS_OIA.forEach((q, i) => l.push((i + 1) + ') ' + q));
-      l.push('', 'Para orar juntos: orem a partir do que o texto mostrou.');
-    }
-    l.push('', 'Testemunho', ws.testemunho);
-    return l.join('\n');
-  }
-
-  CC.estudoDoEncontro = async function (p) {
-    const conduzo = p.euConduzo;
-    if (!p.estudo) {
-      if (conduzo) { folhaPrepararEstudo(p); return; }
-      CC.folha('<h2>Estudo do encontro</h2><p>' + CC.esc(nomeDoLider(p)) + ' ainda não preparou o estudo deste encontro.</p>'
-        + '<div class="acoes"><button class="botao" data-fechar>Entendi</button></div>',
-      { rotulo: 'Estudo do encontro', ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
-      return;
-    }
-    const { html, texto, ref } = await montarEstudo(p);
-    CC.folha('<h2>Estudo do encontro</h2>' + html
-      + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar o estudo no grupo</button>'
-      + '<button class="botao contorno" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button>'
-      + (conduzo ? '<button class="botao contorno" data-mudar>Mudar o estudo</button>' : '')
-      + '<button class="botao plano" data-fechar>Fechar</button></div>',
-    {
-      rotulo: 'Estudo do encontro',
-      rolavel: true,
-      ligar: (folha, fechar) => {
-        folha.querySelector('[data-fechar]').onclick = fechar;
-        const abrir = folha.querySelector('[data-abrir-biblia]');
-        if (abrir) abrir.addEventListener('click', () => fechar());
-        const mudar = folha.querySelector('[data-mudar]');
-        if (mudar) mudar.onclick = () => { fechar(); folhaPrepararEstudo(p); };
-        folha.querySelector('[data-modo-encontro]').onclick = () => CC.modoEncontro(p);
-        folha.querySelector('[data-compartilhar]').onclick = () => compartilharEstudo(texto);
-        if (ref) CC.ligarCartaoVersiculo(folha, ref);
-        if (CC.inseparavel) CC.inseparavel(folha);
-      },
-    });
+  // O que as peças do estudo (src/sob-demanda/estudo-celula.js e estudo-preparo.js) usam daqui.
+  const apoio = {
+    registrarEncontro: (p) => folhaRegistrarEncontro(p),
+    recarregar: () => recarregar(),
+    // só o retrato novo, sem redesenhar: quem chama troca o endereço logo depois
+    carregar: () => CC.carregarPropositos(),
+    endereco: enderecoCelula,
+    dataDoEncontro: dataDoProximo,
+    nomeDoLider,
   };
-
-  async function compartilharEstudo(texto) {
-    const r = await CC.compartilhar(texto, '');
-    if (r === 'copiado') CC.avisar('Estudo copiado. É só colar no grupo.');
-    else if (r === 'falhou') CC.avisar('Não consegui compartilhar agora.');
-  }
-
-  // ---------- modo encontro: tela cheia, letra grande, uma parte por vez ----------
-  // Acolhida, Adoração e Testemunho são um convite curto para ler em voz alta na roda; a
-  // Palavra mantém a estrutura de sempre, com o cartão do versículo e as ações que já existem.
-  CC.modoEncontro = async function (p) {
-    if (!p.estudo) return;
-    const { html, ref } = await montarEstudo(p);
-    const acolhida = p.estudoAcolhida || sugestaoAcolhida(CC.hojeIso());
-    const adoracao = p.estudoAdoracao || SUGESTAO_ADORACAO;
-    const testemunho = p.estudoTestemunho || SUGESTAO_TESTEMUNHO;
-    const partes = [
-      { titulo: 'Acolhida', html: '<p class="frase-cena">' + CC.esc(acolhida) + '</p>' },
-      { titulo: 'Adoração', html: '<p class="frase-cena">' + CC.esc(adoracao) + '</p>' },
-      { titulo: 'Palavra', html, ref },
-      { titulo: 'Testemunho', html: '<p class="frase-cena">' + CC.esc(testemunho) + '</p>' },
-    ];
-    let i = 0;
-    const conteudo = (parte) => '<div class="cena modo-encontro"><span class="etiqueta">' + CC.esc(parte.titulo) + '</span>' + parte.html + '</div>';
-    CC.telaCheia(conteudo(partes[0]), {
-      classe: 'tela-modo-encontro',
-      rotulo: 'Modo encontro',
-      pe: '<div class="modo-encontro-nav">'
-        + '<button type="button" class="botao contorno pequeno" data-anterior disabled>Anterior</button>'
-        + '<span data-indice>1 de ' + partes.length + '</span>'
-        + '<button type="button" class="botao pequeno" data-proximo>Próximo</button></div>'
-        + '<button class="botao plano" data-fechar>Fechar</button>',
-      ligar: (el, fechar) => {
-        const palco = el.querySelector('.tela-cheia-palco');
-        const mostrar = () => {
-          palco.innerHTML = conteudo(partes[i]);
-          el.querySelector('[data-indice]').textContent = (i + 1) + ' de ' + partes.length;
-          el.querySelector('[data-anterior]').disabled = i === 0;
-          el.querySelector('[data-proximo]').disabled = i === partes.length - 1;
-          if (partes[i].ref) CC.ligarCartaoVersiculo(palco, partes[i].ref);
-          if (CC.inseparavel) CC.inseparavel(palco);
-        };
-        el.querySelector('[data-fechar]').onclick = fechar;
-        el.querySelector('[data-anterior]').onclick = () => { if (i > 0) { i--; mostrar(); } };
-        el.querySelector('[data-proximo]').onclick = () => { if (i < partes.length - 1) { i++; mostrar(); } };
-        if (partes[0].ref) CC.ligarCartaoVersiculo(palco, partes[0].ref);
-        if (CC.inseparavel) CC.inseparavel(palco);
-      },
-    });
-  };
-
-  // O estudo pronto para ler: a linha de quem preparou, a palavra do líder e o roteiro. Serve
-  // à folha do estudo e à aba Estudo da tela da célula; "texto" é a versão para o WhatsApp.
-  async function montarEstudo(p) {
-    const est = p.estudo;
-    const e = est.tipo === 'semana' ? semanaDoEstudo(p) : null;
-    const refLer = est.tipo === 'semana' ? e.chave.r.ref : est.tipo === 'trecho' ? est.ref : '';
-    // Com versículos, o texto vem para a folha; capítulo inteiro abre na Bíblia do app.
-    const temVersiculo = /\.\d/.test(refLer || '');
-    const versiculo = temVersiculo ? await CC.textoDoVersiculo(refLer).catch(() => null) : null;
-    const cap = /^(.+?) (\d+)/.exec(refLer || '');
-    const abrirTrecho = cap ? '<a class="botao contorno pequeno" href="#/biblia/' + encodeURIComponent(cap[1]) + '/' + cap[2] + '" data-abrir-biblia>' + CC.ico('livro')
-      + 'Abrir ' + CC.esc(cap[1] + ' ' + cap[2]) + ' na Bíblia</a>' : '';
-    const leiam = refLer ? '<li><b>Leiam juntos</b>' + (versiculo ? CC.cartaoVersiculo(refLer, versiculo) : '<p>' + CC.esc(refLer) + '</p>') + abrirTrecho + '</li>' : '';
-
-    let corpo = '';
-    if (est.tipo === 'livre') corpo = '<div class="estudo-livre">' + paragrafos(est.texto) + '</div>';
-    if (est.tipo === 'semana') {
-      corpo = '<ol class="roteiro">'
-        + '<li><b>Para começar</b><p>Cada um conta, em uma frase, o que mais marcou na leitura da semana.</p></li>'
-        + leiam
-        + '<li><b>A leitura da semana</b><ul class="roteiro-dias">' + e.dias.map((d) => '<li><span>Dia ' + d.n + '</span>' + CC.esc(CC.passagemDe(d.dia))
-          + (d.r.titulo ? '<small>' + CC.esc(d.r.titulo) + '</small>' : '') + '</li>').join('') + '</ul></li>'
-        + '<li><b>Para conversar</b><ul class="roteiro-perguntas">' + e.perguntas.map((x) => '<li>' + CC.esc(x.q)
-          + '<small>Dia ' + x.d.n + (x.d.r.titulo ? ' · ' + CC.esc(x.d.r.titulo) : '') + '</small></li>').join('') + '</ul></li>'
-        + (e.oracao.length ? '<li><b>Para orar juntos</b><ul class="roteiro-oracao">' + e.oracao.map((o) => '<li>' + CC.esc(o) + '</li>').join('') + '</ul></li>' : '')
-        + '</ol>';
-    }
-    if (est.tipo === 'trecho') {
-      corpo = '<ol class="roteiro">' + leiam
-        + '<li><b>Para conversar</b><ul class="roteiro-perguntas">' + PERGUNTAS_OIA.map((q) => '<li>' + CC.esc(q) + '</li>').join('') + '</ul></li>'
-        + '<li><b>Para orar juntos</b><p>Orem a partir do que o texto mostrou.</p></li></ol>';
-    }
-
-    // Acolhida, adoração e testemunho: o que quem conduz escreveu, ou a sugestão padrão.
-    const acolhida = p.estudoAcolhida || sugestaoAcolhida(CC.hojeIso());
-    const adoracao = p.estudoAdoracao || SUGESTAO_ADORACAO;
-    const testemunho = p.estudoTestemunho || SUGESTAO_TESTEMUNHO;
-    const palavra = (est.tipo !== 'livre' && est.texto ? '<div class="recado-lider"><span class="etiqueta">Palavra de ' + CC.esc(nomeDoLider(p)) + '</span>' + paragrafos(est.texto) + '</div>' : '') + corpo;
-
-    return {
-      html: '<p class="passo-dica">' + CC.esc(p.titulo) + (est.tipo === 'semana' ? ' · dias ' + e.de + ' a ' + e.ate + ' do plano' : '')
-        + ' · preparado por ' + CC.esc(nomeDoLider(p)) + '</p>'
-        + secaoW('Acolhida', '<p>' + CC.esc(acolhida) + '</p>')
-        + secaoW('Adoração', '<p>' + CC.esc(adoracao) + '</p>')
-        + secaoW('Palavra', palavra)
-        + secaoW('Testemunho', '<p>' + CC.esc(testemunho) + '</p>'),
-      texto: estudoEmTexto(p, e, versiculo, { acolhida, adoracao, testemunho }),
-      ref: versiculo ? refLer : '',
-    };
-  }
-
-  function folhaPrepararEstudo(p) {
-    const atual = p.estudo || {};
-    let tipo = atual.tipo || 'semana';
-    const livros = (cache && cache.livros) || [];
-    const partes = /^(.+?) (\d+)(?:\.(.+))?$/.exec(atual.tipo === 'trecho' ? atual.ref : '') || [];
-    const semana = semanaDoEstudo(p);
-    // Campo opcional do roteiro 4 Ws: rótulo, dica auxiliar e o valor já salvo (se houver).
-    // <small>, não <span>: dentro de .campo-senha todo <span> vira o rótulo maiúsculo do
-    // campo; .dica-campo (a mesma classe do OIA em 04-licao.js) não passa por ali.
-    const campoW = (chave, rotulo, dica, valor) => '<label class="campo-senha"><span>' + CC.esc(rotulo) + ' (opcional)</span>'
-      + '<small class="dica-campo">' + CC.esc(dica) + '</small>'
-      + '<textarea data-' + chave + ' rows="2" maxlength="' + CAMPO_4W_MAX + '" autocomplete="off">' + CC.esc(valor || '') + '</textarea></label>'
-      + '<p class="passo-dica pequena" data-conta-' + chave + '></p>';
-    CC.folha('<h2>Preparar o estudo</h2>'
-      + '<p class="passo-dica">Você escolhe o que a célula vai estudar no encontro.</p>'
-      + campoW('acolhida', 'Acolhida', 'uma pergunta para começar a conversa', p.estudoAcolhida)
-      + campoW('adoracao', 'Adoração', 'uma música ou um momento de louvor', p.estudoAdoracao)
-      + '<div class="segmentado" role="group" aria-label="Como vai ser a Palavra">'
-      + [['semana', 'Leitura da semana'], ['trecho', 'Um trecho'], ['livre', 'Eu escrevo']].map(([k, r]) => '<button type="button" data-tipo="' + k + '" aria-pressed="' + (k === tipo) + '">' + r + '</button>').join('')
-      + '</div>'
-      + '<p class="passo-dica pequena" data-bloco="semana">O app monta o roteiro com a leitura dos dias ' + semana.de + ' a ' + semana.ate
-        + ' do plano (até onde você leu), as perguntas das reflexões desses dias e um começo de oração.</p>'
-      + '<div data-bloco="trecho" class="escolha-trecho"><label class="campo-senha"><span>Livro</span><select data-livro>'
-        + livros.map((l) => '<option' + (l === partes[1] ? ' selected' : '') + '>' + CC.esc(l) + '</option>').join('') + '</select></label>'
-        + '<label class="campo-senha"><span>Capítulo</span><input data-cap type="number" inputmode="numeric" min="1" max="150" value="' + CC.esc(partes[2] || '1') + '" autocomplete="off"></label>'
-        + '<label class="campo-senha"><span>Versículos (opcional)</span><input data-vers inputmode="numeric" placeholder="Ex.: 16-18" value="' + CC.esc(partes[3] || '') + '" autocomplete="off"></label>'
-        + '<p class="passo-dica pequena">A conversa segue o método OIA: observação, interpretação e aplicação.</p></div>'
-      + '<label class="campo-senha"><span data-rotulo-texto>Sua palavra para a célula (opcional)</span>'
-        + '<textarea data-texto name="estudo-do-lider" rows="5" maxlength="3000" autocomplete="off">' + CC.esc(atual.texto || '') + '</textarea></label>'
-      + campoW('testemunho', 'Testemunho', 'quem vamos convidar e pelo que vamos orar', p.estudoTestemunho)
-      + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao" data-salvar>Salvar o estudo</button>'
-      + (p.estudo ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '')
-      + '<button class="botao plano" data-fechar>Cancelar</button></div>',
-    {
-      rotulo: 'Preparar o estudo',
-      rolavel: true,
-      ligar: (folha, fechar) => {
-        const q = (s) => folha.querySelector(s);
-        const mostrar = () => {
-          folha.querySelectorAll('[data-tipo]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tipo === tipo)));
-          folha.querySelectorAll('[data-bloco]').forEach((el) => { el.hidden = el.dataset.bloco !== tipo; });
-          q('[data-rotulo-texto]').textContent = tipo === 'livre' ? 'O estudo' : 'Sua palavra para a célula (opcional)';
-          q('[data-texto]').rows = tipo === 'livre' ? 12 : 5;
-        };
-        folha.querySelectorAll('[data-tipo]').forEach((b) => { b.onclick = () => { tipo = b.dataset.tipo; mostrar(); }; });
-        mostrar();
-        // Contador de caracteres dos três campos do roteiro, no padrão do recado da célula.
-        ['acolhida', 'adoracao', 'testemunho'].forEach((chave) => {
-          const campo = q('[data-' + chave + ']');
-          const conta = q('[data-conta-' + chave + ']');
-          const atualizar = () => { conta.textContent = campo.value.length + ' de ' + CAMPO_4W_MAX + ' caracteres'; };
-          campo.oninput = atualizar;
-          atualizar();
-        });
-        q('[data-fechar]').onclick = fechar;
-        const salvar = async (corpo) => {
-          try {
-            await CC.api('api/celula', Object.assign({ acao: 'estudo', id: p.id }, corpo));
-            fechar();
-            CC.avisar(corpo.estudo ? 'Estudo salvo' : 'Estudo tirado');
-            await recarregar();
-            const novo = ((cache && cache.propositos) || []).find((x) => x.id === p.id);
-            // Na tela da célula, o estudo novo aparece na aba Estudo; fora dela, abre na folha.
-            if (location.hash.startsWith('#/novidades/celula/')) CC.substituirRota(enderecoCelula(p.id, 'estudo'));
-            else if (novo && novo.estudo) CC.estudoDoEncontro(novo);
-          } catch (e) {
-            const erro = q('.erro-proposito');
-            erro.textContent = e.message;
-            erro.hidden = false;
-          }
-        };
-        q('[data-salvar]').onclick = () => {
-          const vers = q('[data-vers]').value.replace(/\s+/g, '');
-          const ref = q('[data-livro]').value + ' ' + q('[data-cap]').value + (vers ? '.' + vers : '');
-          salvar({
-            estudo: tipo, ref: tipo === 'trecho' ? ref : '', texto: q('[data-texto]').value,
-            acolhida: q('[data-acolhida]').value, adoracao: q('[data-adoracao]').value, testemunho: q('[data-testemunho]').value,
-          });
-        };
-        const tirar = q('[data-tirar]');
-        if (tirar) tirar.onclick = async () => {
-          if (!await CC.confirmar({ titulo: 'Tirar o estudo?', texto: 'A célula volta a ver que o estudo ainda não foi preparado.', acao: 'Tirar', perigo: true })) return;
-          salvar({ estudo: '' });
-        };
-      },
-    });
-  }
+  CC.apoioCelula = apoio;
+  // O estudo do encontro abre na aba Estudo da célula; o modo encontro, na peça.
+  CC.estudoDoEncontro = (p) => { location.hash = enderecoCelula(p.id, 'estudo'); };
+  CC.modoEncontro = (p) => (p && p.estudo ? pedirEstudo(false).then(() => CC.estudoCelula.modoEncontro(p, apoio), () => CC.avisar('Não deu para abrir o modo encontro agora.')) : null);
 
   // Quem já tem conta e abre o link da célula.
   CC.abrirLinkCelula = async function (token) {
