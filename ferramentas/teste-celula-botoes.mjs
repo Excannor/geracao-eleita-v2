@@ -184,6 +184,14 @@ ok(await av('(() => { const t = document.querySelector("[data-remover=\\"ana\\"]
 await clicar('[data-remover="ana"]');
 ok(await esperar('!!document.querySelector(".cortina, .confirmar, [data-confirmar-sim], .folha") '), 'C10: tirar ainda pede confirmação');
 await av('(() => { const b = [...document.querySelectorAll(".folha button, .cortina button")].find((x) => /Cancelar|Agora não|Voltar/.test(x.textContent)); if (b) b.click(); return true; })()');
+await esperar('!document.querySelector(".cortina")');
+// tornar auxiliar: a confirmação não promete o estudo (só o líder prepara, decisão do dono de 17/10)
+await clicar('[data-auxiliar="ana"]');
+const veioAux = await esperar('/Tornar .* auxiliar\\?/.test(document.querySelector(".cortina h2")?.textContent || "")');
+const textoAux = String(await av('(document.querySelector(".cortina") || {}).textContent || ""'));
+ok(veioAux && /registrar quem veio, junto com você\. O estudo continua só com você\./.test(textoAux) && !/preparar o estudo/.test(textoAux), 'C10: "Tornar auxiliar" diz que o estudo continua só com o líder');
+await clicar('.cortina [data-nao]');
+await esperar('!document.querySelector(".cortina")');
 await dormir(400);
 
 // ---------- C7: o recado com dia e hora ----------

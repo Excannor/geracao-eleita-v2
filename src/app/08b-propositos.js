@@ -406,7 +406,7 @@
         const m = p.membros.find((x) => x.usuario === b.dataset.auxiliar);
         if (!await CC.confirmar({
           titulo: (sim ? 'Tornar ' : 'Tirar ') + (m ? m.nome : '@' + b.dataset.auxiliar) + (sim ? ' auxiliar?' : ' de auxiliar?'),
-          texto: sim ? 'A pessoa passa a poder escrever o recado, marcar o dia do encontro, preparar o estudo e registrar o encontro, junto com você.'
+          texto: sim ? 'A pessoa passa a poder escrever o recado, marcar o dia do encontro e registrar quem veio, junto com você. O estudo continua só com você.'
             : 'A pessoa deixa de conduzir a célula com você.',
           acao: sim ? 'Tornar auxiliar' : 'Tirar de auxiliar', perigo: !sim,
         })) return;
