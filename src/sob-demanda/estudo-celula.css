@@ -81,6 +81,7 @@
 .mesa-topo .mesa-titulo-cena { margin: 4px 0 0; color: var(--folha-tinta); font-size: 1.625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
 .mesa-topo .frase-cena.mesa-frase { font-size: 1.5rem; }
 .mesa-topo .mesa-abrir { margin-top: 8px; background: var(--folha-destaque); color: var(--tinta-forte); }
+.mesa-abrir-cartao { margin: 10px 0 0; }
 :root[data-tema="escuro"] .mesa-topo .mesa-abrir { background: var(--campo); color: var(--tinta-forte); }
 .mesa-corpo-encontro { display: grid; gap: 16px; width: 100%; max-width: 560px; padding: 24px 20px 40px; text-align: left; }
 .mesa-corpo-encontro > * { margin: 0; }

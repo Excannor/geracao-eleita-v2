@@ -125,6 +125,9 @@
     if (pedida === 'preparar' && [...raiz.querySelectorAll('.mesa-preparo[data-passo]')].some((el) => el.dataset.celula === id)) return;
     const meu = ++desenhoCelula;
     const nestaTela = () => meu === desenhoCelula && location.hash.startsWith('#/novidades/celula/');
+    // O preparo é montado uma vez por abertura: a resposta nova do servidor (ou a falha dela, sem
+    // internet) não o refaz, senão o líder perde o foco e o teclado no meio da digitação.
+    let preparoMontado = false;
 
     const desenhar = (d) => {
       if (!d) { raiz.innerHTML = CC.esqueleto('lista'); ligarVoltar(raiz); return; }
@@ -137,6 +140,8 @@
       // O preparo do estudo é tela própria, sem as abas, e só de quem prepara (o líder).
       if (pedida === 'preparar') {
         if (!p.euPreparoEstudo) { CC.substituirRota(enderecoCelula(p.id, 'estudo')); return; }
+        if (preparoMontado) return;
+        preparoMontado = true;
         abrirPreparo(raiz, p, () => meu === desenhoCelula);
         return;
       }

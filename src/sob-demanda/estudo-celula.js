@@ -73,6 +73,17 @@
     });
   }
 
+  // "Abrir Efésios 6 na Bíblia": o capítulo de um cartão, inteiro, na Bíblia do app.
+  const abrirNaBiblia = (ref, classe) => {
+    const cap = R.capituloDe(ref);
+    return cap ? '<a class="botao contorno pequeno' + (classe ? ' ' + classe : '') + '" href="#/biblia/' + encodeURIComponent(cap.livro) + '/' + cap.cap + '" data-abrir-biblia>' + CC.ico('livro')
+      + 'Abrir ' + esc(cap.livro + ' ' + cap.cap) + ' na Bíblia</a>' : '';
+  };
+  // O cartão de uma parte do estudo; o cortado (capítulo inteiro, trecho longo) leva logo abaixo
+  // o caminho para o capítulo inteiro.
+  const cartaoDaParte = (c, textos, sigla, versiculos) => cartaoComMais(c.ref, textos.get(c.ref) || '', sigla)
+    + (R.cortaTrecho(c, versiculos) ? '<p class="mesa-abrir-cartao">' + abrirNaBiblia(c.escrito || c.ref) + '</p>' : '');
+
   const secaoW = (titulo, corpo) => '<div class="secao-w"><span class="etiqueta">' + esc(titulo) + '</span>' + corpo + '</div>';
   const quatroWs = (p) => ({
     acolhida: p.estudoAcolhida || R.sugestaoAcolhida(CC.hojeIso()),
@@ -100,9 +111,7 @@
   // (as escolhidas ou as de sempre) e a oração.
   function roteiro(p, e, sem, textos, sigla, versiculos) {
     const cartao = R.comoBlocos(e, sem, versiculos).find((b) => b.t === 'versiculo');
-    const cap = cartao ? R.capituloDe(cartao.ref) : null;
-    const abrir = cap ? '<a class="botao contorno pequeno" href="#/biblia/' + encodeURIComponent(cap.livro) + '/' + cap.cap + '" data-abrir-biblia>' + CC.ico('livro')
-      + 'Abrir ' + esc(cap.livro + ' ' + cap.cap) + ' na Bíblia</a>' : '';
+    const abrir = cartao ? abrirNaBiblia(cartao.ref) : '';
     const leiam = cartao ? '<li><b>Leiam juntos</b>' + cartaoComMais(cartao.ref, textos.get(cartao.ref) || '', sigla) + abrir + '</li>' : '';
     const perguntas = R.perguntasDe(e, sem);
     return '<ol class="roteiro">'
@@ -136,7 +145,7 @@
       ? (e.texto ? '<div class="recado-lider"><span class="etiqueta">Palavra de ' + esc(quem && quem !== 'você' ? quem : apoio.nomeDoLider(p)) + '</span>'
         + e.texto.split(/\n+/).filter(Boolean).map((l) => '<p>' + esc(l) + '</p>').join('') + '</div>' : '') + roteiro(p, e, sem, textos, sigla, versiculos)
       : '<div class="mesa-estudo">' + (nome ? '<h2 class="mesa-t1">' + esc(nome) + '</h2>' : '')
-        + blocos.map((b) => R.blocoEmHtml(b, { cartao: (c) => cartaoComMais(c.ref, textos.get(c.ref) || '', sigla) })).join('') + '</div>';
+        + blocos.map((b) => R.blocoEmHtml(b, { cartao: (c) => cartaoDaParte(c, textos, sigla, versiculos) })).join('') + '</div>';
     const perguntas = legado ? [] : R.perguntasDe(e, sem);
     painel.innerHTML = (linha ? '<p class="passo-dica">' + esc(linha) + '</p>' : '')
       // O estudo que já foi usado num encontro fica guardado: o caminho é preparar o próximo (o
@@ -208,15 +217,17 @@
     const etiqueta = '<span class="etiqueta">' + esc(s.etiqueta) + '</span>';
     if (s.tipo === 'palavra') {
       return etiqueta + (s.titulo ? '<h1 class="mesa-titulo-cena">' + R.negrito(s.titulo) + '</h1>' : '')
-        + (s.abrir ? '<a class="botao contorno pequeno mesa-abrir" href="#/biblia/' + encodeURIComponent(s.abrir.livro) + '/' + s.abrir.cap + '" data-abrir-biblia>'
-          + CC.ico('livro') + 'Abrir ' + esc(s.abrir.livro + ' ' + s.abrir.cap) + ' na Bíblia</a>' : '');
+        + (s.abrir ? abrirNaBiblia(s.abrir.livro + ' ' + s.abrir.cap, 'mesa-abrir') : '');
     }
     return etiqueta + (s.frase ? '<p class="frase-cena mesa-frase">' + R.negrito(s.frase) + '</p>' : '');
   }
-  function corpoDoPasso(s, textos, sigla) {
+  function corpoDoPasso(s, textos, sigla, versiculos) {
     if (s.tipo === 'palavra') {
+      // o cartão cortado ganha o caminho para o capítulo, a não ser o do primeiro cartão, que já
+      // tem o botão no alto do passo
+      const noAlto = s.abrir ? s.abrir.livro + ' ' + s.abrir.cap : '';
       return s.blocos.map((b) => (b.t === 'texto' ? '<p class="mesa-fala">' + R.negrito(b.texto) + '</p>'
-        : R.blocoEmHtml(b, { cartao: (c) => cartaoComMais(c.ref, textos.get(c.ref) || '', sigla) }))).join('');
+        : R.blocoEmHtml(b, { cartao: (c) => (noAlto && R.capituloDe(c.ref) && noAlto === R.capituloDe(c.ref).livro + ' ' + R.capituloDe(c.ref).cap ? cartaoComMais(c.ref, textos.get(c.ref) || '', sigla) : cartaoDaParte(c, textos, sigla, versiculos)) }))).join('');
     }
     if (s.tipo === 'orar' && s.convite) {
       return '<div class="mesa-convite">' + CC.ico('oracao') + '<p>Os pedidos de oração ficam na aba Oração da célula, no celular de cada um. Eles não aparecem nesta tela.</p></div>';
@@ -257,7 +268,7 @@
         const q = (s) => el.querySelector(s);
         const mostrar = () => {
           const s = lista[i];
-          const corpo = corpoDoPasso(s, textos, sigla);
+          const corpo = corpoDoPasso(s, textos, sigla, versiculos);
           palco.innerHTML = '<div class="cena modo-encontro mesa-topo">' + topoDoPasso(s) + '</div>' + (corpo ? '<div class="mesa-corpo-encontro">' + corpo + '</div>' : '');
           palco.scrollTop = 0;
           const ultimo = i === lista.length - 1;

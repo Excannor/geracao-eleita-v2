@@ -68,10 +68,14 @@
   function estadoInicial(p) {
     const e = p.estudo && !p.estudo.usado ? p.estudo : null;
     const base = e ? e.id : '';
+    // "Mudar" mantém o id: a data da última gravação diz se o estudo mudou em outro aparelho
+    // depois que este rascunho começou (aí o rascunho é de uma versão velha e sai)
+    const baseEm = e ? e.editadoEm || e.em || '' : '';
     const salvo = lerRascunho(p.id);
-    if (salvo && (salvo.base || '') === base) return salvo;
+    if (salvo && (salvo.base || '') === base && (salvo.baseEm === undefined || salvo.baseEm === baseEm)) return salvo;
+    if (salvo) CC.avisar('O estudo mudou em outro aparelho. O preparo começa da versão salva.');
     const st = {
-      v: 1, base, tipo: 'blocos', passo: 1, fonte: '', palavra: '', trecho: { livro: 'Gênesis', cap: '1', vers: '' }, traducao: 'nbv',
+      v: 1, base, baseEm, tipo: 'blocos', passo: 1, fonte: '', palavra: '', trecho: { livro: 'Gênesis', cap: '1', vers: '' }, traducao: 'nbv',
       opcoes: true, modo: 'colar', colado: false, coladoWord: false, recusadas: [], perguntas: null, chavePerguntas: '', salvas: null, ws: null,
     };
     if (!e) return st;
@@ -81,7 +85,9 @@
       fonte: e.tipo === 'blocos' ? e.fonte || '' : e.tipo === 'livre' ? e.texto || '' : '',
       palavra: e.tipo === 'semana' || e.tipo === 'trecho' ? e.texto || '' : '',
       trecho: r ? { livro: r.livro, cap: String(r.cap), vers: r.de ? r.de + (r.ate && r.ate !== r.de ? '-' + r.ate : '') : '' } : st.trecho,
-      traducao: e.traducao || 'nbv', opcoes: false, modo: 'escrever', salvas: (e.perguntas || []).slice(),
+      // em semana e trecho, a lista vazia quer dizer "as perguntas de sempre": valem as marcadas de saída
+      traducao: e.traducao || 'nbv', opcoes: false, modo: 'escrever',
+      salvas: (e.tipo === 'semana' || e.tipo === 'trecho') && !(e.perguntas || []).length ? null : (e.perguntas || []).slice(),
     });
   }
 
@@ -134,6 +140,8 @@
     };
     const contar = (biblia) => (biblia ? (livro, cap) => ((biblia.livros[livro] || [])[cap - 1] || []).length : null);
     const rolarAoTopo = () => { if (CC.rolarPara) CC.rolarPara(0); else scrollTo(0, 0); };
+    // A caixa de texto cresce com o que está escrito, sem barra de rolagem por dentro.
+    const crescer = (campo) => { campo.style.height = 'auto'; campo.style.height = (campo.scrollHeight + 4) + 'px'; };
 
     // A moldura de cada passo: voltar, título, as três barrinhas e "Passo N de 3".
     function moldura(n, titulo, nome, voltarPara, painel) {
@@ -157,13 +165,21 @@
       else passo1();
     }
     const temConteudo = () => !!(String(st.fonte || '').trim() || String(st.palavra || '').trim() || st.passo > 1);
+    // Só "Sair" sai: tocar fora da folha (null) é o mesmo que continuar preparando.
     async function sair() {
       if (temConteudo() && await CC.confirmar({
         titulo: 'Sair do preparo?', texto: 'O rascunho fica guardado neste celular. Quando voltar, você continua de onde parou.',
         acao: 'Continuar preparando', cancelar: 'Sair',
-      })) return;
+      }) !== false) return;
       CC.substituirRota(apoio.endereco(p.id, 'estudo'));
     }
+    // A mensagem de um pedido que falhou, com a maiúscula e o ponto da tela. Sem resposta do
+    // servidor (sem internet), o que fazer: o rascunho não se perdeu.
+    const mensagemDe = (e) => {
+      if (!e || !e.status) return 'Sem conexão. O rascunho continua neste celular. Tente de novo.';
+      const m = String(e.message || 'Não deu certo agora. Tente de novo.');
+      return m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.');
+    };
     const mostrarErro = (painel, mensagens) => {
       const el = painel.querySelector('[data-erro]');
       if (!el) return;
@@ -236,7 +252,7 @@
         if (!await CC.confirmar({ titulo: 'Tirar o estudo?', texto: 'A célula volta a ver que o estudo ainda não foi preparado.', acao: 'Tirar', perigo: true })) return;
         try {
           await CC.api('api/celula', { acao: 'estudo', id: p.id, estudo: '' });
-        } catch (e) { mostrarErro(painel, [e.message]); return; }
+        } catch (e) { mostrarErro(painel, [mensagemDe(e)]); return; }
         apagarRascunho(p.id);
         await apoio.carregar();
         CC.substituirRota(apoio.endereco(p.id, 'estudo'));
@@ -373,15 +389,24 @@
     }
 
     // ---------- passo 2: confira as partes ----------
+    // A leitura da semana é sempre na NBV (o servidor grava assim): a prévia mostra o mesmo.
+    const traducaoAgora = () => (st.tipo === 'semana' ? 'nbv' : st.traducao);
     async function passo2() {
       const painel = moldura(2, 'Confira as partes', 'Cada parte do estudo', 'O estudo', CC.esqueleto('texto'));
-      const biblia = await bibliaDe(st.traducao);
+      const biblia = await bibliaDe(traducaoAgora());
       if (!vivo() || st.passo !== 2) return;
       if (st.tipo === 'blocos') await previaDoEstudo(painel, biblia);
       else await previaDoRoteiro(painel, biblia);
       if (CC.inseparavel && painel.isConnected) CC.inseparavel(painel);
     }
-    const cartao = (ref, texto) => CC.cartaoVersiculo(ref, texto || '', { semAcoes: true, sigla: st.traducao });
+    const cartao = (ref, texto) => CC.cartaoVersiculo(ref, texto || '', { semAcoes: true, sigla: traducaoAgora() });
+    // O cartão cortado (o capítulo inteiro, o trecho longo): na aba e no encontro ele vem com o
+    // botão de abrir o capítulo na Bíblia (estudo-celula.js).
+    const avisoDoCorte = (escrito) => {
+      const cap = R.capituloDe(escrito);
+      return 'Mostramos os 10 primeiros versículos de ' + escrito + '.' + (cap ? ' Na aba Estudo e no encontro, o cartão vem com o botão Abrir ' + cap.livro + ' ' + cap.cap + ' na Bíblia.' : '')
+        + ' Para mostrar mais versículos, divida em dois cartões.';
+    };
     const blocoTraducao = (n) => {
       const nome = nomeDa(st.traducao);
       return '<div class="mesa-bloco"><span class="etiqueta">Tradução do estudo</span>'
@@ -422,7 +447,7 @@
         const origem = troca ? (troca.de ? 'No seu texto: citação da ' + troca.de + '. Agora na ' + nome + '.' : 'No seu texto: citação de outra tradução. Agora na ' + nome + '.')
           : 'No seu texto: só a referência. Agora com o texto da ' + nome + '.';
         const avisos = r.avisos.filter((a) => a.bloco === n).map((a) => (a.tipo === 'sem-versiculo' ? semVersiculo(a.ref)
-          : 'Mostramos os 10 primeiros versículos de ' + a.ref + '. Para o capítulo inteiro, use Abrir na Bíblia, ou divida em dois cartões.'));
+          : avisoDoCorte(a.ref)));
         return '<div class="mesa-com-origem"' + (troca && troca === primeiraTroca ? ' id="troca-1"' : '') + '>' + cartao(b.ref, textos.get(b.ref))
           + '<p class="mesa-origem">' + CC.ico('info') + esc(origem) + '</p>'
           + avisos.map((a) => '<p class="mesa-origem mesa-origem-aviso">' + CC.ico('info') + esc(a) + '</p>').join('') + '</div>';
@@ -502,11 +527,16 @@
         + '<label class="campo-senha"><span>O texto desta parte</span><textarea data-trecho rows="8" autocomplete="off" spellcheck="true"></textarea></label>'
         + '<div class="acoes"><button class="botao" data-pronto>Pronto</button><button class="botao plano" data-fechar>Cancelar</button></div>',
       {
+        // presa: o arraste para rolar o texto, ou um toque fora, não fecha a folha e não perde o
+        // que foi mudado. Sai pelo "Pronto" ou pelo "Cancelar".
         rotulo: 'Mudar: ' + parte.rotulo,
         rolavel: true,
+        presa: true,
         ligar: (folha, fechar) => {
           const campo = folha.querySelector('[data-trecho]');
           campo.value = trecho;
+          crescer(campo);
+          campo.addEventListener('input', () => crescer(campo));
           folha.querySelector('[data-fechar]').onclick = fechar;
           folha.querySelector('[data-pronto]').onclick = () => {
             const novas = normalizar(campo.value) ? campo.value.replace(/\r\n?/g, '\n').split('\n') : [];
@@ -553,11 +583,13 @@
         }
       }
       const refs = blocos.filter((b) => b.t === 'versiculo').map((b) => b.ref);
-      const textos = await CC.estudoCelula.textosDe(refs, st.traducao);
+      const textos = await CC.estudoCelula.textosDe(refs, traducaoAgora());
       if (!vivo() || st.passo !== 2) return;
+      // o aviso dos 10 primeiros só quando o cartão mostra menos do que foi pedido (Salmos 117 tem 2,
+      // e o cartão já mostra os dois)
       const html = blocos.map((b) => (b.t === 'versiculo'
-        ? '<div class="mesa-com-origem">' + cartao(b.ref, textos.get(b.ref)) + (b.escrito ? '<p class="mesa-origem mesa-origem-aviso">' + CC.ico('info')
-          + esc('Mostramos os 10 primeiros versículos de ' + b.escrito + '. Para o capítulo inteiro, use Abrir na Bíblia, ou divida em dois cartões.') + '</p>' : '') + '</div>'
+        ? '<div class="mesa-com-origem">' + cartao(b.ref, textos.get(b.ref)) + (R.cortaTrecho(b, contar(biblia)) ? '<p class="mesa-origem mesa-origem-aviso">' + CC.ico('info')
+          + esc(avisoDoCorte(b.escrito)) + '</p>' : '') + '</div>'
         : R.blocoEmHtml(b))).join('');
       const n = palavra.trocas.length;
       painel.innerHTML = (n ? '<div class="mesa-aviso">' + CC.ico('info') + '<b>Tiramos o texto citado da sua palavra</b><p>'
@@ -601,7 +633,8 @@
       const lista = [];
       grupos.forEach((g, gi) => g.perguntas.forEach((pergunta) => {
         const antes = antigas.find((x) => x.de === pergunta);
-        lista.push({ g: gi, de: pergunta, texto: antes ? antes.texto : pergunta, marcada: antes ? antes.marcada : st.salvas ? st.salvas.includes(pergunta) : g.marcadas.includes(pergunta) });
+        // a pergunta do texto com mais de 300 caracteres não vem marcada: o servidor a recusaria
+        lista.push({ g: gi, de: pergunta, texto: antes ? antes.texto : pergunta, marcada: antes ? antes.marcada : st.salvas ? st.salvas.includes(pergunta) : g.marcadas.includes(pergunta) && pergunta.length <= PERGUNTA_MAX });
       }));
       antigas.filter((x) => !x.de).forEach((x) => lista.push(Object.assign({}, x, { g: -1 })));
       if (st.salvas) st.salvas.filter((x) => !lista.some((y) => y.texto === x)).forEach((x) => lista.push({ g: -1, de: '', texto: x, marcada: true }));
@@ -626,8 +659,6 @@
       if (!vivo() || st.passo !== 3) return;
       desenharPerguntas(painel);
     }
-    // A caixa de texto cresce com o que está escrito, sem barra de rolagem por dentro.
-    const crescer = (campo) => { campo.style.height = 'auto'; campo.style.height = (campo.scrollHeight + 4) + 'px'; };
     function linhaPergunta(x, k) {
       if (x.editando) {
         return '<div class="mesa-pergunta editando" role="group" aria-label="Mudando a pergunta" data-q="' + k + '"><span class="caixa-marcar" aria-hidden="true"></span><div class="campo-editar">'
@@ -635,7 +666,8 @@
           + '<div class="pe-editar"><button type="button" class="botao pequeno" data-pronto-q>Pronto</button><button type="button" class="botao pequeno contorno" data-desfazer-q>Desfazer</button></div></div></div>';
       }
       return '<div class="mesa-pergunta' + (x.marcada ? ' marcada' : '') + '" data-q="' + k + '"><label for="q' + k + '"><input type="checkbox" id="q' + k + '"' + (x.marcada ? ' checked' : '') + '>'
-        + '<span class="caixa-marcar" aria-hidden="true">' + (x.marcada ? CC.ico('certo') : '') + '</span><span class="texto">' + esc(x.texto) + '</span></label>'
+        + '<span class="caixa-marcar" aria-hidden="true">' + (x.marcada ? CC.ico('certo') : '') + '</span><span class="texto">' + esc(x.texto)
+        + (x.texto.length > PERGUNTA_MAX ? '<small class="longa">Tem mais de ' + PERGUNTA_MAX + ' caracteres. Toque em Mudar para encurtar.</small>' : '') + '</span></label>'
         + '<button type="button" class="botao pequeno contorno" data-mudar-q="' + k + '" aria-label="Mudar a pergunta">Mudar</button></div>';
     }
     function desenharPerguntas(painel) {
@@ -733,8 +765,9 @@
       {
         rotulo: 'Acolhida, adoração e testemunho',
         rolavel: true,
+        presa: true,
         ligar: (folha, fechar) => {
-          folha.querySelectorAll('[data-w]').forEach((t) => { t.value = valorW(t.dataset.w); });
+          folha.querySelectorAll('[data-w]').forEach((t) => { t.value = valorW(t.dataset.w); crescer(t); t.addEventListener('input', () => crescer(t)); });
           folha.querySelector('[data-fechar]').onclick = fechar;
           folha.querySelector('[data-pronto]').onclick = () => {
             st.ws = {};
@@ -749,6 +782,10 @@
 
     async function salvar(painel) {
       const botao = painel.querySelector('[data-salvar]');
+      if (st.perguntas.some((x) => x.marcada && x.texto.trim().length > PERGUNTA_MAX)) {
+        mostrarErro(painel, ['Encurte a pergunta marcada que passou de ' + PERGUNTA_MAX + ' caracteres: toque em Mudar nela.']);
+        return;
+      }
       const corpo = {
         acao: 'estudo', id: p.id, estudo: st.tipo,
         fonte: st.tipo === 'blocos' ? st.fonte : st.palavra,
@@ -763,8 +800,7 @@
         await CC.api('api/celula', corpo);
       } catch (e) {
         botao.disabled = false;
-        const m = String(e.message || 'Não deu certo agora. Tente de novo.');
-        mostrarErro(painel, [m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.')]);
+        mostrarErro(painel, [mensagemDe(e)]);
         return;
       }
       apagarRascunho(p.id);

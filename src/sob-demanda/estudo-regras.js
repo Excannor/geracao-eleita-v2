@@ -65,6 +65,19 @@
     if (b.ref !== escrever(r)) b.escrito = escrever(r);
     return b;
   }
+  // O cartão mostra menos do que o líder escreveu? O capítulo inteiro de mais versículos do que o
+  // cartão mostra, e o trecho de mais de 10. O "Salmos 117" (2 versículos) e o "Salmos 117.1-5"
+  // não: o cartão já mostra o capítulo inteiro. Sem a contagem da Bíblia, o capítulo inteiro
+  // conta como cortado quando o cartão mostra os 10 (o servidor cortou pelo que o capítulo tem).
+  function cortaTrecho(b, versiculos) {
+    const r = b && b.escrito ? lerR(b.escrito) : null;
+    const c = b ? lerR(b.ref) : null;
+    if (!r || !c) return false;
+    const mostra = (c.ate || c.de) - (c.de || 1) + 1;
+    const total = versiculos ? Number(versiculos(r.livro, r.cap)) || 0 : 0;
+    if (r.inteiro) return total ? total > mostra : mostra >= CC.MAX_TRECHO;
+    return (total ? Math.min(r.ate, total) : r.ate) - (r.de || 1) + 1 > mostra;
+  }
   // O capítulo de um cartão, para "Abrir Efésios 6 na Bíblia".
   function capituloDe(ref) {
     const r = lerR(ref);
@@ -343,7 +356,7 @@
 
   CC.estudoRegras = {
     PERGUNTAS_OIA, PERGUNTAS_ACOLHIDA, SUGESTAO_ADORACAO, SUGESTAO_TESTEMUNHO, sugestaoAcolhida,
-    cruza, cartaoDe, capituloDe, semana, titulo, comoBlocos, perguntasDe, dividir, passos, textoParaGrupo,
+    cruza, cartaoDe, cortaTrecho, capituloDe, semana, titulo, comoBlocos, perguntasDe, dividir, passos, textoParaGrupo,
     noPlano, parabolaDoEstudo, gruposDePerguntas, blocoEmHtml, negrito,
   };
 })(window.CC);

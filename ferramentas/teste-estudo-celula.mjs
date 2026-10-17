@@ -338,6 +338,10 @@ ok(await esperar('!!document.querySelector(".cortina .folha") && /Sair do prepar
 ok(await av('[...document.querySelectorAll(".cortina .botao")].map((b) => b.textContent.trim()).join("|") === "Continuar preparando|Sair" && ' + q('.cortina [data-nao]') + '.classList.contains("contorno")'),
   '5. com "Continuar preparando" e "Sair" (contorno)');
 await foto('01d-preparar-sair');
+await av('document.querySelector(".cortina").click(); true');
+ok(await esperar('!document.querySelector(".cortina")') && /\/preparar$/.test(await av('location.hash')) && !!(await av(existe('[data-fonte]'))), '5. tocar fora da folha "Sair do preparo?" continua preparando');
+await clicar('.mesa-cabeca [data-voltar]');
+await esperar('!!document.querySelector(".cortina [data-nao]")');
 await clicar('.cortina [data-nao]');
 ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector("[data-preparar]") && !document.body.classList.contains("sem-barra")'), '5. "Sair" volta à aba Estudo, com a barra de abas');
 ok(await av('!!localStorage.getItem("cc.rascunho.estudo.' + ID + '")'), '5. o rascunho fica no celular');
@@ -381,6 +385,9 @@ ok(cartoes.every((c) => c.texto === textoDe(NBV, c.ref)), '6. de volta à NBV, p
 await clicar('[data-mudar-parte="0"]');
 ok(await esperar('!!document.querySelector(".cortina [data-trecho]")') && (await av(q('.cortina [data-trecho]') + '.value')) === LINHAS_DONO[0], '7. "Mudar" no Título abre a linha do título');
 await av(q('.cortina [data-trecho]') + '.value = "Estudo: Vigilância e Armadura de Deus"; true');
+await av('document.querySelector(".cortina").click(); true');
+await dormir(300);
+ok(await av('!!document.querySelector(".cortina [data-trecho]") && document.querySelector(".cortina [data-trecho]").value === "Estudo: Vigilância e Armadura de Deus"'), '7. tocar fora da folha "Mudar" não fecha nem perde o que foi escrito');
 await clicar('.cortina [data-pronto]');
 await esperar('!document.querySelector(".cortina")');
 ok(await esperar('/Vigilância e Armadura de Deus/.test(document.querySelector(".mesa-parte .mesa-t1")?.textContent || "")', 15000)
@@ -437,6 +444,11 @@ ok(await av('(() => { const nota = [...document.querySelectorAll(".mesa-nota")].
 await emTodosOsTamanhos('passo 3');
 
 // ---------- 9. Salvar ----------
+await na(() => { window.__fetch = window.fetch; window.fetch = (u, o) => (/api\/celula/.test(String(u)) ? Promise.reject(new TypeError('Failed to fetch')) : window.__fetch(u, o)); return true; });
+await clicar('[data-salvar]');
+ok(await esperar('/Sem conexão\. O rascunho continua neste celular\. Tente de novo\./.test(document.querySelector("[data-erro]")?.textContent || "")') && /\/preparar$/.test(await av('location.hash')),
+  '9. sem internet, salvar diz "Sem conexão. O rascunho continua neste celular. Tente de novo." (e não "Failed to fetch")');
+await na(() => { window.fetch = window.__fetch; return true; });
 await clicar('[data-salvar]');
 ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector(".mesa-lider")', 20000), '9. salvar volta à aba Estudo, com o cartão do líder');
 ok(/Estudo salvo\. Ele fica guardado na célula\./.test(await texto('#aviso-flutuante')) && /Você preparou este estudo/.test(await texto('.mesa-lider')), '9. com o aviso "Estudo salvo" e "Você preparou este estudo"');
@@ -585,8 +597,11 @@ await como(ana, rota());
 ok(await esperar('/Encontro hoje · veja o estudo/.test(document.querySelector(".painel-celula")?.textContent || "")', 15000), '15. com estudo, a Ana vê "Encontro hoje · veja o estudo"');
 await como(lider, rota('estudo'));
 await esperar(existe('[data-mudar]'), 15000);
+// um rascunho da mesma base, mas de antes de uma gravação feita em outro aparelho, não volta
+await av('localStorage.setItem("cc.rascunho.estudo.' + ID + '", JSON.stringify({ v: 1, base: ' + JSON.stringify(salvo.id) + ', baseEm: "2000-01-01T00:00:00.000Z", tipo: "blocos", passo: 1, fonte: "RASCUNHO VELHO", palavra: "", trecho: { livro: "Gênesis", cap: "1", vers: "" }, traducao: "nbv", opcoes: false, modo: "escrever", recusadas: [], perguntas: null, salvas: null, ws: null })); true');
 await clicar('[data-mudar]');
 ok(await esperar('/\\/preparar$/.test(location.hash) && !!document.querySelector("[data-tirar]")', 15000), '16. "Mudar o estudo" abre o preparo com "Tirar o estudo"');
+ok(!(await av(q('[data-fonte]') + '.value')).includes('RASCUNHO VELHO'), '16. o rascunho de antes de uma gravação em outro aparelho não volta: o preparo começa da versão salva');
 ok((await av(q('[data-fonte]') + '.value')).includes('Efésios 6.12') && !(await av(q('[data-fonte]') + '.value')).includes('A nossa luta'), '16. o campo traz a fonte gravada, sem a citação da NVI');
 await clicar('[data-tirar]');
 ok(await esperar('/Tirar o estudo\\?/.test(document.querySelector(".cortina h2")?.textContent || "")'), '16. tirar pede confirmação');
@@ -617,6 +632,38 @@ ok(await av('!/Encontro hoje/.test(document.querySelector(".painel-celula").text
   await clicar('.mesa-lider [data-mudar]');
   ok(await esperar('/\\/preparar$/.test(location.hash) && !!document.querySelector("[data-fonte]") && document.querySelector("[data-fonte]").value === ""', 15000),
     '17. "Preparar o próximo" abre o preparo em branco (o usado fica guardado na célula)');
+}
+
+// ---------- 17b. Um trecho de capítulo curto, a leitura da semana e as perguntas de sempre ----------
+{
+  // (o preparo em branco do 17 está aberto)
+  await clicar('[data-tipo="trecho"]');
+  await esperar(existe('[data-livro]'));
+  await na(() => { const l = document.querySelector('[data-livro]'); l.value = 'Salmos'; l.dispatchEvent(new Event('change')); const c = document.querySelector('[data-cap]'); c.value = '117'; c.dispatchEvent(new Event('input')); return true; });
+  await clicar('[data-ver]');
+  ok(await esperar('document.querySelector(".mesa-parte .cartao-versiculo")?.dataset.ref === "Salmos 117.1-2"', 15000) && !/10 primeiros/.test(await texto('.mesa-preparo')),
+    '17b. o trecho de Salmos 117 mostra o capítulo inteiro (117.1-2), sem o aviso dos 10 primeiros');
+  await clicar('[data-traducao="blivre"]');
+  await esperar('document.querySelector("[data-traducao=\\"blivre\\"]")?.getAttribute("aria-pressed") === "true"', 15000);
+  await clicar('[data-voltar-texto]');
+  await esperar(existe('[data-tipo="semana"]'));
+  await clicar('[data-tipo="semana"]');
+  await clicar('[data-ver]');
+  ok(await esperar('!!document.querySelector(".mesa-parte .cartao-versiculo")', 15000) && await av('document.querySelector(".mesa-parte .cartao-versiculo").dataset.sigla === "nbv"'),
+    '17b. a prévia da leitura da semana fica na NBV, como o servidor grava, mesmo com a Bíblia Livre escolhida antes');
+  // o estudo da semana de antes (perguntas vazias = as de sempre): "Mudar" abre o passo 3 com as de sempre marcadas
+  const r = await pedir('api/celula', { acao: 'estudo', id: ID, estudo: 'semana', fonte: '', perguntas: [], base: '' }, lider);
+  ok(r.status === 200 && r.dado.estudo.perguntas.length === 0, '17b. o líder salva a leitura da semana sem escolher perguntas');
+  await av('localStorage.removeItem("cc.rascunho.estudo.' + ID + '"); true');
+  await como(lider, rota('estudo'));
+  await esperar(existe('.mesa-lider [data-mudar]'), 15000);
+  await clicar('.mesa-lider [data-mudar]');
+  await esperar(existe('[data-ver]'), 15000);
+  await clicar('[data-ver]');
+  await esperar(existe('[data-continuar]:not([disabled])'), 15000);
+  await clicar('[data-continuar]');
+  ok(await esperar('document.querySelectorAll(".mesa-pergunta.marcada").length > 0', 15000) && !/Nenhuma pergunta escolhida/.test(await texto('[data-conta]')),
+    '17b. "Mudar" na leitura da semana sem perguntas escolhidas abre o passo 3 com as de sempre marcadas');
 }
 
 // ---------- 18. sem exceções ----------

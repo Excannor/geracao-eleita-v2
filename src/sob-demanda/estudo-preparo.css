@@ -100,6 +100,7 @@
 .mesa-pergunta.marcada { background: var(--realce); }
 .mesa-pergunta.marcada .caixa-marcar { background: var(--salvia); box-shadow: none; }
 .mesa-pergunta .texto { margin: 2px 0 0; color: var(--tinta-forte); font-size: .9375rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
+.mesa-pergunta .texto .longa { display: block; margin-top: 4px; color: var(--tinta-forte); font-size: .875rem; font-weight: 800; }
 .mesa-pergunta > .botao { min-height: 44px; margin-top: 2px; padding: 8px 14px; background: var(--campo); }
 .mesa-pergunta.editando { grid-template-columns: 26px minmax(0, 1fr); gap: 12px; padding: 14px 20px; }
 .mesa-pergunta.editando .campo-editar { display: grid; gap: 8px; }
