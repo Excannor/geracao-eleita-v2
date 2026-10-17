@@ -23,7 +23,10 @@
   // ---------- a linha, antes das regras ----------
   const INVISIVEIS = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u00ad\u200b-\u200f\u2060\ufeff]/g;
   // a bolinha do Word (inclusive a da fonte Symbol, na área de uso privado) e o hífen de lista
-  const MARCA_LISTA = /^(?:[\u2022\u2023\u2043\u2219\u25a0\u25a1\u25aa\u25ab\u25cf\u25e6\uf076\uf0a7\uf0b7\uf0d8\uf0fc]|[-\u2013](?= ))\s*/;
+  const MARCA_LISTA = /^(?:[\u00b7\u2022\u2023\u2043\u2219\u25a0\u25a1\u25aa\u25ab\u25cf\u25e6\uf076\uf0a7\uf0b7\uf0d8\uf0fc]|[-\u2013](?= ))\s*/;
+  // No texto puro que o Word copia, o marcador da lista vem seguido de um tab: o ponto da fonte
+  // Symbol, o "o" da Courier, o "§" e o "n" da Wingdings. Só com o tab dá para saber que não é texto.
+  const MARCA_LISTA_TAB = /^[ \u00a0]*[\u00b7\u2022o\u00a7n\uf0a7\uf0b7\uf0d8\uf0fc]\t/;
   // o "n " ou "nn " que a cópia do PDF deixa no lugar do marcador, antes de uma referência, de
   // "Conclusão" ou de "Estudo:"
   const PREFIXO_PDF = /^n{1,2} (?=\S)/;
@@ -32,7 +35,7 @@
   function limpar(bruta, capitulos) {
     // Todo espaço (o comum, o inseparável, o tab e os outros que o \s conhece, como o U+1680)
     // vira um espaço só: nenhuma expressão daqui encontra uma fila de espaços para desmontar.
-    let l = String(bruta).replace(INVISIVEIS, '').replace(/\s+/g, ' ').trim();
+    let l = String(bruta).replace(INVISIVEIS, '').replace(MARCA_LISTA_TAB, '').replace(/\s+/g, ' ').trim();
     l = l.replace(MARCA_LISTA, '');
     if (PREFIXO_PDF.test(l)) {
       const resto = l.replace(PREFIXO_PDF, '');

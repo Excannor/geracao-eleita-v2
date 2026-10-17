@@ -86,7 +86,12 @@
   // ---------- colar do Word: o negrito vira *asteriscos*, o resto vira texto ----------
   // O HTML é lido com DOMParser (nada dele roda). Cada bloco (parágrafo, item, linha de tabela)
   // vira uma linha; b, strong ou font-weight de 600 para cima vira *negrito*, linha a linha.
+  // O marcador que o Word desenha na lista (o span com mso-list:Ignore, com o ponto da Symbol, o
+  // "o" da Courier ou o "n" da Wingdings) fica fora. Dentro de um <pre> ou de um white-space: pre
+  // (como o WhatsApp Web e alguns editores copiam), cada quebra de linha continua sendo uma linha.
   const BLOCO = /^(P|DIV|LI|H[1-6]|TR|UL|OL|TABLE|BLOCKQUOTE|SECTION|ARTICLE|HEADER|FOOTER|PRE)$/;
+  const MARCADOR_DO_WORD = /mso-list\s*:\s*ignore/i;
+  const QUEBRA_VALE = /white-space\s*:\s*(?:pre|break-spaces)/i;
   function emNegrito(el) {
     const peso = el.style && el.style.fontWeight;
     if (peso) return peso === 'bold' || peso === 'bolder' || Number(peso) >= 600;
@@ -94,16 +99,19 @@
   }
   function textoDoHtml(html) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const andar = (no, dentroDeNegrito) => {
-      if (no.nodeType === 3) return no.nodeValue.replace(/\s+/g, ' ');
+    const andar = (no, dentroDeNegrito, quebraVale) => {
+      if (no.nodeType === 3) return quebraVale ? no.nodeValue.replace(/\r\n?/g, '\n').replace(/[^\S\n]+/g, ' ') : no.nodeValue.replace(/\s+/g, ' ');
       if (no.nodeType !== 1 || /^(SCRIPT|STYLE|HEAD|TITLE|META|LINK|TEMPLATE)$/.test(no.tagName)) return '';
       if (no.tagName === 'BR') return '\n';
+      const estilo = no.getAttribute('style') || '';
+      if (MARCADOR_DO_WORD.test(estilo)) return '';
+      const quebra = quebraVale || no.tagName === 'PRE' || no.tagName === 'TEXTAREA' || QUEBRA_VALE.test(estilo);
       const negrito = !dentroDeNegrito && emNegrito(no);
-      let dentro = [...no.childNodes].map((c) => andar(c, dentroDeNegrito || negrito)).join('');
+      let dentro = [...no.childNodes].map((c) => andar(c, dentroDeNegrito || negrito, quebra)).join('');
       if (negrito) dentro = dentro.split('\n').map((l) => { const m = /^(\s*)(.*?)(\s*)$/.exec(l); return m[2] ? m[1] + '*' + m[2] + '*' + m[3] : l; }).join('\n');
       return BLOCO.test(no.tagName) ? '\n' + dentro + '\n' : dentro;
     };
-    return andar(doc.body || doc.documentElement, false).replace(/[ \t]*\n[ \t]*/g, '\n').replace(/\n{2,}/g, '\n').trim();
+    return andar(doc.body || doc.documentElement, false, false).replace(/[ \t]*\n[ \t]*/g, '\n').replace(/\n{2,}/g, '\n').trim();
   }
 
   // ---------- a tela ----------

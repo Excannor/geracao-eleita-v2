@@ -294,6 +294,24 @@ const linhasColadas = colado.split('\n');
 ok(linhasColadas.length === 42 && RESUMO.every((i) => linhasColadas[i] === '*' + LINHAS_DONO[i] + '*') && linhasColadas.filter((l, i) => !RESUMO.includes(i)).every((l, i) => l === LINHAS_DONO.filter((x, k) => !RESUMO.includes(k))[i]),
   '3. colado do Word: as 42 linhas, e as 6 do resumo em asteriscos');
 ok(/Estudo colado/.test(await texto('.mesa-escolhido')) && await av('!' + q('.mesa-opcoes')), '3. a escolha recolhe em "Estudo colado · Trocar"');
+{
+  // o marcador que o Word desenha na lista (Symbol, Courier e Wingdings, no span mso-list:Ignore)
+  // e o texto que vem num <pre> ou num white-space: pre-wrap
+  const colagens = await na(() => {
+    const t = CC.estudoPreparo.textoDoHtml;
+    const item = (fonte, marca, texto) => '<p class="MsoListParagraph" style="mso-list:l0 level1 lfo1"><!--[if !supportLists]--><span style="font-family:' + fonte + ';mso-list:Ignore">' + marca
+      + '<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;</span></span><!--[endif]-->' + texto + '</p>';
+    return {
+      word: t(item('Symbol', '\u00b7', 'Efésios 6:12') + item('&quot;Courier New&quot;', 'o', 'Um subitem') + item('Wingdings', 'n', 'Cinturão da verdade \u2192 viver na verdade.')),
+      pre: t('<pre>Estudo: Teste\nEfésios 6:12\n1. Um tópico</pre>'),
+      prewrap: t('<div><span style="white-space: pre-wrap">Estudo: Teste\nEfésios 6:12</span></div>'),
+      comum: t('<p>Uma linha\nque quebra no HTML</p>'),
+    };
+  });
+  ok(colagens.word === 'Efésios 6:12\nUm subitem\nCinturão da verdade \u2192 viver na verdade.', '3. colar uma lista do Word deixa o marcador (Symbol, Courier, Wingdings) de fora (' + JSON.stringify(colagens.word) + ')');
+  ok(colagens.pre === 'Estudo: Teste\nEfésios 6:12\n1. Um tópico' && colagens.prewrap === 'Estudo: Teste\nEfésios 6:12' && colagens.comum === 'Uma linha que quebra no HTML',
+    '3. dentro de <pre> e de white-space: pre-wrap, cada quebra continua sendo uma linha; fora deles, não');
+}
 
 // ---------- 4. A barra de marcas ----------
 await na(() => { document.querySelector('[data-fonte]').blur(); document.querySelector('[data-fonte]').focus(); return true; });

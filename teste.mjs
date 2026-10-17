@@ -568,6 +568,11 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 
     }
   }
 
+  // --- a lista colada do Word: o marcador sai (com o tab do texto puro, ou o ponto do meio) ---
+  checar(JSON.stringify(semL(ler('Título\n\u00b7 Efésios 6:12\n\u00b7\tAmor \u2192 dar\no\tUm subitem\nn\tUm parágrafo\no texto segue').blocos))
+    === JSON.stringify([{ t: 'versiculo', ref: 'Efésios 6.12' }, { t: 'seta', itens: [['Amor', 'dar']], destaque: false }, { t: 'texto', texto: 'Um subitem' }, { t: 'texto', texto: 'Um parágrafo' }, { t: 'texto', texto: 'o texto segue' }]),
+  'o ponto do meio e os marcadores do Word com tab ("o", "n") saem do começo da linha; o "o" do texto fica');
+
   // --- as outras bordas do leitor (revisão de 17/10) ---
   checar(ler('João 3:16 \u2013 O amor de Deus\nTexto').titulo === 'João 3:16 \u2013 O amor de Deus' && ler('*Romanos 8:28-39: Mais que vencedores*\nTexto').titulo === 'Romanos 8:28-39: Mais que vencedores',
     'o título que começa por uma referência com um resto curto continua sendo o título');
