@@ -4,7 +4,7 @@
    desenhos já embutidos); o service worker o guarda na primeira abertura, como as bíblias.
    A Bíblia do app (#/biblia) não muda: o mapa só aponta para ela no botão do fim. A ficha do
    livro (Explorar > Livros) e o mapa apontam um para o outro.
-   O index.html tem teto de 1 MB, então aqui fica o cartão, a tabela dos 66, o link da ficha e a
+   O index.html tem teto de 1 MB, então aqui fica o cartão, os grupos da grade, o link da ficha e a
    casca da tela (a barra, a cabeça com o nome e o esqueleto). O desenho do mapa (as setas, os
    blocos, o estilo deles) vem em mapa-tela.<resumo>.js (src/sob-demanda/mapa-tela.js), pedido
    na primeira vez que um mapa abre e guardado pelo service worker para abrir sem rede. */
@@ -14,27 +14,11 @@
   const D = CC.D;
   const MAPAS = window.MAPAS || [];
 
-  // Os 66, na ordem do cânon, com o grupo da grade e a sigla das referências ("Is 6.1-4").
+  // Os grupos da grade; a tabela dos 66 (nome, grupo e sigla) mora em 01-nucleo.js (CC.LIVROS).
   // A mesma tabela vive em ferramentas/checar-mapa.mjs; o teste.mjs confere que as duas batem.
   const GRUPOS = ['Lei', 'Históricos', 'Poéticos', 'Profetas maiores', 'Profetas menores',
     'Evangelhos e Atos', 'Cartas de Paulo', 'Outras cartas', 'Apocalipse'];
-  const LIVROS = [
-    ['Gênesis', 0, 'Gn'], ['Êxodo', 0, 'Êx'], ['Levítico', 0, 'Lv'], ['Números', 0, 'Nm'], ['Deuteronômio', 0, 'Dt'],
-    ['Josué', 1, 'Js'], ['Juízes', 1, 'Jz'], ['Rute', 1, 'Rt'], ['1 Samuel', 1, '1Sm'], ['2 Samuel', 1, '2Sm'],
-    ['1 Reis', 1, '1Rs'], ['2 Reis', 1, '2Rs'], ['1 Crônicas', 1, '1Cr'], ['2 Crônicas', 1, '2Cr'], ['Esdras', 1, 'Ed'],
-    ['Neemias', 1, 'Ne'], ['Ester', 1, 'Et'],
-    ['Jó', 2, 'Jó'], ['Salmos', 2, 'Sl'], ['Provérbios', 2, 'Pv'], ['Eclesiastes', 2, 'Ec'], ['Cânticos', 2, 'Ct'],
-    ['Isaías', 3, 'Is'], ['Jeremias', 3, 'Jr'], ['Lamentações', 3, 'Lm'], ['Ezequiel', 3, 'Ez'], ['Daniel', 3, 'Dn'],
-    ['Oseias', 4, 'Os'], ['Joel', 4, 'Jl'], ['Amós', 4, 'Am'], ['Obadias', 4, 'Ob'], ['Jonas', 4, 'Jn'], ['Miqueias', 4, 'Mq'],
-    ['Naum', 4, 'Na'], ['Habacuque', 4, 'Hc'], ['Sofonias', 4, 'Sf'], ['Ageu', 4, 'Ag'], ['Zacarias', 4, 'Zc'], ['Malaquias', 4, 'Ml'],
-    ['Mateus', 5, 'Mt'], ['Marcos', 5, 'Mc'], ['Lucas', 5, 'Lc'], ['João', 5, 'Jo'], ['Atos', 5, 'At'],
-    ['Romanos', 6, 'Rm'], ['1 Coríntios', 6, '1Co'], ['2 Coríntios', 6, '2Co'], ['Gálatas', 6, 'Gl'], ['Efésios', 6, 'Ef'],
-    ['Filipenses', 6, 'Fp'], ['Colossenses', 6, 'Cl'], ['1 Tessalonicenses', 6, '1Ts'], ['2 Tessalonicenses', 6, '2Ts'],
-    ['1 Timóteo', 6, '1Tm'], ['2 Timóteo', 6, '2Tm'], ['Tito', 6, 'Tt'], ['Filemom', 6, 'Fm'],
-    ['Hebreus', 7, 'Hb'], ['Tiago', 7, 'Tg'], ['1 Pedro', 7, '1Pe'], ['2 Pedro', 7, '2Pe'], ['1 João', 7, '1Jo'],
-    ['2 João', 7, '2Jo'], ['3 João', 7, '3Jo'], ['Judas', 7, 'Jd'],
-    ['Apocalipse', 8, 'Ap'],
-  ];
+  const LIVROS = CC.LIVROS;
   CC.LIVROS_MAPA = LIVROS;
   CC.GRUPOS_MAPA = GRUPOS;
   // "1 Samuel" vira "1-samuel"; "Cânticos", "canticos": sem acento, minúsculo, com hífen.

@@ -244,8 +244,9 @@ secao('mapas dos livros');
     checar(!html.includes(JSON.stringify(publicado.raiz.texto).slice(1, 40)), 'o conteúdo do mapa ' + m.slug + ' não entra no index.html');
   }
   // A mesma tabela dos 66 no app e no checador: um nome só para cada coisa.
-  const ctx = createContext({ window: { CC: { D: { plano: [] } }, MAPAS: [] }, addEventListener: () => {}, document: {}, setTimeout, clearTimeout, requestAnimationFrame: () => {}, Math, JSON, Map, Set, Number, String, Array, Object });
-  runInContext(readFileSync(join(AQUI, 'src', 'app', '06b-mapas.js'), 'utf8'), ctx, { filename: '06b-mapas.js' });
+  // A tabela mora em 01-nucleo.js (CC.LIVROS) desde a À Mesa: o 06b só a aponta como CC.LIVROS_MAPA.
+  const ctx = createContext({ window: { DADOS: { plano: [] }, MAPAS: [] }, addEventListener: () => {}, document: {}, setTimeout, clearTimeout, requestAnimationFrame: () => {}, Math, JSON, Map, Set, Number, String, Array, Object });
+  for (const f of ['01-nucleo.js', '06b-mapas.js']) runInContext(readFileSync(join(AQUI, 'src', 'app', f), 'utf8'), ctx, { filename: f });
   const tabelaApp = ctx.window.CC.LIVROS_MAPA;
   checar(JSON.stringify(tabelaApp) === JSON.stringify(LIVROS_MAPA) && JSON.stringify(ctx.window.CC.GRUPOS_MAPA) === JSON.stringify(GRUPOS_MAPA),
     'o app e o checador usam a mesma tabela dos 66 livros, grupos e siglas');
@@ -348,6 +349,49 @@ secao('peças sob demanda');
   // o que continua no index: o cartão dos mapas, a casca da rota do mapa e o item do Mais do painel
   checar(html.includes('.cartao-mapas{') && html.includes('CC.cartaoMapas') && html.includes('window.MAPAS='), 'o cartão e a lista dos mapas continuam no index.html');
   checar(html.includes('Painel do administrador') && html.includes('CC.vistaPainel') && /window\.AVISO_TELA="aviso-tela\.[0-9a-f]{10}\.js"/.test(html), 'o item do painel, a casca dele e o nome da tela do aviso continuam no index.html');
+}
+
+// =========================================================================
+secao('referências da Bíblia num lugar só (01-nucleo.js)');
+// =========================================================================
+// A tabela dos 66 e o leitor de referências moram em 01-nucleo.js: o servidor, o leitor de marcas
+// do estudo da célula e o editor de notas usam os mesmos. Aqui no mesmo contexto que o servidor
+// monta em carregarRegras (01-nucleo, 02-estado e 02b-jogo). Casos de docs/a-mesa-fase1.md, 2.5 C.
+const ctxEstudo = createContext({
+  window: { DADOS: D }, console, Date, Math, JSON, Object, Set, Map, Number, String, Array, Boolean, Intl,
+  localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+  document: { documentElement: { dataset: {} }, querySelector: () => null },
+  fetch: () => Promise.reject(new Error('sem rede no teste')),
+  setTimeout, clearTimeout, location: { protocol: 'file:' }, navigator: {}, addEventListener: () => {},
+});
+for (const f of ['01-nucleo.js', '02-estado.js', '02b-jogo.js']) runInContext(readFileSync(join(AQUI, 'src', 'app', f), 'utf8'), ctxEstudo, { filename: f });
+const capitulosDoPlano = ctxEstudo.window.CC.capitulosDoPlano(D.plano);
+{
+  const C = ctxEstudo.window.CC;
+  const capitulos = capitulosDoPlano;
+  const refDe = (t) => { const r = C.lerRefLivre(t, capitulos); return r ? C.escreverRef(r.livro, r.cap, r.de, r.ate) : null; };
+  // --- a tabela dos livros num lugar só ---
+  checar(C.LIVROS.length === 66 && Object.keys(capitulos).length === 66 && capitulos['Salmos'] === 150 && capitulos['Judas'] === 1,
+    'a tabela dos 66 mora em 01-nucleo.js, e o plano dá quantos capítulos cada livro tem');
+  const trilhaFonte = readFileSync(join(AQUI, 'src', 'app', '03-trilha.js'), 'utf8');
+  checar(!trilhaFonte.includes("'Deuteronômio': 'Dt'") && trilhaFonte.includes('CC.LIVROS.map') && html.split("['Deuteronômio', 0, 'Dt']").length === 2,
+    'a trilha monta as abreviaturas da tabela, e o index.html leva a tabela uma vez só');
+
+  // --- C. referências (casos 16 a 23) ---
+  checar(['Efésios 6:12', 'Ef 6.12', 'Ef 6:12', 'efésios 6,12', 'Efésios 6.12'].every((t) => refDe(t) === 'Efésios 6.12'), '16. as formas de Efésios 6.12 dão a mesma referência');
+  checar(['Lucas 11:24–26', 'Lc 11.24-26', 'Lucas 11.24 - 26'].every((t) => refDe(t) === 'Lucas 11.24-26'), '17. trecho com meia-risca, sigla ou espaço dá Lucas 11.24-26');
+  checar(['1 Pedro 5:8', '1Pe 5.8', '1 Pe 5.8', '1Pedro 5.8'].every((t) => refDe(t) === '1 Pedro 5.8'), '18. livro com número, junto ou separado, e a sigla dão 1 Pedro 5.8');
+  checar(refDe('Salmo 23.1') === 'Salmos 23.1' && refDe('Cantares 2.4') === 'Cânticos 2.4' && refDe('Cântico dos Cânticos 2.4') === 'Cânticos 2.4', '21. Salmo e Cantares são apelidos de Salmos e Cânticos');
+  checar(refDe('Efésios 6') === 'Efésios 6' && C.lerRefLivre('Efésios 6', capitulos).inteiro && refDe('Ef 6') === null, 'o capítulo inteiro vale com o nome do livro, nunca só com a sigla');
+  checar(refDe('Os 3 primeiros dias') === null && refDe('Os 3') === null && refDe('Efésios 99.1') === null && refDe('João 3.18-16') === null && refDe('Efésios 5.21-6.9') === null,
+    '22. sigla sem versículo, capítulo que não existe, trecho de trás para frente e trecho que cruza capítulos não são uma referência inteira');
+  {
+    const achadas = C.refsNoTexto('Os 3 primeiros dias, os números 3 e 4, Em Lucas 11:24–26, segundo 1 Pedro 5.8 e Efésios 5.21-6.9.', capitulos)
+      .map((r) => C.escreverRef(r.livro, r.cap, r.de, r.ate) + (r.maiuscula ? '' : ' (minúscula)'));
+    checar(JSON.stringify(achadas) === JSON.stringify(['Números 3 (minúscula)', 'Lucas 11.24-26', '1 Pedro 5.8', 'Efésios 5.21']),
+      'no meio de um texto, o leitor acha as referências, marca a minúscula e fica com a primeira parte do trecho que cruza capítulos');
+  }
+  checar(C.escreverRef('Efésios', 6, 12, 12) === 'Efésios 6.12' && C.escreverRef('Efésios', 6, 0, 0) === 'Efésios 6', 'escreverRef escreve o capítulo inteiro sem versículo');
 }
 
 // =========================================================================

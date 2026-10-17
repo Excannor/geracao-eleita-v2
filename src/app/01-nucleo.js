@@ -70,10 +70,83 @@ window.CC = window.CC || {};
     if (!(de >= 1) || ate < de || ate - de + 1 > CC.MAX_TRECHO) return null;
     return { livro: m[1], cap: Number(m[2]), de, ate };
   };
-  CC.escreverRef = (livro, cap, de, ate) => livro + ' ' + cap + '.' + de + (ate && ate !== de ? '-' + ate : '');
+  // Sem versículo ("de" 0), sai o capítulo inteiro: "Efésios 6".
+  CC.escreverRef = (livro, cap, de, ate) => livro + ' ' + cap + (de ? '.' + de + (ate && ate !== de ? '-' + ate : '') : '');
   CC.hrefDoVerso = (ref) => {
     const r = CC.lerRef(ref);
     return r ? '#/biblia/' + encodeURIComponent(r.livro) + '/' + r.cap : '#/biblia';
+  };
+
+  // Os 66, na ordem do cânon: o nome, o grupo da grade dos mapas (CC.GRUPOS_MAPA, 06b) e a sigla
+  // ("Ef 6.12"). O mapa do livro, a trilha, o estudo da célula e o servidor usam esta tabela;
+  // ferramentas/checar-mapa.mjs tem uma cópia, e o teste.mjs confere que as duas batem.
+  CC.LIVROS = [
+    ['Gênesis', 0, 'Gn'], ['Êxodo', 0, 'Êx'], ['Levítico', 0, 'Lv'], ['Números', 0, 'Nm'], ['Deuteronômio', 0, 'Dt'],
+    ['Josué', 1, 'Js'], ['Juízes', 1, 'Jz'], ['Rute', 1, 'Rt'], ['1 Samuel', 1, '1Sm'], ['2 Samuel', 1, '2Sm'],
+    ['1 Reis', 1, '1Rs'], ['2 Reis', 1, '2Rs'], ['1 Crônicas', 1, '1Cr'], ['2 Crônicas', 1, '2Cr'], ['Esdras', 1, 'Ed'],
+    ['Neemias', 1, 'Ne'], ['Ester', 1, 'Et'],
+    ['Jó', 2, 'Jó'], ['Salmos', 2, 'Sl'], ['Provérbios', 2, 'Pv'], ['Eclesiastes', 2, 'Ec'], ['Cânticos', 2, 'Ct'],
+    ['Isaías', 3, 'Is'], ['Jeremias', 3, 'Jr'], ['Lamentações', 3, 'Lm'], ['Ezequiel', 3, 'Ez'], ['Daniel', 3, 'Dn'],
+    ['Oseias', 4, 'Os'], ['Joel', 4, 'Jl'], ['Amós', 4, 'Am'], ['Obadias', 4, 'Ob'], ['Jonas', 4, 'Jn'], ['Miqueias', 4, 'Mq'],
+    ['Naum', 4, 'Na'], ['Habacuque', 4, 'Hc'], ['Sofonias', 4, 'Sf'], ['Ageu', 4, 'Ag'], ['Zacarias', 4, 'Zc'], ['Malaquias', 4, 'Ml'],
+    ['Mateus', 5, 'Mt'], ['Marcos', 5, 'Mc'], ['Lucas', 5, 'Lc'], ['João', 5, 'Jo'], ['Atos', 5, 'At'],
+    ['Romanos', 6, 'Rm'], ['1 Coríntios', 6, '1Co'], ['2 Coríntios', 6, '2Co'], ['Gálatas', 6, 'Gl'], ['Efésios', 6, 'Ef'],
+    ['Filipenses', 6, 'Fp'], ['Colossenses', 6, 'Cl'], ['1 Tessalonicenses', 6, '1Ts'], ['2 Tessalonicenses', 6, '2Ts'],
+    ['1 Timóteo', 6, '1Tm'], ['2 Timóteo', 6, '2Tm'], ['Tito', 6, 'Tt'], ['Filemom', 6, 'Fm'],
+    ['Hebreus', 7, 'Hb'], ['Tiago', 7, 'Tg'], ['1 Pedro', 7, '1Pe'], ['2 Pedro', 7, '2Pe'], ['1 João', 7, '1Jo'],
+    ['2 João', 7, '2Jo'], ['3 João', 7, '3Jo'], ['Judas', 7, 'Jd'],
+    ['Apocalipse', 8, 'Ap'],
+  ];
+  // Quantos capítulos cada livro tem: o maior capítulo que o plano lê dele (o plano passa pela Bíblia inteira).
+  CC.capitulosDoPlano = (plano) => {
+    const c = {};
+    for (const d of plano || []) for (const t of d.trechos || []) c[t.livro] = Math.max(c[t.livro] || 0, t.ate);
+    return c;
+  };
+
+  // Referência como a pessoa escreve: nome com ou sem acento, sigla da tabela ("Ef", "1Pe",
+  // "1 Pe"), "Salmo", "Cantares", "6:12", "6.12" ou "6,12", trecho com hífen, meia-risca ou
+  // travessão, ou o capítulo inteiro ("Efésios 6"). A expressão acha o candidato; a tabela decide
+  // se é livro. A sigla só vale com capítulo e versículo ("Os 3 primeiros" não é Oseias 3), e o
+  // trecho que passa para outro capítulo ("5.21-6.9") fica só na primeira parte.
+  const PADRAO_REF = '(?<![\\p{L}\\d])((?:[1-3] ?)?\\p{L}+(?: dos \\p{L}+)?) ?(\\d{1,3})(?:(?:: ?|\\.|,(?=\\d))(\\d{1,3})(?: ?[-\\u2013\\u2014] ?(\\d{1,3})(?! ?[.:,] ?\\d))?)?(?![\\d\\p{L}])';
+  CC.regexRef = () => new RegExp(PADRAO_REF, 'gu');
+  const chaveLivro = (s) => String(s).toLowerCase().replace(/\s+/g, '');
+  const LIVRO_DE = new Map();
+  const porLivro = (k, nome, sigla) => { if (!LIVRO_DE.has(k)) LIVRO_DE.set(k, [nome, sigla]); };
+  CC.LIVROS.forEach(([nome]) => porLivro(chaveLivro(nome), nome, false));
+  CC.LIVROS.forEach(([nome, , sigla]) => porLivro(chaveLivro(sigla), nome, sigla !== nome));
+  [['Salmo', 'Salmos'], ['Cantares', 'Cânticos'], ['Cântico dos Cânticos', 'Cânticos'], ['Atos dos Apóstolos', 'Atos']].forEach(([a, nome]) => porLivro(chaveLivro(a), nome, false));
+  // sem acento por último: "jo" já é a sigla de João, e Jó só se escreve com acento
+  [...LIVRO_DE].forEach(([k, v]) => porLivro(CC.semAcento(k), v[0], v[1]));
+  // Um achado da expressão vira { livro, cap, de, ate, inteiro, maiuscula } ou null. Com a lista
+  // de capítulos ({ livro: quantos }), o capítulo precisa existir.
+  CC.refDoAchado = (m, capitulos) => {
+    const v = LIVRO_DE.get(chaveLivro(m[1])) || LIVRO_DE.get(CC.semAcento(m[1]).replace(/\s+/g, ''));
+    if (!v) return null;
+    const cap = Number(m[2]);
+    const de = Number(m[3] || 0);
+    const ate = m[4] ? Number(m[4]) : de;
+    if (!cap || (v[1] && !de) || (m[3] && (de < 1 || ate < de)) || (capitulos && !(cap <= (capitulos[v[0]] || 0)))) return null;
+    return { livro: v[0], cap, de, ate, inteiro: !de, maiuscula: /^\P{L}*\p{Lu}/u.test(m[1]) };
+  };
+  // A referência inteira de um campo ou de uma linha sozinha ("efésios 6,12" vale): { livro, cap, de, ate, inteiro } ou null.
+  CC.lerRefLivre = (texto, capitulos) => {
+    const m = new RegExp('^' + PADRAO_REF + '$', 'u').exec(String(texto || '').replace(/\s+/g, ' ').trim());
+    const r = m && CC.refDoAchado(m, capitulos);
+    return r ? { livro: r.livro, cap: r.cap, de: r.de, ate: r.ate, inteiro: r.inteiro } : null;
+  };
+  // As referências no meio de um texto, em ordem: [{ inicio, fim, livro, cap, de, ate, inteiro, maiuscula }].
+  CC.refsNoTexto = (texto, capitulos) => {
+    const t = String(texto || '');
+    const re = CC.regexRef();
+    const achadas = [];
+    for (let m = re.exec(t); m; m = re.exec(t)) {
+      const r = CC.refDoAchado(m, capitulos);
+      if (r) achadas.push(Object.assign(r, { inicio: m.index, fim: m.index + m[0].length }));
+      else re.lastIndex = m.index + 1;
+    }
+    return achadas;
   };
 
   // No app instalado no iPhone a raiz nunca rola, mas o iOS rola a raiz sozinho para mostrar um
