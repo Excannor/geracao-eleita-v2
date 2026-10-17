@@ -536,7 +536,9 @@ window.CC = window.CC || {};
   }
 
   // Substitui o confirm() do navegador, que num aplicativo instalado parece um erro.
-  CC.confirmar = ({ titulo, texto, acao, perigo }) => new Promise((resolver) => {
+  // cancelar: o nome do segundo botão. Com nome próprio ("Sair"), ele vira contorno: as duas
+  // escolhas pesam igual; o "Cancelar" de sempre continua plano.
+  CC.confirmar = ({ titulo, texto, acao, perigo, cancelar }) => new Promise((resolver) => {
     const cortina = document.createElement('div');
     cortina.className = 'cortina';
     cortina.innerHTML = '<div class="folha" role="dialog" aria-modal="true">'
@@ -544,7 +546,7 @@ window.CC = window.CC || {};
       + (texto ? '<p>' + CC.esc(texto) + '</p>' : '')
       + '<div class="acoes">'
       + '<button class="botao' + (perigo ? ' vermelho' : '') + '" data-sim>' + CC.esc(acao || 'Confirmar') + '</button>'
-      + '<button class="botao plano" data-nao>Cancelar</button>'
+      + '<button class="botao ' + (cancelar ? 'contorno' : 'plano') + '" data-nao>' + CC.esc(cancelar || 'Cancelar') + '</button>'
       + '</div></div>';
     const fechar = (v) => { CC.sair(cortina); resolver(v); };
     cortina.querySelector('[data-sim]').onclick = () => fechar(true);

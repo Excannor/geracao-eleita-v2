@@ -464,6 +464,9 @@
 
   // ---------- marcação ----------
   CC.leu = (dia) => E.lidos.includes(Number(dia));
+  // O dia em que a pessoa marcou o dia do plano como lido ('' se não leu). Fica no aparelho dela:
+  // o "Você leu em" do estudo da célula é só para ela, e nada disso vai para a célula.
+  CC.lidoEm = (dia) => (CC.leu(dia) && E.marcadoEm[Number(dia)]) || '';
   CC.marcarLido = (dia, marcar) => {
     const n = Number(dia);
     const i = E.lidos.indexOf(n);
@@ -805,6 +808,8 @@
     E = VAZIO();
     try { localStorage.removeItem(CHAVE); } catch (e) { /* segue */ }
     try { localStorage.removeItem(CHAVE_ANTIGA); } catch (e) { /* segue */ }
+    // o rascunho do estudo da célula (estudo-preparo.js) é da conta que saiu
+    try { Object.keys(localStorage).filter((k) => k.startsWith('cc.rascunho.estudo.')).forEach((k) => localStorage.removeItem(k)); } catch (e) { /* segue */ }
   };
 
   // ---------- tema ----------

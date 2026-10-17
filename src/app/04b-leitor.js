@@ -28,7 +28,8 @@
   const gravarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* segue */ } };
 
   CC.biblias = () => BIBLIAS;
-  CC.traducao = () => BIBLIAS.find((b) => b.sigla === lerLocal(CHAVE_TRADUCAO)) || BIBLIAS[0] || null;
+  // Com sigla, aquela tradução (o estudo da célula fixa uma para todos); sem, a escolhida.
+  CC.traducao = (sigla) => (sigla && BIBLIAS.find((b) => b.sigla === sigla)) || BIBLIAS.find((b) => b.sigla === lerLocal(CHAVE_TRADUCAO)) || BIBLIAS[0] || null;
   CC.escolherTraducao = (sigla) => {
     gravarLocal(CHAVE_TRADUCAO, sigla);
     guardarNoAparelho();
@@ -68,8 +69,8 @@
   CC.carregarBiblia = carregar;
 
   // "Marcos 1.35" ou "João 3.16-17": devolve o texto na tradução escolhida.
-  CC.textoDoVersiculo = function (ref) {
-    const b = CC.traducao();
+  CC.textoDoVersiculo = function (ref, sigla) {
+    const b = CC.traducao(sigla);
     // Aceita trecho longo (o estudo da célula pode pedir "Romanos 8.1-39"), mas a citação
     // mostra no máximo MAX_TRECHO versículos: é um cartão, não o capítulo.
     const m = /^(.+?) (\d+)\.(\d+)(?:-(\d+))?/.exec(String(ref || ''));

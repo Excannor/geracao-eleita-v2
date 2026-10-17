@@ -80,7 +80,8 @@
   }
 
   // texto(): o texto do trecho (string ou promessa); aoMudar(o que): marca, nota ou fim.
-  function ligarBarra(barra, ref, texto, aoMudar) {
+  // sigla: a tradução do texto, quando não é a da pessoa (o estudo da célula).
+  function ligarBarra(barra, ref, texto, aoMudar, sigla) {
     const r = CC.lerRef(ref);
     barra.querySelectorAll('[data-cor]').forEach((b) => {
       b.onclick = () => {
@@ -111,7 +112,7 @@
       };
     }
     barra.querySelector('[data-copiar-verso]').onclick = async () => {
-      const t = CC.traducao();
+      const t = CC.traducao(sigla);
       const corpo = await Promise.resolve(texto()).catch(() => '');
       const certo = await CC.copiar((corpo ? '“' + corpo + '” ' : '') + ref + (t ? ' (' + t.abreviatura + ')' : ''));
       CC.avisar(certo ? 'Versículo copiado' : 'Não consegui copiar');
@@ -121,7 +122,7 @@
     // fora do app. "Juntos", acima, é outra coisa: mostra o versículo aos amigos dentro do app.
     const compartilhar = barra.querySelector('[data-compartilhar-verso]');
     if (compartilhar) {
-      const t = CC.traducao();
+      const t = CC.traducao(sigla);
       const pedido = async () => ({ tipo: 'versiculo', ref, texto: await Promise.resolve(texto()).catch(() => ''),
         traducao: t ? t.nome.replace(/Biblica® Open |™/g, '') : '' });
       // A imagem fica pronta pouco depois de a barra aparecer (o Safari só abre o
@@ -149,13 +150,12 @@
     oracao: 'Fale com Deus do seu jeito. De outras pessoas, use só o primeiro nome.',
     estudo: 'Ligue os versículos que se explicam. Sem título, a primeira linha vira o título.',
   };
-  // "romanos 5:8" vira "Romanos 5.8", com o nome do livro como está na Bíblia.
-  const LIVROS = () => (CC.COLECOES || []).flatMap(([, l]) => l);
+  // "romanos 5:8" ou "Rm 5.8" vira "Romanos 5.8", com o nome do livro como está na Bíblia. O
+  // leitor de referência é o do núcleo (o mesmo do estudo da célula); a nota pede o versículo.
   function lerRefDigitada(t) {
-    const m = /^\s*(.+?)\s+(\d{1,3})\s*[.:,]\s*(\d{1,3})(?:\s*-\s*(\d{1,3}))?\s*$/.exec(String(t || ''));
-    if (!m) return null;
-    const livro = LIVROS().find((l) => CC.semAcento(l).replace(/\s/g, '') === CC.semAcento(m[1]).replace(/\s/g, ''));
-    return livro ? (CC.lerRef(CC.escreverRef(livro, Number(m[2]), Number(m[3]), Number(m[4] || m[3]))) && CC.escreverRef(livro, Number(m[2]), Number(m[3]), Number(m[4] || m[3]))) : null;
+    const r = CC.lerRefLivre(String(t || '').replace(/\s*([.:,])\s*(?=\d)/g, '$1'));
+    const ref = r && !r.inteiro ? CC.escreverRef(r.livro, r.cap, r.de, r.ate) : '';
+    return ref && CC.lerRef(ref) ? ref : null;
   }
   const todasAsTags = () => [...new Set(CC.notas().flatMap((n) => n.tags))].sort();
 
@@ -476,6 +476,7 @@
   // ---------- no cartão de versículo ----------
   // Trecho longo demais para marcar (um capítulo inteiro no estudo da célula) fica sem barra.
   const acoesDoCartao = (ref, opcoes) => (CC.lerRef(ref) ? '<div class="acoes-verso no-cartao">' + barraHtml(ref, opcoes) + '</div>' : '');
+  // raiz: o próprio cartão (a barra é procurada dentro dele) ou algo que contenha um só.
   function ligarCartao(raiz, ref, texto, opcoes) {
     const barra = raiz.querySelector('.acoes-verso.no-cartao');
     if (!barra) return;
@@ -485,7 +486,7 @@
       const cor = r ? corDoTrecho(r) : 0;
       if (figura) for (const [n] of CORES) figura.classList.toggle('marca-' + n, cor === n);
       barra.innerHTML = barraHtml(ref, opcoes);
-      ligarBarra(barra, ref, () => texto, repintar);
+      ligarBarra(barra, ref, () => texto, repintar, opcoes && opcoes.sigla);
     };
     repintar();
   }

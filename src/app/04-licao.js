@@ -667,18 +667,26 @@
     });
   }
 
-  CC.cartaoVersiculo = (ref, texto, { semAcoes, escrever, rotuloCor } = {}) => {
-    const t = CC.traducao();
-    return '<figure class="cartao-versiculo' + (texto ? '' : ' sem-texto') + '">'
+  // sigla: a tradução do texto (o estudo da célula tem a dele); sem ela, a da pessoa. A figura
+  // leva a referência e a sigla, para cada cartão da tela ser ligado com o que é dele.
+  CC.cartaoVersiculo = (ref, texto, { semAcoes, escrever, rotuloCor, sigla } = {}) => {
+    const t = CC.traducao(sigla);
+    return '<figure class="cartao-versiculo' + (texto ? '' : ' sem-texto') + '" data-ref="' + CC.esc(ref) + '"' + (sigla ? ' data-sigla="' + CC.esc(sigla) + '"' : '') + '>'
       + (texto ? '<span class="aspas" aria-hidden="true">“</span><blockquote>' + CC.esc(texto) + '</blockquote>' : '')
       + '<figcaption><b>' + nb(CC.esc(ref)) + '</b>' + (t && texto ? ' · ' + CC.esc(t.abreviatura) : '') + '</figcaption>'
-      + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref, { escrever, rotuloCor }))
+      + (semAcoes ? '' : CC.versiculos.acoesDoCartao(ref, { escrever, rotuloCor, sigla }))
       + '</figure>';
   };
   // As ações são as mesmas dos leitores (04e-versiculos.js): marcar, nota, Juntos, copiar.
+  // Liga cada cartão de raiz com a referência, a tradução e o texto dele; ref vale só para um
+  // cartão sem data-ref. Antes só o primeiro da tela era ligado.
   CC.ligarCartaoVersiculo = (raiz, ref, opcoes) => {
-    const citacao = raiz.querySelector('.cartao-versiculo blockquote');
-    CC.versiculos.ligarCartao(raiz, ref, citacao ? citacao.textContent : '', opcoes);
+    const cartoes = raiz.matches && raiz.matches('.cartao-versiculo') ? [raiz] : [...raiz.querySelectorAll('.cartao-versiculo')];
+    for (const figura of cartoes) {
+      const citacao = figura.querySelector('blockquote');
+      const sigla = figura.dataset.sigla;
+      CC.versiculos.ligarCartao(figura, figura.dataset.ref || ref, citacao ? citacao.textContent : '', sigla ? Object.assign({}, opcoes, { sigla }) : opcoes);
+    }
   };
 
   // ---------- ir mais fundo ----------

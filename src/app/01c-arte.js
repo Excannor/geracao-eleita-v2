@@ -473,11 +473,18 @@
     el.innerHTML = '<div class="tela-cheia-palco">' + interno + '</div>'
       + (opcoes.pe ? '<div class="tela-cheia-pe">' + opcoes.pe + '</div>' : '');
     document.body.appendChild(el);
+    // fecharAoNavegar: a tela some na primeira troca de endereço (um link dentro dela, como
+    // "Abrir Efésios 6 na Bíblia", ou o voltar do celular); sem isso, só o Esc a fechava.
+    let fechada = false;
     const fechar = () => {
+      if (fechada) return;
+      fechada = true;
+      removeEventListener('hashchange', fechar);
       el.classList.add('saindo');
       setTimeout(() => el.remove(), CC.semMovimento() ? 0 : 180);
       if (origem && origem.focus && document.body.contains(origem)) origem.focus();
     };
+    if (opcoes.fecharAoNavegar) addEventListener('hashchange', fechar);
     if (opcoes.ligar) opcoes.ligar(el, fechar);
     const primeiro = el.querySelector('.tela-cheia-pe button, button');
     if (primeiro) primeiro.focus({ preventScroll: true });
