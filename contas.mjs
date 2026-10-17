@@ -401,7 +401,8 @@ function pedidoDeAprovacao(usuario, papel) {
 }
 
 // Quem conduz a célula: o líder e o auxiliar, enquanto forem membros ativos (quem sai perde o
-// papel, e o auxiliar também se virar visitante; o @ em criadoPor sozinho não conduz nada). É a mesma regra para o servidor decidir o que mostrar e para
+// papel, e o auxiliar também se virar visitante; o @ em criadoPor sozinho não conduz nada).
+// É a mesma regra para o servidor decidir o que mostrar e para
 // contas.mjs decidir o que aceitar. Menor de 18 à espera da aprovação da liderança não conduz
 // ainda: não vê o painel com nomes, a lista de atenção, a presença nem os pedidos reservados.
 export function podeConduzir(p, usuario) {

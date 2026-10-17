@@ -225,9 +225,10 @@
     if (s.tipo === 'palavra') {
       // o cartão cortado ganha o caminho para o capítulo, a não ser o do primeiro cartão, que já
       // tem o botão no alto do passo
+      const capitulo = (ref) => { const c = R.capituloDe(ref); return c ? c.livro + ' ' + c.cap : ''; };
       const noAlto = s.abrir ? s.abrir.livro + ' ' + s.abrir.cap : '';
-      return s.blocos.map((b) => (b.t === 'texto' ? '<p class="mesa-fala">' + R.negrito(b.texto) + '</p>'
-        : R.blocoEmHtml(b, { cartao: (c) => (noAlto && R.capituloDe(c.ref) && noAlto === R.capituloDe(c.ref).livro + ' ' + R.capituloDe(c.ref).cap ? cartaoComMais(c.ref, textos.get(c.ref) || '', sigla) : cartaoDaParte(c, textos, sigla, versiculos)) }))).join('');
+      const cartao = (c) => (noAlto && capitulo(c.ref) === noAlto ? cartaoComMais(c.ref, textos.get(c.ref) || '', sigla) : cartaoDaParte(c, textos, sigla, versiculos));
+      return s.blocos.map((b) => (b.t === 'texto' ? '<p class="mesa-fala">' + R.negrito(b.texto) + '</p>' : R.blocoEmHtml(b, { cartao }))).join('');
     }
     if (s.tipo === 'orar' && s.convite) {
       return '<div class="mesa-convite">' + CC.ico('oracao') + '<p>Os pedidos de oração ficam na aba Oração da célula, no celular de cada um. Eles não aparecem nesta tela.</p></div>';
