@@ -2,7 +2,7 @@
 // um auxiliar ativo, o auxiliar escolhido lidera a célula nova, quem foi escolhido sai da mãe
 // e entra na filha na mesma data, os limites continuam valendo, os avisos nunca vão para o
 // Feed e a leitura pessoal (estado.json) não muda com a mudança de célula.
-// Uso: node ferramentas/teste-multiplicar.mjs
+// Uso: node ferramentas/teste-multiplicar.mjs   (PORTA=<porta> para trocar a 8231)
 import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -10,7 +10,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8231;
+const PORTA = Number(process.env.PORTA) || 8231;
 const PASTA = join(tmpdir(), 'cc-multiplicar');
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 

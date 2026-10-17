@@ -1,14 +1,15 @@
 // Confere o link da célula: o líder cria o grupo sozinho, manda o link, e quem abre entra
 // direto (conta nova ou já existente), vira amigo de quem mandou, e a célula para em 20.
-// Uso: node ferramentas/teste-celula.mjs
+// Uso: node ferramentas/teste-celula.mjs   (PORTA=<porta> para trocar a 8209)
 import { spawn } from 'node:child_process';
-import { rmSync } from 'node:fs';
+import { rmSync, readFileSync } from 'node:fs';
+import { DatabaseSync } from '../db.mjs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8209;
+const PORTA = Number(process.env.PORTA) || 8209;
 const PASTA = join(tmpdir(), 'cc-celula');
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -250,6 +251,82 @@ try {
   doLider2 = (await propositos(lider2.cookie)).find((p) => p.id === id2);
   ok(doLider2.ultimoEncontro.presentes === 3 && doLider2.ultimoEncontro.visitantes === 0 && doLider2.encontrosRegistrados === 1,
     'regravar no mesmo dia troca o registro, sem virar um segundo encontro');
+
+  // ---------- o estudo da célula (À Mesa, docs/a-mesa-fase1.md, 6.4) ----------
+  console.log('\n  O estudo da célula: só o líder prepara\n');
+  const linhasDono = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo.txt'), 'utf8').replace(/\s+$/, '').split('\n');
+  linhasDono[linhasDono.length - 1] = 'Para guardar: ' + linhasDono[linhasDono.length - 1];
+  const doDono = { acao: 'estudo', estudo: 'blocos', fonte: linhasDono.join('\n'), traducao: 'nbv', perguntas: ['O que mais marcou você?', 'O que muda na sua semana?'], base: '' };
+  const retrato2 = async (cookie) => (await propositos(cookie)).find((p) => p.id === id2);
+  ok((await retrato2(lider2.cookie)).euPreparoEstudo === true && (await retrato2(mB.cookie)).euPreparoEstudo === false && (await retrato2(mB.cookie)).euConduzo === true,
+    'euPreparoEstudo vale só para o líder: o auxiliar conduz, mas não prepara');
+  for (const [quem, cookie] of [['o auxiliar', mB.cookie], ['um membro', mC.cookie], ['a visitante', visitaContaCookie], ['a Ana, de outra célula', ana.cookie]]) {
+    const r = await celula2(doDono, cookie);
+    ok(r.status === 403 && (await dados(r)).erro === 'só o líder da célula prepara o estudo', quem + ' não prepara o estudo: 403, "só o líder da célula prepara o estudo"');
+  }
+  ok((await celula2({ acao: 'estudo', acolhida: 'Oi' }, mB.cookie)).status === 403, 'o auxiliar também não grava acolhida, adoração e testemunho');
+  ok((await celula2({ acao: 'recado', texto: 'Encontro às 20h' }, mB.cookie)).status === 200, 'e continua com o recado (o registro do encontro já foi conferido acima)');
+
+  const salvo = await dados(await celula2(doDono, lider2.cookie));
+  const cartoes = (e) => (e && e.blocos ? e.blocos.filter((b) => b.t === 'versiculo').map((b) => b.ref) : []);
+  ok(salvo.ok && salvo.estudo && salvo.estudo.tipo === 'blocos' && salvo.estudo.titulo === 'Batalha espiritual, vigilância e Armadura de Deus'
+    && JSON.stringify(cartoes(salvo.estudo)) === JSON.stringify(['Efésios 6.12', '1 Pedro 5.8', 'Efésios 6.13-17', 'Efésios 6.18', 'Efésios 6.10']),
+  'o líder salva o estudo do dono e recebe de volta o estudo com os 5 cartões');
+  ok(salvo.estudo.fonte && !/A nossa luta|Orem no Espírito|Fortaleça-se/.test(salvo.estudo.fonte) && salvo.estudo.criadoPor === 'lider2' && salvo.estudo.criadoPorNome === 'lider2',
+    'a fonte que volta ao líder já vem sem as citações da NVI, com o @ de quem preparou');
+  const doMembroE = (await retrato2(mC.cookie)).estudo;
+  ok(doMembroE && doMembroE.id === salvo.estudo.id && doMembroE.blocos.length === 32 && !('fonte' in doMembroE) && !('texto' in doMembroE)
+    && JSON.stringify(doMembroE.perguntas) === JSON.stringify(doDono.perguntas) && doMembroE.traducao === 'nbv', 'o membro recebe as partes e as perguntas, mas não a fonte');
+  ok(!/A nossa luta|Orem no Espírito/.test(JSON.stringify(doMembroE)), 'no que o membro recebe não há texto bíblico de outra tradução');
+  ok(!('fonte' in (await retrato2(mB.cookie)).estudo), 'o auxiliar também não recebe a fonte: ele vê o estudo como membro');
+  const doVisitante = (await retrato2(visitaContaCookie)).estudo;
+  ok(doVisitante && doVisitante.id === salvo.estudo.id && doVisitante.blocos.length === 32, 'a visitante também vê o estudo');
+  const doLiderE = (await retrato2(lider2.cookie)).estudo;
+  ok(doLiderE.fonte === salvo.estudo.fonte && doLiderE.criadoPorNome === 'lider2', 'o líder recebe a fonte, para "Mudar o estudo"');
+
+  const recusa = async (corpo) => { const r = await celula2({ acao: 'estudo', ...corpo }, lider2.cookie); return r.status + ' ' + (await dados(r)).erro; };
+  ok(await recusa({ estudo: 'blocos', fonte: 'x'.repeat(10001) }) === '400 o estudo tem no máximo 10.000 caracteres', 'texto puro de 10.001 caracteres: 400');
+  ok(await recusa({ ...doDono, perguntas: ['1', '2', '3', '4', '5', '6', '7'] }) === '400 escolha até 6 perguntas', '7 perguntas: 400');
+  ok(await recusa({ ...doDono, traducao: 'nvi' }) === '400 escolha a NBV ou a Bíblia Livre', 'a tradução "nvi": 400');
+  ok(await recusa({ estudo: 'blocos', fonte: '1. Um tópico logo de cara\nTexto' }) === '400 escreva o título na primeira linha, com até 120 caracteres', 'o estudo sem título: 400');
+  ok((await retrato2(mC.cookie)).estudo.id === salvo.estudo.id, 'as recusas não mexeram no estudo');
+
+  // só os 4 Ws: o estudo fica
+  ok((await celula2({ acao: 'estudo', acolhida: 'O que fez você rir nos últimos dias?' }, lider2.cookie)).status === 200
+    && (await retrato2(mC.cookie)).estudo.id === salvo.estudo.id && (await retrato2(mC.cookie)).estudoAcolhida === 'O que fez você rir nos últimos dias?',
+  'gravar só a acolhida não tira o estudo');
+  // mudar o mesmo estudo e depois um estudo novo: o anterior fica na tabela
+  const mudado = await dados(await celula2({ ...doDono, traducao: 'blivre', base: salvo.estudo.id }, lider2.cookie));
+  ok(mudado.estudo.id === salvo.estudo.id && mudado.estudo.traducao === 'blivre' && mudado.estudo.editadoEm, '"Mudar o estudo" com a base atual atualiza o mesmo estudo');
+  const segundo = await dados(await celula2({ acao: 'estudo', estudo: 'trecho', ref: 'Rm 8:28–30', fonte: 'Tudo coopera para o bem.' }, lider2.cookie));
+  ok(segundo.estudo && segundo.estudo.id !== salvo.estudo.id && segundo.estudo.ref === 'Romanos 8.28-30' && (await retrato2(mC.cookie)).estudo.texto === 'Tudo coopera para o bem.',
+    'um estudo novo passa a ser o atual');
+  {
+    const db = new DatabaseSync(join(PASTA, 'caminho.db'), { readOnly: true });
+    try {
+      const linhas = db.prepare('SELECT id, criado_por, atual_ate FROM celula_estudos WHERE proposito = ? ORDER BY criado_em').all(id2);
+      ok(linhas.length === 2 && linhas[0].id === salvo.estudo.id && linhas[0].atual_ate !== '' && linhas[1].atual_ate === '' && linhas.every((l) => l.criado_por === 'lider2'),
+        'o segundo estudo deixa duas linhas na tabela: o anterior fica, marcado como não atual');
+      ok(db.prepare('SELECT estudo_id FROM propositos WHERE id = ?').get(id2).estudo_id === segundo.estudo.id, 'a célula aponta para o estudo atual');
+    } finally { db.close(); }
+  }
+  ok((await celula2({ acao: 'estudo', estudo: '' }, lider2.cookie)).status === 200 && (await retrato2(mC.cookie)).estudo === null, 'o líder tira o estudo');
+  {
+    const db = new DatabaseSync(join(PASTA, 'caminho.db'), { readOnly: true });
+    try { ok(db.prepare('SELECT count(*) n FROM celula_estudos WHERE proposito = ?').get(id2).n === 2, 'tirar o estudo deixa as linhas no banco'); } finally { db.close(); }
+  }
+
+  // quem preparou apaga a conta: o estudo fica na célula, com o @
+  const liderE = await criar('lidere', { nascimento: '2004-04-05' });
+  const idE = (await dados(await pedir('/api/celula', { acao: 'criar', titulo: 'Estudo fica' }, liderE.cookie))).proposito.id;
+  const tokenE = new URL((await dados(await pedir('/api/celula', { acao: 'link', id: idE }, liderE.cookie))).link).searchParams.get('celula');
+  const mE1 = await criar('membroe1', { nascimento: '2004-04-05', celula: tokenE });
+  await criar('membroe2', { nascimento: '2004-04-05', celula: tokenE });
+  ok((await pedir('/api/celula', { ...doDono, id: idE }, liderE.cookie)).status === 200, 'outro líder salva um estudo');
+  ok((await pedir('/api/apagar-conta', { senha: 'senha123' }, liderE.cookie)).status === 200, 'e apaga a própria conta');
+  const ficou = (await propositos(mE1.cookie)).find((p) => p.id === idE);
+  ok(ficou && ficou.estudo && ficou.estudo.criadoPor === 'lidere' && ficou.estudo.criadoPorNome === '@lidere' && ficou.estudo.blocos.length === 32,
+    'o estudo continua na célula, com o @ de quem preparou');
 
   // ---------- quem precisa de atenção ----------
   console.log('\n  Quem precisa de atenção\n');
