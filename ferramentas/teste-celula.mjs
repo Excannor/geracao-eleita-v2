@@ -327,6 +327,39 @@ try {
   const ficou = (await propositos(mE1.cookie)).find((p) => p.id === idE);
   ok(ficou && ficou.estudo && ficou.estudo.criadoPor === 'lidere' && ficou.estudo.criadoPorNome === '@lidere' && ficou.estudo.blocos.length === 32,
     'o estudo continua na célula, com o @ de quem preparou');
+  {
+    // o @ de quem apagou a conta fica guardado: outra pessoa não vira a líder nem a autora dos estudos
+    const intruso = await criar('lidere', { nascimento: '2004-04-05' });
+    ok(intruso.status === 400 && intruso.corpo.erro === 'esse @ já existe', 'uma conta nova não pega o @ de quem apagou a conta e deixou a célula e o estudo');
+    ok((await propositos(mE1.cookie)).find((p) => p.id === idE).estudo.criadoPorNome === '@lidere', '"preparado por" continua com o @');
+  }
+  {
+    // o líder que saiu da célula não prepara mais o estudo dela
+    const liderS = await criar('liders', { nascimento: '2004-04-05' });
+    const idS = (await dados(await pedir('/api/celula', { acao: 'criar', titulo: 'Quem saiu' }, liderS.cookie))).proposito.id;
+    const tokenS = new URL((await dados(await pedir('/api/celula', { acao: 'link', id: idS }, liderS.cookie))).link).searchParams.get('celula');
+    const mS1 = await criar('membros1', { nascimento: '2004-04-05', celula: tokenS });
+    await criar('membros2', { nascimento: '2004-04-05', celula: tokenS });
+    ok((await pedir('/api/propositos', { acao: 'sair', id: idS }, liderS.cookie)).status === 200, 'o líder sai da própria célula');
+    const r = await pedir('/api/celula', { ...doDono, id: idS }, liderS.cookie);
+    ok(r.status === 403 && (await propositos(mS1.cookie)).find((p) => p.id === idS).estudo === null, 'e não grava mais o estudo dela: 403');
+    ok((await pedir('/api/celula', { acao: 'recado', id: idS, texto: 'Oi' }, liderS.cookie)).status === 403 && (await pedir('/api/celula', { acao: 'remover', id: idS, usuario: 'membros2' }, liderS.cookie)).status === 403,
+      'nem escreve o recado ou tira alguém: quem saiu não lidera');
+
+    // quem só foi convidado (e não aceitou) não recebe o estudo
+    const amiga = await criar('amigas', { nascimento: '2004-04-05' });
+    await pedir('/api/amizade', { acao: 'pedir', usuario: 'amigas' }, mS1.cookie);
+    await pedir('/api/amizade', { acao: 'aceitar', usuario: 'membros1' }, amiga.cookie);
+    const liderS2 = await criar('liders2', { nascimento: '2004-04-05' });
+    const idS2 = (await dados(await pedir('/api/celula', { acao: 'criar', titulo: 'Convite' }, liderS2.cookie))).proposito.id;
+    const tokenS2 = new URL((await dados(await pedir('/api/celula', { acao: 'link', id: idS2 }, liderS2.cookie))).link).searchParams.get('celula');
+    await pedir('/api/celula', { acao: 'entrar', token: tokenS2 }, mS1.cookie);
+    ok((await pedir('/api/celula', { ...doDono, id: idS2 }, liderS2.cookie)).status === 200, 'o líder de outra célula salva o estudo');
+    ok((await pedir('/api/propositos', { acao: 'convidar', id: idS2, usuario: 'amigas' }, mS1.cookie)).status === 200, 'um membro convida uma amiga para essa célula');
+    const daAmiga = (await propositos(amiga.cookie)).find((p) => p.id === idS2);
+    ok(daAmiga && daAmiga.euConvidado === true && daAmiga.estudo === null && daAmiga.estudoAcolhida === '', 'antes de aceitar, a convidada não recebe o estudo');
+    ok((await propositos(mS1.cookie)).find((p) => p.id === idS2).estudo.blocos.length === 32, 'quem é da célula continua recebendo');
+  }
 
   // ---------- quem precisa de atenção ----------
   console.log('\n  Quem precisa de atenção\n');

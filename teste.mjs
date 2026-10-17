@@ -1675,6 +1675,17 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
   checar(linhas("SELECT count(*) n FROM celula_estudos WHERE criado_por = 'lider'")[0].n === 6 && ce.proposito(ID).estudoId === r7.estudo.id,
     'apagar a conta do líder deixa os estudos dele na célula');
   checar(estudoNoRetrato(ce.estudo(r7.estudo.id), {}).criadoPorNome === '@lider', 'sem a conta, "preparado por" mostra o @');
+  checar(await tentar(() => nova('lider')) === 'esse @ já existe|400' && await tentar(() => nova('outro2')) === '',
+    'o @ de quem apagou a conta e deixou estudos na célula fica guardado: uma conta nova não o pega');
+  {
+    // quem sai da célula deixa de ser o líder dela, mesmo com o @ em criadoPor
+    const sai = await ce.criarCelula('outro2', { titulo: 'Sai' }, hojeTeste);
+    const t2 = ce.gerarLinkCelula('outro2', sai.id, assinar).token;
+    for (const u of ['aux', 'ana']) await ce.entrarNaCelula(u, t2, assinar, hojeTeste);
+    await ce.sairDoProposito('outro2', sai.id, hojeTeste);
+    checar(await tentar(() => ce.salvarEstudo('outro2', sai.id, doDono, opcoes())) === MSG_ESTUDO.soLider + '|403'
+      && /só o líder da célula pode fazer isso\|403/.test(await tentar(() => ce.definirAuxiliar('outro2', sai.id, 'ana', true))), 'o líder que saiu da célula recebe 403 no estudo e no que é só do líder');
+  }
 
   fecharBanco(arquivoDoBanco(pastaE));
   rmSync(pastaE, { recursive: true, force: true });

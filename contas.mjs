@@ -400,13 +400,13 @@ function pedidoDeAprovacao(usuario, papel) {
   return { usuario, papel, estado: 'pendente', pedidoEm: new Date().toISOString(), decididoPor: '', decididoEm: '' };
 }
 
-// Quem conduz a célula: o líder sempre, e o auxiliar enquanto for membro ativo (perde o papel
-// se sair ou virar visitante). É a mesma regra para o servidor decidir o que mostrar e para
+// Quem conduz a célula: o líder e o auxiliar, enquanto forem membros ativos (quem sai perde o
+// papel, e o auxiliar também se virar visitante; o @ em criadoPor sozinho não conduz nada). É a mesma regra para o servidor decidir o que mostrar e para
 // contas.mjs decidir o que aceitar. Menor de 18 à espera da aprovação da liderança não conduz
 // ainda: não vê o painel com nomes, a lista de atenção, a presença nem os pedidos reservados.
 export function podeConduzir(p, usuario) {
   if (!p || !usuario) return false;
-  if (p.criadoPor === usuario) return !aprovacaoQueFalta(p, usuario, 'lider');
+  if (p.criadoPor === usuario) return p.membros.some((m) => m.usuario === usuario && m.estado === 'ativo') && !aprovacaoQueFalta(p, usuario, 'lider');
   return p.membros.some((m) => m.usuario === usuario && m.estado === 'ativo' && m.papel === 'auxiliar')
     && !aprovacaoQueFalta(p, usuario, 'auxiliar');
 }
@@ -527,13 +527,21 @@ export class Contas {
   perfilCompleto(conta) { return !!(conta && conta.email && conta.nascimento); }
 
   // ---------- conta ----------
+  // O @ de quem apagou a conta continua guardado quando ficou numa célula: como quem a criou
+  // (criadoPor) ou como quem preparou um estudo dela (celula_estudos, decisão do dono de 17/10).
+  // Uma conta nova com esse @ passaria a ser a líder da célula e a autora dos estudos.
+  arrobaGuardado(chave) {
+    if (Object.values(this.dados.propositos || {}).some((p) => p.grupo && p.criadoPor === chave)) return true;
+    return !!this.banco().prepare('SELECT 1 FROM celula_estudos WHERE criado_por = ? LIMIT 1').get(chave);
+  }
+
   async criar(dados, { exigirPerfil = true } = {}) {
     const { usuario, senha, nome, email, nascimento, fuso } = dados || {};
     const chave = limparNome(usuario);
     if (!nomeValido(chave)) {
       throw erro('o @ aceita letras minúsculas, números, ponto, hífen e sublinhado, de 2 a 30 caracteres');
     }
-    if (this.achar(chave)) throw erro('esse @ já existe');
+    if (this.achar(chave) || (exigirPerfil && this.arrobaGuardado(chave))) throw erro('esse @ já existe');
     // Na importação de conta antiga (sem exigirPerfil) o nome que veio fica inteiro.
     const nomeLimpo = exigirPerfil ? nomeDigitado(nome) : String(nome || '').trim();
     if (exigirPerfil && !nomeLimpo) throw erro('diga como quer ser chamado');
@@ -1303,11 +1311,13 @@ export class Contas {
   // Quem criou a célula é o líder: escolhe o dia do encontro, deixa um recado para todos e pode
   // tirar alguém. Ver quem leu cada dia já é de todos os membros; o líder vê a mais só o número
   // da semana do grupo inteiro, nunca uma lista de quem faltou.
+  // O líder é quem criou a célula e continua nela: quem saiu (ou uma conta nova com o @ de quem
+  // apagou a conta) não lidera mais nada por ter o @ em criadoPor.
   celulaDoLider(eu, id) {
     const a = this.exigirCompleto(eu);
     const p = this.proposito(id);
     if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
-    if (p.criadoPor !== a.usuario) throw erro('só o líder da célula pode fazer isso', 403);
+    if (p.criadoPor !== a.usuario || !this.ativosDe(p).some((m) => m.usuario === a.usuario)) throw erro('só o líder da célula pode fazer isso', 403);
     if (aprovacaoQueFalta(p, a.usuario, 'lider')) throw erro(AGUARDANDO_APROVACAO, 403);
     return p;
   }
@@ -1385,7 +1395,7 @@ export class Contas {
     const a = this.exigirCompleto(eu);
     const p = this.proposito(id);
     if (!p || p.encerradoEm || !p.celula) throw erro('célula não encontrada', 404);
-    if (p.criadoPor !== a.usuario) throw erro(MSG_ESTUDO.soLider, 403);
+    if (p.criadoPor !== a.usuario || !this.ativosDe(p).some((m) => m.usuario === a.usuario)) throw erro(MSG_ESTUDO.soLider, 403);
     if (aprovacaoQueFalta(p, a.usuario, 'lider')) throw erro(AGUARDANDO_APROVACAO, 403);
     return p;
   }

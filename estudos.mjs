@@ -141,13 +141,14 @@ export function estudoDaLinha(l) {
 // da célula, visitantes inclusive. A fonte do estudo escrito só vai para quem prepara: é ela que
 // volta ao campo em "Mudar o estudo", e quem só lê recebe as partes já divididas. Em semana, trecho
 // e no escrito de antes da v19 (livre), a fonte é a palavra do líder e vai como "texto".
-// nomeDe(@) dá o nome de exibição de quem preparou (ou o @, se a conta não existe mais).
+// nomeDe(@, criadoEm) dá o nome de exibição de quem preparou (ou o @, se a conta não existe mais,
+// ou se a conta com esse @ nasceu depois do estudo).
 export function estudoNoRetrato(e, { souQuemPrepara = false, nomeDe = (u) => '@' + u } = {}) {
   if (!e) return null;
   const saida = {
     id: e.id, tipo: e.tipo, titulo: e.titulo, ref: e.ref, planoAte: e.planoAte,
     blocos: e.blocos, refs: e.refs, perguntas: e.perguntas, traducao: e.traducao,
-    criadoPor: e.criadoPor, criadoPorNome: e.criadoPor ? nomeDe(e.criadoPor) : '',
+    criadoPor: e.criadoPor, criadoPorNome: e.criadoPor ? nomeDe(e.criadoPor, e.criadoEm) : '',
     em: e.criadoEm, editadoEm: e.editadoEm,
   };
   if (e.tipo !== 'blocos') saida.texto = e.fonte;

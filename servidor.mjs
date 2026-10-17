@@ -830,12 +830,13 @@ function bannerMultiplicacao(p, referencia) {
 }
 
 // O nome de quem preparou o estudo, como a célula o vê: o apelido ou o primeiro nome; sem a conta
-// (apagada), o @, porque os estudos ficam na célula (decisão do dono, 17/10).
-function nomeNaCelula(info, usuario) {
+// (apagada), o @, porque os estudos ficam na célula (decisão do dono, 17/10). Uma conta criada
+// depois do estudo não é quem o preparou, mesmo com o mesmo @: aparece o @.
+function nomeNaCelula(info, usuario, desde = '') {
   const x = info.get(usuario);
-  if (x) return primeiroNome((x.estado && x.estado.apelido) || x.conta.nome || usuario);
-  const c = CONTAS.achar(usuario);
-  return c ? primeiroNome(c.nome || usuario) : '@' + usuario;
+  const conta = (x && x.conta) || CONTAS.achar(usuario);
+  if (!conta || (desde && conta.criadaEm && conta.criadaEm > String(desde).slice(0, 10))) return '@' + usuario;
+  return primeiroNome((x && x.estado && x.estado.apelido) || conta.nome || usuario);
 }
 
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
@@ -844,14 +845,17 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const conduzo = podeConduzir(p, eu);
   // Só o líder prepara, muda ou tira o estudo; o auxiliar o vê como membro. A tela decide por
   // isto, nunca por euConduzo.
-  const euPreparoEstudo = p.criadoPor === eu && !aprovacaoQueFalta(p, eu, 'lider');
+  const minha = p.membros.find((m) => m.usuario === eu) || {};
+  const convidado = minha.estado === 'convidado';
+  const euPreparoEstudo = p.criadoPor === eu && minha.estado === 'ativo' && !aprovacaoQueFalta(p, eu, 'lider');
   const extra = {
     encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
-    // para quem prepara (estudos.mjs, estudoNoRetrato).
-    estudo: estudoNoRetrato(CONTAS.estudo(p.estudoId), { souQuemPrepara: euPreparoEstudo, nomeDe: (u) => nomeNaCelula(info, u) }),
+    // para quem prepara (estudos.mjs, estudoNoRetrato). Quem só foi convidado e ainda não aceitou
+    // não é da célula (privacidade, seção 7): não recebe o estudo nem o roteiro dele.
+    estudo: convidado ? null : estudoNoRetrato(CONTAS.estudo(p.estudoId), { souQuemPrepara: euPreparoEstudo, nomeDe: (u, desde) => nomeNaCelula(info, u, desde) }),
     euPreparoEstudo,
-    estudoAcolhida: p.estudoAcolhida || '', estudoAdoracao: p.estudoAdoracao || '', estudoTestemunho: p.estudoTestemunho || '',
+    estudoAcolhida: (!convidado && p.estudoAcolhida) || '', estudoAdoracao: (!convidado && p.estudoAdoracao) || '', estudoTestemunho: (!convidado && p.estudoTestemunho) || '',
     euConduzo: conduzo,
     // Menor de 18 à espera da aprovação da liderança: o papel que espera ('lider'/'auxiliar'),
     // para a tela avisar; e se a célula inteira espera (o líder dela), para não oferecer o link.
