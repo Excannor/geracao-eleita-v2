@@ -222,11 +222,19 @@
   }
 
   // ---------- Estudos anteriores: a lista (docs/a-mesa-fase2.md, 4.3) ----------
-  // Fica na memória da peça durante a sessão, por célula; registrar um encontro ou salvar um
-  // estudo a esquece (esquecer). Nenhuma contagem de leitura, presença ou anotação na lista.
+  // Fica na memória da peça durante a sessão, por célula e pela versão do retrato (versao): o
+  // estudo atual, a última mudança dele e, para quem conduz, o último encontro. Assim o estudo que
+  // o líder preparou em outro aparelho, e o encontro que alguém registrou, chegam com a
+  // sincronização. Salvar ou tirar o estudo e registrar um encontro neste aparelho também a
+  // esquecem (esquecer). Nenhuma contagem de leitura, presença ou anotação na lista.
   const listas = new Map();
   const leituras = new Map();
   const maeAberta = new Set();
+  const versao = (p) => {
+    const e = p.estudo || {};
+    const u = p.ultimoEncontro || {};
+    return [e.id || '', e.editadoEm || '', u.data || '', u.presentes || 0, u.visitantes || 0, u.semEncontro ? 1 : 0, (u.estudo && u.estudo.id) || ''].join(':');
+  };
   function esquecer(celula) {
     for (const k of [...listas.keys(), ...leituras.keys()]) if (k.startsWith(celula + '|')) { listas.delete(k); leituras.delete(k); }
   }
@@ -238,7 +246,7 @@
   // Pede uma página (de: '' para os da própria célula, 'mae' para os da célula de origem) e
   // desenha a lista dentro de "alvo", acrescentando as páginas seguintes em "Ver mais estudos".
   async function carregarLista(alvo, p, de) {
-    const chave = p.id + '|' + de;
+    const chave = p.id + '|' + de + '|' + versao(p);
     const desenhar = (l) => {
       alvo.innerHTML = (l.itens.length ? '<div class="mesa-anteriores">' + l.itens.map((x) => linhaAnterior(p, x)).join('') + '</div>' : '')
         + (l.mais ? '<button type="button" class="botao contorno pequeno mesa-mais-estudos" data-mais-estudos>Ver mais estudos</button>' : '')
@@ -288,7 +296,7 @@
     // a lista da célula de origem abre no toque e continua aberta nos redesenhos da sessão
     const daMae = alvo.querySelector('[data-lista-mae]');
     if (daMae) {
-      if (listas.has(p.id + '|mae') || maeAberta.has(p.id)) carregarLista(daMae, p, 'mae');
+      if (maeAberta.has(p.id)) carregarLista(daMae, p, 'mae');
       else daMae.querySelector('[data-ver-mae]').onclick = () => { maeAberta.add(p.id); carregarLista(daMae, p, 'mae'); };
     }
   }
@@ -316,7 +324,7 @@
   }
 
   async function anterior(painel, p, apoio, alvo, aindaAqui) {
-    const chave = p.id + '|' + alvo;
+    const chave = p.id + '|' + alvo + '|' + versao(p);
     let r = leituras.get(chave);
     if (!r) {
       painel.innerHTML = CC.esqueleto('texto');
@@ -469,7 +477,6 @@
       return;
     }
     if (location.hash !== aqui) return;
-    leituras.set(r.celula + '|' + estudo, r);
     CC.substituirRota(apoio.endereco(r.celula, 'estudo') + (r.atual ? '' : '/' + encodeURIComponent(estudo)));
   }
 

@@ -311,6 +311,8 @@
           await CC.api('api/celula', { acao: 'estudo', id: p.id, estudo: '' });
         } catch (e) { mostrarErro(painel, [mensagemDe(e)]); return; }
         apagarRascunho(p.id);
+        // o estudo tirado entra em Estudos anteriores
+        if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
         await apoio.carregar();
         CC.substituirRota(apoio.endereco(p.id, 'estudo'));
         CC.avisar('Estudo tirado', { tipo: 'certo' });

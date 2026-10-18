@@ -1437,6 +1437,8 @@
             await CC.api('api/celula', { acao: 'registrarEncontro', id: p.id, data: dataEscolhida, semEncontro: true, presentes: [], visitantes: 0 });
             fechar();
             CC.avisar('Semana registrada sem encontro');
+            // a lista e a leitura dos anteriores mudam (a data e a presença daquele dia)
+            if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
             recarregar();
           } catch (e) {
             botao.disabled = false;
