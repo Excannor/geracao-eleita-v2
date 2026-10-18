@@ -1130,3 +1130,24 @@ Os commits `84df4ea` (S1, v20), `88ac87f` (S2, regras puras), `5254d33` (S3, con
 - **`ferramentas/teste-estudo-historico.mjs`** tem a parte A e a multiplicação pela API (38 verificações). As partes B e C no navegador entram no lugar marcado no arquivo. O S1 dele já tem os 6 cartões (a linha de Lucas 11.24-26 entra depois do parágrafo, como a sugestão aceita na prévia), e o servidor é religado uma vez para as entradas na célula e as contas voltarem 10 dias.
 
 Ficam para o dono as quatro decisões da seção 11 (A2, A5, as notificações com "Bora" e o aviso no sino).
+
+---
+
+## 13. O que o bloco CLIENTE entregou (18/10)
+
+Os commits `18374e3` (C1, a anotação com lugar próprio e as gírias), `824b8dd` (C2, as regras puras), `c46cba9` (C3, a casca), `51ca4e7` (C4, a peça `estudo-celula`), `dd2cef0` (C5, o preparo) e `7992401` (C6, a prova no navegador). A folga do `dist/index.html` foi de 77,0 para **70,1 KB** (o piso é 60). O que mudou em relação às seções 4 a 9:
+
+- **O título na lista e na folha de registro quebra em quantas linhas precisar**, sem `-webkit-line-clamp`: a revisão de UI trata título cortado com reticências como defeito.
+- **"Quem não veio", o `quando`:** até 6 dias atrás, o dia da semana ("de quinta"); com 7, o mesmo dia da semana de hoje, a data ("de 11/10"), para não parecer o encontro de hoje. "Copiar" é `botao contorno pequeno`, ao lado do WhatsApp.
+- **`#/estudo/<id>` mora na peça** (`CC.estudoCelula.solto`): a casca só pede a peça. Foram 0,9 KB a menos no index.
+- **"Escrever minha anotação" é botão secundário** na aba e na leitura: o principal da aba continua "Mandar no grupo".
+- **Na impressão, "preparado por você" vira o nome** de quem preparou: a folha é lida por outras pessoas.
+- **A confirmação de "Usar como base"** usa o "Cancelar" de sempre (plano); só `true` segue.
+- **A visitante que chega a um anterior por `#/estudo/<id>`** recebe "Ver o estudo atual" para `#/celula`: o 403 não diz de que célula ela é.
+- **O estudo anterior é tela própria para a rolagem** (`telaDe`, `10-roteador.js`): abre no alto, e o voltar devolve a lista na altura em que estava.
+- **As abas da célula a 360 px:** com cinco abas (quem conduz) e o ponto do estudo, "Hoje" ficava com 39 px de largura desde a Fase 1. A 374 px ou menos, as abas têm menos respiro e 44 px de largura mínima.
+- **A lista da célula de origem** continua aberta nos redesenhos da sessão (a sincronização redesenhava a seção e o toque em "Ver os estudos" se perdia).
+- **A semeadura** (`design/ferramentas/semear.mjs`) liga o estudo anterior ao encontro de hoje, não ao de 7 dias atrás: pela API, o encontro só pode ser de um dia em que o estudo já existia.
+- **`teste-estudo-historico`, partes B e C:** 156 verificações com as medidas (128 com `RAPIDO=1`). A prova de que nada manda mensagem olha os pedidos com corpo (só o registro e a sincronização do próprio estado) e a caixa do sino no banco; as leituras de depois do registro (`api/propositos`, `api/estudos`) são o redesenho. As capturas da impressão aplicam as regras do `@media print` na tela, porque a captura de tela não usa a mídia emulada; o PDF em A4 é conferido pelo `MediaBox`.
+
+Ficam para o dono as quatro decisões da seção 11 e as frases com "Bora" das notificações (seção 6.2).
