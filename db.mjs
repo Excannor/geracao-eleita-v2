@@ -309,6 +309,15 @@ const ESQUEMA = [
   `
   ALTER TABLE propositos ADD COLUMN multiplicada_instante TEXT NOT NULL DEFAULT '';
   `,
+  // v22: os estudos que já estavam guardados quando o histórico passou a existir (os da Fase 1 e os
+  // de antes da v19) ganham a marca antes_do_historico. Quando deixam de ser o atual, ficam só para
+  // quem estava na célula enquanto eles eram o atual: foram escritos quando ninguém mais os via, e
+  // abrir para quem entrou depois ampliaria o que essas pessoas veem sem o aviso que a política
+  // promete (privacidade, seção 15). Os estudos gravados daqui em diante nascem sem a marca.
+  `
+  ALTER TABLE celula_estudos ADD COLUMN antes_do_historico INTEGER NOT NULL DEFAULT 0;
+  UPDATE celula_estudos SET antes_do_historico = 1;
+  `,
 ];
 
 function migrarEsquema(db) {

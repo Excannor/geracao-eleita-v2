@@ -221,10 +221,17 @@ Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
       && dbV7.prepare("SELECT estudo FROM celula_encontros WHERE proposito = 'p1' AND data = '2026-01-08'").get().estudo === '',
     'o estudo que já estava fica sem combinado, e o encontro sem o estudo ligado ("" é "não se sabe")');
     dbV7.prepare("UPDATE celula_encontros SET estudo = 'lp2' WHERE proposito = 'p1' AND data = '2026-01-08'").run();
-    // v21: a filha guarda o instante da multiplicação
-    ok(B.versaoDoEsquema() >= 21 && colunas('propositos').includes('multiplicada_instante')
+    // v21: a filha guarda o instante da multiplicação; v22: o estudo que já estava guardado
+    // ganha a marca antes_do_historico, e o gravado depois nasce sem ela
+    ok(B.versaoDoEsquema() >= 22 && colunas('propositos').includes('multiplicada_instante')
       && dbV7.prepare("SELECT multiplicada_instante FROM propositos WHERE id = 'p2'").get().multiplicada_instante === '',
     'a migração v21 acrescenta propositos.multiplicada_instante, vazio para quem já existia (segue pelo dia)');
+    ok(dbV7.prepare("SELECT antes_do_historico FROM celula_estudos WHERE id = 'lp2'").get().antes_do_historico === 1,
+      'a migração v22 marca o estudo que já estava guardado (lp2) como de antes do histórico');
+    dbV7.prepare("INSERT INTO celula_estudos (id, proposito, tipo, criado_em) VALUES ('enovo', 'p2', 'blocos', '2026-01-09T12:00:00.000Z')").run();
+    ok(dbV7.prepare("SELECT antes_do_historico FROM celula_estudos WHERE id = 'enovo'").get().antes_do_historico === 0,
+      'o estudo gravado depois da migração nasce sem a marca');
+    dbV7.prepare("DELETE FROM celula_estudos WHERE id = 'enovo'").run();
   }
   B.apagarPessoaDoBanco(dbV7, 'lider');
   ok(dbV7.prepare("SELECT count(*) n FROM celula_estudos WHERE id = 'lp2'").get().n === 1,

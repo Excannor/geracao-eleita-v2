@@ -871,7 +871,7 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   // própria, com páginas (GET /api/estudos).
   const membroLe = minha.estado === 'ativo' && minha.papel !== 'visitante';
   const doEstudo = convidado ? { combinadoAnterior: null, temAnteriores: false, daMae: null }
-    : CONTAS.dadosDoEstudo(p, { membro: membroLe, conduz: conduzo, hoje: hojeDe(eu) });
+    : CONTAS.dadosDoEstudo(p, { membro: membroLe, eu, conduz: conduzo, hoje: hojeDe(eu) });
   const extra = {
     encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só

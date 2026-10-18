@@ -1771,6 +1771,18 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
     checar(JSON.stringify(encontrosAteOCorte([{ data: '2026-10-08' }, { data: '2026-10-10', em: '2026-10-10T19:00:00.000Z' }, { data: '2026-10-10', em: '2026-10-10T22:00:00.000Z' }, { data: '2026-10-11' }],
       { corte: '2026-10-10', corteEm }).map((x) => x.em || x.data)) === JSON.stringify(['2026-10-08', '2026-10-10T19:00:00.000Z']),
     'os encontros da mãe que a filha vê: até a multiplicação, os do mesmo dia só se registrados antes dela');
+    // o estudo guardado antes do histórico: só para quem o via enquanto era o atual
+    const velho = { ...E1, antesDoHistorico: true, atualAte: '2026-10-05T12:00:00.000Z' };
+    const comEntrada = (entrouEm, saiuEm = '') => ({ ...papeis.membro, diaDe: diaSP, noDono: { entrouEm, saiuEm } });
+    checar(acessoAoEstudo(velho, P, comEntrada('2026-10-01')).ler && acessoAoEstudo(velho, P, comEntrada('2026-10-05')).ler
+      && acessoAoEstudo(velho, P, comEntrada('2026-10-06')).codigo === 404 && acessoAoEstudo(velho, P, { ...papeis.membro, diaDe: diaSP }).codigo === 404,
+    'o estudo guardado antes do histórico fica para quem estava na célula enquanto ele era o atual; quem entrou depois recebe 404');
+    checar(acessoAoEstudo({ ...velho, id: 'E3', atualAte: '' }, P, comEntrada('2026-10-15')).ler && acessoAoEstudo({ ...E1, atualAte: '2026-10-05T12:00:00.000Z' }, P, comEntrada('2026-10-15')).ler,
+      'como estudo atual, todos leem; e o estudo gravado com o histórico já de pé vale para quem entrou depois');
+    checar(acessoAoEstudo(velho, F, { ...comEntrada('2026-10-01', '2026-10-10'), corte: '2026-10-10' }).ler
+      && acessoAoEstudo(velho, F, { ...comEntrada('2026-10-07', '2026-10-10'), corte: '2026-10-10' }).codigo === 404
+      && acessoAoEstudo(velho, F, { ...papeis.membro, corte: '2026-10-10', diaDe: diaSP }).codigo === 404,
+    'na filha, o da mãe guardado antes do histórico fica para quem estava na mãe enquanto ele era o atual');
 
     // quem não veio
     const membros = [
@@ -2129,6 +2141,16 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
     checar(pag1.itens.length === 20 && pag1.mais === true && pag1.itens[0].e.id === 'vx24' && pag1.itens[0].dataDe === 'preparo' && pag1.itens[0].data === '2026-01-24'
       && pag2.itens.length === 5 && pag2.mais === false && pag2.antes === '' && pag2.itens[4].e.id === 'vx00' && !pag2.itens.some((x) => pag1.itens.some((y) => y.e.id === x.e.id)),
     '25 anteriores vêm em duas páginas, 20 e 5, sem repetir, do mais novo para o mais velho');
+    // um estudo guardado antes do histórico (a marca da v21): a Ana, que estava na célula enquanto
+    // ele era o atual, lê; o Caio, que entrou depois, nem o vê na lista
+    ce.banco().prepare("INSERT INTO celula_estudos (id, proposito, tipo, titulo, fonte, criado_por, criado_em, atual_ate, antes_do_historico) VALUES ('fx1', ?, 'blocos', 'Da Fase 1', '', 'lider', ?, ?, 1)")
+      .run(ID, dia(2).toISOString(), dia(4).toISOString());
+    checar(ce.estudosAnteriores('ana', ID).itens.some((x) => x.e.id === 'fx1') && ce.estudoParaLer('ana', 'fx1').acesso.ler
+      && !ce.estudosAnteriores('caio', ID).itens.some((x) => x.e.id === 'fx1') && await tentar(() => ce.estudoParaLer('caio', 'fx1')) === MSG_ESTUDO.naoAberto + '|404',
+    'o estudo guardado antes do histórico fica para quem o via quando era o atual: quem entrou depois não o vê na lista e recebe 404');
+    checar(ce.dadosDoEstudo(p(), { membro: true, eu: 'caio' }, dia(13)).temAnteriores === true && ce.estudosAnteriores('caio', ID).itens.length === 1,
+      'o Caio continua com o anterior gravado depois do histórico');
+    ce.banco().prepare("DELETE FROM celula_estudos WHERE id = 'fx1'").run();
   }
 
   // --- 13. um estudo para ler ---
@@ -2198,8 +2220,8 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   checar(/<p class="atualizada">Versão 5 · atualizada em 18 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5');
   checar(historico.indexOf('<b>Versão 5, 18 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Versão 5,') < historico.indexOf('<b>Versão 4, 18 de outubro de 2026.</b>')
     && historico.indexOf('<b>Versão 4,') < historico.indexOf('<b>Ajuste da versão 3'), 'o histórico tem a versão 5 e a 4, das mais novas para as mais antigas');
-  checar(/<tr><td>O estudo da célula<\/td><td>[^<]*estudos anteriores, só quem faz parte da célula hoje, inclusive quem entrou depois[^<]*célula de origem até a data da multiplicação/.test(pol),
-    'o quadro de quem vê diz quem lê os estudos anteriores, inclusive na célula que nasceu de uma multiplicação');
+  checar(/<tr><td>O estudo da célula<\/td><td>[^<]*estudos anteriores, só quem faz parte da célula hoje, inclusive quem entrou depois[^<]*guardados antes desta versão ficam só para quem já fazia parte da célula[^<]*célula de origem preparados até a multiplicação, como estavam naquele momento/.test(pol),
+    'o quadro de quem vê diz quem lê os estudos anteriores (os de antes desta versão, só quem já os via), inclusive na célula que nasceu de uma multiplicação');
   checar(/O lugar de cada anotação \([^)]*o estudo da célula\) fica sem criptografia/.test(pol) && /Junto com a presença fica qual estudo foi usado no encontro/.test(pol)
     && /mensagem pronta pelo WhatsApp do próprio celular\. O app não manda nada sozinho\./.test(pol) && /Acolhida, adoração e testemunho não ficam guardados nos estudos anteriores/.test(pol),
   'a política diz o lugar da anotação sem cifra, o estudo junto da presença, a mensagem a quem faltou e o que não vai para o histórico');

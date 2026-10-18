@@ -1435,21 +1435,24 @@ export class Contas {
   // As linhas de uma célula em celula_estudos, do mais novo para o mais velho, só com as colunas
   // que a lista, a folha de registro e as datas usam (sem a fonte e sem as partes).
   estudosLeves(proposito) {
-    return this.banco().prepare('SELECT id, proposito, tipo, titulo, ref, refs, plano_ate, traducao, criado_por, criado_em, editado_em, atual_ate, combinado '
+    return this.banco().prepare('SELECT id, proposito, tipo, titulo, ref, refs, plano_ate, traducao, criado_por, criado_em, editado_em, atual_ate, combinado, antes_do_historico '
       + 'FROM celula_estudos WHERE proposito = ? ORDER BY criado_em DESC, id DESC').all(String(proposito || '')).map(estudoDaLinha);
   }
 
   // O que uma pessoa pode num estudo, chegando por uma célula (estudos.mjs, acessoAoEstudo). O dia
-  // de cada instante conta no fuso do líder da célula do estudo (a mãe, num estudo da mãe).
+  // de cada instante conta no fuso do líder da célula do estudo (a mãe, num estudo da mãe). noDono
+  // é a entrada da pessoa na célula do estudo: na própria, a de agora; na mãe, a de quando ela
+  // estava lá (a filha leva quem saiu da mãe pela multiplicação).
   acessoDe(eu, e, p) {
     const u = limparNome(eu);
     if (!e || !p || !p.celula || p.encerradoEm) return acessoAoEstudo(null, null, {});
     const m = p.membros.find((x) => x.usuario === u && x.estado === 'ativo');
     const dono = e.proposito === p.id ? p : this.proposito(e.proposito);
+    const noDono = dono ? dono.membros.find((x) => x.usuario === u) || null : null;
     return acessoAoEstudo(e, p, {
       ativo: !!m, papel: (m && m.papel) || '', conduz: podeConduzir(p, u),
       lidera: !!m && p.criadoPor === u && !aprovacaoQueFalta(p, u, 'lider'),
-      ...this.corteDe(p), diaDe: this.diaNaCelula(dono || p),
+      ...this.corteDe(p), noDono, diaDe: this.diaNaCelula(dono || p),
     });
   }
 
@@ -1533,14 +1536,15 @@ export class Contas {
   }
 
   // O que GET /api/propositos leva do estudo da célula além do atual (docs/a-mesa-fase2.md, 3.4).
-  //   membro: a pessoa é membro ativo e não visitante (lê os anteriores); conduz: é quem conduz a
-  //   célula (recebe a folha de registro); hoje: o dia de quem pede, que é o da folha de registro.
+  //   membro: a pessoa é membro ativo e não visitante (lê os anteriores); eu: o @ dela (as listas
+  //   seguem a mesma regra da leitura); conduz: é quem conduz a célula (recebe a folha de
+  //   registro); hoje: o dia de quem pede, que é o da folha de registro.
   // combinadoAnterior, temAnteriores e daMae, só para os membros: o visitante vê só o estudo atual,
   // e o combinado de antes é do estudo anterior (quem chegou esta semana nem estava quando ele foi
   // combinado). registro, só para quem conduz: os estudos que a folha oferece (o atual, os 3
   // anteriores mais novos e o que valia em cada dia) e os 8 dias que dá para registrar, com o
   // estudo do dia e o que já foi gravado.
-  dadosDoEstudo(p, { membro = false, conduz = false, hoje = '' } = {}, agora = new Date()) {
+  dadosDoEstudo(p, { membro = false, eu = '', conduz = false, hoje = '' } = {}, agora = new Date()) {
     const db = this.banco();
     const diaDe = this.diaNaCelula(p);
     const saida = { combinadoAnterior: null, temAnteriores: false, daMae: null };
@@ -1553,8 +1557,9 @@ export class Contas {
           anterior: estudoDaLinha(linha), encontros: p.encontros, encontro: p.encontro, hoje: diaDe(agora.toISOString()), diaDe,
         });
       }
-      saida.temAnteriores = !!db.prepare("SELECT 1 FROM celula_estudos WHERE proposito = ? AND atual_ate != '' LIMIT 1").get(p.id);
-      saida.daMae = this.estudosDaMae(p);
+      const anteriores = this.estudosLeves(p.id).filter((e) => !!e.atualAte);
+      saida.temAnteriores = eu ? anteriores.some((e) => this.acessoDe(eu, e, p).ler) : anteriores.length > 0;
+      saida.daMae = this.estudosDaMae(p, eu);
     }
     if (!conduz) return saida;
     const base = /^\d{4}-\d{2}-\d{2}$/.test(String(hoje)) ? hoje : diaDe(agora.toISOString());

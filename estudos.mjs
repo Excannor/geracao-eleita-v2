@@ -286,7 +286,9 @@ export function encontrosAteOCorte(encontros, { corte = '', corteEm = '' } = {})
 //   p (visitante inclusive); papel: o papel dela em p ('', 'auxiliar' ou 'visitante'); conduz: é
 //   quem conduz p (podeConduzir); lidera: é o líder de p que prepara o estudo (celulaDeQuemPrepara);
 //   corte e corteEm: o dia e o instante da multiplicação de p, quando p nasceu de outra célula
-//   (daMaeAteOCorte); diaDe(iso): o dia local de um instante, no fuso do líder da célula do estudo.
+//   (daMaeAteOCorte); noDono: { entrouEm, saiuEm } da pessoa na célula do estudo (p, ou a mãe),
+//   ou null quando ela nunca esteve lá; diaDe(iso): o dia local de um instante, no fuso do líder
+//   da célula do estudo.
 // Devolve { ler, codigo (0, 403 ou 404), atual, daMae, presenca, usarComoBase }:
 //   - quem não é membro ativo (convidado, quem saiu, de fora, o administrador): 404, que vale igual
 //     para "não existe" e "não é seu" (um id de estudo não confirma que a célula existe);
@@ -295,19 +297,35 @@ export function encontrosAteOCorte(encontros, { corte = '', corteEm = '' } = {})
 //   - um estudo da célula mãe preparado e escrito até a multiplicação: os membros da filha, só para
 //     leitura (sem presença e sem "Usar como base", nem para o líder da filha); o visitante, 403;
 //     o que a mãe preparou ou mudou depois é de outro grupo: 404. Um nível só: a neta não lê a avó.
+//   - um estudo guardado antes do histórico existir (antesDoHistorico, marcado na v21: os da Fase 1
+//     e os de antes da v19), quando já não é o atual: só quem estava na célula dele enquanto ele era
+//     o atual, porque ninguém mais o via quando ele foi escrito (privacidade, seção 15); os outros
+//     recebem 404, como se ele não existisse;
 //   - presenca (quantas pessoas vieram): quem conduz p, e só nos estudos de p;
 //   - usarComoBase (que cria um estudo novo): só o líder, só num anterior de p.
-export function acessoAoEstudo(e, p, { papel = '', ativo = false, conduz = false, lidera = false, corte = '', corteEm = '', diaDe = (iso) => String(iso || '').slice(0, 10) } = {}) {
+export function acessoAoEstudo(e, p, { papel = '', ativo = false, conduz = false, lidera = false, corte = '', corteEm = '', noDono = null, diaDe = (iso) => String(iso || '').slice(0, 10) } = {}) {
   const nao = (codigo) => ({ ler: false, codigo, atual: false, daMae: false, presenca: false, usarComoBase: false });
   if (!e || !p || !ativo) return nao(404);
   const visitante = papel === 'visitante';
+  // quem estava na célula do estudo enquanto ele era o atual (até fim, 'AAAA-MM-DD' ou '')
+  const viu = (fim) => {
+    const entrou = noDono && noDono.entrouEm;
+    const saiu = noDono && noDono.saiuEm;
+    const nasceu = diaDe(e.criadoEm);
+    return ehDia(entrou) && (!fim || entrou <= fim) && !(ehDia(saiu) && ehDia(nasceu) && saiu < nasceu);
+  };
   if (e.proposito === p.id) {
     const atual = !!p.estudoId && e.id === p.estudoId;
     if (!atual && visitante) return nao(403);
+    if (!atual && e.antesDoHistorico && !viu(e.atualAte ? diaDe(e.atualAte) : '')) return nao(404);
     return { ler: true, codigo: 0, atual, daMae: false, presenca: !!conduz, usarComoBase: !!lidera && !atual };
   }
   if (p.mae && e.proposito === p.mae && daMaeAteOCorte(e, { corte, corteEm, diaDe })) {
     if (visitante) return nao(403);
+    if (e.antesDoHistorico) {
+      const saiu = e.atualAte ? diaDe(e.atualAte) : '';
+      if (!viu(saiu && saiu < corte ? saiu : corte)) return nao(404);
+    }
     return { ler: true, codigo: 0, atual: false, daMae: true, presenca: false, usarComoBase: false };
   }
   return nao(404);
@@ -351,6 +369,8 @@ export function estudoDaLinha(l) {
     traducao: TRADUCOES.includes(l.traducao) ? l.traducao : 'nbv',
     criadoPor: l.criado_por || '', criadoEm: l.criado_em || '', editadoEm: l.editado_em || '', atualAte: l.atual_ate || '',
     combinado: l.combinado || '',
+    // guardado antes de o histórico existir (v21): fica para quem o via enquanto era o atual
+    antesDoHistorico: !!Number(l.antes_do_historico),
   };
   if (e.tipo === 'trecho' && e.ref) {
     if (!e.titulo) e.titulo = e.ref;
