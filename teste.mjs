@@ -1167,6 +1167,29 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '08b-propositos.js'), 'utf8')
   checar(CC.oreHojePor([{ usuario: 'so', nome: 'Só' }], '2026-01-01', 1).length === 1, 'com um candidato só, a sugestão é ele mesmo');
 }
 
+// --- célula: a mensagem pronta para quem faltou e as de cuidado (08b-propositos.js) ---
+// docs/a-mesa-fase2.md, 5.3 e 6.1: cita o estudo pela referência (nunca o texto bíblico), sem gíria.
+{
+  const fecho = ' Está tudo bem com você? Posso orar por alguma coisa?';
+  const ler = ' O estudo está na aba Estudo da célula, no app, se você quiser ler.';
+  const blocos = { tipo: 'blocos', titulo: 'Batalha espiritual, vigilância e Armadura de Deus', refs: ['Efésios 6.12', 'Lucas 11.24-26'] };
+  checar(CC.recadoFaltou({ nome: 'Bia Souza', celula: 'Célula Esperança', quando: 'de quinta', estudo: blocos })
+    === 'Oi, Bia! Sentimos sua falta no encontro de quinta. Estudamos \u201cBatalha espiritual, vigilância e Armadura de Deus\u201d, em Efésios 6.' + ler + fecho,
+  'recadoFaltou(): o estudo escrito, com o título entre aspas e o primeiro capítulo');
+  checar(CC.recadoFaltou({ nome: 'Bia', celula: 'Célula Esperança', quando: 'de hoje', estudo: { tipo: 'semana', titulo: '', refs: [] } })
+    === 'Oi, Bia! Sentimos sua falta no encontro de hoje. Estudamos a leitura da semana do plano.' + ler + fecho, 'recadoFaltou(): a leitura da semana');
+  checar(CC.recadoFaltou({ nome: 'Bia', celula: 'Célula Esperança', quando: 'de ontem', estudo: { tipo: 'trecho', titulo: 'Romanos 8.28-30', refs: ['Romanos 8.28-30'] } })
+    === 'Oi, Bia! Sentimos sua falta no encontro de ontem. Estudamos Romanos 8.28-30.' + ler + fecho, 'recadoFaltou(): um trecho');
+  checar(CC.recadoFaltou({ nome: 'Bia', celula: 'Célula Esperança', quando: '', estudo: null }) === 'Oi, Bia! Sentimos sua falta no encontro da Célula Esperança.' + fecho
+    && CC.recadoFaltou({ nome: 'Bia', celula: 'Jovens', estudo: null }) === 'Oi, Bia! Sentimos sua falta no encontro da célula.' + fecho, 'recadoFaltou(): sem estudo e sem quando, o nome da célula, como antes');
+  checar(CC.recadoFaltou({ nome: 'Bia', celula: 'Célula Esperança', estudo: blocos }).startsWith('Oi, Bia! Sentimos sua falta no encontro da Célula Esperança. Estudamos'), 'recadoFaltou(): sem quando, com o estudo');
+  const p = { titulo: 'Célula Esperança', ultimoEncontro: { estudo: blocos } };
+  checar(CC.recadoDeCuidado(p, { nome: 'Caio Lima', gatilhos: [{ tipo: 'faltou' }] }) === CC.recadoFaltou({ nome: 'Caio', celula: 'Célula Esperança', estudo: blocos }), 'Precisam de atenção: quem faltou recebe a mesma mensagem, com o estudo do último encontro');
+  checar(CC.recadoDeCuidado(p, { nome: 'Caio', gatilhos: [{ tipo: 'ofensiva' }] }) === 'Oi, Caio! Vi que a sua sequência de leitura parou, depois de tantos dias seguidos. Está tudo bem por aí? Se quiser, recomeçamos juntos.'
+    && CC.recadoDeCuidado(p, { nome: 'Caio', gatilhos: [{ tipo: 'semLer' }] }) === 'Oi, Caio! Passando para saber como você está. Que tal voltar a ler junto com a gente?',
+  'Precisam de atenção: a ofensiva que parou e os dias sem ler, sem "Bora" e sem "tempão"');
+}
+
 
 // --- o estudo da célula: as regras puras (src/sob-demanda/estudo-regras.js) ---
 // docs/a-mesa-fase1.md, seção 6.2. O estudo do dono como o servidor o guarda: o texto colado do

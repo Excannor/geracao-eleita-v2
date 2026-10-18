@@ -59,6 +59,8 @@
     // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
     // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
     conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
+    // O estudo da célula aberto pelo endereço curto (a anotação em Minhas anotações) mora na célula.
+    estudo: '#/celula',
     // A caixa do sino abre do Início.
     avisos: '#/',
     // Apoiar também mora no Mais: marca o Mais como selecionado, como o Explorar.
@@ -85,7 +87,9 @@
   const SOBRE_A_TELA = new Set(['dia', 'conhecer', 'biblia', 'busca']);
   function telaDe(rota, arg) {
     if (SOBRE_A_TELA.has(rota)) return rota;
-    if (arg.startsWith('celula/')) return rota + '/' + arg.split('/').slice(0, 2).join('/');
+    // ...menos um estudo anterior (…/estudo/<id>), que é outra tela: abre no alto, e o voltar
+    // devolve a lista na altura em que estava.
+    if (arg.startsWith('celula/')) { const s = arg.split('/'); return rota + '/' + s.slice(0, s[2] === 'estudo' && s[3] ? 4 : 2).join('/'); }
     return rota + '/' + arg;
   }
 
@@ -485,7 +489,8 @@
     conteudo.classList.toggle('sem-entrada', redesenhando);
     // O preparo do estudo da célula é uma tela sem a barra de abas: um toque sem querer nela
     // não tira o líder do meio do texto (01-base.css, body.sem-barra).
-    document.body.classList.toggle('sem-barra', /^celula\/[^/]+\/preparar$/.test(arg || '') && (rota === 'novidades' || rota === 'amigos'));
+    // Também no preparo a partir de um estudo anterior (…/preparar/<estudo>, "Usar como base").
+    document.body.classList.toggle('sem-barra', /^celula\/[^/]+\/preparar(\/[^/]+)?$/.test(arg || '') && (rota === 'novidades' || rota === 'amigos'));
     if (rota !== 'dia') CC.fecharLicao();
     // A tela do dia do Conhecer Jesus é uma folha cheia por cima da lista (igual à lição),
     // então só fica aberta enquanto a rota aponta para aquele dia específico.
@@ -501,6 +506,7 @@
     else if (rota === 'missoes') CC.vistaMissoes(conteudo);
     else if (rota === 'amigos' || rota === 'novidades') (arg.startsWith('celula/') ? (alvo) => CC.vistaCelula(alvo, arg.slice(7)) : arg === 'bloqueados' ? CC.vistaBloqueados : arg === 'propositos' ? CC.vistaPropositos : CC.vistaAmigos)(conteudo);
     else if (rota === 'celula') CC.vistaEscolherCelula(conteudo);
+    else if (rota === 'estudo') CC.abrirEstudoSolto(conteudo, arg);
     else if (rota === 'discipulado') CC.vistaDiscipulado(conteudo);
     else if (rota === 'biblia') CC.vistaBiblia(conteudo, arg);
     else if (rota === 'explorar') CC.vistaExplorar(conteudo);

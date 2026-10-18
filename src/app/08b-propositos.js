@@ -119,7 +119,9 @@
   let desenhoCelula = 0;
 
   CC.vistaCelula = function (raiz, arg) {
-    const [id, pedida] = String(arg || '').split('/');
+    // alvo: o estudo anterior aberto na aba Estudo (…/estudo/<id>) ou o estudo de base do preparo
+    // ("Usar como base", …/preparar/<id>)
+    const [id, pedida, alvo] = String(arg || '').split('/');
     // O preparo do estudo já aberto não se redesenha (a sincronização chama CC.redesenhar): o
     // líder perderia o foco do texto no meio de uma frase. O rascunho já está guardado.
     if (pedida === 'preparar' && [...raiz.querySelectorAll('.mesa-preparo[data-passo]')].some((el) => el.dataset.celula === id)) return;
@@ -142,7 +144,7 @@
         if (!p.euPreparoEstudo) { CC.substituirRota(enderecoCelula(p.id, 'estudo')); return; }
         if (preparoMontado) return;
         preparoMontado = true;
-        abrirPreparo(raiz, p, () => meu === desenhoCelula);
+        abrirPreparo(raiz, p, () => meu === desenhoCelula, alvo || '');
         return;
       }
       const souLider = p.criadoPor === euUsuario();
@@ -172,7 +174,7 @@
       if (aba === 'hoje') ligarHoje(painel, p);
       if (aba === 'pessoas') ligarPessoas(painel, p, souLider);
       if (aba === 'painel') ligarPainel(painel, p);
-      if (aba === 'estudo') preencherEstudo(painel, p, () => meu === desenhoCelula);
+      if (aba === 'estudo') preencherEstudo(painel, p, () => meu === desenhoCelula, alvo || '');
       if (aba === 'oracao') preencherOracao(painel, p, () => meu === desenhoCelula);
     };
 
@@ -318,26 +320,47 @@
     const b = painel.querySelector('[data-acao-estado]');
     if (b) b.onclick = () => CC.redesenhar();
   }
-  function preencherEstudo(painel, p, aindaAqui) {
+  // alvo: um estudo anterior (…/estudo/<id>), lido pela peça (GET /api/estudos). Sem estudo
+  // atual, o vazio de sempre e, para quem faz parte da célula e tem estudos guardados (ou os da
+  // célula de origem), a seção "Estudos anteriores" embaixo, desenhada pela peça.
+  function preencherEstudo(painel, p, aindaAqui, alvo) {
+    if (alvo && !(p.estudo && p.estudo.id === alvo)) {
+      pedirEstudo(false).then(() => { if (aindaAqui()) CC.estudoCelula.anterior(painel, p, apoio, alvo, aindaAqui); },
+        () => { if (aindaAqui()) semPeca(painel, 'Não deu para abrir o estudo'); });
+      return;
+    }
     if (!p.estudo) {
       painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('livro')
         + '<p>' + (p.euPreparoEstudo ? 'O estudo do encontro ainda não foi preparado. Você escolhe: a leitura da semana, um trecho ou um estudo seu.'
           : CC.esc(nomeDoLider(p)) + ' ainda não preparou o estudo deste encontro.') + '</p>'
         + (p.euPreparoEstudo ? '<button class="botao" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>'
-          : '<a class="botao" href="' + leituraDaSemana(p) + '" data-leitura-semana>Ler a leitura da semana' + CC.ico('avancar') + '</a>') + '</div>';
+          : '<a class="botao" href="' + leituraDaSemana(p) + '" data-leitura-semana>Ler a leitura da semana' + CC.ico('avancar') + '</a>') + '</div>'
+        + (p.temAnteriores || p.daMae ? '<div data-anteriores></div>' : '');
       const preparar = painel.querySelector('[data-preparar]');
       if (preparar) preparar.onclick = () => { location.hash = enderecoCelula(p.id, 'preparar'); };
+      const anteriores = painel.querySelector('[data-anteriores]');
+      if (anteriores) pedirEstudo(false).then(() => { if (aindaAqui() && anteriores.isConnected) CC.estudoCelula.anteriores(anteriores, p, apoio); }, () => {});
       return;
     }
     pedirEstudo(false).then(() => { if (aindaAqui()) CC.estudoCelula.aba(painel, p, apoio, aindaAqui); },
       () => { if (aindaAqui()) semPeca(painel, 'Não deu para abrir o estudo'); });
   }
-  function abrirPreparo(raiz, p, aindaAqui) {
+  // deBase: o estudo anterior que o líder usa como base ("Usar como base").
+  function abrirPreparo(raiz, p, aindaAqui, deBase) {
     raiz.innerHTML = '<div class="folha-juntos"><div class="cabeca-centro"><h1>Preparar o estudo</h1></div></div>'
       + '<div class="painel-celula mesa-preparo">' + CC.esqueleto('texto') + '</div>';
-    pedirEstudo(true).then(() => { if (aindaAqui()) CC.estudoPreparo.tela(raiz, p, apoio); },
+    pedirEstudo(true).then(() => { if (aindaAqui()) CC.estudoPreparo.tela(raiz, p, apoio, { deBase }); },
       () => { if (aindaAqui()) semPeca(raiz.querySelector('.mesa-preparo'), 'Não deu para abrir o preparo'); });
   }
+
+  // O endereço curto de um estudo (#/estudo/<id>, o caminho de Minhas anotações, que só sabe o
+  // id): a peça pergunta ao servidor por qual célula a pessoa lê e troca para a aba Estudo dela.
+  CC.abrirEstudoSolto = (raiz, arg) => {
+    raiz.innerHTML = CC.esqueleto('texto');
+    const aqui = location.hash;
+    pedirEstudo(false).then(() => { if (location.hash === aqui) CC.estudoCelula.solto(raiz, String(arg || '').split('/')[0], apoio); },
+      () => { if (location.hash === aqui) semPeca(raiz, 'Não deu para abrir o estudo'); });
+  };
 
   function abaPessoas(p, souLider) {
     // Visitante (só está conhecendo) fica fora da meta, do "leram hoje" e vira uma seção
@@ -1000,12 +1023,39 @@
   // que parou há pouco, ou dias sem ler. Sem cobrança: é um convite para voltar.
   function recadoDeCuidado(p, m) {
     const nome = String(m.nome || '').split(' ')[0];
-    const celula = /^c[ée]lula(\s|$)/i.test(p.titulo || '') ? p.titulo : 'célula';
     const tipo = (m.gatilhos && m.gatilhos[0] && m.gatilhos[0].tipo) || (/faltou/.test(m.motivo || '') ? 'faltou' : 'semLer');
-    if (tipo === 'faltou') return 'Oi, ' + nome + '! Sentimos sua falta no encontro da ' + celula + '. Está tudo bem com você? Posso orar por alguma coisa?';
+    // quem faltou: a mesma mensagem da folha "Quem não veio", com o estudo do último encontro
+    if (tipo === 'faltou') return CC.recadoFaltou({ nome, celula: p.titulo, quando: '', estudo: p.ultimoEncontro && p.ultimoEncontro.estudo });
     if (tipo === 'ofensiva') return 'Oi, ' + nome + '! Vi que a sua sequência de leitura parou, depois de tantos dias seguidos. Está tudo bem por aí? Se quiser, recomeçamos juntos.';
     return 'Oi, ' + nome + '! Passando para saber como você está. Que tal voltar a ler junto com a gente?';
   }
+
+  CC.recadoDeCuidado = recadoDeCuidado;
+
+  // A mensagem pronta para quem faltou ao encontro (docs/a-mesa-fase2.md, 5.3), que quem conduz
+  // manda, se quiser, pelo próprio WhatsApp: o app não avisa ninguém. Cita o estudo pela
+  // referência, nunca pelo texto bíblico. nome: o primeiro nome; celula: o título; quando:
+  // 'de hoje', 'de ontem', 'de quinta' ou ''; estudo: { tipo, titulo, refs } ou null.
+  CC.recadoFaltou = function ({ nome, celula, quando, estudo } = {}) {
+    const daCelula = /^c[ée]lula(\s|$)/i.test(celula || '') ? celula : 'célula';
+    let texto = 'Oi, ' + String(nome || '').split(' ')[0] + '! Sentimos sua falta no encontro ' + (quando || 'da ' + daCelula) + '.';
+    const e = estudo || null;
+    const r = e && (e.refs || [])[0] ? CC.lerRefLivre(e.refs[0]) : null;
+    const capitulo = r ? r.livro + ' ' + r.cap : '';
+    const fala = !e ? '' : e.tipo === 'semana' ? 'a leitura da semana do plano'
+      : e.tipo === 'trecho' ? e.titulo || (e.refs || [])[0] || ''
+      : e.titulo ? '\u201c' + e.titulo + '\u201d' + (capitulo ? ', em ' + capitulo : '') : capitulo;
+    if (fala) texto += ' Estudamos ' + fala + '. O estudo está na aba Estudo da célula, no app, se você quiser ler.';
+    return texto + ' Está tudo bem com você? Posso orar por alguma coisa?';
+  };
+  // "de hoje", "de ontem", "de quinta" (até 6 dias) ou "de 11/10", pelo dia do encontro.
+  const quandoFoi = (data) => {
+    const hoje = CC.hojeIso();
+    if (data === hoje) return 'de hoje';
+    if (data === CC.somaDias(hoje, -1)) return 'de ontem';
+    for (let i = 2; i <= 6; i++) if (data === CC.somaDias(hoje, -i)) return 'de ' + DIAS_ENCONTRO[new Date(data + 'T12:00:00').getDay()];
+    return 'de ' + ddmm(data);
+  };
 
   // Membros ativos que conduzem a célula (líder ou auxiliar): nunca entram no rodízio de
   // oração nem em "quem precisa de atenção".
@@ -1265,10 +1315,35 @@
     return Array.from({ length: 8 }, (_, i) => CC.somaDias(hoje, -i));
   }
 
-  function folhaRegistrarEncontro(p) {
+  // O estudo de cada encontro (docs/a-mesa-fase2.md, 4.7): a folha já traz escolhido o estudo
+  // daquele dia, e quem conduz troca quando registra um encontro de dias atrás. Os estudos e os 8
+  // dias vêm do servidor (p.registro, só para quem conduz). Na leitura da semana o título vem vazio.
+  const tituloDoEstudo = (e) => (e.tipo === 'semana' ? 'A leitura da semana' : e.titulo || (e.refs || [])[0] || 'Estudo do encontro');
+  const NENHUM_ESTUDO = 'Outro estudo, fora do app';
+  // A mensagem do servidor com a maiúscula e o ponto da tela.
+  const comoFrase = (m) => { const t = String(m || 'Não deu certo agora. Tente de novo.'); return t.charAt(0).toUpperCase() + t.slice(1) + (/[.!?]$/.test(t) ? '' : '.'); };
+
+  // opcoes.estudo: o estudo que o modo encontro acabou de usar.
+  function folhaRegistrarEncontro(p, opcoes = {}) {
     const hoje = CC.hojeIso();
     const alvo = dataDoEncontro(p, hoje) || hoje;
-    const opcoes = opcoesDataEncontro(hoje);
+    const reg = p.registro || null;
+    const estudosReg = ((reg && reg.estudos) || []).slice().sort((a, b) => (a.em < b.em ? 1 : a.em > b.em ? -1 : 0));
+    const diaDoReg = (d) => ((reg && reg.dias) || []).find((x) => x.data === d) || null;
+    // os estudos preparados até a data (o preparado depois não foi usado nela)
+    const estudosAte = (d) => estudosReg.filter((e) => !e.dia || e.dia <= d);
+    const vale = (x, d) => x === '-' || estudosAte(d).some((e) => e.id === x);
+    const escolhaDe = (d) => {
+      const r = diaDoReg(d);
+      const ordem = [d === alvo ? opcoes.estudo : '', r && r.estudo, r && r.padrao, p.estudo && p.estudo.id];
+      return ordem.find((x) => x && vale(x, d)) || '-';
+    };
+    const visitantesDe = (d) => { const r = diaDoReg(d); return r ? Number(r.visitantes) || 0 : (p.ultimoEncontro && p.ultimoEncontro.data === d ? p.ultimoEncontro.visitantes : 0); };
+    const nomeDoEscolhido = (x) => { const e = estudosReg.find((y) => y.id === x); return e ? tituloDoEstudo(e) : NENHUM_ESTUDO; };
+    const opcoesEstudo = (d, escolhido) => estudosAte(d).map((e) => '<label class="opcao-estudo"><input type="radio" name="estudo-registro" value="' + CC.esc(e.id) + '"' + (e.id === escolhido ? ' checked' : '') + '>'
+      + '<span><b>' + CC.esc(tituloDoEstudo(e)) + '</b>' + (e.dia ? '<small>Preparado em ' + ddmm(e.dia) + '</small>' : '') + '</span></label>').join('')
+      + '<label class="opcao-estudo"><input type="radio" name="estudo-registro" value="-"' + (escolhido === '-' ? ' checked' : '') + '><span><b>' + NENHUM_ESTUDO + '</b></span></label>';
+    const datas = opcoesDataEncontro(hoje);
     const gente = p.membros.filter((m) => m.estado === 'ativo');
     const rotuloData = (d) => (d === hoje ? 'Hoje' : d === CC.somaDias(hoje, -1) ? 'Ontem' : ddmm(d));
     // A data em destaque é a do encontro desta semana; as outras ficam atrás de "Outra data".
@@ -1279,8 +1354,12 @@
     CC.folha('<h2>Quem foi ao encontro?</h2>'
       + '<div class="data-encontro-realce realce" data-realce-data>' + realce(alvo) + '</div>'
       + '<button type="button" class="botao contorno pequeno" data-outra-data aria-expanded="false">' + CC.ico('calendario') + 'Outra data</button>'
-      + '<div class="escolha-dia" role="group" aria-label="Dia do encontro" data-outras-datas hidden>' + opcoes.map((d) => '<button type="button" class="botao '
+      + '<div class="escolha-dia" role="group" aria-label="Dia do encontro" data-outras-datas hidden>' + datas.map((d) => '<button type="button" class="botao '
         + (d === alvo ? 'azul' : 'contorno') + ' pequeno" data-data="' + d + '" aria-pressed="' + (d === alvo) + '">' + rotuloData(d) + '</button>').join('') + '</div>'
+      // sem nenhum estudo na célula, o bloco não aparece e o registro vai sem o campo
+      + (estudosReg.length ? '<div class="estudo-do-registro"><span class="etiqueta">Estudo deste encontro</span><b data-estudo-escolhido></b>'
+        + '<button type="button" class="botao plano pequeno" data-trocar-estudo aria-expanded="false">Trocar</button></div>'
+        + '<div class="escolha-estudo" role="radiogroup" aria-label="Estudo deste encontro" data-opcoes-estudo hidden></div>' : '')
       + '<div class="escolha-amigos">' + gente.map((m) => '<label class="linha-amigo escolha-amigo">'
         + '<input type="checkbox" value="' + CC.esc(m.usuario) + '"' + (m.usuario === euUsuario() ? ' checked' : '') + '>' + retrato(m)
         + '<span class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + (m.papel === 'visitante' ? ' <small class="selo-lider">visitante</small>' : '') + '</b></span></label>').join('') + '</div>'
@@ -1298,9 +1377,28 @@
       rolavel: true,
       ligar: (folha, fechar) => {
         let dataEscolhida = alvo;
-        let n = (p.ultimoEncontro && p.ultimoEncontro.data === alvo) ? p.ultimoEncontro.visitantes : 0;
+        let n = visitantesDe(alvo);
         const valor = folha.querySelector('[data-visitantes-valor]');
         valor.textContent = n;
+        // o estudo escolhido: refeito ao trocar a data, a não ser que a pessoa já tenha escolhido
+        let estudoEscolhido = escolhaDe(alvo);
+        let escolheuEstudo = false;
+        const caixaEstudos = folha.querySelector('[data-opcoes-estudo]');
+        const trocar = folha.querySelector('[data-trocar-estudo]');
+        const pintarEstudo = () => {
+          if (!caixaEstudos) return;
+          folha.querySelector('[data-estudo-escolhido]').textContent = nomeDoEscolhido(estudoEscolhido);
+          caixaEstudos.innerHTML = opcoesEstudo(dataEscolhida, estudoEscolhido);
+          caixaEstudos.querySelectorAll('input').forEach((i) => {
+            i.onchange = () => { estudoEscolhido = i.value; escolheuEstudo = true; folha.querySelector('[data-estudo-escolhido]').textContent = nomeDoEscolhido(estudoEscolhido); };
+          });
+        };
+        pintarEstudo();
+        if (trocar) trocar.onclick = () => {
+          const abrir = caixaEstudos.hidden;
+          caixaEstudos.hidden = !abrir;
+          trocar.setAttribute('aria-expanded', String(abrir));
+        };
         const outra = folha.querySelector('[data-outra-data]');
         const outras = folha.querySelector('[data-outras-datas]');
         outra.onclick = () => {
@@ -1318,8 +1416,10 @@
               x.classList.toggle('contorno', !sel);
               x.setAttribute('aria-pressed', String(sel));
             });
-            n = (p.ultimoEncontro && p.ultimoEncontro.data === dataEscolhida) ? p.ultimoEncontro.visitantes : 0;
+            n = visitantesDe(dataEscolhida);
             valor.textContent = n;
+            if (!escolheuEstudo || !vale(estudoEscolhido, dataEscolhida)) estudoEscolhido = escolhaDe(dataEscolhida);
+            pintarEstudo();
           };
         });
         folha.querySelector('[data-visitantes-menos]').onclick = () => { n = Math.max(0, n - 1); valor.textContent = n; };
@@ -1344,17 +1444,23 @@
           const botao = folha.querySelector('[data-salvar]');
           botao.disabled = true;
           const presentes = [...folha.querySelectorAll('.escolha-amigo input:checked')].map((i) => i.value);
+          let r;
           try {
-            await CC.api('api/celula', { acao: 'registrarEncontro', id: p.id, data: dataEscolhida, presentes, visitantes: n });
-            fechar();
-            CC.avisar('Encontro registrado');
-            recarregar();
+            r = await CC.api('api/celula', Object.assign({ acao: 'registrarEncontro', id: p.id, data: dataEscolhida, presentes, visitantes: n }, caixaEstudos ? { estudo: estudoEscolhido } : {}));
           } catch (e) {
             botao.disabled = false;
             const erro = folha.querySelector('.erro-proposito');
-            erro.textContent = e.message;
+            erro.textContent = comoFrase(e.message);
             erro.hidden = false;
+            return;
           }
+          fechar();
+          CC.avisar('Encontro registrado');
+          if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
+          // quem não veio, com a mensagem pronta: quem conduz decide se manda (o app não avisa ninguém)
+          const faltaram = (r && r.faltaram) || [];
+          if (faltaram.length) pedirEstudo(false).then(() => CC.estudoCelula.paraQuemFaltou(p, { data: dataEscolhida, faltaram, estudo: r.estudo || null }), () => {});
+          recarregar();
         };
       },
     });
@@ -1362,7 +1468,10 @@
 
   // O que as peças do estudo (src/sob-demanda/estudo-celula.js e estudo-preparo.js) usam daqui.
   const apoio = {
-    registrarEncontro: (p) => folhaRegistrarEncontro(p),
+    registrarEncontro: (p, opcoes) => folhaRegistrarEncontro(p, opcoes),
+    quandoFoi,
+    comoCelula,
+    tituloDoEstudo,
     recarregar: () => recarregar(),
     // só o retrato novo, sem redesenhar: quem chama troca o endereço logo depois
     carregar: () => CC.carregarPropositos(),
