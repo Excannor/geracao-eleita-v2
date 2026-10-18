@@ -533,7 +533,8 @@ try {
   await clicar('[data-usar-base]');
   ok(await esperar('/Usar como base\\?/.test(document.querySelector(".cortina h2")?.textContent || "")'), '15. "Usar como base?" pede confirmação');
   const conf = comum(await texto('.cortina .folha'));
-  ok(conf.includes('Você tem um estudo começado neste celular.') && conf.includes('O estudo atual ainda não foi usado num encontro.'), '15. a confirmação tem as duas frases: o rascunho e o atual sem uso');
+  ok(conf.includes('Você já começou um estudo neste celular. Se continuar, esse rascunho dá lugar ao estudo de ' + ddmm(DIA_3) + '.') && conf.includes('O estudo atual ainda não foi usado num encontro.'),
+    '15. a confirmação tem as duas frases: o rascunho (que dá lugar ao estudo de ' + ddmm(DIA_3) + ') e o atual sem uso');
   await foto('06-usar-como-base-confirmar');
   await av('document.querySelector(".cortina").click(); true');
   ok(await esperar('!document.querySelector(".cortina")') && /\/estudo\//.test(await av('location.hash')), '15. tocar fora fica na leitura');
@@ -550,9 +551,23 @@ try {
   ok(await esperar(existe('[data-combinado]'), 15000) && (await av(q('[data-combinado]') + '.value')) === COMBINADO_1, '15. o passo 3 traz o combinado de S1');
   const ws4 = await av('[...document.querySelectorAll(".mesa-ws dd")].map((d) => d.textContent)');
   ok(ws4[2] === 'Quem vocês querem convidar para o próximo encontro? Orem juntos por essas pessoas, pelo nome.' && !ws4.join(' ').includes('Jonas'), '15. a Acolhida e o Testemunho são as sugestões da semana (o testemunho de S1 não volta)');
-  await abrir(rota('preparar'), '!!document.querySelector("[data-combinado], [data-fonte], [data-continuar]")');
-  await dormir(500);
-  ok(await av('JSON.parse(localStorage.getItem("cc.rascunho.estudo.' + ID + '")).deBase === "' + S1 + '"') && await av('!!document.querySelector(".mesa-de-base") || !!document.querySelector("[data-combinado]")'), '15. reabrir …/preparar mantém este rascunho');
+  // "Mudar o estudo" (…/preparar) com um rascunho de base no celular: a tela pergunta, e não abre
+  // o rascunho calada (salvar um rascunho de base cria um estudo novo)
+  await abrir(rota('preparar'), '/Continuar o rascunho\\?/.test(document.querySelector(".cortina h2")?.textContent || "")');
+  ok((/a partir do estudo de/.test(comum(await texto('.cortina .folha'))) && await av('!document.querySelector("[data-fonte], [data-combinado]")')) || (await diagnostico('continuar-rascunho'), false),
+    '15. …/preparar com um rascunho de base pergunta "Continuar o rascunho?" antes de abrir qualquer coisa');
+  await clicar('.cortina [data-sim]');
+  ok(await esperar('location.hash.endsWith("/preparar/' + S1 + '") && !!document.querySelector("[data-combinado], [data-fonte], [data-continuar]")', 20000)
+    && await av('JSON.parse(localStorage.getItem("cc.rascunho.estudo.' + ID + '")).deBase === "' + S1 + '"'), '15. "Continuar o rascunho" volta ao endereço dele, com o rascunho');
+  // (a pergunta de antes ainda pode estar fechando: a próxima espera não pode achar ela)
+  await esperar('!document.querySelector(".cortina")');
+  await abrir(rota('preparar'), '/Continuar o rascunho\\?/.test(document.querySelector(".cortina h2")?.textContent || "")');
+  await clicar('.cortina [data-nao]');
+  ok(await esperar('!!document.querySelector("[data-tipo=\\"trecho\\"][aria-pressed=\\"true\\"]") && !document.querySelector(".mesa-de-base")', 20000)
+    && await av('!localStorage.getItem("cc.rascunho.estudo.' + ID + '") || !JSON.parse(localStorage.getItem("cc.rascunho.estudo.' + ID + '")).deBase')
+    || (await diagnostico('deixar-de-lado'), false),
+  '15. "Deixar de lado" tira o rascunho de base e abre "Mudar o estudo" com S2 (o trecho)');
+  await esperar('!document.querySelector(".cortina")');
   for (let i = 0; i < 4 && !(await av(existe('.cortina [data-nao]'))); i++) { await clicar('.mesa-cabeca [data-voltar]'); await dormir(400); }
   await clicar('.cortina [data-nao]');
   ok(await esperar('/\\/estudo$/.test(location.hash)', 10000) && (await celulaDe(lider, ID)).estudo.id === S2, '15. "Sair" sai sem salvar: S2 continua o atual');

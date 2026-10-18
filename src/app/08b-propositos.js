@@ -122,9 +122,12 @@
     // alvo: o estudo anterior aberto na aba Estudo (…/estudo/<id>) ou o estudo de base do preparo
     // ("Usar como base", …/preparar/<id>)
     const [id, pedida, alvo] = String(arg || '').split('/');
-    // O preparo do estudo já aberto não se redesenha (a sincronização chama CC.redesenhar): o
-    // líder perderia o foco do texto no meio de uma frase. O rascunho já está guardado.
-    if (pedida === 'preparar' && [...raiz.querySelectorAll('.mesa-preparo[data-passo]')].some((el) => el.dataset.celula === id)) return;
+    // O preparo do estudo já aberto (ou abrindo, com a pergunta do rascunho na tela) não se
+    // redesenha (a sincronização chama CC.redesenhar): o líder perderia o foco do texto no meio de
+    // uma frase, ou ganharia uma segunda pergunta por cima da primeira. O rascunho já está
+    // guardado. Trocar de …/preparar/<base> para …/preparar (ou o contrário) é outro preparo, e
+    // redesenha.
+    if (pedida === 'preparar' && [...raiz.querySelectorAll('.mesa-preparo[data-celula]')].some((el) => el.dataset.celula === id && (el.dataset.deBase || '') === (alvo || ''))) return;
     const meu = ++desenhoCelula;
     const nestaTela = () => meu === desenhoCelula && location.hash.startsWith('#/novidades/celula/');
     // O preparo é montado uma vez por abertura: a resposta nova do servidor (ou a falha dela, sem
@@ -348,9 +351,11 @@
   // deBase: o estudo anterior que o líder usa como base ("Usar como base").
   function abrirPreparo(raiz, p, aindaAqui, deBase) {
     raiz.innerHTML = '<div class="folha-juntos"><div class="cabeca-centro"><h1>Preparar o estudo</h1></div></div>'
-      + '<div class="painel-celula mesa-preparo">' + CC.esqueleto('texto') + '</div>';
+      + '<div class="painel-celula mesa-preparo" data-celula="' + CC.esc(p.id) + '" data-de-base="' + CC.esc(deBase || '') + '">' + CC.esqueleto('texto') + '</div>';
+    // sem a peça, "Tentar de novo" redesenha: o vazio perde a marca de preparo aberto
+    const semPreparo = () => { const m = raiz.querySelector('.mesa-preparo'); delete m.dataset.celula; semPeca(m, 'Não deu para abrir o preparo'); };
     pedirEstudo(true).then(() => { if (aindaAqui()) CC.estudoPreparo.tela(raiz, p, apoio, { deBase }); },
-      () => { if (aindaAqui()) semPeca(raiz.querySelector('.mesa-preparo'), 'Não deu para abrir o preparo'); });
+      () => { if (aindaAqui()) semPreparo(); });
   }
 
   // O endereço curto de um estudo (#/estudo/<id>, o caminho de Minhas anotações, que só sabe o

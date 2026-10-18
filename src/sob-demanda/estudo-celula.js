@@ -356,16 +356,18 @@
     painel.querySelector('.mesa-volta [data-voltar]').onclick = () => { if (CC.anteriorNaPilha && CC.anteriorNaPilha()) history.back(); else CC.substituirRota(apoio.endereco(p.id, 'estudo')); };
     painel.querySelector('[data-imprimir]').onclick = () => imprimir(p, e, apoio, { anterior: true, linha: noPapel(linha, e), palavraDe: legado && e.texto ? 'Palavra de ' + (quem || apoio.nomeDoLider(p)) : '' });
     const base = painel.querySelector('[data-usar-base]');
-    if (base) base.onclick = () => usarComoBase(p, apoio, alvo);
+    if (base) base.onclick = () => usarComoBase(p, apoio, alvo, r.data);
   }
 
   // ---------- Usar como base (docs/a-mesa-fase2.md, 4.5): só o líder, num anterior da célula ----------
-  async function usarComoBase(p, apoio, alvo) {
-    let rascunho = false;
-    try { rascunho = !!localStorage.getItem('cc.rascunho.estudo.' + p.id); } catch (e) { /* sem armazenamento */ }
+  async function usarComoBase(p, apoio, alvo, data) {
+    // o rascunho deste mesmo estudo de base continua de onde parou: não há o que trocar
+    let rascunho = null;
+    try { rascunho = JSON.parse(localStorage.getItem('cc.rascunho.estudo.' + p.id) || 'null'); } catch (e) { rascunho = null; }
+    const outroRascunho = !!rascunho && rascunho.deBase !== alvo;
     const atualSemUso = !!(p.estudo && !p.estudo.usado);
     const frases = [];
-    if (rascunho) frases.push('Você tem um estudo começado neste celular. Usar este como base troca o rascunho pelo texto dele.');
+    if (outroRascunho) frases.push('Você já começou um estudo neste celular. Se continuar, esse rascunho dá lugar ao estudo' + (data ? ' de ' + ddmm(data) : '') + '.');
     if (atualSemUso) frases.push('O estudo atual ainda não foi usado num encontro. Quando você salvar o novo, o atual sai da aba Estudo e fica em Estudos anteriores.');
     // só "Usar como base" segue: tocar fora (null) e "Cancelar" (false) ficam na leitura
     if (frases.length && await CC.confirmar({ titulo: 'Usar como base?', texto: frases.join(' '), acao: 'Usar como base' }) !== true) return;

@@ -70,8 +70,10 @@
   // foi usado num encontro não é a base de nada: o líder prepara o próximo, em branco, e o usado
   // fica guardado na célula. O estudo novo (base '') começa com acolhida, adoração e testemunho
   // vazios, que viram as sugestões da semana: o testemunho de antes podia ter nomes (A5).
-  // O rascunho que começou de um estudo anterior ("Usar como base", deBase) continua valendo ao
-  // reabrir o preparo, mesmo que o estudo atual seja outro.
+  // O rascunho que começou de um estudo anterior ("Usar como base", deBase) só vale no endereço
+  // dele (…/preparar/<esse estudo>): "Mudar o estudo" e "Preparar o próximo" (…/preparar) não o
+  // abrem calados, porque salvar um rascunho de base cria um estudo novo. A tela pergunta antes
+  // (tela, perguntarSobreBase).
   const estadoVazio = (base, baseEm) => ({
     v: 1, base, baseEm, tipo: 'blocos', passo: 1, fonte: '', palavra: '', trecho: { livro: 'Gênesis', cap: '1', vers: '' }, traducao: 'nbv',
     opcoes: true, modo: 'colar', colado: false, coladoWord: false, recusadas: [], perguntas: null, chavePerguntas: '', salvas: null,
@@ -84,7 +86,7 @@
     // depois que este rascunho começou (aí o rascunho é de uma versão velha e sai)
     const baseEm = e ? e.editadoEm || e.em || '' : '';
     const salvo = lerRascunho(p.id);
-    if (salvo && salvo.deBase) return salvo;
+    if (salvo && salvo.deBase) return Object.assign(estadoVazio(base, baseEm), e ? doEstudo(e) : {});
     if (salvo && (salvo.base || '') === base && (salvo.baseEm === undefined || salvo.baseEm === baseEm)) return salvo;
     if (salvo && base && (salvo.base || '') === base) CC.avisar('O estudo mudou em outro aparelho. O preparo começa da versão salva.');
     const st = estadoVazio(base, baseEm);
@@ -162,7 +164,24 @@
         return;
       }
       st = estadoDaBase(p, r);
-    } else st = estadoInicial(p);
+    } else {
+      // um rascunho começado de um estudo anterior: continuar nele (no endereço dele) ou deixar
+      // de lado e partir do estudo atual (ou do zero)
+      const salvo = lerRascunho(p.id);
+      if (salvo && salvo.deBase) {
+        const resposta = await CC.confirmar({
+          titulo: 'Continuar o rascunho?',
+          texto: 'Neste celular há um estudo começado a partir do estudo de ' + ddmm(salvo.deBaseData) + '. Você pode continuar nele ou deixar o rascunho de lado e '
+            + (p.estudo && !p.estudo.usado ? 'mudar o estudo atual.' : 'começar do zero.'),
+          acao: 'Continuar o rascunho', cancelar: 'Deixar de lado',
+        });
+        if (!vivo()) return;
+        // tocar fora (null) é o mesmo que continuar: nada do que a pessoa escreveu se perde sem ela pedir
+        if (resposta !== false) { CC.substituirRota(apoio.endereco(p.id, 'preparar') + '/' + encodeURIComponent(salvo.deBase)); return; }
+        apagarRascunho(p.id);
+      }
+      st = estadoInicial(p);
+    }
     const guardar = () => gravarRascunho(p.id, st);
     const sem = () => R.semana(p.semanaAte);
     const refDoTrecho = () => {
@@ -184,7 +203,7 @@
         + '<h1>' + esc(titulo) + '</h1><span class="vao"></span></div>'
         + '<div class="mesa-passos" aria-hidden="true">' + [1, 2, 3].map((k) => '<i' + (k <= n ? ' class="feito"' : '') + '></i>').join('') + '</div>'
         + '<p class="mesa-passo"><b>Passo ' + n + ' de 3</b>' + PONTO + esc(nome) + '</p></div>'
-        + '<div class="painel-celula mesa-preparo" data-passo="' + n + '" data-celula="' + esc(p.id) + '">' + painel + '</div>';
+        + '<div class="painel-celula mesa-preparo" data-passo="' + n + '" data-celula="' + esc(p.id) + '" data-de-base="' + esc(st.deBase || '') + '">' + painel + '</div>';
       raiz.querySelector('[data-voltar]').onclick = () => (n === 1 ? sair() : irPara(n - 1));
       return raiz.querySelector('.mesa-preparo');
     }
@@ -278,7 +297,8 @@
         + '<div data-erro role="alert" hidden></div>'
         + '<div class="acoes"><button class="botao" data-ver>Ver as partes' + CC.ico('avancar') + '</button>'
         + '<button class="botao plano" data-cancelar>Cancelar</button>'
-        + (p.estudo && !st.deBase ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '') + '</div>');
+        + (p.estudo && !st.deBase ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '')
+        + (st.deBase ? '<button class="botao plano perigo" data-descartar>Descartar o rascunho</button>' : '') + '</div>');
       const q = (s) => painel.querySelector(s);
       painel.querySelectorAll('[data-tipo]').forEach((b) => {
         b.onclick = () => { if (st.tipo !== b.dataset.tipo) { st.tipo = b.dataset.tipo; guardar(); passo1(); } };
@@ -294,6 +314,12 @@
         await apoio.carregar();
         CC.substituirRota(apoio.endereco(p.id, 'estudo'));
         CC.avisar('Estudo tirado', { tipo: 'certo' });
+      };
+      const descartar = q('[data-descartar]');
+      if (descartar) descartar.onclick = async () => {
+        if (await CC.confirmar({ titulo: 'Descartar o rascunho?', texto: 'O que você escreveu a partir do estudo de ' + ddmm(st.deBaseData) + ' sai deste celular. O estudo de ' + ddmm(st.deBaseData) + ' continua guardado.', acao: 'Descartar', perigo: true }) !== true) return;
+        apagarRascunho(p.id);
+        CC.substituirRota(apoio.endereco(p.id, 'estudo') + '/' + encodeURIComponent(st.deBase));
       };
       const ver = q('[data-ver]');
       ver.onclick = () => irPara(2);
