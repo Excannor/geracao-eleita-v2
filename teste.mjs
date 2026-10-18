@@ -2057,6 +2057,20 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   fecharBanco(arquivoDoBanco(pasta));
   rmSync(pasta, { recursive: true, force: true });
 }
+{
+  // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
+  const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
+  const historico = pol.slice(pol.indexOf('<ul class="historico">'));
+  checar(/<p class="atualizada">Versão 5 · atualizada em 18 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5');
+  checar(historico.indexOf('<b>Versão 5, 18 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Versão 5,') < historico.indexOf('<b>Versão 4, 18 de outubro de 2026.</b>')
+    && historico.indexOf('<b>Versão 4,') < historico.indexOf('<b>Ajuste da versão 3'), 'o histórico tem a versão 5 e a 4, das mais novas para as mais antigas');
+  checar(/<tr><td>O estudo da célula<\/td><td>[^<]*estudos anteriores, só quem faz parte da célula hoje, inclusive quem entrou depois[^<]*célula de origem até a data da multiplicação/.test(pol),
+    'o quadro de quem vê diz quem lê os estudos anteriores, inclusive na célula que nasceu de uma multiplicação');
+  checar(/O lugar de cada anotação \([^)]*o estudo da célula\) fica sem criptografia/.test(pol) && /Junto com a presença fica qual estudo foi usado no encontro/.test(pol)
+    && /mensagem pronta pelo WhatsApp do próprio celular\. O app não manda nada sozinho\./.test(pol) && /Acolhida, adoração e testemunho não ficam guardados nos estudos anteriores/.test(pol),
+  'a política diz o lugar da anotação sem cifra, o estudo junto da presença, a mensagem a quem faltou e o que não vai para o histórico');
+  checar(!/[\u2013\u2014]/.test(pol), 'a política não tem travessão nem meia-risca');
+}
 
 // =========================================================================
 secao('painel pastoral agregado (Fase 5, seção 2)');
