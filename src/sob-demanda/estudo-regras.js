@@ -350,10 +350,12 @@
   }
 
   // ---------- Fase 2: guardar (docs/a-mesa-fase2.md, 5.2) ----------
-  // "Na semana passada combinamos: Ligar para alguém que faltou. Como foi?" O ponto só entra
-  // quando o combinado não termina em ponto, exclamação ou interrogação.
+  // "Na semana passada combinamos: “Ligar para alguém que faltou.” Como foi?" O combinado vai
+  // entre aspas, como foi escrito: a maiúscula dele, no meio da frase, fica certa. O ponto só entra
+  // quando ele não termina em ponto, exclamação ou interrogação.
   const comPonto = (t) => { const x = String(t || '').trim(); return x + (/[.!?]$/.test(x) ? '' : '.'); };
-  const lembrarCombinado = (texto) => 'Na semana passada combinamos: ' + comPonto(texto) + ' Como foi?';
+  const entreAspas = (t) => ABRE + comPonto(t) + FECHA;
+  const lembrarCombinado = (texto) => 'Na semana passada combinamos: ' + entreAspas(texto) + ' Como foi?';
 
   // Os capítulos do estudo em poucas letras, na ordem em que aparecem e sem repetir: "Ef 6, Lc
   // 11, 1Pe 5". Até 3, e depois " e mais N".
@@ -404,15 +406,15 @@
     const qs = perguntasDe(e, c.semana);
     const oracao = e.tipo === 'semana' && c.semana ? c.semana.oracao : e.tipo === 'trecho' ? [ORAR_TRECHO] : [];
     const plano = (c.noPlano || []).map((d) => d.capitulo + ' é o dia ' + d.numero + ' do plano').join(PONTO);
-    const acolhida = (c.combinadoAnterior ? '<p class="imp-lembrar"><b>Na semana passada combinamos:</b> ' + esc(comPonto(c.combinadoAnterior)) + ' Como foi?</p>' : '') + p(c.acolhida);
+    const acolhida = (c.combinadoAnterior ? '<p class="imp-lembrar"><b>Na semana passada combinamos:</b> ' + esc(entreAspas(c.combinadoAnterior)) + ' Como foi?</p>' : '') + p(c.acolhida);
     return '<header class="imp-cabeca">' + esc([c.celula, c.linha].filter(Boolean).join(PONTO)) + '</header>'
       + '<h1 class="imp-titulo">' + negrito(nome) + '</h1>'
       + (plano ? '<p class="imp-plano">' + esc(plano) + '</p>' : '')
       + (c.anterior ? '' : parte('Acolhida', acolhida) + parte('Adoração', p(c.adoracao)))
       + parte('Palavra', palavra)
       + parte('Para conversar', qs.length ? '<ol class="imp-perguntas">' + qs.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ol>' : '')
-      + parte('Para orar juntos', oracao.map(p).join(''))
       + parte('Combinado para a semana', p(e.combinado))
+      + parte('Para orar juntos', oracao.map(p).join(''))
       + (c.anterior ? '' : parte('Testemunho', p(c.testemunho)))
       + ((c.credito || []).length ? '<footer class="imp-pe">' + c.credito.map((l) => '<p>' + esc(l) + '</p>').join('') + '</footer>' : '');
   }

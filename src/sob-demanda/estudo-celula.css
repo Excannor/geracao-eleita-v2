@@ -89,6 +89,8 @@
 .tela-modo-encontro .cena.mesa-topo { padding-bottom: 28px; }
 .mesa-topo .mesa-titulo-cena { margin: 4px 0 0; color: var(--folha-tinta); font-size: 1.625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
 .mesa-topo .frase-cena.mesa-frase { font-size: 1.5rem; }
+/* a frase longa (o combinado perto do teto) desce de tamanho e cabe acima do rodapé a 360 px */
+.mesa-topo .frase-cena.mesa-frase.longa { font-size: 1.25rem; }
 .mesa-topo .mesa-abrir { margin-top: 8px; background: var(--folha-destaque); color: var(--tinta-forte); }
 /* no escuro, o fundo do campo (o da tela cheia) é o mesmo da folha do alto e o botão deixava de
    parecer botão: a pílula de destaque da folha, a sálvia com a tinta dela. O seletor precisa
@@ -161,7 +163,7 @@
 .mesa-presenca { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: start; gap: 14px; padding: 16px 18px; border-radius: var(--raio-cartao); background: var(--cartao); }
 .mesa-presenca > svg { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
 .mesa-presenca > span { display: grid; gap: 4px; align-self: center; }
-.mesa-presenca b { color: var(--tinta-forte); font-size: 1rem; font-weight: 700; line-height: 1.4; }
+.mesa-presenca .mesa-veio { color: var(--tinta-forte); font-size: 1rem; font-weight: 500; line-height: 1.4; }
 .mesa-presenca small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
 /* o modo encontro: a pergunta da acolhida embaixo do combinado lembrado */
 .mesa-convite > span { display: grid; gap: 4px; }

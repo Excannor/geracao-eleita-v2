@@ -1305,14 +1305,14 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   checar(R.refsCurtas(['João 3.16', 'Romanos 8.28', 'Salmos 23', 'João 3.17', 'Gênesis 1.1', '1 Coríntios 13.4']) === 'Jo 3, Rm 8, Sl 23 e mais 2', 'refsCurtas(): cinco capítulos dão os três primeiros e " e mais 2"');
   checar(R.refsCurtas([]) === '' && R.refsCurtas() === '', 'refsCurtas(): sem referências, vazio');
   // 17. lembrarCombinado()
-  checar(R.lembrarCombinado('Ligar para alguém') === 'Na semana passada combinamos: Ligar para alguém. Como foi?', 'lembrarCombinado(): o combinado sem ponto ganha o ponto');
-  checar(R.lembrarCombinado('Ligar para alguém.') === 'Na semana passada combinamos: Ligar para alguém. Como foi?', 'lembrarCombinado(): com ponto, não fica com dois');
-  checar(R.lembrarCombinado('Quem vamos visitar?') === 'Na semana passada combinamos: Quem vamos visitar? Como foi?', 'lembrarCombinado(): a interrogação fica');
+  checar(R.lembrarCombinado('Ligar para alguém') === 'Na semana passada combinamos: \u201cLigar para alguém.\u201d Como foi?', 'lembrarCombinado(): o combinado vai entre aspas, e sem ponto ganha o ponto');
+  checar(R.lembrarCombinado('Ligar para alguém.') === 'Na semana passada combinamos: \u201cLigar para alguém.\u201d Como foi?', 'lembrarCombinado(): com ponto, não fica com dois');
+  checar(R.lembrarCombinado('Quem vamos visitar?') === 'Na semana passada combinamos: \u201cQuem vamos visitar?\u201d Como foi?', 'lembrarCombinado(): a interrogação fica');
   // 18. passos() com o combinado de antes e o desta semana
   {
     const comb = { ...dono, combinado: 'Orar todo dia por alguém que ainda não conhece Jesus.' };
     const ps2 = R.passos(comb, { conduzo: true, acolhida: 'Qual foi a melhor parte da sua semana?', adoracao: 'A', testemunho: 'T', combinadoAnterior: 'Ligar para alguém que faltou.' });
-    checar(ps2[0].frase === 'Na semana passada combinamos: Ligar para alguém que faltou. Como foi?' && ps2[0].pergunta === 'Qual foi a melhor parte da sua semana?',
+    checar(ps2[0].frase === 'Na semana passada combinamos: \u201cLigar para alguém que faltou.\u201d Como foi?' && ps2[0].pergunta === 'Qual foi a melhor parte da sua semana?',
       'passos(): com o combinado de antes, a acolhida começa por ele, e a pergunta da acolhida vai junto');
     const iSemana = ps2.findIndex((x) => x.etiqueta === 'Para a semana');
     checar(iSemana > 0 && ps2[iSemana + 1].etiqueta === 'Orar juntos' && ps2[iSemana].frase === comb.combinado && ps2.length === 16, 'passos(): "Para a semana" fica logo antes de "Orar juntos"');
@@ -1330,7 +1330,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
     checar(imp.includes('<h1 class="imp-titulo">' + CC.esc(dono.titulo)) && dono.refs.every((r) => imp.includes('TEXTO ' + r) && imp.includes(r + ' \u00b7 NBV'))
       && R.perguntasDe(comb).every((q) => imp.includes('<li>' + CC.esc(q) + '</li>')) && imp.includes(comb.combinado) && imp.includes('Nova Bíblia Viva') && imp.includes('Efésios 6 é o dia 244 do plano'),
       'paraImprimir(): o título, cada cartão com o texto passado, as perguntas, o combinado, "No plano" e o crédito');
-    checar(imp.includes('<b>Na semana passada combinamos:</b> Ligar para alguém que faltou. Como foi?') && imp.indexOf('ACOLHIDA X') < imp.indexOf('ADORACAO X') && imp.indexOf('ADORACAO X') < imp.indexOf('<h2>Palavra</h2>')
+    checar(imp.includes('<b>Na semana passada combinamos:</b> \u201cLigar para alguém que faltou.\u201d Como foi?') && imp.indexOf('ACOLHIDA X') < imp.indexOf('ADORACAO X') && imp.indexOf('ADORACAO X') < imp.indexOf('<h2>Palavra</h2>')
       && imp.indexOf('<h2>Combinado para a semana</h2>') < imp.indexOf('TESTEMUNHO X'), 'paraImprimir(): o atual leva Acolhida (com o combinado de antes), Adoração, Palavra, Para conversar, Combinado e Testemunho, nessa ordem');
     const impAnt = R.paraImprimir(comb, { ...ctx, anterior: true });
     checar(!/ACOLHIDA X|ADORACAO X|TESTEMUNHO X|Na semana passada|<h2>Acolhida|<h2>Testemunho/.test(impAnt) && impAnt.includes('<h2>Palavra</h2>') && impAnt.includes(comb.combinado),

@@ -111,7 +111,10 @@
   }
 
   // O roteiro de semana e trecho, como já era: Leiam juntos, a leitura da semana, as perguntas
-  // (as escolhidas ou as de sempre) e a oração.
+  // (as escolhidas ou as de sempre), o combinado e a oração (a mesma ordem do modo encontro e do
+  // texto do grupo). A leitura da semana guardada sem a semana do plano (as de antes da v19, com
+  // planoAte 0) chega aqui sem sem: os dias daquela semana não ficaram guardados, e mostrar os de
+  // hoje seria contar outro encontro.
   function roteiro(p, e, sem, textos, sigla, versiculos) {
     const cartao = R.comoBlocos(e, sem, versiculos).find((b) => b.t === 'versiculo');
     const abrir = cartao ? abrirNaBiblia(cartao.ref) : '';
@@ -123,7 +126,8 @@
       + (e.tipo === 'semana' ? '<li><b>A leitura da semana</b><ul class="roteiro-dias">' + sem.dias.map((d) => '<li><span>Dia ' + d.n + '</span>' + esc(CC.passagemDe(d.dia))
         + (d.r.titulo ? '<small>' + esc(d.r.titulo) + '</small>' : '') + '</li>').join('') + '</ul></li>' : '')
       + (perguntas.length ? '<li><b>Para conversar</b><ul class="roteiro-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ul></li>' : '')
-      + (e.tipo === 'semana' && sem.oracao.length ? '<li><b>Para orar juntos</b><ul class="roteiro-oracao">' + sem.oracao.map((o) => '<li>' + esc(o) + '</li>').join('') + '</ul></li>' : '')
+      + (e.combinado ? '<li><b>Combinado para a semana</b><p>' + esc(e.combinado) + '</p></li>' : '')
+      + (e.tipo === 'semana' && sem && sem.oracao.length ? '<li><b>Para orar juntos</b><ul class="roteiro-oracao">' + sem.oracao.map((o) => '<li>' + esc(o) + '</li>').join('') + '</ul></li>' : '')
       + (e.tipo === 'trecho' ? '<li><b>Para orar juntos</b><p>' + esc(R.ORAR_TRECHO) + '</p></li>' : '')
       + '</ol>';
   }
@@ -149,7 +153,7 @@
   // se cumpriu).
   const combinadoLembrado = (texto) => '<div class="mesa-combinado"><p><b>Na semana passada combinamos:</b> '
     + esc(R.lembrarCombinado(texto).replace(/^Na semana passada combinamos: /, '')) + '</p></div>';
-  const secaoCombinado = (e) => (e.combinado ? secaoW('Combinado para a semana', '<p>' + esc(e.combinado) + '</p>') : '');
+  const secaoCombinado = (e) => (e.combinado && e.tipo !== 'semana' && e.tipo !== 'trecho' ? secaoW('Combinado para a semana', '<p>' + esc(e.combinado) + '</p>') : '');
   const visitante = (p) => membroEu(p).papel === 'visitante';
 
   // A Palavra de um estudo (a aba, a leitura de um anterior): o estudo escrito em partes, ou o
@@ -228,7 +232,8 @@
   const nomeDaCelula = (titulo) => (/^c[ée]lula(\s|$)/i.test(titulo || '') ? titulo : 'célula ' + (titulo || ''));
   const linhaAnterior = (p, x) => '<a class="mesa-anterior" href="' + CC.apoioCelula.endereco(p.id, 'estudo') + '/' + encodeURIComponent(x.id) + '">' + CC.ico('livro')
     + '<span><small>' + esc(R.dataDaLista(x)) + '</small><b>' + esc(R.titulo(x) || 'Estudo do encontro') + '</b>'
-    + (R.refsCurtas(x.refs) ? '<small>' + esc(R.refsCurtas(x.refs)) + '</small>' : '') + '</span>' + CC.ico('direita') + '</a>';
+    // no trecho, o título já é a referência ("Romanos 8.28-30"): "Rm 8" embaixo só repetiria
+    + (x.tipo !== 'trecho' && R.refsCurtas(x.refs) ? '<small>' + esc(R.refsCurtas(x.refs)) + '</small>' : '') + '</span>' + CC.ico('direita') + '</a>';
   // Pede uma página (de: '' para os da própria célula, 'mae' para os da célula de origem) e
   // desenha a lista dentro de "alvo", acrescentando as páginas seguintes em "Ver mais estudos".
   async function carregarLista(alvo, p, de) {
@@ -342,8 +347,8 @@
     painel.innerHTML = '<div class="mesa-volta">' + CC.botaoVoltar('Estudo') + '</div>'
       + '<div class="mesa-cabeca-anterior"><span class="etiqueta">' + esc(etiqueta) + '</span><p class="passo-dica">' + esc(linha) + '</p></div>'
       // quantas pessoas vieram: só quem conduz a célula do estudo, nunca na lista (não vira placar)
-      + (presenca.length ? '<div class="mesa-presenca">' + CC.ico('pessoas') + '<span>' + presenca.map((x) => '<b>' + esc((x.pessoas === 1 ? 'Veio 1 pessoa' : 'Vieram ' + x.pessoas + ' pessoas') + ' no encontro de ' + ddmm(x.data) + '.') + '</b>').join('')
-        + '<small>Só quem conduz a célula vê este número.</small></span></div>' : '')
+      + (presenca.length ? '<div class="mesa-presenca">' + CC.ico('pessoas') + '<span>' + presenca.map((x) => '<span class="mesa-veio">' + esc((x.pessoas === 1 ? 'Veio 1 pessoa' : 'Vieram ' + x.pessoas + ' pessoas') + ' no encontro de ' + ddmm(x.data) + '.') + '</span>').join('')
+        + '<small>' + (presenca.length > 1 ? 'Só quem conduz a célula vê estes números.' : 'Só quem conduz a célula vê este número.') + '</small></span></div>' : '')
       + (e.tipo === 'blocos' || e.tipo === 'trecho' ? noPlanoHtml(refs) : '')
       + secaoW('Palavra', palavraHtml(p, e, sem, textos, sigla, versiculos, quem, apoio))
       + (perguntas.length ? secaoW('Para conversar', '<ol class="roteiro-perguntas mesa-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ol>') : '')
@@ -516,7 +521,8 @@
       return etiqueta + (s.titulo ? '<h1 class="mesa-titulo-cena">' + R.negrito(s.titulo) + '</h1>' : '')
         + (s.abrir ? abrirNaBiblia(s.abrir.livro + ' ' + s.abrir.cap, 'mesa-abrir') : '');
     }
-    return etiqueta + (s.frase ? '<p class="frase-cena mesa-frase">' + R.negrito(s.frase) + '</p>' : '');
+    // a frase longa (o combinado perto do teto de 200) desce de tamanho para caber acima do rodapé
+    return etiqueta + (s.frase ? '<p class="frase-cena mesa-frase' + (s.frase.length > 120 ? ' longa' : '') + '">' + R.negrito(s.frase) + '</p>' : '');
   }
   function corpoDoPasso(s, textos, sigla, versiculos) {
     if (s.tipo === 'palavra') {

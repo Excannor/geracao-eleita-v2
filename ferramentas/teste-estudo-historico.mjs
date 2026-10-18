@@ -413,7 +413,8 @@ try {
   const rota = (resto) => '#/novidades/celula/' + ID + (resto ? '/' + resto : '');
   const ddmm = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
   const CARTOES_S1 = (sel) => na((s) => [...document.querySelectorAll(s)].map((f) => ({ ref: f.dataset.ref, texto: (f.querySelector('blockquote') || {}).textContent || '' })), sel);
-  const ACOLHIDA_LEMBRADA = 'Na semana passada combinamos: ' + COMBINADO_1 + ' Como foi?';
+  // o combinado vai entre aspas, como foi escrito (a maiúscula no meio da frase fica certa)
+  const ACOLHIDA_LEMBRADA = 'Na semana passada combinamos: \u201c' + COMBINADO_1 + '\u201d Como foi?';
 
   // 10. o passo 3 do líder: o combinado de S2, o aviso perto do teto, o rascunho e a frase nova
   await como(lider, rota('estudo'));
@@ -453,7 +454,10 @@ try {
   ok(comum(await texto('.secao-w .mesa-combinado')).replace(/\s+/g, ' ') === ACOLHIDA_LEMBRADA && await av('document.querySelector(".mesa-combinado").closest(".secao-w").querySelector(".etiqueta").textContent === "Acolhida"'),
     '11. a Acolhida começa por "' + ACOLHIDA_LEMBRADA + '"');
   ok(await av('!document.querySelector(".mesa-combinado input, .mesa-combinado button, .mesa-combinado [role=checkbox]")'), '11. no combinado lembrado não há caixa de marcar nem botão');
-  ok(await av('[...document.querySelectorAll(".secao-w")].some((s) => s.querySelector(".etiqueta").textContent === "Combinado para a semana" && s.textContent.includes(' + JSON.stringify(COMBINADO_2) + '))'), '11. "Combinado para a semana" mostra o combinado de S2');
+  // S2 é um trecho: o combinado entra no roteiro, logo antes da oração (a ordem do modo encontro e do texto do grupo)
+  ok(await av('(() => { const itens = [...document.querySelectorAll(".painel-celula .roteiro > li > b")].map((b) => b.textContent); const li = [...document.querySelectorAll(".painel-celula .roteiro > li")].find((x) => x.querySelector("b")?.textContent === "Combinado para a semana");'
+    + ' return !!li && li.textContent.includes(' + JSON.stringify(COMBINADO_2) + ') && itens.indexOf("Combinado para a semana") === itens.indexOf("Para orar juntos") - 1; })()'),
+  '11. "Combinado para a semana" mostra o combinado de S2, logo antes de "Para orar juntos"');
   ok(await av('!/\\d+ de \\d+/.test(document.querySelector(".painel-celula").textContent)'), '11. nenhuma contagem "N de M" na aba');
   ok(await av('!/Orem pelo Jonas/.test(document.querySelector(".painel-celula").textContent)'), '11. o testemunho de S1 (com o nome) não aparece em S2');
   ok(/Minhas anotações neste estudo/.test(await texto('.mesa-anotacao')) && /Só você vê/.test(await texto('.mesa-anotacao')), '11. "Minhas anotações neste estudo", com "Só você vê"');
@@ -522,7 +526,7 @@ try {
   await como(aux, rota('estudo/' + S1));
   ok(await esperar(existe('.mesa-presenca'), 20000), '14. o Paulo abre S1 e vê o cartão da presença');
   const presenca = comum(await texto('.mesa-presenca'));
-  ok(presenca.includes('Vieram 2 pessoas no encontro de ' + ddmm(DIA_3) + '.') && presenca.includes('Vieram 5 pessoas no encontro de ' + ddmm(DIA_7) + '.') && presenca.includes('Só quem conduz a célula vê este número.'),
+  ok(presenca.includes('Vieram 2 pessoas no encontro de ' + ddmm(DIA_3) + '.') && presenca.includes('Vieram 5 pessoas no encontro de ' + ddmm(DIA_7) + '.') && presenca.includes('Só quem conduz a célula vê estes números.'),
     '14. "Vieram 2 pessoas no encontro de ' + ddmm(DIA_3) + '." e "Vieram 5 pessoas no encontro de ' + ddmm(DIA_7) + '.", só para quem conduz');
   ok(await av('!/Usar como base/.test(document.querySelector(".painel-celula").textContent)'), '14. o auxiliar não tem "Usar como base"');
   await foto('05-leitura-quem-conduz', true);
