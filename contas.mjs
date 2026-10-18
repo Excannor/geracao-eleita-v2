@@ -1484,7 +1484,8 @@ export class Contas {
   // anterior. Devolve { p, dono, itens: [{ e, data, dataDe }], mais, antes }.
   estudosAnteriores(eu, celulaId, { de = '', antes = '', limite = ESTUDOS_POR_PAGINA } = {}) {
     const u = limparNome(eu);
-    const p = this.proposito(String(celulaId || '').slice(0, 64));
+    const cid = String(celulaId || '');
+    const p = cid.length <= 64 ? this.proposito(cid) : null;
     const m = p && p.celula && !p.encerradoEm ? p.membros.find((x) => x.usuario === u && x.estado === 'ativo') : null;
     if (!m) throw erro('célula não encontrada', 404);
     if (m.papel === 'visitante') throw erro(MSG_ESTUDO.soMembros, 403);

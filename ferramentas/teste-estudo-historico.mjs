@@ -136,7 +136,7 @@ try {
   const s1 = (await pedir('api/celula', { ...DONO, id: ID, combinado: COMBINADO_1, testemunho: TESTEMUNHO }, lider)).dado.estudo;
   ok(s1 && s1.combinado === COMBINADO_1 && JSON.stringify(s1.refs) === JSON.stringify(CARTOES), 'S1: o líder salva o estudo do dono com o combinado');
   const S1 = s1.id;
-  noBanco((db) => db.prepare('UPDATE celula_estudos SET criado_em = ? WHERE id = ?').run(new Date(Date.parse(meioDia(somaDias(HOJE, -8)))).toISOString(), S1));
+  noBanco((db) => db.prepare('UPDATE celula_estudos SET criado_em = ? WHERE id = ?').run(meioDia(somaDias(HOJE, -8)), S1));
   // o sino de todos da célula, contado antes e depois de cada registro
   const caixa = () => lerBanco("SELECT count(*) n FROM push_caixa WHERE usuario IN ('lider', 'aux', 'ana', 'bia', 'vera', 'caio')")[0].n;
   let caixaAntes = caixa();

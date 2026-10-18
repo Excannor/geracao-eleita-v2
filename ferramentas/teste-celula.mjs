@@ -447,7 +447,8 @@ try {
     ok(listaVera.status === 403 && (await dados(listaVera)).erro === 'quem está conhecendo a célula vê só o estudo atual', 'a visitante recebe 403 na lista');
     ok((await estudos('celula=' + idF, ana.cookie)).status === 404 && (await estudos('celula=' + idF)).status === 401 && (await estudos('celula=nenhuma', anaF.cookie)).status === 404,
       'de fora da célula, 404; sem entrar, 401');
-    ok((await estudos('celula=' + idF + '&de=mae', anaF.cookie)).status === 404, 'a lista da célula de origem, numa célula sem mãe: 404');
+    ok((await estudos('celula=' + idF + '&de=mae', anaF.cookie)).status === 404 && (await estudos('celula=' + idF + 'x'.repeat(60), anaF.cookie)).status === 404,
+      'a lista da célula de origem, numa célula sem mãe, e um id de célula comprido demais: 404');
     ok((await pedir('/api/estudos?celula=' + idF, {}, anaF.cookie)).status === 405, 'a rota só lê: POST dá 405');
 
     const lerS1 = async (cookie, extra = '') => { const r = await estudos('estudo=' + s1.id + extra, cookie); return { status: r.status, corpo: await dados(r) }; };
