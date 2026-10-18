@@ -242,6 +242,9 @@ function paraLinhas(d) {
     { tabela: 'celula_encontros', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || []).map((e) => ({
       proposito: p.id, data: e.data, visitantes: Number(e.visitantes) || 0, registrado_por: e.registradoPor || '', em: e.em || '',
       sem_encontro: e.semEncontro ? 1 : 0,
+      // o estudo usado no encontro (v20) tem de estar aqui pelo mesmo motivo do estudo_id da célula:
+      // sem a coluna, o INSERT OR REPLACE da primeira gravação zeraria o estudo de todos os encontros
+      estudo: e.estudo || '',
     }))) },
     { tabela: 'celula_presencas', chaves: ['proposito', 'data', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || [])
       .flatMap((e) => (e.presentes || []).map((usuario) => ({ proposito: p.id, data: e.data, usuario })))) },
@@ -339,7 +342,12 @@ function deLinhas(t, versao) {
   }
   for (const l of t.encontros || []) {
     const p = d.propositos[l.proposito];
-    if (p) p.encontros.push({ data: l.data, visitantes: Number(l.visitantes) || 0, registradoPor: l.registrado_por || '', em: l.em || '', presentes: [], semEncontro: !!l.sem_encontro });
+    if (p) {
+      p.encontros.push({
+        data: l.data, visitantes: Number(l.visitantes) || 0, registradoPor: l.registrado_por || '', em: l.em || '', presentes: [],
+        semEncontro: !!l.sem_encontro, estudo: l.estudo || '',
+      });
+    }
   }
   for (const l of t.presencas || []) {
     const p = d.propositos[l.proposito];

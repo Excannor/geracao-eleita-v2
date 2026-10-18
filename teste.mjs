@@ -1682,6 +1682,23 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
     && linhas("SELECT estudo_tipo, estudo_texto, estudo_id FROM propositos WHERE id = ?", ID)[0].estudo_id === r7.estudo.id,
   'regravar a célula por outro motivo não zera o estudo_id (paraLinhas grava o ponteiro)');
   checar(!('estudo' in ce.proposito(ID)), 'o objeto antigo p.estudo não mora mais na memória');
+  {
+    // v20: a mesma armadilha em celula_encontros. Um encontro gravado com o estudo ligado, relido do
+    // banco, e a célula regravada por outro motivo: o estudo do encontro continua lá
+    ce.proposito(ID).encontros = [{ data: '2026-10-19', em: dia(19).toISOString(), visitantes: 1, presentes: ['ana'], registradoPor: 'lider', semEncontro: false, estudo: '' }];
+    await ce.salvar();
+    ce.banco().prepare("UPDATE celula_encontros SET estudo = 'e1' WHERE proposito = ? AND data = '2026-10-19'").run(ID);
+    ce = await new Contas(arquivoE).carregar();
+    checar(ce.proposito(ID).encontros[0].estudo === 'e1', 'o estudo ligado ao encontro é lido do banco (deLinhas)');
+    ce.proposito(ID).recado = 'Tragam a Bíblia e um caderno';
+    await ce.salvar();
+    ce = await new Contas(arquivoE).carregar();
+    checar(ce.proposito(ID).encontros[0].estudo === 'e1' && linhas('SELECT estudo FROM celula_encontros WHERE proposito = ?', ID)[0].estudo === 'e1',
+      'regravar a célula por outro motivo não zera o estudo dos encontros (paraLinhas grava a coluna)');
+    ce.proposito(ID).encontros = [];
+    ce.proposito(ID).recado = 'Tragam a Bíblia';
+    await ce.salvar();
+  }
 
   // --- a linha antiga e a multiplicação ---
   ce.banco().prepare("INSERT INTO celula_estudos (id, proposito, tipo, ref, fonte, criado_por, criado_em) VALUES ('lx', ?, 'trecho', 'João 3.16-18', '', '', '2026-01-01')").run(ID);

@@ -211,9 +211,23 @@ Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
   dbV7.prepare("INSERT INTO celula_encontros (proposito, data, visitantes, registrado_por, em) VALUES ('p1', '2026-01-08', 2, 'lider', '2026-01-08T20:00:00Z')").run();
   dbV7.prepare("INSERT INTO celula_presencas (proposito, data, usuario) VALUES ('p1', '2026-01-08', 'lider')").run();
   ok(dbV7.prepare("SELECT count(*) n FROM celula_presencas WHERE proposito = 'p1'").get().n === 1, 'as tabelas novas aceitam linhas de verdade');
+  // v20: o combinado mora no estudo, e cada encontro diz qual estudo foi usado. Confere "tem a
+  // v20", nunca "é a v20" (docs/aprendizados.md, 2026-10-04)
+  {
+    const colunas = (tabela) => dbV7.prepare('PRAGMA table_info(' + tabela + ')').all().map((c) => c.name);
+    ok(B.versaoDoEsquema() >= 20 && colunas('celula_estudos').includes('combinado') && colunas('celula_encontros').includes('estudo'),
+      'a migração v20 acrescenta celula_estudos.combinado e celula_encontros.estudo');
+    ok(dbV7.prepare("SELECT combinado FROM celula_estudos WHERE id = 'lp2'").get().combinado === ''
+      && dbV7.prepare("SELECT estudo FROM celula_encontros WHERE proposito = 'p1' AND data = '2026-01-08'").get().estudo === '',
+    'o estudo que já estava fica sem combinado, e o encontro sem o estudo ligado ("" é "não se sabe")');
+    dbV7.prepare("UPDATE celula_encontros SET estudo = 'lp2' WHERE proposito = 'p1' AND data = '2026-01-08'").run();
+  }
   B.apagarPessoaDoBanco(dbV7, 'lider');
   ok(dbV7.prepare("SELECT count(*) n FROM celula_estudos WHERE id = 'lp2'").get().n === 1,
     'apagar a pessoa do banco (e dos backups) não apaga os estudos da célula: eles ficam com o @ de quem preparou');
+  ok(dbV7.prepare("SELECT estudo FROM celula_encontros WHERE proposito = 'p1' AND data = '2026-01-08'").get().estudo === 'lp2'
+    && dbV7.prepare("SELECT count(*) n FROM celula_presencas WHERE proposito = 'p1'").get().n === 0,
+  'e não mexe no estudo ligado ao encontro: só a presença da pessoa sai');
   B.fecharBanco(arquivoV6);
 
   // ---------- migração v7 -> v8 num banco v7 existente ----------

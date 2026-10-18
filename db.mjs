@@ -292,6 +292,16 @@ const ESQUEMA = [
     FROM propositos WHERE celula = 1 AND estudo_tipo != '';
   UPDATE propositos SET estudo_id = 'l' || id WHERE celula = 1 AND estudo_tipo != '';
   `,
+  // v20: o estudo da célula guarda (À Mesa, Fase 2, docs/a-mesa-fase2.md). O combinado para a
+  // semana mora no estudo e vai para o histórico com o título, a Palavra e as perguntas (acolhida,
+  // adoração e testemunho continuam em propositos e não vão). Cada encontro registrado guarda qual
+  // estudo foi usado: o id de celula_estudos, '-' para um estudo de fora do app, ou '' quando não
+  // se sabe (os registros de antes da v20 e a semana sem encontro). Os encontros antigos ficam com
+  // '': deduzir o estudo de cada um pelo período seria palpite.
+  `
+  ALTER TABLE celula_estudos ADD COLUMN combinado TEXT NOT NULL DEFAULT '';
+  ALTER TABLE celula_encontros ADD COLUMN estudo TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrarEsquema(db) {
