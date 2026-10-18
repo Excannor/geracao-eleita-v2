@@ -229,7 +229,7 @@ async function fotoDoPapel(nome) {
     s.id = 'papel-na-tela';
     s.textContent = css.slice(ini + 1, fim).replace(/@page\s*\{[^}]*\}/, '') + ' body.imprimindo-estudo .mesa-impressao { padding: 60px 57px; }';
     document.head.appendChild(s);
-    // o printToPDF dispara o afterprint, que já tirou a classe
+    // a classe sai junto com o bloco, mas a foto do anterior pode vir depois de uma troca de tela
     document.body.classList.add('imprimindo-estudo');
     return true;
   });
@@ -702,11 +702,16 @@ try {
   const caixaPdf = (/\/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)\s*\]/.exec(pdfTexto) || []).slice(1).map(Number);
   ok(caixaPdf.length === 2 && Math.abs(caixaPdf[0] - 595.3) < 1.5 && Math.abs(caixaPdf[1] - 841.9) < 1.5, '21. o PDF sai em A4, 595 x 842 pontos (' + caixaPdf.join(' x ') + ')');
   if (FOTOS) writeFileSync(join(FOTOS, '13-impressao-atual.pdf'), Buffer.from(pdf.data || '', 'base64'));
+  // o afterprint, que há navegador de celular que dispara antes de imprimir, não desfaz a folha:
+  // a classe sai junto com o bloco, na troca de tela
+  await av('dispatchEvent(new Event("afterprint")); true');
+  ok(await av('document.body.classList.contains("imprimindo-estudo") && !!document.querySelector("body > .mesa-impressao") && getComputedStyle(document.querySelector(".aplicativo")).display === "none"'),
+    '21. depois do afterprint, a folha e a classe continuam: o papel não volta a ser o app');
   await fotoDoPapel('13-impressao-atual-escuro');
   await cmd('Emulation.setEmulatedMedia', { media: '', features: [{ name: 'prefers-color-scheme', value: 'light' }] });
   await tema(false);
   await av('location.hash = ' + JSON.stringify(rota()));
-  ok(await esperar('!document.querySelector(".mesa-impressao")'), '21. trocar de tela tira a folha da impressão');
+  ok(await esperar('!document.querySelector(".mesa-impressao") && !document.body.classList.contains("imprimindo-estudo")'), '21. trocar de tela tira a folha da impressão e a classe');
 
   // 22. imprimir um anterior (Ana, S1): só a Palavra, as perguntas e o combinado
   await como(ana, rota('estudo/' + S1), false);

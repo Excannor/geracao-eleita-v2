@@ -426,8 +426,11 @@
   // ---------- Imprimir (docs/a-mesa-fase2.md, 4.10) ----------
   // O estudo no papel, em tinta preta sobre branco nos dois temas, sem as barras do app: um bloco
   // ligado direto no <body>, que o CSS de impressão (estudo-celula.css) deixa sozinho na página.
-  // Ele sai na próxima impressão ou na próxima troca de endereço (há navegador de celular que
-  // dispara o afterprint antes de a impressão terminar). Sem anotação, presença nem pedido.
+  // O bloco e a classe imprimindo-estudo saem juntos, na próxima impressão ou na próxima troca de
+  // endereço, e nunca no afterprint: há navegador de celular que dispara o afterprint antes de
+  // imprimir, e sem a classe o papel sairia com o app no lugar do estudo. Na tela, a classe não
+  // muda nada. Sem anotação, presença nem pedido.
+  let tirarImpressao = null;
   async function imprimir(p, e, apoio, opcoes = {}) {
     if (typeof window.print !== 'function') {
       CC.avisar('Este aparelho não abriu a impressão. Abra o app no navegador do celular ou do computador e tente de novo.', { tipo: 'erro' });
@@ -457,10 +460,14 @@
     folha.innerHTML = html;
     document.body.appendChild(folha);
     document.body.classList.add('imprimindo-estudo');
-    const tirarClasse = () => { document.body.classList.remove('imprimindo-estudo'); removeEventListener('afterprint', tirarClasse); };
-    const tirarBloco = () => { folha.remove(); tirarClasse(); removeEventListener('hashchange', tirarBloco); };
-    addEventListener('afterprint', tirarClasse);
-    addEventListener('hashchange', tirarBloco);
+    if (tirarImpressao) removeEventListener('hashchange', tirarImpressao);
+    tirarImpressao = () => {
+      folha.remove();
+      if (!document.querySelector('.mesa-impressao')) document.body.classList.remove('imprimindo-estudo');
+      removeEventListener('hashchange', tirarImpressao);
+      tirarImpressao = null;
+    };
+    addEventListener('hashchange', tirarImpressao);
     window.print();
   }
 
