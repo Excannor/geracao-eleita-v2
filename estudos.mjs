@@ -361,6 +361,12 @@ export function itemDoHistorico(e, { data = '', dataDe = 'preparo', nomeDe = (u)
   };
 }
 
+// O estudo em poucas palavras, para a mensagem a quem faltou (a resposta do registro e o último
+// encontro de "Precisam de atenção"): o tipo, o título como a lista mostra e as referências.
+export function resumoDoEstudo(e) {
+  return e ? { id: e.id, tipo: e.tipo, titulo: tituloDaLista(e), refs: e.refs } : null;
+}
+
 // O estudo como a folha de registro de presença precisa dele: o que mostrar na escolha e o dia em
 // que foi preparado (a folha esconde o estudo preparado depois da data escolhida).
 export function estudoDoRegistro(e, diaDe) {
