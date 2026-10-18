@@ -144,7 +144,7 @@
   // O que vem de fora (o servidor também passa por aqui). Lido do banco sem abrir (amigos,
   // célula, painel), texto e tags chegam cifrados ({ v, k, iv, tag, dado }, cofre.mjs): o
   // envelope passa inteiro, sem ser cortado nem trocado por vazio.
-  const CONTEXTO = /^(nota|secao|conhecer|parabola):/;
+  const CONTEXTO = /^(nota|secao|conhecer|parabola|estudo):/;
   const cifra = (x) => !!x && typeof x === 'object' && !Array.isArray(x);
   // Título opcional (o mesmo versículo pode ter várias notas, cada uma com um estudo): uma
   // linha só, sem espaço sobrando, até 60 letras; nota antiga, sem título, fica com ''.
@@ -163,8 +163,8 @@
         : (typeof n.tags === 'string' || cifra(n.tags) ? n.tags : []),
       cor: [1, 2, 3, 4].includes(n.cor) ? n.cor : 0,
       // onde a nota foi escrita, além dos versículos: uma página do Explorar ("nota:<id>",
-      // "secao:<pasta>"), um dia do Conhecer Jesus ("conhecer:<n>") ou uma parábola
-      // ("parabola:<slug>"); só o endereço, como os
+      // "secao:<pasta>"), um dia do Conhecer Jesus ("conhecer:<n>"), uma parábola
+      // ("parabola:<slug>") ou um estudo da célula ("estudo:<id>"); só o endereço, como os
       // versículos: o texto da pessoa fica em "texto", que é cifrado
       contexto: typeof n.contexto === 'string' && CONTEXTO.test(n.contexto) ? n.contexto.slice(0, 200) : '',
       fixada: !!n.fixada,

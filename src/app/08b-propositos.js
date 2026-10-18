@@ -566,7 +566,7 @@
       ligar('[data-proposito]', (el) => folhaProposito(lista.find((p) => p.id === el.dataset.proposito)));
       ligar('[data-aceitar-proposito]', async (el) => {
         el.disabled = true;
-        try { await acao({ acao: 'aceitar', id: el.dataset.aceitarProposito }); CC.avisar('Bora juntos!'); } catch (e) { CC.avisar(e.message); }
+        try { await acao({ acao: 'aceitar', id: el.dataset.aceitarProposito }); CC.avisar('Propósito aceito. Boa leitura juntos!'); } catch (e) { CC.avisar(e.message); }
         recarregar();
       });
       ligar('[data-recusar-proposito]', async (el) => {
@@ -993,7 +993,7 @@
           + '" target="_blank" rel="noopener">' + CC.ico('balao') + 'Chamar no WhatsApp</a>'
           + (amigos.includes(m.usuario) ? '<button class="botao plano pequeno" data-toque="' + CC.esc(m.usuario) + '" data-nome="' + CC.esc(m.nome) + '">Dar um toque</button>' : '')
           + '</div></div></div>').join('') + '</div>'
-        : '<p class="passo-dica pequena">Ninguém sumido por aqui.</p>');
+        : '<p class="passo-dica pequena">Ninguém precisa de atenção agora.</p>');
   }
 
   // A mensagem pronta do WhatsApp, pelo primeiro gatilho: falta no encontro, uma ofensiva longa
@@ -1003,8 +1003,8 @@
     const celula = /^c[ée]lula(\s|$)/i.test(p.titulo || '') ? p.titulo : 'célula';
     const tipo = (m.gatilhos && m.gatilhos[0] && m.gatilhos[0].tipo) || (/faltou/.test(m.motivo || '') ? 'faltou' : 'semLer');
     if (tipo === 'faltou') return 'Oi, ' + nome + '! Sentimos sua falta no encontro da ' + celula + '. Está tudo bem com você? Posso orar por alguma coisa?';
-    if (tipo === 'ofensiva') return 'Oi, ' + nome + '! Vi que sua sequência de leitura deu uma pausa depois de um tempão firme. Tudo bem por aí? Bora recomeçar juntos?';
-    return 'Oi, ' + nome + '! Passando para saber como você está. Bora voltar a ler junto com a gente?';
+    if (tipo === 'ofensiva') return 'Oi, ' + nome + '! Vi que a sua sequência de leitura parou, depois de tantos dias seguidos. Está tudo bem por aí? Se quiser, recomeçamos juntos.';
+    return 'Oi, ' + nome + '! Passando para saber como você está. Que tal voltar a ler junto com a gente?';
   }
 
   // Membros ativos que conduzem a célula (líder ou auxiliar): nunca entram no rodízio de

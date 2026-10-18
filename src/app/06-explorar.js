@@ -53,6 +53,7 @@
     const [tipo, alvo] = [chave.slice(0, chave.indexOf(':')), chave.slice(chave.indexOf(':') + 1)];
     if (tipo === 'conhecer') return 'Conhecer Jesus · dia ' + alvo;
     if (tipo === 'parabola') return 'Parábola · ' + (CC.tituloDaParabola ? CC.tituloDaParabola(alvo) : alvo);
+    if (tipo === 'estudo') return 'Estudo da célula';
     return tipo === 'nota' ? (D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : alvo) : ((secaoDe(alvo) || {}).rotulo || alvo);
   };
   CC.hrefDoContexto = (chave) => '#/' + chave.slice(0, chave.indexOf(':')) + '/' + encodeURIComponent(chave.slice(chave.indexOf(':') + 1));

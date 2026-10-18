@@ -288,18 +288,22 @@
     });
   }
 
-  // ---------- onde se escreve (Explorar, Conhecer Jesus): as notas do lugar e "Escrever nota" ----------
+  // ---------- onde se escreve (Explorar, Conhecer Jesus, estudo da célula): as notas do lugar e "Escrever nota" ----------
   // O mesmo bloco em todo lugar: os cartões de Minhas anotações e o mesmo editor, com o lugar
-  // ligado à nota (Estudo por padrão; data-tipo-nota muda).
+  // ligado à nota (Estudo por padrão; data-tipo-nota muda). Opcionais: data-titulo-notas (o título
+  // da seção), data-botao-notas (o botão; com uma nota já escrita, "Escrever outra anotação") e
+  // data-titulo-nota (o título que a nota nova já traz, que a pessoa pode mudar).
   CC.notasDoContexto = function (raiz) {
     const alvo = raiz.querySelector('[data-notas-contexto]');
     if (!alvo) return;
     const contexto = alvo.dataset.notasContexto;
+    const d = alvo.dataset;
     const desenhar = () => {
       const lista = CC.notas().filter((n) => n.contexto === contexto).sort((a, b) => b.editadaEm - a.editadaEm).map((n) => itemDeNota(n));
-      alvo.innerHTML = CC.tituloSecao('Suas anotações', lista.length ? String(lista.length) : '') + lista.map(cartao).join('')
-        + '<button class="botao escrever-contexto" data-escrever-contexto>' + CC.ico('caneta') + 'Escrever nota</button>' + CC.avisoPrivado();
-      alvo.querySelector('[data-escrever-contexto]').onclick = () => CC.versiculos.abrirEditor({ contexto, tipo: alvo.dataset.tipoNota, depois: desenhar });
+      const botao = d.botaoNotas ? (lista.length ? 'Escrever outra anotação' : d.botaoNotas) : 'Escrever nota';
+      alvo.innerHTML = CC.tituloSecao(d.tituloNotas || 'Suas anotações', lista.length ? String(lista.length) : '') + lista.map(cartao).join('')
+        + '<button class="botao escrever-contexto" data-escrever-contexto>' + CC.ico('caneta') + CC.esc(botao) + '</button>' + CC.avisoPrivado();
+      alvo.querySelector('[data-escrever-contexto]').onclick = () => CC.versiculos.abrirEditor({ contexto, tipo: d.tipoNota, titulo: d.tituloNota || '', depois: desenhar });
       CC.ligarAvisoPrivado(alvo);
       ligarCartoes(alvo, lista, desenhar);
     };

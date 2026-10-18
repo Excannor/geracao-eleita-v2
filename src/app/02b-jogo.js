@@ -244,10 +244,11 @@
       texto: (n) => (n === 1 ? 'Volte a ler depois de uma pausa' : 'Volte a ler depois de ' + n + ' pausas'), valor: (e) => recomecos(e) },
     { id: 'marcas', titulo: 'Marca-texto', icone: 'marca-texto', cor: 'amarelo', niveis: [5, 25, 100, 300],
       texto: (n) => 'Marque ' + n + ' versículos', valor: (e) => Object.values(e.marcas || {}).filter((m) => m && m.cor).length },
-    // Conta só quantas notas existem; o texto nunca é lido aqui.
+    // Conta só quantas notas existem; o texto nunca é lido aqui. A anotação num estudo da célula
+    // não conta, nem com versículo ligado: anotar o estudo não vale ponto (docs/a-mesa-fase2.md, 4.9).
     { id: 'notas', titulo: 'Caderno de notas', icone: 'caderno', cor: 'azul', niveis: [5, 25, 100],
       texto: (n) => 'Escreva nota em ' + n + ' versículos',
-      valor: (e) => Object.values(e.notas || {}).filter((n) => n && !n.apagadaEm && (n.versos || []).length).length
+      valor: (e) => Object.values(e.notas || {}).filter((n) => n && !n.apagadaEm && (n.versos || []).length && !/^estudo:/.test(n.contexto || '')).length
         + Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
   ];
 

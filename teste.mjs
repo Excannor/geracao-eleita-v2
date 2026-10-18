@@ -857,6 +857,13 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
   checar(zerado.parabolasLidas.semeador === '2026-10-01', 'zerar o progresso não apaga as parábolas lidas');
   const comNota = CC.normalizarEstado({ atualizadoEm: 1, notas: { n1: { versos: [], tipo: 'nota', texto: 'na mesa', criadaEm: 1, editadaEm: 1, contexto: 'parabola:grande-banquete' } } });
   checar(comNota.notas.n1.contexto === 'parabola:grande-banquete', 'a nota escrita numa parábola guarda o contexto "parabola:<slug>"');
+  // À Mesa, Fase 2 (docs/a-mesa-fase2.md, 4.9): a anotação num estudo da célula guarda o lugar
+  // "estudo:<id>". O servidor roda esta mesma limpeza (REGRAS.normalizarEstado): sem o "estudo:"
+  // na lista, a nota perderia o lugar na sincronização.
+  const doEstudo = CC.normalizarEstado({ atualizadoEm: 1, notas: { n2: { versos: [], tipo: 'nota', titulo: 'Batalha espiritual', texto: 'só minha', criadaEm: 1, editadaEm: 1, contexto: 'estudo:e3f9a1c2b7d4' },
+    n3: { versos: [], tipo: 'nota', texto: 'x', criadaEm: 1, editadaEm: 1, contexto: 'outra:coisa' } } });
+  checar(doEstudo.notas.n2.contexto === 'estudo:e3f9a1c2b7d4' && doEstudo.notas.n3.contexto === '', 'a nota escrita num estudo da célula guarda o contexto "estudo:<id>" (e um lugar desconhecido, não)');
+  checar(CC.normalizarEstado(doEstudo).notas.n2.contexto === 'estudo:e3f9a1c2b7d4', 'o contexto "estudo:" passa por uma segunda limpeza (a do servidor) sem sumir');
 }
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
@@ -1022,6 +1029,9 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   const conta = CC.CONQUISTAS.find((c) => c.id === 'notas').valor;
   checar(conta({ notas: { a: n('x', 1), b: n('y', 1, { apagadaEm: 2 }), c: { ...n('z', 1), versos: [] } }, anotacoes: { 'verso:Jó 1.1': 'velha' } }) === 2,
     'a conquista do caderno conta as notas vivas em versículo (e as do formato antigo)');
+  // a anotação num estudo da célula não vale ponto, nem com um versículo ligado à mão
+  checar(conta({ notas: { a: n('x', 1), e: { ...n('estudo', 1), contexto: 'estudo:e3f9a1c2b7d4' }, f: { ...n('sem verso', 1), versos: [], contexto: 'estudo:e3f9a1c2b7d4' } } }) === 1,
+    'a conquista do caderno não conta a anotação num estudo da célula, nem com versículo ligado');
   E.notas = {}; E.marcas = {}; E.oia = {}; E.anotacoes = {};
 }
 
@@ -1261,6 +1271,22 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   for (const f of ['estudo-regras.js', 'estudo-celula.js', 'estudo-preparo.js']) {
     checar(!/[—–]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', f), 'utf8')), f + ': sem travessão nem meia-risca no texto');
   }
+}
+
+// A voz das telas é cordial e sem gíria (docs/a-mesa-fase2.md, seção 6): nenhum texto entre aspas
+// em src/app e nas peças tem "Bora", "tempão" nem "sumido". As notificações (notificacoes.mjs) têm
+// voz própria e ficam para o dono decidir.
+{
+  const comGiria = [];
+  for (const pasta of [['src', 'app'], ['src', 'sob-demanda']]) {
+    for (const f of readdirSync(join(AQUI, ...pasta)).filter((x) => x.endsWith('.js'))) {
+      const fonte = readFileSync(join(AQUI, ...pasta, f), 'utf8');
+      for (const lit of fonte.match(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g) || []) {
+        if (/(^|[^\p{L}])(Bora|bora|tempão|sumid[oa]s?)(?![\p{L}])/u.test(lit)) comGiria.push(f + ': ' + lit.slice(0, 60));
+      }
+    }
+  }
+  checar(!comGiria.length, 'os textos das telas não têm "Bora", "tempão" nem "sumido"' + (comGiria.length ? ' (' + comGiria.slice(0, 3).join(' | ') + ')' : ''));
 }
 
 // =========================================================================

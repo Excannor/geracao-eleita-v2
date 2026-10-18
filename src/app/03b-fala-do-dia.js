@@ -9,11 +9,11 @@
   // a frase nunca fala em nome de Deus.
   const FALAS = {
     primeiroDia: [
-      'Seu primeiro dia é {passagem}: a primeira página da Bíblia e a primeira do Novo Testamento, juntas de propósito. Uns {min} minutos. Bora?',
+      'Seu primeiro dia é {passagem}: a primeira página da Bíblia e a primeira do Novo Testamento, juntas de propósito. Uns {min} minutos. Vamos?',
     ],
     comecando: [
       'Hoje tem {passagem}. Vamos?',
-      'Um capítulo de cada vez. Bora começar?',
+      'Um capítulo de cada vez. Vamos começar?',
       'Seu passo de hoje: {passagem}.',
     ],
     emDia: [
@@ -30,7 +30,7 @@
       'A estrada esperou por você. O plano continua de onde parou.',
     ],
     quaseLa: [
-      'Faltam poucos dias para fechar esta unidade. Bora?',
+      'Faltam poucos dias para fechar esta unidade. Vamos?',
     ],
   };
 

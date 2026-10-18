@@ -21,8 +21,8 @@
     'Qual música não sai da sua cabeça esta semana?',
     'Conte uma coisa pequena pela qual você quer agradecer hoje.',
     'Qual foi a parte mais difícil da sua semana?',
-    'Quem é uma pessoa que te ajudou recentemente?',
-    'Qual comida te lembra a sua casa?',
+    'Quem ajudou você nos últimos dias?',
+    'Qual comida lembra a sua casa?',
   ];
   const SUGESTAO_ADORACAO = 'Escolham juntos uma música de louvor para começar.';
   const SUGESTAO_TESTEMUNHO = 'Quem vocês querem convidar para o próximo encontro? Orem juntos por essas pessoas, pelo nome.';
