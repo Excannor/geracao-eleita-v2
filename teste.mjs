@@ -367,6 +367,9 @@ secao('peças sob demanda');
       'a peça estudo-celula leva as regras (estudo-regras.js) antes da tela');
     checar(preparo.includes('CC.lerEstudo =') && preparo.includes('CC.estudoPreparo =') && preparo.indexOf('CC.lerEstudo =') < preparo.indexOf('CC.estudoPreparo ='),
       'a peça estudo-preparo leva o leitor de marcas (estudo-marcas.js) antes do editor');
+    // Fase 2: a lista e a leitura dos estudos anteriores, "Quem não veio" e a impressão moram na peça
+    checar(celula.includes('mesa-anteriores') && celula.includes('paraQuemFaltou') && celula.includes('@media print') && !html.includes('mesa-anteriores') && !html.includes('mesa-impressao'),
+      'os estudos anteriores, "Quem não veio" e a impressão estão na peça estudo-celula, fora do index.html');
     checar(!/folhaPrepararEstudo|montarEstudo|estudoEmTexto|semanaDoEstudo|PERGUNTAS_ACOLHIDA/.test(html) && html.includes('CC.apoioCelula'),
       'o estudo antigo (preparar, montar, texto do grupo) saiu do index.html; fica a casca');
   }
