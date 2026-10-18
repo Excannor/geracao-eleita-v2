@@ -17,6 +17,23 @@ function bloco(seletor) {
 }
 const claro = bloco(':root');
 const escuro = { ...claro, ...bloco(':root[data-tema="escuro"]') };
+// O realce (--realce) é a sálvia pálida com listras de --listra (rgba) por cima: a listra mais
+// escura, composta sobre a sálvia pálida, vira a ficha --realce-listra, para medir o texto que
+// fica sobre o realce (a opção marcada e a data do encontro na folha de registro).
+function listra(seletor) {
+  const i = css.indexOf(seletor + ' {');
+  const corpo = css.slice(css.indexOf('{', i) + 1, css.indexOf('}', i));
+  const m = /--listra:\s*rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/.exec(corpo);
+  return m ? { rgb: [m[1], m[2], m[3]].map(Number), a: Number(m[4]) } : null;
+}
+function sobre(cor, base) {
+  const b = [1, 3, 5].map((k) => parseInt(base.slice(k, k + 2), 16));
+  return '#' + b.map((v, k) => Math.round(cor.rgb[k] * cor.a + v * (1 - cor.a)).toString(16).padStart(2, '0')).join('');
+}
+for (const [tema, seletor] of [[claro, ':root'], [escuro, ':root[data-tema="escuro"]']]) {
+  const l = listra(seletor) || listra(':root');
+  if (l && tema['--salvia-palido']) tema['--realce-listra'] = sobre(l, tema['--salvia-palido']);
+}
 
 const canal = (v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
 const luz = (hex) => {
@@ -70,6 +87,10 @@ const PARES = [
   ['--v2-tinta-fraca', '--campo', 4.5, '"Preparado em" na escolha do estudo do registro'],
   ['--v2-tinta-fraca', '--v2-cartao', 4.5, '"Só quem conduz a célula vê este número."'],
   ['--salvia-texto', '--salvia-palido', 4.5, 'ícone de pessoas no cartão da presença'],
+  // a revisão da Fase 2: o texto sobre a listra mais escura do realce (a opção marcada do estudo
+  // do registro e "o encontro desta semana"); a tinta fraca dava 4,36:1 ali
+  ['--v2-tinta', '--realce-listra', 4.5, '"Preparado em" e "o encontro desta semana" sobre o realce'],
+  ['--v2-tinta-forte', '--realce-listra', 4.5, 'título do estudo e nome marcado sobre o realce'],
 ];
 
 let falhas = 0;

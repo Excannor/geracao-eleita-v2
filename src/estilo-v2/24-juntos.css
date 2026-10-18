@@ -137,7 +137,7 @@ button.cartao-proposito:hover { background: var(--campo); }
 .folha .lista-pedidos, .escolha-amigos { gap: 0; border-radius: 24px; background: var(--campo); }
 .folha .linha-amigo .botao.contorno { background: var(--cartao); }
 .escolha-amigo { min-height: 64px; }
-.escolha-amigo:has(input:checked) { background: var(--realce); }
+.escolha-amigo:has(input:checked) { border-color: var(--contorno); background: var(--realce); }
 
 /* ---------- folha do amigo e convite ---------- */
 .cabeca-amigo { gap: 16px; margin-bottom: 16px; }
@@ -348,7 +348,8 @@ button.cartao-proposito:hover { background: var(--campo); }
 .campos-quando input { box-sizing: border-box; width: 100%; min-width: 0; padding-inline: 12px; }
 /* registrar o encontro: a data do encontro desta semana em destaque, as outras atrás do botão */
 .data-encontro-realce { margin: 4px 0 10px; padding: 14px 16px; border-radius: 20px; color: var(--tinta-forte); font-size: 1rem; }
-.data-encontro-realce span { color: var(--tinta-fraca); font-weight: 600; }
+/* sobre o realce listrado, a legenda usa a tinta: a tinta fraca dava 4,36:1 na listra mais escura */
+.data-encontro-realce span { color: var(--tinta); font-weight: 600; }
 .folha [data-outra-data] { margin-bottom: 12px; }
 .folha [data-outra-data] svg { width: 16px; height: 16px; }
 .folha [data-outras-datas]:not([hidden]) { margin-bottom: 12px; }
@@ -360,6 +361,7 @@ button.cartao-proposito:hover { background: var(--campo); }
 .opcao-estudo { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 16px; cursor: pointer; }
 .opcao-estudo + .opcao-estudo { border-top: 1px solid var(--contorno); }
 .opcao-estudo:has(input:checked) { background: var(--realce); }
+.opcao-estudo:has(input:checked) small { color: var(--tinta); }
 .opcao-estudo input { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--azul); }
 .opcao-estudo span { display: grid; gap: 2px; min-width: 0; }
 .opcao-estudo b { color: var(--tinta-forte); font-size: 1rem; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }

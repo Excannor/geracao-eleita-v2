@@ -154,6 +154,8 @@
 .mesa-anterior b { font-size: 1rem; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; text-wrap: pretty; }
 .mesa-anterior small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.35; }
 .mesa-secao-anteriores .botao.pequeno { justify-self: start; }
+/* sem estudo atual, o vazio de sempre e a seção logo embaixo, sem o vão do respiro do vazio */
+.painel-celula > .vazio-amigos:has(+ .mesa-secao-anteriores) { padding-bottom: 8px; }
 /* ler um anterior: o voltar, a etiqueta e a presença (só quem conduz) */
 .mesa-volta { display: flex; }
 .mesa-volta .voltar { margin: 0; }
@@ -173,7 +175,8 @@
 .folha-faltou .mesa-faltou .linha-amigo { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; }
 .mesa-faltou-acoes { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
 .mesa-faltou-acoes .botao-whatsapp { flex: 1 1 auto; justify-content: center; }
-.mesa-faltou-acoes .botao { flex: 0 1 auto; min-height: 44px; }
+/* quando o "Copiar" desce de linha (a 360 px), ele ocupa a linha inteira em vez de ficar sozinho à esquerda */
+.mesa-faltou-acoes .botao { flex: 1 1 auto; min-height: 44px; }
 .folha-faltou .mesa-zap { margin: 0; max-width: 100%; }
 
 /* ---------- a impressão: tinta preta em papel branco, nos dois temas, sem as barras do app ---------- */
