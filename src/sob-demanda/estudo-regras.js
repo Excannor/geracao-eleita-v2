@@ -167,10 +167,15 @@
   // contexto: conduzo (líder e auxiliar: o último passo abre o registro), visitante (sem a aba
   // Oração), acolhida, adoracao, testemunho, semana e versiculos (como em comoBlocos). Nenhum passo da Palavra leva os 4 Ws, e o
   // "Para guardar" só aparece no último. Orar juntos não tem versículo (decisão do dono, 17/10).
+  // combinadoAnterior (o texto do combinado do estudo de antes): a acolhida começa por ele, e a
+  // pergunta da acolhida vai para o corpo do passo. O combinado deste estudo vira o passo "Para a
+  // semana", logo antes de Orar juntos. Ninguém marca se cumpriu (docs/a-mesa-fase2.md, 4.6).
   function passos(e, contexto) {
     const c = contexto || {};
     const lista = [
-      { tipo: 'acolhida', etiqueta: 'Acolhida', frase: c.acolhida || '' },
+      c.combinadoAnterior
+        ? { tipo: 'acolhida', etiqueta: 'Acolhida', frase: lembrarCombinado(c.combinadoAnterior), pergunta: c.acolhida || '' }
+        : { tipo: 'acolhida', etiqueta: 'Acolhida', frase: c.acolhida || '' },
       { tipo: 'adoracao', etiqueta: 'Adoração', frase: c.adoracao || '' },
     ];
     const todos = comoBlocos(e, c.semana, c.versiculos);
@@ -210,6 +215,7 @@
     });
     const qs = perguntasDe(e, c.semana);
     qs.forEach((q, i) => lista.push({ tipo: 'pergunta', etiqueta: 'Para conversar' + (qs.length > 1 ? ', ' + (i + 1) + ' de ' + qs.length : ''), frase: q }));
+    if (e.combinado) lista.push({ tipo: 'combinado', etiqueta: 'Para a semana', frase: e.combinado });
     lista.push({ tipo: 'orar', etiqueta: 'Orar juntos', frase: ORAR, convite: !c.visitante });
     lista.push({ tipo: 'testemunho', etiqueta: 'Testemunho', frase: c.testemunho || '' });
     lista.push({ tipo: 'fechar', etiqueta: 'Fechar o encontro', frase: guardar.length ? guardar[guardar.length - 1].texto : '', registrar: !!c.conduzo });
@@ -267,6 +273,7 @@
     });
     const qs = perguntasDe(e, c.semana);
     if (qs.length) saida.push('', '*Para conversar*', ...qs.map((q, i) => (i + 1) + '. ' + q));
+    if (e.combinado) saida.push('', '*Combinado para a semana:* ' + e.combinado);
     // semana e trecho fecham com a oração, como na aba (o estudo inteiro vai para o grupo)
     const oracao = e.tipo === 'semana' && c.semana ? c.semana.oracao : e.tipo === 'trecho' ? [ORAR_TRECHO] : [];
     if (oracao.length) saida.push('', '*Para orar juntos*', ...oracao);
@@ -342,6 +349,74 @@
     return grupos;
   }
 
+  // ---------- Fase 2: guardar (docs/a-mesa-fase2.md, 5.2) ----------
+  // "Na semana passada combinamos: Ligar para alguém que faltou. Como foi?" O ponto só entra
+  // quando o combinado não termina em ponto, exclamação ou interrogação.
+  const comPonto = (t) => { const x = String(t || '').trim(); return x + (/[.!?]$/.test(x) ? '' : '.'); };
+  const lembrarCombinado = (texto) => 'Na semana passada combinamos: ' + comPonto(texto) + ' Como foi?';
+
+  // Os capítulos do estudo em poucas letras, na ordem em que aparecem e sem repetir: "Ef 6, Lc
+  // 11, 1Pe 5". Até 3, e depois " e mais N".
+  function refsCurtas(refs) {
+    const caps = [];
+    for (const ref of refs || []) {
+      const r = lerR(ref);
+      if (!r) continue;
+      const livro = (CC.LIVROS || []).find((l) => l[0] === r.livro);
+      const curto = (livro ? livro[2] : r.livro) + ' ' + r.cap;
+      if (!caps.includes(curto)) caps.push(curto);
+    }
+    return caps.slice(0, 3).join(', ') + (caps.length > 3 ? ' e mais ' + (caps.length - 3) : '');
+  }
+
+  const ddmm = (iso) => String(iso || '').slice(8, 10) + '/' + String(iso || '').slice(5, 7);
+  // A data de uma linha de Estudos anteriores: a do encontro em que o estudo foi usado ou, sem
+  // encontro ligado, a do preparo.
+  const dataDaLista = (item) => (item.dataDe === 'encontro' ? 'Encontro de ' : 'Preparado em ') + ddmm(item.data);
+
+  // O estudo no papel (Imprimir): HTML puro, tudo escapado, tinta preta em papel branco.
+  // contexto: celula (o nome), linha ("Encontro de quinta, 22/10 · preparado por Marcos"), textos
+  // (ref -> o texto da Bíblia do app, já pedido), sigla (a abreviatura da tradução), credito (as
+  // linhas do crédito da tradução, sem link), anterior (só Palavra, Para conversar e Combinado),
+  // acolhida, adoracao, testemunho, combinadoAnterior (o texto), noPlano ([{ numero, capitulo }]),
+  // palavraDe ("Palavra de Marcos", na leitura da semana e no trecho), semana e versiculos (como
+  // em comoBlocos). Nunca vão: anotação, presença, pedido de oração.
+  function paraImprimir(e, contexto) {
+    const c = contexto || {};
+    const textoDe = (ref) => (c.textos && typeof c.textos.get === 'function' ? c.textos.get(ref) : (c.textos || {})[ref]) || '';
+    const parte = (nome, corpo) => (corpo ? '<section class="imp-parte"><h2>' + esc(nome) + '</h2>' + corpo + '</section>' : '');
+    const p = (t) => (t ? '<p>' + negrito(t) + '</p>' : '');
+    const cartao = (b) => '<figure class="imp-cartao"><blockquote>' + esc(textoDe(b.ref)) + '</blockquote><figcaption>' + esc(b.ref) + (c.sigla ? PONTO + esc(c.sigla) : '') + '</figcaption></figure>';
+    const bloco = (b) => {
+      if (b.t === 'texto') return p(b.texto);
+      if (b.t === 'topico') return '<h3><span class="n">' + esc(b.n) + '.</span> ' + negrito(b.texto) + '</h3>';
+      if (b.t === 'conclusao') return '<h3>Conclusão</h3>';
+      if (b.t === 'versiculo') return cartao(b);
+      if (b.t === 'seta') return '<ul class="imp-seta">' + (b.itens || []).map(([item, sentido]) => '<li><b>' + negrito(item) + '</b>' + esc(SETA) + negrito(sentido) + '</li>').join('') + '</ul>';
+      if (b.t === 'citacao') return '<blockquote class="imp-citacao">' + negrito(b.texto) + (b.autor ? '<cite>' + esc(b.autor) + '</cite>' : '') + '</blockquote>';
+      if (b.t === 'guardar') return '<div class="imp-guardar"><span>Para guardar</span><p>' + negrito(b.texto) + '</p></div>';
+      if (b.t === 'dias') return '<ul class="imp-dias">' + b.dias.map((d) => '<li>Dia ' + esc(d.n) + ': ' + esc(d.passagem) + '</li>').join('') + '</ul>';
+      return '';
+    };
+    const nome = titulo(e) || 'Estudo do encontro';
+    const legado = e.tipo === 'semana' || e.tipo === 'trecho';
+    const palavra = (legado && e.texto && c.palavraDe ? '<p class="imp-dica">' + esc(c.palavraDe) + '</p>' : '') + comoBlocos(e, c.semana, c.versiculos).map(bloco).join('');
+    const qs = perguntasDe(e, c.semana);
+    const oracao = e.tipo === 'semana' && c.semana ? c.semana.oracao : e.tipo === 'trecho' ? [ORAR_TRECHO] : [];
+    const plano = (c.noPlano || []).map((d) => d.capitulo + ' é o dia ' + d.numero + ' do plano').join(PONTO);
+    const acolhida = (c.combinadoAnterior ? '<p class="imp-lembrar"><b>Na semana passada combinamos:</b> ' + esc(comPonto(c.combinadoAnterior)) + ' Como foi?</p>' : '') + p(c.acolhida);
+    return '<header class="imp-cabeca">' + esc([c.celula, c.linha].filter(Boolean).join(PONTO)) + '</header>'
+      + '<h1 class="imp-titulo">' + negrito(nome) + '</h1>'
+      + (plano ? '<p class="imp-plano">' + esc(plano) + '</p>' : '')
+      + (c.anterior ? '' : parte('Acolhida', acolhida) + parte('Adoração', p(c.adoracao)))
+      + parte('Palavra', palavra)
+      + parte('Para conversar', qs.length ? '<ol class="imp-perguntas">' + qs.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ol>' : '')
+      + parte('Para orar juntos', oracao.map(p).join(''))
+      + parte('Combinado para a semana', p(e.combinado))
+      + (c.anterior ? '' : parte('Testemunho', p(c.testemunho)))
+      + ((c.credito || []).length ? '<footer class="imp-pe">' + c.credito.map((l) => '<p>' + esc(l) + '</p>').join('') + '</footer>' : '');
+  }
+
   // ---------- o HTML de cada parte ----------
   // opcoes: cartao(bloco) devolve o cartão do versículo (quem chama já tem o texto da Bíblia);
   // semConclusao (a prévia já diz "Conclusão" na etiqueta da parte); semEtiqueta (Para guardar).
@@ -367,5 +442,6 @@
     PERGUNTAS_OIA, PERGUNTAS_ACOLHIDA, SUGESTAO_ADORACAO, SUGESTAO_TESTEMUNHO, COMECAR_SEMANA, ORAR_TRECHO, sugestaoAcolhida,
     cruza, cartaoDe, cortaTrecho, capituloDe, semana, titulo, comoBlocos, perguntasDe, dividir, passos, textoParaGrupo,
     noPlano, parabolaDoEstudo, gruposDePerguntas, blocoEmHtml, negrito,
+    lembrarCombinado, refsCurtas, dataDaLista, paraImprimir,
   };
 })(window.CC);

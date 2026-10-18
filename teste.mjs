@@ -1271,6 +1271,53 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   for (const f of ['estudo-regras.js', 'estudo-celula.js', 'estudo-preparo.js']) {
     checar(!/[—–]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', f), 'utf8')), f + ': sem travessão nem meia-risca no texto');
   }
+
+  // ---------- Fase 2 (docs/a-mesa-fase2.md, 9.2, itens 16 a 20) ----------
+  // 16. refsCurtas()
+  checar(R.refsCurtas(dono.refs) === 'Ef 6, Lc 11, 1Pe 5', 'refsCurtas(): o estudo do dono dá "Ef 6, Lc 11, 1Pe 5" (' + R.refsCurtas(dono.refs) + ')');
+  checar(R.refsCurtas(['João 3.16', 'Romanos 8.28', 'Salmos 23', 'João 3.17', 'Gênesis 1.1', '1 Coríntios 13.4']) === 'Jo 3, Rm 8, Sl 23 e mais 2', 'refsCurtas(): cinco capítulos dão os três primeiros e " e mais 2"');
+  checar(R.refsCurtas([]) === '' && R.refsCurtas() === '', 'refsCurtas(): sem referências, vazio');
+  // 17. lembrarCombinado()
+  checar(R.lembrarCombinado('Ligar para alguém') === 'Na semana passada combinamos: Ligar para alguém. Como foi?', 'lembrarCombinado(): o combinado sem ponto ganha o ponto');
+  checar(R.lembrarCombinado('Ligar para alguém.') === 'Na semana passada combinamos: Ligar para alguém. Como foi?', 'lembrarCombinado(): com ponto, não fica com dois');
+  checar(R.lembrarCombinado('Quem vamos visitar?') === 'Na semana passada combinamos: Quem vamos visitar? Como foi?', 'lembrarCombinado(): a interrogação fica');
+  // 18. passos() com o combinado de antes e o desta semana
+  {
+    const comb = { ...dono, combinado: 'Orar todo dia por alguém que ainda não conhece Jesus.' };
+    const ps2 = R.passos(comb, { conduzo: true, acolhida: 'Qual foi a melhor parte da sua semana?', adoracao: 'A', testemunho: 'T', combinadoAnterior: 'Ligar para alguém que faltou.' });
+    checar(ps2[0].frase === 'Na semana passada combinamos: Ligar para alguém que faltou. Como foi?' && ps2[0].pergunta === 'Qual foi a melhor parte da sua semana?',
+      'passos(): com o combinado de antes, a acolhida começa por ele, e a pergunta da acolhida vai junto');
+    const iSemana = ps2.findIndex((x) => x.etiqueta === 'Para a semana');
+    checar(iSemana > 0 && ps2[iSemana + 1].etiqueta === 'Orar juntos' && ps2[iSemana].frase === comb.combinado && ps2.length === 16, 'passos(): "Para a semana" fica logo antes de "Orar juntos"');
+    const ps3 = R.passos(dono, { conduzo: true });
+    checar(ps3.length === 15 && !ps3[0].pergunta && JSON.stringify(ps3.map((x) => x.etiqueta)) === JSON.stringify(ETIQUETAS), 'passos(): o estudo do dono, sem combinado, continua com os 15 passos de sempre');
+    // 19. textoParaGrupo() com o combinado
+    const zapComb = R.textoParaGrupo(comb, { data: 'quinta, 22/10', principal, endereco: 'https://exemplo.app' }).split('\n');
+    const iComb = zapComb.indexOf('*Combinado para a semana:* ' + comb.combinado);
+    checar(iComb > 0 && zapComb[iComb - 1] === '' && /^2\. /.test(zapComb[iComb - 2]), 'textoParaGrupo(): o combinado vem depois das perguntas, com uma linha em branco antes');
+    checar(R.textoParaGrupo(dono, { data: 'quinta, 22/10', principal, endereco: 'https://exemplo.app' }) === zap && !zap.includes('Combinado'), 'textoParaGrupo(): sem combinado, o texto continua o de sempre (estudo-exemplo-grupo.txt)');
+    // 20. paraImprimir()
+    const textos = new Map(dono.refs.map((r) => [r, 'TEXTO ' + r]));
+    const ctx = { celula: 'Célula Esperança', linha: 'Encontro de quinta, 22/10' + ' \u00b7 preparado por Marcos', textos, sigla: 'NBV', credito: ['Nova Bíblia Viva', 'Biblica'], acolhida: 'ACOLHIDA X', adoracao: 'ADORACAO X', testemunho: 'TESTEMUNHO X', combinadoAnterior: 'Ligar para alguém que faltou', noPlano: [{ numero: 244, capitulo: 'Efésios 6' }] };
+    const imp = R.paraImprimir(comb, ctx);
+    checar(imp.includes('<h1 class="imp-titulo">' + CC.esc(dono.titulo)) && dono.refs.every((r) => imp.includes('TEXTO ' + r) && imp.includes(r + ' \u00b7 NBV'))
+      && R.perguntasDe(comb).every((q) => imp.includes('<li>' + CC.esc(q) + '</li>')) && imp.includes(comb.combinado) && imp.includes('Nova Bíblia Viva') && imp.includes('Efésios 6 é o dia 244 do plano'),
+      'paraImprimir(): o título, cada cartão com o texto passado, as perguntas, o combinado, "No plano" e o crédito');
+    checar(imp.includes('<b>Na semana passada combinamos:</b> Ligar para alguém que faltou. Como foi?') && imp.indexOf('ACOLHIDA X') < imp.indexOf('ADORACAO X') && imp.indexOf('ADORACAO X') < imp.indexOf('<h2>Palavra</h2>')
+      && imp.indexOf('<h2>Combinado para a semana</h2>') < imp.indexOf('TESTEMUNHO X'), 'paraImprimir(): o atual leva Acolhida (com o combinado de antes), Adoração, Palavra, Para conversar, Combinado e Testemunho, nessa ordem');
+    const impAnt = R.paraImprimir(comb, { ...ctx, anterior: true });
+    checar(!/ACOLHIDA X|ADORACAO X|TESTEMUNHO X|Na semana passada|<h2>Acolhida|<h2>Testemunho/.test(impAnt) && impAnt.includes('<h2>Palavra</h2>') && impAnt.includes(comb.combinado),
+      'paraImprimir(): o anterior não tem acolhida, adoração, testemunho nem "Na semana passada"');
+    const impMal = R.paraImprimir({ tipo: 'blocos', titulo: '<script>alert(1)</script>', blocos: [{ t: 'texto', texto: '<img src=x onerror=1>' }], perguntas: ['<b>q</b>'], combinado: '<i>c</i>' }, { celula: '<s>', textos: {} });
+    checar(!/<script|<img|<i>|<s>|<b>q/.test(impMal) && impMal.includes('&lt;script&gt;'), 'paraImprimir(): <script> e as outras marcas saem escapadas');
+    // (o texto do líder pode ter travessão, e fica como ele escreveu: o que se confere é o que a impressão acrescenta)
+    const todasAsPartes = { tipo: 'blocos', titulo: 'T', combinado: 'C', perguntas: ['P?'], blocos: [{ t: 'texto', texto: 'a' }, { t: 'topico', n: 1, texto: 'b' }, { t: 'versiculo', ref: 'João 3.16' },
+      { t: 'seta', itens: [['x', 'y']] }, { t: 'citacao', texto: 'z', autor: 'w' }, { t: 'conclusao' }, { t: 'guardar', texto: 'g' }] };
+    const impTodas = R.paraImprimir(todasAsPartes, { ...ctx, textos: { 'João 3.16': 'T' } }) + R.paraImprimir(todasAsPartes, { ...ctx, anterior: true });
+    checar(!/[\u2013\u2014]/.test(impTodas) && /imp-seta/.test(impTodas) && /imp-guardar/.test(impTodas), 'paraImprimir(): a impressão não acrescenta travessão nem meia-risca');
+    // a linha da lista
+    checar(R.dataDaLista({ data: '2026-10-15', dataDe: 'encontro' }) === 'Encontro de 15/10' && R.dataDaLista({ data: '2026-10-12', dataDe: 'preparo' }) === 'Preparado em 12/10', 'dataDaLista(): "Encontro de 15/10" ou "Preparado em 12/10"');
+  }
 }
 
 // A voz das telas é cordial e sem gíria (docs/a-mesa-fase2.md, seção 6): nenhum texto entre aspas
