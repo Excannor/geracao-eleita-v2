@@ -191,8 +191,10 @@ button.cartao-proposito:hover { background: var(--campo); }
 .cabeca-celula .dias-cartao .ico-chama { grid-area: 1 / 2 / 3; width: 28px; height: 28px; padding: 10px; vertical-align: 0; color: #a4a99d; }
 .cabeca-celula .dias-cartao small { grid-column: 1; justify-self: start; color: inherit; font-size: .8125rem; font-weight: 600; letter-spacing: 0; white-space: nowrap; }
 .abas-celula button { padding: 0 4px; white-space: nowrap; }
-/* a 360 px, quem conduz tem 5 abas e o ponto do estudo: menos respiro, e nenhuma aba abaixo de 44 px */
-@media (max-width: 374px) { .abas-celula { gap: 2px; padding: 4px; } .abas-celula button { min-width: 44px; padding: 0 2px; font-size: .875rem; } }
+/* a 360 px, quem conduz tem 5 abas e o ponto do estudo: menos respiro, e nenhuma aba abaixo de 44 px.
+   As colunas seguem o conteúdo (auto, e o que sobra se reparte): com 1fr, o min-width tirava o
+   mínimo automático e o "Estudo" com o ponto passava da pílula */
+@media (max-width: 374px) { .abas-celula { grid-auto-columns: auto; gap: 2px; padding: 4px; } .abas-celula button { min-width: 44px; padding: 0 2px; font-size: .875rem; } }
 @media (max-width: 359px) { .abas-celula button { font-size: .8125rem; } }
 .abas-celula .ponto-estudo { position: static; display: inline-block; margin: 0 0 8px 3px; vertical-align: middle; background: var(--salvia-texto); }
 .abas-celula [aria-selected="true"] .ponto-estudo { background: currentColor; }

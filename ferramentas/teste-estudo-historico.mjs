@@ -274,11 +274,19 @@ async function medidas(rotulo) {
         if (f > 0 && f < 11.95) letras.push(n.nodeValue.trim().slice(0, 30) + ' ' + f);
       }
     }
-    return { lateral: document.documentElement.scrollWidth - innerWidth, pequenos: [...new Set(pequenos)], letras: [...new Set(letras)] };
+    // as abas da célula: o texto e o ponto do estudo cabem dentro de cada pílula (a 360 px, com
+    // cinco abas, o ponto do "Estudo" chegou a sair dela)
+    const vazam = [...document.querySelectorAll('.abas-celula button')].filter(visivel).filter((b) => {
+      const r = b.getBoundingClientRect();
+      const ponto = b.querySelector('.ponto-estudo');
+      const p = ponto ? ponto.getBoundingClientRect() : null;
+      return b.scrollWidth > b.clientWidth + 1 || (p && (p.left < r.left - 0.5 || p.right > r.right + 0.5));
+    }).map((b) => b.textContent.trim() + ' ' + b.scrollWidth + '>' + b.clientWidth);
+    return { lateral: document.documentElement.scrollWidth - innerWidth, pequenos: [...new Set(pequenos)], letras: [...new Set(letras)], vazam };
   });
-  const certo = m.lateral <= 0 && !m.pequenos.length && !m.letras.length;
-  ok(certo, rotulo + ': sem rolagem lateral, toque de 44 px e letra de 12 px'
-    + (certo ? '' : ' (lateral ' + m.lateral + ', pequenos: ' + m.pequenos.slice(0, 4).join(' | ') + ', letras: ' + m.letras.slice(0, 4).join(' | ') + ')'));
+  const certo = m.lateral <= 0 && !m.pequenos.length && !m.letras.length && !m.vazam.length;
+  ok(certo, rotulo + ': sem rolagem lateral, toque de 44 px, letra de 12 px e nada vazando das abas'
+    + (certo ? '' : ' (lateral ' + m.lateral + ', pequenos: ' + m.pequenos.slice(0, 4).join(' | ') + ', letras: ' + m.letras.slice(0, 4).join(' | ') + ', vazam: ' + m.vazam.join(' | ') + ')'));
 }
 async function emTodosOsTamanhos(rotulo, preparar) {
   if (process.env.RAPIDO) return;
