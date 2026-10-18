@@ -1342,6 +1342,12 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
       { t: 'seta', itens: [['x', 'y']] }, { t: 'citacao', texto: 'z', autor: 'w' }, { t: 'conclusao' }, { t: 'guardar', texto: 'g' }] };
     const impTodas = R.paraImprimir(todasAsPartes, { ...ctx, textos: { 'João 3.16': 'T' } }) + R.paraImprimir(todasAsPartes, { ...ctx, anterior: true });
     checar(!/[\u2013\u2014]/.test(impTodas) && /imp-seta/.test(impTodas) && /imp-guardar/.test(impTodas), 'paraImprimir(): a impressão não acrescenta travessão nem meia-risca');
+    const impTrecho = R.paraImprimir({ tipo: 'trecho', ref: 'Romanos 8.28-30', titulo: 'Romanos 8.28-30', refs: ['Romanos 8.28-30'], texto: '', perguntas: [], combinado: 'Orar todo dia' }, { ...ctx, textos: { 'Romanos 8.28-30': 'T' } });
+    checar(impTrecho.indexOf('<h2>Combinado para a semana</h2>') > -1 && impTrecho.indexOf('<h2>Combinado para a semana</h2>') < impTrecho.indexOf('<h2>Para orar juntos</h2>'),
+      'paraImprimir(): o combinado vem antes da oração, a mesma ordem do modo encontro e do texto do grupo');
+    const impSemana = R.paraImprimir({ tipo: 'semana', planoAte: 0, texto: 'Palavra do líder', perguntas: [], refs: [] }, { ...ctx, anterior: true, semana: null });
+    checar(impSemana.includes(R.SEMANA_SEM_DIAS) && !/imp-dias|Dia \d/.test(impSemana) && impSemana.includes('Palavra do líder'),
+      'paraImprimir(): a leitura da semana guardada sem a semana do plano diz que os dias não ficaram guardados, sem pôr os de hoje');
     // a linha da lista
     checar(R.dataDaLista({ data: '2026-10-15', dataDe: 'encontro' }) === 'Encontro de 15/10' && R.dataDaLista({ data: '2026-10-12', dataDe: 'preparo' }) === 'Preparado em 12/10', 'dataDaLista(): "Encontro de 15/10" ou "Preparado em 12/10"');
   }

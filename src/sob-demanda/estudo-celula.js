@@ -123,8 +123,9 @@
     return '<ol class="roteiro">'
       + (e.tipo === 'semana' ? '<li><b>Para começar</b><p>' + esc(R.COMECAR_SEMANA) + '</p></li>' : '')
       + leiam
-      + (e.tipo === 'semana' ? '<li><b>A leitura da semana</b><ul class="roteiro-dias">' + sem.dias.map((d) => '<li><span>Dia ' + d.n + '</span>' + esc(CC.passagemDe(d.dia))
+      + (e.tipo === 'semana' && sem ? '<li><b>A leitura da semana</b><ul class="roteiro-dias">' + sem.dias.map((d) => '<li><span>Dia ' + d.n + '</span>' + esc(CC.passagemDe(d.dia))
         + (d.r.titulo ? '<small>' + esc(d.r.titulo) + '</small>' : '') + '</li>').join('') + '</ul></li>' : '')
+      + (e.tipo === 'semana' && !sem ? '<li><b>A leitura da semana</b><p>' + esc(R.SEMANA_SEM_DIAS) + '</p></li>' : '')
       + (perguntas.length ? '<li><b>Para conversar</b><ul class="roteiro-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ul></li>' : '')
       + (e.combinado ? '<li><b>Combinado para a semana</b><p>' + esc(e.combinado) + '</p></li>' : '')
       + (e.tipo === 'semana' && sem && sem.oracao.length ? '<li><b>Para orar juntos</b><ul class="roteiro-oracao">' + sem.oracao.map((o) => '<li>' + esc(o) + '</li>').join('') + '</ul></li>' : '')
@@ -331,7 +332,8 @@
     // o estudo atual tem a aba de sempre
     if (r.atual) { CC.substituirRota(apoio.endereco(p.id, 'estudo')); return; }
     const e = r.estudo;
-    const sem = e.tipo === 'semana' && CC.D && CC.D.plano ? R.semana(e.planoAte || p.semanaAte) : null;
+    // um anterior mostra a semana em que ele valeu, nunca a de hoje (sem planoAte, nenhuma)
+    const sem = e.tipo === 'semana' && e.planoAte && CC.D && CC.D.plano ? R.semana(e.planoAte) : null;
     const sigla = siglaDe(e);
     const versiculos = await contagemDe(e);
     const refs = R.comoBlocos(e, sem, versiculos).filter((b) => b.t === 'versiculo').map((b) => b.ref);
@@ -423,7 +425,7 @@
       CC.avisar('Este aparelho não abriu a impressão. Abra o app no navegador do celular ou do computador e tente de novo.', { tipo: 'erro' });
       return;
     }
-    const sem = e.tipo === 'semana' && CC.D && CC.D.plano ? R.semana(e.planoAte || p.semanaAte) : null;
+    const sem = e.tipo === 'semana' && (e.planoAte || !opcoes.anterior) && CC.D && CC.D.plano ? R.semana(e.planoAte || p.semanaAte) : null;
     const sigla = siglaDe(e);
     const versiculos = await contagemDe(e);
     const refs = R.comoBlocos(e, sem, versiculos).filter((b) => b.t === 'versiculo').map((b) => b.ref);

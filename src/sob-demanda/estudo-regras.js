@@ -30,6 +30,9 @@
   // o começo e a oração do roteiro de semana e trecho (a aba e o texto do grupo dizem o mesmo)
   const COMECAR_SEMANA = 'Cada um conta, em uma frase, o que mais marcou na leitura da semana.';
   const ORAR_TRECHO = 'Orem a partir do que o texto mostrou.';
+  // A leitura da semana guardada sem a semana do plano (planoAte 0, as de antes da v19), aberta
+  // como estudo anterior ou impressa: os dias daquela semana não ficaram guardados.
+  const SEMANA_SEM_DIAS = 'Os dias do plano que a célula leu naquela semana não ficaram guardados.';
   const SETA = ' \u2192 ';
   const ABRE = '\u201c';
   const FECHA = '\u201d';
@@ -402,7 +405,8 @@
     };
     const nome = titulo(e) || 'Estudo do encontro';
     const legado = e.tipo === 'semana' || e.tipo === 'trecho';
-    const palavra = (legado && e.texto && c.palavraDe ? '<p class="imp-dica">' + esc(c.palavraDe) + '</p>' : '') + comoBlocos(e, c.semana, c.versiculos).map(bloco).join('');
+    const palavra = (legado && e.texto && c.palavraDe ? '<p class="imp-dica">' + esc(c.palavraDe) + '</p>' : '') + comoBlocos(e, c.semana, c.versiculos).map(bloco).join('')
+      + (e.tipo === 'semana' && !c.semana ? '<p class="imp-dica">' + esc(SEMANA_SEM_DIAS) + '</p>' : '');
     const qs = perguntasDe(e, c.semana);
     const oracao = e.tipo === 'semana' && c.semana ? c.semana.oracao : e.tipo === 'trecho' ? [ORAR_TRECHO] : [];
     const plano = (c.noPlano || []).map((d) => d.capitulo + ' é o dia ' + d.numero + ' do plano').join(PONTO);
@@ -441,7 +445,7 @@
   }
 
   CC.estudoRegras = {
-    PERGUNTAS_OIA, PERGUNTAS_ACOLHIDA, SUGESTAO_ADORACAO, SUGESTAO_TESTEMUNHO, COMECAR_SEMANA, ORAR_TRECHO, sugestaoAcolhida,
+    PERGUNTAS_OIA, PERGUNTAS_ACOLHIDA, SUGESTAO_ADORACAO, SUGESTAO_TESTEMUNHO, COMECAR_SEMANA, ORAR_TRECHO, SEMANA_SEM_DIAS, sugestaoAcolhida,
     cruza, cartaoDe, cortaTrecho, capituloDe, semana, titulo, comoBlocos, perguntasDe, dividir, passos, textoParaGrupo,
     noPlano, parabolaDoEstudo, gruposDePerguntas, blocoEmHtml, negrito,
     lembrarCombinado, refsCurtas, dataDaLista, paraImprimir,
