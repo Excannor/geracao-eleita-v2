@@ -78,9 +78,12 @@ async function encerrar() {
 }
 process.on('uncaughtException', async (e) => { console.log('  FALHA ' + (e && e.stack || e)); await encerrar(); process.exit(1); });
 process.on('unhandledRejection', async (e) => { console.log('  FALHA ' + (e && e.stack || e)); await encerrar(); process.exit(1); });
-// mexer no banco com o servidor parado (proposito_membros e contas moram na memória dele)
-const noBanco = (fazer) => { const db = new DatabaseSync(arquivoDb); try { return fazer(db); } finally { db.close(); } };
-const lerBanco = (sql, ...x) => { const db = new DatabaseSync(arquivoDb, { readOnly: true }); try { return db.prepare(sql).all(...x); } finally { db.close(); } };
+// mexer no banco: proposito_membros e contas moram na memória do servidor, e só se mudam com ele
+// parado; celula_estudos não, e muda com ele de pé. A espera de 5 s (a mesma do servidor) evita o
+// "database is locked" quando ele está gravando no mesmo instante.
+const abrirDb = (opcoes) => { const db = opcoes ? new DatabaseSync(arquivoDb, opcoes) : new DatabaseSync(arquivoDb); db.exec('PRAGMA busy_timeout = 5000'); return db; };
+const noBanco = (fazer) => { const db = abrirDb(); try { return fazer(db); } finally { db.close(); } };
+const lerBanco = (sql, ...x) => { const db = abrirDb({ readOnly: true }); try { return db.prepare(sql).all(...x); } finally { db.close(); } };
 
 // ---------- a API ----------
 const base = 'http://127.0.0.1:' + PORTA + '/';
