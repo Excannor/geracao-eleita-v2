@@ -16,6 +16,8 @@ import {
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import {
   ESTUDO_MAX, ESTUDO_BRUTO_MAX, ESTUDOS_POR_CELULA, estudoUsado, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
+  COMBINADO_MAX, JANELA_COMBINADO, limparCombinado, estudoDoDia, dataNoHistorico, encontrosDoEstudo, combinadoDoAnterior, acessoAoEstudo, quemFaltou,
+  itemDoHistorico, estudoDoRegistro, cursorDe, lerCursor,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
 
@@ -1558,6 +1560,122 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
       && JSON.stringify(limpa.refs) === JSON.stringify(['Efésios 6.12']), 'o que se grava leva só as chaves de cada parte (sem a linha .l da fonte)');
   }
 
+  // --- Fase 2: as regras puras (docs/a-mesa-fase2.md, seção 2) ---
+  {
+    // 1. o combinado: uma linha só, até 200 caracteres; sem o campo, null
+    checar(COMBINADO_MAX === 200 && limparCombinado('  Orar   todo dia\npor alguém. ') === 'Orar todo dia por alguém.', 'o combinado sai numa linha só, com os espaços juntos');
+    checar(limparCombinado('x'.repeat(200)).length === 200 && erroDe(() => limparCombinado('x'.repeat(201))) === MSG_ESTUDO.combinado + '|400'
+      && MSG_ESTUDO.combinado === 'o combinado tem no máximo 200 caracteres', 'o combinado de 200 caracteres passa, e o de 201 dá 400: "' + MSG_ESTUDO.combinado + '"');
+    checar(limparCombinado(undefined) === null && limparCombinado(null) === null && limparCombinado('') === '' && limparCombinado('   ') === '',
+      'sem o campo, null (quem chama mantém o que estava); vazio é vazio');
+
+    // 3. estudoUsado com a ligação ao encontro
+    const usadoE = (x) => estudoUsado({ id: 'e2', criadoEm: '2026-10-18T12:00:00.000Z', nasceu: '2026-10-18', hoje: '2026-10-20', encontro: -1, encontros: [], ...x });
+    const reg = (data, em, estudo, semEncontro = false) => ({ encontros: [{ data, em, estudo, semEncontro }] });
+    checar(usadoE(reg('2026-10-18', '2026-10-18T08:00:00.000Z', 'e2')) && usadoE(reg('2026-10-11', '2026-10-11T08:00:00.000Z', 'e2')),
+      'um encontro ligado ao estudo marca usado, sem olhar a hora do registro');
+    checar(!usadoE(reg('2026-10-19', '2026-10-19T23:00:00.000Z', 'e1')) && !usadoE(reg('2026-10-19', '2026-10-19T23:00:00.000Z', '-'))
+      && !usadoE(reg('2026-10-19', '2026-10-19T23:00:00.000Z', 'e2', true)),
+    'um encontro ligado a outro estudo, ou a um de fora do app, não conta, mesmo registrado depois (nem o "não houve encontro")');
+    checar(usadoE(reg('2026-10-19', '2026-10-19T23:00:00.000Z', '')) && !usadoE(reg('2026-10-18', '2026-10-18T08:00:00.000Z', ''))
+      && usadoE({ encontro: 1 }) && !usadoE({ encontro: 0, hoje: '2026-10-18' }),
+    'sem estudo ligado (os registros de antes da v20), vale a regra da Fase 1, e a do dia da semana continua');
+
+    // 4. o estudo que valia num dia, no fuso do líder
+    const diaSP = (iso) => hojeNoFuso('America/Sao_Paulo', new Date(iso));
+    const diaLX = (iso) => hojeNoFuso('Europe/Lisbon', new Date(iso));
+    // A nasceu em 01/10 e foi o atual até 08/10 às 23h de Brasília; B, daí até 15/10 às 10h; C é o atual
+    const A = { id: 'A', criadoEm: '2026-10-01T15:00:00.000Z', atualAte: '2026-10-09T02:00:00.000Z' };
+    const B = { id: 'B', criadoEm: '2026-10-09T02:00:00.000Z', atualAte: '2026-10-15T13:00:00.000Z' };
+    const Cc = { id: 'C', criadoEm: '2026-10-15T13:00:00.000Z', atualAte: '' };
+    const doDia = (data, diaDe = diaSP) => estudoDoDia([Cc, A, B], data, diaDe);
+    checar(doDia('2026-10-07') === 'A' && doDia('2026-10-08') === 'B' && doDia('2026-10-15') === 'C' && doDia('2026-10-18') === 'C',
+      'o estudo do dia: 07/10 dá A, 08/10 dá B (preparado no dia do encontro) e 15/10 dá C');
+    checar(doDia('2026-09-30') === '' && doDia('ontem') === '' && estudoDoDia([], '2026-10-08', diaSP) === '', 'antes do primeiro estudo, ou sem estudo, não há estudo do dia');
+    checar(doDia('2026-10-08', diaLX) === 'A', 'o fuso entra pelo dia de cada instante: em Lisboa, B nasceu em 09/10, e o 08/10 ainda é de A');
+    checar(estudoDoDia([{ id: 'T', criadoEm: '2026-10-01T15:00:00.000Z', atualAte: '2026-10-05T15:00:00.000Z' }], '2026-10-06', diaSP) === '',
+      'o estudo tirado sem outro no lugar deixa de valer no dia em que saiu');
+
+    // 6. o combinado de antes
+    const ant = { id: 'a', combinado: 'Ligar para alguém que faltou.', criadoEm: '2026-10-05T12:00:00.000Z', atualAte: '2026-10-17T12:00:00.000Z' };
+    const comb = (extra = {}, encontros = []) => combinadoDoAnterior({ anterior: { ...ant, ...extra }, encontros, hoje: '2026-10-18', diaDe: diaSP });
+    const ligadoEm = (data, estudo = 'a', semEncontro = false) => [{ data, estudo, semEncontro, presentes: [], visitantes: 0 }];
+    checar(JANELA_COMBINADO === 10 && JSON.stringify(comb({}, ligadoEm('2026-10-11'))) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-11', estudo: 'a' }),
+      'com o encontro ligado há 7 dias, o combinado de antes aparece, com a data do encontro');
+    checar(comb({}, ligadoEm('2026-10-07')) === null && comb({ combinado: '' }, ligadoEm('2026-10-11')) === null && comb({}, ligadoEm('2026-10-19')) === null
+      && combinadoDoAnterior({ anterior: null, hoje: '2026-10-18', diaDe: diaSP }) === null,
+    'há 11 dias, sem combinado, com a data depois de hoje ou sem anterior: nada');
+    checar(JSON.stringify(comb({ atualAte: '2026-10-15T12:00:00.000Z' })) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-15', estudo: 'a' })
+      && comb({ atualAte: '2026-10-05T12:00:00.000Z' }) === null,
+    'sem encontro ligado, vale o dia em que ele deixou de ser o atual (3 dias atrás aparece; 13, não)');
+
+    // 7. a data na lista
+    const e7 = { id: 'e7', criadoEm: '2026-10-05T12:00:00.000Z' };
+    checar(JSON.stringify(dataNoHistorico(e7, [...ligadoEm('2026-10-08', 'e7'), ...ligadoEm('2026-10-15', 'e7'), ...ligadoEm('2026-10-16', 'e7', true), ...ligadoEm('2026-10-17', 'outro')], diaSP))
+      === JSON.stringify({ data: '2026-10-15', dataDe: 'encontro' }), 'com dois encontros ligados, a data é a do mais novo; o "não houve encontro" e o de outro estudo não contam');
+    checar(JSON.stringify(dataNoHistorico(e7, [], diaSP)) === JSON.stringify({ data: '2026-10-05', dataDe: 'preparo' }), 'sem encontro ligado, a data em que foi preparado ("Preparado em")');
+    checar(JSON.stringify(encontrosDoEstudo(e7, [{ data: '2026-10-08', estudo: 'e7', presentes: ['ana', 'bia'], visitantes: 3 }, { data: '2026-10-15', estudo: 'e7', presentes: ['ana'], visitantes: 0 },
+      { data: '2026-10-16', estudo: 'e7', semEncontro: true, presentes: [], visitantes: 0 }])) === JSON.stringify([{ data: '2026-10-15', pessoas: 1 }, { data: '2026-10-08', pessoas: 5 }]),
+    'os encontros do estudo, do mais novo para o mais velho, contam quem tem conta e quem não tem');
+
+    // 5. quem lê qual estudo: a tabela inteira
+    const P = { id: 'P', estudoId: 'E3', mae: '' };
+    const F = { id: 'F', estudoId: 'EF', mae: 'P', multiplicadaEm: '2026-10-10' };
+    const E1 = { id: 'E1', proposito: 'P', criadoEm: '2026-10-01T12:00:00.000Z' };
+    const E2 = { id: 'E2', proposito: 'P', criadoEm: '2026-10-11T01:00:00.000Z' }; // 10/10 às 22h em Brasília: antes do fim do dia da multiplicação
+    const E3 = { id: 'E3', proposito: 'P', criadoEm: '2026-10-12T12:00:00.000Z' }; // a mãe preparou depois da multiplicação
+    const EF = { id: 'EF', proposito: 'F', criadoEm: '2026-10-12T12:00:00.000Z' };
+    const EX = { id: 'EX', proposito: 'Q', criadoEm: '2026-10-01T12:00:00.000Z' };
+    const papeis = {
+      lider: { ativo: true, papel: '', conduz: true, lidera: true }, auxiliar: { ativo: true, papel: 'auxiliar', conduz: true },
+      membro: { ativo: true, papel: '' }, visitante: { ativo: true, papel: 'visitante' },
+      saiu: { ativo: false }, convidado: { ativo: false }, admin: { ativo: false },
+    };
+    const ac = (e, p, quem) => { const r = acessoAoEstudo(e, p, { ...quem, corte: p.multiplicadaEm || '', diaDe: diaSP }); return [r.ler ? 'ler' : r.codigo, r.presenca ? 'presenca' : '', r.usarComoBase ? 'base' : '', r.daMae ? 'mae' : '', r.atual ? 'atual' : ''].filter(Boolean).join(' '); };
+    const tabela = {
+      lider: ['ler presenca atual', 'ler presenca base', 404], auxiliar: ['ler presenca atual', 'ler presenca', 404], membro: ['ler atual', 'ler', 404],
+      visitante: ['ler atual', 403, 404], saiu: [404, 404, 404], convidado: [404, 404, 404], admin: [404, 404, 404],
+    };
+    for (const [quem, [atual, anterior, outra]] of Object.entries(tabela)) {
+      checar(ac(E3, P, papeis[quem]) === String(atual) && ac(E1, P, papeis[quem]) === String(anterior) && ac(EX, P, papeis[quem]) === String(outra),
+        'na célula: ' + quem + ' lê o atual (' + atual + '), o anterior (' + anterior + ') e o de outra célula (' + outra + ')');
+    }
+    const daFilha = { lider: papeis.lider, membro: papeis.membro, visitante: papeis.visitante, saiu: papeis.saiu };
+    const tabelaFilha = { lider: ['ler presenca atual', 'ler mae', 'ler mae', 404], membro: ['ler atual', 'ler mae', 'ler mae', 404], visitante: ['ler atual', 403, 403, 404], saiu: [404, 404, 404, 404] };
+    for (const [quem, [atual, e1, e2, e3]] of Object.entries(tabelaFilha)) {
+      checar(ac(EF, F, daFilha[quem]) === String(atual) && ac(E1, F, daFilha[quem]) === String(e1) && ac(E2, F, daFilha[quem]) === String(e2) && ac(E3, F, daFilha[quem]) === String(e3)
+        && ac(EX, F, daFilha[quem]) === '404',
+      'na filha: ' + quem + ' lê o atual dela (' + atual + '), os da mãe até a multiplicação (' + e1 + ') e não os de depois (' + e3 + ')');
+    }
+    checar(ac(E1, F, papeis.lider) === 'ler mae' && ac(E2, F, papeis.lider) === 'ler mae', 'o líder da filha nunca tem "Usar como base" nem a presença num estudo da mãe');
+    checar(acessoAoEstudo(E2, F, { ...papeis.membro, corte: '2026-10-10', diaDe: (iso) => iso.slice(0, 10) }).codigo === 404, 'o corte é o dia no fuso do líder: em UTC, E2 já seria do dia 11');
+    checar(acessoAoEstudo(E1, { id: 'G', mae: 'F', multiplicadaEm: '2026-10-20' }, { ...papeis.membro, corte: '2026-10-20', diaDe: diaSP }).codigo === 404,
+      'um nível só: a neta não lê os estudos da avó');
+
+    // quem não veio
+    const membros = [
+      { usuario: 'lider', estado: 'ativo', papel: '', entrouEm: '2026-10-01' }, { usuario: 'aux', estado: 'ativo', papel: 'auxiliar', entrouEm: '2026-10-01' },
+      { usuario: 'ana', estado: 'ativo', papel: '', entrouEm: '2026-10-01' }, { usuario: 'bia', estado: 'ativo', papel: '', entrouEm: '2026-10-01' },
+      { usuario: 'vera', estado: 'ativo', papel: 'visitante', entrouEm: '2026-10-01' }, { usuario: 'caio', estado: 'ativo', papel: '', entrouEm: '2026-10-16' },
+      { usuario: 'duda', estado: 'saiu', papel: '', entrouEm: '2026-10-01' }, { usuario: 'eva', estado: 'convidado', papel: '', entrouEm: '' },
+    ];
+    checar(JSON.stringify(quemFaltou({ membros, presentes: ['ana'], registradoPor: 'aux', data: '2026-10-15' })) === '["lider","bia"]',
+      'quem não veio: sem visitante, sem quem registrou, sem quem entrou depois, sem os presentes e sem quem saiu ou só foi convidado');
+    checar(quemFaltou({ membros, presentes: [], registradoPor: 'aux', data: '2026-10-15', semEncontro: true }).length === 0, '"não houve encontro" não tem falta de ninguém');
+
+    // a linha da lista e a folha de registro
+    const item = itemDoHistorico({ id: 'e1', tipo: 'blocos', titulo: 'Batalha espiritual', refs: ['Efésios 6.12'], criadoPor: 'lider', criadoEm: '2026-10-05T12:00:00.000Z', fonte: 'x', blocos: [{ t: 'texto' }], perguntas: ['?'], combinado: 'c' },
+      { data: '2026-10-15', dataDe: 'encontro', nomeDe: (u) => 'Nome de ' + u });
+    checar(Object.keys(item).sort().join() === 'criadoPor,criadoPorNome,data,dataDe,id,refs,tipo,titulo' && item.criadoPorNome === 'Nome de lider',
+      'a linha da lista leva só o que mostra: nada de fonte, partes, perguntas, combinado ou presença');
+    checar(itemDoHistorico({ id: 's', tipo: 'semana', titulo: 'x', refs: [] }).titulo === '' && itemDoHistorico({ id: 't', tipo: 'trecho', titulo: '', ref: 'Romanos 8', refs: [] }).titulo === 'Romanos 8'
+      && itemDoHistorico({ id: 'l', tipo: 'livre', titulo: '', refs: [], criadoPor: '' }).criadoPorNome === '', 'na lista, a leitura da semana vai sem título (a tela escreve) e o trecho com a referência');
+    checar(JSON.stringify(estudoDoRegistro({ id: 'e1', tipo: 'blocos', titulo: 'T', refs: ['Efésios 6.12'], criadoEm: '2026-10-09T02:00:00.000Z' }, diaSP))
+      === JSON.stringify({ id: 'e1', tipo: 'blocos', titulo: 'T', refs: ['Efésios 6.12'], em: '2026-10-09T02:00:00.000Z', dia: '2026-10-08' }), 'o estudo da folha de registro leva o dia em que foi preparado, no fuso do líder');
+    checar(cursorDe({ criadoEm: '2026-10-05T12:00:00.000Z', id: 'e1' }) === '2026-10-05T12:00:00.000Z|e1' && JSON.stringify(lerCursor('2026-10-05T12:00:00.000Z|e1')) === JSON.stringify({ criadoEm: '2026-10-05T12:00:00.000Z', id: 'e1' })
+      && lerCursor('') === null && lerCursor('sem-barra') === null && lerCursor('x'.repeat(121) + '|e') === null, 'o cursor da lista vai e volta, e um cursor estranho é ignorado');
+  }
+
   // --- a célula de ensaio: líder, auxiliar, membro, visitante e o líder de outra célula ---
   const pastaE = mkdtempSync(join(tmpdir(), 'cc-teste-estudos-'));
   const arquivoE = join(pastaE, 'contas.json');
@@ -1606,7 +1724,7 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
   const doLider = estudoNoRetrato(ce.estudo(ce.proposito(ID).estudoId), { souQuemPrepara: true, nomeDe: (u) => 'Nome de ' + u });
   checar(!('fonte' in doMembro) && !('texto' in doMembro) && doMembro.blocos.length === 32 && doMembro.criadoPorNome === 'Nome de lider' && doMembro.em === e1.criadoEm,
     'quem só lê recebe as partes, sem a fonte');
-  checar(doLider.fonte === e1.fonte && Object.keys(doLider).sort().join() === 'blocos,criadoPor,criadoPorNome,editadoEm,em,fonte,id,perguntas,planoAte,ref,refs,tipo,titulo,traducao,usado'
+  checar(doLider.fonte === e1.fonte && Object.keys(doLider).sort().join() === 'blocos,combinado,criadoPor,criadoPorNome,editadoEm,em,fonte,id,perguntas,planoAte,ref,refs,tipo,titulo,traducao,usado'
     && doLider.usado === false && !('usado' in doMembro), 'quem prepara recebe a fonte, para "Mudar o estudo", e se o estudo já foi usado (só ele)');
 
   // --- mudar o mesmo estudo (base igual) atualiza a linha ---
