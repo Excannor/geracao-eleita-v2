@@ -272,6 +272,8 @@
     itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
     itens.push(itemPainelMais(CC.ico('caderno'), true, 'Minhas anotações', 'Notas, orações e versículos marcados', '#/perfil/anotacoes'));
     itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
+    // Instalar não é uma tela: abre o passo a passo (07c-instalar.js). Quem já usa pelo ícone não vê.
+    if (CC.tutorialInstalar && !(CC.rodandoComoApp && CC.rodandoComoApp())) itens.push(itemPainelMais(CC.ico('baixar'), true, 'Instalar o app', 'Um ícone na tela de início, como os outros apps', '#instalar'));
     // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.
     if (CC.quem && CC.quem.admin) itens.push(itemPainelMais(CC.ico('grafico'), true, 'Painel do administrador', 'Números da igreja e do app', '#/config/painel'));
     itens.push(itemPainelMais(CC.ico('engrenagem'), true, 'Configurações', 'Tema, notificações e conta', '#/config'));
@@ -280,9 +282,11 @@
     document.querySelectorAll('[data-ir-mais]').forEach((a) => {
       a.onclick = (ev) => {
         ev.preventDefault();
+        CC.vibrar('leve');
+        // Instalar abre a folha do passo a passo por cima: fecha o Mais como o voltar fecha.
+        if (a.dataset.irMais === '#instalar') { fecharPainelMais(); CC.tutorialInstalar(); return; }
         painelMaisAberto = false;
         document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => CC.sair(el, 200));
-        CC.vibrar('leve');
         irSemFantasma(a.dataset.irMais);
       };
     });
@@ -320,7 +324,7 @@
     if (ativa === '#/discipulado') gravarLocal(chaveNova('discipulado'), '1');
 
     const aba = ([href, rotulo, icone, papel], soTrilho) => {
-      const sel = href === ativa;
+      const sel = href === ativa && !(soTrilho && papel === 'explorar' && rota === 'apoiar');
       const ponto = (papel === 'juntos' && pendencias) || (papel === 'celula' && pontoCelula) || (papel === 'discipulado' && pontoDiscipulado)
         ? '<i class="ponto-aba"></i>' : '';
       return '<button type="button" class="aba' + (sel ? ' selecionada' : '') + (soTrilho ? ' so-trilho' : '') + '" data-papel="' + papel + '" data-ir="' + href + '"'
@@ -346,6 +350,18 @@
     // Discipulado. .so-trilho fica invisível no celular (ver estilo.css).
     const fantasmaDesafios = desafiosNaBarra ? '' : aba(DESAFIOS, true);
     const fantasmaExplorar = aba(EXPLORAR, true);
+    // No computador o trilho lista tudo, então não há Mais: o que no celular mora dentro dele
+    // (anotações, apoiar, instalar, painel do administrador e configurações) vira item do
+    // trilho, num grupo abaixo das abas. Cada um acende sozinho pela rota, sem acender o Explorar.
+    const extraDoTrilho = (papel, icone, rotulo, alvo, sel) => '<button type="button" class="aba so-trilho extra-trilho' + (sel ? ' selecionada' : '')
+      + '" data-papel="' + papel + '" ' + (alvo ? 'data-ir="' + alvo + '"' : 'data-instalar-trilho') + (sel ? ' aria-current="page"' : '')
+      + ' aria-label="' + CC.esc(rotulo) + '"><span class="icone-aba">' + CC.ico(icone).replace('<svg ', '<svg class="ico-aba" ') + '</span>'
+      + '<span class="rotulo-aba">' + rotulo + '</span></button>';
+    const extrasDoTrilho = extraDoTrilho('anotacoes', 'caderno', 'Minhas anotações', '#/perfil/anotacoes', rota === 'perfil' && arg === 'anotacoes')
+      + extraDoTrilho('apoiar', 'aperto', 'Apoiar o app', '#/apoiar', rota === 'apoiar')
+      + (CC.tutorialInstalar && !(CC.rodandoComoApp && CC.rodandoComoApp()) ? extraDoTrilho('instalar', 'baixar', 'Instalar o app', '', false) : '')
+      + (CC.quem && CC.quem.admin ? extraDoTrilho('painel', 'grafico', 'Painel admin', '#/config/painel', noPainel) : '')
+      + extraDoTrilho('config', 'engrenagem', 'Configurações', '#/config', rota === 'config' && !noPainel);
 
     // Duas ilhas em pílula, uma de cada lado do botão da Bíblia: no trilho lateral (>= 860px)
     // .ilha vira `display: contents` e some do layout, e a ordem visual passa a ser dada por
@@ -357,7 +373,7 @@
       + '<div class="ilha">' + lado(esq) + '</div>'
       + biblia
       + '<div class="ilha">' + lado(dir) + '</div>'
-      + fantasmaDesafios + fantasmaExplorar;
+      + fantasmaDesafios + fantasmaExplorar + extrasDoTrilho;
     navegacao.classList.toggle('cheia', esq.length + dir.length + 1 === 6);
     navegacao.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
@@ -366,6 +382,8 @@
         if (location.hash === el.dataset.ir && !(history.state && history.state.painelMais)) { CC.redesenhar(); CC.rolarPara(0); } else irSemFantasma(el.dataset.ir);
       };
     });
+    const instalarTrilho = navegacao.querySelector('[data-instalar-trilho]');
+    if (instalarTrilho) instalarTrilho.onclick = () => { CC.vibrar('leve'); CC.tutorialInstalar(); };
     const botao = navegacao.querySelector('[data-abrir-mais]');
     if (botao) botao.onclick = () => { CC.vibrar('leve'); abrirPainelMais(!desafiosNaBarra); };
   }

@@ -765,3 +765,15 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
   body.sem-barra .navegacao { display: none; }
   body.sem-barra .conteudo { padding-bottom: 40px; }
 }
+
+/* Trilho lateral com o grupo que no celular mora no Mais (anotações, apoiar, instalar, painel,
+   configurações): itens mais baixos, o ícone nunca encolhe por causa de um rótulo longo, e o
+   trilho rola sozinho em telas baixas (1366x768) em vez de cortar o último item. */
+@media (min-width: 860px) {
+  .navegacao { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  .aba .icone-aba { flex: 0 0 auto; }
+  .aba.extra-trilho { height: 46px; }
+  .aba.extra-trilho .icone-aba { width: 36px; height: 36px; }
+  .aba.extra-trilho .ico-aba { width: 20px; height: 20px; }
+  .aba.extra-trilho .rotulo-aba { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.875rem; font-weight: 600; }
+}

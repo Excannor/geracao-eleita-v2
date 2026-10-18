@@ -2672,6 +2672,13 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
   .aba[data-papel="biblia"] { order: 5; }
   .aba[data-papel="juntos"] { order: 6; }
   .aba[data-papel="explorar"] { order: 7; }
+  /* O que no celular mora no Mais: um grupo abaixo das abas, separado por um fio. */
+  .aba[data-papel="anotacoes"] { order: 8; margin-top: 21px; position: relative; }
+  .aba[data-papel="anotacoes"]::before { content: ""; position: absolute; left: 14px; right: 14px; top: -11px; height: 1px; background: var(--borda); }
+  .aba[data-papel="apoiar"] { order: 9; }
+  .aba[data-papel="instalar"] { order: 10; }
+  .aba[data-papel="painel"] { order: 11; }
+  .aba[data-papel="config"] { order: 12; }
   /* O Mais só existe no celular: no trilho, Desafios e Explorar já têm lugar fixo na
      lista, e Célula/Discipulado (quando existem) também são itens de verdade. */
   .aba[data-papel="mais"] { display: none; }
