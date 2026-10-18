@@ -243,6 +243,16 @@ async function fotoDoPapel(nome) {
   await av('document.getElementById("papel-na-tela")?.remove(); document.body.classList.remove("imprimindo-estudo"); true');
   await tamanho(largura);
 }
+// a mesma captura a 360 px (as abas de quem conduz, "Quem não veio" e o vazio da filha mudaram nessa largura)
+async function foto360(nome) {
+  if (!FOTOS) return;
+  await tamanho(360);
+  // o campo do combinado cresce com o texto: na largura nova, ele mede de novo
+  await av('document.querySelectorAll("[data-combinado]").forEach((c) => c.dispatchEvent(new Event("input", { bubbles: true }))); true');
+  await dormir(300);
+  await foto('360-' + nome, true);
+  await tamanho(390);
+}
 async function diagnostico(nome) {
   const ex = evs.filter((e) => e.method === 'Runtime.exceptionThrown').slice(-3).map((e) => (e.params.exceptionDetails?.exception?.description || e.params.exceptionDetails?.text || '').slice(0, 300));
   if (ex.length) console.log('    (exceções: ' + JSON.stringify(ex) + ')');
@@ -442,6 +452,7 @@ try {
     '10. o aviso de salvar diz que o estudo fica em Estudos anteriores, também para as células que nascerem dela, e com o @ depois da exclusão');
   ok(await av('!!document.querySelector(".mesa-combinado-campo [data-limite-combinado]")'), '10. o aviso perto do teto fica dentro do cartão do combinado, logo abaixo do campo');
   await foto('01-passo3-combinado', true);
+  await foto360('01-passo3-combinado');
   await emTodosOsTamanhos('o passo 3 com o combinado');
   await cmd('Page.reload');
   ok(await esperar('!!document.querySelector("[data-combinado]") && document.querySelector("[data-combinado]").value === ' + JSON.stringify(CENTO_E_SETENTA), 20000), '10. recarregar mantém o combinado (o rascunho)');
@@ -474,6 +485,7 @@ try {
     '11. o bloco da anotação vem depois dos botões da aba');
   ok(await av('[...document.querySelectorAll(".painel-celula .acoes .botao")].map((b) => b.textContent.trim()).join("|") === "Mandar no grupo|Modo encontro|Imprimir"'), '11. os botões: Mandar no grupo, Modo encontro e Imprimir');
   await foto('02-aba-membro', true);
+  await foto360('02-aba-membro');
   await tema(true);
   await foto('escuro-02-aba-membro', true);
   await tema(false);
@@ -538,6 +550,7 @@ try {
     '14. "Vieram 2 pessoas no encontro de ' + ddmm(DIA_3) + '." e "Vieram 5 pessoas no encontro de ' + ddmm(DIA_7) + '.", só para quem conduz');
   ok(await av('!/Usar como base/.test(document.querySelector(".painel-celula").textContent)'), '14. o auxiliar não tem "Usar como base"');
   await foto('05-leitura-quem-conduz', true);
+  await foto360('05-leitura-quem-conduz');
   await tema(true);
   await foto('escuro-05-leitura-quem-conduz', true);
   await tema(false);
@@ -629,6 +642,7 @@ try {
   ok((await av(q('.folha-faltou [data-zap-faltou="ana"]') + '.getAttribute("href")')) === 'https://wa.me/?text=' + encodeURIComponent(esperadoAna), '17. o WhatsApp da Ana leva a mensagem pronta, com "de hoje" e o estudo');
   ok(/O app não avisa ninguém/.test(await texto('.folha-faltou')) && comum(await texto('.folha-faltou .mesa-zap')) === esperadoAna, '17. "O app não avisa ninguém" e a prévia com a mensagem da primeira pessoa');
   await foto('11-quem-nao-veio', true);
+  await foto360('11-quem-nao-veio');
   await tema(true);
   await foto('escuro-11-quem-nao-veio', true);
   await tema(false);
@@ -773,6 +787,7 @@ try {
   const hrefsMae = await av('[...document.querySelectorAll("[data-lista-mae] .mesa-anterior")].map((a) => a.getAttribute("href"))');
   ok(hrefsMae[0].endsWith('/estudo/' + S2) && hrefsMae[1].endsWith('/estudo/' + S1) && hrefsMae.every((h) => h.includes(FILHA)), '25. as linhas abrem pela filha, S2 e depois S1');
   await foto('15-filha-origem', true);
+  await foto360('15-filha-origem');
   await emTodosOsTamanhos('a lista da célula de origem');
   await clicar('[data-lista-mae] .mesa-anterior:last-child');
   ok(await esperar('/Da Célula Esperança · só para leitura/.test(document.querySelector(".mesa-cabeca-anterior")?.textContent || "")', 20000), '25. a leitura diz "Da Célula Esperança · só para leitura"');
