@@ -456,7 +456,10 @@ try {
   ok(await av('[...document.querySelectorAll(".secao-w")].some((s) => s.querySelector(".etiqueta").textContent === "Combinado para a semana" && s.textContent.includes(' + JSON.stringify(COMBINADO_2) + '))'), '11. "Combinado para a semana" mostra o combinado de S2');
   ok(await av('!/\\d+ de \\d+/.test(document.querySelector(".painel-celula").textContent)'), '11. nenhuma contagem "N de M" na aba');
   ok(await av('!/Orem pelo Jonas/.test(document.querySelector(".painel-celula").textContent)'), '11. o testemunho de S1 (com o nome) não aparece em S2');
-  ok(/Minha anotação neste estudo/.test(await texto('.mesa-anotacao')) && /Só você vê/.test(await texto('.mesa-anotacao')), '11. "Minha anotação neste estudo", com "Só você vê"');
+  ok(/Minhas anotações neste estudo/.test(await texto('.mesa-anotacao')) && /Só você vê/.test(await texto('.mesa-anotacao')), '11. "Minhas anotações neste estudo", com "Só você vê"');
+  // a anotação fica depois dos botões: não aparece entre o conteúdo e "Mandar no grupo" (nem acima de "Modo encontro", na tela que se mostra no encontro)
+  ok(await av('!!(document.querySelector(".painel-celula > .acoes").compareDocumentPosition(document.querySelector(".mesa-anotacao")) & Node.DOCUMENT_POSITION_FOLLOWING)'),
+    '11. o bloco da anotação vem depois dos botões da aba');
   ok(await av('[...document.querySelectorAll(".painel-celula .acoes .botao")].map((b) => b.textContent.trim()).join("|") === "Mandar no grupo|Modo encontro|Imprimir"'), '11. os botões: Mandar no grupo, Modo encontro e Imprimir');
   await foto('02-aba-membro', true);
   await tema(true);
@@ -678,7 +681,7 @@ try {
   ok(imp.titulo === 'Romanos 8.28-30' && imp.cartoes.length === 1 && imp.cartoes[0] === textoDe(NBV, 'Romanos 8.28-30'), '21. a impressão tem o título e o cartão igual a nbv.json');
   ok(imp.texto.includes(COMBINADO_2) && imp.texto.includes('Na semana passada combinamos:') && imp.texto.includes('O que o texto diz?') && /Nova Bíblia Viva|NBV|Biblica/.test(imp.texto),
     '21. com as perguntas, o combinado, a acolhida lembrada e o crédito da NBV');
-  ok(!/Minha anotação|Só você vê|cirurgia|Vieram/.test(imp.texto), '21. sem a anotação, sem "Só você vê", sem a presença e sem o pedido de oração da Ana');
+  ok(!/Minhas? anota|Só você vê|cirurgia|Vieram/.test(imp.texto), '21. sem a anotação, sem "Só você vê", sem a presença e sem o pedido de oração da Ana');
   await tema(true);
   await cmd('Emulation.setEmulatedMedia', { media: 'print', features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
   await dormir(300);

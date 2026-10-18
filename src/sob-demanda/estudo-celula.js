@@ -138,9 +138,11 @@
     const i = corte.lastIndexOf(' ');
     return (i > 10 ? corte.slice(0, i) : t.slice(0, max)).replace(/[\s,.;:]+$/, '');
   }
-  // Minha anotação neste estudo: uma nota como as outras, cifrada, só da pessoa (07g-anotacoes.js).
-  // Não vale ponto nem conquista, e não entra no modo encontro nem na impressão.
-  const blocoAnotacao = (e) => '<div class="mesa-anotacao" data-notas-contexto="estudo:' + esc(e.id) + '" data-tipo-nota="nota" data-titulo-notas="Minha anotação neste estudo"'
+  // As anotações de cada um neste estudo: notas como as outras, cifradas, só da pessoa
+  // (07g-anotacoes.js). Não valem ponto nem conquista, e não entram no modo encontro nem na
+  // impressão. Ficam depois dos botões, antes de "Estudos anteriores": a aba é a tela que o líder
+  // mostra no encontro, e o "Só você vê" não pode ficar entre o estudo e "Mandar no grupo".
+  const blocoAnotacao = (e) => '<div class="mesa-anotacao" data-notas-contexto="estudo:' + esc(e.id) + '" data-tipo-nota="nota" data-titulo-notas="Minhas anotações neste estudo"'
     + ' data-botao-notas="Escrever minha anotação" data-titulo-nota="' + esc(tituloDaNota(e)) + '"></div>';
   const ligarAnotacao = (raiz) => { if (CC.notasDoContexto) CC.notasDoContexto(raiz); };
   // O combinado da semana passada, na Acolhida: só a frase, sem nada para marcar (ninguém marca
@@ -194,10 +196,10 @@
       + (perguntas.length ? secaoW('Para conversar', '<ol class="roteiro-perguntas mesa-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ol>') : '')
       + secaoCombinado(e)
       + secaoW('Testemunho', '<p>' + esc(ws.testemunho) + '</p>')
-      + blocoAnotacao(e)
       + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar no grupo</button>'
       + '<button class="botao contorno" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button>'
       + '<button class="botao plano" data-imprimir>' + CC.ico('folha') + 'Imprimir</button></div>'
+      + blocoAnotacao(e)
       // os estudos anteriores, para quem faz parte da célula (o visitante vê só o atual)
       + (visitante(p) ? '' : '<div data-anteriores></div>');
     ligarMais(painel);
@@ -346,9 +348,9 @@
       + secaoW('Palavra', palavraHtml(p, e, sem, textos, sigla, versiculos, quem, apoio))
       + (perguntas.length ? secaoW('Para conversar', '<ol class="roteiro-perguntas mesa-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ol>') : '')
       + secaoCombinado(e)
-      + blocoAnotacao(e)
       + '<div class="acoes">' + (r.usarComoBase ? '<button class="botao" data-usar-base>' + CC.ico('caneta') + 'Usar como base</button>' : '')
-      + '<button class="botao contorno" data-imprimir>' + CC.ico('folha') + 'Imprimir</button></div>';
+      + '<button class="botao contorno" data-imprimir>' + CC.ico('folha') + 'Imprimir</button></div>'
+      + blocoAnotacao(e);
     ligarMais(painel);
     if (CC.inseparavel) CC.inseparavel(painel);
     ligarAnotacao(painel);
