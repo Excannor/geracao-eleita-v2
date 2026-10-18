@@ -1111,3 +1111,22 @@ S2 e S4 destravam o cliente.
 - **O teto de 200:** o encontro que aponta para um estudo que saiu pelo teto mostra o estudo como `''`. Com um estudo por semana, são uns quatro anos.
 - **A contagem de pessoas** soma os presentes com conta e os sem conta do registro. Se o registro for regravado, o número é o da última gravação.
 - **O retrato** cresce uns 1,5 KB por célula para quem conduz (os 8 dias e os 4 estudos). O histórico fica na rota própria, com páginas, como pede a crítica.
+
+---
+
+## 12. O que o bloco SERVIDOR entregou (18/10)
+
+Os commits `84df4ea` (S1, v20), `88ac87f` (S2, regras puras), `5254d33` (S3, contas), `b2879ad` (S4, API), `7e990d9` (S5, privacidade) e `2818842` (um acerto do S3). O JSON é o das seções 3.2 a 3.6, com estes pontos que o cliente precisa saber:
+
+- **Combinado com citação.** Além do teto de 200 (400, "o combinado tem no máximo 200 caracteres"), o servidor recusa a citação que o leitor de marcas não troca pela referência (aspas no meio da frase com "(NVI)"): 400, "no combinado, escreva só a referência do versículo (como Efésios 6.10), sem o texto". O combinado não tem prévia, e guardar o texto de outra tradução quebraria a regra do texto bíblico. A citação na linha inteira continua virando só a referência. O passo 3 mostra essa mensagem como a do teto.
+- **`registro.dias`** parte do dia de quem pede (`hojeDe(eu)`), que é a mesma faixa que `registrarEncontro` aceita. O dia de cada estudo (`padrao`, `estudos[].dia`) continua no fuso do líder.
+- **`registro.estudos`** são os 4 mais novos da célula e, além deles, qualquer estudo que seja o `padrao` de um dos 8 dias ou que já esteja ligado ao registro de um deles. Assim a escolha já marcada sempre está na lista. Cada um vem como `{ id, tipo, titulo, refs, em, dia }`, com o título da regra da lista (vazio na leitura da semana).
+- **A resposta do registro** traz `estudo` como `{ id, tipo, titulo, refs }` (o mesmo título da lista) ou `null` (sem estudo, ou `'-'`). `faltaram` vem em ordem do nome de exibição (o apelido ou o primeiro nome). `ultimoEncontro.estudo` tem a mesma forma.
+- **`GET /api/estudos`**: 401 sem sessão, 405 para o que não é GET, 404 para id de estudo ou de célula com mais de 64 letras. A leitura do estudo atual (`atual: true`) não leva a fonte nem para o líder: a aba já tem.
+- **`estudoNoRetrato`** ganhou a opção `comFonte` (a leitura de um anterior pelo líder leva a fonte sem o `usado`) e leva `combinado` sempre.
+- **Funções novas em `estudos.mjs`**, além das da seção 2: `quemFaltou`, `encontrosDoEstudo`, `resumoDoEstudo`, `estudoDoRegistro`, `cursorDe` e `lerCursor`. Em `contas.mjs`: `diaNaCelula`, `estudosLeves`, `acessoDe`, `estudoParaLer`, `estudosAnteriores`, `estudosDaMae` e `dadosDoEstudo`.
+- **A anotação no estudo** não precisa de nada novo no servidor: `notas.*.texto`, `notas.*.titulo` e `notas.*.tags` já são cifrados pelo `cofre.mjs`. Mas o servidor roda o mesmo `limparNota` de `02-estado.js` (`REGRAS.normalizarEstado`): enquanto `CONTEXTO` não aceitar `estudo:` (C1), a nota perde o contexto na sincronização.
+- **A privacidade** ganhou "a parábola" na lista dos lugares de uma anotação, que também guarda o contexto sem cifra.
+- **`ferramentas/teste-estudo-historico.mjs`** tem a parte A e a multiplicação pela API (38 verificações). As partes B e C no navegador entram no lugar marcado no arquivo. O S1 dele já tem os 6 cartões (a linha de Lucas 11.24-26 entra depois do parágrafo, como a sugestão aceita na prévia), e o servidor é religado uma vez para as entradas na célula e as contas voltarem 10 dias.
+
+Ficam para o dono as quatro decisões da seção 11 (A2, A5, as notificações com "Bora" e o aviso no sino).
