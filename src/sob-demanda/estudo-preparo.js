@@ -31,6 +31,9 @@
   const PERGUNTAS_MAX = 6;
   const PERGUNTA_MAX = 300;
   const CAMPO_4W_MAX = 300;
+  // o combinado para a semana (estudos.mjs, COMBINADO_MAX): o aviso do teto aparece a partir de 170
+  const COMBINADO_MAX = 200;
+  const AVISO_COMBINADO = 170;
   // As mensagens do servidor (estudos.mjs, MENSAGENS), com a maiúscula e o ponto da tela.
   const MSG = {
     vazio: 'Escreva o estudo.',
@@ -46,6 +49,7 @@
   const NOME_TRADUCAO = { nbv: 'NBV', blivre: 'Bíblia Livre' };
   const nomeDa = (sigla) => NOME_TRADUCAO[sigla] || ((CC.traducao(sigla) || {}).abreviatura) || 'NBV';
   const plural = (n, um, varios) => n + ' ' + (n === 1 ? um : varios);
+  const ddmm = (iso) => String(iso || '').slice(8, 10) + '/' + String(iso || '').slice(5, 7);
   let capitulosMemo = null;
   const capitulos = () => capitulosMemo || (capitulosMemo = CC.capitulosDoPlano(CC.D.plano));
   // A mesma limpeza do leitor de marcas: as linhas (.l) dos blocos contam a partir daqui.
@@ -64,7 +68,15 @@
 
   // Um rascunho de outro estudo (o estudo mudou em outro aparelho) não serve mais. O estudo que já
   // foi usado num encontro não é a base de nada: o líder prepara o próximo, em branco, e o usado
-  // fica guardado na célula.
+  // fica guardado na célula. O estudo novo (base '') começa com acolhida, adoração e testemunho
+  // vazios, que viram as sugestões da semana: o testemunho de antes podia ter nomes (A5).
+  // O rascunho que começou de um estudo anterior ("Usar como base", deBase) continua valendo ao
+  // reabrir o preparo, mesmo que o estudo atual seja outro.
+  const estadoVazio = (base, baseEm) => ({
+    v: 1, base, baseEm, tipo: 'blocos', passo: 1, fonte: '', palavra: '', trecho: { livro: 'Gênesis', cap: '1', vers: '' }, traducao: 'nbv',
+    opcoes: true, modo: 'colar', colado: false, coladoWord: false, recusadas: [], perguntas: null, chavePerguntas: '', salvas: null,
+    ws: base ? null : { acolhida: '', adoracao: '', testemunho: '' }, combinado: '', deBase: '', deBaseData: '',
+  });
   function estadoInicial(p) {
     const e = p.estudo && !p.estudo.usado ? p.estudo : null;
     const base = e ? e.id : '';
@@ -72,23 +84,34 @@
     // depois que este rascunho começou (aí o rascunho é de uma versão velha e sai)
     const baseEm = e ? e.editadoEm || e.em || '' : '';
     const salvo = lerRascunho(p.id);
+    if (salvo && salvo.deBase) return salvo;
     if (salvo && (salvo.base || '') === base && (salvo.baseEm === undefined || salvo.baseEm === baseEm)) return salvo;
     if (salvo && base && (salvo.base || '') === base) CC.avisar('O estudo mudou em outro aparelho. O preparo começa da versão salva.');
-    const st = {
-      v: 1, base, baseEm, tipo: 'blocos', passo: 1, fonte: '', palavra: '', trecho: { livro: 'Gênesis', cap: '1', vers: '' }, traducao: 'nbv',
-      opcoes: true, modo: 'colar', colado: false, coladoWord: false, recusadas: [], perguntas: null, chavePerguntas: '', salvas: null, ws: null,
-    };
-    if (!e) return st;
+    const st = estadoVazio(base, baseEm);
+    return e ? Object.assign(st, doEstudo(e)) : st;
+  }
+  // Os campos do preparo a partir de um estudo salvo (o atual, em "Mudar", ou um anterior, em
+  // "Usar como base").
+  function doEstudo(e) {
     const r = e.tipo === 'trecho' ? CC.lerRefLivre(e.ref) : null;
-    return Object.assign(st, {
+    return {
       tipo: e.tipo === 'livre' ? 'blocos' : e.tipo,
       fonte: e.tipo === 'blocos' ? e.fonte || '' : e.tipo === 'livre' ? e.texto || '' : '',
       palavra: e.tipo === 'semana' || e.tipo === 'trecho' ? e.texto || '' : '',
-      trecho: r ? { livro: r.livro, cap: String(r.cap), vers: r.de ? r.de + (r.ate && r.ate !== r.de ? '-' + r.ate : '') : '' } : st.trecho,
+      trecho: r ? { livro: r.livro, cap: String(r.cap), vers: r.de ? r.de + (r.ate && r.ate !== r.de ? '-' + r.ate : '') : '' } : { livro: 'Gênesis', cap: '1', vers: '' },
       // em semana e trecho, a lista vazia quer dizer "as perguntas de sempre": valem as marcadas de saída
       traducao: e.traducao || 'nbv', opcoes: false, modo: 'escrever',
       salvas: (e.tipo === 'semana' || e.tipo === 'trecho') && !(e.perguntas || []).length ? null : (e.perguntas || []).slice(),
-    });
+      combinado: e.combinado || '',
+    };
+  }
+  // "Usar como base": um rascunho novo (base '', o salvar cria outro estudo) a partir de um anterior,
+  // com o texto, a tradução, as perguntas e o combinado dele, sem acolhida, adoração e testemunho.
+  // r: a leitura do estudo (GET /api/estudos?estudo=), que traz a fonte só para o líder.
+  function estadoDaBase(p, r) {
+    const salvo = lerRascunho(p.id);
+    if (salvo && salvo.deBase === r.estudo.id) return salvo;
+    return Object.assign(estadoVazio('', ''), doEstudo(r.estudo), { deBase: r.estudo.id, deBaseData: r.data || '' });
   }
 
   // ---------- colar do Word: o negrito vira *asteriscos*, o resto vira texto ----------
@@ -124,10 +147,22 @@
 
   // ---------- a tela ----------
   let geracao = 0;
-  function tela(raiz, p, apoio) {
+  // opcoes.deBase: o estudo anterior que o líder usa como base (…/preparar/<id>).
+  async function tela(raiz, p, apoio, opcoes = {}) {
     const meu = ++geracao;
-    const vivo = () => meu === geracao && raiz.isConnected && /\/preparar$/.test(location.hash);
-    const st = estadoInicial(p);
+    const vivo = () => meu === geracao && raiz.isConnected && /\/preparar(\/[^/]+)?$/.test(location.hash);
+    let st;
+    if (opcoes.deBase) {
+      let r = null;
+      try { r = await CC.api('api/estudos?estudo=' + encodeURIComponent(opcoes.deBase) + '&celula=' + encodeURIComponent(p.id)); } catch (e) { r = null; }
+      if (!vivo()) return;
+      if (!r || !r.usarComoBase || !r.estudo) {
+        CC.avisar('Não deu para abrir este estudo agora. Tente de novo.', { tipo: 'erro' });
+        CC.substituirRota(apoio.endereco(p.id, 'estudo') + '/' + encodeURIComponent(opcoes.deBase));
+        return;
+      }
+      st = estadoDaBase(p, r);
+    } else st = estadoInicial(p);
     const guardar = () => gravarRascunho(p.id, st);
     const sem = () => R.semana(p.semanaAte);
     const refDoTrecho = () => {
@@ -235,13 +270,15 @@
           + '<label class="campo-senha"><span>Versículos (opcional)</span><input data-vers inputmode="numeric" placeholder="Ex.: 16-18" autocomplete="off"></label>'
           + '<p class="passo-dica pequena">A conversa segue o método OIA: observação, interpretação e aplicação.</p></div>' + campoPalavra();
       }
-      const painel = moldura(1, 'Preparar o estudo', 'O estudo', p.titulo, '<div class="segmentado" role="group" aria-label="Como vai ser a Palavra" data-tipos' + (st.tipo === 'blocos' && st.colado ? ' hidden' : '') + '>'
+      // a nota de quem começou de um estudo anterior
+      const deBase = st.deBase ? '<p class="mesa-nota mesa-de-base">' + CC.ico('info') + 'Começando do estudo de ' + esc(ddmm(st.deBaseData)) + '. Mude o que quiser antes de salvar.</p>' : '';
+      const painel = moldura(1, 'Preparar o estudo', 'O estudo', p.titulo, deBase + '<div class="segmentado" role="group" aria-label="Como vai ser a Palavra" data-tipos' + (st.tipo === 'blocos' && st.colado ? ' hidden' : '') + '>'
         + [['semana', 'Leitura da semana'], ['trecho', 'Um trecho'], ['blocos', 'Eu escrevo']].map(([k, r]) => '<button type="button" data-tipo="' + k + '" aria-pressed="' + (st.tipo === k) + '">' + r + '</button>').join('') + '</div>'
         + corpo
         + '<div data-erro role="alert" hidden></div>'
         + '<div class="acoes"><button class="botao" data-ver>Ver as partes' + CC.ico('avancar') + '</button>'
         + '<button class="botao plano" data-cancelar>Cancelar</button>'
-        + (p.estudo ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '') + '</div>');
+        + (p.estudo && !st.deBase ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '') + '</div>');
       const q = (s) => painel.querySelector(s);
       painel.querySelectorAll('[data-tipo]').forEach((b) => {
         b.onclick = () => { if (st.tipo !== b.dataset.tipo) { st.tipo = b.dataset.tipo; guardar(); passo1(); } };
@@ -679,9 +716,16 @@
           + (gi === ultimo ? '<div class="mesa-escrever"><input class="campo-falso" data-nova type="text" maxlength="' + PERGUNTA_MAX + '" placeholder="Escreva a sua pergunta" aria-label="Escreva a sua pergunta" autocomplete="off">'
             + '<button type="button" class="botao pequeno contorno" data-por>' + CC.ico('mais-sinal') + 'Pôr na lista</button></div>' : '') + '</div>').join('')
         + '<p class="mesa-conta" data-conta>' + contaPerguntas() + '</p>'
+        // o combinado para a semana: a acolhida do próximo encontro começa por ele, e ele fica
+        // guardado nos estudos anteriores (por isso, sem nomes). Ninguém marca se cumpriu.
+        + '<label class="campo-senha mesa-combinado-campo"><span>Combinado para a semana (opcional)</span>'
+        + '<small class="dica-campo">Uma atitude simples para todos viverem até o próximo encontro. A acolhida do próximo encontro começa por ela.</small>'
+        + '<small class="dica-campo">Evite nomes de pessoas, porque o combinado fica guardado nos estudos anteriores da célula.</small>'
+        + '<textarea data-combinado name="combinado-da-semana" rows="2" maxlength="' + COMBINADO_MAX + '" autocomplete="off" placeholder="Ex.: Orar todo dia por alguém que ainda não conhece Jesus."></textarea></label>'
+        + '<p class="mesa-limite" data-limite-combinado role="status" hidden></p>'
         + '<div class="mesa-ws"><header><b>Acolhida, adoração e testemunho</b><button type="button" class="botao pequeno contorno" data-mudar-ws>Mudar</button></header><dl>'
         + [['acolhida', 'Acolhida'], ['adoracao', 'Adoração'], ['testemunho', 'Testemunho']].map(([k, r]) => '<dt>' + r + '</dt><dd>' + esc(valorW(k) || sugestaoW[k]()) + '</dd>').join('') + '</dl></div>'
-        + '<p class="mesa-nota">' + CC.ico('pessoas') + 'Ao salvar, todos da célula veem o estudo na aba Estudo, inclusive quem está só conhecendo.</p>'
+        + '<p class="mesa-nota">' + CC.ico('pessoas') + 'Ao salvar, todos da célula veem o estudo na aba Estudo, inclusive quem está só conhecendo. Quando você preparar o próximo, este fica em Estudos anteriores para quem faz parte da célula, com o seu nome.</p>'
         + '<div data-erro role="alert" hidden></div>'
         + '<div class="acoes"><button class="botao" data-salvar>' + CC.ico('certo') + 'Salvar o estudo</button>'
         + '<button class="botao plano" data-voltar-partes>Voltar às partes</button></div>';
@@ -746,6 +790,19 @@
         guardar();
         desenharPerguntas(painel);
       };
+      const combinado = q('[data-combinado]');
+      const limiteCombinado = q('[data-limite-combinado]');
+      const contarCombinado = () => {
+        const n = combinado.value.length;
+        const faltam = COMBINADO_MAX - n;
+        limiteCombinado.hidden = n < AVISO_COMBINADO;
+        limiteCombinado.textContent = faltam > 1 ? 'Faltam ' + faltam + ' caracteres para o limite do combinado.'
+          : faltam === 1 ? 'Falta 1 caractere para o limite do combinado.' : 'O combinado chegou ao limite de ' + COMBINADO_MAX + ' caracteres.';
+      };
+      combinado.value = st.combinado || '';
+      crescer(combinado);
+      contarCombinado();
+      combinado.addEventListener('input', () => { st.combinado = combinado.value; guardar(); crescer(combinado); contarCombinado(); });
       q('[data-mudar-ws]').onclick = () => mudarWs(painel);
       q('[data-voltar-partes]').onclick = () => irPara(2);
       q('[data-salvar]').onclick = () => salvar(painel);
@@ -793,6 +850,7 @@
         traducao: st.tipo === 'semana' ? 'nbv' : st.traducao,
         perguntas: st.perguntas.filter((x) => x.marcada).map((x) => x.texto.trim()).filter(Boolean),
         base: st.base || '',
+        combinado: String(st.combinado || '').replace(/\s+/g, ' ').trim(),
       };
       if (st.ws) Object.assign(corpo, st.ws);
       botao.disabled = true;
@@ -804,6 +862,8 @@
         return;
       }
       apagarRascunho(p.id);
+      // a lista de estudos anteriores muda (o atual de antes entra nela)
+      if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
       await apoio.carregar();
       CC.substituirRota(apoio.endereco(p.id, 'estudo'));
       CC.avisar('Estudo salvo. Ele fica guardado na célula.', { tipo: 'certo' });
