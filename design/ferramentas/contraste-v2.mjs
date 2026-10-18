@@ -61,6 +61,15 @@ const PARES = [
   ['--v2-tinta-forte', '--v2-cartao', 4.5, 'convite de Orar juntos no modo encontro'],
   ['--salvia-tinta', '--folha-destaque', 4.5, 'botão "Abrir ... na Bíblia" no alto do passo do encontro'],
   ['--v2-tinta-fraca', '--v2-cartao', 3, 'círculo vazio da escolha no passo 1 do preparo'],
+  // À Mesa, Fase 2 (docs/a-mesa-fase2.md, 9.5): o combinado lembrado, a lista, a leitura de um
+  // anterior, a folha de registro e "Quem não veio"
+  ['--v2-tinta-forte', '--salvia-palido', 4.5, '"Na semana passada combinamos" na Acolhida'],
+  ['--v2-tinta-fraca', '--v2-cartao', 4.5, 'data e referências na lista de Estudos anteriores'],
+  ['--salvia-texto', '--v2-fundo', 4.5, 'etiqueta "Estudo anterior" na leitura'],
+  ['--v2-tinta-forte', '--campo', 4.5, 'título do estudo na folha de registro'],
+  ['--v2-tinta-fraca', '--campo', 4.5, '"Preparado em" na escolha do estudo do registro'],
+  ['--v2-tinta-fraca', '--v2-cartao', 4.5, '"Só quem conduz a célula vê este número."'],
+  ['--salvia-texto', '--salvia-palido', 4.5, 'ícone de pessoas no cartão da presença'],
 ];
 
 let falhas = 0;
