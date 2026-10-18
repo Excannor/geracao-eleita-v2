@@ -1523,21 +1523,24 @@ export class Contas {
   // O que GET /api/propositos leva do estudo da célula além do atual (docs/a-mesa-fase2.md, 3.4).
   //   membro: a pessoa é membro ativo e não visitante (lê os anteriores); conduz: é quem conduz a
   //   célula (recebe a folha de registro); hoje: o dia de quem pede, que é o da folha de registro.
-  // combinadoAnterior vai para todos da célula; temAnteriores e daMae, só para os membros; registro,
-  // só para quem conduz: os estudos que a folha oferece (o atual, os 3 anteriores mais novos e o que
-  // valia em cada dia) e os 8 dias que dá para registrar, com o estudo do dia e o que já foi gravado.
+  // combinadoAnterior, temAnteriores e daMae, só para os membros: o visitante vê só o estudo atual,
+  // e o combinado de antes é do estudo anterior (quem chegou esta semana nem estava quando ele foi
+  // combinado). registro, só para quem conduz: os estudos que a folha oferece (o atual, os 3
+  // anteriores mais novos e o que valia em cada dia) e os 8 dias que dá para registrar, com o
+  // estudo do dia e o que já foi gravado.
   dadosDoEstudo(p, { membro = false, conduz = false, hoje = '' } = {}, agora = new Date()) {
     const db = this.banco();
     const diaDe = this.diaNaCelula(p);
-    const atual = p.estudoId ? this.estudo(p.estudoId) : null;
-    let combinadoAnterior = null;
-    if (atual) {
-      const linha = db.prepare('SELECT id, proposito, tipo, criado_em, atual_ate, combinado FROM celula_estudos '
-        + 'WHERE proposito = ? AND id != ? AND criado_em < ? ORDER BY criado_em DESC, id DESC LIMIT 1').get(p.id, atual.id, atual.criadoEm);
-      combinadoAnterior = combinadoDoAnterior({ anterior: estudoDaLinha(linha), encontros: p.encontros, hoje: diaDe(agora.toISOString()), diaDe });
-    }
-    const saida = { combinadoAnterior, temAnteriores: false, daMae: null };
+    const saida = { combinadoAnterior: null, temAnteriores: false, daMae: null };
     if (membro) {
+      const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+      if (atual) {
+        const linha = db.prepare('SELECT id, proposito, tipo, criado_em, atual_ate, combinado FROM celula_estudos '
+          + 'WHERE proposito = ? AND id != ? AND criado_em < ? ORDER BY criado_em DESC, id DESC LIMIT 1').get(p.id, atual.id, atual.criadoEm);
+        saida.combinadoAnterior = combinadoDoAnterior({
+          anterior: estudoDaLinha(linha), encontros: p.encontros, encontro: p.encontro, hoje: diaDe(agora.toISOString()), diaDe,
+        });
+      }
       saida.temAnteriores = !!db.prepare("SELECT 1 FROM celula_estudos WHERE proposito = ? AND atual_ate != '' LIMIT 1").get(p.id);
       saida.daMae = this.estudosDaMae(p);
     }

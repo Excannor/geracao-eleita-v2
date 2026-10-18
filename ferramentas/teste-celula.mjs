@@ -434,9 +434,8 @@ try {
     const daAnaF = await retratoF(anaF.cookie);
     const daVeraF = await retratoF(veraF.cookie);
     ok(daAnaF.estudoTestemunho === '' && daAnaF.estudoAcolhida === '' && !JSON.stringify(daVeraF).includes('Orem pelo Jonas'), 'o estudo novo zera os 4 Ws: o testemunho com nomes não passa para a semana seguinte');
-    for (const [quem, r] of [['a Ana', daAnaF], ['a visitante', daVeraF]]) {
-      ok(JSON.stringify(r.combinadoAnterior) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: HOJE, estudo: s1.id }), quem + ' recebe "na semana passada combinamos" com o combinado de antes');
-    }
+    ok(JSON.stringify(daAnaF.combinadoAnterior) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: HOJE, estudo: s1.id }), 'a Ana recebe "na semana passada combinamos" com o combinado de antes');
+    ok(daVeraF.combinadoAnterior === null, 'a visitante não recebe o combinado de antes: ele é do estudo anterior, e ela vê só o atual');
     ok(daAnaF.temAnteriores === true && daVeraF.temAnteriores === false && daAnaF.daMae === null && daVeraF.daMae === null, 'só quem faz parte da célula fica sabendo que há estudos anteriores');
 
     // GET /api/estudos: a lista e a leitura

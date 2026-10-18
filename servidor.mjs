@@ -865,10 +865,10 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const convidado = minha.estado === 'convidado';
   const atual = CONTAS.estudo(p.estudoId);
   const euPreparoEstudo = p.criadoPor === eu && minha.estado === 'ativo' && !aprovacaoQueFalta(p, eu, 'lider');
-  // Fase 2 (docs/a-mesa-fase2.md, 3.4): o combinado do estudo de antes vai para todos da célula; se
-  // há estudos anteriores (e da célula de origem), só para quem faz parte dela (o visitante vê só o
-  // atual); a folha de registro com os estudos, só para quem conduz. O histórico não entra aqui:
-  // ele tem a rota própria, com páginas (GET /api/estudos).
+  // Fase 2 (docs/a-mesa-fase2.md, 3.4): o combinado do estudo de antes e se há estudos anteriores
+  // (e da célula de origem), só para quem faz parte da célula (o visitante vê só o atual); a folha
+  // de registro com os estudos, só para quem conduz. O histórico não entra aqui: ele tem a rota
+  // própria, com páginas (GET /api/estudos).
   const membroLe = minha.estado === 'ativo' && minha.papel !== 'visitante';
   const doEstudo = convidado ? { combinadoAnterior: null, temAnteriores: false, daMae: null }
     : CONTAS.dadosDoEstudo(p, { membro: membroLe, conduz: conduzo, hoje: hojeDe(eu) });

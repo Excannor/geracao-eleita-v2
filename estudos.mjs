@@ -234,16 +234,28 @@ export function encontrosDoEstudo(e, encontros) {
 }
 
 // "Na semana passada combinamos: ... Como foi?" O combinado do estudo que veio logo antes do atual,
-// quando ele foi usado num encontro (ou, sem encontro ligado, deixou de ser o atual) até janela
-// dias antes de hoje. Ninguém marca se cumpriu: é só a lembrança para abrir a conversa.
+// quando ele foi usado num encontro até janela dias antes de hoje. Ninguém marca se cumpriu: é só a
+// lembrança para abrir a conversa.
+// Sem encontro ligado (os registros de antes da v20), vale o dia em que ele deixou de ser o atual
+// (o seguinte foi preparado perto do encontro), mas só quando ele conta como usado (estudoUsado,
+// até esse dia) e nenhum encontro desde que nasceu foi ligado a outro estudo ou a um de fora do app
+// ('-'). Sem isso, um combinado que a célula nunca viveu (o estudo corrigido e trocado antes de
+// qualquer encontro, ou a semana feita com outro estudo) abriria a acolhida como se tivesse sido.
 //   anterior: o estudo da célula logo antes do atual (por criado_em), ou null; encontros: os da
-//   célula; hoje: 'AAAA-MM-DD'. Devolve { texto, data, estudo } ou null.
-export function combinadoDoAnterior({ anterior, encontros = [], hoje, diaDe, janela = JANELA_COMBINADO }) {
+//   célula; encontro: o dia da semana do encontro (0 a 6, ou -1); hoje: 'AAAA-MM-DD'.
+//   Devolve { texto, data, estudo } ou null.
+export function combinadoDoAnterior({ anterior, encontros = [], encontro = -1, hoje, diaDe, janela = JANELA_COMBINADO }) {
   if (!anterior || !anterior.combinado || !ehDia(hoje)) return null;
   const ligado = dataNoHistorico(anterior, encontros, diaDe);
-  // sem encontro ligado, a data em que o estudo deixou de ser o atual: o seguinte foi preparado
-  // perto do encontro
-  const data = ligado.dataDe === 'encontro' ? ligado.data : diaDe(anterior.atualAte || anterior.criadoEm);
+  let data = ligado.dataDe === 'encontro' ? ligado.data : '';
+  if (!data && anterior.atualAte) {
+    const nasceu = diaDe(anterior.criadoEm);
+    const saiu = diaDe(anterior.atualAte);
+    const deOutro = (encontros || []).some((x) => x && !x.semEncontro && x.estudo && x.estudo !== anterior.id
+      && ehDia(x.data) && x.data >= nasceu && x.data <= saiu);
+    const usado = estudoUsado({ id: anterior.id, criadoEm: anterior.criadoEm, nasceu, hoje: saiu, encontro, encontros });
+    if (usado && !deOutro) data = saiu;
+  }
   if (!ehDia(data) || data > hoje || diasEntre(data, hoje) > janela) return null;
   return { texto: anterior.combinado, data, estudo: anterior.id };
 }

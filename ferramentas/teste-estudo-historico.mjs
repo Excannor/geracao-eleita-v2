@@ -377,11 +377,12 @@ try {
   noBanco((db) => db.prepare("UPDATE proposito_membros SET entrou_em = ? WHERE proposito = ? AND usuario = 'caio'").run(somaDias(HOJE, -1), ID));
   await subir();
 
-  // 7. o combinado de antes, para todos (a visitante inclusive)
-  for (const [quem, cookie] of [['a Ana', ana], ['a Vera', vera], ['o líder', lider]]) {
+  // 7. o combinado de antes, para quem faz parte da célula (a visitante vê só o estudo atual)
+  for (const [quem, cookie] of [['a Ana', ana], ['o líder', lider]]) {
     const c = await celulaDe(cookie, ID);
     ok(JSON.stringify(c.combinadoAnterior) === JSON.stringify({ texto: COMBINADO_1, data: DIA_7, estudo: S1 }), quem + ' recebe "Na semana passada combinamos", com a data de 7 dias atrás');
   }
+  ok((await celulaDe(vera, ID)).combinadoAnterior === null, 'a Vera (visitante) não recebe o combinado de antes: ele é do estudo anterior');
   ok((await celulaDe(ana, ID)).temAnteriores === true && (await celulaDe(vera, ID)).temAnteriores === false, 'só quem faz parte da célula fica sabendo que há anteriores');
 
   // 8. o encontro de 3 dias atrás, registrado pelo líder sem o campo
@@ -634,12 +635,12 @@ try {
 
   // 19. a visitante
   await como(vera, rota('estudo'));
-  ok(await esperar(existe('.mesa-combinado'), 20000) && await av('!document.querySelector(".mesa-secao-anteriores") && !/Estudos anteriores/.test(document.querySelector(".painel-celula").textContent)'),
-    '19. a Vera vê o estudo atual, a acolhida lembrada e não vê "Estudos anteriores"');
+  ok(await esperar(existe('.painel-celula [data-modo-encontro]'), 20000) && await av('!document.querySelector(".mesa-combinado") && !document.querySelector(".mesa-secao-anteriores") && !/Estudos anteriores|Na semana passada/.test(document.querySelector(".painel-celula").textContent)'),
+    '19. a Vera vê o estudo atual, sem o combinado de antes e sem "Estudos anteriores"');
   await abrir(rota('estudo/' + S1), '/Os estudos anteriores ficam para quem faz parte da célula/.test(document.querySelector(".painel-celula")?.textContent || "")');
   ok(/Os estudos anteriores ficam para quem faz parte da célula\./.test(await texto('.painel-celula')) && /Ver o estudo atual/.test(await texto('.painel-celula')), '19. num anterior, "Os estudos anteriores ficam para quem faz parte da célula." e "Ver o estudo atual"');
   await clicarTexto('.painel-celula', 'Ver o estudo atual');
-  ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector(".mesa-combinado")', 15000), '19. "Ver o estudo atual" volta à aba');
+  ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector(".painel-celula [data-modo-encontro]")', 15000), '19. "Ver o estudo atual" volta à aba');
 
   // 20. quem saiu
   await como(bia, '#/estudo/' + S1);

@@ -1705,9 +1705,18 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
     checar(comb({}, ligadoEm('2026-10-07')) === null && comb({ combinado: '' }, ligadoEm('2026-10-11')) === null && comb({}, ligadoEm('2026-10-19')) === null
       && combinadoDoAnterior({ anterior: null, hoje: '2026-10-18', diaDe: diaSP }) === null,
     'há 11 dias, sem combinado, com a data depois de hoje ou sem anterior: nada');
-    checar(JSON.stringify(comb({ atualAte: '2026-10-15T12:00:00.000Z' })) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-15', estudo: 'a' })
-      && comb({ atualAte: '2026-10-05T12:00:00.000Z' }) === null,
-    'sem encontro ligado, vale o dia em que ele deixou de ser o atual (3 dias atrás aparece; 13, não)');
+    // sem encontro ligado: o registro de antes da v20 (estudo '') feito depois que ele nasceu, ou o
+    // dia da semana do encontro (quinta, 4) que passou enquanto ele era o atual
+    const semLigar = (data, em) => [{ data, em, estudo: '', semEncontro: false, presentes: [], visitantes: 0 }];
+    const combQ = (extra = {}, encontros = []) => combinadoDoAnterior({ anterior: { ...ant, ...extra }, encontros, encontro: 4, hoje: '2026-10-18', diaDe: diaSP });
+    checar(JSON.stringify(combQ({ atualAte: '2026-10-15T12:00:00.000Z' })) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-15', estudo: 'a' })
+      && JSON.stringify(comb({ atualAte: '2026-10-15T12:00:00.000Z' }, semLigar('2026-10-08', '2026-10-08T23:00:00.000Z'))) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-15', estudo: 'a' })
+      && combQ({ atualAte: '2026-10-05T12:00:00.000Z' }) === null,
+    'sem encontro ligado, vale o dia em que ele deixou de ser o atual, quando ele conta como usado (3 dias atrás aparece; 13, não)');
+    checar(comb({ atualAte: '2026-10-15T12:00:00.000Z' }) === null && combQ({ criadoEm: '2026-10-16T12:00:00.000Z', atualAte: '2026-10-17T12:00:00.000Z' }) === null,
+      'o combinado de um estudo que nunca foi usado (sem encontro e sem passar o dia da semana) não abre a acolhida');
+    checar(combQ({ atualAte: '2026-10-15T12:00:00.000Z' }, ligadoEm('2026-10-08', '-')) === null && combQ({ atualAte: '2026-10-15T12:00:00.000Z' }, ligadoEm('2026-10-08', 'outro')) === null,
+      'a semana feita com um estudo de fora do app ou com outro estudo também não: a célula não combinou aquilo');
 
     // 7. a data na lista
     const e7 = { id: 'e7', criadoEm: '2026-10-05T12:00:00.000Z' };
@@ -2082,8 +2091,8 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
       && membro.temAnteriores === true && membro.daMae === null && !('registro' in membro),
     'o membro recebe o combinado de antes (com a data do encontro mais recente), que há anteriores, e nada da folha de registro');
     const visita = ce.dadosDoEstudo(p(), { membro: false }, dia(13));
-    checar(visita.combinadoAnterior && visita.temAnteriores === false && visita.daMae === null, 'o visitante recebe o combinado de antes, mas não que há anteriores');
-    checar(ce.dadosDoEstudo(p(), {}, dia(23)).combinadoAnterior === null, 'onze dias depois do encontro, o combinado de antes não aparece mais');
+    checar(visita.combinadoAnterior === null && visita.temAnteriores === false && visita.daMae === null, 'o visitante não recebe o combinado de antes nem que há anteriores: ele vê só o estudo atual');
+    checar(ce.dadosDoEstudo(p(), { membro: true }, dia(23)).combinadoAnterior === null, 'onze dias depois do encontro, o combinado de antes não aparece mais');
     const conduz = ce.dadosDoEstudo(p(), { membro: true, conduz: true, hoje: '2026-10-13' }, dia(13));
     const d = conduz.registro.dias;
     checar(d.length === 8 && d[0].data === '2026-10-13' && d[7].data === '2026-10-06' && d[0].padrao === S2 && d[0].estudo === null
