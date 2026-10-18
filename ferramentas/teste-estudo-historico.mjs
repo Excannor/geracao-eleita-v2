@@ -429,7 +429,9 @@ try {
   const CENTO_E_SETENTA = ('Visitar alguém da célula que está doente e levar uma palavra de ânimo, orando junto com a família, '.repeat(2)).slice(0, 170);
   await na((t) => { const c = document.querySelector('[data-combinado]'); c.value = t; c.dispatchEvent(new Event('input', { bubbles: true })); return true; }, CENTO_E_SETENTA);
   ok(await esperar('!' + q('[data-limite-combinado]') + '.hidden') && (await texto('[data-limite-combinado]')) === 'Faltam 30 caracteres para o limite do combinado.', '10. com 170 caracteres: "Faltam 30 caracteres para o limite do combinado."');
-  ok(/Quando você preparar o próximo, este fica em Estudos anteriores para quem faz parte da célula, com o seu nome\./.test(await av('document.querySelector(".mesa-preparo").textContent')), '10. o aviso de salvar diz que o estudo fica em Estudos anteriores');
+  ok(/Quando você preparar o próximo, este fica em Estudos anteriores para quem faz parte da célula e para as células que nascerem dela, com o seu nome\. Se você apagar a conta, fica o seu @\./.test(await av('document.querySelector(".mesa-preparo").textContent')),
+    '10. o aviso de salvar diz que o estudo fica em Estudos anteriores, também para as células que nascerem dela, e com o @ depois da exclusão');
+  ok(await av('!!document.querySelector(".mesa-combinado-campo [data-limite-combinado]")'), '10. o aviso perto do teto fica dentro do cartão do combinado, logo abaixo do campo');
   await foto('01-passo3-combinado', true);
   await emTodosOsTamanhos('o passo 3 com o combinado');
   await cmd('Page.reload');

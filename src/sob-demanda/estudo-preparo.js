@@ -747,11 +747,12 @@
         + '<label class="campo-senha mesa-combinado-campo"><span>Combinado para a semana (opcional)</span>'
         + '<small class="dica-campo">Uma atitude simples para todos viverem até o próximo encontro. A acolhida do próximo encontro começa por ela.</small>'
         + '<small class="dica-campo">Evite nomes de pessoas, porque o combinado fica guardado nos estudos anteriores da célula.</small>'
-        + '<textarea data-combinado name="combinado-da-semana" rows="2" maxlength="' + COMBINADO_MAX + '" autocomplete="off" placeholder="Ex.: Orar todo dia por alguém que ainda não conhece Jesus."></textarea></label>'
-        + '<p class="mesa-limite" data-limite-combinado role="status" hidden></p>'
+        + '<textarea data-combinado name="combinado-da-semana" rows="2" maxlength="' + COMBINADO_MAX + '" autocomplete="off" placeholder="Ex.: Orar todo dia por alguém que ainda não conhece Jesus."></textarea>'
+        // perto do teto, o aviso fica no próprio cartão, logo abaixo do campo
+        + '<small class="mesa-limite" data-limite-combinado role="status" hidden></small></label>'
         + '<div class="mesa-ws"><header><b>Acolhida, adoração e testemunho</b><button type="button" class="botao pequeno contorno" data-mudar-ws>Mudar</button></header><dl>'
         + [['acolhida', 'Acolhida'], ['adoracao', 'Adoração'], ['testemunho', 'Testemunho']].map(([k, r]) => '<dt>' + r + '</dt><dd>' + esc(valorW(k) || sugestaoW[k]()) + '</dd>').join('') + '</dl></div>'
-        + '<p class="mesa-nota">' + CC.ico('pessoas') + 'Ao salvar, todos da célula veem o estudo na aba Estudo, inclusive quem está só conhecendo. Quando você preparar o próximo, este fica em Estudos anteriores para quem faz parte da célula, com o seu nome.</p>'
+        + '<p class="mesa-nota">' + CC.ico('pessoas') + 'Ao salvar, todos da célula veem o estudo na aba Estudo, inclusive quem está só conhecendo. Quando você preparar o próximo, este fica em Estudos anteriores para quem faz parte da célula e para as células que nascerem dela, com o seu nome. Se você apagar a conta, fica o seu @.</p>'
         + '<div data-erro role="alert" hidden></div>'
         + '<div class="acoes"><button class="botao" data-salvar>' + CC.ico('certo') + 'Salvar o estudo</button>'
         + '<button class="botao plano" data-voltar-partes>Voltar às partes</button></div>';
