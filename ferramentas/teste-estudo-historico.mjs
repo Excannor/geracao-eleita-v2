@@ -335,8 +335,8 @@ try {
   // 2. o encontro de 7 dias atrás, registrado pelo Paulo sem o campo "estudo" (o app antigo)
   const reg7 = await pedir('api/celula', { acao: 'registrarEncontro', id: ID, data: DIA_7, presentes: ['aux', 'ana', 'vera'], visitantes: 2 }, aux);
   ok(reg7.status === 200 && reg7.dado.encontro.estudo === S1 && reg7.dado.estudo.id === S1, 'o registro de 7 dias atrás, sem o campo, fica ligado a S1 (o estudo que valia naquele dia)');
-  ok(JSON.stringify(reg7.dado.faltaram) === JSON.stringify([{ usuario: 'bia', nome: 'Bia' }, { usuario: 'lider', nome: 'Marcos' }]),
-    'quem não veio: a Bia e o Marcos, em ordem de nome, sem a Vera (visitante) e sem o Paulo (que registrou)');
+  ok(JSON.stringify(reg7.dado.faltaram) === JSON.stringify([{ usuario: 'bia', nome: 'Bia' }]),
+    'quem não veio: a Bia, sem a Vera (visitante), sem o Paulo (que registrou) e sem o Marcos (quem conduz, como em "Precisam de atenção")');
   await dormir(300);
   ok(caixa() === caixaAntes, 'o registro não põe nada no sino de ninguém (nem de quem faltou)');
 
@@ -372,6 +372,10 @@ try {
   // 6. quem entrou depois
   const caio = await criar('caio', 'Caio', { celula: token });
   ok((await estudos('celula=' + ID, caio)).dado.estudos.length === 1 && (await ler(caio)).status === 200, 'o Caio entra depois de S2 e lê S1');
+  // o Caio entrou ontem: quem entra no próprio dia do encontro não faltou a ele
+  await parar();
+  noBanco((db) => db.prepare("UPDATE proposito_membros SET entrou_em = ? WHERE proposito = ? AND usuario = 'caio'").run(somaDias(HOJE, -1), ID));
+  await subir();
 
   // 7. o combinado de antes, para todos (a visitante inclusive)
   for (const [quem, cookie] of [['a Ana', ana], ['a Vera', vera], ['o líder', lider]]) {
@@ -384,8 +388,8 @@ try {
   caixaAntes = caixa();
   const reg3 = await pedir('api/celula', { acao: 'registrarEncontro', id: ID, data: DIA_3, presentes: ['lider', 'ana'], visitantes: 0 }, lider);
   ok(reg3.dado.encontro.estudo === S1, 'o registro de 3 dias atrás, sem o campo, também fica ligado a S1');
-  ok(JSON.stringify(reg3.dado.faltaram.map((x) => x.usuario)) === '["bia","aux"]' && !reg3.dado.faltaram.some((x) => x.usuario === 'caio'),
-    'quem não veio não traz o Caio, que entrou depois daquela data');
+  ok(JSON.stringify(reg3.dado.faltaram.map((x) => x.usuario)) === '["bia"]' && !reg3.dado.faltaram.some((x) => x.usuario === 'caio'),
+    'quem não veio não traz o Caio, que entrou depois daquela data, nem o Paulo, que conduz');
   ok((await celulaDe(lider, ID)).estudo.usado === false, 'S2 continua sem uso: o líder ainda vê "Mudar o estudo"');
   ok(JSON.stringify((await ler(aux)).dado.encontros) === JSON.stringify([{ data: DIA_3, pessoas: 2 }, { data: DIA_7, pessoas: 5 }])
     && (await estudos('celula=' + ID, ana)).dado.estudos[0].data === DIA_3, 'a leitura de S1 pelo Paulo passa a ter os dois encontros, e a lista mostra a data de 3 dias atrás');

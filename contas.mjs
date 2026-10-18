@@ -1724,7 +1724,8 @@ export class Contas {
     const existente = encontros.find((e) => e.data === d);
     if (existente) Object.assign(existente, registro); else encontros.push(registro);
     await this.salvar();
-    return { p, registro, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, data: d, semEncontro: sem }) };
+    const quemConduz = this.ativosDe(p).map((m) => m.usuario).filter((u) => podeConduzir(p, u));
+    return { p, registro, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, quemConduz, data: d, semEncontro: sem }) };
   }
 
   // Os pedidos de oração e de ajuda que a pessoa deixou naquela célula somem com ela: quem

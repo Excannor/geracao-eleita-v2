@@ -1759,8 +1759,10 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
       { usuario: 'vera', estado: 'ativo', papel: 'visitante', entrouEm: '2026-10-01' }, { usuario: 'caio', estado: 'ativo', papel: '', entrouEm: '2026-10-16' },
       { usuario: 'duda', estado: 'saiu', papel: '', entrouEm: '2026-10-01' }, { usuario: 'eva', estado: 'convidado', papel: '', entrouEm: '' },
     ];
-    checar(JSON.stringify(quemFaltou({ membros, presentes: ['ana'], registradoPor: 'aux', data: '2026-10-15' })) === '["lider","bia"]',
-      'quem não veio: sem visitante, sem quem registrou, sem quem entrou depois, sem os presentes e sem quem saiu ou só foi convidado');
+    checar(JSON.stringify(quemFaltou({ membros, presentes: ['ana'], registradoPor: 'aux', quemConduz: ['lider', 'aux'], data: '2026-10-15' })) === '["bia"]',
+      'quem não veio: sem visitante, sem quem conduz, sem quem registrou, sem quem entrou depois, sem os presentes e sem quem saiu ou só foi convidado');
+    checar(JSON.stringify(quemFaltou({ membros, presentes: [], registradoPor: 'lider', data: '2026-10-16' })) === '["aux","ana","bia"]',
+      'quem entrou no próprio dia do encontro (o Caio, em 16/10) não faltou: a mesma regra de "Precisam de atenção"');
     checar(quemFaltou({ membros, presentes: [], registradoPor: 'aux', data: '2026-10-15', semEncontro: true }).length === 0, '"não houve encontro" não tem falta de ninguém');
 
     // a linha da lista e a folha de registro
@@ -2035,7 +2037,7 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   const caixaAntes = linhas("SELECT count(*) n FROM sqlite_master WHERE name = 'push_caixa'")[0].n ? linhas('SELECT count(*) n FROM push_caixa')[0].n : 0;
   const reg1 = await ce.registrarEncontro('aux', ID, { data: '2026-10-08', presentes: ['aux', 'ana', 'vera'], visitantes: 2 }, '2026-10-08', dia(8, 22));
   checar(reg1.registro.estudo === S1 && p().encontros.find((x) => x.data === '2026-10-08').estudo === S1, 'sem o campo, o encontro fica ligado ao estudo que valia naquele dia');
-  checar(JSON.stringify(reg1.faltaram) === '["lider","bia"]', 'quem não veio: o líder e a Bia, sem a visitante e sem quem registrou');
+  checar(JSON.stringify(reg1.faltaram) === '["bia"]', 'quem não veio: a Bia, sem a visitante, sem quem registrou e sem o líder (quem conduz não entra, como em "Precisam de atenção")');
   checar(ce.estudoJaUsado(p(), ce.estudo(S1), dia(9)), 'o estudo ligado a um encontro está usado');
   await ce.entrarNaCelula('caio', tok, assinar, '2026-10-10');
 
@@ -2050,8 +2052,8 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   const reg2 = await ce.registrarEncontro('lider', ID, { data: '2026-10-12', presentes: ['lider', 'ana'], visitantes: 0, estudo: S1 }, '2026-10-12', dia(12, 21));
   checar(reg2.registro.estudo === S1 && !ce.estudoJaUsado(p(), ce.estudo(S2), dia(12, 22)),
     'registrar no mesmo dia o encontro feito com o estudo antigo não marca o novo como usado (o líder continua com "Mudar o estudo")');
-  checar(JSON.stringify(reg2.faltaram) === '["aux","bia","caio"]', 'quem entrou antes do encontro (o Caio) entra em quem não veio; o visitante continua fora');
-  checar(JSON.stringify((await ce.registrarEncontro('lider', ID, { data: '2026-10-09', presentes: [], visitantes: 0 }, '2026-10-12', dia(12, 21))).faltaram) === '["aux","ana","bia"]',
+  checar(JSON.stringify(reg2.faltaram) === '["bia","caio"]', 'quem entrou antes do encontro (o Caio) entra em quem não veio; o visitante e o auxiliar continuam fora');
+  checar(JSON.stringify((await ce.registrarEncontro('lider', ID, { data: '2026-10-09', presentes: [], visitantes: 0 }, '2026-10-12', dia(12, 21))).faltaram) === '["ana","bia"]',
     'quem entrou depois da data (o Caio, num encontro de antes da entrada) não entra em quem não veio');
 
   // --- 9. as recusas e as escolhas do estudo do registro ---

@@ -409,7 +409,10 @@ try {
     const reg = await dados(await celulaF({ acao: 'registrarEncontro', data: HOJE, presentes: ['liderf'], visitantes: 1 }, liderF.cookie));
     ok(reg.ok && reg.encontro && reg.encontro.data === HOJE && reg.encontro.estudo === s1.id && reg.estudo && reg.estudo.id === s1.id
       && reg.estudo.titulo === 'Batalha espiritual, vigilância e Armadura de Deus' && JSON.stringify(reg.estudo.refs) === JSON.stringify(cartoes(s1)), 'sem o campo, o encontro fica ligado ao estudo atual, e a resposta diz qual');
-    ok(JSON.stringify(reg.faltaram) === JSON.stringify([{ usuario: 'anaf', nome: 'anaf' }]), 'a resposta traz quem não veio (a Ana), sem a visitante e sem quem registrou');
+    // a Ana entrou hoje: quem entrou no próprio dia do encontro não faltou, a mesma regra de
+    // "Precisam de atenção" (quem não veio, com uma pessoa de verdade, está no teste.mjs e no
+    // teste-estudo-historico, onde as entradas são de dias antes)
+    ok(Array.isArray(reg.faltaram) && reg.faltaram.length === 0, 'a resposta traz quem não veio: ninguém, porque a Ana entrou hoje e a visitante não é cobrada');
     await dormir(300);
     ok(caixa() === antesDaCaixa, 'nada chega ao sino de quem faltou: o app não avisa ninguém sozinho');
     const outraCelula = await celulaF({ acao: 'registrarEncontro', data: HOJE, presentes: [], visitantes: 0, estudo: salvo.estudo.id }, liderF.cookie);

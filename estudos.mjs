@@ -282,16 +282,19 @@ export function acessoAoEstudo(e, p, { papel = '', ativo = false, conduz = false
 }
 
 // Quem não veio a um encontro, para a mensagem pronta que quem conduz decide se manda (o app não
-// avisa ninguém sozinho). Os membros ativos, menos os visitantes (visitante não é cobrado, a mesma
-// regra de "Precisam de atenção"), menos quem registrou, menos quem entrou na célula depois da data
-// e menos os presentes. "Não houve encontro" não tem falta de ninguém.
-//   membros: p.membros; data: 'AAAA-MM-DD'. Devolve os @, na ordem dos membros.
-export function quemFaltou({ membros = [], presentes = [], registradoPor = '', data = '', semEncontro = false }) {
+// avisa ninguém sozinho). A mesma regra de "Precisam de atenção" (propositos.mjs,
+// quemPrecisaDeAtencao): os membros ativos, menos os visitantes (visitante não é cobrado), menos
+// quem conduz a célula (o líder e o auxiliar, quemConduz), menos quem registrou, menos quem entrou
+// na célula no dia do encontro ou depois e menos os presentes. "Não houve encontro" não tem falta de
+// ninguém.
+//   membros: p.membros; quemConduz: os @ de quem conduz; data: 'AAAA-MM-DD'. Devolve os @, na
+//   ordem dos membros.
+export function quemFaltou({ membros = [], presentes = [], registradoPor = '', quemConduz = [], data = '', semEncontro = false }) {
   if (semEncontro) return [];
-  const vieram = new Set(presentes || []);
+  const fora = new Set([...(presentes || []), ...(quemConduz || []), registradoPor]);
   return (membros || [])
-    .filter((m) => m && m.estado === 'ativo' && m.papel !== 'visitante' && m.usuario !== registradoPor && !vieram.has(m.usuario)
-      && !(m.entrouEm && m.entrouEm > data))
+    .filter((m) => m && m.estado === 'ativo' && m.papel !== 'visitante' && !fora.has(m.usuario)
+      && !(m.entrouEm && m.entrouEm >= data))
     .map((m) => m.usuario);
 }
 
