@@ -17,7 +17,7 @@ import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import {
   ESTUDO_MAX, ESTUDO_BRUTO_MAX, ESTUDOS_POR_CELULA, estudoUsado, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
   COMBINADO_MAX, JANELA_COMBINADO, limparCombinado, estudoDoDia, dataNoHistorico, encontrosDoEstudo, combinadoDoAnterior, acessoAoEstudo, quemFaltou,
-  itemDoHistorico, estudoDoRegistro, cursorDe, lerCursor,
+  itemDoHistorico, estudoDoRegistro, cursorDe, lerCursor, daMaeAteOCorte, encontrosAteOCorte,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
 
@@ -1760,6 +1760,17 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
     checar(acessoAoEstudo(E2, F, { ...papeis.membro, corte: '2026-10-10', diaDe: (iso) => iso.slice(0, 10) }).codigo === 404, 'o corte é o dia no fuso do líder: em UTC, E2 já seria do dia 11');
     checar(acessoAoEstudo(E1, { id: 'G', mae: 'F', multiplicadaEm: '2026-10-20' }, { ...papeis.membro, corte: '2026-10-20', diaDe: diaSP }).codigo === 404,
       'um nível só: a neta não lê os estudos da avó');
+    // o corte pelo instante (v21) e pela última mudança
+    const corteEm = '2026-10-10T20:00:00.000Z'; // 10/10 às 17h em Brasília
+    const pelaFilha = (e, extra = {}) => acessoAoEstudo(e, F, { ...papeis.membro, corte: '2026-10-10', corteEm, diaDe: diaSP, ...extra }).ler;
+    checar(pelaFilha(E1) && !pelaFilha(E2) && !pelaFilha({ ...E1, editadoEm: '2026-10-10T21:00:00.000Z' }) && pelaFilha({ ...E1, editadoEm: '2026-10-10T19:00:00.000Z' }),
+      'com o instante da multiplicação, a filha não lê o que a mãe preparou depois no mesmo dia (E2) nem o estudo mudado depois dele');
+    checar(!pelaFilha({ ...E1, editadoEm: '2026-10-11T12:00:00.000Z' }, { corteEm: '' }) && pelaFilha({ ...E1, editadoEm: '2026-10-10T12:00:00.000Z' }, { corteEm: '' })
+      && daMaeAteOCorte(E1, { corte: '2026-10-10', diaDe: diaSP }) && !daMaeAteOCorte(E1, { corte: '', diaDe: diaSP }),
+    'sem o instante (a filha de antes da v21), vale o dia, para o nascimento e para a última mudança');
+    checar(JSON.stringify(encontrosAteOCorte([{ data: '2026-10-08' }, { data: '2026-10-10', em: '2026-10-10T19:00:00.000Z' }, { data: '2026-10-10', em: '2026-10-10T22:00:00.000Z' }, { data: '2026-10-11' }],
+      { corte: '2026-10-10', corteEm }).map((x) => x.em || x.data)) === JSON.stringify(['2026-10-08', '2026-10-10T19:00:00.000Z']),
+    'os encontros da mãe que a filha vê: até a multiplicação, os do mesmo dia só se registrados antes dela');
 
     // quem não veio
     const membros = [
@@ -2138,11 +2149,23 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
 
   // --- a multiplicação: a filha lê os da mãe até o dia em que nasceu, só para leitura ---
   {
-    const { filha } = await ce.multiplicarCelula('lider', ID, { auxiliar: 'aux', titulo: 'Nova', pessoas: ['ana'] }, '2026-10-12');
+    // a multiplicação foi no dia 12 às 23h30 de Brasília, depois do registro do encontro daquele dia
+    const multiplicou = new Date(dia(12, 23).getTime() + 30 * 60000);
+    const { filha } = await ce.multiplicarCelula('lider', ID, { auxiliar: 'aux', titulo: 'Nova', pessoas: ['ana'] }, '2026-10-12', multiplicou);
+    checar(ce.proposito(filha.id).multiplicadaInstante === multiplicou.toISOString(), 'a filha guarda o instante da multiplicação, além do dia');
+    const daMae0 = ce.estudosAnteriores('ana', filha.id, { de: 'mae' });
+    checar(daMae0.dono.id === ID && daMae0.itens.map((x) => x.e.id).join() === [S2, S1].join(), 'a filha lê os estudos da mãe até a multiplicação (o atual daquele momento incluído)');
+    // a mãe registra um encontro depois da multiplicação e muda o estudo atual, ainda sem uso, na mesma linha
+    await ce.registrarEncontro('lider', ID, { data: '2026-10-13', presentes: ['lider'], visitantes: 0, estudo: S1 }, '2026-10-13', dia(13, 21));
+    const mudado = await ce.salvarEstudo('lider', ID, { estudo: 'trecho', ref: 'Romanos 8.28-30', fonte: 'Escrito depois da multiplicação.', base: S2, combinado: 'Combinado de depois' }, opcoes(), dia(13, 22));
+    checar(mudado.estudo.id === S2, 'a mãe mudou o S2 na mesma linha, depois da multiplicação');
     const r3 = await ce.salvarEstudo('lider', ID, { ...doDono, base: '' }, opcoes(), dia(14));
     const S3 = r3.estudo.id;
     const daMae = ce.estudosAnteriores('ana', filha.id, { de: 'mae' });
-    checar(daMae.dono.id === ID && daMae.itens.map((x) => x.e.id).join() === [S2, S1].join(), 'a filha lê os estudos da mãe até a multiplicação (o atual daquele dia incluído), e não o de depois');
+    checar(daMae.itens.map((x) => x.e.id).join() === S1 && await tentar(() => ce.estudoParaLer('ana', S2, filha.id)) === MSG_ESTUDO.naoAberto + '|404',
+      'o estudo que a mãe mudou depois da multiplicação sai da filha (404): o texto já é de outro grupo');
+    checar(daMae.itens[0].data === '2026-10-12' && ce.estudosAnteriores('caio', ID).itens.find((x) => x.e.id === S1).data === '2026-10-13',
+      'na filha, a data do S1 é a do último encontro antes da multiplicação; na mãe, a do encontro de depois');
     checar(JSON.stringify(ce.dadosDoEstudo(filha, { membro: true }, dia(14)).daMae) === JSON.stringify({ titulo: 'Esperança', ate: '2026-10-12' }), 'o retrato da filha diz que há estudos da mãe, e até quando');
     const pelaFilha = ce.estudoParaLer('ana', S1);
     checar(pelaFilha.p.id === filha.id && pelaFilha.acesso.daMae && pelaFilha.dono.id === ID, 'sem a célula, quem saiu da mãe pela multiplicação lê pela filha');
@@ -2160,7 +2183,7 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
     const lista = ce.estudosAnteriores('caio', ID);
     checar(lista.itens.some((x) => x.e.id === S1 && x.e.criadoPor === 'lider') && itemDoHistorico(lista.itens[0].e, { nomeDe: (u) => (ce.achar(u) ? nomes[u] : '@' + u) }).criadoPorNome === '@lider',
       'sem a conta do líder, a lista continua, com o @ de quem preparou');
-    checar(p().encontros.find((x) => x.data === '2026-10-12').estudo === S1 && dataNoHistorico(ce.estudo(S1), p().encontros, ce.diaNaCelula(p())).data === '2026-10-12',
+    checar(p().encontros.find((x) => x.data === '2026-10-12').estudo === S1 && dataNoHistorico(ce.estudo(S1), p().encontros, ce.diaNaCelula(p())).data === '2026-10-13',
       'e os encontros continuam ligados aos estudos');
   }
   checar(erroDe(() => limparCombinado({ toString: () => 'x'.repeat(300) })) === MSG_ESTUDO.combinado + '|400', 'um combinado que não é texto também passa pelo teto');

@@ -260,23 +260,44 @@ export function combinadoDoAnterior({ anterior, encontros = [], encontro = -1, h
   return { texto: anterior.combinado, data, estudo: anterior.id };
 }
 
+// O corte da filha de uma multiplicação nos estudos da mãe: o que a mãe preparou e escreveu até a
+// multiplicação, o atual daquele momento incluído. Com o instante da multiplicação (corteEm, ISO,
+// desde a v21), o estudo precisa ter nascido e sido mudado pela última vez até ele: um estudo que a
+// mãe muda depois, mesmo sem uso e na mesma linha, já tem o texto de outro grupo. Sem o instante
+// (a filha de antes da v21), vale o dia (corte), no fuso do líder da mãe, para o nascimento e para a
+// última mudança.
+export function daMaeAteOCorte(e, { corte = '', corteEm = '', diaDe = (iso) => String(iso || '').slice(0, 10) } = {}) {
+  if (!e || !e.criadoEm || !ehDia(corte)) return false;
+  if (corteEm) return e.criadoEm <= corteEm && (!e.editadoEm || e.editadoEm <= corteEm);
+  const nasceu = diaDe(e.criadoEm);
+  const mudado = e.editadoEm ? diaDe(e.editadoEm) : '';
+  return ehDia(nasceu) && nasceu <= corte && (!mudado || mudado <= corte);
+}
+
+// Os encontros da mãe que a filha enxerga num estudo dela: os de até a multiplicação. Os do próprio
+// dia contam só quando foram registrados até o instante da multiplicação (sem o instante, contam).
+export function encontrosAteOCorte(encontros, { corte = '', corteEm = '' } = {}) {
+  if (!ehDia(corte)) return [];
+  return (encontros || []).filter((x) => x && ehDia(x.data) && (x.data < corte || (x.data === corte && (!corteEm || !x.em || x.em <= corteEm))));
+}
+
 // Quem pode abrir um estudo, e o que vê nele (docs/a-mesa-fase2.md, seção 3.1).
 //   e: o estudo (estudoDaLinha); p: a célula por onde a pessoa chega; ativo: ela é membro ativo de
 //   p (visitante inclusive); papel: o papel dela em p ('', 'auxiliar' ou 'visitante'); conduz: é
 //   quem conduz p (podeConduzir); lidera: é o líder de p que prepara o estudo (celulaDeQuemPrepara);
-//   corte: o dia da multiplicação de p (p.multiplicadaEm), quando p nasceu de outra célula;
-//   diaDe(iso): o dia local de um instante, no fuso do líder da célula do estudo.
+//   corte e corteEm: o dia e o instante da multiplicação de p, quando p nasceu de outra célula
+//   (daMaeAteOCorte); diaDe(iso): o dia local de um instante, no fuso do líder da célula do estudo.
 // Devolve { ler, codigo (0, 403 ou 404), atual, daMae, presenca, usarComoBase }:
 //   - quem não é membro ativo (convidado, quem saiu, de fora, o administrador): 404, que vale igual
 //     para "não existe" e "não é seu" (um id de estudo não confirma que a célula existe);
 //   - o estudo atual de p: todos, o visitante inclusive;
 //   - um anterior de p: os membros, quem entrou depois inclusive; o visitante recebe 403;
-//   - um estudo da célula mãe preparado até o dia da multiplicação: os membros da filha, só para
+//   - um estudo da célula mãe preparado e escrito até a multiplicação: os membros da filha, só para
 //     leitura (sem presença e sem "Usar como base", nem para o líder da filha); o visitante, 403;
-//     o que a mãe preparou depois é de outro grupo: 404. Um nível só: a neta não lê a avó.
+//     o que a mãe preparou ou mudou depois é de outro grupo: 404. Um nível só: a neta não lê a avó.
 //   - presenca (quantas pessoas vieram): quem conduz p, e só nos estudos de p;
 //   - usarComoBase (que cria um estudo novo): só o líder, só num anterior de p.
-export function acessoAoEstudo(e, p, { papel = '', ativo = false, conduz = false, lidera = false, corte = '', diaDe = (iso) => String(iso || '').slice(0, 10) } = {}) {
+export function acessoAoEstudo(e, p, { papel = '', ativo = false, conduz = false, lidera = false, corte = '', corteEm = '', diaDe = (iso) => String(iso || '').slice(0, 10) } = {}) {
   const nao = (codigo) => ({ ler: false, codigo, atual: false, daMae: false, presenca: false, usarComoBase: false });
   if (!e || !p || !ativo) return nao(404);
   const visitante = papel === 'visitante';
@@ -285,8 +306,7 @@ export function acessoAoEstudo(e, p, { papel = '', ativo = false, conduz = false
     if (!atual && visitante) return nao(403);
     return { ler: true, codigo: 0, atual, daMae: false, presenca: !!conduz, usarComoBase: !!lidera && !atual };
   }
-  const nasceu = e.criadoEm ? diaDe(e.criadoEm) : '';
-  if (p.mae && e.proposito === p.mae && ehDia(corte) && ehDia(nasceu) && nasceu <= corte) {
+  if (p.mae && e.proposito === p.mae && daMaeAteOCorte(e, { corte, corteEm, diaDe })) {
     if (visitante) return nao(403);
     return { ler: true, codigo: 0, atual: false, daMae: true, presenca: false, usarComoBase: false };
   }

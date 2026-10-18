@@ -221,6 +221,10 @@ Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
       && dbV7.prepare("SELECT estudo FROM celula_encontros WHERE proposito = 'p1' AND data = '2026-01-08'").get().estudo === '',
     'o estudo que já estava fica sem combinado, e o encontro sem o estudo ligado ("" é "não se sabe")');
     dbV7.prepare("UPDATE celula_encontros SET estudo = 'lp2' WHERE proposito = 'p1' AND data = '2026-01-08'").run();
+    // v21: a filha guarda o instante da multiplicação
+    ok(B.versaoDoEsquema() >= 21 && colunas('propositos').includes('multiplicada_instante')
+      && dbV7.prepare("SELECT multiplicada_instante FROM propositos WHERE id = 'p2'").get().multiplicada_instante === '',
+    'a migração v21 acrescenta propositos.multiplicada_instante, vazio para quem já existia (segue pelo dia)');
   }
   B.apagarPessoaDoBanco(dbV7, 'lider');
   ok(dbV7.prepare("SELECT count(*) n FROM celula_estudos WHERE id = 'lp2'").get().n === 1,

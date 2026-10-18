@@ -302,6 +302,13 @@ const ESQUEMA = [
   ALTER TABLE celula_estudos ADD COLUMN combinado TEXT NOT NULL DEFAULT '';
   ALTER TABLE celula_encontros ADD COLUMN estudo TEXT NOT NULL DEFAULT '';
   `,
+  // v21: a filha de uma multiplicação guarda também o instante dela (multiplicada_instante, ISO),
+  // além do dia. A filha lê os estudos da mãe escritos até esse instante, e não o que a mãe
+  // preparou ou mudou depois, no mesmo dia inclusive (estudos.mjs, daMaeAteOCorte). As filhas de
+  // antes ficam com '' e seguem pelo dia.
+  `
+  ALTER TABLE propositos ADD COLUMN multiplicada_instante TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrarEsquema(db) {

@@ -2176,7 +2176,8 @@ const servidor = createServer(async (req, res) => {
           json(res, 200, {
             celula: r.p.id, atual: r.acesso.atual,
             daMae: r.acesso.daMae ? { titulo: r.dono.titulo, ate: r.p.multiplicadaEm } : null,
-            ...dataNoHistorico(r.e, r.dono.encontros, CONTAS.diaNaCelula(r.dono)),
+            // da mãe, só os encontros até a multiplicação (contas.mjs, encontrosParaLer)
+            ...dataNoHistorico(r.e, CONTAS.encontrosParaLer(r.p, r.dono), CONTAS.diaNaCelula(r.dono)),
             estudo: estudoNoRetrato(r.e, { comFonte: r.acesso.usarComoBase, nomeDe }),
             encontros: r.acesso.presenca ? encontrosDoEstudo(r.e, r.dono.encontros) : [],
             usarComoBase: r.acesso.usarComoBase,

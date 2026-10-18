@@ -22,6 +22,7 @@ import {
   ESTUDO_MAX, ESTUDO_BRUTO_MAX, TIPOS_ESTUDO, TRADUCOES, MENSAGENS as MSG_ESTUDO, semVersiculo,
   limparPerguntas, limparFonte, validarLeitura, estudoDaLinha, estudoUsado, ESTUDOS_POR_CELULA,
   limparCombinado, estudoDoDia, dataNoHistorico, combinadoDoAnterior, acessoAoEstudo, quemFaltou, cursorDe, lerCursor, ESTUDOS_POR_PAGINA,
+  daMaeAteOCorte, encontrosAteOCorte,
 } from './estudos.mjs';
 
 const scrypt = promisify(scryptCb);
@@ -229,7 +230,8 @@ function paraLinhas(d) {
       // colunas antigas vão vazias, para a linha relida do banco comparar igual à da memória.
       estudo_id: p.estudoId || '', estudo_tipo: '', estudo_ref: '', estudo_texto: '', estudo_em: '',
       estudo_acolhida: p.estudoAcolhida || '', estudo_adoracao: p.estudoAdoracao || '', estudo_testemunho: p.estudoTestemunho || '',
-      mae: p.mae || '', multiplicada_em: p.multiplicadaEm || '',
+      // o instante da multiplicação (v21) tem de estar aqui pelo mesmo motivo do estudo_id
+      mae: p.mae || '', multiplicada_em: p.multiplicadaEm || '', multiplicada_instante: p.multiplicadaInstante || '',
     })) },
     { tabela: 'proposito_membros', chaves: ['proposito', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => p.membros.map((m) => ({
       proposito: p.id, usuario: m.usuario, estado: m.estado, entrou_em: m.entrouEm || '', saiu_em: m.saiuEm || '', convidado_por: m.convidadoPor || '',
@@ -320,7 +322,7 @@ function deLinhas(t, versao) {
       encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '', recadoQuando: l.recado_quando || '',
       estudoId: l.estudo_id || '',
       estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
-      mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '',
+      mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '', multiplicadaInstante: l.multiplicada_instante || '',
       membros: [], diasBatidos: [], encontros: [], aprovacoes: [],
     };
   }
@@ -1447,8 +1449,21 @@ export class Contas {
     return acessoAoEstudo(e, p, {
       ativo: !!m, papel: (m && m.papel) || '', conduz: podeConduzir(p, u),
       lidera: !!m && p.criadoPor === u && !aprovacaoQueFalta(p, u, 'lider'),
-      corte: p.mae ? p.multiplicadaEm || '' : '', diaDe: this.diaNaCelula(dono || p),
+      ...this.corteDe(p), diaDe: this.diaNaCelula(dono || p),
     });
+  }
+
+  // O corte da filha nos estudos da mãe (estudos.mjs, daMaeAteOCorte): o dia e, desde a v21, o
+  // instante da multiplicação. Uma célula sem mãe não tem corte.
+  corteDe(p) {
+    return p && p.mae ? { corte: p.multiplicadaEm || '', corteEm: p.multiplicadaInstante || '' } : { corte: '', corteEm: '' };
+  }
+
+  // Os encontros de uma célula como quem lê por p os vê: os da própria célula inteiros; os da mãe,
+  // só até a multiplicação (o que a mãe fez depois é de outro grupo).
+  encontrosParaLer(p, dono) {
+    if (!dono) return [];
+    return dono.id === (p && p.id) ? dono.encontros || [] : encontrosAteOCorte(dono.encontros, this.corteDe(p));
   }
 
   // Um estudo para ler (GET /api/estudos?estudo=). Sem a célula, o servidor procura por onde a pessoa
@@ -1493,31 +1508,28 @@ export class Contas {
     const dono = daMae ? (p.mae && p.multiplicadaEm ? this.proposito(p.mae) : null) : p;
     if (!dono) throw erro('célula não encontrada', 404);
     const diaDe = this.diaNaCelula(dono);
-    let lista = this.estudosLeves(dono.id).filter((e) => {
-      if (!daMae) return !!e.atualAte;
-      const nasceu = diaDe(e.criadoEm);
-      return !!nasceu && nasceu <= p.multiplicadaEm;
-    });
+    // a mesma regra da leitura (acessoAoEstudo), estudo a estudo: o que não abre não aparece
+    let lista = this.estudosLeves(dono.id).filter((e) => (daMae || !!e.atualAte) && this.acessoDe(u, e, p).ler);
     const c = lerCursor(antes);
     if (c) lista = lista.filter((e) => e.criadoEm < c.criadoEm || (e.criadoEm === c.criadoEm && e.id < c.id));
     const n = Math.max(1, Math.min(Number(limite) || ESTUDOS_POR_PAGINA, ESTUDOS_POR_PAGINA));
     const pagina = lista.slice(0, n);
     const mais = lista.length > n;
+    const encontros = this.encontrosParaLer(p, dono);
     return {
       p, dono, mais, antes: mais ? cursorDe(pagina[pagina.length - 1]) : '',
-      itens: pagina.map((e) => ({ e, ...dataNoHistorico(e, dono.encontros, diaDe) })),
+      itens: pagina.map((e) => ({ e, ...dataNoHistorico(e, encontros, diaDe) })),
     };
   }
 
-  // A filha de uma multiplicação lê os estudos da mãe preparados até o dia da multiplicação: o
-  // título da mãe e o corte, quando há ao menos um; senão null.
-  estudosDaMae(p) {
+  // A filha de uma multiplicação lê os estudos da mãe escritos até a multiplicação: o título da mãe
+  // e o dia do corte, quando a pessoa (eu) abre ao menos um; senão null.
+  estudosDaMae(p, eu = '') {
     if (!p || !p.mae || !p.multiplicadaEm) return null;
     const mae = this.proposito(p.mae);
     if (!mae) return null;
-    const primeiro = this.banco().prepare('SELECT criado_em FROM celula_estudos WHERE proposito = ? ORDER BY criado_em ASC, id ASC LIMIT 1').get(mae.id);
-    const nasceu = primeiro ? this.diaNaCelula(mae)(primeiro.criado_em) : '';
-    return nasceu && nasceu <= p.multiplicadaEm ? { titulo: mae.titulo, ate: p.multiplicadaEm } : null;
+    const algum = this.estudosLeves(mae.id).some((e) => (eu ? this.acessoDe(eu, e, p).ler : daMaeAteOCorte(e, { ...this.corteDe(p), diaDe: this.diaNaCelula(mae) })));
+    return algum ? { titulo: mae.titulo, ate: p.multiplicadaEm } : null;
   }
 
   // O que GET /api/propositos leva do estudo da célula além do atual (docs/a-mesa-fase2.md, 3.4).
@@ -1760,7 +1772,7 @@ export class Contas {
   // data, sem perder a ofensiva pessoal (ela é da conta, nunca da célula); a ofensiva da
   // célula nova começa do zero porque ela nasce naquele dia. O auxiliar deixa de ser
   // auxiliar da mãe só porque saiu dela, não por um passo à parte.
-  async multiplicarCelula(eu, id, { auxiliar, titulo, pessoas } = {}, hoje) {
+  async multiplicarCelula(eu, id, { auxiliar, titulo, pessoas } = {}, hoje, agora = new Date()) {
     const mae = this.celulaDoLider(eu, id);
     const tituloLimpo = tituloDigitado(titulo, 'da célula');
     const novoLider = limparNome(auxiliar);
@@ -1779,7 +1791,8 @@ export class Contas {
     const filha = {
       id: filhaId, tipo: 'plano', alvo: '', titulo: tituloLimpo || 'Célula',
       criadoPor: novoLider, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
-      mae: mae.id, multiplicadaEm: hoje, membros: [], aprovacoes: [], estudoId: '',
+      // o instante, além do dia (v21): a filha lê os estudos da mãe escritos até ele
+      mae: mae.id, multiplicadaEm: hoje, multiplicadaInstante: agora.toISOString(), membros: [], aprovacoes: [], estudoId: '',
     };
     // Liderar a célula nova é função nova: menor de 18 espera a aprovação da liderança de novo.
     const contaNovoLider = this.achar(novoLider);
