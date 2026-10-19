@@ -143,7 +143,7 @@
       + '<div class="quem">'
       // O nome aparece na saudação do Início e para os amigos. Conta antiga sem nome (o nome
       // é o próprio @) abre com o campo vazio, pedindo o nome, em vez de repetir o usuário.
-      + '<label class="rotulo-apelido" for="apelido">Seu nome no app ' + CC.contagem(nomeNoCampo, NOME_MAX) + '</label>'
+      + '<label class="rotulo-apelido" for="apelido">Seu nome ' + CC.contagem(nomeNoCampo, NOME_MAX) + '</label>'
       + '<input id="apelido" class="campo-apelido" value="'
       + CC.esc(nomeNoCampo) + '" '
       + 'placeholder="Como quer ser chamado?" maxlength="' + NOME_MAX + '" autocomplete="given-name">'
@@ -185,7 +185,7 @@
       + (CC.minhasCelulas && CC.minhasCelulas().length ? '' : '<button class="atalho" data-nova-celula>' + CC.ico('pessoas') + '<span>Criar uma célula</span>' + CC.ico('avancar') + '</button>')
       + '</div>'
       // O app: instalar e as configurações com nome, não só o ícone do canto.
-      + '<div class="titulo-secao"><h2>O aplicativo</h2></div>'
+      + '<div class="titulo-secao"><h2>Ajustes</h2></div>'
       + '<div class="lista-atalhos">'
       + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
       + atalho('#/config', 'engrenagem', 'Configurações e conta')

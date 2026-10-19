@@ -13,7 +13,7 @@
 // O que grava: o mesmo pedido que a tela de preparo manda ao salvar um estudo novo (POST api/celula,
 // ação "estudo"), por Contas.salvarEstudo e com as mesmas opções do servidor (regras-app.mjs,
 // opcoesDoEstudo). Tradução NBV. A referência citada no meio de um parágrafo, que o passo 2 do
-// preparo mostra como "Sugestão do app", vira cartão, como se o líder tocasse em "Mostrar o
+// preparo mostra como "Sugestão", vira cartão, como se o líder tocasse em "Mostrar o
 // cartão" (no estudo do dono, Lucas 11.24-26: são 6 cartões). Perguntas: as que o passo 3 do
 // preparo já deixa marcadas, isto é, a primeira da reflexão do dia do plano que cruza um cartão (no
 // estudo do dono, o dia 244, que lê Efésios 6) e a de aplicação do método OIA ("O que muda na
@@ -133,7 +133,7 @@ export function perguntasEscolhidas(grupos, { maximo = PERGUNTAS_MAX, tamanho = 
   return lista;
 }
 
-// "Mostrar o cartão" em cada "Sugestão do app" do passo 2 do preparo (estudo-preparo.js, data-mostrar):
+// "Mostrar o cartão" em cada "Sugestão" do passo 2 do preparo (estudo-preparo.js, data-mostrar):
 // a referência citada no meio de um parágrafo entra numa linha só, logo depois dele, e o texto é
 // lido de novo, uma sugestão por vez, como o líder tocaria de cima para baixo. lerEstudo é o
 // CC.lerEstudo das regras do app; opcoes, as do passo 2 (capitulos, versiculos).
@@ -169,7 +169,7 @@ export function pedidoDoEstudo({ id, fonte, perguntas }) {
 // Devolve { corpo, perguntas: [{ texto, de }], aceitas: [refs que viraram cartão] }.
 export function montarPedido({ id, texto, R }) {
   const C = R.regras;
-  // O passo 2, na NBV: cada "Sugestão do app" vira cartão ("Mostrar o cartão").
+  // O passo 2, na NBV: cada "Sugestão" vira cartão ("Mostrar o cartão").
   const { fonte, aceitas } = aceitarSugestoes(texto, C.lerEstudo, { capitulos: R.capitulos, versiculos: R.versiculosDa('nbv') });
   // O passo 3 (estudo-preparo.js, montarPerguntas): o leitor de marcas acha os cartões e a seção
   // "Perguntas" do texto, e os grupos dizem quais vêm marcadas. A parábola, que o app busca na rede,

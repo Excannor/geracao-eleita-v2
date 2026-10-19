@@ -440,7 +440,7 @@
   // ---------- busca ----------
   CC.campoBusca = function (valor) {
     return '<div class="busca-caixa">' + CC.ico('lupa')
-      + '<input id="campo-busca" type="search" placeholder="Buscar pessoas, lugares, temas…" aria-label="Buscar nos textos do app" '
+      + '<input id="campo-busca" type="search" placeholder="Buscar pessoas, lugares, temas…" aria-label="Buscar" '
       + 'autocomplete="off" spellcheck="false" enterkeyhint="search" value="' + CC.esc(valor) + '"></div>';
   };
 
@@ -482,7 +482,7 @@
           + '</div>'
         : '')
       + (achados.length
-        ? CC.tituloSecao('Nos textos do app', CC.plural(achados.length, 'texto', 'textos'))
+        ? CC.tituloSecao('Nos textos', CC.plural(achados.length, 'texto', 'textos'))
           + '<div class="grade">' + achados.map(CC.itemNota).join('') + '</div>'
         : (q.length < 2 ? '<div class="vazio">Digite pelo menos duas letras.</div>'
           : '<div class="vazio">Não achei nada com “' + CC.esc(consulta) + '”. Tente outra palavra.</div>'));

@@ -45,7 +45,7 @@
     trecho: 'Escolha um livro e um capítulo, como \u201cRomanos 8\u201d ou \u201cJoão 3.16-18\u201d.',
     perguntas: 'Escolha até 6 perguntas.',
   };
-  const semVersiculo = (ref) => 'Não achamos ' + ref + ' na Bíblia do app. Confira a referência.';
+  const semVersiculo = (ref) => 'Não achei ' + ref + ' na Bíblia. Confira a referência.';
   const NOME_TRADUCAO = { nbv: 'NBV', blivre: 'Bíblia Livre' };
   const nomeDa = (sigla) => NOME_TRADUCAO[sigla] || ((CC.traducao(sigla) || {}).abreviatura) || 'NBV';
   const plural = (n, um, varios) => n + ' ' + (n === 1 ? um : varios);
@@ -255,14 +255,14 @@
     function escolhaHtml() {
       if (st.colado) {
         return '<div class="mesa-escolhido">' + CC.ico('caderno') + '<span><b>Estudo colado</b><small>'
-          + (st.coladoWord ? 'Do Word, com o negrito em asteriscos.' : 'Do Word ou do WhatsApp. O app separa as partes.') + '</small></span>'
+          + (st.coladoWord ? 'Do Word, com o negrito em asteriscos.' : 'Do Word ou do WhatsApp.') + '</small></span>'
           + '<button type="button" class="botao pequeno contorno" data-trocar>Trocar</button></div>';
       }
       if (!st.opcoes) return '';
       const opcao = (modo, ico, titulo, texto) => '<button type="button" class="mesa-opcao" role="radio" aria-checked="' + (st.modo === modo) + '" data-modo="' + modo + '">'
         + CC.ico(ico) + '<span><b>' + titulo + '</b><small>' + texto + '</small></span><span class="marca-opcao">' + (st.modo === modo ? CC.ico('certo') : '') + '</span></button>';
       return '<div class="mesa-opcoes" role="radiogroup" aria-label="Como você vai escrever">'
-        + opcao('colar', 'caderno', 'Colar um estudo pronto', 'Do Word ou do WhatsApp. O app separa as partes.')
+        + opcao('colar', 'caderno', 'Colar um estudo pronto', 'Do Word ou do WhatsApp.')
         + opcao('escrever', 'caneta', 'Escrever aqui', 'Começar em branco, com as marcas.') + '</div>';
     }
     const campoPalavra = () => '<label class="campo-senha"><span>Sua palavra para a célula (opcional)</span>'
@@ -280,7 +280,7 @@
           + '<div class="mesa-barra-marcas" role="toolbar" aria-label="Marcas do estudo" data-marcas hidden><p>Toque numa linha do texto e escolha o que ela é.</p><div class="grade">'
           + MARCAS.map(([k, g, r, dica]) => '<button type="button" class="mesa-marca" data-marca="' + k + '" aria-label="' + esc(r + '. ' + dica) + '">' + g + r + '</button>').join('') + '</div></div>';
       } else if (st.tipo === 'semana') {
-        corpo = '<p class="passo-dica pequena">O app monta o roteiro com a leitura dos dias ' + semana.de + ' a ' + semana.ate
+        corpo = '<p class="passo-dica pequena">O roteiro vem da leitura dos dias ' + semana.de + ' a ' + semana.ate
           + ' do plano (até onde você leu), as perguntas das reflexões desses dias e um começo de oração.</p>' + campoPalavra();
       } else {
         corpo = '<div class="escolha-trecho"><label class="campo-senha"><span>Livro</span><select data-livro>'
@@ -517,7 +517,7 @@
           + '<p class="mesa-origem">' + CC.ico('info') + esc(origem) + '</p>'
           + avisos.map((a) => '<p class="mesa-origem mesa-origem-aviso">' + CC.ico('info') + esc(a) + '</p>').join('') + '</div>';
       };
-      const sugestao = (s) => '<div class="mesa-sugestao"><span class="etiqueta">Sugestão do app</span>'
+      const sugestao = (s) => '<div class="mesa-sugestao"><span class="etiqueta">Sugestão</span>'
         + '<p>Você citou <b>' + esc(s.ref) + '</b> no meio do texto. Quer mostrar o texto num cartão?</p>' + cartao(s.ref, textos.get(s.ref))
         + '<div class="mesa-sugestao-botoes" role="group" aria-label="Cartão de ' + esc(s.ref) + '">'
         + '<button type="button" class="botao pequeno contorno" data-mostrar="' + s.bloco + '" data-ref="' + esc(s.ref) + '">' + CC.ico('certo') + 'Mostrar o cartão</button>'
@@ -526,7 +526,7 @@
       // parece ser o texto de um versículo de outra tradução, que ficou como veio.
       const avisoDaParte = (a) => (a.tipo === 'sem-versiculo' ? semVersiculo(a.ref)
         : a.ref ? 'Esta parte começa com ' + a.ref + ' e pode trazer o texto do versículo em outra tradução. Se trouxer, deixe só a referência: o cartão já mostra o texto da ' + nome + '.'
-          : 'Esta parte parece citar a Bíblia em outra tradução. Ponha a referência numa linha só, e o app mostra o texto da ' + nome + ' num cartão.');
+          : 'Esta parte parece citar a Bíblia em outra tradução. Ponha a referência numa linha só, e o texto da ' + nome + ' aparece num cartão.');
       const parteHtml = (n) => {
         const b = r.blocos[n];
         const html = b.t === 'versiculo' ? cartaoComOrigem(b, n) : R.blocoEmHtml(b, { semConclusao: true, semEtiqueta: true })
@@ -546,12 +546,12 @@
       const todas = [{ rotulo: 'Título', linhas: r.linhaTitulo >= 0 ? [r.linhaTitulo, r.linhaTitulo] : [0, -1],
         html: r.titulo && r.titulo.length <= TITULO_MAX ? '<h2 class="mesa-t1">' + esc(r.titulo) + '</h2>' : '<p class="erro-proposito">' + esc(MSG.titulo) + '</p>' }]
         .concat(partes.map((x) => ({ rotulo: x.rotulo, linhas: linhasDe(x.itens), html: x.itens.map(parteHtml).join('') })));
-      painel.innerHTML = (r.trocas.length ? '<button type="button" class="mesa-aviso" data-ver-troca>' + CC.ico('info') + '<b>Trocamos o texto citado pelo da Bíblia do app</b>'
+      painel.innerHTML = (r.trocas.length ? '<button type="button" class="mesa-aviso" data-ver-troca>' + CC.ico('info') + '<b>Citações trocadas pela ' + esc(nome) + '</b>'
         + '<p>' + (r.trocas.length === 1 ? 'Seu estudo trazia 1 citação em outra tradução. Agora ela é um cartão com o texto da ' + esc(nome) + ', palavra por palavra.'
           : 'Seu estudo trazia ' + r.trocas.length + ' citações em outra tradução. Agora cada uma é um cartão com o texto da ' + esc(nome) + ', palavra por palavra.') + '</p>'
         + '<span class="ir">Ver a primeira troca' + CC.ico('direita') + '</span></button>' : '')
         + blocoTraducao(cartoes)
-        + (contagem.length ? '<div class="mesa-bloco"><span class="etiqueta">O app encontrou</span><ul class="mesa-resumo">' + contagem.map((c) => '<li>' + esc(c) + '</li>').join('') + '</ul></div>' : '')
+        + (contagem.length ? '<div class="mesa-bloco"><span class="etiqueta">No estudo</span><ul class="mesa-resumo">' + contagem.map((c) => '<li>' + esc(c) + '</li>').join('') + '</ul></div>' : '')
         + todas.map((x, k) => '<section class="mesa-parte"><header><span class="etiqueta">' + esc(x.rotulo) + '</span>'
           + '<button type="button" class="botao pequeno contorno" data-mudar-parte="' + k + '" aria-label="Mudar: ' + esc(x.rotulo) + '">' + CC.ico('caneta') + 'Mudar</button></header>'
           + '<div class="mesa-estudo">' + x.html + '</div></section>').join('')
@@ -895,7 +895,7 @@
       if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
       await apoio.carregar();
       CC.substituirRota(apoio.endereco(p.id, 'estudo'));
-      CC.avisar('Estudo salvo. Ele fica guardado na célula.', { tipo: 'certo' });
+      CC.avisar('Estudo salvo', { tipo: 'certo' });
     }
 
     desenhar();

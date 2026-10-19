@@ -451,7 +451,7 @@ ok(await esperar('/Sem conexão\. O rascunho continua neste celular\. Tente de n
 await na(() => { window.fetch = window.__fetch; return true; });
 await clicar('[data-salvar]');
 ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector(".mesa-lider")', 20000), '9. salvar volta à aba Estudo, com o cartão do líder');
-ok(/Estudo salvo\. Ele fica guardado na célula\./.test(await texto('#aviso-flutuante')) && /Você preparou este estudo/.test(await texto('.mesa-lider')), '9. com o aviso "Estudo salvo" e "Você preparou este estudo"');
+ok(/Estudo salvo/.test(await texto('#aviso-flutuante')) && !/fica guardado/.test(await texto('#aviso-flutuante')) && /Você preparou este estudo/.test(await texto('.mesa-lider')), '9. com o aviso "Estudo salvo" e "Você preparou este estudo"');
 await foto('04a-estudo-lider', false, true);
 const salvo = (await celulaDe(lider, ID)).estudo;
 ok(salvo && salvo.tipo === 'blocos' && JSON.stringify(salvo.refs) === JSON.stringify(CARTOES) && salvo.traducao === 'nbv' && JSON.stringify(salvo.perguntas) === JSON.stringify([REFLEXAO_244.perguntas[0], OIA_APLICACAO]),

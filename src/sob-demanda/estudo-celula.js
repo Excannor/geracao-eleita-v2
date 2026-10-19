@@ -192,7 +192,7 @@
       // O estudo que já foi usado num encontro fica guardado: o caminho é preparar o próximo (o
       // servidor faz o mesmo, estudos.mjs, estudoUsado)
       + (p.euPreparoEstudo ? '<div class="mesa-lider">' + CC.ico('caneta') + '<span><b>' + (e.criadoPor === (CC.quem || {}).usuario ? 'Você preparou este estudo' : 'O estudo desta célula') + '</b>'
-        + '<small>' + (e.usado ? 'Ele já foi usado num encontro. Quando você preparar o próximo, este fica em Estudos anteriores.' : 'Só o líder pode mudar o estudo.') + '</small></span>'
+        + '<small>' + (e.usado ? 'Ele já foi usado num encontro.' : 'Só o líder pode mudar o estudo.') + '</small></span>'
         + '<button type="button" class="botao pequeno contorno" data-mudar>' + (e.usado ? 'Preparar o próximo' : 'Mudar o estudo') + '</button></div>' : '')
       + (e.tipo === 'blocos' || e.tipo === 'trecho' ? noPlanoHtml(refs) : '')
       + secaoW('Acolhida', (anterior ? combinadoLembrado(anterior) : '') + '<p>' + esc(ws.acolhida) + '</p>')
@@ -250,8 +250,7 @@
     const desenhar = (l) => {
       alvo.innerHTML = (l.itens.length ? '<div class="mesa-anteriores">' + l.itens.map((x) => linhaAnterior(p, x)).join('') + '</div>' : '')
         + (l.mais ? '<button type="button" class="botao contorno pequeno mesa-mais-estudos" data-mais-estudos>Ver mais estudos</button>' : '')
-        + (!l.itens.length && !de && p.estudo ? '<p class="passo-dica pequena">' + (p.euPreparoEstudo ? 'Quando você preparar o próximo estudo, este fica guardado aqui para a célula reler.'
-          : 'Quando o próximo estudo for preparado, este fica guardado aqui para a célula reler.') + '</p>' : '');
+        + (!l.itens.length && !de && p.estudo ? '<p class="passo-dica pequena">' + 'Nenhum estudo anterior ainda.' + '</p>' : '');
       if (CC.inseparavel) CC.inseparavel(alvo);
       const mais = alvo.querySelector('[data-mais-estudos]');
       if (mais) mais.onclick = () => pedir(l.antes);
@@ -290,8 +289,7 @@
     const propria = alvo.querySelector('[data-lista-propria]');
     if (propria) {
       if (p.temAnteriores) carregarLista(propria, p, '');
-      else propria.innerHTML = '<p class="passo-dica pequena">' + (p.euPreparoEstudo ? 'Quando você preparar o próximo estudo, este fica guardado aqui para a célula reler.'
-        : 'Quando o próximo estudo for preparado, este fica guardado aqui para a célula reler.') + '</p>';
+      else propria.innerHTML = '<p class="passo-dica pequena">' + 'Nenhum estudo anterior ainda.' + '</p>';
     }
     // a lista da célula de origem abre no toque e continua aberta nos redesenhos da sessão
     const daMae = alvo.querySelector('[data-lista-mae]');
