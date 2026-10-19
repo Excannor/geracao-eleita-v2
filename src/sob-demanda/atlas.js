@@ -140,7 +140,7 @@
     };
     raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Explorar')
       + '<div class="atlas-cabeca"><span class="mapa-grupo">Explorar</span><h1 class="atlas-nome">Mapas bíblicos</h1>'
-      + '<p>As cidades, os caminhos e o relevo de onde a história aconteceu. Toque num mapa para ver as paradas e ler na Bíblia.</p></div></div>'
+      + '<p>As cidades, os caminhos e o relevo de onde a história aconteceu.</p></div></div>'
       + '<div class="lista-atlas">' + A.grupos.map((g) => '<section class="grupo-atlas"><h2>' + esc(g.nome) + '</h2>'
         + A.itens.filter((it) => it.grupo === g.id).map(cartao).join('') + '</section>').join('')
       + '<p class="atlas-em-breve">Mais mapas em breve.</p></div>';

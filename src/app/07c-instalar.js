@@ -249,8 +249,7 @@
           + ['ios', 'android'].map((s) => '<button class="opcao-sistema" data-sistema="' + s + '">'
             + DESENHO.celular + NOME[s] + '<small>' + (s === 'ios' ? 'Safari' : 'Chrome') + '</small></button>').join('')
           + '</div>'
-          + '<div class="acoes">' + botaoFechar + '</div>'
-          + (contaNova ? '<p class="nota-instalar">Dá para ver isto de novo em Perfil › Instalar no celular.</p>' : '');
+          + '<div class="acoes">' + botaoFechar + '</div>';
         folha.querySelectorAll('[data-sistema]').forEach((b) => {
           b.onclick = () => { lembrar(b.dataset.sistema); guia(b.dataset.sistema); };
         });
@@ -272,7 +271,6 @@
             + NOME[s] + '</button>').join('')
           + '</div>'
           + (aviso ? '<p class="nota-instalar aviso-instalar" role="status">' + CC.esc(aviso) + '</p>' : '')
-          + (CC.rodandoComoApp() ? '<p class="nota-instalar">Você já está usando pelo ícone. Os passos ficam aqui para ajudar alguém.</p>' : '')
           + (podeInstalarJa ? '<div class="acoes"><button class="botao" data-instalar-ja>Instalar agora</button></div>'
             + '<p class="nota-instalar">Ou faça pelo menu do Chrome:</p>' : '')
           + (variante !== 'chrome' && variante !== 'safari' ? '<p class="nota-instalar">No ' + NOME_NAVEGADOR[variante] + ':</p>' : '')
@@ -340,8 +338,7 @@
           + '<button class="botao" data-instalar-ja>' + CC.ico('baixar') + 'Adicionar à tela de início</button>'
           + botaoFechar
           + '</div>'
-          + '<button class="link-nota" data-passo-a-passo>Prefiro fazer pelo menu do navegador</button>'
-          + (contaNova ? '<p class="nota-instalar">Dá para ver isto de novo em Perfil › Instalar no celular.</p>' : '');
+          + '<button class="link-nota" data-passo-a-passo>Prefiro fazer pelo menu do navegador</button>';
         ligarFechar();
         folha.querySelector('[data-passo-a-passo]').onclick = () => guia(sistemaProvavel() || lembrado());
         folha.querySelector('[data-instalar-ja]').onclick = () => instalarJa();

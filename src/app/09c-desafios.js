@@ -316,7 +316,7 @@
     return '<div class="titulo-bloco"><h2>Desafios em grupo</h2></div>' + abertos.map(cartaoGrupo).join('')
       + (podeComecar.length ? '<div class="missao-convite"><span class="icone-missao">' + CC.ico('pessoas') + '</span>'
         + '<p>Faça um desafio de consagração junto com ' + (podeComecar.length === 1 ? CC.esc(nomeDoGrupo(podeComecar[0])) : 'a sua célula ou o seu discipulado')
-        + ': abra um desafio e toque em “Fazer junto”.</p></div>' : '');
+        + '.</p></div>' : '');
   };
   const nomeDoGrupo = (g) => (g.tipo === 'celula' ? (/^c[ée]lula\b/i.test(g.nome) ? 'a ' : 'a célula ') + g.nome : g.nome.replace(/^Você e /, ''));
 

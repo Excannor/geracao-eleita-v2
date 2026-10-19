@@ -555,13 +555,13 @@
       return '<div class="mesa-convite">' + CC.ico('balao') + '<p>Combinem juntos. No próximo encontro, a acolhida começa por aqui.</p></div>';
     }
     if (s.tipo === 'orar' && s.convite) {
-      return '<div class="mesa-convite">' + CC.ico('oracao') + '<p>Os pedidos de oração ficam na aba Oração da célula, no celular de cada um.</p></div>';
+      return '<div class="mesa-convite">' + CC.ico('oracao') + '<p>Os pedidos estão na aba Oração.</p></div>';
     }
     if (s.tipo === 'fechar') {
       return s.registrar
         ? '<div class="mesa-registrar"><h2>Quem veio hoje?</h2><p>Abre o registro de presença deste encontro.</p>'
           + '<button type="button" class="botao" data-registrar>' + CC.ico('lista-visto') + 'Registrar quem veio</button></div>'
-        : '<div class="mesa-convite">' + CC.ico('livro') + '<p>O estudo fica na aba Estudo para você reler durante a semana.</p></div>';
+        : '';
     }
     return '';
   }

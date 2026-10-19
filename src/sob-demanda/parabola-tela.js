@@ -56,7 +56,7 @@
     const chip = (id, nome) => '<button type="button" class="chip-parabola" data-filtro="' + id + '" aria-pressed="' + (filtro === id) + '">' + CC.esc(nome) + '</button>';
     raiz.innerHTML = '<div class="folha-mapa folha-parabolas">' + barra('Parábolas', 'Explorar')
       + '<div class="parabolas-cabeca"><span class="mapa-grupo">Explorar</span><h1 class="parabolas-nome">Parábolas da Bíblia</h1>'
-      + '<p>Jesus contava histórias do dia a dia, de semente, ovelha, festa e dinheiro, para falar do Reino de Deus. Toque numa para ver a cena e ler na Bíblia.</p></div>'
+      + '<p>Jesus contava histórias do dia a dia, de semente, ovelha, festa e dinheiro, para falar do Reino de Deus.</p></div>'
       + '<div class="chips-parabolas" role="group" aria-label="Filtrar por livro">' + chip('todas', 'Todas') + P.grupos.map((g) => chip(g.id, g.curto)).join('') + '</div></div>'
       + '<div class="lista-parabolas" data-lista-parabolas>' + listaHtml() + '</div>';
     const pintar = () => { raiz.querySelector('[data-lista-parabolas]').innerHTML = listaHtml(); CC.inseparavel(raiz); };

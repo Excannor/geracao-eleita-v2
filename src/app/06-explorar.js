@@ -190,7 +190,7 @@
     // Terminado, o caminho vira uma linha discreta no fim da tela, para quem quiser rever.
     if (!proximo) {
       return '<details class="cartao comece feito"><summary>' + CC.ico('certo') + '<span><b>Comece por aqui</b>'
-        + '<span class="passo-dica">Você leu os ' + total + ' passos. Toque para rever.</span></span></summary>'
+        + '<span class="passo-dica">Você leu os ' + total + ' passos.</span></span></summary>'
         + listaComece(vistas, null) + '</details>';
     }
     // Fechado, é só um cartão com o título e o progresso; aberto, mostra a trilha. Fica

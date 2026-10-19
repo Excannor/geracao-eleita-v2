@@ -277,7 +277,7 @@
     itens.push(itemPainelMais(CC.ico('caderno'), true, 'Minhas anotações', 'Notas, orações e versículos marcados', '#/perfil/anotacoes'));
     itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
     // Instalar não é uma tela: abre o passo a passo (07c-instalar.js). Quem já usa pelo ícone não vê.
-    if (CC.tutorialInstalar && !(CC.rodandoComoApp && CC.rodandoComoApp())) itens.push(itemPainelMais(CC.ico('baixar'), true, 'Instalar o app', 'Um ícone na tela de início, como os outros apps', '#instalar'));
+    if (CC.tutorialInstalar && !(CC.rodandoComoApp && CC.rodandoComoApp())) itens.push(itemPainelMais(CC.ico('baixar'), true, 'Instalar o app', '', '#instalar'));
     // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.
     if (CC.quem && CC.quem.admin) itens.push(itemPainelMais(CC.ico('grafico'), true, 'Painel do administrador', 'Números da igreja e do app', '#/config/painel'));
     itens.push(itemPainelMais(CC.ico('engrenagem'), true, 'Configurações', 'Tema, notificações e conta', '#/config'));

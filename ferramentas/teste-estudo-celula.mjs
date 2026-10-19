@@ -564,11 +564,11 @@ const vistos = await percorrer(async (n) => {
 });
 ok(JSON.stringify(vistos.map((v) => v.etiqueta)) === JSON.stringify(ETIQUETAS) && vistos[14].indice === '15 de 15', '12. 15 passos, com as etiquetas do mock');
 ok(vistos.every((v) => !v.texto.includes(PEDIDO)), '12. o pedido de oração da Ana não aparece em passo nenhum');
-ok(vistos[12].cartoes === 0 && /Os pedidos de oração ficam na aba Oração/.test(vistos[12].texto), '12. Orar juntos convida para a aba Oração, sem versículo');
+ok(vistos[12].cartoes === 0 && /Os pedidos estão na aba Oração\./.test(vistos[12].texto), '12. Orar juntos convida para a aba Oração, sem versículo');
 ok(vistos[7].texto.includes('Tópico 4, parte 2 de 2') && /^Tópico 4, parte 2 de 2A Armadura de DeusE Paulo acrescenta algo fundamental:/.test(vistos[7].texto), '12. "Tópico 4, parte 2 de 2" começa por "E Paulo acrescenta algo fundamental:"');
 ok(vistos.slice(2, 10).every((v) => !v.texto.includes(ACOLHIDA) && !v.texto.includes('Escolham juntos uma música')) && vistos.filter((v) => v.texto.includes('Não basta limpar a casa')).length === 1 && vistos[14].texto.includes('Não basta limpar a casa'),
   '12. a Palavra não repete os 4 Ws, e "Para guardar" só aparece no último passo');
-ok(/O estudo fica na aba Estudo para você reler durante a semana\./.test(vistos[14].texto) && await av('!' + q('.tela-cheia [data-registrar]')), '12. o último passo da Ana: "O estudo fica na aba Estudo…", sem "Registrar quem veio"');
+ok(!/reler durante a semana/.test(vistos[14].texto) && await av('!' + q('.tela-cheia [data-registrar]')), '12. o último passo da Ana: sem explicar onde o estudo fica e sem "Registrar quem veio"');
 ok(await av('!' + q('.tela-cheia [data-proximo]') + '.hidden === false && !' + q('.tela-cheia [data-concluir]') + '.hidden && ' + q('.tela-cheia [data-fechar]') + '.hidden'), '12. no último passo, "Concluir" no lugar de "Próximo", e sem "Sair do modo encontro"');
 await clicar('.tela-cheia [data-concluir]');
 ok(await esperar('!document.querySelector(".tela-cheia")'), '12. "Concluir" sai do modo encontro');

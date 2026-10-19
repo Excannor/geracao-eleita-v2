@@ -304,8 +304,6 @@
 .cabeca-folha-unidade ~ .acoes .botao.cor { --b: var(--inverso); color: var(--inverso-tinta); }
 
 /* o baú: o convite pisca sem descer de 4,5:1 (a piscada antiga chegava a 3,7:1) */
-.dica-bau { color: var(--tinta-forte); opacity: 1; animation: piscar-dica 1.8s ease-in-out infinite; }
-@keyframes piscar-dica { 50% { opacity: .72; } }
 
 /* =========================================================================
    O TOPO DO APP, FORA DO INÍCIO: o começo da folha do alto

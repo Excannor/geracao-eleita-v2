@@ -872,7 +872,7 @@
       // O dia do encontro mora no cartão "Próximo encontro", no alto: aqui só o aviso de
       // que ainda não há dia marcado.
       + (p.encontro >= 0 || quandoValendo(p) ? '' : '<p class="passo-dica pequena">'
-        + (conduzo ? 'Marque o dia do encontro para a célula ver "Encontro hoje" no dia.' : 'Quem conduz a célula ainda não marcou o dia do encontro.') + '</p>')
+        + (conduzo ? 'Marque o dia do encontro.' : 'Quem conduz a célula ainda não marcou o dia do encontro.') + '</p>')
       // Só quem conduz vê a pessoa a procurar, com o motivo, nunca um placar. As estatísticas
       // (chama, encontros, check-in, caminhada) moram na aba Painel.
       + (conduzo ? blocoAtencao(p) : '');
@@ -1247,7 +1247,6 @@
       // Dia e hora à parte (opcionais): é o que deixa a célula pôr o encontro na agenda.
       + '<div class="campos-quando"><label class="campo-senha"><span>Dia do encontro</span><input type="date" data-quando-dia min="' + CC.hojeIso() + '" value="' + CC.esc(quandoAtual.slice(0, 10)) + '"></label>'
       + '<label class="campo-senha"><span>Hora</span><input type="time" data-quando-hora step="900" value="' + CC.esc(quandoAtual.slice(11, 16)) + '"></label></div>'
-      + '<p class="passo-dica pequena">Opcional. Com dia e hora, a célula ganha o botão "Pôr na agenda".</p>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao" data-salvar>Publicar recado</button>'
       + (p.recado ? '<button class="botao plano perigo" data-apagar>Apagar o recado</button>' : '')

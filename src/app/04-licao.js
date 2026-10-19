@@ -401,7 +401,6 @@
         // frase abre a escrita da oração já começando por ela.
         + '<section class="etapa-reflexao painel-orar" data-etapa-bloco="orar"' + (etapa === 'orar' ? '' : ' hidden') + '>'
         + tituloEtapa('orar', 'Ore com as suas palavras')
-        + '<p class="dica-orar">Toque numa frase para começar a escrever por ela.</p>'
         + '<ul class="oracao-guia">' + r.oracao.map((frase, i) => '<li><button class="frase-oracao" data-frase-oracao="' + i + '">'
           + '<span>' + CC.esc(comReticencias(frase)) + '</span>' + CC.ico('caneta') + '</button></li>').join('') + '</ul>'
         + '<div class="pe-duplo-plano"><button class="botao contorno" data-orar-escrevendo>' + CC.ico('caneta') + 'Escrever</button>'

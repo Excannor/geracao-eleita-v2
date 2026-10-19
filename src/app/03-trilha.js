@@ -702,8 +702,7 @@
     const u = unidadeDoDia(numero);
     CC.telaCheia('<div class="cena-bau">'
       + '<h1>Um baú na estrada!</h1>'
-      + '<button class="bau-grande" data-abrir-bau aria-label="Abrir o baú">' + CC.faiscasDoBau() + CC.arte.bau('pronto', 'madeira') + '</button>'
-      + '<p class="dica-bau">Toque no baú para abrir</p></div>', {
+      + '<button class="bau-grande" data-abrir-bau aria-label="Abrir o baú">' + CC.faiscasDoBau() + CC.arte.bau('pronto', 'madeira') + '</button></div>', {
       classe: 'tela-bau c-' + u.cor,
       rotulo: 'Baú do dia ' + numero,
       ligar: (el, fechar) => {
