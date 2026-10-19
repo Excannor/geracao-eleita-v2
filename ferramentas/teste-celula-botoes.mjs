@@ -159,7 +159,7 @@ ok(await av('/com a célula inteira lendo/.test(' + q('.cabeca-celula .dias-cart
 await abrir(rotaCelula('painel'), '!!' + q('.cartao-saude'));
 ok(await esperar(q('[data-lembrar-checkin]')) && await alto('[data-lembrar-checkin]'), 'C2: o Painel tem "Lembrar a célula" (só 1 de 3 fez o check-in)');
 ok(await av('decodeURIComponent(' + q('[data-lembrar-checkin]') + '.href).includes("Fazer meu check-in")'), 'C2: o lembrete diz onde fazer o check-in');
-ok(await av('(() => { const t = decodeURIComponent(' + q('[data-lembrar-checkin]') + '.href); return t.includes('"Fazer meu check-in".') && !/soma|nunca o de cada um|segundos/.test(t); })()'), 'C2: o lembrete não fala de quem vê o quê nem promete tempo (sem "só a soma", "10 segundos")');
+ok(await av('(() => { const t = decodeURIComponent(' + q('[data-lembrar-checkin]') + '.href); return t.includes("Fazer meu check-in\\".") && !/soma|nunca o de cada um|segundos/.test(t); })()'), 'C2: o lembrete não fala de quem vê o quê nem promete tempo (sem "só a soma", "10 segundos")');
 const doPainel = await celulaDe(lider, ID);
 ok(doPainel.painel.saude.base === 1 && !doPainel.painel.saude.suficiente, 'C2: o check-in da Bia entra na soma do Painel (base 1), sem aparecer sozinho');
 ok(await av('!/Média|Baixa|Alta/.test(' + q('.painel-celula') + '.textContent)'), 'C2: nenhum nível de check-in de uma pessoa aparece no Painel');

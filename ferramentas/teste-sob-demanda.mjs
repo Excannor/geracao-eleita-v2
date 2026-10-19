@@ -155,7 +155,7 @@ await semRede(true);
 await av('location.hash = "#/mapa/isaias"');
 ok(await esperar('!!' + q('.folha-mapa .mapa-nome') + ' && ' + q('.folha-mapa .mapa-nome') + '.textContent === "Isaías"', 4000), 'o mapa abre na hora com a barra e o nome do livro');
 ok(await esperar('!!' + q('.estado.erro [data-acao-estado]'), 8000), 'sem rede na primeira vez, o mapa não fica carregando para sempre');
-ok(await av(q('.estado.erro b') + '?.textContent === "Sem conexão. Tente de novo."'), 'o recado diz "Sem conexão. Tente de novo."');
+ok(await av(q('.estado.erro b') + '?.textContent === "Sem conexão" && /Conecte-se para abrir\\./.test(' + q('.estado.erro') + '.textContent)'), 'o recado diz "Sem conexão" e "Conecte-se para abrir."');
 await semRede(false);
 await clicar('[data-acao-estado]');
 ok(await esperar('document.querySelectorAll(".mapa .mapa-ramo").length >= 3 && !!' + q('.mapa .mapa-conexao .seta'), 10000), 'com rede, "Tentar de novo" desenha o mapa inteiro');
@@ -172,7 +172,7 @@ await av('location.hash = "#/config/painel"');
 // (sem servidor, o erro chega quase junto: vale o esqueleto ou o recado, com o título em cima)
 ok(await esperar(q('.folha-perfil h1') + '?.textContent === "Painel do administrador" && !!(' + q('.esqueleto') + ' || ' + q('.estado.erro') + ')', 4000), 'o painel abre na hora com o título');
 ok(await esperar('!!' + q('.estado.erro [data-acao-estado]'), 8000), 'sem rede na primeira vez, o painel não fica carregando para sempre');
-ok(await av(q('.estado.erro b') + '?.textContent === "Sem conexão. Tente de novo."'), 'o recado diz "Sem conexão. Tente de novo."');
+ok(await av(q('.estado.erro b') + '?.textContent === "Sem conexão" && /Conecte-se para abrir\\./.test(' + q('.estado.erro') + '.textContent)'), 'o recado diz "Sem conexão" e "Conecte-se para abrir."');
 await semRede(false);
 await clicar('[data-acao-estado]');
 ok(await esperar('!!' + q('.painel-resumo .painel-cartao') + ' && !!' + q('a.painel-ir[href="#/config/painel/aviso"]'), 10000), 'com rede, "Tentar de novo" abre o painel com os números');
