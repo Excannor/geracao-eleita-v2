@@ -7,14 +7,19 @@ window.CC = window.CC || {};
 
   // ---------- texto ----------
   const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-  // Contador "n/máx" de um campo com limite (o padrão da tela de aviso): o <small> fica no
-  // rótulo, e passa a vermelho quando um valor antigo, já salvo, passa do teto.
-  CC.contagem = (valor, max) => '<small class="contagem' + ([...String(valor || '')].length > max ? ' passou' : '') + '">'
-    + [...String(valor || '')].length + '/' + max + '</small>';
+  // Contador "n/máx" de um campo com limite: o <small> fica no rótulo e só aparece perto do
+  // teto (80%), como o aviso de limite do preparo do estudo; passa a vermelho quando um valor
+  // antigo, já salvo, passa do teto.
+  CC.pertoDoLimite = (n, max) => n >= Math.ceil(max * 0.8);
+  CC.contagem = (valor, max) => {
+    const n = [...String(valor || '')].length;
+    return '<small class="contagem' + (n > max ? ' passou' : '') + '"' + (CC.pertoDoLimite(n, max) ? '' : ' hidden') + '>' + n + '/' + max + '</small>';
+  };
   CC.ligarContagem = (campo, saida, max) => {
     const atualizar = () => {
       const n = [...campo.value].length;
       saida.textContent = n + '/' + max;
+      saida.hidden = !CC.pertoDoLimite(n, max);
       saida.classList.toggle('passou', n > max);
     };
     saida.dataset.ligado = '1';
@@ -30,6 +35,7 @@ window.CC = window.CC || {};
       if (!saida || !(campo.maxLength > 0) || saida.dataset.ligado) return;
       const n = [...campo.value].length;
       saida.textContent = n + '/' + campo.maxLength;
+      saida.hidden = !CC.pertoDoLimite(n, campo.maxLength);
       saida.classList.toggle('passou', n > campo.maxLength);
     });
   }

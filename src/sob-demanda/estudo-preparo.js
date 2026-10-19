@@ -259,7 +259,7 @@
         + opcao('colar', 'caderno', 'Colar um estudo pronto', 'Do Word ou do WhatsApp.')
         + opcao('escrever', 'caneta', 'Escrever aqui', 'Começar em branco, com as marcas.') + '</div>';
     }
-    const campoPalavra = () => '<label class="campo-senha"><span>Sua palavra para a célula (opcional)</span>'
+    const campoPalavra = () => '<label class="campo-senha"><span>Sua palavra para a célula</span>'
       + '<textarea data-palavra name="palavra-do-lider" rows="5" maxlength="' + ESTUDO_MAX + '" autocomplete="off"></textarea></label>';
 
     function passo1() {
@@ -280,7 +280,7 @@
         corpo = '<div class="escolha-trecho"><label class="campo-senha"><span>Livro</span><select data-livro>'
           + CC.LIVROS.map(([l]) => '<option' + (l === st.trecho.livro ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></label>'
           + '<label class="campo-senha"><span>Capítulo</span><input data-cap type="number" inputmode="numeric" min="1" max="150" autocomplete="off"></label>'
-          + '<label class="campo-senha"><span>Versículos (opcional)</span><input data-vers inputmode="numeric" placeholder="Ex.: 16-18" autocomplete="off"></label>'
+          + '<label class="campo-senha"><span>Versículos</span><input data-vers inputmode="numeric" placeholder="Ex.: 16-18" autocomplete="off"></label>'
           + '<p class="passo-dica pequena">A conversa segue o método OIA: observação, interpretação e aplicação.</p></div>' + campoPalavra();
       }
       // a nota de quem começou de um estudo anterior
@@ -740,7 +740,7 @@
         + '<p class="mesa-conta" data-conta>' + contaPerguntas() + '</p>'
         // o combinado para a semana: a acolhida do próximo encontro começa por ele, e ele fica
         // guardado nos estudos anteriores (por isso, sem nomes). Ninguém marca se cumpriu.
-        + '<label class="campo-senha mesa-combinado-campo"><span>Combinado para a semana (opcional)</span>'
+        + '<label class="campo-senha mesa-combinado-campo"><span>Combinado para a semana</span>'
         + '<small class="dica-campo">Uma atitude simples para todos viverem até o próximo encontro. A acolhida do próximo encontro começa por ela.</small>'
         + '<small class="dica-campo">Evite nomes de pessoas.</small>'
         + '<textarea data-combinado name="combinado-da-semana" rows="2" maxlength="' + COMBINADO_MAX + '" autocomplete="off" placeholder="Ex.: Orar todo dia por alguém que ainda não conhece Jesus."></textarea>'
@@ -835,7 +835,7 @@
     // Acolhida, adoração e testemunho: três campos de até 300 caracteres. Vazio é a sugestão da
     // semana, que muda sozinha.
     function mudarWs(painel) {
-      const campo = (k, rotulo, dica) => '<label class="campo-senha"><span>' + rotulo + ' (opcional)</span><small class="dica-campo">' + dica + '</small>'
+      const campo = (k, rotulo, dica) => '<label class="campo-senha"><span>' + rotulo + '</span><small class="dica-campo">' + dica + '</small>'
         + '<textarea data-w="' + k + '" rows="2" maxlength="' + CAMPO_4W_MAX + '" autocomplete="off" placeholder="' + esc(sugestaoW[k]()) + '"></textarea></label>';
       CC.folha('<h2>Acolhida, adoração e testemunho</h2>'
         + campo('acolhida', 'Acolhida', 'uma pergunta para começar a conversa')

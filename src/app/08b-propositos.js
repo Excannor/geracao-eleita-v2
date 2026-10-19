@@ -1255,7 +1255,7 @@
       rotulo: 'Recado para a célula',
       ligar: (folha, fechar) => {
         const campo = folha.querySelector('[data-texto]');
-        const conta = () => { folha.querySelector('[data-conta]').textContent = campo.value.length + ' de ' + max + ' caracteres'; };
+        const conta = () => { folha.querySelector('[data-conta]').textContent = CC.pertoDoLimite(campo.value.length, max) ? campo.value.length + ' de ' + max + ' caracteres' : ''; };
         campo.oninput = conta;
         conta();
         folha.querySelector('[data-fechar]').onclick = fechar;
@@ -1804,7 +1804,7 @@
       ligar: (folha, fechar) => {
         folha.querySelector('[data-fechar]').onclick = fechar;
         const campo = folha.querySelector('[data-texto]');
-        const conta = () => { folha.querySelector('[data-conta]').textContent = campo.value.length + ' de ' + max + ' caracteres'; };
+        const conta = () => { folha.querySelector('[data-conta]').textContent = CC.pertoDoLimite(campo.value.length, max) ? campo.value.length + ' de ' + max + ' caracteres' : ''; };
         campo.oninput = conta;
         conta();
         folha.querySelectorAll('[data-destino]').forEach((b) => {

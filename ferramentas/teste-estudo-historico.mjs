@@ -443,7 +443,7 @@ try {
   await esperar(existe('[data-continuar]:not([disabled])'), 15000);
   await clicar('[data-continuar]');
   ok(await esperar(existe('[data-combinado]'), 15000) && (await av(q('[data-combinado]') + '.value')) === COMBINADO_2, '10. no passo 3, o campo do combinado traz o de S2');
-  ok(/Combinado para a semana \(opcional\)/.test(await texto('.mesa-combinado-campo')) && /Evite nomes de pessoas/.test(await texto('.mesa-combinado-campo')), '10. o rótulo e as dicas do combinado');
+  ok(/Combinado para a semana/.test(await texto('.mesa-combinado-campo')) && !/opcional/.test(await texto('.mesa-combinado-campo')) && /Evite nomes de pessoas/.test(await texto('.mesa-combinado-campo')), '10. o rótulo e as dicas do combinado');
   ok(await av(q('[data-limite-combinado]') + '.hidden'), '10. sem aviso de teto com poucos caracteres');
   const CENTO_E_SETENTA = ('Visitar alguém da célula que está doente e levar uma palavra de ânimo, orando junto com a família, '.repeat(2)).slice(0, 170);
   await na((t) => { const c = document.querySelector('[data-combinado]'); c.value = t; c.dispatchEvent(new Event('input', { bubbles: true })); return true; }, CENTO_E_SETENTA);

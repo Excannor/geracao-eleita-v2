@@ -693,11 +693,10 @@
     <form id="form-cadastro" autocomplete="on" novalidate>
       <div data-passo="1">
         <h1>Quem é você?</h1>
-        <div class="campo" style="margin-top:16px"><label for="nome">Como você quer que a gente te chame? <small class="contagem" id="conta-nome" aria-hidden="true">0/20</small></label>
+        <div class="campo" style="margin-top:16px"><label for="nome">Como você quer que a gente te chame? <small class="contagem" id="conta-nome" aria-hidden="true"></small></label>
           <input id="nome" name="name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="20" required></div>
         <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
-          <input id="nascimento" name="bday" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" autocomplete="bday" aria-describedby="ajuda-nascimento" required>
-          <span class="ajuda" id="ajuda-nascimento">Dia, mês e ano (dd/mm/aaaa).</span></div>
+          <input id="nascimento" name="bday" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" autocomplete="bday" required></div>
         <div class="campo" style="margin-top:16px" id="campo-caminho">
           <label id="rotulo-caminho">Você já segue Jesus?</label>
           <div class="caminho-escolha" role="group" aria-labelledby="rotulo-caminho">
@@ -954,7 +953,7 @@
   }
   $('nascimento').addEventListener('input', function () { mascararCampo($('nascimento'), false); });
   // O nome tem até 20 caracteres (o servidor recusa acima disso): o contador acompanha.
-  function contarNome() { $('conta-nome').textContent = Array.from($('nome').value).length + '/20'; }
+  function contarNome() { var n = Array.from($('nome').value).length; $('conta-nome').textContent = n >= 16 ? n + '/20' : ''; }
   $('nome').addEventListener('input', contarNome);
   contarNome();
   $('nascimento').addEventListener('change', function () { mascararCampo($('nascimento'), true); });

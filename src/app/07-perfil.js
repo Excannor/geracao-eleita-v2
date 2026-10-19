@@ -314,7 +314,7 @@
     const conta = (chave) => {
       const campo = raiz.querySelector('[data-campo="' + chave + '"]');
       const nota = raiz.querySelector('[data-conta="' + chave + '"]');
-      if (campo && nota) nota.textContent = campo.value.length + ' de ' + MAX_HISTORIA + ' caracteres';
+      if (campo && nota) nota.textContent = CC.pertoDoLimite(campo.value.length, MAX_HISTORIA) ? campo.value.length + ' de ' + MAX_HISTORIA + ' caracteres' : '';
     };
     const salvo = raiz.querySelector('#salvo-historia');
     const salvar = () => {

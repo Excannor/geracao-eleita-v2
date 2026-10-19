@@ -275,7 +275,7 @@
     }
     itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
     itens.push(itemPainelMais(CC.ico('caderno'), true, 'Minhas anotações', 'Notas, orações e versículos marcados', '#/perfil/anotacoes'));
-    itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação opcional pelo Pix', '#/apoiar'));
+    itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação pelo Pix', '#/apoiar'));
     // Instalar não é uma tela: abre o passo a passo (07c-instalar.js). Quem já usa pelo ícone não vê.
     if (CC.tutorialInstalar && !(CC.rodandoComoApp && CC.rodandoComoApp())) itens.push(itemPainelMais(CC.ico('baixar'), true, 'Instalar o app', '', '#instalar'));
     // Só o dono (CAMINHO_ADMIN no servidor) vê; o servidor recusa o painel para qualquer outra conta.

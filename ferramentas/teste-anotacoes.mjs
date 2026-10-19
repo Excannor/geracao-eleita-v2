@@ -289,9 +289,9 @@ await esperar(existe('.acoes-verso:not([hidden]) [data-nota-verso]'));
 await clicar('.acoes-verso [data-nota-verso]');
 ok(await esperar(existe('.folha-editor #campo-titulo-nota')), 'o editor tem o campo de título');
 ok(await av(`(() => { const t = document.querySelector('#campo-titulo-nota'); const c = document.querySelector('#campo-nota');
-  return t.placeholder === 'Título (opcional)' && t.maxLength === 60 && !!(t.compareDocumentPosition(c) & 4) && t.getBoundingClientRect().height >= 44
+  return t.placeholder === 'Título' && t.maxLength === 60 && !!(t.compareDocumentPosition(c) & 4) && t.getBoundingClientRect().height >= 44
     && !!document.querySelector('label[for="campo-titulo-nota"]') && getComputedStyle(t).borderRadius === getComputedStyle(c).borderRadius; })()`),
-'o título vem acima do texto, com "Título (opcional)", até 60 letras, rótulo, 44px e o mesmo contorno do campo do texto');
+'o título vem acima do texto, com "Título", até 60 letras, rótulo, 44px e o mesmo contorno do campo do texto');
 await fecharFolhas();
 ok(await escreverNoVerso('  O amor   que vem primeiro ', 'Segunda nota no mesmo versículo'), 'guardar a nota com título');
 ok(await av('CC.notas().find((n) => n.texto === "Segunda nota no mesmo versículo").titulo === "O amor que vem primeiro"'), 'o título fica no campo próprio, sem espaço sobrando');

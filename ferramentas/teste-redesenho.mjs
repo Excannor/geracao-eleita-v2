@@ -168,14 +168,16 @@ await clicar('[data-ir="cadastro"]');
 await esperar('!' + q('#tela-cadastro') + '.hidden');
 await clicar('#botao-cadastro');
 ok(await esperar(q('#erro-cadastro') + '.textContent.length > 0'), 'o passo 1 pede o nome antes de seguir');
-// O nome tem até 20 caracteres: o campo mostra o contador e o cadastro recusa o que passa.
+// O nome tem até 20 caracteres: o contador aparece só perto do teto, e o cadastro recusa o que passa.
 ok(await av(q('#nome') + '.maxLength') === 20, 'o campo do nome tem maxlength 20');
 await preencher('#nome', 'Um Nome Comprido Demais');
 await clicar('#botao-cadastro');
 ok(await esperar(q('#erro-cadastro') + '.textContent === "O nome pode ter até 20 caracteres."') && await av(q('#conta-nome') + '.textContent') === '23/20',
   'nome com mais de 20: o contador mostra 23/20 e o passo 1 pede um nome menor');
+await preencher('#nome', 'Ana Clara de Souza');
+ok(await av(q('#conta-nome') + '.textContent') === '18/20', 'perto do teto (18 letras), o contador mostra 18/20');
 await preencher('#nome', 'Ana');
-ok(await av(q('#conta-nome') + '.textContent') === '3/20', 'com "Ana", o contador mostra 3/20');
+ok(await av(q('#conta-nome') + '.textContent') === '', 'com "Ana", longe do teto, o contador não aparece');
 await preencher('#nascimento', '06052004');
 ok(await av(q('#nascimento') + '.type') === 'text' && await av(q('#nascimento') + '.value') === '06/05/2004',
   'a data de nascimento é digitada (sem o calendário do Android) e as barras entram sozinhas');
@@ -441,10 +443,12 @@ await foto('5b-missoes');
 await irPara('#/perfil');
 ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".colecao-atalhos a").length === 2 && document.querySelectorAll(".visao-geral .visao-item").length === 4'),
   'o perfil mostra a visão geral, conquistas com nível e a coleção');
-// O nome no Perfil: contador e teto de 20; o que passa não é guardado (nem cortado).
-ok(await av(q('#apelido') + '.maxLength') === 20 && await av(q('.rotulo-apelido .contagem') + '.textContent') === '3/20', 'o nome no Perfil mostra o contador (3/20)');
+// O nome no Perfil: teto de 20, contador só perto dele; o que passa não é guardado (nem cortado).
+ok(await av(q('#apelido') + '.maxLength') === 20 && await av(q('.rotulo-apelido .contagem') + '.hidden'), 'o nome curto no Perfil não mostra o contador');
+await preencher('#apelido', 'Ana Clara de Souza');
+ok(await av(q('.rotulo-apelido .contagem') + '.textContent') === '18/20' && !(await av(q('.rotulo-apelido .contagem') + '.hidden')) && await av('CC.apelido()') === 'Ana Clara de Souza', 'perto do teto, o contador aparece (18/20) e o nome é guardado');
 await preencher('#apelido', 'Ana Clara');
-ok(await av(q('.rotulo-apelido .contagem') + '.textContent') === '9/20' && await av('CC.apelido()') === 'Ana Clara', 'editar o nome atualiza o contador e guarda');
+ok(await av(q('.rotulo-apelido .contagem') + '.hidden') && await av('CC.apelido()') === 'Ana Clara', 'editar o nome guarda, e longe do teto o contador some');
 await preencher('#apelido', 'Um Nome Antigo Bem Comprido');
 ok(await av(q('.rotulo-apelido .contagem') + '.classList.contains("passou")') && await av('CC.apelido()') === 'Ana Clara',
   'um nome maior que 20 fica marcado no contador e não é guardado cortado');

@@ -194,7 +194,7 @@
       + TIPOS.map(([t, nome]) => '<button data-tipo="' + t + '" aria-pressed="' + (st.tipo === t) + '">' + nome + '</button>').join('') + '</div>'
       // o título é opcional: separa as notas de um mesmo versículo (cada uma, um estudo)
       + '<label class="so-leitor" for="campo-titulo-nota">Título</label>'
-      + '<input id="campo-titulo-nota" class="campo-titulo-nota" type="text" maxlength="' + CC.MAX_TITULO_NOTA + '" placeholder="Título (opcional)"'
+      + '<input id="campo-titulo-nota" class="campo-titulo-nota" type="text" maxlength="' + CC.MAX_TITULO_NOTA + '" placeholder="Título"'
       + ' autocomplete="off" autocapitalize="sentences" enterkeyhint="next" value="' + CC.esc(st.titulo) + '">'
       + '<label class="so-leitor" for="campo-nota">Sua nota</label>'
       + '<textarea id="campo-nota" class="campo-nota" rows="6" maxlength="5000" autocapitalize="sentences">' + CC.esc(st.texto) + '</textarea>'
