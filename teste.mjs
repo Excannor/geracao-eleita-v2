@@ -2223,8 +2223,8 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
   const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
   const historico = pol.slice(pol.indexOf('<ul class="historico">'));
-  checar(/<p class="atualizada">Versão 5 · atualizada em 18 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5');
-  checar(historico.indexOf('<b>Versão 5, 18 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Versão 5,') < historico.indexOf('<b>Versão 4, 18 de outubro de 2026.</b>')
+  checar(/<p class="atualizada">Versão 5 · atualizada em 19 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5');
+  checar(historico.indexOf('<b>Versão 5, 19 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Versão 5,') < historico.indexOf('<b>Versão 4, 18 de outubro de 2026.</b>')
     && historico.indexOf('<b>Versão 4,') < historico.indexOf('<b>Ajuste da versão 3'), 'o histórico tem a versão 5 e a 4, das mais novas para as mais antigas');
   checar(/<tr><td>O estudo da célula<\/td><td>[^<]*estudos anteriores, só quem faz parte da célula hoje, inclusive quem entrou depois[^<]*guardados antes desta versão ficam só para quem já fazia parte da célula[^<]*célula de origem preparados até a multiplicação, como estavam naquele momento/.test(pol),
     'o quadro de quem vê diz quem lê os estudos anteriores (os de antes desta versão, só quem já os via), inclusive na célula que nasceu de uma multiplicação');
