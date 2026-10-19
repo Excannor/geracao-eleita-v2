@@ -9,7 +9,7 @@
   // a frase nunca fala em nome de Deus.
   const FALAS = {
     primeiroDia: [
-      'Seu primeiro dia é {passagem}: a primeira página da Bíblia e a primeira do Novo Testamento, juntas de propósito. Uns {min} minutos. Vamos?',
+      'Seu primeiro dia é {passagem}: a primeira página da Bíblia e a primeira do Novo Testamento, juntas de propósito. Vamos?',
     ],
     comecando: [
       'Hoje tem {passagem}. Vamos?',

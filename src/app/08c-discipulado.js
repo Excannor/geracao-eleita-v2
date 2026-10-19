@@ -84,9 +84,9 @@
     const escolha = {};
     const disc = cache && cache.meuDiscipulador;
     // O discipulador vê o último check-in: a folha diz isso a quem tem discipulador.
-    const quemVe = disc ? ' ' + CC.esc(primeiroNome(disc.nome)) + ' vê só isto, para cuidar melhor de você.' : '';
+    const quemVe = disc ? '<p class="passo-dica">' + CC.esc(primeiroNome(disc.nome)) + ' vê só isto, para cuidar melhor de você.</p>' : '';
     CC.folha('<h2>Como você está hoje?</h2>'
-      + '<p class="passo-dica">Três toques e pronto.' + quemVe + '</p>'
+      + quemVe
       + ESFERAS.map(([k, rot]) => '<div class="linha-checkin"><span class="etiqueta">' + rot + '</span>'
         + '<div class="segmentado" role="group" aria-label="' + rot + '">'
         + [1, 2, 3].map((n) => '<button type="button" data-esfera="' + k + '" data-nivel="' + n + '" aria-pressed="false">' + NIVEIS[n] + '</button>').join('')

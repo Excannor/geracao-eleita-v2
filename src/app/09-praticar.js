@@ -72,7 +72,7 @@
     // Praticar. O destaque é o cartão do Início: a unidade em bold e o botão redondo preto
     // que começa a rodada.
     raiz.innerHTML = '<div class="folha-desafios">' + CC.botaoVoltar('Desafios') + '<h1>Praticar</h1>'
-      + '<p class="subtitulo-tela">Rodadas de ' + POR_SESSAO + ' perguntas, uns 2 minutos, pra guardar versículos na memória.</p>'
+      + '<p class="subtitulo-tela">Rodadas de ' + POR_SESSAO + ' perguntas para guardar versículos na memória.</p>'
       + '<div class="cabeca-pratica c-' + daVez.cor + '">'
       + '<div class="textos"><b class="unidade-pratica">Unidade ' + daVez.numero + '</b>'
       + '<span class="etiqueta">' + nbUnidade(daVez.titulo) + '</span></div>'

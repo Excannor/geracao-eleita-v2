@@ -963,7 +963,7 @@
     // Quem conduz não sabe quem fez: só que falta gente. O lembrete vai para o grupo todo.
     const membros = ativos(p).filter((m) => m.papel !== 'visitante').length;
     const lembrar = comAcoes && s.base < membros
-      ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quando der, façam o check-in de hoje no app: na aba Célula, "Fazer meu check-in". São 10 segundos.' + enderecoApp('#/celula'), 'Lembrar a célula', 'data-lembrar-checkin') + '</div>'
+      ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quando der, façam o check-in de hoje no app: na aba Célula, "Fazer meu check-in".' + enderecoApp('#/celula'), 'Lembrar a célula', 'data-lembrar-checkin') + '</div>'
       : '';
     if (!s.suficiente) {
       return CC.tituloSecao('Como a célula está')
@@ -1102,7 +1102,7 @@
   function blocoCheckinHoje() {
     if (!CC.abrirCheckin || !CC.checkinFeitoHoje || CC.checkinFeitoHoje()) return '';
     return '<div class="bloco-acao bloco-checkin"><h3>Como você está hoje?</h3>'
-      + '<p class="passo-dica pequena">Corpo, mente e espírito, em 10 segundos.</p>'
+      + '<p class="passo-dica pequena">Corpo, mente e espírito.</p>'
       + '<div class="acoes-missao"><button type="button" class="botao pequeno" data-checkin>Fazer meu check-in</button></div></div>';
   }
   // Minha caminhada: o atalho fica até a pessoa marcar alguma coisa.

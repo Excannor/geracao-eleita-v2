@@ -198,7 +198,7 @@
     return '<details class="cartao comece"' + (comeceAberto ? ' open' : '') + ' data-comece>'
       + '<summary><span class="cabeca-comece"><span class="etiqueta">Comece por aqui</span>'
       + '<b>Como ler e entender a Bíblia</b>'
-      + '<span class="passo-dica">' + (feitos ? feitos + ' de ' + total + ' passos lidos' : total + ' textos curtos, de 2 a 6 minutos cada') + '</span>'
+      + '<span class="passo-dica">' + (feitos ? feitos + ' de ' + total + ' passos lidos' : total + ' textos curtos') + '</span>'
       + '<span class="barra-comece" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + feitos + '" aria-label="' + feitos + ' de ' + total + ' passos lidos">'
       + '<i style="width:' + Math.round((feitos / total) * 100) + '%"></i></span></span>'
       + '<span class="seta-comece" aria-hidden="true">' + CC.ico('baixo') + '</span></summary>'
