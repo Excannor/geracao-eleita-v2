@@ -28,7 +28,7 @@ import {
   MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, limparMetadados, avisosDesligados, umaDeCadaVez,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
-import { estudoNoRetrato } from './estudos.mjs';
+import { estudoNoRetrato, itemDoHistorico, estudoDoRegistro, resumoDoEstudo, encontrosDoEstudo, dataNoHistorico } from './estudos.mjs';
 import {
   chamaAcesa, termometro, frequencia, funil, ofensivaPerdida, atencaoComGatilhos, rankingDaChama, evangelismoDoMes,
   saudeDosCheckins, adocao, sincronizarLeituraDias, preencherLeituraDias, apagarLeituraDias, leiturasPorDia, quemLeuEntre,
@@ -839,6 +839,22 @@ function nomeNaCelula(info, usuario, desde = '') {
   return primeiroNome((x && x.estado && x.estado.apelido) || conta.nome || usuario);
 }
 
+// O mesmo nome de quem preparou, fora do retrato (GET /api/estudos): um pedido só por autor, e a
+// mesma regra do @ para a conta apagada ou nascida depois do estudo. Devolve nomeDe(@, desde).
+async function nomesDosAutores(estudos) {
+  const nomes = new Map();
+  for (const e of estudos) {
+    const u = e && e.criadoPor;
+    if (!u || nomes.has(u)) continue;
+    const conta = CONTAS.achar(u);
+    nomes.set(u, conta ? { nome: await nomeDeExibicao(u), criadaEm: conta.criadaEm || '' } : null);
+  }
+  return (u, desde = '') => {
+    const x = nomes.get(u);
+    return !x || (desde && x.criadaEm && x.criadaEm > String(desde).slice(0, 10)) ? '@' + u : x.nome;
+  };
+}
+
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const lider = info.get(p.criadoPor);
   const semanaAte = semanaDoLider(lider && lider.estado);
@@ -849,6 +865,13 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const convidado = minha.estado === 'convidado';
   const atual = CONTAS.estudo(p.estudoId);
   const euPreparoEstudo = p.criadoPor === eu && minha.estado === 'ativo' && !aprovacaoQueFalta(p, eu, 'lider');
+  // Fase 2 (docs/a-mesa-fase2.md, 3.4): o combinado do estudo de antes e se há estudos anteriores
+  // (e da célula de origem), só para quem faz parte da célula (o visitante vê só o atual); a folha
+  // de registro com os estudos, só para quem conduz. O histórico não entra aqui: ele tem a rota
+  // própria, com páginas (GET /api/estudos).
+  const membroLe = minha.estado === 'ativo' && minha.papel !== 'visitante';
+  const doEstudo = convidado ? { combinadoAnterior: null, temAnteriores: false, daMae: null }
+    : CONTAS.dadosDoEstudo(p, { membro: membroLe, eu, conduz: conduzo, hoje: hojeDe(eu) });
   const extra = {
     encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
@@ -857,6 +880,7 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
     estudo: convidado ? null : estudoNoRetrato(atual, { souQuemPrepara: euPreparoEstudo, nomeDe: (u, desde) => nomeNaCelula(info, u, desde), usado: euPreparoEstudo && CONTAS.estudoJaUsado(p, atual) }),
     euPreparoEstudo,
     estudoAcolhida: (!convidado && p.estudoAcolhida) || '', estudoAdoracao: (!convidado && p.estudoAdoracao) || '', estudoTestemunho: (!convidado && p.estudoTestemunho) || '',
+    combinadoAnterior: doEstudo.combinadoAnterior, temAnteriores: doEstudo.temAnteriores, daMae: doEstudo.daMae,
     euConduzo: conduzo,
     // Menor de 18 à espera da aprovação da liderança: o papel que espera ('lider'/'auxiliar'),
     // para a tela avisar; e se a célula inteira espera (o líder dela), para não oferecer o link.
@@ -892,11 +916,16 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   });
 
   const limiteJanela = somaDias(referencia, -JANELA_ENCONTROS);
+  // o estudo do último encontro vai para a mensagem de quem faltou, em "Precisam de atenção"
+  const estudoDoUltimo = ultimo && ultimo.estudo && ultimo.estudo !== '-' ? resumoDoEstudo(CONTAS.estudo(ultimo.estudo)) : null;
+  const diaDe = CONTAS.diaNaCelula(p);
   return {
     ...extra,
     semanaLider: { pessoas: ativos.length, leram, leituras, possiveis: ativos.length * 7 },
     atencao,
-    ultimoEncontro: ultimo ? { data: ultimo.data, presentes: ultimo.presentes.length, visitantes: ultimo.visitantes, semEncontro: !!ultimo.semEncontro } : null,
+    ultimoEncontro: ultimo ? { data: ultimo.data, presentes: ultimo.presentes.length, visitantes: ultimo.visitantes, semEncontro: !!ultimo.semEncontro, estudo: estudoDoUltimo } : null,
+    // só quem conduz registra: o administrador que abre a célula vê o resto, mas não a folha
+    ...(conduzo && doEstudo.registro ? { registro: { estudos: doEstudo.registro.estudos.map((e) => estudoDoRegistro(e, diaDe)), dias: doEstudo.registro.dias } } : {}),
     encontrosRegistrados: encontros.filter((e) => !e.semEncontro && e.data >= limiteJanela && e.data <= referencia).length,
     painel: painelDaCelula(p, info, ativos, referencia),
   };
@@ -1767,7 +1796,7 @@ const servidor = createServer(async (req, res) => {
     if (rota.startsWith('/api/') && ['/api/amigos', '/api/procurar', '/api/amizade', '/api/convites',
       '/api/convites/aceitar', '/api/convites/cancelar', '/api/toques', '/api/cutucar', '/api/denuncias',
       '/api/novidades', '/api/novidades/reagir', '/api/novidades/apagar', '/api/novidades/preferencia', '/api/propositos',
-      '/api/discipulado', '/api/cuidado'].includes(rota)) {
+      '/api/discipulado', '/api/cuidado', '/api/estudos'].includes(rota)) {
       if (!conta) { json(res, 403, { erro: 'entre com uma conta' }); return; }
     }
 
@@ -1986,7 +2015,17 @@ const servidor = createServer(async (req, res) => {
           const nomes = new Map([[eu, await nomeDeExibicao(eu)]]);
           return { estudo: estudoNoRetrato(r.estudo, { souQuemPrepara: true, nomeDe: (u) => nomes.get(u) || '@' + u, usado: CONTAS.estudoJaUsado(r.p, r.estudo) }) };
         }
-        if (qual === 'registrarEncontro') { await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro }, hoje); return {}; }
+        if (qual === 'registrarEncontro') {
+          // estudo: o id do estudo usado, '-' (de fora do app) ou nada (o app antigo: o servidor
+          // liga o estudo que valia naquele dia). A resposta leva quem não veio, pelo nome, para a
+          // mensagem pronta que quem conduz decide se manda: o app não avisa ninguém sozinho.
+          const r = await CONTAS.registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro, estudo: (corpo || {}).estudo }, hoje);
+          const ligado = r.registro.estudo && r.registro.estudo !== '-' ? CONTAS.estudo(r.registro.estudo) : null;
+          const faltaram = [];
+          for (const u of r.faltaram) faltaram.push({ usuario: u, nome: await nomeDeExibicao(u) });
+          faltaram.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR') || a.usuario.localeCompare(b.usuario));
+          return { encontro: { data: r.registro.data, estudo: r.registro.estudo }, estudo: resumoDoEstudo(ligado), faltaram };
+        }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
         if (qual === 'multiplicar') {
           const r = await CONTAS.multiplicarCelula(eu, id, { auxiliar, titulo, pessoas }, hoje);
@@ -2118,6 +2157,42 @@ const servidor = createServer(async (req, res) => {
         }));
       }
       json(res, 200, resposta);
+      return;
+    }
+
+    // ---------- os estudos da célula (À Mesa, Fase 2, docs/a-mesa-fase2.md, 3.5 e 3.6) ----------
+    // Fora de /api/celula/, de propósito: todo GET nesse prefixo é lido como link de convite.
+    //   ?celula=<id>[&de=mae][&antes=<cursor>]: a lista dos estudos anteriores, em páginas de 20;
+    //   ?estudo=<id>[&celula=<id>]: um estudo para ler, com quem conduz vendo quantas pessoas vieram
+    //   e o líder recebendo a fonte para "Usar como base". Sem acolhida, adoração e testemunho: eles
+    //   são da célula de hoje, não do estudo, e podem ter nomes de pessoas.
+    if (rota === '/api/estudos') {
+      if (req.method !== 'GET') { json(res, 405, { erro: 'método não suportado' }); return; }
+      const q = url.searchParams;
+      try {
+        if (q.has('estudo')) {
+          const r = CONTAS.estudoParaLer(eu, q.get('estudo'), q.get('celula') || '');
+          const nomeDe = await nomesDosAutores([r.e]);
+          json(res, 200, {
+            celula: r.p.id, atual: r.acesso.atual,
+            daMae: r.acesso.daMae ? { titulo: r.dono.titulo, ate: r.p.multiplicadaEm } : null,
+            // da mãe, só os encontros até a multiplicação (contas.mjs, encontrosParaLer)
+            ...dataNoHistorico(r.e, CONTAS.encontrosParaLer(r.p, r.dono), CONTAS.diaNaCelula(r.dono)),
+            estudo: estudoNoRetrato(r.e, { comFonte: r.acesso.usarComoBase, nomeDe }),
+            encontros: r.acesso.presenca ? encontrosDoEstudo(r.e, r.dono.encontros) : [],
+            usarComoBase: r.acesso.usarComoBase,
+          });
+          return;
+        }
+        const r = CONTAS.estudosAnteriores(eu, q.get('celula') || '', { de: q.get('de') || '', antes: q.get('antes') || '' });
+        const nomeDe = await nomesDosAutores(r.itens.map((x) => x.e));
+        json(res, 200, {
+          estudos: r.itens.map((x) => itemDoHistorico(x.e, { data: x.data, dataDe: x.dataDe, nomeDe })),
+          mais: r.mais, antes: r.antes, celula: { titulo: r.dono.titulo },
+        });
+      } catch (e) {
+        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora' });
+      }
       return;
     }
 

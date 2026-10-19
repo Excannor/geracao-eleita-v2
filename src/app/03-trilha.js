@@ -346,7 +346,7 @@
     const saudacao = '<header class="saudacao' + (primeira ? ' saudacao-longa' : '') + '">'
       + '<a class="avatar-topo" href="#/perfil" aria-label="Seu perfil">'
       + (foto ? '<img src="' + CC.esc(foto) + '" alt="">' : CC.ico('pessoa')) + '</a>'
-      + '<div class="textos-saudacao"><b>' + CC.esc(primeira ? (nome ? 'Que bom ter você aqui, ' + nome + '!' : 'Que bom ter você aqui!') : (nome ? 'Olá, ' + nome + '!' : 'Olá! Bora ler?')) + '</b>'
+      + '<div class="textos-saudacao"><b>' + CC.esc(primeira ? (nome ? 'Que bom ter você aqui, ' + nome + '!' : 'Que bom ter você aqui!') : (nome ? 'Olá, ' + nome + '!' : 'Olá! Vamos ler?')) + '</b>'
       + '<span>Dia ' + numero + ' de ' + D.plano.length + ' do plano</span></div>'
       // a mesma pílula da chama e o mesmo sino do topo das outras abas (10-roteador.js); o
       // balão do Juntos saiu daqui: a aba Juntos, com o ponto de novidade, fica logo abaixo

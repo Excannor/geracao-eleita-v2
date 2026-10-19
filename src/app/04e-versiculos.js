@@ -160,11 +160,12 @@
   const todasAsTags = () => [...new Set(CC.notas().flatMap((n) => n.tags))].sort();
 
   // { id } edita; { ref } abre nota nova no trecho; sem os dois, nota livre (Estudo).
-  function abrirEditor({ id, ref, texto, tipo, contexto, depois } = {}) {
+  // titulo: o título que a nota nova já traz (o do estudo da célula, por exemplo).
+  function abrirEditor({ id, ref, texto, tipo, contexto, titulo, depois } = {}) {
     const existente = id ? CC.nota(id) : null;
     const chave = id || 'novo:' + (ref || contexto || '');
     const r0 = ref && CC.lerRef(ref);
-    const inicio = existente || { titulo: '', texto: '', tipo: tipo || (ref ? 'nota' : 'estudo'), tags: [], versos: ref ? [ref] : [], cor: r0 ? corDoTrecho(r0) : 0, contexto: contexto || '' };
+    const inicio = existente || { titulo: String(titulo || '').slice(0, CC.MAX_TITULO_NOTA), texto: '', tipo: tipo || (ref ? 'nota' : 'estudo'), tags: [], versos: ref ? [ref] : [], cor: r0 ? corDoTrecho(r0) : 0, contexto: contexto || '' };
     const campos = (x) => JSON.stringify([x.titulo || '', x.texto, x.tipo, x.tags, x.versos, x.cor]);
     const rasc = lerRascunho();
     const recuperou = rasc && rasc.chave === chave && campos(rasc) !== campos(inicio);

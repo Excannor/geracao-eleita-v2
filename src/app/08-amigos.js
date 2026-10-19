@@ -60,7 +60,7 @@
   // O convite do Conhecer Jesus não fala em "propósito" nem "ano": é para quem talvez nunca
   // tenha lido a Bíblia, então o convite abre pelo caminho de 14 dias, sem pressa.
   const TEXTO_CONVITE_CONHECER = 'Estou lendo a Bíblia no Geração Eleita, e lá tem um caminho de 14 dias para quem quer conhecer Jesus, no seu ritmo. Quer ver?';
-  const FALA_TOQUE = 'Bora ler hoje?';
+  const FALA_TOQUE = 'Vamos ler hoje?';
 
   // ---------- peças ----------
   const TONS = ['verde', 'azul', 'roxo', 'turquesa', 'amarelo'];

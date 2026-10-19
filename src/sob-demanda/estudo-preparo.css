@@ -125,3 +125,10 @@
 .mesa-nota { display: flex; align-items: flex-start; gap: 10px; margin: 0 4px; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
 .mesa-nota svg { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--salvia-texto); }
 div.mesa-aviso { cursor: auto; padding-bottom: 18px; }
+/* o combinado para a semana (Fase 2), entre as perguntas e os 4 Ws: um cartão como os outros */
+.mesa-combinado-campo { display: grid; gap: 4px; margin: 0; padding: 16px 20px 18px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.mesa-combinado-campo > span { color: var(--tinta-forte); font-size: 1rem; font-weight: 800; }
+.mesa-combinado-campo .dica-campo { margin: 0; font-size: .8125rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
+.mesa-combinado-campo .mesa-limite { margin: 4px 0 0; font-size: .8125rem; line-height: 1.45; }
+.mesa-combinado-campo textarea { box-sizing: border-box; width: 100%; min-height: 76px; margin-top: 6px; padding: 12px 14px; font-size: 1rem; line-height: 1.45; resize: none; }
+.mesa-de-base { padding: 12px 14px; border-radius: 18px; background: var(--salvia-palido); color: var(--tinta-forte); }

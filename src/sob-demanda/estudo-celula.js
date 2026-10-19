@@ -1,5 +1,6 @@
-/* O estudo da célula pronto (À Mesa): a aba Estudo, o modo encontro passo a passo e a folha
-   "Mandar no grupo". Pedida na primeira vez que alguém abre o estudo: o build junta este arquivo
+/* O estudo da célula pronto (À Mesa): a aba Estudo, o modo encontro passo a passo, a folha
+   "Mandar no grupo" e, na Fase 2 (docs/a-mesa-fase2.md, seção 4), os estudos anteriores (a lista
+   e a leitura), "Usar como base", "Quem não veio", a anotação de cada um e a impressão. Pedida na primeira vez que alguém abre o estudo: o build junta este arquivo
    com estudo-regras.js na peça estudo-celula.<resumo>.js, com o estilo (estudo-celula.css) no
    lugar da marca abaixo, e o service worker a guarda no cache "caminho-telas". A casca (o vazio,
    o selo "Encontro hoje", a rota do preparo) mora em 08b-propositos.js, no index.html.
@@ -93,6 +94,8 @@
   // Quem preparou: "você", o nome de quem preparou (o @ se a conta não existe mais) ou nada (o
   // estudo de antes da v19, que não guardou o autor).
   const quemPreparou = (e) => (!e.criadoPor ? '' : e.criadoPor === (CC.quem || {}).usuario ? 'você' : e.criadoPorNome || '@' + e.criadoPor);
+  // no papel, o nome mesmo para quem preparou ("preparado por você" não diz nada a quem lê a folha)
+  const noPapel = (linha, e) => (e.criadoPor === (CC.quem || {}).usuario ? linha.replace(/ por você$/, ' por ' + (e.criadoPorNome || '@' + e.criadoPor)) : linha);
 
   // "No plano": a leitura do dia de cada capítulo do estudo. "Você leu em" só aparece no
   // aparelho de quem leu, e nada disso vai para a célula.
@@ -108,7 +111,10 @@
   }
 
   // O roteiro de semana e trecho, como já era: Leiam juntos, a leitura da semana, as perguntas
-  // (as escolhidas ou as de sempre) e a oração.
+  // (as escolhidas ou as de sempre), o combinado e a oração (a mesma ordem do modo encontro e do
+  // texto do grupo). A leitura da semana guardada sem a semana do plano (as de antes da v19, com
+  // planoAte 0) chega aqui sem sem: os dias daquela semana não ficaram guardados, e mostrar os de
+  // hoje seria contar outro encontro.
   function roteiro(p, e, sem, textos, sigla, versiculos) {
     const cartao = R.comoBlocos(e, sem, versiculos).find((b) => b.t === 'versiculo');
     const abrir = cartao ? abrirNaBiblia(cartao.ref) : '';
@@ -117,12 +123,51 @@
     return '<ol class="roteiro">'
       + (e.tipo === 'semana' ? '<li><b>Para começar</b><p>' + esc(R.COMECAR_SEMANA) + '</p></li>' : '')
       + leiam
-      + (e.tipo === 'semana' ? '<li><b>A leitura da semana</b><ul class="roteiro-dias">' + sem.dias.map((d) => '<li><span>Dia ' + d.n + '</span>' + esc(CC.passagemDe(d.dia))
+      + (e.tipo === 'semana' && sem ? '<li><b>A leitura da semana</b><ul class="roteiro-dias">' + sem.dias.map((d) => '<li><span>Dia ' + d.n + '</span>' + esc(CC.passagemDe(d.dia))
         + (d.r.titulo ? '<small>' + esc(d.r.titulo) + '</small>' : '') + '</li>').join('') + '</ul></li>' : '')
+      + (e.tipo === 'semana' && !sem ? '<li><b>A leitura da semana</b><p>' + esc(R.SEMANA_SEM_DIAS) + '</p></li>' : '')
       + (perguntas.length ? '<li><b>Para conversar</b><ul class="roteiro-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ul></li>' : '')
-      + (e.tipo === 'semana' && sem.oracao.length ? '<li><b>Para orar juntos</b><ul class="roteiro-oracao">' + sem.oracao.map((o) => '<li>' + esc(o) + '</li>').join('') + '</ul></li>' : '')
+      + (e.combinado ? '<li><b>Combinado para a semana</b><p>' + esc(e.combinado) + '</p></li>' : '')
+      + (e.tipo === 'semana' && sem && sem.oracao.length ? '<li><b>Para orar juntos</b><ul class="roteiro-oracao">' + sem.oracao.map((o) => '<li>' + esc(o) + '</li>').join('') + '</ul></li>' : '')
       + (e.tipo === 'trecho' ? '<li><b>Para orar juntos</b><p>' + esc(R.ORAR_TRECHO) + '</p></li>' : '')
       + '</ol>';
+  }
+
+  // O título que a anotação nova já traz: o do estudo, cortado na última palavra inteira que cabe
+  // em CC.MAX_TITULO_NOTA (60).
+  function tituloDaNota(e) {
+    const t = String(R.titulo(e) || 'Estudo da célula').replace(/\s+/g, ' ').trim();
+    const max = CC.MAX_TITULO_NOTA || 60;
+    if (t.length <= max) return t;
+    const corte = t.slice(0, max + 1);
+    const i = corte.lastIndexOf(' ');
+    return (i > 10 ? corte.slice(0, i) : t.slice(0, max)).replace(/[\s,.;:]+$/, '');
+  }
+  // As anotações de cada um neste estudo: notas como as outras, cifradas, só da pessoa
+  // (07g-anotacoes.js). Não valem ponto nem conquista, e não entram no modo encontro nem na
+  // impressão. Ficam depois dos botões, antes de "Estudos anteriores": a aba é a tela que o líder
+  // mostra no encontro, e o "Só você vê" não pode ficar entre o estudo e "Mandar no grupo".
+  const blocoAnotacao = (e) => '<div class="mesa-anotacao" data-notas-contexto="estudo:' + esc(e.id) + '" data-tipo-nota="nota" data-titulo-notas="Minhas anotações neste estudo"'
+    + ' data-botao-notas="Escrever minha anotação" data-titulo-nota="' + esc(tituloDaNota(e)) + '"></div>';
+  const ligarAnotacao = (raiz) => { if (CC.notasDoContexto) CC.notasDoContexto(raiz); };
+  // O combinado da semana passada, na Acolhida: só a frase, sem nada para marcar (ninguém marca
+  // se cumpriu).
+  const combinadoLembrado = (texto) => '<div class="mesa-combinado"><p><b>Na semana passada combinamos:</b> '
+    + esc(R.lembrarCombinado(texto).replace(/^Na semana passada combinamos: /, '')) + '</p></div>';
+  const secaoCombinado = (e) => (e.combinado && e.tipo !== 'semana' && e.tipo !== 'trecho' ? secaoW('Combinado para a semana', '<p>' + esc(e.combinado) + '</p>') : '');
+  const visitante = (p) => membroEu(p).papel === 'visitante';
+
+  // A Palavra de um estudo (a aba, a leitura de um anterior): o estudo escrito em partes, ou o
+  // roteiro da leitura da semana e do trecho.
+  function palavraHtml(p, e, sem, textos, sigla, versiculos, quem, apoio) {
+    const legado = e.tipo === 'semana' || e.tipo === 'trecho';
+    const nome = R.titulo(e);
+    if (legado) {
+      return (e.texto ? '<div class="recado-lider"><span class="etiqueta">Palavra de ' + esc(quem && quem !== 'você' ? quem : apoio.nomeDoLider(p)) + '</span>'
+        + e.texto.split(/\n+/).filter(Boolean).map((l) => '<p>' + esc(l) + '</p>').join('') + '</div>' : '') + roteiro(p, e, sem, textos, sigla, versiculos);
+    }
+    return '<div class="mesa-estudo">' + (nome ? '<h2 class="mesa-t1">' + esc(nome) + '</h2>' : '')
+      + R.comoBlocos(e, sem, versiculos).map((b) => R.blocoEmHtml(b, { cartao: (c) => cartaoDaParte(c, textos, sigla, versiculos) })).join('') + '</div>';
   }
 
   // ---------- a aba Estudo ----------
@@ -140,33 +185,306 @@
     const linha = data ? 'Para o encontro de ' + data + (quem ? PONTO + 'preparado por ' + quem : '') : quem ? 'Preparado por ' + quem : '';
     const ws = quatroWs(p);
     const legado = e.tipo === 'semana' || e.tipo === 'trecho';
-    const nome = R.titulo(e);
-    const palavra = legado
-      ? (e.texto ? '<div class="recado-lider"><span class="etiqueta">Palavra de ' + esc(quem && quem !== 'você' ? quem : apoio.nomeDoLider(p)) + '</span>'
-        + e.texto.split(/\n+/).filter(Boolean).map((l) => '<p>' + esc(l) + '</p>').join('') + '</div>' : '') + roteiro(p, e, sem, textos, sigla, versiculos)
-      : '<div class="mesa-estudo">' + (nome ? '<h2 class="mesa-t1">' + esc(nome) + '</h2>' : '')
-        + blocos.map((b) => R.blocoEmHtml(b, { cartao: (c) => cartaoDaParte(c, textos, sigla, versiculos) })).join('') + '</div>';
+    const palavra = palavraHtml(p, e, sem, textos, sigla, versiculos, quem, apoio);
     const perguntas = legado ? [] : R.perguntasDe(e, sem);
+    const anterior = p.combinadoAnterior && p.combinadoAnterior.texto;
     painel.innerHTML = (linha ? '<p class="passo-dica">' + esc(linha) + '</p>' : '')
       // O estudo que já foi usado num encontro fica guardado: o caminho é preparar o próximo (o
       // servidor faz o mesmo, estudos.mjs, estudoUsado)
       + (p.euPreparoEstudo ? '<div class="mesa-lider">' + CC.ico('caneta') + '<span><b>' + (e.criadoPor === (CC.quem || {}).usuario ? 'Você preparou este estudo' : 'O estudo desta célula') + '</b>'
-        + '<small>' + (e.usado ? 'Ele já foi usado num encontro e fica guardado na célula.' : 'Só o líder pode mudar o estudo.') + '</small></span>'
+        + '<small>' + (e.usado ? 'Ele já foi usado num encontro. Quando você preparar o próximo, este fica em Estudos anteriores.' : 'Só o líder pode mudar o estudo.') + '</small></span>'
         + '<button type="button" class="botao pequeno contorno" data-mudar>' + (e.usado ? 'Preparar o próximo' : 'Mudar o estudo') + '</button></div>' : '')
       + (e.tipo === 'blocos' || e.tipo === 'trecho' ? noPlanoHtml(refs) : '')
-      + secaoW('Acolhida', '<p>' + esc(ws.acolhida) + '</p>')
+      + secaoW('Acolhida', (anterior ? combinadoLembrado(anterior) : '') + '<p>' + esc(ws.acolhida) + '</p>')
       + secaoW('Adoração', '<p>' + esc(ws.adoracao) + '</p>')
       + secaoW('Palavra', palavra)
       + (perguntas.length ? secaoW('Para conversar', '<ol class="roteiro-perguntas mesa-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ol>') : '')
+      + secaoCombinado(e)
       + secaoW('Testemunho', '<p>' + esc(ws.testemunho) + '</p>')
       + '<div class="acoes"><button class="botao" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar no grupo</button>'
-      + '<button class="botao contorno" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button></div>';
+      + '<button class="botao contorno" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button>'
+      + '<button class="botao plano" data-imprimir>' + CC.ico('folha') + 'Imprimir</button></div>'
+      + blocoAnotacao(e)
+      // os estudos anteriores, para quem faz parte da célula (o visitante vê só o atual)
+      + (visitante(p) ? '' : '<div data-anteriores></div>');
     ligarMais(painel);
     if (CC.inseparavel) CC.inseparavel(painel);
+    ligarAnotacao(painel);
     painel.querySelector('[data-compartilhar]').onclick = () => mandarNoGrupo(p, apoio);
     painel.querySelector('[data-modo-encontro]').onclick = () => modoEncontro(p, apoio);
+    painel.querySelector('[data-imprimir]').onclick = () => imprimir(p, e, apoio, {
+      linha: noPapel(linha, e), ws, combinadoAnterior: anterior, palavraDe: legado && e.texto ? 'Palavra de ' + (quem && quem !== 'você' ? quem : apoio.nomeDoLider(p)) : '',
+    });
     const mudar = painel.querySelector('[data-mudar]');
     if (mudar) mudar.onclick = () => { location.hash = apoio.endereco(p.id, 'preparar'); };
+    const lugar = painel.querySelector('[data-anteriores]');
+    if (lugar) anteriores(lugar, p, apoio);
+  }
+
+  // ---------- Estudos anteriores: a lista (docs/a-mesa-fase2.md, 4.3) ----------
+  // Fica na memória da peça durante a sessão, por célula e pela versão do retrato (versao): o
+  // estudo atual, a última mudança dele e, para quem conduz, o último encontro. Assim o estudo que
+  // o líder preparou em outro aparelho, e o encontro que alguém registrou, chegam com a
+  // sincronização. Salvar ou tirar o estudo e registrar um encontro neste aparelho também a
+  // esquecem (esquecer). Nenhuma contagem de leitura, presença ou anotação na lista.
+  const listas = new Map();
+  const leituras = new Map();
+  const maeAberta = new Set();
+  const versao = (p) => {
+    const e = p.estudo || {};
+    const u = p.ultimoEncontro || {};
+    return [e.id || '', e.editadoEm || '', u.data || '', u.presentes || 0, u.visitantes || 0, u.semEncontro ? 1 : 0, (u.estudo && u.estudo.id) || ''].join(':');
+  };
+  function esquecer(celula) {
+    for (const k of [...listas.keys(), ...leituras.keys()]) if (k.startsWith(celula + '|')) { listas.delete(k); leituras.delete(k); }
+  }
+  const nomeDaCelula = (titulo) => (/^c[ée]lula(\s|$)/i.test(titulo || '') ? titulo : 'célula ' + (titulo || ''));
+  const linhaAnterior = (p, x) => '<a class="mesa-anterior" href="' + CC.apoioCelula.endereco(p.id, 'estudo') + '/' + encodeURIComponent(x.id) + '">' + CC.ico('livro')
+    + '<span><small>' + esc(R.dataDaLista(x)) + '</small><b>' + esc(R.titulo(x) || 'Estudo do encontro') + '</b>'
+    // no trecho, o título já é a referência ("Romanos 8.28-30"): "Rm 8" embaixo só repetiria
+    + (x.tipo !== 'trecho' && R.refsCurtas(x.refs) ? '<small>' + esc(R.refsCurtas(x.refs)) + '</small>' : '') + '</span>' + CC.ico('direita') + '</a>';
+  // Pede uma página (de: '' para os da própria célula, 'mae' para os da célula de origem) e
+  // desenha a lista dentro de "alvo", acrescentando as páginas seguintes em "Ver mais estudos".
+  async function carregarLista(alvo, p, de) {
+    const chave = p.id + '|' + de + '|' + versao(p);
+    const desenhar = (l) => {
+      alvo.innerHTML = (l.itens.length ? '<div class="mesa-anteriores">' + l.itens.map((x) => linhaAnterior(p, x)).join('') + '</div>' : '')
+        + (l.mais ? '<button type="button" class="botao contorno pequeno mesa-mais-estudos" data-mais-estudos>Ver mais estudos</button>' : '')
+        + (!l.itens.length && !de && p.estudo ? '<p class="passo-dica pequena">' + (p.euPreparoEstudo ? 'Quando você preparar o próximo estudo, este fica guardado aqui para a célula reler.'
+          : 'Quando o próximo estudo for preparado, este fica guardado aqui para a célula reler.') + '</p>' : '');
+      if (CC.inseparavel) CC.inseparavel(alvo);
+      const mais = alvo.querySelector('[data-mais-estudos]');
+      if (mais) mais.onclick = () => pedir(l.antes);
+    };
+    const pedir = async (antes) => {
+      const l = listas.get(chave) || { itens: [], mais: false, antes: '' };
+      if (!antes) alvo.innerHTML = CC.esqueleto('lista');
+      let r;
+      try {
+        r = await CC.api('api/estudos?celula=' + encodeURIComponent(p.id) + (de ? '&de=' + de : '') + (antes ? '&antes=' + encodeURIComponent(antes) : ''));
+      } catch (e) {
+        if (!alvo.isConnected) return;
+        if (antes) { CC.avisar('Não deu para abrir os estudos anteriores agora.'); return; }
+        alvo.innerHTML = '<p class="passo-dica pequena">Não deu para abrir os estudos anteriores agora.</p><button type="button" class="botao contorno pequeno" data-tentar-lista>Tentar de novo</button>';
+        alvo.querySelector('[data-tentar-lista]').onclick = () => pedir('');
+        return;
+      }
+      const nova = { itens: (antes ? l.itens : []).concat(r.estudos || []), mais: !!r.mais, antes: r.antes || '', titulo: (r.celula || {}).titulo || '' };
+      listas.set(chave, nova);
+      if (alvo.isConnected) desenhar(nova);
+    };
+    if (listas.has(chave)) desenhar(listas.get(chave));
+    else await pedir('');
+  }
+
+  // A seção inteira, embaixo dos botões da aba (ou do vazio, sem estudo atual): os da própria
+  // célula e, na célula que nasceu de uma multiplicação, os da célula de origem, só para leitura.
+  function anteriores(alvo, p) {
+    if (visitante(p)) { alvo.innerHTML = ''; return; }
+    const proprios = p.temAnteriores || p.estudo;
+    const mae = p.daMae;
+    alvo.className = 'mesa-secao-anteriores';
+    alvo.innerHTML = (proprios ? CC.tituloSecao('Estudos anteriores') + '<div data-lista-propria></div>' : '')
+      + (mae ? CC.tituloSecao('Da célula de origem') + '<p class="passo-dica pequena">Os estudos da ' + esc(nomeDaCelula(mae.titulo)) + ' até a multiplicação, em ' + ddmm(mae.ate) + '. Só para leitura.</p>'
+        + '<div data-lista-mae><button type="button" class="botao contorno pequeno" data-ver-mae>' + CC.ico('livro') + 'Ver os estudos da ' + esc(nomeDaCelula(mae.titulo)) + '</button></div>' : '');
+    const propria = alvo.querySelector('[data-lista-propria]');
+    if (propria) {
+      if (p.temAnteriores) carregarLista(propria, p, '');
+      else propria.innerHTML = '<p class="passo-dica pequena">' + (p.euPreparoEstudo ? 'Quando você preparar o próximo estudo, este fica guardado aqui para a célula reler.'
+        : 'Quando o próximo estudo for preparado, este fica guardado aqui para a célula reler.') + '</p>';
+    }
+    // a lista da célula de origem abre no toque e continua aberta nos redesenhos da sessão
+    const daMae = alvo.querySelector('[data-lista-mae]');
+    if (daMae) {
+      if (maeAberta.has(p.id)) carregarLista(daMae, p, 'mae');
+      else daMae.querySelector('[data-ver-mae]').onclick = () => { maeAberta.add(p.id); carregarLista(daMae, p, 'mae'); };
+    }
+  }
+
+  // ---------- ler um estudo anterior (docs/a-mesa-fase2.md, 4.4) ----------
+  const DIAS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+  const diaDaSemana = (iso) => DIAS[new Date(iso + 'T12:00:00').getDay()];
+  // O que fazer quando o estudo não abre: 404 (quem saiu, o estudo que não existe mais), 403 (a
+  // visitante num anterior) ou sem rede.
+  function naoAbriu(raiz, e, p, apoio, tentar) {
+    const vazio = (texto, botao) => '<div class="vazio-amigos">' + CC.ico('livro') + '<p>' + esc(texto) + '</p>' + botao + '</div>';
+    if (e && e.status === 404) {
+      raiz.innerHTML = vazio('Este estudo não está aberto para você. Se você escreveu uma anotação nele, ela continua em Minhas anotações.',
+        '<a class="botao contorno" href="#/perfil/anotacoes">' + CC.ico('caderno') + 'Minhas anotações</a>');
+    } else if (e && e.status === 403) {
+      raiz.innerHTML = vazio('Os estudos anteriores ficam para quem faz parte da célula. O estudo atual está na aba Estudo.',
+        '<a class="botao contorno" href="' + (p ? apoio.endereco(p.id, 'estudo') : '#/celula') + '" data-atual>Ver o estudo atual</a>');
+      const atual = raiz.querySelector('[data-atual]');
+      if (atual && p) atual.onclick = (ev) => { ev.preventDefault(); CC.substituirRota(apoio.endereco(p.id, 'estudo')); };
+    } else {
+      raiz.innerHTML = CC.estadoSemPeca('Não deu para abrir o estudo');
+      const b = raiz.querySelector('[data-acao-estado]');
+      if (b) b.onclick = tentar;
+    }
+  }
+
+  async function anterior(painel, p, apoio, alvo, aindaAqui) {
+    const chave = p.id + '|' + alvo + '|' + versao(p);
+    let r = leituras.get(chave);
+    if (!r) {
+      painel.innerHTML = CC.esqueleto('texto');
+      try {
+        r = await CC.api('api/estudos?estudo=' + encodeURIComponent(alvo) + '&celula=' + encodeURIComponent(p.id));
+      } catch (erro) {
+        if (aindaAqui && !aindaAqui()) return;
+        naoAbriu(painel, erro, p, apoio, () => anterior(painel, p, apoio, alvo, aindaAqui));
+        return;
+      }
+      leituras.set(chave, r);
+    }
+    // o estudo atual tem a aba de sempre
+    if (r.atual) { CC.substituirRota(apoio.endereco(p.id, 'estudo')); return; }
+    const e = r.estudo;
+    // um anterior mostra a semana em que ele valeu, nunca a de hoje (sem planoAte, nenhuma)
+    const sem = e.tipo === 'semana' && e.planoAte && CC.D && CC.D.plano ? R.semana(e.planoAte) : null;
+    const sigla = siglaDe(e);
+    const versiculos = await contagemDe(e);
+    const refs = R.comoBlocos(e, sem, versiculos).filter((b) => b.t === 'versiculo').map((b) => b.ref);
+    const textos = await textosDe(refs, sigla);
+    if (aindaAqui && !aindaAqui()) return;
+    const quem = quemPreparou(e);
+    const linha = (r.dataDe === 'encontro' ? 'Encontro de ' + diaDaSemana(r.data) + ', ' + ddmm(r.data) + (quem ? PONTO + 'preparado por ' + quem : '')
+      : 'Preparado em ' + ddmm(r.data) + (quem ? ' por ' + quem : ''));
+    const legado = e.tipo === 'semana' || e.tipo === 'trecho';
+    const perguntas = legado ? [] : R.perguntasDe(e, sem);
+    const etiqueta = r.daMae ? 'Da ' + nomeDaCelula(r.daMae.titulo) + PONTO + 'só para leitura' : 'Estudo anterior';
+    const presenca = (r.encontros || []).slice(0, 3);
+    painel.innerHTML = '<div class="mesa-volta">' + CC.botaoVoltar('Estudo') + '</div>'
+      + '<div class="mesa-cabeca-anterior"><span class="etiqueta">' + esc(etiqueta) + '</span><p class="passo-dica">' + esc(linha) + '</p></div>'
+      // quantas pessoas vieram: só quem conduz a célula do estudo, nunca na lista (não vira placar)
+      + (presenca.length ? '<div class="mesa-presenca">' + CC.ico('pessoas') + '<span>' + presenca.map((x) => '<span class="mesa-veio">' + esc((x.pessoas === 1 ? 'Veio 1 pessoa' : 'Vieram ' + x.pessoas + ' pessoas') + ' no encontro de ' + ddmm(x.data) + '.') + '</span>').join('')
+        + '<small>' + (presenca.length > 1 ? 'Só quem conduz a célula vê estes números.' : 'Só quem conduz a célula vê este número.') + '</small></span></div>' : '')
+      + (e.tipo === 'blocos' || e.tipo === 'trecho' ? noPlanoHtml(refs) : '')
+      + secaoW('Palavra', palavraHtml(p, e, sem, textos, sigla, versiculos, quem, apoio))
+      + (perguntas.length ? secaoW('Para conversar', '<ol class="roteiro-perguntas mesa-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ol>') : '')
+      + secaoCombinado(e)
+      + '<div class="acoes">' + (r.usarComoBase ? '<button class="botao" data-usar-base>' + CC.ico('caneta') + 'Usar como base</button>' : '')
+      + '<button class="botao contorno" data-imprimir>' + CC.ico('folha') + 'Imprimir</button></div>'
+      + blocoAnotacao(e);
+    ligarMais(painel);
+    if (CC.inseparavel) CC.inseparavel(painel);
+    ligarAnotacao(painel);
+    // o voltar: de volta à lista (no histórico) ou, sem tela anterior, à aba Estudo
+    painel.querySelector('.mesa-volta [data-voltar]').onclick = () => { if (CC.anteriorNaPilha && CC.anteriorNaPilha()) history.back(); else CC.substituirRota(apoio.endereco(p.id, 'estudo')); };
+    painel.querySelector('[data-imprimir]').onclick = () => imprimir(p, e, apoio, { anterior: true, linha: noPapel(linha, e), palavraDe: legado && e.texto ? 'Palavra de ' + (quem || apoio.nomeDoLider(p)) : '' });
+    const base = painel.querySelector('[data-usar-base]');
+    if (base) base.onclick = () => usarComoBase(p, apoio, alvo, r.data);
+  }
+
+  // ---------- Usar como base (docs/a-mesa-fase2.md, 4.5): só o líder, num anterior da célula ----------
+  async function usarComoBase(p, apoio, alvo, data) {
+    // o rascunho deste mesmo estudo de base continua de onde parou: não há o que trocar
+    let rascunho = null;
+    try { rascunho = JSON.parse(localStorage.getItem('cc.rascunho.estudo.' + p.id) || 'null'); } catch (e) { rascunho = null; }
+    const outroRascunho = !!rascunho && rascunho.deBase !== alvo;
+    const atualSemUso = !!(p.estudo && !p.estudo.usado);
+    const frases = [];
+    if (outroRascunho) frases.push('Você já começou um estudo neste celular. Se continuar, esse rascunho dá lugar ao estudo' + (data ? ' de ' + ddmm(data) : '') + '.');
+    if (atualSemUso) frases.push('O estudo atual ainda não foi usado num encontro. Quando você salvar o novo, o atual sai da aba Estudo e fica em Estudos anteriores.');
+    // só "Usar como base" segue: tocar fora (null) e "Cancelar" (false) ficam na leitura
+    if (frases.length && await CC.confirmar({ titulo: 'Usar como base?', texto: frases.join(' '), acao: 'Usar como base' }) !== true) return;
+    location.hash = apoio.endereco(p.id, 'preparar') + '/' + encodeURIComponent(alvo);
+  }
+
+  // ---------- Quem não veio (docs/a-mesa-fase2.md, 4.8) ----------
+  // Depois do registro, para quem conduz: a mensagem pronta para cada pessoa, que ele manda, se
+  // quiser, pelo próprio WhatsApp. O app não avisa ninguém e não guarda nada disso.
+  function paraQuemFaltou(p, { data, faltaram, estudo } = {}) {
+    const lista = faltaram || [];
+    if (!lista.length) return;
+    const apoio = CC.apoioCelula;
+    const quando = apoio.quandoFoi ? apoio.quandoFoi(data) : '';
+    const recado = (x) => CC.recadoFaltou({ nome: x.nome, celula: p.titulo, quando, estudo });
+    const retrato = (x) => CC.retratoAmigo(Object.assign({}, x, (p.membros || []).find((m) => m.usuario === x.usuario) || {}));
+    CC.folha('<h2>Quem não veio</h2>'
+      + '<p class="passo-dica">O app não avisa ninguém. Se quiser, mande uma mensagem para cada pessoa pelo seu WhatsApp.</p>'
+      + '<div class="mesa-zap-moldura"><span>A mensagem, com o nome de cada um</span><div class="mesa-zap">' + esc(recado(lista[0])) + '</div></div>'
+      + '<div class="lista-pedidos mesa-faltou">' + lista.map((x, i) => '<div class="linha-amigo">' + retrato(x)
+        + '<div class="quem-amigo"><b>' + esc(x.nome) + '</b></div><div class="mesa-faltou-acoes"><a class="botao-whatsapp" data-zap-faltou="' + esc(x.usuario) + '" href="https://wa.me/?text=' + encodeURIComponent(recado(x)) + '" target="_blank" rel="noopener">'
+        + CC.ico('balao') + 'Mandar no WhatsApp</a><button type="button" class="botao contorno pequeno" data-copiar-faltou="' + i + '">Copiar</button></div></div>').join('') + '</div>'
+      + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>',
+    {
+      rotulo: 'Quem não veio',
+      rolavel: true,
+      classe: 'folha-faltou',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelectorAll('[data-copiar-faltou]').forEach((b) => {
+          b.onclick = async () => {
+            CC.avisar((await CC.copiar(recado(lista[Number(b.dataset.copiarFaltou)]))) ? 'Mensagem copiada. É só colar na conversa.' : 'Não consegui copiar agora.');
+          };
+        });
+      },
+    });
+  }
+
+  // ---------- Imprimir (docs/a-mesa-fase2.md, 4.10) ----------
+  // O estudo no papel, em tinta preta sobre branco nos dois temas, sem as barras do app: um bloco
+  // ligado direto no <body>, que o CSS de impressão (estudo-celula.css) deixa sozinho na página.
+  // O bloco e a classe imprimindo-estudo saem juntos, na próxima impressão ou na próxima troca de
+  // endereço, e nunca no afterprint: há navegador de celular que dispara o afterprint antes de
+  // imprimir, e sem a classe o papel sairia com o app no lugar do estudo. Na tela, a classe não
+  // muda nada. Sem anotação, presença nem pedido.
+  let tirarImpressao = null;
+  async function imprimir(p, e, apoio, opcoes = {}) {
+    if (typeof window.print !== 'function') {
+      CC.avisar('Este aparelho não abriu a impressão. Abra o app no navegador do celular ou do computador e tente de novo.', { tipo: 'erro' });
+      return;
+    }
+    const sem = e.tipo === 'semana' && (e.planoAte || !opcoes.anterior) && CC.D && CC.D.plano ? R.semana(e.planoAte || p.semanaAte) : null;
+    const sigla = siglaDe(e);
+    const versiculos = await contagemDe(e);
+    const refs = R.comoBlocos(e, sem, versiculos).filter((b) => b.t === 'versiculo').map((b) => b.ref);
+    const textos = await textosDe(refs, sigla);
+    if (refs.some((r) => !textos.get(r))) {
+      CC.avisar('Sem conexão, o texto dos versículos não veio. Tente imprimir de novo com internet.', { tipo: 'erro' });
+      return;
+    }
+    const t = CC.traducao(sigla) || {};
+    const ws = opcoes.ws || {};
+    const html = R.paraImprimir(e, {
+      celula: p.titulo, linha: opcoes.linha || '', textos, sigla: t.abreviatura || '', anterior: !!opcoes.anterior,
+      credito: (t.credito || []).concat(t.licenca ? ['Licença ' + t.licenca] : []),
+      acolhida: ws.acolhida, adoracao: ws.adoracao, testemunho: ws.testemunho, combinadoAnterior: opcoes.combinadoAnterior || '',
+      noPlano: e.tipo === 'blocos' || e.tipo === 'trecho' ? R.noPlano(refs, CC.D && CC.D.plano) : [], palavraDe: opcoes.palavraDe || '', semana: sem, versiculos,
+    });
+    document.querySelectorAll('.mesa-impressao').forEach((x) => x.remove());
+    const folha = document.createElement('div');
+    folha.className = 'mesa-impressao';
+    folha.setAttribute('aria-hidden', 'true');
+    folha.innerHTML = html;
+    document.body.appendChild(folha);
+    document.body.classList.add('imprimindo-estudo');
+    if (tirarImpressao) removeEventListener('hashchange', tirarImpressao);
+    tirarImpressao = () => {
+      folha.remove();
+      if (!document.querySelector('.mesa-impressao')) document.body.classList.remove('imprimindo-estudo');
+      removeEventListener('hashchange', tirarImpressao);
+      tirarImpressao = null;
+    };
+    addEventListener('hashchange', tirarImpressao);
+    window.print();
+  }
+
+  // ---------- o endereço curto (#/estudo/<id>), vindo de Minhas anotações ----------
+  // O servidor diz por qual célula a pessoa lê (a do estudo ou a filha), e a rota troca para a aba
+  // Estudo dela; senão, o estado de "não está aberto".
+  async function solto(raiz, estudo, apoio) {
+    const aqui = location.hash;
+    let r;
+    try {
+      r = await CC.api('api/estudos?estudo=' + encodeURIComponent(estudo));
+    } catch (e) {
+      if (location.hash === aqui) naoAbriu(raiz, e, null, apoio, () => solto(raiz, estudo, apoio));
+      return;
+    }
+    if (location.hash !== aqui) return;
+    CC.substituirRota(apoio.endereco(r.celula, 'estudo') + (r.atual ? '' : '/' + encodeURIComponent(estudo)));
   }
 
   // ---------- Mandar no grupo: o estudo inteiro, formatado para o WhatsApp ----------
@@ -219,7 +537,8 @@
       return etiqueta + (s.titulo ? '<h1 class="mesa-titulo-cena">' + R.negrito(s.titulo) + '</h1>' : '')
         + (s.abrir ? abrirNaBiblia(s.abrir.livro + ' ' + s.abrir.cap, 'mesa-abrir') : '');
     }
-    return etiqueta + (s.frase ? '<p class="frase-cena mesa-frase">' + R.negrito(s.frase) + '</p>' : '');
+    // a frase longa (o combinado perto do teto de 200) desce de tamanho para caber acima do rodapé
+    return etiqueta + (s.frase ? '<p class="frase-cena mesa-frase' + (s.frase.length > 120 ? ' longa' : '') + '">' + R.negrito(s.frase) + '</p>' : '');
   }
   function corpoDoPasso(s, textos, sigla, versiculos) {
     if (s.tipo === 'palavra') {
@@ -229,6 +548,13 @@
       const noAlto = s.abrir ? s.abrir.livro + ' ' + s.abrir.cap : '';
       const cartao = (c) => (noAlto && capitulo(c.ref) === noAlto ? cartaoComMais(c.ref, textos.get(c.ref) || '', sigla) : cartaoDaParte(c, textos, sigla, versiculos));
       return s.blocos.map((b) => (b.t === 'texto' ? '<p class="mesa-fala">' + R.negrito(b.texto) + '</p>' : R.blocoEmHtml(b, { cartao }))).join('');
+    }
+    // a acolhida que começa pelo combinado de antes: a pergunta da acolhida fica aqui embaixo
+    if (s.tipo === 'acolhida' && s.pergunta) {
+      return '<div class="mesa-convite">' + CC.ico('balao') + '<span><span class="etiqueta">Pergunta da acolhida</span><p>' + esc(s.pergunta) + '</p></span></div>';
+    }
+    if (s.tipo === 'combinado') {
+      return '<div class="mesa-convite">' + CC.ico('balao') + '<p>Combinem juntos. No próximo encontro, a acolhida começa por aqui.</p></div>';
     }
     if (s.tipo === 'orar' && s.convite) {
       return '<div class="mesa-convite">' + CC.ico('oracao') + '<p>Os pedidos de oração ficam na aba Oração da célula, no celular de cada um. Eles não aparecem nesta tela.</p></div>';
@@ -249,7 +575,8 @@
     const sigla = siglaDe(e);
     const ws = quatroWs(p);
     const versiculos = await contagemDe(e);
-    const lista = R.passos(e, { conduzo: !!p.euConduzo, visitante: membroEu(p).papel === 'visitante', acolhida: ws.acolhida, adoracao: ws.adoracao, testemunho: ws.testemunho, semana: sem, versiculos });
+    const lista = R.passos(e, { conduzo: !!p.euConduzo, visitante: visitante(p), acolhida: ws.acolhida, adoracao: ws.adoracao, testemunho: ws.testemunho, semana: sem, versiculos,
+      combinadoAnterior: p.combinadoAnterior ? p.combinadoAnterior.texto : '' });
     const refs = lista.flatMap((s) => (s.blocos || []).filter((b) => b.t === 'versiculo').map((b) => b.ref));
     const textos = await textosDe(refs, sigla);
     let i = Math.min(passoGuardado.get(e.id) || 0, lista.length - 1);
@@ -282,7 +609,8 @@
           ligarMais(palco);
           if (CC.inseparavel) CC.inseparavel(palco);
           const registrar = palco.querySelector('[data-registrar]');
-          if (registrar) registrar.onclick = () => { passoGuardado.delete(e.id); fechar(); apoio.registrarEncontro(p); };
+          // a folha de registro já abre com este estudo escolhido
+          if (registrar) registrar.onclick = () => { passoGuardado.delete(e.id); fechar(); apoio.registrarEncontro(p, { estudo: e.id }); };
         };
         q('[data-fechar]').onclick = fechar;
         q('[data-anterior]').onclick = () => { if (i > 0) { i--; mostrar(); } };
@@ -293,5 +621,5 @@
     });
   }
 
-  CC.estudoCelula = { aba, modoEncontro, mandarNoGrupo, cartaoComMais, ligarMais, textosDe };
+  CC.estudoCelula = { aba, modoEncontro, mandarNoGrupo, cartaoComMais, ligarMais, textosDe, anteriores, anterior, paraQuemFaltou, imprimir, solto, esquecer };
 })(window.CC);

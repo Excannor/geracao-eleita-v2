@@ -21,6 +21,8 @@ import {
 import {
   ESTUDO_MAX, ESTUDO_BRUTO_MAX, TIPOS_ESTUDO, TRADUCOES, MENSAGENS as MSG_ESTUDO, semVersiculo,
   limparPerguntas, limparFonte, validarLeitura, estudoDaLinha, estudoUsado, ESTUDOS_POR_CELULA,
+  limparCombinado, estudoDoDia, dataNoHistorico, combinadoDoAnterior, acessoAoEstudo, quemFaltou, cursorDe, lerCursor, ESTUDOS_POR_PAGINA,
+  daMaeAteOCorte, encontrosAteOCorte,
 } from './estudos.mjs';
 
 const scrypt = promisify(scryptCb);
@@ -228,7 +230,8 @@ function paraLinhas(d) {
       // colunas antigas vão vazias, para a linha relida do banco comparar igual à da memória.
       estudo_id: p.estudoId || '', estudo_tipo: '', estudo_ref: '', estudo_texto: '', estudo_em: '',
       estudo_acolhida: p.estudoAcolhida || '', estudo_adoracao: p.estudoAdoracao || '', estudo_testemunho: p.estudoTestemunho || '',
-      mae: p.mae || '', multiplicada_em: p.multiplicadaEm || '',
+      // o instante da multiplicação (v21) tem de estar aqui pelo mesmo motivo do estudo_id
+      mae: p.mae || '', multiplicada_em: p.multiplicadaEm || '', multiplicada_instante: p.multiplicadaInstante || '',
     })) },
     { tabela: 'proposito_membros', chaves: ['proposito', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => p.membros.map((m) => ({
       proposito: p.id, usuario: m.usuario, estado: m.estado, entrou_em: m.entrouEm || '', saiu_em: m.saiuEm || '', convidado_por: m.convidadoPor || '',
@@ -242,6 +245,9 @@ function paraLinhas(d) {
     { tabela: 'celula_encontros', chaves: ['proposito', 'data'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || []).map((e) => ({
       proposito: p.id, data: e.data, visitantes: Number(e.visitantes) || 0, registrado_por: e.registradoPor || '', em: e.em || '',
       sem_encontro: e.semEncontro ? 1 : 0,
+      // o estudo usado no encontro (v20) tem de estar aqui pelo mesmo motivo do estudo_id da célula:
+      // sem a coluna, o INSERT OR REPLACE da primeira gravação zeraria o estudo de todos os encontros
+      estudo: e.estudo || '',
     }))) },
     { tabela: 'celula_presencas', chaves: ['proposito', 'data', 'usuario'], linhas: Object.values(d.propositos || {}).flatMap((p) => (p.encontros || [])
       .flatMap((e) => (e.presentes || []).map((usuario) => ({ proposito: p.id, data: e.data, usuario })))) },
@@ -316,7 +322,7 @@ function deLinhas(t, versao) {
       encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '', recadoQuando: l.recado_quando || '',
       estudoId: l.estudo_id || '',
       estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
-      mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '',
+      mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '', multiplicadaInstante: l.multiplicada_instante || '',
       membros: [], diasBatidos: [], encontros: [], aprovacoes: [],
     };
   }
@@ -339,7 +345,12 @@ function deLinhas(t, versao) {
   }
   for (const l of t.encontros || []) {
     const p = d.propositos[l.proposito];
-    if (p) p.encontros.push({ data: l.data, visitantes: Number(l.visitantes) || 0, registradoPor: l.registrado_por || '', em: l.em || '', presentes: [], semEncontro: !!l.sem_encontro });
+    if (p) {
+      p.encontros.push({
+        data: l.data, visitantes: Number(l.visitantes) || 0, registradoPor: l.registrado_por || '', em: l.em || '', presentes: [],
+        semEncontro: !!l.sem_encontro, estudo: l.estudo || '',
+      });
+    }
   }
   for (const l of t.presencas || []) {
     const p = d.propositos[l.proposito];
@@ -1401,15 +1412,168 @@ export class Contas {
     return p;
   }
 
+  // O dia local de um instante no fuso do líder da célula (o fuso padrão quando a conta dele não
+  // existe mais): é por ele que se conta em que dia um estudo nasceu ou deixou de ser o atual.
+  diaNaCelula(p) {
+    const fuso = (this.achar(p && p.criadoPor) || {}).fuso;
+    return (iso) => {
+      const d = new Date(iso);
+      return iso && !Number.isNaN(d.getTime()) ? hojeNoFuso(fuso, d) : '';
+    };
+  }
+
   // O estudo já foi usado num encontro desta célula (estudos.mjs, estudoUsado), no fuso do líder.
   estudoJaUsado(p, e, agora = new Date()) {
     if (!p || !e) return false;
-    const fuso = (this.achar(p.criadoPor) || {}).fuso;
-    const nascido = new Date(e.criadoEm);
+    const diaDe = this.diaNaCelula(p);
     return estudoUsado({
-      criadoEm: e.criadoEm, nasceu: Number.isNaN(nascido.getTime()) ? '' : hojeNoFuso(fuso, nascido), hoje: hojeNoFuso(fuso, agora),
+      id: e.id, criadoEm: e.criadoEm, nasceu: diaDe(e.criadoEm), hoje: diaDe(agora.toISOString()),
       encontro: p.encontro, encontros: p.encontros,
     });
+  }
+
+  // As linhas de uma célula em celula_estudos, do mais novo para o mais velho, só com as colunas
+  // que a lista, a folha de registro e as datas usam (sem a fonte e sem as partes).
+  estudosLeves(proposito) {
+    return this.banco().prepare('SELECT id, proposito, tipo, titulo, ref, refs, plano_ate, traducao, criado_por, criado_em, editado_em, atual_ate, combinado, antes_do_historico '
+      + 'FROM celula_estudos WHERE proposito = ? ORDER BY criado_em DESC, id DESC').all(String(proposito || '')).map(estudoDaLinha);
+  }
+
+  // O que uma pessoa pode num estudo, chegando por uma célula (estudos.mjs, acessoAoEstudo). O dia
+  // de cada instante conta no fuso do líder da célula do estudo (a mãe, num estudo da mãe). noDono
+  // é a entrada da pessoa na célula do estudo: na própria, a de agora; na mãe, a de quando ela
+  // estava lá (a filha leva quem saiu da mãe pela multiplicação).
+  acessoDe(eu, e, p) {
+    const u = limparNome(eu);
+    if (!e || !p || !p.celula || p.encerradoEm) return acessoAoEstudo(null, null, {});
+    const m = p.membros.find((x) => x.usuario === u && x.estado === 'ativo');
+    const dono = e.proposito === p.id ? p : this.proposito(e.proposito);
+    const noDono = dono ? dono.membros.find((x) => x.usuario === u) || null : null;
+    return acessoAoEstudo(e, p, {
+      ativo: !!m, papel: (m && m.papel) || '', conduz: podeConduzir(p, u),
+      lidera: !!m && p.criadoPor === u && !aprovacaoQueFalta(p, u, 'lider'),
+      ...this.corteDe(p), noDono, diaDe: this.diaNaCelula(dono || p),
+    });
+  }
+
+  // O corte da filha nos estudos da mãe (estudos.mjs, daMaeAteOCorte): o dia e, desde a v21, o
+  // instante da multiplicação. Uma célula sem mãe não tem corte.
+  corteDe(p) {
+    return p && p.mae ? { corte: p.multiplicadaEm || '', corteEm: p.multiplicadaInstante || '' } : { corte: '', corteEm: '' };
+  }
+
+  // Os encontros de uma célula como quem lê por p os vê: os da própria célula inteiros; os da mãe,
+  // só até a multiplicação (o que a mãe fez depois é de outro grupo).
+  encontrosParaLer(p, dono) {
+    if (!dono) return [];
+    return dono.id === (p && p.id) ? dono.encontros || [] : encontrosAteOCorte(dono.encontros, this.corteDe(p));
+  }
+
+  // Um estudo para ler (GET /api/estudos?estudo=). Sem a célula, o servidor procura por onde a pessoa
+  // lê: a célula do estudo e, senão, uma filha dela em que a pessoa é membro ativo (é o caminho de
+  // Minhas anotações, que só sabe o id do estudo). 403 para o visitante num estudo que não é o atual;
+  // 404 para todo o resto, igual para "não existe" e "não é seu".
+  // Devolve { e, p (a célula por onde lê), dono (a célula do estudo), acesso }.
+  estudoParaLer(eu, estudoId, celulaId = '') {
+    const u = limparNome(eu);
+    const id = String(estudoId || '');
+    const cid = String(celulaId || '');
+    const fechado = () => erro(MSG_ESTUDO.naoAberto, 404);
+    if (!id || id.length > 64 || cid.length > 64) throw fechado();
+    const e = this.estudo(id);
+    if (!e) throw fechado();
+    const ativoEm = (x) => x.membros.some((m) => m.usuario === u && m.estado === 'ativo');
+    const candidatas = cid ? [this.proposito(cid)]
+      : [this.proposito(e.proposito), ...this.propositosAtivos().filter((x) => x.celula && x.mae === e.proposito && ativoEm(x))];
+    let negado = 404;
+    for (const p of candidatas) {
+      if (!p) continue;
+      const acesso = this.acessoDe(u, e, p);
+      if (acesso.ler) return { e, p, dono: e.proposito === p.id ? p : this.proposito(e.proposito), acesso };
+      if (acesso.codigo === 403) negado = 403;
+    }
+    throw negado === 403 ? erro(MSG_ESTUDO.soMembros, 403) : fechado();
+  }
+
+  // A lista de estudos anteriores (GET /api/estudos?celula=): só para os membros ativos da célula
+  // (o visitante recebe 403; os outros, 404). Sem "de", os anteriores da própria célula (os que já
+  // deixaram de ser o atual); com de = 'mae', os da célula mãe preparados até o dia da
+  // multiplicação. Páginas de 20, do mais novo para o mais velho; antes é o cursor da página
+  // anterior. Devolve { p, dono, itens: [{ e, data, dataDe }], mais, antes }.
+  estudosAnteriores(eu, celulaId, { de = '', antes = '', limite = ESTUDOS_POR_PAGINA } = {}) {
+    const u = limparNome(eu);
+    const cid = String(celulaId || '');
+    const p = cid.length <= 64 ? this.proposito(cid) : null;
+    const m = p && p.celula && !p.encerradoEm ? p.membros.find((x) => x.usuario === u && x.estado === 'ativo') : null;
+    if (!m) throw erro('célula não encontrada', 404);
+    if (m.papel === 'visitante') throw erro(MSG_ESTUDO.soMembros, 403);
+    const daMae = de === 'mae';
+    const dono = daMae ? (p.mae && p.multiplicadaEm ? this.proposito(p.mae) : null) : p;
+    if (!dono) throw erro('célula não encontrada', 404);
+    const diaDe = this.diaNaCelula(dono);
+    // a mesma regra da leitura (acessoAoEstudo), estudo a estudo: o que não abre não aparece
+    let lista = this.estudosLeves(dono.id).filter((e) => (daMae || !!e.atualAte) && this.acessoDe(u, e, p).ler);
+    const c = lerCursor(antes);
+    if (c) lista = lista.filter((e) => e.criadoEm < c.criadoEm || (e.criadoEm === c.criadoEm && e.id < c.id));
+    const n = Math.max(1, Math.min(Number(limite) || ESTUDOS_POR_PAGINA, ESTUDOS_POR_PAGINA));
+    const pagina = lista.slice(0, n);
+    const mais = lista.length > n;
+    const encontros = this.encontrosParaLer(p, dono);
+    return {
+      p, dono, mais, antes: mais ? cursorDe(pagina[pagina.length - 1]) : '',
+      itens: pagina.map((e) => ({ e, ...dataNoHistorico(e, encontros, diaDe) })),
+    };
+  }
+
+  // A filha de uma multiplicação lê os estudos da mãe escritos até a multiplicação: o título da mãe
+  // e o dia do corte, quando a pessoa (eu) abre ao menos um; senão null.
+  estudosDaMae(p, eu = '') {
+    if (!p || !p.mae || !p.multiplicadaEm) return null;
+    const mae = this.proposito(p.mae);
+    if (!mae) return null;
+    const algum = this.estudosLeves(mae.id).some((e) => (eu ? this.acessoDe(eu, e, p).ler : daMaeAteOCorte(e, { ...this.corteDe(p), diaDe: this.diaNaCelula(mae) })));
+    return algum ? { titulo: mae.titulo, ate: p.multiplicadaEm } : null;
+  }
+
+  // O que GET /api/propositos leva do estudo da célula além do atual (docs/a-mesa-fase2.md, 3.4).
+  //   membro: a pessoa é membro ativo e não visitante (lê os anteriores); eu: o @ dela (as listas
+  //   seguem a mesma regra da leitura); conduz: é quem conduz a célula (recebe a folha de
+  //   registro); hoje: o dia de quem pede, que é o da folha de registro.
+  // combinadoAnterior, temAnteriores e daMae, só para os membros: o visitante vê só o estudo atual,
+  // e o combinado de antes é do estudo anterior (quem chegou esta semana nem estava quando ele foi
+  // combinado). registro, só para quem conduz: os estudos que a folha oferece (o atual, os 3
+  // anteriores mais novos e o que valia em cada dia) e os 8 dias que dá para registrar, com o
+  // estudo do dia e o que já foi gravado.
+  dadosDoEstudo(p, { membro = false, eu = '', conduz = false, hoje = '' } = {}, agora = new Date()) {
+    const db = this.banco();
+    const diaDe = this.diaNaCelula(p);
+    const saida = { combinadoAnterior: null, temAnteriores: false, daMae: null };
+    if (membro) {
+      const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+      if (atual) {
+        const linha = db.prepare('SELECT id, proposito, tipo, criado_em, atual_ate, combinado FROM celula_estudos '
+          + 'WHERE proposito = ? AND id != ? AND criado_em < ? ORDER BY criado_em DESC, id DESC LIMIT 1').get(p.id, atual.id, atual.criadoEm);
+        saida.combinadoAnterior = combinadoDoAnterior({
+          anterior: estudoDaLinha(linha), encontros: p.encontros, encontro: p.encontro, hoje: diaDe(agora.toISOString()), diaDe,
+        });
+      }
+      const anteriores = this.estudosLeves(p.id).filter((e) => !!e.atualAte);
+      saida.temAnteriores = eu ? anteriores.some((e) => this.acessoDe(eu, e, p).ler) : anteriores.length > 0;
+      saida.daMae = this.estudosDaMae(p, eu);
+    }
+    if (!conduz) return saida;
+    const base = /^\d{4}-\d{2}-\d{2}$/.test(String(hoje)) ? hoje : diaDe(agora.toISOString());
+    const todos = this.estudosLeves(p.id);
+    const porData = new Map((p.encontros || []).map((x) => [x.data, x]));
+    const dias = Array.from({ length: 8 }, (_, i) => {
+      const data = somaDias(base, -i);
+      const r = porData.get(data);
+      return { data, padrao: estudoDoDia(todos, data, diaDe), estudo: r ? r.estudo || '' : null, visitantes: r ? Number(r.visitantes) || 0 : 0, semEncontro: !!(r && r.semEncontro) };
+    });
+    const usados = new Set(dias.flatMap((d) => [d.padrao, d.estudo]).filter((x) => x && x !== '-'));
+    const estudos = todos.filter((e, i) => i < 4 || usados.has(e.id));
+    saida.registro = { estudos, dias };
+    return saida;
   }
 
   // Um estudo pela chave; o atual da célula é o que p.estudoId aponta. Como o check-in, os estudos
@@ -1424,9 +1588,10 @@ export class Contas {
   //           o campo, grava só acolhida, adoração e testemunho, e o estudo fica como está. 'livre'
   //           (o aparelho que ainda tem o app antigo) vale como 'blocos', e "texto" no lugar de "fonte".
   //   fonte (o estudo escrito; em semana e trecho, a palavra do líder), ref (trecho), traducao,
-  //   perguntas (0 a 6), acolhida, adoracao, testemunho e base: o id do estudo que está sendo mudado.
-  //   Igual ao atual, a linha é atualizada; em qualquer outro caso nasce uma linha nova, e a anterior
-  //   ganha atual_ate, para o histórico.
+  //   perguntas (0 a 6), acolhida, adoracao, testemunho, combinado (até 200 caracteres) e base: o id
+  //   do estudo que está sendo mudado. Igual ao atual (e ainda sem uso), a linha é atualizada; em
+  //   qualquer outro caso nasce uma linha nova, a anterior ganha atual_ate, para o histórico, e
+  //   acolhida, adoração e testemunho voltam a vazio, a não ser que o pedido os traga.
   // opcoes: regras (o CC das regras do app: lerEstudo, lerRefLivre, lerRef, escreverRef), livros,
   //   capitulos, versiculos(traducao) => (livro, cap) => quantos versículos, planoAte (até que dia do
   //   plano vai a semana do líder hoje) e refSemana (a referência-chave dessa semana).
@@ -1450,6 +1615,7 @@ export class Contas {
     let tipo = e.estudo === undefined || e.estudo === null ? null : String(e.estudo);
     if (tipo === 'livre') tipo = 'blocos';
     let novo = null;
+    let combinado = null;
     if (tipo) {
       if (!TIPOS_ESTUDO.includes(tipo)) throw erro(MSG_ESTUDO.tipo);
       const traducao = e.traducao === undefined || e.traducao === null || e.traducao === '' ? 'nbv' : String(e.traducao);
@@ -1460,6 +1626,15 @@ export class Contas {
       // seu, conferido antes de o leitor de marcas rodar: ele nunca lê mais que o dobro do estudo.
       if (recebida.length > ESTUDO_BRUTO_MAX) throw erro(MSG_ESTUDO.tamanho);
       const contar = typeof versiculos === 'function' ? versiculos(traducao) : null;
+      // O combinado (Fase 2): sem o campo, mudar o mesmo estudo mantém o que estava, e um estudo
+      // novo nasce sem. Com o campo, passa pelo mesmo leitor de citações da palavra do líder: a
+      // citação de outra tradução vira a referência, e a que ele não consegue trocar é recusada.
+      combinado = limparCombinado(e.combinado);
+      if (combinado) {
+        const lido = regras.lerEstudo(combinado, { capitulos, versiculos: contar, semTitulo: true });
+        if ((lido.avisos || []).some((a) => a && a.tipo === 'citacao')) throw erro(MSG_ESTUDO.combinadoCitacao);
+        combinado = limparCombinado(String(lido.fonte || '').replace(/\n+/g, ' '));
+      }
       novo = { tipo, titulo: '', ref: '', planoAte: 0, fonte: recebida, blocos: [], refs: [], perguntas: perguntas || [], traducao };
       if (tipo === 'blocos') {
         if (!recebida) throw erro(MSG_ESTUDO.vazio);
@@ -1489,6 +1664,7 @@ export class Contas {
     try {
       transacao(db, () => {
         const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+        let nasceuLinha = false;
         if (tipo === '') {
           if (atual) encerrar(atual.id);
           p.estudoId = '';
@@ -1498,19 +1674,25 @@ export class Contas {
           // sido usado num encontro: aí é o estudo do próximo, e o usado fica para o histórico
           if (atual && String(e.base || '') === atual.id && !this.estudoJaUsado(p, atual, agora)) {
             // o estudo de antes da v19 não tinha autor: quem o muda agora é o líder
-            db.prepare("UPDATE celula_estudos SET tipo = ?, titulo = ?, ref = ?, plano_ate = ?, fonte = ?, blocos = ?, refs = ?, perguntas = ?, traducao = ?, editado_em = ?, "
-              + "criado_por = CASE WHEN criado_por = '' THEN ? ELSE criado_por END WHERE id = ?").run(...valores, quando, p.criadoPor, atual.id);
+            db.prepare("UPDATE celula_estudos SET tipo = ?, titulo = ?, ref = ?, plano_ate = ?, fonte = ?, blocos = ?, refs = ?, perguntas = ?, traducao = ?, combinado = ?, editado_em = ?, "
+              + "criado_por = CASE WHEN criado_por = '' THEN ? ELSE criado_por END WHERE id = ?").run(...valores, combinado === null ? atual.combinado : combinado, quando, p.criadoPor, atual.id);
           } else {
             const novoId = 'e' + randomBytes(6).toString('hex');
-            db.prepare('INSERT INTO celula_estudos (id, proposito, tipo, titulo, ref, plano_ate, fonte, blocos, refs, perguntas, traducao, criado_por, criado_em) '
-              + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(novoId, p.id, ...valores, p.criadoPor, quando);
+            db.prepare('INSERT INTO celula_estudos (id, proposito, tipo, titulo, ref, plano_ate, fonte, blocos, refs, perguntas, traducao, combinado, criado_por, criado_em) '
+              + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(novoId, p.id, ...valores, combinado || '', p.criadoPor, quando);
             if (atual) encerrar(atual.id);
             p.estudoId = novoId;
+            nasceuLinha = true;
             // o histórico de uma célula tem teto: além dele, sai o mais antigo que não é o atual
             db.prepare('DELETE FROM celula_estudos WHERE proposito = ? AND id != ? AND id NOT IN '
               + '(SELECT id FROM celula_estudos WHERE proposito = ? ORDER BY criado_em DESC, id DESC LIMIT ?)').run(p.id, novoId, p.id, ESTUDOS_POR_CELULA);
           }
         }
+        // O estudo novo começa com acolhida, adoração e testemunho vazios (as sugestões da semana),
+        // a não ser que o pedido traga os campos: o testemunho de uma semana, às vezes com nomes, não
+        // passa para a seguinte à vista de visitantes (docs/a-mesa-fase2.md, A5). Mudar o mesmo
+        // estudo e tirar o estudo deixam os três como estão.
+        if (nasceuLinha) Object.assign(p, { estudoAcolhida: '', estudoAdoracao: '', estudoTestemunho: '' });
         Object.assign(p, ws);
         gravarMeta(db, 'contas_versao', this.dados.versao || 2);
         sincronizar(db, paraLinhas(this.dados));
@@ -1527,21 +1709,43 @@ export class Contas {
   // naquele dia. "visitantes" aqui é o contador de pessoas que vieram mas não têm conta no app.
   // semEncontro: "não houve encontro nesta semana" (feriado, imprevisto). Fica registrado
   // para aquela data, sem presenças, e não conta como falta de ninguém.
-  async registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro } = {}, hoje) {
+  // estudo (Fase 2): qual estudo foi usado. Um id precisa ser desta célula (a mãe não) e preparado
+  // até o dia do encontro; '-' é um estudo de fora do app. Sem o campo (o app antigo no cache), vale
+  // o estudo que era o atual no fim daquele dia; com semEncontro, nenhum. Quem conduz troca o estudo
+  // do registro (é quem registra), e trocar não muda estudo nenhum: só diz qual foi usado.
+  // Devolve { p, registro, faltaram }: faltaram são os @ de quem não veio (estudos.mjs, quemFaltou),
+  // para a mensagem pronta que quem conduz decide se manda. Nada sai daqui para ninguém.
+  async registrarEncontro(eu, id, { data, presentes, visitantes, semEncontro, estudo } = {}, hoje, agora = new Date()) {
     const p = this.celulaDeQuemConduz(eu, id);
     const d = String(data || '');
     if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d > hoje || d < somaDias(hoje, -7)) throw erro('escolha o dia do encontro, de hoje até 7 dias atrás');
     const sem = semEncontro === true;
     const n = sem ? 0 : Number(visitantes);
     if (!Number.isInteger(n) || n < 0 || n > 30) throw erro('o número de pessoas sem conta vai de 0 a 30');
+    let ligado = '';
+    if (!sem) {
+      const pedido = estudo === undefined || estudo === null ? '' : String(estudo);
+      const diaDe = this.diaNaCelula(p);
+      if (pedido === '-') ligado = '-';
+      else if (pedido) {
+        const e = pedido.length <= 64 ? this.estudo(pedido) : null;
+        const nasceu = e ? diaDe(e.criadoEm) : '';
+        if (!e || e.proposito !== p.id || !nasceu || nasceu > d) throw erro(MSG_ESTUDO.estudoDoRegistro);
+        ligado = e.id;
+      } else {
+        ligado = estudoDoDia(this.estudosLeves(p.id), d, diaDe);
+      }
+    }
     const validos = new Set(this.ativosDe(p).map((m) => m.usuario));
     const lista = sem ? [] : [...new Set((Array.isArray(presentes) ? presentes : []).map(limparNome))].filter((u) => validos.has(u));
-    const registro = { data: d, visitantes: n, registradoPor: limparNome(eu), em: new Date().toISOString(), presentes: lista, semEncontro: sem };
+    const registradoPor = limparNome(eu);
+    const registro = { data: d, visitantes: n, registradoPor, em: agora.toISOString(), presentes: lista, semEncontro: sem, estudo: ligado };
     const encontros = p.encontros || (p.encontros = []);
     const existente = encontros.find((e) => e.data === d);
     if (existente) Object.assign(existente, registro); else encontros.push(registro);
     await this.salvar();
-    return p;
+    const quemConduz = this.ativosDe(p).map((m) => m.usuario).filter((u) => podeConduzir(p, u));
+    return { p, registro, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, quemConduz, data: d, semEncontro: sem }) };
   }
 
   // Os pedidos de oração e de ajuda que a pessoa deixou naquela célula somem com ela: quem
@@ -1573,7 +1777,7 @@ export class Contas {
   // data, sem perder a ofensiva pessoal (ela é da conta, nunca da célula); a ofensiva da
   // célula nova começa do zero porque ela nasce naquele dia. O auxiliar deixa de ser
   // auxiliar da mãe só porque saiu dela, não por um passo à parte.
-  async multiplicarCelula(eu, id, { auxiliar, titulo, pessoas } = {}, hoje) {
+  async multiplicarCelula(eu, id, { auxiliar, titulo, pessoas } = {}, hoje, agora = new Date()) {
     const mae = this.celulaDoLider(eu, id);
     const tituloLimpo = tituloDigitado(titulo, 'da célula');
     const novoLider = limparNome(auxiliar);
@@ -1592,7 +1796,8 @@ export class Contas {
     const filha = {
       id: filhaId, tipo: 'plano', alvo: '', titulo: tituloLimpo || 'Célula',
       criadoPor: novoLider, criadoEm: hoje, encerradoEm: '', grupo: true, celula: true,
-      mae: mae.id, multiplicadaEm: hoje, membros: [], aprovacoes: [], estudoId: '',
+      // o instante, além do dia (v21): a filha lê os estudos da mãe escritos até ele
+      mae: mae.id, multiplicadaEm: hoje, multiplicadaInstante: agora.toISOString(), membros: [], aprovacoes: [], estudoId: '',
     };
     // Liderar a célula nova é função nova: menor de 18 espera a aprovação da liderança de novo.
     const contaNovoLider = this.achar(novoLider);

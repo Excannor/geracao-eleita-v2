@@ -381,6 +381,94 @@ try {
     ok(status.filter((x) => x === 429).length >= 1 && status.slice(0, 10).every((x) => x === 200), 'gravar o estudo mais de 20 vezes num minuto: 429');
   }
 
+  // ---------- Fase 2: o combinado, o estudo do encontro e os estudos anteriores ----------
+  // docs/a-mesa-fase2.md, seções 3.2 a 3.6 e 9.4
+  console.log('\n  O estudo da célula: guardar (Fase 2)\n');
+  {
+    const liderF = await criar('liderf', { nascimento: '2004-04-05' });
+    const idF = (await dados(await pedir('/api/celula', { acao: 'criar', titulo: 'Guardar' }, liderF.cookie))).proposito.id;
+    const tokenF = new URL((await dados(await pedir('/api/celula', { acao: 'link', id: idF }, liderF.cookie))).link).searchParams.get('celula');
+    const anaF = await criar('anaf', { nascimento: '2004-04-05', celula: tokenF });
+    const veraF = await criar('veraf', { nascimento: '2004-04-05' });
+    await pedir('/api/celula', { acao: 'entrar', token: tokenF, visitante: true }, veraF.cookie);
+    const celulaF = (corpo, cookie) => pedir('/api/celula', { id: idF, ...corpo }, cookie);
+    const retratoF = async (cookie) => (await propositos(cookie)).find((p) => p.id === idF);
+    const estudos = (q, cookie) => pedir('/api/estudos?' + q, null, cookie);
+
+    const comb201 = await celulaF({ ...doDono, combinado: 'x'.repeat(201) }, liderF.cookie);
+    ok(comb201.status === 400 && (await dados(comb201)).erro === 'o combinado tem no máximo 200 caracteres', 'o combinado de 201 caracteres: 400');
+    const s1 = (await dados(await celulaF({ ...doDono, combinado: 'Ligar para alguém que faltou.', testemunho: 'Orem pelo Jonas, que está doente.' }, liderF.cookie))).estudo;
+    ok(s1 && s1.combinado === 'Ligar para alguém que faltou.' && (await retratoF(anaF.cookie)).estudo.combinado === 'Ligar para alguém que faltou.', 'o líder salva o estudo com o combinado, e a célula vê');
+
+    // o registro sem o campo "estudo" (o app antigo): o servidor liga o estudo atual
+    const caixa = () => {
+      const db = new DatabaseSync(join(PASTA, 'caminho.db'), { readOnly: true });
+      try { return db.prepare("SELECT count(*) n FROM push_caixa WHERE usuario IN ('anaf', 'veraf')").get().n; } finally { db.close(); }
+    };
+    const antesDaCaixa = caixa();
+    const reg = await dados(await celulaF({ acao: 'registrarEncontro', data: HOJE, presentes: ['liderf'], visitantes: 1 }, liderF.cookie));
+    ok(reg.ok && reg.encontro && reg.encontro.data === HOJE && reg.encontro.estudo === s1.id && reg.estudo && reg.estudo.id === s1.id
+      && reg.estudo.titulo === 'Batalha espiritual, vigilância e Armadura de Deus' && JSON.stringify(reg.estudo.refs) === JSON.stringify(cartoes(s1)), 'sem o campo, o encontro fica ligado ao estudo atual, e a resposta diz qual');
+    // a Ana entrou hoje: quem entrou no próprio dia do encontro não faltou, a mesma regra de
+    // "Precisam de atenção" (quem não veio, com uma pessoa de verdade, está no teste.mjs e no
+    // teste-estudo-historico, onde as entradas são de dias antes)
+    ok(Array.isArray(reg.faltaram) && reg.faltaram.length === 0, 'a resposta traz quem não veio: ninguém, porque a Ana entrou hoje e a visitante não é cobrada');
+    await dormir(300);
+    ok(caixa() === antesDaCaixa, 'nada chega ao sino de quem faltou: o app não avisa ninguém sozinho');
+    const outraCelula = await celulaF({ acao: 'registrarEncontro', data: HOJE, presentes: [], visitantes: 0, estudo: salvo.estudo.id }, liderF.cookie);
+    ok(outraCelula.status === 400 && (await dados(outraCelula)).erro === 'escolha um estudo desta célula preparado até o dia do encontro', 'com o estudo de outra célula: 400');
+    ok((await celulaF({ acao: 'registrarEncontro', data: HOJE, presentes: [], visitantes: 0, estudo: s1.id }, anaF.cookie)).status === 403, 'membro não registra nem troca o estudo do registro: 403');
+    const fora = await dados(await celulaF({ acao: 'registrarEncontro', data: HOJE, presentes: ['liderf', 'anaf'], visitantes: 1, estudo: '-' }, liderF.cookie));
+    ok(fora.encontro.estudo === '-' && fora.estudo === null && fora.faltaram.length === 0, 'regravar com "outro estudo, fora do app" troca a ligação; com todos presentes, ninguém faltou');
+    const doLiderF = await retratoF(liderF.cookie);
+    ok(doLiderF.registro && doLiderF.registro.dias.length === 8 && doLiderF.registro.dias[0].estudo === '-' && doLiderF.registro.dias[0].padrao === s1.id
+      && doLiderF.registro.estudos.length === 1 && doLiderF.registro.estudos[0].id === s1.id && doLiderF.ultimoEncontro.estudo === null,
+    'quem conduz recebe a folha de registro: os 8 dias, com o estudo de cada um, e os estudos para escolher');
+    ok(!('registro' in (await retratoF(anaF.cookie))) && !('registro' in (await retratoF(veraF.cookie))), 'membro e visitante não recebem a folha de registro');
+    await celulaF({ acao: 'registrarEncontro', data: HOJE, presentes: ['liderf'], visitantes: 1, estudo: s1.id }, liderF.cookie);
+    ok((await retratoF(liderF.cookie)).ultimoEncontro.estudo.id === s1.id, 'o último encontro leva o estudo, para a mensagem de quem faltou');
+
+    // o próximo estudo: linha nova, os 4 Ws vazios, e o combinado de antes na acolhida
+    const s2 = (await dados(await celulaF({ acao: 'estudo', estudo: 'trecho', ref: 'Romanos 8.28-30', base: s1.id, combinado: 'Orar todo dia por alguém que ainda não conhece Jesus.' }, liderF.cookie))).estudo;
+    ok(s2 && s2.id !== s1.id, 'com o estudo usado, salvar cria o próximo');
+    const daAnaF = await retratoF(anaF.cookie);
+    const daVeraF = await retratoF(veraF.cookie);
+    ok(daAnaF.estudoTestemunho === '' && daAnaF.estudoAcolhida === '' && !JSON.stringify(daVeraF).includes('Orem pelo Jonas'), 'o estudo novo zera os 4 Ws: o testemunho com nomes não passa para a semana seguinte');
+    ok(JSON.stringify(daAnaF.combinadoAnterior) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: HOJE, estudo: s1.id }), 'a Ana recebe "na semana passada combinamos" com o combinado de antes');
+    ok(daVeraF.combinadoAnterior === null, 'a visitante não recebe o combinado de antes: ele é do estudo anterior, e ela vê só o atual');
+    ok(daAnaF.temAnteriores === true && daVeraF.temAnteriores === false && daAnaF.daMae === null && daVeraF.daMae === null, 'só quem faz parte da célula fica sabendo que há estudos anteriores');
+
+    // GET /api/estudos: a lista e a leitura
+    const listaAna = await estudos('celula=' + idF, anaF.cookie);
+    const corpoLista = await dados(listaAna);
+    ok(listaAna.status === 200 && corpoLista.estudos.length === 1 && corpoLista.estudos[0].id === s1.id && corpoLista.estudos[0].dataDe === 'encontro' && corpoLista.estudos[0].data === HOJE
+      && corpoLista.estudos[0].criadoPorNome === 'liderf' && corpoLista.mais === false && corpoLista.celula.titulo === 'Guardar', 'a Ana lê a lista de estudos anteriores');
+    ok(!('blocos' in corpoLista.estudos[0]) && !('fonte' in corpoLista.estudos[0]) && !('combinado' in corpoLista.estudos[0]) && !/pessoas|encontros/.test(JSON.stringify(corpoLista)),
+      'a lista não leva o estudo inteiro, nem o combinado, nem a presença');
+    const listaVera = await estudos('celula=' + idF, veraF.cookie);
+    ok(listaVera.status === 403 && (await dados(listaVera)).erro === 'quem está conhecendo a célula vê só o estudo atual', 'a visitante recebe 403 na lista');
+    ok((await estudos('celula=' + idF, ana.cookie)).status === 404 && (await estudos('celula=' + idF)).status === 401 && (await estudos('celula=nenhuma', anaF.cookie)).status === 404,
+      'de fora da célula, 404; sem entrar, 401');
+    ok((await estudos('celula=' + idF + '&de=mae', anaF.cookie)).status === 404 && (await estudos('celula=' + idF + 'x'.repeat(60), anaF.cookie)).status === 404,
+      'a lista da célula de origem, numa célula sem mãe, e um id de célula comprido demais: 404');
+    ok((await pedir('/api/estudos?celula=' + idF, {}, anaF.cookie)).status === 405, 'a rota só lê: POST dá 405');
+
+    const lerS1 = async (cookie, extra = '') => { const r = await estudos('estudo=' + s1.id + extra, cookie); return { status: r.status, corpo: await dados(r) }; };
+    const doLiderS1 = await lerS1(liderF.cookie);
+    ok(doLiderS1.status === 200 && doLiderS1.corpo.celula === idF && doLiderS1.corpo.atual === false && doLiderS1.corpo.usarComoBase === true && doLiderS1.corpo.estudo.fonte
+      && !/A nossa luta|Fortaleça-se/.test(doLiderS1.corpo.estudo.fonte) && doLiderS1.corpo.estudo.combinado === 'Ligar para alguém que faltou.'
+      && JSON.stringify(doLiderS1.corpo.encontros) === JSON.stringify([{ data: HOJE, pessoas: 2 }]),
+    'o líder abre o anterior com "Usar como base" e a fonte limpa, e vê quantas pessoas vieram');
+    const daAnaS1 = await lerS1(anaF.cookie, '&celula=' + idF);
+    ok(daAnaS1.status === 200 && daAnaS1.corpo.usarComoBase === false && !('fonte' in daAnaS1.corpo.estudo) && daAnaS1.corpo.encontros.length === 0 && daAnaS1.corpo.estudo.blocos.length === 32,
+      'a Ana lê o anterior, sem a fonte e sem a presença');
+    ok(![doLiderS1, daAnaS1].some((r) => /Orem pelo Jonas|estudoAcolhida|estudoTestemunho/.test(JSON.stringify(r.corpo))), 'nenhuma leitura leva acolhida, adoração ou testemunho');
+    ok((await lerS1(veraF.cookie)).status === 403 && (await lerS1(ana.cookie)).status === 404 && (await estudos('estudo=enada', anaF.cookie)).status === 404,
+      'a visitante recebe 403 no anterior; de fora, ou um estudo que não existe, 404');
+    const atualDaVera = await dados(await estudos('estudo=' + s2.id, veraF.cookie));
+    ok(atualDaVera.atual === true && atualDaVera.estudo.id === s2.id && atualDaVera.estudo.combinado === 'Orar todo dia por alguém que ainda não conhece Jesus.', 'a visitante lê o estudo atual pela rota também');
+  }
+
   // ---------- quem precisa de atenção ----------
   console.log('\n  Quem precisa de atenção\n');
 

@@ -89,6 +89,8 @@
 .tela-modo-encontro .cena.mesa-topo { padding-bottom: 28px; }
 .mesa-topo .mesa-titulo-cena { margin: 4px 0 0; color: var(--folha-tinta); font-size: 1.625rem; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
 .mesa-topo .frase-cena.mesa-frase { font-size: 1.5rem; }
+/* a frase longa (o combinado perto do teto) desce de tamanho e cabe acima do rodapé a 360 px */
+.mesa-topo .frase-cena.mesa-frase.longa { font-size: 1.25rem; }
 .mesa-topo .mesa-abrir { margin-top: 8px; background: var(--folha-destaque); color: var(--tinta-forte); }
 /* no escuro, o fundo do campo (o da tela cheia) é o mesmo da folha do alto e o botão deixava de
    parecer botão: a pílula de destaque da folha, a sálvia com a tinta dela. O seletor precisa
@@ -125,3 +127,88 @@
 /* o texto continua embaixo da barra: um degradê avisa */
 .tela-modo-encontro .tela-cheia-pe.mesa-pe { position: relative; }
 .tela-modo-encontro .tela-cheia-pe.mesa-pe::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 48px; background: linear-gradient(to bottom, color-mix(in srgb, var(--fundo) 0%, transparent), var(--fundo)); pointer-events: none; }
+
+/* ---------- Fase 2: guardar (docs/a-mesa-fase2.md, seção 4) ---------- */
+/* o combinado da semana passada, no alto da Acolhida: sálvia pálido, sem nada para marcar */
+.mesa-combinado { padding: 14px 16px; border-radius: var(--raio-cartao); background: var(--salvia-palido); }
+.mesa-combinado p { margin: 0; color: var(--tinta-forte); font-size: 1rem; font-weight: 600; line-height: 1.5; text-wrap: pretty; }
+.mesa-combinado b { font-weight: 800; }
+/* Minha anotação neste estudo: o bloco de notas de sempre (07g-anotacoes.js) */
+.mesa-anotacao { display: grid; gap: 12px; }
+.mesa-anotacao > .titulo-secao { margin: 8px 0 0; }
+.mesa-anotacao > .aviso-privado { margin-top: 0; }
+/* no estudo, o cartão mostra o começo da anotação: o resto abre no toque (a tela pode estar à vista) */
+.mesa-anotacao .texto-anot { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+/* Estudos anteriores: a lista num cartão só, uma linha por estudo, como "No plano" */
+.mesa-secao-anteriores { display: grid; gap: 12px; }
+.mesa-secao-anteriores > .titulo-secao { margin: 20px 0 0; }
+.mesa-secao-anteriores > .passo-dica, .mesa-secao-anteriores [data-lista-propria] > .passo-dica, .mesa-secao-anteriores [data-lista-mae] > .passo-dica { margin: 0; }
+.mesa-secao-anteriores [data-lista-propria], .mesa-secao-anteriores [data-lista-mae] { display: grid; gap: 12px; }
+.mesa-anteriores { display: grid; border-radius: var(--raio-cartao); background: var(--cartao); overflow: hidden; }
+.mesa-anterior { display: grid; grid-template-columns: 44px minmax(0, 1fr) 24px; align-items: center; gap: 14px; min-height: 72px; padding: 10px 14px; color: var(--tinta-forte); text-decoration: none; }
+.mesa-anterior + .mesa-anterior { border-top: 1px solid var(--contorno); }
+.mesa-anterior:active { background: var(--campo); }
+.mesa-anterior > svg:first-child { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--campo); color: var(--tinta-forte); }
+.mesa-anterior > svg:last-child { width: 20px; height: 20px; color: var(--tinta-fraca); }
+.mesa-anterior > span { display: grid; gap: 2px; min-width: 0; }
+.mesa-anterior b { font-size: 1rem; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; text-wrap: pretty; }
+.mesa-anterior small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.35; }
+.mesa-secao-anteriores .botao.pequeno { justify-self: start; }
+/* sem estudo atual, o vazio de sempre e a seção logo embaixo, sem o vão do respiro do vazio */
+.painel-celula > .vazio-amigos:has(+ .mesa-secao-anteriores) { padding-bottom: 8px; }
+/* ler um anterior: o voltar, a etiqueta e a presença (só quem conduz) */
+.mesa-volta { display: flex; }
+.mesa-volta .voltar { margin: 0; }
+.mesa-cabeca-anterior { display: grid; gap: 4px; }
+.mesa-cabeca-anterior .etiqueta { color: var(--salvia-texto); font-size: .8125rem; }
+.mesa-cabeca-anterior .passo-dica { margin: 0; color: var(--tinta-forte); font-weight: 600; }
+.mesa-presenca { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: start; gap: 14px; padding: 16px 18px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.mesa-presenca > svg { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.mesa-presenca > span { display: grid; gap: 4px; align-self: center; }
+.mesa-presenca .mesa-veio { color: var(--tinta-forte); font-size: 1rem; font-weight: 500; line-height: 1.4; }
+.mesa-presenca small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+/* o modo encontro: a pergunta da acolhida embaixo do combinado lembrado */
+.mesa-convite > span { display: grid; gap: 4px; }
+.mesa-convite > span > .etiqueta { color: var(--salvia-texto); font-size: .8125rem; }
+/* Quem não veio: a prévia de "Mandar no grupo" e uma linha por pessoa */
+.folha-faltou .mesa-faltou { margin-top: 12px; }
+.folha-faltou .mesa-faltou .linha-amigo { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; }
+.mesa-faltou-acoes { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.mesa-faltou-acoes .botao-whatsapp { flex: 1 1 auto; justify-content: center; }
+/* quando o "Copiar" desce de linha (a 360 px), ele ocupa a linha inteira em vez de ficar sozinho à esquerda */
+.mesa-faltou-acoes .botao { flex: 1 1 auto; min-height: 44px; }
+.folha-faltou .mesa-zap { margin: 0; max-width: 100%; }
+
+/* ---------- a impressão: tinta preta em papel branco, nos dois temas, sem as barras do app ---------- */
+.mesa-impressao { display: none; }
+@media print {
+  @page { size: A4; margin: 16mm 15mm 18mm; }
+  html:has(body.imprimindo-estudo), body.imprimindo-estudo { background: #fff !important; }
+  body.imprimindo-estudo > :not(.mesa-impressao) { display: none !important; }
+  body.imprimindo-estudo .mesa-impressao { display: block; color: #111; background: #fff; font: 500 11pt/1.5 Manrope, system-ui, sans-serif; }
+  .mesa-impressao h1, .mesa-impressao h2, .mesa-impressao h3 { break-after: avoid; margin: 0; color: #000; }
+  .mesa-impressao .imp-cabeca { margin: 0 0 6pt; color: #333; font-size: 9pt; font-weight: 600; }
+  .mesa-impressao .imp-titulo { font-size: 20pt; font-weight: 800; line-height: 1.2; }
+  .mesa-impressao .imp-plano, .mesa-impressao .imp-dica { margin: 4pt 0 0; color: #333; font-size: 9.5pt; }
+  .mesa-impressao .imp-parte { margin-top: 14pt; }
+  .mesa-impressao .imp-parte > h2 { margin-bottom: 4pt; color: #333; font-size: 9pt; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .mesa-impressao h3 { margin: 10pt 0 4pt; font-size: 12.5pt; font-weight: 800; }
+  .mesa-impressao p { margin: 0 0 6pt; }
+  .mesa-impressao .imp-cartao { margin: 6pt 0 8pt; padding: 8pt 10pt; border: 1pt solid #999; border-radius: 6pt; }
+  .mesa-impressao .imp-cartao blockquote { margin: 0; font-family: Literata, Georgia, serif; font-size: 11pt; }
+  .mesa-impressao .imp-cartao figcaption { margin-top: 4pt; color: #333; font-size: 9pt; font-weight: 700; }
+  .mesa-impressao ul, .mesa-impressao ol { margin: 4pt 0 8pt; padding-left: 16pt; }
+  .mesa-impressao .imp-seta { padding-left: 0; list-style: none; }
+  .mesa-impressao .imp-citacao { margin: 6pt 0; padding-left: 10pt; border-left: 1.5pt solid #999; font-style: italic; }
+  .mesa-impressao .imp-citacao cite { display: block; font-style: normal; font-size: 9pt; }
+  .mesa-impressao .imp-guardar { margin: 10pt 0; padding: 4pt 0 4pt 10pt; border-left: 1.5pt solid #111; }
+  .mesa-impressao .imp-guardar span { color: #333; font-size: 9pt; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .mesa-impressao .imp-guardar p { margin: 2pt 0 0; font-size: 13pt; font-weight: 800; }
+  .mesa-impressao .imp-lembrar { padding: 6pt 8pt; border: 1pt solid #999; border-radius: 6pt; }
+  .mesa-impressao .imp-cartao, .mesa-impressao .imp-guardar, .mesa-impressao li { break-inside: avoid; }
+  .mesa-impressao .imp-pe { margin-top: 18pt; padding-top: 6pt; border-top: 1pt solid #bbb; color: #333; font-size: 8.5pt; }
+  .mesa-impressao .imp-pe p { margin: 0; }
+}
+/* o botão da anotação é secundário: o principal da aba continua "Mandar no grupo" */
+.mesa-anotacao .escrever-contexto { background: var(--cartao); color: var(--tinta-forte); }
+.mesa-anotacao .escrever-contexto:hover { background: var(--campo); }

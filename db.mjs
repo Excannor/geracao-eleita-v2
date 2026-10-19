@@ -292,6 +292,32 @@ const ESQUEMA = [
     FROM propositos WHERE celula = 1 AND estudo_tipo != '';
   UPDATE propositos SET estudo_id = 'l' || id WHERE celula = 1 AND estudo_tipo != '';
   `,
+  // v20: o estudo da célula guarda (À Mesa, Fase 2, docs/a-mesa-fase2.md). O combinado para a
+  // semana mora no estudo e vai para o histórico com o título, a Palavra e as perguntas (acolhida,
+  // adoração e testemunho continuam em propositos e não vão). Cada encontro registrado guarda qual
+  // estudo foi usado: o id de celula_estudos, '-' para um estudo de fora do app, ou '' quando não
+  // se sabe (os registros de antes da v20 e a semana sem encontro). Os encontros antigos ficam com
+  // '': deduzir o estudo de cada um pelo período seria palpite.
+  `
+  ALTER TABLE celula_estudos ADD COLUMN combinado TEXT NOT NULL DEFAULT '';
+  ALTER TABLE celula_encontros ADD COLUMN estudo TEXT NOT NULL DEFAULT '';
+  `,
+  // v21: a filha de uma multiplicação guarda também o instante dela (multiplicada_instante, ISO),
+  // além do dia. A filha lê os estudos da mãe escritos até esse instante, e não o que a mãe
+  // preparou ou mudou depois, no mesmo dia inclusive (estudos.mjs, daMaeAteOCorte). As filhas de
+  // antes ficam com '' e seguem pelo dia.
+  `
+  ALTER TABLE propositos ADD COLUMN multiplicada_instante TEXT NOT NULL DEFAULT '';
+  `,
+  // v22: os estudos que já estavam guardados quando o histórico passou a existir (os da Fase 1 e os
+  // de antes da v19) ganham a marca antes_do_historico. Quando deixam de ser o atual, ficam só para
+  // quem estava na célula enquanto eles eram o atual: foram escritos quando ninguém mais os via, e
+  // abrir para quem entrou depois ampliaria o que essas pessoas veem sem o aviso que a política
+  // promete (privacidade, seção 15). Os estudos gravados daqui em diante nascem sem a marca.
+  `
+  ALTER TABLE celula_estudos ADD COLUMN antes_do_historico INTEGER NOT NULL DEFAULT 0;
+  UPDATE celula_estudos SET antes_do_historico = 1;
+  `,
 ];
 
 function migrarEsquema(db) {

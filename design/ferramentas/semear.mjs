@@ -108,9 +108,15 @@ if (c.proposito) {
   await api('marcos', 'api/celula', { acao: 'recado', id, texto: 'Quinta às 20h na casa da Ana. Tragam a Bíblia!' });
   // O estudo do dono (À Mesa), como o líder o colaria, com "Para guardar" na última linha: a aba
   // Estudo, "Mandar no grupo" e o modo encontro aparecem cheios na revisão de telas.
+  // Antes dele, um estudo anterior (Fase 2, docs/a-mesa-fase2.md): um trecho com o combinado,
+  // usado no encontro de hoje. Assim a lista de Estudos anteriores, a leitura de um anterior e a
+  // Acolhida com "Na semana passada combinamos" também aparecem. (Pela API, o encontro só pode
+  // ser de um dia em que o estudo já existia: o de hoje.)
+  const antes = await api('marcos', 'api/celula', { acao: 'estudo', id, estudo: 'trecho', ref: 'Romanos 8.28-30', fonte: '', traducao: 'nbv', combinado: 'Ligar para alguém que faltou.' });
+  if (antes.estudo) await api('marcos', 'api/celula', { acao: 'registrarEncontro', id, data: HOJE, presentes: ['marcos', 'ana'], visitantes: 1, estudo: antes.estudo.id });
   const linhas = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'ferramentas', 'estudo-exemplo.txt'), 'utf8').replace(/\s+$/, '').split('\n');
   linhas[linhas.length - 1] = 'Para guardar: ' + linhas[linhas.length - 1];
-  await api('marcos', 'api/celula', { acao: 'estudo', id, estudo: 'blocos', fonte: linhas.join('\n'), traducao: 'nbv' });
+  await api('marcos', 'api/celula', { acao: 'estudo', id, estudo: 'blocos', fonte: linhas.join('\n'), traducao: 'nbv', base: '', combinado: 'Orar todo dia por alguém que ainda não conhece Jesus.' });
 }
 
 // Discipulado: marcos conduz o davi

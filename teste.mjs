@@ -16,6 +16,8 @@ import {
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import {
   ESTUDO_MAX, ESTUDO_BRUTO_MAX, ESTUDOS_POR_CELULA, estudoUsado, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
+  COMBINADO_MAX, JANELA_COMBINADO, limparCombinado, estudoDoDia, dataNoHistorico, encontrosDoEstudo, combinadoDoAnterior, acessoAoEstudo, quemFaltou,
+  itemDoHistorico, estudoDoRegistro, cursorDe, lerCursor, daMaeAteOCorte, encontrosAteOCorte,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
 
@@ -365,6 +367,10 @@ secao('peças sob demanda');
       'a peça estudo-celula leva as regras (estudo-regras.js) antes da tela');
     checar(preparo.includes('CC.lerEstudo =') && preparo.includes('CC.estudoPreparo =') && preparo.indexOf('CC.lerEstudo =') < preparo.indexOf('CC.estudoPreparo ='),
       'a peça estudo-preparo leva o leitor de marcas (estudo-marcas.js) antes do editor');
+    // Fase 2: a lista e a leitura dos estudos anteriores, "Quem não veio" e a impressão moram na peça
+    checar(celula.includes('mesa-anteriores') && celula.includes('paraQuemFaltou') && celula.includes('@media print') && !html.includes('mesa-anteriores') && !html.includes('mesa-impressao'),
+      'os estudos anteriores, "Quem não veio" e a impressão estão na peça estudo-celula, fora do index.html');
+    checar(preparo.includes('data-combinado') && !html.includes('data-combinado'), 'o campo do combinado está na peça do preparo, fora do index.html');
     checar(!/folhaPrepararEstudo|montarEstudo|estudoEmTexto|semanaDoEstudo|PERGUNTAS_ACOLHIDA/.test(html) && html.includes('CC.apoioCelula'),
       'o estudo antigo (preparar, montar, texto do grupo) saiu do index.html; fica a casca');
   }
@@ -855,6 +861,13 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
   checar(zerado.parabolasLidas.semeador === '2026-10-01', 'zerar o progresso não apaga as parábolas lidas');
   const comNota = CC.normalizarEstado({ atualizadoEm: 1, notas: { n1: { versos: [], tipo: 'nota', texto: 'na mesa', criadaEm: 1, editadaEm: 1, contexto: 'parabola:grande-banquete' } } });
   checar(comNota.notas.n1.contexto === 'parabola:grande-banquete', 'a nota escrita numa parábola guarda o contexto "parabola:<slug>"');
+  // À Mesa, Fase 2 (docs/a-mesa-fase2.md, 4.9): a anotação num estudo da célula guarda o lugar
+  // "estudo:<id>". O servidor roda esta mesma limpeza (REGRAS.normalizarEstado): sem o "estudo:"
+  // na lista, a nota perderia o lugar na sincronização.
+  const doEstudo = CC.normalizarEstado({ atualizadoEm: 1, notas: { n2: { versos: [], tipo: 'nota', titulo: 'Batalha espiritual', texto: 'só minha', criadaEm: 1, editadaEm: 1, contexto: 'estudo:e3f9a1c2b7d4' },
+    n3: { versos: [], tipo: 'nota', texto: 'x', criadaEm: 1, editadaEm: 1, contexto: 'outra:coisa' } } });
+  checar(doEstudo.notas.n2.contexto === 'estudo:e3f9a1c2b7d4' && doEstudo.notas.n3.contexto === '', 'a nota escrita num estudo da célula guarda o contexto "estudo:<id>" (e um lugar desconhecido, não)');
+  checar(CC.normalizarEstado(doEstudo).notas.n2.contexto === 'estudo:e3f9a1c2b7d4', 'o contexto "estudo:" passa por uma segunda limpeza (a do servidor) sem sumir');
 }
 const antigo = CC.normalizarEstado({ atualizadoEm: 1, lidos: [7], trilha: ['z'], meta: 20, protegidos: ['2026-01-01'] });
 checar(antigo.licoes[0] === 'z' && antigo.meta === undefined && antigo.protegidos === undefined, 'estado antigo é lido sem meta nem protetor guardado');
@@ -1020,6 +1033,9 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   const conta = CC.CONQUISTAS.find((c) => c.id === 'notas').valor;
   checar(conta({ notas: { a: n('x', 1), b: n('y', 1, { apagadaEm: 2 }), c: { ...n('z', 1), versos: [] } }, anotacoes: { 'verso:Jó 1.1': 'velha' } }) === 2,
     'a conquista do caderno conta as notas vivas em versículo (e as do formato antigo)');
+  // a anotação num estudo da célula não vale ponto, nem com um versículo ligado à mão
+  checar(conta({ notas: { a: n('x', 1), e: { ...n('estudo', 1), contexto: 'estudo:e3f9a1c2b7d4' }, f: { ...n('sem verso', 1), versos: [], contexto: 'estudo:e3f9a1c2b7d4' } } }) === 1,
+    'a conquista do caderno não conta a anotação num estudo da célula, nem com versículo ligado');
   E.notas = {}; E.marcas = {}; E.oia = {}; E.anotacoes = {};
 }
 
@@ -1155,6 +1171,29 @@ runInContext(readFileSync(join(AQUI, 'src', 'app', '08b-propositos.js'), 'utf8')
   checar(CC.oreHojePor([{ usuario: 'so', nome: 'Só' }], '2026-01-01', 1).length === 1, 'com um candidato só, a sugestão é ele mesmo');
 }
 
+// --- célula: a mensagem pronta para quem faltou e as de cuidado (08b-propositos.js) ---
+// docs/a-mesa-fase2.md, 5.3 e 6.1: cita o estudo pela referência (nunca o texto bíblico), sem gíria.
+{
+  const fecho = ' Está tudo bem com você? Posso orar por alguma coisa?';
+  const ler = ' O estudo está na aba Estudo da célula, no app, se você quiser ler.';
+  const blocos = { tipo: 'blocos', titulo: 'Batalha espiritual, vigilância e Armadura de Deus', refs: ['Efésios 6.12', 'Lucas 11.24-26'] };
+  checar(CC.recadoFaltou({ nome: 'Bia Souza', celula: 'Célula Esperança', quando: 'de quinta', estudo: blocos })
+    === 'Oi, Bia! Sentimos sua falta no encontro de quinta. Estudamos \u201cBatalha espiritual, vigilância e Armadura de Deus\u201d, em Efésios 6.' + ler + fecho,
+  'recadoFaltou(): o estudo escrito, com o título entre aspas e o primeiro capítulo');
+  checar(CC.recadoFaltou({ nome: 'Bia', celula: 'Célula Esperança', quando: 'de hoje', estudo: { tipo: 'semana', titulo: '', refs: [] } })
+    === 'Oi, Bia! Sentimos sua falta no encontro de hoje. Estudamos a leitura da semana do plano.' + ler + fecho, 'recadoFaltou(): a leitura da semana');
+  checar(CC.recadoFaltou({ nome: 'Bia', celula: 'Célula Esperança', quando: 'de ontem', estudo: { tipo: 'trecho', titulo: 'Romanos 8.28-30', refs: ['Romanos 8.28-30'] } })
+    === 'Oi, Bia! Sentimos sua falta no encontro de ontem. Estudamos Romanos 8.28-30.' + ler + fecho, 'recadoFaltou(): um trecho');
+  checar(CC.recadoFaltou({ nome: 'Bia', celula: 'Célula Esperança', quando: '', estudo: null }) === 'Oi, Bia! Sentimos sua falta no encontro da Célula Esperança.' + fecho
+    && CC.recadoFaltou({ nome: 'Bia', celula: 'Jovens', estudo: null }) === 'Oi, Bia! Sentimos sua falta no encontro da célula.' + fecho, 'recadoFaltou(): sem estudo e sem quando, o nome da célula, como antes');
+  checar(CC.recadoFaltou({ nome: 'Bia', celula: 'Célula Esperança', estudo: blocos }).startsWith('Oi, Bia! Sentimos sua falta no encontro da Célula Esperança. Estudamos'), 'recadoFaltou(): sem quando, com o estudo');
+  const p = { titulo: 'Célula Esperança', ultimoEncontro: { estudo: blocos } };
+  checar(CC.recadoDeCuidado(p, { nome: 'Caio Lima', gatilhos: [{ tipo: 'faltou' }] }) === CC.recadoFaltou({ nome: 'Caio', celula: 'Célula Esperança', estudo: blocos }), 'Precisam de atenção: quem faltou recebe a mesma mensagem, com o estudo do último encontro');
+  checar(CC.recadoDeCuidado(p, { nome: 'Caio', gatilhos: [{ tipo: 'ofensiva' }] }) === 'Oi, Caio! Vi que a sua sequência de leitura parou, depois de tantos dias seguidos. Está tudo bem por aí? Se quiser, recomeçamos juntos.'
+    && CC.recadoDeCuidado(p, { nome: 'Caio', gatilhos: [{ tipo: 'semLer' }] }) === 'Oi, Caio! Passando para saber como você está. Que tal voltar a ler junto com a gente?',
+  'Precisam de atenção: a ofensiva que parou e os dias sem ler, sem "Bora" e sem "tempão"');
+}
+
 
 // --- o estudo da célula: as regras puras (src/sob-demanda/estudo-regras.js) ---
 // docs/a-mesa-fase1.md, seção 6.2. O estudo do dono como o servidor o guarda: o texto colado do
@@ -1259,6 +1298,75 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   for (const f of ['estudo-regras.js', 'estudo-celula.js', 'estudo-preparo.js']) {
     checar(!/[—–]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', f), 'utf8')), f + ': sem travessão nem meia-risca no texto');
   }
+
+  // ---------- Fase 2 (docs/a-mesa-fase2.md, 9.2, itens 16 a 20) ----------
+  // 16. refsCurtas()
+  checar(R.refsCurtas(dono.refs) === 'Ef 6, Lc 11, 1Pe 5', 'refsCurtas(): o estudo do dono dá "Ef 6, Lc 11, 1Pe 5" (' + R.refsCurtas(dono.refs) + ')');
+  checar(R.refsCurtas(['João 3.16', 'Romanos 8.28', 'Salmos 23', 'João 3.17', 'Gênesis 1.1', '1 Coríntios 13.4']) === 'Jo 3, Rm 8, Sl 23 e mais 2', 'refsCurtas(): cinco capítulos dão os três primeiros e " e mais 2"');
+  checar(R.refsCurtas([]) === '' && R.refsCurtas() === '', 'refsCurtas(): sem referências, vazio');
+  // 17. lembrarCombinado()
+  checar(R.lembrarCombinado('Ligar para alguém') === 'Na semana passada combinamos: \u201cLigar para alguém.\u201d Como foi?', 'lembrarCombinado(): o combinado vai entre aspas, e sem ponto ganha o ponto');
+  checar(R.lembrarCombinado('Ligar para alguém.') === 'Na semana passada combinamos: \u201cLigar para alguém.\u201d Como foi?', 'lembrarCombinado(): com ponto, não fica com dois');
+  checar(R.lembrarCombinado('Quem vamos visitar?') === 'Na semana passada combinamos: \u201cQuem vamos visitar?\u201d Como foi?', 'lembrarCombinado(): a interrogação fica');
+  // 18. passos() com o combinado de antes e o desta semana
+  {
+    const comb = { ...dono, combinado: 'Orar todo dia por alguém que ainda não conhece Jesus.' };
+    const ps2 = R.passos(comb, { conduzo: true, acolhida: 'Qual foi a melhor parte da sua semana?', adoracao: 'A', testemunho: 'T', combinadoAnterior: 'Ligar para alguém que faltou.' });
+    checar(ps2[0].frase === 'Na semana passada combinamos: \u201cLigar para alguém que faltou.\u201d Como foi?' && ps2[0].pergunta === 'Qual foi a melhor parte da sua semana?',
+      'passos(): com o combinado de antes, a acolhida começa por ele, e a pergunta da acolhida vai junto');
+    const iSemana = ps2.findIndex((x) => x.etiqueta === 'Para a semana');
+    checar(iSemana > 0 && ps2[iSemana + 1].etiqueta === 'Orar juntos' && ps2[iSemana].frase === comb.combinado && ps2.length === 16, 'passos(): "Para a semana" fica logo antes de "Orar juntos"');
+    const ps3 = R.passos(dono, { conduzo: true });
+    checar(ps3.length === 15 && !ps3[0].pergunta && JSON.stringify(ps3.map((x) => x.etiqueta)) === JSON.stringify(ETIQUETAS), 'passos(): o estudo do dono, sem combinado, continua com os 15 passos de sempre');
+    // 19. textoParaGrupo() com o combinado
+    const zapComb = R.textoParaGrupo(comb, { data: 'quinta, 22/10', principal, endereco: 'https://exemplo.app' }).split('\n');
+    const iComb = zapComb.indexOf('*Combinado para a semana:* ' + comb.combinado);
+    checar(iComb > 0 && zapComb[iComb - 1] === '' && /^2\. /.test(zapComb[iComb - 2]), 'textoParaGrupo(): o combinado vem depois das perguntas, com uma linha em branco antes');
+    checar(R.textoParaGrupo(dono, { data: 'quinta, 22/10', principal, endereco: 'https://exemplo.app' }) === zap && !zap.includes('Combinado'), 'textoParaGrupo(): sem combinado, o texto continua o de sempre (estudo-exemplo-grupo.txt)');
+    // 20. paraImprimir()
+    const textos = new Map(dono.refs.map((r) => [r, 'TEXTO ' + r]));
+    const ctx = { celula: 'Célula Esperança', linha: 'Encontro de quinta, 22/10' + ' \u00b7 preparado por Marcos', textos, sigla: 'NBV', credito: ['Nova Bíblia Viva', 'Biblica'], acolhida: 'ACOLHIDA X', adoracao: 'ADORACAO X', testemunho: 'TESTEMUNHO X', combinadoAnterior: 'Ligar para alguém que faltou', noPlano: [{ numero: 244, capitulo: 'Efésios 6' }] };
+    const imp = R.paraImprimir(comb, ctx);
+    checar(imp.includes('<h1 class="imp-titulo">' + CC.esc(dono.titulo)) && dono.refs.every((r) => imp.includes('TEXTO ' + r) && imp.includes(r + ' \u00b7 NBV'))
+      && R.perguntasDe(comb).every((q) => imp.includes('<li>' + CC.esc(q) + '</li>')) && imp.includes(comb.combinado) && imp.includes('Nova Bíblia Viva') && imp.includes('Efésios 6 é o dia 244 do plano'),
+      'paraImprimir(): o título, cada cartão com o texto passado, as perguntas, o combinado, "No plano" e o crédito');
+    checar(imp.includes('<b>Na semana passada combinamos:</b> \u201cLigar para alguém que faltou.\u201d Como foi?') && imp.indexOf('ACOLHIDA X') < imp.indexOf('ADORACAO X') && imp.indexOf('ADORACAO X') < imp.indexOf('<h2>Palavra</h2>')
+      && imp.indexOf('<h2>Combinado para a semana</h2>') < imp.indexOf('TESTEMUNHO X'), 'paraImprimir(): o atual leva Acolhida (com o combinado de antes), Adoração, Palavra, Para conversar, Combinado e Testemunho, nessa ordem');
+    const impAnt = R.paraImprimir(comb, { ...ctx, anterior: true });
+    checar(!/ACOLHIDA X|ADORACAO X|TESTEMUNHO X|Na semana passada|<h2>Acolhida|<h2>Testemunho/.test(impAnt) && impAnt.includes('<h2>Palavra</h2>') && impAnt.includes(comb.combinado),
+      'paraImprimir(): o anterior não tem acolhida, adoração, testemunho nem "Na semana passada"');
+    const impMal = R.paraImprimir({ tipo: 'blocos', titulo: '<script>alert(1)</script>', blocos: [{ t: 'texto', texto: '<img src=x onerror=1>' }], perguntas: ['<b>q</b>'], combinado: '<i>c</i>' }, { celula: '<s>', textos: {} });
+    checar(!/<script|<img|<i>|<s>|<b>q/.test(impMal) && impMal.includes('&lt;script&gt;'), 'paraImprimir(): <script> e as outras marcas saem escapadas');
+    // (o texto do líder pode ter travessão, e fica como ele escreveu: o que se confere é o que a impressão acrescenta)
+    const todasAsPartes = { tipo: 'blocos', titulo: 'T', combinado: 'C', perguntas: ['P?'], blocos: [{ t: 'texto', texto: 'a' }, { t: 'topico', n: 1, texto: 'b' }, { t: 'versiculo', ref: 'João 3.16' },
+      { t: 'seta', itens: [['x', 'y']] }, { t: 'citacao', texto: 'z', autor: 'w' }, { t: 'conclusao' }, { t: 'guardar', texto: 'g' }] };
+    const impTodas = R.paraImprimir(todasAsPartes, { ...ctx, textos: { 'João 3.16': 'T' } }) + R.paraImprimir(todasAsPartes, { ...ctx, anterior: true });
+    checar(!/[\u2013\u2014]/.test(impTodas) && /imp-seta/.test(impTodas) && /imp-guardar/.test(impTodas), 'paraImprimir(): a impressão não acrescenta travessão nem meia-risca');
+    const impTrecho = R.paraImprimir({ tipo: 'trecho', ref: 'Romanos 8.28-30', titulo: 'Romanos 8.28-30', refs: ['Romanos 8.28-30'], texto: '', perguntas: [], combinado: 'Orar todo dia' }, { ...ctx, textos: { 'Romanos 8.28-30': 'T' } });
+    checar(impTrecho.indexOf('<h2>Combinado para a semana</h2>') > -1 && impTrecho.indexOf('<h2>Combinado para a semana</h2>') < impTrecho.indexOf('<h2>Para orar juntos</h2>'),
+      'paraImprimir(): o combinado vem antes da oração, a mesma ordem do modo encontro e do texto do grupo');
+    const impSemana = R.paraImprimir({ tipo: 'semana', planoAte: 0, texto: 'Palavra do líder', perguntas: [], refs: [] }, { ...ctx, anterior: true, semana: null });
+    checar(impSemana.includes(R.SEMANA_SEM_DIAS) && !/imp-dias|Dia \d/.test(impSemana) && impSemana.includes('Palavra do líder'),
+      'paraImprimir(): a leitura da semana guardada sem a semana do plano diz que os dias não ficaram guardados, sem pôr os de hoje');
+    // a linha da lista
+    checar(R.dataDaLista({ data: '2026-10-15', dataDe: 'encontro' }) === 'Encontro de 15/10' && R.dataDaLista({ data: '2026-10-12', dataDe: 'preparo' }) === 'Preparado em 12/10', 'dataDaLista(): "Encontro de 15/10" ou "Preparado em 12/10"');
+  }
+}
+
+// A voz das telas é cordial e sem gíria (docs/a-mesa-fase2.md, seção 6): nenhum texto entre aspas
+// em src/app e nas peças tem "Bora", "tempão" nem "sumido". As notificações (notificacoes.mjs) têm
+// voz própria e ficam para o dono decidir.
+{
+  const comGiria = [];
+  for (const pasta of [['src', 'app'], ['src', 'sob-demanda']]) {
+    for (const f of readdirSync(join(AQUI, ...pasta)).filter((x) => x.endsWith('.js'))) {
+      const fonte = readFileSync(join(AQUI, ...pasta, f), 'utf8');
+      for (const lit of fonte.match(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g) || []) {
+        if (/(^|[^\p{L}])(Bora|bora|tempão|sumid[oa]s?)(?![\p{L}])/u.test(lit)) comGiria.push(f + ': ' + lit.slice(0, 60));
+      }
+    }
+  }
+  checar(!comGiria.length, 'os textos das telas não têm "Bora", "tempão" nem "sumido"' + (comGiria.length ? ' (' + comGiria.slice(0, 3).join(' | ') + ')' : ''));
 }
 
 // =========================================================================
@@ -1558,6 +1666,156 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
       && JSON.stringify(limpa.refs) === JSON.stringify(['Efésios 6.12']), 'o que se grava leva só as chaves de cada parte (sem a linha .l da fonte)');
   }
 
+  // --- Fase 2: as regras puras (docs/a-mesa-fase2.md, seção 2) ---
+  {
+    // 1. o combinado: uma linha só, até 200 caracteres; sem o campo, null
+    checar(COMBINADO_MAX === 200 && limparCombinado('  Orar   todo dia\npor alguém. ') === 'Orar todo dia por alguém.', 'o combinado sai numa linha só, com os espaços juntos');
+    checar(limparCombinado('x'.repeat(200)).length === 200 && erroDe(() => limparCombinado('x'.repeat(201))) === MSG_ESTUDO.combinado + '|400'
+      && MSG_ESTUDO.combinado === 'o combinado tem no máximo 200 caracteres', 'o combinado de 200 caracteres passa, e o de 201 dá 400: "' + MSG_ESTUDO.combinado + '"');
+    checar(limparCombinado(undefined) === null && limparCombinado(null) === null && limparCombinado('') === '' && limparCombinado('   ') === '',
+      'sem o campo, null (quem chama mantém o que estava); vazio é vazio');
+
+    // 3. estudoUsado com a ligação ao encontro
+    const usadoE = (x) => estudoUsado({ id: 'e2', criadoEm: '2026-10-18T12:00:00.000Z', nasceu: '2026-10-18', hoje: '2026-10-20', encontro: -1, encontros: [], ...x });
+    const reg = (data, em, estudo, semEncontro = false) => ({ encontros: [{ data, em, estudo, semEncontro }] });
+    checar(usadoE(reg('2026-10-18', '2026-10-18T08:00:00.000Z', 'e2')) && usadoE(reg('2026-10-11', '2026-10-11T08:00:00.000Z', 'e2')),
+      'um encontro ligado ao estudo marca usado, sem olhar a hora do registro');
+    checar(!usadoE(reg('2026-10-19', '2026-10-19T23:00:00.000Z', 'e1')) && !usadoE(reg('2026-10-19', '2026-10-19T23:00:00.000Z', '-'))
+      && !usadoE(reg('2026-10-19', '2026-10-19T23:00:00.000Z', 'e2', true)),
+    'um encontro ligado a outro estudo, ou a um de fora do app, não conta, mesmo registrado depois (nem o "não houve encontro")');
+    checar(usadoE(reg('2026-10-19', '2026-10-19T23:00:00.000Z', '')) && !usadoE(reg('2026-10-18', '2026-10-18T08:00:00.000Z', ''))
+      && usadoE({ encontro: 1 }) && !usadoE({ encontro: 0, hoje: '2026-10-18' }),
+    'sem estudo ligado (os registros de antes da v20), vale a regra da Fase 1, e a do dia da semana continua');
+
+    // 4. o estudo que valia num dia, no fuso do líder
+    const diaSP = (iso) => hojeNoFuso('America/Sao_Paulo', new Date(iso));
+    const diaLX = (iso) => hojeNoFuso('Europe/Lisbon', new Date(iso));
+    // A nasceu em 01/10 e foi o atual até 08/10 às 23h de Brasília; B, daí até 15/10 às 10h; C é o atual
+    const A = { id: 'A', criadoEm: '2026-10-01T15:00:00.000Z', atualAte: '2026-10-09T02:00:00.000Z' };
+    const B = { id: 'B', criadoEm: '2026-10-09T02:00:00.000Z', atualAte: '2026-10-15T13:00:00.000Z' };
+    const Cc = { id: 'C', criadoEm: '2026-10-15T13:00:00.000Z', atualAte: '' };
+    const doDia = (data, diaDe = diaSP) => estudoDoDia([Cc, A, B], data, diaDe);
+    checar(doDia('2026-10-07') === 'A' && doDia('2026-10-08') === 'B' && doDia('2026-10-15') === 'C' && doDia('2026-10-18') === 'C',
+      'o estudo do dia: 07/10 dá A, 08/10 dá B (preparado no dia do encontro) e 15/10 dá C');
+    checar(doDia('2026-09-30') === '' && doDia('ontem') === '' && estudoDoDia([], '2026-10-08', diaSP) === '', 'antes do primeiro estudo, ou sem estudo, não há estudo do dia');
+    checar(doDia('2026-10-08', diaLX) === 'A', 'o fuso entra pelo dia de cada instante: em Lisboa, B nasceu em 09/10, e o 08/10 ainda é de A');
+    checar(estudoDoDia([{ id: 'T', criadoEm: '2026-10-01T15:00:00.000Z', atualAte: '2026-10-05T15:00:00.000Z' }], '2026-10-06', diaSP) === '',
+      'o estudo tirado sem outro no lugar deixa de valer no dia em que saiu');
+
+    // 6. o combinado de antes
+    const ant = { id: 'a', combinado: 'Ligar para alguém que faltou.', criadoEm: '2026-10-05T12:00:00.000Z', atualAte: '2026-10-17T12:00:00.000Z' };
+    const comb = (extra = {}, encontros = []) => combinadoDoAnterior({ anterior: { ...ant, ...extra }, encontros, hoje: '2026-10-18', diaDe: diaSP });
+    const ligadoEm = (data, estudo = 'a', semEncontro = false) => [{ data, estudo, semEncontro, presentes: [], visitantes: 0 }];
+    checar(JANELA_COMBINADO === 10 && JSON.stringify(comb({}, ligadoEm('2026-10-11'))) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-11', estudo: 'a' }),
+      'com o encontro ligado há 7 dias, o combinado de antes aparece, com a data do encontro');
+    checar(comb({}, ligadoEm('2026-10-07')) === null && comb({ combinado: '' }, ligadoEm('2026-10-11')) === null && comb({}, ligadoEm('2026-10-19')) === null
+      && combinadoDoAnterior({ anterior: null, hoje: '2026-10-18', diaDe: diaSP }) === null,
+    'há 11 dias, sem combinado, com a data depois de hoje ou sem anterior: nada');
+    // sem encontro ligado: o registro de antes da v20 (estudo '') feito depois que ele nasceu, ou o
+    // dia da semana do encontro (quinta, 4) que passou enquanto ele era o atual
+    const semLigar = (data, em) => [{ data, em, estudo: '', semEncontro: false, presentes: [], visitantes: 0 }];
+    const combQ = (extra = {}, encontros = []) => combinadoDoAnterior({ anterior: { ...ant, ...extra }, encontros, encontro: 4, hoje: '2026-10-18', diaDe: diaSP });
+    checar(JSON.stringify(combQ({ atualAte: '2026-10-15T12:00:00.000Z' })) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-15', estudo: 'a' })
+      && JSON.stringify(comb({ atualAte: '2026-10-15T12:00:00.000Z' }, semLigar('2026-10-08', '2026-10-08T23:00:00.000Z'))) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-15', estudo: 'a' })
+      && combQ({ atualAte: '2026-10-05T12:00:00.000Z' }) === null,
+    'sem encontro ligado, vale o dia em que ele deixou de ser o atual, quando ele conta como usado (3 dias atrás aparece; 13, não)');
+    checar(comb({ atualAte: '2026-10-15T12:00:00.000Z' }) === null && combQ({ criadoEm: '2026-10-16T12:00:00.000Z', atualAte: '2026-10-17T12:00:00.000Z' }) === null,
+      'o combinado de um estudo que nunca foi usado (sem encontro e sem passar o dia da semana) não abre a acolhida');
+    checar(combQ({ atualAte: '2026-10-15T12:00:00.000Z' }, ligadoEm('2026-10-08', '-')) === null && combQ({ atualAte: '2026-10-15T12:00:00.000Z' }, ligadoEm('2026-10-08', 'outro')) === null,
+      'a semana feita com um estudo de fora do app ou com outro estudo também não: a célula não combinou aquilo');
+
+    // 7. a data na lista
+    const e7 = { id: 'e7', criadoEm: '2026-10-05T12:00:00.000Z' };
+    checar(JSON.stringify(dataNoHistorico(e7, [...ligadoEm('2026-10-08', 'e7'), ...ligadoEm('2026-10-15', 'e7'), ...ligadoEm('2026-10-16', 'e7', true), ...ligadoEm('2026-10-17', 'outro')], diaSP))
+      === JSON.stringify({ data: '2026-10-15', dataDe: 'encontro' }), 'com dois encontros ligados, a data é a do mais novo; o "não houve encontro" e o de outro estudo não contam');
+    checar(JSON.stringify(dataNoHistorico(e7, [], diaSP)) === JSON.stringify({ data: '2026-10-05', dataDe: 'preparo' }), 'sem encontro ligado, a data em que foi preparado ("Preparado em")');
+    checar(JSON.stringify(encontrosDoEstudo(e7, [{ data: '2026-10-08', estudo: 'e7', presentes: ['ana', 'bia'], visitantes: 3 }, { data: '2026-10-15', estudo: 'e7', presentes: ['ana'], visitantes: 0 },
+      { data: '2026-10-16', estudo: 'e7', semEncontro: true, presentes: [], visitantes: 0 }])) === JSON.stringify([{ data: '2026-10-15', pessoas: 1 }, { data: '2026-10-08', pessoas: 5 }]),
+    'os encontros do estudo, do mais novo para o mais velho, contam quem tem conta e quem não tem');
+
+    // 5. quem lê qual estudo: a tabela inteira
+    const P = { id: 'P', estudoId: 'E3', mae: '' };
+    const F = { id: 'F', estudoId: 'EF', mae: 'P', multiplicadaEm: '2026-10-10' };
+    const E1 = { id: 'E1', proposito: 'P', criadoEm: '2026-10-01T12:00:00.000Z' };
+    const E2 = { id: 'E2', proposito: 'P', criadoEm: '2026-10-11T01:00:00.000Z' }; // 10/10 às 22h em Brasília: antes do fim do dia da multiplicação
+    const E3 = { id: 'E3', proposito: 'P', criadoEm: '2026-10-12T12:00:00.000Z' }; // a mãe preparou depois da multiplicação
+    const EF = { id: 'EF', proposito: 'F', criadoEm: '2026-10-12T12:00:00.000Z' };
+    const EX = { id: 'EX', proposito: 'Q', criadoEm: '2026-10-01T12:00:00.000Z' };
+    const papeis = {
+      lider: { ativo: true, papel: '', conduz: true, lidera: true }, auxiliar: { ativo: true, papel: 'auxiliar', conduz: true },
+      membro: { ativo: true, papel: '' }, visitante: { ativo: true, papel: 'visitante' },
+      saiu: { ativo: false }, convidado: { ativo: false }, admin: { ativo: false },
+    };
+    const ac = (e, p, quem) => { const r = acessoAoEstudo(e, p, { ...quem, corte: p.multiplicadaEm || '', diaDe: diaSP }); return [r.ler ? 'ler' : r.codigo, r.presenca ? 'presenca' : '', r.usarComoBase ? 'base' : '', r.daMae ? 'mae' : '', r.atual ? 'atual' : ''].filter(Boolean).join(' '); };
+    const tabela = {
+      lider: ['ler presenca atual', 'ler presenca base', 404], auxiliar: ['ler presenca atual', 'ler presenca', 404], membro: ['ler atual', 'ler', 404],
+      visitante: ['ler atual', 403, 404], saiu: [404, 404, 404], convidado: [404, 404, 404], admin: [404, 404, 404],
+    };
+    for (const [quem, [atual, anterior, outra]] of Object.entries(tabela)) {
+      checar(ac(E3, P, papeis[quem]) === String(atual) && ac(E1, P, papeis[quem]) === String(anterior) && ac(EX, P, papeis[quem]) === String(outra),
+        'na célula: ' + quem + ' lê o atual (' + atual + '), o anterior (' + anterior + ') e o de outra célula (' + outra + ')');
+    }
+    const daFilha = { lider: papeis.lider, membro: papeis.membro, visitante: papeis.visitante, saiu: papeis.saiu };
+    const tabelaFilha = { lider: ['ler presenca atual', 'ler mae', 'ler mae', 404], membro: ['ler atual', 'ler mae', 'ler mae', 404], visitante: ['ler atual', 403, 403, 404], saiu: [404, 404, 404, 404] };
+    for (const [quem, [atual, e1, e2, e3]] of Object.entries(tabelaFilha)) {
+      checar(ac(EF, F, daFilha[quem]) === String(atual) && ac(E1, F, daFilha[quem]) === String(e1) && ac(E2, F, daFilha[quem]) === String(e2) && ac(E3, F, daFilha[quem]) === String(e3)
+        && ac(EX, F, daFilha[quem]) === '404',
+      'na filha: ' + quem + ' lê o atual dela (' + atual + '), os da mãe até a multiplicação (' + e1 + ') e não os de depois (' + e3 + ')');
+    }
+    checar(ac(E1, F, papeis.lider) === 'ler mae' && ac(E2, F, papeis.lider) === 'ler mae', 'o líder da filha nunca tem "Usar como base" nem a presença num estudo da mãe');
+    checar(acessoAoEstudo(E2, F, { ...papeis.membro, corte: '2026-10-10', diaDe: (iso) => iso.slice(0, 10) }).codigo === 404, 'o corte é o dia no fuso do líder: em UTC, E2 já seria do dia 11');
+    checar(acessoAoEstudo(E1, { id: 'G', mae: 'F', multiplicadaEm: '2026-10-20' }, { ...papeis.membro, corte: '2026-10-20', diaDe: diaSP }).codigo === 404,
+      'um nível só: a neta não lê os estudos da avó');
+    // o corte pelo instante (v21) e pela última mudança
+    const corteEm = '2026-10-10T20:00:00.000Z'; // 10/10 às 17h em Brasília
+    const pelaFilha = (e, extra = {}) => acessoAoEstudo(e, F, { ...papeis.membro, corte: '2026-10-10', corteEm, diaDe: diaSP, ...extra }).ler;
+    checar(pelaFilha(E1) && !pelaFilha(E2) && !pelaFilha({ ...E1, editadoEm: '2026-10-10T21:00:00.000Z' }) && pelaFilha({ ...E1, editadoEm: '2026-10-10T19:00:00.000Z' }),
+      'com o instante da multiplicação, a filha não lê o que a mãe preparou depois no mesmo dia (E2) nem o estudo mudado depois dele');
+    checar(!pelaFilha({ ...E1, editadoEm: '2026-10-11T12:00:00.000Z' }, { corteEm: '' }) && pelaFilha({ ...E1, editadoEm: '2026-10-10T12:00:00.000Z' }, { corteEm: '' })
+      && daMaeAteOCorte(E1, { corte: '2026-10-10', diaDe: diaSP }) && !daMaeAteOCorte(E1, { corte: '', diaDe: diaSP }),
+    'sem o instante (a filha de antes da v21), vale o dia, para o nascimento e para a última mudança');
+    checar(JSON.stringify(encontrosAteOCorte([{ data: '2026-10-08' }, { data: '2026-10-10', em: '2026-10-10T19:00:00.000Z' }, { data: '2026-10-10', em: '2026-10-10T22:00:00.000Z' }, { data: '2026-10-11' }],
+      { corte: '2026-10-10', corteEm }).map((x) => x.em || x.data)) === JSON.stringify(['2026-10-08', '2026-10-10T19:00:00.000Z']),
+    'os encontros da mãe que a filha vê: até a multiplicação, os do mesmo dia só se registrados antes dela');
+    // o estudo guardado antes do histórico: só para quem o via enquanto era o atual
+    const velho = { ...E1, antesDoHistorico: true, atualAte: '2026-10-05T12:00:00.000Z' };
+    const comEntrada = (entrouEm, saiuEm = '') => ({ ...papeis.membro, diaDe: diaSP, noDono: { entrouEm, saiuEm } });
+    checar(acessoAoEstudo(velho, P, comEntrada('2026-10-01')).ler && acessoAoEstudo(velho, P, comEntrada('2026-10-05')).ler
+      && acessoAoEstudo(velho, P, comEntrada('2026-10-06')).codigo === 404 && acessoAoEstudo(velho, P, { ...papeis.membro, diaDe: diaSP }).codigo === 404,
+    'o estudo guardado antes do histórico fica para quem estava na célula enquanto ele era o atual; quem entrou depois recebe 404');
+    checar(acessoAoEstudo({ ...velho, id: 'E3', atualAte: '' }, P, comEntrada('2026-10-15')).ler && acessoAoEstudo({ ...E1, atualAte: '2026-10-05T12:00:00.000Z' }, P, comEntrada('2026-10-15')).ler,
+      'como estudo atual, todos leem; e o estudo gravado com o histórico já de pé vale para quem entrou depois');
+    checar(acessoAoEstudo(velho, F, { ...comEntrada('2026-10-01', '2026-10-10'), corte: '2026-10-10' }).ler
+      && acessoAoEstudo(velho, F, { ...comEntrada('2026-10-07', '2026-10-10'), corte: '2026-10-10' }).codigo === 404
+      && acessoAoEstudo(velho, F, { ...papeis.membro, corte: '2026-10-10', diaDe: diaSP }).codigo === 404,
+    'na filha, o da mãe guardado antes do histórico fica para quem estava na mãe enquanto ele era o atual');
+
+    // quem não veio
+    const membros = [
+      { usuario: 'lider', estado: 'ativo', papel: '', entrouEm: '2026-10-01' }, { usuario: 'aux', estado: 'ativo', papel: 'auxiliar', entrouEm: '2026-10-01' },
+      { usuario: 'ana', estado: 'ativo', papel: '', entrouEm: '2026-10-01' }, { usuario: 'bia', estado: 'ativo', papel: '', entrouEm: '2026-10-01' },
+      { usuario: 'vera', estado: 'ativo', papel: 'visitante', entrouEm: '2026-10-01' }, { usuario: 'caio', estado: 'ativo', papel: '', entrouEm: '2026-10-16' },
+      { usuario: 'duda', estado: 'saiu', papel: '', entrouEm: '2026-10-01' }, { usuario: 'eva', estado: 'convidado', papel: '', entrouEm: '' },
+    ];
+    checar(JSON.stringify(quemFaltou({ membros, presentes: ['ana'], registradoPor: 'aux', quemConduz: ['lider', 'aux'], data: '2026-10-15' })) === '["bia"]',
+      'quem não veio: sem visitante, sem quem conduz, sem quem registrou, sem quem entrou depois, sem os presentes e sem quem saiu ou só foi convidado');
+    checar(JSON.stringify(quemFaltou({ membros, presentes: [], registradoPor: 'lider', data: '2026-10-16' })) === '["aux","ana","bia"]',
+      'quem entrou no próprio dia do encontro (o Caio, em 16/10) não faltou: a mesma regra de "Precisam de atenção"');
+    checar(quemFaltou({ membros, presentes: [], registradoPor: 'aux', data: '2026-10-15', semEncontro: true }).length === 0, '"não houve encontro" não tem falta de ninguém');
+
+    // a linha da lista e a folha de registro
+    const item = itemDoHistorico({ id: 'e1', tipo: 'blocos', titulo: 'Batalha espiritual', refs: ['Efésios 6.12'], criadoPor: 'lider', criadoEm: '2026-10-05T12:00:00.000Z', fonte: 'x', blocos: [{ t: 'texto' }], perguntas: ['?'], combinado: 'c' },
+      { data: '2026-10-15', dataDe: 'encontro', nomeDe: (u) => 'Nome de ' + u });
+    checar(Object.keys(item).sort().join() === 'criadoPor,criadoPorNome,data,dataDe,id,refs,tipo,titulo' && item.criadoPorNome === 'Nome de lider',
+      'a linha da lista leva só o que mostra: nada de fonte, partes, perguntas, combinado ou presença');
+    checar(itemDoHistorico({ id: 's', tipo: 'semana', titulo: 'x', refs: [] }).titulo === '' && itemDoHistorico({ id: 't', tipo: 'trecho', titulo: '', ref: 'Romanos 8', refs: [] }).titulo === 'Romanos 8'
+      && itemDoHistorico({ id: 'l', tipo: 'livre', titulo: '', refs: [], criadoPor: '' }).criadoPorNome === '', 'na lista, a leitura da semana vai sem título (a tela escreve) e o trecho com a referência');
+    checar(JSON.stringify(estudoDoRegistro({ id: 'e1', tipo: 'blocos', titulo: 'T', refs: ['Efésios 6.12'], criadoEm: '2026-10-09T02:00:00.000Z' }, diaSP))
+      === JSON.stringify({ id: 'e1', tipo: 'blocos', titulo: 'T', refs: ['Efésios 6.12'], em: '2026-10-09T02:00:00.000Z', dia: '2026-10-08' }), 'o estudo da folha de registro leva o dia em que foi preparado, no fuso do líder');
+    checar(cursorDe({ criadoEm: '2026-10-05T12:00:00.000Z', id: 'e1' }) === '2026-10-05T12:00:00.000Z|e1' && JSON.stringify(lerCursor('2026-10-05T12:00:00.000Z|e1')) === JSON.stringify({ criadoEm: '2026-10-05T12:00:00.000Z', id: 'e1' })
+      && lerCursor('') === null && lerCursor('sem-barra') === null && lerCursor('x'.repeat(121) + '|e') === null, 'o cursor da lista vai e volta, e um cursor estranho é ignorado');
+  }
+
   // --- a célula de ensaio: líder, auxiliar, membro, visitante e o líder de outra célula ---
   const pastaE = mkdtempSync(join(tmpdir(), 'cc-teste-estudos-'));
   const arquivoE = join(pastaE, 'contas.json');
@@ -1606,7 +1864,7 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
   const doLider = estudoNoRetrato(ce.estudo(ce.proposito(ID).estudoId), { souQuemPrepara: true, nomeDe: (u) => 'Nome de ' + u });
   checar(!('fonte' in doMembro) && !('texto' in doMembro) && doMembro.blocos.length === 32 && doMembro.criadoPorNome === 'Nome de lider' && doMembro.em === e1.criadoEm,
     'quem só lê recebe as partes, sem a fonte');
-  checar(doLider.fonte === e1.fonte && Object.keys(doLider).sort().join() === 'blocos,criadoPor,criadoPorNome,editadoEm,em,fonte,id,perguntas,planoAte,ref,refs,tipo,titulo,traducao,usado'
+  checar(doLider.fonte === e1.fonte && Object.keys(doLider).sort().join() === 'blocos,combinado,criadoPor,criadoPorNome,editadoEm,em,fonte,id,perguntas,planoAte,ref,refs,tipo,titulo,traducao,usado'
     && doLider.usado === false && !('usado' in doMembro), 'quem prepara recebe a fonte, para "Mudar o estudo", e se o estudo já foi usado (só ele)');
 
   // --- mudar o mesmo estudo (base igual) atualiza a linha ---
@@ -1682,6 +1940,23 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
     && linhas("SELECT estudo_tipo, estudo_texto, estudo_id FROM propositos WHERE id = ?", ID)[0].estudo_id === r7.estudo.id,
   'regravar a célula por outro motivo não zera o estudo_id (paraLinhas grava o ponteiro)');
   checar(!('estudo' in ce.proposito(ID)), 'o objeto antigo p.estudo não mora mais na memória');
+  {
+    // v20: a mesma armadilha em celula_encontros. Um encontro gravado com o estudo ligado, relido do
+    // banco, e a célula regravada por outro motivo: o estudo do encontro continua lá
+    ce.proposito(ID).encontros = [{ data: '2026-10-19', em: dia(19).toISOString(), visitantes: 1, presentes: ['ana'], registradoPor: 'lider', semEncontro: false, estudo: '' }];
+    await ce.salvar();
+    ce.banco().prepare("UPDATE celula_encontros SET estudo = 'e1' WHERE proposito = ? AND data = '2026-10-19'").run(ID);
+    ce = await new Contas(arquivoE).carregar();
+    checar(ce.proposito(ID).encontros[0].estudo === 'e1', 'o estudo ligado ao encontro é lido do banco (deLinhas)');
+    ce.proposito(ID).recado = 'Tragam a Bíblia e um caderno';
+    await ce.salvar();
+    ce = await new Contas(arquivoE).carregar();
+    checar(ce.proposito(ID).encontros[0].estudo === 'e1' && linhas('SELECT estudo FROM celula_encontros WHERE proposito = ?', ID)[0].estudo === 'e1',
+      'regravar a célula por outro motivo não zera o estudo dos encontros (paraLinhas grava a coluna)');
+    ce.proposito(ID).encontros = [];
+    ce.proposito(ID).recado = 'Tragam a Bíblia';
+    await ce.salvar();
+  }
 
   // --- a linha antiga e a multiplicação ---
   ce.banco().prepare("INSERT INTO celula_estudos (id, proposito, tipo, ref, fonte, criado_por, criado_em) VALUES ('lx', ?, 'trecho', 'João 3.16-18', '', '', '2026-01-01')").run(ID);
@@ -1736,6 +2011,227 @@ secao('estudos da célula no servidor (estudos.mjs e Contas.salvarEstudo)');
 
   fecharBanco(arquivoDoBanco(pastaE));
   rmSync(pastaE, { recursive: true, force: true });
+}
+
+// =========================================================================
+secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro ligado)');
+// =========================================================================
+// docs/a-mesa-fase2.md, seções 1 a 3 e 9.2 (itens 2 e 8 a 14). Uma célula com líder (Marcos),
+// auxiliar (Paulo), Ana e Bia (membros), Vera (visitante) e Caio (entra depois); a outra célula, e
+// a filha que nasce de uma multiplicação. Tudo pelas contas, com as datas passadas como parâmetro.
+{
+  const C = ctxEstudo.window.CC;
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  const erroDe = (f) => { try { f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  const contagens = Object.fromEntries(TRADUCOES.map((t) => {
+    const b = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', t + '.json'), 'utf8'));
+    return [t, Object.fromEntries(Object.entries(b.livros).map(([l, caps]) => [l, caps.map((v) => (v || []).length)]))];
+  }));
+  const opcoes = (extra = {}) => ({
+    regras: C, livros: [...LIVROS], capitulos: capitulosDoPlano,
+    versiculos: (t) => (livro, cap) => ((contagens[t] || {})[livro] || [])[cap - 1] || 0, ...extra,
+  });
+  const linhasDono = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo.txt'), 'utf8').replace(/\s+$/, '').split('\n');
+  linhasDono[linhasDono.length - 1] = 'Para guardar: ' + linhasDono[linhasDono.length - 1];
+  const doDono = { estudo: 'blocos', fonte: linhasDono.join('\n'), traducao: 'nbv', perguntas: ['O que mais marcou você?'] };
+  // dia(n, h): o dia n de outubro de 2026 às h horas de Brasília (UTC-3)
+  const dia = (n, h = 9) => new Date(Date.UTC(2026, 9, n, h + 3));
+
+  const pasta = mkdtempSync(join(tmpdir(), 'cc-teste-estudos2-'));
+  const arquivo = join(pasta, 'contas.json');
+  let ce = await new Contas(arquivo).carregar();
+  const nomes = { lider: 'Marcos', aux: 'Paulo', ana: 'Ana', bia: 'Bia', vera: 'Vera', caio: 'Caio', outro: 'Otto' };
+  for (const [u, nome] of Object.entries(nomes)) await ce.criar({ usuario: u, senha: '12345678', nome, email: u + '@x.com', nascimento: '1990-01-01', consentimento: true });
+  const ID = (await ce.criarCelula('lider', { titulo: 'Esperança' }, '2026-10-01')).id;
+  const tok = ce.gerarLinkCelula('lider', ID, assinar).token;
+  for (const u of ['aux', 'ana', 'bia']) await ce.entrarNaCelula(u, tok, assinar, '2026-10-01');
+  await ce.entrarNaCelula('vera', tok, assinar, '2026-10-01', Date.now(), { visitante: true });
+  await ce.definirAuxiliar('lider', ID, 'aux', true);
+  const OUTRA = (await ce.criarCelula('outro', { titulo: 'Outra' }, '2026-10-01')).id;
+  const linhas = (sql, ...x) => ce.banco().prepare(sql).all(...x);
+  const p = () => ce.proposito(ID);
+
+  // --- 2. o combinado no salvarEstudo, e 8. os 4 Ws de quem prepara ---
+  const r1 = await ce.salvarEstudo('lider', ID, { ...doDono, combinado: '  Ligar para alguém   que faltou. ', testemunho: 'Orem pelo Jonas, que está doente.' }, opcoes(), dia(5));
+  const S1 = r1.estudo.id;
+  checar(r1.estudo.combinado === 'Ligar para alguém que faltou.' && linhas('SELECT combinado FROM celula_estudos WHERE id = ?', S1)[0].combinado === 'Ligar para alguém que faltou.'
+    && estudoNoRetrato(r1.estudo, {}).combinado === 'Ligar para alguém que faltou.', 'o combinado é gravado numa linha só e volta no estudo, para todos');
+  checar(p().estudoTestemunho === 'Orem pelo Jonas, que está doente.', 'o estudo novo grava os 4 Ws que vieram no pedido');
+  const mudar = (extra, quando = dia(6)) => ce.salvarEstudo('lider', ID, { ...doDono, base: S1, ...extra }, opcoes(), quando);
+  const comCitacao = await mudar({ combinado: 'Efésios 6:10 “Fortaleça-se no Senhor” (NVI)' });
+  checar(comCitacao.estudo.id === S1 && comCitacao.estudo.combinado === 'Efésios 6.10' && !JSON.stringify(linhas('SELECT * FROM celula_estudos WHERE id = ?', S1)).includes('Fortaleça-se'),
+    'uma citação colada no combinado vira só a referência: o texto de outra tradução não fica guardado');
+  checar((await mudar({})).estudo.combinado === 'Efésios 6.10', 'mudar o mesmo estudo sem o campo mantém o combinado');
+  checar((await mudar({ combinado: 'Ligar para alguém que faltou.' })).estudo.combinado === 'Ligar para alguém que faltou.' && p().estudoTestemunho === 'Orem pelo Jonas, que está doente.',
+    'mudar o mesmo estudo troca o combinado e não mexe nos 4 Ws');
+  checar(await tentar(() => mudar({ combinado: 'x'.repeat(201) })) === MSG_ESTUDO.combinado + '|400', 'o combinado de 201 caracteres dá 400: "' + MSG_ESTUDO.combinado + '"');
+  checar(await tentar(() => mudar({ combinado: 'Ler todo dia Efésios 6:10 “Fortaleça-se no Senhor” (NVI) e orar' })) === MSG_ESTUDO.combinadoCitacao + '|400',
+    'a citação no meio da frase, que o leitor não troca, é recusada: "' + MSG_ESTUDO.combinadoCitacao + '"');
+  checar(ce.estudo(S1).combinado === 'Ligar para alguém que faltou.' && linhas('SELECT count(*) n FROM celula_estudos WHERE proposito = ?', ID)[0].n === 1, 'as recusas não mexeram no estudo');
+  checar(await tentar(() => ce.salvarEstudo('aux', ID, { ...doDono, base: S1, combinado: 'Do auxiliar' }, opcoes())) === MSG_ESTUDO.soLider + '|403' && ce.estudo(S1).combinado === 'Ligar para alguém que faltou.',
+    'o auxiliar não escreve o combinado: 403');
+
+  // --- 9 e 10. o encontro de quinta, registrado pelo Paulo sem o campo "estudo" (o app antigo) ---
+  const caixaAntes = linhas("SELECT count(*) n FROM sqlite_master WHERE name = 'push_caixa'")[0].n ? linhas('SELECT count(*) n FROM push_caixa')[0].n : 0;
+  const reg1 = await ce.registrarEncontro('aux', ID, { data: '2026-10-08', presentes: ['aux', 'ana', 'vera'], visitantes: 2 }, '2026-10-08', dia(8, 22));
+  checar(reg1.registro.estudo === S1 && p().encontros.find((x) => x.data === '2026-10-08').estudo === S1, 'sem o campo, o encontro fica ligado ao estudo que valia naquele dia');
+  checar(JSON.stringify(reg1.faltaram) === '["bia"]', 'quem não veio: a Bia, sem a visitante, sem quem registrou e sem o líder (quem conduz não entra, como em "Precisam de atenção")');
+  checar(ce.estudoJaUsado(p(), ce.estudo(S1), dia(9)), 'o estudo ligado a um encontro está usado');
+  await ce.entrarNaCelula('caio', tok, assinar, '2026-10-10');
+
+  // --- 8 e 11. o próximo estudo: linha nova, 4 Ws vazios, e o registro de dias atrás com o antigo ---
+  const r2 = await ce.salvarEstudo('lider', ID, { estudo: 'trecho', ref: 'Romanos 8.28-30', fonte: 'Tudo coopera para o bem.', base: S1, combinado: 'Orar todo dia por alguém que ainda não conhece Jesus.' }, opcoes(), dia(12));
+  const S2 = r2.estudo.id;
+  checar(S2 !== S1 && ce.estudo(S1).atualAte === dia(12).toISOString() && r2.estudo.combinado === 'Orar todo dia por alguém que ainda não conhece Jesus.',
+    'preparar o próximo cria a linha nova com o combinado dela, e o anterior vai para o histórico');
+  checar(p().estudoTestemunho === '' && p().estudoAcolhida === '' && p().estudoAdoracao === '', 'o estudo novo sem os 4 Ws começa com os três vazios: o testemunho com nomes não passa para a semana seguinte');
+  checar(r2.estudo.combinado && (await ce.salvarEstudo('lider', ID, { estudo: 'trecho', ref: 'Romanos 8.28-30', base: S2 }, opcoes(), dia(12, 10))).estudo.combinado === r2.estudo.combinado,
+    'mudar o estudo novo antes de usar continua na mesma linha, com o combinado');
+  const reg2 = await ce.registrarEncontro('lider', ID, { data: '2026-10-12', presentes: ['lider', 'ana'], visitantes: 0, estudo: S1 }, '2026-10-12', dia(12, 21));
+  checar(reg2.registro.estudo === S1 && !ce.estudoJaUsado(p(), ce.estudo(S2), dia(12, 22)),
+    'registrar no mesmo dia o encontro feito com o estudo antigo não marca o novo como usado (o líder continua com "Mudar o estudo")');
+  checar(JSON.stringify(reg2.faltaram) === '["bia","caio"]', 'quem entrou antes do encontro (o Caio) entra em quem não veio; o visitante e o auxiliar continuam fora');
+  checar(JSON.stringify((await ce.registrarEncontro('lider', ID, { data: '2026-10-09', presentes: [], visitantes: 0 }, '2026-10-12', dia(12, 21))).faltaram) === '["ana","bia"]',
+    'quem entrou depois da data (o Caio, num encontro de antes da entrada) não entra em quem não veio');
+
+  // --- 9. as recusas e as escolhas do estudo do registro ---
+  const registrar = (extra, data = '2026-10-12') => ce.registrarEncontro('lider', ID, { data, presentes: ['lider'], visitantes: 0, ...extra }, '2026-10-12', dia(12, 23));
+  const rOutra = await ce.salvarEstudo('outro', OUTRA, doDono, opcoes(), dia(5));
+  for (const [como, estudo] of [['de outra célula', rOutra.estudo.id], ['preparado depois da data', S2], ['que não existe', 'enada'], ['com um id de 65 letras', 'e'.repeat(65)]]) {
+    checar(await tentar(() => registrar({ estudo }, '2026-10-08')) === MSG_ESTUDO.estudoDoRegistro + '|400', 'um estudo ' + como + ' no registro dá 400: "' + MSG_ESTUDO.estudoDoRegistro + '"');
+  }
+  checar(p().encontros.find((x) => x.data === '2026-10-08').estudo === S1 && p().encontros.find((x) => x.data === '2026-10-08').presentes.length === 3, 'as recusas não mexeram no registro');
+  checar((await registrar({ estudo: '-' })).registro.estudo === '-' && (await registrar({ estudo: S2 })).registro.estudo === S2,
+    'regravar a mesma data troca o estudo: "-" (um estudo de fora do app) e depois o atual');
+  checar((await registrar({ estudo: S2, semEncontro: true })).registro.estudo === '' && (await registrar({ semEncontro: true })).faltaram.length === 0,
+    '"Não houve encontro" não liga estudo nenhum e não tem falta de ninguém');
+  await registrar({ estudo: S1 });
+  checar(caixaAntes === (linhas("SELECT count(*) n FROM sqlite_master WHERE name = 'push_caixa'")[0].n ? linhas('SELECT count(*) n FROM push_caixa')[0].n : 0),
+    'registrar o encontro não põe nada no sino de ninguém');
+  checar(await tentar(() => ce.registrarEncontro('ana', ID, { data: '2026-10-12', presentes: [], visitantes: 0, estudo: S1 }, '2026-10-12')) === 'só quem conduz a célula pode fazer isso|403',
+    'membro não registra nem troca o estudo do registro: 403');
+  ce = await new Contas(arquivo).carregar();
+  checar(p().encontros.find((x) => x.data === '2026-10-12').estudo === S1 && p().encontros.find((x) => x.data === '2026-10-08').estudo === S1, 'o estudo de cada encontro sobrevive ao banco');
+
+  // --- o que o retrato leva (dadosDoEstudo) ---
+  {
+    const membro = ce.dadosDoEstudo(p(), { membro: true }, dia(13));
+    checar(JSON.stringify(membro.combinadoAnterior) === JSON.stringify({ texto: 'Ligar para alguém que faltou.', data: '2026-10-12', estudo: S1 })
+      && membro.temAnteriores === true && membro.daMae === null && !('registro' in membro),
+    'o membro recebe o combinado de antes (com a data do encontro mais recente), que há anteriores, e nada da folha de registro');
+    const visita = ce.dadosDoEstudo(p(), { membro: false }, dia(13));
+    checar(visita.combinadoAnterior === null && visita.temAnteriores === false && visita.daMae === null, 'o visitante não recebe o combinado de antes nem que há anteriores: ele vê só o estudo atual');
+    checar(ce.dadosDoEstudo(p(), { membro: true }, dia(23)).combinadoAnterior === null, 'onze dias depois do encontro, o combinado de antes não aparece mais');
+    const conduz = ce.dadosDoEstudo(p(), { membro: true, conduz: true, hoje: '2026-10-13' }, dia(13));
+    const d = conduz.registro.dias;
+    checar(d.length === 8 && d[0].data === '2026-10-13' && d[7].data === '2026-10-06' && d[0].padrao === S2 && d[0].estudo === null
+      && d.find((x) => x.data === '2026-10-12').estudo === S1 && d.find((x) => x.data === '2026-10-12').padrao === S2
+      && d.find((x) => x.data === '2026-10-08').padrao === S1 && d.find((x) => x.data === '2026-10-08').visitantes === 2 && d.find((x) => x.data === '2026-10-06').padrao === S1,
+    'quem conduz recebe os 8 dias do registro: o estudo de cada dia, o que o registro já tem e as pessoas sem conta de cada um');
+    checar(conduz.registro.estudos.map((e) => e.id).join() === [S2, S1].join(), 'e os estudos que a folha oferece, do mais novo para o mais velho');
+  }
+
+  // --- 12. a lista de estudos anteriores ---
+  {
+    const lista = ce.estudosAnteriores('ana', ID);
+    checar(lista.itens.length === 1 && lista.itens[0].e.id === S1 && lista.itens[0].data === '2026-10-12' && lista.itens[0].dataDe === 'encontro' && lista.mais === false && lista.antes === '',
+      'a lista traz só os que já deixaram de ser o atual, com a data do encontro mais recente');
+    checar(ce.estudosAnteriores('caio', ID).itens.length === 1, 'quem entrou depois também lê os anteriores');
+    checar(await tentar(() => ce.estudosAnteriores('vera', ID)) === MSG_ESTUDO.soMembros + '|403', 'o visitante recebe 403: "' + MSG_ESTUDO.soMembros + '"');
+    for (const u of ['outro', 'ninguem']) checar(await tentar(() => ce.estudosAnteriores(u, ID)) === 'célula não encontrada|404', u + ' recebe 404 na lista');
+    checar(await tentar(() => ce.estudosAnteriores('ana', ID, { de: 'mae' })) === 'célula não encontrada|404', 'a lista "da mãe" numa célula sem mãe dá 404');
+    const inserir = ce.banco().prepare("INSERT INTO celula_estudos (id, proposito, tipo, titulo, fonte, criado_por, criado_em, atual_ate) VALUES (?, ?, 'blocos', ?, '', 'lider', ?, ?)");
+    for (let i = 0; i < 25; i++) inserir.run('vx' + String(i).padStart(2, '0'), OUTRA, 'Velho ' + i, new Date(Date.UTC(2026, 0, 1 + i)).toISOString(), new Date(Date.UTC(2026, 0, 2 + i)).toISOString());
+    const pag1 = ce.estudosAnteriores('outro', OUTRA);
+    const pag2 = ce.estudosAnteriores('outro', OUTRA, { antes: pag1.antes });
+    checar(pag1.itens.length === 20 && pag1.mais === true && pag1.itens[0].e.id === 'vx24' && pag1.itens[0].dataDe === 'preparo' && pag1.itens[0].data === '2026-01-24'
+      && pag2.itens.length === 5 && pag2.mais === false && pag2.antes === '' && pag2.itens[4].e.id === 'vx00' && !pag2.itens.some((x) => pag1.itens.some((y) => y.e.id === x.e.id)),
+    '25 anteriores vêm em duas páginas, 20 e 5, sem repetir, do mais novo para o mais velho');
+    // um estudo guardado antes do histórico (a marca da v21): a Ana, que estava na célula enquanto
+    // ele era o atual, lê; o Caio, que entrou depois, nem o vê na lista
+    ce.banco().prepare("INSERT INTO celula_estudos (id, proposito, tipo, titulo, fonte, criado_por, criado_em, atual_ate, antes_do_historico) VALUES ('fx1', ?, 'blocos', 'Da Fase 1', '', 'lider', ?, ?, 1)")
+      .run(ID, dia(2).toISOString(), dia(4).toISOString());
+    checar(ce.estudosAnteriores('ana', ID).itens.some((x) => x.e.id === 'fx1') && ce.estudoParaLer('ana', 'fx1').acesso.ler
+      && !ce.estudosAnteriores('caio', ID).itens.some((x) => x.e.id === 'fx1') && await tentar(() => ce.estudoParaLer('caio', 'fx1')) === MSG_ESTUDO.naoAberto + '|404',
+    'o estudo guardado antes do histórico fica para quem o via quando era o atual: quem entrou depois não o vê na lista e recebe 404');
+    checar(ce.dadosDoEstudo(p(), { membro: true, eu: 'caio' }, dia(13)).temAnteriores === true && ce.estudosAnteriores('caio', ID).itens.length === 1,
+      'o Caio continua com o anterior gravado depois do histórico');
+    ce.banco().prepare("DELETE FROM celula_estudos WHERE id = 'fx1'").run();
+  }
+
+  // --- 13. um estudo para ler ---
+  {
+    const lido = ce.estudoParaLer('ana', S1);
+    checar(lido.p.id === ID && lido.acesso.ler && !lido.acesso.atual && !lido.acesso.presenca && !lido.acesso.usarComoBase, 'sem a célula, o servidor acha a célula do estudo');
+    checar(ce.estudoParaLer('lider', S1, ID).acesso.usarComoBase && ce.estudoParaLer('aux', S1, ID).acesso.presenca && !ce.estudoParaLer('aux', S1, ID).acesso.usarComoBase,
+      'o líder pode usar como base; o auxiliar vê a presença, mas não usa como base');
+    checar(ce.estudoParaLer('vera', S2).acesso.atual && await tentar(() => ce.estudoParaLer('vera', S1)) === MSG_ESTUDO.soMembros + '|403', 'o visitante lê o atual, e no anterior recebe 403');
+    for (const [quem, f] of [['de outra célula', () => ce.estudoParaLer('outro', S1)], ['pela célula errada', () => ce.estudoParaLer('ana', S1, OUTRA)],
+      ['que não existe', () => ce.estudoParaLer('ana', 'enada')], ['com um id de 65 letras', () => ce.estudoParaLer('ana', 'e'.repeat(65))]]) {
+      checar(await tentar(f) === MSG_ESTUDO.naoAberto + '|404', 'um estudo ' + quem + ': 404 "' + MSG_ESTUDO.naoAberto + '"');
+    }
+    await ce.sairDoProposito('bia', ID, '2026-10-13');
+    checar(await tentar(() => ce.estudoParaLer('bia', S1)) === MSG_ESTUDO.naoAberto + '|404' && await tentar(() => ce.estudosAnteriores('bia', ID)) === 'célula não encontrada|404',
+      'quem saiu da célula perde a leitura e a lista na hora: 404');
+  }
+
+  // --- a multiplicação: a filha lê os da mãe até o dia em que nasceu, só para leitura ---
+  {
+    // a multiplicação foi no dia 12 às 23h30 de Brasília, depois do registro do encontro daquele dia
+    const multiplicou = new Date(dia(12, 23).getTime() + 30 * 60000);
+    const { filha } = await ce.multiplicarCelula('lider', ID, { auxiliar: 'aux', titulo: 'Nova', pessoas: ['ana'] }, '2026-10-12', multiplicou);
+    checar(ce.proposito(filha.id).multiplicadaInstante === multiplicou.toISOString(), 'a filha guarda o instante da multiplicação, além do dia');
+    const daMae0 = ce.estudosAnteriores('ana', filha.id, { de: 'mae' });
+    checar(daMae0.dono.id === ID && daMae0.itens.map((x) => x.e.id).join() === [S2, S1].join(), 'a filha lê os estudos da mãe até a multiplicação (o atual daquele momento incluído)');
+    // a mãe registra um encontro depois da multiplicação e muda o estudo atual, ainda sem uso, na mesma linha
+    await ce.registrarEncontro('lider', ID, { data: '2026-10-13', presentes: ['lider'], visitantes: 0, estudo: S1 }, '2026-10-13', dia(13, 21));
+    const mudado = await ce.salvarEstudo('lider', ID, { estudo: 'trecho', ref: 'Romanos 8.28-30', fonte: 'Escrito depois da multiplicação.', base: S2, combinado: 'Combinado de depois' }, opcoes(), dia(13, 22));
+    checar(mudado.estudo.id === S2, 'a mãe mudou o S2 na mesma linha, depois da multiplicação');
+    const r3 = await ce.salvarEstudo('lider', ID, { ...doDono, base: '' }, opcoes(), dia(14));
+    const S3 = r3.estudo.id;
+    const daMae = ce.estudosAnteriores('ana', filha.id, { de: 'mae' });
+    checar(daMae.itens.map((x) => x.e.id).join() === S1 && await tentar(() => ce.estudoParaLer('ana', S2, filha.id)) === MSG_ESTUDO.naoAberto + '|404',
+      'o estudo que a mãe mudou depois da multiplicação sai da filha (404): o texto já é de outro grupo');
+    checar(daMae.itens[0].data === '2026-10-12' && ce.estudosAnteriores('caio', ID).itens.find((x) => x.e.id === S1).data === '2026-10-13',
+      'na filha, a data do S1 é a do último encontro antes da multiplicação; na mãe, a do encontro de depois');
+    checar(JSON.stringify(ce.dadosDoEstudo(filha, { membro: true }, dia(14)).daMae) === JSON.stringify({ titulo: 'Esperança', ate: '2026-10-12' }), 'o retrato da filha diz que há estudos da mãe, e até quando');
+    const pelaFilha = ce.estudoParaLer('ana', S1);
+    checar(pelaFilha.p.id === filha.id && pelaFilha.acesso.daMae && pelaFilha.dono.id === ID, 'sem a célula, quem saiu da mãe pela multiplicação lê pela filha');
+    checar(await tentar(() => ce.estudoParaLer('ana', S1, ID)) === MSG_ESTUDO.naoAberto + '|404' && await tentar(() => ce.estudoParaLer('ana', S3)) === MSG_ESTUDO.naoAberto + '|404',
+      'pela mãe (de onde saiu), 404; e o estudo que a mãe preparou depois, 404');
+    const doNovoLider = ce.estudoParaLer('aux', S1, filha.id).acesso;
+    checar(doNovoLider.ler && !doNovoLider.usarComoBase && !doNovoLider.presenca, 'o líder da filha lê o da mãe sem "Usar como base" e sem a presença');
+    checar(await tentar(() => ce.registrarEncontro('aux', filha.id, { data: '2026-10-12', presentes: ['aux'], visitantes: 0, estudo: S1 }, '2026-10-12')) === MSG_ESTUDO.estudoDoRegistro + '|400',
+      'o registro da filha não aceita um estudo da mãe');
+  }
+
+  // --- 14. o líder apaga a conta: os estudos e a ligação com os encontros ficam ---
+  await ce.apagar('lider');
+  {
+    const lista = ce.estudosAnteriores('caio', ID);
+    checar(lista.itens.some((x) => x.e.id === S1 && x.e.criadoPor === 'lider') && itemDoHistorico(lista.itens[0].e, { nomeDe: (u) => (ce.achar(u) ? nomes[u] : '@' + u) }).criadoPorNome === '@lider',
+      'sem a conta do líder, a lista continua, com o @ de quem preparou');
+    checar(p().encontros.find((x) => x.data === '2026-10-12').estudo === S1 && dataNoHistorico(ce.estudo(S1), p().encontros, ce.diaNaCelula(p())).data === '2026-10-13',
+      'e os encontros continuam ligados aos estudos');
+  }
+  checar(erroDe(() => limparCombinado({ toString: () => 'x'.repeat(300) })) === MSG_ESTUDO.combinado + '|400', 'um combinado que não é texto também passa pelo teto');
+
+  fecharBanco(arquivoDoBanco(pasta));
+  rmSync(pasta, { recursive: true, force: true });
+}
+{
+  // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
+  const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
+  const historico = pol.slice(pol.indexOf('<ul class="historico">'));
+  checar(/<p class="atualizada">Versão 5 · atualizada em 18 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5');
+  checar(historico.indexOf('<b>Versão 5, 18 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Versão 5,') < historico.indexOf('<b>Versão 4, 18 de outubro de 2026.</b>')
+    && historico.indexOf('<b>Versão 4,') < historico.indexOf('<b>Ajuste da versão 3'), 'o histórico tem a versão 5 e a 4, das mais novas para as mais antigas');
+  checar(/<tr><td>O estudo da célula<\/td><td>[^<]*estudos anteriores, só quem faz parte da célula hoje, inclusive quem entrou depois[^<]*guardados antes desta versão ficam só para quem já fazia parte da célula[^<]*célula de origem preparados até a multiplicação, como estavam naquele momento/.test(pol),
+    'o quadro de quem vê diz quem lê os estudos anteriores (os de antes desta versão, só quem já os via), inclusive na célula que nasceu de uma multiplicação');
+  checar(/O lugar de cada anotação \([^)]*o estudo da célula\) fica sem criptografia/.test(pol) && /Junto com a presença fica qual estudo foi usado no encontro/.test(pol)
+    && /mensagem pronta pelo WhatsApp do próprio celular\. O app não manda nada sozinho\./.test(pol) && /Acolhida, adoração e testemunho não ficam guardados nos estudos anteriores/.test(pol),
+  'a política diz o lugar da anotação sem cifra, o estudo junto da presença, a mensagem a quem faltou e o que não vai para o histórico');
+  checar(!/[\u2013\u2014]/.test(pol), 'a política não tem travessão nem meia-risca');
 }
 
 // =========================================================================
