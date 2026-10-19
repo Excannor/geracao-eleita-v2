@@ -1207,3 +1207,12 @@ sudo docker compose up -d caminho && sudo docker compose up -d --force-recreate 
 O `run` usa a imagem, o `environment` (com o `.env`) e os volumes do serviço `caminho`: `./dados` em `/app/dados`, com o `CAMINHO_ESTADO=/app/dados/estado.json` da imagem, e a pasta dos backups. `--no-deps` não sobe mais nada e `--rm` apaga o container no fim. Se o @ lidera mais de uma célula, a prévia lista os ids: acrescente `--celula <id>` nas duas chamadas. Recriar o `tunel-fixo` no fim é o mesmo passo do `publicar.ps1`: parar o `caminho` derruba a rede que o túnel usa.
 
 Conferido numa cópia de `estado-base` (líder `marcos`, que já tinha um estudo "Romanos 8.28-30" na célula): a prévia com o app no ar, a recusa do `--sim` com o app no ar, a gravação com ele parado e, de novo no ar, a aba Estudo do líder e de um membro com os 6 cartões na NBV, as 2 perguntas e "Romanos 8.28-30" em Estudos anteriores. As funções puras e o caminho inteiro numa pasta de ensaio estão no `teste.mjs` ("colocar um estudo na célula direto no banco").
+
+## 16. Decisões do dono confirmadas (19/10)
+
+As escolhas que a Fase 2 fez no lugar do dono foram confirmadas por ele, como estão no código:
+
+1. A célula filha lê os estudos da mãe só até o dia da multiplicação.
+2. Um estudo novo começa com Acolhida, Adoração e Testemunho em branco (o app mostra as sugestões da semana).
+3. Os estudos guardados antes do histórico continuam só para quem já os via.
+4. As notificações push com "Bora" (notificacoes.mjs) ficam como estão: têm voz própria, com emoji, e não seguem a regra de gíria das telas.
