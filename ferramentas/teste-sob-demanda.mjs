@@ -203,7 +203,7 @@ await av('location.hash = "#/mapa/isaias"');
 ok(await esperar('document.querySelectorAll(".mapa .mapa-ramo").length >= 3', 10000), 'sem rede, o mapa já aberto uma vez sai da tela guardada');
 await av('location.hash = "#/config/painel"');
 ok(await esperar('!!' + q('.estado.erro') + ' && ' + q('.folha-perfil h1') + '?.textContent === "Painel do administrador"', 10000)
-  && await av('!document.querySelector(".estado.erro b") || document.querySelector(".estado.erro b").textContent === "Não deu para carregar o painel"'),
+  && await av('!document.querySelector(".estado.erro b") || document.querySelector(".estado.erro b").textContent === "Não consegui carregar o painel"'),
 'sem rede, o painel guardado abre e diz que não deu para buscar os números (como antes)');
 await semRede(false);
 

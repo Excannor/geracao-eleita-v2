@@ -672,9 +672,9 @@
 
   // ---------- conquistas (privadas) ----------
   const LEGADO = {
-    'Escriba': ['caneta', 'Dez registros escritos, da versão anterior'],
-    'Estante cheia': ['livro', 'Vinte livros concluídos, da versão anterior'],
-    'Os sessenta e seis': ['coroa', 'Todos os livros, da versão anterior'],
+    'Escriba': ['caneta', 'Dez registros escritos'],
+    'Estante cheia': ['livro', 'Vinte livros concluídos'],
+    'Os sessenta e seis': ['coroa', 'Todos os livros'],
   };
 
   // As conquistas agora têm níveis (02b-jogo.js). As da primeira versão, que não existem

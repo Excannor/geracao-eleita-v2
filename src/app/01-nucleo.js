@@ -510,8 +510,8 @@ window.CC = window.CC || {};
     const semRede = navigator.onLine === false;
     return CC.estado({
       erro: true, icone: 'info',
-      titulo: semRede ? 'Sem conexão. Tente de novo.' : titulo,
-      texto: semRede ? 'Isto ainda não está guardado neste celular. Com internet, fica guardado para abrir sem rede.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
+      titulo: semRede ? 'Sem conexão' : titulo,
+      texto: semRede ? 'Conecte-se para abrir.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
       acao: 'Tentar de novo',
     });
   };
@@ -656,7 +656,17 @@ window.CC = window.CC || {};
     return { folha, fechar };
   };
 
-  // Pedido ao servidor com a mensagem de erro dele, pronta para a tela.
+  // A mensagem de erro do servidor, pronta para a tela: com maiúscula e ponto final, e sem
+  // termo técnico (ação, rota ou método desconhecido, caminho inválido) no lugar de frase.
+  const ERRO_GERAL = 'Não deu certo agora. Tente de novo.';
+  const ERRO_TECNICO = /desconhecid|não suportad|inválid|outra origem|^corpo grande demais/i;
+  CC.frase = (m) => {
+    const t = String(m || '').trim();
+    if (!t || ERRO_TECNICO.test(t)) return ERRO_GERAL;
+    return t.charAt(0).toUpperCase() + t.slice(1) + (/[.!?…]$/.test(t) ? '' : '.');
+  };
+  // Pedido ao servidor com a mensagem de erro dele, pronta para a tela. Sem rede, o erro não
+  // tem status (quem precisa saber, como o preparo do estudo, olha o status).
   CC.api = (rota, corpo, metodo) => {
     const botao = ultimoBotao && ultimoBotao.isConnected && Date.now() - ultimoToque < 800 ? ultimoBotao : null;
     if (botao) { botao.classList.add('ocupado'); botao.setAttribute('aria-busy', 'true'); }
@@ -666,10 +676,10 @@ window.CC = window.CC || {};
       cache: 'no-store',
       headers: corpo ? { 'content-type': 'application/json' } : undefined,
       body: corpo ? JSON.stringify(corpo) : undefined,
-    }).then(async (r) => {
+    }).catch(() => { throw new Error('Sem conexão. Tente de novo.'); }).then(async (r) => {
       const dado = await r.json().catch(() => ({}));
       if (!r.ok) {
-        const e = new Error(dado.erro || (r.status === 401 ? 'Entre de novo.' : 'Não deu certo agora.'));
+        const e = new Error(dado.erro ? CC.frase(dado.erro) : (r.status === 401 ? 'Entre de novo.' : ERRO_GERAL));
         e.status = r.status;
         throw e;
       }

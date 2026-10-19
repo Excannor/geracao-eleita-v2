@@ -146,7 +146,7 @@
     raiz.innerHTML = cabeca('Célula') + CC.esqueleto('cartoes');
     let d;
     try { d = await CC.api('api/painel/celula?id=' + encodeURIComponent(id)); } catch (e) {
-      raiz.innerHTML = cabeca('Célula') + CC.estado({ erro: true, titulo: 'Não deu para abrir a célula', texto: e.message, acao: 'Voltar ao painel' });
+      raiz.innerHTML = cabeca('Célula') + CC.estado({ erro: true, titulo: 'Não consegui abrir a célula', texto: e.message, acao: 'Voltar ao painel' });
       const b = raiz.querySelector('[data-acao-estado]');
       if (b) b.onclick = () => { location.hash = '#/config/painel'; };
       return;
@@ -176,7 +176,7 @@
     });
     pedidoTelaAviso.then(() => { if (location.hash === '#/config/painel/aviso') CC.telaAviso(raiz); }, () => {
       pedidoTelaAviso = null;
-      raiz.querySelector('.esqueleto').outerHTML = CC.estado({ erro: true, titulo: 'Não deu para abrir', texto: 'Pode ter sido a conexão. Tente de novo em instantes.' });
+      raiz.querySelector('.esqueleto').outerHTML = CC.estado({ erro: true, titulo: 'Não consegui abrir', texto: 'Pode ter sido a conexão. Tente de novo em instantes.' });
     });
   }
 
@@ -196,7 +196,7 @@
         CC.api('api/painel/liderancas').catch(() => null)]);
     } catch (e) {
       raiz.innerHTML = cabeca()
-        + CC.estado({ erro: true, titulo: 'Não deu para carregar o painel', texto: e.message, acao: 'Tentar de novo' });
+        + CC.estado({ erro: true, titulo: 'Não consegui carregar o painel', texto: e.message, acao: 'Tentar de novo' });
       const b = raiz.querySelector('[data-acao-estado]');
       if (b) b.onclick = () => CC.vistaPainel(raiz);
       return;

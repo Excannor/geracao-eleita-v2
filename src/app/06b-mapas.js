@@ -188,12 +188,12 @@
     raiz.innerHTML = folha(m) + CC.esqueleto('texto');
     CC.ligarVoltarDoTopo(raiz);
     ajustarNome(raiz);
-    if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Aberto como arquivo solto, o aplicativo não tem de onde trazer o mapa.</div>'; return; }
+    if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Não consegui abrir o mapa agora.</div>'; return; }
     const geracao = (raiz.dataset.mapaGeracao = String(Date.now()));
     const ainda = () => raiz.dataset.mapaGeracao === geracao && raiz.querySelector('.folha-mapa .mapa-nome') && raiz.querySelector('.esqueleto');
     CC.pedirPeca(window.MAPA_TELA, () => !!CC.mapas.tela).then(() => { if (ainda()) CC.mapas.tela(raiz, m); }, () => {
       if (!ainda()) return;
-      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não deu para abrir o mapa');
+      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não consegui abrir o mapa');
       const b = raiz.querySelector('[data-acao-estado]');
       if (b) b.onclick = () => CC.redesenhar();
     });

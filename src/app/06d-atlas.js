@@ -53,12 +53,12 @@
       + (item ? 'Mapas bíblicos' : 'Explorar') + '" aria-label="Voltar">' + CC.ico('voltar') + '</button>'
       + '<span class="mapa-barra-titulo">Mapas bíblicos</span><span style="width:44px"></span></div></div>' + CC.esqueleto('texto');
     CC.ligarVoltarDoTopo(raiz);
-    if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Aberto como arquivo solto, o aplicativo não tem de onde trazer os mapas.</div>'; return; }
+    if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Não consegui abrir os mapas agora.</div>'; return; }
     const geracao = (raiz.dataset.atlasGeracao = String(Date.now()));
     const ainda = () => raiz.dataset.atlasGeracao === geracao && raiz.querySelector('.esqueleto');
     Promise.all([CC.pedirPeca(window.ATLAS_TELA, temTela), item ? buscar(item.arquivo) : null]).then(() => { if (ainda()) pintar(); }, () => {
       if (!ainda()) return;
-      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não deu para abrir o mapa');
+      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não consegui abrir o mapa');
       const b = raiz.querySelector('[data-acao-estado]');
       if (b) b.onclick = () => CC.redesenhar();
     });

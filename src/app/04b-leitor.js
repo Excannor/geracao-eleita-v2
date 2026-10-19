@@ -223,11 +223,11 @@
     const alvo = el.querySelector('.leitor-texto');
     const status = el.querySelector('.so-leitor');
     if (!b) {
-      alvo.innerHTML = aviso('Este aplicativo foi gerado sem nenhuma tradução da Bíblia. Leia na sua Bíblia e marque a passagem na lição.');
+      alvo.innerHTML = aviso('Não consegui abrir o texto agora. Leia na sua Bíblia e marque a passagem na lição.');
       return;
     }
     if (!servido()) {
-      alvo.innerHTML = aviso('Aberto como arquivo solto, o aplicativo não tem de onde trazer o texto. Leia na sua Bíblia e marque a passagem na lição.');
+      alvo.innerHTML = aviso('Não consegui abrir o texto agora. Leia na sua Bíblia e marque a passagem na lição.');
       return;
     }
     alvo.innerHTML = CC.esqueleto('texto');
@@ -243,8 +243,8 @@
     }).catch(() => {
       if (minha !== geracao) return;
       alvo.innerHTML = aviso(navigator.onLine === false
-        ? 'Esta tradução ainda não está neste celular. Com internet, ela fica guardada para ler sem rede.'
-        : 'Não deu para abrir o texto agora.', true);
+        ? 'Sem conexão. Conecte-se para abrir.'
+        : 'Não consegui abrir o texto agora.', true);
       alvo.querySelector('[data-tentar]').onclick = () => preencher(el, dia, chave, b, minha);
     });
   }

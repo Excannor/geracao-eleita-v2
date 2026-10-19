@@ -45,7 +45,7 @@
       throw new Error(permissao === 'denied' ? 'As notificações ficaram bloqueadas neste aparelho.' : 'Sem permissão, sem notificação.');
     }
     const dados = cache || await CC.carregarNotificacoes();
-    if (!dados) throw new Error('Não consegui falar com o servidor agora.');
+    if (!dados) throw new Error('Sem conexão. Tente de novo.');
     let reg = await navigator.serviceWorker.getRegistration();
     if (!reg) reg = await navigator.serviceWorker.register('sw.js');
     await navigator.serviceWorker.ready;
@@ -117,7 +117,7 @@
         ehIos() ? 'Abra os Ajustes do iPhone, entre em Notificações, toque em Geração Eleita e ative.'
           : 'Toque no cadeado ao lado do endereço, ou nas informações do app no celular, e permita notificações.', ''),
       'sem-suporte': cartao('info', 'Este navegador não recebe notificações', 'No Android, use o Chrome. No iPhone, instale o app pela tela de início.', ''),
-      'sem-servidor': cartao('info', 'Sem servidor, sem notificação', 'Abra o app pelo endereço dele para ativar.', ''),
+      'sem-servidor': cartao('info', 'Notificações indisponíveis', 'Tente de novo mais tarde.', ''),
     })[e.situacao];
 
     const preferencias = e.dados

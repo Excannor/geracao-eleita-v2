@@ -329,7 +329,7 @@
   function preencherEstudo(painel, p, aindaAqui, alvo) {
     if (alvo && !(p.estudo && p.estudo.id === alvo)) {
       pedirEstudo(false).then(() => { if (aindaAqui()) CC.estudoCelula.anterior(painel, p, apoio, alvo, aindaAqui); },
-        () => { if (aindaAqui()) semPeca(painel, 'Não deu para abrir o estudo'); });
+        () => { if (aindaAqui()) semPeca(painel, 'Não consegui abrir o estudo'); });
       return;
     }
     if (!p.estudo) {
@@ -346,14 +346,14 @@
       return;
     }
     pedirEstudo(false).then(() => { if (aindaAqui()) CC.estudoCelula.aba(painel, p, apoio, aindaAqui); },
-      () => { if (aindaAqui()) semPeca(painel, 'Não deu para abrir o estudo'); });
+      () => { if (aindaAqui()) semPeca(painel, 'Não consegui abrir o estudo'); });
   }
   // deBase: o estudo anterior que o líder usa como base ("Usar como base").
   function abrirPreparo(raiz, p, aindaAqui, deBase) {
     raiz.innerHTML = '<div class="folha-juntos"><div class="cabeca-centro"><h1>Preparar o estudo</h1></div></div>'
       + '<div class="painel-celula mesa-preparo" data-celula="' + CC.esc(p.id) + '" data-de-base="' + CC.esc(deBase || '') + '">' + CC.esqueleto('texto') + '</div>';
     // sem a peça, "Tentar de novo" redesenha: o vazio perde a marca de preparo aberto
-    const semPreparo = () => { const m = raiz.querySelector('.mesa-preparo'); delete m.dataset.celula; semPeca(m, 'Não deu para abrir o preparo'); };
+    const semPreparo = () => { const m = raiz.querySelector('.mesa-preparo'); delete m.dataset.celula; semPeca(m, 'Não consegui abrir o preparo'); };
     pedirEstudo(true).then(() => { if (aindaAqui()) CC.estudoPreparo.tela(raiz, p, apoio, { deBase }); },
       () => { if (aindaAqui()) semPreparo(); });
   }
@@ -364,7 +364,7 @@
     raiz.innerHTML = CC.esqueleto('texto');
     const aqui = location.hash;
     pedirEstudo(false).then(() => { if (location.hash === aqui) CC.estudoCelula.solto(raiz, String(arg || '').split('/')[0], apoio); },
-      () => { if (location.hash === aqui) semPeca(raiz, 'Não deu para abrir o estudo'); });
+      () => { if (location.hash === aqui) semPeca(raiz, 'Não consegui abrir o estudo'); });
   };
 
   function abaPessoas(p, souLider) {
@@ -612,7 +612,7 @@
       if (!/^#\/novidades\/propositos\/?$/.test(location.hash)) return;
       if (d && JSON.stringify(d) === antes) return;
       if (jaMostrou) raiz.classList.add('sem-entrada');
-      desenhar(d || cache, d ? '' : 'Não consegui falar com o servidor agora.');
+      desenhar(d || cache, d ? '' : 'Sem conexão. Tente de novo.');
     });
   };
 
@@ -1325,7 +1325,7 @@
   const tituloDoEstudo = (e) => (e.tipo === 'semana' ? 'A leitura da semana' : e.titulo || (e.refs || [])[0] || 'Estudo do encontro');
   const NENHUM_ESTUDO = 'Outro estudo, fora do app';
   // A mensagem do servidor com a maiúscula e o ponto da tela.
-  const comoFrase = (m) => { const t = String(m || 'Não deu certo agora. Tente de novo.'); return t.charAt(0).toUpperCase() + t.slice(1) + (/[.!?]$/.test(t) ? '' : '.'); };
+  const comoFrase = (m) => CC.frase(m);
 
   // opcoes.estudo: o estudo que o modo encontro acabou de usar.
   function folhaRegistrarEncontro(p, opcoes = {}) {
@@ -1488,7 +1488,7 @@
   CC.apoioCelula = apoio;
   // O estudo do encontro abre na aba Estudo da célula; o modo encontro, na peça.
   CC.estudoDoEncontro = (p) => { location.hash = enderecoCelula(p.id, 'estudo'); };
-  CC.modoEncontro = (p) => (p && p.estudo ? pedirEstudo(false).then(() => CC.estudoCelula.modoEncontro(p, apoio), () => CC.avisar('Não deu para abrir o modo encontro agora.')) : null);
+  CC.modoEncontro = (p) => (p && p.estudo ? pedirEstudo(false).then(() => CC.estudoCelula.modoEncontro(p, apoio), () => CC.avisar('Não consegui abrir o modo encontro agora.')) : null);
 
   // Quem já tem conta e abre o link da célula.
   CC.abrirLinkCelula = async function (token) {
@@ -1689,7 +1689,7 @@
   }
 
   function desenharOracao(painel, p, d) {
-    if (!d) { painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('aperto') + '<p>Não consegui falar com o servidor agora.</p></div>'; return; }
+    if (!d) { painel.innerHTML = '<div class="vazio-amigos">' + CC.ico('aperto') + '<p>Sem conexão. Tente de novo.</p></div>'; return; }
     const conduzo = p.euConduzo;
     painel.innerHTML = (conduzo && d.denuncias && d.denuncias.length ? blocoRevisaoPedidos(d.denuncias) : '')
       + '<div class="acoes"><button class="botao" data-pedir="oracao">' + CC.ico('aperto') + 'Pedir oração</button>'

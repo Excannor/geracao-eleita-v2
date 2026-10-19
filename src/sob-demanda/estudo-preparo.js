@@ -159,7 +159,7 @@
       try { r = await CC.api('api/estudos?estudo=' + encodeURIComponent(opcoes.deBase) + '&celula=' + encodeURIComponent(p.id)); } catch (e) { r = null; }
       if (!vivo()) return;
       if (!r || !r.usarComoBase || !r.estudo) {
-        CC.avisar('Não deu para abrir este estudo agora. Tente de novo.', { tipo: 'erro' });
+        CC.avisar('Não consegui abrir este estudo agora. Tente de novo.', { tipo: 'erro' });
         CC.substituirRota(apoio.endereco(p.id, 'estudo') + '/' + encodeURIComponent(opcoes.deBase));
         return;
       }

@@ -19,7 +19,7 @@
     const ainda = () => raiz.dataset.painelGeracao === geracao && location.hash.startsWith('#/config/painel') && raiz.querySelector('.esqueleto');
     CC.pedirPeca(window.PAINEL_TELA, () => !!CC.painelTela).then(() => { if (ainda()) CC.painelTela(raiz, arg); }, () => {
       if (!ainda()) return;
-      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não deu para abrir o painel');
+      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não consegui abrir o painel');
       const b = raiz.querySelector('[data-acao-estado]');
       if (b) b.onclick = () => CC.vistaPainel(raiz, arg);
     });

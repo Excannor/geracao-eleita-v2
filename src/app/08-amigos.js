@@ -417,7 +417,7 @@
         else CC.telaNovoProposito(info);
         recarregar();
       } catch (e) {
-        CC.folha('<h2>Não deu para aceitar o convite</h2><p>' + CC.esc(e.message || 'Tente de novo em instantes.') + '</p>'
+        CC.folha('<h2>Não consegui aceitar o convite</h2><p>' + CC.esc(e.message || 'Tente de novo em instantes.') + '</p>'
           + '<div class="acoes"><button class="botao" data-fechar>Entendi</button></div>',
         { ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
       }
@@ -661,7 +661,7 @@
 
   CC.vistaAmigos = function (raiz) {
     if (!servido()) {
-      raiz.innerHTML = '<h1>Juntos</h1><div class="vazio">Os amigos aparecem quando o aplicativo está aberto pelo servidor.</div>';
+      raiz.innerHTML = '<h1>Juntos</h1><div class="vazio">Não consegui abrir os amigos agora.</div>';
       return;
     }
 
@@ -827,7 +827,7 @@
       if (CC.pintarNavegacao) CC.pintarNavegacao();
       if (d && JSON.stringify([d, n || mural, celulasAgora()]) === antes) return;
       if (jaMostrou) raiz.classList.add('sem-entrada');
-      desenhar(d || emCache(), n || mural, d ? '' : 'Não consegui falar com o servidor agora.');
+      desenhar(d || emCache(), n || mural, d ? '' : 'Sem conexão. Tente de novo.');
     });
   };
 

@@ -59,7 +59,7 @@
     raiz.innerHTML = '<div class="folha-mapa"><div class="mapa-barra"><button class="botao-redondo" data-voltar data-rotulo-voltar="'
       + (item ? 'Parábolas' : 'Explorar') + '" aria-label="Voltar">' + CC.ico('voltar') + '</button></div></div>' + CC.esqueleto('texto');
     CC.ligarVoltarDoTopo(raiz);
-    if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Aberto como arquivo solto, o aplicativo não tem de onde trazer as parábolas.</div>'; return; }
+    if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Não consegui abrir as parábolas agora.</div>'; return; }
     const geracao = (raiz.dataset.parabolaGeracao = String(Date.now()));
     const ainda = () => raiz.dataset.parabolaGeracao === geracao && raiz.querySelector('.esqueleto');
     Promise.all([buscar(P.tela, pedirTela), item ? buscar(item.arquivo) : null]).then(([, p]) => { if (ainda()) pintar(p); }).catch(() => {
@@ -67,8 +67,8 @@
       const semRede = navigator.onLine === false;
       raiz.querySelector('.esqueleto').outerHTML = CC.estado({
         erro: true, icone: 'info',
-        titulo: semRede ? 'Sem internet agora' : 'Não deu para abrir as parábolas',
-        texto: semRede ? 'Isto ainda não está guardado neste celular. Com internet, fica guardado para abrir sem rede.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
+        titulo: semRede ? 'Sem conexão' : 'Não consegui abrir as parábolas',
+        texto: semRede ? 'Conecte-se para abrir.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
         acao: 'Tentar de novo',
       });
       const b = raiz.querySelector('[data-acao-estado]');

@@ -35,8 +35,8 @@
 
   function semTraducaoOuOffline(alvo) {
     const b = CC.traducao();
-    if (!b) { mostrarVazio(alvo, 'Este aplicativo foi gerado sem nenhuma tradução da Bíblia.'); return true; }
-    if (!CC.appServido()) { mostrarVazio(alvo, 'Aberto como arquivo solto, o aplicativo não tem de onde trazer o texto.'); return true; }
+    if (!b) { mostrarVazio(alvo, 'Não consegui abrir o texto agora.'); return true; }
+    if (!CC.appServido()) { mostrarVazio(alvo, 'Não consegui abrir o texto agora.'); return true; }
     return false;
   }
 
@@ -45,8 +45,8 @@
     alvo.innerHTML = CC.botaoVoltar('Voltar') + CC.estado({
       erro: true,
       icone: 'info',
-      titulo: semRede ? 'Sem internet agora' : 'Não deu para abrir o texto',
-      texto: semRede ? 'Esta tradução ainda não está guardada neste celular. Com internet, ela fica guardada para ler sem rede.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
+      titulo: semRede ? 'Sem conexão' : 'Não consegui abrir o texto',
+      texto: semRede ? 'Conecte-se para abrir.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
       acao: 'Tentar de novo',
     });
     const b = alvo.querySelector('[data-acao-estado]');

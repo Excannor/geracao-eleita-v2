@@ -260,7 +260,7 @@
     if (cache && cache.pronto) { pintar(cache.pronto); return; }
     raiz.innerHTML = folha(m) + CC.esqueleto('texto');
     ligar(raiz, m);
-    if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Aberto como arquivo solto, o aplicativo não tem de onde trazer o mapa.</div>'; return; }
+    if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Não consegui abrir o mapa agora.</div>'; return; }
     const geracao = (raiz.dataset.mapaGeracao = String(Date.now()));
     carregar(m).then((mapa) => {
       if (raiz.dataset.mapaGeracao !== geracao || !raiz.querySelector('.folha-mapa')) return;
@@ -270,8 +270,8 @@
       const semRede = navigator.onLine === false;
       raiz.querySelector('.esqueleto').outerHTML = CC.estado({
         erro: true, icone: 'info',
-        titulo: semRede ? 'Sem internet agora' : 'Não deu para abrir o mapa',
-        texto: semRede ? 'Este mapa ainda não está guardado neste celular. Com internet, ele fica guardado para abrir sem rede.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
+        titulo: semRede ? 'Sem conexão' : 'Não consegui abrir o mapa',
+        texto: semRede ? 'Conecte-se para abrir.' : 'Pode ter sido a conexão. Tente de novo em instantes.',
         acao: 'Tentar de novo',
       });
       const b = raiz.querySelector('[data-acao-estado]');

@@ -106,7 +106,7 @@
       juntos.onclick = async () => {
         juntos.disabled = true;
         const certo = await CC.compartilharVersiculo(ref).catch(() => false);
-        CC.avisar(certo ? 'Seus amigos vão ver no Juntos' : 'Não deu para mostrar agora');
+        CC.avisar(certo ? 'Seus amigos vão ver no Juntos' : 'Não consegui mostrar agora');
         juntos.disabled = false;
         if (certo) aoMudar('juntos');
       };

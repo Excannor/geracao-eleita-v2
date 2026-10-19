@@ -263,8 +263,8 @@
         r = await CC.api('api/estudos?celula=' + encodeURIComponent(p.id) + (de ? '&de=' + de : '') + (antes ? '&antes=' + encodeURIComponent(antes) : ''));
       } catch (e) {
         if (!alvo.isConnected) return;
-        if (antes) { CC.avisar('Não deu para abrir os estudos anteriores agora.'); return; }
-        alvo.innerHTML = '<p class="passo-dica pequena">Não deu para abrir os estudos anteriores agora.</p><button type="button" class="botao contorno pequeno" data-tentar-lista>Tentar de novo</button>';
+        if (antes) { CC.avisar('Não consegui abrir os estudos anteriores agora.'); return; }
+        alvo.innerHTML = '<p class="passo-dica pequena">Não consegui abrir os estudos anteriores agora.</p><button type="button" class="botao contorno pequeno" data-tentar-lista>Tentar de novo</button>';
         alvo.querySelector('[data-tentar-lista]').onclick = () => pedir('');
         return;
       }
@@ -315,7 +315,7 @@
       const atual = raiz.querySelector('[data-atual]');
       if (atual && p) atual.onclick = (ev) => { ev.preventDefault(); CC.substituirRota(apoio.endereco(p.id, 'estudo')); };
     } else {
-      raiz.innerHTML = CC.estadoSemPeca('Não deu para abrir o estudo');
+      raiz.innerHTML = CC.estadoSemPeca('Não consegui abrir o estudo');
       const b = raiz.querySelector('[data-acao-estado]');
       if (b) b.onclick = tentar;
     }

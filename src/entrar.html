@@ -1021,7 +1021,7 @@
         }
         botao.disabled = false;
         var msg = d.erro || 'Não consegui criar a conta.';
-        msg = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
+        msg = msg.charAt(0).toUpperCase() + msg.slice(1) + (/[.!?]$/.test(msg) ? '' : '.');
         if (/e-mail/.test(msg)) { irPasso(2); erro($('email'), msg); }
         else if (/nascimento/.test(msg)) { irPasso(1); erro($('nascimento'), msg); }
         else if (/12 anos/.test(msg)) { irPasso(1); erro($('nascimento'), msg); }
@@ -1034,7 +1034,7 @@
       });
     }).catch(function () {
       botao.disabled = false;
-      erro(null, 'Sem conexão. Seus dados continuam aqui.');
+      erro(null, 'Sem conexão. Tente de novo.');
     });
   });
 
@@ -1055,7 +1055,7 @@
       $('erro-entrar').textContent = r.status === 429 ? 'Muitas tentativas. Espere um pouco.' : 'Usuário ou senha não conferem.';
     }).catch(function () {
       botao.disabled = false;
-      $('erro-entrar').textContent = 'Sem conexão com o servidor.';
+      $('erro-entrar').textContent = 'Sem conexão. Tente de novo.';
     });
   });
 
@@ -1082,7 +1082,7 @@
       });
     }).catch(function () {
       botao.disabled = false;
-      $('erro-esqueci').textContent = 'Sem conexão com o servidor.';
+      $('erro-esqueci').textContent = 'Sem conexão. Tente de novo.';
     });
   });
 
@@ -1106,13 +1106,13 @@
         }
         botao.disabled = false;
         var msg = d.erro || 'Não consegui trocar a senha.';
-        msg = msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
+        msg = msg.charAt(0).toUpperCase() + msg.slice(1) + (/[.!?]$/.test(msg) ? '' : '.');
         if (r.status === 410) { linkRuim(msg); return; }
         $('erro-redefinir').textContent = msg;
       });
     }).catch(function () {
       botao.disabled = false;
-      $('erro-redefinir').textContent = 'Sem conexão com o servidor.';
+      $('erro-redefinir').textContent = 'Sem conexão. Tente de novo.';
     });
   });
   // Link vencido ou já usado: diz qual dos dois logo ao abrir, e o caminho é pedir outro (o
@@ -1137,7 +1137,7 @@
           $('conta-redefinir').hidden = false;
         } else if (r.status === 410) {
           var msg = d.erro || 'esse link não vale mais. Peça outro';
-          linkRuim(msg.charAt(0).toUpperCase() + msg.slice(1) + '.');
+          linkRuim(msg.charAt(0).toUpperCase() + msg.slice(1) + (/[.!?]$/.test(msg) ? '' : '.'));
         }
       });
     }).catch(function () { /* sem rede: o formulário segue e o POST avisa */ });

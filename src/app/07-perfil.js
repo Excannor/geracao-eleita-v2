@@ -235,7 +235,7 @@
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1></div>'
       + '<div class="caixa-lista">' + conquistas.map(CC.linhaConquista).join('') + '</div>'
       + (legado.length
-        ? CC.tituloSecao('Da primeira versão') + '<div class="caixa-lista">' + legado.map((c) => '<div class="linha-conquista ganha">'
+        ? CC.tituloSecao('Mais conquistas') + '<div class="caixa-lista">' + legado.map((c) => '<div class="linha-conquista ganha">'
           + '<span class="arte-medalha c-amarelo"><span class="escudo">' + CC.ico(c.icone) + '</span></span>'
           + '<div class="corpo-conquista"><b>' + CC.esc(c.titulo) + '</b><span class="descricao-conquista">' + CC.esc(c.descricao) + '</span></div></div>').join('') + '</div>'
         : '');

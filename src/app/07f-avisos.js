@@ -78,7 +78,7 @@
     try {
       r = await CC.api('api/avisos');
     } catch (e) {
-      raiz.innerHTML = cabeca + CC.estado({ erro: true, icone: 'info', titulo: 'Não deu para abrir os avisos', texto: 'Pode ter sido a conexão. Tente de novo em instantes.', acao: 'Tentar de novo' });
+      raiz.innerHTML = cabeca + CC.estado({ erro: true, icone: 'info', titulo: 'Não consegui abrir os avisos', texto: 'Pode ter sido a conexão. Tente de novo em instantes.', acao: 'Tentar de novo' });
       CC.ligarVoltarDoTopo(raiz);
       const b = raiz.querySelector('[data-acao-estado]');
       if (b) b.onclick = () => CC.redesenhar();
