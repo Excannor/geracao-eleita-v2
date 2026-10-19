@@ -287,7 +287,6 @@
     $('[data-cancelar]').onclick = () => {
       guardarRascunho();
       fechar();
-      if (lerRascunho()) CC.avisar('Rascunho guardado neste aparelho');
     };
     $('[data-guardar]').onclick = () => {
       st.texto = campo.value.trim();

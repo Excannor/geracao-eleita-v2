@@ -291,7 +291,7 @@
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelector('[data-compartilhar]').onclick = async () => {
           const r = await CC.compartilhar(texto, link);
-          if (r === 'copiado') CC.avisar('Convite copiado. É só colar na conversa.');
+          if (r === 'copiado') CC.avisar('Convite copiado');
           else if (r === 'falhou') CC.avisar('Não consegui compartilhar. Toque em "Copiar link" e cole na conversa.');
         };
         folha.querySelector('[data-copiar]').onclick = async () => {

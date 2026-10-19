@@ -290,7 +290,7 @@
       // O mesmo link de "Mandar o link da célula": quem abrir escolhe entrar ou só conhecer.
       const texto = 'Quer ir comigo no encontro da minha célula? É ' + nomeDoEncontro(p.encontro) + '. Me chama que eu te passo o endereço.';
       const r = await CC.compartilhar(texto, link);
-      if (r === 'copiado') CC.avisar('Link copiado. É só colar na conversa.');
+      if (r === 'copiado') CC.avisar('Link copiado');
       else if (r === 'falhou') CC.avisar('Não consegui compartilhar agora.');
     });
     const tornar = painel.querySelector('[data-tornar-membro]');
@@ -835,7 +835,7 @@
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelector('[data-compartilhar]').onclick = async () => {
           const r = await CC.compartilhar(texto, link);
-          if (r === 'copiado') CC.avisar('Link copiado. É só colar no grupo.');
+          if (r === 'copiado') CC.avisar('Link copiado');
           else if (r === 'falhou') CC.avisar('Não consegui compartilhar. Toque em "Copiar link" e cole no grupo.');
         };
         folha.querySelector('[data-copiar]').onclick = async () => {

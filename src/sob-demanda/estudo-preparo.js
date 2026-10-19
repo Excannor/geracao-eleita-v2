@@ -218,19 +218,14 @@
       else if (st.passo === 3) passo3();
       else passo1();
     }
-    const temConteudo = () => !!(String(st.fonte || '').trim() || String(st.palavra || '').trim() || st.passo > 1);
-    // Só "Sair" sai: tocar fora da folha (null) é o mesmo que continuar preparando.
-    async function sair() {
-      if (temConteudo() && await CC.confirmar({
-        titulo: 'Sair do preparo?', texto: 'O rascunho fica guardado neste celular. Quando voltar, você continua de onde parou.',
-        acao: 'Continuar preparando', cancelar: 'Sair',
-      }) !== false) return;
+    // O rascunho já fica guardado a cada mudança: sair não pergunta nada.
+    function sair() {
       CC.substituirRota(apoio.endereco(p.id, 'estudo'));
     }
     // A mensagem de um pedido que falhou, com a maiúscula e o ponto da tela. Sem resposta do
     // servidor (sem internet), o que fazer: o rascunho não se perdeu.
     const mensagemDe = (e) => {
-      if (!e || !e.status) return 'Sem conexão. O rascunho continua neste celular. Tente de novo.';
+      if (!e || !e.status) return 'Sem conexão. Tente de novo.';
       const m = String(e.message || 'Não deu certo agora. Tente de novo.');
       return m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.');
     };
@@ -245,7 +240,6 @@
     const legendaCompleta = '<span>Entre asteriscos: negrito.</span>'
       + '<span>Para um versículo, basta a referência numa linha, como Efésios 6:12. Na próxima tela você confere cada cartão.</span>'
       + '<span>As perguntas para conversar ficam no passo 3.</span>';
-    const legendaRascunho = '<span>Rascunho guardado neste celular. Se a tela fechar, o texto continua aqui.</span>';
     const MARCAS = [
       ['topico', '<span class="g">1.</span>', 'Tópico', 'Escreve 1. no começo da linha'],
       ['seta', CC.ico('avancar'), 'Seta', 'Escreve uma seta onde está o cursor'],
@@ -381,7 +375,7 @@
         st.fonte = campo.value;
         guardar();
         const tem = !!st.fonte.trim();
-        legenda.innerHTML = (tem ? legendaCompleta : '') + legendaRascunho;
+        legenda.innerHTML = tem ? legendaCompleta : '';
         ver.disabled = !tem;
         ajustarAltura();
         medir();

@@ -423,7 +423,7 @@
         });
         if (q('[data-pausar]')) q('[data-pausar]').onclick = () => {
           gravarRegistro(d.id, (r) => ({ ...r, ativo: false }));
-          fechar(); redesenhar(); CC.avisar('Pausado. Os dias vencidos ficam guardados.');
+          fechar(); redesenhar(); CC.avisar('Desafio pausado');
         };
         if (q('[data-vencer]')) q('[data-vencer]').onclick = () => {
           const hoje = CC.hojeIso();

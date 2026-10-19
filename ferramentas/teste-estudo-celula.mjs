@@ -334,16 +334,8 @@ await emTodosOsTamanhos('passo 1 com o texto colado');
 await cmd('Page.reload');
 ok(await esperar('!!document.querySelector("[data-fonte]") && document.querySelector("[data-fonte]").value.split("\\n").length === 42', 15000), '5. recarregar a página mantém o texto (rascunho no celular)');
 await clicar('.mesa-cabeca [data-voltar]');
-ok(await esperar('!!document.querySelector(".cortina .folha") && /Sair do preparo\\?/.test(document.querySelector(".cortina .folha").textContent)'), '5. o voltar do topo pergunta "Sair do preparo?"');
-ok(await av('[...document.querySelectorAll(".cortina .botao")].map((b) => b.textContent.trim()).join("|") === "Continuar preparando|Sair" && ' + q('.cortina [data-nao]') + '.classList.contains("contorno")'),
-  '5. com "Continuar preparando" e "Sair" (contorno)');
-await foto('01d-preparar-sair');
-await av('document.querySelector(".cortina").click(); true');
-ok(await esperar('!document.querySelector(".cortina")') && /\/preparar$/.test(await av('location.hash')) && !!(await av(existe('[data-fonte]'))), '5. tocar fora da folha "Sair do preparo?" continua preparando');
-await clicar('.mesa-cabeca [data-voltar]');
-await esperar('!!document.querySelector(".cortina [data-nao]")');
-await clicar('.cortina [data-nao]');
-ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector("[data-preparar]") && !document.body.classList.contains("sem-barra")'), '5. "Sair" volta à aba Estudo, com a barra de abas');
+ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector("[data-preparar]") && !document.body.classList.contains("sem-barra")') && !(await av('!!document.querySelector(".cortina")')),
+  '5. o voltar do topo sai direto para a aba Estudo, com a barra de abas, sem perguntar (o rascunho já está guardado)');
 ok(await av('!!localStorage.getItem("cc.rascunho.estudo.' + ID + '")'), '5. o rascunho fica no celular');
 await clicar('[data-preparar]');
 ok(await esperar('!!document.querySelector("[data-fonte]") && document.querySelector("[data-fonte]").value.startsWith("Estudo: Batalha")', 15000), '5. de volta ao preparo, o texto continua lá');
@@ -446,8 +438,8 @@ await emTodosOsTamanhos('passo 3');
 // ---------- 9. Salvar ----------
 await na(() => { window.__fetch = window.fetch; window.fetch = (u, o) => (/api\/celula/.test(String(u)) ? Promise.reject(new TypeError('Failed to fetch')) : window.__fetch(u, o)); return true; });
 await clicar('[data-salvar]');
-ok(await esperar('/Sem conexão\. O rascunho continua neste celular\. Tente de novo\./.test(document.querySelector("[data-erro]")?.textContent || "")') && /\/preparar$/.test(await av('location.hash')),
-  '9. sem internet, salvar diz "Sem conexão. O rascunho continua neste celular. Tente de novo." (e não "Failed to fetch")');
+ok(await esperar('/Sem conexão\. Tente de novo\./.test(document.querySelector("[data-erro]")?.textContent || "")') && /\/preparar$/.test(await av('location.hash')),
+  '9. sem internet, salvar diz "Sem conexão. Tente de novo." (e não "Failed to fetch")');
 await na(() => { window.fetch = window.__fetch; return true; });
 await clicar('[data-salvar]');
 ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector(".mesa-lider")', 20000), '9. salvar volta à aba Estudo, com o cartão do líder');

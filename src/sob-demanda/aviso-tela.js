@@ -203,7 +203,7 @@
         try {
           const resp = await CC.api('api/painel/aviso/cancelar', { id: a.id });
           resumo = resp.resumo || resumo;
-          CC.avisar('Pronto: aviso cancelado');
+          CC.avisar('Aviso cancelado');
         } catch (e) { CC.avisar(e.message); }
         if (raiz.isConnected) desenhar(raiz);
       };

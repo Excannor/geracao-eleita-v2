@@ -240,7 +240,7 @@
           fechar();
           try {
             await ativando;
-            CC.avisar('Pronto! Lembrete às ' + ((cache && cache.preferencias && cache.preferencias.hora) || '19:00'));
+            CC.avisar('Lembrete às ' + ((cache && cache.preferencias && cache.preferencias.hora) || '19:00'));
           } catch (err) { CC.avisar(err.message); }
         };
       },

@@ -1076,7 +1076,7 @@
         if (!r.ok) { $('erro-esqueci').textContent = 'Não deu certo agora. Tente de novo.'; return; }
         // A mesma resposta para conta que existe e que não existe: a tela não entrega quem tem cadastro.
         $('pronto-esqueci').textContent = d.porEmail
-          ? 'Pronto! Se essa conta tiver e-mail cadastrado, o link chega em alguns minutos. Olhe também a caixa de spam. O link vale por 1 hora.'
+          ? 'Se essa conta tiver e-mail cadastrado, o link chega em alguns minutos. Olhe também a caixa de spam. O link vale por 1 hora.'
           : 'Pedido anotado! Quem cuida do app vai te mandar o link da senha nova, normalmente pelo WhatsApp. Se demorar, fale com o líder que te convidou.';
         $('pronto-esqueci').hidden = false;
       });

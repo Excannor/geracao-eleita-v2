@@ -414,7 +414,7 @@
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelectorAll('[data-copiar-faltou]').forEach((b) => {
           b.onclick = async () => {
-            CC.avisar((await CC.copiar(recado(lista[Number(b.dataset.copiarFaltou)]))) ? 'Mensagem copiada. É só colar na conversa.' : 'Não consegui copiar agora.');
+            CC.avisar((await CC.copiar(recado(lista[Number(b.dataset.copiarFaltou)]))) ? 'Mensagem copiada' : 'Não consegui copiar agora.');
           };
         });
       },
@@ -513,11 +513,11 @@
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelector('[data-mandar]').onclick = async () => {
           const r = await CC.compartilhar(zap, '');
-          if (r === 'copiado') CC.avisar('Estudo copiado. É só colar no grupo.');
+          if (r === 'copiado') CC.avisar('Estudo copiado');
           else if (r === 'falhou') CC.avisar('Não consegui compartilhar agora.');
         };
         folha.querySelector('[data-copiar]').onclick = async () => {
-          CC.avisar((await CC.copiar(zap)) ? 'Estudo copiado. É só colar no grupo.' : 'Não consegui copiar agora.');
+          CC.avisar((await CC.copiar(zap)) ? 'Estudo copiado' : 'Não consegui copiar agora.');
         };
       },
     });

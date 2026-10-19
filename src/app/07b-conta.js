@@ -142,7 +142,7 @@
         acao: 'Sair dos outros',
       });
       if (!certo) return;
-      try { await CC.api('api/sair-dos-outros', {}); CC.avisar('Pronto: só este aparelho continua dentro'); } catch (e) { CC.avisar(e.message); }
+      try { await CC.api('api/sair-dos-outros', {}); CC.avisar('Só este aparelho continua dentro'); } catch (e) { CC.avisar(e.message); }
     });
     ligar('[data-sair]', async () => {
       const certo = await CC.confirmar({
@@ -223,7 +223,6 @@
     return new Promise((resolver) => {
       CC.folha('<p class="fala-bento pequena">Oi' + (quem.nome ? ', ' + CC.esc(quem.nome) : '')
         + '! Faltam só dois detalhes.</p>'
-        + '<p class="passo-dica">Seu progresso está guardado.</p>'
         + (quem.email
           ? '<div class="campo-senha so-leitura"><span>E-mail</span><b id="cad-email-fixo">' + CC.esc(quem.email) + '</b></div>'
           : '<label class="campo-senha"><span>E-mail</span><input type="email" id="cad-email" autocomplete="email"></label>')
