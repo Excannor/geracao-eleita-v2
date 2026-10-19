@@ -235,10 +235,10 @@ export function htmlDoRelatorio({ igreja, celulas, geradoEm, simbolo = '', fonte
     + '<div class="periodo">' + esc(periodo) + '<br>Gerado em ' + esc(new Date(geradoEm).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })) + '</div></header>'
     + secaoAdocao(a)
     + secaoFrutos(igreja.evangelismo)
-    + secaoSaude(igreja.saude, 'Como a igreja está', 'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (igreja.saude.suficiente ? ' (' + igreja.saude.base + ' pessoas)' : '') + '. Só a soma: o check-in de uma pessoa nunca aparece.')
+    + secaoSaude(igreja.saude, 'Como a igreja está', 'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (igreja.saude.suficiente ? ' (' + igreja.saude.base + ' pessoas)' : '') + '.')
     + secaoCelulas(celulas)
     + (celulas.length ? '<section><h2>Cada célula de perto</h2></section>' + celulas.map(detalheDaCelula).join('') : '')
-    + '<p class="rodape">Relatório do administrador do Geração Eleita, só para a liderança da igreja. Traz o que a política de privacidade descreve para quem conduz as células e para a administração: nunca o que alguém escreveu, e o check-in só somado.</p>'
+    + '<p class="rodape">Relatório do administrador do Geração Eleita, só para a liderança da igreja.</p>'
     + '</main>'
     + '<script>' + SCRIPT_RELATORIO + '</script>'
     + '</body></html>';

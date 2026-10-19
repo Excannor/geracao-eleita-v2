@@ -201,7 +201,7 @@
   function vazioHtml() {
     return '<div class="vazio-anot"><span class="icone-vazio">' + CC.ico('caderno') + '</span>'
       + '<h2>Seu caderno com Deus começa aqui</h2>'
-      + '<p>Tudo o que você marcar e escrever na Bíblia fica guardado aqui, só para você.</p>'
+      + '<p>Tudo o que você marcar e escrever na Bíblia fica guardado aqui.</p>'
       + '<ol class="passos-anot"><li><span><b>Toque num versículo</b> enquanto lê</span></li>'
       + '<li><span><b>Escolha uma cor</b> ou toque em <b>Escrever nota</b></span></li>'
       + '<li><span>Encontre tudo aqui, por <b>livro, cor ou tag</b></span></li></ol>'
@@ -227,9 +227,8 @@
       + (todos.length ? '<button class="botao contorno" data-exportar>' + CC.ico('baixar') + 'Baixar tudo o que escrevi</button>' : '')
       + (apagadas ? '<button class="botao contorno" data-apagadas>' + CC.ico('lixeira') + 'Apagadas (' + apagadas + ')</button>' : '')
       + (todos.length ? '<button class="botao plano perigo" data-apagar-todas>Apagar todas as anotações</button>' : '')
-      + CC.avisoPrivado() + '</div>';
+      + '</div>';
 
-    CC.ligarAvisoPrivado(raiz);
     const redesenhar = () => CC.vistaAnotacoes(raiz, { manter: true });
     const pintarLista = () => {
       const alvo = raiz.querySelector('[data-lista]');
@@ -302,9 +301,8 @@
       const lista = CC.notas().filter((n) => n.contexto === contexto).sort((a, b) => b.editadaEm - a.editadaEm).map((n) => itemDeNota(n));
       const botao = d.botaoNotas ? (lista.length ? 'Escrever outra anotação' : d.botaoNotas) : 'Escrever nota';
       alvo.innerHTML = CC.tituloSecao(d.tituloNotas || 'Suas anotações', lista.length ? String(lista.length) : '') + lista.map(cartao).join('')
-        + '<button class="botao escrever-contexto" data-escrever-contexto>' + CC.ico('caneta') + CC.esc(botao) + '</button>' + CC.avisoPrivado();
+        + '<button class="botao escrever-contexto" data-escrever-contexto>' + CC.ico('caneta') + CC.esc(botao) + '</button>';
       alvo.querySelector('[data-escrever-contexto]').onclick = () => CC.versiculos.abrirEditor({ contexto, tipo: d.tipoNota, titulo: d.tituloNota || '', depois: desenhar });
-      CC.ligarAvisoPrivado(alvo);
       ligarCartoes(alvo, lista, desenhar);
     };
     desenhar();

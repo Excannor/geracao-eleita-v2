@@ -106,7 +106,7 @@
       const lido = CC.lidoEm ? CC.lidoEm(d.numero) : '';
       return '<a class="mesa-dia" href="#/dia/' + d.numero + '">' + CC.ico('trilha') + '<span><b>' + esc(d.capitulo + ' é o dia ' + d.numero) + '</b>'
         + '<small>' + esc(d.passagem) + '</small>'
-        + (lido ? '<small class="leu">' + CC.ico('certo') + 'Você leu em ' + ddmm(lido) + ' · só você vê</small>' : '') + '</span>' + CC.ico('direita') + '</a>';
+        + (lido ? '<small class="leu">' + CC.ico('certo') + 'Você leu em ' + ddmm(lido) + '</small>' : '') + '</span>' + CC.ico('direita') + '</a>';
     }).join('') + '</div>';
   }
 
@@ -146,7 +146,7 @@
   // As anotações de cada um neste estudo: notas como as outras, cifradas, só da pessoa
   // (07g-anotacoes.js). Não valem ponto nem conquista, e não entram no modo encontro nem na
   // impressão. Ficam depois dos botões, antes de "Estudos anteriores": a aba é a tela que o líder
-  // mostra no encontro, e o "Só você vê" não pode ficar entre o estudo e "Mandar no grupo".
+  // mostra no encontro, e a anotação de cada um não pode ficar entre o estudo e "Mandar no grupo".
   const blocoAnotacao = (e) => '<div class="mesa-anotacao" data-notas-contexto="estudo:' + esc(e.id) + '" data-tipo-nota="nota" data-titulo-notas="Minhas anotações neste estudo"'
     + ' data-botao-notas="Escrever minha anotação" data-titulo-nota="' + esc(tituloDaNota(e)) + '"></div>';
   const ligarAnotacao = (raiz) => { if (CC.notasDoContexto) CC.notasDoContexto(raiz); };
@@ -358,7 +358,7 @@
       + '<div class="mesa-cabeca-anterior"><span class="etiqueta">' + esc(etiqueta) + '</span><p class="passo-dica">' + esc(linha) + '</p></div>'
       // quantas pessoas vieram: só quem conduz a célula do estudo, nunca na lista (não vira placar)
       + (presenca.length ? '<div class="mesa-presenca">' + CC.ico('pessoas') + '<span>' + presenca.map((x) => '<span class="mesa-veio">' + esc((x.pessoas === 1 ? 'Veio 1 pessoa' : 'Vieram ' + x.pessoas + ' pessoas') + ' no encontro de ' + ddmm(x.data) + '.') + '</span>').join('')
-        + '<small>' + (presenca.length > 1 ? 'Só quem conduz a célula vê estes números.' : 'Só quem conduz a célula vê este número.') + '</small></span></div>' : '')
+        + '</span></div>' : '')
       + (e.tipo === 'blocos' || e.tipo === 'trecho' ? noPlanoHtml(refs) : '')
       + secaoW('Palavra', palavraHtml(p, e, sem, textos, sigla, versiculos, quem, apoio))
       + (perguntas.length ? secaoW('Para conversar', '<ol class="roteiro-perguntas mesa-perguntas">' + perguntas.map((q) => '<li>' + esc(q) + '</li>').join('') + '</ol>') : '')
@@ -402,7 +402,7 @@
     const recado = (x) => CC.recadoFaltou({ nome: x.nome, celula: p.titulo, quando, estudo });
     const retrato = (x) => CC.retratoAmigo(Object.assign({}, x, (p.membros || []).find((m) => m.usuario === x.usuario) || {}));
     CC.folha('<h2>Quem não veio</h2>'
-      + '<p class="passo-dica">O app não avisa ninguém. Se quiser, mande uma mensagem para cada pessoa pelo seu WhatsApp.</p>'
+      + '<p class="passo-dica">Se quiser, mande uma mensagem para cada pessoa pelo seu WhatsApp.</p>'
       + '<div class="mesa-zap-moldura"><span>A mensagem, com o nome de cada um</span><div class="mesa-zap">' + esc(recado(lista[0])) + '</div></div>'
       + '<div class="lista-pedidos mesa-faltou">' + lista.map((x, i) => '<div class="linha-amigo">' + retrato(x)
         + '<div class="quem-amigo"><b>' + esc(x.nome) + '</b></div><div class="mesa-faltou-acoes"><a class="botao-whatsapp" data-zap-faltou="' + esc(x.usuario) + '" href="https://wa.me/?text=' + encodeURIComponent(recado(x)) + '" target="_blank" rel="noopener">'
@@ -557,11 +557,11 @@
       return '<div class="mesa-convite">' + CC.ico('balao') + '<p>Combinem juntos. No próximo encontro, a acolhida começa por aqui.</p></div>';
     }
     if (s.tipo === 'orar' && s.convite) {
-      return '<div class="mesa-convite">' + CC.ico('oracao') + '<p>Os pedidos de oração ficam na aba Oração da célula, no celular de cada um. Eles não aparecem nesta tela.</p></div>';
+      return '<div class="mesa-convite">' + CC.ico('oracao') + '<p>Os pedidos de oração ficam na aba Oração da célula, no celular de cada um.</p></div>';
     }
     if (s.tipo === 'fechar') {
       return s.registrar
-        ? '<div class="mesa-registrar"><h2>Quem veio hoje?</h2><p>Abre o registro de presença deste encontro. Só quem conduz vê quem veio e quem faltou.</p>'
+        ? '<div class="mesa-registrar"><h2>Quem veio hoje?</h2><p>Abre o registro de presença deste encontro.</p>'
           + '<button type="button" class="botao" data-registrar>' + CC.ico('lista-visto') + 'Registrar quem veio</button></div>'
         : '<div class="mesa-convite">' + CC.ico('livro') + '<p>O estudo fica na aba Estudo para você reler durante a semana.</p></div>';
     }

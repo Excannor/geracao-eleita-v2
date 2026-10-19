@@ -456,7 +456,7 @@
         const m = gente.find((x) => x.usuario === b.dataset.remover);
         if (!await CC.confirmar({
           titulo: 'Tirar ' + (m ? m.nome : '@' + b.dataset.remover) + ' da célula?',
-          texto: 'A pessoa sai da célula e da contagem do grupo. A amizade com você continua, e ninguém é avisado.',
+          texto: 'A pessoa sai da célula e da contagem do grupo. A amizade com você continua.',
           acao: 'Tirar', perigo: true,
         })) return;
         try { await CC.api('api/celula', { acao: 'remover', id: p.id, usuario: b.dataset.remover }); CC.avisar('Pronto'); } catch (e) { CC.avisar(e.message); }
@@ -465,7 +465,7 @@
     });
     const sair = painel.querySelector('[data-sair]');
     if (sair) sair.onclick = async () => {
-      if (!await CC.confirmar({ titulo: 'Sair da ' + comoCelula(p.titulo) + '?', texto: 'A célula continua sem você. Ninguém é avisado.', acao: 'Sair', perigo: true })) return;
+      if (!await CC.confirmar({ titulo: 'Sair da ' + comoCelula(p.titulo) + '?', texto: 'A célula continua sem você.', acao: 'Sair', perigo: true })) return;
       try { await acao({ acao: 'sair', id: p.id }); location.hash = '#/novidades'; } catch (e) { CC.avisar(e.message); }
       recarregar();
     };
@@ -692,7 +692,7 @@
             fechar();
             if (!await CC.confirmar({
               titulo: 'Tirar ' + (m ? m.nome : '@' + b.dataset.remover) + ' da célula?',
-              texto: 'A pessoa sai da célula e da contagem do grupo. A amizade com você continua, e ninguém é avisado.',
+              texto: 'A pessoa sai da célula e da contagem do grupo. A amizade com você continua.',
               acao: 'Tirar', perigo: true,
             })) return;
             try { await CC.api('api/celula', { acao: 'remover', id: p.id, usuario: b.dataset.remover }); CC.avisar('Pronto'); } catch (e) { CC.avisar(e.message); }
@@ -704,7 +704,7 @@
           fechar();
           if (!await CC.confirmar({
             titulo: p.grupo ? 'Sair do grupo ' + p.titulo + '?' : 'Encerrar este propósito?',
-            texto: p.grupo ? 'O grupo continua sem você. Ninguém é avisado.' : 'A contagem de vocês some. Ninguém é avisado.',
+            texto: p.grupo ? 'O grupo continua sem você.' : 'A contagem de vocês some.',
             acao: p.grupo ? 'Sair' : 'Encerrar', perigo: true,
           })) return;
           try { await acao({ acao: 'sair', id: p.id }); } catch (e) { CC.avisar(e.message); }
@@ -963,12 +963,12 @@
     // Quem conduz não sabe quem fez: só que falta gente. O lembrete vai para o grupo todo.
     const membros = ativos(p).filter((m) => m.papel !== 'visitante').length;
     const lembrar = comAcoes && s.base < membros
-      ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quando der, façam o check-in de hoje no app: na aba Célula, "Fazer meu check-in". São 10 segundos, e quem conduz vê só a soma da célula, nunca o de cada um.' + enderecoApp('#/celula'), 'Lembrar a célula', 'data-lembrar-checkin') + '</div>'
+      ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quando der, façam o check-in de hoje no app: na aba Célula, "Fazer meu check-in". São 10 segundos.' + enderecoApp('#/celula'), 'Lembrar a célula', 'data-lembrar-checkin') + '</div>'
       : '';
     if (!s.suficiente) {
       return CC.tituloSecao('Como a célula está')
         + '<p class="passo-dica pequena">' + (s.base ? CC.plural(s.base, 'pessoa fez', 'pessoas fizeram') + ' o check-in nesta semana; a soma aparece a partir de ' + s.minimo + '.' : 'Ninguém fez o check-in de Corpo, Mente e Espírito nesta semana.')
-        + ' O check-in de uma pessoa nunca aparece aqui.</p>' + lembrar;
+        + '</p>' + lembrar;
     }
     return CC.tituloSecao('Como a célula está')
       + '<div class="funil-celula">' + Object.keys(ESFERAS_CELULA).map((k) => {
@@ -976,7 +976,7 @@
         return '<div class="funil-linha"><span>' + ESFERAS_CELULA[k] + ' em baixa</span>'
           + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((n / s.base) * 100) + '%"></i></span><b>' + n + '</b></div>';
       }).join('')
-      + '<p class="passo-dica pequena">Do último check-in de cada um nesta semana (' + CC.plural(s.base, 'pessoa', 'pessoas') + '). Só a soma: o check-in de uma pessoa nunca aparece aqui.</p>' + lembrar + '</div>';
+      + '<p class="passo-dica pequena">Do último check-in de cada um nesta semana (' + CC.plural(s.base, 'pessoa', 'pessoas') + ').</p>' + lembrar + '</div>';
   }
 
   // O funil da caminhada, na aba Pessoas de quem conduz: onde as pessoas da célula estão, pelo
@@ -1102,7 +1102,7 @@
   function blocoCheckinHoje() {
     if (!CC.abrirCheckin || !CC.checkinFeitoHoje || CC.checkinFeitoHoje()) return '';
     return '<div class="bloco-acao bloco-checkin"><h3>Como você está hoje?</h3>'
-      + '<p class="passo-dica pequena">Corpo, mente e espírito, em 10 segundos. Só a soma da célula aparece para quem conduz.</p>'
+      + '<p class="passo-dica pequena">Corpo, mente e espírito, em 10 segundos.</p>'
       + '<div class="acoes-missao"><button type="button" class="botao pequeno" data-checkin>Fazer meu check-in</button></div></div>';
   }
   // Minha caminhada: o atalho fica até a pessoa marcar alguma coisa.

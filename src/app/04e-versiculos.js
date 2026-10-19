@@ -202,12 +202,10 @@
       + '<p class="rotulo-editor">Cor</p><div class="cores-marca" role="group" aria-label="Cor da nota" data-cores>' + corHtml() + '</div>'
       + '<p class="rotulo-editor">Tags</p>' + lista('tags', 'tag', 'Nova tag', 'Ex.: graça', ' list="tags-usadas"')
       + '<datalist id="tags-usadas">' + todasAsTags().map((t) => '<option value="' + CC.esc(t) + '">').join('') + '</datalist>'
-      + CC.avisoPrivado()
       + (existente ? '<button class="botao plano perigo" data-apagar>' + CC.ico('lixeira') + 'Apagar nota</button>' : '')
       + '<p class="so-leitor" role="status" data-vivo></p>',
     { rotulo: existente ? 'Editar nota' : 'Nova nota', classe: 'folha-editor', rolavel: true });
 
-    CC.ligarAvisoPrivado(folha);
     const $ = (sel) => folha.querySelector(sel);
     const campo = $('#campo-nota');
     const campoTitulo = $('#campo-titulo-nota');
@@ -298,44 +296,13 @@
         if (existente) apagar(); else { campo.focus(); $('[data-vivo]').textContent = 'Escreva alguma coisa antes de guardar'; }
         return;
       }
-      const primeira = !CC.notas().length && !CC.notasApagadas().length;
       CC.gravarNota(existente ? id : null, { versos: st.versos, tipo: st.tipo, titulo: st.titulo, texto: st.texto, tags: st.tags, cor: st.cor, contexto: st.contexto || '' });
       // a cor escolhida aqui também marca o trecho principal
       const principal = CC.lerRef(st.versos[0]);
       if (principal && st.cor !== inicio.cor) CC.marcar(chavesDoTrecho(principal), st.cor);
       terminar(st.tipo === 'oracao' ? 'Oração guardada' : 'Nota guardada');
-      if (primeira) dicaPrivada();
     };
     if (existente) $('[data-apagar]').onclick = apagar;
-  }
-
-  // ---------- privacidade: a linha do cadeado e a folha "Como guardamos" ----------
-  // Sem promessa absoluta (o relatório jurídico pede): diz o que é verdade e como funciona.
-  CC.avisoPrivado = () => '<button class="aviso-privado" data-como-guardamos>' + CC.ico('cadeado')
-    + '<span>Só você vê. Guardado com criptografia.</span><u>Saiba mais</u></button>';
-  CC.comoGuardamos = () => CC.folha('<h2>Como guardamos suas anotações</h2><ul class="lista-privada">'
-    + '<li>' + CC.ico('pessoa') + '<span><b>Só você vê no app.</b> Amigos, célula, discipulador e liderança não veem o texto.</span></li>'
-    + '<li>' + CC.ico('cadeado') + '<span><b>Guardado com criptografia</b> no nosso servidor, e só a sua conta abre.</span></li>'
-    + '<li>' + CC.ico('baixar') + '<span><b>É seu.</b> Baixe uma cópia (que fica fora do app) ou apague quando quiser, em Minhas anotações.</span></li>'
-    + '<li>' + CC.ico('folha') + '<span><a href="privacidade.html" target="_blank" rel="noopener">Política de privacidade</a></span></li></ul>'
-    + '<div class="acoes"><button class="botao contorno" data-fechar>Entendi</button></div>',
-  { rotulo: 'Como guardamos suas anotações', rolavel: true, ligar: (f, fechar) => { f.querySelector('[data-fechar]').onclick = fechar; } });
-  CC.ligarAvisoPrivado = (raiz) => raiz.querySelectorAll('[data-como-guardamos]').forEach((b) => { b.onclick = CC.comoGuardamos; });
-  // Na primeira nota, uma dica leve (não bloqueia nada e some sozinha) leva à mesma folha.
-  function dicaPrivada() {
-    try { if (localStorage.getItem('cc.dica.privada')) return; localStorage.setItem('cc.dica.privada', '1'); } catch (e) { return; }
-    const el = document.createElement('div');
-    el.className = 'dica-privada';
-    el.setAttribute('role', 'status');
-    el.innerHTML = CC.ico('cadeado') + '<p>Sua primeira nota está guardada. Só você vê, com criptografia.</p>'
-      + '<button class="botao-icone" data-dispensar aria-label="Dispensar a dica">' + CC.ico('fechar') + '</button>'
-      + '<button class="botao pequeno contorno" data-ver>Como guardamos</button>';
-    // depois do aviso "Nota guardada", para os dois não se cobrirem
-    setTimeout(() => document.body.appendChild(el), 2600);
-    const sair = () => { clearTimeout(t); if (el.isConnected) CC.sair(el, 200); };
-    const t = setTimeout(sair, 15000);
-    el.querySelector('[data-ver]').onclick = () => { sair(); CC.comoGuardamos(); };
-    el.querySelector('[data-dispensar]').onclick = sair;
   }
 
   // ---------- a prévia das notas de um trecho (a etiqueta do leitor) ----------

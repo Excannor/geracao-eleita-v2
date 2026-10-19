@@ -26,7 +26,7 @@
   function abrirFolhaConversar(nome) {
     const S = conteudoDe().seguir;
     CC.folha('<h2>Converse com ' + CC.esc(nome) + '</h2>'
-      + '<p class="passo-dica">' + CC.esc(nome) + ' vai saber que você quer conversar (e o líder da sua célula, se você tiver uma). O que você escreve no app fica só com você.</p>'
+      + '<p class="passo-dica">' + CC.esc(nome) + ' vai saber que você quer conversar (e o líder da sua célula, se você tiver uma).</p>'
       + '<div class="acoes"><button class="botao azul" data-enviar>' + CC.esc(S.conversar) + '</button>'
       + '<button class="botao plano" data-fechar>Fechar</button></div>',
     {
@@ -87,7 +87,7 @@
       // Quem convidou vê em que dia a pessoa está (nunca o que ela escreve): dito aqui, às claras.
       + (CC.quem && CC.quem.acompanhadoPor
         ? '<p class="passo-dica pequena" style="margin:12px 4px 0">' + CC.esc(String(CC.quem.acompanhadoPor.nome).split(' ')[0])
-          + ' vê em que dia você está. O que você escreve fica só com você.</p>'
+          + ' vê em que dia você está.</p>'
         : '')
       + CC.tituloSecao('Os 14 dias')
       + '<div class="lista-licoes caixa-lista">' + lista + '</div>'
@@ -401,7 +401,6 @@
   CC.conversarSobreBatismo = function () {
     CC.folha('<h3>Conversar sobre o batismo</h3>'
       + '<p>Vamos avisar quem te acompanha no app: quem te convidou, o líder da sua célula e quem faz discipulado com você, se houver. A pessoa vai te procurar para conversar, do jeito que vocês costumam falar.</p>'
-      + '<p class="passo-dica">Só vai o aviso, nunca o que você escreveu no app.</p>'
       + '<div class="acoes"><button class="botao" data-avisar>Avisar</button><button class="botao plano" data-fechar>Agora não</button></div>', {
       rotulo: 'Conversar sobre o batismo',
       ligar: (folha, fechar) => {

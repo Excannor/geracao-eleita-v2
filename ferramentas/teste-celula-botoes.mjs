@@ -159,6 +159,7 @@ ok(await av('/com a célula inteira lendo/.test(' + q('.cabeca-celula .dias-cart
 await abrir(rotaCelula('painel'), '!!' + q('.cartao-saude'));
 ok(await esperar(q('[data-lembrar-checkin]')) && await alto('[data-lembrar-checkin]'), 'C2: o Painel tem "Lembrar a célula" (só 1 de 3 fez o check-in)');
 ok(await av('decodeURIComponent(' + q('[data-lembrar-checkin]') + '.href).includes("Fazer meu check-in")'), 'C2: o lembrete diz onde fazer o check-in');
+ok(await av('(() => { const t = decodeURIComponent(' + q('[data-lembrar-checkin]') + '.href); return t.includes("São 10 segundos.") && !/soma|nunca o de cada um/.test(t); })()'), 'C2: o lembrete não fala de quem vê o quê (sem "só a soma", "nunca o de cada um")');
 const doPainel = await celulaDe(lider, ID);
 ok(doPainel.painel.saude.base === 1 && !doPainel.painel.saude.suficiente, 'C2: o check-in da Bia entra na soma do Painel (base 1), sem aparecer sozinho');
 ok(await av('!/Média|Baixa|Alta/.test(' + q('.painel-celula') + '.textContent)'), 'C2: nenhum nível de check-in de uma pessoa aparece no Painel');
@@ -233,7 +234,7 @@ ok(ics.startsWith('BEGIN:VCALENDAR\r\nVERSION:2.0') && ics.includes('SUMMARY:Enc
 ok(await av('!!' + q('[data-checkin]')) && await alto('[data-checkin]'), 'C2: um membro sem discipulador tem "Fazer meu check-in" na aba Hoje');
 await clicar('[data-checkin]');
 ok(await esperar('!!' + q('.folha-checkin')), 'C2: o botão abre a folha do check-in');
-ok(await av('/só a soma aparece para quem conduz/.test(' + q('.folha-checkin') + '.textContent)'), 'C2: a folha diz que só a soma aparece');
+ok(await av('/Três toques e pronto\\./.test(' + q('.folha-checkin') + '.textContent) && !/só a soma|nunca aparece|sozinho/.test(' + q('.folha-checkin') + '.textContent)'), 'C2: a folha não repete aviso de privacidade (só a soma, nunca aparece)');
 await av('["corpo","mente","espirito"].forEach((k) => document.querySelector(".folha-checkin [data-esfera=\\"" + k + "\\"][data-nivel=\\"2\\"]").click()); true');
 await clicar('.folha-checkin [data-salvar]');
 ok(await esperar('!document.querySelector(".folha-checkin")'), 'C2: "Pronto" fecha a folha');

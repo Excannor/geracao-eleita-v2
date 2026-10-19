@@ -56,20 +56,6 @@
 .folha-editor .cores-marca { gap: 12px; }
 .folha-editor [data-apagar] { width: 100%; margin-top: 8px; }
 
-/* a linha do cadeado: tocável, leva à folha "Como guardamos suas anotações" */
-.aviso-privado { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; margin-top: 18px; padding: 8px 0; border: 0; border-top: 1px solid var(--contorno); background: none; color: var(--tinta-fraca); font: 600 .875rem/1.4 var(--fonte); text-align: left; cursor: pointer; }
-.aviso-privado svg { flex: none; width: 20px; height: 20px; color: var(--salvia-texto); }
-.aviso-privado u { margin-left: auto; color: var(--salvia-texto); font-weight: 700; white-space: nowrap; }
-.lista-privada { display: grid; gap: 16px; margin: 16px 0 8px; padding: 0; list-style: none; }
-.lista-privada li { display: flex; gap: 12px; color: var(--tinta); line-height: 1.45; }
-.lista-privada svg { flex: none; width: 22px; height: 22px; color: var(--salvia-texto); }
-.lista-privada b { color: var(--tinta-forte); }
-.lista-privada a { display: inline-block; min-height: 44px; color: var(--salvia-texto); font-weight: 700; line-height: 44px; margin-top: -12px; }
-.dica-privada { position: fixed; z-index: 60; right: 16px; bottom: calc(96px + env(safe-area-inset-bottom)); left: 16px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 12px; max-width: 520px; margin: 0 auto; padding: 12px 12px 14px 16px; border-radius: 22px; background: var(--cartao); box-shadow: var(--v2-sombra-flutuante); animation: subir .2s var(--suave); }
-.dica-privada > svg { width: 22px; height: 22px; color: var(--salvia-texto); }
-.dica-privada p { margin: 0; color: var(--tinta-forte); font-size: .9375rem; font-weight: 600; }
-.dica-privada .botao { grid-column: 2 / 4; justify-self: start; width: auto; background: var(--campo); }
-
 /* ---------- prévia das notas e Apagadas ---------- */
 .previa-item { padding: 14px 0; border-top: 1px solid var(--contorno); }
 .previa-item .linha-tipo { margin: 0 0 4px; font-size: .875rem; }
@@ -133,7 +119,6 @@
 .dica-acoes { display: flex; gap: 10px; margin: 12px 0 0; font-size: .875rem; }
 .dica-acoes svg { flex: none; width: 20px; height: 20px; color: var(--salvia-texto); }
 .rodape-anot { display: grid; gap: 10px; margin: 32px 0 16px; }
-.rodape-anot .aviso-privado { margin-top: 4px; }
 .vazio-anot { text-align: center; }
 .icone-vazio { display: grid; place-items: center; width: 104px; height: 104px; margin: 8px auto 16px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
 .icone-vazio svg { width: 44px; height: 44px; }

@@ -1,7 +1,7 @@
 // Minhas anotações num Chrome sem interface, de ponta a ponta: escolher um versículo, escrever a
 // nota no editor (rascunho, versículo ligado, tag), ver a etiqueta no leitor e o cartão em Minhas
-// anotações; oração respondida; busca e filtro; fixar; apagar e recuperar; as rotas antigas; a
-// folha "Como guardamos suas anotações"; o título opcional (vazio, escrito, editado, duas notas
+// anotações; oração respondida; busca e filtro; fixar; apagar e recuperar; as rotas antigas; que
+// nenhum aviso de privacidade aparece na interface; o título opcional (vazio, escrito, editado, duas notas
 // no mesmo versículo, depois de recarregar e sincronizar); o voltar de um versículo aberto das
 // anotações, de uma parábola e de um mapa; e que a nota chega ao servidor.
 // Uso: node ferramentas/teste-anotacoes.mjs   (CHROME, PORTA e PORTAS como nos outros testes)
@@ -90,13 +90,9 @@ ok(await esperar(existe('.folha-editor #campo-nota')), 'o editor abre em folha a
 ok(await av('/Nova nota/.test(' + q('.folha-editor') + '.innerText) && ' + existe('.folha-editor [data-tipo="oracao"]') + ' && ' + existe('.folha-editor [data-mais="versos"]')
   + ' && !/Coleção/.test(' + q('.folha-editor') + '.innerText)'), 'o editor tem tipo, ligar versículo, e nada de Coleção');
 ok(await av('/O que diz\\? · O que significa\\? · Como vivo isso\\?/.test(' + q('.folha-editor') + '.innerText)'), 'as perguntas de ajuda aparecem');
-ok(await av(q('[data-como-guardamos]') + '.innerText.includes("Só você vê. Guardado com criptografia.") && !/ninguém/i.test(' + q('.folha-editor') + '.innerText)'
-  + ' && ' + q('[data-como-guardamos]') + '.getBoundingClientRect().height >= 44'), 'a linha do cadeado diz "Só você vê. Guardado com criptografia." e é tocável (44px)');
-await clicar('[data-como-guardamos]');
-ok(await esperar('[...document.querySelectorAll(".folha")].some((f) => /Como guardamos suas anotações/.test(f.innerText) && f.querySelector("a[href=\'privacidade.html\']"))'),
-  'a folha "Como guardamos suas anotações" abre, com a política de privacidade');
-await av('[...document.querySelectorAll(".folha [data-fechar]")].pop().click()');
-ok(await esperar('![...document.querySelectorAll(".folha")].some((f) => /Como guardamos/.test(f.innerText)) && ' + existe('.folha-editor')), 'e fecha, voltando ao editor');
+// a política de privacidade fica na política: o editor não repete aviso de quem vê
+ok(await av('!' + existe('[data-como-guardamos]') + ' && !/só você vê|criptografia|ninguém|saiba mais/i.test(' + q('.folha-editor') + '.innerText)'),
+  'o editor não tem aviso de privacidade ("Só você vê", "criptografia", "Saiba mais")');
 await preencher('#campo-nota', 'Deus amou primeiro. Ainda pecadores.');
 ok(await av('JSON.parse(localStorage.getItem("cc.rascunho.nota")).texto === "Deus amou primeiro. Ainda pecadores."'), 'o rascunho fica guardado a cada tecla');
 await clicar('.folha-editor [data-mais="versos"]');
@@ -111,9 +107,8 @@ const nota = await av('CC.notas()[0]');
 ok(nota.versos.join() === 'João 3.16,Romanos 5.8' && nota.tags.join() === 'graça' && nota.tipo === 'nota' && !(await av('localStorage.getItem("cc.rascunho.nota")')),
   'a nota guarda os versículos, a tag e o tipo, e o rascunho sai');
 ok(nota.titulo === '', 'sem título escrito, a nota guarda o título vazio (o título é opcional)');
-ok(await esperar(existe('.dica-privada [data-ver]')), 'na primeira nota, uma dica leve (não bloqueia) leva à folha de privacidade');
-await clicar('.dica-privada [data-dispensar]');
-ok(await esperar('!' + existe('.dica-privada')), 'a dica se dispensa com um toque');
+await dormir(3200);
+ok(await av('!' + existe('.dica-privada') + ' && !/só você vê|criptografia/i.test(document.body.innerText)'), 'na primeira nota, nenhuma dica de privacidade aparece depois do "Nota guardada"');
 
 // ---------- a marca no leitor ----------
 ok(await esperar(existe('.leitor-verso[data-v="3:16"] .etiqueta-nota[data-n="1"]')), 'o leitor mostra a etiqueta (caneta e número) no versículo');
@@ -187,7 +182,7 @@ ok(await esperar(existe(cartao(idEstudo)) + ' && !' + existe('[data-apagadas]'))
 // ---------- no Explorar e no Conhecer Jesus: o mesmo bloco de notas ----------
 await av('location.hash = "#/nota/" + encodeURIComponent("05 - Hermenêutica/Os quatro contextos")');
 ok(await esperar(existe('[data-notas-contexto] [data-escrever-contexto]'), 10000) + '' && await av('!' + existe('[data-anotacao]') + ' && !' + existe('[data-copiar-anotacao]')
-  + ' && ' + existe('[data-notas-contexto] [data-como-guardamos]')), 'a página do Explorar troca a caixa solta e o "Copiar" por "Escrever nota" e a linha do cadeado');
+  + ' && !' + existe('[data-notas-contexto] [data-como-guardamos]') + ' && !/só você vê|criptografia/i.test(' + q('[data-notas-contexto]') + '.innerText)'), 'a página do Explorar troca a caixa solta e o "Copiar" por "Escrever nota", sem aviso de privacidade');
 await clicar('[data-escrever-contexto]');
 ok(await esperar(existe('.folha-editor #campo-nota') + ' && /Os quatro contextos/.test(' + q('.folha-editor') + '.innerText) && '
   + q('.folha-editor [data-tipo="estudo"]') + '.getAttribute("aria-pressed") === "true"'), 'o mesmo editor abre, com a página ligada e o tipo Estudo');

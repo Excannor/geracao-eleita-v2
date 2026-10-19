@@ -88,7 +88,7 @@
     + '<button class="botao plano pequeno" data-conversa-feita="' + CC.esc(x.usuario) + '" data-tipo="' + CC.esc(x.tipo) + '">Já conversamos</button></div>';
   CC.blocoPedidosConversa = (lista) => (lista.length
     ? CC.tituloSecao('Pedidos de conversa', String(lista.length))
-      + '<p class="passo-dica pequena">Procure a pessoa do jeito que vocês costumam falar. Só chega o pedido, nunca o que ela escreveu no app.</p>'
+      + '<p class="passo-dica pequena">Procure a pessoa do jeito que vocês costumam falar.</p>'
       + '<div class="lista-pedidos">' + lista.map(CC.linhaPedidoConversa).join('') + '</div>'
     : '');
   CC.pedidosDeConversa = () => (emCache() && emCache().pedidosConversa) || [];
@@ -505,7 +505,7 @@
         folha.querySelector('[data-novo-com]').onclick = () => { fechar(); CC.novoProposito(amigo.usuario); };
         folha.querySelector('[data-encerrar]').onclick = async () => {
           fechar();
-          if (!await CC.confirmar({ titulo: 'Desfazer a amizade com ' + amigo.nome + '?', texto: 'Os propósitos em dupla de vocês acabam, e a contagem some. Ninguém é avisado.', acao: 'Desfazer' })) return;
+          if (!await CC.confirmar({ titulo: 'Desfazer a amizade com ' + amigo.nome + '?', texto: 'Os propósitos em dupla de vocês acabam, e a contagem some.', acao: 'Desfazer' })) return;
           try { await acaoAmizade('desfazer', amigo.usuario); recarregar(); } catch (e) { CC.avisar(e.message); }
         };
         folha.querySelector('[data-bloquear]').onclick = async () => {

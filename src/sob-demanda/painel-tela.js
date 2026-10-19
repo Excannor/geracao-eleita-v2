@@ -110,7 +110,7 @@
       + grupo('Frutos em ' + mesNome(ev.mes), frutosHtml,
         'Marcos de Minha caminhada com data no mês, pelo que cada pessoa marcou.')
       + grupo('Como a igreja está', saudeHtml,
-        'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (s.suficiente ? ' (' + s.base + ' pessoas)' : '') + '. Só a soma, sem nomes: o check-in de uma pessoa nunca aparece aqui.')
+        'Do último check-in de Corpo, Mente e Espírito de cada pessoa nos últimos 7 dias' + (s.suficiente ? ' (' + s.base + ' pessoas)' : '') + '.')
       // O relatório para levar: o que esta tela mostra (a igreja e cada célula de perto), num
       // arquivo só. CSV para planilha; a página de relatório abre o "Salvar como PDF" do navegador.
       + grupo('Exportar relatório',
@@ -204,7 +204,7 @@
     if (location.hash !== '#/config/painel') return;
 
     const pedidos = p.pedidosDeSenha || [];
-    raiz.innerHTML = cabeca('<p class="passo-dica">Só números, sem nomes. Calculado ' + CC.esc(atualizado(p.geradoEm)) + ', em ' + CC.esc(p.hoje.split('-').reverse().join('/')) + '.</p>'
+    raiz.innerHTML = cabeca('<p class="passo-dica">Calculado ' + CC.esc(atualizado(p.geradoEm)) + ', em ' + CC.esc(p.hoje.split('-').reverse().join('/')) + '.</p>'
       + (p.detalhe && p.detalhe.resumo ? '<div class="painel-resumo">'
         + cartaoResumo('abriram o app', p.detalhe.resumo.abriram) + cartaoResumo('leram', p.detalhe.resumo.leram)
         + cartaoResumo('contas novas', p.detalhe.resumo.novas)
@@ -276,7 +276,7 @@
         + numero('Propósitos ativos (grupos)', p.propositos.ativos + ' (' + p.propositos.grupos + ')')
         + numero('Com notificação ligada', p.comNotificacao))
       + grupo('Células e cuidado', celulasECuidado(p.celulasECuidado),
-        'Só números. Com menos de 5 pessoas numa conta, aparece "menos de 5" para não identificar ninguém numa igreja pequena.');
+        'Com menos de 5 pessoas numa conta, aparece "menos de 5".');
 
     async function gerar(usuario) {
       if (!usuario) return;

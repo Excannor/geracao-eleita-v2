@@ -473,7 +473,7 @@ ok(await av('!document.querySelector(".mesa-dia .leu")'), '10. sem ter lido, nad
 await av('CC.marcarLido(244, true); true');
 await abrir(rota('hoje'), existe('.painel-celula'));
 await abrir(rota('estudo'), existe('.mesa-dia'));
-ok(await esperar('/Você leu em \\d{2}\\/\\d{2} · só você vê/.test(document.querySelector(".mesa-dia .leu")?.textContent || "")'), '10. depois de ler o dia 244, "Você leu em" aparece no aparelho dela');
+ok(await esperar('/^Você leu em \\d{2}\\/\\d{2}$/.test(document.querySelector(".mesa-dia .leu")?.textContent || "")'), '10. depois de ler o dia 244, "Você leu em" aparece no aparelho dela, sem "só você vê"');
 ok(await av('!/\\d+ de \\d+/.test(document.querySelector(".painel-celula").textContent)'), '10. nenhuma contagem "N de M" na aba');
 await na(() => { window.__copiado = null; CC.copiar = async (t) => { window.__copiado = t; return true; }; return true; });
 await na(() => { document.querySelectorAll('.painel-celula .mesa-mais')[1].click(); return true; });

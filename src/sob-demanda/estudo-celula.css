@@ -136,7 +136,6 @@
 /* Minha anotação neste estudo: o bloco de notas de sempre (07g-anotacoes.js) */
 .mesa-anotacao { display: grid; gap: 12px; }
 .mesa-anotacao > .titulo-secao { margin: 8px 0 0; }
-.mesa-anotacao > .aviso-privado { margin-top: 0; }
 /* no estudo, o cartão mostra o começo da anotação: o resto abre no toque (a tela pode estar à vista) */
 .mesa-anotacao .texto-anot { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
 /* Estudos anteriores: a lista num cartão só, uma linha por estudo, como "No plano" */

@@ -8,7 +8,7 @@
 // Parte A (a API e as permissões) e a parte C pela API (a multiplicação): bloco SERVIDOR. As
 // partes B e C no navegador (as telas, a impressão, a anotação), num Chrome sem interface como em
 // teste-estudo-celula.mjs: o passo 3 com o combinado, a acolhida lembrada, a lista e a leitura dos
-// anteriores para cada papel, a anotação "Só você vê", "Usar como base", o modo encontro, o
+// anteriores para cada papel, a anotação (sem aviso de privacidade), "Usar como base", o modo encontro, o
 // registro com o estudo e "Quem não veio", a impressão (A4, sem as barras), a filha e os tamanhos
 // (390 e 360 px, claro e escuro). Os textos bíblicos esperados saem de conteudo/biblias.
 //
@@ -479,7 +479,7 @@ try {
   '11. "Combinado para a semana" mostra o combinado de S2, logo antes de "Para orar juntos"');
   ok(await av('!/\\d+ de \\d+/.test(document.querySelector(".painel-celula").textContent)'), '11. nenhuma contagem "N de M" na aba');
   ok(await av('!/Orem pelo Jonas/.test(document.querySelector(".painel-celula").textContent)'), '11. o testemunho de S1 (com o nome) não aparece em S2');
-  ok(/Minhas anotações neste estudo/.test(await texto('.mesa-anotacao')) && /Só você vê/.test(await texto('.mesa-anotacao')), '11. "Minhas anotações neste estudo", com "Só você vê"');
+  ok(/Minhas anotações neste estudo/.test(await texto('.mesa-anotacao')) && !/Só você vê|criptografia/.test(await texto('.mesa-anotacao')), '11. "Minhas anotações neste estudo", sem aviso de privacidade');
   // a anotação fica depois dos botões: não aparece entre o conteúdo e "Mandar no grupo" (nem acima de "Modo encontro", na tela que se mostra no encontro)
   ok(await av('!!(document.querySelector(".painel-celula > .acoes").compareDocumentPosition(document.querySelector(".mesa-anotacao")) & Node.DOCUMENT_POSITION_FOLLOWING)'),
     '11. o bloco da anotação vem depois dos botões da aba');
@@ -546,8 +546,8 @@ try {
   await como(aux, rota('estudo/' + S1));
   ok(await esperar(existe('.mesa-presenca'), 20000), '14. o Paulo abre S1 e vê o cartão da presença');
   const presenca = comum(await texto('.mesa-presenca'));
-  ok(presenca.includes('Vieram 2 pessoas no encontro de ' + ddmm(DIA_3) + '.') && presenca.includes('Vieram 5 pessoas no encontro de ' + ddmm(DIA_7) + '.') && presenca.includes('Só quem conduz a célula vê estes números.'),
-    '14. "Vieram 2 pessoas no encontro de ' + ddmm(DIA_3) + '." e "Vieram 5 pessoas no encontro de ' + ddmm(DIA_7) + '.", só para quem conduz');
+  ok(presenca.includes('Vieram 2 pessoas no encontro de ' + ddmm(DIA_3) + '.') && presenca.includes('Vieram 5 pessoas no encontro de ' + ddmm(DIA_7) + '.') && !/Só quem conduz/.test(presenca),
+    '14. "Vieram 2 pessoas no encontro de ' + ddmm(DIA_3) + '." e "Vieram 5 pessoas no encontro de ' + ddmm(DIA_7) + '.", sem aviso de quem vê');
   ok(await av('!/Usar como base/.test(document.querySelector(".painel-celula").textContent)'), '14. o auxiliar não tem "Usar como base"');
   await foto('05-leitura-quem-conduz', true);
   await foto360('05-leitura-quem-conduz');
@@ -640,7 +640,7 @@ try {
   ok(JSON.stringify(nomesFaltou) === '["Ana","Caio"]', '17. com a Ana e o Caio (' + JSON.stringify(nomesFaltou) + ')');
   const esperadoAna = 'Oi, Ana! Sentimos sua falta no encontro de hoje. Estudamos Romanos 8.28-30. O estudo está na aba Estudo da célula, no app, se você quiser ler. Está tudo bem com você? Posso orar por alguma coisa?';
   ok((await av(q('.folha-faltou [data-zap-faltou="ana"]') + '.getAttribute("href")')) === 'https://wa.me/?text=' + encodeURIComponent(esperadoAna), '17. o WhatsApp da Ana leva a mensagem pronta, com "de hoje" e o estudo');
-  ok(/O app não avisa ninguém/.test(await texto('.folha-faltou')) && comum(await texto('.folha-faltou .mesa-zap')) === esperadoAna, '17. "O app não avisa ninguém" e a prévia com a mensagem da primeira pessoa');
+  ok(/Se quiser, mande uma mensagem para cada pessoa pelo seu WhatsApp\./.test(await texto('.folha-faltou')) && !/O app não avisa ninguém/.test(await texto('.folha-faltou')) && comum(await texto('.folha-faltou .mesa-zap')) === esperadoAna, '17. "Se quiser, mande uma mensagem" (sem "O app não avisa ninguém") e a prévia com a mensagem da primeira pessoa');
   await foto('11-quem-nao-veio', true);
   await foto360('11-quem-nao-veio');
   await tema(true);

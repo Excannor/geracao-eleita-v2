@@ -83,12 +83,10 @@
   function folhaCheckin(opcoes = {}) {
     const escolha = {};
     const disc = cache && cache.meuDiscipulador;
-    // Quem vê o quê: o discipulador vê o último check-in; a célula, só a soma.
-    const quemVe = disc
-      ? CC.esc(primeiroNome(disc.nome)) + ' vê só isto, para cuidar melhor de você.' + (opcoes.naCelula ? ' Na célula, só a soma aparece para quem conduz.' : '')
-      : 'Na célula, só a soma aparece para quem conduz. O seu nunca aparece sozinho.';
+    // O discipulador vê o último check-in: a folha diz isso a quem tem discipulador.
+    const quemVe = disc ? ' ' + CC.esc(primeiroNome(disc.nome)) + ' vê só isto, para cuidar melhor de você.' : '';
     CC.folha('<h2>Como você está hoje?</h2>'
-      + '<p class="passo-dica">Três toques e pronto. ' + quemVe + '</p>'
+      + '<p class="passo-dica">Três toques e pronto.' + quemVe + '</p>'
       + ESFERAS.map(([k, rot]) => '<div class="linha-checkin"><span class="etiqueta">' + rot + '</span>'
         + '<div class="segmentado" role="group" aria-label="' + rot + '">'
         + [1, 2, 3].map((n) => '<button type="button" data-esfera="' + k + '" data-nivel="' + n + '" aria-pressed="false">' + NIVEIS[n] + '</button>').join('')
@@ -257,7 +255,7 @@
   function encerrar(id, nome) {
     return CC.confirmar({
       titulo: 'Encerrar o acompanhamento com ' + nome + '?',
-      texto: 'A relação some da tela dos dois. Ninguém é avisado.',
+      texto: 'A relação some da tela dos dois.',
       acao: 'Encerrar',
       perigo: true,
     }).then((sim) => {
@@ -341,7 +339,7 @@
   function folhaAceitar(pedido) {
     const estado = { passos: true, semana: true, checkin: true, marcos: false };
     CC.folha('<h2>O que você quer mostrar?</h2>'
-      + '<p class="passo-dica">' + CC.esc(pedido.de.nome) + ' vai ver só o que você deixar ligado, nunca o que você escreve. Você pode mudar isso quando quiser.</p>'
+      + '<p class="passo-dica">' + CC.esc(pedido.de.nome) + ' vai ver o que você deixar ligado. Você pode mudar isso quando quiser.</p>'
       + '<div class="caixa-config">' + ORDEM_MOSTRAR.map((chave) => linhaInterruptor('escolha', chave, ROTULOS_MOSTRAR[chave], estado[chave])).join('') + '</div>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao" data-confirmar>Aceitar</button>'
@@ -445,7 +443,7 @@
   CC.folhaAcompanharNaFe = function (pessoa) {
     const nome = primeiroNome(pessoa.nome);
     CC.folha('<h2>Acompanhar ' + CC.esc(nome) + ' na fé?</h2>'
-      + '<p class="passo-dica">Você vai ver o que ' + CC.esc(nome) + ' escolher mostrar: os primeiros passos, quantos dias leu e a caminhada. Nunca o que ' + CC.esc(nome) + ' escreve.</p>'
+      + '<p class="passo-dica">Você vai ver o que ' + CC.esc(nome) + ' escolher mostrar: os primeiros passos, quantos dias leu e a caminhada.</p>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
       + '<div class="acoes"><button class="botao" data-enviar>Convidar</button>'
       + '<button class="botao plano" data-fechar>Agora não</button></div>',
@@ -487,7 +485,7 @@
       }
       const marcos = d.marcos || {};
       raiz.innerHTML = '<div class="folha-juntos">' + cabeca
-        + '<p class="subtitulo-tela">Caminhe com alguém mais perto de Jesus. O que você escreve no app continua só seu.</p></div>'
+        + '<p class="subtitulo-tela">Caminhe com alguém mais perto de Jesus.</p></div>'
         + CC.tituloSecao('Minha caminhada')
         + '<div class="caixa-config">' + MARCOS.map((chave) => linhaMarco(chave, marcos[chave])).join('') + '</div>'
         + (d.meuDiscipulador ? blocoMeuDiscipulador(d.meuDiscipulador) : '')
