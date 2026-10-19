@@ -136,7 +136,7 @@
       + p.secoes.map((s, i) => seta(i) + '<section class="secao-parabola">' + rotulo(s.icone, s.titulo) + s.blocos.map((b) => bloco(p, b)).join('') + '</section>').join('')
       + seta(p.secoes.length) + '<section class="dizendo-parabola">' + rotulo('ancora', 'O que Jesus está dizendo')
       + '<p class="dizendo-texto">' + tx(d.texto) + '</p><p class="dizendo-apoio">' + (d.apoio ? tx(d.apoio) + ref(d.ref) : marca(d.ref)) + '</p></section>'
-      + '<h2 class="pensar-parabola">Pra pensar</h2><ol class="perguntas-parabola">' + p.perguntas.map((q) => '<li>' + tx(q) + '</li>').join('') + '</ol>'
+      + '<h2 class="pensar-parabola">Para pensar</h2><ol class="perguntas-parabola">' + p.perguntas.map((q) => '<li>' + tx(q) + '</li>').join('') + '</ol>'
       + parecidas
       + (t ? '<a class="botao parabola-ler" data-ler-parabola href="#/biblia/' + encodeURIComponent(t.livro) + '/' + t.cap + '">Ler ' + CC.esc(t.livro + ' ' + t.cap) + ' na Bíblia</a>' : '')
       + '<span class="parabola-fim" data-fim-parabola aria-hidden="true"></span>'

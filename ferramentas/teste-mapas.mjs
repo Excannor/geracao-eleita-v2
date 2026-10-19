@@ -96,7 +96,7 @@ const indice = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'mapas', 'indice.j
 ok(mapas.length === indice.publicados.length, 'só os mapas publicados no índice vão ao ar (' + mapas.length + ')');
 
 // ---------- o Explorar: o cartão "Mapas dos livros" ----------
-// Um cartão só, logo depois de "Pra ir além na leitura de hoje", que abre e fecha no lugar
+// Um cartão só, logo depois de "Para ir além na leitura de hoje", que abre e fecha no lugar
 // (nunca rola a página sozinho) e mostra a grade de um testamento por vez.
 await cmd('Page.navigate', { url: base + '#/explorar' });
 ok(await esperar('!!document.querySelector(".cartao-mapas")'), 'o Explorar mostra o cartão "Mapas dos livros"');
@@ -104,7 +104,7 @@ await av('(() => { const a = document.getElementById("aviso-flutuante"); if (a) 
 ok(await av('document.querySelectorAll(".cartao-mapas").length === 1 && !document.querySelector("#mapas-dos-livros, [data-ir-mapas], .grupo-mapas + .grade-mapas:not(.cartao-mapas *)")'),
   'é um cartão só: a seção do fim do Explorar e o atalho que rolava até ela saíram');
 ok(await av('(() => { const c = document.querySelector(".cartao-mapas"); const antes = c.previousElementSibling; return !document.querySelector(".notas-de-hoje") || antes === document.querySelector(".notas-de-hoje"); })()'),
-  'o cartão vem logo depois de "Pra ir além na leitura de hoje"');
+  'o cartão vem logo depois de "Para ir além na leitura de hoje"');
 const cab = '.cartao-mapas [data-abrir-mapas]';
 ok(await av('(() => { const b = document.querySelector("' + cab + '"); const corpo = document.getElementById(b.getAttribute("aria-controls")); return b.tagName === "BUTTON" && b.getAttribute("aria-expanded") === "false" && corpo && corpo.hidden; })()'),
   'fechado de início: botão com aria-expanded="false" ligado ao corpo escondido (aria-controls)');

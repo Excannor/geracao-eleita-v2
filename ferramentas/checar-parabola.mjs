@@ -114,7 +114,7 @@ export function checarParabola(slug, p) {
   if (d.apoio !== undefined) campos.push(['dizendo.apoio', d.apoio, refsDizendo]);
 
   const perguntas = Array.isArray(p.perguntas) ? p.perguntas : [];
-  if (perguntas.length !== 2) erro('"Pra pensar" tem 2 perguntas (tem ' + perguntas.length + ')');
+  if (perguntas.length !== 2) erro('"Para pensar" tem 2 perguntas (tem ' + perguntas.length + ')');
   perguntas.forEach((q, i) => {
     if (!texto(q) || !/\?$/.test(q.trim())) erro('pergunta ' + (i + 1) + ': precisa terminar em "?"');
     campos.push(['pergunta ' + (i + 1), q, []]);

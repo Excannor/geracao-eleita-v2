@@ -31,8 +31,8 @@
   // Os nomes e descrições das seções são escritos aqui, para quem abre o app pela
   // primeira vez, e não com os termos de quem montou o material.
   const TEXTO_SECAO = {
-    '01 - Trilha do Recém-Batizado': ['Primeiros passos', 'Doze lições pra começar firme na fé'],
-    '05 - Hermenêutica': ['Como ler a Bíblia', 'Dicas pra entender o texto sem tirar nada do lugar'],
+    '01 - Trilha do Recém-Batizado': ['Primeiros passos', 'Doze lições para começar firme na fé'],
+    '05 - Hermenêutica': ['Como ler a Bíblia', 'Dicas para entender o texto sem tirar nada do lugar'],
     '15 - Fios Bíblicos': ['Conexões', 'Imagens e promessas que aparecem do começo ao fim da Bíblia'],
     '03 - Livros da Bíblia': ['Livros', 'Os 66 livros, cada um com a sua ficha'],
     '08 - Versículos': ['Versículos', 'Versículos importantes explicados dentro do contexto'],
@@ -139,7 +139,7 @@
   // ---------- explorar ----------
   const GRUPOS = [
     ['Aprender a ler a Bíblia', ['05 - Hermenêutica', '15 - Fios Bíblicos']],
-    ['Pra consultar quando precisar', ['03 - Livros da Bíblia', '08 - Versículos', '06 - Estudos Temáticos',
+    ['Para consultar quando precisar', ['03 - Livros da Bíblia', '08 - Versículos', '06 - Estudos Temáticos',
       '11 - Pessoas', '12 - Eventos', '13 - Lugares', '14 - Alianças']],
   ];
 
@@ -300,7 +300,7 @@
       // Quem ainda não fez o caminho vê ele primeiro; depois ele desce para o fim da tela.
       + (conhecendo ? perguntas : (terminou ? '' : comece))
       + (deHoje.length
-        ? '<div class="cartao notas-de-hoje"><span class="etiqueta">Pra ir além na leitura de hoje</span>'
+        ? '<div class="cartao notas-de-hoje"><span class="etiqueta">Para ir além na leitura de hoje</span>'
           + '<b>' + CC.esc(CC.passagemDe(dia)) + '</b>'
           + '<div class="pilulas">' + deHoje.map(CC.pilulaNota).join('') + '</div></div>'
         : '')
@@ -317,7 +317,7 @@
         + '<span class="passo-dica">Veja o todo antes das partes.</span></span>' + CC.ico('avancar') + '</a>' : '')
       + blocos
       + (conhecendo ? '' : (terminou ? comece : ''))
-      + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos pra explorar.</p>';
+      + '<p class="passo-dica" style="margin-top:26px">' + total + ' textos para explorar.</p>';
     CC.inseparavel(raiz);
     CC.ligarBusca(raiz);
     CC.ligarMapas(raiz);
