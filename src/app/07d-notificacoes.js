@@ -108,7 +108,7 @@
       ativo: cartao('certo', 'Ativadas neste aparelho', 'Os lembretes chegam mesmo com o app fechado.',
         '<button class="botao contorno" data-testar>' + CC.ico('sino') + 'Mandar uma de teste</button>'),
       desligado: cartao('sino', 'Receba um toque na hora certa',
-        'Lembrete da leitura, ofensiva em risco e avisos dos amigos. No máximo 2 lembretes por dia, e nada de madrugada.',
+        'Lembrete da leitura, ofensiva em risco e avisos dos amigos. No máximo 2 lembretes por dia.',
         '<button class="botao" data-ativar>Ativar notificações</button>'),
       instalar: cartao('baixar', 'No iPhone, instale o app primeiro',
         'A Apple só entrega notificações para o app aberto pelo ícone da tela de início.',
@@ -229,7 +229,7 @@
     try { localStorage.setItem('cc.aviso.push', marca ? 'nunca' : String(Date.now())); } catch (e) { return; }
 
     CC.folha('<p class="fala-bento pequena">Posso te dar um toque na hora da leitura?</p>'
-      + '<p>Um lembrete por dia, no horário que você escolher, e os avisos dos seus amigos. Nada de madrugada, nada de spam.</p>'
+      + '<p>Um lembrete por dia, no horário que você escolher, e os avisos dos seus amigos.</p>'
       + '<div class="acoes"><button class="botao" data-sim>Pode mandar</button>'
       + '<button class="botao plano" data-nao>Agora não</button></div>', {
       rotulo: 'Notificações', classe: 'folha-conta',

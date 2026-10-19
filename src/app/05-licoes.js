@@ -38,7 +38,7 @@
       + CC.botaoVoltar('Trilha')
       + '<h1>Primeiros passos</h1>'
       + '<div class="textos">'
-      + '<p class="subtitulo-tela">Doze lições pra firmar a fé. Cada uma conta quando você lê até o fim, e uma por semana é um bom ritmo.</p>'
+      + '<p class="subtitulo-tela">Doze lições para firmar a fé.</p>'
       + '<div class="progresso-passos">' + CC.barra(fracao) + '<b>' + feitas.length + ' de ' + D.licoes.length + '</b></div>'
       + (proxima
         ? '<a class="cartao-destaque" href="#/nota/' + encodeURIComponent(proxima) + '"><span>' + CC.esc(nomeProxima) + '<small class="minutos-licao">uns ' + minutosDaLicao(D.notas[proxima]) + ' min</small></span>' + CC.ico('bandeira') + '</a>'

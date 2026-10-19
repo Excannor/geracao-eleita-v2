@@ -28,9 +28,6 @@ O que continua na tela, porque não é aviso:
   "só para você (teste)" no aviso do administrador.
 - O efeito de uma ação, quando é o que a ação faz: "Seus amigos vão ver no Juntos", "Seus amigos
   deixam de ver", "Ninguém mais vê o pedido" ao apagar um pedido.
-- O aviso de salvar do preparo do estudo ("Ao salvar, todos da célula veem o estudo [...] Se você
-  apagar a conta, fica o seu @."): é o aviso à vista que deixa a regra nova do histórico valer para
-  o estudo que nasce com ele (`docs/aprendizados.md`, 2026-10-18). Só sai se o dono decidir.
 - Conselho sobre a vida de outra pessoa ("Não escreva nome nem detalhe da vida de outra pessoa"),
   que protege quem não está escrevendo.
 

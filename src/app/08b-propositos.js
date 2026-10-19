@@ -929,7 +929,7 @@
     const f = s.frequencia || { encontros: [] };
     const legenda = c.total
       ? CC.plural(c.acesos, 'pessoa', 'pessoas') + ' de ' + c.total + ' com a chama acesa hoje'
-      : 'A chama acende quando alguém lê hoje ou mantém a sequência de ontem.';
+      : 'Nenhuma chama acesa hoje.';
     const maior = Math.max(1, ...f.encontros.map((e) => e.pessoas || 0));
     const barras = f.encontros.length
       ? '<div class="mini-barras" role="img" aria-label="' + CC.esc(f.encontros.map((e) => ddmm(e.data) + ': ' + (e.semEncontro ? 'sem encontro' : CC.plural(e.pessoas, 'pessoa', 'pessoas'))).join(', ')) + '">'
@@ -996,7 +996,7 @@
       + '<div class="funil-celula">' + etapas.map((e) => '<div class="funil-linha"><span>' + CC.esc(e.rotulo) + '</span>'
         + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((e.pessoas / maior) * 100) + '%"></i></span><b>' + e.pessoas + '</b></div>'
         + (e.nomes && e.nomes.length ? '<p class="funil-nomes">' + nomeLista(e.nomes) + '</p>' : '')).join('')
-      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada, para você saber por onde cuidar.</p>'
+      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada.</p>'
       // Quem ainda não marcou nada não sabe onde marcar: o líder manda o caminho no grupo.
       + (comAcoes && comeco.pessoas ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quem puder, marque no app o que já aconteceu na sua caminhada: decisão, batismo, célula. Fica em Minha caminhada, no Discipulado. Ajuda a gente a cuidar melhor de cada um.' + enderecoApp('#/perfil/discipulado'), 'Pedir para a célula marcar', 'data-pedir-caminhada') + '</div>' : '')
       + '</div>';

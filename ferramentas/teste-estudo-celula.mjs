@@ -439,8 +439,8 @@ ok(await esperar(existe('.cortina [data-w="acolhida"]')), '8. "Mudar" nos 4 Ws a
 await av(q('.cortina [data-w="acolhida"]') + '.value = ' + JSON.stringify(ACOLHIDA) + '; true');
 await clicar('.cortina [data-pronto]');
 ok(await esperar('!document.querySelector(".cortina") && /' + ACOLHIDA.replace(/\?/g, '\\?') + '/.test(document.querySelector(".mesa-ws dd").textContent)') || (await diagnostico('ws'), false), '8. a acolhida nova aparece no cartão');
-ok(await av('(() => { const nota = [...document.querySelectorAll(".mesa-nota")].find((n) => /inclusive quem está só conhecendo/.test(n.textContent)); const salvar = document.querySelector("[data-salvar]"); return !!nota && !!(nota.compareDocumentPosition(salvar) & Node.DOCUMENT_POSITION_FOLLOWING); })()'),
-  '8. o aviso de que até quem está só conhecendo vê o estudo vem antes de "Salvar o estudo"');
+ok(await av('(() => { const nota = [...document.querySelectorAll(".mesa-nota")].find((n) => /Ao salvar, a célula vê o estudo na aba Estudo\./.test(n.textContent)); const salvar = document.querySelector("[data-salvar]"); return !!nota && !!(nota.compareDocumentPosition(salvar) & Node.DOCUMENT_POSITION_FOLLOWING); })()'),
+  '8. "Ao salvar, a célula vê o estudo na aba Estudo." vem antes de "Salvar o estudo"');
 await emTodosOsTamanhos('passo 3');
 
 // ---------- 9. Salvar ----------

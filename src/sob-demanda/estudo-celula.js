@@ -500,9 +500,8 @@
     let previa = esc(zap).replace(/\*([^*\n]+)\*/g, '<span class="ast">*</span><b>$1</b><span class="ast">*</span>');
     if (endereco) previa = previa.split(esc(endereco)).join('<span class="link">' + esc(endereco) + '</span>');
     CC.folha('<h2>Mandar no grupo</h2>'
-      + '<p class="passo-dica">Assim o estudo chega no WhatsApp. O texto se entende sozinho, mesmo para quem não tem o app.</p>'
+      + '<p class="passo-dica">Assim o estudo chega no WhatsApp.</p>'
       + '<div class="mesa-zap-moldura"><span>Prévia</span><div class="mesa-zap">' + previa + '</div></div>'
-      + '<p class="passo-dica pequena">No WhatsApp, o que fica entre asteriscos aparece em negrito.</p>'
       + '<div class="acoes"><button class="botao" data-mandar>' + CC.ico('compartilhar') + 'Mandar</button>'
       + '<button class="botao contorno" data-copiar>Copiar o texto</button>'
       + '<button class="botao plano" data-fechar>Fechar</button></div>',

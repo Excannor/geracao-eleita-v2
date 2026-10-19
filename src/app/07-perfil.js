@@ -274,8 +274,7 @@
     };
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil')
       + '<h1>Livros da Bíblia</h1>'
-      + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos. '
-      + 'Cada livro se acende conforme você lê os dias que passam por ele.</p></div>'
+      + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos.</p></div>'
       + '<div class="pilulas">' + vistos.map(pilula).join('') + '</div>';
   };
 

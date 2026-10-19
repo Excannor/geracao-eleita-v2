@@ -330,8 +330,7 @@
       + '<div class="dupla-nomeada">'
       + '<span>' + retrato(eu(), 'enorme') + '<b>Você</b></span>'
       + '<span class="chama-meio">' + CC.icoChama() + '</span>'
-      + '<span>' + retrato(amigo, 'enorme') + '<b>' + CC.esc(amigo.nome) + '</b></span></div>'
-      + '<p class="frase-cena">A contagem sobe nos dias em que vocês dois fazem a lição.</p></div>', {
+      + '<span>' + retrato(amigo, 'enorme') + '<b>' + CC.esc(amigo.nome) + '</b></span></div></div>', {
       classe: 'tela-proposito',
       rotulo: 'Novo propósito',
       pe: '<button class="botao" data-ver>Ver propósito</button>',
@@ -427,7 +426,6 @@
     CC.folha('<div class="dupla-convite">' + retrato(info, 'grande') + '<span class="chama-convite">' + CC.icoChama() + '</span>'
       + retrato(eu(), 'grande') + '</div>'
       + '<h2>' + CC.esc(info.nome) + ' te chamou para um propósito!</h2>'
-      + '<p>No propósito dos amigos, a contagem sobe nos dias em que vocês dois fazem a lição.</p>'
       + '<p class="recado-senha" id="recado" role="alert"></p>'
       + '<div class="acoes"><button class="botao" data-aceitar>Aceitar</button>'
       + '<button class="botao plano" data-fechar>Agora não</button></div>',

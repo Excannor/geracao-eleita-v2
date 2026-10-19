@@ -694,8 +694,7 @@
       <div data-passo="1">
         <h1>Quem é você?</h1>
         <div class="campo" style="margin-top:16px"><label for="nome">Como você quer que a gente te chame? <small class="contagem" id="conta-nome" aria-hidden="true">0/20</small></label>
-          <input id="nome" name="name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="20" required>
-          <span class="ajuda">Até 20 letras. É assim que seus amigos veem você.</span></div>
+          <input id="nome" name="name" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" maxlength="20" required></div>
         <div class="campo" style="margin-top:16px"><label for="nascimento">Data de nascimento</label>
           <input id="nascimento" name="bday" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" autocomplete="bday" aria-describedby="ajuda-nascimento" required>
           <span class="ajuda" id="ajuda-nascimento">Dia, mês e ano (dd/mm/aaaa).</span></div>
@@ -710,14 +709,13 @@
       <div data-passo="2" hidden>
         <h1>Seu e-mail</h1>
         <div class="campo" style="margin-top:16px"><label for="email">E-mail</label>
-          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" required>
-          <span class="ajuda">Com ele você também entra em outro aparelho.</span></div>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" required></div>
       </div>
       <div data-passo="3" hidden>
         <h1>Crie seu acesso</h1>
         <div class="campo" style="margin-top:16px"><label for="usuario">Escolha um @usuário</label>
           <input id="usuario" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" maxlength="30" required>
-          <span class="ajuda">Letras minúsculas, números, ponto, hífen e sublinhado. É por ele que um amigo te encontra.</span></div>
+          <span class="ajuda">Letras minúsculas, números, ponto, hífen e sublinhado.</span></div>
         <div class="campo" style="margin-top:16px"><label for="senha-nova">Crie uma senha</label>
           <div class="senha"><input id="senha-nova" name="new-password" type="password" autocomplete="new-password" enterkeyhint="done" minlength="8" required>
             <button type="button" class="mostrar" data-mostrar="senha-nova" aria-pressed="false">Mostrar</button></div>
