@@ -130,7 +130,9 @@ TUDO=1 node design/ferramentas/analise/textos-tela.mjs $S/strings.txt $S/rev/rel
   maiúscula e ponto nos avisos de erro; sem travessão (o `teste.mjs` reprova travessão no conteúdo e
   o guia estende a regra à interface), sem emoji na interface, sem "vc"; português de conversa,
   sem jargão de igreja sem explicação; frases dirigidas ao leitor sem marcar gênero ("cansado" →
-  "o que me cansa"), como nas revisões de `docs/revisao-2026-09-29`.
+  "o que me cansa"), como nas revisões de `docs/revisao-2026-09-29`; **sem aviso de privacidade
+  na interface** ("só você vê", "ninguém vê", "só a soma", "o app não avisa ninguém": isso fica
+  na política de privacidade; o que fica e o que sai em `docs/voz.md`).
 - Onde os textos moram: `src/app/*.js` (os literais), `src/entrar.html`, `privacidade.html`,
   `termos.html`; os textos dos lembretes em `notificacoes.mjs` (`T`); o conteúdo do plano e das notas
   em `conteudo/` (é revisão de conteúdo, outra frente: `ferramentas/reflexoes/`).

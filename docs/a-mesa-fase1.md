@@ -416,7 +416,7 @@ Mock, quadros 9 e 10. Ordem:
 3. **"No plano"** (`mesa-plano`), em `blocos` e `trecho`:
    - Até 2 linhas, uma por capítulo citado: primeiro os capítulos com mais cartões e, no empate, a ordem em que aparecem.
    - Cada linha mostra "Efésios 6 é o dia 244", "Salmos 141-143 e Efésios 6", e leva a `#/dia/244`.
-   - Embaixo, **só no aparelho da pessoa e só se ela leu:** "Você leu em 01/09 · só você vê".
+   - Embaixo, **só no aparelho da pessoa e só se ela leu:** "Você leu em 01/09" (o " · só você vê" saiu em 19/10, quando o dono pediu para tirar da interface os avisos de privacidade; ver `docs/voz.md`).
      - A data sai de `marcadoEm`, pelo `CC.lidoEm(n)` novo em `02-estado.js`.
      - Nada disso vai ao servidor, e não há contagem de ninguém.
    - No estudo do dono, com o cartão de Lucas: dias 244 e 77. Sem ele: 244 e 318.

@@ -16,6 +16,11 @@ reflexões e textos de tela seguem este catálogo. **O único texto que não se 
 os arquivos de `conteudo/biblias` não se mexem, e toda citação entre aspas fica palavra por
 palavra como está na NBV. O resto pode e deve ser reescrito na voz humana.
 
+**Sem aviso de privacidade na interface (dono, 19/10):** não colocar avisos de privacidade na
+interface ("só você vê", "ninguém vê", "só a soma", "nunca o de cada um", "o app não avisa
+ninguém", "guardado com criptografia"); isso fica na política de privacidade. O que fica e o que
+sai, com exemplos, em `docs/voz.md`.
+
 ## A voz
 
 Alguém da célula contando o livro para um amigo que nunca o leu, numa mesa de café. O amigo

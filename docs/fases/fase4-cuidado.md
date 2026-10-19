@@ -58,7 +58,7 @@ Apagar conta remove os pedidos da pessoa, os gestos e as denúncias dela. Sair o
   - Quem conduz vê no topo "Pedidos para rever" quando houver denúncia, com "Manter" / "Tirar".
   - Estado vazio: "Nenhum pedido agora. Quando alguém pedir oração, aparece aqui."
 - **Perfil → "Minha história com Deus"** (rota `#/perfil/historia`), guia privado:
-  - Introdução: "Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus. Escreva só para você. Ninguém vê o que está aqui."
+  - Introdução: "Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus." (o "Escreva só para você. Ninguém vê o que está aqui." saiu em 19/10, quando o dono pediu para tirar da interface os avisos de privacidade; ver `docs/voz.md`)
   - Três campos (até 600 caracteres cada), com as perguntas-guia:
     1. "Antes: como era a sua vida? O que você buscava?"
     2. "O encontro: como você conheceu Jesus? Quem estava por perto?"

@@ -503,7 +503,7 @@ A folha "Quem foi ao encontro?" (`08b:1268-1361`, no index) ganha, entre o botã
 `CC.estudoCelula.paraQuemFaltou(p, { data, faltaram, estudo })`, uma folha (`CC.folha`, `rolavel: true`, `classe: 'folha-faltou'`):
 
 1. `h2`: "Quem não veio".
-2. `passo-dica`: "O app não avisa ninguém. Se quiser, mande uma mensagem para cada pessoa pelo seu WhatsApp."
+2. `passo-dica`: "Se quiser, mande uma mensagem para cada pessoa pelo seu WhatsApp." (sem "O app não avisa ninguém"; em 19/10 o dono pediu para tirar da interface os avisos de privacidade; ver `docs/voz.md`)
 3. A prévia (`mesa-zap-moldura`, igual à de "Mandar no grupo"), com a etiqueta "A mensagem, com o nome de cada um" e a mensagem do primeiro da lista.
 4. A lista (`lista-pedidos`), uma linha por pessoa (`linha-amigo`, 64 px): o retrato, o nome e dois botões:
    - "Mandar no WhatsApp" (`a.botao-whatsapp`, `href="https://wa.me/?text=..."`, `target="_blank"`), como em "Precisam de atenção" (`08b:992-993`);
@@ -530,7 +530,7 @@ O bloco de sempre (`CC.notasDoContexto`, `07g-anotacoes.js:294-308`), com o cont
   - `data-titulo-nota`, o título que a nota nova já traz.
 - O título que a nota nova já traz é o título do estudo, cortado na última palavra inteira que cabe em 60 caracteres (`CC.MAX_TITULO_NOTA`). Ele é cifrado como o texto (`notas.*.titulo`) e a pessoa pode mudar.
 - `abrirEditor` (`04e-versiculos.js:163`) aceita `titulo` no começo da nota nova. A nota nasce sem versículo (`versos: []`).
-- Embaixo vai `CC.avisoPrivado()`: "Só você vê. Guardado com criptografia." e "Saiba mais" (`04e-versiculos.js:313-314`).
+- ~~Embaixo vai `CC.avisoPrivado()`: "Só você vê. Guardado com criptografia." e "Saiba mais".~~ A linha do cadeado saiu de todo o app (19/10: o dono pediu para tirar da interface os avisos de privacidade; ver `docs/voz.md`).
 - O bloco entra no estudo atual e nos anteriores. Não entra no modo encontro nem na impressão.
 - **O contexto `estudo:<id>`:**
   - `02-estado.js:147`: `CONTEXTO = /^(nota|secao|conhecer|parabola|estudo):/`. O `limparNota` roda também no servidor (`REGRAS.normalizarEstado`), e é isso que deixa o contexto passar pela sincronização;
@@ -632,13 +632,13 @@ A impressão não usa as fichas do tema: é tinta preta sobre papel branco nos d
 | Registro, botão | Trocar |
 | Registro, opção | Outro estudo, fora do app |
 | Quem não veio, título | Quem não veio |
-| Quem não veio, dica | O app não avisa ninguém. Se quiser, mande uma mensagem para cada pessoa pelo seu WhatsApp. |
+| Quem não veio, dica | Se quiser, mande uma mensagem para cada pessoa pelo seu WhatsApp. |
 | Quem não veio, prévia | A mensagem, com o nome de cada um |
 | Quem não veio, botões | Mandar no WhatsApp / Copiar / Fechar |
 | Quem não veio, aviso | Mensagem copiada. É só colar na conversa. |
 | Anotação, seção | Minha anotação neste estudo |
 | Anotação, botão | Escrever minha anotação / Escrever outra anotação |
-| Anotação, aviso | Só você vê. Guardado com criptografia. Saiba mais (o de sempre) |
+| Anotação, aviso | Nenhum (19/10: o dono pediu para tirar da interface os avisos de privacidade; ver `docs/voz.md`) |
 | Minhas anotações, chip | Estudo da célula |
 
 ### 5.2 Funções puras novas em `CC.estudoRegras` (`estudo-regras.js`)
@@ -970,7 +970,7 @@ Ao lado de `:116-188`:
     - tocar abre a leitura, com os 6 cartões iguais a `nbv.json`;
     - a leitura não tem "Orem pelo Jonas", a Acolhida de hoje, "Vieram" nem "Usar como base".
 13. **Anotação da Ana em S1:**
-    - "Minha anotação neste estudo" e "Só você vê" aparecem;
+    - "Minha anotação neste estudo" aparece, sem aviso de privacidade;
     - a nota guardada já traz o título do estudo e continua lá ao reabrir S1;
     - Minhas anotações mostra a nota com o chip "Estudo da célula", que leva de volta a S1 (por `#/estudo/S1`);
     - o valor da conquista "notas" não muda, nem depois de ligar um versículo à nota;
