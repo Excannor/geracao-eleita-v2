@@ -1181,3 +1181,29 @@ Três revisões leram o diff de `336d46d` a `ab51e4c` (correção, segurança e 
 **Descartado depois de conferir:** só a sugestão de levar o CSS de `.estudo-do-registro` e `.opcao-estudo` para a peça, para guardar folga: a folha de registro é da casca e abre pela aba Hoje sem a peça, e ficaria sem estilo. A folga está em 69,7 KB (o piso é 60). Ficaram como estão, de propósito: os títulos dos estudos na folha de registro de quem conduz (só títulos, e a escolha já marcada precisa estar na lista, mesmo de um estudo de antes do histórico); e o `crescer` dos campos de texto, que mede na digitação e não numa troca de largura (é de todos os campos do preparo, desde a Fase 1).
 
 **Para o dono decidir:** A2 (a filha lê os da mãe só até a multiplicação), A5 (o estudo novo começa com os 4 Ws vazios) e as notificações com "Bora" continuam. O aviso no sino aos líderes com estudos guardados deixou de ser preciso para a política valer (v22); fica a pergunta se o dono quer abrir os estudos antigos a quem entrou depois, e aí, sim, com o aviso antes.
+
+---
+
+## 15. Pôr um estudo pronto na célula, direto no banco (19/10)
+
+`ferramentas/colocar-estudo.mjs` põe um estudo escrito fora do app (o do dono está em `ferramentas/estudo-exemplo.txt`) na célula de um líder, como se ele mesmo o tivesse preparado e salvo pelo app. É o pedido que o preparo manda num estudo novo: NBV, a referência citada no meio do parágrafo virando cartão (a "Sugestão do app" com "Mostrar o cartão"; no estudo do dono, Lucas 11.24-26, e são 6 cartões), as perguntas que o passo 3 deixa marcadas (a primeira da reflexão do dia 244 e a de aplicação do OIA), sem combinado, e acolhida, adoração e testemunho vazios (o app mostra as sugestões da semana). Grava pelo mesmo `Contas.salvarEstudo`, com as mesmas opções do servidor: o que o servidor montava em `carregarRegras` passou para `regras-app.mjs` (`opcoesDoEstudo`), e os dois usam. O estudo entra como estudo novo: o atual da célula, se havia, vai para Estudos anteriores.
+
+- **Sem `--sim`, só a prévia** (célula, título, número de partes e de versículos, perguntas). Tudo roda antes numa cópia do banco, tirada por uma conexão só de leitura; o banco de verdade só é lido, e a prévia funciona com o app no ar.
+- **Só grava com o app parado.** O servidor guarda as células na memória e, na próxima vez que salvasse a célula, voltaria o ponteiro para o estudo de antes. Com `--sim`, a ferramenta recusa quando o app responde em `127.0.0.1` na porta `PORTA` (8080 no container) ou em `http://caminho:8080`, o serviço na rede do compose, onde o container do `docker compose run` também está.
+- **Para e não muda nada** quando o @ não existe, quando ele não lidera célula nenhuma e quando lidera mais de uma sem `--celula` (aí lista o id e o título de cada uma).
+
+No Raspberry, na pasta do app (a do `publicar.ps1`), depois de publicar a versão que traz a ferramenta (a imagem precisa tê-la):
+
+```sh
+cd ~/geracao-eleita
+# a prévia, com o app ainda no ar (só lê)
+sudo docker compose run --rm --no-deps caminho node ferramentas/colocar-estudo.mjs maarcos_e
+# parar o app, gravar e subir de novo: o app fica fora do ar só nestas três linhas
+sudo docker compose stop caminho
+sudo docker compose run --rm --no-deps caminho node ferramentas/colocar-estudo.mjs maarcos_e --sim
+sudo docker compose up -d caminho && sudo docker compose up -d --force-recreate tunel-fixo
+```
+
+O `run` usa a imagem, o `environment` (com o `.env`) e os volumes do serviço `caminho`: `./dados` em `/app/dados`, com o `CAMINHO_ESTADO=/app/dados/estado.json` da imagem, e a pasta dos backups. `--no-deps` não sobe mais nada e `--rm` apaga o container no fim. Se o @ lidera mais de uma célula, a prévia lista os ids: acrescente `--celula <id>` nas duas chamadas. Recriar o `tunel-fixo` no fim é o mesmo passo do `publicar.ps1`: parar o `caminho` derruba a rede que o túnel usa.
+
+Conferido numa cópia de `estado-base` (líder `marcos`, que já tinha um estudo "Romanos 8.28-30" na célula): a prévia com o app no ar, a recusa do `--sim` com o app no ar, a gravação com ele parado e, de novo no ar, a aba Estudo do líder e de um membro com os 6 cartões na NBV, as 2 perguntas e "Romanos 8.28-30" em Estudos anteriores. As funções puras e o caminho inteiro numa pasta de ensaio estão no `teste.mjs` ("colocar um estudo na célula direto no banco").

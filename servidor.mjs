@@ -8,7 +8,6 @@ import { join, dirname, extname, normalize, basename, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { networkInterfaces } from 'node:os';
 import { createHmac, createHash, randomBytes } from 'node:crypto';
-import { createContext, runInContext } from 'node:vm';
 import {
   Contas, arquivoDoEstado, seloDaConta, limparNome, iguais, hojeNoFuso, fusoValido, somaDias,
   datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA, podeConduzir, aguardandoAprovacao, aprovacaoQueFalta,
@@ -38,6 +37,7 @@ import {
 import { configDoEmail, enviarEmail } from './email.mjs';
 import { chavesDasNotas, selarEstado, abrirEstado, migrarEstadosCifrados } from './cofre.mjs';
 import { csvDoRelatorio, htmlDoRelatorio, nomeDoArquivo, SCRIPT_RELATORIO } from './relatorio.mjs';
+import { carregarRegrasDoApp } from './regras-app.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, 'dist');
@@ -72,60 +72,21 @@ const TIPOS = {
 
 // ---------- as regras do aplicativo, as mesmas do navegador ----------
 // A fusão entre aparelhos e a conta da ofensiva com escudos moram em 02-estado.js.
-// O servidor carrega o mesmo arquivo, para os dois lados nunca discordarem.
+// O servidor carrega o mesmo arquivo, para os dois lados nunca discordarem. O carregamento mora em
+// regras-app.mjs, que a ferramenta de colocar um estudo na célula (ferramentas/colocar-estudo.mjs)
+// também usa: ela grava pelas mesmas regras e com as mesmas opções de salvarEstudo.
+const APP = carregarRegrasDoApp(AQUI);
 // O plano do conteúdo: os propósitos de livro precisam saber por onde cada dia passa.
-let PLANO_DO_CONTEUDO = [];
+const PLANO_DO_CONTEUDO = APP.plano;
 // As reflexões dão o "tema" do dia aos lembretes ("a reflexão de hoje se chama ...").
-let REFLEXOES_DO_CONTEUDO = {};
+const REFLEXOES_DO_CONTEUDO = APP.reflexoes;
 // Os 14 dias do Conhecer Jesus: a leitura do dia de quem está nesse caminho.
 const CONHECER_DO_CONTEUDO = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
-function carregarRegras() {
-  const D = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conteudo.json'), 'utf8'));
-  PLANO_DO_CONTEUDO = D.plano;
-  REFLEXOES_DO_CONTEUDO = D.reflexoes || {};
-  const contexto = createContext({
-    window: { DADOS: D }, console, Date, Math, JSON, Object, Set, Map, Number, String, Array, Boolean, Intl,
-    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
-    document: { documentElement: { dataset: {} }, querySelector: () => null },
-    fetch: () => Promise.reject(new Error('sem rede no servidor')),
-    setTimeout, clearTimeout, location: { protocol: 'file:' }, navigator: {}, addEventListener: () => {},
-  });
-  for (const f of ['01-nucleo.js', '02-estado.js', '02b-jogo.js']) {
-    runInContext(readFileSync(join(AQUI, 'src', 'app', f), 'utf8'), contexto, { filename: f });
-  }
-  // O leitor de marcas do estudo da célula (CC.lerEstudo) é o mesmo da prévia do líder: o servidor
-  // relê o texto que chega e grava só o que ele mesmo leu (docs/a-mesa-fase1.md, seção 2).
-  runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-marcas.js'), 'utf8'), contexto, { filename: 'estudo-marcas.js' });
-  return contexto.window.CC;
-}
-const REGRAS = carregarRegras();
-const TODOS_LIVROS = [...new Set(PLANO_DO_CONTEUDO.flatMap((d) => d.livros))];
-// Quantos capítulos cada livro tem (o plano passa pela Bíblia inteira): sem isso, "Efésios 99.1"
-// viraria cartão.
-const CAPITULOS = REGRAS.capitulosDoPlano(PLANO_DO_CONTEUDO);
-// Quantos versículos cada capítulo tem, por tradução: o cartão do estudo precisa existir na Bíblia
-// do app. Só a contagem fica na memória; o texto é lido uma vez, no primeiro estudo salvo naquela
-// tradução, e descartado. Sem o arquivo, a conferência fica só no capítulo.
-const VERSICULOS = new Map();
-function versiculosDa(sigla) {
-  if (!VERSICULOS.has(sigla)) {
-    let contagem = null;
-    try {
-      const b = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', sigla + '.json'), 'utf8'));
-      contagem = Object.fromEntries(Object.entries(b.livros || {}).map(([livro, caps]) => [livro, caps.map((v) => (Array.isArray(v) ? v.length : 0))]));
-    } catch { contagem = null; }
-    VERSICULOS.set(sigla, contagem);
-  }
-  const c = VERSICULOS.get(sigla);
-  return c ? (livro, cap) => (c[livro] || [])[cap - 1] || 0 : null;
-}
+const REGRAS = APP.regras;
+const TODOS_LIVROS = APP.livros;
 // A semana que o roteiro "Leitura da semana" cobre: os 7 dias do plano até onde o líder já leu (é
-// ele quem conduz o encontro), e a referência-chave dela, a da reflexão do 4º dia.
-function semanaDoLider(estadoDoLider) {
-  const lidos = ((estadoDoLider && estadoDoLider.lidos) || []).map(Number).filter((n) => n >= 1 && n <= PLANO_DO_CONTEUDO.length);
-  return Math.min(PLANO_DO_CONTEUDO.length, Math.max(7, lidos.length ? Math.max(...lidos) : 0));
-}
-const refDaSemana = (ate) => (((REFLEXOES_DO_CONTEUDO[ate - 3] || [])[0] || {}).ref) || '';
+// ele quem conduz o encontro).
+const { semanaDoLider } = APP;
 
 // ---------- cabeçalhos de segurança ----------
 // O app é uma página só, com os scripts dentro do HTML. A CSP libera exatamente esses
@@ -2005,13 +1966,11 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto, new Date(), { quando, hoje }); return {}; }
         if (qual === 'estudo') {
           // Só o líder prepara (contas.mjs, salvarEstudo, dá 403 aos outros). A leitura da semana
-          // congela até que dia do plano ela vai, contado pelo que o líder já leu. Gravar o estudo
-          // tem limite por minuto: cada estudo novo é uma linha no histórico da célula.
+          // congela até que dia do plano ela vai, contado pelo que o líder já leu (regras-app.mjs,
+          // opcoesDoEstudo, as mesmas de ferramentas/colocar-estudo.mjs). Gravar o estudo tem limite
+          // por minuto: cada estudo novo é uma linha no histórico da célula.
           if (!dentroDoLimite('estudo:' + eu, 20)) throw Object.assign(new Error('muitas tentativas, espere um pouco'), { publico: true, codigo: 429 });
-          const ate = semanaDoLider(await lerEstado(arquivoDe(eu)));
-          const r = await CONTAS.salvarEstudo(eu, id, corpo, {
-            regras: REGRAS, livros: TODOS_LIVROS, capitulos: CAPITULOS, versiculos: versiculosDa, planoAte: ate, refSemana: refDaSemana(ate),
-          });
+          const r = await CONTAS.salvarEstudo(eu, id, corpo, APP.opcoesDoEstudo(await lerEstado(arquivoDe(eu))));
           const nomes = new Map([[eu, await nomeDeExibicao(eu)]]);
           return { estudo: estudoNoRetrato(r.estudo, { souQuemPrepara: true, nomeDe: (u) => nomes.get(u) || '@' + u, usado: CONTAS.estudoJaUsado(r.p, r.estudo) }) };
         }

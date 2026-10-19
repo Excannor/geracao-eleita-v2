@@ -497,6 +497,8 @@ falhou e o container continua servindo o build de antes.
 | `servidor.mjs` | serve `dist/`, as rotas da API, os backups e a rodada das notificações |
 | `db.mjs` | o banco: esquema com versão, gravação só do que mudou, importação, backups |
 | `cofre.mjs` | a cifra dos textos privados no banco: a lista dos campos, a chave e a migração |
+| `regras-app.mjs` | as regras do app (as de `src/app` e o leitor de marcas do estudo) carregadas fora da tela, para o servidor e as ferramentas |
+| `ferramentas/colocar-estudo.mjs` | põe um estudo pronto na célula de um líder, direto no banco, com o app parado (`docs/a-mesa-fase2.md`, seção 15) |
 | `src/estilo.css` | a base do estilo: peças, telas e nós da trilha |
 | `src/estilo-v2/` | as fichas de cor e de letra (`00-tokens.css`) e o desenho de cada tela, por cima da base |
 | `src/app/02-estado.js` | progresso, fusão entre aparelhos, ofensiva, XP, conquistas |

@@ -2235,6 +2235,106 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
 }
 
 // =========================================================================
+secao('colocar um estudo na célula direto no banco (ferramentas/colocar-estudo.mjs)');
+// =========================================================================
+// A ferramenta do dono grava pelo mesmo Contas.salvarEstudo e com as mesmas opções do servidor
+// (regras-app.mjs), com o pedido que o preparo manda num estudo novo. Aqui as funções puras dela e
+// o caminho inteiro numa pasta de ensaio, sem o servidor.
+{
+  const F = await import('./ferramentas/colocar-estudo.mjs');
+  const { carregarRegrasDoApp } = await import('./regras-app.mjs');
+  const R = F.carregarRegras(AQUI);
+  const OIA = R.regras.estudoRegras.PERGUNTAS_OIA;
+  const reflexao244 = D.reflexoes['244'][0];
+
+  // --- a linha de comando ---
+  const args = (...x) => JSON.stringify(F.lerArgumentos(x));
+  checar(args('@maarcos_e') === JSON.stringify({ usuario: '@maarcos_e', celula: '', arquivo: '', sim: false, ajuda: false })
+    && F.lerArgumentos(['maarcos_e', '--celula', 'p1', '--arquivo=a.txt', '--sim']).celula === 'p1'
+    && F.lerArgumentos(['maarcos_e', '--celula=p1', '--arquivo', 'a.txt']).arquivo === 'a.txt' && F.lerArgumentos(['x', '--sim']).sim === true,
+  'a linha de comando: o @, --celula e --arquivo (com espaço ou =) e --sim');
+  checar(!!F.lerArgumentos([]).erro && !!F.lerArgumentos(['a', 'b']).erro && !!F.lerArgumentos(['a', '--celula']).erro
+    && !!F.lerArgumentos(['a', '--celula', '--sim']).erro && !!F.lerArgumentos(['a', '--rapido']).erro && F.lerArgumentos(['--ajuda']).ajuda === true,
+  'sem o @, com dois @, sem o valor de --celula ou com uma opção que não existe: erro, e nada roda');
+
+  // --- quais células ---
+  const cel = (id, titulo, criadoPor, membros, extra = {}) => ({ id, titulo, celula: true, criadoPor, membros: membros.map(([usuario, estado]) => ({ usuario, estado })), encerradoEm: '', ...extra });
+  const propositos = [
+    cel('c2', 'Vida', 'marcos', [['marcos', 'ativo']]),
+    cel('c1', 'Esperança', 'marcos', [['marcos', 'ativo'], ['ana', 'ativo']]),
+    cel('c3', 'Encerrada', 'marcos', [['marcos', 'ativo']], { encerradoEm: '2026-10-01' }),
+    cel('c4', 'Saiu', 'marcos', [['marcos', 'saiu']]),
+    cel('c5', 'Da Ana', 'ana', [['ana', 'ativo'], ['marcos', 'ativo']]),
+    { ...cel('g1', 'Grupo de leitura', 'marcos', [['marcos', 'ativo']]), celula: false },
+  ];
+  checar(JSON.stringify(F.celulasQueLidera(propositos, '@Marcos')) === JSON.stringify([{ id: 'c1', titulo: 'Esperança' }, { id: 'c2', titulo: 'Vida' }]),
+    'as células que a pessoa lidera: só as abertas que ela criou e em que continua, em ordem de título (não a de que só é membro, nem grupo)');
+  checar(F.escolherCelula([], '').motivo === 'nenhuma' && F.escolherCelula([], 'c1').motivo === 'nenhuma'
+    && F.escolherCelula([{ id: 'c1' }, { id: 'c2' }], '').motivo === 'varias' && F.escolherCelula([{ id: 'c1' }], 'c9').motivo === 'outra'
+    && F.escolherCelula([{ id: 'c1' }], '').celula.id === 'c1' && F.escolherCelula([{ id: 'c1' }, { id: 'c2' }], 'c2').celula.id === 'c2',
+  'a escolha: sem célula, nenhuma; várias sem --celula, para; --celula de outra, para; uma só, ela');
+
+  // --- as perguntas marcadas de saída ---
+  const g = (titulo, perguntas, marcadas) => ({ titulo, perguntas, marcadas });
+  checar(JSON.stringify(F.perguntasEscolhidas([g('A', ['a1', 'a2'], ['a1']), g('B', ['b1', 'x'.repeat(301)], ['x'.repeat(301)]), g('C', ['a1', 'c1'], ['a1', 'c1'])]))
+    === JSON.stringify([{ texto: 'a1', de: 'A' }, { texto: 'c1', de: 'C' }]), 'as perguntas escolhidas: as marcadas, na ordem dos grupos, sem repetir e sem as de mais de 300 caracteres');
+  checar(F.perguntasEscolhidas([g('T', ['1', '2', '3', '4', '5', '6', '7'], ['1', '2', '3', '4', '5', '6', '7'])]).length === 6, 'no máximo 6 perguntas, como no preparo');
+
+  // --- o estudo do dono, do texto ao pedido ---
+  const texto = readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo.txt'), 'utf8');
+  const sug = F.aceitarSugestoes(texto, R.regras.lerEstudo, { capitulos: R.capitulos, versiculos: R.versiculosDa('nbv') });
+  const linhasSug = sug.fonte.split('\n');
+  checar(JSON.stringify(sug.aceitas) === JSON.stringify(['Lucas 11.24-26']) && linhasSug[linhasSug.findIndex((l) => l.startsWith('Em Lucas 11:24')) + 1] === 'Lucas 11.24-26',
+    'a sugestão do app (Lucas 11.24-26, citada no meio do parágrafo) vira cartão numa linha só, logo depois do parágrafo, como "Mostrar o cartão"');
+  const montado = F.montarPedido({ id: 'c1', texto, R });
+  checar(JSON.stringify(montado.corpo.perguntas) === JSON.stringify([reflexao244.perguntas[0], OIA[2]])
+    && JSON.stringify(montado.perguntas.map((x) => x.de)) === JSON.stringify(['Da reflexão do dia 244', 'Do método OIA']),
+  'as perguntas do pedido: a primeira da reflexão do dia 244 (Efésios 6) e a de aplicação do OIA');
+  const c = montado.corpo;
+  checar(c.acao === 'estudo' && c.id === 'c1' && c.estudo === 'blocos' && c.traducao === 'nbv' && c.base === '' && c.combinado === ''
+    && c.acolhida === '' && c.adoracao === '' && c.testemunho === '' && c.ref === '' && c.fonte === sug.fonte,
+  'o pedido é o do preparo num estudo novo: blocos, NBV, base vazia, sem combinado e com acolhida, adoração e testemunho vazios');
+
+  // --- as mesmas opções do servidor ---
+  const srv = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
+  checar(/CONTAS\.salvarEstudo\(eu, id, corpo, APP\.opcoesDoEstudo\(await lerEstado\(arquivoDe\(eu\)\)\)\)/.test(srv) && /const APP = carregarRegrasDoApp\(AQUI\);/.test(srv),
+    'o servidor grava o estudo com as opções de regras-app.mjs, as mesmas da ferramenta');
+  {
+    const A = carregarRegrasDoApp(AQUI);
+    const o = A.opcoesDoEstudo({ lidos: [1, 2, 250] });
+    checar(o.planoAte === 250 && o.refSemana === D.reflexoes['247'][0].ref && A.opcoesDoEstudo(null).planoAte === 7 && o.capitulos.Efésios === capitulosDoPlano.Efésios
+      && o.livros.length === 66 && o.versiculos('nbv')('Efésios', 6) === 24 && o.versiculos('nao-existe') === null,
+    'opcoesDoEstudo: a semana do líder pelo que ele leu, a referência dela, os capítulos e a contagem de versículos por tradução');
+    const ferramenta = readFileSync(join(AQUI, 'ferramentas', 'colocar-estudo.mjs'), 'utf8');
+    const copia = new Set(((readFileSync(join(AQUI, 'Dockerfile'), 'utf8').match(/^COPY (.*\.mjs.*) \.\/$/m) || [])[1] || '').split(/\s+/));
+    const faltam = [...ferramenta.matchAll(/from '\.\.\/([\w-]+\.mjs)'/g)].map((m) => m[1]).filter((m) => !copia.has(m));
+    checar(faltam.length === 0, 'os módulos que a ferramenta carrega estão na imagem (COPY do Dockerfile)' + (faltam.length ? ' (faltam: ' + faltam.join(', ') + ')' : ''));
+  }
+
+  // --- o caminho inteiro numa pasta de ensaio ---
+  const pastaC = mkdtempSync(join(tmpdir(), 'cc-teste-colocar-'));
+  const ce = await new Contas(join(pastaC, 'contas.json')).carregar();
+  for (const u of ['lider', 'ana']) await ce.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '1990-01-01', consentimento: true });
+  const ID = (await ce.criarCelula('lider', { titulo: 'Esperança' }, hojeTeste)).id;
+  await ce.entrarNaCelula('ana', ce.gerarLinkCelula('lider', ID, assinar).token, assinar, hojeTeste);
+  const antes = (await ce.salvarEstudo('lider', ID, { estudo: 'trecho', ref: 'Romanos 8.28-30', testemunho: 'Orem pelo Jonas.' }, R.opcoesDoEstudo(null))).estudo;
+  checar(F.escolherCelula(F.celulasQueLidera(Object.values(ce.dados.propositos), 'ana')).motivo === 'nenhuma', 'quem é só membro não lidera célula nenhuma');
+  const so = F.escolherCelula(F.celulasQueLidera(Object.values(ce.dados.propositos), 'lider'));
+  const r = await ce.salvarEstudo('lider', so.celula.id, F.montarPedido({ id: so.celula.id, texto, R }).corpo, R.opcoesDoEstudo(null));
+  const e = r.estudo;
+  checar(e.tipo === 'blocos' && e.titulo === 'Batalha espiritual, vigilância e Armadura de Deus' && e.traducao === 'nbv' && e.criadoPor === 'lider' && e.combinado === ''
+    && JSON.stringify(e.refs) === JSON.stringify(['Efésios 6.12', 'Lucas 11.24-26', '1 Pedro 5.8', 'Efésios 6.13-17', 'Efésios 6.18', 'Efésios 6.10'])
+    && e.blocos.filter((b) => b.t === 'versiculo').length === 6 && e.perguntas.length === 2,
+  'gravado pelo salvarEstudo: o estudo do dono, na NBV, com os 6 cartões e as 2 perguntas, preparado pelo líder');
+  checar(ce.proposito(ID).estudoId === e.id && ce.estudo(antes.id).atualAte !== '' && ce.proposito(ID).estudoTestemunho === '',
+    'o estudo de antes vai para os anteriores (atual_ate), e o testemunho da semana dele não passa para o novo');
+  await ce.criarCelula('lider', { titulo: 'Vida' }, hojeTeste);
+  checar(F.escolherCelula(F.celulasQueLidera(Object.values(ce.dados.propositos), 'lider')).motivo === 'varias', 'com duas células e sem --celula, a ferramenta para e lista');
+  fecharBanco(arquivoDoBanco(pastaC));
+  rmSync(pastaC, { recursive: true, force: true });
+}
+
+// =========================================================================
 secao('painel pastoral agregado (Fase 5, seção 2)');
 // =========================================================================
 {
