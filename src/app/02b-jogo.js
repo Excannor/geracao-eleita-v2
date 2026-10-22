@@ -202,6 +202,29 @@
     return bau;
   };
 
+  // ---------- cartas (docs/cartas.md) ----------
+  // A regra (cartas-regras), a arte (cartas) e o álbum (album) são peças sob demanda; aqui ficam
+  // só os pedidos e a contagem por álbum (o esqueleto do catálogo está em window.CARTAS_INDICE).
+  CC.pedirCartas = () => Promise.all([CC.pedirPeca(window.CARTAS_REGRAS, () => !!CC.cartasRegras),
+    CC.pedirPeca(window.CARTAS, () => !!CC.cartas), CC.pedirPeca(window.ALBUM_CARTAS, () => !!CC.album)]);
+  // Paga o que estiver pendente (baús antigos, marcos, convites): na abertura, na volta ao app e
+  // a cada troca de tela, no máximo a cada 3 s.
+  let acertadoEm = 0;
+  CC.acertarCartas = () => {
+    if (Date.now() - acertadoEm < 3000 || !window.CARTAS_REGRAS) return;
+    acertadoEm = Date.now();
+    CC.pedirPeca(window.CARTAS_REGRAS, () => !!CC.cartasEmDia).then(() => CC.cartasEmDia(), () => {});
+  };
+  CC.albunsDeCartas = (e) => {
+    const c = est(e).cartas || {};
+    const tem = new Set(Object.values(c.eventos || {}).concat(Object.values(c.glorias || {})).map((x) => x.carta).filter(Boolean));
+    const hoje = CC.hojeIso();
+    return (window.CARTAS_INDICE || []).filter((a) => !a.especial && a.lancadoEm <= hoje).map((a) => {
+      const ids = a.c.split(' ');
+      return { id: a.id, nome: a.nome, feitos: ids.filter((id) => tem.has(id)).length, total: ids.length };
+    });
+  };
+
   // Todos os versículos já guardados, do mais novo para o mais antigo.
   CC.versiculosGuardados = (e) => Object.keys(est(e).bausAbertos || {})
     .map((chave) => Number(String(chave).replace('dia:', '')))
@@ -328,7 +351,9 @@
       testamento('Bíblia inteira', livrosDe(CC.COLECOES)),
       { tipo: 'plano', cor: 'verde', titulo: 'Plano de um ano', feitos: lidos.size, total: 365, ganho: lidos.size >= 365 },
     ];
-    return { colecoes, unidades, desafios, testamentos };
+    // Álbuns de cartas: um troféu por álbum completo (as 13, em qualquer versão).
+    const albuns = CC.albunsDeCartas(e).map((a) => ({ tipo: 'album', cor: 'amarelo', titulo: a.nome, feitos: a.feitos, total: a.total, ganho: a.feitos === a.total }));
+    return { colecoes, unidades, desafios, testamentos, albuns };
   };
 
   // ---------- novidades: o que o servidor confere ----------

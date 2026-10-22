@@ -1,2 +1,102 @@
-/* O álbum das cartas (album.js). */
-.album-grade { display: grid; }
+/* O álbum das cartas (album.js): a grade, as versões, a carta grande, a carta de texto (sem
+   desenho ainda), as revelações e "O que pode vir". Cores pelos tokens do tema (claro e escuro);
+   as das raridades são as da tabela de cartas-raridade.md. */
+.album-secao { margin: 8px 0 22px; }
+.album-versoes { margin: -4px 0 10px; color: var(--v2-tinta-fraca); font-size: .86rem; font-weight: 700; }
+.album-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--album-mini, 76px), 1fr)); gap: 10px; }
+.album-carta, .album-vaga { position: relative; width: 100%; aspect-ratio: 5 / 7; border-radius: 9px; }
+.album-carta { display: block; padding: 0; border: 0; background: none; cursor: pointer; }
+.album-carta:focus-visible { outline: 3px solid var(--salvia-texto); outline-offset: 3px; }
+.album-mini, .album-mini > * { display: block; width: 100% !important; height: 100%; }
+.album-mini canvas { border-radius: 9px; box-shadow: 0 2px 6px rgba(0, 0, 0, .18); }
+.album-vaga { border: 2px dashed var(--contorno); background: repeating-linear-gradient(135deg, transparent 0 8px, var(--listra) 8px 16px); }
+.album-sem-arte { display: grid !important; place-items: center; border-radius: 9px; border: 4px solid var(--rar, #bfae8e); background: var(--campo); color: var(--rar-tinta, #5f5136); }
+.album-sem-arte svg { width: 42%; height: auto; }
+[data-raridade="linho"] { --rar: #bfae8e; --rar-claro: #e8dcc4; --rar-tinta: #5f5136; }
+[data-raridade="bronze"] { --rar: #8c5a2b; --rar-claro: #b07a45; --rar-tinta: #6e3d14; }
+[data-raridade="prata"] { --rar: #8e96a3; --rar-claro: #c9ced6; --rar-tinta: #454e5c; }
+[data-raridade="ouro"] { --rar: #a87b12; --rar-claro: #d4a62a; --rar-tinta: #6f4f08; }
+[data-raridade="gloria"] { --rar: #e9d9a6; --rar-claro: #fff4d6; --rar-tinta: #5e4a14; }
+.album-pips { position: absolute; left: 50%; bottom: -7px; display: flex; gap: 3px; padding: 3px 5px; border-radius: 99px; background: var(--v2-cartao);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .2); transform: translateX(-50%); }
+.album-pips i { width: 7px; height: 7px; border: 1.5px solid var(--contorno); border-radius: 50%; }
+.album-pips i.tem.pip-linho { background: #bfae8e; border-color: #bfae8e; }
+.album-pips i.tem.pip-bronze { background: #b07a45; border-color: #8c5a2b; }
+.album-pips i.tem.pip-prata { background: #c9ced6; border-color: #8e96a3; }
+.album-pips i.tem.pip-ouro { background: #d4a62a; border-color: #a87b12; }
+.album-pips i.tem.pip-gloria { background: conic-gradient(#ffe9a8, #bff3ff, #e8c8ff, #c8ffd8, #ffe9a8); border-color: #e9d9a6; }
+.album-copias { position: absolute; top: -6px; right: -6px; min-width: 26px; padding: 2px 6px; border-radius: 99px; background: var(--v2-inverso); color: var(--v2-inverso-tinta);
+  font-size: .72rem; font-weight: 800; text-align: center; }
+.album-limiar { display: grid; gap: 12px; justify-items: center; }
+.album-limiar small { color: var(--v2-tinta-fraca); font-size: .78rem; font-weight: 800; }
+.album-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 12px 0 6px; color: var(--v2-tinta-fraca); font-size: .9rem; }
+.album-acoes .botao svg { width: 18px; height: 18px; }
+.album-gloria { display: flex; align-items: center; gap: 12px; margin: 12px 0; padding: 12px 14px; border-radius: var(--raio-cartao);
+  background: linear-gradient(120deg, #fff4d6, #f2ecd8 40%, #e8f4ff 70%, #f6eaff); color: #3b3010; }
+.album-gloria svg { flex: none; width: 32px; height: 32px; }
+.album-gloria p { flex: 1; margin: 0; }
+.album-sub { margin: 18px 0 6px; font-size: 1rem; }
+.album-chances, .album-regras { margin: 0; padding: 0; list-style: none; }
+.album-chances li { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--contorno); }
+.album-chances svg { width: 26px; height: 26px; flex: none; }
+.album-chances span { display: flex; flex: 1; justify-content: space-between; }
+.album-regras li { position: relative; padding: 4px 0 4px 16px; }
+.album-regras li::before { content: ''; position: absolute; left: 2px; top: 13px; width: 6px; height: 6px; border-radius: 50%; background: var(--salvia-texto); }
+
+/* a carta grande e as versões */
+.tela-carta .tela-cheia-palco { overflow-y: auto; }
+.carta-grande { display: grid; justify-items: center; gap: 12px; max-width: 520px; margin: 0 auto; padding: 8px 16px 16px; text-align: center; }
+.carta-grande-arte { display: grid; justify-items: center; gap: 10px; }
+.carta-grande h2 { margin: 4px 0 0; }
+.carta-sabia { margin: 0; max-width: 34em; }
+.carta-sabia small { display: block; color: var(--v2-tinta-fraca); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.carta-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin: 0; }
+.carta-links a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 700; }
+.carta-links svg { width: 18px; height: 18px; }
+.carta-versoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.carta-versao { position: relative; display: grid; justify-items: center; gap: 2px; min-width: 58px; min-height: 52px; padding: 6px 6px 4px; border: 2px solid var(--contorno);
+  border-radius: 14px; background: var(--v2-cartao); color: var(--v2-tinta); font: inherit; font-size: .74rem; font-weight: 800; }
+button.carta-versao { cursor: pointer; }
+.carta-versao svg { width: 22px; height: 22px; }
+.carta-versao[aria-pressed="true"] { border-color: var(--salvia-texto); box-shadow: 0 0 0 2px var(--salvia-texto) inset; }
+.carta-versao small { position: absolute; top: -8px; right: -6px; padding: 1px 5px; border-radius: 99px; background: var(--v2-inverso); color: var(--v2-inverso-tinta); font-size: .68rem; }
+.carta-versao.falta { opacity: .55; border-style: dashed; }
+.carta-versao.falta i { width: 18px; height: 22px; margin: 0 2px; border: 2px dashed var(--contorno); border-radius: 4px; }
+
+/* a carta de texto (sem desenho ainda) */
+.carta-texto { width: var(--largura); aspect-ratio: 5 / 7; perspective: 900px; }
+.ct-giro { position: relative; width: 100%; height: 100%; transition: transform .45s ease; transform-style: preserve-3d; }
+.carta-texto.mostra-verso .ct-giro { transform: rotateY(180deg); }
+.ct-face { position: absolute; inset: 0; overflow: hidden; border-radius: 16px; backface-visibility: hidden; }
+.ct-frente { display: flex; flex-direction: column; gap: 10px; padding: 18px 16px; border: 10px solid var(--rar); background: #f2ecd8; color: #23241e; text-align: left;
+  box-shadow: 0 0 0 2px var(--rar-claro) inset, 0 10px 26px rgba(0, 0, 0, .28); }
+.ct-verso { transform: rotateY(180deg); background: #121310; }
+.ct-verso canvas { width: 100%; height: 100%; }
+.ct-rar { display: inline-flex; align-items: center; gap: 6px; color: var(--rar-tinta); font-size: .8rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.ct-rar svg { width: 22px; height: 22px; }
+.ct-titulo { font-family: var(--fonte-biblia); font-size: 1.35rem; line-height: 1.15; }
+.ct-sabia { flex: 1; font-size: .92rem; line-height: 1.35; }
+.ct-sabia small { display: block; margin-bottom: 2px; font-weight: 800; }
+.ct-ref, .ct-album { font-size: .8rem; font-weight: 700; color: #5d5a4b; }
+.carta-texto.entrando { animation: album-entra .6s ease both; }
+@keyframes album-entra { from { opacity: 0; transform: translateY(24px) scale(.94); } }
+
+/* as revelações */
+.album-revela { display: grid; justify-items: center; gap: 10px; }
+.album-revela-carta { display: grid; justify-items: center; gap: 8px; min-height: 120px; }
+.album-legenda { min-height: 1.5em; margin: 0; font-size: 1.05rem; }
+.album-revela-titulo { margin: 0; opacity: 0; transition: opacity .3s; }
+.album-revela-titulo span { color: var(--v2-tinta-fraca); font-size: .9rem; }
+.legenda-pronta .album-revela-titulo { opacity: 1; }
+.album-completo { display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 12px; border-radius: 14px; background: #fff4d6; color: #3b3010; font-weight: 700; }
+.album-completo svg { width: 24px; height: 24px; flex: none; }
+.album-escolha { max-width: 640px; margin: 0 auto; padding: 8px 16px; text-align: center; }
+.album-escolha .album-grade { margin-top: 12px; text-align: left; }
+
+@media (min-width: 720px) {
+  .album-grade { grid-template-columns: repeat(auto-fill, minmax(var(--album-mini, 108px), var(--album-mini, 108px))); gap: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ct-giro, .album-revela-titulo { transition: none; }
+  .carta-texto.entrando { animation: none; }
+}

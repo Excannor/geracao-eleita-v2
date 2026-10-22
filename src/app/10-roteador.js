@@ -403,7 +403,7 @@
   // ---------- roteamento ----------
   const PERFIL = () => ({
     anotacoes: CC.vistaAnotacoes, livros: CC.vistaLivros, conquistas: CC.vistaConquistas,
-    trofeus: CC.vistaTrofeus, discipulado: CC.vistaDiscipulado,
+    trofeus: CC.vistaTrofeus, discipulado: CC.vistaDiscipulado, album: CC.vistaAlbum,
     // as duas telas antigas viraram Minhas anotações; os atalhos guardados continuam valendo
     escritos: () => CC.substituirRota('#/perfil/anotacoes'), versiculos: () => CC.substituirRota('#/perfil/anotacoes'),
     historia: CC.vistaHistoria,
@@ -551,6 +551,7 @@
 
     pintarTopo();
     pintarNavegacao(rota, arg);
+    if (!redesenhando && CC.acertarCartas) CC.acertarCartas();
 
     ligarVoltarDoTopo(conteudo);
 
@@ -752,6 +753,8 @@
 
   CC.sincronizar(true).then(async () => {
     CC.migrarEstado();
+    // as cartas pendentes (baús abertos antes das cartas, marcos, convites): docs/cartas.md
+    CC.acertarCartas();
     CC.guardarConquistas();
     const quem = CC.quem;
     if (quem && quem.comSenha) {
@@ -836,7 +839,7 @@
       .then(() => Promise.all([CC.carregarAmigos(), CC.carregarNovidades(), CC.carregarDiscipulado ? CC.carregarDiscipulado() : null]))
       // A folha do alto da trilha também: o "já leu hoje" muda com a meia-noite e com a
       // leitura dos amigos enquanto o app estava em segundo plano.
-      .then(() => { pintarTopo(); pintarNavegacao(); if (CC.repintarQuemLeu) CC.repintarQuemLeu(); });
+      .then(() => { pintarTopo(); pintarNavegacao(); if (CC.repintarQuemLeu) CC.repintarQuemLeu(); CC.acertarCartas(); });
   });
 
   if (location.protocol.startsWith('http')) {

@@ -698,44 +698,15 @@
   }
 
   // ---------- baú ----------
-  // As cartas do baú (amostra para o dono, src/sob-demanda/cartas.js): a peça é pedida assim
-  // que a tela abre, para estar pronta quando o baú abrir. Sem ela, fica o versículo de antes.
-  const pecaCartas = () => (window.CARTAS ? CC.pedirPeca(window.CARTAS, () => !!CC.cartas) : Promise.reject(new Error('peça')));
+  // O baú guarda o versículo (CC.abrirBau) e paga uma carta (docs/cartas.md). A tela pede as peças
+  // das cartas (regra, arte e álbum) assim que abre; chegando em até 2,5 s, a carta é revelada pela
+  // arte (CC.album.revelarNoBau). Sem elas, fica o versículo, e a carta chega na próxima vez que a
+  // regra carregar (CC.acertarCartas).
   const comPrazo = (p, ms) => Promise.race([p.then(() => true, () => false), new Promise((r) => setTimeout(() => r(false), ms))]);
-  const arquivoDe = (canvas, nome) => new Promise((r) => canvas.toBlob(r, 'image/png')).then((b) => new File([b], nome, { type: 'image/png' }));
-  function revelarCarta(el, palco, numero, ref, fechar) {
-    const carta = CC.cartas.cartaDoBau(numero);
-    palco.innerHTML = '<div class="cena-carta revelando"><h1>Baú aberto!</h1>'
-      + '<p class="passo-dica dica-carta">Uma carta nova para a sua coleção.</p><div id="carta-do-bau"></div></div>';
-    CC.cartas.revelar(palco.querySelector('#carta-do-bau'), carta);
-    // as duas imagens ficam prontas antes do toque (o Safari recusa o compartilhar longe dele),
-    // desenhadas depois da virada para não travar a animação
-    const depois = new Promise((r) => setTimeout(r, 1500));
-    const story = depois.then(() => arquivoDe(CC.cartas.storyDaCarta(carta), 'geracao-eleita-carta-' + carta.id + '.png'));
-    const papel = depois.then(() => (ref && CC.textoDoVersiculo ? CC.textoDoVersiculo(ref) : null))
-      .then((texto) => (texto ? arquivoDe(CC.cartas.papelDeParede({ ref, texto }), 'geracao-eleita-papel-de-parede.png') : null));
-    const pe = document.createElement('div');
-    pe.className = 'tela-cheia-pe';
-    pe.innerHTML = '<button class="botao contorno" data-compartilhar-carta>' + CC.ico('compartilhar') + 'Compartilhar carta</button>'
-      + '<button class="botao contorno" data-papel-de-parede>' + CC.ico('baixar') + 'Salvar papel de parede</button>'
-      + '<button class="botao" data-guardar>Continuar</button>';
-    el.appendChild(pe);
-    pe.querySelector('[data-compartilhar-carta]').onclick = (ev) => CC.ocupado(ev.currentTarget, async () => {
-      CC.compartilharImagem(await story, carta.titulo + ', a carta que tirei no baú do Geração Eleita. https://' + CC.story.ENDERECO);
-    });
-    pe.querySelector('[data-papel-de-parede]').onclick = (ev) => CC.ocupado(ev.currentTarget, async () => {
-      const arquivo = await papel.catch(() => null);
-      if (!arquivo) { CC.avisar('Não consegui gerar o papel de parede agora.'); return; }
-      CC.compartilharImagem(arquivo, ref + ', no Geração Eleita.', 'Papel de parede salvo. Escolha a imagem nas suas fotos para usar na tela de bloqueio.');
-    });
-    pe.querySelector('[data-guardar]').onclick = () => { fechar(); CC.redesenhar(); };
-    pe.querySelector('[data-guardar]').focus({ preventScroll: true });
-  }
-
   CC.telaBau = function (numero) {
     const u = unidadeDoDia(numero);
-    const cartas = pecaCartas();
-    cartas.catch(() => { /* sem a peça, o baú abre com o versículo */ });
+    const pecas = CC.pedirCartas();
+    pecas.catch(() => { /* sem as peças, o baú abre com o versículo */ });
     if (CC.story) CC.story.prepararFontes();
     CC.telaCheia('<div class="cena-bau">'
       + '<h1>Um baú na estrada!</h1>'
@@ -749,19 +720,19 @@
           const bau = CC.abrirBau(numero);
           botao.classList.add('abrindo');
           CC.vibrar('conquista');
-          const [, comCarta] = await Promise.all([CC.esperar(650), comPrazo(cartas, 2500)]);
+          const [, comCartas] = await Promise.all([CC.esperar(650), comPrazo(pecas, 2500)]);
           const palco = el.querySelector('.tela-cheia-palco');
           const ref = bau.ref || CC.versiculoDoBau(numero);
-          if (comCarta) {
-            revelarCarta(el, palco, numero, ref, fechar);
-            CC.arte.confete(el);
-            const novos = CC.guardarConquistas();
-            if (CC.publicarNovidades) CC.publicarNovidades({ niveis: novos });
-            return;
+          const novos = CC.guardarConquistas();
+          if (CC.publicarNovidades) CC.publicarNovidades({ niveis: novos });
+          if (comCartas) {
+            CC.cartasEmDia({ calado: true });
+            if (CC.album.revelarNoBau(el, palco, { chave: CC.cartasRegras.chaveDoBau(numero, CC.estado()), ref, fechar })) { CC.arte.confete(el); return; }
           }
           palco.innerHTML = '<div class="cena-carta revelando"><h1>Baú aberto!</h1>'
             + '<p class="passo-dica">Um versículo dos sete dias que você acabou de ler.</p>'
-            + '<div class="versiculo-do-bau" id="versiculo-do-bau"></div></div>';
+            + '<div class="versiculo-do-bau" id="versiculo-do-bau"></div>'
+            + '<p class="passo-dica pequena"><a href="#/perfil/album">A carta deste baú vai para o seu álbum.</a></p></div>';
           CC.arte.confete(el);
           // O texto vem da tradução escolhida e chega depois: o cartão entra quando
           // chegar, sem segurar a comemoração esperando o carregamento.
@@ -779,10 +750,9 @@
           el.appendChild(pe);
           pe.querySelector('[data-guardar]').onclick = () => { fechar(); CC.redesenhar(); };
           pe.querySelector('[data-guardar]').focus();
-          const novos = CC.guardarConquistas();
-          if (CC.publicarNovidades) CC.publicarNovidades({ niveis: novos });
         };
       },
+      fecharAoNavegar: true,
     });
   };
   CC.faiscasDoBau = () => CC.arte.faiscas();

@@ -120,7 +120,8 @@
     const ritmo = CC.ritmo();
     const conquistas = CC.conquistasComNivel();
     const trofeus = CC.trofeus();
-    const todos = [...trofeus.unidades, ...trofeus.colecoes, ...(trofeus.desafios || []), ...(trofeus.testamentos || [])];
+    const todos = [...trofeus.unidades, ...trofeus.colecoes, ...(trofeus.desafios || []), ...(trofeus.testamentos || []), ...(trofeus.albuns || [])];
+    const albuns = CC.albunsDeCartas();
     const ganhos = todos.filter((t) => t.ganho);
 
     // Visão geral: quatro números em grade simples, sem cartão colorido em volta de cada um
@@ -171,6 +172,8 @@
       + '<div class="colecao-atalhos">'
       + '<a href="#/perfil/conquistas">' + CC.ico('medalha') + '<b>Conquistas</b><small>' + conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length + '</small></a>'
       + '<a href="#/perfil/trofeus">' + CC.ico('trofeu') + '<b>Troféus</b><small>' + ganhos.length + ' de ' + todos.length + '</small></a>'
+      + (albuns.length ? '<a href="#/perfil/album" data-album-cartas>' + CC.ico('cartoes') + '<b>Cartas</b><small>' + albuns.reduce((n, a) => n + a.feitos, 0)
+        + ' de ' + albuns.reduce((n, a) => n + a.total, 0) + '</small></a>' : '')
       + '</div>'
       + '<div data-semeador>' + cartaoSemeador((CC.quem || {}).semeador) + '</div>'
       // O que é da pessoa: o que escreveu, guardou e leu.
@@ -252,7 +255,25 @@
       + CC.tituloSecao('Partes da Bíblia', t.colecoes.filter((x) => x.ganho).length + ' de ' + t.colecoes.length)
       + '<div class="estante">' + t.colecoes.map(trofeuHtml).join('') + '</div>'
       + CC.tituloSecao('Desafios', t.desafios.filter((x) => x.ganho).length + ' de ' + t.desafios.length)
-      + '<div class="estante">' + t.desafios.map(trofeuHtml).join('') + '</div>';
+      + '<div class="estante">' + t.desafios.map(trofeuHtml).join('') + '</div>'
+      + (t.albuns.length ? CC.tituloSecao('Álbuns de cartas', t.albuns.filter((x) => x.ganho).length + ' de ' + t.albuns.length)
+        + '<div class="estante">' + t.albuns.map(trofeuHtml).join('') + '</div>' : '');
+  };
+
+  // ---------- cartas ----------
+  // A tela do álbum vem da peça "album" (src/sob-demanda/album.js, docs/cartas.md seção 9): na
+  // primeira vez, o título e o esqueleto até ela chegar; sem rede, o recado com "Tentar de novo".
+  CC.vistaAlbum = function (raiz) {
+    if (CC.album && CC.cartasRegras && CC.cartas) { CC.album.tela(raiz); return; }
+    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Cartas</h1></div>' + CC.esqueleto('cartoes');
+    const geracao = (raiz.dataset.album = String(Date.now()));
+    const ainda = () => raiz.dataset.album === geracao && raiz.querySelector('.esqueleto');
+    CC.pedirCartas().then(() => { if (ainda()) CC.album.tela(raiz); }, () => {
+      if (!ainda()) return;
+      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não consegui abrir o álbum');
+      const b = raiz.querySelector('[data-acao-estado]');
+      if (b) b.onclick = () => CC.redesenhar();
+    });
   };
 
   // Meus versículos e Minhas anotações viraram uma tela só: 07g-anotacoes.js.

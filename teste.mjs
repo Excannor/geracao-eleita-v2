@@ -347,6 +347,10 @@ secao('peças sob demanda');
     ['estudo-preparo', 'ESTUDO_PREPARO', 'mesa-barra-marcas', '', 'o preparo do estudo'],
     // a tela do baú (03-trilha.js) fica no index: os desenhos das cartas e o papel de parede saem
     ['cartas', 'CARTAS', 'desenhoAzeite', '', 'as cartas do baú'],
+    // as cartas (docs/cartas.md): a regra do sorteio e o álbum (com o catálogo inteiro) saem;
+    // no index ficam o esqueleto do catálogo, a fusão (02-estado.js) e as cascas
+    ['cartas-regras', 'CARTAS_REGRAS', 'PESO_NOVA_ATUAL', '', 'a regra das cartas'],
+    ['album', 'ALBUM_CARTAS', 'album-sem-arte', '', 'o álbum das cartas'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -2454,7 +2458,10 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
   const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
   const historico = pol.slice(pol.indexOf('<ul class="historico">'));
-  checar(/<p class="atualizada">Versão 5 · atualizada em 19 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5');
+  checar(/<p class="atualizada">Versão 5 · atualizada em 22 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5, com o ajuste de 22 de outubro');
+  checar(/conquistas e pontos, cartas e álbuns\)/.test(pol) && /as suas anotações e as suas cartas continuam guardadas/.test(pol)
+    && historico.indexOf('<b>Ajuste da versão 5, 22 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 5,') < historico.indexOf('<b>Versão 5,'),
+    'a política lista cartas e álbuns no progresso, diz que ficam ao zerar e tem o ajuste no histórico');
   checar(historico.indexOf('<b>Versão 5, 19 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Versão 5,') < historico.indexOf('<b>Versão 4, 18 de outubro de 2026.</b>')
     && historico.indexOf('<b>Versão 4,') < historico.indexOf('<b>Ajuste da versão 3'), 'o histórico tem a versão 5 e a 4, das mais novas para as mais antigas');
   checar(/<tr><td>O estudo da célula<\/td><td>[^<]*estudos anteriores, só quem faz parte da célula hoje, inclusive quem entrou depois[^<]*guardados antes desta versão ficam só para quem já fazia parte da célula[^<]*célula de origem preparados até a multiplicação, como estavam naquele momento/.test(pol),
