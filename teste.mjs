@@ -11,7 +11,7 @@ import { fecharBanco, arquivoDoBanco } from './db.mjs';
 import {
   Contas, diasDeProposito, resumoDeAmigo, somaDias, nascimentoValido,
   somaAnos, idadeMinimaOk, hojeNoFuso, FUSO_PADRAO, IDADE_MINIMA,
-  menorDeIdade, podeConduzir, aguardandoAprovacao,
+  menorDeIdade, podeConduzir, aguardandoAprovacao, LIMIARES_SEMEADORES, conferirCartasDoServidor,
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import {
@@ -20,7 +20,7 @@ import {
   itemDoHistorico, estudoDoRegistro, cursorDe, lerCursor, daMaeAteOCorte, encontrosAteOCorte,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
-import { lerCatalogo, validarCatalogo, esqueletoDoCatalogo } from './ferramentas/cartas-catalogo.mjs';
+import { lerCatalogo, validarCatalogo, esqueletoDoCatalogo, LIMIARES_SEMEADORES as LIMIARES_CATALOGO } from './ferramentas/cartas-catalogo.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 let falhas = 0;
@@ -1729,6 +1729,32 @@ checar(contas.achar('novo2').caminho === 'conhecer' && contas.achar('novo2').aco
   'o convite "conhecer" põe a conta nova nos 14 dias e anota quem convidou');
 checar(!contas.duplaPlano('novo2', 'ana'), 'quem entra pelo convite "conhecer" não ganha a dupla de leitura do plano');
 checar(contas.relacao('novo2', 'ana') === 'amigos', 'mesmo sem dupla, a amizade nasce normal');
+// ---------- cartas que só o servidor confirma (docs/cartas.md, seção 3) ----------
+{
+  checar(JSON.stringify(LIMIARES_SEMEADORES) === JSON.stringify(LIMIARES_CATALOGO), 'os limiares de Semeadores do servidor são os do catálogo (1, 5, 15, 40 e 100)');
+  checar(!contas.cartasDoServidor('ana').chaves.length && !contas.cartasDoServidor('novo2').chaves.includes('convidado'), 'convite aceito sem a primeira lição não dá carta a ninguém');
+  await contas.ativarConvidado('novo2');
+  const ana = contas.cartasDoServidor('ana');
+  checar(ana.amigos === 1 && JSON.stringify(ana.chaves) === '["convite:tier:1"]', 'a primeira pessoa que veio pelo convite e leu dá o primeiro limiar a quem convidou');
+  checar(contas.cartasDoServidor('novo2').chaves.includes('convidado'), 'e quem chegou pelo convite ganha a de Boas-vindas');
+  const limiares = (n) => { contas.semeadorDe = () => n; const r = contas.cartasDoServidor('ana').chaves.filter((k) => k.startsWith('convite:')).length; delete contas.semeadorDe; return r; };
+  checar([0, 1, 4, 5, 14, 15, 39, 40, 99, 100, 101, 500].map(limiares).join() === '0,1,1,2,2,3,3,4,4,5,5,5', 'os limiares valem em 1, 5, 15, 40 e 100 amigos, e além de 100 nada mais');
+  // célula e discipulado: a primeira presença e o primeiro encontro
+  contas.dados.propositos['teste-cartas'] = { id: 'teste-cartas', membros: [], encontros: [{ data: '2026-03-01', presentes: ['bia'] }] };
+  contas.dados.discipulados['teste-cartas'] = { id: 'teste-cartas', discipulador: 'ana', discipulo: 'bia', estado: 'ativo', encontros: ['2026-03-02'] };
+  const bia = contas.cartasDoServidor('bia').chaves;
+  checar(bia.includes('celula:primeiro') && bia.includes('discipulado:primeiro') && contas.cartasDoServidor('ana').chaves.includes('discipulado:primeiro') && !contas.cartasDoServidor('ana').chaves.includes('celula:primeiro'),
+    'presença marcada num encontro de célula e encontro de discipulado registrado dão a carta a quem esteve; a falta não aparece em lugar nenhum');
+  delete contas.dados.propositos['teste-cartas'];
+  delete contas.dados.discipulados['teste-cartas'];
+  // a conferência antes de gravar: chave inventada sai com a carta; a confirmada e a já gravada ficam
+  const junto = { cartas: { recebidas: { 'semente-lancada': { em: 1, fonte: 'convite:tier:1' }, 'andre-chama-pedro': { em: 1, fonte: 'convite:tier:2' }, mana: { em: 1, fonte: 'celula:primeiro' }, perola: { em: 1, fonte: 'bau:dia:7' } },
+    eventos: { 'convite:tier:1': { em: 1, carta: 'semente-lancada' }, 'convite:tier:2': { em: 1, carta: 'andre-chama-pedro' }, 'celula:primeiro': { em: 1, carta: 'mana' }, 'bau:dia:7': { em: 1, carta: 'perola' } }, glorias: {} } };
+  const atual = { cartas: { recebidas: {}, eventos: { 'celula:primeiro': { em: 1, carta: 'mana' } }, glorias: {} } };
+  conferirCartasDoServidor(atual, junto, ['convite:tier:1']);
+  checar(Object.keys(junto.cartas.eventos).sort().join() === 'bau:dia:7,celula:primeiro,convite:tier:1' && !junto.cartas.recebidas['andre-chama-pedro'] && junto.cartas.recebidas['semente-lancada'] && junto.cartas.recebidas.mana,
+    'um limiar inventado sai do estado com a carta; o confirmado, o já gravado e o baú ficam');
+}
 {
   const [carga, firma] = conviteConhecer.token.split('.');
   const dado = JSON.parse(Buffer.from(carga, 'base64url').toString('utf8'));

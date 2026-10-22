@@ -11,6 +11,7 @@ import { createHmac, createHash, randomBytes } from 'node:crypto';
 import {
   Contas, arquivoDoEstado, seloDaConta, limparNome, iguais, hojeNoFuso, fusoValido, somaDias,
   datasFeitas, diasDeProposito, resumoDeAmigo, MOTIVOS_DENUNCIA, podeConduzir, aguardandoAprovacao, aprovacaoQueFalta,
+  conferirCartasDoServidor,
 } from './contas.mjs';
 import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs';
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
@@ -1526,6 +1527,8 @@ const servidor = createServer(async (req, res) => {
         consentimentoEm: (conta && conta.consentimento && conta.consentimento.em) || '',
         comSenha: !!conta,
         semeador,
+        // as cartas que só o servidor confirma (convite, célula, discipulado): docs/cartas.md
+        cartasServidor: conta ? CONTAS.cartasDoServidor(eu) : null,
         admin: ehAdmin(eu),
         caminho: (conta && conta.caminho) || 'plano',
         ...(quemAcompanha ? { acompanhadoPor: { usuario: quemAcompanha.usuario, nome: quemAcompanha.nome } } : {}),
@@ -1738,6 +1741,8 @@ const servidor = createServer(async (req, res) => {
           const atual = REGRAS.normalizarEstado(atualAberto);
           const junto = atual ? REGRAS.fundir(atual, novo) : novo;
           if (novo.dono) junto.dono = novo.dono;
+          // carta de convite, célula ou discipulado que o servidor não confirma não entra
+          conferirCartasDoServidor(atual, junto, conta ? CONTAS.cartasDoServidor(eu).chaves : []);
           await gravarEstado(limparPerfilDoEstado(conferirProgresso(atual, junto, hojeDe(eu))), arquivo);
           // A cópia achatada das datas (inteligencia.mjs) acompanha o progresso: só as datas.
           sincronizarLeituraDias(DB, arquivo, datasFeitas(junto));

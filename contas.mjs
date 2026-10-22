@@ -39,6 +39,29 @@ const senhaLonga = (senha) => String(senha || '').length > SENHA_MAX;
 export const LIMITE_ACEITES_HORA = 30;
 export const LIMITE_TOQUES_DIA = 5;
 export const VALIDADE_CONVITE = 30 * 24 * 60 * 60 * 1000;
+
+// ---------- cartas que só o servidor confirma (docs/cartas.md, seções 2 e 3) ----------
+// Semeadores: uma carta por limiar de amigos que vieram pelo convite (conta nova pelo link e
+// primeira lição feita, o número da Trilha do Semeador). O mesmo teto do catálogo
+// (ferramentas/cartas-catalogo.mjs); o teste.mjs confere que os dois batem. Além de 100, nada.
+export const LIMIARES_SEMEADORES = [1, 5, 15, 40, 100];
+const FONTES_DO_SERVIDOR = /^(convite|convidado|celula|discipulado)(:|$)/;
+// Antes de gravar o estado: evento novo de uma fonte do servidor (convite, convidado, célula,
+// discipulado) que ele não confirma sai, com a carta e a Glória que tenha dado. O que já estava
+// gravado não é mexido. Devolve o próprio estado.
+export function conferirCartasDoServidor(atual, junto, permitidas) {
+  const c = junto && junto.cartas;
+  if (!c) return junto;
+  const antes = ((atual && atual.cartas) || {}).eventos || {};
+  const ok = new Set(permitidas || []);
+  for (const chave of Object.keys(c.eventos || {})) {
+    if (!FONTES_DO_SERVIDOR.test(chave) || antes[chave] || ok.has(chave)) continue;
+    delete c.eventos[chave];
+    for (const [id, r] of Object.entries(c.recebidas || {})) if (r && r.fonte === chave) delete c.recebidas[id];
+    if (c.glorias) delete c.glorias[chave];
+  }
+  return junto;
+}
 export const RECADO_MAX = 280;
 // O dia e a hora do encontro no recado: vazio, ou "AAAA-MM-DDTHH:MM" de verdade (sem 31/02 nem
 // 25h), de hoje até 366 dias para a frente.
@@ -1087,6 +1110,20 @@ export class Contas {
   semeadorDe(usuario) {
     const u = limparNome(usuario);
     return (this.dados.convitesAceites || []).filter((x) => x.de === u && x.contaNova && x.ativadoEm && this.achar(x.para)).length;
+  }
+
+  // As chaves das fontes de carta que só o servidor sabe: os limiares de Semeadores alcançados,
+  // "convidado" (veio por um convite e fez a primeira lição), a primeira presença marcada num
+  // encontro de célula e o primeiro encontro de discipulado registrado. amigos: o número da
+  // própria pessoa, para a tela de Semeadores; nunca o de outra.
+  cartasDoServidor(usuario) {
+    const u = limparNome(usuario);
+    const amigos = this.semeadorDe(u);
+    const chaves = LIMIARES_SEMEADORES.map((l, i) => (amigos >= l ? 'convite:tier:' + (i + 1) : '')).filter(Boolean);
+    if ((this.dados.convitesAceites || []).some((x) => x.para === u && x.contaNova && x.ativadoEm)) chaves.push('convidado');
+    if (Object.values(this.dados.propositos || {}).some((p) => (p.encontros || []).some((e) => (e.presentes || []).includes(u)))) chaves.push('celula:primeiro');
+    if (this.discipuladosDe(u).some((x) => (x.encontros || []).length)) chaves.push('discipulado:primeiro');
+    return { chaves, amigos };
   }
 
   // O maior nível da Trilha do Semeador que já virou marco. Só sobe.
