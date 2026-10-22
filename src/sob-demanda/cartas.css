@@ -1,20 +1,228 @@
-/* A carta que vira no baú (src/sob-demanda/cartas.js). Entra de costas, gira em 3D e para de
-   frente; a especial ganha um brilho de metal que passa uma vez. Com menos movimento, só aparece. */
-.cena-carta .revelar-carta { width: min(80vw, 340px, calc((100dvh - 360px) * 5 / 7)); min-width: 200px; aspect-ratio: 5 / 7; margin: 4px auto 0; perspective: 1400px; }
-.revelar-carta .carta-giro { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transform: rotateY(180deg) scale(.82); animation: carta-virar 1.15s cubic-bezier(.2, .75, .25, 1) .2s forwards; }
-.revelar-carta .carta-face { position: absolute; inset: 0; border-radius: 4.6% / 3.3%; overflow: hidden; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
-.revelar-carta .carta-face canvas { display: block; width: 100%; height: 100%; }
-.revelar-carta .carta-verso { transform: rotateY(180deg); }
-.revelar-carta .carta-brilho { position: absolute; inset: -20% -60%; background: linear-gradient(105deg, transparent 38%, rgba(255, 250, 225, .55) 48%, rgba(255, 250, 225, 0) 58%); transform: translateX(-70%); animation: carta-brilho 1.6s ease-in-out 1.35s 1 forwards; mix-blend-mode: soft-light; pointer-events: none; }
-@keyframes carta-virar {
-  0% { transform: translateY(18px) rotateY(180deg) scale(.82); }
-  65% { transform: translateY(-4px) rotateY(-10deg) scale(1.03); }
-  100% { transform: none; }
+/* As cartas do baú (src/sob-demanda/cartas.js): a carta viva, que inclina com o dedo e vira,
+   o brilho de cada raridade e a revelação no baú. Técnica própria (camadas com gradientes e
+   mix-blend-mode por cima do canvas), sem imagem: o canvas desenha a carta parada; aqui só a
+   luz que muda com o ângulo. Todo brilho fica fora do papel do texto (clip-path).
+   Texto da carta: o papel (título, "Você sabia?", referência e raridade), o rótulo do álbum
+   no alto e a marca no pé. O papel sai pelo clip-path; o rótulo e a marca, por uma máscara de
+   borda macia (--sem-rotulos), para o brilho não fazer um recorte de caixa em volta deles.
+   As zonas, em % da carta de 1000 x 1400 (cartas.js: JX 56, JY 118, JH 846, PY 980, PH 350). */
+.carta-viva {
+  --rx: 0deg; --ry: 0deg; --giro: 0deg; --mx: 50%; --my: 50%; --bx: 50%; --by: 50%; --o: 0; --d: 0;
+  --zona-moldura: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.6% 8.43%, 94.4% 8.43%, 94.4% 68.86%, 5.6% 68.86%, 5.6% 8.43%, 0 0, 5.6% 70%, 94.4% 70%, 94.4% 95%, 5.6% 95%, 5.6% 70%, 0 0);
+  --zona-arte: inset(8.43% 5.6% 31.14% 5.6% round 2.5% / 1.8%);
+  --zona-sem-texto: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.6% 70%, 94.4% 70%, 94.4% 95%, 5.6% 95%, 5.6% 70%, 0 0);
+  --sem-rotulos: radial-gradient(ellipse 35% 4.4% at 50% 5.6%, transparent 60%, #000 100%), radial-gradient(ellipse 25% 3.2% at 50% 97.6%, transparent 60%, #000 100%);
+  --zona-verso-campo: inset(4% 5.6% round 2.5% / 1.8%);
+  --sem-marca-verso: radial-gradient(ellipse 30% 4.4% at 50% 67.6%, transparent 58%, #000 100%);
+  --zona-verso-moldura: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.6% 4%, 94.4% 4%, 94.4% 96%, 5.6% 96%, 5.6% 4%, 0 0);
+  position: relative; width: var(--largura, 300px); aspect-ratio: 5 / 7; perspective: 1100px; isolation: isolate;
+  touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; cursor: pointer;
 }
-@keyframes carta-brilho { to { transform: translateX(70%); } }
-.cena-carta .dica-carta { margin: 2px 0 0; }
+.cv-giro { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--giro))); }
+.cv-face {
+  position: absolute; inset: 0; overflow: hidden; border-radius: 4.6% / 3.3%;
+  -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(.1px);
+  box-shadow: 0 calc(12px + var(--d) * 10px) 30px -10px rgba(0, 0, 0, .6), 0 2px 6px rgba(0, 0, 0, .3);
+}
+.cv-verso { transform: rotateY(180deg) translateZ(.1px); }
+.cv-face canvas { display: block; width: 100%; height: 100%; }
+.cv-face > i { position: absolute; inset: 0; display: none; pointer-events: none; }
+.cv-frente > :is(.cv-metal, .cv-reflexo), [data-raridade="prata"] .cv-frente > .cv-holo {
+  -webkit-mask-image: var(--sem-rotulos); mask-image: var(--sem-rotulos); -webkit-mask-composite: source-in; mask-composite: intersect;
+}
+.cv-purpurina canvas { width: 100%; height: 100%; }
+
+/* o reflexo (glare): a luz que segue o dedo, em todas as raridades */
+.cv-reflexo {
+  display: block !important; clip-path: var(--zona-sem-texto);
+  background: radial-gradient(farthest-corner circle at var(--mx) var(--my), rgba(255, 255, 255, .85) 0%, rgba(255, 255, 255, .3) 22%, rgba(0, 0, 0, .4) 95%);
+  mix-blend-mode: overlay; opacity: calc(var(--o) * .55);
+}
+.cv-verso .cv-reflexo { clip-path: none; }
+.cv-verso > :is(.cv-holo, .cv-reflexo) { -webkit-mask-image: var(--sem-marca-verso); mask-image: var(--sem-marca-verso); }
+/* Linho: fosco. Só um reflexo branco leve, de 15% */
+[data-raridade="linho"] .cv-reflexo {
+  background: radial-gradient(farthest-corner circle at var(--mx) var(--my), rgba(255, 255, 255, .15) 0%, rgba(255, 255, 255, 0) 62%);
+  mix-blend-mode: normal; opacity: var(--o);
+}
+
+/* Bronze: metal quente na moldura, uma faixa larga de luz que corre com o ângulo */
+[data-raridade="bronze"] .cv-metal {
+  display: block; clip-path: var(--zona-moldura);
+  background:
+    linear-gradient(112deg, transparent calc(var(--bx) - 7%), rgba(255, 246, 228, .95) var(--bx), transparent calc(var(--bx) + 7%)),
+    linear-gradient(112deg, rgba(90, 40, 0, .5) calc(var(--bx) - 46%), rgba(255, 190, 120, .0) calc(var(--bx) - 30%), rgba(255, 206, 150, .85) var(--bx), rgba(255, 190, 120, 0) calc(var(--bx) + 30%), rgba(90, 40, 0, .5) calc(var(--bx) + 46%));
+  mix-blend-mode: overlay; opacity: calc(.3 + var(--o) * .7);
+}
+[data-raridade="bronze"] .cv-verso .cv-metal { clip-path: var(--zona-verso-moldura); }
+
+/* Prata: holográfico frio só na moldura (reverse holo): o arco-íris de prata, azul e lilás em
+   faixas, visto através de uma trama fina em losango, como a folha holográfica */
+[data-raridade="prata"] .cv-holo {
+  display: block; clip-path: var(--zona-moldura);
+  background:
+    repeating-linear-gradient(58deg, rgba(20, 24, 40, .32) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-58deg, rgba(20, 24, 40, .32) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(105deg, #6c80b4 0%, #92bcff 5%, #d2bfff 10%, #f4f8ff 13.5%, #8fdcff 18%, #b7a2ff 23%, #e9f2ff 26.5%, #6c80b4 31%);
+  background-size: 100% 100%, 100% 100%, 320% 320%;
+  background-position: 0 0, 0 0, var(--bx) var(--by);
+  mix-blend-mode: hard-light; filter: brightness(.9) contrast(1.25) saturate(1.35);
+  opacity: calc(.32 + var(--o) * .55);
+}
+[data-raridade="prata"] .cv-metal {
+  display: block; clip-path: var(--zona-moldura);
+  background: linear-gradient(112deg, transparent calc(var(--bx) - 9%), rgba(240, 248, 255, .95) var(--bx), transparent calc(var(--bx) + 9%));
+  mix-blend-mode: overlay; opacity: calc(.15 + var(--o) * .85);
+}
+[data-raridade="prata"] .cv-verso .cv-holo, [data-raridade="prata"] .cv-verso .cv-metal { clip-path: var(--zona-verso-moldura); }
+
+/* Ouro: holográfico dourado na ilustração inteira, em faixas, com a trama fina da folha e a
+   purpurina que acende perto da luz; a moldura de folha de ouro ganha a faixa de brilho */
+[data-raridade="ouro"] .cv-holo {
+  display: block; clip-path: var(--zona-arte);
+  background:
+    repeating-linear-gradient(-62deg, rgba(110, 60, 0, 0) 0%, rgba(255, 210, 110, .95) 3%, rgba(255, 150, 40, .7) 5.5%, rgba(255, 252, 228, 1) 8%, rgba(190, 255, 214, .55) 10.5%, rgba(255, 196, 90, .8) 12.5%, rgba(110, 60, 0, 0) 15%);
+  background-size: 320% 320%;
+  background-position: var(--bx) var(--by);
+  mix-blend-mode: color-dodge; filter: brightness(.5) contrast(1.4) saturate(1.15);
+  opacity: calc(.2 + var(--o) * .6);
+}
+[data-raridade="ouro"] .cv-purpurina {
+  display: block; clip-path: var(--zona-sem-texto); mix-blend-mode: color-dodge;
+  -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 24%, transparent 56%), var(--sem-rotulos);
+  mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 24%, transparent 56%), var(--sem-rotulos);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  opacity: calc(.35 + var(--o) * .65);
+}
+[data-raridade="ouro"] .cv-metal {
+  display: block; clip-path: var(--zona-moldura);
+  background: linear-gradient(112deg, transparent calc(var(--bx) - 10%), rgba(255, 252, 230, .95) var(--bx), transparent calc(var(--bx) + 10%));
+  mix-blend-mode: overlay; opacity: calc(.25 + var(--o) * .75);
+}
+[data-raridade="ouro"] .cv-verso :is(.cv-holo, .cv-purpurina) { clip-path: var(--zona-verso-campo); }
+[data-raridade="ouro"] .cv-verso .cv-purpurina { -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 24%, transparent 56%), var(--sem-marca-verso); mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 24%, transparent 56%), var(--sem-marca-verso); -webkit-mask-composite: source-in; mask-composite: intersect; }
+[data-raridade="ouro"] .cv-verso .cv-metal { clip-path: var(--zona-verso-moldura); }
+
+/* Glória: prismático na carta toda (menos o texto), o "cosmos" (névoa colorida e estrelas)
+   e o halo de luz em volta */
+[data-raridade="gloria"] .cv-holo {
+  display: block; clip-path: var(--zona-arte);
+  background:
+    radial-gradient(farthest-corner circle at var(--mx) var(--my), rgba(255, 255, 255, .6), rgba(0, 0, 0, .5) 80%),
+    repeating-linear-gradient(115deg, hsl(45 90% 78%) 0%, hsl(90 60% 76%) 3%, hsl(175 60% 76%) 6%, hsl(215 70% 82%) 9%, hsl(270 55% 84%) 12%, hsl(45 90% 80%) 15%);
+  background-size: 100% 100%, 360% 360%;
+  background-position: 0 0, var(--bx) var(--by);
+  background-blend-mode: multiply, normal;
+  mix-blend-mode: color-dodge; filter: brightness(.56) contrast(1.3) saturate(1.05);
+  opacity: calc(.22 + var(--o) * .7);
+}
+[data-raridade="gloria"] .cv-metal {
+  display: block; clip-path: var(--zona-moldura);
+  background:
+    repeating-linear-gradient(55deg, rgba(255, 255, 255, .4) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(115deg, hsl(45 95% 72%) 0%, hsl(95 60% 70%) 3%, hsl(180 60% 70%) 6%, hsl(220 75% 78%) 9%, hsl(275 60% 80%) 12%, hsl(330 70% 82%) 15%, hsl(45 95% 74%) 18%);
+  background-size: 100% 100%, 360% 360%;
+  background-position: 0 0, calc(var(--bx) + 12%) var(--by);
+  mix-blend-mode: multiply; filter: saturate(1) brightness(1.12);
+  opacity: calc(.18 + var(--o) * .62);
+}
+[data-raridade="gloria"] .cv-purpurina {
+  display: block; clip-path: var(--zona-sem-texto); mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .7) 34%, rgba(0, 0, 0, .25) 70%), var(--sem-rotulos);
+  mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .7) 34%, rgba(0, 0, 0, .25) 70%), var(--sem-rotulos);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  opacity: calc(.45 + var(--o) * .55);
+}
+[data-raridade="gloria"] .cv-verso .cv-holo { clip-path: var(--zona-verso-campo); mix-blend-mode: multiply; filter: saturate(.9) brightness(1.22); opacity: calc(.12 + var(--o) * .4); }
+[data-raridade="gloria"] .cv-verso .cv-metal { clip-path: var(--zona-verso-moldura); }
+[data-raridade="gloria"] .cv-verso .cv-purpurina { clip-path: var(--zona-verso-campo); -webkit-mask-image: var(--sem-marca-verso); mask-image: var(--sem-marca-verso); mix-blend-mode: multiply; filter: invert(1) hue-rotate(180deg); opacity: calc(.15 + var(--o) * .25); }
+.carta-viva[data-raridade="gloria"]::before {
+  content: ''; position: absolute; inset: -14%; z-index: -1; border-radius: 50%; pointer-events: none;
+  background:
+    radial-gradient(closest-side, rgba(255, 240, 190, .95), rgba(255, 228, 160, .55) 60%, rgba(255, 228, 160, 0)),
+    conic-gradient(from 0deg, rgba(255, 214, 120, .7), rgba(196, 238, 176, .6), rgba(160, 206, 255, .65), rgba(218, 186, 255, .6), rgba(255, 214, 120, .7));
+  filter: blur(28px); opacity: calc(.55 + var(--o) * .35); animation: cv-halo 12s linear infinite;
+}
+@keyframes cv-halo { to { transform: rotate(1turn); } }
+
+.cv-botao-virar {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 1px solid rgba(242, 236, 216, .35);
+  border-radius: 999px; background: rgba(242, 236, 216, .08); color: inherit; font: 600 .875rem/1 Manrope, sans-serif; cursor: pointer;
+}
+.cv-botao-virar svg { width: 18px; height: 18px; }
+.revelar-carta-viva { display: grid; justify-items: center; gap: 14px; margin: 4px auto 0; }
+.cv-mini { display: block; aspect-ratio: 5 / 7; height: auto; border-radius: 4.6% / 3.3%; box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .55); }
+
+/* ---------- a revelação no baú ---------- */
+.rv { position: relative; display: grid; justify-items: center; align-content: start; gap: 12px; padding: 56px 16px 24px; color: #f2ecd8; text-align: center; }
+.rv-pular {
+  position: absolute; top: 10px; right: 10px; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px;
+  background: rgba(242, 236, 216, .1); color: #f2ecd8; font: 600 .875rem/1 Manrope, sans-serif; cursor: pointer;
+}
+.rv[data-fase="fim"] .rv-pular { visibility: hidden; }
+.rv-palco { position: relative; width: var(--largura); height: calc(var(--largura) * 1.72); transition: height .45s ease; }
+.rv[data-fase="fim"] .rv-palco { height: calc(var(--largura) * 1.4); }
+.rv-carta { position: absolute; inset: 0 0 auto; aspect-ratio: 5 / 7; opacity: 0; transform: translateY(78%) scale(.22); transition: transform .6s cubic-bezier(.2, .85, .25, 1), opacity .3s ease; pointer-events: none; }
+.rv-carta .carta-viva { --largura: 100% !important; width: 100%; }
+.rv-carta::before {
+  content: ''; position: absolute; inset: -5%; border-radius: 10%; pointer-events: none;
+  background: var(--luz); filter: blur(30px); opacity: 0; transition: opacity .5s ease;
+}
+.rv:is([data-fase="sobe"], [data-fase="espera"], [data-fase="vira"], [data-fase="brilha"], [data-fase="fim"]) .rv-carta { opacity: 1; transform: none; pointer-events: auto; }
+.rv:is([data-fase="sobe"], [data-fase="espera"]) .rv-carta::before { opacity: .75; }
+.rv:is([data-fase="vira"], [data-fase="brilha"]) .rv-carta::before { opacity: .5; }
+.rv[data-fase="fim"] .rv-carta::before { opacity: .22; }
+.rv[data-fase="espera"] .rv-carta .carta-viva { animation: rv-chamar 1.6s ease-in-out infinite; }
+@keyframes rv-chamar { 50% { transform: translateY(-6px); } }
+.rv-bau { position: absolute; left: 50%; bottom: 0; width: 64%; padding: 0; border: 0; background: none; color: var(--luz); cursor: pointer; transform: translateX(-50%); transition: opacity .5s ease, transform .5s ease; }
+.rv-bau svg { display: block; width: 100%; overflow: visible; }
+.rv[data-fase="fechado"] .rv-bau svg { animation: rv-respirar 2.4s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes rv-respirar { 50% { transform: translateY(-4px) scale(1.02); } }
+.rv[data-fase="balanca"] .rv-bau svg { animation: rv-balancar .4s ease-in-out; transform-origin: 50% 92%; }
+@keyframes rv-balancar { 20% { transform: rotate(-5deg); } 45% { transform: rotate(5deg); } 70% { transform: rotate(-3deg); } 90% { transform: rotate(2deg); } }
+.rv-bau-tampa { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .3s cubic-bezier(.3, 1.4, .5, 1); }
+.rv-bau-boca, .rv-bau-luz { opacity: 0; transition: opacity .2s ease; }
+.rv:not([data-fase="fechado"]):not([data-fase="balanca"]) .rv-bau-tampa { transform: translateY(-3px) scaleY(-.42); }
+.rv:not([data-fase="fechado"]):not([data-fase="balanca"]) :is(.rv-bau-boca, .rv-bau-luz) { opacity: 1; }
+.rv:is([data-fase="espera"], [data-fase="vira"], [data-fase="brilha"]) .rv-bau { opacity: .45; transform: translateX(-50%) translateY(6%) scale(.86); }
+.rv[data-fase="fim"] .rv-bau { opacity: 0; pointer-events: none; }
+.rv-coluna {
+  position: absolute; left: 50%; bottom: 10%; width: 80%; height: 96%; pointer-events: none;
+  background: radial-gradient(ellipse 50% 100% at 50% 100%, var(--luz), color-mix(in srgb, var(--luz) 30%, transparent) 55%, transparent 75%);
+  filter: blur(10px); opacity: 0; transform: translateX(-50%) scaleY(0); transform-origin: 50% 100%; transition: transform .35s ease-out, opacity .35s ease;
+}
+.rv:is([data-fase="abre"], [data-fase="sobe"]) .rv-coluna { opacity: .95; transform: translateX(-50%) scaleY(1); }
+.rv:is([data-fase="espera"], [data-fase="vira"], [data-fase="brilha"]) .rv-coluna { opacity: .3; transform: translateX(-50%) scaleY(1); }
+.rv-raios {
+  position: absolute; left: 50%; top: 41%; width: 190%; aspect-ratio: 1; pointer-events: none; opacity: 0; transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--luz) 55%, transparent) 0deg 5deg, transparent 5deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, .5) 30%, transparent 62%);
+  mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, .5) 30%, transparent 62%);
+  transition: opacity .6s ease; animation: rv-girar 40s linear infinite;
+}
+@keyframes rv-girar { to { transform: translate(-50%, -50%) rotate(1turn); } }
+.rv:is([data-fase="sobe"], [data-fase="espera"], [data-fase="vira"], [data-fase="brilha"]) .rv-raios { opacity: .55; }
+.rv[data-fase="fim"] .rv-raios { opacity: .2; }
+.rv-raridade { display: inline-flex; align-items: center; gap: 8px; min-height: 28px; margin: 6px 0 0; color: var(--luz); font: 600 1rem/1 Oswald, sans-serif; letter-spacing: .18em; text-transform: uppercase; opacity: 0; transition: opacity .4s ease .1s; }
+.rv-raridade svg { width: 26px; height: 26px; }
+.rv:not([data-fase="fechado"]):not([data-fase="balanca"]):not([data-fase="abre"]) .rv-raridade { opacity: 1; }
+.rv-fim { display: grid; justify-items: center; gap: 6px; opacity: 0; transform: translateY(8px); transition: opacity .4s ease, transform .4s ease; pointer-events: none; }
+.rv[data-fase="fim"] .rv-fim { opacity: 1; transform: none; pointer-events: auto; }
+.rv-nova { margin: 0; font: 600 1rem/1.3 Manrope, sans-serif; }
+.rv-nova strong { color: var(--luz); }
+.rv-titulo { margin: 0; font: 600 1.25rem/1.25 Literata, Georgia, serif; }
+.rv-titulo span { display: block; margin-top: 4px; color: rgba(242, 236, 216, .7); font: 600 .75rem/1 Oswald, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.rv-botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
+
+/* Menos movimento: a carta não inclina, o brilho fica parado no meio do caminho, virar é
+   troca, e a revelação aparece sem balanço, sem giro e sem raios girando */
 @media (prefers-reduced-motion: reduce) {
-  .revelar-carta .carta-giro { transform: none; animation: carta-surgir .25s ease both; }
-  .revelar-carta .carta-verso, .revelar-carta .carta-brilho { display: none; }
+  .carta-viva { --rx: 0deg !important; --ry: 0deg !important; --o: .45 !important; --mx: 35% !important; --my: 30% !important; --bx: 40% !important; --by: 40% !important; }
+  .carta-viva[data-raridade="gloria"]::before, .rv-raios, .rv-bau svg, .rv-carta .carta-viva { animation: none !important; }
+  .rv-carta, .rv-coluna, .rv-bau, .rv-bau-tampa { transition: opacity .3s ease !important; }
+  .rv-carta { transform: none !important; }
 }
-@keyframes carta-surgir { from { opacity: 0; } to { opacity: 1; } }
+:root.menos-movimento .carta-viva { --rx: 0deg !important; --ry: 0deg !important; --o: .45 !important; --mx: 35% !important; --my: 30% !important; --bx: 40% !important; --by: 40% !important; }
+:root.menos-movimento .carta-viva[data-raridade="gloria"]::before, :root.menos-movimento :is(.rv-raios, .rv-bau svg, .rv-carta .carta-viva) { animation: none !important; }
+:root.menos-movimento :is(.rv-carta, .rv-coluna, .rv-bau, .rv-bau-tampa) { transition: opacity .3s ease !important; }
+:root.menos-movimento .rv-carta { transform: none !important; }

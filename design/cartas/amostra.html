@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartas do baú: raridades</title>
+<!-- Amostra para o dono aprovar (2026-10-22). Usa o JS e o CSS reais da peça
+     (src/sob-demanda/cartas.js e cartas.css) e o núcleo do app só pelo símbolo e pelo
+     escape de texto. Abra direto do disco (file://) ou por qualquer servidor estático. -->
+<link rel="stylesheet" href="../../src/fontes.css">
+<link rel="stylesheet" href="../../src/sob-demanda/cartas.css">
+<style>
+  :root { --papel: #ebe7dc; --tinta: #23241e; --fraca: #5d5e52; --salvia: #56663a; --palco: #0e0f0c; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--papel); color: var(--tinta); font: 500 16px/1.5 Manrope, system-ui, sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { margin: 0 0 4px; font: 600 2rem/1.15 Literata, Georgia, serif; }
+  h2 { margin: 48px 0 6px; font: 600 1.375rem/1.2 Literata, Georgia, serif; }
+  .sub { margin: 0; color: var(--fraca); max-width: 62ch; }
+  .fila { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px 22px; margin-top: 22px; }
+  .item { display: grid; justify-items: center; gap: 10px; width: 224px; }
+  .rotulo { display: grid; gap: 4px; width: 100%; text-align: left; }
+  .rotulo .nome { display: flex; align-items: center; gap: 8px; font: 600 1rem/1 Oswald, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+  .rotulo .nome svg { width: 24px; height: 24px; }
+  .rotulo .cores { display: flex; gap: 6px; align-items: center; color: var(--fraca); font-size: .75rem; }
+  .rotulo .cores i { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, .2); }
+  .rotulo p { margin: 0; color: var(--fraca); font-size: .8125rem; line-height: 1.4; }
+  .rotulo .conta { color: var(--tinta); font-weight: 700; }
+  .palco { margin-top: 18px; border-radius: 22px; background: radial-gradient(ellipse at 50% 30%, #23251d, var(--palco) 70%); color: #f2ecd8; overflow: hidden; }
+  .controles { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 16px 16px 0; }
+  .controles .grupo { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+  .controles button, .controles label { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid rgba(242, 236, 216, .25); border-radius: 999px; background: transparent; color: inherit; font: 600 .875rem/1 Manrope, sans-serif; cursor: pointer; }
+  .controles button svg { width: 18px; height: 18px; }
+  .controles button[aria-pressed="true"] { background: #f2ecd8; color: #1b1c17; }
+  .controles .direita { margin-left: auto; display: inline-flex; gap: 8px; }
+  #revelacao { min-height: 760px; }
+  .botao { min-height: 48px; padding: 0 22px; border: 0; border-radius: 999px; background: #c8da8c; color: #1d2216; font: 700 1rem/1 Manrope, sans-serif; cursor: pointer; }
+  .album { margin-top: 18px; padding: 22px; border-radius: 22px; background: #f6f3ea; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06); }
+  .album-cabeca { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .album-cabeca h3 { margin: 0; font: 600 1.125rem/1.2 Literata, Georgia, serif; }
+  .album-cabeca span { color: var(--fraca); font-size: .875rem; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 14px 12px; margin-top: 16px; }
+  .vaga { display: grid; justify-items: center; gap: 6px; }
+  .vaga .vazia { display: grid; place-items: center; width: 92px; aspect-ratio: 5 / 7; border: 2px dashed rgba(35, 36, 30, .22); border-radius: 4.6% / 3.3%; color: rgba(35, 36, 30, .4); font: 600 1.125rem/1 Oswald, sans-serif; }
+  .vaga small { display: flex; align-items: center; gap: 4px; color: var(--fraca); font: 600 .6875rem/1 Oswald, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+  .vaga small svg { width: 14px; height: 14px; }
+  .pode-vir { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 18px 0 0; padding-top: 14px; border-top: 1px solid rgba(0, 0, 0, .08); color: var(--fraca); font-size: .875rem; }
+  .pode-vir b { color: var(--tinta); }
+  .pode-vir span { display: inline-flex; align-items: center; gap: 4px; }
+  .pode-vir svg { width: 16px; height: 16px; }
+  @media (max-width: 560px) { .item { width: min(86vw, 300px); } .controles .direita { margin-left: 0; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Cartas do baú</h1>
+  <p class="sub">Amostra das cinco raridades. Passe o mouse ou o dedo para inclinar; toque para virar; arraste para o lado para girar.</p>
+
+  <section id="acabamentos">
+    <h2>A mesma carta nos cinco acabamentos</h2>
+    <p class="sub">A raridade é o acabamento, os materiais do tabernáculo (Êxodo 25.3-4), e sempre aparece pelo nome e pelo ícone.</p>
+    <div class="fila" data-fila="acabamentos"></div>
+  </section>
+
+  <section id="cartas">
+    <h2>Uma carta de cada raridade</h2>
+    <div class="fila" data-fila="cartas"></div>
+  </section>
+
+  <section id="versos">
+    <h2>O verso</h2>
+    <div class="fila" data-fila="versos"></div>
+  </section>
+
+  <section id="bau">
+    <h2>A revelação do baú</h2>
+    <p class="sub">Escolha a raridade que sai e toque no baú.</p>
+    <div class="palco">
+      <div class="controles">
+        <div class="grupo" role="group" aria-label="Raridade que sai" data-escolha></div>
+        <div class="direita">
+          <button type="button" data-giroscopio hidden>Usar giroscópio</button>
+          <label><input type="checkbox" data-menos> Menos movimento</label>
+          <button type="button" data-de-novo>De novo</button>
+        </div>
+      </div>
+      <div id="revelacao"></div>
+    </div>
+  </section>
+
+  <section id="album">
+    <h2>O álbum</h2>
+    <div class="album">
+      <div class="album-cabeca"><h3>Uma página do álbum</h3><span>4 de 13 · amostra com cartas de álbuns diferentes</span></div>
+      <div class="grade" data-grade></div>
+      <p class="pode-vir" data-pode-vir></p>
+    </div>
+  </section>
+</main>
+
+<script>window.DADOS = {};</script>
+<script src="../../src/app/01-nucleo.js"></script>
+<script src="../../src/app/01d-story.js"></script>
+<script src="../../src/sob-demanda/cartas.js"></script>
+<script>
+(async function () {
+  const C = CC.cartas;
+  await CC.story.prepararFontes();
+  const ORDEM = ['linho', 'bronze', 'prata', 'ouro', 'gloria'];
+  const POR_ALBUM = { linho: '5 por álbum', bronze: '4 por álbum', prata: '3 por álbum', ouro: '1 por álbum, a carta-tema', gloria: 'Fora do sorteio: só por marco' };
+  const DA_ARTE = { linho: 'davi-funda', bronze: 'poco-jaco', prata: 'azeite-viuva', ouro: 'arca-alianca', gloria: 'tumulo-vazio' };
+  const carta = (id) => C.lista.find((c) => c.id === id);
+  const vivas = window.amostra = { acabamentos: {}, cartas: {}, versos: {} };
+  const rotulo = (rar, extra) => {
+    const R = C.RARIDADES[rar];
+    return '<div class="rotulo"><span class="nome" style="color:' + R.tinta + '">' + C.iconeSvg(rar) + R.nome + '</span>'
+      + '<span class="cores"><i style="background:' + R.cor + '"></i><i style="background:' + R.cor2 + '"></i>' + R.cor + ' / ' + R.cor2 + '</span>'
+      + '<p>' + R.brilho + '</p><p class="conta">' + (extra || POR_ALBUM[rar]) + '</p></div>';
+  };
+  const poe = (fila, chave, c, opcoes, texto) => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    const api = C.cartaViva(c, { largura: 224, ...opcoes });
+    item.appendChild(api.el);
+    item.insertAdjacentHTML('beforeend', texto);
+    document.querySelector('[data-fila="' + fila + '"]').appendChild(item);
+    vivas[fila][chave] = api;
+  };
+  for (const rar of ORDEM) poe('acabamentos', rar, { ...carta('davi-funda'), raridade: rar }, {}, rotulo(rar));
+  for (const rar of ORDEM) {
+    const c = carta(DA_ARTE[rar]);
+    poe('cartas', rar, c, {}, rotulo(rar, c.titulo + ' · ' + c.ref));
+  }
+  for (const rar of ORDEM) poe('versos', rar, carta(DA_ARTE[rar]), { verso: true }, rotulo(rar, ''));
+
+  // a revelação
+  const escolha = document.querySelector('[data-escolha]');
+  let atual = 'ouro';
+  const PROGRESSO = { linho: '5/13', bronze: '6/13', prata: '2/13', ouro: '9/13', gloria: '13/13' };
+  const abrir = () => {
+    window.revelacaoAtual = C.revelacao(document.getElementById('revelacao'), carta(DA_ARTE[atual]), { progresso: PROGRESSO[atual], largura: 280 });
+  };
+  for (const rar of ORDEM) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = C.iconeSvg(rar) + C.RARIDADES[rar].nome;
+    b.setAttribute('aria-pressed', rar === atual ? 'true' : 'false');
+    b.onclick = () => { atual = rar; escolha.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false')); abrir(); };
+    escolha.appendChild(b);
+  }
+  document.querySelector('[data-de-novo]').onclick = abrir;
+  document.querySelector('[data-menos]').onchange = (ev) => { document.documentElement.classList.toggle('menos-movimento', ev.target.checked); abrir(); };
+  window.escolherRaridade = (rar) => { atual = rar; abrir(); };
+  const giro = document.querySelector('[data-giroscopio]');
+  giro.hidden = !('DeviceOrientationEvent' in window && matchMedia('(pointer: coarse)').matches);
+  giro.onclick = async () => { const ok = await window.revelacaoAtual.carta.giroscopio(); giro.textContent = ok ? 'Giroscópio ligado' : 'Giroscópio indisponível'; };
+  abrir();
+
+  // o álbum: as cartas que já saíram, paradas, e as vagas que faltam
+  const grade = document.querySelector('[data-grade]');
+  const tem = { 1: 'arca-alianca', 3: 'poco-jaco', 4: 'davi-funda', 7: 'azeite-viuva' };
+  for (let n = 1; n <= 13; n++) {
+    const vaga = document.createElement('div');
+    vaga.className = 'vaga';
+    if (tem[n]) {
+      const c = carta(tem[n]);
+      vaga.appendChild(C.miniatura(c, 92));
+      const rar = c.raridade;
+      vaga.insertAdjacentHTML('beforeend', '<small style="color:' + C.RARIDADES[rar].tinta + '">' + C.iconeSvg(rar) + C.RARIDADES[rar].nome + '</small>');
+    } else {
+      vaga.innerHTML = '<div class="vazia" aria-label="Vaga ' + n + '">' + n + '</div><small>&nbsp;</small>';
+    }
+    grade.appendChild(vaga);
+  }
+  const restam = [['linho', 4], ['bronze', 3], ['prata', 2]];
+  document.querySelector('[data-pode-vir]').innerHTML = '<b>O que pode vir:</b> restam 9 · '
+    + restam.map(([rar, n]) => '<span>' + C.iconeSvg(rar) + n + ' ' + C.RARIDADES[rar].nome + '</span>').join('')
+    + '<span>Nunca repete até completar.</span>';
+  window.amostraPronta = true;
+})();
+</script>
+</body>
+</html>
