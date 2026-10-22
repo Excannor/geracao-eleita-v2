@@ -65,17 +65,19 @@
 
   // ---------- as raridades: os materiais do tabernáculo (Êx 25.3-4) ----------
   // Cada uma tem nome, ícone e cor: a raridade nunca é dita só pela cor. "tinta" é a cor do
-  // nome no papel da carta (contraste AA sobre o creme); "luz" é a cor da luz do baú.
+  // nome no papel da carta (contraste AA sobre o creme); "luz" é a cor da luz do baú, uma para
+  // cada raridade (o linho morno, o bronze cobre, a prata fria, o ouro dourado, a glória branca
+  // e perolada), para a luz nunca enganar.
   const RARIDADES = {
-    linho: { nome: 'Linho', icone: 'linho', cor: '#E8DCC4', cor2: '#BFAE8E', tinta: '#5f5136', luz: '#f4ead2', ordem: 0,
+    linho: { nome: 'Linho', icone: 'linho', cor: '#E8DCC4', cor2: '#BFAE8E', tinta: '#5f5136', luz: '#e8c48e', ordem: 0,
       brilho: 'Fosco. Inclina pouco, com um reflexo branco leve.' },
-    bronze: { nome: 'Bronze', icone: 'bacia', cor: '#B07A45', cor2: '#8C5A2B', tinta: '#6e3d14', luz: '#e0a466', ordem: 1,
+    bronze: { nome: 'Bronze', icone: 'bacia', cor: '#B07A45', cor2: '#8C5A2B', tinta: '#6e3d14', luz: '#ec8548', ordem: 1,
       brilho: 'Metal batido na moldura, que acende com o ângulo.' },
-    prata: { nome: 'Prata', icone: 'trombeta', cor: '#C9CED6', cor2: '#8E96A3', tinta: '#454e5c', luz: '#dfe6f2', ordem: 2,
+    prata: { nome: 'Prata', icone: 'trombeta', cor: '#C9CED6', cor2: '#8E96A3', tinta: '#454e5c', luz: '#9fc3ff', ordem: 2,
       brilho: 'Holográfico frio (prata, azul, lilás) só na moldura.' },
-    ouro: { nome: 'Ouro', icone: 'candelabro', cor: '#D4A62A', cor2: '#A87B12', tinta: '#6f4f08', luz: '#ffc44d', ordem: 3,
+    ouro: { nome: 'Ouro', icone: 'candelabro', cor: '#D4A62A', cor2: '#A87B12', tinta: '#6f4f08', luz: '#ffb92e', ordem: 3,
       brilho: 'Holográfico dourado na ilustração, com purpurina.' },
-    gloria: { nome: 'Glória', icone: 'nuvem', cor: '#FFF4D6', cor2: '#E9D9A6', tinta: '#5e4a14', luz: '#fff4d6', ordem: 4,
+    gloria: { nome: 'Glória', icone: 'nuvem', cor: '#FFF4D6', cor2: '#E9D9A6', tinta: '#5e4a14', luz: '#fffaf0', ordem: 4,
       brilho: 'Prismático na carta toda e um halo de luz em volta.' },
   };
   const raridadeDe = (carta) => (RARIDADES[carta.raridade] ? carta.raridade : carta.especial ? 'ouro' : 'linho');
@@ -102,14 +104,15 @@
       ['s', 'M10.7 15.4v2.2M13.3 15.4v2.2'],
       ['sf', 'M5.2 20.8h13.6c-.8-1.9-3.3-3-6.8-3s-6 1.1-6.8 3z'],
     ] },
-    // duas trombetas de prata batida (Nm 10.2), longas e retas, cruzadas: o bocal, o tubo fino,
-    // um anel e a campânula larga (o que faz ler "trombeta" pequeno)
+    // duas trombetas de prata batida (Nm 10.2), longas e retas, cruzadas, com as campânulas
+    // para cima: o bocal em taça, o tubo fino, um anel e a campânula que abre em curva até a
+    // boca (a elipse aberta), o que faz ler "trombeta" e não martelo, mesmo pequeno
     trombeta: { partes: [
-      ...[-45, -135].flatMap((g) => [
-        ['s', 'M2.6 12H15.6', g],
-        ['s', 'M1.4 10.6v2.8', g],
-        ['s', 'M7.6 10.9v2.2', g],
-        ['sf', 'M15.4 11.2C18.2 11 20.4 9.4 22.4 6.6V17.4C20.4 14.6 18.2 13 15.4 12.8z', g],
+      ...[-58, -122].flatMap((g) => [
+        ['s', 'M2.6 12H13', g],
+        ['s', 'M.9 11.1v1.8', g],
+        ['s', 'M6.6 11.2v1.6', g],
+        ['sf', 'M12.6 11.5C16.8 11.4 19.6 10.6 22 8.6V15.4C19.6 13.4 16.8 12.6 12.6 12.5z', g],
       ]),
     ] },
     // o candelabro de sete braços (Êx 25.31-37), com as chamas acesas
@@ -122,11 +125,15 @@
       ['f', [4, 6.6, 9.2, 12, 14.8, 17.4, 20].map((x) => 'M' + x + ' .9c.7.9 1.05 1.55 1.05 2.05a1.05 1.05 0 0 1-2.1 0c0-.5.35-1.15 1.05-2.05z').join('')],
       ['sf', 'M12 19.4l-3.8 2.6h7.6z'],
     ] },
-    // a nuvem da glória pousada sobre a tenda do tabernáculo (Êx 40.34)
+    // a nuvem da glória pousada sobre a tenda do tabernáculo (Êx 40.34): a tenda de pano, de
+    // lados caídos até o chão, com a porta aberta, a ponta da estaca no alto, as cordas e as
+    // estacas; a nuvem em traço, como os outros ícones
     nuvem: { partes: [
-      ['sf', 'M6.1 12.6h11.6a3.1 3.1 0 0 0 .3-6.2 4.6 4.6 0 0 0-8.8-1A3.6 3.6 0 0 0 6.1 12.6z'],
-      ['sf', 'M4.6 21.4V17.2L12 14.8l7.4 2.4v4.2z'],
-      ['s', 'M10.4 21.4v-3.4h3.2v3.4M2.6 21.4h18.8'],
+      ['s', 'M6.6 9.4h10.8a2.5 2.5 0 0 0 .2-5 3.8 3.8 0 0 0-7.2-.9A2.9 2.9 0 0 0 6.6 9.4z'],
+      ['s', 'M12 11.9V13.2'],
+      ['sf', 'M12 13.2L3.4 21.2H20.6z'],
+      ['f', 'M12 15.8L9.7 21.2H14.3z'],
+      ['s', 'M1.4 21.2H3.4M20.6 21.2H22.6M3.4 21.2L1.8 19.4M20.6 21.2L22.2 19.4'],
     ] },
   };
   function iconeSvg(id, classe) {
@@ -206,6 +213,16 @@
     k.arcTo(x, y + h, x, y, raio);
     k.arcTo(x, y, x + w, y, raio);
     k.closePath();
+  }
+  function redondo(x, y, w, h, raio) {
+    const p = new Path2D();
+    p.moveTo(x + raio, y);
+    p.arcTo(x + w, y, x + w, y + h, raio);
+    p.arcTo(x + w, y + h, x, y + h, raio);
+    p.arcTo(x, y + h, x, y, raio);
+    p.arcTo(x, y, x + w, y, raio);
+    p.closePath();
+    return p;
   }
   // Grão de impressão: um pixel em cada seis clareia ou escurece um pouco (ralo, para o PNG
   // não pesar), como nas artes.
@@ -1863,9 +1880,12 @@
   }
   function desenhoArca(k, W, H, obj) {
     const r = sorteio(4507);
-    const P = camera(W / 2 + 10, 690, 1.42, -0.5, 0.3, 1400);
+    // a perspectiva é leve (foco longo): as quinas de cima e de baixo da frente correm quase
+    // paralelas e se encontram, de leve, no mesmo ponto de fuga à esquerda
+    const P = camera(W / 2 + 10, 690, 1.42, -0.5, 0.3, 4000);
     const chao = Math.round(P([0, -16, -330])[1]);
-    const centro = P([0, 250, 0]);
+    // a luz pousa sobre a tampa, no meio dos dois querubins (Êx 25.22), não nas mãos deles
+    const centro = P([0, 188, 0]);
     const fonte = [centro[0], centro[1]];
     const luzEm = ([x, y]) => Math.max(0, Math.min(1, 0.06 + 0.94 * Math.exp(-(((x - fonte[0]) / 300) ** 2 + ((y - fonte[1]) / 280) ** 2))));
     veuEmPregas(k, r, W, chao, luzEm);
@@ -1908,6 +1928,8 @@
     const A = 150;
     const VZ = 88;
     const VY = 4;
+    // as duas varas do mesmo tamanho, saindo o mesmo tanto dos dois lados
+    const VARA = 290;
     // uma vara: cilindro ao longo de x, em z = vz
     const vara = (vz, x0, x1, rr) => {
       const a = P([x0, VY, vz]);
@@ -1967,7 +1989,7 @@
     // 1) a vara de trás e as argolas de trás (aparecem dos dois lados da arca)
     argola(-L + 20, -VZ, 'tras');
     argola(L - 20, -VZ, 'tras');
-    vara(-VZ, -250, 250, 7);
+    vara(-VZ, -VARA, VARA, 7.5);
     argola(-L + 20, -VZ, 'frente');
     argola(L - 20, -VZ, 'frente');
     // 2) os pés
@@ -1983,7 +2005,7 @@
     const sombraFrente = (x, y) => 1.05 - luzEm([x, y - 120]) * 0.95 + (y - P([0, A, Z])[1]) / 300;
     faceDeOuro(k, [P([L, A, Z]), P([L, A, -Z]), P([L, 0, -Z]), P([L, 0, Z])], 0.38, 0.14, Math.atan2(P([L, 0, -Z])[1] - P([L, 0, Z])[1], P([L, 0, -Z])[0] - P([L, 0, Z])[0]), 4, () => 0.85, obj);
     faceDeOuro(k, [P([-L, A, Z]), P([L, A, Z]), P([L, 0, Z]), P([-L, 0, Z])], 0.7, 0.24, Math.PI / 2 + 0.06, 4.2, sombraFrente, obj);
-    // o painel rebaixado da frente, com o friso de folhas de amendoeira
+    // o painel rebaixado da frente, liso (Êx 25 só fala da coroa de ouro em volta)
     const painel = (u0, u1, v0, v1) => [P([u0, v0, Z]), P([u1, v0, Z]), P([u1, v1, Z]), P([u0, v1, Z])];
     const pp = painel(-L + 22, L - 22, A - 26, 22);
     const pPainel = poligono(pp);
@@ -1999,42 +2021,6 @@
     k.lineTo(pp[2][0] - 2, pp[2][1] - 2);
     k.lineTo(pp[1][0] - 2, pp[1][1] + 2);
     k.stroke();
-    // o friso: um ramo correndo no meio do painel, com folhas e flores
-    const fr = (u) => P([u, A * 0.48 + Math.sin(u * 0.08) * 6, Z]);
-    k.save();
-    k.lineCap = 'round';
-    k.strokeStyle = TINTA_OURO;
-    k.lineWidth = 3.4;
-    k.beginPath();
-    for (let u = -L + 32; u <= L - 32; u += 3) { const q = fr(u); if (u === -L + 32) k.moveTo(q[0], q[1]); else k.lineTo(q[0], q[1]); }
-    k.stroke();
-    k.strokeStyle = tomDeOuro(0.85);
-    k.lineWidth = 1.4;
-    k.stroke();
-    for (let u = -L + 40, i = 0; u <= L - 40; u += 15, i++) {
-      const q = fr(u);
-      const up = i % 2 ? -1 : 1;
-      const f = new Path2D();
-      f.moveTo(q[0], q[1]);
-      f.quadraticCurveTo(q[0] + 9, q[1] + up * 10, q[0] + 4, q[1] + up * 20);
-      f.quadraticCurveTo(q[0] - 5, q[1] + up * 9, q[0], q[1]);
-      k.fillStyle = tomDeOuro(0.8);
-      k.fill(f);
-      k.lineWidth = 1.1;
-      k.strokeStyle = TINTA_OURO;
-      k.stroke(f);
-      if (i % 4 === 2) {
-        for (let pe2 = 0; pe2 < 5; pe2++) {
-          const a = (pe2 / 5) * Math.PI * 2;
-          k.fillStyle = tomDeOuro(0.95);
-          k.beginPath();
-          k.ellipse(q[0] + Math.cos(a) * 5, q[1] - up * 2 + Math.sin(a) * 5, 4.4, 2.6, a, 0, Math.PI * 2);
-          k.fill();
-          k.stroke();
-        }
-      }
-    }
-    k.restore();
     // a moldura em volta (a coroa de ouro), um pouco para fora, com as contas
     const M = 6;
     const mA = A + 16;
@@ -2065,7 +2051,7 @@
     // 5) a vara da frente, por dentro das argolas
     argola(-L + 20, VZ, 'tras');
     argola(L - 20, VZ, 'tras');
-    vara(VZ, -260, 262, 7.5);
+    vara(VZ, -VARA, VARA, 7.5);
     argola(-L + 20, VZ, 'frente');
     argola(L - 20, VZ, 'frente');
     // as presilhas das argolas na arca
@@ -2082,7 +2068,8 @@
     k.globalCompositeOperation = 'screen';
     k.lineCap = 'round';
     for (let i = 0; i < 48; i++) {
-      const a = (i / 48) * Math.PI * 2 + (r() - 0.5) * 0.05;
+      // só para cima e para os lados: a luz sai de cima da tampa
+      const a = Math.PI * (1.04 + (i / 47) * 0.92) + (r() - 0.5) * 0.05;
       const r0 = 18 + r() * 8;
       const r1 = 70 + r() * (i % 3 === 0 ? 150 : 70);
       const gr = k.createLinearGradient(fonte[0], fonte[1], fonte[0] + Math.cos(a) * r1, fonte[1] + Math.sin(a) * r1);
@@ -2096,8 +2083,14 @@
       k.stroke();
     }
     k.restore();
-    brilho(k, fonte[0], fonte[1], 120, 'rgba(255,214,130,.5)', 'screen');
-    brilho(k, fonte[0], fonte[1], 30, 'rgba(255,250,232,.95)', 'screen');
+    // o clarão deitado sobre a tampa (mais largo que alto) e o miolo, perto dela
+    k.save();
+    k.translate(fonte[0], fonte[1] + 14);
+    k.scale(1, 0.42);
+    brilho(k, 0, 0, 190, 'rgba(255,214,130,.55)', 'screen');
+    brilho(k, 0, 0, 80, 'rgba(255,246,220,.8)', 'screen');
+    k.restore();
+    brilho(k, fonte[0], fonte[1] + 6, 26, 'rgba(255,250,232,.9)', 'screen');
     for (let i = 0; i < 180; i++) {
       const a = r() * Math.PI * 2;
       const d = Math.sqrt(r()) * 300;
@@ -2333,15 +2326,22 @@
     capim(k, r, 452, 133, 22, 6, 'rgba(43,33,18,.75)');
     capim(k, r, 690, 128, 18, 5, 'rgba(43,33,18,.75)');
     // a boca da gruta: um vão cavado na rocha, de beirada irregular e arredondada, sem batente
-    const bx = 350;
+    // a porta mais à esquerda e a pedra mais para dentro, com ar dos dois lados: nem a moldura
+    // da carta nem o recorte da arte cheia (glória) cortam a pedra
+    const bx = 292;
+    const bw = 190;
     const bBase = 630;
+    // a pedra redonda (desenhada no fim, de pé no sulco, à direita da porta)
+    const pcx = 648;
+    const pR = 158;
+    const pcy = 620 - pR;
     const bontos = [];
     for (let i = 0; i <= 22; i++) {
       const a = Math.PI - (i / 22) * Math.PI;
       const ruido = (r() - 0.5) * 22 + Math.sin(i * 1.7) * 6;
-      bontos.push([bx + Math.cos(a) * (206 + ruido), bBase - Math.sin(a) * (360 + ruido * 0.8) - (i > 0 && i < 22 ? 0 : 0)]);
+      bontos.push([bx + Math.cos(a) * (bw + ruido), bBase - Math.sin(a) * (360 + ruido * 0.8)]);
     }
-    bontos.push([bx + 206, bBase + 4], [bx - 206, bBase + 4]);
+    bontos.push([bx + bw, bBase + 4], [bx - bw, bBase + 4]);
     const porta = contornoRocha(r, bontos, 6);
     porta.closePath();
     // a sombra da beirada na rocha, fora (para baixo e à direita)
@@ -2483,7 +2483,7 @@
     for (let i = 0; i <= 22; i++) {
       const a = Math.PI - (i / 22) * Math.PI;
       const e = 16 + r() * 22 + (i > 14 ? 10 : 0);
-      dentroBorda.push([bx + Math.cos(a) * (206 - e) + 4, bBase + 6 - Math.sin(a) * (360 - e * 1.3)]);
+      dentroBorda.push([bx + Math.cos(a) * (bw - e) + 4, bBase + 6 - Math.sin(a) * (360 - e * 1.3)]);
     }
     const bordaIn = contornoRocha(r, dentroBorda, 5);
     const aro = new Path2D();
@@ -2501,7 +2501,7 @@
     k.fillRect(bx - 240, bBase - 400, 480, 420);
     for (let i = 0; i < 70; i++) {
       const a = Math.PI - (i / 69) * Math.PI;
-      const x = bx + Math.cos(a) * 214;
+      const x = bx + Math.cos(a) * (bw + 8);
       const y = bBase - Math.sin(a) * 370;
       const som = 0.3 + (Math.cos(a) + 1) / 2 * 0.0 + (1 - (Math.cos(a) + 1) / 2) * 0.0 + (x - bx) / 400;
       k.strokeStyle = 'rgba(43,33,18,' + Math.max(0.25, Math.min(0.9, 0.45 + som)).toFixed(2) + ')';
@@ -2519,43 +2519,45 @@
     k.strokeStyle = SEPIA;
     k.lineWidth = 3;
     k.stroke(porta);
-    // o sulco cavado na frente da rocha, onde a pedra corre
+    // o pé da rocha: uma beirada irregular (nada de tábua de lado a lado) e, só na frente da
+    // porta e da pedra, o sulco raso cavado onde a pedra corre
     const sy = 624;
+    const pe = onda(sorteio(4630), 4, 0.02);
+    const yPe = (x) => sy + 10 + pe(x) * 5;
+    const s0 = bx - bw - 16;
+    const s1 = pcx + 150;
     const sulco = new Path2D();
-    sulco.moveTo(60, sy);
-    sulco.lineTo(W + 10, sy - 8);
-    sulco.lineTo(W + 10, sy + 14);
-    sulco.lineTo(60, sy + 20);
+    sulco.moveTo(s0, sy + 2);
+    for (let x = s0; x <= s1; x += 12) sulco.lineTo(x, sy + 2 + pe(x * 1.7) * 1.5);
+    sulco.lineTo(s1 + 8, sy + 8);
+    for (let x = s1; x >= s0; x -= 12) sulco.lineTo(x, sy + 13 + pe(x * 2.3) * 1.5);
     sulco.closePath();
-    k.fillStyle = '#7d6942';
+    k.fillStyle = '#b29d70';
     k.fill(sulco);
-    gravar(k, sulco, W / 2, sy + 6, 500, -0.01, 3.2, 1.5, () => 0.85, '#1d160a', 0);
-    k.strokeStyle = SEPIA;
-    k.lineWidth = 2;
-    k.beginPath();
-    k.moveTo(60, sy);
-    k.lineTo(W + 10, sy - 8);
-    k.stroke();
-    // o lábio de baixo do sulco, aceso
-    k.strokeStyle = 'rgba(255,248,226,.8)';
-    k.lineWidth = 2.5;
-    k.beginPath();
-    k.moveTo(60, sy + 22);
-    k.lineTo(W + 10, sy + 16);
-    k.stroke();
+    gravar(k, sulco, (s0 + s1) / 2, sy + 8, (s1 - s0) / 2 + 10, -0.01, 3.4, 1.2, () => 0.55, '#1d160a', 0);
+    k.strokeStyle = 'rgba(43,33,18,.8)';
+    k.lineWidth = 1.6;
+    k.stroke(sulco);
     // o chão de pedra e terra na frente, com o capim
     const chao = new Path2D();
-    chao.moveTo(-10, sy + 26);
-    chao.lineTo(W + 10, sy + 16);
+    const beira = (x) => (x > s0 && x < s1 ? Math.max(yPe(x), sy + 14) : yPe(x));
+    chao.moveTo(-10, beira(-10));
+    for (let x = 0; x <= W + 10; x += 10) chao.lineTo(x, beira(x));
     chao.lineTo(W + 10, H + 10);
     chao.lineTo(-10, H + 10);
     chao.closePath();
     k.fillStyle = '#e2d1a4';
     k.fill(chao);
+    // a beirada da rocha sobre o chão, em traço irregular
+    k.strokeStyle = 'rgba(43,33,18,.85)';
+    k.lineWidth = 2;
+    k.beginPath();
+    for (let x = -10; x <= W + 10; x += 10) { if (x === -10) k.moveTo(x, beira(x)); else k.lineTo(x, beira(x)); }
+    k.stroke();
     const linhasChao = [];
     for (let i = 0; i < 9; i++) {
       const f = onda(sorteio(800 + i), 3, 0.008);
-      const y0 = sy + 22 + Math.pow(i / 8, 1.5) * (H - sy);
+      const y0 = sy + 26 + Math.pow(i / 8, 1.5) * (H - sy);
       linhasChao.push((x) => y0 + f(x) * (4 + i * 1.5));
     }
     hachuraEmFaixas(k, r, chao, -10, W + 10, linhasChao, 3, 1.7, (x, y) => 0.1 + (x / W) * 0.3, 'rgba(43,33,18,.8)', { quebra: 0.3 });
@@ -2578,9 +2580,6 @@
     }
     for (let i = 0; i < 7; i++) capim(k, r, r() * W, sy + 60 + r() * (H - sy - 80), 20 + r() * 22, 6);
     // a grande pedra redonda, rolada para fora e de pé no sulco, à direita da porta
-    const pcx = 748;
-    const pcy = 448;
-    const pR = 172;
     const esp = 22;
     // a sombra dela na rocha e no chão
     k.save();
@@ -2850,7 +2849,7 @@
   // claros) em faixas diagonais largas, as linhas de crescimento da concha e um brilho.
   function madreperola(k, w, h, r, desloc = 0) {
     const g = k.createLinearGradient(0, 0, w, h);
-    const tons = ['#fbf3e4', '#f7cfe0', '#cadff9', '#cdf0db', '#fde6b0', '#e2cff9', '#fbf3e4'];
+    const tons = ['#fbf1de', '#f4b9d3', '#a8cdf6', '#b2ead0', '#fbd788', '#d3bcf6', '#fbf1de'];
     for (let i = 0; i <= 18; i++) g.addColorStop(i / 18, tons[(i + desloc) % tons.length]);
     k.fillStyle = g;
     k.fillRect(0, 0, w, h);
@@ -2878,14 +2877,14 @@
     k.restore();
   }
   // Os enfeites dos cantos, na cor da letra da moldura.
-  function enfeiteDosCantos(k, tipo, cor, claro) {
-    const cantos = [[1, 1, 40, 40], [-1, 1, CW - 40, 40], [1, -1, 40, CH - 40], [-1, -1, CW - 40, CH - 40]];
+  function enfeiteDosCantos(k, tipo, cor, claro, { recuo = 40, escala = 1 } = {}) {
+    const cantos = [[1, 1, recuo, recuo], [-1, 1, CW - recuo, recuo], [1, -1, recuo, CH - recuo], [-1, -1, CW - recuo, CH - recuo]];
     k.save();
     k.lineCap = 'round';
     for (const [sx, sy, x, y] of cantos) {
       k.save();
       k.translate(x, y);
-      k.scale(sx, sy);
+      k.scale(sx * escala, sy * escala);
       if (tipo === 'rebite') {
         // o rebite de bronze: a cabeça redonda, a luz e a sombra
         const g = k.createRadialGradient(-3 * sx, -3 * sy, 1, 0, 0, 11);
@@ -2956,7 +2955,7 @@
     prata: { pintar: (k, w, h, r) => folhaDeMetal(k, w, h, r, METAIS.prata, { escuro: '30,36,48', claro: '255,255,255', guilloche: true }),
       letra: '#1d222b', filete: 'rgba(30,36,48,.5)', luz: 'rgba(255,255,255,.7)', janela: 'rgba(24,28,36,.8)', enfeite: 'traco', cantos: 'roseta', corCanto: 'rgba(30,36,48,.7)' },
     ouro: { pintar: (k, w, h, r) => folhaDeMetal(k, w, h, r, METAIS.ouro), letra: '#2a1d04', filete: 'rgba(70,46,6,.55)', luz: 'rgba(255,248,214,.5)',
-      janela: 'rgba(60,40,4,.75)', enfeite: 'estrela', papel: '#b8862a', cantos: 'filigrana', corCanto: 'rgba(70,46,6,.8)' },
+      janela: 'rgba(60,40,4,.75)', enfeite: 'estrela', papel: '#b8862a', cantos: 'filigrana', corCanto: 'rgba(70,46,6,.8)', cartela: true },
     gloria: { cheia: true, pintar: madreperola, letra: '#3d300c', filete: 'rgba(120,96,60,.5)', luz: 'rgba(255,255,255,.8)', janela: 'rgba(120,96,60,.6)', enfeite: 'estrela', papel: '#d9b860' },
   };
   // As medidas da carta (em 1000 x 1400): a janela da ilustração e o papel do texto. A máscara
@@ -2970,8 +2969,19 @@
   const ILU_CORTE = (ILU_H - JH) / 2;
   const PY = JY + JH + 16;
   const PH = CH - 56 - PY;
-  // a faixa de madrepérola da glória (a arte passa por baixo dela)
-  const FAIXA = 42;
+  // A moldura da glória: o aro de ouro grosso por fora (0 a 16), a faixa de madrepérola e o
+  // filete de ouro de dentro (44 a 52). A arte cheia fica só dentro dela (ARTE_CHEIA: de FAIXA
+  // até um pouco abaixo do alto do papel, que a cobre), nunca embaixo nem dos lados do papel.
+  const FAIXA = 52;
+  const ARO = 16;
+  // Na glória o papel sobe um pouco (PY_CHEIA), para a arte caber inteira na largura do vão.
+  const PY_CHEIA = 898;
+  const ARTE_CHEIA = { x: FAIXA, y: FAIXA, w: CW - 2 * FAIXA, h: PY_CHEIA + 8 - FAIXA };
+  // A margem da arte que fica de fora na arte cheia e na miniatura: a beirada de cada desenho
+  // tem filete, vinheta e grão que só servem dentro da janela.
+  const ARTE_MARGEM = 40;
+  // o papel da glória: de lado a lado do vão, do alto do papel até o filete de dentro
+  const PAPEL_CHEIO = { x: FAIXA, y: PY_CHEIA, w: CW - 2 * FAIXA, h: CH - FAIXA - PY_CHEIA };
   // A ilustração e a silhueta dos objetos dela (para a máscara do brilho), guardadas por id:
   // desenhar a arte é o que mais custa, e a carta viva, a miniatura e a máscara a usam.
   const GUARDADAS = new Map();
@@ -2990,37 +3000,103 @@
     if (GUARDADAS.size > 6) GUARDADAS.delete(GUARDADAS.keys().next().value);
     return v;
   }
-  // Onde a arte entra: na janela (cortada em cima e embaixo) ou cheia, de lado a lado (glória).
+  // Onde a arte entra: na janela (cortada em cima e embaixo) ou cheia (glória): cobrindo o
+  // retângulo ARTE_CHEIA sem a margem do desenho, recortada no vão de dentro da moldura. Nada
+  // da arte passa para baixo do papel nem para a moldura (nada de pixel esticado).
   function porArte(k, img, cheia) {
     k.imageSmoothingQuality = 'high';
     if (cheia) {
-      const alto = ILU_H * CW / JW;
-      k.drawImage(img, 0, 0, CW, alto);
-      k.drawImage(img, 0, ILU_H - 2, JW, 2, 0, alto - 1, CW, CH - alto + 1);
+      const A = ARTE_CHEIA;
+      const sw = JW - 2 * ARTE_MARGEM;
+      const sh = ILU_H - 2 * ARTE_MARGEM;
+      const e = Math.max(A.w / sw, A.h / sh);
+      const uw = A.w / e;
+      const uh = A.h / e;
+      k.save();
+      k.beginPath();
+      k.rect(A.x, A.y, A.w, A.h);
+      k.clip();
+      retRedondo(k, FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
+      k.clip();
+      k.drawImage(img, ARTE_MARGEM + (sw - uw) / 2, ARTE_MARGEM + (sh - uh) / 2, uw, uh, A.x, A.y, A.w, A.h);
+      k.restore();
     } else k.drawImage(img, 0, ILU_CORTE, JW, JH, JX, JY, JW, JH);
   }
-  // O rótulo do alto: o álbum e o número.
+  // O rótulo do alto: o álbum e o número. No ouro e na glória ele vai numa plaqueta (a
+  // cartela de ouro, de cantos recortados, e a pílula de madrepérola); a máscara do brilho
+  // (mascaraDoBrilho e mascaraDoRotulo) recorta exatamente a mesma forma, para a beirada da
+  // plaqueta sair nítida com a carta inclinada.
+  const textoDoRotulo = (carta) => String(carta.album || '').toUpperCase() + '  ·  ' + carta.numero + '/' + (carta.total || 13);
+  function plaqueta(k, carta, M) {
+    const wr = medir(k, textoDoRotulo(carta), oswald(32, 600), 4.5);
+    if (M.cheia) return { wr, forma: redondo(CW / 2 - wr / 2 - 62, 44, wr + 124, 54, 27), x: CW / 2 - wr / 2 - 62, y: 44, w: wr + 124, h: 54 };
+    if (M.cartela) {
+      const w = wr + 132;
+      const x = CW / 2 - w / 2;
+      return { wr, forma: cartela(x, 46, w, 56, 12), x, y: 46, w, h: 56 };
+    }
+    return { wr, forma: null };
+  }
+  // A cartela: o retângulo com os quatro cantos recortados para dentro.
+  function cartela(x, y, w, h, q) {
+    const p = new Path2D();
+    p.moveTo(x + q, y);
+    p.lineTo(x + w - q, y);
+    p.arc(x + w, y, q, Math.PI, Math.PI / 2, true);
+    p.lineTo(x + w, y + h - q);
+    p.arc(x + w, y + h, q, Math.PI * 1.5, Math.PI, true);
+    p.lineTo(x + q, y + h);
+    p.arc(x, y + h, q, 0, -Math.PI / 2, true);
+    p.lineTo(x, y + q);
+    p.arc(x, y, q, Math.PI / 2, 0, true);
+    p.closePath();
+    return p;
+  }
   function rotuloDoAlto(k, carta, M) {
-    const rotulo = String(carta.album || '').toUpperCase() + '  ·  ' + carta.numero + '/' + (carta.total || 13);
-    const wr = medir(k, rotulo, oswald(32, 600), 4.5);
+    const rotulo = textoDoRotulo(carta);
+    const P = plaqueta(k, carta, M);
+    const wr = P.wr;
     if (M.cheia) {
       // na arte cheia, numa plaqueta de madrepérola, para ler sobre qualquer arte
       k.save();
       k.filter = 'blur(8px)';
       k.fillStyle = 'rgba(20,16,8,.35)';
-      retRedondo(k, CW / 2 - wr / 2 - 66, 50, wr + 132, 54, 27);
+      retRedondo(k, P.x - 4, P.y + 6, P.w + 8, P.h, 27);
       k.fill();
       k.restore();
       k.save();
-      retRedondo(k, CW / 2 - wr / 2 - 62, 44, wr + 124, 54, 27);
-      k.clip();
-      k.translate(CW / 2 - wr / 2 - 62, 44);
-      madreperola(k, wr + 124, 54, sorteio(5), 2);
+      k.clip(P.forma);
+      k.translate(P.x, P.y);
+      madreperola(k, P.w, P.h, sorteio(5), 2);
       k.restore();
       k.strokeStyle = M.papel;
+      k.lineWidth = 3;
+      k.stroke(P.forma);
+    } else if (M.cartela) {
+      // no ouro, a cartela de ouro gravada: a folha mais clara, o contorno escuro e o filete
+      k.save();
+      k.translate(1.5, 3);
+      k.fillStyle = 'rgba(60,36,0,.45)';
+      k.fill(P.forma);
+      k.restore();
+      const g = k.createLinearGradient(0, P.y, 0, P.y + P.h);
+      g.addColorStop(0, '#fff1c2');
+      g.addColorStop(0.5, '#f1cd78');
+      g.addColorStop(1, '#d9a845');
+      k.fillStyle = g;
+      k.fill(P.forma);
+      k.save();
+      k.clip(P.forma);
+      k.strokeStyle = 'rgba(110,72,8,.16)';
+      k.lineWidth = 1;
+      for (let x = P.x; x < P.x + P.w; x += 4) { k.beginPath(); k.moveTo(x, P.y); k.lineTo(x, P.y + P.h); k.stroke(); }
+      k.restore();
+      k.strokeStyle = '#4a3006';
       k.lineWidth = 2.5;
-      retRedondo(k, CW / 2 - wr / 2 - 62, 44, wr + 124, 54, 27);
-      k.stroke();
+      k.stroke(P.forma);
+      k.strokeStyle = 'rgba(74,48,6,.55)';
+      k.lineWidth = 1.2;
+      k.stroke(cartela(P.x + 6, P.y + 6, P.w - 12, P.h - 12, 8));
     }
     escrever(k, rotulo, CW / 2, 84, oswald(32, 600), M.letra, { alinhar: 'center', espaco: 4.5 });
     if (M.enfeite === 'estrela') {
@@ -3033,30 +3109,66 @@
       k.globalAlpha = 1;
     }
   }
+  // A máscara do resto do brilho (o metal e o reflexo): tudo menos a plaqueta do rótulo, com a
+  // mesma forma dela. Sem plaqueta, fica a elipse macia do CSS (--sem-rotulos).
+  function mascaraDoRotulo(carta, rar) {
+    const M = MOLDURAS[rar];
+    const w = 400;
+    const c = tela(w, w * 1.4);
+    const k = c.getContext('2d');
+    k.setTransform(w / CW, 0, 0, w / CW, 0, 0);
+    const P = plaqueta(k, carta, M);
+    if (!P.forma) return null;
+    k.fillStyle = '#000';
+    k.fillRect(0, 0, CW, CH);
+    k.globalCompositeOperation = 'destination-out';
+    k.fill(P.forma);
+    return c;
+  }
   // A moldura (o material e os filetes); na glória, a faixa de madrepérola por cima da arte.
   function moldura(k, M, r, rar) {
     if (M.cheia) {
+      // a madrepérola: de ARO até FAIXA, com as cores do nácar à vista mesmo parada
       k.save();
-      k.clip(vazado(FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26), 'evenodd');
+      const banda = new Path2D();
+      banda.addPath(redondo(ARO, ARO, CW - 2 * ARO, CH - 2 * ARO, 36));
+      banda.addPath(redondo(FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26));
+      k.clip(banda, 'evenodd');
       madreperola(k, CW, CH, r);
       k.restore();
-      // o ouro em volta da madrepérola: a borda de fora e o filete de dentro
+      // o ouro: o aro grosso por fora e o filete de dentro, em folha com gravura fina
       const go = k.createLinearGradient(0, 0, CW, CH);
       METAIS.ouro.forEach(([q, cor]) => go.addColorStop(q, cor));
-      k.strokeStyle = 'rgba(0,0,0,.4)';
-      k.lineWidth = 5;
-      retRedondo(k, FAIXA + 1, FAIXA + 3, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
+      const anelDeOuro = (fora, dentro) => {
+        const a = new Path2D();
+        a.addPath(fora);
+        a.addPath(dentro);
+        k.save();
+        k.clip(a, 'evenodd');
+        k.fillStyle = go;
+        k.fillRect(0, 0, CW, CH);
+        k.strokeStyle = 'rgba(90,60,10,.22)';
+        k.lineWidth = 1.2;
+        for (let i = -CH; i < CW + CH; i += 7) { k.beginPath(); k.moveTo(i, 0); k.lineTo(i - CH * 0.55, CH); k.stroke(); }
+        k.restore();
+      };
+      anelDeOuro(redondo(0, 0, CW, CH, 46), redondo(ARO, ARO, CW - 2 * ARO, CH - 2 * ARO, 36));
+      anelDeOuro(redondo(FAIXA - 9, FAIXA - 9, CW - 2 * FAIXA + 18, CH - 2 * FAIXA + 18, 32), redondo(FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26));
+      // os relevos: a luz na beira de fora de cada ouro e a sombra na de dentro
+      k.lineWidth = 2;
+      k.strokeStyle = 'rgba(255,248,214,.85)';
+      retRedondo(k, 3, 3, CW - 6, CH - 6, 44);
       k.stroke();
-      k.strokeStyle = go;
-      k.lineWidth = 6;
+      retRedondo(k, FAIXA - 8, FAIXA - 8, CW - 2 * FAIXA + 16, CH - 2 * FAIXA + 16, 31);
+      k.stroke();
+      k.strokeStyle = 'rgba(70,44,4,.75)';
+      retRedondo(k, ARO, ARO, CW - 2 * ARO, CH - 2 * ARO, 36);
+      k.stroke();
       retRedondo(k, FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
       k.stroke();
-      k.lineWidth = 10;
-      retRedondo(k, 5, 5, CW - 10, CH - 10, 41);
-      k.stroke();
-      k.strokeStyle = 'rgba(90,60,10,.6)';
-      k.lineWidth = 1.5;
-      retRedondo(k, 11, 11, CW - 22, CH - 22, 36);
+      k.strokeStyle = 'rgba(0,0,0,.35)';
+      k.lineWidth = 4;
+      retRedondo(k, FAIXA + 2, FAIXA + 3, CW - 2 * FAIXA - 4, CH - 2 * FAIXA - 4, 25);
       k.stroke();
       return;
     }
@@ -3096,6 +3208,10 @@
       porArte(k, ilu, true);
       // a luz da glória, parada no papel: o clarão no alto e os raios finos, simétricos
       k.save();
+      k.beginPath();
+      k.rect(ARTE_CHEIA.x, ARTE_CHEIA.y, ARTE_CHEIA.w, ARTE_CHEIA.h);
+      k.clip();
+      k.save();
       k.globalCompositeOperation = 'screen';
       k.lineCap = 'round';
       for (let i = 0; i < 72; i++) {
@@ -3125,9 +3241,11 @@
       k.restore();
       k.restore();
       brilho(k, CW / 2, 0, 640, 'rgba(255,236,190,.5)', 'screen');
+      k.restore();
     }
     moldura(k, M, r, rar);
-    if (M.cheia) enfeiteDosCantos(k, 'filigrana', 'rgba(150,110,30,.9)');
+    // na glória, a filigrana menor, na faixa de madrepérola (sem entrar no vão nem no papel)
+    if (M.cheia) enfeiteDosCantos(k, 'filigrana', 'rgba(150,110,30,.9)', '#fff', { recuo: 30, escala: 0.62 });
     rotuloDoAlto(k, carta, M);
     if (!M.cheia) {
       // a janela da ilustração, rebaixada na moldura
@@ -3151,44 +3269,78 @@
       retRedondo(k, JX - 4, JY - 4, JW + 8, JH + 8, 25);
       k.stroke();
     }
-    // o papel do texto
+    // o papel do texto (na glória, de lado a lado do vão, com a beirada de cima translúcida
+    // sobre a arte, que termina embaixo dele)
+    const py = M.cheia ? PY_CHEIA : PY;
+    const ph = M.cheia ? CH - FAIXA - 8 - PY_CHEIA : PH;
+    const papel = M.cheia ? PAPEL_CHEIO : { x: JX, y: py, w: JW, h: ph };
+    if (M.cheia) {
+      k.save();
+      retRedondo(k, FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
+      k.clip();
+      const gv = k.createLinearGradient(0, py - 40, 0, py + 4);
+      gv.addColorStop(0, 'rgba(236,229,207,0)');
+      gv.addColorStop(0.6, 'rgba(236,229,207,.55)');
+      gv.addColorStop(1, 'rgba(236,229,207,.96)');
+      k.fillStyle = gv;
+      k.fillRect(FAIXA, py - 40, CW - 2 * FAIXA, 44);
+      k.restore();
+    } else {
+      k.save();
+      k.filter = 'blur(6px)';
+      k.fillStyle = 'rgba(0,0,0,.3)';
+      retRedondo(k, JX + 2, py + 5, JW, ph, 22);
+      k.fill();
+      k.restore();
+    }
     k.save();
-    k.filter = 'blur(6px)';
-    k.fillStyle = 'rgba(0,0,0,.3)';
-    retRedondo(k, JX + 2, PY + 5, JW, PH, 22);
-    k.fill();
-    k.restore();
-    k.save();
-    retRedondo(k, JX, PY, JW, PH, 22);
+    if (M.cheia) {
+      retRedondo(k, FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
+      k.clip();
+      k.beginPath();
+      k.rect(papel.x, papel.y, papel.w, papel.h);
+    } else retRedondo(k, JX, py, JW, ph, 22);
     k.clip();
     k.fillStyle = COR.papel;
-    k.fillRect(JX, PY, JW, PH);
-    brilho(k, CW / 2, PY + PH * 0.4, 520, 'rgba(255,252,240,.5)');
+    k.fillRect(papel.x, papel.y, papel.w, papel.h);
+    brilho(k, CW / 2, py + ph * 0.4, 520, 'rgba(255,252,240,.5)');
     for (let i = 0; i < 2400; i++) {
       k.fillStyle = r() < 0.6 ? 'rgba(90,80,50,' + (0.03 + r() * 0.06).toFixed(3) + ')' : 'rgba(255,255,250,.3)';
-      k.fillRect(JX + r() * JW, PY + r() * PH, 1 + r() * 3, 1);
+      k.fillRect(papel.x + r() * papel.w, papel.y + r() * papel.h, 1 + r() * 3, 1);
     }
-    const gb = k.createLinearGradient(0, PY, 0, PY + PH);
+    const gb = k.createLinearGradient(0, papel.y, 0, papel.y + papel.h);
     gb.addColorStop(0, 'rgba(60,50,20,.10)');
     gb.addColorStop(0.15, 'rgba(60,50,20,0)');
     gb.addColorStop(0.85, 'rgba(60,50,20,0)');
     gb.addColorStop(1, 'rgba(60,50,20,.12)');
     k.fillStyle = gb;
-    k.fillRect(JX, PY, JW, PH);
+    k.fillRect(papel.x, papel.y, papel.w, papel.h);
     k.restore();
-    k.lineWidth = 2;
-    k.strokeStyle = M.janela;
-    retRedondo(k, JX, PY, JW, PH, 22);
-    k.stroke();
+    if (M.cheia) {
+      // o filete de ouro que separa a arte do papel
+      const gl = k.createLinearGradient(FAIXA, 0, CW - FAIXA, 0);
+      gl.addColorStop(0, M.papel);
+      gl.addColorStop(0.5, '#ffe7a0');
+      gl.addColorStop(1, M.papel);
+      k.fillStyle = 'rgba(70,44,4,.55)';
+      k.fillRect(FAIXA, py + 1, CW - 2 * FAIXA, 2);
+      k.fillStyle = gl;
+      k.fillRect(FAIXA, py + 3, CW - 2 * FAIXA, 4);
+    } else {
+      k.lineWidth = 2;
+      k.strokeStyle = M.janela;
+      retRedondo(k, JX, py, JW, ph, 22);
+      k.stroke();
+    }
     if (M.papel) {
       // o ouro e a glória levam o filete de folha também no papel
       k.lineWidth = 3;
-      const gf = k.createLinearGradient(JX, PY, JX + JW, PY + PH);
+      const gf = k.createLinearGradient(JX, py, JX + JW, py + ph);
       gf.addColorStop(0, M.papel);
       gf.addColorStop(0.5, '#ffe7a0');
       gf.addColorStop(1, M.papel);
       k.strokeStyle = gf;
-      retRedondo(k, JX + 10, PY + 10, JW - 20, PH - 20, 14);
+      retRedondo(k, JX + 10, py + 10, JW - 20, ph - 20, 14);
       k.stroke();
     }
     // o texto: título 64, "Você sabia?" 28, a frase 44, o pé 32 (a 330 px de largura na
@@ -3198,16 +3350,27 @@
     let tT = 64;
     k.font = literata(tT);
     while (k.measureText(carta.titulo).width > larg && tT > 48) { tT -= 2; k.font = literata(tT); }
-    escrever(k, carta.titulo, x0, PY + 76, literata(tT), COR.tinta, { espaco: -0.5 });
-    escrever(k, 'VOCÊ SABIA?', x0, PY + 124, oswald(28, 600), COR.salviaEscura, { espaco: 4 });
+    escrever(k, carta.titulo, x0, py + 76, literata(tT), COR.tinta, { espaco: -0.5 });
+    escrever(k, 'VOCÊ SABIA?', x0, py + 124, oswald(28, 600), COR.salviaEscura, { espaco: 4 });
     let tS = 44;
     let linhas = quebrar(k, carta.sabia, manrope(tS, 600), larg);
     while (linhas.length > 3 && tS > 38) { tS -= 2; linhas = quebrar(k, carta.sabia, manrope(tS, 600), larg); }
-    linhas.slice(0, 3).forEach((l, i) => escrever(k, l, x0, PY + 178 + i * (tS + 9), manrope(tS, 600), '#2b2c25'));
+    linhas.slice(0, 3).forEach((l, i) => escrever(k, l, x0, py + 178 + i * (tS + 9), manrope(tS, 600), '#2b2c25'));
     // o pé: a referência e a raridade (ícone e nome, nunca só a cor)
-    const yPe = PY + PH - 32;
+    const yPe = py + ph - 32;
+    // o filete do pé, aberto no meio para a marca (o símbolo e GERAÇÃO ELEITA, pequenos)
+    const yM = yPe - 53;
+    const marca = 'GERAÇÃO ELEITA';
+    const wm = medir(k, marca, oswald(21, 600), 5.5);
+    const hl = 26;
+    const wl = CC.story && CC.CAMINHO_SIMBOLO ? hl * 1357 / 1936 : 0;
+    const wTot = wl + (wl ? 10 : 0) + wm;
+    const xm = CW / 2 - wTot / 2;
     k.fillStyle = 'rgba(35,36,30,.18)';
-    k.fillRect(x0, yPe - 54, larg, 2);
+    k.fillRect(x0, yM - 1, xm - 18 - x0, 2);
+    k.fillRect(xm + wTot + 18, yM - 1, x0 + larg - (xm + wTot + 18), 2);
+    if (wl) CC.story.logo(k, xm, yM - hl / 2 - 1, hl, 'rgba(69,70,60,.78)');
+    escrever(k, marca, xm + wl + (wl ? 10 : 0), yM + 7.5, oswald(21, 600), 'rgba(69,70,60,.78)', { espaco: 5.5 });
     escrever(k, String(carta.ref || '').toUpperCase(), x0, yPe, oswald(32, 600), '#45463c', { espaco: 3 });
     const wn = medir(k, R.nome.toUpperCase(), oswald(32, 600), 3.5);
     escrever(k, R.nome.toUpperCase(), x0 + larg, yPe, oswald(32, 600), R.tinta, { alinhar: 'right', espaco: 3.5 });
@@ -3258,22 +3421,23 @@
     porArte(k, obj, !!M.cheia);
     k.filter = 'none';
     k.globalAlpha = 1;
-    // fora do texto: o papel e o rótulo do alto
-    k.fillStyle = '#000';
-    retRedondo(k, JX - 6, PY - 6, JW + 12, PH + 12, 26);
-    k.fill();
-    retRedondo(k, CW / 2 - 300, 36, 600, 72, 36);
-    k.fill();
+    // fora do texto: o papel e a plaqueta do rótulo (a forma exata dela)
+    const P = plaqueta(k, carta, M);
+    const tirarTexto = () => {
+      k.fillStyle = '#000';
+      if (M.cheia) k.fillRect(PAPEL_CHEIO.x - 4, PAPEL_CHEIO.y - 6, PAPEL_CHEIO.w + 8, PAPEL_CHEIO.h + 10);
+      else { retRedondo(k, JX - 6, PY - 6, JW + 12, PH + 12, 26); k.fill(); }
+      if (P.forma) k.fill(P.forma);
+      else { retRedondo(k, CW / 2 - 300, 36, 600, 72, 36); k.fill(); }
+    };
+    tirarTexto();
     // a moldura inteira entra
     k.globalCompositeOperation = 'source-over';
     k.save();
     k.clip(M.cheia ? vazado(FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26) : vazado(JX - 6, JY - 6, JW + 12, JH + 12, 26), 'evenodd');
     k.fillRect(0, 0, CW, CH);
     k.globalCompositeOperation = 'destination-out';
-    retRedondo(k, JX - 6, PY - 6, JW + 12, PH + 12, 26);
-    k.fill();
-    retRedondo(k, CW / 2 - 300, 36, 600, 72, 36);
-    k.fill();
+    tirarTexto();
     k.restore();
     return c;
   }
@@ -3365,7 +3529,9 @@
     k.restore();
     return c;
   }
-  // A miniatura do álbum: só a moldura, a arte e o ícone da raridade num selo, sem texto.
+  // A miniatura do álbum: a moldura e a arte no mesmo enquadramento da carta inteira (nada de
+  // corte novo, para o objeto principal nunca sair da miniatura) e, no lugar do texto, o
+  // ícone da raridade num selo grande, para ler pequeno.
   function desenharMiniatura(c, carta) {
     const k = c.getContext('2d');
     const s = c.width / CW;
@@ -3378,45 +3544,49 @@
     const { ilu } = ilustracao(carta);
     retRedondo(k, 0, 0, CW, CH, 46);
     k.clip();
-    const ax = 56;
-    const ay = 56;
-    const aw = CW - 112;
-    const ah = 1010;
-    // a arte cortada para caber na janela alta
-    const fonteW = ILU_H * aw / ah;
+    let papel;
     if (M.cheia) {
-      k.drawImage(ilu, (JW - JW * 0.74) / 2, 0, JW * 0.74, ILU_H, 0, 0, CW, CH);
+      porArte(k, ilu, true);
       moldura(k, M, r, rar);
+      papel = PAPEL_CHEIO;
+      k.save();
+      retRedondo(k, FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
+      k.clip();
+      k.fillStyle = COR.papel;
+      k.fillRect(papel.x, papel.y, papel.w, papel.h);
+      k.restore();
+      k.fillStyle = M.papel;
+      k.fillRect(FAIXA, PY_CHEIA, CW - 2 * FAIXA, 6);
     } else {
       moldura(k, M, r, rar);
       k.save();
-      retRedondo(k, ax, ay, aw, ah, 26);
+      retRedondo(k, JX, JY, JW, JH, 22);
       k.clip();
-      k.drawImage(ilu, (JW - fonteW) / 2, 0, fonteW, ILU_H, ax, ay, aw, ah);
+      porArte(k, ilu, false);
       k.restore();
       k.lineWidth = 4;
       k.strokeStyle = M.janela;
-      retRedondo(k, ax, ay, aw, ah, 26);
+      retRedondo(k, JX, JY, JW, JH, 22);
+      k.stroke();
+      papel = { x: JX, y: PY, w: JW, h: PH };
+      k.fillStyle = COR.papel;
+      retRedondo(k, JX, PY, JW, PH, 22);
+      k.fill();
+      k.lineWidth = 3;
+      k.strokeStyle = M.janela;
       k.stroke();
     }
-    // o ícone num selo, embaixo, grande para ler pequeno
-    const cy = M.cheia ? CH - 190 : ay + ah + (CH - ay - ah) / 2;
-    const rs = M.cheia ? 120 : 112;
-    k.save();
-    k.filter = 'blur(6px)';
-    k.fillStyle = 'rgba(0,0,0,.35)';
-    k.beginPath();
-    k.arc(CW / 2 + 3, cy + 6, rs, 0, Math.PI * 2);
-    k.fill();
-    k.restore();
-    k.fillStyle = COR.papel;
+    // o ícone num selo, no meio do papel
+    const cy = papel.y + papel.h / 2;
+    const rs = 150;
+    k.fillStyle = 'rgba(255,252,240,.6)';
     k.beginPath();
     k.arc(CW / 2, cy, rs, 0, Math.PI * 2);
     k.fill();
-    k.lineWidth = 6;
-    k.strokeStyle = M.cheia ? M.papel : M.janela;
+    k.lineWidth = 7;
+    k.strokeStyle = R.tinta;
     k.stroke();
-    iconeCanvas(k, rar, CW / 2 - rs * 0.68, cy - rs * 0.68, rs * 1.36, R.tinta, { traco: 1.9, cheio: 0.25 });
+    iconeCanvas(k, rar, CW / 2 - rs * 0.7, cy - rs * 0.7, rs * 1.4, R.tinta, { traco: 1.9, cheio: 0.25 });
     k.lineWidth = 3;
     k.strokeStyle = 'rgba(0,0,0,.45)';
     retRedondo(k, 1.5, 1.5, CW - 3, CH - 3, 45);
@@ -3638,6 +3808,10 @@
     // o holográfico do ouro e da glória só nas luzes e na moldura, fora dos objetos e do texto
     if (rar === 'ouro' || rar === 'gloria') {
       try { el.style.setProperty('--mascara', 'url(' + mascaraDoBrilho(carta, rar).toDataURL() + ')'); } catch (e) { /* sem máscara, fica o recorte do CSS */ }
+      try {
+        const mr = mascaraDoRotulo(carta, rar);
+        if (mr) el.style.setProperty('--sem-rotulos', 'url(' + mr.toDataURL() + ')');
+      } catch (e) { /* fica a elipse macia */ }
     }
     el.style.setProperty('--largura', largura + 'px');
     el.setAttribute('role', 'img');
@@ -4094,7 +4268,8 @@
     const R = RARIDADES[rar];
     const menos = menosMovimento();
     const T = (ms) => ms * ESCALA_TEMPO;
-    const vw = Math.min(window.innerWidth || 390, document.documentElement.clientWidth || 9999);
+    // a largura que vale é a do lugar onde a revelação entra (o baú nunca passa da borda dele)
+    const vw = Math.min(window.innerWidth || 390, document.documentElement.clientWidth || 9999, alvo.clientWidth || 9999);
     const vh = window.innerHeight || 844;
     // a carta com 320 a 340 px de largura no celular (menos se a tela for baixa); o baú, maior
     const larg = opts.largura || Math.round(Math.max(220, Math.min(340, vw - 50, (vh - 300) / 1.4)));
@@ -4105,9 +4280,9 @@
       + '<button type="button" class="rv-pular">Pular</button>'
       + '<div class="rv-palco">'
       + '<i class="rv-raios" aria-hidden="true"></i><i class="rv-aura" aria-hidden="true"></i>'
-      + '<div class="rv-bau-pecas" aria-hidden="true"><i class="rv-peca rv-luz"></i><div class="rv-peca rv-dentro"></div><div class="rv-peca rv-boca"></div></div>'
-      + '<div class="rv-carta"><i class="rv-anel" aria-hidden="true"></i></div>'
-      + '<button type="button" class="rv-bau" aria-label="Abrir o baú"><span class="rv-peca rv-corpo"></span><span class="rv-peca rv-tampa"></span></button>'
+      + '<div class="rv-bau-pecas" aria-hidden="true"><i class="rv-peca rv-luz"></i><div class="rv-peca rv-boca"></div></div>'
+      + '<div class="rv-saida"><div class="rv-carta"><i class="rv-anel" aria-hidden="true"></i></div></div>'
+      + '<button type="button" class="rv-bau" aria-label="Abrir o baú"><span class="rv-peca rv-corpo"></span><span class="rv-peca rv-tampa"><span class="rv-dobradica"></span></span></button>'
       + '</div>'
       + '<p class="rv-raridade">' + iconeSvg(rar) + '<span>' + R.nome + '</span></p>'
       + '<div class="rv-fim" tabindex="-1" aria-live="polite"><p class="rv-nova">' + legendaHtml(legenda) + '</p>'
@@ -4117,8 +4292,10 @@
     const bau = bauEmGravura(largBau);
     rv.querySelector('.rv-corpo').appendChild(bau.corpo);
     rv.querySelector('.rv-boca').appendChild(bau.boca);
-    rv.querySelector('.rv-tampa').appendChild(bau.fora);
-    rv.querySelector('.rv-dentro').appendChild(bau.dentro);
+    // a tampa é uma peça só, com duas faces: a de fora e, no verso dela, a de dentro
+    bau.fora.classList.add('rv-tampa-fora');
+    bau.dentro.classList.add('rv-tampa-dentro');
+    rv.querySelector('.rv-dobradica').append(bau.fora, bau.dentro);
     const api = cartaViva(c, { largura: larg, verso: true });
     api.el.setAttribute('tabindex', '0');
     rv.querySelector('.rv-carta').appendChild(api.el);
