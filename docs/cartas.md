@@ -370,38 +370,51 @@ marcos não têm geração: o Zerar não os faz pagar de novo.
 
 ## 8. Revelação
 
-- **No baú**: tocar no baú guarda o versículo (`CC.abrirBau`, como antes). A tela pede as três
-  peças (regra, arte e álbum) assim que abre. Com elas prontas, `CC.cartasEmDia` paga o baú e
-  `CC.album.revelarNoBau` passa a abertura inteira para a arte, por uma função só:
-  `CC.cartas.revelar(alvo, carta, { raridade, legenda, abrir: 'ja', largura, aoLer })`. A arte faz
-  o baú balançar, a tampa abrir com a luz na cor da raridade, a carta subir e virar; o baú da
-  Trilha não anima antes (nada anima duas vezes). Se as peças ainda não chegaram, o baú da Trilha
-  balança enquanto espera, até 2,5 s.
-- A legenda (dentro da arte):
+Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
+
+- **No baú**: a tela pede as três peças (regra, arte e álbum) assim que abre. Com elas prontas
+  antes do toque, a tela prevê a carta do baú (`CC.cartasRegras.emDia` num estado com o baú
+  aberto; o sorteio é determinístico) e troca o baú da Trilha pelo baú da arte, no mesmo lugar:
+  `CC.album.bauDaRevelacao(el, palco, { previsto, chave, ref, fechar, guardar, titulo })`, que
+  chama `CC.cartas.revelar(alvo, carta, { raridade, legenda, abrir: 'toque', largura, aoLer })`.
+  Na tela fica um elemento de baú só, com "Um baú na estrada!" abaixo do "Pular".
+- **O toque** (ou "Pular" antes dele) guarda o baú uma vez: `CC.abrirBau`, a vibração e
+  `CC.cartasEmDia`, que paga a carta. Se a carta paga não for a prevista (outro aparelho pagou
+  antes, por exemplo), a revelação recomeça já aberta com a carta paga (`revelarNoBau`). A arte
+  faz o resto sem troca de tela: a tampa abre com a luz na cor da raridade, a carta sobe, vira e
+  brilha. "Pular" vai direto ao fim.
+- **O fim** mostra só a carta, grande (do tamanho que sobra na tela), sem baú: a origem quando há
+  ("Marco: 100 dias de leitura"), a legenda, "Ler a história" e "Virar"; embaixo, só agora,
+  "Compartilhar carta" (só com desenho), "Salvar papel de parede" e "Continuar". Durante a
+  abertura não há botões embaixo. Cabe sem rolar em 390×844 e 360×740, claro e escuro.
+- A legenda:
   - carta nova: "**Nova!** Você tem 9 de 13 em Objetos";
   - versão nova de uma carta que a pessoa já tem: "Nova versão Prata de Davi e a funda";
   - repetida: "Repetida: agora você tem 2 de Davi e a funda (Bronze)".
-- "Ler a história" (o `aoLer` da arte) abre a referência da carta na Bíblia. Embaixo, fora da arte:
-  "Compartilhar carta" (só com desenho), "Salvar papel de parede" e "Continuar".
+- "Ler a história" (o `aoLer` da arte) abre a referência da carta na Bíblia e fecha a tela.
 - O que o baú pagou junto vem em seguida, na mesma tela, uma revelação depois da outra: o sorteio
   de marco do álbum que ele completou ("Álbum completo! Ganhou um sorteio de marco."), um marco de
   unidade, uma carta de outra fonte.
-- A arte foi feita para um palco escuro (texto creme): a tela da revelação fica escura nos dois
-  temas, com as fichas do tema escuro.
+- A cena usa as fichas do tema do app (claro e escuro); não há palco escuro à parte.
+- **Peças ainda não prontas no toque**: o baú da Trilha balança enquanto espera, até 2,5 s, e a
+  revelação segue já aberta.
 - **Sem as peças** (sem rede na primeira vez): a tela de sempre, com o confete e o versículo, e
   "A carta deste baú vai para o seu álbum." A carta chega quando a regra carregar (seção 6).
 - **Outras fontes e marcos**: quando `CC.cartasEmDia` paga carta de outra fonte e nada está aberto
-  na tela, `CC.album.revelarNovas` mostra uma revelação depois da outra; o título diz a origem
-  ("Primeiros passos completos", "Amigos que chegaram pelo seu convite") e, no marco, "Marco: 100
-  dias de leitura", "Marco: unidade 3 completa", "Marco: Objetos completo". Com algo aberto, e para
-  os baús antigos, um aviso curto: "Carta nova no seu álbum." ou "3 cartas novas no seu álbum."
+  na tela, `CC.album.revelarNovas` mostra uma revelação depois da outra, com a origem acima da
+  legenda ("Primeiros passos completos", "Amigos que chegaram pelo seu convite") e, no marco,
+  "Marco: 100 dias de leitura", "Marco: unidade 3 completa", "Marco: Objetos completo". Com algo
+  aberto, e para os baús antigos, um aviso curto: "Carta nova no seu álbum." ou "3 cartas novas no
+  seu álbum."
 
 | Função | Teste |
 |---|---|
 | `CC.pedirCartas()` | teste-bau: a arte e o álbum não vêm no index.html; na Trilha não são pedidos |
-| `CC.album.revelarNoBau(el, palco, { chave, ref, fechar, outros })` | teste-bau: com as peças prontas o baú da Trilha não balança e a arte faz a abertura até o fim; "Nova! Você tem 1 de 13 em Heróis da fé", Prata; os três botões com 44 px; "Ler a história" abre 1 Samuel 17 e fecha a tela; palco escuro no tema claro |
+| `CC.album.bauDaRevelacao(el, palco, { previsto, chave, ref, fechar, guardar, titulo })` | teste-bau: um elemento de baú antes do toque, um durante a abertura e nenhum no fim; botões embaixo só no fim; o fim cabe em 390×844 e 360×740, claro e escuro; "Nova! Você tem 1 de 13 em Heróis da fé", Prata; "Ler a história" abre 1 Samuel 17 e fecha a tela; capturas do fluxo inteiro (fechado, abrindo, carta de costas, de frente, fim) |
+| "Pular" antes do toque | teste-bau: o baú é guardado, a carta é paga e a tela vai ao fim |
+| `CC.album.revelarNoBau(el, palco, { chave, ref, fechar, outros })` | caminho de reserva (peças chegando depois do toque, ou carta paga diferente da prevista); sem teste de navegador próprio, a legenda e o fim são os mesmos de `bauDaRevelacao` |
 | `legenda(x)` | teste-bau: nova, repetida ("Repetida: agora você tem 3 de Davi e a funda (Prata)") e versão nova ("Nova versão Ouro de Davi e a funda") |
-| `CC.album.revelarNovas(lista)` | teste-bau: a prática sem erro revela a carta com a origem no título; os marcos de 100 dias e das 3 unidades, cada um com Prata, Ouro ou Glória e "Marco: ..." |
+| `CC.album.revelarNovas(lista)` | teste-bau: a prática sem erro revela a carta com a origem; os marcos de 100 dias e das 3 unidades, cada um com Prata, Ouro ou Glória e "Marco: ..." |
 | reserva sem peças | teste-bau: o versículo e o aviso; quando a regra carrega, a carta chega |
 
 ## 9. Álbum, carta grande e "O que pode vir"
@@ -510,7 +523,7 @@ zerar (seção 11), com "Ajuste da versão 5, 22 de outubro de 2026" no históri
 
 - `index.html`: a fusão e a forma (02-estado.js), os pedidos e a contagem por álbum (02b-jogo.js),
   a tela do baú, a entrada do Perfil, a casca do álbum e o esqueleto do catálogo. A folga do
-  index.html continua acima de 60 KB (teste.mjs): 68,3 KB.
+  index.html continua acima de 60 KB (teste.mjs): 67,3 KB.
 - Peças: `cartas-regras` (a regra, cerca de 14 KB), `album` (catálogo, telas e estilo, cerca de
   42 KB) e `cartas` (a arte, cerca de 150 KB), pedidas só quando servem.
 
@@ -522,8 +535,8 @@ zerar (seção 11), com "Ajuste da versão 5, 22 de outubro de 2026" no históri
   Semeadores, repetidas contadas pelo livro-caixa, resultado estável por evento, fusão sem
   duplicar, Zerar, fontes do estado e do servidor, Semeadores fora do sorteio, álbum novo no dia do
   lançamento, e a simulação (regular: 9 a 14 meses; proteções nunca falham; 8 álbuns completam).
-- `ferramentas/teste-bau.mjs`, contra a peça de arte de verdade: abrir o baú (a arte faz a abertura),
-  a carta aparecer, "Ler a história", compartilhar, papel de parede, só lançadas, a entrada no
+- `ferramentas/teste-bau.mjs`, contra a peça de arte de verdade: abrir o baú (um baú só no fluxo,
+  nenhum no fim, o fim cabe em 390×844 e 360×740), "Pular" antes do toque, a carta aparecer, "Ler a história", compartilhar, papel de parede, só lançadas, a entrada no
   Perfil, o álbum, a carta grande e as versões, a carta sem desenho, "O que pode vir" com as duas
   tabelas, outra fonte e os marcos revelados, repetida e versão nova, Troféus, o álbum no
   computador e a reserva sem as peças.
