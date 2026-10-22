@@ -4012,250 +4012,55 @@
   // "Pular" fica à vista até o fim. Menos movimento: sem balanço nem giro; o baú some e a
   // carta aparece de frente (troca suave), com o halo parado e o nome. Sem som. Só transform
   // e opacity animam (nada de layout), para correr liso num Android médio.
-  // O baú é desenhado em gravura, como as cartas, e é maior que a carta.
+  // O baú é o mesmo da Trilha (CC.arte.bau('pronto', 'madeira'), 01c-arte.js), em tamanho
+  // grande e partido em peças: o corpo, a boca (a do baú "aberto") e a tampa, com a face de
+  // fora (a fechada, com a fechadura) e a de dentro (a tampa do "aberto", que fica inclinada).
   let ESCALA_TEMPO = 1;
-  function bauEmGravura(larg) {
-    // larg: a largura do baú na tela, em px; as peças saem em canvas na densidade da tela
-    const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
-    const f = (larg * dpr) / 1000;
-    const peca = (alto, y0) => {
-      const c = tela(Math.round(1000 * f), Math.round(alto * f));
-      const k = c.getContext('2d');
-      k.setTransform(f, 0, 0, f, 0, -y0 * f);
-      return [c, k];
+  // A cópia do desenho, para quando a peça roda fora do app (a amostra). No app, o desenho
+  // vem do próprio CC.arte.bau, então os dois baús não se separam.
+  const BAU_COPIA = {
+    pronto: '<svg viewBox="0 0 120 110"><ellipse cx="60" cy="102" rx="44" ry="7" fill="currentColor" opacity=".12"/><rect x="14" y="50" width="92" height="48" rx="10" fill="#b07a42"/><rect x="14" y="80" width="92" height="18" rx="8" fill="#82552b"/><rect x="30" y="50" width="10" height="48" fill="#d2a24e"/><rect x="80" y="50" width="10" height="48" fill="#d2a24e"/>'
+      + '<g class="tampa"><rect x="14" y="26" width="92" height="30" rx="10" fill="#b07a42"/><rect x="14" y="44" width="92" height="12" fill="#82552b"/><rect x="30" y="26" width="10" height="30" fill="#d2a24e"/><rect x="80" y="26" width="10" height="30" fill="#d2a24e"/></g>'
+      + '<rect x="48" y="44" width="24" height="24" rx="7" fill="#d2a24e"/><rect x="48" y="58" width="24" height="10" rx="4" fill="#9e7328"/><circle cx="60" cy="54" r="4" fill="#82552b"/></svg>',
+    aberto: '<svg viewBox="0 0 120 110"><g class="tampa aberta"><g transform="rotate(-14 60 47)"><rect x="18" y="20" width="84" height="27" rx="9" fill="#b07a42"/><rect x="25" y="26" width="70" height="16" rx="7" fill="#82552b"/><rect x="32" y="20" width="10" height="27" fill="#d2a24e"/><rect x="78" y="20" width="10" height="27" fill="#d2a24e"/></g>'
+      + '<ellipse cx="60" cy="50" rx="43" ry="8" fill="#82552b"/><ellipse cx="60" cy="51" rx="35" ry="5.5" fill="#1a1a1a" opacity=".75"/><ellipse class="brilho-bau" cx="60" cy="50" rx="20" ry="3.5" fill="#f2f2f2" opacity=".95"/></g></svg>',
+  };
+  // As peças saem no mesmo quadro (viewBox) e no mesmo lugar, umas por cima das outras: assim
+  // balançam juntas e a carta passa entre elas. O quadro corta 10 de cada lado do da Trilha,
+  // para o baú ocupar a largura do palco.
+  const BAU_QUADRO = '10 0 100 112';
+  function bauDaTrilha() {
+    const ler = (estado) => {
+      const d = document.createElement('div');
+      d.innerHTML = CC.arte && CC.arte.bau ? CC.arte.bau(estado, 'madeira') : BAU_COPIA[estado];
+      return d.firstElementChild;
     };
-    const r = sorteio(1907);
-    const TB = '#24160a';
-    // a madeira: o tom, as tábuas e a gravura em linhas (mais grossas na sombra)
-    const madeira = (k, forma, cx, cy, raio, ang, sombra, tons = ['#c49a68', '#8e643a']) => {
-      const g = k.createLinearGradient(0, cy - raio, 0, cy + raio);
-      g.addColorStop(0, tons[0]);
-      g.addColorStop(1, tons[1]);
-      k.fillStyle = g;
-      k.fill(forma);
-      gravar(k, forma, cx, cy, raio, ang, 7, 4, sombra, TB, 0.04);
-      // os veios e os nós
-      k.save();
-      k.clip(forma);
-      k.strokeStyle = 'rgba(36,22,10,.55)';
-      k.lineCap = 'round';
-      for (let i = 0; i < 22; i++) {
-        const x = cx - raio + r() * raio * 2;
-        const y = cy - raio + r() * raio * 2;
-        k.lineWidth = 2.4;
-        k.beginPath();
-        k.ellipse(x, y, 12 + r() * 18, 4 + r() * 4, ang, 0, Math.PI * 2);
-        k.stroke();
-      }
-      k.restore();
+    const svg = (classe, ...nos) => {
+      const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      s.setAttribute('viewBox', BAU_QUADRO);
+      s.setAttribute('aria-hidden', 'true');
+      s.setAttribute('class', 'rv-svg ' + classe);
+      s.append(...nos);
+      return s;
     };
-    // o metal das cintas: bronze dourado, com a luz em cima e os rebites
-    const metal = (k, forma, x0, y0, x1, y1) => {
-      const g = k.createLinearGradient(x0, y0, x1, y1);
-      [[0, '#e6c27a'], [0.35, '#b98a3c'], [0.7, '#7d5a22'], [1, '#a77d36']].forEach(([p, c]) => g.addColorStop(p, c));
-      k.fillStyle = g;
-      k.fill(forma);
-      gravar(k, forma, (x0 + x1) / 2, (y0 + y1) / 2, Math.hypot(x1 - x0, y1 - y0) / 2 + 20, 0.5, 6, 2.6, () => 0.5, '#3a2608', 0);
-      k.strokeStyle = TB;
-      k.lineWidth = 5;
-      k.stroke(forma);
+    const pronto = ler('pronto');
+    const tampa = pronto.querySelector('.tampa');
+    const filhos = [...pronto.children];
+    const antes = filhos.slice(0, filhos.indexOf(tampa));
+    const depois = filhos.slice(filhos.indexOf(tampa) + 1);
+    const aberta = ler('aberto').querySelector('.tampa');
+    const giro = aberta.querySelector('g');
+    const brilho = aberta.querySelector('.brilho-bau');
+    if (brilho) brilho.setAttribute('class', 'rv-brilho');
+    // a face de dentro é a tampa do "aberto" sem o giro (o CSS faz o giro); desenhada 21 acima
+    // (a distância que a dobradiça desce ao abrir), para chegar ao lugar dela no fim
+    giro.setAttribute('transform', 'translate(0 -21)');
+    return {
+      corpo: svg('rv-corpo-svg', ...antes),
+      boca: svg('rv-boca-svg', ...aberta.querySelectorAll(':scope > ellipse')),
+      fora: svg('rv-tampa-fora', tampa, ...depois),
+      dentro: svg('rv-tampa-dentro', giro),
     };
-    const rebite = (k, x, y, rr = 9) => {
-      const g = k.createRadialGradient(x - rr * 0.35, y - rr * 0.35, 1, x, y, rr);
-      g.addColorStop(0, '#fff1c4');
-      g.addColorStop(1, '#8a6224');
-      k.fillStyle = 'rgba(0,0,0,.45)';
-      k.beginPath();
-      k.arc(x + 2, y + 3, rr, 0, Math.PI * 2);
-      k.fill();
-      k.fillStyle = g;
-      k.beginPath();
-      k.arc(x, y, rr, 0, Math.PI * 2);
-      k.fill();
-      k.strokeStyle = TB;
-      k.lineWidth = 1.6;
-      k.stroke();
-    };
-    // ---- o corpo (a frente), de y 0 a 500 ----
-    const [corpo, kc] = peca(510, 0);
-    const frente = new Path2D();
-    frente.moveTo(60, 0);
-    frente.lineTo(940, 0);
-    frente.lineTo(940, 446);
-    frente.quadraticCurveTo(940, 470, 916, 470);
-    frente.lineTo(84, 470);
-    frente.quadraticCurveTo(60, 470, 60, 446);
-    frente.closePath();
-    kc.save();
-    kc.filter = 'blur(14px)';
-    kc.fillStyle = 'rgba(0,0,0,.55)';
-    kc.beginPath();
-    kc.ellipse(500, 486, 470, 20, 0, 0, Math.PI * 2);
-    kc.fill();
-    kc.restore();
-    madeira(kc, frente, 500, 235, 520, 0, (x, y) => 0.25 + y / 900 + Math.abs(x - 500) / 1600);
-    // as tábuas
-    kc.strokeStyle = TB;
-    kc.lineWidth = 7;
-    for (const y of [150, 310]) { kc.beginPath(); kc.moveTo(60, y); kc.lineTo(940, y); kc.stroke(); }
-    kc.strokeStyle = 'rgba(255,226,170,.35)';
-    kc.lineWidth = 2;
-    for (const y of [154, 314]) { kc.beginPath(); kc.moveTo(60, y); kc.lineTo(940, y); kc.stroke(); }
-    // as cintas de metal em pé e a de cima
-    for (const x of [170, 770]) {
-      const cinta = new Path2D();
-      cinta.rect(x, 0, 64, 470);
-      metal(kc, cinta, x, 0, x + 64, 60);
-      for (let y = 40; y < 460; y += 82) { rebite(kc, x + 18, y); rebite(kc, x + 46, y + 40); }
-    }
-    const aro = new Path2D();
-    aro.rect(56, -4, 888, 40);
-    metal(kc, aro, 0, -4, 0, 36);
-    for (let x = 90; x < 930; x += 60) rebite(kc, x, 16, 7);
-    // as cantoneiras de baixo
-    for (const [x, s] of [[60, 1], [940, -1]]) {
-      const c = new Path2D();
-      c.moveTo(x, 470);
-      c.lineTo(x, 330);
-      c.lineTo(x + s * 50, 330);
-      c.lineTo(x + s * 50, 420);
-      c.lineTo(x + s * 140, 420);
-      c.lineTo(x + s * 140, 470);
-      c.closePath();
-      metal(kc, c, x, 330, x + s * 140, 470);
-      rebite(kc, x + s * 25, 360);
-      rebite(kc, x + s * 25, 445);
-      rebite(kc, x + s * 110, 445);
-    }
-    // a fechadura: a placa com o buraco da chave
-    const placa = new Path2D();
-    placa.moveTo(430, 36);
-    placa.lineTo(570, 36);
-    placa.lineTo(570, 170);
-    placa.quadraticCurveTo(500, 214, 430, 170);
-    placa.closePath();
-    metal(kc, placa, 430, 36, 570, 210);
-    kc.fillStyle = '#0d0905';
-    kc.beginPath();
-    kc.arc(500, 112, 15, 0, Math.PI * 2);
-    kc.moveTo(492, 118);
-    kc.lineTo(508, 118);
-    kc.lineTo(514, 160);
-    kc.lineTo(486, 160);
-    kc.closePath();
-    kc.fill();
-    for (const [x, y] of [[448, 56], [552, 56], [448, 156], [552, 156]]) rebite(kc, x, y, 7);
-    // os pés
-    for (const x of [100, 840]) {
-      const pe = new Path2D();
-      pe.rect(x, 470, 60, 34);
-      metal(kc, pe, x, 470, x + 60, 504);
-    }
-    kc.strokeStyle = TB;
-    kc.lineWidth = 8;
-    kc.stroke(frente);
-    // ---- a boca (o lado de dentro, visto de cima), de y -90 a 10 ----
-    const [boca, kb] = peca(100, -90);
-    const fundo = new Path2D();
-    fundo.moveTo(66, 4);
-    fundo.lineTo(110, -78);
-    fundo.lineTo(890, -78);
-    fundo.lineTo(934, 4);
-    fundo.closePath();
-    const gfb = kb.createLinearGradient(0, -78, 0, 4);
-    gfb.addColorStop(0, '#3a2412');
-    gfb.addColorStop(1, '#0b0704');
-    kb.fillStyle = gfb;
-    kb.fill(fundo);
-    gravar(kb, fundo, 500, -38, 460, 0, 4, 1.8, () => 0.7, '#050302', 0);
-    // a borda de cima das paredes (a espessura da tábua), clara
-    kb.strokeStyle = '#c99a5a';
-    kb.lineWidth = 12;
-    kb.lineJoin = 'round';
-    kb.beginPath();
-    kb.moveTo(66, 4);
-    kb.lineTo(110, -78);
-    kb.lineTo(890, -78);
-    kb.lineTo(934, 4);
-    kb.stroke();
-    kb.strokeStyle = TB;
-    kb.lineWidth = 2.5;
-    kb.stroke();
-    // ---- a tampa por fora (abobadada), de y -340 a 70 (a lingueta desce sobre a placa) ----
-    const [fora, kf] = peca(410, -340);
-    const tampa = new Path2D();
-    tampa.moveTo(44, 0);
-    tampa.lineTo(44, -150);
-    tampa.bezierCurveTo(44, -290, 300, -332, 500, -332);
-    tampa.bezierCurveTo(700, -332, 956, -290, 956, -150);
-    tampa.lineTo(956, 0);
-    tampa.closePath();
-    madeira(kf, tampa, 500, -166, 520, 0, (x, y) => 0.15 + (y + 330) / 700 + Math.abs(x - 500) / 1400, ['#d4ac7a', '#9c7044']);
-    kf.save();
-    kf.clip(tampa);
-    kf.strokeStyle = TB;
-    kf.lineWidth = 7;
-    for (const y of [-120, -230]) { kf.beginPath(); kf.moveTo(40, y + Math.abs(500 - 500) * 0); kf.bezierCurveTo(300, y - 40, 700, y - 40, 960, y); kf.stroke(); }
-    kf.restore();
-    for (const x of [170, 770]) {
-      const cinta = new Path2D();
-      cinta.moveTo(x, 0);
-      cinta.lineTo(x, x < 500 ? -268 : -270);
-      cinta.lineTo(x + 64, x < 500 ? -290 : -262);
-      cinta.lineTo(x + 64, 0);
-      cinta.closePath();
-      kf.save();
-      kf.clip(tampa);
-      metal(kf, cinta, x, -300, x + 64, 0);
-      kf.restore();
-      for (let y = -40; y > -250; y -= 70) { rebite(kf, x + 18, y); rebite(kf, x + 46, y - 30); }
-    }
-    const beira = new Path2D();
-    beira.rect(40, -34, 920, 38);
-    metal(kf, beira, 0, -34, 0, 4);
-    for (let x = 80; x < 940; x += 60) rebite(kf, x, -15, 7);
-    // a lingueta da fechadura, descendo da tampa
-    const lingueta = new Path2D();
-    lingueta.moveTo(468, -40);
-    lingueta.lineTo(532, -40);
-    lingueta.lineTo(532, 60);
-    lingueta.quadraticCurveTo(500, 84, 468, 60);
-    lingueta.closePath();
-    metal(kf, lingueta, 468, -40, 532, 80);
-    rebite(kf, 500, -14, 8);
-    kf.strokeStyle = TB;
-    kf.lineWidth = 8;
-    kf.stroke(tampa);
-    // ---- a tampa por dentro (o que se vê com ela aberta) ----
-    const [dentro, kd] = peca(330, -330);
-    const forro = new Path2D();
-    forro.moveTo(90, 0);
-    forro.lineTo(90, -200);
-    forro.bezierCurveTo(90, -300, 300, -326, 500, -326);
-    forro.bezierCurveTo(700, -326, 910, -300, 910, -200);
-    forro.lineTo(910, 0);
-    forro.closePath();
-    madeira(kd, forro, 500, -160, 500, Math.PI / 2, (x, y) => 0.55 - (y + 330) / 900, ['#5a381c', '#2e1c0c']);
-    kd.save();
-    kd.clip(forro);
-    kd.strokeStyle = TB;
-    kd.lineWidth = 3;
-    for (let x = 190; x < 900; x += 100) { kd.beginPath(); kd.moveTo(x, 0); kd.lineTo(x, -330); kd.stroke(); }
-    const gl = kd.createLinearGradient(0, 0, 0, -330);
-    gl.addColorStop(0, 'rgba(255,220,150,.35)');
-    gl.addColorStop(1, 'rgba(255,220,150,0)');
-    kd.fillStyle = gl;
-    kd.fillRect(0, -330, 1000, 330);
-    kd.restore();
-    kd.strokeStyle = '#b98a3c';
-    kd.lineWidth = 14;
-    kd.stroke(forro);
-    kd.strokeStyle = TB;
-    kd.lineWidth = 3;
-    kd.stroke(forro);
-    for (const c of [corpo, fora, dentro]) grao(c.getContext('2d'), c.width, c.height, 14, 31);
-    for (const c of [corpo, boca, fora, dentro]) { c.setAttribute('aria-hidden', 'true'); c.className = 'rv-gravura'; }
-    return { corpo, boca, fora, dentro };
   }
   // A legenda do fim: "Nova!" em destaque quando a frase começa com ela.
   function legendaHtml(texto) {
@@ -4274,13 +4079,29 @@
     // a carta com 320 a 340 px de largura no celular (menos se a tela for baixa); o baú, maior
     const larg = opts.largura || Math.round(Math.max(220, Math.min(340, vw - 50, (vh - 300) / 1.4)));
     const largBau = Math.round(Math.min(vw - 20, larg + 44));
+    // A linha da boca do baú (o meio da boca escura, y 51 no desenho), no palco: o baú
+    // fechado fica no meio do palco, desce o que for preciso para a carta estreita caber
+    // inteira acima da boca, e nunca passa do pé do palco. u é a unidade do desenho em px.
+    const u = largBau / 100;
+    const hc = larg * 1.4;
+    const S0 = 0.56;
+    const yb = Math.round(Math.min(hc + 14 - 47 * u, Math.max((hc + 20) / 2 - 11 * u, S0 * hc - 32)));
+    // o recorte da carta enquanto ela sobe: tudo acima da beirada da frente da boca (a metade
+    // de baixo da elipse escura), para a carta sair de dentro dela
+    const arco = [];
+    for (let i = 0; i <= 12; i++) {
+      const a = (i / 12) * Math.PI;
+      arco.push((50 * u + 35 * u * Math.cos(a)).toFixed(1) + 'px ' + (yb + 5.5 * u * Math.sin(a)).toFixed(1) + 'px');
+    }
+    const boca = 'polygon(-200% -200%, 300% -200%, 300% ' + yb + 'px, ' + arco.join(', ') + ', -200% ' + yb + 'px)';
     const legenda = opts.legenda || ('Nova! ' + (carta.album || ''));
-    alvo.innerHTML = '<div class="rv" data-raridade="' + rar + '" data-fase="fechado" style="--luz:' + R.luz + ';--t:' + ESCALA_TEMPO
-      + ';--lc:' + larg + 'px;--lb:' + largBau + 'px">'
-      + '<button type="button" class="rv-pular">Pular</button>'
+    alvo.innerHTML = '<div class="rv" data-raridade="' + rar + '" data-fase="fechado" style="--luz:' + R.luz + ';--tinta-r:' + R.tinta
+      + ';--t:' + ESCALA_TEMPO + ';--lc:' + larg + 'px;--lb:' + largBau + 'px;--yb:' + yb + 'px;--s0:' + S0 + ';--boca:' + boca + '">'
+      + '<button type="button" class="botao contorno pequeno rv-pular">Pular</button>'
       + '<div class="rv-palco">'
       + '<i class="rv-raios" aria-hidden="true"></i><i class="rv-aura" aria-hidden="true"></i>'
-      + '<div class="rv-bau-pecas" aria-hidden="true"><i class="rv-peca rv-luz"></i><div class="rv-peca rv-boca"></div></div>'
+      + '<div class="rv-bau-pecas" aria-hidden="true"><span class="rv-peca rv-boca"></span><i class="rv-luz"></i>'
+      + '<span class="rv-faiscas">' + [0, 1, 2, 3, 4, 5, 6, 7].map((i) => '<i style="--i:' + i + '"></i>').join('') + '</span></div>'
       + '<div class="rv-saida"><div class="rv-carta"><i class="rv-anel" aria-hidden="true"></i></div></div>'
       + '<button type="button" class="rv-bau" aria-label="Abrir o baú"><span class="rv-peca rv-corpo"></span><span class="rv-peca rv-tampa"><span class="rv-dobradica"></span></span></button>'
       + '</div>'
@@ -4289,22 +4110,22 @@
       + '<p class="rv-titulo">' + CC.esc(carta.titulo) + ' <span>' + CC.esc(carta.ref) + '</span></p>'
       + '<div class="rv-botoes"></div></div></div>';
     const rv = alvo.querySelector('.rv');
-    const bau = bauEmGravura(largBau);
+    const bau = bauDaTrilha();
     rv.querySelector('.rv-corpo').appendChild(bau.corpo);
     rv.querySelector('.rv-boca').appendChild(bau.boca);
     // a tampa é uma peça só, com duas faces: a de fora e, no verso dela, a de dentro
-    bau.fora.classList.add('rv-tampa-fora');
-    bau.dentro.classList.add('rv-tampa-dentro');
     rv.querySelector('.rv-dobradica').append(bau.fora, bau.dentro);
     const api = cartaViva(c, { largura: larg, verso: true });
     api.el.setAttribute('tabindex', '0');
     rv.querySelector('.rv-carta').appendChild(api.el);
     const botoes = rv.querySelector('.rv-botoes');
-    botoes.appendChild(botaoVirar(api));
+    const virar0 = botaoVirar(api);
+    virar0.classList.add('botao', 'contorno', 'pequeno');
+    botoes.appendChild(virar0);
     if (opts.aoLer) {
       const ler = document.createElement('button');
       ler.type = 'button';
-      ler.className = 'botao rv-ler';
+      ler.className = 'botao pequeno rv-ler';
       ler.textContent = 'Ler a história';
       ler.onclick = () => opts.aoLer(carta);
       botoes.appendChild(ler);

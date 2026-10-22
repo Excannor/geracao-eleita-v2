@@ -187,25 +187,36 @@
 .cv-mini { display: block; aspect-ratio: 5 / 7; height: auto; border-radius: 4.6% / 3.3%; box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .55); }
 
 /* ---------- a revelação no baú (revelar) ----------
-   O palco tem a largura do baú (--lb, maior que a carta) e a altura da carta (--lc x 1,4).
-   As camadas (z-index, de trás para a frente): os raios e a aura (0); a tampa aberta (1); a
-   boca do baú (2); a coluna de luz (3); o corpo (4); a carta (5); a tampa fechada (6). Cada
-   peça do baú é um invólucro (.rv-peca, que balança) com o canvas dentro. Só transform e
-   opacity animam (e o z-index da tampa, que troca na metade do giro). --t é a escala do tempo.
-   A tampa gira de verdade na dobradiça de trás: uma peça só, com a face de fora e a de dentro
-   (backface-visibility), que troca de face sozinha a 90 graus; nada de duas tampas
-   translúcidas. A carta sobe de dentro: estreita (mais que a boca), recortada na beirada do
-   baú, e só cresce depois de sair inteira; o baú some por trás dela, sem esmaecer por cima. */
+   A cena é do app: o fundo, a tinta, os botões e as letras vêm das fichas do app (--fundo,
+   --tinta, --campo..., com o valor do tema claro de reserva para a amostra) e seguem o tema
+   claro e o escuro. O que é especial é só a luz da raridade (a coluna, a aura e os raios) e o
+   brilho da carta.
+   O baú é o da Trilha (CC.arte.bau('pronto', 'madeira')), grande: cada peça é um SVG no mesmo
+   quadro e no mesmo lugar (.rv-peca, que balança), umas por cima das outras. --lb é a largura
+   do baú; uma unidade do desenho vale --lb / 100, e --yb é a linha da boca (y 51 do desenho).
+   As camadas (z-index, de trás para a frente): os raios e a aura (0); o corpo (1); a tampa
+   aberta (2); a boca, a luz e as faíscas (3 e 4); a carta (5); a tampa fechada (6). Só
+   transform e opacity animam (e o z-index da tampa, que troca na metade do giro). --t é a
+   escala do tempo. A tampa gira de verdade na dobradiça de trás: uma peça só, com a face de
+   fora e a de dentro (backface-visibility), que troca de face sozinha a 90 graus, e termina
+   inclinada como a do baú aberto da Trilha. A carta sobe de dentro: estreita (mais que a
+   boca), recortada na beirada da frente da boca, e só cresce depois de sair inteira; o baú
+   some por trás dela, sem esmaecer por cima. */
 .rv {
-  --t: 1; --hc: calc(var(--lc) * 1.4); --yb: calc((var(--hc) + 20px - var(--lb) * .85) / 2 + var(--lb) * .34 + 36px);
-  --s0: .56; --forca: 1;
+  --t: 1; --hc: calc(var(--lc) * 1.4); --forca: 1;
   position: relative; overflow: hidden; display: grid; justify-items: center; align-content: start; gap: 8px;
-  padding: 60px 0 24px; color: #f2ecd8; text-align: center; -webkit-tap-highlight-color: transparent;
+  padding: 60px 0 24px; background: var(--fundo, #f4f5f0); color: var(--tinta, #2c2d2b); font-family: var(--fonte-ui, Manrope, sans-serif);
+  text-align: center; -webkit-tap-highlight-color: transparent;
 }
-.rv-pular {
-  position: absolute; top: 10px; right: 12px; z-index: 7; min-height: 44px; padding: 0 20px; border: 1px solid rgba(242, 236, 216, .3); border-radius: 999px;
-  background: rgba(14, 15, 12, .55); color: #f2ecd8; font: 600 .9375rem/1 Manrope, sans-serif; cursor: pointer;
+/* os botões são os do app (.botao contorno pequeno): as mesmas medidas aqui, para a amostra */
+.rv .rv-pular, .rv .rv-botoes .botao {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: auto; min-height: 44px; padding: 10px 18px;
+  border: 0; border-radius: 999px; background: var(--campo, #eff1ea); color: var(--tinta-forte, #151615);
+  font: 700 .9375rem/1.25 var(--fonte-ui, Manrope, sans-serif); letter-spacing: 0; text-transform: none; cursor: pointer;
 }
+.rv .rv-botoes .rv-ler { background: var(--inverso, #151615); color: var(--inverso-tinta, #ffffff); }
+.rv .rv-botoes .botao svg { width: 20px; height: 20px; }
+.rv .rv-pular { position: absolute; top: 10px; right: 12px; z-index: 7; }
 .rv[data-fase="fim"] .rv-pular { visibility: hidden; }
 .rv-palco { position: relative; width: var(--lb); height: calc(var(--hc) + 20px); isolation: isolate; }
 .rv-palco > *, .rv-bau-pecas > *, .rv-bau > *, .rv-saida > * { position: absolute; }
@@ -213,39 +224,72 @@
 .rv-bau { padding: 0; border: 0; background: none; cursor: pointer; }
 .rv:not([data-fase="fechado"]) .rv-bau { pointer-events: none; }
 .rv-raios, .rv-aura { z-index: 0; }
-.rv-peca { left: 0; width: var(--lb); display: block; perspective: 700px; perspective-origin: 50% 0; }
-.rv-peca canvas { display: block; width: 100%; height: 100%; }
-.rv-corpo { top: var(--yb); height: calc(var(--lb) * .51); z-index: 4; }
-.rv-boca { top: calc(var(--yb) - var(--lb) * .09); height: calc(var(--lb) * .1); z-index: 2; }
-.rv-tampa { top: calc(var(--yb) - var(--lb) * .34); height: calc(var(--lb) * .41); z-index: 6; }
+/* no app, a revelação entra na tela cheia do baú, mais alta que a tela: o começo (o título)
+   fica à vista e o resto rola, em vez de cortar o alto ao centralizar */
+.tela-cheia-palco:has(.rv) { justify-content: safe center; }
+.rv-peca {
+  left: 0; top: calc(var(--yb) - var(--lb) * .51); width: var(--lb); height: calc(var(--lb) * 1.12); display: block;
+  transform-origin: 50% 88.4%; perspective: 700px; perspective-origin: 50% 0;
+}
+.rv-svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; }
+/* a sombra no chão, como a do baú grande do app */
+.rv-corpo-svg { color: rgba(0, 0, 0, .5); }
+.rv-corpo { z-index: 1; }
+.rv-boca { z-index: 3; opacity: 0; }
+.rv-brilho { fill: var(--luz); }
 .rv-luz {
-  left: calc(var(--lb) * .1); width: calc(var(--lb) * .8); top: calc(var(--yb) - var(--hc) - var(--lb) * .03); height: var(--hc); z-index: 3;
+  left: calc(var(--lb) * .1); width: calc(var(--lb) * .8); top: calc(var(--yb) - var(--hc)); height: var(--hc); z-index: 3;
   background: radial-gradient(ellipse 50% 100% at 50% 100%, var(--luz), color-mix(in srgb, var(--luz) 30%, transparent) 40%, transparent 72%);
   transform-origin: 50% 100%; transform: scaleY(0); opacity: 0; pointer-events: none;
 }
-/* a tampa: a dobradiça fica no alto da face de fora (a beira de trás, vista de frente); ao
-   abrir, gira -166 graus e desce até a beira de trás da boca, onde a face de dentro fica em pé */
-.rv-dobradica { position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: 50% calc(var(--lb) * .008); }
-.rv-dobradica canvas { position: absolute; left: 0; width: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
-.rv-tampa .rv-tampa-fora { top: 0; height: 100%; }
-.rv-tampa .rv-tampa-dentro { top: auto; bottom: calc(100% - var(--lb) * .008); height: calc(var(--lb) * .33); transform-origin: 50% 100%; transform: rotateX(180deg); }
-@keyframes rv-tampa-abre { from { transform: translateY(0) rotateX(0deg); } to { transform: translateY(calc(var(--lb) * .252)) rotateX(-166deg); } }
-@keyframes rv-tampa-atras { 0%, 49% { z-index: 6; } 50%, 100% { z-index: 1; } }
+/* a tampa: a dobradiça é a beira de cima da face de fora (y 26 do desenho, a beira de trás vista
+   de frente); ao abrir, gira 180 graus para trás, desce 21 até a beira de trás da boca e
+   inclina 14 graus, como a tampa do baú aberto da Trilha. A face de dentro já está desenhada
+   no verso, virada, e aparece sozinha depois dos 90 graus. */
+.rv-tampa { z-index: 6; }
+.rv-dobradica { position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: 50% 23.214%; }
+.rv-dobradica .rv-svg { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.rv-dobradica .rv-tampa-dentro { transform-origin: 50% 23.214%; transform: rotateX(180deg); }
+@keyframes rv-tampa-abre {
+  from { transform: translateY(0) rotate(0deg) rotateX(0deg); }
+  to { transform: translateY(calc(var(--lb) * .21)) rotate(-14deg) rotateX(-180deg); }
+}
+@keyframes rv-tampa-atras { 0%, 49% { z-index: 6; } 50%, 100% { z-index: 2; } }
 .rv:not([data-fase="fechado"]):not([data-fase="balanca"]):not([data-fase="menos"]) .rv-dobradica { animation: rv-tampa-abre calc(300ms * var(--t)) cubic-bezier(.45, 0, .35, 1) both; }
 .rv:not([data-fase="fechado"]):not([data-fase="balanca"]):not([data-fase="menos"]) .rv-tampa { animation: rv-tampa-atras calc(300ms * var(--t)) linear both; }
+.rv:is([data-fase="abre"], [data-fase="sobe"]) .rv-boca { opacity: 1; transition: opacity calc(90ms * var(--t)) ease; }
 .rv:is([data-fase="abre"], [data-fase="sobe"]) .rv-luz { transform: scaleY(1); opacity: var(--forca); transition: transform calc(320ms * var(--t)) cubic-bezier(.2, .8, .3, 1), opacity calc(200ms * var(--t)) ease; }
-/* fechado, o baú respira; ao tocar, balança (só translate: as peças andam juntas) */
-.rv[data-fase="fechado"] .rv-peca { animation: rv-respirar calc(2400ms * var(--t)) ease-in-out infinite; }
-@keyframes rv-respirar { 50% { transform: translateY(-4px); } }
+/* as faíscas do baú do app, na cor da luz, saindo da boca para cima quando a tampa abre */
+.rv-faiscas { left: 50%; top: var(--yb); z-index: 4; pointer-events: none; }
+.rv-faiscas i {
+  position: absolute; left: 0; top: 0; width: 10px; height: 18px; margin: -9px 0 0 -5px; border-radius: 6px; background: var(--luz); opacity: 0;
+  --a: calc(var(--i) * 22deg - 77deg);
+}
+.rv-faiscas i:nth-child(2n) { width: 8px; height: 12px; background: color-mix(in srgb, var(--luz) 55%, #fff6c9); }
+.rv:is([data-fase="abre"], [data-fase="sobe"]) .rv-faiscas i { animation: rv-faisca calc(1100ms * var(--t)) cubic-bezier(.2, .8, .3, 1) calc(120ms * var(--t)) both; }
+@keyframes rv-faisca {
+  0% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--lb) * -.06)) scale(.4); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--lb) * -.34)) scale(1); }
+}
+/* fechado, o baú chama como o da Trilha; ao tocar, balança (as peças giram juntas, no mesmo
+   quadro e no mesmo eixo) */
+.rv[data-fase="fechado"] .rv-peca { animation: rv-chama calc(2200ms * var(--t)) ease-in-out infinite; }
+@keyframes rv-chama {
+  0%, 70%, 100% { transform: rotate(0) scale(1); }
+  76% { transform: rotate(-7deg) scale(1.05); }
+  84% { transform: rotate(6deg) scale(1.05); }
+  92% { transform: rotate(-3deg) scale(1.02); }
+}
 .rv[data-fase="balanca"] .rv-peca { animation: rv-balancar calc(400ms * var(--t)) ease-in-out; }
-@keyframes rv-balancar { 15% { transform: translate(-7px, -2px); } 35% { transform: translate(7px, -4px); } 55% { transform: translate(-5px, -2px); } 75% { transform: translate(4px, -1px); } }
+@keyframes rv-balancar { 20% { transform: rotate(-8deg) scale(1.03); } 45% { transform: rotate(8deg) scale(1.05); } 70% { transform: rotate(-5deg) scale(1.03); } 90% { transform: rotate(2deg); } }
 /* a carta sobe de dentro do baú em dois tempos: (1) estreita (--s0, mais estreita que a boca),
-   recortada na beirada da frente do baú (.rv-saida), até sair inteira por cima dela; (2) só
-   então cresce até o lugar, na frente do baú */
-.rv-saida { inset: 0; z-index: 5; pointer-events: none; --borda: calc(var(--yb) - var(--lb) * .004); }
+   recortada na beirada da frente da boca (.rv-saida, --boca), até sair inteira por cima dela;
+   (2) só então cresce até o lugar, na frente do baú */
+.rv-saida { inset: 0; z-index: 5; pointer-events: none; }
 .rv-carta {
   top: 10px; left: calc((var(--lb) - var(--lc)) / 2); width: var(--lc); height: var(--hc);
-  --ty0: calc(var(--yb) - 6px - (1 - var(--s0)) * var(--hc) / 2);
+  --ty0: calc(var(--yb) + var(--lb) * .06 - 10px - (1 - var(--s0)) * var(--hc) / 2);
   --ty1: calc(var(--yb) - 18px - (1 + var(--s0)) * var(--hc) / 2);
   transform: translateY(var(--ty0)) scale(var(--s0)); opacity: 0; pointer-events: none;
 }
@@ -259,7 +303,7 @@
   100% { transform: translateY(0) scale(1); }
 }
 @keyframes rv-saida {
-  0%, 52% { clip-path: polygon(-200% -200%, 300% -200%, 300% var(--borda), -200% var(--borda)); }
+  0%, 52% { clip-path: var(--boca); }
   52.5%, 100% { clip-path: polygon(-200% -200%, 300% -200%, 300% 300%, -200% 300%); }
 }
 /* o baú fica parado atrás da carta e some só quando ela já o cobre inteiro */
@@ -317,20 +361,22 @@
 .rv[data-fase="espera"] .rv-anel { animation: rv-anel calc(1000ms * var(--t)) cubic-bezier(.4, 0, .4, 1) infinite; }
 @keyframes rv-pulso { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.055); } }
 @keyframes rv-anel { 0%, 100% { opacity: .15; transform: scale(.98); } 45% { opacity: 1; transform: scale(1.04); } }
-/* o nome e o ícone da raridade, embaixo, desde que a carta sobe */
+/* o nome e o ícone da raridade, embaixo, desde que a carta sobe; nas letras do app, na tinta
+   da raridade no claro e na luz dela no escuro */
 .rv-raridade {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 30px; margin: 4px 0 0; color: var(--luz);
-  font: 600 1.0625rem/1 Oswald, sans-serif; letter-spacing: .18em; text-transform: uppercase; opacity: 0; transition: opacity calc(400ms * var(--t)) ease calc(100ms * var(--t));
+  display: inline-flex; align-items: center; gap: 8px; min-height: 30px; margin: 4px 0 0; color: var(--tinta-r);
+  font: 800 1rem/1 var(--fonte-ui, Manrope, sans-serif); letter-spacing: .02em; opacity: 0; transition: opacity calc(400ms * var(--t)) ease calc(100ms * var(--t));
 }
+[data-tema="escuro"] .rv-raridade { color: var(--luz); }
 .rv-raridade svg { width: 28px; height: 28px; }
 .rv:not([data-fase="fechado"]):not([data-fase="balanca"]):not([data-fase="abre"]) .rv-raridade { opacity: 1; }
 .rv-fim:focus { outline: none; }
 .rv-fim { display: grid; justify-items: center; gap: 6px; padding: 0 16px; opacity: 0; transform: translateY(8px); transition: opacity .4s ease, transform .4s ease; pointer-events: none; }
 .rv[data-fase="fim"] .rv-fim { opacity: 1; transform: none; pointer-events: auto; }
-.rv-nova { margin: 0; font: 600 1.0625rem/1.35 Manrope, sans-serif; }
-.rv-nova strong { color: var(--luz); }
-.rv-titulo { margin: 0; font: 600 1.25rem/1.25 Literata, Georgia, serif; }
-.rv-titulo span { display: block; margin-top: 4px; color: rgba(242, 236, 216, .72); font: 600 .8125rem/1 Oswald, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.rv-nova { margin: 0; color: var(--tinta, #2c2d2b); font-size: .9375rem; font-weight: 500; line-height: 1.4; }
+.rv-nova strong { color: var(--salvia-texto, #5a6b2a); font-weight: 800; }
+.rv-titulo { margin: 0; color: var(--tinta-forte, #151615); font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.18; }
+.rv-titulo span { display: block; margin-top: 4px; color: var(--tinta-fraca, #686b66); font-size: .8125rem; font-weight: 700; letter-spacing: 0; }
 .rv-botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
 
 /* Menos movimento: a carta não inclina, o brilho fica parado no meio do caminho, virar é
@@ -338,13 +384,13 @@
    aparece de frente (troca suave), com o halo parado e o nome */
 @media (prefers-reduced-motion: reduce) {
   .carta-viva { --rx: 0deg !important; --ry: 0deg !important; --o: .45 !important; --mx: 35% !important; --my: 30% !important; --bx: 40% !important; --by: 40% !important; }
-  .rv-raios, .rv-peca, .rv-carta, .rv-anel, .rv-saida, .rv-dobradica, .rv-tampa { animation: none !important; }
+  .rv-raios, .rv-peca, .rv-carta, .rv-anel, .rv-saida, .rv-dobradica, .rv-tampa, .rv-faiscas i { animation: none !important; }
   .rv-raios { display: none; }
   .rv-carta { transform: none !important; transition: opacity .4s ease !important; }
   .rv-peca { transition: opacity .35s ease !important; transform: none !important; }
 }
 :root.menos-movimento .carta-viva { --rx: 0deg !important; --ry: 0deg !important; --o: .45 !important; --mx: 35% !important; --my: 30% !important; --bx: 40% !important; --by: 40% !important; }
-:root.menos-movimento :is(.rv-raios, .rv-peca, .rv-carta, .rv-anel, .rv-saida, .rv-dobradica, .rv-tampa) { animation: none !important; }
+:root.menos-movimento :is(.rv-raios, .rv-peca, .rv-carta, .rv-anel, .rv-saida, .rv-dobradica, .rv-tampa, .rv-faiscas i) { animation: none !important; }
 :root.menos-movimento .rv-raios { display: none; }
 :root.menos-movimento .rv-carta { transform: none !important; transition: opacity .4s ease !important; }
 :root.menos-movimento .rv-peca { transition: opacity .35s ease !important; transform: none !important; }
