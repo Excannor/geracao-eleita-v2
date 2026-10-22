@@ -441,8 +441,8 @@ await foto('5b-missoes');
 
 // ---------- perfil e configurações ----------
 await irPara('#/perfil');
-ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".colecao-atalhos a").length === 2 && document.querySelectorAll(".visao-geral .visao-item").length === 4'),
-  'o perfil mostra a visão geral, conquistas com nível e a coleção');
+ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".colecao-atalhos a").length === 3 && !!document.querySelector(".colecao-atalhos [data-album-cartas]") && document.querySelectorAll(".visao-geral .visao-item").length === 4'),
+  'o perfil mostra a visão geral, conquistas com nível e a coleção (Conquistas, Troféus e Cartas)');
 // O nome no Perfil: teto de 20, contador só perto dele; o que passa não é guardado (nem cortado).
 ok(await av(q('#apelido') + '.maxLength') === 20 && await av(q('.rotulo-apelido .contagem') + '.hidden'), 'o nome curto no Perfil não mostra o contador');
 await preencher('#apelido', 'Ana Clara de Souza');

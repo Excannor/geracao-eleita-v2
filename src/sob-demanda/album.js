@@ -34,7 +34,8 @@
     return { id, album: a.nome, albumId: a.id, numero: c.numero, total: doAlbum(c.album).length, titulo: c.titulo, sabia: c.voceSabia,
       ref: c.referencia, desenho: c.desenho || id, link: c.link || '', raridade: raridade || c.raridade || 'linho', rascunho: !!c.rascunho };
   };
-  const temArte = (carta) => !!(CC.cartas && (CC.cartas.temArte ? CC.cartas.temArte(carta) : (CC.cartas.desenhos || {})[carta.desenho]));
+  // temArte(id) na arte nova (os desenhos pelo id da carta); na amostra, pelo campo desenho.
+  const temArte = (carta) => !!(CC.cartas && (CC.cartas.temArte ? CC.cartas.temArte(carta.id) : (CC.cartas.desenhos || {})[carta.desenho]));
   const icone = (rar) => (CC.cartas && CC.cartas.iconeSvg ? CC.cartas.iconeSvg(rar) : '');
 
   // A carta de texto, para quem ainda não tem desenho: frente com o texto, verso com a marca.
@@ -141,13 +142,20 @@
       + (x.completou ? '<p class="album-completo">' + icone('gloria') + '<span>Álbum completo! Escolha uma carta para a versão Glória.</span></p>' : '') + '</div>';
     const alvo = palco.querySelector('.album-revela-carta');
     const largura = Math.round(Math.min(300, innerWidth * 0.68, Math.max(180, (innerHeight - 380) / 1.4)));
-    if (temArte(carta)) CC.cartas.revelar(alvo, carta, { raridade: carta.raridade, nova: !!x.nova, progresso: x.tem + '/' + x.total });
-    else {
+    const texto = legenda(x);
+    let daArte = false;
+    if (temArte(carta)) {
+      // A arte faz a revelação; a nova (uma Promise) já mostra a legenda e o título dentro dela.
+      const api = CC.cartas.revelar(alvo, carta, { raridade: carta.raridade, nova: !!x.nova, progresso: x.tem + '/' + x.total,
+        legenda: texto.replace(/<[^>]+>/g, ''), abrir: 'ja' });
+      daArte = !!(api && typeof api.then === 'function');
+    } else {
       const api = cartaGrande(alvo, carta, largura);
       api.el.classList.add('entrando');
     }
     const fala = palco.querySelector('.album-legenda');
-    setTimeout(() => { fala.innerHTML = legenda(x); palco.querySelector('.album-revela').classList.add('legenda-pronta'); }, menosMovimento() ? 0 : 1200);
+    if (daArte) { fala.remove(); palco.querySelector('.album-revela-titulo').remove(); }
+    else setTimeout(() => { fala.innerHTML = texto; palco.querySelector('.album-revela').classList.add('legenda-pronta'); }, menosMovimento() ? 0 : 1200);
     let pe = el.querySelector('.tela-cheia-pe');
     if (!pe) { pe = document.createElement('div'); pe.className = 'tela-cheia-pe'; el.appendChild(pe); }
     pe.innerHTML = (temArte(carta) ? '<button class="botao contorno" data-compartilhar-carta>' + CC.ico('compartilhar') + 'Compartilhar carta</button>' : '')

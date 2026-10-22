@@ -220,6 +220,34 @@ try {
   ok(await esperar(q('.tela-carta [data-versao="gloria"]') + '?.getAttribute("aria-pressed") === "true"'), 'e a carta abre na versão Glória');
   await fecharTudo();
 
+  // ---------- outra fonte: a prática sem erro revela uma carta ----------
+  await av('location.hash = "#/"');
+  await dormir(3300);
+  await av('CC.gravar("pratica", { 1: { melhor: 10, total: 10, feitoEm: CC.hojeIso(), vezes: 1 } }); CC.acertarCartas(); true');
+  ok(await esperar('/Prática sem nenhum erro/.test((document.querySelector(".tela-carta-nova h1") || {}).textContent || "")', 10000), 'a prática sem erro (outra fonte) revela uma carta, com a origem no título');
+  ok(await esperar('/Nova!|Nova versão|Repetida/.test((document.querySelector(".tela-carta-nova .album-legenda") || {}).textContent || "")') && !!(await av('CC.estado().cartas.eventos["pratica:1"]')),
+    'com a legenda, e o evento fica no livro-caixa');
+  await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
+  ok(await esperar('!document.querySelector(".tela-carta-nova")'), 'Continuar fecha');
+  // as legendas de repetida e de versão nova, uma revelação depois da outra
+  await av(`CC.album.revelarNovas([{ fonte: 'desafio', chave: 'desafio:x', carta: 'davi-funda', raridade: 'prata', nova: false, versaoNova: false, copias: 3, tem: 3, total: 13 },
+    { fonte: 'passos', chave: 'passos:todos', carta: 'davi-funda', raridade: 'ouro', nova: false, versaoNova: true, copias: 1, tem: 3, total: 13 }]); true`);
+  ok(await esperar('/Repetida: agora você tem 3 de Davi e a funda \\(Prata\\)/.test((document.querySelector(".tela-carta-nova .album-legenda") || {}).textContent || "")'),
+    'repetida: "Repetida: agora você tem 3 de Davi e a funda (Prata)"');
+  await dormir(1300);
+  await nosDoisTemas('09-repetida');
+  await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
+  ok(await esperar('/Nova versão Ouro de Davi e a funda/.test((document.querySelector(".tela-carta-nova .album-legenda") || {}).textContent || "") && /Primeiros passos completos/.test(document.querySelector(".tela-carta-nova h1").textContent)'),
+    'a seguinte: "Nova versão Ouro de Davi e a funda", com a origem dela');
+  await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
+  ok(await esperar('!document.querySelector(".tela-carta-nova")'), 'no fim da fila, Continuar fecha');
+
+  // ---------- troféus ----------
+  await av('location.hash = "#/perfil/trofeus"');
+  ok(await esperar('/Álbuns de cartas/.test(document.body.textContent) && /Heróis da fé/.test(document.body.textContent)'), 'Troféus tem a estante "Álbuns de cartas"');
+  await av('location.hash = "#/perfil/album"');
+  await esperar('!!' + q('.album-grade .album-carta'));
+
   // ---------- desktop ----------
   largura = 1280;
   await cmd('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });

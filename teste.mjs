@@ -3087,6 +3087,16 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     checar(lido.oia[1].oracao === 'SEGREDO-ORACAO-ANA' && lido.notas['v:João 3.16'].texto === 'SEGREDO-VERSO-ANA' && lido.notas['e:nota:x'].texto === 'SEGREDO-NOTA-ANA' && lido.notas['e:nota:x'].contexto === 'nota:x'
       && !lido.anotacoes['verso:João 3.16'] && lido.historia.antes === 'SEGREDO-HISTORIA-ANA',
       'o dono lê de volta, em claro, pelo /api/estado');
+    // as cartas pelo servidor: gravam e voltam; uma carta de convite inventada não entra; um aparelho antigo, sem cartas, não as apaga
+    {
+      const comCartas = { ...lido, atualizadoEm: Date.now() + 500, cartas: { eventos: { 'bau:dia:7': { em: 5, carta: 'mana', raridade: 'prata' },
+        'convite:tier:1': { em: 6, carta: 'semente-lancada', raridade: 'linho' } }, glorias: {} } };
+      checar((await pedir('/api/estado', comCartas, ana, 'PUT')).status === 200, 'o dono grava o estado com cartas');
+      await pedir('/api/estado', { ...CC.normalizarEstado({}), atualizadoEm: Date.now() + 600, cartas: undefined }, ana, 'PUT');
+      const volta = (await (await pedir('/api/estado', null, ana)).json()).cartas || {};
+      checar(volta.eventos && volta.eventos['bau:dia:7'] && volta.eventos['bau:dia:7'].carta === 'mana' && !volta.eventos['convite:tier:1'],
+        'no servidor, a carta do baú grava e volta, a de convite que ele não confirma não entra, e o aparelho sem cartas não as apaga');
+    }
     const outro = await (await pedir('/api/estado', null, bia)).text();
     checar(!/SEGREDO/.test(outro), 'outra pessoa não obtém o texto');
     const painel = await pedir('/api/painel', null, chefe);
