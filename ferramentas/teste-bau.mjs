@@ -106,8 +106,16 @@ true`;
 
 console.log('\n  O baú e as cartas\n');
 const LANCADAS = ['davi-funda', 'poco-jaco', 'azeite-viuva', 'arca-alianca', 'tumulo-vazio', 'mar-vermelho'];
-// a legenda da revelação: dentro da arte (.rv-nova) ou, sem desenho, embaixo (.album-legenda)
-const legenda = (tela) => '((document.querySelector("' + tela + ' .rv-nova, ' + tela + ' .album-legenda") || {}).textContent || "")';
+// a legenda da revelação, na tela do fim
+const legenda = (tela) => '((document.querySelector("' + tela + ' .album-fim .album-legenda") || {}).textContent || "")';
+// os baús na tela: o da Trilha (.bau-grande) e o da revelação da arte (.rv-bau)
+const baus = (tela) => 'document.querySelectorAll("' + tela + ' .bau-grande, ' + tela + ' .rv-bau").length';
+// o fim cabe sem rolar: a tela não rola, e a carta, a legenda e os botões estão inteiros na tela
+const cabe = (tela) => `(() => { const t = document.querySelector("${tela}"); const p = t.querySelector(".tela-cheia-palco");
+  const dentro = (el) => { const r = el.getBoundingClientRect(); return r.top >= -1 && r.bottom <= innerHeight + 1 && r.left >= -1 && r.right <= innerWidth + 1; };
+  return p.scrollHeight <= p.clientHeight + 1 && [...t.querySelectorAll(".album-fim .carta-viva, .album-fim .carta-texto, .album-fim .album-legenda, .album-fim [data-ler], .tela-cheia-pe .botao")].every(dentro); })()`;
+// tocar no baú: o da revelação, quando as peças já chegaram, ou o da Trilha
+const tocarBau = () => av('(() => { const b = document.querySelector(".tela-bau .rv-bau") || document.querySelector(".tela-bau [data-abrir-bau]"); b.click(); return true; })()');
 const terminar = (tela) => av('(() => { const b = document.querySelector("' + tela + ' .rv-pular"); if (b) b.click(); return true; })()');
 try {
   await cmd('Page.enable');
@@ -130,23 +138,30 @@ try {
   ok(await esperar('!!' + q('[data-abrir-bau]')), 'a tela do baú abre');
   await esperar('!!window.CC.album && !!window.CC.cartas', 8000);
   await av(SIMULAR);
-  await av(q('[data-abrir-bau]') + '.click()');
-  ok(await esperar('!!' + q('.tela-bau .rv .carta-viva'), 8000), 'abrir o baú passa a abertura para a arte (CC.cartas.revelar), sem animar o baú duas vezes');
-  ok(await av('!document.querySelector(".tela-bau .bau-grande.abrindo")'), 'com as peças prontas, o baú da Trilha não balança antes');
-  ok(await esperar('document.querySelector(".tela-bau .rv").dataset.fase === "fim"', 15000), 'a revelação chega ao fim (baú, luz, carta que sobe e vira)');
+  ok(await esperar('!!document.querySelector(".tela-bau .rv-bau")', 8000) && await av(baus('.tela-bau') + ' === 1 && !document.querySelector(".tela-bau .bau-grande")'),
+    'com as peças prontas, o baú da tela já é o da revelação: um baú só, antes do toque');
+  ok(await av('!CC.estado().bausAbertos["dia:7"] && !CC.estado().cartas.eventos["bau:dia:7"]'), 'antes do toque nada é guardado');
+  await tocarBau();
+  ok(await esperar('!!' + q('.tela-bau .rv .carta-viva'), 8000), 'o toque passa a abertura para a arte (CC.cartas.revelar), no mesmo lugar');
+  const durante = [];
+  for (let i = 0; i < 12 && await av('!!document.querySelector(".tela-bau .rv") && document.querySelector(".tela-bau .rv").dataset.fase !== "fim"'); i++) {
+    durante.push(await av('[' + baus('.tela-bau') + ', document.querySelector(".tela-bau .rv").dataset.fase, !!document.querySelector(".tela-bau .tela-cheia-pe:not([hidden])")]'));
+    await dormir(350);
+  }
+  ok(durante.length >= 3 && durante.every(([n, , pe]) => n === 1 && !pe), 'durante a abertura há um baú só, e os botões do fim não aparecem (' + durante.map((d) => d[1]).join(',') + ')');
+  ok(await av('!!document.querySelector(".tela-bau .rv-pular")'), 'durante a abertura o único controle é "Pular"');
+  ok(await esperar('!!' + q('.tela-bau .album-fim .carta-viva'), 15000), 'a revelação chega ao fim e a tela passa à carta grande');
+  ok(await av(baus('.tela-bau') + ' === 0 && !document.querySelector(".tela-bau .rv")'), 'no fim não sobra baú nenhum, só a carta');
   ok(await esperar('/Nova! Você tem 1 de 13 em Heróis da fé/.test(' + legenda('.tela-bau') + ')'), 'a legenda diz "Nova! Você tem 1 de 13 em Heróis da fé" (' + await av(legenda('.tela-bau')) + ')');
   const ev = await av('JSON.stringify(CC.estado().cartas.eventos["bau:dia:7"])');
-  ok(/"carta":"davi-funda"/.test(ev) && /"raridade":"prata"/.test(ev) && await av('document.querySelector(".tela-bau .rv").dataset.raridade === "prata"'),
-    'a carta fica no estado e a arte mostra a raridade dela: Davi e a funda, em Prata, a primeira da vida (' + ev + ')');
+  ok(/"carta":"davi-funda"/.test(ev) && /"raridade":"prata"/.test(ev) && await av('document.querySelector(".tela-bau .album-fim .carta-viva").dataset.raridade === "prata"'),
+    'a carta fica no estado e aparece na raridade dela: Davi e a funda, em Prata, a primeira da vida (' + ev + ')');
+  ok(await esperar(cabe('.tela-bau'), 3000), 'o fim cabe na tela sem rolar (390x844)');
   ok(await av('!!CC.estado().bausAbertos["dia:7"].ref'), 'o baú guarda o versículo da semana, como antes');
   const botoes = await av('[...document.querySelectorAll(".tela-cheia-pe .botao")].map((b) => b.textContent.trim())');
   ok(JSON.stringify(botoes) === JSON.stringify(['Compartilhar carta', 'Salvar papel de parede', 'Continuar']), 'os botões: Compartilhar carta, Salvar papel de parede e Continuar (' + botoes + ')');
   ok(await av('[...document.querySelectorAll(".tela-cheia-pe .botao")].every((b) => b.getBoundingClientRect().height >= 44 && b.getBoundingClientRect().right <= innerWidth)'), 'os botões têm 44 px ou mais e cabem na tela');
-  ok(await av('!!document.querySelector(".tela-bau .rv-ler")') && /Ler a história/.test(await texto('.tela-bau .rv-ler')), 'a revelação tem "Ler a história"');
-  await dormir(800);
-  await nosDoisTemas('01-bau-revelado');
-  ok(await av('(() => { const t = document.querySelector(".tela-bau .rv-nova"); const c = getComputedStyle(t).color; const f = getComputedStyle(document.querySelector(".tela-bau")).backgroundColor; return c !== f && /rgb\\(18, 19, 16\\)/.test(f); })()'),
-    'a revelação fica num palco escuro também no tema claro (o texto da arte é creme)');
+  ok(/Ler a história/.test(await texto('.tela-bau [data-ler]')), 'o fim tem "Ler a história"');
   await av('document.querySelector("[data-compartilhar-carta]").click()');
   ok(await esperar('!!window.__compartilhado', 12000), 'Compartilhar carta abre a folha do sistema');
   const story = await av('(async () => { const d = window.__compartilhado; return { ...(await __png(d.files[0])), texto: d.text }; })()');
@@ -156,20 +171,21 @@ try {
   ok(await esperar('!!window.__compartilhado', 12000), 'Salvar papel de parede abre a folha do sistema');
   const papel = await av('(async () => __png(window.__compartilhado.files[0]))()');
   ok(papel && papel.w === 1080 && papel.h === 2340, 'vai o papel de parede, PNG 1080x2340 (' + JSON.stringify(papel) + ')');
-  await av('document.querySelector(".tela-bau .rv-ler").click()');
+  await av('document.querySelector(".tela-bau [data-ler]").click()');
   ok(await esperar('/^#\\/biblia\\/1%20Samuel\\/17/.test(location.hash) && !document.querySelector(".tela-bau")'), '"Ler a história" abre 1 Samuel 17 na Bíblia e fecha a tela do baú (' + await av('location.hash') + ')');
   await av('location.hash = "#/"');
   await dormir(600);
 
   // ---------- o segundo baú: outra carta lançada ----------
   await av('CC.telaBau(14)');
-  await esperar('!!' + q('[data-abrir-bau]'));
-  await av(q('[data-abrir-bau]') + '.click()');
+  await esperar('!!document.querySelector(".tela-bau .rv-bau")');
+  await tocarBau();
   ok(await esperar('!!' + q('.tela-bau .rv .carta-viva'), 8000), 'o segundo baú também revela pela arte');
+  ok(await av(baus('.tela-bau') + ' === 1'), 'e com um baú só');
   const ev2 = await av('JSON.stringify(CC.estado().cartas.eventos["bau:dia:14"])');
   ok(LANCADAS.some((id) => ev2.includes('"' + id + '"')) && !/davi-funda/.test(ev2), 'sai outra carta, e só das lançadas (' + ev2 + ')');
   await terminar('.tela-bau');
-  ok(await esperar('/Nova! Você tem 1 de 13 em/.test(' + legenda('.tela-bau') + ')'), 'a legenda conta a carta no álbum dela (' + await av(legenda('.tela-bau')) + ')');
+  ok(await esperar('/Nova! Você tem 1 de 13 em/.test(' + legenda('.tela-bau') + ')') && await av(baus('.tela-bau') + ' === 0'), '"Pular" vai direto ao fim, sem baú (' + await av(legenda('.tela-bau')) + ')');
   await av('document.querySelector("[data-continuar]").click()');
   ok(await esperar('!document.querySelector(".tela-bau")'), 'Continuar fecha a tela do baú');
 
@@ -236,8 +252,9 @@ try {
   await av('location.hash = "#/"');
   await dormir(3300);
   await av('CC.gravar("pratica", { 1: { melhor: 10, total: 10, feitoEm: CC.hojeIso(), vezes: 1 } }); CC.acertarCartas(); true');
-  ok(await esperar('/Prática sem nenhum erro/.test((document.querySelector(".tela-carta-nova h1") || {}).textContent || "")', 10000), 'a prática sem erro (outra fonte) revela uma carta, com a origem no título');
+  ok(await esperar('!!document.querySelector(".tela-carta-nova .rv")', 10000), 'a prática sem erro (outra fonte) revela uma carta pela arte');
   await terminar('.tela-carta-nova');
+  ok(await esperar('/Prática sem nenhum erro/.test((document.querySelector(".tela-carta-nova .album-origem") || {}).textContent || "")'), 'e o fim diz a origem: "Prática sem nenhum erro"');
   ok(await esperar('/Nova!|Nova versão|Repetida/.test(' + legenda('.tela-carta-nova') + ')') && !!(await av('CC.estado().cartas.eventos["pratica:1"]')), 'com a legenda, e o evento fica no livro-caixa');
   await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
   ok(await esperar('!document.querySelector(".tela-carta-nova")'), 'Continuar fecha');
@@ -249,7 +266,8 @@ try {
   await dormir(600);
   await nosDoisTemas('06-repetida');
   await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
-  ok(await esperar('/Nova versão Ouro de Davi e a funda/.test(' + legenda('.tela-carta-nova') + ') && /Primeiros passos completos/.test(document.querySelector(".tela-carta-nova h1").textContent)'),
+  await terminar('.tela-carta-nova');
+  ok(await esperar('/Nova versão Ouro de Davi e a funda/.test(' + legenda('.tela-carta-nova') + ') && /Primeiros passos completos/.test(document.querySelector(".tela-carta-nova .album-origem").textContent)'),
     'a seguinte: "Nova versão Ouro de Davi e a funda", com a origem dela');
   await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
   ok(await esperar('!document.querySelector(".tela-carta-nova")'), 'no fim da fila, Continuar fecha');
@@ -257,11 +275,14 @@ try {
   // ---------- os marcos: 100 dias e as unidades ----------
   await dormir(3300);
   await av('(() => { for (let n = 1; n <= 100; n++) CC.marcarLido(n, true); CC.acertarCartas(); return true; })()');
-  ok(await esperar('/^Marco: /.test((document.querySelector(".tela-carta-nova h1") || {}).textContent || "")', 10000), 'chegar aos 100 dias e completar unidades revela os sorteios de marco ("Marco: ...")');
+  ok(await esperar('!!document.querySelector(".tela-carta-nova .rv")', 10000), 'chegar aos 100 dias e completar unidades revela os sorteios de marco');
   const marcos = [];
   for (let i = 0; i < 6 && await av('!!document.querySelector(".tela-carta-nova")'); i++) {
-    marcos.push(await av('document.querySelector(".tela-carta-nova h1").textContent + " · " + (document.querySelector(".tela-carta-nova .rv") || document.querySelector(".tela-carta-nova .carta-texto") || {}).dataset.raridade'));
-    if (i === 0) { await terminar('.tela-carta-nova'); await dormir(1200); await nosDoisTemas('07-marco'); }
+    await esperar('!!document.querySelector(".tela-carta-nova .rv, .tela-carta-nova .album-fim")');
+    await terminar('.tela-carta-nova');
+    await esperar('!!document.querySelector(".tela-carta-nova .album-fim")');
+    marcos.push(await av('document.querySelector(".tela-carta-nova .album-origem").textContent + " · " + document.querySelector(".tela-carta-nova .album-fim .carta-viva, .tela-carta-nova .album-fim .carta-texto").dataset.raridade'));
+    if (i === 0) { await dormir(600); await nosDoisTemas('07-marco'); }
     await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
     await dormir(400);
   }
@@ -283,6 +304,61 @@ try {
   await capturar('08-album', 'claro');
   await av('CC.guardarTema(false)');
   largura = 390;
+  await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+
+  await av('location.hash = "#/"');
+  await dormir(500);
+  // ---------- "Pular" antes de tocar no baú: o baú é guardado do mesmo jeito ----------
+  await av('CC.telaBau(56)');
+  await esperar('!!document.querySelector(".tela-bau .rv-bau")');
+  ok(/Um baú na estrada!/.test(await texto('.tela-bau .album-titulo-bau')), 'fechado, o título "Um baú na estrada!" aparece por cima do baú');
+  await terminar('.tela-bau');
+  ok(await esperar('!!' + q('.tela-bau .album-fim .carta-viva')) && await av('!!CC.estado().bausAbertos["dia:56"] && !!CC.estado().cartas.eventos["bau:dia:56"]'),
+    '"Pular" antes do toque vai ao fim e guarda o baú e a carta');
+  ok(await av('document.querySelector(".tela-bau .album-fim .carta-viva").dataset.raridade === CC.estado().cartas.eventos["bau:dia:56"].raridade'), 'e a carta mostrada é a que foi paga');
+  await av('document.querySelector(".tela-bau [data-continuar]").click()');
+  await esperar('!document.querySelector(".tela-bau")');
+
+  // ---------- o fluxo do baú inteiro, em 390x844 e 360x740, claro e escuro ----------
+  // Em câmera lenta (CC.cartas._escalaTempo), para ver cada momento: fechado, abrindo, a carta de
+  // costas, de frente e o fim com os botões. Baús 28 a 49: o baú abre pelo número, sem leitura.
+  await av('location.hash = "#/"');
+  await dormir(500);
+  let numero = 21;
+  for (const [w, h] of [[390, 844], [360, 740]]) {
+    await cmd('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true });
+    for (const tema of ['claro', 'escuro']) {
+      numero += 7;
+      await av('CC.guardarTema(' + (tema === 'escuro') + '); document.querySelectorAll(".tela-cheia, .cortina").forEach((e) => e.remove()); CC.cartas._escalaTempo(2); true');
+      const foto = async (n, nome) => {
+        if (!SAIDA) return;
+        const f = await cmd('Page.captureScreenshot', { format: 'png' });
+        writeFileSync(join(SAIDA, '09-fluxo-' + w + 'x' + h + '-' + tema + '-' + n + '-' + nome + '.png'), Buffer.from(f.data, 'base64'));
+      };
+      await av('CC.telaBau(' + numero + ')');
+      await esperar('!!document.querySelector(".tela-bau .rv-bau")');
+      await dormir(700);
+      ok(await av(baus('.tela-bau') + ' === 1'), w + 'x' + h + ' ' + tema + ': fechado, um baú só');
+      await foto(1, 'fechado');
+      await tocarBau();
+      const vistos = [];
+      for (const [fase, n, nome] of [['abre', 2, 'abrindo'], ['espera', 3, 'carta-de-costas'], ['brilha', 4, 'carta-de-frente']]) {
+        if (await esperar('(document.querySelector(".tela-bau .rv") || {}).dataset?.fase === "' + fase + '"', 15000)) {
+          vistos.push(fase + ':' + await av(baus('.tela-bau')));
+          await dormir(fase === 'abre' ? 150 : 500);
+          await foto(n, nome);
+        }
+      }
+      ok(vistos.length === 3 && vistos.every((v) => v.endsWith(':1')), w + 'x' + h + ' ' + tema + ': abrindo, de costas e de frente, sempre com um baú só (' + vistos.join(' ') + ')');
+      ok(await esperar('!!' + q('.tela-bau .album-fim .carta-viva'), 15000) && await av(baus('.tela-bau') + ' === 0'), w + 'x' + h + ' ' + tema + ': o fim mostra só a carta, sem baú');
+      await dormir(700);
+      ok(await av(cabe('.tela-bau')), w + 'x' + h + ' ' + tema + ': a carta, a legenda, "Ler a história" e os três botões cabem sem rolar');
+      await foto(5, 'fim');
+      await av('CC.cartas._escalaTempo(1); document.querySelector(".tela-bau [data-continuar]").click()');
+      await esperar('!document.querySelector(".tela-bau")');
+    }
+  }
+  await av('CC.guardarTema(false)');
   await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
 
   // ---------- sem as peças: o versículo, e a carta depois ----------

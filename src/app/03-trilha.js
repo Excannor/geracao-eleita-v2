@@ -716,6 +716,27 @@
       rotulo: 'Baú do dia ' + numero,
       ligar: (el, fechar) => {
         const botao = el.querySelector('[data-abrir-bau]');
+        const palco = el.querySelector('.tela-cheia-palco');
+        // Com as peças prontas antes do toque, o baú desta tela vira o baú da revelação da arte
+        // (um baú só, um toque): a carta é a que o toque vai pagar, prevista pelo mesmo sorteio.
+        pecas.then(() => {
+          if (botao.disabled || !palco.isConnected || CC.bauAberto(numero)) return;
+          const E = CC.estado();
+          const chave = CC.cartasRegras.chaveDoBau(numero, E);
+          const hipotese = { ...E, bausAbertos: { ...(E.bausAbertos || {}), [CC.chaveBau(numero)]: { em: CC.hojeIso() } } };
+          const previsto = CC.cartasRegras.emDia(hipotese, { dono: E.dono || '', em: Date.now(), quem: CC.quem || null, hoje: CC.hojeIso() }).novos.find((x) => x.chave === chave);
+          if (!previsto || !previsto.carta || !CC.album.temArte(CC.album.paraArte(previsto.carta, previsto.raridade))) return;
+          botao.disabled = true;
+          CC.album.bauDaRevelacao(el, palco, { previsto, chave, ref: CC.versiculoDoBau(numero), fechar, titulo: 'Um baú na estrada!',
+            guardar: () => {
+              CC.abrirBau(numero);
+              CC.vibrar('conquista');
+              const pago = CC.cartasEmDia({ calado: true });
+              const novos = CC.guardarConquistas();
+              if (CC.publicarNovidades) CC.publicarNovidades({ niveis: novos });
+              return pago;
+            } });
+        }, () => {});
         botao.onclick = async () => {
           botao.disabled = true;
           const bau = CC.abrirBau(numero);
@@ -724,7 +745,6 @@
           // anima duas vezes. Esperando por elas, este balança.
           if (!prontas) botao.classList.add('abrindo');
           const comCartas = prontas || (await Promise.all([CC.esperar(650), comPrazo(pecas, 2500)]))[1];
-          const palco = el.querySelector('.tela-cheia-palco');
           const ref = bau.ref || CC.versiculoDoBau(numero);
           const novos = CC.guardarConquistas();
           if (CC.publicarNovidades) CC.publicarNovidades({ niveis: novos });

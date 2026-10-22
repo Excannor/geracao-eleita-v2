@@ -81,34 +81,29 @@ button.carta-versao { cursor: pointer; }
 .carta-texto.entrando { animation: album-entra .6s ease both; }
 @keyframes album-entra { from { opacity: 0; transform: translateY(24px) scale(.94); } }
 
-/* as revelações: a arte (CC.cartas.revelar) foi feita para um palco escuro (texto creme, luz do
-   baú), então a tela da revelação fica escura nos dois temas, com as fichas do tema escuro */
-.tela-cheia.com-revelacao {
-  --v2-fundo: #121310; --v2-cartao: #252724; --campo: #2e302c; --contorno: #3a3d37;
-  --v2-tinta-forte: #f2ecd8; --v2-tinta: #e2dccb; --v2-tinta-fraca: #b3ad9c; --v2-inverso: #f2ecd8; --v2-inverso-tinta: #121310;
-  --fundo: var(--v2-fundo); --fundo-2: var(--campo); --cartao: var(--v2-cartao); --borda: var(--contorno);
-  --tinta: var(--v2-tinta); --tinta-forte: var(--v2-tinta-forte); --tinta-fraca: var(--v2-tinta-fraca);
-  --inverso: var(--v2-inverso); --inverso-tinta: var(--v2-inverso-tinta);
-  background: var(--v2-fundo); color: var(--v2-tinta);
-}
-.tela-cheia.com-revelacao .tela-cheia-palco { justify-content: flex-start; }
-.tela-cheia.com-revelacao .botao:not(.contorno):not(.plano) { --b: var(--v2-inverso); background: var(--v2-inverso); color: var(--v2-inverso-tinta); }
-.album-revela { display: grid; justify-items: center; gap: 10px; }
-.album-revela h1 { margin: 0; font-size: 1.45rem; text-align: center; }
-.album-revela-carta { display: grid; justify-items: center; gap: 8px; min-height: 120px; }
-.album-legenda { min-height: 1.5em; margin: 0; font-size: 1.05rem; }
-.album-revela-titulo { margin: 0; opacity: 0; transition: opacity .3s; }
-.album-revela-titulo span { color: var(--v2-tinta-fraca); font-size: .9rem; }
-.legenda-pronta .album-revela-titulo { opacity: 1; }
-.album-completo { display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 12px; border-radius: 14px; background: #fff4d6; color: #3b3010; font-weight: 700; }
-.album-completo svg { width: 24px; height: 24px; flex: none; }
-.album-escolha { max-width: 640px; margin: 0 auto; padding: 8px 16px; text-align: center; }
-.album-escolha .album-grade { margin-top: 12px; text-align: left; }
+/* as revelações: a abertura é da arte (cartas.css); o fim é daqui: a carta grande, a legenda e,
+   embaixo, os botões, que só aparecem no fim */
+.album-revela { width: 100%; }
+/* o título fica abaixo do "Pular" sem ocupar lugar: quando some (no toque), o baú não pula */
+.album-titulo-bau { position: relative; z-index: 8; margin: 4px 0 -44px; font-size: 1.45rem; text-align: center; transform: translateY(48px); }
+.tela-cheia.com-revelacao .tela-cheia-palco { justify-content: safe center; padding-top: calc(12px + env(safe-area-inset-top)); }
+.album-fim { display: grid; justify-items: center; gap: 8px; width: 100%; text-align: center; }
+.album-fim-carta { display: grid; justify-items: center; }
+.album-fim-carta .cv-botao-virar { display: none; }
+.album-origem { margin: 0; color: var(--v2-tinta-fraca); font-size: .8rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.album-legenda { margin: 0; font-size: 1.02rem; line-height: 1.35; }
+.album-fim-acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.album-fim-acoes .cv-botao-virar { display: inline-flex; }
+.album-completo { display: flex; align-items: center; gap: 8px; margin: 0; padding: 6px 12px; border-radius: 14px; background: #fff4d6; color: #3b3010; font-size: .9rem; font-weight: 700; }
+.album-completo svg { width: 22px; height: 22px; flex: none; }
+.tela-cheia-pe.album-pe { gap: 8px; }
+.album-pe-entra { animation: album-pe .35s ease both; }
+@keyframes album-pe { from { opacity: 0; transform: translateY(10px); } }
 
 @media (min-width: 720px) {
   .album-grade { grid-template-columns: repeat(auto-fill, minmax(var(--album-mini, 108px), var(--album-mini, 108px))); gap: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ct-giro, .album-revela-titulo { transition: none; }
-  .carta-texto.entrando { animation: none; }
+  .ct-giro { transition: none; }
+  .carta-texto.entrando, .album-pe-entra { animation: none; }
 }

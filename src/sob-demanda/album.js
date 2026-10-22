@@ -140,45 +140,77 @@
     return ORIGEM[fonte] || 'Carta nova';
   };
 
-  // Uma revelação: a arte faz a animação (CC.cartas.revelar); embaixo, a legenda, o título e os botões.
-  function montarRevelacao(el, palco, x, { titulo, ref, aoContinuar }) {
+  // Uma revelação, num fluxo só (dono, 22/10): a arte faz a abertura inteira
+  // (CC.cartas.revelar: o baú da Trilha balança, a tampa abre, a luz sobe, a carta sai, vira e
+  // brilha), com "Pular" como único controle. Quando ela termina (ou no Pular), a tela passa ao fim:
+  // só a carta, grande, a legenda ("Nova! ...", "Repetida: ..."), "Ler a história" e "Virar", e
+  // embaixo "Compartilhar carta", "Salvar papel de parede" e "Continuar", que só então aparecem.
+  // Nenhum baú fica no fim, e tudo cabe na tela sem rolar (390x844 e 360x740).
+  // x: o resultado (ou uma função que o lê no fim, quando ele só existe depois do toque).
+  // abrir: 'ja' (o baú abre sozinho) ou 'toque' (o baú da revelação espera o toque, e antes() roda
+  // nele: é ali que a Trilha guarda o baú). titulo: o título enquanto o baú está fechado.
+  function montarRevelacao(el, palco, x, { origem: kicker, ref, aoContinuar, abrir = 'ja', antes, titulo }) {
     el.classList.add('com-revelacao');
-    const carta = paraArte(x.carta, x.raridade);
-    palco.innerHTML = '<div class="cena-carta revelando album-revela">'
-      + '<h1>' + CC.esc(titulo) + '</h1><div class="album-revela-carta"></div>'
-      + '<p class="album-legenda" aria-live="polite"></p>'
-      + '<p class="album-revela-titulo"><b>' + CC.esc(carta.titulo) + '</b> <span>' + CC.esc(carta.ref) + '</span></p>'
-      + (x.completou ? '<p class="album-completo">' + icone('gloria') + '<span>Álbum completo! Ganhou um sorteio de marco.</span></p>' : '') + '</div>';
-    const alvo = palco.querySelector('.album-revela-carta');
-    // a carta cabe com o título em cima, o fim da revelação e os botões embaixo
-    const largura = Math.round(Math.min(300, innerWidth * 0.7, Math.max(170, (innerHeight - 500) / 1.4)));
-    const texto = legenda(x);
-    let daArte = false;
-    if (temArte(carta)) {
-      // A arte faz a revelação inteira, do baú fechado à carta aberta, e mostra a legenda, o título
-      // e "Ler a história" (a referência na Bíblia) dentro dela. O baú da Trilha já foi tocado:
-      // abre na hora. A raridade é a da cópia (a Glória também sai por sorte, mais nos marcos).
-      const api = CC.cartas.revelar(alvo, carta, { raridade: carta.raridade, legenda: texto.replace(/<[^>]+>/g, ''), abrir: 'ja', largura,
-        aoLer: () => { location.hash = CC.hrefDoVerso(carta.ref); } });
-      daArte = !!(api && typeof api.then === 'function');
-    } else {
-      const api = cartaGrande(alvo, carta, largura);
-      api.el.classList.add('entrando');
-    }
-    const fala = palco.querySelector('.album-legenda');
-    if (daArte) { fala.remove(); palco.querySelector('.album-revela-titulo').remove(); }
-    else setTimeout(() => { fala.innerHTML = texto; palco.querySelector('.album-revela').classList.add('legenda-pronta'); }, menosMovimento() ? 0 : 1200);
+    const lerX = () => (typeof x === 'function' ? x() : x);
+    const x0 = lerX();
+    const carta = paraArte(x0.carta, x0.raridade);
+    const texto = legenda(x0);
+    const ler = () => { location.hash = CC.hrefDoVerso(carta.ref); };
     let pe = el.querySelector('.tela-cheia-pe');
     if (!pe) { pe = document.createElement('div'); pe.className = 'tela-cheia-pe'; el.appendChild(pe); }
-    pe.innerHTML = (temArte(carta) ? '<button class="botao contorno" data-compartilhar-carta>' + CC.ico('compartilhar') + 'Compartilhar carta</button>' : '')
-      + (ref ? '<button class="botao contorno" data-papel-de-parede>' + CC.ico('baixar') + 'Salvar papel de parede</button>' : '')
+    pe.classList.add('album-pe');
+    pe.hidden = true;
+    pe.innerHTML = (temArte(carta) ? '<button class="botao contorno pequeno" data-compartilhar-carta>' + CC.ico('compartilhar') + 'Compartilhar carta</button>' : '')
+      + (ref ? '<button class="botao contorno pequeno" data-papel-de-parede>' + CC.ico('baixar') + 'Salvar papel de parede</button>' : '')
       + '<button class="botao" data-continuar>Continuar</button>';
     const comp = pe.querySelector('[data-compartilhar-carta]');
     if (comp) ligarCompartilhar(comp, carta);
     const papel = pe.querySelector('[data-papel-de-parede]');
     if (papel) ligarPapelDeParede(papel, ref);
     pe.querySelector('[data-continuar]').onclick = aoContinuar;
-    pe.querySelector('[data-continuar]').focus({ preventScroll: true });
+    let terminou = false;
+    const fim = () => {
+      if (terminou || !palco.isConnected) return;
+      terminou = true;
+      const x = lerX();
+      const texto = legenda(x);
+      pe.hidden = false;
+      pe.classList.add('album-pe-entra');
+      palco.innerHTML = '<div class="album-fim">' + (kicker ? '<p class="album-origem">' + CC.esc(kicker) + '</p>' : '')
+        + '<div class="album-fim-carta"></div><p class="album-legenda" aria-live="polite">' + texto + '</p>'
+        + (x.completou ? '<p class="album-completo">' + icone('gloria') + '<span>Álbum completo! Ganhou um sorteio de marco.</span></p>' : '')
+        + '<div class="album-fim-acoes"><button type="button" class="botao contorno pequeno" data-ler>' + CC.ico('livro') + 'Ler a história</button></div></div>';
+      // a carta ocupa a altura que sobra
+      const resto = palco.querySelector('.album-fim').getBoundingClientRect().height;
+      const alto = palco.clientHeight - resto - 16;
+      const largura = Math.round(Math.max(150, Math.min(330, innerWidth - 64, alto / 1.4)));
+      const api = cartaGrande(palco.querySelector('.album-fim-carta'), carta, largura);
+      const virar = palco.querySelector('.album-fim-carta .cv-botao-virar');
+      if (virar) { virar.classList.add('botao', 'contorno', 'pequeno'); palco.querySelector('.album-fim-acoes').appendChild(virar); }
+      if (api.soltar) api.soltar();
+      palco.querySelector('[data-ler]').onclick = ler;
+      pe.querySelector('[data-continuar]').focus({ preventScroll: true });
+    };
+    if (temArte(carta)) {
+      // a raridade é a da cópia (a Glória também sai por sorte, mais nos marcos)
+      palco.innerHTML = (titulo ? '<h1 class="album-titulo-bau">' + CC.esc(titulo) + '</h1>' : '') + '<div class="album-revela"></div>';
+      const rv = CC.cartas.revelar(palco.querySelector('.album-revela'), carta, { raridade: carta.raridade, legenda: texto.replace(/<[^>]+>/g, ''), abrir,
+        largura: Math.round(Math.max(170, Math.min(300, innerWidth - 80, (innerHeight - 300) / 1.4))), aoLer: ler });
+      if (abrir === 'toque') {
+        // o toque no baú (ou "Pular" antes dele): primeiro quem chamou guarda o baú, uma vez; se ele
+        // recusar (a carta paga não é a prevista), a revelação não segue
+        let guardado = false;
+        const guardar = (ev) => {
+          if (guardado) return;
+          guardado = true;
+          const t = palco.querySelector('.album-titulo-bau');
+          if (t) t.remove();
+          if (antes && antes() === false) { ev.stopImmediatePropagation(); ev.preventDefault(); }
+        };
+        palco.querySelectorAll('.rv-bau, .rv-pular').forEach((b) => b.addEventListener('click', guardar, true));
+      }
+      if (rv && typeof rv.then === 'function') rv.then(fim); else fim();
+    } else fim();
   }
 
   // O resultado de um evento já pago, lido do livro-caixa (para a legenda).
@@ -210,10 +242,34 @@
     const proxima = () => {
       const y = fila.shift();
       if (!y) { fechar(); CC.redesenhar(); return; }
-      montarRevelacao(el, palco, y, { titulo: origem(y), aoContinuar: proxima });
+      montarRevelacao(el, palco, y, { origem: origem(y), aoContinuar: proxima });
     };
-    montarRevelacao(el, palco, x, { titulo: 'Baú aberto!', ref, aoContinuar: proxima });
+    montarRevelacao(el, palco, x, { ref, aoContinuar: proxima });
     return true;
+  }
+
+  // O baú da Trilha já como o baú da revelação (um baú só, um toque): a carta prevista é a que o
+  // toque vai pagar (o sorteio é o mesmo, com a mesma semente). guardar() é o toque: guarda o baú
+  // e devolve o que foi pago; se a carta paga não for a prevista (o estado mudou no meio), a
+  // revelação recomeça com a carta de verdade.
+  function bauDaRevelacao(el, palco, { previsto, chave, ref, fechar, guardar, titulo }) {
+    let fila = [];
+    const proxima = () => {
+      const y = fila.shift();
+      if (!y) { fechar(); CC.redesenhar(); return; }
+      montarRevelacao(el, palco, y, { origem: origem(y), aoContinuar: proxima });
+    };
+    montarRevelacao(el, palco, () => (estado().eventos[chave] ? resultadoDe(chave) : previsto), {
+      ref, abrir: 'toque', titulo, aoContinuar: proxima,
+      antes: () => {
+        const pago = guardar();
+        fila = pago.novos.filter((y) => y.chave !== chave && y.fonte !== 'bau' && y.carta && estado().eventos[y.chave]).map((y) => resultadoDe(y.chave));
+        const ev = estado().eventos[chave];
+        if (ev && ev.carta === previsto.carta && ev.raridade === previsto.raridade) return true;
+        setTimeout(() => revelarNoBau(el, palco, { chave, ref, fechar, outros: pago.novos.filter((y) => y.chave !== chave && y.fonte !== 'bau') }));
+        return false;
+      },
+    });
   }
 
   // As cartas de outras fontes, uma depois da outra.
@@ -229,7 +285,7 @@
         const proxima = () => {
           const x = fila.shift();
           if (!x) { fechar(); CC.redesenhar(); return; }
-          montarRevelacao(el, palco, x, { titulo: origem(x), aoContinuar: proxima });
+          montarRevelacao(el, palco, x, { origem: origem(x), aoContinuar: proxima });
         };
         proxima();
       },
@@ -366,5 +422,5 @@
     });
   }
 
-  CC.album = { CATALOGO, tela, abrirCarta, oQuePodeVir, revelarNoBau, revelarNovas, paraArte, temArte };
+  CC.album = { CATALOGO, tela, abrirCarta, oQuePodeVir, revelarNoBau, bauDaRevelacao, revelarNovas, paraArte, temArte };
 })(window.CC);
