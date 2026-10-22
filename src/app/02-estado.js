@@ -55,9 +55,9 @@
     // Parábolas lidas no Explorar: { [slug]: data ISO da primeira leitura }. É material de
     // consulta, não andamento da trilha: fica fora do PROGRESSO_DA_TRILHA e o "Zerar" não apaga.
     parabolasLidas: {},
-    // As cartas do baú e de outras fontes (docs/cartas.md): a coleção, o livro-caixa de eventos
-    // que já pagaram e as Glórias. Ficam fora do PROGRESSO_DA_TRILHA: o "Zerar" não as apaga.
-    cartas: { recebidas: {}, eventos: {}, glorias: {} },
+    // As cartas do baú e de outras fontes (docs/cartas.md): o livro-caixa de eventos (cada um, uma
+    // cópia) e as Glórias. Ficam fora do PROGRESSO_DA_TRILHA: o "Zerar" não as apaga.
+    cartas: { eventos: {}, glorias: {} },
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -87,48 +87,49 @@
     return saida;
   }
 
-  // As cartas: a forma é conferida aqui (o servidor passa por normalizar e fundir), e a fusão é
-  // uma união em que a entrada mais antiga vence: a carta recebida e o que um evento pagou não
-  // mudam depois. Na Glória vale a escolha mais antiga; duas Glórias na mesma carta deixam a mais
-  // nova para escolher de novo.
-  const MAX_CARTAS = 400;
+  // As cartas (docs/cartas.md): a coleção é o livro-caixa de eventos. Cada evento que pagou uma
+  // carta é uma cópia (id = a chave do evento), e o que ele pagou nunca muda: na fusão vale o
+  // registro mais antigo de cada chave, então nada é contado duas vezes nem se perde. Na Glória
+  // vale a escolha mais antiga; duas Glórias na mesma carta deixam a mais nova para escolher de
+  // novo. A forma é conferida aqui, e o servidor passa por normalizar e fundir.
+  const MAX_EVENTOS = 2000;
   const ID_CARTA = /^[a-z0-9-]{2,40}$/;
   const CHAVE_EVENTO = /^[a-z]{2,12}(:[a-z0-9@:-]{1,40})?$/;
+  const VERSOES = ['linho', 'bronze', 'prata', 'ouro', 'gloria'];
   const ms = (x) => (Number.isFinite(Number(x)) && Number(x) > 0 ? Math.floor(Number(x)) : 0);
   function limparCartas(x) {
     const c = x && typeof x === 'object' ? x : {};
-    const tabela = (t, chave, valor) => Object.fromEntries(Object.entries(t && typeof t === 'object' ? t : {})
-      .filter(([k, v]) => chave.test(k) && v && typeof v === 'object').slice(0, MAX_CARTAS).map(([k, v]) => [k, valor(v)]));
+    const tabela = (t, valor) => Object.fromEntries(Object.entries(t && typeof t === 'object' ? t : {})
+      .filter(([k, v]) => CHAVE_EVENTO.test(k) && v && typeof v === 'object').slice(0, MAX_EVENTOS).map(([k, v]) => [k, valor(v)]));
     const carta = (v) => (typeof v === 'string' && ID_CARTA.test(v) ? v : '');
     return {
-      recebidas: tabela(c.recebidas, ID_CARTA, (v) => ({ em: ms(v.em), fonte: typeof v.fonte === 'string' && CHAVE_EVENTO.test(v.fonte) ? v.fonte : '' })),
-      eventos: tabela(c.eventos, CHAVE_EVENTO, (v) => (carta(v.carta) ? { em: ms(v.em), carta: v.carta } : { em: ms(v.em), gloria: 1 })),
-      glorias: tabela(c.glorias, CHAVE_EVENTO, (v) => ({ em: ms(v.em), carta: carta(v.carta), escolhidaEm: carta(v.carta) ? ms(v.escolhidaEm) : 0 })),
+      eventos: tabela(c.eventos, (v) => (carta(v.carta) && VERSOES.includes(v.raridade) ? { em: ms(v.em), carta: v.carta, raridade: v.raridade } : { em: ms(v.em), gloria: 1 })),
+      glorias: tabela(c.glorias, (v) => ({ em: ms(v.em), carta: carta(v.carta), escolhidaEm: carta(v.carta) ? ms(v.escolhidaEm) : 0 })),
     };
   }
   CC.limparCartas = limparCartas;
   function fundirCartas(a, b) {
     a = limparCartas(a);
     b = limparCartas(b);
-    const antiga = (x, y) => (!x ? y : !y ? x : (y.em < x.em || (y.em === x.em && JSON.stringify(y) < JSON.stringify(x))) ? y : x);
-    const unir = (t1, t2, escolher) => {
-      const saida = { ...t1 };
-      for (const [k, v] of Object.entries(t2)) saida[k] = escolher(saida[k], v);
-      return saida;
-    };
-    const glorias = unir(a.glorias, b.glorias, (x, y) => {
-      if (!x || !y) return x || y;
-      if (!!x.carta !== !!y.carta) return x.carta ? x : y;
-      if (x.carta && (y.escolhidaEm < x.escolhidaEm || (y.escolhidaEm === x.escolhidaEm && y.carta < x.carta))) return { ...y, em: Math.min(x.em, y.em) };
-      return { ...x, em: Math.min(x.em, y.em) };
-    });
+    const eventos = { ...a.eventos };
+    for (const [k, y] of Object.entries(b.eventos)) {
+      const x = eventos[k];
+      if (!x || y.em < x.em || (y.em === x.em && JSON.stringify(y) < JSON.stringify(x))) eventos[k] = y;
+    }
+    const glorias = { ...a.glorias };
+    for (const [k, y] of Object.entries(b.glorias)) {
+      const x = glorias[k];
+      if (!x || (!x.carta && y.carta)) glorias[k] = { ...y, em: Math.min(y.em, x ? x.em : y.em) };
+      else if (x.carta && y.carta && (y.escolhidaEm < x.escolhidaEm || (y.escolhidaEm === x.escolhidaEm && y.carta < x.carta))) glorias[k] = { ...y, em: Math.min(x.em, y.em) };
+      else glorias[k] = { ...x, em: Math.min(x.em, y.em) };
+    }
     const dona = {};
     for (const [k, g] of Object.entries(glorias).sort((x, y) => (x[1].escolhidaEm - y[1].escolhidaEm) || (x[0] < y[0] ? -1 : 1))) {
       if (!g.carta) continue;
       if (dona[g.carta]) glorias[k] = { ...g, carta: '', escolhidaEm: 0 };
       else dona[g.carta] = k;
     }
-    return limparCartas({ recebidas: unir(a.recebidas, b.recebidas, antiga), eventos: unir(a.eventos, b.eventos, antiga), glorias });
+    return { eventos, glorias };
   }
   CC.fundirCartas = fundirCartas;
 

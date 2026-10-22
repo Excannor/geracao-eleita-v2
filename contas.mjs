@@ -47,8 +47,8 @@ export const VALIDADE_CONVITE = 30 * 24 * 60 * 60 * 1000;
 export const LIMIARES_SEMEADORES = [1, 5, 15, 40, 100];
 const FONTES_DO_SERVIDOR = /^(convite|convidado|celula|discipulado)(:|$)/;
 // Antes de gravar o estado: evento novo de uma fonte do servidor (convite, convidado, célula,
-// discipulado) que ele não confirma sai, com a carta e a Glória que tenha dado. O que já estava
-// gravado não é mexido. Devolve o próprio estado.
+// discipulado) que ele não confirma sai (e com ele a cópia da carta, que é o próprio evento). O que
+// já estava gravado não é mexido. Devolve o próprio estado.
 export function conferirCartasDoServidor(atual, junto, permitidas) {
   const c = junto && junto.cartas;
   if (!c) return junto;
@@ -57,7 +57,6 @@ export function conferirCartasDoServidor(atual, junto, permitidas) {
   for (const chave of Object.keys(c.eventos || {})) {
     if (!FONTES_DO_SERVIDOR.test(chave) || antes[chave] || ok.has(chave)) continue;
     delete c.eventos[chave];
-    for (const [id, r] of Object.entries(c.recebidas || {})) if (r && r.fonte === chave) delete c.recebidas[id];
     if (c.glorias) delete c.glorias[chave];
   }
   return junto;
