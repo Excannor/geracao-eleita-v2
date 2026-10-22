@@ -49,13 +49,17 @@
   .pode-vir b { color: var(--tinta); }
   .pode-vir span { display: inline-flex; align-items: center; gap: 4px; }
   .pode-vir svg { width: 16px; height: 16px; }
+  .albuns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .albuns button { min-height: 44px; padding: 0 14px; border: 1px solid rgba(35, 36, 30, .2); border-radius: 999px; background: transparent; color: inherit; font: 600 .875rem/1 Manrope, sans-serif; cursor: pointer; }
+  .albuns button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+  .marco { margin: 12px 16px 0; padding: 10px 14px; border-radius: 12px; background: rgba(255, 250, 240, .1); color: #f2ecd8; font-size: .875rem; }
   @media (max-width: 560px) { .item { width: min(86vw, 300px); } .controles .direita { margin-left: 0; } }
 </style>
 </head>
 <body>
 <main>
   <h1>Cartas do baú</h1>
-  <p class="sub">Amostra das cinco raridades. Passe o mouse ou o dedo para inclinar; toque para virar; arraste para o lado para girar.</p>
+  <p class="sub">Amostra das cinco raridades. Passe o mouse ou o dedo sobre a carta para inclinar e ver o brilho; arraste para o lado para girar até o verso.</p>
 
   <section id="acabamentos">
     <h2>A mesma carta nos cinco acabamentos</h2>
@@ -75,7 +79,7 @@
 
   <section id="bau">
     <h2>A revelação do baú</h2>
-    <p class="sub">Escolha a raridade que sai e toque no baú. A carta vira sozinha em 3 segundos, ou no toque.</p>
+    <p class="sub">Escolha a raridade que sai e toque no baú. A carta sobe de costas e vira sozinha em 3 segundos.</p>
     <div class="palco">
       <div class="controles">
         <div class="grupo" role="group" aria-label="Raridade que sai" data-escolha></div>
@@ -85,6 +89,7 @@
           <button type="button" data-de-novo>De novo</button>
         </div>
       </div>
+      <p class="marco" data-marco hidden><b>Revelação de marco.</b> No app a Glória não sai do baú do dia: ela vem só por marco (o sistema cuida disso). Aqui ela sai do baú só para mostrar a luz e o halo.</p>
       <div id="revelacao"></div>
     </div>
   </section>
@@ -92,7 +97,8 @@
   <section id="album">
     <h2>O álbum</h2>
     <div class="album">
-      <div class="album-cabeca"><h3>Uma página do álbum</h3><span>4 de 13 · amostra com cartas de álbuns diferentes</span></div>
+      <div class="albuns" role="group" aria-label="Álbum" data-albuns></div>
+      <div class="album-cabeca"><h3 data-album-nome></h3><span data-album-conta></span></div>
       <div class="grade" data-grade></div>
       <p class="pode-vir" data-pode-vir></p>
     </div>
@@ -140,6 +146,8 @@
   const TENHO = { linho: 5, bronze: 6, prata: 2, ouro: 9, gloria: 13 };
   const abrir = () => {
     const c = carta(DA_ARTE[atual]);
+    // a glória não sai do sorteio do baú: aqui a demonstração dela é a revelação de um marco
+    document.querySelector('[data-marco]').hidden = atual !== 'gloria';
     window.revelacaoAtual = C.revelar(document.getElementById('revelacao'), c, {
       raridade: atual, legenda: 'Nova! Você tem ' + TENHO[atual] + ' de 13 em ' + c.album });
   };
@@ -153,32 +161,57 @@
   }
   document.querySelector('[data-de-novo]').onclick = abrir;
   document.querySelector('[data-menos]').onchange = (ev) => { document.documentElement.classList.toggle('menos-movimento', ev.target.checked); abrir(); };
-  window.escolherRaridade = (rar) => { atual = rar; abrir(); };
+  window.escolherRaridade = (rar) => {
+    atual = rar;
+    escolha.querySelectorAll('button').forEach((x, i) => x.setAttribute('aria-pressed', ORDEM[i] === rar ? 'true' : 'false'));
+    abrir();
+  };
   const giro = document.querySelector('[data-giroscopio]');
   giro.hidden = !('DeviceOrientationEvent' in window && matchMedia('(pointer: coarse)').matches);
   giro.onclick = async () => { const ok = await window.revelacaoAtual.carta.giroscopio(); giro.textContent = ok ? 'Giroscópio ligado' : 'Giroscópio indisponível'; };
   abrir();
 
-  // o álbum: as cartas que já saíram, paradas, e as vagas que faltam
+  // o álbum: uma página por álbum, com as cartas da amostra daquele álbum, cada uma na vaga do
+  // seu número, e as vagas que faltam. A conta é a das cartas mostradas; embaixo de cada carta,
+  // o ícone e o nome da raridade (nunca só a cor). A glória fica fora do sorteio (só por marco).
+  const POR_RARIDADE = { linho: 5, bronze: 4, prata: 3, ouro: 1 };  // por álbum, no sorteio
+  const albuns = [...new Set(C.lista.map((c) => c.album))];
   const grade = document.querySelector('[data-grade]');
-  const tem = { 1: 'arca-alianca', 3: 'poco-jaco', 4: 'davi-funda', 7: 'azeite-viuva' };
-  for (let n = 1; n <= 13; n++) {
-    const vaga = document.createElement('div');
-    vaga.className = 'vaga';
-    if (tem[n]) {
-      const c = carta(tem[n]);
-      vaga.appendChild(C.miniatura(c, 92));
-      const rar = c.raridade;
-      vaga.insertAdjacentHTML('beforeend', '<small style="color:' + C.RARIDADES[rar].tinta + '">' + C.iconeSvg(rar) + C.RARIDADES[rar].nome + '</small>');
-    } else {
-      vaga.innerHTML = '<div class="vazia" aria-label="Vaga ' + n + '">' + n + '</div><small>&nbsp;</small>';
+  const mostrarAlbum = (album) => {
+    document.querySelectorAll('[data-albuns] button').forEach((b) => b.setAttribute('aria-pressed', b.textContent === album ? 'true' : 'false'));
+    const tenho = C.lista.filter((c) => c.album === album);
+    const naVaga = new Map(tenho.map((c) => [c.numero, c]));
+    document.querySelector('[data-album-nome]').textContent = album;
+    document.querySelector('[data-album-conta]').textContent = 'Você tem ' + tenho.length + ' de 13';
+    grade.innerHTML = '';
+    for (let n = 1; n <= 13; n++) {
+      const vaga = document.createElement('div');
+      vaga.className = 'vaga';
+      const c = naVaga.get(n);
+      if (c) {
+        vaga.appendChild(C.miniatura(c, 92));
+        const R = C.RARIDADES[c.raridade];
+        vaga.insertAdjacentHTML('beforeend', '<small style="color:' + R.tinta + '">' + C.iconeSvg(c.raridade) + R.nome + '</small>');
+      } else {
+        vaga.innerHTML = '<div class="vazia" aria-label="Vaga ' + n + '">' + n + '</div><small>&nbsp;</small>';
+      }
+      grade.appendChild(vaga);
     }
-    grade.appendChild(vaga);
+    // o que falta: as vagas vazias, que só o sorteio do baú preenche (linho, bronze, prata e ouro)
+    const vagas = 13 - tenho.length;
+    document.querySelector('[data-pode-vir]').innerHTML = '<b>O que pode vir:</b> ' + vagas + (vagas === 1 ? ' vaga' : ' vagas') + ' · '
+      + Object.keys(POR_RARIDADE).map((rar) => '<span>' + C.iconeSvg(rar) + C.RARIDADES[rar].nome + '</span>').join('')
+      + '<span>Nunca repete até completar.</span>';
+  };
+  for (const album of albuns) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = album;
+    b.onclick = () => mostrarAlbum(album);
+    document.querySelector('[data-albuns]').appendChild(b);
   }
-  const restam = [['linho', 4], ['bronze', 3], ['prata', 2]];
-  document.querySelector('[data-pode-vir]').innerHTML = '<b>O que pode vir:</b> restam 9 · '
-    + restam.map(([rar, n]) => '<span>' + C.iconeSvg(rar) + n + ' ' + C.RARIDADES[rar].nome + '</span>').join('')
-    + '<span>Nunca repete até completar.</span>';
+  window.mostrarAlbum = mostrarAlbum;
+  mostrarAlbum('Objetos');
   window.amostraPronta = true;
 })();
 </script>
