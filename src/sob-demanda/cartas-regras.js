@@ -255,8 +255,9 @@
     if (!a.especial && !completo(a, antes) && completo(a, tem)) {
       // álbum completo: um troféu (CC.trofeus) e um sorteio de marco
       resultado.completou = a.id;
+      // (o sorteio de marco pode completar outro álbum: o marco dele vem junto, em seguida)
       const m = R.receber(c, 'album', 'album:' + a.id, { dono, em: em + 1, hoje });
-      return { cartas: m.cartas, resultado, extra: m.resultado ? [{ fonte: 'album', ...m.resultado }] : [] };
+      return { cartas: m.cartas, resultado, extra: (m.resultado ? [{ fonte: 'album', ...m.resultado }] : []).concat(m.extra || []) };
     }
     return { cartas: c, resultado };
   };

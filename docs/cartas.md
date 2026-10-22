@@ -43,26 +43,46 @@ Onde mora cada coisa:
   Cada carta: `id` (minúsculas e hífen, estável para sempre: é ele que fica no estado de quem
   recebeu), `album`, `numero` (1 a 13), `titulo`, `referencia` ("Livro cap.vers", o formato de
   `CC.lerRef`), `voceSabia` (uma linha, fato conferível na referência), `link` (rota de mapa,
-  atlas ou parábola), `desenho` (a chave do desenho na peça de arte; sem ele, o próprio id) e
-  `rascunho: true` até a revisão.
+  atlas ou parábola), `lancada` (seção "Lançamento aos poucos") e `rascunho: true` até a revisão.
+  Os desenhos vão pelo id da carta (`CC.cartas.temArte(id)`).
 - Conjuntos especiais (`especial: true`), fora do sorteio e das proteções, com raridade fixa por
   carta: **Semeadores** (5 cartas por amigos que vieram pelo convite, seção 3) e **Boas-vindas**
   (1 carta Linho para quem chegou por um convite).
 - O build confere tudo (`validarCatalogo`) e para se algo estiver errado: álbuns de 13, datas de
   lançamento válidas e em ordem, capa do próprio álbum, ids únicos, raridade só nos especiais,
-  referência que existe na NBV do repositório, link com destino publicado, sem travessão.
+  referência que existe na NBV do repositório, link com destino publicado, sem travessão, e carta
+  lançada só com desenho na peça de arte.
   No `index.html` vai só o esqueleto do sorteio (`window.CARTAS_INDICE`, cerca de 1,2 KB); o
   catálogo inteiro entra na peça `album`.
-- Carta sem desenho ainda: a miniatura vira a silhueta da raridade (sem texto), e a revelação e a
-  carta grande caem numa carta de texto (moldura da raridade, título, "Você sabia?", referência,
-  verso com a marca). A arte chega depois pelo `desenho`/id, sem mudar nada aqui.
+- Carta sem desenho na coleção (não deveria acontecer, porque só a lançada sai, mas o estado vem do
+  aparelho): a miniatura vira a silhueta da raridade (sem texto), e a carta grande cai numa carta
+  de texto (moldura da raridade, título, "Você sabia?", referência, verso com a marca).
+
+### Lançamento aos poucos (dono, 22/10)
+
+O app vai ao ar com a arte que existe; as outras cartas são desenhadas e revisadas depois.
+
+- Só entra no sorteio a carta com `lancada: true`. O build confere que toda carta lançada tem
+  desenho na peça de arte (`desenhosDaArte`: as chaves de `DESENHOS` em `cartas.js`). Hoje são 6:
+  Davi e a funda, O poço de Jacó, O azeite da viúva, A Arca da Aliança, O túmulo vazio e O mar
+  aberto.
+- No esqueleto do `index.html`, a carta não lançada leva um "~" antes do id.
+- O sorteio, as proteções, o viés para carta nova e as repetidas valem sobre as lançadas. O álbum
+  mostra a não lançada como silhueta, sem texto nenhum sobre data. Um álbum só fica completo com
+  as 13 lançadas e na coleção.
+- Quando um desenho chega, trocar `lancada` para `true` põe a carta no sorteio, e o viés para carta
+  nova a traz logo para quem já tem as outras.
+- Semeadores e Boas-vindas sem desenho: o limiar alcançado fica anotado no livro-caixa
+  (`{ pendente: 1 }`) e paga a carta quando ela for lançada (`R.pagarPendentes`), sem se perder.
+- "O que pode vir" diz quantas cartas podem sair hoje ("Hoje podem sair 6 das 52 cartas.").
 
 | Função | Teste |
 |---|---|
-| `validarCatalogo(cat, raiz)` | teste.mjs: o catálogo confere; acusa id repetido, contagem errada, lançamento fora de ordem e raridade fixa em carta de álbum; as capas pedidas; tudo rascunho |
+| `validarCatalogo(cat, raiz)`, `desenhosDaArte(raiz)` | teste.mjs: o catálogo confere; acusa id repetido, contagem errada, lançamento fora de ordem, raridade fixa em carta de álbum e carta lançada sem desenho; as lançadas são exatamente as com desenho; as capas pedidas; tudo rascunho |
+| lançamento aos poucos | teste.mjs: carta não lançada nunca sai (340 sorteios comuns e de marco); nenhum álbum completa sem as 13 lançadas; lançar uma carta põe ela no sorteio e o viés a traz logo; limiar de Semeadores sem desenho fica anotado e paga quando a carta é lançada; na fusão, o evento pago vence o anotado |
 | `esqueletoDoCatalogo(cat)` | teste.mjs: o esqueleto do index.html é o do catálogo; os textos e a regra não estão no index |
 | `R.albuns(hoje)`, `R.especiais()`, `R.carta(id)` | teste.mjs: 4 álbuns de 13 e os especiais com raridade fixa |
-| `paraArte(id, raridade)`, `temArte(carta)` (album.js) | teste-bau: a carta com desenho vem pela arte; a sem desenho vira carta de texto, sem erro |
+| `paraArte(id, raridade)`, `temArte(carta)` (album.js) | teste-bau: só saem as lançadas, pela arte; carta sem desenho na coleção vira silhueta e carta de texto, sem erro |
 
 ### Catálogo que cresce
 
@@ -94,8 +114,8 @@ tema são revisão).
 Toda carta vem de uma **fonte**. Cada fonte tem uma regra (quando dispara), um prêmio e uma **chave
 de evento** que só paga uma vez:
 
-- `carta`: um sorteio (seção 4);
-- `gloria`: uma versão Glória para escolher (seção 11);
+- `carta`: um sorteio comum (seção 4);
+- `marco`: um sorteio de marco, com chance maior de Ouro e de Glória (seção 11);
 - `especial`: uma carta fixa de um conjunto especial.
 
 O livro-caixa `E.cartas.eventos[chave]` guarda o que cada evento pagou. Ele fica fora do
@@ -127,9 +147,9 @@ e o que ele pagou nunca muda.
 | `discipulado` | primeiro encontro de discipulado registrado | `discipulado:primeiro` | sorteio | 1 na vida | valoriza começar o acompanhamento |
 | `convite` | amigos que vieram pelo seu convite: 1, 5, 15, 40 e 100 | `convite:tier:<1 a 5>` | carta fixa de Semeadores | até 5 na vida | trazer alguém para a Palavra; só conta quem entrou de verdade |
 | `convidado` | sua conta veio por um convite e você fez a primeira lição | `convidado` | Boas-vindas (Linho) | 1 na vida | boas-vindas a quem chega |
-| `album` | completar um álbum (as 13, em qualquer versão) | `album:<id>` | Glória para escolher | 1 por álbum | fim de uma coleção |
-| `unidade` | completar uma unidade da Trilha | `unidade:<n>` | Glória para escolher | até 12 | fim de uma etapa da leitura |
-| `dias` | 100 e 365 dias do plano lidos, acumulados | `dias:100`, `dias:365` | Glória para escolher | 2 | constância, sem exigir dias seguidos |
+| `album` | completar um álbum (as 13 lançadas, em qualquer versão) | `album:<id>` | sorteio de marco | 1 por álbum | fim de uma coleção |
+| `unidade` | completar uma unidade da Trilha | `unidade:<n>` | sorteio de marco | até 12 | fim de uma etapa da leitura |
+| `dias` | 100 e 365 dias do plano lidos, acumulados | `dias:100`, `dias:365` | sorteio de marco | 2 | constância, sem exigir dias seguidos |
 
 **Semeadores**, as cartas do convite, com a raridade fixa de cada limiar (fora do sorteio e das
 proteções; o número de amigos mostrado é só o da própria pessoa, o mesmo da Trilha do Semeador):
@@ -146,7 +166,8 @@ Os títulos seguem a NBV: "Venha e veja você mesmo" (João 1.46) e "Eles já es
 colheita" (João 4.35). A referência da samaritana ficou em João 4.28-30: o formato aceita um
 trecho seguido só, e o versículo 39 não entra junto. Quem pula limiares de uma vez (três amigos
 entram antes de abrir o app) recebe a carta de cada limiar, uma revelação depois da outra. Além de
-100, nada.
+100, nada. Enquanto a carta do limiar não tem desenho, o limiar fica anotado como alcançado (a tela
+de Semeadores mostra "5 amigos · alcançado") e a carta vem quando for lançada.
 
 Fontes avaliadas e **recusadas**:
 
@@ -186,59 +207,80 @@ Fontes avaliadas e **recusadas**:
 Cada fonte de sorteio tira **primeiro a raridade, depois a carta**, com repetidas. O sorteio é
 determinístico: a semente é o `@` da conta (`E.dono`) mais a chave do evento (FNV-1a e
 mulberry32), então o mesmo evento sobre a mesma coleção sorteia igual em qualquer aparelho. Sem
-conta (arquivo aberto direto, servidor de teste aberto), a semente usa `''`.
+conta (arquivo aberto direto, servidor de teste aberto), a semente usa `''`. Só as cartas
+lançadas saem (seção 1).
 
-**Chances por sorteio** (públicas, em "O que pode vir"):
+**Sorteio comum** (baús e as outras fontes; público em "O que pode vir"):
 
 | Raridade | Chance | Comparação |
 |---|---|---|
-| Linho | 50% | |
+| Linho | 49% | |
 | Bronze | 30% | |
 | Prata | 15% | perto de um Épico ou um "Double Rare" por pacote |
 | Ouro | 5% | perto de um Lendário por pacote |
-| Glória | não sai no sorteio | o "god pack" daqui, só por marco |
+| Glória | 1% | o "god pack" daqui |
+
+**Sorteio de marco** (álbum completo, fim de unidade, 100 e 365 dias de leitura; um sorteio a mais,
+nunca Linho nem Bronze):
+
+| Raridade | Chance |
+|---|---|
+| Prata | 40% |
+| Ouro | 35% |
+| Glória | 25% |
 
 **Proteções**:
 
 - a primeira carta da vida é uma Prata;
-- depois de 5 sorteios sem Prata nem Ouro, o seguinte é Prata ou Ouro (nas proporções 15 para 5);
+- depois de 5 sorteios sem Prata ou melhor, o seguinte é Prata ou melhor (Prata e Ouro na proporção
+  de sempre, a Glória continua em 1%);
 - a partir do 12º sorteio sem Ouro, a chance de Ouro sobe 5 pontos por sorteio (10%, 15%... 45%
-  no 19º), e o 20º é Ouro; as outras raridades encolhem na mesma proporção;
+  no 19º), e o 20º é Ouro, também quando ele é um marco; as outras raridades encolhem na mesma
+  proporção, menos a Glória;
+- a Glória conta como "Prata ou melhor", mas não zera a conta do Ouro; no sorteio comum não há
+  garantia de Glória;
+- no marco, cada marco sem Glória dá 15 pontos a ela no marco seguinte (25, 40, 55, 70...),
+  tirados primeiro da Prata e depois do Ouro; volta aos 25 quando sai uma Glória;
 - o viés para carta nova faz o papel da proteção contra repetida.
 
-**A carta**: dos álbuns lançados, com viés para a que a pessoa ainda não tem, em qualquer versão:
+**A carta**: dos álbuns lançados, só as cartas lançadas, com viés para a que a pessoa ainda não tem:
 
-- uma carta que falta no **álbum atual** (o primeiro incompleto, na ordem de lançamento) pesa 20;
+- uma carta que falta no **álbum atual** (o primeiro com carta lançada que falta, na ordem de
+  lançamento) pesa 20;
 - uma que falta nos outros álbuns pesa 5;
-- uma que a pessoa já tem pesa 1.
+- uma que a pessoa já tem pesa 1, ou 2 se ainda não tem a versão sorteada.
 
 Escolha entre "álbum atual" e "todos os álbuns": a simulação mostrou que, só com todos, os quatro
 álbuns enchem juntos e completam todos no fim do ano (nenhum troféu antes). Só com o álbum atual,
-as repetidas passam de 40%, porque as repetidas caem nas poucas cartas do começo. O misto (20, 5 e
-1) completa um álbum por vez, com troféu e Glória ao longo do ano, e ainda deixa os outros
-álbuns aparecerem.
+as repetidas sobem, porque elas caem nas poucas cartas do começo. O misto (20, 5 e 1) completa um
+álbum por vez, com troféu e marco ao longo do ano, e ainda deixa os outros álbuns aparecerem.
 
-### Simulação (ferramentas/simular-cartas.mjs, 300 contas; 8 álbuns, 100 contas)
+### Simulação
 
-| Leitor | Sorteios por ano | Linho / Bronze / Prata / Ouro por ano | Entre Ouros (média / pior) | 4 álbuns completos (mediana, de p10 a p90) | Cartas repetidas no 1º ano | Versão repetida no 1º ano |
-|---|---|---|---|---|---|---|
-| leve | 30 | 13,2 / 7,9 / 6,3 / 2,6 | 10 / 20 | 26,8 meses (24,8 a 30,0) | 6,2% | 2,0% |
-| regular | 75 | 33,3 / 20,1 / 14,7 / 6,9 | 10,1 / 20 | 10,7 meses (9,9 a 12,0) | 30,9% | 11,0% |
-| intenso | 120 | 53,5 / 32,1 / 23,0 / 11,4 | 10,1 / 20 | 6,7 meses (6,2 a 7,5) | 56,7% | 24,3% |
-| regular, 8 álbuns | 75 | 33,3 / 20,1 / 14,6 / 7,0 | 10 / 20 | 23,8 meses (21,8 a 27,0) | 9,2% | 2,8% |
+`ferramentas/simular-cartas.mjs`, a regra de verdade, com o catálogo inteiro lançado (o plano de
+longo prazo; hoje são 6 cartas). 300 contas com 4 álbuns e 100 com 8, ao longo de 3 e 5 anos.
+"Marcos" são as unidades e os 100 e 365 dias (os álbuns completos entram por si).
 
-- Em toda conta simulada, a primeira carta foi Prata, nunca houve mais de 5 sorteios seguidos sem
-  Prata ou Ouro, e o Ouro veio até o 20º.
-- Com as proteções, a taxa real fica em uns 20% de Prata e 9% de Ouro por sorteio (acima dos 15% e
-  5% da tabela). "O que pode vir" mostra a tabela e as proteções.
-- Leitor regular: as 52 cartas em 10,7 meses, dentro da meta de 10 a 14.
-- Repetidas: 30,9% no 1º ano, no limite de cima da meta (20 a 30%). Boa parte delas vem depois que
-  o álbum se completa (meses 11 e 12, quando toda carta já é repetida). Mexer só no viés não
-  baixou isso: de 10/3 a 30/8 a repetida ficou entre 29 e 33%, e com viés menor o álbum demora mais.
-  Por isso o viés ficou como estava (20, 5 e 1). A 60 sorteios por ano, são 13,4 meses e 18% de
-  repetidas.
-- Versões (carta, raridade): a coleção não termina; com 4 álbuns são 208 versões sorteáveis, que
-  se enchem ao longo dos anos (seção "Versões e os anos").
+| Leitor | Sorteios comuns + marcos por ano | Cartas no 1º ano | Linho / Bronze / Prata / Ouro / Glória no 1º ano | Glórias por ano (anos 1, 2, 3) | Entre Ouros (média / pior) | 4 álbuns completos (mediana, p10 a p90) | Cartas repetidas no 1º ano | Versão repetida no 1º ano |
+|---|---|---|---|---|---|---|---|---|
+| leve | 30 + 6 | 36,4 | 14,0 / 8,6 / 6,9 / 4,2 / 2,7 | 2,7 / 3,6 / 3,0 | 7,7 / 20 | 25,2 meses (22,4 a 29,6) | 11,5% | 1,9% |
+| regular | 75 + 14 | 92,9 | 35,1 / 21,9 / 16,7 / 11,6 / 7,6 | 7,6 / 6,3 / 6,3 | 8,1 / 20 | 10,2 meses (9,0 a 11,8) | 44,1% | 9,2% |
+| intenso | 120 + 14 | 138,0 | 54,6 / 33,5 / 25,8 / 16,2 / 8,0 | 8,0 / 6,4 / 6,7 | 8,6 / 20 | 6,8 meses (5,9 a 7,9) | 62,3% | 17,8% |
+| regular, 8 álbuns | 75 + 14 | 90,0 | 34,8 / 21,9 / 15,9 / 11,1 / 6,3 | 6,3 / 8,5 / 6,6 | 8,0 / 20 | 23,7 meses (21,0 a 27,0) | 17,6% | 2,7% |
+| leve, 8 álbuns | 30 + 6 | 36,0 | 14,1 / 8,6 / 6,6 / 4,3 / 2,5 | 2,5 / 2,8 / 3,1 | 7,9 / 20 | 58,8 meses | 4,9% | 0,6% |
+
+- Em todas as contas simuladas: a primeira carta foi Prata, o mesmo evento sorteou igual, nunca
+  houve mais de 5 sorteios seguidos sem Prata ou melhor, o Ouro veio até o 20º, o marco nunca deu
+  Linho nem Bronze, e a Glória no sorteio comum ficou em 0,93 a 1,01%.
+- Leitor regular: as 52 cartas em 10,2 meses (mediana), dentro da meta de 10 a 14.
+- Repetidas: no leitor regular são 44% das cartas do 1º ano, acima da meta de 20 a 30%. O motivo é o
+  volume: com os marcos, são uns 93 sorteios no ano para 52 cartas, e depois de completar (mês 10)
+  toda carta é repetida de alguma versão. Mexer só no viés não muda isso (de 8/3 a 30/8 a repetida
+  ficou entre 44 e 46%; com viés menor, o álbum demora mais). Repetida da mesma versão (carta e
+  raridade iguais) fica em 9%. Ficou o viés 20, 5 e 1 (2 para versão que falta). Com 8 álbuns, a
+  repetida cai para 18%: o catálogo que cresce é o que resolve.
+- Com 6 cartas lançadas hoje, as repetidas são muito mais comuns até os desenhos chegarem: o viés
+  para carta nova traz cada carta lançada logo, e depois vêm as versões.
 
 ### Referências (contexto para as chances)
 
@@ -250,57 +292,58 @@ as repetidas passam de 40%, porque as repetidas caem nas poucas cartas do começ
   Ultra Rare em 1 de 15, Special Illustration Rare em 1 de 32; todo pacote tem um Raro ou melhor.
 - Pokémon TCG Pocket: as camadas mais altas bem abaixo de 1% por espaço, mais o "god pack" de 0,05%.
 - O baú daqui é como um pacote, mas dá uma carta só, e a pessoa abre uns 75 por ano, não centenas:
-  por isso as chances por sorteio ficam no nível de "por pacote", e as proteções, mais curtas.
+  por isso as chances por sorteio ficam no nível de "por pacote", e as proteções, mais curtas. O
+  primeiro sorteio em Prata faz o papel do primeiro Lendário garantido; o viés para carta nova, o da
+  proteção contra repetida; a Glória, o do "god pack".
 
 | Função | Teste |
 |---|---|
 | `R.semente(dono, chave)`, `R.aleatorio(semente)` | teste.mjs: mesma conta e evento, mesma semente; muda com a conta e com o evento |
-| `R.raridade(cartas, r)`, `R.chanceDeOuro(semOuro)` | teste.mjs: 40.000 sorteios dão 50/30/15/5% (±1); o Ouro sobe de 5 em 5 a partir do 12º e o 20º é Ouro; depois de 5 sem Prata ou Ouro só sai Prata ou Ouro; o primeiro da vida é Prata |
-| `R.cartaDoSorteio(cartas, r, hoje)` | teste.mjs: nos 13 primeiros sorteios, 98% de cartas novas e o álbum atual mais que os outros juntos; álbum lançado depois dá a carta seguinte |
-| `R.sortear(cartas, dono, chave, hoje)` | teste.mjs: o mesmo evento sobre o mesmo estado sorteia igual |
-| `simular(...)` | teste.mjs: leitor regular completa em 9,5 a 14 meses com 18 a 33% de repetidas; proteções nunca falham; 8 álbuns também completam |
+| `R.raridade(cartas, r)`, `R.chanceDeOuro(semOuro)` | teste.mjs: 60.000 sorteios dão 49/30/15/5/1%; a Glória fica em 1% com ou sem proteção ativa; o Ouro sobe de 5 em 5 a partir do 12º e o 20º é Ouro; depois de 5 sem Prata ou melhor só sai Prata ou melhor; a Glória não zera a conta do Ouro; o primeiro da vida é Prata |
+| `R.raridadeDeMarco`, `R.chancesDeMarco`, `R.marcosSemGloria` | teste.mjs: 40/35/25%; nunca Linho nem Bronze; +15 por marco sem Glória, tirados da Prata e depois do Ouro; zera quando sai Glória |
+| `R.cartaDoSorteio(cartas, r, hoje, raridade)` | teste.mjs: nos 13 primeiros sorteios, mais de 90% de cartas novas e o álbum atual mais que os outros juntos; só lançadas; álbum lançado depois dá a carta seguinte |
+| `R.sortear(cartas, dono, chave, hoje, marco)` | teste.mjs: o mesmo evento sobre o mesmo estado sorteia igual |
+| `simular(...)` | teste.mjs: leitor regular completa em 9 a 14 meses; proteções nunca falham; marco sem Linho nem Bronze; Glória comum perto de 1%; 8 álbuns também completam |
 
 ### Versões e os anos
 
-- A unidade colecionável é a versão (carta, raridade). Com 4 álbuns: 52 cartas, 208 versões
-  sorteáveis (Linho, Bronze, Prata e Ouro) e 52 Glórias, escolhidas por marco.
+- A unidade colecionável é a versão (carta, raridade). Com 4 álbuns: 52 cartas e 260 versões
+  (Linho, Bronze, Prata, Ouro e Glória).
 - No primeiro ano, o viés enche a base (as 52 cartas em alguma versão). Depois, os sorteios
-  continuam e as versões e as repetidas vão se juntando: a Prata e o Ouro de cada carta são o que
+  continuam, e as versões e as repetidas vão se juntando: Ouro e Glória de cada carta são o que
   falta nos anos seguintes.
 - Recomeçar a Trilha (ou "Zerar progresso") guarda tudo: os baús voltam fechados e pagam sorteios
   novos (seção 7).
 - Cada álbum mostra "13 de 13 cartas" (a base, em qualquer versão) e, à parte,
-  "Coleção: 21 de 52 versões".
+  "Coleção: 21 de 65 versões".
 
 ## 5. Estado e sincronização entre aparelhos
 
-`E.cartas = { eventos, glorias }`:
+`E.cartas = { eventos }`, o livro-caixa:
 
-- `eventos[chave] = { em, carta, raridade }` quando o evento pagou uma carta, ou `{ em, gloria: 1 }`
-  quando deu uma Glória para escolher;
-- `glorias[chave] = { em, carta, escolhidaEm }`: a Glória, com `carta` vazia enquanto a pessoa não
-  escolhe.
+- `eventos[chave] = { em, carta, raridade }` quando o evento pagou uma carta;
+- `eventos[chave] = { em, pendente: 1 }` quando o evento foi alcançado mas a carta dele (especial)
+  ainda não tem desenho; vira carta quando ela for lançada.
 
 A coleção é derivada do livro-caixa (`R.copias`, `R.tem`): **cada evento que pagou uma carta é uma
-cópia**, com id próprio (a chave do evento), origem (a fonte) e data; a Glória escolhida também é
-uma cópia (a versão Glória da carta). O número de repetidas sai da contagem. Isso deixa trocas
-possíveis no futuro (seção 19): uma cópia tem identidade.
+cópia**, com id próprio (a chave do evento), origem (a fonte) e data. O número de repetidas sai da
+contagem. Isso deixa trocas possíveis no futuro (seção 19): uma cópia tem identidade.
 
 Fusão (`fundirCartas`, em `02-estado.js`, a mesma no servidor): união por chave, em que vale o
-registro mais antigo de cada chave. Assim nada é contado duas vezes (o mesmo baú aberto em dois
-aparelhos é uma chave só) e nenhuma cópia se perde. Na Glória vale a escolha mais antiga; duas
-Glórias na mesma carta deixam a mais nova para escolher de novo. `limparCartas` confere a forma de
+registro mais antigo de cada chave, e o evento que já pagou a carta vence o que ainda esperava.
+Assim nada é contado duas vezes (o mesmo baú aberto em dois aparelhos é uma chave só), nenhuma
+cópia se perde, e o resultado de cada evento fica para sempre. `limparCartas` confere a forma de
 tudo que chega: chaves num alfabeto curto, carta e raridade conhecidas, números, no máximo 2.000
 eventos. O servidor roda as duas em `/api/estado` (normalizar, depois fundir), então um aparelho
 com a versão antiga, que manda o estado sem `cartas`, não as apaga.
 
 | Função | Teste |
 |---|---|
-| `limparCartas(x)` | teste.mjs: chave inválida, carta ou raridade estranha e campos a mais saem; teto de 2.000 |
-| `fundirCartas(a, b)` | teste.mjs: mesmo resultado nos dois sentidos; o baú do dia 14 nos dois aparelhos conta uma vez; fundir de novo não duplica; Glória duplicada volta a escolher |
+| `limparCartas(x)` | teste.mjs: chave inválida, carta ou raridade estranha e campos a mais saem; o alcançado fica; teto de 2.000 |
+| `fundirCartas(a, b)` | teste.mjs: mesmo resultado nos dois sentidos; o baú do dia 14 nos dois aparelhos conta uma vez; fundir de novo não duplica; o evento pago vence o anotado |
 | `R.copias`, `R.tem` | teste.mjs: três eventos de uma carta dão Bronze ×2 e Ouro ×1, uma repetida, cópias com id, origem e data |
 | `fundir` (02-estado) leva `cartas` | teste.mjs: na fusão com um aparelho que zerou, as cartas dos dois lados ficam; aparelho antigo sem cartas não as apaga |
-| `/api/estado` | teste.mjs (servidor do cofre) e teste-bau: as cartas gravam e voltam |
+| `/api/estado` | teste.mjs (servidor do cofre): as cartas gravam e voltam, a de convite não confirmada não entra, o aparelho sem cartas não as apaga |
 
 ## 6. Baús abertos antes das cartas
 
@@ -328,57 +371,66 @@ marcos não têm geração: o Zerar não os faz pagar de novo.
 ## 8. Revelação
 
 - **No baú**: tocar no baú guarda o versículo (`CC.abrirBau`, como antes). A tela pede as três
-  peças (regra, arte e álbum) assim que abre; chegando em até 2,5 s, `CC.cartasEmDia` paga o baú e
-  `CC.album.revelarNoBau` mostra a carta pela arte, com uma função só:
-  `CC.cartas.revelar(alvo, carta, { raridade, nova, progresso })`. Embaixo:
+  peças (regra, arte e álbum) assim que abre. Com elas prontas, `CC.cartasEmDia` paga o baú e
+  `CC.album.revelarNoBau` passa a abertura inteira para a arte, por uma função só:
+  `CC.cartas.revelar(alvo, carta, { raridade, legenda, abrir: 'ja', largura, aoLer })`. A arte faz
+  o baú balançar, a tampa abrir com a luz na cor da raridade, a carta subir e virar; o baú da
+  Trilha não anima antes (nada anima duas vezes). Se as peças ainda não chegaram, o baú da Trilha
+  balança enquanto espera, até 2,5 s.
+- A legenda (dentro da arte):
   - carta nova: "**Nova!** Você tem 9 de 13 em Objetos";
-  - versão nova de uma carta que a pessoa já tem: "**Nova versão Prata** de Davi e a funda";
-  - repetida: "Repetida: agora você tem 2 de Davi e a funda (Bronze)";
-  - álbum completo: "Álbum completo! Escolha uma carta para a versão Glória." e "Escolher a Glória";
-  - "Compartilhar carta" (só com desenho), "Salvar papel de parede" e "Continuar".
+  - versão nova de uma carta que a pessoa já tem: "Nova versão Prata de Davi e a funda";
+  - repetida: "Repetida: agora você tem 2 de Davi e a funda (Bronze)".
+- "Ler a história" (o `aoLer` da arte) abre a referência da carta na Bíblia. Embaixo, fora da arte:
+  "Compartilhar carta" (só com desenho), "Salvar papel de parede" e "Continuar".
+- O que o baú pagou junto vem em seguida, na mesma tela, uma revelação depois da outra: o sorteio
+  de marco do álbum que ele completou ("Álbum completo! Ganhou um sorteio de marco."), um marco de
+  unidade, uma carta de outra fonte.
+- A arte foi feita para um palco escuro (texto creme): a tela da revelação fica escura nos dois
+  temas, com as fichas do tema escuro.
 - **Sem as peças** (sem rede na primeira vez): a tela de sempre, com o confete e o versículo, e
   "A carta deste baú vai para o seu álbum." A carta chega quando a regra carregar (seção 6).
-- **Outras fontes**: quando `CC.cartasEmDia` paga carta de outra fonte e nada está aberto na tela,
-  `CC.album.revelarNovas` mostra uma revelação depois da outra (o título diz a origem: "Primeiros
-  passos completos", "Amigos que chegaram pelo seu convite"...). Com algo aberto, e para os baús
-  antigos, um aviso curto: "Carta nova no seu álbum." ou "3 cartas novas no seu álbum."
+- **Outras fontes e marcos**: quando `CC.cartasEmDia` paga carta de outra fonte e nada está aberto
+  na tela, `CC.album.revelarNovas` mostra uma revelação depois da outra; o título diz a origem
+  ("Primeiros passos completos", "Amigos que chegaram pelo seu convite") e, no marco, "Marco: 100
+  dias de leitura", "Marco: unidade 3 completa", "Marco: Objetos completo". Com algo aberto, e para
+  os baús antigos, um aviso curto: "Carta nova no seu álbum." ou "3 cartas novas no seu álbum."
 
 | Função | Teste |
 |---|---|
 | `CC.pedirCartas()` | teste-bau: a arte e o álbum não vêm no index.html; na Trilha não são pedidos |
-| `CC.album.revelarNoBau(el, palco, { chave, ref, fechar })` | teste-bau: abrir o baú revela a carta pela arte, "Nova! Você tem 1 de 13 em Heróis da fé", Prata, os três botões com 44 px |
-| carta de texto | teste-bau: a segunda carta, sem desenho, vira carta de texto; "2 de 13"; sem Compartilhar carta |
-| `legenda(x)` | teste-bau (nova); a repetida e a versão nova saem da mesma função |
-| `CC.album.revelarNovas(lista)` | coberta pelo `emDia` em teste.mjs; a tela é a mesma da revelação do baú |
+| `CC.album.revelarNoBau(el, palco, { chave, ref, fechar, outros })` | teste-bau: com as peças prontas o baú da Trilha não balança e a arte faz a abertura até o fim; "Nova! Você tem 1 de 13 em Heróis da fé", Prata; os três botões com 44 px; "Ler a história" abre 1 Samuel 17 e fecha a tela; palco escuro no tema claro |
+| `legenda(x)` | teste-bau: nova, repetida ("Repetida: agora você tem 3 de Davi e a funda (Prata)") e versão nova ("Nova versão Ouro de Davi e a funda") |
+| `CC.album.revelarNovas(lista)` | teste-bau: a prática sem erro revela a carta com a origem no título; os marcos de 100 dias e das 3 unidades, cada um com Prata, Ouro ou Glória e "Marco: ..." |
+| reserva sem peças | teste-bau: o versículo e o aviso; quando a regra carrega, a carta chega |
 
 ## 9. Álbum, carta grande e "O que pode vir"
 
 - Rota `#/perfil/album` (casca `CC.vistaAlbum` no index; a tela vem da peça `album`). Entrada no
   Perfil, na Coleção, ao lado de Conquistas e Troféus: "Cartas", "9 de 52".
 - No topo: quantas cartas de quantas e quantas repetidas; "O que pode vir"; o álbum atual.
-- Para cada álbum lançado: nome, "9 de 13 cartas", "Coleção: 21 de 52 versões" (e quantas Glórias),
-  e a grade das 13. A recebida aparece na **melhor versão** (Glória, Ouro, Prata, Bronze, Linho),
-  com 5 bolinhas embaixo (as versões que a pessoa tem) e "×2" quando há mais de uma cópia daquela
-  versão. A que falta é silhueta, fora do leitor de tela. Nenhum texto nas miniaturas; o rótulo
-  acessível diz título, versões e repetidas.
-- Semeadores, à parte: os 5 limiares em silhueta, com "1 amigo", "5 amigos"... embaixo, e quantos
-  amigos chegaram pelo convite da própria pessoa. Boas-vindas aparece só para quem recebeu.
+- Para cada álbum lançado: nome, "9 de 13 cartas", "Coleção: 21 de 65 versões" e a grade das 13. A
+  recebida aparece na **melhor versão** (Glória, Ouro, Prata, Bronze, Linho), com 5 bolinhas
+  embaixo (as versões que a pessoa tem) e "×2" quando há mais de uma cópia daquela versão. A que
+  falta, e a ainda não lançada, é silhueta, fora do leitor de tela. Nenhum texto nas miniaturas; o
+  rótulo acessível diz título, versões e repetidas.
+- Semeadores, à parte: os 5 limiares em silhueta, com "1 amigo", "5 amigos"... embaixo ("· alcançado"
+  quando a carta ainda espera o desenho), e quantos amigos chegaram pelo convite da própria pessoa.
+  Boas-vindas aparece só para quem recebeu.
 - Tocar numa recebida abre a carta grande: inclina com o dedo, vira para o verso com a marca GE
   (toque, arraste ou "Virar"), a troca entre as versões que a pessoa tem (as que faltam em
   silhueta, com ×N nas repetidas), título, "Você sabia?", a referência com link para a Bíblia, o
   link para o mapa ou a parábola e "Compartilhar".
-- "O que pode vir": as chances de cada raridade, as proteções e os números da pessoa (álbum atual,
-  sorteios desde o último Ouro e desde a última Prata ou Ouro).
-- Glória para escolher: no topo do álbum, "Uma versão Glória para escolher" e "Escolher"; a tela de
-  escolha mostra as cartas que a pessoa tem sem Glória; confirmar abre a carta na versão Glória.
+- "O que pode vir": a tabela do sorteio comum e a do marco, as proteções, quantas cartas podem
+  sair hoje e os números da pessoa (álbum atual, sorteios desde o último Ouro e desde a última
+  Prata ou melhor, a chance de Glória no próximo marco).
 
 | Função | Teste |
 |---|---|
-| `R.resumo(cartas, hoje)` | teste.mjs: álbum atual, cartas, versões, repetidas, Glórias pendentes, sorteios desde Ouro e desde Prata |
-| `CC.album.tela(raiz)` | teste-bau: 2 desenhadas e 11 silhuetas sem texto; "2 de 13 cartas" e "Coleção: 3 de 52 versões"; bolinhas, ×2 e rótulo; Semeadores com os 5 limiares; cabe no computador sem rolagem de lado |
-| `CC.album.abrirCarta(id, raridade)` | teste-bau: a melhor versão aberta, ×2, silhuetas das que faltam; troca para Bronze; Virar mostra o verso; Compartilhar e link da Bíblia |
-| `CC.album.oQuePodeVir()` | teste-bau: as chances, as proteções e os números da pessoa; nada de "não repete" |
-| `CC.album.escolherGloria()` | teste-bau: o álbum oferece a escolha, mostra as cartas que a pessoa tem, confirmar põe a Glória e abre a carta nela |
+| `R.resumo(cartas, hoje)` | teste.mjs: álbum atual, cartas, lançadas, versões, repetidas, alcançados, sorteios desde Ouro e desde Prata, marcos sem Glória |
+| `CC.album.tela(raiz)` | teste-bau: as recebidas e as silhuetas sem texto; "2 de 13 cartas" e "Coleção: 3 de 65 versões"; bolinhas, ×2 e rótulo; carta sem desenho em silhueta; Semeadores com os 5 limiares; cabe no computador sem rolagem de lado |
+| `CC.album.abrirCarta(id, raridade)` | teste-bau: a melhor versão aberta, ×2, silhuetas das que faltam; troca para Bronze; Virar mostra o verso; Compartilhar e link da Bíblia; sem desenho, carta de texto sem Compartilhar |
+| `CC.album.oQuePodeVir()` | teste-bau: as duas tabelas (49/30/15/5/1 e 40/35/25), as proteções, "Hoje podem sair 6 das 52 cartas" e os números da pessoa; nada de "não repete" |
 
 ## 10. Compartilhar e papel de parede
 
@@ -394,21 +446,22 @@ marcos não têm geração: o Zerar não os faz pagar de novo.
 |---|
 | teste-bau: Compartilhar carta manda um PNG 1080×1920 com o título e a versão; Salvar papel de parede manda um PNG 1080×2340 |
 
-## 11. Troféus e Glória
+## 11. Troféus, marcos e Glória
 
-- Álbum completo (as 13, em qualquer versão): um troféu na estante (`CC.trofeus().albuns`, seção
-  "Álbuns de cartas" em Troféus) e uma versão Glória para escolher.
-- A Glória **nunca sai no sorteio**. Os marcos dão a versão Glória de uma carta que a pessoa
-  **escolhe** entre as que tem sem Glória: álbum completo, fim de cada unidade da Trilha, 100 e 365
-  dias do plano lidos (acumulados). Se a pessoa não escolhe, a Glória espera, sem prazo.
-- Carta de Semeadores e de Boas-vindas não recebe Glória (a de 100 amigos já nasce Glória).
+- Álbum completo (as 13 lançadas e na coleção, em qualquer versão): um troféu na estante
+  (`CC.trofeus().albuns`, seção "Álbuns de cartas" em Troféus) e um sorteio de marco.
+- A Glória é sorte (dono, 22/10): 1% no sorteio comum e, nos marcos, um sorteio a mais com
+  Glória 25% (subindo 15 pontos a cada marco sem ela), Ouro 35% e Prata 40%. A carta é escolhida
+  como em qualquer sorteio (lançadas, viés para carta nova e para a versão que falta).
+- Marcos: álbum completo, fim de cada unidade da Trilha, 100 e 365 dias do plano lidos
+  (acumulados). Cada um paga uma vez na vida.
+- A carta de 100 amigos de Semeadores é Glória por ser de limiar fixo, não sorteio.
 
 | Função | Teste |
 |---|---|
-| `CC.trofeus` com `albuns`, `CC.albunsDeCartas` | teste-bau: a entrada do Perfil conta as cartas; o troféu aparece em Troféus |
-| fonte `album` | teste.mjs: a carta que falta completa o álbum, que fica completo e dá uma Glória para escolher |
-| `R.podeGloria`, `R.escolherGloria(cartas, id, em)` | teste.mjs: a pessoa escolhe, e a versão Glória entra como cópia; sem pendente, nada; não repete Glória na mesma carta; Semeadores não recebe |
-| fontes `unidade`, `dias` | teste.mjs: dão Glória para escolher, sem carta, uma vez |
+| `CC.trofeus` com `albuns`, `CC.albunsDeCartas` | teste-bau: a entrada do Perfil conta as cartas; a estante "Álbuns de cartas" em Troféus |
+| fonte `album` | teste.mjs: a carta que falta completa o álbum, que fica completo e paga um sorteio de marco junto; o marco que completa outro álbum traz o marco dele também |
+| fontes `unidade`, `dias` | teste.mjs: pagam um sorteio de marco, com Prata ou melhor, uma vez; teste-bau: "Marco: 100 dias de leitura" e as unidades revelados |
 
 ## 12. Sem rede
 
@@ -443,8 +496,8 @@ zerar (seção 11), com "Ajuste da versão 5, 22 de outubro de 2026" no históri
 
 - **Nada é pago.** Não há moeda, não há loja e não há como comprar sorteio, nem com dinheiro nem
   com nada que se compre. As cartas vêm só da leitura e das fontes da seção 3.
-- **As chances são públicas**: "O que pode vir" mostra a chance de cada raridade, as proteções e os
-  números da própria pessoa. Isso importa por causa do ECA Digital (art. 20, sobre caixas de
+- **As chances são públicas**: "O que pode vir" mostra a chance de cada raridade no sorteio comum e
+  no de marco, as proteções e os números da própria pessoa. Isso importa por causa do ECA Digital (art. 20, sobre caixas de
   recompensa para crianças e adolescentes): aqui não há compra, e as chances estão à vista.
 - Sem FOMO: nada expira, não há "quase ganhou", não há placar nem raridade dos amigos.
 - Cada evento paga uma vez (livro-caixa). Repetir uma ação não dá carta.
@@ -457,20 +510,23 @@ zerar (seção 11), com "Ajuste da versão 5, 22 de outubro de 2026" no históri
 
 - `index.html`: a fusão e a forma (02-estado.js), os pedidos e a contagem por álbum (02b-jogo.js),
   a tela do baú, a entrada do Perfil, a casca do álbum e o esqueleto do catálogo. A folga do
-  index.html continua acima de 60 KB (teste.mjs): 67,7 KB.
-- Peças: `cartas-regras` (a regra, cerca de 11 KB), `album` (catálogo, telas e estilo) e `cartas`
-  (a arte), pedidas só quando servem.
+  index.html continua acima de 60 KB (teste.mjs): 68,3 KB.
+- Peças: `cartas-regras` (a regra, cerca de 14 KB), `album` (catálogo, telas e estilo, cerca de
+  42 KB) e `cartas` (a arte, cerca de 150 KB), pedidas só quando servem.
 
 ## 18. Testes
 
 - `node teste.mjs`, seção "cartas e álbuns", mais as partes de contas e do servidor do cofre:
-  catálogo, chances (40.000 sorteios), proteções, primeira Prata, viés para carta nova, repetidas
-  contadas pelo livro-caixa, resultado estável por evento, fusão sem duplicar, Zerar, fontes do
-  estado e do servidor, Semeadores fora do sorteio, álbum novo no dia do lançamento, e a simulação
-  com as metas (regular: 9,5 a 14 meses, 18 a 33% de repetidas; 8 álbuns completam).
-- `ferramentas/teste-bau.mjs`: abrir o baú, a carta aparecer, compartilhar, papel de parede, carta
-  sem desenho, a entrada no Perfil, o álbum, a carta grande e as versões, "O que pode vir", a
-  escolha da Glória, o álbum no computador e a reserva sem as peças.
+  catálogo e lançadas com desenho, chances do comum (60.000 sorteios) e do marco, Glória a 1% no
+  comum, proteções, primeira Prata, viés para carta nova, só lançadas saem, pendentes de
+  Semeadores, repetidas contadas pelo livro-caixa, resultado estável por evento, fusão sem
+  duplicar, Zerar, fontes do estado e do servidor, Semeadores fora do sorteio, álbum novo no dia do
+  lançamento, e a simulação (regular: 9 a 14 meses; proteções nunca falham; 8 álbuns completam).
+- `ferramentas/teste-bau.mjs`, contra a peça de arte de verdade: abrir o baú (a arte faz a abertura),
+  a carta aparecer, "Ler a história", compartilhar, papel de parede, só lançadas, a entrada no
+  Perfil, o álbum, a carta grande e as versões, a carta sem desenho, "O que pode vir" com as duas
+  tabelas, outra fonte e os marcos revelados, repetida e versão nova, Troféus, o álbum no
+  computador e a reserva sem as peças.
 - `ferramentas/simular-cartas.mjs`: o relatório da seção 4 (leve, regular e intenso; 4 e 8 álbuns).
 - A bateria de sempre (`scratchpad/testar-tudo.sh`), mais `teste-bau`, `teste-story` e
   `teste-compartilhar`.
@@ -493,7 +549,8 @@ precisaria, no mínimo:
 
 - Trocas (seção 19).
 - Cor de destaque e moldura destraváveis (fase 2 do plano).
-- Os desenhos das cartas e das 5 de Semeadores (peça de arte, em paralelo), e a revisão pastoral dos
-  textos do catálogo (marcados `rascunho`).
+- Os desenhos das outras 46 cartas, das 5 de Semeadores e da de Boas-vindas (peça de arte, em
+  paralelo; entram por `lancada`), e a revisão pastoral dos textos do catálogo (marcados
+  `rascunho`).
 - Os álbuns futuros (proposta na seção 1).
 - Som.

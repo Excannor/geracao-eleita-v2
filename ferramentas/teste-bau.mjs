@@ -181,7 +181,7 @@ try {
   ok(await esperar('!!' + q('[data-album-cartas]')), 'o Perfil tem a entrada Cartas, ao lado de Conquistas e Troféus');
   ok(/Cartas\s*3 de 52/.test(await texto('[data-album-cartas]')), 'a entrada diz quantas cartas de 52 (' + (await texto('[data-album-cartas]')).trim() + ')');
   await av(q('[data-album-cartas]') + '.scrollIntoView({ block: "center" })');
-  await nosDoisTemas('03-perfil-entrada');
+  await nosDoisTemas('02-perfil-entrada');
 
   // ---------- o álbum ----------
   await av(q('[data-album-cartas]') + '.click()');
@@ -198,7 +198,7 @@ try {
   ok(await av('!!document.querySelector("[data-carta=noe-arca] .album-sem-arte")'), 'carta sem desenho aparece em silhueta da raridade');
   ok(await av('document.querySelectorAll("[data-album=semeadores] .album-limiar").length === 5 && /100 amigos/.test(document.querySelector("[data-album=semeadores]").textContent)'),
     'Semeadores aparece à parte, com os 5 limiares em silhueta (de 1 a 100 amigos)');
-  await nosDoisTemas('04-album');
+  await nosDoisTemas('03-album');
 
   // ---------- a carta grande ----------
   await av(q('[data-carta="davi-funda"]') + '.click()');
@@ -212,7 +212,7 @@ try {
   ok(await av('!!document.querySelector(".tela-carta [data-compartilhar-carta]:not([hidden])") && /1 Samuel 17/.test(document.querySelector(".carta-links").textContent)'), 'a carta grande tem Compartilhar e o link para a Bíblia');
   await av(q('.tela-carta .cv-botao-virar') + '.click()');
   await dormir(900);
-  await nosDoisTemas('05-carta-grande');
+  await nosDoisTemas('04-carta-grande');
   await fecharTudo();
   await av(q('[data-carta="noe-arca"]') + '.click()');
   ok(await esperar('!!' + q('.tela-carta .carta-texto')) && await av('!!document.querySelector(".tela-carta [data-compartilhar-carta][hidden]")'), 'a carta sem desenho abre como carta de texto, sem Compartilhar');
@@ -229,7 +229,7 @@ try {
   ok(/No máximo 5 seguidas sem Prata ou melhor/.test(pode) && /20º é Ouro/.test(pode) && /sobe 15 pontos/.test(pode) && /Hoje podem sair 6 das 52 cartas/.test(pode) && /Desde o último Ouro: 5 sorteios/.test(pode),
     'mostra as proteções, quantas cartas podem sair hoje e os números da pessoa');
   ok(!/nunca repete|não repete/i.test(pode), 'não promete que as cartas não se repetem');
-  await nosDoisTemas('06-o-que-pode-vir');
+  await nosDoisTemas('05-o-que-pode-vir');
   await fecharTudo();
 
   // ---------- outra fonte: a prática sem erro revela uma carta ----------
@@ -247,7 +247,7 @@ try {
   ok(await esperar('/Repetida: agora você tem 3 de Davi e a funda \\(Prata\\)/.test(' + legenda('.tela-carta-nova') + ')'), 'repetida: "Repetida: agora você tem 3 de Davi e a funda (Prata)"');
   await terminar('.tela-carta-nova');
   await dormir(600);
-  await nosDoisTemas('09-repetida');
+  await nosDoisTemas('06-repetida');
   await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
   ok(await esperar('/Nova versão Ouro de Davi e a funda/.test(' + legenda('.tela-carta-nova') + ') && /Primeiros passos completos/.test(document.querySelector(".tela-carta-nova h1").textContent)'),
     'a seguinte: "Nova versão Ouro de Davi e a funda", com a origem dela');
@@ -261,7 +261,7 @@ try {
   const marcos = [];
   for (let i = 0; i < 6 && await av('!!document.querySelector(".tela-carta-nova")'); i++) {
     marcos.push(await av('document.querySelector(".tela-carta-nova h1").textContent + " · " + (document.querySelector(".tela-carta-nova .rv") || document.querySelector(".tela-carta-nova .carta-texto") || {}).dataset.raridade'));
-    if (i === 0) { await terminar('.tela-carta-nova'); await dormir(1200); await nosDoisTemas('10-marco'); }
+    if (i === 0) { await terminar('.tela-carta-nova'); await dormir(1200); await nosDoisTemas('07-marco'); }
     await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
     await dormir(400);
   }
