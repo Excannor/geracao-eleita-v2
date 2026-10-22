@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { copyFileSync } from 'node:fs';
 import { montarAbertura } from './ferramentas/abertura.mjs';
+import { lerCatalogo, validarCatalogo, esqueletoDoCatalogo } from './ferramentas/cartas-catalogo.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const src = (...p) => join(AQUI, 'src', ...p);
@@ -362,6 +363,18 @@ writeFileSync(dist(arquivoAvisoTela), telaAviso, 'utf8');
 writeFileSync(dist(arquivoAvisoTela + '.gz'), gzipSync(Buffer.from(telaAviso, 'utf8'), { level: 9 }));
 console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 
+// ---------- cartas do baú ----------
+// O catálogo (conteudo/cartas/indice.json, docs/cartas.md) é conferido aqui: forma errada para o
+// build. No index.html vai só o esqueleto do sorteio (álbum, id e raridade, perto de 1 KB); o
+// catálogo inteiro entra na peça "album" no lugar da marca '/*CATALOGO_CARTAS*/'.
+const catalogoCartas = lerCatalogo(AQUI);
+{
+  const erros = validarCatalogo(catalogoCartas, AQUI);
+  if (erros.length) throw new Error('conteudo/cartas/indice.json: ' + erros.slice(0, 5).join('; '));
+}
+const esqueletoCartas = esqueletoDoCatalogo(catalogoCartas);
+console.log('cartas:', catalogoCartas.cartas.length, 'em', catalogoCartas.albuns.length, 'álbuns');
+
 // ---------- peças sob demanda ----------
 // O que pesa e pouca gente usa (o gerador de QR, a tela do mapa, o painel do administrador,
 // as cartas do baú)
@@ -374,7 +387,7 @@ console.log('tela do aviso:', arquivoAvisoTela, kb(telaAviso));
 // Uma peça pode juntar vários arquivos (PARTES_PECA), na ordem: o estudo da célula leva as regras
 // puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela, e o preparo leva o leitor
 // de marcas (estudo-marcas.js, que o servidor também carrega) antes do editor. O padrão é <nome>.js.
-const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas'];
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album'];
 const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
@@ -384,6 +397,10 @@ const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
     if (/<\/style/i.test(css)) throw new Error('src/sob-demanda/' + nome + '.css tem "</style>" dentro');
     if (!codigo.includes("'/*ESTILO_PECA*/'")) throw new Error('src/sob-demanda/' + nome + '.js não tem a marca do estilo');
     codigo = codigo.replace("'/*ESTILO_PECA*/'", () => JSON.stringify(css));
+  }
+  if (nome === 'album') {
+    if (!codigo.includes("'/*CATALOGO_CARTAS*/'")) throw new Error('src/sob-demanda/album.js não tem a marca do catálogo');
+    codigo = codigo.replace("'/*CATALOGO_CARTAS*/'", () => JSON.stringify(catalogoCartas).replace(/</g, '\\u003c'));
   }
   const arquivo = nome + '.' + createHash('sha256').update(codigo).digest('hex').slice(0, 10) + '.js';
   writeFileSync(dist(arquivo), codigo, 'utf8');
@@ -491,6 +508,9 @@ const html = molde
     + 'window.ESTUDO_PREPARO=' + JSON.stringify(pecas['estudo-preparo']) + ';'
     + 'window.ATLAS=' + JSON.stringify(atlas).replace(/</g, '\\u003c') + ';'
     + 'window.CARTAS=' + JSON.stringify(pecas.cartas) + ';'
+    + 'window.ALBUM_CARTAS=' + JSON.stringify(pecas.album) + ';'
+    + 'window.CARTAS_REGRAS=' + JSON.stringify(pecas['cartas-regras']) + ';'
+    + 'window.CARTAS_INDICE=' + JSON.stringify(esqueletoCartas).replace(/</g, '\\u003c') + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
     + 'window.BIBLIAS=' + JSON.stringify(biblias).replace(/</g, '\\u003c') + ';')

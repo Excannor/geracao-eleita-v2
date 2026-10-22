@@ -20,6 +20,7 @@ import {
   itemDoHistorico, estudoDoRegistro, cursorDe, lerCursor, daMaeAteOCorte, encontrosAteOCorte,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
+import { lerCatalogo, validarCatalogo, esqueletoDoCatalogo } from './ferramentas/cartas-catalogo.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 let falhas = 0;
@@ -1369,6 +1370,206 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
     }
   }
   checar(!comGiria.length, 'os textos das telas não têm "Bora", "tempão" nem "sumido"' + (comGiria.length ? ' (' + comGiria.slice(0, 3).join(' | ') + ')' : ''));
+}
+
+// =========================================================================
+secao('cartas e álbuns (docs/cartas.md)');
+// =========================================================================
+const CATALOGO = lerCatalogo(AQUI);
+{
+  const erros = validarCatalogo(CATALOGO, AQUI);
+  checar(!erros.length, 'o catálogo tem 4 álbuns de 13 (5 Linho, 4 Bronze, 3 Prata, 1 Ouro), ids únicos, referências na NBV e links com destino' + (erros.length ? ' (' + erros.slice(0, 4).join('; ') + ')' : ''));
+  const ouro = (a) => (CATALOGO.cartas.find((c) => c.album === a && c.raridade === 'ouro') || {}).titulo;
+  checar(ouro('herois') === 'Nuvem de testemunhas' && ouro('lugares') === 'Jerusalém' && ouro('objetos') === 'A Arca da Aliança' && ouro('milagres') === 'O túmulo vazio',
+    'o Ouro de cada álbum é o pedido: Nuvem de testemunhas, Jerusalém, a Arca da Aliança e o túmulo vazio');
+  checar(CATALOGO.cartas.every((c) => c.rascunho === true), 'os textos do catálogo estão marcados como rascunho até a revisão');
+  const ruim = validarCatalogo({ albuns: CATALOGO.albuns, cartas: CATALOGO.cartas.slice(1).concat({ ...CATALOGO.cartas[1] }) });
+  checar(ruim.some((e) => /repetido/.test(e)) && ruim.some((e) => /13 cartas|linho/.test(e)), 'a conferência acusa id repetido e contagem errada');
+  const esq = esqueletoDoCatalogo(CATALOGO);
+  const noIndex = JSON.parse((html.match(/window\.CARTAS_INDICE=(\[.*?\]);/) || [])[1] || 'null');
+  checar(JSON.stringify(noIndex) === JSON.stringify(esq) && esq.filter((a) => !a.especial).every((a) => a.c.split(' ').length === 13) && esq.filter((a) => a.especial).map((a) => a.id).join() === 'semeadores,boas-vindas', 'o esqueleto do sorteio no index.html é o do catálogo (' + JSON.stringify(esq).length + ' bytes)');
+  checar(!html.includes('"voceSabia"') && !html.includes(CATALOGO.cartas[0].voceSabia), 'os textos das cartas não estão no index.html');
+}
+
+// --- o sorteio (src/sob-demanda/cartas-regras.js) ---
+contexto.window.CARTAS_INDICE = esqueletoDoCatalogo(CATALOGO);
+runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'cartas-regras.js'), 'utf8'), contexto, { filename: 'cartas-regras.js' });
+const RC = CC.cartasRegras;
+const RARIDADE_DE = Object.fromEntries(CATALOGO.cartas.map((c) => [c.id, c.raridade]));
+const ALTA = (id) => ['prata', 'ouro'].includes(RARIDADE_DE[id]);
+const CONTAS_TESTE = Array.from({ length: 300 }, (_, i) => 'pessoa' + i).concat('', 'ana', 'Ana');
+{
+  checar(RC.albuns().length === 4 && RC.albuns().every((a) => a.cartas.length === 13) && RC.carta('arca-alianca').raridade === 'ouro' && RC.carta('arca-alianca').album === 'objetos',
+    'a regra lê o esqueleto do catálogo: 4 álbuns de 13, com raridade e álbum de cada carta');
+  checar(RC.semente('ana', 'herois') === RC.semente('ana', 'herois') && RC.semente('ana', 'herois') !== RC.semente('ana', 'lugares') && RC.semente('ana', 'herois') !== RC.semente('bia', 'herois'),
+    'a semente é a mesma para a mesma conta e álbum, e muda com a conta e com o álbum');
+  checar(JSON.stringify(RC.ordem('ana')) === JSON.stringify(RC.ordem('ana')) && JSON.stringify(RC.ordem('ana')) !== JSON.stringify(RC.ordem('bia')),
+    'a ordem é estável para a mesma conta (todo aparelho tira a mesma) e muda de uma conta para outra');
+  // cabe em blocos de 3, 3, 3 e 4 (em alguma ordem), cada um com exatamente uma Prata ou Ouro
+  const emBlocos = (ids) => [[4, 3, 3, 3], [3, 4, 3, 3], [3, 3, 4, 3], [3, 3, 3, 4]].some((tam) => {
+    let i = 0;
+    return tam.every((t) => { const b = ids.slice(i, i += t); return b.filter(ALTA).length === 1; });
+  });
+  const seca = (ids) => { let d = 0, m = 0; for (const id of ids) { d = ALTA(id) ? 0 : d + 1; m = Math.max(m, d); } return m; };
+  let semRepetir = true, blocos = true, primeiraPrata = true, ouroNoAlbum = true, secaMax = 0, vidaInteira = true;
+  for (const dono of CONTAS_TESTE) {
+    const tudo = RC.ordem(dono);
+    vidaInteira &&= tudo.length === 52 && new Set(tudo).size === 52;
+    for (let a = 0; a < 4; a++) {
+      const ids = tudo.slice(a * 13, a * 13 + 13);
+      semRepetir &&= new Set(ids).size === 13 && ids.every((id) => RC.carta(id).album === CATALOGO.albuns[a].id);
+      blocos &&= emBlocos(ids);
+      ouroNoAlbum &&= ids.filter((id) => RARIDADE_DE[id] === 'ouro').length === 1;
+    }
+    primeiraPrata &&= RARIDADE_DE[tudo[0]] === 'prata';
+    secaMax = Math.max(secaMax, seca(tudo));
+  }
+  checar(semRepetir && vidaInteira, 'cada álbum sai com as suas 13 cartas sem repetir, e a vida inteira com as 52 (' + CONTAS_TESTE.length + ' contas)');
+  checar(blocos, 'a ordem de cada álbum cabe em blocos de 3, 3, 3 e 4 com exatamente uma Prata ou Ouro cada');
+  checar(ouroNoAlbum, 'o Ouro de cada álbum chega até a 13ª carta dele');
+  checar(primeiraPrata, 'a primeira carta da vida é sempre uma Prata');
+  checar(secaMax <= 5, 'nunca mais de 5 cartas seguidas sem Prata ou Ouro, inclusive na troca de álbum (maior seca: ' + secaMax + ')');
+  // a raridade não é sempre a mesma na mesma posição: o sorteio varia de verdade
+  const posicoes = new Set(CONTAS_TESTE.map((d) => RC.ordem(d).slice(0, 13).map((id) => RARIDADE_DE[id][0]).join('')));
+  checar(posicoes.size > 50, 'as contas tiram sequências de raridade diferentes (' + posicoes.size + ' distintas)');
+}
+
+// --- a coleção: próxima carta, fontes, resumo e Glória (cartas-regras.js) ---
+{
+  const ordemAna = RC.ordem('ana');
+  let c = RC.vazio();
+  checar(RC.proxima(c, 'ana') === ordemAna[0], 'a próxima carta de quem não tem nenhuma é a primeira da ordem dela');
+  let r = RC.receber(c, 'bau', 'bau:dia:7', { dono: 'ana', em: 1000 });
+  checar(r.resultado.carta === ordemAna[0] && r.resultado.nova && r.resultado.tem === 1 && r.resultado.total === 13 && r.resultado.album === 'herois'
+    && r.cartas.recebidas[ordemAna[0]].fonte === 'bau:dia:7' && r.cartas.eventos['bau:dia:7'].carta === ordemAna[0], 'o baú paga a primeira carta e anota de onde ela veio');
+  checar(!Object.keys(c.recebidas).length, 'receber não mexe no estado que entrou (devolve outro)');
+  const mesma = RC.receber(r.cartas, 'bau', 'bau:dia:7', { dono: 'ana', em: 2000 });
+  checar(mesma.resultado.repetido && Object.keys(mesma.cartas.recebidas).length === 1, 'a mesma chave não paga duas vezes');
+  RC.FONTES.conhecer.ativa = false;
+  const desligada = RC.receber(r.cartas, 'conhecer', 'conhecer:14', { dono: 'ana' }).resultado;
+  RC.FONTES.conhecer.ativa = true;
+  checar(desligada === null && RC.receber(r.cartas, 'xyz', 'xyz:1', { dono: 'ana' }).resultado === null
+    && RC.receber(r.cartas, 'bau', 'unidade:1', { dono: 'ana' }).resultado === null, 'fonte desligada, desconhecida ou chave de outra fonte não paga');
+  const fontes = Object.keys(RC.FONTES).sort().join();
+  checar(fontes === 'album,bau,celula,conhecer,convidado,convite,desafio,dias,discipulado,parabolas,passos,pratica,proposito,unidade' && Object.values(RC.FONTES).every((f) => f.ativa),
+    'as fontes aprovadas pelo dono estão na lista e ligadas (' + fontes + ')');
+  // 13 baús completam o primeiro álbum, sem repetir, e o Ouro dele ganha a Glória
+  c = RC.vazio();
+  const vistas = [];
+  for (let n = 1; n <= 13; n++) { r = RC.receber(c, 'bau', 'bau:dia:' + n * 7, { dono: 'ana', em: n }); c = r.cartas; vistas.push(r.resultado.carta); }
+  checar(JSON.stringify(vistas) === JSON.stringify(ordemAna.slice(0, 13)), 'os baús seguem a ordem sorteada da pessoa, sem repetir');
+  checar(r.resultado.completou === 'herois' && c.glorias['album:herois'].carta === 'nuvem-testemunhas' && c.eventos['album:herois'].gloria,
+    'o 13º baú completa Heróis da fé e o Ouro do álbum ganha a Glória');
+  r = RC.receber(c, 'bau', 'bau:dia:98', { dono: 'ana', em: 14 });
+  checar(r.resultado.album === 'lugares' && r.resultado.carta === ordemAna[13] && r.resultado.tem === 1, 'álbum completo: o baú seguinte abre o próximo álbum');
+  // o resumo
+  const s1 = RC.resumo(r.cartas);
+  const lug = s1.albuns.find((a) => a.id === 'lugares');
+  checar(s1.ativo === 'lugares' && s1.tem === 14 && s1.total === 52 && s1.albuns[0].completo && lug.tem === 1
+    && lug.faltam.linho + lug.faltam.bronze + lug.faltam.prata + lug.faltam.ouro === 12 && s1.gloria.has('nuvem-testemunhas') && !s1.pendentes.length,
+    'o resumo diz o álbum ativo, quantas tem, o que falta por raridade e quais têm Glória');
+  // tudo completo: o baú dá uma Glória para escolher
+  c = RC.vazio();
+  for (let n = 1; n <= 52; n++) c = RC.receber(c, 'bau', 'bau:dia:' + n, { dono: 'ana', em: n }).cartas;
+  checar(Object.keys(c.recebidas).length === 52 && RC.proxima(c, 'ana') === null && RC.resumo(c).ativo === '' && RC.comGloria(c).size === 4, 'com as 52, não há próxima e os 4 Ouros têm Glória');
+  r = RC.receber(c, 'bau', 'bau:dia:999', { dono: 'ana', em: 60 });
+  checar(r.resultado.gloria && !r.resultado.carta && RC.resumo(r.cartas).pendentes.join() === 'bau:dia:999', 'com tudo completo, o baú dá uma Glória para escolher');
+  const comum = Object.keys(c.recebidas).find((id) => !RC.comGloria(c).has(id));
+  const escolhida = RC.escolherGloria(r.cartas, comum, 70);
+  checar(escolhida && escolhida.glorias['bau:dia:999'].carta === comum && RC.comGloria(escolhida).has(comum) && !RC.resumo(escolhida).pendentes.length, 'a pessoa escolhe a carta que ganha a Glória');
+  checar(RC.escolherGloria(r.cartas, 'nuvem-testemunhas') === null && RC.escolherGloria(r.cartas, 'nao-existe') === null && RC.escolherGloria(escolhida, comum) === null
+    && RC.escolherGloria(RC.vazio(), comum) === null, 'não vale escolher carta que já é Glória, que não existe, nem sem Glória pendente');
+  // as fontes de Glória
+  const g = RC.receber(RC.receber(RC.vazio(), 'unidade', 'unidade:1', { em: 5 }).cartas, 'dias', 'dias:100', { em: 6 });
+  checar(RC.resumo(g.cartas).pendentes.join() === 'dias:100,unidade:1' && !Object.keys(g.cartas.recebidas).length, 'fim de unidade e 100 dias lidos dão uma Glória para escolher, sem carta');
+}
+
+// --- estado das cartas: forma e fusão entre aparelhos (02-estado.js) ---
+{
+  const lixo = CC.limparCartas({ recebidas: { 'arca-alianca': { em: 5, fonte: 'bau:dia:7' }, 'X<script>': { em: 1 }, 'mana': 'texto', 'perola': { em: 'abc', fonte: '<b>' } },
+    eventos: { 'bau:dia:7': { em: 5, carta: 'arca-alianca' }, 'bau dia 8': { em: 1 }, 'dias:100': { em: 2, gloria: true } },
+    glorias: { 'dias:100': { em: 2, carta: 'A B', escolhidaEm: 3 } }, extra: 1 });
+  checar(JSON.stringify(lixo) === JSON.stringify({ recebidas: { 'arca-alianca': { em: 5, fonte: 'bau:dia:7' }, perola: { em: 0, fonte: '' } },
+    eventos: { 'bau:dia:7': { em: 5, carta: 'arca-alianca' }, 'dias:100': { em: 2, gloria: 1 } }, glorias: { 'dias:100': { em: 2, carta: '', escolhidaEm: 0 } } }),
+  'a forma das cartas é conferida: id e chave inválidos, tipos errados e campos a mais saem');
+  const muitas = { recebidas: Object.fromEntries(Array.from({ length: 900 }, (_, i) => ['c' + i, { em: i }])) };
+  checar(Object.keys(CC.limparCartas(muitas).recebidas).length === 400 && JSON.stringify(CC.limparCartas(null)) === JSON.stringify(RC.vazio()), 'no máximo 400 entradas por tabela; nada vira vazio');
+  // dois aparelhos abriram baús diferentes, e o mesmo baú com cartas diferentes (estados que divergiram)
+  const a = { recebidas: { mana: { em: 10, fonte: 'bau:dia:7' }, perola: { em: 30, fonte: 'bau:dia:14' } }, eventos: { 'bau:dia:7': { em: 10, carta: 'mana' }, 'bau:dia:14': { em: 30, carta: 'perola' } },
+    glorias: { 'dias:100': { em: 40, carta: 'mana', escolhidaEm: 41 } } };
+  const b = { recebidas: { belem: { em: 20, fonte: 'bau:dia:14' }, mana: { em: 50, fonte: 'bau:dia:21' } }, eventos: { 'bau:dia:14': { em: 20, carta: 'belem' } },
+    glorias: { 'dias:100': { em: 40, carta: '', escolhidaEm: 0 }, 'unidade:1': { em: 45, carta: 'mana', escolhidaEm: 46 } } };
+  const ab = CC.fundirCartas(a, b);
+  const ba = CC.fundirCartas(b, a);
+  checar(JSON.stringify(ab) === JSON.stringify(CC.fundirCartas(a, b)) && JSON.stringify(Object.entries(ab.recebidas).sort()) === JSON.stringify(Object.entries(ba.recebidas).sort())
+    && JSON.stringify(Object.entries(ab.eventos).sort()) === JSON.stringify(Object.entries(ba.eventos).sort()) && JSON.stringify(Object.entries(ab.glorias).sort()) === JSON.stringify(Object.entries(ba.glorias).sort()),
+  'a fusão das cartas dá o mesmo resultado nos dois sentidos');
+  checar(Object.keys(ab.recebidas).sort().join() === 'belem,mana,perola' && ab.recebidas.mana.em === 10 && ab.recebidas.mana.fonte === 'bau:dia:7',
+    'a fusão une as coleções, e a carta recebida primeiro fica como estava');
+  checar(ab.eventos['bau:dia:14'].carta === 'belem' && ab.eventos['bau:dia:7'].carta === 'mana', 'o que cada evento pagou fica o primeiro registro (nenhuma carta é tirada da coleção)');
+  checar(ab.glorias['dias:100'].carta === 'mana' && ab.glorias['unidade:1'].carta === '' && ab.glorias['unidade:1'].escolhidaEm === 0,
+    'na Glória vale a escolha mais antiga, e a segunda Glória na mesma carta volta a ser escolhida');
+  // a fusão do estado inteiro leva as cartas, e o zerado não as apaga
+  const e1 = { ...CC.normalizarEstado({}), atualizadoEm: 100, cartas: a };
+  const e2 = { ...CC.normalizarEstado({}), atualizadoEm: 200, zeradoEm: 200, cartas: { recebidas: {}, eventos: {}, glorias: {} } };
+  const f1 = CC.fundir(e1, e2);
+  checar(Object.keys(f1.cartas.recebidas).sort().join() === 'mana,perola' && !CC.PROGRESSO_DA_TRILHA.includes('cartas'), 'na fusão com um aparelho que zerou, as cartas dos dois lados ficam');
+  const antigo = { atualizadoEm: 300, lidos: [1], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {} };
+  checar(Object.keys(CC.fundir(e1, antigo).cartas.recebidas).length === 2 && Object.keys(CC.normalizarEstado(antigo).cartas.recebidas).length === 0,
+    'um aparelho com a versão antiga, que manda o estado sem cartas, não as apaga');
+}
+
+// --- em dia: baús antigos, fontes do estado e do servidor, Zerar, Semeadores (cartas-regras.js) ---
+{
+  const estado = (extra) => ({ ...CC.normalizarEstado({}), dono: 'ana', ...extra });
+  // baús abertos antes das cartas ganham carta, na ordem dos dias, e o versículo fica
+  const e1 = estado({ bausAbertos: { 'dia:14': { em: '2026-03-14', ref: 'Gênesis 50.20' }, 'dia:7': { em: '2026-03-07', ref: 'Gênesis 12.3' } } });
+  const r1 = RC.emDia(e1, { dono: 'ana', em: 100 });
+  const ordemAna = RC.ordem('ana');
+  checar(r1.novos.length === 2 && r1.cartas.eventos['bau:dia:7'].carta === ordemAna[0] && r1.cartas.eventos['bau:dia:14'].carta === ordemAna[1]
+    && e1.bausAbertos['dia:7'].ref === 'Gênesis 12.3' && !e1.bausAbertos['dia:7'].carta, 'baú aberto antes das cartas ganha a carta (do dia menor para o maior) e o versículo dele não muda');
+  const e1b = { ...e1, cartas: r1.cartas };
+  checar(!RC.emDia(e1b, { dono: 'ana', em: 200 }).novos.length, 'em dia de novo, nada mais é pago');
+  // Zerar: as cartas ficam; abrir o mesmo baú de novo dá a próxima que falta
+  const z = estado({ zeradoEm: 5000, cartas: r1.cartas, bausAbertos: { 'dia:7': { em: '2026-04-07', ref: 'Gênesis 12.3' } } });
+  const rz = RC.emDia(z, { dono: 'ana', em: 300 });
+  checar(rz.novos.length === 1 && rz.novos[0].chave === 'bau:dia:7@5000' && rz.novos[0].carta === ordemAna[2] && !r1.cartas.recebidas[ordemAna[2]]
+    && Object.keys(rz.cartas.recebidas).length === 3, 'depois de zerar, reabrir o baú do dia 7 dá a próxima carta que falta, nunca uma repetida');
+  // marcos e fontes do estado: cada um paga uma vez, e o Zerar não os faz pagar de novo
+  const lidos = Array.from({ length: 100 }, (_, i) => i + 1);
+  const e2 = estado({ lidos, conhecidos: Object.fromEntries(Array.from({ length: 14 }, (_, i) => [i + 1, '2026-01-01'])), licoes: D.licoes.slice(),
+    parabolasLidas: Object.fromEntries(Array.from({ length: 15 }, (_, i) => ['p' + i, '2026-01-01'])), pratica: { 1: { melhor: 10, total: 10 }, 2: { melhor: 8, total: 10 } }, maiorProposito: 9 });
+  CC.DESAFIOS = [{ id: 'sem-redes-21' }, { id: 'gratidao-14' }];
+  const situacao = CC.situacaoDesafio;
+  CC.situacaoDesafio = (d) => ({ concluido: d.id === 'gratidao-14' });
+  const r2 = RC.emDia(e2, { dono: 'ana', em: 400 });
+  CC.situacaoDesafio = situacao;
+  delete CC.DESAFIOS;
+  const chaves = r2.novos.map((x) => x.chave).sort().join();
+  checar(chaves === 'conhecer:14,desafio:gratidao-14,dias:100,parabolas:14,parabolas:7,passos:todos,pratica:1,proposito:7,unidade:1,unidade:2,unidade:3',
+    'as fontes do estado pagam cada evento alcançado: unidades e 100 dias (Glória), Conhecer, Primeiros passos, desafio, parábolas, prática e propósito (' + chaves + ')');
+  checar(r2.novos.filter((x) => x.carta).length === 7 && RC.resumo(r2.cartas).pendentes.length === 4, 'as fontes de carta dão a próxima do álbum; as de marco, uma Glória para escolher');
+  const zerado2 = { ...e2, lidos: [], conhecidos: {}, licoes: [], pratica: {}, zeradoEm: 9000, cartas: r2.cartas };
+  checar(!RC.emDia({ ...zerado2, lidos, licoes: D.licoes.slice(), pratica: e2.pratica }, { dono: 'ana', em: 500 }).novos.length, 'depois de zerar, refazer as mesmas coisas não paga de novo');
+  // fontes do servidor: só o que /api/quem confirma
+  const quem = { cartasServidor: { chaves: ['convite:tier:1', 'convite:tier:2', 'convidado', 'celula:primeiro', 'discipulado:primeiro', 'convite:tier:9', 'outra:1'] } };
+  const r3 = RC.emDia(estado({}), { dono: 'ana', em: 600, quem });
+  const pagos = r3.novos.map((x) => x.chave).sort().join();
+  checar(pagos === 'celula:primeiro,convidado,convite:tier:1,convite:tier:2,discipulado:primeiro', 'as fontes do servidor pagam o que /api/quem confirma, e só chave conhecida (' + pagos + ')');
+  checar(r3.cartas.recebidas['semente-lancada'] && r3.cartas.recebidas['andre-chama-pedro'] && r3.cartas.recebidas['da-familia'] && !r3.cartas.recebidas['venha-e-veja'],
+    'quem pula limiares de uma vez recebe a carta de cada limiar alcançado (Semente lançada e André chama Pedro), e quem chegou por convite, a de Boas-vindas');
+  checar(RARIDADE_DE[r3.novos.find((x) => x.chave === 'celula:primeiro').carta] === 'prata' && !RC.emDia({ ...estado({}), cartas: r3.cartas }, { dono: 'ana', quem }).novos.length,
+    'a célula e o discipulado pagam do sorteio (a primeira carta da vida, a Prata), e nada paga duas vezes');
+  // Semeadores fica fora do sorteio e das garantias dos 4 álbuns
+  let s1 = RC.vazio();
+  for (let n = 1; n <= 5; n++) s1 = RC.receber(s1, 'convite', 'convite:tier:' + n, { em: n }).cartas;
+  checar(RC.proxima(s1, 'ana') === ordemAna[0] && JSON.stringify(RC.ordem('ana')) === JSON.stringify(ordemAna) && RC.resumo(s1).tem === 0
+    && RC.resumo(s1).especiais.find((a) => a.id === 'semeadores').tem === 5, 'as 5 cartas de Semeadores não mexem no sorteio, na ordem nem na contagem dos 4 álbuns');
+  checar(RC.receber(s1, 'convite', 'convite:tier:6', {}).resultado === null && RC.receber(s1, 'convite', 'convite:tier:1', {}).resultado.repetido,
+    'não existe limiar além do quinto, e o mesmo limiar não paga de novo');
+  checar(RC.escolherGloria(RC.receber(s1, 'dias', 'dias:100', {}).cartas, 'campos-maduros') === null, 'a carta que já nasce Glória não recebe outra Glória');
+  checar(RC.chaveDoBau(7, { zeradoEm: 0 }) === 'bau:dia:7' && RC.chaveDoBau(7, { zeradoEm: 12 }) === 'bau:dia:7@12' && CC.limparCartas({ eventos: { 'bau:dia:7@1761100000000': { em: 1 } } }).eventos['bau:dia:7@1761100000000'],
+    'a chave do baú leva a geração do Zerar, e a forma dela passa na conferência');
 }
 
 // =========================================================================

@@ -1,0 +1,683 @@
+{
+  "versao": 1,
+  "rascunho": "Textos em rascunho (22/10/2026), a revisar: títulos, \"Você sabia?\" e links. As referências conferem com a NBV do repositório.",
+  "albuns": [
+    {
+      "id": "herois",
+      "nome": "Heróis da fé"
+    },
+    {
+      "id": "lugares",
+      "nome": "Lugares"
+    },
+    {
+      "id": "objetos",
+      "nome": "Objetos"
+    },
+    {
+      "id": "milagres",
+      "nome": "Milagres"
+    },
+    {
+      "id": "semeadores",
+      "nome": "Semeadores",
+      "especial": true
+    },
+    {
+      "id": "boas-vindas",
+      "nome": "Boas-vindas",
+      "especial": true
+    }
+  ],
+  "cartas": [
+    {
+      "id": "abel-oferta",
+      "album": "herois",
+      "numero": 1,
+      "titulo": "A oferta de Abel",
+      "raridade": "linho",
+      "referencia": "Gênesis 4.4",
+      "voceSabia": "Abel ofereceu a Deus as primeiras crias do seu rebanho.",
+      "link": "#/mapa/genesis",
+      "rascunho": true
+    },
+    {
+      "id": "noe-arca",
+      "album": "herois",
+      "numero": 2,
+      "titulo": "Noé e a arca",
+      "raridade": "bronze",
+      "referencia": "Gênesis 6.14",
+      "voceSabia": "A arca era de madeira de cipreste, revestida de piche por dentro e por fora.",
+      "link": "#/mapa/genesis",
+      "rascunho": true
+    },
+    {
+      "id": "abraao-estrelas",
+      "album": "herois",
+      "numero": 3,
+      "titulo": "Abraão e as estrelas",
+      "raridade": "prata",
+      "referencia": "Gênesis 15.5",
+      "voceSabia": "Deus levou Abraão para fora da tenda e pediu que ele contasse as estrelas.",
+      "link": "#/atlas/abraao",
+      "rascunho": true
+    },
+    {
+      "id": "sara-riso",
+      "album": "herois",
+      "numero": 4,
+      "titulo": "O riso de Sara",
+      "raridade": "linho",
+      "referencia": "Gênesis 21.1-7",
+      "voceSabia": "Abraão tinha cem anos quando Isaque nasceu.",
+      "link": "#/atlas/abraao",
+      "rascunho": true
+    },
+    {
+      "id": "jose-sonhos",
+      "album": "herois",
+      "numero": 5,
+      "titulo": "Os sonhos de José",
+      "raridade": "bronze",
+      "referencia": "Gênesis 37.5-9",
+      "voceSabia": "No sonho de José, os feixes dos irmãos se inclinavam diante do feixe dele.",
+      "link": "#/mapa/genesis",
+      "rascunho": true
+    },
+    {
+      "id": "moises-cesto",
+      "album": "herois",
+      "numero": 6,
+      "titulo": "Moisés no cesto",
+      "raridade": "linho",
+      "referencia": "Êxodo 2.3",
+      "voceSabia": "A mãe vedou um cesto de junco com betume e o deixou entre os juncos do rio.",
+      "link": "#/mapa/exodo",
+      "rascunho": true
+    },
+    {
+      "id": "raabe-corda",
+      "album": "herois",
+      "numero": 7,
+      "titulo": "A corda vermelha de Raabe",
+      "raridade": "prata",
+      "referencia": "Josué 2.18",
+      "voceSabia": "A corda que ajudou os espias a descer ficou pendurada na janela de Raabe.",
+      "link": "#/atlas/invasao",
+      "rascunho": true
+    },
+    {
+      "id": "gideao-tochas",
+      "album": "herois",
+      "numero": 8,
+      "titulo": "Gideão e as tochas",
+      "raridade": "bronze",
+      "referencia": "Juízes 7.16-20",
+      "voceSabia": "Cada um dos trezentos levava uma corneta e uma tocha dentro de um vaso de barro.",
+      "link": "#/mapa/juizes",
+      "rascunho": true
+    },
+    {
+      "id": "rute-espigas",
+      "album": "herois",
+      "numero": 9,
+      "titulo": "Rute e as espigas",
+      "raridade": "linho",
+      "referencia": "Rute 2.2-3",
+      "voceSabia": "Rute recolhia as espigas que sobravam atrás dos ceifeiros, no campo de Boaz.",
+      "link": "#/mapa/rute",
+      "rascunho": true
+    },
+    {
+      "id": "davi-funda",
+      "album": "herois",
+      "numero": 10,
+      "titulo": "Davi e a funda",
+      "raridade": "linho",
+      "referencia": "1 Samuel 17.40-49",
+      "voceSabia": "Davi apanhou cinco pedras lisas de um riacho e usou só uma.",
+      "link": "#/mapa/1-samuel",
+      "desenho": "davi",
+      "rascunho": true
+    },
+    {
+      "id": "ester-cetro",
+      "album": "herois",
+      "numero": 11,
+      "titulo": "Ester diante do rei",
+      "raridade": "prata",
+      "referencia": "Ester 5.1-2",
+      "voceSabia": "Ester tocou a ponta do cetro de ouro que o rei estendeu para ela.",
+      "link": "#/mapa/ester",
+      "rascunho": true
+    },
+    {
+      "id": "daniel-leoes",
+      "album": "herois",
+      "numero": 12,
+      "titulo": "Daniel na cova dos leões",
+      "raridade": "bronze",
+      "referencia": "Daniel 6.22-23",
+      "voceSabia": "Quando tiraram Daniel da cova, não havia nele o menor arranhão.",
+      "link": "#/mapa/daniel",
+      "rascunho": true
+    },
+    {
+      "id": "nuvem-testemunhas",
+      "album": "herois",
+      "numero": 13,
+      "titulo": "Nuvem de testemunhas",
+      "raridade": "ouro",
+      "referencia": "Hebreus 12.1",
+      "voceSabia": "Os heróis da fé do capítulo 11 são a multidão de testemunhas ao nosso redor.",
+      "link": "#/mapa/hebreus",
+      "rascunho": true
+    },
+    {
+      "id": "jardim-eden",
+      "album": "lugares",
+      "numero": 1,
+      "titulo": "O jardim do Éden",
+      "raridade": "linho",
+      "referencia": "Gênesis 2.10",
+      "voceSabia": "Um rio nascia no Éden e depois se dividia em quatro braços.",
+      "link": "#/mapa/genesis",
+      "rascunho": true
+    },
+    {
+      "id": "montes-ararate",
+      "album": "lugares",
+      "numero": 2,
+      "titulo": "Os montes de Ararate",
+      "raridade": "bronze",
+      "referencia": "Gênesis 8.4",
+      "voceSabia": "A arca tocou o alto das montanhas no sétimo mês.",
+      "link": "#/mapa/genesis",
+      "rascunho": true
+    },
+    {
+      "id": "betel",
+      "album": "lugares",
+      "numero": 3,
+      "titulo": "Betel",
+      "raridade": "prata",
+      "referencia": "Gênesis 28.18-19",
+      "voceSabia": "Jacó pôs em pé, como coluna, a pedra que tinha usado de travesseiro.",
+      "link": "#/atlas/abraao",
+      "rascunho": true
+    },
+    {
+      "id": "monte-sinai",
+      "album": "lugares",
+      "numero": 4,
+      "titulo": "O monte Sinai",
+      "raridade": "bronze",
+      "referencia": "Êxodo 19.18",
+      "voceSabia": "Saía fumaça do monte, como de uma fornalha, e o monte inteiro tremia.",
+      "link": "#/atlas/exodo",
+      "rascunho": true
+    },
+    {
+      "id": "rio-jordao",
+      "album": "lugares",
+      "numero": 5,
+      "titulo": "O rio Jordão",
+      "raridade": "linho",
+      "referencia": "Josué 3.15-16",
+      "voceSabia": "Era tempo de colheita, e o rio transbordava quando os sacerdotes molharam os pés.",
+      "link": "#/atlas/invasao",
+      "rascunho": true
+    },
+    {
+      "id": "jerusalem",
+      "album": "lugares",
+      "numero": 6,
+      "titulo": "Jerusalém",
+      "raridade": "ouro",
+      "referencia": "2 Samuel 5.7-9",
+      "voceSabia": "Davi tomou a fortaleza de Sião e a chamou de Cidade de Davi.",
+      "link": "#/mapa/2-samuel",
+      "rascunho": true
+    },
+    {
+      "id": "babilonia",
+      "album": "lugares",
+      "numero": 7,
+      "titulo": "Os rios da Babilônia",
+      "raridade": "linho",
+      "referencia": "Salmos 137.1-2",
+      "voceSabia": "Longe de casa, o povo pendurava as harpas nos galhos dos salgueiros.",
+      "link": "#/mapa/salmos",
+      "rascunho": true
+    },
+    {
+      "id": "ninive",
+      "album": "lugares",
+      "numero": 8,
+      "titulo": "Nínive",
+      "raridade": "bronze",
+      "referencia": "Jonas 3.3",
+      "voceSabia": "A cidade era tão grande que levava três dias para atravessá-la a pé.",
+      "link": "#/mapa/jonas",
+      "rascunho": true
+    },
+    {
+      "id": "belem",
+      "album": "lugares",
+      "numero": 9,
+      "titulo": "Belém",
+      "raridade": "prata",
+      "referencia": "Miqueias 5.2",
+      "voceSabia": "Miqueias chamou Belém de pequena vila, o lugar onde nasceria o rei de Israel.",
+      "link": "#/mapa/miqueias",
+      "rascunho": true
+    },
+    {
+      "id": "mar-galileia",
+      "album": "lugares",
+      "numero": 10,
+      "titulo": "O mar da Galileia",
+      "raridade": "prata",
+      "referencia": "Mateus 4.18",
+      "voceSabia": "Pedro e André pescavam com rede neste mar: eram pescadores de profissão.",
+      "link": "#/mapa/mateus",
+      "rascunho": true
+    },
+    {
+      "id": "nazare",
+      "album": "lugares",
+      "numero": 11,
+      "titulo": "Nazaré",
+      "raridade": "linho",
+      "referencia": "João 1.46",
+      "voceSabia": "Natanael perguntou se podia vir alguma coisa boa de Nazaré.",
+      "link": "#/mapa/joao",
+      "rascunho": true
+    },
+    {
+      "id": "poco-jaco",
+      "album": "lugares",
+      "numero": 12,
+      "titulo": "O poço de Jacó",
+      "raridade": "bronze",
+      "referencia": "João 4.6-7",
+      "voceSabia": "Jesus chegou cansado a este poço por volta do meio-dia e pediu água.",
+      "link": "#/mapa/joao",
+      "desenho": "poco",
+      "rascunho": true
+    },
+    {
+      "id": "patmos",
+      "album": "lugares",
+      "numero": 13,
+      "titulo": "A ilha de Patmos",
+      "raridade": "linho",
+      "referencia": "Apocalipse 1.9",
+      "voceSabia": "João foi levado para esta ilha por causa da palavra de Deus.",
+      "link": "#/mapa/apocalipse",
+      "rascunho": true
+    },
+    {
+      "id": "tunica-jose",
+      "album": "objetos",
+      "numero": 1,
+      "titulo": "A túnica de José",
+      "raridade": "linho",
+      "referencia": "Gênesis 37.3",
+      "voceSabia": "José, o filho preferido, ganhou uma túnica longa de diversas cores.",
+      "link": "#/mapa/genesis",
+      "rascunho": true
+    },
+    {
+      "id": "vara-moises",
+      "album": "objetos",
+      "numero": 2,
+      "titulo": "A vara de Moisés",
+      "raridade": "bronze",
+      "referencia": "Êxodo 4.2-4",
+      "voceSabia": "Jogada no chão, a vara virou serpente; pega pela cauda, voltou a ser vara.",
+      "link": "#/mapa/exodo",
+      "rascunho": true
+    },
+    {
+      "id": "arca-alianca",
+      "album": "objetos",
+      "numero": 3,
+      "titulo": "A Arca da Aliança",
+      "raridade": "ouro",
+      "referencia": "Êxodo 25.10-11",
+      "voceSabia": "Era de madeira de acácia, revestida de ouro puro por dentro e por fora.",
+      "link": "#/atlas/exodo",
+      "desenho": "arca",
+      "rascunho": true
+    },
+    {
+      "id": "candelabro",
+      "album": "objetos",
+      "numero": 4,
+      "titulo": "O candelabro de ouro",
+      "raridade": "prata",
+      "referencia": "Êxodo 25.31-37",
+      "voceSabia": "Era uma peça só de ouro batido, com sete lâmpadas.",
+      "link": "#/atlas/exodo",
+      "rascunho": true
+    },
+    {
+      "id": "tabuas-alianca",
+      "album": "objetos",
+      "numero": 5,
+      "titulo": "As tábuas da aliança",
+      "raridade": "bronze",
+      "referencia": "Êxodo 31.18",
+      "voceSabia": "Eram duas tábuas de pedra, escritas pelo dedo de Deus.",
+      "link": "#/atlas/exodo",
+      "rascunho": true
+    },
+    {
+      "id": "serpente-bronze",
+      "album": "objetos",
+      "numero": 6,
+      "titulo": "A serpente de bronze",
+      "raridade": "prata",
+      "referencia": "Números 21.8-9",
+      "voceSabia": "Quem era mordido e olhava para a serpente no alto do poste continuava vivo.",
+      "link": "#/mapa/numeros",
+      "rascunho": true
+    },
+    {
+      "id": "harpa-davi",
+      "album": "objetos",
+      "numero": 7,
+      "titulo": "A harpa de Davi",
+      "raridade": "linho",
+      "referencia": "1 Samuel 16.23",
+      "voceSabia": "Quando Davi tocava a harpa, Saul se sentia melhor.",
+      "link": "#/mapa/1-samuel",
+      "rascunho": true
+    },
+    {
+      "id": "manto-elias",
+      "album": "objetos",
+      "numero": 8,
+      "titulo": "O manto de Elias",
+      "raridade": "bronze",
+      "referencia": "2 Reis 2.13-14",
+      "voceSabia": "Eliseu bateu nas águas do Jordão com o manto, e elas se separaram.",
+      "link": "#/mapa/2-reis",
+      "rascunho": true
+    },
+    {
+      "id": "azeite-viuva",
+      "album": "objetos",
+      "numero": 9,
+      "titulo": "O azeite da viúva",
+      "raridade": "prata",
+      "referencia": "2 Reis 4.1-7",
+      "voceSabia": "O azeite só parou de correr quando não sobrou nenhuma vasilha vazia.",
+      "link": "#/mapa/2-reis",
+      "desenho": "azeite",
+      "rascunho": true
+    },
+    {
+      "id": "vaso-oleiro",
+      "album": "objetos",
+      "numero": 10,
+      "titulo": "O vaso do oleiro",
+      "raridade": "linho",
+      "referencia": "Jeremias 18.3-4",
+      "voceSabia": "O vaso não saiu bom, e o oleiro amassou o barro para fazer outro.",
+      "link": "#/mapa/jeremias",
+      "rascunho": true
+    },
+    {
+      "id": "perola",
+      "album": "objetos",
+      "numero": 11,
+      "titulo": "A pérola de grande valor",
+      "raridade": "linho",
+      "referencia": "Mateus 13.45-46",
+      "voceSabia": "O negociante vendeu tudo o que tinha para ficar com uma pérola só.",
+      "link": "#/parabola/tesouro-e-perola",
+      "rascunho": true
+    },
+    {
+      "id": "moeda-perdida",
+      "album": "objetos",
+      "numero": 12,
+      "titulo": "A moeda perdida",
+      "raridade": "linho",
+      "referencia": "Lucas 15.8-9",
+      "voceSabia": "A mulher acendeu uma lamparina e procurou em cada canto da casa.",
+      "link": "#/parabola/moeda-perdida",
+      "rascunho": true
+    },
+    {
+      "id": "paes-peixes",
+      "album": "objetos",
+      "numero": 13,
+      "titulo": "Cinco pães e dois peixes",
+      "raridade": "bronze",
+      "referencia": "João 6.9",
+      "voceSabia": "Os pães eram de cevada, e quem os tinha era um rapaz.",
+      "link": "#/mapa/joao",
+      "rascunho": true
+    },
+    {
+      "id": "mar-vermelho",
+      "album": "milagres",
+      "numero": 1,
+      "titulo": "O mar aberto",
+      "raridade": "bronze",
+      "referencia": "Êxodo 14.21-22",
+      "voceSabia": "Um vento forte soprou a noite inteira e deixou o fundo do mar seco.",
+      "link": "#/atlas/exodo",
+      "desenho": "mar",
+      "rascunho": true
+    },
+    {
+      "id": "mana",
+      "album": "milagres",
+      "numero": 2,
+      "titulo": "O maná",
+      "raridade": "linho",
+      "referencia": "Êxodo 16.31",
+      "voceSabia": "Era branco como semente de coentro e tinha gosto de bolo de mel.",
+      "link": "#/atlas/exodo",
+      "rascunho": true
+    },
+    {
+      "id": "agua-rocha",
+      "album": "milagres",
+      "numero": 3,
+      "titulo": "A água da rocha",
+      "raridade": "linho",
+      "referencia": "Êxodo 17.6",
+      "voceSabia": "Moisés bateu com a vara na rocha do monte Horebe, e saiu água.",
+      "link": "#/atlas/exodo",
+      "rascunho": true
+    },
+    {
+      "id": "muralhas-jerico",
+      "album": "milagres",
+      "numero": 4,
+      "titulo": "As muralhas de Jericó",
+      "raridade": "prata",
+      "referencia": "Josué 6.20",
+      "voceSabia": "O povo gritou ao toque das cornetas, e os muros vieram abaixo.",
+      "link": "#/atlas/invasao",
+      "rascunho": true
+    },
+    {
+      "id": "fogo-carmelo",
+      "album": "milagres",
+      "numero": 5,
+      "titulo": "O fogo no Carmelo",
+      "raridade": "prata",
+      "referencia": "1 Reis 18.38",
+      "voceSabia": "O fogo queimou até as pedras e lambeu a água da valeta.",
+      "link": "#/mapa/1-reis",
+      "rascunho": true
+    },
+    {
+      "id": "machado-flutua",
+      "album": "milagres",
+      "numero": 6,
+      "titulo": "O machado que flutuou",
+      "raridade": "linho",
+      "referencia": "2 Reis 6.5-6",
+      "voceSabia": "O machado era emprestado, e o ferro voltou à superfície da água.",
+      "link": "#/mapa/2-reis",
+      "rascunho": true
+    },
+    {
+      "id": "fornalha",
+      "album": "milagres",
+      "numero": 7,
+      "titulo": "A fornalha ardente",
+      "raridade": "bronze",
+      "referencia": "Daniel 3.25-27",
+      "voceSabia": "Os três saíram do fogo sem nem cheiro de fumaça.",
+      "link": "#/mapa/daniel",
+      "rascunho": true
+    },
+    {
+      "id": "jonas-peixe",
+      "album": "milagres",
+      "numero": 8,
+      "titulo": "Jonas e o grande peixe",
+      "raridade": "bronze",
+      "referencia": "Jonas 1.17",
+      "voceSabia": "Jonas ficou três dias e três noites dentro do peixe.",
+      "link": "#/mapa/jonas",
+      "rascunho": true
+    },
+    {
+      "id": "tempestade",
+      "album": "milagres",
+      "numero": 9,
+      "titulo": "A tempestade acalmada",
+      "raridade": "linho",
+      "referencia": "Marcos 4.37-39",
+      "voceSabia": "O barco estava quase afundando, e Jesus dormia na popa, com a cabeça numa almofada.",
+      "link": "#/mapa/marcos",
+      "rascunho": true
+    },
+    {
+      "id": "pesca",
+      "album": "milagres",
+      "numero": 10,
+      "titulo": "A pesca maravilhosa",
+      "raridade": "bronze",
+      "referencia": "Lucas 5.6-7",
+      "voceSabia": "As redes começaram a romper, e os dois barcos quase afundaram de tanto peixe.",
+      "link": "#/mapa/lucas",
+      "rascunho": true
+    },
+    {
+      "id": "agua-vinho",
+      "album": "milagres",
+      "numero": 11,
+      "titulo": "A água que virou vinho",
+      "raridade": "prata",
+      "referencia": "João 2.6-9",
+      "voceSabia": "Eram seis talhas de pedra, e em cada uma cabiam de 80 a 120 litros.",
+      "link": "#/mapa/joao",
+      "rascunho": true
+    },
+    {
+      "id": "tumulo-vazio",
+      "album": "milagres",
+      "numero": 12,
+      "titulo": "O túmulo vazio",
+      "raridade": "ouro",
+      "referencia": "João 20.1-8",
+      "voceSabia": "As faixas de linho ficaram ali, e o pano da cabeça, enrolado à parte.",
+      "link": "#/mapa/joao",
+      "desenho": "tumulo",
+      "rascunho": true
+    },
+    {
+      "id": "pedro-prisao",
+      "album": "milagres",
+      "numero": 13,
+      "titulo": "Pedro sai da prisão",
+      "raridade": "linho",
+      "referencia": "Atos 12.6-10",
+      "voceSabia": "As correntes caíram dos pulsos de Pedro, e o portão de ferro se abriu sozinho.",
+      "link": "#/mapa/atos",
+      "rascunho": true
+    },
+    {
+      "id": "semente-lancada",
+      "album": "semeadores",
+      "numero": 1,
+      "titulo": "A semente lançada",
+      "raridade": "linho",
+      "referencia": "Mateus 13.3-8",
+      "voceSabia": "A semente que caiu em solo bom deu 30, 60 e até 100 vezes mais.",
+      "link": "#/parabola/semeador",
+      "amigos": 1,
+      "rascunho": true
+    },
+    {
+      "id": "andre-chama-pedro",
+      "album": "semeadores",
+      "numero": 2,
+      "titulo": "André chama Pedro",
+      "raridade": "bronze",
+      "referencia": "João 1.40-42",
+      "voceSabia": "André foi procurar o irmão e o levou para conhecer Jesus.",
+      "link": "#/mapa/joao",
+      "amigos": 5,
+      "rascunho": true
+    },
+    {
+      "id": "venha-e-veja",
+      "album": "semeadores",
+      "numero": 3,
+      "titulo": "Venha e veja",
+      "raridade": "prata",
+      "referencia": "João 1.45-46",
+      "voceSabia": "Natanael duvidou de Nazaré, e Filipe respondeu: venha e veja você mesmo.",
+      "link": "#/mapa/joao",
+      "amigos": 15,
+      "rascunho": true
+    },
+    {
+      "id": "samaritana-cidade",
+      "album": "semeadores",
+      "numero": 4,
+      "titulo": "A samaritana e a cidade",
+      "raridade": "ouro",
+      "referencia": "João 4.28-30",
+      "voceSabia": "A mulher deixou o cântaro ao lado do poço e voltou para chamar a aldeia inteira.",
+      "link": "#/mapa/joao",
+      "amigos": 40,
+      "rascunho": true
+    },
+    {
+      "id": "campos-maduros",
+      "album": "semeadores",
+      "numero": 5,
+      "titulo": "Os campos maduros",
+      "raridade": "gloria",
+      "referencia": "João 4.35",
+      "voceSabia": "Os campos já estavam maduros para a colheita, sem esperar quatro meses.",
+      "link": "#/mapa/joao",
+      "amigos": 100,
+      "rascunho": true
+    },
+    {
+      "id": "da-familia",
+      "album": "boas-vindas",
+      "numero": 1,
+      "titulo": "Da família de Deus",
+      "raridade": "linho",
+      "referencia": "Efésios 2.19",
+      "voceSabia": "Quem chega já não é estranho nem forasteiro: é da família de Deus.",
+      "link": "#/mapa/efesios",
+      "rascunho": true
+    }
+  ]
+}

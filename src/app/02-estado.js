@@ -55,6 +55,9 @@
     // Parábolas lidas no Explorar: { [slug]: data ISO da primeira leitura }. É material de
     // consulta, não andamento da trilha: fica fora do PROGRESSO_DA_TRILHA e o "Zerar" não apaga.
     parabolasLidas: {},
+    // As cartas do baú e de outras fontes (docs/cartas.md): a coleção, o livro-caixa de eventos
+    // que já pagaram e as Glórias. Ficam fora do PROGRESSO_DA_TRILHA: o "Zerar" não as apaga.
+    cartas: { recebidas: {}, eventos: {}, glorias: {} },
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -83,6 +86,51 @@
     }
     return saida;
   }
+
+  // As cartas: a forma é conferida aqui (o servidor passa por normalizar e fundir), e a fusão é
+  // uma união em que a entrada mais antiga vence: a carta recebida e o que um evento pagou não
+  // mudam depois. Na Glória vale a escolha mais antiga; duas Glórias na mesma carta deixam a mais
+  // nova para escolher de novo.
+  const MAX_CARTAS = 400;
+  const ID_CARTA = /^[a-z0-9-]{2,40}$/;
+  const CHAVE_EVENTO = /^[a-z]{2,12}(:[a-z0-9@:-]{1,40})?$/;
+  const ms = (x) => (Number.isFinite(Number(x)) && Number(x) > 0 ? Math.floor(Number(x)) : 0);
+  function limparCartas(x) {
+    const c = x && typeof x === 'object' ? x : {};
+    const tabela = (t, chave, valor) => Object.fromEntries(Object.entries(t && typeof t === 'object' ? t : {})
+      .filter(([k, v]) => chave.test(k) && v && typeof v === 'object').slice(0, MAX_CARTAS).map(([k, v]) => [k, valor(v)]));
+    const carta = (v) => (typeof v === 'string' && ID_CARTA.test(v) ? v : '');
+    return {
+      recebidas: tabela(c.recebidas, ID_CARTA, (v) => ({ em: ms(v.em), fonte: typeof v.fonte === 'string' && CHAVE_EVENTO.test(v.fonte) ? v.fonte : '' })),
+      eventos: tabela(c.eventos, CHAVE_EVENTO, (v) => (carta(v.carta) ? { em: ms(v.em), carta: v.carta } : { em: ms(v.em), gloria: 1 })),
+      glorias: tabela(c.glorias, CHAVE_EVENTO, (v) => ({ em: ms(v.em), carta: carta(v.carta), escolhidaEm: carta(v.carta) ? ms(v.escolhidaEm) : 0 })),
+    };
+  }
+  CC.limparCartas = limparCartas;
+  function fundirCartas(a, b) {
+    a = limparCartas(a);
+    b = limparCartas(b);
+    const antiga = (x, y) => (!x ? y : !y ? x : (y.em < x.em || (y.em === x.em && JSON.stringify(y) < JSON.stringify(x))) ? y : x);
+    const unir = (t1, t2, escolher) => {
+      const saida = { ...t1 };
+      for (const [k, v] of Object.entries(t2)) saida[k] = escolher(saida[k], v);
+      return saida;
+    };
+    const glorias = unir(a.glorias, b.glorias, (x, y) => {
+      if (!x || !y) return x || y;
+      if (!!x.carta !== !!y.carta) return x.carta ? x : y;
+      if (x.carta && (y.escolhidaEm < x.escolhidaEm || (y.escolhidaEm === x.escolhidaEm && y.carta < x.carta))) return { ...y, em: Math.min(x.em, y.em) };
+      return { ...x, em: Math.min(x.em, y.em) };
+    });
+    const dona = {};
+    for (const [k, g] of Object.entries(glorias).sort((x, y) => (x[1].escolhidaEm - y[1].escolhidaEm) || (x[0] < y[0] ? -1 : 1))) {
+      if (!g.carta) continue;
+      if (dona[g.carta]) glorias[k] = { ...g, carta: '', escolhidaEm: 0 };
+      else dona[g.carta] = k;
+    }
+    return limparCartas({ recebidas: unir(a.recebidas, b.recebidas, antiga), eventos: unir(a.eventos, b.eventos, antiga), glorias });
+  }
+  CC.fundirCartas = fundirCartas;
 
   // União por dia; quando os dois lados marcaram o mesmo dia do Conhecer, vale a data mais
   // antiga: é a que corresponde a quando a pessoa terminou de verdade.
@@ -301,6 +349,7 @@
       historia: fundirHistoria(a.historia, b.historia),
       desafios: fundirDesafios(a.desafios, b.desafios),
       notas: fundirNotas(a.notas, b.notas),
+      cartas: fundirCartas(a.cartas, b.cartas),
     };
   }
   function fundirPratica(a, b) {
@@ -326,6 +375,7 @@
     delete e.meta;
     delete e.protegidos;
     e.lidos = (e.lidos || []).map(Number).filter((n) => n >= 1 && n <= D.plano.length);
+    e.cartas = limparCartas(e.cartas);
     return migrarNotas(e);
   }
   CC.normalizarEstado = normalizar;
