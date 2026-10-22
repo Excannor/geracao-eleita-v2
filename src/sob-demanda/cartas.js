@@ -28,17 +28,17 @@
   // do que ela mostra.
   const CARTAS = [
     { id: 'davi-funda', album: 'Heróis da fé', numero: 4, total: 13, titulo: 'Davi e a funda',
-      sabia: 'Davi apanhou cinco pedras lisas num riacho e usou só uma.', ref: '1 Samuel 17.40-50', desenho: 'davi', raridade: 'linho' },
+      sabia: 'Davi apanhou cinco pedras lisas num riacho e usou só uma.', ref: '1 Samuel 17.40-50', raridade: 'linho' },
     { id: 'poco-jaco', album: 'Lugares', numero: 3, total: 13, titulo: 'O poço de Jacó',
-      sabia: 'Jesus chegou cansado a este poço por volta do meio-dia e pediu água.', ref: 'João 4.6-7', desenho: 'poco', raridade: 'bronze' },
+      sabia: 'Jesus chegou cansado a este poço por volta do meio-dia e pediu água.', ref: 'João 4.6-7', raridade: 'bronze' },
     { id: 'azeite-viuva', album: 'Objetos', numero: 7, total: 13, titulo: 'O azeite da viúva',
-      sabia: 'O azeite só parou de correr quando não sobrou nenhuma vasilha vazia.', ref: '2 Reis 4.1-7', desenho: 'azeite', raridade: 'prata' },
+      sabia: 'O azeite só parou de correr quando não sobrou nenhuma vasilha vazia.', ref: '2 Reis 4.1-7', raridade: 'prata' },
     { id: 'arca-alianca', album: 'Objetos', numero: 1, total: 13, titulo: 'A Arca da Aliança',
-      sabia: 'Era de madeira de acácia, coberta de ouro puro por dentro e por fora.', ref: 'Êxodo 25.10-22', desenho: 'arca', raridade: 'ouro' },
+      sabia: 'Era de madeira de acácia, coberta de ouro puro por dentro e por fora.', ref: 'Êxodo 25.10-22', raridade: 'ouro' },
     { id: 'tumulo-vazio', album: 'Milagres', numero: 13, total: 13, titulo: 'O túmulo vazio',
-      sabia: 'As faixas de linho ficaram ali, e o pano da cabeça, enrolado à parte.', ref: 'João 20.1-8', desenho: 'tumulo', raridade: 'gloria' },
+      sabia: 'O linho ficou ali, e o pano da cabeça, dobrado num lugar à parte.', ref: 'João 20.1-8', raridade: 'gloria' },
     { id: 'mar-vermelho', album: 'Milagres', numero: 1, total: 13, titulo: 'O mar aberto',
-      sabia: 'Um vento forte soprou a noite inteira e deixou o fundo do mar seco.', ref: 'Êxodo 14.21-22', desenho: 'mar', raridade: 'bronze' },
+      sabia: 'Um vento forte soprou a noite inteira e deixou o fundo do mar seco.', ref: 'Êxodo 14.21-22', raridade: 'bronze' },
   ];
 
   // ---------- as raridades: os materiais do tabernáculo (Êx 25.3-4) ----------
@@ -163,6 +163,18 @@
     c.width = w;
     c.height = h;
     return c;
+  }
+  // A moldura como forma: o retângulo da carta com um buraco redondo (para clip evenodd).
+  function vazado(x, y, w, h, raio) {
+    const p = new Path2D();
+    p.rect(-10, -10, 2000, 3000);
+    p.moveTo(x + raio, y);
+    p.arcTo(x + w, y, x + w, y + h, raio);
+    p.arcTo(x + w, y + h, x, y + h, raio);
+    p.arcTo(x, y + h, x, y, raio);
+    p.arcTo(x, y, x + w, y, raio);
+    p.closePath();
+    return p;
   }
   function retRedondo(k, x, y, w, h, raio) {
     k.beginPath();
@@ -1611,9 +1623,11 @@
     k.stroke();
     k.restore();
   }
-  // Um querubim de ouro ajoelhado, de perfil, com a cabeça baixa para a tampa: só o volume
-  // da escultura (a veste longa em pregas, o braço recolhido, as mãos juntas), sem rosto.
-  // "lado" 1 olha para a direita. Desenha a asa de trás antes do corpo e a da frente depois.
+  // Um querubim de ouro ajoelhado, de perfil, de rosto baixo para a tampa (Êx 25.20): uma
+  // escultura em gravura, como a arca: a veste longa em pregas (a hachura aperta no fundo de
+  // cada prega), a faixa na cintura, o pé de quem ajoelha aparecendo atrás, a manga com as
+  // mãos juntas e a cabeça de perfil, inclinada, com o cabelo em mechas. "lado" 1 olha para a
+  // direita. Desenha a asa de trás antes do corpo e a da frente depois.
   function querubim(k, x0, y0, esc, lado, luzEm, obj) {
     const T = (x, y) => [x0 + lado * x * esc, y0 + y * esc];
     const caminho = (lista) => {
@@ -1623,78 +1637,133 @@
       p.closePath();
       return p;
     };
-    // a asa de trás: mais alta, mais escura
-    const borda = (dx, dy) => [T(-26 + dx, -134 + dy), T(-62 + dx, -290 + dy), T(40 + dx, -350 + dy), T(124 + dx, -292 + dy)];
-    asaOrdenada(k, borda(16, -26), luzEm, { escurecer: 0.45, escala: esc * 0.95, lado, obj });
-    const corpo = caminho([[-56, 0], [-62, -10], [-66, -28], [-64, -40], [-62, -60], [-48, -84], [-44, -110], [-40, -130], [-32, -144], [-22, -150],
-      [-12, -158], [0, -156], [6, -152], [16, -146], [26, -134], [24, -120], [22, -106], [20, -94], [22, -86], [34, -78], [52, -66], [62, -50],
-      [70, -36], [70, -12], [66, 0], [30, 4], [-20, 4], [-56, 0]]);
-    // a cabeça baixa, para a tampa, com o cabelo preso atrás; sem rosto
-    const cabeca = new Path2D();
-    const [hx, hy] = T(20, -168);
-    cabeca.ellipse(hx, hy, 21 * esc, 25 * esc, lado * 0.62, 0, Math.PI * 2);
-    const braco = caminho([[-12, -144], [6, -130], [26, -116], [44, -110], [56, -108], [66, -106], [64, -96], [52, -92], [32, -94], [12, -104], [-8, -120], [-16, -132], [-12, -144]]);
     const luzLocal = (x, y) => luzEm(T(x, y));
-    for (const [forma, cx, cy, raio] of [[corpo, 0, -76, 124], [cabeca, 20, -168, 34], [braco, 26, -116, 50]]) {
-      const [gx0, gy0] = T(-60, 0);
-      const [gx1, gy1] = T(56, 0);
+    // a forma em ouro gravado: o tom (mais claro do lado da luz, que vem da frente) e as
+    // linhas; "pregas" faz a sombra subir e descer em faixas, como pano dobrado
+    const ouroGravado = (forma, cx, cy, raio, ang, pregas = 0) => {
+      const [gx0, gy0] = T(-64, 0);
+      const [gx1, gy1] = T(60, 0);
       const g = k.createLinearGradient(gx0, gy0, gx1, gy1);
-      g.addColorStop(0, tomDeOuro(0.22));
-      g.addColorStop(0.65, tomDeOuro(0.42 + luzLocal(cx, cy) * 0.3));
-      g.addColorStop(1, tomDeOuro(0.62 + luzLocal(cx, cy) * 0.3));
+      g.addColorStop(0, tomDeOuro(0.2));
+      g.addColorStop(0.6, tomDeOuro(0.42 + luzLocal(cx, cy) * 0.28));
+      g.addColorStop(1, tomDeOuro(0.66 + luzLocal(cx, cy) * 0.3));
       k.fillStyle = g;
       k.fill(forma);
       if (obj) obj.fill(forma);
       const [ccx, ccy] = T(cx, cy);
-      gravar(k, forma, ccx, ccy, raio * esc, Math.PI / 2 + lado * 0.18, 3.6, 1.8, (x) => {
-        const u = ((x - x0) * lado / esc + 60) / 116;
-        return 0.85 - u * 0.7 - luzLocal(cx, cy) * 0.25;
-      }, TINTA_OURO, 0.2);
+      gravar(k, forma, ccx, ccy, raio * esc, ang, 3.3, 1.9, (x, y) => {
+        const u = (x - x0) * lado / esc;
+        const base = 0.8 - (u + 64) / 124 * 0.62 - luzLocal(cx, cy) * 0.22;
+        return base + (pregas ? Math.max(0, Math.sin(u * pregas + (y - y0) / esc * 0.02)) * 0.42 : 0);
+      }, TINTA_OURO, 0.15);
       k.strokeStyle = TINTA_OURO;
-      k.lineWidth = 2;
+      k.lineWidth = 2.2;
       k.stroke(forma);
-    }
-    // o cabelo preso, na parte de trás da cabeça, em linhas curvas (o rosto fica liso, sem traço)
+    };
+    // a asa de trás: mais alta, mais escura
+    const borda = (dx, dy) => [T(-26 + dx, -134 + dy), T(-62 + dx, -290 + dy), T(40 + dx, -350 + dy), T(124 + dx, -292 + dy)];
+    asaOrdenada(k, borda(16, -26), luzEm, { escurecer: 0.45, escala: esc * 0.95, lado, obj });
+    // o pé de trás, a sola virada para fora (de quem está de joelhos)
+    const pe = caminho([[-58, -2], [-70, -4], [-84, -6], [-86, -14], [-84, -22], [-72, -22], [-60, -18], [-58, -12], [-58, -6], [-58, -2]]);
+    ouroGravado(pe, -72, -12, 20, 0.2);
+    const corpo = caminho([[-56, 0], [-62, -10], [-66, -28], [-64, -40], [-62, -60], [-48, -84], [-44, -110], [-40, -130], [-32, -144], [-22, -150],
+      [-12, -158], [0, -156], [6, -152], [16, -146], [26, -134], [24, -120], [22, -106], [20, -94], [22, -86], [34, -78], [52, -66], [62, -50],
+      [70, -36], [70, -12], [66, 0], [30, 4], [-20, 4], [-56, 0]]);
+    ouroGravado(corpo, 0, -76, 124, Math.PI / 2 + lado * 0.12, 0.42);
+    // as pregas: do ombro e da cintura até a barra, com o filete de luz ao lado de cada uma
+    k.save();
+    k.clip(corpo);
+    k.lineCap = 'round';
+    const prega = (pts, larg = 2) => {
+      k.strokeStyle = 'rgba(42,28,5,.85)';
+      k.lineWidth = larg;
+      k.beginPath();
+      k.moveTo(...T(...pts[0]));
+      k.bezierCurveTo(...T(...pts[1]), ...T(...pts[2]), ...T(...pts[3]));
+      k.stroke();
+      k.strokeStyle = 'rgba(255,240,200,.55)';
+      k.lineWidth = 1.1;
+      k.beginPath();
+      k.moveTo(...T(pts[0][0] + 3, pts[0][1]));
+      k.bezierCurveTo(...T(pts[1][0] + 3, pts[1][1]), ...T(pts[2][0] + 3, pts[2][1]), ...T(pts[3][0] + 3, pts[3][1]));
+      k.stroke();
+    };
+    prega([[-36, -136], [-48, -100], [-58, -50], [-60, -6]]);
+    prega([[-22, -140], [-30, -100], [-34, -50], [-40, 0]]);
+    prega([[-8, -142], [-12, -110], [-14, -60], [-18, 2]]);
+    prega([[6, -84], [4, -56], [2, -30], [4, 2]]);
+    prega([[22, -82], [34, -62], [40, -34], [40, 2]], 1.8);
+    prega([[36, -74], [52, -56], [58, -30], [56, 2]], 1.8);
+    // a barra da veste, ondulada, no chão
+    k.strokeStyle = 'rgba(42,28,5,.9)';
+    k.lineWidth = 2;
+    k.beginPath();
+    for (let x = -60; x <= 68; x += 4) { const q = T(x, -6 + Math.sin(x * 0.28) * 3); if (x === -60) k.moveTo(...q); else k.lineTo(...q); }
+    k.stroke();
+    k.restore();
+    // a faixa da cintura
+    const faixa = caminho([[-46, -96], [-20, -102], [6, -102], [24, -98], [25, -92], [24, -86], [22, -82], [6, -88], [-20, -88], [-46, -96]]);
+    ouroGravado(faixa, -10, -92, 40, 0.1);
+    // a manga e as mãos juntas, estendidas para a tampa
+    const braco = caminho([[-12, -146], [6, -132], [26, -118], [44, -112], [54, -110], [62, -108], [62, -98], [50, -92], [32, -94], [12, -104], [-8, -120], [-16, -134], [-12, -146]]);
+    ouroGravado(braco, 22, -118, 52, 0.35, 0.6);
+    const maos = caminho([[58, -112], [66, -114], [74, -110], [76, -104], [76, -98], [70, -94], [62, -96], [58, -100], [58, -106], [58, -112]]);
+    ouroGravado(maos, 66, -104, 16, 1.2);
+    k.strokeStyle = 'rgba(42,28,5,.8)';
+    k.lineWidth = 1.2;
+    k.beginPath();
+    k.moveTo(...T(60, -104));
+    k.lineTo(...T(75, -103));
+    k.stroke();
+    // a cabeça de perfil, inclinada para a tampa: o crânio, a testa, o nariz, o queixo
+    const giro = 0.6;
+    const H = (x, y) => {
+      const c = Math.cos(giro);
+      const s = Math.sin(giro);
+      return T(18 + x * c - y * s, -170 + x * s + y * c);
+    };
+    const perfil = [[-20, -2], [-21, -16], [-12, -26], [2, -26], [14, -24], [20, -16], [21, -8], [22, -4], [26, 1], [22, 3], [21, 6],
+      [22, 9], [20, 11], [19, 15], [15, 19], [8, 20], [2, 18], [-4, 22], [-10, 24], [-14, 16], [-18, 10]];
+    const cabeca = new Path2D();
+    cabeca.moveTo(...H(...perfil[0]));
+    for (let i = 1; i < perfil.length; i++) cabeca.lineTo(...H(...perfil[i]));
+    cabeca.closePath();
+    const pescoco = caminho([[-8, -148], [-2, -158], [8, -164], [14, -160], [16, -154], [10, -146], [-8, -148]]);
+    ouroGravado(pescoco, 4, -152, 16, 0.4);
+    ouroGravado(cabeca, 16, -172, 30, giro + Math.PI / 2);
+    // o cabelo: a massa atrás e em cima, em mechas curvas; o rosto fica liso
     k.save();
     k.clip(cabeca);
-    const [cx2, cy2] = T(8, -176);
-    k.fillStyle = tomDeOuro(0.28, 0.9);
-    k.beginPath();
-    k.ellipse(cx2, cy2, 19 * esc, 24 * esc, lado * 0.62, 0, Math.PI * 2);
-    k.fill();
-    k.strokeStyle = 'rgba(42,28,5,.8)';
+    const cab = new Path2D();
+    cab.moveTo(...H(-22, 24));
+    cab.lineTo(...H(-24, -10));
+    cab.lineTo(...H(-10, -28));
+    cab.lineTo(...H(8, -28));
+    cab.lineTo(...H(16, -20));
+    cab.quadraticCurveTo(...H(2, -14), ...H(-2, 2));
+    cab.quadraticCurveTo(...H(-4, 14), ...H(-6, 24));
+    cab.closePath();
+    k.fillStyle = tomDeOuro(0.3, 0.92);
+    k.fill(cab);
+    k.strokeStyle = 'rgba(42,28,5,.85)';
     k.lineCap = 'round';
-    k.lineWidth = 1.4;
-    for (let i = 0; i < 7; i++) {
+    k.lineWidth = 1.3;
+    for (let i = 0; i < 8; i++) {
       k.beginPath();
-      k.moveTo(...T(-4 + i * 4, -194 + i * 1.5));
-      k.quadraticCurveTo(...T(-16 + i * 3, -176), ...T(-6 + i * 3, -150));
+      k.moveTo(...H(12 - i * 4, -24 + i));
+      k.quadraticCurveTo(...H(-2 - i * 3, -10), ...H(-8 - i * 2, 14 + i));
       k.stroke();
     }
     k.restore();
     k.strokeStyle = TINTA_OURO;
     k.lineWidth = 2;
     k.stroke(cabeca);
-    // as pregas da veste, da cintura ao chão
-    k.save();
-    k.clip(corpo);
-    k.strokeStyle = 'rgba(42,28,5,.75)';
-    k.lineCap = 'round';
-    for (const [a, b, c, d] of [[-40, -120, -56, -8], [-24, -126, -30, -4], [-8, -112, -6, -2], [30, -72, 30, -4], [46, -60, 52, -6]]) {
-      k.lineWidth = 1.7;
-      k.beginPath();
-      k.moveTo(...T(a, b));
-      k.quadraticCurveTo(...T((a + c) / 2 + 6, (b + d) / 2), ...T(c, d));
-      k.stroke();
-      k.strokeStyle = 'rgba(255,240,200,.35)';
-      k.lineWidth = 1;
-      k.beginPath();
-      k.moveTo(...T(a + 3, b));
-      k.quadraticCurveTo(...T((a + c) / 2 + 9, (b + d) / 2), ...T(c + 3, d));
-      k.stroke();
-      k.strokeStyle = 'rgba(42,28,5,.75)';
-    }
-    k.restore();
+    // a sobrancelha e o olho baixo, só um traço
+    k.lineWidth = 1.4;
+    k.beginPath();
+    k.moveTo(...H(10, -10));
+    k.quadraticCurveTo(...H(15, -12), ...H(19, -9));
+    k.stroke();
     // a asa da frente
     asaOrdenada(k, borda(0, 0), luzEm, { escala: esc, lado, obj });
   }
@@ -2233,202 +2302,197 @@
     k.beginPath();
     topo.forEach(([x, y], i) => (i ? k.lineTo(x, y) : k.moveTo(x, y)));
     k.stroke();
-    // o arbusto no alto da rocha
-    for (let i = 0; i < 14; i++) capim(k, r, 340 + i * 26 + r() * 12, 140 - Math.sin(i / 13 * Math.PI) * 4 + (i > 7 ? -6 : 0), 26 + r() * 22, 7);
-    // a fachada lavrada: o plano liso cortado na rocha, com as marcas do cinzel
-    const fx0 = 92;
-    const fx1 = 600;
-    const fy0 = 214;
-    const fy1 = 640;
-    const fachada = contornoRocha(r, [[fx0, fy1], [fx0 + 4, fy0 + 30], [fx0 + 30, fy0 + 6], [fx1 - 40, fy0], [fx1 - 4, fy0 + 20], [fx1, fy1]], 5);
-    fachada.closePath();
-    k.save();
-    k.filter = 'blur(6px)';
-    k.fillStyle = 'rgba(43,33,18,.35)';
-    k.translate(10, 8);
-    k.fill(fachada);
-    k.restore();
-    k.fillStyle = '#eadcb6';
-    k.fill(fachada);
-    gravar(k, fachada, (fx0 + fx1) / 2, 430, 340, Math.PI / 2, 6, 1.3, (x) => 0.18 + ((x - fx0) / (fx1 - fx0)) * 0.42, SEPIA, 0);
-    k.save();
-    k.clip(fachada);
-    k.strokeStyle = 'rgba(43,33,18,.45)';
-    k.lineCap = 'round';
-    for (let i = 0; i < 260; i++) {
-      const x = fx0 + r() * (fx1 - fx0);
-      const y = fy0 + r() * (fy1 - fy0);
-      k.lineWidth = 1 + r() * 0.8;
-      k.beginPath();
-      k.moveTo(x, y);
-      k.lineTo(x + 7 + r() * 6, y - 9 - r() * 5);
-      k.stroke();
+    // dois tufos ralos de capim seco no alto da rocha
+    capim(k, r, 452, 133, 22, 6, 'rgba(43,33,18,.75)');
+    capim(k, r, 690, 128, 18, 5, 'rgba(43,33,18,.75)');
+    // a boca da gruta: um vão cavado na rocha, de beirada irregular e arredondada, sem batente
+    const bx = 350;
+    const bBase = 630;
+    const bontos = [];
+    for (let i = 0; i <= 22; i++) {
+      const a = Math.PI - (i / 22) * Math.PI;
+      const ruido = (r() - 0.5) * 22 + Math.sin(i * 1.7) * 6;
+      bontos.push([bx + Math.cos(a) * (206 + ruido), bBase - Math.sin(a) * (360 + ruido * 0.8) - (i > 0 && i < 22 ? 0 : 0)]);
     }
-    k.restore();
-    k.strokeStyle = SEPIA;
-    k.lineWidth = 2.2;
-    k.stroke(fachada);
-    // a porta: um vão baixo e largo, de verga reta, com a espessura da rocha à direita
-    const px0 = 176;
-    const px1 = 486;
-    const py0 = 300;
-    const py1 = 628;
-    const porta = contornoRocha(r, [[px0, py1], [px0 - 2, py0 + 14], [px0 + 10, py0], [px1 - 10, py0 - 2], [px1 + 2, py0 + 12], [px1, py1]], 3);
+    bontos.push([bx + 206, bBase + 4], [bx - 206, bBase + 4]);
+    const porta = contornoRocha(r, bontos, 6);
     porta.closePath();
-    // dentro: o escuro da câmara, em hachura cruzada sobre o fundo
+    // a sombra da beirada na rocha, fora (para baixo e à direita)
+    k.save();
+    k.filter = 'blur(8px)';
+    k.strokeStyle = 'rgba(43,33,18,.45)';
+    k.lineWidth = 16;
+    k.translate(6, 4);
+    k.stroke(porta);
+    k.restore();
     k.save();
     k.clip(porta);
-    k.fillStyle = '#3a2f1d';
-    k.fillRect(px0 - 20, py0 - 20, px1 - px0 + 40, py1 - py0 + 40);
+    // dentro: a câmara funda, mais escura no alto e no meio, em hachura cruzada
+    const gd = k.createRadialGradient(bx, bBase - 220, 40, bx, bBase - 120, 330);
+    gd.addColorStop(0, '#120c05');
+    gd.addColorStop(0.7, '#2a1d0f');
+    gd.addColorStop(1, '#4a3820');
+    k.fillStyle = gd;
+    k.fillRect(bx - 230, bBase - 400, 460, 420);
     const dentro = new Path2D();
-    dentro.rect(px0 - 20, py0 - 20, px1 - px0 + 40, py1 - py0 + 40);
-    gravar(k, dentro, (px0 + px1) / 2, (py0 + py1) / 2, 300, 0.75, 5, 2.4, () => 0.95, '#120d06', 0);
-    gravar(k, dentro, (px0 + px1) / 2, (py0 + py1) / 2, 300, -0.75, 5, 2.4, () => 0.95, '#120d06', 0);
-    // a luz da manhã entra de viés pela porta e cai no banco
+    dentro.rect(bx - 230, bBase - 400, 460, 420);
+    gravar(k, dentro, bx, bBase - 190, 330, 0.75, 5, 2.2, (x, y) => 0.7 + (1 - Math.hypot(x - bx, y - bBase + 120) / 330) * 0.3, '#0a0703', 0);
+    gravar(k, dentro, bx, bBase - 190, 330, -0.75, 5.5, 2, (x, y) => 0.5 + (1 - Math.hypot(x - bx, y - bBase + 120) / 330) * 0.5, '#0a0703', 0);
+    // o fundo da gruta: uma parede curva, mais baixa e mais escura
+    const fundoG = new Path2D();
+    fundoG.ellipse(bx + 10, bBase - 70, 160, 250, 0, Math.PI, 0);
+    k.fillStyle = 'rgba(8,5,2,.45)';
+    k.fill(fundoG);
+    // a luz da manhã entra de viés e cai no banco
     const faixa = new Path2D();
-    faixa.moveTo(px0 - 10, py0 - 10);
-    faixa.lineTo(px0 + 150, py0 - 10);
-    faixa.lineTo(px1 + 30, py1 + 10);
-    faixa.lineTo(px0 + 120, py1 + 10);
+    faixa.moveTo(bx - 260, bBase - 400);
+    faixa.lineTo(bx - 60, bBase - 400);
+    faixa.lineTo(bx + 240, bBase + 10);
+    faixa.lineTo(bx - 10, bBase + 10);
     faixa.closePath();
     k.save();
-    k.filter = 'blur(16px)';
-    k.fillStyle = 'rgba(255,230,170,.42)';
+    k.filter = 'blur(18px)';
+    k.fillStyle = 'rgba(255,230,170,.4)';
     k.fill(faixa);
     k.restore();
-    // a parede do fundo e o banco de pedra cavado nela
-    const bancoT = 470;
-    const bancoF = 520;
-    const banco = new Path2D();
-    banco.rect(px0 - 10, bancoT, px1 - px0 + 20, bancoF - bancoT);
-    k.fillStyle = '#8a7650';
+    // o banco cavado na rocha, ao longo do fundo
+    const bancoT = 500;
+    const bancoF = 556;
+    const banco = contornoRocha(r, [[bx - 210, bancoT + 4], [bx - 120, bancoT], [bx, bancoT - 2], [bx + 120, bancoT], [bx + 210, bancoT + 6], [bx + 210, bancoF], [bx - 210, bancoF]], 3);
+    banco.closePath();
+    k.fillStyle = '#8f7a52';
     k.fill(banco);
-    gravar(k, banco, (px0 + px1) / 2, (bancoT + bancoF) / 2, 200, 0, 4.2, 1.8, (x) => 0.35 + Math.abs(x - 340) / 300, '#1d160a', 0);
-    const tampo = new Path2D();
-    tampo.moveTo(px0 - 10, bancoT);
-    tampo.lineTo(px0 + 14, bancoT - 22);
-    tampo.lineTo(px1 - 4, bancoT - 22);
-    tampo.lineTo(px1 + 10, bancoT);
+    gravar(k, banco, bx, (bancoT + bancoF) / 2, 230, 0, 4.2, 1.8, (x) => 0.3 + Math.abs(x - bx + 40) / 320, '#1d160a', 0);
+    const tampo = contornoRocha(r, [[bx - 210, bancoT + 4], [bx - 180, bancoT - 26], [bx + 190, bancoT - 28], [bx + 210, bancoT + 6]], 2);
     tampo.closePath();
-    k.fillStyle = '#b9a272';
+    k.fillStyle = '#c3ab78';
     k.fill(tampo);
-    gravar(k, tampo, 330, bancoT - 11, 200, 0, 4, 1.1, (x) => 0.3 + Math.abs(x - 330) / 400, '#1d160a', 0);
+    gravar(k, tampo, bx, bancoT - 12, 230, 0, 4, 1.1, (x) => 0.25 + Math.abs(x - bx + 40) / 420, '#1d160a', 0);
     k.strokeStyle = '#1d160a';
-    k.lineWidth = 1.6;
+    k.lineWidth = 1.8;
     k.stroke(tampo);
     k.stroke(banco);
-    // o chão da câmara, mais baixo que a soleira
-    const chaoD = new Path2D();
-    chaoD.rect(px0 - 10, bancoF, px1 - px0 + 20, py1 - bancoF + 10);
-    k.fillStyle = 'rgba(40,30,16,.55)';
-    k.fill(chaoD);
-    gravar(k, chaoD, 330, 580, 200, 0, 5, 1.6, () => 0.7, '#120d06', 0);
     // o lençol de linho: um só pano comprido, deitado e vazio, com uma ponta caída pela beirada
+    const L0 = bx - 172;
+    const ly = bancoT - 16;
     const lencol = new Path2D();
-    lencol.moveTo(194, 462);
-    lencol.bezierCurveTo(196, 452, 200, 446, 214, 445);
-    lencol.bezierCurveTo(250, 442, 290, 447, 330, 443);
-    lencol.bezierCurveTo(350, 441, 362, 444, 364, 452);
-    lencol.lineTo(366, 466);
-    lencol.lineTo(244, 470);
-    // a ponta que cai pela frente do banco
-    lencol.bezierCurveTo(246, 486, 242, 500, 238, 512);
-    lencol.lineTo(206, 508);
-    lencol.bezierCurveTo(204, 494, 200, 480, 196, 470);
+    lencol.moveTo(L0, ly + 12);
+    lencol.bezierCurveTo(L0 + 2, ly - 4, L0 + 6, ly - 12, L0 + 24, ly - 13);
+    lencol.bezierCurveTo(L0 + 72, ly - 18, L0 + 120, ly - 9, L0 + 171, ly - 16);
+    lencol.bezierCurveTo(L0 + 189, ly - 18, L0 + 202, ly - 12, L0 + 203, ly);
+    lencol.lineTo(L0 + 205, ly + 16);
+    lencol.lineTo(L0 + 61, ly + 22);
+    lencol.bezierCurveTo(L0 + 64, ly + 46, L0 + 59, ly + 66, L0 + 54, ly + 84);
+    lencol.lineTo(L0 + 14, ly + 78);
+    lencol.bezierCurveTo(L0 + 11, ly + 56, L0 + 6, ly + 36, L0 + 2, ly + 20);
     lencol.closePath();
     k.save();
-    k.filter = 'blur(4px)';
-    k.fillStyle = 'rgba(10,8,4,.7)';
-    k.translate(5, 7);
+    k.filter = 'blur(5px)';
+    k.fillStyle = 'rgba(10,8,4,.75)';
+    k.translate(7, 9);
     k.fill(lencol);
     k.restore();
-    k.fillStyle = '#f7efdc';
+    k.fillStyle = '#f8f0de';
     k.fill(lencol);
     if (obj) obj.fill(lencol);
-    gravar(k, lencol, 280, 470, 140, 0.02, 3.6, 1.2, (x, y) => (y - 446) / 26 * 0.55 + (x < 246 && y > 468 ? 0.25 : 0), '#4a3d24', 0);
+    gravar(k, lencol, L0 + 102, ly + 30, 170, 0.02, 4, 1.3, (x, y) => (y - ly + 14) / 38 * 0.55 + (x < L0 + 62 && y > ly + 20 ? 0.25 : 0), '#4a3d24', 0);
     k.save();
     k.clip(lencol);
-    k.strokeStyle = 'rgba(58,47,29,.8)';
+    k.strokeStyle = 'rgba(58,47,29,.85)';
     k.lineCap = 'round';
-    k.lineWidth = 1.4;
-    // as pregas no comprimento e as rugas curtas
-    for (const yy of [451, 457]) {
+    k.lineWidth = 1.8;
+    for (const yy of [ly - 6, ly + 3]) {
       k.beginPath();
-      k.moveTo(206, yy + 2);
-      k.bezierCurveTo(250, yy - 3, 300, yy + 3, 356, yy - 1);
+      k.moveTo(L0 + 13, yy + 3);
+      k.bezierCurveTo(L0 + 64, yy - 4, L0 + 128, yy + 4, L0 + 197, yy - 1);
       k.stroke();
     }
-    for (const x of [236, 262, 298, 326]) { k.beginPath(); k.moveTo(x, 446); k.quadraticCurveTo(x + 5, 455, x + 2, 466); k.stroke(); }
+    for (const x of [L0 + 50, L0 + 83, L0 + 120, L0 + 157]) { k.beginPath(); k.moveTo(x, ly - 14); k.quadraticCurveTo(x + 7, ly, x + 3, ly + 16); k.stroke(); }
     k.beginPath();
-    k.moveTo(244, 470);
-    k.bezierCurveTo(260, 468, 330, 466, 366, 466);
+    k.moveTo(L0 + 61, ly + 22);
+    k.bezierCurveTo(L0 + 96, ly + 19, L0 + 160, ly + 17, L0 + 205, ly + 16);
     k.stroke();
-    k.beginPath();
-    k.moveTo(222, 472);
-    k.quadraticCurveTo(226, 490, 222, 508);
-    k.stroke();
+    for (const x of [L0 + 24, L0 + 42]) { k.beginPath(); k.moveTo(x, ly + 24); k.quadraticCurveTo(x + 5, ly + 50, x + 1, ly + 80); k.stroke(); }
     k.restore();
     k.strokeStyle = '#2b2112';
-    k.lineWidth = 1.8;
+    k.lineWidth = 2.2;
     k.stroke(lencol);
     // o pano da cabeça, dobrado, num lugar à parte (Jo 20.7)
+    const D0 = bx + 60;
     const pano = new Path2D();
-    pano.moveTo(394, 456);
-    pano.lineTo(400, 444);
-    pano.lineTo(442, 443);
-    pano.lineTo(446, 455);
-    pano.lineTo(446, 466);
-    pano.lineTo(394, 467);
+    pano.moveTo(D0, ly + 4);
+    pano.lineTo(D0 + 8, ly - 14);
+    pano.lineTo(D0 + 70, ly - 16);
+    pano.lineTo(D0 + 76, ly + 2);
+    pano.lineTo(D0 + 76, ly + 18);
+    pano.lineTo(D0, ly + 19);
     pano.closePath();
     k.save();
-    k.filter = 'blur(4px)';
-    k.fillStyle = 'rgba(10,8,4,.7)';
-    k.translate(5, 6);
+    k.filter = 'blur(5px)';
+    k.fillStyle = 'rgba(10,8,4,.75)';
+    k.translate(6, 8);
     k.fill(pano);
     k.restore();
-    k.fillStyle = '#f2e8d0';
+    k.fillStyle = '#f3e9d2';
     k.fill(pano);
     if (obj) obj.fill(pano);
     k.fillStyle = 'rgba(74,61,36,.35)';
-    k.fillRect(394, 456, 52, 11);
+    k.fillRect(D0, ly + 3, 76, 16);
     k.strokeStyle = '#2b2112';
-    k.lineWidth = 1.6;
+    k.lineWidth = 2;
     k.stroke(pano);
-    k.lineWidth = 1.1;
+    k.lineWidth = 1.3;
     k.beginPath();
-    k.moveTo(394, 456); k.lineTo(446, 455);
-    k.moveTo(395, 460); k.lineTo(445, 459.5);
-    k.moveTo(395, 463.5); k.lineTo(445, 463);
-    k.moveTo(421, 443.5); k.lineTo(420, 455.5);
+    k.moveTo(D0, ly + 3); k.lineTo(D0 + 76, ly + 2);
+    k.moveTo(D0 + 1, ly + 9); k.lineTo(D0 + 75, ly + 8.5);
+    k.moveTo(D0 + 1, ly + 14); k.lineTo(D0 + 75, ly + 13.5);
+    k.moveTo(D0 + 39, ly - 15); k.lineTo(D0 + 38, ly + 2);
     k.stroke();
-    brilho(k, 300, 452, 150, 'rgba(255,248,226,.3)', 'screen');
+    brilho(k, bx - 40, ly, 190, 'rgba(255,248,226,.32)', 'screen');
     k.restore();
-    // a espessura da porta (o lado de dentro do batente direito, aceso) e a soleira
-    const batente = new Path2D();
-    batente.moveTo(px1 - 2, py0 + 10);
-    batente.lineTo(px1 - 26, py0 + 30);
-    batente.lineTo(px1 - 26, py1 - 6);
-    batente.lineTo(px1, py1);
-    batente.closePath();
-    k.fillStyle = '#d9c597';
-    k.fill(batente);
-    gravar(k, batente, px1 - 13, (py0 + py1) / 2, 180, Math.PI / 2, 5, 1.1, () => 0.45, SEPIA, 0);
-    k.strokeStyle = SEPIA;
-    k.lineWidth = 1.6;
-    k.stroke(batente);
-    const verga = new Path2D();
-    verga.moveTo(px0 + 10, py0);
-    verga.lineTo(px1 - 10, py0 - 2);
-    verga.lineTo(px1 - 26, py0 + 26);
-    verga.lineTo(px0 + 22, py0 + 26);
-    verga.closePath();
-    k.fillStyle = '#5a4a2c';
-    k.fill(verga);
-    gravar(k, verga, (px0 + px1) / 2, py0 + 12, 200, 0, 3.6, 1.6, () => 0.8, '#120d06', 0);
+    // a beirada cavada: a espessura da rocha por dentro do vão, de largura irregular, clara à
+    // esquerda (do lado do sol) e na sombra à direita, gravada em linhas que entram no escuro
+    const dentroBorda = [];
+    for (let i = 0; i <= 22; i++) {
+      const a = Math.PI - (i / 22) * Math.PI;
+      const e = 16 + r() * 22 + (i > 14 ? 10 : 0);
+      dentroBorda.push([bx + Math.cos(a) * (206 - e) + 4, bBase + 6 - Math.sin(a) * (360 - e * 1.3)]);
+    }
+    const bordaIn = contornoRocha(r, dentroBorda, 5);
+    const aro = new Path2D();
+    aro.addPath(porta);
+    aro.addPath(bordaIn);
+    k.save();
+    k.clip(porta);
+    k.save();
+    k.clip(aro, 'evenodd');
+    const gb = k.createLinearGradient(bx - 220, 0, bx + 220, 0);
+    gb.addColorStop(0, '#eadbb4');
+    gb.addColorStop(0.5, '#b49b6c');
+    gb.addColorStop(1, '#6a5432');
+    k.fillStyle = gb;
+    k.fillRect(bx - 240, bBase - 400, 480, 420);
+    for (let i = 0; i < 70; i++) {
+      const a = Math.PI - (i / 69) * Math.PI;
+      const x = bx + Math.cos(a) * 214;
+      const y = bBase - Math.sin(a) * 370;
+      const som = 0.3 + (Math.cos(a) + 1) / 2 * 0.0 + (1 - (Math.cos(a) + 1) / 2) * 0.0 + (x - bx) / 400;
+      k.strokeStyle = 'rgba(43,33,18,' + Math.max(0.25, Math.min(0.9, 0.45 + som)).toFixed(2) + ')';
+      k.lineWidth = 1 + Math.max(0, som) * 1.6;
+      k.beginPath();
+      k.moveTo(x, y);
+      k.lineTo(x - Math.cos(a) * 48, y + Math.sin(a) * 60);
+      k.stroke();
+    }
+    k.restore();
+    k.strokeStyle = '#1d160a';
+    k.lineWidth = 2.4;
+    k.stroke(bordaIn);
+    k.restore();
     k.strokeStyle = SEPIA;
     k.lineWidth = 3;
     k.stroke(porta);
-    // o sulco cavado na frente da fachada, onde a pedra corre
+    // o sulco cavado na frente da rocha, onde a pedra corre
     const sy = 624;
     const sulco = new Path2D();
     sulco.moveTo(60, sy);
@@ -2485,13 +2549,13 @@
       k.lineWidth = 1.2;
       k.stroke(sx);
     }
-    for (let i = 0; i < 16; i++) capim(k, r, r() * W, sy + 50 + r() * (H - sy - 60), 22 + r() * 30, 8);
+    for (let i = 0; i < 7; i++) capim(k, r, r() * W, sy + 60 + r() * (H - sy - 80), 20 + r() * 22, 6);
     // a grande pedra redonda, rolada para fora e de pé no sulco, à direita da porta
-    const pcx = 716;
-    const pcy = 438;
-    const pR = 182;
+    const pcx = 748;
+    const pcy = 448;
+    const pR = 172;
     const esp = 22;
-    // a sombra dela na fachada e no chão
+    // a sombra dela na rocha e no chão
     k.save();
     k.filter = 'blur(12px)';
     k.fillStyle = 'rgba(43,33,18,.45)';
@@ -2569,7 +2633,41 @@
     capim(k, r, 560, sy + 34, 40, 9);
     vinheta(k, W, H, 0.2);
   }
-  const DESENHOS = { davi: desenhoDavi, poco: desenhoPoco, azeite: desenhoAzeite, mar: desenhoMar, arca: desenhoArca, tumulo: desenhoTumulo };
+  // As artes, pela id da carta. temArte(id) diz se a carta já tem desenho; sem ele, a carta
+  // sai com a gravura neutra (desenhoEmBreve) e o sistema pode preferir a silhueta.
+  const DESENHOS = { 'davi-funda': desenhoDavi, 'poco-jaco': desenhoPoco, 'azeite-viuva': desenhoAzeite, 'mar-vermelho': desenhoMar,
+    'arca-alianca': desenhoArca, 'tumulo-vazio': desenhoTumulo };
+  const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
+  // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
+  function desenhoEmBreve(k, W, H) {
+    const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
+    g.addColorStop(0, '#f1e8cf');
+    g.addColorStop(1, '#d6c7a0');
+    k.fillStyle = g;
+    k.fillRect(0, 0, W, H);
+    k.lineWidth = 1.2;
+    for (let i = 0; i < 30; i++) {
+      k.strokeStyle = 'rgba(43,33,18,' + (i % 4 === 0 ? 0.22 : 0.1) + ')';
+      k.beginPath();
+      for (let a = 0; a <= Math.PI * 2 + 0.01; a += 0.02) {
+        const d = 60 + i * 12 + Math.sin(a * 16 + i * 0.5) * 4;
+        const x = W / 2 + Math.cos(a) * d;
+        const y = H / 2 + Math.sin(a) * d * 0.95;
+        if (a === 0) k.moveTo(x, y); else k.lineTo(x, y);
+      }
+      k.stroke();
+    }
+    if (CC.story && CC.CAMINHO_SIMBOLO) CC.story.logo(k, W / 2 - 120 * 1357 / 1936 / 2, H / 2 - 60, 120, 'rgba(43,33,18,.35)');
+  }
+  // Marca a silhueta de um objeto no contexto "obj" (a máscara do brilho), no mesmo lugar em
+  // que o desenho está (copia a transformação do contexto da arte).
+  function marcar(k, obj, forma, traco) {
+    if (!obj) return;
+    obj.save();
+    obj.setTransform(k.getTransform());
+    if (traco) { obj.lineWidth = traco; obj.lineCap = 'round'; obj.lineJoin = 'round'; obj.stroke(forma); } else obj.fill(forma);
+    obj.restore();
+  }
 
   // ---------- a carta ----------
   const oswald = (t, peso = 600) => peso + ' ' + t + 'px Oswald, "Arial Narrow", sans-serif';
@@ -2583,6 +2681,13 @@
     try { k.letterSpacing = espaco + 'px'; } catch (e) { /* navegador sem letterSpacing */ }
     k.fillText(txt, x, y);
     try { k.letterSpacing = '0px'; } catch (e) { /* idem */ }
+  }
+  function medir(k, txt, fonte, espaco) {
+    k.font = fonte;
+    try { k.letterSpacing = espaco + 'px'; } catch (e) { /* idem */ }
+    const w = k.measureText(txt).width;
+    try { k.letterSpacing = '0px'; } catch (e) { /* idem */ }
+    return w;
   }
   // Quebra em linhas equilibradas (sem palavra sozinha na última).
   function quebrar(k, texto, fonte, largura) {
@@ -2619,12 +2724,13 @@
     k.fill();
   }
   // ---------- os materiais da moldura ----------
-  // O metal: as faixas de luz na diagonal, o escovado e a faixa larga de brilho. Serve ao
-  // bronze (batido, com as marcas do martelo), à prata (com a guilhoché gravada, onde o
-  // holográfico frio corre) e ao ouro (a folha dourada das primeiras amostras).
+  // Cada raridade tem um material que se reconhece de longe, e também um enfeite próprio nos
+  // cantos (além do nome e do ícone no pé): o linho é pano cru com pesponto; o bronze, metal
+  // batido escuro com rebites; a prata, metal frio e claro com guilhoché e rosetas; o ouro,
+  // folha dourada com cantoneiras de filigrana; a glória, arte cheia com moldura de madrepérola.
   const METAIS = {
-    bronze: [[0, '#4e2f12'], [0.13, '#a86f3b'], [0.26, '#efc394'], [0.35, '#b57a43'], [0.5, '#62391a'], [0.64, '#b9824b'], [0.77, '#f2cfa2'], [0.88, '#93602e'], [1, '#432810']],
-    prata: [[0, '#5d6470'], [0.14, '#b9bfc9'], [0.27, '#f7f9fc'], [0.37, '#b3bac5'], [0.52, '#6f7784'], [0.66, '#cfd4dc'], [0.78, '#ffffff'], [0.88, '#9ea6b3'], [1, '#535a66']],
+    bronze: [[0, '#3f2410'], [0.13, '#94592a'], [0.26, '#d9a06a'], [0.35, '#9c6230'], [0.5, '#4f2c12'], [0.64, '#a26a36'], [0.77, '#e0b07c'], [0.88, '#7c4c22'], [1, '#36200c']],
+    prata: [[0, '#6b7380'], [0.14, '#c3c9d2'], [0.27, '#fbfcff'], [0.37, '#c0c6d0'], [0.52, '#7d8592'], [0.66, '#d9dde4'], [0.78, '#ffffff'], [0.88, '#a9b0bc'], [1, '#606875']],
     ouro: [[0, '#7a5714'], [0.14, '#d9a23a'], [0.27, '#fff0b8'], [0.36, '#e3ae45'], [0.52, '#8c6519'], [0.66, '#e8b84e'], [0.78, '#fff4c8'], [0.88, '#c99430'], [1, '#6e4f12']],
   };
   function folhaDeMetal(k, w, h, r, tons, { escuro = '80,50,0', claro = '255,250,220', batido = false, guilloche = false, escovado = true } = {}) {
@@ -2633,20 +2739,19 @@
     k.fillStyle = g;
     k.fillRect(0, 0, w, h);
     if (batido) {
-      // as marcas do martelo: covinhas pequenas e regulares, uma ao lado da outra, cada uma
-      // com o brilho em cima à esquerda e a sombra curta embaixo à direita
-      const passo = 17;
+      // as marcas do martelo: covinhas regulares, o brilho em cima à esquerda, a sombra embaixo
+      const passo = 19;
       for (let y = -passo, l = 0; y < h + passo; y += passo * 0.87, l++) {
         for (let x = -passo + (l % 2) * passo / 2; x < w + passo; x += passo) {
           const cx = x + (r() - 0.5) * 3;
           const cy = y + (r() - 0.5) * 3;
-          const rr = 6.5 + r() * 1.5;
-          k.strokeStyle = 'rgba(' + claro + ',.32)';
-          k.lineWidth = 1.4;
+          const rr = 7.5 + r() * 1.5;
+          k.strokeStyle = 'rgba(' + claro + ',.42)';
+          k.lineWidth = 1.8;
           k.beginPath();
           k.arc(cx, cy, rr, Math.PI * 0.95, Math.PI * 1.55);
           k.stroke();
-          k.strokeStyle = 'rgba(' + escuro + ',.16)';
+          k.strokeStyle = 'rgba(' + escuro + ',.3)';
           k.beginPath();
           k.arc(cx, cy, rr, Math.PI * 1.95, Math.PI * 2.55);
           k.stroke();
@@ -2667,11 +2772,11 @@
     }
     if (guilloche) {
       // a guilhoché: ondas finas em leque a partir dos quatro cantos, como em cédula
-      k.lineWidth = 1;
+      k.lineWidth = 1.2;
       for (const [ox, oy] of [[0, 0], [w, 0], [0, h], [w, h]]) {
         for (let i = 0; i < 60; i++) {
           const raio = 40 + i * 9;
-          k.strokeStyle = i % 5 === 0 ? 'rgba(' + escuro + ',.12)' : 'rgba(' + escuro + ',.06)';
+          k.strokeStyle = i % 5 === 0 ? 'rgba(' + escuro + ',.2)' : 'rgba(' + escuro + ',.09)';
           k.beginPath();
           for (let a = 0; a <= Math.PI * 2; a += 0.012) {
             const d = raio + Math.sin(a * 22 + i * 0.5) * 4;
@@ -2696,75 +2801,139 @@
     k.fill();
     k.restore();
   }
-  // O linho: o tecido cru, só a trama fina e regular (por cima, por baixo) e a borda mais escura.
+  // O linho: o pano cru, a trama fina e regular (por cima, por baixo) e a borda mais escura.
   function tecidoDeLinho(k, w, h, r) {
     const g = k.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, '#e6d9be');
-    g.addColorStop(0.55, '#d8c9a9');
-    g.addColorStop(1, '#c6b490');
+    g.addColorStop(0, '#ece2cb');
+    g.addColorStop(0.55, '#ddd0b2');
+    g.addColorStop(1, '#cbbb98');
     k.fillStyle = g;
     k.fillRect(0, 0, w, h);
-    const passo = 4;
+    const passo = 5;
     for (let y = 0; y < h; y += passo) {
       for (let x = 0; x < w; x += passo) {
         const cima = ((x + y) / passo) % 2 === 0;
-        k.fillStyle = cima ? 'rgba(255,250,236,' + (0.14 + r() * 0.06).toFixed(3) + ')' : 'rgba(100,82,50,' + (0.08 + r() * 0.05).toFixed(3) + ')';
-        k.fillRect(x, y + (cima ? 0 : 1), cima ? passo : passo - 1, cima ? passo - 1.4 : passo - 1);
+        k.fillStyle = cima ? 'rgba(255,250,236,' + (0.2 + r() * 0.08).toFixed(3) + ')' : 'rgba(100,82,50,' + (0.12 + r() * 0.06).toFixed(3) + ')';
+        k.fillRect(x, y + (cima ? 0 : 1), cima ? passo : passo - 1, cima ? passo - 1.6 : passo - 1);
       }
     }
-    vinheta(k, w, h, 0.25);
+    vinheta(k, w, h, 0.22);
   }
-  // A glória é "arte cheia": a ilustração passa por baixo da moldura, que vira dois filetes de
-  // ouro. Aqui só o que fica por baixo de tudo e o filete; a arte entra em desenharCarta.
-  function filetesDeOuro(k, w, h) {
+  // A madrepérola da glória: o branco quente com as cores do nácar (rosa, céu, menta e ouro
+  // claros) em faixas diagonais largas, as linhas de crescimento da concha e um brilho.
+  function madreperola(k, w, h, r, desloc = 0) {
     const g = k.createLinearGradient(0, 0, w, h);
-    [[0, '#a87b12'], [0.25, '#ffe9a8'], [0.45, '#c99430'], [0.7, '#fff4c8'], [1, '#8c6519']].forEach(([p, c]) => g.addColorStop(p, c));
+    const tons = ['#fbf3e4', '#f7cfe0', '#cadff9', '#cdf0db', '#fde6b0', '#e2cff9', '#fbf3e4'];
+    for (let i = 0; i <= 18; i++) g.addColorStop(i / 18, tons[(i + desloc) % tons.length]);
+    k.fillStyle = g;
+    k.fillRect(0, 0, w, h);
     k.save();
-    k.strokeStyle = 'rgba(0,0,0,.45)';
-    k.lineWidth = 4;
-    retRedondo(k, 16, 16, w - 32, h - 32, 32);
-    k.stroke();
-    k.strokeStyle = g;
-    k.lineWidth = 13;
-    retRedondo(k, 12, 12, w - 24, h - 24, 34);
-    k.stroke();
-    k.strokeStyle = 'rgba(60,40,4,.6)';
-    k.lineWidth = 1.5;
-    retRedondo(k, 19, 19, w - 38, h - 38, 28);
-    k.stroke();
-    k.strokeStyle = g;
-    k.lineWidth = 3;
-    retRedondo(k, 30, 30, w - 60, h - 60, 24);
-    k.stroke();
-    // os cantos: um losango de ouro em cada
-    for (const [x, y] of [[30, 30], [w - 30, 30], [30, h - 30], [w - 30, h - 30]]) {
-      k.fillStyle = g;
+    k.lineWidth = 1.4;
+    for (let i = 0; i < 90; i++) {
+      const y0 = -h * 0.2 + i * (h * 1.4) / 90;
+      k.strokeStyle = i % 3 ? 'rgba(255,255,255,.55)' : 'rgba(150,130,110,.16)';
       k.beginPath();
-      k.moveTo(x, y - 14);
-      k.lineTo(x + 14, y);
-      k.lineTo(x, y + 14);
-      k.lineTo(x - 14, y);
-      k.closePath();
-      k.fill();
-      k.strokeStyle = 'rgba(60,40,4,.7)';
-      k.lineWidth = 1.5;
+      for (let x = -20; x <= w + 20; x += 16) {
+        const y = y0 + x * 0.35 + Math.sin(x * 0.02 + i * 0.7) * 10;
+        if (x === -20) k.moveTo(x, y); else k.lineTo(x, y);
+      }
       k.stroke();
+    }
+    k.globalCompositeOperation = 'screen';
+    k.filter = 'blur(26px)';
+    k.fillStyle = 'rgba(255,255,255,.65)';
+    k.beginPath();
+    k.moveTo(w * 0.6, -50);
+    k.lineTo(w * 0.74, -50);
+    k.lineTo(w * 0.24, h + 50);
+    k.lineTo(w * 0.1, h + 50);
+    k.fill();
+    k.restore();
+  }
+  // Os enfeites dos cantos, na cor da letra da moldura.
+  function enfeiteDosCantos(k, tipo, cor, claro) {
+    const cantos = [[1, 1, 40, 40], [-1, 1, CW - 40, 40], [1, -1, 40, CH - 40], [-1, -1, CW - 40, CH - 40]];
+    k.save();
+    k.lineCap = 'round';
+    for (const [sx, sy, x, y] of cantos) {
+      k.save();
+      k.translate(x, y);
+      k.scale(sx, sy);
+      if (tipo === 'rebite') {
+        // o rebite de bronze: a cabeça redonda, a luz e a sombra
+        const g = k.createRadialGradient(-3 * sx, -3 * sy, 1, 0, 0, 11);
+        g.addColorStop(0, claro);
+        g.addColorStop(1, cor);
+        k.fillStyle = 'rgba(0,0,0,.35)';
+        k.beginPath();
+        k.arc(2, 3, 11, 0, Math.PI * 2);
+        k.fill();
+        k.fillStyle = g;
+        k.beginPath();
+        k.arc(0, 0, 10, 0, Math.PI * 2);
+        k.fill();
+        k.strokeStyle = 'rgba(40,18,4,.7)';
+        k.lineWidth = 1.5;
+        k.stroke();
+      } else if (tipo === 'roseta') {
+        // a roseta gravada da prata
+        k.strokeStyle = cor;
+        k.lineWidth = 1.6;
+        for (let i = 0; i < 8; i++) {
+          k.save();
+          k.rotate((i / 8) * Math.PI * 2);
+          k.beginPath();
+          k.ellipse(0, -7, 3.2, 7, 0, 0, Math.PI * 2);
+          k.stroke();
+          k.restore();
+        }
+        k.beginPath();
+        k.arc(0, 0, 2.6, 0, Math.PI * 2);
+        k.fillStyle = cor;
+        k.fill();
+      } else if (tipo === 'filigrana') {
+        // a cantoneira de filigrana do ouro: duas volutas e a estrela
+        k.strokeStyle = cor;
+        k.lineWidth = 2.2;
+        k.beginPath();
+        k.moveTo(-14, 34);
+        k.bezierCurveTo(-14, 6, 6, -14, 34, -14);
+        k.stroke();
+        k.lineWidth = 1.6;
+        for (const [ax, ay, dx, dy] of [[-14, 34, 1, 0], [34, -14, 0, 1]]) {
+          k.beginPath();
+          k.arc(ax + dx * 7, ay + dy * 7, 7, 0, Math.PI * 1.6);
+          k.stroke();
+        }
+        estrelinha(k, 4, 4, 9, cor);
+      } else if (tipo === 'pesponto') {
+        // o canto do pesponto: um ponto em cruz
+        k.strokeStyle = cor;
+        k.lineWidth = 2;
+        k.beginPath();
+        k.moveTo(-6, -6);
+        k.lineTo(6, 6);
+        k.moveTo(6, -6);
+        k.lineTo(-6, 6);
+        k.stroke();
+      }
+      k.restore();
     }
     k.restore();
   }
-  // O que muda em cada material: o fundo, a cor das letras e dos filetes da moldura.
+  // O que muda em cada material: o fundo, a cor das letras, dos filetes e o enfeite.
   const MOLDURAS = {
-    linho: { pintar: tecidoDeLinho, letra: '#3b3120', filete: 'rgba(59,49,32,.4)', luz: 'rgba(255,250,236,.55)', janela: 'rgba(43,34,18,.85)', enfeite: 'traco' },
-    bronze: { pintar: (k, w, h, r) => folhaDeMetal(k, w, h, r, METAIS.bronze, { escuro: '60,30,8', claro: '255,236,210', batido: true, escovado: false }),
-      letra: '#2a1405', filete: 'rgba(50,24,4,.55)', luz: 'rgba(255,232,200,.5)', janela: 'rgba(42,20,4,.8)', enfeite: 'traco' },
+    linho: { pintar: tecidoDeLinho, letra: '#3b3120', filete: 'rgba(59,49,32,.45)', luz: 'rgba(255,250,236,.6)', janela: 'rgba(43,34,18,.85)', enfeite: 'traco', cantos: 'pesponto', pesponto: true },
+    bronze: { pintar: (k, w, h, r) => folhaDeMetal(k, w, h, r, METAIS.bronze, { escuro: '40,18,4', claro: '255,226,190', batido: true, escovado: false }),
+      letra: '#24120a', filete: 'rgba(40,18,4,.6)', luz: 'rgba(255,226,190,.45)', janela: 'rgba(36,16,2,.85)', enfeite: 'traco', cantos: 'rebite', corCanto: '#7a4a20', claroCanto: '#f0c08a' },
     prata: { pintar: (k, w, h, r) => folhaDeMetal(k, w, h, r, METAIS.prata, { escuro: '30,36,48', claro: '255,255,255', guilloche: true }),
-      letra: '#1d222b', filete: 'rgba(30,36,48,.5)', luz: 'rgba(255,255,255,.65)', janela: 'rgba(24,28,36,.8)', enfeite: 'traco' },
+      letra: '#1d222b', filete: 'rgba(30,36,48,.5)', luz: 'rgba(255,255,255,.7)', janela: 'rgba(24,28,36,.8)', enfeite: 'traco', cantos: 'roseta', corCanto: 'rgba(30,36,48,.7)' },
     ouro: { pintar: (k, w, h, r) => folhaDeMetal(k, w, h, r, METAIS.ouro), letra: '#2a1d04', filete: 'rgba(70,46,6,.55)', luz: 'rgba(255,248,214,.5)',
-      janela: 'rgba(60,40,4,.75)', enfeite: 'estrela', papel: '#b8862a' },
-    gloria: { cheia: true, letra: '#f6e7b8', filete: 'rgba(255,233,168,.6)', luz: 'rgba(255,255,255,.5)', janela: 'rgba(110,82,20,.7)', enfeite: 'estrela', papel: '#c9a548' },
+      janela: 'rgba(60,40,4,.75)', enfeite: 'estrela', papel: '#b8862a', cantos: 'filigrana', corCanto: 'rgba(70,46,6,.8)' },
+    gloria: { cheia: true, pintar: madreperola, letra: '#3d300c', filete: 'rgba(120,96,60,.5)', luz: 'rgba(255,255,255,.8)', janela: 'rgba(120,96,60,.6)', enfeite: 'estrela', papel: '#d9b860' },
   };
-  // As medidas da carta (em 1000 x 1400): a janela da ilustração e o papel do texto. O CSS do
-  // brilho (cartas.css) usa as mesmas, em porcentagem, para deixar o texto sempre fora dele.
+  // As medidas da carta (em 1000 x 1400): a janela da ilustração e o papel do texto. A máscara
+  // do brilho (mascaraDoBrilho) e o CSS usam as mesmas, para o brilho ficar fora do texto.
   // A ilustração é desenhada em 888 x 846 e entra cortada em cima e embaixo (ILU_CORTE).
   const JX = 56;
   const JY = 118;
@@ -2774,84 +2943,165 @@
   const ILU_CORTE = (ILU_H - JH) / 2;
   const PY = JY + JH + 16;
   const PH = CH - 56 - PY;
-  function desenharIlustracao(carta) {
+  // a faixa de madrepérola da glória (a arte passa por baixo dela)
+  const FAIXA = 42;
+  // A ilustração e a silhueta dos objetos dela (para a máscara do brilho), guardadas por id:
+  // desenhar a arte é o que mais custa, e a carta viva, a miniatura e a máscara a usam.
+  const GUARDADAS = new Map();
+  function ilustracao(carta) {
+    const id = carta.id;
+    if (GUARDADAS.has(id)) return GUARDADAS.get(id);
     const ilu = tela(JW, ILU_H);
-    const ki = ilu.getContext('2d');
-    (DESENHOS[carta.desenho] || desenhoDavi)(ki, JW, ILU_H);
-    grao(ki, JW, ILU_H, 16, 5000 + carta.numero);
-    return ilu;
+    const obj = tela(JW, ILU_H);
+    const ko = obj.getContext('2d');
+    ko.fillStyle = '#000';
+    ko.strokeStyle = '#000';
+    (DESENHOS[id] || desenhoEmBreve)(ilu.getContext('2d'), JW, ILU_H, ko);
+    grao(ilu.getContext('2d'), JW, ILU_H, 16, 5000 + (carta.numero || 0));
+    const v = { ilu, obj };
+    GUARDADAS.set(id, v);
+    if (GUARDADAS.size > 6) GUARDADAS.delete(GUARDADAS.keys().next().value);
+    return v;
   }
-  // A arte da glória, cheia: a ilustração cobre a carta de lado a lado até o papel, e embaixo
-  // dele continua escurecendo.
-  function arteCheia(k, ilu) {
-    const esc = CW / JW;
-    k.fillStyle = '#0f0f0c';
-    k.fillRect(0, 0, CW, CH);
+  // Onde a arte entra: na janela (cortada em cima e embaixo) ou cheia, de lado a lado (glória).
+  function porArte(k, img, cheia) {
     k.imageSmoothingQuality = 'high';
-    const alto = ILU_H * esc;
-    k.drawImage(ilu, 0, 0, CW, alto);
-    k.drawImage(ilu, 0, ILU_H - 2, JW, 2, 0, alto - 1, CW, CH - alto + 1);
-    const g = k.createLinearGradient(0, alto - 120, 0, CH);
-    g.addColorStop(0, 'rgba(12,12,9,0)');
-    g.addColorStop(0.4, 'rgba(12,12,9,.75)');
-    g.addColorStop(1, 'rgba(12,12,9,.95)');
-    k.fillStyle = g;
-    k.fillRect(0, alto - 120, CW, CH - alto + 120);
+    if (cheia) {
+      const alto = ILU_H * CW / JW;
+      k.drawImage(img, 0, 0, CW, alto);
+      k.drawImage(img, 0, ILU_H - 2, JW, 2, 0, alto - 1, CW, CH - alto + 1);
+    } else k.drawImage(img, 0, ILU_CORTE, JW, JH, JX, JY, JW, JH);
   }
-  function desenharCarta(c, carta) {
+  // O rótulo do alto: o álbum e o número.
+  function rotuloDoAlto(k, carta, M) {
+    const rotulo = String(carta.album || '').toUpperCase() + '  ·  ' + carta.numero + '/' + (carta.total || 13);
+    const wr = medir(k, rotulo, oswald(32, 600), 4.5);
+    if (M.cheia) {
+      // na arte cheia, numa plaqueta de madrepérola, para ler sobre qualquer arte
+      k.save();
+      k.filter = 'blur(8px)';
+      k.fillStyle = 'rgba(20,16,8,.35)';
+      retRedondo(k, CW / 2 - wr / 2 - 66, 50, wr + 132, 54, 27);
+      k.fill();
+      k.restore();
+      k.save();
+      retRedondo(k, CW / 2 - wr / 2 - 62, 44, wr + 124, 54, 27);
+      k.clip();
+      k.translate(CW / 2 - wr / 2 - 62, 44);
+      madreperola(k, wr + 124, 54, sorteio(5), 2);
+      k.restore();
+      k.strokeStyle = M.papel;
+      k.lineWidth = 2.5;
+      retRedondo(k, CW / 2 - wr / 2 - 62, 44, wr + 124, 54, 27);
+      k.stroke();
+    }
+    escrever(k, rotulo, CW / 2, 84, oswald(32, 600), M.letra, { alinhar: 'center', espaco: 4.5 });
+    if (M.enfeite === 'estrela') {
+      estrelinha(k, CW / 2 - wr / 2 - 30, 72, 12, M.letra);
+      estrelinha(k, CW / 2 + wr / 2 + 30, 72, 12, M.letra);
+    } else {
+      k.fillStyle = M.letra;
+      k.globalAlpha = 0.55;
+      for (const lado of [-1, 1]) k.fillRect(CW / 2 + lado * (wr / 2 + 26) - (lado < 0 ? 40 : 0), 71, 40, 2.5);
+      k.globalAlpha = 1;
+    }
+  }
+  // A moldura (o material e os filetes); na glória, a faixa de madrepérola por cima da arte.
+  function moldura(k, M, r, rar) {
+    if (M.cheia) {
+      k.save();
+      k.clip(vazado(FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26), 'evenodd');
+      madreperola(k, CW, CH, r);
+      k.restore();
+      // o ouro em volta da madrepérola: a borda de fora e o filete de dentro
+      const go = k.createLinearGradient(0, 0, CW, CH);
+      METAIS.ouro.forEach(([q, cor]) => go.addColorStop(q, cor));
+      k.strokeStyle = 'rgba(0,0,0,.4)';
+      k.lineWidth = 5;
+      retRedondo(k, FAIXA + 1, FAIXA + 3, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
+      k.stroke();
+      k.strokeStyle = go;
+      k.lineWidth = 6;
+      retRedondo(k, FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
+      k.stroke();
+      k.lineWidth = 10;
+      retRedondo(k, 5, 5, CW - 10, CH - 10, 41);
+      k.stroke();
+      k.strokeStyle = 'rgba(90,60,10,.6)';
+      k.lineWidth = 1.5;
+      retRedondo(k, 11, 11, CW - 22, CH - 22, 36);
+      k.stroke();
+      return;
+    }
+    M.pintar(k, CW, CH, r);
+    k.lineWidth = 2;
+    k.strokeStyle = M.filete;
+    retRedondo(k, 20, 20, CW - 40, CH - 40, 30);
+    k.stroke();
+    k.strokeStyle = M.luz;
+    retRedondo(k, 23, 23, CW - 46, CH - 46, 28);
+    k.stroke();
+    if (M.pesponto) {
+      k.save();
+      k.setLineDash([10, 7]);
+      k.lineWidth = 2.2;
+      k.strokeStyle = 'rgba(70,54,30,.6)';
+      retRedondo(k, 32, 32, CW - 64, CH - 64, 24);
+      k.stroke();
+      k.restore();
+    }
+    enfeiteDosCantos(k, M.cantos, M.corCanto || M.letra, M.claroCanto || '#fff');
+  }
+  function desenharFrente(c, carta) {
     const k = c.getContext('2d');
     const s = c.width / CW;
     k.save();
     k.setTransform(s, 0, 0, s, 0, 0);
-    const r = sorteio(9000 + carta.id.length * 97 + carta.numero);
+    const r = sorteio(9000 + carta.id.length * 97 + (carta.numero || 0));
     const rar = raridadeDe(carta);
     const R = RARIDADES[rar];
     const M = MOLDURAS[rar];
-    const ilu = desenharIlustracao(carta);
+    const { ilu } = ilustracao(carta);
     retRedondo(k, 0, 0, CW, CH, 46);
     k.save();
     k.clip();
     if (M.cheia) {
-      arteCheia(k, ilu);
-      filetesDeOuro(k, CW, CH);
-    } else {
-      M.pintar(k, CW, CH, r);
-      k.lineWidth = 2;
-      k.strokeStyle = M.filete;
-      retRedondo(k, 20, 20, CW - 40, CH - 40, 30);
-      k.stroke();
-      k.strokeStyle = M.luz;
-      retRedondo(k, 23, 23, CW - 46, CH - 46, 28);
-      k.stroke();
-    }
-    // o álbum e o número, no alto (na arte cheia, numa plaqueta escura, para ler sobre qualquer arte)
-    const rotulo = carta.album.toUpperCase() + '  ·  ' + carta.numero + '/' + carta.total;
-    k.font = oswald(32, 600);
-    try { k.letterSpacing = '4.5px'; } catch (e) { /* idem */ }
-    const wr = k.measureText(rotulo).width;
-    try { k.letterSpacing = '0px'; } catch (e) { /* idem */ }
-    if (M.cheia) {
+      porArte(k, ilu, true);
+      // a luz da glória, parada no papel: o clarão no alto e os raios finos, simétricos
       k.save();
-      k.filter = 'blur(10px)';
-      k.fillStyle = 'rgba(10,10,8,.55)';
-      retRedondo(k, CW / 2 - wr / 2 - 70, 48, wr + 140, 52, 26);
-      k.fill();
-      k.restore();
-      k.fillStyle = 'rgba(14,13,10,.6)';
-      retRedondo(k, CW / 2 - wr / 2 - 60, 50, wr + 120, 48, 24);
-      k.fill();
-      k.strokeStyle = 'rgba(255,233,168,.55)';
+      k.globalCompositeOperation = 'screen';
+      k.lineCap = 'round';
+      for (let i = 0; i < 72; i++) {
+        const a = Math.PI / 2 + ((i + 0.5) / 72 - 0.5) * 2.6;
+        const g = k.createLinearGradient(CW / 2, -60, CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
+        g.addColorStop(0, 'rgba(255,244,214,' + (i % 2 ? 0.16 : 0.3) + ')');
+        g.addColorStop(0.75, 'rgba(255,244,214,0)');
+        k.strokeStyle = g;
+        k.lineWidth = i % 2 ? 2 : 4;
+        k.beginPath();
+        k.moveTo(CW / 2, -60);
+        k.lineTo(CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
+        k.stroke();
+      }
+      // nas artes claras o clarão some; ali os raios entram como traço de ouro fino
+      k.save();
+      k.globalAlpha = 0.16;
+      k.strokeStyle = '#b8862a';
       k.lineWidth = 1.5;
-      k.stroke();
+      for (let i = 0; i < 72; i += 2) {
+        const a = Math.PI / 2 + ((i + 0.5) / 72 - 0.5) * 2.6;
+        k.beginPath();
+        k.moveTo(CW / 2 + Math.cos(a) * 160, -60 + Math.sin(a) * 160);
+        k.lineTo(CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
+        k.stroke();
+      }
+      k.restore();
+      k.restore();
+      brilho(k, CW / 2, 0, 640, 'rgba(255,236,190,.5)', 'screen');
     }
-    escrever(k, rotulo, CW / 2, 86, oswald(32, 600), M.letra, { alinhar: 'center', espaco: 4.5 });
-    if (M.enfeite === 'estrela') {
-      estrelinha(k, CW / 2 - wr / 2 - 30, 74, 12, M.letra);
-      estrelinha(k, CW / 2 + wr / 2 + 30, 74, 12, M.letra);
-    } else {
-      k.fillStyle = M.filete;
-      for (const lado of [-1, 1]) k.fillRect(CW / 2 + lado * (wr / 2 + 26) - (lado < 0 ? 40 : 0), 73, 40, 2);
-    }
+    moldura(k, M, r, rar);
+    if (M.cheia) enfeiteDosCantos(k, 'filigrana', 'rgba(150,110,30,.9)');
+    rotuloDoAlto(k, carta, M);
     if (!M.cheia) {
       // a janela da ilustração, rebaixada na moldura
       k.save();
@@ -2863,8 +3113,7 @@
       k.save();
       retRedondo(k, JX, JY, JW, JH, 22);
       k.clip();
-      k.imageSmoothingQuality = 'high';
-      k.drawImage(ilu, 0, ILU_CORTE, JW, JH, JX, JY, JW, JH);
+      porArte(k, ilu, false);
       k.restore();
       k.lineWidth = 3;
       k.strokeStyle = M.janela;
@@ -2915,7 +3164,8 @@
       retRedondo(k, JX + 10, PY + 10, JW - 20, PH - 20, 14);
       k.stroke();
     }
-    // o texto: título 64, "Você sabia?" 28, a frase 44, o pé 32
+    // o texto: título 64, "Você sabia?" 28, a frase 44, o pé 32 (a 330 px de largura na
+    // tela, o título fica com 21 px, a frase com 14,5 e o pé com 10,5)
     const x0 = JX + 44;
     const larg = JW - 88;
     let tT = 64;
@@ -2931,11 +3181,8 @@
     const yPe = PY + PH - 32;
     k.fillStyle = 'rgba(35,36,30,.18)';
     k.fillRect(x0, yPe - 54, larg, 2);
-    escrever(k, carta.ref.toUpperCase(), x0, yPe, oswald(32, 600), '#45463c', { espaco: 3 });
-    k.font = oswald(32, 600);
-    try { k.letterSpacing = '3.5px'; } catch (e) { /* idem */ }
-    const wn = k.measureText(R.nome.toUpperCase()).width;
-    try { k.letterSpacing = '0px'; } catch (e) { /* idem */ }
+    escrever(k, String(carta.ref || '').toUpperCase(), x0, yPe, oswald(32, 600), '#45463c', { espaco: 3 });
+    const wn = medir(k, R.nome.toUpperCase(), oswald(32, 600), 3.5);
     escrever(k, R.nome.toUpperCase(), x0 + larg, yPe, oswald(32, 600), R.tinta, { alinhar: 'right', espaco: 3.5 });
     iconeCanvas(k, rar, x0 + larg - wn - 52, yPe - 37, 44, R.tinta, { traco: 1.7, cheio: 0.25 });
     k.restore();
@@ -2947,17 +3194,73 @@
     k.restore();
     return c;
   }
+  // A máscara do brilho (canvas pequeno, só alfa): onde o holográfico pode aparecer. Fica nas
+  // luzes da arte (pela luminância) e na moldura; sai de cima dos objetos desenhados (a
+  // silhueta que o desenho marca) e de todo o texto (o papel e o rótulo do alto).
+  function mascaraDoBrilho(carta, rar) {
+    const w = 200;
+    const h = 280;
+    const c = tela(w, h);
+    const k = c.getContext('2d');
+    const M = MOLDURAS[rar];
+    const { ilu, obj } = ilustracao(carta);
+    k.setTransform(w / CW, 0, 0, h / CH, 0, 0);
+    if (M.cheia) porArte(k, ilu, true);
+    else {
+      k.save();
+      retRedondo(k, JX, JY, JW, JH, 22);
+      k.clip();
+      porArte(k, ilu, false);
+      k.restore();
+    }
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    const img = k.getImageData(0, 0, w, h);
+    const d = img.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const l = (d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11) / 255;
+      const t = Math.max(0, Math.min(1, (l - 0.3) / 0.55));
+      d[i + 3] = d[i + 3] ? Math.round(255 * t * t * (3 - 2 * t)) : 0;
+      d[i] = d[i + 1] = d[i + 2] = 0;
+    }
+    k.putImageData(img, 0, 0);
+    k.setTransform(w / CW, 0, 0, h / CH, 0, 0);
+    // fora dos objetos
+    k.globalCompositeOperation = 'destination-out';
+    k.globalAlpha = 0.9;
+    k.filter = 'blur(2px)';
+    porArte(k, obj, !!M.cheia);
+    k.filter = 'none';
+    k.globalAlpha = 1;
+    // fora do texto: o papel e o rótulo do alto
+    k.fillStyle = '#000';
+    retRedondo(k, JX - 6, PY - 6, JW + 12, PH + 12, 26);
+    k.fill();
+    retRedondo(k, CW / 2 - 300, 36, 600, 72, 36);
+    k.fill();
+    // a moldura inteira entra
+    k.globalCompositeOperation = 'source-over';
+    k.save();
+    k.clip(M.cheia ? vazado(FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26) : vazado(JX - 6, JY - 6, JW + 12, JH + 12, 26), 'evenodd');
+    k.fillRect(0, 0, CW, CH);
+    k.globalCompositeOperation = 'destination-out';
+    retRedondo(k, JX - 6, PY - 6, JW + 12, PH + 12, 26);
+    k.fill();
+    retRedondo(k, CW / 2 - 300, 36, 600, 72, 36);
+    k.fill();
+    k.restore();
+    return c;
+  }
   // O verso: o desenho aprovado (o campo escuro com as curvas de nível, o medalhão com o anel
-  // fino e o símbolo creme) com a moldura no material da raridade e o anel na cor dela.
+  // fino e o símbolo creme, centrado) com a moldura no material da raridade e o anel na cor dela.
   const VERSOS = {
     linho: { anel: '#e8dcc4' },
-    bronze: { anel: '#d39457' },
-    prata: { anel: '#dfe4ec' },
+    bronze: { anel: '#e0a466' },
+    prata: { anel: '#e6ebf3' },
     ouro: { anel: '#ffc44d' },
-    gloria: { anel: '#ffe9a8', duplo: true },
+    gloria: { anel: '#fff1c8', duplo: true },
   };
   const MARGEM_VERSO = 30;
-  function desenharVerso(c, raridade = 'linho') {
+  function desenharCostas(c, raridade, semTexto) {
     const rar = RARIDADES[raridade] ? raridade : 'linho';
     const M = MOLDURAS[rar];
     const V = VERSOS[rar];
@@ -2968,17 +3271,7 @@
     const r = sorteio(777);
     retRedondo(k, 0, 0, CW, CH, 46);
     k.clip();
-    // a moldura no material
-    if (M.cheia) {
-      const g = k.createLinearGradient(0, 0, CW, CH);
-      [[0, '#e9d39a'], [0.25, '#fffaf0'], [0.5, '#f1dfae'], [0.75, '#fffdf6'], [1, '#c9a548']].forEach(([p, cor]) => g.addColorStop(p, cor));
-      k.fillStyle = g;
-      k.fillRect(0, 0, CW, CH);
-      k.strokeStyle = '#b8862a';
-      k.lineWidth = 3;
-      retRedondo(k, 12, 12, CW - 24, CH - 24, 36);
-      k.stroke();
-    } else M.pintar(k, CW, CH, r);
+    M.pintar(k, CW, CH, r);
     // o campo escuro
     const m = MARGEM_VERSO;
     k.save();
@@ -3004,30 +3297,31 @@
       k.fillStyle = r() < 0.5 ? 'rgba(255,255,240,.04)' : 'rgba(0,0,0,.25)';
       k.fillRect(r() * CW, r() * CH, 2, 2);
     }
-    // o medalhão com o símbolo
+    // o medalhão com o símbolo, no centro exato
     k.fillStyle = '#151612';
     k.beginPath();
-    k.arc(CW / 2, CH / 2, 150, 0, Math.PI * 2);
+    k.arc(CW / 2, CH / 2, 160, 0, Math.PI * 2);
     k.fill();
     k.strokeStyle = V.anel;
-    k.lineWidth = 4;
+    k.lineWidth = 5;
     k.stroke();
     if (V.duplo) {
-      k.lineWidth = 1.5;
+      k.lineWidth = 2;
       k.beginPath();
-      k.arc(CW / 2, CH / 2, 140, 0, Math.PI * 2);
+      k.arc(CW / 2, CH / 2, 148, 0, Math.PI * 2);
       k.stroke();
     }
     k.strokeStyle = 'rgba(242,236,216,.3)';
     k.lineWidth = 1.5;
     k.beginPath();
-    k.arc(CW / 2, CH / 2, 164, 0, Math.PI * 2);
+    k.arc(CW / 2, CH / 2, 176, 0, Math.PI * 2);
     k.stroke();
     if (CC.story && CC.CAMINHO_SIMBOLO) {
-      const h = 160;
+      // o símbolo inteiro (1357 x 1936) com a altura de 190, centrado no medalhão
+      const h = 190;
       CC.story.logo(k, CW / 2 - h * 1357 / 1936 / 2, CH / 2 - h / 2, h, COR.creme);
     }
-    escrever(k, 'GERAÇÃO ELEITA', CW / 2, CH - 110, oswald(28, 600), 'rgba(242,236,216,.7)', { alinhar: 'center', espaco: 8 });
+    if (!semTexto) escrever(k, 'GERAÇÃO ELEITA', CW / 2, CH - 110, oswald(30, 600), 'rgba(242,236,216,.72)', { alinhar: 'center', espaco: 8 });
     k.lineWidth = 2;
     k.strokeStyle = 'rgba(242,236,216,.22)';
     retRedondo(k, m + 14, m + 14, CW - 2 * m - 28, CH - 2 * m - 28, 22);
@@ -3044,7 +3338,7 @@
     k.restore();
     return c;
   }
-  // A miniatura do álbum: só a moldura, a arte e o ícone da raridade, sem texto.
+  // A miniatura do álbum: só a moldura, a arte e o ícone da raridade num selo, sem texto.
   function desenharMiniatura(c, carta) {
     const k = c.getContext('2d');
     const s = c.width / CW;
@@ -3053,28 +3347,21 @@
     const rar = raridadeDe(carta);
     const R = RARIDADES[rar];
     const M = MOLDURAS[rar];
-    const r = sorteio(9100 + carta.numero);
-    const ilu = desenharIlustracao(carta);
+    const r = sorteio(9100 + (carta.numero || 0));
+    const { ilu } = ilustracao(carta);
     retRedondo(k, 0, 0, CW, CH, 46);
     k.clip();
     const ax = 56;
     const ay = 56;
     const aw = CW - 112;
-    const ah = 960;
+    const ah = 1010;
     // a arte cortada para caber na janela alta
     const fonteW = ILU_H * aw / ah;
     if (M.cheia) {
-      k.fillStyle = '#0f0f0c';
-      k.fillRect(0, 0, CW, CH);
-      k.drawImage(ilu, (JW - JW * 0.8) / 2, 0, JW * 0.8, ILU_H, -20, 0, CW + 40, CH * 0.88);
-      const g = k.createLinearGradient(0, CH * 0.62, 0, CH);
-      g.addColorStop(0, 'rgba(12,12,9,0)');
-      g.addColorStop(1, 'rgba(12,12,9,.95)');
-      k.fillStyle = g;
-      k.fillRect(0, CH * 0.62, CW, CH * 0.38);
-      filetesDeOuro(k, CW, CH);
+      k.drawImage(ilu, (JW - JW * 0.74) / 2, 0, JW * 0.74, ILU_H, 0, 0, CW, CH);
+      moldura(k, M, r, rar);
     } else {
-      M.pintar(k, CW, CH, r);
+      moldura(k, M, r, rar);
       k.save();
       retRedondo(k, ax, ay, aw, ah, 26);
       k.clip();
@@ -3085,22 +3372,53 @@
       retRedondo(k, ax, ay, aw, ah, 26);
       k.stroke();
     }
-    // o ícone num selo, embaixo
-    const cy = ay + ah + (CH - ay - ah) / 2;
-    k.fillStyle = M.cheia ? 'rgba(14,13,10,.7)' : COR.papel;
+    // o ícone num selo, embaixo, grande para ler pequeno
+    const cy = M.cheia ? CH - 190 : ay + ah + (CH - ay - ah) / 2;
+    const rs = M.cheia ? 120 : 112;
+    k.save();
+    k.filter = 'blur(6px)';
+    k.fillStyle = 'rgba(0,0,0,.35)';
     k.beginPath();
-    k.arc(CW / 2, cy, 92, 0, Math.PI * 2);
+    k.arc(CW / 2 + 3, cy + 6, rs, 0, Math.PI * 2);
     k.fill();
-    k.lineWidth = 5;
-    k.strokeStyle = M.cheia ? '#ffe9a8' : M.janela;
+    k.restore();
+    k.fillStyle = COR.papel;
+    k.beginPath();
+    k.arc(CW / 2, cy, rs, 0, Math.PI * 2);
+    k.fill();
+    k.lineWidth = 6;
+    k.strokeStyle = M.cheia ? M.papel : M.janela;
     k.stroke();
-    iconeCanvas(k, rar, CW / 2 - 62, cy - 62, 124, M.cheia ? '#ffe9a8' : R.tinta, { traco: 1.8, cheio: 0.25 });
+    iconeCanvas(k, rar, CW / 2 - rs * 0.68, cy - rs * 0.68, rs * 1.36, R.tinta, { traco: 1.9, cheio: 0.25 });
     k.lineWidth = 3;
     k.strokeStyle = 'rgba(0,0,0,.45)';
     retRedondo(k, 1.5, 1.5, CW - 3, CH - 3, 45);
     k.stroke();
     k.restore();
     return c;
+  }
+  // A carta, por fora: desenharCarta(carta, { largura, raridade, semTexto, canvas }) devolve o
+  // canvas. largura é a do canvas em px (padrão 1000; a altura é 1,4 vez); semTexto dá a
+  // miniatura do álbum (moldura, arte e o selo da raridade, sem letra nenhuma). Ainda aceita
+  // a forma antiga desenharCarta(canvas, carta).
+  function desenharCarta(a, b) {
+    let carta = a;
+    let op = b || {};
+    let c;
+    if (a && a.getContext) { c = a; carta = b; op = {}; } else {
+      const larg = Math.max(40, Math.round(op.largura || CW));
+      c = op.canvas || tela(larg, Math.round(larg * 1.4));
+    }
+    if (op.raridade) carta = { ...carta, raridade: op.raridade };
+    return op.semTexto ? desenharMiniatura(c, carta) : desenharFrente(c, carta);
+  }
+  // O verso: desenharVerso({ largura, raridade, semTexto, canvas }) devolve o canvas; semTexto
+  // tira o "GERAÇÃO ELEITA" do pé (fica só o símbolo). Aceita a forma antiga (canvas, raridade).
+  function desenharVerso(a, b) {
+    if (a && a.getContext) return desenharCostas(a, b, false);
+    const op = a || {};
+    const larg = Math.max(40, Math.round(op.largura || CW));
+    return desenharCostas(op.canvas || tela(larg, Math.round(larg * 1.4)), op.raridade, !!op.semTexto);
   }
 
   // ---------- a carta em story (1080x1920), para compartilhar ----------
@@ -3228,7 +3546,7 @@
   // brilho fica fora do texto por clip-path (as medidas de JX/JY/PY acima, em %).
   // Toque: vira para o verso e volta. Arraste na horizontal: gira livre e, ao soltar, assenta
   // no lado mais perto. Com menos movimento: não inclina, o brilho fica parado e virar é troca.
-  const ARTE_CLARA = new Set(['davi', 'poco']);
+  const ARTE_CLARA = new Set(['davi-funda', 'poco-jaco', 'tumulo-vazio']);
   const INCLINACAO = { linho: 7, bronze: 10, prata: 12, ouro: 14, gloria: 14 };
   const menosMovimento = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
     || document.documentElement.classList.contains('menos-movimento');
@@ -3289,7 +3607,11 @@
     el.className = 'carta-viva';
     el.dataset.raridade = rar;
     // arte clara (papel, terra ao sol): o holo da arte troca o color-dodge, que estoura o claro
-    if (ARTE_CLARA.has(carta.desenho)) el.dataset.arte = 'clara';
+    if (ARTE_CLARA.has(carta.id)) el.dataset.arte = 'clara';
+    // o holográfico do ouro e da glória só nas luzes e na moldura, fora dos objetos e do texto
+    if (rar === 'ouro' || rar === 'gloria') {
+      try { el.style.setProperty('--mascara', 'url(' + mascaraDoBrilho(carta, rar).toDataURL() + ')'); } catch (e) { /* sem máscara, fica o recorte do CSS */ }
+    }
     el.style.setProperty('--largura', largura + 'px');
     el.setAttribute('role', 'img');
     el.setAttribute('aria-label', 'Carta ' + carta.album + ', ' + carta.numero + ' de ' + carta.total + ', ' + RARIDADES[rar].nome + ': '
