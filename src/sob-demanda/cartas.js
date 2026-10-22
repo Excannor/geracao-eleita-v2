@@ -1,16 +1,38 @@
 /* As cartas colecionáveis do baú (amostra para o dono aprovar: o estilo em 2026-10-11, as
    raridades em 2026-10-22). Cada baú da Trilha revela uma carta ilustrada: a moldura com o
    álbum e o número, a ilustração, o título, um "Você sabia?" de uma linha, a referência e a
-   raridade. Os desenhos são em canvas, no padrão das artes de story (01e-story-artes.js): luz,
-   sombra, grão e textura de gravura, sem figura humana, com o amarelo como única cor quente e
-   a sálvia de apoio. A raridade (linho, bronze, prata, ouro, glória) é o material da moldura e
-   do verso; o brilho que muda com o ângulo é do cartas.css, por cima do canvas (cartaViva).
+   raridade. Os desenhos são em canvas, em gravura sobre papel com grão, sem figura humana
+   (gente só como objeto ou cena). A raridade (linho, bronze, prata, ouro, glória) é o
+   material da moldura e do verso, sempre com nome e ícone; o brilho que muda com o ângulo é
+   do cartas.css, por cima do canvas (cartaViva). Nada de imagem: tudo desenhado por código.
    Pedida só quando a tela do baú abre: o build a publica como cartas.<resumo>.js, com o
    estilo (cartas.css) no lugar da marca abaixo, e o service worker a guarda no cache
-   "caminho-telas". Aqui também moram o papel de parede do versículo da semana (1080x2340), a
-   imagem de story da carta (1080x1920) e a revelação do baú (revelacao), que a amostra
-   design/cartas/amostra.html usa.
-   Tudo desenhado com semente fixa: a mesma carta sai sempre igual. */
+   "caminho-telas". Tudo desenhado com semente fixa: a mesma carta sai sempre igual.
+
+   A INTERFACE (CC.cartas), estável para o sistema de cartas (sorteio, estado, álbum):
+   - revelar(el, carta, opts) -> Promise. A entrada única da revelação inteira, do baú fechado
+     à carta aberta, dentro de el. opts:
+       raridade  a raridade que sai (senão carta.raridade); a luz do baú é sempre a dela;
+       legenda   o texto do fim, ex.: "Nova! Você tem 9 de 13 em Objetos" ("Nova!" em destaque);
+       abrir     'toque' (padrão: o baú espera o toque) ou 'ja' (abre sozinho);
+       largura   a largura da carta em px (padrão: 320 a 340 no celular);
+       aoLer     se vier, mostra "Ler a história" no fim e chama aoLer(carta).
+     A Promise resolve no fim (ou ao Pular) com { pulou, carta (a carta viva), el }. Ela traz
+     junto .abrir(), .pular(), .virar(), .fase() e .el, para quem quiser comandar.
+   - desenharCarta(carta, { largura, raridade, semTexto, canvas }) -> canvas. largura é a do
+     canvas em px (padrão 1000; a altura é 1,4 vez). semTexto: a miniatura do álbum (moldura,
+     arte e o selo da raridade, sem nenhuma letra). raridade troca o acabamento.
+   - desenharVerso({ largura, raridade, semTexto, canvas }) -> canvas. semTexto tira o nome do
+     pé (fica o símbolo).
+   - temArte(id) -> true se a carta de id tem desenho; os desenhos vão pela carta.id. Sem
+     desenho, desenharCarta sai com uma gravura neutra (o sistema pode preferir a silhueta).
+   - cartaViva(carta, { largura, verso, interativa }) -> { el, inclinar, soltar, virar, ... }:
+     a carta que inclina com o dedo e vira, com o brilho da raridade.
+   - miniatura(carta, largura) -> canvas da miniatura já no tamanho da tela (sem texto).
+   - storyDaCarta(carta) -> canvas 1080x1920; papelDeParede({ ref, texto }) -> canvas 1080x2340.
+   - RARIDADES (nome, ícone, cores), iconeSvg(raridade), lista (as cartas de amostra),
+     cartaDoBau(numero) (a carta fixa da amostra, até o sorteio vir do sistema).
+   carta = { id, album, numero, total, titulo, sabia, ref, raridade }. */
 (function (CC) {
   'use strict';
 
@@ -80,14 +102,14 @@
       ['s', 'M10.7 15.4v2.2M13.3 15.4v2.2'],
       ['sf', 'M5.2 20.8h13.6c-.8-1.9-3.3-3-6.8-3s-6 1.1-6.8 3z'],
     ] },
-    // duas trombetas de prata batida (Nm 10.2), longas e retas, cruzadas: tubo fino, dois anéis
-    // e a campânula
+    // duas trombetas de prata batida (Nm 10.2), longas e retas, cruzadas: o bocal, o tubo fino,
+    // um anel e a campânula larga (o que faz ler "trombeta" pequeno)
     trombeta: { partes: [
       ...[-45, -135].flatMap((g) => [
-        ['s', 'M1.6 12H17.8', g],
-        ['s', 'M1.2 10.9v2.2', g],
-        ['s', 'M6.6 11v2M11.8 11v2', g],
-        ['sf', 'M17.6 11.3c1.7-.1 3-1 4.3-2.8v7c-1.3-1.8-2.6-2.7-4.3-2.8z', g],
+        ['s', 'M2.6 12H15.6', g],
+        ['s', 'M1.4 10.6v2.8', g],
+        ['s', 'M7.6 10.9v2.2', g],
+        ['sf', 'M15.4 11.2C18.2 11 20.4 9.4 22.4 6.6V17.4C20.4 14.6 18.2 13 15.4 12.8z', g],
       ]),
     ] },
     // o candelabro de sete braços (Êx 25.31-37), com as chamas acesas
@@ -367,8 +389,9 @@
     const luz = Math.max(0, -0.55 * u - 0.6 * v + 0.58 * nz);
     return 1 - luz * 1.15 + (zz < 0.12 ? 0.25 : 0);
   };
-  function pedraGravada(k, r, x, y, rx, ry, giro, { quente = false } = {}) {
+  function pedraGravada(k, r, x, y, rx, ry, giro, { quente = false, obj } = {}) {
     const p = seixo(r, x, y, rx, ry, giro, 0.06);
+    marcar(k, obj, p);
     // a sombra no papel, para baixo e à direita, em hachura
     const ps = seixo(r, x + rx * 0.32, y + ry * 0.42, rx * 1.02, ry * 0.9, giro, 0.04);
     k.save();
@@ -398,7 +421,7 @@
     k.lineWidth = 2.2;
     k.stroke(p);
   }
-  function desenhoDavi(k, W, H) {
+  function desenhoDavi(k, W, H, obj) {
     const r = sorteio(4101);
     // o papel sálvia, com fibra, manchas do tempo e a borda escurecida
     const g = k.createRadialGradient(W * 0.45, H * 0.4, 80, W / 2, H / 2, W * 0.8);
@@ -426,6 +449,9 @@
     const by = H * 0.31;
     const cordaoGravado = (pts, larg) => {
       const linha = () => { k.beginPath(); k.moveTo(pts[0][0], pts[0][1]); for (const p of pts) k.lineTo(p[0], p[1]); };
+      const fio = new Path2D();
+      pts.forEach((p, i) => (i ? fio.lineTo(p[0], p[1]) : fio.moveTo(p[0], p[1])));
+      marcar(k, obj, fio, larg + 6);
       k.save();
       k.lineCap = 'round';
       k.lineJoin = 'round';
@@ -501,6 +527,7 @@
     k.restore();
     k.fillStyle = '#b3bd86';
     k.fill(bolsa);
+    marcar(k, obj, bolsa);
     const sb = sombraOval(bx, by + 2, 160, 70, 0);
     gravar(k, bolsa, bx, by, 180, 1.35, 5, 3.4, (x, y) => sb(x, y) * 0.9 + 0.1, TINTA, -0.25);
     // as rugas do couro
@@ -537,7 +564,7 @@
     }
     // a pedra que está na bolsa
     brilho(k, bx, by - 2, 150, 'rgba(255,196,77,.35)');
-    pedraGravada(k, r, bx + 4, by - 2, 62, 46, -0.12, { quente: true });
+    pedraGravada(k, r, bx + 4, by - 2, 62, 46, -0.12, { quente: true, obj });
     k.restore();
     // a fileira das cinco: quatro pedras e o lugar vazio da quinta
     const fila = H * 0.72;
@@ -554,7 +581,7 @@
         k.stroke(seixo(sorteio(77), x, fila, 62 * E, 46 * E, -0.12, 0.06));
         k.setLineDash([]);
       } else {
-        pedraGravada(k, r, x, fila, rx, ry, giro);
+        pedraGravada(k, r, x, fila, rx, ry, giro, { obj });
       }
       escrever(k, romanos[i], x, fila + 96, 'italic 500 26px Literata, Georgia, serif', 'rgba(29,34,22,.8)', { alinhar: 'center' });
     });
@@ -3797,117 +3824,392 @@
   }
 
   // ---------- a revelação no baú ----------
-  // Tocar abre (Pular sempre à vista): o baú balança (0-400 ms); a tampa abre e sobe a luz na
-  // cor da raridade, que nunca engana (400-700); o verso sobe com a aura, o ícone e o nome da
-  // raridade (700-1300); toque na carta, ou 3 s, e ela vira (450); o brilho passa (700; prata
-  // e ouro 900; glória mais o halo); no fim, "Nova!", a referência e "Ler a história", com a
-  // carta inclinável. Com menos movimento: sem balanço nem giro, a carta aparece com o halo
-  // parado e o nome. Sem som.
-  function bauSvg() {
-    const [ouro, ouroS, corpo, corpoS] = ['#d2a24e', '#9e7328', '#b07a42', '#82552b'];
-    return '<svg class="rv-bau-arte" viewBox="0 0 120 110" aria-hidden="true">'
-      + '<ellipse cx="60" cy="102" rx="44" ry="7" fill="#000" opacity=".18"/>'
-      + '<rect x="14" y="50" width="92" height="48" rx="10" fill="' + corpo + '"/>'
-      + '<rect x="14" y="80" width="92" height="18" rx="8" fill="' + corpoS + '"/>'
-      + '<rect x="30" y="50" width="10" height="48" fill="' + ouro + '"/><rect x="80" y="50" width="10" height="48" fill="' + ouro + '"/>'
-      + '<ellipse class="rv-bau-boca" cx="60" cy="52" rx="40" ry="6" fill="#1a1a1a"/>'
-      + '<ellipse class="rv-bau-luz" cx="60" cy="51" rx="30" ry="4" fill="currentColor"/>'
-      + '<g class="rv-bau-tampa"><rect x="14" y="26" width="92" height="30" rx="10" fill="' + corpo + '"/>'
-      + '<rect x="14" y="44" width="92" height="12" fill="' + corpoS + '"/>'
-      + '<rect x="30" y="26" width="10" height="30" fill="' + ouro + '"/><rect x="80" y="26" width="10" height="30" fill="' + ouro + '"/>'
-      + '<rect x="48" y="44" width="24" height="24" rx="7" fill="' + ouro + '"/><rect x="48" y="58" width="24" height="10" rx="4" fill="' + ouroS + '"/>'
-      + '<circle cx="60" cy="54" r="4" fill="' + corpoS + '"/></g></svg>';
+  // revelar(el, carta, opts) faz tudo, do baú fechado à carta aberta, e devolve uma Promise
+  // que resolve quando a revelação termina ou é pulada. A linha do tempo (cartas-raridade.md):
+  //   0-400 ms    o baú balança;
+  //   400-700     a tampa abre na dobradiça e sobe a luz na cor da raridade (a de verdade);
+  //   700-1300    o verso sobe de dentro do baú, com a aura, o ícone e o nome da raridade;
+  //   espera      a carta pulsa forte; vira sozinha em 3 s, ou no toque;
+  //   vira        450 ms;
+  //   brilho      700 ms (prata e ouro: varredura holográfica de 900; ouro: purpurina;
+  //               glória: mais 400 de halo);
+  //   fim         a legenda ("Nova! Você tem 9 de 13 em Objetos"), o título e a referência;
+  //               a carta fica inclinável.
+  // "Pular" fica à vista até o fim. Menos movimento: sem balanço nem giro; o baú some e a
+  // carta aparece de frente (troca suave), com o halo parado e o nome. Sem som. Só transform
+  // e opacity animam (nada de layout), para correr liso num Android médio.
+  // O baú é desenhado em gravura, como as cartas, e é maior que a carta.
+  let ESCALA_TEMPO = 1;
+  function bauEmGravura(larg) {
+    // larg: a largura do baú na tela, em px; as peças saem em canvas na densidade da tela
+    const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+    const f = (larg * dpr) / 1000;
+    const peca = (alto, y0) => {
+      const c = tela(Math.round(1000 * f), Math.round(alto * f));
+      const k = c.getContext('2d');
+      k.setTransform(f, 0, 0, f, 0, -y0 * f);
+      return [c, k];
+    };
+    const r = sorteio(1907);
+    const TB = '#24160a';
+    // a madeira: o tom, as tábuas e a gravura em linhas (mais grossas na sombra)
+    const madeira = (k, forma, cx, cy, raio, ang, sombra, tons = ['#c49a68', '#8e643a']) => {
+      const g = k.createLinearGradient(0, cy - raio, 0, cy + raio);
+      g.addColorStop(0, tons[0]);
+      g.addColorStop(1, tons[1]);
+      k.fillStyle = g;
+      k.fill(forma);
+      gravar(k, forma, cx, cy, raio, ang, 7, 4, sombra, TB, 0.04);
+      // os veios e os nós
+      k.save();
+      k.clip(forma);
+      k.strokeStyle = 'rgba(36,22,10,.55)';
+      k.lineCap = 'round';
+      for (let i = 0; i < 22; i++) {
+        const x = cx - raio + r() * raio * 2;
+        const y = cy - raio + r() * raio * 2;
+        k.lineWidth = 2.4;
+        k.beginPath();
+        k.ellipse(x, y, 12 + r() * 18, 4 + r() * 4, ang, 0, Math.PI * 2);
+        k.stroke();
+      }
+      k.restore();
+    };
+    // o metal das cintas: bronze dourado, com a luz em cima e os rebites
+    const metal = (k, forma, x0, y0, x1, y1) => {
+      const g = k.createLinearGradient(x0, y0, x1, y1);
+      [[0, '#e6c27a'], [0.35, '#b98a3c'], [0.7, '#7d5a22'], [1, '#a77d36']].forEach(([p, c]) => g.addColorStop(p, c));
+      k.fillStyle = g;
+      k.fill(forma);
+      gravar(k, forma, (x0 + x1) / 2, (y0 + y1) / 2, Math.hypot(x1 - x0, y1 - y0) / 2 + 20, 0.5, 6, 2.6, () => 0.5, '#3a2608', 0);
+      k.strokeStyle = TB;
+      k.lineWidth = 5;
+      k.stroke(forma);
+    };
+    const rebite = (k, x, y, rr = 9) => {
+      const g = k.createRadialGradient(x - rr * 0.35, y - rr * 0.35, 1, x, y, rr);
+      g.addColorStop(0, '#fff1c4');
+      g.addColorStop(1, '#8a6224');
+      k.fillStyle = 'rgba(0,0,0,.45)';
+      k.beginPath();
+      k.arc(x + 2, y + 3, rr, 0, Math.PI * 2);
+      k.fill();
+      k.fillStyle = g;
+      k.beginPath();
+      k.arc(x, y, rr, 0, Math.PI * 2);
+      k.fill();
+      k.strokeStyle = TB;
+      k.lineWidth = 1.6;
+      k.stroke();
+    };
+    // ---- o corpo (a frente), de y 0 a 500 ----
+    const [corpo, kc] = peca(510, 0);
+    const frente = new Path2D();
+    frente.moveTo(60, 0);
+    frente.lineTo(940, 0);
+    frente.lineTo(940, 446);
+    frente.quadraticCurveTo(940, 470, 916, 470);
+    frente.lineTo(84, 470);
+    frente.quadraticCurveTo(60, 470, 60, 446);
+    frente.closePath();
+    kc.save();
+    kc.filter = 'blur(14px)';
+    kc.fillStyle = 'rgba(0,0,0,.55)';
+    kc.beginPath();
+    kc.ellipse(500, 486, 470, 20, 0, 0, Math.PI * 2);
+    kc.fill();
+    kc.restore();
+    madeira(kc, frente, 500, 235, 520, 0, (x, y) => 0.25 + y / 900 + Math.abs(x - 500) / 1600);
+    // as tábuas
+    kc.strokeStyle = TB;
+    kc.lineWidth = 7;
+    for (const y of [150, 310]) { kc.beginPath(); kc.moveTo(60, y); kc.lineTo(940, y); kc.stroke(); }
+    kc.strokeStyle = 'rgba(255,226,170,.35)';
+    kc.lineWidth = 2;
+    for (const y of [154, 314]) { kc.beginPath(); kc.moveTo(60, y); kc.lineTo(940, y); kc.stroke(); }
+    // as cintas de metal em pé e a de cima
+    for (const x of [170, 770]) {
+      const cinta = new Path2D();
+      cinta.rect(x, 0, 64, 470);
+      metal(kc, cinta, x, 0, x + 64, 60);
+      for (let y = 40; y < 460; y += 82) { rebite(kc, x + 18, y); rebite(kc, x + 46, y + 40); }
+    }
+    const aro = new Path2D();
+    aro.rect(56, -4, 888, 40);
+    metal(kc, aro, 0, -4, 0, 36);
+    for (let x = 90; x < 930; x += 60) rebite(kc, x, 16, 7);
+    // as cantoneiras de baixo
+    for (const [x, s] of [[60, 1], [940, -1]]) {
+      const c = new Path2D();
+      c.moveTo(x, 470);
+      c.lineTo(x, 330);
+      c.lineTo(x + s * 50, 330);
+      c.lineTo(x + s * 50, 420);
+      c.lineTo(x + s * 140, 420);
+      c.lineTo(x + s * 140, 470);
+      c.closePath();
+      metal(kc, c, x, 330, x + s * 140, 470);
+      rebite(kc, x + s * 25, 360);
+      rebite(kc, x + s * 25, 445);
+      rebite(kc, x + s * 110, 445);
+    }
+    // a fechadura: a placa com o buraco da chave
+    const placa = new Path2D();
+    placa.moveTo(430, 36);
+    placa.lineTo(570, 36);
+    placa.lineTo(570, 170);
+    placa.quadraticCurveTo(500, 214, 430, 170);
+    placa.closePath();
+    metal(kc, placa, 430, 36, 570, 210);
+    kc.fillStyle = '#0d0905';
+    kc.beginPath();
+    kc.arc(500, 112, 15, 0, Math.PI * 2);
+    kc.moveTo(492, 118);
+    kc.lineTo(508, 118);
+    kc.lineTo(514, 160);
+    kc.lineTo(486, 160);
+    kc.closePath();
+    kc.fill();
+    for (const [x, y] of [[448, 56], [552, 56], [448, 156], [552, 156]]) rebite(kc, x, y, 7);
+    // os pés
+    for (const x of [100, 840]) {
+      const pe = new Path2D();
+      pe.rect(x, 470, 60, 34);
+      metal(kc, pe, x, 470, x + 60, 504);
+    }
+    kc.strokeStyle = TB;
+    kc.lineWidth = 8;
+    kc.stroke(frente);
+    // ---- a boca (o lado de dentro, visto de cima), de y -90 a 10 ----
+    const [boca, kb] = peca(100, -90);
+    const fundo = new Path2D();
+    fundo.moveTo(66, 4);
+    fundo.lineTo(110, -78);
+    fundo.lineTo(890, -78);
+    fundo.lineTo(934, 4);
+    fundo.closePath();
+    const gfb = kb.createLinearGradient(0, -78, 0, 4);
+    gfb.addColorStop(0, '#3a2412');
+    gfb.addColorStop(1, '#0b0704');
+    kb.fillStyle = gfb;
+    kb.fill(fundo);
+    gravar(kb, fundo, 500, -38, 460, 0, 4, 1.8, () => 0.7, '#050302', 0);
+    // a borda de cima das paredes (a espessura da tábua), clara
+    kb.strokeStyle = '#c99a5a';
+    kb.lineWidth = 12;
+    kb.lineJoin = 'round';
+    kb.beginPath();
+    kb.moveTo(66, 4);
+    kb.lineTo(110, -78);
+    kb.lineTo(890, -78);
+    kb.lineTo(934, 4);
+    kb.stroke();
+    kb.strokeStyle = TB;
+    kb.lineWidth = 2.5;
+    kb.stroke();
+    // ---- a tampa por fora (abobadada), de y -340 a 70 (a lingueta desce sobre a placa) ----
+    const [fora, kf] = peca(410, -340);
+    const tampa = new Path2D();
+    tampa.moveTo(44, 0);
+    tampa.lineTo(44, -150);
+    tampa.bezierCurveTo(44, -290, 300, -332, 500, -332);
+    tampa.bezierCurveTo(700, -332, 956, -290, 956, -150);
+    tampa.lineTo(956, 0);
+    tampa.closePath();
+    madeira(kf, tampa, 500, -166, 520, 0, (x, y) => 0.15 + (y + 330) / 700 + Math.abs(x - 500) / 1400, ['#d4ac7a', '#9c7044']);
+    kf.save();
+    kf.clip(tampa);
+    kf.strokeStyle = TB;
+    kf.lineWidth = 7;
+    for (const y of [-120, -230]) { kf.beginPath(); kf.moveTo(40, y + Math.abs(500 - 500) * 0); kf.bezierCurveTo(300, y - 40, 700, y - 40, 960, y); kf.stroke(); }
+    kf.restore();
+    for (const x of [170, 770]) {
+      const cinta = new Path2D();
+      cinta.moveTo(x, 0);
+      cinta.lineTo(x, x < 500 ? -268 : -270);
+      cinta.lineTo(x + 64, x < 500 ? -290 : -262);
+      cinta.lineTo(x + 64, 0);
+      cinta.closePath();
+      kf.save();
+      kf.clip(tampa);
+      metal(kf, cinta, x, -300, x + 64, 0);
+      kf.restore();
+      for (let y = -40; y > -250; y -= 70) { rebite(kf, x + 18, y); rebite(kf, x + 46, y - 30); }
+    }
+    const beira = new Path2D();
+    beira.rect(40, -34, 920, 38);
+    metal(kf, beira, 0, -34, 0, 4);
+    for (let x = 80; x < 940; x += 60) rebite(kf, x, -15, 7);
+    // a lingueta da fechadura, descendo da tampa
+    const lingueta = new Path2D();
+    lingueta.moveTo(468, -40);
+    lingueta.lineTo(532, -40);
+    lingueta.lineTo(532, 60);
+    lingueta.quadraticCurveTo(500, 84, 468, 60);
+    lingueta.closePath();
+    metal(kf, lingueta, 468, -40, 532, 80);
+    rebite(kf, 500, -14, 8);
+    kf.strokeStyle = TB;
+    kf.lineWidth = 8;
+    kf.stroke(tampa);
+    // ---- a tampa por dentro (o que se vê com ela aberta) ----
+    const [dentro, kd] = peca(330, -330);
+    const forro = new Path2D();
+    forro.moveTo(90, 0);
+    forro.lineTo(90, -200);
+    forro.bezierCurveTo(90, -300, 300, -326, 500, -326);
+    forro.bezierCurveTo(700, -326, 910, -300, 910, -200);
+    forro.lineTo(910, 0);
+    forro.closePath();
+    madeira(kd, forro, 500, -160, 500, Math.PI / 2, (x, y) => 0.55 - (y + 330) / 900, ['#5a381c', '#2e1c0c']);
+    kd.save();
+    kd.clip(forro);
+    kd.strokeStyle = TB;
+    kd.lineWidth = 3;
+    for (let x = 190; x < 900; x += 100) { kd.beginPath(); kd.moveTo(x, 0); kd.lineTo(x, -330); kd.stroke(); }
+    const gl = kd.createLinearGradient(0, 0, 0, -330);
+    gl.addColorStop(0, 'rgba(255,220,150,.35)');
+    gl.addColorStop(1, 'rgba(255,220,150,0)');
+    kd.fillStyle = gl;
+    kd.fillRect(0, -330, 1000, 330);
+    kd.restore();
+    kd.strokeStyle = '#b98a3c';
+    kd.lineWidth = 14;
+    kd.stroke(forro);
+    kd.strokeStyle = TB;
+    kd.lineWidth = 3;
+    kd.stroke(forro);
+    for (const c of [corpo, fora, dentro]) grao(c.getContext('2d'), c.width, c.height, 14, 31);
+    for (const c of [corpo, boca, fora, dentro]) { c.setAttribute('aria-hidden', 'true'); c.className = 'rv-gravura'; }
+    return { corpo, boca, fora, dentro };
   }
-  function revelacao(palco, carta, { progresso = '', aoLer, largura } = {}) {
-    const rar = raridadeDe(carta);
+  // A legenda do fim: "Nova!" em destaque quando a frase começa com ela.
+  function legendaHtml(texto) {
+    const t = CC.esc(texto);
+    return t.startsWith('Nova!') ? '<strong>Nova!</strong>' + t.slice(5) : t;
+  }
+  function revelar(alvo, carta, opts = {}) {
+    const rar = RARIDADES[opts.raridade] ? opts.raridade : raridadeDe(carta);
+    const c = rar === raridadeDe(carta) ? carta : { ...carta, raridade: rar };
     const R = RARIDADES[rar];
-    const larg = largura || Math.round(Math.min(300, window.innerWidth * 0.72, (window.innerHeight - 300) / 1.4));
-    palco.innerHTML = '<div class="rv" data-raridade="' + rar + '" data-fase="fechado" style="--luz:' + R.luz + '">'
+    const menos = menosMovimento();
+    const T = (ms) => ms * ESCALA_TEMPO;
+    const vw = Math.min(window.innerWidth || 390, document.documentElement.clientWidth || 9999);
+    const vh = window.innerHeight || 844;
+    // a carta com 320 a 340 px de largura no celular (menos se a tela for baixa); o baú, maior
+    const larg = opts.largura || Math.round(Math.max(220, Math.min(340, vw - 50, (vh - 300) / 1.4)));
+    const largBau = Math.round(Math.min(vw - 20, larg + 44));
+    const legenda = opts.legenda || ('Nova! ' + (carta.album || ''));
+    alvo.innerHTML = '<div class="rv" data-raridade="' + rar + '" data-fase="fechado" style="--luz:' + R.luz + ';--t:' + ESCALA_TEMPO
+      + ';--lc:' + larg + 'px;--lb:' + largBau + 'px">'
       + '<button type="button" class="rv-pular">Pular</button>'
-      + '<div class="rv-palco" style="--largura:' + larg + 'px">'
-      + '<i class="rv-raios" aria-hidden="true"></i><i class="rv-coluna" aria-hidden="true"></i>'
-      + '<div class="rv-carta"></div>'
-      + '<button type="button" class="rv-bau" aria-label="Abrir o baú">' + bauSvg() + '</button></div>'
-      + '<p class="rv-raridade" aria-live="polite">' + iconeSvg(rar) + '<span>' + R.nome + '</span></p>'
-      + '<div class="rv-fim"><p class="rv-nova"><strong>Nova!</strong> ' + CC.esc(progresso ? progresso + ' · ' + carta.album : carta.album) + '</p>'
+      + '<div class="rv-palco">'
+      + '<i class="rv-raios" aria-hidden="true"></i><i class="rv-aura" aria-hidden="true"></i>'
+      + '<div class="rv-bau-pecas" aria-hidden="true"><i class="rv-peca rv-luz"></i><div class="rv-peca rv-dentro"></div><div class="rv-peca rv-boca"></div></div>'
+      + '<div class="rv-carta"><i class="rv-anel" aria-hidden="true"></i></div>'
+      + '<button type="button" class="rv-bau" aria-label="Abrir o baú"><span class="rv-peca rv-corpo"></span><span class="rv-peca rv-tampa"></span></button>'
+      + '</div>'
+      + '<p class="rv-raridade">' + iconeSvg(rar) + '<span>' + R.nome + '</span></p>'
+      + '<div class="rv-fim" tabindex="-1" aria-live="polite"><p class="rv-nova">' + legendaHtml(legenda) + '</p>'
       + '<p class="rv-titulo">' + CC.esc(carta.titulo) + ' <span>' + CC.esc(carta.ref) + '</span></p>'
-      + '<div class="rv-botoes"><button type="button" class="botao rv-ler">Ler a história</button></div></div></div>';
-    const rv = palco.querySelector('.rv');
-    const api = cartaViva(carta, { largura: larg, verso: true });
+      + '<div class="rv-botoes"></div></div></div>';
+    const rv = alvo.querySelector('.rv');
+    const bau = bauEmGravura(largBau);
+    rv.querySelector('.rv-corpo').appendChild(bau.corpo);
+    rv.querySelector('.rv-boca').appendChild(bau.boca);
+    rv.querySelector('.rv-tampa').appendChild(bau.fora);
+    rv.querySelector('.rv-dentro').appendChild(bau.dentro);
+    const api = cartaViva(c, { largura: larg, verso: true });
+    api.el.setAttribute('tabindex', '0');
     rv.querySelector('.rv-carta').appendChild(api.el);
-    rv.querySelector('.rv-botoes').prepend(botaoVirar(api));
+    const botoes = rv.querySelector('.rv-botoes');
+    botoes.appendChild(botaoVirar(api));
+    if (opts.aoLer) {
+      const ler = document.createElement('button');
+      ler.type = 'button';
+      ler.className = 'botao rv-ler';
+      ler.textContent = 'Ler a história';
+      ler.onclick = () => opts.aoLer(carta);
+      botoes.appendChild(ler);
+    }
     const timers = [];
-    const depois = (ms, f) => timers.push(setTimeout(f, ms));
+    const depois = (ms, f) => timers.push(setTimeout(f, T(ms)));
     const fase = (f) => { rv.dataset.fase = f; };
     let virou = false;
-    const brilhar = () => {
-      fase('brilha');
-      const dur = rar === 'linho' || rar === 'bronze' ? 700 : 900;
-      api.varrer(dur, () => {
-        if (rar === 'gloria') { rv.classList.add('com-halo'); depois(400, terminar); } else terminar();
-      });
-      if (rar === 'gloria') rv.classList.add('com-halo');
-    };
-    const virar = () => {
-      if (virou) return;
-      virou = true;
-      fase('vira');
-      api.girarPara(0, 450, brilhar);
-    };
+    let acabou = false;
+    let pulou = false;
+    let resolver;
+    const fim = new Promise((res) => { resolver = res; });
     const terminar = () => {
+      if (acabou) return;
+      acabou = true;
       timers.forEach(clearTimeout);
       fase('fim');
-      rv.classList.add('com-halo');
       api.soltar();
-      const ler = rv.querySelector('.rv-ler');
-      ler.onclick = () => (aoLer ? aoLer(carta) : null);
-      ler.focus({ preventScroll: true });
+      // o foco vai para o fim (a legenda é lida); "Ler a história", se houver, fica a um Tab
+      const foco = rv.querySelector('.rv-fim');
+      try { foco.focus({ preventScroll: true }); } catch (e) { /* sem foco */ }
+      resolver({ pulou, carta: api, el: rv });
+    };
+    const brilhar = () => {
+      fase('brilha');
+      const dur = rar === 'prata' || rar === 'ouro' ? 900 : rar === 'gloria' ? 900 : 700;
+      api.varrer(T(dur), () => {
+        if (rar === 'gloria') { rv.classList.add('com-halo'); depois(400, terminar); } else terminar();
+      });
+    };
+    const virar = () => {
+      if (virou || acabou) return;
+      virou = true;
+      timers.forEach(clearTimeout);
+      fase('vira');
+      api.girarPara(0, T(450), brilhar);
     };
     const pular = () => {
+      if (acabou) return;
+      pulou = true;
       timers.forEach(clearTimeout);
       virou = true;
       api.girarJa(0);
+      rv.classList.add('com-halo', 'pulou');
       terminar();
     };
-    api.el.addEventListener('virou', (ev) => {
-      // o primeiro toque na carta de costas é o que a vira na revelação
+    api.el.addEventListener('virou', () => {
+      // na espera, o toque na carta de costas é o que a vira; depois, vira à vontade
       if (rv.dataset.fase === 'espera') { api.girarJa(180); virar(); }
+    });
+    api.el.addEventListener('keydown', (ev) => {
+      if ((ev.key === 'Enter' || ev.key === ' ') && rv.dataset.fase === 'espera') { ev.preventDefault(); virar(); }
     });
     const abrir = () => {
       if (rv.dataset.fase !== 'fechado') return;
-      if (menosMovimento()) {
-        fase('sobe');
-        depois(500, () => { virou = true; api.girarJa(0); fase('brilha'); api.varrer(0); depois(300, terminar); });
+      if (menos) {
+        // troca suave: o baú some, a carta aparece de frente com o halo parado e o nome
+        virou = true;
+        api.girarJa(0);
+        fase('menos');
+        depois(500, () => { rv.classList.add('com-halo'); terminar(); });
         return;
       }
       fase('balanca');
       depois(400, () => fase('abre'));
       depois(700, () => fase('sobe'));
       depois(1300, () => fase('espera'));
-      depois(4300, virar);
+      depois(1300 + 3000, virar);
     };
     rv.querySelector('.rv-bau').onclick = abrir;
     rv.querySelector('.rv-pular').onclick = pular;
-    return { el: rv, abrir, pular, carta: api, fase: () => rv.dataset.fase };
-  }
-
-  // Na Trilha (03-trilha.js): a carta entra de costas e vira sozinha; depois, inclina e vira
-  // ao toque, com o botão "Virar carta" embaixo.
-  function revelar(alvo, carta) {
-    const larg = Math.round(Math.min(340, window.innerWidth * 0.8, Math.max(200, (window.innerHeight - 360) / 1.4)));
-    const api = cartaViva(carta, { largura: larg, verso: !menosMovimento() });
-    alvo.innerHTML = '';
-    alvo.classList.add('revelar-carta-viva');
-    alvo.appendChild(api.el);
-    alvo.appendChild(botaoVirar(api));
-    if (!menosMovimento()) setTimeout(() => api.girarPara(0, 650, () => api.varrer(RARIDADES[api.raridade].ordem >= 2 ? 900 : 700)), 250);
-    return api;
+    if (opts.abrir === 'ja') requestAnimationFrame(() => requestAnimationFrame(abrir));
+    // a Promise, com os controles junto (para a amostra e para quem chama)
+    return Object.assign(fim, { el: rv, abrir, pular, virar, carta: api, fase: () => rv.dataset.fase });
   }
 
   // A carta de cada baú (amostra): fixa pelo número do dia, enquanto o sorteio por pessoa não vem.
   const cartaDoBau = (numero) => CARTAS[Math.floor(numero / 7) % CARTAS.length];
 
-  CC.cartas = { desenharMiniatura, lista: CARTAS, desenhos: DESENHOS, RARIDADES, iconeSvg, iconeCanvasTeste: iconeCanvas, cartaViva, botaoVirar, miniatura, revelacao,
-    cartaDoBau, desenharCarta, desenharVerso, revelar, storyDaCarta, papelDeParede,
+  CC.cartas = { revelar, desenharCarta, desenharVerso, temArte, cartaViva, miniatura, storyDaCarta, papelDeParede,
+    RARIDADES, iconeSvg, lista: CARTAS, cartaDoBau, botaoVirar, desenhos: DESENHOS, iconeCanvasTeste: iconeCanvas,
+    // só para as capturas da amostra: a revelação em câmera lenta (2 = metade da velocidade)
+    _escalaTempo: (n) => { ESCALA_TEMPO = n > 0 ? n : 1; },
     tela: () => tela(CW, CH), CW, CH };
 })(window.CC);
