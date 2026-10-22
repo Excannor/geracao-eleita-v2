@@ -1,13 +1,16 @@
 // O baú e as cartas (docs/cartas.md) num Chrome sem interface, com conta criada pela API num
-// servidor próprio:
-//   - abrir o baú: a carta aparece pela arte, com "Nova! Você tem 1 de 13 em Heróis da fé", e os
-//     botões Compartilhar carta, Salvar papel de parede e Continuar; a primeira da vida é Prata;
+// servidor próprio, contra a peça de arte de verdade (src/sob-demanda/cartas.js):
+//   - abrir o baú: a arte faz a abertura inteira (CC.cartas.revelar) e mostra a carta com
+//     "Nova! Você tem 1 de 13 em Heróis da fé"; a primeira da vida é Prata; Compartilhar carta,
+//     Salvar papel de parede e Continuar; "Ler a história" leva à referência na Bíblia;
 //   - compartilhar manda um PNG 1080x1920; o papel de parede, um PNG 1080x2340;
-//   - o segundo baú dá uma carta ainda sem desenho: a carta de texto entra no lugar, sem erro;
+//   - só saem as cartas lançadas (com desenho);
 //   - Perfil tem a entrada Cartas; o álbum mostra as recebidas e as silhuetas, sem texto nas
-//     miniaturas, com as versões e as repetidas; a carta grande abre, vira e troca de versão;
-//   - "O que pode vir" mostra as chances, as proteções e os números da pessoa;
-//   - a versão Glória: o álbum oferece a escolha, e a carta ganha a versão;
+//     miniaturas, com as versões e as repetidas; a carta grande abre, vira e troca de versão; uma
+//     carta sem desenho cai na carta de texto;
+//   - "O que pode vir" mostra as duas tabelas (comum e marco), as proteções e os números da pessoa;
+//   - outra fonte (a prática sem erro) e os marcos (100 dias, unidades) revelam a carta deles;
+//     as legendas de repetida e de versão nova; a estante de Troféus;
 //   - sem as peças das cartas, o baú abre com o versículo, e a carta chega depois.
 // Com SAIDA=<pasta>, guarda as capturas (390 px, claro e escuro, e o álbum largo).
 // Uso: CHROME=<chrome> [SAIDA=<pasta>] node ferramentas/teste-bau.mjs   (PORTA=<porta> para trocar a 8396)
@@ -43,14 +46,14 @@ const perfil = mkdtempSync(join(tmpdir(), 'cc-bau-nav-'));
 const nav = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--hide-scrollbars',
   '--remote-debugging-port=' + PORTA_NAV, '--user-data-dir=' + perfil, '--window-size=390,844', 'about:blank'], { stdio: 'ignore' });
 
-// A conta: "leitora9" tira, pela semente dela, Davi e a funda (com desenho) no primeiro baú e uma
-// carta ainda sem desenho no segundo (ferramentas/simular-cartas.mjs dá para conferir).
+// A conta: "leitora0" tira, pela semente dela e com as 6 cartas lançadas hoje, Davi e a funda em
+// Prata no primeiro baú e outra carta no segundo.
 const criar = async (usuario) => {
   const r = await fetch(base + 'api/criar-conta', { method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ usuario, senha: 'senha123', nome: 'Leitora', email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true }) });
   return (r.headers.get('set-cookie') || '').split(';')[0];
 };
-const cookie = await criar('leitora9');
+const cookie = await criar('leitora0');
 
 async function alvo() {
   for (let i = 0; i < 60; i++) {
@@ -102,6 +105,10 @@ window.__png = async (arquivo) => { const img = await createImageBitmap(arquivo)
 true`;
 
 console.log('\n  O baú e as cartas\n');
+const LANCADAS = ['davi-funda', 'poco-jaco', 'azeite-viuva', 'arca-alianca', 'tumulo-vazio', 'mar-vermelho'];
+// a legenda da revelação: dentro da arte (.rv-nova) ou, sem desenho, embaixo (.album-legenda)
+const legenda = (tela) => '((document.querySelector("' + tela + ' .rv-nova, ' + tela + ' .album-legenda") || {}).textContent || "")';
+const terminar = (tela) => av('(() => { const b = document.querySelector("' + tela + ' .rv-pular"); if (b) b.click(); return true; })()');
 try {
   await cmd('Page.enable');
   await cmd('Runtime.enable');
@@ -112,7 +119,7 @@ try {
   const [nomeCookie, ...resto] = cookie.split('=');
   await cmd('Network.setCookie', { name: nomeCookie, value: resto.join('='), url: base });
   await cmd('Page.navigate', { url: base + '#/' });
-  ok(await esperar('!!(window.CC && CC.telaBau && CC.estado().dono === "leitora9")', 20000), 'o app abre com a conta');
+  ok(await esperar('!!(window.CC && CC.telaBau && CC.estado().dono === "leitora0")', 20000), 'o app abre com a conta');
   await dormir(1500);
   ok(await av('typeof CC.cartas === "undefined" && typeof CC.album === "undefined" && /^cartas-regras\\.[0-9a-f]{10}\\.js$/.test(window.CARTAS_REGRAS) && /^album\\.[0-9a-f]{10}\\.js$/.test(window.ALBUM_CARTAS)'),
     'a arte e o álbum não vêm no index.html, só o nome dos arquivos');
@@ -121,47 +128,58 @@ try {
   await av('(() => { for (let n = 1; n <= 14; n++) CC.marcarLido(n, true); return true; })()');
   await av('CC.telaBau(7)');
   ok(await esperar('!!' + q('[data-abrir-bau]')), 'a tela do baú abre');
+  await esperar('!!window.CC.album && !!window.CC.cartas', 8000);
   await av(SIMULAR);
   await av(q('[data-abrir-bau]') + '.click()');
-  ok(await esperar('!!' + q('.album-revela .carta-viva'), 8000), 'abrir o baú revela a carta pela arte');
-  ok(await esperar('/Nova! Você tem 1 de 13 em Heróis da fé/.test(' + q('.album-legenda') + '.textContent)'), 'a legenda diz "Nova! Você tem 1 de 13 em Heróis da fé" (' + await texto('.album-legenda') + ')');
+  ok(await esperar('!!' + q('.tela-bau .rv .carta-viva'), 8000), 'abrir o baú passa a abertura para a arte (CC.cartas.revelar), sem animar o baú duas vezes');
+  ok(await av('!document.querySelector(".tela-bau .bau-grande.abrindo")'), 'com as peças prontas, o baú da Trilha não balança antes');
+  ok(await esperar('document.querySelector(".tela-bau .rv").dataset.fase === "fim"', 15000), 'a revelação chega ao fim (baú, luz, carta que sobe e vira)');
+  ok(await esperar('/Nova! Você tem 1 de 13 em Heróis da fé/.test(' + legenda('.tela-bau') + ')'), 'a legenda diz "Nova! Você tem 1 de 13 em Heróis da fé" (' + await av(legenda('.tela-bau')) + ')');
   const ev = await av('JSON.stringify(CC.estado().cartas.eventos["bau:dia:7"])');
-  ok(/"carta":"davi-funda"/.test(ev) && /"raridade":"prata"/.test(ev), 'a carta fica no estado: Davi e a funda, em Prata, a primeira da vida (' + ev + ')');
+  ok(/"carta":"davi-funda"/.test(ev) && /"raridade":"prata"/.test(ev) && await av('document.querySelector(".tela-bau .rv").dataset.raridade === "prata"'),
+    'a carta fica no estado e a arte mostra a raridade dela: Davi e a funda, em Prata, a primeira da vida (' + ev + ')');
   ok(await av('!!CC.estado().bausAbertos["dia:7"].ref'), 'o baú guarda o versículo da semana, como antes');
   const botoes = await av('[...document.querySelectorAll(".tela-cheia-pe .botao")].map((b) => b.textContent.trim())');
   ok(JSON.stringify(botoes) === JSON.stringify(['Compartilhar carta', 'Salvar papel de parede', 'Continuar']), 'os botões: Compartilhar carta, Salvar papel de parede e Continuar (' + botoes + ')');
   ok(await av('[...document.querySelectorAll(".tela-cheia-pe .botao")].every((b) => b.getBoundingClientRect().height >= 44 && b.getBoundingClientRect().right <= innerWidth)'), 'os botões têm 44 px ou mais e cabem na tela');
-  await dormir(1600);
+  ok(await av('!!document.querySelector(".tela-bau .rv-ler")') && /Ler a história/.test(await texto('.tela-bau .rv-ler')), 'a revelação tem "Ler a história"');
+  await dormir(800);
   await nosDoisTemas('01-bau-revelado');
+  ok(await av('(() => { const t = document.querySelector(".tela-bau .rv-nova"); const c = getComputedStyle(t).color; const f = getComputedStyle(document.querySelector(".tela-bau")).backgroundColor; return c !== f && /rgb\\(18, 19, 16\\)/.test(f); })()'),
+    'a revelação fica num palco escuro também no tema claro (o texto da arte é creme)');
   await av('document.querySelector("[data-compartilhar-carta]").click()');
   ok(await esperar('!!window.__compartilhado', 12000), 'Compartilhar carta abre a folha do sistema');
   const story = await av('(async () => { const d = window.__compartilhado; return { ...(await __png(d.files[0])), texto: d.text }; })()');
-  ok(story && story.w === 1080 && story.h === 1920 && story.tipo === 'image/png' && /Davi e a funda/.test(story.texto), 'vai o story da carta, PNG 1080x1920 (' + JSON.stringify(story) + ')');
+  ok(story && story.w === 1080 && story.h === 1920 && story.tipo === 'image/png' && /Davi e a funda \(Prata\)/.test(story.texto), 'vai o story da carta, PNG 1080x1920 (' + JSON.stringify(story) + ')');
   await av(SIMULAR);
   await av('document.querySelector("[data-papel-de-parede]").click()');
   ok(await esperar('!!window.__compartilhado', 12000), 'Salvar papel de parede abre a folha do sistema');
   const papel = await av('(async () => __png(window.__compartilhado.files[0]))()');
   ok(papel && papel.w === 1080 && papel.h === 2340, 'vai o papel de parede, PNG 1080x2340 (' + JSON.stringify(papel) + ')');
-  await av('document.querySelector("[data-continuar]").click()');
-  ok(await esperar('!document.querySelector(".tela-bau")'), 'Continuar fecha a tela do baú');
+  await av('document.querySelector(".tela-bau .rv-ler").click()');
+  ok(await esperar('/^#\\/biblia\\/1%20Samuel\\/17/.test(location.hash) && !document.querySelector(".tela-bau")'), '"Ler a história" abre 1 Samuel 17 na Bíblia e fecha a tela do baú (' + await av('location.hash') + ')');
+  await av('location.hash = "#/"');
+  await dormir(600);
 
-  // ---------- o segundo baú: carta ainda sem desenho ----------
+  // ---------- o segundo baú: outra carta lançada ----------
   await av('CC.telaBau(14)');
   await esperar('!!' + q('[data-abrir-bau]'));
   await av(q('[data-abrir-bau]') + '.click()');
-  ok(await esperar('!!' + q('.album-revela .carta-texto'), 8000), 'carta sem desenho: a carta de texto entra no lugar');
-  ok(await esperar('/Nova! Você tem 2 de 13 em Heróis da fé/.test(' + q('.album-legenda') + '.textContent)') && await av('!document.querySelector("[data-compartilhar-carta]") && !!document.querySelector("[data-papel-de-parede]")'),
-    'a legenda conta 2 de 13; sem desenho não há Compartilhar carta, e o papel de parede continua');
-  await dormir(800);
-  await nosDoisTemas('02-bau-carta-de-texto');
+  ok(await esperar('!!' + q('.tela-bau .rv .carta-viva'), 8000), 'o segundo baú também revela pela arte');
+  const ev2 = await av('JSON.stringify(CC.estado().cartas.eventos["bau:dia:14"])');
+  ok(LANCADAS.some((id) => ev2.includes('"' + id + '"')) && !/davi-funda/.test(ev2), 'sai outra carta, e só das lançadas (' + ev2 + ')');
+  await terminar('.tela-bau');
+  ok(await esperar('/Nova! Você tem 1 de 13 em/.test(' + legenda('.tela-bau') + ')'), 'a legenda conta a carta no álbum dela (' + await av(legenda('.tela-bau')) + ')');
   await av('document.querySelector("[data-continuar]").click()');
+  ok(await esperar('!document.querySelector(".tela-bau")'), 'Continuar fecha a tela do baú');
 
-  // ---------- uma repetida e o Perfil ----------
+  // ---------- repetidas, uma carta sem desenho e o Perfil ----------
   await av(`(() => { const c = CC.estado().cartas; c.eventos["bau:dia:901"] = { em: Date.now(), carta: "davi-funda", raridade: "prata" };
-    c.eventos["bau:dia:902"] = { em: Date.now() + 1, carta: "davi-funda", raridade: "bronze" }; CC.gravar("cartas", c); return true; })()`);
+    c.eventos["bau:dia:902"] = { em: Date.now() + 1, carta: "davi-funda", raridade: "bronze" };
+    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "noe-arca", raridade: "linho" }; CC.gravar("cartas", c); return true; })()`);
   await av('location.hash = "#/perfil"');
   ok(await esperar('!!' + q('[data-album-cartas]')), 'o Perfil tem a entrada Cartas, ao lado de Conquistas e Troféus');
-  ok(/Cartas\s*2 de 52/.test(await texto('[data-album-cartas]')), 'a entrada diz quantas cartas de 52 (' + (await texto('[data-album-cartas]')).trim() + ')');
+  ok(/Cartas\s*3 de 52/.test(await texto('[data-album-cartas]')), 'a entrada diz quantas cartas de 52 (' + (await texto('[data-album-cartas]')).trim() + ')');
   await av(q('[data-album-cartas]') + '.scrollIntoView({ block: "center" })');
   await nosDoisTemas('03-perfil-entrada');
 
@@ -171,12 +189,13 @@ try {
   const grade = await av(`(() => { const s = document.querySelector('[data-album="herois"]');
     return { cartas: s.querySelectorAll('.album-carta').length, vagas: s.querySelectorAll('.album-vaga').length, texto: [...s.querySelectorAll('.album-grade')].map((g) => g.innerText.replace(/×\\d+/g, '').trim()).join(''),
       titulo: s.querySelector('.titulo-secao').textContent, versoes: s.querySelector('.album-versoes').textContent }; })()`);
-  ok(grade.cartas === 2 && grade.vagas === 11 && !grade.texto, 'Heróis da fé: 2 desenhadas e 11 silhuetas, sem texto nas miniaturas (' + JSON.stringify(grade) + ')');
-  ok(/2 de 13 cartas/.test(grade.titulo) && /Coleção: 3 de 52 versões/.test(grade.versoes), 'o álbum diz "2 de 13 cartas" e "Coleção: 3 de 52 versões"');
+  ok(grade.cartas === 2 && grade.vagas === 11 && !grade.texto, 'Heróis da fé: as 2 recebidas e 11 silhuetas, sem texto nas miniaturas (' + JSON.stringify(grade) + ')');
+  ok(/2 de 13 cartas/.test(grade.titulo) && /Coleção: 3 de 65 versões/.test(grade.versoes), 'o álbum diz "2 de 13 cartas" e "Coleção: 3 de 65 versões"');
   const davi = await av(`(() => { const b = document.querySelector('[data-carta="davi-funda"]'); return { rotulo: b.getAttribute('aria-label'), pips: [...b.querySelectorAll('.album-pips i.tem')].map((i) => i.className),
-    copias: (b.querySelector('.album-copias') || {}).textContent || '' }; })()`);
-  ok(/Versões: Bronze, Prata/.test(davi.rotulo) && /Repetidas: 2 de Prata/.test(davi.rotulo) && davi.pips.length === 2 && davi.copias === '×2',
-    'a miniatura mostra as versões (bolinhas), as cópias da versão à mostra (×2) e diz tudo no rótulo (' + davi.rotulo + ')');
+    copias: (b.querySelector('.album-copias') || {}).textContent || '', canvas: !!b.querySelector('canvas') }; })()`);
+  ok(/Versões: Bronze, Prata/.test(davi.rotulo) && /Repetidas: 2 de Prata/.test(davi.rotulo) && davi.pips.length === 2 && davi.copias === '×2' && davi.canvas,
+    'a miniatura desenhada mostra as versões (bolinhas), as cópias da versão à mostra (×2) e diz tudo no rótulo (' + davi.rotulo + ')');
+  ok(await av('!!document.querySelector("[data-carta=noe-arca] .album-sem-arte")'), 'carta sem desenho aparece em silhueta da raridade');
   ok(await av('document.querySelectorAll("[data-album=semeadores] .album-limiar").length === 5 && /100 amigos/.test(document.querySelector("[data-album=semeadores]").textContent)'),
     'Semeadores aparece à parte, com os 5 limiares em silhueta (de 1 a 100 amigos)');
   await nosDoisTemas('04-album');
@@ -195,29 +214,22 @@ try {
   await dormir(900);
   await nosDoisTemas('05-carta-grande');
   await fecharTudo();
+  await av(q('[data-carta="noe-arca"]') + '.click()');
+  ok(await esperar('!!' + q('.tela-carta .carta-texto')) && await av('!!document.querySelector(".tela-carta [data-compartilhar-carta][hidden]")'), 'a carta sem desenho abre como carta de texto, sem Compartilhar');
+  await fecharTudo();
 
   // ---------- O que pode vir ----------
   await av(q('[data-pode-vir]') + '.click()');
   ok(await esperar('!!' + q('.folha-pode-vir')), '"O que pode vir" abre');
+  const comum = await texto('.folha-pode-vir [data-tabela="comum"]');
+  const marco = await texto('.folha-pode-vir [data-tabela="marco"]');
   const pode = await texto('.folha-pode-vir');
-  ok(/Linho\s*50%/.test(pode) && /Bronze\s*30%/.test(pode) && /Prata\s*15%/.test(pode) && /Ouro\s*5%/.test(pode) && /Glória\s*não sai no sorteio/.test(pode), 'mostra as chances de cada raridade');
-  ok(/No máximo 5 seguidas sem Prata ou Ouro/.test(pode) && /20º é Ouro/.test(pode) && /Desde o último Ouro: 4 sorteios/.test(pode) && /Heróis da fé, 2 de 13/.test(pode),
-    'mostra as proteções e os números da pessoa');
+  ok(/Linho\s*49%/.test(comum) && /Bronze\s*30%/.test(comum) && /Prata\s*15%/.test(comum) && /Ouro\s*5%/.test(comum) && /Glória\s*1%/.test(comum), 'mostra as chances do sorteio comum (' + comum.replace(/\s+/g, ' ') + ')');
+  ok(/Prata\s*40%/.test(marco) && /Ouro\s*35%/.test(marco) && /Glória\s*25%/.test(marco) && !/Linho|Bronze/.test(marco), 'e as do sorteio de marco, sem Linho nem Bronze (' + marco.replace(/\s+/g, ' ') + ')');
+  ok(/No máximo 5 seguidas sem Prata ou melhor/.test(pode) && /20º é Ouro/.test(pode) && /sobe 15 pontos/.test(pode) && /Hoje podem sair 6 das 52 cartas/.test(pode) && /Desde o último Ouro: 5 sorteios/.test(pode),
+    'mostra as proteções, quantas cartas podem sair hoje e os números da pessoa');
   ok(!/nunca repete|não repete/i.test(pode), 'não promete que as cartas não se repetem');
   await nosDoisTemas('06-o-que-pode-vir');
-  await fecharTudo();
-
-  // ---------- a versão Glória ----------
-  await av('(() => { const c = CC.estado().cartas; c.eventos["dias:100"] = { em: Date.now(), gloria: 1 }; c.glorias["dias:100"] = { em: Date.now(), carta: "", escolhidaEm: 0 }; CC.gravar("cartas", c); CC.redesenhar(); return true; })()');
-  ok(await esperar('!!' + q('.album-gloria [data-escolher]')), 'com uma Glória pendente, o álbum oferece a escolha');
-  await av(q('.album-gloria [data-escolher]') + '.click()');
-  ok(await esperar('document.querySelectorAll(".tela-escolha [data-glorificar]").length === 2'), 'a escolha mostra as cartas que a pessoa tem');
-  await nosDoisTemas('07-escolher-gloria');
-  await av(q('[data-glorificar="noe-arca"], [data-glorificar]') + '.click()');
-  await esperar('!!' + q('.cortina [data-sim]'));
-  await av(q('.cortina [data-sim]') + '.click()');
-  ok(await esperar('Object.values(CC.estado().cartas.glorias).some((g) => g.carta)'), 'confirmar põe a versão Glória na carta escolhida');
-  ok(await esperar(q('.tela-carta [data-versao="gloria"]') + '?.getAttribute("aria-pressed") === "true"'), 'e a carta abre na versão Glória');
   await fecharTudo();
 
   // ---------- outra fonte: a prática sem erro revela uma carta ----------
@@ -225,22 +237,36 @@ try {
   await dormir(3300);
   await av('CC.gravar("pratica", { 1: { melhor: 10, total: 10, feitoEm: CC.hojeIso(), vezes: 1 } }); CC.acertarCartas(); true');
   ok(await esperar('/Prática sem nenhum erro/.test((document.querySelector(".tela-carta-nova h1") || {}).textContent || "")', 10000), 'a prática sem erro (outra fonte) revela uma carta, com a origem no título');
-  ok(await esperar('/Nova!|Nova versão|Repetida/.test((document.querySelector(".tela-carta-nova .album-legenda") || {}).textContent || "")') && !!(await av('CC.estado().cartas.eventos["pratica:1"]')),
-    'com a legenda, e o evento fica no livro-caixa');
+  await terminar('.tela-carta-nova');
+  ok(await esperar('/Nova!|Nova versão|Repetida/.test(' + legenda('.tela-carta-nova') + ')') && !!(await av('CC.estado().cartas.eventos["pratica:1"]')), 'com a legenda, e o evento fica no livro-caixa');
   await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
   ok(await esperar('!document.querySelector(".tela-carta-nova")'), 'Continuar fecha');
   // as legendas de repetida e de versão nova, uma revelação depois da outra
-  await av(`CC.album.revelarNovas([{ fonte: 'desafio', chave: 'desafio:x', carta: 'davi-funda', raridade: 'prata', nova: false, versaoNova: false, copias: 3, tem: 3, total: 13 },
-    { fonte: 'passos', chave: 'passos:todos', carta: 'davi-funda', raridade: 'ouro', nova: false, versaoNova: true, copias: 1, tem: 3, total: 13 }]); true`);
-  ok(await esperar('/Repetida: agora você tem 3 de Davi e a funda \\(Prata\\)/.test((document.querySelector(".tela-carta-nova .album-legenda") || {}).textContent || "")'),
-    'repetida: "Repetida: agora você tem 3 de Davi e a funda (Prata)"');
-  await dormir(1300);
+  await av(`CC.album.revelarNovas([{ fonte: 'desafio', chave: 'desafio:x', carta: 'davi-funda', raridade: 'prata', nova: false, versaoNova: false, copias: 3, tem: 1, total: 13 },
+    { fonte: 'passos', chave: 'passos:todos', carta: 'davi-funda', raridade: 'ouro', nova: false, versaoNova: true, copias: 1, tem: 1, total: 13 }]); true`);
+  ok(await esperar('/Repetida: agora você tem 3 de Davi e a funda \\(Prata\\)/.test(' + legenda('.tela-carta-nova') + ')'), 'repetida: "Repetida: agora você tem 3 de Davi e a funda (Prata)"');
+  await terminar('.tela-carta-nova');
+  await dormir(600);
   await nosDoisTemas('09-repetida');
   await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
-  ok(await esperar('/Nova versão Ouro de Davi e a funda/.test((document.querySelector(".tela-carta-nova .album-legenda") || {}).textContent || "") && /Primeiros passos completos/.test(document.querySelector(".tela-carta-nova h1").textContent)'),
+  ok(await esperar('/Nova versão Ouro de Davi e a funda/.test(' + legenda('.tela-carta-nova') + ') && /Primeiros passos completos/.test(document.querySelector(".tela-carta-nova h1").textContent)'),
     'a seguinte: "Nova versão Ouro de Davi e a funda", com a origem dela');
   await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
   ok(await esperar('!document.querySelector(".tela-carta-nova")'), 'no fim da fila, Continuar fecha');
+
+  // ---------- os marcos: 100 dias e as unidades ----------
+  await dormir(3300);
+  await av('(() => { for (let n = 1; n <= 100; n++) CC.marcarLido(n, true); CC.acertarCartas(); return true; })()');
+  ok(await esperar('/^Marco: /.test((document.querySelector(".tela-carta-nova h1") || {}).textContent || "")', 10000), 'chegar aos 100 dias e completar unidades revela os sorteios de marco ("Marco: ...")');
+  const marcos = [];
+  for (let i = 0; i < 6 && await av('!!document.querySelector(".tela-carta-nova")'); i++) {
+    marcos.push(await av('document.querySelector(".tela-carta-nova h1").textContent + " · " + (document.querySelector(".tela-carta-nova .rv") || document.querySelector(".tela-carta-nova .carta-texto") || {}).dataset.raridade'));
+    if (i === 0) { await terminar('.tela-carta-nova'); await dormir(1200); await nosDoisTemas('10-marco'); }
+    await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
+    await dormir(400);
+  }
+  ok(marcos.length === 4 && marcos.some((m) => /Marco: 100 dias de leitura/.test(m)) && marcos.filter((m) => /Marco: unidade \d completa/.test(m)).length === 3
+    && marcos.every((m) => / · (prata|ouro|gloria)$/.test(m)), 'os quatro marcos (3 unidades e 100 dias), cada um revelado com Prata, Ouro ou Glória (' + marcos.join('; ') + ')');
 
   // ---------- troféus ----------
   await av('location.hash = "#/perfil/trofeus"');
@@ -260,12 +286,12 @@ try {
   await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
 
   // ---------- sem as peças: o versículo, e a carta depois ----------
-  await av('(() => { for (let n = 15; n <= 21; n++) CC.marcarLido(n, true); return true; })()');
+  await av('(() => { for (let n = 101; n <= 105; n++) CC.marcarLido(n, true); return true; })()');
   // na Trilha (o álbum aberto pediria as peças de novo)
   await av('location.hash = "#/"; window.__antes = 1');
   await dormir(300);
   await cmd('Page.reload');
-  await esperar('!window.__antes && !!(window.CC && CC.telaBau && CC.estado().dono === "leitora9")', 20000);
+  await esperar('!window.__antes && !!(window.CC && CC.telaBau && CC.estado().dono === "leitora0")', 20000);
   await dormir(1200);
   ok(await av('typeof CC.cartas === "undefined" && typeof CC.album === "undefined"'), 'na Trilha, a arte e o álbum não foram pedidos');
   await av('window.__regras = window.CARTAS_REGRAS; window.CARTAS = "sem-arte.js"; window.ALBUM_CARTAS = "sem-album.js"; window.CARTAS_REGRAS = "sem-regra.js"; true');

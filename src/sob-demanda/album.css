@@ -81,8 +81,20 @@ button.carta-versao { cursor: pointer; }
 .carta-texto.entrando { animation: album-entra .6s ease both; }
 @keyframes album-entra { from { opacity: 0; transform: translateY(24px) scale(.94); } }
 
-/* as revelações */
+/* as revelações: a arte (CC.cartas.revelar) foi feita para um palco escuro (texto creme, luz do
+   baú), então a tela da revelação fica escura nos dois temas, com as fichas do tema escuro */
+.tela-cheia.com-revelacao {
+  --v2-fundo: #121310; --v2-cartao: #252724; --campo: #2e302c; --contorno: #3a3d37;
+  --v2-tinta-forte: #f2ecd8; --v2-tinta: #e2dccb; --v2-tinta-fraca: #b3ad9c; --v2-inverso: #f2ecd8; --v2-inverso-tinta: #121310;
+  --fundo: var(--v2-fundo); --fundo-2: var(--campo); --cartao: var(--v2-cartao); --borda: var(--contorno);
+  --tinta: var(--v2-tinta); --tinta-forte: var(--v2-tinta-forte); --tinta-fraca: var(--v2-tinta-fraca);
+  --inverso: var(--v2-inverso); --inverso-tinta: var(--v2-inverso-tinta);
+  background: var(--v2-fundo); color: var(--v2-tinta);
+}
+.tela-cheia.com-revelacao .tela-cheia-palco { justify-content: flex-start; }
+.tela-cheia.com-revelacao .botao:not(.contorno):not(.plano) { --b: var(--v2-inverso); background: var(--v2-inverso); color: var(--v2-inverso-tinta); }
 .album-revela { display: grid; justify-items: center; gap: 10px; }
+.album-revela h1 { margin: 0; font-size: 1.45rem; text-align: center; }
 .album-revela-carta { display: grid; justify-items: center; gap: 8px; min-height: 120px; }
 .album-legenda { min-height: 1.5em; margin: 0; font-size: 1.05rem; }
 .album-revela-titulo { margin: 0; opacity: 0; transition: opacity .3s; }

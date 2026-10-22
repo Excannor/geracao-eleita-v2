@@ -20,7 +20,7 @@ import {
   itemDoHistorico, estudoDoRegistro, cursorDe, lerCursor, daMaeAteOCorte, encontrosAteOCorte,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
-import { lerCatalogo, validarCatalogo, esqueletoDoCatalogo, LIMIARES_SEMEADORES as LIMIARES_CATALOGO } from './ferramentas/cartas-catalogo.mjs';
+import { lerCatalogo, validarCatalogo, esqueletoDoCatalogo, todasLancadas, desenhosDaArte, LIMIARES_SEMEADORES as LIMIARES_CATALOGO } from './ferramentas/cartas-catalogo.mjs';
 import { simular } from './ferramentas/simular-cartas.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -1383,54 +1383,83 @@ secao('cartas e álbuns (docs/cartas.md)');
 const CATALOGO = lerCatalogo(AQUI);
 {
   const erros = validarCatalogo(CATALOGO, AQUI);
-  checar(!erros.length, 'o catálogo confere: álbuns de 13 com data de lançamento e capa, ids únicos, referências na NBV e links com destino' + (erros.length ? ' (' + erros.slice(0, 4).join('; ') + ')' : ''));
+  checar(!erros.length, 'o catálogo confere: álbuns de 13 com data de lançamento e capa, ids únicos, referências na NBV, links com destino e lançadas com desenho' + (erros.length ? ' (' + erros.slice(0, 4).join('; ') + ')' : ''));
   const capa = (a) => (CATALOGO.cartas.find((c) => c.id === CATALOGO.albuns.find((x) => x.id === a).capa) || {}).titulo;
   checar(capa('herois') === 'Nuvem de testemunhas' && capa('lugares') === 'Jerusalém' && capa('objetos') === 'A Arca da Aliança' && capa('milagres') === 'O túmulo vazio',
     'a capa de cada álbum é a pedida: Nuvem de testemunhas, Jerusalém, a Arca da Aliança e o túmulo vazio');
   checar(CATALOGO.cartas.every((c) => c.rascunho === true), 'os textos do catálogo estão marcados como rascunho até a revisão');
   checar(CATALOGO.cartas.filter((c) => !CATALOGO.albuns.find((a) => a.id === c.album).especial).every((c) => c.raridade === undefined),
     'carta de álbum não tem raridade fixa: a raridade é da cópia recebida');
+  const lancadas = CATALOGO.cartas.filter((c) => c.lancada).map((c) => c.id).sort();
+  const desenhos = [...desenhosDaArte(AQUI)].sort();
+  checar(JSON.stringify(lancadas) === JSON.stringify(desenhos) && lancadas.length === 6,
+    'lançadas são exatamente as cartas com desenho na peça de arte (' + lancadas.join(', ') + ')');
   const ruim = validarCatalogo({ albuns: CATALOGO.albuns.map((a, i) => (i === 1 ? { ...a, lancadoEm: '2020-01-01' } : a)),
-    cartas: CATALOGO.cartas.slice(1).concat({ ...CATALOGO.cartas[1] }, { ...CATALOGO.cartas[2], id: 'nova-x', raridade: 'ouro' }) });
-  checar(ruim.some((e) => /repetido/.test(e)) && ruim.some((e) => /13 cartas/.test(e)) && ruim.some((e) => /lançado antes/.test(e)) && ruim.some((e) => /raridade só é fixa/.test(e)),
-    'a conferência acusa id repetido, contagem errada, lançamento fora de ordem e raridade fixa em carta de álbum');
+    cartas: CATALOGO.cartas.slice(1).concat({ ...CATALOGO.cartas[1] }, { ...CATALOGO.cartas[2], id: 'nova-x', raridade: 'ouro' }).map((c) => (c.id === 'noe-arca' ? { ...c, lancada: true } : c)) }, AQUI);
+  checar(ruim.some((e) => /repetido/.test(e)) && ruim.some((e) => /13 cartas/.test(e)) && ruim.some((e) => /lançado antes/.test(e)) && ruim.some((e) => /raridade só é fixa/.test(e))
+    && ruim.some((e) => /noe-arca: lancada sem desenho/.test(e)), 'a conferência acusa id repetido, contagem errada, lançamento fora de ordem, raridade fixa em carta de álbum e carta lançada sem desenho');
   const esq = esqueletoDoCatalogo(CATALOGO);
   const noIndex = JSON.parse((html.match(/window\.CARTAS_INDICE=(\[.*?\]);/) || [])[1] || 'null');
   checar(JSON.stringify(noIndex) === JSON.stringify(esq) && esq.filter((a) => !a.especial).every((a) => a.c.split(' ').length === 13 && a.lancadoEm && a.capa)
-    && esq.filter((a) => a.especial).map((a) => a.id).join() === 'semeadores,boas-vindas', 'o esqueleto do sorteio no index.html é o do catálogo (' + JSON.stringify(esq).length + ' bytes)');
+    && esq.filter((a) => a.especial).map((a) => a.id).join() === 'semeadores,boas-vindas' && /~abel-oferta/.test(esq[0].c) && / davi-funda /.test(esq[0].c),
+  'o esqueleto do sorteio no index.html é o do catálogo, com "~" nas não lançadas (' + JSON.stringify(esq).length + ' bytes)');
   checar(!html.includes('"voceSabia"') && !html.includes(CATALOGO.cartas[0].voceSabia) && !html.includes('PESO_NOVA_ATUAL'), 'os textos das cartas e a regra do sorteio não estão no index.html');
 }
 
-// --- a regra (src/sob-demanda/cartas-regras.js) ---
-contexto.window.CARTAS_INDICE = esqueletoDoCatalogo(CATALOGO);
+// --- a regra (src/sob-demanda/cartas-regras.js), com o catálogo inteiro lançado ---
+const ESQ_HOJE = esqueletoDoCatalogo(CATALOGO);
+const ESQ_TODAS = todasLancadas(ESQ_HOJE);
+contexto.window.CARTAS_INDICE = ESQ_TODAS;
 runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'cartas-regras.js'), 'utf8'), contexto, { filename: 'cartas-regras.js' });
 const RC = CC.cartasRegras;
+const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(raridades.map((r, i) => [fonte + ':dia:' + (i + 1), { em: i + 1, carta: 'mana', raridade: r }])) });
 {
   checar(RC.albuns().length === 4 && RC.albuns().every((a) => a.cartas.length === 13) && RC.carta('arca-alianca').album === 'objetos'
     && RC.especiais().map((a) => a.id).join() === 'semeadores,boas-vindas' && RC.carta('campos-maduros').raridade === 'gloria',
     'a regra lê o esqueleto: 4 álbuns de 13 no sorteio e os especiais com a raridade fixa');
   checar(RC.semente('ana', 'bau:dia:7') === RC.semente('ana', 'bau:dia:7') && RC.semente('ana', 'bau:dia:7') !== RC.semente('ana', 'bau:dia:14') && RC.semente('ana', 'bau:dia:7') !== RC.semente('bia', 'bau:dia:7'),
     'a semente é a mesma para a mesma conta e evento, e muda com a conta e com o evento');
-  // as chances, com as proteções desligadas (o último sorteio foi um Ouro)
-  const comOuro = { eventos: { 'bau:dia:1': { em: 1, carta: 'mana', raridade: 'ouro' } }, glorias: {} };
-  const conta = { linho: 0, bronze: 0, prata: 0, ouro: 0 };
-  const N = 40000;
+  // as chances do sorteio comum, com as proteções desligadas (o último sorteio foi um Ouro)
+  const N = 60000;
+  const conta = { linho: 0, bronze: 0, prata: 0, ouro: 0, gloria: 0 };
+  const comOuro = historia(['ouro']);
   for (let i = 0; i < N; i++) conta[RC.raridade(comOuro, RC.aleatorio(RC.semente('chances', 'e' + i))).raridade]++;
   const pct = Object.fromEntries(Object.entries(conta).map(([k, v]) => [k, (v / N) * 100]));
-  checar(Math.abs(pct.linho - 50) < 1.2 && Math.abs(pct.bronze - 30) < 1.2 && Math.abs(pct.prata - 15) < 1 && Math.abs(pct.ouro - 5) < 0.6,
-    'as chances por sorteio são Linho 50%, Bronze 30%, Prata 15% e Ouro 5% (' + Object.entries(pct).map(([k, v]) => k + ' ' + v.toFixed(1)).join(', ') + ' em ' + N + ')');
+  checar(Math.abs(pct.linho - 49) < 1.2 && Math.abs(pct.bronze - 30) < 1.2 && Math.abs(pct.prata - 15) < 1 && Math.abs(pct.ouro - 5) < 0.5 && Math.abs(pct.gloria - 1) < 0.25,
+    'as chances do sorteio comum: Linho 49%, Bronze 30%, Prata 15%, Ouro 5% e Glória 1% (' + Object.entries(pct).map(([k, v]) => k + ' ' + v.toFixed(2)).join(', ') + ' em ' + N + ')');
+  // a Glória nunca passa de 1% no sorteio comum, em qualquer situação das proteções
+  let gloriaMax = 0;
+  for (const h of [historia(['ouro']), historia(['ouro', 'linho', 'linho', 'linho', 'linho', 'linho']), historia(['ouro'].concat(Array(15).fill('prata')))]) {
+    let g = 0;
+    for (let i = 0; i < 20000; i++) if (RC.raridade(h, RC.aleatorio(i + 7)).raridade === 'gloria') g++;
+    gloriaMax = Math.max(gloriaMax, (g / 20000) * 100);
+  }
+  checar(gloriaMax <= 1.25, 'no sorteio comum a Glória fica em 1%, com ou sem proteção ativa (maior: ' + gloriaMax.toFixed(2) + '%)');
   checar([0, 5, 10, 11, 12, 17, 18, 19, 25].map(RC.chanceDeOuro).join() === '5,5,5,10,15,40,45,100,100',
     'o Ouro sobe 5 pontos por sorteio a partir do 12º sem ele (10%, 15%... 45%) e o 20º é Ouro');
-  const historia = (raridades) => ({ eventos: Object.fromEntries(raridades.map((r, i) => ['bau:dia:' + (i + 1), { em: i + 1, carta: 'mana', raridade: r }])), glorias: {} });
   let soAltas = true;
-  for (let i = 0; i < 2000; i++) soAltas &&= ['prata', 'ouro'].includes(RC.raridade(historia(['prata', 'linho', 'bronze', 'linho', 'linho', 'bronze']), RC.aleatorio(i + 1)).raridade);
-  checar(soAltas, 'depois de 5 sorteios sem Prata nem Ouro, o seguinte é Prata ou Ouro');
-  const vinteSemOuro = historia(['prata'].concat(Array(18).fill('linho').map((r, i) => (i % 4 === 3 ? 'prata' : r))));
-  checar(RC.raridade(vinteSemOuro, RC.aleatorio(1)).raridade === 'ouro' && RC.raridade(vinteSemOuro, RC.aleatorio(1)).protecao === 'ouro', 'o 20º sorteio sem Ouro é Ouro');
+  for (let i = 0; i < 3000; i++) soAltas &&= ['prata', 'ouro', 'gloria'].includes(RC.raridade(historia(['prata', 'linho', 'bronze', 'linho', 'linho', 'bronze']), RC.aleatorio(i + 1)).raridade);
+  checar(soAltas, 'depois de 5 sorteios sem Prata ou melhor, o seguinte é Prata, Ouro ou Glória');
+  const comGloria = historia(['ouro'].concat(Array(18).fill('linho').map((r, i) => (i === 3 ? 'gloria' : i % 4 === 0 ? 'prata' : r))));
+  checar(RC.raridade(comGloria, RC.aleatorio(1)).raridade === 'ouro' && RC.raridade(historia(['linho', 'linho', 'linho', 'linho', 'gloria']), RC.aleatorio(3)).protecao !== 'alta',
+    'a Glória não zera a conta do Ouro (o 20º sem Ouro é Ouro mesmo com uma Glória no meio) e conta como Prata ou melhor');
   checar(RC.raridade(RC.vazio(), RC.aleatorio(9)).raridade === 'prata', 'o primeiro sorteio da vida é uma Prata');
+  // o sorteio de marco
+  checar(JSON.stringify([0, 1, 2, 3, 4, 5, 9].map((n) => RC.chancesDeMarco(n))) === JSON.stringify([
+    { prata: 40, ouro: 35, gloria: 25 }, { prata: 25, ouro: 35, gloria: 40 }, { prata: 10, ouro: 35, gloria: 55 }, { prata: 0, ouro: 30, gloria: 70 },
+    { prata: 0, ouro: 15, gloria: 85 }, { prata: 0, ouro: 0, gloria: 100 }, { prata: 0, ouro: 0, gloria: 100 }]),
+  'no marco: Prata 40%, Ouro 35% e Glória 25%; cada marco sem Glória dá 15 pontos a ela, tirados da Prata e depois do Ouro');
+  const cm = { prata: 0, ouro: 0, gloria: 0 };
+  let baixa = false;
+  for (let i = 0; i < 20000; i++) { const x = RC.raridadeDeMarco(historia(['ouro']), RC.aleatorio(i + 11)).raridade; if (cm[x] === undefined) baixa = true; else cm[x]++; }
+  checar(!baixa && Math.abs(cm.prata / 200 - 40) < 1.5 && Math.abs(cm.ouro / 200 - 35) < 1.5 && Math.abs(cm.gloria / 200 - 25) < 1.5,
+    'o marco nunca dá Linho nem Bronze, e as chances batem (' + Object.entries(cm).map(([k, v]) => k + ' ' + (v / 200).toFixed(1)).join(', ') + ')');
+  const marcos = (rs) => ({ eventos: Object.fromEntries(rs.map((r, i) => ['unidade:' + (i + 1), { em: i + 1, carta: 'mana', raridade: r }])) });
+  checar(RC.marcosSemGloria(marcos(['prata', 'ouro'])) === 2 && RC.marcosSemGloria(marcos(['prata', 'gloria'])) === 0 && RC.marcosSemGloria(marcos(['gloria', 'prata', 'ouro', 'prata'])) === 3,
+    'a proteção do marco conta os marcos desde a última Glória, e zera quando ela sai');
 }
 
-// --- receber, cópias, repetidas, Glória e fontes ---
+// --- receber, cópias, repetidas e fontes ---
 {
   let r = RC.receber(RC.vazio(), 'bau', 'bau:dia:7', { dono: 'ana', em: 1000 });
   const primeira = r.resultado;
@@ -1445,56 +1474,85 @@ const RC = CC.cartasRegras;
   checar(desligada === null && RC.receber(r.cartas, 'xyz', 'xyz:1', {}).resultado === null && RC.receber(r.cartas, 'bau', 'unidade:1', {}).resultado === null,
     'fonte desligada, desconhecida ou chave de outra fonte não paga');
   const fontes = Object.keys(RC.FONTES).sort().join();
-  checar(fontes === 'album,bau,celula,conhecer,convidado,convite,desafio,dias,discipulado,parabolas,passos,pratica,proposito,unidade' && Object.values(RC.FONTES).every((f) => f.ativa),
-    'as fontes aprovadas pelo dono estão na lista e ligadas');
+  checar(fontes === 'album,bau,celula,conhecer,convidado,convite,desafio,dias,discipulado,parabolas,passos,pratica,proposito,unidade' && Object.values(RC.FONTES).every((f) => f.ativa)
+    && ['album', 'unidade', 'dias'].every((f) => RC.FONTES[f].premio === 'marco'), 'as fontes aprovadas pelo dono estão na lista e ligadas; álbum, unidade e dias são sorteios de marco');
+  const m = RC.receber(r.cartas, 'unidade', 'unidade:1', { dono: 'ana', em: 1001 });
+  checar(m.resultado.marco && ['prata', 'ouro', 'gloria'].includes(m.resultado.raridade) && m.resultado.carta, 'o fim de uma unidade paga um sorteio de marco, com carta');
   // repetidas: a contagem sai do livro-caixa, uma cópia por evento
-  const duas = { eventos: { 'bau:dia:7': { em: 1, carta: 'mana', raridade: 'bronze' }, 'bau:dia:14': { em: 2, carta: 'mana', raridade: 'bronze' }, 'bau:dia:21': { em: 3, carta: 'mana', raridade: 'ouro' } }, glorias: {} };
+  const duas = { eventos: { 'bau:dia:7': { em: 1, carta: 'mana', raridade: 'bronze' }, 'bau:dia:14': { em: 2, carta: 'mana', raridade: 'bronze' }, 'bau:dia:21': { em: 3, carta: 'mana', raridade: 'ouro' } } };
   const t = RC.tem(duas);
   checar(t.mana.bronze === 2 && t.mana.ouro === 1 && RC.resumo(duas).repetidas === 1 && RC.resumo(duas).copias === 3 && RC.copias(duas).map((x) => x.id).join() === 'bau:dia:7,bau:dia:14,bau:dia:21',
     'repetidas contadas certo: cada evento é uma cópia com id próprio (a chave), origem e data');
   // o viés para carta nova e o álbum atual
-  let novasNoComeco = 0, doAtual = 0, contasV = 150;
+  let novas = 0, doAtual = 0;
+  const contasV = 150;
   for (let p = 0; p < contasV; p++) {
     let c = RC.vazio();
-    for (let d = 1; d <= 13; d++) { const x = RC.receber(c, 'bau', 'bau:dia:' + d, { dono: 'v' + p, em: d }); c = x.cartas; if (x.resultado.nova) novasNoComeco++; if (x.resultado.album === 'herois') doAtual++; }
+    for (let d = 1; d <= 13; d++) { const x = RC.receber(c, 'bau', 'bau:dia:' + d, { dono: 'v' + p, em: d }); c = x.cartas; if (x.resultado.nova) novas++; if (x.resultado.album === 'herois') doAtual++; }
   }
-  checar(novasNoComeco / (contasV * 13) > 0.9 && doAtual / (contasV * 13) > 0.45, 'nos primeiros 13 sorteios quase todas as cartas são novas (' + (novasNoComeco / contasV / 13 * 100).toFixed(0) + '%) e o álbum atual vem mais que os outros três juntos quase sempre (' + (doAtual / contasV / 13 * 100).toFixed(0) + '%)');
-  // álbum completo: troféu e uma Glória para escolher; a Glória vai numa carta que a pessoa tem
+  checar(novas / (contasV * 13) > 0.9 && doAtual / (contasV * 13) > 0.45, 'nos 13 primeiros sorteios, ' + (novas / contasV / 13 * 100).toFixed(0) + '% de cartas novas, e o álbum atual dá ' + (doAtual / contasV / 13 * 100).toFixed(0) + '% (mais que os outros três juntos)');
+  // álbum completo: troféu e um sorteio de marco junto
   const herois = RC.albuns()[0].cartas.map((x) => x.id);
-  let c = { eventos: Object.fromEntries(herois.slice(0, 12).map((id, i) => ['bau:dia:' + (i + 1), { em: i + 1, carta: id, raridade: 'linho' }])), glorias: {} };
+  let c = { eventos: Object.fromEntries(herois.slice(0, 12).map((id, i) => ['bau:dia:' + (i + 1), { em: i + 1, carta: id, raridade: 'linho' }])) };
   let x = null;
   for (let d = 13; !x || x.resultado.completou !== 'herois'; d++) { x = RC.receber(c, 'bau', 'bau:dia:' + d, { dono: 'ana', em: d }); c = x.cartas; if (d > 400) break; }
-  checar(x.resultado.completou === 'herois' && c.eventos['album:herois'].gloria && RC.resumo(c).pendentes.join() === 'album:herois' && RC.resumo(c).albuns[0].completo,
-    'a carta que falta completa Heróis da fé: o álbum fica completo e dá uma versão Glória para escolher');
-  checar(!RC.podeGloria(c, 'pedro-prisao') || !!RC.tem(c)['pedro-prisao'], 'não dá para escolher Glória de carta que não tem');
-  const escolhida = RC.escolherGloria(c, herois[0], 77);
-  checar(escolhida && RC.tem(escolhida)[herois[0]].gloria === 1 && !RC.resumo(escolhida).pendentes.length && RC.copias(escolhida).some((y) => y.id === 'album:herois' && y.raridade === 'gloria'),
-    'a pessoa escolhe a carta, e a versão Glória entra na coleção como cópia');
-  checar(RC.escolherGloria(escolhida, herois[1]) === null && RC.escolherGloria(RC.receber(escolhida, 'dias', 'dias:100', {}).cartas, herois[0]) === null
-    && RC.escolherGloria(RC.receber(RC.receber(escolhida, 'convite', 'convite:tier:1', {}).cartas, 'dias', 'dias:100', {}).cartas, 'semente-lancada') === null,
-    'sem Glória pendente nada muda; a mesma carta não ganha outra Glória; carta de Semeadores não ganha Glória');
-  const g = RC.receber(RC.receber(RC.vazio(), 'unidade', 'unidade:1', { em: 5 }).cartas, 'dias', 'dias:100', { em: 6 });
-  checar(RC.resumo(g.cartas).pendentes.join() === 'dias:100,unidade:1' && !RC.copias(g.cartas).length, 'fim de unidade e 100 dias lidos dão uma versão Glória para escolher, sem carta; ela espera, sem prazo');
+  checar(x.resultado.completou === 'herois' && c.eventos['album:herois'].carta && x.extra.length === 1 && x.extra[0].marco && RC.resumo(c).albuns[0].completo,
+    'a carta que falta completa Heróis da fé: o álbum fica completo e paga um sorteio de marco junto');
+}
+
+// --- lançamento aos poucos: só as cartas com desenho saem ---
+{
+  contexto.window.CARTAS_INDICE = ESQ_HOJE;
+  const lancadas = new Set(CATALOGO.cartas.filter((c) => c.lancada).map((c) => c.id));
+  let soLancadas = true;
+  let c = RC.vazio();
+  for (let d = 1; d <= 300; d++) { const x = RC.receber(c, 'bau', 'bau:dia:' + d, { dono: 'lanc', em: d }); c = x.cartas; soLancadas &&= lancadas.has(x.resultado.carta); }
+  for (let d = 1; d <= 40; d++) { const x = RC.receber(c, 'unidade', 'unidade:' + d, { dono: 'lanc', em: 400 + d }); c = x.cartas; soLancadas &&= lancadas.has(x.resultado.carta); }
+  const r = RC.resumo(c);
+  checar(soLancadas && r.lancadas === 6 && r.cartas === 6, 'carta não lançada nunca sai (340 sorteios, comuns e de marco, só as 6 com desenho)');
+  checar(r.albuns.every((a) => !a.completo) && !Object.keys(c.eventos).some((k) => k.startsWith('album:')), 'nenhum álbum completa enquanto as 13 não forem lançadas e estiverem na coleção');
+  const comNoe = ESQ_HOJE.map((a) => (a.id === 'herois' ? { ...a, c: a.c.replace('~noe-arca', 'noe-arca') } : a));
+  contexto.window.CARTAS_INDICE = comNoe;
+  const x = RC.receber(c, 'bau', 'bau:dia:301', { dono: 'lanc', em: 999 });
+  checar(x.resultado.carta === 'noe-arca' || RC.cartaDoSorteio(c, RC.aleatorio(5), '', 'linho') === 'noe-arca' || RC.cartaDoSorteio(c, RC.aleatorio(6), '', 'linho') === 'noe-arca',
+    'lançar uma carta põe ela no sorteio, e o viés para carta nova a traz logo');
+  let novaVem = 0;
+  for (let i = 0; i < 400; i++) if (RC.cartaDoSorteio(c, RC.aleatorio(i + 1), '', 'linho') === 'noe-arca') novaVem++;
+  checar(novaVem / 400 > 0.4, 'a carta recém-lançada sai em ' + (novaVem / 4).toFixed(0) + '% dos sorteios de quem já tem as outras');
+  // Semeadores sem desenho: o limiar fica anotado e a carta vem quando for lançada
+  contexto.window.CARTAS_INDICE = ESQ_HOJE;
+  const quem = { cartasServidor: { chaves: ['convite:tier:1', 'convite:tier:2'] } };
+  const e0 = { ...CC.normalizarEstado({}), dono: 'ana', cartas: RC.vazio() };
+  const p1 = RC.emDia(e0, { dono: 'ana', em: 10, quem });
+  checar(p1.cartas.eventos['convite:tier:1'].pendente && p1.cartas.eventos['convite:tier:2'].pendente && !RC.copias(p1.cartas).length && RC.resumo(p1.cartas).alcancados.join() === 'convite:tier:1,convite:tier:2',
+    'limiar de Semeadores sem desenho fica anotado como alcançado, sem carta');
+  checar(!RC.emDia({ ...e0, cartas: p1.cartas }, { dono: 'ana', em: 11, quem }).novos.length, 'e não é pago de novo enquanto espera');
+  contexto.window.CARTAS_INDICE = ESQ_HOJE.map((a) => (a.id === 'semeadores' ? { ...a, c: a.c.replace('~semente-lancada', 'semente-lancada') } : a));
+  const p2 = RC.emDia({ ...e0, cartas: p1.cartas }, { dono: 'ana', em: 12, quem });
+  checar(p2.novos.length === 1 && p2.cartas.eventos['convite:tier:1'].carta === 'semente-lancada' && p2.cartas.eventos['convite:tier:1'].raridade === 'linho' && p2.cartas.eventos['convite:tier:2'].pendente,
+    'quando a carta é lançada, o limiar anotado paga a carta, sem se perder');
+  const f = CC.fundirCartas(p1.cartas, p2.cartas);
+  checar(f.eventos['convite:tier:1'].carta === 'semente-lancada' && CC.fundirCartas(p2.cartas, p1.cartas).eventos['convite:tier:1'].carta === 'semente-lancada',
+    'na fusão, o evento que já pagou a carta vence o que ainda esperava');
+  contexto.window.CARTAS_INDICE = ESQ_TODAS;
 }
 
 // --- estado das cartas: forma e fusão entre aparelhos (02-estado.js) ---
 {
   const lixo = CC.limparCartas({ eventos: { 'bau:dia:7': { em: 5, carta: 'arca-alianca', raridade: 'ouro' }, 'bau dia 8': { em: 1 }, 'bau:dia:9': { em: 2, carta: 'X<b>', raridade: 'ouro' },
-    'bau:dia:10': { em: 3, carta: 'mana', raridade: 'diamante' }, 'dias:100': { em: 2, gloria: true } }, glorias: { 'dias:100': { em: 2, carta: 'A B', escolhidaEm: 3 } }, recebidas: { x: 1 } });
-  checar(JSON.stringify(lixo) === JSON.stringify({ eventos: { 'bau:dia:7': { em: 5, carta: 'arca-alianca', raridade: 'ouro' }, 'bau:dia:9': { em: 2, gloria: 1 }, 'bau:dia:10': { em: 3, gloria: 1 }, 'dias:100': { em: 2, gloria: 1 } },
-    glorias: { 'dias:100': { em: 2, carta: '', escolhidaEm: 0 } } }), 'a forma das cartas é conferida: chave inválida, carta ou raridade estranha e campos a mais saem');
-  checar(Object.keys(CC.limparCartas({ eventos: Object.fromEntries(Array.from({ length: 2500 }, (_, i) => ['bau:dia:' + i, { em: i }])) }).eventos).length === 2000
+    'bau:dia:10': { em: 3, carta: 'mana', raridade: 'diamante' }, 'convite:tier:1': { em: 2, pendente: true } }, glorias: { x: 1 } });
+  checar(JSON.stringify(lixo) === JSON.stringify({ eventos: { 'bau:dia:7': { em: 5, carta: 'arca-alianca', raridade: 'ouro' }, 'convite:tier:1': { em: 2, pendente: 1 } } }),
+    'a forma das cartas é conferida: chave inválida, carta ou raridade estranha e campos a mais saem; o alcançado fica');
+  checar(Object.keys(CC.limparCartas({ eventos: Object.fromEntries(Array.from({ length: 2500 }, (_, i) => ['bau:dia:' + i, { em: i, carta: 'mana', raridade: 'linho' }])) }).eventos).length === 2000
     && JSON.stringify(CC.limparCartas(null)) === JSON.stringify(RC.vazio()), 'no máximo 2000 eventos; nada vira vazio');
-  const a = { eventos: { 'bau:dia:7': { em: 10, carta: 'mana', raridade: 'linho' }, 'bau:dia:14': { em: 30, carta: 'perola', raridade: 'bronze' } }, glorias: { 'dias:100': { em: 40, carta: 'mana', escolhidaEm: 41 } } };
-  const b = { eventos: { 'bau:dia:14': { em: 20, carta: 'belem', raridade: 'prata' }, 'bau:dia:21': { em: 50, carta: 'mana', raridade: 'linho' } },
-    glorias: { 'dias:100': { em: 40, carta: '', escolhidaEm: 0 }, 'unidade:1': { em: 45, carta: 'mana', escolhidaEm: 46 } } };
+  const a = { eventos: { 'bau:dia:7': { em: 10, carta: 'mana', raridade: 'linho' }, 'bau:dia:14': { em: 30, carta: 'perola', raridade: 'bronze' } } };
+  const b = { eventos: { 'bau:dia:14': { em: 20, carta: 'belem', raridade: 'prata' }, 'bau:dia:21': { em: 50, carta: 'mana', raridade: 'linho' } } };
   const ab = CC.fundirCartas(a, b);
-  const ordenar = (x) => JSON.stringify([Object.entries(x.eventos).sort(), Object.entries(x.glorias).sort()]);
+  const ordenar = (x) => JSON.stringify(Object.entries(x.eventos).sort());
   checar(ordenar(ab) === ordenar(CC.fundirCartas(b, a)), 'a fusão das cartas dá o mesmo resultado nos dois sentidos');
   checar(Object.keys(ab.eventos).sort().join() === 'bau:dia:14,bau:dia:21,bau:dia:7' && ab.eventos['bau:dia:14'].carta === 'belem' && RC.tem(ab).mana.linho === 2,
     'a fusão une os eventos por chave (vale o registro mais antigo): o baú do dia 14 conta uma vez só');
   checar(ordenar(CC.fundirCartas(ab, ab)) === ordenar(ab) && RC.copias(CC.fundirCartas(ab, a)).length === RC.copias(ab).length, 'fundir de novo com o que já veio não duplica nenhuma cópia');
-  checar(ab.glorias['dias:100'].carta === 'mana' && ab.glorias['unidade:1'].carta === '', 'na Glória vale a escolha mais antiga, e a segunda na mesma carta volta a ser escolhida');
   const e1 = { ...CC.normalizarEstado({}), atualizadoEm: 100, cartas: a };
   const e2 = { ...CC.normalizarEstado({}), atualizadoEm: 200, zeradoEm: 200, cartas: RC.vazio() };
   checar(Object.keys(CC.fundir(e1, e2).cartas.eventos).length === 2 && !CC.PROGRESSO_DA_TRILHA.includes('cartas'), 'na fusão com um aparelho que zerou, as cartas dos dois lados ficam');
@@ -1526,7 +1584,8 @@ const RC = CC.cartasRegras;
   const chaves = r2.novos.map((x) => x.chave).sort().join();
   checar(chaves === 'conhecer:14,desafio:gratidao-14,dias:100,parabolas:14,parabolas:7,passos:todos,pratica:1,proposito:7,unidade:1,unidade:2,unidade:3',
     'as fontes do estado pagam cada evento alcançado (' + chaves + ')');
-  checar(r2.novos.filter((x) => x.carta).length === 7 && RC.resumo(r2.cartas).pendentes.length === 4, 'as fontes de carta sorteiam; as de marco dão uma Glória para escolher');
+  checar(r2.novos.every((x) => x.carta) && r2.novos.filter((x) => x.marco).length === 4 && r2.novos.filter((x) => x.marco).every((x) => ['prata', 'ouro', 'gloria'].includes(x.raridade)),
+    'todas pagam carta; as quatro de marco (3 unidades e 100 dias), com Prata ou melhor');
   checar(!RC.emDia({ ...e2, zeradoEm: 9000, cartas: r2.cartas }, { dono: 'ana', em: 500 }).novos.length, 'depois de zerar, refazer as mesmas coisas não paga de novo');
   const quem = { cartasServidor: { chaves: ['convite:tier:1', 'convite:tier:2', 'convidado', 'celula:primeiro', 'discipulado:primeiro', 'convite:tier:9', 'outra:1'] } };
   const r3 = RC.emDia(estado({}), { dono: 'ana', em: 600, quem });
@@ -1534,9 +1593,7 @@ const RC = CC.cartasRegras;
   const t3 = RC.tem(r3.cartas);
   checar(t3['semente-lancada'].linho === 1 && t3['andre-chama-pedro'].bronze === 1 && t3['da-familia'].linho === 1 && !t3['venha-e-veja'],
     'quem pula limiares de uma vez recebe a carta de cada um, com a raridade fixa (Linho, Bronze), e quem chegou por convite, a de Boas-vindas em Linho');
-  checar(RC.carta(r3.novos.find((x) => x.chave === 'celula:primeiro').carta).album === 'herois' && !RC.emDia({ ...estado({}), cartas: r3.cartas }, { dono: 'ana', quem }).novos.length,
-    'célula e discipulado sorteiam como o baú, e nada paga duas vezes');
-  // Semeadores fica fora do sorteio e das proteções
+  checar(!RC.emDia({ ...estado({}), cartas: r3.cartas }, { dono: 'ana', quem }).novos.length, 'nada paga duas vezes');
   let s1 = RC.vazio();
   for (let n = 1; n <= 5; n++) s1 = RC.receber(s1, 'convite', 'convite:tier:' + n, { em: n }).cartas;
   const semTier = [];
@@ -1544,17 +1601,16 @@ const RC = CC.cartasRegras;
   let c0 = RC.vazio();
   let c1 = s1;
   for (let d = 1; d <= 30; d++) {
-    const a = RC.receber(c0, 'bau', 'bau:dia:' + d, { dono: 'ana', em: 100 + d }); c0 = a.cartas; semTier.push(a.resultado.carta + a.resultado.raridade);
-    const b = RC.receber(c1, 'bau', 'bau:dia:' + d, { dono: 'ana', em: 100 + d }); c1 = b.cartas; comTier.push(b.resultado.carta + b.resultado.raridade);
+    const x = RC.receber(c0, 'bau', 'bau:dia:' + d, { dono: 'ana', em: 100 + d }); c0 = x.cartas; semTier.push(x.resultado.carta + x.resultado.raridade);
+    const y = RC.receber(c1, 'bau', 'bau:dia:' + d, { dono: 'ana', em: 100 + d }); c1 = y.cartas; comTier.push(y.resultado.carta + y.resultado.raridade);
   }
   checar(JSON.stringify(semTier) === JSON.stringify(comTier) && RC.resumo(s1).cartas === 0 && RC.resumo(s1).especiais.find((a) => a.id === 'semeadores').tem === 5
-    && RC.tem(s1)['campos-maduros'].gloria === 1, 'as 5 cartas de Semeadores (a última já em Glória) não mexem no sorteio, nas proteções nem na contagem dos álbuns');
+    && RC.tem(s1)['campos-maduros'].gloria === 1, 'as 5 cartas de Semeadores (a de 100 amigos já em Glória) não mexem no sorteio, nas proteções nem na contagem dos álbuns');
   checar(RC.receber(s1, 'convite', 'convite:tier:6', {}).resultado === null && RC.receber(s1, 'convite', 'convite:tier:1', {}).resultado.repetido, 'não há limiar além do quinto (100 amigos), e o mesmo limiar não paga de novo');
-  checar(RC.chaveDoBau(7, { zeradoEm: 0 }) === 'bau:dia:7' && RC.chaveDoBau(7, { zeradoEm: 12 }) === 'bau:dia:7@12' && CC.limparCartas({ eventos: { 'bau:dia:7@1761100000000': { em: 1, gloria: 1 } } }).eventos['bau:dia:7@1761100000000'],
+  checar(RC.chaveDoBau(7, { zeradoEm: 0 }) === 'bau:dia:7' && RC.chaveDoBau(7, { zeradoEm: 12 }) === 'bau:dia:7@12' && CC.limparCartas({ eventos: { 'bau:dia:7@1761100000000': { em: 1, carta: 'mana', raridade: 'linho' } } }).eventos['bau:dia:7@1761100000000'],
     'a chave do baú leva a geração do Zerar, e a forma dela passa na conferência');
   // o catálogo cresce: um álbum lançado depois entra no sorteio no dia dele, com prioridade
-  const indice = contexto.window.CARTAS_INDICE;
-  contexto.window.CARTAS_INDICE = indice.slice(0, 4).concat({ id: 'profetas', nome: 'Profetas', lancadoEm: '2027-03-01', capa: 'p-1', c: Array.from({ length: 13 }, (_, i) => 'p-' + (i + 1)).join(' ') }, indice.slice(4));
+  contexto.window.CARTAS_INDICE = ESQ_TODAS.slice(0, 4).concat({ id: 'profetas', nome: 'Profetas', lancadoEm: '2027-03-01', capa: 'p-1', c: Array.from({ length: 13 }, (_, i) => 'p-' + (i + 1)).join(' ') }, ESQ_TODAS.slice(4));
   const dia = (iso) => Date.parse(iso + 'T12:00:00Z');
   let cg = RC.vazio();
   for (let d = 1; d <= 20; d++) cg = RC.receber(cg, 'bau', 'bau:dia:' + d, { dono: 'ana', em: dia('2026-11-01') + d * 864e5, hoje: '2026-11-30' }).cartas;
@@ -1563,18 +1619,19 @@ const RC = CC.cartasRegras;
   const noDia = RC.receber(cg, 'bau', 'bau:dia:21', { dono: 'ana', em: dia('2027-03-02'), hoje: '2027-03-02' });
   checar(RC.carta(antesDoDia.carta).album !== 'profetas' && RC.carta(noDia.resultado.carta).album === 'profetas' && noDia.resultado.nova && noDia.resultado.total === 13
     && JSON.stringify(Object.fromEntries(Object.entries(noDia.cartas.eventos).filter(([k]) => k !== 'bau:dia:21'))) === antes && RC.albuns('2027-03-02').length === 5 && RC.albuns('2027-02-28').length === 4,
-    'um álbum novo entra no sorteio no dia do lançamento: o baú seguinte dá uma carta nova dele, e as cópias de antes ficam como estavam');
-  contexto.window.CARTAS_INDICE = indice;
+  'um álbum novo entra no sorteio no dia do lançamento: o baú seguinte dá uma carta nova dele, e as cópias de antes ficam como estavam');
+  contexto.window.CARTAS_INDICE = ESQ_TODAS;
 }
 
-// --- a simulação (ferramentas/simular-cartas.mjs, a mesma regra) ---
+// --- a simulação (ferramentas/simular-cartas.mjs, a mesma regra, com o catálogo inteiro lançado) ---
 {
-  const regular = simular({ contas: 40, porAno: 75, anos: 1.5 });
-  checar(regular.primeiraPrata && regular.estaveis && regular.piorSemAlta <= 5 && regular.entreOuros.pior <= 20,
-    'na simulação, o primeiro sorteio é sempre Prata, o resultado é estável, nunca há mais de 5 sem Prata ou Ouro e o Ouro vem até o 20º');
-  checar(regular.mesesParaCompletar.mediana >= 9.5 && regular.mesesParaCompletar.mediana <= 14 && regular.repetidasAno1 >= 18 && regular.repetidasAno1 <= 33,
-    'leitor regular (75 sorteios por ano): os 4 álbuns em ' + regular.mesesParaCompletar.mediana + ' meses (mediana), com ' + regular.repetidasAno1 + '% de repetidas no 1º ano');
-  const oito = simular({ contas: 15, porAno: 75, anos: 4, albuns: 8 });
+  const regular = simular({ contas: 40, porAno: 75, marcos: 14, anos: 1.5 });
+  checar(regular.primeiraPrata && regular.estaveis && regular.piorSemAlta <= 5 && regular.entreOuros.pior <= 20 && !regular.marcoBaixo && regular.gloriaNoComum < 1.6,
+    'na simulação: primeiro sorteio Prata, resultado estável, nunca mais de 5 sem Prata ou melhor, Ouro até o 20º, marco sem Linho nem Bronze, Glória comum perto de 1% (' + regular.gloriaNoComum + '%)');
+  checar(regular.mesesParaCompletar.mediana >= 9 && regular.mesesParaCompletar.mediana <= 14,
+    'leitor regular (75 sorteios e 14 marcos por ano): os 4 álbuns em ' + regular.mesesParaCompletar.mediana + ' meses (mediana); ' + regular.repetidasAno1 + '% de cartas repetidas e '
+    + regular.versaoRepetidaAno1 + '% de versões repetidas no 1º ano; ' + regular.gloriasPorAno[0] + ' Glórias no ano');
+  const oito = simular({ contas: 15, porAno: 75, marcos: 14, anos: 4, albuns: 8 });
   checar(oito.cartas === 104 && oito.mesesParaCompletar.p90 < 48 && oito.piorSemAlta <= 5, 'com 8 álbuns (104 cartas) a coleção base também completa: ' + oito.mesesParaCompletar.mediana + ' meses (mediana)');
 }
 
@@ -1755,10 +1812,10 @@ checar(contas.relacao('novo2', 'ana') === 'amigos', 'mesmo sem dupla, a amizade 
   delete contas.dados.discipulados['teste-cartas'];
   // a conferência antes de gravar: chave inventada sai (e com ela a cópia); a confirmada e a já gravada ficam
   const junto = { cartas: { eventos: { 'convite:tier:1': { em: 1, carta: 'semente-lancada', raridade: 'linho' }, 'convite:tier:2': { em: 1, carta: 'andre-chama-pedro', raridade: 'bronze' },
-    'celula:primeiro': { em: 1, carta: 'mana', raridade: 'linho' }, 'bau:dia:7': { em: 1, carta: 'perola', raridade: 'linho' }, 'discipulado:primeiro': { em: 1, gloria: 1 } }, glorias: { 'discipulado:primeiro': { em: 1, carta: '' } } } };
-  const atual = { cartas: { eventos: { 'celula:primeiro': { em: 1, carta: 'mana', raridade: 'linho' } }, glorias: {} } };
+    'celula:primeiro': { em: 1, carta: 'mana', raridade: 'linho' }, 'bau:dia:7': { em: 1, carta: 'perola', raridade: 'linho' }, 'discipulado:primeiro': { em: 1, pendente: 1 } } } };
+  const atual = { cartas: { eventos: { 'celula:primeiro': { em: 1, carta: 'mana', raridade: 'linho' } } } };
   conferirCartasDoServidor(atual, junto, ['convite:tier:1']);
-  checar(Object.keys(junto.cartas.eventos).sort().join() === 'bau:dia:7,celula:primeiro,convite:tier:1' && !junto.cartas.glorias['discipulado:primeiro'],
+  checar(Object.keys(junto.cartas.eventos).sort().join() === 'bau:dia:7,celula:primeiro,convite:tier:1',
     'um limiar inventado sai do estado com a cópia; o confirmado, o já gravado e o baú ficam');
 }
 {
@@ -3090,7 +3147,7 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     // as cartas pelo servidor: gravam e voltam; uma carta de convite inventada não entra; um aparelho antigo, sem cartas, não as apaga
     {
       const comCartas = { ...lido, atualizadoEm: Date.now() + 500, cartas: { eventos: { 'bau:dia:7': { em: 5, carta: 'mana', raridade: 'prata' },
-        'convite:tier:1': { em: 6, carta: 'semente-lancada', raridade: 'linho' } }, glorias: {} } };
+        'convite:tier:1': { em: 6, carta: 'semente-lancada', raridade: 'linho' } } } };
       checar((await pedir('/api/estado', comCartas, ana, 'PUT')).status === 200, 'o dono grava o estado com cartas');
       await pedir('/api/estado', { ...CC.normalizarEstado({}), atualizadoEm: Date.now() + 600, cartas: undefined }, ana, 'PUT');
       const volta = (await (await pedir('/api/estado', null, ana)).json()).cartas || {};

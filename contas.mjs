@@ -57,7 +57,6 @@ export function conferirCartasDoServidor(atual, junto, permitidas) {
   for (const chave of Object.keys(c.eventos || {})) {
     if (!FONTES_DO_SERVIDOR.test(chave) || antes[chave] || ok.has(chave)) continue;
     delete c.eventos[chave];
-    if (c.glorias) delete c.glorias[chave];
   }
   return junto;
 }

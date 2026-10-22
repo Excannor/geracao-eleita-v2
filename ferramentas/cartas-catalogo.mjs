@@ -14,6 +14,14 @@ export const LIMIARES_SEMEADORES = [1, 5, 15, 40, 100];
 const LETRA = { linho: 'l', bronze: 'b', prata: 'p', ouro: 'o', gloria: 'g' };
 const DATA = /^\d{4}-\d{2}-\d{2}$/;
 
+// As cartas que já têm desenho na peça de arte: as chaves de DESENHOS em src/sob-demanda/cartas.js
+// (os desenhos vão pelo id da carta).
+export function desenhosDaArte(raiz) {
+  const fonte = readFileSync(join(raiz, 'src', 'sob-demanda', 'cartas.js'), 'utf8');
+  const bloco = (fonte.match(/const DESENHOS = \{([^}]*)\}/) || [])[1] || '';
+  return new Set([...bloco.matchAll(/'([a-z0-9-]+)'\s*:/g)].map((m) => m[1]));
+}
+
 export function lerCatalogo(raiz) {
   return JSON.parse(readFileSync(join(raiz, 'conteudo', 'cartas', 'indice.json'), 'utf8'));
 }
@@ -50,6 +58,7 @@ export function validarCatalogo(cat, raiz) {
     for (const campo of ['titulo', 'referencia', 'voceSabia']) if (!String(c[campo] || '').trim()) erros.push(c.id + ': sem ' + campo);
     if (!/^(.+?) (\d{1,3})\.(\d{1,3})(?:-(\d{1,3}))?$/.test(c.referencia || '')) erros.push(c.id + ': referência ilegível ' + c.referencia);
     if (/[\u2013\u2014]/.test(c.titulo + c.voceSabia)) erros.push(c.id + ': travessão no texto');
+    if (typeof c.lancada !== 'boolean') erros.push(c.id + ': lancada tem de ser true ou false');
   }
   for (const a of albuns) {
     const doAlbum = cartas.filter((c) => c.album === a.id);
@@ -62,6 +71,9 @@ export function validarCatalogo(cat, raiz) {
   if (semeadores.map((c) => c.amigos).join() !== LIMIARES_SEMEADORES.join()) erros.push('semeadores: limiares ' + LIMIARES_SEMEADORES.join(', ') + ' (' + semeadores.map((c) => c.amigos).join(', ') + ')');
   if (!cartas.some((c) => c.album === 'boas-vindas' && c.raridade === 'linho')) erros.push('boas-vindas: falta a carta Linho');
   if (raiz) {
+    // lançamento aos poucos: só entra no sorteio carta com desenho na peça de arte
+    const desenhos = desenhosDaArte(raiz);
+    for (const c of cartas) if (c.lancada && !desenhos.has(c.id)) erros.push(c.id + ': lancada sem desenho na peça de arte');
     const nbv = JSON.parse(readFileSync(join(raiz, 'conteudo', 'biblias', 'nbv.json'), 'utf8'));
     const atlas = JSON.parse(readFileSync(join(raiz, 'conteudo', 'atlas', 'indice.json'), 'utf8'));
     for (const c of cartas) {
@@ -81,13 +93,18 @@ export function validarCatalogo(cat, raiz) {
   return erros;
 }
 
-// O esqueleto do sorteio, no index.html: [{ id, nome, lancadoEm, capa, c: "id id ..." }] na ordem
+// O esqueleto do sorteio, no index.html: [{ id, nome, lancadoEm, capa, c: "id ~id ..." }] na ordem
 // do álbum; os especiais, com especial: 1 e a raridade fixa de cada carta ("id:l").
+// todasLancadas: o mesmo esqueleto com o catálogo inteiro lançado (para a simulação).
 export function esqueletoDoCatalogo(cat) {
   return cat.albuns.map((a) => {
     const ids = cat.cartas.filter((c) => c.album === a.id).sort((x, y) => x.numero - y.numero);
+    // "~" antes do id: carta ainda não lançada (fora do sorteio, silhueta no álbum)
+    const id = (c) => (c.lancada ? '' : '~') + c.id;
     return a.especial
-      ? { id: a.id, nome: a.nome, especial: 1, c: ids.map((c) => c.id + ':' + LETRA[c.raridade]).join(' ') }
-      : { id: a.id, nome: a.nome, lancadoEm: a.lancadoEm, capa: a.capa, c: ids.map((c) => c.id).join(' ') };
+      ? { id: a.id, nome: a.nome, especial: 1, c: ids.map((c) => id(c) + ':' + LETRA[c.raridade]).join(' ') }
+      : { id: a.id, nome: a.nome, lancadoEm: a.lancadoEm, capa: a.capa, c: ids.map(id).join(' ') };
   });
 }
+
+export const todasLancadas = (esqueleto) => esqueleto.map((a) => ({ ...a, c: a.c.replace(/~/g, '') }));

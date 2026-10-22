@@ -1,6 +1,5 @@
 /* O álbum das cartas (docs/cartas.md, seções 8 a 11): o catálogo inteiro, a tela do álbum, a carta
-   grande com as versões, "O que pode vir", a escolha da Glória e as revelações (no baú e das outras
-   fontes). Pedida com a regra (cartas-regras.js) e a arte (cartas.js) só quando o baú ou o álbum
+   grande com as versões, "O que pode vir" e as revelações (no baú, das outras fontes e dos marcos). Pedida com a regra (cartas-regras.js) e a arte (cartas.js) só quando o baú ou o álbum
    abre (CC.pedirCartas, 02b-jogo.js). O build põe o catálogo no lugar da marca abaixo.
    A arte é chamada por poucas funções (CC.cartas.revelar, cartaViva, botaoVirar, miniatura,
    desenharVerso, storyDaCarta, papelDeParede, iconeSvg); carta sem desenho ainda cai numa carta
@@ -23,7 +22,7 @@
   const ORDEM = ['linho', 'bronze', 'prata', 'ouro', 'gloria'];
   const melhor = (versoes) => ORDEM.slice().reverse().find((v) => (versoes || {})[v]) || '';
   const menosMovimento = () => CC.semMovimento && CC.semMovimento();
-  const estado = () => CC.estado().cartas || { eventos: {}, glorias: {} };
+  const estado = () => CC.estado().cartas || { eventos: {} };
 
   // ---------- a carta para a arte ----------
   // O objeto que a peça de arte recebe: os campos dela (album com o nome, total, sabia, ref,
@@ -32,7 +31,7 @@
     const c = porId.get(id) || {};
     const a = albumDe(c.album);
     return { id, album: a.nome, albumId: a.id, numero: c.numero, total: doAlbum(c.album).length, titulo: c.titulo, sabia: c.voceSabia,
-      ref: c.referencia, desenho: c.desenho || id, link: c.link || '', raridade: raridade || c.raridade || 'linho', rascunho: !!c.rascunho };
+      ref: c.referencia, desenho: id, link: c.link || '', raridade: raridade || c.raridade || 'linho', rascunho: !!c.rascunho };
   };
   // temArte(id) na arte nova (os desenhos pelo id da carta); na amostra, pelo campo desenho.
   const temArte = (carta) => !!(CC.cartas && (CC.cartas.temArte ? CC.cartas.temArte(carta.id) : (CC.cartas.desenhos || {})[carta.desenho]));
@@ -50,8 +49,8 @@
       + '<b class="ct-titulo">' + CC.esc(carta.titulo) + '</b><span class="ct-sabia"><small>Você sabia?</small>' + CC.esc(carta.sabia) + '</span>'
       + '<span class="ct-ref">' + CC.esc(carta.ref) + '</span><span class="ct-album">' + CC.esc(carta.album) + ' · ' + carta.numero + '/' + carta.total + '</span></div>'
       + '<div class="ct-face ct-verso"></div></div>';
-    if (CC.cartas && CC.cartas.desenharVerso && CC.cartas.tela) {
-      const verso = CC.cartas.desenharVerso(CC.cartas.tela(), carta.raridade);
+    if (CC.cartas && CC.cartas.desenharVerso) {
+      const verso = CC.cartas.desenharVerso({ largura: Math.min(1000, Math.round(largura * 2)), raridade: carta.raridade });
       verso.setAttribute('aria-hidden', 'true');
       el.querySelector('.ct-verso').appendChild(verso);
     }
@@ -131,23 +130,36 @@
     pratica: 'Prática sem nenhum erro', proposito: 'Sete dias num propósito', celula: 'Seu primeiro encontro da célula', discipulado: 'Seu primeiro encontro de discipulado',
     convite: 'Amigos que chegaram pelo seu convite', convidado: 'Boas-vindas',
   };
+  // O título da revelação: a origem; nos marcos, "Marco: ..." (o sorteio de marco tem chance maior
+  // de Ouro e de Glória).
+  const origem = (x) => {
+    const [fonte, arg] = String(x.chave || x.fonte || '').split(':');
+    if (fonte === 'album') return 'Marco: ' + albumDe(arg).nome + ' completo';
+    if (fonte === 'unidade') return 'Marco: unidade ' + arg + ' completa';
+    if (fonte === 'dias') return 'Marco: ' + arg + ' dias de leitura';
+    return ORIGEM[fonte] || 'Carta nova';
+  };
 
   // Uma revelação: a arte faz a animação (CC.cartas.revelar); embaixo, a legenda, o título e os botões.
   function montarRevelacao(el, palco, x, { titulo, ref, aoContinuar }) {
+    el.classList.add('com-revelacao');
     const carta = paraArte(x.carta, x.raridade);
     palco.innerHTML = '<div class="cena-carta revelando album-revela">'
       + '<h1>' + CC.esc(titulo) + '</h1><div class="album-revela-carta"></div>'
       + '<p class="album-legenda" aria-live="polite"></p>'
       + '<p class="album-revela-titulo"><b>' + CC.esc(carta.titulo) + '</b> <span>' + CC.esc(carta.ref) + '</span></p>'
-      + (x.completou ? '<p class="album-completo">' + icone('gloria') + '<span>Álbum completo! Escolha uma carta para a versão Glória.</span></p>' : '') + '</div>';
+      + (x.completou ? '<p class="album-completo">' + icone('gloria') + '<span>Álbum completo! Ganhou um sorteio de marco.</span></p>' : '') + '</div>';
     const alvo = palco.querySelector('.album-revela-carta');
-    const largura = Math.round(Math.min(300, innerWidth * 0.68, Math.max(180, (innerHeight - 380) / 1.4)));
+    // a carta cabe com o título em cima, o fim da revelação e os botões embaixo
+    const largura = Math.round(Math.min(300, innerWidth * 0.7, Math.max(170, (innerHeight - 500) / 1.4)));
     const texto = legenda(x);
     let daArte = false;
     if (temArte(carta)) {
-      // A arte faz a revelação; a nova (uma Promise) já mostra a legenda e o título dentro dela.
-      const api = CC.cartas.revelar(alvo, carta, { raridade: carta.raridade, nova: !!x.nova, progresso: x.tem + '/' + x.total,
-        legenda: texto.replace(/<[^>]+>/g, ''), abrir: 'ja' });
+      // A arte faz a revelação inteira, do baú fechado à carta aberta, e mostra a legenda, o título
+      // e "Ler a história" (a referência na Bíblia) dentro dela. O baú da Trilha já foi tocado:
+      // abre na hora. A raridade é a da cópia (a Glória também sai por sorte, mais nos marcos).
+      const api = CC.cartas.revelar(alvo, carta, { raridade: carta.raridade, legenda: texto.replace(/<[^>]+>/g, ''), abrir: 'ja', largura,
+        aoLer: () => { location.hash = CC.hrefDoVerso(carta.ref); } });
       daArte = !!(api && typeof api.then === 'function');
     } else {
       const api = cartaGrande(alvo, carta, largura);
@@ -160,7 +172,6 @@
     if (!pe) { pe = document.createElement('div'); pe.className = 'tela-cheia-pe'; el.appendChild(pe); }
     pe.innerHTML = (temArte(carta) ? '<button class="botao contorno" data-compartilhar-carta>' + CC.ico('compartilhar') + 'Compartilhar carta</button>' : '')
       + (ref ? '<button class="botao contorno" data-papel-de-parede>' + CC.ico('baixar') + 'Salvar papel de parede</button>' : '')
-      + (x.completou ? '<a class="botao contorno" href="#/perfil/album" data-escolher-gloria>' + CC.ico('estrela') + 'Escolher a Glória</a>' : '')
       + '<button class="botao" data-continuar>Continuar</button>';
     const comp = pe.querySelector('[data-compartilhar-carta]');
     if (comp) ligarCompartilhar(comp, carta);
@@ -170,8 +181,21 @@
     pe.querySelector('[data-continuar]').focus({ preventScroll: true });
   }
 
-  // No baú (03-trilha.js): a carta que o baú pagou. outros: o que mais foi pago junto (outras fontes).
-  function revelarNoBau(el, palco, { chave, ref, fechar }) {
+  // O resultado de um evento já pago, lido do livro-caixa (para a legenda).
+  function resultadoDe(chave) {
+    const ev = estado().eventos[chave];
+    const c = porId.get(ev.carta);
+    const r = R().resumo(estado());
+    const copias = R().copias(estado()).filter((y) => y.carta === ev.carta);
+    const desta = copias.filter((y) => y.raridade === ev.raridade);
+    const doMesmo = doAlbum(c.album);
+    return { chave, carta: ev.carta, raridade: ev.raridade, nova: copias[0].chave === chave, versaoNova: desta[0].chave === chave, copias: desta.length,
+      tem: doMesmo.filter((y) => r.tem[y.id]).length, total: doMesmo.length };
+  }
+
+  // No baú (03-trilha.js): a carta que o baú pagou e, em seguida, na mesma tela, o que mais foi pago
+  // junto (outros: o sorteio de marco do álbum que ele completou, um marco de unidade...).
+  function revelarNoBau(el, palco, { chave, ref, fechar, outros = [] }) {
     const ev = estado().eventos[chave];
     if (!ev || !ev.carta) return false;
     const r = R().resumo(estado());
@@ -182,7 +206,13 @@
     const x = { carta: ev.carta, raridade: ev.raridade, nova: copias[0].chave === chave, versaoNova: desta[0].chave === chave, copias: desta.length,
       tem: doMesmo.filter((y) => r.tem[y.id]).length, total: doMesmo.length,
       completou: estado().eventos['album:' + c.album] && copias[0].chave === chave && doMesmo.every((y) => r.tem[y.id]) ? c.album : '' };
-    montarRevelacao(el, palco, x, { titulo: 'Baú aberto!', ref, aoContinuar: () => { fechar(); CC.redesenhar(); } });
+    const fila = outros.filter((y) => y.carta && estado().eventos[y.chave]).map((y) => resultadoDe(y.chave));
+    const proxima = () => {
+      const y = fila.shift();
+      if (!y) { fechar(); CC.redesenhar(); return; }
+      montarRevelacao(el, palco, y, { titulo: origem(y), aoContinuar: proxima });
+    };
+    montarRevelacao(el, palco, x, { titulo: 'Baú aberto!', ref, aoContinuar: proxima });
     return true;
   }
 
@@ -199,8 +229,7 @@
         const proxima = () => {
           const x = fila.shift();
           if (!x) { fechar(); CC.redesenhar(); return; }
-          montarRevelacao(el, palco, x, { titulo: ORIGEM[x.fonte] || 'Carta nova', aoContinuar: proxima });
-          if (CC.arte && CC.arte.confete) CC.arte.confete(el);
+          montarRevelacao(el, palco, x, { titulo: origem(x), aoContinuar: proxima });
         };
         proxima();
       },
@@ -232,26 +261,27 @@
     const r = R().resumo(cartas, CC.hojeIso());
     const tem = r.tem;
     const largura = innerWidth >= 720 ? 108 : Math.floor((Math.min(innerWidth, 560) - 32 - 3 * 10) / 4);
-    const podeEscolher = r.pendentes.length && Object.keys(tem).some((id) => R().podeGloria(cartas, id));
     const atual = r.albuns.find((a) => a.id === r.atual);
     const secoes = r.albuns.map((a) => '<section class="album-secao" data-album="' + a.id + '">'
       + CC.tituloSecao(a.nome, a.tem + ' de ' + a.total + ' cartas')
-      + '<p class="album-versoes">Coleção: ' + a.versoes + ' de ' + a.totalVersoes + ' versões' + (a.glorias ? ' · ' + plural(a.glorias, 'Glória', 'Glórias') : '') + '</p>'
+      + '<p class="album-versoes">Coleção: ' + a.versoes + ' de ' + a.totalVersoes + ' versões</p>'
       + '<div class="album-grade">' + doAlbum(a.id).map((c) => itemDaGrade(c, tem, largura)).join('') + '</div></section>').join('');
     const quem = (CC.quem || {}).cartasServidor;
     const semeadores = doAlbum('semeadores');
     const secSemeadores = '<section class="album-secao album-especial" data-album="semeadores">'
       + CC.tituloSecao('Semeadores', plural(semeadores.filter((c) => tem[c.id]).length, 'carta', 'cartas'))
       + (quem ? '<p class="album-versoes">' + (quem.amigos === 1 ? '1 amigo chegou' : quem.amigos + ' amigos chegaram') + ' pelo seu convite.</p>' : '')
-      + '<div class="album-grade">' + semeadores.map((c) => '<div class="album-limiar">' + itemDaGrade(c, tem, largura)
-        + '<small>' + plural(c.amigos, 'amigo', 'amigos') + '</small></div>').join('') + '</div></section>';
+      + '<div class="album-grade">' + semeadores.map((c, i) => {
+        // limiar alcançado cuja carta ainda não tem desenho: fica anotado e a carta vem depois
+        const alcancado = !tem[c.id] && r.alcancados.includes('convite:tier:' + (i + 1));
+        return '<div class="album-limiar' + (alcancado ? ' alcancado' : '') + '">' + itemDaGrade(c, tem, largura)
+          + '<small>' + plural(c.amigos, 'amigo', 'amigos') + (alcancado ? ' · alcançado' : '') + '</small></div>';
+      }).join('') + '</div></section>';
     const boas = doAlbum('boas-vindas').filter((c) => tem[c.id]);
     const secBoas = boas.length ? '<section class="album-secao album-especial" data-album="boas-vindas">' + CC.tituloSecao('Boas-vindas')
       + '<div class="album-grade">' + boas.map((c) => itemDaGrade(c, tem, largura)).join('') + '</div></section>' : '';
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Cartas</h1>'
       + '<p class="passo-dica">' + r.cartas + ' de ' + r.totalCartas + ' cartas' + (r.repetidas ? ' · ' + plural(r.repetidas, 'repetida', 'repetidas') : '') + '</p></div>'
-      + (podeEscolher ? '<div class="album-gloria">' + icone('gloria') + '<p><b>' + (r.pendentes.length === 1 ? 'Uma versão Glória para escolher' : r.pendentes.length + ' versões Glória para escolher')
-        + '</b></p><button class="botao pequeno" data-escolher>Escolher</button></div>' : '')
       + '<div class="album-acoes"><button class="botao contorno pequeno" data-pode-vir>' + CC.ico('info') + 'O que pode vir</button>'
       + (atual ? '<span>Álbum atual: <b>' + CC.esc(atual.nome) + '</b></span>' : '') + '</div>'
       + secoes + secSemeadores + secBoas;
@@ -262,8 +292,6 @@
     });
     raiz.querySelectorAll('[data-carta]').forEach((b) => { b.onclick = () => abrirCarta(b.dataset.carta); });
     raiz.querySelector('[data-pode-vir]').onclick = oQuePodeVir;
-    const esc = raiz.querySelector('[data-escolher]');
-    if (esc) esc.onclick = escolherGloria;
     if (CC.ligarVoltarDoTopo) CC.ligarVoltarDoTopo(raiz);
   }
 
@@ -304,26 +332,32 @@
   }
 
   // ---------- O que pode vir ----------
-  // As chances são públicas: a de cada raridade, as proteções e os números da própria pessoa.
+  // As chances são públicas: as do sorteio comum e as do sorteio de marco, as proteções e os
+  // números da própria pessoa.
   function oQuePodeVir() {
     const P = R().PESOS;
     const r = R().resumo(estado(), CC.hojeIso());
+    const M = R().chancesDeMarco(r.marcosSemGloria);
     const atual = r.albuns.find((a) => a.id === r.atual);
     const linha = (rar, texto) => '<li>' + icone(rar) + '<span><b>' + NOMES[rar] + '</b> ' + texto + '</span></li>';
     CC.folha('<h2>O que pode vir</h2>'
       + '<p class="passo-dica pequena">Cada baú sorteia uma raridade e depois a carta.</p>'
-      + '<ul class="album-chances">' + ['linho', 'bronze', 'prata', 'ouro'].map((v) => linha(v, P[v] + '%')).join('')
-      + linha('gloria', 'não sai no sorteio') + '</ul>'
+      + '<ul class="album-chances" data-tabela="comum">' + ORDEM.map((v) => linha(v, P[v] + '%')).join('') + '</ul>'
+      + '<h3 class="album-sub">Nos marcos</h3>'
+      + '<p class="passo-dica pequena">Álbum completo, fim de uma unidade da Trilha, 100 e 365 dias de leitura: um sorteio a mais, sem Linho nem Bronze.</p>'
+      + '<ul class="album-chances" data-tabela="marco">' + ['prata', 'ouro', 'gloria'].map((v) => linha(v, M[v] + '%')).join('') + '</ul>'
       + '<h3 class="album-sub">Proteções</h3><ul class="album-regras">'
       + '<li>A primeira carta é uma Prata.</li>'
-      + '<li>No máximo ' + R().MAX_SEM_ALTA + ' seguidas sem Prata ou Ouro.</li>'
+      + '<li>No máximo ' + R().MAX_SEM_ALTA + ' seguidas sem Prata ou melhor.</li>'
       + '<li>A partir do ' + R().OURO_SOBE_EM + 'º sorteio sem Ouro, a chance dele sobe ' + R().OURO_PASSO + ' pontos a cada um, e o ' + R().OURO_ATE + 'º é Ouro.</li>'
+      + '<li>A cada marco sem Glória, a chance dela no marco seguinte sobe ' + R().MARCO_PASSO + ' pontos.</li>'
       + '<li>As cartas que você ainda não tem saem mais, principalmente as do álbum atual.</li>'
-      + '<li>A versão Glória você escolhe ao completar um álbum ou uma unidade da Trilha, e nos 100 e 365 dias de leitura.</li></ul>'
+      + (r.lancadas < r.totalCartas ? '<li>Hoje podem sair ' + r.lancadas + ' das ' + r.totalCartas + ' cartas.</li>' : '') + '</ul>'
       + '<h3 class="album-sub">Você</h3><ul class="album-regras">'
-      + (atual ? '<li>Álbum atual: ' + CC.esc(atual.nome) + ', ' + atual.tem + ' de ' + atual.total + ' cartas.</li>' : '<li>Todas as cartas já estão no álbum. Agora vêm as versões.</li>')
+      + (atual ? '<li>Álbum atual: ' + CC.esc(atual.nome) + ', ' + atual.tem + ' de ' + atual.total + ' cartas.</li>' : '')
       + '<li>Desde o último Ouro: ' + plural(r.semOuro, 'sorteio', 'sorteios') + '.</li>'
-      + '<li>Desde a última Prata ou Ouro: ' + plural(r.semAlta, 'sorteio', 'sorteios') + '.</li></ul>'
+      + '<li>Desde a última Prata ou melhor: ' + plural(r.semAlta, 'sorteio', 'sorteios') + '.</li>'
+      + '<li>No seu próximo marco, a Glória tem ' + M.gloria + '%.</li></ul>'
       + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>', {
       rotulo: 'O que pode vir',
       classe: 'folha-pode-vir',
@@ -332,39 +366,5 @@
     });
   }
 
-  // ---------- a escolha da Glória ----------
-  function escolherGloria() {
-    const cartas = estado();
-    const tem = R().tem(cartas);
-    const ids = CATALOGO.cartas.filter((c) => R().podeGloria(cartas, c.id)).map((c) => c.id);
-    if (!ids.length) return;
-    const largura = innerWidth >= 720 ? 96 : Math.floor((Math.min(innerWidth, 560) - 32 - 3 * 10) / 4);
-    CC.telaCheia('<div class="album-escolha"><h1>Versão Glória</h1><p class="passo-dica">Escolha a carta.</p>'
-      + '<div class="album-grade" style="--album-mini:' + largura + 'px">' + ids.map((id) => '<button class="album-carta" data-glorificar="' + id + '" aria-label="' + CC.esc(porId.get(id).titulo) + '">'
-        + '<span class="album-mini" data-mini="' + id + '"></span></button>').join('') + '</div></div>', {
-      classe: 'tela-carta tela-escolha',
-      rotulo: 'Escolher a versão Glória',
-      fecharAoNavegar: true,
-      pe: '<button class="botao plano" data-depois>Depois</button>',
-      ligar: (el, fechar) => {
-        el.querySelectorAll('[data-mini]').forEach((m) => m.appendChild(miniatura(paraArte(m.dataset.mini, melhor(tem[m.dataset.mini])), largura)));
-        el.querySelector('[data-depois]').onclick = fechar;
-        el.querySelectorAll('[data-glorificar]').forEach((b) => {
-          b.onclick = async () => {
-            const id = b.dataset.glorificar;
-            const sim = await CC.confirmar({ titulo: 'Versão Glória de ' + porId.get(id).titulo + '?', acao: 'Escolher' });
-            if (!sim) return;
-            const novo = R().escolherGloria(estado(), id);
-            if (!novo) return;
-            CC.gravar('cartas', novo);
-            fechar();
-            CC.redesenhar();
-            abrirCarta(id, 'gloria');
-          };
-        });
-      },
-    });
-  }
-
-  CC.album = { CATALOGO, tela, abrirCarta, oQuePodeVir, escolherGloria, revelarNoBau, revelarNovas, paraArte, temArte };
+  CC.album = { CATALOGO, tela, abrirCarta, oQuePodeVir, revelarNoBau, revelarNovas, paraArte, temArte };
 })(window.CC);

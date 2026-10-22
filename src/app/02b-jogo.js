@@ -217,11 +217,13 @@
   };
   CC.albunsDeCartas = (e) => {
     const c = est(e).cartas || {};
-    const tem = new Set(Object.values(c.eventos || {}).concat(Object.values(c.glorias || {})).map((x) => x.carta).filter(Boolean));
+    const tem = new Set(Object.values(c.eventos || {}).map((x) => x.carta).filter(Boolean));
     const hoje = CC.hojeIso();
     return (window.CARTAS_INDICE || []).filter((a) => !a.especial && a.lancadoEm <= hoje).map((a) => {
+      // "~": carta ainda não lançada; o álbum só completa com as 13 lançadas e na coleção
       const ids = a.c.split(' ');
-      return { id: a.id, nome: a.nome, feitos: ids.filter((id) => tem.has(id)).length, total: ids.length };
+      const feitos = ids.filter((id) => tem.has(id.replace('~', ''))).length;
+      return { id: a.id, nome: a.nome, feitos, total: ids.length, completo: ids.every((id) => id[0] !== '~' && tem.has(id)) };
     });
   };
 
@@ -352,7 +354,7 @@
       { tipo: 'plano', cor: 'verde', titulo: 'Plano de um ano', feitos: lidos.size, total: 365, ganho: lidos.size >= 365 },
     ];
     // Álbuns de cartas: um troféu por álbum completo (as 13, em qualquer versão).
-    const albuns = CC.albunsDeCartas(e).map((a) => ({ tipo: 'album', cor: 'amarelo', titulo: a.nome, feitos: a.feitos, total: a.total, ganho: a.feitos === a.total }));
+    const albuns = CC.albunsDeCartas(e).map((a) => ({ tipo: 'album', cor: 'amarelo', titulo: a.nome, feitos: a.feitos, total: a.total, ganho: a.completo }));
     return { colecoes, unidades, desafios, testamentos, albuns };
   };
 

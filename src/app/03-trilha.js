@@ -706,7 +706,8 @@
   CC.telaBau = function (numero) {
     const u = unidadeDoDia(numero);
     const pecas = CC.pedirCartas();
-    pecas.catch(() => { /* sem as peças, o baú abre com o versículo */ });
+    let prontas = false;
+    pecas.then(() => { prontas = true; }, () => { /* sem as peças, o baú abre com o versículo */ });
     if (CC.story) CC.story.prepararFontes();
     CC.telaCheia('<div class="cena-bau">'
       + '<h1>Um baú na estrada!</h1>'
@@ -718,16 +719,19 @@
         botao.onclick = async () => {
           botao.disabled = true;
           const bau = CC.abrirBau(numero);
-          botao.classList.add('abrindo');
           CC.vibrar('conquista');
-          const [, comCartas] = await Promise.all([CC.esperar(650), comPrazo(pecas, 2500)]);
+          // Com as peças prontas, a arte faz a abertura inteira (CC.cartas.revelar): o baú não
+          // anima duas vezes. Esperando por elas, este balança.
+          if (!prontas) botao.classList.add('abrindo');
+          const comCartas = prontas || (await Promise.all([CC.esperar(650), comPrazo(pecas, 2500)]))[1];
           const palco = el.querySelector('.tela-cheia-palco');
           const ref = bau.ref || CC.versiculoDoBau(numero);
           const novos = CC.guardarConquistas();
           if (CC.publicarNovidades) CC.publicarNovidades({ niveis: novos });
           if (comCartas) {
-            CC.cartasEmDia({ calado: true });
-            if (CC.album.revelarNoBau(el, palco, { chave: CC.cartasRegras.chaveDoBau(numero, CC.estado()), ref, fechar })) { CC.arte.confete(el); return; }
+            const chave = CC.cartasRegras.chaveDoBau(numero, CC.estado());
+            const pago = CC.cartasEmDia({ calado: true });
+            if (CC.album.revelarNoBau(el, palco, { chave, ref, fechar, outros: pago.novos.filter((x) => x.chave !== chave && x.fonte !== 'bau') })) return;
           }
           palco.innerHTML = '<div class="cena-carta revelando"><h1>Baú aberto!</h1>'
             + '<p class="passo-dica">Um versículo dos sete dias que você acabou de ler.</p>'
