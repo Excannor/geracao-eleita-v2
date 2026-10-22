@@ -2854,8 +2854,8 @@
       CC.story.logo(k, lx - 2, ly - 2, h, V.claro ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.28)');
       const gl = k.createLinearGradient(lx, ly, lx + w, ly + h);
       gl.addColorStop(0, V.anel[1]);
-      gl.addColorStop(0.5, V.anel[0]);
-      gl.addColorStop(1, V.anel[2]);
+      gl.addColorStop(0.55, V.claro ? V.anel[0] : V.anel[1]);
+      gl.addColorStop(1, V.anel[0]);
       CC.story.logo(k, lx, ly, h, gl);
     }
     escrever(k, 'GERAÇÃO ELEITA', CW / 2, cy + R + 96, oswald(30, 600), 'rgba(' + V.traco + ',' + (V.claro ? 0.95 : 0.85) + ')', { alinhar: 'center', espaco: 9 });
@@ -2992,6 +2992,7 @@
   // brilho fica fora do texto por clip-path (as medidas de JX/JY/PY acima, em %).
   // Toque: vira para o verso e volta. Arraste na horizontal: gira livre e, ao soltar, assenta
   // no lado mais perto. Com menos movimento: não inclina, o brilho fica parado e virar é troca.
+  const ARTE_CLARA = new Set(['davi', 'poco']);
   const INCLINACAO = { linho: 7, bronze: 10, prata: 12, ouro: 14, gloria: 14 };
   const menosMovimento = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
     || document.documentElement.classList.contains('menos-movimento');
@@ -3051,6 +3052,8 @@
     const el = document.createElement('div');
     el.className = 'carta-viva';
     el.dataset.raridade = rar;
+    // arte clara (papel, terra ao sol): o holo da arte troca o color-dodge, que estoura o claro
+    if (ARTE_CLARA.has(carta.desenho)) el.dataset.arte = 'clara';
     el.style.setProperty('--largura', largura + 'px');
     el.setAttribute('role', 'img');
     el.setAttribute('aria-label', 'Carta ' + carta.album + ', ' + carta.numero + ' de ' + carta.total + ', ' + RARIDADES[rar].nome + ': '

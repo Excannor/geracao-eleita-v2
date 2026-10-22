@@ -13,7 +13,7 @@
   --zona-sem-texto: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.6% 70%, 94.4% 70%, 94.4% 95%, 5.6% 95%, 5.6% 70%, 0 0);
   --sem-rotulos: radial-gradient(ellipse 35% 4.4% at 50% 5.6%, transparent 60%, #000 100%), radial-gradient(ellipse 25% 3.2% at 50% 97.6%, transparent 60%, #000 100%);
   --zona-verso-campo: inset(4% 5.6% round 2.5% / 1.8%);
-  --sem-marca-verso: radial-gradient(ellipse 30% 4.4% at 50% 67.6%, transparent 58%, #000 100%);
+  --sem-marca-verso: radial-gradient(ellipse 44% 8% at 50% 67.6%, rgba(0, 0, 0, .05) 28%, #000 100%);
   --zona-verso-moldura: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.6% 4%, 94.4% 4%, 94.4% 96%, 5.6% 96%, 5.6% 4%, 0 0);
   position: relative; width: var(--largura, 300px); aspect-ratio: 5 / 7; perspective: 1100px; isolation: isolate;
   touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; cursor: pointer;
@@ -103,6 +103,10 @@
 [data-raridade="ouro"] .cv-verso .cv-purpurina { -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 24%, transparent 56%), var(--sem-marca-verso); mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 24%, transparent 56%), var(--sem-marca-verso); -webkit-mask-composite: source-in; mask-composite: intersect; }
 [data-raridade="ouro"] .cv-verso .cv-metal { clip-path: var(--zona-verso-moldura); }
 
+/* Na arte clara (o papel do Davi, a terra do poço), o holo da arte é soft-light: o dodge estoura */
+[data-arte="clara"]:is([data-raridade="ouro"], [data-raridade="gloria"]) .cv-frente .cv-holo { mix-blend-mode: soft-light; filter: saturate(1.4) contrast(1.1); opacity: calc(.2 + var(--o) * .75); }
+[data-arte="clara"]:is([data-raridade="ouro"], [data-raridade="gloria"]) .cv-frente .cv-purpurina { mix-blend-mode: overlay; }
+
 /* Glória: prismático na carta toda (menos o texto), o "cosmos" (névoa colorida e estrelas)
    e o halo de luz em volta */
 [data-raridade="gloria"] .cv-holo {
@@ -141,9 +145,10 @@
   background:
     radial-gradient(closest-side, rgba(255, 240, 190, .95), rgba(255, 228, 160, .55) 60%, rgba(255, 228, 160, 0)),
     conic-gradient(from 0deg, rgba(255, 214, 120, .7), rgba(196, 238, 176, .6), rgba(160, 206, 255, .65), rgba(218, 186, 255, .6), rgba(255, 214, 120, .7));
-  filter: blur(28px); opacity: calc(.55 + var(--o) * .35); animation: cv-halo 12s linear infinite;
+  filter: blur(28px); opacity: calc(.55 + var(--o) * .35); animation: cv-halo 9s ease-in-out infinite alternate;
 }
-@keyframes cv-halo { to { transform: rotate(1turn); } }
+/* o halo muda de cor devagar; girar mudaria a caixa dele e abriria rolagem para o lado */
+@keyframes cv-halo { to { filter: blur(28px) hue-rotate(50deg); } }
 
 .cv-botao-virar {
   display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 1px solid rgba(242, 236, 216, .35);
@@ -154,7 +159,7 @@
 .cv-mini { display: block; aspect-ratio: 5 / 7; height: auto; border-radius: 4.6% / 3.3%; box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .55); }
 
 /* ---------- a revelação no baú ---------- */
-.rv { position: relative; display: grid; justify-items: center; align-content: start; gap: 12px; padding: 56px 16px 24px; color: #f2ecd8; text-align: center; }
+.rv { position: relative; overflow: hidden; display: grid; justify-items: center; align-content: start; gap: 12px; padding: 56px 16px 24px; color: #f2ecd8; text-align: center; }
 .rv-pular {
   position: absolute; top: 10px; right: 10px; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px;
   background: rgba(242, 236, 216, .1); color: #f2ecd8; font: 600 .875rem/1 Manrope, sans-serif; cursor: pointer;
