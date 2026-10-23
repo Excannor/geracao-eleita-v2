@@ -10122,12 +10122,16 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
   function tuboDeOuro(k, c, larg, { luz = -1, obj, claro = 0, tom = tomDeOuro, tinta = TINTA_OURO, brilhoCor = 'rgba(255,246,214,.75)', semPontas = false } = {}) {
     const { forma, e: bordaE, d: bordaD } = tuboAo(c, larg);
     marcar(k, obj, forma);
+    // o lado da sombra de cada amostra é o que olha para baixo e para a direita (a luz vem de
+    // cima, da esquerda), qualquer que seja o sentido em que a curva foi traçada
+    const lado = (q) => ((q.ty * 0.55 - q.tx * 0.83) >= 0 ? 1 : -1);
     k.save();
     k.clip(forma);
     for (const q of c) {
       const w = larg(q.s) / 2 + 1.5;
+      const sl = lado(q);
       for (let v = -1; v <= 1.001; v += 0.2) {
-        const l = Math.max(0, Math.min(1, 0.5 - v * luz * 0.42 - Math.abs(v) * 0.18 + claro));
+        const l = Math.max(0, Math.min(1, 0.5 + v * sl * 0.42 - Math.abs(v) * 0.18 + claro));
         k.fillStyle = tom(0.2 + l * 0.75);
         k.beginPath();
         k.arc(q.x - q.ty * v * w, q.y + q.tx * v * w, Math.max(1.6, w * 0.24), 0, 6.283);
@@ -10136,20 +10140,23 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     }
     k.strokeStyle = tinta;
     k.lineCap = 'round';
-    for (let i = 0; i < c.length; i += 1) {
+    for (let i = 0; i < c.length; i += 2) {
       const q = c[i];
-      if (i % 1) continue;
       const w = larg(q.s) / 2;
-      k.lineWidth = 0.75;
-      k.beginPath();
-      k.moveTo(q.x + q.ty * luz * 0.2 * w, q.y - q.tx * luz * 0.2 * w);
-      k.lineTo(q.x + q.ty * luz * 1.0 * w, q.y - q.tx * luz * 1.0 * w);
-      k.stroke();
+      // os traços de volta só no lado da sombra, mais grossos perto da beirada
+      for (const [v0, v1, lw] of [[0.05, 0.45, 0.6], [0.45, 1.0, 1.1]]) {
+        k.lineWidth = lw;
+        k.beginPath();
+        const sl = lado(q);
+        k.moveTo(q.x + q.ty * sl * v0 * w, q.y - q.tx * sl * v0 * w);
+        k.lineTo(q.x + q.ty * sl * v1 * w, q.y - q.tx * sl * v1 * w);
+        k.stroke();
+      }
     }
     k.strokeStyle = brilhoCor;
     k.lineWidth = Math.max(1, larg(0) * 0.08);
     k.beginPath();
-    c.forEach((q, i) => { const w = larg(q.s) / 2; const x = q.x - q.ty * luz * -0.55 * w; const y = q.y + q.tx * luz * -0.55 * w; if (i) k.lineTo(x, y); else k.moveTo(x, y); });
+    c.forEach((q, i) => { const w = larg(q.s) / 2; const sl = lado(q); const x = q.x - q.ty * sl * 0.55 * w; const y = q.y + q.tx * sl * 0.55 * w; if (i) k.lineTo(x, y); else k.moveTo(x, y); });
     k.stroke();
     k.restore();
     k.strokeStyle = tinta;
@@ -10157,61 +10164,142 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     if (semPontas) { k.stroke(pol(bordaE, false)); k.stroke(pol(bordaD, false)); } else k.stroke(forma);
     return forma;
   }
-  // Uma taça em flor de amêndoa num braço do candelabro (Êx 25.33): o botão (o bulbo redondo)
-  // e a flor (o cálice de cinco pétalas que abre para cima), em ouro, na direção do braço.
+  // Um corpo de ouro torneado (o pé do candelabro): o perfil é a lista [y, raio] de cima para
+  // baixo; visto um pouco de cima, cada anel é uma elipse achatada (kE). O tom corre da luz (à
+  // esquerda) para a sombra, as linhas da gravura são verticais, mais grossas na sombra, e o
+  // tampo de cada degrau fica aceso.
+  function torneadoDeOuro(k, cx, perfil, kE, obj) {
+    const esq = perfil.map(([y, rr]) => [cx - rr, y]);
+    const dir = perfil.map(([y, rr]) => [cx + rr, y]).reverse();
+    const [yb, rb] = perfil[perfil.length - 1];
+    const forma = new Path2D();
+    forma.moveTo(esq[0][0], esq[0][1]);
+    for (const p of esq) forma.lineTo(p[0], p[1]);
+    forma.ellipse(cx, yb, rb, rb * kE, 0, Math.PI, 0, true);
+    for (const p of dir) forma.lineTo(p[0], p[1]);
+    forma.closePath();
+    const rMax = Math.max(...perfil.map((p) => p[1]));
+    const g = k.createLinearGradient(cx - rMax, 0, cx + rMax, 0);
+    g.addColorStop(0, tomDeOuro(0.5));
+    g.addColorStop(0.28, tomDeOuro(0.92));
+    g.addColorStop(0.62, tomDeOuro(0.55));
+    g.addColorStop(1, tomDeOuro(0.18));
+    k.fillStyle = g;
+    k.fill(forma);
+    marcar(k, obj, forma);
+    // as linhas verticais que seguem o volume (curvas como as elipses), na sombra
+    k.save();
+    k.clip(forma);
+    k.strokeStyle = TINTA_OURO;
+    k.lineCap = 'round';
+    for (let u = -0.98; u <= 0.98; u += 0.05) {
+      const sv = u > -0.3 ? (u + 0.3) * 1.4 : (-0.62 - u) * 1.5;
+      if (sv <= 0.08) continue;
+      k.lineWidth = Math.min(2, sv * 1.8);
+      k.beginPath();
+      perfil.forEach(([y, rr], i) => { const x = cx + u * rr; const yy = y + Math.sqrt(Math.max(0, 1 - u * u)) * rr * kE; if (i) k.lineTo(x, yy); else k.moveTo(x, yy); });
+      k.stroke();
+    }
+    k.restore();
+    // os degraus: onde o raio aumenta de repente, o tampo do degrau, aceso, e a sua beirada
+    for (let i = 1; i < perfil.length; i++) {
+      const [y0, r0] = perfil[i - 1];
+      const [y1, r1] = perfil[i];
+      if (r1 - r0 > 6 && y1 - y0 < 6) {
+        const tampo = new Path2D();
+        tampo.ellipse(cx, y1, r1, r1 * kE, 0, 0, 6.283);
+        k.save();
+        k.clip(tampo);
+        const gt = k.createLinearGradient(cx - r1, 0, cx + r1, 0);
+        gt.addColorStop(0, tomDeOuro(0.98));
+        gt.addColorStop(1, tomDeOuro(0.6));
+        k.fillStyle = gt;
+        k.fill(tampo);
+        k.restore();
+        k.strokeStyle = TINTA_OURO;
+        k.lineWidth = 1.4;
+        k.beginPath();
+        k.ellipse(cx, y1, r1, r1 * kE, 0, 0, Math.PI);
+        k.stroke();
+        k.strokeStyle = tomDeOuro(0.4);
+        k.beginPath();
+        k.ellipse(cx, y1, r0, r0 * kE, 0, 0, Math.PI);
+        k.stroke();
+      }
+    }
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 2;
+    k.stroke(forma);
+  }
+  // Uma taça em flor de amêndoa num braço do candelabro (Êx 25.33), de uma peça com ele: o
+  // botão (um anel bojudo, mais largo que o braço, que o abraça) e a flor (o cálice que sai do
+  // braço e abre em três pétalas viradas para a lâmpada, cada uma com a nervura); o braço
+  // continua de dentro do cálice. "ang" 0 é o braço subindo; w é a largura do braço.
   function tacaDeAmendoa(k, x, y, ang, w, obj, flor = true) {
     k.save();
     k.translate(x, y);
     k.rotate(ang);
-    // o botão
-    const b = new Path2D();
-    b.ellipse(0, 0, w * 0.72, w * 0.95, 0, 0, 6.283);
-    const g = k.createLinearGradient(-w, 0, w, 0);
-    g.addColorStop(0, tomDeOuro(0.92));
-    g.addColorStop(0.45, tomDeOuro(0.62));
-    g.addColorStop(1, tomDeOuro(0.22));
-    k.fillStyle = g;
-    k.fill(b);
-    marcar(k, obj, b);
-    gravar(k, b, 0, 0, w * 1.2, 0.2, 2.2, 0.9, (px) => 0.2 + px / w * 0.5, TINTA_OURO, 0.3);
+    const pinta = (p, a0, a1) => {
+      const g = k.createLinearGradient(-w * 1.2, 0, w * 1.2, 0);
+      g.addColorStop(0, tomDeOuro(a0));
+      g.addColorStop(0.35, tomDeOuro(0.82));
+      g.addColorStop(1, tomDeOuro(a1));
+      k.fillStyle = g;
+      k.fill(p);
+      marcar(k, obj, p);
+    };
+    // o botão: um anel bojudo em volta do braço
+    const bt = new Path2D();
+    bt.moveTo(-w * 0.5, w * 1.0);
+    bt.bezierCurveTo(-w * 0.95, w * 0.95, -w * 0.95, w * 0.25, -w * 0.5, w * 0.18);
+    bt.lineTo(w * 0.5, w * 0.18);
+    bt.bezierCurveTo(w * 0.95, w * 0.25, w * 0.95, w * 0.95, w * 0.5, w * 1.0);
+    bt.closePath();
+    pinta(bt, 0.55, 0.2);
+    k.save();
+    k.clip(bt);
     k.strokeStyle = TINTA_OURO;
-    k.lineWidth = 1.4;
-    k.stroke(b);
+    k.lineWidth = 0.8;
+    for (let u = 0.1; u < 1; u += 0.18) { k.beginPath(); k.moveTo(u * w * 0.9, w * 0.2); k.quadraticCurveTo(u * w * 1.05, w * 0.6, u * w * 0.9, w * 1.0); k.stroke(); }
+    k.restore();
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 1.3;
+    k.stroke(bt);
     if (!flor) { k.restore(); return; }
-    // a flor: o cálice que abre, com as pétalas recortadas
+    // o cálice: sai do braço logo acima do botão e abre em três pétalas
     const f = new Path2D();
-    const y0 = -w * 0.8;
-    f.moveTo(-w * 0.45, y0);
-    f.bezierCurveTo(-w * 0.9, y0 - w * 0.4, -w * 1.25, y0 - w * 0.9, -w * 1.15, y0 - w * 1.3);
-    f.quadraticCurveTo(-w * 0.75, y0 - w * 1.05, -w * 0.5, y0 - w * 1.4);
-    f.quadraticCurveTo(-w * 0.25, y0 - w * 1.1, 0, y0 - w * 1.5);
-    f.quadraticCurveTo(w * 0.25, y0 - w * 1.1, w * 0.5, y0 - w * 1.4);
-    f.quadraticCurveTo(w * 0.75, y0 - w * 1.05, w * 1.15, y0 - w * 1.3);
-    f.bezierCurveTo(w * 1.25, y0 - w * 0.9, w * 0.9, y0 - w * 0.4, w * 0.45, y0);
+    f.moveTo(-w * 0.48, w * 0.12);
+    f.bezierCurveTo(-w * 0.6, -w * 0.2, -w * 1.15, -w * 0.5, -w * 1.2, -w * 1.0);
+    f.quadraticCurveTo(-w * 0.75, -w * 0.82, -w * 0.42, -w * 0.72);
+    f.quadraticCurveTo(-w * 0.3, -w * 1.15, 0, -w * 1.4);
+    f.quadraticCurveTo(w * 0.3, -w * 1.15, w * 0.42, -w * 0.72);
+    f.quadraticCurveTo(w * 0.75, -w * 0.82, w * 1.2, -w * 1.0);
+    f.bezierCurveTo(w * 1.15, -w * 0.5, w * 0.6, -w * 0.2, w * 0.48, w * 0.12);
     f.closePath();
-    const g2 = k.createLinearGradient(-w, 0, w, 0);
-    g2.addColorStop(0, tomDeOuro(0.95));
-    g2.addColorStop(0.5, tomDeOuro(0.7));
-    g2.addColorStop(1, tomDeOuro(0.3));
-    k.fillStyle = g2;
-    k.fill(f);
-    marcar(k, obj, f);
+    pinta(f, 0.6, 0.25);
+    k.save();
+    k.clip(f);
+    // a sombra do lado de lá de cada pétala e as nervuras
     k.strokeStyle = TINTA_OURO;
-    k.lineWidth = 1;
-    for (const dx of [-0.75, -0.25, 0.25, 0.75]) {
+    k.lineCap = 'round';
+    for (const [sx, tx, ty] of [[-0.3, -1.05, -0.9], [0, 0, -1.25], [0.3, 1.05, -0.9]]) {
+      k.lineWidth = 1;
       k.beginPath();
-      k.moveTo(dx * w * 0.5, y0);
-      k.quadraticCurveTo(dx * w * 0.9, y0 - w * 0.6, dx * w * 1.15, y0 - w * 1.15);
+      k.moveTo(sx * w, -w * 0.05);
+      k.quadraticCurveTo((sx + tx) * w * 0.5, -w * 0.45, tx * w * 0.9, ty * w * 0.92);
       k.stroke();
     }
-    k.lineWidth = 1.4;
+    gravar(k, f, 0, -w * 0.5, w * 1.6, 1.2, 2.2, 1, (px) => (px / w) * 0.6 + 0.05, TINTA_OURO, 0);
+    k.restore();
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 1.3;
     k.stroke(f);
     k.restore();
   }
 
   // ---------- (4) O candelabro de ouro (Êx 25.31-37) ----------
-  // De noite, no Lugar Santo: o candelabro de ouro batido, de frente, uma peça só: o pé de três
-  // garras, a haste com as suas quatro taças, e os seis braços em arco (três de cada lado), cada
+  // De noite, no Lugar Santo: o candelabro de ouro batido, de frente, uma peça só: o pedestal
+  // torneado (disco, degrau e domo), a haste com as suas quatro taças, e os seis braços em arco (três de cada lado), cada
   // um com três taças em flor de amêndoa, botão e flor; um botão debaixo de cada par de braços
   // (25.35). No alto, as sete lâmpadas acesas, com o bico virado para a frente (25.37). Atrás,
   // as tábuas de acácia revestidas de ouro, com as travessas, na penumbra.
@@ -10329,51 +10417,24 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         bracos.push({ c: curvaPor(pts, 2.5), lado, i, R, h });
       }
     }
-    // o pé: três garras, a base em domo e o começo da haste
-    const pe = new Path2D();
-    pe.moveTo(cx - 34, 650);
-    pe.bezierCurveTo(cx - 40, 690, cx - 90, 716, cx - 118, 742);
-    pe.quadraticCurveTo(cx - 132, 756, cx - 116, 760);
-    pe.lineTo(cx - 84, 760);
-    pe.quadraticCurveTo(cx - 60, 740, cx - 30, 736);
-    pe.quadraticCurveTo(cx, 734, cx + 30, 736);
-    pe.quadraticCurveTo(cx + 60, 740, cx + 84, 760);
-    pe.lineTo(cx + 116, 760);
-    pe.quadraticCurveTo(cx + 132, 756, cx + 118, 742);
-    pe.bezierCurveTo(cx + 90, 716, cx + 40, 690, cx + 34, 650);
-    pe.closePath();
-    const gpe = k.createLinearGradient(cx - 120, 0, cx + 120, 0);
-    gpe.addColorStop(0, tomDeOuro(0.85));
-    gpe.addColorStop(0.4, tomDeOuro(0.62));
-    gpe.addColorStop(1, tomDeOuro(0.22));
-    k.fillStyle = gpe;
-    k.fill(pe);
-    marcar(k, obj, pe);
-    gravar(k, pe, cx, 705, 140, 1.25, 3, 1.5, (x, y) => 0.15 + (x - cx + 120) / 240 * 0.6 + (y - 650) / 300, TINTA_OURO, 0.2);
-    k.strokeStyle = TINTA_OURO;
-    k.lineWidth = 2;
-    k.stroke(pe);
-    // a garra de trás, no meio, e o friso da base
-    k.lineWidth = 1.4;
-    k.beginPath();
-    k.moveTo(cx - 30, 736);
-    k.quadraticCurveTo(cx, 724, cx + 30, 736);
-    k.stroke();
+    // o pé (25.31 "o pedestal"): torneado de ouro, visto um pouco de cima: o disco largo do
+    // chão, o degrau, o domo que sobe e o colar onde a haste começa
+    torneadoDeOuro(k, cx, [[640, 18], [652, 18], [656, 26], [668, 30], [690, 48], [712, 76], [728, 96], [734, 98], [736, 112], [748, 114], [750, 124], [764, 126]], 0.22, obj);
     // a haste
-    const haste = curvaPor([[cx, 660], [cx, topo]], 2.5);
-    tuboDeOuro(k, haste, (s) => hW * 2 + (s < 30 ? (30 - s) * 0.5 : 0), { luz: -1, obj });
+    const haste = curvaPor([[cx, 642], [cx, topo]], 2.5);
+    tuboDeOuro(k, haste, () => hW * 2, { luz: -1, obj });
     // os braços (os de trás primeiro não há: todos no mesmo plano, de frente)
     for (const b of bracos) tuboDeOuro(k, b.c, () => hW * 1.7, { luz: -1, obj });
     // um botão debaixo de cada par de braços, na haste (25.35)
-    for (const y of sai) tacaDeAmendoa(k, cx, y + 14, 0, 18, obj, false);
+    for (const y of sai) tacaDeAmendoa(k, cx, y + 4, 0, hW * 1.7, obj, false);
     // as quatro taças da haste (25.34): no alto e entre os pares
-    for (const y of [600, 438, 360, 280]) tacaDeAmendoa(k, cx, y, 0, 13, obj);
+    for (const y of [600, 444, 366, 290]) tacaDeAmendoa(k, cx, y, 0, hW * 1.5, obj);
     // as três taças de cada braço, ao longo do arco, na direção dele
     for (const b of bracos) {
       const L = b.c[b.c.length - 1].s;
-      for (const f of [0.3, 0.58, 0.84]) {
+      for (const f of b.i === 2 ? [0.3, 0.55, 0.78] : [0.28, 0.56, 0.83]) {
         const q = b.c[Math.round((f * L) / 2.5)];
-        tacaDeAmendoa(k, q.x, q.y, Math.atan2(q.tx, -q.ty), 12, obj);
+        tacaDeAmendoa(k, q.x, q.y, Math.atan2(q.ty, q.tx) + Math.PI / 2, hW * 1.3, obj);
       }
     }
     // as sete lâmpadas de ouro, com o bico virado para a frente e a chama acesa
