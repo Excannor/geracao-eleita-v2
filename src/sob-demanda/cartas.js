@@ -6280,7 +6280,8 @@
     'candelabro': desenhoCandelabro,
     'tabuas-alianca': desenhoTabuas,
     'serpente-bronze': desenhoSerpente,
-    'harpa-davi': desenhoHarpa };
+    'harpa-davi': desenhoHarpa,
+    'manto-elias': desenhoManto };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
   // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
   // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
@@ -6289,7 +6290,7 @@
   // Gideão: a corneta, deitada embaixo à direita; Ester: o alto do dossel, na beirada de cima; Sara: as
   // borlas do pano da tenda, no alto; Raabe: o terraço com o linho, no alto da casa; a
   // Multidão: a soleira da largada, acima do papel.
-  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96], /* objetos */ 'tunica-jose': [0.5, 0.94, 0.95], 'candelabro': [0.5, 0.93, 0.94] };
+  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96], /* objetos */ 'tunica-jose': [0.5, 0.94, 0.95], 'candelabro': [0.5, 0.93, 0.94], 'manto-elias': [0.5, 0.86, 0.96] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
@@ -11179,6 +11180,273 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       peca(k, bt, [a - 14, b - 16, a + 14, b + 16], { cor: '#93602f', ang: 1, passo: 2.4, maxL: 1.2, sombra: sombraOval(a, b, 13, 15, 0), cruzada: 0.7, traco: 1.8, obj });
     }
     vinheta(k, W, H, 0.32);
+  }
+  // ---------- (8) O manto de Elias (2 Rs 2.13-14) ----------
+  // Sobre o Jordão, de tarde: o manto de pelos de Elias (2 Rs 1.8) ainda caindo do alto,
+  // depois que o redemoinho o levou (2.11-13), aberto no ar em ondas largas, com a barra
+  // costurada e uma quina virada. Embaixo, o rio corre de lado a lado e já está aberto num
+  // caminho de leito molhado, de uma margem à outra (2.14): a água para e amontoa baixa dos
+  // dois lados do vão. No céu, só os rastros do vento que subiu. Sem gente.
+  function desenhoManto(k, W, H, obj) {
+    const r = sorteio(7801);
+    papelVelho(k, W, H, r, ['#f8ecd2', '#ecd6ae', '#cfae80'], [620, 160]);
+    const hz = 420;
+    ceuEmLinhas(k, W, hz, [[160, 330, 220, 22], [760, 370, 180, 16]], { topo: 0.48, base: 0.1 });
+    // os rastros do vento que subiu: poucas curvas compridas, abertas, que sobem para a direita
+    k.save();
+    k.lineCap = 'round';
+    for (const [x0, y0, x1, y1, c] of [[60, 380, 860, 30, -130], [160, 400, 880, 120, -100], [20, 300, 640, 0, -150]]) {
+      for (let f = 0; f < 3; f++) {
+        k.strokeStyle = 'rgba(255,250,236,' + (0.7 - f * 0.2).toFixed(2) + ')';
+        k.lineWidth = 3 - f;
+        k.beginPath();
+        k.moveTo(x0 + f * 14, y0 + f * 6);
+        k.quadraticCurveTo((x0 + x1) / 2 + f * 10, (y0 + y1) / 2 + c, x1, y1 + f * 8);
+        k.stroke();
+      }
+    }
+    k.restore();
+    // os morros da outra margem
+    for (const [base, amp, cor, sv, sem] of [[390, 44, '#e3c9a0', 0.3, 1], [424, 24, '#d1b086', 0.48, 2]]) {
+      const f = onda(sorteio(7810 + sem), 4, 0.007);
+      const m = pol([[-10, 500], ...Array.from({ length: 50 }, (_, i) => [i * 19 - 4, base - Math.abs(f(i * 19)) * amp]), [W + 10, 500]]);
+      peca(k, m, [-10, base - amp, W + 10, 500], { cor, ang: 1.2, passo: 4.2, maxL: 1.1, sombra: (x, y) => sv + (y - base + amp) / 260, cruzada: 0.9, traco: 1.4 });
+    }
+    // a outra margem, baixa, com tamargueiras
+    const outra = pol([[-10, 452], ...Array.from({ length: 30 }, (_, i) => [i * 31, 440 + Math.sin(i * 0.8) * 4]), [W + 10, 452], [W + 10, 500], [-10, 500]]);
+    k.fillStyle = '#d6bb8e';
+    k.fill(outra);
+    chaoEmLinhas(k, r, outra, -10, W + 10, 438, 500, 1.4, () => 0.45);
+    for (const [x, rx] of [[50, 30], [130, 22], [330, 24], [800, 30], [860, 22]]) copaGravada(k, r, x, 440 - rx * 0.5, rx, rx * 0.7, { cor: '#a8a070' });
+    // o rio, de lado a lado, e o vão do caminho no meio (largo perto, estreito longe)
+    const rioA = 500;
+    const rioB = 610;
+    const vaoE = (y) => 610 - (y - rioA) * 0.42;
+    const vaoD = (y) => 668 + (y - rioA) * 0.5;
+    for (const p of [pol([[-10, rioA], [vaoE(rioA), rioA], [vaoE(rioB), rioB], [-10, rioB]]), pol([[vaoD(rioA), rioA], [W + 10, rioA], [W + 10, rioB], [vaoD(rioB), rioB]])]) {
+      k.fillStyle = '#a3a690';
+      k.fill(p);
+      k.save();
+      k.clip(p);
+      k.strokeStyle = 'rgba(40,46,36,.75)';
+      k.lineCap = 'round';
+      for (let y = rioA + 3; y < rioB; y += 3 + (y - rioA) * 0.03) {
+        let x = -r() * 60;
+        while (x < W) {
+          const c = 30 + r() * 90;
+          k.lineWidth = 0.6 + (y - rioA) / 70;
+          k.beginPath();
+          k.moveTo(x, y);
+          k.quadraticCurveTo(x + c / 2, y + Math.sin(x * 0.05 + y) * 1.5, x + c, y);
+          k.stroke();
+          x += c + 8 + r() * 20;
+        }
+      }
+      k.restore();
+    }
+    // o leito molhado do vão: lama escura, pedrinhas e poças
+    const leito = pol([[vaoE(rioA), rioA], [vaoD(rioA), rioA], [vaoD(rioB), rioB], [vaoE(rioB), rioB]]);
+    k.fillStyle = '#b39c74';
+    k.fill(leito);
+    chaoEmLinhas(k, r, leito, 540, 760, rioA, rioB, 1.6, () => 0.6);
+    for (let i = 0; i < 22; i++) {
+      const y = rioA + 6 + r() * (rioB - rioA - 10);
+      const x = vaoE(y) + 6 + r() * (vaoD(y) - vaoE(y) - 12);
+      const rx = 2 + (y - rioA) / 20 + r() * 3;
+      k.fillStyle = r() < 0.5 ? '#d8c4a0' : '#6e5c40';
+      k.beginPath();
+      k.ellipse(x, y, rx, rx * 0.5, 0, 0, 6.283);
+      k.fill();
+    }
+    // a água que parou: de cada lado do vão, a beirada amontoada desce em rampa curva até o
+    // leito (mais escura embaixo), e a espuma é só uma renda torta no alto da beirada
+    for (const [f, lado] of [[vaoE, -1], [vaoD, 1]]) {
+      const larg = (y) => 14 + (y - rioA) * 0.32;
+      const pts = [];
+      for (let y = rioA; y <= rioB; y += 6) pts.push([f(y) - lado * larg(y) + Math.sin(y * 0.2) * 2, y]);
+      for (let y = rioB; y >= rioA; y -= 6) pts.push([f(y), y]);
+      const face = pol(pts);
+      k.fillStyle = '#8e957c';
+      k.fill(face);
+      k.save();
+      k.clip(face);
+      k.strokeStyle = '#283024';
+      k.lineCap = 'round';
+      for (let t = 0.05; t < 1; t += 0.12) {
+        k.lineWidth = 0.6 + t * 1.8;
+        k.beginPath();
+        for (let y = rioA - 4; y <= rioB + 4; y += 6) {
+          const x = f(y) - lado * larg(y) * (1 - t) + Math.sin(y * 0.15 + t * 5) * 1.2;
+          if (y === rioA - 4) k.moveTo(x, y); else k.lineTo(x, y);
+        }
+        k.stroke();
+      }
+      k.restore();
+      k.strokeStyle = 'rgba(252,250,238,.95)';
+      k.lineCap = 'round';
+      for (let y = rioA + 2; y < rioB - 4; y += 4 + r() * 6) {
+        const x = f(y) - lado * larg(y) + Math.sin(y * 0.2) * 2;
+        k.lineWidth = 1 + r() * 1.6;
+        k.beginPath();
+        k.moveTo(x - lado * 3, y);
+        k.quadraticCurveTo(x + lado * 2, y + 2, x + lado * (2 + r() * 5), y + 4 + r() * 3);
+        k.stroke();
+      }
+    }
+    // a margem de cá
+    const margem = pol([[-10, rioB], ...Array.from({ length: 30 }, (_, i) => [i * 31, rioB + 3 + Math.sin(i * 0.9) * 3]), [W + 10, rioB], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#dcc39a';
+    k.fill(margem);
+    chaoEmLinhas(k, r, margem, -10, W + 10, rioB, H, 1.8, (x, y) => 0.36 + (y - rioB) / 500);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.6;
+    k.stroke(margem);
+    for (const [x, y, rx, ry] of [[90, 650, 30, 11], [760, 680, 34, 12], [840, 790, 30, 11], [640, 800, 22, 8]]) {
+      const p = contornoRocha(r, [[x - rx, y + ry * 0.5], [x - rx * 0.6, y - ry * 0.8], [x + rx * 0.3, y - ry], [x + rx, y - ry * 0.1], [x + rx * 0.8, y + ry * 0.7]], 2);
+      p.closePath();
+      sombraNoChao(k, p, -rx * 0.4, ry * 0.4, 3, 0.3);
+      peca(k, p, [x - rx, y - ry, x + rx, y + ry], { cor: '#cdb995', ang: 0.6, passo: 2.8, maxL: 1.4, sombra: sombraOval(x, y, rx, ry, 0), cruzada: 0.7, traco: 1.5 });
+    }
+
+    // o manto, largado na areia da margem, perto da água: um pano pesado amarrotado, com as
+    // dobras desiguais que atravessam o pano em várias direções e a barra tecida em listras
+    // que corre torta pela beirada (em mundo: x para a direita, y para cima, z para quem olha)
+    const S0 = 450;
+    const cx0 = 440;
+    const cy0 = 690;
+    const V = (x, y, z) => [cx0 + x * S0 + z * S0 * 0.1, cy0 - y * S0 * 0.95 + z * S0 * 0.48];
+    const NU = 56;
+    const NV = 44;
+    const rugas = [];
+    for (let n = 0; n < 12; n++) rugas.push([0.1 + r() * 0.8, 0.1 + r() * 0.8, r() * 3.14, 0.018 + r() * 0.026, 0.025 + r() * 0.035, 0.9 + r() * 1.3]);
+    // duas dobras compridas e baixas, que cruzam o pano de beira a beira (nada de calombo)
+    rugas.push([0.45, 0.5, 0.35, 0.045, 0.06, 2.6], [0.68, 0.45, 2.1, 0.035, 0.05, 2.2]);
+    const malha = [];
+    for (let j = 0; j <= NV; j++) {
+      const linha = [];
+      for (let i = 0; i <= NU; i++) {
+        const u = i / NU;
+        const v = j / NV;
+        // o pano encolhe ao amarrotar: as linhas do tecido entortam
+        let X = -0.72 + u * 1.42 + Math.sin(v * 6 + u * 2) * 0.05 + Math.sin(v * 15 + 1) * 0.015;
+        let Z = -0.42 + v * 0.8 + Math.sin(u * 5 + 2) * 0.06 + Math.sin(u * 13) * 0.015;
+        // onde duas dobras se cruzam, vale a mais alta (somar faria um calombo)
+        let Y = 0.006;
+        let soma = 0;
+        for (const [ru, rv, ang, alt, larg, comp] of rugas) {
+          const dd = (u - ru) * Math.sin(ang) - (v - rv) * Math.cos(ang);
+          const ao = (u - ru) * Math.cos(ang) + (v - rv) * Math.sin(ang);
+          const h = alt * Math.exp(-((dd / larg) ** 2)) * Math.max(0, 1 - (Math.abs(ao) * 2 / comp) ** 2);
+          Y = Math.max(Y, 0.006 + h);
+          soma += h;
+        }
+        Y += (soma - Y) * 0.15;
+        // a parte da direita dobrou por cima, ao cair: o avesso (mais claro) fica para cima,
+        // num rolo baixo que faz a curva da dobra
+        let avesso = false;
+        const uf = 0.72 + (v - 0.5) * 0.08;
+        if (u > uf) {
+          const t = (u - uf) * 1.42;
+          const ang = Math.min(Math.PI, t / 0.022);
+          const raio = 0.022;
+          const xf = -0.72 + uf * 1.42 + Math.sin(v * 6 + uf * 2) * 0.05;
+          if (t < raio * Math.PI) { X = xf + Math.sin(ang) * raio; Y = 0.006 + raio - Math.cos(ang) * raio; } else { X = xf - (t - raio * Math.PI); Y = 0.006 + raio * 2 + Y * 0.5; avesso = true; }
+          Z += (u - uf) * 0.12;
+        }
+        linha.push({ X, Y, Z, u, v, avesso });
+      }
+      malha.push(linha);
+    }
+    const proj = (q) => V(q.X, q.Y, q.Z);
+    // a luz: de cima, à esquerda e da frente
+    const L = [-0.75, 0.55, 0.2];
+    const nl = Math.hypot(...L);
+    const luzDe = (i, j) => {
+      const a = malha[j][Math.min(NU, i + 1)];
+      const b = malha[j][Math.max(0, i - 1)];
+      const c = malha[Math.min(NV, j + 1)][i];
+      const d = malha[Math.max(0, j - 1)][i];
+      const du = [a.X - b.X, a.Y - b.Y, a.Z - b.Z];
+      const dv = [c.X - d.X, c.Y - d.Y, c.Z - d.Z];
+      const n = [du[1] * dv[2] - du[2] * dv[1], du[2] * dv[0] - du[0] * dv[2], du[0] * dv[1] - du[1] * dv[0]];
+      const nn = Math.hypot(...n) || 1;
+      const s = n[1] < 0 ? -1 : 1;
+      return Math.max(0, (n[0] * L[0] + n[1] * L[1] + n[2] * L[2]) * s / nn / nl);
+    };
+    // a silhueta do pano (a união das células), para a máscara e a sombra
+    const fManto = new Path2D();
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) fManto.addPath(pol([proj(malha[j][i]), proj(malha[j][i + 1]), proj(malha[j + 1][i + 1]), proj(malha[j + 1][i])]));
+    sombraNoChao(k, fManto, 22, 10, 9, 0.38);
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) { const c = pol([proj(malha[j][i]), proj(malha[j][i + 1]), proj(malha[j + 1][i + 1]), proj(malha[j + 1][i])]); marcar(k, obj, c); marcar(k, obj, c, 2); }
+    // as células, de trás para a frente (a dobra por cima de tudo): o tom pela luz, a linha
+    // da gravura ao longo do pano, mais grossa na sombra, e a beirada quando é a do pano
+    const celulas = [];
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) {
+      const a = malha[j][i];
+      const c = malha[j + 1][i + 1];
+      celulas.push({ i, j, z: (a.Z + c.Z) / 2 + (a.avesso || c.avesso ? 10 + a.Y : 0) });
+    }
+    celulas.sort((p, q) => p.z - q.z);
+    const tomPelo = (l, i, j) => {
+      const m = Math.min(i, NU - 1 - i, j, NV - 1 - j);
+      const base = malha[j][i].avesso ? (m === 1 ? [176, 146, 104] : [150, 122, 86]) : m === 1 ? [176, 146, 104] : m < 3 ? [70, 48, 30] : [98, 72, 46];
+      const f = 0.45 + l * 0.75;
+      return 'rgb(' + base.map((c) => Math.round(Math.min(255, c * f))).join(',') + ')';
+    };
+    k.lineCap = 'round';
+    k.lineJoin = 'round';
+    for (const { i, j } of celulas) {
+      const A = proj(malha[j][i]);
+      const B = proj(malha[j][i + 1]);
+      const C = proj(malha[j + 1][i + 1]);
+      const D = proj(malha[j + 1][i]);
+      const p = pol([A, B, C, D]);
+      const l = luzDe(i, j);
+      k.fillStyle = tomPelo(l, i, j);
+      k.strokeStyle = k.fillStyle;
+      k.lineWidth = 1.2;
+      k.fill(p);
+      k.stroke(p);
+      const w = (1 - l) * 2.2 * (i % 2 ? 0.55 : 1);
+      if (w > 0.3 && i > 0) {
+        k.strokeStyle = 'rgba(24,14,4,.85)';
+        k.lineWidth = w;
+        k.beginPath();
+        k.moveTo(A[0], A[1]);
+        k.lineTo(D[0], D[1]);
+        k.stroke();
+      }
+      // a costura da barra, por dentro
+      k.strokeStyle = 'rgba(40,24,8,.8)';
+      k.lineWidth = 1.2;
+      if ((j === 2 || j === NV - 2) && i % 2 === 0) { k.beginPath(); k.moveTo(A[0], A[1]); k.lineTo(B[0], B[1]); k.stroke(); }
+      if ((i === 2 || i === NU - 2) && j % 2 === 0) { k.beginPath(); k.moveTo(A[0], A[1]); k.lineTo(D[0], D[1]); k.stroke(); }
+      // a beirada do pano em tinta
+      k.strokeStyle = '#1e1308';
+      k.lineWidth = 2.4;
+      k.beginPath();
+      if (j === 0) { k.moveTo(A[0], A[1]); k.lineTo(B[0], B[1]); }
+      if (j === NV - 1) { k.moveTo(D[0], D[1]); k.lineTo(C[0], C[1]); }
+      if (i === 0) { k.moveTo(A[0], A[1]); k.lineTo(D[0], D[1]); }
+      if (i === NU - 1) { k.moveTo(B[0], B[1]); k.lineTo(C[0], C[1]); }
+      k.stroke();
+    }
+    // o pelo de cabra: uns fios curtos e claros no lado da luz, só na parte de cima à vista
+    for (let n = 0; n < 500; n++) {
+      const i = 2 + Math.floor(r() * (NU - 4));
+      const j = 2 + Math.floor(r() * (NV - 4));
+      const l = luzDe(i, j);
+      if (l < 0.55 || (!malha[j][i].avesso && malha[j][Math.min(NU, i + 1)].avesso === false && i > NU * 0.45)) continue;
+      const [x0, y0] = proj(malha[j][i]);
+      const [x1, y1] = proj(malha[j + 1][i]);
+      k.strokeStyle = 'rgba(214,186,140,.55)';
+      k.lineWidth = 1;
+      k.beginPath();
+      k.moveTo(x0 + (r() - 0.5) * 4, y0);
+      k.quadraticCurveTo((x0 + x1) / 2 + (r() - 0.5) * 4, (y0 + y1) / 2, x1 + (r() - 0.5) * 4, y1);
+      k.stroke();
+    }
+    vinheta(k, W, H, 0.22);
   }
   // ---------- fim dos Objetos ----------
 
