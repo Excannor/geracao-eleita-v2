@@ -5964,10 +5964,8 @@
   // sobem a pista até a chegada, onde a coroa de louros está deitada sobre um pedestal largo.
   // Nas arquibancadas de pedra escura, em gravura sépia, a multidão é uma nuvem de luz: em cada
   // lugar, uma lamparina acesa, fileira por fileira, diminuindo ao longe e dando a volta na curva
-  // do fundo ("temos uma multidão de testemunhas ao nosso redor"); nenhuma figura de gente. Sobre
-  // a soleira, o manto pesado deixado para trás, caído em pregas até o chão, e a corda enroscada
-  // ("afastemos de nós qualquer coisa que nos torne vagarosos... aqueles pecados que se
-  // enroscam... em nossos pés").
+  // do fundo ("temos uma multidão de testemunhas ao nosso redor"); nenhuma figura de gente.
+  // Diante da largada, só a pista com a poeira e umas pedrinhas.
   function desenhoTestemunhas(k, W, H, obj) {
     const r = sorteio(6301);
     const F = [444, 318];
@@ -6226,114 +6224,38 @@
       k.ellipse(F[0] + f * larg(0.665), yT(0.665), 5, 3, 0, 0, 6.283);
       k.fill();
     }
-    // o manto pesado, deixado para trás, jogado por cima da soleira da largada: uma parte fica
-    // deitada na pedra, com as rugas; a outra cai pela frente da soleira em dobras de gravidade
-    // (tubos de pano, claros de um lado e escuros do outro), e um canto da barra desce mais, até
-    // a pista, com a listra e a franja. A corda sai de baixo do pano, faz uma laçada e se
-    // enrosca ("afastemos de nós qualquer coisa que nos torne vagarosos... aqueles pecados que se
-    // enroscam... em nossos pés")
-    const ySol = yT(t2);
-    const yTopo = yT(tl);
-    const laco = (cx, cy, rx, ry, g, n = 25) => Array.from({ length: n }, (_, i) => { const a = (i / (n - 1)) * 6.283 + 1.4; return [cx + Math.cos(a) * rx * Math.cos(g) - Math.sin(a) * ry * Math.sin(g), cy + Math.cos(a) * rx * Math.sin(g) + Math.sin(a) * ry * Math.cos(g)]; });
-    const corda = [[300, ySol + 30], [330, ySol + 44], [350, ySol + 54], ...laco(384, ySol + 50, 30, 18, -0.6), [404, ySol + 62],
-      ...bezier([404, ySol + 62], [432, ySol + 88], [458, ySol + 38], [482, ySol + 56], 16), ...bezier([482, ySol + 56], [498, ySol + 70], [474, ySol + 82], [460, ySol + 68], 10),
-      ...bezier([460, ySol + 68], [482, ySol + 54], [532, ySol + 60], [586, ySol + 72], 16)];
-    cordao(k, corda, 6, { cor: '#c9a86a', escuro: '#2a1408' });
-    const x0 = 156;
-    const x1 = 352;
-    // a parte deitada na pedra: a beirada de trás em rolo, as rugas
-    const deitada = new Path2D();
-    deitada.moveTo(x0, ySol);
-    deitada.bezierCurveTo(x0 - 4, ySol - 18, x0 + 10, yTopo + 14, x0 + 34, yTopo + 10);
-    deitada.bezierCurveTo(x0 + 70, yTopo + 2, x0 + 96, yTopo + 14, x0 + 128, yTopo + 6);
-    deitada.bezierCurveTo(x0 + 160, yTopo, x1 - 14, yTopo + 12, x1, ySol - 16);
-    deitada.lineTo(x1 + 6, ySol);
-    deitada.closePath();
-    sombraNoChao(k, deitada, 6, 5, 6, 0.4);
-    peca(k, deitada, [x0 - 6, yTopo, x1 + 8, ySol], { cor: '#a8704a', tinta: '#2a1206', ang: 0.15, passo: 2.8, maxL: 1.6, sombra: (x, y) => 0.25 + (y - yTopo) / 120, cruzada: 0.75, traco: 2.2, obj });
+    // diante da largada, a pista vazia: só a poeira batida pelos pés (riscos curtos em leque, mais
+    // densos perto da soleira) e umas pedrinhas soltas, espalhadas sem ordem
+    const ySol = yT(t2) + 14;
     k.save();
-    k.clip(deitada);
+    k.clip(pista);
     k.lineCap = 'round';
-    for (const [ax, bx2, cy] of [[x0 + 20, x0 + 90, yTopo + 26], [x0 + 104, x0 + 170, yTopo + 22], [x0 + 60, x0 + 140, yTopo + 40]]) {
-      k.strokeStyle = 'rgba(42,18,6,.8)';
-      k.lineWidth = 1.6;
+    for (let i = 0; i < 160; i++) {
+      const t = r();
+      const y = ySol + 6 + t * t * (H - ySol - 6);
+      const meia = larg(Math.min(1.3, (y - F[1] - 30) / (H - F[1] - 30)));
+      const x = F[0] + (r() * 2 - 1) * meia * 0.95;
+      const c = 4 + r() * 8 + t * 6;
+      const g = (r() - 0.5) * 0.5;
+      k.strokeStyle = 'rgba(70,44,10,' + (0.35 + r() * 0.3).toFixed(2) + ')';
+      k.lineWidth = 0.9 + t * 0.8;
       k.beginPath();
-      k.moveTo(ax, cy + 4);
-      k.quadraticCurveTo((ax + bx2) / 2, cy - 6, bx2, cy + 2);
-      k.stroke();
-      k.strokeStyle = 'rgba(250,230,196,.75)';
-      k.lineWidth = 1.4;
-      k.beginPath();
-      k.moveTo(ax + 4, cy);
-      k.quadraticCurveTo((ax + bx2) / 2, cy - 10, bx2 - 4, cy - 2);
+      k.moveTo(x, y);
+      k.lineTo(x + Math.cos(g) * c, y + Math.sin(g) * c * 0.3);
       k.stroke();
     }
-    k.restore();
-    // a parte que cai pela frente: a barra de baixo é uma linha ondulada que desce até um canto
-    // (o canto do manto, que toca a pista) e sobe de novo; cada dobra é um tubo
-    const bainha = (x) => {
-      const t = (x - x0) / (x1 - x0);
-      const canto = Math.max(0, 1 - Math.abs(t - 0.36) / 0.36);
-      return ySol + 26 + canto * canto * 44 + Math.sin(t * 19) * 3;
-    };
-    const queda = new Path2D();
-    queda.moveTo(x0, ySol - 2);
-    queda.lineTo(x1 + 6, ySol - 2);
-    for (let x = x1 + 6; x >= x0 - 4; x -= 3) queda.lineTo(x, bainha(x));
-    queda.closePath();
-    sombraNoChao(k, queda, 8, 6, 7, 0.5);
-    k.fillStyle = '#b07a52';
-    k.fill(queda);
-    marcar(k, obj, queda);
+    // a sombra da soleira na pista
     k.save();
-    k.clip(queda);
-    // os tubos: larguras desiguais; cada um com a hachura vertical que escurece da luz (esquerda)
-    // para a sombra (direita), e a crista clara
-    const tubos = [x0 - 4, x0 + 22, x0 + 40, x0 + 66, x0 + 84, x0 + 104, x0 + 130, x0 + 150, x0 + 168, x1 + 8];
-    for (let i = 0; i < tubos.length - 1; i++) {
-      const a2 = tubos[i];
-      const b2 = tubos[i + 1];
-      // os tubos se abrem para baixo, como pano que cai
-      const tubo = pol([[a2 + (b2 - a2) * 0.15, ySol - 4], [b2 - (b2 - a2) * 0.1, ySol - 4], [b2 + 3, ySol + 80], [a2 - 3, ySol + 80]]);
-      gravar(k, tubo, (a2 + b2) / 2, ySol + 30, 70, Math.PI / 2 + 0.06, 2.4, 1.9, (x) => 0.05 + Math.pow(Math.max(0, (x - a2) / (b2 - a2)), 1.4) * 0.95, '#2a1206', 0);
-      gravar(k, tubo, (a2 + b2) / 2, ySol + 30, 70, 0.3, 3, 1.4, (x) => (Math.max(0, (x - a2) / (b2 - a2)) - 0.65) * 2.6, '#2a1206', 0);
-      k.strokeStyle = 'rgba(253,240,214,.85)';
-      k.lineWidth = 1.8;
-      k.beginPath();
-      k.moveTo(a2 + (b2 - a2) * 0.3, ySol);
-      k.lineTo(a2 + (b2 - a2) * 0.26, bainha(a2 + (b2 - a2) * 0.26) - 6);
-      k.stroke();
-    }
-    // a barra listrada, logo acima da bainha
-    for (const [d, w] of [[7, 4], [13, 1.6]]) {
-      k.strokeStyle = 'rgba(232,196,120,.95)';
-      k.lineWidth = w;
-      k.beginPath();
-      for (let x = x0 - 4; x <= x1 + 6; x += 3) (x === x0 - 4 ? k.moveTo(x, bainha(x) - d) : k.lineTo(x, bainha(x) - d));
-      k.stroke();
-    }
+    k.filter = 'blur(5px)';
+    k.fillStyle = 'rgba(46,28,6,.28)';
+    k.fillRect(F[0] - larg(1.3), ySol, larg(1.3) * 2, 10);
     k.restore();
-    k.strokeStyle = '#2a1206';
-    k.lineWidth = 2.2;
-    k.stroke(queda);
-    // a beirada da pedra por cima do pano (a dobra que vira na quina)
-    k.strokeStyle = 'rgba(42,18,6,.9)';
-    k.lineWidth = 2;
-    k.beginPath();
-    k.moveTo(x0, ySol - 1);
-    k.bezierCurveTo(x0 + 60, ySol + 3, x1 - 60, ySol - 1, x1 + 6, ySol + 1);
-    k.stroke();
-    // a franja: borlas de três fios ao longo da bainha
-    k.lineCap = 'round';
-    for (let x = x0 + 2; x <= x1; x += 8) {
-      const y = bainha(x);
-      k.strokeStyle = '#2a1206';
-      k.lineWidth = 0.8;
-      for (const d of [-1.5, 0, 1.5]) { k.beginPath(); k.moveTo(x, y + 1); k.quadraticCurveTo(x + d, y + 5, x + d * 1.3 + 0.4, y + 9); k.stroke(); }
-      k.fillStyle = '#2a1206';
-      k.beginPath();
-      k.arc(x, y + 1.5, 1.4, 0, 6.283);
-      k.fill();
+    k.restore();
+    // três pedras chatas, da cor da pista, de tamanhos desencontrados e longe umas das outras
+    for (const [x, y, rx, ry, g] of [[222, ySol + 104, 26, 9, 0.12], [610, ySol + 52, 15, 6, -0.18], [702, ySol + 126, 20, 8, 0.3]]) {
+      const p = seixo(r, x, y, rx, ry, g, 0.22);
+      sombraNoChao(k, p, 5, 4, 4, 0.4);
+      peca(k, p, [x - rx, y - ry, x + rx, y + ry], { cor: '#dcc394', tinta: '#2e1c06', ang: 0.6, passo: 3, maxL: 1.4, sombra: (px, py) => 0.2 + (py - y + ry) / (ry * 2) * 0.6, cruzada: 0.8, traco: 1.8 });
     }
     vinheta(k, W, H, 0.22);
   }
@@ -6358,8 +6280,8 @@
   // desenho não tem mais para onde ir, a arte desce (ou sobe) e a beirada dela se estende.
   // Gideão: a corneta, deitada embaixo à direita; Ester: o alto do dossel, na beirada de cima; Sara: as
   // borlas do pano da tenda, no alto; Raabe: o terraço com o linho, no alto da casa; a
-  // Multidão: o manto e a corda, embaixo, acima do papel.
-  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.93, 0.96] };
+  // Multidão: a soleira da largada, acima do papel.
+  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
