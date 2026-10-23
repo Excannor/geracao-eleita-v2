@@ -6277,7 +6277,8 @@
     // Objetos
     'tunica-jose': desenhoTunica,
     'vara-moises': desenhoVara,
-    'candelabro': desenhoCandelabro };
+    'candelabro': desenhoCandelabro,
+    'tabuas-alianca': desenhoTabuas };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
   // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
   // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
@@ -10553,6 +10554,175 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.fill();
     }
     vinheta(k, W, H, 0.4);
+  }
+  // ---------- (5) As tábuas da aliança (Êx 31.18) ----------
+  // As duas tábuas de pedra, no alto do monte, encostadas uma na outra sobre uma laje, com a
+  // nuvem pesada em cima (Êx 24.16). A escrita é de Deus e não se imita: são fileiras de sulcos
+  // cavados na pedra, como linhas de texto vistas de longe, com um fio de luz morna no fundo de
+  // cada sulco. Cinco fileiras em cada tábua (as dez palavras). A pedra é granito, de grão
+  // miúdo, com as quinas um pouco lascadas.
+  function desenhoTabuas(k, W, H, obj) {
+    const r = sorteio(7501);
+    papelVelho(k, W, H, r, ['#f7ecd8', '#e9d6b6', '#cdb08a'], [444, 300]);
+    const hz = 560;
+    // o céu: a nuvem pesada no alto, em linhas cerradas, que abre embaixo, perto do horizonte
+    linhas(k, 0, 0, W, hz, 4.4, 2.5, (x, y) => {
+      const nuvem = Math.max(0, 1 - y / 300) ** 0.8 * (0.85 + Math.sin(x * 0.012 + Math.sin(x * 0.031) * 1.4) * 0.15);
+      const borda = Math.max(0, 1 - Math.abs(y - (250 + Math.sin(x * 0.018) * 30)) / 40) * 0.25;
+      // a luz que abre na nuvem atrás das tábuas (só a linha mais rala, sem anel)
+      const abre = Math.exp(-(((x - 444) / 340) ** 2) - (((y - 300) / 300) ** 2));
+      return (0.1 + nuvem * 1.05 + borda) * (1 - abre * 0.9);
+    });
+    // os picos de granito ao longe, embaixo da nuvem, baixos e claros de distância
+    const fP = onda(sorteio(7510), 5, 0.01);
+    const picos = pol([[-10, 600], ...Array.from({ length: 56 }, (_, i) => [i * 17 - 6, 548 - Math.abs(fP(i * 17)) * 22]), [W + 10, 600]]);
+    peca(k, picos, [-10, 500, W + 10, 600], { cor: '#dccbb0', ang: 1.2, passo: 3.6, maxL: 0.9, sombra: (x, y) => 0.25 + (y - 520) / 240, cruzada: 0.95, traco: 1.2 });
+    // o alto do monte: um chão de pedra largo, em perspectiva, até a beirada de baixo
+    const tampo = 572;
+    const chao = pol([[-10, tampo + 10], [200, tampo - 2], [520, tampo - 6], [W + 10, tampo + 4], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#d9c5a2';
+    k.fill(chao);
+    chaoEmLinhas(k, r, chao, -10, W + 10, tampo - 8, H, 1.9, (x, y) => 0.32 + (y - tampo) / 600 + Math.sin(x * 0.013 + y * 0.01) * 0.1);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.6;
+    k.stroke(chao);
+    // as rachas do granito no chão, que fogem para o horizonte
+    k.strokeStyle = 'rgba(43,33,18,.7)';
+    k.lineCap = 'round';
+    for (const [x0, y0, dx] of [[60, 820, 0.5], [300, 840, 0.2], [640, 830, -0.25], [820, 760, -0.5], [140, 690, 0.35]]) {
+      let x = x0;
+      let y = y0;
+      k.lineWidth = 2;
+      k.beginPath();
+      k.moveTo(x, y);
+      for (let j = 0; j < 7; j++) { x += dx * 22 + (r() - 0.5) * 14; y -= 14 + r() * 10; k.lineWidth = 2 - j * 0.2; k.lineTo(x, y); }
+      k.stroke();
+    }
+    // umas pedras soltas
+    for (const [x, y, rx, ry] of [[90, 700, 30, 12], [770, 690, 36, 14], [610, 800, 26, 10], [240, 790, 18, 8], [820, 604, 14, 5]]) {
+      const p = contornoRocha(r, [[x - rx, y + ry * 0.5], [x - rx * 0.6, y - ry * 0.8], [x + rx * 0.3, y - ry], [x + rx, y - ry * 0.1], [x + rx * 0.8, y + ry * 0.7]], 2);
+      p.closePath();
+      sombraNoChao(k, p, rx * 0.4, ry * 0.4, 3, 0.3);
+      peca(k, p, [x - rx, y - ry, x + rx, y + ry], { cor: '#cdb995', ang: 0.6, passo: 2.8, maxL: 1.4, sombra: sombraOval(x, y, rx, ry, 0), cruzada: 0.7, traco: 1.5 });
+    }
+
+    // uma tábua: a face de alto arredondado, a espessura à direita e no alto, o grão do
+    // granito, as quinas lascadas e as fileiras da escrita
+    const tabua = (A, B, C, D, arco, esp, luz, semente) => {
+      const rr = sorteio(semente);
+      const P = (u, v) => [A[0] + (B[0] - A[0]) * u + (D[0] - A[0]) * v + (C[0] - B[0] - D[0] + A[0]) * u * v, A[1] + (B[1] - A[1]) * u + (D[1] - A[1]) * v + (C[1] - B[1] - D[1] + A[1]) * u * v];
+      // o alto em arco: pontos de A a B
+      const topo = [];
+      for (let i = 0; i <= 24; i++) { const t = i / 24; const [x, y] = P(t, 0); topo.push([x, y - Math.sin(t * Math.PI) * arco]); }
+      const desl = (pts) => pts.map(([x, y]) => [x + esp[0], y + esp[1]]);
+      // a espessura: a lateral direita e o alto em arco, mais escuros
+      const lado = pol([B, [B[0] + esp[0], B[1] + esp[1]], [C[0] + esp[0], C[1] + esp[1]], C]);
+      const alto = pol([...topo, ...desl(topo).reverse()]);
+      sombraNoChao(k, pol([D, C, [C[0] + esp[0] + 170, C[1] + 30], [D[0] + 190, D[1] + 34]]), 0, 0, 9, 0.48);
+      peca(k, lado, [B[0], B[1] + esp[1], C[0] + esp[0], C[1]], { cor: '#9c8668', ang: 1.45, passo: 2.8, maxL: 1.6, sombra: () => 0.62 - luz * 0.2, cruzada: 0.7, traco: 2, obj });
+      peca(k, alto, [A[0], A[1] - arco + esp[1], B[0] + esp[0], B[1]], { cor: '#cbb898', ang: 0.05, passo: 3, maxL: 1.3, sombra: () => 0.35, cruzada: 0.9, traco: 2, obj });
+      // a face, com as quinas lascadas
+      const borda = [];
+      const lascas = (pts, k0) => { pts.forEach(([x, y], i) => { const d = i && rr() < 0.16 ? 3 + rr() * 5 : rr() * 1.5; borda.push([x + k0[0] * d, y + k0[1] * d]); }); };
+      lascas(topo, [0, 1]);
+      lascas(Array.from({ length: 12 }, (_, i) => P(1, i / 12)), [-1, 0]);
+      lascas(Array.from({ length: 12 }, (_, i) => P(1 - i / 12, 1)), [0, -1]);
+      lascas(Array.from({ length: 12 }, (_, i) => P(0, 1 - i / 12)), [1, 0]);
+      const face = pol(borda);
+      k.fillStyle = '#dcc3a6';
+      k.fill(face);
+      marcar(k, obj, face);
+      const cxF = (A[0] + C[0]) / 2;
+      const cyF = (A[1] + C[1]) / 2;
+      gravar(k, face, cxF, cyF, 280, 1.32, 3.4, 1.7, (x, y) => 0.22 + (x - A[0]) / 800 + (y - A[1]) / 1200 + (1 - luz) * 0.4, SEPIA, 0.05);
+      k.save();
+      k.clip(face);
+      // o grão do granito: pintas claras e escuras
+      for (let i = 0; i < 560; i++) {
+        const [x, y] = P(rr(), rr() * 1.1 - 0.1);
+        k.fillStyle = rr() < 0.55 ? 'rgba(52,38,22,' + (0.25 + rr() * 0.4).toFixed(2) + ')' : 'rgba(255,250,236,.7)';
+        k.beginPath();
+        k.arc(x, y, 0.6 + rr() * 1.3, 0, 6.283);
+        k.fill();
+      }
+      // a escrita: em cada fileira, grupos de golpes curtos de cinzel (riscos de pé, tortos, de
+      // alturas desiguais, ligados aqui e ali por um traço deitado), cavados: o risco escuro e,
+      // ao lado, o fio de luz da beirada; nenhuma letra
+      k.lineCap = 'round';
+      for (let f = 0; f < 5; f++) {
+        const v = 0.14 + f * 0.17;
+        let u = 0.09 + rr() * 0.05;
+        while (u < 0.88) {
+          const l = Math.min(0.91 - u, 0.07 + rr() * 0.15);
+          if (l < 0.05) break;
+          const a = P(u, v);
+          const b = P(u + l, v);
+          const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+          const comp = Math.hypot(b[0] - a[0], b[1] - a[1]);
+          k.save();
+          k.translate(a[0], a[1]);
+          k.rotate(ang);
+          // a palavra: golpes deitados do cinzel, de comprimentos desiguais, em duas alturas
+          // que se encostam (a pedra cavada: o fio escuro em cima, o fio aceso embaixo e o
+          // fundo morno, como pedra ainda acesa); nenhuma letra
+          for (const dy of [-3.2, 3.2]) {
+            let x = rr() * 4;
+            while (x < comp - 4) {
+              const c = Math.min(comp - x, 4 + rr() * 16);
+              const y = dy + (rr() - 0.5) * 1.6;
+              k.strokeStyle = 'rgba(36,22,8,.92)';
+              k.lineWidth = 2.2;
+              k.beginPath();
+              k.moveTo(x, y - 0.6);
+              k.lineTo(x + c, y - 0.6 + (rr() - 0.5) * 1.2);
+              k.stroke();
+              k.strokeStyle = 'rgba(236,146,46,.65)';
+              k.lineWidth = 0.9;
+              k.beginPath();
+              k.moveTo(x + 1, y + 0.4);
+              k.lineTo(x + c - 1, y + 0.4);
+              k.stroke();
+              k.strokeStyle = 'rgba(255,250,236,.95)';
+              k.lineWidth = 1.1;
+              k.beginPath();
+              k.moveTo(x + 0.5, y + 1.9);
+              k.lineTo(x + c, y + 1.9);
+              k.stroke();
+              x += c + 2 + rr() * 3;
+            }
+          }
+          k.restore();
+          u += l + 0.04 + rr() * 0.03;
+        }
+      }
+      // umas rachas finas na pedra
+      k.strokeStyle = 'rgba(40,28,12,.7)';
+      k.lineWidth = 1.1;
+      for (let i = 0; i < 3; i++) {
+        let [x, y] = P(rr() < 0.5 ? 0.02 : 0.98, 0.1 + rr() * 0.8);
+        k.beginPath();
+        k.moveTo(x, y);
+        for (let j = 0; j < 4; j++) { x += (x < cxF ? 1 : -1) * (6 + rr() * 10); y += (rr() - 0.5) * 14; k.lineTo(x, y); }
+        k.stroke();
+      }
+      k.restore();
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 2.4;
+      k.lineJoin = 'round';
+      k.stroke(face);
+      // a quina acesa da esquerda e do arco
+      k.strokeStyle = 'rgba(255,250,236,.85)';
+      k.lineWidth = 1.5;
+      k.beginPath();
+      k.moveTo(D[0] + 3, D[1] - 4);
+      k.lineTo(A[0] + 3, A[1] + 2);
+      for (let i = 1; i <= 12; i++) k.lineTo(topo[i][0], topo[i][1] + 3);
+      k.stroke();
+    };
+    // a de trás, encostada na da frente, inclinada; a da frente, de pé, inteira
+    tabua([432, 206], [682, 210], [690, 676], [436, 672], 52, [16, -5], 0.6, 7520);
+    tabua([196, 200], [446, 200], [450, 686], [200, 686], 52, [16, -5], 1, 7530);
+    vinheta(k, W, H, 0.22);
   }
   // ---------- fim dos Objetos ----------
 
