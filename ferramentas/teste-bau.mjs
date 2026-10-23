@@ -2,8 +2,8 @@
 // servidor próprio, contra a peça de arte de verdade (src/sob-demanda/cartas.js):
 //   - abrir o baú: a arte faz a abertura inteira (CC.cartas.revelar) e mostra a carta com
 //     "Nova! Você tem 1 de 13 em Heróis da fé"; a primeira da vida é Prata; Compartilhar carta,
-//     Salvar papel de parede e Continuar; "Ler a história" leva à referência na Bíblia;
-//   - compartilhar manda um PNG 1080x1920; o papel de parede, um PNG 1080x2340;
+//     e Continuar; "Ler a história" leva à referência na Bíblia;
+//   - compartilhar manda um PNG 1080x1920 (o papel de parede saiu do fim do baú, 23/10);
 //   - só saem as cartas lançadas (com desenho);
 //   - Perfil tem a entrada Cartas; o álbum mostra as recebidas e as silhuetas, sem texto nas
 //     miniaturas, com as versões e as repetidas; a carta grande abre, vira e troca de versão; uma
@@ -159,7 +159,7 @@ try {
   ok(await esperar(cabe('.tela-bau'), 3000), 'o fim cabe na tela sem rolar (390x844)');
   ok(await av('!!CC.estado().bausAbertos["dia:7"].ref'), 'o baú guarda o versículo da semana, como antes');
   const botoes = await av('[...document.querySelectorAll(".tela-cheia-pe .botao")].map((b) => b.textContent.trim())');
-  ok(JSON.stringify(botoes) === JSON.stringify(['Compartilhar carta', 'Salvar papel de parede', 'Continuar']), 'os botões: Compartilhar carta, Salvar papel de parede e Continuar (' + botoes + ')');
+  ok(JSON.stringify(botoes) === JSON.stringify(['Compartilhar carta', 'Continuar']), 'os botões: Compartilhar carta e Continuar, sem o papel de parede (' + botoes + ')');
   ok(await av('[...document.querySelectorAll(".tela-cheia-pe .botao")].every((b) => b.getBoundingClientRect().height >= 44 && b.getBoundingClientRect().right <= innerWidth)'), 'os botões têm 44 px ou mais e cabem na tela');
   ok(/Ler a história/.test(await texto('.tela-bau [data-ler]')), 'o fim tem "Ler a história"');
   await av('document.querySelector("[data-compartilhar-carta]").click()');
@@ -190,11 +190,6 @@ try {
   })()`);
   ok(assado && assado.ouro.moldura > 8 && assado.ouro.moldura > 3 * assado.linho.moldura && assado.ouro.papel < 4 && assado.linho.papel < 4 && assado.igual,
     'o story leva o brilho da raridade: a moldura do Ouro muda, a do Linho (fosco) não, o texto fica limpo e a imagem é sempre a mesma (' + JSON.stringify(assado) + ')');
-  await av(SIMULAR);
-  await av('document.querySelector("[data-papel-de-parede]").click()');
-  ok(await esperar('!!window.__compartilhado', 12000), 'Salvar papel de parede abre a folha do sistema');
-  const papel = await av('(async () => __png(window.__compartilhado.files[0]))()');
-  ok(papel && papel.w === 1080 && papel.h === 2340, 'vai o papel de parede, PNG 1080x2340 (' + JSON.stringify(papel) + ')');
   await av('document.querySelector(".tela-bau [data-ler]").click()');
   ok(await esperar('/^#\\/biblia\\/1%20Samuel\\/17/.test(location.hash) && !document.querySelector(".tela-bau")'), '"Ler a história" abre 1 Samuel 17 na Bíblia e fecha a tela do baú (' + await av('location.hash') + ')');
   await av('location.hash = "#/"');

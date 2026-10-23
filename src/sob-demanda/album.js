@@ -111,18 +111,6 @@
       await CC.compartilharImagem(arquivo, textoDaCarta(carta));
     });
   }
-  function ligarPapelDeParede(botao, ref) {
-    const pronto = new Promise((r) => setTimeout(r, menosMovimento() ? 0 : 1500))
-      .then(() => (ref && CC.textoDoVersiculo ? CC.textoDoVersiculo(ref) : null))
-      .then((texto) => (texto ? arquivoDe(CC.cartas.papelDeParede({ ref, texto }), 'geracao-eleita-papel-de-parede.png') : null));
-    pronto.catch(() => {});
-    botao.onclick = (ev) => CC.ocupado(ev.currentTarget, async () => {
-      const arquivo = await pronto.catch(() => null);
-      if (!arquivo) { CC.avisar('Não consegui gerar o papel de parede agora.'); return; }
-      await CC.compartilharImagem(arquivo, ref + ', no Geração Eleita.', 'Papel de parede salvo. Escolha a imagem nas suas fotos para usar na tela de bloqueio.');
-    });
-  }
-
   // ---------- a legenda da revelação ----------
   // Nova carta, nova versão ou repetida: sempre curto e para cima.
   function legenda(x) {
@@ -151,7 +139,7 @@
   // (CC.cartas.revelar: o baú da Trilha balança, a tampa abre, a luz sobe, a carta sai, vira e
   // brilha), com "Pular" como único controle. Quando ela termina (ou no Pular), a tela passa ao fim:
   // só a carta, grande, a legenda ("Nova! ...", "Repetida: ..."), "Ler a história" e "Virar", e
-  // embaixo "Compartilhar carta", "Salvar papel de parede" e "Continuar", que só então aparecem.
+  // embaixo "Compartilhar carta" e "Continuar", que só então aparecem (o papel de parede saiu, 23/10).
   // Nenhum baú fica no fim, e tudo cabe na tela sem rolar (390x844 e 360x740).
   // x: o resultado (ou uma função que o lê no fim, quando ele só existe depois do toque).
   // abrir: 'ja' (o baú abre sozinho) ou 'toque' (o baú da revelação espera o toque, e antes() roda
@@ -170,12 +158,9 @@
     pe.classList.add('album-pe');
     pe.hidden = true;
     pe.innerHTML = (temArte(carta) ? '<button class="botao contorno pequeno" data-compartilhar-carta>' + CC.ico('compartilhar') + 'Compartilhar carta</button>' : '')
-      + (ref ? '<button class="botao contorno pequeno" data-papel-de-parede>' + CC.ico('baixar') + 'Salvar papel de parede</button>' : '')
       + '<button class="botao" data-continuar>Continuar</button>';
     const comp = pe.querySelector('[data-compartilhar-carta]');
     if (comp) ligarCompartilhar(comp, carta);
-    const papel = pe.querySelector('[data-papel-de-parede]');
-    if (papel) ligarPapelDeParede(papel, ref);
     pe.querySelector('[data-continuar]').onclick = aoContinuar;
     let terminou = false;
     const fim = () => {

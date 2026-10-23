@@ -416,7 +416,7 @@ Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
   brilha. "Pular" vai direto ao fim.
 - **O fim** mostra só a carta, grande (do tamanho que sobra na tela), sem baú: a origem quando há
   ("Marco: 100 dias de leitura"), a legenda, "Ler a história" e "Virar"; embaixo, só agora,
-  "Compartilhar carta" (só com desenho), "Salvar papel de parede" e "Continuar". Durante a
+  "Compartilhar carta" (só com desenho) e "Continuar". O "Salvar papel de parede" saiu (dono, 23/10). Durante a
   abertura não há botões embaixo. Cabe sem rolar em 390×844 e 360×740, claro e escuro.
 - A legenda:
   - carta nova: "**Nova!** Você tem 9 de 13 em Objetos";
@@ -481,14 +481,12 @@ Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
 - "Compartilhar carta" e "Compartilhar": `CC.cartas.storyDaCarta(carta)` (1080×1920) pelo caminho de
   sempre (`CC.compartilharImagem`, 01d-story.js): a folha do sistema ou o download com aviso. Só
   para carta com desenho.
-- "Salvar papel de parede" (na revelação do baú): `CC.cartas.papelDeParede({ ref, texto })`,
-  1080×2340, com o versículo da semana na tradução escolhida, palavra por palavra
-  (`CC.textoDoVersiculo`).
+- O "Salvar papel de parede" saiu do fim do baú (dono, 23/10). `CC.cartas.papelDeParede` fica na peça, sem uso.
 - As imagens ficam prontas antes do toque (o Safari recusa o compartilhar longe dele).
 
 | Teste |
 |---|
-| teste-bau: Compartilhar carta manda um PNG 1080×1920 com o título e a versão; Salvar papel de parede manda um PNG 1080×2340 |
+| teste-bau: Compartilhar carta manda um PNG 1080×1920 com o título e a versão |
 
 ## 11. Troféus, marcos e Glória
 
