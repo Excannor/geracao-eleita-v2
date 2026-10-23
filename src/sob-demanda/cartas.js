@@ -7173,16 +7173,20 @@
     k.clip(forma);
     k.lineCap = 'round';
     k.lineJoin = 'round';
-    for (const { c, pol: pl } of facetas(r, x0, y0, x1, y1, 150, 120)) {
-      if (pl.length < 3) continue;
+    // poucos planos grandes; o valor de cada um vem antes, para a junta só aparecer onde a luz
+    // muda de verdade entre dois planos vizinhos
+    const cels = facetas(r, x0, y0, x1, y1, 260, 200).filter((q) => q.pol.length >= 3);
+    for (const q of cels) q.v = Math.max(0.08, Math.min(1, luz(q.c[0], q.c[1]) + (r() - 0.5) * 0.16));
+    const vizinha = (x, y) => { let m = null; let dm = 1e9; for (const q of cels) { const d = Math.hypot(q.c[0] - x, q.c[1] - y); if (d < dm) { dm = d; m = q; } } return m; };
+    for (const q of cels) {
+      const { c, pol: pl, v } = q;
       const p = new Path2D();
-      pl.forEach((q, i) => (i ? p.lineTo(q[0], q[1]) : p.moveTo(q[0], q[1])));
+      pl.forEach((pt, i) => (i ? p.lineTo(pt[0], pt[1]) : p.moveTo(pt[0], pt[1])));
       p.closePath();
-      const v = Math.max(0.08, Math.min(1, luz(c[0], c[1]) + (r() - 0.5) * 0.25));
-      const ang = Math.PI / 2 + (c[0] < (x0 + x1) / 2 ? -0.35 : 0.35) + (r() - 0.5) * 0.3;
-      const R = Math.max(...pl.map((q) => Math.hypot(q[0] - c[0], q[1] - c[1]))) + 2;
-      gravar(k, p, c[0], c[1], R, ang, 4.2, 2.3, (x, y) => v + (y - c[1]) / 600, cor, 0.08);
-      if (v > 0.55) gravar(k, p, c[0], c[1], R, ang + 0.6, 5.4, 1.6, () => (v - 0.5) * 1.8, cor, 0);
+      const ang = Math.PI / 2 + (v < 0.5 ? -0.4 : 0.35) + (r() - 0.5) * 0.25;
+      const R = Math.max(...pl.map((pt) => Math.hypot(pt[0] - c[0], pt[1] - c[1]))) + 2;
+      gravar(k, p, c[0], c[1], R, ang, 4.2, 2.3, (x, y) => v + (y - c[1]) / 700, cor, 0.08);
+      if (v > 0.55) gravar(k, p, c[0], c[1], R, ang + 0.65, 5, 1.7, () => (v - 0.5) * 1.8, cor, 0);
       // as camadas inclinadas do granito, em traço partido, só em parte dos planos
       if (r() < 0.6) {
         k.save();
@@ -7190,26 +7194,34 @@
         k.strokeStyle = cor;
         k.lineWidth = 1.4;
         const inc = -0.3 + (r() - 0.5) * 0.2;
-        for (let yy = c[1] - R; yy < c[1] + R; yy += 18 + r() * 14) {
+        for (let yy = c[1] - R; yy < c[1] + R; yy += 22 + r() * 18) {
           let x = c[0] - R;
-          while (x < c[0] + R) { const l = 20 + r() * 50; if (r() < 0.7) { k.beginPath(); k.moveTo(x, yy + (x - c[0]) * inc); k.lineTo(x + l, yy + (x + l - c[0]) * inc); k.stroke(); } x += l + 6 + r() * 20; }
+          while (x < c[0] + R) { const l = 20 + r() * 50; if (r() < 0.6) { k.beginPath(); k.moveTo(x, yy + (x - c[0]) * inc); k.lineTo(x + l, yy + (x + l - c[0]) * inc); k.stroke(); } x += l + 8 + r() * 24; }
         }
         k.restore();
       }
-      // a junta principal: a beirada de baixo e a da direita, firmes
+      // a junta: só onde a luz muda entre os dois planos, ou numa parte das beiradas, e partida
       for (let i = 0; i < pl.length; i++) {
-        const q = pl[i];
-        const s2 = pl[(i + 1) % pl.length];
-        const nx = s2[1] - q[1];
-        const ny = q[0] - s2[0];
+        const a2 = pl[i];
+        const b2 = pl[(i + 1) % pl.length];
+        const nx = b2[1] - a2[1];
+        const ny = a2[0] - b2[0];
         if (!(ny > 0 || nx > 0)) continue;
+        const l = Math.hypot(nx, ny) || 1;
+        const m = [(a2[0] + b2[0]) / 2 + (nx / l) * 6, (a2[1] + b2[1]) / 2 + (ny / l) * 6];
+        const viz = vizinha(m[0], m[1]);
+        const muda = viz && viz !== q && Math.abs(viz.v - v) > 0.2;
+        if (!muda && r() > 0.3) continue;
         k.strokeStyle = cor;
-        k.lineWidth = 2.6;
-        k.beginPath();
-        k.moveTo(q[0], q[1]);
-        k.lineTo((q[0] + s2[0]) / 2 + (r() - 0.5) * 8, (q[1] + s2[1]) / 2 + (r() - 0.5) * 8);
-        k.lineTo(s2[0], s2[1]);
-        k.stroke();
+        k.lineWidth = muda ? 2.4 : 1.6;
+        for (let t = 0; t < 1; ) {
+          const t2 = Math.min(1, t + 0.18 + r() * 0.25);
+          k.beginPath();
+          k.moveTo(a2[0] + (b2[0] - a2[0]) * t + (r() - 0.5) * 4, a2[1] + (b2[1] - a2[1]) * t + (r() - 0.5) * 4);
+          k.lineTo(a2[0] + (b2[0] - a2[0]) * t2 + (r() - 0.5) * 4, a2[1] + (b2[1] - a2[1]) * t2 + (r() - 0.5) * 4);
+          k.stroke();
+          t = t2 + 0.06 + r() * 0.12;
+        }
       }
     }
     // as fraturas compridas: descem tortas do alto, com a sombra cerrada de um lado
@@ -7254,7 +7266,7 @@
     const kg = tg.getContext('2d');
     kg.fillStyle = '#b48a6a';
     kg.fill(monte);
-    granitoEmFaces(kg, r, monte, [-10, 190, W + 10, 700], (x, y) => 0.18 + Math.max(0, (x - 300) / 900) + (y - 220) / 900, {
+    granitoEmFaces(kg, r, monte, [-10, 190, W + 10, 700], (x, y) => (x < 430 ? 0.24 : 0.74) + (y - 220) / 1400, {
       fraturas: [[[300, 270], [270, 380], [220, 480], [170, 660]], [[560, 250], [600, 380], [640, 500], [700, 660]], [[430, 300], [446, 420], [420, 540], [450, 660]]],
     });
     k.drawImage(tg, 0, 0);
@@ -7275,7 +7287,7 @@
     const base = (x) => 290 + 74 * Math.exp(-(((x - 440) / 280) ** 2));
     const rolo = (q) => {
       const fogo = Math.max(0, Math.min(1, (q.y + q.rr * 0.7 - 210) / 120)) * Math.max(0, 1 - Math.abs(q.x - 460) / 330);
-      const pts = Array.from({ length: 11 }, (_, i) => { const a = (i / 11) * 6.283; const f2 = 0.82 + r() * 0.36; return [q.x + Math.cos(a) * q.rr * f2 * 1.15, q.y + Math.sin(a) * q.rr * (Math.sin(a) > 0 ? 0.55 : 0.8) * f2]; });
+      const pts = Array.from({ length: 11 }, (_, i) => { const a = (i / 11) * 6.283; const f2 = 0.82 + r() * 0.36; return [q.x + Math.cos(a) * q.rr * f2 * (q.y < 100 ? 1.6 : 1.15), q.y + Math.sin(a) * q.rr * (Math.sin(a) > 0 ? 0.55 : 0.8) * f2]; });
       const forma = lanoso(r, pts, q.rr * 0.1, q.rr * 0.38);
       k.fillStyle = q.tom;
       k.fill(forma);
@@ -7374,28 +7386,41 @@
       p.ellipse(x + vai * 0.5, y - h * 0.5, larg * 0.8, h * 0.55, 0, 0, 6.283);
       marcar(k, obj, p);
     };
-    const ombro = (x) => base(x) + 62 + Math.sin(x * 0.05) * 8 + Math.sin(x * 0.13 + 1) * 6;
-    for (const [x, h, vai, larg] of [[352, 160, -22, 70], [470, 220, 12, 90], [586, 130, 26, 60]]) lingua(x, ombro(x) + 16, h, vai, larg);
-    // o ombro de rocha na frente das bases do fogo: a mesma pedra, com a beirada torta acesa
-    const ombroP = [];
-    for (let x = 200; x <= 720; x += 10) ombroP.push([x, ombro(x) + (r() - 0.5) * 6]);
-    const frente = contornoRocha(r, [...ombroP, [740, 700], [180, 700]], 3);
-    frente.closePath();
-    k.save();
-    k.clip(monte);
-    k.clip(frente);
-    k.drawImage(tg, 0, 0);
-    k.strokeStyle = '#2a1a10';
-    k.lineWidth = 2.6;
-    k.beginPath();
-    ombroP.forEach(([px, py], i) => (i ? k.lineTo(px, py) : k.moveTo(px, py)));
-    k.stroke();
-    k.strokeStyle = 'rgba(240,170,90,.85)';
-    k.lineWidth = 1.6;
-    k.beginPath();
-    ombroP.forEach(([px, py], i) => (i ? k.lineTo(px, py + 3) : k.moveTo(px, py + 3)));
-    k.stroke();
-    k.restore();
+    // o fogo sai de trás de três nós de rocha, de alturas diferentes, que se sobrepõem; os da
+    // direita têm a barriga escura; a beirada acesa só no alto, virada para as chamas
+    const nosR = [
+      { x0: 196, x1: 420, y: base(300) + 70, pico: 300 },
+      { x0: 380, x1: 560, y: base(470) + 34, pico: 470 },
+      { x0: 520, x1: 730, y: base(620) + 90, pico: 600 },
+    ];
+    const topoNo = (n, x) => n.y + Math.pow(Math.abs(x - n.pico) / ((n.x1 - n.x0) / 2), 1.6) * 36 + Math.sin(x * 0.11) * 4;
+    for (const [x, h, vai, larg, n] of [[340, 160, -22, 70, 0], [470, 220, 12, 90, 1], [600, 130, 26, 60, 2]]) lingua(x, topoNo(nosR[n], x) + 18, h, vai, larg);
+    for (const [ni, n] of [[0, nosR[0]], [2, nosR[2]], [1, nosR[1]]]) {
+      const cima = [];
+      for (let x = n.x0; x <= n.x1; x += 8) cima.push([x, topoNo(n, x) + (r() - 0.5) * 5]);
+      const no = pol([...cima, [n.x1 + 10, n.y + 140], [n.x0 - 10, n.y + 140]]);
+      k.save();
+      k.clip(monte);
+      k.clip(no);
+      k.drawImage(tg, 0, 0);
+      if (ni > 0) {
+        // a sombra que o nó faz logo abaixo da beirada (a barriga escura), em hachura que some
+        gravar(k, no, n.pico, n.y + 40, 160, Math.PI / 2 + 0.35, 3.2, 1.8, (x, y) => 0.9 - (y - topoNo(n, x)) / 50, '#2a1a10', 0);
+      }
+      k.restore();
+      k.strokeStyle = '#2a1a10';
+      k.lineWidth = 2.6;
+      k.beginPath();
+      cima.forEach(([px, py], i) => (i ? k.lineTo(px, py) : k.moveTo(px, py)));
+      k.stroke();
+      // a beirada acesa: só no trecho de cima, perto do fogo
+      k.strokeStyle = 'rgba(240,170,90,.85)';
+      k.lineWidth = 1.6;
+      k.beginPath();
+      let dentro = false;
+      cima.forEach(([px, py]) => { const perto = Math.abs(px - n.pico) < (n.x1 - n.x0) * 0.3; if (perto && !dentro) { k.moveTo(px, py + 3); dentro = true; } else if (perto) k.lineTo(px, py + 3); else dentro = false; });
+      k.stroke();
+    }
     // o relâmpago (19.16): um só, fora do meio, quebrado e com um galho
     {
       const pts = [[150, 30]];
