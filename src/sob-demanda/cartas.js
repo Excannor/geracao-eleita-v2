@@ -3322,8 +3322,8 @@
       }
       k.restore();
     };
-    const pe = [(p0 + p1) / 2, 800];
-    const caminho = [...bezier([20, 712], [230, 700], [pe[0] - 60, 836], pe, 11)];
+    const pe = [(p0 + p1) / 2, 786];
+    const caminho = [...bezier([20, 700], [230, 690], [pe[0] - 70, 800], pe, 11)];
     for (const [trilha, dx, tipo] of [[0, -18, 'casco'], [1, 18, 'pata']]) {
       caminho.forEach(([x, y], i) => {
         if (i === caminho.length - 1) return;
