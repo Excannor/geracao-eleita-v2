@@ -6273,7 +6273,9 @@
     // Lugares
     'jardim-eden': desenhoEden, 'montes-ararate': desenhoArarate, 'betel': desenhoBetel, 'monte-sinai': desenhoSinai,
     'rio-jordao': desenhoJordao, 'jerusalem': desenhoJerusalem, 'babilonia': desenhoBabilonia, 'ninive': desenhoNinive,
-    'belem': desenhoBelem, 'mar-galileia': desenhoGalileia, 'nazare': desenhoNazare, 'patmos': desenhoPatmos };
+    'belem': desenhoBelem, 'mar-galileia': desenhoGalileia, 'nazare': desenhoNazare, 'patmos': desenhoPatmos,
+    // Objetos
+    'tunica-jose': desenhoTunica };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
   // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
   // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
@@ -6282,7 +6284,7 @@
   // Gideão: a corneta, deitada embaixo à direita; Ester: o alto do dossel, na beirada de cima; Sara: as
   // borlas do pano da tenda, no alto; Raabe: o terraço com o linho, no alto da casa; a
   // Multidão: a soleira da largada, acima do papel.
-  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96] };
+  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96], /* objetos */ 'tunica-jose': [0.5, 0.94, 0.95] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
@@ -9597,6 +9599,279 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.22);
   }
   // ---------- fim dos Lugares ----------
+
+  // ---------- Objetos: as pranchas ----------
+  // Cada objeto é uma prancha de gravura, como a funda de Davi: o objeto grande, no meio, em
+  // tinta sépia sobre papel com fibra (ou no escuro da casa, quando a história pede luz de
+  // lâmpada), com o lugar dele em volta só para contar a história. Gente nenhuma: só o que as
+  // pessoas usaram ou deixaram. Cada prancha tem o seu chão e o seu céu, sem repetir as outras.
+
+  // Um céu de manhã em linhas, mais cheio no alto, com bancos de nuvem feitos só de linha mais
+  // rala (sem contorno) e a barriga um pouco mais escura.
+  function ceuEmLinhas(k, W, hz, nuvens, { passo = 5.2, maxL = 1.5, topo = 0.62, base = 0.08 } = {}) {
+    const ruido = (x, y) => { const v = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453; return v - Math.floor(v) - 0.5; };
+    linhas(k, 0, 0, W, hz, passo, maxL, (x, y) => {
+      let v = base + Math.pow(1 - y / hz, 1.3) * (topo - base);
+      for (const [cx, cy, rx, ry] of nuvens) {
+        const u = (x - cx) / rx;
+        const w = (y - cy) / ry;
+        const d = u * u + w * w;
+        if (d < 1) v = v * (0.15 + 0.85 * d) + (w > 0.25 ? (1 - d) * 0.32 : 0);
+      }
+      return v + ruido(x, y) * 0.16;
+    });
+  }
+  // A faixa bordada (barra, punho): losangos e dentes em tinta e cor, ao longo de uma tira.
+  function faixaBordada(k, a, b, alt, cor, cor2, tinta) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const L = Math.hypot(dx, dy);
+    k.save();
+    k.translate(a[0], a[1]);
+    k.rotate(Math.atan2(dy, dx));
+    k.fillStyle = cor;
+    k.fillRect(0, -alt / 2, L, alt);
+    k.strokeStyle = tinta;
+    k.lineWidth = 1.2;
+    k.strokeRect(0, -alt / 2, L, alt);
+    const n = Math.max(2, Math.round(L / (alt * 1.1)));
+    const p = L / n;
+    for (let i = 0; i < n; i++) {
+      const x = i * p;
+      k.fillStyle = cor2;
+      k.beginPath();
+      k.moveTo(x + p * 0.5, -alt * 0.36);
+      k.lineTo(x + p * 0.86, 0);
+      k.lineTo(x + p * 0.5, alt * 0.36);
+      k.lineTo(x + p * 0.14, 0);
+      k.closePath();
+      k.fill();
+      k.stroke();
+      k.fillStyle = tinta;
+      k.beginPath();
+      k.arc(x + p * 0.5, 0, Math.max(1, alt * 0.07), 0, 6.283);
+      k.fill();
+    }
+    k.lineWidth = 1;
+    k.beginPath();
+    for (let x = 0; x <= L; x += alt * 0.32) { k.moveTo(x, -alt / 2); k.lineTo(x + alt * 0.16, -alt / 2 + alt * 0.14); k.lineTo(x + alt * 0.32, -alt / 2); }
+    k.stroke();
+    k.restore();
+  }
+
+  // ---------- (1) A túnica de José (Gn 37.3) ----------
+  // A túnica longa de diversas cores, pendurada pelos ombros numa vara de pastor deitada sobre
+  // duas forquilhas, no campo de Hebrom, de manhã. Uma manga cai solta, a outra foi jogada por
+  // cima da vara; a barra bordada encosta no capim e dobra no chão (é longa). As faixas de cor
+  // descem pelas pregas, e a gravura aperta no fundo de cada prega.
+  function desenhoTunica(k, W, H, obj) {
+    const r = sorteio(7101);
+    papelVelho(k, W, H, r, ['#fbf1dc', '#f0dcb8', '#d9bb90'], [200, 160]);
+    const hz = 492;
+    ceuEmLinhas(k, W, hz, [[180, 150, 230, 34], [640, 96, 200, 26], [760, 300, 170, 22]]);
+    // os morros de Hebrom, longe, em duas camadas
+    for (const [base, amp, cor, sv, sem] of [[452, 30, '#e6cda4', 0.32, 1], [486, 22, '#d4b48a', 0.5, 2]]) {
+      const f = onda(sorteio(7110 + sem), 4, 0.007);
+      const m = pol([[-10, 560], ...Array.from({ length: 48 }, (_, i) => [i * 19 - 4, base + f(i * 19) * amp]), [W + 10, 560]]);
+      peca(k, m, [-10, base - amp, W + 10, 560], { cor, ang: 0, passo: 4.4, maxL: 1.2, sombra: () => sv, cruzada: 0.85, traco: 1.4 });
+    }
+    // o campo: capim baixo em linhas, mais cheio perto
+    const chao = new Path2D();
+    chao.moveTo(-10, 520);
+    for (let x = -10; x <= W + 10; x += 10) chao.lineTo(x, 514 + Math.sin(x * 0.01 + 1) * 5);
+    chao.lineTo(W + 10, H + 10);
+    chao.lineTo(-10, H + 10);
+    chao.closePath();
+    k.fillStyle = '#dcc596';
+    k.fill(chao);
+    chaoEmLinhas(k, r, chao, -10, W + 10, 510, H, 1.8, (x, y) => 0.4 + (y - 510) / 700 + Math.sin(x * 0.015) * 0.08);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.6;
+    k.stroke(chao);
+    // a vara deitada nas duas forquilhas
+    const yv = (x) => 214 + (x - 70) * 0.03;
+    const poste = (x, base, alto, inc) => {
+      const t = [x + inc, base - alto];
+      const p = pol([[x - 11, base], [x - 9, base - alto * 0.5], [t[0] - 8, t[1] + 26], [t[0] - 24, t[1] - 18], [t[0] - 17, t[1] - 22], [t[0] - 1, t[1] + 8], [t[0] + 2, t[1] + 8], [t[0] + 16, t[1] - 20], [t[0] + 23, t[1] - 15], [t[0] + 9, t[1] + 26], [x + 10, base - alto * 0.5], [x + 12, base]]);
+      sombraNoChao(k, pol([[x - 10, base - 2], [x + 12, base - 2], [x + 150, base + 22], [x + 120, base + 26]]), 0, 0, 5, 0.3);
+      peca(k, p, [x - 24, t[1] - 22, x + 24, base], { cor: '#a98a5c', ang: 1.52, passo: 2.8, maxL: 1.5, sombra: (px) => 0.25 + (px - x + 12) / 24 * 0.6, cruzada: 0.7, traco: 2, obj });
+      // os nós da madeira e a casca
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.4;
+      for (const f of [0.28, 0.55, 0.8]) { const yy = base - alto * f; k.beginPath(); k.ellipse(x + (r() - 0.5) * 6, yy, 4, 7, 0, 0, 6.283); k.stroke(); }
+      // as pedras de calço no pé
+      for (const [dx, rx, ry] of [[-24, 16, 10], [22, 13, 8]]) {
+        const s = contornoRocha(r, [[x + dx - rx, base + 4], [x + dx - rx * 0.7, base - ry], [x + dx + rx * 0.4, base - ry * 1.1], [x + dx + rx, base + 4]], 2);
+        s.closePath();
+        peca(k, s, [x + dx - rx, base - ry, x + dx + rx, base + 4], { cor: '#d8c29a', ang: 0.5, passo: 3, maxL: 1.4, sombra: sombraOval(x + dx, base - ry * 0.3, rx, ry, 0), cruzada: 0.7, traco: 1.5 });
+      }
+    };
+    poste(116, 772, 572, 4);
+    poste(782, 760, 532, -4);
+    const varaP = [[52, yv(52) + 1], [300, yv(300)], [560, yv(560)], [846, yv(846) - 1]];
+    vara(k, varaP, 13, '#9c7a4c', obj);
+    // a casca da vara: anéis e nós
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.2;
+    for (let x = 80; x < 840; x += 26 + r() * 30) { k.beginPath(); k.moveTo(x, yv(x) - 7); k.quadraticCurveTo(x + 3, yv(x), x + 1, yv(x) + 7); k.stroke(); }
+
+    // a túnica: pendurada pela gola na vara; o corpo longo cai em pregas até o capim, as mangas
+    // pendem fora dele (com o vão da cava entre a manga e o corpo, para ler "túnica")
+    const TI = '#24180a';
+    const yo = (x) => yv(x) - 2;
+    const xs0 = 300;
+    const xs1 = 590;
+    // as bordas do corpo: retas até a cava, depois abrem para a barra
+    const bordaE = (y) => xs0 + 4 - Math.max(0, y - 380) * 0.13 + Math.sin(y * 0.021) * 2;
+    const bordaD = (y) => xs1 - 4 + Math.max(0, y - 380) * 0.14 + Math.sin(y * 0.017 + 1) * 3;
+    // as pregas: espaços desiguais (u torto), cada uma com a sua fundura
+    const torto = (u) => u + Math.sin(u * 9.4 + 0.7) * 0.035;
+    const NP = 6;
+    const fase = (u) => torto(u) * NP * Math.PI * 2 + 0.5;
+    const fundura = [0.7, 1, 0.55, 0.9, 0.65, 1, 0.8];
+    const fu = (u) => fundura[Math.max(0, Math.min(6, Math.floor(torto(u) * NP + 0.5)))];
+    // a barra: cada prega acaba na sua altura (a crista desce mais, o fundo sobe), sem dente igual
+    const barra = (u) => 782 + Math.cos(fase(u)) * 6 * fu(u) + Math.sin(u * 17 + 0.4) * 2.5 + u * 6 - (u < 0.05 ? (0.05 - u) * 110 : 0) - (u > 0.96 ? (u - 0.96) * 110 : 0);
+    const xDe = (u, y) => bordaE(y) + (bordaD(y) - bordaE(y)) * u + Math.sin(fase(u)) * 11 * fu(u) * Math.min(1, Math.max(0, (y - 250) / 260)) * Math.max(0, Math.min(1, u * 9, (1 - u) * 9));
+    const corpoPts = [];
+    for (let y = yo(xs0) - 6; y <= barra(0); y += 8) corpoPts.push([bordaE(y), y]);
+    for (let i = 0; i <= 90; i++) { const u = i / 90; corpoPts.push([xDe(u, barra(u)), barra(u)]); }
+    for (let y = barra(1); y >= yo(xs1) - 6; y -= 8) corpoPts.push([bordaD(y), y]);
+    // o alto: os ombros dobram por cima da vara (uma curva baixa) e a gola abre no meio
+    corpoPts.push([xs1 - 30, yo(xs1) - 14], [490, yo(490) - 15], [470, yo(470) - 13], [445, yo(445) - 11], [420, yo(420) - 13], [400, yo(400) - 15], [xs0 + 30, yo(xs0) - 14]);
+    const corpo = pol(corpoPts);
+    // a sombra da túnica no capim, para a direita (o sol vem da esquerda, de manhã)
+    sombraNoChao(k, pol([[bordaE(780) + 20, 778], [bordaD(780), 788], [bordaD(780) + 170, 812], [bordaE(780) + 160, 808]]), 0, 0, 10, 0.32);
+    marcar(k, obj, corpo);
+    // as faixas de cor (tingidas, gastas: o tom é baixo, a gravura faz o resto)
+    const faixas = [['#b0603c', 0.12], ['#ece0c2', 0.04], ['#5a6e92', 0.13], ['#d8b062', 0.08], ['#8a9258', 0.11], ['#ece0c2', 0.04], ['#b0603c', 0.13], ['#6e5a80', 0.07], ['#d8b062', 0.1], ['#5a6e92', 0.1], ['#b0603c', 0.08]];
+    const pinta = (forma, lista, xDeU, y0, y1) => {
+      const soma = lista.reduce((s, f) => s + f[1], 0);
+      k.save();
+      k.clip(forma);
+      let u0 = 0;
+      for (const [cor, w] of lista) {
+        const u1 = u0 + w / soma;
+        const pts = [];
+        for (let y = y0; y <= y1; y += 10) pts.push([xDeU(u0, y) - 0.6, y]);
+        for (let y = y1; y >= y0; y -= 10) pts.push([xDeU(u1, y) + 0.6, y]);
+        k.fillStyle = cor;
+        k.fill(pol(pts));
+        // um fio fino de tinta entre as faixas (o tear)
+        k.strokeStyle = 'rgba(36,24,10,.45)';
+        k.lineWidth = 1;
+        k.beginPath();
+        for (let y = y0; y <= y1; y += 10) { const x = xDeU(u1, y); if (y === y0) k.moveTo(x, y); else k.lineTo(x, y); }
+        k.stroke();
+        u0 = u1;
+      }
+      k.restore();
+    };
+    pinta(corpo, faixas, (u, y) => xDe(u, y), 180, 820);
+    k.save();
+    k.clip(corpo);
+    // as pregas: a sombra sobe no fundo de cada prega e do lado direito; a luz, na crista
+    const uDe = (x, y) => (x - bordaE(y)) / (bordaD(y) - bordaE(y));
+    const sombraPano = (x, y) => {
+      const u = uDe(x, y);
+      const funda = Math.max(0, Math.sin(fase(u) + Math.PI * 0.5)) * fu(u);
+      const desce = Math.min(1, Math.max(0, (y - 240) / 160));
+      const crista = Math.max(0, Math.sin(fase(u) - Math.PI * 0.5)) * fu(u);
+      return 0.14 + funda * 0.8 * desce - crista * 0.12 * desce + u * 0.16 + Math.max(0, 0.34 - (y - 226) / 70) * 0.7;
+    };
+    gravar(k, corpo, 444, 500, 380, Math.PI / 2, 3.4, 1.8, sombraPano, TI, 0);
+    gravar(k, corpo, 444, 500, 380, Math.PI / 2 - 0.55, 4.4, 1.4, (x, y) => (sombraPano(x, y) - 0.55) * 2.2, TI, 0);
+    // as linhas das pregas, do ombro à barra, cada uma com o filete de luz ao lado
+    for (let i = 0; i < NP; i++) {
+      const u = (i + 0.75 - 0.5 / NP) / NP;
+      const y0 = 248 + (i % 3) * 22;
+      k.strokeStyle = 'rgba(30,18,6,.85)';
+      k.lineWidth = 1.4 + fu(u);
+      k.beginPath();
+      for (let y = y0; y <= barra(u) - 8; y += 8) { const x = xDe(u, y); if (y === y0) k.moveTo(x, y); else k.lineTo(x, y); }
+      k.stroke();
+      k.strokeStyle = 'rgba(255,246,222,.55)';
+      k.lineWidth = 1.3;
+      k.beginPath();
+      for (let y = y0 + 16; y <= barra(u) - 14; y += 8) { const x = xDe(u - 0.42 / NP, y); if (y === y0 + 16) k.moveTo(x, y); else k.lineTo(x, y); }
+      k.stroke();
+    }
+    // a barra bordada, seguindo a quebra das pregas
+    for (let i = 0; i < 36; i++) {
+      const ua = i / 36;
+      const ub = (i + 1) / 36;
+      faixaBordada(k, [xDe(ua, barra(ua) - 15), barra(ua) - 15], [xDe(ub, barra(ub) - 15) + 0.8, barra(ub) - 15], 22, '#7e3622', '#c7a052', TI);
+    }
+    k.restore();
+    k.strokeStyle = TI;
+    k.lineWidth = 2.4;
+    k.lineJoin = 'round';
+    k.stroke(corpo);
+    // a gola: a abertura funda do pescoço (a vara passa por dentro dela) e a tira bordada em volta
+    const gola = pol([[408, yo(408) - 13], [445, yo(445) + 52], [482, yo(482) - 13], [470, yo(470) - 13], [445, yo(445) + 30], [420, yo(420) - 13]]);
+    k.fillStyle = '#1c1206';
+    k.fill(gola);
+    k.lineCap = 'round';
+    for (const [a, b] of [[[404, yo(404) - 12], [445, yo(445) + 56]], [[445, yo(445) + 56], [486, yo(486) - 12]]]) {
+      faixaBordada(k, a, b, 14, '#7e3622', '#c7a052', TI);
+    }
+    // a vara aparece no fundo da gola
+    k.save();
+    k.clip(gola);
+    vara(k, [[400, yv(400)], [490, yv(490)]], 13, '#7f6440', null);
+    k.restore();
+    // a manga esquerda: dobra por cima da vara e cai solta, fora do corpo (o vão da cava fica à vista)
+    const mE = pol([[xs0 + 34, yo(xs0 + 34) - 14], [262, yo(262) - 14], [236, yo(236) - 8], [226, yo(226) + 16], [222, 330], [214, 420], [212, 488], [268, 494], [276, 430], [284, 352], [292, 318], [306, yo(306) + 50]]);
+    sombraNoChao(k, mE, 10, 8, 6, 0.3);
+    marcar(k, obj, mE);
+    const xManga = (u, y) => 226 - (y - 240) * 0.05 + u * (60 + (y - 240) * 0.01);
+    pinta(mE, [['#5a6e92', 0.3], ['#d8b062', 0.12], ['#b0603c', 0.3], ['#ece0c2', 0.08], ['#8a9258', 0.3]], xManga, 200, 520);
+    const sManga = (x, y) => 0.16 + Math.max(0, Math.sin((x - 230) * 0.1 + 1.4)) * 0.45 + (x - 214) / 180 + Math.max(0, 0.3 - (y - 226) / 60);
+    gravar(k, mE, 250, 360, 200, Math.PI / 2 + 0.05, 3.4, 1.8, sManga, TI, 0);
+    gravar(k, mE, 250, 360, 200, Math.PI / 2 + 1.1, 4.2, 1.5, (x, y) => (sManga(x, y) - 0.62) * 2.2, TI, 0);
+    faixaBordada(k, [212, 472], [272, 478], 22, '#7e3622', '#c7a052', TI);
+    k.strokeStyle = TI;
+    k.lineWidth = 2.4;
+    k.stroke(mE);
+    // a boca do punho, escura, e a cava (a costura onde a manga encontra o corpo)
+    k.fillStyle = '#1c1206';
+    k.beginPath();
+    k.ellipse(240, 491, 27, 5, 0.1, 0, 6.283);
+    k.fill();
+    // a manga direita: jogada por cima da vara, pende atrás dela, mais curta e torcida
+    const mD = pol([[xs1 - 18, yo(xs1) - 13], [640, yo(640) - 16], [690, yo(690) - 13], [708, yo(708) + 8], [714, 300], [710, 368], [664, 376], [660, 316], [650, yo(650) + 20], [604, yo(604) + 18], [xs1 - 6, yo(xs1) + 30]]);
+    sombraNoChao(k, mD, 10, 8, 6, 0.28);
+    marcar(k, obj, mD);
+    pinta(mD, [['#b0603c', 0.32], ['#ece0c2', 0.08], ['#5a6e92', 0.3], ['#d8b062', 0.3]], (u, y) => 600 + u * 116, 180, 400);
+    const sMD = (x, y) => 0.26 + (x - 600) / 220 + (y < yo(x) + 4 ? -0.18 : 0.14) + Math.max(0, Math.sin((x - 600) * 0.08)) * 0.25;
+    gravar(k, mD, 656, 290, 150, Math.PI / 2 - 0.05, 3.4, 1.8, sMD, TI, 0);
+    gravar(k, mD, 656, 290, 150, Math.PI / 2 + 1.1, 4.2, 1.5, (x, y) => (sMD(x, y) - 0.62) * 2.2, TI, 0);
+    faixaBordada(k, [662, 360], [712, 356], 20, '#7e3622', '#c7a052', TI);
+    k.strokeStyle = TI;
+    k.lineWidth = 2.4;
+    k.stroke(mD);
+    // a vara passa por cima da manga dobrada (a ponta dela pende atrás)
+    vara(k, [[612, yv(612)], [846, yv(846) - 1]], 13, '#9c7a4c', obj);
+    // o capim na barra e no pé dos postes: tufos cheios, claros
+    k.save();
+    k.strokeStyle = 'rgba(96,78,40,.6)';
+    k.lineCap = 'round';
+    for (const [x0, x1, y, n] of [[90, 150, 776, 22], [744, 820, 764, 20], [230, 330, 800, 18], [560, 660, 806, 18]]) {
+      for (let i = 0; i < n; i++) {
+        const bx = x0 + r() * (x1 - x0);
+        const a = -Math.PI / 2 + (r() - 0.5) * 1.9;
+        const c = 14 + r() * 18;
+        k.lineWidth = 1.4 + r() * 0.9;
+        k.beginPath();
+        k.moveTo(bx, y + 4);
+        k.quadraticCurveTo(bx + Math.cos(a) * c * 0.5, y + Math.sin(a) * c * 0.7, bx + Math.cos(a) * c, y + Math.sin(a) * c * 0.9);
+        k.stroke();
+      }
+    }
+    k.restore();
+    vinheta(k, W, H, 0.2);
+  }
+  // ---------- fim dos Objetos ----------
 
   // ---------- a carta ----------
   const oswald = (t, peso = 600) => peso + ' ' + t + 'px Oswald, "Arial Narrow", sans-serif';
