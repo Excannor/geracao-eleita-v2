@@ -10123,8 +10123,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     const { forma, e: bordaE, d: bordaD } = tuboAo(c, larg);
     marcar(k, obj, forma);
     // o lado da sombra de cada amostra é o que olha para baixo e para a direita (a luz vem de
-    // cima, da esquerda), qualquer que seja o sentido em que a curva foi traçada
-    const lado = (q) => ((q.ty * 0.55 - q.tx * 0.83) >= 0 ? 1 : -1);
+    // cima, da esquerda), qualquer que seja o sentido em que a curva foi traçada; onde a curva
+    // vira, o lado passa de um para o outro aos poucos (sem salto na sombra nem no brilho)
+    const lado = (q) => Math.max(-1, Math.min(1, (q.ty * 0.55 - q.tx * 0.83) * 3));
     k.save();
     k.clip(forma);
     for (const q of c) {
@@ -10144,10 +10145,12 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const q = c[i];
       const w = larg(q.s) / 2;
       // os traços de volta só no lado da sombra, mais grossos perto da beirada
+      const lq = lado(q);
+      if (Math.abs(lq) < 0.05) continue;
       for (const [v0, v1, lw] of [[0.05, 0.45, 0.6], [0.45, 1.0, 1.1]]) {
-        k.lineWidth = lw;
+        k.lineWidth = lw * Math.abs(lq);
         k.beginPath();
-        const sl = lado(q);
+        const sl = Math.sign(lq);
         k.moveTo(q.x + q.ty * sl * v0 * w, q.y - q.tx * sl * v0 * w);
         k.lineTo(q.x + q.ty * sl * v1 * w, q.y - q.tx * sl * v1 * w);
         k.stroke();
@@ -10424,7 +10427,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     const haste = curvaPor([[cx, 642], [cx, topo]], 2.5);
     tuboDeOuro(k, haste, () => hW * 2, { luz: -1, obj });
     // os braços (os de trás primeiro não há: todos no mesmo plano, de frente)
-    for (const b of bracos) tuboDeOuro(k, b.c, () => hW * 1.7, { luz: -1, obj });
+    // (sem as tampas nas pontas: os braços de um lado e do outro se encontram na haste sem
+    // a costura do meio; a ponta de cima fica debaixo da lâmpada)
+    for (const b of bracos) tuboDeOuro(k, b.c, () => hW * 1.7, { luz: -1, obj, semPontas: true });
     // um botão debaixo de cada par de braços, na haste (25.35)
     for (const y of sai) tacaDeAmendoa(k, cx, y + 4, 0, hW * 1.7, obj, false);
     // as quatro taças da haste (25.34): no alto e entre os pares
