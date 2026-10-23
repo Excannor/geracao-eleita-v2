@@ -11629,37 +11629,36 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.22);
   }
   // ---------- (11) A pérola de grande valor (Mt 13.45-46) ----------
-  // Sobre a mesa do negociante: o pano de veludo azul aberto, com a barra bordada, e no meio
-  // dele, sozinha, a pérola grande, com o brilho de madrepérola. Ao lado, a bolsa de couro
-  // virada do avesso e vazia, com o cordão solto: ele vendeu tudo o que tinha (13.46). Atrás,
-  // a parede em hachura e o pano pendurado; a luz vem da esquerda.
+  // Sobre a mesa do negociante, de tarde, com a luz que entra pela esquerda: a caixinha rasa de
+  // madeira de oliveira, aberta, forrada de um pano de lã cor de vinho velho, amarrotado; no
+  // meio do forro, na cova do pano, a pérola, sozinha, com o lustre de madrepérola (um rosado e
+  // um verde-água bem leves) e a sombra mansa embaixo. A tampa está encostada atrás. Na frente,
+  // a bolsa de couro do negociante, mole e vazia, de boca virada para fora e o cordão solto: ele
+  // vendeu tudo o que tinha (13.46).
   function desenhoPerola(k, W, H, obj) {
     const r = sorteio(8101);
     papelVelho(k, W, H, r, ['#f4e8d0', '#e2cba4', '#c3a274'], [200, 220]);
-    const mesa = 430;
-    // a parede: hachura cruzada, mais escura longe da luz (da esquerda, alta)
-    linhas(k, 0, 0, W, mesa, 4, 2, (x, y) => 0.4 + x / W * 0.45 + y / mesa * 0.1);
-    // o pano pendurado na parede, à direita, com pregas
-    const cortina = pol([[640, -10], [W + 10, -10], [W + 10, 340], [860, 356], [800, 340], [740, 360], [690, 334], [656, 350]]);
-    peca(k, cortina, [620, -10, W + 10, 440], { cor: '#8a4a34', tinta: '#24100a', ang: Math.PI / 2, passo: 3, maxL: 1.8, sombra: (x) => 0.3 + Math.max(0, Math.sin((x - 620) * 0.05)) * 0.5, cruzada: 0.75, traco: 2 });
-    // a mesa de madeira, em perspectiva, com a borda da frente
+    const mesa = 420;
+    // a parede: linhas, e o facho de luz que entra pela esquerda e desce na diagonal
+    const facho = (x, y) => Math.max(0, 1 - Math.abs((x - 120) - (y * 0.9)) / 260);
+    linhas(k, 0, 0, W, mesa, 4, 2, (x, y) => 0.62 - facho(x, y) * 0.45 + y / mesa * 0.08);
+    // a mesa de madeira, com o veio e a borda da frente
     const tampo = pol([[-10, mesa], [W + 10, mesa], [W + 10, 790], [-10, 790]]);
-    k.fillStyle = '#b58e5e';
+    k.fillStyle = '#b8946a';
     k.fill(tampo);
     k.save();
     k.clip(tampo);
     k.strokeStyle = 'rgba(52,30,10,.6)';
     k.lineCap = 'round';
     for (let y = mesa + 3; y < 790; y += 3 + (y - mesa) * 0.02) {
-      k.lineWidth = 0.6 + (y - mesa) / 200;
+      k.lineWidth = (0.6 + (y - mesa) / 200) * (1 - facho(400, y) * 0.2);
       k.beginPath();
       for (let x = -10; x <= W + 10; x += 12) { const yy = y + Math.sin(x * 0.012 + y * 0.05) * 2; if (x === -10) k.moveTo(x, yy); else k.lineTo(x, yy); }
       k.stroke();
     }
     k.restore();
-    // a luz na mesa, à esquerda, e a borda da frente
-    const borda = pol([[-10, 790], [W + 10, 790], [W + 10, H + 10], [-10, H + 10]]);
-    peca(k, borda, [-10, 790, W + 10, H + 10], { cor: '#8a6438', ang: 0.02, passo: 3, maxL: 1.8, sombra: (x) => 0.45 + x / W * 0.3, cruzada: 0.7, traco: 2 });
+    const bordaM = pol([[-10, 790], [W + 10, 790], [W + 10, H + 10], [-10, H + 10]]);
+    peca(k, bordaM, [-10, 790, W + 10, H + 10], { cor: '#8a6438', ang: 0.02, passo: 3, maxL: 1.8, sombra: (x) => 0.45 + x / W * 0.3, cruzada: 0.7, traco: 2 });
     k.strokeStyle = 'rgba(255,236,196,.6)';
     k.lineWidth = 2;
     k.beginPath();
@@ -11667,186 +11666,187 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.lineTo(W + 10, 791);
     k.stroke();
 
-    // o pano do negociante, aberto na mesa: um quadrado de pano azul-escuro, com as quatro
-    // pontas abertas (uma virada), as dobras que vêm do meio e a barra bordada
-    const cx = 500;
-    const cy = 580;
-    const M = (u, v) => [cx + u * 290 + v * 80, cy + v * 128 - u * 20];
-    const NP = 30;
-    const altura = (u, v) => {
-      // a cova do meio, onde a pérola pousa, e as dobras que irradiam dela
-      const d = Math.hypot(u, v);
-      const ang = Math.atan2(v, u);
-      return -Math.exp(-((d / 0.22) ** 2)) * 10 + Math.pow(Math.max(0, Math.sin(ang * 2.5 + 0.6 + Math.sin(d * 4) * 0.4)), 3) * Math.min(1, d * 2.5) * 22 * (1 - d * 0.5) + Math.sin(ang * 4 + 2 + d * 3) * 5 * d + Math.sin(u * 7 + v * 3) * 3;
-    };
-    const P2 = (u, v) => { const [x, y] = M(u, v); return [x, y - altura(u, v)]; };
-    const contorno = [];
-    for (let i = 0; i <= NP; i++) contorno.push(P2(-1 + (2 * i) / NP, -1 + Math.sin((i / NP) * Math.PI) * -0.06));
-    for (let i = 0; i <= NP; i++) contorno.push(P2(1 + Math.sin((i / NP) * Math.PI) * 0.05, -1 + (2 * i) / NP));
-    for (let i = 0; i <= NP; i++) contorno.push(P2(1 - (2 * i) / NP, 1 + Math.sin((i / NP) * Math.PI) * 0.04));
-    for (let i = 0; i <= NP; i++) contorno.push(P2(-1 - Math.sin((i / NP) * Math.PI) * 0.05, 1 - (2 * i) / NP));
-    const pano = pol(contorno);
-    sombraNoChao(k, pano, 18, 10, 8, 0.4);
-    k.fillStyle = '#2e3e62';
-    k.fill(pano);
-    marcar(k, obj, pano);
-    // a gravura do veludo: linhas que seguem o pano, mais grossas nas dobras de sombra
+    // a caixinha: em mundo (x à direita, y para cima, z para quem olha), vista de cima, de leve
+    const S0 = 300;
+    const V = (x, y, z) => [470 + x * S0 + z * S0 * 0.28, 600 - y * S0 + z * S0 * 0.5];
+    const bw = 0.62;
+    const bd = 0.42;
+    const bh = 0.16;
+    const parede = 0.035;
+    const face = (pts, cor, sv, ang, o = obj) => { const p = pol(pts.map((q) => V(...q))); peca(k, p, [0, 0, W, H], { cor, tinta: '#24140a', ang, passo: 2.4, maxL: 1.5, sombra: typeof sv === 'function' ? sv : () => sv, cruzada: 0.75, traco: 1.8, obj: o }); return p; };
+    // a sombra da caixa na mesa e a tampa encostada atrás, inclinada
+    sombraNoChao(k, pol([V(-bw, 0, -bd), V(bw, 0, -bd), V(bw + 0.25, 0, bd), V(-bw + 0.1, 0, bd + 0.05)]), 26, 10, 10, 0.45);
+    const inc = 0.35;
+    const tz = (ly) => -bd - 0.02 - ly * Math.sin(inc);
+    const ty = (ly) => ly * Math.cos(inc);
+    face([[-bw, ty(0), tz(0)], [bw, ty(0), tz(0)], [bw, ty(0.55), tz(0.55)], [-bw, ty(0.55), tz(0.55)]], '#9c7448', (x, y) => 0.35 + (x - 300) / 900, 1.45);
+    // a almofada de dentro da tampa: o mesmo pano
+    face([[-bw + 0.06, ty(0.06), tz(0.06) + 0.005], [bw - 0.06, ty(0.06), tz(0.06) + 0.005], [bw - 0.06, ty(0.49), tz(0.49) + 0.005], [-bw + 0.06, ty(0.49), tz(0.49) + 0.005]], '#6a3a2c', 0.55, 0.3, null);
+    // a caixa: a frente e o lado direito
+    face([[-bw, 0, bd], [bw, 0, bd], [bw, bh, bd], [-bw, bh, bd]], '#b08452', (x) => 0.25 + (x - 300) / 1200, 1.52);
+    face([[bw, 0, bd], [bw, 0, -bd], [bw, bh, -bd], [bw, bh, bd]], '#8c6640', 0.6, 1.2);
+    // o alto das paredes (a beirada da caixa) e o vão de dentro
+    const fora = [[-bw, bh, -bd], [bw, bh, -bd], [bw, bh, bd], [-bw, bh, bd]];
+    const dentro = [[-bw + parede, bh, -bd + parede], [bw - parede, bh, -bd + parede], [bw - parede, bh, bd - parede], [-bw + parede, bh, bd - parede]];
+    const beira = new Path2D();
+    beira.addPath(pol(fora.map((q) => V(...q))));
+    k.fillStyle = '#d2a670';
+    k.fill(beira);
+    marcar(k, obj, beira);
+    const vao = pol(dentro.map((q) => V(...q)));
+    // o forro: pano de lã amarrotado, cor de vinho velho, que sobe nas paredes; dobras desiguais
+    // em volta de uma cova no meio, onde a pérola descansa
     k.save();
-    k.clip(pano);
+    k.clip(vao);
+    k.fillStyle = '#5e3428';
+    k.fill(vao);
+    const [cx, cy] = V(0.02, bh - 0.02, 0.02);
+    // as dobras: vincos curvos e desiguais que atravessam o forro, cada um com o fundo escuro e a
+    // crista acesa ao lado; nenhum sai do meio (nada de raio)
+    const vincos = [
+      [[-0.56, 0.11, -0.3], [-0.3, 0.13, -0.24], [-0.14, 0.11, -0.32]],
+      [[0.2, 0.11, -0.3], [0.38, 0.13, -0.24], [0.56, 0.11, -0.3]],
+      [[-0.56, 0.11, 0.26], [-0.36, 0.13, 0.18], [-0.18, 0.11, 0.3]],
+      [[0.22, 0.11, 0.28], [0.4, 0.13, 0.2], [0.56, 0.11, 0.3]],
+    ];
+    gravar(k, vao, cx, cy, 260, 0.15, 2.4, 1.5, (x, y) => 0.5 + (x - cx) / 900 + Math.exp(-(((x - cx) / 60) ** 2) - (((y - cy) / 26) ** 2)) * 0.35, '#1e0e08', 0.1);
+    // as dobras macias do pano: largas e borradas (a lã não faz vinco), cada uma uma sombra e,
+    // ao lado, uma crista clara
     k.lineCap = 'round';
-    for (let j = -1; j <= 1.001; j += 0.04) {
-      let ant = null;
-      for (let i = -1.05; i <= 1.05; i += 0.03) {
-        const [x, y] = P2(i, j);
-        const s0 = altura(i + 0.03, j) - altura(i, j);
-        const s1 = altura(i, j + 0.03) - altura(i, j);
-        const sombra = Math.max(0, Math.min(1, 0.45 - s0 * 0.25 + s1 * 0.25 + (i + j) * 0.12));
-        if (ant) {
-          k.strokeStyle = 'rgba(8,12,24,' + (0.4 + sombra * 0.5).toFixed(2) + ')';
-          k.lineWidth = 0.6 + sombra * 2;
-          k.beginPath();
-          k.moveTo(ant[0], ant[1]);
-          k.lineTo(x, y);
-          k.stroke();
-        }
-        ant = [x, y];
-      }
+    for (const v of vincos) {
+      const c = bezier(V(...v[0]), V(...v[1]), V(...v[1]), V(...v[2]), 20);
+      k.save();
+      k.filter = 'blur(5px)';
+      k.strokeStyle = 'rgba(18,6,2,.55)';
+      k.lineWidth = 14;
+      k.beginPath();
+      c.forEach(([x, y], i) => (i ? k.lineTo(x + 5, y + 4) : k.moveTo(x + 5, y + 4)));
+      k.stroke();
+      k.strokeStyle = 'rgba(200,140,110,.5)';
+      k.lineWidth = 10;
+      k.beginPath();
+      c.forEach(([x, y], i) => (i ? k.lineTo(x - 5, y - 4) : k.moveTo(x - 5, y - 4)));
+      k.stroke();
+      k.restore();
     }
-    // o lustro do veludo nas cristas das dobras
-    for (let j = -0.96; j <= 0.96; j += 0.04) {
-      let ant = null;
-      for (let i = -1; i <= 1; i += 0.03) {
-        const [x, y] = P2(i, j);
-        const s0 = altura(i + 0.03, j) - altura(i, j);
-        const s1 = altura(i, j + 0.03) - altura(i, j);
-        const luz = Math.max(0, s0 * 0.5 - s1 * 0.4 - 0.4);
-        if (ant && luz > 0.05) {
-          k.strokeStyle = 'rgba(160,180,222,' + Math.min(0.8, luz).toFixed(2) + ')';
-          k.lineWidth = 1.4;
-          k.beginPath();
-          k.moveTo(ant[0], ant[1]);
-          k.lineTo(x, y);
-          k.stroke();
-        }
-        ant = [x, y];
-      }
-    }
+    // a gravura do pano por cima, para as dobras virarem linha (mais grossa na sombra)
+    gravar(k, vao, cx, cy, 260, 0.15, 3, 1.2, () => 0.35, '#1e0e08', 0.1);
+    // a sombra das paredes no forro (lado da luz à esquerda)
+    k.fillStyle = 'rgba(20,8,4,.35)';
+    k.fill(pol([V(-bw + parede, bh, -bd + parede), V(bw - parede, bh, -bd + parede), V(bw - parede, bh - 0.05, -bd + 0.12), V(-bw + parede, bh - 0.05, -bd + 0.12)]));
+    k.fill(pol([V(bw - parede, bh, -bd + parede), V(bw - parede, bh, bd - parede), V(bw - 0.1, bh - 0.05, bd - parede), V(bw - 0.1, bh - 0.05, -bd + parede)]));
     k.restore();
-    // a barra bordada de ouro, pela beira
-    k.strokeStyle = '#24120a';
-    k.lineWidth = 2.2;
-    k.stroke(pano);
-    k.strokeStyle = 'rgba(214,170,80,.9)';
-    k.lineWidth = 2.4;
-    k.setLineDash([10, 6]);
-    const dentro = [];
-    for (let i = 0; i <= NP; i++) dentro.push(P2(-0.92 + (1.84 * i) / NP, -0.9));
-    for (let i = 0; i <= NP; i++) dentro.push(P2(0.92, -0.9 + (1.8 * i) / NP));
-    for (let i = 0; i <= NP; i++) dentro.push(P2(0.92 - (1.84 * i) / NP, 0.9));
-    for (let i = 0; i <= NP; i++) dentro.push(P2(-0.92, 0.9 - (1.8 * i) / NP));
-    k.stroke(pol(dentro));
-    k.setLineDash([]);
-    // a pérola: grande, sozinha na cova do pano, com o tom de madrepérola (rosado de um lado,
-    // azulado do outro), a gravura de volta no lado da sombra, o reflexo do pano embaixo e um
-    // só brilho
-    const pr = 92;
-    const [px, py0] = P2(0, 0);
-    const py = py0 - pr + 14;
-    const contato = new Path2D();
-    contato.ellipse(px + 14, py + pr - 8, pr * 0.95, pr * 0.28, 0, 0, 6.283);
-    k.save();
-    k.filter = 'blur(8px)';
-    k.fillStyle = 'rgba(4,6,14,.55)';
-    k.fill(contato);
-    k.restore();
+    k.strokeStyle = '#24140a';
+    k.lineWidth = 1.6;
+    k.stroke(vao);
+    k.lineWidth = 2;
+    k.stroke(pol(fora.map((q) => V(...q))));
+    // a pérola: lisa, um nada irregular, com o lustre: o tom perolado, um rosado de um lado e um
+    // verde-água do outro, a janela da luz em cima (macia) e o reflexo morno do pano embaixo
+    const pr = 50;
+    const px = cx + 6;
+    const py = cy - pr * 0.62;
     const perola = new Path2D();
-    perola.arc(px, py, pr, 0, 6.283);
-    const g = k.createRadialGradient(px - pr * 0.4, py - pr * 0.45, pr * 0.05, px, py, pr);
-    g.addColorStop(0, '#fffdf6');
-    g.addColorStop(0.35, '#f3ead8');
-    g.addColorStop(0.72, '#d6c9bb');
-    g.addColorStop(1, '#a29696');
+    for (let i = 0; i <= 48; i++) {
+      const a = (i / 48) * 6.283;
+      const rr = pr * (1 + Math.sin(a * 3 + 0.4) * 0.012 + Math.sin(a * 2) * 0.01);
+      if (i) perola.lineTo(px + Math.cos(a) * rr, py + Math.sin(a) * rr); else perola.moveTo(px + Math.cos(a) * rr, py + Math.sin(a) * rr);
+    }
+    perola.closePath();
+    // a sombra mansa, deitada no pano, e o escuro da cova logo embaixo
+    k.save();
+    k.filter = 'blur(7px)';
+    k.fillStyle = 'rgba(16,6,2,.6)';
+    k.beginPath();
+    k.ellipse(px + 18, py + pr * 0.9, pr * 1.05, pr * 0.32, 0, 0, 6.283);
+    k.fill();
+    k.restore();
+    const g = k.createRadialGradient(px - pr * 0.35, py - pr * 0.4, pr * 0.05, px, py, pr * 1.02);
+    g.addColorStop(0, '#fbf6ea');
+    g.addColorStop(0.45, '#ece2d0');
+    g.addColorStop(0.8, '#c9bcae');
+    g.addColorStop(1, '#9c8c84');
     k.fillStyle = g;
     k.fill(perola);
     marcar(k, obj, perola);
-    brilho(k, px + pr * 0.35, py - pr * 0.1, pr * 0.7, 'rgba(240,186,198,.35)');
-    brilho(k, px - pr * 0.25, py + pr * 0.45, pr * 0.6, 'rgba(160,196,210,.35)');
-    // o lado da sombra em pontilhado fino (a pérola é lisa: nada de linha que vire costura)
     k.save();
     k.clip(perola);
-    for (let n = 0; n < 900; n++) {
-      const a = r() * 6.283;
-      const dd = Math.sqrt(r()) * pr;
-      const x = px + Math.cos(a) * dd;
-      const y = py + Math.sin(a) * dd;
-      const s = ((x - px) * 0.6 + (y - py) * 0.7) / pr;
-      if (r() > s * 0.9) continue;
-      k.fillStyle = 'rgba(110,100,96,.35)';
+    // o oriente: lavagens leves de rosado e verde-água, e o reflexo vinho do pano embaixo
+    brilho(k, px + pr * 0.42, py - pr * 0.05, pr * 0.75, 'rgba(236,180,190,.32)');
+    brilho(k, px - pr * 0.3, py + pr * 0.35, pr * 0.65, 'rgba(160,200,192,.3)');
+    brilho(k, px + pr * 0.1, py + pr * 1.05, pr * 0.7, 'rgba(150,70,60,.45)');
+    // a sombra da pérola em linhas finas de volta, só no lado de baixo e da direita
+    for (let i = 0; i < 9; i++) {
+      const rr = pr * (0.62 + i * 0.045);
+      k.strokeStyle = 'rgba(90,76,70,' + (0.1 + i * 0.03).toFixed(2) + ')';
+      k.lineWidth = 0.9;
       k.beginPath();
-      k.arc(x, y, 0.6 + s * 0.4, 0, 6.283);
-      k.fill();
+      k.arc(px - pr * 0.18, py - pr * 0.2, rr, 0.05, 1.9);
+      k.stroke();
     }
+    // a janela da luz: um brilho macio (sem ponto duro) e um segundo, fraco, do outro lado
+    brilho(k, px - pr * 0.38, py - pr * 0.42, pr * 0.32, 'rgba(255,255,255,.95)');
+    brilho(k, px + pr * 0.42, py + pr * 0.38, pr * 0.18, 'rgba(255,240,230,.4)');
     k.restore();
-    k.save();
-    k.clip(perola);
-    k.strokeStyle = 'rgba(70,90,140,.5)';
-    k.lineWidth = 7;
-    k.beginPath();
-    k.arc(px, py, pr - 4, 0.35, 2.6);
-    k.stroke();
-    k.restore();
-    k.strokeStyle = '#4a4038';
-    k.lineWidth = 1.8;
+    k.strokeStyle = 'rgba(80,66,60,.85)';
+    k.lineWidth = 1.4;
     k.stroke(perola);
-    k.fillStyle = 'rgba(255,255,255,.95)';
-    k.beginPath();
-    k.ellipse(px - pr * 0.42, py - pr * 0.42, pr * 0.15, pr * 0.09, -0.6, 0, 6.283);
-    k.fill();
-    // a bolsa de couro, deitada e vazia, na frente à esquerda: o corpo murcho, o pescoço
-    // franzido, a boca aberta para quem olha (o escuro de dentro, sem nada) e o cordão solto
+
+    // a bolsa de couro, mole e vazia, deitada na frente à esquerda: o saco redondo e murcho, o
+    // pescoço franzido amarrado e a boca virada para fora (o avesso mais claro), sem nada dentro
     {
-      const bx = 170;
-      const by = 752;
-      const corpoB = pol([[bx - 110, by + 8], [bx - 104, by - 26], [bx - 70, by - 50], [bx - 20, by - 54], [bx + 26, by - 40], [bx + 46, by - 18], [bx + 48, by + 6], [bx + 30, by + 20], [bx - 30, by + 26], [bx - 86, by + 22]]);
-      sombraNoChao(k, corpoB, 14, 8, 6, 0.35);
-      peca(k, corpoB, [bx - 110, by - 54, bx + 48, by + 26], { cor: '#a06c3c', tinta: '#2a1406', ang: 1.3, passo: 2.6, maxL: 1.6, sombra: (x, y) => 0.25 + (y - by + 54) / 110 + (x - bx) / 400, cruzada: 0.7, traco: 2, obj });
-      // as pregas do couro murcho, que correm para o pescoço
-      k.strokeStyle = 'rgba(42,20,6,.8)';
+      const bx = 175;
+      const by = 712;
+      const saco = new Path2D();
+      saco.moveTo(bx - 96, by + 10);
+      saco.bezierCurveTo(bx - 108, by - 36, bx - 50, by - 66, bx + 4, by - 54);
+      saco.bezierCurveTo(bx + 34, by - 46, bx + 46, by - 24, bx + 50, by - 8);
+      saco.bezierCurveTo(bx + 52, by + 12, bx + 30, by + 30, bx - 20, by + 32);
+      saco.bezierCurveTo(bx - 60, by + 34, bx - 90, by + 28, bx - 96, by + 10);
+      saco.closePath();
+      sombraNoChao(k, saco, 14, 8, 6, 0.35);
+      peca(k, saco, [bx - 108, by - 66, bx + 52, by + 34], { cor: '#9a6a40', tinta: '#2a1406', ang: 1.1, passo: 2.6, maxL: 1.6, sombra: (x, y) => 0.25 + (y - by + 60) / 120 + (x - bx) / 500, cruzada: 0.75, traco: 2, obj });
+      // as pregas moles do couro, que vão para o pescoço
+      k.strokeStyle = 'rgba(42,20,6,.75)';
       k.lineCap = 'round';
-      for (const [x0, y0, c] of [[bx - 90, by - 6, 0], [bx - 70, by - 34, -6], [bx - 40, by + 16, 6], [bx - 30, by - 44, -4]]) {
-        k.lineWidth = 1.6;
+      k.lineWidth = 1.6;
+      for (const [x0, y0] of [[bx - 80, by - 4], [bx - 60, by - 34], [bx - 34, by + 18], [bx - 20, by - 46]]) {
         k.beginPath();
         k.moveTo(x0, y0);
-        k.quadraticCurveTo((x0 + bx + 40) / 2, (y0 + by - 14) / 2 + c, bx + 40, by - 14);
+        k.quadraticCurveTo((x0 + bx + 44) / 2, (y0 + by - 12) / 2 + 6, bx + 44, by - 12);
         k.stroke();
       }
-      // o pescoço franzido e a boca aberta, de lado
-      const pesc = pol([[bx + 40, by - 30], [bx + 62, by - 26], [bx + 64, by + 4], [bx + 42, by + 10]]);
-      peca(k, pesc, [bx + 40, by - 30, bx + 64, by + 10], { cor: '#8a5a30', tinta: '#2a1406', ang: 1.5, passo: 2, maxL: 1.2, sombra: () => 0.5, traco: 1.8, obj });
-      // a boca: o couro franzido que abre em leque depois do pescoço, em pregas, e o escuro
-      // de dentro aparecendo entre elas (vazia)
-      const leque = [];
-      for (let i = 0; i <= 12; i++) {
-        const a = -1.05 + (i / 12) * 2.1;
-        const R = i % 2 ? 40 : 50;
-        leque.push([bx + 62 + Math.cos(a) * R * 0.8, by - 10 + Math.sin(a) * R]);
-      }
-      const fLeque = pol([[bx + 62, by - 22], ...leque, [bx + 62, by + 2]]);
-      peca(k, fLeque, [bx + 62, by - 60, bx + 104, by + 40], { cor: '#b07a46', tinta: '#2a1406', ang: 0.2, passo: 2.4, maxL: 1.3, sombra: (x, y) => 0.25 + (y - by + 50) / 160, cruzada: 0.8, traco: 2, obj });
-      k.strokeStyle = 'rgba(42,20,6,.85)';
-      k.lineWidth = 1.4;
-      for (let i = 1; i < 12; i += 2) { k.beginPath(); k.moveTo(bx + 64, by - 10); k.lineTo(leque[i][0], leque[i][1]); k.stroke(); }
-      const fundo = new Path2D();
-      fundo.ellipse(bx + 92, by - 8, 7, 26, 0.1, 0, 6.283);
-      k.fillStyle = '#1e0e04';
-      k.fill(fundo);
-      // o cordão solto, que sai do pescoço e serpenteia na mesa
+      // o pescoço franzido, amarrado com o cordão
+      const pesc = pol([[bx + 44, by - 26], [bx + 64, by - 22], [bx + 66, by + 2], [bx + 46, by + 6]]);
+      peca(k, pesc, [bx + 44, by - 26, bx + 66, by + 6], { cor: '#86582e', tinta: '#2a1406', ang: 1.5, passo: 2, maxL: 1.2, sombra: () => 0.5, traco: 1.8, obj });
       k.strokeStyle = '#d8c09a';
-      k.lineWidth = 3.2;
+      k.lineWidth = 4;
       k.beginPath();
-      k.moveTo(bx + 50, by + 6);
-      k.bezierCurveTo(bx + 40, by + 50, bx + 110, by + 40, bx + 150, by + 56);
-      k.bezierCurveTo(bx + 180, by + 68, bx + 150, by + 84, bx + 120, by + 80);
+      k.moveTo(bx + 54, by - 26);
+      k.lineTo(bx + 56, by + 6);
+      k.stroke();
+      // a boca virada para fora: uma gola larga de couro mais claro, ondulada, que abre em
+      // flor, e o escuro raso de dentro (vazio)
+      const gola = new Path2D();
+      gola.ellipse(bx + 80, by - 10, 18, 30, 0.08, 0, 6.283);
+      peca(k, gola, [bx + 62, by - 40, bx + 98, by + 20], { cor: '#c99a62', tinta: '#2a1406', ang: 0.3, passo: 2.4, maxL: 1.1, sombra: (x, y) => 0.2 + (y - by + 40) / 160, cruzada: 0.85, traco: 1.8, obj });
+      // a beirada virada (o avesso), em duas ondas, e o escuro raso de dentro: vazio
+      k.strokeStyle = 'rgba(42,20,6,.7)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.ellipse(bx + 82, by - 10, 12, 23, 0.08, 0, 6.283);
+      k.stroke();
+      k.fillStyle = 'rgba(40,18,4,.85)';
+      k.beginPath();
+      k.ellipse(bx + 84, by - 9, 7, 16, 0.08, 0, 6.283);
+      k.fill();
+      // o cordão solto, que faz uma curva na mesa e volta (fica todo em cima da mesa)
+      k.strokeStyle = '#d8c09a';
+      k.lineWidth = 3;
+      k.beginPath();
+      k.moveTo(bx + 56, by + 6);
+      k.bezierCurveTo(bx + 50, by + 40, bx + 120, by + 50, bx + 150, by + 34);
+      k.bezierCurveTo(bx + 176, by + 20, bx + 150, by + 2, bx + 128, by + 16);
       k.stroke();
       k.strokeStyle = 'rgba(42,20,6,.85)';
       k.lineWidth = 1;
