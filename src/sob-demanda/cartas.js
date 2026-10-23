@@ -14649,7 +14649,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const p = seixo(r, x, y, s0, s0 * 0.6, 0, 0.16);
       peca(k, p, [x - s0, y - s0, x + s0, y + s0], { cor: '#3c463a', tinta: '#0a0e0a', ang: 0.6, passo: 3, maxL: 1.6, sombra: sombraOval(x, y, s0, s0 * 0.6, 0), cruzada: 0.7, traco: 1.8 });
     }
-    const alga = (x, base, alto, fase) => {
+    const alga = (x, base, alto, fase, passo = 0.11, larg = 18) => {
       k.strokeStyle = 'rgba(80,98,62,.95)';
       k.lineCap = 'round';
       k.lineWidth = 3.4;
@@ -14660,14 +14660,14 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         if (t === 0) k.moveTo(xx, yy); else k.lineTo(xx, yy);
       }
       k.stroke();
-      for (let t = 0.12; t < 1; t += 0.11) {
+      for (let t = 0.12 + fase * 0.02; t < 1; t += passo) {
         const xx = x + Math.sin(t * 5 + fase) * 16 * t;
         const yy = base - t * alto;
-        const ld = (t * 9) % 2 > 1 ? 1 : -1;
+        const ld = (t * 9 + fase) % 2 > 1 ? 1 : -1;
         const fl = new Path2D();
         fl.moveTo(xx, yy);
-        fl.quadraticCurveTo(xx + ld * 18, yy - 4, xx + ld * 26, yy - 18);
-        fl.quadraticCurveTo(xx + ld * 8, yy - 10, xx, yy);
+        fl.quadraticCurveTo(xx + ld * larg, yy - 4, xx + ld * larg * 1.45, yy - larg);
+        fl.quadraticCurveTo(xx + ld * larg * 0.45, yy - larg * 0.55, xx, yy);
         k.fillStyle = 'rgba(96,114,70,.9)';
         k.fill(fl);
         k.strokeStyle = 'rgba(20,28,14,.9)';
@@ -14675,7 +14675,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         k.stroke(fl);
       }
     };
-    for (const [x, a, f] of [[60, 260, 0], [130, 200, 1.4], [320, 150, 2.2], [690, 220, 0.6], [760, 300, 2.9], [830, 180, 1.1]]) alga(x, fundoY(x) + 4, a, f);
+    for (const [x, a, f, ps, lg] of [[60, 260, 0, 0.09, 16], [130, 200, 1.4, 0.15, 22], [320, 150, 2.2, 0.2, 14], [690, 220, 0.6, 0.12, 20], [760, 300, 2.9, 0.08, 15], [830, 180, 1.1, 0.17, 24]]) alga(x, fundoY(x) + 4, a, f, ps, lg);
     k.restore();
     // a linha d'água: o traço claro da superfície vista de lado
     k.strokeStyle = 'rgba(240,238,220,.9)';
@@ -14692,8 +14692,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     // garoupa: a cabeça grande, a boca comprida e fechada (o queixo um pouco para fora), as
     // costas escuras e a barriga clara, as escamas, as barbatanas de raios e a cauda em leque
     k.save();
-    k.translate(470, 520);
+    k.translate(440, 520);
     k.rotate(-0.13);
+    k.scale(0.96, 0.96);
     k.translate(-470, -520);
     const perfil = curvaPor([[140, 520], [170, 470], [230, 428], [320, 398], [430, 384], [540, 392], [640, 420], [720, 452], [770, 470], [772, 500], [726, 520], [640, 560], [530, 604], [420, 626], [310, 620], [230, 596], [176, 568], [150, 548], [140, 520]], 3);
     const peixe = pol(perfil.map((q) => [q.x, q.y]));
@@ -14803,18 +14804,15 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.fill();
     // a barbatana do peito, por cima do corpo
     barb([[330, 514], [340, 540], [352, 560]], [[400, 520], [440, 556], [432, 594]], '#6a7460');
-    k.restore();
-    // as bolhas que sobem da guelra, poucas e de tamanhos diferentes
-    for (let i = 0; i < 10; i++) {
-      const x = 296 + (r() - 0.5) * 24 + i * 3;
-      const y = 380 - i * 22 - r() * 8;
-      if (y < nivel + 12) break;
+    // umas bolhas que saem da fenda da guelra e sobem, poucas e desencontradas
+    for (const [x, y, rr] of [[306, 420, 4], [298, 396, 6], [312, 372, 3], [300, 346, 5], [314, 318, 3.5]]) {
       k.strokeStyle = 'rgba(224,232,214,.85)';
       k.lineWidth = 1.2;
       k.beginPath();
-      k.arc(x, y, 2 + r() * 5, 0, 6.283);
+      k.arc(x, y, rr, 0, 6.283);
       k.stroke();
     }
+    k.restore();
     vinheta(k, W, H, 0.24);
   }
 
