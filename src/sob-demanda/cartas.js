@@ -13829,192 +13829,210 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.stroke(varaF);
     vinheta(k, W, H, 0.2);
   }
-  // ---------- (4) As muralhas de Jericó (Js 6.4-5, 6.20) ----------
-  // De fora, de longe: a cidade no alto do morro, cercada pelo muro de pedra embaixo e de
-  // tijolo em cima, com as torres. No meio, o muro vem abaixo: os blocos caem rolando pela
-  // encosta, as pontas que ficaram em pé estão rachadas e tortas, e o pó sobe do rombo em
-  // nuvens gravadas. Na frente, no chão, as cornetas de chifre de carneiro (6.4), deitadas,
-  // de anéis escuros. Ninguém desenhado.
+  // ---------- (4) As muralhas de Jericó (Js 6.20) ----------
+  // De baixo e de viés, ao pé do monte da cidade: o talude de pedra que reveste o morro e, em
+  // cima, o muro de tijolo de barro, que foge em perspectiva para a direita. No meio, o muro
+  // "veio abaixo": as fiadas cedem, se dobram para fora e escorrem talude abaixo num monte de
+  // entulho (blocos com a face de cima e a do lado, tijolos soltos), a torre do lado partida, e
+  // do entulho sobe o pó em rolos gravados. Pelo rombo aparecem as casas da cidade. Na frente,
+  // uma corneta de chifre de carneiro só, encostada numa pedra. Ninguém desenhado.
   function desenhoMuralhas(k, W, H, obj) {
     const r = sorteio(9401);
-    papelVelho(k, W, H, r, ['#fbf0d6', '#ecd6aa', '#cfae7a'], [700, 140]);
-    const hz = 300;
-    ceuEmLinhas(k, W, hz, [[160, 90, 200, 18], [760, 150, 150, 14]], { topo: 0.5, base: 0.08 });
-    // o morro da cidade (o tel), de perto, e a planície
-    const morro = (x) => 470 + Math.sin(x * 0.01) * 6;
-    const pe = (x) => 590 + Math.sin(x * 0.012 + 1) * 8;
+    papelVelho(k, W, H, r, ['#fbf0d6', '#ecd6aa', '#cfae7a'], [760, 100]);
+    const hz = 250;
+    ceuEmLinhas(k, W, hz, [[120, 60, 200, 18], [700, 120, 160, 14]], { topo: 0.5, base: 0.08 });
     const chao = pol([[-10, hz], [W + 10, hz], [W + 10, H + 10], [-10, H + 10]]);
-    k.fillStyle = '#e2c99a';
+    k.fillStyle = '#e0c698';
     k.fill(chao);
     chaoEmLinhas(k, r, chao, -10, W + 10, hz, H, 1.8, (x, y) => 0.3 + (y - hz) / 900);
-    // as casas da cidade, lá dentro, que aparecem pelo rombo
-    for (let i = 0; i < 6; i++) {
-      const x = 290 + i * 62 + (r() - 0.5) * 12;
-      casinha(k, r, x, 330 + (r() - 0.5) * 10, 52 + r() * 20, 34 + r() * 20, 12, { cor: '#e8d2a2', lado: '#c2a172', teto: '#d8c08e', porta: r() < 0.6, janela: r() < 0.5, traco: 1.3 });
-    }
-    // o pó que sobe do rombo, atrás: nuvens largas e baixas, gravadas do lado da sombra
-    const nuvemDePo = (cx, cy, rx, ry, a) => {
-      const p = seixo(r, cx, cy, rx, ry, (r() - 0.5) * 0.3, 0.14);
-      k.save();
-      k.filter = 'blur(2px)';
-      k.fillStyle = 'rgba(236,220,186,' + a + ')';
-      k.fill(p);
-      k.restore();
-      gravar(k, p, cx, cy, Math.max(rx, ry) * 1.1, 0.25, 4, 1.5, (x, y) => (y - cy) / ry * 0.6 + (x - cx) / rx * 0.2 + 0.1, 'rgba(96,68,32,.85)', 0.25);
-      marcar(k, obj, p);
+    // a perspectiva: tudo do muro é desenhado num plano inclinado (y cai para a direita)
+    const inc = -0.2;
+    const S0 = (x, y) => [x, y + x * inc];
+    const base = 600;
+    const alt = (x) => 230 - x * 0.11;
+    const rombo = [300, 600];
+    const fR = onda(sorteio(9420), 4, 0.06);
+    const topoM = (x) => {
+      const h = alt(x);
+      let f = 1;
+      if (x > rombo[0] && x < rombo[1]) { const t = (x - rombo[0]) / (rombo[1] - rombo[0]); f = 0.15 + Math.pow(Math.abs(2 * t - 1), 1.6) * 0.85 + fR(x) * 0.06; }
+      return base - h * f + (Math.floor(x / 22) % 2 === 0 && f > 0.98 ? -12 : 0);
     };
-    for (const [cx, cy, rx, ry] of [[450, 190, 150, 64], [340, 250, 110, 60], [580, 240, 120, 62], [460, 290, 170, 64], [520, 130, 90, 40]]) nuvemDePo(cx, cy, rx, ry, 0.93);
-    // a encosta do tel: o revestimento de pedra, em talude
-    const talude = pol([[-10, morro(-10)], ...Array.from({ length: 46 }, (_, i) => [i * 20 - 6, morro(i * 20 - 6)]), [W + 10, pe(W + 10)], ...Array.from({ length: 46 }, (_, i) => { const x = W + 10 - i * 20; return [x, pe(x)]; })]);
-    muroEmFiadas(k, r, talude, [-10, 460, W + 10, 610], { h: 16, cor: '#d2b07c', sombra: (x, y) => 0.4 + (y - 470) / 300, traco: 1, larg: 2.2 });
+    // as casas da cidade, atrás, que aparecem pelo rombo
+    for (let i = 0; i < 7; i++) {
+      const x = 330 + i * 46 + (r() - 0.5) * 10;
+      const [, y] = S0(x, base - alt(x) - 6);
+      casinha(k, r, x, y + 10, 50 + r() * 16, 34 + r() * 18, 10, { cor: '#e8d2a2', lado: '#c2a172', teto: '#d8c08e', porta: r() < 0.5, janela: r() < 0.6, traco: 1.3 });
+    }
+    k.save();
+    k.transform(1, inc, 0, 1, 0, 0);
+    // o talude de pedra (o revestimento do morro), inclinado, de pedras grandes
+    const talude = pol([[-30, base], [W + 60, base], [W + 60, base + 60], [-30, base + 150]]);
+    muroEmFiadas(k, r, talude, [-30, base - 4, W + 60, base + 160], { h: 26, cor: '#d4b07a', sombra: (x, y) => 0.38 + (y - base) / 300, traco: 1.4, larg: 2.4 });
     k.strokeStyle = SEPIA;
     k.lineWidth = 2;
     k.stroke(talude);
     marcar(k, obj, talude);
-    // o muro de tijolo em cima, com as ameias e as torres; de cada lado do rombo, a ponta que
-    // ficou em pé, quebrada em degraus tortos e debruçada para fora
-    const topoM = 214;
-    const trecho = (xa, xb, quebra, lado) => {
-      const pts = [[xa, morro(xa) + 4]];
-      for (let x = xa; x <= xb; x += 6) {
-        let y = topoM + (Math.floor((x - xa) / 26) % 2 === 0 ? -16 : 0);
-        const d = lado < 0 ? xb - x : x - xa;
-        if (d < quebra) y += (quebra - d) * 2.2 + Math.sin(d * 0.3) * 10 + (r() - 0.5) * 8;
-        pts.push([x, y]);
-      }
-      pts.push([xb, morro(xb) + 4]);
-      return pol(pts);
-    };
-    for (const [xa, xb, lado, giro] of [[-20, 300, -1, -0.04], [600, W + 20, 1, 0.05]]) {
-      const m = trecho(xa, xb, 120, lado);
-      k.save();
-      const px0 = lado < 0 ? xb : xa;
-      k.translate(px0, morro(px0));
-      k.rotate(giro);
-      k.translate(-px0, -morro(px0));
-      muroEmFiadas(k, r, m, [xa, topoM - 20, xb, morro(xb) + 6], { h: 18, cor: '#dcbd86', sombra: (x, y) => 0.3 + (y - 200) / 500, traco: 1.2, larg: 2.2 });
-      k.strokeStyle = SEPIA;
+    // o muro de tijolo, inteiro dos dois lados do rombo
+    const muro = pol([[-30, base], ...Array.from({ length: 98 }, (_, i) => { const x = -30 + i * 10; return [x, topoM(x)]; }), [W + 60, base]]);
+    muroEmFiadas(k, r, muro, [-30, 300, W + 60, base], { h: 16, cor: '#dcbc86', sombra: (x, y) => 0.3 + (y - 380) / 500 + (x > rombo[0] - 40 && x < rombo[1] + 40 ? 0.15 : 0), traco: 1.1, larg: 2.4 });
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.stroke(muro);
+    marcar(k, obj, muro);
+    // as rachaduras compridas nas beiradas do rombo, e o muro que se debruça para fora
+    k.strokeStyle = 'rgba(26,14,4,.9)';
+    k.lineCap = 'round';
+    for (const [x0, dir] of [[rombo[0] - 10, -1], [rombo[0] - 60, -1], [rombo[1] + 10, 1], [rombo[1] + 70, 1]]) {
+      let x = x0;
+      let y = topoM(x0) + 10;
       k.lineWidth = 2.4;
-      k.stroke(m);
-      marcar(k, obj, m);
-      // as rachaduras que descem da quebra
-      k.strokeStyle = 'rgba(26,14,4,.9)';
-      k.lineCap = 'round';
-      for (let q = 0; q < 3; q++) {
-        let x = (lado < 0 ? xb - 40 - q * 34 : xa + 40 + q * 34);
-        let y = topoM + 60 + q * 30;
-        k.lineWidth = 2.4;
-        k.beginPath();
-        k.moveTo(x, y);
-        for (let i = 0; i < 6; i++) { x -= lado * (4 + r() * 12); y += 18 + r() * 12; k.lineTo(x, y); }
-        k.stroke();
-      }
-      k.restore();
-    }
-    // as torres das pontas
-    for (const tx of [70, 820]) {
-      const tw = 74;
-      const t = pol([[tx - tw / 2, morro(tx)], [tx - tw / 2, topoM - 46], [tx - tw / 2 + 14, topoM - 46], [tx - tw / 2 + 14, topoM - 62], [tx - 8, topoM - 62], [tx - 8, topoM - 46], [tx + 8, topoM - 46], [tx + 8, topoM - 62], [tx + tw / 2 - 14, topoM - 62], [tx + tw / 2 - 14, topoM - 46], [tx + tw / 2, topoM - 46], [tx + tw / 2, morro(tx)]]);
-      muroEmFiadas(k, r, t, [tx - tw / 2, topoM - 64, tx + tw / 2, morro(tx) + 2], { h: 18, cor: '#e2c792', sombra: (x) => 0.22 + (x - tx + tw / 2) / tw * 0.5, traco: 1.2, larg: 1.6 });
-      k.strokeStyle = SEPIA;
-      k.lineWidth = 2.4;
-      k.stroke(t);
-      marcar(k, obj, t);
-    }
-    // os pedaços do muro que caem: lascas grandes de várias fiadas, girando, pela encosta
-    // abaixo, os de cima ainda no ar
-    const lasca = (x, y, w, h, giro) => {
-      k.save();
-      k.translate(x, y);
-      k.rotate(giro);
-      const pts = [[-w / 2, -h / 2 + (r() - 0.5) * 12], [-w * 0.1, -h / 2 - 6 + (r() - 0.5) * 10], [w / 2, -h / 2 + (r() - 0.5) * 14], [w / 2 + (r() - 0.5) * 10, h / 2], [w * 0.1, h / 2 + (r() - 0.5) * 10], [-w / 2 + (r() - 0.5) * 10, h / 2]];
-      const p = pol(pts);
-      sombraNoChao(k, p, 8, 10, 4, 0.3);
-      muroEmFiadas(k, r, p, [-w / 2 - 12, -h / 2 - 16, w / 2 + 12, h / 2 + 12], { h: 16, cor: '#d4b27c', sombra: (px, py) => 0.32 + (py + h / 2) / h * 0.4, traco: 1.2, larg: 2 });
-      k.strokeStyle = SEPIA;
-      k.lineWidth = 2.2;
-      k.stroke(p);
-      marcar(k, obj, p);
-      k.restore();
-    };
-    for (const [x, y, w, h, g] of [[360, 250, 110, 70, -0.5], [520, 236, 96, 64, 0.6], [440, 330, 150, 80, 0.25], [330, 400, 120, 62, -0.9], [560, 380, 130, 70, -0.35], [450, 470, 140, 66, 0.15], [270, 500, 90, 50, 0.7], [640, 500, 100, 56, -0.6], [380, 560, 80, 44, 1.1], [520, 560, 96, 50, -0.2]]) lasca(x, y, w, h, g);
-    // tijolos soltos no ar e no chão
-    for (let i = 0; i < 26; i++) {
-      const x = 260 + r() * 400;
-      const y = 220 + r() * 380;
-      k.save();
-      k.translate(x, y);
-      k.rotate(r() * 3);
-      const p = pol([[-12, -7], [12, -7], [12, 7], [-12, 7]]);
-      peca(k, p, [-12, -7, 12, 7], { cor: '#cfa772', ang: 0.2, passo: 2.4, maxL: 1, sombra: (px, py) => 0.3 + (py + 7) / 14 * 0.5, cruzada: 0.8, traco: 1.3, obj });
-      k.restore();
-    }
-    // o pó de baixo, no pé, em volta dos pedaços que já caíram
-    for (const [cx, cy, rx, ry] of [[300, 590, 90, 30], [610, 596, 100, 32], [460, 610, 120, 30]]) nuvemDePo(cx, cy, rx, ry, 0.85);
-    // as cornetas de chifre de carneiro, deitadas na frente, de tamanhos diferentes: o chifre
-    // que afina e se curva, os anéis da ponta à boca, a boca larga e o bocal liso
-    const chifre = (pts, l0, l1, tom) => {
-      const c = curvaPor(pts, 3);
-      const S = c[c.length - 1].s;
-      const larg = (s) => l0 + (l1 - l0) * Math.pow(s / S, 1.3);
-      const sombraC = tuboAo(c.map((q) => ({ ...q, x: q.x + 8, y: q.y + 10 })), larg).forma;
-      sombraNoChao(k, sombraC, 0, 0, 6, 0.4);
-      const { forma } = tuboAo(c, larg);
-      k.fillStyle = tom;
-      k.fill(forma);
-      marcar(k, obj, forma);
-      k.save();
-      k.clip(forma);
-      // o volume: escuro embaixo, a luz em cima
-      for (let v = -1; v <= 1; v += 0.1) {
-        k.strokeStyle = v > 0 ? 'rgba(30,16,4,' + (v * 0.6).toFixed(2) + ')' : 'rgba(255,236,196,' + (-v * 0.35).toFixed(2) + ')';
-        k.lineWidth = 2;
-        k.beginPath();
-        c.forEach((q, i) => { const w = larg(q.s) / 2; const x = q.x - q.ty * v * w; const y = q.y + q.tx * v * w; if (i) k.lineTo(x, y); else k.moveTo(x, y); });
-        k.stroke();
-      }
-      // os anéis do chifre, mais juntos perto da ponta
-      k.strokeStyle = 'rgba(30,16,4,.8)';
-      for (let s = 10; s < S - 30; s += 6 + (s / S) * 10) {
-        const q = c[Math.min(c.length - 1, Math.round(s / 3))];
-        const w = larg(s) / 2 + 2;
-        k.lineWidth = 1.2;
-        k.beginPath();
-        k.moveTo(q.x + q.ty * w, q.y - q.tx * w);
-        k.quadraticCurveTo(q.x + q.tx * w * 0.35, q.y + q.ty * w * 0.35, q.x - q.ty * w, q.y + q.tx * w);
-        k.stroke();
-      }
-      k.restore();
-      k.strokeStyle = '#1e1206';
-      k.lineWidth = 2.2;
-      k.stroke(forma);
-      // a boca larga, aberta, na ponta grossa
-      const f = c[c.length - 1];
-      const w = l1 / 2;
-      const boca = new Path2D();
-      boca.ellipse(f.x, f.y, w * 0.42, w, Math.atan2(f.ty, f.tx), 0, 6.283);
-      k.fillStyle = '#2a1608';
-      k.fill(boca);
-      k.strokeStyle = '#e8c890';
-      k.lineWidth = 2;
-      k.stroke(boca);
-      marcar(k, obj, boca);
-      // o bocal, na ponta fina, mais claro e liso
-      const p0 = c[0];
-      k.fillStyle = '#e2c48e';
       k.beginPath();
-      k.ellipse(p0.x, p0.y, l0 * 0.5, l0 * 0.7, Math.atan2(p0.ty, p0.tx), 0, 6.283);
-      k.fill();
-      k.strokeStyle = '#1e1206';
-      k.lineWidth = 1.4;
+      k.moveTo(x, y);
+      for (let i = 0; i < 7; i++) { x += dir * (2 + r() * 8) * (r() < 0.5 ? -1 : 1); y += 20 + r() * 10; k.lineTo(x, y); }
       k.stroke();
+    }
+    // o desmoronamento: a massa de tijolo que cede e escorre do rombo talude abaixo, com as
+    // fiadas dobradas para baixo (o muro cai sobre si mesmo e para fora)
+    const cx = (rombo[0] + rombo[1]) / 2;
+    const monte = null;
+    const cm = contornoRocha(r, [[rombo[0] - 10, topoM(rombo[0] - 10) + 40], [rombo[0] + 30, topoM(rombo[0] + 30) + 10], [cx - 70, topoM(cx - 70) + 4], [cx - 10, topoM(cx) - 4], [cx + 60, topoM(cx + 60) + 2], [rombo[1] - 30, topoM(rombo[1] - 30) + 10], [rombo[1] + 10, topoM(rombo[1] + 10) + 40], [rombo[1] + 70, base + 40], [rombo[1] + 90, base + 96], [cx + 80, base + 120], [cx - 60, base + 126], [rombo[0] - 50, base + 100], [rombo[0] - 40, base + 40]], 12);
+    cm.closePath();
+    void monte;
+    sombraNoChao(k, cm, 14, 10, 8, 0.4);
+    k.fillStyle = '#c09a66';
+    k.fill(cm);
+    marcar(k, obj, cm);
+    k.save();
+    k.clip(cm);
+    // as fiadas dobradas: arcos que caem dos dois lados do rombo, partidos em pedaços
+    for (let j = 0; j < 16; j++) {
+      const y0 = topoM(cx) + j * 18;
+      k.strokeStyle = 'rgba(30,18,6,.8)';
+      k.lineWidth = 1.4;
+      let x = rombo[0] - 100;
+      while (x < rombo[1] + 100) {
+        const L = 30 + r() * 60;
+        const yy = (xx) => y0 + Math.pow((xx - cx) / 220, 2) * (40 + j * 10) + j * 4;
+        k.beginPath();
+        k.moveTo(x, yy(x));
+        k.quadraticCurveTo(x + L / 2, yy(x + L / 2) + (r() - 0.5) * 6, x + L, yy(x + L));
+        k.stroke();
+        x += L + 8 + r() * 20;
+      }
+    }
+    gravar(k, cm, cx, base, 300, 0.6, 3.6, 1.8, (x, y) => 0.3 + (y - topoM(cx)) / 600 + Math.abs(x - cx) / 900, SEPIA, 0);
+    k.restore();
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.stroke(cm);
+    // os blocos soltos no entulho: cada um com a face de cima clara e a do lado escura
+    const bloco = (x, y, w, h, prof, giro) => {
+      k.save();
+      k.translate(x, y);
+      k.rotate(giro);
+      const frente = pol([[-w / 2, 0], [w / 2, 0], [w / 2, h], [-w / 2, h]]);
+      const topo = pol([[-w / 2, 0], [-w / 2 + prof, -prof * 0.6], [w / 2 + prof, -prof * 0.6], [w / 2, 0]]);
+      const lado = pol([[w / 2, 0], [w / 2 + prof, -prof * 0.6], [w / 2 + prof, h - prof * 0.6], [w / 2, h]]);
+      sombraNoChao(k, pol([[-w / 2, h], [w / 2 + prof, h], [w / 2 + prof + 10, h + 8], [-w / 2 + 6, h + 10]]), 0, 0, 3, 0.35);
+      peca(k, frente, [-w / 2, 0, w / 2, h], { cor: '#d0ab74', ang: 0.1, passo: 2.8, maxL: 1.2, sombra: () => 0.45, cruzada: 0.8, traco: 1.4, obj });
+      peca(k, topo, [-w / 2, -prof, w / 2 + prof, 0], { cor: '#ecd4a2', ang: 0.1, passo: 3.6, maxL: 1, sombra: () => 0.15, cruzada: 1, traco: 1.4, obj });
+      peca(k, lado, [w / 2, -prof, w / 2 + prof, h], { cor: '#a8865a', ang: 1.4, passo: 2.6, maxL: 1.3, sombra: () => 0.7, cruzada: 0.8, traco: 1.4, obj });
+      k.restore();
     };
-    chifre([[90, 672], [150, 684], [230, 676], [300, 650], [346, 636], [384, 646]], 9, 44, '#8a5a2c');
-    chifre([[150, 744], [220, 756], [306, 752], [382, 728], [428, 706], [466, 716]], 10, 52, '#6f4520');
-    chifre([[560, 730], [610, 748], [690, 748], [740, 726], [770, 696]], 8, 42, '#9a6a36');
-    capim(k, r, 520, 680, 30, 11);
-    capim(k, r, 830, 700, 26, 9);
-    capim(k, r, 60, 790, 30, 11);
+    const blocos = [];
+    for (let i = 0; i < 160; i++) {
+      const t = r();
+      const x = cx + (r() - 0.5) * (220 + t * 260);
+      const y = topoM(cx) + 50 + t * (base + 100 - topoM(cx));
+      if (!k.isPointInPath(cm, x, y + inc * x)) continue;
+      blocos.push([x, y, 14 + r() * 30, 8 + r() * 12, 5 + r() * 8, (r() - 0.5) * 0.9]);
+    }
+    blocos.sort((a2, b2) => a2[1] - b2[1]);
+    for (const b2 of blocos) bloco(...b2);
+    // a torre do lado direito do rombo, partida no alto, de beirada em degraus tortos
+    const tx = rombo[1] + 60;
+    const tw = 80;
+    const tTopo = base - alt(tx) - 70;
+    const torre = pol([[tx - tw / 2, base], [tx - tw / 2, tTopo + 60], [tx - tw / 2 + 12, tTopo + 30], [tx - 10, tTopo + 46], [tx + 4, tTopo + 10], [tx + 20, tTopo + 26], [tx + tw / 2, tTopo], [tx + tw / 2, base]]);
+    muroEmFiadas(k, r, torre, [tx - tw / 2, tTopo - 4, tx + tw / 2, base], { h: 16, cor: '#e2c792', sombra: (x) => 0.22 + (x - tx + tw / 2) / tw * 0.5, traco: 1.1, larg: 1.6 });
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.stroke(torre);
+    marcar(k, obj, torre);
+    // a torre da esquerda, inteira, com as ameias
+    const ex = 90;
+    const ew = 96;
+    const eTopo = base - alt(ex) - 60;
+    const torreE = pol([[ex - ew / 2, base], [ex - ew / 2, eTopo], [ex - ew / 2 + 18, eTopo], [ex - ew / 2 + 18, eTopo - 16], [ex - 10, eTopo - 16], [ex - 10, eTopo], [ex + 10, eTopo], [ex + 10, eTopo - 16], [ex + ew / 2 - 18, eTopo - 16], [ex + ew / 2 - 18, eTopo], [ex + ew / 2, eTopo], [ex + ew / 2, base]]);
+    muroEmFiadas(k, r, torreE, [ex - ew / 2, eTopo - 18, ex + ew / 2, base], { h: 16, cor: '#e2c792', sombra: (x) => 0.22 + (x - ex + ew / 2) / ew * 0.5, traco: 1.1, larg: 1.6 });
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.stroke(torreE);
+    marcar(k, obj, torreE);
+    k.restore();
+    // o pó que sobe do entulho: rolos gravados, de beirada clara e barriga em hachura, que se
+    // abrem para cima e somem (nada de mancha borrada)
+    const rolos = [];
+    for (let i = 0; i < 9; i++) {
+      const t = i / 8;
+      const [px, py] = S0(cx + (r() - 0.5) * 260 * (1 - t * 0.3) + t * 60, topoM(cx) + 40 - t * 260);
+      rolos.push([px, py, 54 + t * 40 + r() * 24, 34 + t * 20 + r() * 12, t]);
+    }
+    for (const [x, y, rx, ry, t] of rolos.reverse()) {
+      const p = seixo(r, x, y, rx, ry, (r() - 0.5) * 0.3, 0.14);
+      k.globalAlpha = 1 - t * 0.3;
+      k.fillStyle = '#e6d2a8';
+      k.fill(p);
+      gravar(k, p, x, y, Math.max(rx, ry) * 1.1, 0.35, 3.2, 1.8, (px, py) => (py - y) / ry * 0.6 + 0.35 - t * 0.25 + (px - x) / rx * 0.15, 'rgba(80,56,26,.95)', 0.3);
+      k.strokeStyle = 'rgba(96,68,32,.6)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.ellipse(x, y, rx, ry, 0, 0.1, Math.PI - 0.1);
+      k.stroke();
+      k.globalAlpha = 1;
+      marcar(k, obj, p);
+    }
+    // uma corneta de chifre de carneiro, só, encostada numa pedra no canto de baixo
+    const pedra = contornoRocha(r, [[84, 742], [96, 714], [128, 700], [150, 680], [196, 684], [232, 702], [256, 736]], 4);
+    pedra.closePath();
+    sombraNoChao(k, pedra, 16, 8, 6, 0.35);
+    peca(k, pedra, [84, 676, 256, 744], { cor: '#c6a676', ang: 0.6, passo: 3, maxL: 1.6, sombra: (x, y) => 0.25 + (x - 90) / 300 + (y - 680) / 200, cruzada: 0.72, traco: 2, obj });
+    const c = curvaPor([[150, 730], [196, 718], [246, 690], [284, 654], [300, 620], [316, 606]], 3);
+    const S1 = c[c.length - 1].s;
+    const lg = (sx) => 7 + 30 * Math.pow(sx / S1, 1.4);
+    const { forma } = tuboAo(c, lg);
+    sombraNoChao(k, forma, 8, 10, 5, 0.4);
+    k.fillStyle = '#8a5a2c';
+    k.fill(forma);
+    marcar(k, obj, forma);
+    k.save();
+    k.clip(forma);
+    k.strokeStyle = 'rgba(30,16,4,.8)';
+    for (let sx = 10; sx < S1 - 12; sx += 6 + (sx / S1) * 8) {
+      const q = c[Math.min(c.length - 1, Math.round(sx / 3))];
+      const w = lg(sx) / 2 + 2;
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.moveTo(q.x + q.ty * w, q.y - q.tx * w);
+      k.quadraticCurveTo(q.x + q.tx * w * 0.35, q.y + q.ty * w * 0.35, q.x - q.ty * w, q.y + q.tx * w);
+      k.stroke();
+    }
+    gravar(k, forma, 230, 680, 140, 0.8, 3, 1.4, (x, y) => 0.3 + (y - 630) / 200, '#1e1006', 0);
+    k.restore();
+    k.strokeStyle = '#1e1206';
+    k.lineWidth = 2.2;
+    k.stroke(forma);
+    const fb = c[c.length - 1];
+    k.fillStyle = '#2a1608';
+    k.beginPath();
+    k.ellipse(fb.x, fb.y, 10, 19, Math.atan2(fb.ty, fb.tx), 0, 6.283);
+    k.fill();
+    k.strokeStyle = '#e8c890';
+    k.lineWidth = 2;
+    k.stroke();
+    capim(k, r, 420, 790, 30, 11);
+    capim(k, r, 780, 740, 26, 9);
     vinheta(k, W, H, 0.2);
   }
 
