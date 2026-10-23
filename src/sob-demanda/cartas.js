@@ -2806,45 +2806,300 @@
     }
   }
 
-  // (1) A oferta de Abel (Gn 4.4): o altar de pedras brutas, a lenha, a lã branca do cordeiro
-  // (uma das primeiras crias do rebanho) e a fumaça subindo reta no céu claro; o cajado de
-  // pastor (Abel era pastor de ovelhas, 4.2) encostado no altar.
+  // A fumaça em gravura: do fogo sobe um fio estreito de traços que serpenteiam e, mais acima,
+  // rolos que se abrem com o vento (vai), cada um com o contorno em ondinhas e a hachura curva
+  // do lado da sombra, cada vez mais claros, até sumir no céu. Sem disco de luz nem tampa.
+  function fumaca(k, r, x, y, yTopo, larg0, larg1, vai, cor = SEPIA) {
+    const alto = y - yTopo;
+    const meio = (t) => x + vai * Math.pow(t, 1.4) + Math.sin(t * 6.2 + 0.4) * 22 * t;
+    const larg = (t) => larg0 + (larg1 - larg0) * Math.pow(t, 0.9);
+    k.save();
+    k.lineCap = 'round';
+    k.strokeStyle = cor;
+    // o fio que sai do fogo
+    for (let i = 0; i < 7; i++) {
+      const u = (i / 6) * 2 - 1;
+      const fase = r() * 6.283;
+      let ant = null;
+      for (let t = 0; t <= 0.3; t += 0.01) {
+        const px = meio(t) + u * larg(t) * 0.32 + Math.sin(t * 20 + fase) * 4;
+        const py = y - t * alto;
+        if (ant) {
+          k.globalAlpha = 0.75;
+          k.lineWidth = 1.5 - t * 2;
+          k.beginPath();
+          k.moveTo(ant[0], ant[1]);
+          k.lineTo(px, py);
+          k.stroke();
+        }
+        ant = [px, py];
+      }
+    }
+    // os rolos, do mais alto (atrás) ao mais baixo (na frente)
+    const rolos = [];
+    for (let i = 0; i < 9; i++) {
+      const t = 0.2 + i * 0.095;
+      rolos.push({ t, x: meio(t) + (i % 2 ? 1 : -1) * larg(t) * 0.18 + (r() - 0.5) * 10, y: y - t * alto, rr: larg(t) * (0.34 + r() * 0.08) });
+    }
+    for (const q of rolos.reverse()) {
+      const forma = seixo(r, q.x, q.y, q.rr, q.rr * 0.78, (r() - 0.5) * 0.4, 0.07);
+      const a = Math.max(0, 1 - q.t * 1.05);
+      k.globalAlpha = 0.25 + a * 0.6;
+      k.fillStyle = '#efe5ca';
+      k.fill(forma);
+      k.globalAlpha = 0.15 + a * 0.75;
+      const so = sombraOval(q.x, q.y, q.rr, q.rr * 0.78, 0);
+      gravar(k, forma, q.x, q.y, q.rr * 1.1, 0.5, 4.2, 1.5 * a + 0.3, (px, py) => (so(px, py) - 0.45) * 1.6, cor, 0.35);
+      // o contorno em ondinhas, só do lado de baixo e da direita (o de cima se perde na luz)
+      k.lineWidth = 0.8 + a * 1.1;
+      k.beginPath();
+      for (let g = -0.6; g <= 2.6; g += 0.05) {
+        const w = 1 + Math.sin(g * 9) * 0.035;
+        const px = q.x + Math.cos(g) * q.rr * w;
+        const py = q.y + Math.sin(g) * q.rr * 0.78 * w;
+        if (g === -0.6) k.moveTo(px, py); else k.lineTo(px, py);
+      }
+      k.stroke();
+    }
+    k.restore();
+  }
+  // O contorno de uma labareda: a base reta e, em cima, as línguas (pontas de alturas soltas,
+  // tortas para o lado do vento), ligadas por vales, com os lados em curva de S.
+  function contornoDeLabareda(x, y, larg, picos) {
+    const p = new Path2D();
+    p.moveTo(x - larg / 2, y);
+    let ant = [x - larg / 2, y - picos[0].v];
+    p.quadraticCurveTo(x - larg / 2 - 6, y - picos[0].v * 0.4, ant[0], ant[1]);
+    picos.forEach((q, i) => {
+      const prox = picos[i + 1];
+      const vale = prox ? [(q.x + prox.x) / 2 + q.vai * 0.25, y - prox.v] : [x + larg / 2, y - q.v * 0.5];
+      const ponta = [q.x + q.vai, y - q.h];
+      const dy = ant[1] - ponta[1];
+      p.bezierCurveTo(ant[0] - 4, ant[1] - dy * 0.45, ponta[0] - q.vai * 0.7 - q.curva, ponta[1] + dy * 0.42, ponta[0], ponta[1]);
+      const dy2 = vale[1] - ponta[1];
+      p.bezierCurveTo(ponta[0] - q.vai * 0.15 + q.curva * 0.5, ponta[1] + dy2 * 0.35, vale[0] + 6, vale[1] - dy2 * 0.5, vale[0], vale[1]);
+      ant = vale;
+    });
+    p.quadraticCurveTo(x + larg / 2 + 8, y - 10, x + larg / 2, y);
+    p.closePath();
+    return p;
+  }
+  // O fogo do altar em gravura: uma labareda só, larga e baixa, com várias línguas tortas
+  // para o lado do vento; o miolo claro; a hachura que sobe acompanhando o fogo, mais cheia
+  // nas beiradas; umas lascas soltas no alto e as fagulhas. É fogo de lenha; a tocha de
+  // Gideão tem outro.
+  function fogoDoAltar(k, r, x, y, larg, alto, n, vento = 1) {
+    const picos = Array.from({ length: n }, (_, i) => {
+      const t = (i + 0.5) / n - 0.5;
+      const h = alto * Math.max(0.12, 1 - Math.abs(t) * 1.7) * (0.55 + r() * 0.5) * (i % 2 ? 0.8 : 1);
+      return { x: x + t * larg * 0.9 + (r() - 0.5) * 10, h, v: h * (0.3 + r() * 0.2), vai: vento * (h * 0.14 + r() * 16), curva: (r() - 0.5) * 18 };
+    });
+    // a do meio é a mais alta
+    const m = picos[Math.floor(n / 2)];
+    m.h = Math.min(alto, Math.max(...picos.map((q) => q.h)) * 1.18);
+    m.vai = vento * m.h * 0.2;
+    m.curva = 22;
+    const fora = contornoDeLabareda(x, y, larg, picos);
+    const dentro = contornoDeLabareda(x + 6, y, larg * 0.62, picos.slice(1, -1).map((q) => ({ ...q, x: x + 6 + (q.x - x) * 0.62, h: q.h * 0.58, v: q.v * 0.7, vai: q.vai * 0.6 })));
+    k.save();
+    k.lineJoin = 'round';
+    k.fillStyle = 'rgba(217,138,58,.72)';
+    k.fill(fora);
+    k.fillStyle = 'rgba(255,230,168,.85)';
+    k.fill(dentro);
+    // a hachura sobe com o fogo, inclinada para o vento, mais grossa longe do miolo
+    gravar(k, fora, x, y - alto / 2, alto * 0.75, -Math.PI / 2 + vento * 0.16, 3.4, 1.6,
+      (px, py) => 0.12 + Math.min(1, Math.abs(px - x - (y - py) * 0.16 * vento) / (larg * 0.5)) * 0.8 - Math.max(0, (py - y + alto * 0.5) / alto) * 0.3, '#6b2a08', 0.3);
+    gravar(k, dentro, x, y - alto / 3, alto * 0.5, -Math.PI / 2 + vento * 0.16, 4.4, 0.9, () => 0.5, '#9a4a14', 0.3);
+    k.strokeStyle = '#5a2406';
+    k.lineWidth = 1.8;
+    k.stroke(fora);
+    k.lineWidth = 1;
+    k.strokeStyle = 'rgba(120,52,14,.7)';
+    k.stroke(dentro);
+    k.strokeStyle = '#7a3410';
+    k.lineCap = 'round';
+    for (let i = 0; i < 12; i++) {
+      const px = x + (r() - 0.3) * larg * 0.8;
+      const py = y - alto * (0.85 + r() * 0.5);
+      const a = -Math.PI / 2 + vento * 0.4 + (r() - 0.5) * 0.8;
+      k.lineWidth = 1.3 + r() * 0.8;
+      k.beginPath();
+      k.moveTo(px, py);
+      k.lineTo(px + Math.cos(a) * (3 + r() * 4), py + Math.sin(a) * (3 + r() * 4));
+      k.stroke();
+    }
+    k.restore();
+  }
+  // Um cordeiro deitado, de perfil para a esquerda, com a cabeça erguida: a lã em cachinhos
+  // gravados (mais cheios e mais escuros embaixo, longe da luz), a cara de pelo curto, a
+  // orelha de lado, o olho manso, o focinho e os cascos. (ox, oy) é o chão sob a barriga.
+  function cordeiro(k, r, ox, oy, e, obj) {
+    k.save();
+    k.translate(ox, oy);
+    k.scale(e, e);
+    k.lineJoin = 'round';
+    k.lineCap = 'round';
+    k.save();
+    k.filter = 'blur(9px)';
+    k.fillStyle = 'rgba(40,26,10,.42)';
+    k.beginPath();
+    k.ellipse(14, 4, 160, 17, 0, 0, 6.283);
+    k.fill();
+    k.restore();
+    const tinta = '#3a2c18';
+    // o casco de trás, que aparece sob a barriga, e o rabo
+    const cascoTras = pol([[48, -12], [26, -10], [16, 1], [50, 1]]);
+    peca(k, cascoTras, [16, -12, 50, 1], { cor: '#4a3a26', sombra: () => 0.6, passo: 3, maxL: 1, traco: 1.6, tinta, obj });
+    const rabo = lanoso(r, [[118, -70], [140, -66], [150, -40], [142, -20], [126, -28]], 4, 9);
+    peca(k, rabo, [118, -70, 150, -20], { cor: '#efe6cf', sombra: (x, y) => 0.4 + (y + 70) / 90, passo: 3.6, maxL: 1.3, traco: 1.8, tinta, obj });
+    // o corpo de lã
+    const corpo = lanoso(r, [[-112, -6], [-126, -40], [-134, -80], [-130, -112], [-114, -134], [-84, -128], [-40, -124], [10, -128], [60, -122],
+      [100, -106], [128, -78], [136, -44], [126, -16], [98, -2], [40, 2], [-30, 2], [-80, 0]], 6, 15);
+    k.fillStyle = '#f7f0de';
+    k.fill(corpo);
+    marcar(k, obj, corpo);
+    const so = sombraOval(-2, -66, 136, 70, 0);
+    gravar(k, corpo, 0, -64, 160, 0.35, 5, 1.5, (x, y) => (so(x, y) - 0.5) * 1.6, tinta, 0.25);
+    k.save();
+    k.clip(corpo);
+    // os cachos: fileiras de arcos que seguem o volume
+    for (let y = -132, f = 0; y < 6; y += 9.5, f++) {
+      for (let x = -140 + (f % 2) * 6; x < 142; x += 11.5) {
+        const px = x + (r() - 0.5) * 6;
+        const py = y + (r() - 0.5) * 4;
+        const s = Math.max(0, Math.min(1, so(px, py)));
+        if (r() > s * 1.05 + 0.22) continue;
+        const rr = 3.4 + r() * 2.4;
+        const a0 = 2.2 + (r() - 0.5) * 1.6;
+        k.lineWidth = 0.7 + s * 1.5;
+        k.strokeStyle = 'rgba(58,44,24,' + (0.4 + s * 0.5).toFixed(2) + ')';
+        k.beginPath();
+        k.arc(px, py, rr, a0, a0 + 3.4 + r() * 1.2);
+        k.stroke();
+      }
+    }
+    k.restore();
+    k.strokeStyle = tinta;
+    k.lineWidth = 2;
+    k.stroke(corpo);
+    // a perna da frente dobrada para a frente, com o casco fendido
+    const perna = pol([[-100, -26], [-120, -22], [-136, -14], [-140, -2], [-124, 0], [-100, -2]]);
+    peca(k, perna, [-140, -26, -100, 0], { cor: '#f1e8d2', sombra: (x, y) => 0.25 + (y + 24) / 34, passo: 3.4, maxL: 1.3, traco: 1.8, tinta, obj });
+    const casco = pol([[-136, -15], [-149, -11], [-155, -1], [-136, -1]]);
+    peca(k, casco, [-155, -15, -136, -1], { cor: '#4a3a26', sombra: () => 0.55, passo: 3, maxL: 1, traco: 1.6, tinta, obj });
+    k.strokeStyle = '#efe6cf';
+    k.lineWidth = 1.2;
+    k.beginPath();
+    k.moveTo(-145, -10);
+    k.lineTo(-147, -2);
+    k.stroke();
+    // a cabeça é grande (é um filhote): tudo dela sai 1,18 vez em volta do pescoço
+    k.save();
+    k.translate(-118, -126);
+    k.scale(1.18, 1.18);
+    k.translate(118, 126);
+    // a orelha de trás, só a ponta acima da cabeça
+    const orelha2 = new Path2D();
+    orelha2.moveTo(-142, -156);
+    orelha2.quadraticCurveTo(-140, -180, -118, -186);
+    orelha2.quadraticCurveTo(-124, -168, -128, -154);
+    orelha2.closePath();
+    peca(k, orelha2, [-142, -186, -118, -154], { cor: '#e3d6b8', sombra: () => 0.6, passo: 3, maxL: 1.2, traco: 1.6, tinta, obj });
+    // a cabeça: o perfil de nariz curvo, o focinho e o queixo
+    const cab = new Path2D();
+    cab.moveTo(-110, -150);
+    cab.bezierCurveTo(-128, -168, -158, -168, -174, -152);
+    cab.bezierCurveTo(-188, -138, -198, -118, -205, -102);
+    cab.bezierCurveTo(-209, -93, -204, -85, -194, -84);
+    cab.bezierCurveTo(-182, -82, -168, -88, -152, -96);
+    cab.bezierCurveTo(-136, -104, -122, -108, -108, -120);
+    cab.closePath();
+    k.fillStyle = '#f6eedb';
+    k.fill(cab);
+    marcar(k, obj, cab);
+    gravar(k, cab, -156, -126, 70, 2.56, 3.4, 1.5, (x, y) => (y + 128) / 40 + (x + 150) / 160 - 0.1, tinta, 0.2);
+    k.strokeStyle = tinta;
+    k.lineWidth = 2;
+    k.stroke(cab);
+    // o topete de lã entre as orelhas
+    const topete = lanoso(r, [[-156, -158], [-142, -170], [-120, -166], [-106, -148], [-124, -148], [-142, -152]], 4, 8);
+    k.fillStyle = '#f7f0de';
+    k.fill(topete);
+    k.save();
+    k.clip(topete);
+    k.strokeStyle = 'rgba(58,44,24,.6)';
+    k.lineWidth = 1;
+    for (let i = 0; i < 9; i++) { k.beginPath(); k.arc(-150 + i * 5 + (r() - 0.5) * 4, -158 + (r() - 0.5) * 8, 3, 2, 5.6); k.stroke(); }
+    k.restore();
+    k.strokeStyle = tinta;
+    k.lineWidth = 1.6;
+    k.stroke(topete);
+    // a orelha da frente, de lado, caída para trás
+    const orelha = new Path2D();
+    orelha.moveTo(-128, -150);
+    orelha.quadraticCurveTo(-106, -164, -80, -150);
+    orelha.quadraticCurveTo(-102, -136, -126, -140);
+    orelha.closePath();
+    peca(k, orelha, [-128, -164, -80, -136], { cor: '#efe2c6', sombra: (x, y) => 0.2 + (y + 150) / 24, passo: 3, maxL: 1.3, traco: 1.8, tinta, obj });
+    // o olho manso, com a pálpebra, a narina e a boca
+    k.save();
+    k.translate(-160, -134);
+    k.rotate(0.45);
+    k.fillStyle = '#2a1e10';
+    k.beginPath();
+    k.ellipse(0, 0, 6.4, 3.8, 0, 0, 6.283);
+    k.fill();
+    k.fillStyle = 'rgba(255,248,226,.9)';
+    k.beginPath();
+    k.arc(-2.2, -1.2, 1.3, 0, 6.283);
+    k.fill();
+    k.strokeStyle = tinta;
+    k.lineWidth = 1.6;
+    k.beginPath();
+    k.ellipse(0, 0.6, 9, 6, 0, Math.PI * 1.08, Math.PI * 1.92);
+    k.stroke();
+    k.restore();
+    k.lineWidth = 1.8;
+    k.beginPath();
+    k.moveTo(-196, -110);
+    k.quadraticCurveTo(-203, -106, -199, -100);
+    k.stroke();
+    k.beginPath();
+    k.moveTo(-201, -92);
+    k.quadraticCurveTo(-194, -91, -184, -93);
+    k.stroke();
+    k.restore();
+    k.restore();
+  }
+
+  // (1) A oferta de Abel (Gn 4.4): o altar de pedras brutas com a lenha e o fogo, e a fumaça
+  // subindo e se desfazendo no céu; ao pé do altar, deitado, o cordeiro, uma das primeiras crias
+  // do rebanho, e o cajado de pastor (Abel era pastor de ovelhas, 4.2) encostado nas pedras.
   function desenhoAbel(k, W, H, obj) {
     const r = sorteio(5101);
-    papelVelho(k, W, H, r, ['#fbf2da', '#efdfba', '#d4ba86'], [W * 0.5, 120]);
-    linhas(k, 0, 0, W, 600, 7, 1.2, (x, y) => Math.min(1, Math.hypot(x - W / 2, (y - 120) * 1.3) / 640) * 0.95 - 0.1);
+    papelVelho(k, W, H, r, ['#fbf2da', '#efdfba', '#d4ba86'], [W * 0.4, 120]);
+    linhas(k, 0, 0, W, 600, 7, 0.95, (x, y) => 0.12 + (1 - y / 600) * 0.55);
     // os morros de longe e o chão
     const fm = onda(r, 4, 0.01);
-    const morro = pol([[-10, 640], ...Array.from({ length: 46 }, (_, i) => [i * 20, 566 + fm(i * 20) * 14]), [W + 10, 640]]);
-    peca(k, morro, [0, 540, W, 640], { cor: '#e4d0a4', ang: -0.15, passo: 6, maxL: 1.1, sombra: () => 0.55, traco: 1.6 });
+    const morro = pol([[-10, 640], ...Array.from({ length: 46 }, (_, i) => [i * 20, 560 + fm(i * 20) * 16]), [W + 10, 640]]);
+    peca(k, morro, [0, 530, W, 640], { cor: '#e2cea2', ang: -0.15, passo: 5.5, maxL: 1.2, sombra: () => 0.72, cruzada: 0.6, traco: 1.6 });
     const chao = new Path2D();
-    chao.rect(-10, 606, W + 20, H);
+    chao.rect(-10, 604, W + 20, H);
     k.fillStyle = '#dcc597';
     k.fill(chao);
-    linhas(k, 0, 606, W, H, 6, 1.7, (x, y) => 0.25 + (y - 606) / 500);
+    linhas(k, 0, 604, W, H, 5.5, 1.8, (x, y) => 0.22 + (y - 604) / 420);
     k.strokeStyle = SEPIA;
     k.lineWidth = 2;
     k.beginPath();
-    k.moveTo(0, 606);
-    for (let x = 0; x <= W; x += 8) k.lineTo(x, 606 + Math.sin(x * 0.03) * 1.5);
+    k.moveTo(0, 604);
+    for (let x = 0; x <= W; x += 8) k.lineTo(x, 604 + Math.sin(x * 0.03) * 1.5);
     k.stroke();
-    // a fumaça, reta, que se abre e some no alto
-    const cx = W * 0.5;
-    const meio = (y) => cx + Math.sin(y * 0.018) * 8 * (1 - y / 420);
-    const larg = (y) => 46 + (420 - y) * 0.32;
-    const fum = pol([...Array.from({ length: 30 }, (_, i) => { const y = 420 - i * 12.4; return [meio(y) - larg(y) / 2, y]; }),
-      ...Array.from({ length: 30 }, (_, i) => { const y = 60 + i * 12.4; return [meio(y) + larg(y) / 2, y]; })]);
-    const gf = k.createLinearGradient(0, 60, 0, 420);
-    gf.addColorStop(0, 'rgba(160,146,120,0)');
-    gf.addColorStop(0.4, 'rgba(150,136,112,.35)');
-    gf.addColorStop(1, 'rgba(110,96,74,.55)');
-    k.fillStyle = gf;
-    k.fill(fum);
-    if (obj) { obj.save(); obj.globalAlpha = 0.7; marcar(k, obj, fum); obj.restore(); }
-    gravar(k, fum, cx, 240, 240, -Math.PI / 2, 5.5, 1.5, (x, y) => (0.25 + Math.abs(x - meio(y)) / larg(y)) * Math.min(1, (y - 60) / 200), SEPIA, 0.5);
-    // o altar: três fiadas de pedras brutas, de baixo para cima
-    const sombraAltar = pol([[250, 700], [640, 700], [700, 740], [300, 744]]);
-    sombraNoChao(k, sombraAltar, 10, 0, 12, 0.4);
+    // a fumaça, que sobe do fogo e se desfaz com o vento
+    const cx = 330;
+    fumaca(k, r, cx + 24, 400, 24, 110, 260, 120);
+    // o altar: três fiadas de pedras brutas, de baixo para cima, e a sombra à direita
+    sombraNoChao(k, pol([[220, 700], [600, 700], [720, 742], [300, 748]]), 10, 0, 12, 0.42);
     const fiadas = [[668, 4, 54, 36, 98, 0], [610, 4, 50, 33, 92, 14], [556, 4, 47, 30, 86, -6]];
     for (const [y, n, rx, ry, passoX, des] of fiadas) {
       for (let i = 0; i < n; i++) {
@@ -2857,45 +3112,61 @@
         peca(k, p, [x - a, y - b, x + a, y + b], { cor: r() < 0.5 ? '#d3c29c' : '#c6b28a', ang: 0.5 + r() * 0.5, passo: 4.2, maxL: 2.6, sombra: (px, py) => so(px, py) * 0.85 + (px - cx) / 900, obj, abaulado: 0.15 });
       }
     }
-    // a lenha sobre as pedras
-    for (const [x0, y0, x1, y1] of [[318, 526, 590, 516], [338, 514, 578, 530], [360, 506, 556, 502]]) {
+    // a lenha em cima das pedras: toras cruzadas, com o topo cortado à mostra
+    const toras = [[208, 532, 448, 520, 10], [228, 516, 466, 528, 9], [248, 506, 430, 500, 8.5]];
+    for (const [x0, y0, x1, y1, rr] of toras) {
       const ang = Math.atan2(y1 - y0, x1 - x0);
-      const nx = -Math.sin(ang) * 9;
-      const ny = Math.cos(ang) * 9;
+      const nx = -Math.sin(ang) * rr;
+      const ny = Math.cos(ang) * rr;
       const tora = pol([[x0 + nx, y0 + ny], [x1 + nx, y1 + ny], [x1 - nx, y1 - ny], [x0 - nx, y0 - ny]]);
-      peca(k, tora, [x0, y0 - 10, x1, y1 + 10], { cor: '#9c7448', ang, passo: 3.4, maxL: 1.8, sombra: (x, y) => 0.3 + ((y - (y0 + (x - x0) * Math.tan(ang))) / 9 + 1) * 0.3, obj });
-    }
-    // o fogo, atrás e dos lados da lã
-    fogo(k, r, cx, 512, 280, 180, 8);
-    // a lã do cordeiro, estendida sobre a lenha, com as pontas das patas caídas pela frente
-    const la = lanoso(r, [[350, 506], [366, 474], [420, 462], [470, 466], [522, 460], [554, 480], [558, 506], [546, 524], [520, 528], [514, 552], [506, 578], [488, 582],
-      [480, 556], [474, 532], [432, 532], [422, 556], [410, 584], [392, 586], [386, 560], [380, 532], [358, 526]]);
-    sombraNoChao(k, la, 6, 8, 6, 0.45);
-    k.fillStyle = '#fbf6e6';
-    k.fill(la);
-    marcar(k, obj, la);
-    k.save();
-    k.clip(la);
-    k.strokeStyle = 'rgba(90,72,40,.7)';
-    k.lineWidth = 1.4;
-    for (let i = 0; i < 190; i++) {
-      const x = 346 + r() * 216;
-      const y = 452 + r() * 136;
+      peca(k, tora, [x0, y0 - rr, x1, y1 + rr], { cor: '#8f6a42', ang, passo: 3, maxL: 1.7, sombra: (x, y) => 0.3 + ((y - (y0 + (x - x0) * Math.tan(ang))) / rr + 1) * 0.3, obj });
+      const topo = new Path2D();
+      topo.ellipse(x1, y1, rr * 0.55, rr, ang, 0, 6.283);
+      k.fillStyle = '#e2c897';
+      k.fill(topo);
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.6;
+      k.stroke(topo);
+      k.lineWidth = 0.9;
       k.beginPath();
-      k.arc(x, y, 2.5 + r() * 3.5, r() * 6, r() * 6 + 3.8);
+      k.ellipse(x1, y1, rr * 0.28, rr * 0.5, ang, 0, 6.283);
       k.stroke();
     }
+    // o fogo sobre a lenha
+    fogoDoAltar(k, r, cx + 4, 514, 230, 210, 7);
+    // uma tora na frente do fogo, para ele ficar dentro da lenha
+    {
+      const [x0, y0, x1, y1, rr] = [262, 528, 418, 536, 8];
+      const tora = pol([[x0, y0 - rr], [x1, y1 - rr], [x1, y1 + rr], [x0, y0 + rr]]);
+      peca(k, tora, [x0, y0 - rr, x1, y1 + rr], { cor: '#7d5a36', ang: 0.05, passo: 3, maxL: 1.7, sombra: (x, y) => 0.35 + (y - y0 + rr) / (rr * 2) * 0.5, obj });
+      k.fillStyle = '#e2c897';
+      k.beginPath();
+      k.ellipse(x1, y1, rr * 0.55, rr, 0, 0, 6.283);
+      k.fill();
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.5;
+      k.stroke();
+    }
+    // o cajado de pastor, encostado nas pedras da esquerda, com a sombra onde toca
+    const cajado = [[112, 722], ...bezier([112, 722], [124, 640], [146, 470], [162, 384], 24), ...bezier([162, 384], [166, 352], [178, 334], [198, 336], 10),
+      ...bezier([198, 336], [220, 338], [228, 352], [224, 366], 10)];
+    k.save();
+    k.filter = 'blur(4px)';
+    k.fillStyle = 'rgba(30,20,8,.4)';
+    k.beginPath();
+    k.ellipse(134, 642, 10, 18, 0.2, 0, 6.283);
+    k.fill();
+    k.beginPath();
+    k.ellipse(122, 724, 22, 6, 0, 0, 6.283);
+    k.fill();
     k.restore();
-    gravar(k, la, 452, 510, 130, 0.3, 4.4, 1.5, (x, y) => (y - 500) / 90 + (x - 452) / 500, '#5a4628', 0);
-    k.strokeStyle = SEPIA;
-    k.lineWidth = 2.2;
-    k.stroke(la);
-    brilho(k, cx, 486, 170, 'rgba(255,214,140,.28)', 'screen');
-    // o cajado de pastor encostado no altar
-    vara(k, [[690, 716], ...bezier([690, 716], [672, 600], [640, 460], [628, 360], 20), ...bezier([628, 360], [620, 316], [578, 304], [566, 334], 14), [574, 352]], 9, '#a37a4a', obj);
-    capim(k, r, 150, 640, 30, 8);
-    capim(k, r, 760, 700, 34, 9);
-    capim(k, r, 222, 760, 26, 7);
+    vara(k, cajado, 9, '#a07648', obj);
+    // o cordeiro deitado ao pé do altar
+    cordeiro(k, r, 640, 772, 1, obj);
+    capim(k, r, 88, 650, 30, 8);
+    capim(k, r, 812, 640, 34, 9);
+    capim(k, r, 300, 790, 26, 7);
+    capim(k, r, 470, 730, 22, 6);
     vinheta(k, W, H, 0.22);
   }
   // (2) Noé e a arca (Gn 6.14-16): a embarcação de cipreste, em terra seca, revestida de piche
