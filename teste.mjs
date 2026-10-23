@@ -1512,26 +1512,31 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
 
 // --- lançamento aos poucos: só as cartas com desenho saem ---
 {
-  contexto.window.CARTAS_INDICE = ESQ_HOJE;
-  const lancadas = new Set(CATALOGO.cartas.filter((c) => c.lancada).map((c) => c.id));
+  // com todas as cartas comuns já lançadas, simula a véspera: a última comum volta a "não lançada"
+  const especial = (x) => CATALOGO.albuns.find((a) => a.id === x.album).especial;
+  const ultima = CATALOGO.cartas.some((x) => !x.lancada && !especial(x)) ? null : CATALOGO.cartas.filter((x) => !especial(x)).pop();
+  const CAT_L = ultima ? { ...CATALOGO, cartas: CATALOGO.cartas.map((x) => (x === ultima ? { ...x, lancada: false } : x)) } : CATALOGO;
+  const ESQ_L = esqueletoDoCatalogo(CAT_L);
+  contexto.window.CARTAS_INDICE = ESQ_L;
+  const lancadas = new Set(CAT_L.cartas.filter((c) => c.lancada).map((c) => c.id));
   let soLancadas = true;
   let c = RC.vazio();
   for (let d = 1; d <= 300; d++) { const x = RC.receber(c, 'bau', 'bau:dia:' + d, { dono: 'lanc', em: d }); c = x.cartas; soLancadas &&= lancadas.has(x.resultado.carta); }
   for (let d = 1; d <= 40; d++) { const x = RC.receber(c, 'unidade', 'unidade:' + d, { dono: 'lanc', em: 400 + d }); c = x.cartas; soLancadas &&= lancadas.has(x.resultado.carta); }
   const r = RC.resumo(c);
-  const nLancadas = CATALOGO.cartas.filter((x) => x.lancada && !CATALOGO.albuns.find((a) => a.id === x.album).especial).length;
+  const nLancadas = CAT_L.cartas.filter((x) => x.lancada && !CAT_L.albuns.find((a) => a.id === x.album).especial).length;
   checar(soLancadas && r.lancadas === nLancadas && r.cartas === nLancadas, 'carta não lançada nunca sai (340 sorteios, comuns e de marco, só as ' + nLancadas + ' lançadas, todas recebidas)');
   // só pode completar o álbum que tem as 13 lançadas (lido do catálogo); os outros, nunca
-  const albunsInteiros = new Set(CATALOGO.albuns.filter((a) => !a.especial && CATALOGO.cartas.filter((x) => x.album === a.id && x.lancada).length === 13).map((a) => a.id));
+  const albunsInteiros = new Set(CAT_L.albuns.filter((a) => !a.especial && CAT_L.cartas.filter((x) => x.album === a.id && x.lancada).length === 13).map((a) => a.id));
   const completos = Object.keys(c.eventos).filter((k) => k.startsWith('album:')).map((k) => k.slice(6));
   checar(r.albuns.every((a) => !a.completo || albunsInteiros.has(a.id)) && completos.every((id) => albunsInteiros.has(id)),
     'nenhum álbum completa enquanto as 13 não forem lançadas e estiverem na coleção (inteiros hoje: ' + ([...albunsInteiros].join(', ') || 'nenhum') + ')');
   // a próxima a lançar: a primeira carta ainda não lançada de um álbum comum (lida do catálogo)
-  const proxima = CATALOGO.cartas.find((x) => !x.lancada && !CATALOGO.albuns.find((a) => a.id === x.album).especial);
-  const comNoe = ESQ_HOJE.map((a) => (a.id === proxima.album ? { ...a, c: a.c.replace('~' + proxima.id, proxima.id) } : a));
+  const proxima = CAT_L.cartas.find((x) => !x.lancada && !CAT_L.albuns.find((a) => a.id === x.album).especial);
+  const comNoe = ESQ_L.map((a) => (a.id === proxima.album ? { ...a, c: a.c.replace('~' + proxima.id, proxima.id) } : a));
   contexto.window.CARTAS_INDICE = comNoe;
   const x = RC.receber(c, 'bau', 'bau:dia:301', { dono: 'lanc', em: 999 });
-  checar(x.resultado.carta === proxima.id || RC.cartaDoSorteio(c, RC.aleatorio(5), '', 'linho') === proxima.id || RC.cartaDoSorteio(c, RC.aleatorio(6), '', 'linho') === proxima.id,
+  checar(x.resultado.carta === proxima.id || Array.from({ length: 20 }, (_, i) => RC.cartaDoSorteio(c, RC.aleatorio(i + 5), '', 'linho')).includes(proxima.id),
     'lançar uma carta põe ela no sorteio, e o viés para carta nova a traz logo');
   let novaVem = 0;
   for (let i = 0; i < 400; i++) if (RC.cartaDoSorteio(c, RC.aleatorio(i + 1), '', 'linho') === proxima.id) novaVem++;
