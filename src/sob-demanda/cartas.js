@@ -10497,9 +10497,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
   // ---------- (5) As tábuas da aliança (Êx 31.18) ----------
   // No alto do Sinai, debaixo da nuvem pesada (Êx 24.16): as duas tábuas de pedra, juntas e de
   // pé num afloramento de granito partido em facetas, de pedra cinza, alto reto e cantos
-  // partidos em lascas, a grossura maciça à vista, a de trás encostada na da frente. A escrita
-  // de Deus não se imita: a pedra brilha de dentro, mais no meio, sem letra nem fileira. A
-  // nuvem desce em massas de linha cerrada, com a barriga acesa pela luz das tábuas.
+  // partidos em lascas, a grossura maciça à vista; a de trás, menor, fica por trás da outra.
+  // A escrita de Deus não se imita: a hachura da pedra se desfaz em luz no meio da face, sem
+  // letra nem fileira, e a luz passa para o céu. A nuvem desce em massas de linha cerrada.
   function desenhoTabuas(k, W, H, obj) {
     const r = sorteio(7501);
     papelVelho(k, W, H, r, ['#efe0c4', '#dcc6a0', '#b89a72'], [444, 520]);
@@ -10518,7 +10518,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const m = Math.max(0, massa(x, y));
       const barriga = Math.max(0, massa(x, y - 26) - m) * 2.2;
       const luz = Math.exp(-(((x - 444) / 300) ** 2) - (((y - 470) / 160) ** 2));
-      return 0.22 + m * 0.75 + (1 - y / 560) * 0.25 - barriga * 0.6 - luz * 0.55 + ruido(x, y) * 0.12;
+      // a luz das tábuas passa do alto delas para o céu: as linhas afinam por cima delas
+      const sobra = Math.exp(-(((x - 400) / 230) ** 2) - (((y - 300) / 110) ** 2));
+      return 0.22 + m * 0.75 + (1 - y / 560) * 0.25 - barriga * 0.6 - luz * 0.55 - sobra * 0.5 + ruido(x, y) * 0.12;
     });
     // o cume: um afloramento de granito partido em facetas (o tampo aceso onde as tábuas
     // estão, as faces da frente e dos ombros em planos de ângulos diferentes), separadas por
@@ -10645,62 +10647,58 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.lineWidth = 2.2;
     k.stroke(pol(crista, false));
     // as duas tábuas: lajes de pedra cinza, de alto reto e cantos partidos em lascas
-    // desiguais (um canto cortado, outro vivo, uma falha pequena), com a grossura maciça à
-    // vista. A face é pedra: grão miúdo pontilhado e um ou dois veios compridos e apagados.
-    // A escrita de Deus é luz: um brilho de dentro da pedra, que esmorece para as beiradas,
-    // sem letra nem fileira. A de trás se encosta na da frente.
-    const tabua = (x0, base, w, h, giro, semente, cantos, piv) => {
+    // desiguais, vistas um pouco da esquerda (a grossura aparece à esquerda e em cima). A da
+    // frente está mais perto e mais baixa; a de trás, menor e mais alta, fica por trás dela,
+    // com dois terços escondidos. A escrita de Deus é luz: a hachura da pedra afina e se
+    // desfaz em traços soltos até o papel nu no meio da face (a luz é a falta de linha), mais
+    // na da frente que na de trás, sem letra nem fileira.
+    const tabua = (x0, base, w, h, giro, semente, cantos, esp, luzF) => {
       const rt = sorteio(semente);
-      const esp = [28, -15];
-      // o contorno, de baixo à esquerda, subindo, pelo alto e descendo pela direita
       const loc = cantos(w, h);
       const cg = Math.cos(giro);
       const sg = Math.sin(giro);
-      const [px, py] = piv === 'esq' ? [0, 0] : [w / 2, 0];
-      const face = loc.map(([x, y]) => [x0 + px + (x - px) * cg - (y - py) * sg, base + (x - px) * sg + (y - py) * cg]);
+      const face = loc.map(([x, y]) => [x0 + x * cg - y * sg, base + x * sg + y * cg]);
       const atras = face.map(([x, y]) => [x + esp[0], y + esp[1]]);
       const n = face.length;
       // a sombra de contato no pé e a projetada no tampo, para trás e à direita
       const pe0 = face[0];
       const pe1 = face[n - 1];
-      sombraNoChao(k, pol([[pe0[0] - 6, pe0[1] + 3], [pe1[0] + esp[0] + 4, pe1[1] + 3], [pe1[0] + esp[0] + 44, pe1[1] - 18], [pe0[0] + 34, pe0[1] - 20]]), 0, 0, 7, 0.55);
+      sombraNoChao(k, pol([[pe0[0] + esp[0] - 4, pe0[1] + 3], [pe1[0] + 6, pe1[1] + 3], [pe1[0] + 46, pe1[1] - 18], [pe0[0] + 30, pe0[1] - 20]]), 0, 0, 7, 0.55);
       sombraNoChao(k, pol([[pe0[0] + 2, pe0[1] + 4], [pe1[0] - 2, pe1[1] + 4], [pe1[0] - 2, pe1[1] + 9], [pe0[0] + 2, pe0[1] + 9]]), 0, 0, 2.5, 0.7);
-      // a grossura: opaca, pedaço a pedaço; o que olha para cima pega a luz
+      // a grossura: opaca, pedaço a pedaço; o alto pega a luz, o lado é meio-tom
       const pedacos = [pol(atras), ...face.slice(1).map((p, i) => pol([face[i], p, atras[i + 1], atras[i]]))];
       k.lineWidth = 1.2;
-      k.fillStyle = '#6f6a5c';
-      k.strokeStyle = '#6f6a5c';
+      k.fillStyle = '#8a8574';
+      k.strokeStyle = '#8a8574';
       k.fill(pedacos[0]);
       k.stroke(pedacos[0]);
       marcar(k, obj, pedacos[0]);
       const sobe = (i) => { const dx = face[i][0] - face[i - 1][0]; const dy = face[i][1] - face[i - 1][1]; return dx > Math.abs(dy) * 0.4; };
       for (let i = 1; i < n; i++) {
-        k.fillStyle = sobe(i) ? '#aaa595' : '#76705f';
+        k.fillStyle = sobe(i) ? '#b4af9f' : '#8a8574';
         k.strokeStyle = k.fillStyle;
         k.fill(pedacos[i]);
         k.stroke(pedacos[i]);
         marcar(k, obj, pedacos[i]);
       }
-      // a hachura da grossura, na direção da espessura, e a quebra do meio (o cinzel deixa
-      // dois planos: uma linha clara e uma escura a meia espessura)
       for (let i = 1; i < n; i++) {
         const dx = face[i][0] - face[i - 1][0];
         const dy = face[i][1] - face[i - 1][1];
         const c = sobe(i);
-        const m = Math.max(1, Math.round(Math.hypot(dx, dy) / (c ? 5 : 3)));
-        k.strokeStyle = 'rgba(34,32,26,.7)';
-        k.lineWidth = c ? 0.8 : 1.2;
+        const m = Math.max(1, Math.round(Math.hypot(dx, dy) / (c ? 6 : 4)));
+        k.strokeStyle = 'rgba(34,32,26,.6)';
+        k.lineWidth = c ? 0.7 : 1;
         for (let j = 0; j < m; j++) {
           const t = j / m;
           const x = face[i - 1][0] + dx * t;
           const y = face[i - 1][1] + dy * t;
           k.beginPath();
-          k.moveTo(x + esp[0] * (c ? 0 : 0.5), y + esp[1] * (c ? 0 : 0.5));
+          k.moveTo(x + esp[0] * 0.15, y + esp[1] * 0.15);
           k.lineTo(x + esp[0], y + esp[1]);
           k.stroke();
         }
         const f = 0.45 + rt() * 0.15;
-        k.strokeStyle = c ? 'rgba(236,232,220,.55)' : 'rgba(30,28,22,.6)';
+        k.strokeStyle = c ? 'rgba(236,232,220,.55)' : 'rgba(30,28,22,.45)';
         k.lineWidth = 1;
         k.beginPath();
         k.moveTo(face[i - 1][0] + esp[0] * f, face[i - 1][1] + esp[1] * f);
@@ -10709,107 +10707,109 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       }
       k.strokeStyle = '#1c1a14';
       k.lineWidth = 2;
-      k.stroke(pol(atras.slice(1), false));
-      for (let i = 1; i < n; i++) {
-        const a = face[i];
-        const tr = atras[i];
-        const visto = sobe(i) || (i < n - 1 && sobe(i + 1)) || face[i][0] - face[i - 1][0] >= -0.5;
-        if (!visto) continue;
-        k.lineWidth = 1.2;
+      k.stroke(pol(atras.slice(0, -1), false));
+      k.lineWidth = 1.2;
+      for (let i = 0; i < n; i++) {
         k.beginPath();
-        k.moveTo(a[0], a[1]);
-        k.lineTo(tr[0], tr[1]);
+        k.moveTo(face[i][0], face[i][1]);
+        k.lineTo(atras[i][0], atras[i][1]);
         k.stroke();
       }
-      // a face: pedra cinza-sépia, fria
+      // a face: o papel claro da pedra; o cinza vem da hachura
       const fF = pol(face);
       marcar(k, obj, fF);
-      const g = k.createLinearGradient(x0, base - h, x0 + w, base);
-      g.addColorStop(0, '#b9b4a4');
-      g.addColorStop(1, '#827c6c');
-      k.fillStyle = g;
+      const [lu, lv, lr, lmin] = luzF;
+      const lx = x0 + w * lu;
+      const ly = base - h * lv;
+      const R = Math.max(w, h) * lr;
+      const gf = k.createRadialGradient(lx, ly, 0, lx, ly, R * 1.6);
+      gf.addColorStop(0, '#efe6cc');
+      gf.addColorStop(0.5, '#d8d2c0');
+      gf.addColorStop(1, '#bcb6a6');
+      k.fillStyle = gf;
       k.fill(fF);
       k.save();
       k.clip(fF);
-      // a luz de dentro: mais forte no meio, que some antes de chegar à beirada
-      const mx = x0 + w / 2;
-      const my = base - h * 0.5;
-      k.globalCompositeOperation = 'screen';
-      const gl = k.createRadialGradient(mx, my, 10, mx, my, Math.max(w, h) * 0.5);
-      gl.addColorStop(0, 'rgba(250,224,160,.7)');
-      gl.addColorStop(0.5, 'rgba(220,190,130,.3)');
-      gl.addColorStop(1, 'rgba(220,190,130,0)');
-      k.fillStyle = gl;
-      k.fillRect(x0 - 60, base - h - 60, w + 120, h + 120);
-      k.globalCompositeOperation = 'source-over';
-      // o grão do granito: pontilhado miúdo, mais cerrado em nuvens
-      const nuv = onda(sorteio(semente + 5), 4, 0.03);
-      for (let m = 0; m < w * h * 0.06; m++) {
-        const qx = x0 - 30 + rt() * (w + 60);
-        const qy = base - h - 30 + rt() * (h + 60);
-        const d = 0.5 + nuv(qx * 0.7 + qy) * 0.35;
-        if (rt() > d) continue;
-        k.fillStyle = rt() < 0.7 ? 'rgba(40,36,28,' + (0.16 + rt() * 0.2).toFixed(2) + ')' : 'rgba(240,236,224,' + (0.18 + rt() * 0.2).toFixed(2) + ')';
+      // a força da hachura: zero no meio da luz (ou lmin, na de trás), cheia nas beiradas
+      const forca = (x, y) => {
+        const d = Math.hypot((x - lx) / R, (y - ly) / (R * 1.25));
+        return lmin + (1 - lmin) * Math.max(0, Math.min(1, (d - 0.25) / 0.9));
+      };
+      // duas hachuras de direções próprias de cada tábua; perto da luz os traços se partem
+      k.lineCap = 'round';
+      for (const [ang, passo, peso] of [[luzF[4], 3.2, 1.25 * luzF[5]], [luzF[4] + 1.1, 4.6, 0.9 * luzF[5]]]) {
+        const dx = Math.cos(ang);
+        const dy = Math.sin(ang);
+        const raio = Math.hypot(w, h) * 0.75;
+        const cx0 = x0 + w / 2;
+        const cy0 = base - h / 2;
+        k.strokeStyle = '#2c2a22';
+        for (let d = -raio; d <= raio; d += passo) {
+          let ant = null;
+          let liga = true;
+          for (let s = -raio; s <= raio; s += 3) {
+            const x = cx0 + s * dx - d * dy;
+            const y = cy0 + s * dy + d * dx;
+            let f = forca(x, y);
+            if (peso < 1) f = Math.max(0, f * 1.4 - 0.5);
+            // perto da luz o traço se parte em pedaços de tamanhos desiguais
+            if (f < 0.6 && rt() < 0.07 + (0.6 - f) * 0.22) liga = !liga;
+            if (f >= 0.6) liga = true;
+            const lw = peso * f;
+            if (ant && lw > 0.12 && liga) {
+              k.lineWidth = lw;
+              k.beginPath();
+              k.moveTo(ant[0], ant[1]);
+              k.lineTo(x, y);
+              k.stroke();
+            }
+            ant = [x, y];
+          }
+        }
+      }
+      // o grão do granito: pontilhado miúdo, que também some na luz
+      for (let m = 0; m < w * h * 0.03; m++) {
+        const qx = x0 - 20 + rt() * (w + 40);
+        const qy = base - h - 20 + rt() * (h + 40);
+        if (rt() > forca(qx, qy) + 0.15) continue;
+        k.fillStyle = 'rgba(40,36,28,' + (0.2 + rt() * 0.25).toFixed(2) + ')';
         k.fillRect(qx, qy, 1, 1);
       }
-      // os veios: um ou dois, compridos, na diagonal, claros e apagados
-      for (const [a0, b0, a1, b1] of [[-0.1, 0.25 + rt() * 0.15, 1.1, 0.55 + rt() * 0.2], [0.2 + rt() * 0.2, -0.05, 0.9, 0.35 + rt() * 0.1]].slice(0, 1 + (semente % 2))) {
-        const pts = [];
-        for (let t = 0; t <= 1.0001; t += 0.05) {
-          pts.push([x0 + w * (a0 + (a1 - a0) * t) + Math.sin(t * 9 + semente) * 6, base - h + h * (b0 + (b1 - b0) * t) + Math.sin(t * 5.3 + semente) * 10]);
-        }
-        k.strokeStyle = 'rgba(244,240,228,.5)';
-        k.lineWidth = 1.3;
-        k.stroke(pol(pts, false));
-        k.strokeStyle = 'rgba(52,46,36,.28)';
-        k.lineWidth = 0.8;
-        k.stroke(pol(pts.map(([qx, qy]) => [qx + 1.2, qy + 1.4]), false));
-      }
-      // a sombra da pedra em hachura fina oblíqua, mais forte embaixo e à direita
-      gravar(k, fF, mx, my, h, 0.95 + giro, 3.4, 1.1, (x, y) => -0.05 + (x - x0) / w * 0.45 + (y - base + h) / h * 0.3, '#34302a', 0);
+      // um veio comprido, claro e apagado
+      const pts = [];
+      const vb0 = 0.2 + rt() * 0.2;
+      for (let t = 0; t <= 1.0001; t += 0.05) pts.push([x0 + w * (-0.1 + 1.2 * t) + Math.sin(t * 9 + semente) * 6, base - h + h * (vb0 + 0.35 * t) + Math.sin(t * 5.3 + semente) * 10]);
+      k.strokeStyle = 'rgba(244,240,228,.5)';
+      k.lineWidth = 1.3;
+      k.stroke(pol(pts, false));
       k.restore();
-      // as quinas: escuras em volta, a luz nas beiradas do alto e da esquerda
+      // as quinas: escuras em volta, a luz nas beiradas do alto
       k.strokeStyle = '#1c1a14';
       k.lineWidth = 2.4;
       k.lineJoin = 'miter';
       k.stroke(fF);
-      k.strokeStyle = 'rgba(248,246,236,.75)';
-      k.lineWidth = 1.4;
-      for (let i = 1; i < n; i++) {
-        const dx = face[i][0] - face[i - 1][0];
-        const dy = face[i][1] - face[i - 1][1];
-        // só os lados que olham para cima ou para a esquerda
-        if (!(dy < -Math.abs(dx) * 0.3 || dx > Math.abs(dy) * 0.3)) continue;
-        const L = Math.hypot(dx, dy);
-        const ux = dx / L;
-        const uy = dy / L;
-        k.beginPath();
-        k.moveTo(face[i - 1][0] + uy * -2 + ux * 3, face[i - 1][1] - ux * -2 + uy * 3);
-        k.lineTo(face[i][0] + uy * -2 - ux * 3, face[i][1] - ux * -2 - uy * 3);
-        k.stroke();
-      }
       return face;
     };
     const baseT = 670;
     // o resplendor atrás das tábuas, macio (gradiente, sem beirada)
     k.save();
-    const hal = k.createRadialGradient(470, 470, 40, 470, 470, 320);
-    hal.addColorStop(0, 'rgba(255,224,150,.4)');
+    const hal = k.createRadialGradient(440, 440, 40, 440, 440, 320);
+    hal.addColorStop(0, 'rgba(255,224,150,.35)');
     hal.addColorStop(1, 'rgba(255,224,150,0)');
     k.globalCompositeOperation = 'screen';
     k.fillStyle = hal;
     k.fillRect(0, 0, W, 640);
     k.restore();
-    // a de trás (a da direita) primeiro: encostada na da frente, o alto tombado para ela; ela
-    // apoia na quina de baixo à esquerda, e a quina da direita sai um pouco do chão
-    tabua(456, baseT - 2, 198, 350, -0.075, 7511, (w, h) => [
-      [0, 0], [0, -h * 0.4], [0, -h + 7], [7, -h], [w * 0.42, -h - 1], [w - 40, -h + 2], [w - 18, -h + 14], [w, -h + 42],
-      [w, -h * 0.34], [w - 6, -h * 0.3], [w, -h * 0.26], [w, 0],
-    ], 'esq');
-    tabua(240, baseT + 2, 204, 364, 0.0, 7512, (w, h) => [
-      [0, 0], [0, -h * 0.56], [6, -h * 0.6], [0, -h * 0.64], [0, -h + 30], [26, -h], [w * 0.54, -h - 2], [w * 0.61, -h], [w * 0.65, -h + 8],
+    // a de trás primeiro: 9 % menor, mais alta (mais longe, no fundo do tampo) e à direita,
+    // com uns dois terços escondidos pela da frente; um nada tombada para ela
+    tabua(404, baseT - 18, 188, 306, -0.035, 7511, (w, h) => [
+      [0, 0], [0, -h + 7], [7, -h], [w * 0.46, -h - 1], [w - 40, -h + 2], [w - 18, -h + 14], [w, -h + 42], [w, 0],
+    ], [-20, -11], [0.7, 0.6, 0.3, 0.3, -0.95, 0.95]);
+    // a da frente: maior, mais baixa, com uma lasca grande e irregular no lado esquerdo
+    tabua(250, baseT + 14, 206, 336, 0.0, 7512, (w, h) => [
+      [0, 0], [0, -h * 0.4], [3, -h * 0.45], [6, -h * 0.485], [11, -h * 0.515], [9, -h * 0.54], [4, -h * 0.552], [0, -h * 0.558], [0, -h + 30], [26, -h], [w * 0.54, -h - 2], [w * 0.61, -h], [w * 0.65, -h + 8],
       [w * 0.7, -h + 1], [w - 4, -h + 1], [w, -h + 7], [w, 0],
-    ], 'meio');
+    ], [-24, -13], [0.44, 0.56, 0.42, 0, 1.15, 1]);
     // o brilho das tábuas no ar (fraco: nunca mais claro que o céu)
     brilho(k, 444, baseT - 170, 360, 'rgba(255,214,140,.14)', 'screen');
     vinheta(k, W, H, 0.24);
