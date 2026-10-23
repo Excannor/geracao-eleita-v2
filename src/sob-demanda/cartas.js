@@ -7484,30 +7484,47 @@
       k.strokeRect(x, jy - 6 - h, w, h);
     }
     for (const x of [jx - 20, jx + 50, jx + 100, jx + 186, jx + 206]) palmeiraGravada(k, r, x, jy + 12, 40, (r() - 0.5) * 0.3, 0.42);
-    // a margem de lá, alagada: a água da cheia entre os tamariscos
-    const la = pol([[-10, 300], [W + 10, 290], [W + 10, 440], [-10, 452]]);
-    k.fillStyle = '#e4e2cc';
+    // a margem de lá: terra baixa e alagada pela cheia, mais alta que o leito, com o barranco
+    // que desce até ele; a água da cheia fica em poças entre os tamariscos, de pé na terra
+    const la = pol([[-10, 300], [W + 10, 290], [W + 10, 424], [-10, 434]]);
+    k.fillStyle = '#d8c597';
     k.fill(la);
-    agua(k, r, -10, 296, W + 10, 448, 'rgba(43,33,18,.5)');
+    chaoEmLinhas(k, r, la, -10, W + 10, 290, 434, 1.4, (x, y) => 0.4 + (y - 290) / 500);
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.6;
     k.beginPath();
     k.moveTo(-10, 300);
     k.lineTo(W + 10, 290);
     k.stroke();
-    for (let i = 0; i < 18; i++) {
-      const x = 260 + r() * 640;
-      const y = 316 + r() * 100;
-      const e = 0.5 + (y - 300) / 220;
-      const rx = (20 + r() * 14) * e;
-      // o reflexo do tufo na água, partido
-      k.fillStyle = 'rgba(43,33,18,.35)';
-      for (let j = 0; j < 4; j++) k.fillRect(x - rx * 0.7 + r() * 6, y + 4 + j * 4, rx * 1.3 - j * 5, 1.6);
-      copaGravada(k, r, x, y - rx * 0.55, rx, rx * 0.65, { cor: '#9c9663' });
+    for (const [x, y, rx, ry] of [[420, 330, 70, 7], [620, 350, 90, 9], [800, 318, 60, 6], [520, 396, 80, 9], [760, 404, 70, 8], [380, 412, 50, 7]]) {
+      const p = seixo(r, x, y, rx, ry, 0, 0.12);
+      k.fillStyle = '#e4e2cc';
+      k.fill(p);
+      k.save();
+      k.clip(p);
+      agua(k, r, x - rx, y - ry, x + rx, y + ry, 'rgba(43,33,18,.55)');
+      k.restore();
       k.strokeStyle = SEPIA;
-      k.lineWidth = 1.2;
-      for (let j = -1; j <= 1; j++) { k.beginPath(); k.moveTo(x + j * rx * 0.25, y); k.lineTo(x + j * rx * 0.15, y - rx * 0.4); k.stroke(); }
+      k.lineWidth = 1.3;
+      k.stroke(p);
     }
+    for (let i = 0; i < 16; i++) {
+      const x = 340 + r() * 560;
+      const y = 316 + r() * 96;
+      const e = 0.5 + (y - 300) / 220;
+      const rx = (18 + r() * 14) * e;
+      copaGravada(k, r, x, y - rx * 0.6, rx, rx * 0.66, { cor: '#9c9663' });
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.4;
+      for (let j = -1; j <= 1; j++) { k.beginPath(); k.moveTo(x + j * rx * 0.25, y); k.lineTo(x + j * rx * 0.15, y - rx * 0.45); k.stroke(); }
+      k.beginPath();
+      k.moveTo(x - rx * 0.6, y + 1);
+      k.lineTo(x + rx * 0.6, y + 1);
+      k.stroke();
+    }
+    // o barranco da margem de lá, que desce para o leito
+    const barr = pol([[-10, 434], [W + 10, 424], [W + 10, 440], [-10, 452]]);
+    peca(k, barr, [-10, 424, W + 10, 452], { cor: '#c2a878', ang: Math.PI / 2, passo: 3.4, maxL: 1.4, sombra: () => 0.55, cruzada: 1, traco: 1.6 });
     // o leito seco: lama clara, rachada em placas, com seixos e as marcas da correnteza
     const lt = new Path2D();
     lt.moveTo(-10, 452);
@@ -7552,81 +7569,103 @@
       const p = seixo(r, x, y, s, s * 0.6, (r() - 0.5) * 0.5, 0.12);
       peca(k, p, [x - s, y - s, x + s, y + s], { cor: r() < 0.5 ? '#cdbb92' : '#bfa97e', sombra: sombraOval(x, y, s, s * 0.6, 0), passo: 2.4, maxL: 1.1, traco: 1.2 });
     }
-    // a muralha de água: a água de cima parada e amontoada, mais alta que as margens. O alto
-    // sobe da esquerda para a crista, onde a água chega e para; a face, junto do leito seco, é
-    // íngreme e debruça um pouco, escura e lisa, com os brilhos; a crista tem a espuma.
-    const crX = 300;
-    const crY = 214;
-    const altoM = (x) => crY + Math.pow(Math.max(0, (crX - x) / 310), 1.4) * 110 + Math.sin(x * 0.05) * 3;
-    const face = (y) => crX + 20 - Math.sin(((y - crY) / 480) * Math.PI * 0.5) * 46;
+    // a muralha de água: a água de cima parada e amontoada, de pé no leito. A frente é um
+    // bojo redondo que debruça para o leito seco, em hachura curva que acompanha o bojo, mais
+    // escura embaixo; o alto da água amontoada vai para trás, rio acima, em perspectiva, até
+    // sumir no horizonte; a espuma é só traço branco quebrado na crista.
+    const crX = 318;
+    const crY = 262;
+    const pe = 690;
+    const face = (y) => { const t = (y - crY) / (pe - crY); return crX + 34 * Math.sin(Math.min(1, t * 1.6) * Math.PI * 0.62) - Math.max(0, t - 0.55) * 70; };
+    const atrasY = (x) => crY - ((crX - x) / (crX + 10)) * 58;
     const muralha = new Path2D();
-    muralha.moveTo(-10, altoM(-10));
-    for (let x = -10; x <= crX; x += 8) muralha.lineTo(x, altoM(x));
-    muralha.quadraticCurveTo(crX + 16, crY - 4, face(crY + 6), crY + 6);
-    for (let y = crY + 6; y <= 694; y += 8) muralha.lineTo(face(y), y);
-    muralha.lineTo(-10, 694);
+    muralha.moveTo(-10, atrasY(-10));
+    for (let x = -10; x <= crX; x += 8) muralha.lineTo(x, atrasY(x) - Math.sin(x * 0.06) * 3);
+    for (let y = crY; y <= pe; y += 6) muralha.lineTo(face(y), y);
+    muralha.lineTo(-10, pe);
     muralha.closePath();
-    k.fillStyle = '#c3cbbd';
+    k.fillStyle = '#c4c8b6';
     k.fill(muralha);
     marcar(k, obj, muralha);
     k.save();
     k.clip(muralha);
     k.lineCap = 'round';
-    // o corpo: ondinhas curtas que vão ficando mais juntas e mais escuras embaixo
-    k.strokeStyle = '#26312c';
-    for (let y = crY; y < 700; y += 4 + (y - crY) * 0.004) {
-      const t = (y - crY) / 480;
-      let x = -10 - r() * 30;
-      while (x < face(y)) {
-        const c = 10 + r() * 22;
-        if (y > altoM(x) + 4) {
-          k.lineWidth = 0.6 + t * 1.5;
+    // o alto, rio acima: ondinhas em perspectiva, miúdas longe e maiores perto da crista
+    k.strokeStyle = '#2b3530';
+    for (let y = atrasY(-10) - 4; y < crY + 60; y += 4) {
+      let x = -10 - r() * 20;
+      while (x < crX) {
+        const perto = Math.max(0, Math.min(1, x / crX));
+        const c = 6 + perto * 18 + r() * 8;
+        if (y > atrasY(x) + 2 && y < atrasY(x) + 40 + perto * 30) {
+          k.lineWidth = 0.6 + perto * 1;
           k.beginPath();
           k.moveTo(x, y);
-          k.quadraticCurveTo(x + c / 2, y - 2.5 - t * 2, x + c, y);
+          k.quadraticCurveTo(x + c / 2, y - 2, x + c, y);
           k.stroke();
         }
-        x += c + 3 + r() * (10 - t * 6);
+        x += c + 3 + r() * 8;
       }
     }
-    // a face íngreme: as linhas acompanham a curva, mais escuras perto do leito
-    for (let d = 2; d < 64; d += 5) {
-      k.lineWidth = 0.6 + (1 - d / 64) * 1.6;
+    // o bojo: as camadas da água que vem de trás deitadas e, chegando à frente, dobram para
+    // baixo por cima do bojo, cada vez mais juntas e escuras embaixo
+    let y = crY + 12;
+    let passo = 8;
+    while (y < pe + 10) {
+      const t = (y - crY) / (pe - crY);
+      const fx = face(y);
+      const dobra = 46 + t * 30;
+      k.lineWidth = 0.6 + t * 1.6;
       k.beginPath();
-      for (let y = crY + 10; y <= 694; y += 8) { const x = face(y) - d - Math.sin(y * 0.03 + d) * 1.5; if (y === crY + 10) k.moveTo(x, y); else k.lineTo(x, y); }
+      k.moveTo(-10, y);
+      let x = -10;
+      while (x < fx - dobra) { x += 12; k.lineTo(x, y + Math.sin(x * 0.045 + y * 0.2) * 2.2); }
+      k.bezierCurveTo(fx - dobra * 0.4, y - 2, fx - 2, y + 6, face(y + 30) - 3, y + 30);
       k.stroke();
+      y += passo;
+      passo = Math.max(5.6, passo * 0.99);
     }
+    // a base escura, onde a água se apoia no leito
+    gravar(k, muralha, 160, pe - 40, 220, 0.1, 3.2, 1.8, (x, y) => (y - pe + 90) / 90, '#1d2622', 0);
+    // os brilhos do bojo: traços claros curtos, deitados, na curva da frente
     k.strokeStyle = 'rgba(250,250,240,.9)';
-    for (let i = 0; i < 7; i++) {
-      const y0 = crY + 50 + i * 60 + r() * 20;
+    for (const y0 of [crY + 50, crY + 120, crY + 200, crY + 300]) {
+      const fx = face(y0);
       k.lineWidth = 2.2;
       k.beginPath();
-      k.moveTo(face(y0) - 22, y0);
-      k.lineTo(face(y0 + 34) - 22, y0 + 34);
+      k.moveTo(fx - 90, y0 + 2);
+      k.bezierCurveTo(fx - 40, y0 - 2, fx - 16, y0 + 4, fx - 8, y0 + 16);
       k.stroke();
     }
     k.restore();
     k.strokeStyle = SEPIA;
     k.lineWidth = 2.4;
     k.beginPath();
-    for (let y = crY + 6; y <= 690; y += 8) (y === crY + 6 ? k.moveTo(face(y), y) : k.lineTo(face(y), y));
+    for (let y = crY; y <= pe; y += 6) (y === crY ? k.moveTo(face(y), y) : k.lineTo(face(y), y));
     k.stroke();
-    // a espuma: a beirada de cima em rolinhos, que engrossa na crista e debruça sobre a face
-    const pts = [];
-    for (let x = -10; x <= crX; x += 16) pts.push([x, altoM(x) - 4 - (x / crX) * 8]);
-    pts.push([crX + 24, crY - 20], [face(crY + 10) + 24, crY + 4], [face(crY + 24) + 14, crY + 30], [face(crY + 30) - 10, crY + 26]);
-    for (let x = crX - 10; x >= -10; x -= 16) pts.push([x, altoM(x) + 8 + (x / crX) * 10]);
-    const espuma = lanoso(r, pts, 6, 14);
-    k.fillStyle = '#f7f6ee';
-    k.fill(espuma);
-    gravar(k, espuma, 160, crY + 40, 260, 0, 3, 1.1, (px, py) => (py - altoM(px) + 6) / 26, '#26312c', 0);
-    k.strokeStyle = SEPIA;
-    k.lineWidth = 1.6;
-    k.stroke(espuma);
-    marcar(k, obj, espuma);
-    // gotas e borrifos soltos da crista
-    k.fillStyle = '#26312c';
-    for (let i = 0; i < 18; i++) { const x = face(crY) + 18 + r() * 40; const y = crY - 6 + r() * 70; k.beginPath(); k.arc(x, y, 1.2 + r() * 1.8, 0, 6.283); k.fill(); }
+    k.lineWidth = 1.4;
+    k.beginPath();
+    for (let x = -10; x <= crX; x += 8) (x < 0 ? k.moveTo(x, atrasY(x)) : k.lineTo(x, atrasY(x) - Math.sin(x * 0.06) * 3));
+    k.stroke();
+    // a espuma: traços brancos quebrados, com a beirada de tinta embaixo, ao longo da crista
+    for (let x = 0; x < crX + 20; x += 10 + r() * 8) {
+      const y = atrasY(Math.min(crX, x)) + 2 + r() * 6;
+      const l = 8 + r() * 14 + (x / crX) * 10;
+      k.strokeStyle = 'rgba(253,252,246,.98)';
+      k.lineWidth = 3 + (x / crX) * 2;
+      k.beginPath();
+      k.moveTo(x, y);
+      k.quadraticCurveTo(x + l / 2, y - 4, x + l, y + 1);
+      k.stroke();
+      k.strokeStyle = 'rgba(29,38,34,.7)';
+      k.lineWidth = 1;
+      k.beginPath();
+      k.moveTo(x + 2, y + 4);
+      k.quadraticCurveTo(x + l / 2, y + 1, x + l - 2, y + 5);
+      k.stroke();
+    }
+    k.fillStyle = '#2b3530';
+    for (let i = 0; i < 14; i++) { const x = face(crY + 20) + 8 + r() * 30; const y = crY - 4 + r() * 60; k.beginPath(); k.arc(x, y, 1.2 + r() * 1.6, 0, 6.283); k.fill(); }
     // a margem de cá: lama escura, alagada em poças, com os juncos
     const ca = new Path2D();
     ca.moveTo(-10, 676);
@@ -7668,28 +7707,38 @@
         for (let j = 0; j < 7; j++) { const tx = bx + g * h; const ty = by - h; k.beginPath(); k.moveTo(tx, ty); k.quadraticCurveTo(tx + 6 + j * 2, ty - 8, tx + 10 + j * 3, ty + 4 + j * 3); k.stroke(); }
       }
     }
-    // as pegadas molhadas dos sacerdotes: saem da margem de cá e entram no leito, até o meio
-    const passos = [[612, 800, 1], [586, 744, 0.9], [560, 694, 0.8], [540, 650, 0.68], [522, 612, 0.58], [508, 580, 0.5], [496, 554, 0.44]];
-    for (const [x, y, e] of passos) {
-      for (const lado of [-1, 1]) {
-        const p = new Path2D();
-        p.ellipse(x + lado * 12 * e, y + (lado > 0 ? -10 * e : 0), 6 * e, 13 * e * 0.55, -0.35, 0, 6.283);
-        k.fillStyle = 'rgba(70,52,26,.75)';
+    // as pegadas molhadas dos sacerdotes: saem da margem de cá e entram no leito, em pares,
+    // escuras de lama molhada, e param juntas no meio do leito (3.17)
+    const pegada = (x, y, e, g) => {
+      k.save();
+      k.translate(x, y);
+      k.rotate(g);
+      k.scale(e, e);
+      const sola = new Path2D();
+      sola.ellipse(0, -6, 8, 13, 0, 0, 6.283);
+      const calc = new Path2D();
+      calc.ellipse(0, 12, 6.5, 7.5, 0, 0, 6.283);
+      for (const p of [sola, calc]) {
+        k.fillStyle = 'rgba(58,40,18,.88)';
         k.fill(p);
-        k.strokeStyle = 'rgba(255,248,226,.6)';
-        k.lineWidth = 1;
+        k.strokeStyle = 'rgba(255,246,220,.75)';
+        k.lineWidth = 1.4 / e;
         k.stroke(p);
       }
-    }
-    // no meio do leito, onde os sacerdotes ficaram parados (3.17), as pegadas se juntam
-    for (let i = 0; i < 10; i++) {
-      const x = 450 + (i % 5) * 18 + r() * 6;
-      const y = 520 + Math.floor(i / 5) * 18 + r() * 4;
-      const p = new Path2D();
-      p.ellipse(x, y, 3.4, 4, -0.3, 0, 6.283);
-      k.fillStyle = 'rgba(70,52,26,.7)';
-      k.fill(p);
-    }
+      k.fillStyle = 'rgba(200,214,206,.5)';
+      k.beginPath();
+      k.ellipse(-2, -9, 3, 5, 0, 0, 6.283);
+      k.fill();
+      k.restore();
+    };
+    const passos = [[640, 812, 1.25], [602, 748, 1.1], [566, 692, 0.95], [538, 646, 0.82], [514, 608, 0.72], [494, 576, 0.64], [478, 550, 0.57]];
+    passos.forEach(([x, y, e], i) => pegada(x + (i % 2 ? 14 : -14) * e, y, e, -0.5));
+    // onde pararam: dois pares lado a lado, e a marca molhada em volta
+    const parada = new Path2D();
+    parada.ellipse(462, 520, 70, 16, -0.05, 0, 6.283);
+    k.fillStyle = 'rgba(96,74,40,.28)';
+    k.fill(parada);
+    for (const [x, y] of [[436, 516], [456, 512], [482, 520], [502, 516]]) pegada(x, y, 0.55, -0.1);
     vinheta(k, W, H, 0.22);
   }
 
