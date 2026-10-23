@@ -7673,20 +7673,23 @@
     k.lineCap = 'round';
     k.fillStyle = '#9d9e89';
     k.fill(plano);
+    // a água do rio: linhas deitadas, compridas e partidas, em perspectiva (miúdas e juntas
+    // longe), com uns brilhos; nada de escamas
     k.save();
     k.clip(plano);
-    for (let y = 262, p = 1.8; y < 520; y += p, p = Math.min(8, p * 1.085)) {
+    for (let y = 262, p = 1.6; y < 520; y += p, p = Math.min(6.5, p * 1.07)) {
       const t = (y - 262) / 258;
-      let x = -10 - r() * 20;
+      let x = -10 - r() * 40;
       while (x < 340) {
-        const c = 3 + t * 26 + r() * 8;
-        k.strokeStyle = r() < 0.12 ? 'rgba(240,240,228,.8)' : 'rgba(34,38,30,' + (0.45 + t * 0.4).toFixed(2) + ')';
-        k.lineWidth = 0.45 + t * 1.4;
+        const c = 10 + t * 70 + r() * (20 + t * 50);
+        const claro = r() < 0.1;
+        k.strokeStyle = claro ? 'rgba(240,240,228,.85)' : 'rgba(30,34,26,' + (0.45 + t * 0.4).toFixed(2) + ')';
+        k.lineWidth = claro ? 1.4 : 0.45 + t * 1.5;
         k.beginPath();
-        k.moveTo(x, y);
-        k.quadraticCurveTo(x + c / 2, y - 1 - t * 3, x + c, y);
+        k.moveTo(x, y + (r() - 0.5));
+        k.quadraticCurveTo(x + c / 2, y + (r() - 0.5) * 2.5, x + c, y + (r() - 0.5));
         k.stroke();
-        x += c + 3 + r() * (3 + t * 12);
+        x += c + 3 + r() * (4 + t * 16);
       }
     }
     k.restore();
