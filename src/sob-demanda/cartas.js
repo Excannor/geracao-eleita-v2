@@ -3691,10 +3691,11 @@
     // o capuz: a ponta do pano que cobre a cabeça vem dobrada por cima, uma aba em ponta
     // deitada para a direita, com a sombra embaixo; as rugas saem do bico do capuz
     const aba = new Path2D();
-    aba.moveTo(bx - 160, bb - 84);
-    aba.bezierCurveTo(bx - 128, bb - 62, bx - 96, bb - 44, bx - 52, bb - 30);
+    aba.moveTo(bx - 150, bb - 76);
+    aba.bezierCurveTo(bx - 164, bb - 86, bx - 172, bb - 64, bx - 158, bb - 62);
+    aba.bezierCurveTo(bx - 128, bb - 56, bx - 96, bb - 44, bx - 52, bb - 30);
     aba.bezierCurveTo(bx - 70, bb - 12, bx - 96, bb + 4, bx - 120, bb + 22);
-    aba.bezierCurveTo(bx - 136, bb - 10, bx - 150, bb - 50, bx - 160, bb - 84);
+    aba.bezierCurveTo(bx - 140, bb - 6, bx - 146, bb - 40, bx - 150, bb - 76);
     aba.closePath();
     k.save();
     k.filter = 'blur(4px)';
@@ -3705,10 +3706,15 @@
     peca(k, aba, [bx - 160, bb - 84, bx - 52, bb + 22], { cor: '#efe2c6', ang: 0.6, passo: 3.2, maxL: 1.5, sombra: (x, y) => 0.12 + (y - bb + 84) / 160 + (x - bx + 160) / 500, tinta: '#3a2c16', cruzada: 0.7, traco: 2, obj });
     k.strokeStyle = '#3a2c16';
     k.lineWidth = 1.2;
-    for (const [x1, y1] of [[bx - 104, bb - 50], [bx - 118, bb - 20], [bx - 132, bb + 4]]) {
+    // as rugas: uma corre ao longo do embrulho, para trás; as outras são curtas e soltas
+    k.beginPath();
+    k.moveTo(bx - 148, bb - 58);
+    k.bezierCurveTo(bx - 120, bb - 44, bx - 90, bb - 36, bx - 60, bb - 30);
+    k.stroke();
+    for (const [x0, y0, x1, y1] of [[bx - 136, bb - 34, bx - 108, bb - 22], [bx - 132, bb - 8, bx - 112, bb + 4]]) {
       k.beginPath();
-      k.moveTo(bx - 156, bb - 76);
-      k.quadraticCurveTo((bx - 156 + x1) / 2 + 6, (bb - 76 + y1) / 2 - 4, x1, y1);
+      k.moveTo(x0, y0);
+      k.quadraticCurveTo((x0 + x1) / 2, (y0 + y1) / 2 - 6, x1, y1);
       k.stroke();
     }
     // a beirada da aba, com a barra tecida
@@ -3767,19 +3773,19 @@
       sombraNoChao(k, seixo(r, 8, 22, 34, 12, 0, 0.02), 0, 0, 6, 0.45);
       const corpoR = seixo(r, 0, 0, 32, 29, 0, 0.03);
       peca(k, corpoR, [-32, -29, 32, 29], { cor: '#c98a5a', sombra: (x, y) => sombraOval(0, 0, 32, 29, 0)(x, y) * 0.9, passo: 3, maxL: 1.7, tinta: '#3a1a08', cruzada: 0.8, obj, traco: 2 });
-      const coroa = pol([[-12, -26], [-14, -40], [-7, -33], [0, -44], [7, -33], [14, -40], [12, -26]]);
-      peca(k, coroa, [-14, -44, 14, -26], { cor: '#b9784a', sombra: () => 0.5, passo: 2.8, maxL: 1.2, tinta: '#3a1a08', obj, traco: 1.8 });
-      k.strokeStyle = 'rgba(110,30,14,.85)';
-      k.lineWidth = 3;
-      k.beginPath();
-      k.ellipse(0, -2, 31, 7, 0, 0.1, Math.PI - 0.1);
-      k.stroke();
-      k.lineWidth = 2;
-      k.beginPath();
-      k.ellipse(0, 10, 27, 6, 0, 0.2, Math.PI - 0.2);
-      k.stroke();
+      // o cálice, pequeno, e em volta dele o anel de furinhos por onde sai o som
+      const coroa = pol([[-7, -27], [-8, -35], [-4, -31], [0, -37], [4, -31], [8, -35], [7, -27]]);
+      peca(k, coroa, [-8, -37, 8, -27], { cor: '#b9784a', sombra: () => 0.5, passo: 2.6, maxL: 1.1, tinta: '#3a1a08', obj, traco: 1.6 });
       k.fillStyle = '#2a1206';
-      for (const [dx, dy] of [[-14, -12], [8, -16], [18, -6], [-4, -10]]) { k.beginPath(); k.arc(dx, dy, 2, 0, 6.283); k.fill(); }
+      for (let i = 0; i < 7; i++) { const a2 = Math.PI + 0.35 + (i / 6) * (Math.PI - 0.7); k.beginPath(); k.arc(Math.cos(a2) * 15, -22 + Math.sin(a2) * -4 + 4, 1.4, 0, 6.283); k.fill(); }
+      // a faixa pintada, baixa e quase reta (na barriga), com o zigue-zague do oleiro
+      k.strokeStyle = 'rgba(110,30,14,.85)';
+      k.lineWidth = 2;
+      for (const yb of [6, 16]) { k.beginPath(); k.ellipse(0, yb, 31 - (yb - 6) * 0.3, 3, 0, 0.12, Math.PI - 0.12); k.stroke(); }
+      k.lineWidth = 1.6;
+      k.beginPath();
+      for (let i = 0; i <= 12; i++) { const x = -26 + i * (52 / 12); const y = 11 + (i % 2 ? -3 : 3) + Math.abs(x) * 0.04; if (i) k.lineTo(x, y); else k.moveTo(x, y); }
+      k.stroke();
       k.restore();
     }
     // a beirada do pano da tenda, no alto: tecida em faixas, com as borlas
