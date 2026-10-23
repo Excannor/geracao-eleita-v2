@@ -3801,41 +3801,57 @@
     vinheta(k, W, H, 0.22);
   }
   // Um feixe de trigo ou cevada, de pé em (x, base): os talos se juntam na amarra e se abrem
-  // embaixo e em cima, nas espigas; "giro" inclina o feixe em volta da base (a reverência).
-  function feixe(k, r, x, base, alto, giro, { cor = '#e2b866', tinta = '#3a2a0e', barba = false, obj } = {}) {
+  // embaixo e em cima, nas espigas; "giro" inclina o feixe em volta da base (a reverência) e
+  // "dobra" curva a cabeça das espigas um pouco mais para o mesmo lado. "varia" (0 a 1) muda de
+  // um feixe para outro o número de talos, a altura da amarra e a abertura das espigas (até
+  // 15%), para nenhum ser cópia do outro.
+  function feixe(k, r, x, base, alto, giro, { cor = '#e2b866', tinta = '#3a2a0e', barba = false, obj, dobra = 0, varia = 0 } = {}) {
+    const vv = (a) => 1 + (r() - 0.5) * 2 * a * varia;
+    const L = alto * 0.3 * vv(0.15);
+    const am = 0.54 * vv(0.12);
+    const abre = vv(0.15);
+    const nT = Math.max(9, Math.round(14 * vv(0.25)));
+    const yA = -alto * am;
+    // a cabeça curva em volta da amarra, mais na ponta
+    const B = ([px, py]) => {
+      if (py >= yA || !dobra) return [px, py];
+      const u = Math.min(1, (yA - py) / (alto - alto * am));
+      const a = dobra * (0.4 + u * 0.6);
+      const dx = px;
+      const dy = py - yA;
+      return [dx * Math.cos(a) - dy * Math.sin(a), yA + dx * Math.sin(a) + dy * Math.cos(a)];
+    };
     k.save();
     k.translate(x, base);
     k.rotate(giro);
-    const L = alto * 0.3;
+    const contorno = [[-L * 0.62, 0], [-L * 0.36, -alto * 0.3], [-L * 0.2, yA], [-L * 0.5 * abre, -alto * 0.74], [-L * 0.62 * abre, -alto * 0.92], [-L * 0.3 * abre, -alto * 1.02],
+      [0, -alto * 1.05], [L * 0.3 * abre, -alto * 1.02], [L * 0.62 * abre, -alto * 0.92], [L * 0.5 * abre, -alto * 0.74], [L * 0.2, yA], [L * 0.36, -alto * 0.3], [L * 0.62, 0]].map(B);
     const p = new Path2D();
-    p.moveTo(-L * 0.62, 0);
-    p.quadraticCurveTo(-L * 0.12, -alto * 0.42, -L * 0.18, -alto * 0.56);
-    p.quadraticCurveTo(-L * 0.9, -alto * 0.86, -L * 0.5, -alto);
-    p.quadraticCurveTo(0, -alto * 1.08, L * 0.5, -alto);
-    p.quadraticCurveTo(L * 0.9, -alto * 0.86, L * 0.18, -alto * 0.56);
-    p.quadraticCurveTo(L * 0.12, -alto * 0.42, L * 0.62, 0);
+    p.moveTo(contorno[0][0], contorno[0][1]);
+    for (let i = 1; i < contorno.length - 1; i++) p.quadraticCurveTo(contorno[i][0], contorno[i][1], (contorno[i][0] + contorno[i + 1][0]) / 2, (contorno[i][1] + contorno[i + 1][1]) / 2);
+    p.lineTo(contorno[contorno.length - 1][0], contorno[contorno.length - 1][1]);
     p.closePath();
     sombraNoChao(k, p, 8, 4, 6, 0.3);
-    peca(k, p, [-L, -alto, L, 0], { cor, tinta, ang: -Math.PI / 2, passo: 3.6, maxL: 1.4, sombra: (px) => 0.2 + (px + L) / (2 * L) * 0.7, cruzada: 0.8, traco: 1.8, obj });
+    peca(k, p, [-L, -alto * 1.05, L, 0], { cor, tinta, ang: -Math.PI / 2 + dobra * 0.5, passo: 3.6, maxL: 1.4, sombra: (px) => 0.2 + ((px + L) / (2 * L)) * 0.7, cruzada: 0.8, traco: 1.8, obj });
     // os talos e as espigas
     k.strokeStyle = tinta;
     k.lineCap = 'round';
-    for (let i = 0; i < 14; i++) {
-      const t = i / 13 - 0.5;
+    for (let i = 0; i < nT; i++) {
+      const t = i / (nT - 1) - 0.5 + (r() - 0.5) * 0.04;
       k.lineWidth = 1.1;
       k.beginPath();
       k.moveTo(t * L * 1.2, -2);
-      k.quadraticCurveTo(t * L * 0.15, -alto * 0.5, t * L * 0.3, -alto * 0.56);
+      k.quadraticCurveTo(t * L * 0.15, yA * 0.9, t * L * 0.3, yA);
       k.stroke();
-      const ex = t * L * 1.5 + (r() - 0.5) * 8;
-      const ey = -alto * (0.86 + Math.cos(t * 3) * 0.12);
+      const e = B([t * L * 1.5 * abre + (r() - 0.5) * 8, -alto * (0.86 + Math.cos(t * 3) * 0.12) * (0.97 + r() * 0.06)]);
+      const c = B([t * L * 0.6, -alto * 0.72]);
       k.beginPath();
-      k.moveTo(t * L * 0.3, -alto * 0.56);
-      k.quadraticCurveTo(t * L * 0.6, -alto * 0.72, ex, ey);
+      k.moveTo(t * L * 0.3, yA);
+      k.quadraticCurveTo(c[0], c[1], e[0], e[1]);
       k.stroke();
       k.save();
-      k.translate(ex, ey);
-      k.rotate(t * 1.2);
+      k.translate(e[0], e[1]);
+      k.rotate(t * 1.2 * abre + dobra * 0.9);
       k.fillStyle = '#c99640';
       k.beginPath();
       k.ellipse(0, -alto * 0.06, alto * 0.022, alto * 0.07, 0, 0, 6.283);
@@ -3847,41 +3863,36 @@
       k.restore();
     }
     // a amarra de palha torcida
-    const am = pol([[-L * 0.3, -alto * 0.5], [L * 0.3, -alto * 0.5], [L * 0.28, -alto * 0.585], [-L * 0.28, -alto * 0.585]]);
-    peca(k, am, [-L * 0.3, -alto * 0.59, L * 0.3, -alto * 0.5], { cor: '#b98a3a', tinta, ang: 1, passo: 3, maxL: 1.2, sombra: () => 0.5, traco: 1.6 });
+    const am2 = pol([[-L * 0.3, yA + alto * 0.04], [L * 0.3, yA + alto * 0.04], [L * 0.28, yA - alto * 0.045], [-L * 0.28, yA - alto * 0.045]]);
+    peca(k, am2, [-L * 0.3, yA - alto * 0.05, L * 0.3, yA + alto * 0.04], { cor: '#b98a3a', tinta, ang: 1, passo: 3, maxL: 1.2, sombra: () => 0.5, traco: 1.6 });
     k.restore();
   }
 
-  // (5) Os sonhos de José (Gn 37.5-9): no campo, ao entardecer, os feixes dos irmãos em roda,
-  // inclinados diante do feixe de José, que ficou em pé; no céu, o outro sonho: o sol, a lua e
-  // onze estrelas.
+  // (5) Os sonhos de José (Gn 37.5-9): no campo de trigo ceifado, ao entardecer, os onze feixes
+  // dos irmãos em roda, todos inclinados diante do feixe de José, que se levantou e ficou em pé
+  // no meio (a roda se abre na frente, para ele se ver do pé à ponta); no céu, o outro sonho:
+  // o sol, a lua e onze estrelas. Céu e chão só em linha gravada.
   function desenhoJose(k, W, H, obj) {
     const r = sorteio(5501);
-    const hz = 420;
-    const g = k.createLinearGradient(0, 0, 0, hz);
-    g.addColorStop(0, '#2e2a3e');
-    g.addColorStop(0.55, '#7d5f62');
-    g.addColorStop(1, '#efc278');
-    k.fillStyle = g;
-    k.fillRect(0, 0, W, hz + 2);
-    papelVelho(k, W, H, r, ['rgba(0,0,0,0)', 'rgba(0,0,0,0)'], [W / 2, H / 2], true);
-    linhas(k, 0, 0, W, hz, 6, 1.1, (x, y) => 0.2 + (1 - y / hz) * 0.3, 'rgba(250,232,196,.35)');
+    const hz = 430;
+    papelVelho(k, W, H, r, ['#f4dca6', '#e6c587', '#c9a466'], [150, 380]);
+    // o céu: as linhas engrossam para o alto (a noite que vem) e afinam perto do sol
+    linhas(k, 0, 0, W, hz, 5.5, 2.1, (x, y) => 0.08 + (1 - y / hz) ** 1.6 * 0.95 - Math.max(0, 0.5 - Math.hypot(x - 150, y - 360) / 400), '#3a2a1c');
     // o sol, baixo, à esquerda, com os raios gravados; a lua à direita
-    const sol = [150, 330];
-    brilho(k, sol[0], sol[1], 230, 'rgba(255,214,130,.6)');
-    k.strokeStyle = 'rgba(255,236,190,.75)';
-    k.lineWidth = 2;
-    for (let i = 0; i < 24; i++) {
-      const a = (i / 24) * 6.283;
+    const sol = [150, 360];
+    k.strokeStyle = '#7a4a14';
+    k.lineCap = 'round';
+    for (let i = 0; i < 32; i++) {
+      const a = (i / 32) * 6.283;
+      k.lineWidth = i % 2 ? 1.4 : 2.2;
       k.beginPath();
-      k.moveTo(sol[0] + Math.cos(a) * 64, sol[1] + Math.sin(a) * 64);
-      k.lineTo(sol[0] + Math.cos(a) * (i % 2 ? 96 : 120), sol[1] + Math.sin(a) * (i % 2 ? 96 : 120));
+      k.moveTo(sol[0] + Math.cos(a) * 62, sol[1] + Math.sin(a) * 62);
+      k.lineTo(sol[0] + Math.cos(a) * (i % 2 ? 92 : 124), sol[1] + Math.sin(a) * (i % 2 ? 92 : 124));
       k.stroke();
     }
     const disco = new Path2D();
-    disco.arc(sol[0], sol[1], 56, 0, 6.283);
-    peca(k, disco, [sol[0] - 56, sol[1] - 56, sol[0] + 56, sol[1] + 56], { cor: '#ffe7a6', tinta: '#a8661a', sombra: (x, y) => 0.2 + Math.hypot(x - sol[0], y - sol[1]) / 140, ang: 0, passo: 5, maxL: 1.2, cruzada: 1, traco: 2.4, obj });
-    // a lua crescente: o arco de fora e o de dentro, pelos dois pontos onde se cruzam
+    disco.arc(sol[0], sol[1], 54, 0, 6.283);
+    peca(k, disco, [sol[0] - 54, sol[1] - 54, sol[0] + 54, sol[1] + 54], { cor: '#ffe3a0', tinta: '#8a5414', sombra: (x, y) => 0.15 + Math.hypot(x - sol[0], y - sol[1]) / 120, ang: 0, passo: 4.6, maxL: 1.3, cruzada: 1, traco: 2.4, obj });
     const lua = new Path2D();
     const fi = Math.atan2(-12, 22);
     const dl = Math.hypot(22, 12);
@@ -3891,28 +3902,32 @@
     lua.arc(730, 150, 50, fi + al, fi - al + 6.283);
     lua.arc(752, 138, 44, Math.atan2(p2[1] - 138, p2[0] - 752), Math.atan2(p1[1] - 138, p1[0] - 752), true);
     lua.closePath();
-    brilho(k, 724, 154, 120, 'rgba(255,244,214,.25)');
-    peca(k, lua, [680, 100, 780, 200], { cor: '#f8efd4', tinta: '#5a4a3a', sombra: (x) => 0.1 + (x - 680) / 200, ang: 0.4, passo: 4, maxL: 1.2, cruzada: 1, traco: 2, obj });
-    // as onze estrelas, em arco entre o sol e a lua
+    peca(k, lua, [680, 100, 780, 200], { cor: '#f8efd4', tinta: '#3a2a1c', sombra: (x) => 0.1 + (x - 680) / 200, ang: 0.4, passo: 4, maxL: 1.2, cruzada: 1, traco: 2.2, obj });
+    // as onze estrelas, em arco entre o sol e a lua: papel recortado no céu de linhas
     for (let i = 0; i < 11; i++) {
       const t = i / 10;
       const x = 250 + t * 400;
-      const y = 214 - Math.sin(t * Math.PI) * 120 + (i % 2) * 14;
-      brilho(k, x, y, 34, 'rgba(255,240,200,.35)');
-      estrelinha(k, x, y, 15, '#fff6dc');
+      const y = 226 - Math.sin(t * Math.PI) * 130 + (i % 2) * 14;
       const e = new Path2D();
-      e.arc(x, y, 8, 0, 6.283);
+      for (let j = 0; j < 8; j++) {
+        const a = (j / 8) * Math.PI * 2 - Math.PI / 2;
+        const d = j % 2 ? 4.4 : 17;
+        e.lineTo(x + Math.cos(a) * d, y + Math.sin(a) * d);
+      }
+      e.closePath();
+      k.fillStyle = '#fbefcf';
+      k.fill(e);
+      k.strokeStyle = '#3a2a1c';
+      k.lineWidth = 1.4;
+      k.stroke(e);
       marcar(k, obj, e);
     }
-    // o campo ceifado, no fim do dia
+    // o campo ceifado: a palha cortada em linha e os tocos
     const campo = new Path2D();
     campo.rect(-10, hz, W + 20, H);
-    const gc = k.createLinearGradient(0, hz, 0, H);
-    gc.addColorStop(0, '#d7b673');
-    gc.addColorStop(1, '#b38c4c');
-    k.fillStyle = gc;
+    k.fillStyle = '#d6b36c';
     k.fill(campo);
-    linhas(k, 0, hz, W, H, 5.5, 1.6, (x, y) => 0.2 + (y - hz) / 700);
+    linhas(k, 0, hz, W, H, 5, 1.25, (x, y) => 0.15 + (y - hz) / 700);
     k.strokeStyle = 'rgba(58,42,14,.6)';
     k.lineWidth = 1.2;
     for (let i = 0; i < 260; i++) {
@@ -3930,19 +3945,37 @@
     k.moveTo(0, hz);
     k.lineTo(W, hz);
     k.stroke();
-    // a roda dos onze feixes inclinados e o feixe de José, em pé, no meio
+    // a roda dos onze feixes: espaçados por igual numa elipse aberta na frente, cada um
+    // inclinado de 20 a 35 graus para o feixe de José, com a cabeça curvada para ele
     const cx = W / 2;
-    const cy = 600;
-    const roda = Array.from({ length: 11 }, (_, i) => (i + 0.5) / 11 * 6.283 + Math.PI / 2 - 2.5 / 11 * 6.283 + 0.0);
+    const cy = 616;
+    const RX = 366;
+    const RY = 150;
+    // seis à esquerda e cinco à direita, por igual ao longo do arco (na tela), com a abertura
+    // na frente e uma fresta atrás, para nenhum ficar escondido atrás do feixe de José
+    const arco = (a0, a1, n) => {
+      const pts = Array.from({ length: 201 }, (_, i) => a0 + ((a1 - a0) * i) / 200);
+      const acum = [0];
+      for (let i = 1; i < pts.length; i++) acum.push(acum[i - 1] + Math.hypot(RX * (Math.cos(pts[i]) - Math.cos(pts[i - 1])), RY * (Math.sin(pts[i]) - Math.sin(pts[i - 1]))));
+      const tot = acum[acum.length - 1];
+      return Array.from({ length: n }, (_, j) => pts[acum.findIndex((v) => v >= (tot * j) / (n - 1))]);
+    };
+    const roda = [...arco(Math.PI / 2 + 0.78, Math.PI * 1.5 - 0.3, 6), ...arco(Math.PI * 1.5 + 0.42, Math.PI * 2.5 - 0.78, 5)];
     const um = (a) => {
       const sx = Math.cos(a);
       const sy = Math.sin(a);
-      const e = 0.78 + sy * 0.22;
-      feixe(k, r, cx + sx * 300, cy + sy * 120, 170 * e, -sx * 0.55, { obj });
+      const e = 0.72 + sy * 0.16;
+      const lado = sx < 0 ? 1 : -1;
+      const fundo = Math.max(0, -sy);
+      const inc = (0.35 + r() * 0.26) * (1 - fundo * Math.max(0, 1 - Math.abs(sx) * 2.2) * 0.5);
+      k.save();
+      k.translate(cx + sx * RX, cy + sy * RY);
+      k.scale(1, 1 - fundo * 0.12);
+      feixe(k, r, 0, 0, 176 * e, lado * inc, { obj, dobra: lado * (0.18 + r() * 0.12), varia: 1, cor: r() < 0.5 ? '#e2b866' : '#ddb05c' });
+      k.restore();
     };
     for (const a of roda.filter((a) => Math.sin(a) < 0)) um(a);
-    feixe(k, r, cx, cy + 10, 300, 0, { cor: '#f0c874', obj });
-    brilho(k, cx, cy - 220, 120, 'rgba(255,230,160,.3)', 'screen');
+    feixe(k, r, cx, cy + 14, 318, 0, { cor: '#f0c874', obj });
     for (const a of roda.filter((a) => Math.sin(a) >= 0).sort((a, b) => Math.sin(a) - Math.sin(b))) um(a);
     vinheta(k, W, H, 0.25);
   }
