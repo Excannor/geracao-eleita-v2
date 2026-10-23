@@ -14219,250 +14219,321 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.28);
   }
   // ---------- (6) O machado que flutuou (2 Rs 6.4-7) ----------
-  // Rente à água do Jordão, de perto: a correnteza barrenta passa em linhas compridas e, no
-  // meio dela, boiando, o ferro do machado (a cunha de ferro, com o olho vazio onde entrava o
-  // cabo), com a água se abrindo em volta dele rio abaixo. Ao lado, a vara recém-cortada que
-  // Eliseu jogou na água, de pontas claras. Lá atrás, na margem, os troncos derrubados, o toco
-  // com as marcas do machado e as lascas no chão (6.4). Ninguém desenhado.
+  // Rente à água, de perto: a câmera baixa, quase na correnteza do Jordão, que vem de longe
+  // entre as tamargueiras da outra margem. No meio, o ferro do machado veio à tona: a cunha de
+  // ferro boiando, metade fora d'água, com a água lambendo as beiradas e uma esteira de
+  // marolas rio abaixo; perto dele, a vara que Eliseu cortou, boiando torta. Na frente, em
+  // diagonal, a margem de cá com o tronco derrubado, o talho do machado e as lascas (6.4).
+  // Ninguém desenhado.
   function desenhoMachado(k, W, H, obj) {
     const r = sorteio(9601);
-    papelVelho(k, W, H, r, ['#f6efd8', '#e4d6b2', '#c2ad84'], [260, 120]);
-    // a margem de lá: o barranco, o mato de tamargueiras e os troncos derrubados
-    const mY = (x) => 268 + Math.sin(x * 0.011) * 10 + Math.sin(x * 0.037) * 4;
-    linhas(k, 0, 0, W, 150, 5, 1.2, (x, y) => 0.12 + (1 - y / 150) * 0.35);
-    for (let i = 0; i < 9; i++) copaGravada(k, r, 30 + i * 104 + (r() - 0.5) * 30, 120 + (r() - 0.5) * 20, 70 + r() * 30, 46 + r() * 14, { cor: '#aaa47a' });
-    const margem = pol([[-10, 150], [W + 10, 150], [W + 10, mY(W + 10)], ...Array.from({ length: 46 }, (_, i) => { const x = W + 10 - i * 20; return [x, mY(x)]; })]);
-    k.fillStyle = '#d8c094';
-    k.fill(margem);
-    chaoEmLinhas(k, r, margem, -10, W + 10, 150, 290, 1.8, (x, y) => 0.32 + (y - 150) / 300);
-    // o barranco que cai na água
-    const barranco = pol([...Array.from({ length: 46 }, (_, i) => { const x = i * 20 - 10; return [x, mY(x) - 14]; }), ...Array.from({ length: 46 }, (_, i) => { const x = W + 10 - i * 20; return [x, mY(x) + 4]; })]);
-    peca(k, barranco, [-10, 240, W + 10, 300], { cor: '#b89a6c', ang: 1.45, passo: 3.4, maxL: 1.6, sombra: () => 0.55, cruzada: 0.8, traco: 1.6 });
-    // o toco com as marcas do machado e as lascas, e os troncos derrubados
-    const toco = pol([[600, 236], [604, 196], [628, 186], [656, 190], [668, 200], [672, 238]]);
-    peca(k, toco, [600, 186, 672, 240], { cor: '#9c7448', ang: 1.5, passo: 3, maxL: 1.6, sombra: (x) => 0.3 + (x - 600) / 120, cruzada: 0.8, traco: 2 });
-    const corte = new Path2D();
-    corte.ellipse(636, 192, 34, 9, -0.1, 0, 6.283);
-    k.fillStyle = '#ecd4a0';
-    k.fill(corte);
-    k.strokeStyle = SEPIA;
-    k.lineWidth = 1.6;
-    k.stroke(corte);
-    for (let i = 1; i < 4; i++) { k.lineWidth = 0.8; k.beginPath(); k.ellipse(636, 192, 34 - i * 8, 9 - i * 2, -0.1, 0, 6.283); k.stroke(); }
-    // as marcas do machado: o talho em cunha no lado
-    k.fillStyle = '#e6c890';
-    k.beginPath();
-    k.moveTo(652, 206);
-    k.lineTo(670, 214);
-    k.lineTo(652, 222);
-    k.closePath();
-    k.fill();
-    k.stroke();
-    for (const [x0, y0, x1, y1] of [[250, 226, 520, 214], [300, 244, 540, 238]]) {
-      vara(k, [[x0, y0], [x1, y1]], 24, '#8e6a42');
-      // o corte claro na ponta da tora
-      k.fillStyle = '#ecd4a0';
+    papelVelho(k, W, H, r, ['#f4eedb', '#e2d8b8', '#c0b08a'], [640, 120]);
+    const hz = 214;
+    linhas(k, 0, 0, W, hz, 5, 1.2, (x, y) => 0.1 + (1 - y / hz) * 0.4);
+    // a outra margem: o barranco baixo e as tamargueiras, de folha em fiapos (não em bolas)
+    const fM = onda(sorteio(9610), 4, 0.012);
+    const margem = pol([[-10, hz + 4], ...Array.from({ length: 46 }, (_, i) => [i * 20 - 6, hz - 6 - Math.max(0, fM(i * 20)) * 6]), [W + 10, hz + 4]]);
+    peca(k, margem, [-10, hz - 30, W + 10, hz + 4], { cor: '#c8b48a', ang: 0.05, passo: 3, maxL: 1.2, sombra: () => 0.45, cruzada: 1, traco: 1.2 });
+    const tamargueira = (x, base, alto, e) => {
+      k.strokeStyle = 'rgba(52,40,22,.85)';
+      k.lineCap = 'round';
+      k.lineWidth = 2.4 * e;
       k.beginPath();
-      k.ellipse(x1 + 2, y1, 7, 14, 0, 0, 6.283);
-      k.fill();
-      k.strokeStyle = SEPIA;
-      k.lineWidth = 1.6;
+      k.moveTo(x, base);
+      k.quadraticCurveTo(x + 4 * e, base - alto * 0.4, x - 2 * e, base - alto * 0.6);
       k.stroke();
-      k.lineWidth = 0.8;
-      k.beginPath();
-      k.ellipse(x1 + 2, y1, 3, 7, 0, 0, 6.283);
-      k.stroke();
-    }
-    for (let i = 0; i < 18; i++) {
-      const x = 560 + r() * 160;
-      const y = 236 + r() * 26;
-      k.save();
-      k.translate(x, y);
-      k.rotate(r() * 3);
-      const p = pol([[-6, -2], [6, -3], [5, 2], [-5, 3]]);
-      k.fillStyle = '#e8cc96';
-      k.fill(p);
-      k.strokeStyle = SEPIA;
-      k.lineWidth = 1;
-      k.stroke(p);
-      k.restore();
-    }
-    // o rio: a água barrenta e verde, a correnteza em linhas compridas que descem da esquerda
-    // para a direita, mais juntas longe
-    const rio = pol([...Array.from({ length: 46 }, (_, i) => { const x = i * 20 - 10; return [x, mY(x) + 2]; }), [W + 10, H + 10], [-10, H + 10]]);
-    k.fillStyle = '#b8b392';
+      // a folhagem: uma coluna fofa e torta de fiapos finos e caídos, que sobe do chão até a
+      // copa (a tamargueira não tem copa redonda nem de guarda-chuva)
+      for (let i = 0; i < 150; i++) {
+        const t = r();
+        const cx = x + (r() - 0.5) * alto * 0.5 * (0.4 + Math.sin(t * Math.PI) * 0.8) + Math.sin(t * 5) * 4 * e;
+        const cy = base - alto * (0.12 + t * 0.88);
+        const L = (5 + r() * 9) * e;
+        const ld = r() < 0.5 ? -1 : 1;
+        k.strokeStyle = 'rgba(60,64,38,' + (0.35 + r() * 0.45).toFixed(2) + ')';
+        k.lineWidth = 0.9;
+        k.beginPath();
+        k.moveTo(cx, cy);
+        k.quadraticCurveTo(cx + ld * L * 0.6, cy - L * 0.2, cx + ld * L * 0.8, cy + L * 0.7);
+        k.stroke();
+      }
+    };
+    for (const [x, a] of [[40, 70], [120, 92], [230, 60], [310, 84], [420, 66], [540, 96], [640, 70], [730, 88], [830, 74]]) tamargueira(x + (r() - 0.5) * 20, hz - 2, a, 0.8);
+    // o rio, visto rente: as ondulações compridas e mansas, cada vez mais juntas longe, a
+    // corrente da esquerda para a direita; o reflexo das árvores em riscos de pé longe
+    const rio = pol([[-10, hz + 2], [W + 10, hz + 2], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#b2ae90';
     k.fill(rio);
-    const cx = 420;
-    const cy = 520;
-    const dist = (x, y) => Math.hypot((x - cx) / 1.6, y - cy);
+    const cx = 540;
+    const cy = 456;
     k.save();
     k.clip(rio);
     k.lineCap = 'round';
-    for (let y0 = 270; y0 < H + 80; y0 += 3 + (y0 - 270) * 0.022) {
-      const t = (y0 - 270) / (H - 270);
-      let x = -30 - r() * 60;
-      const fase = r() * 6;
-      while (x < W + 30) {
-        const c = (30 + r() * 120) * (0.4 + t);
-        let ant = null;
-        for (let xx = x; xx <= x + c; xx += 8) {
-          // a correnteza se abre em volta do ferro e se junta depois dele
-          let y = y0 + (xx - 444) * 0.06 + Math.sin(xx * 0.012 + fase) * 4 * (0.4 + t);
-          const d = dist(xx, y);
-          if (d < 220 && xx > cx - 80) y += Math.sign(y - cy || 1) * (220 - d) * 0.2 * Math.min(1, (xx - cx + 80) / 160);
-          const p = [xx, y];
-          if (ant) {
-            k.strokeStyle = 'rgba(40,46,30,' + (0.35 + t * 0.4).toFixed(2) + ')';
-            k.lineWidth = 0.6 + t * 1.6;
-            k.beginPath();
-            k.moveTo(ant[0], ant[1]);
-            k.lineTo(p[0], p[1]);
-            k.stroke();
-          }
-          ant = p;
+    for (let y = hz + 3; y < H + 10; y += 1.8 + (y - hz) * 0.035) {
+      const t = (y - hz) / (H - hz);
+      let x = -20 - r() * 60;
+      while (x < W + 20) {
+        const c = (30 + r() * 80) * (0.3 + t * 1.8);
+        // perto do ferro a água se abre em volta dele
+        const d = Math.hypot((x + c / 2 - cx) / 2.4, y - cy);
+        if (Math.hypot((x + c / 2 - cx + 30) / 4, y - cy - 10) > 56) {
+          const claro = r() < 0.3;
+          k.strokeStyle = claro ? 'rgba(248,246,230,.8)' : 'rgba(40,44,30,' + (0.4 + t * 0.4).toFixed(2) + ')';
+          k.lineWidth = (0.5 + t * 2) * (claro ? 0.8 : 1);
+          k.beginPath();
+          k.moveTo(x, y);
+          k.quadraticCurveTo(x + c / 2, y - 1 - t * 4, x + c, y);
+          k.stroke();
         }
-        x += c + 8 + r() * 30 * (0.4 + t);
+        x += c + (4 + r() * 20) * (0.3 + t * 1.6);
       }
     }
-    // o reflexo claro do céu, em riscos compridos e soltos
-    for (let i = 0; i < 40; i++) {
-      const y = 290 + r() * (H - 290);
-      const x = r() * W;
-      const L = 30 + r() * 90;
-      if (dist(x, y) < 200 || dist(x + L, y) < 200) continue;
-      k.strokeStyle = 'rgba(252,248,232,.7)';
-      k.lineWidth = 1 + (y - 290) / 400;
+    // o reflexo das tamargueiras, longe: riscos escuros de pé, quebrados
+    for (let x = 0; x < W; x += 3) {
+      if (r() < 0.4) continue;
+      const L = 10 + r() * 24;
+      k.strokeStyle = 'rgba(60,62,40,.35)';
+      k.lineWidth = 1.2;
       k.beginPath();
-      k.moveTo(x, y);
-      k.lineTo(x + L, y + L * 0.06);
+      k.moveTo(x, hz + 4);
+      k.lineTo(x + (r() - 0.5) * 2, hz + 4 + L);
       k.stroke();
     }
     k.restore();
-    // a esteira do ferro: dois braços de marolas que abrem rio abaixo (nada de anel em volta)
-    k.strokeStyle = 'rgba(40,46,30,.8)';
+    // a esteira do ferro: dois braços de marolas partidas que se abrem rio abaixo
     k.lineCap = 'round';
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
       for (const lado of [-1, 1]) {
-        const x = cx + 170 + i * 48;
-        const y = cy + lado * (52 + i * 16) + i * 5;
-        k.lineWidth = 2 - i * 0.22;
+        const x = cx + 120 + i * 46;
+        const y = cy + 8 + lado * (12 + i * 9);
+        const L = 26 - i * 1.5;
+        k.strokeStyle = 'rgba(40,44,30,' + (0.8 - i * 0.07).toFixed(2) + ')';
+        k.lineWidth = 2 - i * 0.18;
         k.beginPath();
-        k.moveTo(x - 18, y - lado * 4);
-        k.quadraticCurveTo(x, y + lado * 3, x + 22, y + lado * 2);
+        k.moveTo(x - L / 2, y - lado * 2);
+        k.quadraticCurveTo(x, y + lado * 2, x + L / 2, y + lado * 3);
         k.stroke();
-        k.strokeStyle = 'rgba(252,248,232,.8)';
+        k.strokeStyle = 'rgba(250,248,232,.85)';
         k.lineWidth = 1.2;
         k.beginPath();
-        k.moveTo(x - 16, y - lado * 4 - 3);
-        k.quadraticCurveTo(x, y + lado * 3 - 3, x + 18, y + lado * 2 - 3);
+        k.moveTo(x - L / 2 + 2, y - lado * 2 - 3);
+        k.quadraticCurveTo(x, y + lado * 2 - 3, x + L / 2 - 2, y + lado * 3 - 3);
         k.stroke();
-        k.strokeStyle = 'rgba(40,46,30,.8)';
       }
     }
-    // o ferro do machado, boiando: a cunha de ferro de lado, a lâmina larga e gasta à esquerda,
-    // a cabeça com o olho vazio à direita; a linha d'água corta a metade de baixo
+    // o ferro: a cunha de lado, a lâmina larga em leque à esquerda e o olho do cabo à direita
+    // a grossura do ferro, vista de pouco acima: a beirada que fica fora d'água
     k.save();
-    k.translate(cx, cy);
-    k.scale(1.9, 1.9);
-    k.translate(-cx, -cy);
+    k.translate(cx, cy - 4);
+    k.rotate(-0.04);
+    k.scale(1.8, 0.95);
+    const grossura = new Path2D();
+    grossura.moveTo(-110, 48);
+    grossura.quadraticCurveTo(-60, 22, -4, 14);
+    grossura.lineTo(74, 22);
+    grossura.lineTo(74, 30);
+    grossura.lineTo(-4, 22);
+    grossura.quadraticCurveTo(-60, 30, -110, 56);
+    grossura.closePath();
+    k.fillStyle = '#2a2620';
+    k.fill(grossura);
+    marcar(k, obj, grossura);
+    k.restore();
+    k.save();
+    k.translate(cx, cy - 4);
+    k.rotate(-0.04);
+    k.scale(1.8, 0.95);
     const ferro = new Path2D();
-    ferro.moveTo(cx - 112, cy - 50);
-    ferro.quadraticCurveTo(cx - 134, cy, cx - 110, cy + 48);
-    ferro.quadraticCurveTo(cx - 60, cy + 22, cx - 4, cy + 14);
-    ferro.lineTo(cx + 34, cy + 16);
-    ferro.lineTo(cx + 40, cy + 22);
-    ferro.lineTo(cx + 74, cy + 22);
-    ferro.quadraticCurveTo(cx + 82, cy, cx + 74, cy - 22);
-    ferro.lineTo(cx + 40, cy - 22);
-    ferro.lineTo(cx + 34, cy - 16);
-    ferro.lineTo(cx - 4, cy - 14);
-    ferro.quadraticCurveTo(cx - 60, cy - 22, cx - 112, cy - 50);
+    ferro.moveTo(-112, -50);
+    ferro.quadraticCurveTo(-134, 0, -110, 48);
+    ferro.quadraticCurveTo(-60, 22, -4, 14);
+    ferro.lineTo(34, 16);
+    ferro.lineTo(40, 22);
+    ferro.lineTo(74, 22);
+    ferro.quadraticCurveTo(82, 0, 74, -22);
+    ferro.lineTo(40, -22);
+    ferro.lineTo(34, -16);
+    ferro.lineTo(-4, -14);
+    ferro.quadraticCurveTo(-60, -22, -112, -50);
     ferro.closePath();
-    const olho = new Path2D();
-    olho.ellipse(cx + 56, cy, 9, 14, 0, 0, 6.283);
-    sombraNoChao(k, ferro, 10, 12, 8, 0.35);
-    k.fillStyle = '#4c4840';
+    k.fillStyle = '#5e5a50';
     k.fill(ferro);
     marcar(k, obj, ferro);
-    gravar(k, ferro, cx - 20, cy, 120, 0.1, 2.8, 1.8, (x, y) => 0.4 + (y - cy) / 50 + Math.max(0, (cx - 60 - x) / 200), '#121008', 0);
-    // a ferrugem e o gume claro e gasto
+    gravar(k, ferro, -20, 0, 120, 0.1, 2.6, 1.8, (x, y) => 0.4 + y / 50 + Math.max(0, (-60 - x) / 200), '#121008', 0);
     k.save();
     k.clip(ferro);
-    for (let i = 0; i < 120; i++) {
-      k.fillStyle = 'rgba(150,80,36,' + (0.3 + r() * 0.4).toFixed(2) + ')';
-      k.beginPath();
-      k.arc(cx - 110 + r() * 190, cy - 30 + r() * 60, 1 + r() * 2.4, 0, 6.283);
-      k.fill();
-    }
+    // a ferrugem: riscos ao longo das beiradas, em sépia
+    k.strokeStyle = 'rgba(120,70,34,.6)';
+    k.lineWidth = 1.4;
+    for (let i = 0; i < 26; i++) { const x = -100 + r() * 170; const y = (r() < 0.5 ? -1 : 1) * (12 + r() * 10); k.beginPath(); k.moveTo(x, y); k.lineTo(x + 6 + r() * 12, y + (r() - 0.5) * 3); k.stroke(); }
     k.strokeStyle = 'rgba(232,228,214,.9)';
     k.lineWidth = 2.4;
     k.beginPath();
-    k.moveTo(cx - 110, cy - 46);
-    k.quadraticCurveTo(cx - 129, cy, cx - 107, cy + 44);
+    k.moveTo(-110, -46);
+    k.quadraticCurveTo(-129, 0, -107, 44);
     k.stroke();
     k.strokeStyle = 'rgba(232,228,214,.5)';
-    k.lineWidth = 1.6;
+    k.lineWidth = 1.4;
     k.beginPath();
-    k.moveTo(cx - 100, cy - 44);
-    k.quadraticCurveTo(cx - 60, cy - 20, cx - 4, cy - 12);
-    k.lineTo(cx + 34, cy - 14);
+    k.moveTo(-100, -44);
+    k.quadraticCurveTo(-60, -20, -4, -12);
+    k.lineTo(34, -14);
     k.stroke();
     k.restore();
-    k.fillStyle = '#7d785e';
+    const olho = new Path2D();
+    olho.ellipse(56, 0, 9, 14, 0, 0, 6.283);
+    k.fillStyle = '#8a8668';
     k.fill(olho);
     k.strokeStyle = '#121008';
     k.lineWidth = 2;
     k.stroke(olho);
     k.lineWidth = 2.6;
     k.stroke(ferro);
-    // a água que cobre a beirada de baixo do ferro: a linha d'água torta, com marolas
+    // a água por cima da metade de baixo: a linha d'água torta e, por baixo dela, o ferro
+    // visto através da água (mais claro e esverdeado, as linhas do rio passando por cima)
     k.save();
     k.clip(ferro);
-    const agua = pol([[cx - 140, cy + 12], ...Array.from({ length: 24 }, (_, i) => [cx - 140 + i * 10, cy + 10 + Math.sin(i * 0.9) * 3]), [cx + 100, cy + 40], [cx - 140, cy + 40]]);
-    k.fillStyle = 'rgba(184,179,146,.88)';
-    k.fill(agua);
-    k.strokeStyle = 'rgba(40,46,30,.7)';
+    const debaixo = pol([[-140, 12], ...Array.from({ length: 26 }, (_, i) => [-140 + i * 9, 10 + Math.sin(i * 1.1) * 3 + (i - 13) * 0.6]), [100, 26], [100, 90], [-140, 90]]);
+    k.fillStyle = 'rgba(170,168,138,.86)';
+    k.fill(debaixo);
+    k.strokeStyle = 'rgba(40,44,30,.6)';
     k.lineWidth = 1;
-    for (let y = cy + 16; y < cy + 40; y += 4) { k.beginPath(); k.moveTo(cx - 140, y); k.lineTo(cx + 100, y + 1); k.stroke(); }
+    for (let y = 14; y < 60; y += 4) { k.beginPath(); k.moveTo(-140, y + (y - 14) * 0.1); k.lineTo(100, y + 14); k.stroke(); }
     k.restore();
-    k.strokeStyle = 'rgba(252,248,232,.9)';
-    k.lineWidth = 1.8;
+    // a linha d'água atravessando o ferro, clara e torta
+    k.strokeStyle = 'rgba(252,250,236,.95)';
+    k.lineWidth = 1.6;
     k.beginPath();
-    for (let i = 0; i < 24; i++) { const x = cx - 132 + i * 9; const y = cy + 11 + Math.sin(i * 0.9) * 3; if (i) k.lineTo(x, y); else k.moveTo(x, y); }
+    for (let i = 0; i < 26; i++) { const x = -140 + i * 9; const y = 10 + Math.sin(i * 1.1) * 3 + (i - 13) * 0.6; if (i) k.lineTo(x, y); else k.moveTo(x, y); }
+    k.save();
+    k.clip(ferro);
     k.stroke();
     k.restore();
-    // a vara que Eliseu cortou e jogou: um galho reto, de casca, com as duas pontas cortadas claras
-    // e uma folha ainda presa, boiando em diagonal ao lado do ferro
-    const v0 = [cx - 300, cy + 190];
-    const v1 = [cx - 40, cy + 250];
-    vara(k, [v0, [(v0[0] + v1[0]) / 2, (v0[1] + v1[1]) / 2 + 4], v1], 13, '#7a5a34', obj);
+    k.restore();
+    // a linha d'água em volta do ferro: o menisco claro, partido, rente às beiradas, e as
+    // marolinhas que lambem a lâmina e o olho (sem anel fechado)
+    k.lineCap = 'round';
+    for (const [a0, a1, rx, ry] of [[0.15, 1.2, 250, 34], [1.6, 2.9, 250, 34]]) {
+      k.strokeStyle = 'rgba(252,250,236,.95)';
+      k.lineWidth = 2;
+      k.beginPath();
+      k.ellipse(cx - 30, cy + 14, rx, ry, -0.04, a0, a1);
+      k.stroke();
+      k.strokeStyle = 'rgba(40,44,30,.7)';
+      k.lineWidth = 1.3;
+      k.beginPath();
+      k.ellipse(cx - 30, cy + 18, rx + 14, ry + 8, -0.04, a0 + 0.1, a1 - 0.1);
+      k.stroke();
+    }
+    // a vara que Eliseu cortou: um galho reto, de casca, as pontas cortadas claras e uma folha,
+    // boiando torta perto do ferro, com a linha d'água ao longo
+    const v0 = [cx - 420, cy + 150];
+    const v1 = [cx - 190, cy + 104];
+    vara(k, [v0, [(v0[0] + v1[0]) / 2, (v0[1] + v1[1]) / 2 + 6], v1], 14, '#7a5a34', obj);
     for (const [x, y] of [v0, v1]) {
       k.fillStyle = '#efdcae';
       k.beginPath();
-      k.ellipse(x, y, 5, 8, -0.3, 0, 6.283);
+      k.ellipse(x, y, 5, 8, 0.1, 0, 6.283);
       k.fill();
       k.strokeStyle = SEPIA;
       k.lineWidth = 1.4;
       k.stroke();
     }
+    k.strokeStyle = 'rgba(252,250,236,.9)';
+    k.lineWidth = 1.8;
+    k.beginPath();
+    k.moveTo(v0[0] + 4, v0[1] + 8);
+    k.lineTo((v0[0] + v1[0]) / 2, (v0[1] + v1[1]) / 2 + 14);
+    k.lineTo(v1[0] + 4, v1[1] + 8);
+    k.stroke();
     const folha = new Path2D();
-    folha.moveTo(cx - 160, cy + 224);
-    folha.quadraticCurveTo(cx - 142, cy + 194, cx - 110, cy + 192);
-    folha.quadraticCurveTo(cx - 130, cy + 216, cx - 160, cy + 224);
+    folha.moveTo(cx - 300, cy + 128);
+    folha.quadraticCurveTo(cx - 284, cy + 100, cx - 252, cy + 98);
+    folha.quadraticCurveTo(cx - 272, cy + 120, cx - 300, cy + 128);
     folha.closePath();
-    k.fillStyle = '#9a9a62';
+    k.fillStyle = '#8e9258';
     k.fill(folha);
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.2;
     k.stroke(folha);
     marcar(k, obj, folha);
-    // a linha d'água ao longo da vara
-    k.strokeStyle = 'rgba(252,248,232,.85)';
+    // a margem de cá, em diagonal, no canto de baixo à esquerda: terra e capim, e o tronco
+    // derrubado, com a casca em gravura, o corte em cunha do machado e os anéis na ponta
+    const banco = pol([[-10, 600], [120, 640], [300, 720], [470, 800], [560, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#c4aa7c';
+    k.fill(banco);
+    chaoEmLinhas(k, r, banco, -10, 560, 580, H, 2, (x, y) => 0.35 + (y - 600) / 600);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.stroke(banco);
+    k.strokeStyle = 'rgba(252,250,236,.8)';
     k.lineWidth = 1.6;
     k.beginPath();
-    k.moveTo(v0[0] + 4, v0[1] + 7);
-    k.lineTo(v1[0] + 4, v1[1] + 7);
+    k.moveTo(-10, 594);
+    k.lineTo(120, 634);
+    k.lineTo(300, 714);
+    k.lineTo(470, 794);
     k.stroke();
+    marcar(k, obj, banco);
+    const eixo = curvaPor([[-30, 790], [120, 740], [260, 700], [372, 676]], 3);
+    const { forma: tronco } = tuboAo(eixo, (sx) => 66 - sx * 0.04);
+    sombraNoChao(k, tronco, 10, 14, 8, 0.4);
+    k.fillStyle = '#7a5a36';
+    k.fill(tronco);
+    marcar(k, obj, tronco);
+    k.save();
+    k.clip(tronco);
+    // a casca: sulcos compridos ao longo, partidos, e o escuro embaixo
+    for (let v = -0.9; v <= 0.9; v += 0.12) {
+      let ant = null;
+      for (const q of eixo) {
+        const w = (66 - q.s * 0.04) / 2;
+        const pt = [q.x - q.ty * v * w, q.y + q.tx * v * w + Math.sin(q.s * 0.2 + v * 7) * 1.2];
+        if (ant && r() > 0.2) { k.strokeStyle = v > 0.2 ? 'rgba(30,18,6,.85)' : 'rgba(30,18,6,.55)'; k.lineWidth = 1 + Math.max(0, v) * 1.6; k.beginPath(); k.moveTo(ant[0], ant[1]); k.lineTo(pt[0], pt[1]); k.stroke(); }
+        ant = pt;
+      }
+    }
+    // o talho do machado: a cunha clara cortada no tronco
+    const qT = eixo[Math.round(eixo.length * 0.55)];
+    const talho = pol([[qT.x - 18, qT.y - 30], [qT.x + 16, qT.y - 34], [qT.x + 2, qT.y + 2]]);
+    k.fillStyle = '#ecd2a0';
+    k.fill(talho);
+    gravar(k, talho, qT.x, qT.y - 16, 30, 0.6, 2.2, 0.9, () => 0.4, '#7a5a30', 0);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.4;
+    k.stroke(talho);
+    k.restore();
+    k.strokeStyle = '#1e1208';
+    k.lineWidth = 2.4;
+    k.stroke(tronco);
+    // a ponta cortada: os anéis da madeira
+    const pf = eixo[eixo.length - 1];
+    const corte = new Path2D();
+    corte.ellipse(pf.x + 2, pf.y, 11, 26, -0.35, 0, 6.283);
+    k.fillStyle = '#e8cc96';
+    k.fill(corte);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.8;
+    k.stroke(corte);
+    k.lineWidth = 0.8;
+    for (const f of [0.7, 0.45, 0.2]) { k.beginPath(); k.ellipse(pf.x + 2, pf.y, 11 * f, 26 * f, -0.35, 0, 6.283); k.stroke(); }
+    // as lascas no chão
+    for (let i = 0; i < 16; i++) {
+      const x = 60 + r() * 360;
+      const y = 760 + r() * 70 - (x - 60) * 0.05;
+      k.save();
+      k.translate(x, y);
+      k.rotate(r() * 3);
+      const p = pol([[-8, -2], [8, -4], [7, 3], [-6, 4]]);
+      k.fillStyle = '#ecd4a0';
+      k.fill(p);
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1;
+      k.stroke(p);
+      k.restore();
+    }
+    capim(k, r, 470, 790, 34, 12, 'rgba(70,52,24,.8)');
+    capim(k, r, 30, 610, 30, 10, 'rgba(70,52,24,.8)');
     vinheta(k, W, H, 0.22);
   }
 
