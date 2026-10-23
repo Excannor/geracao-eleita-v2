@@ -12892,9 +12892,11 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       // uma fenda escura que afina nas pontas, com a beirada de cima acesa
       const nR = 2 + Math.floor(rr() * 3);
       for (let n = 0; n < nR; n++) {
-        const phi = -2.6 + rr() * 2.4 + (n % 2 ? Math.PI : 0) * 0.5;
+        // só no ombro de trás e nos lados: na frente, uma fenda em arco leria como boca
+        const setor = [[-2.6, -0.6], [-0.55, 0.15], [2.95, 3.55]][Math.floor(rr() * 3)];
+        const phi = setor[0] + rr() * (setor[1] - setor[0]);
         const q0 = 0.72 + rr() * 0.12;
-        const comp = 0.5 + rr() * 0.5;
+        const comp = 0.4 + rr() * 0.35;
         const meio = [];
         for (let s0 = 0; s0 <= 10; s0++) {
           const ph = phi + (s0 / 10) * comp;
@@ -12993,13 +12995,12 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       }
     };
     // os três de trás, encostados na borda; os dois da frente por cima
-    pao(282, 486, 98, 18, 0.18, 8331, [[-0.15, -0.2, -0.5, 0.42, 0.08], [0.22, 0.18, 0.45, 0.32, -0.06]]);
-    pao(452, 466, 102, 19, -0.1, 8332, 'cruz');
-    pao(620, 490, 96, 17, 0.12, 8333, [[-0.25, 0.05, 1.25, 0.34, 0.1], [0.12, -0.18, 0.2, 0.4, -0.05], [0.3, 0.3, -0.75, 0.22, 0.08]]);
-    // o pão partido: as duas metades lado a lado, afastadas, com o miolo virado para nós
-    pao(282, 630, 84, 30, -0.3, 8334, [[-0.3, -0.45, 0.25, 0.26, 0.06]], 'tras');
-    pao(442, 640, 84, 30, -2.84, 8334, [[0.1, 0.55, -0.35, 0.22, 0.06]], 'frente');
-    pao(586, 612, 98, 18, 0.1, 8335, [[-0.1, -0.15, 0.7, 0.45, -0.1], [0.28, 0.25, -0.35, 0.28, 0.07]]);
+    // cinco pães inteiros (Jo 6.9: o lanche ainda não foi repartido), afastados um do outro
+    pao(262, 480, 80, 17, 0.18, 8331, [[-0.15, -0.2, -0.5, 0.42, 0.08], [0.22, 0.18, 0.45, 0.32, -0.06]]);
+    pao(446, 470, 84, 18, -0.1, 8332, 'cruz');
+    pao(630, 484, 80, 16, 0.12, 8337, [[-0.2, -0.25, 0.35, 0.4, 0.07], [0.3, 0.05, 1.15, 0.3, -0.06]]);
+    pao(330, 622, 94, 18, -0.08, 8334, [[-0.3, -0.3, 0.3, 0.32, 0.06], [0.2, 0.0, -0.9, 0.3, -0.07], [0.15, 0.42, 0.15, 0.2, 0.05]]);
+    pao(582, 616, 96, 18, 0.1, 8335, [[-0.1, -0.15, 0.7, 0.45, -0.1], [0.28, 0.25, -0.35, 0.28, 0.07]]);
 
     // os dois peixinhos, secos e salgados, diferentes: um comprido e fino (de lombo cinza-pardo,
     // salgado), outro mais curto e alto, mais escuro e torto do sol; deitados, com a sombra
@@ -13098,6 +13099,38 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.beginPath();
       for (let t = 0.2; t <= 0.8; t += 0.02) { const yy = yc(t) - meia(t) * 0.12; if (t > 0.2) k.lineTo(X(t), yy); else k.moveTo(X(t), yy); }
       k.stroke();
+      // a cabeça gravada: a hachura da bochecha, mais escura debaixo do olho e para trás
+      const cab = pol([...cima.filter((p, i) => i <= 10), ...baixo.filter((p, i) => i <= 10).reverse()]);
+      gravar(k, cab, X(0.1), yc(0.1), A * 2.2, 1.35, 2.4, 1.1, (qx, qy) => 0.25 + (qy - yc(0.1)) / A * 0.45 + (qx - X(0)) / (L * 0.2) * 0.25, '#1e160a', 0);
+      // o opérculo: duas curvas de contorno
+      k.strokeStyle = 'rgba(30,20,8,.65)';
+      k.lineWidth = 0.9;
+      k.beginPath();
+      k.arc(X(0.06), yc(0.17), meia(0.17) * 0.8, -0.95, 0.95);
+      k.stroke();
+      k.beginPath();
+      k.arc(X(0.1), yc(0.16), meia(0.16) * 0.55, -0.6, 1.1);
+      k.stroke();
+      // o rabo: os raios saindo da raiz, mais escura
+      const raiz = [X(0.8), yT];
+      const gr = k.createRadialGradient(raiz[0], raiz[1], 2, raiz[0], raiz[1], A * 1.4);
+      gr.addColorStop(0, 'rgba(30,20,8,.55)');
+      gr.addColorStop(1, 'rgba(30,20,8,0)');
+      k.fillStyle = gr;
+      k.fillRect(raiz[0] - 2, raiz[1] - A * 1.5, L * 0.25, A * 3);
+      k.strokeStyle = 'rgba(30,20,8,.6)';
+      k.lineWidth = 0.8;
+      for (let i = 0; i <= 10; i++) {
+        const f = i / 10;
+        const pa = f < 0.5 ? rabo[0] : rabo[2];
+        const ff = f < 0.5 ? 1 - f * 2 : (f - 0.5) * 2;
+        const qx = rabo[1][0] + (pa[0] - rabo[1][0]) * ff;
+        const qy = rabo[1][1] + (pa[1] - rabo[1][1]) * ff;
+        k.beginPath();
+        k.moveTo(raiz[0] + 3, raiz[1] + (qy - raiz[1]) * 0.15);
+        k.lineTo(qx - 2, qy);
+        k.stroke();
+      }
       // o sal: grãos claros soltos
       for (let n = 0; n < L * 0.25; n++) {
         const t = 0.1 + rp() * 0.65;
@@ -13127,21 +13160,41 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       for (const q of raios) { k.beginPath(); k.moveTo(p0[0], p0[1]); k.lineTo(q[0], q[1]); k.stroke(); }
       k.lineWidth = 1;
       k.stroke(pol([raios[0], ...raios.slice(1)], false));
-      k.lineWidth = 1.3;
+      // a boca: uma fenda curta e oblíqua, que segue a queixada para trás e para baixo
+      k.lineWidth = 1.2;
       k.beginPath();
-      k.moveTo(X(0), yc(0));
-      k.lineTo(X(0.05), yc(0.05) + meia(0.05) * 0.15);
+      k.moveTo(X(0.003), yc(0.003) + 0.5);
+      k.quadraticCurveTo(X(0.03), yc(0.03) + meia(0.03) * 0.15, X(0.055), yc(0.055) + meia(0.055) * 0.42);
+      k.stroke();
+      k.lineWidth = 0.8;
+      k.beginPath();
+      k.moveTo(X(0.02), yc(0.02) + meia(0.02) * 0.6);
+      k.quadraticCurveTo(X(0.045), yc(0.045) + meia(0.045) * 0.62, X(0.06), yc(0.06) + meia(0.06) * 0.45);
+      k.stroke();
+      // o olho: a órbita, a íris baça e a pupila, com um ponto de luz pequeno
+      const ex = X(0.085);
+      const ey = yc(0.085) - meia(0.085) * 0.28;
+      const er = Math.max(3.2, L * 0.02);
+      k.fillStyle = '#c8bc98';
+      k.beginPath();
+      k.arc(ex, ey, er, 0, 6.283);
+      k.fill();
+      k.lineWidth = 1;
       k.stroke();
       k.fillStyle = '#140e06';
       k.beginPath();
-      k.arc(X(0.075), yc(0.075) - meia(0.075) * 0.3, Math.max(2.2, L * 0.012), 0, 6.283);
+      k.arc(ex + er * 0.1, ey + er * 0.05, er * 0.58, 0, 6.283);
+      k.fill();
+      k.fillStyle = 'rgba(255,250,236,.75)';
+      k.beginPath();
+      k.arc(ex - er * 0.15, ey - er * 0.2, er * 0.18, 0, 6.283);
       k.fill();
       k.restore();
     };
     // a metade da frente da borda passa por cima do pé dos pães da frente
     borda(0, Math.PI);
-    peixe(470, 466, 246, -0.14, 1, 0.1, 0.03, 8351, ['#5c4c32', '#a8946e', '#dccfae']);
-    peixe(606, 592, 196, 0.3, -1, 0.165, -0.09, 8352, ['#4a3016', '#94703f', '#d2b484']);
+    peixe(452, 468, 240, -0.14, 1, 0.1, 0.03, 8351, ['#5c4c32', '#a8946e', '#dccfae']);
+    peixe(604, 596, 192, 0.3, -1, 0.165, -0.09, 8352, ['#4a3016', '#94703f', '#d2b484']);
     vinheta(k, W, H, 0.22);
   }
   // ---------- fim dos Objetos ----------
