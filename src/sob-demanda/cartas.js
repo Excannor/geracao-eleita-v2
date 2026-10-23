@@ -11215,13 +11215,30 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.save();
     k.strokeStyle = 'rgba(60,52,24,.8)';
     k.lineCap = 'round';
-    for (let x = -6; x < W + 6; x += 3 + r() * 5) {
-      const h = 10 + r() * 22;
-      k.lineWidth = 0.8 + r() * 0.6;
-      k.beginPath();
-      k.moveTo(x, 360);
-      k.quadraticCurveTo(x + (r() - 0.5) * 6, 360 - h * 0.6, x + (r() - 0.3) * 8, 360 - h);
-      k.stroke();
+    // touceiras de juncos separadas, de alturas bem diferentes, com folhas que se curvam e,
+    // aqui e ali, um pendão; entre elas, a margem fica limpa
+    let xj = -10 + r() * 30;
+    while (xj < W + 10) {
+      const n = 5 + Math.floor(r() * 5);
+      const alto = 14 + r() * 40;
+      const larg = 14 + r() * 22;
+      for (let q = 0; q < n; q++) {
+        const x = xj + (q / (n - 1) - 0.5) * larg + (r() - 0.5) * 4;
+        const h = alto * (0.5 + r() * 0.6);
+        const curva = (x - xj) / larg * 14 + (r() - 0.5) * 6;
+        k.lineWidth = 0.9 + r() * 0.7;
+        k.beginPath();
+        k.moveTo(x, 362);
+        k.quadraticCurveTo(x + curva * 0.3, 362 - h * 0.6, x + curva, 362 - h);
+        k.stroke();
+        if (r() < 0.18) {
+          k.fillStyle = 'rgba(60,52,24,.8)';
+          k.beginPath();
+          k.ellipse(x + curva, 362 - h - 4, 2.4, 6, curva * 0.03, 0, 6.283);
+          k.fill();
+        }
+      }
+      xj += larg + 24 + r() * 70;
     }
     k.restore();
     // o rio, largo e manso, de lado a lado: linhas compridas deitadas, mais juntas longe, e o
@@ -11300,16 +11317,18 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         // a parte da direita dobrou por cima, ao cair: o avesso (mais claro) fica para cima,
         // num rolo baixo que faz a curva da dobra
         let avesso = false;
-        const uf = 0.72 + (v - 0.5) * 0.08;
+        let dobra = false;
+        const uf = 0.73;
         if (u > uf) {
+          dobra = true;
           const t = (u - uf) * 1.42;
           const ang = Math.min(Math.PI, t / 0.022);
           const raio = 0.022;
           const xf = -0.72 + uf * 1.42 + Math.sin(v * 6 + uf * 2) * 0.05;
-          if (t < raio * Math.PI) { X = xf + Math.sin(ang) * raio; Y = 0.006 + raio - Math.cos(ang) * raio; } else { X = xf - (t - raio * Math.PI); Y = 0.006 + raio * 2 + Y * 0.5; avesso = true; }
+          if (t < raio * Math.PI) { X = xf + Math.sin(ang) * raio; Y = 0.006 + raio - Math.cos(ang) * raio; } else { X = xf - (t - raio * Math.PI); Y = 0.006 + raio * 2 + Y * 0.12; avesso = true; }
           Z += (u - uf) * 0.12;
         }
-        linha.push({ X, Y, Z, u, v, avesso });
+        linha.push({ X, Y, Z, u, v, avesso, dobra });
       }
       malha.push(linha);
     }
@@ -11329,64 +11348,124 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const s = n[1] < 0 ? -1 : 1;
       return Math.max(0, (n[0] * L[0] + n[1] * L[1] + n[2] * L[2]) * s / nn / nl);
     };
-    // a silhueta do pano (a união das células), para a máscara e a sombra
+    // o pano em duas camadas (o corpo e, por cima, a dobra virada): em cada uma, o tom vem de
+    // uma tela à parte, pintada célula a célula e depois borrada (o tom corre contínuo, sem
+    // mosaico), recortada na silhueta; por cima, a gravura: as linhas ao longo do pano, mais
+    // grossas na sombra, e a hachura cruzada nas sombras fundas; a barra é uma faixa tecida
+    // (duas linhas com os pontos de través) e a beirada em tinta
+    const celula = (i, j) => pol([proj(malha[j][i]), proj(malha[j][i + 1]), proj(malha[j + 1][i + 1]), proj(malha[j + 1][i])]);
+    const camadas = [[], []];
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) camadas[malha[j][i].dobra && malha[j + 1][i].dobra ? 1 : 0].push([i, j]);
     const fManto = new Path2D();
-    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) fManto.addPath(pol([proj(malha[j][i]), proj(malha[j][i + 1]), proj(malha[j + 1][i + 1]), proj(malha[j + 1][i])]));
+    for (const lista of camadas) for (const [i, j] of lista) fManto.addPath(celula(i, j));
     sombraNoChao(k, fManto, 22, 10, 9, 0.38);
-    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) { const c = pol([proj(malha[j][i]), proj(malha[j][i + 1]), proj(malha[j + 1][i + 1]), proj(malha[j + 1][i])]); marcar(k, obj, c); marcar(k, obj, c, 2); }
-    // as células, de trás para a frente (a dobra por cima de tudo): o tom pela luz, a linha
-    // da gravura ao longo do pano, mais grossa na sombra, e a beirada quando é a do pano
-    const celulas = [];
-    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) {
-      const a = malha[j][i];
-      const c = malha[j + 1][i + 1];
-      celulas.push({ i, j, z: (a.Z + c.Z) / 2 + (a.avesso || c.avesso ? 10 + a.Y : 0) });
-    }
-    celulas.sort((p, q) => p.z - q.z);
-    const tomPelo = (l, i, j) => {
-      const m = Math.min(i, NU - 1 - i, j, NV - 1 - j);
-      const base = malha[j][i].avesso ? (m === 1 ? [176, 146, 104] : [150, 122, 86]) : m === 1 ? [176, 146, 104] : m < 3 ? [70, 48, 30] : [98, 72, 46];
+    for (const lista of camadas) for (const [i, j] of lista) { const c = celula(i, j); marcar(k, obj, c); marcar(k, obj, c, 2); }
+    const tomPelo = (l, aves) => {
+      const base = aves ? [150, 122, 86] : [98, 72, 46];
       const f = 0.45 + l * 0.75;
       return 'rgb(' + base.map((c) => Math.round(Math.min(255, c * f))).join(',') + ')';
     };
-    k.lineCap = 'round';
-    k.lineJoin = 'round';
-    for (const { i, j } of celulas) {
-      const A = proj(malha[j][i]);
-      const B = proj(malha[j][i + 1]);
-      const C = proj(malha[j + 1][i + 1]);
-      const D = proj(malha[j + 1][i]);
-      const p = pol([A, B, C, D]);
-      const l = luzDe(i, j);
-      k.fillStyle = tomPelo(l, i, j);
-      k.strokeStyle = k.fillStyle;
-      k.lineWidth = 1.2;
-      k.fill(p);
-      k.stroke(p);
-      const w = (1 - l) * 2.2 * (i % 2 ? 0.55 : 1);
-      if (w > 0.3 && i > 0) {
-        k.strokeStyle = 'rgba(24,14,4,.85)';
-        k.lineWidth = w;
-        k.beginPath();
-        k.moveTo(A[0], A[1]);
-        k.lineTo(D[0], D[1]);
-        k.stroke();
+    camadas.forEach((lista, aves) => {
+      if (!lista.length) return;
+      const sil = new Path2D();
+      for (const [i, j] of lista) sil.addPath(celula(i, j));
+      const t = tela(W, H);
+      const kt = t.getContext('2d');
+      for (const [i, j] of lista) {
+        const p = celula(i, j);
+        kt.fillStyle = tomPelo(luzDe(i, j), aves);
+        kt.strokeStyle = kt.fillStyle;
+        kt.lineWidth = 2;
+        kt.fill(p);
+        kt.stroke(p);
       }
-      // a costura da barra, por dentro
-      k.strokeStyle = 'rgba(40,24,8,.8)';
-      k.lineWidth = 1.2;
-      if ((j === 2 || j === NV - 2) && i % 2 === 0) { k.beginPath(); k.moveTo(A[0], A[1]); k.lineTo(B[0], B[1]); k.stroke(); }
-      if ((i === 2 || i === NU - 2) && j % 2 === 0) { k.beginPath(); k.moveTo(A[0], A[1]); k.lineTo(D[0], D[1]); k.stroke(); }
-      // a beirada do pano em tinta
+      k.save();
+      k.clip(sil);
+      k.fillStyle = tomPelo(0.5, aves);
+      k.fill(sil);
+      k.filter = 'blur(5px)';
+      k.drawImage(t, 0, 0);
+      k.filter = 'none';
+      // a gravura ao longo do pano
+      k.lineCap = 'round';
+      const naCamada = new Set(lista.map(([i, j]) => i + ',' + j));
+      for (let i = 1; i < NU; i++) {
+        for (let j = 0; j < NV; j++) {
+          if (!naCamada.has(i + ',' + j)) continue;
+          const l = luzDe(i, j);
+          const w = (1 - l) * 2.1 * (i % 2 ? 0.6 : 1);
+          if (w < 0.3) continue;
+          const [x0, y0] = proj(malha[j][i]);
+          const [x1, y1] = proj(malha[j + 1][i]);
+          k.strokeStyle = 'rgba(24,14,4,.8)';
+          k.lineWidth = w;
+          k.beginPath();
+          k.moveTo(x0, y0);
+          k.lineTo(x1, y1);
+          k.stroke();
+        }
+      }
+      for (let j = 1; j < NV; j += 2) {
+        for (let i = 0; i < NU; i++) {
+          if (!naCamada.has(i + ',' + j)) continue;
+          const l = luzDe(i, j);
+          if (l > 0.38) continue;
+          const [x0, y0] = proj(malha[j][i]);
+          const [x1, y1] = proj(malha[j][i + 1]);
+          k.strokeStyle = 'rgba(24,14,4,.6)';
+          k.lineWidth = (0.38 - l) * 3.4;
+          k.beginPath();
+          k.moveTo(x0, y0);
+          k.lineTo(x1, y1);
+          k.stroke();
+        }
+      }
+      // a barra tecida: duas linhas paralelas à beirada e os pontos de través entre elas
+      const faixa = (pts0, pts1) => {
+        k.strokeStyle = 'rgba(30,18,6,.8)';
+        k.lineWidth = 1.3;
+        k.stroke(pol(pts0, false));
+        k.stroke(pol(pts1, false));
+        k.strokeStyle = 'rgba(214,180,130,.55)';
+        k.lineWidth = 1;
+        for (let n = 1; n < pts0.length - 1; n += 3) { k.beginPath(); k.moveTo(pts0[n][0], pts0[n][1]); k.lineTo(pts1[n + 1][0], pts1[n + 1][1]); k.stroke(); }
+      };
+      faixa(malha[1].map(proj), malha[3].map(proj));
+      faixa(malha[NV - 1].map(proj), malha[NV - 3].map(proj));
+      faixa(malha.map((l) => proj(l[1])), malha.map((l) => proj(l[3])));
+      faixa(malha.map((l) => proj(l[NU - 1])), malha.map((l) => proj(l[NU - 3])));
+      k.restore();
+      // a beirada desta camada em tinta: as arestas de célula que não têm vizinha no pano; o
+      // vinco da dobra (onde a dobra encontra o corpo) é uma linha lisa à parte
+      const noPano = (i, j) => i >= 0 && j >= 0 && i < NU && j < NV;
+      if (aves) {
+        const vinco = [];
+        for (let j = 0; j <= NV; j++) {
+          const row = lista.filter(([, jj]) => jj === Math.min(j, NV - 1)).map(([i]) => i);
+          if (row.length) vinco.push(proj(malha[j][Math.min(...row)]));
+        }
+        if (vinco.length > 2) {
+          const lisa = curvaPor(vinco, 3).map((q) => [q.x, q.y]);
+          k.strokeStyle = '#1e1308';
+          k.lineWidth = 2.4;
+          k.stroke(pol(lisa, false));
+        }
+      }
       k.strokeStyle = '#1e1308';
       k.lineWidth = 2.4;
       k.beginPath();
-      if (j === 0) { k.moveTo(A[0], A[1]); k.lineTo(B[0], B[1]); }
-      if (j === NV - 1) { k.moveTo(D[0], D[1]); k.lineTo(C[0], C[1]); }
-      if (i === 0) { k.moveTo(A[0], A[1]); k.lineTo(D[0], D[1]); }
-      if (i === NU - 1) { k.moveTo(B[0], B[1]); k.lineTo(C[0], C[1]); }
+      for (const [i, j] of lista) {
+        const A = proj(malha[j][i]);
+        const B = proj(malha[j][i + 1]);
+        const C = proj(malha[j + 1][i + 1]);
+        const D = proj(malha[j + 1][i]);
+        if (!noPano(i, j - 1)) { k.moveTo(A[0], A[1]); k.lineTo(B[0], B[1]); }
+        if (!noPano(i, j + 1)) { k.moveTo(D[0], D[1]); k.lineTo(C[0], C[1]); }
+        if (!noPano(i - 1, j)) { k.moveTo(A[0], A[1]); k.lineTo(D[0], D[1]); }
+        if (!noPano(i + 1, j)) { k.moveTo(B[0], B[1]); k.lineTo(C[0], C[1]); }
+      }
       k.stroke();
-    }
+    });
     // o pelo de cabra: uns fios curtos e claros no lado da luz, só na parte de cima à vista
     for (let n = 0; n < 500; n++) {
       const i = 2 + Math.floor(r() * (NU - 4));
