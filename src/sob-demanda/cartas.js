@@ -9039,14 +9039,20 @@
     for (let i = 0; i < 18; i++) { const x = r() * W; const y = 210 + r() * 70; k.beginPath(); k.moveTo(x, y); k.lineTo(x + (r() - 0.5) * 6, y + 20); k.stroke(); }
     k.restore();
     const gruta = (x, y, w, h) => {
-      const g = contornoRocha(r, [[x, y], [x + 4, y - h * 0.6], [x + w * 0.3, y - h], [x + w * 0.7, y - h * 0.95], [x + w - 4, y - h * 0.55], [x + w, y]], 4);
-      g.closePath();
+      const pts = [[x, y]];
+      for (let i = 1; i < 9; i++) { const t = i / 9; pts.push([x + w * t + (r() - 0.5) * 6, y - h * Math.pow(Math.sin(t * Math.PI), 0.45) * (0.85 + r() * 0.2)]); }
+      pts.push([x + w, y]);
+      const g = pol(pts);
       k.fillStyle = '#2a1e10';
       k.fill(g);
-      gravar(k, g, x + w / 2, y - h / 2, w, 0.8, 4, 1, () => 0.5, 'rgba(240,220,180,.25)', 0);
       k.strokeStyle = SEPIA;
-      k.lineWidth = 2;
+      k.lineWidth = 2.2;
       k.stroke(g);
+      // as camadas do calcário passam por cima da boca, com a sombra embaixo da laje
+      k.lineWidth = 1.6;
+      for (const dy of [h + 10, h + 22]) { k.beginPath(); k.moveTo(x - 30, y - dy + (r() - 0.5) * 3); k.lineTo(x + w * 0.5, y - dy - 2); k.lineTo(x + w + 30, y - dy + (r() - 0.5) * 3); k.stroke(); }
+      k.fillStyle = 'rgba(42,30,16,.5)';
+      k.fillRect(x + 4, y - h * 0.95 - 2, w - 8, 3);
     };
     gruta(120, 292, 90, 62);
     gruta(600, 290, 100, 66);
@@ -9084,76 +9090,110 @@
             peca(k, deg, [sx, sy - h / 5, sx + 22, sy], { cor: '#e9d6aa', ang: 0, passo: 3, maxL: 1, sombra: () => 0.45, traco: 1.2, obj });
           }
         }
-        // o jarro à porta
-        if (r() < 0.6) {
-          const jx = x + w * 0.45;
-          const j = vaso(k, jx, base + 2, 30, 20, (u) => (u < 0.15 ? 0.4 : 0.55 + Math.sin(u * Math.PI) * 0.45));
-          peca(k, j, [jx - 10, base - 28, jx + 10, base + 2], { cor: '#c48852', tinta: '#3a1e08', ang: 0.2, passo: 2.4, maxL: 1.1, sombra: sombraOval(jx, base - 13, 10, 15, 0), cruzada: 0.7, traco: 1.4, obj });
+        // às vezes um jarro, de feitio diferente: o alto de colo estreito, o pote baixo, a bilha
+        if (r() < 0.32) {
+          const tipo = Math.floor(r() * 3);
+          const naLaje = tipo === 2 && r() < 0.6;
+          const jx = naLaje ? x + w * 0.7 : x + w * 0.45;
+          const jb = naLaje ? base - h - 4 : base + 2;
+          const perfis = [[38, 20, (u) => (u < 0.18 ? 0.32 : 0.5 + Math.sin(u * Math.PI) * 0.5)], [24, 30, (u) => (u < 0.1 ? 0.7 : 0.8 + Math.sin(u * Math.PI) * 0.2)], [32, 22, (u) => (u < 0.25 ? 0.3 + u : 0.62 + Math.sin(u * Math.PI) * 0.38)]];
+          const [alt, larg, perfil] = perfis[tipo];
+          const j = vaso(k, jx, jb, alt, larg, perfil);
+          peca(k, j, [jx - larg / 2, jb - alt, jx + larg / 2, jb], { cor: '#c6a072', tinta: '#3a1e08', ang: 0.2 + tipo * 0.5, passo: 2.4, maxL: 1.3, sombra: sombraOval(jx, jb - alt / 2, larg / 2, alt / 2, 0), cruzada: 0.65, traco: 1.4, obj });
         }
       }
     });
-    // o caminho de terra que sobe entre as casas
-    const cam = bezier([430, H + 20], [330, 720], [500, 650], [420, 590], 30).concat(bezier([420, 590], [350, 540], [420, 500], [370, 470], 20).slice(1));
-    k.lineCap = 'round';
-    for (let i = 1; i < cam.length; i++) {
-      const t = (cam[i][1] - 470) / 380;
-      k.strokeStyle = '#f2e5c2';
-      k.lineWidth = 10 + t * 56;
-      k.beginPath();
-      k.moveTo(cam[i - 1][0], cam[i - 1][1]);
-      k.lineTo(cam[i][0], cam[i][1]);
-      k.stroke();
+    // perto, à direita: um socalco de horta, com a mureta e os pés de lentilha e cebola em fila
+    const horta = pol([[560, 846], [560, 740], [W + 10, 726], [W + 10, 846]]);
+    k.fillStyle = '#c9ad7c';
+    k.fill(horta);
+    chaoEmLinhas(k, r, horta, 560, W + 10, 726, H, 2, () => 0.6);
+    for (let fila = 0; fila < 4; fila++) {
+      for (let x = 580 + fila * 8; x < W; x += 26) capim(k, r, x, 760 + fila * 22, 14 + fila * 3, 6);
     }
-    k.strokeStyle = 'rgba(43,33,18,.6)';
-    k.lineWidth = 1.1;
-    for (let i = 2; i < cam.length; i += 2) { const [x, y] = cam[i]; const t = (y - 470) / 380; k.beginPath(); k.moveTo(x - 6 - t * 22, y); k.lineTo(x + 6 + t * 22, y + 1); k.stroke(); }
-    for (let i = 0; i < 12; i++) {
-      const y = 620 + r() * 210;
-      const x = (r() < 0.5 ? 260 + r() * 100 : 520 + r() * 160);
-      const s = 5 + (y - 600) / 30 + r() * 4;
-      const p = seixo(r, x, y, s, s * 0.6, 0, 0.18);
-      peca(k, p, [x - s, y - s, x + s, y + s], { cor: '#e2cd9e', sombra: sombraOval(x, y, s, s * 0.6, 0), passo: 2.2, maxL: 1, traco: 1.2 });
+    const mh = pol([[540, 744], [W + 10, 728], [W + 10, 748], [540, 764]]);
+    muroEmFiadas(k, r, mh, [540, 726, W + 10, 766], { h: 9, larg: 2, cor: '#e2cb9a', sombra: () => 0.4 });
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.6;
+    k.stroke(mh);
+    // a escada de pedra que sobe entre os socalcos (Nazaré é aldeia de degraus): lajes
+    // gastas, cada degrau com o espelho na sombra, mais estreita para cima
+    const degraus = [];
+    for (let i = 0; i < 26; i++) {
+      const t = i / 25;
+      const y = H + 6 - t * 470;
+      const x = 440 - t * 60 + Math.sin(t * 7) * 26;
+      degraus.push([x, y, 120 - t * 64, 18 - t * 8]);
     }
-    // a figueira, perto, à esquerda: o tronco liso e claro, os galhos e as folhas largas de
-    // cinco lobos, com as nervuras claras
+    // as muretas dos dois lados da escada, de pedra solta
+    for (const lado of [-1, 1]) {
+      for (const [x, y, w] of degraus) {
+        const px = x + lado * (w / 2 + 6);
+        const p = seixo(r, px, y - 6, 7 * (w / 120) + 3, 5 * (w / 120) + 2, 0, 0.2);
+        peca(k, p, [px - 10, y - 14, px + 10, y], { cor: '#dcc597', sombra: () => 0.5, passo: 2, maxL: 0.9, traco: 1.1 });
+      }
+    }
+    for (const [x, y, w, h] of degraus) {
+      const espelho = pol([[x - w / 2, y], [x - w / 2 + 2, y - h * 0.55], [x + w / 2 - 2, y - h * 0.55], [x + w / 2, y]]);
+      peca(k, espelho, [x - w / 2, y - h * 0.55, x + w / 2, y], { cor: '#b89c6c', ang: 0, passo: 2.4, maxL: 1.4, sombra: () => 0.75, cruzada: 1, traco: 1.3 });
+      const piso = pol([[x - w / 2 + 2, y - h * 0.55], [x - w / 2 + 6, y - h], [x + w / 2 - 6, y - h], [x + w / 2 - 2, y - h * 0.55]]);
+      k.fillStyle = '#ead8b0';
+      k.fill(piso);
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1;
+      k.stroke(piso);
+    }
+    // a figueira, embaixo à esquerda: o tronco grosso e cinza, os galhos baixos que se abrem e
+    // a copa cheia de folhas largas, gravada como as outras copas; na beirada, as folhas de
+    // cinco lobos em traço
     const tronco = new Path2D();
-    tronco.moveTo(60, H + 10);
-    tronco.bezierCurveTo(70, 760, 110, 700, 120, 640);
-    tronco.lineTo(150, 646);
-    tronco.bezierCurveTo(140, 710, 112, 770, 116, H + 10);
+    tronco.moveTo(30, H + 10);
+    tronco.bezierCurveTo(40, 800, 70, 770, 84, 730);
+    tronco.lineTo(112, 736);
+    tronco.bezierCurveTo(100, 780, 90, 812, 96, H + 10);
     tronco.closePath();
-    peca(k, tronco, [60, 640, 150, H + 10], { cor: '#a8987a', ang: 1.4, passo: 3.2, maxL: 1.8, sombra: (x) => 0.2 + (x - 60) / 120, cruzada: 0.7, traco: 2.2, obj });
-    const galhos = [[[130, 650], [90, 590], [40, 560], [-10, 540]], [[136, 648], [190, 600], [250, 590], [310, 560]], [[134, 646], [140, 590], [130, 540], [150, 500]]];
-    for (const g of galhos) {
-      const pts = bezier(g[0], g[1], g[2], g[3], 16);
-      vara(k, pts, 9, '#a8987a', obj);
-    }
-    const folha = (x, y, s, g) => {
+    peca(k, tronco, [30, 730, 112, H + 10], { cor: '#a39a86', ang: 1.3, passo: 3, maxL: 1.8, sombra: (x) => 0.25 + (x - 30) / 120, cruzada: 0.7, traco: 2.2, obj });
+    for (const g of [[[96, 740], [70, 712], [36, 700], [-6, 694]], [[100, 738], [140, 714], [180, 706], [226, 690]], [[98, 736], [104, 712], [100, 690], [116, 664]]]) vara(k, bezier(g[0], g[1], g[2], g[3], 14), 8, '#a39a86', obj);
+    // a copa: uma massa escura de sombra e, por cima, as folhas largas da figueira, de cinco
+    // lobos fundos e pontudos, cada uma com a nervura do meio e as dos lobos, em hachura
+    const sombraCopa = lanoso(r, [[-20, 700], [-10, 640], [40, 600], [110, 590], [180, 610], [240, 650], [250, 700], [200, 730], [100, 736], [20, 730]], 10, 30);
+    k.fillStyle = '#4f4c2e';
+    k.fill(sombraCopa);
+    gravar(k, sombraCopa, 110, 660, 160, 0.8, 3, 1.6, () => 0.8, '#1c1a0e', 0);
+    marcar(k, obj, sombraCopa);
+    const folha = (x, y, s2, g) => {
       k.save();
       k.translate(x, y);
       k.rotate(g);
-      const f = new Path2D();
-      const n = 60;
+      const lobos = [-Math.PI / 2, -Math.PI / 2 - 0.85, -Math.PI / 2 + 0.85, -Math.PI / 2 - 1.7, -Math.PI / 2 + 1.7];
+      const tam = [1, 0.85, 0.85, 0.6, 0.6];
+      const f2 = new Path2D();
+      const n = 90;
       for (let i = 0; i <= n; i++) {
-        const a = -Math.PI + (i / n) * Math.PI;
-        const lobo = Math.pow(Math.abs(Math.cos((a + Math.PI / 2) * 2.5)), 0.7);
-        const rr = s * (0.42 + 0.58 * lobo) * (1 - Math.pow(Math.abs(a + Math.PI / 2) / (Math.PI / 2), 6) * 0.35);
-        const px = Math.cos(a) * rr * 0.9;
-        const py = Math.sin(a) * rr;
-        if (i) f.lineTo(px, py); else f.moveTo(px, py);
+        const a = -Math.PI - 0.5 + (i / n) * (Math.PI + 1);
+        let m = 0;
+        lobos.forEach((c, q) => { m = Math.max(m, tam[q] * Math.pow(Math.max(0, Math.cos((a - c) * 2.3)), 0.9)); });
+        const rr = s2 * (0.4 + 0.6 * m);
+        (i ? f2.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : f2.moveTo(Math.cos(a) * rr, Math.sin(a) * rr));
       }
-      f.quadraticCurveTo(0, s * 0.18, -s * 0.9 * 0.42, 0);
-      f.closePath();
-      peca(k, f, [-s, -s, s, s * 0.2], { cor: '#8e8c58', ang: 0.6, passo: 2.8, maxL: 1.5, sombra: (px, py) => 0.3 + (px / s) * 0.35 + (py / s) * -0.1, cruzada: 0.7, traco: 1.8, obj });
-      k.strokeStyle = 'rgba(250,240,200,.8)';
-      k.lineWidth = 1.5;
-      for (const a of [-Math.PI * 0.82, -Math.PI * 0.66, -Math.PI / 2, -Math.PI * 0.34, -Math.PI * 0.18]) { k.beginPath(); k.moveTo(0, 2); k.quadraticCurveTo(Math.cos(a) * s * 0.3, Math.sin(a) * s * 0.4, Math.cos(a) * s * 0.78, Math.sin(a) * s * 0.85); k.stroke(); }
+      f2.quadraticCurveTo(0, s2 * 0.12, Math.cos(-Math.PI - 0.5) * s2 * 0.3, Math.sin(-Math.PI - 0.5) * s2 * 0.3);
+      f2.closePath();
+      peca(k, f2, [-s2, -s2, s2, s2 * 0.3], { cor: '#8a8858', ang: 0.5, passo: 2.4, maxL: 1.3, sombra: (px, py) => 0.3 + (px / s2) * 0.25 + (py / s2) * -0.15, cruzada: 0.75, traco: 1.4, obj });
+      k.strokeStyle = 'rgba(244,236,200,.85)';
+      k.lineWidth = 1.1;
+      lobos.forEach((c, q) => { k.beginPath(); k.moveTo(0, 0); k.lineTo(Math.cos(c) * s2 * tam[q] * 0.85, Math.sin(c) * s2 * tam[q] * 0.85); k.stroke(); });
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 2;
+      k.beginPath();
+      k.moveTo(0, 0);
+      k.lineTo(0, s2 * 0.3);
+      k.stroke();
       k.restore();
     };
-    for (const [x, y, s, g] of [[-6, 548, 80, -0.9], [60, 560, 76, -0.3], [150, 500, 84, 0.1], [214, 586, 72, 0.6], [300, 556, 66, 1.0], [96, 620, 62, -1.4], [250, 640, 58, 1.6], [176, 470, 60, -0.4]]) folha(x, y, s, g);
-    for (const [x, y] of [[120, 560], [200, 540], [40, 600]]) {
-      const p = seixo(r, x, y, 11, 14, 0.3, 0.05);
-      peca(k, p, [x - 11, y - 14, x + 11, y + 14], { cor: '#7d7a48', sombra: sombraOval(x, y, 11, 14, 0), passo: 2.2, maxL: 1.1, traco: 1.6, obj });
+    for (const [x, y, s2, g] of [[0, 640, 36, -0.9], [50, 616, 40, -0.4], [110, 604, 40, 0.1], [170, 620, 38, 0.5], [226, 660, 34, 1.1], [20, 690, 34, -1.3], [80, 660, 42, -0.2], [146, 666, 40, 0.3], [200, 704, 32, 1.4], [116, 714, 34, 0.9], [60, 720, 30, -0.9], [-10, 600, 30, -0.6], [130, 640, 30, 2.6], [40, 650, 30, 3.0]]) folha(x, y, s2, g);
+    for (const [x, y] of [[102, 690], [176, 690], [40, 712]]) {
+      const p = seixo(r, x, y, 7, 9, 0.3, 0.05);
+      peca(k, p, [x - 7, y - 9, x + 7, y + 9], { cor: '#7d7a48', sombra: sombraOval(x, y, 7, 9, 0), passo: 2, maxL: 1, traco: 1.3, obj });
     }
     vinheta(k, W, H, 0.2);
   }
