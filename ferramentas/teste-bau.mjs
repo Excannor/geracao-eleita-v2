@@ -166,6 +166,30 @@ try {
   ok(await esperar('!!window.__compartilhado', 12000), 'Compartilhar carta abre a folha do sistema');
   const story = await av('(async () => { const d = window.__compartilhado; return { ...(await __png(d.files[0])), texto: d.text }; })()');
   ok(story && story.w === 1080 && story.h === 1920 && story.tipo === 'image/png' && /Davi e a funda \(Prata\)/.test(story.texto), 'vai o story da carta, PNG 1080x1920 (' + JSON.stringify(story) + ')');
+  // o brilho da raridade vai assado no story: a carta do story (800 px, em 140, 400) contra a
+  // mesma carta desenhada sem brilho; no Ouro a moldura muda, no Linho (fosco) só o grão; o papel
+  // do texto fica igual nos dois; e a mesma carta sai sempre igual
+  const assado = await av(`(() => {
+    const C = CC.cartas;
+    const base = { id: 'davi-funda', album: 'Heróis da fé', numero: 10, total: 13, titulo: 'Davi e a funda', sabia: 'Davi apanhou cinco pedras.', ref: '1 Samuel 17.40' };
+    const medir = (rar) => {
+      const carta = { ...base, raridade: rar };
+      const s = C.storyDaCarta(carta).getContext('2d');
+      const plana = C.desenharCarta(carta, { largura: 800 }).getContext('2d');
+      const dif = (x, y, w, h) => {
+        const a = s.getImageData(140 + x, 400 + y, w, h).data;
+        const b = plana.getImageData(x, y, w, h).data;
+        let t = 0;
+        for (let i = 0; i < a.length; i += 4) t += Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]);
+        return Math.round((t / (a.length / 4) / 3) * 10) / 10;
+      };
+      return { moldura: dif(6, 300, 32, 400), papel: dif(120, 790, 420, 130) };
+    };
+    const igual = C.storyDaCarta({ ...base, raridade: 'ouro' }).toDataURL() === C.storyDaCarta({ ...base, raridade: 'ouro' }).toDataURL();
+    return { ouro: medir('ouro'), linho: medir('linho'), igual };
+  })()`);
+  ok(assado && assado.ouro.moldura > 8 && assado.ouro.moldura > 3 * assado.linho.moldura && assado.ouro.papel < 4 && assado.linho.papel < 4 && assado.igual,
+    'o story leva o brilho da raridade: a moldura do Ouro muda, a do Linho (fosco) não, o texto fica limpo e a imagem é sempre a mesma (' + JSON.stringify(assado) + ')');
   await av(SIMULAR);
   await av('document.querySelector("[data-papel-de-parede]").click()');
   ok(await esperar('!!window.__compartilhado', 12000), 'Salvar papel de parede abre a folha do sistema');

@@ -26,10 +26,17 @@
      pé (fica o símbolo).
    - temArte(id) -> true se a carta de id tem desenho; os desenhos vão pela carta.id. Sem
      desenho, desenharCarta sai com uma gravura neutra (o sistema pode preferir a silhueta).
-   - cartaViva(carta, { largura, verso, interativa }) -> { el, inclinar, soltar, virar, ... }:
-     a carta que inclina com o dedo e vira, com o brilho da raridade.
-   - miniatura(carta, largura) -> canvas da miniatura já no tamanho da tela (sem texto).
-   - storyDaCarta(carta) -> canvas 1080x1920; papelDeParede({ ref, texto }) -> canvas 1080x2340.
+   - cartaViva(carta, { largura, verso, interativa, parada }) -> { el, inclinar, soltar, virar,
+     parada, ... }: a carta que inclina com o dedo e vira, com o brilho da raridade. Parada (em
+     repouso), o brilho continua vivo: a luz passeia devagar e a carta respira 1 a 2 graus
+     (o "brilho parado", PARADO abaixo); o dedo ou o giroscópio assume sem pulo e, depois de
+     soltar(), ele volta devagar. parada (padrão true) liga esse brilho; false o deixa
+     desligado até api.parada(true) (a revelação o liga só no fim). Ele dorme fora da tela e
+     com a aba escondida; com menos movimento, o brilho fica parado num repouso fixo.
+   - miniatura(carta, largura) -> canvas da miniatura já no tamanho da tela (sem texto); da
+     Prata para cima, com o tom parado do holo na moldura (para a raridade se ver na grade).
+   - storyDaCarta(carta) -> canvas 1080x1920, com o brilho da raridade assado num repouso fixo
+     (e o halo, na glória); papelDeParede({ ref, texto }) -> canvas 1080x2340 (sem brilho).
    - RARIDADES (nome, ícone, cores), iconeSvg(raridade), lista (as cartas de amostra),
      cartaDoBau(numero) (a carta fixa da amostra, até o sorteio vir do sistema).
    carta = { id, album, numero, total, titulo, sabia, ref, raridade }. */
@@ -4546,6 +4553,12 @@
     'raabe-corda': desenhoRaabe, 'gideao-tochas': desenhoGideao, 'rute-espigas': desenhoRute,
     'ester-cetro': desenhoEster, 'daniel-leoes': desenhoDaniel, 'nuvem-testemunhas': desenhoTestemunhas };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
+  // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
+  // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
+  // o terceiro número (opcional, até 1) afasta a arte, usando a margem do desenho. Quando o
+  // desenho não tem mais para onde ir, a arte desce (ou sobe) e a beirada dela se estende.
+  // Gideão: a corneta, no pé do desenho; Ester: o alto do dossel, na beirada de cima.
+  const FOCO = { 'gideao-tochas': [0.33, 0.985, 0.92], 'ester-cetro': [0.5, 0, 1] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
@@ -4867,6 +4880,23 @@
   // A ilustração e a silhueta dos objetos dela (para a máscara do brilho), guardadas por id:
   // desenhar a arte é o que mais custa, e a carta viva, a miniatura e a máscara a usam.
   const GUARDADAS = new Map();
+  // O tom da arte, medido uma vez por desenho (a luminância média do que aparece na janela):
+  // 'clara' (papel, terra ao sol, acima de 135), 'escura' (noite, cova, abaixo de 80) ou ''. Na
+  // clara, o holo do ouro e da glória é soft-light (o color-dodge estoura o claro); na escura,
+  // os raios da glória e o reflexo da inclinação baixam (senão viram grade e névoa no céu).
+  function tomDe(ilu) {
+    const m = tela(48, 46);
+    const km = m.getContext('2d');
+    km.drawImage(ilu, ARTE_MARGEM, ILU_CORTE + ARTE_MARGEM, JW - 2 * ARTE_MARGEM, JH - 2 * ARTE_MARGEM, 0, 0, 48, 46);
+    let d;
+    try { d = km.getImageData(0, 0, 48, 46).data; } catch (e) { return ''; }
+    let t = 0;
+    for (let i = 0; i < d.length; i += 4) t += d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+    const luz = t / (d.length / 4);
+    return luz > 135 ? 'clara' : luz < 80 ? 'escura' : '';
+  }
+  const TONS = new Map();
+  const tomDaArte = (carta) => ilustracao(carta).tom;
   function ilustracao(carta) {
     const id = carta.id;
     if (GUARDADAS.has(id)) return GUARDADAS.get(id);
@@ -4877,7 +4907,8 @@
     ko.strokeStyle = '#000';
     (DESENHOS[id] || desenhoEmBreve)(ilu.getContext('2d'), JW, ILU_H, ko);
     grao(ilu.getContext('2d'), JW, ILU_H, 16, 5000 + (carta.numero || 0));
-    const v = { ilu, obj };
+    if (!TONS.has(id)) TONS.set(id, tomDe(ilu));
+    const v = { ilu, obj, tom: TONS.get(id), foco: FOCO[id] || null };
     GUARDADAS.set(id, v);
     if (GUARDADAS.size > 6) GUARDADAS.delete(GUARDADAS.keys().next().value);
     return v;
@@ -4885,22 +4916,43 @@
   // Onde a arte entra: na janela (cortada em cima e embaixo) ou cheia (glória): cobrindo o
   // retângulo ARTE_CHEIA sem a margem do desenho, recortada no vão de dentro da moldura. Nada
   // da arte passa para baixo do papel nem para a moldura (nada de pixel esticado).
-  function porArte(k, img, cheia) {
+  // a faixa da arte cheia que fica à vista: abaixo da pílula do rótulo e acima do papel
+  const SEGURO_CHEIA = { topo: 110, base: 858 };
+  function porArte(k, img, cheia, foco) {
     k.imageSmoothingQuality = 'high';
     if (cheia) {
       const A = ARTE_CHEIA;
       const sw = JW - 2 * ARTE_MARGEM;
       const sh = ILU_H - 2 * ARTE_MARGEM;
-      const e = Math.max(A.w / sw, A.h / sh);
+      let e = Math.max(A.w / sw, A.h / sh);
+      if (foco && foco[2]) e = Math.max(e * foco[2], A.w / JW, A.h / ILU_H);
       const uw = A.w / e;
       const uh = A.h / e;
+      let sx = (JW - uw) / 2;
+      let sy = (ILU_H - uh) / 2;
+      let dy = 0;
+      if (foco) {
+        // o ponto do foco entre a pílula e o papel; o que o desenho não cobre vira deslocamento
+        const fx = foco[0] * JW;
+        const fy = foco[1] * ILU_H;
+        const y = A.y + (fy - sy) * e;
+        if (y < SEGURO_CHEIA.topo) sy = fy - (SEGURO_CHEIA.topo - A.y) / e;
+        else if (y > SEGURO_CHEIA.base) sy = fy - (SEGURO_CHEIA.base - A.y) / e;
+        if (sy < 0) { dy = -sy * e; sy = 0; } else if (sy > ILU_H - uh) { dy = -(sy - (ILU_H - uh)) * e; sy = ILU_H - uh; }
+        const x = A.x + (fx - sx) * e;
+        if (x < A.x + 60) sx = fx - 60 / e; else if (x > A.x + A.w - 60) sx = fx - (A.w - 60) / e;
+        sx = Math.max(0, Math.min(JW - uw, sx));
+      }
       k.save();
       k.beginPath();
       k.rect(A.x, A.y, A.w, A.h);
       k.clip();
       retRedondo(k, FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
       k.clip();
-      k.drawImage(img, ARTE_MARGEM + (sw - uw) / 2, ARTE_MARGEM + (sh - uh) / 2, uw, uh, A.x, A.y, A.w, A.h);
+      // a beirada que sobra (com a arte deslocada) é a última linha do desenho, esticada
+      if (dy > 0) k.drawImage(img, sx, 0, uw, 3, A.x, A.y, A.w, dy + 2);
+      if (dy < 0) k.drawImage(img, sx, ILU_H - 3, uw, 3, A.x, A.y + A.h + dy - 2, A.w, -dy + 2);
+      k.drawImage(img, sx, sy, uw, uh, A.x, A.y + dy, A.w, A.h);
       k.restore();
     } else k.drawImage(img, 0, ILU_CORTE, JW, JH, JX, JY, JW, JH);
   }
@@ -5082,13 +5134,16 @@
     const rar = raridadeDe(carta);
     const R = RARIDADES[rar];
     const M = MOLDURAS[rar];
-    const { ilu } = ilustracao(carta);
+    const { ilu, foco, tom } = ilustracao(carta);
     retRedondo(k, 0, 0, CW, CH, 46);
     k.save();
     k.clip();
     if (M.cheia) {
-      porArte(k, ilu, true);
-      // a luz da glória, parada no papel: o clarão no alto e os raios finos, simétricos
+      porArte(k, ilu, true, foco);
+      // a luz da glória, parada no papel: o clarão no alto e os raios finos, simétricos. Na arte
+      // escura (a noite de Abraão, de Gideão), os raios ficam curtos e fracos, só no alto: no céu
+      // escuro, raio longo vira grade
+      const escura = tom === 'escura';
       k.save();
       k.beginPath();
       k.rect(ARTE_CHEIA.x, ARTE_CHEIA.y, ARTE_CHEIA.w, ARTE_CHEIA.h);
@@ -5099,8 +5154,8 @@
       for (let i = 0; i < 72; i++) {
         const a = Math.PI / 2 + ((i + 0.5) / 72 - 0.5) * 2.6;
         const g = k.createLinearGradient(CW / 2, -60, CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
-        g.addColorStop(0, 'rgba(255,244,214,' + (i % 2 ? 0.16 : 0.3) + ')');
-        g.addColorStop(0.75, 'rgba(255,244,214,0)');
+        g.addColorStop(0, 'rgba(255,244,214,' + (i % 2 ? 0.16 : 0.3) * (escura ? 0.3 : 1) + ')');
+        g.addColorStop(escura ? 0.36 : 0.75, 'rgba(255,244,214,0)');
         k.strokeStyle = g;
         k.lineWidth = i % 2 ? 2 : 4;
         k.beginPath();
@@ -5110,7 +5165,7 @@
       }
       // nas artes claras o clarão some; ali os raios entram como traço de ouro fino
       k.save();
-      k.globalAlpha = 0.16;
+      k.globalAlpha = escura ? 0 : 0.16;
       k.strokeStyle = '#b8862a';
       k.lineWidth = 1.5;
       for (let i = 0; i < 72; i += 2) {
@@ -5275,9 +5330,9 @@
     const c = tela(w, h);
     const k = c.getContext('2d');
     const M = MOLDURAS[rar];
-    const { ilu, obj } = ilustracao(carta);
+    const { ilu, obj, foco } = ilustracao(carta);
     k.setTransform(w / CW, 0, 0, h / CH, 0, 0);
-    if (M.cheia) porArte(k, ilu, true);
+    if (M.cheia) porArte(k, ilu, true, foco);
     else {
       k.save();
       retRedondo(k, JX, JY, JW, JH, 22);
@@ -5300,7 +5355,7 @@
     k.globalCompositeOperation = 'destination-out';
     k.globalAlpha = 0.9;
     k.filter = 'blur(2px)';
-    porArte(k, obj, !!M.cheia);
+    porArte(k, obj, !!M.cheia, foco);
     k.filter = 'none';
     k.globalAlpha = 1;
     // fora do texto: o papel e a plaqueta do rótulo (a forma exata dela)
@@ -5322,6 +5377,222 @@
     tirarTexto();
     k.restore();
     return c;
+  }
+  // ---------- o brilho assado: a imagem salva (storyDaCarta) e a miniatura do álbum ----------
+  // O brilho da raridade do cartas.css, pintado no canvas num repouso fixo (a luz no alto, à
+  // esquerda, como a carta parada sobre a mesa), com as mesmas camadas e as mesmas máscaras:
+  // nada sobre os objetos desenhados nem sobre o texto. Determinístico: a mesma carta sai
+  // sempre igual. Linho é fosco (nada). Na miniatura (mini), só o tom parado da moldura, da
+  // prata para cima, para a raridade se ver na grade.
+  const REPOUSO = { mx: 34, my: 28, o: 0.5, og: 0.45 };
+  // a linha de um linear-gradient do CSS (graus: 0 para cima, 90 para a direita) na caixa
+  function gradienteCss(k, graus, x, y, w, h, paradas) {
+    const a = (graus * Math.PI) / 180;
+    const dx = Math.sin(a);
+    const dy = -Math.cos(a);
+    const meia = (Math.abs(w * dx) + Math.abs(h * dy)) / 2;
+    const cx = x + w / 2;
+    const cy = y + h / 2;
+    const g = k.createLinearGradient(cx - dx * meia, cy - dy * meia, cx + dx * meia, cy + dy * meia);
+    for (const [q, cor] of paradas) g.addColorStop(Math.max(0, Math.min(1, q)), cor);
+    return g;
+  }
+  // as paradas de um repeating-linear-gradient (em fração da linha), repetidas até o fim dela
+  const repetir = (paradas, periodo) => {
+    const r = [];
+    for (let i = 0; i * periodo < 1; i++) for (const [q, cor] of paradas) if (q + i * periodo <= 1) r.push([q + i * periodo, cor]);
+    return r;
+  };
+  // as riscas de um repeating-linear-gradient fino do CSS (graus), uma a cada passo
+  function riscas(k, W, H, graus, passo, largura, cor) {
+    const L = Math.hypot(W, H);
+    k.save();
+    k.translate(W / 2, H / 2);
+    k.rotate(((graus - 90) * Math.PI) / 180);
+    k.strokeStyle = cor;
+    k.lineWidth = largura;
+    k.beginPath();
+    for (let d = -L / 2; d < L / 2; d += passo) { k.moveTo(d, -L / 2); k.lineTo(d, L / 2); }
+    k.stroke();
+    k.restore();
+  }
+  // o radial-gradient(farthest-corner circle at mx my) do CSS
+  function radialCss(k, W, H, mx, my, paradas) {
+    const x = (W * mx) / 100;
+    const y = (H * my) / 100;
+    const g = k.createRadialGradient(x, y, 0, x, y, Math.hypot(Math.max(x, W - x), Math.max(y, H - y)));
+    for (const [q, cor] of paradas) g.addColorStop(q, cor);
+    return g;
+  }
+  // As zonas (máscaras só de alfa, no tamanho W x H): a moldura sem o texto, e a carta sem o
+  // papel nem o rótulo do alto (o --zona-moldura / --zona-sem-texto / --sem-rotulos do CSS).
+  function zonaDaCarta(carta, rar, W, H, { moldura, mini }) {
+    const c = tela(W, H);
+    const k = c.getContext('2d');
+    const M = MOLDURAS[rar];
+    k.setTransform(W / CW, 0, 0, H / CH, 0, 0);
+    k.fillStyle = '#000';
+    if (moldura) k.fill(M.cheia ? vazado(FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26) : vazado(JX, JY, JW, JH, 22), 'evenodd');
+    else k.fillRect(0, 0, CW, CH);
+    k.globalCompositeOperation = 'destination-out';
+    if (M.cheia) k.fillRect(PAPEL_CHEIO.x - 4, PAPEL_CHEIO.y - 6, PAPEL_CHEIO.w + 8, PAPEL_CHEIO.h + 10);
+    else { retRedondo(k, JX - 2, PY - 2, JW + 4, PH + 4, 24); k.fill(); }
+    if (!mini) {
+      const P = plaqueta(k, carta, M);
+      if (P.forma) k.fill(P.forma);
+      else {
+        // o rótulo escrito direto na moldura: a elipse macia do --sem-rotulos
+        k.save();
+        k.translate(CW / 2, CH * 0.056);
+        k.scale(1, (CH * 0.044) / (CW * 0.35));
+        const g = k.createRadialGradient(0, 0, 0, 0, 0, CW * 0.35);
+        g.addColorStop(0, '#000');
+        g.addColorStop(0.6, '#000');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        k.fillStyle = g;
+        k.fillRect(-CW * 0.35, -CW * 0.35, CW * 0.7, CW * 0.7);
+        k.restore();
+      }
+    }
+    return c;
+  }
+  // uma camada: pinta, corta pelas máscaras (todas juntas, e sempre pela forma da própria carta,
+  // para nada sair nos cantos redondos) e mistura na carta
+  function camadaDeBrilho(k, W, H, pintar, mascaras, modo, alfa, filtro) {
+    const l = tela(W, H);
+    const kl = l.getContext('2d');
+    pintar(kl);
+    kl.globalCompositeOperation = 'destination-in';
+    for (const m of [...mascaras, k.canvas]) if (m) kl.drawImage(m, 0, 0, W, H);
+    k.save();
+    k.globalCompositeOperation = modo;
+    k.globalAlpha = Math.max(0, Math.min(1, alfa));
+    if (filtro) k.filter = filtro;
+    k.drawImage(l, 0, 0);
+    k.restore();
+  }
+  function assarBrilho(c, carta, { mini = false } = {}) {
+    const rar = raridadeDe(carta);
+    if (rar === 'linho' || (mini && RARIDADES[rar].ordem < 2)) return c;
+    const W = c.width;
+    const H = c.height;
+    const k = c.getContext('2d');
+    const { mx, my, o, og } = REPOUSO;
+    const bx = 50 + (mx - 50) * 0.9;
+    const by = 50 + (my - 50) * 0.9;
+    // o px do CSS numa carta de 340 (na miniatura, a trama fica um pouco mais grossa)
+    const u = W / (mini ? 170 : 340);
+    const tom = tomDaArte(carta);
+    const clara = tom === 'clara';
+    const escura = tom === 'escura';
+    const moldura = zonaDaCarta(carta, rar, W, H, { moldura: true, mini });
+    const semTexto = mini ? null : zonaDaCarta(carta, rar, W, H, { moldura: false });
+    let luzes = moldura;
+    if (!mini && (rar === 'ouro' || rar === 'gloria')) { try { luzes = mascaraDoBrilho(carta, rar); } catch (e) { /* fica a moldura */ } }
+    // o fundo de 320% (ou 260%, 300%) do CSS, posto em --bx --by
+    const caixa = (escala) => [(W - W * escala) * bx / 100, (H - H * escala) * by / 100, W * escala, H * escala];
+    // a faixa de luz do metal, de lado a lado da moldura (o lampejo, aqui parado em --bx)
+    const faixa = (meia, cor) => (kl) => {
+      kl.fillStyle = gradienteCss(kl, 112, 0, 0, W, H, [[(bx - meia) / 100, 'rgba(0,0,0,0)'], [bx / 100, cor], [(bx + meia) / 100, 'rgba(0,0,0,0)']]);
+      kl.fillRect(0, 0, W, H);
+    };
+    if (rar === 'bronze') {
+      camadaDeBrilho(k, W, H, (kl) => {
+        kl.fillStyle = gradienteCss(kl, 112, 0, 0, W, H, [[(bx - 46) / 100, 'rgba(90,40,0,.5)'], [(bx - 30) / 100, 'rgba(255,190,120,0)'],
+          [bx / 100, 'rgba(255,206,150,.85)'], [(bx + 30) / 100, 'rgba(255,190,120,0)'], [(bx + 46) / 100, 'rgba(90,40,0,.5)']]);
+        kl.fillRect(0, 0, W, H);
+        faixa(7, 'rgba(255,246,228,.95)')(kl);
+      }, [moldura], 'overlay', 0.3 + o * 0.7);
+    }
+    if (rar === 'prata') {
+      camadaDeBrilho(k, W, H, (kl) => {
+        const [x, y, w, h] = caixa(3.2);
+        kl.fillStyle = gradienteCss(kl, 105, x, y, w, h, repetir([[0, '#6c80b4'], [0.05, '#92bcff'], [0.1, '#d2bfff'], [0.135, '#f4f8ff'],
+          [0.18, '#8fdcff'], [0.23, '#b7a2ff'], [0.265, '#e9f2ff'], [0.31, '#6c80b4']], 0.31));
+        kl.fillRect(0, 0, W, H);
+        // a trama em losango da folha holográfica
+        riscas(kl, W, H, 58, 3 * u, u, 'rgba(20,24,40,.32)');
+        riscas(kl, W, H, -58, 3 * u, u, 'rgba(20,24,40,.32)');
+      }, [moldura], 'hard-light', 0.32 + o * 0.55, 'brightness(.9) contrast(1.25) saturate(1.35)');
+    }
+    if (rar === 'ouro') {
+      camadaDeBrilho(k, W, H, (kl) => {
+        const [x, y, w, h] = caixa(2.6);
+        kl.fillStyle = gradienteCss(kl, -58, x, y, w, h, [[0, '#8c6216'], [0.09, '#d9a640'], [0.16, '#fbe7a8'], [0.23, '#e7b552'], [0.31, '#b88a3a'],
+          [0.39, '#f3d48a'], [0.47, '#c99a3c'], [0.55, '#ffe9b0'], [0.63, '#d8a24a'], [0.71, '#a87c30'], [0.8, '#f0cc7c'], [0.88, '#e2ad4c'], [1, '#8c6216']]);
+        kl.fillRect(0, 0, W, H);
+        kl.globalCompositeOperation = 'soft-light';
+        riscas(kl, W, H, -58, 2.5 * u, 1.2 * u, 'rgba(255,246,214,.28)');
+        kl.globalCompositeOperation = 'multiply';
+        kl.fillStyle = radialCss(kl, W, H, mx, my, [[0, 'rgba(255,250,235,.9)'], [0.7, 'rgba(120,80,10,.35)'], [1, 'rgba(120,80,10,.35)']]);
+        kl.fillRect(0, 0, W, H);
+      }, semTexto ? [luzes, semTexto] : [luzes], clara && !mini ? 'soft-light' : 'color-dodge', mini ? 0.5 : clara ? 0.45 + o * 0.55 : 0.28 + o * 0.55,
+      clara && !mini ? 'saturate(1.5) contrast(1.15)' : 'brightness(.6) contrast(1.15)');
+    }
+    if (rar === 'gloria') {
+      camadaDeBrilho(k, W, H, (kl) => {
+        // as faixas finas do prisma (15 px do CSS), deslocadas com --bx
+        const per = 15 * u;
+        const cores = ['hsl(42 95% 74%)', 'hsl(330 80% 80%)', 'hsl(265 70% 82%)', 'hsl(205 85% 76%)', 'hsl(160 60% 74%)', 'hsl(42 95% 74%)'];
+        const L = Math.hypot(W, H) + per * 2;
+        const desvio = ((bx / 100) * W * 2) % per;
+        kl.save();
+        kl.translate(W / 2, H / 2);
+        kl.rotate(((115 - 90) * Math.PI) / 180);
+        const g = kl.createLinearGradient(-L / 2 - desvio, 0, L / 2 - desvio, 0);
+        const n = Math.ceil(L / per);
+        for (let i = 0; i < n; i++) cores.forEach((cor, j) => g.addColorStop(Math.min(1, (i + j / 5) / n), cor));
+        kl.fillStyle = g;
+        kl.fillRect(-L / 2, -L / 2, L, L);
+        kl.restore();
+        kl.globalCompositeOperation = 'multiply';
+        kl.fillStyle = radialCss(kl, W, H, mx, my, [[0, 'rgba(255,255,255,.7)'], [0.8, 'rgba(60,60,80,.4)'], [1, 'rgba(60,60,80,.4)']]);
+        kl.fillRect(0, 0, W, H);
+      }, semTexto ? [luzes, semTexto] : [luzes], (clara || escura) && !mini ? 'soft-light' : 'color-dodge',
+      mini ? 0.55 : clara ? 0.3 + o * 0.55 : escura ? 0.25 + o * 0.35 : 0.4 + o * 0.55,
+      clara && !mini ? 'saturate(1.5) contrast(1.15)' : escura && !mini ? 'saturate(1.3)' : 'brightness(.6) contrast(1.25)');
+    }
+    // o metal da moldura: a faixa de luz que corre (prata, ouro e glória)
+    if (rar !== 'bronze') {
+      const [meia, cor, alfa] = { prata: [9, 'rgba(240,248,255,.95)', 0.15], ouro: [10, 'rgba(255,252,230,.95)', 0.25], gloria: [12, 'rgba(255,255,255,.95)', 0.3] }[rar];
+      camadaDeBrilho(k, W, H, faixa(meia, cor), [moldura], 'overlay', alfa + o * (1 - alfa));
+    }
+    if (mini) return c;
+    // a purpurina perto da luz (ouro e glória), nas luzes da arte e na moldura
+    if (rar === 'ouro' || rar === 'gloria') {
+      const pp = purpurina(W, H, rar, 31);
+      const perto = tela(W, H);
+      const kp = perto.getContext('2d');
+      kp.fillStyle = radialCss(kp, W, H, mx, my, rar === 'ouro' ? [[0, '#000'], [0.26, 'rgba(0,0,0,.55)'], [0.58, 'rgba(0,0,0,0)']]
+        : [[0, '#000'], [0.34, 'rgba(0,0,0,.6)'], [0.7, 'rgba(0,0,0,.15)'], [1, 'rgba(0,0,0,.15)']]);
+      kp.fillRect(0, 0, W, H);
+      camadaDeBrilho(k, W, H, (kl) => kl.drawImage(pp, 0, 0), [perto, luzes, semTexto],
+        rar === 'gloria' ? 'screen' : clara ? 'overlay' : 'color-dodge', rar === 'gloria' ? 0.4 + o * 0.6 : 0.35 + o * 0.65);
+    }
+    // o reflexo: a luz da mesa, fora do papel e do rótulo
+    camadaDeBrilho(k, W, H, (kl) => {
+      kl.fillStyle = radialCss(kl, W, H, mx, my, [[0, 'rgba(255,255,255,.85)'], [0.22, 'rgba(255,255,255,.3)'], [0.95, 'rgba(0,0,0,.4)'], [1, 'rgba(0,0,0,.4)']]);
+      kl.fillRect(0, 0, W, H);
+    }, [semTexto], 'overlay', og * (escura ? 0.3 : 0.55));
+    return c;
+  }
+  // O halo da glória em volta da carta (o ::before do CSS): o brilho macio, dourado e perolado,
+  // na forma da carta, igual dos quatro lados. x, y, w, h é a carta; ela é desenhada por cima.
+  function haloAssado(k, x, y, w, h) {
+    const u = w / 340;
+    const raio = w * 0.046;
+    for (const [borrao, abre, cor] of [[16, 3, 'rgba(255,224,150,.8)'], [34, 8, 'rgba(255,196,228,.32)'], [56, 14, 'rgba(170,214,255,.24)']]) {
+      const a = abre * u;
+      k.save();
+      // só a sombra: a forma fica longe, fora do canvas, e a sombra volta para o lugar
+      k.shadowColor = cor;
+      k.shadowBlur = borrao * u;
+      k.shadowOffsetX = 20000;
+      k.fillStyle = '#000';
+      retRedondo(k, x - a - 20000, y - a, w + 2 * a, h + 2 * a, raio + a);
+      k.fill();
+      k.restore();
+    }
   }
   // O verso: o desenho aprovado (o campo escuro com as curvas de nível, o medalhão com o anel
   // fino e o símbolo creme, centrado) com a moldura no material da raridade e o anel na cor dela.
@@ -5423,12 +5694,12 @@
     const R = RARIDADES[rar];
     const M = MOLDURAS[rar];
     const r = sorteio(9100 + (carta.numero || 0));
-    const { ilu } = ilustracao(carta);
+    const { ilu, foco } = ilustracao(carta);
     retRedondo(k, 0, 0, CW, CH, 46);
     k.clip();
     let papel;
     if (M.cheia) {
-      porArte(k, ilu, true);
+      porArte(k, ilu, true, foco);
       moldura(k, M, r, rar);
       papel = PAPEL_CHEIO;
       k.save();
@@ -5474,7 +5745,8 @@
     retRedondo(k, 1.5, 1.5, CW - 3, CH - 3, 45);
     k.stroke();
     k.restore();
-    return c;
+    // da prata para cima, o tom parado do holo na moldura, para a raridade se ver na grade
+    return assarBrilho(c, carta, { mini: true });
   }
   // A carta, por fora: desenharCarta(carta, { largura, raridade, semTexto, canvas }) devolve o
   // canvas. largura é a do canvas em px (padrão 1000; a altura é 1,4 vez); semTexto dá a
@@ -5512,12 +5784,14 @@
     escrever(k, 'TIREI ESTA CARTA NO BAÚ DA SEMANA', L / 2, 330, oswald(34, 600), COR.creme, { alinhar: 'center', espaco: 6 });
     const cw = 800;
     const ch = cw * 1.4;
-    const carta2 = desenharCarta(tela(cw, ch), carta);
+    // a carta com o brilho da raridade assado, no repouso (assarBrilho); na glória, o halo
+    const carta2 = assarBrilho(desenharCarta(tela(cw, ch), carta), carta);
     k.save();
     k.filter = 'blur(40px)';
     k.fillStyle = 'rgba(0,0,0,.7)';
     k.fillRect(L / 2 - cw / 2 + 20, 420 + 40, cw - 40, ch - 20);
     k.restore();
+    if (raridadeDe(carta) === 'gloria') haloAssado(k, L / 2 - cw / 2, 400, cw, ch);
     k.drawImage(carta2, L / 2 - cw / 2, 400);
     grao(k, L, A, 12, 4242);
     if (CC.story && CC.story.marca) CC.story.marca(k, A - 250 - 80, { cor: '#f4f1ea', corFraca: '#a9a49a' });
@@ -5625,10 +5899,37 @@
   // brilho fica fora do texto por clip-path (as medidas de JX/JY/PY acima, em %).
   // Toque: vira para o verso e volta. Arraste na horizontal: gira livre e, ao soltar, assenta
   // no lado mais perto. Com menos movimento: não inclina, o brilho fica parado e virar é troca.
-  const ARTE_CLARA = new Set(['davi-funda', 'poco-jaco', 'tumulo-vazio']);
   const INCLINACAO = { linho: 7, bronze: 10, prata: 12, ouro: 14, gloria: 14 };
-  const menosMovimento = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-    || document.documentElement.classList.contains('menos-movimento');
+  const MQ_MENOS = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const menosMovimento = () => !!(MQ_MENOS && MQ_MENOS.matches) || document.documentElement.classList.contains('menos-movimento');
+  // O brilho parado: com a carta em repouso (sem dedo nem giroscópio, sem varredura, fora das
+  // fases da revelação), a luz passeia devagar pela carta, como um holográfico sobre a mesa.
+  // Por raridade: o (o holo em repouso, 0 a 1), og (o reflexo), ax/ay (quanto a luz anda, em %
+  // da carta), incl (a respiração da inclinação, em graus), lampejo [a cada s, dura s, reforço]
+  // (o reflexo de metal que passa de lado a lado da moldura) e halo (o pulso do halo, em s).
+  // A luz faz uma Lissajous lenta (10,5 s por 14,5 s), sem repetir o mesmo caminho logo.
+  const PARADO = {
+    linho: { o: 0, og: 0.55, ax: 22, ay: 15, incl: 0.8 },
+    bronze: { o: 0.12, og: 0.32, ax: 18, ay: 12, incl: 1, lampejo: [4.2, 1.4, 0.5] },
+    prata: { o: 0.42, og: 0.3, ax: 30, ay: 22, incl: 1.2, lampejo: [6, 1.7, 0.15] },
+    ouro: { o: 0.45, og: 0.3, ax: 32, ay: 26, incl: 1.4, lampejo: [5.5, 1.7, 0] },
+    gloria: { o: 0.55, og: 0.3, ax: 34, ay: 28, incl: 1.5, lampejo: [5, 1.9, 0], halo: 4.6 },
+  };
+  // Quem está à vista: um IntersectionObserver só, para todas as cartas vivas, e o
+  // visibilitychange da aba; fora da tela ou com a aba escondida, o brilho parado dorme.
+  const VIGIADAS = new Map();
+  let olho = null;
+  function vigiar(el, aviso) {
+    VIGIADAS.set(el, aviso);
+    if (typeof IntersectionObserver !== 'function') { aviso(true); return; }
+    if (!olho) olho = new IntersectionObserver((es) => { for (const e of es) { const f = VIGIADAS.get(e.target); if (f) f(e.isIntersecting); } });
+    olho.observe(el);
+  }
+  function esquecer(el) {
+    VIGIADAS.delete(el);
+    if (olho) olho.unobserve(el);
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) for (const f of [...VIGIADAS.values()]) f(null); });
   // A purpurina: pontos e estrelinhas de quatro pontas, desenhados uma vez; o CSS mostra só os
   // que estão perto da luz (máscara no ponteiro). Na glória, também a névoa colorida do cosmos.
   function purpurina(w, h, rar, semente) {
@@ -5673,7 +5974,7 @@
     return c;
   }
   const CAMADAS = '<i class="cv-holo"></i><i class="cv-metal"></i><i class="cv-purpurina"></i><i class="cv-reflexo"></i>';
-  function cartaViva(carta, { largura = 300, verso = false, interativa = true } = {}) {
+  function cartaViva(carta, { largura = 300, verso = false, interativa = true, parada = true } = {}) {
     const rar = raridadeDe(carta);
     const dpr = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
     const px = Math.round(Math.min(CW, Math.max(320, largura * dpr)));
@@ -5685,8 +5986,10 @@
     const el = document.createElement('div');
     el.className = 'carta-viva';
     el.dataset.raridade = rar;
-    // arte clara (papel, terra ao sol): o holo da arte troca o color-dodge, que estoura o claro
-    if (ARTE_CLARA.has(carta.id)) el.dataset.arte = 'clara';
+    // o tom da arte, medido no desenho (tomDe): na clara, o holo troca o color-dodge, que
+    // estoura o claro; na escura, o reflexo e o holo da glória baixam
+    const tom = tomDaArte(carta);
+    if (tom) el.dataset.arte = tom;
     // o holográfico do ouro e da glória só nas luzes e na moldura, fora dos objetos e do texto
     if (rar === 'ouro' || rar === 'gloria') {
       try { el.style.setProperty('--mascara', 'url(' + mascaraDoBrilho(carta, rar).toDataURL() + ')'); } catch (e) { /* sem máscara, fica o recorte do CSS */ }
@@ -5711,28 +6014,76 @@
     let quadro = 0;
     let tween = null;
     const max = INCLINACAO[rar];
+    // O brilho parado (PARADO): w é o peso dele (0 a 1), que sobe devagar quando a carta fica em
+    // repouso e desce rápido quando o dedo pega; o que ele soma vai por cima do valor da mola,
+    // então a troca entre o dedo e o repouso nunca pula. t é o relógio dele (só anda quando ele
+    // roda); lx é o lugar do lampejo de metal (estacionado fora da carta entre um e outro).
+    const P = PARADO[rar];
+    const pd = { ligado: !!parada, visivel: false, conectou: false, mao: false, w: 0, t: 0, ultimo: 0, aplicou: 0,
+      lx: 130, ini: -1, prox: 0.6, reforco: 0 };
+    const rodaParado = () => pd.ligado && pd.visivel && !document.hidden && !menosMovimento();
+    const querParado = () => rodaParado() && !pd.mao && !tween;
     const aplicar = () => {
       const g = est.giro[0];
       const s = el.style;
-      s.setProperty('--rx', est.rx[0].toFixed(2) + 'deg');
-      s.setProperty('--ry', est.ry[0].toFixed(2) + 'deg');
+      const w = pd.w;
+      const a = (pd.t / 10.5) * 6.2832;
+      const b = (pd.t / 14.5) * 6.2832 + 0.9;
+      const mx = est.mx[0] + w * P.ax * Math.sin(a);
+      const my = est.my[0] + w * P.ay * Math.sin(b);
+      s.setProperty('--rx', (est.rx[0] - w * P.incl * 0.8 * Math.sin(b)).toFixed(2) + 'deg');
+      s.setProperty('--ry', (est.ry[0] + w * P.incl * Math.sin(a)).toFixed(2) + 'deg');
       s.setProperty('--giro', g.toFixed(2) + 'deg');
-      s.setProperty('--mx', est.mx[0].toFixed(1) + '%');
-      s.setProperty('--my', est.my[0].toFixed(1) + '%');
+      s.setProperty('--mx', mx.toFixed(1) + '%');
+      s.setProperty('--my', my.toFixed(1) + '%');
       // o holo corre com o ângulo: inclinar e girar mexem a posição das faixas
       const gx = Math.sin((g * Math.PI) / 180) * 40;
-      s.setProperty('--bx', (50 + (est.mx[0] - 50) * 0.9 + gx).toFixed(1) + '%');
-      s.setProperty('--by', (50 + (est.my[0] - 50) * 0.9).toFixed(1) + '%');
-      s.setProperty('--o', Math.max(0, Math.min(1, est.o[0])).toFixed(3));
+      const bx = 50 + (mx - 50) * 0.9 + gx;
+      s.setProperty('--bx', bx.toFixed(1) + '%');
+      s.setProperty('--by', (50 + (my - 50) * 0.9).toFixed(1) + '%');
+      // o lampejo: com o dedo, na faixa de luz do holo (--bx); parada, no lugar dele
+      s.setProperty('--lx', (P.lampejo ? bx * (1 - w) + pd.lx * w : bx).toFixed(1) + '%');
+      s.setProperty('--o', Math.max(0, Math.min(1, est.o[0] + w * (P.o + pd.reforco))).toFixed(3));
+      s.setProperty('--og', Math.max(0, Math.min(1, est.o[0] + w * P.og)).toFixed(3));
+      if (P.halo) s.setProperty('--halo', (w * (0.5 - 0.5 * Math.cos((pd.t / P.halo) * 6.2832))).toFixed(3));
+      // a sombra só segue o dedo (o brilho parado não repinta a sombra a cada quadro)
       s.setProperty('--d', (Math.hypot(est.mx[0] - 50, est.my[0] - 50) / 70).toFixed(3));
       const lado = ((Math.round(g / 180) % 2) + 2) % 2 === 1;
       el.classList.toggle('mostra-verso', lado);
+      pd.aplicou = performance.now();
+    };
+    // um passo do brilho parado: o peso, o relógio e o lampejo; diz se ainda quer quadros
+    const passoParado = (agora) => {
+      const dt = Math.min(50, Math.max(0, agora - (pd.ultimo || agora)));
+      pd.ultimo = agora;
+      if (!rodaParado()) { pd.ultimo = 0; return false; }
+      const alvoW = querParado() ? 1 : 0;
+      if (pd.w !== alvoW) {
+        pd.w += (alvoW - pd.w) * (1 - Math.exp(-dt / (alvoW > pd.w ? 500 : 220)));
+        if (Math.abs(alvoW - pd.w) < 0.003) pd.w = alvoW;
+      }
+      if (pd.w <= 0) return alvoW > 0;
+      pd.t += dt / 1000;
+      if (P.lampejo) {
+        const [cada, dura, forca] = P.lampejo;
+        // só começa com o peso cheio: assim a volta para fora da carta nunca aparece
+        if (pd.ini < 0 && pd.t >= pd.prox && pd.w > 0.97) pd.ini = pd.t;
+        if (pd.ini >= 0) {
+          const f = (pd.t - pd.ini) / dura;
+          if (f >= 1) { pd.ini = -1; pd.lx = 130; pd.reforco = 0; pd.prox = pd.t + cada - dura; } else {
+            pd.lx = -30 + 160 * f * f * (3 - 2 * f);
+            pd.reforco = forca * Math.sin(Math.PI * f);
+          }
+        }
+      }
+      return true;
     };
     const passo = () => {
       quadro = 0;
+      const agora = performance.now();
       let mexendo = false;
       if (tween) {
-        const t = Math.min(1, (performance.now() - tween.inicio) / tween.duracao);
+        const t = Math.min(1, (agora - tween.inicio) / tween.duracao);
         const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         for (const [nome, de, para] of tween.vars) { est[nome][0] = de + (para - de) * e; est[nome][1] = 0; est[nome][2] = para; }
         if (t < 1) mexendo = true; else { const fim = tween.fim; tween = null; if (fim) fim(); }
@@ -5746,14 +6097,24 @@
           if (Math.abs(v[1]) > 0.01 || Math.abs(v[2] - v[0]) > 0.02) mexendo = true; else v[0] = v[2];
         }
       }
-      aplicar();
-      if (mexendo) quadro = requestAnimationFrame(passo);
+      if (pd.conectou && !el.isConnected) { esquecer(el); pd.ligado = false; }
+      const parado = passoParado(agora);
+      // só o brilho parado andando (a luz devagar): 30 quadros por segundo bastam
+      if (mexendo || pd.w < 1 || agora - pd.aplicou > 30) aplicar();
+      if (mexendo || parado) quadro = requestAnimationFrame(passo);
     };
     const mover = () => { if (!quadro) quadro = requestAnimationFrame(passo); };
     const alvo = (vals) => { for (const [n, v] of Object.entries(vals)) est[n][2] = v; mover(); };
+    vigiar(el, (v) => {
+      if (v !== null) pd.visivel = v;
+      if (v) pd.conectou = true;
+      if (pd.conectou && !el.isConnected) { esquecer(el); return; }
+      mover();
+    });
     const mirar = (fx, fy, forca = 1) => {
       // fx, fy de 0 a 1 na carta; a carta inclina para longe do dedo, como quem aperta a ponta
       const verso = el.classList.contains('mostra-verso');
+      pd.mao = true;
       alvo({ rx: (0.5 - fy) * 2 * max * forca, ry: (fx - 0.5) * 2 * max * forca * (verso ? -1 : 1), mx: fx * 100, my: fy * 100, o: forca });
     };
     const api = {
@@ -5763,9 +6124,13 @@
       inclinar(fx, fy, forca = 1) {
         mirar(fx, fy, forca);
         for (const v of Object.values(est)) { v[0] = v[2]; v[1] = 0; }
+        pd.w = 0;
         aplicar();
       },
-      soltar() { alvo({ rx: 0, ry: 0, mx: 50, my: 50, o: 0 }); },
+      // larga a carta: ela volta ao repouso e, se o brilho parado estiver ligado, ele volta devagar
+      soltar() { pd.mao = false; alvo({ rx: 0, ry: 0, mx: 50, my: 50, o: 0 }); },
+      // liga (padrão) ou desliga o brilho parado; a revelação o liga só no fim
+      parada(ligar = true) { pd.ligado = !!ligar; mover(); },
       virar(paraVerso) {
         const atual = Math.round(est.giro[2] / 180) * 180;
         const verso = paraVerso === undefined ? !el.classList.contains('mostra-verso') : paraVerso;
@@ -5825,6 +6190,7 @@
             toque.ux = ev.clientX;
             toque.ut = agora;
             est.giro[2] = toque.giro + dx * (180 / Math.max(160, q.width * 0.9));
+            pd.mao = true;
             alvo({ rx: 0, ry: 0, o: 0.8, mx: 50 + Math.sin((est.giro[2] * Math.PI) / 180) * 40, my: 50 });
             return;
           }
@@ -5997,7 +6363,8 @@
     rv.querySelector('.rv-boca').appendChild(bau.boca);
     // a tampa é uma peça só, com duas faces: a de fora e, no verso dela, a de dentro
     rv.querySelector('.rv-dobradica').append(bau.fora, bau.dentro);
-    const api = cartaViva(c, { largura: larg, verso: true });
+    // o brilho parado espera o fim: nas fases da revelação, a luz é a da linha do tempo
+    const api = cartaViva(c, { largura: larg, verso: true, parada: false });
     api.el.setAttribute('tabindex', '0');
     rv.querySelector('.rv-carta').appendChild(api.el);
     const botoes = rv.querySelector('.rv-botoes');
@@ -6026,6 +6393,7 @@
       timers.forEach(clearTimeout);
       fase('fim');
       api.soltar();
+      api.parada(true);
       // o foco vai para o fim (a legenda é lida); "Ler a história", se houver, fica a um Tab
       const foco = rv.querySelector('.rv-fim');
       try { foco.focus({ preventScroll: true }); } catch (e) { /* sem foco */ }
