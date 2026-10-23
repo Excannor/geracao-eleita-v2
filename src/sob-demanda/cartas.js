@@ -4686,142 +4686,221 @@
     vinheta(k, W, H, 0.35);
   }
 
-  // Uma espiga de cevada ao longo do caminho (x0, y0) -> (x1, y1): os grãos alternados dos dois
-  // lados e as barbas compridas, que são o que distingue a cevada.
-  function espiga(k, x0, y0, x1, y1, larg, tinta = '#3a2a0e', cor = '#e6c070') {
-    const n = 9;
-    const a = Math.atan2(y1 - y0, x1 - x0);
+  // Uma espiga de cevada, deitada ou em pé, de (x, y) para o ângulo a: o pedaço de talo, os
+  // grãos em duas fileiras alternadas, cada um com a barba comprida que segue a espiga (é a
+  // barba que diz cevada, não trigo). "e" é a escala (1 = uns 60 px de espiga, mais a barba).
+  function cevada(k, x, y, a, e, { tinta = '#3b3220', cor = '#efe0b0', talo = 40 } = {}) {
     const ca = Math.cos(a);
     const sa = Math.sin(a);
+    k.save();
     k.lineCap = 'round';
+    k.lineJoin = 'round';
+    // o talo, antes da espiga
+    k.strokeStyle = tinta;
+    k.lineWidth = 3.4 * e;
+    k.beginPath();
+    k.moveTo(x - ca * talo * e, y - sa * talo * e);
+    k.lineTo(x, y);
+    k.stroke();
+    k.strokeStyle = '#d9c88e';
+    k.lineWidth = 1.6 * e;
+    k.stroke();
+    const n = 8;
+    const comp = 60 * e;
     for (let i = 0; i < n; i++) {
-      const t = i / n;
-      const px = x0 + (x1 - x0) * t;
-      const py = y0 + (y1 - y0) * t;
-      for (const lado of [-1, 1]) {
-        const gx = px - sa * lado * larg * 0.45;
-        const gy = py + ca * lado * larg * 0.45;
-        k.strokeStyle = tinta;
-        k.lineWidth = 1;
-        k.beginPath();
-        k.moveTo(gx, gy);
-        k.lineTo(gx + ca * larg * 4.4 - sa * lado * larg * 1.2, gy + sa * larg * 4.4 + ca * lado * larg * 1.2);
-        k.stroke();
-        k.fillStyle = cor;
-        k.beginPath();
-        k.ellipse(gx, gy, larg * 0.75, larg * 0.42, a + lado * 0.5, 0, 6.283);
-        k.fill();
-        k.lineWidth = 1.2;
-        k.stroke();
-      }
+      const t = (i + 0.5) / n;
+      const lado = i % 2 ? 1 : -1;
+      const px = x + ca * comp * t;
+      const py = y + sa * comp * t;
+      const gx = px - sa * lado * 4.2 * e;
+      const gy = py + ca * lado * 4.2 * e;
+      const ga = a + lado * 0.32;
+      // a barba: longa, quase paralela à espiga, abrindo um pouco
+      k.strokeStyle = tinta;
+      k.lineWidth = 0.9 * e;
+      k.beginPath();
+      k.moveTo(gx + Math.cos(ga) * 6 * e, gy + Math.sin(ga) * 6 * e);
+      k.quadraticCurveTo(gx + Math.cos(a + lado * 0.14) * 50 * e, gy + Math.sin(a + lado * 0.14) * 50 * e, gx + Math.cos(a + lado * 0.2) * (78 - t * 20) * e, gy + Math.sin(a + lado * 0.2) * (78 - t * 20) * e);
+      k.stroke();
+      // o grão, em gota, com a hachura do lado de baixo
+      const grao = new Path2D();
+      grao.ellipse(gx, gy, 7.2 * e, 3.6 * e, ga, 0, 6.283);
+      k.fillStyle = cor;
+      k.fill(grao);
+      k.save();
+      k.clip(grao);
+      k.strokeStyle = 'rgba(59,50,32,.6)';
+      k.lineWidth = 0.9 * e;
+      for (let d = -6; d <= 6; d += 2.4) { k.beginPath(); k.moveTo(gx + Math.cos(ga) * d * e, gy + Math.sin(ga) * d * e + 1.4 * e); k.lineTo(gx + Math.cos(ga) * d * e + 2 * e, gy + Math.sin(ga) * d * e + 4 * e); k.stroke(); }
+      k.restore();
+      k.strokeStyle = tinta;
+      k.lineWidth = 1.2 * e;
+      k.stroke(grao);
     }
+    k.restore();
   }
 
-  // (9) Rute e as espigas (Rt 2.2-3): no campo de Boaz, na colheita da cevada, o punhado de
-  // espigas que Rute recolheu atrás dos ceifeiros, amarrado e deitado na beira do campo, e as
-  // espigas que sobraram no chão; atrás, a cevada em pé e os feixes dos ceifeiros.
+  // (9) Rute e as espigas (Rt 2.2-3): no campo de Boaz, de tarde, na colheita da cevada (1.22),
+  // visto de perto do chão: o restolho, e as espigas que sobraram atrás dos ceifeiros (2.3),
+  // soltas, uma aqui, outra ali, levando ao xale dobrado onde está o punhado que Rute já
+  // recolheu. Os feixes dos ceifeiros ficam lá no meio do campo, pequenos. A cevada é pálida,
+  // de palha clara; o sol da tarde, gravado em raios.
   function desenhoRute(k, W, H, obj) {
     const r = sorteio(5901);
-    papelVelho(k, W, H, r, ['#fbf0d0', '#f0d9a2', '#d5b475'], [W * 0.75, 90]);
-    linhas(k, 0, 0, W, 350, 7, 1, (x, y) => 0.06 + Math.hypot(x - 660, y - 120) / 1500);
+    papelVelho(k, W, H, r, ['#f7f1dc', '#e9e0c0', '#cfc49c'], [W * 0.8, 160]);
+    linhas(k, 0, 0, W, 300, 6.5, 1.1, (x, y) => 0.1 + (1 - y / 300) * 0.4 - Math.max(0, 0.4 - Math.hypot(x - 700, y - 170) / 300));
+    // o sol da tarde, baixo, com os raios gravados
+    const sol = [700, 170];
+    k.strokeStyle = '#6e5a2c';
+    k.lineCap = 'round';
+    for (let i = 0; i < 28; i++) {
+      const a = (i / 28) * 6.283;
+      k.lineWidth = i % 2 ? 1.2 : 2;
+      k.beginPath();
+      k.moveTo(sol[0] + Math.cos(a) * 46, sol[1] + Math.sin(a) * 46);
+      k.lineTo(sol[0] + Math.cos(a) * (i % 2 ? 68 : 90), sol[1] + Math.sin(a) * (i % 2 ? 68 : 90));
+      k.stroke();
+    }
+    const disco = new Path2D();
+    disco.arc(sol[0], sol[1], 38, 0, 6.283);
+    peca(k, disco, [sol[0] - 38, sol[1] - 38, sol[0] + 38, sol[1] + 38], { cor: '#fbf0c8', tinta: '#6e5a2c', sombra: (x, y) => 0.1 + Math.hypot(x - sol[0], y - sol[1]) / 90, ang: 0, passo: 4.4, maxL: 1.1, cruzada: 1, traco: 2, obj });
     // os morros de Belém, longe
     const fm = onda(r, 4, 0.009);
-    const morro = pol([[-10, 380], ...Array.from({ length: 46 }, (_, i) => [i * 20, 312 + fm(i * 20) * 20]), [W + 10, 380]]);
-    peca(k, morro, [0, 270, W, 380], { cor: '#e8d3a0', ang: -0.3, passo: 5.5, maxL: 1.1, sombra: (x) => 0.4 + Math.sin(x * 0.015) * 0.15, traco: 1.6 });
-    // a cevada em pé, ao fundo, e o campo já ceifado
+    const morro = pol([[-10, 320], ...Array.from({ length: 46 }, (_, i) => [i * 20, 262 + fm(i * 20) * 18]), [W + 10, 320]]);
+    peca(k, morro, [0, 230, W, 320], { cor: '#e2dbb8', ang: -0.3, passo: 5, maxL: 1.1, sombra: (x) => 0.45 + Math.sin(x * 0.015) * 0.15, cruzada: 0.55, traco: 1.6 });
+    // a cevada ainda em pé, na beira do fundo: uma faixa de hastes com as barbas
     const campo = new Path2D();
-    campo.rect(-10, 350, W + 20, H);
-    k.fillStyle = '#e1c283';
+    campo.rect(-10, 300, W + 20, H);
+    k.fillStyle = '#e6dcb4';
     k.fill(campo);
-    linhas(k, 0, 350, W, H, 6, 1.5, (x, y) => 0.2 + (y - 350) / 900);
-    for (let i = 0; i < 150; i++) {
-      const x = r() * W;
-      const y = 362 + r() * 26;
-      const h = 432 - y - r() * 10;
-      k.strokeStyle = 'rgba(58,42,14,.7)';
-      k.lineWidth = 1;
+    linhas(k, 0, 300, W, H, 5.5, 1.3, (x, y) => 0.18 + (y - 300) / 1200);
+    k.strokeStyle = 'rgba(59,50,32,.75)';
+    k.lineWidth = 1;
+    for (let x = 0; x < W; x += 4) {
+      const h = 22 + r() * 10;
       k.beginPath();
-      k.moveTo(x, y + h);
-      k.quadraticCurveTo(x + 4, y + h / 2, x + 8, y);
+      k.moveTo(x, 322);
+      k.lineTo(x + 2, 322 - h);
+      k.lineTo(x + 6, 322 - h - 10);
       k.stroke();
-      espiga(k, x + 8, y, x + 18, y - 24, 2.4, 'rgba(58,42,14,.7)', '#e9c97e');
     }
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.6;
     k.beginPath();
-    k.moveTo(0, 432);
-    for (let x = 0; x <= W; x += 10) k.lineTo(x, 432 + Math.sin(x * 0.05) * 3);
+    k.moveTo(0, 322);
+    k.lineTo(W, 322);
     k.stroke();
-    // os feixes dos ceifeiros, no meio do campo
-    for (const [x, y, h] of [[120, 506, 110], [300, 490, 92], [610, 494, 100], [780, 512, 116]]) feixe(k, r, x, y, h, (r() - 0.5) * 0.15, { cor: '#e6c277', barba: true });
-    // o restolho
-    k.strokeStyle = 'rgba(58,42,14,.55)';
-    k.lineWidth = 1.3;
-    for (let i = 0; i < 420; i++) {
-      const x = r() * W;
-      const y = 446 + r() * (H - 446);
-      const h = 3 + (y - 436) / 34;
+    // os feixes dos ceifeiros, pequenos, no meio do campo: medas de palha com as barbas no alto
+    for (const [x, y, h] of [[90, 376, 46], [250, 362, 38], [430, 370, 42], [640, 358, 36], [800, 380, 48]]) {
+      sombraNoChao(k, pol([[x - h * 0.5, y], [x + h * 0.5, y], [x + h * 0.2, y + 8], [x - h * 0.8, y + 8]]), 0, 0, 3, 0.35);
+      const m = new Path2D();
+      m.moveTo(x - h * 0.5, y);
+      m.quadraticCurveTo(x - h * 0.42, y - h * 0.7, x - h * 0.1, y - h);
+      m.quadraticCurveTo(x + h * 0.1, y - h * 1.08, x + h * 0.22, y - h * 0.94);
+      m.quadraticCurveTo(x + h * 0.44, y - h * 0.6, x + h * 0.5, y);
+      m.closePath();
+      peca(k, m, [x - h * 0.5, y - h * 1.08, x + h * 0.5, y], { cor: '#e8dbab', tinta: '#3b3220', ang: -Math.PI / 2 + 0.1, passo: 2.6, maxL: 1.1, sombra: (px) => 0.25 + (px - x + h * 0.5) / h * 0.6, traco: 1.4 });
+      k.strokeStyle = '#3b3220';
+      k.lineWidth = 1;
+      for (let i = 0; i < 9; i++) { const a = -Math.PI / 2 + (i / 8 - 0.5) * 2.2; k.beginPath(); k.moveTo(x + Math.cos(a) * h * 0.2, y - h * 0.9 + Math.sin(a) * h * 0.1); k.lineTo(x + Math.cos(a) * h * 0.55, y - h * 0.9 + Math.sin(a) * h * 0.5); k.stroke(); }
+      k.lineWidth = 2;
       k.beginPath();
-      k.moveTo(x, y);
-      k.lineTo(x + (r() - 0.5) * 3, y - h);
+      k.moveTo(x - h * 0.36, y - h * 0.45);
+      k.quadraticCurveTo(x, y - h * 0.38, x + h * 0.36, y - h * 0.45);
       k.stroke();
     }
-    // as espigas soltas no chão
-    for (let i = 0; i < 9; i++) {
-      const x = 80 + r() * 720;
-      const y = 560 + r() * 230;
-      if (y > 600 && y < 760 && x > 180 && x < 720) continue;
-      const a = r() * 6.283;
-      k.strokeStyle = '#3a2a0e';
-      k.lineWidth = 1.4;
+    // o restolho: os tocos cortados, espalhados, maiores e mais grossos perto
+    k.strokeStyle = 'rgba(59,50,32,.7)';
+    for (let i = 0; i < 1500; i++) {
+      const u = r();
+      const y = 390 + u ** 1.7 * (H - 390);
+      const e = 0.4 + (y - 390) / 260;
+      const xx = r() * (W + 20) - 10;
+      const h = (4 + r() * 5) * e;
+      const g = (r() - 0.5) * 0.5;
+      k.lineWidth = 0.8 * e;
       k.beginPath();
-      k.moveTo(x, y);
-      k.lineTo(x + Math.cos(a) * 40, y + Math.sin(a) * 12);
+      k.moveTo(xx, y);
+      k.lineTo(xx + Math.sin(g) * h, y - h);
       k.stroke();
-      espiga(k, x + Math.cos(a) * 40, y + Math.sin(a) * 12, x + Math.cos(a) * 80, y + Math.sin(a) * 24, 4);
     }
-    // o punhado de Rute: os talos juntos, a amarra de palha e as espigas abertas em leque
+    // as espigas que sobraram, soltas no chão, uma depois da outra até o xale
+    for (const [x, y, a, e] of [[602, 410, 2.9, 0.45], [520, 440, 0.3, 0.5], [610, 476, 3.4, 0.58], [470, 506, 2.6, 0.64], [802, 470, 3.6, 0.6], [120, 456, -0.2, 0.55], [120, 800, -0.15, 1.02], [800, 790, 3.3, 1.08], [700, 560, 3.0, 0.8]]) {
+      sombraNoChao(k, pol([[x, y + 3], [x + Math.cos(a) * 110 * e, y + Math.sin(a) * 110 * e + 3], [x + Math.cos(a) * 110 * e, y + Math.sin(a) * 110 * e + 9], [x, y + 9]]), 0, 0, 3 * e, 0.3);
+      cevada(k, x, y, a, e);
+      const m = new Path2D();
+      m.ellipse(x + Math.cos(a) * 40 * e, y + Math.sin(a) * 40 * e, 50 * e, 12 * e, a, 0, 6.283);
+      marcar(k, obj, m);
+    }
+    // o xale de lã crua, largado no chão, com as dobras, as listras e a franja
+    const xale = new Path2D();
+    xale.moveTo(200, 612);
+    xale.bezierCurveTo(330, 580, 520, 600, 660, 556);
+    xale.bezierCurveTo(690, 600, 700, 640, 752, 690);
+    xale.bezierCurveTo(600, 712, 420, 760, 262, 786);
+    xale.bezierCurveTo(250, 730, 226, 660, 200, 612);
+    xale.closePath();
+    sombraNoChao(k, xale, -12, 12, 12, 0.5);
+    peca(k, xale, [200, 556, 752, 786], { cor: '#f0e6c8', tinta: '#3b3220', ang: 0.2, passo: 4, maxL: 1.5, sombra: (x, y) => 0.12 + (y - 560) / 420 + (752 - x) / 1800, cruzada: 0.75, traco: 2.2, obj });
     k.save();
-    k.translate(440, 690);
-    k.scale(1.16, 1.16);
-    k.translate(-440, -690);
-    const base = [210, 720];
-    const amarra = [380, 664];
-    const sombraP = pol([[180, 744], [430, 680], [720, 620], [770, 700], [440, 760], [200, 780]]);
-    sombraNoChao(k, sombraP, 0, 0, 18, 0.5);
-    const hastes = [];
-    for (let i = 0; i < 24; i++) {
-      const t = i / 23 - 0.5;
-      const a0 = [base[0] + t * 30 + (r() - 0.5) * 8, base[1] + t * 40];
-      const a1 = [amarra[0] + t * 8, amarra[1] + t * 10];
-      const ponta = [610 + t * 60 + r() * 30, 600 + t * 150 + (r() - 0.5) * 20];
-      hastes.push([a0, a1, ponta]);
+    k.clip(xale);
+    for (const [d, w, al] of [[30, 10, 0.8], [48, 4, 0.8], [190, 10, 0.65], [206, 4, 0.65]]) {
+      k.strokeStyle = 'rgba(92,60,34,' + al + ')';
+      k.lineWidth = w;
+      k.beginPath();
+      k.moveTo(200 + d * 0.3, 612 + d * 0.9);
+      k.bezierCurveTo(330 + d * 0.2, 580 + d * 0.95, 520 + d * 0.15, 600 + d * 0.9, 660 + d * 0.45, 556 + d * 0.65);
+      k.stroke();
     }
-    const ponto = new Path2D();
-    hastes.forEach(([a0, a1, p]) => { ponto.moveTo(a0[0], a0[1]); ponto.quadraticCurveTo(a1[0], a1[1], p[0], p[1]); });
-    marcar(k, obj, ponto, 16);
-    for (const [a0, a1, p] of hastes) {
-      for (const [cor, lw] of [['#2e2008', 6], ['#f0cf80', 3]]) {
-        k.strokeStyle = cor;
-        k.lineWidth = lw;
-        k.beginPath();
-        k.moveTo(a0[0], a0[1]);
-        k.quadraticCurveTo(a1[0], a1[1], p[0], p[1]);
-        k.stroke();
-      }
+    // as dobras: sulcos com a hachura do lado da sombra
+    for (const [x0, y0, x1, y1, x2, y2] of [[420, 596, 450, 670, 430, 760], [560, 586, 600, 650, 590, 728], [300, 600, 330, 660, 320, 776]]) {
+      const sulco = pol([...bezier([x0, y0], [x1, y1], [x1, y1], [x2, y2], 12), ...bezier([x2 + 26, y2 - 4], [x1 + 30, y1], [x1 + 30, y1], [x0 + 22, y0 - 2], 12)]);
+      gravar(k, sulco, x1 + 12, y1, 110, 1.25, 3.2, 1.6, (x) => 0.9 - (x - x1) / 36, '#3b3220', 0.1);
+      k.strokeStyle = '#3b3220';
+      k.lineWidth = 1.6;
+      k.beginPath();
+      k.moveTo(x0, y0);
+      k.quadraticCurveTo(x1, y1, x2, y2);
+      k.stroke();
     }
-    for (const [, a1, p] of hastes) {
-      const a = Math.atan2(p[1] - a1[1], p[0] - a1[0]);
-      espiga(k, p[0], p[1], p[0] + Math.cos(a) * 76, p[1] + Math.sin(a) * 76, 7.4, '#2e2008', '#f2c868');
-      const e = new Path2D();
-      e.ellipse(p[0] + Math.cos(a) * 40, p[1] + Math.sin(a) * 40, 50, 16, a, 0, 6.283);
-      marcar(k, obj, e);
-    }
-    cordao(k, bezier([amarra[0] - 6, amarra[1] - 34], [amarra[0] + 16, amarra[1] - 12], [amarra[0] + 12, amarra[1] + 20], [amarra[0] - 4, amarra[1] + 40], 16), 9, { cor: '#c9a35a', escuro: '#3a2a0e' });
-    cordao(k, bezier([amarra[0] + 14, amarra[1] - 32], [amarra[0] + 34, amarra[1] - 10], [amarra[0] + 30, amarra[1] + 20], [amarra[0] + 12, amarra[1] + 40], 16), 9, { cor: '#c9a35a', escuro: '#3a2a0e' });
     k.restore();
-    brilho(k, 560, 640, 200, 'rgba(255,236,190,.22)', 'screen');
-    vinheta(k, W, H, 0.22);
+    k.strokeStyle = '#3b3220';
+    k.lineWidth = 1.6;
+    for (let t = 0.02; t < 1; t += 0.03) {
+      const p = bezier([752, 690], [600, 712], [420, 760], [262, 786], 40)[Math.round(t * 40)];
+      k.beginPath();
+      k.moveTo(p[0], p[1]);
+      k.lineTo(p[0] - 1 + (r() - 0.5) * 3, p[1] + 12);
+      k.stroke();
+    }
+    // o punhado: sete espigas soltas, juntas pelo talo e abertas em leque, no colo do xale
+    for (const [a, e, rr] of [[-0.5, 1.12, 120], [-0.33, 1.2, 168], [-0.17, 1.22, 128], [0, 1.24, 176], [0.16, 1.2, 134], [0.32, 1.14, 170], [0.47, 1.06, 126]]) {
+      const x = 250 + Math.cos(a) * rr;
+      const y = 700 + Math.sin(a) * rr * 0.8;
+      cevada(k, x, y, a * 0.85, e, { talo: rr / e, tinta: '#2e2614', cor: '#e6d293' });
+      const m = new Path2D();
+      m.ellipse(x + Math.cos(a) * 46 * e, y + Math.sin(a) * 46 * e, 58 * e, 14 * e, a, 0, 6.283);
+      marcar(k, obj, m);
+    }
+    // a aba do xale virada por cima dos talos
+    const aba = new Path2D();
+    aba.moveTo(200, 612);
+    aba.bezierCurveTo(250, 600, 290, 604, 318, 598);
+    aba.bezierCurveTo(340, 650, 344, 712, 330, 772);
+    aba.bezierCurveTo(300, 778, 280, 782, 262, 786);
+    aba.bezierCurveTo(250, 730, 226, 660, 200, 612);
+    aba.closePath();
+    peca(k, aba, [200, 598, 344, 786], { cor: '#e8dcbc', tinta: '#3b3220', ang: 1.3, passo: 3.4, maxL: 1.5, sombra: (x) => 0.25 + (x - 200) / 220, cruzada: 0.8, traco: 2.2, obj });
+    k.save();
+    k.clip(aba);
+    k.strokeStyle = 'rgba(92,60,34,.8)';
+    k.lineWidth = 10;
+    k.beginPath();
+    k.moveTo(296, 600);
+    k.quadraticCurveTo(318, 690, 306, 780);
+    k.stroke();
+    k.restore();
+    vinheta(k, W, H, 0.2);
   }
 
   // Um leão deitado, em calma, de perfil para "lado" (1 = olha para a direita): o corpo, a anca,
