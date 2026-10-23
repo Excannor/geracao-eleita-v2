@@ -8775,48 +8775,83 @@
     k.moveTo(-10, hz);
     k.lineTo(W + 10, hz);
     k.stroke();
-    // a rede de lançar aberta na água, à direita do barco: a malha, a borda de chumbadas e as
-    // dobras que ainda boiam, e a corda que volta ao barco
+    // a rede de lançar, já na água, à direita do barco: a beirada torta de chumbadas, a metade
+    // de lá afundada (a água passa por cima dela), a metade de cá ainda à vista, com a malha e
+    // umas boias; em volta, o anel de ondinhas onde ela caiu; a corda volta ao barco
     const rx = 690;
-    const ry = 560;
+    const ry = 566;
+    const raio = (a) => 1 + Math.sin(a * 3 + 1) * 0.07 + Math.sin(a * 7) * 0.04;
     const borda = new Path2D();
-    borda.ellipse(rx, ry, 150, 44, -0.04, 0, 6.283);
+    for (let i = 0; i <= 48; i++) { const a = (i / 48) * 6.283; const px = rx + Math.cos(a) * 150 * raio(a); const py = ry + Math.sin(a) * 42 * raio(a); (i ? borda.lineTo(px, py) : borda.moveTo(px, py)); }
+    borda.closePath();
     k.save();
     k.clip(borda);
-    k.fillStyle = 'rgba(210,206,184,.6)';
+    k.fillStyle = 'rgba(200,194,170,.55)';
     k.fill(borda);
-    k.strokeStyle = 'rgba(43,33,18,.7)';
+    k.strokeStyle = 'rgba(43,33,18,.75)';
     k.lineWidth = 1;
-    for (let d = -200; d < 200; d += 9) {
+    for (let d = -220; d < 220; d += 9) {
       k.beginPath();
-      k.moveTo(rx + d - 60, ry - 60);
-      k.lineTo(rx + d + 60, ry + 60);
+      k.moveTo(rx + d - 50, ry - 50);
+      k.quadraticCurveTo(rx + d, ry + Math.sin(d * 0.05) * 4, rx + d + 50, ry + 50);
       k.stroke();
       k.beginPath();
-      k.moveTo(rx + d + 60, ry - 60);
-      k.lineTo(rx + d - 60, ry + 60);
+      k.moveTo(rx + d + 50, ry - 50);
+      k.quadraticCurveTo(rx + d, ry + Math.cos(d * 0.05) * 4, rx + d - 50, ry + 50);
       k.stroke();
+    }
+    // a metade de lá, debaixo d'água: a água por cima e as ondinhas atravessando
+    const lado = new Path2D();
+    lado.moveTo(rx - 170, ry + 6);
+    for (let x = rx - 170; x <= rx + 170; x += 10) lado.lineTo(x, ry + 4 + Math.sin(x * 0.05) * 5);
+    lado.lineTo(rx + 170, ry - 60);
+    lado.lineTo(rx - 170, ry - 60);
+    lado.closePath();
+    k.fillStyle = 'rgba(225,224,207,.78)';
+    k.fill(lado);
+    k.strokeStyle = SEPIA;
+    for (let y = ry - 46; y < ry + 6; y += 4.4) {
+      let x = rx - 170 + r() * 20;
+      while (x < rx + 170) { const c = 14 + r() * 30; k.lineWidth = 1; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2, x + c, y); k.stroke(); x += c + 6 + r() * 16; }
     }
     k.restore();
     marcar(k, obj, borda);
-    k.strokeStyle = SEPIA;
+    // a beirada: inteira e firme na metade de cá, só sugerida na de lá
     k.lineWidth = 2;
-    k.stroke(borda);
-    for (let i = 0; i < 40; i++) {
-      const a = (i / 40) * 6.283;
-      const px = rx + Math.cos(a) * 150;
-      const py = ry + Math.sin(a) * 44;
+    k.strokeStyle = SEPIA;
+    k.beginPath();
+    for (let i = 0; i <= 24; i++) { const a = (i / 24) * Math.PI; const px = rx + Math.cos(a) * 150 * raio(a); const py = ry + Math.sin(a) * 42 * raio(a); (i ? k.lineTo(px, py) : k.moveTo(px, py)); }
+    k.stroke();
+    k.strokeStyle = 'rgba(43,33,18,.35)';
+    k.lineWidth = 1.2;
+    k.setLineDash([6, 8]);
+    k.beginPath();
+    for (let i = 24; i <= 48; i++) { const a = (i / 48) * 6.283; const px = rx + Math.cos(a) * 150 * raio(a); const py = ry + Math.sin(a) * 42 * raio(a); (i > 24 ? k.lineTo(px, py) : k.moveTo(px, py)); }
+    k.stroke();
+    k.setLineDash([]);
+    // as chumbadas da beirada de cá e umas boias que ainda aparecem
+    for (let i = 1; i < 24; i++) {
+      const a = (i / 24) * Math.PI;
+      const px = rx + Math.cos(a) * 150 * raio(a);
+      const py = ry + Math.sin(a) * 42 * raio(a);
       k.fillStyle = '#3a3226';
       k.beginPath();
-      k.ellipse(px, py, 4.4, 3, 0, 0, 6.283);
+      k.ellipse(px, py + 1, 3.6, 2.6, 0, 0, 6.283);
       k.fill();
-      k.strokeStyle = 'rgba(250,246,230,.7)';
-      k.lineWidth = 1;
+    }
+    for (const [x, y] of [[rx - 90, ry - 22], [rx + 30, ry - 34], [rx + 110, ry - 18], [rx - 30, ry - 38]]) {
+      k.fillStyle = '#d9c39a';
+      k.beginPath();
+      k.ellipse(x, y, 6, 3.4, 0, 0, 6.283);
+      k.fill();
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.2;
       k.stroke();
     }
-    // as ondinhas que a rede abriu em volta
+    // o anel de ondinhas onde ela caiu
     k.strokeStyle = 'rgba(43,33,18,.6)';
-    for (const [a, b, w] of [[170, 54, 1.4], [196, 66, 1]]) { k.lineWidth = w; k.beginPath(); k.ellipse(rx, ry + 4, a, b, -0.04, 0.2, Math.PI - 0.2); k.stroke(); }
+    for (const [a, b, w] of [[172, 54, 1.5], [198, 66, 1.1], [226, 78, 0.8]]) { k.lineWidth = w; k.beginPath(); k.ellipse(rx, ry + 2, a, b, -0.03, 0.15, Math.PI - 0.15); k.stroke(); k.beginPath(); k.ellipse(rx, ry + 2, a, b, -0.03, Math.PI + 0.5, Math.PI * 2 - 0.5); k.stroke(); }
+
     // o barco: de lado, a proa alta à esquerda, as tábuas, a borda clara e o casco escuro
     const bx = 330;
     const by = 520;
@@ -8828,19 +8863,24 @@
     for (let i = 40; i >= 0; i--) { const t = i / 40; const x = bx - L / 2 + t * L + (t < 0.08 ? (0.08 - t) * 200 : 0) - (t > 0.94 ? (t - 0.94) * 160 : 0); casco.lineTo(x, Math.min(quilha(t), by + 16)); }
     casco.closePath();
     sombraNoChao(k, casco, 0, 40, 10, 0.25);
-    peca(k, casco, [bx - L / 2, by - 170, bx + L / 2, by + 20], { cor: '#5d4630', tinta: '#1c140c', ang: 0.04, passo: 3.2, maxL: 1.8, sombra: (x, y) => 0.35 + (y - by + 100) / 200, cruzada: 0.8, traco: 2.4, obj });
+    k.fillStyle = '#32261a';
+    k.fill(casco);
+    k.strokeStyle = '#140e08';
+    k.lineWidth = 2.4;
+    k.stroke(casco);
+    marcar(k, obj, casco);
     // as tábuas compridas, seguindo a borda
     k.save();
     k.clip(casco);
     for (let j = 1; j < 6; j++) {
-      k.strokeStyle = 'rgba(240,222,180,.55)';
-      k.lineWidth = 1.2;
+      k.strokeStyle = '#5a4632';
+      k.lineWidth = 1.6;
       k.beginPath();
       for (let i = 0; i <= 40; i++) { const t = i / 40; const x = bx - L / 2 + t * L; const y = borda1(t) + j * 18 + Math.sin(t * Math.PI) * j * 3; if (i) k.lineTo(x, y); else k.moveTo(x, y); }
       k.stroke();
     }
     // a faixa clara da borda e o brilho
-    k.fillStyle = '#c8a77a';
+    k.fillStyle = '#7a6040';
     k.beginPath();
     for (let i = 0; i <= 40; i++) { const t = i / 40; const x = bx - L / 2 + t * L; if (i) k.lineTo(x, borda1(t)); else k.moveTo(x, borda1(t)); }
     for (let i = 40; i >= 0; i--) { const t = i / 40; const x = bx - L / 2 + t * L; k.lineTo(x, borda1(t) + 13); }
@@ -8865,9 +8905,21 @@
     k.strokeStyle = SEPIA;
     for (let y = by - 2; y < by + 40; y += 5) { k.lineWidth = 1.4; let x = bx - L / 2 - 20 + r() * 20; while (x < bx + L / 2 + 20) { const c = 16 + r() * 30; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2.5, x + c, y); k.stroke(); x += c + 4 + r() * 10; } }
     k.restore();
-    // o reflexo escuro do casco, partido
-    k.fillStyle = 'rgba(40,30,20,.45)';
-    for (let i = 0; i < 8; i++) k.fillRect(bx - L / 2 + 30 + r() * 30, by + 44 + i * 7, L - 80 - r() * 80, 2.4);
+    // o reflexo do casco: uma mancha escura que treme, colada na linha d'água, com a beirada
+    // de baixo partida em lascas de onda e umas ondinhas claras por cima
+    const refl = new Path2D();
+    refl.moveTo(bx - L / 2 + 26, by - 3);
+    for (let x = bx - L / 2 + 26; x <= bx + L / 2 - 36; x += 10) refl.lineTo(x, by - 4 + Math.sin(x * 0.2) * 2);
+    for (let x = bx + L / 2 - 36, i = 0; x >= bx - L / 2 + 26; x -= 14, i++) refl.lineTo(x, by + 54 + (i % 2 ? 10 : -6) + Math.sin(x * 0.05) * 8 - Math.max(0, Math.abs(x - bx) - L * 0.3) * 0.5);
+    refl.closePath();
+    k.fillStyle = 'rgba(46,34,22,.86)';
+    k.fill(refl);
+    k.save();
+    k.clip(refl);
+    k.strokeStyle = 'rgba(225,224,207,.85)';
+    k.lineWidth = 1.6;
+    for (let y = by + 14; y < by + 70; y += 8) { let x = bx - L / 2 + 30 + r() * 40; while (x < bx + L / 2 - 40) { const c = 14 + r() * 30; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2.5, x + c, y); k.stroke(); x += c + 30 + r() * 50; } }
+    k.restore();
     // o mastro, a verga com a vela enrolada e os cabos
     const mx = bx + 20;
     const topoMastro = 150;
@@ -8937,7 +8989,7 @@
     }
     pedras.sort((a, b) => a[1] - b[1]);
     for (const [x, y, s] of pedras) {
-      const p = seixo(r, x, y, s * 1.3, s * 0.75, (r() - 0.5) * 0.4, 0.12);
+      const p = pol(Array.from({ length: 7 }, (_, i) => { const a = (i / 7) * 6.283 + r() * 0.5; const f2 = 0.7 + r() * 0.35; return [x + Math.cos(a) * s * 1.3 * f2, y + Math.sin(a) * s * 0.75 * f2]; }));
       sombraNoChao(k, p, 4, 4, 3, 0.35);
       peca(k, p, [x - s * 1.3, y - s, x + s * 1.3, y + s], { cor: '#5f584a', tinta: '#1a1712', ang: 0.6, passo: 2.8, maxL: 1.6, sombra: (px, py) => sombraOval(x, y, s * 1.3, s * 0.75, 0)(px, py) * 0.8, cruzada: 0.7, traco: 1.8 });
       // os poros do basalto
