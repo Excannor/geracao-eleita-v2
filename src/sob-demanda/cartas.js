@@ -6077,7 +6077,7 @@
           const [x, y] = ponto(lado, t, u + 0.02);
           const px = x + (r() - 0.5) * h * 0.2;
           const py = y + (r() - 0.5) * h * 0.08;
-          if (r() > 0.05) lampada(px, py, h);
+          lampada(px, py, h);
           t += (h * (0.62 + r() * 0.2)) / (380 + 430 * u);
         }
       }
@@ -6088,16 +6088,16 @@
     // a curva do fundo, atrás da chegada, também cheia
     const curva = new Path2D();
     curva.moveTo(...ponto(-1, 0, 1));
-    curva.quadraticCurveTo(F[0], F[1] - 90, ...ponto(1, 0, 1));
+    curva.quadraticCurveTo(F[0], F[1] - 50, ...ponto(1, 0, 1));
     curva.lineTo(...ponto(1, 0, 0));
     curva.quadraticCurveTo(F[0], F[1] + 4, ...ponto(-1, 0, 0));
     curva.closePath();
-    peca(k, curva, [F[0] - 160, F[1] - 90, F[0] + 160, F[1] + 30], { cor: '#7a5430', tinta: '#22140a', ang: 0, passo: 3, maxL: 1.6, sombra: () => 0.55, cruzada: 0.6, traco: 2 });
+    peca(k, curva, [F[0] - 160, F[1] - 50, F[0] + 160, F[1] + 30], { cor: '#7a5430', tinta: '#22140a', ang: 0, passo: 3, maxL: 1.6, sombra: () => 0.55, cruzada: 0.6, traco: 2 });
     for (let d = 3; d >= 0; d--) {
       const f = (d + 0.5) / 4;
       for (let a = 0.05; a < 0.96; a += 0.034) {
         const ax = ponto(-1, 0, f)[0] + (ponto(1, 0, f)[0] - ponto(-1, 0, f)[0]) * a;
-        const ay = F[1] + 30 - f * 60 - Math.sin(a * Math.PI) * 40 * f - 6;
+        const ay = F[1] + 30 - f * 60 - Math.sin(a * Math.PI) * 14 * f - 6;
         const px = ax + (r() - 0.5) * 3;
         lampada(px, ay, 12 + r() * 2);
       }
@@ -6225,73 +6225,68 @@
     }
     // atrás da largada (mais perto de quem olha), o manto pesado, largado, com as dobras, e a
     // corda que se enrosca em laçadas
-    // o manto pesado, deixado para trás sobre a soleira da largada: uma parte deitada na pedra,
-    // dobrada, e o resto caído pela frente da soleira em pregas que descem até o chão, com a
-    // barra listrada e a franja na bainha ondulada; a corda sai de baixo dele, enroscada
+    // o manto pesado, jogado no chão e deixado para trás, logo à frente da largada: o pano
+    // aberto e amarrotado, visto de cima, com os cantos de pano (um deles subiu na soleira, outro
+    // virou e mostra o forro claro), as dobras em S que atravessam o pano (a crista clara, a
+    // sombra escura ao lado), a barra listrada na beirada da frente, que dobra junto, e a franja;
+    // a corda sai de baixo dele, enroscada ("afastemos de nós qualquer coisa que nos torne
+    // vagarosos")
     const ySol = yT(t2);
-    const ySolT = yT(tl);
-    const mx0 = 150;
-    const mx1 = 340;
-    const bainha = (x) => ySol + 56 + 7 * Math.sin((x - mx0) * 0.11) + ((x - mx0) / (mx1 - mx0)) ** 2 * 40;
-    // a parte deitada em cima da soleira
-    const cima = new Path2D();
-    cima.moveTo(mx0 + 14, ySol);
-    cima.bezierCurveTo(mx0 + 18, ySolT + 20, mx0 + 30, ySolT - 2, mx0 + 70, ySolT + 2);
-    cima.bezierCurveTo(mx0 + 110, ySolT + 6, mx0 + 130, ySolT - 6, mx1 - 40, ySolT + 4);
-    cima.bezierCurveTo(mx1 - 10, ySolT + 10, mx1 + 6, ySolT + 30, mx1 + 4, ySol);
-    cima.closePath();
-    peca(k, cima, [mx0, ySolT, mx1, ySol], { cor: '#8e5638', tinta: '#22100a', ang: 0.1, passo: 3, maxL: 1.5, sombra: (x, y) => 0.2 + (y - ySolT) / 120, cruzada: 0.8, traco: 2.2, obj });
-    k.strokeStyle = 'rgba(214,170,96,.9)';
-    k.lineWidth = 4;
-    k.beginPath();
-    k.moveTo(mx0 + 36, ySolT + 9);
-    k.lineTo(mx1 - 58, ySolT + 7);
-    k.stroke();
-    // a parte caída: as pregas verticais, cada uma um cilindro de pano (luz à esquerda, sombra à
-    // direita), a bainha em onda
-    const caido = new Path2D();
-    caido.moveTo(mx0 + 14, ySol - 2);
-    caido.lineTo(mx1 + 4, ySol - 2);
-    caido.bezierCurveTo(mx1 + 10, ySol + 30, mx1 + 8, ySol + 60, mx1 + 2, bainha(mx1));
-    for (let x = mx1; x >= mx0; x -= 4) caido.lineTo(x, bainha(x));
-    caido.bezierCurveTo(mx0 - 6, ySol + 50, mx0 + 4, ySol + 20, mx0 + 14, ySol - 2);
-    caido.closePath();
-    sombraNoChao(k, caido, 12, 6, 8, 0.45);
-    k.fillStyle = '#7e4a32';
-    k.fill(caido);
-    marcar(k, obj, caido);
-    const pregas = [mx0 - 4, 176, 212, 230, 266, 304, 318, mx1 + 8];
+    const manto = new Path2D();
+    manto.moveTo(144, ySol + 14);
+    manto.bezierCurveTo(176, ySol + 6, 206, ySol + 12, 236, ySol + 6);
+    manto.bezierCurveTo(262, ySol + 2, 286, ySol - 4, 304, ySol - 14);
+    manto.lineTo(334, ySol - 10);
+    manto.bezierCurveTo(342, ySol, 352, ySol + 8, 368, ySol + 12);
+    manto.bezierCurveTo(380, ySol + 26, 384, ySol + 42, 378, ySol + 54);
+    manto.bezierCurveTo(340, ySol + 66, 290, ySol + 74, 244, ySol + 76);
+    manto.bezierCurveTo(212, ySol + 78, 186, ySol + 74, 168, ySol + 70);
+    manto.bezierCurveTo(152, ySol + 56, 140, ySol + 36, 144, ySol + 14);
+    manto.closePath();
+    sombraNoChao(k, manto, 10, 6, 8, 0.45);
+    peca(k, manto, [138, ySol - 16, 386, ySol + 80], { cor: '#7e4a32', tinta: '#22100a', ang: 0.35, passo: 3.2, maxL: 1.5, sombra: (x, y) => 0.3 + (y - ySol) / 260 + (x - 140) / 1600, cruzada: 0.75, traco: 2.4, obj });
     k.save();
-    k.clip(caido);
-    for (let i = 0; i < pregas.length - 1; i++) {
-      const xa = pregas[i];
-      const xb = pregas[i + 1];
-      const tira = pol([[xa, ySol - 4], [xb, ySol - 4], [xb, ySol + 120], [xa, ySol + 120]]);
-      gravar(k, tira, (xa + xb) / 2, ySol + 50, 90, Math.PI / 2, 2.8, 1.9, (x) => 0.12 + ((x - xa) / (xb - xa)) ** 1.5 * 0.95, '#22100a', 0);
-      k.strokeStyle = 'rgba(236,196,150,.55)';
-      k.lineWidth = 1.6;
+    k.clip(manto);
+    // as dobras em S, do fundo para a frente
+    for (const pts of [
+      [[170, ySol + 10], [214, ySol + 26], [178, ySol + 50], [226, ySol + 76]],
+      [[250, ySol + 4], [258, ySol + 40], [236, ySol + 50], [258, ySol + 76]],
+      [[300, ySol - 10], [340, ySol + 14], [300, ySol + 36], [330, ySol + 66]],
+      [[336, ySol + 8], [356, ySol + 22], [350, ySol + 38], [372, ySol + 50]],
+    ]) {
+      const crista = bezier(...pts, 24);
+      const sombra = crista.map(([x, y], i) => [x + 10 * Math.sin((i / 24) * Math.PI) + 3, y + 3]);
+      const faixa = pol([...crista, ...sombra.reverse()]);
+      gravar(k, faixa, (pts[0][0] + pts[3][0]) / 2 + 6, (pts[0][1] + pts[3][1]) / 2, 60, 1.2, 2.2, 1.9, () => 1, '#22100a', 0);
+      k.strokeStyle = 'rgba(236,196,150,.75)';
+      k.lineWidth = 1.8;
       k.beginPath();
-      k.moveTo(xa + (xb - xa) * 0.25, ySol + 4);
-      k.lineTo(xa + (xb - xa) * 0.25, bainha(xa + (xb - xa) * 0.25) - 4);
+      crista.forEach(([x, y], i) => (i ? k.lineTo(x - 2, y) : k.moveTo(x - 2, y)));
       k.stroke();
     }
-    // a barra listrada, logo acima da bainha
-    for (const [d, w] of [[12, 6], [22, 2.4]]) {
+    // a barra listrada na beirada da frente, que acompanha o pano (e ondula nas dobras)
+    for (const [d, w] of [[7, 5], [15, 2]]) {
       k.strokeStyle = 'rgba(214,170,96,.9)';
       k.lineWidth = w;
       k.beginPath();
-      for (let x = mx0 - 4; x <= mx1 + 8; x += 4) (x === mx0 - 4 ? k.moveTo(x, bainha(x) - d) : k.lineTo(x, bainha(x) - d));
+      for (let i = 0; i <= 40; i++) {
+        const t = i / 40;
+        const [x, y] = bezier([170, ySol + 70], [240, ySol + 80], [320, ySol + 68], [378, ySol + 52], 40)[i];
+        const yy = y - d + Math.sin(t * Math.PI * 3.2) * 2.5;
+        if (i) k.lineTo(x, yy); else k.moveTo(x, yy);
+      }
       k.stroke();
     }
     k.restore();
+    // o canto virado, à esquerda na frente, mostrando o forro claro
+    const canto = pol([[168, ySol + 70], [150, ySol + 52], [204, ySol + 60], [214, ySol + 76]]);
+    peca(k, canto, [150, ySol + 52, 214, ySol + 78], { cor: '#d8c094', tinta: '#22100a', ang: 0.6, passo: 3, maxL: 1.2, sombra: (x, y) => 0.15 + (y - ySol - 52) / 60, cruzada: 0.8, traco: 2, obj });
+    // a franja da beirada da frente
     k.strokeStyle = '#22100a';
-    k.lineWidth = 2.4;
-    k.stroke(caido);
-    // a franja
-    k.lineWidth = 1.6;
-    for (let x = mx0 + 2; x <= mx1; x += 7) { const y = bainha(x); k.beginPath(); k.moveTo(x, y); k.lineTo(x - 1, y + 9); k.stroke(); }
+    k.lineWidth = 1.5;
+    for (const [x, y] of bezier([214, ySol + 76], [260, ySol + 78], [330, ySol + 68], [378, ySol + 54], 20)) { k.beginPath(); k.moveTo(x, y); k.lineTo(x - 1, y + 8); k.stroke(); }
     const laco = (cx, cy, rx, ry, g) => Array.from({ length: 25 }, (_, i) => { const a = (i / 24) * 6.283; return [cx + Math.cos(a) * rx * Math.cos(g) - Math.sin(a) * ry * Math.sin(g), cy + Math.cos(a) * rx * Math.sin(g) + Math.sin(a) * ry * Math.cos(g)]; });
-    cordao(k, [[330, 770], [356, 784], [400, 790], ...laco(436, 790, 30, 16, -0.2), [466, 784], ...laco(502, 794, 26, 14, 0.25), [530, 802], [576, 792], [614, 800]], 6, { cor: '#c9a86a', escuro: '#2a1408' });
+    cordao(k, [[360, 724], [392, 730], [410, 740], ...laco(444, 744, 28, 15, -0.2), [474, 738], ...laco(508, 748, 24, 13, 0.25), [534, 756], [578, 748], [614, 756]], 6, { cor: '#c9a86a', escuro: '#2a1408' });
     vinheta(k, W, H, 0.22);
   }
 
@@ -6310,8 +6305,9 @@
   // o terceiro número (opcional, até 1) afasta a arte, usando a margem do desenho. Quando o
   // desenho não tem mais para onde ir, a arte desce (ou sobe) e a beirada dela se estende.
   // Gideão: a corneta, deitada embaixo à direita; Ester: o alto do dossel, na beirada de cima; Sara: as
-  // borlas do pano da tenda, no alto; Raabe: o terraço com o linho, no alto da casa.
-  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96] };
+  // borlas do pano da tenda, no alto; Raabe: o terraço com o linho, no alto da casa; a
+  // Multidão: o manto e a corda, embaixo, acima do papel.
+  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.93, 0.96] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
