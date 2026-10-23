@@ -15937,22 +15937,48 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.22);
   }
   // ---------- (10) A pesca maravilhosa (Lc 5.4-7) ----------
-  // De manhã cedo, no meio do lago, de dentro de um dos barcos: a borda dele atravessa a prancha
-  // em diagonal, com a água do lago já rente a ela (5.7); por cima da borda vem a rede, um saco
-  // enorme e pesado de peixe, metade ainda na água e metade derramando no fundo do barco, a
-  // malha rompida em dois rasgos, com os fios soltos e os peixes escapando de volta (5.6). Logo
-  // ali, o outro barco que veio ajudar, também fundo na água e cheio de peixe. Sem mastro, sem
-  // boias, ninguém desenhado.
+  // De manhã cedo, no meio do lago: o nosso barco de três quartos, visto de fora e um pouco de
+  // cima, tão carregado que a água chega quase à borda (5.7); por dentro, os bancos de través e
+  // o peixe amontoado. Por cima da borda de cá vem a rede, puxada da água: um saco de malha
+  // que pesa e estufa, cheio de peixe que aparece entre os fios, a parte de baixo ainda na
+  // água; na beirada, um rasgo torto por onde os peixes escapam (5.6). Lá atrás, o outro barco,
+  // um barco de pesca aberto, com o mastro e a vela enrolada na verga, também fundo na água e
+  // cheio de peixe. O sol baixo, à direita, em traço. Ninguém desenhado.
   function desenhoPesca(k, W, H, obj) {
     const r = sorteio(10001);
     papelVelho(k, W, H, r, ['#f6f0da', '#e2d8b8', '#c0b08a'], [700, 150]);
     const hz = 214;
-    linhas(k, 0, 0, W, hz, 5, 1.2, (x, y) => 0.1 + Math.min(1, Math.hypot(x - 700, (y - 200) * 1.5) / 800) * 0.45);
+    const sol = [716, hz - 4];
+    // o céu em linhas, mais ralas perto do sol
+    linhas(k, 0, 0, W, hz, 4.4, 1.5, (x, y) => 0.12 + Math.min(1, Math.hypot(x - sol[0], (y - sol[1]) * 1.4) / 700) * 0.6);
+    // o sol nascendo atrás dos morros: o disco em traço e os raios finos, partidos
+    k.save();
+    k.lineCap = 'round';
+    k.strokeStyle = 'rgba(60,44,20,.55)';
+    for (let i = 0; i < 26; i++) {
+      const a = Math.PI + (i + 0.5) / 26 * Math.PI;
+      const r0 = 46 + (i % 2) * 10;
+      const r1 = r0 + 30 + (i % 3) * 22;
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.moveTo(sol[0] + Math.cos(a) * r0, sol[1] + Math.sin(a) * r0);
+      k.lineTo(sol[0] + Math.cos(a) * r1, sol[1] + Math.sin(a) * r1);
+      k.stroke();
+    }
+    const disco = new Path2D();
+    disco.arc(sol[0], sol[1], 34, Math.PI, Math.PI * 2);
+    disco.closePath();
+    k.fillStyle = '#fbf3dc';
+    k.fill(disco);
+    k.strokeStyle = 'rgba(60,44,20,.8)';
+    k.lineWidth = 1.6;
+    k.stroke(disco);
+    k.restore();
     // a outra margem, os morros baixos e longe
     const fM = onda(sorteio(10010), 4, 0.008);
     const morros = pol([[-10, hz + 2], ...Array.from({ length: 46 }, (_, i) => [i * 20 - 6, hz - 10 - Math.max(0, fM(i * 20)) * 16]), [W + 10, hz + 2]]);
     peca(k, morros, [-10, hz - 40, W + 10, hz + 2], { cor: '#cfc4a2', ang: 0.04, passo: 3.6, maxL: 1, sombra: () => 0.35, cruzada: 1, traco: 1.2 });
-    // o lago: ondinhas em perspectiva, mais miúdas e juntas longe
+    // o lago: ondinhas em perspectiva, mais miúdas e juntas longe; a esteira do sol clara
     const lago = pol([[-10, hz], [W + 10, hz], [W + 10, H + 10], [-10, H + 10]]);
     k.fillStyle = '#d2cfb8';
     k.fill(lago);
@@ -15965,7 +15991,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       let x = -10 - r() * 40;
       while (x < W + 10) {
         const c = (12 + r() * 40) * (0.4 + t * 1.4);
-        k.lineWidth = 0.5 + t * 1.5;
+        const esteira = Math.max(0, 1 - Math.abs(x + c / 2 - sol[0]) / (40 + t * 120));
+        k.lineWidth = (0.5 + t * 1.5) * (1 - esteira * 0.7);
         k.beginPath();
         k.moveTo(x, y);
         k.quadraticCurveTo(x + c / 2, y - 1.5 - t * 4, x + c, y);
@@ -15974,258 +16001,405 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       }
     }
     k.restore();
-    const peixinho = (x, y, L, a, tom) => {
+    // um peixe em gravura: o corpo fusiforme, a barbatana de cima, o rabo em forquilha; o
+    // dorso escuro em riscos ao comprido e a barriga clara; o olho é um pontinho
+    const peixe = (x, y, L, a, claro = 1) => {
       k.save();
       k.translate(x, y);
       k.rotate(a);
+      const h = L * 0.2;
       const p = new Path2D();
       p.moveTo(-L / 2, 0);
-      p.quadraticCurveTo(-L * 0.1, -L * 0.2, L * 0.3, -L * 0.05);
-      p.lineTo(L / 2, -L * 0.16);
-      p.lineTo(L * 0.42, 0);
-      p.lineTo(L / 2, L * 0.16);
-      p.lineTo(L * 0.3, L * 0.05);
-      p.quadraticCurveTo(-L * 0.1, L * 0.2, -L / 2, 0);
+      p.bezierCurveTo(-L * 0.4, -h * 1.1, -L * 0.05, -h * 1.15, L * 0.1, -h * 0.95);
+      p.lineTo(L * 0.02, -h * 1.5);
+      p.lineTo(L * 0.2, -h * 0.8);
+      p.bezierCurveTo(L * 0.3, -h * 0.6, L * 0.36, -h * 0.3, L * 0.38, -h * 0.15);
+      p.lineTo(L / 2, -h * 0.9);
+      p.lineTo(L * 0.46, 0);
+      p.lineTo(L / 2, h * 0.9);
+      p.lineTo(L * 0.38, h * 0.15);
+      p.bezierCurveTo(L * 0.3, h * 0.6, -L * 0.1, h * 1.05, -L * 0.35, h * 0.7);
+      p.quadraticCurveTo(-L * 0.46, h * 0.4, -L / 2, 0);
       p.closePath();
-      k.fillStyle = tom;
+      k.fillStyle = claro ? '#e8ebe2' : '#c2c8be';
       k.fill(p);
       k.save();
       k.clip(p);
-      k.strokeStyle = 'rgba(30,32,26,.55)';
+      k.strokeStyle = 'rgba(30,36,30,.75)';
+      k.lineCap = 'round';
+      for (let i = 0; i < 6; i++) {
+        const yy = -h * 1.1 + i * h * 0.26;
+        k.lineWidth = Math.max(0.4, L * 0.03 * (1 - i / 6));
+        k.beginPath();
+        k.moveTo(-L * 0.42, yy + h * 0.3);
+        k.quadraticCurveTo(0, yy - h * 0.1, L * 0.45, yy * 0.4);
+        k.stroke();
+      }
       k.lineWidth = Math.max(0.5, L * 0.025);
-      for (let i = 1; i <= 3; i++) { k.beginPath(); k.moveTo(-L / 2, i * L * 0.04); k.lineTo(L / 2, i * L * 0.04 + L * 0.03); k.stroke(); }
+      k.beginPath();
+      k.moveTo(-L * 0.3, -h * 0.75);
+      k.quadraticCurveTo(-L * 0.24, 0, -L * 0.3, h * 0.6);
+      k.stroke();
       k.restore();
-      k.strokeStyle = 'rgba(20,22,18,.85)';
-      k.lineWidth = Math.max(0.7, L * 0.04);
+      k.strokeStyle = 'rgba(20,22,18,.9)';
+      k.lineWidth = Math.max(0.6, L * 0.032);
       k.stroke(p);
       k.fillStyle = '#141410';
       k.beginPath();
-      k.arc(-L * 0.36, -L * 0.03, Math.max(0.8, L * 0.035), 0, 6.283);
+      k.arc(-L * 0.38, -h * 0.2, Math.max(0.7, L * 0.022), 0, 6.283);
       k.fill();
       k.restore();
     };
-    const monteDePeixe = (forma, x0, y0, x1, y1, n, Lm) => {
+    const cardume = (forma, x0, y0, x1, y1, n, Lm, fundo) => {
       k.save();
       k.clip(forma);
-      k.fillStyle = '#8a9084';
+      k.fillStyle = fundo;
       k.fill(forma);
       const ps = [];
-      for (let i = 0; i < n; i++) ps.push([x0 + r() * (x1 - x0), y0 + r() * (y1 - y0), Lm * (0.75 + r() * 0.5), (r() - 0.5) * 3]);
+      for (let i = 0; i < n; i++) ps.push([x0 + r() * (x1 - x0), y0 + r() * (y1 - y0), Lm * (0.75 + r() * 0.5), (r() - 0.5) * 2.4 + (r() < 0.5 ? Math.PI : 0)]);
       ps.sort((a, b) => a[1] - b[1]);
-      for (const [x, y, L, a] of ps) peixinho(x, y, L, a, r() < 0.6 ? '#e2e4da' : '#b8beb2');
+      for (const [x, y, L, a] of ps) peixe(x, y, L, a, r() < 0.7);
       k.restore();
     };
-    // um barco visto de lado e um pouco de cima, fundo na água: a borda de lá, o miolo cheio de
-    // peixe, a borda de cá, e só uma faixa estreita do costado acima da água (5.7)
-    const barco = (bx, by, L, e) => {
-      k.save();
-      k.translate(bx, by);
-      k.scale(e, e);
-      const fundo = 46;
-      const sobe = (t) => -Math.pow(1 - t, 4) * 60 - Math.pow(t, 4) * 80;
-      const cá = (t) => -22 + sobe(t);
-      const lá = (t) => -22 - fundo * Math.sin(t * Math.PI) * 0.9 + sobe(t) * 1.1;
-      const N = 40;
-      const xt = (t) => -L / 2 + t * L;
-      // o costado de cá, acima da água (a água chega a poucos dedos da borda)
-      const costado = pol([...Array.from({ length: N + 1 }, (_, i) => [xt(i / N), cá(i / N)]), ...Array.from({ length: N + 1 }, (_, i) => { const t = 1 - i / N; return [xt(t), 6 + Math.sin(t * 25) * 1.5]; })]);
-      // o miolo, entre as duas bordas, com o monte de peixe que passa da borda
-      const miolo = pol([...Array.from({ length: N + 1 }, (_, i) => [xt(i / N), lá(i / N)]), ...Array.from({ length: N + 1 }, (_, i) => { const t = 1 - i / N; return [xt(t), cá(t)]; })]);
-      const monte = pol([...Array.from({ length: N + 1 }, (_, i) => { const t = i / N; return [xt(t), lá(t) - Math.sin(t * Math.PI) * 26 + 6]; }), ...Array.from({ length: N + 1 }, (_, i) => { const t = 1 - i / N; return [xt(t), cá(t)]; })]);
-      k.fillStyle = '#4a3624';
+    // um barco de pesca aberto, de três quartos: de S (popa) a B (proa), a boca de largura b;
+    // a borda de cá embaixo, a de lá em cima, as pontas subindo; tão fundo que a água chega
+    // quase na borda
+    const barco = (S, B, b, sobeS, sobeB, bordo) => {
+      const A = (t) => [S[0] + (B[0] - S[0]) * t, S[1] + (B[1] - S[1]) * t];
+      const forma = (t) => Math.pow(Math.max(0, Math.sin(Math.PI * t)), 0.62);
+      const sobe = (t) => sobeS * Math.pow(1 - t, 3) + sobeB * Math.pow(t, 3);
+      const N = (t) => { const [x, y] = A(t); return [x, y + b * forma(t) - sobe(t)]; };
+      const F = (t) => { const [x, y] = A(t); return [x, y - b * 0.82 * forma(t) - sobe(t)]; };
+      // a linha d'água é mais curta que a borda: a proa e a popa avançam por cima da água
+      const Wl = (t) => { const t2 = 0.07 + t * 0.86; const [x, y] = N(t2); return [x, y + bordo * (0.6 + forma(t2) * 0.4) + sobe(t2) * 0.9]; };
+      const ts = Array.from({ length: 49 }, (_, i) => i / 48);
+      return { A, N, F, Wl, ts, miolo: pol([...ts.map(F), ...ts.slice().reverse().map(N)]), costado: pol([...ts.map(N), ...ts.slice().reverse().map(Wl)]) };
+    };
+    const desenhaBarco = (bc, { escala, peixes, Lp, bancos, mastro }) => {
+      const { N, F, Wl, ts, miolo, costado } = bc;
+      // por dentro: o costado de lá, em tábuas, e o fundo cheio de peixe
+      k.fillStyle = '#4a3420';
       k.fill(miolo);
-      // a borda de lá, por dentro
-      k.strokeStyle = '#86683e';
-      k.lineWidth = 7;
-      k.beginPath();
-      for (let i = 0; i <= N; i++) { const t = i / N; if (i) k.lineTo(xt(t), lá(t)); else k.moveTo(xt(t), lá(t)); }
-      k.stroke();
-      monteDePeixe(monte, -L / 2, -110, L / 2, -10, Math.round(L * 0.5), 30);
-      marcar(k, obj, monte);
-      k.strokeStyle = '#140e08';
-      k.lineWidth = 2;
-      k.beginPath();
-      for (let i = 0; i <= N; i++) { const t = i / N; if (i) k.lineTo(xt(t), lá(t) - 3); else k.moveTo(xt(t), lá(t) - 3); }
-      k.stroke();
-      // o costado de cá
-      k.fillStyle = '#3a2a1c';
-      k.fill(costado);
-      gravar(k, costado, 0, -10, L / 2, 0.02, 3, 1.4, () => 0.6, '#140a04', 0);
-      marcar(k, obj, costado);
-      // a borda de cá (a falca), clara
-      k.strokeStyle = '#140e08';
-      k.lineWidth = 9;
-      k.beginPath();
-      for (let i = 0; i <= N; i++) { const t = i / N; if (i) k.lineTo(xt(t), cá(t)); else k.moveTo(xt(t), cá(t)); }
-      k.stroke();
-      k.strokeStyle = '#a2825a';
-      k.lineWidth = 6;
-      k.stroke();
-      // a proa e a popa: as pontas que sobem, fechando as duas bordas
-      for (const t of [0, 1]) { k.strokeStyle = '#140e08'; k.lineWidth = 3; k.beginPath(); k.moveTo(xt(t), cá(t)); k.lineTo(xt(t), lá(t)); k.stroke(); }
-      // a linha d'água rente e as ondinhas batendo no costado
-      k.strokeStyle = 'rgba(250,250,240,.9)';
-      k.lineWidth = 2;
-      k.beginPath();
-      for (let i = 0; i <= N; i++) { const t = i / N; const y = 6 + Math.sin(t * 25) * 1.5; if (i) k.lineTo(xt(t), y); else k.moveTo(xt(t), y); }
-      k.stroke();
-      for (let y = 10; y < 46; y += 5) {
-        let x = -L / 2 + 10 + r() * 20;
-        while (x < L / 2 - 10) { const c = 10 + r() * 30; if (r() < 0.7) { k.strokeStyle = 'rgba(40,30,20,' + (0.75 - (y - 10) / 60).toFixed(2) + ')'; k.lineWidth = 2.4; k.beginPath(); k.moveTo(x, y); k.lineTo(x + c, y); k.stroke(); } x += c + 6 + r() * 14; }
-      }
-      k.restore();
-      return (t) => [bx + e * xt(t), by + e * cá(t)];
-    };
-    // o outro barco, que veio ajudar, logo ali
-    barco(560, 330, 520, 0.8);
-    // a borda do nosso barco, em diagonal; embaixo dela, o fundo do barco; em cima, o lago, já
-    // rente à borda
-    const borda = (x) => 700 - x * 0.17;
-    const dentro = pol([[-20, borda(-20)], [W + 20, borda(W + 20)], [W + 20, H + 20], [-20, H + 20]]);
-    k.fillStyle = '#6e4e30';
-    k.fill(dentro);
-    marcar(k, obj, dentro);
-    k.save();
-    k.clip(dentro);
-    // as tábuas do fundo, que fogem para longe, e as cavernas de través
-    for (let i = -6; i < 16; i++) {
-      k.strokeStyle = 'rgba(30,16,6,.85)';
-      k.lineWidth = 1.8;
-      k.beginPath();
-      k.moveTo(-200 + i * 80, H + 20);
-      k.lineTo(200 + i * 46, borda(200 + i * 46));
-      k.stroke();
-    }
-    gravar(k, dentro, 440, 760, 520, 0.4, 3.4, 1.6, (x, y) => 0.4 + (borda(x) - y) / -600, '#1e1006', 0);
-    for (const x0 of [140, 520]) vara(k, [[x0 - 90, H + 20], [x0 + 40, borda(x0 + 40) + 10]], 22, '#8e6a42');
-    k.restore();
-    // o lago encostado na borda, por fora: as ondinhas que batem e passam um pouco por cima
-    k.strokeStyle = 'rgba(250,250,240,.9)';
-    k.lineCap = 'round';
-    for (let x = -10; x < W + 10; x += 22 + r() * 12) {
-      const y = borda(x) - 16;
-      k.lineWidth = 1.8;
-      k.beginPath();
-      k.moveTo(x - 10, y + 3);
-      k.quadraticCurveTo(x, y - 3, x + 12, y + 2);
-      k.stroke();
-    }
-    // a borda (a falca), grossa, com a luz em cima, e a rede apertada nela
-    const falca = curvaPor([[-30, borda(-30)], [W + 30, borda(W + 30)]], 4);
-    const { forma: falcaF } = tuboAo(falca, () => 30);
-    k.fillStyle = '#9a7650';
-    k.fill(falcaF);
-    gravar(k, falcaF, 440, borda(440), 500, -0.17, 3, 1.4, (x, y) => 0.25 + (y - borda(x) + 15) / 30 * 0.6, '#1e1006', 0);
-    k.strokeStyle = '#140a02';
-    k.lineWidth = 2.2;
-    k.stroke(falcaF);
-    k.strokeStyle = 'rgba(255,236,196,.7)';
-    k.lineWidth = 2;
-    k.beginPath();
-    k.moveTo(-30, borda(-30) - 10);
-    k.lineTo(W + 30, borda(W + 30) - 10);
-    k.stroke();
-    marcar(k, obj, falcaF);
-    // a rede: o saco cheio de peixe, que vem da água e passa por cima da borda, derramando no
-    // fundo; a malha esticada por cima e dois rasgos
-    const saco = new Path2D();
-    saco.moveTo(350, borda(350));
-    saco.bezierCurveTo(280, borda(300) - 20, 200, 540, 240, 470);
-    saco.bezierCurveTo(280, 400, 420, 390, 540, 396);
-    saco.bezierCurveTo(680, 404, 790, 450, 790, 510);
-    saco.bezierCurveTo(790, 550, 700, borda(660) - 30, 640, borda(640));
-    saco.bezierCurveTo(700, borda(700) + 30, 760, 700, 700, 760);
-    saco.bezierCurveTo(640, 810, 460, 820, 360, 790);
-    saco.bezierCurveTo(260, 760, 280, 690, 320, borda(320) + 34);
-    saco.bezierCurveTo(336, borda(336) + 14, 346, borda(346) + 6, 350, borda(350));
-    saco.closePath();
-    k.save();
-    k.filter = 'blur(10px)';
-    k.fillStyle = 'rgba(20,14,8,.45)';
-    k.translate(10, 14);
-    k.fill(saco);
-    k.restore();
-    monteDePeixe(saco, 180, 380, 820, 830, 520, 54);
-    marcar(k, obj, saco);
-    // a parte que está na água, mais escura e com as ondinhas por cima da beirada de lá
-
-    const furos = [[700, 486, 40], [320, 476, 32]];
-    const fora = (x, y) => furos.every(([fx, fy, fr]) => Math.hypot(x - fx, (y - fy) * 1.3) > fr);
-    k.save();
-    k.clip(saco);
-    k.strokeStyle = 'rgba(40,34,22,.6)';
-    k.lineWidth = 1.2;
-    for (let d = -1200; d < 1200; d += 32) {
-      for (const sgn of [1, -1]) {
-        k.beginPath();
-        let ini = true;
-        for (let t = 0; t <= 1; t += 0.005) {
-          const x = 180 + t * 640;
-          const y = 600 + sgn * (x - 500) * 0.7 + d * 0.5 - Math.sin(t * Math.PI) * 40;
-          if (!fora(x, y)) { ini = true; continue; }
-          if (ini) { k.moveTo(x, y); ini = false; } else k.lineTo(x, y);
-        }
-        k.stroke();
-      }
-    }
-    // o volume: a sombra de baixo e dos lados, em hachura
-    gravar(k, saco, 500, 600, 400, 0.6, 4.4, 1.4, (x, y) => Math.max(0, (y - 620) / 260) + Math.max(0, Math.abs(x - 500) - 220) / 200, '#1e1a12', 0);
-    k.restore();
-    k.strokeStyle = '#3a2410';
-    k.lineWidth = 3.2;
-    k.stroke(saco);
-    // onde a rede dobra por cima da falca: a madeira aparece entre os fios esticados
-    k.save();
-    k.clip(saco);
-    const cinta = pol([[300, borda(300) - 14], [700, borda(700) - 14], [700, borda(700) + 14], [300, borda(300) + 14]]);
-    k.fillStyle = 'rgba(154,118,80,.8)';
-    k.fill(cinta);
-    k.strokeStyle = 'rgba(30,20,8,.9)';
-    k.lineWidth = 1.6;
-    k.beginPath();
-    k.moveTo(300, borda(300) - 14);
-    k.lineTo(700, borda(700) - 14);
-    k.moveTo(300, borda(300) + 14);
-    k.lineTo(700, borda(700) + 14);
-    k.stroke();
-    k.strokeStyle = 'rgba(40,30,14,.9)';
-    k.lineWidth = 2;
-    for (let x = 340; x < 660; x += 11) { k.beginPath(); k.moveTo(x - 4, borda(x) - 22); k.quadraticCurveTo(x + 2, borda(x), x + 6, borda(x) + 22); k.stroke(); }
-    k.restore();
-    // os rasgos: a água aparece pelo buraco, os fios rompidos em volta e os peixes escapando
-    for (const [fx, fy, fr] of furos) {
-      const h = seixo(r, fx, fy, fr, fr / 1.3, 0.2, 0.2);
-      k.fillStyle = '#d2cfb8';
-      k.fill(h);
       k.save();
-      k.clip(h);
-      k.strokeStyle = SEPIA;
+      k.clip(miolo);
+      const ladoLa = pol([...ts.map(F), ...ts.slice().reverse().map((t) => { const [x, y] = F(t); return [x, y + 26 * escala]; })]);
+      k.fillStyle = '#8a6a44';
+      k.fill(ladoLa);
+      gravar(k, ladoLa, (F(0.5)[0]), F(0.5)[1] + 12 * escala, 500 * escala, -0.12, 2.8, 1.3, (x) => 0.55 - (x - F(0)[0]) / 1600, '#1e1006', 0);
+      k.strokeStyle = 'rgba(30,16,6,.8)';
       k.lineWidth = 1.2;
-      for (let y = fy - fr; y < fy + fr; y += 5) { let x = fx - fr + r() * 8; while (x < fx + fr) { const c = 8 + r() * 14; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2, x + c, y); k.stroke(); x += c + 5 + r() * 8; } }
+      for (const f of [0.35, 0.7]) { k.beginPath(); ts.forEach((t, i) => { const [x, y] = F(t); if (i) k.lineTo(x, y + 26 * escala * f); else k.moveTo(x, y + 26 * escala * f); }); k.stroke(); }
+      const monte = pol([...ts.map((t) => { const [x, y] = F(t); return [x, y + 18 * escala]; }), ...ts.slice().reverse().map(N)]);
+      cardume(monte, F(0)[0], F(0.5)[1] - 10, N(1)[0], N(0.5)[1] + 10, peixes, Lp, '#4a4a3c');
+      gravar(k, monte, N(0.5)[0], N(0.5)[1], 520 * escala, 0.5, 3.4, 1.3, (x, y) => (y - F(0.5)[1]) / (N(0.5)[1] - F(0.5)[1]) * 0.6 - 0.1, '#1a1a12', 0);
       k.restore();
-    }
-    for (const [fx, fy, fr] of furos) {
-      k.strokeStyle = 'rgba(30,26,18,.95)';
-      k.lineWidth = 1.7;
-      for (let i = 0; i < 16; i++) {
-        const a = (i / 16) * 6.283 + r() * 0.2;
-        const x = fx + Math.cos(a) * fr;
-        const y = fy + Math.sin(a) * fr / 1.3;
+      // os bancos de través, de borda a borda
+      for (const t of bancos) {
+        const d = 0.018;
+        const q = [N(t - d), N(t + d), F(t + d), F(t - d)].map(([x, y], i) => [x, y + (i < 2 ? -3 : 6) * escala]);
+        const banco = pol(q);
+        k.fillStyle = '#a8845a';
+        k.fill(banco);
+        gravar(k, banco, (q[0][0] + q[2][0]) / 2, (q[0][1] + q[2][1]) / 2, 120 * escala, Math.atan2(q[2][1] - q[1][1], q[2][0] - q[1][0]), 2.8, 1.2, () => 0.35, '#1e1006', 0);
+        const frente = pol([q[0], q[1], [q[1][0], q[1][1] + 6 * escala], [q[0][0], q[0][1] + 6 * escala]]);
+        k.fillStyle = '#3a2614';
+        k.fill(frente);
+        k.strokeStyle = '#140a02';
+        k.lineWidth = 1.4;
+        k.stroke(banco);
+      }
+      if (mastro) mastro();
+      // a borda de lá, por cima
+      k.lineCap = 'round';
+      k.lineJoin = 'round';
+      k.strokeStyle = '#140a02';
+      k.lineWidth = 8 * escala;
+      k.beginPath();
+      ts.forEach((t, i) => { const [x, y] = F(t); if (i) k.lineTo(x, y); else k.moveTo(x, y); });
+      k.stroke();
+      k.strokeStyle = '#b08c5e';
+      k.lineWidth = 5 * escala;
+      k.stroke();
+      // o costado de cá, por fora: as fiadas de tábua, escuro, molhado em baixo
+      k.fillStyle = '#5a3e24';
+      k.fill(costado);
+      gravar(k, costado, N(0.5)[0], N(0.5)[1] + 10, 520 * escala, Math.atan2(N(0.6)[1] - N(0.4)[1], N(0.6)[0] - N(0.4)[0]), 2.6, 1.5, () => 0.6, '#140a04', 0);
+      k.strokeStyle = 'rgba(20,10,2,.9)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      ts.forEach((t, i) => { const [x, y] = N(t); const [, y2] = Wl(t); if (i) k.lineTo(x, (y + y2) / 2); else k.moveTo(x, (y + y2) / 2); });
+      k.stroke();
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.8;
+      k.stroke(costado);
+      // a roda de proa e o cadaste: as pontas que fecham as bordas, lançadas para fora, e o
+      // topo da roda um pouco acima da borda
+      for (const t of [0, 1]) {
+        const [wx, wy] = Wl(t);
+        const [nx, ny] = N(t);
+        k.strokeStyle = '#140a02';
+        k.lineWidth = 6 * escala;
         k.beginPath();
-        k.moveTo(x, y);
-        k.quadraticCurveTo(x - Math.cos(a) * 8 + (r() - 0.5) * 10, y - Math.sin(a) * 6, x - Math.cos(a) * (12 + r() * 12), y - Math.sin(a) * (8 + r() * 8) + 6);
+        k.moveTo(wx, wy);
+        k.lineTo(nx, ny);
+        k.lineTo(nx + (t ? 6 : -6) * escala, ny - 14 * escala);
+        k.stroke();
+      }
+      // a linha d'água rente e as ondinhas que batem no costado
+      k.strokeStyle = 'rgba(250,250,240,.9)';
+      k.lineWidth = 1.6;
+      k.beginPath();
+      ts.forEach((t, i) => { const [x, y] = Wl(t); if (i) k.lineTo(x, y + Math.sin(t * 40) * 1.4); else k.moveTo(x, y); });
+      k.stroke();
+      marcar(k, obj, miolo);
+      marcar(k, obj, costado);
+    };
+    const bordaCa = (bc, escala) => {
+      const { N, ts } = bc;
+      k.lineCap = 'round';
+      k.lineJoin = 'round';
+      k.strokeStyle = '#140a02';
+      k.lineWidth = 11 * escala;
+      k.beginPath();
+      ts.forEach((t, i) => { const [x, y] = N(t); if (i) k.lineTo(x, y); else k.moveTo(x, y); });
+      k.stroke();
+      k.strokeStyle = '#b8946a';
+      k.lineWidth = 7.4 * escala;
+      k.stroke();
+      k.strokeStyle = 'rgba(255,240,210,.7)';
+      k.lineWidth = 2 * escala;
+      k.beginPath();
+      ts.forEach((t, i) => { const [x, y] = N(t); if (i) k.lineTo(x, y - 2 * escala); else k.moveTo(x, y - 2 * escala); });
+      k.stroke();
+      marcar(k, obj, pol([...ts.map((t) => { const [x, y] = N(t); return [x, y - 7 * escala]; }), ...ts.slice().reverse().map((t) => { const [x, y] = N(t); return [x, y + 7 * escala]; })]));
+    };
+    // o outro barco, lá atrás, de proa para a esquerda e um pouco para cá, com o mastro e a
+    // vela enrolada na verga
+    const outro = barco([330, 304], [100, 318], 30, 30, 48, 8);
+    desenhaBarco(outro, {
+      escala: 0.4, peixes: 320, Lp: 12, bancos: [0.3, 0.62],
+      mastro: () => {
+        const [mx, my] = outro.A(0.62);
+        const topoM = [mx + 4, my - 168];
+        k.lineCap = 'round';
+        k.strokeStyle = '#140a02';
+        k.lineWidth = 5.4;
+        k.beginPath();
+        k.moveTo(mx, my);
+        k.lineTo(...topoM);
+        k.stroke();
+        k.strokeStyle = '#a07c50';
+        k.lineWidth = 3;
+        k.stroke();
+        // a verga inclinada, com a vela enrolada nela: um rolo torto amarrado em voltas
+        const v0 = [mx - 94, my - 70];
+        const v1 = [mx + 70, my - 160];
+        const enrolada = curvaPor([v0, [mx - 10, my - 112], v1], 3);
+        const { forma } = tuboAo(enrolada, (s) => 6 + Math.sin(s * 0.09) * 2.4 + Math.min(1, s / 30) * 4 * Math.min(1, (190 - s) / 30));
+        k.fillStyle = '#e6dcc0';
+        k.fill(forma);
+        gravar(k, forma, mx, my - 115, 110, 1.0, 2.4, 1.1, (x, y) => 0.25 + (y - (my - 160)) / 200, '#3a2a14', 0);
+        k.strokeStyle = '#2a1c0c';
+        k.lineWidth = 1.4;
+        k.stroke(forma);
+        for (let s = 18; s < 180; s += 26) {
+          const q = enrolada[Math.min(enrolada.length - 1, Math.round(s / 3))];
+          k.beginPath();
+          k.moveTo(q.x + q.ty * 9, q.y - q.tx * 9);
+          k.lineTo(q.x - q.ty * 9, q.y + q.tx * 9);
+          k.stroke();
+        }
+        marcar(k, obj, forma);
+        // os cabos: do topo à proa e à popa, finos
+        k.strokeStyle = 'rgba(30,20,8,.75)';
+        k.lineWidth = 1;
+        k.beginPath();
+        k.moveTo(...topoM);
+        k.lineTo(...outro.F(0.02));
+        k.moveTo(...topoM);
+        k.lineTo(...outro.N(0.98));
+        k.stroke();
+        marcar(k, obj, pol([[mx - 4, my], [topoM[0] - 4, topoM[1]], [topoM[0] + 4, topoM[1]], [mx + 4, my]]));
+      },
+    });
+    bordaCa(outro, 0.4);
+    // o nosso barco, de perto: a popa sai pela esquerda, a proa sobe à direita
+    const nosso = barco([70, 640], [826, 500], 112, 70, 120, 16);
+    desenhaBarco(nosso, { escala: 1, peixes: 700, Lp: 30, bancos: [0.22, 0.5, 0.78] });
+    // a rede: o saco de malha que vem da água, sobe pelo costado e passa por cima da borda de
+    // cá; a parte de dentro derrama sobre o peixe do barco. A malha é desenhada num pano que
+    // estufa: os fios se apertam nas beiradas, como numa bola.
+    const t0 = 0.3;
+    const t1 = 0.7;
+    const P0 = nosso.N(t0);
+    const P1 = nosso.N(t1);
+    const fundo = 128;
+    const meiaL = (v) => (P1[0] - P0[0]) / 2 * (1 + 0.12 * Math.sin(Math.PI * Math.min(1, v * 1.15))) * (v > 0.7 ? 1 - (v - 0.7) * 0.9 : 1);
+    const meioX = (P0[0] + P1[0]) / 2 + 14;
+    const sacoXY = (u, v) => {
+      const x = meioX + meiaL(v) * Math.sin((u - 0.5) * Math.PI * 0.86) / Math.sin(0.43 * Math.PI);
+      const yTop = P0[1] + (P1[1] - P0[1]) * u;
+      const y = yTop + fundo * Math.pow(v, 0.92) + Math.sin(Math.PI * u) * 34 * v;
+      return [x, y];
+    };
+    // o contorno, com as bolotas dos peixes que forçam a malha
+    const borda = [];
+    for (let v = 0; v <= 1.0001; v += 0.04) borda.push(sacoXY(0, v));
+    for (let u = 0; u <= 1.0001; u += 0.04) borda.push(sacoXY(u, 1));
+    for (let v = 1; v >= -0.0001; v -= 0.04) borda.push(sacoXY(1, v));
+    const bolotas = borda.map(([x, y], i) => {
+      const c = [meioX, P0[1] + fundo * 0.5];
+      const d = Math.hypot(x - c[0], y - c[1]) || 1;
+      const b2 = Math.pow(Math.abs(Math.sin(i * 0.42 + 0.6)), 1.5) * 12;
+      return [x + (x - c[0]) / d * b2, y + (y - c[1]) / d * b2];
+    });
+    const saco = contornoRocha(r, [...bolotas, P0], 1);
+    saco.closePath();
+    // a parte de dentro do barco: a rede que passou por cima da borda e escorre no peixe
+    const dentroR = contornoRocha(r, [P0, [P0[0] + 16, P0[1] - 40], [P0[0] + 80, P0[1] - 64], [meioX - 40, P0[1] - 58], [meioX + 30, P0[1] - 80], [P1[0] - 70, P1[1] - 66], [P1[0] - 14, P1[1] - 40], P1], 6);
+    dentroR.closePath();
+    // o rasgo, na beirada de baixo à direita: um buraco torto aberto no pano (em u, v)
+    const rasgo = (u, v) => {
+      const du = (u - 0.88) / 0.17;
+      const dv = (v - 0.7) / 0.24;
+      return du * du + dv * dv + Math.sin(u * 40) * 0.15 + Math.sin(v * 31) * 0.12 < 1;
+    };
+    // a malha: fio de cânhamo claro de beirada escura, cruzado em losango, com os nós
+    const malha = (forma, mapa, passo) => {
+      k.save();
+      k.clip(forma);
+      k.lineCap = 'round';
+      const fios = [];
+      for (const sgn of [1, -1]) {
+        for (let c = -1; c <= 2.0001; c += passo) {
+          let fio = [];
+          for (let s2 = 0; s2 <= 1.0001; s2 += 0.01) {
+            const u = s2;
+            const v = c + sgn * (s2 - 0.5);
+            if (v < -0.02 || v > 1.02 || (mapa === sacoXY && rasgo(u, v))) { if (fio.length > 1) fios.push(fio); fio = []; continue; }
+            fio.push(mapa(u, v));
+          }
+          if (fio.length > 1) fios.push(fio);
+        }
+      }
+      for (const [lw, cor] of [[2.4, 'rgba(30,22,10,.9)'], [1.1, '#d8c8a0']]) {
+        k.strokeStyle = cor;
+        k.lineWidth = lw;
+        for (const fio of fios) {
+          k.beginPath();
+          fio.forEach(([x, y], i) => (i ? k.lineTo(x, y) : k.moveTo(x, y)));
+          k.stroke();
+        }
+      }
+      for (let a2 = -1; a2 <= 2; a2 += passo) {
+        for (let b2 = -1; b2 <= 2; b2 += passo) {
+          const u = (a2 + b2) / 2 + 0.5;
+          const v = (a2 - b2) / 2 + 0.5;
+          if (u < 0 || u > 1 || v < 0 || v > 1 || (mapa === sacoXY && rasgo(u, v))) continue;
+          const [x, y] = mapa(u, v);
+          k.fillStyle = 'rgba(30,22,10,.95)';
+          k.beginPath();
+          k.arc(x, y, 2.3, 0, 6.283);
+          k.fill();
+          k.fillStyle = '#e2d4b0';
+          k.beginPath();
+          k.arc(x - 0.4, y - 0.4, 1.3, 0, 6.283);
+          k.fill();
+        }
+      }
+      k.restore();
+    };
+    // por dentro: o peixe derramado e a malha por cima
+    cardume(dentroR, P0[0] - 20, P0[1] - 100, P1[0] + 20, P1[1] + 10, 160, 32, '#3a3e34');
+    const mapaDentro = (u, v) => [P0[0] + (P1[0] - P0[0]) * u + Math.sin(Math.PI * u) * 10, P0[1] + (P1[1] - P0[1]) * u - 84 * (1 - v) * Math.pow(Math.sin(Math.PI * (0.1 + u * 0.8)), 0.7) + 4];
+    malha(dentroR, mapaDentro, 0.14);
+    k.strokeStyle = '#2a1c0c';
+    k.lineWidth = 1.8;
+    k.stroke(dentroR);
+    marcar(k, obj, dentroR);
+    // por fora: o saco cheio, pendurado no costado; a sombra dele no casco
+    cardume(saco, P0[0] - 80, P0[1] - 20, P1[0] + 80, P1[1] + fundo + 60, 300, 40, '#2e3430');
+    // o volume do saco: a barriga de baixo e as beiradas na sombra, em hachura
+    k.save();
+    k.clip(saco);
+    gravar(k, saco, meioX, P0[1] + fundo * 0.5, 300, 0.5, 3.4, 1.6, (x, y) => {
+      const u = (x - meioX) / (meiaL(0.5) * 1.1);
+      return Math.pow(Math.abs(u), 3) * 0.7 + Math.max(0, (y - P0[1] - fundo * 0.65) / fundo) * 0.7;
+    }, '#141a14', 0);
+    k.restore();
+    malha(saco, sacoXY, 0.11);
+    // o pé do saco ainda na água: o lago passa por cima, em véu e ondinhas
+    const linhaDagua = (x) => nosso.Wl(Math.max(0, Math.min(1, (x - 70) / 756)))[1] + 54;
+    k.save();
+    k.clip(saco);
+    const abaixo = pol([[0, linhaDagua(0)], ...Array.from({ length: 30 }, (_, i) => [i * 30, linhaDagua(i * 30)]), [W, H], [0, H]]);
+    k.clip(abaixo);
+    k.fillStyle = 'rgba(206,204,184,.4)';
+    k.fill(saco);
+    k.strokeStyle = 'rgba(43,33,18,.7)';
+    k.lineCap = 'round';
+    for (let y = P0[1]; y < P0[1] + fundo + 60; y += 6) {
+      let x = P0[0] - 80 + r() * 20;
+      while (x < P1[0] + 80) { const c = 14 + r() * 30; k.lineWidth = 1.2; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2, x + c, y); k.stroke(); x += c + 8 + r() * 14; }
+    }
+    k.restore();
+    k.strokeStyle = '#1e160a';
+    k.lineWidth = 2.4;
+    k.stroke(saco);
+    marcar(k, obj, saco);
+    // a beirada do rasgo: os fios rompidos, soltos para dentro do buraco e para baixo, de
+    // tamanhos desencontrados
+    k.lineCap = 'round';
+    for (let i = 0; i < 22; i++) {
+      const a = r() * 6.283;
+      let u = 0.88 + Math.cos(a) * 0.17;
+      let v = 0.7 + Math.sin(a) * 0.24;
+      for (let j = 0; j < 10 && rasgo(u, v); j++) { u += Math.cos(a) * 0.02; v += Math.sin(a) * 0.02; }
+      if (u > 1 || v > 1) continue;
+      const [x, y] = sacoXY(u, v);
+      const L = 10 + r() * 18;
+      const pts = [[x, y], [x - Math.cos(a) * L * 0.5 + (r() - 0.5) * 8, y - Math.sin(a) * L * 0.4 + 6], [x - Math.cos(a) * L + (r() - 0.5) * 6, y - Math.sin(a) * L * 0.6 + 14]];
+      for (const [lw, cor] of [[2.4, 'rgba(30,22,10,.9)'], [1.1, '#d8c8a0']]) {
+        k.strokeStyle = cor;
+        k.lineWidth = lw;
+        k.beginPath();
+        k.moveTo(...pts[0]);
+        k.quadraticCurveTo(...pts[1], ...pts[2]);
         k.stroke();
       }
     }
-    for (const [x, y, a] of [[790, 476, -0.4], [812, 500, 0.2], [776, 450, -0.9], [262, 500, -2.6], [246, 520, -3.0]]) {
-      peixinho(x, y, 32, a, '#ccd0c4');
-      k.strokeStyle = 'rgba(250,250,240,.9)';
-      k.lineWidth = 1.3;
+    // os peixes que escapam pelo rasgo, de volta à água: meio de fora, de cabeça para baixo,
+    // e as marolas partidas onde caem
+    const [rx0, ry0] = sacoXY(0.9, 0.78);
+    for (const [dx, dy, L, a] of [[18, 10, 44, 1.2], [44, 30, 40, 0.7], [70, 58, 38, 1.5], [30, 66, 36, 0.4], [86, 20, 34, 0.9]]) {
+      const x = rx0 + dx;
+      const y = ry0 + dy;
+      peixe(x, y, L, a, 1);
+      k.strokeStyle = 'rgba(43,33,18,.75)';
+      k.lineWidth = 1.2;
+      for (let i = 0; i < 3; i++) {
+        const w = L * (0.4 + i * 0.3);
+        const a0 = 0.3 + r() * 0.5;
+        k.beginPath();
+        k.ellipse(x + Math.cos(a) * L * 0.4, y + Math.sin(a) * L * 0.4 + 4, w, w * 0.22, 0, a0, Math.PI - a0 - r() * 0.5);
+        k.stroke();
+      }
+      marcar(k, obj, pol([[x - L / 2, y - L / 2], [x + L / 2, y - L / 2], [x + L / 2, y + L / 2], [x - L / 2, y + L / 2]]));
+    }
+    // a borda de cá passa por cima da rede, e a malha se dobra sobre ela
+    bordaCa(nosso, 1);
+    k.save();
+    k.strokeStyle = 'rgba(30,22,10,.95)';
+    k.lineWidth = 1.6;
+    k.lineCap = 'round';
+    for (let t = t0 + 0.006; t < t1; t += 0.009) {
+      const [x, y] = nosso.N(t);
       k.beginPath();
-      k.moveTo(x - 14, y + 16);
-      k.quadraticCurveTo(x, y + 10, x + 14, y + 16);
+      k.moveTo(x - 3, y - 9);
+      k.quadraticCurveTo(x + 2, y, x + 4, y + 9);
       k.stroke();
     }
+    k.restore();
     vinheta(k, W, H, 0.2);
   }
 
