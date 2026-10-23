@@ -2227,6 +2227,11 @@
     papelVelho(k, W, H, r, ['#fbf1d8', '#ecdcb6', '#cdb88a'], [90, 150]);
     // o céu da manhã: linhas finas, que somem perto da luz que vem da esquerda (sem sol)
     linhas(k, 0, 0, W, 330, 4.8, 1.3, (x, y) => 0.1 + Math.min(1, Math.hypot(x - 60, (y - 200) * 1.6) / 900) * 0.55);
+    // a cena um pouco mais perto (a boca e a pedra maiores, menos chão vazio)
+    k.save();
+    k.translate(440, 330);
+    k.scale(1.1, 1.1);
+    k.translate(-440, -330);
     // os morros de longe, baixos, à esquerda
     const fL = onda(sorteio(4620), 4, 0.012);
     const longe = pol([[-10, 300], ...Array.from({ length: 24 }, (_, i) => [i * 16 - 6, 250 - Math.max(0, fL(i * 16)) * 14 - i * 1.2]), [380, 300]]);
@@ -2241,53 +2246,62 @@
     k.fillStyle = '#e4cf9f';
     k.fill(rocha);
     marcar(k, obj, rocha);
-    // as camadas: faixas deitadas e onduladas, um pouco caídas para a direita, com as juntas
-    const nC = 9;
-    const curvas = Array.from({ length: nC + 1 }, (_, i) => {
-      const b = 150 + i * 52 + (i > 5 ? (i - 5) * 6 : 0);
-      const fq = onda(sorteio(4640 + i), 3, 0.008);
-      return (x) => b + x * 0.035 + fq(x) * (6 + i * 0.8);
-    });
-    const luzRocha = (x, y) => 0.18 + Math.max(0, (x - 120) / 900) * 0.55 + (y - 200) / 1600;
-    hachuraEmFaixas(k, r, rocha, -20, W + 20, curvas, 3, 1.8, luzRocha, SEPIA, { quebra: 0.07, juntas: 0 });
-    // o beiral: a sombra curta logo abaixo de cada camada que avança, e uma ou outra fenda torta
+    // o calcário em bancadas: camadas de espessuras bem diferentes, de beiradas onduladas e
+    // gastas (o traço da beirada falha aqui e ali), umas afinando até sumir; a hachura inclinada
+    // corre por toda a rocha e escurece no recuo logo abaixo de cada bancada que avança; poucas
+    // fraturas compridas atravessam várias bancadas de uma vez, com a lasca clara de um lado
+    const bases = [168, 214, 300, 336, 420, 506, 552, 640];
+    const curvas = bases.map((b, i) => { const fq = onda(sorteio(4640 + i), 4, 0.007); return (x) => b + x * 0.028 + fq(x) * (9 + i * 1.2); });
+    const recuo = (x, y) => { let d = 1; for (const c of curvas) { const t = y - c(x); if (t > 0 && t < 22) d = Math.min(d, t / 22); } return 1 - d; };
+    const ruidoR = onda(sorteio(4660), 3, 0.004);
+    const luzRocha = (x, y) => 0.2 + Math.max(0, (x - 120) / 900) * 0.45 + (y - 200) / 1800 + ruidoR(x + y) * 0.05;
     k.save();
     k.clip(rocha);
-    for (let i = 1; i < curvas.length; i++) {
-      const c = curvas[i];
-      for (let x = -20; x < W + 20; x += 4) {
-        const d = Math.max(0, Math.sin(x * 0.011 + i * 1.7) + Math.sin(x * 0.027 + i)) * 0.5;
-        if (d < 0.25) continue;
-        k.strokeStyle = 'rgba(43,33,18,' + (0.25 + d * 0.4).toFixed(2) + ')';
-        k.lineWidth = 1 + d * 1.6;
+    gravar(k, rocha, W / 2, 400, 620, 0.78, 4.2, 1.8, (x, y) => luzRocha(x, y) + recuo(x, y) * 0.5, SEPIA, 0);
+    gravar(k, rocha, W / 2, 400, 620, 2.0, 5.4, 1.3, (x, y) => (luzRocha(x, y) - 0.45) * 1.4 + recuo(x, y) * 0.6, SEPIA, 0);
+    k.lineCap = 'round';
+    for (const c of curvas) {
+      // a beirada de cima da bancada pega a luz; a de baixo, em traço firme que falha
+      let x = -20;
+      while (x < W + 20) {
+        const L = 60 + r() * 220;
+        k.strokeStyle = SEPIA;
+        k.lineWidth = 1.4 + r() * 1.2;
         k.beginPath();
-        k.moveTo(x, c(x) + 2);
-        k.lineTo(x + 2, c(x) + 4 + d * 7);
+        for (let xx = x; xx <= Math.min(W + 20, x + L); xx += 8) { const y = c(xx) + (r() - 0.5) * 1.4; if (xx === x) k.moveTo(xx, y); else k.lineTo(xx, y); }
         k.stroke();
+        k.strokeStyle = 'rgba(255,246,220,.65)';
+        k.lineWidth = 1.3;
+        k.beginPath();
+        for (let xx = x + 6; xx <= Math.min(W + 20, x + L - 6); xx += 8) { const y = c(xx) - 2.5; if (xx === x + 6) k.moveTo(xx, y); else k.lineTo(xx, y); }
+        k.stroke();
+        x += L + 10 + r() * 50;
       }
     }
-    for (let i = 0; i < 140; i++) {
+    // as fraturas compridas, que cortam duas, três bancadas
+    for (const [x0, i0, n] of [[70, 1, 3], [250, 0, 2], [560, 2, 3], [700, 0, 2], [820, 3, 3], [150, 4, 2]]) {
+      const pts = [];
+      let x = x0;
+      for (let i = i0; i <= Math.min(curvas.length - 1, i0 + n); i++) { pts.push([x, curvas[i](x)]); x += (r() - 0.4) * 22; }
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 2.2;
+      k.beginPath();
+      pts.forEach(([px, py], j) => { if (j) { const [qx, qy] = pts[j - 1]; k.lineTo((px + qx) / 2 + (r() - 0.5) * 8, (py + qy) / 2); k.lineTo(px, py); } else k.moveTo(px, py); });
+      k.stroke();
+      k.strokeStyle = 'rgba(255,246,220,.55)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      pts.forEach(([px, py], j) => (j ? k.lineTo(px - 4, py) : k.moveTo(px - 4, py)));
+      k.stroke();
+    }
+    for (let i = 0; i < 160; i++) {
       const x = r() * W;
-      const y = alto(x) + 20 + r() * (600 - alto(x));
-      const s0 = 1 + r() * 2.6;
+      const y = alto(x) + 20 + r() * (620 - alto(x));
+      const s0 = 0.8 + r() * 2.4;
       k.fillStyle = 'rgba(52,36,16,' + (0.35 + r() * 0.3).toFixed(2) + ')';
       k.beginPath();
-      k.ellipse(x, y, s0 * 1.4, s0 * 0.8, (r() - 0.5) * 0.6, 0, 6.283);
+      k.ellipse(x, y, s0 * 1.3, s0 * 0.9, (r() - 0.5) * 0.6, 0, 6.283);
       k.fill();
-      k.fillStyle = 'rgba(255,246,220,.5)';
-      k.beginPath();
-      k.ellipse(x - 0.8, y - s0 * 0.7, s0 * 1.1, s0 * 0.4, 0, 0, 6.283);
-      k.fill();
-    }
-    for (const [x, y, n] of [[90, 330, 4], [560, 300, 3], [810, 420, 4], [130, 520, 3]]) {
-      let a = x;
-      let b = y;
-      k.strokeStyle = SEPIA;
-      k.lineWidth = 1.6;
-      k.beginPath();
-      k.moveTo(a, b);
-      for (let q = 0; q < n; q++) { a += (r() - 0.5) * 16; b += 14 + r() * 12; k.lineTo(a, b); }
-      k.stroke();
     }
     k.restore();
     // o alto da rocha em traço firme e os tufos de capim ralo lá em cima
@@ -2348,7 +2362,16 @@
     const frente = pol([[262, 514], [470, 506], [470, 556], [262, 562]]);
     k.fillStyle = '#5e4a2c';
     k.fill(frente);
-    gravar(k, frente, 360, 534, 130, 1.5, 3.4, 1.7, (x) => 0.85 - (x - 262) / 600, '#0e0904', 0);
+    gravar(k, frente, 360, 534, 130, 0.03, 3, 1.6, (x, y) => 0.55 - (x - 262) / 900 + (y - 514) / 120, '#0e0904', 0);
+    // os talhos do cinzel na frente do banco e a sombra funda logo abaixo da beirada
+    k.save();
+    k.clip(frente);
+    k.strokeStyle = 'rgba(200,170,120,.4)';
+    k.lineWidth = 1;
+    for (let i = 0; i < 40; i++) { const x = 266 + r() * 200; const y = 520 + r() * 36; k.beginPath(); k.moveTo(x, y); k.lineTo(x + 6 + r() * 6, y + 2); k.stroke(); }
+    k.fillStyle = 'rgba(10,6,2,.55)';
+    k.fill(pol([[262, 514], [470, 506], [470, 514], [262, 522]]));
+    k.restore();
     k.fillStyle = '#9c8358';
     k.fill(tampo);
     k.strokeStyle = '#1a1208';
@@ -2372,90 +2395,92 @@
     gravar(k, boca, 340, 400, 140, 0.05, 2.8, 2.2, (x, y) => 0.95 - (y - 374) / 46, '#0e0904', 0);
     // as faixas de linho, deitadas e vazias sobre o banco: tiras compridas e frouxas, umas por
     // cima das outras, com as dobras finas, e duas pontas caídas pela beirada
-    const faixa = (pts, larg, tom) => {
-      const c = curvaPor(pts, 2.5);
-      const fz = r() * 6;
-      const { forma } = tuboAo(c.map((q) => ({ ...q, y: q.y + Math.sin(q.s * 0.09 + fz) * 0.9 })), (sx) => larg * (0.82 + Math.sin(sx * 0.07 + fz) * 0.12 + Math.sin(sx * 0.23) * 0.05));
+    // as faixas de linho, deitadas e vazias sobre o banco: tiras moles, de beirada torta, que
+    // se cruzam um pouco, com a trama em fios finos ao longo e as rugas onde o pano dobra
+    const faixa = (pts, larg, tom, sem) => {
+      const rr = sorteio(sem);
+      const c = curvaPor(pts, 2);
+      const fw = onda(rr, 3, 0.08);
+      const e = [];
+      const d = [];
+      for (const q of c) {
+        const w = larg * (0.8 + fw(q.s) * 0.12) / 2;
+        e.push([q.x + q.ty * w + (rr() - 0.5) * 0.8, q.y - q.tx * w + (rr() - 0.5) * 0.8]);
+        d.push([q.x - q.ty * w + (rr() - 0.5) * 0.8, q.y + q.tx * w + (rr() - 0.5) * 0.8]);
+      }
+      const forma = pol([...e, ...d.reverse()]);
       k.fillStyle = tom;
       k.fill(forma);
       marcar(k, obj, forma);
       k.save();
       k.clip(forma);
-      k.strokeStyle = 'rgba(96,74,40,.55)';
-      k.lineWidth = 1;
-      for (let i = 2; i < c.length; i += 6 + Math.floor(r() * 4)) {
-        const q = c[i];
+      for (let v = -0.7; v <= 0.71; v += 0.35) {
+        k.strokeStyle = 'rgba(110,88,52,.3)';
+        k.lineWidth = 0.6;
         k.beginPath();
-        k.moveTo(q.x - q.ty * larg * 0.6 + q.tx * 3, q.y + q.tx * larg * 0.6 + q.ty * 3);
-        k.quadraticCurveTo(q.x, q.y, q.x + q.ty * larg * 0.6 - q.tx * 2, q.y - q.tx * larg * 0.6 - q.ty * 2);
+        c.forEach((q, i) => { const w = larg / 2; const x = q.x - q.ty * v * w; const y = q.y + q.tx * v * w; if (i) k.lineTo(x, y); else k.moveTo(x, y); });
         k.stroke();
       }
-      k.strokeStyle = 'rgba(96,74,40,.4)';
-      k.beginPath();
-      c.forEach((q, i) => { const x = q.x + q.ty * larg * 0.25; const y = q.y - q.tx * larg * 0.25; if (i) k.lineTo(x, y); else k.moveTo(x, y); });
-      k.stroke();
+      // as rugas: arquinhos curtos de través, tortos, onde o pano se junta
+      for (let i = 10; i < c.length - 6; i += 22 + Math.floor(rr() * 16)) {
+        const q = c[i];
+        const w = larg * 0.5;
+        k.strokeStyle = 'rgba(90,68,36,.4)';
+        k.lineWidth = 0.8;
+        k.beginPath();
+        k.moveTo(q.x + q.ty * w, q.y - q.tx * w);
+        k.quadraticCurveTo(q.x + q.tx * 4 * (rr() - 0.3), q.y + 2, q.x - q.ty * w * 0.4, q.y + q.tx * w * 0.4);
+        k.stroke();
+      }
       k.restore();
-      k.strokeStyle = 'rgba(40,28,12,.9)';
-      k.lineWidth = 1.3;
+      k.strokeStyle = 'rgba(40,28,12,.8)';
+      k.lineWidth = 1.1;
       k.stroke(forma);
     };
-    faixa([[322, 503], [350, 497], [380, 500], [410, 494], [440, 497], [466, 491]], 13, '#ece2c8');
-    faixa([[334, 510], [362, 508], [392, 503], [418, 507], [446, 501], [468, 503]], 11, '#f4ecd8');
-    faixa([[340, 494], [366, 489], [392, 492], [418, 486], [446, 489]], 9, '#e4d8ba');
-    faixa([[360, 506], [366, 520], [358, 536], [364, 552]], 10, '#efe6cf');
-    faixa([[436, 502], [446, 518], [440, 538]], 9, '#e9dfc5');
-    faixa([[384, 512], [396, 516], [406, 512]], 7, '#f6efdd');
-    // o pano da cabeça, enrolado, num lugar à parte: na outra ponta do banco
+    faixa([[320, 502], [346, 496], [372, 500], [398, 494], [426, 497], [452, 491], [470, 493]], 12, '#ece2c8', 4701);
+    faixa([[336, 506], [360, 509], [388, 503], [414, 508], [440, 502], [462, 506], [472, 512], [470, 530], [474, 546]], 11, '#f4ecd8', 4702);
+    faixa([[356, 494], [380, 489], [406, 492], [430, 487], [458, 489]], 9, '#e4d8ba', 4703);
+    faixa([[392, 508], [404, 502], [422, 506], [436, 499]], 8, '#efe6cf', 4704);
+    // o pano da cabeça, enrolado, num lugar à parte (Jo 20.7): na outra ponta do banco, um
+    // pano enrolado frouxo e deitado de lado, mole, com as camadas do pano aparecendo em
+    // beiradas onduladas e as rugas em arco, de todo jeito (nada de espiral nem de ponta solta)
     {
-      const cx = 286;
-      const cy = 494;
-      const L = 40;
-      const R = 12;
-      const corpo = new Path2D();
-      corpo.moveTo(cx - L / 2, cy - R);
-      corpo.bezierCurveTo(cx - L / 6, cy - R - 2, cx + L / 6, cy - R + 1, cx + L / 2, cy - R);
-      corpo.lineTo(cx + L / 2, cy + R);
-      corpo.bezierCurveTo(cx + L / 6, cy + R + 1, cx - L / 6, cy + R - 1, cx - L / 2, cy + R);
-      corpo.closePath();
-      k.fillStyle = '#efe5cb';
-      k.fill(corpo);
-      gravar(k, corpo, cx, cy, L, 0.06, 2.6, 1.3, (x, y) => 0.15 + (y - cy + R) / (2 * R) * 0.8, '#3a2c14', 0);
-      k.strokeStyle = 'rgba(40,28,12,.9)';
-      k.lineWidth = 1.3;
-      k.stroke(corpo);
-      // as voltas do pano em volta do rolo, em diagonal
+      const cx = 290;
+      const cy = 490;
+      const contorno = [[cx - 32, cy + 6], [cx - 33, cy - 3], [cx - 25, cy - 11], [cx - 10, cy - 12], [cx + 4, cy - 10], [cx + 16, cy - 7], [cx + 28, cy - 4], [cx + 40, cy - 1], [cx + 46, cy + 3], [cx + 40, cy + 8], [cx + 26, cy + 9], [cx + 10, cy + 11], [cx - 10, cy + 12], [cx - 24, cy + 11]];
+      const trouxa = contornoRocha(r, contorno, 1.2);
+      trouxa.closePath();
+      k.fillStyle = '#ece2c6';
+      k.fill(trouxa);
+      gravar(k, trouxa, cx, cy, 50, 1.2, 2.4, 1.1, (x, y) => 0.05 + (y - cy + 8) / 20 * 0.8, '#3a2c14', 0);
       k.save();
-      k.clip(corpo);
-      k.strokeStyle = 'rgba(70,52,26,.7)';
-      k.lineWidth = 1;
-      for (const x of [cx - 12, cx - 2, cx + 9]) { k.beginPath(); k.moveTo(x - 4, cy - R); k.quadraticCurveTo(x + 2, cy, x + 5, cy + R); k.stroke(); }
-      k.restore();
-      // a ponta de cá, enrolada em espiral
-      const ponta = new Path2D();
-      ponta.ellipse(cx + L / 2, cy, R * 0.55, R, 0, 0, 6.283);
-      k.fillStyle = '#f8f1de';
-      k.fill(ponta);
-      k.stroke(ponta);
-      k.lineWidth = 0.9;
+      k.clip(trouxa);
+      k.strokeStyle = 'rgba(60,44,20,.75)';
+      k.lineWidth = 1.1;
+      // a volta de fora do pano: a beirada ondulada que dá a volta no rolo, de viés
       k.beginPath();
-      for (let a = 0; a < 6.283 * 2.3; a += 0.18) { const rr = R * (0.95 - a / (6.283 * 2.6)); const x = cx + L / 2 + Math.cos(a) * rr * 0.55; const y = cy + Math.sin(a) * rr; if (a === 0) k.moveTo(x, y); else k.lineTo(x, y); }
+      k.moveTo(cx - 20, cy - 12);
+      k.bezierCurveTo(cx - 12, cy - 2, cx - 16, cy + 6, cx - 8, cy + 12);
       k.stroke();
-      // a ponta solta do pano, que cai mole pela beirada do banco
-      const aba = new Path2D();
-      aba.moveTo(cx - 8, cy + R - 2);
-      aba.bezierCurveTo(cx - 4, cy + R + 8, cx - 10, cy + R + 18, cx - 2, cy + R + 26);
-      aba.lineTo(cx + 10, cy + R + 24);
-      aba.bezierCurveTo(cx + 6, cy + R + 14, cx + 10, cy + R + 6, cx + 8, cy + R - 2);
-      aba.closePath();
-      k.fillStyle = '#e8ddc2';
-      k.fill(aba);
-      gravar(k, aba, cx, cy + R + 12, 20, 1.5, 2.4, 1, (x) => 0.3 + (x - cx + 8) / 30, '#3a2c14', 0);
-      k.strokeStyle = 'rgba(40,28,12,.9)';
+      // a torção da ponta: traços em diagonal, cada vez mais juntos onde o pano afina
+      for (const [x, inc] of [[cx + 14, 7], [cx + 24, 6], [cx + 32, 5], [cx + 38, 4]]) {
+        k.beginPath();
+        k.moveTo(x - inc, cy - 9);
+        k.quadraticCurveTo(x, cy, x + inc * 0.6, cy + 10);
+        k.stroke();
+      }
+      // as rugas moles do corpo
+      for (const [x0, y0, x1, y1, d] of [[cx - 28, cy - 2, cx - 22, cy + 6, 3], [cx - 4, cy - 9, cx + 4, cy - 2, -2]]) {
+        k.beginPath();
+        k.moveTo(x0, y0);
+        k.quadraticCurveTo((x0 + x1) / 2 + d, (y0 + y1) / 2, x1, y1);
+        k.stroke();
+      }
+      k.restore();
+      k.strokeStyle = 'rgba(40,28,12,.85)';
       k.lineWidth = 1.2;
-      k.stroke(aba);
-      marcar(k, obj, corpo);
-      marcar(k, obj, ponta);
-      marcar(k, obj, aba);
+      k.stroke(trouxa);
+      marcar(k, obj, trouxa);
     }
     k.restore();
     // a beirada da boca: o traço firme e lascado, com a luz no lábio da esquerda
@@ -2471,19 +2496,19 @@
     k.restore();
     // a soleira e o sulco raso cavado na rocha da frente, onde a pedra corre: duas linhas
     // finas e a sombra rasa dentro (nada de tábua)
-    const sulco = pol([[236, 601], [760, 603], [760, 613], [236, 612]]);
+    const sulco = pol([[470, 601], [720, 603], [720, 613], [470, 612]]);
     k.fillStyle = 'rgba(120,92,52,.35)';
     k.fill(sulco);
     k.strokeStyle = 'rgba(43,33,18,.8)';
     k.lineWidth = 1.4;
     k.beginPath();
-    k.moveTo(236, 601);
-    for (let x = 236; x <= 760; x += 12) k.lineTo(x, 601 + Math.sin(x * 0.07) * 1.1 + (r() - 0.5) * 1.2);
+    k.moveTo(470, 601);
+    for (let x = 470; x <= 720; x += 12) k.lineTo(x, 601 + Math.sin(x * 0.07) * 1.1 + (r() - 0.5) * 1.2);
     k.stroke();
     k.strokeStyle = 'rgba(255,244,214,.6)';
     k.beginPath();
-    k.moveTo(236, 613);
-    for (let x = 236; x <= 760; x += 12) k.lineTo(x, 613 + Math.sin(x * 0.05) * 1 + (r() - 0.5) * 1.2);
+    k.moveTo(470, 613);
+    for (let x = 470; x <= 720; x += 12) k.lineTo(x, 613 + Math.sin(x * 0.05) * 1 + (r() - 0.5) * 1.2);
     k.stroke();
     k.restore();
     // o chão de terra e pedra na frente
@@ -2502,6 +2527,21 @@
       sombraNoChao(k, p, s * 0.4, s * 0.3, 3, 0.3);
       peca(k, p, [x - s, y - s, x + s, y + s], { cor: '#d3bb8c', ang: 0.6, passo: 2.6, maxL: 1.3, sombra: sombraOval(x, y, s, s * 0.7, 0), cruzada: 0.72, traco: 1.4 });
     }
+    // dois pedaços de calcário caídos da encosta, irregulares, com a face de cima clara
+    for (const [x, y, w, h] of [[176, 712, 92, 40], [736, 692, 70, 30]]) {
+      const pts = [[x - w / 2, y + h * 0.4], [x - w * 0.46, y - h * 0.1], [x - w * 0.3, y - h * 0.48], [x + w * 0.05, y - h * 0.55], [x + w * 0.36, y - h * 0.42], [x + w / 2, y - h * 0.05], [x + w * 0.44, y + h * 0.42], [x, y + h * 0.5]];
+      const p = contornoRocha(r, pts, 4);
+      p.closePath();
+      sombraNoChao(k, p, 14, 8, 6, 0.4);
+      peca(k, p, [x - w / 2, y - h, x + w / 2, y + h], { cor: '#dcc697', ang: 0.8, passo: 3.4, maxL: 1.6, sombra: (px, py) => 0.15 + (py - y + h * 0.5) / h * 0.6 + Math.max(0, (px - x) / w) * 0.3, cruzada: 0.72, traco: 1.8 });
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.4;
+      k.beginPath();
+      k.moveTo(x - w * 0.46, y - h * 0.05);
+      k.quadraticCurveTo(x, y - h * 0.02, x + w * 0.48, y - h * 0.1);
+      k.stroke();
+      for (let i = 0; i < 6; i++) { k.fillStyle = 'rgba(52,36,16,.5)'; k.beginPath(); k.ellipse(x - w / 3 + r() * w * 0.6, y + r() * h * 0.3, 1.6, 1.1, 0, 0, 6.283); k.fill(); }
+    }
     capim(k, r, 120, 652, 40, 13, 'rgba(70,52,24,.8)');
     capim(k, r, 610, 650, 34, 11, 'rgba(70,52,24,.8)');
     capim(k, r, 860, 660, 30, 10, 'rgba(70,52,24,.8)');
@@ -2511,7 +2551,7 @@
     k.scale(1.3, 1.3);
     k.translate(-420, -612);
     // a grande pedra redonda, rolada para o lado, de pé no sulco, inteira e com ar em volta
-    const pcx = 606;
+    const pcx = 590;
     const pcy = 492;
     const R = 112;
     const esp = 26;
@@ -2575,6 +2615,7 @@
     const calco = contornoRocha(r, [[pcx - 118, 612], [pcx - 128, 588], [pcx - 96, 578], [pcx - 82, 610]], 2);
     calco.closePath();
     peca(k, calco, [pcx - 130, 576, pcx - 80, 614], { cor: '#d6c393', ang: 0.7, passo: 3, maxL: 1.4, sombra: () => 0.55, cruzada: 0.8, traco: 1.8, obj });
+    k.restore();
     k.restore();
     vinheta(k, W, H, 0.2);
   }
