@@ -7264,13 +7264,13 @@
       const n = Math.round((q.rr * q.rr) / 18);
       for (let i = 0; i < n; i++) {
         const [cx, cy, tr] = tufos[Math.floor(r() * tufos.length)];
-        const a = Math.PI + r() * Math.PI * 1.3 - 0.3;
-        const d = 0.55 + r() * 0.5;
+        const a = Math.PI * 0.7 + r() * Math.PI * 1.6;
+        const d = 0.4 + r() * 0.7;
         const l = 6 + r() * 16;
         const da = l / (d * tr);
         const sombra = 0.55 - Math.sin(a) * 0.3 + (cy - q.y) / q.rr * -0.3;
-        k.strokeStyle = 'rgba(14,9,5,' + Math.min(0.9, 0.35 + sombra * 0.6).toFixed(2) + ')';
-        k.lineWidth = 0.7 + Math.max(0, sombra) * 1.5;
+        k.strokeStyle = 'rgba(14,9,5,' + Math.min(0.8, 0.3 + sombra * 0.45).toFixed(2) + ')';
+        k.lineWidth = 0.7 + Math.max(0, sombra) * 1.0;
         k.beginPath();
         k.ellipse(cx, cy, d * tr, d * tr * 0.85, 0, a, a + da);
         k.stroke();
