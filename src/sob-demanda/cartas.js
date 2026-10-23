@@ -12297,11 +12297,12 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         k.stroke();
       }
     }
-    // a sombra funda, embaixo do meio (onde os pães assentam)
-    const fundo = new Path2D();
-    fundo.ellipse(cx, cy + alt * 0.42, (rx - 12) * 0.86, (ry - 8) * 0.62, 0, 0, 6.283);
-    k.fillStyle = 'rgba(40,22,6,.55)';
-    k.fill(fundo);
+    // o pano de linho que forra o cesto: claro, com dobras moles, que aparece entre os pães
+    const pano = new Path2D();
+    pano.ellipse(cx, cy + 12, (rx - 20) * 0.94, (ry - 10) * 0.86, 0, 0, 6.283);
+    k.fillStyle = '#e8dcc0';
+    k.fill(pano);
+    gravar(k, pano, cx, cy + 12, rx, 0.25, 3, 1.4, (x, y) => 0.35 + (y - cy) / 160 + Math.sin(x * 0.04) * 0.15, '#4a3a20', 0.1);
     k.restore();
     // a borda enrolada (a metade de trás): um rolo de vime torcido
     const rolo = (de, ate) => {
@@ -12341,47 +12342,92 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.stroke(pol(dentro, false));
     };
     rolo(Math.PI, Math.PI * 2);
-    // os cinco pães de cevada: redondos e achatados, de casca rachada em cruz rasa e farelo
-    const pao = (x, y, R, giro, inclina) => {
-      const forma = new Path2D();
-      forma.ellipse(x, y, R, R * inclina, giro, 0, 6.283);
-      sombraNoChao(k, forma, 8, 10, 6, 0.4);
-      const g = k.createRadialGradient(x - R * 0.35, y - R * inclina * 0.5, R * 0.1, x, y, R);
-      g.addColorStop(0, '#f0cf8e');
-      g.addColorStop(0.6, '#c99556');
-      g.addColorStop(1, '#8a5a2a');
-      k.fillStyle = g;
-      k.fill(forma);
-      marcar(k, obj, forma);
-      gravar(k, forma, x, y, R + 4, giro + 0.6, 2.8, 1.5, sombraOval(x, y, R, R * inclina, giro), '#3a2008', 0.2);
-      k.strokeStyle = '#3a2008';
+    // os cinco pães de cevada: chatos e largos (pão de cevada é baixo), de casca escura e
+    // áspera, com os cortes na casca e o farelo; um partido ao meio, mostrando o miolo
+    const pao = (x, y, R, giro, inclina, partido = false) => {
+      const esp = R * 0.2;
+      const lado = new Path2D();
+      lado.ellipse(x, y + esp, R, R * inclina, giro, 0, 6.283);
+      const topo = new Path2D();
+      topo.ellipse(x, y, R, R * inclina, giro, 0, 6.283);
+      const todo = new Path2D();
+      todo.addPath(lado);
+      todo.addPath(topo);
+      todo.addPath(pol([[x - R * Math.cos(giro), y - R * Math.sin(giro)], [x + R * Math.cos(giro), y + R * Math.sin(giro)], [x + R * Math.cos(giro), y + R * Math.sin(giro) + esp], [x - R * Math.cos(giro), y - R * Math.sin(giro) + esp]]));
+      sombraNoChao(k, lado, 8, 8, 6, 0.45);
+      marcar(k, obj, todo);
+      k.fillStyle = '#6e4018';
+      k.fill(lado);
+      k.fill(pol([[x - R * Math.cos(giro), y - R * Math.sin(giro)], [x + R * Math.cos(giro), y + R * Math.sin(giro)], [x + R * Math.cos(giro), y + R * Math.sin(giro) + esp], [x - R * Math.cos(giro), y - R * Math.sin(giro) + esp]]));
+      gravar(k, lado, x, y + esp, R + 4, 1.4, 2.4, 1.4, () => 0.6, '#2a1404', 0);
+      k.strokeStyle = '#2a1404';
       k.lineWidth = 2;
-      k.stroke(forma);
-      // as rachaduras da casca, tortas, e o farelo de cevada
+      k.stroke(lado);
+      const g = k.createRadialGradient(x - R * 0.35, y - R * inclina * 0.5, R * 0.1, x, y, R);
+      g.addColorStop(0, '#d9a868');
+      g.addColorStop(0.6, '#a8703a');
+      g.addColorStop(1, '#6e4018');
+      k.fillStyle = g;
+      k.fill(topo);
+      gravar(k, topo, x, y, R + 4, giro + 0.6, 2.6, 1.5, sombraOval(x, y, R, R * inclina, giro), '#2a1404', 0.2);
       k.save();
-      k.clip(forma);
-      k.strokeStyle = 'rgba(58,32,8,.85)';
-      k.lineWidth = 1.6;
-      for (const ang of [giro + 0.3, giro + 1.9]) {
+      k.clip(topo);
+      // os cortes na casca: três talhos paralelos, abertos, com a borda clara
+      for (const d of [-0.38, 0, 0.38]) {
+        const ax = x + Math.cos(giro + 1.4) * d * R;
+        const ay = y + Math.sin(giro + 1.4) * d * R * inclina;
+        const dx = Math.cos(giro + 0.25) * R * 0.55;
+        const dy = Math.sin(giro + 0.25) * R * 0.55 * inclina;
+        k.strokeStyle = 'rgba(42,20,4,.9)';
+        k.lineWidth = 3;
         k.beginPath();
-        for (let t = -0.7; t <= 0.7; t += 0.1) {
-          const px = x + Math.cos(ang) * t * R + (r() - 0.5) * 3;
-          const py = y + Math.sin(ang) * t * R * inclina + (r() - 0.5) * 3;
-          if (t === -0.7) k.moveTo(px, py); else k.lineTo(px, py);
-        }
+        k.moveTo(ax - dx, ay - dy);
+        k.quadraticCurveTo(ax, ay + 2, ax + dx, ay + dy);
+        k.stroke();
+        k.strokeStyle = 'rgba(240,206,150,.8)';
+        k.lineWidth = 1.2;
+        k.beginPath();
+        k.moveTo(ax - dx, ay - dy - 2.5);
+        k.quadraticCurveTo(ax, ay - 0.5, ax + dx, ay + dy - 2.5);
         k.stroke();
       }
-      for (let n = 0; n < R * 1.4; n++) {
+      // a casca áspera: farelo e grãos de cevada
+      for (let n = 0; n < R * 1.6; n++) {
         const a = r() * 6.283;
-        const d = Math.sqrt(r()) * R * 0.9;
-        k.fillStyle = r() < 0.5 ? 'rgba(255,240,200,.85)' : 'rgba(80,46,12,.7)';
+        const d = Math.sqrt(r()) * R * 0.92;
+        k.fillStyle = r() < 0.45 ? 'rgba(250,226,180,.8)' : 'rgba(52,26,6,.75)';
         k.beginPath();
-        k.ellipse(x + Math.cos(a) * d, y + Math.sin(a) * d * inclina, 1.6, 0.9, a, 0, 6.283);
+        k.ellipse(x + Math.cos(a) * d, y + Math.sin(a) * d * inclina, 1.8, 1, a, 0, 6.283);
         k.fill();
       }
       k.restore();
+      k.strokeStyle = '#2a1404';
+      k.lineWidth = 2;
+      k.stroke(topo);
+      if (partido) {
+        // a metade da frente foi partida: a face do miolo, clara e porosa, com a casca em volta
+        const quebra = [];
+        for (let i = 0; i <= 14; i++) { const t = -0.98 + (i / 14) * 1.96; quebra.push([x + t * R, y + R * inclina * 0.15 + (i % 2 ? 4 : -3) + Math.sin(t * 5) * 3]); }
+        const baixo = [];
+        for (let i = 0; i <= 20; i++) { const a = (i / 20) * Math.PI; baixo.push([x + Math.cos(a) * R * 0.98, y + esp + Math.sin(a) * R * inclina * 0.98]); }
+        const miolo = pol([...quebra, ...baixo]);
+        k.fillStyle = '#ecd6a8';
+        k.fill(miolo);
+        k.save();
+        k.clip(miolo);
+        for (let n = 0; n < 160; n++) {
+          k.fillStyle = 'rgba(150,104,52,.6)';
+          k.beginPath();
+          k.ellipse(x + (r() - 0.5) * R * 1.8, y + r() * (esp + R * inclina), 1.2 + r() * 2, 1 + r() * 1.4, 0, 0, 6.283);
+          k.fill();
+        }
+        k.restore();
+        k.strokeStyle = '#2a1404';
+        k.lineWidth = 1.8;
+        k.stroke(miolo);
+      }
     };
-    for (const [x, y, R, g, i] of [[322, 498, 62, 0.2, 0.62], [446, 482, 60, -0.1, 0.6], [568, 498, 62, 0.15, 0.6], [380, 574, 68, -0.2, 0.62], [512, 582, 68, 0.1, 0.62]]) pao(x, y, R, g, i);
+    for (const [x, y, R, g, i] of [[318, 500, 70, 0.2, 0.5], [446, 486, 70, -0.1, 0.48], [572, 502, 70, 0.15, 0.5]]) pao(x, y, R, g, i);
 
     // os dois peixinhos secos, deitados por cima dos pães, em diagonais diferentes
     const peixe = (x, y, L, ang, lado) => {
@@ -12465,10 +12511,13 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       }
       k.restore();
     };
-    peixe(394, 520, 200, -0.18, 1);
-    peixe(520, 576, 196, -0.06, -1);
-    // a metade da frente da borda passa por cima dos pães: eles estão dentro do cesto
+    // a metade da frente da borda; os dois pães da frente ficam por cima dela e dos de trás,
+    // amontoados (o cesto está cheio), um deles partido
     rolo(0, Math.PI);
+    pao(372, 572, 74, -0.15, 0.5, true);
+    pao(520, 580, 74, 0.12, 0.5);
+    peixe(410, 500, 200, -0.18, 1);
+    peixe(500, 540, 196, -0.08, -1);
     vinheta(k, W, H, 0.22);
   }
   // ---------- fim dos Objetos ----------
