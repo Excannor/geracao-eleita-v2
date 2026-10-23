@@ -6251,8 +6251,9 @@
     k.fillRect(F[0] - larg(1.3), ySol, larg(1.3) * 2, 10);
     k.restore();
     k.restore();
-    // três pedras chatas, da cor da pista, de tamanhos desencontrados e longe umas das outras
-    for (const [x, y, rx, ry, g] of [[222, ySol + 104, 26, 9, 0.12], [610, ySol + 52, 15, 6, -0.18], [702, ySol + 126, 20, 8, 0.3]]) {
+    // duas pedras chatas, da cor da pista, de tamanhos desencontrados e longe uma da outra
+    // (as duas dentro da janela da frente e acima do papel da glória)
+    for (const [x, y, rx, ry, g] of [[222, ySol + 66, 26, 9, 0.12], [610, ySol + 40, 15, 6, -0.18]]) {
       const p = seixo(r, x, y, rx, ry, g, 0.22);
       sombraNoChao(k, p, 5, 4, 4, 0.4);
       peca(k, p, [x - rx, y - ry, x + rx, y + ry], { cor: '#dcc394', tinta: '#2e1c06', ang: 0.6, passo: 3, maxL: 1.4, sombra: (px, py) => 0.2 + (py - y + ry) / (ry * 2) * 0.6, cruzada: 0.8, traco: 1.8 });
