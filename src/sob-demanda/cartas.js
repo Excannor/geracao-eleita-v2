@@ -2766,32 +2766,6 @@
     p.closePath();
     return p;
   }
-  function fogo(k, r, x, y, larg, alto, n) {
-    brilho(k, x, y - alto * 0.4, alto * 1.1, 'rgba(255,190,90,.5)');
-    // as línguas, das mais altas (atrás) às mais baixas, cada uma num lugar e numa inclinação
-    const linguas = Array.from({ length: n }, (_, i) => {
-      const t = (i + 0.5) / n - 0.5 + (r() - 0.5) * 0.12;
-      return { t, h: alto * (1 - Math.abs(t) * 1.2) * (0.6 + r() * 0.45), vai: (r() - 0.5) * alto * 0.35 - t * alto * 0.2 };
-    }).sort((a, b) => b.h - a.h);
-    // o corpo do fogo, inteiro, atrás das línguas
-    const corpo = chama(x, y, larg * 1.05, alto * 0.82, (r() - 0.5) * 20);
-    k.fillStyle = '#e98a36';
-    k.fill(corpo);
-    k.strokeStyle = '#5e2606';
-    k.lineWidth = 1.8;
-    k.stroke(corpo);
-    for (const { t, h, vai } of linguas) {
-      const p = chama(x + t * larg, y, larg / n * 2.4, h, vai);
-      k.fillStyle = '#eda048';
-      k.fill(p);
-      k.fillStyle = '#ffe196';
-      k.fill(chama(x + t * larg, y, larg / n * 1.1, h * 0.6, vai * 0.5));
-      gravar(k, p, x + t * larg, y - h / 2, h * 0.6, -Math.PI / 2 + 0.15, 5, 1.6, (px, py) => 0.2 + (py - y + h) / h * 0.7, '#7a3410', 0.4);
-      k.strokeStyle = '#5e2606';
-      k.lineWidth = 1.8;
-      k.stroke(p);
-    }
-  }
   // Poucos pontos de estrela (cinco pontas não: quatro, como as da purpurina).
   function estrelasDoCeu(k, r, x0, y0, x1, y1, n, fora) {
     for (let i = 0; i < n; i++) {
@@ -4464,130 +4438,252 @@
     vinheta(k, W, H, 0.22);
   }
 
-  // (8) Gideão e as tochas (Jz 7.16-20): de noite, os vasos de barro com a tocha dentro; um
-  // quebrado, com a tocha acesa saindo dos cacos, e a corneta de chifre no chão. Lá embaixo,
-  // no vale, as tendas do acampamento.
-  function desenhoGideao(k, W, H, obj) {
-    const r = sorteio(5801);
-    const g = k.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, '#120f14');
-    g.addColorStop(0.5, '#221a1a');
-    g.addColorStop(1, '#2e2016');
-    k.fillStyle = g;
-    k.fillRect(0, 0, W, H);
-    papelVelho(k, W, H, r, ['rgba(0,0,0,0)', 'rgba(0,0,0,0)'], [W / 2, H / 2], true);
-    linhas(k, 0, 0, W, 400, 6, 1, (x, y) => 0.12 + y / 1400, 'rgba(236,214,170,.3)');
-    estrelasDoCeu(k, r, 30, 30, W - 30, 300, 220);
-    // o vale e as tendas de Midiã, lá embaixo
-    const fm = onda(r, 3, 0.01);
-    const vale = pol([[-10, 520], ...Array.from({ length: 46 }, (_, i) => [i * 20, 380 + fm(i * 20) * 14 + Math.abs(i - 23) * 1.4]), [W + 10, 520]]);
-    k.fillStyle = '#1c1612';
-    k.fill(vale);
-    gravar(k, vale, W / 2, 450, 480, 0, 6, 1, () => 0.5, 'rgba(236,214,170,.28)', 0);
-    k.strokeStyle = 'rgba(236,214,170,.5)';
-    k.lineWidth = 1.4;
-    for (let i = 0; i < 26; i++) {
-      const x = 40 + r() * (W - 80);
-      const yy = 410 + r() * 40;
-      const w = 14 + r() * 10;
+  // O fogo de uma tocha de pano, à noite, em xilogravura: uma língua alta só, com duas menores
+  // do lado, em camadas de dentro para fora (cada uma com o contorno), e o clarão em traços
+  // curtos em volta, não em mancha. É diferente do fogo de lenha do altar de Abel.
+  function fogoDePano(k, r, x, y, h, vai) {
+    k.save();
+    k.lineCap = 'round';
+    for (let i = 0; i < 64; i++) {
+      const a = (i / 64) * 6.283;
+      const d0 = h * (0.62 + r() * 0.1);
+      const d1 = d0 + h * (0.12 + r() * 0.22);
+      const cy = y - h * 0.42;
+      k.strokeStyle = 'rgba(255,196,110,' + (0.25 + r() * 0.3).toFixed(2) + ')';
+      k.lineWidth = 1.2 + r();
       k.beginPath();
-      k.moveTo(x - w, yy);
-      k.lineTo(x, yy - w * 0.8);
-      k.lineTo(x + w, yy);
+      k.moveTo(x + vai * 0.4 + Math.cos(a) * d0 * 0.75, cy + Math.sin(a) * d0);
+      k.lineTo(x + vai * 0.4 + Math.cos(a) * d1 * 0.75, cy + Math.sin(a) * d1);
       k.stroke();
     }
-    // o chão do morro, perto
-    const chao = pol([[-10, H + 10], [-10, 560], [200, 530], [520, 548], [W + 10, 520], [W + 10, H + 10]]);
-    k.fillStyle = '#2a1f17';
+    const lingua = (s, dx, hh, v) => {
+      const l = h * 0.34 * s;
+      const p = new Path2D();
+      p.moveTo(x + dx - l / 2, y);
+      p.bezierCurveTo(x + dx - l * 0.9, y - hh * 0.4, x + dx + v * 0.2 - l * 0.35, y - hh * 0.62, x + dx + v, y - hh);
+      p.bezierCurveTo(x + dx + v * 0.35 + l * 0.15, y - hh * 0.72, x + dx + l * 0.95, y - hh * 0.42, x + dx + l / 2, y);
+      p.closePath();
+      return p;
+    };
+    const camadas = [[1, '#d9772a'], [0.72, '#f0a344'], [0.48, '#ffd27a'], [0.26, '#fff2c4']];
+    for (const [dx, hh, v, s] of [[-h * 0.2, h * 0.42, -h * 0.16, 0.5], [h * 0.2, h * 0.7, h * 0.3, 0.58]]) {
+      const p = lingua(s, dx, hh, v);
+      k.fillStyle = '#d9772a';
+      k.fill(p);
+      k.strokeStyle = '#5a2406';
+      k.lineWidth = 1.6;
+      k.stroke(p);
+    }
+    camadas.forEach(([s, cor], i) => {
+      const p = lingua(s * (1 - i * 0.04), -i * 3, h * (0.35 + s * 0.65), vai * s * (1 + i * 0.25));
+      k.fillStyle = cor;
+      k.fill(p);
+      k.strokeStyle = i ? 'rgba(122,52,10,.7)' : '#5a2406';
+      k.lineWidth = i ? 1.2 : 1.8;
+      k.stroke(p);
+    });
+    k.restore();
+  }
+
+  // (8) Gideão e as tochas (Jz 7.16-20): de noite, no alto do morro, os vasos de barro com a
+  // tocha escondida dentro (a boca acesa); um quebrado, de beirada partida com a espessura do
+  // barro à mostra e os cacos em volta, e a tocha de pano saindo dele, inclinada; na frente,
+  // a corneta de chifre. Lá embaixo, no vale, as tendas do acampamento de Midiã.
+  function desenhoGideao(k, W, H, obj) {
+    const r = sorteio(5801);
+    k.fillStyle = '#171316';
+    k.fillRect(0, 0, W, H);
+    papelVelho(k, W, H, r, ['rgba(0,0,0,0)', 'rgba(0,0,0,0)'], [W / 2, H / 2], true);
+    linhas(k, 0, 0, W, 420, 5.5, 1.2, (x, y) => 0.06 + (y / 420) ** 1.6 * 0.6, 'rgba(236,214,170,.38)');
+    estrelasDoCeu(k, r, 30, 30, W - 30, 300, 200);
+    // os morros dos dois lados e o vale lá embaixo, com as tendas
+    const fm = onda(r, 3, 0.01);
+    const serra = pol([[-10, 470], ...Array.from({ length: 46 }, (_, i) => [i * 20, 330 + fm(i * 20) * 16 + Math.abs(i - 23) ** 1.4 * 0.9 + 40 * Math.exp(-(((i - 23) / 7) ** 2))]), [W + 10, 470]]);
+    k.fillStyle = '#211a17';
+    k.fill(serra);
+    gravar(k, serra, W / 2, 420, 480, -0.12, 5.5, 1, (x, y) => 0.35 + (y - 330) / 500, 'rgba(236,214,170,.32)', 0);
+    k.strokeStyle = 'rgba(236,214,170,.55)';
+    k.lineWidth = 1.4;
+    k.stroke(serra);
+    const fundoVale = pol([[-10, 520], [-10, 452], [200, 440], [444, 432], [700, 442], [W + 10, 450], [W + 10, 520]]);
+    k.fillStyle = '#2a211c';
+    k.fill(fundoVale);
+    linhas(k, 0, 432, W, 520, 4.5, 1.1, () => 0.4, 'rgba(236,214,170,.32)');
+    // as tendas: baixas, de pelo de cabra, com a cumeeira, a porta acesa e uma fogueirinha
+    const tendas = [[90, 466, 70], [178, 460, 56], [262, 470, 78], [350, 452, 50], [430, 462, 66], [520, 450, 52], [598, 466, 74], [690, 456, 58], [770, 468, 72], [140, 486, 64], [470, 488, 62], [820, 486, 56]];
+    for (const [x, y, w] of tendas) {
+      const h = w * 0.42;
+      const t = pol([[x - w / 2, y], [x - w * 0.44, y - h * 0.62], [x - w * 0.2, y - h], [x + w * 0.08, y - h * 0.86], [x + w * 0.3, y - h], [x + w * 0.46, y - h * 0.6], [x + w / 2, y]]);
+      k.fillStyle = '#0d0a09';
+      k.fill(t);
+      gravar(k, t, x, y - h / 2, w * 0.7, 1.5, 3.4, 0.8, () => 0.5, 'rgba(236,214,170,.35)', 0);
+      k.strokeStyle = 'rgba(236,214,170,.7)';
+      k.lineWidth = 1.3;
+      k.stroke(t);
+      k.fillStyle = 'rgba(255,190,100,.85)';
+      k.fillRect(x - w * 0.06, y - h * 0.5, w * 0.12, h * 0.5);
+      k.strokeStyle = 'rgba(255,200,120,.5)';
+      k.lineWidth = 1;
+      for (let i = 0; i < 6; i++) { const a = -Math.PI / 2 + (i / 5 - 0.5) * 2; k.beginPath(); k.moveTo(x + w * 0.6 + Math.cos(a) * 3, y + Math.sin(a) * 3); k.lineTo(x + w * 0.6 + Math.cos(a) * 8, y + Math.sin(a) * 8); k.stroke(); }
+    }
+    // o alto do morro, perto: a terra escura em linhas, que clareiam perto da tocha
+    const tx = 446;
+    const chao = pol([[-10, H + 10], [-10, 548], [200, 528], [520, 540], [W + 10, 518], [W + 10, H + 10]]);
+    k.fillStyle = '#251c15';
     k.fill(chao);
-    gravar(k, chao, W / 2, 690, 520, 0.05, 6, 1.3, (x, y) => 0.4 + (y - 540) / 900, 'rgba(236,214,170,.3)', 0);
-    // a luz da tocha no chão
-    const tx = 470;
-    brilho(k, tx, 600, 420, 'rgba(255,170,70,.32)');
-    // um vaso de barro: o perfil de cântaro, a hachura e a luz da tocha de um lado
+    gravar(k, chao, W / 2, 690, 520, 0.03, 5, 1.6, (x, y) => 0.85 - Math.hypot(x - tx, (y - 640) * 1.6) / 700, 'rgba(255,214,150,.42)', 0);
+    k.strokeStyle = 'rgba(236,214,170,.55)';
+    k.lineWidth = 1.4;
+    k.stroke(chao);
+    // um vaso inteiro: o perfil de cântaro e a luz da tocha escondida, na boca, em raios
     const cantaro = (t) => (t < 0.12 ? 0.42 + t : t < 0.3 ? 0.54 + (t - 0.12) * 2.2 : 0.94 - Math.pow((t - 0.3) / 0.7, 2) * 0.5);
-    const umVaso = (cx, base, alt, larg, luzX) => {
+    const umVaso = (cx, base, alt, larg) => {
       const p = vaso(k, cx, base, alt, larg, cantaro);
-      sombraNoChao(k, pol([[cx - larg * 0.4, base], [cx + larg * 0.4, base], [cx + larg * 0.4 - (luzX - cx) * 0.4, base + 22], [cx - larg * 0.4 - (luzX - cx) * 0.4, base + 22]]), 0, 0, 8, 0.6);
-      const dir = Math.sign(luzX - cx);
-      peca(k, p, [cx - larg / 2, base - alt, cx + larg / 2, base], { cor: '#a8643a', tinta: '#1a0c04', ang: 0.2, passo: 3.8, maxL: 2.2, sombra: (x, y) => 0.42 - (x - cx) * dir / larg * 0.9 + (y - base + alt) / alt * 0.15, cruzada: 0.72, traco: 2.4, obj, abaulado: 0.2 });
-      // a boca: o escuro e a luz da tocha escondida lá dentro
+      const dir = Math.sign(tx - cx);
+      sombraNoChao(k, pol([[cx - larg * 0.4, base], [cx + larg * 0.4, base], [cx + larg * 0.4 - dir * 50, base + 20], [cx - larg * 0.4 - dir * 50, base + 20]]), 0, 0, 8, 0.6);
+      peca(k, p, [cx - larg / 2, base - alt, cx + larg / 2, base], { cor: '#a8643a', tinta: '#1a0c04', ang: 0.2, passo: 3.6, maxL: 2.2, sombra: (x, y) => 0.42 - ((x - cx) * dir) / larg * 0.9 + ((y - base + alt) / alt) * 0.15, cruzada: 0.72, traco: 2.4, obj, abaulado: 0.2 });
+      k.save();
+      k.clip(p);
+      k.strokeStyle = 'rgba(40,16,4,.6)';
+      k.lineWidth = 1.6;
+      for (const f of [0.34, 0.38, 0.62]) { k.beginPath(); k.ellipse(cx, base - alt * (1 - f), larg * cantaro(f) / 2, larg * 0.06, 0, 0.1, Math.PI - 0.1); k.stroke(); }
+      k.restore();
       const boca = new Path2D();
       boca.ellipse(cx, base - alt + 2, larg * 0.21, larg * 0.06, 0, 0, 6.283);
-      k.fillStyle = '#ffcf7a';
+      k.fillStyle = '#ffd88a';
       k.fill(boca);
-      brilho(k, cx, base - alt - 10, larg * 0.5, 'rgba(255,190,90,.55)');
+      k.strokeStyle = 'rgba(255,214,140,.65)';
+      k.lineCap = 'round';
+      for (let i = 0; i < 13; i++) {
+        const a = -Math.PI + (i / 12) * Math.PI;
+        k.lineWidth = 1.4;
+        k.beginPath();
+        k.moveTo(cx + Math.cos(a) * larg * 0.26, base - alt + Math.sin(a) * larg * 0.12);
+        k.lineTo(cx + Math.cos(a) * larg * (0.36 + (i % 2) * 0.12), base - alt + Math.sin(a) * larg * (0.26 + (i % 2) * 0.14));
+        k.stroke();
+      }
       k.strokeStyle = '#1a0c04';
       k.lineWidth = 2;
       k.stroke(boca);
     };
-    umVaso(200, 700, 200, 150, tx);
-    umVaso(720, 676, 180, 136, tx);
-    // o vaso quebrado: o fundo que ficou, os cacos em volta e a tocha acesa saindo dele
+    umVaso(176, 694, 196, 150);
+    umVaso(744, 628, 158, 120);
+    // o vaso quebrado: a barriga que ficou, partida em linha torta que acompanha a curva do
+    // vaso; na beirada, a espessura do barro (clara por dentro), e o escuro lá dentro
     const bx = tx;
-    const bb = 760;
-    const fundo = new Path2D();
-    fundo.moveTo(bx - 82, bb - 70);
-    fundo.lineTo(bx - 60, bb - 92);
-    fundo.lineTo(bx - 34, bb - 64);
-    fundo.lineTo(bx - 4, bb - 100);
-    fundo.lineTo(bx + 26, bb - 70);
-    fundo.lineTo(bx + 56, bb - 96);
-    fundo.lineTo(bx + 84, bb - 66);
-    fundo.bezierCurveTo(bx + 84, bb - 20, bx + 50, bb, bx, bb);
-    fundo.bezierCurveTo(bx - 50, bb, bx - 84, bb - 20, bx - 82, bb - 70);
-    fundo.closePath();
-    // a tocha: o cabo de madeira e o pano enrolado em chamas
-    vara(k, [[bx - 6, bb - 30], [bx + 20, bb - 300]], 14, '#7a5432', obj);
-    const trapo = pol([[bx + 4, bb - 250], [bx + 32, bb - 248], [bx + 36, bb - 300], [bx + 4, bb - 302]]);
-    peca(k, trapo, [bx + 4, bb - 302, bx + 36, bb - 248], { cor: '#4a3020', tinta: '#140a04', ang: 0.5, passo: 3, maxL: 1.4, sombra: () => 0.5, traco: 2, obj });
-    fogo(k, r, bx + 22, bb - 286, 150, 250, 8);
-    brilho(k, bx + 24, bb - 360, 200, 'rgba(255,220,140,.35)', 'screen');
-    sombraNoChao(k, fundo, -18, 12, 8, 0.6);
-    peca(k, fundo, [bx - 86, bb - 100, bx + 86, bb], { cor: '#a6623a', tinta: '#1a0c04', ang: 0.2, passo: 3.6, maxL: 2, sombra: (x, y) => 0.15 + Math.abs(x - bx) / 200 + (y - bb + 100) / 300, cruzada: 0.75, traco: 2.4, obj, abaulado: 0.2 });
-    const cacos = [[bx - 170, bb + 20, 0.4], [bx + 140, bb + 10, -0.6], [bx + 210, bb - 20, 1.2], [bx - 120, bb + 50, -1], [bx + 60, bb + 50, 0.3]];
-    for (const [x, y, gi] of cacos) {
-      const p = new Path2D();
-      p.moveTo(x - 30, y);
-      p.quadraticCurveTo(x, y - 26, x + 34, y - 4);
-      p.lineTo(x + 18, y + 12);
-      p.lineTo(x - 8, y + 6);
-      p.closePath();
+    const bb = 744;
+    const R = 78;
+    // a linha da quebra: alta à esquerda (ficou um pedaço do ombro), baixa à direita, com
+    // degraus e lascas desiguais, nunca em dente regular
+    const alturas = [158, 150, 162, 140, 128, 132, 112, 104, 108, 92, 96, 84, 88, 80];
+    const corte = alturas.map((h, i) => {
+      const t = i / (alturas.length - 1);
+      const x = bx - R * 1.02 + t * R * 2.04 + (r() - 0.5) * 6;
+      const larg = R * (h > 120 ? 0.86 + (h - 120) / 400 : 1);
+      return [bx + ((x - bx) / R) * larg, bb - h + (r() - 0.5) * 5];
+    });
+    const barriga = new Path2D();
+    barriga.moveTo(corte[0][0], corte[0][1]);
+    corte.forEach(([x, y]) => barriga.lineTo(x, y));
+    barriga.bezierCurveTo(bx + R + 8, bb - 40, bx + R * 0.7, bb, bx, bb);
+    barriga.bezierCurveTo(bx - R * 0.7, bb, bx - R - 8, bb - 40, corte[0][0], corte[0][1]);
+    barriga.closePath();
+    sombraNoChao(k, barriga, -26, 10, 8, 0.6);
+    // o lado de dentro, escuro, que aparece por cima da beirada de trás
+    const dentro = new Path2D();
+    dentro.ellipse(bx + 4, bb - 104, R - 10, 18, -0.12, 0, 6.283);
+    k.fillStyle = '#120804';
+    k.fill(dentro);
+    peca(k, barriga, [bx - R - 8, bb - 170, bx + R + 8, bb], { cor: '#a6623a', tinta: '#1a0c04', ang: 0.2, passo: 3.4, maxL: 2.1, sombra: (x, y) => 0.25 - (x - bx) / 260 + (y - bb + 100) / 400, cruzada: 0.72, traco: 2.4, obj, abaulado: 0.25 });
+    // a espessura na beirada partida: a faixa clara do barro cortado
+    k.strokeStyle = '#e2a874';
+    k.lineWidth = 5;
+    k.lineJoin = 'miter';
+    k.beginPath();
+    corte.forEach(([x, y], i) => (i ? k.lineTo(x, y + 3) : k.moveTo(x, y + 3)));
+    k.stroke();
+    k.strokeStyle = '#1a0c04';
+    k.lineWidth = 1.6;
+    k.beginPath();
+    corte.forEach(([x, y], i) => (i ? k.lineTo(x, y + 6) : k.moveTo(x, y + 6)));
+    k.stroke();
+    // a tocha: o cabo curto de madeira saindo do vaso, inclinado, com o pano enrolado
+    const t0 = [bx - 4, bb - 80];
+    const t1 = [bx + 64, bb - 268];
+    vara(k, [t0, t1], 15, '#8a5e36', obj);
+    fogoDePano(k, r, t1[0] - 2, t1[1] + 26, 196, 44);
+    k.save();
+    k.translate(t1[0], t1[1]);
+    k.rotate(Math.atan2(t1[1] - t0[1], t1[0] - t0[0]) + Math.PI / 2);
+    const pano = pol([[-15, -6], [15, -6], [17, 54], [-13, 56]]);
+    peca(k, pano, [-17, -6, 17, 56], { cor: '#5a3c26', tinta: '#140a04', ang: 0.5, passo: 3, maxL: 1.4, sombra: (x) => 0.35 + (x + 15) / 60, traco: 2, obj });
+    k.strokeStyle = '#140a04';
+    k.lineWidth = 1.8;
+    for (let yy = 4; yy < 54; yy += 9) { k.beginPath(); k.moveTo(-16, yy); k.quadraticCurveTo(0, yy + 7, 17, yy + 2); k.stroke(); }
+    k.restore();
+    // os cacos: lascas angulosas e curvas, clara a face de dentro, escura a de fora, com a
+    // espessura na quebra
+    const cacos = [[bx - 162, bb + 26, 0.4, 1], [bx + 132, bb + 18, -0.5, 0], [bx + 210, bb - 16, 1.1, 1], [bx - 110, bb + 62, -0.9, 0], [bx + 52, bb + 54, 0.25, 1], [bx - 230, bb - 6, 2.2, 0]];
+    for (const [x, y, gi, dentroV] of cacos) {
+      const s = 0.8 + r() * 0.5;
+      const pts = [[-30, -4], [-12, -20], [16, -16], [34, 2], [20, 14], [-6, 10], [-22, 12]].map(([a, b]) => [a * s + (r() - 0.5) * 6, b * s + (r() - 0.5) * 5]);
       k.save();
       k.translate(x, y);
       k.rotate(gi);
-      k.translate(-x, -y);
-      peca(k, p, [x - 30, y - 26, x + 34, y + 12], { cor: '#b06c40', tinta: '#1a0c04', ang: 0.8, passo: 3.4, maxL: 1.6, sombra: () => 0.45, cruzada: 1, traco: 2, obj });
+      sombraNoChao(k, pol(pts), -8, 6, 4, 0.6);
+      const face = pol(pts);
+      peca(k, face, [-34, -22, 36, 16], { cor: dentroV ? '#d39864' : '#94522c', tinta: '#1a0c04', ang: 0.8, passo: 3.2, maxL: 1.5, sombra: (px, py) => (dentroV ? 0.15 : 0.5) + (py + 20) / 120, cruzada: 0.8, traco: 2, obj });
+      // a espessura: a faixa clara num dos lados partidos
+      k.strokeStyle = '#e8b484';
+      k.lineWidth = 3.4;
+      k.beginPath();
+      k.moveTo(pts[3][0], pts[3][1]);
+      k.lineTo(pts[4][0], pts[4][1] + 2);
+      k.lineTo(pts[5][0], pts[5][1] + 2);
+      k.stroke();
+      // a curva do vaso que a lasca guarda
+      k.strokeStyle = 'rgba(26,12,4,.7)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.moveTo(pts[0][0] + 6, pts[0][1] + 2);
+      k.quadraticCurveTo(0, -6 * s, pts[3][0] - 6, pts[3][1]);
+      k.stroke();
       k.restore();
     }
-    // a corneta de chifre de carneiro, deitada na frente
-    const ch = bezier([150, 800], [260, 830], [420, 816], [520, 742], 30);
-    for (let i = ch.length - 1; i > 0; i--) {
-      const [x, y] = ch[i];
-      const raio = 6 + (i / ch.length) ** 1.6 * 34;
-      const p = new Path2D();
-      p.ellipse(x, y, raio, raio * 0.9, 0, 0, 6.283);
-      k.fillStyle = i % 4 === 0 ? '#bf9a62' : '#d9b77e';
-      k.fill(p);
-      marcar(k, obj, p);
-    }
+    // a corneta de chifre de carneiro, deitada na frente, à direita, com os anéis do chifre
+    const ch = bezier([540, 722], [614, 740], [700, 732], [780, 670], 30);
+    const raioDe = (i) => 5 + (i / (ch.length - 1)) ** 1.6 * 30;
+    const lado = (s) => ch.map(([x, y], i) => { const j = Math.min(i, ch.length - 2); const a = Math.atan2(ch[j + 1][1] - ch[j][1], ch[j + 1][0] - ch[j][0]); return [x - Math.sin(a) * raioDe(i) * s, y + Math.cos(a) * raioDe(i) * s]; });
     const chifre = new Path2D();
-    const lado = (s) => ch.map(([x, y], i) => { const raio = 6 + (i / ch.length) ** 1.6 * 34; const j = Math.min(i, ch.length - 2); const a = Math.atan2(ch[j + 1][1] - ch[j][1], ch[j + 1][0] - ch[j][0]); return [x - Math.sin(a) * raio * s, y + Math.cos(a) * raio * s]; });
-    const l1 = lado(1);
-    const l2 = lado(-1);
-    l1.forEach(([x, y], i) => (i ? chifre.lineTo(x, y) : chifre.moveTo(x, y)));
-    l2.reverse().forEach(([x, y]) => chifre.lineTo(x, y));
+    lado(1).forEach(([x, y], i) => (i ? chifre.lineTo(x, y) : chifre.moveTo(x, y)));
+    lado(-1).reverse().forEach(([x, y]) => chifre.lineTo(x, y));
     chifre.closePath();
-    peca(k, chifre, [130, 700, 560, 840], { tinta: '#1a0c04', ang: 1.3, passo: 3.6, maxL: 1.8, sombra: (x, y) => 0.2 + (y - 740) / 160, cruzada: 0.8, traco: 2.4 });
+    sombraNoChao(k, chifre, -10, 12, 6, 0.6);
+    peca(k, chifre, [520, 650, 850, 790], { cor: '#d6b47c', tinta: '#1a0c04', ang: 1.3, passo: 3.4, maxL: 1.8, sombra: (x, y) => 0.15 + (y - 690) / 140 + (x - 546) / 1400, cruzada: 0.8, traco: 2.4, obj });
+    k.save();
+    k.clip(chifre);
+    k.strokeStyle = 'rgba(26,12,4,.75)';
+    k.lineWidth = 1.5;
+    for (let i = 3; i < ch.length - 1; i += 2) {
+      const [x, y] = ch[i];
+      const a = Math.atan2(ch[i + 1][1] - ch[i][1], ch[i + 1][0] - ch[i][0]) + Math.PI / 2;
+      const rr = raioDe(i);
+      k.beginPath();
+      k.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+      k.quadraticCurveTo(x + Math.cos(a - Math.PI / 2) * rr * 0.3, y + Math.sin(a - Math.PI / 2) * rr * 0.3, x - Math.cos(a) * rr, y - Math.sin(a) * rr);
+      k.stroke();
+    }
+    k.restore();
     const [ex, ey] = ch[ch.length - 1];
     const bocal = new Path2D();
-    bocal.ellipse(ex, ey, 18, 36, 0.7, 0, 6.283);
+    bocal.ellipse(ex, ey, 14, 30, 0.6, 0, 6.283);
     k.fillStyle = '#2a1a0a';
     k.fill(bocal);
     k.strokeStyle = '#1a0c04';
     k.lineWidth = 2.4;
     k.stroke(bocal);
-    vinheta(k, W, H, 0.4);
+    marcar(k, obj, bocal);
+    vinheta(k, W, H, 0.35);
   }
 
   // Uma espiga de cevada ao longo do caminho (x0, y0) -> (x1, y1): os grãos alternados dos dois
@@ -5348,9 +5444,9 @@
   // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
   // o terceiro número (opcional, até 1) afasta a arte, usando a margem do desenho. Quando o
   // desenho não tem mais para onde ir, a arte desce (ou sobe) e a beirada dela se estende.
-  // Gideão: a corneta, no pé do desenho; Ester: o alto do dossel, na beirada de cima; Sara: as
+  // Gideão: a corneta, deitada embaixo à direita; Ester: o alto do dossel, na beirada de cima; Sara: as
   // borlas do pano da tenda, no alto.
-  const FOCO = { 'gideao-tochas': [0.33, 0.985, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96] };
+  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
