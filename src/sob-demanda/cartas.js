@@ -6696,7 +6696,7 @@
   // arca pousou nele, com as pontas do casco ainda sobre a água. A arca é o casco comprido e
   // baixo de piche, com a borda em curva, as faixas de tábuas (6.16) e o teto com a cumeeira.
   // O vento forte que fez a água baixar (8.1) arrasta a frente da tempestade em farrapos para o
-  // lado, com as cortinas de chuva que ainda caem longe.
+  // lado; a chuva já parou (8.2).
   function desenhoArarate(k, W, H, obj) {
     const r = sorteio(6201);
     papelVelho(k, W, H, r, ['#f7efd9', '#e6d8b6', '#c6b18a'], [W * 0.45, 380]);
@@ -6705,7 +6705,7 @@
     linhas(k, 0, 0, W, nivel, 5.5, 1.4, (x, y) => 0.12 + Math.max(0, 1 - y / 300) * 0.25);
     // a frente da tempestade: no alto, a massa da nuvem, em hachura aberta (o papel aparece
     // entre os traços); embaixo, a beirada rasgada em farrapos de tamanhos soltos, puxados pelo
-    // vento para a direita e para baixo, e as cortinas de chuva que caem deles
+    // vento para a direita e para baixo (a chuva já parou)
     const fr = sorteio(6231);
     const baseDe = (xx) => 150 + Math.sin(xx * 0.006 + 1) * 30 + Math.sin(xx * 0.019) * 12 + Math.sin(xx * 0.047 + 2) * 6;
     const pts = [[-20, -20], [W + 20, -20]];
@@ -6746,17 +6746,6 @@
       k.fillStyle = '#e8dec6';
       k.fill(tira);
       gravar(k, tira, cx + l / 2, cy, l, -0.08, 3, 1.3, () => 0.45, SEPIA, 0);
-    }
-    // as cortinas de chuva, longe, à esquerda: traços finos inclinados até o horizonte
-    k.strokeStyle = 'rgba(43,33,18,.32)';
-    k.lineWidth = 1;
-    for (let i = 0; i < 70; i++) {
-      const x0 = 20 + fr() * 260;
-      const y0 = baseDe(x0) + 10 + fr() * 30;
-      k.beginPath();
-      k.moveTo(x0, y0);
-      k.lineTo(x0 + (nivel - y0) * 0.28, nivel - 4 - fr() * 30);
-      k.stroke();
     }
     // os riscos do vento, soltos, no céu claro
     k.strokeStyle = 'rgba(43,33,18,.45)';
@@ -6811,9 +6800,6 @@
     k.moveTo(206, 478);
     nos.forEach(([xx, yy]) => k.lineTo(xx, yy));
     k.stroke();
-    // longe, à direita, a ponta de outra rocha que mal aparece
-    const ponta = pol([[728, nivel + 2], [746, nivel - 8], [770, nivel - 12], [792, nivel - 6], [806, nivel + 2]]);
-    peca(k, ponta, [728, nivel - 12, 806, nivel + 2], { cor: '#9c8c70', ang: Math.PI / 2, passo: 3, maxL: 1.2, sombra: (xx) => 0.4 + (xx - 728) / 200, cruzada: 1, traco: 1.4 });
     // a arca: o casco comprido e baixo de piche, a borda em curva, as três faixas de tábuas e o
     // teto com a cumeeira; tudo escuro de verdade (o raio da glória só passa no claro)
     const ax = 372;
