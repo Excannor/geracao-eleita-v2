@@ -12614,9 +12614,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.save();
       k.clip(banda);
       // o feixe: fibras ao comprido
-      for (let f = 0; f < 7; f++) {
-        const m = (f + 0.5) / 7;
-        k.strokeStyle = 'rgba(52,30,8,' + (0.45 + m * 0.3).toFixed(2) + ')';
+      for (let f = 0; f < 11; f++) {
+        const m = (f + 0.5) / 11;
+        k.strokeStyle = 'rgba(52,30,8,' + (0.4 + m * 0.4).toFixed(2) + ')';
         k.lineWidth = 0.9;
         k.beginPath();
         for (let i = 0; i <= 80; i++) {
@@ -12628,27 +12628,35 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         }
         k.stroke();
       }
-      // as amarras: tiras largas, claras, inclinadas, com a sombra de um lado
-      const n = Math.round(Math.abs(ate - de) / 0.105);
-      for (let i = 0; i < n; i++) {
-        const a = de + (ate - de) * ((i + 0.5) / n);
-        const d = 0.022;
-        const P = (aa, m) => [cx + Math.cos(aa) * (rx + 12 - m * (rx + 16 - rxi)), cy + Math.sin(aa) * (ry + 8 - m * (ry + 12 - ryi))];
-        const tira = pol([P(a - d - 0.02, 0), P(a + d - 0.02, 0), P(a + d + 0.02, 1), P(a - d + 0.02, 1)]);
-        const luz = 0.5 - Math.cos(a) * 0.35 + Math.sin(a) * 0.1;
-        k.fillStyle = 'rgb(' + [236, 208, 150].map((c) => Math.round(c * (0.62 + luz * 0.38))).join(',') + ')';
-        k.fill(tira);
-        k.strokeStyle = 'rgba(40,22,6,.9)';
-        k.lineWidth = 1.2;
-        k.stroke(tira);
-        const s0 = P(a + d + 0.02, 0);
-        const s1 = P(a + d + 0.06, 1);
-        k.strokeStyle = 'rgba(40,22,6,.55)';
-        k.lineWidth = 2.4;
-        k.beginPath();
-        k.moveTo(s0[0] + 2, s0[1]);
-        k.lineTo(s1[0] + 2, s1[1]);
-        k.stroke();
+      // as amarras: tiras de palha enroladas no feixe a passos desiguais, às vezes duas ou três
+      // juntas, de largura e inclinação variadas, quase do tom do feixe
+      const ra = sorteio(de > 3.5 ? 8341 : 8342);
+      const P = (aa, m) => [cx + Math.cos(aa) * (rx + 11 - m * (rx + 14 - rxi)), cy + Math.sin(aa) * (ry + 7 - m * (ry + 10 - ryi))];
+      const dirA = ate > de ? 1 : -1;
+      let a = de + dirA * (0.03 + ra() * 0.08);
+      while ((a - ate) * dirA < 0) {
+        const nJ = ra() < 0.55 ? 1 : ra() < 0.6 ? 2 : 3;
+        for (let j = 0; j < nJ; j++) {
+          const d = 0.011 + ra() * 0.012;
+          const inc = 0.014 + ra() * 0.03;
+          const tira = pol([P(a - d - inc, 0), P(a + d - inc, 0), P(a + d + inc, 1), P(a - d + inc, 1)]);
+          const luz = 0.5 - Math.cos(a) * 0.3 + Math.sin(a) * 0.1 + (ra() - 0.5) * 0.15;
+          k.fillStyle = 'rgb(' + [200, 168, 112].map((c) => Math.round(c * (0.72 + luz * 0.3))).join(',') + ')';
+          k.fill(tira);
+          k.strokeStyle = 'rgba(46,26,8,.6)';
+          k.lineWidth = 0.9;
+          k.stroke(tira);
+          k.strokeStyle = 'rgba(70,44,14,.4)';
+          k.lineWidth = 0.6;
+          const m0 = P(a - inc * 0.2, 0.15);
+          const m1 = P(a + inc * 0.6, 0.85);
+          k.beginPath();
+          k.moveTo(m0[0], m0[1]);
+          k.lineTo(m1[0], m1[1]);
+          k.stroke();
+          a += dirA * (2 * d + 0.004);
+        }
+        a += dirA * (0.06 + ra() * 0.11);
       }
       k.restore();
       k.strokeStyle = '#2e1c08';
@@ -12681,8 +12689,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         const wy = (u * sg + v * cg) * R;
         return [x + wx, y + wy * sE - z * cE];
       };
-      // o rasgo (pão partido em dois): 'tras' é a metade de trás, com a face do miolo virada
-      // para nós; 'frente' é a outra metade, puxada para a frente, de face escondida
+      // o rasgo (pão partido em dois): 'tras' e 'frente' são as duas metades; cada uma é girada
+      // para que a face do miolo fique virada para nós
       const fR = onda(sorteio(semente + 7), 6, 2.2);
       const rR = sorteio(semente + 11);
       const passos = [];
@@ -12720,7 +12728,6 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       }
       const face = [];
       const faceBaixo = [];
-      const beira = [];
       if (partido) {
         for (let u = -1.3; u <= 1.3; u += 0.01) {
           const v = rasgo(u);
@@ -12729,8 +12736,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
           const z = alto(u, v) * 0.94 - lasca[Math.max(0, Math.min(140, Math.round((u + 1.4) * 50)))];
           face.push(proj(u, v, z));
           faceBaixo.push(proj(u, v, 0));
-          amostras.push(proj(u, v, partido === 'tras' ? 0 : z));
-          if (partido === 'frente') beira.push(proj(u, v + 0.02, z - 0.6));
+          amostras.push(proj(u, v, 0));
+          amostras.push(proj(u, v, z));
         }
       }
       const c0 = proj(0, partido === 'tras' ? -0.3 : partido ? 0.45 : 0, H * 0.4);
@@ -12774,8 +12781,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       quads.sort((a, b) => a.prof - b.prof);
       for (const qd of quads) {
         const l = luzEm(qd.um, qd.vm);
-        const t = Math.min(1, l * 1.15);
-        const cor = [[86, 48, 16], [150, 96, 46], [218, 172, 110]];
+        const t = Math.min(1, 0.12 + l * 0.85);
+        const cor = [[104, 66, 30], [160, 112, 62], [202, 160, 108]];
         const m = t < 0.5 ? 0 : 1;
         const f = t < 0.5 ? t * 2 : (t - 0.5) * 2;
         const c = cor[m].map((v, i) => Math.round(v + (cor[m + 1][i] - v) * f));
@@ -12844,74 +12851,74 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
           talho([u0 - Math.cos(ang) * l, v0 - Math.sin(ang) * l], [u0 + Math.cos(ang) * l, v0 + Math.sin(ang) * l], cv, 0.06);
         }
       }
-      // a casca rachada nos ombros: fendas finas que seguem a volta do pão, em zigue-zague mole
-      for (let n = 0; n < 9; n++) {
-        const phi = rr() * 6.283;
-        const q0 = 0.58 + rr() * 0.26;
-        const comp = 0.3 + rr() * 0.4;
-        const pts = [];
-        for (let s = 0; s <= 6; s++) {
-          const ph = phi + (s / 6) * comp;
-          const q = (q0 + (rr() - 0.5) * 0.06) * borda(ph);
-          pts.push([Math.cos(ph) * q, Math.sin(ph) * q]);
-        }
-        if (!pts.every(([u, v]) => fica(u, v))) continue;
-        const sc = sobre(pts);
-        k.strokeStyle = 'rgba(36,16,2,.92)';
-        k.lineWidth = 2.2;
-        k.lineJoin = 'round';
-        k.stroke(pol(sc, false));
-        k.strokeStyle = 'rgba(248,220,168,.6)';
-        k.lineWidth = 1;
-        k.stroke(pol(sc.map(([px, py]) => [px - 0.8, py - 1.6]), false));
-        // os ramos curtos da rachadura
-        const m = sc[3];
-        k.strokeStyle = 'rgba(36,16,2,.8)';
-        k.lineWidth = 1;
+      // a textura da casca: golpes curtos e pontos, fosca e áspera
+      for (let n = 0; n < R * 9; n++) {
+        const a = rr() * 6.283;
+        const d = Math.sqrt(rr()) * 0.95;
+        const u = Math.cos(a) * d * borda(a);
+        const v = Math.sin(a) * d * borda(a);
+        if (!fica(u, v)) continue;
+        const [px, py] = proj(u, v);
+        const g = rr() * 3.14;
+        const l = 1 + rr() * 2.5;
+        k.strokeStyle = rr() < 0.7 ? 'rgba(48,24,6,.32)' : 'rgba(236,206,156,.3)';
+        k.lineWidth = 0.9;
         k.beginPath();
-        k.moveTo(m[0], m[1]);
-        k.lineTo(m[0] + (rr() - 0.5) * 12, m[1] + (rr() - 0.5) * 8);
+        k.moveTo(px, py);
+        k.lineTo(px + Math.cos(g) * l, py + Math.sin(g) * l);
         k.stroke();
       }
-      // a farinha: manchas brancas moles no alto, e o pó fino espalhado
-      k.save();
-      k.filter = 'blur(6px)';
-      for (let n = 0; n < 5; n++) {
-        const u = (rr() - 0.5) * 0.9;
-        const v = (rr() - 0.6) * 0.8;
-        if (!fica(u, v)) continue;
-        const [px, py] = proj(u, v);
-        k.fillStyle = 'rgba(252,248,234,' + (0.5 + rr() * 0.3).toFixed(2) + ')';
-        k.beginPath();
-        k.ellipse(px, py, R * (0.16 + rr() * 0.14), R * (0.09 + rr() * 0.07), giro + rr(), 0, 6.283);
-        k.fill();
+      // a casca rachada nos ombros: duas a quatro fendas que seguem a volta do pão; cada uma é
+      // uma fenda escura que afina nas pontas, com a beirada de cima acesa
+      const nR = 2 + Math.floor(rr() * 3);
+      for (let n = 0; n < nR; n++) {
+        const phi = -2.6 + rr() * 2.4 + (n % 2 ? Math.PI : 0) * 0.5;
+        const q0 = 0.72 + rr() * 0.12;
+        const comp = 0.5 + rr() * 0.5;
+        const meio = [];
+        for (let s0 = 0; s0 <= 10; s0++) {
+          const ph = phi + (s0 / 10) * comp;
+          const q = (q0 + Math.sin(s0 * 0.9 + n) * 0.008) * borda(ph);
+          meio.push([ph, q]);
+        }
+        const pts = meio.map(([ph, q]) => [Math.cos(ph) * q, Math.sin(ph) * q]);
+        if (!pts.every(([u, v]) => fica(u, v))) continue;
+        const fora = meio.map(([ph, q], i) => { const w = Math.sin((i / 10) * Math.PI) * 0.035; return [Math.cos(ph) * (q + w), Math.sin(ph) * (q + w)]; });
+        const dentro = meio.map(([ph, q], i) => { const w = Math.sin((i / 10) * Math.PI) * 0.025; return [Math.cos(ph) * (q - w), Math.sin(ph) * (q - w)]; });
+        const fenda = pol(sobre([...fora, ...dentro.slice().reverse()]));
+        k.fillStyle = 'rgba(40,18,2,.9)';
+        k.fill(fenda);
+        // a beirada acesa: do lado que olha para cima na imagem
+        const sf = sobre(fora);
+        const sd = sobre(dentro);
+        const lab = sf[5][1] < sd[5][1] ? sf : sd;
+        k.strokeStyle = 'rgba(232,200,146,.85)';
+        k.lineWidth = 1.5;
+        k.stroke(pol(lab.map(([px, py]) => [px, py - 1.2]), false));
       }
-      k.restore();
-      for (let n = 0; n < R * 2.2; n++) {
-        const a = rr() * 6.283;
-        const d = Math.abs((rr() + rr() + rr()) / 3 - 0.5) * 2 * 0.85;
-        const u = Math.cos(a) * d;
-        const v = Math.sin(a) * d - 0.1;
-        if (!fica(u, v)) continue;
-        const [px, py] = proj(u, v);
-        k.fillStyle = rr() < 0.8 ? 'rgba(255,250,236,.85)' : 'rgba(44,22,4,.6)';
-        k.fillRect(px, py, 1.4, 1.4);
+      // a farinha: manchas secas de pó miúdo (pontos soltos, sem brilho), mais no alto
+      for (let n = 0; n < 4; n++) {
+        const u0 = (rr() - 0.5) * 0.9;
+        const v0 = (rr() - 0.65) * 0.8;
+        const ru = 0.12 + rr() * 0.14;
+        const rv = 0.08 + rr() * 0.08;
+        for (let m = 0; m < 70; m++) {
+          const a = rr() * 6.283;
+          const d = Math.sqrt(rr());
+          const u = u0 + Math.cos(a) * ru * d;
+          const v = v0 + Math.sin(a) * rv * d;
+          if (!fica(u, v) || Math.hypot(u, v) > 0.9) continue;
+          const [px, py] = proj(u, v);
+          k.fillStyle = 'rgba(232,222,196,' + (0.35 + rr() * 0.35).toFixed(2) + ')';
+          const sz = 0.8 + rr() * 1.4;
+          k.fillRect(px, py, sz, sz);
+        }
       }
       k.restore();
       k.strokeStyle = '#2a1404';
       k.lineWidth = 2;
       k.stroke(sil);
-      if (partido === 'frente') {
-        // a beirada rasgada vista de cima: um fio de miolo claro e a casca em lascas
-        k.strokeStyle = 'rgba(236,212,164,.95)';
-        k.lineWidth = 2.6;
-        k.lineJoin = 'round';
-        k.stroke(pol(beira, false));
-        k.strokeStyle = '#3a1c06';
-        k.lineWidth = 1;
-        k.stroke(pol(beira.map(([px, py]) => [px, py + 1.8]), false));
-      }
-      if (partido === 'tras') {
+      if (partido) {
         // a face do miolo, rasgada: clara, porosa, com lascas; a casca é uma tira fina em cima
         const miolo = pol([...face, ...faceBaixo.slice().reverse()]);
         k.fillStyle = '#ead4a4';
@@ -12966,111 +12973,155 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       }
     };
     // os três de trás, encostados na borda; os dois da frente por cima
-    pao(282, 486, 98, 24, 0.18, 8331, [[-0.15, -0.2, -0.5, 0.42, 0.08], [0.22, 0.18, 0.45, 0.32, -0.06]]);
-    pao(452, 466, 102, 26, -0.1, 8332, 'cruz');
-    pao(620, 490, 96, 23, 0.12, 8333, [[-0.25, 0.05, 1.25, 0.34, 0.1], [0.12, -0.18, 0.2, 0.4, -0.05], [0.3, 0.3, -0.75, 0.22, 0.08]]);
-    pao(356, 596, 102, 34, -0.12, 8334, [[-0.3, -0.35, 0.25, 0.3, 0.06], [0.35, -0.3, -1.1, 0.2, 0.06]], 'tras');
-    pao(338, 626, 102, 34, -0.14, 8334, [[0.05, 0.62, -0.35, 0.24, 0.06]], 'frente');
-    pao(560, 610, 100, 25, 0.1, 8335, [[-0.1, -0.15, 0.7, 0.45, -0.1], [0.28, 0.25, -0.35, 0.28, 0.07]]);
+    pao(282, 486, 98, 18, 0.18, 8331, [[-0.15, -0.2, -0.5, 0.42, 0.08], [0.22, 0.18, 0.45, 0.32, -0.06]]);
+    pao(452, 466, 102, 19, -0.1, 8332, 'cruz');
+    pao(620, 490, 96, 17, 0.12, 8333, [[-0.25, 0.05, 1.25, 0.34, 0.1], [0.12, -0.18, 0.2, 0.4, -0.05], [0.3, 0.3, -0.75, 0.22, 0.08]]);
+    // o pão partido: as duas metades lado a lado, afastadas, com o miolo virado para nós
+    pao(282, 630, 84, 30, -0.3, 8334, [[-0.3, -0.45, 0.25, 0.26, 0.06]], 'tras');
+    pao(442, 640, 84, 30, -2.84, 8334, [[0.1, 0.55, -0.35, 0.22, 0.06]], 'frente');
+    pao(586, 612, 98, 18, 0.1, 8335, [[-0.1, -0.15, 0.7, 0.45, -0.1], [0.28, 0.25, -0.35, 0.28, 0.07]]);
 
-    // os dois peixinhos secos, deitados por cima dos pães, em diagonais diferentes
-    const peixe = (x, y, L, ang, lado) => {
+    // os dois peixinhos, secos e salgados, diferentes: um comprido e fino (de lombo cinza-pardo,
+    // salgado), outro mais curto e alto, mais escuro e torto do sol; deitados, com a sombra
+    // de contato, um por cima de um pão
+    const peixe = (x, y, L, ang, lado, D, curva, semente, cores) => {
+      const rp = sorteio(semente);
       k.save();
       k.translate(x, y);
       k.rotate(ang);
       k.scale(lado, 1);
-      const corpo = new Path2D();
-      corpo.moveTo(-L * 0.5, 0);
-      corpo.bezierCurveTo(-L * 0.36, -L * 0.17, L * 0.18, -L * 0.18, L * 0.36, -L * 0.02);
-      corpo.lineTo(L * 0.5, -L * 0.12);
-      corpo.lineTo(L * 0.46, 0);
-      corpo.lineTo(L * 0.5, L * 0.12);
-      corpo.lineTo(L * 0.36, L * 0.02);
-      corpo.bezierCurveTo(L * 0.18, L * 0.16, -L * 0.36, L * 0.14, -L * 0.5, 0);
-      corpo.closePath();
-      // a barbatana do dorso nasce do lombo: a base fica por baixo do corpo
-      const dorso = (t) => {
-        const u = 1 - t;
-        return [
-          (u * u * u * -0.5 + 3 * u * u * t * -0.36 + 3 * u * t * t * 0.18 + t * t * t * 0.36) * L,
-          (3 * u * u * t * -0.17 + 3 * u * t * t * -0.18 + t * t * t * -0.02) * L,
-        ];
+      const A = D * L;
+      const yc = (t) => curva * L * ((t - 0.45) ** 2 - 0.2);
+      const perfil = [[0, 0], [0.03, 0.42], [0.1, 0.78], [0.25, 1], [0.45, 0.94], [0.62, 0.66], [0.74, 0.4], [0.8, 0.26]];
+      const meia = (t) => {
+        for (let i = 1; i < perfil.length; i++) {
+          if (perfil[i][0] >= t) { const [t0, h0] = perfil[i - 1]; const [t1, h1] = perfil[i]; const f = (t - t0) / (t1 - t0); return (h0 + (h1 - h0) * (0.5 - Math.cos(f * Math.PI) / 2)) * A; }
+        }
+        return perfil[perfil.length - 1][1] * A;
       };
-      const base = [];
-      for (let t = 0.4; t <= 0.66; t += 0.02) base.push(dorso(t));
-      const pontas = base.map(([bx, by], i) => {
-        const f = i / (base.length - 1);
-        return [bx + L * 0.03 * f, by - L * (0.03 + Math.sin(f * Math.PI * 0.9 + 0.2) * 0.06)];
-      });
-      const fin = pol([...base.map(([bx, by]) => [bx, by + L * 0.03]).reverse(), ...pontas]);
-      const corpoTodo = new Path2D();
-      corpoTodo.addPath(corpo);
-      corpoTodo.addPath(fin);
-      sombraNoChao(k, corpoTodo, 6 * lado, 10, 5, 0.45);
-      if (obj) marcar(k, obj, corpoTodo);
-      k.fillStyle = '#b8ae90';
-      k.fill(fin);
-      k.strokeStyle = '#2a2414';
-      k.lineWidth = 1.2;
-      k.stroke(fin);
-      k.lineWidth = 0.8;
-      for (let i = 1; i < base.length - 1; i += 2) {
-        k.beginPath();
-        k.moveTo(base[i][0], base[i][1] + 1);
-        k.lineTo(pontas[i][0], pontas[i][1]);
-        k.stroke();
+      const X = (t) => (t - 0.5) * L;
+      const cima = [];
+      const baixo = [];
+      for (let t = 0; t <= 0.8001; t += 0.02) {
+        cima.push([X(t), yc(t) - meia(t) * 1.05]);
+        baixo.push([X(t), yc(t) + meia(t) * 0.95]);
       }
-      const g = k.createLinearGradient(0, -L * 0.18, 0, L * 0.16);
-      g.addColorStop(0, '#a49a7c');
-      g.addColorStop(0.5, '#cfc6a6');
-      g.addColorStop(1, '#8a7e5c');
+      const yT = yc(0.8);
+      const rabo = [[X(1.0), yT - A * 0.85], [X(0.93), yT + A * 0.02], [X(1.0), yT + A * 0.8]];
+      const corpo = pol([...cima, ...rabo, ...baixo.slice().reverse()]);
+      // as barbatanas do dorso e do ventre: a base fica por baixo do corpo
+      const barb = (t0, t1, alto, emCima) => {
+        const base = [];
+        const ponta = [];
+        for (let t = t0; t <= t1 + 1e-6; t += (t1 - t0) / 8) {
+          const f = (t - t0) / (t1 - t0);
+          const yb = emCima ? yc(t) - meia(t) * 1.05 : yc(t) + meia(t) * 0.95;
+          const h = A * alto * Math.sin(Math.min(1, f * 1.15) * Math.PI * 0.85 + 0.15);
+          base.push([X(t), yb + (emCima ? A * 0.2 : -A * 0.2)]);
+          ponta.push([X(t) + L * 0.02 * f, yb + (emCima ? -h : h)]);
+        }
+        return { forma: pol([...base, ...ponta.slice().reverse()]), base, ponta };
+      };
+      const fins = [barb(0.36, 0.58, 0.5, true), barb(0.6, 0.74, 0.32, false)];
+      const tudo = new Path2D();
+      tudo.addPath(corpo);
+      for (const f of fins) tudo.addPath(f.forma);
+      // a sombra no que está embaixo: larga e mole, e a de contato, curta e escura
+      sombraNoChao(k, tudo, 4 * lado, 8, 6, 0.5);
+      sombraNoChao(k, corpo, 1 * lado, 3, 2, 0.55);
+      if (obj) marcar(k, obj, tudo);
+      for (const f of fins) {
+        k.fillStyle = cores[1];
+        k.fill(f.forma);
+        k.strokeStyle = 'rgba(30,20,8,.8)';
+        k.lineWidth = 0.8;
+        f.base.forEach((b, i) => { if (i % 2) return; k.beginPath(); k.moveTo(b[0], b[1]); k.lineTo(f.ponta[i][0], f.ponta[i][1]); k.stroke(); });
+        k.lineWidth = 1.2;
+        k.stroke(f.forma);
+      }
+      // o corpo: o lombo escuro, o ventre claro
+      const g = k.createLinearGradient(0, -A, 0, A);
+      g.addColorStop(0, cores[0]);
+      g.addColorStop(0.45, cores[1]);
+      g.addColorStop(1, cores[2]);
       k.fillStyle = g;
       k.fill(corpo);
-      // as escamas: arquinhos em fileiras desencontradas, do lado da cabeça para o rabo
       k.save();
       k.clip(corpo);
-      k.strokeStyle = 'rgba(44,38,22,.75)';
-      k.lineWidth = 1;
-      for (let row = -4; row <= 4; row++) {
-        for (let c = -0.3; c < 0.3; c += 0.034) {
-          const sx = (c + (row % 2 ? 0.017 : 0)) * L;
-          const sy = row * L * 0.028;
-          k.globalAlpha = 0.45 + Math.max(0, row) * 0.1;
+      // a hachura ao comprido no lombo (o volume) e as escamas gravadas, mais fortes no alto
+      for (let row = -6; row <= 6; row++) {
+        for (let t = 0.17; t < 0.78; t += 0.028) {
+          const sy = yc(t) + (row / 6) * meia(t);
+          const sx = X(t + (row % 2 ? 0.014 : 0));
+          const al = 0.2 + Math.max(0, -row) * 0.07;
+          k.strokeStyle = 'rgba(30,20,8,' + al.toFixed(2) + ')';
+          k.lineWidth = 0.9;
           k.beginPath();
-          k.arc(sx, sy, L * 0.017, -1.1, 1.1);
+          k.arc(sx, sy, L * 0.016, -1.15, 1.15);
           k.stroke();
         }
       }
-      k.globalAlpha = 1;
-      // a linha lateral e o dorso mais escuro
-      k.strokeStyle = 'rgba(44,38,22,.9)';
-      k.lineWidth = 1.4;
+      for (let row = 0; row < 5; row++) {
+        k.strokeStyle = 'rgba(30,20,8,' + (0.55 - row * 0.08).toFixed(2) + ')';
+        k.lineWidth = 1.1 - row * 0.12;
+        k.beginPath();
+        for (let t = 0.05; t <= 0.8; t += 0.02) {
+          const yy = yc(t) - meia(t) * (0.95 - row * 0.12);
+          if (t > 0.05) k.lineTo(X(t), yy);
+          else k.moveTo(X(t), yy);
+        }
+        k.stroke();
+      }
+      // a linha do flanco
+      k.strokeStyle = 'rgba(30,20,8,.75)';
+      k.lineWidth = 1.2;
       k.beginPath();
-      k.moveTo(-L * 0.38, -L * 0.01);
-      k.quadraticCurveTo(0, -L * 0.04, L * 0.34, 0);
+      for (let t = 0.2; t <= 0.8; t += 0.02) { const yy = yc(t) - meia(t) * 0.12; if (t > 0.2) k.lineTo(X(t), yy); else k.moveTo(X(t), yy); }
       k.stroke();
+      // o sal: grãos claros soltos
+      for (let n = 0; n < L * 0.25; n++) {
+        const t = 0.1 + rp() * 0.65;
+        const yy = yc(t) + (rp() - 0.5) * 1.6 * meia(t);
+        k.fillStyle = 'rgba(246,240,224,' + (0.4 + rp() * 0.4).toFixed(2) + ')';
+        k.fillRect(X(t), yy, 1.3, 1.3);
+      }
       k.restore();
-      k.strokeStyle = '#2a2414';
+      k.strokeStyle = '#241a0c';
       k.lineWidth = 1.8;
+      k.lineJoin = 'round';
       k.stroke(corpo);
-      // a guelra, a boca fechada e o olho seco (um anel pequeno)
-      k.lineWidth = 1.4;
+      // a guelra, a barbatana do peito, a boca e o olho (um ponto escuro)
+      k.lineWidth = 1.3;
       k.beginPath();
-      k.arc(-L * 0.32, 0, L * 0.09, -1.2, 1.2);
+      k.arc(X(0.02), yc(0.18), meia(0.18) * 0.95, -1.05, 1.05);
       k.stroke();
+      // a barbatana do peito: um leque pequeno de raios, colado atrás da guelra
+      const p0 = [X(0.19), yc(0.19) + meia(0.19) * 0.25];
+      const raios = [0.05, 0.22, 0.4, 0.56].map((f) => [X(0.19 + 0.11 - f * 0.02), yc(0.3) + meia(0.3) * (0.05 + f)]);
+      const pe = pol([p0, ...raios]);
+      k.fillStyle = cores[1];
+      k.globalAlpha = 0.85;
+      k.fill(pe);
+      k.globalAlpha = 1;
+      k.lineWidth = 0.8;
+      for (const q of raios) { k.beginPath(); k.moveTo(p0[0], p0[1]); k.lineTo(q[0], q[1]); k.stroke(); }
+      k.lineWidth = 1;
+      k.stroke(pol([raios[0], ...raios.slice(1)], false));
+      k.lineWidth = 1.3;
       k.beginPath();
-      k.moveTo(-L * 0.5, 0);
-      k.lineTo(-L * 0.45, L * 0.012);
+      k.moveTo(X(0), yc(0));
+      k.lineTo(X(0.05), yc(0.05) + meia(0.05) * 0.15);
       k.stroke();
+      k.fillStyle = '#140e06';
       k.beginPath();
-      k.arc(-L * 0.41, -L * 0.035, L * 0.018, 0, 6.283);
-      k.stroke();
+      k.arc(X(0.075), yc(0.075) - meia(0.075) * 0.3, Math.max(2.2, L * 0.012), 0, 6.283);
+      k.fill();
       k.restore();
     };
     // a metade da frente da borda passa por cima do pé dos pães da frente
     borda(0, Math.PI);
-    peixe(432, 500, 236, -0.2, 1);
-    peixe(530, 556, 226, -0.05, -1);
+    peixe(470, 466, 246, -0.14, 1, 0.1, 0.03, 8351, ['#5c4c32', '#a8946e', '#dccfae']);
+    peixe(606, 592, 196, 0.3, -1, 0.165, -0.09, 8352, ['#4a3016', '#94703f', '#d2b484']);
     vinheta(k, W, H, 0.22);
   }
   // ---------- fim dos Objetos ----------
