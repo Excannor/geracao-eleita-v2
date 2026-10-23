@@ -487,7 +487,7 @@
       "voceSabia": "Era branco, semelhante à semente de coentro, e tinha gosto de bolo de mel.",
       "link": "#/atlas/exodo",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "agua-rocha",
@@ -553,7 +553,7 @@
       "voceSabia": "Jonas ficou três dias e três noites dentro do peixe.",
       "link": "#/mapa/jonas",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "tempestade",
@@ -564,7 +564,7 @@
       "voceSabia": "Jesus dormia na popa do barco com a cabeça numa almofada.",
       "link": "#/mapa/marcos",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "pesca",
@@ -586,7 +586,7 @@
       "voceSabia": "Eram seis talhas de pedra, e em cada uma cabiam entre 80 e 120 litros.",
       "link": "#/mapa/joao",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "tumulo-vazio",
@@ -608,7 +608,7 @@
       "voceSabia": "As correntes caíram dos pulsos de Pedro, e o portão de ferro se abriu.",
       "link": "#/mapa/atos",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "semente-lancada",
