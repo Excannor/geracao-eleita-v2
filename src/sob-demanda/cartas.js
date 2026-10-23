@@ -14330,9 +14330,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.stroke();
       // a folhagem: uma coluna fofa e torta de fiapos finos e caídos, que sobe do chão até a
       // copa (a tamargueira não tem copa redonda nem de guarda-chuva)
-      for (let i = 0; i < 150; i++) {
+      for (let i = 0; i < 240; i++) {
         const t = r();
-        const cx = x + (r() - 0.5) * alto * 0.5 * (0.4 + Math.sin(t * Math.PI) * 0.8) + Math.sin(t * 5) * 4 * e;
+        const cx = x + (r() - 0.5) * alto * 0.55 * (0.4 + Math.sin(t * Math.PI) * 0.8) + Math.sin(t * 5) * 4 * e;
         const cy = base - alto * (0.12 + t * 0.88);
         const L = (5 + r() * 9) * e;
         const ld = r() < 0.5 ? -1 : 1;
@@ -14344,7 +14344,48 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         k.stroke();
       }
     };
-    for (const [x, a] of [[40, 70], [120, 92], [230, 60], [310, 84], [420, 66], [540, 96], [640, 70], [730, 88], [830, 74]]) tamargueira(x + (r() - 0.5) * 20, hz - 2, a, 0.8);
+    // a margem de lá em moitas: grupos desiguais de tamargueiras, uns choupos altos e finos, e
+    // entre eles só o mato baixo (nada de fila de árvores iguais)
+    const choupo = (x, base, alto) => {
+      k.strokeStyle = 'rgba(52,40,22,.85)';
+      k.lineWidth = 2;
+      k.beginPath();
+      k.moveTo(x, base);
+      k.lineTo(x + 1, base - alto * 0.3);
+      k.stroke();
+      const copa = new Path2D();
+      copa.moveTo(x, base - alto);
+      copa.bezierCurveTo(x + alto * 0.16, base - alto * 0.8, x + alto * 0.14, base - alto * 0.35, x + 2, base - alto * 0.25);
+      copa.bezierCurveTo(x - alto * 0.12, base - alto * 0.35, x - alto * 0.14, base - alto * 0.8, x, base - alto);
+      k.fillStyle = '#9a9a6a';
+      k.fill(copa);
+      gravar(k, copa, x, base - alto * 0.6, alto * 0.5, 1.45, 2.4, 1.2, (px) => 0.3 + (px - x + 10) / 40, '#2a2a14', 0);
+      k.strokeStyle = 'rgba(30,30,14,.8)';
+      k.lineWidth = 1;
+      k.stroke(copa);
+    };
+    const mato = (x0, x1) => {
+      for (let x = x0; x < x1; x += 3) {
+        const h = 6 + r() * 10;
+        k.strokeStyle = 'rgba(60,64,38,' + (0.4 + r() * 0.4).toFixed(2) + ')';
+        k.lineWidth = 1;
+        k.beginPath();
+        k.moveTo(x, hz - 2);
+        k.lineTo(x + (r() - 0.5) * 6, hz - 2 - h);
+        k.stroke();
+      }
+    };
+    mato(-10, W + 10);
+    // cada moita: uma barra baixa e escura de arbusto em hachura, e por cima as tamargueiras de
+    // alturas bem diferentes, umas por cima das outras
+    for (const [x0, x1, n, a0] of [[0, 120, 4, 70], [150, 215, 2, 110], [250, 280, 1, 40], [440, 610, 6, 90], [625, 720, 3, 130], [770, 880, 3, 60]]) {
+      const moita = pol([[x0, hz - 1], ...Array.from({ length: 12 }, (_, i) => { const x = x0 + ((x1 - x0) * i) / 11; return [x, hz - 8 - Math.sin((i / 11) * Math.PI) * (10 + r() * 10)]; }), [x1, hz - 1]]);
+      k.fillStyle = '#8a8a5c';
+      k.fill(moita);
+      gravar(k, moita, (x0 + x1) / 2, hz - 10, (x1 - x0) / 2 + 20, 0.05, 2.4, 1.2, () => 0.6, '#2a2a14', 0);
+      for (let i = 0; i < n; i++) tamargueira(x0 + 10 + r() * (x1 - x0 - 20), hz - 4, a0 * (0.5 + r() * 0.6), 0.7 + r() * 0.5);
+    }
+    void choupo;
     // o rio, visto rente: as ondulações compridas e mansas, cada vez mais juntas longe, a
     // corrente da esquerda para a direita; o reflexo das árvores em riscos de pé longe
     const rio = pol([[-10, hz + 2], [W + 10, hz + 2], [W + 10, H + 10], [-10, H + 10]]);
@@ -14363,9 +14404,13 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         // perto do ferro a água se abre em volta dele
         const d = Math.hypot((x + c / 2 - cx) / 2.4, y - cy);
         if (Math.hypot((x + c / 2 - cx + 30) / 4, y - cy - 10) > 56) {
-          const claro = r() < 0.3;
-          k.strokeStyle = claro ? 'rgba(248,246,230,.8)' : 'rgba(40,44,30,' + (0.4 + t * 0.4).toFixed(2) + ')';
-          k.lineWidth = (0.5 + t * 2) * (claro ? 0.8 : 1);
+          // o tom da água: mais escura rente à margem de lá e perto de quem olha, com umas faixas
+          // mais claras de correnteza no meio
+          const faixa = Math.sin((y - hz) * 0.022 + Math.sin(x * 0.004) * 1.5);
+          const tom = 0.75 + Math.max(0, 1 - (y - hz) / 50) * 0.6 + t * 0.35 - Math.max(0, faixa) * 0.35;
+          const claro = r() < 0.18 + Math.max(0, faixa) * 0.25;
+          k.strokeStyle = claro ? 'rgba(248,246,230,.8)' : 'rgba(40,44,30,' + Math.min(0.95, (0.35 + t * 0.4) * tom).toFixed(2) + ')';
+          k.lineWidth = (0.5 + t * 2) * (claro ? 0.8 : tom);
           k.beginPath();
           k.moveTo(x, y);
           k.quadraticCurveTo(x + c / 2, y - 1 - t * 4, x + c, y);
@@ -14375,9 +14420,11 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       }
     }
     // o reflexo das tamargueiras, longe: riscos escuros de pé, quebrados
+    const moitas = [[20, 110, 34], [150, 210, 40], [240, 270, 22], [450, 600, 40], [620, 720, 44], [780, 850, 30]];
     for (let x = 0; x < W; x += 3) {
-      if (r() < 0.4) continue;
-      const L = 10 + r() * 24;
+      const m = moitas.find(([a, b]) => x >= a && x <= b);
+      if (r() < (m ? 0.3 : 0.75)) continue;
+      const L = m ? 10 + r() * m[2] : 4 + r() * 8;
       k.strokeStyle = 'rgba(60,62,40,.35)';
       k.lineWidth = 1.2;
       k.beginPath();
