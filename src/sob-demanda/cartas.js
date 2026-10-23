@@ -1683,7 +1683,7 @@
   function asasDoQuerubim(k, x0, y0, esc, lado, luzEm, obj) {
     const T = (x, y) => [x0 + lado * x * esc, y0 + y * esc];
     // a asa de trás: mais alta, mais escura, a ponta lá em cima, sobre o meio da tampa
-    asaOrdenada(k, [T(-40, -96), T(-96, -290), T(10, -380), T(96, -340)], luzEm, { escurecer: 0.42, escala: esc * 0.92, lado, obj });
+    asaOrdenada(k, [T(-40, -96), T(-96, -270), T(10, -348), T(96, -316)], luzEm, { escurecer: 0.42, escala: esc * 0.92, lado, obj });
     // a asa da frente: sai mais baixa e avança mais sobre a tampa
     asaOrdenada(k, [T(-14, -84), T(-56, -236), T(40, -306), T(118, -262)], luzEm, { escala: esc, lado, obj });
   }
