@@ -443,7 +443,7 @@ Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
 | Função | Teste |
 |---|---|
 | `R.resumo(cartas, hoje)` | teste.mjs: álbum atual, cartas, lançadas, versões, repetidas, alcançados, sorteios desde Ouro e desde Prata, marcos sem Glória |
-| `CC.album.tela(raiz)` | teste-bau: as recebidas e as silhuetas sem texto; "2 de 13 cartas" e "Coleção: 3 de 65 versões"; bolinhas, ×2 e rótulo; carta sem desenho em silhueta; Semeadores com os 5 limiares; cabe no computador sem rolagem de lado |
+| `CC.album.tela(raiz)` | teste-bau: as recebidas e as silhuetas sem texto; "1 de 13 cartas" e "Coleção: 2 de 65 versões"; bolinhas, ×2 e rótulo; carta sem desenho em silhueta; Semeadores com os 5 limiares; cabe no computador sem rolagem de lado |
 | `CC.album.abrirCarta(id, raridade)` | teste-bau: a melhor versão aberta, ×2, silhuetas das que faltam; troca para Bronze; Virar mostra o verso; Compartilhar e link da Bíblia; sem desenho, carta de texto sem Compartilhar |
 | `CC.album.oQuePodeVir()` | teste-bau: as duas tabelas (49/30/15/5/1 e 40/35/25), as proteções, "Hoje podem sair 6 das 52 cartas" e os números da pessoa; nada de "não repete" |
 
@@ -527,7 +527,7 @@ zerar (seção 11), com "Ajuste da versão 5, 22 de outubro de 2026" no históri
   a tela do baú, a entrada do Perfil, a casca do álbum e o esqueleto do catálogo. A folga do
   index.html continua acima de 60 KB (teste.mjs): 67,3 KB.
 - Peças: `cartas-regras` (a regra, cerca de 14 KB), `album` (catálogo, telas e estilo, cerca de
-  42 KB) e `cartas` (a arte, cerca de 150 KB), pedidas só quando servem.
+  42 KB) e `cartas` (a arte, cerca de 226 KB, 61 KB comprimida), pedidas só quando servem.
 
 ## 18. Testes
 
