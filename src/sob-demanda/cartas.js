@@ -13663,8 +13663,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     // face, cada uma pelo seu caminho; na beirada de cada saliência a água se solta um pouco e
     // engrossa, e embaixo cai na poça
     const filetes = [
-      { pts: [[424, 396], [430, 428], [438, 462], [446, 490], [452, 528], [458, 562], [470, 592], [474, 632], [478, 684]], w0: 24, w1: 40, fase: 0.4 },
-      { pts: [[414, 398], [404, 430], [398, 468], [392, 500], [386, 534], [388, 568], [380, 600], [376, 640], [374, 680]], w0: 9, w1: 16, fase: 2.2 },
+      { pts: [[426, 398], [433, 452], [443, 520], [455, 590], [467, 640], [476, 684]], w0: 22, w1: 36, fase: 0.4 },
+      { pts: [[414, 400], [403, 452], [394, 520], [386, 590], [378, 640], [374, 680]], w0: 9, w1: 15, fase: 2.2 },
       { pts: [[410, 352], [400, 384], [392, 426], [380, 470], [366, 500], [358, 540], [350, 572], [338, 606], [334, 646], [332, 676]], w0: 4, w1: 8, fase: 4.1 },
       { pts: [[460, 570], [486, 592], [500, 628], [508, 682]], w0: 9, w1: 15, fase: 1.3 },
     ];
@@ -13674,19 +13674,42 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       f.L = f.c[f.c.length - 1].s;
       f.w = (s) => {
         const q = f.c[Math.min(f.c.length - 1, Math.round(s / 3))];
-        return f.w0 + (f.w1 - f.w0) * (s / f.L) + Math.sin(s * 0.09 + f.fase) * f.w0 * 0.14 + naSaliencia(q.y) * f.w0 * 0.6;
+        return f.w0 + (f.w1 - f.w0) * (s / f.L) + Math.sin(s * 0.05 + f.fase) * f.w0 * 0.08 + naSaliencia(q.y) * f.w0 * 0.12;
       };
       f.forma = tuboAo(f.c, f.w).forma;
     });
-    // a pedra molhada em volta dos filetes: mais escura, em hachura fechada de pé, com uns
-    // riscos de brilho
+    // a pedra molhada: só faixas estreitas e partidas grudadas nos filetes, cada uma de um
+    // lado e de um tamanho, seguindo a queda; entre elas a pedra seca aparece
     k.save();
     k.clip(rocha);
-    filetes.forEach((f) => {
-      const m = tuboAo(f.c, (s) => f.w(s) + 18 + Math.sin(s * 0.05 + f.fase * 3) * 8 + (s / f.L) * 14).forma;
-      k.fillStyle = 'rgba(60,40,20,.3)';
-      k.fill(m);
-      gravar(k, m, f.c[0].x, (f.c[0].y + 680) / 2, 220, 1.5, 2.6, 1.8, () => 0.85, '#2a1a0c', 0);
+    filetes.forEach((f, fi) => {
+      for (const lado of [-1, 1]) {
+        let s0 = r() * 30;
+        while (s0 < f.L - 10) {
+          const comp = 26 + r() * 70;
+          const s1 = Math.min(f.L, s0 + comp);
+          if (r() < (lado === 1 ? 0.7 : 0.45) - fi * 0.08) {
+            const larg = 5 + r() * 9;
+            const a = [];
+            const b = [];
+            for (const q of f.c) {
+              if (q.s < s0 || q.s > s1) continue;
+              const t = (q.s - s0) / (s1 - s0);
+              const w = f.w(q.s) / 2;
+              const ex = larg * Math.sin(Math.PI * t);
+              a.push([q.x - q.ty * w * lado, q.y + q.tx * w * lado]);
+              b.push([q.x - q.ty * (w + ex) * lado, q.y + q.tx * (w + ex) * lado]);
+            }
+            if (a.length > 2) {
+              const m = pol([...a, ...b.reverse()]);
+              k.fillStyle = 'rgba(60,40,20,.34)';
+              k.fill(m);
+              gravar(k, m, a[0][0], (a[0][1] + a[a.length - 1][1]) / 2, comp, 1.5, 2.4, 1.6, () => 0.85, '#2a1a0c', 0);
+            }
+          }
+          s0 = s1 + 10 + r() * 40;
+        }
+      }
     });
     k.lineCap = 'round';
     filetes.forEach((f) => {
@@ -13705,8 +13728,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.restore();
     // a fenda: um talho fundo e torto na face, uns 100 de alto, escuro por dentro; a beirada
     // de cima clara e a de baixo, por onde a água transborda, molhada
-    const fenda = contornoRocha(r, [[402, 294], [416, 306], [414, 324], [428, 346], [424, 366], [440, 388], [436, 404], [420, 400], [408, 380], [410, 356], [396, 334], [398, 312]], 3);
-    fenda.closePath();
+    // (a beirada quebrada, de cantos vivos e lascas, e uma racha que corre para fora)
+    const fenda = pol([[402, 290], [412, 300], [416, 318], [428, 324], [430, 344], [425, 352], [436, 370], [446, 392], [440, 405], [424, 401], [414, 394], [410, 376], [404, 352], [398, 330], [400, 312]]);
     k.fillStyle = '#160e06';
     k.fill(fenda);
     k.save();
@@ -13717,9 +13740,24 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.strokeStyle = 'rgba(255,244,218,.85)';
     k.lineWidth = 2;
     k.beginPath();
-    k.moveTo(418, 306);
-    k.quadraticCurveTo(434, 330, 432, 350);
-    k.quadraticCurveTo(446, 372, 444, 392);
+    k.moveTo(415, 302);
+    k.lineTo(419, 318);
+    k.lineTo(431, 324);
+    k.lineTo(433, 343);
+    k.moveTo(439, 369);
+    k.lineTo(449, 390);
+    k.stroke();
+    // a racha que sai da fenda, para cima e para a direita, e uma lasca solta na beirada
+    k.strokeStyle = 'rgba(22,12,4,.85)';
+    k.lineWidth = 2;
+    k.beginPath();
+    k.moveTo(400, 292);
+    k.lineTo(408, 276);
+    k.lineTo(404, 262);
+    k.lineTo(414, 244);
+    k.moveTo(430, 344);
+    k.lineTo(446, 340);
+    k.lineTo(458, 348);
     k.stroke();
     k.strokeStyle = SEPIA;
     k.lineWidth = 2.2;
@@ -13877,20 +13915,21 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
           ant = pt;
         }
       }
-      // a espuma na beirada das saliências
+      k.restore();
+      // onde passa pela beirada de cada saliência, uns respingos soltos para os lados
       for (const q of f.c) {
-        const nS = naSaliencia(q.y);
-        if (nS > 0.6 && r() < 0.5) {
+        if (naSaliencia(q.y) > 0.85 && r() < 0.35) {
           const w = f.w(q.s) / 2;
+          const lado = r() < 0.5 ? -1 : 1;
+          const L = 4 + r() * 8;
           k.strokeStyle = 'rgba(255,255,252,.95)';
-          k.lineWidth = 1.6;
+          k.lineWidth = 1.3;
           k.beginPath();
-          k.moveTo(q.x - w, q.y);
-          k.lineTo(q.x + w * (r() - 0.2), q.y + (r() - 0.5) * 3);
+          k.moveTo(q.x + lado * (w + 2), q.y);
+          k.lineTo(q.x + lado * (w + 2 + L), q.y + 3 + r() * 5);
           k.stroke();
         }
       }
-      k.restore();
       k.strokeStyle = 'rgba(30,44,40,.55)';
       k.lineWidth = 1;
       k.stroke(f.forma);
@@ -13929,14 +13968,15 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.lineWidth = 8;
     k.lineCap = 'round';
     k.beginPath();
-    k.moveTo(590, 612);
-    k.lineTo(574, 548);
-    k.lineTo(564, 500);
-    k.lineTo(560, 470);
+    k.moveTo(600, 662);
+    k.lineTo(592, 600);
+    k.lineTo(584, 532);
+    k.lineTo(580, 478);
     k.stroke();
     k.restore();
-    const sombraV = pol([[676, 732], [650, 744], [610, 750], [612, 744], [660, 730]]);
-    gravar(k, sombraV, 676, 738, 50, 0, 2.2, 1.4, () => 0.8, '#2a1a0c', 0);
+    // no chão: do pé da vara até o pé da rocha, para a esquerda (o sol vem da direita)
+    const sombraV = pol([[678, 732], [640, 704], [602, 668], [598, 660], [610, 662], [646, 694], [682, 726]]);
+    gravar(k, sombraV, 640, 700, 70, -0.7, 2.2, 1.5, () => 0.85, '#2a1a0c', 0);
     k.fillStyle = '#8a5a30';
     k.fill(varaF);
     marcar(k, obj, varaF);
