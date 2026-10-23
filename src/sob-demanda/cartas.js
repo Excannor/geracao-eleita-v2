@@ -11199,138 +11199,85 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.32);
   }
   // ---------- (8) O manto de Elias (2 Rs 2.13-14) ----------
-  // Sobre o Jordão, de tarde: o manto de pelos de Elias (2 Rs 1.8) ainda caindo do alto,
-  // depois que o redemoinho o levou (2.11-13), aberto no ar em ondas largas, com a barra
-  // costurada e uma quina virada. Embaixo, o rio corre de lado a lado e já está aberto num
-  // caminho de leito molhado, de uma margem à outra (2.14): a água para e amontoa baixa dos
-  // dois lados do vão. No céu, só os rastros do vento que subiu. Sem gente.
+  // Do lado de cá do Jordão, depois da travessia (2.14): o manto de pelos de Elias (2 Rs 1.8)
+  // largado na areia molhada da beira, grande, perto de quem olha: um pano pesado, com dobras
+  // compridas e baixas, a barra tecida em listras e uma ponta dobrada por cima, mostrando o
+  // avesso mais claro. Atrás, o rio já fechado corre de lado a lado, largo e manso, com a
+  // margem de lá baixa, de juncos, e os morros. Sem gente, sem água aberta.
   function desenhoManto(k, W, H, obj) {
     const r = sorteio(7801);
     papelVelho(k, W, H, r, ['#f8ecd2', '#ecd6ae', '#cfae80'], [620, 160]);
-    const hz = 420;
-    ceuEmLinhas(k, W, hz, [[160, 330, 220, 22], [760, 370, 180, 16]], { topo: 0.48, base: 0.1 });
-    // os rastros do vento que subiu: poucas curvas compridas, abertas, que sobem para a direita
+    const hz = 300;
+    ceuEmLinhas(k, W, hz, [[180, 120, 260, 26], [700, 200, 220, 20]], { topo: 0.5, base: 0.1 });
+    // os morros de lá, baixos, em duas camadas
+    for (const [base, amp, cor, sv, sem] of [[272, 46, '#e3c9a0', 0.3, 1], [306, 24, '#d1b086', 0.48, 2]]) {
+      const f = onda(sorteio(7810 + sem), 4, 0.007);
+      const m = pol([[-10, 380], ...Array.from({ length: 50 }, (_, i) => [i * 19 - 4, base - Math.abs(f(i * 19)) * amp]), [W + 10, 380]]);
+      peca(k, m, [-10, base - amp, W + 10, 380], { cor, ang: 1.2, passo: 4.2, maxL: 1.1, sombra: (x, y) => sv + (y - base + amp) / 260, cruzada: 0.9, traco: 1.4 });
+    }
+    // a margem de lá: uma faixa baixa de terra, com uma fileira de juncos em traço
+    const outra = pol([[-10, 336], ...Array.from({ length: 30 }, (_, i) => [i * 31, 326 + Math.sin(i * 0.8) * 3]), [W + 10, 336], [W + 10, 372], [-10, 372]]);
+    k.fillStyle = '#d6bb8e';
+    k.fill(outra);
+    chaoEmLinhas(k, r, outra, -10, W + 10, 324, 372, 1.2, () => 0.45);
     k.save();
+    k.strokeStyle = 'rgba(60,52,24,.8)';
     k.lineCap = 'round';
-    for (const [x0, y0, x1, y1, c] of [[60, 380, 860, 30, -130], [160, 400, 880, 120, -100], [20, 300, 640, 0, -150]]) {
-      for (let f = 0; f < 3; f++) {
-        k.strokeStyle = 'rgba(255,250,236,' + (0.7 - f * 0.2).toFixed(2) + ')';
-        k.lineWidth = 3 - f;
+    for (let x = -6; x < W + 6; x += 3 + r() * 5) {
+      const h = 10 + r() * 22;
+      k.lineWidth = 0.8 + r() * 0.6;
+      k.beginPath();
+      k.moveTo(x, 360);
+      k.quadraticCurveTo(x + (r() - 0.5) * 6, 360 - h * 0.6, x + (r() - 0.3) * 8, 360 - h);
+      k.stroke();
+    }
+    k.restore();
+    // o rio, largo e manso, de lado a lado: linhas compridas deitadas, mais juntas longe, e o
+    // reflexo claro do céu no meio
+    const rio = pol([[-10, 368], [W + 10, 368], [W + 10, 520], [-10, 520]]);
+    k.fillStyle = '#b4b6a0';
+    k.fill(rio);
+    k.save();
+    k.clip(rio);
+    k.strokeStyle = 'rgba(40,46,36,.75)';
+    k.lineCap = 'round';
+    for (let y = 371; y < 522; y += 2.6 + (y - 368) * 0.05) {
+      let x = -r() * 60;
+      while (x < W) {
+        const c = 40 + r() * 120;
+        const refl = Math.exp(-(((x + c / 2 - 560) / 150) ** 2));
+        k.lineWidth = (0.5 + (y - 368) / 80) * (1 - refl * 0.7);
         k.beginPath();
-        k.moveTo(x0 + f * 14, y0 + f * 6);
-        k.quadraticCurveTo((x0 + x1) / 2 + f * 10, (y0 + y1) / 2 + c, x1, y1 + f * 8);
+        k.moveTo(x, y);
+        k.quadraticCurveTo(x + c / 2, y + Math.sin(x * 0.05 + y) * 1.2, x + c, y);
         k.stroke();
+        x += c + 6 + r() * 18;
       }
     }
     k.restore();
-    // os morros da outra margem
-    for (const [base, amp, cor, sv, sem] of [[390, 44, '#e3c9a0', 0.3, 1], [424, 24, '#d1b086', 0.48, 2]]) {
-      const f = onda(sorteio(7810 + sem), 4, 0.007);
-      const m = pol([[-10, 500], ...Array.from({ length: 50 }, (_, i) => [i * 19 - 4, base - Math.abs(f(i * 19)) * amp]), [W + 10, 500]]);
-      peca(k, m, [-10, base - amp, W + 10, 500], { cor, ang: 1.2, passo: 4.2, maxL: 1.1, sombra: (x, y) => sv + (y - base + amp) / 260, cruzada: 0.9, traco: 1.4 });
-    }
-    // a outra margem, baixa, com tamargueiras
-    const outra = pol([[-10, 452], ...Array.from({ length: 30 }, (_, i) => [i * 31, 440 + Math.sin(i * 0.8) * 4]), [W + 10, 452], [W + 10, 500], [-10, 500]]);
-    k.fillStyle = '#d6bb8e';
-    k.fill(outra);
-    chaoEmLinhas(k, r, outra, -10, W + 10, 438, 500, 1.4, () => 0.45);
-    for (const [x, rx] of [[50, 30], [130, 22], [330, 24], [800, 30], [860, 22]]) copaGravada(k, r, x, 440 - rx * 0.5, rx, rx * 0.7, { cor: '#a8a070' });
-    // o rio, de lado a lado, e o vão do caminho no meio (largo perto, estreito longe)
-    const rioA = 500;
-    const rioB = 610;
-    const vaoE = (y) => 610 - (y - rioA) * 0.42;
-    const vaoD = (y) => 668 + (y - rioA) * 0.5;
-    for (const p of [pol([[-10, rioA], [vaoE(rioA), rioA], [vaoE(rioB), rioB], [-10, rioB]]), pol([[vaoD(rioA), rioA], [W + 10, rioA], [W + 10, rioB], [vaoD(rioB), rioB]])]) {
-      k.fillStyle = '#a3a690';
-      k.fill(p);
-      k.save();
-      k.clip(p);
-      k.strokeStyle = 'rgba(40,46,36,.75)';
-      k.lineCap = 'round';
-      for (let y = rioA + 3; y < rioB; y += 3 + (y - rioA) * 0.03) {
-        let x = -r() * 60;
-        while (x < W) {
-          const c = 30 + r() * 90;
-          k.lineWidth = 0.6 + (y - rioA) / 70;
-          k.beginPath();
-          k.moveTo(x, y);
-          k.quadraticCurveTo(x + c / 2, y + Math.sin(x * 0.05 + y) * 1.5, x + c, y);
-          k.stroke();
-          x += c + 8 + r() * 20;
-        }
-      }
-      k.restore();
-    }
-    // o leito molhado do vão: lama escura, pedrinhas e poças
-    const leito = pol([[vaoE(rioA), rioA], [vaoD(rioA), rioA], [vaoD(rioB), rioB], [vaoE(rioB), rioB]]);
-    k.fillStyle = '#b39c74';
-    k.fill(leito);
-    chaoEmLinhas(k, r, leito, 540, 760, rioA, rioB, 1.6, () => 0.6);
-    for (let i = 0; i < 22; i++) {
-      const y = rioA + 6 + r() * (rioB - rioA - 10);
-      const x = vaoE(y) + 6 + r() * (vaoD(y) - vaoE(y) - 12);
-      const rx = 2 + (y - rioA) / 20 + r() * 3;
-      k.fillStyle = r() < 0.5 ? '#d8c4a0' : '#6e5c40';
-      k.beginPath();
-      k.ellipse(x, y, rx, rx * 0.5, 0, 0, 6.283);
-      k.fill();
-    }
-    // a água que parou: de cada lado do vão, a beirada amontoada desce em rampa curva até o
-    // leito (mais escura embaixo), e a espuma é só uma renda torta no alto da beirada
-    for (const [f, lado] of [[vaoE, -1], [vaoD, 1]]) {
-      const larg = (y) => 14 + (y - rioA) * 0.32;
-      const pts = [];
-      for (let y = rioA; y <= rioB; y += 6) pts.push([f(y) - lado * larg(y) + Math.sin(y * 0.2) * 2, y]);
-      for (let y = rioB; y >= rioA; y -= 6) pts.push([f(y), y]);
-      const face = pol(pts);
-      k.fillStyle = '#8e957c';
-      k.fill(face);
-      k.save();
-      k.clip(face);
-      k.strokeStyle = '#283024';
-      k.lineCap = 'round';
-      for (let t = 0.05; t < 1; t += 0.12) {
-        k.lineWidth = 0.6 + t * 1.8;
-        k.beginPath();
-        for (let y = rioA - 4; y <= rioB + 4; y += 6) {
-          const x = f(y) - lado * larg(y) * (1 - t) + Math.sin(y * 0.15 + t * 5) * 1.2;
-          if (y === rioA - 4) k.moveTo(x, y); else k.lineTo(x, y);
-        }
-        k.stroke();
-      }
-      k.restore();
-      k.strokeStyle = 'rgba(252,250,238,.95)';
-      k.lineCap = 'round';
-      for (let y = rioA + 2; y < rioB - 4; y += 4 + r() * 6) {
-        const x = f(y) - lado * larg(y) + Math.sin(y * 0.2) * 2;
-        k.lineWidth = 1 + r() * 1.6;
-        k.beginPath();
-        k.moveTo(x - lado * 3, y);
-        k.quadraticCurveTo(x + lado * 2, y + 2, x + lado * (2 + r() * 5), y + 4 + r() * 3);
-        k.stroke();
-      }
-    }
-    // a margem de cá
-    const margem = pol([[-10, rioB], ...Array.from({ length: 30 }, (_, i) => [i * 31, rioB + 3 + Math.sin(i * 0.9) * 3]), [W + 10, rioB], [W + 10, H + 10], [-10, H + 10]]);
-    k.fillStyle = '#dcc39a';
-    k.fill(margem);
-    chaoEmLinhas(k, r, margem, -10, W + 10, rioB, H, 1.8, (x, y) => 0.36 + (y - rioB) / 500);
+    // a beira de cá: a lama molhada (escura) e a areia que sobe, clara, até embaixo
+    const lama = pol([[-10, 512], ...Array.from({ length: 30 }, (_, i) => [i * 31, 518 + Math.sin(i * 1.3) * 5]), [W + 10, 512], [W + 10, 560], [-10, 560]]);
+    k.fillStyle = '#a99476';
+    k.fill(lama);
+    chaoEmLinhas(k, r, lama, -10, W + 10, 512, 560, 1.6, () => 0.6);
+    const areia = pol([[-10, 552], ...Array.from({ length: 30 }, (_, i) => [i * 31, 548 + Math.sin(i * 0.9) * 6]), [W + 10, 552], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#ecdcbc';
+    k.fill(areia);
+    chaoEmLinhas(k, r, areia, -10, W + 10, 548, H, 1.3, (x, y) => 0.22 + (y - 548) / 900);
     k.strokeStyle = SEPIA;
-    k.lineWidth = 1.6;
-    k.stroke(margem);
-    for (const [x, y, rx, ry] of [[90, 650, 30, 11], [760, 680, 34, 12], [840, 790, 30, 11], [640, 800, 22, 8]]) {
-      const p = contornoRocha(r, [[x - rx, y + ry * 0.5], [x - rx * 0.6, y - ry * 0.8], [x + rx * 0.3, y - ry], [x + rx, y - ry * 0.1], [x + rx * 0.8, y + ry * 0.7]], 2);
-      p.closePath();
-      sombraNoChao(k, p, -rx * 0.4, ry * 0.4, 3, 0.3);
-      peca(k, p, [x - rx, y - ry, x + rx, y + ry], { cor: '#cdb995', ang: 0.6, passo: 2.8, maxL: 1.4, sombra: sombraOval(x, y, rx, ry, 0), cruzada: 0.7, traco: 1.5 });
-    }
+    k.lineWidth = 1.4;
+    k.stroke(areia);
+    // umas marcas de onda na lama, e as poças rasas
+    k.strokeStyle = 'rgba(255,250,236,.8)';
+    k.lineWidth = 1.4;
+    for (const [x, y, l] of [[90, 530, 60], [340, 536, 80], [700, 528, 70], [820, 540, 40]]) { k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + l / 2, y - 3, x + l, y); k.stroke(); }
 
     // o manto, largado na areia da margem, perto da água: um pano pesado amarrotado, com as
     // dobras desiguais que atravessam o pano em várias direções e a barra tecida em listras
     // que corre torta pela beirada (em mundo: x para a direita, y para cima, z para quem olha)
-    const S0 = 450;
-    const cx0 = 440;
-    const cy0 = 690;
+    const S0 = 520;
+    const cx0 = 500;
+    const cy0 = 696;
     const V = (x, y, z) => [cx0 + x * S0 + z * S0 * 0.1, cy0 - y * S0 * 0.95 + z * S0 * 0.48];
     const NU = 56;
     const NV = 44;
