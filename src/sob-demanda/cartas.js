@@ -5909,11 +5909,12 @@
   // (13) A multidão de testemunhas (Hb 12.1), a capa do álbum: o estádio visto da largada. A
   // soleira de pedra com os sulcos para os pés (a balbis dos estádios antigos) e as raias que
   // sobem a pista até a chegada, onde a coroa de louros está deitada sobre um pedestal largo.
-  // Nas arquibancadas de pedra, em gravura sépia, fileira por fileira, a multidão em luz: gente
-  // só em silhueta clara, sem rosto, que diminui com a distância e dá a volta na curva do fundo
-  // ("temos uma multidão de testemunhas ao nosso redor"). Atrás da largada, o manto pesado
-  // deixado para trás, com a corda enroscada ("afastemos de nós qualquer coisa que nos torne
-  // vagarosos... aqueles pecados que se enroscam... em nossos pés").
+  // Nas arquibancadas de pedra escura, em gravura sépia, a multidão é uma nuvem de luz: em cada
+  // lugar, uma lamparina acesa, fileira por fileira, diminuindo ao longe e dando a volta na curva
+  // do fundo ("temos uma multidão de testemunhas ao nosso redor"); nenhuma figura de gente. Sobre
+  // a soleira, o manto pesado deixado para trás, caído em pregas até o chão, e a corda enroscada
+  // ("afastemos de nós qualquer coisa que nos torne vagarosos... aqueles pecados que se
+  // enroscam... em nossos pés").
   function desenhoTestemunhas(k, W, H, obj) {
     const r = sorteio(6301);
     const F = [444, 318];
@@ -5939,35 +5940,48 @@
     const altA = (t) => 60 + t * 420;
     const ponto = (lado, t, u) => [F[0] + lado * (larg(t) + (40 + t * 430) * u), yT(t) - altA(t) * u];
     const NF = 9;
-    // a gente: cabeça e ombros, em luz, sem rosto; h é a altura da fileira ali. Cada um muda
-    // um pouco (mais alto, mais largo, a cabeça de lado), para a fileira ser gente e não ícone
-    const pessoa = (x, y, h) => {
-      const w = h * (0.36 + r() * 0.12);
-      const alto = h * (0.4 + r() * 0.14);
-      const hc = h * (0.17 + r() * 0.05);
-      const dx = (r() - 0.5) * h * 0.12;
-      const p = new Path2D();
-      p.moveTo(x - w, y);
-      p.bezierCurveTo(x - w, y - alto * 0.8, x - w * 0.5, y - alto, x + dx * 0.5, y - alto);
-      p.bezierCurveTo(x + w * 0.5, y - alto, x + w, y - alto * 0.8, x + w, y);
-      p.closePath();
-      p.moveTo(x + dx + hc, y - alto - hc * 0.7);
-      p.ellipse(x + dx, y - alto - hc * 0.7, hc, hc * 1.1, 0, 0, 6.283);
-      return p;
-    };
-    const luz = (p, h, x, y) => {
-      k.save();
-      k.translate(x, y);
-      k.scale(1.18, 1.12);
-      k.translate(-x, -y);
-      k.fillStyle = 'rgba(255,236,186,.4)';
-      k.fill(p);
-      k.restore();
-      k.fillStyle = '#fff6dc';
-      k.fill(p);
-      k.strokeStyle = 'rgba(110,72,20,.45)';
+    // as testemunhas em luz: em cada lugar da arquibancada, uma lamparina de barro acesa (o
+    // corpo baixo, o bico, a chama), sem gente desenhada; de perto, a lamparina; de longe, só a
+    // chama e o clarão. Fileira por fileira, elas enchem as arquibancadas como uma nuvem de luz.
+    const lampada = (x, y, h) => {
+      const gx = x + h * 0.42;
+      const gy = y - h * 0.5;
+      const gl = k.createRadialGradient(gx, gy, 0, gx, gy, h * 0.9);
+      gl.addColorStop(0, 'rgba(255,230,160,.55)');
+      gl.addColorStop(1, 'rgba(255,230,160,0)');
+      k.fillStyle = gl;
+      k.fillRect(gx - h, gy - h, h * 2, h * 2);
+      if (h > 10) {
+        const corpo = new Path2D();
+        corpo.ellipse(x, y - h * 0.1, h * 0.3, h * 0.12, 0, 0, 6.283);
+        corpo.moveTo(x + h * 0.22, y - h * 0.16);
+        corpo.lineTo(x + h * 0.46, y - h * 0.17);
+        corpo.lineTo(x + h * 0.44, y - h * 0.08);
+        corpo.lineTo(x + h * 0.22, y - h * 0.05);
+        k.fillStyle = '#9a6234';
+        k.fill(corpo);
+        k.strokeStyle = '#2e1c06';
+        k.lineWidth = Math.max(0.6, h * 0.035);
+        k.stroke(corpo);
+        k.fillStyle = '#2e1c06';
+        k.beginPath();
+        k.ellipse(x - h * 0.04, y - h * 0.16, h * 0.08, h * 0.03, 0, 0, 6.283);
+        k.fill();
+      }
+      const fx = x + h * 0.42;
+      const fy = y - h * 0.17;
+      const fh = h * (0.7 + r() * 0.16);
+      const fl = h * 0.22;
+      const ch = new Path2D();
+      ch.moveTo(fx - fl / 2, fy);
+      ch.bezierCurveTo(fx - fl * 0.7, fy - fh * 0.45, fx - fl * 0.1, fy - fh * 0.7, fx + fl * 0.15, fy - fh);
+      ch.bezierCurveTo(fx + fl * 0.4, fy - fh * 0.6, fx + fl * 0.7, fy - fh * 0.35, fx + fl / 2, fy);
+      ch.closePath();
+      k.fillStyle = '#fff3c8';
+      k.fill(ch);
+      k.strokeStyle = '#a8661a';
       k.lineWidth = Math.max(0.5, h * 0.03);
-      k.stroke(p);
+      k.stroke(ch);
     };
     // as arquibancadas: degraus de pedra, cada um com o espelho escuro e o piso claro, e a
     // fileira de gente sentada em cada um
@@ -5991,8 +6005,8 @@
       }
       const cx0 = lado > 0 ? F[0] : -10;
       const cx1 = lado > 0 ? W + 10 : F[0];
-      peca(k, pisos, [cx0, F[1] - 60, cx1, H + 10], { cor: '#d2ac70', tinta: '#2e1c06', ang: lado > 0 ? 0.62 : Math.PI - 0.62, passo: 4.4, maxL: 1.2, sombra: () => 0.3, cruzada: 1, traco: 0 });
-      peca(k, espelhos, [cx0, F[1] - 60, cx1, H + 10], { cor: '#9c7240', tinta: '#2e1c06', ang: 0, passo: 3.2, maxL: 1.8, sombra: (x) => 0.55 + Math.abs(x - F[0]) / 3000, cruzada: 0.6, traco: 0 });
+      peca(k, pisos, [cx0, F[1] - 60, cx1, H + 10], { cor: '#8c6438', tinta: '#22140a', ang: lado > 0 ? 0.62 : Math.PI - 0.62, passo: 3.6, maxL: 1.5, sombra: () => 0.5, cruzada: 0.7, traco: 0 });
+      peca(k, espelhos, [cx0, F[1] - 60, cx1, H + 10], { cor: '#5e3e20', tinta: '#1a0e04', ang: 0, passo: 3, maxL: 2, sombra: (x) => 0.65 + Math.abs(x - F[0]) / 3000, cruzada: 0.5, traco: 0 });
       k.strokeStyle = '#2e1c06';
       k.lineWidth = 1.4;
       for (const um of bordas) {
@@ -6010,8 +6024,8 @@
           const [x, y] = ponto(lado, t, u + 0.02);
           const px = x + (r() - 0.5) * h * 0.2;
           const py = y + (r() - 0.5) * h * 0.08;
-          if (r() > 0.04) luz(pessoa(px, py, h), h, px, py);
-          t += (h * (0.46 + r() * 0.22)) / (380 + 430 * u);
+          if (r() > 0.05) lampada(px, py, h);
+          t += (h * (0.62 + r() * 0.2)) / (380 + 430 * u);
         }
       }
       k.strokeStyle = '#2e1c06';
@@ -6025,14 +6039,14 @@
     curva.lineTo(...ponto(1, 0, 0));
     curva.quadraticCurveTo(F[0], F[1] + 4, ...ponto(-1, 0, 0));
     curva.closePath();
-    peca(k, curva, [F[0] - 160, F[1] - 90, F[0] + 160, F[1] + 30], { cor: '#b48a52', tinta: '#2e1c06', ang: 0, passo: 3, maxL: 1.4, sombra: () => 0.5, cruzada: 0.7, traco: 2 });
+    peca(k, curva, [F[0] - 160, F[1] - 90, F[0] + 160, F[1] + 30], { cor: '#7a5430', tinta: '#22140a', ang: 0, passo: 3, maxL: 1.6, sombra: () => 0.55, cruzada: 0.6, traco: 2 });
     for (let d = 3; d >= 0; d--) {
       const f = (d + 0.5) / 4;
-      for (let a = 0.05; a < 0.96; a += 0.026) {
+      for (let a = 0.05; a < 0.96; a += 0.034) {
         const ax = ponto(-1, 0, f)[0] + (ponto(1, 0, f)[0] - ponto(-1, 0, f)[0]) * a;
         const ay = F[1] + 30 - f * 60 - Math.sin(a * Math.PI) * 40 * f - 6;
         const px = ax + (r() - 0.5) * 3;
-        luz(pessoa(px, ay, 13 + r() * 2), 13, px, ay);
+        lampada(px, ay, 12 + r() * 2);
       }
     }
     // a pista de areia batida, em linhas que se apertam ao longe, e as raias
@@ -6158,54 +6172,73 @@
     }
     // atrás da largada (mais perto de quem olha), o manto pesado, largado, com as dobras, e a
     // corda que se enrosca em laçadas
-    // o manto, aberto no chão como caiu: a gola no alto, as abas que se abrem, a barra com a
-    // franja embaixo, e as dobras que saem da gola
-    const gola = [236, 722];
-    const manto = new Path2D();
-    manto.moveTo(gola[0] - 40, gola[1] + 2);
-    manto.bezierCurveTo(gola[0] - 20, gola[1] + 16, gola[0] + 20, gola[1] + 16, gola[0] + 40, gola[1] + 2);
-    manto.bezierCurveTo(gola[0] + 80, gola[1] - 6, gola[0] + 120, gola[1] + 4, gola[0] + 150, gola[1] + 30);
-    manto.bezierCurveTo(gola[0] + 162, gola[1] + 54, gola[0] + 150, gola[1] + 76, gola[0] + 160, gola[1] + 92);
-    manto.lineTo(gola[0] - 160, gola[1] + 96);
-    manto.bezierCurveTo(gola[0] - 150, gola[1] + 70, gola[0] - 166, gola[1] + 44, gola[0] - 146, gola[1] + 26);
-    manto.bezierCurveTo(gola[0] - 116, gola[1] + 2, gola[0] - 76, gola[1] - 6, gola[0] - 40, gola[1] + 2);
-    manto.closePath();
-    sombraNoChao(k, manto, 10, 6, 10, 0.5);
-    peca(k, manto, [gola[0] - 166, gola[1] - 6, gola[0] + 162, gola[1] + 96], { cor: '#7e4a32', tinta: '#22100a', ang: 0.9, passo: 3.4, maxL: 1.8, sombra: (x, y) => 0.3 + (y - gola[1]) / 220 + Math.abs(x - gola[0]) / 900, cruzada: 0.7, traco: 2.4, obj });
+    // o manto pesado, deixado para trás sobre a soleira da largada: uma parte deitada na pedra,
+    // dobrada, e o resto caído pela frente da soleira em pregas que descem até o chão, com a
+    // barra listrada e a franja na bainha ondulada; a corda sai de baixo dele, enroscada
+    const ySol = yT(t2);
+    const ySolT = yT(tl);
+    const mx0 = 150;
+    const mx1 = 340;
+    const bainha = (x) => ySol + 56 + 7 * Math.sin((x - mx0) * 0.11) + ((x - mx0) / (mx1 - mx0)) ** 2 * 40;
+    // a parte deitada em cima da soleira
+    const cima = new Path2D();
+    cima.moveTo(mx0 + 14, ySol);
+    cima.bezierCurveTo(mx0 + 18, ySolT + 20, mx0 + 30, ySolT - 2, mx0 + 70, ySolT + 2);
+    cima.bezierCurveTo(mx0 + 110, ySolT + 6, mx0 + 130, ySolT - 6, mx1 - 40, ySolT + 4);
+    cima.bezierCurveTo(mx1 - 10, ySolT + 10, mx1 + 6, ySolT + 30, mx1 + 4, ySol);
+    cima.closePath();
+    peca(k, cima, [mx0, ySolT, mx1, ySol], { cor: '#8e5638', tinta: '#22100a', ang: 0.1, passo: 3, maxL: 1.5, sombra: (x, y) => 0.2 + (y - ySolT) / 120, cruzada: 0.8, traco: 2.2, obj });
+    k.strokeStyle = 'rgba(214,170,96,.9)';
+    k.lineWidth = 4;
+    k.beginPath();
+    k.moveTo(mx0 + 36, ySolT + 9);
+    k.lineTo(mx1 - 58, ySolT + 7);
+    k.stroke();
+    // a parte caída: as pregas verticais, cada uma um cilindro de pano (luz à esquerda, sombra à
+    // direita), a bainha em onda
+    const caido = new Path2D();
+    caido.moveTo(mx0 + 14, ySol - 2);
+    caido.lineTo(mx1 + 4, ySol - 2);
+    caido.bezierCurveTo(mx1 + 10, ySol + 30, mx1 + 8, ySol + 60, mx1 + 2, bainha(mx1));
+    for (let x = mx1; x >= mx0; x -= 4) caido.lineTo(x, bainha(x));
+    caido.bezierCurveTo(mx0 - 6, ySol + 50, mx0 + 4, ySol + 20, mx0 + 14, ySol - 2);
+    caido.closePath();
+    sombraNoChao(k, caido, 12, 6, 8, 0.45);
+    k.fillStyle = '#7e4a32';
+    k.fill(caido);
+    marcar(k, obj, caido);
+    const pregas = [mx0 - 4, 176, 212, 230, 266, 304, 318, mx1 + 8];
     k.save();
-    k.clip(manto);
-    for (const [dx, dy] of [[-150, 92], [-96, 96], [-40, 96], [24, 96], [86, 94], [146, 90]]) {
-      const x0 = gola[0] + dx * 0.18;
-      const y0 = gola[1] + 12;
-      const x1 = gola[0] + dx;
-      const y1 = gola[1] + dy;
-      const sulco = pol([[x0, y0], [x1, y1], [x1 + 16, y1], [x0 + 4, y0]]);
-      gravar(k, sulco, (x0 + x1) / 2 + 6, (y0 + y1) / 2, 70, Math.atan2(y1 - y0, x1 - x0) + 0.4, 2.6, 1.6, () => 0.85, '#22100a', 0);
-      k.strokeStyle = 'rgba(236,196,150,.6)';
-      k.lineWidth = 1.8;
+    k.clip(caido);
+    for (let i = 0; i < pregas.length - 1; i++) {
+      const xa = pregas[i];
+      const xb = pregas[i + 1];
+      const tira = pol([[xa, ySol - 4], [xb, ySol - 4], [xb, ySol + 120], [xa, ySol + 120]]);
+      gravar(k, tira, (xa + xb) / 2, ySol + 50, 90, Math.PI / 2, 2.8, 1.9, (x) => 0.12 + ((x - xa) / (xb - xa)) ** 1.5 * 0.95, '#22100a', 0);
+      k.strokeStyle = 'rgba(236,196,150,.55)';
+      k.lineWidth = 1.6;
       k.beginPath();
-      k.moveTo(x0 - 3, y0);
-      k.lineTo(x1 - 6, y1);
+      k.moveTo(xa + (xb - xa) * 0.25, ySol + 4);
+      k.lineTo(xa + (xb - xa) * 0.25, bainha(xa + (xb - xa) * 0.25) - 4);
       k.stroke();
     }
-    k.strokeStyle = 'rgba(214,170,96,.9)';
-    k.lineWidth = 7;
-    k.beginPath();
-    k.moveTo(gola[0] - 164, gola[1] + 82);
-    k.lineTo(gola[0] + 164, gola[1] + 78);
-    k.stroke();
+    // a barra listrada, logo acima da bainha
+    for (const [d, w] of [[12, 6], [22, 2.4]]) {
+      k.strokeStyle = 'rgba(214,170,96,.9)';
+      k.lineWidth = w;
+      k.beginPath();
+      for (let x = mx0 - 4; x <= mx1 + 8; x += 4) (x === mx0 - 4 ? k.moveTo(x, bainha(x) - d) : k.lineTo(x, bainha(x) - d));
+      k.stroke();
+    }
     k.restore();
-    // a gola, com o avesso claro aparecendo
-    const avesso = new Path2D();
-    avesso.moveTo(gola[0] - 40, gola[1] + 2);
-    avesso.bezierCurveTo(gola[0] - 20, gola[1] + 16, gola[0] + 20, gola[1] + 16, gola[0] + 40, gola[1] + 2);
-    avesso.bezierCurveTo(gola[0] + 20, gola[1] - 6, gola[0] - 20, gola[1] - 6, gola[0] - 40, gola[1] + 2);
-    peca(k, avesso, [gola[0] - 40, gola[1] - 6, gola[0] + 40, gola[1] + 16], { cor: '#dcc69a', tinta: '#22100a', ang: 0, passo: 2.6, maxL: 1.2, sombra: (x, y) => 0.6 - (y - gola[1]) / 30, traco: 2, obj });
     k.strokeStyle = '#22100a';
+    k.lineWidth = 2.4;
+    k.stroke(caido);
+    // a franja
     k.lineWidth = 1.6;
-    for (let x = gola[0] - 156; x < gola[0] + 158; x += 9) { const y = gola[1] + 96 - ((x - gola[0] + 156) / 314) * 4; k.beginPath(); k.moveTo(x, y); k.lineTo(x - 2, y + 9); k.stroke(); }
+    for (let x = mx0 + 2; x <= mx1; x += 7) { const y = bainha(x); k.beginPath(); k.moveTo(x, y); k.lineTo(x - 1, y + 9); k.stroke(); }
     const laco = (cx, cy, rx, ry, g) => Array.from({ length: 25 }, (_, i) => { const a = (i / 24) * 6.283; return [cx + Math.cos(a) * rx * Math.cos(g) - Math.sin(a) * ry * Math.sin(g), cy + Math.cos(a) * rx * Math.sin(g) + Math.sin(a) * ry * Math.cos(g)]; });
-    cordao(k, [[380, 782], [410, 770], ...laco(444, 766, 30, 16, -0.2), [472, 762], ...laco(508, 772, 26, 14, 0.25), [534, 778], [580, 770], [616, 778]], 6, { cor: '#c9a86a', escuro: '#2a1408' });
+    cordao(k, [[330, 770], [356, 784], [400, 790], ...laco(436, 790, 30, 16, -0.2), [466, 784], ...laco(502, 794, 26, 14, 0.25), [530, 802], [576, 792], [614, 800]], 6, { cor: '#c9a86a', escuro: '#2a1408' });
     vinheta(k, W, H, 0.22);
   }
 
