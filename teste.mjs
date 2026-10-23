@@ -1532,7 +1532,9 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
     'lançar uma carta põe ela no sorteio, e o viés para carta nova a traz logo');
   let novaVem = 0;
   for (let i = 0; i < 400; i++) if (RC.cartaDoSorteio(c, RC.aleatorio(i + 1), '', 'linho') === proxima.id) novaVem++;
-  checar(novaVem / 400 > 0.4, 'a carta recém-lançada sai em ' + (novaVem / 4).toFixed(0) + '% dos sorteios de quem já tem as outras');
+  // o viés para carta nova: bem acima da parte justa (1 entre as lançadas) e pelo menos 1 em 4
+  const parteJusta = 1 / (lancadas.size + 1);
+  checar(novaVem / 400 > Math.max(0.25, 5 * parteJusta), 'a carta recém-lançada sai em ' + (novaVem / 4).toFixed(0) + '% dos sorteios de quem já tem as outras (a parte justa seria ' + (parteJusta * 100).toFixed(0) + '%)');
   // Semeadores sem desenho: o limiar fica anotado e a carta vem quando for lançada
   contexto.window.CARTAS_INDICE = ESQ_HOJE;
   const quem = { cartasServidor: { chaves: ['convite:tier:1', 'convite:tier:2'] } };
