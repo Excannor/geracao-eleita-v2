@@ -15260,12 +15260,14 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     // finas na ponta, tortas para fora e para a direita (a tiragem puxa a chama pela boca);
     // a hachura corre ao longo de cada língua, cheia nas beiradas e rala no meio, então cada
     // uma tem volume. Atrás vermelhas e escuras, na frente laranja e amarelas; o miolo branco.
-    const chama = (x, y, alto, larg, vai, cor, tinta, claro, contorno, turb = 0.14, fase = r() * 6.28, pe = 0) => {
+    const chama = (x, y, alto, larg, vai, cor, tinta, claro, contorno, turb = 0.14, fase = r() * 6.28, pe = 0, volta = 0) => {
       const amp = larg * (0.18 + ((fase * 7.3) % 1) * 0.22);
       const pts = [];
-      for (let i = 0; i <= 6; i++) {
-        const t = i / 6;
-        pts.push([x + vai * t * t + Math.sin(fase + t * 3.2) * amp * t, y - alto * t]);
+      for (let i = 0; i <= 9; i++) {
+        const t = i / 9;
+        // a ponta que se dobra de volta por cima de si mesma (volta > 0)
+        const u = Math.max(0, (t - 0.62) / 0.38);
+        pts.push([x + vai * t * t + Math.sin(fase + t * 3.2) * amp * t - Math.sign(vai || 1) * volta * u * u * alto * 0.42, y - alto * t + volta * u * u * alto * 0.2]);
       }
       const c = curvaPor(pts, 3);
       const L = c[c.length - 1].s;
@@ -15314,20 +15316,39 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.fill(boca);
     // a parede do fundo do forno, vermelha, em hachura deitada
     gravar(k, boca, cx, 520, 260, 0.04, 3, 1.4, (x, y) => 0.75 - calor(x, y) * 0.7, '#1e0602', 0);
-    // as línguas grandes que vão sair pelo alto da boca: o pé delas fica aqui dentro
-    const sai = [];
-    for (let i = 0; i < 8; i++) {
-      const t = i / 7;
-      sai.push({ x: bx0 + 100 + t * (bx1 - bx0 - 220) + (r() - 0.5) * 20, alto: 400 + Math.sin(t * Math.PI) * 90 + r() * 50 + t * 30, larg: 170 + r() * 70, vai: -50 + t * 260 + (r() - 0.5) * 40, fase: r() * 6.28 });
-    }
+    // as línguas grandes que vão sair pelo alto da boca: o pé delas fica aqui dentro. De
+    // alturas bem diferentes, desencontradas, umas se juntando, uma bifurcada, duas com a
+    // ponta dobrada de volta, as beiradas rasgadas
+    const sai = [
+      { x: 372, alto: 300, larg: 150, vai: -70, volta: 0, turb: 0.34 },
+      { x: 404, alto: 470, larg: 200, vai: 30, volta: 0.9, turb: 0.26 },
+      { x: 430, alto: 360, larg: 130, vai: -10, volta: 0, turb: 0.4 },
+      { x: 470, alto: 540, larg: 230, vai: 150, volta: 0, turb: 0.3 },
+      { x: 478, alto: 420, larg: 140, vai: 260, volta: 0, turb: 0.36 },
+      { x: 530, alto: 280, larg: 120, vai: 120, volta: 0.7, turb: 0.42 },
+      { x: 552, alto: 500, larg: 190, vai: 230, volta: 0.4, turb: 0.28 },
+    ].map((q) => ({ ...q, fase: r() * 6.28 }));
     const passaSai = () => {
       const p = new Path2D();
-      sai.forEach((q) => p.addPath(chama(q.x, by1, q.alto, q.larg, q.vai, 'rgba(192,68,20,.96)', '#3a0a02', 0.22, 'rgba(46,10,2,.75)', 0.3, q.fase, 0.45)));
+      sai.forEach((q) => p.addPath(chama(q.x, by1, q.alto, q.larg, q.vai, 'rgba(192,68,20,.96)', '#3a0a02', 0.22, 'rgba(46,10,2,.75)', q.turb, q.fase, 0.45, q.volta)));
       sai.forEach((q, i) => {
-        if (i % 3 !== 1) p.addPath(chama(q.x + 12, by1, q.alto * 0.82, q.larg * 0.55, q.vai * 0.85, 'rgba(240,148,54,.96)', '#7a2406', 0.1, null, 0.22, q.fase + 1, 0.45));
+        if (i % 3 !== 1) p.addPath(chama(q.x + 12, by1, q.alto * (0.6 + (i % 2) * 0.2), q.larg * 0.55, q.vai * 0.85, 'rgba(240,148,54,.96)', '#7a2406', 0.1, null, 0.22, q.fase + 1, 0.45, q.volta * 0.6));
       });
       return p;
     };
+    // a fundura: a beirada do vão por dentro na sombra, em hachura (sem borrão), por baixo
+    // das línguas, para nenhuma linha atravessar o fogo
+    for (let d = 0; d < 34; d += 3.4) {
+      k.strokeStyle = 'rgba(30,6,2,' + (0.6 - d / 60).toFixed(2) + ')';
+      k.lineWidth = 3.2 - d / 12;
+      const enc = new Path2D();
+      enc.moveTo(bx0 + d, by1);
+      enc.lineTo(bx0 + d, by0 + 90);
+      enc.quadraticCurveTo(bx0 + d, by0 - 10 + d, cx, by0 - 16 + d);
+      enc.quadraticCurveTo(bx1 - d, by0 - 10 + d, bx1 - d, by0 + 90);
+      enc.lineTo(bx1 - d, by1);
+      k.stroke(enc);
+    }
     passaSai();
     for (let i = 0; i < 22; i++) {
       const x = bx0 - 10 + r() * (bx1 - bx0 + 20);
@@ -15344,18 +15365,6 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     for (let i = 0; i < 7; i++) {
       const x = cx - 70 + r() * 130;
       chama(x, by1 + 6, 70 + r() * 70, 34 + r() * 24, 6 + r() * 24, 'rgba(255,248,228,.98)', '#d08a30', -0.15, null);
-    }
-    // a fundura: a beirada do vão por dentro na sombra, em hachura (sem borrão)
-    for (let d = 0; d < 34; d += 3.4) {
-      k.strokeStyle = 'rgba(30,6,2,' + (0.6 - d / 60).toFixed(2) + ')';
-      k.lineWidth = 3.2 - d / 12;
-      const enc = new Path2D();
-      enc.moveTo(bx0 + d, by1);
-      enc.lineTo(bx0 + d, by0 + 90);
-      enc.quadraticCurveTo(bx0 + d, by0 - 10 + d, cx, by0 - 16 + d);
-      enc.quadraticCurveTo(bx1 - d, by0 - 10 + d, bx1 - d, by0 + 90);
-      enc.lineTo(bx1 - d, by1);
-      k.stroke(enc);
     }
     // o leito de brasa no chão do forno, em hachura cruzada acesa
     const leito = pol([[bx0, by1], [bx0 + 30, by1 - 26], [cx, by1 - 34], [bx1 - 30, by1 - 26], [bx1, by1]]);
@@ -15374,6 +15383,10 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.clip(fora, 'evenodd');
     const escapa = passaSai();
     k.restore();
+    // uns fiapos soltos acima das pontas, que se desprendem e vão para a direita
+    for (const [x, y, alto, larg, vai] of [[488, 196, 84, 30, 34], [700, 262, 70, 26, 40], [612, 214, 56, 20, 22]]) {
+      escapa.addPath(chama(x, y, alto, larg, vai, 'rgba(226,112,36,.95)', '#4a1204', 0.2, 'rgba(46,10,2,.6)', 0.06, r() * 6.28, 0.35));
+    }
     marcar(k, obj, escapa);
     // a soleira de pedra e o chão de tijolo, acesos pelo fogo
     const chao = pol([[-10, 690], [W + 10, 690], [W + 10, H + 10], [-10, H + 10]]);
