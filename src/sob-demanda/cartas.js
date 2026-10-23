@@ -3625,50 +3625,98 @@
     k.strokeStyle = '#2e1e0c';
     k.lineWidth = 2.6;
     k.stroke(corpo);
-    // a boca: o lado de dentro em hachura curva (escuro sob a borda de trás), e o aro
+    // a boca: o lado de dentro, de vime claro; a parede de trás desce em voltas de espiral, com
+    // a hachura curva que escurece logo abaixo da borda de trás (a sombra dela), e o fundo
     const boca = new Path2D();
     boca.ellipse(bx, bo, RX - 8, RY - 6, 0, 0, 6.283);
-    k.fillStyle = '#8a6438';
+    k.fillStyle = '#b48c56';
     k.fill(boca);
     k.save();
     k.clip(boca);
-    for (let i = 0; i < 16; i++) {
-      const t = i / 16;
-      k.strokeStyle = 'rgba(30,18,6,' + (0.7 - t * 0.4).toFixed(2) + ')';
-      k.lineWidth = 2.2 - t * 1.2;
+    for (let i = 0; i < 9; i++) {
+      const cy = bo - (RY - 8) + 4 + i * 9;
+      const rx = (RX - 12) * (1 - i * 0.035);
+      const ry = (RY - 8) * (1 - i * 0.06);
+      k.strokeStyle = 'rgba(46,30,12,.85)';
+      k.lineWidth = 1.8;
       k.beginPath();
-      k.ellipse(bx, bo - RY * 0.2 + t * 60, (RX - 14) * (1 - t * 0.12), (RY - 10) * (1 - t * 0.1), 0, Math.PI * 1.04, Math.PI * 1.96);
+      k.ellipse(bx, cy + ry, rx, ry, 0, Math.PI * 1.03, Math.PI * 1.97);
       k.stroke();
+      k.strokeStyle = 'rgba(255,238,196,.45)';
+      k.lineWidth = 1.1;
+      k.beginPath();
+      k.ellipse(bx, cy + ry + 3, rx, ry, 0, Math.PI * 1.15, Math.PI * 1.6);
+      k.stroke();
+      // os pontos da costura, desencontrados
+      k.strokeStyle = 'rgba(46,30,12,.75)';
+      k.lineWidth = 1.2;
+      for (let g = Math.PI * 1.08 + (i % 2) * 0.06; g < Math.PI * 1.94; g += 0.13) {
+        const x = bx + Math.cos(g) * rx;
+        const y = cy + ry + Math.sin(g) * ry + 4;
+        k.beginPath();
+        k.moveTo(x - 2, y - 3);
+        k.lineTo(x + 2, y + 3);
+        k.stroke();
+      }
     }
+    // a sombra da borda de trás, em hachura curva que acompanha a boca, e o lado esquerdo
+    // (longe do sol) mais escuro
+    gravar(k, boca, bx, bo, RX, 0.06, 3.4, 2, (x, y) => 0.95 - (y - bo + RY) / (RY * 1.5) + (bx - x) / 900, '#24160a', 0.5);
+    gravar(k, boca, bx, bo, RX, 1.1, 4.4, 1.5, (x, y) => (0.85 - (y - bo + RY) / (RY * 1.4) - 0.3) * 1.8, '#24160a', 0);
     k.restore();
     const aro = (a0, a1) => cordao(k, Array.from({ length: 37 }, (_, i) => { const a = a0 + ((a1 - a0) * i) / 36; return [bx + Math.cos(a) * (RX - 3), bo + Math.sin(a) * (RY - 2)]; }), 10, { cor: '#d8b47a', escuro: '#2e1e0c', luz: 'rgba(255,240,200,.6)' });
     aro(Math.PI, Math.PI * 2);
     marcar(k, obj, boca);
-    // a criança enrolada: o embrulho de pano, a ponta da cabeça mais cheia (à esquerda), as faixas
-    // cruzadas e as dobras; sem rosto
-    const bb = bo + 24;
+    // a criança enrolada, afundada no berço (a beirada da frente passa por cima): o embrulho de
+    // pano, a ponta da cabeça coberta por um capuz do mesmo pano, as faixas cruzadas e as
+    // dobras; sem rosto
+    const bb = bo + 40;
+    const dentro = new Path2D();
+    dentro.rect(-10, -10, W + 20, bo + 10);
+    dentro.ellipse(bx, bo, RX - 8, RY - 6, 0, 0, Math.PI * 2);
+    k.save();
+    k.clip(dentro);
     const emb = new Path2D();
     emb.moveTo(bx - 168, bb + 4);
-    emb.bezierCurveTo(bx - 176, bb - 60, bx - 96, bb - 86, bx - 58, bb - 54);
+    emb.bezierCurveTo(bx - 180, bb - 30, bx - 174, bb - 66, bx - 160, bb - 84);
+    emb.bezierCurveTo(bx - 120, bb - 80, bx - 80, bb - 70, bx - 58, bb - 54);
     emb.bezierCurveTo(bx - 10, bb - 66, bx + 70, bb - 58, bx + 120, bb - 34);
     emb.bezierCurveTo(bx + 158, bb - 18, bx + 162, bb + 10, bx + 130, bb + 18);
     emb.bezierCurveTo(bx + 40, bb + 26, bx - 80, bb + 28, bx - 168, bb + 4);
     emb.closePath();
-    sombraNoChao(k, emb, -10, 8, 8, 0.45);
-    peca(k, emb, [bx - 176, bb - 86, bx + 162, bb + 28], { cor: '#f7eedb', ang: 0.25, passo: 3.8, maxL: 1.6, sombra: (x, y) => 0.1 + (y - bb + 40) / 120 + (bx - x) / 900, tinta: '#3a2c16', cruzada: 0.7, obj, traco: 2.2 });
+    sombraNoChao(k, emb, -10, 8, 8, 0.5);
+    peca(k, emb, [bx - 176, bb - 86, bx + 162, bb + 28], { cor: '#f4ead4', ang: 0.25, passo: 3.6, maxL: 1.7, sombra: (x, y) => 0.18 + (y - bb + 40) / 100 + (bx - x) / 700, tinta: '#3a2c16', cruzada: 0.62, obj, traco: 2.2 });
     k.save();
     k.clip(emb);
-    // o pano dobrado em volta da cabeça
+    // o capuz: a ponta do pano que cobre a cabeça vem dobrada por cima, uma aba em ponta
+    // deitada para a direita, com a sombra embaixo; as rugas saem do bico do capuz
+    const aba = new Path2D();
+    aba.moveTo(bx - 160, bb - 84);
+    aba.bezierCurveTo(bx - 128, bb - 62, bx - 96, bb - 44, bx - 52, bb - 30);
+    aba.bezierCurveTo(bx - 70, bb - 12, bx - 96, bb + 4, bx - 120, bb + 22);
+    aba.bezierCurveTo(bx - 136, bb - 10, bx - 150, bb - 50, bx - 160, bb - 84);
+    aba.closePath();
+    k.save();
+    k.filter = 'blur(4px)';
+    k.translate(6, 7);
+    k.fillStyle = 'rgba(40,28,10,.45)';
+    k.fill(aba);
+    k.restore();
+    peca(k, aba, [bx - 160, bb - 84, bx - 52, bb + 22], { cor: '#efe2c6', ang: 0.6, passo: 3.2, maxL: 1.5, sombra: (x, y) => 0.12 + (y - bb + 84) / 160 + (x - bx + 160) / 500, tinta: '#3a2c16', cruzada: 0.7, traco: 2, obj });
     k.strokeStyle = '#3a2c16';
-    k.lineWidth = 2;
+    k.lineWidth = 1.2;
+    for (const [x1, y1] of [[bx - 104, bb - 50], [bx - 118, bb - 20], [bx - 132, bb + 4]]) {
+      k.beginPath();
+      k.moveTo(bx - 156, bb - 76);
+      k.quadraticCurveTo((bx - 156 + x1) / 2 + 6, (bb - 76 + y1) / 2 - 4, x1, y1);
+      k.stroke();
+    }
+    // a beirada da aba, com a barra tecida
+    k.strokeStyle = 'rgba(130,52,28,.8)';
+    k.lineWidth = 3;
     k.beginPath();
-    k.moveTo(bx - 60, bb - 56);
-    k.bezierCurveTo(bx - 40, bb - 30, bx - 52, bb + 2, bx - 80, bb + 22);
-    k.stroke();
-    k.lineWidth = 1.4;
-    k.beginPath();
-    k.moveTo(bx - 120, bb - 72);
-    k.bezierCurveTo(bx - 96, bb - 50, bx - 92, bb - 20, bx - 110, bb + 12);
+    k.moveTo(bx - 56, bb - 30);
+    k.bezierCurveTo(bx - 72, bb - 14, bx - 96, bb + 2, bx - 118, bb + 18);
     k.stroke();
     // as faixas cruzadas, com a beirada tecida
     for (const [x0, x1] of [[-30, 20], [20, 70], [70, 116]]) {
@@ -3679,14 +3727,6 @@
       k.lineWidth = 1.6;
       k.stroke(faixa);
       gravar(k, faixa, bx + (x0 + x1) / 2 + 10, bb - 18, 60, 1.1, 3.4, 1, (x, y) => 0.25 + (y - bb + 40) / 120, '#3a2c16', 0);
-    }
-    // as dobras compridas do pano
-    k.lineWidth = 1.3;
-    for (const [a, b] of [[-140, -10], [-10, -30], [100, 0]]) {
-      k.beginPath();
-      k.moveTo(bx + a, bb + b);
-      k.quadraticCurveTo(bx + a + 30, bb + b - 18, bx + a + 60, bb + b - 8);
-      k.stroke();
     }
     k.restore();
     // a manta por cima do embrulho, da cintura para baixo, com a beirada tecida
@@ -3712,7 +3752,8 @@
     borda.forEach(([x, y], i) => { if (i % 2) return; k.beginPath(); k.moveTo(x + 12, y - 4); k.lineTo(x + 16, y); k.lineTo(x + 12, y + 4); k.lineTo(x + 8, y); k.fill(); });
     k.strokeStyle = '#3a2c16';
     k.lineWidth = 1.3;
-    for (const [a, b] of [[10, -40], [60, -20], [40, 6]]) { k.beginPath(); k.moveTo(bx + a, bb + b); k.quadraticCurveTo(bx + a + 40, bb + b - 14, bx + a + 80, bb + b + 2); k.stroke(); }
+    for (const [a2, b2] of [[10, -40], [60, -20], [40, 6]]) { k.beginPath(); k.moveTo(bx + a2, bb + b2); k.quadraticCurveTo(bx + a2 + 40, bb + b2 - 14, bx + a2 + 80, bb + b2 + 2); k.stroke(); }
+    k.restore();
     k.restore();
     // a metade da frente do aro, por cima do embrulho
     aro(0, Math.PI);
