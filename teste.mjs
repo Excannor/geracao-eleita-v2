@@ -1543,15 +1543,17 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
   // o viés para carta nova: bem acima da parte justa (1 entre as lançadas) e pelo menos 1 em 4
   const parteJusta = 1 / (lancadas.size + 1);
   checar(novaVem / 400 > Math.max(0.25, 5 * parteJusta), 'a carta recém-lançada sai em ' + (novaVem / 4).toFixed(0) + '% dos sorteios de quem já tem as outras (a parte justa seria ' + (parteJusta * 100).toFixed(0) + '%)');
-  // Semeadores sem desenho: o limiar fica anotado e a carta vem quando for lançada
-  contexto.window.CARTAS_INDICE = ESQ_HOJE;
+  // Semeadores sem desenho: o limiar fica anotado e a carta vem quando for lançada (as cartas
+  // dos limiares 1 e 2 voltam a "não lançadas" aqui, para o teste não depender do catálogo de hoje)
+  const ESQ_SEM = ESQ_HOJE.map((a) => (a.id === 'semeadores' ? { ...a, c: a.c.replace(/(^| )(semente-lancada|andre-chama-pedro):/g, '$1~$2:') } : a));
+  contexto.window.CARTAS_INDICE = ESQ_SEM;
   const quem = { cartasServidor: { chaves: ['convite:tier:1', 'convite:tier:2'] } };
   const e0 = { ...CC.normalizarEstado({}), dono: 'ana', cartas: RC.vazio() };
   const p1 = RC.emDia(e0, { dono: 'ana', em: 10, quem });
   checar(p1.cartas.eventos['convite:tier:1'].pendente && p1.cartas.eventos['convite:tier:2'].pendente && !RC.copias(p1.cartas).length && RC.resumo(p1.cartas).alcancados.join() === 'convite:tier:1,convite:tier:2',
     'limiar de Semeadores sem desenho fica anotado como alcançado, sem carta');
   checar(!RC.emDia({ ...e0, cartas: p1.cartas }, { dono: 'ana', em: 11, quem }).novos.length, 'e não é pago de novo enquanto espera');
-  contexto.window.CARTAS_INDICE = ESQ_HOJE.map((a) => (a.id === 'semeadores' ? { ...a, c: a.c.replace('~semente-lancada', 'semente-lancada') } : a));
+  contexto.window.CARTAS_INDICE = ESQ_SEM.map((a) => (a.id === 'semeadores' ? { ...a, c: a.c.replace('~semente-lancada', 'semente-lancada') } : a));
   const p2 = RC.emDia({ ...e0, cartas: p1.cartas }, { dono: 'ana', em: 12, quem });
   checar(p2.novos.length === 1 && p2.cartas.eventos['convite:tier:1'].carta === 'semente-lancada' && p2.cartas.eventos['convite:tier:1'].raridade === 'linho' && p2.cartas.eventos['convite:tier:2'].pendente,
     'quando a carta é lançada, o limiar anotado paga a carta, sem se perder');
