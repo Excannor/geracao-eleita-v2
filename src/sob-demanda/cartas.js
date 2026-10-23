@@ -7122,62 +7122,100 @@
     vinheta(k, W, H, 0.22);
   }
 
-  // Um maciço de granito em blocos: o monte partido em lascas grandes e irregulares, mais altas
-  // que largas (as juntas quase de pé do granito), cada uma com a sua luz. A hachura é de pé,
-  // pela queda da rocha, e só cruza na sombra funda; uma beirada de cada bloco acende e a outra
-  // escurece; umas fendas compridas descem pelo monte. É outra pele, diferente dos montes de
-  // Ararate e de Patmos (e, de pé, não cruza os raios da glória).
-  function granitoEmBlocos(k, r, forma, [x0, y0, x1, y1], luz, { cor = '#2a1a10', claro = 'rgba(255,226,180,.6)' } = {}) {
+  // Um maciço de granito: o monte partido em blocos de tamanhos bem diferentes (miúdos no
+  // alto, grandes embaixo), cada um com a sua luz; a hachura é de pé, pela queda da rocha, e só
+  // cruza na sombra funda; a beirada de baixo e a da direita de cada bloco escurecem e a de
+  // cima acende. Umas ravinas compridas descem do alto, com a sombra ao lado. É outra pele,
+  // diferente dos montes de Ararate e de Patmos (e, de pé, não cruza os raios da glória).
+  function granitoEmBlocos(k, r, forma, [x0, y0, x1, y1], luz, { cor = '#2a1a10', claro = 'rgba(255,226,180,.6)', ravinas = [] } = {}) {
+    // os centros, sorteados sem fileira: espaçamento que cresce para baixo, e cada bloco um
+    // pouco mais alto que largo (as juntas de pé do granito)
+    const pts = [];
+    const pDe = (y) => { const t = Math.max(0, Math.min(1, (y - y0) / (y1 - y0))); return 28 + t * t * 105; };
+    for (let i = 0; i < 4000 && pts.length < 420; i++) {
+      const x = x0 - 60 + r() * (x1 - x0 + 120);
+      const y = y0 - 30 + r() * (y1 - y0 + 90);
+      const p = pDe(y) * (0.8 + r() * 0.45);
+      if (pts.some((q) => Math.abs(q[0] - x) < (q[2] + p) * 0.28 && Math.abs(q[1] - y) < (q[2] + p) * 0.45)) continue;
+      pts.push([x, y, p]);
+    }
+    const corta = (pl, a, b) => {
+      const mx = (a[0] + b[0]) / 2;
+      const my = (a[1] + b[1]) / 2;
+      const nx = b[0] - a[0];
+      const ny = b[1] - a[1];
+      const lado = (p) => (p[0] - mx) * nx + (p[1] - my) * ny;
+      const out = [];
+      for (let i = 0; i < pl.length; i++) {
+        const p = pl[i];
+        const q = pl[(i + 1) % pl.length];
+        const lp = lado(p);
+        const lq = lado(q);
+        if (lp <= 0) out.push(p);
+        if ((lp < 0) !== (lq < 0)) { const u = lp / (lp - lq); out.push([p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u]); }
+      }
+      return out;
+    };
     k.save();
     k.clip(forma);
     k.lineCap = 'round';
     k.lineJoin = 'round';
-    for (const { c, pol: pl } of facetas(r, x0, y0, x1, y1, 74, 104)) {
+    for (const a of pts) {
+      const R = a[2] * 2.2;
+      let pl = [[a[0] - R, a[1] - R], [a[0] + R, a[1] - R], [a[0] + R, a[1] + R], [a[0] - R, a[1] + R]];
+      for (const b of pts) if (b !== a && Math.abs(b[0] - a[0]) < R && Math.abs(b[1] - a[1]) < R) pl = corta(pl, a, b);
       if (pl.length < 3) continue;
       const p = new Path2D();
       pl.forEach((q, i) => (i ? p.lineTo(q[0], q[1]) : p.moveTo(q[0], q[1])));
       p.closePath();
-      const v = Math.max(0, Math.min(1, luz(c[0], c[1]) + (r() - 0.5) * 0.5));
-      const ang = Math.PI / 2 + (r() - 0.5) * 0.4;
-      if (v > 0.1) gravar(k, p, c[0], c[1], 140, ang, 4.4, 2.3, (x, y) => v + (y - c[1]) / 500, cor, 0.1);
-      if (v > 0.62) gravar(k, p, c[0], c[1], 140, ang + 0.5, 5.6, 1.6, () => (v - 0.55) * 2, cor, 0);
-      // a beirada: o lado de baixo e o da direita escuros, o de cima aceso
+      const v = Math.max(0, Math.min(1, luz(a[0], a[1]) + (r() - 0.5) * 0.45));
+      const ang = Math.PI / 2 + (r() - 0.5) * 0.5;
+      const passo = Math.max(3, Math.min(4.6, a[2] / 12));
+      const Rb = Math.max(...pl.map((q) => Math.hypot(q[0] - a[0], q[1] - a[1]))) + 2;
+      if (v > 0.1) gravar(k, p, a[0], a[1], Rb, ang, passo, 2.2, (x, y) => v + (y - a[1]) / 400, cor, 0.1);
+      if (v > 0.6) gravar(k, p, a[0], a[1], Rb, ang + 0.55, passo * 1.3, 1.5, () => (v - 0.55) * 2, cor, 0);
       for (let i = 0; i < pl.length; i++) {
         const q = pl[i];
         const s2 = pl[(i + 1) % pl.length];
         const nx = s2[1] - q[1];
         const ny = q[0] - s2[0];
         const baixo = ny > 0 || nx > 0;
+        if ((!baixo && r() < 0.5) || (baixo && r() < 0.22)) continue;
         k.strokeStyle = baixo ? cor : claro;
-        k.lineWidth = baixo ? 2 + v * 1.2 : 1.3;
-        if (!baixo && r() < 0.4) continue;
+        k.lineWidth = baixo ? 1.4 + v * 1.2 + a[2] / 80 : 1.2;
         k.beginPath();
         k.moveTo(q[0], q[1]);
-        k.lineTo((q[0] + s2[0]) / 2 + (r() - 0.5) * 6, (q[1] + s2[1]) / 2 + (r() - 0.5) * 6);
+        k.lineTo((q[0] + s2[0]) / 2 + (r() - 0.5) * a[2] * 0.08, (q[1] + s2[1]) / 2 + (r() - 0.5) * a[2] * 0.08);
         k.lineTo(s2[0], s2[1]);
         k.stroke();
       }
     }
-    // as fendas compridas que descem
-    k.strokeStyle = cor;
-    for (let i = 0; i < 9; i++) {
-      let x = x0 + r() * (x1 - x0);
-      let y = y0 + r() * 120;
+    // as ravinas: um sulco escuro que desce torto, com a sombra cerrada do lado esquerdo
+    for (const rv of ravinas) {
+      const pts2 = bezier(...rv, 30);
+      const larg = (t) => 3 + t * 9;
+      const cima = [];
+      const baixo = [];
+      pts2.forEach(([x, y], i) => { const t = i / (pts2.length - 1); cima.push([x - larg(t), y]); baixo.push([x + larg(t) * 0.3, y]); });
+      const sulco = pol([...cima, ...baixo.reverse()]);
+      k.fillStyle = 'rgba(42,26,16,.35)';
+      k.fill(sulco);
+      gravar(k, sulco, pts2[15][0], pts2[15][1], 260, Math.PI / 2 + 0.1, 2.4, 2, () => 0.85, cor, 0);
+      k.strokeStyle = cor;
       k.lineWidth = 2.6;
       k.beginPath();
-      k.moveTo(x, y);
-      for (let j = 0; j < 8; j++) { x += (r() - 0.5) * 22; y += 30 + r() * 20; k.lineTo(x, y); }
+      pts2.forEach(([x, y], i) => (i ? k.lineTo(x + 2, y) : k.moveTo(x + 2, y)));
       k.stroke();
     }
     k.restore();
   }
   // (4) O monte Sinai (Êx 19.18): "Saía fumaça do monte Sinai, porque o Senhor tinha descido
   // sobre ele no meio de labaredas de fogo. Subia fumaça como de uma fornalha. E todo o monte
-  // tremia violentamente." O maciço de granito, em blocos e juntas; o alto dele some dentro
-  // da nuvem de fumaça que desceu por cima e o envolve, escura e grossa, em rolos gravados que
-  // sobem para fora da prancha (a nuvem do 19.16, com os relâmpagos); embaixo dela, saindo das
-  // fendas das pedras, as línguas de fogo em traço, que acendem a barriga da fumaça. O tremor
-  // está na crista em traço dobrado, nas pedras que rolam e no pó ao pé do monte.
+  // tremia violentamente." O maciço de granito, em blocos de tamanhos soltos e ravinas; o alto
+  // dele some dentro da coluna de fumaça, grossa como de fornalha, em rolos gravados que se
+  // abrem para cima e para fora da prancha (a nuvem do 19.16, com os relâmpagos); embaixo dela,
+  // saindo das fendas da rocha, três línguas de fogo em traço que sobem para a fumaça. O tremor
+  // está na crista em traço dobrado e nas pedras que rolam, com o sopro de pó.
   function desenhoSinai(k, W, H, obj) {
     const r = sorteio(6401);
     papelVelho(k, W, H, r, ['#ecdcbc', '#d2b88e', '#9c8160'], [W / 2, 300]);
@@ -7187,13 +7225,19 @@
     k.fillStyle = '#2c241c';
     k.fill(ceu);
     gravar(k, ceu, W / 2, 300, 660, Math.PI / 2, 5, 1.6, () => 0.7, '#120c07', 0);
-    // o monte: largo e alto, de muitos picos, em granito em blocos
-    const perfil = [[-10, 520], [40, 470], [92, 430], [128, 444], [170, 380], [214, 336], [244, 350], [282, 290], [318, 258], [350, 270], [384, 222], [420, 200], [452, 208], [482, 238], [516, 214], [548, 244], [584, 270], [620, 256], [660, 318], [700, 350], [740, 336], [780, 400], [830, 440], [W + 10, 480]];
+    // o monte: largo, de muitos picos, em granito; o cume some dentro da fumaça
+    const perfil = [[-10, 540], [40, 494], [92, 452], [128, 466], [170, 400], [214, 352], [244, 366], [282, 300], [318, 262], [350, 276], [384, 222], [420, 196], [452, 206], [482, 238], [516, 214], [548, 246], [584, 274], [620, 262], [660, 324], [700, 356], [740, 342], [780, 410], [830, 450], [W + 10, 488]];
     const monte = contornoRocha(r, [...perfil, [W + 10, 700], [-10, 700]], 4);
     monte.closePath();
-    k.fillStyle = '#b48a6a';
-    k.fill(monte);
-    granitoEmBlocos(k, r, monte, [-10, 190, W + 10, 700], (x, y) => 0.25 + (y - 220) / 700 + Math.abs(x - 430) / 1800);
+    // o granito vai numa tela à parte: entra aqui e de novo no ombro, na frente do fogo
+    const tg = tela(W, H);
+    const kg = tg.getContext('2d');
+    kg.fillStyle = '#b48a6a';
+    kg.fill(monte);
+    granitoEmBlocos(kg, r, monte, [-10, 190, W + 10, 700], (x, y) => 0.22 + (y - 220) / 640 + Math.abs(x - 430) / 1700, {
+      ravinas: [[[200, 380], [150, 460], [190, 540], [120, 660]], [[700, 360], [760, 440], [700, 540], [770, 660]]],
+    });
+    k.drawImage(tg, 0, 0);
     // o tremor: a crista em traço dobrado, cada vez mais fraco
     for (const [d, a] of [[0, 1], [5, 0.5], [10, 0.25]]) {
       k.strokeStyle = 'rgba(26,18,10,' + a + ')';
@@ -7202,84 +7246,127 @@
       perfil.forEach(([x, y], i) => (i ? k.lineTo(x + d * 0.6, y - d) : k.moveTo(x + d * 0.6, y - d)));
       k.stroke();
     }
-    // a nuvem de fumaça: rolos gravados, sem contorno fechado, que descem por cima do cume e
-    // sobem para fora da prancha, de tamanhos soltos; a barriga dos de baixo acende com o fogo
-    const base = (x) => 296 + 46 * Math.exp(-(((x - 430) / 210) ** 2));
+    // a fumaça, como de fornalha: uma coluna de rolos que sai do alto do monte e se abre para
+    // cima e para os lados, para fora da prancha. Cada rolo é feito de traços curtos e curvos que
+    // acompanham a forma dele, de comprimentos soltos (nada de anéis); a sombra fica em cima e à
+    // esquerda; só a beirada de baixo dos rolos perto do fogo acende, com uns traços quentes.
+    const base = (x) => 290 + 74 * Math.exp(-(((x - 440) / 280) ** 2));
     const rolo = (q) => {
-      const fogoPerto = Math.max(0, Math.min(1, (q.y + q.rr * 0.6 - 200) / 140)) * Math.max(0, 1 - Math.abs(q.x - 430) / 380);
-      const forma = lanoso(r, Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * 6.283; const f = 0.86 + r() * 0.28; return [q.x + Math.cos(a) * q.rr * f, q.y + Math.sin(a) * q.rr * 0.72 * f]; }), q.rr * 0.12, q.rr * 0.42);
+      const fogo = Math.max(0, Math.min(1, (q.y + q.rr * 0.7 - 210) / 120)) * Math.max(0, 1 - Math.abs(q.x - 440) / 330);
+      const forma = seixo(r, q.x, q.y, q.rr, q.rr * 0.8, (r() - 0.5) * 0.4, 0.09);
       k.fillStyle = q.tom;
       k.fill(forma);
       k.save();
       k.clip(forma);
-      k.strokeStyle = '#120c07';
-      for (let j = 0; j < 3; j++) {
-        k.lineWidth = 2.4 - j * 0.5;
+      // a couve-flor da fumaça: cada rolo tem uns tufos menores dentro, e os traços curtos
+      // contornam esses tufos (não o centro do rolo), mais cheios do lado da sombra
+      const tufos = Array.from({ length: 5 + Math.floor(r() * 3) }, () => { const a = r() * 6.283; const d = r() * 0.55; return [q.x + Math.cos(a) * q.rr * d, q.y + Math.sin(a) * q.rr * 0.8 * d, q.rr * (0.28 + r() * 0.22)]; });
+      const n = Math.round((q.rr * q.rr) / 18);
+      for (let i = 0; i < n; i++) {
+        const [cx, cy, tr] = tufos[Math.floor(r() * tufos.length)];
+        const a = Math.PI + r() * Math.PI * 1.3 - 0.3;
+        const d = 0.55 + r() * 0.5;
+        const l = 6 + r() * 16;
+        const da = l / (d * tr);
+        const sombra = 0.55 - Math.sin(a) * 0.3 + (cy - q.y) / q.rr * -0.3;
+        k.strokeStyle = 'rgba(14,9,5,' + Math.min(0.9, 0.35 + sombra * 0.6).toFixed(2) + ')';
+        k.lineWidth = 0.7 + Math.max(0, sombra) * 1.5;
         k.beginPath();
-        k.ellipse(q.x - q.rr * 0.1 + (r() - 0.5) * 8, q.y + q.rr * 0.12 + j * 7, q.rr * (0.96 - j * 0.1), q.rr * 0.7 * (0.96 - j * 0.1), 0, Math.PI + 0.35 + r() * 0.3, Math.PI * 2 - 0.3 - r() * 0.4);
+        k.ellipse(cx, cy, d * tr, d * tr * 0.85, 0, a, a + da);
         k.stroke();
       }
-      const n = 3 + Math.round(fogoPerto * 3);
-      for (let j = 0; j < n; j++) {
-        const a = fogoPerto > 0.05 ? 0.3 + fogoPerto * 0.55 : 0.18;
-        k.strokeStyle = fogoPerto > 0.05 ? 'rgba(214,130,58,' + (a * (1 - j * 0.13)).toFixed(3) + ')' : 'rgba(150,128,104,' + (a * (1 - j * 0.15)).toFixed(3) + ')';
-        k.lineWidth = 2.6 - j * 0.3;
+      // a beirada de baixo, acesa pelo fogo: poucos traços quentes, curtos, só embaixo
+      const quentes = fogo > 0.05 ? 4 + Math.round(fogo * 8) : 2;
+      for (let i = 0; i < quentes; i++) {
+        const a = 0.5 + r() * 2.1;
+        const d = 0.78 + r() * 0.2;
+        k.strokeStyle = fogo > 0.05 ? 'rgba(214,128,56,' + (0.35 + fogo * 0.5).toFixed(2) + ')' : 'rgba(150,126,100,.35)';
+        k.lineWidth = 1.2 + fogo * 1.6;
         k.beginPath();
-        k.ellipse(q.x + q.rr * 0.06 + (r() - 0.5) * 6, q.y - q.rr * 0.04 - j * 6, q.rr * (0.9 - j * 0.07), q.rr * 0.7 * (0.9 - j * 0.07), 0, 0.4 + r() * 0.3, Math.PI - 0.4 - r() * 0.3);
+        k.ellipse(q.x, q.y, d * q.rr, d * q.rr * 0.8, 0, a, a + 0.2 + r() * 0.35);
         k.stroke();
       }
       k.restore();
+      // a beirada de cima, partida: separa o rolo do de trás
+      k.strokeStyle = 'rgba(10,6,3,.8)';
+      for (let i = 0; i < 3; i++) {
+        const a = Math.PI + 0.3 + r() * 2.2;
+        k.lineWidth = 1.6;
+        k.beginPath();
+        k.ellipse(q.x, q.y, q.rr * 0.97, q.rr * 0.78, 0, a, a + 0.2 + r() * 0.3);
+        k.stroke();
+      }
     };
     const rolos = [];
-    for (let i = 0; i < 64; i++) {
-      const t = Math.pow(r(), 0.8);
-      const x = -60 + r() * (W + 120);
-      const yMax = base(x) - 40;
-      const y = -40 + t * (yMax + 40);
-      const rr = 50 + r() * 70 + (1 - t) * 40;
-      rolos.push({ x, y, rr, tom: t > 0.75 ? '#463829' : t > 0.4 ? '#3d3127' : '#342a21' });
+    for (let i = 0; i < 110; i++) {
+      const x = -70 + r() * (W + 140);
+      const t = Math.pow(r(), 0.55);
+      const y = base(x) - 22 - (1 - t) * (base(x) + 80);
+      rolos.push({ x, y, rr: 36 + (1 - t) * 64 + r() * 30, tom: t < 0.5 ? '#30271f' : '#382d23' });
     }
     rolos.sort((a, b) => a.y - b.y);
     for (const q of rolos) rolo(q);
-    // o fogo: línguas em traço que saem das fendas da encosta alta e sobem para a fumaça;
-    // cada língua é um feixe de traços curvos que se abrem e afinam na ponta
+    // o fogo: três línguas de tamanhos diferentes, saindo das fendas da rocha e subindo para
+    // dentro da fumaça; cada uma é um feixe de traços em S que se abrem, se dividem e afinam,
+    // com a base torta escondida atrás de uma beirada de pedra
     const crista = (x) => { for (let i = 1; i < perfil.length; i++) if (perfil[i][0] >= x) { const [ax, ay] = perfil[i - 1]; const [bx, by] = perfil[i]; return ay + (by - ay) * ((x - ax) / Math.max(1, bx - ax)); } return 500; };
+    const tracoDeFogo = (x0, y0, x1, y1, ondula, larg, cor) => {
+      const pts = bezier([x0, y0], [x0 + ondula, y0 - (y0 - y1) * 0.35], [x1 - ondula * 0.8, y0 - (y0 - y1) * 0.72], [x1, y1], 18);
+      k.strokeStyle = cor;
+      for (let i = 1; i < pts.length; i++) {
+        k.lineWidth = Math.max(0.4, larg * (1 - i / pts.length));
+        k.beginPath();
+        k.moveTo(pts[i - 1][0], pts[i - 1][1]);
+        k.lineTo(pts[i][0], pts[i][1]);
+        k.stroke();
+      }
+      return pts;
+    };
     const lingua = (x, y, h, vai, larg) => {
-      // a língua de fogo em gravura: o contorno repetido para dentro, cada vez mais quente, sem
-      // tinta chapada; duas ou três pontas de alturas diferentes, tortas como chama que sobe
-      const pontas = [[0, 1, 1], [-0.28, 0.62, 0.55], [0.3, 0.72, 0.6]];
-      k.save();
-      k.beginPath();
-      k.rect(x - larg * 2, y - h * 1.6, larg * 4, h * 1.6 - 5);
-      k.clip();
-      for (const [dx, fh, fl] of pontas) {
-        for (let j = 0; j < 6; j++) {
-          const s2 = 1 - j * 0.15;
-          const p = chama(x + dx * larg, y - j * 2, larg * fl * s2, h * fh * s2, vai * fh * (0.8 + s2 * 0.2) + Math.sin(j + dx * 5) * 4);
-          k.strokeStyle = j < 2 ? 'rgba(201,119,46,.72)' : j < 4 ? 'rgba(226,150,64,.7)' : 'rgba(246,200,118,.75)';
-          k.lineWidth = 2.6 - j * 0.25;
-          k.stroke(p);
-          if (j === 0) marcar(k, obj, p);
+      // de fora para dentro: as línguas largas e escuras de laranja, depois as do meio, mais
+      // claras; cada traço é largo na base e afina na ponta, em S, e as pontas se juntam no alto
+      for (const [n, wl, cor, fh, fl] of [[7, 9, 'rgba(196,106,40,.82)', 1, 1], [6, 7, 'rgba(226,146,62,.88)', 0.86, 0.72], [4, 5, 'rgba(248,210,130,.95)', 0.66, 0.42]]) {
+        for (let j = 0; j < n; j++) {
+          const u = n > 1 ? j / (n - 1) - 0.5 : 0;
+          const x0 = x + u * larg * fl + (r() - 0.5) * 8;
+          const y0 = y + (r() - 0.5) * 12;
+          const hj = h * fh * (0.55 + (0.5 - Math.abs(u)) * 0.9 + r() * 0.3);
+          const x1 = x + vai * (hj / h) + u * larg * 0.18 + (r() - 0.5) * 14;
+          const pts = tracoDeFogo(x0, y0, x1, y0 - hj, (r() < 0.5 ? -1 : 1) * (18 + r() * 30), wl, cor);
+          if (r() < 0.35 && n > 4) {
+            const [bx, by] = pts[10];
+            tracoDeFogo(bx, by, bx + (u < 0 ? -1 : 1) * (14 + r() * 24), by - hj * (0.22 + r() * 0.18), (r() - 0.5) * 16, wl * 0.45, cor);
+          }
         }
       }
-      k.restore();
-      // a fenda escura de onde ela sai
-      k.strokeStyle = '#1a100a';
-      k.lineWidth = 3;
-      k.beginPath();
-      k.moveTo(x - larg * 0.75, y + 6);
-      k.lineTo(x - larg * 0.35, y - 6);
-      k.lineTo(x + larg * 0.05, y - 1);
-      k.lineTo(x + larg * 0.4, y - 7);
-      k.lineTo(x + larg * 0.75, y + 5);
-      k.stroke();
+      const p = new Path2D();
+      p.ellipse(x + vai * 0.5, y - h * 0.5, larg * 0.8, h * 0.55, 0, 0, 6.283);
+      marcar(k, obj, p);
     };
-    k.lineCap = 'round';
-    for (const [x, h, vai, larg] of [[236, 120, -26, 56], [336, 170, -14, 70], [440, 190, 10, 78], [544, 160, 24, 70], [640, 110, 30, 54]]) lingua(x, Math.max(crista(x), base(x)) + 70, h, vai, larg);
-    // uns rolos baixos na frente, que cobrem a ponta de algumas línguas
-    for (const [x, rr] of [[300, 46], [470, 52], [610, 40]]) rolo({ x, y: base(x) - 6, rr, tom: '#4a3b2c' });
+    const ombro = (x) => base(x) + 62 + Math.sin(x * 0.05) * 8 + Math.sin(x * 0.13 + 1) * 6;
+    for (const [x, h, vai, larg] of [[352, 160, -22, 70], [470, 220, 12, 90], [586, 130, 26, 60]]) lingua(x, ombro(x) + 16, h, vai, larg);
+    // o ombro de rocha na frente das bases do fogo: a mesma pedra, com a beirada torta acesa
+    const ombroP = [];
+    for (let x = 200; x <= 720; x += 10) ombroP.push([x, ombro(x) + (r() - 0.5) * 6]);
+    const frente = contornoRocha(r, [...ombroP, [740, 700], [180, 700]], 3);
+    frente.closePath();
+    k.save();
+    k.clip(monte);
+    k.clip(frente);
+    k.drawImage(tg, 0, 0);
+    k.strokeStyle = '#2a1a10';
+    k.lineWidth = 2.6;
+    k.beginPath();
+    ombroP.forEach(([px, py], i) => (i ? k.lineTo(px, py) : k.moveTo(px, py)));
+    k.stroke();
+    k.strokeStyle = 'rgba(240,170,90,.85)';
+    k.lineWidth = 1.6;
+    k.beginPath();
+    ombroP.forEach(([px, py], i) => (i ? k.lineTo(px, py + 3) : k.moveTo(px, py + 3)));
+    k.stroke();
+    k.restore();
     // os relâmpagos (19.16): riscos brancos e quebrados, com a beirada fina de tinta
-    for (const [x, y, segs, dir] of [[140, 40, 6, 1], [760, 60, 5, -1]]) {
+    for (const [x, y, segs, dir] of [[120, 40, 6, 1], [780, 60, 5, -1]]) {
       const pts = [[x, y]];
       for (let i = 0; i < segs; i++) { const [px, py] = pts[pts.length - 1]; pts.push([px + dir * (10 + r() * 24) * (i % 2 ? -0.5 : 1), py + 22 + r() * 16]); }
       for (const [w, c] of [[6, 'rgba(18,12,7,.95)'], [2.8, '#f6eedc']]) {
@@ -7291,16 +7378,19 @@
         k.stroke();
       }
     }
-    // as pedras que rolam, com os riscos do movimento
-    for (const [x, y, s] of [[150, 470, 15], [116, 520, 10], [720, 440, 14], [770, 500, 10]]) {
+    // as pedras que rolam, com os riscos do movimento e um sopro de pó atrás
+    for (const [x, y, s] of [[150, 486, 15], [116, 540, 10], [740, 458, 14], [790, 520, 10]]) {
+      const dir = x < 430 ? 1 : -1;
+      k.strokeStyle = 'rgba(236,214,176,.7)';
+      k.lineWidth = 1.2;
+      for (let i = 0; i < 5; i++) { k.beginPath(); k.ellipse(x + dir * s * 1.6, y - s * 1.6, s * (0.6 + i * 0.2), s * 0.4, 0, Math.PI + 0.3, Math.PI * 2 - 0.3); k.stroke(); }
       const p = seixo(r, x, y, s, s * 0.8, r(), 0.18);
       peca(k, p, [x - s, y - s, x + s, y + s], { cor: '#9b7458', sombra: sombraOval(x, y, s, s * 0.8, 0), passo: 2.4, maxL: 1.2, traco: 1.6 });
       k.strokeStyle = 'rgba(26,18,10,.75)';
       k.lineWidth = 1.3;
-      const dir = x < 430 ? 1 : -1;
       for (let i = -1; i <= 1; i++) { k.beginPath(); k.moveTo(x + dir * s * 0.7 + i * 5, y - s * 1.2); k.lineTo(x + dir * s * 1.9 + i * 5, y - s * 2.8); k.stroke(); }
     }
-    // o pé do monte e a planície de areia, perto
+    // o pé do monte e a planície de areia, perto, sem faixa de pó
     const chao = new Path2D();
     chao.moveTo(-10, 650);
     for (let x = -10; x <= W + 10; x += 12) chao.lineTo(x, 640 + Math.sin(x * 0.01 + 1) * 10);
@@ -7313,14 +7403,6 @@
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.8;
     k.stroke(chao);
-    // o pó que o tremor levanta: uma faixa baixa e comprida, de beirada em tufos desiguais
-    const po = lanoso(r, [[-30, 660], ...Array.from({ length: 14 }, (_, i) => [i * 70, 618 - Math.abs(Math.sin(i * 1.7)) * 26 - r() * 10]), [W + 30, 640], [W + 30, 668], [-30, 672]], 7, 22);
-    k.fillStyle = 'rgba(232,216,180,.92)';
-    k.fill(po);
-    gravar(k, po, W / 2, 640, 480, 0, 3.6, 1.1, (px, py) => (py - 600) / 60, SEPIA, 0);
-    k.strokeStyle = 'rgba(43,33,18,.6)';
-    k.lineWidth = 1.3;
-    k.stroke(po);
     // as rachaduras na planície, abertas pelo tremor
     k.strokeStyle = SEPIA;
     k.lineCap = 'round';
