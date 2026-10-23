@@ -56,8 +56,8 @@
   // A raridade é o acabamento da carta (linho, bronze, prata, ouro, glória), não a importância
   // do que ela mostra.
   const CARTAS = [
-    { id: 'davi-funda', album: 'Heróis da fé', numero: 4, total: 13, titulo: 'Davi e a funda',
-      sabia: 'Davi apanhou cinco pedras lisas num riacho e usou só uma.', ref: '1 Samuel 17.40-50', raridade: 'linho' },
+    { id: 'davi-funda', album: 'Heróis da fé', numero: 10, total: 13, titulo: 'Davi e a funda',
+      sabia: 'Davi apanhou cinco pedras lisas de um riacho e usou só uma.', ref: '1 Samuel 17.40-49', raridade: 'linho' },
     { id: 'poco-jaco', album: 'Lugares', numero: 3, total: 13, titulo: 'O poço de Jacó',
       sabia: 'Jesus chegou cansado a este poço por volta do meio-dia e pediu água.', ref: 'João 4.6-7', raridade: 'bronze' },
     { id: 'azeite-viuva', album: 'Objetos', numero: 7, total: 13, titulo: 'O azeite da viúva',
@@ -369,7 +369,8 @@
   }
 
   // ---------- (1) Heróis da fé: a funda de Davi e as cinco pedras ----------
-  // Uma prancha de gravura, como as dos livros antigos de história natural: no papel sálvia,
+  // Uma prancha de gravura, como as dos livros antigos de história natural: no papel sálvia
+  // (puxado para o sépia, para casar com as outras pranchas do álbum),
   // a funda estendida, de couro e cordão trançado, e embaixo a fileira das cinco pedras lisas
   // do riacho, numeradas. Falta uma na fileira (só o contorno pontilhado): é a que está na
   // bolsa da funda, a única que Davi usou, e a única que leva o amarelo.
@@ -449,13 +450,13 @@
     const r = sorteio(4101);
     // o papel sálvia, com fibra, manchas do tempo e a borda escurecida
     const g = k.createRadialGradient(W * 0.45, H * 0.4, 80, W / 2, H / 2, W * 0.8);
-    g.addColorStop(0, '#dde3bc');
-    g.addColorStop(0.6, '#c7d09d');
-    g.addColorStop(1, '#a9b47c');
+    g.addColorStop(0, '#e3e0bd');
+    g.addColorStop(0.6, '#cfcc9f');
+    g.addColorStop(1, '#b1ad7f');
     k.fillStyle = g;
     k.fillRect(0, 0, W, H);
     for (let i = 0; i < 9000; i++) {
-      k.fillStyle = r() < 0.6 ? 'rgba(60,70,30,' + (0.03 + r() * 0.07).toFixed(3) + ')' : 'rgba(255,255,240,.22)';
+      k.fillStyle = r() < 0.6 ? 'rgba(70,64,30,' + (0.03 + r() * 0.07).toFixed(3) + ')' : 'rgba(255,252,236,.22)';
       k.fillRect(r() * W, r() * H, 1 + r() * 4, 1);
     }
     for (let i = 0; i < 28; i++) {
