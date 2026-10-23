@@ -3378,20 +3378,15 @@
   // branca sobre o fundo escuro, como na xilogravura.
   function desenhoAbraao(k, W, H, obj) {
     const r = sorteio(5301);
-    const g = k.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, '#100f18');
-    g.addColorStop(0.55, '#1d1a27');
-    g.addColorStop(0.78, '#3b2e30');
-    g.addColorStop(1, '#1a1512');
-    k.fillStyle = g;
+    // a noite é a tinta lisa; o tom do céu vem só das linhas brancas da gravura
+    k.fillStyle = '#15131b';
     k.fillRect(0, 0, W, H);
     papelVelho(k, W, H, r, ['rgba(0,0,0,0)', 'rgba(0,0,0,0)'], [W / 2, H / 2], true);
     // a linha branca do céu, mais cheia perto do horizonte
-    linhas(k, 0, 0, W, 660, 6, 1.1, (x, y) => 0.12 + (y / 660) ** 2 * 0.7, 'rgba(236,220,186,.4)');
+    linhas(k, 0, 0, W, 660, 5.5, 1.3, (x, y) => 0.06 + (y / 660) ** 2 * 0.8, 'rgba(236,220,186,.42)');
     // a Via Láctea: uma faixa de luz e de estrelas miúdas, na diagonal
     const via = (t) => [80 + t * 760, 600 - t * 560];
-    for (let i = 0; i < 26; i++) { const [x, y] = via(i / 25); brilho(k, x + (r() - 0.5) * 40, y + (r() - 0.5) * 40, 70 + r() * 50, 'rgba(230,214,190,.07)'); }
-    for (let i = 0; i < 1100; i++) {
+    for (let i = 0; i < 2200; i++) {
       const [x, y] = via(r());
       const d = (r() + r() + r() - 1.5) * 90;
       const px = x + d * 0.6;
@@ -3440,6 +3435,11 @@
     tenda.lineTo(tx1 + 36, B);
     tenda.closePath();
     const pd = tc + 40;
+    // a tenda sai 1,25 vez, em volta do pé do meio (para ler na miniatura)
+    k.save();
+    k.translate(tc + 44, B);
+    k.scale(1.25, 1.25);
+    k.translate(-tc, -B);
     brilho(k, pd, B, 150, 'rgba(255,190,100,.42)');
     k.fillStyle = 'rgba(0,0,0,.5)';
     k.fillRect(tx0 - 40, B - 2, tx1 - tx0 + 80, 10);
@@ -3490,6 +3490,7 @@
       k.lineTo(x + dx + 3, B + 20);
       k.stroke();
     }
+    k.restore();
     vinheta(k, W, H, 0.35);
   }
   // (4) O riso de Sara (Gn 21.1-7): Isaque nasceu quando Abraão tinha cem anos. Na sombra do
