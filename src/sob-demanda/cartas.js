@@ -4341,27 +4341,53 @@
       k.arc(x, tc + 14, 3, 0, 6.283);
       k.stroke();
     }
-    // o linho posto para secar no terraço: feixes de hastes deitados no parapeito, com as
-    // cápsulas numa ponta e a amarra no meio
-    for (let i = 0; i < 5; i++) {
-      const fx = x0 - 6 + i * 66 + (r() - 0.5) * 8;
-      const fy = tc - 30 - (i % 2) * 6;
-      const g = (r() - 0.5) * 0.12;
-      k.save();
-      k.translate(fx, fy);
-      k.rotate(g);
-      const f = pol([[0, -6], [104, -9], [112, 0], [104, 9], [0, 6]]);
-      peca(k, f, [0, -9, 112, 9], { cor: '#e3cf98', ang: 0, passo: 2.6, maxL: 1, sombra: (x, yy) => 0.2 + (yy + 9) / 30, traco: 1.6 });
-      k.fillStyle = '#7a6436';
-      for (let j = 0; j < 7; j++) { k.beginPath(); k.arc(104 + (r() - 0.5) * 8, (j - 3) * 2.6, 2.2, 0, 6.283); k.fill(); }
+    // o linho posto para secar no terraço (Js 2.6): feixes de hastes finas e compridas,
+    // deitados sobre o parapeito, um pouco abertos, com as cápsulas numa ponta, a amarra no
+    // meio e umas hastes soltas
+    k.save();
+    k.lineCap = 'round';
+    for (let i = 0; i < 4; i++) {
+      const fx = x0 + 6 + i * 84 + (r() - 0.5) * 8;
+      const fy = tc - 28 - (i % 2) * 5;
+      const g = (r() - 0.5) * 0.1;
+      const n = 22;
+      for (let j = 0; j < n; j++) {
+        const u = j / (n - 1) - 0.5;
+        const comp = 112 + r() * 22;
+        const meio = 50;
+        const ax = fx;
+        const ay = fy + u * 8;
+        const bx = fx + comp * Math.cos(g);
+        const by = fy + comp * Math.sin(g) + u * 20 + (r() - 0.5) * 4;
+        k.strokeStyle = j % 3 ? '#4a3a1c' : '#7a6436';
+        k.lineWidth = 1.1;
+        k.beginPath();
+        k.moveTo(ax, ay);
+        k.quadraticCurveTo(fx + meio, fy + u * 3, bx, by);
+        k.stroke();
+        k.fillStyle = '#6a5428';
+        k.beginPath();
+        k.arc(bx + 1.5, by, 1.8, 0, 6.283);
+        k.fill();
+      }
       k.strokeStyle = '#8a5a2a';
-      k.lineWidth = 3;
+      k.lineWidth = 3.4;
       k.beginPath();
-      k.moveTo(46, -8);
-      k.lineTo(46, 8);
+      k.moveTo(fx + 50, fy - 6);
+      k.lineTo(fx + 52, fy + 6);
       k.stroke();
-      k.restore();
+      // umas hastes soltas, caindo pela beirada
+      k.strokeStyle = '#4a3a1c';
+      k.lineWidth = 1;
+      for (let j = 0; j < 2; j++) {
+        const sx = fx + 20 + r() * 70;
+        k.beginPath();
+        k.moveTo(sx, fy + 4);
+        k.quadraticCurveTo(sx + 10, fy + 14, sx + 6 + r() * 12, fy + 26);
+        k.stroke();
+      }
     }
+    k.restore();
     // a janela: o lintel de madeira, o batente, o escuro de dentro e a sombra que cai embaixo
     const jx = 420;
     const jy = 214;
@@ -6074,8 +6100,8 @@
   // o terceiro número (opcional, até 1) afasta a arte, usando a margem do desenho. Quando o
   // desenho não tem mais para onde ir, a arte desce (ou sobe) e a beirada dela se estende.
   // Gideão: a corneta, deitada embaixo à direita; Ester: o alto do dossel, na beirada de cima; Sara: as
-  // borlas do pano da tenda, no alto.
-  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96] };
+  // borlas do pano da tenda, no alto; Raabe: o terraço com o linho, no alto da casa.
+  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
