@@ -4545,6 +4545,7 @@
       const p = lingua(s, dx, hh, v);
       k.fillStyle = '#d9772a';
       k.fill(p);
+      gravar(k, p, x + dx, y - hh * 0.5, hh * 0.7, -Math.PI / 2 + 0.25, 3.2, 1.3, () => 0.6, '#6b2a08', 0.4);
       k.strokeStyle = '#5a2406';
       k.lineWidth = 1.6;
       k.stroke(p);
@@ -4553,6 +4554,7 @@
       const p = lingua(s * (1 - i * 0.04), -i * 3, h * (0.35 + s * 0.65), vai * s * (1 + i * 0.25));
       k.fillStyle = cor;
       k.fill(p);
+      if (i < 2) gravar(k, p, x, y - h * 0.5, h * 0.7, -Math.PI / 2 + 0.25, 3.2, 1.3, (px, py) => 0.35 + Math.abs(px - x - (y - py) * 0.2) / (h * 0.3) * 0.6 - i * 0.25, '#6b2a08', 0.4);
       k.strokeStyle = i ? 'rgba(122,52,10,.7)' : '#5a2406';
       k.lineWidth = i ? 1.2 : 1.8;
       k.stroke(p);
@@ -4643,48 +4645,56 @@
     };
     umVaso(176, 694, 196, 150);
     umVaso(744, 628, 158, 120);
-    // o vaso quebrado: a barriga que ficou, partida em linha torta que acompanha a curva do
-    // vaso; na beirada, a espessura do barro (clara por dentro), e o escuro lá dentro
+    // o vaso quebrado: o mesmo cântaro dos inteiros (pé, barriga, ombro), com o terço de cima
+    // partido. O vaso é uma superfície de revolução vista um pouco de cima: o ponto da altura t
+    // (0 = boca, 1 = pé) e do ângulo g fica em (cx + raio(t) cos g, y(t) + 0,26 raio(t) sen g).
+    // A quebra é uma altura t para cada ângulo, em trechos compridos e tortos, com dois degraus:
+    // o pedaço do ombro que ficou de um lado, e o barro mais baixo do outro.
     const bx = tx;
-    const bb = 744;
-    const R = 78;
-    // a linha da quebra: alta à esquerda (ficou um pedaço do ombro), baixa à direita, com
-    // degraus e lascas desiguais, nunca em dente regular
-    const alturas = [158, 150, 162, 140, 128, 132, 112, 104, 108, 92, 96, 84, 88, 80];
-    const corte = alturas.map((h, i) => {
-      const t = i / (alturas.length - 1);
-      const x = bx - R * 1.02 + t * R * 2.04 + (r() - 0.5) * 6;
-      const larg = R * (h > 120 ? 0.86 + (h - 120) / 400 : 1);
-      return [bx + ((x - bx) / R) * larg, bb - h + (r() - 0.5) * 5];
-    });
-    const barriga = new Path2D();
-    barriga.moveTo(corte[0][0], corte[0][1]);
-    corte.forEach(([x, y]) => barriga.lineTo(x, y));
-    barriga.bezierCurveTo(bx + R + 8, bb - 40, bx + R * 0.7, bb, bx, bb);
-    barriga.bezierCurveTo(bx - R * 0.7, bb, bx - R - 8, bb - 40, corte[0][0], corte[0][1]);
-    barriga.closePath();
-    sombraNoChao(k, barriga, -26, 10, 8, 0.6);
-    // o lado de dentro, escuro, que aparece por cima da beirada de trás
-    const dentro = new Path2D();
-    dentro.ellipse(bx + 4, bb - 104, R - 10, 18, -0.12, 0, 6.283);
-    k.fillStyle = '#120804';
-    k.fill(dentro);
-    peca(k, barriga, [bx - R - 8, bb - 170, bx + R + 8, bb], { cor: '#a6623a', tinta: '#1a0c04', ang: 0.2, passo: 3.4, maxL: 2.1, sombra: (x, y) => 0.25 - (x - bx) / 260 + (y - bb + 100) / 400, cruzada: 0.72, traco: 2.4, obj, abaulado: 0.25 });
-    // a espessura na beirada partida: a faixa clara do barro cortado
+    const bb = 748;
+    const alt = 188;
+    const larg = 146;
+    const yDe = (t) => bb - alt + t * alt;
+    const rDe = (t) => (cantaro(t) * larg) / 2;
+    const pt = (t, g) => [bx + rDe(t) * Math.cos(g), yDe(t) + 0.26 * rDe(t) * Math.sin(g)];
+    const quebra = [[0, 0.4], [0.45, 0.44], [0.8, 0.47], [1.15, 0.45], [1.45, 0.5], [1.8, 0.46], [2.1, 0.36], [2.3, 0.34], [2.6, 0.2], [2.95, 0.14],
+      [3.4, 0.13], [3.9, 0.12], [4.3, 0.2], [4.7, 0.24], [5.1, 0.3], [5.6, 0.34], [6.283, 0.4]];
+    const tQ = (g) => {
+      const gg = ((g % 6.283) + 6.283) % 6.283;
+      for (let i = 1; i < quebra.length; i++) {
+        if (gg <= quebra[i][0]) {
+          const [g0, t0] = quebra[i - 1];
+          const [g1, t1] = quebra[i];
+          return t0 + ((t1 - t0) * (gg - g0)) / (g1 - g0);
+        }
+      }
+      return quebra[0][1];
+    };
+    const N = 120;
+    const borda = Array.from({ length: N + 1 }, (_, i) => { const g = (i / N) * 6.283; return pt(tQ(g) + (r() - 0.5) * 0.006, g); });
+    const frente = borda.slice(0, N / 2 + 1);
+    const tras = borda.slice(N / 2);
+    // a sombra no chão, para a esquerda (a tocha está acima, à direita)
+    sombraNoChao(k, pol([[bx - 60, bb], [bx + 60, bb], [bx + 10, bb + 22], [bx - 110, bb + 22]]), 0, 0, 8, 0.6);
+    // a boca partida, por dentro: o escuro, e a parede de dentro, de trás, iluminada pela tocha
+    const abertura = pol(borda);
+    k.fillStyle = '#2a1206';
+    k.fill(abertura);
+    const paredeDentro = pol([...tras, ...tras.slice().reverse().map(([x, y]) => [x, y + 44])]);
+    k.save();
+    k.clip(abertura);
+    peca(k, paredeDentro, [bx - 80, bb - 140, bx + 80, bb - 40], { cor: '#8a4a26', tinta: '#1a0c04', ang: 1.45, passo: 3, maxL: 1.6, sombra: (x, y) => 0.3 + (y - bb + 130) / 80 + (bx - x) / 300, cruzada: 0.8, traco: 0 });
+    gravar(k, abertura, bx, bb - 100, 90, 0.1, 3.2, 1.8, (x, y) => 0.45 + (y - bb + 120) / 60, '#120602', 0.4);
+    k.restore();
+    // a espessura da beirada de trás: uma linha clara fina por cima
     k.strokeStyle = '#e2a874';
-    k.lineWidth = 5;
-    k.lineJoin = 'miter';
+    k.lineWidth = 3;
     k.beginPath();
-    corte.forEach(([x, y], i) => (i ? k.lineTo(x, y + 3) : k.moveTo(x, y + 3)));
+    tras.forEach(([x, y], i) => (i ? k.lineTo(x, y - 1.5) : k.moveTo(x, y - 1.5)));
     k.stroke();
-    k.strokeStyle = '#1a0c04';
-    k.lineWidth = 1.6;
-    k.beginPath();
-    corte.forEach(([x, y], i) => (i ? k.lineTo(x, y + 6) : k.moveTo(x, y + 6)));
-    k.stroke();
-    // a tocha: o cabo curto de madeira saindo do vaso, inclinado, com o pano enrolado
-    const t0 = [bx - 4, bb - 80];
-    const t1 = [bx + 64, bb - 268];
+    // a tocha: o cabo curto de madeira enfiado na boca partida, inclinado, com o pano enrolado
+    const t0 = [bx - 6, bb - 112];
+    const t1 = [bx + 64, bb - 272];
     vara(k, [t0, t1], 15, '#8a5e36', obj);
     fogoDePano(k, r, t1[0] - 2, t1[1] + 26, 196, 44);
     k.save();
@@ -4696,33 +4706,90 @@
     k.lineWidth = 1.8;
     for (let yy = 4; yy < 54; yy += 9) { k.beginPath(); k.moveTo(-16, yy); k.quadraticCurveTo(0, yy + 7, 17, yy + 2); k.stroke(); }
     k.restore();
-    // os cacos: lascas angulosas e curvas, clara a face de dentro, escura a de fora, com a
-    // espessura na quebra
-    const cacos = [[bx - 162, bb + 26, 0.4, 1], [bx + 132, bb + 18, -0.5, 0], [bx + 210, bb - 16, 1.1, 1], [bx - 110, bb + 62, -0.9, 0], [bx + 52, bb + 54, 0.25, 1], [bx - 230, bb - 6, 2.2, 0]];
-    for (const [x, y, gi, dentroV] of cacos) {
-      const s = 0.8 + r() * 0.5;
-      const pts = [[-30, -4], [-12, -20], [16, -16], [34, 2], [20, 14], [-6, 10], [-22, 12]].map(([a, b]) => [a * s + (r() - 0.5) * 6, b * s + (r() - 0.5) * 5]);
+    // o corpo de fora: da quebra da frente até o pé, pelo perfil do cântaro
+    const tD = tQ(0);
+    const tE = tQ(Math.PI);
+    const corpo = new Path2D();
+    corpo.moveTo(frente[0][0], frente[0][1]);
+    frente.forEach(([x, y]) => corpo.lineTo(x, y));
+    for (let i = 0; i <= 30; i++) { const t = tE + ((1 - tE) * i) / 30; corpo.lineTo(bx - rDe(t), yDe(t)); }
+    corpo.quadraticCurveTo(bx, bb + larg * 0.05, bx + rDe(1), yDe(1));
+    for (let i = 30; i >= 0; i--) { const t = tD + ((1 - tD) * i) / 30; corpo.lineTo(bx + rDe(t), yDe(t)); }
+    corpo.closePath();
+    peca(k, corpo, [bx - larg / 2, bb - alt, bx + larg / 2, bb], { cor: '#a8643a', tinta: '#1a0c04', ang: 0.2, passo: 3.6, maxL: 2.2, sombra: (x, y) => 0.42 - ((x - bx) / larg) * 0.9 + ((y - bb + alt) / alt) * 0.15, cruzada: 0.72, traco: 2.4, obj, abaulado: 0.2 });
+    // as faixas do torno, como nos inteiros, só abaixo da quebra
+    k.save();
+    k.clip(corpo);
+    k.strokeStyle = 'rgba(40,16,4,.6)';
+    k.lineWidth = 1.6;
+    for (const f of [0.34, 0.38, 0.62]) { k.beginPath(); k.ellipse(bx, yDe(f), rDe(f), 0.26 * rDe(f), 0, 0.1, Math.PI - 0.1); k.stroke(); }
+    k.restore();
+    // a espessura do barro na quebra da frente: a faixa clara do corte, com a linha escura
+    // embaixo (a face de fora)
+    k.lineJoin = 'round';
+    k.strokeStyle = '#e8b07c';
+    k.lineWidth = 6;
+    k.beginPath();
+    frente.forEach(([x, y], i) => (i ? k.lineTo(x, y + 2) : k.moveTo(x, y + 2)));
+    k.stroke();
+    k.strokeStyle = '#1a0c04';
+    k.lineWidth = 1.8;
+    k.beginPath();
+    frente.forEach(([x, y], i) => (i ? k.lineTo(x, y + 5.5) : k.moveTo(x, y + 5.5)));
+    k.stroke();
+    k.lineWidth = 1.4;
+    k.beginPath();
+    frente.forEach(([x, y], i) => (i ? k.lineTo(x, y - 1) : k.moveTo(x, y - 1)));
+    k.stroke();
+    // os cacos: pedaços do mesmo cântaro, cada um um trecho do anel da parede (uma beirada
+    // curva, a do vaso, e as outras partidas), deitados no chão. A face de fora (escura, com a
+    // hachura que segue a curva) é a maior parte; a espessura, uma faixa clara na beirada partida.
+    const cacos = [[bx - 170, bb + 34, 0.3, 1.35, 0], [bx + 134, bb + 26, -0.5, 1.2, 1], [bx + 222, bb - 6, 1.0, 1.05, 0], [bx - 100, bb + 70, -1.1, 1.45, 0],
+      [bx + 58, bb + 62, 0.15, 1.1, 1], [bx - 240, bb + 2, 2.3, 1.0, 0]];
+    for (const [x, y, gi, e, dentroV] of cacos) {
       k.save();
       k.translate(x, y);
       k.rotate(gi);
-      sombraNoChao(k, pol(pts), -8, 6, 4, 0.6);
-      const face = pol(pts);
-      peca(k, face, [-34, -22, 36, 16], { cor: dentroV ? '#d39864' : '#94522c', tinta: '#1a0c04', ang: 0.8, passo: 3.2, maxL: 1.5, sombra: (px, py) => (dentroV ? 0.15 : 0.5) + (py + 20) / 120, cruzada: 0.8, traco: 2, obj });
-      // a espessura: a faixa clara num dos lados partidos
-      k.strokeStyle = '#e8b484';
-      k.lineWidth = 3.4;
+      k.scale(e, e * 0.82);
+      // a lasca: um polígono anguloso de quebra, com um lado só em curva leve (a boca ou a
+      // barriga do vaso); a face de fora escura, hachurada em diagonal, com a luz na lombada
+      const n = 6;
+      const partida = [];
+      for (let i = 0; i < n; i++) {
+        const a = Math.PI * 0.15 + (i / (n - 1)) * Math.PI * 1.25 + (r() - 0.5) * 0.25;
+        const d = 22 + r() * 14;
+        partida.push([Math.cos(a) * d * 1.2, Math.sin(a) * d]);
+      }
+      const p0 = partida[n - 1];
+      const p1 = partida[0];
+      const curva = bezier(p0, [p0[0] + 14, p0[1] - 10], [p1[0] + 16, p1[1] - 4], p1, 10);
+      const forma = pol([...partida, ...curva]);
+      k.save();
+      k.translate(-5, 5);
+      k.filter = 'blur(3px)';
+      k.fillStyle = 'rgba(0,0,0,.6)';
+      k.fill(forma);
+      k.restore();
+      k.fillStyle = dentroV ? '#c98a5a' : '#8e4e2a';
+      k.fill(forma);
+      marcar(k, obj, forma);
+      gravar(k, forma, 0, 0, 50, 0.75, 3.2, dentroV ? 1.2 : 1.7, (px, py) => (dentroV ? 0.2 : 0.45) + (px + py) / 160 + Math.hypot(px - p0[0] - 10, py - p0[1] + 6) / 260, '#1a0c04', 0.3);
+      // a luz na beirada curva (a lombada da parede)
+      k.strokeStyle = dentroV ? 'rgba(255,226,180,.7)' : 'rgba(240,170,110,.75)';
+      k.lineWidth = 2.4;
       k.beginPath();
-      k.moveTo(pts[3][0], pts[3][1]);
-      k.lineTo(pts[4][0], pts[4][1] + 2);
-      k.lineTo(pts[5][0], pts[5][1] + 2);
+      curva.forEach(([px, py], i) => (i ? k.lineTo(px - 2, py + 3) : k.moveTo(px - 2, py + 3)));
       k.stroke();
-      // a curva do vaso que a lasca guarda
-      k.strokeStyle = 'rgba(26,12,4,.7)';
-      k.lineWidth = 1.2;
+      // a espessura: a faixa clara ao longo da beirada partida
+      k.strokeStyle = '#ebb888';
+      k.lineWidth = 4;
+      k.lineJoin = 'miter';
       k.beginPath();
-      k.moveTo(pts[0][0] + 6, pts[0][1] + 2);
-      k.quadraticCurveTo(0, -6 * s, pts[3][0] - 6, pts[3][1]);
+      partida.slice(1).forEach(([px, py], i) => (i ? k.lineTo(px - 1.5, py - 1.5) : k.moveTo(px - 1.5, py - 1.5)));
       k.stroke();
+      k.strokeStyle = '#1a0c04';
+      k.lineWidth = 2;
+      k.stroke(forma);
       k.restore();
     }
     // a corneta de chifre de carneiro, deitada na frente, à direita, com os anéis do chifre
