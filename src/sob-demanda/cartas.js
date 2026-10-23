@@ -4269,80 +4269,195 @@
     vinheta(k, W, H, 0.22);
   }
 
-  // (7) A corda vermelha de Raabe (Js 2.15-21): a casa de Raabe fazia parte do muro de Jericó;
-  // da janela, a corda de fios vermelhos amarrada e caída pelo muro; ao longe, as montanhas
-  // (para onde os espiões fugiram).
+  // (7) A corda vermelha de Raabe (Js 2.15-21): a casa de Raabe fazia parte do muro de Jericó
+  // (2.15): no alto do muro de pedra, a frente de barro rebocado da casa, com o terraço e o
+  // linho posto para secar (2.6). Na janela, uma trave de madeira atravessada na soleira, a
+  // corda de fios vermelhos amarrada nela com o nó, a volta por cima da beirada e a queda pelo
+  // muro (2.18, 2.21). As ameias são blocos inteiros; as fiadas de pedra, de tamanhos
+  // desencontrados, escurecem embaixo, onde o muro assenta no talude.
   function desenhoRaabe(k, W, H, obj) {
     const r = sorteio(5701);
     papelVelho(k, W, H, r, ['#fbf1d8', '#ecdab2', '#d2b886'], [W * 0.2, 80]);
-    linhas(k, 0, 0, W, 200, 7, 1, (x, y) => 0.08 + x / 2400 + y / 1200);
+    linhas(k, 0, 0, W, 240, 7, 1, (x, y) => 0.08 + x / 2400 + y / 1200);
     const fm = onda(r, 4, 0.008);
-    const mont = pol([[-10, 200], ...Array.from({ length: 46 }, (_, i) => [i * 20, 120 + fm(i * 20) * 26 + Math.abs(i - 30) * 1.2]), [W + 10, 200]]);
-    peca(k, mont, [0, 60, W, 200], { cor: '#e2d0a6', ang: -0.5, passo: 5, maxL: 1.2, sombra: (x) => 0.4 + Math.sin(x * 0.02) * 0.2, traco: 1.6 });
-    // o muro: fiadas de pedra, mais altas embaixo, com o alto em ameias
-    const topo = 170;
-    const chao = 782;
+    const mont = pol([[-10, 250], ...Array.from({ length: 46 }, (_, i) => [i * 20, 160 + fm(i * 20) * 26 + Math.abs(i - 30) * 1.2]), [W + 10, 250]]);
+    peca(k, mont, [0, 100, W, 250], { cor: '#e2d0a6', ang: -0.5, passo: 5, maxL: 1.2, sombra: (x) => 0.4 + Math.sin(x * 0.02) * 0.2, cruzada: 0.55, traco: 1.6 });
+    const topo = 236;
+    const chao = 790;
+    const talude = 676;
+    // a casa: de x0 a x1, sobe acima do muro
+    const x0 = 300;
+    const x1 = 640;
+    const tc = 120;
+    // o muro de pedra, sem a parte da casa
     const muro = new Path2D();
-    muro.moveTo(-10, chao);
-    muro.lineTo(-10, topo);
-    for (let x = -10; x < W + 10; x += 74) { muro.lineTo(x + 40, topo); muro.lineTo(x + 40, topo - 30); muro.lineTo(x + 74, topo - 30); muro.lineTo(x + 74, topo); }
-    muro.lineTo(W + 10, chao);
-    muro.closePath();
+    muro.rect(-10, topo, W + 20, talude - topo);
     k.fillStyle = '#ddc898';
     k.fill(muro);
     k.save();
     k.clip(muro);
-    let y = topo - 30;
+    let y = topo;
     let fiada = 0;
-    while (y < chao) {
-      const h = 34 + fiada * 3.2 + r() * 6;
+    while (y < talude) {
+      const h = Math.min(talude - y, 30 + fiada * 3 + r() * 14);
       let x = -10 - r() * 60;
       while (x < W + 10) {
-        const w = 70 + r() * 70 + fiada * 4;
-        const pedra = new Path2D();
-        pedra.moveTo(x + 4, y + 3);
-        pedra.lineTo(x + w - 4, y + 2 + (r() - 0.5) * 3);
-        pedra.lineTo(x + w - 3, y + h - 3);
-        pedra.lineTo(x + 3, y + h - 2);
-        pedra.closePath();
-        const t = 0.15 + r() * 0.25;
-        peca(k, pedra, [x, y, x + w, y + h], { cor: r() < 0.5 ? '#d9c391' : '#cfb682', ang: 0.6 + (r() - 0.5) * 0.4, passo: 4.4, maxL: 1.9, sombra: (px, py) => t + (py - y) / h * 0.35 + (px - x) / w * 0.2, cruzada: 0.7, traco: 1.6 });
+        const w = 44 + r() * (r() < 0.3 ? 120 : 70) + fiada * 3;
+        const pedra = pol([[x + 3 + r() * 2, y + 2 + r() * 2], [x + w - 3 - r() * 2, y + 2 + r() * 2], [x + w - 2, y + h - 2 - r() * 2], [x + 3, y + h - 2]]);
+        const t = 0.12 + r() * 0.25 + Math.max(0, (y - 420) / 600);
+        peca(k, pedra, [x, y, x + w, y + h], { cor: r() < 0.5 ? '#d9c391' : '#ceb581', ang: 0.6 + (r() - 0.5) * 0.4, passo: 4.4, maxL: 1.9, sombra: (px, py) => t + ((py - y) / h) * 0.35 + ((px - x) / w) * 0.2, cruzada: 0.62, traco: 1.6 });
         x += w;
       }
       y += h;
       fiada++;
     }
     k.restore();
+    // o talude de pedra embaixo, inclinado, mais escuro
+    const tal = pol([[-10, talude], [W + 10, talude], [W + 40, chao], [-40, chao]]);
+    peca(k, tal, [-40, talude, W + 40, chao], { cor: '#c3a878', ang: 0.35, passo: 4, maxL: 2, sombra: (x, yy) => 0.55 + (yy - talude) / 300, cruzada: 0.6, traco: 2.2 });
+    k.save();
+    k.clip(tal);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.6;
+    for (let yy = talude + 26; yy < chao; yy += 30) { k.beginPath(); k.moveTo(-40, yy); k.lineTo(W + 40, yy); k.stroke(); }
+    for (let i = 0; i < 26; i++) { const x = r() * W; const yy = talude + Math.floor(r() * 4) * 30; k.beginPath(); k.moveTo(x, yy); k.lineTo(x + 6, yy + 30); k.stroke(); }
+    k.restore();
     k.strokeStyle = SEPIA;
     k.lineWidth = 2.4;
     k.stroke(muro);
-    // a janela da casa de Raabe, no alto do muro: o batente, o escuro e o lintel
-    const jx = 400;
-    const jy = 268;
-    const jw = 110;
-    const jh = 120;
-    sombraNoChao(k, pol([[jx - 18, jy - 22], [jx + jw + 18, jy - 22], [jx + jw + 18, jy + jh + 16], [jx - 18, jy + jh + 16]]), 6, 8, 8, 0.35);
-    const batente = pol([[jx - 18, jy - 22], [jx + jw + 18, jy - 22], [jx + jw + 18, jy + jh + 16], [jx - 18, jy + jh + 16]]);
-    peca(k, batente, [jx - 18, jy - 22, jx + jw + 18, jy + jh + 16], { cor: '#a07a4c', ang: 0, passo: 3.6, maxL: 1.5, sombra: () => 0.45, traco: 2.4, obj });
+    // as ameias: cada uma um bloco só, com a sombra e a hachura dele
+    for (let x = -30; x < W + 10; x += 76) {
+      if (x + 40 > x0 - 6 && x < x1 + 6) continue;
+      const a = pol([[x, topo], [x, topo - 34], [x + 42, topo - 34], [x + 42, topo]]);
+      peca(k, a, [x, topo - 34, x + 42, topo], { cor: '#d6bf8c', ang: 0.6, passo: 4.4, maxL: 1.8, sombra: (px) => 0.2 + (px - x) / 120, cruzada: 0.7, traco: 2.2 });
+    }
+    // a casa de Raabe no muro: a frente de barro rebocado, as vigas de madeira, o terraço
+    const casa = pol([[x0, topo + 170], [x0, tc], [x1, tc], [x1, topo + 170]]);
+    sombraNoChao(k, casa, 10, 6, 10, 0.3);
+    peca(k, casa, [x0, tc, x1, topo + 170], { cor: '#e6d3a6', ang: 1.2, passo: 5, maxL: 1.4, sombra: (x, yy) => 0.12 + (x - x0) / 1400 + (yy - tc) / 900, cruzada: 1, traco: 2.4 });
+    // o reboco gasto deixa ver os tijolos aqui e ali
+    k.save();
+    k.clip(casa);
+    k.strokeStyle = 'rgba(43,33,18,.55)';
+    k.lineWidth = 1.2;
+    for (const [bx, by] of [[330, 180], [560, 300], [600, 170], [350, 330]]) {
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) k.strokeRect(bx + j * 30 + (i % 2) * 15, by + i * 14, 30, 14);
+    }
+    k.restore();
+    // a casa assenta nas pedras: a última fiada passa por baixo dela
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.beginPath();
+    k.moveTo(x0, topo + 170);
+    k.lineTo(x1, topo + 170);
+    k.stroke();
+    // as pontas das vigas do teto e o parapeito do terraço
+    const parapeito = pol([[x0 - 10, tc], [x0 - 10, tc - 26], [x1 + 10, tc - 26], [x1 + 10, tc]]);
+    peca(k, parapeito, [x0 - 10, tc - 26, x1 + 10, tc], { cor: '#dcc694', ang: 0, passo: 4, maxL: 1.4, sombra: () => 0.35, traco: 2.2 });
+    for (let x = x0 + 14; x < x1; x += 40) {
+      const v = new Path2D();
+      v.ellipse(x, tc + 14, 7, 6, 0, 0, 6.283);
+      k.fillStyle = '#8a6440';
+      k.fill(v);
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.6;
+      k.stroke(v);
+      k.beginPath();
+      k.arc(x, tc + 14, 3, 0, 6.283);
+      k.stroke();
+    }
+    // o linho posto para secar no terraço: feixes de hastes deitados no parapeito, com as
+    // cápsulas numa ponta e a amarra no meio
+    for (let i = 0; i < 5; i++) {
+      const fx = x0 - 6 + i * 66 + (r() - 0.5) * 8;
+      const fy = tc - 30 - (i % 2) * 6;
+      const g = (r() - 0.5) * 0.12;
+      k.save();
+      k.translate(fx, fy);
+      k.rotate(g);
+      const f = pol([[0, -6], [104, -9], [112, 0], [104, 9], [0, 6]]);
+      peca(k, f, [0, -9, 112, 9], { cor: '#e3cf98', ang: 0, passo: 2.6, maxL: 1, sombra: (x, yy) => 0.2 + (yy + 9) / 30, traco: 1.6 });
+      k.fillStyle = '#7a6436';
+      for (let j = 0; j < 7; j++) { k.beginPath(); k.arc(104 + (r() - 0.5) * 8, (j - 3) * 2.6, 2.2, 0, 6.283); k.fill(); }
+      k.strokeStyle = '#8a5a2a';
+      k.lineWidth = 3;
+      k.beginPath();
+      k.moveTo(46, -8);
+      k.lineTo(46, 8);
+      k.stroke();
+      k.restore();
+    }
+    // a janela: o lintel de madeira, o batente, o escuro de dentro e a sombra que cai embaixo
+    const jx = 420;
+    const jy = 214;
+    const jw = 104;
+    const jh = 118;
+    k.save();
+    k.filter = 'blur(6px)';
+    k.fillStyle = 'rgba(40,26,10,.35)';
+    k.beginPath();
+    k.moveTo(jx - 4, jy + jh + 8);
+    k.lineTo(jx + jw + 30, jy + jh + 8);
+    k.lineTo(jx + jw + 46, jy + jh + 44);
+    k.lineTo(jx + 10, jy + jh + 44);
+    k.fill();
+    k.restore();
+    const batente = pol([[jx - 14, jy - 6], [jx + jw + 14, jy - 6], [jx + jw + 14, jy + jh + 10], [jx - 14, jy + jh + 10]]);
+    peca(k, batente, [jx - 14, jy - 6, jx + jw + 14, jy + jh + 10], { cor: '#b89060', ang: 0, passo: 3.6, maxL: 1.4, sombra: () => 0.42, traco: 2.4, obj });
     const vao = pol([[jx, jy], [jx + jw, jy], [jx + jw, jy + jh], [jx, jy + jh]]);
     k.fillStyle = '#1a120a';
     k.fill(vao);
     gravar(k, vao, jx + jw / 2, jy + jh / 2, 90, 0.8, 4, 1.4, () => 0.6, '#000', 0);
-    // a corda de fios vermelhos: amarrada no batente, cai pelo muro até perto do chão
-    const nx = jx + 40;
-    const ny = jy + jh + 6;
-    // a corda vem lá de dentro (amarrada na janela), passa pela soleira e cai pelo muro
-    const fio = bezier([nx + 4, jy + jh - 36], [nx + 10, jy + jh - 6], [nx - 2, ny - 4], [nx, ny + 4], 12).concat(bezier([nx, ny + 4], [nx + 30, ny + 140], [nx - 30, ny + 300], [nx + 6, 744], 60));
-    cordao(k, fio, 10, { cor: '#c4392a', escuro: '#3a0e08', luz: 'rgba(255,196,170,.6)' });
-    marcar(k, obj, pol(fio, false), 16);
-    k.lineWidth = 1.6;
-    for (let i = -2; i <= 2; i++) { k.beginPath(); k.moveTo(nx + 6, 744); k.lineTo(nx + 6 + i * 4, 760 + Math.abs(i) * 2); k.strokeStyle = '#a82a1e'; k.stroke(); }
+    const lintel = pol([[jx - 30, jy - 30], [jx + jw + 30, jy - 30], [jx + jw + 30, jy - 6], [jx - 30, jy - 6]]);
+    peca(k, lintel, [jx - 30, jy - 30, jx + jw + 30, jy - 6], { cor: '#8a6440', ang: 0.02, passo: 3, maxL: 1.6, sombra: (x, yy) => 0.25 + (yy - jy + 30) / 50, traco: 2.2, obj });
+    const soleira = pol([[jx - 22, jy + jh], [jx + jw + 22, jy + jh], [jx + jw + 26, jy + jh + 14], [jx - 26, jy + jh + 14]]);
+    peca(k, soleira, [jx - 26, jy + jh, jx + jw + 26, jy + jh + 14], { cor: '#c8a878', ang: 0, passo: 3, maxL: 1.2, sombra: () => 0.35, traco: 2, obj });
+    // a trave de madeira clara atravessada na janela, por cima da soleira
+    const tb = jy + jh - 16;
+    const trave = pol([[jx - 8, tb - 7], [jx + jw + 8, tb - 7], [jx + jw + 8, tb + 7], [jx - 8, tb + 7]]);
+    peca(k, trave, [jx - 8, tb - 7, jx + jw + 8, tb + 7], { cor: '#d9b27a', ang: 0, passo: 2.8, maxL: 1.1, sombra: (x, yy) => 0.15 + (yy - tb + 7) / 20, traco: 1.8, obj });
+    // a corda: as voltas e o nó na trave, a volta por cima da beirada da soleira e a queda
+    const nx = jx + 52;
+    const vermelho = { cor: '#c4392a', escuro: '#3a0e08', luz: 'rgba(255,196,170,.6)' };
+    for (const dx of [-14, -3, 8]) {
+      const volta = pol([[nx + dx, tb - 8], [nx + dx + 9, tb - 8], [nx + dx + 13, tb + 8], [nx + dx + 4, tb + 8]]);
+      k.fillStyle = '#c4392a';
+      k.fill(volta);
+      gravar(k, volta, nx + dx + 6, tb, 12, 1.2, 2.6, 1, (x, yy) => 0.3 + (yy - tb + 8) / 24, '#3a0e08', 0);
+      k.strokeStyle = '#3a0e08';
+      k.lineWidth = 1.6;
+      k.stroke(volta);
+      marcar(k, obj, volta);
+    }
+    const no = new Path2D();
+    no.ellipse(nx + 22, tb + 4, 10, 9, 0.4, 0, 6.283);
+    k.fillStyle = '#c4392a';
+    k.fill(no);
+    gravar(k, no, nx + 22, tb + 4, 14, 0.8, 3, 1.3, (x, yy) => 0.3 + (x - nx - 14) / 30, '#3a0e08', 0);
+    k.strokeStyle = '#3a0e08';
+    k.lineWidth = 2;
+    k.stroke(no);
+    cordao(k, [[nx + 26, tb + 8], [nx + 34, tb + 14], [nx + 36, tb + 26]], 7, vermelho);
+    const fio = bezier([nx + 16, tb + 10], [nx + 22, jy + jh + 18], [nx + 4, jy + jh + 22], [nx + 2, jy + jh + 40], 12)
+      .concat(bezier([nx + 2, jy + jh + 40], [nx + 24, 470], [nx - 24, 600], [nx + 4, 700], 50));
+    cordao(k, fio, 15, vermelho);
+    marcar(k, obj, pol(fio, false), 21);
+    marcar(k, obj, no);
+    k.lineWidth = 1.8;
+    k.strokeStyle = '#a82a1e';
+    for (let i = -2; i <= 2; i++) { k.beginPath(); k.moveTo(nx + 4, 700); k.lineTo(nx + 4 + i * 5, 718 + Math.abs(i) * 2); k.stroke(); }
     // o chão ao pé do muro
     const base = new Path2D();
     base.rect(-10, chao, W + 20, H);
     k.fillStyle = '#d6bf8e';
     k.fill(base);
     linhas(k, 0, chao, W, H, 5, 1.5, () => 0.5);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.beginPath();
+    k.moveTo(0, chao);
+    k.lineTo(W, chao);
+    k.stroke();
     capim(k, r, 120, chao + 4, 30, 9);
     capim(k, r, 300, chao + 2, 22, 7);
     capim(k, r, 700, chao + 4, 34, 9);
