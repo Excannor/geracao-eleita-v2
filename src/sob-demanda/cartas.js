@@ -15477,23 +15477,39 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     for (const y of [chaoY, 600, 660, 750]) { k.beginPath(); k.moveTo(-10, y); k.lineTo(W + 10, y); k.stroke(); }
     for (let xb = -900; xb < 1800; xb += 200) { k.beginPath(); k.moveTo(535 + (xb - 535) * 0.3, chaoY); k.lineTo(xb, H + 10); k.stroke(); }
     marcar(k, obj, chao);
-    // a luz que entra e corre pelo chão, larga para cá; e nela a sombra das grades da folha
+    // a luz que entra e corre pelo chão, abrindo para cá (sai da porta, que é a fonte)
     const raia = pol([[px0, py1], [px1, py1], [px1 + 260, H + 10], [px0 - 160, H + 10]]);
     k.save();
     k.clip(raia);
     k.fillStyle = 'rgba(246,226,176,.75)';
     k.fill(raia);
     chaoEmLinhas(k, r, raia, px0 - 200, px1 + 300, chaoY, H, 1.4, () => 0.5, 'rgba(120,90,50,.8)');
-    k.strokeStyle = 'rgba(40,28,16,.75)';
-    for (let i = 0; i < 7; i++) {
-      const x0 = px0 + 10 + i * 30;
-      k.lineWidth = 4 + i * 0.6;
-      k.beginPath();
-      k.moveTo(x0, py1);
-      k.lineTo(x0 - 120 - i * 34, H + 10);
-      k.stroke();
-    }
     k.restore();
+    // a folha aberta fica fora da raia, à esquerda da porta: a luz que espalha pela cela
+    // desenha a sombra das grades no chão para a esquerda, cada uma saindo do pé da sua grade e
+    // se abrindo para longe da porta (a fonte), mais larga e mais fraca longe
+    {
+      const fonte = [535, 548];
+      const pes = Array.from({ length: 7 }, (_, i) => { const t = i / 6; return [px0 + (px0 - 150 - px0) * t, py1 + 52 * t]; });
+      k.save();
+      k.clip(chao);
+      k.lineCap = 'butt';
+      for (const [fx, fy] of pes) {
+        const dx = fx - fonte[0];
+        const dy = fy - fonte[1];
+        const L = 1.6;
+        const g = k.createLinearGradient(fx, fy, fx + dx * L, fy + dy * L);
+        g.addColorStop(0, 'rgba(10,6,2,.55)');
+        g.addColorStop(1, 'rgba(10,6,2,0)');
+        k.strokeStyle = g;
+        k.lineWidth = 7;
+        k.beginPath();
+        k.moveTo(fx, fy + 2);
+        k.lineTo(fx + dx * L, fy + dy * L + 2);
+        k.stroke();
+      }
+      k.restore();
+    }
     // a luz (o vão e a raia no chão) fica fora da máscara dos objetos: ali o brilho pode entrar
     if (obj) {
       obj.save();
@@ -15580,22 +15596,52 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.translate(x, y);
       k.rotate(giro);
       k.scale(e, e);
-      // as duas metades do aro, abertas na dobradiça
-      for (const [a0, a1, dx, dy, g] of [[Math.PI * 0.55, Math.PI * 1.45, 0, 0, 0], [Math.PI * 1.55, Math.PI * 2.45, 14, -10, -0.7]]) {
+      // meia argola: uma faixa de ferro em arco, com a beirada de dentro e a de fora
+      const meia = (abre) => {
         k.save();
-        k.translate(dx, dy);
-        k.rotate(g);
-        k.lineCap = 'round';
-        for (const [w, c] of [[16, '#0c0806'], [12, '#4c463a'], [3, 'rgba(250,230,180,.6)']]) { k.strokeStyle = c; k.lineWidth = w; k.beginPath(); k.ellipse(0, 0, 30, 20, 0, a0, a1); k.stroke(); }
+        k.rotate(abre);
+        const p = new Path2D();
+        p.ellipse(0, 22, 26, 22, 0, -Math.PI / 2, Math.PI / 2, true);
+        p.ellipse(0, 22, 17, 14, 0, Math.PI / 2, -Math.PI / 2);
+        p.closePath();
+        k.fillStyle = '#4c463a';
+        k.fill(p);
+        k.strokeStyle = '#0c0806';
+        k.lineWidth = 2;
+        k.stroke(p);
+        k.strokeStyle = 'rgba(250,230,180,.55)';
+        k.lineWidth = 1.6;
+        k.beginPath();
+        k.ellipse(0, 22, 22, 18, 0, -Math.PI * 0.55, -Math.PI * 0.95, true);
+        k.stroke();
+        // a ponta de fechar: um dente com o furo
+        k.fillStyle = '#3a342c';
+        k.fillRect(-4, 40, 8, 10);
+        k.strokeRect(-4, 40, 8, 10);
         k.restore();
-      }
-      k.fillStyle = '#1a140e';
+        return p;
+      };
+      const p1 = meia(1.05);
+      k.save();
+      k.scale(-1, 1);
+      const p2 = meia(0.8);
+      k.restore();
+      // a dobradiça: as duas orelhas e o pino redondo
+      k.fillStyle = '#3a342c';
       k.beginPath();
-      k.arc(0, -20, 5, 0, 6.283);
+      k.ellipse(0, 0, 9, 7, 0, 0, 6.283);
       k.fill();
-      const p = new Path2D();
-      p.ellipse(6, -4, 44, 32, 0, 0, 6.283);
-      marcar(k, obj, p);
+      k.strokeStyle = '#0c0806';
+      k.lineWidth = 2;
+      k.stroke();
+      k.fillStyle = '#c8b088';
+      k.beginPath();
+      k.arc(0, 0, 3, 0, 6.283);
+      k.fill();
+      const m = new Path2D();
+      m.ellipse(0, 20, 46, 40, 0, 0, 6.283);
+      marcar(k, obj, m);
+      void p1; void p2;
       k.restore();
     };
     for (const [x, y] of [[110, 392], [262, 456]]) {
@@ -15611,9 +15657,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.fillRect(x - 10, y - 8, 20, 12);
     }
     const f1 = corrente([[110, 428], [104, 540], [120, 610], [170, 650], [250, 640], [276, 672], [220, 700], [184, 724], [250, 742], [322, 726]], 1.2);
-    algema(f1.x + 34, f1.y - 6, 0.2, 1.2);
+    algema(f1.x + 8, f1.y - 4, -1.3, 1.25);
     const f2 = corrente([[262, 492], [268, 560], [320, 600], [400, 616], [466, 636], [448, 670], [384, 688], [440, 714], [530, 706]], 1.15);
-    algema(f2.x + 34, f2.y - 4, -0.15, 1.15);
+    algema(f2.x + 8, f2.y - 2, -1.6, 1.2);
     // uns fiapos de palha no chão
     k.strokeStyle = 'rgba(200,170,110,.7)';
     k.lineWidth = 1.4;
