@@ -3839,6 +3839,20 @@
     };
     k.save();
     k.translate(x, base);
+    // o pé no chão: a sombra de contato logo embaixo, achatada, e a sombra curta que o sol
+    // (à esquerda, baixo) joga para a direita
+    k.save();
+    k.filter = 'blur(3px)';
+    k.fillStyle = 'rgba(40,26,8,.55)';
+    k.beginPath();
+    k.ellipse(0, 1, L * 0.85, L * 0.16, 0, 0, 6.283);
+    k.fill();
+    k.filter = 'blur(6px)';
+    k.fillStyle = 'rgba(40,26,8,.25)';
+    k.beginPath();
+    k.ellipse(L * 1.1, 2, L * 1.2, L * 0.16, 0, 0, 6.283);
+    k.fill();
+    k.restore();
     k.rotate(giro);
     const contorno = [[-L * 0.62, 0], [-L * 0.36, -alto * 0.3], [-L * 0.2, yA], [-L * 0.5 * abre, -alto * 0.74], [-L * 0.62 * abre, -alto * 0.92], [-L * 0.3 * abre, -alto * 1.02],
       [0, -alto * 1.05], [L * 0.3 * abre, -alto * 1.02], [L * 0.62 * abre, -alto * 0.92], [L * 0.5 * abre, -alto * 0.74], [L * 0.2, yA], [L * 0.36, -alto * 0.3], [L * 0.62, 0]].map(B);
@@ -3847,7 +3861,6 @@
     for (let i = 1; i < contorno.length - 1; i++) p.quadraticCurveTo(contorno[i][0], contorno[i][1], (contorno[i][0] + contorno[i + 1][0]) / 2, (contorno[i][1] + contorno[i + 1][1]) / 2);
     p.lineTo(contorno[contorno.length - 1][0], contorno[contorno.length - 1][1]);
     p.closePath();
-    sombraNoChao(k, p, 8, 4, 6, 0.3);
     peca(k, p, [-L, -alto * 1.05, L, 0], { cor, tinta, ang: -Math.PI / 2 + dobra * 0.5, passo: 3.6, maxL: 1.4, sombra: (px) => 0.2 + ((px + L) / (2 * L)) * 0.7, cruzada: 0.8, traco: 1.8, obj });
     // os talos e as espigas
     k.strokeStyle = tinta;
@@ -3877,6 +3890,15 @@
       for (let g = -2; g <= 2; g++) { k.beginPath(); k.moveTo(-alto * 0.02, -alto * (0.06 + g * 0.025)); k.lineTo(alto * 0.02, -alto * (0.07 + g * 0.025)); k.stroke(); }
       if (barba) for (const s of [-1, 0, 1]) { k.beginPath(); k.moveTo(s * alto * 0.01, -alto * 0.12); k.lineTo(s * alto * 0.035, -alto * 0.24); k.stroke(); }
       k.restore();
+    }
+    // o pé do feixe: as pontas cortadas dos talos, assentadas no chão
+    k.strokeStyle = tinta;
+    k.lineWidth = 1.2;
+    for (let i = 0; i < 7; i++) {
+      const t = i / 6 - 0.5;
+      k.beginPath();
+      k.ellipse(t * L * 1.1, -1, 2.2, 1.2, 0, 0, 6.283);
+      k.stroke();
     }
     // a amarra de palha torcida
     const am2 = pol([[-L * 0.3, yA + alto * 0.04], [L * 0.3, yA + alto * 0.04], [L * 0.28, yA - alto * 0.045], [-L * 0.28, yA - alto * 0.045]]);
@@ -3961,38 +3983,23 @@
     k.moveTo(0, hz);
     k.lineTo(W, hz);
     k.stroke();
-    // a roda dos onze feixes: espaçados por igual numa elipse aberta na frente, cada um
-    // inclinado de 20 a 35 graus para o feixe de José, com a cabeça curvada para ele
+    // os onze feixes dos irmãos em roda, abertos na frente: cinco atrás e três de cada lado, em
+    // lugares escolhidos para nenhum cobrir o outro. Cada um tem o pé plantado no chão, quase em
+    // pé, e se inclina para o feixe de José: um pouco o feixe inteiro e mais a cabeça, dobrada
+    // na amarra.
     const cx = W / 2;
-    const cy = 616;
-    const RX = 366;
-    const RY = 150;
-    // seis à esquerda e cinco à direita, por igual ao longo do arco (na tela), com a abertura
-    // na frente e uma fresta atrás, para nenhum ficar escondido atrás do feixe de José
-    const arco = (a0, a1, n) => {
-      const pts = Array.from({ length: 201 }, (_, i) => a0 + ((a1 - a0) * i) / 200);
-      const acum = [0];
-      for (let i = 1; i < pts.length; i++) acum.push(acum[i - 1] + Math.hypot(RX * (Math.cos(pts[i]) - Math.cos(pts[i - 1])), RY * (Math.sin(pts[i]) - Math.sin(pts[i - 1]))));
-      const tot = acum[acum.length - 1];
-      return Array.from({ length: n }, (_, j) => pts[acum.findIndex((v) => v >= (tot * j) / (n - 1))]);
+    const roda = [
+      [338, 466, 0.58], [240, 486, 0.63], [150, 524, 0.7], [62, 668, 0.84], [170, 772, 0.94], [292, 806, 1],
+      [552, 466, 0.58], [650, 486, 0.63], [742, 524, 0.7], [826, 668, 0.84], [700, 776, 0.96],
+    ];
+    const um = ([x, y, e]) => {
+      const lado = x < cx ? 1 : -1;
+      const perto = Math.min(1, Math.abs(x - cx) / 260);
+      feixe(k, r, x, y, 176 * e, lado * (0.12 + r() * 0.1) * (0.6 + perto * 0.4), { obj, dobra: lado * (0.42 + r() * 0.16), varia: 1, cor: r() < 0.5 ? '#e2b866' : '#ddb05c' });
     };
-    const roda = [...arco(Math.PI / 2 + 0.78, Math.PI * 1.5 - 0.3, 6), ...arco(Math.PI * 1.5 + 0.42, Math.PI * 2.5 - 0.78, 5)];
-    const um = (a) => {
-      const sx = Math.cos(a);
-      const sy = Math.sin(a);
-      const e = 0.72 + sy * 0.16;
-      const lado = sx < 0 ? 1 : -1;
-      const fundo = Math.max(0, -sy);
-      const inc = (0.35 + r() * 0.26) * (1 - fundo * Math.max(0, 1 - Math.abs(sx) * 2.2) * 0.5);
-      k.save();
-      k.translate(cx + sx * RX, cy + sy * RY);
-      k.scale(1, 1 - fundo * 0.12);
-      feixe(k, r, 0, 0, 176 * e, lado * inc, { obj, dobra: lado * (0.18 + r() * 0.12), varia: 1, cor: r() < 0.5 ? '#e2b866' : '#ddb05c' });
-      k.restore();
-    };
-    for (const a of roda.filter((a) => Math.sin(a) < 0)) um(a);
-    feixe(k, r, cx, cy + 14, 318, 0, { cor: '#f0c874', obj });
-    for (const a of roda.filter((a) => Math.sin(a) >= 0).sort((a, b) => Math.sin(a) - Math.sin(b))) um(a);
+    for (const p of roda.filter((q) => q[1] < 600).sort((a2, b2) => a2[1] - b2[1])) um(p);
+    feixe(k, r, cx, 640, 318, 0, { cor: '#f0c874', obj });
+    for (const p of roda.filter((q) => q[1] >= 600).sort((a2, b2) => a2[1] - b2[1])) um(p);
     vinheta(k, W, H, 0.25);
   }
 
