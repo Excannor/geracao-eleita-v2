@@ -6877,12 +6877,19 @@
   // Os raios da glória numa camada à parte, recortada pela luz da arte já pintada em c: alfa =
   // smoothstep(luminância, 70, 160). Assim o papel recebe os raios inteiros e o escuro, nenhum,
   // qualquer que seja o tom médio do desenho.
-  function raiosDaGloria(k, c, s, escura) {
+  // As camadas prontas (raios e traço de ouro, já recortados) ficam guardadas por carta e por
+  // tamanho: a leitura dos pixels e a máscara custam ~60 ms numa carta de 1000 px, e a mesma carta
+  // é desenhada de novo (a viva, a story, a miniatura grande).
+  const RAIOS = new Map();
+  function raiosDaGloria(k, c, s, escura, id) {
     const A = ARTE_CHEIA;
     const x0 = Math.floor(A.x * s);
     const y0 = Math.floor(A.y * s);
     const w = Math.ceil(A.w * s);
     const h = Math.ceil(A.h * s);
+    const chave = id + '|' + w + 'x' + h + (escura ? '|e' : '');
+    const pronto = RAIOS.get(chave);
+    if (pronto) { pintarRaios(k, pronto, x0, y0); return; }
     const camada = tela(w, h);
     const kc = camada.getContext('2d');
     kc.setTransform(s, 0, 0, s, -x0, -y0);
@@ -6920,7 +6927,7 @@
     // a máscara: a luminância da arte já pintada
     let mascara = null;
     try {
-      const d = c.getContext('2d').getImageData(x0, y0, w, h);
+      const d = c.getContext('2d', { willReadFrequently: true }).getImageData(x0, y0, w, h);
       const px = d.data;
       for (let i = 0; i < px.length; i += 4) {
         const l = px[i] * 0.3 + px[i + 1] * 0.59 + px[i + 2] * 0.11;
@@ -6938,6 +6945,14 @@
       kk.globalCompositeOperation = 'destination-in';
       kk.drawImage(mascara, 0, 0);
     }
+    const v = { camada, ouro };
+    if (mascara && id) {
+      RAIOS.set(chave, v);
+      if (RAIOS.size > 6) RAIOS.delete(RAIOS.keys().next().value);
+    }
+    pintarRaios(k, v, x0, y0);
+  }
+  function pintarRaios(k, { camada, ouro }, x0, y0) {
     k.save();
     k.setTransform(1, 0, 0, 1, 0, 0);
     k.globalCompositeOperation = 'screen';
@@ -6971,7 +6986,7 @@
       k.beginPath();
       k.rect(ARTE_CHEIA.x, ARTE_CHEIA.y, ARTE_CHEIA.w, ARTE_CHEIA.h);
       k.clip();
-      raiosDaGloria(k, c, s, escura);
+      raiosDaGloria(k, c, s, escura, carta.id);
       brilho(k, CW / 2, 0, 640, 'rgba(255,236,190,.5)', 'screen');
       k.restore();
     }
