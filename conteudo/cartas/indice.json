@@ -366,7 +366,7 @@
       "voceSabia": "Era uma peça só de ouro batido, com sete lâmpadas.",
       "link": "#/atlas/exodo",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "tabuas-alianca",
@@ -432,7 +432,7 @@
       "voceSabia": "O vaso não saiu do agrado do oleiro, que amassou novamente o barro.",
       "link": "#/mapa/jeremias",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "perola",
