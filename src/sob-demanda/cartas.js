@@ -6351,42 +6351,77 @@
   }
   const curvaDeRio = (p0, p1, p2, p3, w0, w1, n = 50) => bezier(p0, p1, p2, p3, n).map(([x, y], i) => ({ x, y, w: w0 + (w1 - w0) * Math.pow(i / n, 0.8) }));
   // O flanco de um monte em gravura: os espigões que descem de cada pico em raio, cada um com
-  // a face da luz (à direita) clara e a outra em hachura cheia. Os traços vão pela queda do
-  // monte (do pico para fora), curtos e soltos; o lado do monte que dá as costas para a luz
-  // escurece. picos: [{ x, y, n (espigões), fase }]; luz: 1 vem da direita, -1 da esquerda.
-  function flancoEmRaios(k, r, forma, picos, [x0, y0, x1, y1], { maxL = 2.2, cor = SEPIA, passoX = 4.6, passoY = 11, luz = 1, base = 0, escurece = 0.22 } = {}) {
+  // a face da luz (à direita) clara e a outra em hachura cheia. As linhas são compridas, pela
+  // queda do monte (do pico para fora), e engrossam e afinam com a sombra; quando os raios se
+  // abrem, entram linhas novas no meio, como o gravador faz. O lado do monte que dá as costas
+  // para a luz escurece. picos: [{ x, y, n (espigões), fase }]; luz: 1 vem da direita.
+  function flancoEmRaios(k, r, forma, picos, [x0, y0, x1, y1], { maxL = 2.2, cor = SEPIA, passo = 5, luz = 1, base = 0, escurece = 0.22, alcance = 900, cruzada = 0.62 } = {}) {
     k.save();
     k.clip(forma);
     k.strokeStyle = cor;
     k.lineCap = 'round';
-    for (let y = y0; y < y1; y += passoY) {
-      for (let x = x0; x < x1; x += passoX) {
-        const px = x + (r() - 0.5) * passoX;
-        const py = y + (r() - 0.5) * passoY;
-        let p = picos[0];
-        let dm = 1e9;
-        for (const q of picos) { const d = Math.hypot(px - q.x, (py - q.y) * 0.8); if (d < dm && py > q.y - 6) { dm = d; p = q; } }
-        const dx = px - p.x;
-        const dy = Math.max(1, py - p.y);
-        const a = Math.atan2(dx, dy);
-        const d = Math.hypot(dx, dy);
-        const fi = a * (p.n || 9) + (p.fase || 0) + Math.sin(d * 0.018 + (p.fase || 0)) * 0.7;
-        const s = 0.42 + Math.cos(fi) * 0.36 * luz + (dx * luz < 0 ? escurece : -escurece * 0.5) + base + d / 2400;
-        const w = maxL * Math.max(0, Math.min(1, s));
-        if (w < 0.25) continue;
-        const l = passoY * (0.8 + r() * 0.6);
-        const ux = dx / d;
-        const uy = dy / d;
-        k.lineWidth = w;
-        k.beginPath();
-        k.moveTo(px - ux * l * 0.5, py - uy * l * 0.5);
-        k.lineTo(px + ux * l * 0.5, py + uy * l * 0.5);
-        k.stroke();
+    const dono = (x, y) => { let p = picos[0]; let dm = 1e9; for (const q of picos) { const d = Math.hypot(x - q.x, (y - q.y) * 0.8); if (d < dm && y > q.y - 6) { dm = d; p = q; } } return p; };
+    for (const p of picos) {
+      const n = p.n || 9;
+      const fase = p.fase || 0;
+      for (let D = 10, nivel = 0; D < alcance; D *= 2, nivel++) {
+        const passoA = passo / D;
+        const total = Math.floor(3.0 / passoA);
+        for (let i = 0; i <= total; i++) {
+          if (nivel > 0 && i % 2 === 0) continue;
+          const a0 = -1.5 + i * passoA;
+          const treme = r() * 6.283;
+          let ant = null;
+          for (let d = nivel ? D : 4; d < alcance; d += 6) {
+            const a = a0 + Math.sin(d * 0.02 + treme) * 0.012;
+            const x = p.x + Math.sin(a) * d;
+            const y = p.y + Math.cos(a) * d;
+            if (y > y1 || x < x0 - 20 || x > x1 + 20) break;
+            if (picos.length > 1 && dono(x, y) !== p) { ant = null; continue; }
+            const fi = a * n + fase + Math.sin(d * 0.018 + fase) * 0.7;
+            const dx = x - p.x;
+            const sv = 0.42 + Math.cos(fi) * 0.36 * luz + (dx * luz < 0 ? escurece : -escurece * 0.5) + base + d / 2400;
+            const w = maxL * Math.max(0, Math.min(1, sv)) * (0.85 + Math.sin(d * 0.15 + treme) * 0.15);
+            if (ant && w > 0.25) {
+              k.lineWidth = w;
+              k.beginPath();
+              k.moveTo(ant[0], ant[1]);
+              k.lineTo(x, y);
+              k.stroke();
+            }
+            ant = [x, y];
+          }
+        }
+      }
+    }
+    // na sombra funda, a hachura cruzada: linhas quase deitadas, como as curvas de nível
+    if (cruzada < 1) {
+      for (let y = y0; y < y1; y += passo * 1.3) {
+        let ant = null;
+        const treme = r() * 6.283;
+        for (let x = x0; x <= x1; x += 6) {
+          const yy = y + Math.sin(x * 0.03 + treme) * 2;
+          const p = dono(x, yy);
+          const dx = x - p.x;
+          const dy = Math.max(1, yy - p.y);
+          const a = Math.atan2(dx, dy);
+          const d = Math.hypot(dx, dy);
+          const fi = a * (p.n || 9) + (p.fase || 0) + Math.sin(d * 0.018 + (p.fase || 0)) * 0.7;
+          const sv = 0.42 + Math.cos(fi) * 0.36 * luz + (dx * luz < 0 ? escurece : -escurece * 0.5) + base + d / 2400;
+          const w = maxL * 0.75 * Math.max(0, Math.min(1, (sv - cruzada) * 2.6));
+          if (ant && w > 0.25) {
+            k.lineWidth = w;
+            k.beginPath();
+            k.moveTo(ant[0], ant[1]);
+            k.lineTo(x, yy);
+            k.stroke();
+          }
+          ant = [x, yy];
+        }
       }
     }
     k.restore();
   }
-
   // (1) O jardim do Éden (Gn 2.10): "Nascia no Éden um rio que atravessava o jardim para o
   // irrigar, dividindo-se depois em quatro braços." Vista do alto, como numa prancha de atlas:
   // a nascente no fundo, entre as árvores, o rio que desce em curvas pelo jardim e, no meio,
@@ -6530,42 +6565,54 @@
   // fez a água baixar (8.1) rasga as nuvens em tiras.
   function desenhoArarate(k, W, H, obj) {
     const r = sorteio(6201);
-    papelVelho(k, W, H, r, ['#f3f0e2', '#dfdac4', '#bcb59a'], [W * 0.7, 90]);
+    papelVelho(k, W, H, r, ['#f7efd9', '#e6d8b6', '#c6b18a'], [W * 0.45, 380]);
     const nivel = 572;
-    // o céu de vento: linhas retas, mais cheias no alto
-    linhas(k, 0, 0, W, nivel, 5.5, 1.5, (x, y) => 0.18 + (1 - y / nivel) * 0.5);
+    // o céu de vento: o fim da tempestade indo embora no alto (linhas cheias), e embaixo a
+    // faixa clara onde o céu abriu, atrás dos montes
+    linhas(k, 0, 0, W, nivel, 5.5, 2, (x, y) => 0.12 + Math.max(0, 1 - y / 330) ** 1.4 * 0.85);
     k.strokeStyle = 'rgba(43,33,18,.5)';
     k.lineCap = 'round';
-    for (let i = 0; i < 34; i++) {
+    for (let i = 0; i < 30; i++) {
       const x = r() * W;
-      const y = 30 + r() * 400;
+      const y = 200 + r() * 260;
       k.lineWidth = 1 + r() * 0.8;
       k.beginPath();
       k.moveTo(x, y);
       k.quadraticCurveTo(x + 30, y - 3, x + 60 + r() * 60, y + 1);
       k.stroke();
     }
-    // as nuvens rasgadas: dois ou três rolos juntos, a base reta, o alto em tufos e a ponta
-    // desfiada para o lado do vento
-    for (const [x, y, rx, ry] of [[170, 70, 190, 30], [560, 118, 160, 26], [800, 62, 120, 22], [100, 214, 120, 18], [390, 236, 100, 16]]) {
-      const partes = [[x - rx * 0.45, y + ry * 0.15, rx * 0.55, ry * 0.8], [x + rx * 0.05, y - ry * 0.1, rx * 0.6, ry], [x + rx * 0.5, y + ry * 0.2, rx * 0.45, ry * 0.7]];
-      const n = new Path2D();
-      for (const [cx, cy, a, b] of partes) n.addPath(lanoso(r, Array.from({ length: 12 }, (_, i) => { const t = (i / 12) * 6.283; return [cx + Math.cos(t) * a, cy + Math.min(Math.sin(t) * b, b * 0.35)]; }), 5, 18));
-      k.fillStyle = '#efebdc';
-      k.fill(n);
-      gravar(k, n, x, y, rx * 1.1, 0, 3.4, 1.8, (px, py) => Math.max(0, (py - y + ry * 0.1) / (ry * 0.9)) * 1.2 + (px - x) / rx * 0.15, SEPIA, 0);
-      k.strokeStyle = 'rgba(43,33,18,.6)';
-      k.lineWidth = 1.2;
-      k.stroke(n);
-      k.lineWidth = 1;
-      for (let j = 0; j < 4; j++) { k.beginPath(); k.moveTo(x + rx * 0.85, y + j * 5 - 2); k.lineTo(x + rx * 1.2 + j * 12, y + j * 5 - 4); k.stroke(); }
+    // a frente da tempestade: uma massa só, presa ao alto, com a beirada de baixo em rolos
+    for (const [base, amp, tom, sem] of [[150, 34, '#b3a689', 1], [112, 30, '#a0937a', 2]]) {
+      const rr = sorteio(6230 + sem);
+      const frente = new Path2D();
+      frente.moveTo(-20, -20);
+      frente.lineTo(W + 20, -20);
+      let x = W + 20;
+      let y = base + (rr() - 0.5) * amp;
+      frente.lineTo(x, y);
+      while (x > -20) {
+        const l = 50 + rr() * 70;
+        const ny = base + (rr() - 0.5) * amp + Math.sin(x * 0.01 + sem) * amp * 0.6;
+        frente.quadraticCurveTo(x - l / 2, Math.max(y, ny) + 18 + rr() * 22, x - l, ny);
+        x -= l;
+        y = ny;
+      }
+      frente.lineTo(-20, -20);
+      frente.closePath();
+      k.fillStyle = tom;
+      k.fill(frente);
+      gravar(k, frente, W / 2, base / 2, 520, 0, 3.8, 2.1, (px, py) => 0.9 - Math.max(0, (py - base + 30) / 60) * 0.7, SEPIA, 0);
+      gravar(k, frente, W / 2, base / 2, 520, 0.75, 5.2, 1.5, (px, py) => 0.8 - py / base * 0.6, SEPIA, 0);
+      k.strokeStyle = 'rgba(43,33,18,.8)';
+      k.lineWidth = 1.6;
+      k.stroke(frente);
     }
     const contorno = (pts, asp) => { const p = contornoRocha(r, pts, asp); p.closePath(); return p; };
     // o monte pequeno, em cone, atrás e mais claro
     const pq = contorno([[-10, nivel + 4], [-10, 452], [52, 396], [112, 338], [150, 300], [172, 288], [194, 296], [230, 332], [280, 382], [334, 426], [404, nivel + 4]], 4);
-    k.fillStyle = '#d6ceb2';
+    k.fillStyle = '#d2c5a2';
     k.fill(pq);
-    flancoEmRaios(k, r, pq, [{ x: 172, y: 288, n: 7, fase: 1 }], [-10, 280, 410, nivel + 4], { maxL: 1.6, passoX: 5, passoY: 10, base: -0.05 });
+    flancoEmRaios(k, r, pq, [{ x: 172, y: 288, n: 7, fase: 1 }], [-10, 280, 410, nivel + 4], { maxL: 2.4, passo: 5, base: 0.05 });
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.6;
     k.stroke(pq);
@@ -6573,9 +6620,9 @@
     const pico = { x: 700, y: 146, n: 11, fase: 0.4 };
     const perfil = [[226, nivel + 4], [250, 494], [290, 436], [334, 382], [362, 348], [390, 334], [470, 330], [556, 326], [594, 304], [622, 254], [648, 200], [672, 164], [700, 146], [728, 150], [758, 180], [800, 224], [846, 262], [W + 10, 286], [W + 10, nivel + 4]];
     const gr = contorno(perfil, 4);
-    k.fillStyle = '#cdc1a0';
+    k.fillStyle = '#c2b28c';
     k.fill(gr);
-    flancoEmRaios(k, r, gr, [pico, { x: 470, y: 330, n: 5, fase: 2 }], [220, 140, W + 10, nivel + 4], { maxL: 2.2, passoX: 4.4, passoY: 11 });
+    flancoEmRaios(k, r, gr, [pico, { x: 470, y: 330, n: 5, fase: 2 }], [220, 140, W + 10, nivel + 4], { maxL: 3.2, passo: 5, escurece: 0.3, base: 0.05 });
     // a neve do cume: desce mais pelos espigões e menos pelos vales
     const linhaNeve = (x) => { const a = Math.atan2(x - pico.x, 90); return 232 + Math.abs(x - pico.x) * 0.14 - Math.max(0, Math.cos(a * pico.n + pico.fase)) * 34 + Math.sin(x * 0.13) * 5; };
     const neve = new Path2D();
@@ -6588,7 +6635,7 @@
     k.clip(gr);
     k.fillStyle = '#f8f6ee';
     k.fill(neve);
-    flancoEmRaios(k, r, neve, [pico], [560, 140, W + 10, 340], { maxL: 1.1, passoX: 6, passoY: 10, base: -0.25 });
+    flancoEmRaios(k, r, neve, [pico], [560, 140, W + 10, 340], { maxL: 1.3, passo: 5, base: -0.25, cruzada: 1 });
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.3;
     k.beginPath();
@@ -6655,7 +6702,7 @@
     const topo = (x) => Math.min(alturaDoPerfil(perfil, x), x < 404 ? alturaDoPerfil([[-10, 452], [52, 396], [112, 338], [150, 300], [172, 288], [194, 296], [230, 332], [280, 382], [334, 426], [404, nivel]], x) : nivel);
     const mar = new Path2D();
     mar.rect(-10, nivel, W + 20, H);
-    k.fillStyle = '#d3cdb5';
+    k.fillStyle = '#c9bc9c';
     k.fill(mar);
     k.save();
     k.clip(mar);
@@ -7021,11 +7068,11 @@
     k.fillStyle = '#b48a6a';
     k.fill(monte);
     const picos = [{ x: cume[0], y: cume[1], n: 8, fase: 0.3 }, { x: 214, y: 346, n: 6, fase: 1.2 }, { x: 96, y: 446, n: 5, fase: 2 }, { x: 318, y: 262, n: 6, fase: 0.4 }, { x: 516, y: 206, n: 6, fase: 2.6 }, { x: 620, y: 252, n: 6, fase: 1.7 }, { x: 740, y: 336, n: 6, fase: 0.8 }];
-    flancoEmRaios(k, r, monte, picos, [-10, 160, W + 10, 700], { maxL: 2.5, cor: '#2a1a10', passoX: 4.2, passoY: 10, base: 0.08, escurece: 0.18 });
+    flancoEmRaios(k, r, monte, picos, [-10, 160, W + 10, 700], { maxL: 3.2, cor: '#2a1a10', passo: 5, base: 0.12, escurece: 0.18 });
     // o reflexo do fogo nas pedras do alto: um tom chapado e quente, em dois degraus
     k.save();
     k.clip(monte);
-    for (const [rx, ry, a] of [[270, 160, 0.22], [150, 90, 0.2]]) {
+    for (const [rx, ry, a] of [[250, 130, 0.16]]) {
       k.fillStyle = 'rgba(232,140,56,' + a + ')';
       k.beginPath();
       k.ellipse(cume[0] + 10, cume[1] + 40, rx, ry, 0, 0, 6.283);
