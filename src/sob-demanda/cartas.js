@@ -2489,7 +2489,7 @@
     k.lineWidth = 3.2;
     k.stroke(boca);
     k.save();
-    k.clip(pol([[150, 300], [330, 300], [330, 640], [150, 640]]));
+    k.clip(pol([[150, 300], [330, 300], [330, 560], [150, 560]]));
     k.translate(-4, -2);
     k.strokeStyle = 'rgba(255,244,214,.75)';
     k.lineWidth = 2.2;
