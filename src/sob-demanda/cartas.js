@@ -7659,23 +7659,26 @@
     // para baixo só debaixo do lábio), mais juntas e escuras embaixo; uma faixa mais clara logo
     // abaixo da crista; a espuma é uma renda partida só no lábio; no pé, só a linha molhada.
     k.lineCap = 'round';
-    // o rio que vem de longe: uma faixa em S, estreita nos morros e larga perto
-    const eixoR = bezier([214, 236], [310, 262], [10, 280], [70, 372], 30);
-    const meiaR = (t) => 7 + t * t * 80;
+    // o valor de uma curva amostrada, interpolado entre as amostras (v no eixo a, devolve o b)
+    const lerpEm = (pts, a, b) => (v) => { for (let i = 1; i < pts.length; i++) { const p = pts[i - 1]; const q = pts[i]; if ((v - p[a]) * (v - q[a]) <= 0) return p[b] + (q[b] - p[b]) * ((v - p[a]) / ((q[a] - p[a]) || 1)); } return v < pts[0][a] ? pts[0][b] : pts[pts.length - 1][b]; };
+    // o rio que vem de longe: uma faixa em S, estreita nos morros e larga perto, que entra
+    // pelas costas da muralha na altura do alto dela (a parte de baixo fica coberta pela água)
+    const eixoR = bezier([214, 236], [300, 252], [40, 262], [90, 300], 30);
+    const meiaR = (t) => 8 + t * 34 + t * t * 60;
     const rioE = eixoR.map(([x, y], i) => [x - meiaR(i / 30), y]);
     const rioD = eixoR.map(([x, y], i) => [x + meiaR(i / 30), y]);
-    const rio = pol([...rioE, ...rioD.slice().reverse()]);
+    const rio = pol([...rioE, [rioE[30][0], 330], [rioD[30][0], 330], ...rioD.slice().reverse()]);
     k.fillStyle = '#8f917e';
     k.fill(rio);
     k.save();
     k.clip(rio);
-    for (let y = 236, p = 1.6; y < 390; y += p, p = Math.min(5, p * 1.08)) {
-      const t = (y - 236) / 150;
+    for (let y = 236, p = 1.6; y < 330; y += p, p = Math.min(4, p * 1.08)) {
+      const t = (y - 236) / 70;
       let x = -10 - r() * 30;
       while (x < 330) {
         const c = 6 + t * 40 + r() * 20;
-        k.strokeStyle = r() < 0.12 ? 'rgba(240,240,228,.8)' : 'rgba(30,34,26,' + (0.5 + t * 0.35).toFixed(2) + ')';
-        k.lineWidth = 0.5 + t * 1.1;
+        k.strokeStyle = r() < 0.12 ? 'rgba(240,240,228,.8)' : 'rgba(30,34,26,' + Math.min(0.85, 0.5 + t * 0.35).toFixed(2) + ')';
+        k.lineWidth = 0.5 + Math.min(1, t) * 1.1;
         k.beginPath();
         k.moveTo(x, y);
         k.quadraticCurveTo(x + c / 2, y + (r() - 0.5) * 2, x + c, y);
@@ -7688,61 +7691,77 @@
     k.lineWidth = 1.4;
     for (const m of [rioE, rioD]) { k.beginPath(); m.forEach(([x, y], i) => (i ? k.lineTo(x, y) : k.moveTo(x, y))); k.stroke(); }
     marcar(k, obj, rio);
-    // a onda de pé: o alto sobe da esquerda até a crista; o lábio se enrola para a direita; a
-    // face côncava desce até o pé, que se abre um pouco sobre o leito
+    // a muralha: o alto é largo e quase plano (sobe pouco da esquerda até perto do lábio), com
+    // umas ondinhas baixas; o lábio é fino e agudo, pendurado para a frente sobre o oco escuro
+    // da onda; a face côncava desce até o pé
     const pe = 690;
-    const alto = bezier([-10, 372], [110, 356], [250, 280], [330, 240], 24);
-    const labio = bezier([330, 240], [370, 230], [408, 246], [404, 270], 12);
-    const debaixo = bezier([404, 270], [396, 286], [372, 280], [360, 296], 8);
-    const face = bezier([360, 296], [334, 360], [324, 520], [352, 620], 24).concat(bezier([352, 620], [362, 660], [384, 682], [410, pe], 8).slice(1));
+    const altoLiso = bezier([-10, 300], [90, 280], [170, 262], [250, 256], 20).concat(bezier([250, 256], [300, 253], [340, 250], [372, 248], 8).slice(1));
+    const picos = [[96, -5, 22], [168, 6, 18], [232, -6, 20], [300, 5, 16]];
+    const ondinha = (x) => picos.reduce((s2, [c, a, l]) => s2 + a * Math.max(0, 1 - Math.abs(x - c) / l), 0);
+    const alto = [];
+    for (let x = -10; x <= 372; x += 4) alto.push([x, lerpEm(altoLiso, 0, 1)(x) + ondinha(x)]);
+    const labio = bezier([372, 248], [392, 242], [414, 246], [424, 262], 10);
+    const debaixo = bezier([424, 262], [410, 259], [394, 262], [380, 276], 8);
+    const face = bezier([380, 276], [348, 320], [326, 470], [348, 610], 24).concat(bezier([348, 610], [362, 656], [386, 680], [410, pe], 8).slice(1));
     const perfil = [...alto, ...labio.slice(1), ...debaixo.slice(1), ...face.slice(1)];
     const muralha = pol([...perfil, [-10, pe]]);
-    const faceX = (y) => { let m = face[0]; for (const q of face) if (Math.abs(q[1] - y) < Math.abs(m[1] - y)) m = q; return m[0]; };
-    const altoY = (x) => { let m = alto[0]; for (const q of alto) if (Math.abs(q[0] - x) < Math.abs(m[0] - x)) m = q; return m[1]; };
+    const faceX = lerpEm(face, 1, 0);
+    const altoY = lerpEm(altoLiso, 0, 1);
     k.fillStyle = '#585b4c';
     k.fill(muralha);
     marcar(k, obj, muralha);
     k.save();
     k.clip(muralha);
-    // a faixa clara, translúcida, logo abaixo da crista
-    const faixa = pol([...alto, ...labio.slice(1, 6), ...alto.slice().reverse().map(([x, y]) => [x, y + 30 + (x + 10) * 0.05])]);
+    // a faixa clara, translúcida, logo abaixo do alto
+    const faixa = pol([...alto, ...labio.slice(1, 6), ...alto.slice().reverse().map(([x]) => [x, altoY(x) + 28 + (x + 10) * 0.04])]);
     k.fillStyle = '#7f826e';
     k.fill(faixa);
-    // as linhas da água: deitadas, seguem a subida do alto e, perto da face, dobram para baixo
-    // por debaixo do lábio; mais juntas e mais escuras embaixo
-    for (let d = 4, p = 7; d < 420; d += p, p = Math.max(3.6, p * 0.985)) {
-      const t = d / 420;
+    // as linhas da água: deitadas, seguem o alto (sem as ondinhas) e, perto da face, dobram
+    // para baixo por dentro do oco; mais juntas e mais escuras embaixo
+    for (let d = 4, p = 7; d < 440; d += p, p = Math.max(3.6, p * 0.985)) {
+      const t = d / 440;
       const pts = [];
-      for (let x = -10; x <= 400; x += 8) {
-        const yTopo = altoY(Math.min(x, 330));
-        let y = yTopo + d * (1 - Math.max(0, (x - 240) / 300) * 0.25);
+      for (let x = -10; x <= 420; x += 6) {
+        const yTopo = altoY(Math.min(x, 372));
+        let y = yTopo + d * (1 - Math.max(0, (x - 240) / 300) * 0.2);
         const fx = faceX(y) - 6;
-        if (x > fx - 50) { const u = Math.min(1, (x - (fx - 50)) / 50); y += u * u * 40; if (x > faceX(y) - 4) break; }
-        pts.push([x, y + Math.sin(x * 0.05 + d * 0.3) * 1.6]);
+        if (x > fx - 50) { const u = Math.min(1, (x - (fx - 50)) / 50); y += u * u * 30; if (x > faceX(y) - 4) break; }
+        pts.push([x, y + Math.sin(x * 0.04 + d * 0.3) * 1.6]);
       }
       const fase = r() * 6.283;
+      const corte = r() < 0.5 ? -1 : Math.floor(r() * pts.length);
       for (let i = 1; i < pts.length; i++) {
-        if (r() < 0.07) continue;
+        if (i === corte || i === corte + 1) continue;
         k.strokeStyle = 'rgba(18,20,14,' + (0.45 + t * 0.5).toFixed(2) + ')';
-        k.lineWidth = 0.8 + t * 1.8 + Math.sin(i * 0.4 + fase) * 0.3;
+        k.lineWidth = 0.8 + t * 1.8 + Math.sin(i * 0.3 + fase) * 0.3;
         k.beginPath();
         k.moveTo(pts[i - 1][0], pts[i - 1][1]);
         k.lineTo(pts[i][0], pts[i][1]);
         k.stroke();
       }
     }
-    // debaixo do lábio, a curva da onda: linhas que acompanham o enrolar
-    for (let q = 1; q < 8; q++) {
-      k.strokeStyle = 'rgba(18,20,14,.8)';
-      k.lineWidth = 1.2 + q * 0.15;
+    // o oco da onda, debaixo do lábio: em linha cheia que acompanha a curva de dentro, mais
+    // escuro colado na face e sumindo para dentro e para baixo
+    for (let dx = 2; dx < 40; dx += 2.2) {
+      const u = dx / 40;
+      k.strokeStyle = 'rgba(16,18,12,' + (0.85 - u * 0.7).toFixed(2) + ')';
+      k.lineWidth = 1.6 - u * 0.8;
       k.beginPath();
-      k.moveTo(330 - q * 6, 246 + q * 5);
-      k.bezierCurveTo(368 - q * 4, 238 + q * 6, 398 - q * 5, 252 + q * 5, 392 - q * 6, 276 + q * 4);
+      const ate = Math.round(12 - u * 6);
+      face.slice(0, ate).forEach(([x, y], q) => (q ? k.lineTo(x - dx * (1 - q / (ate * 1.6)), y) : k.moveTo(x - dx * 0.7, y - 6 + u * 4)));
+      k.stroke();
+    }
+    // dentro do oco, três linhas claras que acompanham a curva de dentro da onda
+    for (const [dx, al] of [[8, 0.42], [18, 0.3], [30, 0.2]]) {
+      k.strokeStyle = 'rgba(176,182,160,' + al + ')';
+      k.lineWidth = 1.3;
+      k.beginPath();
+      face.slice(0, 9).forEach(([x, y], q) => (q ? k.lineTo(x - dx + q * 0.6, y + 2) : k.moveTo(x - dx + 6, y + 4)));
       k.stroke();
     }
     // uns brilhos deitados na água
     k.strokeStyle = 'rgba(236,236,224,.75)';
-    for (const [x0, y0, l] of [[60, 420, 90], [180, 360, 70], [120, 480, 110], [250, 310, 50]]) { k.lineWidth = 1.6; k.beginPath(); k.moveTo(x0, y0); k.quadraticCurveTo(x0 + l / 2, y0 - 6, x0 + l, y0 + 2); k.stroke(); }
+    for (const [x0, y0, l] of [[60, 420, 90], [180, 350, 70], [120, 480, 110], [250, 300, 50]]) { k.lineWidth = 1.6; k.beginPath(); k.moveTo(x0, y0); k.quadraticCurveTo(x0 + l / 2, y0 - 5, x0 + l, y0 + 2); k.stroke(); }
     k.restore();
     // as beiradas: o alto e o lábio, firmes; a face, firme
     k.strokeStyle = SEPIA;
@@ -7750,31 +7769,30 @@
     k.beginPath();
     perfil.forEach(([x, y], i) => (i ? k.lineTo(x, y) : k.moveTo(x, y)));
     k.stroke();
-    // a renda de espuma, partida, só no lábio e na crista perto dele
-    for (const [x, y] of [...alto.slice(16), ...labio.slice(1)]) {
-      for (let q = 0; q < 2; q++) {
-        if (r() < 0.25) continue;
-        const l = 4 + r() * 9;
-        const a = -0.3 + r() * 0.8;
-        k.strokeStyle = 'rgba(252,251,244,.97)';
-        k.lineWidth = 1.6 + r() * 1.2;
-        k.beginPath();
-        k.moveTo(x + (r() - 0.5) * 6, y - 2 + (r() - 0.5) * 4);
-        k.lineTo(x + Math.cos(a) * l, y - 2 + Math.sin(a) * l);
-        k.stroke();
-      }
-      if (r() < 0.4) { k.fillStyle = 'rgba(252,251,244,.95)'; k.beginPath(); k.arc(x + (r() - 0.5) * 10, y - 6 - r() * 6, 1 + r() * 1.4, 0, 6.283); k.fill(); }
+    // a renda de espuma, partida, só na ponta do lábio e na barriga dele: traços curtos
+    // deitados ao longo da beirada, não espetados para fora
+    const beira = [...labio.slice(5), ...debaixo.slice(1)];
+    for (let q = 1; q < beira.length; q++) {
+      if (r() < 0.3) continue;
+      const [x0, y0] = beira[q - 1];
+      const [x1, y1] = beira[q];
+      k.strokeStyle = 'rgba(252,251,244,.95)';
+      k.lineWidth = 1.4 + r() * 1.2;
+      k.beginPath();
+      k.moveTo(x0 + (x1 - x0) * 0.15, y0 + (y1 - y0) * 0.15 + 1);
+      k.lineTo(x0 + (x1 - x0) * 0.85, y0 + (y1 - y0) * 0.85 + 1);
+      k.stroke();
     }
-    // umas gotas que pingam do lábio
-    k.fillStyle = 'rgba(40,44,34,.85)';
-    for (const [x, y] of [[396, 296], [400, 318], [392, 340]]) { k.beginPath(); k.ellipse(x, y, 1.6, 3, 0, 0, 6.283); k.fill(); }
-    // no pé, só a linha molhada onde a água encosta no leito seco
-    k.strokeStyle = 'rgba(40,30,16,.75)';
-    k.lineWidth = 3;
-    k.beginPath();
-    k.moveTo(250, pe + 2);
-    k.quadraticCurveTo(360, pe + 6, 440, pe + 3);
-    k.stroke();
+    // umas gotas de água clara que caem da ponta do lábio
+    for (const [x, y, s2] of [[421, 276, 1.6], [418, 298, 1.3], [420, 324, 1.1]]) {
+      k.beginPath();
+      k.ellipse(x, y, s2 * 1.2, s2 * 2.2, 0, 0, 6.283);
+      k.fillStyle = 'rgba(232,234,222,.85)';
+      k.fill();
+      k.strokeStyle = 'rgba(30,34,26,.7)';
+      k.lineWidth = 0.7;
+      k.stroke();
+    }
     // a margem de cá: lama escura, alagada em poças, com os juncos
     const ca = new Path2D();
     ca.moveTo(-10, 676);
@@ -7788,6 +7806,20 @@
     k.strokeStyle = SEPIA;
     k.lineWidth = 2;
     k.stroke(ca);
+    // no pé da muralha, a areia molhada onde a água encosta no leito seco: uma faixa escura
+    // logo acima da margem de cá, da face até um pouco à direita
+    k.save();
+    const beiraCa = bezier([-10, 676], [300, 672], [600, 662], [W + 10, 656], 80);
+    const caY = lerpEm(beiraCa, 0, 1);
+    k.lineCap = 'round';
+    for (const [off, ate, lw] of [[-2.5, 540, 2.2], [-5.5, 490, 1.6], [-8.5, 440, 1.2]]) {
+      k.strokeStyle = 'rgba(46,36,20,.8)';
+      k.lineWidth = lw;
+      k.beginPath();
+      for (let x = 352; x <= ate; x += 6) (x === 352 ? k.moveTo(x, caY(x) + off) : k.lineTo(x, caY(x) + off + Math.sin(x * 0.3) * 0.6));
+      k.stroke();
+    }
+    k.restore();
     for (const [x, y, rx] of [[120, 760, 110], [760, 800, 90], [400, 820, 60]]) {
       const p = seixo(r, x, y, rx, rx * 0.16, 0, 0.1);
       k.fillStyle = '#e4e2cc';
