@@ -333,7 +333,7 @@
       "voceSabia": "José, o filho preferido, ganhou uma túnica longa de diversas cores.",
       "link": "#/mapa/genesis",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "vara-moises",
@@ -344,7 +344,7 @@
       "voceSabia": "Jogada no chão, a vara virou serpente; pega pela cauda, voltou a ser vara.",
       "link": "#/mapa/exodo",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "arca-alianca",
@@ -399,7 +399,7 @@
       "voceSabia": "Quando Davi tocava a harpa, Saul se sentia melhor.",
       "link": "#/mapa/1-samuel",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "manto-elias",
@@ -454,7 +454,7 @@
       "voceSabia": "A mulher acende uma lamparina e olha em cada canto da casa.",
       "link": "#/parabola/moeda-perdida",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "paes-peixes",
