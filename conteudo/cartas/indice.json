@@ -621,7 +621,7 @@
       "link": "#/parabola/semeador",
       "amigos": 1,
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "andre-chama-pedro",
@@ -634,7 +634,7 @@
       "link": "#/mapa/joao",
       "amigos": 5,
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "venha-e-veja",
@@ -685,7 +685,7 @@
       "voceSabia": "Quem chega já não é estranho nem forasteiro: é da família de Deus.",
       "link": "#/mapa/efesios",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     }
   ]
 }
