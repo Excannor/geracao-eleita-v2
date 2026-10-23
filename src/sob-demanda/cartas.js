@@ -1517,9 +1517,10 @@
   // Em três quartos, no escuro do Lugar Santíssimo, como prancha gravada: atrás, o véu em
   // pregas fundas; a arca de ouro (2,5 x 1,5 x 1,5 côvados) com a moldura em volta (Êx 25.11),
   // os pés, as argolas e as duas varas passando por dentro delas (Êx 25.12-15); sobre a tampa,
-  // os dois querubins de ouro ajoelhados, de frente um para o outro e de rosto para a tampa,
-  // com as asas abertas para cima e para a frente, cobrindo-a (Êx 25.18-20): penas em fileiras
-  // ordenadas, umas por cima das outras. Entre eles, a luz (Êx 25.22). Rosto nenhum desenhado.
+  // os querubins de ouro mostrados só pelas asas (dono, 23/10: nem corpo nem rosto): em cada
+  // ponta da tampa, um par de asas que sobe dela, de uma peça só com ela (Êx 25.19), e se abre
+  // para cima e para a frente, cobrindo-a, as duas pontas de frente uma para a outra (Êx
+  // 25.20): penas em fileiras ordenadas, umas por cima das outras. Entre elas, a luz (Êx 25.22).
   const OURO_TONS = [[0, [38, 26, 6]], [0.25, [110, 78, 18]], [0.5, [201, 148, 48]], [0.75, [246, 214, 130]], [1, [255, 246, 214]]];
   function tomDeOuro(v, a = 1) {
     const t = Math.max(0, Math.min(1, v));
@@ -1675,149 +1676,16 @@
     k.stroke();
     k.restore();
   }
-  // Um querubim de ouro ajoelhado, de perfil, de rosto baixo para a tampa (Êx 25.20): uma
-  // escultura em gravura, como a arca: a veste longa em pregas (a hachura aperta no fundo de
-  // cada prega), a faixa na cintura, o pé de quem ajoelha aparecendo atrás, a manga com as
-  // mãos juntas e a cabeça de perfil, inclinada, com o cabelo em mechas. "lado" 1 olha para a
-  // direita. Desenha a asa de trás antes do corpo e a da frente depois.
-  function querubim(k, x0, y0, esc, lado, luzEm, obj) {
+  // As asas de um querubim, sem corpo nem rosto: o par sobe da ponta da tampa (as penas de
+  // baixo pousam nela, de uma peça só) e se abre para cima e para dentro, para o meio da
+  // tampa. A asa de trás é mais alta e mais escura; a da frente, mais baixa, avança mais sobre
+  // a tampa. "lado" 1 abre para a direita.
+  function asasDoQuerubim(k, x0, y0, esc, lado, luzEm, obj) {
     const T = (x, y) => [x0 + lado * x * esc, y0 + y * esc];
-    const caminho = (lista) => {
-      const p = new Path2D();
-      p.moveTo(...T(...lista[0]));
-      for (let i = 1; i < lista.length; i += 3) p.bezierCurveTo(...T(...lista[i]), ...T(...lista[i + 1]), ...T(...lista[i + 2]));
-      p.closePath();
-      return p;
-    };
-    const luzLocal = (x, y) => luzEm(T(x, y));
-    // a forma em ouro gravado: o tom (mais claro do lado da luz, que vem da frente) e as
-    // linhas; "pregas" faz a sombra subir e descer em faixas, como pano dobrado
-    const ouroGravado = (forma, cx, cy, raio, ang, pregas = 0) => {
-      const [gx0, gy0] = T(-64, 0);
-      const [gx1, gy1] = T(60, 0);
-      const g = k.createLinearGradient(gx0, gy0, gx1, gy1);
-      g.addColorStop(0, tomDeOuro(0.2));
-      g.addColorStop(0.6, tomDeOuro(0.42 + luzLocal(cx, cy) * 0.28));
-      g.addColorStop(1, tomDeOuro(0.66 + luzLocal(cx, cy) * 0.3));
-      k.fillStyle = g;
-      k.fill(forma);
-      if (obj) obj.fill(forma);
-      const [ccx, ccy] = T(cx, cy);
-      gravar(k, forma, ccx, ccy, raio * esc, ang, 3.3, 1.9, (x, y) => {
-        const u = (x - x0) * lado / esc;
-        const base = 0.8 - (u + 64) / 124 * 0.62 - luzLocal(cx, cy) * 0.22;
-        return base + (pregas ? Math.max(0, Math.sin(u * pregas + (y - y0) / esc * 0.02)) * 0.42 : 0);
-      }, TINTA_OURO, 0.15);
-      k.strokeStyle = TINTA_OURO;
-      k.lineWidth = 2.2;
-      k.stroke(forma);
-    };
-    // a asa de trás: mais alta, mais escura
-    const borda = (dx, dy) => [T(-26 + dx, -134 + dy), T(-62 + dx, -290 + dy), T(40 + dx, -350 + dy), T(124 + dx, -292 + dy)];
-    asaOrdenada(k, borda(16, -26), luzEm, { escurecer: 0.45, escala: esc * 0.95, lado, obj });
-    // o pé de trás, a sola virada para fora (de quem está de joelhos)
-    const pe = caminho([[-58, -2], [-70, -4], [-84, -6], [-86, -14], [-84, -22], [-72, -22], [-60, -18], [-58, -12], [-58, -6], [-58, -2]]);
-    ouroGravado(pe, -72, -12, 20, 0.2);
-    const corpo = caminho([[-56, 0], [-62, -10], [-66, -28], [-64, -40], [-62, -60], [-48, -84], [-44, -110], [-40, -130], [-32, -144], [-22, -150],
-      [-12, -158], [0, -156], [6, -152], [16, -146], [26, -134], [24, -120], [22, -106], [20, -94], [22, -86], [34, -78], [52, -66], [62, -50],
-      [70, -36], [70, -12], [66, 0], [30, 4], [-20, 4], [-56, 0]]);
-    ouroGravado(corpo, 0, -76, 124, Math.PI / 2 + lado * 0.12, 0.42);
-    // as pregas: do ombro e da cintura até a barra, com o filete de luz ao lado de cada uma
-    k.save();
-    k.clip(corpo);
-    k.lineCap = 'round';
-    const prega = (pts, larg = 2) => {
-      k.strokeStyle = 'rgba(42,28,5,.85)';
-      k.lineWidth = larg;
-      k.beginPath();
-      k.moveTo(...T(...pts[0]));
-      k.bezierCurveTo(...T(...pts[1]), ...T(...pts[2]), ...T(...pts[3]));
-      k.stroke();
-      k.strokeStyle = 'rgba(255,240,200,.55)';
-      k.lineWidth = 1.1;
-      k.beginPath();
-      k.moveTo(...T(pts[0][0] + 3, pts[0][1]));
-      k.bezierCurveTo(...T(pts[1][0] + 3, pts[1][1]), ...T(pts[2][0] + 3, pts[2][1]), ...T(pts[3][0] + 3, pts[3][1]));
-      k.stroke();
-    };
-    prega([[-36, -136], [-48, -100], [-58, -50], [-60, -6]]);
-    prega([[-22, -140], [-30, -100], [-34, -50], [-40, 0]]);
-    prega([[-8, -142], [-12, -110], [-14, -60], [-18, 2]]);
-    prega([[6, -84], [4, -56], [2, -30], [4, 2]]);
-    prega([[22, -82], [34, -62], [40, -34], [40, 2]], 1.8);
-    prega([[36, -74], [52, -56], [58, -30], [56, 2]], 1.8);
-    // a barra da veste, ondulada, no chão
-    k.strokeStyle = 'rgba(42,28,5,.9)';
-    k.lineWidth = 2;
-    k.beginPath();
-    for (let x = -60; x <= 68; x += 4) { const q = T(x, -6 + Math.sin(x * 0.28) * 3); if (x === -60) k.moveTo(...q); else k.lineTo(...q); }
-    k.stroke();
-    k.restore();
-    // a faixa da cintura
-    const faixa = caminho([[-46, -96], [-20, -102], [6, -102], [24, -98], [25, -92], [24, -86], [22, -82], [6, -88], [-20, -88], [-46, -96]]);
-    ouroGravado(faixa, -10, -92, 40, 0.1);
-    // a manga e as mãos juntas, estendidas para a tampa
-    const braco = caminho([[-12, -146], [6, -132], [26, -118], [44, -112], [54, -110], [62, -108], [62, -98], [50, -92], [32, -94], [12, -104], [-8, -120], [-16, -134], [-12, -146]]);
-    ouroGravado(braco, 22, -118, 52, 0.35, 0.6);
-    const maos = caminho([[58, -112], [66, -114], [74, -110], [76, -104], [76, -98], [70, -94], [62, -96], [58, -100], [58, -106], [58, -112]]);
-    ouroGravado(maos, 66, -104, 16, 1.2);
-    k.strokeStyle = 'rgba(42,28,5,.8)';
-    k.lineWidth = 1.2;
-    k.beginPath();
-    k.moveTo(...T(60, -104));
-    k.lineTo(...T(75, -103));
-    k.stroke();
-    // a cabeça de perfil, inclinada para a tampa: o crânio, a testa, o nariz, o queixo
-    const giro = 0.6;
-    const H = (x, y) => {
-      const c = Math.cos(giro);
-      const s = Math.sin(giro);
-      return T(18 + x * c - y * s, -170 + x * s + y * c);
-    };
-    const perfil = [[-20, -2], [-21, -16], [-12, -26], [2, -26], [14, -24], [20, -16], [21, -8], [22, -4], [26, 1], [22, 3], [21, 6],
-      [22, 9], [20, 11], [19, 15], [15, 19], [8, 20], [2, 18], [-4, 22], [-10, 24], [-14, 16], [-18, 10]];
-    const cabeca = new Path2D();
-    cabeca.moveTo(...H(...perfil[0]));
-    for (let i = 1; i < perfil.length; i++) cabeca.lineTo(...H(...perfil[i]));
-    cabeca.closePath();
-    const pescoco = caminho([[-8, -148], [-2, -158], [8, -164], [14, -160], [16, -154], [10, -146], [-8, -148]]);
-    ouroGravado(pescoco, 4, -152, 16, 0.4);
-    ouroGravado(cabeca, 16, -172, 30, giro + Math.PI / 2);
-    // o cabelo: a massa atrás e em cima, em mechas curvas; o rosto fica liso
-    k.save();
-    k.clip(cabeca);
-    const cab = new Path2D();
-    cab.moveTo(...H(-22, 24));
-    cab.lineTo(...H(-24, -10));
-    cab.lineTo(...H(-10, -28));
-    cab.lineTo(...H(8, -28));
-    cab.lineTo(...H(16, -20));
-    cab.quadraticCurveTo(...H(2, -14), ...H(-2, 2));
-    cab.quadraticCurveTo(...H(-4, 14), ...H(-6, 24));
-    cab.closePath();
-    k.fillStyle = tomDeOuro(0.3, 0.92);
-    k.fill(cab);
-    k.strokeStyle = 'rgba(42,28,5,.85)';
-    k.lineCap = 'round';
-    k.lineWidth = 1.3;
-    for (let i = 0; i < 8; i++) {
-      k.beginPath();
-      k.moveTo(...H(12 - i * 4, -24 + i));
-      k.quadraticCurveTo(...H(-2 - i * 3, -10), ...H(-8 - i * 2, 14 + i));
-      k.stroke();
-    }
-    k.restore();
-    k.strokeStyle = TINTA_OURO;
-    k.lineWidth = 2;
-    k.stroke(cabeca);
-    // a sobrancelha e o olho baixo, só um traço
-    k.lineWidth = 1.4;
-    k.beginPath();
-    k.moveTo(...H(10, -10));
-    k.quadraticCurveTo(...H(15, -12), ...H(19, -9));
-    k.stroke();
-    // a asa da frente
-    asaOrdenada(k, borda(0, 0), luzEm, { escala: esc, lado, obj });
+    // a asa de trás: mais alta, mais escura, a ponta lá em cima, sobre o meio da tampa
+    asaOrdenada(k, [T(-40, -96), T(-96, -290), T(10, -380), T(96, -340)], luzEm, { escurecer: 0.42, escala: esc * 0.92, lado, obj });
+    // a asa da frente: sai mais baixa e avança mais sobre a tampa
+    asaOrdenada(k, [T(-14, -84), T(-56, -236), T(40, -306), T(118, -262)], luzEm, { escala: esc, lado, obj });
   }
   // O véu atrás, em pregas fundas: as linhas da gravura correm de cima a baixo e se apertam
   // onde a prega vira para dentro (escuro) e se abrem onde ela vem para a frente (luz).
@@ -2051,11 +1919,11 @@
     }
     // a tampa (o propiciatório), vista de cima, acesa pela luz
     faceDeOuro(k, [P([-L - M, mA, -Z - M]), P([L + M, mA, -Z - M]), P([L + M, mA, Z + M]), P([-L - M, mA, Z + M])], 0.8, 0.98, -0.32, 3.4, (x, y) => 0.7 - luzEm([x, y]) * 0.7, obj);
-    // 4) os querubins: o de trás (esquerda, mais longe) antes, o da frente depois
+    // 4) as asas dos querubins: as do de trás (esquerda, mais longe) antes, as do da frente depois
     const qe = P([-L + 26, mA, 0]);
     const qd = P([L - 26, mA, 0]);
-    querubim(k, qe[0], qe[1] + 4, 1.08 * qe[3], 1, luzEm, obj);
-    querubim(k, qd[0], qd[1] + 4, 1.08 * qd[3], -1, luzEm, obj);
+    asasDoQuerubim(k, qe[0], qe[1] + 4, 1.08 * qe[3], 1, luzEm, obj);
+    asasDoQuerubim(k, qd[0], qd[1] + 4, 1.08 * qd[3], -1, luzEm, obj);
     // 5) a vara da frente, por dentro das argolas
     argola(-L + 20, VZ, 'tras');
     argola(L - 20, VZ, 'tras');
