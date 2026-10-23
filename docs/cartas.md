@@ -36,7 +36,8 @@ Onde mora cada coisa:
 - Álbuns de 13 cartas. Os 4 de lançamento, na ordem: Heróis da fé, Lugares, Objetos, Milagres.
 - **A raridade não é da carta, é da cópia recebida**: toda carta de álbum existe em Linho, Bronze,
   Prata, Ouro e Glória. A coleção vai se enchendo de versões ao longo dos anos.
-- Cada álbum tem uma **capa**, a carta-tema: Heróis da fé, "Nuvem de testemunhas" (Hebreus 12.1);
+- Cada álbum tem uma **capa**, a carta-tema: Heróis da fé, "Multidão de testemunhas" (Hebreus 12.1,
+  com a palavra da NBV; o id `nuvem-testemunhas` fica);
   Lugares, Jerusalém; Objetos, a Arca da Aliança; Milagres, o túmulo vazio. A capa sai em todas as
   versões, como as outras. Jesus e Deus não são carta.
 - `conteudo/cartas/indice.json`: `{ albuns: [{ id, nome, lancadoEm, capa, especial? }], cartas: [...] }`.
@@ -70,15 +71,16 @@ O app vai ao ar com a arte que existe; as outras cartas são desenhadas e revisa
 - O sorteio, as proteções, o viés para carta nova e as repetidas valem sobre as lançadas. O álbum
   mostra a não lançada como silhueta, sem texto nenhum sobre data. Um álbum só fica completo com
   as 13 lançadas e na coleção.
-- Quando um desenho chega, trocar `lancada` para `true` põe a carta no sorteio, e o viés para carta
-  nova a traz logo para quem já tem as outras.
+- Quando um desenho chega, ele fica na peça de arte sem lançar até o dono aprovar a carta; trocar
+  `lancada` para `true` põe a carta no sorteio, e o viés para carta nova a traz logo para quem já
+  tem as outras.
 - Semeadores e Boas-vindas sem desenho: o limiar alcançado fica anotado no livro-caixa
   (`{ pendente: 1 }`) e paga a carta quando ela for lançada (`R.pagarPendentes`), sem se perder.
 - "O que pode vir" diz quantas cartas podem sair hoje ("Hoje podem sair 6 das 52 cartas.").
 
 | Função | Teste |
 |---|---|
-| `validarCatalogo(cat, raiz)`, `desenhosDaArte(raiz)` | teste.mjs: o catálogo confere; acusa id repetido, contagem errada, lançamento fora de ordem, raridade fixa em carta de álbum e carta lançada sem desenho; as lançadas são exatamente as com desenho; as capas pedidas; tudo rascunho |
+| `validarCatalogo(cat, raiz)`, `desenhosDaArte(raiz)` | teste.mjs: o catálogo confere; acusa id repetido, contagem errada, lançamento fora de ordem, raridade fixa em carta de álbum e carta lançada sem desenho; toda lançada tem desenho (o desenho pronto pode esperar a aprovação); as capas pedidas; tudo rascunho |
 | lançamento aos poucos | teste.mjs: carta não lançada nunca sai (340 sorteios comuns e de marco); nenhum álbum completa sem as 13 lançadas; lançar uma carta põe ela no sorteio e o viés a traz logo; limiar de Semeadores sem desenho fica anotado e paga quando a carta é lançada; na fusão, o evento pago vence o anotado |
 | `esqueletoDoCatalogo(cat)` | teste.mjs: o esqueleto do index.html é o do catálogo; os textos e a regra não estão no index |
 | `R.albuns(hoje)`, `R.especiais()`, `R.carta(id)` | teste.mjs: 4 álbuns de 13 e os especiais com raridade fixa |
@@ -470,7 +472,7 @@ Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
 | Função | Teste |
 |---|---|
 | `R.resumo(cartas, hoje)` | teste.mjs: álbum atual, cartas, lançadas, versões, repetidas, alcançados, sorteios desde Ouro e desde Prata, marcos sem Glória |
-| `CC.album.tela(raiz)` | teste-bau: as recebidas e as silhuetas sem texto; "2 de 13 cartas" e "Coleção: 3 de 65 versões"; bolinhas, ×2 e rótulo; carta sem desenho em silhueta; Semeadores com os 5 limiares; cabe no computador sem rolagem de lado |
+| `CC.album.tela(raiz)` | teste-bau: as recebidas e as silhuetas sem texto; "1 de 13 cartas" e "Coleção: 2 de 65 versões"; bolinhas, ×2 e rótulo; carta sem desenho em silhueta; Semeadores com os 5 limiares; cabe no computador sem rolagem de lado |
 | `CC.album.abrirCarta(id, raridade)` | teste-bau: a melhor versão aberta, ×2, silhuetas das que faltam; troca para Bronze; Virar mostra o verso; Compartilhar e link da Bíblia; sem desenho, carta de texto sem Compartilhar |
 | `CC.album.oQuePodeVir()` | teste-bau: as duas tabelas (49/30/15/5/1 e 40/35/25), as proteções, "Hoje podem sair 6 das 52 cartas" e os números da pessoa; nada de "não repete" |
 
@@ -554,7 +556,7 @@ zerar (seção 11), com "Ajuste da versão 5, 22 de outubro de 2026" no históri
   a tela do baú, a entrada do Perfil, a casca do álbum e o esqueleto do catálogo. A folga do
   index.html continua acima de 60 KB (teste.mjs): 66,5 KB.
 - Peças: `cartas-regras` (a regra, cerca de 14 KB), `album` (catálogo, telas e estilo, cerca de
-  42 KB) e `cartas` (a arte, cerca de 150 KB), pedidas só quando servem.
+  42 KB) e `cartas` (a arte, cerca de 226 KB, 61 KB comprimida), pedidas só quando servem.
 
 ## 18. Testes
 

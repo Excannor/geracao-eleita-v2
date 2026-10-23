@@ -6,9 +6,12 @@
    no alto. O papel sai pelo clip-path; o rótulo, por uma máscara de borda macia
    (--sem-rotulos). No ouro e na glória, a peça ainda passa --mascara (luzes da arte e moldura,
    sem os objetos nem o texto).
+   O brilho parado (cartaViva, PARADO): em repouso, a peça passeia --mx/--my, sobe --o (holo) e
+   --og (reflexo) a um nível de repouso, passa o lampejo do metal (--lx, a faixa de luz da
+   moldura) de tempos em tempos e pulsa o halo da glória (--halo). Com o dedo, --lx é --bx.
    As zonas, em % da carta de 1000 x 1400 (cartas.js: JX 56, JY 118, JH 800, PY 934, PH 410). */
 .carta-viva {
-  --rx: 0deg; --ry: 0deg; --giro: 0deg; --mx: 50%; --my: 50%; --bx: 50%; --by: 50%; --o: 0; --d: 0;
+  --rx: 0deg; --ry: 0deg; --giro: 0deg; --mx: 50%; --my: 50%; --bx: 50%; --by: 50%; --lx: 50%; --o: 0; --og: 0; --halo: 0; --d: 0;
   --zona-moldura: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.6% 8.43%, 94.4% 8.43%, 94.4% 65.57%, 5.6% 65.57%, 5.6% 8.43%, 0 0, 5.6% 66.71%, 94.4% 66.71%, 94.4% 96%, 5.6% 96%, 5.6% 66.71%, 0 0);
   --zona-arte: inset(8.43% 5.6% 34.43% 5.6% round 2.5% / 1.8%);
   --zona-sem-texto: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.6% 66.71%, 94.4% 66.71%, 94.4% 96%, 5.6% 96%, 5.6% 66.71%, 0 0);
@@ -21,9 +24,18 @@
   touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; cursor: pointer;
 }
 .cv-giro { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--giro))); }
+/* Cada face recorta tudo o que tem dentro (o canvas e as camadas de brilho) na forma exata da
+   carta, cantos redondos inclusive, com clip-path: o overflow com border-radius falha com o 3D
+   e o brilho vazava pela borda. A face já é um grupo isolado (transform), então o mix-blend-mode
+   das camadas continua misturando com o canvas dela. A sombra, que o recorte cortaria, fica numa
+   placa à parte, no meio das duas faces. */
 .cv-face {
   position: absolute; inset: 0; overflow: hidden; border-radius: 4.6% / 3.3%;
+  -webkit-clip-path: inset(0 round 4.6% / 3.3%); clip-path: inset(0 round 4.6% / 3.3%);
   -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(.1px);
+}
+.cv-giro::before {
+  content: ''; position: absolute; inset: 0; border-radius: 4.6% / 3.3%; pointer-events: none;
   box-shadow: 0 calc(12px + var(--d) * 10px) 30px -10px rgba(0, 0, 0, .6), 0 2px 6px rgba(0, 0, 0, .3);
 }
 .cv-verso { transform: rotateY(180deg) translateZ(.1px); }
@@ -44,21 +56,21 @@
 .cv-reflexo {
   display: block !important; clip-path: var(--zona-sem-texto);
   background: radial-gradient(farthest-corner circle at var(--mx) var(--my), rgba(255, 255, 255, .85) 0%, rgba(255, 255, 255, .3) 22%, rgba(0, 0, 0, .4) 95%);
-  mix-blend-mode: overlay; opacity: calc(var(--o) * .55);
+  mix-blend-mode: overlay; opacity: calc(var(--og) * .55);
 }
 .cv-verso .cv-reflexo { clip-path: none; }
 .cv-verso > :is(.cv-holo, .cv-reflexo) { -webkit-mask-image: var(--sem-marca-verso); mask-image: var(--sem-marca-verso); }
 /* Linho: fosco. Só um reflexo branco leve, de 15% */
 [data-raridade="linho"] .cv-reflexo {
   background: radial-gradient(farthest-corner circle at var(--mx) var(--my), rgba(255, 255, 255, .15) 0%, rgba(255, 255, 255, 0) 62%);
-  mix-blend-mode: normal; opacity: var(--o);
+  mix-blend-mode: normal; opacity: var(--og);
 }
 
 /* Bronze: metal quente na moldura, uma faixa larga de luz que corre com o ângulo */
 [data-raridade="bronze"] .cv-metal {
   display: block; clip-path: var(--zona-moldura);
   background:
-    linear-gradient(112deg, transparent calc(var(--bx) - 7%), rgba(255, 246, 228, .95) var(--bx), transparent calc(var(--bx) + 7%)),
+    linear-gradient(112deg, transparent calc(var(--lx) - 7%), rgba(255, 246, 228, .95) var(--lx), transparent calc(var(--lx) + 7%)),
     linear-gradient(112deg, rgba(90, 40, 0, .5) calc(var(--bx) - 46%), rgba(255, 190, 120, .0) calc(var(--bx) - 30%), rgba(255, 206, 150, .85) var(--bx), rgba(255, 190, 120, 0) calc(var(--bx) + 30%), rgba(90, 40, 0, .5) calc(var(--bx) + 46%));
   mix-blend-mode: overlay; opacity: calc(.3 + var(--o) * .7);
 }
@@ -79,7 +91,7 @@
 }
 [data-raridade="prata"] .cv-metal {
   display: block; clip-path: var(--zona-moldura);
-  background: linear-gradient(112deg, transparent calc(var(--bx) - 9%), rgba(240, 248, 255, .95) var(--bx), transparent calc(var(--bx) + 9%));
+  background: linear-gradient(112deg, transparent calc(var(--lx) - 9%), rgba(240, 248, 255, .95) var(--lx), transparent calc(var(--lx) + 9%));
   mix-blend-mode: overlay; opacity: calc(.15 + var(--o) * .85);
 }
 [data-raridade="prata"] .cv-verso .cv-holo, [data-raridade="prata"] .cv-verso .cv-metal { clip-path: var(--zona-verso-moldura); }
@@ -112,7 +124,7 @@
 }
 [data-raridade="ouro"] .cv-metal {
   display: block; clip-path: var(--zona-moldura);
-  background: linear-gradient(112deg, transparent calc(var(--bx) - 10%), rgba(255, 252, 230, .95) var(--bx), transparent calc(var(--bx) + 10%));
+  background: linear-gradient(112deg, transparent calc(var(--lx) - 10%), rgba(255, 252, 230, .95) var(--lx), transparent calc(var(--lx) + 10%));
   mix-blend-mode: overlay; opacity: calc(.25 + var(--o) * .75);
 }
 [data-raridade="ouro"] .cv-verso .cv-holo { display: block; clip-path: var(--zona-verso-moldura);
@@ -123,10 +135,16 @@
 [data-raridade="ouro"] .cv-verso .cv-purpurina { clip-path: var(--zona-verso-campo); -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 24%, transparent 56%), var(--sem-marca-verso); mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 24%, transparent 56%), var(--sem-marca-verso); -webkit-mask-composite: source-in; mask-composite: intersect; }
 [data-raridade="ouro"] .cv-verso .cv-metal { clip-path: var(--zona-verso-moldura); }
 
-/* Na arte clara (o papel do Davi, a terra do poço, a rocha do túmulo), o holo é soft-light:
-   o dodge estoura o claro */
+/* Na arte clara (o papel do Davi, a muralha de Raabe, o palácio de Ester...), o holo é
+   soft-light: o dodge estoura o claro. data-arte vem da peça, pela luminância medida de cada
+   desenho (tomDe), e vale sozinho para toda carta nova */
 [data-arte="clara"]:is([data-raridade="ouro"], [data-raridade="gloria"]) .cv-frente .cv-holo { mix-blend-mode: soft-light; filter: saturate(1.5) contrast(1.15); opacity: calc(.45 + var(--o) * .55); }
 [data-arte="clara"]:is([data-raridade="ouro"], [data-raridade="gloria"]) .cv-frente .cv-purpurina { mix-blend-mode: overlay; }
+/* Na arte escura (a noite de Abraão, de Gideão), o reflexo da inclinação baixa (o branco por cima
+   vira névoa no céu) e o holo da glória fica suave (o tom vem da peça, medido no desenho) */
+[data-arte="escura"] .cv-frente .cv-reflexo { opacity: calc(var(--og) * .3); }
+[data-arte="escura"][data-raridade="linho"] .cv-frente .cv-reflexo { mix-blend-mode: soft-light; opacity: calc(var(--og) * .6); }
+[data-arte="escura"][data-raridade="gloria"] .cv-frente .cv-holo { mix-blend-mode: soft-light; filter: saturate(1.3); opacity: calc(.25 + var(--o) * .35); }
 
 /* Glória: arte cheia com moldura de madrepérola (o canvas já mostra o nácar parado); por cima,
    o prismático em faixas finas na moldura e nas luzes da arte (a mesma máscara do ouro), a
@@ -146,7 +164,7 @@
 }
 [data-raridade="gloria"] .cv-metal {
   display: block; clip-path: var(--zona-moldura-cheia);
-  background: linear-gradient(112deg, transparent calc(var(--bx) - 12%), rgba(255, 255, 255, .95) var(--bx), transparent calc(var(--bx) + 12%));
+  background: linear-gradient(112deg, transparent calc(var(--lx) - 12%), rgba(255, 255, 255, .95) var(--lx), transparent calc(var(--lx) + 12%));
   mix-blend-mode: overlay; opacity: calc(.3 + var(--o) * .7);
 }
 [data-raridade="gloria"] .cv-purpurina {
@@ -162,21 +180,17 @@
   background-size: 300% 300%; background-position: var(--bx) var(--by); mix-blend-mode: soft-light; opacity: calc(.5 + var(--o) * .5); }
 [data-raridade="gloria"] .cv-verso .cv-metal { clip-path: var(--zona-verso-moldura); }
 [data-raridade="gloria"] .cv-verso .cv-purpurina { clip-path: var(--zona-verso-campo); -webkit-mask-image: var(--sem-marca-verso); mask-image: var(--sem-marca-verso); opacity: calc(.2 + var(--o) * .3); }
-/* o halo: luz dourada e perolada, simétrica, com raios finos iguais em volta; parado, forte o
-   bastante para aparecer também em fundo claro. Sai só 7%
-   para os lados (24 px numa carta de 340), para não abrir rolagem para o lado no celular */
-.carta-viva[data-raridade="gloria"]::before {
-  content: ''; position: absolute; inset: -10% -7%; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(closest-side, rgba(255, 236, 170, 0) 55%, rgba(255, 236, 170, 1) 72%, rgba(240, 172, 44, .8) 84%, rgba(240, 172, 44, 0) 100%),
-    repeating-conic-gradient(from 0deg at 50% 50%, rgba(236, 160, 30, 1) 0deg 2.5deg, rgba(236, 160, 30, 0) 2.5deg 10deg),
-    conic-gradient(from 0deg, rgba(255, 150, 200, .5), rgba(150, 210, 255, .5), rgba(170, 240, 190, .45), rgba(255, 220, 130, .5), rgba(210, 170, 255, .5), rgba(255, 150, 200, .5));
-  -webkit-mask-image: radial-gradient(closest-side, transparent 50%, #000 68%, #000 76%, transparent 100%); mask-image: radial-gradient(closest-side, transparent 50%, #000 68%, #000 76%, transparent 100%);
-  opacity: 1; transition: opacity .3s ease;
+/* o halo: um brilho macio atrás da carta, dourado e perolado, na forma dela (sombras de luz,
+   iguais dos quatro lados), numa placa que gira com a carta (assim ele segue o contorno dela
+   em qualquer ângulo, sem caixa parada atrás). Não ocupa lugar (box-shadow não abre rolagem) e
+   pulsa de leve com o brilho parado (--halo) */
+.carta-viva[data-raridade="gloria"] .cv-giro::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: 4.6% / 3.3%;
+  box-shadow: 0 0 16px 3px rgba(255, 224, 150, .8), 0 0 34px 8px rgba(255, 196, 228, .32), 0 0 56px 14px rgba(170, 214, 255, .24);
+  opacity: calc(1 - var(--halo) * .35); transition: opacity .3s ease;
 }
-/* o miolo do halo fica vazio (por trás da carta) e ele some com a carta de costas: de lado,
-   na hora de virar, não aparece um clarão no lugar da carta */
-.carta-viva[data-raridade="gloria"].mostra-verso::before { opacity: 0; }
+/* ele some com a carta de costas: de lado, na hora de virar, não fica um clarão no lugar dela */
+.carta-viva[data-raridade="gloria"].mostra-verso .cv-giro::after { opacity: 0; }
 
 .cv-botao-virar {
   display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 1px solid rgba(242, 236, 216, .35);
@@ -383,13 +397,13 @@
    troca; na revelação, sem balanço, sem tampa girando e sem pulso: o baú some e a carta
    aparece de frente (troca suave), com o halo parado e o nome */
 @media (prefers-reduced-motion: reduce) {
-  .carta-viva { --rx: 0deg !important; --ry: 0deg !important; --o: .45 !important; --mx: 35% !important; --my: 30% !important; --bx: 40% !important; --by: 40% !important; }
+  .carta-viva { --rx: 0deg !important; --ry: 0deg !important; --o: .45 !important; --og: .45 !important; --halo: 0 !important; --mx: 35% !important; --my: 30% !important; --bx: 40% !important; --by: 40% !important; --lx: 40% !important; }
   .rv-raios, .rv-peca, .rv-carta, .rv-anel, .rv-saida, .rv-dobradica, .rv-tampa, .rv-faiscas i { animation: none !important; }
   .rv-raios { display: none; }
   .rv-carta { transform: none !important; transition: opacity .4s ease !important; }
   .rv-peca { transition: opacity .35s ease !important; transform: none !important; }
 }
-:root.menos-movimento .carta-viva { --rx: 0deg !important; --ry: 0deg !important; --o: .45 !important; --mx: 35% !important; --my: 30% !important; --bx: 40% !important; --by: 40% !important; }
+:root.menos-movimento .carta-viva { --rx: 0deg !important; --ry: 0deg !important; --o: .45 !important; --og: .45 !important; --halo: 0 !important; --mx: 35% !important; --my: 30% !important; --bx: 40% !important; --by: 40% !important; --lx: 40% !important; }
 :root.menos-movimento :is(.rv-raios, .rv-peca, .rv-carta, .rv-anel, .rv-saida, .rv-dobradica, .rv-tampa, .rv-faiscas i) { animation: none !important; }
 :root.menos-movimento .rv-raios { display: none; }
 :root.menos-movimento .rv-carta { transform: none !important; transition: opacity .4s ease !important; }

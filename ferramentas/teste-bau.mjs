@@ -166,6 +166,30 @@ try {
   ok(await esperar('!!window.__compartilhado', 12000), 'Compartilhar carta abre a folha do sistema');
   const story = await av('(async () => { const d = window.__compartilhado; return { ...(await __png(d.files[0])), texto: d.text }; })()');
   ok(story && story.w === 1080 && story.h === 1920 && story.tipo === 'image/png' && /Davi e a funda \(Prata\)/.test(story.texto), 'vai o story da carta, PNG 1080x1920 (' + JSON.stringify(story) + ')');
+  // o brilho da raridade vai assado no story: a carta do story (800 px, em 140, 400) contra a
+  // mesma carta desenhada sem brilho; no Ouro a moldura muda, no Linho (fosco) só o grão; o papel
+  // do texto fica igual nos dois; e a mesma carta sai sempre igual
+  const assado = await av(`(() => {
+    const C = CC.cartas;
+    const base = { id: 'davi-funda', album: 'Heróis da fé', numero: 10, total: 13, titulo: 'Davi e a funda', sabia: 'Davi apanhou cinco pedras.', ref: '1 Samuel 17.40' };
+    const medir = (rar) => {
+      const carta = { ...base, raridade: rar };
+      const s = C.storyDaCarta(carta).getContext('2d');
+      const plana = C.desenharCarta(carta, { largura: 800 }).getContext('2d');
+      const dif = (x, y, w, h) => {
+        const a = s.getImageData(140 + x, 400 + y, w, h).data;
+        const b = plana.getImageData(x, y, w, h).data;
+        let t = 0;
+        for (let i = 0; i < a.length; i += 4) t += Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]);
+        return Math.round((t / (a.length / 4) / 3) * 10) / 10;
+      };
+      return { moldura: dif(6, 300, 32, 400), papel: dif(120, 790, 420, 130) };
+    };
+    const igual = C.storyDaCarta({ ...base, raridade: 'ouro' }).toDataURL() === C.storyDaCarta({ ...base, raridade: 'ouro' }).toDataURL();
+    return { ouro: medir('ouro'), linho: medir('linho'), igual };
+  })()`);
+  ok(assado && assado.ouro.moldura > 8 && assado.ouro.moldura > 3 * assado.linho.moldura && assado.ouro.papel < 4 && assado.linho.papel < 4 && assado.igual,
+    'o story leva o brilho da raridade: a moldura do Ouro muda, a do Linho (fosco) não, o texto fica limpo e a imagem é sempre a mesma (' + JSON.stringify(assado) + ')');
   await av(SIMULAR);
   await av('document.querySelector("[data-papel-de-parede]").click()');
   ok(await esperar('!!window.__compartilhado', 12000), 'Salvar papel de parede abre a folha do sistema');
@@ -192,7 +216,7 @@ try {
   // ---------- repetidas, uma carta sem desenho e o Perfil ----------
   await av(`(() => { const c = CC.estado().cartas; c.eventos["bau:dia:901"] = { em: Date.now(), carta: "davi-funda", raridade: "prata" };
     c.eventos["bau:dia:902"] = { em: Date.now() + 1, carta: "davi-funda", raridade: "bronze" };
-    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "noe-arca", raridade: "linho" }; CC.gravar("cartas", c); return true; })()`);
+    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "jardim-eden", raridade: "linho" }; CC.gravar("cartas", c); return true; })()`);
   await av('location.hash = "#/perfil"');
   ok(await esperar('!!' + q('[data-album-cartas]')), 'o Perfil tem a entrada Cartas, ao lado de Conquistas e Troféus');
   ok(/Cartas\s*3 de 52/.test(await texto('[data-album-cartas]')), 'a entrada diz quantas cartas de 52 (' + (await texto('[data-album-cartas]')).trim() + ')');
@@ -205,13 +229,13 @@ try {
   const grade = await av(`(() => { const s = document.querySelector('[data-album="herois"]');
     return { cartas: s.querySelectorAll('.album-carta').length, vagas: s.querySelectorAll('.album-vaga').length, texto: [...s.querySelectorAll('.album-grade')].map((g) => g.innerText.replace(/×\\d+/g, '').trim()).join(''),
       titulo: s.querySelector('.titulo-secao').textContent, versoes: s.querySelector('.album-versoes').textContent }; })()`);
-  ok(grade.cartas === 2 && grade.vagas === 11 && !grade.texto, 'Heróis da fé: as 2 recebidas e 11 silhuetas, sem texto nas miniaturas (' + JSON.stringify(grade) + ')');
-  ok(/2 de 13 cartas/.test(grade.titulo) && /Coleção: 3 de 65 versões/.test(grade.versoes), 'o álbum diz "2 de 13 cartas" e "Coleção: 3 de 65 versões"');
+  ok(grade.cartas === 1 && grade.vagas === 12 && !grade.texto, 'Heróis da fé: a recebida e 12 silhuetas, sem texto nas miniaturas (' + JSON.stringify(grade) + ')');
+  ok(/1 de 13 cartas/.test(grade.titulo) && /Coleção: 2 de 65 versões/.test(grade.versoes), 'o álbum diz "1 de 13 cartas" e "Coleção: 2 de 65 versões"');
   const davi = await av(`(() => { const b = document.querySelector('[data-carta="davi-funda"]'); return { rotulo: b.getAttribute('aria-label'), pips: [...b.querySelectorAll('.album-pips i.tem')].map((i) => i.className),
     copias: (b.querySelector('.album-copias') || {}).textContent || '', canvas: !!b.querySelector('canvas') }; })()`);
   ok(/Versões: Bronze, Prata/.test(davi.rotulo) && /Repetidas: 2 de Prata/.test(davi.rotulo) && davi.pips.length === 2 && davi.copias === '×2' && davi.canvas,
     'a miniatura desenhada mostra as versões (bolinhas), as cópias da versão à mostra (×2) e diz tudo no rótulo (' + davi.rotulo + ')');
-  ok(await av('!!document.querySelector("[data-carta=noe-arca] .album-sem-arte")'), 'carta sem desenho aparece em silhueta da raridade');
+  ok(await av('!!document.querySelector("[data-carta=jardim-eden] .album-sem-arte")'), 'carta sem desenho aparece em silhueta da raridade');
   ok(await av('document.querySelectorAll("[data-album=semeadores] .album-limiar").length === 5 && /100 amigos/.test(document.querySelector("[data-album=semeadores]").textContent)'),
     'Semeadores aparece à parte, com os 5 limiares em silhueta (de 1 a 100 amigos)');
   await nosDoisTemas('03-album');
@@ -230,7 +254,7 @@ try {
   await dormir(900);
   await nosDoisTemas('04-carta-grande');
   await fecharTudo();
-  await av(q('[data-carta="noe-arca"]') + '.click()');
+  await av(q('[data-carta="jardim-eden"]') + '.click()');
   ok(await esperar('!!' + q('.tela-carta .carta-texto')) && await av('!!document.querySelector(".tela-carta [data-compartilhar-carta][hidden]")'), 'a carta sem desenho abre como carta de texto, sem Compartilhar');
   await fecharTudo();
 

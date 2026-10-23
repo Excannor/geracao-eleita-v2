@@ -26,10 +26,17 @@
      pé (fica o símbolo).
    - temArte(id) -> true se a carta de id tem desenho; os desenhos vão pela carta.id. Sem
      desenho, desenharCarta sai com uma gravura neutra (o sistema pode preferir a silhueta).
-   - cartaViva(carta, { largura, verso, interativa }) -> { el, inclinar, soltar, virar, ... }:
-     a carta que inclina com o dedo e vira, com o brilho da raridade.
-   - miniatura(carta, largura) -> canvas da miniatura já no tamanho da tela (sem texto).
-   - storyDaCarta(carta) -> canvas 1080x1920; papelDeParede({ ref, texto }) -> canvas 1080x2340.
+   - cartaViva(carta, { largura, verso, interativa, parada }) -> { el, inclinar, soltar, virar,
+     parada, ... }: a carta que inclina com o dedo e vira, com o brilho da raridade. Parada (em
+     repouso), o brilho continua vivo: a luz passeia devagar e a carta respira 1 a 2 graus
+     (o "brilho parado", PARADO abaixo); o dedo ou o giroscópio assume sem pulo e, depois de
+     soltar(), ele volta devagar. parada (padrão true) liga esse brilho; false o deixa
+     desligado até api.parada(true) (a revelação o liga só no fim). Ele dorme fora da tela e
+     com a aba escondida; com menos movimento, o brilho fica parado num repouso fixo.
+   - miniatura(carta, largura) -> canvas da miniatura já no tamanho da tela (sem texto); da
+     Prata para cima, com o tom parado do holo na moldura (para a raridade se ver na grade).
+   - storyDaCarta(carta) -> canvas 1080x1920, com o brilho da raridade assado num repouso fixo
+     (e o halo, na glória); papelDeParede({ ref, texto }) -> canvas 1080x2340 (sem brilho).
    - RARIDADES (nome, ícone, cores), iconeSvg(raridade), lista (as cartas de amostra),
      cartaDoBau(numero) (a carta fixa da amostra, até o sorteio vir do sistema).
    carta = { id, album, numero, total, titulo, sabia, ref, raridade }. */
@@ -2659,11 +2666,1899 @@
     capim(k, r, 560, sy + 34, 40, 9);
     vinheta(k, W, H, 0.2);
   }
+  // ---------- Heróis da fé: as pranchas ----------
+  // Cada herói é contado por um objeto ou um lugar, nunca por uma figura: gravura em tinta
+  // sépia sobre papel com fibra, a hachura que engrossa na sombra e a silhueta dos objetos na
+  // máscara do brilho. As peças abaixo são comuns às pranchas.
+  // O papel: o tom em gradiente a partir da luz, a fibra e as manchas do tempo.
+  function papelVelho(k, W, H, r, tons, luz, escuro = false) {
+    const g = k.createRadialGradient(luz[0], luz[1], 30, W / 2, H / 2, W * 0.95);
+    tons.forEach((c, i) => g.addColorStop(i / (tons.length - 1), c));
+    k.fillStyle = g;
+    k.fillRect(0, 0, W, H);
+    for (let i = 0; i < 8000; i++) {
+      k.fillStyle = r() < 0.6 ? 'rgba(' + (escuro ? '0,0,0' : '70,52,24') + ',' + (0.03 + r() * 0.06).toFixed(3) + ')' : 'rgba(255,248,226,' + (escuro ? 0.05 : 0.25) + ')';
+      k.fillRect(r() * W, r() * H, 1 + r() * 4, 1);
+    }
+    for (let i = 0; i < 20; i++) brilho(k, r() * W, r() * H, 6 + r() * 24, 'rgba(120,90,40,' + (0.04 + r() * 0.06).toFixed(3) + ')');
+  }
+  // Um caminho pelos pontos (fechado, se nada disser o contrário).
+  function pol(pts, fechar = true) {
+    const p = new Path2D();
+    pts.forEach(([x, y], i) => (i ? p.lineTo(x, y) : p.moveTo(x, y)));
+    if (fechar) p.closePath();
+    return p;
+  }
+  // A sombra que vai do lado da luz (a) ao lado escuro (b), de v0 a v1.
+  const degrade = (ax, ay, bx, by, v0, v1) => (x, y) => {
+    const t = ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / ((bx - ax) ** 2 + (by - ay) ** 2);
+    return v0 + (v1 - v0) * Math.max(0, Math.min(1, t));
+  };
+  // Uma peça gravada: o tom, a hachura pela sombra (e a cruzada onde escurece), o contorno de
+  // tinta e a silhueta na máscara do brilho. caixa = [x0, y0, x1, y1].
+  function peca(k, forma, [x0, y0, x1, y1], { cor, tinta = SEPIA, ang = 0.7, passo = 4.6, maxL = 2.4, sombra, cruzada = 0.62, traco = 2.2, obj, abaulado = 0 } = {}) {
+    const cx = (x0 + x1) / 2;
+    const cy = (y0 + y1) / 2;
+    const raio = Math.hypot(x1 - x0, y1 - y0) / 2 + 4;
+    if (cor) { k.fillStyle = cor; k.fill(forma); }
+    if (sombra) {
+      gravar(k, forma, cx, cy, raio, ang, passo, maxL, sombra, tinta, abaulado);
+      if (cruzada < 1) gravar(k, forma, cx, cy, raio, ang + 1.2, passo * 1.25, maxL * 0.75, (x, y) => (sombra(x, y) - cruzada) * 2.2, tinta, 0);
+    }
+    if (traco) { k.strokeStyle = tinta; k.lineWidth = traco; k.lineJoin = 'round'; k.stroke(forma); }
+    marcar(k, obj, forma);
+  }
+  // A sombra de uma forma no chão, borrada.
+  function sombraNoChao(k, forma, dx, dy, desfoque, alfa) {
+    k.save();
+    k.filter = 'blur(' + desfoque + 'px)';
+    k.fillStyle = 'rgba(30,20,8,' + alfa + ')';
+    k.translate(dx, dy);
+    k.fill(forma);
+    k.restore();
+  }
+  // O céu e o chão em linhas: horizontais, mais grossas onde a sombra pede.
+  function linhas(k, x0, y0, x1, y1, passo, maxL, sombra, cor = SEPIA) {
+    const p = new Path2D();
+    p.rect(x0, y0, x1 - x0, y1 - y0);
+    gravar(k, p, (x0 + x1) / 2, (y0 + y1) / 2, Math.hypot(x1 - x0, y1 - y0) / 2, 0, passo, maxL, sombra, cor, 0);
+  }
+  // Uma vara em traço (cajado, poste, haste): o contorno escuro, a madeira e a luz de um lado.
+  function vara(k, pts, larg, cor, obj) {
+    const p = pol(pts, false);
+    marcar(k, obj, p, larg + 4);
+    k.save();
+    k.lineCap = 'round';
+    k.lineJoin = 'round';
+    for (const [w, c] of [[larg + 4, SEPIA], [larg, cor], [larg * 0.3, 'rgba(255,240,200,.55)']]) {
+      k.strokeStyle = c;
+      k.lineWidth = w;
+      if (w < larg) k.translate(-larg * 0.22, -larg * 0.1);
+      k.stroke(p);
+    }
+    k.restore();
+  }
+  // Um contorno de lã ou nuvem: os pontos ligados por arcos para fora (a beirada em rolinhos).
+  function lanoso(r, pts, bolha = 7, passo = 13) {
+    const q = [];
+    pts.forEach((a, i) => {
+      const b = pts[(i + 1) % pts.length];
+      const n = Math.max(1, Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / passo));
+      for (let j = 0; j < n; j++) q.push([a[0] + (b[0] - a[0]) * j / n, a[1] + (b[1] - a[1]) * j / n]);
+    });
+    const p = new Path2D();
+    p.moveTo(q[0][0], q[0][1]);
+    q.forEach((a, i) => {
+      const b = q[(i + 1) % q.length];
+      const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      const s = bolha * (0.7 + r() * 0.6);
+      p.quadraticCurveTo((a[0] + b[0]) / 2 + (b[1] - a[1]) / d * s, (a[1] + b[1]) / 2 - (b[0] - a[0]) / d * s, b[0], b[1]);
+    });
+    p.closePath();
+    return p;
+  }
+  // Uma língua de fogo, da base (x, y) até a ponta, com a inclinação "vai".
+  function chama(x, y, larg, alto, vai) {
+    const p = new Path2D();
+    p.moveTo(x - larg / 2, y);
+    p.bezierCurveTo(x - larg * 0.6, y - alto * 0.45, x + vai * 0.2 - larg * 0.1, y - alto * 0.7, x + vai, y - alto);
+    p.bezierCurveTo(x + vai * 0.3 + larg * 0.25, y - alto * 0.62, x + larg * 0.65, y - alto * 0.38, x + larg / 2, y);
+    p.closePath();
+    return p;
+  }
+  function fogo(k, r, x, y, larg, alto, n) {
+    brilho(k, x, y - alto * 0.4, alto * 1.1, 'rgba(255,190,90,.5)');
+    // as línguas, das mais altas (atrás) às mais baixas, cada uma num lugar e numa inclinação
+    const linguas = Array.from({ length: n }, (_, i) => {
+      const t = (i + 0.5) / n - 0.5 + (r() - 0.5) * 0.12;
+      return { t, h: alto * (1 - Math.abs(t) * 1.2) * (0.6 + r() * 0.45), vai: (r() - 0.5) * alto * 0.35 - t * alto * 0.2 };
+    }).sort((a, b) => b.h - a.h);
+    // o corpo do fogo, inteiro, atrás das línguas
+    const corpo = chama(x, y, larg * 1.05, alto * 0.82, (r() - 0.5) * 20);
+    k.fillStyle = '#e98a36';
+    k.fill(corpo);
+    k.strokeStyle = '#5e2606';
+    k.lineWidth = 1.8;
+    k.stroke(corpo);
+    for (const { t, h, vai } of linguas) {
+      const p = chama(x + t * larg, y, larg / n * 2.4, h, vai);
+      k.fillStyle = '#eda048';
+      k.fill(p);
+      k.fillStyle = '#ffe196';
+      k.fill(chama(x + t * larg, y, larg / n * 1.1, h * 0.6, vai * 0.5));
+      gravar(k, p, x + t * larg, y - h / 2, h * 0.6, -Math.PI / 2 + 0.15, 5, 1.6, (px, py) => 0.2 + (py - y + h) / h * 0.7, '#7a3410', 0.4);
+      k.strokeStyle = '#5e2606';
+      k.lineWidth = 1.8;
+      k.stroke(p);
+    }
+  }
+  // Poucos pontos de estrela (cinco pontas não: quatro, como as da purpurina).
+  function estrelasDoCeu(k, r, x0, y0, x1, y1, n, fora) {
+    for (let i = 0; i < n; i++) {
+      const x = x0 + r() * (x1 - x0);
+      const y = y0 + r() * (y1 - y0);
+      if (fora && fora(x, y)) continue;
+      const g = r();
+      k.fillStyle = 'rgba(255,246,220,' + (0.35 + g * 0.6).toFixed(3) + ')';
+      k.beginPath();
+      k.arc(x, y, 0.6 + g * g * 2.2, 0, 6.283);
+      k.fill();
+    }
+  }
+
+  // (1) A oferta de Abel (Gn 4.4): o altar de pedras brutas, a lenha, a lã branca do cordeiro
+  // (uma das primeiras crias do rebanho) e a fumaça subindo reta no céu claro; o cajado de
+  // pastor (Abel era pastor de ovelhas, 4.2) encostado no altar.
+  function desenhoAbel(k, W, H, obj) {
+    const r = sorteio(5101);
+    papelVelho(k, W, H, r, ['#fbf2da', '#efdfba', '#d4ba86'], [W * 0.5, 120]);
+    linhas(k, 0, 0, W, 600, 7, 1.2, (x, y) => Math.min(1, Math.hypot(x - W / 2, (y - 120) * 1.3) / 640) * 0.95 - 0.1);
+    // os morros de longe e o chão
+    const fm = onda(r, 4, 0.01);
+    const morro = pol([[-10, 640], ...Array.from({ length: 46 }, (_, i) => [i * 20, 566 + fm(i * 20) * 14]), [W + 10, 640]]);
+    peca(k, morro, [0, 540, W, 640], { cor: '#e4d0a4', ang: -0.15, passo: 6, maxL: 1.1, sombra: () => 0.55, traco: 1.6 });
+    const chao = new Path2D();
+    chao.rect(-10, 606, W + 20, H);
+    k.fillStyle = '#dcc597';
+    k.fill(chao);
+    linhas(k, 0, 606, W, H, 6, 1.7, (x, y) => 0.25 + (y - 606) / 500);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.beginPath();
+    k.moveTo(0, 606);
+    for (let x = 0; x <= W; x += 8) k.lineTo(x, 606 + Math.sin(x * 0.03) * 1.5);
+    k.stroke();
+    // a fumaça, reta, que se abre e some no alto
+    const cx = W * 0.5;
+    const meio = (y) => cx + Math.sin(y * 0.018) * 8 * (1 - y / 420);
+    const larg = (y) => 46 + (420 - y) * 0.32;
+    const fum = pol([...Array.from({ length: 30 }, (_, i) => { const y = 420 - i * 12.4; return [meio(y) - larg(y) / 2, y]; }),
+      ...Array.from({ length: 30 }, (_, i) => { const y = 60 + i * 12.4; return [meio(y) + larg(y) / 2, y]; })]);
+    const gf = k.createLinearGradient(0, 60, 0, 420);
+    gf.addColorStop(0, 'rgba(160,146,120,0)');
+    gf.addColorStop(0.4, 'rgba(150,136,112,.35)');
+    gf.addColorStop(1, 'rgba(110,96,74,.55)');
+    k.fillStyle = gf;
+    k.fill(fum);
+    if (obj) { obj.save(); obj.globalAlpha = 0.7; marcar(k, obj, fum); obj.restore(); }
+    gravar(k, fum, cx, 240, 240, -Math.PI / 2, 5.5, 1.5, (x, y) => (0.25 + Math.abs(x - meio(y)) / larg(y)) * Math.min(1, (y - 60) / 200), SEPIA, 0.5);
+    // o altar: três fiadas de pedras brutas, de baixo para cima
+    const sombraAltar = pol([[250, 700], [640, 700], [700, 740], [300, 744]]);
+    sombraNoChao(k, sombraAltar, 10, 0, 12, 0.4);
+    const fiadas = [[668, 4, 54, 36, 98, 0], [610, 4, 50, 33, 92, 14], [556, 4, 47, 30, 86, -6]];
+    for (const [y, n, rx, ry, passoX, des] of fiadas) {
+      for (let i = 0; i < n; i++) {
+        const x = cx + (i - (n - 1) / 2) * passoX + des + (r() - 0.5) * 10;
+        const a = rx * (0.9 + r() * 0.2);
+        const b = ry * (0.9 + r() * 0.25);
+        const giro = (r() - 0.5) * 0.3;
+        const p = seixo(r, x, y + (r() - 0.5) * 6, a, b, giro, 0.12);
+        const so = sombraOval(x, y, a, b, giro);
+        peca(k, p, [x - a, y - b, x + a, y + b], { cor: r() < 0.5 ? '#d3c29c' : '#c6b28a', ang: 0.5 + r() * 0.5, passo: 4.2, maxL: 2.6, sombra: (px, py) => so(px, py) * 0.85 + (px - cx) / 900, obj, abaulado: 0.15 });
+      }
+    }
+    // a lenha sobre as pedras
+    for (const [x0, y0, x1, y1] of [[318, 526, 590, 516], [338, 514, 578, 530], [360, 506, 556, 502]]) {
+      const ang = Math.atan2(y1 - y0, x1 - x0);
+      const nx = -Math.sin(ang) * 9;
+      const ny = Math.cos(ang) * 9;
+      const tora = pol([[x0 + nx, y0 + ny], [x1 + nx, y1 + ny], [x1 - nx, y1 - ny], [x0 - nx, y0 - ny]]);
+      peca(k, tora, [x0, y0 - 10, x1, y1 + 10], { cor: '#9c7448', ang, passo: 3.4, maxL: 1.8, sombra: (x, y) => 0.3 + ((y - (y0 + (x - x0) * Math.tan(ang))) / 9 + 1) * 0.3, obj });
+    }
+    // o fogo, atrás e dos lados da lã
+    fogo(k, r, cx, 512, 280, 180, 8);
+    // a lã do cordeiro, estendida sobre a lenha, com as pontas das patas caídas pela frente
+    const la = lanoso(r, [[350, 506], [366, 474], [420, 462], [470, 466], [522, 460], [554, 480], [558, 506], [546, 524], [520, 528], [514, 552], [506, 578], [488, 582],
+      [480, 556], [474, 532], [432, 532], [422, 556], [410, 584], [392, 586], [386, 560], [380, 532], [358, 526]]);
+    sombraNoChao(k, la, 6, 8, 6, 0.45);
+    k.fillStyle = '#fbf6e6';
+    k.fill(la);
+    marcar(k, obj, la);
+    k.save();
+    k.clip(la);
+    k.strokeStyle = 'rgba(90,72,40,.7)';
+    k.lineWidth = 1.4;
+    for (let i = 0; i < 190; i++) {
+      const x = 346 + r() * 216;
+      const y = 452 + r() * 136;
+      k.beginPath();
+      k.arc(x, y, 2.5 + r() * 3.5, r() * 6, r() * 6 + 3.8);
+      k.stroke();
+    }
+    k.restore();
+    gravar(k, la, 452, 510, 130, 0.3, 4.4, 1.5, (x, y) => (y - 500) / 90 + (x - 452) / 500, '#5a4628', 0);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.2;
+    k.stroke(la);
+    brilho(k, cx, 486, 170, 'rgba(255,214,140,.28)', 'screen');
+    // o cajado de pastor encostado no altar
+    vara(k, [[690, 716], ...bezier([690, 716], [672, 600], [640, 460], [628, 360], 20), ...bezier([628, 360], [620, 316], [578, 304], [566, 334], 14), [574, 352]], 9, '#a37a4a', obj);
+    capim(k, r, 150, 640, 30, 8);
+    capim(k, r, 760, 700, 34, 9);
+    capim(k, r, 222, 760, 26, 7);
+    vinheta(k, W, H, 0.22);
+  }
+  // (2) Noé e a arca (Gn 6.14-16): a embarcação de cipreste, em terra seca, revestida de piche
+  // por dentro e por fora (o casco escuro e brilhante, as tábuas com as juntas de piche), os
+  // três andares, a porta do lado e a abertura de meio metro entre o teto e o corpo. A porta
+  // desceu como rampa, e as pegadas, duas a duas, sobem por ela; o céu pesa à direita.
+  function desenhoNoe(k, W, H, obj) {
+    const r = sorteio(5201);
+    papelVelho(k, W, H, r, ['#f6ecd2', '#e6d6b0', '#c9b088'], [W * 0.18, 110]);
+    linhas(k, 0, 0, W, 584, 7, 1.3, (x, y) => 0.12 + (x / W) * 0.45 + (1 - y / 584) * 0.3 - Math.max(0, 0.25 - Math.hypot(x - 160, y - 110) / 700));
+    const fm = onda(r, 4, 0.012);
+    const morro = pol([[-10, 600], ...Array.from({ length: 46 }, (_, i) => [i * 20, 552 + fm(i * 20) * 12]), [W + 10, 600]]);
+    peca(k, morro, [0, 530, W, 600], { cor: '#dfcca2', ang: -0.15, passo: 6, maxL: 1.2, sombra: () => 0.55, traco: 1.6 });
+    const chao = new Path2D();
+    chao.rect(-10, 584, W + 20, H);
+    k.fillStyle = '#d9c293';
+    k.fill(chao);
+    linhas(k, 0, 584, W, H, 6, 1.7, (x, y) => 0.22 + (y - 584) / 560);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.beginPath();
+    k.moveTo(0, 584);
+    k.lineTo(W, 584);
+    k.stroke();
+    // a arca: o casco de tábuas curvas, escorado no chão seco
+    const cx = 445;
+    const conves = (x) => 404 + 30 * (1 - ((x - cx) / 355) ** 2);
+    const quilha = (x) => 628 - 80 * ((x - cx) / 330) ** 2;
+    const casco = new Path2D();
+    casco.moveTo(86, conves(86));
+    for (let x = 86; x <= 804; x += 12) casco.lineTo(x, conves(x));
+    casco.bezierCurveTo(800, 500, 776, 548, 712, quilha(712));
+    for (let x = 712; x >= 178; x -= 12) casco.lineTo(x, quilha(x));
+    casco.bezierCurveTo(124, 556, 92, 500, 86, conves(86));
+    casco.closePath();
+    // as escoras e a sombra
+    sombraNoChao(k, pol([[150, 622], [740, 622], [820, 668], [200, 668]]), 0, 0, 14, 0.5);
+    for (const [x, d] of [[196, -1], [330, -1], [600, 1], [720, 1]]) vara(k, [[x, quilha(x) - 36], [x + d * 58, 660]], 8, '#8a6642');
+    for (const x of [300, 445, 590]) peca(k, pol([[x - 26, quilha(x) - 4], [x + 26, quilha(x) - 4], [x + 28, 648], [x - 28, 648]]), [x - 28, 600, x + 28, 648], { cor: '#9a7a50', sombra: () => 0.5, passo: 3.4, maxL: 1.4, traco: 2 });
+    peca(k, casco, [86, 398, 804, 628], { cor: '#5a4029', ang: 0, passo: 4.2, maxL: 1.9, sombra: (x, y) => 0.38 + (x - 86) / 1800 + (y - 420) / 520, tinta: '#140c05', obj, traco: 3 });
+    // as tábuas acompanham a curva do casco: a junta de piche e a luz na beirada
+    k.save();
+    k.clip(casco);
+    for (let i = 1; i < 13; i++) {
+      const t = i / 13;
+      const y = (x) => conves(x) + (quilha(x) + 26 * ((x - cx) / 330) ** 2 - conves(x)) * t;
+      for (const [cor, lw, dy] of [['#120a04', i === 4 || i === 8 ? 8 : 3, 0], ['rgba(255,226,170,.3)', 1.2, i === 4 || i === 8 ? 5 : 2.5]]) {
+        k.strokeStyle = cor;
+        k.lineWidth = lw;
+        k.beginPath();
+        for (let x = 70; x <= 820; x += 12) (x === 70 ? k.moveTo(x, y(x) + dy) : k.lineTo(x, y(x) + dy));
+        k.stroke();
+      }
+      k.strokeStyle = '#120a04';
+      k.lineWidth = 2;
+      for (let x = 100 + ((i * 97) % 170); x < 800; x += 150 + r() * 70) {
+        k.beginPath();
+        k.moveTo(x, y(x) - 15);
+        k.lineTo(x, y(x));
+        k.stroke();
+      }
+    }
+    brilho(k, 300, 450, 240, 'rgba(255,230,180,.2)', 'screen');
+    k.restore();
+    // a casa de cima: as paredes, a abertura com os esteios e o teto baixo
+    const h0 = 214;
+    const h1 = 676;
+    const parede = pol([[h0, conves(h0) + 2], [h0, 352], [h1, 352], [h1, conves(h1) + 2]]);
+    peca(k, parede, [h0, 352, h1, 432], { cor: '#5f442b', ang: 0, passo: 4, maxL: 1.8, sombra: (x) => 0.45 + (x - h0) / 1200, tinta: '#140c05', obj, traco: 2.4 });
+    const vao = pol([[h0 - 4, 330], [h1 + 4, 330], [h1, 352], [h0, 352]]);
+    k.fillStyle = '#120b05';
+    k.fill(vao);
+    marcar(k, obj, vao);
+    for (let x = h0 + 4; x < h1; x += 38) {
+      const p = pol([[x, 330], [x + 8, 330], [x + 8, 352], [x, 352]]);
+      peca(k, p, [x, 330, x + 8, 352], { cor: '#7a5834', sombra: () => 0.35, passo: 3, maxL: 1, traco: 1.2, tinta: '#140c05' });
+    }
+    const teto = pol([[h0 - 34, 332], [h1 + 34, 332], [h1 - 40, 276], [h0 + 40, 276]]);
+    peca(k, teto, [h0 - 34, 276, h1 + 34, 332], { cor: '#6a4b2c', ang: 1.45, passo: 4.4, maxL: 1.9, sombra: (x, y) => 0.32 + (x - h0) / 1300 + (y - 276) / 200, tinta: '#140c05', obj, traco: 3 });
+    // a porta do lado, aberta, e a rampa (a própria porta descida até o chão)
+    const px0 = 506;
+    const px1 = 572;
+    const yB = 568;
+    const porta = pol([[px0, 466], [px1, 464], [px1, yB], [px0, yB + 2]]);
+    k.fillStyle = '#0c0703';
+    k.fill(porta);
+    brilho(k, (px0 + px1) / 2, yB - 24, 50, 'rgba(255,190,110,.25)');
+    k.strokeStyle = '#2a1c0e';
+    k.lineWidth = 4;
+    k.stroke(porta);
+    const rampa = pol([[px0, yB + 2], [px1, yB], [px1 + 112, 742], [px0 + 66, 752]]);
+    sombraNoChao(k, rampa, 14, 6, 8, 0.4);
+    peca(k, rampa, [px0, yB, px1 + 112, 752], { cor: '#8a6642', ang: 0.12, passo: 4, maxL: 1.6, sombra: (x) => 0.22 + (x - px0) / 600, tinta: '#140c05', obj, traco: 2.4 });
+    k.strokeStyle = '#140c05';
+    k.lineWidth = 3;
+    for (let t = 0.12; t < 1; t += 0.14) {
+      k.beginPath();
+      k.moveTo(px0 + 66 * t, yB + 2 + (752 - yB) * t);
+      k.lineTo(px1 + 112 * t, yB + (742 - yB) * t);
+      k.stroke();
+    }
+    // as pegadas, duas a duas, vindo pelo chão e subindo a rampa
+    const pegada = (x, y, e, giro) => {
+      k.save();
+      k.translate(x, y);
+      k.rotate(giro);
+      k.fillStyle = 'rgba(43,33,18,.75)';
+      for (const lado of [-1, 1]) { k.beginPath(); k.ellipse(lado * 3.2 * e, 0, 2.6 * e, 5 * e, lado * 0.15, 0, 6.283); k.fill(); }
+      k.restore();
+    };
+    for (let i = 0; i < 9; i++) {
+      const t = i / 8;
+      const x = 800 - t * 190 + Math.sin(t * 5) * 8;
+      const y = 800 - t * 230;
+      const e = 1.4 - t * 0.5;
+      if (y < 586) continue;
+      pegada(x - 12, y + (i % 2) * 8, e, -0.7);
+      pegada(x + 12, y + 6 + ((i + 1) % 2) * 8, e, -0.7);
+    }
+    // um par de aves sobre o teto
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.lineCap = 'round';
+    for (const [x, y, e] of [[600, 214, 1], [646, 196, 0.85]]) {
+      k.beginPath();
+      k.moveTo(x - 18 * e, y - 4 * e);
+      k.quadraticCurveTo(x - 8 * e, y - 12 * e, x, y);
+      k.quadraticCurveTo(x + 8 * e, y - 12 * e, x + 18 * e, y - 5 * e);
+      k.stroke();
+    }
+    capim(k, r, 96, 676, 30, 8);
+    capim(k, r, 300, 740, 28, 8);
+    capim(k, r, 420, 790, 24, 7);
+    vinheta(k, W, H, 0.22);
+  }
+  // (3) Abraão e as estrelas (Gn 15.5): de noite, fora da tenda, o céu cheio de estrelas que
+  // não se podem contar, com a Via Láctea atravessando; a tenda de pelo de cabra no alto do
+  // morro, com a porta aberta e a lamparina acesa lá dentro (ele saiu). Gravura em linha
+  // branca sobre o fundo escuro, como na xilogravura.
+  function desenhoAbraao(k, W, H, obj) {
+    const r = sorteio(5301);
+    const g = k.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#100f18');
+    g.addColorStop(0.55, '#1d1a27');
+    g.addColorStop(0.78, '#3b2e30');
+    g.addColorStop(1, '#1a1512');
+    k.fillStyle = g;
+    k.fillRect(0, 0, W, H);
+    papelVelho(k, W, H, r, ['rgba(0,0,0,0)', 'rgba(0,0,0,0)'], [W / 2, H / 2], true);
+    // a linha branca do céu, mais cheia perto do horizonte
+    linhas(k, 0, 0, W, 660, 6, 1.1, (x, y) => 0.12 + (y / 660) ** 2 * 0.7, 'rgba(236,220,186,.4)');
+    // a Via Láctea: uma faixa de luz e de estrelas miúdas, na diagonal
+    const via = (t) => [80 + t * 760, 600 - t * 560];
+    for (let i = 0; i < 26; i++) { const [x, y] = via(i / 25); brilho(k, x + (r() - 0.5) * 40, y + (r() - 0.5) * 40, 70 + r() * 50, 'rgba(230,214,190,.07)'); }
+    for (let i = 0; i < 1100; i++) {
+      const [x, y] = via(r());
+      const d = (r() + r() + r() - 1.5) * 90;
+      const px = x + d * 0.6;
+      const py = y + d * 0.8;
+      k.fillStyle = 'rgba(250,240,214,' + (0.25 + r() * 0.5).toFixed(3) + ')';
+      k.fillRect(px, py, 1.4, 1.4);
+    }
+    // as estrelas: muitas pequenas e algumas grandes, com a cruz de luz
+    const morroY = (x) => 650 - 40 * Math.exp(-(((x - 320) / 300) ** 2)) + Math.sin(x * 0.02) * 6;
+    estrelasDoCeu(k, r, 30, 30, W - 30, 660, 900, (x, y) => y > morroY(x) - 10);
+    for (let i = 0; i < 16; i++) {
+      const x = 60 + r() * (W - 120);
+      const y = 60 + r() * 440;
+      const t = 5 + r() * 12;
+      if (y > 440 && x < 600) continue;
+      brilho(k, x, y, t * 2.2, 'rgba(255,236,190,.35)');
+      estrelinha(k, x, y, t, 'rgba(255,248,226,.95)');
+    }
+    // o morro, escuro, com a linha da crista
+    const morro = new Path2D();
+    morro.moveTo(-10, H + 10);
+    for (let x = -10; x <= W + 10; x += 8) morro.lineTo(x, morroY(x));
+    morro.lineTo(W + 10, H + 10);
+    morro.closePath();
+    k.fillStyle = '#16120f';
+    k.fill(morro);
+    gravar(k, morro, W / 2, 720, 520, 0.08, 7, 1.1, (x, y) => 0.45 - (y - 560) / 900, 'rgba(236,214,170,.35)', 0);
+    k.strokeStyle = 'rgba(240,222,180,.6)';
+    k.lineWidth = 1.6;
+    k.beginPath();
+    for (let x = -10; x <= W + 10; x += 8) (x < 0 ? k.moveTo(x, morroY(x)) : k.lineTo(x, morroY(x)));
+    k.stroke();
+    // a tenda: baixa e larga, os três esteios levantando o teto, as faixas do pano de pelo de
+    // cabra e a parede da frente com a porta aberta
+    const B = 664;
+    const tx0 = 120;
+    const tx1 = 520;
+    const tc = (tx0 + tx1) / 2;
+    const tenda = new Path2D();
+    tenda.moveTo(tx0 - 36, B);
+    tenda.lineTo(tx0, B - 96);
+    tenda.quadraticCurveTo(tx0 + 30, B - 120, tx0 + 64, B - 152);
+    tenda.quadraticCurveTo(tx0 + 120, B - 120, tc, B - 166);
+    tenda.quadraticCurveTo(tx1 - 120, B - 120, tx1 - 64, B - 152);
+    tenda.quadraticCurveTo(tx1 - 30, B - 120, tx1, B - 96);
+    tenda.lineTo(tx1 + 36, B);
+    tenda.closePath();
+    const pd = tc + 40;
+    brilho(k, pd, B, 150, 'rgba(255,190,100,.42)');
+    k.fillStyle = 'rgba(0,0,0,.5)';
+    k.fillRect(tx0 - 40, B - 2, tx1 - tx0 + 80, 10);
+    peca(k, tenda, [tx0 - 36, B - 166, tx1 + 36, B], { cor: '#2b221d', tinta: 'rgba(240,216,170,.55)', ang: 1.5, passo: 5, maxL: 1.3, sombra: (x, y) => (y < B - 96 ? 0.25 : 0.4) + Math.abs(x - pd) / 600, cruzada: 1, traco: 0, obj });
+    k.save();
+    k.clip(tenda);
+    for (let y = B - 166; y < B - 96; y += 18) { k.fillStyle = 'rgba(150,120,86,.3)'; k.fillRect(tx0 - 40, y, tx1 - tx0 + 80, 7); }
+    k.fillStyle = 'rgba(0,0,0,.35)';
+    k.fillRect(tx0 - 40, B - 98, tx1 - tx0 + 80, 10);
+    k.restore();
+    k.strokeStyle = 'rgba(244,224,180,.85)';
+    k.lineWidth = 2;
+    k.stroke(tenda);
+    k.beginPath();
+    k.moveTo(tx0, B - 96);
+    k.lineTo(tx1, B - 96);
+    k.stroke();
+    // a porta: o dentro aceso, a lamparina no chão e a aba dobrada de lado
+    const porta = pol([[pd - 36, B], [pd - 34, B - 92], [pd + 34, B - 92], [pd + 36, B]]);
+    const gp = k.createLinearGradient(0, B - 92, 0, B);
+    gp.addColorStop(0, '#6e421a');
+    gp.addColorStop(1, '#f4bc66');
+    k.fillStyle = gp;
+    k.fill(porta);
+    gravar(k, porta, pd, B - 46, 60, 0, 4, 1.2, (x, y) => 0.8 - (y - B + 92) / 110, '#3a2410', 0);
+    k.strokeStyle = '#120d0a';
+    k.lineWidth = 2;
+    k.stroke(porta);
+    const lamp = pol([[pd - 15, B - 12], [pd + 15, B - 12], [pd + 8, B - 5], [pd - 8, B - 5]]);
+    k.fillStyle = '#3a2410';
+    k.fill(lamp);
+    k.fillStyle = '#fff1b8';
+    k.fill(chama(pd + 12, B - 12, 7, 16, 2));
+    brilho(k, pd + 12, B - 20, 46, 'rgba(255,230,160,.85)');
+    const aba = pol([[pd + 34, B - 92], [pd + 70, B - 92], [pd + 40, B - 20]]);
+    peca(k, aba, [pd + 34, B - 92, pd + 70, B - 20], { cor: '#3a2e26', tinta: 'rgba(240,216,170,.7)', ang: 1.2, passo: 4, maxL: 1, sombra: () => 0.4, cruzada: 1, traco: 1.6, obj });
+    // as cordas e as estacas
+    k.strokeStyle = 'rgba(240,222,180,.7)';
+    for (const [x, y, dx] of [[tx0, B - 96, -80], [tx0 + 64, B - 152, -150], [tx1, B - 96, 80], [tx1 - 64, B - 152, 150]]) {
+      k.lineWidth = 1.4;
+      k.beginPath();
+      k.moveTo(x, y);
+      k.lineTo(x + dx, B + 14);
+      k.stroke();
+      k.lineWidth = 3;
+      k.beginPath();
+      k.moveTo(x + dx, B + 8);
+      k.lineTo(x + dx + 3, B + 20);
+      k.stroke();
+    }
+    vinheta(k, W, H, 0.35);
+  }
+  // (4) O riso de Sara (Gn 21.1-7): Isaque nasceu quando Abraão tinha cem anos. Na sombra do
+  // toldo da tenda, o berço de pano pendurado na trave, com a manta dobrada e um chocalho de
+  // barro; encostados no esteio, os dois cajados gastos dos velhos. Lá fora, o sol do
+  // deserto.
+  function desenhoSara(k, W, H, obj) {
+    const r = sorteio(5401);
+    papelVelho(k, W, H, r, ['#fdf3d8', '#f0dcae', '#d6b984'], [W * 0.85, 360]);
+    // lá fora: o horizonte claro e o chão de areia
+    linhas(k, 0, 300, W, 520, 7, 1, (x, y) => 0.1 + Math.abs(x - 750) / 1600);
+    const fm = onda(r, 3, 0.01);
+    const morro = pol([[-10, 540], ...Array.from({ length: 46 }, (_, i) => [i * 20, 500 + fm(i * 20) * 10]), [W + 10, 540]]);
+    peca(k, morro, [0, 480, W, 540], { cor: '#e6d3a8', ang: -0.1, passo: 6, maxL: 1, sombra: () => 0.5, traco: 1.4 });
+    const chao = new Path2D();
+    chao.rect(-10, 530, W + 20, H);
+    k.fillStyle = '#e2cb9a';
+    k.fill(chao);
+    linhas(k, 0, 530, W, H, 6, 1.6, (x, y) => 0.15 + (y - 530) / 600);
+    // o toldo: o pano listrado da tenda, esticado no alto, com a beirada em franja
+    const beira = (x) => 236 + (x - 40) * 0.07 + Math.sin(x * 0.012) * 8;
+    const toldo = new Path2D();
+    toldo.moveTo(-10, -10);
+    toldo.lineTo(W + 10, -10);
+    for (let x = W + 10; x >= -10; x -= 10) toldo.lineTo(x, beira(x));
+    toldo.closePath();
+    // a sombra do toldo no chão, à esquerda (o sol vem da direita)
+    k.save();
+    k.filter = 'blur(10px)';
+    k.fillStyle = 'rgba(60,40,16,.28)';
+    k.beginPath();
+    k.moveTo(-10, 560);
+    k.lineTo(620, 560);
+    k.lineTo(520, 780);
+    k.lineTo(-10, 780);
+    k.fill();
+    k.restore();
+    // o fundo da tenda, escuro, entre os esteios
+    const fundo = pol([[60, beira(60)], [700, beira(700)], [700, 612], [60, 612]]);
+    peca(k, fundo, [60, 230, 700, 590], { cor: '#5a4128', ang: 1.5, passo: 4.4, maxL: 2, sombra: (x, y) => 0.45 + (590 - y) / 700, tinta: '#140d06', cruzada: 0.7, traco: 0 });
+    k.save();
+    k.clip(fundo);
+    for (let x = 60; x < 700; x += 64) { k.fillStyle = 'rgba(150,118,80,.22)'; k.fillRect(x, 0, 14, 600); }
+    k.restore();
+    // a esteira no chão da tenda
+    const esteira = pol([[100, 610], [670, 610], [740, 712], [30, 712]]);
+    peca(k, esteira, [30, 610, 740, 712], { cor: '#c79a5a', ang: 0, passo: 5, maxL: 1.3, sombra: () => 0.45, traco: 2 });
+    k.save();
+    k.clip(esteira);
+    k.strokeStyle = 'rgba(110,40,20,.6)';
+    k.lineWidth = 6;
+    for (const y of [626, 696]) { k.beginPath(); k.moveTo(0, y); k.lineTo(W, y); k.stroke(); }
+    k.fillStyle = 'rgba(110,40,20,.55)';
+    for (let x = 50; x < 740; x += 36) { k.beginPath(); k.moveTo(x, 661); k.lineTo(x + 10, 652); k.lineTo(x + 20, 661); k.lineTo(x + 10, 670); k.fill(); }
+    k.restore();
+    sombraNoChao(k, toldo, 0, 14, 10, 0.4);
+    peca(k, toldo, [0, 0, W, 300], { cor: '#6e5236', ang: 0.05, passo: 4.6, maxL: 2, sombra: (x, y) => 0.3 + y / 900, tinta: '#140d06', traco: 0 });
+    k.save();
+    k.clip(toldo);
+    for (let y = 30; y < 300; y += 56) { k.fillStyle = 'rgba(236,214,170,.38)'; k.fillRect(0, y, W, 16); }
+    k.restore();
+    k.strokeStyle = '#140d06';
+    k.lineWidth = 3;
+    k.stroke(toldo);
+    k.lineWidth = 2;
+    for (let x = 0; x <= W; x += 14) { k.beginPath(); k.moveTo(x, beira(x)); k.lineTo(x + 2, beira(x) + 12); k.stroke(); }
+    // os esteios e a trave
+    vara(k, [[72, beira(72) + 4], [70, 700]], 12, '#8a6440');
+    vara(k, [[700, beira(700) + 4], [702, 712]], 12, '#8a6440');
+    // o cajado gasto, torto e cheio de nós, encostado no esteio da direita
+    const caj = Array.from({ length: 24 }, (_, i) => { const t = i / 23; return [626 + t * 62 + Math.sin(t * 19) * 4, 726 - t * 352 + Math.cos(t * 13) * 2]; });
+    vara(k, caj, 12, '#9a7244', obj);
+    const nob = new Path2D();
+    nob.ellipse(689, 372, 14, 11, 0.4, 0, 6.283);
+    peca(k, nob, [675, 361, 703, 383], { cor: '#8a6238', sombra: sombraOval(689, 372, 14, 11, 0.4), passo: 3, maxL: 1.6, obj, traco: 2 });
+    // o berço de vime sobre a esteira, com a manta dobrada por cima da beirada
+    const bx = 380;
+    const bo = 548;
+    const bb = 652;
+    k.save();
+    k.translate(bx, bb);
+    k.scale(1.18, 1.18);
+    k.translate(-bx, -bb);
+    const corpo = new Path2D();
+    corpo.ellipse(bx, bo, 170, 42, 0, Math.PI, 0, true);
+    corpo.lineTo(bx + 142, bb);
+    corpo.ellipse(bx, bb, 142, 30, 0, 0, Math.PI);
+    corpo.closePath();
+    sombraNoChao(k, pol([[bx - 150, bb], [bx + 160, bb], [bx + 200, bb + 30], [bx - 120, bb + 34]]), 0, 0, 10, 0.5);
+    peca(k, corpo, [bx - 170, bo - 42, bx + 170, bb + 30], { cor: '#c9a066', ang: 0, passo: 4, maxL: 1.4, sombra: (x) => 0.25 + (bx - x) / 500, tinta: '#2e1e0c', cruzada: 1, obj, traco: 2.4 });
+    // a trama do vime: as fiadas curvas e as varetas em pé
+    k.save();
+    k.clip(corpo);
+    for (let i = 1; i < 8; i++) {
+      const t = i / 8;
+      k.strokeStyle = 'rgba(46,30,12,.75)';
+      k.lineWidth = 2.2;
+      k.beginPath();
+      k.ellipse(bx, bo + (bb - bo) * t, 170 - 28 * t, 42 - 12 * t, 0, 0.05, Math.PI - 0.05);
+      k.stroke();
+      k.strokeStyle = 'rgba(255,236,190,.4)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.ellipse(bx, bo + (bb - bo) * t - 4, 170 - 28 * t, 42 - 12 * t, 0, 0.3, Math.PI - 0.3);
+      k.stroke();
+    }
+    k.strokeStyle = 'rgba(46,30,12,.5)';
+    k.lineWidth = 1.4;
+    for (let a = 0.12; a < Math.PI; a += 0.16) {
+      k.beginPath();
+      k.moveTo(bx + Math.cos(a) * 170, bo + Math.sin(a) * 42);
+      k.lineTo(bx + Math.cos(a) * 142, bb + Math.sin(a) * 30);
+      k.stroke();
+    }
+    k.restore();
+    // a boca: o fundo de dentro e o aro de vime trançado
+    const boca = new Path2D();
+    boca.ellipse(bx, bo, 170, 42, 0, 0, 6.283);
+    k.fillStyle = '#4a3218';
+    k.fill(boca);
+    gravar(k, boca, bx, bo, 170, 0, 4, 1.4, (x, y) => 0.5 + (bo - y) / 60, '#1e1206', 0);
+    cordao(k, Array.from({ length: 61 }, (_, i) => [bx + Math.cos(i / 60 * 6.283) * 170, bo + Math.sin(i / 60 * 6.283) * 42]), 9, { cor: '#d8b47a', escuro: '#2e1e0c', luz: 'rgba(255,240,200,.6)' });
+    marcar(k, obj, boca);
+    // a manta: deitada dentro e caindo pela frente
+    const manta = new Path2D();
+    manta.moveTo(bx - 120, bo - 6);
+    manta.bezierCurveTo(bx - 60, bo - 30, bx + 40, bo - 22, bx + 110, bo - 14);
+    manta.bezierCurveTo(bx + 120, bo + 6, bx + 112, bo + 30, bx + 104, bo + 62);
+    manta.lineTo(bx + 30, bo + 70);
+    manta.bezierCurveTo(bx + 34, bo + 50, bx + 30, bo + 40, bx + 24, bo + 34);
+    manta.bezierCurveTo(bx - 30, bo + 34, bx - 90, bo + 30, bx - 120, bo - 6);
+    manta.closePath();
+    peca(k, manta, [bx - 120, bo - 30, bx + 120, bo + 70], { cor: '#f6ecd6', ang: 0.2, passo: 3.8, maxL: 1.6, sombra: (x, y) => 0.12 + (y - bo + 20) / 140, tinta: '#3a2c16', cruzada: 1, obj, traco: 2.2 });
+    k.save();
+    k.clip(manta);
+    k.strokeStyle = 'rgba(160,62,36,.85)';
+    k.lineWidth = 6;
+    for (const d of [30, 46]) { k.beginPath(); k.moveTo(bx + d, bo - 30); k.bezierCurveTo(bx + d + 8, bo, bx + d + 4, bo + 40, bx + d - 2, bo + 80); k.stroke(); }
+    k.restore();
+    k.restore();
+    // o chocalho de barro na esteira
+    const ch = [150, 684];
+    vara(k, [[ch[0] - 8, ch[1] + 4], [ch[0] - 40, ch[1] + 14]], 6, '#b06a3c', obj);
+    const bola = new Path2D();
+    bola.arc(ch[0], ch[1], 15, 0, 6.283);
+    peca(k, bola, [ch[0] - 15, ch[1] - 15, ch[0] + 15, ch[1] + 15], { cor: '#c4794a', sombra: sombraOval(ch[0], ch[1], 15, 15, 0), passo: 3, maxL: 1.6, tinta: '#3a1a08', obj, traco: 1.8 });
+    k.fillStyle = '#3a1a08';
+    for (const [dx, dy] of [[-5, -4], [4, -6], [0, 3]]) { k.beginPath(); k.arc(ch[0] + dx, ch[1] + dy, 1.6, 0, 6.283); k.fill(); }
+    capim(k, r, 820, 600, 30, 8);
+    capim(k, r, 790, 780, 26, 7);
+    vinheta(k, W, H, 0.22);
+  }
+  // Um feixe de trigo ou cevada, de pé em (x, base): os talos se juntam na amarra e se abrem
+  // embaixo e em cima, nas espigas; "giro" inclina o feixe em volta da base (a reverência).
+  function feixe(k, r, x, base, alto, giro, { cor = '#e2b866', tinta = '#3a2a0e', barba = false, obj } = {}) {
+    k.save();
+    k.translate(x, base);
+    k.rotate(giro);
+    const L = alto * 0.3;
+    const p = new Path2D();
+    p.moveTo(-L * 0.62, 0);
+    p.quadraticCurveTo(-L * 0.12, -alto * 0.42, -L * 0.18, -alto * 0.56);
+    p.quadraticCurveTo(-L * 0.9, -alto * 0.86, -L * 0.5, -alto);
+    p.quadraticCurveTo(0, -alto * 1.08, L * 0.5, -alto);
+    p.quadraticCurveTo(L * 0.9, -alto * 0.86, L * 0.18, -alto * 0.56);
+    p.quadraticCurveTo(L * 0.12, -alto * 0.42, L * 0.62, 0);
+    p.closePath();
+    sombraNoChao(k, p, 8, 4, 6, 0.3);
+    peca(k, p, [-L, -alto, L, 0], { cor, tinta, ang: -Math.PI / 2, passo: 3.6, maxL: 1.4, sombra: (px) => 0.2 + (px + L) / (2 * L) * 0.7, cruzada: 0.8, traco: 1.8, obj });
+    // os talos e as espigas
+    k.strokeStyle = tinta;
+    k.lineCap = 'round';
+    for (let i = 0; i < 14; i++) {
+      const t = i / 13 - 0.5;
+      k.lineWidth = 1.1;
+      k.beginPath();
+      k.moveTo(t * L * 1.2, -2);
+      k.quadraticCurveTo(t * L * 0.15, -alto * 0.5, t * L * 0.3, -alto * 0.56);
+      k.stroke();
+      const ex = t * L * 1.5 + (r() - 0.5) * 8;
+      const ey = -alto * (0.86 + Math.cos(t * 3) * 0.12);
+      k.beginPath();
+      k.moveTo(t * L * 0.3, -alto * 0.56);
+      k.quadraticCurveTo(t * L * 0.6, -alto * 0.72, ex, ey);
+      k.stroke();
+      k.save();
+      k.translate(ex, ey);
+      k.rotate(t * 1.2);
+      k.fillStyle = '#c99640';
+      k.beginPath();
+      k.ellipse(0, -alto * 0.06, alto * 0.022, alto * 0.07, 0, 0, 6.283);
+      k.fill();
+      k.lineWidth = 1;
+      k.stroke();
+      for (let g = -2; g <= 2; g++) { k.beginPath(); k.moveTo(-alto * 0.02, -alto * (0.06 + g * 0.025)); k.lineTo(alto * 0.02, -alto * (0.07 + g * 0.025)); k.stroke(); }
+      if (barba) for (const s of [-1, 0, 1]) { k.beginPath(); k.moveTo(s * alto * 0.01, -alto * 0.12); k.lineTo(s * alto * 0.035, -alto * 0.24); k.stroke(); }
+      k.restore();
+    }
+    // a amarra de palha torcida
+    const am = pol([[-L * 0.3, -alto * 0.5], [L * 0.3, -alto * 0.5], [L * 0.28, -alto * 0.585], [-L * 0.28, -alto * 0.585]]);
+    peca(k, am, [-L * 0.3, -alto * 0.59, L * 0.3, -alto * 0.5], { cor: '#b98a3a', tinta, ang: 1, passo: 3, maxL: 1.2, sombra: () => 0.5, traco: 1.6 });
+    k.restore();
+  }
+
+  // (5) Os sonhos de José (Gn 37.5-9): no campo, ao entardecer, os feixes dos irmãos em roda,
+  // inclinados diante do feixe de José, que ficou em pé; no céu, o outro sonho: o sol, a lua e
+  // onze estrelas.
+  function desenhoJose(k, W, H, obj) {
+    const r = sorteio(5501);
+    const hz = 420;
+    const g = k.createLinearGradient(0, 0, 0, hz);
+    g.addColorStop(0, '#2e2a3e');
+    g.addColorStop(0.55, '#7d5f62');
+    g.addColorStop(1, '#efc278');
+    k.fillStyle = g;
+    k.fillRect(0, 0, W, hz + 2);
+    papelVelho(k, W, H, r, ['rgba(0,0,0,0)', 'rgba(0,0,0,0)'], [W / 2, H / 2], true);
+    linhas(k, 0, 0, W, hz, 6, 1.1, (x, y) => 0.2 + (1 - y / hz) * 0.3, 'rgba(250,232,196,.35)');
+    // o sol, baixo, à esquerda, com os raios gravados; a lua à direita
+    const sol = [150, 330];
+    brilho(k, sol[0], sol[1], 230, 'rgba(255,214,130,.6)');
+    k.strokeStyle = 'rgba(255,236,190,.75)';
+    k.lineWidth = 2;
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * 6.283;
+      k.beginPath();
+      k.moveTo(sol[0] + Math.cos(a) * 64, sol[1] + Math.sin(a) * 64);
+      k.lineTo(sol[0] + Math.cos(a) * (i % 2 ? 96 : 120), sol[1] + Math.sin(a) * (i % 2 ? 96 : 120));
+      k.stroke();
+    }
+    const disco = new Path2D();
+    disco.arc(sol[0], sol[1], 56, 0, 6.283);
+    peca(k, disco, [sol[0] - 56, sol[1] - 56, sol[0] + 56, sol[1] + 56], { cor: '#ffe7a6', tinta: '#a8661a', sombra: (x, y) => 0.2 + Math.hypot(x - sol[0], y - sol[1]) / 140, ang: 0, passo: 5, maxL: 1.2, cruzada: 1, traco: 2.4, obj });
+    // a lua crescente: o arco de fora e o de dentro, pelos dois pontos onde se cruzam
+    const lua = new Path2D();
+    const fi = Math.atan2(-12, 22);
+    const dl = Math.hypot(22, 12);
+    const al = Math.acos((50 * 50 - 44 * 44 + dl * dl) / (2 * dl) / 50);
+    const p1 = [730 + Math.cos(fi + al) * 50, 150 + Math.sin(fi + al) * 50];
+    const p2 = [730 + Math.cos(fi - al) * 50, 150 + Math.sin(fi - al) * 50];
+    lua.arc(730, 150, 50, fi + al, fi - al + 6.283);
+    lua.arc(752, 138, 44, Math.atan2(p2[1] - 138, p2[0] - 752), Math.atan2(p1[1] - 138, p1[0] - 752), true);
+    lua.closePath();
+    brilho(k, 724, 154, 120, 'rgba(255,244,214,.25)');
+    peca(k, lua, [680, 100, 780, 200], { cor: '#f8efd4', tinta: '#5a4a3a', sombra: (x) => 0.1 + (x - 680) / 200, ang: 0.4, passo: 4, maxL: 1.2, cruzada: 1, traco: 2, obj });
+    // as onze estrelas, em arco entre o sol e a lua
+    for (let i = 0; i < 11; i++) {
+      const t = i / 10;
+      const x = 250 + t * 400;
+      const y = 214 - Math.sin(t * Math.PI) * 120 + (i % 2) * 14;
+      brilho(k, x, y, 34, 'rgba(255,240,200,.35)');
+      estrelinha(k, x, y, 15, '#fff6dc');
+      const e = new Path2D();
+      e.arc(x, y, 8, 0, 6.283);
+      marcar(k, obj, e);
+    }
+    // o campo ceifado, no fim do dia
+    const campo = new Path2D();
+    campo.rect(-10, hz, W + 20, H);
+    const gc = k.createLinearGradient(0, hz, 0, H);
+    gc.addColorStop(0, '#d7b673');
+    gc.addColorStop(1, '#b38c4c');
+    k.fillStyle = gc;
+    k.fill(campo);
+    linhas(k, 0, hz, W, H, 5.5, 1.6, (x, y) => 0.2 + (y - hz) / 700);
+    k.strokeStyle = 'rgba(58,42,14,.6)';
+    k.lineWidth = 1.2;
+    for (let i = 0; i < 260; i++) {
+      const x = r() * W;
+      const y = hz + 10 + r() * (H - hz);
+      const h = 4 + (y - hz) / 40;
+      k.beginPath();
+      k.moveTo(x, y);
+      k.lineTo(x + (r() - 0.5) * 3, y - h);
+      k.stroke();
+    }
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.beginPath();
+    k.moveTo(0, hz);
+    k.lineTo(W, hz);
+    k.stroke();
+    // a roda dos onze feixes inclinados e o feixe de José, em pé, no meio
+    const cx = W / 2;
+    const cy = 600;
+    const roda = Array.from({ length: 11 }, (_, i) => (i + 0.5) / 11 * 6.283 + Math.PI / 2 - 2.5 / 11 * 6.283 + 0.0);
+    const um = (a) => {
+      const sx = Math.cos(a);
+      const sy = Math.sin(a);
+      const e = 0.78 + sy * 0.22;
+      feixe(k, r, cx + sx * 300, cy + sy * 120, 170 * e, -sx * 0.55, { obj });
+    };
+    for (const a of roda.filter((a) => Math.sin(a) < 0)) um(a);
+    feixe(k, r, cx, cy + 10, 300, 0, { cor: '#f0c874', obj });
+    brilho(k, cx, cy - 220, 120, 'rgba(255,230,160,.3)', 'screen');
+    for (const a of roda.filter((a) => Math.sin(a) >= 0).sort((a, b) => Math.sin(a) - Math.sin(b))) um(a);
+    vinheta(k, W, H, 0.25);
+  }
+
+  // Um junco de papiro: a haste de três quinas, um pouco curva, e a cabeleira em leque no alto.
+  function papiro(k, r, x, base, alto, giro, tinta = SEPIA, cor = '#8f8a58') {
+    const tx = x + Math.sin(giro) * alto;
+    const ty = base - Math.cos(giro) * alto;
+    k.strokeStyle = tinta;
+    k.lineCap = 'round';
+    k.lineWidth = 6;
+    k.beginPath();
+    k.moveTo(x, base);
+    k.quadraticCurveTo(x + (tx - x) * 0.3 + giro * 40, (base + ty) / 2, tx, ty);
+    k.stroke();
+    k.strokeStyle = cor;
+    k.lineWidth = 3;
+    k.stroke();
+    k.strokeStyle = tinta;
+    k.lineWidth = 1.2;
+    for (let i = 0; i < 26; i++) {
+      const a = giro - Math.PI / 2 + (i / 25 - 0.5) * 2.6;
+      const c = alto * (0.12 + r() * 0.06);
+      k.beginPath();
+      k.moveTo(tx, ty);
+      k.quadraticCurveTo(tx + Math.cos(a) * c * 0.6, ty + Math.sin(a) * c * 0.6 - 4, tx + Math.cos(a) * c, ty + Math.sin(a) * c + c * 0.25);
+      k.stroke();
+    }
+  }
+  // Água em linhas: ondinhas horizontais quebradas, mais densas embaixo.
+  function agua(k, r, x0, y0, x1, y1, tinta = SEPIA) {
+    k.strokeStyle = tinta;
+    k.lineCap = 'round';
+    for (let y = y0 + 4; y < y1; y += 5 + (y - y0) * 0.012) {
+      let x = x0 - r() * 40;
+      while (x < x1) {
+        const c = 20 + r() * 60;
+        k.lineWidth = 0.8 + (y - y0) / (y1 - y0) * 1.4;
+        k.beginPath();
+        k.moveTo(x, y);
+        k.quadraticCurveTo(x + c / 2, y + (r() - 0.5) * 4, x + c, y);
+        k.stroke();
+        x += c + 6 + r() * 30;
+      }
+    }
+  }
+
+  // (6) Moisés no cesto (Êx 2.3): o cesto de junco vedado com betume (escuro e brilhante),
+  // com a tampa, entre os juncos à beira do Nilo.
+  function desenhoMoises(k, W, H, obj) {
+    const r = sorteio(5601);
+    papelVelho(k, W, H, r, ['#f6efd8', '#e6dcb8', '#c9bb8e'], [W * 0.7, 140]);
+    linhas(k, 0, 0, W, 380, 7, 1, (x, y) => 0.08 + Math.hypot(x - 620, y - 100) / 1600);
+    // a outra margem, longe, com palmeiras
+    const fm = onda(r, 3, 0.01);
+    const outra = pol([[-10, 420], ...Array.from({ length: 46 }, (_, i) => [i * 20, 372 + fm(i * 20) * 8]), [W + 10, 420]]);
+    peca(k, outra, [0, 360, W, 420], { cor: '#d8cfa4', ang: -0.1, passo: 5, maxL: 1.1, sombra: () => 0.55, traco: 1.4 });
+    for (const [x, h] of [[640, 70], [676, 58], [760, 76]]) {
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 3;
+      k.beginPath();
+      k.moveTo(x, 380);
+      k.quadraticCurveTo(x + 6, 380 - h / 2, x + 2, 380 - h);
+      k.stroke();
+      k.lineWidth = 2;
+      for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + (i / 6 - 0.5) * 3; k.beginPath(); k.moveTo(x + 2, 380 - h); k.quadraticCurveTo(x + 2 + Math.cos(a) * 14, 380 - h + Math.sin(a) * 14 - 6, x + 2 + Math.cos(a) * 26, 380 - h + Math.sin(a) * 26 + 8); k.stroke(); }
+    }
+    // o rio
+    const rio = new Path2D();
+    rio.rect(-10, 410, W + 20, H);
+    const gr = k.createLinearGradient(0, 410, 0, H);
+    gr.addColorStop(0, '#e2dcbc');
+    gr.addColorStop(1, '#b7ae86');
+    k.fillStyle = gr;
+    k.fill(rio);
+    agua(k, r, 0, 414, W, H, 'rgba(43,33,18,.7)');
+    // os juncos de trás, claros
+    for (let i = 0; i < 26; i++) papiro(k, r, 40 + i * 32 + (r() - 0.5) * 20, 560 + r() * 30, 180 + r() * 120, (r() - 0.5) * 0.4, 'rgba(43,33,18,.55)', '#b7b384');
+    // o cesto: o corpo de junco em espiral (as voltas aparecem sob o betume), a tampa abaulada
+    // e a amarra; escuro e brilhante do betume
+    const cx = 444;
+    const cy = 590;
+    const R = 190;
+    const corpo = new Path2D();
+    corpo.ellipse(cx, cy, R, 40, 0, Math.PI, 0, true);
+    corpo.bezierCurveTo(cx + R, cy + 60, cx + R * 0.6, cy + 92, cx, cy + 92);
+    corpo.bezierCurveTo(cx - R * 0.6, cy + 92, cx - R, cy + 60, cx - R, cy);
+    corpo.closePath();
+    const tampa = new Path2D();
+    tampa.moveTo(cx - R - 8, cy);
+    tampa.bezierCurveTo(cx - R + 10, cy - 150, cx + R - 10, cy - 150, cx + R + 8, cy);
+    tampa.ellipse(cx, cy, R + 8, 42, 0, 0, Math.PI);
+    tampa.closePath();
+    // o reflexo escuro na água
+    const wl = cy + 80;
+    k.save();
+    k.filter = 'blur(5px)';
+    k.globalAlpha = 0.4;
+    k.translate(0, wl);
+    k.scale(1, -0.5);
+    k.translate(0, -wl);
+    k.fillStyle = '#2a1d10';
+    k.fill(corpo);
+    k.fill(tampa);
+    k.restore();
+    const voltas = (p, y0, y1, rx0, rx1, ry) => {
+      k.save();
+      k.clip(p);
+      for (let y = y0; y < y1; y += 11) {
+        const t = (y - y0) / (y1 - y0);
+        const rx = rx0 + (rx1 - rx0) * t;
+        k.strokeStyle = 'rgba(10,6,2,.85)';
+        k.lineWidth = 2.6;
+        k.beginPath();
+        k.ellipse(cx, y, rx, ry, 0, 0.02, Math.PI - 0.02);
+        k.stroke();
+        k.strokeStyle = 'rgba(255,226,170,.28)';
+        k.lineWidth = 1.4;
+        k.beginPath();
+        k.ellipse(cx, y - 4, rx, ry, 0, 0.5, Math.PI - 0.2);
+        k.stroke();
+      }
+      k.restore();
+    };
+    peca(k, corpo, [cx - R, cy - 40, cx + R, cy + 92], { cor: '#3b2a18', tinta: '#0e0904', ang: 0.04, passo: 3.6, maxL: 1.6, sombra: (x, y) => 0.4 + (y - cy) / 200 + (x - cx) / 900, cruzada: 0.75, traco: 2.6, obj });
+    voltas(corpo, cy + 8, cy + 100, R, R * 0.7, 36);
+    peca(k, tampa, [cx - R - 8, cy - 150, cx + R + 8, cy + 42], { cor: '#4a3520', tinta: '#0e0904', ang: 0.04, passo: 3.6, maxL: 1.6, sombra: (x, y) => 0.25 + (x - cx) / 700 + (y - cy + 100) / 400, cruzada: 0.75, traco: 2.6, obj });
+    voltas(tampa, cy - 112, cy + 30, R * 0.4, R + 8, 30);
+    k.save();
+    k.clip(tampa);
+    brilho(k, cx - 80, cy - 80, 120, 'rgba(255,236,196,.45)', 'screen');
+    k.restore();
+    k.save();
+    k.clip(corpo);
+    brilho(k, cx - 100, cy + 40, 100, 'rgba(255,236,196,.25)', 'screen');
+    k.restore();
+    // a beirada da tampa e a amarra de junco
+    cordao(k, Array.from({ length: 31 }, (_, i) => [cx + Math.cos(i / 30 * Math.PI) * (R + 8), cy + Math.sin(i / 30 * Math.PI) * 42]), 8, { cor: '#6b4c2a', escuro: '#0e0904', luz: 'rgba(255,226,170,.5)' });
+    for (const d of [-70, 70]) cordao(k, bezier([cx + d * 0.5, cy - 112], [cx + d * 0.9, cy - 80], [cx + d * 1.05, cy - 10], [cx + d, cy + 90], 20), 6, { cor: '#c9a86a', escuro: '#1e1408' });
+    // a água batendo no cesto
+    k.strokeStyle = 'rgba(250,244,224,.8)';
+    k.lineWidth = 2;
+    for (let i = 0; i < 4; i++) { k.beginPath(); k.ellipse(cx, wl + i * 9, R + 10 + i * 30, 10 + i * 3, 0, 0.1, Math.PI - 0.1); k.stroke(); }
+    // os juncos da frente, escuros, de um lado e do outro
+    for (let i = 0; i < 9; i++) papiro(k, r, 30 + i * 22 + (r() - 0.5) * 10, 840, 300 + r() * 160, -0.1 + (r() - 0.5) * 0.3);
+    for (let i = 0; i < 8; i++) papiro(k, r, 690 + i * 24 + (r() - 0.5) * 10, 840, 280 + r() * 160, 0.1 + (r() - 0.5) * 0.3);
+    vinheta(k, W, H, 0.22);
+  }
+
+  // (7) A corda vermelha de Raabe (Js 2.15-21): a casa de Raabe fazia parte do muro de Jericó;
+  // da janela, a corda de fios vermelhos amarrada e caída pelo muro; ao longe, as montanhas
+  // (para onde os espiões fugiram).
+  function desenhoRaabe(k, W, H, obj) {
+    const r = sorteio(5701);
+    papelVelho(k, W, H, r, ['#fbf1d8', '#ecdab2', '#d2b886'], [W * 0.2, 80]);
+    linhas(k, 0, 0, W, 200, 7, 1, (x, y) => 0.08 + x / 2400 + y / 1200);
+    const fm = onda(r, 4, 0.008);
+    const mont = pol([[-10, 200], ...Array.from({ length: 46 }, (_, i) => [i * 20, 120 + fm(i * 20) * 26 + Math.abs(i - 30) * 1.2]), [W + 10, 200]]);
+    peca(k, mont, [0, 60, W, 200], { cor: '#e2d0a6', ang: -0.5, passo: 5, maxL: 1.2, sombra: (x) => 0.4 + Math.sin(x * 0.02) * 0.2, traco: 1.6 });
+    // o muro: fiadas de pedra, mais altas embaixo, com o alto em ameias
+    const topo = 170;
+    const chao = 782;
+    const muro = new Path2D();
+    muro.moveTo(-10, chao);
+    muro.lineTo(-10, topo);
+    for (let x = -10; x < W + 10; x += 74) { muro.lineTo(x + 40, topo); muro.lineTo(x + 40, topo - 30); muro.lineTo(x + 74, topo - 30); muro.lineTo(x + 74, topo); }
+    muro.lineTo(W + 10, chao);
+    muro.closePath();
+    k.fillStyle = '#ddc898';
+    k.fill(muro);
+    k.save();
+    k.clip(muro);
+    let y = topo - 30;
+    let fiada = 0;
+    while (y < chao) {
+      const h = 34 + fiada * 3.2 + r() * 6;
+      let x = -10 - r() * 60;
+      while (x < W + 10) {
+        const w = 70 + r() * 70 + fiada * 4;
+        const pedra = new Path2D();
+        pedra.moveTo(x + 4, y + 3);
+        pedra.lineTo(x + w - 4, y + 2 + (r() - 0.5) * 3);
+        pedra.lineTo(x + w - 3, y + h - 3);
+        pedra.lineTo(x + 3, y + h - 2);
+        pedra.closePath();
+        const t = 0.15 + r() * 0.25;
+        peca(k, pedra, [x, y, x + w, y + h], { cor: r() < 0.5 ? '#d9c391' : '#cfb682', ang: 0.6 + (r() - 0.5) * 0.4, passo: 4.4, maxL: 1.9, sombra: (px, py) => t + (py - y) / h * 0.35 + (px - x) / w * 0.2, cruzada: 0.7, traco: 1.6 });
+        x += w;
+      }
+      y += h;
+      fiada++;
+    }
+    k.restore();
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.stroke(muro);
+    // a janela da casa de Raabe, no alto do muro: o batente, o escuro e o lintel
+    const jx = 400;
+    const jy = 268;
+    const jw = 110;
+    const jh = 120;
+    sombraNoChao(k, pol([[jx - 18, jy - 22], [jx + jw + 18, jy - 22], [jx + jw + 18, jy + jh + 16], [jx - 18, jy + jh + 16]]), 6, 8, 8, 0.35);
+    const batente = pol([[jx - 18, jy - 22], [jx + jw + 18, jy - 22], [jx + jw + 18, jy + jh + 16], [jx - 18, jy + jh + 16]]);
+    peca(k, batente, [jx - 18, jy - 22, jx + jw + 18, jy + jh + 16], { cor: '#a07a4c', ang: 0, passo: 3.6, maxL: 1.5, sombra: () => 0.45, traco: 2.4, obj });
+    const vao = pol([[jx, jy], [jx + jw, jy], [jx + jw, jy + jh], [jx, jy + jh]]);
+    k.fillStyle = '#1a120a';
+    k.fill(vao);
+    gravar(k, vao, jx + jw / 2, jy + jh / 2, 90, 0.8, 4, 1.4, () => 0.6, '#000', 0);
+    // a corda de fios vermelhos: amarrada no batente, cai pelo muro até perto do chão
+    const nx = jx + 40;
+    const ny = jy + jh + 6;
+    // a corda vem lá de dentro (amarrada na janela), passa pela soleira e cai pelo muro
+    const fio = bezier([nx + 4, jy + jh - 36], [nx + 10, jy + jh - 6], [nx - 2, ny - 4], [nx, ny + 4], 12).concat(bezier([nx, ny + 4], [nx + 30, ny + 140], [nx - 30, ny + 300], [nx + 6, 744], 60));
+    cordao(k, fio, 10, { cor: '#c4392a', escuro: '#3a0e08', luz: 'rgba(255,196,170,.6)' });
+    marcar(k, obj, pol(fio, false), 16);
+    k.lineWidth = 1.6;
+    for (let i = -2; i <= 2; i++) { k.beginPath(); k.moveTo(nx + 6, 744); k.lineTo(nx + 6 + i * 4, 760 + Math.abs(i) * 2); k.strokeStyle = '#a82a1e'; k.stroke(); }
+    // o chão ao pé do muro
+    const base = new Path2D();
+    base.rect(-10, chao, W + 20, H);
+    k.fillStyle = '#d6bf8e';
+    k.fill(base);
+    linhas(k, 0, chao, W, H, 5, 1.5, () => 0.5);
+    capim(k, r, 120, chao + 4, 30, 9);
+    capim(k, r, 300, chao + 2, 22, 7);
+    capim(k, r, 700, chao + 4, 34, 9);
+    vinheta(k, W, H, 0.22);
+  }
+
+  // (8) Gideão e as tochas (Jz 7.16-20): de noite, os vasos de barro com a tocha dentro; um
+  // quebrado, com a tocha acesa saindo dos cacos, e a corneta de chifre no chão. Lá embaixo,
+  // no vale, as tendas do acampamento.
+  function desenhoGideao(k, W, H, obj) {
+    const r = sorteio(5801);
+    const g = k.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#120f14');
+    g.addColorStop(0.5, '#221a1a');
+    g.addColorStop(1, '#2e2016');
+    k.fillStyle = g;
+    k.fillRect(0, 0, W, H);
+    papelVelho(k, W, H, r, ['rgba(0,0,0,0)', 'rgba(0,0,0,0)'], [W / 2, H / 2], true);
+    linhas(k, 0, 0, W, 400, 6, 1, (x, y) => 0.12 + y / 1400, 'rgba(236,214,170,.3)');
+    estrelasDoCeu(k, r, 30, 30, W - 30, 300, 220);
+    // o vale e as tendas de Midiã, lá embaixo
+    const fm = onda(r, 3, 0.01);
+    const vale = pol([[-10, 520], ...Array.from({ length: 46 }, (_, i) => [i * 20, 380 + fm(i * 20) * 14 + Math.abs(i - 23) * 1.4]), [W + 10, 520]]);
+    k.fillStyle = '#1c1612';
+    k.fill(vale);
+    gravar(k, vale, W / 2, 450, 480, 0, 6, 1, () => 0.5, 'rgba(236,214,170,.28)', 0);
+    k.strokeStyle = 'rgba(236,214,170,.5)';
+    k.lineWidth = 1.4;
+    for (let i = 0; i < 26; i++) {
+      const x = 40 + r() * (W - 80);
+      const yy = 410 + r() * 40;
+      const w = 14 + r() * 10;
+      k.beginPath();
+      k.moveTo(x - w, yy);
+      k.lineTo(x, yy - w * 0.8);
+      k.lineTo(x + w, yy);
+      k.stroke();
+    }
+    // o chão do morro, perto
+    const chao = pol([[-10, H + 10], [-10, 560], [200, 530], [520, 548], [W + 10, 520], [W + 10, H + 10]]);
+    k.fillStyle = '#2a1f17';
+    k.fill(chao);
+    gravar(k, chao, W / 2, 690, 520, 0.05, 6, 1.3, (x, y) => 0.4 + (y - 540) / 900, 'rgba(236,214,170,.3)', 0);
+    // a luz da tocha no chão
+    const tx = 470;
+    brilho(k, tx, 600, 420, 'rgba(255,170,70,.32)');
+    // um vaso de barro: o perfil de cântaro, a hachura e a luz da tocha de um lado
+    const cantaro = (t) => (t < 0.12 ? 0.42 + t : t < 0.3 ? 0.54 + (t - 0.12) * 2.2 : 0.94 - Math.pow((t - 0.3) / 0.7, 2) * 0.5);
+    const umVaso = (cx, base, alt, larg, luzX) => {
+      const p = vaso(k, cx, base, alt, larg, cantaro);
+      sombraNoChao(k, pol([[cx - larg * 0.4, base], [cx + larg * 0.4, base], [cx + larg * 0.4 - (luzX - cx) * 0.4, base + 22], [cx - larg * 0.4 - (luzX - cx) * 0.4, base + 22]]), 0, 0, 8, 0.6);
+      const dir = Math.sign(luzX - cx);
+      peca(k, p, [cx - larg / 2, base - alt, cx + larg / 2, base], { cor: '#a8643a', tinta: '#1a0c04', ang: 0.2, passo: 3.8, maxL: 2.2, sombra: (x, y) => 0.42 - (x - cx) * dir / larg * 0.9 + (y - base + alt) / alt * 0.15, cruzada: 0.72, traco: 2.4, obj, abaulado: 0.2 });
+      // a boca: o escuro e a luz da tocha escondida lá dentro
+      const boca = new Path2D();
+      boca.ellipse(cx, base - alt + 2, larg * 0.21, larg * 0.06, 0, 0, 6.283);
+      k.fillStyle = '#ffcf7a';
+      k.fill(boca);
+      brilho(k, cx, base - alt - 10, larg * 0.5, 'rgba(255,190,90,.55)');
+      k.strokeStyle = '#1a0c04';
+      k.lineWidth = 2;
+      k.stroke(boca);
+    };
+    umVaso(200, 700, 200, 150, tx);
+    umVaso(720, 676, 180, 136, tx);
+    // o vaso quebrado: o fundo que ficou, os cacos em volta e a tocha acesa saindo dele
+    const bx = tx;
+    const bb = 760;
+    const fundo = new Path2D();
+    fundo.moveTo(bx - 82, bb - 70);
+    fundo.lineTo(bx - 60, bb - 92);
+    fundo.lineTo(bx - 34, bb - 64);
+    fundo.lineTo(bx - 4, bb - 100);
+    fundo.lineTo(bx + 26, bb - 70);
+    fundo.lineTo(bx + 56, bb - 96);
+    fundo.lineTo(bx + 84, bb - 66);
+    fundo.bezierCurveTo(bx + 84, bb - 20, bx + 50, bb, bx, bb);
+    fundo.bezierCurveTo(bx - 50, bb, bx - 84, bb - 20, bx - 82, bb - 70);
+    fundo.closePath();
+    // a tocha: o cabo de madeira e o pano enrolado em chamas
+    vara(k, [[bx - 6, bb - 30], [bx + 20, bb - 300]], 14, '#7a5432', obj);
+    const trapo = pol([[bx + 4, bb - 250], [bx + 32, bb - 248], [bx + 36, bb - 300], [bx + 4, bb - 302]]);
+    peca(k, trapo, [bx + 4, bb - 302, bx + 36, bb - 248], { cor: '#4a3020', tinta: '#140a04', ang: 0.5, passo: 3, maxL: 1.4, sombra: () => 0.5, traco: 2, obj });
+    fogo(k, r, bx + 22, bb - 286, 150, 250, 8);
+    brilho(k, bx + 24, bb - 360, 200, 'rgba(255,220,140,.35)', 'screen');
+    sombraNoChao(k, fundo, -18, 12, 8, 0.6);
+    peca(k, fundo, [bx - 86, bb - 100, bx + 86, bb], { cor: '#a6623a', tinta: '#1a0c04', ang: 0.2, passo: 3.6, maxL: 2, sombra: (x, y) => 0.15 + Math.abs(x - bx) / 200 + (y - bb + 100) / 300, cruzada: 0.75, traco: 2.4, obj, abaulado: 0.2 });
+    const cacos = [[bx - 170, bb + 20, 0.4], [bx + 140, bb + 10, -0.6], [bx + 210, bb - 20, 1.2], [bx - 120, bb + 50, -1], [bx + 60, bb + 50, 0.3]];
+    for (const [x, y, gi] of cacos) {
+      const p = new Path2D();
+      p.moveTo(x - 30, y);
+      p.quadraticCurveTo(x, y - 26, x + 34, y - 4);
+      p.lineTo(x + 18, y + 12);
+      p.lineTo(x - 8, y + 6);
+      p.closePath();
+      k.save();
+      k.translate(x, y);
+      k.rotate(gi);
+      k.translate(-x, -y);
+      peca(k, p, [x - 30, y - 26, x + 34, y + 12], { cor: '#b06c40', tinta: '#1a0c04', ang: 0.8, passo: 3.4, maxL: 1.6, sombra: () => 0.45, cruzada: 1, traco: 2, obj });
+      k.restore();
+    }
+    // a corneta de chifre de carneiro, deitada na frente
+    const ch = bezier([150, 800], [260, 830], [420, 816], [520, 742], 30);
+    for (let i = ch.length - 1; i > 0; i--) {
+      const [x, y] = ch[i];
+      const raio = 6 + (i / ch.length) ** 1.6 * 34;
+      const p = new Path2D();
+      p.ellipse(x, y, raio, raio * 0.9, 0, 0, 6.283);
+      k.fillStyle = i % 4 === 0 ? '#bf9a62' : '#d9b77e';
+      k.fill(p);
+      marcar(k, obj, p);
+    }
+    const chifre = new Path2D();
+    const lado = (s) => ch.map(([x, y], i) => { const raio = 6 + (i / ch.length) ** 1.6 * 34; const j = Math.min(i, ch.length - 2); const a = Math.atan2(ch[j + 1][1] - ch[j][1], ch[j + 1][0] - ch[j][0]); return [x - Math.sin(a) * raio * s, y + Math.cos(a) * raio * s]; });
+    const l1 = lado(1);
+    const l2 = lado(-1);
+    l1.forEach(([x, y], i) => (i ? chifre.lineTo(x, y) : chifre.moveTo(x, y)));
+    l2.reverse().forEach(([x, y]) => chifre.lineTo(x, y));
+    chifre.closePath();
+    peca(k, chifre, [130, 700, 560, 840], { tinta: '#1a0c04', ang: 1.3, passo: 3.6, maxL: 1.8, sombra: (x, y) => 0.2 + (y - 740) / 160, cruzada: 0.8, traco: 2.4 });
+    const [ex, ey] = ch[ch.length - 1];
+    const bocal = new Path2D();
+    bocal.ellipse(ex, ey, 18, 36, 0.7, 0, 6.283);
+    k.fillStyle = '#2a1a0a';
+    k.fill(bocal);
+    k.strokeStyle = '#1a0c04';
+    k.lineWidth = 2.4;
+    k.stroke(bocal);
+    vinheta(k, W, H, 0.4);
+  }
+
+  // Uma espiga de cevada ao longo do caminho (x0, y0) -> (x1, y1): os grãos alternados dos dois
+  // lados e as barbas compridas, que são o que distingue a cevada.
+  function espiga(k, x0, y0, x1, y1, larg, tinta = '#3a2a0e', cor = '#e6c070') {
+    const n = 9;
+    const a = Math.atan2(y1 - y0, x1 - x0);
+    const ca = Math.cos(a);
+    const sa = Math.sin(a);
+    k.lineCap = 'round';
+    for (let i = 0; i < n; i++) {
+      const t = i / n;
+      const px = x0 + (x1 - x0) * t;
+      const py = y0 + (y1 - y0) * t;
+      for (const lado of [-1, 1]) {
+        const gx = px - sa * lado * larg * 0.45;
+        const gy = py + ca * lado * larg * 0.45;
+        k.strokeStyle = tinta;
+        k.lineWidth = 1;
+        k.beginPath();
+        k.moveTo(gx, gy);
+        k.lineTo(gx + ca * larg * 4.4 - sa * lado * larg * 1.2, gy + sa * larg * 4.4 + ca * lado * larg * 1.2);
+        k.stroke();
+        k.fillStyle = cor;
+        k.beginPath();
+        k.ellipse(gx, gy, larg * 0.75, larg * 0.42, a + lado * 0.5, 0, 6.283);
+        k.fill();
+        k.lineWidth = 1.2;
+        k.stroke();
+      }
+    }
+  }
+
+  // (9) Rute e as espigas (Rt 2.2-3): no campo de Boaz, na colheita da cevada, o punhado de
+  // espigas que Rute recolheu atrás dos ceifeiros, amarrado e deitado na beira do campo, e as
+  // espigas que sobraram no chão; atrás, a cevada em pé e os feixes dos ceifeiros.
+  function desenhoRute(k, W, H, obj) {
+    const r = sorteio(5901);
+    papelVelho(k, W, H, r, ['#fbf0d0', '#f0d9a2', '#d5b475'], [W * 0.75, 90]);
+    linhas(k, 0, 0, W, 350, 7, 1, (x, y) => 0.06 + Math.hypot(x - 660, y - 120) / 1500);
+    // os morros de Belém, longe
+    const fm = onda(r, 4, 0.009);
+    const morro = pol([[-10, 380], ...Array.from({ length: 46 }, (_, i) => [i * 20, 312 + fm(i * 20) * 20]), [W + 10, 380]]);
+    peca(k, morro, [0, 270, W, 380], { cor: '#e8d3a0', ang: -0.3, passo: 5.5, maxL: 1.1, sombra: (x) => 0.4 + Math.sin(x * 0.015) * 0.15, traco: 1.6 });
+    // a cevada em pé, ao fundo, e o campo já ceifado
+    const campo = new Path2D();
+    campo.rect(-10, 350, W + 20, H);
+    k.fillStyle = '#e1c283';
+    k.fill(campo);
+    linhas(k, 0, 350, W, H, 6, 1.5, (x, y) => 0.2 + (y - 350) / 900);
+    for (let i = 0; i < 150; i++) {
+      const x = r() * W;
+      const y = 362 + r() * 26;
+      const h = 432 - y - r() * 10;
+      k.strokeStyle = 'rgba(58,42,14,.7)';
+      k.lineWidth = 1;
+      k.beginPath();
+      k.moveTo(x, y + h);
+      k.quadraticCurveTo(x + 4, y + h / 2, x + 8, y);
+      k.stroke();
+      espiga(k, x + 8, y, x + 18, y - 24, 2.4, 'rgba(58,42,14,.7)', '#e9c97e');
+    }
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.6;
+    k.beginPath();
+    k.moveTo(0, 432);
+    for (let x = 0; x <= W; x += 10) k.lineTo(x, 432 + Math.sin(x * 0.05) * 3);
+    k.stroke();
+    // os feixes dos ceifeiros, no meio do campo
+    for (const [x, y, h] of [[120, 506, 110], [300, 490, 92], [610, 494, 100], [780, 512, 116]]) feixe(k, r, x, y, h, (r() - 0.5) * 0.15, { cor: '#e6c277', barba: true });
+    // o restolho
+    k.strokeStyle = 'rgba(58,42,14,.55)';
+    k.lineWidth = 1.3;
+    for (let i = 0; i < 420; i++) {
+      const x = r() * W;
+      const y = 446 + r() * (H - 446);
+      const h = 3 + (y - 436) / 34;
+      k.beginPath();
+      k.moveTo(x, y);
+      k.lineTo(x + (r() - 0.5) * 3, y - h);
+      k.stroke();
+    }
+    // as espigas soltas no chão
+    for (let i = 0; i < 9; i++) {
+      const x = 80 + r() * 720;
+      const y = 560 + r() * 230;
+      if (y > 600 && y < 760 && x > 180 && x < 720) continue;
+      const a = r() * 6.283;
+      k.strokeStyle = '#3a2a0e';
+      k.lineWidth = 1.4;
+      k.beginPath();
+      k.moveTo(x, y);
+      k.lineTo(x + Math.cos(a) * 40, y + Math.sin(a) * 12);
+      k.stroke();
+      espiga(k, x + Math.cos(a) * 40, y + Math.sin(a) * 12, x + Math.cos(a) * 80, y + Math.sin(a) * 24, 4);
+    }
+    // o punhado de Rute: os talos juntos, a amarra de palha e as espigas abertas em leque
+    k.save();
+    k.translate(440, 690);
+    k.scale(1.16, 1.16);
+    k.translate(-440, -690);
+    const base = [210, 720];
+    const amarra = [380, 664];
+    const sombraP = pol([[180, 744], [430, 680], [720, 620], [770, 700], [440, 760], [200, 780]]);
+    sombraNoChao(k, sombraP, 0, 0, 18, 0.5);
+    const hastes = [];
+    for (let i = 0; i < 24; i++) {
+      const t = i / 23 - 0.5;
+      const a0 = [base[0] + t * 30 + (r() - 0.5) * 8, base[1] + t * 40];
+      const a1 = [amarra[0] + t * 8, amarra[1] + t * 10];
+      const ponta = [610 + t * 60 + r() * 30, 600 + t * 150 + (r() - 0.5) * 20];
+      hastes.push([a0, a1, ponta]);
+    }
+    const ponto = new Path2D();
+    hastes.forEach(([a0, a1, p]) => { ponto.moveTo(a0[0], a0[1]); ponto.quadraticCurveTo(a1[0], a1[1], p[0], p[1]); });
+    marcar(k, obj, ponto, 16);
+    for (const [a0, a1, p] of hastes) {
+      for (const [cor, lw] of [['#2e2008', 6], ['#f0cf80', 3]]) {
+        k.strokeStyle = cor;
+        k.lineWidth = lw;
+        k.beginPath();
+        k.moveTo(a0[0], a0[1]);
+        k.quadraticCurveTo(a1[0], a1[1], p[0], p[1]);
+        k.stroke();
+      }
+    }
+    for (const [, a1, p] of hastes) {
+      const a = Math.atan2(p[1] - a1[1], p[0] - a1[0]);
+      espiga(k, p[0], p[1], p[0] + Math.cos(a) * 76, p[1] + Math.sin(a) * 76, 7.4, '#2e2008', '#f2c868');
+      const e = new Path2D();
+      e.ellipse(p[0] + Math.cos(a) * 40, p[1] + Math.sin(a) * 40, 50, 16, a, 0, 6.283);
+      marcar(k, obj, e);
+    }
+    cordao(k, bezier([amarra[0] - 6, amarra[1] - 34], [amarra[0] + 16, amarra[1] - 12], [amarra[0] + 12, amarra[1] + 20], [amarra[0] - 4, amarra[1] + 40], 16), 9, { cor: '#c9a35a', escuro: '#3a2a0e' });
+    cordao(k, bezier([amarra[0] + 14, amarra[1] - 32], [amarra[0] + 34, amarra[1] - 10], [amarra[0] + 30, amarra[1] + 20], [amarra[0] + 12, amarra[1] + 40], 16), 9, { cor: '#c9a35a', escuro: '#3a2a0e' });
+    k.restore();
+    brilho(k, 560, 640, 200, 'rgba(255,236,190,.22)', 'screen');
+    vinheta(k, W, H, 0.22);
+  }
+
+  // Um leão deitado, em calma, de perfil para "lado" (1 = olha para a direita): o corpo, a anca,
+  // as patas da frente estendidas, a cabeça pousada nelas com a boca fechada e a juba.
+  function leao(k, r, x, y, e, lado, obj) {
+    k.save();
+    k.translate(x, y);
+    k.scale(e * lado, e);
+    const pelo = '#c9a066';
+    const tinta = '#24170a';
+    const luz = (px, py) => 0.3 + (py + 40) / 160;
+    const sombra = new Path2D();
+    sombra.ellipse(-10, 52, 190, 16, 0, 0, 6.283);
+    k.fillStyle = 'rgba(0,0,0,.4)';
+    k.fill(sombra);
+    // a cauda, enrolada no chão, com a ponta
+    const cauda = new Path2D();
+    cauda.moveTo(-150, 30);
+    cauda.bezierCurveTo(-190, 44, -196, 12, -176, 4);
+    k.strokeStyle = tinta;
+    k.lineWidth = 9;
+    k.lineCap = 'round';
+    k.stroke(cauda);
+    k.strokeStyle = pelo;
+    k.lineWidth = 5;
+    k.stroke(cauda);
+    const tufo = new Path2D();
+    tufo.ellipse(-176, 2, 11, 8, -0.6, 0, 6.283);
+    peca(k, tufo, [-187, -6, -165, 10], { cor: '#6a4420', tinta, sombra: () => 0.6, passo: 3, maxL: 1.2, traco: 1.6, obj });
+    // o corpo e a anca
+    const corpo = new Path2D();
+    corpo.moveTo(-160, 48);
+    corpo.bezierCurveTo(-190, 10, -150, -46, -90, -44);
+    corpo.bezierCurveTo(-30, -42, 30, -40, 70, -24);
+    corpo.lineTo(90, 48);
+    corpo.closePath();
+    peca(k, corpo, [-190, -46, 90, 48], { cor: pelo, tinta, ang: 1.3, passo: 3.8, maxL: 1.8, sombra: luz, cruzada: 0.75, traco: 2.2, obj, abaulado: 0.2 });
+    const anca = new Path2D();
+    anca.ellipse(-118, 12, 46, 38, -0.2, 0, 6.283);
+    k.strokeStyle = 'rgba(36,23,10,.6)';
+    k.lineWidth = 1.6;
+    k.stroke(anca);
+    const pata = pol([[-110, 40], [-60, 44], [-56, 52], [-118, 52]]);
+    peca(k, pata, [-118, 40, -56, 52], { cor: pelo, tinta, sombra: () => 0.4, passo: 3, maxL: 1.2, traco: 1.8, obj });
+    // as patas da frente, estendidas
+    for (const dy of [36, 46]) {
+      const p = new Path2D();
+      p.moveTo(40, dy - 12);
+      p.lineTo(150, dy - 10);
+      p.quadraticCurveTo(168, dy - 4, 156, dy + 6);
+      p.lineTo(40, dy + 6);
+      p.closePath();
+      peca(k, p, [40, dy - 12, 168, dy + 6], { cor: dy > 40 ? pelo : '#b88c56', tinta, ang: 0, passo: 3, maxL: 1.3, sombra: () => (dy > 40 ? 0.35 : 0.55), traco: 2, obj });
+      k.strokeStyle = tinta;
+      k.lineWidth = 1.2;
+      for (const t of [-4, 2]) { k.beginPath(); k.moveTo(156 + t, dy - 4); k.lineTo(150 + t, dy + 4); k.stroke(); }
+    }
+    // a juba, a cabeça pousada sobre as patas e a boca fechada
+    const juba = lanoso(r, [[30, -76], [86, -92], [130, -70], [146, -24], [134, 20], [96, 34], [50, 30], [20, 0], [14, -44]], 9, 15);
+    peca(k, juba, [14, -92, 146, 34], { cor: '#8a5a2a', tinta, ang: 1.1, passo: 3.6, maxL: 2, sombra: (px, py) => 0.4 + (py + 92) / 220, cruzada: 0.75, traco: 2.2, obj, abaulado: 0.3 });
+    k.save();
+    k.clip(juba);
+    k.strokeStyle = 'rgba(36,23,10,.7)';
+    k.lineWidth = 1.6;
+    for (let i = 0; i < 26; i++) {
+      const a = (i / 26) * 6.283;
+      k.beginPath();
+      k.moveTo(86 + Math.cos(a) * 30, -28 + Math.sin(a) * 30);
+      k.quadraticCurveTo(86 + Math.cos(a + 0.3) * 50, -28 + Math.sin(a + 0.3) * 50, 86 + Math.cos(a + 0.2) * 70, -28 + Math.sin(a + 0.2) * 66);
+      k.stroke();
+    }
+    k.restore();
+    const cara = new Path2D();
+    cara.moveTo(84, -60);
+    cara.bezierCurveTo(116, -64, 138, -44, 150, -14);
+    cara.bezierCurveTo(164, -6, 164, 14, 148, 20);
+    cara.bezierCurveTo(126, 26, 100, 22, 90, 12);
+    cara.bezierCurveTo(74, -6, 70, -44, 84, -60);
+    cara.closePath();
+    peca(k, cara, [70, -64, 164, 26], { cor: '#d8b47a', tinta, ang: 0.3, passo: 3.4, maxL: 1.5, sombra: (px, py) => 0.2 + (py + 64) / 140, cruzada: 1, traco: 2.2, obj });
+    k.strokeStyle = tinta;
+    k.lineCap = 'round';
+    k.lineWidth = 2.6;
+    // o olho fechado, o focinho e a boca fechada
+    k.beginPath();
+    k.moveTo(112, -30);
+    k.quadraticCurveTo(122, -24, 132, -30);
+    k.stroke();
+    k.fillStyle = tinta;
+    k.beginPath();
+    k.ellipse(156, -2, 7, 5, 0.3, 0, 6.283);
+    k.fill();
+    k.lineWidth = 2;
+    k.beginPath();
+    k.moveTo(154, 4);
+    k.quadraticCurveTo(150, 14, 136, 14);
+    k.stroke();
+    const orelha = new Path2D();
+    orelha.ellipse(98, -64, 10, 13, -0.4, 0, 6.283);
+    peca(k, orelha, [88, -77, 108, -51], { cor: '#b88c56', tinta, sombra: () => 0.5, passo: 3, maxL: 1.2, traco: 2 });
+    k.restore();
+  }
+
+  // (12) Daniel na cova dos leões (Dn 6.17-23): em corte, a boca da cova fechada pela pedra,
+  // com o cordão e os dois selos (o anel do rei e o selo do reino); lá embaixo, no escuro, os
+  // leões deitados em calma, de boca fechada. No alto, o céu da madrugada (o rei correu à cova
+  // bem cedinho).
+  function desenhoDaniel(k, W, H, obj) {
+    const r = sorteio(6201);
+    papelVelho(k, W, H, r, ['#fbeed2', '#efd7ae', '#d2b080'], [W * 0.5, 60]);
+    linhas(k, 0, 0, W, 210, 6.5, 1, (x, y) => 0.06 + Math.hypot(x - W / 2, (y - 210) * 2) / 1400);
+    brilho(k, W / 2, 210, 300, 'rgba(255,206,140,.45)');
+    // a terra em corte: a superfície, as camadas e a cova escavada
+    const sup = (x) => 214 + Math.sin(x * 0.012) * 6;
+    const terra = pol([[-10, sup(-10)], ...Array.from({ length: 46 }, (_, i) => [i * 20, sup(i * 20)]), [W + 10, sup(W)], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#b8966a';
+    k.fill(terra);
+    // a cova: a boca estreita e, embaixo, a gruta larga de beirada irregular
+    const cv = contornoRocha(r, [[-20, 470], [30, 440], [90, 420], [150, 398], [196, 360], [218, 310], [224, 262], [446, 262], [452, 310], [478, 350],
+      [540, 376], [620, 384], [700, 396], [780, 420], [840, 446], [W + 20, 470], [W + 20, H + 20], [-20, H + 20]], 12);
+    cv.closePath();
+    const camadas = [0, 1, 2, 3, 4, 5, 6].map((i) => (x) => 226 + i * 100 + Math.sin(x * 0.01 + i) * 14);
+    k.save();
+    k.clip(terra);
+    hachuraEmFaixas(k, r, terra, 0, W, camadas, 7, 1.6, (x) => 0.35 + Math.abs(x - W / 2) / 1200, '#3a2810', { quebra: 0.04, juntas: 3 });
+    k.restore();
+    // o escuro da cova, com a luz fina que entra pelas frestas da pedra
+    const gd = k.createRadialGradient(335, 330, 40, W / 2, 640, 480);
+    gd.addColorStop(0, '#5a4228');
+    gd.addColorStop(1, '#1e140a');
+    k.fillStyle = gd;
+    k.fill(cv);
+    gravar(k, cv, W / 2, 540, 440, 0.8, 5, 1.6, (x, y) => 0.45 + Math.abs(x - W / 2) / 900, '#000', 0);
+    k.save();
+    k.clip(cv);
+    rochaEmFacetas(k, r, cv, [60, 260, 830, 820], 150, 90, (x, y) => 0.35 + Math.hypot(x - 335, y - 300) / 1400, 'rgba(0,0,0,.5)');
+    k.restore();
+    k.save();
+    k.clip(cv);
+    k.filter = 'blur(10px)';
+    for (const [x0, x1, d] of [[236, 262, 120], [410, 434, 250]]) {
+      const f = pol([[x0, 262], [x1, 262], [x1 + d + 40, 800], [x0 + d - 40, 800]]);
+      k.fillStyle = 'rgba(255,220,150,.16)';
+      k.fill(f);
+    }
+    k.restore();
+    k.strokeStyle = '#1a1006';
+    k.lineWidth = 3;
+    k.stroke(cv);
+    // o chão da cova
+    const chao = pol([[-10, 748], [W + 10, 748], [W + 10, H + 10], [-10, H + 10]]);
+    k.save();
+    k.clip(cv);
+    k.fillStyle = '#2e2010';
+    k.fill(chao);
+    gravar(k, chao, W / 2, 770, 400, 0, 5, 1.2, () => 0.5, 'rgba(236,210,160,.35)', 0);
+    k.restore();
+    // os leões, deitados, de frente um para o outro
+    leao(k, r, 272, 712, 1.04, 1, obj);
+    leao(k, r, 630, 722, 0.98, -1, obj);
+    // o poço da boca, a pedra que a fecha, o cordão e os selos
+    const boca = pol([[220, 214], [450, 214], [450, 266], [220, 266]]);
+    k.fillStyle = '#1a1006';
+    k.fill(boca);
+    k.save();
+    k.translate(-110, 0);
+    const pedra = contornoRocha(r, [[262, 222], [300, 168], [444, 152], [590, 166], [630, 220], [600, 246], [444, 252], [290, 248]], 8);
+    pedra.closePath();
+    sombraNoChao(k, pedra, 10, 8, 8, 0.45);
+    peca(k, pedra, [262, 152, 630, 252], { cor: '#cdbb94', ang: 0.5, passo: 4.2, maxL: 2.4, sombra: (x, y) => 0.15 + (y - 152) / 150 + (x - 262) / 1200, cruzada: 0.65, traco: 2.6, obj, abaulado: 0.15 });
+    k.strokeStyle = '#2a1d0e';
+    k.lineWidth = 2.4;
+    for (const [x0, y0, x1, y1] of [[240, 226, 320, 196], [320, 196, 568, 196], [568, 196, 650, 226]]) {
+      k.beginPath();
+      k.moveTo(x0, y0);
+      k.lineTo(x1, y1);
+      k.stroke();
+    }
+    for (const [x0, y0] of [[240, 226], [650, 226]]) {
+      const estaca = pol([[x0 - 4, y0 - 6], [x0 + 4, y0 - 6], [x0 + 3, y0 + 26], [x0 - 3, y0 + 26]]);
+      peca(k, estaca, [x0 - 4, y0 - 6, x0 + 4, y0 + 26], { cor: '#8a6440', sombra: () => 0.4, passo: 3, maxL: 1, traco: 1.6 });
+    }
+    // os dois selos de barro no cordão: o do anel do rei e o do reino
+    for (const [x, y, rr] of [[364, 196, 22], [612, 214, 18]]) {
+      const selo = new Path2D();
+      selo.ellipse(x, y, rr, rr * 0.9, 0, 0, 6.283);
+      peca(k, selo, [x - rr, y - rr, x + rr, y + rr], { cor: '#a8452e', tinta: '#2a0c04', sombra: sombraOval(x, y, rr, rr * 0.9, 0), passo: 3, maxL: 1.5, cruzada: 1, traco: 2, obj });
+      k.strokeStyle = 'rgba(42,12,4,.8)';
+      k.lineWidth = 1.6;
+      k.beginPath();
+      k.arc(x, y, rr * 0.55, 0, 6.283);
+      k.stroke();
+      estrelinha(k, x, y, rr * 0.4, 'rgba(42,12,4,.8)');
+    }
+    k.restore();
+    vinheta(k, W, H, 0.25);
+  }
+
+  // (11) Ester diante do rei (Et 5.1-2): Ester está no pátio, de onde se vê o salão; os degraus
+  // sobem até o trono, que fica na sombra do dossel, e de lá o rei estende o cetro de ouro,
+  // cuja ponta brilha onde ela tocou. Ninguém desenhado: só o trono, os degraus e o cetro.
+  function desenhoEster(k, W, H, obj) {
+    const r = sorteio(6101);
+    papelVelho(k, W, H, r, ['#f8ecd2', '#e9d4aa', '#c9a874'], [W * 0.5, 220]);
+    // a parede do salão, em linhas, e as colunas de mármore
+    linhas(k, 0, 0, W, 360, 6, 1.4, (x, y) => 0.25 + Math.abs(x - 444) / 1400 - Math.max(0, 0.3 - Math.hypot(x - 444, y - 220) / 900));
+    for (const cx of [96, 800]) {
+      const fuste = pol([[cx - 34, 70], [cx + 34, 70], [cx + 38, 380], [cx - 38, 380]]);
+      peca(k, fuste, [cx - 38, 70, cx + 38, 380], { cor: '#efe4ca', ang: Math.PI / 2, passo: 4, maxL: 1.8, sombra: (x) => 0.1 + Math.abs(x - cx + 12) / 50, cruzada: 0.8, traco: 2.2 });
+      k.strokeStyle = 'rgba(43,33,18,.55)';
+      k.lineWidth = 1.4;
+      for (let x = cx - 26; x <= cx + 26; x += 13) { k.beginPath(); k.moveTo(x, 80); k.lineTo(x * 1.0 + (x - cx) * 0.1, 376); k.stroke(); }
+      const capitel = pol([[cx - 58, 30], [cx + 58, 30], [cx + 46, 56], [cx + 36, 72], [cx - 36, 72], [cx - 46, 56]]);
+      peca(k, capitel, [cx - 58, 30, cx + 58, 72], { cor: '#e8dcbc', ang: 0, passo: 3.6, maxL: 1.6, sombra: (x, y) => 0.2 + (y - 30) / 80, traco: 2.2 });
+      for (const s of [-1, 1]) {
+        const vol = new Path2D();
+        vol.arc(cx + s * 50, 50, 14, 0, 6.283);
+        peca(k, vol, [cx + s * 50 - 14, 36, cx + s * 50 + 14, 64], { cor: '#e8dcbc', sombra: sombraOval(cx + s * 50, 50, 14, 14, 0), passo: 3, maxL: 1.4, traco: 2 });
+        k.beginPath();
+        k.arc(cx + s * 50, 50, 6, 0, 6.283);
+        k.stroke();
+      }
+    }
+    // o dossel: o pano pesado que cai de cima e deixa o trono na sombra
+    const dossel = new Path2D();
+    dossel.moveTo(254, -10);
+    dossel.lineTo(634, -10);
+    dossel.bezierCurveTo(634, 60, 614, 110, 564, 130);
+    dossel.bezierCurveTo(494, 104, 394, 104, 324, 130);
+    dossel.bezierCurveTo(274, 100, 254, 60, 254, -10);
+    dossel.closePath();
+    // o trono: o espaldar alto, os braços, o assento na sombra
+    const tx = 444;
+    const trono = new Path2D();
+    trono.moveTo(tx - 110, 330);
+    trono.lineTo(tx - 110, 210);
+    trono.lineTo(tx - 92, 210);
+    trono.lineTo(tx - 92, 120);
+    trono.quadraticCurveTo(tx, 74, tx + 92, 120);
+    trono.lineTo(tx + 92, 210);
+    trono.lineTo(tx + 110, 210);
+    trono.lineTo(tx + 110, 330);
+    trono.closePath();
+    sombraNoChao(k, trono, 12, 10, 10, 0.4);
+    peca(k, trono, [tx - 110, 74, tx + 110, 330], { cor: '#d9a84a', tinta: '#2e1c04', ang: Math.PI / 2, passo: 4, maxL: 1.8, sombra: (x, y) => 0.3 + (x - tx) / 400 + (y - 74) / 900, cruzada: 0.75, traco: 2.4, obj });
+    const fundoT = new Path2D();
+    fundoT.moveTo(tx - 76, 262);
+    fundoT.lineTo(tx - 76, 140);
+    fundoT.quadraticCurveTo(tx, 104, tx + 76, 140);
+    fundoT.lineTo(tx + 76, 262);
+    fundoT.closePath();
+    const gt = k.createLinearGradient(0, 110, 0, 262);
+    gt.addColorStop(0, '#120a02');
+    gt.addColorStop(1, '#4a3212');
+    k.fillStyle = gt;
+    k.fill(fundoT);
+    gravar(k, fundoT, tx, 190, 110, 0.8, 4, 1.4, (x, y) => 0.8 - (y - 110) / 300, '#000', 0);
+    const assento = pol([[tx - 96, 262], [tx + 96, 262], [tx + 100, 284], [tx - 100, 284]]);
+    peca(k, assento, [tx - 100, 262, tx + 100, 284], { cor: '#b98a34', tinta: '#2e1c04', ang: 0, passo: 3, maxL: 1.4, sombra: () => 0.5, traco: 2 });
+    for (const s of [-1, 1]) {
+      const pe = pol([[tx + s * 100 - 10, 284], [tx + s * 100 + 10, 284], [tx + s * 100 + 8, 330], [tx + s * 100 - 8, 330]]);
+      peca(k, pe, [tx + s * 100 - 10, 284, tx + s * 100 + 10, 330], { cor: '#c99a3e', tinta: '#2e1c04', sombra: () => 0.4, passo: 3, maxL: 1.2, traco: 2 });
+      const bola = new Path2D();
+      bola.arc(tx + s * 101, 206, 12, 0, 6.283);
+      peca(k, bola, [tx + s * 101 - 12, 194, tx + s * 101 + 12, 218], { cor: '#f0c860', tinta: '#2e1c04', sombra: sombraOval(tx + s * 101, 206, 12, 12, 0), passo: 3, maxL: 1.4, traco: 2, obj });
+    }
+    peca(k, dossel, [254, -10, 634, 130], { cor: '#7a2e2a', tinta: '#1e0806', ang: Math.PI / 2 - 0.1, passo: 4, maxL: 2, sombra: (x, y) => 0.35 + y / 260 + Math.abs(x - tx) / 900, cruzada: 0.7, traco: 2.4 });
+    k.save();
+    k.clip(dossel);
+    k.strokeStyle = 'rgba(30,8,6,.6)';
+    k.lineWidth = 2;
+    for (let x = 274; x < 634; x += 36) { k.beginPath(); k.moveTo(x, -10); k.quadraticCurveTo(x + 6, 60, x - 4 + (x - tx) * 0.1, 130); k.stroke(); }
+    k.restore();
+    k.strokeStyle = '#d9a84a';
+    k.lineWidth = 3;
+    k.beginPath();
+    k.moveTo(564, 130);
+    k.bezierCurveTo(494, 104, 394, 104, 324, 130);
+    k.stroke();
+    // os degraus: piso de mármore, cada um mais largo, com o espelho na sombra
+    const degraus = 5;
+    for (let i = 0; i < degraus; i++) {
+      const y0 = 330 + i * 62;
+      const m = 200 + i * 46;
+      const espelho = pol([[tx - m - 20, y0 + 20], [tx + m + 20, y0 + 20], [tx + m + 20, y0 + 62], [tx - m - 20, y0 + 62]]);
+      const piso = pol([[tx - m, y0], [tx + m, y0], [tx + m + 20, y0 + 20], [tx - m - 20, y0 + 20]]);
+      peca(k, piso, [tx - m - 20, y0, tx + m + 20, y0 + 20], { cor: '#efe4c8', ang: 0, passo: 4.4, maxL: 1, sombra: (x) => 0.15 + Math.abs(x - tx) / 1600, traco: 2 });
+      peca(k, espelho, [tx - m - 20, y0 + 20, tx + m + 20, y0 + 62], { cor: '#d6c6a0', ang: 0, passo: 3.8, maxL: 1.8, sombra: (x) => 0.4 + Math.abs(x - tx) / 1400, cruzada: 0.8, traco: 2 });
+    }
+    // o piso do pátio, em quadros de mármore
+    const piso = new Path2D();
+    piso.rect(-10, 640, W + 20, H);
+    k.fillStyle = '#e4d6b4';
+    k.fill(piso);
+    k.save();
+    k.clip(piso);
+    for (let i = 0; i < 6; i++) {
+      for (let j = -8; j < 9; j++) {
+        if ((i + j) % 2) continue;
+        const y0 = 640 + i * 36 + i * i * 2;
+        const y1 = 640 + (i + 1) * 36 + (i + 1) * (i + 1) * 2;
+        const xa = (y) => tx + j * 70 * (1 + (y - 640) / 260);
+        const q = pol([[xa(y0), y0], [xa(y0) + 70 * (1 + (y0 - 640) / 260), y0], [xa(y1) + 70 * (1 + (y1 - 640) / 260), y1], [xa(y1), y1]]);
+        peca(k, q, [xa(y1), y0, xa(y1) + 160, y1], { cor: '#b9a27a', ang: 0, passo: 4, maxL: 1.2, sombra: () => 0.4, traco: 1.2 });
+      }
+    }
+    k.restore();
+    // o cetro de ouro estendido: sai da sombra do trono e desce sobre os degraus; a ponta brilha
+    const c0 = [tx + 10, 222];
+    const c1 = [190, 556];
+    const ang = Math.atan2(c1[1] - c0[1], c1[0] - c0[0]);
+    const nx = -Math.sin(ang);
+    const ny = Math.cos(ang);
+    const e = 9;
+    const vara = pol([[c0[0] + nx * e, c0[1] + ny * e], [c1[0] + nx * e, c1[1] + ny * e], [c1[0] - nx * e, c1[1] - ny * e], [c0[0] - nx * e, c0[1] - ny * e]]);
+    sombraNoChao(k, vara, 18, 30, 10, 0.35);
+    brilho(k, c1[0], c1[1], 150, 'rgba(255,214,120,.5)');
+    peca(k, vara, [Math.min(c0[0], c1[0]), c0[1], Math.max(c0[0], c1[0]), c1[1]], { cor: '#e6b64e', tinta: '#3a2404', ang, passo: 3, maxL: 1.6, sombra: (x, y) => 0.25 + ((x - c0[0]) * nx + (y - c0[1]) * ny) / e * 0.3, cruzada: 1, traco: 2.2, obj });
+    k.strokeStyle = 'rgba(255,248,214,.85)';
+    k.lineWidth = 2.4;
+    k.beginPath();
+    k.moveTo(c0[0] - nx * 4, c0[1] - ny * 4);
+    k.lineTo(c1[0] - nx * 4, c1[1] - ny * 4);
+    k.stroke();
+    for (const t of [0.15, 0.5, 0.82]) {
+      const x = c0[0] + (c1[0] - c0[0]) * t;
+      const y = c0[1] + (c1[1] - c0[1]) * t;
+      const anel = pol([[x + nx * 13 - Math.cos(ang) * 6, y + ny * 13 - Math.sin(ang) * 6], [x + nx * 13 + Math.cos(ang) * 6, y + ny * 13 + Math.sin(ang) * 6], [x - nx * 13 + Math.cos(ang) * 6, y - ny * 13 + Math.sin(ang) * 6], [x - nx * 13 - Math.cos(ang) * 6, y - ny * 13 - Math.sin(ang) * 6]]);
+      peca(k, anel, [x - 14, y - 14, x + 14, y + 14], { cor: '#d19a32', tinta: '#3a2404', sombra: () => 0.45, passo: 2.6, maxL: 1.2, traco: 2, obj });
+    }
+    // a ponta: o botão de ouro canelado
+    const pc = [c1[0] - Math.cos(ang) * 22, c1[1] - Math.sin(ang) * 22];
+    const ponta = new Path2D();
+    ponta.ellipse(pc[0], pc[1], 30, 24, ang, 0, 6.283);
+    peca(k, ponta, [pc[0] - 30, pc[1] - 30, pc[0] + 30, pc[1] + 30], { cor: '#f2c860', tinta: '#3a2404', sombra: sombraOval(pc[0], pc[1], 30, 24, ang), passo: 3, maxL: 1.8, cruzada: 0.8, traco: 2.4, obj });
+    k.strokeStyle = 'rgba(58,36,4,.7)';
+    k.lineWidth = 1.4;
+    for (const d of [-12, 0, 12]) { k.beginPath(); k.ellipse(pc[0], pc[1], 28, Math.abs(d) * 1.4 + 3, ang + Math.PI / 2, 0, 6.283); k.stroke(); }
+    brilho(k, pc[0] - 10, pc[1] - 10, 22, 'rgba(255,250,220,.75)', 'screen');
+    // a ponta de cima some na sombra do trono
+    k.save();
+    k.clip(fundoT);
+    const gs = k.createRadialGradient(c0[0], c0[1], 4, c0[0], c0[1], 70);
+    gs.addColorStop(0, 'rgba(18,10,2,.95)');
+    gs.addColorStop(1, 'rgba(18,10,2,0)');
+    k.fillStyle = gs;
+    k.fillRect(c0[0] - 80, c0[1] - 80, 160, 160);
+    k.restore();
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * 6.283 + 0.2;
+      k.strokeStyle = 'rgba(160,100,10,.6)';
+      k.lineWidth = 2;
+      k.beginPath();
+      k.moveTo(pc[0] + Math.cos(a) * 44, pc[1] + Math.sin(a) * 44);
+      k.lineTo(pc[0] + Math.cos(a) * (i % 2 ? 60 : 74), pc[1] + Math.sin(a) * (i % 2 ? 60 : 74));
+      k.stroke();
+    }
+    vinheta(k, W, H, 0.24);
+  }
+
+  // (13) A multidão de testemunhas (Hb 12.1), a capa do álbum: o estádio visto do chão da pista,
+  // da linha de largada de pedra até a chegada, onde a coroa de louros espera; nas
+  // arquibancadas dos dois lados, a multidão de testemunhas em luz, como uma nuvem; e, na
+  // beira da largada, o manto pesado deixado para trás com a corda que se enrosca nos pés
+  // ("afastemos de nós qualquer coisa que nos torne vagarosos").
+  function desenhoTestemunhas(k, W, H, obj) {
+    const r = sorteio(6301);
+    const F = [444, 392];
+    // o céu de ouro, mais claro na chegada, com poucos raios gravados
+    const g = k.createRadialGradient(F[0], F[1], 20, F[0], F[1], 700);
+    g.addColorStop(0, '#fff8e0');
+    g.addColorStop(0.3, '#efcf8a');
+    g.addColorStop(1, '#a87a34');
+    k.fillStyle = g;
+    k.fillRect(0, 0, W, H);
+    papelVelho(k, W, H, r, ['rgba(0,0,0,0)', 'rgba(0,0,0,0)'], F);
+    k.save();
+    k.lineCap = 'round';
+    for (let i = 0; i < 46; i++) {
+      const a = Math.PI + 0.12 + (i / 45) * (Math.PI - 0.24);
+      k.strokeStyle = 'rgba(110,70,14,' + (i % 3 ? 0.07 : 0.14) + ')';
+      k.lineWidth = i % 3 ? 1.2 : 2;
+      k.beginPath();
+      k.moveTo(F[0] + Math.cos(a) * 110, F[1] + Math.sin(a) * 110);
+      k.lineTo(F[0] + Math.cos(a) * 800, F[1] + Math.sin(a) * 800);
+      k.stroke();
+    }
+    k.restore();
+    // a perspectiva: t = 0 na chegada, t = 1 na borda de baixo; u = 0 na beira da pista, 1 no
+    // alto da arquibancada
+    const yT = (t) => F[1] + 34 + t * (H - F[1] - 34);
+    const larg = (t) => 26 + t * 380;
+    const ponto = (lado, t, u) => [F[0] + lado * (larg(t) + (30 + t * 420) * u), yT(t) - (36 + t * 380) * u];
+    // as arquibancadas dos dois lados e a curva do fundo
+    for (const lado of [-1, 1]) {
+      const arq = pol([ponto(lado, 0, 0), ponto(lado, 0, 1), ponto(lado, 1.3, 1), ponto(lado, 1.3, 0)]);
+      k.fillStyle = '#cfa762';
+      k.fill(arq);
+      k.save();
+      k.clip(arq);
+      for (let d = 0; d <= 14; d++) {
+        const u = d / 14;
+        k.strokeStyle = 'rgba(70,44,10,' + (0.3 + (1 - u) * 0.3).toFixed(2) + ')';
+        k.lineWidth = 1 + (1 - u) * 1.2;
+        k.beginPath();
+        k.moveTo(...ponto(lado, 0, u));
+        k.lineTo(...ponto(lado, 1.3, u));
+        k.stroke();
+      }
+      gravar(k, arq, F[0] + lado * 420, 560, 640, lado > 0 ? 0.62 : Math.PI - 0.62, 4.6, 1.3, (x, y) => 0.2 + Math.abs(x - F[0]) / 1800 + (y - 300) / 1600, 'rgba(70,44,10,.75)', 0);
+      k.restore();
+      k.strokeStyle = '#3a2408';
+      k.lineWidth = 2.2;
+      k.beginPath();
+      k.moveTo(...ponto(lado, 0, 1));
+      k.lineTo(...ponto(lado, 1.3, 1));
+      k.stroke();
+    }
+    const curva = new Path2D();
+    curva.moveTo(...ponto(-1, 0, 1));
+    curva.quadraticCurveTo(F[0], F[1] - 52, ...ponto(1, 0, 1));
+    curva.lineTo(...ponto(1, 0, 0));
+    curva.quadraticCurveTo(F[0], F[1] + 22, ...ponto(-1, 0, 0));
+    curva.closePath();
+    k.fillStyle = '#ead09a';
+    k.fill(curva);
+    // a multidão de testemunhas: uma nuvem de luz pousada nas arquibancadas, mais densa no
+    // alto, feita de luzes miúdas
+    k.save();
+    k.globalCompositeOperation = 'screen';
+    for (const lado of [-1, 1]) {
+      // a nuvem: luz macia que sobe das arquibancadas para o céu
+      for (let i = 0; i < 120; i++) {
+        const t = Math.pow(r(), 1.1) * 1.2;
+        const [x, y] = ponto(lado, t, 0.7 + r() * 1.3);
+        brilho(k, x, y, 20 + t * 120, 'rgba(255,248,222,' + (0.18 + r() * 0.16).toFixed(2) + ')');
+      }
+      // as fileiras de luzes, uma por degrau, como gente sentada
+      for (let d = 2; d <= 14; d++) {
+        const u = d / 14 - 0.03;
+        for (let t = 0.02; t < 1.25; t += 0.012 + t * 0.03) {
+          if (r() < 0.18) continue;
+          const [x, y] = ponto(lado, t + r() * 0.008, u);
+          k.fillStyle = 'rgba(255,252,236,' + (0.45 + r() * 0.55).toFixed(2) + ')';
+          k.beginPath();
+          k.arc(x, y - (2 + t * 6), (0.9 + r() * 0.8) * (0.6 + t * 2.2), 0, 6.283);
+          k.fill();
+        }
+      }
+      for (let i = 0; i < 700; i++) {
+        const [x, y] = ponto(lado, Math.pow(r(), 1.1) * 1.2, 1 + Math.pow(r(), 1.5) * 1.2);
+        k.fillStyle = 'rgba(255,252,236,' + (0.3 + r() * 0.5).toFixed(2) + ')';
+        k.beginPath();
+        k.arc(x, y, 0.8 + r() * 2, 0, 6.283);
+        k.fill();
+      }
+    }
+    // e em arco por trás da chegada, em volta da coroa
+    for (let i = 0; i < 40; i++) {
+      const a = Math.PI + 0.1 + r() * (Math.PI - 0.2);
+      const d = 90 + r() * 140;
+      brilho(k, F[0] + Math.cos(a) * d * 1.5, F[1] - 30 + Math.sin(a) * d * 0.8, 30 + r() * 50, 'rgba(255,248,222,.22)');
+    }
+    for (let i = 0; i < 500; i++) {
+      const a = Math.PI + r() * Math.PI;
+      const d = 80 + Math.pow(r(), 0.7) * 190;
+      k.fillStyle = 'rgba(255,252,236,' + (0.4 + r() * 0.5).toFixed(2) + ')';
+      k.beginPath();
+      k.arc(F[0] + Math.cos(a) * d * 1.5, F[1] - 30 + Math.sin(a) * d * 0.8, 0.7 + r() * 1.5, 0, 6.283);
+      k.fill();
+    }
+    brilho(k, F[0], F[1] - 20, 260, 'rgba(255,250,230,.5)');
+    k.restore();
+    // a pista de areia batida, em linhas que se apertam ao longe
+    const pista = pol([[F[0] - larg(0), yT(0)], [F[0] + larg(0), yT(0)], [F[0] + larg(1.2), yT(1.2)], [F[0] - larg(1.2), yT(1.2)]]);
+    const gp = k.createLinearGradient(0, F[1], 0, H);
+    gp.addColorStop(0, '#f8e8bc');
+    gp.addColorStop(1, '#d5ae6a');
+    k.fillStyle = gp;
+    k.fill(pista);
+    k.save();
+    k.clip(pista);
+    k.lineCap = 'round';
+    for (let t = 0.03; t < 1.2; t *= 1.11) {
+      const y = yT(t);
+      k.strokeStyle = 'rgba(70,44,10,' + Math.min(0.55, 0.12 + t * 0.4).toFixed(2) + ')';
+      k.lineWidth = 0.6 + t * 1.3;
+      let x = F[0] - larg(t);
+      while (x < F[0] + larg(t)) {
+        const c = 20 + r() * 80 * (0.3 + t);
+        k.beginPath();
+        k.moveTo(x, y + (r() - 0.5) * 2);
+        k.lineTo(x + c, y + (r() - 0.5) * 2);
+        k.stroke();
+        x += c + 10 + r() * 30 * t;
+      }
+    }
+    k.restore();
+    k.strokeStyle = '#3a2408';
+    k.lineWidth = 2.4;
+    for (const lado of [-1, 1]) { k.beginPath(); k.moveTo(F[0] + lado * larg(0), yT(0)); k.lineTo(F[0] + lado * larg(1.2), yT(1.2)); k.stroke(); }
+    // a linha de chegada e a coroa de louros sobre a coluna
+    const tc = 0.13;
+    const yc = yT(tc);
+    k.strokeStyle = 'rgba(255,253,240,.95)';
+    k.lineWidth = 5;
+    k.beginPath();
+    k.moveTo(F[0] - larg(tc), yc);
+    k.lineTo(F[0] + larg(tc), yc);
+    k.stroke();
+    const coluna = pol([[F[0] - 26, yc + 4], [F[0] + 26, yc + 4], [F[0] + 20, yc - 84], [F[0] - 20, yc - 84]]);
+    sombraNoChao(k, pol([[F[0] - 26, yc], [F[0] + 26, yc], [F[0] + 60, yc + 14], [F[0] - 10, yc + 14]]), 0, 0, 5, 0.35);
+    peca(k, coluna, [F[0] - 26, yc - 84, F[0] + 26, yc + 4], { cor: '#f2e6c6', tinta: '#3a2408', ang: Math.PI / 2, passo: 3.4, maxL: 1.4, sombra: (x) => 0.12 + (x - F[0] + 26) / 80, traco: 2, obj });
+    const tampo = pol([[F[0] - 34, yc - 84], [F[0] + 34, yc - 84], [F[0] + 34, yc - 96], [F[0] - 34, yc - 96]]);
+    peca(k, tampo, [F[0] - 34, yc - 96, F[0] + 34, yc - 84], { cor: '#e9dab4', tinta: '#3a2408', sombra: () => 0.4, passo: 3, maxL: 1.2, traco: 2, obj });
+    const cc = [F[0], yc - 150];
+    brilho(k, cc[0], cc[1], 130, 'rgba(255,240,180,.9)');
+    marcar(k, obj, (() => { const p = new Path2D(); p.ellipse(cc[0], cc[1], 56, 46, 0, 0, 6.283); return p; })(), 24);
+    for (const lado of [-1, 1]) {
+      const ramo = new Path2D();
+      ramo.ellipse(cc[0], cc[1], 54, 44, 0, Math.PI / 2 + lado * 0.2, Math.PI / 2 + lado * 2.9, lado < 0);
+      k.strokeStyle = '#4a4a14';
+      k.lineWidth = 3;
+      k.stroke(ramo);
+      for (let i = 0; i < 10; i++) {
+        const a = Math.PI / 2 + lado * (0.3 + i * 0.27);
+        const x = cc[0] + Math.cos(a) * 54;
+        const y = cc[1] + Math.sin(a) * 44;
+        for (const s of [-1, 1]) {
+          const fa = a + lado * Math.PI / 2 + s * 0.55;
+          const folha = new Path2D();
+          folha.ellipse(x + Math.cos(fa) * 11, y + Math.sin(fa) * 11, 13, 5.5, fa, 0, 6.283);
+          k.fillStyle = s > 0 ? '#8e9a42' : '#6f7a30';
+          k.fill(folha);
+          k.strokeStyle = '#2a2a08';
+          k.lineWidth = 1.5;
+          k.stroke(folha);
+        }
+      }
+    }
+    k.strokeStyle = '#b8862a';
+    k.lineWidth = 4;
+    k.lineCap = 'round';
+    k.beginPath();
+    k.moveTo(cc[0] - 6, cc[1] + 44);
+    k.quadraticCurveTo(cc[0] - 16, cc[1] + 62, cc[0] - 10, cc[1] + 76);
+    k.moveTo(cc[0] + 6, cc[1] + 44);
+    k.quadraticCurveTo(cc[0] + 16, cc[1] + 62, cc[0] + 14, cc[1] + 74);
+    k.stroke();
+    // a largada: a soleira de pedra de lado a lado, com os dois sulcos para os pés
+    const tl = 0.7;
+    const t2 = 0.8;
+    const laje = pol([[F[0] - larg(tl), yT(tl)], [F[0] + larg(tl), yT(tl)], [F[0] + larg(t2), yT(t2)], [F[0] - larg(t2), yT(t2)]]);
+    peca(k, laje, [F[0] - larg(t2), yT(tl), F[0] + larg(t2), yT(t2)], { cor: '#f0e4c2', tinta: '#3a2408', ang: 0.5, passo: 4.4, maxL: 1.4, sombra: (x, y) => 0.12 + (y - yT(tl)) / 140 + Math.abs(x - F[0]) / 1600, traco: 2.4, obj });
+    for (const t of [0.73, 0.765]) {
+      k.strokeStyle = '#3a2408';
+      k.lineWidth = 3;
+      k.beginPath();
+      k.moveTo(F[0] - larg(t) + 8, yT(t));
+      k.lineTo(F[0] + larg(t) - 8, yT(t));
+      k.stroke();
+      k.strokeStyle = 'rgba(255,250,232,.8)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.moveTo(F[0] - larg(t) + 8, yT(t) + 3);
+      k.lineTo(F[0] + larg(t) - 8, yT(t) + 3);
+      k.stroke();
+    }
+    k.strokeStyle = '#3a2408';
+    k.lineWidth = 2;
+    for (let i = 1; i < 7; i++) {
+      const f = i / 7 * 2 - 1;
+      k.beginPath();
+      k.moveTo(F[0] + f * larg(tl), yT(tl));
+      k.lineTo(F[0] + f * larg(t2), yT(t2));
+      k.stroke();
+    }
+    // o manto deixado na beira da pista, com a corda que se enrosca nos pés
+    k.save();
+    k.translate(14, -58);
+    const manto = new Path2D();
+    manto.moveTo(96, 812);
+    manto.bezierCurveTo(100, 776, 140, 758, 182, 764);
+    manto.bezierCurveTo(214, 746, 262, 760, 270, 790);
+    manto.bezierCurveTo(286, 806, 276, 828, 250, 830);
+    manto.lineTo(110, 832);
+    manto.bezierCurveTo(96, 830, 92, 822, 96, 812);
+    manto.closePath();
+    sombraNoChao(k, manto, 8, 6, 8, 0.45);
+    peca(k, manto, [92, 746, 286, 832], { cor: '#9a6a44', tinta: '#2a1008', ang: 0.9, passo: 3.6, maxL: 1.8, sombra: (x, y) => 0.25 + (y - 746) / 150, cruzada: 0.7, traco: 2.2, obj });
+    k.save();
+    k.clip(manto);
+    k.strokeStyle = 'rgba(42,16,8,.8)';
+    k.lineWidth = 2.2;
+    for (const [x0, y0, x1, y1] of [[150, 770, 130, 830], [190, 766, 196, 830], [232, 770, 256, 826], [120, 800, 270, 806]]) { k.beginPath(); k.moveTo(x0, y0); k.quadraticCurveTo((x0 + x1) / 2 + 12, (y0 + y1) / 2, x1, y1); k.stroke(); }
+    k.strokeStyle = 'rgba(236,206,150,.8)';
+    k.lineWidth = 5;
+    for (const d of [0, 14]) { k.beginPath(); k.moveTo(100, 800 + d); k.bezierCurveTo(150, 770 + d, 220, 772 + d, 280, 800 + d); k.stroke(); }
+    k.restore();
+    // a franja da beirada
+    k.strokeStyle = '#2a1008';
+    k.lineWidth = 1.6;
+    for (let x = 116; x < 250; x += 9) { k.beginPath(); k.moveTo(x, 831); k.lineTo(x - 2, 840); k.stroke(); }
+    cordao(k, [[250, 812], [292, 822], [318, 806], [300, 790], [276, 804], [300, 828], [344, 826], [372, 808]], 5, { cor: '#c9a86a', escuro: '#2a1408' });
+    k.restore();
+    vinheta(k, W, H, 0.2);
+  }
+
   // As artes, pela id da carta. temArte(id) diz se a carta já tem desenho; sem ele, a carta
   // sai com a gravura neutra (desenhoEmBreve) e o sistema pode preferir a silhueta.
   const DESENHOS = { 'davi-funda': desenhoDavi, 'poco-jaco': desenhoPoco, 'azeite-viuva': desenhoAzeite, 'mar-vermelho': desenhoMar,
-    'arca-alianca': desenhoArca, 'tumulo-vazio': desenhoTumulo };
+    'arca-alianca': desenhoArca, 'tumulo-vazio': desenhoTumulo,
+    'abel-oferta': desenhoAbel, 'noe-arca': desenhoNoe,
+    'abraao-estrelas': desenhoAbraao, 'sara-riso': desenhoSara,
+    'jose-sonhos': desenhoJose, 'moises-cesto': desenhoMoises,
+    'raabe-corda': desenhoRaabe, 'gideao-tochas': desenhoGideao, 'rute-espigas': desenhoRute,
+    'ester-cetro': desenhoEster, 'daniel-leoes': desenhoDaniel, 'nuvem-testemunhas': desenhoTestemunhas };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
+  // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
+  // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
+  // o terceiro número (opcional, até 1) afasta a arte, usando a margem do desenho. Quando o
+  // desenho não tem mais para onde ir, a arte desce (ou sobe) e a beirada dela se estende.
+  // Gideão: a corneta, no pé do desenho; Ester: o alto do dossel, na beirada de cima.
+  const FOCO = { 'gideao-tochas': [0.33, 0.985, 0.92], 'ester-cetro': [0.5, 0, 1] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
@@ -2985,6 +4880,23 @@
   // A ilustração e a silhueta dos objetos dela (para a máscara do brilho), guardadas por id:
   // desenhar a arte é o que mais custa, e a carta viva, a miniatura e a máscara a usam.
   const GUARDADAS = new Map();
+  // O tom da arte, medido uma vez por desenho (a luminância média do que aparece na janela):
+  // 'clara' (papel, terra ao sol, acima de 135), 'escura' (noite, cova, abaixo de 80) ou ''. Na
+  // clara, o holo do ouro e da glória é soft-light (o color-dodge estoura o claro); na escura,
+  // os raios da glória e o reflexo da inclinação baixam (senão viram grade e névoa no céu).
+  function tomDe(ilu) {
+    const m = tela(48, 46);
+    const km = m.getContext('2d');
+    km.drawImage(ilu, ARTE_MARGEM, ILU_CORTE + ARTE_MARGEM, JW - 2 * ARTE_MARGEM, JH - 2 * ARTE_MARGEM, 0, 0, 48, 46);
+    let d;
+    try { d = km.getImageData(0, 0, 48, 46).data; } catch (e) { return ''; }
+    let t = 0;
+    for (let i = 0; i < d.length; i += 4) t += d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+    const luz = t / (d.length / 4);
+    return luz > 135 ? 'clara' : luz < 80 ? 'escura' : '';
+  }
+  const TONS = new Map();
+  const tomDaArte = (carta) => ilustracao(carta).tom;
   function ilustracao(carta) {
     const id = carta.id;
     if (GUARDADAS.has(id)) return GUARDADAS.get(id);
@@ -2995,7 +4907,8 @@
     ko.strokeStyle = '#000';
     (DESENHOS[id] || desenhoEmBreve)(ilu.getContext('2d'), JW, ILU_H, ko);
     grao(ilu.getContext('2d'), JW, ILU_H, 16, 5000 + (carta.numero || 0));
-    const v = { ilu, obj };
+    if (!TONS.has(id)) TONS.set(id, tomDe(ilu));
+    const v = { ilu, obj, tom: TONS.get(id), foco: FOCO[id] || null };
     GUARDADAS.set(id, v);
     if (GUARDADAS.size > 6) GUARDADAS.delete(GUARDADAS.keys().next().value);
     return v;
@@ -3003,22 +4916,43 @@
   // Onde a arte entra: na janela (cortada em cima e embaixo) ou cheia (glória): cobrindo o
   // retângulo ARTE_CHEIA sem a margem do desenho, recortada no vão de dentro da moldura. Nada
   // da arte passa para baixo do papel nem para a moldura (nada de pixel esticado).
-  function porArte(k, img, cheia) {
+  // a faixa da arte cheia que fica à vista: abaixo da pílula do rótulo e acima do papel
+  const SEGURO_CHEIA = { topo: 110, base: 858 };
+  function porArte(k, img, cheia, foco) {
     k.imageSmoothingQuality = 'high';
     if (cheia) {
       const A = ARTE_CHEIA;
       const sw = JW - 2 * ARTE_MARGEM;
       const sh = ILU_H - 2 * ARTE_MARGEM;
-      const e = Math.max(A.w / sw, A.h / sh);
+      let e = Math.max(A.w / sw, A.h / sh);
+      if (foco && foco[2]) e = Math.max(e * foco[2], A.w / JW, A.h / ILU_H);
       const uw = A.w / e;
       const uh = A.h / e;
+      let sx = (JW - uw) / 2;
+      let sy = (ILU_H - uh) / 2;
+      let dy = 0;
+      if (foco) {
+        // o ponto do foco entre a pílula e o papel; o que o desenho não cobre vira deslocamento
+        const fx = foco[0] * JW;
+        const fy = foco[1] * ILU_H;
+        const y = A.y + (fy - sy) * e;
+        if (y < SEGURO_CHEIA.topo) sy = fy - (SEGURO_CHEIA.topo - A.y) / e;
+        else if (y > SEGURO_CHEIA.base) sy = fy - (SEGURO_CHEIA.base - A.y) / e;
+        if (sy < 0) { dy = -sy * e; sy = 0; } else if (sy > ILU_H - uh) { dy = -(sy - (ILU_H - uh)) * e; sy = ILU_H - uh; }
+        const x = A.x + (fx - sx) * e;
+        if (x < A.x + 60) sx = fx - 60 / e; else if (x > A.x + A.w - 60) sx = fx - (A.w - 60) / e;
+        sx = Math.max(0, Math.min(JW - uw, sx));
+      }
       k.save();
       k.beginPath();
       k.rect(A.x, A.y, A.w, A.h);
       k.clip();
       retRedondo(k, FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26);
       k.clip();
-      k.drawImage(img, ARTE_MARGEM + (sw - uw) / 2, ARTE_MARGEM + (sh - uh) / 2, uw, uh, A.x, A.y, A.w, A.h);
+      // a beirada que sobra (com a arte deslocada) é a última linha do desenho, esticada
+      if (dy > 0) k.drawImage(img, sx, 0, uw, 3, A.x, A.y, A.w, dy + 2);
+      if (dy < 0) k.drawImage(img, sx, ILU_H - 3, uw, 3, A.x, A.y + A.h + dy - 2, A.w, -dy + 2);
+      k.drawImage(img, sx, sy, uw, uh, A.x, A.y + dy, A.w, A.h);
       k.restore();
     } else k.drawImage(img, 0, ILU_CORTE, JW, JH, JX, JY, JW, JH);
   }
@@ -3200,13 +5134,16 @@
     const rar = raridadeDe(carta);
     const R = RARIDADES[rar];
     const M = MOLDURAS[rar];
-    const { ilu } = ilustracao(carta);
+    const { ilu, foco, tom } = ilustracao(carta);
     retRedondo(k, 0, 0, CW, CH, 46);
     k.save();
     k.clip();
     if (M.cheia) {
-      porArte(k, ilu, true);
-      // a luz da glória, parada no papel: o clarão no alto e os raios finos, simétricos
+      porArte(k, ilu, true, foco);
+      // a luz da glória, parada no papel: o clarão no alto e os raios finos, simétricos. Na arte
+      // escura (a noite de Abraão, de Gideão), os raios ficam curtos e fracos, só no alto: no céu
+      // escuro, raio longo vira grade
+      const escura = tom === 'escura';
       k.save();
       k.beginPath();
       k.rect(ARTE_CHEIA.x, ARTE_CHEIA.y, ARTE_CHEIA.w, ARTE_CHEIA.h);
@@ -3217,8 +5154,8 @@
       for (let i = 0; i < 72; i++) {
         const a = Math.PI / 2 + ((i + 0.5) / 72 - 0.5) * 2.6;
         const g = k.createLinearGradient(CW / 2, -60, CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
-        g.addColorStop(0, 'rgba(255,244,214,' + (i % 2 ? 0.16 : 0.3) + ')');
-        g.addColorStop(0.75, 'rgba(255,244,214,0)');
+        g.addColorStop(0, 'rgba(255,244,214,' + (i % 2 ? 0.16 : 0.3) * (escura ? 0.3 : 1) + ')');
+        g.addColorStop(escura ? 0.36 : 0.75, 'rgba(255,244,214,0)');
         k.strokeStyle = g;
         k.lineWidth = i % 2 ? 2 : 4;
         k.beginPath();
@@ -3228,7 +5165,7 @@
       }
       // nas artes claras o clarão some; ali os raios entram como traço de ouro fino
       k.save();
-      k.globalAlpha = 0.16;
+      k.globalAlpha = escura ? 0 : 0.16;
       k.strokeStyle = '#b8862a';
       k.lineWidth = 1.5;
       for (let i = 0; i < 72; i += 2) {
@@ -3393,9 +5330,9 @@
     const c = tela(w, h);
     const k = c.getContext('2d');
     const M = MOLDURAS[rar];
-    const { ilu, obj } = ilustracao(carta);
+    const { ilu, obj, foco } = ilustracao(carta);
     k.setTransform(w / CW, 0, 0, h / CH, 0, 0);
-    if (M.cheia) porArte(k, ilu, true);
+    if (M.cheia) porArte(k, ilu, true, foco);
     else {
       k.save();
       retRedondo(k, JX, JY, JW, JH, 22);
@@ -3418,7 +5355,7 @@
     k.globalCompositeOperation = 'destination-out';
     k.globalAlpha = 0.9;
     k.filter = 'blur(2px)';
-    porArte(k, obj, !!M.cheia);
+    porArte(k, obj, !!M.cheia, foco);
     k.filter = 'none';
     k.globalAlpha = 1;
     // fora do texto: o papel e a plaqueta do rótulo (a forma exata dela)
@@ -3440,6 +5377,222 @@
     tirarTexto();
     k.restore();
     return c;
+  }
+  // ---------- o brilho assado: a imagem salva (storyDaCarta) e a miniatura do álbum ----------
+  // O brilho da raridade do cartas.css, pintado no canvas num repouso fixo (a luz no alto, à
+  // esquerda, como a carta parada sobre a mesa), com as mesmas camadas e as mesmas máscaras:
+  // nada sobre os objetos desenhados nem sobre o texto. Determinístico: a mesma carta sai
+  // sempre igual. Linho é fosco (nada). Na miniatura (mini), só o tom parado da moldura, da
+  // prata para cima, para a raridade se ver na grade.
+  const REPOUSO = { mx: 34, my: 28, o: 0.5, og: 0.45 };
+  // a linha de um linear-gradient do CSS (graus: 0 para cima, 90 para a direita) na caixa
+  function gradienteCss(k, graus, x, y, w, h, paradas) {
+    const a = (graus * Math.PI) / 180;
+    const dx = Math.sin(a);
+    const dy = -Math.cos(a);
+    const meia = (Math.abs(w * dx) + Math.abs(h * dy)) / 2;
+    const cx = x + w / 2;
+    const cy = y + h / 2;
+    const g = k.createLinearGradient(cx - dx * meia, cy - dy * meia, cx + dx * meia, cy + dy * meia);
+    for (const [q, cor] of paradas) g.addColorStop(Math.max(0, Math.min(1, q)), cor);
+    return g;
+  }
+  // as paradas de um repeating-linear-gradient (em fração da linha), repetidas até o fim dela
+  const repetir = (paradas, periodo) => {
+    const r = [];
+    for (let i = 0; i * periodo < 1; i++) for (const [q, cor] of paradas) if (q + i * periodo <= 1) r.push([q + i * periodo, cor]);
+    return r;
+  };
+  // as riscas de um repeating-linear-gradient fino do CSS (graus), uma a cada passo
+  function riscas(k, W, H, graus, passo, largura, cor) {
+    const L = Math.hypot(W, H);
+    k.save();
+    k.translate(W / 2, H / 2);
+    k.rotate(((graus - 90) * Math.PI) / 180);
+    k.strokeStyle = cor;
+    k.lineWidth = largura;
+    k.beginPath();
+    for (let d = -L / 2; d < L / 2; d += passo) { k.moveTo(d, -L / 2); k.lineTo(d, L / 2); }
+    k.stroke();
+    k.restore();
+  }
+  // o radial-gradient(farthest-corner circle at mx my) do CSS
+  function radialCss(k, W, H, mx, my, paradas) {
+    const x = (W * mx) / 100;
+    const y = (H * my) / 100;
+    const g = k.createRadialGradient(x, y, 0, x, y, Math.hypot(Math.max(x, W - x), Math.max(y, H - y)));
+    for (const [q, cor] of paradas) g.addColorStop(q, cor);
+    return g;
+  }
+  // As zonas (máscaras só de alfa, no tamanho W x H): a moldura sem o texto, e a carta sem o
+  // papel nem o rótulo do alto (o --zona-moldura / --zona-sem-texto / --sem-rotulos do CSS).
+  function zonaDaCarta(carta, rar, W, H, { moldura, mini }) {
+    const c = tela(W, H);
+    const k = c.getContext('2d');
+    const M = MOLDURAS[rar];
+    k.setTransform(W / CW, 0, 0, H / CH, 0, 0);
+    k.fillStyle = '#000';
+    if (moldura) k.fill(M.cheia ? vazado(FAIXA, FAIXA, CW - 2 * FAIXA, CH - 2 * FAIXA, 26) : vazado(JX, JY, JW, JH, 22), 'evenodd');
+    else k.fillRect(0, 0, CW, CH);
+    k.globalCompositeOperation = 'destination-out';
+    if (M.cheia) k.fillRect(PAPEL_CHEIO.x - 4, PAPEL_CHEIO.y - 6, PAPEL_CHEIO.w + 8, PAPEL_CHEIO.h + 10);
+    else { retRedondo(k, JX - 2, PY - 2, JW + 4, PH + 4, 24); k.fill(); }
+    if (!mini) {
+      const P = plaqueta(k, carta, M);
+      if (P.forma) k.fill(P.forma);
+      else {
+        // o rótulo escrito direto na moldura: a elipse macia do --sem-rotulos
+        k.save();
+        k.translate(CW / 2, CH * 0.056);
+        k.scale(1, (CH * 0.044) / (CW * 0.35));
+        const g = k.createRadialGradient(0, 0, 0, 0, 0, CW * 0.35);
+        g.addColorStop(0, '#000');
+        g.addColorStop(0.6, '#000');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        k.fillStyle = g;
+        k.fillRect(-CW * 0.35, -CW * 0.35, CW * 0.7, CW * 0.7);
+        k.restore();
+      }
+    }
+    return c;
+  }
+  // uma camada: pinta, corta pelas máscaras (todas juntas, e sempre pela forma da própria carta,
+  // para nada sair nos cantos redondos) e mistura na carta
+  function camadaDeBrilho(k, W, H, pintar, mascaras, modo, alfa, filtro) {
+    const l = tela(W, H);
+    const kl = l.getContext('2d');
+    pintar(kl);
+    kl.globalCompositeOperation = 'destination-in';
+    for (const m of [...mascaras, k.canvas]) if (m) kl.drawImage(m, 0, 0, W, H);
+    k.save();
+    k.globalCompositeOperation = modo;
+    k.globalAlpha = Math.max(0, Math.min(1, alfa));
+    if (filtro) k.filter = filtro;
+    k.drawImage(l, 0, 0);
+    k.restore();
+  }
+  function assarBrilho(c, carta, { mini = false } = {}) {
+    const rar = raridadeDe(carta);
+    if (rar === 'linho' || (mini && RARIDADES[rar].ordem < 2)) return c;
+    const W = c.width;
+    const H = c.height;
+    const k = c.getContext('2d');
+    const { mx, my, o, og } = REPOUSO;
+    const bx = 50 + (mx - 50) * 0.9;
+    const by = 50 + (my - 50) * 0.9;
+    // o px do CSS numa carta de 340 (na miniatura, a trama fica um pouco mais grossa)
+    const u = W / (mini ? 170 : 340);
+    const tom = tomDaArte(carta);
+    const clara = tom === 'clara';
+    const escura = tom === 'escura';
+    const moldura = zonaDaCarta(carta, rar, W, H, { moldura: true, mini });
+    const semTexto = mini ? null : zonaDaCarta(carta, rar, W, H, { moldura: false });
+    let luzes = moldura;
+    if (!mini && (rar === 'ouro' || rar === 'gloria')) { try { luzes = mascaraDoBrilho(carta, rar); } catch (e) { /* fica a moldura */ } }
+    // o fundo de 320% (ou 260%, 300%) do CSS, posto em --bx --by
+    const caixa = (escala) => [(W - W * escala) * bx / 100, (H - H * escala) * by / 100, W * escala, H * escala];
+    // a faixa de luz do metal, de lado a lado da moldura (o lampejo, aqui parado em --bx)
+    const faixa = (meia, cor) => (kl) => {
+      kl.fillStyle = gradienteCss(kl, 112, 0, 0, W, H, [[(bx - meia) / 100, 'rgba(0,0,0,0)'], [bx / 100, cor], [(bx + meia) / 100, 'rgba(0,0,0,0)']]);
+      kl.fillRect(0, 0, W, H);
+    };
+    if (rar === 'bronze') {
+      camadaDeBrilho(k, W, H, (kl) => {
+        kl.fillStyle = gradienteCss(kl, 112, 0, 0, W, H, [[(bx - 46) / 100, 'rgba(90,40,0,.5)'], [(bx - 30) / 100, 'rgba(255,190,120,0)'],
+          [bx / 100, 'rgba(255,206,150,.85)'], [(bx + 30) / 100, 'rgba(255,190,120,0)'], [(bx + 46) / 100, 'rgba(90,40,0,.5)']]);
+        kl.fillRect(0, 0, W, H);
+        faixa(7, 'rgba(255,246,228,.95)')(kl);
+      }, [moldura], 'overlay', 0.3 + o * 0.7);
+    }
+    if (rar === 'prata') {
+      camadaDeBrilho(k, W, H, (kl) => {
+        const [x, y, w, h] = caixa(3.2);
+        kl.fillStyle = gradienteCss(kl, 105, x, y, w, h, repetir([[0, '#6c80b4'], [0.05, '#92bcff'], [0.1, '#d2bfff'], [0.135, '#f4f8ff'],
+          [0.18, '#8fdcff'], [0.23, '#b7a2ff'], [0.265, '#e9f2ff'], [0.31, '#6c80b4']], 0.31));
+        kl.fillRect(0, 0, W, H);
+        // a trama em losango da folha holográfica
+        riscas(kl, W, H, 58, 3 * u, u, 'rgba(20,24,40,.32)');
+        riscas(kl, W, H, -58, 3 * u, u, 'rgba(20,24,40,.32)');
+      }, [moldura], 'hard-light', 0.32 + o * 0.55, 'brightness(.9) contrast(1.25) saturate(1.35)');
+    }
+    if (rar === 'ouro') {
+      camadaDeBrilho(k, W, H, (kl) => {
+        const [x, y, w, h] = caixa(2.6);
+        kl.fillStyle = gradienteCss(kl, -58, x, y, w, h, [[0, '#8c6216'], [0.09, '#d9a640'], [0.16, '#fbe7a8'], [0.23, '#e7b552'], [0.31, '#b88a3a'],
+          [0.39, '#f3d48a'], [0.47, '#c99a3c'], [0.55, '#ffe9b0'], [0.63, '#d8a24a'], [0.71, '#a87c30'], [0.8, '#f0cc7c'], [0.88, '#e2ad4c'], [1, '#8c6216']]);
+        kl.fillRect(0, 0, W, H);
+        kl.globalCompositeOperation = 'soft-light';
+        riscas(kl, W, H, -58, 2.5 * u, 1.2 * u, 'rgba(255,246,214,.28)');
+        kl.globalCompositeOperation = 'multiply';
+        kl.fillStyle = radialCss(kl, W, H, mx, my, [[0, 'rgba(255,250,235,.9)'], [0.7, 'rgba(120,80,10,.35)'], [1, 'rgba(120,80,10,.35)']]);
+        kl.fillRect(0, 0, W, H);
+      }, semTexto ? [luzes, semTexto] : [luzes], clara && !mini ? 'soft-light' : 'color-dodge', mini ? 0.5 : clara ? 0.45 + o * 0.55 : 0.28 + o * 0.55,
+      clara && !mini ? 'saturate(1.5) contrast(1.15)' : 'brightness(.6) contrast(1.15)');
+    }
+    if (rar === 'gloria') {
+      camadaDeBrilho(k, W, H, (kl) => {
+        // as faixas finas do prisma (15 px do CSS), deslocadas com --bx
+        const per = 15 * u;
+        const cores = ['hsl(42 95% 74%)', 'hsl(330 80% 80%)', 'hsl(265 70% 82%)', 'hsl(205 85% 76%)', 'hsl(160 60% 74%)', 'hsl(42 95% 74%)'];
+        const L = Math.hypot(W, H) + per * 2;
+        const desvio = ((bx / 100) * W * 2) % per;
+        kl.save();
+        kl.translate(W / 2, H / 2);
+        kl.rotate(((115 - 90) * Math.PI) / 180);
+        const g = kl.createLinearGradient(-L / 2 - desvio, 0, L / 2 - desvio, 0);
+        const n = Math.ceil(L / per);
+        for (let i = 0; i < n; i++) cores.forEach((cor, j) => g.addColorStop(Math.min(1, (i + j / 5) / n), cor));
+        kl.fillStyle = g;
+        kl.fillRect(-L / 2, -L / 2, L, L);
+        kl.restore();
+        kl.globalCompositeOperation = 'multiply';
+        kl.fillStyle = radialCss(kl, W, H, mx, my, [[0, 'rgba(255,255,255,.7)'], [0.8, 'rgba(60,60,80,.4)'], [1, 'rgba(60,60,80,.4)']]);
+        kl.fillRect(0, 0, W, H);
+      }, semTexto ? [luzes, semTexto] : [luzes], (clara || escura) && !mini ? 'soft-light' : 'color-dodge',
+      mini ? 0.55 : clara ? 0.3 + o * 0.55 : escura ? 0.25 + o * 0.35 : 0.4 + o * 0.55,
+      clara && !mini ? 'saturate(1.5) contrast(1.15)' : escura && !mini ? 'saturate(1.3)' : 'brightness(.6) contrast(1.25)');
+    }
+    // o metal da moldura: a faixa de luz que corre (prata, ouro e glória)
+    if (rar !== 'bronze') {
+      const [meia, cor, alfa] = { prata: [9, 'rgba(240,248,255,.95)', 0.15], ouro: [10, 'rgba(255,252,230,.95)', 0.25], gloria: [12, 'rgba(255,255,255,.95)', 0.3] }[rar];
+      camadaDeBrilho(k, W, H, faixa(meia, cor), [moldura], 'overlay', alfa + o * (1 - alfa));
+    }
+    if (mini) return c;
+    // a purpurina perto da luz (ouro e glória), nas luzes da arte e na moldura
+    if (rar === 'ouro' || rar === 'gloria') {
+      const pp = purpurina(W, H, rar, 31);
+      const perto = tela(W, H);
+      const kp = perto.getContext('2d');
+      kp.fillStyle = radialCss(kp, W, H, mx, my, rar === 'ouro' ? [[0, '#000'], [0.26, 'rgba(0,0,0,.55)'], [0.58, 'rgba(0,0,0,0)']]
+        : [[0, '#000'], [0.34, 'rgba(0,0,0,.6)'], [0.7, 'rgba(0,0,0,.15)'], [1, 'rgba(0,0,0,.15)']]);
+      kp.fillRect(0, 0, W, H);
+      camadaDeBrilho(k, W, H, (kl) => kl.drawImage(pp, 0, 0), [perto, luzes, semTexto],
+        rar === 'gloria' ? 'screen' : clara ? 'overlay' : 'color-dodge', rar === 'gloria' ? 0.4 + o * 0.6 : 0.35 + o * 0.65);
+    }
+    // o reflexo: a luz da mesa, fora do papel e do rótulo
+    camadaDeBrilho(k, W, H, (kl) => {
+      kl.fillStyle = radialCss(kl, W, H, mx, my, [[0, 'rgba(255,255,255,.85)'], [0.22, 'rgba(255,255,255,.3)'], [0.95, 'rgba(0,0,0,.4)'], [1, 'rgba(0,0,0,.4)']]);
+      kl.fillRect(0, 0, W, H);
+    }, [semTexto], 'overlay', og * (escura ? 0.3 : 0.55));
+    return c;
+  }
+  // O halo da glória em volta da carta (o ::before do CSS): o brilho macio, dourado e perolado,
+  // na forma da carta, igual dos quatro lados. x, y, w, h é a carta; ela é desenhada por cima.
+  function haloAssado(k, x, y, w, h) {
+    const u = w / 340;
+    const raio = w * 0.046;
+    for (const [borrao, abre, cor] of [[16, 3, 'rgba(255,224,150,.8)'], [34, 8, 'rgba(255,196,228,.32)'], [56, 14, 'rgba(170,214,255,.24)']]) {
+      const a = abre * u;
+      k.save();
+      // só a sombra: a forma fica longe, fora do canvas, e a sombra volta para o lugar
+      k.shadowColor = cor;
+      k.shadowBlur = borrao * u;
+      k.shadowOffsetX = 20000;
+      k.fillStyle = '#000';
+      retRedondo(k, x - a - 20000, y - a, w + 2 * a, h + 2 * a, raio + a);
+      k.fill();
+      k.restore();
+    }
   }
   // O verso: o desenho aprovado (o campo escuro com as curvas de nível, o medalhão com o anel
   // fino e o símbolo creme, centrado) com a moldura no material da raridade e o anel na cor dela.
@@ -3541,12 +5694,12 @@
     const R = RARIDADES[rar];
     const M = MOLDURAS[rar];
     const r = sorteio(9100 + (carta.numero || 0));
-    const { ilu } = ilustracao(carta);
+    const { ilu, foco } = ilustracao(carta);
     retRedondo(k, 0, 0, CW, CH, 46);
     k.clip();
     let papel;
     if (M.cheia) {
-      porArte(k, ilu, true);
+      porArte(k, ilu, true, foco);
       moldura(k, M, r, rar);
       papel = PAPEL_CHEIO;
       k.save();
@@ -3592,7 +5745,8 @@
     retRedondo(k, 1.5, 1.5, CW - 3, CH - 3, 45);
     k.stroke();
     k.restore();
-    return c;
+    // da prata para cima, o tom parado do holo na moldura, para a raridade se ver na grade
+    return assarBrilho(c, carta, { mini: true });
   }
   // A carta, por fora: desenharCarta(carta, { largura, raridade, semTexto, canvas }) devolve o
   // canvas. largura é a do canvas em px (padrão 1000; a altura é 1,4 vez); semTexto dá a
@@ -3630,12 +5784,14 @@
     escrever(k, 'TIREI ESTA CARTA NO BAÚ DA SEMANA', L / 2, 330, oswald(34, 600), COR.creme, { alinhar: 'center', espaco: 6 });
     const cw = 800;
     const ch = cw * 1.4;
-    const carta2 = desenharCarta(tela(cw, ch), carta);
+    // a carta com o brilho da raridade assado, no repouso (assarBrilho); na glória, o halo
+    const carta2 = assarBrilho(desenharCarta(tela(cw, ch), carta), carta);
     k.save();
     k.filter = 'blur(40px)';
     k.fillStyle = 'rgba(0,0,0,.7)';
     k.fillRect(L / 2 - cw / 2 + 20, 420 + 40, cw - 40, ch - 20);
     k.restore();
+    if (raridadeDe(carta) === 'gloria') haloAssado(k, L / 2 - cw / 2, 400, cw, ch);
     k.drawImage(carta2, L / 2 - cw / 2, 400);
     grao(k, L, A, 12, 4242);
     if (CC.story && CC.story.marca) CC.story.marca(k, A - 250 - 80, { cor: '#f4f1ea', corFraca: '#a9a49a' });
@@ -3743,10 +5899,37 @@
   // brilho fica fora do texto por clip-path (as medidas de JX/JY/PY acima, em %).
   // Toque: vira para o verso e volta. Arraste na horizontal: gira livre e, ao soltar, assenta
   // no lado mais perto. Com menos movimento: não inclina, o brilho fica parado e virar é troca.
-  const ARTE_CLARA = new Set(['davi-funda', 'poco-jaco', 'tumulo-vazio']);
   const INCLINACAO = { linho: 7, bronze: 10, prata: 12, ouro: 14, gloria: 14 };
-  const menosMovimento = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-    || document.documentElement.classList.contains('menos-movimento');
+  const MQ_MENOS = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const menosMovimento = () => !!(MQ_MENOS && MQ_MENOS.matches) || document.documentElement.classList.contains('menos-movimento');
+  // O brilho parado: com a carta em repouso (sem dedo nem giroscópio, sem varredura, fora das
+  // fases da revelação), a luz passeia devagar pela carta, como um holográfico sobre a mesa.
+  // Por raridade: o (o holo em repouso, 0 a 1), og (o reflexo), ax/ay (quanto a luz anda, em %
+  // da carta), incl (a respiração da inclinação, em graus), lampejo [a cada s, dura s, reforço]
+  // (o reflexo de metal que passa de lado a lado da moldura) e halo (o pulso do halo, em s).
+  // A luz faz uma Lissajous lenta (10,5 s por 14,5 s), sem repetir o mesmo caminho logo.
+  const PARADO = {
+    linho: { o: 0, og: 0.55, ax: 22, ay: 15, incl: 0.8 },
+    bronze: { o: 0.12, og: 0.32, ax: 18, ay: 12, incl: 1, lampejo: [4.2, 1.4, 0.5] },
+    prata: { o: 0.42, og: 0.3, ax: 30, ay: 22, incl: 1.2, lampejo: [6, 1.7, 0.15] },
+    ouro: { o: 0.45, og: 0.3, ax: 32, ay: 26, incl: 1.4, lampejo: [5.5, 1.7, 0] },
+    gloria: { o: 0.55, og: 0.3, ax: 34, ay: 28, incl: 1.5, lampejo: [5, 1.9, 0], halo: 4.6 },
+  };
+  // Quem está à vista: um IntersectionObserver só, para todas as cartas vivas, e o
+  // visibilitychange da aba; fora da tela ou com a aba escondida, o brilho parado dorme.
+  const VIGIADAS = new Map();
+  let olho = null;
+  function vigiar(el, aviso) {
+    VIGIADAS.set(el, aviso);
+    if (typeof IntersectionObserver !== 'function') { aviso(true); return; }
+    if (!olho) olho = new IntersectionObserver((es) => { for (const e of es) { const f = VIGIADAS.get(e.target); if (f) f(e.isIntersecting); } });
+    olho.observe(el);
+  }
+  function esquecer(el) {
+    VIGIADAS.delete(el);
+    if (olho) olho.unobserve(el);
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) for (const f of [...VIGIADAS.values()]) f(null); });
   // A purpurina: pontos e estrelinhas de quatro pontas, desenhados uma vez; o CSS mostra só os
   // que estão perto da luz (máscara no ponteiro). Na glória, também a névoa colorida do cosmos.
   function purpurina(w, h, rar, semente) {
@@ -3791,7 +5974,7 @@
     return c;
   }
   const CAMADAS = '<i class="cv-holo"></i><i class="cv-metal"></i><i class="cv-purpurina"></i><i class="cv-reflexo"></i>';
-  function cartaViva(carta, { largura = 300, verso = false, interativa = true } = {}) {
+  function cartaViva(carta, { largura = 300, verso = false, interativa = true, parada = true } = {}) {
     const rar = raridadeDe(carta);
     const dpr = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
     const px = Math.round(Math.min(CW, Math.max(320, largura * dpr)));
@@ -3803,8 +5986,10 @@
     const el = document.createElement('div');
     el.className = 'carta-viva';
     el.dataset.raridade = rar;
-    // arte clara (papel, terra ao sol): o holo da arte troca o color-dodge, que estoura o claro
-    if (ARTE_CLARA.has(carta.id)) el.dataset.arte = 'clara';
+    // o tom da arte, medido no desenho (tomDe): na clara, o holo troca o color-dodge, que
+    // estoura o claro; na escura, o reflexo e o holo da glória baixam
+    const tom = tomDaArte(carta);
+    if (tom) el.dataset.arte = tom;
     // o holográfico do ouro e da glória só nas luzes e na moldura, fora dos objetos e do texto
     if (rar === 'ouro' || rar === 'gloria') {
       try { el.style.setProperty('--mascara', 'url(' + mascaraDoBrilho(carta, rar).toDataURL() + ')'); } catch (e) { /* sem máscara, fica o recorte do CSS */ }
@@ -3829,28 +6014,76 @@
     let quadro = 0;
     let tween = null;
     const max = INCLINACAO[rar];
+    // O brilho parado (PARADO): w é o peso dele (0 a 1), que sobe devagar quando a carta fica em
+    // repouso e desce rápido quando o dedo pega; o que ele soma vai por cima do valor da mola,
+    // então a troca entre o dedo e o repouso nunca pula. t é o relógio dele (só anda quando ele
+    // roda); lx é o lugar do lampejo de metal (estacionado fora da carta entre um e outro).
+    const P = PARADO[rar];
+    const pd = { ligado: !!parada, visivel: false, conectou: false, mao: false, w: 0, t: 0, ultimo: 0, aplicou: 0,
+      lx: 130, ini: -1, prox: 0.6, reforco: 0 };
+    const rodaParado = () => pd.ligado && pd.visivel && !document.hidden && !menosMovimento();
+    const querParado = () => rodaParado() && !pd.mao && !tween;
     const aplicar = () => {
       const g = est.giro[0];
       const s = el.style;
-      s.setProperty('--rx', est.rx[0].toFixed(2) + 'deg');
-      s.setProperty('--ry', est.ry[0].toFixed(2) + 'deg');
+      const w = pd.w;
+      const a = (pd.t / 10.5) * 6.2832;
+      const b = (pd.t / 14.5) * 6.2832 + 0.9;
+      const mx = est.mx[0] + w * P.ax * Math.sin(a);
+      const my = est.my[0] + w * P.ay * Math.sin(b);
+      s.setProperty('--rx', (est.rx[0] - w * P.incl * 0.8 * Math.sin(b)).toFixed(2) + 'deg');
+      s.setProperty('--ry', (est.ry[0] + w * P.incl * Math.sin(a)).toFixed(2) + 'deg');
       s.setProperty('--giro', g.toFixed(2) + 'deg');
-      s.setProperty('--mx', est.mx[0].toFixed(1) + '%');
-      s.setProperty('--my', est.my[0].toFixed(1) + '%');
+      s.setProperty('--mx', mx.toFixed(1) + '%');
+      s.setProperty('--my', my.toFixed(1) + '%');
       // o holo corre com o ângulo: inclinar e girar mexem a posição das faixas
       const gx = Math.sin((g * Math.PI) / 180) * 40;
-      s.setProperty('--bx', (50 + (est.mx[0] - 50) * 0.9 + gx).toFixed(1) + '%');
-      s.setProperty('--by', (50 + (est.my[0] - 50) * 0.9).toFixed(1) + '%');
-      s.setProperty('--o', Math.max(0, Math.min(1, est.o[0])).toFixed(3));
+      const bx = 50 + (mx - 50) * 0.9 + gx;
+      s.setProperty('--bx', bx.toFixed(1) + '%');
+      s.setProperty('--by', (50 + (my - 50) * 0.9).toFixed(1) + '%');
+      // o lampejo: com o dedo, na faixa de luz do holo (--bx); parada, no lugar dele
+      s.setProperty('--lx', (P.lampejo ? bx * (1 - w) + pd.lx * w : bx).toFixed(1) + '%');
+      s.setProperty('--o', Math.max(0, Math.min(1, est.o[0] + w * (P.o + pd.reforco))).toFixed(3));
+      s.setProperty('--og', Math.max(0, Math.min(1, est.o[0] + w * P.og)).toFixed(3));
+      if (P.halo) s.setProperty('--halo', (w * (0.5 - 0.5 * Math.cos((pd.t / P.halo) * 6.2832))).toFixed(3));
+      // a sombra só segue o dedo (o brilho parado não repinta a sombra a cada quadro)
       s.setProperty('--d', (Math.hypot(est.mx[0] - 50, est.my[0] - 50) / 70).toFixed(3));
       const lado = ((Math.round(g / 180) % 2) + 2) % 2 === 1;
       el.classList.toggle('mostra-verso', lado);
+      pd.aplicou = performance.now();
+    };
+    // um passo do brilho parado: o peso, o relógio e o lampejo; diz se ainda quer quadros
+    const passoParado = (agora) => {
+      const dt = Math.min(50, Math.max(0, agora - (pd.ultimo || agora)));
+      pd.ultimo = agora;
+      if (!rodaParado()) { pd.ultimo = 0; return false; }
+      const alvoW = querParado() ? 1 : 0;
+      if (pd.w !== alvoW) {
+        pd.w += (alvoW - pd.w) * (1 - Math.exp(-dt / (alvoW > pd.w ? 500 : 220)));
+        if (Math.abs(alvoW - pd.w) < 0.003) pd.w = alvoW;
+      }
+      if (pd.w <= 0) return alvoW > 0;
+      pd.t += dt / 1000;
+      if (P.lampejo) {
+        const [cada, dura, forca] = P.lampejo;
+        // só começa com o peso cheio: assim a volta para fora da carta nunca aparece
+        if (pd.ini < 0 && pd.t >= pd.prox && pd.w > 0.97) pd.ini = pd.t;
+        if (pd.ini >= 0) {
+          const f = (pd.t - pd.ini) / dura;
+          if (f >= 1) { pd.ini = -1; pd.lx = 130; pd.reforco = 0; pd.prox = pd.t + cada - dura; } else {
+            pd.lx = -30 + 160 * f * f * (3 - 2 * f);
+            pd.reforco = forca * Math.sin(Math.PI * f);
+          }
+        }
+      }
+      return true;
     };
     const passo = () => {
       quadro = 0;
+      const agora = performance.now();
       let mexendo = false;
       if (tween) {
-        const t = Math.min(1, (performance.now() - tween.inicio) / tween.duracao);
+        const t = Math.min(1, (agora - tween.inicio) / tween.duracao);
         const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         for (const [nome, de, para] of tween.vars) { est[nome][0] = de + (para - de) * e; est[nome][1] = 0; est[nome][2] = para; }
         if (t < 1) mexendo = true; else { const fim = tween.fim; tween = null; if (fim) fim(); }
@@ -3864,14 +6097,24 @@
           if (Math.abs(v[1]) > 0.01 || Math.abs(v[2] - v[0]) > 0.02) mexendo = true; else v[0] = v[2];
         }
       }
-      aplicar();
-      if (mexendo) quadro = requestAnimationFrame(passo);
+      if (pd.conectou && !el.isConnected) { esquecer(el); pd.ligado = false; }
+      const parado = passoParado(agora);
+      // só o brilho parado andando (a luz devagar): 30 quadros por segundo bastam
+      if (mexendo || pd.w < 1 || agora - pd.aplicou > 30) aplicar();
+      if (mexendo || parado) quadro = requestAnimationFrame(passo);
     };
     const mover = () => { if (!quadro) quadro = requestAnimationFrame(passo); };
     const alvo = (vals) => { for (const [n, v] of Object.entries(vals)) est[n][2] = v; mover(); };
+    vigiar(el, (v) => {
+      if (v !== null) pd.visivel = v;
+      if (v) pd.conectou = true;
+      if (pd.conectou && !el.isConnected) { esquecer(el); return; }
+      mover();
+    });
     const mirar = (fx, fy, forca = 1) => {
       // fx, fy de 0 a 1 na carta; a carta inclina para longe do dedo, como quem aperta a ponta
       const verso = el.classList.contains('mostra-verso');
+      pd.mao = true;
       alvo({ rx: (0.5 - fy) * 2 * max * forca, ry: (fx - 0.5) * 2 * max * forca * (verso ? -1 : 1), mx: fx * 100, my: fy * 100, o: forca });
     };
     const api = {
@@ -3881,9 +6124,13 @@
       inclinar(fx, fy, forca = 1) {
         mirar(fx, fy, forca);
         for (const v of Object.values(est)) { v[0] = v[2]; v[1] = 0; }
+        pd.w = 0;
         aplicar();
       },
-      soltar() { alvo({ rx: 0, ry: 0, mx: 50, my: 50, o: 0 }); },
+      // larga a carta: ela volta ao repouso e, se o brilho parado estiver ligado, ele volta devagar
+      soltar() { pd.mao = false; alvo({ rx: 0, ry: 0, mx: 50, my: 50, o: 0 }); },
+      // liga (padrão) ou desliga o brilho parado; a revelação o liga só no fim
+      parada(ligar = true) { pd.ligado = !!ligar; mover(); },
       virar(paraVerso) {
         const atual = Math.round(est.giro[2] / 180) * 180;
         const verso = paraVerso === undefined ? !el.classList.contains('mostra-verso') : paraVerso;
@@ -3943,6 +6190,7 @@
             toque.ux = ev.clientX;
             toque.ut = agora;
             est.giro[2] = toque.giro + dx * (180 / Math.max(160, q.width * 0.9));
+            pd.mao = true;
             alvo({ rx: 0, ry: 0, o: 0.8, mx: 50 + Math.sin((est.giro[2] * Math.PI) / 180) * 40, my: 50 });
             return;
           }
@@ -4115,7 +6363,8 @@
     rv.querySelector('.rv-boca').appendChild(bau.boca);
     // a tampa é uma peça só, com duas faces: a de fora e, no verso dela, a de dentro
     rv.querySelector('.rv-dobradica').append(bau.fora, bau.dentro);
-    const api = cartaViva(c, { largura: larg, verso: true });
+    // o brilho parado espera o fim: nas fases da revelação, a luz é a da linha do tempo
+    const api = cartaViva(c, { largura: larg, verso: true, parada: false });
     api.el.setAttribute('tabindex', '0');
     rv.querySelector('.rv-carta').appendChild(api.el);
     const botoes = rv.querySelector('.rv-botoes');
@@ -4144,6 +6393,7 @@
       timers.forEach(clearTimeout);
       fase('fim');
       api.soltar();
+      api.parada(true);
       // o foco vai para o fim (a legenda é lida); "Ler a história", se houver, fica a um Tab
       const foco = rv.querySelector('.rv-fim');
       try { foco.focus({ preventScroll: true }); } catch (e) { /* sem foco */ }

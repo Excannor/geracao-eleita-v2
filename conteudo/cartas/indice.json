@@ -44,7 +44,7 @@
       "numero": 1,
       "titulo": "A oferta de Abel",
       "referencia": "Gênesis 4.4",
-      "voceSabia": "Abel ofereceu a Deus as primeiras crias do seu rebanho.",
+      "voceSabia": "Abel ofereceu ao Senhor as primeiras crias do seu rebanho.",
       "link": "#/mapa/genesis",
       "rascunho": true,
       "lancada": false
@@ -55,7 +55,7 @@
       "numero": 2,
       "titulo": "Noé e a arca",
       "referencia": "Gênesis 6.14",
-      "voceSabia": "A arca era de madeira de cipreste, revestida de piche por dentro e por fora.",
+      "voceSabia": "A arca era de cipreste, revestida de piche por dentro e por fora.",
       "link": "#/mapa/genesis",
       "rascunho": true,
       "lancada": false
@@ -66,7 +66,7 @@
       "numero": 3,
       "titulo": "Abraão e as estrelas",
       "referencia": "Gênesis 15.5",
-      "voceSabia": "Deus levou Abraão para fora da tenda e pediu que ele contasse as estrelas.",
+      "voceSabia": "O Senhor o levou para fora da tenda e disse: conte as estrelas, se puder.",
       "link": "#/atlas/abraao",
       "rascunho": true,
       "lancada": false
@@ -88,7 +88,7 @@
       "numero": 5,
       "titulo": "Os sonhos de José",
       "referencia": "Gênesis 37.5-9",
-      "voceSabia": "No sonho de José, os feixes dos irmãos se inclinavam diante do feixe dele.",
+      "voceSabia": "No sonho, os feixes dos irmãos se inclinavam diante do feixe de José.",
       "link": "#/mapa/genesis",
       "rascunho": true,
       "lancada": false
@@ -99,7 +99,7 @@
       "numero": 6,
       "titulo": "Moisés no cesto",
       "referencia": "Êxodo 2.3",
-      "voceSabia": "A mãe vedou um cesto de junco com betume e o deixou entre os juncos do rio.",
+      "voceSabia": "A mãe vedou um cesto de junco com betume e o deixou à beira do rio.",
       "link": "#/mapa/exodo",
       "rascunho": true,
       "lancada": false
@@ -110,7 +110,7 @@
       "numero": 7,
       "titulo": "A corda vermelha de Raabe",
       "referencia": "Josué 2.18",
-      "voceSabia": "A corda que ajudou os espias a descer ficou pendurada na janela de Raabe.",
+      "voceSabia": "A corda vermelha que ajudou os espiões a descer ficou na janela.",
       "link": "#/atlas/invasao",
       "rascunho": true,
       "lancada": false
@@ -121,7 +121,7 @@
       "numero": 8,
       "titulo": "Gideão e as tochas",
       "referencia": "Juízes 7.16-20",
-      "voceSabia": "Cada um dos trezentos levava uma corneta e uma tocha dentro de um vaso de barro.",
+      "voceSabia": "Cada soldado levava uma corneta e uma tocha num vaso de barro.",
       "link": "#/mapa/juizes",
       "rascunho": true,
       "lancada": false
@@ -132,7 +132,7 @@
       "numero": 9,
       "titulo": "Rute e as espigas",
       "referencia": "Rute 2.2-3",
-      "voceSabia": "Rute recolhia as espigas que sobravam atrás dos ceifeiros, no campo de Boaz.",
+      "voceSabia": "No campo de Boaz, Rute recolhia as espigas que sobravam.",
       "link": "#/mapa/rute",
       "rascunho": true,
       "lancada": false
@@ -174,9 +174,9 @@
       "id": "nuvem-testemunhas",
       "album": "herois",
       "numero": 13,
-      "titulo": "Nuvem de testemunhas",
+      "titulo": "Multidão de testemunhas",
       "referencia": "Hebreus 12.1",
-      "voceSabia": "Os heróis da fé do capítulo 11 são a multidão de testemunhas ao nosso redor.",
+      "voceSabia": "Os heróis de Hebreus 11 são a multidão de testemunhas.",
       "link": "#/mapa/hebreus",
       "rascunho": true,
       "lancada": false
