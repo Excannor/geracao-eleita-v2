@@ -10490,11 +10490,10 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.4);
   }
   // ---------- (5) As tábuas da aliança (Êx 31.18) ----------
-  // No alto do Sinai, debaixo da nuvem pesada (Êx 24.16): sobre uma laje de rocha, as duas
-  // tábuas de pedra, retangulares, de quinas gastas e com a grossura à vista; uma deitada na
-  // laje, a outra encostada nela, inclinada para trás, um pouco virada. A escrita de Deus não se
-  // imita: a face cavada é uma pedra lavrada miúda, toda por igual (sem fileira nem palavra),
-  // que brilha de dentro com uma luz morna, mais forte no meio. A nuvem desce em massas de
+  // No alto do Sinai, debaixo da nuvem pesada (Êx 24.16): as duas tábuas de pedra, juntas e de
+  // pé num afloramento de granito em camadas, de alto arredondado, faces lisas lavradas, quinas
+  // vivas e a grossura maciça à vista. A escrita de Deus não se imita: a face brilha por igual,
+  // de dentro da pedra, com uma luz morna sem letra nem fileira. A nuvem desce em massas de
   // linha cerrada, com a barriga acesa pela luz das tábuas.
   function desenhoTabuas(k, W, H, obj) {
     const r = sorteio(7501);
@@ -10516,173 +10515,138 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const luz = Math.exp(-(((x - 444) / 300) ** 2) - (((y - 470) / 160) ** 2));
       return 0.22 + m * 0.75 + (1 - y / 560) * 0.25 - barriga * 0.6 - luz * 0.55 + ruido(x, y) * 0.12;
     });
-    // a câmera: x à direita, y para cima, z para quem olha (vista um pouco de cima)
-    const S0 = 280;
-    const V = (x, y, z) => [444 + x * S0 + z * S0 * 0.32, 610 - y * S0 + z * S0 * 0.6];
-    // o cume: um bloco de rocha que ocupa o pé da prancha, de tampo largo e quase plano, que
-    // a luz das tábuas acende no meio; a frente cai em faces partidas
-    const luzT = (x, y) => Math.exp(-(((x - 440) / 260) ** 2) - (((y - 620) / 140) ** 2));
-    const cume = contornoRocha(r, [[-10, 640], [60, 612], [180, 596], [330, 590], [520, 594], [680, 588], [800, 600], [W + 10, 612], [W + 10, H + 10], [-10, H + 10]], 8);
-    cume.closePath();
-    k.fillStyle = '#bca684';
-    k.fill(cume);
-    gravar(k, cume, 444, 680, 560, 0.08, 3.4, 1.9, (x, y) => 0.42 + (y - 600) / 600 - luzT(x, y) * 0.5, SEPIA, 0);
-    gravar(k, cume, 444, 680, 560, 1.3, 4.4, 1.5, (x, y) => (y - 680) / 300 - luzT(x, y) * 0.6, SEPIA, 0);
-    // a beirada do tampo, acesa, e as fendas da rocha
-    k.strokeStyle = SEPIA;
-    k.lineWidth = 2;
-    k.stroke(cume);
-    k.lineCap = 'round';
-    for (const [x0, y0, dx] of [[60, 640, 0.3], [250, 690, -0.2], [660, 680, 0.25], [820, 620, -0.3]]) {
-      let x = x0;
-      let y = y0;
-      k.lineWidth = 2.2;
-      k.beginPath();
-      k.moveTo(x, y);
-      for (let j = 0; j < 8; j++) { x += dx * 18 + (r() - 0.5) * 16; y += 16 + r() * 14; k.lineTo(x, y); }
-      k.stroke();
+    // o cume: um afloramento de granito recortado, em camadas inclinadas, com o tampo aceso
+    // pela luz das tábuas e as faces da frente partidas em blocos, mais escuras embaixo
+    const topoR = (x) => 652 + Math.sin(x * 0.011) * 6 + Math.max(0, Math.abs(x - 450) - 230) * 0.55;
+    // a crista recortada: degraus e lascas de bloco, com dois ombros que sobem dos lados
+    const crista = [[-10, topoR(-10)]];
+    for (let x = 6; x <= W + 10; x += 26 + r() * 20) {
+      const y = topoR(x);
+      const p = crista[crista.length - 1];
+      if (r() < 0.45) crista.push([x - 6, p[1] + (r() - 0.6) * 16]);
+      crista.push([x, y + (r() - 0.5) * 18]);
     }
-    // a pedra grande atrás, onde a tábua de pé se encosta
-    const encosto = contornoRocha(r, [[400, 610], [420, 500], [480, 420], [560, 380], [640, 396], [700, 372], [780, 410], [830, 500], [850, 610]], 5);
-    encosto.closePath();
-    peca(k, encosto, [400, 372, 850, 610], { cor: '#a8916e', ang: 0.9, passo: 3.2, maxL: 1.8, sombra: (x, y) => 0.55 + (x - 600) / 600 - luzT(x, y) * 0.3, cruzada: 0.7, traco: 2 });
-    // uma tábua: o contorno retangular de quinas gastas no plano (u, v), levado ao mundo por
-    // pos(u, v); a grossura vai na direção "atras"
-    const contorno = (rr) => {
-      const pts = [];
-      const lado = (u0, v0, u1, v1, n) => {
-        for (let i = 0; i < n; i++) {
-          const t = i / n;
-          const lasca = rr() < 0.08 ? 0.008 + rr() * 0.012 : rr() * 0.003;
-          const nu = v1 - v0;
-          const nv = -(u1 - u0);
-          pts.push([u0 + (u1 - u0) * t + nu * lasca, v0 + (v1 - v0) * t + nv * lasca]);
-        }
-      };
-      // as quinas, gastas (cortadas em chanfro desigual)
-      lado(0.03, 0, 0.97, 0.01, 18);
-      lado(1, 0.03, 0.99, 0.97, 24);
-      lado(0.96, 1, 0.04, 0.99, 18);
-      lado(0, 0.96, 0.01, 0.04, 24);
-      return pts;
-    };
-    const tabua = (pos, atras, luzFace, semente) => {
-      const rr = sorteio(semente);
-      const cont = contorno(rr);
-      const frenteP = cont.map(([u, v]) => V(...pos(u, v)));
-      const trasP = cont.map(([u, v]) => { const [x, y, z] = pos(u, v); return V(x + atras[0], y + atras[1], z + atras[2]); });
-      // a grossura: o contorno de trás e as faixas entre os dois
-      const corpo = new Path2D();
-      corpo.addPath(pol(trasP));
-      for (let i = 0; i < cont.length; i++) { const j = (i + 1) % cont.length; corpo.addPath(pol([frenteP[i], frenteP[j], trasP[j], trasP[i]])); }
-      marcar(k, obj, corpo);
-      k.fillStyle = '#857a6a';
-      k.fill(corpo);
-      k.strokeStyle = '#857a6a';
-      k.lineWidth = 1.5;
-      k.stroke(corpo);
-      gravar(k, corpo, (frenteP[0][0] + frenteP[40][0]) / 2, (frenteP[0][1] + frenteP[40][1]) / 2, 300, 1.4, 2.8, 1.5, () => 0.6, SEPIA, 0);
-      k.strokeStyle = SEPIA;
-      k.lineWidth = 2.2;
-      k.stroke(pol(trasP));
-      // a face: a pedra lavrada miúda, por igual, que brilha de dentro
-      const face = pol(frenteP);
-      marcar(k, obj, face);
-      const [mx, my] = V(...pos(0.5, 0.5));
-      const raioF = Math.hypot(frenteP[0][0] - frenteP[42][0], frenteP[0][1] - frenteP[42][1]);
-      const g = k.createRadialGradient(mx, my, raioF * 0.05, mx, my, raioF * 0.62);
-      g.addColorStop(0, 'rgba(236,222,196,1)');
-      g.addColorStop(0.55, 'rgba(204,194,174,1)');
-      g.addColorStop(1, 'rgba(160,150,134,1)');
-      k.fillStyle = g;
-      k.fill(face);
-      // a pedra lavrada: linhas finas, oblíquas, como de gravura, e a luz que sai de dentro da
-      // face (mais forte no meio, sem beirada), sem marca nenhuma de escrita
-      k.save();
-      k.clip(face);
-      gravar(k, face, mx, my, raioF, 1.1, 3, 1.2, (x, y) => 0.55 - Math.max(0, 1 - Math.hypot(x - mx, y - my) / (raioF * 0.55)) * 0.7, '#5a3e1c', 0);
-      for (let n = 0; n < 380; n++) {
-        const [x, y] = V(...pos(rr(), rr()));
-        k.fillStyle = rr() < 0.6 ? 'rgba(70,52,30,.35)' : 'rgba(255,250,236,.6)';
-        k.beginPath();
-        k.arc(x, y, 0.6 + rr(), 0, 6.283);
-        k.fill();
-      }
-      // a lavra: um campo de incisões miúdas espalhadas por igual (nenhuma fileira), mais
-      // fundas e mais acesas no meio, onde a luz sai da pedra
-      k.lineCap = 'round';
-      for (let n = 0; n < 1100; n++) {
-        const u = 0.07 + rr() * 0.86;
-        const v = 0.07 + rr() * 0.86;
-        const [x, y] = V(...pos(u, v));
-        const meio = Math.max(0, 1 - Math.hypot(u - 0.5, v - 0.5) * 1.8);
-        const a = rr() * Math.PI;
-        const l = 1.5 + rr() * 2.5;
-        k.strokeStyle = 'rgba(110,56,12,' + (0.25 + meio * 0.45).toFixed(2) + ')';
-        k.lineWidth = 0.9;
-        k.beginPath();
-        k.moveTo(x, y);
-        k.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l);
-        k.stroke();
-        // o fundo de cada incisão acende, morno, mais no meio
-        k.strokeStyle = 'rgba(255,190,90,' + (meio * 0.85).toFixed(2) + ')';
-        k.lineWidth = 0.7;
-        k.beginPath();
-        k.moveTo(x + 0.6, y + 0.8);
-        k.lineTo(x + 0.6 + Math.cos(a) * l, y + 0.8 + Math.sin(a) * l);
-        k.stroke();
-      }
-      k.globalCompositeOperation = 'screen';
-      const gl = k.createRadialGradient(mx, my, 0, mx, my, raioF * 0.6);
-      gl.addColorStop(0, 'rgba(255,206,120,.85)');
-      gl.addColorStop(0.6, 'rgba(255,180,90,.3)');
-      gl.addColorStop(1, 'rgba(255,190,110,0)');
-      k.fillStyle = gl;
-      k.fill(face);
-      k.restore();
-      // a sombra do lado longe da luz e o fio aceso das quinas
-      k.save();
-      k.clip(face);
-      gravar(k, face, mx, my, raioF, 0.9, 3.2, 1.4, (x, y) => (1 - luzFace) * 0.9 - 0.1 + ((x - mx) * 0.4 + (y - my) * 0.3) / raioF, SEPIA, 0);
-      k.restore();
+    const cume = pol([...crista, [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#b8a07c';
+    k.fill(cume);
+    // as camadas: faixas que descem um pouco para a direita, partidas em blocos
+    const faixas = [0, 34, 74, 120, 176, 240].map((d, q) => (x) => topoR(x) + 18 + d + (x - 444) * 0.04 + Math.sin(x * 0.02 + q) * 4);
+    hachuraEmFaixas(k, r, cume, -10, W + 10, faixas, 4, 2.2, (x, y) => 0.4 + (y - 620) / 300 - Math.exp(-(((x - 444) / 240) ** 2)) * 0.25, SEPIA, { juntas: 0 });
+    gravar(k, cume, 444, 760, 560, 1.15, 4, 1.6, (x, y) => (y - 680) / 200 + Math.abs(x - 444) / 900, SEPIA, 0);
+    // as fraturas do granito: rachas compridas e tortas que descem da crista, com a beirada de
+    // cima acesa (o bloco da esquerda pega a luz)
+    k.lineCap = 'round';
+    for (const x0 of [70, 210, 330, 590, 700, 830]) {
+      let x = x0;
+      let y = topoR(x0) + 6;
+      const pts = [[x, y]];
+      while (y < H + 10) { x += (r() - 0.45) * 26; y += 20 + r() * 26; pts.push([x, y]); }
       k.strokeStyle = SEPIA;
       k.lineWidth = 2.4;
-      k.lineJoin = 'round';
-      k.stroke(face);
-      // umas lascas nas quinas
+      k.stroke(pol(pts, false));
+      k.strokeStyle = 'rgba(250,236,204,.7)';
       k.lineWidth = 1.4;
-      for (const [u, v] of [[0.02, 0.4], [0.98, 0.7], [0.5, 0.02]]) {
-        const [x, y] = V(...pos(u, v));
-        k.beginPath();
-        k.moveTo(x - 6, y);
-        k.lineTo(x, y + 4);
-        k.lineTo(x + 6, y - 1);
-        k.stroke();
+      k.stroke(pol(pts.map(([a, b]) => [a - 3, b]), false));
+    }
+    // o tampo aceso: uma faixa clara logo abaixo da crista, onde as tábuas estão
+    const tampo = pol([...crista, ...crista.slice().reverse().map(([x, y]) => [x, y + 16 + Math.exp(-(((x - 444) / 200) ** 2)) * 8])]);
+    k.fillStyle = 'rgba(244,226,186,.75)';
+    k.fill(tampo);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.2;
+    k.stroke(pol(crista, false));
+    // as duas tábuas, juntas e de pé no cume, um nada inclinadas para trás: lajes de alto
+    // arredondado, de faces lisas lavradas e quinas vivas, com a grossura de pedra maciça à
+    // direita e em cima; a escrita de Deus é luz: a face toda brilha por igual, de dentro
+    const tabua = (x0, base, w, h) => {
+      const arco = w * 0.5;
+      const esp = [22, -12];
+      // o contorno da face: o retângulo de baixo e o arco de cima
+      const face = [];
+      face.push([x0, base]);
+      face.push([x0, base - h + arco]);
+      for (let i = 0; i <= 24; i++) { const a = Math.PI + (i / 24) * Math.PI; face.push([x0 + w / 2 + Math.cos(a) * w / 2, base - h + arco + Math.sin(a) * arco]); }
+      face.push([x0 + w, base]);
+      const atras = face.map(([x, y]) => [x + esp[0], y + esp[1]]);
+      // a grossura: primeiro um corpo opaco (a união da face de trás e das faixas entre as duas),
+      // depois a hachura dele
+      // (cada pedaço preenchido sozinho: juntos, os sentidos opostos furariam o corpo)
+      const pedacos = [pol(atras), ...face.slice(1).map((p, i) => pol([face[i], p, atras[i + 1], atras[i]]))];
+      const corpo = new Path2D();
+      k.fillStyle = '#8e8270';
+      k.strokeStyle = '#8e8270';
+      k.lineWidth = 1.2;
+      for (const p of pedacos) { k.fill(p); k.stroke(p); corpo.addPath(p); marcar(k, obj, p); }
+      // a hachura da grossura: linhas na direção da espessura, uma por pedaço
+      k.strokeStyle = 'rgba(42,34,22,.8)';
+      k.lineWidth = 1.2;
+      for (let i = 1; i < face.length; i++) {
+        const n = Math.max(1, Math.round(Math.hypot(face[i][0] - face[i - 1][0], face[i][1] - face[i - 1][1]) / 3));
+        for (let j = 0; j < n; j++) {
+          const t = j / n;
+          const x = face[i - 1][0] + (face[i][0] - face[i - 1][0]) * t;
+          const y = face[i - 1][1] + (face[i][1] - face[i - 1][1]) * t;
+          k.beginPath();
+          k.moveTo(x, y);
+          k.lineTo(x + esp[0], y + esp[1]);
+          k.stroke();
+        }
       }
+      k.strokeStyle = '#1e1810';
+      k.lineWidth = 2;
+      k.stroke(pol(atras.slice(1), false));
+      // a face lisa: a pedra lavrada clara, com o lavrado miúdo e direito (traço fino oblíquo)
+      const fF = pol(face);
+      marcar(k, obj, fF);
+      const g = k.createLinearGradient(x0, base - h, x0 + w, base);
+      g.addColorStop(0, '#d8ccb6');
+      g.addColorStop(1, '#a89880');
+      k.fillStyle = g;
+      k.fill(fF);
+      k.save();
+      k.clip(fF);
+      gravar(k, fF, x0 + w / 2, base - h / 2, h, 0.95, 3.2, 1.1, (x, y) => 0.3 + (x - x0) / w * 0.4 + (y - base + h) / h * 0.2, '#4a3e2c', 0);
+      // a luz da escrita: um brilho morno e por igual em toda a face, de beirada macia (a pedra
+      // acesa de dentro), sem fileira e sem letra
+      k.filter = 'blur(10px)';
+      k.globalCompositeOperation = 'screen';
+      const dentro = pol(face.map(([x, y]) => [x0 + w / 2 + (x - x0 - w / 2) * 0.8, base - h / 2 + (y - base + h / 2) * 0.86]));
+      k.fillStyle = 'rgba(230,150,46,.7)';
+      k.fill(dentro);
+      k.filter = 'blur(26px)';
+      k.fillStyle = 'rgba(255,200,110,.55)';
+      k.fill(dentro);
+      k.restore();
+      // as quinas vivas: a luz na beirada da esquerda e do arco, a sombra na da direita
+      k.strokeStyle = '#1e1810';
+      k.lineWidth = 2.4;
+      k.lineJoin = 'round';
+      k.stroke(fF);
+      k.strokeStyle = 'rgba(255,250,236,.9)';
+      k.lineWidth = 1.6;
+      k.beginPath();
+      face.slice(0, 15).forEach(([x, y], i) => (i ? k.lineTo(x + 2, y + 2) : k.moveTo(x + 2, y - 2)));
+      k.stroke();
+      return face;
     };
-    // a tábua de trás: encostada na outra e na laje, inclinada uns 34 graus para trás
-    const inc = 0.6;
-    const giroB = -0.18;
-    const posB = (u, v) => {
-      const lx = (u - 0.5) * 0.78;
-      const ly = (1 - v) * 1.1;
-      const x = lx * Math.cos(giroB) + 0.22;
-      const z = lx * Math.sin(giroB) + 0.02 - ly * Math.sin(inc);
-      return [x, ly * Math.cos(inc), z];
-    };
-    const sombraB = pol([V(...posB(0, 1)), V(...posB(1, 1)), V(...posB(1, 0)).map((c, i) => c + (i ? 0 : 0)), V(...posB(0, 0))]);
-    sombraNoChao(k, sombraB, 60, 90, 14, 0.3);
-    tabua(posB, [0.04, 0.16 * Math.sin(inc), -0.16 * Math.cos(inc)], 0.75, 7520);
-    // a tábua da frente: deitada na laje, de pé baixo para quem olha, virada para a outra
-    const giroA = 0.55;
-    const posA = (u, v) => {
-      const lx = (u - 0.5) * 0.78;
-      const lz = (v - 0.5) * 1.1;
-      return [lx * Math.cos(giroA) - lz * Math.sin(giroA) - 0.5, 0.14, lx * Math.sin(giroA) + lz * Math.cos(giroA) + 0.5];
-    };
-    const sombraA = pol([V(...posA(0, 0)).map((c) => c), V(...posA(1, 0)), V(...posA(1, 1)), V(...posA(0, 1))]);
-    sombraNoChao(k, sombraA, 18, 14, 8, 0.4);
-    tabua(posA, [0.02, -0.14, 0], 1, 7530);
+    // a sombra das tábuas no tampo, para trás e à direita (a luz vem delas e de cima)
+    const baseT = 652;
+    sombraNoChao(k, pol([[244, baseT], [654, baseT], [700, baseT - 14], [300, baseT - 18]]), 0, 0, 6, 0.5);
+    // o resplendor atrás das tábuas, macio (gradiente, sem beirada)
+    k.save();
+    const hal = k.createRadialGradient(470, 460, 40, 470, 460, 330);
+    hal.addColorStop(0, 'rgba(255,224,150,.6)');
+    hal.addColorStop(1, 'rgba(255,224,150,0)');
+    k.globalCompositeOperation = 'screen';
+    k.fillStyle = hal;
+    k.fillRect(0, 0, W, 640);
+    k.restore();
+    // a de trás (a da direita) primeiro, encostada na outra
+    tabua(452, baseT, 200, 360);
+    tabua(246, baseT + 2, 200, 360);
+    // o brilho das tábuas no ar e no tampo
+    brilho(k, 444, baseT - 160, 380, 'rgba(255,214,140,.22)', 'screen');
+    brilho(k, 444, baseT + 6, 260, 'rgba(255,214,140,.25)', 'screen');
     vinheta(k, W, H, 0.24);
   }
   // O tom do bronze, do escuro (0) ao brilho (1).
