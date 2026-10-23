@@ -388,7 +388,7 @@
       "voceSabia": "Quem era mordido e olhava para a serpente de bronze permanecia vivo.",
       "link": "#/mapa/numeros",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "harpa-davi",
@@ -410,7 +410,7 @@
       "voceSabia": "Eliseu bateu nas águas do Jordão com o manto, e elas se separaram.",
       "link": "#/mapa/2-reis",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "azeite-viuva",
@@ -443,7 +443,7 @@
       "voceSabia": "Por uma pérola de grande valor, o negociante vendeu tudo o que tinha.",
       "link": "#/parabola/tesouro-e-perola",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "moeda-perdida",
