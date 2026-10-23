@@ -14698,8 +14698,6 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.clip(corpo);
     // a curva da cúpula: hachura escura que acompanha o alto, mais cheia longe do fogo
     gravar(k, corpo, cx, 400, 520, 0.02, 3.6, 2.2, (x, y) => 0.7 - luzF(x, y) * 1.1 + Math.max(0, (Math.abs(x - cx) - 250) / 300), '#0c0602', 0.4);
-    k.globalCompositeOperation = 'screen';
-    brilho(k, cx, 480, 400, 'rgba(255,140,50,.55)');
     k.restore();
     k.strokeStyle = '#120804';
     k.lineWidth = 3;
@@ -14744,110 +14742,128 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.lineWidth = 2.6;
     k.stroke(aduelas);
     marcar(k, obj, aduelas);
-    // dentro da boca: o vão tem fundura (a grossura do arco por dentro, escura dos lados), e lá
-    // no fundo o fogo é uma massa só, revolta, branca e amarela no miolo, laranja e vermelha na
-    // beirada, feita de traços que rolam e se enroscam (nenhuma língua em pé separada); por
-    // baixo, o leito de brasa em hachura
+    // o fogo em gravura: línguas que sobem do leito de brasa em curva de S, largas no pé e
+    // finas na ponta, tortas para fora e para a direita (a tiragem puxa a chama pela boca);
+    // a hachura corre ao longo de cada língua, cheia nas beiradas e rala no meio, então cada
+    // uma tem volume. Atrás vermelhas e escuras, na frente laranja e amarelas; o miolo branco.
+    const chama = (x, y, alto, larg, vai, cor, tinta, claro, contorno, turb = 0.14, fase = r() * 6.28, pe = 0) => {
+      const amp = larg * (0.18 + ((fase * 7.3) % 1) * 0.22);
+      const pts = [];
+      for (let i = 0; i <= 6; i++) {
+        const t = i / 6;
+        pts.push([x + vai * t * t + Math.sin(fase + t * 3.2) * amp * t, y - alto * t]);
+      }
+      const c = curvaPor(pts, 3);
+      const L = c[c.length - 1].s;
+      const w = (s) => {
+        const t = s / L;
+        return larg * Math.pow(Math.max(0, 1 - t), 0.85) * (1 + turb * Math.sin(t * 11 + fase) + turb * 0.6 * Math.sin(t * 23 + fase * 2)) * (t < 0.08 ? 0.8 + t * 2.5 : 1) * (pe && t < pe ? 0.5 + (t / pe) * 0.5 : 1);
+      };
+      const { forma } = tuboAo(c, w);
+      k.fillStyle = cor;
+      k.fill(forma);
+      k.save();
+      k.clip(forma);
+      k.strokeStyle = tinta;
+      k.lineCap = 'round';
+      for (let f = -0.5; f <= 0.5001; f += 0.1) {
+        const peso = claro + Math.pow(Math.abs(f) * 2, 1.6) * 0.9;
+        let ant = null;
+        for (const q of c) {
+          const t = q.s / L;
+          const ww = w(q.s) / 2;
+          const px = q.x - q.ty * f * 2 * ww;
+          const py = q.y + q.tx * f * 2 * ww;
+          const lw = 1.7 * Math.max(0, Math.min(1, peso * (1 - t * 0.5)));
+          if (ant && lw > 0.2) {
+            k.lineWidth = lw;
+            k.beginPath();
+            k.moveTo(ant[0], ant[1]);
+            k.lineTo(px, py);
+            k.stroke();
+          }
+          ant = [px, py];
+        }
+      }
+      k.restore();
+      if (contorno) {
+        k.strokeStyle = contorno;
+        k.lineWidth = 1.2;
+        k.stroke(forma);
+      }
+      return forma;
+    };
+    const calor = (x, y) => Math.max(0, 1 - Math.hypot((x - cx) / 180, (y - 590) / 150));
     k.save();
     k.clip(boca);
-    k.fillStyle = '#3a1406';
+    k.fillStyle = '#5a1a06';
     k.fill(boca);
-    // a massa de fogo: uma forma torta que enche o fundo e transborda pela boca acima
-    const fogoPts = [];
-    for (let i = 0; i <= 40; i++) {
-      const t = i / 40;
-      const a = Math.PI + t * Math.PI;
-      const rx = (bx1 - bx0) * 0.5 * (0.92 + Math.sin(t * 17) * 0.05 + Math.sin(t * 7 + 1) * 0.04);
-      const ry = (by1 - by0) * (0.86 + Math.sin(t * 13 + 2) * 0.06);
-      fogoPts.push([cx + Math.cos(a) * rx + Math.sin(t * 23) * 8, by1 - 10 + Math.sin(a) * ry]);
+    // a parede do fundo do forno, vermelha, em hachura deitada
+    gravar(k, boca, cx, 520, 260, 0.04, 3, 1.4, (x, y) => 0.75 - calor(x, y) * 0.7, '#1e0602', 0);
+    // as línguas grandes que vão sair pelo alto da boca: o pé delas fica aqui dentro
+    const sai = [];
+    for (let i = 0; i < 8; i++) {
+      const t = i / 7;
+      sai.push({ x: bx0 + 100 + t * (bx1 - bx0 - 220) + (r() - 0.5) * 20, alto: 400 + Math.sin(t * Math.PI) * 90 + r() * 50 + t * 30, larg: 170 + r() * 70, vai: -50 + t * 260 + (r() - 0.5) * 40, fase: r() * 6.28 });
     }
-    void fogoPts;
-    k.fillStyle = '#b4441a';
-    k.fill(boca);
-    // o calor por zonas, em hachura curva e enroscada: escuro de fora para dentro
-    const calor = (x, y) => Math.max(0, 1 - Math.hypot((x - cx) / 170, (y - 560) / 130));
-    k.lineCap = 'round';
-    for (let i = 0; i < 420; i++) {
-      // cada rolo: um arco que sobe e se enrosca, de grossura que afina na ponta
-      const x0 = bx0 - 10 + r() * (bx1 - bx0 + 20);
-      const y0 = by0 - 10 + r() * (by1 - by0 + 10);
-      const q = calor(x0, y0);
-      const R0 = 8 + r() * 24;
-      const giro = r() < 0.5 ? 1 : -1;
-      const a0 = r() * 6.283;
-      k.strokeStyle = q > 0.6 ? 'rgba(255,248,220,.8)' : q > 0.32 ? 'rgba(255,206,110,.75)' : q > 0.1 ? 'rgba(232,126,44,.75)' : 'rgba(100,26,4,.75)';
-      let ant = null;
-      for (let j = 0; j <= 14; j++) {
-        const u = j / 14;
-        const a = a0 + giro * u * 4.2;
-        const rr = R0 * (1 - u * 0.6);
-        const pt = [x0 + Math.cos(a) * rr, y0 + Math.sin(a) * rr * 0.8 - u * 40];
-        if (ant) { k.lineWidth = Math.max(0.6, (q > 0.6 ? 4 : 2.6) * (1 - u)); k.beginPath(); k.moveTo(ant[0], ant[1]); k.lineTo(pt[0], pt[1]); k.stroke(); }
-        ant = pt;
-      }
+    const passaSai = () => {
+      const p = new Path2D();
+      sai.forEach((q) => p.addPath(chama(q.x, by1, q.alto, q.larg, q.vai, 'rgba(192,68,20,.96)', '#3a0a02', 0.22, 'rgba(46,10,2,.75)', 0.3, q.fase, 0.45)));
+      sai.forEach((q, i) => {
+        if (i % 3 !== 1) p.addPath(chama(q.x + 12, by1, q.alto * 0.82, q.larg * 0.55, q.vai * 0.85, 'rgba(240,148,54,.96)', '#7a2406', 0.1, null, 0.22, q.fase + 1, 0.45));
+      });
+      return p;
+    };
+    passaSai();
+    for (let i = 0; i < 22; i++) {
+      const x = bx0 - 10 + r() * (bx1 - bx0 + 20);
+      chama(x, by1 + 10, 240 + r() * 120, 60 + r() * 50, 20 + r() * 70, 'rgba(168,52,16,.95)', '#2e0802', 0.25, 'rgba(40,8,2,.6)');
     }
-    // o miolo branco, liso, onde o fogo é mais quente
-    const miolo = seixo(r, cx + 10, 570, 90, 60, 0.1, 0.3);
-    k.save();
-    k.filter = 'blur(14px)';
-    k.fillStyle = 'rgba(255,250,224,.55)';
-    k.fill(miolo);
-    k.restore();
-    // a fundura: a beirada do vão por dentro fica na sombra (uma sombra mole, sem quina)
-    k.save();
-    k.filter = 'blur(18px)';
-    k.strokeStyle = 'rgba(40,10,2,.9)';
-    k.lineWidth = 70;
-    k.stroke(boca);
-    k.restore();
-    // o leito de brasa no chão do forno: hachura cruzada acesa, sem disco nenhum
-    const leito = pol([[bx0, by1], [bx0 + 30, by1 - 30], [cx, by1 - 40], [bx1 - 30, by1 - 30], [bx1, by1]]);
-    k.fillStyle = '#e07a2a';
+    for (let i = 0; i < 16; i++) {
+      const x = cx - 160 + r() * 300;
+      chama(x, by1 + 10, 170 + r() * 130, 50 + r() * 40, 16 + r() * 60, 'rgba(230,124,40,.96)', '#6a1a04', 0.12, 'rgba(90,24,4,.5)');
+    }
+    for (let i = 0; i < 11; i++) {
+      const x = cx - 110 + r() * 200;
+      chama(x, by1 + 10, 110 + r() * 100, 40 + r() * 34, 10 + r() * 40, 'rgba(252,204,114,.97)', '#9a4a10', 0.05, null);
+    }
+    for (let i = 0; i < 7; i++) {
+      const x = cx - 70 + r() * 130;
+      chama(x, by1 + 6, 70 + r() * 70, 34 + r() * 24, 6 + r() * 24, 'rgba(255,248,228,.98)', '#d08a30', -0.15, null);
+    }
+    // a fundura: a beirada do vão por dentro na sombra, em hachura (sem borrão)
+    for (let d = 0; d < 34; d += 3.4) {
+      k.strokeStyle = 'rgba(30,6,2,' + (0.6 - d / 60).toFixed(2) + ')';
+      k.lineWidth = 3.2 - d / 12;
+      const enc = new Path2D();
+      enc.moveTo(bx0 + d, by1);
+      enc.lineTo(bx0 + d, by0 + 90);
+      enc.quadraticCurveTo(bx0 + d, by0 - 10 + d, cx, by0 - 16 + d);
+      enc.quadraticCurveTo(bx1 - d, by0 - 10 + d, bx1 - d, by0 + 90);
+      enc.lineTo(bx1 - d, by1);
+      k.stroke(enc);
+    }
+    // o leito de brasa no chão do forno, em hachura cruzada acesa
+    const leito = pol([[bx0, by1], [bx0 + 30, by1 - 26], [cx, by1 - 34], [bx1 - 30, by1 - 26], [bx1, by1]]);
+    k.fillStyle = '#e88a34';
     k.fill(leito);
-    gravar(k, leito, cx, by1 - 20, 220, 0.4, 3, 1.6, (x) => 0.6 - calor(x, by1 - 60) * 0.5, '#5a1404', 0);
-    gravar(k, leito, cx, by1 - 20, 220, -0.6, 4, 1.2, (x) => 0.4 - calor(x, by1 - 60) * 0.4, '#5a1404', 0);
+    gravar(k, leito, cx, by1 - 18, 220, 0.4, 3, 1.6, (x) => 0.6 - calor(x, by1 - 80) * 0.5, '#5a1404', 0);
+    gravar(k, leito, cx, by1 - 18, 220, -0.6, 4, 1.2, (x) => 0.4 - calor(x, by1 - 80) * 0.4, '#5a1404', 0);
     k.restore();
     marcar(k, obj, boca);
-    // o fogo transborda pelo alto do arco: uma faixa contínua de rolos que se enroscam por
-    // cima das aduelas, mais alta para o lado direito (o fogo puxa para lá), sem língua solta
-    const arcoY = (x) => { const t = (x - (bx0 - 36)) / (bx1 - bx0 + 72); return by0 - 52 + Math.pow(2 * t - 1, 2) * 140; };
-    const faixaF = new Path2D();
-    faixaF.moveTo(bx0 - 30, arcoY(bx0 - 30) + 40);
-    for (let x = bx0 - 30; x <= bx1 + 30; x += 10) faixaF.lineTo(x, arcoY(x) - 30 - Math.max(0, x - cx) * 0.25 - Math.abs(Math.sin(x * 0.05)) * 18);
-    for (let x = bx1 + 30; x >= bx0 - 30; x -= 10) faixaF.lineTo(x, arcoY(x) + 40);
-    faixaF.closePath();
+    // o fogo que sai pelo alto da boca: as línguas nascem lá dentro e passam por cima do arco,
+    // subindo e se abrindo para fora; mais para a direita, onde a tiragem leva (lado desigual)
     k.save();
-    k.filter = 'blur(16px)';
-    k.fillStyle = 'rgba(255,150,60,.45)';
-    k.fill(faixaF);
+    const fora = new Path2D();
+    fora.rect(-20, -20, W + 40, H + 40);
+    fora.addPath(boca);
+    k.clip(fora, 'evenodd');
+    const escapa = passaSai();
     k.restore();
-    for (let i = 0; i < 160; i++) {
-      const x0 = bx0 - 20 + r() * (bx1 - bx0 + 40);
-      const sobe = 10 + Math.max(0, x0 - cx) * 0.22;
-      const y0 = arcoY(x0) + 10 - r() * sobe;
-      const R0 = 8 + r() * 18;
-      const giro = r() < 0.5 ? 1 : -1;
-      const a0 = r() * 6.283;
-      const q = r();
-      k.strokeStyle = q > 0.7 ? 'rgba(255,236,170,.85)' : q > 0.35 ? 'rgba(240,146,56,.85)' : 'rgba(120,34,8,.8)';
-      let ant = null;
-      for (let j = 0; j <= 12; j++) {
-        const u = j / 12;
-        const a = a0 + giro * u * 4;
-        const rr = R0 * (1 - u * 0.6);
-        const pt = [x0 + Math.cos(a) * rr + u * 10, y0 + Math.sin(a) * rr * 0.8 - u * 30];
-        if (ant) { k.lineWidth = Math.max(0.6, 2.8 * (1 - u)); k.beginPath(); k.moveTo(ant[0], ant[1]); k.lineTo(pt[0], pt[1]); k.stroke(); }
-        ant = pt;
-      }
-    }
-    marcar(k, obj, faixaF);
+    marcar(k, obj, escapa);
     // a soleira de pedra e o chão de tijolo, acesos pelo fogo
     const chao = pol([[-10, 690], [W + 10, 690], [W + 10, H + 10], [-10, H + 10]]);
     muroEmFiadas(k, r, chao, [-10, 690, W + 10, H + 10], { h: 22, cor: '#5c3a22', tinta: '#120804', sombra: (x, y) => 0.8 - luzF(x, y - 120) * 0.8, traco: 1.4, larg: 3 });
-    k.save();
-    k.globalCompositeOperation = 'screen';
-    brilho(k, cx, 700, 330, 'rgba(255,150,60,.5)');
-    k.restore();
     const soleira = pol([[bx0 - 60, 690], [bx1 + 60, 690], [bx1 + 80, 716], [bx0 - 80, 716]]);
     peca(k, soleira, [bx0 - 80, 688, bx1 + 80, 718], { cor: '#c8925a', tinta: '#1a0c04', ang: 0.05, passo: 3.2, maxL: 1.4, sombra: (x, y) => 0.25 + (y - 690) / 40, cruzada: 0.8, traco: 2.2, obj });
     // as cordas soltas na soleira e no chão: de cânhamo claro, inteiras, de pontas desfiadas,
