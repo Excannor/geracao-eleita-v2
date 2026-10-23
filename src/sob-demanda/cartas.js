@@ -11415,8 +11415,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
   // ---------- (10) O vaso do oleiro (Jr 18.3-4) ----------
   // Na casa do oleiro, debaixo do alpendre de esteira, de manhã: a roda de oleiro de pedra (o
   // disco grande de baixo, que o pé gira, o eixo e o prato de cima) e, no prato, o vaso que
-  // não saiu bom (18.4): a barriga redonda subiu certa, mas a parede de um lado cedeu e caiu
-  // para dentro, dobrando sobre a boca, com as linhas da roda quebradas e o barro molhado. Ao lado, no chão:
+  // não saiu bom (18.4): o barro ainda mole e molhado cedeu, o corpo torceu e pendeu, o ombro
+  // de um lado afundou numa dobra macia e a boca ficou torta, com as linhas da roda inteiras. Ao lado, no chão:
   // a bacia de água, a faca de madeira e o fio de cortar; atrás, numa prateleira de tábua, dois
   // jarros secando. Ninguém: só o barro que ainda vai ser outro jarro.
   function desenhoVaso(k, W, H, obj) {
@@ -11480,10 +11480,12 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.moveTo(0, chao);
     k.lineTo(W, chao);
     k.stroke();
-    // o monte de barro amassado e os respingos no chão
-    const monte = lanoso(r, [[680, 610], [710, 584], [760, 576], [810, 590], [840, 612], [760, 622]], 6, 16);
-    sombraNoChao(k, monte, 10, 6, 4, 0.3);
-    peca(k, monte, [680, 576, 840, 622], { cor: '#a8754a', tinta: '#2e1a08', ang: 0.4, passo: 2.6, maxL: 1.5, sombra: sombraOval(760, 600, 80, 24, 0), cruzada: 0.7, traco: 1.8 });
+    // o bloco de barro amassado, alto, com a face lisa do corte do fio, e os respingos
+    const monte = pol([[690, 616], [694, 580], [712, 556], [748, 548], [790, 556], [812, 580], [816, 616]]);
+    sombraNoChao(k, monte, 12, 4, 4, 0.3);
+    peca(k, monte, [690, 548, 816, 616], { cor: '#a8754a', tinta: '#2e1a08', ang: 1.2, passo: 2.6, maxL: 1.5, sombra: (x, y) => 0.25 + (x - 690) / 200 + (y - 548) / 300, cruzada: 0.7, traco: 1.8 });
+    const corte = pol([[712, 556], [748, 548], [790, 556], [770, 570], [730, 572]]);
+    peca(k, corte, [712, 548, 790, 572], { cor: '#c48e60', tinta: '#2e1a08', ang: 0.1, passo: 2.4, maxL: 0.9, sombra: () => 0.2, cruzada: 0.95, traco: 1.4 });
     for (let i = 0; i < 14; i++) { k.fillStyle = 'rgba(130,84,46,.7)'; k.beginPath(); k.ellipse(200 + r() * 500, 700 + r() * 120, 2 + r() * 5, 1 + r() * 2, 0, 0, 6.283); k.fill(); }
 
     // a roda: o disco grande de baixo (de pedra), o eixo e o prato de cima
@@ -11525,85 +11527,112 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.strokeStyle = 'rgba(70,40,16,.6)';
     k.lineWidth = 1;
     for (const f of [0.7, 0.86]) { k.beginPath(); k.ellipse(cx, yT, rT * f, rT * kB * f, 0, 0, 6.283); k.stroke(); }
-    // o vaso que não saiu bom: a barriga redonda subiu certa, mas a parede da direita cedeu e
-    // caiu para dentro, dobrando sobre a boca; a boca ficou torta e rasgada desse lado
-    const base = yT + 6;
-    const alt = 236;
-    const raio = (t) => 48 + Math.sin(Math.min(1, t / 0.86) * Math.PI * 0.92) * 56 - (t > 0.86 ? (t - 0.86) * 84 : 0);
-    const caiu = 0.46;
-    const ptsE = [];
-    const ptsD = [];
-    for (let i = 0; i <= 40; i++) {
-      const t = i / 40;
-      ptsE.push([cx - raio(t), base - t * alt]);
-      if (t <= caiu) ptsD.push([cx + raio(t), base - t * alt]);
-      else {
-        // a parte que cedeu dobra para dentro e para baixo, num arco
-        const u = (t - caiu) / (1 - caiu);
-        const a = u * Math.PI * 0.75;
-        const R = (1 - caiu) * alt * 0.62;
-        const x0 = cx + raio(caiu);
-        const y0 = base - caiu * alt;
-        ptsD.push([x0 - Math.sin(a) * R * 0.9 + Math.sin(u * 9) * 3, y0 - (1 - Math.cos(a)) * R * 0.2 - Math.sin(a) * R * 0.55]);
-      }
-    }
-    const bocaE = ptsE[40];
-    const bocaD = ptsD[40];
-    const corpo = pol([[cx - raio(0), base], ...ptsE, ...Array.from({ length: 8 }, (_, i) => { const t = (i + 1) / 9; return [bocaE[0] + (bocaD[0] - bocaE[0]) * t, bocaE[1] + (bocaD[1] - bocaE[1]) * t - Math.sin(t * Math.PI) * 4 + (i % 2 ? 5 : -2)]; }), ...ptsD.slice().reverse()]);
-    sombraNoChao(k, corpo, 16, 4, 6, 0.3);
+    // o vaso que não saiu bom (18.4): barro ainda mole e molhado, sem queimar, que cedeu: o
+    // corpo torceu e pendeu para a direita, o ombro desse lado afundou para dentro numa dobra
+    // macia e a boca ficou torta, mais baixa desse lado. As linhas da roda seguem a forma,
+    // inteiras, e o brilho é o da água no barro, em traços curtos.
+    const base = yT + 4;
+    const alt = 230;
+    const rad = (t) => 52 + Math.sin(Math.min(1, t / 0.78) * Math.PI * 0.95) * 58 - Math.max(0, t - 0.78) * 70;
+    const pende = (t) => t * t * 34;
+    const afunda = (t) => Math.exp(-(((t - 0.74) / 0.18) ** 2)) * 0.5;
+    const desce = (t) => Math.max(0, t - 0.5) ** 1.5 * 150;
+    const anel = (t, a) => {
+      const c = Math.cos(a);
+      const lado = Math.max(0, c);
+      const rr = rad(t) * (1 - afunda(t) * lado * lado);
+      return [cx + pende(t) + c * rr, base - t * alt + Math.sin(a) * rad(t) * 0.26 + desce(t) * lado * lado];
+    };
+    const T = 60;
+    const esq = [];
+    const dir = [];
+    for (let i = 0; i <= T; i++) { esq.push(anel(i / T, Math.PI)); dir.push(anel(i / T, 0)); }
+    const frenteB = [];
+    for (let i = 0; i <= 24; i++) frenteB.push(anel(0, Math.PI - (i / 24) * Math.PI));
+    const boca = [];
+    for (let i = 0; i <= 48; i++) boca.push(anel(1, (i / 48) * 6.283));
+    const corpo = pol([...esq, ...boca.slice(24, 49), ...dir.slice().reverse(), ...frenteB.slice(1)]);
+    // a lama molhada no prato, em volta do pé
+    const lamaP = new Path2D();
+    lamaP.ellipse(cx + 6, base + 2, rad(0) + 34, (rad(0) + 34) * 0.26, 0, 0, 6.283);
+    k.fillStyle = 'rgba(112,66,34,.75)';
+    k.fill(lamaP);
+    k.strokeStyle = 'rgba(255,236,206,.6)';
+    k.lineWidth = 1.4;
+    for (const [a0, a1] of [[3.4, 3.9], [4.5, 5.0], [0.3, 0.8]]) { k.beginPath(); k.ellipse(cx + 6, base + 2, rad(0) + 26, (rad(0) + 26) * 0.26, 0, a0, a1); k.stroke(); }
+    sombraNoChao(k, corpo, 18, 6, 8, 0.3);
     marcar(k, obj, corpo);
-    k.fillStyle = '#b07a4c';
+    k.fillStyle = '#a8714a';
     k.fill(corpo);
     k.save();
     k.clip(corpo);
+    // as linhas da roda: anéis inteiros que seguem a forma (só a metade da frente), mais
+    // grossos na sombra (à direita) e onde a dobra afunda
     k.lineCap = 'round';
-    // as linhas da roda, que abraçam a barriga (arcos de elipse), lisas embaixo e quebradas
-    // em cacos na parte que caiu
-    for (let y = base - alt - 6; y < base + 4; y += 5) {
-      const t = (base - y) / alt;
-      const rr0 = raio(Math.max(0, Math.min(1, t)));
-      for (let x = cx - rr0 - 4; x < cx + rr0 + 4; x += 6) {
-        const u = (x - cx) / Math.max(10, rr0);
-        const cai = x > cx + 4 && t > caiu - 0.05;
-        const sm = Math.max(0, Math.min(1, 0.25 + u * 0.45 + (cai ? 0.25 : 0)));
-        const yy = y + (1 - u * u) * 4 + (cai ? Math.sin(x * 0.4 + y) * 3 : 0);
-        k.strokeStyle = 'rgba(52,26,8,' + (0.3 + sm * 0.55).toFixed(2) + ')';
-        k.lineWidth = 0.7 + sm * 1.6;
+    for (let i = 1; i < T; i++) {
+      const t = i / T;
+      for (let j = 0; j < 24; j++) {
+        const a0 = Math.PI - (j / 24) * Math.PI;
+        const a1 = Math.PI - ((j + 1) / 24) * Math.PI;
+        const p0 = anel(t, a0);
+        const p1 = anel(t, a1);
+        const c = Math.cos((a0 + a1) / 2);
+        const sv = 0.25 - c * 0.45 + afunda(t) * Math.max(0, -c) * 0 + afunda(t) * Math.max(0, c) * 2.2 + (t > 0.95 ? 0.3 : 0);
+        k.strokeStyle = 'rgba(46,22,6,' + Math.max(0.2, Math.min(0.9, 0.3 + sv * 0.6)).toFixed(2) + ')';
+        k.lineWidth = Math.max(0.5, Math.min(2.4, 0.6 + sv * 1.6));
         k.beginPath();
-        k.moveTo(x, yy);
-        k.lineTo(x + 6, yy + (cai ? (r() - 0.5) * 4 : (u > 0 ? 0.6 : -0.6)));
+        k.moveTo(p0[0], p0[1]);
+        k.lineTo(p1[0], p1[1]);
         k.stroke();
       }
     }
-    // a dobra: o vinco escuro embaixo da parte caída e a crista acesa em cima dela
-    const dob = ptsD.slice(Math.round(caiu * 40), 41);
-    k.strokeStyle = 'rgba(36,16,4,.9)';
-    k.lineWidth = 2.6;
-    k.beginPath();
-    dob.forEach(([x, y], i) => (i ? k.lineTo(x - 5, y + 9) : k.moveTo(x - 3, y + 3)));
-    k.stroke();
-    k.strokeStyle = 'rgba(255,232,196,.85)';
-    k.lineWidth = 1.8;
-    k.beginPath();
-    dob.forEach(([x, y], i) => (i ? k.lineTo(x - 3, y + 4) : k.moveTo(x, y)));
-    k.stroke();
-    // o brilho da água no barro, do lado da luz
-    k.strokeStyle = 'rgba(255,240,214,.8)';
-    k.lineWidth = 2.2;
-    k.beginPath();
-    k.moveTo(cx - raio(0.2) + 16, base - alt * 0.2);
-    k.quadraticCurveTo(cx - raio(0.45) + 10, base - alt * 0.45, cx - raio(0.7) + 14, base - alt * 0.7);
-    k.stroke();
+    // a dobra macia: a sombra funda embaixo do ombro que afundou e a crista acesa por cima
+    for (const [dt, cor, lw] of [[0.04, 'rgba(36,14,2,.7)', 6], [-0.06, 'rgba(255,226,190,.55)', 3]]) {
+      k.strokeStyle = cor;
+      k.lineWidth = lw;
+      k.beginPath();
+      for (let j = 0; j <= 12; j++) {
+        const a = -0.9 + (j / 12) * 1.6;
+        const p = anel(0.72 + dt, a);
+        if (j) k.lineTo(p[0], p[1]); else k.moveTo(p[0], p[1]);
+      }
+      k.stroke();
+    }
+    // o brilho da água no barro: traços curtos e quebrados no lado da luz
+    k.strokeStyle = 'rgba(255,240,220,.8)';
+    k.lineWidth = 2;
+    for (let n = 0; n < 16; n++) {
+      const t = 0.15 + r() * 0.6;
+      const a = Math.PI * (0.62 + r() * 0.2);
+      const p = anel(t, a);
+      k.beginPath();
+      k.moveTo(p[0], p[1]);
+      k.lineTo(p[0] + 2, p[1] - 6 - r() * 8);
+      k.stroke();
+    }
     k.restore();
     k.strokeStyle = '#2e1a08';
     k.lineWidth = 2.4;
     k.lineJoin = 'round';
     k.stroke(corpo);
-    // a boca que ficou de pé, à esquerda: o lábio e o escuro de dentro
-    k.fillStyle = 'rgba(46,22,6,.85)';
+    // a boca: o lábio grosso (um anel de barro que é do pescoço) e o escuro de dentro
+    const fora = pol(boca);
+    const dentro = pol(boca.map(([x, y]) => { const [mx, my] = anel(1, 0); const [ex, ey] = anel(1, Math.PI); const ccx = (mx + ex) / 2; const ccy = (my + ey) / 2; return [ccx + (x - ccx) * 0.72, ccy + (y - ccy) * 0.6 + 2]; }));
+    k.fillStyle = '#c08a5e';
+    k.fill(fora);
+    k.fillStyle = '#2a1206';
+    k.fill(dentro);
+    k.strokeStyle = '#2e1a08';
+    k.lineWidth = 2;
+    k.stroke(fora);
+    k.lineWidth = 1.4;
+    k.stroke(dentro);
+    // a luz no lábio, de cima à esquerda
+    k.strokeStyle = 'rgba(255,236,206,.85)';
+    k.lineWidth = 2;
     k.beginPath();
-    k.ellipse(bocaE[0] + 30, bocaE[1] + 8, 30, 8, 0.25, 0, 6.283);
-    k.fill();
+    for (let i = 14; i <= 30; i++) { const p = boca[i]; if (i === 14) k.moveTo(p[0], p[1] - 1.5); else k.lineTo(p[0], p[1] - 1.5); }
+    k.stroke();
     // a bacia de água e a faca de madeira, no chão, à frente
     const bacia = new Path2D();
     bacia.ellipse(120, 760, 70, 22, 0, 0, Math.PI);
