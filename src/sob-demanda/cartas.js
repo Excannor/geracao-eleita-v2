@@ -9841,11 +9841,11 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.beginPath();
     k.ellipse(240, 491, 27, 5, 0.1, 0, 6.283);
     k.fill();
-    // a manga direita: jogada por cima da vara, pende atrás dela, mais curta e torcida
+    // a manga direita: jogada por cima da vara, pende na frente dela, mais curta e torcida
     const mD = pol([[xs1 - 18, yo(xs1) - 13], [640, yo(640) - 16], [690, yo(690) - 13], [708, yo(708) + 8], [714, 300], [710, 368], [664, 376], [660, 316], [650, yo(650) + 20], [604, yo(604) + 18], [xs1 - 6, yo(xs1) + 30]]);
     sombraNoChao(k, mD, 10, 8, 6, 0.28);
     marcar(k, obj, mD);
-    pinta(mD, [['#b0603c', 0.32], ['#ece0c2', 0.08], ['#5a6e92', 0.3], ['#d8b062', 0.3]], (u, y) => 600 + u * 116, 180, 400);
+    pinta(mD, [['#b0603c', 0.32], ['#ece0c2', 0.08], ['#5a6e92', 0.3], ['#d8b062', 0.3]], (u, y) => 562 + u * 156, 180, 400);
     const sMD = (x, y) => 0.26 + (x - 600) / 220 + (y < yo(x) + 4 ? -0.18 : 0.14) + Math.max(0, Math.sin((x - 600) * 0.08)) * 0.25;
     gravar(k, mD, 656, 290, 150, Math.PI / 2 - 0.05, 3.4, 1.8, sMD, TI, 0);
     gravar(k, mD, 656, 290, 150, Math.PI / 2 + 1.1, 4.2, 1.5, (x, y) => (sMD(x, y) - 0.62) * 2.2, TI, 0);
@@ -9853,8 +9853,6 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.strokeStyle = TI;
     k.lineWidth = 2.4;
     k.stroke(mD);
-    // a vara passa por cima da manga dobrada (a ponta dela pende atrás)
-    vara(k, [[612, yv(612)], [846, yv(846) - 1]], 13, '#9c7a4c', obj);
     // o capim na barra e no pé dos postes: tufos cheios, claros
     k.save();
     k.strokeStyle = 'rgba(96,78,40,.6)';
@@ -9970,7 +9968,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       sombraNoChao(k, p, rx * 0.5, ry * 0.4, 2 + rx * 0.08, 0.3);
       peca(k, p, [x - rx, y - ry, x + rx, y + ry], { cor: '#d9c09a', ang: 0.6, passo: Math.max(2.2, rx * 0.12), maxL: 1.4, sombra: sombraOval(x, y, rx, ry, 0), cruzada: 0.72, traco: Math.min(1.6, 0.6 + rx * 0.04) });
     };
-    for (const [x, y, rx, ry] of [[150, 310, 22, 9], [470, 280, 14, 6], [640, 330, 26, 10], [60, 470, 34, 14], [850, 790, 40, 18], [300, 806, 30, 12], [560, 800, 24, 10], [720, 270, 10, 4], [250, 262, 9, 4], [420, 420, 16, 6]]) pedrinha(x, y, rx, ry);
+    for (const [x, y, rx, ry] of [[150, 310, 22, 9], [470, 280, 14, 6], [350, 300, 22, 8], [60, 470, 34, 14], [850, 790, 40, 18], [300, 806, 30, 12], [560, 800, 24, 10], [520, 266, 10, 4], [250, 262, 9, 4], [420, 420, 16, 6]]) pedrinha(x, y, rx, ry);
     // um arbusto seco de deserto, longe, à esquerda
     k.save();
     k.strokeStyle = 'rgba(58,40,18,.8)';
@@ -9991,7 +9989,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.restore();
 
     // a vara e a serpente: uma linha só, do cabo (na madeira) à cabeça erguida
-    const linha = curvaPor([[118, 704], [86, 712], [76, 744], [102, 768], [150, 764], [300, 690], [440, 618], [530, 584], [612, 616], [680, 662], [748, 652], [772, 588], [752, 510], [744, 442], [722, 404], [688, 394]], 2.5);
+    const linha = curvaPor([[118, 704], [86, 712], [76, 744], [102, 768], [150, 764], [300, 690], [440, 618], [530, 584], [612, 616], [680, 662], [748, 652], [772, 588], [752, 510], [744, 442], [722, 404], [688, 394]].map(([x, y]) => [x, y - 34]), 2.5);
     const S = linha[linha.length - 1].s;
     const qDe0 = (s) => linha[Math.max(0, Math.min(linha.length - 1, Math.round(s / 2.5)))];
     const qDe = qDe0;
