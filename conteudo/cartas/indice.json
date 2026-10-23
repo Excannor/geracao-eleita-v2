@@ -80,7 +80,7 @@
       "voceSabia": "Abraão tinha cem anos quando Isaque nasceu.",
       "link": "#/atlas/abraao",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "jose-sonhos",
@@ -168,7 +168,7 @@
       "voceSabia": "Quando tiraram Daniel da cova, não havia nele o menor arranhão.",
       "link": "#/mapa/daniel",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "nuvem-testemunhas",
