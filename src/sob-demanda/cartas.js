@@ -6968,7 +6968,7 @@
     for (const [base, amp, cor, sombra, sem] of [[500, 26, '#e3c69c', 0.35, 1], [540, 20, '#cfae84', 0.55, 2]]) {
       const f = onda(sorteio(6310 + sem), 4, 0.006);
       const m = pol([[-10, 600], ...Array.from({ length: 48 }, (_, i) => [i * 19 - 4, base + f(i * 19) * amp]), [W + 10, 600]]);
-      peca(k, m, [-10, base - amp, W + 10, 600], { cor, ang: 0, passo: 4.6, maxL: 1.2, sombra: (x) => sombra - Math.max(0, 1 - Math.abs(x - sol[0]) / 300) * 0.3, cruzada: 0.8, traco: 1.5 });
+      peca(k, m, [-10, base - amp, W + 10, 600], { cor, ang: 0, passo: 4.6, maxL: 1.2, sombra: (x) => Math.max(0.18, sombra - Math.max(0, 1 - Math.abs(x - sol[0]) / 300) * 0.3), cruzada: 0.8, traco: 1.5 });
     }
     // o alto de Betel: o chão de calcário, perto
     const chao = new Path2D();
@@ -7034,46 +7034,45 @@
     k.strokeStyle = SEPIA;
     k.lineWidth = 2.6;
     k.stroke(face);
-    // o óleo: escurece o alto, molha a beirada e desce em fios pelas facetas, sem tampa
+    // o óleo, em gravura: a faceta de cima escurece por uma segunda hachura, cerrada, num marrom
+    // quente; a beirada molhada tem um fio de luz; e o óleo desce em três fios finos que seguem
+    // as arestas das facetas (o mais comprido com uns 60 px)
+    const topo = pol(facetas[1][0]);
     k.save();
     k.clip(face);
-    k.fillStyle = 'rgba(112,72,20,.5)';
-    k.fill(pol(facetas[1][0]));
-    k.strokeStyle = 'rgba(255,240,190,.85)';
-    k.lineWidth = 2;
-    k.beginPath();
-    k.moveTo(338, 492);
-    k.lineTo(354, 494);
-    k.moveTo(368, 486);
-    k.lineTo(390, 487);
-    k.stroke();
-    k.restore();
+    gravar(k, topo, 362, 500, 70, 0.25, 2.6, 1.3, (px, py) => 0.7 - Math.max(0, py - 486) / 34 - Math.abs(px - 364) / 160 + Math.sin(px * 0.3) * 0.08, '#5a3810', 0);
     const molhado = new Path2D();
     molhado.moveTo(318, 498);
-    for (const [x, y] of [[334, 486], [356, 490], [366, 480], [392, 482], [406, 500], [398, 514], [384, 506], [366, 524], [350, 510], [334, 518]]) molhado.lineTo(x, y);
+    for (const [x, y] of [[334, 486], [356, 490], [366, 480], [392, 482], [406, 500], [398, 514], [384, 508], [366, 526], [350, 512], [334, 520]]) molhado.lineTo(x, y);
     molhado.closePath();
-    k.save();
-    k.clip(face);
-    k.fillStyle = 'rgba(112,72,20,.45)';
-    k.fill(molhado);
-    for (const [x0, y0, l, larg, dx] of [[360, 516, 132, 8, -10], [390, 506, 64, 6, 6], [334, 510, 46, 5, -6]]) {
-      const pts = [];
-      for (let t = 0; t <= 1.0001; t += 0.05) pts.push([x0 + dx * t + Math.sin(t * 6 + x0) * 2.5, y0 + t * l, larg * (1 - t * 0.5)]);
-      k.lineCap = 'round';
-      for (let i = 1; i < pts.length; i++) {
-        k.strokeStyle = 'rgba(96,60,14,.72)';
-        k.lineWidth = pts[i][2];
-        k.beginPath();
-        k.moveTo(pts[i - 1][0], pts[i - 1][1]);
-        k.lineTo(pts[i][0], pts[i][1]);
-        k.stroke();
-        k.strokeStyle = 'rgba(255,236,176,.85)';
-        k.lineWidth = Math.max(1, pts[i][2] * 0.22);
-        k.beginPath();
-        k.moveTo(pts[i - 1][0] - pts[i][2] * 0.2, pts[i - 1][1]);
-        k.lineTo(pts[i][0] - pts[i][2] * 0.2, pts[i][1]);
-        k.stroke();
-      }
+    gravar(k, molhado, 362, 504, 70, -0.5, 3.2, 1, (px, py) => 0.55 - Math.max(0, py - 500) / 40, '#5a3810', 0);
+    k.strokeStyle = 'rgba(255,240,190,.9)';
+    k.lineWidth = 1.6;
+    k.beginPath();
+    k.moveTo(320, 497);
+    k.lineTo(334, 487);
+    k.lineTo(356, 491);
+    k.lineTo(366, 481);
+    k.lineTo(392, 483);
+    k.stroke();
+    // os fios: linhas de 2 a 3 px pelas arestas (334,560) a (384,556), e pela face
+    k.lineCap = 'round';
+    for (const pts of [[[366, 524], [362, 540], [358, 556], [352, 572], [350, 584]], [[396, 512], [392, 528], [388, 546], [386, 556]], [[336, 520], [334, 534], [333, 546]]]) {
+      k.strokeStyle = 'rgba(78,48,12,.9)';
+      k.lineWidth = 2.6;
+      k.beginPath();
+      pts.forEach(([x, y], i) => (i ? k.lineTo(x, y) : k.moveTo(x, y)));
+      k.stroke();
+      k.strokeStyle = 'rgba(255,236,176,.8)';
+      k.lineWidth = 0.9;
+      k.beginPath();
+      pts.forEach(([x, y], i) => (i ? k.lineTo(x - 0.8, y) : k.moveTo(x - 0.8, y)));
+      k.stroke();
+      const [ex, ey] = pts[pts.length - 1];
+      k.fillStyle = 'rgba(78,48,12,.9)';
+      k.beginPath();
+      k.ellipse(ex, ey + 2, 2.2, 3, 0, 0, 6.283);
+      k.fill();
     }
     k.restore();
     // a mancha de óleo no chão, ao pé
@@ -7118,8 +7117,8 @@
       k.fill();
     }
     // um tufo de capim de verdade, ao pé da pedra
-    capim(k, r, 168, 748, 40, 14);
-    capim(k, r, 520, 770, 34, 11);
+    capim(k, r, 156, 750, 34, 22, 'rgba(84,66,36,.7)');
+    capim(k, r, 182, 752, 26, 16, 'rgba(84,66,36,.6)');
     vinheta(k, W, H, 0.22);
   }
 
