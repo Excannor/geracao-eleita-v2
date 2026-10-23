@@ -11771,10 +11771,11 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.28);
   }
   // ---------- (12) A moeda perdida (Lc 15.8-9) ----------
-  // De noite, rente ao chão de lajes da casa: a lamparina de barro acesa no chão, a vassoura
+  // De noite, rente ao chão de lajes da casa: a lamparina de pires (tigelinha de barro de
+  // borda apertada em bico) acesa no chão, a vassoura
   // de ramos deitada ao lado, o pó varrido em arcos e, numa junta entre as lajes, a dracma de
-  // prata achada, de pé e torta, brilhando na luz da lamparina. O escuro da casa é hachura
-  // cruzada no papel; só a roda de luz em volta da lamparina fica clara. Ninguém: a mulher
+  // prata achada, de pé e torta, brilhando na luz da lamparina. O escuro da casa é linha
+  // cerrada no papel; só a roda de luz em volta da lamparina fica clara. Ninguém: a mulher
   // está só no achado.
   function desenhoMoeda(k, W, H, obj) {
     const r = sorteio(8201);
@@ -11882,55 +11883,98 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     }
     k.restore();
 
-    // a lamparina de barro, no chão: o corpo redondo achatado, o bico com a chama, a asa
+    // a lamparina de barro, no chão: uma tigelinha aberta (de pires), de borda dobrada e
+    // apertada num lado para fazer o bico; dentro, o azeite e o pavio de pano deitado no bico
     const lx = 0;
     const ly = 0;
     k.save();
     k.translate(440, 540);
     k.scale(1.55, 1.55);
-    const corpo = new Path2D();
-    corpo.ellipse(lx, ly, 62, 30, 0, 0, 6.283);
-    const bico = pol([[lx + 40, ly - 16], [lx + 96, ly - 8], [lx + 104, ly + 2], [lx + 96, ly + 12], [lx + 40, ly + 18]]);
-    sombraNoChao(k, corpo, -30, 18, 8, 0.4);
-    peca(k, bico, [lx + 40, ly - 16, lx + 104, ly + 18], { cor: '#c4844e', tinta: '#2e1606', ang: 0.2, passo: 2.4, maxL: 1.3, sombra: (x, y) => 0.15 + (y - ly + 16) / 50, cruzada: 0.8, traco: 1.8, obj });
-    peca(k, corpo, [lx - 62, ly - 30, lx + 62, ly + 30], { cor: '#c4844e', tinta: '#2e1606', ang: 0.15, passo: 2.6, maxL: 1.5, sombra: (x, y) => 0.1 + (y - ly + 30) / 70 + (lx - x) / 400, cruzada: 0.75, traco: 2, obj });
-    // o disco de cima, rebaixado, com o furo do azeite (pequeno, fora do centro)
-    k.strokeStyle = 'rgba(46,22,6,.8)';
+    // o bojo: a meia elipse de baixo, mais funda que a borda
+    const bojo = new Path2D();
+    bojo.moveTo(lx - 66, ly);
+    bojo.bezierCurveTo(lx - 64, ly + 40, lx + 52, ly + 42, lx + 70, ly + 2);
+    bojo.lineTo(lx + 96, ly - 4);
+    bojo.lineTo(lx + 98, ly + 2);
+    bojo.bezierCurveTo(lx + 60, ly + 26, lx - 40, ly + 50, lx - 66, ly);
+    bojo.closePath();
+    sombraNoChao(k, bojo, -30, 18, 8, 0.4);
+    peca(k, bojo, [lx - 66, ly - 4, lx + 98, ly + 46], { cor: '#b9774a', tinta: '#2e1606', ang: 1.35, passo: 2.4, maxL: 1.5, sombra: (x, y) => 0.25 + (y - ly) / 60 + (lx - x) / 300, cruzada: 0.7, traco: 2, obj });
+    // a borda de cima: o anel largo da tigela, que se aperta em bico à direita
+    const beira = new Path2D();
+    beira.moveTo(lx - 68, ly);
+    beira.bezierCurveTo(lx - 66, ly - 34, lx + 40, ly - 38, lx + 66, ly - 12);
+    beira.quadraticCurveTo(lx + 82, ly - 10, lx + 100, ly - 7);
+    beira.quadraticCurveTo(lx + 84, ly - 1, lx + 68, ly + 6);
+    beira.bezierCurveTo(lx + 40, ly + 30, lx - 64, ly + 30, lx - 68, ly);
+    beira.closePath();
+    peca(k, beira, [lx - 68, ly - 36, lx + 100, ly + 30], { cor: '#d49a64', tinta: '#2e1606', ang: 0.1, passo: 2.6, maxL: 1.1, sombra: (x, y) => 0.12 + (y - ly + 30) / 120, cruzada: 0.9, traco: 2, obj });
+    // o azeite dentro, escuro e liso, com o reflexo da chama
+    const oleo = new Path2D();
+    oleo.moveTo(lx - 54, ly);
+    oleo.bezierCurveTo(lx - 52, ly - 24, lx + 34, ly - 27, lx + 56, ly - 8);
+    oleo.quadraticCurveTo(lx + 62, ly - 4, lx + 56, ly + 2);
+    oleo.bezierCurveTo(lx + 30, ly + 20, lx - 50, ly + 20, lx - 54, ly);
+    oleo.closePath();
+    k.fillStyle = '#4a2a10';
+    k.fill(oleo);
+    gravar(k, oleo, lx, ly - 4, 64, 0.05, 2.2, 1.1, () => 0.6, '#1e0e04', 0);
+    k.strokeStyle = 'rgba(255,214,140,.7)';
+    k.lineWidth = 1.6;
+    k.beginPath();
+    k.moveTo(lx + 18, ly - 12);
+    k.quadraticCurveTo(lx + 30, ly - 14, lx + 40, ly - 10);
+    k.stroke();
+    // a dobra apertada do bico: as duas beiradas que se encontram
+    k.strokeStyle = '#2e1606';
     k.lineWidth = 1.4;
     k.beginPath();
-    k.ellipse(lx - 4, ly - 6, 38, 15, 0, 0, 6.283);
+    k.moveTo(lx + 60, ly - 10);
+    k.quadraticCurveTo(lx + 78, ly - 8, lx + 96, ly - 6);
+    k.moveTo(lx + 60, ly + 2);
+    k.quadraticCurveTo(lx + 78, ly - 2, lx + 96, ly - 5);
     k.stroke();
-    k.fillStyle = '#2e1606';
+    // o pavio de pano torcido, deitado no bico, com a ponta queimada para fora
+    k.strokeStyle = '#e8d6b0';
+    k.lineWidth = 4;
+    k.lineCap = 'round';
     k.beginPath();
-    k.ellipse(lx - 10, ly - 6, 6, 3, 0, 0, 6.283);
+    k.moveTo(lx + 40, ly - 4);
+    k.quadraticCurveTo(lx + 70, ly - 6, lx + 96, ly - 6);
+    k.stroke();
+    k.strokeStyle = 'rgba(46,22,6,.7)';
+    k.lineWidth = 1;
+    for (let t = 44; t < 94; t += 6) { k.beginPath(); k.moveTo(lx + t, ly - 8); k.lineTo(lx + t + 3, ly - 3); k.stroke(); }
+    k.fillStyle = '#2a1608';
+    k.beginPath();
+    k.arc(lx + 98, ly - 6, 3, 0, 6.283);
     k.fill();
-    // a asa, atrás: uma argola fechada de barro
-    k.strokeStyle = '#2e1606';
-    k.lineWidth = 10;
-    k.beginPath();
-    k.ellipse(lx - 70, ly - 8, 14, 10, -0.3, 0, 6.283);
-    k.stroke();
-    k.strokeStyle = '#c4844e';
-    k.lineWidth = 5.5;
-    k.stroke();
-    // a chama no bico, em traços que afinam
+    // a chama: uma língua mansa e redonda, larga embaixo, com o clarão em volta
     const fx = lx + 98;
     const fy = ly - 6;
     brilho(k, fx, fy - 30, 160, 'rgba(255,214,140,.35)', 'screen');
-    brilho(k, fx, fy - 26, 70, 'rgba(255,236,190,.5)', 'screen');
-    const ch = chama(fx, fy, 16, 64, 6);
-    k.fillStyle = 'rgba(255,220,130,.95)';
+    brilho(k, fx, fy - 22, 60, 'rgba(255,236,190,.55)', 'screen');
+    const ch = new Path2D();
+    ch.moveTo(fx, fy + 2);
+    ch.bezierCurveTo(fx - 16, fy - 2, fx - 14, fy - 26, fx - 2, fy - 44);
+    ch.bezierCurveTo(fx + 2, fy - 38, fx + 14, fy - 24, fx + 13, fy - 10);
+    ch.bezierCurveTo(fx + 12, fy - 2, fx + 6, fy + 2, fx, fy + 2);
+    ch.closePath();
+    const gch = k.createRadialGradient(fx, fy - 12, 2, fx, fy - 16, 30);
+    gch.addColorStop(0, 'rgba(255,252,236,1)');
+    gch.addColorStop(0.45, 'rgba(255,214,120,.97)');
+    gch.addColorStop(1, 'rgba(226,120,40,.9)');
+    k.fillStyle = gch;
     k.fill(ch);
-    k.save();
-    k.clip(ch);
-    k.strokeStyle = 'rgba(204,96,26,.85)';
-    k.lineWidth = 1.2;
-    for (let j = -2; j <= 2; j++) { k.beginPath(); k.moveTo(fx + j * 3, fy); k.quadraticCurveTo(fx + j * 2, fy - 30, fx + 6, fy - 64); k.stroke(); }
-    k.restore();
-    k.fillStyle = 'rgba(255,252,236,.95)';
+    k.strokeStyle = 'rgba(190,90,24,.6)';
+    k.lineWidth = 1;
+    k.stroke(ch);
+    // o pé azulado da chama, junto ao pavio
+    k.strokeStyle = 'rgba(110,130,180,.45)';
+    k.lineWidth = 2;
     k.beginPath();
-    k.ellipse(fx + 1, fy - 18, 4, 10, 0.05, 0, 6.283);
-    k.fill();
+    k.arc(fx, fy - 4, 5, 0.3, Math.PI - 0.3);
+    k.stroke();
     k.restore();
 
     // a dracma: um disco de prata grosso, de pé e torto na junta das lajes, à direita e na
