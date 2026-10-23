@@ -340,10 +340,13 @@ try {
     marcos.push(await av('document.querySelector(".tela-carta-nova .album-origem").textContent + " · " + document.querySelector(".tela-carta-nova .album-fim .carta-viva, .tela-carta-nova .album-fim .carta-texto").dataset.raridade'));
     if (i === 0) { await dormir(600); await nosDoisTemas('07-marco'); }
     await av('document.querySelector(".tela-carta-nova [data-continuar]").click()');
-    await dormir(400);
+    // espera a tela fechar ou a próxima revelação montar (400 ms às vezes pegava a tela ainda saindo)
+    await esperar('!document.querySelector(".tela-carta-nova") || !!document.querySelector(".tela-carta-nova .rv")', 3000);
   }
-  ok(marcos.length === 4 && marcos.some((m) => /Marco: 100 dias de leitura/.test(m)) && marcos.filter((m) => /Marco: unidade \d completa/.test(m)).length === 3
-    && marcos.every((m) => / · (prata|ouro|gloria)$/.test(m)), 'os quatro marcos (3 unidades e 100 dias), cada um revelado com Prata, Ouro ou Glória (' + marcos.join('; ') + ')');
+  // só os marcos contam aqui; outra carta da fila (sem origem de marco) pode vir junto e não é erro
+  const deMarco = marcos.filter((m) => /^Marco: /.test(m));
+  ok(deMarco.length === 4 && deMarco.some((m) => /Marco: 100 dias de leitura/.test(m)) && deMarco.filter((m) => /Marco: unidade \d completa/.test(m)).length === 3
+    && deMarco.every((m) => / · (prata|ouro|gloria)$/.test(m)), 'os quatro marcos (3 unidades e 100 dias), cada um revelado com Prata, Ouro ou Glória (' + marcos.join('; ') + ')');
 
   // ---------- troféus ----------
   await av('location.hash = "#/perfil/trofeus"');
