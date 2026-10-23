@@ -642,12 +642,12 @@
       "numero": 3,
       "titulo": "Venha e veja",
       "raridade": "prata",
-      "referencia": "João 1.45-46",
+      "referencia": "João 1.45-48",
       "voceSabia": "Natanael duvidou de Nazaré, e Filipe respondeu: venha e veja você mesmo.",
       "link": "#/mapa/joao",
       "amigos": 15,
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "samaritana-cidade",
@@ -673,7 +673,7 @@
       "link": "#/mapa/joao",
       "amigos": 100,
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "da-familia",

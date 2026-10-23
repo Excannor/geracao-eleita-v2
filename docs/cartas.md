@@ -162,7 +162,7 @@ proteções; o número de amigos mostrado é só o da própria pessoa, o mesmo d
 |---|---|---|---|---|
 | 1 | 1 | Linho | A semente lançada | Mateus 13.3-8 |
 | 2 | 5 | Bronze | André chama Pedro | João 1.40-42 |
-| 3 | 15 | Prata | Venha e veja (Filipe e Natanael) | João 1.45-46 |
+| 3 | 15 | Prata | Venha e veja (Filipe e Natanael) | João 1.45-48 |
 | 4 | 40 | Ouro | A samaritana e a cidade | João 4.28-30 |
 | 5 | 100 | Glória | Os campos maduros | João 4.35 |
 

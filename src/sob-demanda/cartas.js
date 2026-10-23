@@ -17739,7 +17739,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.2);
   }
 
-  // ---------- (S3) Venha e veja (Jo 1.45-46) ----------
+  // ---------- (S3) Venha e veja (Jo 1.45-48) ----------
   // "Pode vir alguma coisa boa de Nazaré?", perguntou Natanael. "Venha e veja você mesmo",
   // respondeu Filipe. E Jesus disse depois: "eu vi você debaixo da figueira" (1.48). De manhã:
   // a figueira grande, de tronco liso e torto e folhas largas de lóbulos fundos, com o banco
