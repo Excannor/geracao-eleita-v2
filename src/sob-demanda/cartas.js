@@ -8868,13 +8868,13 @@
     k.lineTo(W + 10, hz);
     k.stroke();
     // a rede de lançar, já na água, à direita do barco: a beirada torta de chumbadas, a metade
-    // de lá afundada (a água passa por cima dela), a metade de cá ainda à vista, com a malha e
-    // umas boias; em volta, o anel de ondinhas onde ela caiu; a corda volta ao barco
-    const rx = 690;
+    // de lá afundada (a água passa por cima dela), a metade de cá ainda à vista, com a malha;
+    // em volta, o anel de ondinhas onde ela caiu; a corda volta ao barco
+    const rx = 630;
     const ry = 566;
     const raio = (a) => 1 + Math.sin(a * 3 + 1) * 0.07 + Math.sin(a * 7) * 0.04;
     const borda = new Path2D();
-    for (let i = 0; i <= 48; i++) { const a = (i / 48) * 6.283; const px = rx + Math.cos(a) * 150 * raio(a); const py = ry + Math.sin(a) * 42 * raio(a); (i ? borda.lineTo(px, py) : borda.moveTo(px, py)); }
+    for (let i = 0; i <= 48; i++) { const a = (i / 48) * 6.283; const px = rx + Math.cos(a) * 130 * raio(a); const py = ry + Math.sin(a) * 38 * raio(a); (i ? borda.lineTo(px, py) : borda.moveTo(px, py)); }
     borda.closePath();
     k.save();
     k.clip(borda);
@@ -8894,8 +8894,8 @@
     }
     // a metade de lá, debaixo d'água: a água por cima e as ondinhas atravessando
     const lado = new Path2D();
-    lado.moveTo(rx - 170, ry + 6);
-    for (let x = rx - 170; x <= rx + 170; x += 10) lado.lineTo(x, ry + 4 + Math.sin(x * 0.05) * 5);
+    lado.moveTo(rx - 150, ry + 6);
+    for (let x = rx - 150; x <= rx + 150; x += 10) lado.lineTo(x, ry + 4 + Math.sin(x * 0.05) * 5);
     lado.lineTo(rx + 170, ry - 60);
     lado.lineTo(rx - 170, ry - 60);
     lado.closePath();
@@ -8912,37 +8912,28 @@
     k.lineWidth = 2;
     k.strokeStyle = SEPIA;
     k.beginPath();
-    for (let i = 0; i <= 24; i++) { const a = (i / 24) * Math.PI; const px = rx + Math.cos(a) * 150 * raio(a); const py = ry + Math.sin(a) * 42 * raio(a); (i ? k.lineTo(px, py) : k.moveTo(px, py)); }
+    for (let i = 0; i <= 24; i++) { const a = (i / 24) * Math.PI; const px = rx + Math.cos(a) * 130 * raio(a); const py = ry + Math.sin(a) * 38 * raio(a); (i ? k.lineTo(px, py) : k.moveTo(px, py)); }
     k.stroke();
     k.strokeStyle = 'rgba(43,33,18,.35)';
     k.lineWidth = 1.2;
     k.setLineDash([6, 8]);
     k.beginPath();
-    for (let i = 24; i <= 48; i++) { const a = (i / 48) * 6.283; const px = rx + Math.cos(a) * 150 * raio(a); const py = ry + Math.sin(a) * 42 * raio(a); (i > 24 ? k.lineTo(px, py) : k.moveTo(px, py)); }
+    for (let i = 24; i <= 48; i++) { const a = (i / 48) * 6.283; const px = rx + Math.cos(a) * 130 * raio(a); const py = ry + Math.sin(a) * 38 * raio(a); (i > 24 ? k.lineTo(px, py) : k.moveTo(px, py)); }
     k.stroke();
     k.setLineDash([]);
-    // as chumbadas da beirada de cá e umas boias que ainda aparecem
+    // as chumbadas da beirada de cá
     for (let i = 1; i < 24; i++) {
       const a = (i / 24) * Math.PI;
-      const px = rx + Math.cos(a) * 150 * raio(a);
-      const py = ry + Math.sin(a) * 42 * raio(a);
+      const px = rx + Math.cos(a) * 130 * raio(a);
+      const py = ry + Math.sin(a) * 38 * raio(a);
       k.fillStyle = '#3a3226';
       k.beginPath();
       k.ellipse(px, py + 1, 3.6, 2.6, 0, 0, 6.283);
       k.fill();
     }
-    for (const [x, y] of [[rx - 90, ry - 22], [rx + 30, ry - 34], [rx + 110, ry - 18], [rx - 30, ry - 38]]) {
-      k.fillStyle = '#d9c39a';
-      k.beginPath();
-      k.ellipse(x, y, 6, 3.4, 0, 0, 6.283);
-      k.fill();
-      k.strokeStyle = SEPIA;
-      k.lineWidth = 1.2;
-      k.stroke();
-    }
     // o anel de ondinhas onde ela caiu
     k.strokeStyle = 'rgba(43,33,18,.6)';
-    for (const [a, b, w] of [[172, 54, 1.5], [198, 66, 1.1], [226, 78, 0.8]]) { k.lineWidth = w; k.beginPath(); k.ellipse(rx, ry + 2, a, b, -0.03, 0.15, Math.PI - 0.15); k.stroke(); k.beginPath(); k.ellipse(rx, ry + 2, a, b, -0.03, Math.PI + 0.5, Math.PI * 2 - 0.5); k.stroke(); }
+    for (const [a, b, w] of [[150, 50, 1.5], [172, 60, 1.1], [194, 70, 0.8]]) { k.lineWidth = w; k.beginPath(); k.ellipse(rx, ry + 2, a, b, -0.03, 0.15, Math.PI - 0.15); k.stroke(); k.beginPath(); k.ellipse(rx, ry + 2, a, b, -0.03, Math.PI + 0.5, Math.PI * 2 - 0.5); k.stroke(); }
 
     // o barco: de lado, a proa alta à esquerda, as tábuas, a borda clara e o casco escuro
     const bx = 330;
@@ -8997,21 +8988,27 @@
     k.strokeStyle = SEPIA;
     for (let y = by - 2; y < by + 40; y += 5) { k.lineWidth = 1.4; let x = bx - L / 2 - 20 + r() * 20; while (x < bx + L / 2 + 20) { const c = 16 + r() * 30; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2.5, x + c, y); k.stroke(); x += c + 4 + r() * 10; } }
     k.restore();
-    // o reflexo do casco: uma mancha escura que treme, colada na linha d'água, com a beirada
-    // de baixo partida em lascas de onda e umas ondinhas claras por cima
-    const refl = new Path2D();
-    refl.moveTo(bx - L / 2 + 26, by - 3);
-    for (let x = bx - L / 2 + 26; x <= bx + L / 2 - 36; x += 10) refl.lineTo(x, by - 4 + Math.sin(x * 0.2) * 2);
-    for (let x = bx + L / 2 - 36, i = 0; x >= bx - L / 2 + 26; x -= 14, i++) refl.lineTo(x, by + 54 + (i % 2 ? 10 : -6) + Math.sin(x * 0.05) * 8 - Math.max(0, Math.abs(x - bx) - L * 0.3) * 0.5);
-    refl.closePath();
-    k.fillStyle = 'rgba(46,34,22,.86)';
-    k.fill(refl);
-    k.save();
-    k.clip(refl);
-    k.strokeStyle = 'rgba(225,224,207,.85)';
-    k.lineWidth = 1.6;
-    for (let y = by + 14; y < by + 70; y += 8) { let x = bx - L / 2 + 30 + r() * 40; while (x < bx + L / 2 - 40) { const c = 14 + r() * 30; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2.5, x + c, y); k.stroke(); x += c + 30 + r() * 50; } }
-    k.restore();
+    // o reflexo do casco: traços escuros deitados e partidos, colados na linha d'água, de
+    // comprimentos soltos, cada vez mais curtos e ralos com a fundura; nada de mancha fechada
+    k.lineCap = 'round';
+    for (let y = by - 2; y < by + 78; y += 4.2) {
+      const t = (y - by + 2) / 80;
+      const x0 = bx - L / 2 + 30 + t * 40;
+      const x1 = bx + L / 2 - 40 - t * 50;
+      let x = x0 + r() * 12;
+      while (x < x1) {
+        const c = (14 + r() * 46) * (1 - t * 0.55);
+        if (r() > t * 0.75) {
+          k.strokeStyle = 'rgba(40,30,20,' + (0.9 - t * 0.5).toFixed(2) + ')';
+          k.lineWidth = 3 - t * 1.8;
+          k.beginPath();
+          k.moveTo(x, y + Math.sin(x * 0.07 + y) * 1.4);
+          k.lineTo(Math.min(x1, x + c), y + Math.sin((x + c) * 0.07 + y) * 1.4);
+          k.stroke();
+        }
+        x += c + 4 + r() * (8 + t * 30);
+      }
+    }
     // o mastro, a verga com a vela enrolada e os cabos
     const mx = bx + 20;
     const topoMastro = 150;
@@ -9020,7 +9017,7 @@
     vara(k, verga, 5, '#8a6a44', obj);
     const vela = new Path2D();
     vela.moveTo(mx - 150, topoMastro + 40);
-    for (let i = 0; i <= 12; i++) { const t = i / 12; vela.quadraticCurveTo(mx - 150 + t * 310 - 13, topoMastro + 40 - t * 26 + 14, mx - 150 + t * 310, topoMastro + 40 - t * 26 + (i % 2 ? 4 : 0)); }
+    for (let i = 0, t = 0; t < 1; i++) { const dt = 0.05 + r() * 0.09; t = Math.min(1, t + dt); vela.quadraticCurveTo(mx - 150 + (t - dt / 2) * 310, topoMastro + 40 - t * 26 + 6 + r() * 14, mx - 150 + t * 310, topoMastro + 40 - t * 26 + r() * 5); }
     vela.lineTo(mx + 160, topoMastro + 6);
     vela.lineTo(mx - 150, topoMastro + 30);
     vela.closePath();
@@ -9033,7 +9030,7 @@
     vara(k, [[bx - 30, borda1(0.42) + 4], [bx + 180, borda1(0.97) - 10]], 5, '#a2825a', obj);
     // a rede: uma ponta molhada caída por cima da borda, da popa até a água, e a corda até a
     // rede aberta
-    const caida = pol([[bx + 110, borda1(0.79) + 4], [bx + 160, borda1(0.92) + 6], [bx + 172, by - 2], [bx + 120, by - 6]]);
+const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [bx + 158, borda1(0.92) + 40], [bx + 166, by - 4], [bx + 146, by + 2], [bx + 134, borda1(0.85) + 46]]);
     k.save();
     k.clip(caida);
     k.fillStyle = 'rgba(200,190,160,.85)';
@@ -9048,7 +9045,7 @@
     marcar(k, obj, caida);
     const corda = new Path2D();
     corda.moveTo(bx + 166, by - 4);
-    corda.bezierCurveTo(bx + 220, by + 20, rx - 200, ry - 20, rx - 148, ry - 6);
+    corda.bezierCurveTo(bx + 220, by + 20, rx - 170, ry - 20, rx - 128, ry - 6);
     k.strokeStyle = '#3a2410';
     k.lineWidth = 2.6;
     k.stroke(corda);
