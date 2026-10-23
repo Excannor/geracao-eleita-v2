@@ -6185,7 +6185,7 @@
     'mana': desenhoMana, 'agua-rocha': desenhoAguaRocha, 'muralhas-jerico': desenhoMuralhas,
     'fogo-carmelo': desenhoFogoCarmelo, 'machado-flutua': desenhoMachado, 'fornalha': desenhoFornalha,
     'jonas-peixe': desenhoJonas, 'tempestade': desenhoTempestade, 'pesca': desenhoPesca,
-    'agua-vinho': desenhoAguaVinho,
+    'agua-vinho': desenhoAguaVinho, 'pedro-prisao': desenhoPedro,
     // Lugares
     'jardim-eden': desenhoEden, 'montes-ararate': desenhoArarate, 'betel': desenhoBetel, 'monte-sinai': desenhoSinai,
     'rio-jordao': desenhoJordao, 'jerusalem': desenhoJerusalem, 'babilonia': desenhoBabilonia, 'ninive': desenhoNinive,
@@ -15157,6 +15157,206 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.ellipse(590, 724, 16, 4, 0, 0, 6.283);
     k.fill();
     vinheta(k, W, H, 0.22);
+  }
+  // ---------- (13) Pedro sai da prisão (At 12.6-10) ----------
+  // De noite, na cela: as paredes de pedra grande, o chão de lajes; no fundo, o portão de ferro
+  // aberto, de folha gradeada escancarada para dentro, e por ele entra uma luz forte (12.7, 12.10)
+  // que corre pelo chão e desenha a sombra das grades. Na frente, as duas correntes (12.6), presas
+  // nas argolas da parede, caídas no chão em voltas soltas, cada uma com a algema aberta na ponta
+  // (12.7). Ninguém desenhado.
+  function desenhoPedro(k, W, H, obj) {
+    const r = sorteio(10301);
+    k.fillStyle = '#2a2018';
+    k.fillRect(0, 0, W, H);
+    const chaoY = 560;
+    const porta = [430, 232, 640, chaoY];
+    const luz = [535, 420];
+    const longe = (x, y) => Math.min(1, Math.hypot((x - luz[0]) / 1.2, y - luz[1]) / 520);
+    // a parede do fundo, de pedra grande em fiadas, escura longe da luz
+    const parede = pol([[-10, -10], [W + 10, -10], [W + 10, chaoY], [-10, chaoY]]);
+    muroEmFiadas(k, r, parede, [-10, -10, W + 10, chaoY], { h: 46, cor: '#6e6050', tinta: '#140e08', sombra: (x, y) => 0.35 + longe(x, y) * 0.7, traco: 1.8, larg: 1.9 });
+    k.save();
+    k.globalCompositeOperation = 'screen';
+    brilho(k, luz[0], luz[1], 380, 'rgba(255,226,160,.4)');
+    k.restore();
+    marcar(k, obj, parede);
+    // a porta: o vão com a verga de pedra, e a luz forte lá fora
+    const [px0, py0, px1, py1] = porta;
+    const vao = pol([[px0, py1], [px0, py0], [px1, py0], [px1, py1]]);
+    k.fillStyle = '#fbf3da';
+    k.fill(vao);
+    k.save();
+    k.clip(vao);
+    // a luz em linhas finas que saem do meio do vão
+    k.strokeStyle = 'rgba(214,180,110,.55)';
+    k.lineWidth = 1.2;
+    for (let i = 0; i < 40; i++) {
+      const a = (i / 40) * 6.283;
+      k.beginPath();
+      k.moveTo(luz[0] + Math.cos(a) * 30, luz[1] - 30 + Math.sin(a) * 30);
+      k.lineTo(luz[0] + Math.cos(a) * 400, luz[1] - 30 + Math.sin(a) * 400);
+      k.stroke();
+    }
+    brilho(k, luz[0], luz[1] - 30, 110, 'rgba(255,255,248,.95)');
+    k.restore();
+    const verga = pol([[px0 - 40, py0 - 50], [px1 + 40, py0 - 50], [px1 + 40, py0], [px0 - 40, py0]]);
+    peca(k, verga, [px0 - 40, py0 - 50, px1 + 40, py0], { cor: '#a08868', tinta: '#140e08', ang: 0.05, passo: 3.2, maxL: 1.6, sombra: (x, y) => 0.25 + (py0 - y) / 120, cruzada: 0.8, traco: 2.4, obj });
+    for (const [xa, xb] of [[px0 - 40, px0], [px1, px1 + 40]]) {
+      const ombreira = pol([[xa, py0], [xb, py0], [xb, py1], [xa, py1]]);
+      peca(k, ombreira, [xa, py0, xb, py1], { cor: '#8e7658', tinta: '#140e08', ang: 1.5, passo: 3.4, maxL: 1.6, sombra: (x) => 0.3 + Math.abs(x - (xa + xb) / 2) / 60, cruzada: 0.8, traco: 2.2, obj });
+    }
+    // o chão de lajes em perspectiva
+    const chao = pol([[-10, chaoY], [W + 10, chaoY], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#5a4c3c';
+    k.fill(chao);
+    chaoEmLinhas(k, r, chao, -10, W + 10, chaoY, H, 2.4, (x, y) => 0.45 + longe(x, y) * 0.6, '#140e08');
+    k.strokeStyle = 'rgba(20,14,8,.85)';
+    k.lineWidth = 1.6;
+    for (const y of [chaoY, 600, 660, 750]) { k.beginPath(); k.moveTo(-10, y); k.lineTo(W + 10, y); k.stroke(); }
+    for (let xb = -900; xb < 1800; xb += 200) { k.beginPath(); k.moveTo(535 + (xb - 535) * 0.3, chaoY); k.lineTo(xb, H + 10); k.stroke(); }
+    marcar(k, obj, chao);
+    // a luz que entra e corre pelo chão, larga para cá; e nela a sombra das grades da folha
+    const raia = pol([[px0, py1], [px1, py1], [px1 + 260, H + 10], [px0 - 160, H + 10]]);
+    k.save();
+    k.clip(raia);
+    k.fillStyle = 'rgba(246,226,176,.75)';
+    k.fill(raia);
+    chaoEmLinhas(k, r, raia, px0 - 200, px1 + 300, chaoY, H, 1.4, () => 0.5, 'rgba(120,90,50,.8)');
+    k.strokeStyle = 'rgba(40,28,16,.75)';
+    for (let i = 0; i < 7; i++) {
+      const x0 = px0 + 10 + i * 30;
+      k.lineWidth = 4 + i * 0.6;
+      k.beginPath();
+      k.moveTo(x0, py1);
+      k.lineTo(x0 - 120 - i * 34, H + 10);
+      k.stroke();
+    }
+    k.restore();
+    // a luz (o vão e a raia no chão) fica fora da máscara dos objetos: ali o brilho pode entrar
+    if (obj) {
+      obj.save();
+      obj.setTransform(k.getTransform());
+      obj.globalCompositeOperation = 'destination-out';
+      obj.fill(vao);
+      obj.fill(raia);
+      obj.restore();
+    }
+    // a folha do portão, de ferro, aberta para dentro: a moldura, as grades em pé e as duas
+    // travessas rebitadas; as dobradiças do lado da ombreira
+    const folha = [[px0, py0 + 4], [px0, py1], [px0 - 150, py1 + 52], [px0 - 150, py0 - 40]];
+    const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    k.save();
+    k.lineCap = 'round';
+    const barra = (a, b, w) => {
+      for (const [ww, c] of [[w + 3, '#0c0806'], [w, '#3a342c'], [w * 0.35, 'rgba(250,230,180,.55)']]) { k.strokeStyle = c; k.lineWidth = ww; k.beginPath(); k.moveTo(a[0], a[1]); k.lineTo(b[0], b[1]); k.stroke(); }
+    };
+    for (let i = 0; i <= 6; i++) {
+      const t = i / 6;
+      barra(lerp(folha[0], folha[3], t), lerp(folha[1], folha[2], t), 6 + t * 2);
+    }
+    for (const t of [0.04, 0.5, 0.96]) barra(lerp(folha[0], folha[1], t), lerp(folha[3], folha[2], t), 10);
+    for (const t of [0.04, 0.5, 0.96]) {
+      for (let i = 0; i <= 6; i++) {
+        const p = lerp(lerp(folha[0], folha[1], t), lerp(folha[3], folha[2], t), i / 6);
+        k.fillStyle = '#d8c090';
+        k.beginPath();
+        k.arc(p[0], p[1], 2.4, 0, 6.283);
+        k.fill();
+      }
+    }
+    const contornoF = pol(folha);
+    marcar(k, obj, contornoF);
+    for (const t of [0.12, 0.88]) { const p = lerp(folha[0], folha[1], t); k.fillStyle = '#1a140e'; k.fillRect(p[0] - 8, p[1] - 10, 14, 20); }
+    k.restore();
+    // as argolas na parede e as correntes caídas, de elos alternados (um de frente, um de lado),
+    // em voltas soltas pelo chão, cada uma com a algema aberta na ponta
+    const corrente = (pts, e) => {
+      const c = curvaPor(pts, 3);
+      const passo = 15 * e;
+      let acum = 0;
+      let n = 0;
+      for (let i = 1; i < c.length; i++) {
+        acum += 3;
+        if (acum < passo) continue;
+        acum = 0;
+        const q = c[i];
+        const a = Math.atan2(q.ty, q.tx);
+        k.save();
+        k.translate(q.x, q.y);
+        k.rotate(a);
+        if (n % 2 === 0) {
+          const elo = new Path2D();
+          elo.ellipse(0, 0, 11 * e, 6 * e, 0, 0, 6.283);
+          elo.ellipse(0, 0, 6 * e, 2.4 * e, 0, 0, 6.283);
+          k.fillStyle = '#4a443a';
+          k.fill(elo, 'evenodd');
+          k.strokeStyle = '#0c0806';
+          k.lineWidth = 1.6;
+          k.stroke(elo);
+          k.strokeStyle = 'rgba(250,230,180,.6)';
+          k.lineWidth = 1.2;
+          k.beginPath();
+          k.ellipse(0, 0, 9 * e, 4.4 * e, 0, Math.PI * 1.1, Math.PI * 1.7);
+          k.stroke();
+          marcar(k, obj, elo);
+        } else {
+          const elo = pol([[-11 * e, -2.6 * e], [11 * e, -2.6 * e], [11 * e, 2.6 * e], [-11 * e, 2.6 * e]]);
+          k.fillStyle = '#3a342c';
+          k.fill(elo);
+          k.strokeStyle = '#0c0806';
+          k.lineWidth = 1.6;
+          k.stroke(elo);
+          marcar(k, obj, elo);
+        }
+        k.restore();
+        n++;
+      }
+      return c[c.length - 1];
+    };
+    const algema = (x, y, giro, e) => {
+      k.save();
+      k.translate(x, y);
+      k.rotate(giro);
+      k.scale(e, e);
+      // as duas metades do aro, abertas na dobradiça
+      for (const [a0, a1, dx, dy, g] of [[Math.PI * 0.55, Math.PI * 1.45, 0, 0, 0], [Math.PI * 1.55, Math.PI * 2.45, 14, -10, -0.7]]) {
+        k.save();
+        k.translate(dx, dy);
+        k.rotate(g);
+        k.lineCap = 'round';
+        for (const [w, c] of [[16, '#0c0806'], [12, '#4c463a'], [3, 'rgba(250,230,180,.6)']]) { k.strokeStyle = c; k.lineWidth = w; k.beginPath(); k.ellipse(0, 0, 30, 20, 0, a0, a1); k.stroke(); }
+        k.restore();
+      }
+      k.fillStyle = '#1a140e';
+      k.beginPath();
+      k.arc(0, -20, 5, 0, 6.283);
+      k.fill();
+      const p = new Path2D();
+      p.ellipse(6, -4, 44, 32, 0, 0, 6.283);
+      marcar(k, obj, p);
+      k.restore();
+    };
+    for (const [x, y] of [[110, 392], [262, 456]]) {
+      k.strokeStyle = '#0c0806';
+      k.lineWidth = 12;
+      k.beginPath();
+      k.ellipse(x, y + 18, 16, 20, 0, 0, 6.283);
+      k.stroke();
+      k.strokeStyle = '#5a544a';
+      k.lineWidth = 7;
+      k.stroke();
+      k.fillStyle = '#1a140e';
+      k.fillRect(x - 10, y - 8, 20, 12);
+    }
+    const f1 = corrente([[110, 428], [104, 540], [120, 610], [170, 650], [250, 640], [276, 672], [220, 700], [184, 724], [250, 742], [322, 726]], 1.2);
+    algema(f1.x + 34, f1.y - 6, 0.2, 1.2);
+    const f2 = corrente([[262, 492], [268, 560], [320, 600], [400, 616], [466, 636], [448, 670], [384, 688], [440, 714], [530, 706]], 1.15);
+    algema(f2.x + 34, f2.y - 4, -0.15, 1.15);
+    // uns fiapos de palha no chão
+    k.strokeStyle = 'rgba(200,170,110,.7)';
+    k.lineWidth = 1.4;
+    for (let i = 0; i < 40; i++) { const x = r() * W; const y = 600 + r() * 220; const a = r() * 3; k.beginPath(); k.moveTo(x, y); k.lineTo(x + Math.cos(a) * 18, y + Math.sin(a) * 6); k.stroke(); }
+    vinheta(k, W, H, 0.4);
   }
   // ---------- fim dos Milagres ----------
 
