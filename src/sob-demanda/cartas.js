@@ -6276,7 +6276,8 @@
     'belem': desenhoBelem, 'mar-galileia': desenhoGalileia, 'nazare': desenhoNazare, 'patmos': desenhoPatmos,
     // Objetos
     'tunica-jose': desenhoTunica,
-    'vara-moises': desenhoVara };
+    'vara-moises': desenhoVara,
+    'candelabro': desenhoCandelabro };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
   // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
   // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
@@ -6285,7 +6286,7 @@
   // Gideão: a corneta, deitada embaixo à direita; Ester: o alto do dossel, na beirada de cima; Sara: as
   // borlas do pano da tenda, no alto; Raabe: o terraço com o linho, no alto da casa; a
   // Multidão: a soleira da largada, acima do papel.
-  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96], /* objetos */ 'tunica-jose': [0.5, 0.94, 0.95] };
+  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96], /* objetos */ 'tunica-jose': [0.5, 0.94, 0.95], 'candelabro': [0.5, 0.93, 0.94] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
@@ -10241,6 +10242,317 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.stroke();
     k.restore();
     vinheta(k, W, H, 0.2);
+  }
+  // Um tubo de ouro gravado ao longo de uma curva: o tom pela largura (aceso do lado da luz),
+  // a hachura de volta na sombra e o fio de luz. "luz" diz de que lado (−1 ou 1) a luz bate.
+  function tuboDeOuro(k, c, larg, { luz = -1, obj, claro = 0 } = {}) {
+    const { forma } = tuboAo(c, larg);
+    marcar(k, obj, forma);
+    k.save();
+    k.clip(forma);
+    for (const q of c) {
+      const w = larg(q.s) / 2 + 1.5;
+      for (let v = -1; v <= 1.001; v += 0.2) {
+        const l = Math.max(0, Math.min(1, 0.5 - v * luz * 0.42 - Math.abs(v) * 0.18 + claro));
+        k.fillStyle = tomDeOuro(0.2 + l * 0.75);
+        k.beginPath();
+        k.arc(q.x - q.ty * v * w, q.y + q.tx * v * w, Math.max(1.6, w * 0.24), 0, 6.283);
+        k.fill();
+      }
+    }
+    k.strokeStyle = TINTA_OURO;
+    k.lineCap = 'round';
+    for (let i = 0; i < c.length; i += 1) {
+      const q = c[i];
+      if (i % 1) continue;
+      const w = larg(q.s) / 2;
+      k.lineWidth = 0.75;
+      k.beginPath();
+      k.moveTo(q.x + q.ty * luz * 0.2 * w, q.y - q.tx * luz * 0.2 * w);
+      k.lineTo(q.x + q.ty * luz * 1.0 * w, q.y - q.tx * luz * 1.0 * w);
+      k.stroke();
+    }
+    k.strokeStyle = 'rgba(255,246,214,.75)';
+    k.lineWidth = Math.max(1, larg(0) * 0.08);
+    k.beginPath();
+    c.forEach((q, i) => { const w = larg(q.s) / 2; const x = q.x - q.ty * luz * -0.55 * w; const y = q.y + q.tx * luz * -0.55 * w; if (i) k.lineTo(x, y); else k.moveTo(x, y); });
+    k.stroke();
+    k.restore();
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 1.8;
+    k.stroke(forma);
+    return forma;
+  }
+  // Uma taça em flor de amêndoa num braço do candelabro (Êx 25.33): o botão (o bulbo redondo)
+  // e a flor (o cálice de cinco pétalas que abre para cima), em ouro, na direção do braço.
+  function tacaDeAmendoa(k, x, y, ang, w, obj, flor = true) {
+    k.save();
+    k.translate(x, y);
+    k.rotate(ang);
+    // o botão
+    const b = new Path2D();
+    b.ellipse(0, 0, w * 0.72, w * 0.95, 0, 0, 6.283);
+    const g = k.createLinearGradient(-w, 0, w, 0);
+    g.addColorStop(0, tomDeOuro(0.92));
+    g.addColorStop(0.45, tomDeOuro(0.62));
+    g.addColorStop(1, tomDeOuro(0.22));
+    k.fillStyle = g;
+    k.fill(b);
+    marcar(k, obj, b);
+    gravar(k, b, 0, 0, w * 1.2, 0.2, 2.2, 0.9, (px) => 0.2 + px / w * 0.5, TINTA_OURO, 0.3);
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 1.4;
+    k.stroke(b);
+    if (!flor) { k.restore(); return; }
+    // a flor: o cálice que abre, com as pétalas recortadas
+    const f = new Path2D();
+    const y0 = -w * 0.8;
+    f.moveTo(-w * 0.45, y0);
+    f.bezierCurveTo(-w * 0.9, y0 - w * 0.4, -w * 1.25, y0 - w * 0.9, -w * 1.15, y0 - w * 1.3);
+    f.quadraticCurveTo(-w * 0.75, y0 - w * 1.05, -w * 0.5, y0 - w * 1.4);
+    f.quadraticCurveTo(-w * 0.25, y0 - w * 1.1, 0, y0 - w * 1.5);
+    f.quadraticCurveTo(w * 0.25, y0 - w * 1.1, w * 0.5, y0 - w * 1.4);
+    f.quadraticCurveTo(w * 0.75, y0 - w * 1.05, w * 1.15, y0 - w * 1.3);
+    f.bezierCurveTo(w * 1.25, y0 - w * 0.9, w * 0.9, y0 - w * 0.4, w * 0.45, y0);
+    f.closePath();
+    const g2 = k.createLinearGradient(-w, 0, w, 0);
+    g2.addColorStop(0, tomDeOuro(0.95));
+    g2.addColorStop(0.5, tomDeOuro(0.7));
+    g2.addColorStop(1, tomDeOuro(0.3));
+    k.fillStyle = g2;
+    k.fill(f);
+    marcar(k, obj, f);
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 1;
+    for (const dx of [-0.75, -0.25, 0.25, 0.75]) {
+      k.beginPath();
+      k.moveTo(dx * w * 0.5, y0);
+      k.quadraticCurveTo(dx * w * 0.9, y0 - w * 0.6, dx * w * 1.15, y0 - w * 1.15);
+      k.stroke();
+    }
+    k.lineWidth = 1.4;
+    k.stroke(f);
+    k.restore();
+  }
+
+  // ---------- (4) O candelabro de ouro (Êx 25.31-37) ----------
+  // De noite, no Lugar Santo: o candelabro de ouro batido, de frente, uma peça só: o pé de três
+  // garras, a haste com as suas quatro taças, e os seis braços em arco (três de cada lado), cada
+  // um com três taças em flor de amêndoa, botão e flor; um botão debaixo de cada par de braços
+  // (25.35). No alto, as sete lâmpadas acesas, com o bico virado para a frente (25.37). Atrás,
+  // as tábuas de acácia revestidas de ouro, com as travessas, na penumbra.
+  function desenhoCandelabro(k, W, H, obj) {
+    const r = sorteio(7401);
+    const cx = W / 2;
+    const topo = 222;
+    const chao = 760;
+    const lamp = [-3, -2, -1, 0, 1, 2, 3].map((i) => [cx + i * 92, topo]);
+    const luzEm = ([x, y]) => {
+      let l = 0;
+      for (const [lx, ly] of lamp) l += Math.exp(-(((x - lx) / 260) ** 2 + ((y - ly + 30) / 300) ** 2));
+      return Math.min(1, l * 0.32);
+    };
+    // as tábuas da parede, em pé, de ouro na penumbra (Êx 26.29)
+    k.fillStyle = '#120d06';
+    k.fillRect(0, 0, W, H);
+    const larT = 118;
+    for (let i = -1; i < 9; i++) {
+      const x0 = i * larT + 22;
+      for (let x = x0 + 3; x < x0 + larT - 2; x += 3.4) {
+        for (let y = -10; y < chao + 20; y += 12) {
+          const l = luzEm([x, y]) * (0.75 + 0.25 * Math.sin((x - x0) / larT * Math.PI));
+          k.strokeStyle = 'rgba(214,160,64,' + (0.05 + l * 0.6).toFixed(3) + ')';
+          k.lineWidth = 0.4 + l * 1.6;
+          k.beginPath();
+          k.moveTo(x + Math.sin(y * 0.02 + i) * 0.6, y);
+          k.lineTo(x + Math.sin((y + 12) * 0.02 + i) * 0.6, y + 12);
+          k.stroke();
+        }
+      }
+      // a junta entre as tábuas
+      k.strokeStyle = 'rgba(0,0,0,.85)';
+      k.lineWidth = 3;
+      k.beginPath();
+      k.moveTo(x0, -10);
+      k.lineTo(x0, chao + 10);
+      k.stroke();
+      k.strokeStyle = 'rgba(232,190,110,' + (0.08 + luzEm([x0, 300]) * 0.4).toFixed(3) + ')';
+      k.lineWidth = 1;
+      k.beginPath();
+      k.moveTo(x0 + 2.5, -10);
+      k.lineTo(x0 + 2.5, chao + 10);
+      k.stroke();
+    }
+    // as travessas de ouro, por fora das tábuas, com as argolas
+    for (const yb of [96, 590]) {
+      const c = curvaPor([[-20, yb], [W + 20, yb]], 3);
+      k.save();
+      k.globalAlpha = 0.85;
+      tuboDeOuro(k, c, () => 16, { luz: -1, claro: -0.25 });
+      k.restore();
+    }
+    // a escuridão por cima das tábuas, longe das lâmpadas
+    const esc = k.createRadialGradient(cx, topo + 120, 120, cx, topo + 200, 720);
+    esc.addColorStop(0, 'rgba(10,7,3,0)');
+    esc.addColorStop(1, 'rgba(10,7,3,.72)');
+    k.fillStyle = esc;
+    k.fillRect(0, 0, W, H);
+    // o chão de terra batida
+    const gch = k.createLinearGradient(0, chao, 0, H);
+    gch.addColorStop(0, '#2a1d0c');
+    gch.addColorStop(1, '#120c05');
+    k.fillStyle = gch;
+    k.fillRect(0, chao, W, H - chao);
+    k.save();
+    k.lineCap = 'round';
+    for (let y = chao + 4; y < H; y += 3 + (y - chao) * 0.05) {
+      let x = -r() * 40;
+      while (x < W) {
+        const c = 20 + r() * 80;
+        const l = luzEm([x + c / 2, chao - 80]) * (1 - (y - chao) / 140);
+        k.strokeStyle = 'rgba(214,160,80,' + Math.max(0.03, l * 0.5).toFixed(3) + ')';
+        k.lineWidth = 0.8 + (y - chao) / 80;
+        k.beginPath();
+        k.moveTo(x, y);
+        k.lineTo(x + c, y + (r() - 0.5) * 1.5);
+        k.stroke();
+        x += c + 6 + r() * 16;
+      }
+    }
+    k.restore();
+    k.strokeStyle = 'rgba(232,190,110,.25)';
+    k.lineWidth = 1.5;
+    k.beginPath();
+    k.moveTo(0, chao);
+    k.lineTo(W, chao);
+    k.stroke();
+    // o clarão das lâmpadas na parede (antes do candelabro, que fica na frente dele)
+    brilho(k, cx, topo - 10, 470, 'rgba(255,190,90,.2)', 'screen');
+    // a sombra do candelabro no chão e na parede
+    k.save();
+    k.filter = 'blur(10px)';
+    k.fillStyle = 'rgba(0,0,0,.6)';
+    k.beginPath();
+    k.ellipse(cx, chao + 6, 150, 16, 0, 0, 6.283);
+    k.fill();
+    k.restore();
+
+    // o candelabro
+    const hW = 15;
+    // os braços: três de cada lado, em arco, do ponto na haste até o alto
+    const sai = [470, 392, 314];
+    const raio = [276, 184, 92];
+    const bracos = [];
+    for (let i = 0; i < 3; i++) {
+      for (const lado of [-1, 1]) {
+        const R = raio[i];
+        const h = sai[i] - topo;
+        const pts = [];
+        for (let a = 0; a <= 1.0001; a += 0.05) {
+          const t = a * Math.PI / 2;
+          pts.push([cx + lado * R * Math.sin(t), topo + h * Math.cos(t)]);
+        }
+        bracos.push({ c: curvaPor(pts, 2.5), lado, i, R, h });
+      }
+    }
+    // o pé: três garras, a base em domo e o começo da haste
+    const pe = new Path2D();
+    pe.moveTo(cx - 34, 650);
+    pe.bezierCurveTo(cx - 40, 690, cx - 90, 716, cx - 118, 742);
+    pe.quadraticCurveTo(cx - 132, 756, cx - 116, 760);
+    pe.lineTo(cx - 84, 760);
+    pe.quadraticCurveTo(cx - 60, 740, cx - 30, 736);
+    pe.quadraticCurveTo(cx, 734, cx + 30, 736);
+    pe.quadraticCurveTo(cx + 60, 740, cx + 84, 760);
+    pe.lineTo(cx + 116, 760);
+    pe.quadraticCurveTo(cx + 132, 756, cx + 118, 742);
+    pe.bezierCurveTo(cx + 90, 716, cx + 40, 690, cx + 34, 650);
+    pe.closePath();
+    const gpe = k.createLinearGradient(cx - 120, 0, cx + 120, 0);
+    gpe.addColorStop(0, tomDeOuro(0.85));
+    gpe.addColorStop(0.4, tomDeOuro(0.62));
+    gpe.addColorStop(1, tomDeOuro(0.22));
+    k.fillStyle = gpe;
+    k.fill(pe);
+    marcar(k, obj, pe);
+    gravar(k, pe, cx, 705, 140, 1.25, 3, 1.5, (x, y) => 0.15 + (x - cx + 120) / 240 * 0.6 + (y - 650) / 300, TINTA_OURO, 0.2);
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 2;
+    k.stroke(pe);
+    // a garra de trás, no meio, e o friso da base
+    k.lineWidth = 1.4;
+    k.beginPath();
+    k.moveTo(cx - 30, 736);
+    k.quadraticCurveTo(cx, 724, cx + 30, 736);
+    k.stroke();
+    // a haste
+    const haste = curvaPor([[cx, 660], [cx, topo]], 2.5);
+    tuboDeOuro(k, haste, (s) => hW * 2 + (s < 30 ? (30 - s) * 0.5 : 0), { luz: -1, obj });
+    // os braços (os de trás primeiro não há: todos no mesmo plano, de frente)
+    for (const b of bracos) tuboDeOuro(k, b.c, () => hW * 1.7, { luz: -1, obj });
+    // um botão debaixo de cada par de braços, na haste (25.35)
+    for (const y of sai) tacaDeAmendoa(k, cx, y + 14, 0, 18, obj, false);
+    // as quatro taças da haste (25.34): no alto e entre os pares
+    for (const y of [600, 438, 360, 280]) tacaDeAmendoa(k, cx, y, 0, 13, obj);
+    // as três taças de cada braço, ao longo do arco, na direção dele
+    for (const b of bracos) {
+      const L = b.c[b.c.length - 1].s;
+      for (const f of [0.3, 0.58, 0.84]) {
+        const q = b.c[Math.round((f * L) / 2.5)];
+        tacaDeAmendoa(k, q.x, q.y, Math.atan2(q.tx, -q.ty), 12, obj);
+      }
+    }
+    // as sete lâmpadas de ouro, com o bico virado para a frente e a chama acesa
+    for (const [lx, ly] of lamp) {
+      const lp = new Path2D();
+      lp.moveTo(lx - 30, ly - 6);
+      lp.bezierCurveTo(lx - 28, ly + 14, lx + 26, ly + 14, lx + 30, ly - 6);
+      lp.quadraticCurveTo(lx + 16, ly - 14, lx, ly - 13);
+      lp.quadraticCurveTo(lx - 16, ly - 14, lx - 30, ly - 6);
+      lp.closePath();
+      const gl = k.createLinearGradient(lx - 30, 0, lx + 30, 0);
+      gl.addColorStop(0, tomDeOuro(0.95));
+      gl.addColorStop(0.5, tomDeOuro(0.7));
+      gl.addColorStop(1, tomDeOuro(0.3));
+      k.fillStyle = gl;
+      k.fill(lp);
+      marcar(k, obj, lp);
+      gravar(k, lp, lx, ly, 34, 0.1, 2.4, 1, (x) => 0.2 + (x - lx + 30) / 60 * 0.6, TINTA_OURO, 0);
+      k.strokeStyle = TINTA_OURO;
+      k.lineWidth = 1.6;
+      k.stroke(lp);
+      // a boca do óleo, escura, e o bico para a frente (para baixo, na vista de frente)
+      k.fillStyle = '#2a1c05';
+      k.beginPath();
+      k.ellipse(lx - 6, ly - 8, 9, 3, 0, 0, 6.283);
+      k.fill();
+      k.fillStyle = tomDeOuro(0.7);
+      k.beginPath();
+      k.ellipse(lx + 12, ly - 4, 7, 5, 0, 0, 6.283);
+      k.fill();
+      k.stroke();
+      // a chama: língua em traços que afinam, sem contorno cheio
+      brilho(k, lx + 12, ly - 32, 60, 'rgba(255,214,140,.45)', 'screen');
+      const ch = chama(lx + 12, ly - 7, 13, 40 + (lx % 7), (lx % 5) - 2);
+      k.fillStyle = 'rgba(255,214,120,.95)';
+      k.fill(ch);
+      k.save();
+      k.clip(ch);
+      k.strokeStyle = 'rgba(200,96,24,.85)';
+      k.lineWidth = 1.1;
+      for (let j = -2; j <= 2; j++) {
+        k.beginPath();
+        k.moveTo(lx + 12 + j * 3, ly - 6);
+        k.quadraticCurveTo(lx + 12 + j * 2.4, ly - 24, lx + 12 + (lx % 5) - 2, ly - 46);
+        k.stroke();
+      }
+      k.restore();
+      k.fillStyle = 'rgba(255,250,232,.95)';
+      k.beginPath();
+      k.ellipse(lx + 12, ly - 14, 3, 7, 0, 0, 6.283);
+      k.fill();
+    }
+    vinheta(k, W, H, 0.4);
   }
   // ---------- fim dos Objetos ----------
 
