@@ -10802,7 +10802,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.restore();
     // a de trás primeiro: 9 % menor, mais alta (mais longe, no fundo do tampo) e à direita,
     // com uns dois terços escondidos pela da frente; um nada tombada para ela
-    tabua(404, baseT - 18, 188, 306, -0.035, 7511, (w, h) => [
+    tabua(392, baseT - 18, 188, 306, -0.035, 7511, (w, h) => [
       [0, 0], [0, -h + 7], [7, -h], [w * 0.46, -h - 1], [w - 40, -h + 2], [w - 18, -h + 14], [w, -h + 42], [w, 0],
     ], [-20, -11], [0.7, 0.6, 0.3, 0.3, -0.95, 0.95]);
     // a da frente: maior, mais baixa, com uma lasca grande e irregular no lado esquerdo
