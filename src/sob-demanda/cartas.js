@@ -5051,36 +5051,248 @@
     vinheta(k, W, H, 0.2);
   }
 
-  // A juba em gravura: mechas curvas que saem de um centro (cx, cy) e vão para fora, mais
-  // grossas e escuras longe da luz; "forma" é o contorno da juba.
-  function juba(k, r, forma, cx, cy, raio, luz, tinta) {
+  // A juba do leão, de perfil, com o focinho para +x (em coordenadas da cabeça): uma massa que
+  // começa na testa, à frente da orelha, passa por cima do crânio, desce pela nuca e pelo pescoço
+  // até o peito ("baixo") e volta por baixo da queixada. As mechas saem para trás e para baixo.
+  function jubaDeLeao(k, r, { baixo = 140, tinta = '#2a1c0e', obj } = {}) {
+    const forma = lanoso(r, [[30, -50], [6, -80], [-40, -92], [-90, -72], [-124, -26], [-130, 36], [-112, baixo * 0.72], [-66, baixo], [-6, baixo * 0.96],
+      [36, baixo * 0.66], [62, 58], [40, 50], [18, 18], [10, -16], [16, -44]], 4, 10);
+    k.save();
+    k.filter = 'blur(6px)';
+    k.translate(6, 8);
+    k.fillStyle = 'rgba(20,12,4,.35)';
+    k.fill(forma);
+    k.restore();
+    k.fillStyle = '#946436';
+    k.fill(forma);
+    marcar(k, obj, forma);
+    // as mechas: curvas que nascem perto da cara e vão para trás e para baixo, mais escuras
+    // longe da luz (alto, à esquerda da cena) e embaixo
     k.save();
     k.clip(forma);
     k.lineCap = 'round';
-    for (let i = 0; i < 900; i++) {
-      const a = r() * 6.283;
-      const d0 = raio * (0.2 + r() * 0.85);
-      const c = 14 + r() * 22;
-      const x0 = cx + Math.cos(a) * d0;
-      const y0 = cy + Math.sin(a) * d0 * 1.05;
-      const curva = (r() - 0.5) * 0.8;
-      const x1 = x0 + Math.cos(a + curva) * c;
-      const y1 = y0 + Math.sin(a + curva) * c;
-      const s = Math.max(0, Math.min(1, luz(x0, y0)));
+    for (let i = 0; i < 1300; i++) {
+      const u = r();
+      const v = r();
+      const x0 = 30 - u * 150;
+      const y0 = -86 + v * (baixo + 86);
+      const ang = Math.atan2(y0 + 10, x0 - 40) + (r() - 0.5) * 0.5;
+      const c = 16 + r() * 26;
+      const s = Math.max(0, Math.min(1, 0.35 + (y0 + 60) / (baixo * 2.4) + (-x0) / 400));
       k.strokeStyle = tinta;
-      k.globalAlpha = 0.35 + s * 0.6;
-      k.lineWidth = 0.7 + s * 1.6;
+      k.globalAlpha = 0.3 + s * 0.6;
+      k.lineWidth = 0.6 + s * 1.6;
       k.beginPath();
       k.moveTo(x0, y0);
-      k.quadraticCurveTo((x0 + x1) / 2 + Math.cos(a + 1.57) * c * 0.15, (y0 + y1) / 2 + Math.sin(a + 1.57) * c * 0.15, x1, y1);
+      k.quadraticCurveTo(x0 + Math.cos(ang) * c * 0.5 + Math.cos(ang + 1.57) * c * 0.18, y0 + Math.sin(ang) * c * 0.5 + Math.sin(ang + 1.57) * c * 0.18, x0 + Math.cos(ang) * c, y0 + Math.sin(ang) * c);
       k.stroke();
     }
     k.restore();
+    // a beirada: mechas compridas e desiguais que passam da massa para fora, para trás e para
+    // baixo, sem contorno (a juba é cabelo, não gola)
+    k.save();
+    k.lineCap = 'round';
+    const bordaJ = [[30, -50], [6, -80], [-40, -92], [-90, -72], [-124, -26], [-130, 36], [-112, baixo * 0.72], [-66, baixo], [-6, baixo * 0.96], [36, baixo * 0.66]];
+    for (let i = 0; i < bordaJ.length - 1; i++) {
+      const [x0, y0] = bordaJ[i];
+      const [x1, y1] = bordaJ[i + 1];
+      const n = Math.round(Math.hypot(x1 - x0, y1 - y0) / 5);
+      for (let j = 0; j < n; j++) {
+        const t = j / n;
+        const px = x0 + (x1 - x0) * t;
+        const py = y0 + (y1 - y0) * t;
+        const ang = 0.45 * (Math.atan2(py + 10, px - 40) + 0.3) + 0.55 * 2.5 + (r() - 0.5) * 0.5;
+        const c = 8 + r() * 16;
+        const ix = px + Math.cos(ang + Math.PI) * 10;
+        const iy = py + Math.sin(ang + Math.PI) * 10;
+        k.strokeStyle = tinta;
+        k.globalAlpha = 0.75;
+        k.lineWidth = 1 + r() * 1.2;
+        k.beginPath();
+        k.moveTo(ix, iy);
+        k.quadraticCurveTo(px + Math.cos(ang + 0.5) * c * 0.3, py + Math.sin(ang + 0.5) * c * 0.3, px + Math.cos(ang) * c, py + Math.sin(ang) * c);
+        k.stroke();
+        if (r() < 0.5) {
+          k.strokeStyle = '#946436';
+          k.globalAlpha = 0.9;
+          k.lineWidth = 2.4;
+          k.beginPath();
+          k.moveTo(ix, iy);
+          k.quadraticCurveTo(px + Math.cos(ang + 0.5) * c * 0.25, py + Math.sin(ang + 0.5) * c * 0.25, px + Math.cos(ang) * c * 0.7, py + Math.sin(ang) * c * 0.7);
+          k.stroke();
+        }
+      }
+    }
+    k.restore();
+  }
+  // A cabeça do leão de perfil, focinho para +x, em gravura: a testa larga, a cana do nariz longa
+  // e reta, a almofada escura do nariz na ponta, o lábio de cima cheio com as fileiras dos pontos
+  // dos bigodes, a linha da boca que corre para trás e para baixo (nada de sorriso), o queixo e a
+  // queixada; o olho pequeno, em amêndoa inclinada, sob a arcada (a arcada é tom, não risco); a
+  // orelha redonda meio enterrada na juba; e as mechas da juba que passam por cima da beirada da
+  // cara, na testa e na bochecha, emoldurando-a. fechado: o olho é uma linha reta.
+  function cabecaDeLeao(k, r, { fechado = false, tinta = '#2a1c0e', obj } = {}) {
+    // a orelha
+    const orelha = new Path2D();
+    orelha.ellipse(-6, -56, 12, 15, -0.5, 0, 6.283);
+    peca(k, orelha, [-20, -72, 8, -40], { cor: '#b48450', tinta, sombra: () => 0.55, passo: 2.6, maxL: 1.3, traco: 1.8, obj });
+    k.strokeStyle = tinta;
+    k.lineWidth = 1.2;
+    k.beginPath();
+    k.ellipse(-4, -54, 6, 9, -0.5, Math.PI * 0.6, Math.PI * 1.6);
+    k.stroke();
+    const cab = new Path2D();
+    cab.moveTo(4, -48);
+    cab.bezierCurveTo(30, -60, 56, -54, 70, -44);
+    cab.bezierCurveTo(88, -32, 104, -22, 112, -14);
+    cab.bezierCurveTo(118, -10, 120, -2, 116, 4);
+    cab.bezierCurveTo(118, 14, 116, 30, 106, 36);
+    cab.bezierCurveTo(98, 42, 86, 44, 76, 42);
+    cab.bezierCurveTo(72, 50, 60, 56, 46, 56);
+    cab.bezierCurveTo(24, 56, 8, 40, 4, 18);
+    cab.bezierCurveTo(0, -6, -2, -32, 4, -48);
+    cab.closePath();
+    peca(k, cab, [0, -60, 120, 56], { cor: '#d9b078', tinta, ang: 0.62, passo: 3, maxL: 1.7, sombra: (x, y) => 0.06 + Math.max(0, (y + 10) / 60) * 0.6 + Math.max(0, (24 - x) / 60) * 0.5, cruzada: 0.66, traco: 0, obj, abaulado: 0.25 });
+    // só o perfil da frente leva contorno (da testa ao queixo); o de trás se perde na juba
+    const perfil = new Path2D();
+    perfil.moveTo(30, -58);
+    perfil.bezierCurveTo(44, -56, 60, -50, 70, -44);
+    perfil.bezierCurveTo(88, -32, 104, -22, 112, -14);
+    perfil.bezierCurveTo(118, -10, 120, -2, 116, 4);
+    perfil.bezierCurveTo(118, 14, 116, 30, 106, 36);
+    perfil.bezierCurveTo(98, 42, 86, 44, 76, 42);
+    perfil.bezierCurveTo(72, 50, 60, 56, 46, 56);
+    k.strokeStyle = tinta;
+    k.lineWidth = 2.2;
+    k.stroke(perfil);
+    k.save();
+    k.clip(cab);
+    // o pelo curto da cara, ao longo do focinho
+    k.strokeStyle = tinta;
+    k.lineCap = 'round';
+    k.globalAlpha = 0.5;
+    k.lineWidth = 0.9;
+    for (let i = 0; i < 80; i++) {
+      const px = 10 + r() * 100;
+      const py = -50 + r() * 100;
+      k.beginPath();
+      k.moveTo(px, py);
+      k.lineTo(px - 6 - r() * 4, py - 2 + (r() - 0.5) * 2);
+      k.stroke();
+    }
+    k.globalAlpha = 1;
+    // a arcada: tom em hachura cruzada acima do olho, e a sombra da órbita
+    const arcada = new Path2D();
+    arcada.ellipse(56, -40, 22, 9, 0.45, 0, 6.283);
+    gravar(k, arcada, 56, -40, 22, 0.2, 2.6, 1.3, () => 0.7, tinta, 0);
+    // o focinho: a bochecha dos bigodes em sombra embaixo, e a sombra sob a queixada
+    const boch = new Path2D();
+    boch.ellipse(94, 24, 24, 16, -0.2, 0, 6.283);
+    gravar(k, boch, 94, 24, 28, 1.1, 2.6, 1.2, (x, y) => 0.15 + (y - 14) / 24, tinta, 0.2);
+    const garganta = new Path2D();
+    garganta.ellipse(42, 50, 36, 12, 0.1, 0, 6.283);
+    gravar(k, garganta, 42, 50, 38, 0.3, 2.4, 1.4, () => 0.75, tinta, 0);
+    k.restore();
+    // o olho
+    k.lineCap = 'round';
+    if (fechado) {
+      k.strokeStyle = tinta;
+      k.lineWidth = 2.2;
+      k.beginPath();
+      k.moveTo(52, -32);
+      k.lineTo(70, -26);
+      k.stroke();
+      k.lineWidth = 1;
+      k.beginPath();
+      k.moveTo(55, -28);
+      k.lineTo(67, -24);
+      k.stroke();
+    } else {
+      const olho = new Path2D();
+      olho.moveTo(52, -34);
+      olho.quadraticCurveTo(60, -37, 70, -27);
+      olho.quadraticCurveTo(59, -25, 52, -34);
+      olho.closePath();
+      k.fillStyle = '#d4a040';
+      k.fill(olho);
+      k.fillStyle = '#140a02';
+      k.beginPath();
+      k.arc(61, -30, 2.2, 0, 6.283);
+      k.fill();
+      k.strokeStyle = tinta;
+      k.lineWidth = 1.8;
+      k.stroke(olho);
+    }
+    // a cana do nariz e a almofada do nariz, escura, na ponta
+    k.strokeStyle = 'rgba(42,28,14,.55)';
+    k.lineWidth = 1.2;
+    k.beginPath();
+    k.moveTo(72, -40);
+    k.lineTo(106, -18);
+    k.stroke();
+    const nariz = new Path2D();
+    nariz.moveTo(108, -14);
+    nariz.bezierCurveTo(114, -13, 119, -6, 118, 0);
+    nariz.bezierCurveTo(116, 5, 111, 6, 108, 3);
+    nariz.bezierCurveTo(107, -2, 106, -8, 108, -14);
+    k.fillStyle = '#2a140a';
+    k.fill(nariz);
+    k.fillStyle = 'rgba(255,230,200,.35)';
+    k.beginPath();
+    k.ellipse(112, -9, 2, 1.1, -0.4, 0, 6.283);
+    k.fill();
+    // a boca fechada: do nariz desce o sulco e a linha corre para trás e para baixo
+    k.strokeStyle = tinta;
+    k.lineWidth = 1.8;
+    k.beginPath();
+    k.moveTo(112, 10);
+    k.lineTo(111, 24);
+    k.quadraticCurveTo(96, 34, 74, 41);
+    k.stroke();
+    // os pontos dos bigodes, em fileiras, e uns fios compridos
+    k.fillStyle = tinta;
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) { k.beginPath(); k.arc(86 + i * 6, 12 + j * 5 - i * 0.8, 1.2, 0, 6.283); k.fill(); }
+    k.strokeStyle = 'rgba(42,28,14,.5)';
+    k.lineWidth = 0.7;
+    for (let i = 0; i < 4; i++) { k.beginPath(); k.moveTo(102, 16 + i * 3); k.quadraticCurveTo(122, 18 + i * 6, 140, 20 + i * 11); k.stroke(); }
+    // as mechas da juba por cima da beirada da cara: no alto da testa e descendo pela bochecha
+    // até debaixo da queixada, para a juba emoldurar a cara
+    const borda = [...bezier([40, -58], [18, -56], [4, -44], [2, -20], 10), ...bezier([2, -20], [2, 12], [18, 44], [50, 60], 14)];
+    k.lineCap = 'round';
+    for (let i = 0; i < borda.length; i++) {
+      for (let j = 0; j < 5; j++) {
+        const [bx, by] = borda[i];
+        const dentro = 6 + r() * 16;
+        const ang = (i < 10 ? -2.6 : 2.9 - (i - 10) * 0.05) + (r() - 0.5) * 0.5;
+        const c = 18 + r() * 20;
+        const x0 = bx + dentro * (i < 10 ? 0.35 : 1);
+        const y0 = by + dentro * (i < 10 ? 1 : -0.15);
+        const x1 = x0 + Math.cos(ang) * c;
+        const y1 = y0 + Math.sin(ang) * c;
+        if (j < 2) {
+          k.strokeStyle = '#946436';
+          k.globalAlpha = 0.95;
+          k.lineWidth = 3;
+          k.beginPath();
+          k.moveTo(x0, y0);
+          k.quadraticCurveTo((x0 + x1) / 2 + 3, (y0 + y1) / 2, x1, y1);
+          k.stroke();
+        }
+        k.strokeStyle = tinta;
+        k.globalAlpha = 0.85;
+        k.lineWidth = 1.1 + r() * 0.8;
+        k.beginPath();
+        k.moveTo(x0, y0);
+        k.quadraticCurveTo((x0 + x1) / 2 + 3, (y0 + y1) / 2, x1, y1);
+        k.stroke();
+      }
+    }
+    k.globalAlpha = 1;
   }
   // Um leão deitado de perfil, virado para a direita, com a cabeça pousada nas patas da frente e
   // os olhos fechados: o corpo comprido, a anca, a pata de trás dobrada, o rabo com o tufo, a
-  // juba em mechas e a cabeça de focinho reto, sobrancelha pesada e boca fechada. Gravura de
-  // livro de história natural. (x, y) é o chão sob o peito; "e" a escala.
+  // juba (jubaDeLeao) e a cabeça (cabecaDeLeao). Gravura de livro de história natural. (x, y) é
+  // o chão sob o peito; "e" a escala.
   function leaoDeitado(k, r, x, y, e, obj) {
     const tinta = '#2a1c0e';
     k.save();
@@ -5138,86 +5350,21 @@
     const p2 = pernaDeLeao(10, -10, 206);
     peca(k, p2, [40, -74, 236, -8], { cor: '#b48650', tinta, ang: 0.05, passo: 3, maxL: 1.6, sombra: () => 0.62, cruzada: 0.7, traco: 1.8 });
     dedosDeLeao(k, 10, -10, 206, tinta);
-    // a juba: das orelhas ao peito, em mechas
-    const jb = lanoso(r, [[20, -150], [70, -168], [120, -150], [138, -110], [132, -60], [110, -20], [70, -8], [30, -24], [0, -70], [4, -120]], 12, 22);
-    k.fillStyle = '#9a6a38';
-    k.fill(jb);
-    marcar(k, obj, jb);
-    juba(k, r, jb, 116, -84, 120, (px, py) => 0.35 + (120 - px) / 220 + (py + 80) / 300, tinta);
-    k.strokeStyle = tinta;
-    k.lineWidth = 2;
-    k.stroke(jb);
+    // a juba e, depois da perna, a cabeça pousada nela, de olho fechado
+    k.save();
+    k.translate(112, -84);
+    k.rotate(0.06);
+    jubaDeLeao(k, r, { baixo: 100, tinta, obj });
+    k.restore();
     // a perna da frente de cá, estendida: o cotovelo no chão, o antebraço e a pata com os dedos
     const pata = pernaDeLeao(0, 0, 230);
     peca(k, pata, [36, -60, 250, 4], { cor: '#d6ab70', tinta, ang: 0.05, passo: 3.2, maxL: 1.7, sombra: (px, py) => 0.18 + (py + 40) / 50, cruzada: 0.75, traco: 2, obj, abaulado: 0.3 });
     dedosDeLeao(k, 0, 0, 230, tinta);
-    // a cabeça, pousada nas patas: a testa que desce, a cana do nariz reta, o focinho de frente
-    // quadrada, o queixo e a queixada
-    const cab = new Path2D();
-    cab.moveTo(108, -134);
-    cab.bezierCurveTo(132, -142, 156, -132, 172, -120);
-    cab.bezierCurveTo(190, -108, 204, -96, 214, -86);
-    cab.bezierCurveTo(218, -80, 218, -70, 214, -62);
-    cab.bezierCurveTo(206, -58, 196, -56, 190, -56);
-    cab.bezierCurveTo(196, -52, 198, -44, 190, -40);
-    cab.bezierCurveTo(176, -36, 152, -36, 132, -42);
-    cab.bezierCurveTo(108, -54, 96, -104, 108, -134);
-    cab.closePath();
-    peca(k, cab, [96, -142, 218, -36], { cor: '#dcb47a', tinta, ang: 1.1, passo: 3.2, maxL: 1.7, sombra: (px, py) => 0.12 + (py + 120) / 120 + (150 - px) / 300, cruzada: 0.7, traco: 2.2, obj, abaulado: 0.2 });
     k.save();
-    k.clip(cab);
-    k.strokeStyle = tinta;
-    k.lineCap = 'round';
-    k.globalAlpha = 0.6;
-    for (let i = 0; i < 40; i++) {
-      const px = 112 + r() * 60;
-      const py = -126 + r() * 84;
-      k.lineWidth = 1;
-      k.beginPath();
-      k.moveTo(px, py);
-      k.lineTo(px - 8 - r() * 6, py + (r() - 0.5) * 4);
-      k.stroke();
-    }
-    k.globalAlpha = 1;
-    const boch = new Path2D();
-    boch.ellipse(190, -62, 20, 12, 0.2, 0, 6.283);
-    gravar(k, boch, 190, -62, 22, 1.3, 3, 1.1, (px, py) => 0.2 + (py + 66) / 30, tinta, 0);
+    k.translate(112, -84);
+    k.rotate(0.06);
+    cabecaDeLeao(k, r, { fechado: true, tinta, obj });
     k.restore();
-    // a orelha, redonda, meio na juba
-    const orelha = new Path2D();
-    orelha.ellipse(118, -138, 13, 11, -0.5, 0, 6.283);
-    peca(k, orelha, [105, -149, 131, -127], { cor: '#b48450', tinta, sombra: () => 0.6, passo: 2.8, maxL: 1.3, traco: 1.8 });
-    k.strokeStyle = tinta;
-    // a sobrancelha pesada e o olho fechado
-    k.lineWidth = 2.8;
-    k.beginPath();
-    k.moveTo(146, -118);
-    k.quadraticCurveTo(160, -122, 174, -114);
-    k.stroke();
-    k.lineWidth = 2.2;
-    k.beginPath();
-    k.moveTo(152, -104);
-    k.quadraticCurveTo(162, -99, 172, -103);
-    k.stroke();
-    k.lineWidth = 1.1;
-    for (let i = 0; i < 5; i++) { k.beginPath(); k.moveTo(149 + i * 5, -112); k.lineTo(153 + i * 5, -105); k.stroke(); }
-    // a cana do nariz, o nariz, a boca fechada e os pontos dos bigodes
-    k.lineWidth = 1.6;
-    k.beginPath();
-    k.moveTo(176, -114);
-    k.quadraticCurveTo(196, -100, 208, -88);
-    k.stroke();
-    const nariz = pol([[204, -88], [216, -86], [216, -76], [206, -78]]);
-    k.fillStyle = '#2a1c0e';
-    k.fill(nariz);
-    k.lineWidth = 2;
-    k.beginPath();
-    k.moveTo(214, -74);
-    k.lineTo(212, -62);
-    k.quadraticCurveTo(200, -58, 186, -58);
-    k.stroke();
-    k.fillStyle = tinta;
-    for (const [px, py] of [[194, -72], [200, -70], [190, -66], [197, -65], [204, -64]]) { k.beginPath(); k.arc(px, py, 1.3, 0, 6.283); k.fill(); }
     k.restore();
   }
   // Uma perna da frente de leão deitado, estendida para a frente (para a direita), em coordenadas
@@ -5251,12 +5398,10 @@
     k.quadraticCurveTo(dx + 64, dy - 18, dx + 92, dy - 26);
     k.stroke();
   }
-  // Um leão deitado de perfil, virado para a esquerda, de cabeça erguida e boca fechada (Dn
-  // 6.22): o corpo comprido e baixo, a anca e a coxa dobrada (só em hachura de contorno), as
-  // patas da frente estendidas no chão, o rabo; a cabeça de perfil, de leão: a testa, a cana do
-  // nariz comprida e larga, a almofada escura do nariz, o focinho com as fileiras de pontos dos
-  // bigodes, a boca fechada, o queixo, o olho pequeno sob a arcada pesada, a orelha redonda e a
-  // juba em mechas compridas que emolduram a queixada. (x, y) é o chão sob o peito.
+  // Um leão deitado de perfil, de cabeça erguida e boca fechada (Dn 6.22): o corpo comprido e
+  // baixo, a coxa dobrada (só em hachura de contorno), as patas da frente estendidas no chão, o
+  // rabo, e a cabeça (cabecaDeLeao) com a juba (jubaDeLeao) que desce pelo pescoço até os ombros.
+  // Desenhado virado para a direita e espelhado. (x, y) é o chão sob o peito.
   function leaoAtento(k, r, x, y, e, obj) {
     const tinta = '#2a1c0e';
     k.save();
@@ -5322,117 +5467,19 @@
     const pataT = new Path2D();
     pataT.ellipse(-96, -4, 26, 10, 0, 0, 6.283);
     peca(k, pataT, [-122, -14, -70, 6], { cor: '#d0a468', tinta, sombra: () => 0.4, passo: 2.8, maxL: 1.3, traco: 1.8, obj });
-    // a juba: do alto da cabeça ao peito, em mechas compridas
-    const jb = lanoso(r, [[142, -274], [100, -280], [60, -262], [36, -216], [8, -160], [-6, -100], [14, -46], [56, -20], [96, -50], [150, -98], [196, -128], [176, -152], [140, -146], [108, -160], [102, -210], [124, -250]], 12, 22);
-    k.fillStyle = '#9a6a38';
-    k.fill(jb);
-    marcar(k, obj, jb);
-    juba(k, r, jb, 90, -170, 140, (px, py) => 0.3 + (110 - px) / 260 + (py + 160) / 400, tinta);
-    k.strokeStyle = tinta;
-    k.lineWidth = 2;
-    k.stroke(jb);
+    // a juba, do alto da cabeça ao peito e aos ombros
+    k.save();
+    k.translate(118, -192);
+    jubaDeLeao(k, r, { baixo: 196, tinta, obj });
+    k.restore();
     // a perna da frente de cá
     const p1 = pernaDeLeao(0, 0, 218);
     peca(k, p1, [30, -64, 240, 4], { cor: '#d6ab70', tinta, ang: 0.05, passo: 3.2, maxL: 1.7, sombra: (px, py) => 0.18 + (py + 40) / 50, cruzada: 0.75, traco: 2, obj, abaulado: 0.3 });
     dedosDeLeao(k, 0, 0, 218, tinta);
-    // a cabeça de perfil, olhando para a frente (para a direita, antes do espelho)
+    // a cabeça de perfil, erguida, olhando para a frente (para a direita, antes do espelho)
     k.save();
-    k.translate(122, -196);
-    const cab = new Path2D();
-    cab.moveTo(-30, -46);
-    cab.bezierCurveTo(0, -60, 34, -54, 56, -40);
-    cab.bezierCurveTo(74, -30, 90, -22, 100, -16);
-    cab.bezierCurveTo(108, -10, 108, 6, 106, 16);
-    cab.bezierCurveTo(104, 26, 100, 32, 94, 36);
-    cab.bezierCurveTo(90, 46, 80, 54, 62, 56);
-    cab.bezierCurveTo(34, 60, 4, 54, -24, 40);
-    cab.bezierCurveTo(-50, 20, -54, -26, -30, -46);
-    cab.closePath();
-    peca(k, cab, [-56, -60, 108, 60], { cor: '#dcb47a', tinta, ang: 0.35, passo: 3, maxL: 1.6, sombra: (px, py) => 0.08 + (py + 40) / 120 + Math.max(0, (-px - 10) / 80), cruzada: 0.7, traco: 2.2, obj, abaulado: 0.2 });
-    k.save();
-    k.clip(cab);
-    // o pelo curto: riscos para trás, da cara para a juba
-    k.strokeStyle = tinta;
-    k.globalAlpha = 0.55;
-    k.lineWidth = 1;
-    for (let i = 0; i < 70; i++) {
-      const px = -40 + r() * 120;
-      const py = -44 + r() * 90;
-      k.beginPath();
-      k.moveTo(px, py);
-      k.lineTo(px - 7 - r() * 5, py + (r() - 0.5) * 3);
-      k.stroke();
-    }
-    k.globalAlpha = 1;
-    // o focinho (a bochecha dos bigodes), em sombra por baixo
-    const boch = new Path2D();
-    boch.ellipse(78, 24, 28, 20, -0.1, 0, 6.283);
-    gravar(k, boch, 78, 24, 30, 1.2, 2.8, 1.2, (px, py) => 0.15 + (py - 14) / 26, tinta, 0.2);
-    k.restore();
-    // a orelha, redonda, atrás, meio na juba
-    const orelha = new Path2D();
-    orelha.ellipse(-22, -46, 15, 12, -0.4, 0, 6.283);
-    peca(k, orelha, [-37, -58, -7, -34], { cor: '#b48450', tinta, sombra: () => 0.55, passo: 2.8, maxL: 1.3, traco: 2, obj });
-    k.strokeStyle = tinta;
-    k.lineWidth = 1.4;
-    k.beginPath();
-    k.ellipse(-20, -44, 8, 6, -0.4, Math.PI, Math.PI * 2);
-    k.stroke();
-    // a arcada pesada e o olho pequeno, âmbar, de lado, com a pupila redonda
-    k.lineWidth = 3;
-    k.beginPath();
-    k.moveTo(24, -38);
-    k.quadraticCurveTo(40, -44, 58, -34);
-    k.stroke();
-    const olho = new Path2D();
-    olho.moveTo(32, -28);
-    olho.quadraticCurveTo(42, -34, 52, -28);
-    olho.quadraticCurveTo(42, -23, 32, -28);
-    k.fillStyle = '#d9a03c';
-    k.fill(olho);
-    k.fillStyle = '#1a0e04';
-    k.beginPath();
-    k.arc(44, -28.5, 2.6, 0, 6.283);
-    k.fill();
-    k.lineWidth = 1.8;
-    k.stroke(olho);
-    k.lineWidth = 1.4;
-    k.beginPath();
-    k.moveTo(28, -26);
-    k.quadraticCurveTo(24, -16, 28, -6);
-    k.stroke();
-    // a cana do nariz, larga, e a almofada escura do nariz, na ponta
-    k.lineWidth = 1.6;
-    k.beginPath();
-    k.moveTo(58, -36);
-    k.quadraticCurveTo(80, -26, 98, -16);
-    k.stroke();
-    const nariz = new Path2D();
-    nariz.moveTo(94, -16);
-    nariz.quadraticCurveTo(106, -16, 108, -6);
-    nariz.quadraticCurveTo(108, 4, 102, 8);
-    nariz.quadraticCurveTo(94, 4, 94, -16);
-    k.fillStyle = '#2a1408';
-    k.fill(nariz);
-    // a boca fechada: o lábio que desce da almofada do nariz e corre para trás, e o queixo
-    k.lineWidth = 2;
-    k.beginPath();
-    k.moveTo(103, 8);
-    k.lineTo(103, 20);
-    k.quadraticCurveTo(100, 32, 88, 36);
-    k.quadraticCurveTo(70, 40, 54, 36);
-    k.stroke();
-    k.lineWidth = 1.4;
-    k.beginPath();
-    k.moveTo(90, 44);
-    k.quadraticCurveTo(76, 54, 56, 52);
-    k.stroke();
-    // os pontos dos bigodes, em fileiras, e uns fios
-    k.fillStyle = tinta;
-    for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) { k.beginPath(); k.arc(70 + i * 7, 12 + j * 6 - i, 1.4, 0, 6.283); k.fill(); }
-    k.strokeStyle = 'rgba(42,28,14,.6)';
-    k.lineWidth = 0.8;
-    for (let i = 0; i < 4; i++) { k.beginPath(); k.moveTo(92, 16 + i * 4); k.quadraticCurveTo(112, 20 + i * 6, 128, 24 + i * 10); k.stroke(); }
+    k.translate(118, -192);
+    cabecaDeLeao(k, r, { tinta, obj });
     k.restore();
     k.restore();
   }
