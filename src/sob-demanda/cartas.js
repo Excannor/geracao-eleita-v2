@@ -5152,7 +5152,7 @@
     cab.bezierCurveTo(24, 56, 8, 40, 4, 18);
     cab.bezierCurveTo(0, -6, -2, -32, 4, -48);
     cab.closePath();
-    peca(k, cab, [0, -60, 120, 56], { cor: '#d9b078', tinta, ang: 0.62, passo: 3, maxL: 1.7, sombra: (x, y) => 0.06 + Math.max(0, (y + 10) / 60) * 0.6 + Math.max(0, (24 - x) / 60) * 0.5, cruzada: 0.66, traco: 0, obj, abaulado: 0.25 });
+    peca(k, cab, [0, -60, 120, 56], { cor: '#c99d62', tinta, ang: 0.62, passo: 2.8, maxL: 1.8, sombra: (x, y) => 0.28 + Math.max(0, (y + 10) / 60) * 0.55 + Math.max(0, (40 - x) / 60) * 0.5 - Math.max(0, 1 - Math.hypot(x - 84, y + 20) / 34) * 0.3, cruzada: 0.6, traco: 0, obj, abaulado: 0.25 });
     // só o perfil da frente leva contorno (da testa ao queixo); o de trás se perde na juba
     const perfil = new Path2D();
     perfil.moveTo(30, -58);
@@ -5184,7 +5184,7 @@
     // a arcada: tom em hachura cruzada acima do olho, e a sombra da órbita
     const arcada = new Path2D();
     arcada.ellipse(56, -40, 22, 9, 0.45, 0, 6.283);
-    gravar(k, arcada, 56, -40, 22, 0.2, 2.6, 1.3, () => 0.7, tinta, 0);
+    gravar(k, arcada, 56, -40, 22, 0.2, 2.4, 1.6, () => 0.85, tinta, 0);
     // o focinho: a bochecha dos bigodes em sombra embaixo, e a sombra sob a queixada
     const boch = new Path2D();
     boch.ellipse(94, 24, 24, 16, -0.2, 0, 6.283);
@@ -5197,7 +5197,7 @@
     k.lineCap = 'round';
     if (fechado) {
       k.strokeStyle = tinta;
-      k.lineWidth = 2.2;
+      k.lineWidth = 3;
       k.beginPath();
       k.moveTo(52, -32);
       k.lineTo(70, -26);
