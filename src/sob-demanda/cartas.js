@@ -17746,45 +17746,38 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
   // de pedra na sombra dela; do banco sai o caminho, que atravessa o campo e sobe o morro até a
   // aldeia pequena de Nazaré, lá no alto, à direita.
 
-  // Uma folha de figueira, da base (x, y) para o ângulo a, de comprimento c: palmada, de cinco
-  // (ou três) lóbulos compridos, mais compridos que largos, de ponta romba, o do meio o maior,
-  // separados por recortes fundos (até perto da metade da folha); as nervuras que saem da base,
-  // uma para cada lóbulo, as nervurinhas do lóbulo do meio e, nas da beirada, o pecíolo.
+  // Uma folha de figueira, da base (x, y) para o ângulo a, de comprimento c: palmada, de três
+  // (ou cinco) lóbulos largos e de ponta redonda, o do meio o maior, separados por recortes rasos
+  // e redondos; as nervuras que saem da base, uma para cada lóbulo, as nervurinhas do lóbulo do
+  // meio e, nas da beirada, o pecíolo.
   function folhaDeFigueira(k, x, y, a, c, { cor = '#aaa477', tinta = SEPIA, sombra = 0.4, lobos = 5, peciolo = false } = {}) {
-    const L5 = [[-1.4, 0.5, 0.1], [-0.74, 0.84, 0.14], [0, 1, 0.16], [0.74, 0.84, 0.14], [1.4, 0.5, 0.1]];
-    const L3 = [[-0.82, 0.78, 0.16], [0, 1, 0.18], [0.82, 0.78, 0.16]];
+    // [ângulo, alcance, abertura] de cada lóbulo. O contorno é polar: em cada direção, o raio é
+    // o maior dos lóbulos (um "máximo macio"), então os lóbulos saem largos de um corpo cheio, de
+    // ponta redonda, e os recortes ficam rasos e redondos (a uns 35 % da folha). Nos de cinco,
+    // os dois de baixo são curtos; a base é larga e redonda e a beirada um pouco ondulada,
+    // como a da figueira.
+    const L5 = [[-1.7, 0.46, 0.5], [-0.88, 0.84, 0.46], [0, 1, 0.5], [0.88, 0.84, 0.46], [1.7, 0.46, 0.5]];
+    const L3 = [[-1.0, 0.82, 0.62], [0, 1, 0.56], [1.0, 0.82, 0.62]];
     const lb = lobos === 5 ? L5 : L3;
-    const rs = lobos === 5 ? [0.3, 0.42, 0.42, 0.3] : [0.4, 0.4];
+    const lb5 = lobos === 5 ? L5 : L3;
     k.save();
     k.translate(x, y);
     k.rotate(a + Math.PI / 2);
     k.scale(c, c);
-    const pts = [[0, 0.02]];
-    lb.forEach(([an, L, w], i) => {
-      const u = [Math.sin(an), -Math.cos(an)];
-      const p = [Math.cos(an), Math.sin(an)];
-      const r0 = (i === 0 ? 0.14 : rs[i - 1]) * 0.9;
-      const r1 = (i === lb.length - 1 ? 0.14 : rs[i]) * 0.9;
-      const larg = (t, r) => w * Math.pow(Math.sin(Math.PI * Math.min(1, (t - r * 0.6) / (L - r * 0.6))), 0.55);
-      for (let j = 0; j <= 10; j++) {
-        const t = r0 + (L - r0) * (j / 10);
-        const ww = j === 10 ? 0 : larg(t, r0);
-        pts.push([u[0] * t - p[0] * ww, u[1] * t - p[1] * ww]);
-      }
-      for (let j = 9; j >= 0; j--) {
-        const t = r1 + (L - r1) * (j / 10);
-        const ww = larg(t, r1);
-        pts.push([u[0] * t + p[0] * ww, u[1] * t + p[1] * ww]);
-      }
-      if (i < lb.length - 1) {
-        const m = (an + lb[i + 1][0]) / 2;
-        pts.push([Math.sin(m) * rs[i], -Math.cos(m) * rs[i]]);
-      }
-    });
-    pts.push([0, 0.02]);
+    const raio = (th) => {
+      let soma = 0;
+      for (const [an, L, sg] of lb) soma += Math.pow(L * Math.exp(-(Math.abs((th - an) / sg) ** 3)), 6);
+      return Math.pow(soma, 1 / 8) * (1 + 0.025 * Math.sin(th * 17));
+    };
     const f = new Path2D();
-    f.moveTo(pts[0][0], pts[0][1]);
-    for (let i = 1; i < pts.length - 1; i++) f.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+    const th0 = lobos === 5 ? 2.6 : 2.4;
+    for (let i = 0; i <= 90; i++) {
+      const th = -th0 + (2 * th0 * i) / 90;
+      const R = raio(th);
+      const px = Math.sin(th) * R;
+      const py = -Math.cos(th) * R;
+      if (i === 0) { f.moveTo(0, 0); f.lineTo(px, py); } else f.lineTo(px, py);
+    }
     f.closePath();
     if (peciolo) {
       k.strokeStyle = tinta;
@@ -17816,9 +17809,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.lineCap = 'round';
     k.lineWidth = Math.min(1.6, 0.5 + c * 0.025) / c;
     k.beginPath();
-    for (const [an, L] of lb) {
+    for (const [an, L] of lb5) {
       k.moveTo(0, 0);
-      k.lineTo(Math.sin(an) * L * 0.86, -Math.cos(an) * L * 0.86);
+      k.lineTo(Math.sin(an) * L * 0.84, -Math.cos(an) * L * 0.84);
     }
     for (const t of [0.5, 0.68, 0.84]) {
       k.moveTo(0, -t);
@@ -17826,6 +17819,45 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.moveTo(0, -t);
       k.lineTo(-0.09, -t - 0.08);
     }
+    k.stroke();
+    k.lineWidth = Math.min(1.8, 0.5 + c * 0.035) / c;
+    k.lineJoin = 'round';
+    k.stroke(f);
+    k.restore();
+  }
+
+  // Uma folha vista de lado ou encurtada: uma oval com a nervura do meio e a hachura de um lado.
+  function folhaDePerfil(k, x, y, a, c, { cor = '#a49e70', tinta = SEPIA, sombra = 0.4, fecha = 0.32 } = {}) {
+    k.save();
+    k.translate(x, y);
+    k.rotate(a + Math.PI / 2);
+    k.scale(c, c);
+    const f = new Path2D();
+    f.moveTo(0, 0);
+    f.bezierCurveTo(fecha * 1.2, -0.15, fecha * 1.1, -0.8, 0, -1);
+    f.bezierCurveTo(-fecha * 0.9, -0.8, -fecha, -0.15, 0, 0);
+    f.closePath();
+    k.fillStyle = cor;
+    k.fill(f);
+    k.save();
+    k.clip(f);
+    k.strokeStyle = tinta;
+    k.lineCap = 'round';
+    for (let d = -0.4; d < 0.4; d += 0.07) {
+      const wl = Math.max(0, sombra + d * 1.2) * 1.4 / c;
+      if (wl * c < 0.25) continue;
+      k.lineWidth = wl;
+      k.beginPath();
+      k.moveTo(d, 0.05);
+      k.lineTo(d + 0.15, -1.05);
+      k.stroke();
+    }
+    k.restore();
+    k.strokeStyle = tinta;
+    k.lineWidth = Math.min(1.4, 0.5 + c * 0.025) / c;
+    k.beginPath();
+    k.moveTo(0, 0.08);
+    k.quadraticCurveTo(fecha * 0.2, -0.5, 0, -0.95);
     k.stroke();
     k.lineWidth = Math.min(1.8, 0.5 + c * 0.035) / c;
     k.lineJoin = 'round';
@@ -17981,16 +18013,23 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     marcar(k, obj, casca);
     // o nó do galho da direita, com a casca enrugada em volta
     {
+      // uma cicatriz de galho cortado: um fuso comprido ao longo do galho, no tom da casca,
+      // com a beirada dobrada e umas rugas (sem miolo escuro)
       const no = new Path2D();
-      no.ellipse(262, 572, 8, 5, -0.2, 0, 6.283);
-      k.fillStyle = '#5e5848';
+      no.moveTo(244, 576);
+      no.quadraticCurveTo(262, 564, 282, 568);
+      no.quadraticCurveTo(264, 578, 244, 576);
+      no.closePath();
+      k.fillStyle = '#a69e86';
       k.fill(no);
+      gravar(k, no, 262, 572, 22, 0.1, 2.2, 1, () => 0.55, tinta, 0);
       k.strokeStyle = tinta;
-      k.lineWidth = 1.6;
+      k.lineWidth = 1.4;
       k.stroke(no);
       k.lineWidth = 1;
       k.beginPath();
-      k.ellipse(262, 572, 13, 9, -0.2, 0, 6.283);
+      k.moveTo(240, 580);
+      k.quadraticCurveTo(262, 560, 288, 566);
       k.stroke();
     }
     // as rugas da casca lisa: arcos curtos em volta dos galhos, mais nas dobras
@@ -18062,7 +18101,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const c = 44 + r() * 20;
       const s = 0.12 + alto * 0.55 + lado * 0.15;
       const tom = s < 0.35 ? '#b8b384' : s < 0.55 ? '#a49e70' : '#8e8860';
-      folhaDeFigueira(k, x, y, a, c, { cor: tom, sombra: s, lobos: r() < 0.7 ? 5 : 3 });
+      const tipo = r();
+      if (tipo < 0.28) folhaDePerfil(k, x, y, a, c * 0.85, { cor: tom, sombra: s, fecha: 0.22 + r() * 0.2 });
+      else folhaDeFigueira(k, x, y, a, c, { cor: tom, sombra: s, lobos: tipo < 0.7 ? 3 : 5 });
     }
     // umas folhas soltas pendendo embaixo da copa, na frente do tronco
     for (const [x, y, a, c] of [[60, 462, 1.9, 46], [250, 486, 1.4, 50], [372, 488, 1.3, 50], [400, 476, 1.0, 46], [520, 444, 1.0, 44]]) folhaDeFigueira(k, x, y, a, c, { cor: '#9a946a', sombra: 0.6, peciolo: true });
@@ -18437,7 +18478,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     const hz = 382;
     // o céu do meio-dia, em linhas, mais cheio no alto
     linhas(k, 0, 0, W, hz + 4, 4.6, 1.5, (x, y) => 0.1 + Math.pow(1 - y / hz, 1.6) * 0.55);
-    nuvemGravada(k, r, 728, 156, 132, 54, 5);
+    nuvemGravada(k, r, 700, 156, 114, 54, 5);
     nuvemGravada(k, r, 182, 186, 128, 48, 4);
     nuvemGravada(k, r, 452, 268, 80, 26, 4);
     // os morros de Samaria, baixos e longe, e Sicar pequena na encosta da esquerda
