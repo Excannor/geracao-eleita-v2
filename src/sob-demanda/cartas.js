@@ -6535,78 +6535,6 @@
     k.restore();
   }
   const curvaDeRio = (p0, p1, p2, p3, w0, w1, n = 50) => bezier(p0, p1, p2, p3, n).map(([x, y], i) => ({ x, y, w: w0 + (w1 - w0) * Math.pow(i / n, 0.8) }));
-  // O flanco de um monte em gravura: os espigões que descem de cada pico em raio, cada um com
-  // a face da luz (à direita) clara e a outra em hachura cheia. As linhas são compridas, pela
-  // queda do monte (do pico para fora), e engrossam e afinam com a sombra; quando os raios se
-  // abrem, entram linhas novas no meio, como o gravador faz. O lado do monte que dá as costas
-  // para a luz escurece. picos: [{ x, y, n (espigões), fase }]; luz: 1 vem da direita.
-  function flancoEmRaios(k, r, forma, picos, [x0, y0, x1, y1], { maxL = 2.2, cor = SEPIA, passo = 5, luz = 1, base = 0, escurece = 0.22, alcance = 900, cruzada = 0.62 } = {}) {
-    k.save();
-    k.clip(forma);
-    k.strokeStyle = cor;
-    k.lineCap = 'round';
-    const dono = (x, y) => { let p = picos[0]; let dm = 1e9; for (const q of picos) { const d = Math.hypot(x - q.x, (y - q.y) * 0.8); if (d < dm && y > q.y - 6) { dm = d; p = q; } } return p; };
-    for (const p of picos) {
-      const n = p.n || 9;
-      const fase = p.fase || 0;
-      for (let D = 10, nivel = 0; D < alcance; D *= 2, nivel++) {
-        const passoA = passo / D;
-        const total = Math.floor(3.0 / passoA);
-        for (let i = 0; i <= total; i++) {
-          if (nivel > 0 && i % 2 === 0) continue;
-          const a0 = -1.5 + i * passoA;
-          const treme = r() * 6.283;
-          let ant = null;
-          for (let d = nivel ? D : 4; d < alcance; d += 6) {
-            const a = a0 + Math.sin(d * 0.02 + treme) * 0.012;
-            const x = p.x + Math.sin(a) * d;
-            const y = p.y + Math.cos(a) * d;
-            if (y > y1 || x < x0 - 20 || x > x1 + 20) break;
-            if (picos.length > 1 && dono(x, y) !== p) { ant = null; continue; }
-            const fi = a * n + fase + Math.sin(d * 0.018 + fase) * 0.7;
-            const dx = x - p.x;
-            const sv = 0.42 + Math.cos(fi) * 0.36 * luz + (dx * luz < 0 ? escurece : -escurece * 0.5) + base + d / 2400;
-            const w = maxL * Math.max(0, Math.min(1, sv)) * (0.85 + Math.sin(d * 0.15 + treme) * 0.15);
-            if (ant && w > 0.25) {
-              k.lineWidth = w;
-              k.beginPath();
-              k.moveTo(ant[0], ant[1]);
-              k.lineTo(x, y);
-              k.stroke();
-            }
-            ant = [x, y];
-          }
-        }
-      }
-    }
-    // na sombra funda, a hachura cruzada: linhas quase deitadas, como as curvas de nível
-    if (cruzada < 1) {
-      for (let y = y0; y < y1; y += passo * 1.3) {
-        let ant = null;
-        const treme = r() * 6.283;
-        for (let x = x0; x <= x1; x += 6) {
-          const yy = y + Math.sin(x * 0.03 + treme) * 2;
-          const p = dono(x, yy);
-          const dx = x - p.x;
-          const dy = Math.max(1, yy - p.y);
-          const a = Math.atan2(dx, dy);
-          const d = Math.hypot(dx, dy);
-          const fi = a * (p.n || 9) + (p.fase || 0) + Math.sin(d * 0.018 + (p.fase || 0)) * 0.7;
-          const sv = 0.42 + Math.cos(fi) * 0.36 * luz + (dx * luz < 0 ? escurece : -escurece * 0.5) + base + d / 2400;
-          const w = maxL * 0.75 * Math.max(0, Math.min(1, (sv - cruzada) * 2.6));
-          if (ant && w > 0.25) {
-            k.lineWidth = w;
-            k.beginPath();
-            k.moveTo(ant[0], ant[1]);
-            k.lineTo(x, yy);
-            k.stroke();
-          }
-          ant = [x, yy];
-        }
-      }
-    }
-    k.restore();
-  }
   // (1) O jardim do Éden (Gn 2.10): "Nascia no Éden um rio que atravessava o jardim para o
   // irrigar, dividindo-se depois em quatro braços." Vista do alto, como numa prancha de atlas:
   // a nascente no fundo, entre as árvores, o rio que desce em curvas pelo jardim e, no meio,
@@ -7283,7 +7211,7 @@
       k.restore();
     };
     const rolos = [];
-    for (let i = 0; i < 46; i++) {
+    for (let i = 0; i < 64; i++) {
       const t = Math.pow(r(), 0.8);
       const x = -60 + r() * (W + 120);
       const yMax = base(x) - 40;
