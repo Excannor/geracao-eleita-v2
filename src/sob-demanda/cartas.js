@@ -15301,8 +15301,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.stroke();
     // uma talha de pedra: a boca larga de beiço grosso, o pescoço, o corpo alto e reto que
     // afina um pouco e o pé torneado; os anéis do torno e a pedra clara riscada
-    const talha = (cx, base, e, conteudo) => {
-      const alt = 300 * e;
+    const talha = (cx, base, e, conteudo, largura = 1, altura = 1) => {
+      const alt = 300 * e * altura;
       const R = (t) => {
         // t = 0 no alto, 1 no pé
         if (t < 0.06) return 1.0;
@@ -15311,7 +15311,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         if (t < 0.88) return 0.58;
         return 0.74;
       };
-      const larg = 116 * e;
+      const larg = 116 * e * largura;
       const p = new Path2D();
       const n = 60;
       const pts = [];
@@ -15346,12 +15346,13 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const sup = new Path2D();
       sup.ellipse(cx, yb + 3 * e, wb * 0.8, wb * 0.17, 0, 0, 6.283);
       if (conteudo === 'vinho') {
-        k.fillStyle = '#5e1420';
+        k.fillStyle = '#3e1a14';
         k.fill(sup);
-        k.strokeStyle = 'rgba(255,200,190,.6)';
-        k.lineWidth = 1.6;
+        gravar(k, sup, cx, yb + 3 * e, wb, 0, 2.2, 1, () => 0.6, '#140604', 0);
+        k.strokeStyle = 'rgba(240,206,170,.75)';
+        k.lineWidth = 1.8;
         k.beginPath();
-        k.ellipse(cx - wb * 0.15, yb + 1 * e, wb * 0.45, wb * 0.07, 0, Math.PI * 1.1, Math.PI * 1.7);
+        k.ellipse(cx, yb + 3 * e, wb * 0.78, wb * 0.16, 0, Math.PI * 1.05, Math.PI * 1.6);
         k.stroke();
       } else {
         k.fillStyle = '#b4b8a6';
@@ -15371,25 +15372,33 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     };
     // as cinco de lá, em fila que foge para o fundo, e a da frente, maior
     for (const [cx, base, e] of [[96, 508, 0.66], [212, 520, 0.72], [334, 534, 0.8], [462, 552, 0.88], [600, 576, 0.97]]) talha(cx, base, e, 'agua');
-    const { yb, wb } = talha(728, 640, 1.18, 'vinho');
-    // o vinho que escorreu pela beirada e a poça no chão
-    k.fillStyle = '#5e1420';
-    for (const [dx, L] of [[-0.6, 60], [-0.35, 34]]) {
-      k.beginPath();
-      k.moveTo(728 + dx * wb, yb + 6);
-      k.quadraticCurveTo(728 + dx * wb - 3, yb + L * 0.5, 728 + dx * wb + 1, yb + L);
-      k.quadraticCurveTo(728 + dx * wb + 5, yb + L * 0.5, 728 + dx * wb + 5, yb + 6);
-      k.fill();
-    }
-    // a concha de tirar: uma cuia de barro com cabo comprido, apoiada na boca, mergulhada no vinho
-    vara(k, [[700, yb + 2], [650, yb - 70], [622, yb - 110]], 9, '#8e6a42', obj);
+    const { yb, wb } = talha(722, 640, 1.18, 'vinho', 1.32, 0.86);
+    // a concha de tirar: uma cuia de barro de cabo comprido, pendurada pela beirada da boca,
+    // com o vinho dentro; o cabo sobe para fora
+    vara(k, [[690, yb - 4], [652, yb - 60], [628, yb - 98]], 9, '#8e6a42', obj);
     const cuia = new Path2D();
-    cuia.ellipse(712, yb + 6, 26, 9, 0.2, 0, Math.PI);
+    cuia.moveTo(668, yb - 8);
+    cuia.bezierCurveTo(668, yb + 22, 716, yb + 26, 720, yb - 4);
+    cuia.closePath();
     k.fillStyle = '#9a5a32';
     k.fill(cuia);
+    gravar(k, cuia, 694, yb + 6, 30, 1.5, 2.4, 1.2, (x) => 0.2 + (x - 668) / 60, '#2a1206', 0);
+    k.strokeStyle = '#2a1206';
+    k.lineWidth = 1.8;
+    k.stroke(cuia);
+    const vinhoC = new Path2D();
+    vinhoC.ellipse(694, yb - 6, 26, 6, 0.05, 0, 6.283);
+    k.fillStyle = '#3e1a14';
+    k.fill(vinhoC);
+    k.strokeStyle = 'rgba(240,206,170,.7)';
+    k.lineWidth = 1.2;
+    k.beginPath();
+    k.ellipse(690, yb - 7, 16, 3, 0.05, Math.PI * 1.1, Math.PI * 1.7);
+    k.stroke();
     k.strokeStyle = '#2a1206';
     k.lineWidth = 1.6;
-    k.stroke(cuia);
+    k.stroke(vinhoC);
+    marcar(k, obj, cuia);
     // o jarro de barro ao lado, já cheio de vinho, para levar ao mestre de cerimônias (2.8)
     const jx = 470;
     const jb = 734;
@@ -15398,7 +15407,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     peca(k, jarro, [jx - 60, jb - 150, jx + 60, jb], { cor: '#b46a3c', tinta: '#2a1206', ang: 1.45, passo: 3, maxL: 1.8, sombra: (x) => 0.18 + Math.max(0, (x - jx + 20) / 120) * 0.8, cruzada: 0.65, traco: 2.2, obj });
     const bocaJ = new Path2D();
     bocaJ.ellipse(jx, jb - 150, 27, 7, 0, 0, 6.283);
-    k.fillStyle = '#4a0e18';
+    k.fillStyle = '#3e1a14';
     k.fill(bocaJ);
     k.strokeStyle = '#2a1206';
     k.lineWidth = 1.8;
@@ -15413,11 +15422,16 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.strokeStyle = '#b46a3c';
     k.lineWidth = 5;
     k.stroke();
-    // uma gota de vinho no chão entre a talha e o jarro
-    k.fillStyle = '#5e1420';
-    k.beginPath();
-    k.ellipse(590, 724, 16, 4, 0, 0, 6.283);
-    k.fill();
+    // o copo de barro cheio, ao pé do jarro
+    const copo = vaso(k, jx + 100, jb + 6, 30, 60, (t) => 0.98 - t * 0.38);
+    peca(k, copo, [jx + 70, jb - 24, jx + 130, jb + 6], { cor: '#b87442', tinta: '#2a1206', ang: 1.45, passo: 2.6, maxL: 1.4, sombra: (x) => 0.2 + Math.max(0, (x - jx - 90) / 50) * 0.7, cruzada: 0.7, traco: 1.8, obj });
+    const bocaC = new Path2D();
+    bocaC.ellipse(jx + 100, jb - 24, 29, 7, 0, 0, 6.283);
+    k.fillStyle = '#3e1a14';
+    k.fill(bocaC);
+    k.strokeStyle = '#2a1206';
+    k.lineWidth = 1.4;
+    k.stroke(bocaC);
     vinheta(k, W, H, 0.22);
   }
   // ---------- (13) Pedro sai da prisão (At 12.6-10) ----------
