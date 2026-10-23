@@ -1330,17 +1330,20 @@
         k.stroke();
       }
     }
-    // as poças que ficaram, espelhando a luz do fim
+    // as manchas molhadas que ficaram na areia: claras, rasas, sem fundo escuro (nada de buraco)
     for (const [lat, z, w, d] of [[-2.6, 34, 1.2, 0.5], [1.9, 44, 0.9, 0.4], [-0.6, 70, 1.1, 0.4], [2.4, 110, 0.9, 0.4], [-1.8, 150, 0.9, 0.4]]) {
       const x = px(lat, z);
       const y = py(0, z);
       const p = seixo(r, x, y, w * f / z, Math.max(3, d * f / z * 0.6), 0, 0.06);
-      k.fillStyle = 'rgba(62,66,56,.9)';
+      k.save();
+      k.filter = 'blur(3px)';
+      k.fillStyle = 'rgba(90,80,56,.22)';
       k.fill(p);
+      k.restore();
       k.save();
       k.clip(p);
       for (let yy = y - d * f / z; yy < y + d * f / z; yy += 2.6) {
-        k.strokeStyle = 'rgba(236,228,196,' + (0.3 + r() * 0.4).toFixed(2) + ')';
+        k.strokeStyle = 'rgba(70,60,40,' + (0.15 + r() * 0.2).toFixed(2) + ')';
         k.lineWidth = 1;
         const c = w * f / z * (0.3 + r() * 0.7);
         const xx = x + (r() - 0.5) * w * f / z;
@@ -1350,9 +1353,7 @@
         k.stroke();
       }
       k.restore();
-      k.strokeStyle = 'rgba(30,24,14,.85)';
-      k.lineWidth = Math.max(0.8, 40 / z);
-      k.stroke(p);
+
     }
     // as algas deitadas e as conchas
     for (let i = 0; i < 10; i++) {
