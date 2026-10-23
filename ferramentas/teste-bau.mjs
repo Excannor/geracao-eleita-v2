@@ -211,7 +211,7 @@ try {
   // ---------- repetidas, uma carta sem desenho e o Perfil ----------
   await av(`(() => { const c = CC.estado().cartas; c.eventos["bau:dia:901"] = { em: Date.now(), carta: "davi-funda", raridade: "prata" };
     c.eventos["bau:dia:902"] = { em: Date.now() + 1, carta: "davi-funda", raridade: "bronze" };
-    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "jardim-eden", raridade: "linho" }; CC.gravar("cartas", c); return true; })()`);
+    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "tunica-jose", raridade: "linho" }; CC.gravar("cartas", c); return true; })()`);
   await av('location.hash = "#/perfil"');
   ok(await esperar('!!' + q('[data-album-cartas]')), 'o Perfil tem a entrada Cartas, ao lado de Conquistas e Troféus');
   ok(/Cartas\s*3 de 52/.test(await texto('[data-album-cartas]')), 'a entrada diz quantas cartas de 52 (' + (await texto('[data-album-cartas]')).trim() + ')');
@@ -230,7 +230,7 @@ try {
     copias: (b.querySelector('.album-copias') || {}).textContent || '', canvas: !!b.querySelector('canvas') }; })()`);
   ok(/Versões: Bronze, Prata/.test(davi.rotulo) && /Repetidas: 2 de Prata/.test(davi.rotulo) && davi.pips.length === 2 && davi.copias === '×2' && davi.canvas,
     'a miniatura desenhada mostra as versões (bolinhas), as cópias da versão à mostra (×2) e diz tudo no rótulo (' + davi.rotulo + ')');
-  ok(await av('!!document.querySelector("[data-carta=jardim-eden] .album-sem-arte")'), 'carta sem desenho aparece em silhueta da raridade');
+  ok(await av('!!document.querySelector("[data-carta=tunica-jose] .album-sem-arte")'), 'carta sem desenho aparece em silhueta da raridade');
   ok(await av('document.querySelectorAll("[data-album=semeadores] .album-limiar").length === 5 && /100 amigos/.test(document.querySelector("[data-album=semeadores]").textContent)'),
     'Semeadores aparece à parte, com os 5 limiares em silhueta (de 1 a 100 amigos)');
   await nosDoisTemas('03-album');
@@ -249,7 +249,7 @@ try {
   await dormir(900);
   await nosDoisTemas('04-carta-grande');
   await fecharTudo();
-  await av(q('[data-carta="jardim-eden"]') + '.click()');
+  await av(q('[data-carta="tunica-jose"]') + '.click()');
   ok(await esperar('!!' + q('.tela-carta .carta-texto')) && await av('!!document.querySelector(".tela-carta [data-compartilhar-carta][hidden]")'), 'a carta sem desenho abre como carta de texto, sem Compartilhar');
   await fecharTudo();
 
