@@ -10429,173 +10429,200 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     vinheta(k, W, H, 0.4);
   }
   // ---------- (5) As tábuas da aliança (Êx 31.18) ----------
-  // As duas tábuas de pedra, no alto do monte, encostadas uma na outra sobre uma laje, com a
-  // nuvem pesada em cima (Êx 24.16). A escrita é de Deus e não se imita: são fileiras de sulcos
-  // cavados na pedra, como linhas de texto vistas de longe, com um fio de luz morna no fundo de
-  // cada sulco. Cinco fileiras em cada tábua (as dez palavras). A pedra é granito, de grão
-  // miúdo, com as quinas um pouco lascadas.
+  // No alto do Sinai, debaixo da nuvem pesada (Êx 24.16): sobre uma laje de rocha, as duas
+  // tábuas de pedra, retangulares, de quinas gastas e com a grossura à vista; uma deitada na
+  // laje, a outra encostada nela, inclinada para trás, um pouco virada. A escrita de Deus não se
+  // imita: a face cavada é uma pedra lavrada miúda, toda por igual (sem fileira nem palavra),
+  // que brilha de dentro com uma luz morna, mais forte no meio. A nuvem desce em massas de
+  // linha cerrada, com a barriga acesa pela luz das tábuas.
   function desenhoTabuas(k, W, H, obj) {
     const r = sorteio(7501);
-    papelVelho(k, W, H, r, ['#f7ecd8', '#e9d6b6', '#cdb08a'], [444, 300]);
-    const hz = 560;
-    // o céu: a nuvem pesada no alto, em linhas cerradas, que abre embaixo, perto do horizonte
-    linhas(k, 0, 0, W, hz, 4.4, 2.5, (x, y) => {
-      const nuvem = Math.max(0, 1 - y / 300) ** 0.8 * (0.85 + Math.sin(x * 0.012 + Math.sin(x * 0.031) * 1.4) * 0.15);
-      const borda = Math.max(0, 1 - Math.abs(y - (250 + Math.sin(x * 0.018) * 30)) / 40) * 0.25;
-      // a luz que abre na nuvem atrás das tábuas (só a linha mais rala, sem anel)
-      const abre = Math.exp(-(((x - 444) / 340) ** 2) - (((y - 300) / 300) ** 2));
-      return (0.1 + nuvem * 1.05 + borda) * (1 - abre * 0.9);
+    papelVelho(k, W, H, r, ['#efe0c4', '#dcc6a0', '#b89a72'], [444, 520]);
+    // a nuvem pesada: massas que só existem pelo peso da linha (sem contorno), mais escuras no
+    // alto, com a barriga mais clara onde a luz das tábuas bate
+    const massa = (x, y) => {
+      let v = 0;
+      for (const [cx, cy, rx, ry] of [[120, 120, 260, 120], [420, 80, 300, 110], [760, 140, 240, 120], [260, 260, 220, 80], [640, 290, 260, 90], [40, 330, 160, 70], [880, 360, 160, 70]]) {
+        const d = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2;
+        v = Math.max(v, 1 - d);
+      }
+      return v;
+    };
+    const ruido = (x, y) => { const q = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453; return q - Math.floor(q) - 0.5; };
+    linhas(k, 0, 0, W, 560, 3.8, 2.6, (x, y) => {
+      const m = Math.max(0, massa(x, y));
+      const barriga = Math.max(0, massa(x, y - 26) - m) * 2.2;
+      const luz = Math.exp(-(((x - 444) / 300) ** 2) - (((y - 470) / 160) ** 2));
+      return 0.22 + m * 0.75 + (1 - y / 560) * 0.25 - barriga * 0.6 - luz * 0.55 + ruido(x, y) * 0.12;
     });
-    // os picos de granito ao longe, embaixo da nuvem, baixos e claros de distância
-    const fP = onda(sorteio(7510), 5, 0.01);
-    const picos = pol([[-10, 600], ...Array.from({ length: 56 }, (_, i) => [i * 17 - 6, 548 - Math.abs(fP(i * 17)) * 22]), [W + 10, 600]]);
-    peca(k, picos, [-10, 500, W + 10, 600], { cor: '#dccbb0', ang: 1.2, passo: 3.6, maxL: 0.9, sombra: (x, y) => 0.25 + (y - 520) / 240, cruzada: 0.95, traco: 1.2 });
-    // o alto do monte: um chão de pedra largo, em perspectiva, até a beirada de baixo
-    const tampo = 572;
-    const chao = pol([[-10, tampo + 10], [200, tampo - 2], [520, tampo - 6], [W + 10, tampo + 4], [W + 10, H + 10], [-10, H + 10]]);
-    k.fillStyle = '#d9c5a2';
-    k.fill(chao);
-    chaoEmLinhas(k, r, chao, -10, W + 10, tampo - 8, H, 1.9, (x, y) => 0.32 + (y - tampo) / 600 + Math.sin(x * 0.013 + y * 0.01) * 0.1);
+    // a câmera: x à direita, y para cima, z para quem olha (vista um pouco de cima)
+    const S0 = 280;
+    const V = (x, y, z) => [444 + x * S0 + z * S0 * 0.32, 610 - y * S0 + z * S0 * 0.6];
+    // o cume: um bloco de rocha que ocupa o pé da prancha, de tampo largo e quase plano, que
+    // a luz das tábuas acende no meio; a frente cai em faces partidas
+    const luzT = (x, y) => Math.exp(-(((x - 440) / 260) ** 2) - (((y - 620) / 140) ** 2));
+    const cume = contornoRocha(r, [[-10, 640], [60, 612], [180, 596], [330, 590], [520, 594], [680, 588], [800, 600], [W + 10, 612], [W + 10, H + 10], [-10, H + 10]], 8);
+    cume.closePath();
+    k.fillStyle = '#bca684';
+    k.fill(cume);
+    gravar(k, cume, 444, 680, 560, 0.08, 3.4, 1.9, (x, y) => 0.42 + (y - 600) / 600 - luzT(x, y) * 0.5, SEPIA, 0);
+    gravar(k, cume, 444, 680, 560, 1.3, 4.4, 1.5, (x, y) => (y - 680) / 300 - luzT(x, y) * 0.6, SEPIA, 0);
+    // a beirada do tampo, acesa, e as fendas da rocha
     k.strokeStyle = SEPIA;
-    k.lineWidth = 1.6;
-    k.stroke(chao);
-    // as rachas do granito no chão, que fogem para o horizonte
-    k.strokeStyle = 'rgba(43,33,18,.7)';
+    k.lineWidth = 2;
+    k.stroke(cume);
     k.lineCap = 'round';
-    for (const [x0, y0, dx] of [[60, 820, 0.5], [300, 840, 0.2], [640, 830, -0.25], [820, 760, -0.5], [140, 690, 0.35]]) {
+    for (const [x0, y0, dx] of [[60, 640, 0.3], [250, 690, -0.2], [660, 680, 0.25], [820, 620, -0.3]]) {
       let x = x0;
       let y = y0;
-      k.lineWidth = 2;
+      k.lineWidth = 2.2;
       k.beginPath();
       k.moveTo(x, y);
-      for (let j = 0; j < 7; j++) { x += dx * 22 + (r() - 0.5) * 14; y -= 14 + r() * 10; k.lineWidth = 2 - j * 0.2; k.lineTo(x, y); }
+      for (let j = 0; j < 8; j++) { x += dx * 18 + (r() - 0.5) * 16; y += 16 + r() * 14; k.lineTo(x, y); }
       k.stroke();
     }
-    // umas pedras soltas
-    for (const [x, y, rx, ry] of [[90, 700, 30, 12], [770, 690, 36, 14], [610, 800, 26, 10], [240, 790, 18, 8], [820, 604, 14, 5]]) {
-      const p = contornoRocha(r, [[x - rx, y + ry * 0.5], [x - rx * 0.6, y - ry * 0.8], [x + rx * 0.3, y - ry], [x + rx, y - ry * 0.1], [x + rx * 0.8, y + ry * 0.7]], 2);
-      p.closePath();
-      sombraNoChao(k, p, rx * 0.4, ry * 0.4, 3, 0.3);
-      peca(k, p, [x - rx, y - ry, x + rx, y + ry], { cor: '#cdb995', ang: 0.6, passo: 2.8, maxL: 1.4, sombra: sombraOval(x, y, rx, ry, 0), cruzada: 0.7, traco: 1.5 });
-    }
-
-    // uma tábua: a face de alto arredondado, a espessura à direita e no alto, o grão do
-    // granito, as quinas lascadas e as fileiras da escrita
-    const tabua = (A, B, C, D, arco, esp, luz, semente) => {
+    // a pedra grande atrás, onde a tábua de pé se encosta
+    const encosto = contornoRocha(r, [[400, 610], [420, 500], [480, 420], [560, 380], [640, 396], [700, 372], [780, 410], [830, 500], [850, 610]], 5);
+    encosto.closePath();
+    peca(k, encosto, [400, 372, 850, 610], { cor: '#a8916e', ang: 0.9, passo: 3.2, maxL: 1.8, sombra: (x, y) => 0.55 + (x - 600) / 600 - luzT(x, y) * 0.3, cruzada: 0.7, traco: 2 });
+    // uma tábua: o contorno retangular de quinas gastas no plano (u, v), levado ao mundo por
+    // pos(u, v); a grossura vai na direção "atras"
+    const contorno = (rr) => {
+      const pts = [];
+      const lado = (u0, v0, u1, v1, n) => {
+        for (let i = 0; i < n; i++) {
+          const t = i / n;
+          const lasca = rr() < 0.08 ? 0.008 + rr() * 0.012 : rr() * 0.003;
+          const nu = v1 - v0;
+          const nv = -(u1 - u0);
+          pts.push([u0 + (u1 - u0) * t + nu * lasca, v0 + (v1 - v0) * t + nv * lasca]);
+        }
+      };
+      // as quinas, gastas (cortadas em chanfro desigual)
+      lado(0.03, 0, 0.97, 0.01, 18);
+      lado(1, 0.03, 0.99, 0.97, 24);
+      lado(0.96, 1, 0.04, 0.99, 18);
+      lado(0, 0.96, 0.01, 0.04, 24);
+      return pts;
+    };
+    const tabua = (pos, atras, luzFace, semente) => {
       const rr = sorteio(semente);
-      const P = (u, v) => [A[0] + (B[0] - A[0]) * u + (D[0] - A[0]) * v + (C[0] - B[0] - D[0] + A[0]) * u * v, A[1] + (B[1] - A[1]) * u + (D[1] - A[1]) * v + (C[1] - B[1] - D[1] + A[1]) * u * v];
-      // o alto em arco: pontos de A a B
-      const topo = [];
-      for (let i = 0; i <= 24; i++) { const t = i / 24; const [x, y] = P(t, 0); topo.push([x, y - Math.sin(t * Math.PI) * arco]); }
-      const desl = (pts) => pts.map(([x, y]) => [x + esp[0], y + esp[1]]);
-      // a espessura: a lateral direita e o alto em arco, mais escuros
-      const lado = pol([B, [B[0] + esp[0], B[1] + esp[1]], [C[0] + esp[0], C[1] + esp[1]], C]);
-      const alto = pol([...topo, ...desl(topo).reverse()]);
-      sombraNoChao(k, pol([D, C, [C[0] + esp[0] + 170, C[1] + 30], [D[0] + 190, D[1] + 34]]), 0, 0, 9, 0.48);
-      peca(k, lado, [B[0], B[1] + esp[1], C[0] + esp[0], C[1]], { cor: '#9c8668', ang: 1.45, passo: 2.8, maxL: 1.6, sombra: () => 0.62 - luz * 0.2, cruzada: 0.7, traco: 2, obj });
-      peca(k, alto, [A[0], A[1] - arco + esp[1], B[0] + esp[0], B[1]], { cor: '#cbb898', ang: 0.05, passo: 3, maxL: 1.3, sombra: () => 0.35, cruzada: 0.9, traco: 2, obj });
-      // a face, com as quinas lascadas
-      const borda = [];
-      const lascas = (pts, k0) => { pts.forEach(([x, y], i) => { const d = i && rr() < 0.16 ? 3 + rr() * 5 : rr() * 1.5; borda.push([x + k0[0] * d, y + k0[1] * d]); }); };
-      lascas(topo, [0, 1]);
-      lascas(Array.from({ length: 12 }, (_, i) => P(1, i / 12)), [-1, 0]);
-      lascas(Array.from({ length: 12 }, (_, i) => P(1 - i / 12, 1)), [0, -1]);
-      lascas(Array.from({ length: 12 }, (_, i) => P(0, 1 - i / 12)), [1, 0]);
-      const face = pol(borda);
-      k.fillStyle = '#dcc3a6';
-      k.fill(face);
+      const cont = contorno(rr);
+      const frenteP = cont.map(([u, v]) => V(...pos(u, v)));
+      const trasP = cont.map(([u, v]) => { const [x, y, z] = pos(u, v); return V(x + atras[0], y + atras[1], z + atras[2]); });
+      // a grossura: o contorno de trás e as faixas entre os dois
+      const corpo = new Path2D();
+      corpo.addPath(pol(trasP));
+      for (let i = 0; i < cont.length; i++) { const j = (i + 1) % cont.length; corpo.addPath(pol([frenteP[i], frenteP[j], trasP[j], trasP[i]])); }
+      marcar(k, obj, corpo);
+      k.fillStyle = '#857a6a';
+      k.fill(corpo);
+      k.strokeStyle = '#857a6a';
+      k.lineWidth = 1.5;
+      k.stroke(corpo);
+      gravar(k, corpo, (frenteP[0][0] + frenteP[40][0]) / 2, (frenteP[0][1] + frenteP[40][1]) / 2, 300, 1.4, 2.8, 1.5, () => 0.6, SEPIA, 0);
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 2.2;
+      k.stroke(pol(trasP));
+      // a face: a pedra lavrada miúda, por igual, que brilha de dentro
+      const face = pol(frenteP);
       marcar(k, obj, face);
-      const cxF = (A[0] + C[0]) / 2;
-      const cyF = (A[1] + C[1]) / 2;
-      gravar(k, face, cxF, cyF, 280, 1.32, 3.4, 1.7, (x, y) => 0.22 + (x - A[0]) / 800 + (y - A[1]) / 1200 + (1 - luz) * 0.4, SEPIA, 0.05);
+      const [mx, my] = V(...pos(0.5, 0.5));
+      const raioF = Math.hypot(frenteP[0][0] - frenteP[42][0], frenteP[0][1] - frenteP[42][1]);
+      const g = k.createRadialGradient(mx, my, raioF * 0.05, mx, my, raioF * 0.62);
+      g.addColorStop(0, 'rgba(236,222,196,1)');
+      g.addColorStop(0.55, 'rgba(204,194,174,1)');
+      g.addColorStop(1, 'rgba(160,150,134,1)');
+      k.fillStyle = g;
+      k.fill(face);
+      // a pedra lavrada: linhas finas, oblíquas, como de gravura, e a luz que sai de dentro da
+      // face (mais forte no meio, sem beirada), sem marca nenhuma de escrita
       k.save();
       k.clip(face);
-      // o grão do granito: pintas claras e escuras
-      for (let i = 0; i < 560; i++) {
-        const [x, y] = P(rr(), rr() * 1.1 - 0.1);
-        k.fillStyle = rr() < 0.55 ? 'rgba(52,38,22,' + (0.25 + rr() * 0.4).toFixed(2) + ')' : 'rgba(255,250,236,.7)';
+      gravar(k, face, mx, my, raioF, 1.1, 3, 1.2, (x, y) => 0.55 - Math.max(0, 1 - Math.hypot(x - mx, y - my) / (raioF * 0.55)) * 0.7, '#5a3e1c', 0);
+      for (let n = 0; n < 380; n++) {
+        const [x, y] = V(...pos(rr(), rr()));
+        k.fillStyle = rr() < 0.6 ? 'rgba(70,52,30,.35)' : 'rgba(255,250,236,.6)';
         k.beginPath();
-        k.arc(x, y, 0.6 + rr() * 1.3, 0, 6.283);
+        k.arc(x, y, 0.6 + rr(), 0, 6.283);
         k.fill();
       }
-      // a escrita: em cada fileira, grupos de golpes curtos de cinzel (riscos de pé, tortos, de
-      // alturas desiguais, ligados aqui e ali por um traço deitado), cavados: o risco escuro e,
-      // ao lado, o fio de luz da beirada; nenhuma letra
+      // a lavra: um campo de incisões miúdas espalhadas por igual (nenhuma fileira), mais
+      // fundas e mais acesas no meio, onde a luz sai da pedra
       k.lineCap = 'round';
-      for (let f = 0; f < 5; f++) {
-        const v = 0.14 + f * 0.17;
-        let u = 0.09 + rr() * 0.05;
-        while (u < 0.88) {
-          const l = Math.min(0.91 - u, 0.07 + rr() * 0.15);
-          if (l < 0.05) break;
-          const a = P(u, v);
-          const b = P(u + l, v);
-          const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
-          const comp = Math.hypot(b[0] - a[0], b[1] - a[1]);
-          k.save();
-          k.translate(a[0], a[1]);
-          k.rotate(ang);
-          // a palavra: golpes deitados do cinzel, de comprimentos desiguais, em duas alturas
-          // que se encostam (a pedra cavada: o fio escuro em cima, o fio aceso embaixo e o
-          // fundo morno, como pedra ainda acesa); nenhuma letra
-          for (const dy of [-3.2, 3.2]) {
-            let x = rr() * 4;
-            while (x < comp - 4) {
-              const c = Math.min(comp - x, 4 + rr() * 16);
-              const y = dy + (rr() - 0.5) * 1.6;
-              k.strokeStyle = 'rgba(36,22,8,.92)';
-              k.lineWidth = 2.2;
-              k.beginPath();
-              k.moveTo(x, y - 0.6);
-              k.lineTo(x + c, y - 0.6 + (rr() - 0.5) * 1.2);
-              k.stroke();
-              k.strokeStyle = 'rgba(236,146,46,.65)';
-              k.lineWidth = 0.9;
-              k.beginPath();
-              k.moveTo(x + 1, y + 0.4);
-              k.lineTo(x + c - 1, y + 0.4);
-              k.stroke();
-              k.strokeStyle = 'rgba(255,250,236,.95)';
-              k.lineWidth = 1.1;
-              k.beginPath();
-              k.moveTo(x + 0.5, y + 1.9);
-              k.lineTo(x + c, y + 1.9);
-              k.stroke();
-              x += c + 2 + rr() * 3;
-            }
-          }
-          k.restore();
-          u += l + 0.04 + rr() * 0.03;
-        }
-      }
-      // umas rachas finas na pedra
-      k.strokeStyle = 'rgba(40,28,12,.7)';
-      k.lineWidth = 1.1;
-      for (let i = 0; i < 3; i++) {
-        let [x, y] = P(rr() < 0.5 ? 0.02 : 0.98, 0.1 + rr() * 0.8);
+      for (let n = 0; n < 1100; n++) {
+        const u = 0.07 + rr() * 0.86;
+        const v = 0.07 + rr() * 0.86;
+        const [x, y] = V(...pos(u, v));
+        const meio = Math.max(0, 1 - Math.hypot(u - 0.5, v - 0.5) * 1.8);
+        const a = rr() * Math.PI;
+        const l = 1.5 + rr() * 2.5;
+        k.strokeStyle = 'rgba(110,56,12,' + (0.25 + meio * 0.45).toFixed(2) + ')';
+        k.lineWidth = 0.9;
         k.beginPath();
         k.moveTo(x, y);
-        for (let j = 0; j < 4; j++) { x += (x < cxF ? 1 : -1) * (6 + rr() * 10); y += (rr() - 0.5) * 14; k.lineTo(x, y); }
+        k.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l);
+        k.stroke();
+        // o fundo de cada incisão acende, morno, mais no meio
+        k.strokeStyle = 'rgba(255,190,90,' + (meio * 0.85).toFixed(2) + ')';
+        k.lineWidth = 0.7;
+        k.beginPath();
+        k.moveTo(x + 0.6, y + 0.8);
+        k.lineTo(x + 0.6 + Math.cos(a) * l, y + 0.8 + Math.sin(a) * l);
         k.stroke();
       }
+      k.globalCompositeOperation = 'screen';
+      const gl = k.createRadialGradient(mx, my, 0, mx, my, raioF * 0.6);
+      gl.addColorStop(0, 'rgba(255,206,120,.85)');
+      gl.addColorStop(0.6, 'rgba(255,180,90,.3)');
+      gl.addColorStop(1, 'rgba(255,190,110,0)');
+      k.fillStyle = gl;
+      k.fill(face);
+      k.restore();
+      // a sombra do lado longe da luz e o fio aceso das quinas
+      k.save();
+      k.clip(face);
+      gravar(k, face, mx, my, raioF, 0.9, 3.2, 1.4, (x, y) => (1 - luzFace) * 0.9 - 0.1 + ((x - mx) * 0.4 + (y - my) * 0.3) / raioF, SEPIA, 0);
       k.restore();
       k.strokeStyle = SEPIA;
       k.lineWidth = 2.4;
       k.lineJoin = 'round';
       k.stroke(face);
-      // a quina acesa da esquerda e do arco
-      k.strokeStyle = 'rgba(255,250,236,.85)';
-      k.lineWidth = 1.5;
-      k.beginPath();
-      k.moveTo(D[0] + 3, D[1] - 4);
-      k.lineTo(A[0] + 3, A[1] + 2);
-      for (let i = 1; i <= 12; i++) k.lineTo(topo[i][0], topo[i][1] + 3);
-      k.stroke();
+      // umas lascas nas quinas
+      k.lineWidth = 1.4;
+      for (const [u, v] of [[0.02, 0.4], [0.98, 0.7], [0.5, 0.02]]) {
+        const [x, y] = V(...pos(u, v));
+        k.beginPath();
+        k.moveTo(x - 6, y);
+        k.lineTo(x, y + 4);
+        k.lineTo(x + 6, y - 1);
+        k.stroke();
+      }
     };
-    // a de trás, encostada na da frente, inclinada; a da frente, de pé, inteira
-    tabua([432, 206], [682, 210], [690, 676], [436, 672], 52, [16, -5], 0.6, 7520);
-    tabua([196, 200], [446, 200], [450, 686], [200, 686], 52, [16, -5], 1, 7530);
-    vinheta(k, W, H, 0.22);
+    // a tábua de trás: encostada na outra e na laje, inclinada uns 34 graus para trás
+    const inc = 0.6;
+    const giroB = -0.18;
+    const posB = (u, v) => {
+      const lx = (u - 0.5) * 0.78;
+      const ly = (1 - v) * 1.1;
+      const x = lx * Math.cos(giroB) + 0.22;
+      const z = lx * Math.sin(giroB) + 0.02 - ly * Math.sin(inc);
+      return [x, ly * Math.cos(inc), z];
+    };
+    const sombraB = pol([V(...posB(0, 1)), V(...posB(1, 1)), V(...posB(1, 0)).map((c, i) => c + (i ? 0 : 0)), V(...posB(0, 0))]);
+    sombraNoChao(k, sombraB, 60, 90, 14, 0.3);
+    tabua(posB, [0.04, 0.16 * Math.sin(inc), -0.16 * Math.cos(inc)], 0.75, 7520);
+    // a tábua da frente: deitada na laje, de pé baixo para quem olha, virada para a outra
+    const giroA = 0.55;
+    const posA = (u, v) => {
+      const lx = (u - 0.5) * 0.78;
+      const lz = (v - 0.5) * 1.1;
+      return [lx * Math.cos(giroA) - lz * Math.sin(giroA) - 0.5, 0.14, lx * Math.sin(giroA) + lz * Math.cos(giroA) + 0.5];
+    };
+    const sombraA = pol([V(...posA(0, 0)).map((c) => c), V(...posA(1, 0)), V(...posA(1, 1)), V(...posA(0, 1))]);
+    sombraNoChao(k, sombraA, 18, 14, 8, 0.4);
+    tabua(posA, [0.02, -0.14, 0], 1, 7530);
+    vinheta(k, W, H, 0.24);
   }
   // O tom do bronze, do escuro (0) ao brilho (1).
   const BRONZE_TONS = [[0, [34, 16, 6]], [0.3, [104, 50, 20]], [0.6, [176, 98, 46]], [0.85, [232, 170, 104]], [1, [255, 232, 196]]];
