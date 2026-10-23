@@ -6713,7 +6713,7 @@
     const frente = pol(pts);
     k.fillStyle = '#e4d9bf';
     k.fill(frente);
-    gravar(k, frente, W / 2, 110, 560, -0.1, 4.2, 2.1, (px, py) => 0.85 - Math.max(0, py - 40) / 190, SEPIA, 0);
+    gravar(k, frente, W / 2, 110, 560, -0.1, 3.6, 2.4, (px, py) => 0.95 - Math.max(0, py - 60) / 190, SEPIA, 0);
     gravar(k, frente, W / 2, 110, 560, 0.7, 5.4, 1.6, (px, py) => 0.75 - Math.max(0, py - 30) / 120, SEPIA, 0);
     // os farrapos que o vento arrasta da beirada: feixes de traços curvos, compridos e finos,
     // que saem da nuvem, descem para a direita e se desfazem
@@ -6737,12 +6737,12 @@
       }
     }
     // farrapos soltos embaixo, rasgados pelo vento: tiras compridas e finas, inclinadas
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 5; i++) {
       const cx = 40 + fr() * 800;
       const cy = 230 + fr() * 110;
       const l = 60 + fr() * 140;
-      const h = 5 + fr() * 9;
-      const tira = pol([[cx, cy], [cx + l * 0.3, cy - h], [cx + l, cy + h * 0.6 + l * 0.06], [cx + l * 0.5, cy + h * 0.4]]);
+      const h = 2 + fr() * 3;
+      const tira = pol([[cx, cy], [cx + l * 0.4, cy - h], [cx + l * 1.6, cy + h * 0.6 + l * 0.08], [cx + l * 0.6, cy + h * 0.5]]);
       k.fillStyle = '#e8dec6';
       k.fill(tira);
       gravar(k, tira, cx + l / 2, cy, l, -0.08, 3, 1.3, () => 0.45, SEPIA, 0);
@@ -6770,63 +6770,89 @@
       k.quadraticCurveTo(xx + 30, yy - 3, xx + 60 + r() * 60, yy + 1);
       k.stroke();
     }
-    // o ressalto de rocha que rompe a água: basalto escuro e molhado, em faces de pé (traço
-    // vertical, mais cheio na sombra), as arestas acesas e a água escorrendo
-    const topoM = (xx) => 448 + ((xx - 370) / 190) ** 2 * 50 + Math.sin(xx * 0.09) * 3 + Math.sin(xx * 0.031) * 4;
-    const rocha = new Path2D();
-    rocha.moveTo(210, nivel + 3);
-    for (let xx = 210; xx <= 530; xx += 4) rocha.lineTo(xx, Math.min(nivel + 2, topoM(xx)));
-    rocha.lineTo(530, nivel + 3);
-    rocha.closePath();
-    k.fillStyle = '#8a7a62';
+    // o alto do monte que rompe a água: basalto molhado em dois ou três nós de pedra, com a
+    // hachura deitada que acompanha a encosta, a beirada de cima acesa, a faixa escura e
+    // molhada logo acima da água e uns fios de água escorrendo nos vãos. A arca pousa num nó;
+    // na ponta da proa sobra um vão de céu debaixo da quilha.
+    const nos = [[226, 470], [262, 452], [300, 446], [334, 452], [360, 444], [392, 440], [430, 446], [452, 458], [474, 452], [500, 462], [534, 474], [560, nivel + 2]];
+    const topoM = (xx) => { for (let i = 1; i < nos.length; i++) if (nos[i][0] >= xx) { const [ax2, ay2] = nos[i - 1]; const [bx2, by2] = nos[i]; return ay2 + (by2 - ay2) * ((xx - ax2) / (bx2 - ax2)); } return nivel; };
+    const rocha = pol([[200, nivel + 3], [206, 478], ...nos, [560, nivel + 3]]);
+    k.fillStyle = '#7d6f58';
     k.fill(rocha);
-    gravar(k, rocha, 370, 470, 190, Math.PI / 2 + 0.15, 3.2, 2, (px) => 0.45 + Math.max(0, (px - 360) / 160) * 0.5, '#1f170e', 0);
     k.save();
     k.clip(rocha);
     k.strokeStyle = '#1f170e';
-    k.lineWidth = 1.8;
-    for (const xx of [250, 300, 344, 404, 452, 500]) { k.beginPath(); k.moveTo(xx, topoM(xx)); k.lineTo(xx + 4, nivel); k.stroke(); }
-    k.strokeStyle = 'rgba(250,244,226,.8)';
-    k.lineWidth = 1.3;
-    for (const xx of [240, 286, 334, 392, 444]) { k.beginPath(); k.moveTo(xx, topoM(xx) + 3); k.lineTo(xx + 2, topoM(xx) + 14); k.stroke(); }
+    k.lineCap = 'round';
+    for (let i = 0; i < 14; i++) {
+      let ant = null;
+      for (let xx = 196; xx <= 564; xx += 5) {
+        const yy = topoM(xx) + 3 + i * 2.8 + Math.sin(xx * 0.05 + i) * 1.4;
+        const w = 0.6 + (i / 14) * 1.4 + Math.max(0, (xx - 392) / 200) * 0.8;
+        if (ant && r() > 0.08) { k.lineWidth = w; k.beginPath(); k.moveTo(ant[0], ant[1]); k.lineTo(xx, yy); k.stroke(); }
+        ant = [xx, yy];
+      }
+    }
+    // a faixa molhada, escura, logo acima da água
+    k.fillStyle = 'rgba(28,20,12,.55)';
+    k.fillRect(190, nivel - 9, 380, 10);
+    // a água escorrendo nos vãos, em traços curtos e partidos
+    k.strokeStyle = 'rgba(246,240,222,.85)';
+    k.lineWidth = 1.2;
+    for (const xx of [244, 318, 412, 486]) { let yy = topoM(xx) + 6; while (yy < nivel - 4) { k.beginPath(); k.moveTo(xx + (r() - 0.5) * 3, yy); k.lineTo(xx + (r() - 0.5) * 3, yy + 3 + r() * 3); k.stroke(); yy += 6 + r() * 4; } }
     k.restore();
+    k.strokeStyle = 'rgba(250,244,226,.8)';
+    k.lineWidth = 1.4;
+    k.beginPath();
+    nos.slice(0, -1).forEach(([xx, yy], i) => (i ? k.lineTo(xx, yy + 2) : k.moveTo(xx, yy + 2)));
+    k.stroke();
     k.strokeStyle = SEPIA;
     k.lineWidth = 2;
     k.beginPath();
-    for (let xx = 210; xx <= 530; xx += 4) (xx === 210 ? k.moveTo(xx, Math.min(nivel + 2, topoM(xx))) : k.lineTo(xx, Math.min(nivel + 2, topoM(xx))));
+    k.moveTo(206, 478);
+    nos.forEach(([xx, yy]) => k.lineTo(xx, yy));
     k.stroke();
     // longe, à direita, a ponta de outra rocha que mal aparece
     const ponta = pol([[728, nivel + 2], [746, nivel - 8], [770, nivel - 12], [792, nivel - 6], [806, nivel + 2]]);
     peca(k, ponta, [728, nivel - 12, 806, nivel + 2], { cor: '#9c8c70', ang: Math.PI / 2, passo: 3, maxL: 1.2, sombra: (xx) => 0.4 + (xx - 728) / 200, cruzada: 1, traco: 1.4 });
     // a arca: o casco comprido e baixo de piche, a borda em curva, as três faixas de tábuas e o
     // teto com a cumeeira; tudo escuro de verdade (o raio da glória só passa no claro)
-    const ax = 370;
-    const ay = topoM(370) + 8;
-    const L = 410;
-    const borda = (t) => ay - 54 - Math.pow(Math.abs(t - 0.5) * 2, 2.4) * 12;
-    const fundo = (t) => ay - Math.pow(Math.abs(t - 0.5) * 2, 3) * 18;
+    const ax = 372;
+    const ay = 454;
+    const L = 420;
+    const borda = (t) => ay - 64 - Math.pow(Math.abs(t - 0.5) * 2, 4) * 6;
+    const fundo = (t) => ay - Math.pow(Math.abs(t - 0.5) * 2, 6) * 26;
     const xDe = (t) => ax - L / 2 + t * L;
     const casco = new Path2D();
     for (let i = 0; i <= 30; i++) { const t = i / 30; (i ? casco.lineTo(xDe(t), borda(t)) : casco.moveTo(xDe(t), borda(t))); }
-    for (let i = 30; i >= 0; i--) { const t = i / 30; casco.lineTo(xDe(t) + (t > 0.97 ? -6 : t < 0.03 ? 6 : 0), fundo(t)); }
+    for (let i = 30; i >= 0; i--) { const t = i / 30; casco.lineTo(xDe(t), fundo(t)); }
     casco.closePath();
-    sombraNoChao(k, pol([[ax - 90, ay - 2], [ax + 110, ay - 2], [ax + 130, ay + 6], [ax - 70, ay + 8]]), 0, 0, 4, 0.4);
-    k.fillStyle = '#20180f';
+    k.fillStyle = '#2a2016';
     k.fill(casco);
     marcar(k, obj, casco);
+    // o casco gravado: as tábuas compridas em hachura que segue as fiadas, mais escura embaixo,
+    // e a faixa de tábuas acesa logo abaixo da borda (não é só silhueta)
     k.save();
     k.clip(casco);
-    // as faixas de tábuas: linhas que seguem a borda, num tom um pouco mais claro, ainda escuro
+    k.lineCap = 'round';
+    for (let j = 0; j < 16; j++) {
+      const u = j / 15;
+      const luz = u < 0.22 ? 0.8 : 0;
+      k.strokeStyle = luz ? 'rgba(150,128,96,.85)' : 'rgba(84,66,46,' + (0.6 - u * 0.35).toFixed(2) + ')';
+      k.lineWidth = luz ? 2.2 : 1.4;
+      k.beginPath();
+      for (let i = 0; i <= 30; i++) { const t = i / 30; const y = borda(t) + (fundo(t) - borda(t)) * u + 1; (i ? k.lineTo(xDe(t), y) : k.moveTo(xDe(t), y)); }
+      k.stroke();
+    }
     for (const j of [1, 2]) {
-      k.strokeStyle = '#4a3a28';
-      k.lineWidth = 2;
+      k.strokeStyle = '#120c06';
+      k.lineWidth = 2.6;
       k.beginPath();
       for (let i = 0; i <= 30; i++) { const t = i / 30; const y = borda(t) + (fundo(t) - borda(t)) * (j / 3); (i ? k.lineTo(xDe(t), y) : k.moveTo(xDe(t), y)); }
       k.stroke();
     }
-    k.strokeStyle = '#33271a';
-    k.lineWidth = 1;
-    for (let i = 0; i <= 30; i++) { const t = i / 30; const y0 = borda(t); k.beginPath(); k.moveTo(xDe(t), y0 + 4); k.lineTo(xDe(t), fundo(t) - 2); if (i % 3 === 0) k.stroke(); }
+    k.strokeStyle = 'rgba(18,12,6,.8)';
+    k.lineWidth = 1.2;
+    for (let i = 1; i < 18; i++) { const t = i / 18; k.beginPath(); k.moveTo(xDe(t) + (i % 2) * 6, borda(t) + 4); k.lineTo(xDe(t) + (i % 2) * 6, fundo(t) - 2); k.stroke(); }
     k.restore();
     k.strokeStyle = '#0e0905';
     k.lineWidth = 2.4;
@@ -6841,32 +6867,35 @@
     const tE = xDe(0.08);
     const tD = xDe(0.92);
     const ty = borda(0.5) - 6;
-    const teto = pol([[tE, ty + 4], [tE + 14, ty - 22], [tD - 14, ty - 22], [tD, ty + 4]]);
+    const teto = pol([[tE, ty + 4], [tE + 18, ty - 30], [tD - 18, ty - 30], [tD, ty + 4]]);
     k.fillStyle = '#2a1f14';
     k.fill(teto);
     marcar(k, obj, teto);
     k.strokeStyle = '#4a3a28';
     k.lineWidth = 1.2;
-    for (let x = tE + 10; x < tD - 6; x += 9) { k.beginPath(); k.moveTo(x, ty + 2); k.lineTo(x + 6, ty - 20); k.stroke(); }
+    for (let x = tE + 10; x < tD - 6; x += 9) { k.beginPath(); k.moveTo(x, ty + 2); k.lineTo(x + 8, ty - 28); k.stroke(); }
     k.strokeStyle = '#0e0905';
     k.lineWidth = 2.2;
     k.stroke(teto);
     k.strokeStyle = '#6a5640';
     k.lineWidth = 2;
     k.beginPath();
-    k.moveTo(tE + 14, ty - 22);
-    k.lineTo(tD - 14, ty - 22);
+    k.moveTo(tE + 18, ty - 30);
+    k.lineTo(tD - 18, ty - 30);
     k.stroke();
     k.fillStyle = '#0e0905';
     k.fillRect(tE + 4, ty + 3, tD - tE - 8, 5);
     // a porta do lado (6.16), fechada
     k.strokeStyle = '#4a3a28';
     k.lineWidth = 1.6;
-    k.strokeRect(ax + 40, borda(0.63) + 10, 22, 30);
+    k.strokeRect(ax + 40, borda(0.63) + 10, 22, 34);
+    // as janelinhas sob o teto (a fresta de 6.16), em fila
+    k.fillStyle = 'rgba(160,138,104,.9)';
+    for (let x = tE + 20; x < tD - 20; x += 26) k.fillRect(x, ty - 2, 10, 4);
     // o mar da enchente: ondas compridas, mais escuras e mais altas perto, com o reflexo
     const mar = new Path2D();
     mar.rect(-10, nivel, W + 20, H);
-    k.fillStyle = '#cbbf9f';
+    k.fillStyle = '#a99e83';
     k.fill(mar);
     k.save();
     k.clip(mar);
@@ -6879,9 +6908,9 @@
       let ant = null;
       for (let x = -10; x <= W + 10; x += 6) {
         const yy = y + Math.sin(x * comp + fase) * (1 + t * 6);
-        const dentro = x > 210 && x < 530 && (y - nivel) * 1.4 < nivel - topoM(x) + 8;
+        const dentro = x > 200 && x < 560 && (y - nivel) * 1.4 < nivel - topoM(x) + 8;
         const arca = false;
-        const w = (0.5 + t * 1.6) * Math.max(0.12, 0.45 + Math.cos(x * comp + fase) * 0.35 + (dentro ? 0.35 : 0) + (arca ? 0.8 : 0));
+        const w = (0.7 + t * 2.1) * Math.max(0.15, 0.5 + Math.cos(x * comp + fase) * 0.35 + (dentro ? 0.35 : 0) + (arca ? 0.8 : 0));
         if (ant && r() > 0.04) { k.lineWidth = w; k.beginPath(); k.moveTo(ant[0], ant[1]); k.lineTo(x, yy); k.stroke(); }
         ant = [x, yy];
       }
@@ -6909,16 +6938,27 @@
       k.stroke();
     }
     k.restore();
-    // a espuma batendo no pé do monte
+    // a espuma batendo no pé do monte: traços quebrados de tamanhos e vãos soltos, mais cheios
+    // do lado do vento (à esquerda), com falhas onde a pedra entra direto na água
     k.strokeStyle = 'rgba(252,250,240,.95)';
-    k.lineWidth = 2.2;
-    for (let x = 206; x < 532; x += 12) { const y = nivel + 2 + r() * 3; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + 6, y - 4, x + 12, y); k.stroke(); }
+    for (let x = 196; x < 566;) {
+      const l = 8 + r() * 30 * (1 - (x - 196) / 600);
+      if (r() > 0.3) {
+        k.lineWidth = 1.2 + r() * 2 * (1 - (x - 196) / 400);
+        k.beginPath();
+        k.moveTo(x, nivel + 1 + r() * 2);
+        k.lineTo(x + l * 0.4, nivel - r() * 2);
+        k.lineTo(x + l, nivel + 1 + r() * 2);
+        k.stroke();
+      }
+      x += l + 2 + r() * 20;
+    }
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.6;
     k.beginPath();
     k.moveTo(-10, nivel);
-    k.lineTo(210, nivel);
-    k.moveTo(530, nivel);
+    k.lineTo(200, nivel);
+    k.moveTo(560, nivel);
     k.lineTo(W + 10, nivel);
     k.stroke();
     vinheta(k, W, H, 0.22);
