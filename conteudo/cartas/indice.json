@@ -256,7 +256,7 @@
       "voceSabia": "Junto aos rios da Babilônia, o povo pendurava as harpas nos salgueiros.",
       "link": "#/mapa/salmos",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "ninive",
@@ -267,7 +267,7 @@
       "voceSabia": "A cidade era tão grande que levava três dias para atravessá-la a pé.",
       "link": "#/mapa/jonas",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "belem",
@@ -322,7 +322,7 @@
       "voceSabia": "João foi levado para esta ilha por causa da palavra de Deus.",
       "link": "#/mapa/apocalipse",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "tunica-jose",
