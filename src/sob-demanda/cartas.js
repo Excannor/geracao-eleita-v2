@@ -8370,7 +8370,7 @@
     // as casas, da última fileira (longe, miúdas) para a primeira (logo atrás do muro)
     for (let f = 0; f < 22; f++) {
       const t = f / 21;
-      const y = hz + 4 + Math.pow(t, 1.7) * 330;
+      const y = hz + 4 + Math.pow(t, 1.7) * 292;
       const e = 0.14 + Math.pow(t, 1.5) * 0.9;
       let x = -10 - r() * 40 * e + (y < 420 ? 60 + (1 - t) * 120 : 0);
       while (x < W + 10) {
@@ -8433,18 +8433,36 @@
       k.stroke(p);
       marcar(k, obj, p);
       for (let a = x; a < x + w - 10; a += 30) ameia(a + 2, mt - alto + 1, 26, '#e2c290');
-      // a faixa de tijolo vidrado, com as rosetas
-      k.fillStyle = '#4e6a72';
-      k.fillRect(x, mt - alto + 40, w, 12);
-      k.fillStyle = '#efe2be';
-      for (let a = x + 10; a < x + w - 4; a += 20) { k.beginPath(); k.arc(a, mt - alto + 46, 4, 0, 6.283); k.fill(); }
+      // a faixa de pedra lavrada, com as rosetas em relevo
+      k.fillStyle = '#ecd6a6';
+      k.fillRect(x, mt - alto + 40, w, 14);
       k.strokeStyle = SEPIA;
       k.lineWidth = 1.2;
-      k.strokeRect(x, mt - alto + 40, w, 12);
+      k.strokeRect(x, mt - alto + 40, w, 14);
+      for (let a = x + 10; a < x + w - 4; a += 20) {
+        k.beginPath();
+        k.arc(a, mt - alto + 47, 4.6, 0, 6.283);
+        k.stroke();
+        for (let p = 0; p < 6; p++) { const g = (p / 6) * 6.283; k.beginPath(); k.moveTo(a, mt - alto + 47); k.lineTo(a + Math.cos(g) * 4, mt - alto + 47 + Math.sin(g) * 4); k.stroke(); }
+      }
+      k.strokeStyle = 'rgba(43,33,18,.6)';
+      k.beginPath();
+      k.moveTo(x, mt - alto + 56);
+      k.lineTo(x + w, mt - alto + 56);
+      k.stroke();
     };
     for (const x of [40, 760]) torre(x, 92, 50);
     torre(300, 110, 90);
     torre(480, 110, 90);
+    // o corpo da porta, entre as duas torres, alto como elas, com as ameias
+    const corpo = pol([[410, mb], [410, mt - 62], [480, mt - 62], [480, mb]]);
+    muroEmFiadas(k, r, corpo, [410, mt - 64, 480, mb], { h: 11, larg: 2, cor: '#ddbd88', sombra: () => 0.35 });
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.stroke(corpo);
+    marcar(k, obj, corpo);
+    ameia(412, mt - 61, 26, '#ddbd88');
+    ameia(444, mt - 61, 26, '#ddbd88');
     const porta = new Path2D();
     porta.moveTo(410, mb);
     porta.lineTo(410, mt + 30);
@@ -8456,18 +8474,61 @@
     k.strokeStyle = SEPIA;
     k.lineWidth = 2;
     k.stroke(porta);
-    // pela porta, lá dentro, a estrada que segue clara
+    // a passagem da porta é escura; lá no fundo, a boca de dentro, pequena e clara, com o
+    // começo da rua e dois telhados vistos por ela
+    const fundo = new Path2D();
+    fundo.moveTo(432, mt + 96);
+    fundo.lineTo(432, mt + 62);
+    fundo.arc(445, mt + 62, 13, Math.PI, 0);
+    fundo.lineTo(458, mt + 96);
+    fundo.closePath();
+    k.fillStyle = '#efe0bb';
+    k.fill(fundo);
     k.save();
-    k.clip(porta);
+    k.clip(fundo);
+    k.fillStyle = '#d9c296';
+    k.fillRect(426, mt + 66, 12, 12);
+    k.fillRect(450, mt + 70, 12, 10);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 0.8;
+    k.strokeRect(426, mt + 66, 12, 12);
+    k.strokeRect(450, mt + 70, 12, 10);
     k.fillStyle = '#e8d4a4';
     k.beginPath();
-    k.moveTo(430, mb);
-    k.lineTo(440, mt + 10);
-    k.lineTo(452, mt + 10);
-    k.lineTo(462, mb);
+    k.moveTo(440, mt + 96);
+    k.lineTo(443, mt + 84);
+    k.lineTo(447, mt + 84);
+    k.lineTo(450, mt + 96);
     k.fill();
     k.restore();
-    for (const a of [0, 1, 2]) { k.strokeStyle = 'rgba(250,236,200,.7)'; k.lineWidth = 1.2; k.beginPath(); k.arc(445, mt + 30, 40 + a * 6, Math.PI, 0); k.stroke(); }
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.4;
+    k.stroke(fundo);
+    // o chão da passagem, na sombra, até a soleira
+    k.save();
+    k.clip(porta);
+    k.fillStyle = 'rgba(60,42,20,.9)';
+    k.beginPath();
+    k.moveTo(410, mb);
+    k.lineTo(432, mt + 96);
+    k.lineTo(458, mt + 96);
+    k.lineTo(480, mb);
+    k.fill();
+    k.strokeStyle = 'rgba(120,96,60,.6)';
+    k.lineWidth = 1;
+    for (let y = mt + 104; y < mb; y += 8) { const t = (y - mt - 96) / (mb - mt - 96); k.beginPath(); k.moveTo(432 - t * 22, y); k.lineTo(458 + t * 22, y); k.stroke(); }
+    k.restore();
+    k.strokeStyle = '#e8d4a4';
+    k.lineWidth = 3;
+    k.beginPath();
+    k.moveTo(410, mb - 1);
+    k.lineTo(480, mb - 1);
+    k.stroke();
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.6;
+    k.beginPath();
+    k.arc(445, mt + 30, 44, Math.PI, 0);
+    k.stroke();
     // a estrada de cá, que chega à porta, e o chão do morro
     const ca = new Path2D();
     ca.moveTo(-10, mb);
