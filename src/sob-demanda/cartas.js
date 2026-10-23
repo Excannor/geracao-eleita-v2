@@ -7483,7 +7483,7 @@
     const r = sorteio(6601);
     papelVelho(k, W, H, r, ['#fdf1d4', '#f1d9a8', '#d2ad74'], [W * 0.15, 160]);
     // o céu do entardecer: linhas, e as nuvens compridas em faixas de traço, acesas embaixo
-    linhas(k, 0, 0, W, 330, 5.5, 1.5, (x, y) => 0.12 + (1 - y / 330) * 0.5 + x / 3000);
+    linhas(k, 0, 0, W, 330, 5.5, 1.8, (x, y) => 0.12 + (1 - y / 330) * 0.6 + x / 2500, '#3a2610');
     for (const [x, y, l, n] of [[520, 52, 380, 5], [150, 118, 240, 4], [700, 150, 200, 3], [330, 190, 160, 3]]) {
       for (let i = 0; i < n; i++) {
         const yy = y + i * 7;
@@ -7552,9 +7552,9 @@
     }
     casas.sort((a, b) => a.base - b.base);
     for (const c of casas) {
-      casinha(k, r, c.x, c.base, c.w, c.h, c.d, { cor: r() < 0.5 ? '#f5e3b8' : '#ecd5a4', lado: '#c09c66', teto: '#e6cc98', traco: 1.2, janela: r() < 0.7, porta: r() < 0.4, obj });
+      casinha(k, r, c.x, c.base, c.w, c.h, c.d, { cor: r() < 0.5 ? '#f5e3b8' : '#ecd5a4', lado: '#a98450', teto: '#e6cc98', traco: 1.2, janela: r() < 0.7, porta: r() < 0.4, obj });
       // às vezes, o quarto de cima no terraço
-      if (r() < 0.22) casinha(k, r, c.x + c.w * 0.5, c.base - c.h - c.d * 0.2, c.w * 0.4, 14, c.d * 0.6, { cor: '#f5e3b8', lado: '#c09c66', teto: '#e6cc98', traco: 1, porta: true, janela: false, obj });
+      if (r() < 0.22) casinha(k, r, c.x + c.w * 0.5, c.base - c.h - c.d * 0.2, c.w * 0.4, 14, c.d * 0.6, { cor: '#f5e3b8', lado: '#a98450', teto: '#e6cc98', traco: 1, porta: true, janela: false, obj });
     }
     // a muralha da cidade, de torre em torre, até a fortaleza
     const altM = 52;
@@ -7722,9 +7722,9 @@
     ca.lineTo(W + 10, H + 10);
     ca.lineTo(-10, H + 10);
     ca.closePath();
-    k.fillStyle = '#b08c58';
+    k.fillStyle = '#9c7848';
     k.fill(ca);
-    chaoEmLinhas(k, r, ca, -10, W + 10, 690, H, 2.4, (x, y) => 0.6 + (y - 700) / 400);
+    chaoEmLinhas(k, r, ca, -10, W + 10, 690, H, 2.6, (x, y) => 0.7 + (y - 700) / 300);
     k.strokeStyle = SEPIA;
     k.lineWidth = 2;
     k.stroke(ca);
@@ -8038,7 +8038,7 @@
     papelVelho(k, W, H, r, ['#fbf1d6', '#efd9ab', '#d3b078'], [W * 0.66, 70]);
     const hz = 236;
     // o céu quente do meio-dia: linhas ralas, quase brancas perto do sol
-    const sol = [600, 84];
+    const sol = [610, 140];
     linhas(k, 0, 0, W, hz, 6, 1.2, (x, y) => 0.08 + Math.min(1, Math.hypot(x - sol[0], y - sol[1]) / 600) * 0.5);
     k.fillStyle = '#fffaea';
     k.beginPath();
