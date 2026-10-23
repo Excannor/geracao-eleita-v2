@@ -13314,95 +13314,120 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     const fS = onda(sorteio(9210), 4, 0.009);
     const serra = pol([[-10, hz + 2], ...Array.from({ length: 46 }, (_, i) => [i * 20 - 6, hz - 16 - Math.max(0, fS(i * 20)) * 16 - (i > 26 && i < 40 ? Math.sin((i - 26) / 14 * Math.PI) * 18 : 0)]), [W + 10, hz + 2]]);
     peca(k, serra, [-10, hz - 60, W + 10, hz + 2], { cor: '#e6d6b2', ang: 0.04, passo: 4.4, maxL: 1, sombra: () => 0.32, cruzada: 1, traco: 1.2 });
-    // o chão do deserto, em perspectiva
+    // o chão do deserto, em perspectiva, com umas ondulações largas de duna; o tom em linhas
+    // de grossura variada, que falham, mais cheias na sombra de cada ondulação
     const chao = new Path2D();
     chao.moveTo(-10, hz);
     for (let x = -10; x <= W + 10; x += 10) chao.lineTo(x, hz + Math.sin(x * 0.01) * 2);
     chao.lineTo(W + 10, H + 10);
     chao.lineTo(-10, H + 10);
     chao.closePath();
-    k.fillStyle = '#d4b783';
+    k.fillStyle = '#c4a574';
     k.fill(chao);
-    chaoEmLinhas(k, r, chao, -10, W + 10, hz, H, 2.2, (x, y) => 0.42 + (y - hz) / 700 + Math.sin(x * 0.009 + y * 0.003) * 0.1);
+    const duna = (x, y) => Math.sin(x * 0.006 + y * 0.018) * 0.5 + Math.sin(x * 0.013 - y * 0.009 + 2) * 0.3;
+    k.save();
+    k.clip(chao);
+    k.strokeStyle = SEPIA;
+    k.lineCap = 'round';
+    for (let y = hz + 1; y < H; y += 2.6 + (y - hz) * 0.03) {
+      let x = -10 - r() * 40;
+      const t = (y - hz) / (H - hz);
+      while (x < W + 10) {
+        const c = 20 + r() * 90 * (0.4 + t);
+        const v = 0.3 + duna(x + c / 2, y) * 0.35 + t * 0.2;
+        const w = (0.4 + t * 1.6) * Math.max(0, v) * (0.5 + r() * 0.8);
+        if (w > 0.25) {
+          k.lineWidth = w;
+          k.beginPath();
+          k.moveTo(x, y + (r() - 0.5));
+          k.quadraticCurveTo(x + c / 2, y - 1 + duna(x, y) * 3, x + c, y + (r() - 0.5));
+          k.stroke();
+        }
+        x += c + 6 + r() * 30 * (0.4 + t);
+      }
+    }
+    k.restore();
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.3;
     k.beginPath();
     for (let x = -10; x <= W + 10; x += 10) { const y = hz + Math.sin(x * 0.01) * 2; if (x === -10) k.moveTo(x, y); else k.lineTo(x, y); }
     k.stroke();
-    // as tendas do acampamento, baixas e compridas, de pelo de cabra listrado, com as estacas e
-    // as cordas; pequenas e espalhadas rente ao horizonte (nenhuma porta acesa: é dia)
+    // o acampamento, longe, rente ao horizonte: tendas de pelo de cabra compridas e baixas, de
+    // teto quase reto que cede entre as varas, o lado da frente aberto (as varas à vista) e as
+    // cordas esticadas até as estacas
     const tenda = (x, y, w, h) => {
-      const t = new Path2D();
-      t.moveTo(x - w / 2, y);
-      t.lineTo(x - w * 0.42, y - h * 0.72);
-      t.quadraticCurveTo(x - w * 0.2, y - h * 1.05, x, y - h * 0.86);
-      t.quadraticCurveTo(x + w * 0.2, y - h * 1.08, x + w * 0.42, y - h * 0.74);
-      t.lineTo(x + w / 2, y);
-      t.closePath();
-      k.fillStyle = '#5e4c36';
-      k.fill(t);
-      k.save();
-      k.clip(t);
-      k.strokeStyle = 'rgba(30,22,12,.85)';
-      k.lineWidth = Math.max(0.8, w * 0.03);
-      for (let i = 1; i < 5; i++) { k.beginPath(); k.moveTo(x - w / 2 + (w * i) / 5, y); k.lineTo(x - w / 2 + (w * i) / 5 + (i - 2.5) * w * 0.02, y - h); k.stroke(); }
-      k.fillStyle = 'rgba(16,10,4,.85)';
-      k.fillRect(x - w * 0.1, y - h * 0.55, w * 0.14, h * 0.55);
-      k.restore();
-      k.strokeStyle = 'rgba(30,22,12,.9)';
-      k.lineWidth = Math.max(0.8, w * 0.025);
-      k.stroke(t);
-      k.lineWidth = Math.max(0.5, w * 0.012);
+      const teto = new Path2D();
+      teto.moveTo(x - w / 2, y - h * 0.55);
+      for (let i = 1; i <= 4; i++) { const xi = x - w / 2 + (w * i) / 4; teto.quadraticCurveTo(xi - w / 8, y - h * 0.85, xi, y - h * (i % 2 ? 1 : 0.95)); }
+      teto.lineTo(x + w / 2 + w * 0.08, y);
+      teto.lineTo(x - w / 2 - w * 0.06, y);
+      teto.closePath();
+      k.fillStyle = '#4a3a2a';
+      k.fill(teto);
+      // o lado aberto: o escuro de dentro e as varas
+      const aberto = pol([[x - w * 0.36, y], [x - w * 0.36, y - h * 0.6], [x + w * 0.3, y - h * 0.62], [x + w * 0.3, y]]);
+      k.fillStyle = '#6e5a40';
+      k.fill(aberto);
+      gravar(k, aberto, x, y - h * 0.3, w * 0.4, 0.05, 2, 0.9, (px, py) => 0.3 + (y - h * 0.6 - py) / (-h * 0.6) * -0.5 + 0.4, '#1a120a', 0);
+      k.strokeStyle = '#1a120a';
+      k.lineWidth = Math.max(0.8, w * 0.012);
+      for (const t of [-0.36, -0.1, 0.12, 0.3]) { k.beginPath(); k.moveTo(x + w * t, y); k.lineTo(x + w * t, y - h * 0.62); k.stroke(); }
+      k.strokeStyle = 'rgba(20,14,8,.9)';
+      k.lineWidth = Math.max(0.6, w * 0.012);
+      k.stroke(teto);
+      k.lineWidth = Math.max(0.4, w * 0.006);
       k.beginPath();
-      k.moveTo(x - w * 0.42, y - h * 0.72);
-      k.lineTo(x - w * 0.62, y);
-      k.moveTo(x + w * 0.42, y - h * 0.74);
-      k.lineTo(x + w * 0.62, y);
+      k.moveTo(x - w / 2, y - h * 0.55);
+      k.lineTo(x - w / 2 - w * 0.22, y);
+      k.moveTo(x + w / 2, y - h * 0.95);
+      k.lineTo(x + w / 2 + w * 0.24, y);
       k.stroke();
-      marcar(k, obj, t);
+      marcar(k, obj, teto);
     };
-    for (const [x, w] of [[40, 40], [92, 30], [150, 48], [214, 34], [268, 44], [700, 34], [748, 46], [806, 32], [856, 40]]) tenda(x, hz + 2 + (r() - 0.5) * 2, w, w * 0.42);
-    const perto = [[372, 306, 84], [60, 318, 96], [760, 322, 112], [196, 330, 128]];
-    // o maná no chão: flocos brancos e miúdos, redondinhos e chatos, com a sombrinha do lado da
-    // sombra; graúdos e soltos perto, cada vez menores e mais juntos longe, até virar um véu
+    for (const [x, w] of [[60, 70], [150, 54], [236, 82], [330, 48], [640, 60], [728, 86], [826, 58]]) tenda(x, hz + 1 + (r() - 0.5) * 2, w, w * 0.26);
+    // o maná no chão: flocos finos e miúdos como escamas de geada (16.14), sem contorno:
+    // cada um uma lasquinha torta e clara com uma sombrinha de um lado; graúdos e soltos perto,
+    // cada vez menores e mais juntos longe, até virar um pontilhado
     const floco = (x, y, s) => {
-      k.fillStyle = 'rgba(70,48,20,.5)';
-      k.beginPath();
-      k.ellipse(x + s * 0.4, y + s * 0.35, s, s * 0.55, 0, 0, 6.283);
-      k.fill();
-      k.fillStyle = '#fbf8ee';
-      k.beginPath();
-      k.ellipse(x, y, s, s * 0.6, (r() - 0.5) * 0.6, 0, 6.283);
-      k.fill();
-      if (s > 2.2) {
-        k.strokeStyle = 'rgba(70,52,24,.55)';
-        k.lineWidth = 0.8;
-        k.stroke();
-        k.fillStyle = 'rgba(200,180,140,.6)';
+      const n = 5;
+      const pts = Array.from({ length: n }, (_, i) => { const a = (i / n) * 6.283 + r() * 0.8; const f = 0.5 + r() * 0.7; return [x + Math.cos(a) * s * f, y + Math.sin(a) * s * f * 0.55]; });
+      if (s > 1.6) {
+        k.fillStyle = 'rgba(80,58,26,.35)';
         k.beginPath();
-        k.arc(x + s * 0.2, y + s * 0.1, s * 0.22, 0, 6.283);
+        pts.forEach(([px, py], i) => (i ? k.lineTo(px + s * 0.35, py + s * 0.3) : k.moveTo(px + s * 0.35, py + s * 0.3)));
+        k.closePath();
         k.fill();
       }
+      k.fillStyle = s > 1.6 ? '#fbf8ee' : 'rgba(252,248,236,.85)';
+      k.beginPath();
+      pts.forEach(([px, py], i) => (i ? k.lineTo(px, py) : k.moveTo(px, py)));
+      k.closePath();
+      k.fill();
     };
     const pontos = [];
-    for (let i = 0; i < 5200; i++) {
-      const t = Math.pow(r(), 1.9);
+    for (let i = 0; i < 17000; i++) {
+      const t = Math.pow(r(), 1.25);
       const y = hz + 4 + t * (H - hz);
       const x = r() * W;
-      pontos.push([x, y, 0.6 + Math.pow(t, 1.2) * 6.4 * (0.7 + r() * 0.6)]);
+      pontos.push([x, y, 0.7 + Math.pow(t, 1.2) * 4.4 * (0.6 + r() * 0.8)]);
     }
+    // longe, a geada vira um véu claro e liso por cima do chão
+    k.save();
+    k.clip(chao);
+    const veu = k.createLinearGradient(0, hz, 0, hz + 180);
+    veu.addColorStop(0, 'rgba(250,246,232,.7)');
+    veu.addColorStop(1, 'rgba(250,246,232,0)');
+    k.fillStyle = veu;
+    k.fillRect(0, hz, W, 180);
+    k.restore();
     pontos.sort((a, b) => a[1] - b[1]);
-    // as tendas de mais perto entram na ordem da fundura, entre os flocos
-    for (const [x, y, s] of pontos) {
-      while (perto.length && perto[0][1] < y) { const [tx0, ty0, w] = perto.shift(); tenda(tx0, ty0, w, w * 0.42); }
-      floco(x, y, s);
-    }
+    for (const [x, y, s] of pontos) floco(x, y, s);
     // a tigela de madeira, cheia, em três quartos, com os grãos que caíram em volta
-    const tx = 520;
-    const ty = 640;
-    const rx = 182;
-    const ry = 56;
-    const fundoT = 110;
+    const tx = 540;
+    const ty = 600;
+    const rx = 178;
+    const ry = 54;
+    const fundoT = 108;
     const corpo = new Path2D();
     corpo.moveTo(tx - rx, ty);
     corpo.bezierCurveTo(tx - rx, ty + fundoT * 0.75, tx - rx * 0.5, ty + fundoT, tx, ty + fundoT);
