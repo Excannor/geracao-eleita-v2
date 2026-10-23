@@ -9941,9 +9941,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     chao.lineTo(W + 10, H + 10);
     chao.lineTo(-10, H + 10);
     chao.closePath();
-    k.fillStyle = '#e0c296';
+    k.fillStyle = '#ead5ae';
     k.fill(chao);
-    chaoEmLinhas(k, r, chao, -10, W + 10, hz, H, 2, (x, y) => 0.38 + (y - hz) / 900 + Math.sin(x * 0.011 + y * 0.004) * 0.12);
+    chaoEmLinhas(k, r, chao, -10, W + 10, hz, H, 1.7, (x, y) => 0.32 + (y - hz) / 1000 + Math.sin(x * 0.011 + y * 0.004) * 0.12);
     k.strokeStyle = SEPIA;
     k.lineWidth = 1.5;
     k.stroke(chao);
@@ -10024,8 +10024,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       // o corte transversal: escuro embaixo (lado d), claro em cima (lado e)
       for (let v = -1; v <= 1; v += 0.25) {
         const luz = Math.max(0, -v * 0.8 + 0.25);
-        const cMad = [Math.round(150 + 70 * luz), Math.round(112 + 56 * luz), Math.round(66 + 40 * luz)];
-        const cCob = [Math.round(122 + 80 * luz), Math.round(110 + 70 * luz), Math.round(70 + 46 * luz)];
+        const cMad = [Math.round(132 + 70 * luz), Math.round(92 + 56 * luz), Math.round(48 + 40 * luz)];
+        const cCob = [Math.round(100 + 70 * luz), Math.round(90 + 64 * luz), Math.round(54 + 42 * luz)];
         const c = cMad.map((m, j) => Math.round(m * (1 - t) + cCob[j] * t));
         k.fillStyle = 'rgb(' + c.join(',') + ')';
         k.beginPath();
@@ -10119,7 +10119,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
         if (Math.abs(vv) > 0.98) continue;
         const luz = Math.max(0, Math.min(1, -vv * 0.7 + 0.35));
         const escuro = desenho(s, vv) && s > sMuda;
-        const base = escuro ? [74, 58, 30] : [168 + luz * 50, 150 + luz * 46, 96 + luz * 40];
+        const base = escuro ? [58, 44, 22] : [140 + luz * 60, 124 + luz * 56, 76 + luz * 44];
         escama(q.x - q.ty * vv * w, q.y + q.tx * vv * w, a, 6.8 + w * 0.12, luz, 'rgb(' + base.map(Math.round).join(',') + ')');
       }
     }
@@ -10153,7 +10153,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     }
     k.restore();
     k.strokeStyle = '#24180a';
-    k.lineWidth = 2.4;
+    k.lineWidth = 3;
     k.lineJoin = 'round';
     k.stroke(tubo);
     // a ponta do cabo: o corte gasto da madeira
