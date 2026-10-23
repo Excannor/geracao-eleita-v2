@@ -660,7 +660,7 @@
       "link": "#/mapa/joao",
       "amigos": 40,
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "campos-maduros",
