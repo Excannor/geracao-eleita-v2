@@ -1519,13 +1519,15 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
   const nLancadas = CATALOGO.cartas.filter((x) => x.lancada && !CATALOGO.albuns.find((a) => a.id === x.album).especial).length;
   checar(soLancadas && r.lancadas === nLancadas && r.cartas === nLancadas, 'carta não lançada nunca sai (340 sorteios, comuns e de marco, só as ' + nLancadas + ' lançadas, todas recebidas)');
   checar(r.albuns.every((a) => !a.completo) && !Object.keys(c.eventos).some((k) => k.startsWith('album:')), 'nenhum álbum completa enquanto as 13 não forem lançadas e estiverem na coleção');
-  const comNoe = ESQ_HOJE.map((a) => (a.id === 'herois' ? { ...a, c: a.c.replace('~noe-arca', 'noe-arca') } : a));
+  // a próxima a lançar: a primeira carta ainda não lançada de um álbum comum (lida do catálogo)
+  const proxima = CATALOGO.cartas.find((x) => !x.lancada && !CATALOGO.albuns.find((a) => a.id === x.album).especial);
+  const comNoe = ESQ_HOJE.map((a) => (a.id === proxima.album ? { ...a, c: a.c.replace('~' + proxima.id, proxima.id) } : a));
   contexto.window.CARTAS_INDICE = comNoe;
   const x = RC.receber(c, 'bau', 'bau:dia:301', { dono: 'lanc', em: 999 });
-  checar(x.resultado.carta === 'noe-arca' || RC.cartaDoSorteio(c, RC.aleatorio(5), '', 'linho') === 'noe-arca' || RC.cartaDoSorteio(c, RC.aleatorio(6), '', 'linho') === 'noe-arca',
+  checar(x.resultado.carta === proxima.id || RC.cartaDoSorteio(c, RC.aleatorio(5), '', 'linho') === proxima.id || RC.cartaDoSorteio(c, RC.aleatorio(6), '', 'linho') === proxima.id,
     'lançar uma carta põe ela no sorteio, e o viés para carta nova a traz logo');
   let novaVem = 0;
-  for (let i = 0; i < 400; i++) if (RC.cartaDoSorteio(c, RC.aleatorio(i + 1), '', 'linho') === 'noe-arca') novaVem++;
+  for (let i = 0; i < 400; i++) if (RC.cartaDoSorteio(c, RC.aleatorio(i + 1), '', 'linho') === proxima.id) novaVem++;
   checar(novaVem / 400 > 0.4, 'a carta recém-lançada sai em ' + (novaVem / 4).toFixed(0) + '% dos sorteios de quem já tem as outras');
   // Semeadores sem desenho: o limiar fica anotado e a carta vem quando for lançada
   contexto.window.CARTAS_INDICE = ESQ_HOJE;
