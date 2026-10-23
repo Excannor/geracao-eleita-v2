@@ -1385,8 +1385,8 @@ const CATALOGO = lerCatalogo(AQUI);
   const erros = validarCatalogo(CATALOGO, AQUI);
   checar(!erros.length, 'o catálogo confere: álbuns de 13 com data de lançamento e capa, ids únicos, referências na NBV, links com destino e lançadas com desenho' + (erros.length ? ' (' + erros.slice(0, 4).join('; ') + ')' : ''));
   const capa = (a) => (CATALOGO.cartas.find((c) => c.id === CATALOGO.albuns.find((x) => x.id === a).capa) || {}).titulo;
-  checar(capa('herois') === 'Nuvem de testemunhas' && capa('lugares') === 'Jerusalém' && capa('objetos') === 'A Arca da Aliança' && capa('milagres') === 'O túmulo vazio',
-    'a capa de cada álbum é a pedida: Nuvem de testemunhas, Jerusalém, a Arca da Aliança e o túmulo vazio');
+  checar(capa('herois') === 'Multidão de testemunhas' && capa('lugares') === 'Jerusalém' && capa('objetos') === 'A Arca da Aliança' && capa('milagres') === 'O túmulo vazio',
+    'a capa de cada álbum é a pedida: Multidão de testemunhas, Jerusalém, a Arca da Aliança e o túmulo vazio');
   checar(CATALOGO.cartas.every((c) => c.rascunho === true), 'os textos do catálogo estão marcados como rascunho até a revisão');
   checar(CATALOGO.cartas.filter((c) => !CATALOGO.albuns.find((a) => a.id === c.album).especial).every((c) => c.raridade === undefined),
     'carta de álbum não tem raridade fixa: a raridade é da cópia recebida');

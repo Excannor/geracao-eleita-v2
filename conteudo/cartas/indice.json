@@ -132,7 +132,7 @@
       "numero": 9,
       "titulo": "Rute e as espigas",
       "referencia": "Rute 2.2-3",
-      "voceSabia": "Rute recolhia as espigas que sobravam atrás dos ceifeiros, no campo de Boaz.",
+      "voceSabia": "No campo de Boaz, Rute recolhia as espigas que sobravam.",
       "link": "#/mapa/rute",
       "rascunho": true,
       "lancada": false
@@ -174,9 +174,9 @@
       "id": "nuvem-testemunhas",
       "album": "herois",
       "numero": 13,
-      "titulo": "Nuvem de testemunhas",
+      "titulo": "Multidão de testemunhas",
       "referencia": "Hebreus 12.1",
-      "voceSabia": "Os heróis da fé do capítulo 11 são a multidão de testemunhas ao nosso redor.",
+      "voceSabia": "Os heróis de Hebreus 11 são a multidão de testemunhas.",
       "link": "#/mapa/hebreus",
       "rascunho": true,
       "lancada": false

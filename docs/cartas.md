@@ -36,7 +36,8 @@ Onde mora cada coisa:
 - Álbuns de 13 cartas. Os 4 de lançamento, na ordem: Heróis da fé, Lugares, Objetos, Milagres.
 - **A raridade não é da carta, é da cópia recebida**: toda carta de álbum existe em Linho, Bronze,
   Prata, Ouro e Glória. A coleção vai se enchendo de versões ao longo dos anos.
-- Cada álbum tem uma **capa**, a carta-tema: Heróis da fé, "Nuvem de testemunhas" (Hebreus 12.1);
+- Cada álbum tem uma **capa**, a carta-tema: Heróis da fé, "Multidão de testemunhas" (Hebreus 12.1,
+  com a palavra da NBV; o id `nuvem-testemunhas` fica);
   Lugares, Jerusalém; Objetos, a Arca da Aliança; Milagres, o túmulo vazio. A capa sai em todas as
   versões, como as outras. Jesus e Deus não são carta.
 - `conteudo/cartas/indice.json`: `{ albuns: [{ id, nome, lancadoEm, capa, especial? }], cartas: [...] }`.
