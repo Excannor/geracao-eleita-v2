@@ -16336,48 +16336,6 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     }
     // a borda de cá passa por cima da rede, e a malha se dobra sobre ela
     bordaCa(nosso, 1);
-    // num ponto a marola passa por cima da borda de cá e entra no barco (5.7): a água do lago
-    // cobre a borda ali, com a crista de espuma, e um lençol fino escorre para dentro
-    {
-      const ts2 = Array.from({ length: 15 }, (_, i) => 0.13 + i * 0.01);
-      const sobe2 = (t) => Math.sin(Math.PI * (t - 0.13) / 0.14);
-      const crista = ts2.map((t) => { const [x, y] = nosso.N(t); return [x, y - 4 - 7 * sobe2(t)]; });
-      const pe = ts2.slice().reverse().map((t) => { const [x, y] = nosso.N(t); return [x, y + 26]; });
-      const marola = pol([...crista, ...pe]);
-      const lencol = pol([...ts2.map((t) => { const [x, y] = nosso.N(t); return [x, y - 4]; }), ...ts2.slice().reverse().map((t) => { const [x, y] = nosso.N(t); return [x + 6 * sobe2(t), y - 4 - 30 * Math.pow(sobe2(t), 0.8)]; })]);
-      for (const p of [lencol, marola]) {
-        k.fillStyle = 'rgba(210,207,184,.92)';
-        k.fill(p);
-        k.save();
-        k.clip(p);
-        k.strokeStyle = 'rgba(43,33,18,.75)';
-        k.lineCap = 'round';
-        const [x0, y0] = nosso.N(0.13);
-        for (let y = y0 - 40; y < y0 + 30; y += 3.4) {
-          let x = x0 - 10 + r() * 8;
-          while (x < x0 + 120) { const c = 10 + r() * 16; k.lineWidth = 1.6; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2.4, x + c, y); k.stroke(); x += c + 3 + r() * 6; }
-        }
-        k.restore();
-        marcar(k, obj, p);
-      }
-      // a crista: espuma em festões, com a beirada escura embaixo
-      for (let i = 0; i < crista.length - 2; i += 2) {
-        const [xa, ya] = crista[i];
-        const [xb, yb] = crista[i + 2];
-        k.strokeStyle = 'rgba(30,26,16,.8)';
-        k.lineWidth = 1.4;
-        k.beginPath();
-        k.moveTo(xa, ya + 3);
-        k.quadraticCurveTo((xa + xb) / 2, (ya + yb) / 2 - 4, xb, yb + 3);
-        k.stroke();
-        k.strokeStyle = 'rgba(252,252,244,.98)';
-        k.lineWidth = 2.4;
-        k.beginPath();
-        k.moveTo(xa, ya);
-        k.quadraticCurveTo((xa + xb) / 2, (ya + yb) / 2 - 7, xb, yb);
-        k.stroke();
-      }
-    }
     k.save();
     k.strokeStyle = 'rgba(30,22,10,.95)';
     k.lineWidth = 1.6;
