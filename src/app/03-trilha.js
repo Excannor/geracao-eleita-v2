@@ -700,8 +700,9 @@
   // ---------- baú ----------
   // O baú guarda o versículo (CC.abrirBau) e paga uma carta (docs/cartas.md). A tela pede as peças
   // das cartas (regra, arte e álbum) assim que abre; chegando em até 2,5 s, a carta é revelada pela
-  // arte (CC.album.revelarNoBau). Sem elas, fica o versículo, e a carta chega na próxima vez que a
-  // regra carregar (CC.acertarCartas).
+  // arte (CC.album.revelarNoBau). Sem elas, fica o versículo, e o baú volta a ficar pronto na Trilha
+  // até a carta ser revelada. Um baú aberto antes das cartas, ou com a carta paga sem revelação,
+  // abre do mesmo jeito: o toque revela a carta (a que já estava paga, sem sortear de novo).
   const comPrazo = (p, ms) => Promise.race([p.then(() => true, () => false), new Promise((r) => setTimeout(() => r(false), ms))]);
   CC.telaBau = function (numero) {
     const u = unidadeDoDia(numero);
@@ -723,15 +724,17 @@
           if (botao.disabled || !palco.isConnected || CC.bauAberto(numero)) return;
           const E = CC.estado();
           const chave = CC.cartasRegras.chaveDoBau(numero, E);
-          const hipotese = { ...E, bausAbertos: { ...(E.bausAbertos || {}), [CC.chaveBau(numero)]: { em: CC.hojeIso() } } };
-          const previsto = CC.cartasRegras.emDia(hipotese, { dono: E.dono || '', em: Date.now(), quem: CC.quem || null, hoje: CC.hojeIso() }).novos.find((x) => x.chave === chave);
+          const ja = ((E.cartas || {}).eventos || {})[chave];
+          const hipotese = { ...E, bausAbertos: { [CC.chaveBau(numero)]: { em: CC.hojeIso() }, ...(E.bausAbertos || {}) } };
+          const previsto = ja && ja.carta ? { chave, carta: ja.carta, raridade: ja.raridade }
+            : CC.cartasRegras.emDia(hipotese, { dono: E.dono || '', em: Date.now(), quem: CC.quem || null, hoje: CC.hojeIso(), bau: numero }).novos.find((x) => x.chave === chave);
           if (!previsto || !previsto.carta || !CC.album.temArte(CC.album.paraArte(previsto.carta, previsto.raridade))) return;
           botao.disabled = true;
           CC.album.bauDaRevelacao(el, palco, { previsto, chave, ref: CC.versiculoDoBau(numero), fechar, titulo: 'Um baú na estrada!',
             guardar: () => {
               CC.abrirBau(numero);
               CC.vibrar('conquista');
-              const pago = CC.cartasEmDia({ calado: true });
+              const pago = CC.cartasEmDia({ calado: true, bau: numero });
               const novos = CC.guardarConquistas();
               if (CC.publicarNovidades) CC.publicarNovidades({ niveis: novos });
               return pago;
@@ -750,13 +753,13 @@
           if (CC.publicarNovidades) CC.publicarNovidades({ niveis: novos });
           if (comCartas) {
             const chave = CC.cartasRegras.chaveDoBau(numero, CC.estado());
-            const pago = CC.cartasEmDia({ calado: true });
-            if (CC.album.revelarNoBau(el, palco, { chave, ref, fechar, outros: pago.novos.filter((x) => x.chave !== chave && x.fonte !== 'bau') })) return;
+            CC.cartasEmDia({ calado: true, bau: numero });
+            if (CC.album.revelarNoBau(el, palco, { chave, ref, fechar })) return;
           }
           palco.innerHTML = '<div class="cena-carta revelando"><h1>Baú aberto!</h1>'
             + '<p class="passo-dica">Um versículo dos sete dias que você acabou de ler.</p>'
             + '<div class="versiculo-do-bau" id="versiculo-do-bau"></div>'
-            + '<p class="passo-dica pequena"><a href="#/perfil/album">A carta deste baú vai para o seu álbum.</a></p></div>';
+            + '<p class="passo-dica pequena">A carta deste baú sai quando ele abrir com internet.</p></div>';
           CC.arte.confete(el);
           // O texto vem da tradução escolhida e chega depois: o cartão entra quando
           // chegar, sem segurar a comemoração esperando o carregamento.

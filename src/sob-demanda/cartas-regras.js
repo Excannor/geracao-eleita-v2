@@ -229,7 +229,8 @@
   // Paga a fonte. A mesma chave nunca paga duas vezes, e o que ela pagou fica para sempre.
   // Devolve o estado novo das cartas e o que houve (a carta, a raridade, se é nova, se a versão é
   // nova, quantas cópias daquela versão a pessoa tem agora, o álbum e se ele completou).
-  R.receber = (cartas, fonte, chave, { dono = '', em = Date.now(), hoje = '' } = {}) => {
+  // visto: a carta foi revelada agora (o toque no baú); fica anotado no evento (docs/cartas.md, seção 6).
+  R.receber = (cartas, fonte, chave, { dono = '', em = Date.now(), hoje = '', visto = false } = {}) => {
     const c = copia(cartas);
     const f = R.FONTES[fonte];
     if (!f || !f.ativa || !chave || fonteDe(chave) !== fonte) return { cartas: c, resultado: null };
@@ -245,7 +246,7 @@
     } else sorteio = R.sortear(c, dono, chave, hoje, f.premio === 'marco');
     if (!sorteio) return { cartas: c, resultado: null };
     const antes = R.tem(c);
-    c.eventos[chave] = { em, carta: sorteio.carta, raridade: sorteio.raridade };
+    c.eventos[chave] = visto ? { em, carta: sorteio.carta, raridade: sorteio.raridade, visto: em } : { em, carta: sorteio.carta, raridade: sorteio.raridade };
     const tem = R.tem(c);
     const info = R.carta(sorteio.carta);
     const a = lerIndice().find((x) => x.id === info.album);
@@ -310,24 +311,31 @@
   // A chave do baú leva a geração do "Zerar" (zeradoEm): depois de zerar, ler de novo e abrir o
   // mesmo baú paga um novo sorteio.
   R.chaveDoBau = (numero, e) => 'bau:dia:' + numero + ((e || {}).zeradoEm ? '@' + e.zeradoEm : '');
-  // Paga o que está pendente, na ordem: as cartas especiais que foram lançadas, os baús abertos
-  // sem carta (do dia menor para o maior), as fontes que saem do estado ou do servidor e o marco
-  // dos álbuns que ficaram completos (numa fusão, por exemplo). Devolve o estado novo das cartas e
-  // a lista do que foi pago agora.
-  R.emDia = (e, { dono = '', em = Date.now(), quem = null, hoje = '' } = {}) => {
+  // Paga o que está pendente, na ordem: as cartas especiais que foram lançadas, o baú que está sendo
+  // aberto agora (bau: o número do dia), as fontes que saem do estado ou do servidor e o marco dos
+  // álbuns que ficaram completos (numa fusão, por exemplo). A carta de um baú só sai no toque
+  // nele: os baús abertos antes das cartas não são pagos aqui, ficam prontos para abrir na Trilha
+  // (seção 6). O toque anota a carta do baú como vista; se ela já estava paga (sem ter sido vista),
+  // só anota, sem sortear de novo. Devolve o estado novo das cartas, a lista do que foi pago agora
+  // e se algo mudou.
+  R.emDia = (e, { dono = '', em = Date.now(), quem = null, hoje = '', bau = 0 } = {}) => {
     let c = copia(e.cartas);
     const pend = R.pagarPendentes(c, em);
     c = pend.cartas;
     const novos = pend.pagos.slice();
+    let mudou = false;
     let t = em;
-    const pagar = (fonte, chave) => {
-      const r = R.receber(c, fonte, chave, { dono, em: t++, hoje });
+    const pagar = (fonte, chave, visto) => {
+      const r = R.receber(c, fonte, chave, { dono, em: t++, hoje, visto });
       c = r.cartas;
       if (r.resultado && !r.resultado.repetido) novos.push({ fonte, chave, ...r.resultado });
       for (const x of r.extra || []) { novos.push(x); t++; }
     };
-    Object.keys(e.bausAbertos || {}).map((k) => Number(String(k).replace('dia:', ''))).filter((n) => n > 0).sort((x, y) => x - y)
-      .forEach((n) => pagar('bau', R.chaveDoBau(n, e)));
+    if (bau > 0 && (e.bausAbertos || {})['dia:' + bau]) {
+      const chave = R.chaveDoBau(bau, e);
+      const ev = c.eventos[chave];
+      if (ev && ev.carta) { if (!ev.visto) { c.eventos[chave] = { ...ev, visto: em }; mudou = true; } } else pagar('bau', chave, true);
+    }
     for (const [fonte, f] of Object.entries(R.FONTES)) {
       if (!f.ativa || !f.detectar) continue;
       let chaves = [];
@@ -336,23 +344,38 @@
     }
     const tem = R.tem(c);
     for (const a of R.albuns(hoje)) if (!c.eventos['album:' + a.id] && completo(a, tem)) pagar('album', 'album:' + a.id);
-    return { cartas: c, novos };
+    return { cartas: c, novos, mudou: mudou || novos.length > 0 };
+  };
+
+  // As cartas pagas e ainda não vistas, fora as dos baús (que se revelam no toque, na Trilha), da
+  // mais antiga para a mais nova: a fila que se revela uma vez, uma depois da outra, na próxima
+  // abertura de um baú ou do álbum (seção 6).
+  R.naoVistas = (cartas) => Object.entries(copia(cartas).eventos)
+    .filter(([k, ev]) => ev.carta && !ev.visto && fonteDe(k) !== 'bau')
+    .sort((a, b) => a[1].em - b[1].em || (a[0] < b[0] ? -1 : 1)).map(([k]) => k);
+  // Anota como vistas (a data mais antiga fica, na fusão).
+  R.marcarVistas = (cartas, chaves, em = Date.now()) => {
+    const c = copia(cartas);
+    let mudou = false;
+    for (const k of chaves) if (c.eventos[k] && c.eventos[k].carta && !c.eventos[k].visto) { c.eventos[k] = { ...c.eventos[k], visto: em }; mudou = true; }
+    return { cartas: c, mudou };
   };
 
   // ---------- ponte com o app ----------
   // Paga o pendente e grava. As cartas que não vêm do baú (marcos, convite, célula...) aparecem
   // numa revelação quando nada está aberto na tela; senão, e para os baús antigos, um aviso curto.
   // A tela do baú pede { calado: true }: ela mesma revela a carta do baú dela (e o marco junto).
-  CC.cartasEmDia = ({ calado = false } = {}) => {
+  // bau: o baú que está sendo aberto agora (o toque na tela do baú).
+  CC.cartasEmDia = ({ calado = false, bau = 0 } = {}) => {
     const E = CC.estado();
-    const r = R.emDia(E, { dono: E.dono || '', em: Date.now(), quem: CC.quem || null, hoje: CC.hojeIso() });
-    if (!r.novos.length) return r;
+    const r = R.emDia(E, { dono: E.dono || '', em: Date.now(), quem: CC.quem || null, hoje: CC.hojeIso(), bau });
+    if (!r.mudou) return r;
     CC.gravar('cartas', r.cartas);
-    if (calado) return r;
+    if (calado || !r.novos.length) return r;
     const cartas = r.novos.filter((x) => x.carta && x.fonte !== 'bau');
     const calmo = !document.querySelector('.tela-cheia, .cortina, .licao:not(.saindo)');
     if (cartas.length && calmo && CC.pedirCartas) {
-      CC.pedirCartas().then(() => CC.album.revelarNovas(cartas), () => CC.avisar('Carta nova no seu álbum.'));
+      CC.pedirCartas().then(() => CC.album.revelarFila(), () => CC.avisar('Carta nova no seu álbum.'));
       return r;
     }
     const n = r.novos.filter((x) => x.carta).length;

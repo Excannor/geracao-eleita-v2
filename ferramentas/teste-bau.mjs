@@ -370,18 +370,70 @@ try {
   await esperar('!window.__antes && !!(window.CC && CC.telaBau && CC.estado().dono === "leitora0")', 20000);
   await dormir(1200);
   ok(await av('typeof CC.cartas === "undefined" && typeof CC.album === "undefined"'), 'na Trilha, a arte e o álbum não foram pedidos');
-  await av('window.__regras = window.CARTAS_REGRAS; window.CARTAS = "sem-arte.js"; window.ALBUM_CARTAS = "sem-album.js"; window.CARTAS_REGRAS = "sem-regra.js"; true');
+  await av('window.__pecas = [window.CARTAS_REGRAS, window.CARTAS, window.ALBUM_CARTAS]; window.CARTAS = "sem-arte.js"; window.ALBUM_CARTAS = "sem-album.js"; window.CARTAS_REGRAS = "sem-regra.js"; true');
   const chave = await av('"bau:dia:21" + (CC.estado().zeradoEm ? "@" + CC.estado().zeradoEm : "")');
   await av('CC.telaBau(21)');
   await esperar('!!' + q('[data-abrir-bau]'));
   await av(q('[data-abrir-bau]') + '.click()');
   const reserva = await esperar('!!' + q('.tela-bau .versiculo-do-bau'), 8000);
-  ok(reserva && /vai para o seu álbum/.test(await texto('.tela-bau')), 'sem as peças, o baú abre com o versículo e avisa que a carta vai para o álbum');
-  ok(await av('!!CC.estado().bausAbertos["dia:21"]'), 'o baú fica aberto');
-  await av('document.querySelector("[data-guardar]").click(); window.CARTAS_REGRAS = window.__regras; true');
+  ok(reserva && /sai quando ele abrir com internet/.test(await texto('.tela-bau')), 'sem as peças, o baú abre com o versículo e avisa que a carta sai quando ele abrir com internet');
+  ok(await av('!!CC.estado().bausAbertos["dia:21"] && !CC.bauAberto(21)'), 'o versículo fica guardado, e o baú segue pronto na Trilha até a carta ser vista');
+  await av('document.querySelector("[data-guardar]").click(); [window.CARTAS_REGRAS, window.CARTAS, window.ALBUM_CARTAS] = window.__pecas; true');
   await dormir(3200);
-  await av('CC.acertarCartas()');
-  ok(await esperar('!!CC.estado().cartas.eventos[' + JSON.stringify(chave) + ']', 8000), 'quando a regra carrega, a carta do baú chega ao estado');
+  await av('CC.acertarCartas(true)');
+  await dormir(1500);
+  ok(await av('!CC.estado().cartas.eventos[' + JSON.stringify(chave) + '] && !CC.bauAberto(21)'),
+    'quando a regra carrega, a carta do baú não é paga calada: o baú do dia 21 continua para abrir');
+  await av('CC.telaBau(21)');
+  await esperar('!!document.querySelector(".tela-bau .rv-bau")', 8000);
+  await tocarBau();
+  await terminar('.tela-bau');
+  ok(await esperar('!!' + q('.tela-bau .album-fim .carta-viva'), 8000) && await av('!!(CC.estado().cartas.eventos[' + JSON.stringify(chave) + '] || {}).visto && CC.bauAberto(21)'),
+    'o toque no baú pronto revela e paga a carta; aí ele conta como aberto');
+  await av('document.querySelector(".tela-bau [data-continuar]").click()');
+  await esperar('!document.querySelector(".tela-bau")');
+
+  // ---------- baús abertos antes das cartas (a conta como o servidor a tem desde antes delas) ----------
+  // Três baús abertos e nenhuma carta: voltam prontos na Trilha, com o "Abrir"; nada é pago calado;
+  // tocar num deles faz a revelação e paga; depois de recarregar, ele fica aberto e os outros, prontos.
+  const hojeLocal = await av('CC.hojeIso()');
+  const cookie2 = await criar('antigo0');
+  const lidos21 = Array.from({ length: 21 }, (_, i) => i + 1);
+  const antigo = { dono: 'antigo0', atualizadoEm: Date.now() - 86400000, dia: 22, lidos: lidos21, marcadoEm: Object.fromEntries(lidos21.map((n) => [n, hojeLocal])),
+    bausAbertos: { 'dia:7': { em: '2026-10-01' }, 'dia:14': { em: '2026-10-08' }, 'dia:21': { em: '2026-10-15' } } };
+  ok((await fetch(base + 'api/estado', { method: 'PUT', headers: { 'content-type': 'application/json', cookie: cookie2 }, body: JSON.stringify(antigo) })).ok,
+    'a conta antiga: 21 dias lidos e os baús 7, 14 e 21 abertos antes das cartas');
+  await cmd('Page.navigate', { url: base + 'privacidade.html' });
+  await esperar('document.readyState === "complete"');
+  await av('localStorage.clear(); true');
+  const [nome2, ...resto2] = cookie2.split('=');
+  await cmd('Network.setCookie', { name: nome2, value: resto2.join('='), url: base });
+  await cmd('Page.navigate', { url: base + '#/' });
+  ok(await esperar('!!(window.CC && CC.estado().dono === "antigo0" && CC.estado().bausAbertos["dia:21"])', 20000), 'o app abre com a conta antiga');
+  const prontos = '[...document.querySelectorAll(".no-bau.pronto")].map((b) => b.dataset.bau).join()';
+  await esperar(prontos + ' === "7,14,21"', 8000);
+  await dormir(3500);
+  ok(await av(prontos + ' === "7,14,21" && document.querySelectorAll(".balao-bau").length === 3 && !document.querySelector(".no-bau.aberto")'),
+    'na Trilha, os três baús antigos estão prontos, com três balões "Abrir" (' + await av(prontos) + ')');
+  ok(await av('!Object.keys(CC.estado().cartas.eventos).length && !document.querySelector(".tela-cheia")'), 'nenhuma carta foi paga calada na abertura do app');
+  ok(await av('(document.querySelector("[aria-current=step]") || {}).dataset?.dia === "22" && scrollY > 0'), 'a Trilha rola até o dia de hoje, como sempre');
+  await av('document.querySelector(".no-bau.pronto[data-bau=\\"14\\"]").click()');
+  ok(await esperar('!!document.querySelector(".tela-bau .rv-bau")', 8000) && await av(baus('.tela-bau') + ' === 1'), 'tocar no baú 14 da Trilha abre a tela dele, com um baú só');
+  await tocarBau();
+  ok(await esperar('!!' + q('.tela-bau .rv .carta-viva'), 8000), 'o toque faz a revelação');
+  await terminar('.tela-bau');
+  ok(await esperar('!!' + q('.tela-bau .album-fim .carta-viva'), 8000) && /Nova! Você tem 1 de 13 em/.test(await av(legenda('.tela-bau'))), 'e a carta aparece: "' + await av(legenda('.tela-bau')) + '"');
+  ok(await av('Object.keys(CC.estado().cartas.eventos).join() === "bau:dia:14" && !!CC.estado().cartas.eventos["bau:dia:14"].visto'), 'pagou a carta do baú 14, uma só, já vista');
+  await av('document.querySelector(".tela-bau [data-continuar]").click()');
+  await esperar('!document.querySelector(".tela-bau")');
+  await dormir(2500);
+  await cmd('Page.reload');
+  await esperar('!!(window.CC && CC.estado().dono === "antigo0" && !!document.querySelector(".no-bau"))', 20000);
+  await dormir(3500);
+  ok(await av(prontos + ' === "7,21" && [...document.querySelectorAll(".no-bau.aberto")].map((b) => b.dataset.bau).join() === "14" && document.querySelectorAll(".balao-bau").length === 2'),
+    'depois de recarregar, o baú 14 fica aberto e o 7 e o 21 seguem prontos');
+  const doServidor = await (await fetch(base + 'api/estado', { headers: { cookie: cookie2 } })).json();
+  ok(Object.keys(doServidor.cartas.eventos).join() === 'bau:dia:14' && doServidor.cartas.eventos['bau:dia:14'].visto > 0, 'no servidor, a carta do baú 14 e a marca de vista, e nada mais');
 } catch (e) {
   falhas++;
   console.log('  FALHA o teste parou: ' + (e && e.message));

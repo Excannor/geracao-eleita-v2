@@ -753,8 +753,8 @@
 
   CC.sincronizar(true).then(async () => {
     CC.migrarEstado();
-    // as cartas pendentes (baús abertos antes das cartas, marcos, convites): docs/cartas.md
-    CC.acertarCartas();
+    // as cartas pendentes (marcos, convites): docs/cartas.md
+    CC.acertarCartas(true);
     CC.guardarConquistas();
     const quem = CC.quem;
     if (quem && quem.comSenha) {
@@ -839,7 +839,7 @@
       .then(() => Promise.all([CC.carregarAmigos(), CC.carregarNovidades(), CC.carregarDiscipulado ? CC.carregarDiscipulado() : null]))
       // A folha do alto da trilha também: o "já leu hoje" muda com a meia-noite e com a
       // leitura dos amigos enquanto o app estava em segundo plano.
-      .then(() => { pintarTopo(); pintarNavegacao(); if (CC.repintarQuemLeu) CC.repintarQuemLeu(); CC.acertarCartas(); });
+      .then(() => { pintarTopo(); pintarNavegacao(); if (CC.repintarQuemLeu) CC.repintarQuemLeu(); CC.acertarCartas(true); });
   });
 
   if (location.protocol.startsWith('http')) {

@@ -102,17 +102,24 @@
     const eventos = {};
     for (const [k, v] of Object.entries(ev).slice(0, MAX_EVENTOS)) {
       if (!CHAVE_EVENTO.test(k) || !v || typeof v !== 'object') continue;
-      if (typeof v.carta === 'string' && ID_CARTA.test(v.carta) && VERSOES.includes(v.raridade)) eventos[k] = { em: ms(v.em), carta: v.carta, raridade: v.raridade };
+      // visto: quando a carta foi revelada (o baú só conta como aberto na Trilha com ela vista)
+      if (typeof v.carta === 'string' && ID_CARTA.test(v.carta) && VERSOES.includes(v.raridade)) eventos[k] = { em: ms(v.em), carta: v.carta, raridade: v.raridade, ...(ms(v.visto) ? { visto: ms(v.visto) } : {}) };
       else if (v.pendente) eventos[k] = { em: ms(v.em), pendente: 1 };
     }
     return { eventos };
   }
   CC.limparCartas = limparCartas;
+  const semVisto = (v) => JSON.stringify({ ...v, visto: undefined });
   function fundirCartas(a, b) {
     const eventos = { ...limparCartas(a).eventos };
     for (const [k, y] of Object.entries(limparCartas(b).eventos)) {
       const x = eventos[k];
-      if (!x || (x.pendente && y.carta) || (!(y.pendente && x.carta) && (y.em < x.em || (y.em === x.em && JSON.stringify(y) < JSON.stringify(x))))) eventos[k] = y;
+      const ganha = !x || (x.pendente && y.carta) || (!(y.pendente && x.carta) && (y.em < x.em || (y.em === x.em && semVisto(y) < semVisto(x))));
+      // a carta vista: vale a data mais antiga dos dois lados
+      const visto = Math.min(...[x && x.visto, y.visto].filter((v) => v > 0));
+      const z = ganha ? { ...y } : { ...x };
+      delete z.visto;
+      eventos[k] = z.carta && Number.isFinite(visto) ? { ...z, visto } : z;
     }
     return { eventos };
   }

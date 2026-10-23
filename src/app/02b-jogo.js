@@ -167,7 +167,22 @@
   // ler, e não um brinde avulso. A referência de cada dia já existe em CC.reflexaoDoDia.
   CC.temBau = (numero) => numero % 7 === 0;
   CC.chaveBau = (numero) => 'dia:' + numero;
-  CC.bauAberto = (numero, e) => !!(est(e).bausAbertos || {})[CC.chaveBau(numero)];
+  // O baú só conta como aberto na Trilha quando a carta dele foi vista (docs/cartas.md, seção 6):
+  // os baús abertos antes das cartas, e os que tiveram a carta paga sem revelação, voltam a ficar
+  // prontos para abrir. bausAbertos não muda (a fusão por união traria tudo de volta): o que decide
+  // é o livro-caixa das cartas. Um evento sem a marca, de antes dela, conta como visto quando a
+  // carta foi paga no mesmo dia em que o baú abriu (a tela do baú paga no toque; o pagamento
+  // calado dos baús antigos veio depois).
+  CC.chaveCartaDoBau = (numero, e) => 'bau:dia:' + numero + (est(e).zeradoEm ? '@' + est(e).zeradoEm : '');
+  CC.cartaDoBauVista = (numero, e) => {
+    const s = est(e);
+    const ev = ((s.cartas || {}).eventos || {})[CC.chaveCartaDoBau(numero, s)];
+    if (!ev || !ev.carta) return false;
+    if (ev.visto) return true;
+    const bau = (s.bausAbertos || {})[CC.chaveBau(numero)];
+    return !!bau && ev.em > 0 && bau.em === CC.isoDe(new Date(ev.em));
+  };
+  CC.bauAberto = (numero, e) => !!(est(e).bausAbertos || {})[CC.chaveBau(numero)] && CC.cartaDoBauVista(numero, e);
 
   // Qual versículo cabe ao baú do dia N, entre os sete dias que ele fecha. A escolha é
   // fixa para cada baú (deriva só do número), por dois motivos: reabrir a tela mostra o
@@ -207,11 +222,12 @@
   // só os pedidos e a contagem por álbum (o esqueleto do catálogo está em window.CARTAS_INDICE).
   CC.pedirCartas = () => Promise.all([CC.pedirPeca(window.CARTAS_REGRAS, () => !!CC.cartasRegras),
     CC.pedirPeca(window.CARTAS, () => !!CC.cartas), CC.pedirPeca(window.ALBUM_CARTAS, () => !!CC.album)]);
-  // Paga o que estiver pendente (baús antigos, marcos, convites): na abertura, na volta ao app e
-  // a cada troca de tela, no máximo a cada 3 s.
+  // Paga o que estiver pendente (marcos, convites; os baús, só no toque): na abertura, na volta
+  // ao app e a cada troca de tela, no máximo a cada 3 s. agora: sem esperar os 3 s (depois da
+  // sincronização da abertura, que chega logo depois da primeira tela e antes era engolida).
   let acertadoEm = 0;
-  CC.acertarCartas = () => {
-    if (Date.now() - acertadoEm < 3000 || !window.CARTAS_REGRAS) return;
+  CC.acertarCartas = (agora) => {
+    if ((!agora && Date.now() - acertadoEm < 3000) || !window.CARTAS_REGRAS) return;
     acertadoEm = Date.now();
     CC.pedirPeca(window.CARTAS_REGRAS, () => !!CC.cartasEmDia).then(() => CC.cartasEmDia(), () => {});
   };

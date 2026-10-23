@@ -23,6 +23,13 @@
   const melhor = (versoes) => ORDEM.slice().reverse().find((v) => (versoes || {})[v]) || '';
   const menosMovimento = () => CC.semMovimento && CC.semMovimento();
   const estado = () => CC.estado().cartas || { eventos: {} };
+  // A fila das cartas pagas e ainda não vistas (fora as dos baús), e a marca de vista, que vai no
+  // evento e viaja com a fusão (docs/cartas.md, seção 6).
+  const filaNaoVista = () => R().naoVistas(estado()).map(resultadoDe);
+  const marcarVista = (chave) => {
+    const m = R().marcarVistas(estado(), [chave]);
+    if (m.mudou) CC.gravar('cartas', m.cartas);
+  };
 
   // ---------- a carta para a arte ----------
   // O objeto que a peça de arte recebe: os campos dela (album com o nome, total, sabia, ref,
@@ -153,6 +160,8 @@
     el.classList.add('com-revelacao');
     const lerX = () => (typeof x === 'function' ? x() : x);
     const x0 = lerX();
+    // a carta fica vista quando a revelação começa; no baú que espera o toque, é o toque que marca
+    if (abrir === 'ja' && x0.chave) marcarVista(x0.chave);
     const carta = paraArte(x0.carta, x0.raridade);
     const texto = legenda(x0);
     const ler = () => { location.hash = CC.hrefDoVerso(carta.ref); };
@@ -225,9 +234,10 @@
       tem: doMesmo.filter((y) => r.tem[y.id]).length, total: doMesmo.length };
   }
 
-  // No baú (03-trilha.js): a carta que o baú pagou e, em seguida, na mesma tela, o que mais foi pago
-  // junto (outros: o sorteio de marco do álbum que ele completou, um marco de unidade...).
-  function revelarNoBau(el, palco, { chave, ref, fechar, outros = [] }) {
+  // No baú (03-trilha.js): a carta que o baú pagou e, em seguida, na mesma tela, as cartas ainda não
+  // vistas (o sorteio de marco do álbum que ele completou, um marco de unidade, as que foram pagas
+  // sem revelação), uma depois da outra.
+  function revelarNoBau(el, palco, { chave, ref, fechar }) {
     const ev = estado().eventos[chave];
     if (!ev || !ev.carta) return false;
     const r = R().resumo(estado());
@@ -238,7 +248,7 @@
     const x = { carta: ev.carta, raridade: ev.raridade, nova: copias[0].chave === chave, versaoNova: desta[0].chave === chave, copias: desta.length,
       tem: doMesmo.filter((y) => r.tem[y.id]).length, total: doMesmo.length,
       completou: estado().eventos['album:' + c.album] && copias[0].chave === chave && doMesmo.every((y) => r.tem[y.id]) ? c.album : '' };
-    const fila = outros.filter((y) => y.carta && estado().eventos[y.chave]).map((y) => resultadoDe(y.chave));
+    const fila = filaNaoVista();
     const proxima = () => {
       const y = fila.shift();
       if (!y) { fechar(); CC.redesenhar(); return; }
@@ -262,17 +272,18 @@
     montarRevelacao(el, palco, () => (estado().eventos[chave] ? resultadoDe(chave) : previsto), {
       ref, abrir: 'toque', titulo, aoContinuar: proxima,
       antes: () => {
-        const pago = guardar();
-        fila = pago.novos.filter((y) => y.chave !== chave && y.fonte !== 'bau' && y.carta && estado().eventos[y.chave]).map((y) => resultadoDe(y.chave));
+        guardar();
+        fila = filaNaoVista();
         const ev = estado().eventos[chave];
         if (ev && ev.carta === previsto.carta && ev.raridade === previsto.raridade) return true;
-        setTimeout(() => revelarNoBau(el, palco, { chave, ref, fechar, outros: pago.novos.filter((y) => y.chave !== chave && y.fonte !== 'bau') }));
+        setTimeout(() => revelarNoBau(el, palco, { chave, ref, fechar }));
         return false;
       },
     });
   }
 
-  // As cartas de outras fontes, uma depois da outra.
+  // As cartas de outras fontes, uma depois da outra (cada uma fica vista ao aparecer).
+  const revelarFila = () => revelarNovas(filaNaoVista());
   function revelarNovas(lista) {
     const fila = lista.slice();
     if (!fila.length || document.querySelector('.tela-cheia')) return;
@@ -349,6 +360,8 @@
     raiz.querySelectorAll('[data-carta]').forEach((b) => { b.onclick = () => abrirCarta(b.dataset.carta); });
     raiz.querySelector('[data-pode-vir]').onclick = oQuePodeVir;
     if (CC.ligarVoltarDoTopo) CC.ligarVoltarDoTopo(raiz);
+    // as cartas pagas e ainda não vistas aparecem agora, uma vez
+    revelarFila();
   }
 
   // ---------- a carta grande ----------
@@ -422,5 +435,5 @@
     });
   }
 
-  CC.album = { CATALOGO, tela, abrirCarta, oQuePodeVir, revelarNoBau, bauDaRevelacao, revelarNovas, paraArte, temArte };
+  CC.album = { CATALOGO, tela, abrirCarta, oQuePodeVir, revelarNoBau, bauDaRevelacao, revelarNovas, revelarFila, paraArte, temArte };
 })(window.CC);

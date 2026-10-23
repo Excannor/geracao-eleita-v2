@@ -321,7 +321,8 @@ longo prazo; hoje são 6 cartas). 300 contas com 4 álbuns e 100 com 8, ao longo
 
 `E.cartas = { eventos }`, o livro-caixa:
 
-- `eventos[chave] = { em, carta, raridade }` quando o evento pagou uma carta;
+- `eventos[chave] = { em, carta, raridade, visto? }` quando o evento pagou uma carta; `visto` é
+  quando a carta foi revelada (seção 6);
 - `eventos[chave] = { em, pendente: 1 }` quando o evento foi alcançado mas a carta dele (especial)
   ainda não tem desenho; vira carta quando ela for lançada.
 
@@ -330,7 +331,8 @@ cópia**, com id próprio (a chave do evento), origem (a fonte) e data. O númer
 contagem. Isso deixa trocas possíveis no futuro (seção 19): uma cópia tem identidade.
 
 Fusão (`fundirCartas`, em `02-estado.js`, a mesma no servidor): união por chave, em que vale o
-registro mais antigo de cada chave, e o evento que já pagou a carta vence o que ainda esperava.
+registro mais antigo de cada chave, e o evento que já pagou a carta vence o que ainda esperava; a
+marca `visto` passa de um lado para o outro e vale a mais antiga (fora do desempate).
 Assim nada é contado duas vezes (o mesmo baú aberto em dois aparelhos é uma chave só), nenhuma
 cópia se perde, e o resultado de cada evento fica para sempre. `limparCartas` confere a forma de
 tudo que chega: chaves num alfabeto curto, carta e raridade conhecidas, números, no máximo 2.000
@@ -340,22 +342,49 @@ com a versão antiga, que manda o estado sem `cartas`, não as apaga.
 | Função | Teste |
 |---|---|
 | `limparCartas(x)` | teste.mjs: chave inválida, carta ou raridade estranha e campos a mais saem; o alcançado fica; teto de 2.000 |
-| `fundirCartas(a, b)` | teste.mjs: mesmo resultado nos dois sentidos; o baú do dia 14 nos dois aparelhos conta uma vez; fundir de novo não duplica; o evento pago vence o anotado |
+| `fundirCartas(a, b)` | teste.mjs: mesmo resultado nos dois sentidos; o baú do dia 14 nos dois aparelhos conta uma vez; fundir de novo não duplica; o evento pago vence o anotado; a marca `visto` de um lado só ou dos dois, a mais antiga; dois aparelhos abrindo o mesmo baú dão uma cópia só |
 | `R.copias`, `R.tem` | teste.mjs: três eventos de uma carta dão Bronze ×2 e Ouro ×1, uma repetida, cópias com id, origem e data |
 | `fundir` (02-estado) leva `cartas` | teste.mjs: na fusão com um aparelho que zerou, as cartas dos dois lados ficam; aparelho antigo sem cartas não as apaga |
-| `/api/estado` | teste.mjs (servidor do cofre): as cartas gravam e voltam, a de convite não confirmada não entra, o aparelho sem cartas não as apaga |
+| `/api/estado` | teste.mjs (servidor do cofre): as cartas gravam e voltam, a de convite não confirmada não entra, o aparelho sem cartas não as apaga, a marca `visto` grava e volta |
 
-## 6. Baús abertos antes das cartas
+## 6. A carta do baú só sai no baú (dono, 23/10)
 
-Na abertura do app, na volta do segundo plano e a cada troca de tela (no máximo a cada 3 s,
-`CC.acertarCartas`), a regra carrega e `CC.cartasEmDia` paga o que está pendente: cada baú de
-`E.bausAbertos` sem evento no livro-caixa, do dia menor para o maior. O versículo guardado do baú
-não muda.
+A carta de um baú só aparece abrindo o baú. Na versão de 22/10, `CC.acertarCartas` pagava calado
+os baús abertos antes das cartas (no máximo um aviso curto), e a chamada logo depois da
+sincronização da abertura era engolida pelo intervalo de 3 s: quem abria o app e ficava na Trilha
+não recebia nada, e quem trocava de tela recebia as cartas sem revelação.
 
-| Teste |
-|---|
-| teste.mjs: baú antigo ganha a carta (a primeira em Prata) e o versículo não muda; de novo, nada é pago |
-| teste-bau: com as peças bloqueadas, o baú abre com o versículo; quando a regra carrega, a carta chega |
+- **Um baú conta como aberto na Trilha só com a carta dele vista** (`CC.bauAberto` em
+  `02b-jogo.js`, pelo livro-caixa: `CC.cartaDoBauVista`). `bausAbertos` não muda (a fusão por união
+  traria tudo de volta) e o versículo guardado também não. Os baús abertos antes das cartas, e os
+  que tiveram a carta paga calada em 22/10, voltam a ficar prontos: em madeira, com o balão
+  "Abrir", como o baú de hoje.
+- **O toque paga** (`CC.cartasEmDia({ bau: numero })`, `R.emDia(e, { bau })`): sem evento, sorteia
+  e grava a carta já com `visto`; com a carta paga e não vista, só anota `visto` e revela a mesma
+  carta, sem sortear de novo. `R.emDia` sem `bau` não paga baú nenhum.
+- Evento de antes da marca (22/10) sem `visto` conta como visto quando a carta foi paga no mesmo
+  dia em que o baú abriu: é o baú aberto pela tela de revelação. O pagamento calado dos baús
+  antigos veio dias depois da abertura deles.
+- **As outras fontes** (marcos, convite, célula...) pagam como antes, e a carta fica sem `visto`
+  até aparecer. As não vistas formam uma fila (`R.naoVistas`, da mais antiga para a mais nova),
+  revelada uma vez, uma depois da outra: na abertura do álbum, no fim da revelação de um baú e,
+  quando nada está aberto na tela, logo depois de pagas. Cada uma fica vista quando a revelação
+  começa (`R.marcarVistas`). Nas de antes da marca não há como saber se já apareceram: aparecem
+  uma vez.
+- A sincronização da abertura e a volta do segundo plano chamam `CC.acertarCartas(true)`, sem o
+  intervalo.
+- Sem as peças (sem rede), o baú abre com o versículo e "A carta deste baú sai quando ele abrir
+  com internet."; ele segue pronto na Trilha até a carta ser vista.
+- Muitos baús antigos (20, por exemplo) ficam prontos, cada um com o seu momento; a Trilha mostra
+  os da unidade aberta, como sempre (redesenho em cerca de 13 ms com 140 dias e 20 baús).
+
+| Função | Teste |
+|---|---|
+| `CC.bauAberto`, `CC.cartaDoBauVista` | teste.mjs: baú antigo sem evento fica pronto; com a carta paga calada, também; de antes da marca, paga no dia da abertura, conta como vista; depois de zerar, a geração nova ainda não tem carta |
+| `R.emDia(e, { bau })` | teste.mjs: sem `bau` não paga baú; o toque paga só aquele baú, já visto, a primeira em Prata, e o versículo não muda; abrir de novo não paga; a carta paga calada é revelada sem sortear de novo |
+| `R.naoVistas`, `R.marcarVistas` | teste.mjs: fora os baús e as pendentes, da mais antiga para a mais nova; marcar tira da fila |
+| conta antiga no navegador | teste-bau: três baús abertos antes das cartas voltam prontos, com três "Abrir"; nada é pago na abertura do app; a Trilha rola até hoje; tocar no 14 revela e paga uma carta só, vista; recarregado, o 14 fica aberto e o 7 e o 21 prontos; o servidor tem a carta e a marca |
+| reserva sem peças | teste-bau: o versículo e o aviso; quando a regra carrega, nada é pago calado; o toque no baú revela e paga |
 
 ## 7. Zerar progresso e recomeçar a Trilha
 
@@ -373,13 +402,13 @@ marcos não têm geração: o Zerar não os faz pagar de novo.
 Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
 
 - **No baú**: a tela pede as três peças (regra, arte e álbum) assim que abre. Com elas prontas
-  antes do toque, a tela prevê a carta do baú (`CC.cartasRegras.emDia` num estado com o baú
-  aberto; o sorteio é determinístico) e troca o baú da Trilha pelo baú da arte, no mesmo lugar:
+  antes do toque, a tela prevê a carta do baú (`CC.cartasRegras.emDia(..., { bau })` num estado com
+  o baú aberto; o sorteio é determinístico; se a carta já estava paga e não vista, é ela) e troca o baú da Trilha pelo baú da arte, no mesmo lugar:
   `CC.album.bauDaRevelacao(el, palco, { previsto, chave, ref, fechar, guardar, titulo })`, que
   chama `CC.cartas.revelar(alvo, carta, { raridade, legenda, abrir: 'toque', largura, aoLer })`.
   Na tela fica um elemento de baú só, com "Um baú na estrada!" abaixo do "Pular".
 - **O toque** (ou "Pular" antes dele) guarda o baú uma vez: `CC.abrirBau`, a vibração e
-  `CC.cartasEmDia`, que paga a carta. Se a carta paga não for a prevista (outro aparelho pagou
+  `CC.cartasEmDia({ bau })`, que paga a carta (ou anota a já paga como vista). Se a carta paga não for a prevista (outro aparelho pagou
   antes, por exemplo), a revelação recomeça já aberta com a carta paga (`revelarNoBau`). A arte
   faz o resto sem troca de tela: a tampa abre com a luz na cor da raridade, a carta sobe, vira e
   brilha. "Pular" vai direto ao fim.
@@ -399,12 +428,12 @@ Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
 - **Peças ainda não prontas no toque**: o baú da Trilha balança enquanto espera, até 2,5 s, e a
   revelação segue já aberta.
 - **Sem as peças** (sem rede na primeira vez): a tela de sempre, com o confete e o versículo, e
-  "A carta deste baú vai para o seu álbum." A carta chega quando a regra carregar (seção 6).
+  "A carta deste baú sai quando ele abrir com internet." O baú segue pronto na Trilha (seção 6).
 - **Outras fontes e marcos**: quando `CC.cartasEmDia` paga carta de outra fonte e nada está aberto
   na tela, `CC.album.revelarNovas` mostra uma revelação depois da outra, com a origem acima da
   legenda ("Primeiros passos completos", "Amigos que chegaram pelo seu convite") e, no marco,
   "Marco: 100 dias de leitura", "Marco: unidade 3 completa", "Marco: Objetos completo". Com algo
-  aberto, e para os baús antigos, um aviso curto: "Carta nova no seu álbum." ou "3 cartas novas no
+  aberto, um aviso curto: "Carta nova no seu álbum." ou "3 cartas novas no
   seu álbum."
 
 | Função | Teste |
@@ -415,7 +444,7 @@ Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
 | `CC.album.revelarNoBau(el, palco, { chave, ref, fechar, outros })` | caminho de reserva (peças chegando depois do toque, ou carta paga diferente da prevista); sem teste de navegador próprio, a legenda e o fim são os mesmos de `bauDaRevelacao` |
 | `legenda(x)` | teste-bau: nova, repetida ("Repetida: agora você tem 3 de Davi e a funda (Prata)") e versão nova ("Nova versão Ouro de Davi e a funda") |
 | `CC.album.revelarNovas(lista)` | teste-bau: a prática sem erro revela a carta com a origem; os marcos de 100 dias e das 3 unidades, cada um com Prata, Ouro ou Glória e "Marco: ..." |
-| reserva sem peças | teste-bau: o versículo e o aviso; quando a regra carrega, a carta chega |
+| reserva sem peças | teste-bau: o versículo e o aviso; o baú segue pronto e o toque, com as peças, revela e paga |
 
 ## 9. Álbum, carta grande e "O que pode vir"
 
@@ -523,7 +552,7 @@ zerar (seção 11), com "Ajuste da versão 5, 22 de outubro de 2026" no históri
 
 - `index.html`: a fusão e a forma (02-estado.js), os pedidos e a contagem por álbum (02b-jogo.js),
   a tela do baú, a entrada do Perfil, a casca do álbum e o esqueleto do catálogo. A folga do
-  index.html continua acima de 60 KB (teste.mjs): 67,3 KB.
+  index.html continua acima de 60 KB (teste.mjs): 66,5 KB.
 - Peças: `cartas-regras` (a regra, cerca de 14 KB), `album` (catálogo, telas e estilo, cerca de
   42 KB) e `cartas` (a arte, cerca de 150 KB), pedidas só quando servem.
 

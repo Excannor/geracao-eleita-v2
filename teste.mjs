@@ -1564,13 +1564,51 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
 {
   const estado = (extra) => ({ ...CC.normalizarEstado({}), dono: 'ana', ...extra });
   const e1 = estado({ bausAbertos: { 'dia:14': { em: '2026-03-14', ref: 'Gênesis 50.20' }, 'dia:7': { em: '2026-03-07', ref: 'Gênesis 12.3' } } });
-  const r1 = RC.emDia(e1, { dono: 'ana', em: 100 });
-  checar(r1.novos.map((x) => x.chave).join() === 'bau:dia:7,bau:dia:14' && r1.novos[0].raridade === 'prata' && e1.bausAbertos['dia:7'].ref === 'Gênesis 12.3',
-    'baú aberto antes das cartas ganha a carta (do dia menor para o maior) e o versículo dele não muda');
-  checar(!RC.emDia({ ...e1, cartas: r1.cartas }, { dono: 'ana', em: 200 }).novos.length, 'em dia de novo, nada mais é pago');
+  // baús abertos antes das cartas: nada é pago calado; cada um volta a ficar pronto e paga no toque
+  checar(!RC.emDia(e1, { dono: 'ana', em: 100 }).novos.length && !CC.bauAberto(7, e1) && !CC.bauAberto(14, e1) && !!e1.bausAbertos['dia:7'],
+    'baú aberto antes das cartas não é pago calado: fica pronto para abrir de novo (bausAbertos não muda)');
+  const r1 = RC.emDia(e1, { dono: 'ana', em: 100, bau: 7 });
+  const e1b = { ...e1, cartas: r1.cartas };
+  checar(r1.novos.map((x) => x.chave).join() === 'bau:dia:7' && r1.novos[0].raridade === 'prata' && r1.cartas.eventos['bau:dia:7'].visto === 100 && e1.bausAbertos['dia:7'].ref === 'Gênesis 12.3',
+    'o toque no baú antigo paga a carta dele, só dele, já vista, e o versículo não muda');
+  checar(CC.bauAberto(7, e1b) && !CC.bauAberto(14, e1b), 'com a carta vista, o baú fica aberto na Trilha; o outro continua pronto');
+  const r1c = RC.emDia(e1b, { dono: 'ana', em: 200, bau: 7 });
+  checar(!r1c.novos.length && !r1c.mudou && RC.copias(r1c.cartas).length === 1, 'abrir de novo o mesmo baú não paga outra vez');
+  // a carta paga calada (versão de 22/10), sem ter sido vista: o baú volta a ficar pronto e o toque revela a mesma carta
+  const calado = { 'bau:dia:14': { em: Date.parse('2026-10-22T15:00:00'), carta: 'mar-vermelho', raridade: 'bronze' } };
+  const e1d = { ...e1b, cartas: { eventos: { ...r1.cartas.eventos, ...calado } } };
+  checar(!CC.bauAberto(14, e1d), 'baú com a carta paga calada, sem revelação, fica pronto para abrir');
+  const r1d = RC.emDia(e1d, { dono: 'ana', em: 300, bau: 14 });
+  checar(!r1d.novos.length && r1d.mudou && r1d.cartas.eventos['bau:dia:14'].carta === 'mar-vermelho' && r1d.cartas.eventos['bau:dia:14'].visto === 300
+    && RC.copias(r1d.cartas).length === 2 && CC.bauAberto(14, { ...e1d, cartas: r1d.cartas }), 'e o toque revela a mesma carta, sem sortear de novo nem pagar duas vezes');
+  // de antes da marca: paga no mesmo dia em que o baú abriu (a tela do baú de 22/10) conta como vista
+  const hojeE = { ...estado({ bausAbertos: { 'dia:21': { em: '2026-10-22' } } }), cartas: { eventos: { 'bau:dia:21': { em: Date.parse('2026-10-22T15:00:00'), carta: 'poco-jaco', raridade: 'linho' } } } };
+  checar(CC.bauAberto(21, hojeE), 'evento de antes da marca, pago no dia em que o baú abriu, conta como visto');
+  // dois aparelhos abrem o mesmo baú: um evento só, e a marca mais antiga
+  const a1 = RC.emDia(e1, { dono: 'ana', em: 500, bau: 14 }).cartas;
+  const a2 = RC.emDia(e1, { dono: 'ana', em: 600, bau: 14 }).cartas;
+  const a12 = CC.fundirCartas(a1, a2);
+  checar(RC.copias(a12).length === 1 && a12.eventos['bau:dia:14'].visto === 500 && JSON.stringify(a12) === JSON.stringify(CC.fundirCartas(a2, a1)),
+    'dois aparelhos abrindo o mesmo baú: uma cópia só na fusão, com a marca mais antiga, nos dois sentidos');
+  // a marca de vista: limpa, funde por união e vale a mais antiga
+  const semMarca = { eventos: { 'bau:dia:7': { em: 10, carta: 'mana', raridade: 'linho' } } };
+  const comMarca = { eventos: { 'bau:dia:7': { em: 10, carta: 'mana', raridade: 'linho', visto: 40 } } };
+  const outraMarca = { eventos: { 'bau:dia:7': { em: 10, carta: 'mana', raridade: 'linho', visto: 30 } } };
+  checar(CC.fundirCartas(semMarca, comMarca).eventos['bau:dia:7'].visto === 40 && CC.fundirCartas(comMarca, semMarca).eventos['bau:dia:7'].visto === 40
+    && CC.fundirCartas(comMarca, outraMarca).eventos['bau:dia:7'].visto === 30 && CC.fundirCartas(outraMarca, comMarca).eventos['bau:dia:7'].visto === 30,
+    'a marca de vista passa na fusão (de um lado só ou dos dois), e vale a mais antiga');
+  checar(CC.limparCartas({ eventos: { 'bau:dia:7': { em: 1, carta: 'mana', raridade: 'linho', visto: 'x' }, 'bau:dia:8': { em: 1, carta: 'mana', raridade: 'linho', visto: 9 } } }).eventos['bau:dia:7'].visto === undefined
+    && CC.limparCartas({ eventos: { 'bau:dia:8': { em: 1, carta: 'mana', raridade: 'linho', visto: 9 } } }).eventos['bau:dia:8'].visto === 9
+    && CC.normalizarEstado({ cartas: comMarca }).cartas.eventos['bau:dia:7'].visto === 40, 'a marca inválida sai na limpeza; a boa passa pelo normalizar do servidor');
+  // a fila das não vistas: só fora dos baús, da mais antiga para a mais nova; marcar tira da fila
+  const fila = { eventos: { 'bau:dia:7': { em: 1, carta: 'mana', raridade: 'linho' }, 'dias:100': { em: 5, carta: 'mana', raridade: 'ouro' },
+    'conhecer:14': { em: 3, carta: 'mana', raridade: 'linho' }, 'passos:todos': { em: 2, carta: 'mana', raridade: 'linho', visto: 2 }, 'convite:tier:2': { em: 1, pendente: 1 } } };
+  checar(RC.naoVistas(fila).join() === 'conhecer:14,dias:100' && RC.naoVistas(RC.marcarVistas(fila, ['conhecer:14'], 9).cartas).join() === 'dias:100',
+    'a fila das cartas não vistas: fora as dos baús e as pendentes, da mais antiga para a mais nova; marcar tira da fila');
   const z = estado({ zeradoEm: 5000, cartas: r1.cartas, bausAbertos: { 'dia:7': { em: '2026-04-07', ref: 'Gênesis 12.3' } } });
-  const rz = RC.emDia(z, { dono: 'ana', em: 300 });
-  checar(rz.novos.length === 1 && rz.novos[0].chave === 'bau:dia:7@5000' && RC.copias(rz.cartas).length === 3 && rz.cartas.eventos['bau:dia:7'].carta === r1.cartas.eventos['bau:dia:7'].carta,
+  checar(!CC.bauAberto(7, z), 'depois de zerar, o baú do dia 7 reaberto ainda não tem a carta da geração nova');
+  const rz = RC.emDia(z, { dono: 'ana', em: 300, bau: 7 });
+  checar(rz.novos.length === 1 && rz.novos[0].chave === 'bau:dia:7@5000' && RC.copias(rz.cartas).length === 2 && rz.cartas.eventos['bau:dia:7'].carta === r1.cartas.eventos['bau:dia:7'].carta,
     'depois de zerar (ou recomeçar a Trilha), reabrir o baú do dia 7 paga um sorteio novo, e as cópias de antes ficam como estavam');
   const lidos = Array.from({ length: 100 }, (_, i) => i + 1);
   const e2 = estado({ lidos, conhecidos: Object.fromEntries(Array.from({ length: 14 }, (_, i) => [i + 1, '2026-01-01'])), licoes: D.licoes.slice(),
@@ -3153,6 +3191,10 @@ secao('cofre das anotações (cofre.mjs e servidor)');
       const volta = (await (await pedir('/api/estado', null, ana)).json()).cartas || {};
       checar(volta.eventos && volta.eventos['bau:dia:7'] && volta.eventos['bau:dia:7'].carta === 'mana' && !volta.eventos['convite:tier:1'],
         'no servidor, a carta do baú grava e volta, a de convite que ele não confirma não entra, e o aparelho sem cartas não as apaga');
+      // a marca de vista chega de outro aparelho, passa pela conferência do servidor e volta
+      await pedir('/api/estado', { ...CC.normalizarEstado({}), atualizadoEm: Date.now() + 700, cartas: { eventos: { 'bau:dia:7': { em: 5, carta: 'mana', raridade: 'prata', visto: 77 } } } }, ana, 'PUT');
+      const vista = (await (await pedir('/api/estado', null, ana)).json()).cartas.eventos['bau:dia:7'];
+      checar(vista.visto === 77 && vista.carta === 'mana', 'no servidor, a marca de vista da carta do baú grava e volta, sem trocar a carta');
     }
     const outro = await (await pedir('/api/estado', null, bia)).text();
     checar(!/SEGREDO/.test(outro), 'outra pessoa não obtém o texto');
