@@ -6642,6 +6642,78 @@
     }
     enfeiteDosCantos(k, M.cantos, M.corCanto || M.letra, M.claroCanto || '#fff');
   }
+  // Os raios da glória numa camada à parte, recortada pela luz da arte já pintada em c: alfa =
+  // smoothstep(luminância, 70, 160). Assim o papel recebe os raios inteiros e o escuro, nenhum,
+  // qualquer que seja o tom médio do desenho.
+  function raiosDaGloria(k, c, s, escura) {
+    const A = ARTE_CHEIA;
+    const x0 = Math.floor(A.x * s);
+    const y0 = Math.floor(A.y * s);
+    const w = Math.ceil(A.w * s);
+    const h = Math.ceil(A.h * s);
+    const camada = tela(w, h);
+    const kc = camada.getContext('2d');
+    kc.setTransform(s, 0, 0, s, -x0, -y0);
+    kc.lineCap = 'round';
+    for (let i = 0; i < 72; i++) {
+      const a = Math.PI / 2 + ((i + 0.5) / 72 - 0.5) * 2.6;
+      const g = kc.createLinearGradient(CW / 2, -60, CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
+      g.addColorStop(0, 'rgba(255,244,214,' + (i % 2 ? 0.16 : 0.3) * (escura ? 0.3 : 1) + ')');
+      g.addColorStop(escura ? 0.36 : 0.75, 'rgba(255,244,214,0)');
+      kc.strokeStyle = g;
+      kc.lineWidth = i % 2 ? 2 : 4;
+      kc.beginPath();
+      kc.moveTo(CW / 2, -60);
+      kc.lineTo(CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
+      kc.stroke();
+    }
+    // nas artes claras o clarão some; ali os raios entram como traço de ouro fino (numa segunda
+    // camada, que entra normal, não em screen)
+    const ouro = tela(w, h);
+    const ko = ouro.getContext('2d');
+    if (!escura) {
+      ko.setTransform(s, 0, 0, s, -x0, -y0);
+      ko.globalAlpha = 0.16;
+      ko.strokeStyle = '#b8862a';
+      ko.lineWidth = 1.5;
+      ko.lineCap = 'round';
+      for (let i = 0; i < 72; i += 2) {
+        const a = Math.PI / 2 + ((i + 0.5) / 72 - 0.5) * 2.6;
+        ko.beginPath();
+        ko.moveTo(CW / 2 + Math.cos(a) * 160, -60 + Math.sin(a) * 160);
+        ko.lineTo(CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
+        ko.stroke();
+      }
+    }
+    // a máscara: a luminância da arte já pintada
+    let mascara = null;
+    try {
+      const d = c.getContext('2d').getImageData(x0, y0, w, h);
+      const px = d.data;
+      for (let i = 0; i < px.length; i += 4) {
+        const l = px[i] * 0.3 + px[i + 1] * 0.59 + px[i + 2] * 0.11;
+        const t = Math.max(0, Math.min(1, (l - 70) / 90));
+        px[i] = px[i + 1] = px[i + 2] = 0;
+        px[i + 3] = Math.round(255 * t * t * (3 - 2 * t));
+      }
+      mascara = tela(w, h);
+      mascara.getContext('2d').putImageData(d, 0, 0);
+    } catch (e) { /* sem leitura de pixel: os raios entram sem máscara */ }
+    for (const kk of [kc, ko]) {
+      if (!mascara) break;
+      kk.setTransform(1, 0, 0, 1, 0, 0);
+      kk.globalAlpha = 1;
+      kk.globalCompositeOperation = 'destination-in';
+      kk.drawImage(mascara, 0, 0);
+    }
+    k.save();
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    k.globalCompositeOperation = 'screen';
+    k.drawImage(camada, x0, y0);
+    k.globalCompositeOperation = 'source-over';
+    k.drawImage(ouro, x0, y0);
+    k.restore();
+  }
   function desenharFrente(c, carta) {
     const k = c.getContext('2d');
     const s = c.width / CW;
@@ -6657,43 +6729,17 @@
     k.clip();
     if (M.cheia) {
       porArte(k, ilu, true, foco);
-      // a luz da glória, parada no papel: o clarão no alto e os raios finos, simétricos. Na arte
-      // escura (a noite de Abraão, de Gideão), os raios ficam curtos e fracos, só no alto: no céu
-      // escuro, raio longo vira grade
+      // a luz da glória, parada no papel: o clarão no alto e os raios finos, simétricos. Os raios
+      // são pintados à parte e só ficam onde a arte é clara, pixel a pixel (a máscara de
+      // luminância, de 70 a 160): sobre o escuro (o casco de piche, a cova, a janela, o céu da
+      // noite), raio claro cruza a hachura e vira grade. Na arte escura no todo (a noite de
+      // Abraão, de Gideão), eles ainda ficam curtos e fracos.
       const escura = tom === 'escura';
       k.save();
       k.beginPath();
       k.rect(ARTE_CHEIA.x, ARTE_CHEIA.y, ARTE_CHEIA.w, ARTE_CHEIA.h);
       k.clip();
-      k.save();
-      k.globalCompositeOperation = 'screen';
-      k.lineCap = 'round';
-      for (let i = 0; i < 72; i++) {
-        const a = Math.PI / 2 + ((i + 0.5) / 72 - 0.5) * 2.6;
-        const g = k.createLinearGradient(CW / 2, -60, CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
-        g.addColorStop(0, 'rgba(255,244,214,' + (i % 2 ? 0.16 : 0.3) * (escura ? 0.3 : 1) + ')');
-        g.addColorStop(escura ? 0.36 : 0.75, 'rgba(255,244,214,0)');
-        k.strokeStyle = g;
-        k.lineWidth = i % 2 ? 2 : 4;
-        k.beginPath();
-        k.moveTo(CW / 2, -60);
-        k.lineTo(CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
-        k.stroke();
-      }
-      // nas artes claras o clarão some; ali os raios entram como traço de ouro fino
-      k.save();
-      k.globalAlpha = escura ? 0 : 0.16;
-      k.strokeStyle = '#b8862a';
-      k.lineWidth = 1.5;
-      for (let i = 0; i < 72; i += 2) {
-        const a = Math.PI / 2 + ((i + 0.5) / 72 - 0.5) * 2.6;
-        k.beginPath();
-        k.moveTo(CW / 2 + Math.cos(a) * 160, -60 + Math.sin(a) * 160);
-        k.lineTo(CW / 2 + Math.cos(a) * 1100, -60 + Math.sin(a) * 1100);
-        k.stroke();
-      }
-      k.restore();
-      k.restore();
+      raiosDaGloria(k, c, s, escura);
       brilho(k, CW / 2, 0, 640, 'rgba(255,236,190,.5)', 'screen');
       k.restore();
     }
