@@ -377,7 +377,7 @@
       "voceSabia": "Eram duas tábuas de pedra, escritas pelo dedo de Deus.",
       "link": "#/atlas/exodo",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "serpente-bronze",
@@ -465,7 +465,7 @@
       "voceSabia": "Os pães eram de cevada, e quem os tinha era um rapaz.",
       "link": "#/mapa/joao",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "mar-vermelho",
