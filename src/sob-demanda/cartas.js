@@ -6151,7 +6151,8 @@
     'harpa-davi': desenhoHarpa,
     'manto-elias': desenhoManto,
     'vaso-oleiro': desenhoVaso,
-    'perola': desenhoPerola };
+    'perola': desenhoPerola,
+    'moeda-perdida': desenhoMoeda };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
   // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
   // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
@@ -11767,6 +11768,240 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.stroke();
     }
     vinheta(k, W, H, 0.28);
+  }
+  // ---------- (12) A moeda perdida (Lc 15.8-9) ----------
+  // De noite, rente ao chão de lajes da casa: a lamparina de barro acesa no chão, a vassoura
+  // de ramos deitada ao lado, o pó varrido em arcos e, numa junta entre as lajes, a dracma de
+  // prata achada, de pé e torta, brilhando na luz da lamparina. O escuro da casa é hachura
+  // cruzada no papel; só a roda de luz em volta da lamparina fica clara. Ninguém: a mulher
+  // está só no achado.
+  function desenhoMoeda(k, W, H, obj) {
+    const r = sorteio(8201);
+    papelVelho(k, W, H, r, ['#f6e2b8', '#e2c08a', '#b88a56'], [470, 560]);
+    const luz = [470, 520];
+    const escuro = (x, y) => Math.min(1, Math.hypot((x - luz[0]) / 1.2, (y - luz[1]) * 1.25) / 430);
+    // a parede do fundo (no alto) e o chão em lajes, em perspectiva
+    const hz = 250;
+    const par = new Path2D();
+    par.rect(0, 0, W, hz);
+    linhas(k, 0, 0, W, hz, 3.6, 2.2, (x, y) => 0.55 + escuro(x, y) * 0.6);
+
+    const chao = pol([[-10, hz], [W + 10, hz], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#d8b884';
+    k.fill(chao);
+    // as lajes: juntas que fogem para um ponto de fuga alto e as juntas de través, mais juntas longe
+    const fuga = [470, -260];
+    const juntasY = [hz, 296, 356, 436, 540, 676, 860];
+    const linhaFuga = (xb, y) => fuga[0] + (xb - fuga[0]) * ((y - fuga[1]) / (H - fuga[1]));
+    // o tom do chão: linhas deitadas, mais grossas longe da luz
+    chaoEmLinhas(k, r, chao, -10, W + 10, hz, H, 2.4, (x, y) => 0.15 + escuro(x, y) * 1.1);
+
+    k.strokeStyle = 'rgba(30,20,8,.75)';
+    k.lineCap = 'round';
+    for (let i = 0; i < juntasY.length - 1; i++) {
+      const y0 = juntasY[i];
+      const y1 = juntasY[i + 1];
+      k.lineWidth = 1.2 + i * 0.4;
+      k.beginPath();
+      k.moveTo(-10, y0 + (r() - 0.5) * 2);
+      k.lineTo(W + 10, y0 + (r() - 0.5) * 2);
+      k.stroke();
+      // juntas de pé, desencontradas por fileira
+      const des = (i % 2) * 0.5;
+      for (let xb = -900 + des * 300; xb < 1800; xb += 300) {
+        const xa = linhaFuga(xb, y0);
+        const xc = linhaFuga(xb, y1);
+        k.beginPath();
+        k.moveTo(xa, y0);
+        k.lineTo(xc + (r() - 0.5) * 3, y1);
+        k.stroke();
+      }
+    }
+    // o pó varrido: arcos de traço fino, de vassoura, e o montinho de pó num canto
+    k.strokeStyle = 'rgba(120,90,50,.55)';
+    k.lineWidth = 1;
+    for (let n = 0; n < 9; n++) {
+      const cx = 170 + n * 26;
+      const cy = 640 + n * 6;
+      for (let f = 0; f < 6; f++) {
+        k.beginPath();
+        k.arc(cx, cy + 200, 200 + f * 3, -Math.PI * 0.62, -Math.PI * 0.38);
+        k.stroke();
+      }
+    }
+    const po = lanoso(r, [[90, 560], [120, 540], [170, 536], [210, 552], [190, 566], [120, 570]], 4, 10);
+    peca(k, po, [90, 536, 210, 570], { cor: '#c8a878', ang: 0.2, passo: 2.2, maxL: 1, sombra: (x, y) => 0.3 + (y - 536) / 80, cruzada: 0.9, traco: 1.2 });
+
+    // o escuro da casa, longe da lamparina: mais duas camadas de hachura cruzada, cerradas
+    const tudo = new Path2D();
+    tudo.rect(0, 0, W, H);
+    // (uma aguada sépia por baixo, e por cima uma só família de linhas, deitadas e de peso
+    // variável, que engrossam até quase fechar; nada de trama cruzada, que vira tela)
+    k.save();
+    const ag = k.createRadialGradient(luz[0], luz[1], 120, luz[0], luz[1], 620);
+    ag.addColorStop(0, 'rgba(40,24,8,0)');
+    ag.addColorStop(1, 'rgba(40,24,8,.6)');
+    k.fillStyle = ag;
+    k.fillRect(0, 0, W, H);
+    k.restore();
+    gravar(k, tudo, W / 2, H / 2, 700, 0.04, 4.2, 3.6, (x, y) => escuro(x, y) * 1.6 - 0.6, '#1e140a', 0);
+    // a vassoura de ramos deitada, do canto da esquerda para a lamparina
+    const cabo = [[-20, 760], [250, 690]];
+    vara(k, cabo, 13, '#8a6a40', obj);
+    k.save();
+    k.translate(250, 690);
+    k.rotate(Math.atan2(-70, 270));
+    k.scale(1.25, 1.25);
+    const feixe = pol([[-6, -12], [40, -18], [150, -34], [170, 0], [150, 38], [40, 18], [-6, 12]]);
+    sombraNoChao(k, feixe, 4, 14, 6, 0.35);
+    k.fillStyle = '#b8955a';
+    k.fill(feixe);
+    marcar(k, obj, feixe);
+    k.strokeStyle = 'rgba(52,32,10,.85)';
+    k.lineCap = 'round';
+    for (let i = 0; i < 46; i++) {
+      const a = (r() - 0.5) * 0.45;
+      const l = 120 + r() * 50;
+      k.lineWidth = 0.8 + r() * 1.2;
+      k.beginPath();
+      k.moveTo(10, (r() - 0.5) * 16);
+      k.quadraticCurveTo(l * 0.5, Math.sin(a) * l * 0.5 + (r() - 0.5) * 6, l, Math.sin(a) * l);
+      k.stroke();
+    }
+    k.strokeStyle = '#24160a';
+    k.lineWidth = 2;
+    k.stroke(feixe);
+    // as amarras de cordão
+    for (const x of [8, 26]) {
+      k.fillStyle = '#d8c09a';
+      k.fillRect(x, -15, 8, 30);
+      k.strokeStyle = '#24160a';
+      k.lineWidth = 1.2;
+      k.strokeRect(x, -15, 8, 30);
+    }
+    k.restore();
+
+    // a lamparina de barro, no chão: o corpo redondo achatado, o bico com a chama, a asa
+    const lx = 0;
+    const ly = 0;
+    k.save();
+    k.translate(440, 540);
+    k.scale(1.55, 1.55);
+    const corpo = new Path2D();
+    corpo.ellipse(lx, ly, 62, 30, 0, 0, 6.283);
+    const bico = pol([[lx + 40, ly - 16], [lx + 96, ly - 8], [lx + 104, ly + 2], [lx + 96, ly + 12], [lx + 40, ly + 18]]);
+    sombraNoChao(k, corpo, -30, 18, 8, 0.4);
+    peca(k, bico, [lx + 40, ly - 16, lx + 104, ly + 18], { cor: '#c4844e', tinta: '#2e1606', ang: 0.2, passo: 2.4, maxL: 1.3, sombra: (x, y) => 0.15 + (y - ly + 16) / 50, cruzada: 0.8, traco: 1.8, obj });
+    peca(k, corpo, [lx - 62, ly - 30, lx + 62, ly + 30], { cor: '#c4844e', tinta: '#2e1606', ang: 0.15, passo: 2.6, maxL: 1.5, sombra: (x, y) => 0.1 + (y - ly + 30) / 70 + (lx - x) / 400, cruzada: 0.75, traco: 2, obj });
+    // o disco de cima, rebaixado, com o furo do azeite (pequeno, fora do centro)
+    k.strokeStyle = 'rgba(46,22,6,.8)';
+    k.lineWidth = 1.4;
+    k.beginPath();
+    k.ellipse(lx - 4, ly - 6, 38, 15, 0, 0, 6.283);
+    k.stroke();
+    k.fillStyle = '#2e1606';
+    k.beginPath();
+    k.ellipse(lx - 10, ly - 6, 6, 3, 0, 0, 6.283);
+    k.fill();
+    // a asa, atrás: uma argola fechada de barro
+    k.strokeStyle = '#2e1606';
+    k.lineWidth = 10;
+    k.beginPath();
+    k.ellipse(lx - 70, ly - 8, 14, 10, -0.3, 0, 6.283);
+    k.stroke();
+    k.strokeStyle = '#c4844e';
+    k.lineWidth = 5.5;
+    k.stroke();
+    // a chama no bico, em traços que afinam
+    const fx = lx + 98;
+    const fy = ly - 6;
+    brilho(k, fx, fy - 30, 160, 'rgba(255,214,140,.35)', 'screen');
+    brilho(k, fx, fy - 26, 70, 'rgba(255,236,190,.5)', 'screen');
+    const ch = chama(fx, fy, 16, 64, 6);
+    k.fillStyle = 'rgba(255,220,130,.95)';
+    k.fill(ch);
+    k.save();
+    k.clip(ch);
+    k.strokeStyle = 'rgba(204,96,26,.85)';
+    k.lineWidth = 1.2;
+    for (let j = -2; j <= 2; j++) { k.beginPath(); k.moveTo(fx + j * 3, fy); k.quadraticCurveTo(fx + j * 2, fy - 30, fx + 6, fy - 64); k.stroke(); }
+    k.restore();
+    k.fillStyle = 'rgba(255,252,236,.95)';
+    k.beginPath();
+    k.ellipse(fx + 1, fy - 18, 4, 10, 0.05, 0, 6.283);
+    k.fill();
+    k.restore();
+
+    // a dracma: um disco de prata grosso, de pé e torto na junta das lajes, à direita e na
+    // frente da lamparina; na face, um ramo de palma estampado; o brilho da chama na beirada
+    const mx = 650;
+    const my = 690;
+    k.save();
+    k.translate(mx, my);
+    k.rotate(-0.28);
+    const raio = 66;
+    const esp = 13;
+    const borda = new Path2D();
+    borda.ellipse(esp, 0, raio * 0.42, raio, 0, -Math.PI / 2, Math.PI / 2);
+    borda.lineTo(0, raio);
+    borda.ellipse(0, 0, raio * 0.42, raio, 0, Math.PI / 2, -Math.PI / 2, true);
+    borda.closePath();
+    const face = new Path2D();
+    face.ellipse(0, 0, raio * 0.42, raio, 0, 0, 6.283);
+    sombraNoChao(k, face, 26, 12, 6, 0.5);
+    k.fillStyle = '#6e7276';
+    k.fill(borda);
+    k.strokeStyle = '#1c1e20';
+    k.lineWidth = 1.6;
+    k.stroke(borda);
+    // os riscos da serrilha na borda
+    k.save();
+    k.clip(borda);
+    k.strokeStyle = 'rgba(20,22,24,.7)';
+    k.lineWidth = 1;
+    for (let a = -1.4; a < 1.4; a += 0.12) { k.beginPath(); k.moveTo(Math.cos(a) * raio * 0.42, Math.sin(a) * raio); k.lineTo(Math.cos(a) * raio * 0.42 + esp, Math.sin(a) * raio); k.stroke(); }
+    k.restore();
+    const gm = k.createLinearGradient(-raio * 0.42, -raio, raio * 0.42, raio);
+    gm.addColorStop(0, '#f6f7f2');
+    gm.addColorStop(0.45, '#c9ccc8');
+    gm.addColorStop(1, '#8a8e90');
+    k.fillStyle = gm;
+    k.fill(face);
+    k.strokeStyle = '#1c1e20';
+    k.lineWidth = 2;
+    k.stroke(face);
+    // o ramo de palma estampado (a haste e as folhinhas), achatado pela perspectiva
+    k.save();
+    k.scale(0.42, 1);
+    k.strokeStyle = 'rgba(40,42,44,.85)';
+    k.lineWidth = 2.2;
+    k.beginPath();
+    k.moveTo(0, raio * 0.7);
+    k.quadraticCurveTo(-4, 0, 2, -raio * 0.7);
+    k.stroke();
+    k.lineWidth = 1.6;
+    for (let t = -0.55; t < 0.6; t += 0.18) {
+      const y = t * raio;
+      k.beginPath();
+      k.moveTo(0, y);
+      k.lineTo(-14 - (0.6 - Math.abs(t)) * 10, y - 10);
+      k.moveTo(0, y);
+      k.lineTo(14 + (0.6 - Math.abs(t)) * 10, y - 10);
+      k.stroke();
+    }
+    k.beginPath();
+    k.arc(0, 0, raio * 0.86, 0, 6.283);
+    k.setLineDash([3, 4]);
+    k.stroke();
+    k.setLineDash([]);
+    k.restore();
+    k.restore();
+    const mF = new Path2D();
+    mF.ellipse(mx + 4, my, raio * 0.6, raio * 1.05, -0.28, 0, 6.283);
+    marcar(k, obj, mF);
+    // o brilho: uma estrelinha de luz na beirada que olha para a chama
+    estrelinha(k, mx - 16, my - 46, 22, 'rgba(255,250,230,.95)');
+    vinheta(k, W, H, 0.3);
   }
   // ---------- fim dos Objetos ----------
 
