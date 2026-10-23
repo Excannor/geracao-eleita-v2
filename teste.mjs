@@ -1518,7 +1518,11 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
   const r = RC.resumo(c);
   const nLancadas = CATALOGO.cartas.filter((x) => x.lancada && !CATALOGO.albuns.find((a) => a.id === x.album).especial).length;
   checar(soLancadas && r.lancadas === nLancadas && r.cartas === nLancadas, 'carta não lançada nunca sai (340 sorteios, comuns e de marco, só as ' + nLancadas + ' lançadas, todas recebidas)');
-  checar(r.albuns.every((a) => !a.completo) && !Object.keys(c.eventos).some((k) => k.startsWith('album:')), 'nenhum álbum completa enquanto as 13 não forem lançadas e estiverem na coleção');
+  // só pode completar o álbum que tem as 13 lançadas (lido do catálogo); os outros, nunca
+  const albunsInteiros = new Set(CATALOGO.albuns.filter((a) => !a.especial && CATALOGO.cartas.filter((x) => x.album === a.id && x.lancada).length === 13).map((a) => a.id));
+  const completos = Object.keys(c.eventos).filter((k) => k.startsWith('album:')).map((k) => k.slice(6));
+  checar(r.albuns.every((a) => !a.completo || albunsInteiros.has(a.id)) && completos.every((id) => albunsInteiros.has(id)),
+    'nenhum álbum completa enquanto as 13 não forem lançadas e estiverem na coleção (inteiros hoje: ' + ([...albunsInteiros].join(', ') || 'nenhum') + ')');
   // a próxima a lançar: a primeira carta ainda não lançada de um álbum comum (lida do catálogo)
   const proxima = CATALOGO.cartas.find((x) => !x.lancada && !CATALOGO.albuns.find((a) => a.id === x.album).especial);
   const comNoe = ESQ_HOJE.map((a) => (a.id === proxima.album ? { ...a, c: a.c.replace('~' + proxima.id, proxima.id) } : a));
