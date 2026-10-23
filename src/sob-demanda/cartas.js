@@ -6184,6 +6184,8 @@
     // Milagres
     'mana': desenhoMana, 'agua-rocha': desenhoAguaRocha, 'muralhas-jerico': desenhoMuralhas,
     'fogo-carmelo': desenhoFogoCarmelo, 'machado-flutua': desenhoMachado, 'fornalha': desenhoFornalha,
+    'jonas-peixe': desenhoJonas, 'tempestade': desenhoTempestade, 'pesca': desenhoPesca,
+    'agua-vinho': desenhoAguaVinho,
     // Lugares
     'jardim-eden': desenhoEden, 'montes-ararate': desenhoArarate, 'betel': desenhoBetel, 'monte-sinai': desenhoSinai,
     'rio-jordao': desenhoJordao, 'jerusalem': desenhoJerusalem, 'babilonia': desenhoBabilonia, 'ninive': desenhoNinive,
@@ -14307,6 +14309,854 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.fillStyle = 'rgba(255,220,150,.95)';
     for (let i = 0; i < 70; i++) { const x = cx + (r() - 0.5) * 560; const y = 120 + r() * 300; k.beginPath(); k.arc(x, y, 0.7 + r() * 1.6, 0, 6.283); k.fill(); }
     vinheta(k, W, H, 0.35);
+  }
+  // ---------- (8) Jonas e o grande peixe (Jn 1.15-17, 2.3-6) ----------
+  // Visto de fora, em corte: em cima, o mar que acaba de se aquietar (1.15), de ondas longas, e o
+  // navio pequeno indo embora no horizonte; embaixo da linha d'água, o fundo verde-escuro do
+  // mar, e o grande peixe descendo, enorme, de boca fechada, entre as algas (2.5) e as pedras
+  // do fundo (2.6). Ninguém desenhado: Jonas está dentro do peixe (1.17).
+  function desenhoJonas(k, W, H, obj) {
+    const r = sorteio(9801);
+    papelVelho(k, W, H, r, ['#f4eedb', '#e0d6b8', '#bfb08c'], [640, 80]);
+    const hz = 150;
+    const nivel = 262;
+    // o céu que limpa: linhas ralas, mais cheias à esquerda (a tempestade que vai embora)
+    linhas(k, 0, 0, W, hz, 4.6, 1.5, (x, y) => 0.12 + Math.max(0, (400 - x) / 600) * 0.6 + (1 - y / hz) * 0.15);
+    // o navio, pequeno, indo embora: o casco, o mastro e a vela cheia
+    {
+      const nx = 690;
+      const ny = hz + 4;
+      const casco = pol([[nx - 40, ny - 10], [nx + 44, ny - 12], [nx + 30, ny + 2], [nx - 30, ny + 2]]);
+      k.fillStyle = '#3a2a1a';
+      k.fill(casco);
+      vara(k, [[nx, ny - 10], [nx + 2, ny - 62]], 2.4, '#5a4026');
+      const vela = pol([[nx - 22, ny - 58], [nx + 26, ny - 60], [nx + 30, ny - 20], [nx - 20, ny - 18]]);
+      peca(k, vela, [nx - 22, ny - 62, nx + 30, ny - 18], { cor: '#efe2c0', ang: 1.4, passo: 2.6, maxL: 1, sombra: (x) => 0.2 + (x - nx + 20) / 100, cruzada: 1, traco: 1.4 });
+      marcar(k, obj, casco);
+      marcar(k, obj, vela);
+    }
+    // o mar de cima: ondas longas e mansas, já sem espuma
+    const sup = pol([[-10, hz], [W + 10, hz], [W + 10, nivel], [-10, nivel]]);
+    k.fillStyle = '#c8c3a6';
+    k.fill(sup);
+    k.save();
+    k.clip(sup);
+    k.strokeStyle = SEPIA;
+    k.lineCap = 'round';
+    for (let y = hz + 3; y < nivel; y += 2.4 + (y - hz) * 0.05) {
+      const t = (y - hz) / (nivel - hz);
+      let x = -20 - r() * 40;
+      while (x < W + 20) {
+        const c = (40 + r() * 90) * (0.5 + t);
+        k.lineWidth = 0.6 + t * 1.6;
+        k.beginPath();
+        k.moveTo(x, y);
+        k.quadraticCurveTo(x + c / 2, y - 2 - t * 6, x + c, y);
+        k.stroke();
+        x += c + 6 + r() * 26;
+      }
+    }
+    k.restore();
+    // a linha d'água do corte, ondulada, clara
+    const ondaN = (x) => nivel + Math.sin(x * 0.018) * 8 + Math.sin(x * 0.051 + 1) * 3;
+    // o fundo do mar: verde-escuro, mais fundo embaixo, em linhas deitadas
+    const fundo = pol([[-10, ondaN(-10)], ...Array.from({ length: 46 }, (_, i) => [i * 20 - 6, ondaN(i * 20 - 6)]), [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#3d4a40';
+    k.fill(fundo);
+    marcar(k, obj, fundo);
+    k.save();
+    k.clip(fundo);
+    linhas(k, 0, nivel - 10, W, H, 3.4, 1.6, (x, y) => 0.25 + (y - nivel) / 700, 'rgba(14,22,18,.9)');
+    // os feixes de luz que descem da superfície, retos e ralos, que somem no fundo
+    for (let i = 0; i < 9; i++) {
+      const x0 = 80 + i * 92 + (r() - 0.5) * 40;
+      const p = pol([[x0, nivel], [x0 + 26, nivel], [x0 + 110, H], [x0 + 60, H]]);
+      k.save();
+      k.filter = 'blur(6px)';
+      k.fillStyle = 'rgba(200,220,190,.12)';
+      k.fill(p);
+      k.restore();
+    }
+    // as pedras do fundo (a base das montanhas, 2.6), escuras, e as algas compridas que sobem
+    const fundoY = (x) => 770 + Math.sin(x * 0.012) * 24 + Math.sin(x * 0.04) * 8;
+    const chao = pol([[-10, fundoY(-10)], ...Array.from({ length: 46 }, (_, i) => [i * 20 - 6, fundoY(i * 20 - 6)]), [W + 10, H + 10], [-10, H + 10]]);
+    peca(k, chao, [-10, 720, W + 10, H + 10], { cor: '#2c342c', tinta: '#0a0e0a', ang: 0.2, passo: 3, maxL: 1.8, sombra: () => 0.75, cruzada: 0.6, traco: 2 });
+    for (const [x, y, s0] of [[90, 770, 46], [250, 790, 34], [600, 780, 52], [780, 760, 40], [430, 800, 30]]) {
+      const p = seixo(r, x, y, s0, s0 * 0.6, 0, 0.16);
+      peca(k, p, [x - s0, y - s0, x + s0, y + s0], { cor: '#3c463a', tinta: '#0a0e0a', ang: 0.6, passo: 3, maxL: 1.6, sombra: sombraOval(x, y, s0, s0 * 0.6, 0), cruzada: 0.7, traco: 1.8 });
+    }
+    const alga = (x, base, alto, fase) => {
+      k.strokeStyle = 'rgba(80,98,62,.95)';
+      k.lineCap = 'round';
+      k.lineWidth = 3.4;
+      k.beginPath();
+      for (let t = 0; t <= 1.0001; t += 0.04) {
+        const xx = x + Math.sin(t * 5 + fase) * 16 * t;
+        const yy = base - t * alto;
+        if (t === 0) k.moveTo(xx, yy); else k.lineTo(xx, yy);
+      }
+      k.stroke();
+      for (let t = 0.12; t < 1; t += 0.11) {
+        const xx = x + Math.sin(t * 5 + fase) * 16 * t;
+        const yy = base - t * alto;
+        const ld = (t * 9) % 2 > 1 ? 1 : -1;
+        const fl = new Path2D();
+        fl.moveTo(xx, yy);
+        fl.quadraticCurveTo(xx + ld * 18, yy - 4, xx + ld * 26, yy - 18);
+        fl.quadraticCurveTo(xx + ld * 8, yy - 10, xx, yy);
+        k.fillStyle = 'rgba(96,114,70,.9)';
+        k.fill(fl);
+        k.strokeStyle = 'rgba(20,28,14,.9)';
+        k.lineWidth = 1;
+        k.stroke(fl);
+      }
+    };
+    for (const [x, a, f] of [[60, 260, 0], [130, 200, 1.4], [320, 150, 2.2], [690, 220, 0.6], [760, 300, 2.9], [830, 180, 1.1]]) alga(x, fundoY(x) + 4, a, f);
+    k.restore();
+    // a linha d'água: o traço claro da superfície vista de lado
+    k.strokeStyle = 'rgba(240,238,220,.9)';
+    k.lineWidth = 2.4;
+    k.beginPath();
+    for (let x = -10; x <= W + 10; x += 6) { const y = ondaN(x); if (x === -10) k.moveTo(x, y); else k.lineTo(x, y); }
+    k.stroke();
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.2;
+    k.beginPath();
+    for (let x = -10; x <= W + 10; x += 6) { const y = ondaN(x) + 3; if (x === -10) k.moveTo(x, y); else k.lineTo(x, y); }
+    k.stroke();
+    // o grande peixe: enorme, de lado, descendo para a esquerda, de corpo alto como o de uma
+    // garoupa: a cabeça grande, a boca comprida e fechada (o queixo um pouco para fora), as
+    // costas escuras e a barriga clara, as escamas, as barbatanas de raios e a cauda em leque
+    k.save();
+    k.translate(470, 520);
+    k.rotate(-0.13);
+    k.translate(-470, -520);
+    const perfil = curvaPor([[140, 520], [170, 470], [230, 428], [320, 398], [430, 384], [540, 392], [640, 420], [720, 452], [770, 470], [772, 500], [726, 520], [640, 560], [530, 604], [420, 626], [310, 620], [230, 596], [176, 568], [150, 548], [140, 520]], 3);
+    const peixe = pol(perfil.map((q) => [q.x, q.y]));
+    // uma barbatana: a membrana clara entre a base (no corpo) e a beirada, e os raios finos que
+    // vão de uma à outra, sem se cruzar
+    const barb = (base, borda, cor = '#7c846c') => {
+      const p = pol([...base, ...borda.slice().reverse()]);
+      k.fillStyle = cor;
+      k.fill(p);
+      marcar(k, obj, p);
+      const cb = curvaPor(base, 2);
+      const ce = curvaPor(borda, 2);
+      k.strokeStyle = 'rgba(12,16,10,.8)';
+      k.lineWidth = 1.2;
+      for (let t = 0; t <= 1.0001; t += 1 / 12) {
+        const qa = cb[Math.round(t * (cb.length - 1))];
+        const qb = ce[Math.round(t * (ce.length - 1))];
+        k.beginPath();
+        k.moveTo(qa.x, qa.y);
+        k.quadraticCurveTo((qa.x + qb.x) / 2 + 4, (qa.y + qb.y) / 2, qb.x, qb.y);
+        k.stroke();
+      }
+      k.strokeStyle = '#0c100a';
+      k.lineWidth = 2;
+      k.beginPath();
+      ce.forEach((q, i) => (i ? k.lineTo(q.x, q.y) : k.moveTo(q.x, q.y)));
+      k.stroke();
+    };
+    // a cauda, a barbatana das costas e a de baixo, atrás do corpo
+    barb([[756, 470], [764, 486], [758, 502]], [[820, 392], [850, 440], [836, 488], [852, 540], [818, 584]]);
+    barb([[340, 402], [440, 386], [540, 392], [640, 420], [700, 446]], [[352, 352], [430, 328], [520, 334], [610, 372], [690, 428]]);
+    barb([[540, 600], [600, 580], [660, 556]], [[560, 650], [620, 640], [670, 576]]);
+    k.fillStyle = '#727a66';
+    k.fill(peixe);
+    marcar(k, obj, peixe);
+    k.save();
+    k.clip(peixe);
+    // o tom: escuro nas costas, claro na barriga, em linhas que acompanham o corpo
+    gravar(k, peixe, 460, 510, 340, -0.05, 3.2, 2.4, (x, y) => 0.95 - (y - 390) / 230 * 0.9, '#10140c', 0.25);
+    gravar(k, peixe, 460, 510, 340, 0.9, 4.6, 1.6, (x, y) => 0.75 - (y - 390) / 200, '#10140c', 0);
+    // as escamas, em fileiras desencontradas, do corpo para trás (não na cabeça)
+    k.strokeStyle = 'rgba(14,18,12,.7)';
+    k.lineWidth = 1.1;
+    for (let x = 330; x < 760; x += 15) {
+      const fila = Math.round(x / 15) % 2;
+      for (let y = 390 + fila * 7; y < 630; y += 14) {
+        k.beginPath();
+        k.arc(x, y, 8, Math.PI * 0.6, Math.PI * 1.4);
+        k.stroke();
+      }
+    }
+    // as manchas de garoupa nas costas
+    for (let i = 0; i < 26; i++) {
+      k.fillStyle = 'rgba(20,24,16,.45)';
+      k.beginPath();
+      k.ellipse(300 + r() * 420, 410 + r() * 90, 6 + r() * 10, 4 + r() * 6, 0, 0, 6.283);
+      k.fill();
+    }
+    k.restore();
+    // a linha do lado
+    k.strokeStyle = 'rgba(232,228,200,.65)';
+    k.lineWidth = 1.6;
+    k.beginPath();
+    k.moveTo(300, 440);
+    k.bezierCurveTo(420, 420, 600, 440, 760, 486);
+    k.stroke();
+    k.strokeStyle = '#0c100a';
+    k.lineWidth = 2.8;
+    k.stroke(peixe);
+    // a tampa da guelra
+    k.lineWidth = 2.4;
+    k.beginPath();
+    k.moveTo(300, 404);
+    k.bezierCurveTo(334, 470, 330, 560, 290, 616);
+    k.stroke();
+    k.lineWidth = 1.4;
+    k.beginPath();
+    k.moveTo(278, 414);
+    k.bezierCurveTo(306, 470, 302, 550, 268, 606);
+    k.stroke();
+    // a boca: comprida e fechada, quase reta, caindo um pouco para trás; o queixo de baixo
+    // passa um pouco da de cima
+    k.lineWidth = 2.6;
+    k.beginPath();
+    k.moveTo(142, 528);
+    k.bezierCurveTo(170, 534, 210, 542, 248, 552);
+    k.stroke();
+    k.lineWidth = 1.6;
+    k.beginPath();
+    k.moveTo(150, 546);
+    k.quadraticCurveTo(190, 560, 236, 566);
+    k.stroke();
+    // a narina e o olho, redondo e pequeno, sem sobrancelha
+    k.fillStyle = '#0c100a';
+    k.beginPath();
+    k.arc(186, 486, 3, 0, 6.283);
+    k.fill();
+    k.fillStyle = '#cbbd86';
+    k.beginPath();
+    k.arc(232, 468, 11, 0, 6.283);
+    k.fill();
+    k.lineWidth = 2;
+    k.stroke();
+    k.fillStyle = '#0a0c08';
+    k.beginPath();
+    k.arc(230, 469, 6, 0, 6.283);
+    k.fill();
+    // a barbatana do peito, por cima do corpo
+    barb([[330, 514], [340, 540], [352, 560]], [[400, 520], [440, 556], [432, 594]], '#6a7460');
+    k.restore();
+    // as bolhas que sobem da guelra, poucas e de tamanhos diferentes
+    for (let i = 0; i < 10; i++) {
+      const x = 296 + (r() - 0.5) * 24 + i * 3;
+      const y = 380 - i * 22 - r() * 8;
+      if (y < nivel + 12) break;
+      k.strokeStyle = 'rgba(224,232,214,.85)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.arc(x, y, 2 + r() * 5, 0, 6.283);
+      k.stroke();
+    }
+    vinheta(k, W, H, 0.24);
+  }
+
+  // ---------- (9) A tempestade acalmada (Mc 4.37-39) ----------
+  // De dentro do barco, olhando para a popa, logo depois da ordem "Aquiete-se!": o mar liso
+  // como espelho até o horizonte e as nuvens da tempestade se desfazendo para os lados. No
+  // barco, a água que entrou ainda no fundo (4.37), os remos largados, um balde de couro e, na
+  // popa, a almofada (4.38), com a dobra de quem dormiu. Ninguém desenhado.
+  function desenhoTempestade(k, W, H, obj) {
+    const r = sorteio(9901);
+    papelVelho(k, W, H, r, ['#f6f0dc', '#e2d8b8', '#bcae88'], [444, 260]);
+    const hz = 330;
+    // o céu: claro no meio, onde abre; as nuvens pesadas indo embora pelos lados e por cima,
+    // em massas gravadas (hachura cruzada), de beirada rasgada e clara do lado da luz
+    linhas(k, 0, 0, W, hz, 5, 1.2, (x, y) => 0.06 + Math.min(1, Math.hypot(x - 444, (y - 300) * 1.4) / 600) * 0.45);
+    // cada nuvem é um punhado de bolos sobrepostos, feita só de hachura (sem contorno): mais
+    // escura embaixo e para fora, a beirada do lado da luz deixada no papel
+    const nuvem = (cx, cy, rx, ry) => {
+      const p = new Path2D();
+      for (let i = 0; i < 9; i++) p.addPath(seixo(r, cx + (r() - 0.5) * rx * 1.5, cy + (r() - 0.5) * ry * 0.8, rx * (0.3 + r() * 0.3), ry * (0.4 + r() * 0.3), (r() - 0.5) * 0.15, 0.1));
+      const fora = (x) => Math.min(1, Math.abs(x - 444) / 420);
+      gravar(k, p, cx, cy, Math.max(rx, ry) * 1.3, 0.12, 3.2, 2.4, (x, y) => 0.25 + fora(x) * 0.6 + (y - cy) / ry * 0.3, '#1e180e', 0.1);
+      gravar(k, p, cx, cy, Math.max(rx, ry) * 1.3, 1.25, 4.4, 1.6, (x, y) => fora(x) * 0.8 + (y - cy) / ry * 0.25 - 0.1, '#1e180e', 0);
+      marcar(k, obj, p);
+    };
+    for (const [cx, cy, rx, ry] of [[60, 70, 300, 80], [830, 60, 300, 76], [10, 200, 200, 46], [880, 190, 200, 50], [260, 6, 260, 44], [640, 10, 240, 40]]) nuvem(cx, cy, rx, ry);
+    // os fiapos que se desfazem no meio do céu
+    k.strokeStyle = 'rgba(60,52,36,.55)';
+    k.lineCap = 'round';
+    for (let i = 0; i < 14; i++) {
+      const lado = i % 2 ? 1 : -1;
+      const x0 = 444 + lado * (180 + r() * 120);
+      const y0 = 60 + r() * 200;
+      k.lineWidth = 2 + r() * 2;
+      k.beginPath();
+      k.moveTo(x0, y0);
+      k.quadraticCurveTo(x0 - lado * 40, y0 + 6, x0 - lado * (70 + r() * 50), y0 + 2);
+      k.stroke();
+    }
+    // o mar liso: linhas longas e finas, quase retas, e o reflexo claro do céu aberto
+    const mar = pol([[-10, hz], [W + 10, hz], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#ddd6bc';
+    k.fill(mar);
+    k.save();
+    k.clip(mar);
+    k.strokeStyle = SEPIA;
+    for (let y = hz + 2; y < H; y += 2.2 + (y - hz) * 0.03) {
+      const t = (y - hz) / (H - hz);
+      let x = -10 - r() * 40;
+      while (x < W + 10) {
+        const c = 160 + r() * 340;
+        const meio = Math.abs(x + c / 2 - 444) < 120;
+        k.lineWidth = (0.4 + t * 1.2) * (meio ? 0.4 : 1);
+        k.beginPath();
+        k.moveTo(x, y);
+        k.lineTo(x + c, y + (r() - 0.5));
+        k.stroke();
+        x += c + 10 + r() * 40;
+      }
+    }
+    k.restore();
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.4;
+    k.beginPath();
+    k.moveTo(-10, hz);
+    k.lineTo(W + 10, hz);
+    k.stroke();
+    // o barco, de dentro: as duas bordas que vêm dos cantos de baixo e se juntam na popa, alta
+    const popa = [444, 352];
+    const bordaE = curvaPor([[-30, 700], [80, 590], [220, 470], [350, 392], [430, 356], [444, 352]], 4);
+    const bordaD = curvaPor([[918, 700], [808, 590], [668, 470], [538, 392], [458, 356], [444, 352]], 4);
+    const fundoB = curvaPor([[-30, 900], [200, 760], [340, 620], [420, 520], [444, 470]], 4);
+    const fundoD = curvaPor([[918, 900], [688, 760], [548, 620], [468, 520], [444, 470]], 4);
+    // o costado por dentro (as tábuas), de cada lado
+    const ladoE = pol([...bordaE.map((q) => [q.x, q.y]), ...fundoB.slice().reverse().map((q) => [q.x, q.y])]);
+    const ladoD = pol([...bordaD.map((q) => [q.x, q.y]), ...fundoD.slice().reverse().map((q) => [q.x, q.y])]);
+    for (const [p, lado] of [[ladoE, -1], [ladoD, 1]]) {
+      k.fillStyle = '#7a5634';
+      k.fill(p);
+      marcar(k, obj, p);
+      k.save();
+      k.clip(p);
+      // as tábuas: linhas que acompanham a borda e correm para a popa
+      for (let j = 1; j < 9; j++) {
+        const t = j / 9;
+        const a = lado < 0 ? bordaE : bordaD;
+        const b = lado < 0 ? fundoB : fundoD;
+        k.strokeStyle = 'rgba(30,16,6,.85)';
+        k.lineWidth = 1.6;
+        k.beginPath();
+        for (let i = 0; i <= 40; i++) {
+          const u = i / 40;
+          const qa = a[Math.round(u * (a.length - 1))];
+          const qb = b[Math.round(u * (b.length - 1))];
+          const x = qa.x + (qb.x - qa.x) * t;
+          const y = qa.y + (qb.y - qa.y) * t;
+          if (i) k.lineTo(x, y); else k.moveTo(x, y);
+        }
+        k.stroke();
+      }
+      gravar(k, p, 444 + lado * 260, 620, 420, lado < 0 ? -0.75 : 0.75, 3.6, 1.4, (x, y) => 0.35 + (y - 400) / 700, '#1e1006', 0);
+      // as cavernas (as costelas do barco), de través
+      for (const u of [0.18, 0.4, 0.62]) {
+        const a = lado < 0 ? bordaE : bordaD;
+        const b = lado < 0 ? fundoB : fundoD;
+        const qa = a[Math.round(u * (a.length - 1))];
+        const qb = b[Math.round(u * (b.length - 1))];
+        vara(k, [[qa.x, qa.y], [qb.x, qb.y]], 16 - u * 14, '#8e6a42');
+      }
+      k.restore();
+    }
+    // o fundo do barco entre os costados, com a água que entrou, rasa, refletindo o céu
+    const piso = pol([...fundoB.map((q) => [q.x, q.y]), ...fundoD.slice().reverse().map((q) => [q.x, q.y]), [918, H + 20], [-30, H + 20]]);
+    k.fillStyle = '#6e4e30';
+    k.fill(piso);
+    marcar(k, obj, piso);
+    k.save();
+    k.clip(piso);
+    gravar(k, piso, 444, 760, 500, 0, 3.6, 1.6, () => 0.6, '#1e1006', 0);
+    for (let x = -20; x < W + 20; x += 54) { k.strokeStyle = 'rgba(30,16,6,.8)'; k.lineWidth = 1.6; k.beginPath(); k.moveTo(444 + (x - 444) * 0.08, 470); k.lineTo(x, H + 20); k.stroke(); }
+    const agua = seixo(r, 444, 690, 230, 52, 0, 0.12);
+    k.fillStyle = 'rgba(150,142,118,.9)';
+    k.fill(agua);
+    k.save();
+    k.clip(agua);
+    k.strokeStyle = 'rgba(43,33,18,.6)';
+    for (let y = 640; y < 750; y += 4.4) { let x = 210 + r() * 30; while (x < 680) { const c = 30 + r() * 90; k.lineWidth = 1; k.beginPath(); k.moveTo(x, y); k.lineTo(x + c, y); k.stroke(); x += c + 10 + r() * 30; } }
+    k.restore();
+    k.strokeStyle = 'rgba(30,16,6,.7)';
+    k.lineWidth = 1.4;
+    k.stroke(agua);
+    k.restore();
+    // as bordas (as falcas), grossas e claras em cima
+    for (const b of [bordaE, bordaD]) {
+      const { forma } = tuboAo(b, (s) => 30 - s * 0.03);
+      k.fillStyle = '#a07a4c';
+      k.fill(forma);
+      gravar(k, forma, 444, 520, 520, 0.6, 3.6, 1.3, (x, y) => 0.3 + (y - 352) / 900, '#1e1006', 0);
+      k.strokeStyle = '#1a0e04';
+      k.lineWidth = 2.2;
+      k.stroke(forma);
+      marcar(k, obj, forma);
+    }
+    // a popa: o banco de trás, alto, e a almofada de couro em cima, com a dobra de quem dormiu
+    const banco = pol([[372, 420], [516, 420], [530, 446], [358, 446]]);
+    peca(k, banco, [358, 418, 530, 448], { cor: '#9a7448', tinta: '#1a0e04', ang: 0.05, passo: 2.8, maxL: 1.4, sombra: (x, y) => 0.3 + (y - 420) / 40, cruzada: 0.8, traco: 2, obj });
+    const frenteBanco = pol([[358, 446], [530, 446], [522, 486], [366, 486]]);
+    peca(k, frenteBanco, [358, 446, 530, 486], { cor: '#6e4e30', tinta: '#1a0e04', ang: 1.5, passo: 3, maxL: 1.6, sombra: () => 0.7, cruzada: 0.7, traco: 2, obj });
+    const alm = new Path2D();
+    alm.moveTo(386, 424);
+    alm.bezierCurveTo(380, 398, 404, 386, 444, 388);
+    alm.bezierCurveTo(484, 386, 508, 396, 504, 424);
+    alm.bezierCurveTo(480, 432, 410, 432, 386, 424);
+    alm.closePath();
+    k.fillStyle = '#8a3e24';
+    k.fill(alm);
+    gravar(k, alm, 444, 410, 70, 0.15, 2.6, 1.3, (x, y) => 0.2 + (y - 388) / 50 + Math.max(0, (x - 444) / 200), '#2a0c04', 0.2);
+    // a cova no meio, onde a cabeça ficou, e as costuras
+    k.strokeStyle = 'rgba(42,12,4,.85)';
+    k.lineWidth = 1.6;
+    k.beginPath();
+    k.moveTo(420, 406);
+    k.quadraticCurveTo(446, 420, 474, 406);
+    k.stroke();
+    k.strokeStyle = 'rgba(255,220,180,.6)';
+    k.lineWidth = 1.4;
+    k.beginPath();
+    k.moveTo(396, 404);
+    k.quadraticCurveTo(420, 392, 452, 392);
+    k.stroke();
+    k.setLineDash([3, 3]);
+    k.strokeStyle = 'rgba(42,12,4,.7)';
+    k.lineWidth = 1;
+    k.beginPath();
+    k.moveTo(390, 420);
+    k.bezierCurveTo(420, 428, 470, 428, 500, 420);
+    k.stroke();
+    k.setLineDash([]);
+    k.strokeStyle = '#2a0c04';
+    k.lineWidth = 2;
+    k.stroke(alm);
+    marcar(k, obj, alm);
+    // o cadaste: a peça alta da popa que sobe e se curva, por trás da almofada
+    vara(k, [[444, 360], [446, 320], [456, 292], [470, 280]], 14, '#8e6a42', obj);
+    // o remo de governo, de lado, e os remos largados no fundo
+    vara(k, [[520, 400], [600, 470], [720, 560]], 12, '#9a7650', obj);
+    vara(k, [[120, 830], [300, 640], [380, 560]], 13, '#a07c52', obj);
+    vara(k, [[620, 846], [560, 700], [530, 600]], 12, '#93704a', obj);
+    // o balde de couro tombado, na água do fundo
+    const balde = seixo(r, 650, 740, 46, 34, -0.3, 0.06);
+    peca(k, balde, [600, 700, 700, 780], { cor: '#5a3a20', tinta: '#140a02', ang: 1.2, passo: 2.8, maxL: 1.6, sombra: (x) => 0.3 + (x - 600) / 140, cruzada: 0.7, traco: 2, obj });
+    const bocaB = new Path2D();
+    bocaB.ellipse(620, 722, 22, 30, -0.3, 0, 6.283);
+    k.fillStyle = '#1e1208';
+    k.fill(bocaB);
+    k.strokeStyle = '#c49a68';
+    k.lineWidth = 2;
+    k.stroke(bocaB);
+    vinheta(k, W, H, 0.22);
+  }
+  // ---------- (10) A pesca maravilhosa (Lc 5.4-7) ----------
+  // De manhã cedo, no meio do lago, visto do alto: os dois barcos lado a lado, tão cheios de
+  // peixe que a água já lambe a borda (5.7), sem mastro nem vela; entre eles, a rede presa nos
+  // dois, um cerco de boias cheio de peixe até a tona, que se rompe em dois lugares, com os
+  // fios soltos e os peixes escapando (5.6). Ninguém desenhado.
+  function desenhoPesca(k, W, H, obj) {
+    const r = sorteio(10001);
+    papelVelho(k, W, H, r, ['#f6f0da', '#e2d8b8', '#c0b08a'], [760, 60]);
+    const hz = 96;
+    linhas(k, 0, 0, W, hz, 4.6, 1.2, (x, y) => 0.1 + Math.min(1, Math.hypot(x - 760, (y - 90) * 1.5) / 700) * 0.45);
+    k.fillStyle = '#b8ac8a';
+    k.fillRect(-10, hz - 5, W + 20, 5);
+    // o lago visto do alto: ondinhas curtas e soltas, mais miúdas longe
+    const lago = pol([[-10, hz], [W + 10, hz], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#d2cfb8';
+    k.fill(lago);
+    k.save();
+    k.clip(lago);
+    k.strokeStyle = SEPIA;
+    k.lineCap = 'round';
+    for (let y = hz + 2; y < H; y += 3 + (y - hz) * 0.022) {
+      const t = (y - hz) / (H - hz);
+      let x = -10 - r() * 40;
+      while (x < W + 10) {
+        const c = (10 + r() * 30) * (0.5 + t);
+        k.lineWidth = 0.5 + t * 1.3;
+        k.beginPath();
+        k.moveTo(x, y);
+        k.quadraticCurveTo(x + c / 2, y - 1.5 - t * 3, x + c, y);
+        k.stroke();
+        x += c + (8 + r() * 30) * (0.5 + t);
+      }
+    }
+    k.restore();
+    const peixinho = (x, y, L, a, tom) => {
+      k.save();
+      k.translate(x, y);
+      k.rotate(a);
+      const p = new Path2D();
+      p.moveTo(-L / 2, 0);
+      p.quadraticCurveTo(-L * 0.1, -L * 0.22, L * 0.3, -L * 0.05);
+      p.lineTo(L / 2, -L * 0.17);
+      p.lineTo(L * 0.42, 0);
+      p.lineTo(L / 2, L * 0.17);
+      p.lineTo(L * 0.3, L * 0.05);
+      p.quadraticCurveTo(-L * 0.1, L * 0.22, -L / 2, 0);
+      p.closePath();
+      k.fillStyle = tom;
+      k.fill(p);
+      k.strokeStyle = 'rgba(20,22,18,.85)';
+      k.lineWidth = Math.max(0.7, L * 0.04);
+      k.stroke(p);
+      k.strokeStyle = 'rgba(255,255,248,.8)';
+      k.lineWidth = Math.max(0.6, L * 0.03);
+      k.beginPath();
+      k.moveTo(-L * 0.3, -L * 0.07);
+      k.quadraticCurveTo(0, -L * 0.13, L * 0.24, -L * 0.05);
+      k.stroke();
+      k.fillStyle = '#141410';
+      k.beginPath();
+      k.arc(-L * 0.36, -L * 0.03, Math.max(0.8, L * 0.035), 0, 6.283);
+      k.fill();
+      k.restore();
+    };
+    const cardume = (forma, x0, y0, x1, y1, n, Lm) => {
+      k.save();
+      k.clip(forma);
+      k.fillStyle = '#a2a89a';
+      k.fill(forma);
+      const ps = [];
+      for (let i = 0; i < n; i++) ps.push([x0 + r() * (x1 - x0), y0 + r() * (y1 - y0), Lm * (0.75 + r() * 0.5), (r() - 0.5) * 3.2]);
+      ps.sort((a, b) => a[1] - b[1]);
+      for (const [x, y, L, a] of ps) peixinho(x, y, L, a, r() < 0.5 ? '#d0d4c8' : '#a8aea2');
+      k.restore();
+    };
+    // um barco visto do alto e de lado: a borda em amêndoa, o costado escuro do lado de cá, o
+    // fundo cheio de peixe até a borda, a água batendo rente
+    const barco = (cx, cy, L, Lw, giro, e) => {
+      k.save();
+      k.translate(cx, cy);
+      k.rotate(giro);
+      const meia = (t) => Math.pow(Math.sin(t * Math.PI), 0.7) * Lw / 2;
+      const borda = new Path2D();
+      for (let i = 0; i <= 40; i++) { const t = i / 40; const x = -L / 2 + t * L; const y = -meia(t); if (i) borda.lineTo(x, y); else borda.moveTo(x, y); }
+      for (let i = 40; i >= 0; i--) { const t = i / 40; borda.lineTo(-L / 2 + t * L, meia(t)); }
+      borda.closePath();
+      // o costado de cá (só uma faixa: o barco está fundo na água)
+      const costado = new Path2D();
+      for (let i = 0; i <= 40; i++) { const t = i / 40; const x = -L / 2 + t * L; if (i) costado.lineTo(x, meia(t)); else costado.moveTo(x, meia(t)); }
+      for (let i = 40; i >= 0; i--) { const t = i / 40; costado.lineTo(-L / 2 + t * L, meia(t) + 14 * e * Math.sin(t * Math.PI)); }
+      costado.closePath();
+      sombraNoChao(k, borda, 10 * e, 22 * e, 10, 0.3);
+      k.fillStyle = '#3a2a1c';
+      k.fill(costado);
+      k.strokeStyle = '#140e08';
+      k.lineWidth = 2;
+      k.stroke(costado);
+      marcar(k, obj, costado);
+      // a falca (a borda grossa de madeira) e o fundo cheio de peixe
+      k.fillStyle = '#8a6a42';
+      k.fill(borda);
+      marcar(k, obj, borda);
+      const dentro = new Path2D();
+      for (let i = 0; i <= 40; i++) { const t = i / 40; const x = -L / 2 + 18 * e + t * (L - 36 * e); const y = -meia(t) * 0.8; if (i) dentro.lineTo(x, y); else dentro.moveTo(x, y); }
+      for (let i = 40; i >= 0; i--) { const t = i / 40; dentro.lineTo(-L / 2 + 18 * e + t * (L - 36 * e), meia(t) * 0.8); }
+      dentro.closePath();
+      cardume(dentro, -L / 2, -Lw / 2, L / 2, Lw / 2, Math.round(240 * e * e), 34 * e);
+      // os bancos de través, quase cobertos de peixe
+      for (const t of [0.3, 0.55, 0.78]) { const x = -L / 2 + t * L; vara(k, [[x, -meia(t) * 0.8], [x + 4, meia(t) * 0.8]], 9 * e, '#9a7650'); }
+      k.strokeStyle = '#140e08';
+      k.lineWidth = 2.4;
+      k.stroke(borda);
+      k.stroke(dentro);
+      // a água batendo rente na borda de cá
+      k.strokeStyle = 'rgba(250,250,240,.85)';
+      k.lineWidth = 1.6;
+      for (let t = 0.08; t < 0.95; t += 0.06) {
+        const x = -L / 2 + t * L;
+        const y = meia(t) + 14 * e * Math.sin(t * Math.PI) + 2;
+        k.beginPath();
+        k.moveTo(x - 10, y);
+        k.quadraticCurveTo(x, y - 4, x + 10, y);
+        k.stroke();
+      }
+      k.restore();
+    };
+    // o barco de lá
+    barco(330, 214, 460, 118, -0.36, 0.8);
+    // a rede: o cerco de boias entre os dois barcos, cheio de peixe até a tona
+    const aro = curvaPor([[190, 360], [340, 300], [560, 296], [724, 340], [800, 450], [744, 556], [560, 604], [350, 576], [200, 500], [180, 420], [190, 360]], 4);
+    const cerco = pol(aro.map((q) => [q.x, q.y]));
+    cardume(cerco, 150, 280, 860, 620, 330, 38);
+    marcar(k, obj, cerco);
+    // a malha por cima dos peixes, com os dois rombos
+    const furos = [[250, 532, 64], [770, 496, 50]];
+    const longe = (x, y) => furos.every(([fx, fy, fr]) => Math.hypot(x - fx, (y - fy) * 1.3) > fr);
+    k.save();
+    k.clip(cerco);
+    k.strokeStyle = 'rgba(30,26,18,.55)';
+    k.lineWidth = 1.1;
+    for (let d = -900; d < 900; d += 19) {
+      for (const sgn of [1, -1]) {
+        k.beginPath();
+        let ini = true;
+        for (let t = 0; t <= 1; t += 0.008) {
+          const x = 100 + t * 760;
+          const y = 300 + sgn * (x - 480) * 0.55 + d * 0.5 + 160;
+          if (!longe(x, y)) { ini = true; continue; }
+          if (ini) { k.moveTo(x, y); ini = false; } else k.lineTo(x, y);
+        }
+        k.stroke();
+      }
+    }
+    k.restore();
+    // os rombos: a água aberta onde a malha se foi, com as ondinhas
+    for (const [fx, fy, fr] of furos) {
+      const h = seixo(r, fx, fy, fr * 0.9, fr * 0.66, 0.2, 0.2);
+      k.save();
+      k.clip(cerco);
+      k.fillStyle = '#d2cfb8';
+      k.fill(h);
+      k.clip(h);
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.2;
+      for (let y = fy - fr; y < fy + fr; y += 6) { let x = fx - fr + r() * 10; while (x < fx + fr) { const c = 10 + r() * 16; k.beginPath(); k.moveTo(x, y); k.quadraticCurveTo(x + c / 2, y - 2, x + c, y); k.stroke(); x += c + 6 + r() * 10; } }
+      k.restore();
+      peixinho(fx - fr * 0.2, fy + 4, 36, 2.6 + r(), '#ccd0c4');
+    }
+    // os fios rompidos em volta dos rombos e os peixes que escapam por eles para a água
+    for (const [fx, fy, fr] of furos) {
+      k.strokeStyle = 'rgba(30,26,18,.9)';
+      k.lineWidth = 1.4;
+      for (let i = 0; i < 18; i++) {
+        const a = (i / 18) * 6.283 + r() * 0.2;
+        const x = fx + Math.cos(a) * fr;
+        const y = fy + Math.sin(a) * fr / 1.3;
+        k.beginPath();
+        k.moveTo(x, y);
+        k.quadraticCurveTo(x - Math.cos(a) * 8 + (r() - 0.5) * 10, y - Math.sin(a) * 6, x - Math.cos(a) * (12 + r() * 12), y - Math.sin(a) * (8 + r() * 8) + 4);
+        k.stroke();
+      }
+    }
+    for (const [x, y, a] of [[180, 580, 2.4], [150, 606, 2.8], [214, 620, 2.0], [812, 500, 0.5], [826, 530, 0.9], [798, 548, 0.2]]) {
+      peixinho(x, y, 40, a, '#ccd0c4');
+      k.strokeStyle = 'rgba(250,250,240,.9)';
+      k.lineWidth = 1.4;
+      k.beginPath();
+      k.ellipse(x, y + 6, 26, 8, 0, 0.2, Math.PI - 0.2);
+      k.stroke();
+    }
+    // a corda de boias que fecha o cerco e prende a rede nos dois barcos
+    const ptsB = aro.filter((q, i) => i % 3 === 0).map((q) => [q.x, q.y]);
+    k.strokeStyle = '#3a2410';
+    k.lineWidth = 3;
+    k.beginPath();
+    ptsB.forEach(([x, y], i) => { if (!longe(x, y)) { k.stroke(); k.beginPath(); return; } if (i) k.lineTo(x, y); else k.moveTo(x, y); });
+    k.stroke();
+    ptsB.forEach(([x, y], i) => {
+      if (i % 4 || !longe(x, y)) return;
+      const boia = new Path2D();
+      boia.ellipse(x, y, 9, 6, 0, 0, 6.283);
+      k.fillStyle = '#c6a46c';
+      k.fill(boia);
+      k.strokeStyle = '#2a1a08';
+      k.lineWidth = 1.4;
+      k.stroke(boia);
+    });
+    // os respingos dos peixes que pulam na beirada
+    k.strokeStyle = 'rgba(250,250,240,.9)';
+    k.lineWidth = 1.6;
+    for (let i = 0; i < 40; i++) {
+      const [x, y] = ptsB[Math.floor(r() * ptsB.length)];
+      k.beginPath();
+      k.moveTo(x, y);
+      k.lineTo(x + (r() - 0.5) * 10, y - 6 - r() * 12);
+      k.stroke();
+    }
+    // o barco de cá, por cima da beirada da rede
+    barco(486, 676, 580, 152, 0.24, 1.02);
+    vinheta(k, W, H, 0.2);
+  }
+
+  // ---------- (11) A água que virou vinho (Jo 2.6-9) ----------
+  // No pátio da casa da festa, à tarde: as seis talhas de pedra da purificação (2.6), altas e
+  // torneadas, de pé, em fila que foge para o fundo; nas cinco de lá a superfície é de água; na
+  // da frente, o vinho escuro, com a concha de tirar ainda dentro e o jarro já cheio ao lado
+  // (2.8). Ninguém desenhado.
+  function desenhoAguaVinho(k, W, H, obj) {
+    const r = sorteio(10101);
+    papelVelho(k, W, H, r, ['#f8ecd2', '#e8d0a4', '#c4a070'], [160, 160]);
+    const chaoY = 470;
+    // a parede de reboco, com as juntas de pedra aparecendo embaixo e um arco fechado
+    const parede = pol([[-10, -10], [W + 10, -10], [W + 10, chaoY], [-10, chaoY]]);
+    k.fillStyle = '#e6d2a8';
+    k.fill(parede);
+    linhas(k, 0, 0, W, chaoY, 4.2, 1.5, (x, y) => 0.22 + x / 2200 + (y / chaoY) * 0.2);
+    const arco = new Path2D();
+    arco.moveTo(560, chaoY);
+    arco.lineTo(560, 230);
+    arco.quadraticCurveTo(560, 140, 680, 140);
+    arco.quadraticCurveTo(800, 140, 800, 230);
+    arco.lineTo(800, chaoY);
+    arco.closePath();
+    k.save();
+    k.clip(arco);
+    muroEmFiadas(k, r, arco, [560, 130, 800, chaoY], { h: 26, cor: '#cdb486', sombra: (x, y) => 0.45 + (y - 140) / 800, traco: 1.3, larg: 1.8 });
+    k.restore();
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.stroke(arco);
+    // a guirlanda de folhas da festa, pendurada na parede
+    k.strokeStyle = '#4a4a26';
+    k.lineWidth = 2.2;
+    k.beginPath();
+    k.moveTo(40, 90);
+    k.quadraticCurveTo(250, 170, 480, 96);
+    k.stroke();
+    for (let t = 0.04; t < 1; t += 0.05) {
+      const p = bezier([40, 90], [180, 145], [330, 140], [480, 96], 40)[Math.round(t * 40)];
+      for (const ld of [-1, 1]) {
+        const fl = new Path2D();
+        fl.moveTo(p[0], p[1]);
+        fl.quadraticCurveTo(p[0] + ld * 10, p[1] + 6, p[0] + ld * 6, p[1] + 20);
+        fl.quadraticCurveTo(p[0] + ld * 2, p[1] + 8, p[0], p[1]);
+        k.fillStyle = '#8c9258';
+        k.fill(fl);
+        k.strokeStyle = '#2a2a10';
+        k.lineWidth = 1;
+        k.stroke(fl);
+      }
+    }
+    // o chão de lajes, em perspectiva
+    const chao = pol([[-10, chaoY], [W + 10, chaoY], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#d8bc8c';
+    k.fill(chao);
+    chaoEmLinhas(k, r, chao, -10, W + 10, chaoY, H, 2, (x, y) => 0.32 + (y - chaoY) / 900 + x / 3000);
+    k.strokeStyle = 'rgba(43,33,18,.75)';
+    k.lineWidth = 1.4;
+    for (const y of [chaoY, 520, 590, 690, 830]) { k.beginPath(); k.moveTo(-10, y); k.lineTo(W + 10, y); k.stroke(); }
+    for (let xb = -800; xb < 1800; xb += 230) { k.beginPath(); k.moveTo(444 + (xb - 444) * 0.25, chaoY); k.lineTo(xb, H + 10); k.stroke(); }
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.beginPath();
+    k.moveTo(-10, chaoY);
+    k.lineTo(W + 10, chaoY);
+    k.stroke();
+    // uma talha de pedra: a boca larga de beiço grosso, o pescoço, o corpo alto e reto que
+    // afina um pouco e o pé torneado; os anéis do torno e a pedra clara riscada
+    const talha = (cx, base, e, conteudo) => {
+      const alt = 300 * e;
+      const R = (t) => {
+        // t = 0 no alto, 1 no pé
+        if (t < 0.06) return 1.0;
+        if (t < 0.12) return 0.86;
+        if (t < 0.8) return 0.92 - (t - 0.12) * 0.22;
+        if (t < 0.88) return 0.58;
+        return 0.74;
+      };
+      const larg = 116 * e;
+      const p = new Path2D();
+      const n = 60;
+      const pts = [];
+      for (let i = 0; i <= n; i++) { const t = i / n; pts.push([R(t) * larg / 2, base - alt + t * alt]); }
+      p.moveTo(cx - pts[0][0], pts[0][1]);
+      for (const [x, y] of pts) p.lineTo(cx - x, y);
+      for (let i = n; i >= 0; i--) p.lineTo(cx + pts[i][0], pts[i][1]);
+      p.closePath();
+      sombraNoChao(k, p, 24 * e, 8 * e, 10 * e, 0.3);
+      const so = (x, y) => 0.12 + Math.max(0, (x - cx + larg * 0.25) / larg) * 0.75;
+      peca(k, p, [cx - larg / 2, base - alt, cx + larg / 2, base], { cor: '#ddd2b8', tinta: '#2a2216', ang: 1.5, passo: 3 * Math.max(0.7, e), maxL: 1.8, sombra: so, cruzada: 0.62, traco: 2.2, obj });
+      // os anéis do torno
+      k.strokeStyle = 'rgba(42,34,22,.75)';
+      for (const t of [0.06, 0.12, 0.2, 0.5, 0.8, 0.88, 0.94]) {
+        const y = base - alt + t * alt;
+        const w = R(t) * larg / 2;
+        k.lineWidth = 1.2;
+        k.beginPath();
+        k.ellipse(cx, y, w, w * 0.16, 0, 0.1, Math.PI - 0.1);
+        k.stroke();
+      }
+      // a boca: o beiço e o que está dentro (água ou vinho)
+      const yb = base - alt;
+      const wb = larg / 2;
+      const beico = new Path2D();
+      beico.ellipse(cx, yb, wb, wb * 0.24, 0, 0, 6.283);
+      k.fillStyle = '#e8dec6';
+      k.fill(beico);
+      k.strokeStyle = '#2a2216';
+      k.lineWidth = 2;
+      k.stroke(beico);
+      const sup = new Path2D();
+      sup.ellipse(cx, yb + 3 * e, wb * 0.8, wb * 0.17, 0, 0, 6.283);
+      if (conteudo === 'vinho') {
+        k.fillStyle = '#5e1420';
+        k.fill(sup);
+        k.strokeStyle = 'rgba(255,200,190,.6)';
+        k.lineWidth = 1.6;
+        k.beginPath();
+        k.ellipse(cx - wb * 0.15, yb + 1 * e, wb * 0.45, wb * 0.07, 0, Math.PI * 1.1, Math.PI * 1.7);
+        k.stroke();
+      } else {
+        k.fillStyle = '#b4b8a6';
+        k.fill(sup);
+        k.strokeStyle = 'rgba(250,250,240,.8)';
+        k.lineWidth = 1.2;
+        k.beginPath();
+        k.moveTo(cx - wb * 0.5, yb + 3 * e);
+        k.lineTo(cx + wb * 0.2, yb + 3 * e);
+        k.stroke();
+      }
+      k.strokeStyle = '#2a2216';
+      k.lineWidth = 1.2;
+      k.stroke(sup);
+      marcar(k, obj, beico);
+      return { yb, wb };
+    };
+    // as cinco de lá, em fila que foge para o fundo, e a da frente, maior
+    for (const [cx, base, e] of [[96, 508, 0.66], [212, 520, 0.72], [334, 534, 0.8], [462, 552, 0.88], [600, 576, 0.97]]) talha(cx, base, e, 'agua');
+    const { yb, wb } = talha(728, 640, 1.18, 'vinho');
+    // o vinho que escorreu pela beirada e a poça no chão
+    k.fillStyle = '#5e1420';
+    for (const [dx, L] of [[-0.6, 60], [-0.35, 34]]) {
+      k.beginPath();
+      k.moveTo(728 + dx * wb, yb + 6);
+      k.quadraticCurveTo(728 + dx * wb - 3, yb + L * 0.5, 728 + dx * wb + 1, yb + L);
+      k.quadraticCurveTo(728 + dx * wb + 5, yb + L * 0.5, 728 + dx * wb + 5, yb + 6);
+      k.fill();
+    }
+    // a concha de tirar: uma cuia de barro com cabo comprido, apoiada na boca, mergulhada no vinho
+    vara(k, [[700, yb + 2], [650, yb - 70], [622, yb - 110]], 9, '#8e6a42', obj);
+    const cuia = new Path2D();
+    cuia.ellipse(712, yb + 6, 26, 9, 0.2, 0, Math.PI);
+    k.fillStyle = '#9a5a32';
+    k.fill(cuia);
+    k.strokeStyle = '#2a1206';
+    k.lineWidth = 1.6;
+    k.stroke(cuia);
+    // o jarro de barro ao lado, já cheio de vinho, para levar ao mestre de cerimônias (2.8)
+    const jx = 470;
+    const jb = 734;
+    const jarro = vaso(k, jx, jb, 150, 104, (t) => (t < 0.08 ? 0.5 : t < 0.2 ? 0.42 : 0.42 + Math.sin(((t - 0.2) / 0.8) * Math.PI) * 0.55));
+    sombraNoChao(k, jarro, 20, 8, 8, 0.35);
+    peca(k, jarro, [jx - 60, jb - 150, jx + 60, jb], { cor: '#b46a3c', tinta: '#2a1206', ang: 1.45, passo: 3, maxL: 1.8, sombra: (x) => 0.18 + Math.max(0, (x - jx + 20) / 120) * 0.8, cruzada: 0.65, traco: 2.2, obj });
+    const bocaJ = new Path2D();
+    bocaJ.ellipse(jx, jb - 150, 27, 7, 0, 0, 6.283);
+    k.fillStyle = '#4a0e18';
+    k.fill(bocaJ);
+    k.strokeStyle = '#2a1206';
+    k.lineWidth = 1.8;
+    k.stroke(bocaJ);
+    // a asa do jarro
+    k.strokeStyle = '#2a1206';
+    k.lineWidth = 9;
+    k.beginPath();
+    k.moveTo(jx + 22, jb - 136);
+    k.bezierCurveTo(jx + 70, jb - 136, jx + 76, jb - 90, jx + 46, jb - 76);
+    k.stroke();
+    k.strokeStyle = '#b46a3c';
+    k.lineWidth = 5;
+    k.stroke();
+    // uma gota de vinho no chão entre a talha e o jarro
+    k.fillStyle = '#5e1420';
+    k.beginPath();
+    k.ellipse(590, 724, 16, 4, 0, 0, 6.283);
+    k.fill();
+    vinheta(k, W, H, 0.22);
   }
   // ---------- fim dos Milagres ----------
 
