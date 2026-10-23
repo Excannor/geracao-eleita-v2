@@ -1397,9 +1397,12 @@ const CATALOGO = lerCatalogo(AQUI);
   // (lido do catálogo: liberar mais cartas não muda o teste)
   checar(lancadas.length > 0 && lancadas.every((id) => desenhos.includes(id)),
     'toda carta lançada tem desenho na peça de arte (' + lancadas.join(', ') + '); ' + (desenhos.length - lancadas.length) + ' desenhos esperam a aprovação');
-  const semDesenho = CATALOGO.cartas.find((c) => !desenhos.includes(c.id) && !CATALOGO.albuns.find((a) => a.id === c.album).especial).id;
+  // uma carta de álbum sem desenho; com os álbuns todos desenhados, uma carta inventada (a mais,
+  // o que a contagem de 13 também acusa)
+  const semDesenhoReal = CATALOGO.cartas.find((c) => !desenhos.includes(c.id) && !CATALOGO.albuns.find((a) => a.id === c.album).especial);
+  const semDesenho = semDesenhoReal ? semDesenhoReal.id : 'sem-desenho-x';
   const ruim = validarCatalogo({ albuns: CATALOGO.albuns.map((a, i) => (i === 1 ? { ...a, lancadoEm: '2020-01-01' } : a)),
-    cartas: CATALOGO.cartas.slice(1).concat({ ...CATALOGO.cartas[1] }, { ...CATALOGO.cartas[2], id: 'nova-x', raridade: 'ouro' }).map((c) => (c.id === semDesenho ? { ...c, lancada: true } : c)) }, AQUI);
+    cartas: CATALOGO.cartas.slice(1).concat({ ...CATALOGO.cartas[1] }, { ...CATALOGO.cartas[2], id: 'nova-x', raridade: 'ouro' }, semDesenhoReal ? [] : [{ ...CATALOGO.cartas[3], id: semDesenho }]).map((c) => (c.id === semDesenho ? { ...c, lancada: true } : c)) }, AQUI);
   checar(ruim.some((e) => /repetido/.test(e)) && ruim.some((e) => /13 cartas/.test(e)) && ruim.some((e) => /lançado antes/.test(e)) && ruim.some((e) => /raridade só é fixa/.test(e))
     && ruim.some((e) => e.includes(semDesenho + ': lancada sem desenho')), 'a conferência acusa id repetido, contagem errada, lançamento fora de ordem, raridade fixa em carta de álbum e carta lançada sem desenho');
   const esq = esqueletoDoCatalogo(CATALOGO);

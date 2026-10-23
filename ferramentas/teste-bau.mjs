@@ -57,7 +57,11 @@ const DO_SORTEIO = CAT.cartas.filter((c) => !ESPECIAIS.has(c.album));
 const LANCADAS = DO_SORTEIO.filter((c) => c.lancada).map((c) => c.id);
 const TOTAL = DO_SORTEIO.length;
 const DESENHOS = desenhosDaArte(AQUI);
-const SEM_DESENHO = DO_SORTEIO.find((c) => !c.lancada && !DESENHOS.has(c.id)).id;
+// a carta sem desenho: uma de verdade, se houver; com os álbuns todos desenhados, uma não lançada
+// cujo desenho a página tira da peça de arte (SEM_DESENHO_TIRAR), como se ainda não tivesse chegado
+const SEM_DESENHO_REAL = DO_SORTEIO.find((c) => !c.lancada && !DESENHOS.has(c.id));
+const SEM_DESENHO = (SEM_DESENHO_REAL || DO_SORTEIO.find((c) => !c.lancada) || DO_SORTEIO[DO_SORTEIO.length - 1]).id;
+const SEM_DESENHO_TIRAR = SEM_DESENHO_REAL ? '' : 'if (CC.cartas && CC.cartas.desenhos) delete CC.cartas.desenhos[' + JSON.stringify(SEM_DESENHO) + '];';
 const REGRA = carregarRegras(esqueletoDoCatalogo(CAT));
 const hojeAqui = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 const sorteio1 = REGRA.receber(REGRA.vazio(), 'bau', 'bau:dia:7', { dono: 'leitora0', em: 1, hoje: hojeAqui }).resultado;
@@ -233,7 +237,7 @@ try {
   // a primeira carta ganha mais uma Prata e uma Bronze; uma carta sem desenho entra em Linho
   await av(`(() => { const c = CC.estado().cartas; c.eventos["bau:dia:901"] = { em: Date.now(), carta: "${PRIMEIRA.id}", raridade: "prata", visto: Date.now() };
     c.eventos["bau:dia:902"] = { em: Date.now() + 1, carta: "${PRIMEIRA.id}", raridade: "bronze", visto: Date.now() };
-    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "${SEM_DESENHO}", raridade: "linho", visto: Date.now() }; CC.gravar("cartas", c); return true; })()`);
+    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "${SEM_DESENHO}", raridade: "linho", visto: Date.now() }; CC.gravar("cartas", c); ${SEM_DESENHO_TIRAR} return true; })()`);
   // o que a pessoa tem agora, carta por carta e versão por versão
   const temAgora = {};
   for (const [id, rar] of [[PRIMEIRA.id, 'prata'], [SEGUNDA.carta, SEGUNDA.raridade], [PRIMEIRA.id, 'prata'], [PRIMEIRA.id, 'bronze'], [SEM_DESENHO, 'linho']]) {
