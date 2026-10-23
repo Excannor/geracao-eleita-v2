@@ -6937,7 +6937,10 @@
     const sol = [690, 512];
     const hz = 540;
     // o céu da madrugada: linhas, mais cheias no alto e à esquerda, que abrem em volta do sol
-    linhas(k, 0, 0, W, hz, 5.5, 1.5, (x, y) => 0.1 + Math.min(1, Math.hypot(x - sol[0], (y - sol[1]) * 1.4) / 720) * 0.72);
+    // (um ruído miúdo no peso de cada traço: sem ele, a linha que cruza 1 px de grossura vira um
+    // arco visível no céu)
+    const ruido = (x, y) => { const v = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453; return v - Math.floor(v) - 0.5; };
+    linhas(k, 0, 0, W, hz, 5.5, 1.5, (x, y) => 0.1 + Math.pow(Math.hypot(x - sol[0], (y - sol[1]) * 1.4) / 1100, 0.9) * 0.95 + ruido(x, y) * 0.22);
     // umas tiras de nuvem baixa, com a barriga acesa
     for (const [x, y, rx] of [[170, 330, 150], [520, 236, 110], [840, 380, 80]]) {
       const n = pol(Array.from({ length: 24 }, (_, i) => { const a = (i / 24) * 6.283; return [x + Math.cos(a) * rx, y + Math.sin(a) * 9 * (1 + Math.cos(a * 3) * 0.2)]; }));
@@ -7117,8 +7120,21 @@
       k.fill();
     }
     // um tufo de capim de verdade, ao pé da pedra
-    capim(k, r, 156, 750, 34, 22, 'rgba(84,66,36,.7)');
-    capim(k, r, 182, 752, 26, 16, 'rgba(84,66,36,.6)');
+    // um tufo de capim seco ao pé da pedra: claro, baixo e largo, de folhas curvas
+    k.save();
+    k.strokeStyle = 'rgba(120,100,60,.55)';
+    k.lineCap = 'round';
+    for (let i = 0; i < 26; i++) {
+      const bx = 150 + r() * 46;
+      const a = -Math.PI / 2 + (r() - 0.5) * 2.4;
+      const c = 12 + r() * 14;
+      k.lineWidth = 1.6 + r();
+      k.beginPath();
+      k.moveTo(bx, 752);
+      k.quadraticCurveTo(bx + Math.cos(a) * c * 0.6, 752 + Math.sin(a) * c * 0.8, bx + Math.cos(a) * c * 1.3, 752 + Math.sin(a) * c * 0.55);
+      k.stroke();
+    }
+    k.restore();
     vinheta(k, W, H, 0.22);
   }
 
