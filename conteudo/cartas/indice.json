@@ -201,7 +201,7 @@
       "voceSabia": "A arca tocou o alto das montanhas no sétimo mês.",
       "link": "#/mapa/genesis",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "betel",
@@ -223,7 +223,7 @@
       "voceSabia": "Saía fumaça do monte, como de uma fornalha, e o monte inteiro tremia.",
       "link": "#/atlas/exodo",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "rio-jordao",
@@ -300,7 +300,7 @@
       "voceSabia": "Natanael perguntou se podia vir alguma coisa boa de Nazaré.",
       "link": "#/mapa/joao",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "poco-jaco",
