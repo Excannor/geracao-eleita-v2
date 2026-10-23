@@ -14823,11 +14823,11 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
   // popa, a almofada (4.38), com a dobra de quem dormiu. Ninguém desenhado.
   function desenhoTempestade(k, W, H, obj) {
     const r = sorteio(9901);
-    papelVelho(k, W, H, r, ['#f6f0dc', '#e2d8b8', '#bcae88'], [444, 260]);
+    papelVelho(k, W, H, r, ['#ece4cc', '#e2d8b8', '#bcae88'], [444, -300]);
     const hz = 330;
     // o céu: claro no meio, onde abre; as nuvens pesadas indo embora pelos lados e por cima,
     // em massas gravadas (hachura cruzada), de beirada rasgada e clara do lado da luz
-    linhas(k, 0, 0, W, hz, 5, 1.2, (x, y) => 0.06 + Math.min(1, Math.hypot(x - 444, (y - 300) * 1.4) / 600) * 0.45);
+    linhas(k, 0, 0, W, hz, 5, 1.2, (x, y) => 0.2 + Math.min(1, Math.hypot(x - 444, (y - 300) * 1.4) / 700) * 0.35);
     // cada nuvem é um punhado de bolos sobrepostos, feita só de hachura (sem contorno): mais
     // escura embaixo e para fora, a beirada do lado da luz deixada no papel
     const nuvem = (cx, cy, rx, ry) => {
@@ -14933,16 +14933,34 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.clip(piso);
     gravar(k, piso, 444, 760, 500, 0, 3.6, 1.6, () => 0.6, '#1e1006', 0);
     for (let x = -20; x < W + 20; x += 54) { k.strokeStyle = 'rgba(30,16,6,.8)'; k.lineWidth = 1.6; k.beginPath(); k.moveTo(444 + (x - 444) * 0.08, 470); k.lineTo(x, H + 20); k.stroke(); }
-    const agua = seixo(r, 444, 690, 230, 52, 0, 0.12);
-    k.fillStyle = 'rgba(150,142,118,.9)';
+    // a água que entrou: uma lâmina rasa no fundo, deitada entre as tábuas (que aparecem por
+    // baixo dela), com as ondinhas e o reflexo das cavernas, e a beirada molhada e torta
+    const agua = pol(Array.from({ length: 24 }, (_, i) => { const a = (i / 24) * 6.283; const f = 1 + Math.sin(a * 3 + 1) * 0.08 + Math.sin(a * 5) * 0.05; return [444 + Math.cos(a) * 250 * f, 700 + Math.sin(a) * 46 * f]; }));
+    k.fillStyle = 'rgba(132,132,112,.45)';
     k.fill(agua);
     k.save();
     k.clip(agua);
-    k.strokeStyle = 'rgba(43,33,18,.6)';
-    for (let y = 640; y < 750; y += 4.4) { let x = 210 + r() * 30; while (x < 680) { const c = 30 + r() * 90; k.lineWidth = 1; k.beginPath(); k.moveTo(x, y); k.lineTo(x + c, y); k.stroke(); x += c + 10 + r() * 30; } }
+    k.lineCap = 'round';
+    for (let y = 656; y < 750; y += 3.6) {
+      let x = 180 + r() * 30;
+      while (x < 710) {
+        const c = 16 + r() * 40;
+        k.strokeStyle = r() < 0.3 ? 'rgba(250,246,226,.7)' : 'rgba(43,33,18,.45)';
+        k.lineWidth = 1;
+        k.beginPath();
+        k.moveTo(x, y);
+        k.quadraticCurveTo(x + c / 2, y - 1.6, x + c, y);
+        k.stroke();
+        x += c + 12 + r() * 30;
+      }
+    }
+    // o reflexo das cavernas: traços escuros, quebrados, que descem da beirada
+    for (const x0 of [262, 330, 558, 626]) {
+      for (let y = 664; y < 744; y += 6) { if (r() < 0.35) continue; k.strokeStyle = 'rgba(40,24,10,.55)'; k.lineWidth = 3; k.beginPath(); k.moveTo(x0 + (r() - 0.5) * 4, y); k.lineTo(x0 + (r() - 0.5) * 4 + 8, y); k.stroke(); }
+    }
     k.restore();
-    k.strokeStyle = 'rgba(30,16,6,.7)';
-    k.lineWidth = 1.4;
+    k.strokeStyle = 'rgba(30,16,6,.55)';
+    k.lineWidth = 1.2;
     k.stroke(agua);
     k.restore();
     // as bordas (as falcas), grossas e claras em cima
@@ -14957,60 +14975,131 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       marcar(k, obj, forma);
     }
     // a popa: o banco de trás, alto, e a almofada de couro em cima, com a dobra de quem dormiu
+    // o banco da popa e a almofada, um pouco maiores, para a almofada ler
+    k.save();
+    k.translate(444, 450);
+    k.scale(1.35, 1.35);
+    k.translate(-444, -450);
     const banco = pol([[372, 420], [516, 420], [530, 446], [358, 446]]);
     peca(k, banco, [358, 418, 530, 448], { cor: '#9a7448', tinta: '#1a0e04', ang: 0.05, passo: 2.8, maxL: 1.4, sombra: (x, y) => 0.3 + (y - 420) / 40, cruzada: 0.8, traco: 2, obj });
     const frenteBanco = pol([[358, 446], [530, 446], [522, 486], [366, 486]]);
     peca(k, frenteBanco, [358, 446, 530, 486], { cor: '#6e4e30', tinta: '#1a0e04', ang: 1.5, passo: 3, maxL: 1.6, sombra: () => 0.7, cruzada: 0.7, traco: 2, obj });
-    const alm = new Path2D();
-    alm.moveTo(386, 424);
-    alm.bezierCurveTo(380, 398, 404, 386, 444, 388);
-    alm.bezierCurveTo(484, 386, 508, 396, 504, 424);
-    alm.bezierCurveTo(480, 432, 410, 432, 386, 424);
-    alm.closePath();
-    k.fillStyle = '#8a3e24';
-    k.fill(alm);
-    gravar(k, alm, 444, 410, 70, 0.15, 2.6, 1.3, (x, y) => 0.2 + (y - 388) / 50 + Math.max(0, (x - 444) / 200), '#2a0c04', 0.2);
-    // a cova no meio, onde a cabeça ficou, e as costuras
-    k.strokeStyle = 'rgba(42,12,4,.85)';
-    k.lineWidth = 1.6;
+    // a almofada: um saco de couro chato e gasto, em cima do banco, mais largo que alto, com
+    // a costura em volta, as rugas e a cova rasa onde a cabeça ficou (Mc 4.38)
+    const topo = new Path2D();
+    topo.moveTo(384, 414);
+    topo.bezierCurveTo(390, 398, 420, 394, 446, 395);
+    topo.bezierCurveTo(476, 394, 502, 398, 506, 414);
+    topo.bezierCurveTo(508, 424, 504, 430, 498, 432);
+    topo.bezierCurveTo(470, 436, 420, 436, 392, 432);
+    topo.bezierCurveTo(384, 430, 380, 422, 384, 414);
+    topo.closePath();
+    const lado = new Path2D();
+    lado.moveTo(392, 432);
+    lado.bezierCurveTo(420, 436, 470, 436, 498, 432);
+    lado.lineTo(500, 440);
+    lado.bezierCurveTo(470, 445, 420, 445, 390, 440);
+    lado.closePath();
+    k.fillStyle = '#6a4a2c';
+    k.fill(lado);
+    k.fillStyle = '#a07c54';
+    k.fill(topo);
+    gravar(k, topo, 445, 414, 70, 0.1, 2.8, 1.2, (x, y) => 0.2 + (y - 396) / 60 + Math.max(0, (x - 470) / 120), '#2a1608', 0.15);
+    // a cova: mais escura, um pouco fora do meio, com a beirada de baixo acesa
+    const cova = new Path2D();
+    cova.ellipse(432, 414, 30, 9, -0.05, 0, 6.283);
+    k.save();
+    k.clip(cova);
+    k.filter = 'blur(3px)';
+    k.fillStyle = 'rgba(60,34,14,.22)';
+    k.fill(cova);
+    k.filter = 'none';
+    gravar(k, cova, 432, 414, 34, 0.1, 2.2, 1.1, (x, y) => 0.1 + (y - 407) / 16, '#2a1608', 0);
+    k.restore();
+    k.strokeStyle = 'rgba(250,230,190,.6)';
+    k.lineWidth = 1.2;
     k.beginPath();
-    k.moveTo(420, 406);
-    k.quadraticCurveTo(446, 420, 474, 406);
+    k.ellipse(432, 416, 26, 7, -0.05, Math.PI + 0.3, Math.PI * 2 - 0.3);
     k.stroke();
-    k.strokeStyle = 'rgba(255,220,180,.6)';
-    k.lineWidth = 1.4;
-    k.beginPath();
-    k.moveTo(396, 404);
-    k.quadraticCurveTo(420, 392, 452, 392);
-    k.stroke();
-    k.setLineDash([3, 3]);
-    k.strokeStyle = 'rgba(42,12,4,.7)';
+    k.strokeStyle = 'rgba(42,22,8,.5)';
     k.lineWidth = 1;
     k.beginPath();
-    k.moveTo(390, 420);
-    k.bezierCurveTo(420, 428, 470, 428, 500, 420);
+    k.ellipse(432, 414, 30, 9, -0.05, Math.PI + 0.6, Math.PI * 2 - 0.6);
+    k.stroke();
+    // as rugas que saem da cova
+    k.strokeStyle = 'rgba(42,22,8,.7)';
+    k.lineWidth = 1;
+    for (const [x0, y0, x1, y1] of [[402, 412, 390, 420], [462, 410, 482, 404], [460, 418, 488, 424], [420, 406, 410, 400]]) { k.beginPath(); k.moveTo(x0, y0); k.quadraticCurveTo((x0 + x1) / 2, (y0 + y1) / 2 + 2, x1, y1); k.stroke(); }
+    // a costura em volta
+    k.setLineDash([3, 3]);
+    k.strokeStyle = 'rgba(42,22,8,.7)';
+    k.beginPath();
+    k.moveTo(390, 426);
+    k.bezierCurveTo(420, 431, 470, 431, 500, 426);
     k.stroke();
     k.setLineDash([]);
-    k.strokeStyle = '#2a0c04';
-    k.lineWidth = 2;
-    k.stroke(alm);
-    marcar(k, obj, alm);
+    k.strokeStyle = '#2a1608';
+    k.lineWidth = 1.8;
+    k.stroke(topo);
+    k.stroke(lado);
+    marcar(k, obj, topo);
+    marcar(k, obj, lado);
+    k.restore();
     // o cadaste: a peça alta da popa que sobe e se curva, por trás da almofada
     vara(k, [[444, 360], [446, 320], [456, 292], [470, 280]], 14, '#8e6a42', obj);
     // o remo de governo, de lado, e os remos largados no fundo
     vara(k, [[520, 400], [600, 470], [720, 560]], 12, '#9a7650', obj);
     vara(k, [[120, 830], [300, 640], [380, 560]], 13, '#a07c52', obj);
     vara(k, [[620, 846], [560, 700], [530, 600]], 12, '#93704a', obj);
-    // o balde de couro tombado, na água do fundo
-    const balde = seixo(r, 650, 740, 46, 34, -0.3, 0.06);
-    peca(k, balde, [600, 700, 700, 780], { cor: '#5a3a20', tinta: '#140a02', ang: 1.2, passo: 2.8, maxL: 1.6, sombra: (x) => 0.3 + (x - 600) / 140, cruzada: 0.7, traco: 2, obj });
+    // o balde de aduelas, tombado, com a água que saiu dele
+    k.save();
+    k.translate(664, 742);
+    k.rotate(-0.35);
+    const corpoB = pol([[-50, -30], [42, -36], [42, 36], [-50, 30]]);
+    sombraNoChao(k, corpoB, 6, 8, 5, 0.4);
+    k.fillStyle = '#8a6440';
+    k.fill(corpoB);
+    k.save();
+    k.clip(corpoB);
+    for (let i = -3; i <= 3; i++) {
+      const y = i * 10;
+      k.strokeStyle = 'rgba(30,16,6,.8)';
+      k.lineWidth = 1.2;
+      k.beginPath();
+      k.moveTo(-50, y * 0.85);
+      k.lineTo(42, y);
+      k.stroke();
+    }
+    gravar(k, corpoB, 0, 0, 60, 0.05, 3, 1.4, (x, y) => 0.3 + (y + 30) / 70, '#1e1006', 0);
+    k.restore();
+    for (const x of [-30, 20]) { k.strokeStyle = '#2a2420'; k.lineWidth = 4; k.beginPath(); k.moveTo(x, -31 - (x + 50) * 0.06); k.lineTo(x, 31 + (x + 50) * 0.06); k.stroke(); }
+    k.strokeStyle = '#140a02';
+    k.lineWidth = 2;
+    k.stroke(corpoB);
     const bocaB = new Path2D();
-    bocaB.ellipse(620, 722, 22, 30, -0.3, 0, 6.283);
-    k.fillStyle = '#1e1208';
+    bocaB.ellipse(44, 0, 12, 36, 0, 0, 6.283);
+    k.fillStyle = '#2a1a0c';
     k.fill(bocaB);
     k.strokeStyle = '#c49a68';
-    k.lineWidth = 2;
+    k.lineWidth = 2.4;
     k.stroke(bocaB);
+    // a alça de corda
+    k.strokeStyle = '#3a2410';
+    k.lineWidth = 3;
+    k.beginPath();
+    k.moveTo(30, -36);
+    k.bezierCurveTo(70, -70, 100, -30, 70, 10);
+    k.stroke();
+    marcar(k, obj, corpoB);
+    marcar(k, obj, bocaB);
+    k.restore();
+    // a água que saiu do balde: uma língua rasa com ondinhas
+    const derrame = pol([[700, 736], [760, 726], [800, 740], [790, 760], [736, 768], [700, 756]]);
+    k.fillStyle = 'rgba(132,132,112,.45)';
+    k.fill(derrame);
+    k.strokeStyle = 'rgba(250,246,226,.7)';
+    k.lineWidth = 1;
+    for (const y of [738, 746, 754]) { k.beginPath(); k.moveTo(714, y); k.quadraticCurveTo(740, y - 2, 770, y); k.stroke(); }
     vinheta(k, W, H, 0.22);
   }
   // ---------- (10) A pesca maravilhosa (Lc 5.4-7) ----------
