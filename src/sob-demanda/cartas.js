@@ -14037,10 +14037,10 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       return base - alt(x);
     };
     // as casas da cidade, atrás, que aparecem pelo rombo
-    for (let i = 0; i < 7; i++) {
-      const x = 330 + i * 46 + (r() - 0.5) * 10;
+    // (de alturas e larguras diferentes; uma com porta, outra com janela, outras lisas)
+    for (const [x, w, h, porta, janela, dy] of [[326, 58, 38, true, false, 4], [382, 46, 56, false, true, -6], [426, 64, 32, false, false, 6], [486, 52, 48, true, true, 0], [536, 46, 36, false, false, 8], [584, 62, 52, true, false, -2], [642, 50, 40, false, true, 4]]) {
       const [, y] = S0(x, base - alt(x) - 6);
-      casinha(k, r, x, y + 10, 50 + r() * 16, 34 + r() * 18, 10, { cor: '#e8d2a2', lado: '#c2a172', teto: '#d8c08e', porta: r() < 0.5, janela: r() < 0.6, traco: 1.3 });
+      casinha(k, r, x, y + 10 + dy, w, h, 10, { cor: '#e8d2a2', lado: '#c2a172', teto: '#d8c08e', porta, janela, traco: 1.3 });
     }
     k.save();
     k.transform(1, inc, 0, 1, 0, 0);
@@ -14161,38 +14161,59 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.restore();
     // o pó: rolos opacos, de beirada partida, a luz do alto à esquerda e a barriga de baixo e
     // da direita em hachura (cruzada no mais fundo); cada rolo cobre o de trás
-    const rolo = (x, y, rr, ach = 0.8) => {
+    // a sombra do pó é da massa toda: mais escura embaixo e à direita (a luz vem do alto à
+    // esquerda), e cada rolo só escurece na barriga de baixo e no lado de lá
+    const nuvemTopo = 220;
+    const nuvemBase = 500;
+    const rolo = (x, y, rr, t = 0, ach = 0.8) => {
       const n = 26;
       const f = r() * 6.28;
       const pts = Array.from({ length: n }, (_, i) => {
         const a = (i / n) * Math.PI * 2;
-        const q = rr * (1 + Math.sin(a * 4 + f) * 0.08 + Math.sin(a * 9 + f * 2) * 0.04);
+        const q = rr * (1 + Math.sin(a * 4 + f) * 0.08 + Math.sin(a * 9 + f * 2) * 0.05);
         return [x + Math.cos(a) * q, y + Math.sin(a) * q * ach];
       });
       const p = contornoRocha(r, [...pts, pts[0]], 3);
       p.closePath();
+      const somb = (px, py) => (py - nuvemTopo) / (nuvemBase - nuvemTopo) * 0.4 + (px - 540) / 700 + Math.max(0, ((px - x) * 0.45 + (py - y) / ach) / rr - 0.15) * 0.9;
+      if (t > 0.78) {
+        // no alto o pó se desfaz: só uns riscos partidos e a hachura rala, sem massa
+        gravar(k, p, x, y, rr * 1.05, 0.45, 3.6, 1.1, (px, py) => somb(px, py) * 0.7, 'rgba(84,58,26,.8)', 0.3);
+        k.strokeStyle = 'rgba(70,46,18,.7)';
+        k.lineWidth = 1;
+        k.lineCap = 'round';
+        for (let i = 0; i < 2; i++) {
+          const a = Math.PI * (1.1 + r() * 0.7);
+          k.beginPath();
+          k.ellipse(x + (r() - 0.5) * rr * 0.4, y, rr * (0.7 + r() * 0.3), rr * ach * 0.8, 0, a, a + 0.4 + r() * 0.3);
+          k.stroke();
+        }
+        return;
+      }
       k.fillStyle = '#eadab2';
       k.fill(p);
-      const somb = (px, py) => ((px - x) * 0.5 + (py - y) / ach) / rr * 0.75 + 0.32;
       gravar(k, p, x, y, rr * 1.05, 0.45, 2.6, 1.7, somb, 'rgba(84,58,26,.95)', 0.3);
-      gravar(k, p, x, y, rr * 1.05, -0.7, 3.2, 1.4, (px, py) => somb(px, py) - 0.5, 'rgba(84,58,26,.9)', 0.2);
-      // o contorno partido: só embaixo e à direita, o lado da sombra, e com falhas
+      gravar(k, p, x, y, rr * 1.05, -0.7, 3.2, 1.4, (px, py) => somb(px, py) - 0.55, 'rgba(84,58,26,.9)', 0.2);
+      // o contorno partido: mais cheio na barriga e no lado de lá, fino e falhado do lado da
+      // luz
       k.lineCap = 'round';
-      for (let a = -0.6; a < Math.PI + 0.4; a += 0.3) {
-        if (r() < 0.3) continue;
+      for (let a = -Math.PI; a < Math.PI; a += 0.3) {
+        const sombra = Math.sin(a) > -0.2 || Math.cos(a) > 0.4;
+        if (r() < (sombra ? 0.3 : 0.55)) continue;
         k.strokeStyle = 'rgba(70,46,18,.8)';
-        k.lineWidth = 1.4;
+        k.lineWidth = sombra ? 1.4 : 0.8;
         k.beginPath();
-        k.ellipse(x, y, rr, rr * ach, 0, a, a + 0.2 + r() * 0.1);
+        k.ellipse(x, y, rr, rr * ach, 0, a, a + 0.18 + r() * 0.1);
         k.stroke();
       }
       marcar(k, obj, p);
     };
     // os rolos altos, de trás, que sobem do rombo e se abrem, levados um pouco para a direita
     const altos = [];
-    for (let i = 0; i < 50; i++) {
-      const t = Math.pow(r(), 1.3);
-      altos.push([480 + t * 130 + (r() - 0.5) * (300 - t * 120), 486 - t * 240 + (r() - 0.5) * 24, 22 + (1 - t) * 10 + r() * 22]);
+    // grandes embaixo, pequenos em cima, a massa levada para a direita
+    for (let i = 0; i < 46; i++) {
+      const t = Math.pow(r(), 1.1);
+      altos.push([490 + t * 150 + (r() - 0.5) * (320 - t * 140), 482 - t * 270 + (r() - 0.5) * 20, 14 + Math.pow(1 - t, 1.3) * 50 + r() * 14, t]);
     }
     altos.sort((a, b) => a[1] - b[1]);
     for (const q of altos) rolo(...q);
@@ -14242,18 +14263,15 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const dy = -d * 0.5;
       const J = () => (r() - 0.5) * q * 0.14;
       const nb = h / n;
-      // a beirada de cima, da esquerda para a direita, com um degrau de tijolo quebrado
-      const y0 = -h / 2 + (r() < 0.5 && n > 1 ? nb : 0);
-      const topo = [[-w / 2 + J() * 0.5, y0]];
-      if (r() < 0.75) {
-        const nx = -w / 2 + w * (0.2 + r() * 0.45);
-        topo.push([nx, y0 + J() * 0.2], [nx + J() * 0.4, y0 === -h / 2 && n > 1 ? -h / 2 + nb : -h / 2]);
-      }
-      topo.push([w / 2 - r() * w * 0.15, -h / 2 + J() * 0.2]);
-      const tr = topo[topo.length - 1];
+      // a face de cima é um plano só; a quebra fica no contorno: o canto da frente à esquerda
+      // comido e o canto de trás à direita lascado
+      const c1 = q * (0.12 + r() * 0.2);
+      const topo = [[-w / 2 + c1, -h / 2 + J() * 0.15], [w / 2 - r() * w * 0.12, -h / 2 + J() * 0.15]];
+      const tr = topo[1];
       const dir = [[w / 2 + J() * 0.5, -h / 2 + h * (0.3 + r() * 0.2)], [w / 2 - q * 0.12 + J(), h * 0.12], [w / 2 + J() * 0.5, h / 2]];
-      const fr = [...topo, ...dir, [w * 0.2 + J(), h / 2 + J() * 0.4], [-w * 0.25 + J(), h / 2 + J() * 0.4], [-w / 2 + J(), h * 0.15]];
-      const cima = [...topo, ...topo.slice().reverse().map(([a, b]) => [a + dx, b + dy])];
+      const fr = [...topo, ...dir, [w * 0.2 + J(), h / 2 + J() * 0.4], [-w * 0.25 + J(), h / 2 + J() * 0.4], [-w / 2 + J(), h * 0.15], [-w / 2 + J() * 0.4, -h / 2 + c1 * 0.8]];
+      const lasca = 0.25 + r() * 0.3;
+      const cima = [topo[0], topo[1], [topo[1][0] + dx * lasca, topo[1][1] + dy * lasca - 2], [topo[1][0] + dx - w * 0.12, topo[1][1] + dy], [topo[0][0] + dx, topo[0][1] + dy]];
       const lado = [tr, [tr[0] + dx, tr[1] + dy], [dir[0][0] + dx, dir[0][1] + dy], [dir[1][0] + dx * 0.8, dir[1][1] + dy * 0.8], dir[1], dir[0]];
       k.save();
       k.translate(x, y);
