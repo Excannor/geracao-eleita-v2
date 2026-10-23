@@ -6279,7 +6279,8 @@
     'vara-moises': desenhoVara,
     'candelabro': desenhoCandelabro,
     'tabuas-alianca': desenhoTabuas,
-    'serpente-bronze': desenhoSerpente };
+    'serpente-bronze': desenhoSerpente,
+    'harpa-davi': desenhoHarpa };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
   // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
   // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
@@ -10936,6 +10937,248 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.fill();
     k.restore();
     vinheta(k, W, H, 0.22);
+  }
+  // ---------- (7) A harpa de Davi (1 Sm 16.23) ----------
+  // Na casa de Saul, de tarde: a harpa de Davi (o kinnor, a lira de braços desiguais) de pé
+  // sobre um tapete, apoiada na caixa, virada de três quartos, diante de um banco de cedro. O braço da
+  // esquerda é mais alto, a travessa desce em diagonal, as dez cordas vão da travessa ao
+  // cavalete da caixa e duas ainda vibram (as linhas dobradas): acabou de tocar. A luz entra
+  // por uma janela alta e cai sobre ela. No banco, a palheta de osso. Diferente da lira da
+  // Babilônia: outra forma, dentro de casa, de pé e de lado, não pendurada de frente.
+  function desenhoHarpa(k, W, H, obj) {
+    const r = sorteio(7701);
+    // a parede de pedra rebocada, em linhas, mais escura longe da janela
+    k.fillStyle = '#d9c6a2';
+    k.fillRect(0, 0, W, H);
+    const jan = [120, 90, 110, 170];
+    const luzEm = (x, y) => {
+      // o facho da janela desce para a direita
+      const t = (y - jan[1]) / 600;
+      const cx = jan[0] + jan[2] / 2 + t * 420;
+      const larg = 110 + t * 260;
+      return Math.max(0, 1 - Math.abs(x - cx) / larg) * (y > jan[1] ? 1 : 0);
+    };
+    const chao = 640;
+    linhas(k, 0, 0, W, chao, 4.2, 2, (x, y) => 0.62 - luzEm(x, y) * 0.5 + Math.sin(x * 0.03 + y * 0.01) * 0.04);
+    // as fiadas de pedra, sob o reboco gasto
+    k.strokeStyle = 'rgba(43,33,18,.35)';
+    k.lineWidth = 1.2;
+    for (let y = 40; y < chao; y += 58) {
+      k.beginPath();
+      k.moveTo(0, y + (r() - 0.5) * 4);
+      for (let x = 0; x <= W; x += 40) k.lineTo(x, y + (r() - 0.5) * 4);
+      k.stroke();
+      for (let x = ((y / 58) % 2) * 60 + r() * 30; x < W; x += 110 + r() * 40) { k.beginPath(); k.moveTo(x, y); k.lineTo(x + (r() - 0.5) * 4, y + 58); k.stroke(); }
+    }
+    // a janela alta: o vão em arco, fundo na parede grossa, o peitoril e o céu da tarde lá fora,
+    // com o morro de longe
+    const [jx, jy, jw, jh] = jan;
+    const vao = new Path2D();
+    vao.moveTo(jx, jy + jh);
+    vao.lineTo(jx, jy + jw / 2);
+    vao.arc(jx + jw / 2, jy + jw / 2, jw / 2, Math.PI, 0);
+    vao.lineTo(jx + jw, jy + jh);
+    vao.closePath();
+    k.fillStyle = '#f8ecd0';
+    k.fill(vao);
+    k.save();
+    k.clip(vao);
+    linhas(k, jx, jy, jx + jw, jy + jh, 5, 1, (x, y) => 0.12 + (jy + jh - y) / jh * 0.3);
+    const morro = pol([[jx - 5, jy + jh], [jx - 5, jy + jh - 34], [jx + 30, jy + jh - 52], [jx + 70, jy + jh - 40], [jx + jw + 5, jy + jh - 58], [jx + jw + 5, jy + jh]]);
+    peca(k, morro, [jx, jy + jh - 60, jx + jw, jy + jh], { cor: '#e2c99e', ang: 0, passo: 3, maxL: 1.1, sombra: () => 0.4, cruzada: 0.9, traco: 1.2 });
+    k.restore();
+    // a parede grossa: o lado direito do vão, na sombra
+    const lado = new Path2D();
+    lado.moveTo(jx + jw, jy + jw / 2);
+    lado.arc(jx + jw / 2, jy + jw / 2, jw / 2, 0, -0.9, true);
+    lado.lineTo(jx + jw - 14, jy + jw / 2 - 8);
+    lado.lineTo(jx + jw - 14, jy + jh);
+    lado.lineTo(jx + jw, jy + jh);
+    lado.closePath();
+    peca(k, lado, [jx + jw - 20, jy, jx + jw, jy + jh], { cor: '#b9a27a', ang: 1.5, passo: 2.6, maxL: 1.5, sombra: () => 0.65, cruzada: 0.7, traco: 1.2 });
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.stroke(vao);
+    peca(k, pol([[jx - 14, jy + jh], [jx + jw + 14, jy + jh], [jx + jw + 18, jy + jh + 16], [jx - 18, jy + jh + 16]]), [jx - 18, jy + jh, jx + jw + 18, jy + jh + 16], { cor: '#e2cfa8', ang: 0, passo: 3, maxL: 1.2, sombra: () => 0.35, cruzada: 0.9, traco: 1.6 });
+    // o facho de luz no ar: só a parede mais clara (feito acima) e uns grãos de poeira
+    for (let i = 0; i < 90; i++) {
+      const y = jy + jh + r() * 420;
+      const t = (y - jy) / 600;
+      const x = jx + jw / 2 + t * 420 + (r() - 0.5) * (110 + t * 260);
+      k.fillStyle = 'rgba(255,246,222,' + (0.3 + r() * 0.5).toFixed(2) + ')';
+      k.beginPath();
+      k.arc(x, y, 0.8 + r() * 1.2, 0, 6.283);
+      k.fill();
+    }
+    // o chão de lajes, em perspectiva
+    const piso = pol([[-10, chao], [W + 10, chao], [W + 10, H + 10], [-10, H + 10]]);
+    k.fillStyle = '#c9b089';
+    k.fill(piso);
+    chaoEmLinhas(k, r, piso, -10, W + 10, chao, H, 1.8, (x, y) => 0.5 - luzEm(x, y) * 0.3 + (y - chao) / 900);
+    k.strokeStyle = 'rgba(43,33,18,.6)';
+    k.lineWidth = 1.4;
+    for (const xb of [-300, -60, 180, 420, 660, 900, 1140]) { k.beginPath(); k.moveTo(444 + (xb - 444) * 0.62, chao); k.lineTo(xb, H + 10); k.stroke(); }
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2;
+    k.beginPath();
+    k.moveTo(0, chao);
+    k.lineTo(W, chao);
+    k.stroke();
+    // o banco de cedro, encostado na parede, à direita
+    const bx0 = 470;
+    const bx1 = 900;
+    const tampoB = pol([[bx0, 520], [bx1, 520], [bx1, 548], [bx0, 548]]);
+    const frenteB = pol([[bx0, 548], [bx1, 548], [bx1, 690], [bx0, 690]]);
+    sombraNoChao(k, pol([[bx0 - 10, 690], [bx1, 690], [bx1, 720], [bx0 - 40, 716]]), 0, 0, 8, 0.35);
+    peca(k, tampoB, [bx0, 520, bx1, 548], { cor: '#a8794a', ang: 0, passo: 3, maxL: 1.4, sombra: (x) => 0.3 - luzEm(x, 520) * 0.2, cruzada: 0.8, traco: 2, obj });
+    peca(k, frenteB, [bx0, 548, bx1, 690], { cor: '#8e6238', ang: 0.02, passo: 3.2, maxL: 1.8, sombra: (x, y) => 0.55 - luzEm(x, y) * 0.25, cruzada: 0.7, traco: 2, obj });
+    // os veios e as almofadas do painel do banco
+    k.strokeStyle = 'rgba(40,22,8,.7)';
+    k.lineWidth = 1.6;
+    for (const xa of [bx0 + 20, bx0 + 160, bx0 + 300]) k.strokeRect(xa, 566, 120, 106);
+    // o pano dobrado em cima do banco, com a palheta de osso
+    const pano = pol([[640, 522], [660, 498], [790, 494], [812, 520]]);
+    peca(k, pano, [640, 494, 812, 522], { cor: '#7e3a2a', ang: 0, passo: 2.6, maxL: 1.3, sombra: (x, y) => 0.35 + (y - 494) / 60, cruzada: 0.8, traco: 1.6, obj });
+    k.strokeStyle = '#d9a443';
+    k.lineWidth = 3;
+    k.beginPath();
+    k.moveTo(646, 516);
+    k.lineTo(806, 514);
+    k.stroke();
+    const palheta = new Path2D();
+    palheta.moveTo(700, 494);
+    palheta.quadraticCurveTo(724, 484, 744, 488);
+    palheta.quadraticCurveTo(730, 496, 704, 499);
+    palheta.closePath();
+    k.fillStyle = '#f2e6c8';
+    k.fill(palheta);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.4;
+    k.stroke(palheta);
+    marcar(k, obj, palheta);
+    // o tapete no chão, em perspectiva, com as faixas tecidas
+    const tap = [[120, 700], [600, 690], [700, 820], [40, 836]];
+    const tapete = pol(tap);
+    sombraNoChao(k, tapete, 4, 6, 4, 0.25);
+    k.fillStyle = '#b45a3a';
+    k.fill(tapete);
+    k.save();
+    k.clip(tapete);
+    const T = (u, v) => [tap[0][0] + (tap[1][0] - tap[0][0]) * u + (tap[3][0] - tap[0][0]) * v + (tap[2][0] - tap[1][0] - tap[3][0] + tap[0][0]) * u * v, tap[0][1] + (tap[1][1] - tap[0][1]) * u + (tap[3][1] - tap[0][1]) * v + (tap[2][1] - tap[1][1] - tap[3][1] + tap[0][1]) * u * v];
+    for (const [v0, v1, cor] of [[0.08, 0.2, '#e3c78a'], [0.32, 0.44, '#3f4e6e'], [0.56, 0.68, '#e3c78a'], [0.8, 0.92, '#3f4e6e']]) {
+      k.fillStyle = cor;
+      k.fill(pol([T(0, v0), T(1, v0), T(1, v1), T(0, v1)]));
+      // os losangos da faixa
+      k.fillStyle = cor === '#e3c78a' ? '#7e3a2a' : '#e3c78a';
+      for (let u = 0.03; u < 1; u += 0.07) {
+        const vm = (v0 + v1) / 2;
+        k.fill(pol([T(u, vm - 0.04), T(u + 0.025, vm), T(u, vm + 0.04), T(u - 0.025, vm)]));
+      }
+    }
+    gravar(k, tapete, 370, 765, 380, 0.05, 3, 1.3, (x, y) => 0.3 - luzEm(x, y) * 0.3 + (y - 690) / 400, '#2a1408', 0);
+    k.restore();
+    k.strokeStyle = '#2a1408';
+    k.lineWidth = 1.8;
+    k.stroke(tapete);
+
+    // a harpa (kinnor): desenhada em pé no seu próprio plano e posta no lugar com um giro
+    // de três quartos (achatada no x) e uma leve inclinação para trás, contra o banco
+    const ox = 420;
+    const oy = 752;
+    const giro = -0.07;
+    const ach = 0.78;
+    const P = (x, y) => [ox + (x * ach) * Math.cos(giro) - y * Math.sin(giro), oy + (x * ach) * Math.sin(giro) + y * Math.cos(giro)];
+    const esp = [16, -5];
+    const caminho = (pts, fechar = true) => pol(pts.map(([x, y]) => P(x, y)), fechar);
+    const madeira = '#a26a36';
+    const sombraLira = (x, y) => 0.32 - luzEm(x, y) * 0.3;
+    // as formas, em coordenadas da harpa (y para cima é negativo; a base da caixa é y = 0)
+    const caixa = [[-118, -4], [-128, -40], [-120, -78], [124, -82], [134, -42], [124, -4]];
+    // os braços: curvos, abrindo para fora; o da esquerda bem mais alto (a travessa desce)
+    const bracoE = curvaPor([[-104, -70], [-140, -160], [-182, -270], [-196, -370], [-184, -452]].map(([x, y]) => P(x, y)), 3);
+    const bracoD = curvaPor([[104, -72], [138, -150], [158, -230], [156, -300], [140, -346]].map(([x, y]) => P(x, y)), 3);
+    const lBE = (s) => 30 - s * 0.03;
+    const lBD = (s) => 28 - s * 0.03;
+    const yE = [-196, -428];
+    const yD = [150, -326];
+    const travessa = [[yE[0] - 26, yE[1] - 18], [yE[0] + 14, yE[1] - 14], [yD[0] + 8, yD[1] - 14], [yD[0] + 34, yD[1] - 6], [yD[0] + 32, yD[1] + 16], [yD[0] + 6, yD[1] + 10], [yE[0] + 12, yE[1] + 12], [yE[0] - 28, yE[1] + 6]];
+    const espessura = (pts) => pol(pts.map(([x, y]) => { const [a, b] = P(x, y); return [a + esp[0], b + esp[1]]; }));
+    const espTubo = (c, l) => tuboAo(c.map((q) => ({ ...q, x: q.x + esp[0], y: q.y + esp[1] })), l).forma;
+    // a sombra no tapete e no banco
+    sombraNoChao(k, pol([P(-130, 0), P(130, 0), [P(130, 0)[0] + 120, P(130, 0)[1] - 10], [P(-130, 0)[0] + 140, P(-130, 0)[1] + 4]]), 0, 0, 8, 0.35);
+    // a espessura (o lado de trás que aparece), mais escura
+    for (const f of [espTubo(bracoE, lBE), espTubo(bracoD, lBD), espessura(travessa), espessura(caixa)]) peca(k, f, [0, 0, W, H], { cor: '#6a4220', sombra: () => 0.7, ang: 0.4, passo: 3, maxL: 1.4, cruzada: 0.75, traco: 1.8, obj });
+    // a caixa de som, com a tampa de madeira fina
+    const fCaixa = caminho(caixa);
+    peca(k, fCaixa, [P(-130, -82)[0], P(130, -82)[1] - 60, P(130, 0)[0], P(-130, 0)[1] + 10], { cor: madeira, ang: giro + 0.05, passo: 3, maxL: 1.8, sombra: (x, y) => sombraLira(x, y) + (y - P(0, -42)[1]) / 220, cruzada: 0.7, traco: 2.2, obj });
+    k.save();
+    k.clip(fCaixa);
+    k.strokeStyle = 'rgba(50,24,6,.55)';
+    k.lineWidth = 1;
+    for (let y = -72; y < -8; y += 9) {
+      k.beginPath();
+      for (let x = -128; x <= 132; x += 8) { const [a, b] = P(x, y + Math.sin(x * 0.03 + y) * 2.2); if (x === -128) k.moveTo(a, b); else k.lineTo(a, b); }
+      k.stroke();
+    }
+    k.restore();
+    // os braços, curvos, e a travessa
+    for (const [c, l] of [[bracoE, lBE], [bracoD, lBD]]) {
+      const fb = tuboAo(c, l).forma;
+      peca(k, fb, [0, 0, W, H], { cor: madeira, ang: giro + Math.PI / 2 + 0.1, passo: 2.8, maxL: 1.7, sombra: (x, y) => sombraLira(x, y) + 0.12, cruzada: 0.7, traco: 2.2, obj });
+    }
+    const fT = caminho(travessa);
+    peca(k, fT, [0, 0, W, H], { cor: '#93602f', ang: giro - 0.55, passo: 2.8, maxL: 1.7, sombra: (x, y) => sombraLira(x, y) + 0.15, cruzada: 0.7, traco: 2.2, obj });
+    // o cavalete na caixa, onde cada corda se prende embaixo
+    const cav = caminho([[-80, -60], [80, -62], [80, -50], [-80, -48]]);
+    peca(k, cav, [0, 0, W, H], { cor: '#e6d2a8', ang: 0, passo: 2.4, maxL: 1, sombra: () => 0.3, cruzada: 0.9, traco: 1.4, obj });
+    const n = 10;
+    const cordas = [];
+    for (let i = 0; i < n; i++) {
+      const u = i / (n - 1);
+      const baixo = [-72 + u * 144, -54];
+      const alto = [yE[0] + 40 + u * (yD[0] - yE[0] - 70), yE[1] + 8 + u * (yD[1] - yE[1] - 12)];
+      cordas.push([baixo, alto]);
+    }
+    k.lineCap = 'round';
+    cordas.forEach(([b, a], i) => {
+      const [x0, y0] = P(...b);
+      const [x1, y1] = P(...a);
+      const vibra = i === 3 || i === 6;
+      k.strokeStyle = 'rgba(40,20,6,.55)';
+      k.lineWidth = 1.6;
+      k.beginPath();
+      k.moveTo(x0 + 3, y0 + 1);
+      k.lineTo(x1 + 3, y1 + 1);
+      k.stroke();
+      for (const d of vibra ? [-2.6, 2.6] : [0]) {
+        k.strokeStyle = vibra ? 'rgba(250,238,208,.8)' : '#f4e6c0';
+        k.lineWidth = vibra ? 1.1 : 1.6;
+        k.beginPath();
+        k.moveTo(x0, y0);
+        k.quadraticCurveTo((x0 + x1) / 2 + d, (y0 + y1) / 2, x1, y1);
+        k.stroke();
+      }
+      // a volta de cordão na travessa
+      k.fillStyle = '#e6d2a8';
+      k.beginPath();
+      k.ellipse(x1, y1 - 2, 5, 7, giro - 0.55, 0, 6.283);
+      k.fill();
+      k.strokeStyle = SEPIA;
+      k.lineWidth = 1.2;
+      k.stroke();
+      k.beginPath();
+      k.moveTo(x1 - 4, y1 - 4);
+      k.lineTo(x1 + 4, y1);
+      k.stroke();
+    });
+    // as pontas dos braços acima da travessa, entalhadas em botão
+    for (const [x, y] of [[-184, -462], [140, -356]]) {
+      const [a, b] = P(x, y);
+      const bt = new Path2D();
+      bt.ellipse(a, b, 13, 15, giro, 0, 6.283);
+      peca(k, bt, [a - 14, b - 16, a + 14, b + 16], { cor: '#93602f', ang: 1, passo: 2.4, maxL: 1.2, sombra: sombraOval(a, b, 13, 15, 0), cruzada: 0.7, traco: 1.8, obj });
+    }
+    vinheta(k, W, H, 0.32);
   }
   // ---------- fim dos Objetos ----------
 
