@@ -9205,38 +9205,49 @@
   // no céu, as nuvens redondas do Egeu e as gaivotas.
   function desenhoPatmos(k, W, H, obj) {
     const r = sorteio(7201);
-    papelVelho(k, W, H, r, ['#f8f0dc', '#e8d8b4', '#c4aa7e'], [170, 230]);
+    papelVelho(k, W, H, r, ['#f8f0dc', '#e8d8b4', '#c4aa7e'], [210, 380]);
     const hz = 410;
-    const sol = [170, 250];
-    // o céu da tarde: linhas que abrem em volta do sol baixo, as nuvens redondas
-    linhas(k, 0, 0, W, hz, 5, 1.5, (x, y) => 0.1 + Math.min(1, Math.hypot(x - sol[0], y - sol[1]) / 760) * 0.6);
-    for (const [x, y, rr] of [[560, 120, 70], [650, 96, 56], [730, 130, 60], [470, 140, 48], [300, 70, 44], [360, 60, 36], [820, 200, 40]]) {
-      const n = lanoso(r, Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * 6.283; return [x + Math.cos(a) * rr * 1.2, y + Math.min(Math.sin(a) * rr * 0.8, rr * 0.3)]; }), rr * 0.18, rr * 0.5);
-      k.fillStyle = '#fbf3df';
-      k.fill(n);
-      gravar(k, n, x, y, rr * 1.3, 0.3, 3.4, 1.6, (px, py) => 0.1 + Math.max(0, (py - y + rr * 0.2) / rr) * 0.9 + (px - x) / rr * 0.2, SEPIA, 0.3);
-      k.strokeStyle = 'rgba(43,33,18,.7)';
-      k.lineWidth = 1.4;
-      k.stroke(n);
+    const sol = [210, 400];
+    // o céu da tarde, só em linhas: um banco de nuvens que atravessa o céu, cheio de linha
+    // embaixo de cada rolo (a sombra) e com o alto dos rolos deixado em papel (a luz); embaixo
+    // dele, rente ao mar, a faixa clara onde o sol baixo rompe, sem disco
+    // as nuvens: cúmulos de base chata, cada um feito de vários rolos redondos; o alto fica
+    // no papel (a luz) e a sombra cresce para a base; o céu em volta, em linha mais cheia
+    const nuvens = [[330, 256, 140], [600, 236, 160], [170, 300, 96], [470, 316, 84], [740, 318, 84]];
+    const bolas = [];
+    for (const [cx, base, larg] of nuvens) {
+      const n = 6;
+      for (let q = 0; q < n; q++) {
+        const t = q / (n - 1) - 0.5;
+        const rr = larg * (0.32 - Math.abs(t) * 0.22) * (0.85 + r() * 0.3);
+        bolas.push({ x: cx + t * larg * 1.3 + (r() - 0.5) * 12, y: base - rr * 0.6, rr, base, larg });
+      }
+      bolas.push({ x: cx + (r() - 0.5) * 30, y: base - larg * 0.42, rr: larg * 0.3, base, larg });
     }
-    k.fillStyle = '#fff6de';
-    k.beginPath();
-    k.arc(sol[0], sol[1], 34, 0, 6.283);
-    k.fill();
-    k.strokeStyle = '#7a4a1c';
-    k.lineWidth = 1.6;
-    k.stroke();
-    {
-      const n = lanoso(r, Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * 6.283; return [sol[0] + 30 + Math.cos(a) * 70, sol[1] + 26 + Math.min(Math.sin(a) * 26, 10)]; }), 9, 26);
-      k.fillStyle = '#fbf3df';
-      k.fill(n);
-      gravar(k, n, sol[0] + 30, sol[1] + 26, 80, 0.3, 3.4, 1.5, (px, py) => 0.1 + Math.max(0, (py - sol[1] - 20) / 20) * 0.9, SEPIA, 0.3);
-      k.strokeStyle = 'rgba(43,33,18,.7)';
-      k.lineWidth = 1.4;
-      k.stroke(n);
-    }
+    const nuvem = (x, y) => {
+      let v = -1;
+      for (const b of bolas) {
+        if (y > b.base) continue;
+        const d = Math.hypot(x - b.x, y - b.y) / b.rr;
+        if (d < 1) {
+          const lado = (x - b.x) / b.rr;
+          v = Math.max(v, Math.min(0.85, 0.02 + Math.max(0, (y - (b.base - b.larg * 0.45)) / (b.larg * 0.45)) * 0.75 + Math.max(0, lado) * 0.2));
+        }
+      }
+      return v;
+    };
+    const fenda = (x, y) => Math.max(0, 1 - Math.hypot((x - sol[0]) / 280, (y - 372) / 46));
+    linhas(k, 0, 0, W, hz, 4, 2, (x, y) => {
+      const v = nuvem(x, y);
+      const base = v >= 0 ? v : 0.36 + (y < 120 ? (120 - y) / 300 : 0);
+      return base - fenda(x, y) * 0.95;
+    });
+    // os raios do sol que saem da fenda, finos, para cima, por trás das nuvens
+    k.strokeStyle = 'rgba(122,74,28,.35)';
+    k.lineWidth = 1;
+    for (let i = 0; i < 9; i++) { const a = -Math.PI / 2 + (i - 4) * 0.16; k.beginPath(); k.moveTo(sol[0] + Math.cos(a) * 60, 356 + Math.sin(a) * 40); k.lineTo(sol[0] + Math.cos(a) * 300, 356 + Math.sin(a) * 250); k.stroke(); }
     // as gaivotas: o corpo e as asas em arco, poucas
-    for (const [x, y, s] of [[420, 230, 1], [470, 260, 0.8], [640, 250, 1.2], [700, 300, 0.7], [250, 180, 0.6]]) {
+    for (const [x, y, s] of [[420, 330, 1], [470, 352, 0.8], [640, 340, 1.2], [700, 364, 0.7]]) {
       k.strokeStyle = SEPIA;
       k.lineWidth = 2.2 * s;
       k.lineCap = 'round';
@@ -9256,7 +9267,33 @@
     ilha.closePath();
     k.fillStyle = '#c9ae80';
     k.fill(ilha);
-    flancoEmRaios(k, r, ilha, [{ x: 414, y: 270, n: 9, fase: 0.6 }, { x: 300, y: 290, n: 7, fase: 1.8 }, { x: 530, y: 300, n: 7, fase: 2.4 }, { x: 660, y: 330, n: 6, fase: 0.2 }, { x: 160, y: 346, n: 5, fase: 1.1 }], [50, 260, 880, hz + 8], { maxL: 2.4, passo: 4.6, luz: -1, base: 0.04 });
+    // a pele da ilha: camadas de rocha deitadas, que acompanham o morro, mais cheias do lado da
+    // sombra (a luz vem da esquerda, do sol baixo), e o mato baixo em pontinhos
+    const alto = (x) => { for (let i = 1; i < perfil.length; i++) if (perfil[i][0] >= x) { const [ax, ay] = perfil[i - 1]; const [bx2, by2] = perfil[i]; return ay + (by2 - ay) * ((x - ax) / Math.max(1, bx2 - ax)); } return hz; };
+    k.save();
+    k.clip(ilha);
+    k.strokeStyle = SEPIA;
+    k.lineCap = 'round';
+    for (let y = 268; y < hz + 4; y += 4.2) {
+      let ant = null;
+      for (let x = 56; x <= 870; x += 5) {
+        const yy = y + Math.sin(x * 0.012 + y * 0.05) * 3 + (alto(x) - 270) * 0.18;
+        const dx = x - 414;
+        const w = 0.5 + Math.max(0, dx / 420) * 1.6 + (yy - alto(x)) / 260 + Math.max(0, Math.sin(x * 0.04 + y * 0.1)) * 0.5;
+        if (ant && yy > alto(x) + 2 && r() > 0.06) { k.lineWidth = Math.min(2.4, w); k.beginPath(); k.moveTo(ant[0], ant[1]); k.lineTo(x, yy); k.stroke(); }
+        ant = [x, yy];
+      }
+    }
+    for (let i = 0; i < 160; i++) {
+      const x = 70 + r() * 790;
+      const y = alto(x) + 6 + r() * (hz - alto(x) - 30);
+      k.fillStyle = 'rgba(43,33,18,.75)';
+      k.beginPath();
+      k.ellipse(x, y, 2.6 + r() * 2, 1.6 + r(), 0, 0, 6.283);
+      k.fill();
+    }
+    k.restore();
+
     k.strokeStyle = SEPIA;
     k.lineWidth = 2;
     k.stroke(ilha);
@@ -9332,7 +9369,7 @@
     roch.closePath();
     k.fillStyle = '#8f7656';
     k.fill(roch);
-    flancoEmRaios(k, r, roch, [{ x: 720, y: 640, n: 6, fase: 1 }, { x: 850, y: 610, n: 5, fase: 2.2 }], [560, 600, W + 10, H + 10], { maxL: 2.8, passo: 5, luz: -1, base: 0.15 });
+    hachuraEmFaixas(k, r, roch, 560, W + 10, [610, 660, 712, 760, 812, 870].map((b0, q) => (x) => b0 + (x - 560) * -0.12 + Math.sin(x * 0.03 + q) * 6), 5, 2.4, (x) => 0.45 + (x - 600) / 500, SEPIA, { juntas: 3 });
     k.strokeStyle = SEPIA;
     k.lineWidth = 2.4;
     k.stroke(roch);
