@@ -5074,7 +5074,7 @@
     for (let i = 0; i < 1300; i++) {
       const u = r();
       const v = r();
-      const x0 = 30 - u * 150;
+      const x0 = 64 - u * 196;
       const y0 = -86 + v * (baixo + 86);
       const ang = Math.atan2(y0 + 10, x0 - 40) + (r() - 0.5) * 0.5;
       const c = 16 + r() * 26;
@@ -5096,13 +5096,13 @@
     for (let i = 0; i < bordaJ.length - 1; i++) {
       const [x0, y0] = bordaJ[i];
       const [x1, y1] = bordaJ[i + 1];
-      const n = Math.round(Math.hypot(x1 - x0, y1 - y0) / 5);
+      const n = Math.round(Math.hypot(x1 - x0, y1 - y0) / 7);
       for (let j = 0; j < n; j++) {
         const t = j / n;
         const px = x0 + (x1 - x0) * t;
         const py = y0 + (y1 - y0) * t;
         const ang = 0.45 * (Math.atan2(py + 10, px - 40) + 0.3) + 0.55 * 2.5 + (r() - 0.5) * 0.5;
-        const c = 8 + r() * 16;
+        const c = 6 + r() * 13;
         const ix = px + Math.cos(ang + Math.PI) * 10;
         const iy = py + Math.sin(ang + Math.PI) * 10;
         k.strokeStyle = tinta;
@@ -5358,7 +5358,7 @@
     k.restore();
     // a perna da frente de cá, estendida: o cotovelo no chão, o antebraço e a pata com os dedos
     const pata = pernaDeLeao(0, 0, 230);
-    peca(k, pata, [36, -60, 250, 4], { cor: '#d6ab70', tinta, ang: 0.05, passo: 3.2, maxL: 1.7, sombra: (px, py) => 0.18 + (py + 40) / 50, cruzada: 0.75, traco: 2, obj, abaulado: 0.3 });
+    peca(k, pata, [36, -60, 250, 4], { cor: '#d0a46a', tinta, ang: 0.05, passo: 3.2, maxL: 1.7, sombra: (px, py) => 0.3 + (py + 40) / 60 + Math.max(0, (110 - px) / 200), cruzada: 0.75, traco: 2, obj, abaulado: 0.3 });
     dedosDeLeao(k, 0, 0, 230, tinta);
     k.save();
     k.translate(112, -84);
@@ -5372,13 +5372,13 @@
   // redonda com os dedos e as almofadas. Devolve a forma, para quem a pinta.
   function pernaDeLeao(dx, dy, comp) {
     const p = new Path2D();
-    p.moveTo(dx + 36, dy - 60);
-    p.bezierCurveTo(dx + 56, dy - 58, dx + 74, dy - 40, dx + 96, dy - 32);
+    p.moveTo(dx + 34, dy - 40);
+    p.bezierCurveTo(dx + 38, dy - 50, dx + 66, dy - 44, dx + 96, dy - 32);
     p.bezierCurveTo(dx + 130, dy - 26, dx + comp - 50, dy - 30, dx + comp - 22, dy - 32);
     p.bezierCurveTo(dx + comp - 4, dy - 36, dx + comp + 16, dy - 26, dx + comp + 18, dy - 12);
     p.bezierCurveTo(dx + comp + 19, dy - 2, dx + comp + 10, dy + 2, dx + comp - 6, dy + 2);
     p.lineTo(dx + 80, dy + 2);
-    p.bezierCurveTo(dx + 56, dy + 4, dx + 38, dy - 4, dx + 36, dy - 22);
+    p.bezierCurveTo(dx + 50, dy + 4, dx + 32, dy - 10, dx + 34, dy - 40);
     p.closePath();
     return p;
   }
@@ -5474,7 +5474,7 @@
     k.restore();
     // a perna da frente de cá
     const p1 = pernaDeLeao(0, 0, 218);
-    peca(k, p1, [30, -64, 240, 4], { cor: '#d6ab70', tinta, ang: 0.05, passo: 3.2, maxL: 1.7, sombra: (px, py) => 0.18 + (py + 40) / 50, cruzada: 0.75, traco: 2, obj, abaulado: 0.3 });
+    peca(k, p1, [30, -64, 240, 4], { cor: '#d0a46a', tinta, ang: 0.05, passo: 3.2, maxL: 1.7, sombra: (px, py) => 0.3 + (py + 40) / 60 + Math.max(0, (110 - px) / 200), cruzada: 0.75, traco: 2, obj, abaulado: 0.3 });
     dedosDeLeao(k, 0, 0, 218, tinta);
     // a cabeça de perfil, erguida, olhando para a frente (para a direita, antes do espelho)
     k.save();
