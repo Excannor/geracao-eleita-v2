@@ -6278,7 +6278,8 @@
     'tunica-jose': desenhoTunica,
     'vara-moises': desenhoVara,
     'candelabro': desenhoCandelabro,
-    'tabuas-alianca': desenhoTabuas };
+    'tabuas-alianca': desenhoTabuas,
+    'serpente-bronze': desenhoSerpente };
   const temArte = (id) => Object.prototype.hasOwnProperty.call(DESENHOS, id);
   // O foco da arte cheia (a glória), opcional por desenho: [fx, fy] é o ponto do desenho (em
   // fração dos 888 x 846) que tem de ficar à vista, entre a pílula do alto e o papel do texto;
@@ -10244,8 +10245,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
   }
   // Um tubo de ouro gravado ao longo de uma curva: o tom pela largura (aceso do lado da luz),
   // a hachura de volta na sombra e o fio de luz. "luz" diz de que lado (−1 ou 1) a luz bate.
-  function tuboDeOuro(k, c, larg, { luz = -1, obj, claro = 0 } = {}) {
-    const { forma } = tuboAo(c, larg);
+  function tuboDeOuro(k, c, larg, { luz = -1, obj, claro = 0, tom = tomDeOuro, tinta = TINTA_OURO, brilhoCor = 'rgba(255,246,214,.75)', semPontas = false } = {}) {
+    const { forma, e: bordaE, d: bordaD } = tuboAo(c, larg);
     marcar(k, obj, forma);
     k.save();
     k.clip(forma);
@@ -10253,13 +10254,13 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       const w = larg(q.s) / 2 + 1.5;
       for (let v = -1; v <= 1.001; v += 0.2) {
         const l = Math.max(0, Math.min(1, 0.5 - v * luz * 0.42 - Math.abs(v) * 0.18 + claro));
-        k.fillStyle = tomDeOuro(0.2 + l * 0.75);
+        k.fillStyle = tom(0.2 + l * 0.75);
         k.beginPath();
         k.arc(q.x - q.ty * v * w, q.y + q.tx * v * w, Math.max(1.6, w * 0.24), 0, 6.283);
         k.fill();
       }
     }
-    k.strokeStyle = TINTA_OURO;
+    k.strokeStyle = tinta;
     k.lineCap = 'round';
     for (let i = 0; i < c.length; i += 1) {
       const q = c[i];
@@ -10271,15 +10272,15 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       k.lineTo(q.x + q.ty * luz * 1.0 * w, q.y - q.tx * luz * 1.0 * w);
       k.stroke();
     }
-    k.strokeStyle = 'rgba(255,246,214,.75)';
+    k.strokeStyle = brilhoCor;
     k.lineWidth = Math.max(1, larg(0) * 0.08);
     k.beginPath();
     c.forEach((q, i) => { const w = larg(q.s) / 2; const x = q.x - q.ty * luz * -0.55 * w; const y = q.y + q.tx * luz * -0.55 * w; if (i) k.lineTo(x, y); else k.moveTo(x, y); });
     k.stroke();
     k.restore();
-    k.strokeStyle = TINTA_OURO;
+    k.strokeStyle = tinta;
     k.lineWidth = 1.8;
-    k.stroke(forma);
+    if (semPontas) { k.stroke(pol(bordaE, false)); k.stroke(pol(bordaD, false)); } else k.stroke(forma);
     return forma;
   }
   // Uma taça em flor de amêndoa num braço do candelabro (Êx 25.33): o botão (o bulbo redondo)
@@ -10720,6 +10721,220 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     // a de trás, encostada na da frente, inclinada; a da frente, de pé, inteira
     tabua([432, 206], [682, 210], [690, 676], [436, 672], 52, [16, -5], 0.6, 7520);
     tabua([196, 200], [446, 200], [450, 686], [200, 686], 52, [16, -5], 1, 7530);
+    vinheta(k, W, H, 0.22);
+  }
+  // O tom do bronze, do escuro (0) ao brilho (1).
+  const BRONZE_TONS = [[0, [34, 16, 6]], [0.3, [104, 50, 20]], [0.6, [176, 98, 46]], [0.85, [232, 170, 104]], [1, [255, 232, 196]]];
+  function tomDeBronze(v, a = 1) {
+    const t = Math.max(0, Math.min(1, v));
+    let i = 0;
+    while (i < BRONZE_TONS.length - 2 && t > BRONZE_TONS[i + 1][0]) i++;
+    const [p0, c0] = BRONZE_TONS[i];
+    const [p1, c1] = BRONZE_TONS[i + 1];
+    const u = (t - p0) / (p1 - p0);
+    return 'rgba(' + c0.map((c, j) => Math.round(c + (c1[j] - c) * u)).join(',') + ',' + a + ')';
+  }
+  const TINTA_BRONZE = '#2a1206';
+
+  // ---------- (6) A serpente de bronze (Nm 21.8-9) ----------
+  // Vista de baixo, no deserto, no fim da tarde: o poste alto de madeira, firmado num monte de
+  // pedras, e no alto dele a serpente de bronze enrolada (duas voltas, o rabo embaixo), com o
+  // pescoço erguido acima da ponta e a cabeça de perfil, alta sobre o deserto. O bronze é
+  // gravado em escamas, como peça fundida e cinzelada. Atrás, as serras de Edom (21.4).
+  function desenhoSerpente(k, W, H, obj) {
+    const r = sorteio(7601);
+    papelVelho(k, W, H, r, ['#fbeccf', '#f1d2a2', '#d8ac76'], [700, 520]);
+    const hz = 640;
+    // o céu do fim da tarde: linhas que abrem perto do sol baixo, à direita (fora do quadro)
+    ceuEmLinhas(k, W, hz, [[200, 220, 260, 30], [640, 140, 220, 24], [300, 470, 300, 20], [760, 400, 160, 16]], { topo: 0.66, base: 0.12, maxL: 1.6 });
+    // as serras de Edom, longe
+    for (const [base, amp, cor, sv, sem] of [[600, 60, '#e2c09a', 0.3, 1], [636, 34, '#d2ac80', 0.5, 2]]) {
+      const f = onda(sorteio(7610 + sem), 5, 0.009);
+      const m = pol([[-10, 700], ...Array.from({ length: 60 }, (_, i) => [i * 16 - 6, base - Math.abs(f(i * 16)) * amp]), [W + 10, 700]]);
+      peca(k, m, [-10, base - amp, W + 10, 700], { cor, ang: 1.1, passo: 4, maxL: 1.1, sombra: (x, y) => sv + (y - base + amp) / 300, cruzada: 0.9, traco: 1.4 });
+    }
+    // o chão de pedra e areia, perto
+    const chao = new Path2D();
+    chao.moveTo(-10, hz + 6);
+    for (let x = -10; x <= W + 10; x += 10) chao.lineTo(x, hz + 2 + Math.sin(x * 0.015) * 4);
+    chao.lineTo(W + 10, H + 10);
+    chao.lineTo(-10, H + 10);
+    chao.closePath();
+    k.fillStyle = '#dcbf92';
+    k.fill(chao);
+    chaoEmLinhas(k, r, chao, -10, W + 10, hz, H, 1.8, (x, y) => 0.4 + (y - hz) / 400);
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.5;
+    k.stroke(chao);
+    const pedra = (x, y, rx, ry, o) => {
+      const p = contornoRocha(r, [[x - rx, y + ry * 0.5], [x - rx * 0.7, y - ry * 0.6], [x - rx * 0.1, y - ry], [x + rx * 0.6, y - ry * 0.7], [x + rx, y + ry * 0.3], [x + rx * 0.5, y + ry * 0.8]], Math.max(1.5, rx * 0.1));
+      p.closePath();
+      sombraNoChao(k, p, -rx * 0.4, ry * 0.3, 3, 0.3);
+      peca(k, p, [x - rx, y - ry, x + rx, y + ry], { cor: '#d3b88e', ang: 0.7, passo: Math.max(2.4, rx * 0.1), maxL: 1.5, sombra: sombraOval(x, y, rx, ry, 0), cruzada: 0.7, traco: 1.6, obj: o });
+    };
+    for (const [x, y, rx, ry] of [[80, 690, 30, 10], [760, 680, 40, 13], [640, 760, 22, 8], [120, 800, 46, 16], [820, 790, 30, 11], [300, 700, 16, 6]]) pedra(x, y, rx, ry);
+    // o poste: madeira em pé, um pouco torta, firmada num monte de pedras
+    const px = 430;
+    const pTopo = 256;
+    const pBase = 740;
+    const poste = pol([[px - 19, pBase], [px - 16, 420], [px - 14, pTopo + 4], [px - 6, pTopo - 3], [px + 8, pTopo - 2], [px + 15, pTopo + 6], [px + 16, 420], [px + 20, pBase]]);
+    sombraNoChao(k, pol([[px - 14, pBase], [px + 14, pBase], [px - 220, pBase + 70], [px - 250, pBase + 66]]), 0, 0, 6, 0.3);
+    peca(k, poste, [px - 16, pTopo, px + 16, pBase], { cor: '#9a7a50', ang: 1.56, passo: 2.6, maxL: 1.5, sombra: (x) => 0.2 + (px + 16 - x) / 32 * 0.55, cruzada: 0.75, traco: 2.2, obj });
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.3;
+    for (const y of [300, 470, 620]) { k.beginPath(); k.ellipse(px + (r() - 0.5) * 4, y, 4, 8, 0, 0, 6.283); k.stroke(); }
+    for (const [x, y, rx, ry] of [[px - 58, pBase + 4, 34, 18], [px + 52, pBase + 6, 38, 20], [px - 6, pBase + 18, 30, 14], [px - 30, pBase - 18, 22, 12], [px + 30, pBase - 16, 22, 12], [px, pBase - 30, 18, 10]]) pedra(x, y, rx, ry, obj);
+
+    // a serpente de bronze: duas voltas em hélice em volta do alto do poste, o rabo embaixo
+    const R = 66;
+    const yRabo = 600;
+    const yCima = 300;
+    const voltas = 2;
+    const pts = [];
+    for (let i = 0; i <= 120; i++) {
+      const t = i / 120;
+      const a = t * voltas * Math.PI * 2 + 0.5;
+      pts.push({ x: px + Math.cos(a) * R * (0.85 + 0.15 * t), y: yRabo - t * (yRabo - yCima) + Math.sin(a) * 36, z: Math.sin(a) });
+    }
+    // depois da última volta, o pescoço sobe acima da ponta do poste e a cabeça vira para a frente
+    const pesc = [[pts[120].x, pts[120].y], [px + 14, yCima - 70], [px - 8, yCima - 116], [px + 18, yCima - 152], [px + 58, yCima - 162]];
+    const corpoC = curvaPor([...pts.map((q) => [q.x, q.y]), ...pesc.slice(1)], 2);
+    const Ltot = corpoC[corpoC.length - 1].s;
+    const largB = (s) => 13 + Math.min(1, s / (Ltot * 0.5)) * 25 - Math.max(0, s - Ltot + 90) * 0.08;
+    // a profundidade de cada ponto da curva: perto (na frente do poste) ou longe (atrás)
+    const zDe = (q) => {
+      if (q.y < yCima - 4) return 1;
+      let m = 0;
+      let d0 = 1e9;
+      pts.forEach((p, i) => { const d = Math.abs(p.x - q.x) + Math.abs(p.y - q.y); if (d < d0) { d0 = d; m = i; } });
+      return pts[m].z;
+    };
+    const tons = { tom: tomDeBronze, tinta: TINTA_BRONZE, brilhoCor: 'rgba(255,226,180,.8)', luz: 1 };
+    const trechos = (frente) => {
+      const out = [];
+      let atual = [];
+      for (const q of corpoC) {
+        const z = zDe(q);
+        if ((z >= -0.05) === frente) atual.push(q);
+        else if (atual.length) { out.push(atual); atual = []; }
+      }
+      if (atual.length) out.push(atual);
+      return out;
+    };
+    // o corpo em discos, um por amostra, do rabo à cabeça: primeiro a beirada escura de todos,
+    // depois o bronze (o tom com a luz da direita) e as escamas cinzeladas de cada disco. Assim
+    // as voltas fazem a curva sem emenda; as de trás vêm antes do poste, as da frente depois.
+    const discos = (lista, escurecer) => {
+      for (const q of lista) {
+        const w = largB(q.s) / 2;
+        k.fillStyle = TINTA_BRONZE;
+        k.beginPath();
+        k.arc(q.x, q.y, w + 1.8, 0, 6.283);
+        k.fill();
+      }
+      // o tom: pontos ao longo da largura (aceso à direita, na sombra à esquerda)
+      for (const q of lista) {
+        const w = largB(q.s) / 2;
+        k.fillStyle = tomDeBronze(0.6 - escurecer);
+        k.beginPath();
+        k.arc(q.x, q.y, w, 0, 6.283);
+        k.fill();
+        for (let v = -0.95; v <= 0.951; v += 0.19) {
+          const l = Math.max(0, Math.min(1, 0.55 + v * 0.42 - Math.abs(v) ** 3 * 0.35 - escurecer));
+          k.fillStyle = tomDeBronze(0.18 + l * 0.8);
+          k.beginPath();
+          k.arc(q.x - q.ty * v * w, q.y + q.tx * v * w, Math.max(2, w * 0.2), 0, 6.283);
+          k.fill();
+        }
+      }
+      // as escamas: riscos oblíquos cinzelados, mais fundos na sombra; o fio de luz em cima
+      k.lineCap = 'round';
+      lista.forEach((q, i) => {
+        if (i % 3) return;
+        const w = largB(q.s) / 2;
+        for (const sg of [1, -1]) {
+          for (let v = -0.8; v < 0.4; v += 0.4) {
+            const v1 = v + 0.4;
+            k.strokeStyle = 'rgba(42,18,6,' + (0.3 + Math.max(0, -v) * 0.5).toFixed(2) + ')';
+            k.lineWidth = 0.8 + Math.max(0, -v) * 0.6;
+            k.beginPath();
+            k.moveTo(q.x - q.ty * v * w, q.y + q.tx * v * w);
+            k.lineTo(q.x - q.ty * v1 * w + q.tx * sg * w * 0.38, q.y + q.tx * v1 * w + q.ty * sg * w * 0.38);
+            k.stroke();
+          }
+        }
+      });
+      k.strokeStyle = 'rgba(255,230,190,.7)';
+      k.lineWidth = 1.4;
+      lista.forEach((q, i) => {
+        if (i % 2) return;
+        const w = largB(q.s) / 2;
+        k.beginPath();
+        k.arc(q.x - q.ty * 0.55 * w, q.y + q.tx * 0.55 * w, 0.8, 0, 6.283);
+        k.stroke();
+      });
+      if (obj) for (const q of lista) { const pp = new Path2D(); pp.arc(q.x, q.y, largB(q.s) / 2 + 2, 0, 6.283); marcar(k, obj, pp); }
+    };
+    const fT = tuboAo(corpoC, (s) => largB(s)).forma;
+    sombraNoChao(k, fT, 10, 6, 5, 0.3);
+    const tras = corpoC.filter((q, i) => i % 2 === 0 && zDe(q) < -0.05);
+    const frente = corpoC.filter((q, i) => i % 2 === 0 && zDe(q) >= -0.05);
+    discos(tras, 0.04);
+    peca(k, poste, [px - 20, pTopo, px + 20, pBase], { cor: '#9a7a50', ang: 1.56, passo: 2.6, maxL: 1.5, sombra: (x) => 0.2 + (px + 16 - x) / 32 * 0.55, cruzada: 0.75, traco: 2.2 });
+    discos(frente, 0);
+    // a cabeça de bronze, de perfil para a direita, alta sobre o poste: larga atrás, o focinho
+    // baixo e redondo, a boca fechada em linha comprida, a placa grossa por cima do olho
+    const fimB = corpoC[corpoC.length - 1];
+    k.save();
+    k.translate(fimB.x - 8, fimB.y);
+    k.rotate(Math.atan2(fimB.ty, fimB.tx) * 0.5 + 0.06);
+    k.scale(1.7, 1.7);
+    const cab = new Path2D();
+    cab.moveTo(-14, 13);
+    cab.bezierCurveTo(-14, -4, -2, -15, 16, -16);
+    cab.bezierCurveTo(32, -17, 48, -11, 57, -3);
+    cab.bezierCurveTo(63, 2, 62, 8, 56, 10);
+    cab.bezierCurveTo(40, 14, 20, 17, 4, 18);
+    cab.bezierCurveTo(-6, 19, -12, 18, -14, 13);
+    cab.closePath();
+    const gc = k.createLinearGradient(0, -16, 0, 18);
+    gc.addColorStop(0, tomDeBronze(0.92));
+    gc.addColorStop(0.5, tomDeBronze(0.66));
+    gc.addColorStop(1, tomDeBronze(0.3));
+    k.fillStyle = gc;
+    k.fill(cab);
+    marcar(k, obj, cab);
+    gravar(k, cab, 22, 0, 46, 0.12, 2.6, 1.3, (x, y) => 0.15 + (y + 16) / 34 * 0.75, TINTA_BRONZE, 0.1);
+    k.strokeStyle = TINTA_BRONZE;
+    k.lineWidth = 1.8;
+    k.stroke(cab);
+    k.lineWidth = 1.2;
+    k.beginPath();
+    for (const [x0, y0, x1, y1] of [[8, -13, 12, -5], [22, -16, 24, -7], [36, -14, 36, -6]]) { k.moveTo(x0, y0); k.lineTo(x1, y1); }
+    k.stroke();
+    k.lineWidth = 1.5;
+    k.beginPath();
+    k.moveTo(58, 7);
+    k.bezierCurveTo(44, 11, 26, 12, 10, 13);
+    k.stroke();
+    // a placa sobre o olho e o olho de bronze (um botão cinzelado)
+    k.beginPath();
+    k.moveTo(28, -11);
+    k.quadraticCurveTo(36, -12, 42, -7);
+    k.stroke();
+    k.fillStyle = tomDeBronze(0.95);
+    k.beginPath();
+    k.arc(35, -5, 3.6, 0, 6.283);
+    k.fill();
+    k.stroke();
+    k.fillStyle = TINTA_BRONZE;
+    k.beginPath();
+    k.arc(35.4, -4.6, 1.3, 0, 6.283);
+    k.fill();
+    k.beginPath();
+    k.ellipse(54, 0, 1.4, 1, 0.3, 0, 6.283);
+    k.fill();
+    k.restore();
     vinheta(k, W, H, 0.22);
   }
   // ---------- fim dos Objetos ----------
