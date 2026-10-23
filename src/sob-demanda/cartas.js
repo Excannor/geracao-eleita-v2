@@ -10663,12 +10663,13 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
   const TINTA_BRONZE = '#2a1206';
 
   // ---------- (6) A serpente de bronze (Nm 21.8-9) ----------
-  // No deserto, no fim da tarde, vista de baixo: o poste alto de madeira firmado num monte de
-  // lajes chatas empilhadas e, no alto dele, a serpente de bronze fundido enrolada em duas
-  // voltas, um corpo só que afina do pescoço ao rabo, com o pescoço erguido acima da ponta e a
-  // cabeça de perfil, larga atrás e de focinho baixo. O bronze é gravado: a sombra em linhas
-  // que correm ao longo do corpo, as escamas em losango cinzeladas e o fio de luz em cima; o
-  // poste corta as voltas que passam atrás dele. Atrás, as serras de Edom (21.4).
+  // No deserto, no fim da tarde: o poste de madeira com a travessa no alto (a haste de
+  // estandarte), firmado num monte de lajes chatas, e a serpente de bronze fundido enrolada
+  // nele, rente, em duas voltas: um corpo só, que afina para o rabo, sobe na frente do poste e
+  // deita o pescoço por cima da travessa, com a cabeça em cunha de perfil, no fim do corpo, com
+  // o olho pequeno e escuro e a boca fechada. O bronze é gravado: a sombra em linhas ao
+  // comprido do corpo (o lado aceso troca sem salto), as escamas em losango e o fio de luz.
+  // Atrás, as serras de Edom (21.4).
   function desenhoSerpente(k, W, H, obj) {
     const r = sorteio(7601);
     papelVelho(k, W, H, r, ['#fbeccf', '#f1d2a2', '#d8ac76'], [700, 520]);
@@ -10702,17 +10703,24 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       peca(k, tampo, [x - w, y - h, x + w, y + h], { cor: '#dcc6a0', ang: 0.1, passo: 3, maxL: 1.2, sombra: (px) => 0.15 + (px - x + w) / (2 * w) * 0.35, cruzada: 0.9, traco: 1.6, obj: o });
     };
     for (const [x, y, w, h] of [[90, 700, 40, 12], [760, 690, 48, 14], [650, 780, 30, 10], [150, 812, 56, 16]]) laje(x, y, w, h);
-    // o poste
+    // o poste, com a travessa no alto (a haste de estandarte), de madeira, um pouco torto
     const px = 430;
-    const pTopo = 256;
+    const pTopo = 214;
     const pBase = 740;
+    const yBar = 252;
     const poste = pol([[px - 19, pBase], [px - 16, 420], [px - 14, pTopo + 4], [px - 6, pTopo - 3], [px + 8, pTopo - 2], [px + 15, pTopo + 6], [px + 16, 420], [px + 20, pBase]]);
+    const barra = pol([[px - 132, yBar - 9], [px - 120, yBar - 13], [px + 128, yBar - 12], [px + 136, yBar - 7], [px + 134, yBar + 9], [px - 128, yBar + 11]]);
     sombraNoChao(k, pol([[px - 14, pBase], [px + 14, pBase], [px - 220, pBase + 70], [px - 250, pBase + 66]]), 0, 0, 6, 0.3);
     const pintaPoste = (o) => {
       peca(k, poste, [px - 16, pTopo, px + 16, pBase], { cor: '#9a7a50', ang: 1.56, passo: 2.6, maxL: 1.5, sombra: (x) => 0.2 + (px + 16 - x) / 32 * 0.55, cruzada: 0.75, traco: 2.2, obj: o });
       k.strokeStyle = SEPIA;
       k.lineWidth = 1.3;
-      for (const [y, dx] of [[300, 1], [470, -1], [620, 0]]) { k.beginPath(); k.ellipse(px + dx, y, 4, 8, 0, 0, 6.283); k.stroke(); }
+      for (const [y, dx] of [[470, -1], [620, 0]]) { k.beginPath(); k.ellipse(px + dx, y, 4, 8, 0, 0, 6.283); k.stroke(); }
+      peca(k, barra, [px - 132, yBar - 13, px + 136, yBar + 11], { cor: '#a08056', ang: 0.02, passo: 2.6, maxL: 1.5, sombra: (x, y) => 0.15 + (y - yBar + 12) / 24 * 0.6, cruzada: 0.75, traco: 2.2, obj: o });
+      // a amarra de couro onde a travessa cruza o poste
+      k.strokeStyle = '#3a2410';
+      k.lineWidth = 2.4;
+      for (const dy of [-6, 0, 6]) { k.beginPath(); k.moveTo(px - 18, yBar + dy - 4); k.lineTo(px + 18, yBar + dy + 4); k.stroke(); }
     };
     pintaPoste(obj);
     // o monte de lajes empilhadas no pé do poste
@@ -10720,25 +10728,25 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
 
     // a serpente: um corpo só, ao longo de uma curva lisa: do rabo (embaixo, atrás) às duas
     // voltas em volta do poste, e o pescoço que sobe acima da ponta
-    const R = 66;
+    const R = 38;
     const yRabo = 600;
-    const yCima = 330;
+    const yCima = 300;
     const voltas = 2;
-    // a hélice bem amostrada (cada ponto com a sua profundidade: seno > 0 é a frente) e o
-    // pescoço, que sobe na frente
+    // a hélice bem amostrada (cada ponto com a sua profundidade: seno > 0 é a frente), que acaba
+    // na frente do poste; dali o corpo sobe rente a ele, passa por cima da travessa e a cabeça
+    // pende do outro lado, olhando para baixo, para quem olha para ela (21.8)
+    const fase0 = Math.PI / 2 - voltas * Math.PI * 2;
     const densa = [];
     for (let i = 0; i <= 600; i++) {
       const t = i / 600;
-      const a = t * voltas * Math.PI * 2 + 0.5;
-      densa.push([px + Math.cos(a) * R * (0.8 + 0.2 * t), yRabo - t * (yRabo - yCima) + Math.sin(a) * 52, Math.sin(a)]);
+      const a = fase0 + t * voltas * Math.PI * 2;
+      densa.push([px + Math.cos(a) * R * (0.85 + 0.15 * t), yRabo - t * (yRabo - yCima) + Math.sin(a) * 6, Math.sin(a)]);
     }
     const fimH = densa[600];
-    const tg = [fimH[0] - densa[597][0], fimH[1] - densa[597][1]];
-    const tn = Math.hypot(tg[0], tg[1]) || 1;
-    for (const [i, q] of bezier([fimH[0], fimH[1]], [fimH[0] + (tg[0] / tn) * 70, fimH[1] + (tg[1] / tn) * 70], [px + 54, yCima - 196], [px + 104, yCima - 190], 60).entries()) if (i) densa.push([q[0], q[1], 1]);
+    const subida = curvaPor([[fimH[0], fimH[1]], [px + 4, yBar + 6], [px + 30, yBar - 24], [px + 78, yBar - 30], [px + 120, yBar - 26], [px + 150, yBar - 14]], 1);
+    for (const q of subida.slice(1)) densa.push([q.x, q.y, 1]);
     const corpoC = curvaPor(densa.filter((q, i) => i % 3 === 0 || i === densa.length - 1).map((q) => [q[0], q[1]]), 2);
     const L = corpoC[corpoC.length - 1].s;
-    // a profundidade de cada amostra: do ponto denso mais perto, andando sempre para a frente
     let ji = 0;
     const zs = corpoC.map((q) => {
       let melhor = ji;
@@ -10747,7 +10755,22 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       ji = melhor;
       return densa[melhor][2];
     });
-    const larg = (s) => Math.max(5, 32 * Math.min(1, s / 260) ** 0.7 * (s > L - 120 ? 0.8 + 0.2 * (L - s) / 120 : 1));
+    // a largura: o rabo fino, o corpo cheio, o pescoço mais fino e a cabeça em cunha (larga nas
+    // mandíbulas, afinando para o focinho, que fecha redondo)
+    const perfilCab = [[0, 12], [6, 22], [16, 30], [42, 38], [58, 31], [76, 23], [96, 21]];
+    const larg = (s) => {
+      const dd = L - s;
+      if (dd < 96) {
+        let i = 1;
+        while (i < perfilCab.length - 1 && perfilCab[i][0] < dd) i++;
+        const [d0, w0] = perfilCab[i - 1];
+        const [d1, w1] = perfilCab[i];
+        return w0 + (w1 - w0) * Math.max(0, Math.min(1, (dd - d0) / (d1 - d0)));
+      }
+      const corpo = 32 * Math.min(1, s / 240) ** 0.7;
+      const pesc = dd < 240 ? 21 + (corpo - 21) * ((dd - 96) / 144) : corpo;
+      return Math.max(5, pesc);
+    };
     const tons = (v) => {
       // bronze fosco: do escuro esverdeado ao claro dourado
       const t = Math.max(0, Math.min(1, v));
@@ -10760,19 +10783,23 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     // um pedaço do corpo entre as amostras i e i+1: o tom pela largura (luz à direita e em
     // cima), as linhas de sombra ao comprido, as escamas em losango e o contorno dos lados
     const ponto = (q, v) => { const w = larg(q.s) / 2; return [q.x - q.ty * v * w, q.y + q.tx * v * w]; };
+    // o lado aceso é o que olha para cima e para a esquerda; a troca é contínua (sem virada brusca)
+    const ladoLuz = (q) => Math.max(-1, Math.min(1, (0.6 * q.ty - 0.8 * q.tx) * 3));
     const pedaco = (i) => {
       const a = corpoC[i];
       const b = corpoC[i + 1];
+      const sl = ladoLuz(a);
       for (let v = -1; v < 1; v += 0.25) {
-        const luz = 0.5 + (v + 0.125) * 0.42 - Math.abs(v + 0.125) ** 2 * 0.45;
+        const vm = v + 0.125;
+        const luz = 0.5 + vm * sl * 0.42 - Math.abs(vm) ** 2 * 0.45;
         k.fillStyle = tons(luz);
         const p = pol([ponto(a, v - 0.01), ponto(b, v - 0.01), ponto(b, v + 0.26), ponto(a, v + 0.26)]);
         k.fill(p);
       }
       // as linhas de sombra ao comprido, mais grossas do lado escuro (v < 0)
       k.lineCap = 'butt';
-      for (const v of [-0.85, -0.65, -0.45, -0.25, -0.05]) {
-        const w = Math.max(0, -v - 0.0) * 2.2 * Math.min(1, larg(a.s) / 20);
+      for (const v of [-0.85, -0.65, -0.45, -0.25, -0.05, 0.25, 0.45, 0.65, 0.85]) {
+        const w = (Math.max(0, -v * sl) * 2.2 + Math.max(0, Math.abs(v) - 0.6) * 1.6) * Math.min(1, larg(a.s) / 20);
         if (w < 0.25) continue;
         k.strokeStyle = 'rgba(30,22,8,.75)';
         k.lineWidth = w;
@@ -10786,8 +10813,8 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       // o fio de luz no lombo
       k.strokeStyle = 'rgba(255,240,196,.75)';
       k.lineWidth = 1.4;
-      const l0 = ponto(a, 0.55);
-      const l1 = ponto(b, 0.55);
+      const l0 = ponto(a, 0.55 * sl);
+      const l1 = ponto(b, 0.55 * sl);
       k.beginPath();
       k.moveTo(l0[0], l0[1]);
       k.lineTo(l1[0], l1[1]);
@@ -10855,69 +10882,70 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     k.restore();
     for (const i of frente) pedaco(i);
     escamasDe(frente);
-    marcaCorpo(corpoC);
-    // o rabo: a ponta afinada, fechada com uma curva
-    // a cabeça de bronze, de perfil para a direita: larga atrás das mandíbulas, o focinho baixo e
-    // redondo, a boca fechada em linha comprida; o olho é um botão fundido, sem sobrancelha
-    const fim = corpoC[corpoC.length - 1];
-    const ang = Math.atan2(fim.ty, fim.tx);
-    const wN = larg(L) / 2;
-    k.save();
-    k.translate(fim.x, fim.y);
-    k.rotate(ang);
-    const cab = new Path2D();
-    cab.moveTo(-6, -wN);
-    cab.bezierCurveTo(10, -wN - 6, 26, -wN - 9, 44, -wN - 6);
-    cab.bezierCurveTo(58, -wN - 3, 68, -4, 68, 2);
-    cab.bezierCurveTo(68, 8, 60, wN + 2, 44, wN + 4);
-    cab.bezierCurveTo(26, wN + 7, 10, wN + 4, -6, wN);
-    cab.closePath();
-    const gH = k.createLinearGradient(0, -wN - 8, 0, wN + 6);
-    gH.addColorStop(0, tons(0.95));
-    gH.addColorStop(0.5, tons(0.62));
-    gH.addColorStop(1, tons(0.3));
-    k.fillStyle = gH;
-    k.fill(cab);
-    marcar(k, obj, cab);
-    k.save();
-    k.clip(cab);
-    // a sombra da cabeça em linhas ao comprido (as mesmas do corpo) e as placas do alto
-    for (let v = -0.8; v <= 0.9; v += 0.2) {
-      const w = Math.max(0, v + 0.1) * 2;
-      if (w < 0.25) continue;
-      k.strokeStyle = 'rgba(30,22,8,.7)';
-      k.lineWidth = w;
-      k.beginPath();
-      k.moveTo(-6, v * (wN + 6));
-      k.quadraticCurveTo(30, v * (wN + 8), 66, v * 4);
-      k.stroke();
+    // as viradas (onde o corpo passa de trás para a frente do poste) ficam longe do poste: ali
+    // os pedaços são pintados de novo em sequência, para a curva não ter corte
+    for (let i = 1; i < corpoC.length - 1; i++) {
+      if ((zs[i - 1] < 0) === (zs[i] < 0)) continue;
+      const lista = [];
+      for (let j = Math.max(0, i - 7); j < Math.min(corpoC.length - 1, i + 7); j++) lista.push(j);
+      const atrasPrimeiro = zs[i - 1] < 0;
+      for (const j of atrasPrimeiro ? lista : lista.slice().reverse()) pedaco(j);
+      escamas(lista[0], lista[lista.length - 1] + 1);
     }
-    k.restore();
+    marcaCorpo(corpoC);
+    // a cabeça é o fim do corpo (a mesma gravura): o focinho fecha num arco; o lado de cima da
+    // cabeça é o de fora da curva (à direita); o olho é um ponto escuro pequeno, sem brilho; a
+    // boca é uma linha reta e curta ao longo da mandíbula, fechada; a narina, um ponto
+    const fim = corpoC[corpoC.length - 1];
+    const ultimo = corpoC[corpoC.length - 2];
+    k.fillStyle = tons(0.45);
+    k.beginPath();
+    k.arc(fim.x, fim.y, larg(L) / 2, Math.atan2(fim.ty, fim.tx) - Math.PI / 2, Math.atan2(fim.ty, fim.tx) + Math.PI / 2);
+    k.fill();
     k.strokeStyle = '#1e160a';
     k.lineWidth = 2;
-    k.stroke(cab);
-    // a boca fechada
+    k.stroke();
+    const qEm = (dd) => corpoC[Math.max(0, Math.min(corpoC.length - 1, Math.round((L - dd) / 2)))];
+    const dorso = ponto(qEm(30), 1)[0] > ponto(qEm(30), -1)[0] ? 1 : -1;
+    // o escudo da cabeça: umas placas maiores no alto, em traço
+    k.strokeStyle = 'rgba(30,22,8,.7)';
+    k.lineWidth = 1;
+    for (const dd of [14, 24, 34, 46]) {
+      const q = qEm(dd);
+      const a = ponto(q, dorso * 0.95);
+      const b = ponto(q, dorso * 0.2);
+      k.beginPath();
+      k.moveTo(a[0], a[1]);
+      k.lineTo(b[0], b[1]);
+      k.stroke();
+    }
+    // o olho
+    const olho = ponto(qEm(30), dorso * 0.42);
+    k.fillStyle = '#120c04';
+    k.beginPath();
+    k.ellipse(olho[0], olho[1], 3.6, 3, 0, 0, 6.283);
+    k.fill();
+    // a placa de cima do olho, sombreada (tom, não sobrancelha)
+    k.strokeStyle = 'rgba(30,22,8,.55)';
+    k.lineWidth = 3;
+    const sob = [ponto(qEm(24), dorso * 0.62), ponto(qEm(36), dorso * 0.66)];
+    k.beginPath();
+    k.moveTo(sob[0][0], sob[0][1]);
+    k.lineTo(sob[1][0], sob[1][1]);
+    k.stroke();
+    // a boca: do focinho até o canto da mandíbula, reta, no lado de baixo
+    k.strokeStyle = '#1e160a';
     k.lineWidth = 1.6;
     k.beginPath();
-    k.moveTo(67, 4);
-    k.bezierCurveTo(50, 8, 30, 9, 14, 8);
+    for (let dd = 1; dd <= 40; dd += 3) { const p = ponto(qEm(dd), -dorso * 0.38); if (dd === 1) k.moveTo(p[0], p[1]); else k.lineTo(p[0], p[1]); }
     k.stroke();
-    // o olho: um botão de bronze, liso, com um ponto de luz
-    k.fillStyle = tons(0.4);
-    k.beginPath();
-    k.arc(40, -4, 4.4, 0, 6.283);
-    k.fill();
-    k.stroke();
-    k.fillStyle = 'rgba(255,240,200,.9)';
-    k.beginPath();
-    k.arc(39, -5.5, 1.3, 0, 6.283);
-    k.fill();
     // a narina
+    const nar = ponto(qEm(5), dorso * 0.4);
     k.fillStyle = '#1e160a';
     k.beginPath();
-    k.ellipse(61, -3, 1.6, 1.1, 0.3, 0, 6.283);
+    k.arc(nar[0], nar[1], 1.6, 0, 6.283);
     k.fill();
-    k.restore();
+    void ultimo;
     vinheta(k, W, H, 0.22);
   }
   // ---------- (7) A harpa de Davi (1 Sm 16.23) ----------
