@@ -3980,28 +3980,46 @@
     vinheta(k, W, H, 0.25);
   }
 
-  // Um junco de papiro: a haste de três quinas, um pouco curva, e a cabeleira em leque no alto.
+  // Um junco de papiro: a haste de três quinas, um pouco curva, e a umbela no alto, de raios
+  // finos que se abrem e caem nas pontas (alguns mais caídos), com as florzinhas.
   function papiro(k, r, x, base, alto, giro, tinta = SEPIA, cor = '#8f8a58') {
     const tx = x + Math.sin(giro) * alto;
     const ty = base - Math.cos(giro) * alto;
     k.strokeStyle = tinta;
     k.lineCap = 'round';
-    k.lineWidth = 6;
+    k.lineWidth = 5.5;
     k.beginPath();
     k.moveTo(x, base);
     k.quadraticCurveTo(x + (tx - x) * 0.3 + giro * 40, (base + ty) / 2, tx, ty);
     k.stroke();
     k.strokeStyle = cor;
-    k.lineWidth = 3;
+    k.lineWidth = 2.6;
     k.stroke();
+    // as brácteas na base da umbela
+    k.fillStyle = tinta;
+    k.beginPath();
+    k.moveTo(tx - 5, ty + 2);
+    k.lineTo(tx, ty - 9);
+    k.lineTo(tx + 5, ty + 2);
+    k.fill();
     k.strokeStyle = tinta;
-    k.lineWidth = 1.2;
-    for (let i = 0; i < 26; i++) {
-      const a = giro - Math.PI / 2 + (i / 25 - 0.5) * 2.6;
-      const c = alto * (0.12 + r() * 0.06);
+    const n = 34;
+    for (let i = 0; i < n; i++) {
+      const u = i / (n - 1) - 0.5;
+      const a = giro - Math.PI / 2 + u * 2.9;
+      const c = alto * (0.13 + r() * 0.07);
+      const cai = c * (0.25 + Math.abs(u) * 0.7 + (r() < 0.15 ? 0.6 : 0));
+      const fx = tx + Math.cos(a) * c;
+      const fy = ty + Math.sin(a) * c + cai;
+      k.lineWidth = 0.9;
       k.beginPath();
-      k.moveTo(tx, ty);
-      k.quadraticCurveTo(tx + Math.cos(a) * c * 0.6, ty + Math.sin(a) * c * 0.6 - 4, tx + Math.cos(a) * c, ty + Math.sin(a) * c + c * 0.25);
+      k.moveTo(tx, ty - 4);
+      k.quadraticCurveTo(tx + Math.cos(a) * c * 0.7, ty + Math.sin(a) * c * 0.7 - 6, fx, fy);
+      k.stroke();
+      k.lineWidth = 1.4;
+      k.beginPath();
+      k.moveTo(fx, fy);
+      k.lineTo(fx + Math.cos(a) * 4, fy + 3);
       k.stroke();
     }
   }
@@ -4013,7 +4031,7 @@
       let x = x0 - r() * 40;
       while (x < x1) {
         const c = 20 + r() * 60;
-        k.lineWidth = 0.8 + (y - y0) / (y1 - y0) * 1.4;
+        k.lineWidth = 0.8 + ((y - y0) / (y1 - y0)) * 1.4;
         k.beginPath();
         k.moveTo(x, y);
         k.quadraticCurveTo(x + c / 2, y + (r() - 0.5) * 4, x + c, y);
@@ -4023,105 +4041,231 @@
     }
   }
 
-  // (6) Moisés no cesto (Êx 2.3): o cesto de junco vedado com betume (escuro e brilhante),
-  // com a tampa, entre os juncos à beira do Nilo.
+  // (6) Moisés no cesto (Êx 2.3-5): o cesto feito de junco, oval, de lados retos e um pouco
+  // abertos, mais alto que a tampa; a tampa baixa e chata, um pouco fora do lugar (vê-se a
+  // beirada de dentro); o junco trançado em espiral, e o betume escuro e brilhante só da
+  // metade para baixo, até a linha da água. Ele fica entre os juncos, junto da margem de lama
+  // com as raízes; na frente, umas hastes de papiro; do outro lado do Nilo, as palmeiras.
   function desenhoMoises(k, W, H, obj) {
     const r = sorteio(5601);
     papelVelho(k, W, H, r, ['#f6efd8', '#e6dcb8', '#c9bb8e'], [W * 0.7, 140]);
-    linhas(k, 0, 0, W, 380, 7, 1, (x, y) => 0.08 + Math.hypot(x - 620, y - 100) / 1600);
-    // a outra margem, longe, com palmeiras
+    linhas(k, 0, 0, W, 330, 6.5, 1.1, (x, y) => 0.1 + (1 - y / 330) * 0.45);
+    // a outra margem: uma faixa de terra com a sua hachura, e as palmeiras plantadas nela
     const fm = onda(r, 3, 0.01);
-    const outra = pol([[-10, 420], ...Array.from({ length: 46 }, (_, i) => [i * 20, 372 + fm(i * 20) * 8]), [W + 10, 420]]);
-    peca(k, outra, [0, 360, W, 420], { cor: '#d8cfa4', ang: -0.1, passo: 5, maxL: 1.1, sombra: () => 0.55, traco: 1.4 });
-    for (const [x, h] of [[640, 70], [676, 58], [760, 76]]) {
+    const topoM = (x) => 302 + fm(x) * 8;
+    const outra = pol([[-10, 352], ...Array.from({ length: 46 }, (_, i) => [i * 20, topoM(i * 20)]), [W + 10, 352]]);
+    peca(k, outra, [0, 290, W, 352], { cor: '#d3c596', ang: -0.08, passo: 4.2, maxL: 1.5, sombra: (x, y) => 0.4 + (y - 300) / 120, cruzada: 0.7, traco: 1.6 });
+    for (const [x, h, g] of [[520, 92, 0.05], [566, 74, -0.08], [690, 100, 0.1], [742, 70, -0.05], [820, 88, 0.06]]) {
+      const b = topoM(x) + 8;
+      const tx = x + g * h;
       k.strokeStyle = SEPIA;
-      k.lineWidth = 3;
+      k.lineCap = 'round';
+      k.lineWidth = 4;
       k.beginPath();
-      k.moveTo(x, 380);
-      k.quadraticCurveTo(x + 6, 380 - h / 2, x + 2, 380 - h);
+      k.moveTo(x, b);
+      k.quadraticCurveTo(x + g * h * 0.2 + 4, b - h / 2, tx, b - h);
       k.stroke();
-      k.lineWidth = 2;
-      for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + (i / 6 - 0.5) * 3; k.beginPath(); k.moveTo(x + 2, 380 - h); k.quadraticCurveTo(x + 2 + Math.cos(a) * 14, 380 - h + Math.sin(a) * 14 - 6, x + 2 + Math.cos(a) * 26, 380 - h + Math.sin(a) * 26 + 8); k.stroke(); }
-    }
-    // o rio
-    const rio = new Path2D();
-    rio.rect(-10, 410, W + 20, H);
-    const gr = k.createLinearGradient(0, 410, 0, H);
-    gr.addColorStop(0, '#e2dcbc');
-    gr.addColorStop(1, '#b7ae86');
-    k.fillStyle = gr;
-    k.fill(rio);
-    agua(k, r, 0, 414, W, H, 'rgba(43,33,18,.7)');
-    // os juncos de trás, claros
-    for (let i = 0; i < 26; i++) papiro(k, r, 40 + i * 32 + (r() - 0.5) * 20, 560 + r() * 30, 180 + r() * 120, (r() - 0.5) * 0.4, 'rgba(43,33,18,.55)', '#b7b384');
-    // o cesto: o corpo de junco em espiral (as voltas aparecem sob o betume), a tampa abaulada
-    // e a amarra; escuro e brilhante do betume
-    const cx = 444;
-    const cy = 590;
-    const R = 190;
-    const corpo = new Path2D();
-    corpo.ellipse(cx, cy, R, 40, 0, Math.PI, 0, true);
-    corpo.bezierCurveTo(cx + R, cy + 60, cx + R * 0.6, cy + 92, cx, cy + 92);
-    corpo.bezierCurveTo(cx - R * 0.6, cy + 92, cx - R, cy + 60, cx - R, cy);
-    corpo.closePath();
-    const tampa = new Path2D();
-    tampa.moveTo(cx - R - 8, cy);
-    tampa.bezierCurveTo(cx - R + 10, cy - 150, cx + R - 10, cy - 150, cx + R + 8, cy);
-    tampa.ellipse(cx, cy, R + 8, 42, 0, 0, Math.PI);
-    tampa.closePath();
-    // o reflexo escuro na água
-    const wl = cy + 80;
-    k.save();
-    k.filter = 'blur(5px)';
-    k.globalAlpha = 0.4;
-    k.translate(0, wl);
-    k.scale(1, -0.5);
-    k.translate(0, -wl);
-    k.fillStyle = '#2a1d10';
-    k.fill(corpo);
-    k.fill(tampa);
-    k.restore();
-    const voltas = (p, y0, y1, rx0, rx1, ry) => {
-      k.save();
-      k.clip(p);
-      for (let y = y0; y < y1; y += 11) {
-        const t = (y - y0) / (y1 - y0);
-        const rx = rx0 + (rx1 - rx0) * t;
-        k.strokeStyle = 'rgba(10,6,2,.85)';
-        k.lineWidth = 2.6;
-        k.beginPath();
-        k.ellipse(cx, y, rx, ry, 0, 0.02, Math.PI - 0.02);
-        k.stroke();
-        k.strokeStyle = 'rgba(255,226,170,.28)';
-        k.lineWidth = 1.4;
-        k.beginPath();
-        k.ellipse(cx, y - 4, rx, ry, 0, 0.5, Math.PI - 0.2);
-        k.stroke();
+      k.lineWidth = 1;
+      for (let y = b - 6; y > b - h; y -= 6) { k.beginPath(); k.moveTo(x - 3 + (b - y) / h * g * h, y); k.lineTo(x + 3 + (b - y) / h * g * h, y - 2); k.stroke(); }
+      for (let i = 0; i < 9; i++) {
+        const a = -Math.PI / 2 + (i / 8 - 0.5) * 3.3;
+        const c = 28 + r() * 8;
+        const folha = new Path2D();
+        folha.moveTo(tx, b - h);
+        folha.quadraticCurveTo(tx + Math.cos(a) * c * 0.5, b - h + Math.sin(a) * c * 0.5 - 10, tx + Math.cos(a) * c, b - h + Math.sin(a) * c + 12);
+        k.lineWidth = 2.4;
+        k.stroke(folha);
       }
-      k.restore();
-    };
-    peca(k, corpo, [cx - R, cy - 40, cx + R, cy + 92], { cor: '#3b2a18', tinta: '#0e0904', ang: 0.04, passo: 3.6, maxL: 1.6, sombra: (x, y) => 0.4 + (y - cy) / 200 + (x - cx) / 900, cruzada: 0.75, traco: 2.6, obj });
-    voltas(corpo, cy + 8, cy + 100, R, R * 0.7, 36);
-    peca(k, tampa, [cx - R - 8, cy - 150, cx + R + 8, cy + 42], { cor: '#4a3520', tinta: '#0e0904', ang: 0.04, passo: 3.6, maxL: 1.6, sombra: (x, y) => 0.25 + (x - cx) / 700 + (y - cy + 100) / 400, cruzada: 0.75, traco: 2.6, obj });
-    voltas(tampa, cy - 112, cy + 30, R * 0.4, R + 8, 30);
+    }
+    // o rio, em linhas de água
+    const rio = new Path2D();
+    rio.rect(-10, 350, W + 20, H);
+    k.fillStyle = '#e0d9b8';
+    k.fill(rio);
+    agua(k, r, 0, 352, W, H, 'rgba(43,33,18,.62)');
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 1.6;
+    k.beginPath();
+    for (let x = 0; x <= W; x += 10) (x ? k.lineTo(x, topoM(x) + 50) : k.moveTo(x, topoM(x) + 50));
+    k.stroke();
+    // a margem de cá, à esquerda: a lama em camadas, com as raízes dos juncos
+    const margem = new Path2D();
+    margem.moveTo(-10, 520);
+    margem.bezierCurveTo(120, 540, 200, 640, 250, 700);
+    margem.bezierCurveTo(300, 760, 420, 800, 520, 860);
+    margem.lineTo(-10, 860);
+    margem.closePath();
+    k.fillStyle = '#b9a174';
+    k.fill(margem);
+    hachuraEmFaixas(k, r, margem, -10, 530, [(x) => 520 + x * 0.2, (x) => 600 + x * 0.3, (x) => 690 + x * 0.3, (x) => 790 + x * 0.2, (x) => 880], 5, 1.9, (x) => 0.45 + (300 - x) / 900, SEPIA, { quebra: 0.05 });
+    k.strokeStyle = SEPIA;
+    k.lineWidth = 2.4;
+    k.stroke(margem);
+    // os juncos de trás, do lado da margem
+    for (let i = 0; i < 16; i++) papiro(k, r, 10 + i * 24 + (r() - 0.5) * 16, 600 + i * 6 + r() * 20, 230 + r() * 140, -0.05 + (r() - 0.5) * 0.35, 'rgba(43,33,18,.6)', '#aaa676');
+    // o cesto
+    const cx = 336;
+    const yA = 482;
+    const yF = 624;
+    const RA = 142;
+    const rA = 46;
+    const RF = 124;
+    const rF = 40;
+    const agua0 = 600;
+    // a sombra e o reflexo na água, em linhas mais grossas logo embaixo
     k.save();
-    k.clip(tampa);
-    brilho(k, cx - 80, cy - 80, 120, 'rgba(255,236,196,.45)', 'screen');
+    k.beginPath();
+    k.ellipse(cx + 10, yF + 6, RF + 40, 26, 0, 0, 6.283);
+    k.clip();
+    agua(k, r, cx - RF - 50, yF - 20, cx + RF + 60, yF + 40, 'rgba(30,20,8,.9)');
     k.restore();
+    const corpo = new Path2D();
+    corpo.ellipse(cx, yA, RA, rA, 0, Math.PI, 0, true);
+    corpo.lineTo(cx + RF, yF);
+    corpo.ellipse(cx, yF, RF, rF, 0, 0, Math.PI);
+    corpo.closePath();
+    k.fillStyle = '#c9aa6c';
+    k.fill(corpo);
+    marcar(k, obj, corpo);
+    // a trança: voltas de junco costuradas, que acompanham a curva
+    const volta = (t) => ({ y: yA + (yF - yA) * t, rx: RA + (RF - RA) * t, ry: rA + (rF - rA) * t });
     k.save();
     k.clip(corpo);
-    brilho(k, cx - 100, cy + 40, 100, 'rgba(255,236,196,.25)', 'screen');
+    const nV = 9;
+    gravar(k, corpo, cx, (yA + yF) / 2, RA + 20, 0.05, 3.4, 1.4, (x) => (cx - x) / 260 + 0.12, '#3a2610', 0);
+    for (let i = 0; i < nV; i++) {
+      const a = volta(i / nV);
+      const b = volta((i + 1) / nV);
+      k.strokeStyle = '#2e1e0c';
+      k.lineWidth = 2;
+      k.beginPath();
+      k.ellipse(cx, b.y, b.rx, b.ry, 0, 0.02, Math.PI - 0.02);
+      k.stroke();
+      k.strokeStyle = '#3a2610';
+      k.lineWidth = 1.4;
+      for (let g = 0.12 + (i % 2) * 0.1; g < Math.PI - 0.08; g += 0.2) {
+        const x = cx + (Math.cos(g) * (a.rx + b.rx)) / 2;
+        const y = (a.y + b.y) / 2 + (Math.sin(g) * (a.ry + b.ry)) / 2;
+        const h = (b.y - a.y) * 0.85;
+        k.beginPath();
+        k.moveTo(x + 3, y - h / 2);
+        k.lineTo(x - 3, y + h / 2);
+        k.stroke();
+      }
+    }
     k.restore();
-    // a beirada da tampa e a amarra de junco
-    cordao(k, Array.from({ length: 31 }, (_, i) => [cx + Math.cos(i / 30 * Math.PI) * (R + 8), cy + Math.sin(i / 30 * Math.PI) * 42]), 8, { cor: '#6b4c2a', escuro: '#0e0904', luz: 'rgba(255,226,170,.5)' });
-    for (const d of [-70, 70]) cordao(k, bezier([cx + d * 0.5, cy - 112], [cx + d * 0.9, cy - 80], [cx + d * 1.05, cy - 10], [cx + d, cy + 90], 20), 6, { cor: '#c9a86a', escuro: '#1e1408' });
-    // a água batendo no cesto
-    k.strokeStyle = 'rgba(250,244,224,.8)';
-    k.lineWidth = 2;
-    for (let i = 0; i < 4; i++) { k.beginPath(); k.ellipse(cx, wl + i * 9, R + 10 + i * 30, 10 + i * 3, 0, 0.1, Math.PI - 0.1); k.stroke(); }
-    // os juncos da frente, escuros, de um lado e do outro
-    for (let i = 0; i < 9; i++) papiro(k, r, 30 + i * 22 + (r() - 0.5) * 10, 840, 300 + r() * 160, -0.1 + (r() - 0.5) * 0.3);
-    for (let i = 0; i < 8; i++) papiro(k, r, 690 + i * 24 + (r() - 0.5) * 10, 840, 280 + r() * 160, 0.1 + (r() - 0.5) * 0.3);
+    // o betume: da metade para baixo, escuro e brilhante, com a beirada de cima desigual
+    const betume = new Path2D();
+    const yB = (x) => yA + (yF - yA) * 0.46 + Math.sin(x * 0.09) * 4 + Math.sin(x * 0.031) * 6;
+    betume.moveTo(cx - RA - 10, yB(cx - RA));
+    for (let x = cx - RA - 10; x <= cx + RA + 10; x += 6) betume.lineTo(x, yB(x) + rA * 0.8 * Math.sqrt(Math.max(0, 1 - ((x - cx) / (RA + 10)) ** 2)));
+    betume.lineTo(cx + RA + 10, yF + 60);
+    betume.lineTo(cx - RA - 10, yF + 60);
+    betume.closePath();
+    k.save();
+    k.clip(corpo);
+    k.fillStyle = 'rgba(28,18,8,.9)';
+    k.fill(betume);
+    k.clip(betume);
+    for (let i = 1; i < nV; i++) {
+      const b = volta(i / nV);
+      k.strokeStyle = 'rgba(0,0,0,.8)';
+      k.lineWidth = 2.2;
+      k.beginPath();
+      k.ellipse(cx, b.y, b.rx, b.ry, 0, 0.02, Math.PI - 0.02);
+      k.stroke();
+    }
+    // o brilho do betume: riscos claros na luz (à direita, de onde vem o sol)
+    gravar(k, betume, cx + 60, yF, RA, 0.04, 3.2, 1.3, (x, y) => Math.max(0, 0.55 - Math.abs(y - yF + 6) / 30) * Math.max(0, (x - cx + 60) / 260), 'rgba(255,236,200,.7)', 0.2);
+    k.restore();
+    k.strokeStyle = '#140c04';
+    k.lineWidth = 2.6;
+    k.stroke(corpo);
+    // a boca e a beirada de dentro, que aparece porque a tampa ficou um pouco de lado
+    const boca = new Path2D();
+    boca.ellipse(cx, yA, RA, rA, 0, 0, 6.283);
+    k.fillStyle = '#4a3218';
+    k.fill(boca);
+    k.save();
+    k.clip(boca);
+    for (let i = 0; i < 8; i++) {
+      k.strokeStyle = 'rgba(20,12,4,.7)';
+      k.lineWidth = 1.6;
+      k.beginPath();
+      k.ellipse(cx, yA - rA * 0.4 + i * 9, RA - 10, rA - 8, 0, Math.PI * 1.05, Math.PI * 1.95);
+      k.stroke();
+    }
+    k.restore();
+    cordao(k, Array.from({ length: 61 }, (_, i) => [cx + Math.cos((i / 60) * 6.283) * RA, yA + Math.sin((i / 60) * 6.283) * rA]), 8, { cor: '#d2b278', escuro: '#2e1e0c', luz: 'rgba(255,240,200,.55)' });
+    marcar(k, obj, boca);
+    // a tampa: baixa e chata, de junco em espiral, deslocada para a direita e um pouco inclinada
+    k.save();
+    k.translate(cx + 40, yA - 10);
+    k.rotate(-0.07);
+    const TR = RA + 6;
+    const tr = rA + 4;
+    const aba = new Path2D();
+    aba.ellipse(0, 0, TR, tr, 0, 0, Math.PI);
+    aba.lineTo(-TR, -12);
+    aba.ellipse(0, -12, TR, tr, 0, Math.PI, 0, true);
+    aba.closePath();
+    peca(k, aba, [-TR, -tr - 12, TR, tr], { cor: '#b8955a', tinta: '#2e1e0c', ang: 0, passo: 3.2, maxL: 1.3, sombra: (x) => 0.3 + (-x) / 500, cruzada: 1, traco: 2.2, obj });
+    const topo = new Path2D();
+    topo.ellipse(0, -12, TR, tr, 0, 0, 6.283);
+    k.fillStyle = '#d4b67c';
+    k.fill(topo);
+    marcar(k, obj, topo);
+    k.save();
+    k.clip(topo);
+    // a espiral da tampa, do meio para fora, com os pontos
+    k.strokeStyle = '#3a2610';
+    for (let i = 1; i <= 7; i++) {
+      const f = i / 7;
+      k.lineWidth = 1.3;
+      k.globalAlpha = 0.75;
+      k.beginPath();
+      k.ellipse(0, -12 - (1 - f) * 6, TR * f, tr * f, 0, 0, 6.283);
+      k.stroke();
+      k.lineWidth = 1.1;
+      for (let g = (i % 2) * 0.2; g < 6.283; g += 0.5 / f + 0.14) {
+        const x = Math.cos(g) * TR * (f - 0.055);
+        const y = -12 - (1 - f) * 6 + Math.sin(g) * tr * (f - 0.055);
+        k.beginPath();
+        k.moveTo(x - 2, y - 2.5);
+        k.lineTo(x + 2, y + 2.5);
+        k.stroke();
+      }
+    }
+    k.globalAlpha = 1;
+    gravar(k, topo, 0, -12, TR, 0.1, 4.4, 1.2, (x, y) => (-x) / 400 + (y + 12) / 120 + 0.05, '#3a2610', 0);
+    k.restore();
+    k.strokeStyle = '#2e1e0c';
+    k.lineWidth = 2.2;
+    k.stroke(topo);
+    k.restore();
+    // o pé do cesto dentro da água: a água passa por cima da parte de baixo
+    k.save();
+    k.clip(corpo);
+    const linhaAgua = new Path2D();
+    linhaAgua.rect(cx - RA - 20, yF + 18, RA * 2 + 40, 80);
+    k.fillStyle = 'rgba(214,206,176,.82)';
+    k.fill(linhaAgua);
+    k.clip(linhaAgua);
+    agua(k, r, cx - RA - 20, yF + 16, cx + RA + 20, yF + 90, 'rgba(30,20,8,.75)');
+    k.restore();
+    // a água batendo no cesto, na linha do betume
+    k.strokeStyle = 'rgba(250,244,224,.85)';
+    k.lineCap = 'round';
+    for (let i = 0; i < 3; i++) {
+      k.lineWidth = 2.2 - i * 0.5;
+      k.beginPath();
+      k.ellipse(cx, yF + 14 + i * 10, RF + 10 + i * 28, rF * 0.4 + i * 4, 0, 0.1, Math.PI - 0.1);
+      k.stroke();
+    }
+    // as hastes de papiro na frente do cesto, que o escondem um pouco
+    for (const [x, b, h, g] of [[150, 860, 430, 0.08], [206, 860, 400, -0.03], [252, 860, 470, 0.1], [536, 860, 420, -0.08]]) papiro(k, r, x, b, h, g);
+    // e, do lado de lá, uns juncos soltos na água
+    for (let i = 0; i < 4; i++) papiro(k, r, 700 + i * 46 + (r() - 0.5) * 10, 860, 300 + r() * 120, 0.08 + (r() - 0.5) * 0.25, 'rgba(43,33,18,.75)', '#a6a070');
     vinheta(k, W, H, 0.22);
   }
 
