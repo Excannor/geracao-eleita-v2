@@ -109,8 +109,8 @@
       "album": "herois",
       "numero": 7,
       "titulo": "A corda vermelha de Raabe",
-      "referencia": "Josué 2.18",
-      "voceSabia": "A corda vermelha que ajudou os espiões a descer ficou na janela.",
+      "referencia": "Josué 2.18-21",
+      "voceSabia": "A corda que ajudou os espiões a descer ficou amarrada na janela.",
       "link": "#/atlas/invasao",
       "rascunho": true,
       "lancada": false
@@ -176,7 +176,7 @@
       "numero": 13,
       "titulo": "Multidão de testemunhas",
       "referencia": "Hebreus 12.1",
-      "voceSabia": "Os heróis de Hebreus 11 são a multidão de testemunhas.",
+      "voceSabia": "Temos uma multidão de testemunhas ao nosso redor.",
       "link": "#/mapa/hebreus",
       "rascunho": true,
       "lancada": false
