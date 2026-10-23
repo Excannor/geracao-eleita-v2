@@ -498,7 +498,7 @@
       "voceSabia": "Moisés bateu com a vara na rocha do monte Horebe, e saiu água.",
       "link": "#/atlas/exodo",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "muralhas-jerico",
@@ -509,7 +509,7 @@
       "voceSabia": "O povo gritou ao toque das cornetas, e os muros vieram abaixo.",
       "link": "#/atlas/invasao",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "fogo-carmelo",
@@ -520,7 +520,7 @@
       "voceSabia": "O fogo queimou até as pedras e lambeu a água da valeta.",
       "link": "#/mapa/1-reis",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "machado-flutua",
@@ -542,7 +542,7 @@
       "voceSabia": "Os três saíram do fogo sem nem cheiro de fumaça.",
       "link": "#/mapa/daniel",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "jonas-peixe",
