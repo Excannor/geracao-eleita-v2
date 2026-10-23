@@ -64,9 +64,11 @@ Onde mora cada coisa:
 O app vai ao ar com a arte que existe; as outras cartas são desenhadas e revisadas depois.
 
 - Só entra no sorteio a carta com `lancada: true`. O build confere que toda carta lançada tem
-  desenho na peça de arte (`desenhosDaArte`: as chaves de `DESENHOS` em `cartas.js`). Hoje são 6:
-  Davi e a funda, O poço de Jacó, O azeite da viúva, A Arca da Aliança, O túmulo vazio e O mar
-  aberto.
+  desenho na peça de arte (`desenhosDaArte`: as chaves de `DESENHOS` em `cartas.js`). Hoje são 11:
+  em Heróis da fé, A oferta de Abel, Abraão e as estrelas, Moisés no cesto, Rute e as espigas,
+  Davi e a funda e Ester diante do rei; e O poço de Jacó, O azeite da viúva, A Arca da Aliança, O
+  túmulo vazio e O mar aberto. Os testes leem as lançadas do catálogo (teste.mjs e teste-bau, que
+  tira a primeira carta da conta de teste pela própria regra): liberar mais cartas não os quebra.
 - No esqueleto do `index.html`, a carta não lançada leva um "~" antes do id.
 - O sorteio, as proteções, o viés para carta nova e as repetidas valem sobre as lançadas. O álbum
   mostra a não lançada como silhueta, sem texto nenhum sobre data. Um álbum só fica completo com
@@ -76,7 +78,7 @@ O app vai ao ar com a arte que existe; as outras cartas são desenhadas e revisa
   tem as outras.
 - Semeadores e Boas-vindas sem desenho: o limiar alcançado fica anotado no livro-caixa
   (`{ pendente: 1 }`) e paga a carta quando ela for lançada (`R.pagarPendentes`), sem se perder.
-- "O que pode vir" diz quantas cartas podem sair hoje ("Hoje podem sair 6 das 52 cartas.").
+- "O que pode vir" diz quantas cartas podem sair hoje ("Hoje podem sair 11 das 52 cartas."); com todas lançadas, a linha some..
 
 | Função | Teste |
 |---|---|
@@ -260,7 +262,7 @@ as repetidas sobem, porque elas caem nas poucas cartas do começo. O misto (20, 
 ### Simulação
 
 `ferramentas/simular-cartas.mjs`, a regra de verdade, com o catálogo inteiro lançado (o plano de
-longo prazo; hoje são 6 cartas). 300 contas com 4 álbuns e 100 com 8, ao longo de 3 e 5 anos.
+longo prazo; hoje são 11 cartas). 300 contas com 4 álbuns e 100 com 8, ao longo de 3 e 5 anos.
 "Marcos" são as unidades e os 100 e 365 dias (os álbuns completos entram por si).
 
 | Leitor | Sorteios comuns + marcos por ano | Cartas no 1º ano | Linho / Bronze / Prata / Ouro / Glória no 1º ano | Glórias por ano (anos 1, 2, 3) | Entre Ouros (média / pior) | 4 álbuns completos (mediana, p10 a p90) | Cartas repetidas no 1º ano | Versão repetida no 1º ano |
@@ -281,7 +283,7 @@ longo prazo; hoje são 6 cartas). 300 contas com 4 álbuns e 100 com 8, ao longo
   ficou entre 44 e 46%; com viés menor, o álbum demora mais). Repetida da mesma versão (carta e
   raridade iguais) fica em 9%. Ficou o viés 20, 5 e 1 (2 para versão que falta). Com 8 álbuns, a
   repetida cai para 18%: o catálogo que cresce é o que resolve.
-- Com 6 cartas lançadas hoje, as repetidas são muito mais comuns até os desenhos chegarem: o viés
+- Com 11 cartas lançadas hoje, as repetidas são muito mais comuns até os desenhos chegarem: o viés
   para carta nova traz cada carta lançada logo, e depois vêm as versões.
 
 ### Referências (contexto para as chances)
@@ -441,7 +443,7 @@ Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
 | Função | Teste |
 |---|---|
 | `CC.pedirCartas()` | teste-bau: a arte e o álbum não vêm no index.html; na Trilha não são pedidos |
-| `CC.album.bauDaRevelacao(el, palco, { previsto, chave, ref, fechar, guardar, titulo })` | teste-bau: um elemento de baú antes do toque, um durante a abertura e nenhum no fim; botões embaixo só no fim; o fim cabe em 390×844 e 360×740, claro e escuro; "Nova! Você tem 1 de 13 em Heróis da fé", Prata; "Ler a história" abre 1 Samuel 17 e fecha a tela; capturas do fluxo inteiro (fechado, abrindo, carta de costas, de frente, fim) |
+| `CC.album.bauDaRevelacao(el, palco, { previsto, chave, ref, fechar, guardar, titulo })` | teste-bau: um elemento de baú antes do toque, um durante a abertura e nenhum no fim; botões embaixo só no fim; o fim cabe em 390×844 e 360×740, claro e escuro; "Nova! Você tem 1 de 13 em <álbum>", Prata, com a carta que a regra tira para a conta de teste (hoje A oferta de Abel); "Ler a história" abre a referência dela (Gênesis 4) e fecha a tela; capturas do fluxo inteiro (fechado, abrindo, carta de costas, de frente, fim) |
 | "Pular" antes do toque | teste-bau: o baú é guardado, a carta é paga e a tela vai ao fim |
 | `CC.album.revelarNoBau(el, palco, { chave, ref, fechar, outros })` | caminho de reserva (peças chegando depois do toque, ou carta paga diferente da prevista); sem teste de navegador próprio, a legenda e o fim são os mesmos de `bauDaRevelacao` |
 | `legenda(x)` | teste-bau: nova, repetida ("Repetida: agora você tem 3 de Davi e a funda (Prata)") e versão nova ("Nova versão Ouro de Davi e a funda") |
@@ -474,7 +476,7 @@ Um fluxo só, um baú só, um toque (decisão do dono, 22/10).
 | `R.resumo(cartas, hoje)` | teste.mjs: álbum atual, cartas, lançadas, versões, repetidas, alcançados, sorteios desde Ouro e desde Prata, marcos sem Glória |
 | `CC.album.tela(raiz)` | teste-bau: as recebidas e as silhuetas sem texto; "1 de 13 cartas" e "Coleção: 2 de 65 versões"; bolinhas, ×2 e rótulo; carta sem desenho em silhueta; Semeadores com os 5 limiares; cabe no computador sem rolagem de lado |
 | `CC.album.abrirCarta(id, raridade)` | teste-bau: a melhor versão aberta, ×2, silhuetas das que faltam; troca para Bronze; Virar mostra o verso; Compartilhar e link da Bíblia; sem desenho, carta de texto sem Compartilhar |
-| `CC.album.oQuePodeVir()` | teste-bau: as duas tabelas (49/30/15/5/1 e 40/35/25), as proteções, "Hoje podem sair 6 das 52 cartas" e os números da pessoa; nada de "não repete" |
+| `CC.album.oQuePodeVir()` | teste-bau: as duas tabelas (49/30/15/5/1 e 40/35/25), as proteções, "Hoje podem sair N das 52 cartas" (N lido do catálogo) e os números da pessoa; nada de "não repete" |
 
 ## 10. Compartilhar e papel de parede
 
@@ -591,7 +593,7 @@ precisaria, no mínimo:
 
 - Trocas (seção 19).
 - Cor de destaque e moldura destraváveis (fase 2 do plano).
-- Os desenhos das outras 46 cartas, das 5 de Semeadores e da de Boas-vindas (peça de arte, em
+- Os desenhos das outras cartas, das 5 de Semeadores e da de Boas-vindas (peça de arte, em
   paralelo; entram por `lancada`), e a revisão pastoral dos textos do catálogo (marcados
   `rascunho`).
 - Os álbuns futuros (proposta na seção 1).

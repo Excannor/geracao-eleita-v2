@@ -1,7 +1,7 @@
 // O baú e as cartas (docs/cartas.md) num Chrome sem interface, com conta criada pela API num
 // servidor próprio, contra a peça de arte de verdade (src/sob-demanda/cartas.js):
 //   - abrir o baú: a arte faz a abertura inteira (CC.cartas.revelar) e mostra a carta com
-//     "Nova! Você tem 1 de 13 em Heróis da fé"; a primeira da vida é Prata; Compartilhar carta,
+//     "Nova! Você tem 1 de 13 em <álbum>"; a primeira da vida é Prata; Compartilhar carta,
 //     e Continuar; "Ler a história" leva à referência na Bíblia;
 //   - compartilhar manda um PNG 1080x1920 (o papel de parede saiu do fim do baú, 23/10);
 //   - só saem as cartas lançadas (com desenho);
@@ -20,6 +20,8 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { lerCatalogo, esqueletoDoCatalogo, desenhosDaArte } from './cartas-catalogo.mjs';
+import { carregarRegras } from './simular-cartas.mjs';
 
 const PORTA_NAV = await portaLivre();
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -46,8 +48,23 @@ const perfil = mkdtempSync(join(tmpdir(), 'cc-bau-nav-'));
 const nav = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--hide-scrollbars',
   '--remote-debugging-port=' + PORTA_NAV, '--user-data-dir=' + perfil, '--window-size=390,844', 'about:blank'], { stdio: 'ignore' });
 
-// A conta: "leitora0" tira, pela semente dela e com as 6 cartas lançadas hoje, Davi e a funda em
-// Prata no primeiro baú e outra carta no segundo.
+// O catálogo de hoje (o que está lançado muda a cada liberação): as cartas do sorteio, as lançadas,
+// uma sem desenho, e a primeira carta da conta "leitora0", tirada pela regra de verdade (o sorteio é
+// determinístico: a semente é a conta e o baú; a primeira da vida é Prata).
+const CAT = lerCatalogo(AQUI);
+const ESPECIAIS = new Set(CAT.albuns.filter((a) => a.especial).map((a) => a.id));
+const DO_SORTEIO = CAT.cartas.filter((c) => !ESPECIAIS.has(c.album));
+const LANCADAS = DO_SORTEIO.filter((c) => c.lancada).map((c) => c.id);
+const TOTAL = DO_SORTEIO.length;
+const DESENHOS = desenhosDaArte(AQUI);
+const SEM_DESENHO = DO_SORTEIO.find((c) => !c.lancada && !DESENHOS.has(c.id)).id;
+const REGRA = carregarRegras(esqueletoDoCatalogo(CAT));
+const hojeAqui = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+const sorteio1 = REGRA.receber(REGRA.vazio(), 'bau', 'bau:dia:7', { dono: 'leitora0', em: 1, hoje: hojeAqui }).resultado;
+const PRIMEIRA = CAT.cartas.find((c) => c.id === sorteio1.carta);
+const ALBUM1 = CAT.albuns.find((a) => a.id === PRIMEIRA.album);
+const [, LIVRO1, CAP1] = /^(.*\S) (\d+)\./.exec(PRIMEIRA.referencia);
+
 const criar = async (usuario) => {
   const r = await fetch(base + 'api/criar-conta', { method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ usuario, senha: 'senha123', nome: 'Leitora', email: usuario + '@teste.com', nascimento: '2000-01-01', consentimento: true }) });
@@ -105,7 +122,7 @@ window.__png = async (arquivo) => { const img = await createImageBitmap(arquivo)
 true`;
 
 console.log('\n  O baú e as cartas\n');
-const LANCADAS = ['davi-funda', 'poco-jaco', 'azeite-viuva', 'arca-alianca', 'tumulo-vazio', 'mar-vermelho'];
+console.log('  (' + LANCADAS.length + ' de ' + TOTAL + ' cartas lançadas; a primeira da leitora0: ' + PRIMEIRA.id + ', em ' + sorteio1.raridade + ')\n');
 // a legenda da revelação, na tela do fim
 const legenda = (tela) => '((document.querySelector("' + tela + ' .album-fim .album-legenda") || {}).textContent || "")';
 // os baús na tela: o da Trilha (.bau-grande) e o da revelação da arte (.rv-bau)
@@ -152,10 +169,11 @@ try {
   ok(await av('!!document.querySelector(".tela-bau .rv-pular")'), 'durante a abertura o único controle é "Pular"');
   ok(await esperar('!!' + q('.tela-bau .album-fim .carta-viva'), 15000), 'a revelação chega ao fim e a tela passa à carta grande');
   ok(await av(baus('.tela-bau') + ' === 0 && !document.querySelector(".tela-bau .rv")'), 'no fim não sobra baú nenhum, só a carta');
-  ok(await esperar('/Nova! Você tem 1 de 13 em Heróis da fé/.test(' + legenda('.tela-bau') + ')'), 'a legenda diz "Nova! Você tem 1 de 13 em Heróis da fé" (' + await av(legenda('.tela-bau')) + ')');
+  const novaNo1 = 'Nova! Você tem 1 de 13 em ' + ALBUM1.nome;
+  ok(await esperar(JSON.stringify(novaNo1) + ' === ' + legenda('.tela-bau') + '.trim()'), 'a legenda diz "' + novaNo1 + '" (' + await av(legenda('.tela-bau')) + ')');
   const ev = await av('JSON.stringify(CC.estado().cartas.eventos["bau:dia:7"])');
-  ok(/"carta":"davi-funda"/.test(ev) && /"raridade":"prata"/.test(ev) && await av('document.querySelector(".tela-bau .album-fim .carta-viva").dataset.raridade === "prata"'),
-    'a carta fica no estado e aparece na raridade dela: Davi e a funda, em Prata, a primeira da vida (' + ev + ')');
+  ok(sorteio1.raridade === 'prata' && JSON.parse(ev).carta === PRIMEIRA.id && JSON.parse(ev).raridade === 'prata' && await av('document.querySelector(".tela-bau .album-fim .carta-viva").dataset.raridade === "prata"'),
+    'a carta fica no estado e aparece na raridade dela: ' + PRIMEIRA.titulo + ' (a do sorteio da conta), em Prata, a primeira da vida (' + ev + ')');
   ok(await esperar(cabe('.tela-bau'), 3000), 'o fim cabe na tela sem rolar (390x844)');
   ok(await av('!!CC.estado().bausAbertos["dia:7"].ref'), 'o baú guarda o versículo da semana, como antes');
   const botoes = await av('[...document.querySelectorAll(".tela-cheia-pe .botao")].map((b) => b.textContent.trim())');
@@ -165,7 +183,7 @@ try {
   await av('document.querySelector("[data-compartilhar-carta]").click()');
   ok(await esperar('!!window.__compartilhado', 12000), 'Compartilhar carta abre a folha do sistema');
   const story = await av('(async () => { const d = window.__compartilhado; return { ...(await __png(d.files[0])), texto: d.text }; })()');
-  ok(story && story.w === 1080 && story.h === 1920 && story.tipo === 'image/png' && /Davi e a funda \(Prata\)/.test(story.texto), 'vai o story da carta, PNG 1080x1920 (' + JSON.stringify(story) + ')');
+  ok(story && story.w === 1080 && story.h === 1920 && story.tipo === 'image/png' && story.texto.includes(PRIMEIRA.titulo + ' (Prata)'), 'vai o story da carta, PNG 1080x1920 (' + JSON.stringify(story) + ')');
   // o brilho da raridade vai assado no story: a carta do story (800 px, em 140, 400) contra a
   // mesma carta desenhada sem brilho; no Ouro a moldura muda, no Linho (fosco) só o grão; o papel
   // do texto fica igual nos dois; e a mesma carta sai sempre igual
@@ -191,7 +209,9 @@ try {
   ok(assado && assado.ouro.moldura > 8 && assado.ouro.moldura > 3 * assado.linho.moldura && assado.ouro.papel < 4 && assado.linho.papel < 4 && assado.igual,
     'o story leva o brilho da raridade: a moldura do Ouro muda, a do Linho (fosco) não, o texto fica limpo e a imagem é sempre a mesma (' + JSON.stringify(assado) + ')');
   await av('document.querySelector(".tela-bau [data-ler]").click()');
-  ok(await esperar('/^#\\/biblia\\/1%20Samuel\\/17/.test(location.hash) && !document.querySelector(".tela-bau")'), '"Ler a história" abre 1 Samuel 17 na Bíblia e fecha a tela do baú (' + await av('location.hash') + ')');
+  const hashLer = '#/biblia/' + encodeURIComponent(LIVRO1) + '/' + CAP1;
+  ok(await esperar('(location.hash === ' + JSON.stringify(hashLer) + ' || location.hash.startsWith(' + JSON.stringify(hashLer + '/') + ')) && !document.querySelector(".tela-bau")'),
+    '"Ler a história" abre ' + LIVRO1 + ' ' + CAP1 + ' na Bíblia e fecha a tela do baú (' + await av('location.hash') + ')');
   await av('location.hash = "#/"');
   await dormir(600);
 
@@ -202,41 +222,54 @@ try {
   ok(await esperar('!!' + q('.tela-bau .rv .carta-viva'), 8000), 'o segundo baú também revela pela arte');
   ok(await av(baus('.tela-bau') + ' === 1'), 'e com um baú só');
   const ev2 = await av('JSON.stringify(CC.estado().cartas.eventos["bau:dia:14"])');
-  ok(LANCADAS.some((id) => ev2.includes('"' + id + '"')) && !/davi-funda/.test(ev2), 'sai outra carta, e só das lançadas (' + ev2 + ')');
+  const SEGUNDA = JSON.parse(ev2 || '{}');
+  ok(LANCADAS.includes(SEGUNDA.carta) && SEGUNDA.carta !== PRIMEIRA.id, 'sai outra carta, e só das lançadas (' + ev2 + ')');
   await terminar('.tela-bau');
   ok(await esperar('/Nova! Você tem 1 de 13 em/.test(' + legenda('.tela-bau') + ')') && await av(baus('.tela-bau') + ' === 0'), '"Pular" vai direto ao fim, sem baú (' + await av(legenda('.tela-bau')) + ')');
   await av('document.querySelector("[data-continuar]").click()');
   ok(await esperar('!document.querySelector(".tela-bau")'), 'Continuar fecha a tela do baú');
 
   // ---------- repetidas, uma carta sem desenho e o Perfil ----------
-  await av(`(() => { const c = CC.estado().cartas; c.eventos["bau:dia:901"] = { em: Date.now(), carta: "davi-funda", raridade: "prata" };
-    c.eventos["bau:dia:902"] = { em: Date.now() + 1, carta: "davi-funda", raridade: "bronze" };
-    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "jardim-eden", raridade: "linho" }; CC.gravar("cartas", c); return true; })()`);
+  // a primeira carta ganha mais uma Prata e uma Bronze; uma carta sem desenho entra em Linho
+  await av(`(() => { const c = CC.estado().cartas; c.eventos["bau:dia:901"] = { em: Date.now(), carta: "${PRIMEIRA.id}", raridade: "prata", visto: Date.now() };
+    c.eventos["bau:dia:902"] = { em: Date.now() + 1, carta: "${PRIMEIRA.id}", raridade: "bronze", visto: Date.now() };
+    c.eventos["bau:dia:903"] = { em: Date.now() + 2, carta: "${SEM_DESENHO}", raridade: "linho", visto: Date.now() }; CC.gravar("cartas", c); return true; })()`);
+  // o que a pessoa tem agora, carta por carta e versão por versão
+  const temAgora = {};
+  for (const [id, rar] of [[PRIMEIRA.id, 'prata'], [SEGUNDA.carta, SEGUNDA.raridade], [PRIMEIRA.id, 'prata'], [PRIMEIRA.id, 'bronze'], [SEM_DESENHO, 'linho']]) {
+    temAgora[id] = temAgora[id] || {};
+    temAgora[id][rar] = (temAgora[id][rar] || 0) + 1;
+  }
+  const doAlbum1 = Object.keys(temAgora).filter((id) => CAT.cartas.find((c) => c.id === id).album === ALBUM1.id);
+  const versoesNo1 = doAlbum1.reduce((n, id) => n + Object.keys(temAgora[id]).length, 0);
   await av('location.hash = "#/perfil"');
   ok(await esperar('!!' + q('[data-album-cartas]')), 'o Perfil tem a entrada Cartas, ao lado de Conquistas e Troféus');
-  ok(/Cartas\s*3 de 52/.test(await texto('[data-album-cartas]')), 'a entrada diz quantas cartas de 52 (' + (await texto('[data-album-cartas]')).trim() + ')');
+  ok(new RegExp('Cartas\\s*' + Object.keys(temAgora).length + ' de ' + TOTAL).test(await texto('[data-album-cartas]')),
+    'a entrada diz quantas cartas de ' + TOTAL + ' (' + (await texto('[data-album-cartas]')).trim() + ')');
   await av(q('[data-album-cartas]') + '.scrollIntoView({ block: "center" })');
   await nosDoisTemas('02-perfil-entrada');
 
   // ---------- o álbum ----------
   await av(q('[data-album-cartas]') + '.click()');
   ok(await esperar('!!' + q('.album-grade .album-carta'), 15000), 'o álbum abre');
-  const grade = await av(`(() => { const s = document.querySelector('[data-album="herois"]');
+  const grade = await av(`(() => { const s = document.querySelector('[data-album="${ALBUM1.id}"]');
     return { cartas: s.querySelectorAll('.album-carta').length, vagas: s.querySelectorAll('.album-vaga').length, texto: [...s.querySelectorAll('.album-grade')].map((g) => g.innerText.replace(/×\\d+/g, '').trim()).join(''),
       titulo: s.querySelector('.titulo-secao').textContent, versoes: s.querySelector('.album-versoes').textContent }; })()`);
-  ok(grade.cartas === 1 && grade.vagas === 12 && !grade.texto, 'Heróis da fé: a recebida e 12 silhuetas, sem texto nas miniaturas (' + JSON.stringify(grade) + ')');
-  ok(/1 de 13 cartas/.test(grade.titulo) && /Coleção: 2 de 65 versões/.test(grade.versoes), 'o álbum diz "1 de 13 cartas" e "Coleção: 2 de 65 versões"');
-  const davi = await av(`(() => { const b = document.querySelector('[data-carta="davi-funda"]'); return { rotulo: b.getAttribute('aria-label'), pips: [...b.querySelectorAll('.album-pips i.tem')].map((i) => i.className),
+  ok(grade.cartas === doAlbum1.length && grade.vagas === 13 - doAlbum1.length && !grade.texto,
+    ALBUM1.nome + ': as recebidas (' + doAlbum1.join(', ') + ') e as silhuetas, sem texto nas miniaturas (' + JSON.stringify(grade) + ')');
+  ok(new RegExp(doAlbum1.length + ' de 13 cartas').test(grade.titulo) && new RegExp('Coleção: ' + versoesNo1 + ' de 65 versões').test(grade.versoes),
+    'o álbum diz "' + doAlbum1.length + ' de 13 cartas" e "Coleção: ' + versoesNo1 + ' de 65 versões"');
+  const mini = await av(`(() => { const b = document.querySelector('[data-carta="${PRIMEIRA.id}"]'); return { rotulo: b.getAttribute('aria-label'), pips: [...b.querySelectorAll('.album-pips i.tem')].map((i) => i.className),
     copias: (b.querySelector('.album-copias') || {}).textContent || '', canvas: !!b.querySelector('canvas') }; })()`);
-  ok(/Versões: Bronze, Prata/.test(davi.rotulo) && /Repetidas: 2 de Prata/.test(davi.rotulo) && davi.pips.length === 2 && davi.copias === '×2' && davi.canvas,
-    'a miniatura desenhada mostra as versões (bolinhas), as cópias da versão à mostra (×2) e diz tudo no rótulo (' + davi.rotulo + ')');
-  ok(await av('!!document.querySelector("[data-carta=jardim-eden] .album-sem-arte")'), 'carta sem desenho aparece em silhueta da raridade');
+  ok(/Versões: Bronze, Prata/.test(mini.rotulo) && /Repetidas: 2 de Prata/.test(mini.rotulo) && mini.pips.length === 2 && mini.copias === '×2' && mini.canvas,
+    'a miniatura desenhada mostra as versões (bolinhas), as cópias da versão à mostra (×2) e diz tudo no rótulo (' + mini.rotulo + ')');
+  ok(await av('!!document.querySelector("[data-carta=' + SEM_DESENHO + '] .album-sem-arte")'), 'carta sem desenho aparece em silhueta da raridade');
   ok(await av('document.querySelectorAll("[data-album=semeadores] .album-limiar").length === 5 && /100 amigos/.test(document.querySelector("[data-album=semeadores]").textContent)'),
     'Semeadores aparece à parte, com os 5 limiares em silhueta (de 1 a 100 amigos)');
   await nosDoisTemas('03-album');
 
   // ---------- a carta grande ----------
-  await av(q('[data-carta="davi-funda"]') + '.click()');
+  await av(q('[data-carta="' + PRIMEIRA.id + '"]') + '.click()');
   ok(await esperar('!!' + q('.tela-carta .carta-grande .carta-viva')), 'tocar na carta abre a carta grande');
   const versoes = await av('[...document.querySelectorAll(".carta-versoes .carta-versao")].map((v) => v.textContent.trim() + (v.getAttribute("aria-pressed") === "true" ? "*" : "") + (v.classList.contains("falta") ? "?" : ""))');
   ok(JSON.stringify(versoes) === JSON.stringify(['Linho?', 'Bronze', 'Prata×2*', 'Ouro?', 'Glória?']), 'as versões: a melhor aberta, as repetidas com ×2 e as que faltam em silhueta (' + versoes + ')');
@@ -244,12 +277,12 @@ try {
   ok(await esperar(q('.tela-carta .carta-viva') + '?.dataset.raridade === "bronze"'), 'trocar de versão mostra a carta em Bronze');
   await av(q('.tela-carta .cv-botao-virar') + '.click()');
   ok(await esperar(q('.tela-carta .carta-viva') + '?.classList.contains("mostra-verso")', 4000), 'o botão Virar mostra o verso com a marca');
-  ok(await av('!!document.querySelector(".tela-carta [data-compartilhar-carta]:not([hidden])") && /1 Samuel 17/.test(document.querySelector(".carta-links").textContent)'), 'a carta grande tem Compartilhar e o link para a Bíblia');
+  ok(await av('!!document.querySelector(".tela-carta [data-compartilhar-carta]:not([hidden])") && document.querySelector(".carta-links").textContent.includes(' + JSON.stringify(LIVRO1 + ' ' + CAP1) + ')'), 'a carta grande tem Compartilhar e o link para a Bíblia');
   await av(q('.tela-carta .cv-botao-virar') + '.click()');
   await dormir(900);
   await nosDoisTemas('04-carta-grande');
   await fecharTudo();
-  await av(q('[data-carta="jardim-eden"]') + '.click()');
+  await av(q('[data-carta="' + SEM_DESENHO + '"]') + '.click()');
   ok(await esperar('!!' + q('.tela-carta .carta-texto')) && await av('!!document.querySelector(".tela-carta [data-compartilhar-carta][hidden]")'), 'a carta sem desenho abre como carta de texto, sem Compartilhar');
   await fecharTudo();
 
@@ -259,10 +292,14 @@ try {
   const comum = await texto('.folha-pode-vir [data-tabela="comum"]');
   const marco = await texto('.folha-pode-vir [data-tabela="marco"]');
   const pode = await texto('.folha-pode-vir');
+  // os números da pessoa pela regra, a partir do livro-caixa dela
+  const semOuro = REGRA.resumo(JSON.parse(await av('JSON.stringify(CC.estado().cartas)'))).semOuro;
+  const hojeSaem = LANCADAS.length < TOTAL ? 'Hoje podem sair ' + LANCADAS.length + ' das ' + TOTAL + ' cartas' : '';
   ok(/Linho\s*49%/.test(comum) && /Bronze\s*30%/.test(comum) && /Prata\s*15%/.test(comum) && /Ouro\s*5%/.test(comum) && /Glória\s*1%/.test(comum), 'mostra as chances do sorteio comum (' + comum.replace(/\s+/g, ' ') + ')');
   ok(/Prata\s*40%/.test(marco) && /Ouro\s*35%/.test(marco) && /Glória\s*25%/.test(marco) && !/Linho|Bronze/.test(marco), 'e as do sorteio de marco, sem Linho nem Bronze (' + marco.replace(/\s+/g, ' ') + ')');
-  ok(/No máximo 5 seguidas sem Prata ou melhor/.test(pode) && /20º é Ouro/.test(pode) && /sobe 15 pontos/.test(pode) && /Hoje podem sair 6 das 52 cartas/.test(pode) && /Desde o último Ouro: 5 sorteios/.test(pode),
-    'mostra as proteções, quantas cartas podem sair hoje e os números da pessoa');
+  ok(/No máximo 5 seguidas sem Prata ou melhor/.test(pode) && /20º é Ouro/.test(pode) && /sobe 15 pontos/.test(pode)
+    && (hojeSaem ? pode.includes(hojeSaem) : !/Hoje podem sair/.test(pode)) && pode.includes('Desde o último Ouro: ' + semOuro + (semOuro === 1 ? ' sorteio' : ' sorteios')),
+    'mostra as proteções, quantas cartas podem sair hoje e os números da pessoa (' + (hojeSaem || 'todas lançadas') + '; ' + semOuro + ' desde o último Ouro)');
   ok(!/nunca repete|não repete/i.test(pode), 'não promete que as cartas não se repetem');
   await nosDoisTemas('05-o-que-pode-vir');
   await fecharTudo();

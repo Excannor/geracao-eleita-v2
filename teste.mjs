@@ -1394,7 +1394,8 @@ const CATALOGO = lerCatalogo(AQUI);
   const desenhos = [...desenhosDaArte(AQUI)].sort();
   // Um desenho pronto espera a aprovação do dono antes de lançar: toda lançada tem desenho, mas
   // nem todo desenho já está lançado.
-  checar(lancadas.every((id) => desenhos.includes(id)) && lancadas.length === 6,
+  // (lido do catálogo: liberar mais cartas não muda o teste)
+  checar(lancadas.length > 0 && lancadas.every((id) => desenhos.includes(id)),
     'toda carta lançada tem desenho na peça de arte (' + lancadas.join(', ') + '); ' + (desenhos.length - lancadas.length) + ' desenhos esperam a aprovação');
   const semDesenho = CATALOGO.cartas.find((c) => !desenhos.includes(c.id) && !CATALOGO.albuns.find((a) => a.id === c.album).especial).id;
   const ruim = validarCatalogo({ albuns: CATALOGO.albuns.map((a, i) => (i === 1 ? { ...a, lancadoEm: '2020-01-01' } : a)),
@@ -1404,7 +1405,10 @@ const CATALOGO = lerCatalogo(AQUI);
   const esq = esqueletoDoCatalogo(CATALOGO);
   const noIndex = JSON.parse((html.match(/window\.CARTAS_INDICE=(\[.*?\]);/) || [])[1] || 'null');
   checar(JSON.stringify(noIndex) === JSON.stringify(esq) && esq.filter((a) => !a.especial).every((a) => a.c.split(' ').length === 13 && a.lancadoEm && a.capa)
-    && esq.filter((a) => a.especial).map((a) => a.id).join() === 'semeadores,boas-vindas' && /~abel-oferta/.test(esq[0].c) && / davi-funda /.test(esq[0].c),
+    && esq.filter((a) => a.especial).map((a) => a.id).join() === 'semeadores,boas-vindas'
+    // cada carta pelo número, com "~" só nas não lançadas (lido do catálogo)
+    && esq.filter((a) => !a.especial).every((a) => a.c === CATALOGO.cartas.filter((c) => c.album === a.id).sort((x, y) => x.numero - y.numero)
+      .map((c) => (c.lancada ? '' : '~') + c.id).join(' ')),
   'o esqueleto do sorteio no index.html é o do catálogo, com "~" nas não lançadas (' + JSON.stringify(esq).length + ' bytes)');
   checar(!html.includes('"voceSabia"') && !html.includes(CATALOGO.cartas[0].voceSabia) && !html.includes('PESO_NOVA_ATUAL'), 'os textos das cartas e a regra do sorteio não estão no index.html');
 }
@@ -1512,7 +1516,8 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
   for (let d = 1; d <= 300; d++) { const x = RC.receber(c, 'bau', 'bau:dia:' + d, { dono: 'lanc', em: d }); c = x.cartas; soLancadas &&= lancadas.has(x.resultado.carta); }
   for (let d = 1; d <= 40; d++) { const x = RC.receber(c, 'unidade', 'unidade:' + d, { dono: 'lanc', em: 400 + d }); c = x.cartas; soLancadas &&= lancadas.has(x.resultado.carta); }
   const r = RC.resumo(c);
-  checar(soLancadas && r.lancadas === 6 && r.cartas === 6, 'carta não lançada nunca sai (340 sorteios, comuns e de marco, só as 6 com desenho)');
+  const nLancadas = CATALOGO.cartas.filter((x) => x.lancada && !CATALOGO.albuns.find((a) => a.id === x.album).especial).length;
+  checar(soLancadas && r.lancadas === nLancadas && r.cartas === nLancadas, 'carta não lançada nunca sai (340 sorteios, comuns e de marco, só as ' + nLancadas + ' lançadas, todas recebidas)');
   checar(r.albuns.every((a) => !a.completo) && !Object.keys(c.eventos).some((k) => k.startsWith('album:')), 'nenhum álbum completa enquanto as 13 não forem lançadas e estiverem na coleção');
   const comNoe = ESQ_HOJE.map((a) => (a.id === 'herois' ? { ...a, c: a.c.replace('~noe-arca', 'noe-arca') } : a));
   contexto.window.CARTAS_INDICE = comNoe;

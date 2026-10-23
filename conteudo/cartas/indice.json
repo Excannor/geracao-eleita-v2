@@ -47,7 +47,7 @@
       "voceSabia": "Abel ofereceu ao Senhor as primeiras crias do seu rebanho.",
       "link": "#/mapa/genesis",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "noe-arca",
@@ -69,7 +69,7 @@
       "voceSabia": "O Senhor o levou para fora da tenda e disse: conte as estrelas, se puder.",
       "link": "#/atlas/abraao",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "sara-riso",
@@ -102,7 +102,7 @@
       "voceSabia": "A mãe vedou um cesto de junco com betume e o deixou à beira do rio.",
       "link": "#/mapa/exodo",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "raabe-corda",
@@ -135,7 +135,7 @@
       "voceSabia": "No campo de Boaz, Rute recolhia as espigas que sobravam.",
       "link": "#/mapa/rute",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "davi-funda",
@@ -157,7 +157,7 @@
       "voceSabia": "Ester tocou a ponta do cetro de ouro que o rei estendeu para ela.",
       "link": "#/mapa/ester",
       "rascunho": true,
-      "lancada": false
+      "lancada": true
     },
     {
       "id": "daniel-leoes",
