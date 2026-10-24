@@ -1302,6 +1302,56 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
     'blocoEmHtml(): tudo escapado, e só *negrito* vira <b>');
   checar(!/<(?!\/?(p|b|ul|li|span|svg|path|h3|div|figure|blockquote|figcaption)\b)/.test(dono.blocos.map((b) => R.blocoEmHtml(b, { cartao: () => '' })).join('')), 'blocoEmHtml(): o estudo do dono vira só as marcas de sempre');
 
+  // 5b. dividirEmEncontros(): o estudo que passou dos tetos vira dois encontros (ou mais), cortado
+  // no tópico mais perto do meio, nunca no meio de uma passagem, e sem perder nenhuma linha
+  {
+    const lerE = (texto) => ctxEstudo.window.CC.lerEstudo(texto, { capitulos: capitulosDoPlano });
+    const emLinhas = (texto) => texto.replace(/\r\n?/g, '\n').replace(/^(?:[ \t ]*\n)+/, '').replace(/\s+$/, '').split('\n');
+    const semL = (blocos) => JSON.stringify(blocos.map(({ l, ...b }) => b));
+    const dividirTexto = (texto, tetos) => R.dividirEmEncontros(lerE(texto), emLinhas(texto), tetos);
+    const longo = readFileSync(join(AQUI, 'ferramentas', 'estudo-longo.txt'), 'utf8');
+    const inteiro = lerE(longo);
+    checar(inteiro.blocos.length === 101 && inteiro.blocos.length > R.TETOS_DO_ESTUDO.partes, 'dividirEmEncontros(): o estudo longo (ferramentas/estudo-longo.txt) tem 101 partes, acima do teto de 80');
+    const duas = dividirTexto(longo);
+    const relidas = duas.map((x) => lerE(x.fonte));
+    checar(duas.length === 2 && duas[0].titulo === 'O fruto do Espírito no dia a dia (parte 1)' && duas[1].titulo === 'O fruto do Espírito no dia a dia (parte 2)'
+      && relidas.every((x, k) => x.titulo === duas[k].titulo), 'dividirEmEncontros(): duas partes, "(parte 1)" e "(parte 2)" no título, que o leitor lê como título');
+    checar(duas[1].comeco === 'Tópico 5: Amabilidade e bondade: o jeito de tratar' && relidas[1].blocos[0].t === 'topico' && relidas[1].blocos[0].n === 5,
+      'dividirEmEncontros(): o corte cai no tópico mais perto do meio (o 5, bloco 50 de 101)');
+    checar(relidas.every((x) => x.blocos.length <= 80 && x.blocos.filter((b) => b.t === 'versiculo').length <= 15 && x.fonte.length <= 10000)
+      && relidas.map((x) => x.blocos.length).join() === duas.map((x) => x.blocos).join(), 'dividirEmEncontros(): cada parte cabe nos tetos (80 partes, 15 cartões, 10.000 caracteres), relida pelo leitor');
+    checar(semL(relidas.flatMap((x) => x.blocos)) === semL(inteiro.blocos), 'dividirEmEncontros(): relidas, as partes juntas dão exatamente os blocos do estudo inteiro');
+    checar(duas.map((x) => x.fonte.split('\n').slice(1).join('\n')).join('\n') === emLinhas(longo).slice(1).join('\n'), 'dividirEmEncontros(): nenhuma linha do texto se perde nem se repete');
+    const quatro = dividirTexto(longo, { partes: 30 });
+    checar(quatro && quatro.length === 4 && quatro.every((x) => x.blocos <= 30) && quatro.slice(1).every((x) => /^Tópico \d/.test(x.comeco)) && quatro[3].titulo.endsWith('(parte 4)'),
+      'dividirEmEncontros(): com um teto de 30 partes, quatro encontros, todos começando num tópico');
+    const tres = dividirTexto(longo, { cartoes: 6 });
+    checar(tres && tres.length === 3 && tres.every((x) => x.cartoes <= 6), 'dividirEmEncontros(): o teto de cartões também divide (3 encontros com até 6 cartões)');
+    // sem tópicos: corta num parágrafo, nunca depois do texto que apresenta o cartão nem antes do "Para guardar"
+    const corrido = ['Sem tópicos', 'Primeiro parágrafo.', 'Segundo parágrafo.', 'Leiam juntos:', 'João 3.16', 'Terceiro parágrafo.', 'Quarto parágrafo.', 'E Paulo acrescenta:', 'Romanos 8.28', 'Quinto parágrafo.', 'Para guardar: Deus amou o mundo.'].join('\n');
+    const semTopicos = dividirTexto(corrido, { partes: 6 });
+    const lidoCorrido = lerE(corrido);
+    const cortesCorrido = semTopicos ? semTopicos.slice(1).map((x) => x.primeiro) : [];
+    checar(semTopicos && semTopicos.length === 2 && cortesCorrido.every((k) => R.pontoDeCorte(lidoCorrido.blocos, k) === 1) && semTopicos.every((x) => x.blocos <= 6)
+      && semL(semTopicos.flatMap((x) => lerE(x.fonte).blocos)) === semL(lidoCorrido.blocos), 'dividirEmEncontros(): sem tópicos, corta num parágrafo permitido, e as duas partes relidas dão o estudo inteiro');
+    const b = lidoCorrido.blocos;
+    const k = (t, texto) => b.findIndex((x) => x.t === t && (!texto || x.texto === texto || x.ref === texto));
+    checar(R.pontoDeCorte(b, k('versiculo', 'João 3.16')) === 0 && R.pontoDeCorte(b, k('guardar')) === 0 && R.pontoDeCorte(b, k('texto', 'Segundo parágrafo.')) === 1,
+      'pontoDeCorte(): nunca entre "Leiam juntos:" e o cartão, nem antes do "Para guardar"; entre dois parágrafos, sim');
+    const bt = inteiro.blocos;
+    const t5 = bt.findIndex((x) => x.t === 'topico' && x.n === 5);
+    checar(R.pontoDeCorte(bt, t5) === 2 && R.pontoDeCorte(bt, t5 + 1) === 0 && R.pontoDeCorte(bt, bt.findIndex((x) => x.t === 'conclusao')) === 2,
+      'pontoDeCorte(): o começo de um tópico e da conclusão é o corte natural; logo depois do título do tópico, nunca');
+    checar(R.dividirEmEncontros(lerE('T\nLeiam:\nJoão 3.16\nPara guardar: amor.'), emLinhas('T\nLeiam:\nJoão 3.16\nPara guardar: amor.'), { partes: 2 }) === null,
+      'dividirEmEncontros(): sem lugar permitido para cortar, devolve null (a tela avisa)');
+    const nomeLongo = 'Um estudo com um título bem comprido sobre a vida no Espírito, o fruto que permanece e a alegria de servir na célula toda semana';
+    const cortado = R.tituloDaParte(nomeLongo, 2, 120);
+    checar(cortado.length <= 120 && cortado.endsWith(' (parte 2)') && nomeLongo.startsWith(cortado.slice(0, -' (parte 2)'.length)) && nomeLongo[cortado.length - ' (parte 2)'.length] === ' ',
+      'tituloDaParte(): o título comprido é cortado na palavra para caber "(parte 2)" nos 120 caracteres (' + cortado + ')');
+    const doDono = dividirTexto(readFileSync(join(AQUI, 'ferramentas', 'estudo-exemplo.txt'), 'utf8'));
+    checar(doDono && doDono.length === 2 && /^Tópico \d/.test(doDono[1].comeco), 'dividirEmEncontros(): o estudo do dono (32 partes) também se divide num tópico (' + (doDono ? doDono[1].comeco : '') + ')');
+  }
+
   // 6. nada de travessão nem meia-risca nos textos das peças do estudo (as letras especiais como escape)
   for (const f of ['estudo-regras.js', 'estudo-celula.js', 'estudo-preparo.js']) {
     checar(!/[—–]/.test(readFileSync(join(AQUI, 'src', 'sob-demanda', f), 'utf8')), f + ': sem travessão nem meia-risca no texto');

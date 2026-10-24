@@ -167,6 +167,118 @@
     return partes;
   }
 
+  // ---------- o estudo comprido em dois encontros (ou mais) ----------
+  // Os tetos de um estudo (estudos.mjs confere de novo): partes, cartões, caracteres da fonte e o
+  // título.
+  const TETOS_DO_ESTUDO = { partes: 80, cartoes: 15, caracteres: 10000, titulo: 120 };
+  // Onde um encontro novo pode começar, antes do bloco k: 2 no começo de um tópico ou da conclusão
+  // (a divisão que o próprio estudo já tem), 1 no começo de um parágrafo, de um cartão, de uma lista
+  // ou de uma frase, e 0 (nunca) logo depois do título de um tópico ou da conclusão, depois do texto
+  // que termina em dois pontos (ele apresenta o que vem), antes do "Para guardar" (ele fecha o que
+  // veio antes), entre as duas metades de uma lista longa e no meio de uma linha (o tópico que já
+  // traz o cartão, a conclusão com o texto na mesma linha).
+  function pontoDeCorte(blocos, k) {
+    const antes = blocos[k - 1];
+    const b = blocos[k];
+    if (!antes || !b) return 0;
+    if (antes.t === 'topico' || antes.t === 'conclusao' || b.t === 'guardar') return 0;
+    if (antes.t === 'texto' && /:\s*$/.test(semAsteriscos(antes.texto))) return 0;
+    if (antes.t === 'seta' && b.t === 'seta') return 0;
+    if (antes.l && b.l && b.l[0] <= antes.l[1]) return 0;
+    return b.t === 'topico' || b.t === 'conclusao' ? 2 : 1;
+  }
+  // "Título (parte 2)", cortando o título na palavra quando os dois juntos passam do teto.
+  function tituloDaParte(nome, k, teto) {
+    const fim = ' (parte ' + k + ')';
+    const base = String(nome || '').trim() || 'Estudo do encontro';
+    if (base.length + fim.length <= teto) return base + fim;
+    const corte = base.slice(0, Math.max(1, teto - fim.length));
+    const palavra = corte.replace(/\s+\S*$/, '');
+    return (palavra.length >= 10 ? palavra : corte).replace(/[\s,.;:\u2013\u2014-]+$/, '') + fim;
+  }
+  // O que abre uma parte, para a prévia da divisão: "Tópico 4: A Armadura de Deus", "Conclusão", a
+  // referência do cartão ou o começo do texto.
+  function comecoDe(b) {
+    if (!b) return '';
+    if (b.t === 'topico') return 'Tópico ' + b.n + ': ' + semAsteriscos(b.texto);
+    if (b.t === 'conclusao') return 'Conclusão';
+    if (b.t === 'versiculo') return b.escrito || b.ref;
+    const t = semAsteriscos(b.t === 'seta' ? (b.itens[0] || []).join(SETA) : b.texto || '').trim();
+    return t.length > 60 ? t.slice(0, 57).replace(/\s+\S*$/, '') + '\u2026' : t;
+  }
+  // Divide um estudo que passou de algum teto em encontros, todos dentro dos tetos, cortando sempre
+  // num lugar permitido (pontoDeCorte): de preferência no tópico mais perto do meio e, só quando
+  // nenhum tópico serve, num parágrafo. Dois encontros, se der; senão três, e assim por diante.
+  // leitura: o que CC.lerEstudo devolveu para a fonte; linhas: a fonte em linhas (as linhas .l dos
+  // blocos contam a partir dela). Nada se perde: cada parte leva as linhas do texto como foram
+  // escritas, do começo do seu primeiro bloco até antes do primeiro bloco da parte seguinte (uma
+  // seção "Perguntas" fica na parte em que estava), com o título e "(parte N)" na primeira linha.
+  // Devolve [{ titulo, fonte, blocos, cartoes, caracteres, comeco }], ou null quando nenhuma
+  // divisão cabe nos tetos (uma parte sem lugar para cortar maior que o teto).
+  function dividirEmEncontros(leitura, linhas, tetos) {
+    const t = Object.assign({}, TETOS_DO_ESTUDO, tetos || {});
+    const blocos = (leitura && leitura.blocos) || [];
+    const ls = linhas || [];
+    const N = blocos.length;
+    if (N < 2) return null;
+    const nome = (leitura.titulo || '').trim();
+    // a linha onde cada bloco começa; a parte k vai de inicio(a) até antes de inicio(b)
+    const inicio = (k) => (k >= N ? ls.length : k === 0 ? (leitura.linhaTitulo >= 0 ? leitura.linhaTitulo + 1 : 0) : blocos[k].l[0]);
+    const somaLinhas = [0];
+    ls.forEach((l, i) => somaLinhas.push(somaLinhas[i] + String(l).length + 1));
+    const somaCartoes = [0];
+    blocos.forEach((b, i) => somaCartoes.push(somaCartoes[i] + (b.t === 'versiculo' ? 1 : 0)));
+    const cortes = [];
+    for (let k = 1; k < N; k++) cortes[k] = pontoDeCorte(blocos, k);
+    const maiorTitulo = tituloDaParte(nome, 99, t.titulo).length + 1;
+    const cabe = (a, b) => b - a <= t.partes && somaCartoes[b] - somaCartoes[a] <= t.cartoes
+      && somaLinhas[inicio(b)] - somaLinhas[inicio(a)] + maiorTitulo <= t.caracteres;
+    const pontos = [0];
+    for (let k = 1; k < N; k++) if (cortes[k]) pontos.push(k);
+    pontos.push(N);
+    for (let n = 2; n <= Math.min(N, 30); n++) {
+      // o melhor jeito de pôr os primeiros pontos[i] blocos em j partes: as partes perto do tamanho
+      // médio e, muito acima disso, o corte num tópico (o corte num parágrafo pesa mais que qualquer
+      // desequilíbrio)
+      const media = N / n;
+      const pesoParagrafo = (N + 1) * (N + 1) * n;
+      let custo = pontos.map((x) => (x === 0 ? 0 : Infinity));
+      const de = [];
+      for (let j = 1; j <= n; j++) {
+        const novo = pontos.map(() => Infinity);
+        de[j] = pontos.map(() => -1);
+        for (let i = 1; i < pontos.length; i++) {
+          const b = pontos[i];
+          if ((j === n) !== (b === N)) continue;
+          const pena = b === N ? 0 : cortes[b] === 2 ? 0 : pesoParagrafo;
+          for (let h = 0; h < i; h++) {
+            if (custo[h] === Infinity || !cabe(pontos[h], b)) continue;
+            const c = custo[h] + (b - pontos[h] - media) * (b - pontos[h] - media) + pena;
+            if (c < novo[i]) { novo[i] = c; de[j][i] = h; }
+          }
+        }
+        custo = novo;
+      }
+      const ultimo = pontos.length - 1;
+      if (custo[ultimo] === Infinity) continue;
+      const limites = [N];
+      for (let j = n, i = ultimo; j >= 1; j--) { i = de[j][i]; limites.unshift(pontos[i]); }
+      const partes = [];
+      for (let k = 0; k < n; k++) {
+        const a = limites[k];
+        const b = limites[k + 1];
+        const corpo = ls.slice(inicio(a), inicio(b)).map(String);
+        while (corpo.length && !corpo[0].trim()) corpo.shift();
+        while (corpo.length && !corpo[corpo.length - 1].trim()) corpo.pop();
+        const titulo = tituloDaParte(nome, k + 1, t.titulo);
+        const fonte = [titulo].concat(corpo).join('\n');
+        partes.push({ titulo, fonte, blocos: b - a, cartoes: somaCartoes[b] - somaCartoes[a], caracteres: fonte.length, comeco: comecoDe(blocos[a]), primeiro: a });
+      }
+      return partes;
+    }
+    return null;
+  }
+
   // contexto: conduzo (líder e auxiliar: o último passo abre o registro), visitante (sem a aba
   // Oração), acolhida, adoracao, testemunho, semana e versiculos (como em comoBlocos). Nenhum passo da Palavra leva os 4 Ws, e o
   // "Para guardar" só aparece no último. Orar juntos não tem versículo (decisão do dono, 17/10).
@@ -447,6 +559,7 @@
   CC.estudoRegras = {
     PERGUNTAS_OIA, PERGUNTAS_ACOLHIDA, SUGESTAO_ADORACAO, SUGESTAO_TESTEMUNHO, COMECAR_SEMANA, ORAR_TRECHO, SEMANA_SEM_DIAS, sugestaoAcolhida,
     cruza, cartaoDe, cortaTrecho, capituloDe, semana, titulo, comoBlocos, perguntasDe, dividir, passos, textoParaGrupo,
+    TETOS_DO_ESTUDO, pontoDeCorte, tituloDaParte, dividirEmEncontros,
     noPlano, parabolaDoEstudo, gruposDePerguntas, blocoEmHtml, negrito,
     lembrarCombinado, refsCurtas, dataDaLista, paraImprimir,
   };
