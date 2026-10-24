@@ -182,7 +182,9 @@
 .mesa-impressao { display: none; }
 @media print {
   @page { size: A4; margin: 16mm 15mm 18mm; }
-  html:has(body.imprimindo-estudo), body.imprimindo-estudo { background: #fff !important; }
+  /* o tema escuro não vaza para o papel: com color-scheme escuro, o Chrome pinta de preto a margem
+     da folha e o fim da última página quando a impressão leva os fundos */
+  html:has(body.imprimindo-estudo), body.imprimindo-estudo { background: #fff !important; color-scheme: only light !important; }
   /* a página inteira vai para o papel: nenhuma regra de tela (a altura presa do app instalado no
      iPhone, html.app-ios) corta o estudo na primeira folha */
   html:has(body.imprimindo-estudo), body.imprimindo-estudo { display: block !important; height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important; }
@@ -210,6 +212,22 @@
   .mesa-impressao .imp-cartao, .mesa-impressao .imp-guardar, .mesa-impressao li { break-inside: avoid; }
   .mesa-impressao .imp-pe { margin-top: 18pt; padding-top: 6pt; border-top: 1pt solid #bbb; color: #333; font-size: 8.5pt; }
   .mesa-impressao .imp-pe p { margin: 0; }
+  /* a marca d'água, em cada folha (o que é fixed se repete por página): cinza bem claro por cima
+     do texto, que continua preto e legível, também na impressora sem cor */
+  .mesa-impressao .imp-marca { position: fixed; top: 50%; left: 50%; width: 88mm; transform: translate(-50%, -50%); opacity: .06; pointer-events: none; }
+  .mesa-impressao .imp-marca img { display: block; width: 100%; height: auto; }
+}
+/* A linha do app no pé de cada folha, na margem de baixo (@bottom-center): o que é fixed e passa
+   da área da página o Chrome joga para o alto da folha seguinte, por cima do texto. A folha do
+   estudo tem página própria (page: estudo), e as outras impressões do app não ganham a linha. O
+   navegador que não conhece as caixas da margem só deixa a linha de fora. */
+@media print {
+  @page estudo {
+    size: A4;
+    margin: 16mm 15mm 18mm;
+    @bottom-center { content: "Geração Eleita · geracaoeleita.app"; color: #666; font: 600 7.5pt Manrope, system-ui, sans-serif; letter-spacing: .02em; vertical-align: middle; }
+  }
+  body.imprimindo-estudo .mesa-impressao { page: estudo; }
 }
 /* o botão da anotação é secundário: o principal da aba continua "Mandar no grupo" */
 .mesa-anotacao .escrever-contexto { background: var(--cartao); color: var(--tinta-forte); }

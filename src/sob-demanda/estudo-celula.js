@@ -428,6 +428,16 @@
   // endereço, e nunca no afterprint: há navegador de celular que dispara o afterprint antes de
   // imprimir, e sem a classe o papel sairia com o app no lugar do estudo. Na tela, a classe não
   // muda nada. Sem anotação, presença nem pedido.
+  // Em toda folha, a marca d'água da Geração Eleita (o símbolo da chama, o mesmo das imagens de
+  // story e de CC.icoLogo) bem clara no meio: ela é "fixed" no papel, e o Chrome repete o que é
+  // fixo em cada página. Vai como imagem (<img> com o SVG em data:), e não como <svg> no HTML: o
+  // Chrome repete a caixa fixa em todas as folhas, mas o <svg> de dentro só sai na primeira. A
+  // linha do app no pé vem do CSS (a margem de baixo da página).
+  const marcaNoPapel = () => {
+    if (!CC.CAMINHO_SIMBOLO) return '';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="569 169 1357 1936"><g transform="translate(0,2508) scale(.1,-.1)" fill="#000"><path d="' + CC.CAMINHO_SIMBOLO + '"/></g></svg>';
+    return '<div class="imp-marca" aria-hidden="true"><img alt="" src="data:image/svg+xml,' + encodeURIComponent(svg) + '"></div>';
+  };
   let tirarImpressao = null;
   async function imprimir(p, e, apoio, opcoes = {}) {
     if (typeof window.print !== 'function') {
@@ -455,7 +465,7 @@
     const folha = document.createElement('div');
     folha.className = 'mesa-impressao';
     folha.setAttribute('aria-hidden', 'true');
-    folha.innerHTML = html;
+    folha.innerHTML = marcaNoPapel() + html;
     document.body.appendChild(folha);
     document.body.classList.add('imprimindo-estudo');
     if (tirarImpressao) removeEventListener('hashchange', tirarImpressao);
@@ -466,6 +476,9 @@
       tirarImpressao = null;
     };
     addEventListener('hashchange', tirarImpressao);
+    // a marca d'água pronta antes de abrir a impressão (a imagem em data: decodifica num instante)
+    const marca = folha.querySelector('.imp-marca img');
+    if (marca && marca.decode) await marca.decode().catch(() => {});
     window.print();
   }
 
