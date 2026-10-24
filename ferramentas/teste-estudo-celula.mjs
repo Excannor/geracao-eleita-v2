@@ -594,7 +594,9 @@ for (let i = 0; i < 14; i++) await proximo();
 await foto('06e-encontro-15');
 await emTodosOsTamanhos('o último passo do encontro');
 await clicar('.tela-cheia [data-registrar]');
-ok(await esperar('!document.querySelector(".tela-cheia") && /Quem foi ao encontro\\?/.test(document.querySelector(".cortina .folha h2")?.textContent || "")'), '13. "Registrar quem veio" fecha a tela cheia e abre "Quem foi ao encontro?"');
+// (desde as cartas do baú, concluir o encontro pode abrir a tela cheia da carta nova por cima: o que
+// sai é a tela cheia do modo encontro, a que tem .mesa-topo)
+ok(await esperar('!document.querySelector(".tela-cheia .mesa-topo") && /Quem foi ao encontro\\?/.test(document.querySelector(".cortina .folha h2")?.textContent || "")'), '13. "Registrar quem veio" fecha a tela cheia e abre "Quem foi ao encontro?"');
 await clicar('.cortina [data-fechar]');
 
 // ---------- 14. A visitante ----------
