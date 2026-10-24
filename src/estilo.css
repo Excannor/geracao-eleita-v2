@@ -389,8 +389,11 @@ button { font-family: inherit; }
    ainda depois que o teclado abre e fecha: a barra de abas subia para o meio da tela, com o
    conteúdo aparecendo embaixo dela (bug 297779 do WebKit, sem correção oficial). Aqui a página
    não rola: quem rola é a .aplicativo, e a barra vira um bloco comum no fim da coluna, sem
-   "fixed" nenhum. Fora do app instalado no iPhone, nada muda. */
-@media (max-width: 859px) {
+   "fixed" nenhum. Fora do app instalado no iPhone, nada muda.
+   Só na tela (screen): no papel, a folha A4 tem uns 680 px de largura e caía nesta regra, e a
+   página presa em 100% de altura com overflow escondido saía só com a primeira folha (o estudo
+   da célula impresso no iPhone acabava no meio do primeiro tópico). */
+@media screen and (max-width: 859px) {
   html.app-ios, html.app-ios body { height: 100%; overflow: hidden; }
   html.app-ios body { display: flex; flex-direction: column; padding-bottom: 0; }
   html.app-ios .aplicativo { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
