@@ -89,7 +89,8 @@
     const x = fila().ler(id);
     if (!x) return null;
     const parte = x.partes[0];
-    return { tipo: 'blocos', fonte: parte.fonte, traducao: x.traducao || 'nbv', opcoes: false, modo: 'escrever', daFila: { id: parte.origem, k: parte.k, total: x.total, titulo: x.titulo || '' } };
+    return { tipo: 'blocos', fonte: parte.fonte, traducao: parte.traducao || x.traducao || 'nbv', opcoes: false, modo: 'escrever',
+      daFila: { id: parte.origem, k: parte.k, total: parte.total || x.total, titulo: parte.titulo || x.titulo || '' } };
   }
   function estadoInicial(p) {
     const e = p.estudo && !p.estudo.usado ? p.estudo : null;
@@ -312,7 +313,7 @@
             // a divisão de uma parte que já vinha da fila entra na frente do que esperava
             fila().gravar(p.id, {
               titulo: r.titulo || '', total: n, traducao: st.traducao,
-              partes: partes.slice(1).map((x, i) => ({ origem: id, k: i + 2, fonte: x.fonte })).concat(antes ? antes.partes : []),
+              partes: partes.slice(1).map((x, i) => ({ origem: id, k: i + 2, total: n, titulo: r.titulo || '', traducao: st.traducao, fonte: x.fonte })).concat(antes ? antes.partes : []),
             });
             st.divisao = { id, original: st.fonte, total: n, titulo: r.titulo || '' };
             st.fonte = partes[0].fonte;

@@ -175,7 +175,8 @@
   // segue no preparo, e as outras ficam guardadas neste celular (cc.estudo.proximos.<célula>) até o
   // líder tocar em "Preparar o próximo", quando a primeira da fila abre pronta. Cada uma é salva
   // como um estudo comum, com a mesma regra de sempre (Contas.salvarEstudo).
-  // { v: 1, titulo (o do estudo inteiro), total, traducao, partes: [{ origem (a divisão), k, fonte }] }
+  // { v: 1, titulo, total, traducao (os da divisão mais nova), partes: [{ origem (a divisão), k, total,
+  // titulo (o do estudo inteiro), traducao, fonte }] }
   const chaveProximos = (id) => 'cc.estudo.proximos.' + id;
   const proximos = {
     ler(id) {
@@ -218,7 +219,7 @@
     const anterior = p.combinadoAnterior && p.combinadoAnterior.texto;
     // a parte seguinte de um estudo dividido, guardada neste celular para o próximo encontro
     const fila = p.euPreparoEstudo ? proximos.ler(p.id) : null;
-    const naFila = fila ? '<small class="mesa-fila">A parte ' + esc(fila.partes[0].k) + ' de ' + esc(fila.total) + ' já está guardada para o próximo encontro.</small>' : '';
+    const naFila = fila ? '<small class="mesa-fila">A parte ' + esc(fila.partes[0].k) + ' de ' + esc(fila.partes[0].total || fila.total) + ' já está guardada para o próximo encontro.</small>' : '';
     painel.innerHTML = (linha ? '<p class="passo-dica">' + esc(linha) + '</p>' : '')
       // O estudo que já foi usado num encontro fica guardado: o caminho é preparar o próximo (o
       // servidor faz o mesmo, estudos.mjs, estudoUsado)
