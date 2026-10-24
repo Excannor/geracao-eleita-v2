@@ -78,7 +78,19 @@
     v: 1, base, baseEm, tipo: 'blocos', passo: 1, fonte: '', palavra: '', trecho: { livro: 'Gênesis', cap: '1', vers: '' }, traducao: 'nbv',
     opcoes: true, modo: 'colar', colado: false, coladoWord: false, recusadas: [], perguntas: null, chavePerguntas: '', salvas: null,
     ws: base ? null : { acolhida: '', adoracao: '', testemunho: '' }, combinado: '', deBase: '', deBaseData: '',
+    // divisao: o estudo comprido dividido aqui ({ id, original, total, titulo }: desfazer volta o
+    // original); daFila: a parte que esperava o próximo encontro ({ id, k, total, titulo })
+    divisao: null, daFila: null,
   });
+  // As partes de um estudo dividido que esperam o próximo encontro (estudo-celula.js, proximos).
+  const fila = () => (CC.estudoCelula && CC.estudoCelula.proximos) || { ler: () => null, gravar: () => {}, tirar: () => {} };
+  // O preparo do próximo começa pela primeira parte da fila, quando há.
+  function daFila(id) {
+    const x = fila().ler(id);
+    if (!x) return null;
+    const parte = x.partes[0];
+    return { tipo: 'blocos', fonte: parte.fonte, traducao: x.traducao || 'nbv', opcoes: false, modo: 'escrever', daFila: { id: parte.origem, k: parte.k, total: x.total, titulo: x.titulo || '' } };
+  }
   function estadoInicial(p) {
     const e = p.estudo && !p.estudo.usado ? p.estudo : null;
     const base = e ? e.id : '';
@@ -90,7 +102,7 @@
     if (salvo && (salvo.base || '') === base && (salvo.baseEm === undefined || salvo.baseEm === baseEm)) return salvo;
     if (salvo && base && (salvo.base || '') === base) CC.avisar('O estudo mudou em outro aparelho. O preparo começa da versão salva.');
     const st = estadoVazio(base, baseEm);
-    return e ? Object.assign(st, doEstudo(e)) : st;
+    return e ? Object.assign(st, doEstudo(e)) : Object.assign(st, daFila(p.id) || {});
   }
   // Os campos do preparo a partir de um estudo salvo (o atual, em "Mudar", ou um anterior, em
   // "Usar como base").
@@ -236,6 +248,84 @@
       el.hidden = !(mensagens || []).length;
     };
 
+    // ---------- dividir o estudo comprido em encontros ----------
+    // A nota de quem está preparando uma parte: a parte 1, logo depois de dividir (com "Desfazer a
+    // divisão"), ou a parte que esperava o próximo encontro.
+    function notaDaDivisao() {
+      if (st.divisao) {
+        const seguintes = st.divisao.total === 2 ? 'a parte 2 fica guardada para o próximo encontro' : 'as partes 2 a ' + st.divisao.total + ' ficam guardadas para os próximos encontros';
+        return '<div class="mesa-nota mesa-de-base mesa-dividido" role="status">' + CC.ico('calendario')
+          + '<span><b>Estudo dividido em ' + st.divisao.total + ' encontros.</b> Esta é a parte 1; ' + seguintes + '.</span>'
+          + '<button type="button" class="botao pequeno contorno" data-desfazer-divisao>Desfazer a divisão</button></div>';
+      }
+      if (st.daFila) {
+        return '<p class="mesa-nota mesa-de-base mesa-da-fila">' + CC.ico('calendario') + 'Parte ' + esc(st.daFila.k) + ' de ' + esc(st.daFila.total)
+          + (st.daFila.titulo ? ' de \u201c' + esc(st.daFila.titulo) + '\u201d' : '') + '. Mude o que quiser antes de salvar.</p>';
+      }
+      return '';
+    }
+    function ligarDivisao(painel) {
+      const desfazer = painel.querySelector('[data-desfazer-divisao]');
+      if (!desfazer) return;
+      desfazer.onclick = () => {
+        fila().tirar(p.id, st.divisao.id);
+        st.fonte = st.divisao.original;
+        st.divisao = null;
+        guardar();
+        rolarAoTopo();
+        desenhar();
+        CC.avisar('Pronto: o estudo voltou a ser um só', { tipo: 'certo' });
+      };
+    }
+    // Onde uma parte começa: "no Tópico 5: …", "na Conclusão", "em Efésios 6.12", "em “O amor…”".
+    const ondeComeca = (x) => (x.abre === 'topico' ? 'no ' + x.comeco : x.abre === 'conclusao' ? 'na ' + x.comeco
+      : x.abre === 'versiculo' ? 'em ' + x.comeco : 'em \u201c' + x.comeco + '\u201d');
+    // Por que o estudo não cabe num encontro, em uma frase, ou '' quando cabe.
+    function porQueNaoCabe(r) {
+      const cartoes = r.blocos.filter((b) => b.t === 'versiculo').length;
+      if (r.blocos.length > BLOCOS_MAX) return 'Ele tem ' + r.blocos.length + ' partes, e cada encontro leva até ' + BLOCOS_MAX + '.';
+      if (cartoes > CARTOES_MAX) return 'Ele tem ' + cartoes + ' versículos, e cada encontro leva até ' + CARTOES_MAX + '.';
+      if (r.fonte.length > ESTUDO_MAX || st.fonte.length > ESTUDO_BRUTO_MAX) return 'Ele tem ' + Math.max(r.fonte.length, st.fonte.length).toLocaleString('pt-BR') + ' caracteres, e cada encontro leva até ' + ESTUDO_MAX.toLocaleString('pt-BR') + '.';
+      return '';
+    }
+    // A prévia da divisão, numa folha: cada encontro com o título, onde começa e o tamanho. Só em
+    // "Dividir" o rascunho muda: a parte 1 fica no preparo e as outras vão para a fila.
+    function preverDivisao(r, partes) {
+      const n = partes.length;
+      const encontro = (x, k) => '<section class="mesa-encontro-dividido"><span class="etiqueta">' + (k === 0 ? 'Encontro 1' + PONTO + 'agora' : 'Encontro ' + (k + 1) + PONTO + (k === 1 ? 'o próximo' : 'depois')) + '</span>'
+        + '<b>' + esc(x.titulo) + '</b>'
+        + '<small>' + (k === 0 ? 'Do começo do estudo' : 'Começa ' + esc(ondeComeca(x))) + '</small>'
+        + '<ul class="mesa-resumo"><li>' + plural(x.blocos, 'parte', 'partes') + '</li>' + (x.cartoes ? '<li>' + plural(x.cartoes, 'versículo', 'versículos') + '</li>' : '') + '</ul></section>';
+      CC.folha('<h2>Dividir em ' + n + ' encontros</h2>'
+        + partes.map(encontro).join('')
+        + '<p class="mesa-nota">' + CC.ico('info') + (n === 2 ? 'Você segue com a parte 1. A parte 2 fica guardada neste celular e abre pronta em Preparar o próximo.'
+          : 'Você segue com a parte 1. As outras ficam guardadas neste celular e abrem prontas, uma de cada vez, em Preparar o próximo.') + '</p>'
+        + '<div class="acoes"><button class="botao" data-confirmar-divisao>' + CC.ico('certo') + 'Dividir</button><button class="botao plano" data-fechar>Cancelar</button></div>',
+      {
+        rotulo: 'Dividir em ' + n + ' encontros',
+        rolavel: true,
+        ligar: (folha, fechar) => {
+          folha.querySelector('[data-fechar]').onclick = fechar;
+          folha.querySelector('[data-confirmar-divisao]').onclick = () => {
+            const id = 'd' + Date.now().toString(36);
+            const antes = fila().ler(p.id);
+            // a divisão de uma parte que já vinha da fila entra na frente do que esperava
+            fila().gravar(p.id, {
+              titulo: r.titulo || '', total: n, traducao: st.traducao,
+              partes: partes.slice(1).map((x, i) => ({ origem: id, k: i + 2, fonte: x.fonte })).concat(antes ? antes.partes : []),
+            });
+            st.divisao = { id, original: st.fonte, total: n, titulo: r.titulo || '' };
+            st.fonte = partes[0].fonte;
+            guardar();
+            fechar();
+            rolarAoTopo();
+            passo2();
+            CC.avisar('Pronto: estudo dividido em ' + n + ' encontros', { tipo: 'certo' });
+          };
+        },
+      });
+    }
+
     // ---------- passo 1: o estudo ----------
     const legendaCompleta = '<span>Entre asteriscos: negrito.</span>'
       + '<span>Para um versículo, basta a referência numa linha, como Efésios 6:12. Na próxima tela você confere cada cartão.</span>'
@@ -284,7 +374,8 @@
           + '<p class="passo-dica pequena">A conversa segue o método OIA: observação, interpretação e aplicação.</p></div>' + campoPalavra();
       }
       // a nota de quem começou de um estudo anterior
-      const deBase = st.deBase ? '<p class="mesa-nota mesa-de-base">' + CC.ico('info') + 'Começando do estudo de ' + esc(ddmm(st.deBaseData)) + '. Mude o que quiser antes de salvar.</p>' : '';
+      const deBase = (st.deBase ? '<p class="mesa-nota mesa-de-base">' + CC.ico('info') + 'Começando do estudo de ' + esc(ddmm(st.deBaseData)) + '. Mude o que quiser antes de salvar.</p>' : '')
+        + notaDaDivisao();
       const painel = moldura(1, 'Preparar o estudo', 'O estudo', p.titulo, deBase + '<div class="segmentado" role="group" aria-label="Como vai ser a Palavra" data-tipos' + (st.tipo === 'blocos' && st.colado ? ' hidden' : '') + '>'
         + [['semana', 'Leitura da semana'], ['trecho', 'Um trecho'], ['blocos', 'Eu escrevo']].map(([k, r]) => '<button type="button" data-tipo="' + k + '" aria-pressed="' + (st.tipo === k) + '">' + r + '</button>').join('') + '</div>'
         + corpo
@@ -292,7 +383,9 @@
         + '<div class="acoes"><button class="botao" data-ver>Ver as partes' + CC.ico('avancar') + '</button>'
         + '<button class="botao plano" data-cancelar>Cancelar</button>'
         + (p.estudo && !st.deBase ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '')
-        + (st.deBase ? '<button class="botao plano perigo" data-descartar>Descartar o rascunho</button>' : '') + '</div>');
+        + (st.deBase ? '<button class="botao plano perigo" data-descartar>Descartar o rascunho</button>' : '')
+        + (st.daFila ? '<button class="botao plano perigo" data-descartar-parte>Descartar a parte ' + esc(st.daFila.k) + '</button>' : '') + '</div>');
+      ligarDivisao(painel);
       const q = (s) => painel.querySelector(s);
       painel.querySelectorAll('[data-tipo]').forEach((b) => {
         b.onclick = () => { if (st.tipo !== b.dataset.tipo) { st.tipo = b.dataset.tipo; guardar(); passo1(); } };
@@ -316,6 +409,17 @@
         if (await CC.confirmar({ titulo: 'Descartar o rascunho?', texto: 'O que você escreveu a partir do estudo de ' + ddmm(st.deBaseData) + ' sai deste celular. O estudo de ' + ddmm(st.deBaseData) + ' continua guardado.', acao: 'Descartar', perigo: true }) !== true) return;
         apagarRascunho(p.id);
         CC.substituirRota(apoio.endereco(p.id, 'estudo') + '/' + encodeURIComponent(st.deBase));
+      };
+      const descartarParte = q('[data-descartar-parte]');
+      if (descartarParte) descartarParte.onclick = async () => {
+        const k = st.daFila.k;
+        if (await CC.confirmar({ titulo: 'Descartar a parte ' + k + '?', texto: 'O texto da parte ' + k + ' de \u201c' + st.daFila.titulo + '\u201d sai deste celular.', acao: 'Descartar', perigo: true }) !== true) return;
+        fila().tirar(p.id, st.daFila.id, k);
+        apagarRascunho(p.id);
+        st = estadoInicial(p);
+        guardar();
+        rolarAoTopo();
+        desenhar();
       };
       const ver = q('[data-ver]');
       ver.onclick = () => irPara(2);
@@ -487,6 +591,18 @@
       const nome = nomeDa(st.traducao);
       const cartoes = r.blocos.filter((b) => b.t === 'versiculo').length;
       const erros = errosDe(r);
+      // o estudo que não cabe num encontro: o botão que divide em dois (ou mais), no lugar dos avisos
+      // de teto, que ele resolve
+      const motivo = porQueNaoCabe(r);
+      const partesDivididas = motivo ? R.dividirEmEncontros(r, normalizar(st.fonte).split('\n'), { partes: BLOCOS_MAX, cartoes: CARTOES_MAX, caracteres: ESTUDO_MAX, titulo: TITULO_MAX }) : null;
+      const TETOS = [MSG.partes, MSG.cartoes, MSG.tamanho];
+      const errosNaTela = partesDivididas ? erros.filter((m) => !TETOS.includes(m))
+        : motivo ? erros.concat('Não achei onde dividir sem cortar uma passagem. Separe o texto em dois e prepare um de cada vez.') : erros;
+      const n = partesDivididas ? partesDivididas.length : 0;
+      const avisoDividir = partesDivididas ? '<div class="mesa-aviso mesa-dividir" data-aviso-dividir>' + CC.ico('calendario')
+        + '<b>Este estudo rende ' + n + ' encontros</b>'
+        + '<p>' + esc(motivo) + ' ' + (n === 2 ? 'A parte 2 começa ' + esc(ondeComeca(partesDivididas[1])) + ', perto do meio.' : 'Cada parte começa num ponto que não corta nenhuma passagem.') + '</p>'
+        + '<button type="button" class="botao" data-dividir>' + CC.ico('calendario') + 'Dividir em ' + n + ' encontros</button></div>' : '';
       // o que o app encontrou, contado
       const topicos = r.blocos.filter((b) => b.t === 'topico').length;
       const conclusao = r.blocos.some((b) => b.t === 'conclusao');
@@ -540,7 +656,7 @@
       const todas = [{ rotulo: 'Título', linhas: r.linhaTitulo >= 0 ? [r.linhaTitulo, r.linhaTitulo] : [0, -1],
         html: r.titulo && r.titulo.length <= TITULO_MAX ? '<h2 class="mesa-t1">' + esc(r.titulo) + '</h2>' : '<p class="erro-proposito">' + esc(MSG.titulo) + '</p>' }]
         .concat(partes.map((x) => ({ rotulo: x.rotulo, linhas: linhasDe(x.itens), html: x.itens.map(parteHtml).join('') })));
-      painel.innerHTML = (r.trocas.length ? '<button type="button" class="mesa-aviso" data-ver-troca>' + CC.ico('info') + '<b>Citações trocadas pela ' + esc(nome) + '</b>'
+      painel.innerHTML = notaDaDivisao() + avisoDividir + (r.trocas.length ? '<button type="button" class="mesa-aviso" data-ver-troca>' + CC.ico('info') + '<b>Citações trocadas pela ' + esc(nome) + '</b>'
         + '<p>' + (r.trocas.length === 1 ? 'Seu estudo trazia 1 citação em outra tradução. Agora ela é um cartão com o texto da ' + esc(nome) + ', palavra por palavra.'
           : 'Seu estudo trazia ' + r.trocas.length + ' citações em outra tradução. Agora cada uma é um cartão com o texto da ' + esc(nome) + ', palavra por palavra.') + '</p>'
         + '<span class="ir">Ver a primeira troca' + CC.ico('direita') + '</span></button>' : '')
@@ -550,9 +666,12 @@
           + '<button type="button" class="botao pequeno contorno" data-mudar-parte="' + k + '" aria-label="Mudar: ' + esc(x.rotulo) + '">' + CC.ico('caneta') + 'Mudar</button></header>'
           + '<div class="mesa-estudo">' + x.html + '</div></section>').join('')
         + acoes2;
-      mostrarErro(painel, erros);
+      mostrarErro(painel, errosNaTela);
       const q = (s) => painel.querySelector(s);
       q('[data-continuar]').disabled = erros.length > 0;
+      ligarDivisao(painel);
+      const dividir = q('[data-dividir]');
+      if (dividir) dividir.onclick = () => preverDivisao(r, partesDivididas);
       q('[data-continuar]').onclick = () => irPara(3);
       q('[data-voltar-texto]').onclick = () => irPara(1);
       const verTroca = q('[data-ver-troca]');
@@ -885,11 +1004,13 @@
         return;
       }
       apagarRascunho(p.id);
+      // a parte que esperava o próximo encontro sai da fila: agora é o estudo da célula
+      if (st.daFila) fila().tirar(p.id, st.daFila.id, st.daFila.k);
       // a lista de estudos anteriores muda (o atual de antes entra nela)
       if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
       await apoio.carregar();
       CC.substituirRota(apoio.endereco(p.id, 'estudo'));
-      CC.avisar('Estudo salvo', { tipo: 'certo' });
+      CC.avisar(!st.divisao ? 'Estudo salvo' : st.divisao.total === 2 ? 'Estudo salvo. A parte 2 fica para o próximo encontro.' : 'Estudo salvo. As outras partes ficam para os próximos encontros.', { tipo: 'certo' });
     }
 
     desenhar();

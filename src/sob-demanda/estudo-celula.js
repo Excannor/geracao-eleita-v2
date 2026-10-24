@@ -170,6 +170,34 @@
       + R.comoBlocos(e, sem, versiculos).map((b) => R.blocoEmHtml(b, { cartao: (c) => cartaoDaParte(c, textos, sigla, versiculos) })).join('') + '</div>';
   }
 
+  // ---------- as partes que esperam o próximo encontro ----------
+  // O estudo comprido dividido no preparo (estudo-preparo.js, "Dividir em 2 encontros"): a parte 1
+  // segue no preparo, e as outras ficam guardadas neste celular (cc.estudo.proximos.<célula>) até o
+  // líder tocar em "Preparar o próximo", quando a primeira da fila abre pronta. Cada uma é salva
+  // como um estudo comum, com a mesma regra de sempre (Contas.salvarEstudo).
+  // { v: 1, titulo (o do estudo inteiro), total, traducao, partes: [{ origem (a divisão), k, fonte }] }
+  const chaveProximos = (id) => 'cc.estudo.proximos.' + id;
+  const proximos = {
+    ler(id) {
+      try {
+        const x = JSON.parse(localStorage.getItem(chaveProximos(id)) || 'null');
+        return x && x.v === 1 && Array.isArray(x.partes) && x.partes.length ? x : null;
+      } catch (e) { return null; }
+    },
+    gravar(id, x) {
+      try {
+        if (x && x.partes && x.partes.length) localStorage.setItem(chaveProximos(id), JSON.stringify(Object.assign({}, x, { v: 1, em: new Date().toISOString() })));
+        else localStorage.removeItem(chaveProximos(id));
+      } catch (e) { /* segue */ }
+    },
+    // tira as partes que vieram de uma divisão (desfazer) ou só uma delas (salva ou descartada)
+    tirar(id, origem, k) {
+      const x = proximos.ler(id);
+      if (!x) return;
+      proximos.gravar(id, Object.assign(x, { partes: x.partes.filter((y) => !(y.origem === origem && (k === undefined || y.k === k))) }));
+    },
+  };
+
   // ---------- a aba Estudo ----------
   async function aba(painel, p, apoio, aindaAqui) {
     const e = p.estudo;
@@ -188,11 +216,14 @@
     const palavra = palavraHtml(p, e, sem, textos, sigla, versiculos, quem, apoio);
     const perguntas = legado ? [] : R.perguntasDe(e, sem);
     const anterior = p.combinadoAnterior && p.combinadoAnterior.texto;
+    // a parte seguinte de um estudo dividido, guardada neste celular para o próximo encontro
+    const fila = p.euPreparoEstudo ? proximos.ler(p.id) : null;
+    const naFila = fila ? '<small class="mesa-fila">A parte ' + esc(fila.partes[0].k) + ' de ' + esc(fila.total) + ' já está guardada para o próximo encontro.</small>' : '';
     painel.innerHTML = (linha ? '<p class="passo-dica">' + esc(linha) + '</p>' : '')
       // O estudo que já foi usado num encontro fica guardado: o caminho é preparar o próximo (o
       // servidor faz o mesmo, estudos.mjs, estudoUsado)
       + (p.euPreparoEstudo ? '<div class="mesa-lider">' + CC.ico('caneta') + '<span><b>' + (e.criadoPor === (CC.quem || {}).usuario ? 'Você preparou este estudo' : 'O estudo desta célula') + '</b>'
-        + '<small>' + (e.usado ? 'Ele já foi usado num encontro.' : 'Só o líder pode mudar o estudo.') + '</small></span>'
+        + '<small>' + (e.usado ? 'Ele já foi usado num encontro.' : 'Só o líder pode mudar o estudo.') + '</small>' + naFila + '</span>'
         + '<button type="button" class="botao pequeno contorno" data-mudar>' + (e.usado ? 'Preparar o próximo' : 'Mudar o estudo') + '</button></div>' : '')
       + (e.tipo === 'blocos' || e.tipo === 'trecho' ? noPlanoHtml(refs) : '')
       + secaoW('Acolhida', (anterior ? combinadoLembrado(anterior) : '') + '<p>' + esc(ws.acolhida) + '</p>')
@@ -631,5 +662,5 @@
     });
   }
 
-  CC.estudoCelula = { aba, modoEncontro, mandarNoGrupo, cartaoComMais, ligarMais, textosDe, anteriores, anterior, paraQuemFaltou, imprimir, solto, esquecer };
+  CC.estudoCelula = { aba, modoEncontro, mandarNoGrupo, cartaoComMais, ligarMais, textosDe, anteriores, anterior, paraQuemFaltou, imprimir, solto, esquecer, proximos };
 })(window.CC);

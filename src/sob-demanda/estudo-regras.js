@@ -213,7 +213,8 @@
   // blocos contam a partir dela). Nada se perde: cada parte leva as linhas do texto como foram
   // escritas, do começo do seu primeiro bloco até antes do primeiro bloco da parte seguinte (uma
   // seção "Perguntas" fica na parte em que estava), com o título e "(parte N)" na primeira linha.
-  // Devolve [{ titulo, fonte, blocos, cartoes, caracteres, comeco }], ou null quando nenhuma
+  // Devolve [{ titulo, fonte, blocos, cartoes, caracteres, comeco, abre (o tipo do primeiro bloco),
+  // primeiro (o índice dele) }], ou null quando nenhuma
   // divisão cabe nos tetos (uma parte sem lugar para cortar maior que o teto).
   function dividirEmEncontros(leitura, linhas, tetos) {
     const t = Object.assign({}, TETOS_DO_ESTUDO, tetos || {});
@@ -272,7 +273,7 @@
         while (corpo.length && !corpo[corpo.length - 1].trim()) corpo.pop();
         const titulo = tituloDaParte(nome, k + 1, t.titulo);
         const fonte = [titulo].concat(corpo).join('\n');
-        partes.push({ titulo, fonte, blocos: b - a, cartoes: somaCartoes[b] - somaCartoes[a], caracteres: fonte.length, comeco: comecoDe(blocos[a]), primeiro: a });
+        partes.push({ titulo, fonte, blocos: b - a, cartoes: somaCartoes[b] - somaCartoes[a], caracteres: fonte.length, comeco: comecoDe(blocos[a]), abre: blocos[a].t, primeiro: a });
       }
       return partes;
     }

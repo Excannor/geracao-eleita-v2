@@ -132,3 +132,17 @@ div.mesa-aviso { cursor: auto; padding-bottom: 18px; }
 .mesa-combinado-campo .mesa-limite { margin: 4px 0 0; font-size: .8125rem; line-height: 1.45; }
 .mesa-combinado-campo textarea { box-sizing: border-box; width: 100%; min-height: 76px; margin-top: 6px; padding: 12px 14px; font-size: 1rem; line-height: 1.45; resize: none; }
 .mesa-de-base { padding: 12px 14px; border-radius: 18px; background: var(--salvia-palido); color: var(--tinta-forte); }
+/* o estudo que não cabe num encontro: o aviso com o botão que divide (passo 2), a nota de quem
+   prepara uma parte e a prévia da divisão, na folha */
+.mesa-dividir { cursor: auto; padding-bottom: 18px; }
+.mesa-dividir > .botao { grid-column: 1 / -1; width: 100%; min-height: 48px; margin-top: 10px; }
+.mesa-dividir > .botao svg { width: 20px; height: 20px; }
+.mesa-dividido { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; margin: 0; }
+.mesa-dividido b { color: var(--tinta-forte); font-weight: 800; }
+.mesa-dividido .botao { grid-column: 1 / -1; width: 100%; min-height: 44px; background: var(--cartao); }
+.mesa-encontro-dividido { display: grid; gap: 4px; margin: 0 0 10px; padding: 14px 16px; border-radius: 18px; background: var(--campo); }
+.mesa-encontro-dividido .etiqueta { color: var(--salvia-texto); font-size: .8125rem; }
+.mesa-encontro-dividido b { color: var(--tinta-forte); font-size: 1rem; font-weight: 800; line-height: 1.35; text-wrap: balance; }
+.mesa-encontro-dividido small { color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
+.mesa-encontro-dividido .mesa-resumo { margin-top: 6px; }
+.mesa-encontro-dividido .mesa-resumo li { background: var(--cartao); }
