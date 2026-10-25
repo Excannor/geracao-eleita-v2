@@ -130,7 +130,12 @@ await av('document.getElementById("botao-comecar").click()');
 await esperar('!document.getElementById("tela-cadastro").hidden');
 const preencher = (id, v) => av('(() => { const e = document.getElementById(' + JSON.stringify(id) + '); e.value = ' + JSON.stringify(v) + '; e.dispatchEvent(new Event("input", { bubbles: true })); })()');
 await preencher('nome', 'Sheyla');
+caso('data de nascimento no Android', 'campo digitável com teclado numérico, sem calendário nativo',
+  'type=' + (await av('document.getElementById("nascimento").type')) + ', inputmode=' + (await av('document.getElementById("nascimento").inputMode')),
+  (await av('document.getElementById("nascimento").type')) === 'text' && (await av('document.getElementById("nascimento").inputMode')) === 'numeric');
 await preencher('nascimento', '04032001');
+caso('máscara da data de nascimento', 'DD/MM/AAAA', 'valor=' + (await av('document.getElementById("nascimento").value')),
+  (await av('document.getElementById("nascimento").value')) === '04/03/2001');
 await av('document.getElementById("botao-cadastro").click()');
 await preencher('email', 'sheyla@exemplo.com');
 await av('document.getElementById("botao-cadastro").click()');

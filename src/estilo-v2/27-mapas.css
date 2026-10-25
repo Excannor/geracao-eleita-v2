@@ -66,6 +66,9 @@
 .grupo-mapas { margin: 16px 0 8px; padding: 0 4px; color: var(--folha-tinta-fraca); font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .mapas-nenhum { margin: 14px 4px 0; color: var(--folha-tinta-fraca); }
 .grade-mapas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+/* Quando todos os mapas estão prontos, não existe mais o rótulo "Prontos" para separar
+   a grade do seletor. A primeira linha ainda precisa respirar abaixo dele. */
+.grades-mapas > .grade-mapas:first-child { margin-top: 8px; }
 .celula-mapa {
   position: relative; display: flex; flex-direction: column; justify-content: center; gap: 1px;
   min-height: 56px; padding: 9px 36px 9px 14px; border-radius: 18px;

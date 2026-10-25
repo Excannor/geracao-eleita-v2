@@ -101,6 +101,18 @@ ok(mapas.length === indice.publicados.length, 'só os mapas publicados no índic
 await cmd('Page.navigate', { url: base + '#/explorar' });
 ok(await esperar('!!document.querySelector(".cartao-mapas")'), 'o Explorar mostra o cartão "Mapas dos livros"');
 await av('(() => { const a = document.getElementById("aviso-flutuante"); if (a) a.remove(); })()');
+
+// Digitar na busca troca a rota e filtra os textos, mas o campo precisa continuar sendo o
+// mesmo nó focado. Recriá-lo fecha o teclado virtual do Android depois da primeira letra.
+await av('(() => { const c = document.getElementById("campo-busca"); window.__campoBuscaOriginal = c; c.focus(); c.value = "s"; c.dispatchEvent(new Event("input", { bubbles: true })); })()');
+ok(await esperar('location.hash === "#/busca/s" && document.getElementById("campo-busca") === window.__campoBuscaOriginal && document.activeElement === window.__campoBuscaOriginal'),
+  'a primeira letra abre a busca sem substituir o campo nem perder o foco');
+await av('(() => { const c = window.__campoBuscaOriginal; c.value = "sa"; c.dispatchEvent(new Event("input", { bubbles: true })); })()');
+ok(await esperar('location.hash === "#/busca/sa" && document.getElementById("campo-busca") === window.__campoBuscaOriginal && document.activeElement === window.__campoBuscaOriginal && window.__campoBuscaOriginal.value === "sa"'),
+  'a segunda letra atualiza os resultados com o mesmo campo focado (o teclado permanece aberto)');
+await av('location.hash = "#/explorar"');
+await esperar('!!document.querySelector(".cartao-mapas")');
+
 ok(await av('document.querySelectorAll(".cartao-mapas").length === 1 && !document.querySelector("#mapas-dos-livros, [data-ir-mapas], .grupo-mapas + .grade-mapas:not(.cartao-mapas *)")'),
   'é um cartão só: a seção do fim do Explorar e o atalho que rolava até ela saíram');
 ok(await av('(() => { const c = document.querySelector(".cartao-mapas"); const antes = c.previousElementSibling; return !document.querySelector(".notas-de-hoje") || antes === document.querySelector(".notas-de-hoje"); })()'),
@@ -132,6 +144,10 @@ ok(await av('JSON.stringify([CC.rolagemY(), Math.round(document.querySelector("'
 // o testamento do livro de hoje, os prontos primeiro e os "em breve" depois
 ok(await av('document.querySelector("[data-testamento=at]").getAttribute("aria-pressed") === "true" && document.querySelector("[data-testamento=nt]").getAttribute("aria-pressed") === "false"'),
   'começa no testamento do livro de hoje (Gênesis: Antigo)');
+if (mapas.length === 66) {
+  const folgaDaGrade = await av('Math.round(document.querySelector(".grade-mapas").getBoundingClientRect().top - document.querySelector(".segmentos-mapas").getBoundingClientRect().bottom)');
+  ok(folgaDaGrade >= 8, 'a grade não fica colada ao seletor quando os 66 mapas estão prontos (' + folgaDaGrade + 'px)');
+}
 const ordemOk = (n) => av('(() => { const c = [...document.querySelectorAll(".cartao-mapas .celula-mapa")]; const i = c.findIndex((x) => x.classList.contains("breve")); return c.length === ' + n + ' && (i < 0 || c.slice(i).every((x) => x.classList.contains("breve") && x.tagName !== "A")) && c.slice(0, i < 0 ? c.length : i).every((x) => x.tagName === "A"); })()');
 ok(await ordemOk(39), 'a grade mostra só os 39 do Antigo Testamento, os prontos primeiro e os "em breve" depois, sem link');
 ok(await av('!!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/isaias"]\') && !!document.querySelector(\'.cartao-mapas a.celula-mapa[href="#/mapa/genesis"]\')'), 'Gênesis e Isaías viram link para o mapa');

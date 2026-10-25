@@ -446,16 +446,14 @@
 
   CC.ligarBusca = function (raiz) {
     const campo = raiz.querySelector('#campo-busca');
-    if (!campo) return;
+    if (!campo || campo.dataset.buscaLigada) return;
+    campo.dataset.buscaLigada = '1';
     let atraso;
     campo.addEventListener('input', () => {
       clearTimeout(atraso);
       atraso = setTimeout(() => {
         const q = campo.value.trim();
-        const fim = campo.selectionStart;
         location.hash = q ? '#/busca/' + encodeURIComponent(q) : '#/explorar';
-        const novo = document.getElementById('campo-busca');
-        if (novo) { novo.focus(); try { novo.setSelectionRange(fim, fim); } catch (e) { /* segue */ } }
       }, 220);
     });
   };
@@ -473,8 +471,7 @@
 
     const meus = q.length < 2 ? [] : CC.meusTextos().filter((x) => CC.semAcento(x.texto).includes(q));
 
-    raiz.innerHTML = '<div class="folha-perfil">' + CC.campoBusca(consulta) + '</div>'
-      + (meus.length
+    const resultados = (meus.length
         ? CC.tituloSecao('No que você escreveu', CC.plural(meus.length, 'trecho', 'trechos'))
           + '<div class="grade">' + meus.slice(0, 12).map((x) =>
             '<a class="item" href="' + x.href + '"><span class="sub">' + CC.esc(x.onde) + '</span>'
@@ -486,6 +483,26 @@
           + '<div class="grade">' + achados.map(CC.itemNota).join('') + '</div>'
         : (q.length < 2 ? '<div class="vazio">Digite pelo menos duas letras.</div>'
           : '<div class="vazio">Não achei nada com “' + CC.esc(consulta) + '”. Tente outra palavra.</div>'));
+
+    // No celular, trocar o innerHTML da tela destruía o input que estava focado. O Android
+    // fechava o teclado já na primeira letra. Na passagem Explorar → Busca e nas letras
+    // seguintes, conservamos exatamente o mesmo campo e redesenhamos apenas seus irmãos.
+    let campo = raiz.querySelector('#campo-busca');
+    const caixa = campo && campo.closest('.busca-caixa');
+    const folha = caixa && caixa.closest('.folha-perfil');
+    const preservarCampo = campo && document.activeElement === campo && folha && folha.parentElement === raiz;
+    if (preservarCampo) {
+      [...folha.childNodes].forEach((no) => { if (no !== caixa) no.remove(); });
+      [...raiz.childNodes].forEach((no) => { if (no !== folha) no.remove(); });
+      raiz.insertAdjacentHTML('beforeend', resultados);
+      if (campo.value.trim() !== consulta) {
+        campo.value = consulta;
+        try { campo.setSelectionRange(consulta.length, consulta.length); } catch (e) { /* segue */ }
+      }
+    } else {
+      raiz.innerHTML = '<div class="folha-perfil">' + CC.campoBusca(consulta) + '</div>' + resultados;
+      campo = raiz.querySelector('#campo-busca');
+    }
     CC.ligarBusca(raiz);
     CC.inseparavel(raiz);
   };

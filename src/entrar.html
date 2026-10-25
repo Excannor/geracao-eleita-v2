@@ -961,7 +961,7 @@
       if (Array.from($('nome').value.trim()).length > 20) return erro($('nome'), 'O nome pode ter até 20 caracteres.');
       var d = dataIso($('nascimento').value);
       var hoje = new Date().toISOString().slice(0, 10);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= hoje) return erro($('nascimento'), 'Confira a data de nascimento.');
+      if (!d || d >= hoje) return erro($('nascimento'), 'Confira a data no formato DD/MM/AAAA.');
       if (d > somaAnos(hoje, -12)) return erro($('nascimento'), 'O Geração Eleita é para quem tem 12 anos ou mais.');
     }
     if (n === 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim())) return erro($('email'), 'Esse e-mail não parece certo.');
